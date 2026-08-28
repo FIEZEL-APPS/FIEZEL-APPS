@@ -5701,7 +5701,7 @@
       },
       "question": "Kalimat mana yang maknanya sama dengan “My hands are cold because I am afraid”?",
       "options": [
-        "She holds her mother hand",
+        "She holds her mother's hand",
         "Her body shows her fear",
         "She forgets her gloves at home",
         "The clinic room is very cold"
@@ -8914,7 +8914,7 @@
       "maxReplays": 2,
       "pedagogy": {
         "focus": "accurate decoding and word segmentation",
-        "scenario": "A weak internet connection — online class from his uncle house",
+        "scenario": "A weak internet connection — online class from his uncle's house",
         "character": "Krisna"
       },
       "privacy": {
@@ -8934,12 +8934,12 @@
       "schema": "fiezel-listening-item-v1",
       "level": "A2",
       "mode": "gist",
-      "script": "My name is Krisna. My internet at home is weak, so during online lessons I go to my uncle house. His connection is much better and he lets me use the small back room. I only have to be there before eight, because he locks the gate at that time.",
+      "script": "My name is Krisna. My internet at home is weak, so during online lessons I go to my uncle's house. His connection is much better and he lets me use the small back room. I only have to be there before eight, because he locks the gate at that time.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
         "focus": "main idea",
-        "scenario": "A weak internet connection — online class from his uncle house",
+        "scenario": "A weak internet connection — online class from his uncle's house",
         "character": "Krisna"
       },
       "privacy": {
@@ -8965,12 +8965,12 @@
       "schema": "fiezel-listening-item-v1",
       "level": "A2",
       "mode": "detail",
-      "script": "My name is Krisna. My internet at home is weak, so during online lessons I go to my uncle house. His connection is much better and he lets me use the small back room. I only have to be there before eight, because he locks the gate at that time.",
+      "script": "My name is Krisna. My internet at home is weak, so during online lessons I go to my uncle's house. His connection is much better and he lets me use the small back room. I only have to be there before eight, because he locks the gate at that time.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
         "focus": "specific detail",
-        "scenario": "A weak internet connection — online class from his uncle house",
+        "scenario": "A weak internet connection — online class from his uncle's house",
         "character": "Krisna"
       },
       "privacy": {
@@ -8996,12 +8996,12 @@
       "schema": "fiezel-listening-item-v1",
       "level": "A2",
       "mode": "inference",
-      "script": "My name is Krisna. My internet at home is weak, so during online lessons I go to my uncle house. His connection is much better and he lets me use the small back room. I only have to be there before eight, because he locks the gate at that time.",
+      "script": "My name is Krisna. My internet at home is weak, so during online lessons I go to my uncle's house. His connection is much better and he lets me use the small back room. I only have to be there before eight, because he locks the gate at that time.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
         "focus": "inference",
-        "scenario": "A weak internet connection — online class from his uncle house",
+        "scenario": "A weak internet connection — online class from his uncle's house",
         "character": "Krisna"
       },
       "privacy": {
@@ -9027,12 +9027,12 @@
       "schema": "fiezel-listening-item-v1",
       "level": "A2",
       "mode": "attitude",
-      "script": "My name is Krisna. My internet at home is weak, so during online lessons I go to my uncle house. His connection is much better and he lets me use the small back room. I only have to be there before eight, because he locks the gate at that time.",
+      "script": "My name is Krisna. My internet at home is weak, so during online lessons I go to my uncle's house. His connection is much better and he lets me use the small back room. I only have to be there before eight, because he locks the gate at that time.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
         "focus": "speaker's attitude or purpose",
-        "scenario": "A weak internet connection — online class from his uncle house",
+        "scenario": "A weak internet connection — online class from his uncle's house",
         "character": "Krisna"
       },
       "privacy": {
@@ -9058,12 +9058,12 @@
       "schema": "fiezel-listening-item-v1",
       "level": "A2",
       "mode": "paraphrase",
-      "script": "My name is Krisna. My internet at home is weak, so during online lessons I go to my uncle house. His connection is much better and he lets me use the small back room. I only have to be there before eight, because he locks the gate at that time.",
+      "script": "My name is Krisna. My internet at home is weak, so during online lessons I go to my uncle's house. His connection is much better and he lets me use the small back room. I only have to be there before eight, because he locks the gate at that time.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
         "focus": "paraphrase recognition",
-        "scenario": "A weak internet connection — online class from his uncle house",
+        "scenario": "A weak internet connection — online class from his uncle's house",
         "character": "Krisna"
       },
       "privacy": {
@@ -9474,7 +9474,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "A2",
       "mode": "gist",
-      "script": "I am Nabila. I applied for a scholarship and I sent everything by email last Monday. This morning the office called me because one paper was missing. I have to bring my parents income letter before Friday, or my application will not be read.",
+      "script": "I am Nabila. I applied for a scholarship and I sent everything by email last Monday. This morning the office called me because one paper was missing. I have to bring my parents' income letter before Friday, or my application will not be read.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -9505,7 +9505,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "A2",
       "mode": "detail",
-      "script": "I am Nabila. I applied for a scholarship and I sent everything by email last Monday. This morning the office called me because one paper was missing. I have to bring my parents income letter before Friday, or my application will not be read.",
+      "script": "I am Nabila. I applied for a scholarship and I sent everything by email last Monday. This morning the office called me because one paper was missing. I have to bring my parents' income letter before Friday, or my application will not be read.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -9536,7 +9536,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "A2",
       "mode": "inference",
-      "script": "I am Nabila. I applied for a scholarship and I sent everything by email last Monday. This morning the office called me because one paper was missing. I have to bring my parents income letter before Friday, or my application will not be read.",
+      "script": "I am Nabila. I applied for a scholarship and I sent everything by email last Monday. This morning the office called me because one paper was missing. I have to bring my parents' income letter before Friday, or my application will not be read.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -9567,7 +9567,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "A2",
       "mode": "attitude",
-      "script": "I am Nabila. I applied for a scholarship and I sent everything by email last Monday. This morning the office called me because one paper was missing. I have to bring my parents income letter before Friday, or my application will not be read.",
+      "script": "I am Nabila. I applied for a scholarship and I sent everything by email last Monday. This morning the office called me because one paper was missing. I have to bring my parents' income letter before Friday, or my application will not be read.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -9598,7 +9598,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "A2",
       "mode": "paraphrase",
-      "script": "I am Nabila. I applied for a scholarship and I sent everything by email last Monday. This morning the office called me because one paper was missing. I have to bring my parents income letter before Friday, or my application will not be read.",
+      "script": "I am Nabila. I applied for a scholarship and I sent everything by email last Monday. This morning the office called me because one paper was missing. I have to bring my parents' income letter before Friday, or my application will not be read.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -14332,7 +14332,7 @@
       "privacy": {
         "rawLearnerResponseRequiredForPersistence": false
       },
-      "question": "What can we understand about the interviewer reaction?",
+      "question": "What can we understand about the interviewer's reaction?",
       "options": [
         "She had already decided to refuse Aisyah",
         "She wanted to see the certificates first",
@@ -14543,7 +14543,7 @@
       "privacy": {
         "rawLearnerResponseRequiredForPersistence": false
       },
-      "question": "What is Bagus attitude towards the owner?",
+      "question": "What is Bagus's attitude towards the owner?",
       "options": [
         "He believes the cafe owner is dishonest",
         "He thinks the owner should move the cafe",
@@ -15157,7 +15157,7 @@
       "privacy": {
         "rawLearnerResponseRequiredForPersistence": false
       },
-      "question": "What does the colleague remark suggest?",
+      "question": "What does the colleague's remark suggest?",
       "options": [
         "Farah should stop cycling to the office",
         "Parts without locks are the easiest targets",
@@ -15433,12 +15433,12 @@
       "question": "What is Hafiz mainly talking about?",
       "options": [
         "Older people who never listen to community radio",
-        "How a listener message changed his radio program",
+        "How a listener's message changed his radio program",
         "A listener who wanted to take over the station",
         "A night program that the station canceled"
       ],
       "answerIndex": 1,
-      "explain": "Sepanjang audio, Hafiz terutama membicarakan hal ini — jadi jawaban yang benar: “How a listener message changed his radio program”.",
+      "explain": "Sepanjang audio, Hafiz terutama membicarakan hal ini — jadi jawaban yang benar: “How a listener's message changed his radio program”.",
       "scoring": {
         "metric": "exact_choice"
       },
@@ -17267,7 +17267,7 @@
       "privacy": {
         "rawLearnerResponseRequiredForPersistence": false
       },
-      "question": "What changed Ricky mind?",
+      "question": "What changed Ricky's mind?",
       "options": [
         "The result being changed later",
         "Watching the recording of the debate",
@@ -18442,13 +18442,13 @@
       },
       "question": "What is Yasmin mainly talking about?",
       "options": [
-        "Weighing her grandmother recipes into a notebook before they are lost",
+        "Weighing her grandmother's recipes into a notebook before they are lost",
         "A grandmother who has written down all of her own recipes",
         "A notebook that she bought for her grandmother as a small gift",
         "A cooking scale that she sold to her family after using it once"
       ],
       "answerIndex": 0,
-      "explain": "Sepanjang audio, Yasmin terutama membicarakan hal ini — jadi jawaban yang benar: “Weighing her grandmother recipes into a notebook before they are lost”.",
+      "explain": "Sepanjang audio, Yasmin terutama membicarakan hal ini — jadi jawaban yang benar: “Weighing her grandmother's recipes into a notebook before they are lost”.",
       "scoring": {
         "metric": "exact_choice"
       },
@@ -18502,7 +18502,7 @@
       "privacy": {
         "rawLearnerResponseRequiredForPersistence": false
       },
-      "question": "What does her grandmother request show?",
+      "question": "What does her grandmother's request show?",
       "options": [
         "She wants to sell the recipes",
         "She has forgotten the recipes",
@@ -19226,11 +19226,11 @@
       "options": [
         "A weak internet connection",
         "The tablet being far too old to use",
-        "His father fear of doing damage",
-        "His father poor eyesight"
+        "His father's fear of doing damage",
+        "His father's poor eyesight"
       ],
       "answerIndex": 2,
-      "explain": "Jawaban ini tidak diucapkan langsung, tetapi petunjuk dalam audio mengarah ke kesimpulan: “His father fear of doing damage”.",
+      "explain": "Jawaban ini tidak diucapkan langsung, tetapi petunjuk dalam audio mengarah ke kesimpulan: “His father's fear of doing damage”.",
       "scoring": {
         "metric": "exact_choice"
       },
@@ -19433,7 +19433,7 @@
       "privacy": {
         "rawLearnerResponseRequiredForPersistence": false
       },
-      "question": "How does Deva treat the coach comment?",
+      "question": "How does Deva treat the coach's comment?",
       "options": [
         "As proof that the trial was unfair",
         "As a reason to stop playing",
@@ -19973,7 +19973,7 @@
       "privacy": {
         "rawLearnerResponseRequiredForPersistence": false
       },
-      "question": "What is Gading attitude towards the criticism?",
+      "question": "What is Gading's attitude towards the criticism?",
       "options": [
         "He still agrees with the critics",
         "He is angry with his neighbors",
@@ -20513,7 +20513,7 @@
       "privacy": {
         "rawLearnerResponseRequiredForPersistence": false
       },
-      "question": "What did the other students reaction show?",
+      "question": "What did the other students' reaction show?",
       "options": [
         "His difficulty was widely shared",
         "He was the only one struggling",
@@ -21357,7 +21357,7 @@
       "privacy": {
         "rawLearnerResponseRequiredForPersistence": false
       },
-      "question": "What does Adam imply about his colleagues behavior?",
+      "question": "What does Adam imply about his colleagues' behavior?",
       "options": [
         "They do not understand how the dashboard works",
         "They are working much harder than before",
@@ -22263,7 +22263,7 @@
       "privacy": {
         "rawLearnerResponseRequiredForPersistence": false
       },
-      "question": "What is Fira attitude towards the local shop owners?",
+      "question": "What is Fira's attitude towards the local shop owners?",
       "options": [
         "They should be excluded from the meeting",
         "They have already been proved right",
@@ -24338,13 +24338,13 @@
       },
       "question": "What does Rosa ask about first?",
       "options": [
-        "The shape of the patient day",
+        "The shape of the patient's day",
         "The price of the medicine",
         "The name of their doctor",
         "Their previous prescriptions"
       ],
       "answerIndex": 0,
-      "explain": "Detail ini disebutkan langsung di audio: “The shape of the patient day”.",
+      "explain": "Detail ini disebutkan langsung di audio: “The shape of the patient's day”.",
       "scoring": {
         "metric": "exact_choice"
       },
@@ -28866,7 +28866,7 @@
       "privacy": {
         "rawLearnerResponseRequiredForPersistence": false
       },
-      "question": "What was the mentor advice?",
+      "question": "What was the mentor's advice?",
       "options": [
         "To ignore the state of the market",
         "To turn down most opportunities",
@@ -29544,7 +29544,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C1",
       "mode": "gist",
-      "script": "I am Hyewon. I now use a language tool for first drafts, and my output has roughly doubled while my satisfaction has fallen. Editing something adequate is faster than writing something from nothing, but it starts me inside somebody else structure. What I have started doing is writing my own outline before I let the tool near the page, which costs twenty minutes and gives me back the part of the work I actually wanted.",
+      "script": "I am Hyewon. I now use a language tool for first drafts, and my output has roughly doubled while my satisfaction has fallen. Editing something adequate is faster than writing something from nothing, but it starts me inside somebody else's structure. What I have started doing is writing my own outline before I let the tool near the page, which costs twenty minutes and gives me back the part of the work I actually wanted.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -29575,7 +29575,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C1",
       "mode": "detail",
-      "script": "I am Hyewon. I now use a language tool for first drafts, and my output has roughly doubled while my satisfaction has fallen. Editing something adequate is faster than writing something from nothing, but it starts me inside somebody else structure. What I have started doing is writing my own outline before I let the tool near the page, which costs twenty minutes and gives me back the part of the work I actually wanted.",
+      "script": "I am Hyewon. I now use a language tool for first drafts, and my output has roughly doubled while my satisfaction has fallen. Editing something adequate is faster than writing something from nothing, but it starts me inside somebody else's structure. What I have started doing is writing my own outline before I let the tool near the page, which costs twenty minutes and gives me back the part of the work I actually wanted.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -29606,7 +29606,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C1",
       "mode": "inference",
-      "script": "I am Hyewon. I now use a language tool for first drafts, and my output has roughly doubled while my satisfaction has fallen. Editing something adequate is faster than writing something from nothing, but it starts me inside somebody else structure. What I have started doing is writing my own outline before I let the tool near the page, which costs twenty minutes and gives me back the part of the work I actually wanted.",
+      "script": "I am Hyewon. I now use a language tool for first drafts, and my output has roughly doubled while my satisfaction has fallen. Editing something adequate is faster than writing something from nothing, but it starts me inside somebody else's structure. What I have started doing is writing my own outline before I let the tool near the page, which costs twenty minutes and gives me back the part of the work I actually wanted.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -29637,7 +29637,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C1",
       "mode": "attitude",
-      "script": "I am Hyewon. I now use a language tool for first drafts, and my output has roughly doubled while my satisfaction has fallen. Editing something adequate is faster than writing something from nothing, but it starts me inside somebody else structure. What I have started doing is writing my own outline before I let the tool near the page, which costs twenty minutes and gives me back the part of the work I actually wanted.",
+      "script": "I am Hyewon. I now use a language tool for first drafts, and my output has roughly doubled while my satisfaction has fallen. Editing something adequate is faster than writing something from nothing, but it starts me inside somebody else's structure. What I have started doing is writing my own outline before I let the tool near the page, which costs twenty minutes and gives me back the part of the work I actually wanted.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -29668,7 +29668,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C1",
       "mode": "paraphrase",
-      "script": "I am Hyewon. I now use a language tool for first drafts, and my output has roughly doubled while my satisfaction has fallen. Editing something adequate is faster than writing something from nothing, but it starts me inside somebody else structure. What I have started doing is writing my own outline before I let the tool near the page, which costs twenty minutes and gives me back the part of the work I actually wanted.",
+      "script": "I am Hyewon. I now use a language tool for first drafts, and my output has roughly doubled while my satisfaction has fallen. Editing something adequate is faster than writing something from nothing, but it starts me inside somebody else's structure. What I have started doing is writing my own outline before I let the tool near the page, which costs twenty minutes and gives me back the part of the work I actually wanted.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -29739,7 +29739,7 @@
       "options": [
         "Writing an honest review of work by somebody he respects",
         "A paper that he submitted anonymously under a different name",
-        "An editor who asked him to reject a colleague paper",
+        "An editor who asked him to reject a colleague's paper",
         "A review that he decided in the end not to write"
       ],
       "answerIndex": 0,
@@ -29864,7 +29864,7 @@
         "His hesitation had a different source",
         "He was frightened of the consequences",
         "He felt no hesitation whatsoever",
-        "He was afraid of the editor reaction"
+        "He was afraid of the editor's reaction"
       ],
       "answerIndex": 0,
       "explain": "Dalam audio, kalimat yang dikutip pada soal menyampaikan makna yang sama dengan “His hesitation had a different source”.",
@@ -31654,7 +31654,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C1",
       "mode": "gist",
-      "script": "I am Thandi. We teach a language with about four hundred remaining speakers, and a parent asked me directly why her daughter should spend Saturday mornings on something that will never earn her anything. It is a fair question and the honest answer is that it will not. What it will do is let her read her grandmother letters without a translator, and I am not going to pretend that is an economic argument.",
+      "script": "I am Thandi. We teach a language with about four hundred remaining speakers, and a parent asked me directly why her daughter should spend Saturday mornings on something that will never earn her anything. It is a fair question and the honest answer is that it will not. What it will do is let her read her grandmother's letters without a translator, and I am not going to pretend that is an economic argument.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -31685,7 +31685,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C1",
       "mode": "detail",
-      "script": "I am Thandi. We teach a language with about four hundred remaining speakers, and a parent asked me directly why her daughter should spend Saturday mornings on something that will never earn her anything. It is a fair question and the honest answer is that it will not. What it will do is let her read her grandmother letters without a translator, and I am not going to pretend that is an economic argument.",
+      "script": "I am Thandi. We teach a language with about four hundred remaining speakers, and a parent asked me directly why her daughter should spend Saturday mornings on something that will never earn her anything. It is a fair question and the honest answer is that it will not. What it will do is let her read her grandmother's letters without a translator, and I am not going to pretend that is an economic argument.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -31716,7 +31716,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C1",
       "mode": "inference",
-      "script": "I am Thandi. We teach a language with about four hundred remaining speakers, and a parent asked me directly why her daughter should spend Saturday mornings on something that will never earn her anything. It is a fair question and the honest answer is that it will not. What it will do is let her read her grandmother letters without a translator, and I am not going to pretend that is an economic argument.",
+      "script": "I am Thandi. We teach a language with about four hundred remaining speakers, and a parent asked me directly why her daughter should spend Saturday mornings on something that will never earn her anything. It is a fair question and the honest answer is that it will not. What it will do is let her read her grandmother's letters without a translator, and I am not going to pretend that is an economic argument.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -31727,7 +31727,7 @@
       "privacy": {
         "rawLearnerResponseRequiredForPersistence": false
       },
-      "question": "How does she answer the parent question?",
+      "question": "How does she answer the parent's question?",
       "options": [
         "She argues it will improve job prospects",
         "She refuses to discuss the matter with the parent",
@@ -31747,7 +31747,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C1",
       "mode": "attitude",
-      "script": "I am Thandi. We teach a language with about four hundred remaining speakers, and a parent asked me directly why her daughter should spend Saturday mornings on something that will never earn her anything. It is a fair question and the honest answer is that it will not. What it will do is let her read her grandmother letters without a translator, and I am not going to pretend that is an economic argument.",
+      "script": "I am Thandi. We teach a language with about four hundred remaining speakers, and a parent asked me directly why her daughter should spend Saturday mornings on something that will never earn her anything. It is a fair question and the honest answer is that it will not. What it will do is let her read her grandmother's letters without a translator, and I am not going to pretend that is an economic argument.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -31778,7 +31778,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C1",
       "mode": "paraphrase",
-      "script": "I am Thandi. We teach a language with about four hundred remaining speakers, and a parent asked me directly why her daughter should spend Saturday mornings on something that will never earn her anything. It is a fair question and the honest answer is that it will not. What it will do is let her read her grandmother letters without a translator, and I am not going to pretend that is an economic argument.",
+      "script": "I am Thandi. We teach a language with about four hundred remaining speakers, and a parent asked me directly why her daughter should spend Saturday mornings on something that will never earn her anything. It is a fair question and the honest answer is that it will not. What it will do is let her read her grandmother's letters without a translator, and I am not going to pretend that is an economic argument.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -32014,7 +32014,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C1",
       "mode": "gist",
-      "script": "I am Valeria. Our code reviews approve almost everything, and the team reads that as a sign of high standards among the authors. The defect rate says otherwise. What I think is happening is that rejecting a colleague work in writing feels personal, so people leave a comment and approve anyway. I have started asking reviewers to state one thing they would change even when they approve, which sounds trivial and has already caught two real problems.",
+      "script": "I am Valeria. Our code reviews approve almost everything, and the team reads that as a sign of high standards among the authors. The defect rate says otherwise. What I think is happening is that rejecting a colleague's work in writing feels personal, so people leave a comment and approve anyway. I have started asking reviewers to state one thing they would change even when they approve, which sounds trivial and has already caught two real problems.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -32045,7 +32045,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C1",
       "mode": "detail",
-      "script": "I am Valeria. Our code reviews approve almost everything, and the team reads that as a sign of high standards among the authors. The defect rate says otherwise. What I think is happening is that rejecting a colleague work in writing feels personal, so people leave a comment and approve anyway. I have started asking reviewers to state one thing they would change even when they approve, which sounds trivial and has already caught two real problems.",
+      "script": "I am Valeria. Our code reviews approve almost everything, and the team reads that as a sign of high standards among the authors. The defect rate says otherwise. What I think is happening is that rejecting a colleague's work in writing feels personal, so people leave a comment and approve anyway. I have started asking reviewers to state one thing they would change even when they approve, which sounds trivial and has already caught two real problems.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -32076,7 +32076,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C1",
       "mode": "inference",
-      "script": "I am Valeria. Our code reviews approve almost everything, and the team reads that as a sign of high standards among the authors. The defect rate says otherwise. What I think is happening is that rejecting a colleague work in writing feels personal, so people leave a comment and approve anyway. I have started asking reviewers to state one thing they would change even when they approve, which sounds trivial and has already caught two real problems.",
+      "script": "I am Valeria. Our code reviews approve almost everything, and the team reads that as a sign of high standards among the authors. The defect rate says otherwise. What I think is happening is that rejecting a colleague's work in writing feels personal, so people leave a comment and approve anyway. I have started asking reviewers to state one thing they would change even when they approve, which sounds trivial and has already caught two real problems.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -32107,7 +32107,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C1",
       "mode": "attitude",
-      "script": "I am Valeria. Our code reviews approve almost everything, and the team reads that as a sign of high standards among the authors. The defect rate says otherwise. What I think is happening is that rejecting a colleague work in writing feels personal, so people leave a comment and approve anyway. I have started asking reviewers to state one thing they would change even when they approve, which sounds trivial and has already caught two real problems.",
+      "script": "I am Valeria. Our code reviews approve almost everything, and the team reads that as a sign of high standards among the authors. The defect rate says otherwise. What I think is happening is that rejecting a colleague's work in writing feels personal, so people leave a comment and approve anyway. I have started asking reviewers to state one thing they would change even when they approve, which sounds trivial and has already caught two real problems.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -32138,7 +32138,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C1",
       "mode": "paraphrase",
-      "script": "I am Valeria. Our code reviews approve almost everything, and the team reads that as a sign of high standards among the authors. The defect rate says otherwise. What I think is happening is that rejecting a colleague work in writing feels personal, so people leave a comment and approve anyway. I have started asking reviewers to state one thing they would change even when they approve, which sounds trivial and has already caught two real problems.",
+      "script": "I am Valeria. Our code reviews approve almost everything, and the team reads that as a sign of high standards among the authors. The defect rate says otherwise. What I think is happening is that rejecting a colleague's work in writing feels personal, so people leave a comment and approve anyway. I have started asking reviewers to state one thing they would change even when they approve, which sounds trivial and has already caught two real problems.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -32365,7 +32365,7 @@
         "Two whole years in which her daughter stopped talking",
         "A reversal in the language her daughter now speaks more fluently",
         "A school that forbade her daughter from speaking the home language",
-        "A choice she made about her daughter school friends"
+        "A choice she made about her daughter's school friends"
       ],
       "answerIndex": 1,
       "explain": "Sepanjang audio, Ximena terutama membicarakan hal ini — jadi jawaban yang benar: “A reversal in the language her daughter now speaks more fluently”.",
@@ -35080,7 +35080,7 @@
       },
       "question": "What does she say customers are comparing it with?",
       "options": [
-        "The regulator official description",
+        "The regulator's official description",
         "Their recollection of the scent",
         "The formula printed on the box",
         "A competitor fragrance"
@@ -35800,7 +35800,7 @@
       },
       "question": "How does he treat his own failure to do so?",
       "options": [
-        "As his employer responsibility rather than his",
+        "As his employer's responsibility rather than his",
         "As something he still cannot fully explain",
         "As an entirely justified decision",
         "As a matter of no importance at all"
@@ -36029,7 +36029,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C2",
       "mode": "dictation",
-      "script": "The most effective way to shape an inquiry conclusion is to shape its boundary, and it is the one intervention that never appears in the findings.",
+      "script": "The most effective way to shape an inquiry's conclusion is to shape its boundary, and it is the one intervention that never appears in the findings.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -36041,8 +36041,8 @@
         "rawLearnerResponseRequiredForPersistence": false
       },
       "question": "Ketik kalimat yang kamu dengar. Teks jawaban tidak disimpan setelah penilaian.",
-      "answerText": "The most effective way to shape an inquiry conclusion is to shape its boundary, and it is the one intervention that never appears in the findings.",
-      "explain": "Kalimat yang diucapkan di audio persis: “The most effective way to shape an inquiry conclusion is to shape its boundary, and it is the one intervention that never appears in the findings.”.",
+      "answerText": "The most effective way to shape an inquiry's conclusion is to shape its boundary, and it is the one intervention that never appears in the findings.",
+      "explain": "Kalimat yang diucapkan di audio persis: “The most effective way to shape an inquiry's conclusion is to shape its boundary, and it is the one intervention that never appears in the findings.”.",
       "scoring": {
         "metric": "token_f1"
       },
@@ -36054,7 +36054,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C2",
       "mode": "gist",
-      "script": "My name is Emrys. The terms of reference for this inquiry cover the decisions taken after the eleventh of March, and everybody who has read the file knows that the consequential decisions were taken in the preceding fortnight. Nobody obstructed anything. A date was chosen, defensibly, for reasons of proportionality and cost, and that date determines what can be found. The most effective way to shape an inquiry conclusion is to shape its boundary, and it is the one intervention that never appears in the findings.",
+      "script": "My name is Emrys. The terms of reference for this inquiry cover the decisions taken after the eleventh of March, and everybody who has read the file knows that the consequential decisions were taken in the preceding fortnight. Nobody obstructed anything. A date was chosen, defensibly, for reasons of proportionality and cost, and that date determines what can be found. The most effective way to shape an inquiry's conclusion is to shape its boundary, and it is the one intervention that never appears in the findings.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -36085,7 +36085,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C2",
       "mode": "detail",
-      "script": "My name is Emrys. The terms of reference for this inquiry cover the decisions taken after the eleventh of March, and everybody who has read the file knows that the consequential decisions were taken in the preceding fortnight. Nobody obstructed anything. A date was chosen, defensibly, for reasons of proportionality and cost, and that date determines what can be found. The most effective way to shape an inquiry conclusion is to shape its boundary, and it is the one intervention that never appears in the findings.",
+      "script": "My name is Emrys. The terms of reference for this inquiry cover the decisions taken after the eleventh of March, and everybody who has read the file knows that the consequential decisions were taken in the preceding fortnight. Nobody obstructed anything. A date was chosen, defensibly, for reasons of proportionality and cost, and that date determines what can be found. The most effective way to shape an inquiry's conclusion is to shape its boundary, and it is the one intervention that never appears in the findings.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -36116,7 +36116,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C2",
       "mode": "inference",
-      "script": "My name is Emrys. The terms of reference for this inquiry cover the decisions taken after the eleventh of March, and everybody who has read the file knows that the consequential decisions were taken in the preceding fortnight. Nobody obstructed anything. A date was chosen, defensibly, for reasons of proportionality and cost, and that date determines what can be found. The most effective way to shape an inquiry conclusion is to shape its boundary, and it is the one intervention that never appears in the findings.",
+      "script": "My name is Emrys. The terms of reference for this inquiry cover the decisions taken after the eleventh of March, and everybody who has read the file knows that the consequential decisions were taken in the preceding fortnight. Nobody obstructed anything. A date was chosen, defensibly, for reasons of proportionality and cost, and that date determines what can be found. The most effective way to shape an inquiry's conclusion is to shape its boundary, and it is the one intervention that never appears in the findings.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -36147,7 +36147,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C2",
       "mode": "attitude",
-      "script": "My name is Emrys. The terms of reference for this inquiry cover the decisions taken after the eleventh of March, and everybody who has read the file knows that the consequential decisions were taken in the preceding fortnight. Nobody obstructed anything. A date was chosen, defensibly, for reasons of proportionality and cost, and that date determines what can be found. The most effective way to shape an inquiry conclusion is to shape its boundary, and it is the one intervention that never appears in the findings.",
+      "script": "My name is Emrys. The terms of reference for this inquiry cover the decisions taken after the eleventh of March, and everybody who has read the file knows that the consequential decisions were taken in the preceding fortnight. Nobody obstructed anything. A date was chosen, defensibly, for reasons of proportionality and cost, and that date determines what can be found. The most effective way to shape an inquiry's conclusion is to shape its boundary, and it is the one intervention that never appears in the findings.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -36178,7 +36178,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C2",
       "mode": "paraphrase",
-      "script": "My name is Emrys. The terms of reference for this inquiry cover the decisions taken after the eleventh of March, and everybody who has read the file knows that the consequential decisions were taken in the preceding fortnight. Nobody obstructed anything. A date was chosen, defensibly, for reasons of proportionality and cost, and that date determines what can be found. The most effective way to shape an inquiry conclusion is to shape its boundary, and it is the one intervention that never appears in the findings.",
+      "script": "My name is Emrys. The terms of reference for this inquiry cover the decisions taken after the eleventh of March, and everybody who has read the file knows that the consequential decisions were taken in the preceding fortnight. Nobody obstructed anything. A date was chosen, defensibly, for reasons of proportionality and cost, and that date determines what can be found. The most effective way to shape an inquiry's conclusion is to shape its boundary, and it is the one intervention that never appears in the findings.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -37720,7 +37720,7 @@
       "options": [
         "Neither faction would accept the alternative",
         "The drafters ran out of available time",
-        "The wording was copied from another country constitution",
+        "The wording was copied from another country's constitution",
         "Nobody in the room understood the issue"
       ],
       "answerIndex": 0,
@@ -37814,10 +37814,10 @@
         "She believes the court decision will be easy",
         "She considers the court entirely incompetent",
         "She wishes that she could sit on the court herself",
-        "She recognizes the difficulty of the judges task"
+        "She recognizes the difficulty of the judges' task"
       ],
       "answerIndex": 3,
-      "explain": "Dalam audio, kalimat yang dikutip pada soal menyampaikan makna yang sama dengan “She recognizes the difficulty of the judges task”.",
+      "explain": "Dalam audio, kalimat yang dikutip pada soal menyampaikan makna yang sama dengan “She recognizes the difficulty of the judges' task”.",
       "scoring": {
         "metric": "exact_choice"
       },
@@ -37829,7 +37829,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C2",
       "mode": "gist",
-      "script": "My name is Orsolya. The metronome marking in the autograph is considerably faster than any performance you have heard, and the tradition of taking it slowly begins with one celebrated recording in the nineteen fifties. Playing the composer marking sounds, to an audience raised on that tradition, like a mistake. I take it at the marked speed and I explain why in the program note, which is a slightly absurd position: I am asking listeners to hear a piece through a footnote.",
+      "script": "My name is Orsolya. The metronome marking in the autograph is considerably faster than any performance you have heard, and the tradition of taking it slowly begins with one celebrated recording in the nineteen fifties. Playing the composer's marking sounds, to an audience raised on that tradition, like a mistake. I take it at the marked speed and I explain why in the program note, which is a slightly absurd position: I am asking listeners to hear a piece through a footnote.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -37860,7 +37860,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C2",
       "mode": "detail",
-      "script": "My name is Orsolya. The metronome marking in the autograph is considerably faster than any performance you have heard, and the tradition of taking it slowly begins with one celebrated recording in the nineteen fifties. Playing the composer marking sounds, to an audience raised on that tradition, like a mistake. I take it at the marked speed and I explain why in the program note, which is a slightly absurd position: I am asking listeners to hear a piece through a footnote.",
+      "script": "My name is Orsolya. The metronome marking in the autograph is considerably faster than any performance you have heard, and the tradition of taking it slowly begins with one celebrated recording in the nineteen fifties. Playing the composer's marking sounds, to an audience raised on that tradition, like a mistake. I take it at the marked speed and I explain why in the program note, which is a slightly absurd position: I am asking listeners to hear a piece through a footnote.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -37873,7 +37873,7 @@
       },
       "question": "Where does the slow tradition originate?",
       "options": [
-        "The composer own autograph score",
+        "The composer's own autograph score",
         "A nineteenth century performance practice tradition",
         "An instruction from the publisher",
         "A single recording from the nineteen fifties"
@@ -37891,7 +37891,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C2",
       "mode": "inference",
-      "script": "My name is Orsolya. The metronome marking in the autograph is considerably faster than any performance you have heard, and the tradition of taking it slowly begins with one celebrated recording in the nineteen fifties. Playing the composer marking sounds, to an audience raised on that tradition, like a mistake. I take it at the marked speed and I explain why in the program note, which is a slightly absurd position: I am asking listeners to hear a piece through a footnote.",
+      "script": "My name is Orsolya. The metronome marking in the autograph is considerably faster than any performance you have heard, and the tradition of taking it slowly begins with one celebrated recording in the nineteen fifties. Playing the composer's marking sounds, to an audience raised on that tradition, like a mistake. I take it at the marked speed and I explain why in the program note, which is a slightly absurd position: I am asking listeners to hear a piece through a footnote.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -37922,7 +37922,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C2",
       "mode": "attitude",
-      "script": "My name is Orsolya. The metronome marking in the autograph is considerably faster than any performance you have heard, and the tradition of taking it slowly begins with one celebrated recording in the nineteen fifties. Playing the composer marking sounds, to an audience raised on that tradition, like a mistake. I take it at the marked speed and I explain why in the program note, which is a slightly absurd position: I am asking listeners to hear a piece through a footnote.",
+      "script": "My name is Orsolya. The metronome marking in the autograph is considerably faster than any performance you have heard, and the tradition of taking it slowly begins with one celebrated recording in the nineteen fifties. Playing the composer's marking sounds, to an audience raised on that tradition, like a mistake. I take it at the marked speed and I explain why in the program note, which is a slightly absurd position: I am asking listeners to hear a piece through a footnote.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -37953,7 +37953,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C2",
       "mode": "paraphrase",
-      "script": "My name is Orsolya. The metronome marking in the autograph is considerably faster than any performance you have heard, and the tradition of taking it slowly begins with one celebrated recording in the nineteen fifties. Playing the composer marking sounds, to an audience raised on that tradition, like a mistake. I take it at the marked speed and I explain why in the program note, which is a slightly absurd position: I am asking listeners to hear a piece through a footnote.",
+      "script": "My name is Orsolya. The metronome marking in the autograph is considerably faster than any performance you have heard, and the tradition of taking it slowly begins with one celebrated recording in the nineteen fifties. Playing the composer's marking sounds, to an audience raised on that tradition, like a mistake. I take it at the marked speed and I explain why in the program note, which is a slightly absurd position: I am asking listeners to hear a piece through a footnote.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -39039,7 +39039,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C2",
       "mode": "dictation",
-      "script": "Arguing for the restored version means the composer own judgment is the one voice we ignore.",
+      "script": "Arguing for the restored version means the composer's own judgment is the one voice we ignore.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -39051,8 +39051,8 @@
         "rawLearnerResponseRequiredForPersistence": false
       },
       "question": "Ketik kalimat yang kamu dengar. Teks jawaban tidak disimpan setelah penilaian.",
-      "answerText": "Arguing for the restored version means the composer own judgment is the one voice we ignore.",
-      "explain": "Kalimat yang diucapkan di audio persis: “Arguing for the restored version means the composer own judgment is the one voice we ignore.”.",
+      "answerText": "Arguing for the restored version means the composer's own judgment is the one voice we ignore.",
+      "explain": "Kalimat yang diucapkan di audio persis: “Arguing for the restored version means the composer's own judgment is the one voice we ignore.”.",
       "scoring": {
         "metric": "token_f1"
       },
@@ -39064,7 +39064,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C2",
       "mode": "gist",
-      "script": "I am Vittorio. The aria we all consider the emotional center of the second act was cut by the composer after three performances and restored by a conductor in nineteen twenty two, and audiences have known the opera in that form for a century. Arguing for the composer version means arguing that a hundred years of performance history counts for nothing, which is a strange position for anybody who believes opera is a living practice. Arguing for the restored version means the composer own judgment is the one voice we ignore.",
+      "script": "I am Vittorio. The aria we all consider the emotional center of the second act was cut by the composer after three performances and restored by a conductor in nineteen twenty two, and audiences have known the opera in that form for a century. Arguing for the composer's version means arguing that a hundred years of performance history counts for nothing, which is a strange position for anybody who believes opera is a living practice. Arguing for the restored version means the composer's own judgment is the one voice we ignore.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -39095,7 +39095,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C2",
       "mode": "detail",
-      "script": "I am Vittorio. The aria we all consider the emotional center of the second act was cut by the composer after three performances and restored by a conductor in nineteen twenty two, and audiences have known the opera in that form for a century. Arguing for the composer version means arguing that a hundred years of performance history counts for nothing, which is a strange position for anybody who believes opera is a living practice. Arguing for the restored version means the composer own judgment is the one voice we ignore.",
+      "script": "I am Vittorio. The aria we all consider the emotional center of the second act was cut by the composer after three performances and restored by a conductor in nineteen twenty two, and audiences have known the opera in that form for a century. Arguing for the composer's version means arguing that a hundred years of performance history counts for nothing, which is a strange position for anybody who believes opera is a living practice. Arguing for the restored version means the composer's own judgment is the one voice we ignore.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -39126,7 +39126,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C2",
       "mode": "inference",
-      "script": "I am Vittorio. The aria we all consider the emotional center of the second act was cut by the composer after three performances and restored by a conductor in nineteen twenty two, and audiences have known the opera in that form for a century. Arguing for the composer version means arguing that a hundred years of performance history counts for nothing, which is a strange position for anybody who believes opera is a living practice. Arguing for the restored version means the composer own judgment is the one voice we ignore.",
+      "script": "I am Vittorio. The aria we all consider the emotional center of the second act was cut by the composer after three performances and restored by a conductor in nineteen twenty two, and audiences have known the opera in that form for a century. Arguing for the composer's version means arguing that a hundred years of performance history counts for nothing, which is a strange position for anybody who believes opera is a living practice. Arguing for the restored version means the composer's own judgment is the one voice we ignore.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -39137,12 +39137,12 @@
       "privacy": {
         "rawLearnerResponseRequiredForPersistence": false
       },
-      "question": "What is the difficulty with the composer version?",
+      "question": "What is the difficulty with the composer's version?",
       "options": [
         "The second act was written by somebody else",
         "It sets aside a century of performance history",
-        "The composer version has never been printed anywhere",
-        "The composer version needs a much larger orchestra"
+        "The composer's version has never been printed anywhere",
+        "The composer's version needs a much larger orchestra"
       ],
       "answerIndex": 1,
       "explain": "Jawaban ini tidak diucapkan langsung, tetapi petunjuk dalam audio mengarah ke kesimpulan: “It sets aside a century of performance history”.",
@@ -39157,7 +39157,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C2",
       "mode": "attitude",
-      "script": "I am Vittorio. The aria we all consider the emotional center of the second act was cut by the composer after three performances and restored by a conductor in nineteen twenty two, and audiences have known the opera in that form for a century. Arguing for the composer version means arguing that a hundred years of performance history counts for nothing, which is a strange position for anybody who believes opera is a living practice. Arguing for the restored version means the composer own judgment is the one voice we ignore.",
+      "script": "I am Vittorio. The aria we all consider the emotional center of the second act was cut by the composer after three performances and restored by a conductor in nineteen twenty two, and audiences have known the opera in that form for a century. Arguing for the composer's version means arguing that a hundred years of performance history counts for nothing, which is a strange position for anybody who believes opera is a living practice. Arguing for the restored version means the composer's own judgment is the one voice we ignore.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -39172,11 +39172,11 @@
       "options": [
         "It was never performed in public",
         "Audiences have never heard it",
-        "It disregards the composer own decision",
+        "It disregards the composer's own decision",
         "It shortens the second act considerably"
       ],
       "answerIndex": 2,
-      "explain": "Pilihan kata dan nada Vittorio di audio menunjukkan: “It disregards the composer own decision”.",
+      "explain": "Pilihan kata dan nada Vittorio di audio menunjukkan: “It disregards the composer's own decision”.",
       "scoring": {
         "metric": "exact_choice"
       },
@@ -39188,7 +39188,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C2",
       "mode": "paraphrase",
-      "script": "I am Vittorio. The aria we all consider the emotional center of the second act was cut by the composer after three performances and restored by a conductor in nineteen twenty two, and audiences have known the opera in that form for a century. Arguing for the composer version means arguing that a hundred years of performance history counts for nothing, which is a strange position for anybody who believes opera is a living practice. Arguing for the restored version means the composer own judgment is the one voice we ignore.",
+      "script": "I am Vittorio. The aria we all consider the emotional center of the second act was cut by the composer after three performances and restored by a conductor in nineteen twenty two, and audiences have known the opera in that form for a century. Arguing for the composer's version means arguing that a hundred years of performance history counts for nothing, which is a strange position for anybody who believes opera is a living practice. Arguing for the restored version means the composer's own judgment is the one voice we ignore.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -41689,7 +41689,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C2",
       "mode": "gist",
-      "script": "My name is Katinka. The notation records position, timing and direction with great precision, and the quality that made this choreographer work recognizable was a delay in the shoulder that dancers learned by watching her. It is not in the score because the system has no symbol for it. Companies now reconstruct from the notation and produce something accurate and inert, and the archive is slowly becoming the reason the thing it preserves cannot be recovered.",
+      "script": "My name is Katinka. The notation records position, timing and direction with great precision, and the quality that made this choreographer's work recognizable was a delay in the shoulder that dancers learned by watching her. It is not in the score because the system has no symbol for it. Companies now reconstruct from the notation and produce something accurate and inert, and the archive is slowly becoming the reason the thing it preserves cannot be recovered.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -41720,7 +41720,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C2",
       "mode": "detail",
-      "script": "My name is Katinka. The notation records position, timing and direction with great precision, and the quality that made this choreographer work recognizable was a delay in the shoulder that dancers learned by watching her. It is not in the score because the system has no symbol for it. Companies now reconstruct from the notation and produce something accurate and inert, and the archive is slowly becoming the reason the thing it preserves cannot be recovered.",
+      "script": "My name is Katinka. The notation records position, timing and direction with great precision, and the quality that made this choreographer's work recognizable was a delay in the shoulder that dancers learned by watching her. It is not in the score because the system has no symbol for it. Companies now reconstruct from the notation and produce something accurate and inert, and the archive is slowly becoming the reason the thing it preserves cannot be recovered.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -41751,7 +41751,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C2",
       "mode": "inference",
-      "script": "My name is Katinka. The notation records position, timing and direction with great precision, and the quality that made this choreographer work recognizable was a delay in the shoulder that dancers learned by watching her. It is not in the score because the system has no symbol for it. Companies now reconstruct from the notation and produce something accurate and inert, and the archive is slowly becoming the reason the thing it preserves cannot be recovered.",
+      "script": "My name is Katinka. The notation records position, timing and direction with great precision, and the quality that made this choreographer's work recognizable was a delay in the shoulder that dancers learned by watching her. It is not in the score because the system has no symbol for it. Companies now reconstruct from the notation and produce something accurate and inert, and the archive is slowly becoming the reason the thing it preserves cannot be recovered.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -41782,7 +41782,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C2",
       "mode": "attitude",
-      "script": "My name is Katinka. The notation records position, timing and direction with great precision, and the quality that made this choreographer work recognizable was a delay in the shoulder that dancers learned by watching her. It is not in the score because the system has no symbol for it. Companies now reconstruct from the notation and produce something accurate and inert, and the archive is slowly becoming the reason the thing it preserves cannot be recovered.",
+      "script": "My name is Katinka. The notation records position, timing and direction with great precision, and the quality that made this choreographer's work recognizable was a delay in the shoulder that dancers learned by watching her. It is not in the score because the system has no symbol for it. Companies now reconstruct from the notation and produce something accurate and inert, and the archive is slowly becoming the reason the thing it preserves cannot be recovered.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -41813,7 +41813,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C2",
       "mode": "paraphrase",
-      "script": "My name is Katinka. The notation records position, timing and direction with great precision, and the quality that made this choreographer work recognizable was a delay in the shoulder that dancers learned by watching her. It is not in the score because the system has no symbol for it. Companies now reconstruct from the notation and produce something accurate and inert, and the archive is slowly becoming the reason the thing it preserves cannot be recovered.",
+      "script": "My name is Katinka. The notation records position, timing and direction with great precision, and the quality that made this choreographer's work recognizable was a delay in the shoulder that dancers learned by watching her. It is not in the score because the system has no symbol for it. Companies now reconstruct from the notation and produce something accurate and inert, and the archive is slowly becoming the reason the thing it preserves cannot be recovered.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -42049,7 +42049,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C2",
       "mode": "gist",
-      "script": "My name is Marisol. The transcript shows the interpreted English and marks the original testimony as spoken in another language, without recording what was said. On appeal the court reviews the transcript, which means it reviews my work rather than the witness words, and any error I made has become the fact of the case. I have asked for the source audio to be retained. The objection is storage cost, and I notice that the cost is borne by an institution and the risk by a person.",
+      "script": "My name is Marisol. The transcript shows the interpreted English and marks the original testimony as spoken in another language, without recording what was said. On appeal the court reviews the transcript, which means it reviews my work rather than the witness's words, and any error I made has become the fact of the case. I have asked for the source audio to be retained. The objection is storage cost, and I notice that the cost is borne by an institution and the risk by a person.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -42080,7 +42080,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C2",
       "mode": "detail",
-      "script": "My name is Marisol. The transcript shows the interpreted English and marks the original testimony as spoken in another language, without recording what was said. On appeal the court reviews the transcript, which means it reviews my work rather than the witness words, and any error I made has become the fact of the case. I have asked for the source audio to be retained. The objection is storage cost, and I notice that the cost is borne by an institution and the risk by a person.",
+      "script": "My name is Marisol. The transcript shows the interpreted English and marks the original testimony as spoken in another language, without recording what was said. On appeal the court reviews the transcript, which means it reviews my work rather than the witness's words, and any error I made has become the fact of the case. I have asked for the source audio to be retained. The objection is storage cost, and I notice that the cost is borne by an institution and the risk by a person.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -42111,7 +42111,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C2",
       "mode": "inference",
-      "script": "My name is Marisol. The transcript shows the interpreted English and marks the original testimony as spoken in another language, without recording what was said. On appeal the court reviews the transcript, which means it reviews my work rather than the witness words, and any error I made has become the fact of the case. I have asked for the source audio to be retained. The objection is storage cost, and I notice that the cost is borne by an institution and the risk by a person.",
+      "script": "My name is Marisol. The transcript shows the interpreted English and marks the original testimony as spoken in another language, without recording what was said. On appeal the court reviews the transcript, which means it reviews my work rather than the witness's words, and any error I made has become the fact of the case. I have asked for the source audio to be retained. The objection is storage cost, and I notice that the cost is borne by an institution and the risk by a person.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -42124,13 +42124,13 @@
       },
       "question": "What does the appeal court actually review?",
       "options": [
-        "The interpreter rendering of the evidence",
+        "The interpreter's rendering of the evidence",
         "The original spoken words of the witness",
         "A recording of the whole hearing",
         "The notes taken by the judge"
       ],
       "answerIndex": 0,
-      "explain": "Jawaban ini tidak diucapkan langsung, tetapi petunjuk dalam audio mengarah ke kesimpulan: “The interpreter rendering of the evidence”.",
+      "explain": "Jawaban ini tidak diucapkan langsung, tetapi petunjuk dalam audio mengarah ke kesimpulan: “The interpreter's rendering of the evidence”.",
       "scoring": {
         "metric": "exact_choice"
       },
@@ -42142,7 +42142,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C2",
       "mode": "attitude",
-      "script": "My name is Marisol. The transcript shows the interpreted English and marks the original testimony as spoken in another language, without recording what was said. On appeal the court reviews the transcript, which means it reviews my work rather than the witness words, and any error I made has become the fact of the case. I have asked for the source audio to be retained. The objection is storage cost, and I notice that the cost is borne by an institution and the risk by a person.",
+      "script": "My name is Marisol. The transcript shows the interpreted English and marks the original testimony as spoken in another language, without recording what was said. On appeal the court reviews the transcript, which means it reviews my work rather than the witness's words, and any error I made has become the fact of the case. I have asked for the source audio to be retained. The objection is storage cost, and I notice that the cost is borne by an institution and the risk by a person.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -42173,7 +42173,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C2",
       "mode": "paraphrase",
-      "script": "My name is Marisol. The transcript shows the interpreted English and marks the original testimony as spoken in another language, without recording what was said. On appeal the court reviews the transcript, which means it reviews my work rather than the witness words, and any error I made has become the fact of the case. I have asked for the source audio to be retained. The objection is storage cost, and I notice that the cost is borne by an institution and the risk by a person.",
+      "script": "My name is Marisol. The transcript shows the interpreted English and marks the original testimony as spoken in another language, without recording what was said. On appeal the court reviews the transcript, which means it reviews my work rather than the witness's words, and any error I made has become the fact of the case. I have asked for the source audio to be retained. The objection is storage cost, and I notice that the cost is borne by an institution and the risk by a person.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {

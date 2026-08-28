@@ -36,7 +36,7 @@ const diag=[
 const ctx={
   console,Promise,JSON,Date,Object,String,setTimeout,
   document:{readyState:'complete',body,createElement:element,addEventListener(){}},
-  location:{origin:'https://fitrajft-ux.github.io',href:'https://fitrajft-ux.github.io/FIEZEL-APPS/'},
+  location:{origin:'https://fiezel-apps.github.io',href:'https://fiezel-apps.github.io/FIEZEL-APPS/'},
   navigator:{userAgent:'iPhone',standalone:true},
   matchMedia:()=>({matches:true}),
   // Keep the raw localStorage target absent so this test measures exactly the

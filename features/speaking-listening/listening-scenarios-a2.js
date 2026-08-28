@@ -93,8 +93,8 @@ module.exports = { level: 'A2', scenarios: [
  ['Bagaimana perasaan Jihan soal berjalan saat hujan?','Ia merasa itu tidak nyaman','Ia sangat menikmatinya','Ia tidak memedulikannya','Ia menolak melakukannya'],
  ['Kalimat mana yang maknanya sama dengan “I still arrive on time”?','She is not late for her lessons','She arrives before everybody','She arrives later than before','She misses the first lesson']],
 
-['Krisna','online class from his uncle house','A weak internet connection',
- 'My name is Krisna. My internet at home is weak, so during online lessons I go to my uncle house. His connection is much better and he lets me use the small back room. I only have to be there before eight, because he locks the gate at that time.',
+['Krisna','online class from his uncle\'s house','A weak internet connection',
+ 'My name is Krisna. My internet at home is weak, so during online lessons I go to my uncle\'s house. His connection is much better and he lets me use the small back room. I only have to be there before eight, because he locks the gate at that time.',
  ['Apa yang terutama dibicarakan Krisna?','Tempat ia mengikuti pelajaran daringnya','Paman yang mengajarinya setiap pagi','Gerbang yang ia perbaiki di rumahnya','Kamar kecil yang ia sewa di kota'],
  ['Kapan Krisna harus tiba?','Sebelum pukul delapan','Setelah pelajaran pertamanya','Sebelum pamannya pergi','Kapan saja di pagi hari'],
  ['Mengapa Krisna tidak belajar di rumah sendiri?','Koneksi di rumahnya tidak kuat','Rumahnya terlalu berisik','Pamannya memintanya datang sebelum pukul delapan','Ia tidak punya komputer di rumah'],
@@ -118,7 +118,7 @@ module.exports = { level: 'A2', scenarios: [
  ['Kalimat mana yang maknanya sama dengan “now it is safe”?','He can ride it without danger','The bicycle is at the shop','He sold it to somebody else','The brakes are still weak']],
 
 ['Nabila','school office about a scholarship','Missing one document',
- 'I am Nabila. I applied for a scholarship and I sent everything by email last Monday. This morning the office called me because one paper was missing. I have to bring my parents income letter before Friday, or my application will not be read.',
+ 'I am Nabila. I applied for a scholarship and I sent everything by email last Monday. This morning the office called me because one paper was missing. I have to bring my parents\' income letter before Friday, or my application will not be read.',
  ['Apa yang terutama dibicarakan Nabila?','Berkas kurang yang harus ia antar sebelum Jumat','Beasiswa yang sudah ia terima tahun ini','Surel yang tidak pernah dibuka pihak kantor','Surat yang ia tulis untuk orang tuanya'],
  ['Apa yang kurang dari berkas lamarannya?','Surat keterangan penghasilan orang tuanya','Rapor sekolahnya tahun lalu','Foto dan tanda tangannya','Alamat surel kantor itu'],
  ['Apa yang terjadi jika ia terlambat?','Lamarannya tidak akan diproses','Ia akan membayar denda kecil','Kantor itu akan meneleponnya lagi','Ia boleh mengirimnya lewat surel'],
