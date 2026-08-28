@@ -1,6 +1,13 @@
 const fs=require('fs');const path=require('path');
 const root=__dirname;
 const app=fs.readFileSync(path.join(root,'app.js'),'utf8');
+/* 2026-08-29 adaptasi i18n m025-186: naskah murid pindah ke features/i18n/copy-id-*.js.
+   Pemeriksaan KALIMAT kini melihat permukaan gabungan (app + peta copy-id) - kontraknya
+   tidak berubah: kalimat Indonesia itu tetap wajib ada, hanya alamat berkasnya yang sah
+   bertambah. Pemeriksaan STRUKTUR (nama fungsi/kunci skema) tetap membaca app saja. */
+const i18nDir=path.join(root,'features','i18n');
+const copyId=fs.existsSync(i18nDir)?fs.readdirSync(i18nDir).filter(n=>/^copy-id-.*\.js$/.test(n)).sort().map(n=>fs.readFileSync(path.join(i18nDir,n),'utf8')).join('\n'):'';
+const appCopy=app+'\n'+copyId;
 const css=fs.readFileSync(path.join(root,'style.css'),'utf8');
 const index=fs.readFileSync(path.join(root,'index.html'),'utf8');
 const worker=fs.readFileSync(path.join(root,'fiezel-core-worker.js'),'utf8');
@@ -16,7 +23,7 @@ check('Error pattern detector',app.includes('errorPatterns')&&app.includes('sele
 check('Confusion network is history-backed',app.includes('confusionPairs')&&app.includes('confusion-network'),'Confusion pairs are ranked from observed wrong answers and vocabulary relations.');
 check('Diagnostic report',app.includes('diagnosticReport')&&app.includes('rows.map'),'Report separates Vocabulary, Grammar and Reading evidence.');
 check('Reading skill map',app.includes("reading_inference")&&app.includes("reading_comparison"),'Reading skills are tracked independently.');
-check('Smart review UI exposes forgetting',app.includes('risiko lupa ${Math.round(forgettingProbability(x)*100)}%'),'Ulangan Pintar menjelaskan risiko lupa dengan Bahasa Indonesia.');
+check('Smart review UI exposes forgetting',(app.includes('risiko lupa ${Math.round(forgettingProbability(x)*100)}%')||(appCopy.includes('risiko lupa {x}%')&&app.includes('forgettingProbability('))),'Ulangan Pintar menjelaskan risiko lupa dengan Bahasa Indonesia.');
 check('Creator credit',app.includes('./instagram.svg')&&app.includes('@fitrarustqi')&&fs.existsSync(path.join(root,'instagram.svg')),'Uses a local SVG Instagram icon and creator handle.');
 check('No fake Instagram glyph',!app.includes('class="instagram-mark">◎'),'Legacy placeholder glyph removed.');
 check('Daily brief',app.includes('dailyBrief')&&app.includes('goal:'),'Daily learning recommendation exists.');
@@ -52,7 +59,7 @@ check('Correct and wrong sounds',app.includes('playFeedbackSound')&&app.includes
 check('Animated answer popup',index.includes('id="answerBurst"')&&css.includes('.answer-burst.show')&&app.includes('showAnswerBurst'),'Jawaban memicu popup animasi dengan status yang berbeda.');
 check('Realtime celestial cycle',app.includes('getCelestialState')&&app.includes('getScenePalette')&&app.includes('SUNRISE_MINUTE=6*60')&&app.includes('SUNSET_MINUTE=18*60')&&css.includes('.global-sky')&&css.includes('.sky-light')&&index.includes('id="globalSky"'),'The whole viewport follows the device-local sun and moon cycle with dynamic light.');
 check('Focused twenty-five-mode grammar lessons',app.includes('GRAMMAR_SESSION_SIZE=25')&&app.includes('GRAMMAR_PRACTICE_MODES')&&app.includes('buildGrammarLessonQuestions')&&!app.includes('familyPeers=')&&!app.includes('levelPeers='),'Every grammar lesson builds 25 validated pedagogical modes from its own concept without importing peer questions.');
-check('Natural Indonesian explanations',app.includes('NATURAL_AI_STYLE')&&app.includes('Hindari gaya buku teks')&&app.includes('grammarRuleIndonesian'),'Grammar, vocabulary, reading, and AI explanations use the Indonesian language contract.');
+check('Natural Indonesian explanations',app.includes('NATURAL_AI_STYLE')&&appCopy.includes('Hindari gaya buku teks')&&app.includes('grammarRuleIndonesian'),'Grammar, vocabulary, reading, and AI explanations use the Indonesian language contract.');
 check('Creator reporting',app.includes("sendCreatorReport('session_complete')")&&app.includes("sendCreatorReport('daily_access'")&&app.includes('reportConsent:false'),'Session and daily access reports require explicit consent.');
 check('Creator report privacy',app.includes('validReportEndpoint')&&app.includes('buildCreatorReport')&&fs.existsSync(path.join(root,'fiezel-report-worker.js')),'Reporting is restricted to Puter Workers with a dedicated collector.');
 check('Runtime syntax',true,'Validated separately with node --check.');

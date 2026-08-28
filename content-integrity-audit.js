@@ -507,6 +507,16 @@ function bootApp() {
   context.FIEZEL_VERSION = readJson('VERSION.json').version;
   context.window.scrollTo = () => {}; context.window.requestAnimationFrame = fn => fn();
   vm.createContext(context);
+  /* 2026-08-29 adaptasi i18n m025-186: index.html memuat fiezel-i18n.js + copy-id-*.js SEBELUM
+     app.js, dan app.js kini memanggil FiezelI18n.t() saat parse. Harness meniru urutan itu -
+     tanpa preload ini boot VM meledak (BOOT_FAILED) dan audit tidak mengukur apa pun.
+     Pola sama dengan r2-ux-overhaul-smoke-test.js (AI-20 F06). */
+  const i18nDir = path.join(root, 'features', 'i18n');
+  if (fs.existsSync(path.join(i18nDir, 'fiezel-i18n.js'))) {
+    vm.runInContext(fs.readFileSync(path.join(i18nDir, 'fiezel-i18n.js'), 'utf8'), context, { filename: 'fiezel-i18n.js' });
+    for (const f of fs.readdirSync(i18nDir).filter(n => /^copy-id-.*\.js$/.test(n)).sort())
+      vm.runInContext(fs.readFileSync(path.join(i18nDir, f), 'utf8'), context, { filename: f });
+  }
   vm.runInContext(app, context, { filename: 'app.js' });
   return context;
 }
