@@ -1,6 +1,14 @@
 const fs=require('fs'),path=require('path'),vm=require('vm');
 const root=__dirname;
 const app=fs.readFileSync(path.join(root,'app.js'),'utf8');
+// AI-20 F06 (kategori 2a, UNION-CORPUS): kontrak naskah alami ('Hindari gaya buku teks',
+// 'Gunakan Bahasa Indonesia yang jernih') boleh PINDAH byte-identik ke copy-map
+// features/i18n/copy-id-*.js (dijaga id-golden-snapshot-test.js), jadi literalnya dicari
+// di gabungan app.js + copy-map id. Sinkron dengan release-audit.py check
+// 'Natural Indonesian explanations' yang memakai corpus gabungan yang sama.
+const i18nDir=path.join(root,'features','i18n');
+const copyIdCorpus=fs.existsSync(i18nDir)?fs.readdirSync(i18nDir).filter(n=>/^copy-id-.*\.js$/.test(n)).sort().map(n=>fs.readFileSync(path.join(i18nDir,n),'utf8')).join('\n'):'';
+const idCorpus=app+'\n'+copyIdCorpus;
 const css=fs.readFileSync(path.join(root,'style.css'),'utf8');
 const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
 const grammar=JSON.parse(fs.readFileSync(path.join(root,'grammar-templates.json'),'utf8'));
@@ -22,6 +30,11 @@ vm.createContext(context);
 // m029: mesin SFX dimuat lebih dulu, persis urutan <script defer> di index.html - app.js
 // mendelegasikan playFeedbackSound ke FiezelUiSfx, jadi tanpa modul ini tesnya menguji udara.
 vm.runInContext(fs.readFileSync(path.join(root,'features/audio/fiezel-ui-sfx.js'),'utf8'),context,{filename:'features/audio/fiezel-ui-sfx.js'});
+/* m025-186 merge-fix: kontrak index.html FIEZEL_I18N_BEGIN — fiezel-i18n.js lalu SEMUA
+   copy-id-*.js dimuat SEBELUM app.js; tanpa ini app.js:16 (FiezelI18n.t) melempar. */
+for (const __f of ['features/i18n/fiezel-i18n.js'].concat(fs.readdirSync(path.join(root,'features/i18n')).filter(n=>/^copy-id-.*\.js$/.test(n)).sort().map(n=>'features/i18n/'+n))) {
+  vm.runInContext(fs.readFileSync(path.join(root, __f), 'utf8'), context, { filename: __f });
+}
 vm.runInContext(app,context,{filename:'app.js'});
 const signature=q=>String(q.question).toLowerCase().replace(/\s+/g,' ').trim()+'||'+q.options.map(x=>String(x).toLowerCase()).sort().join('|');
 
@@ -76,7 +89,7 @@ setTimeout(()=>{try{
   assert(html.includes('id="answerBurst"')&&css.includes('.answer-burst.show'),'answer popup surface is missing');
   assert(html.includes('id="globalSky"')&&html.includes('id="globalCelestial"'),'full-screen celestial layer is missing');
   assert(css.includes('.global-sky')&&css.includes('.sky-light')&&css.includes('.scene-night'),'day/night full-screen visual phases are incomplete');
-  assert(app.includes('Hindari gaya buku teks')&&app.includes('Gunakan Bahasa Indonesia yang jernih'),'AI natural-language contract is missing');
+  assert(idCorpus.includes('Hindari gaya buku teks')&&idCorpus.includes('Gunakan Bahasa Indonesia yang jernih'),'AI natural-language contract is missing');
   // Unduh+dekode sampel berjalan asinkron; beri satu putaran event loop sebelum menagih
   // bunyinya benar-benar DIBUNYIKAN (AudioBufferSourceNode.start), bukan hanya diminta.
   setTimeout(()=>{try{

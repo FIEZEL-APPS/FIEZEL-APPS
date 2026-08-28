@@ -24,6 +24,15 @@
 }(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
 
+  // i18n (AI-02 F01): naskah murid modul ini pindah ke features/i18n/copy-id-feat-a.js.
+  // Di browser, fiezel-i18n.js + copy-map dimuat lebih dulu lewat urutan <script defer>
+  // di index.html (AI-01 F02), jadi FiezelI18n dipakai langsung tanpa guard. Di Node
+  // (tes print-only me-require modul ini), copy-map dimuat lewat require supaya nilai
+  // 'id' tetap SATU sumber yang byte-identik dengan naskah beku gerbang emas.
+  var I18N = (typeof FiezelI18n !== 'undefined') ? FiezelI18n
+    : ((typeof module === 'object' && module.exports) ? require('../i18n/copy-id-feat-a.js') : null);
+  function t(key, params) { return I18N.t(key, params); }
+
   var SCHEMA = 'fiezel-daily-target-v1';
   // Floor and ceiling on a day's work. Below the floor the target is not worth locking
   // for; above the ceiling it stops being a daily habit and becomes a punishment.
@@ -111,13 +120,13 @@
     function panelMarkup(st) {
       var percent = st.total ? Math.min(100, Math.round((st.done / st.total) * 100)) : 0;
       return '<div class="daily-lock-panel">' +
-        '<div class="daily-lock-mark">TARGET HARIAN FIEZEL · WAJIB</div>' +
-        '<h2>Target hari ini belum selesai</h2>' +
-        '<p>FIEZEL menilai kamu perlu <b>' + st.total + ' soal</b> hari ini. Sisa <b>' + st.remaining + '</b> lagi. Aplikasi terbuka penuh setelah target beres.</p>' +
+        t('daily.lock-mark') +
+        t('daily.lock-title') +
+        t('daily.lock-body', { total: st.total, remaining: st.remaining }) +
         '<div class="daily-lock-track"><span style="width:' + percent + '%"></span></div>' +
-        '<p class="daily-lock-count">' + st.done + ' / ' + st.total + ' soal</p>' +
-        '<button type="button" class="primary wide" id="dailyLockStart">Kerjakan sekarang</button>' +
-        '<p class="daily-lock-note">Keluar dari aplikasi tidak menghapus target. Saat kembali, target ini masih menunggu.</p>' +
+        t('daily.lock-count', { done: st.done, total: st.total }) +
+        t('daily.lock-start-btn') +
+        t('daily.lock-note') +
         '</div>';
     }
 
@@ -131,7 +140,7 @@
         node.className = 'daily-lock';
         node.setAttribute('role', 'dialog');
         node.setAttribute('aria-modal', 'true');
-        node.setAttribute('aria-label', 'Target harian FIEZEL');
+        node.setAttribute('aria-label', t('daily.lock-aria'));
         node.innerHTML = panelMarkup(st);
         doc.body.appendChild(node);
       }
@@ -165,7 +174,7 @@
           armed = false;
           working = false;
           close();
-          try { if (typeof target.showToast === 'function') target.showToast('Target harian selesai. Aplikasi terbuka penuh.'); } catch (_) {}
+          try { if (typeof target.showToast === 'function') target.showToast(t('daily.done-toast')); } catch (_) {}
         }
         return st;
       }
@@ -214,7 +223,7 @@
       var guarded = function (view) {
         if (armed && !status().met && view !== 'test') {
           working = false;
-          try { if (typeof target.showToast === 'function') target.showToast('Selesaikan target harian dulu.'); } catch (_) {}
+          try { if (typeof target.showToast === 'function') target.showToast(t('daily.finish-first-toast')); } catch (_) {}
           open();
           return false;
         }

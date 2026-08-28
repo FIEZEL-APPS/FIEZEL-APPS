@@ -4014,3 +4014,81 @@ body.reduce-motion .fz-coach-bubble.is-paw-birth{animation:fzBubbleBirthFade .24
    smile dinaikkan sebagai bacaan pengganti. !important menang atas inline. */
 .map-note .coach-strip-face fiezel-mascot :is(.fz-m-wave,.fz-m-flat,.fz-m-concern,.fz-m-sad){display:none!important}
 .map-note .coach-strip-face fiezel-mascot:has(:is(.fz-m-wave,.fz-m-flat,.fz-m-concern,.fz-m-sad):not([style*="none"])) .fz-m-smile{display:block!important}
+
+/* ==========================================================================
+   ===== FASE3 / W3-FONT — TIPOGRAFI THAI (semua aturan HANYA :lang(th)) =====
+   Ditambahkan append-only di bawah marker FASE3 sesuai konvensi (style.css
+   ±3227): cascade posisi akhir menang tanpa !important, dan nol byte aturan
+   id yang ada disentuh — murid Indonesia tidak melihat perubahan apa pun.
+   Dasar: AI-05 F01/F02 (webfont brand 0 glyph Thai, tanpa unicode-range),
+   AI-05 F03 + AI-04 F06 (line-height ketat merusak tumpukan sara/wannayuk),
+   AI-05 F04 (letter-spacing lebar memecah bentuk kata Thai), AI-04 F01
+   (tanpa jaring pengaman pembungkusan kata).
+   ========================================================================== */
+
+/* Noto Sans Thai Looped — keputusan orkestrator (IMPL-BRIEF): wajah looped,
+   subset self-host dari repo resmi google/fonts (lisensi OFL 1.1, salinan di
+   assets/fonts/OFL-NotoSansThaiLooped.txt). Empat berat statis diinstansiasi
+   dari VF resmi lalu di-subset (Thai U+0E00-0E7F + Latin dasar + tanda baca
+   umum), ±40 KB per berat. unicode-range membatasi wajah ini ke blok Thai
+   SAJA: huruf Latin/angka di kalimat campur tetap memakai wajah brand
+   (AI-05 F02), dan peramban murid id TIDAK PERNAH mengunduh berkas ini
+   karena deklarasinya baru aktif saat ada karakter Thai di layar
+   (AI-05 F09 — itu sebabnya TIDAK ada preload statis di index.html;
+   pengisian offline lewat manifest features/i18n/locale-assets-th.json). */
+@font-face{font-family:'Noto Sans Thai Looped';font-style:normal;font-weight:400;font-display:swap;
+  src:url('./assets/fonts/NotoSansThaiLooped-400.woff2') format('woff2');unicode-range:U+0E00-0E7F}
+@font-face{font-family:'Noto Sans Thai Looped';font-style:normal;font-weight:500;font-display:swap;
+  src:url('./assets/fonts/NotoSansThaiLooped-500.woff2') format('woff2');unicode-range:U+0E00-0E7F}
+@font-face{font-family:'Noto Sans Thai Looped';font-style:normal;font-weight:600;font-display:swap;
+  src:url('./assets/fonts/NotoSansThaiLooped-600.woff2') format('woff2');unicode-range:U+0E00-0E7F}
+@font-face{font-family:'Noto Sans Thai Looped';font-style:normal;font-weight:700;font-display:swap;
+  src:url('./assets/fonts/NotoSansThaiLooped-700.woff2') format('woff2');unicode-range:U+0E00-0E7F}
+
+/* Token font di bawah locale th: wajah Thai disisipkan DI DEPAN stack brand.
+   Karena unicode-range di atas, "di depan" hanya berarti karakter Thai yang
+   mengambilnya — Latin lolos ke wajah brand berikutnya, jadi kartu dwibahasa
+   (AI-05 F05) memakai brand untuk Inggris dan Noto Thai untuk Thai dalam satu
+   baris. :root:lang(th) (0,2,0) menang atas :root (0,1,0); duplikat token di
+   dalam .fiezel-splash/.fiezel-ob TIDAK ditimpa — zona splash byte-parity
+   (AI-04 F10) tetap utuh dan memang tidak memuat konten Thai. */
+:root:lang(th){
+  --fz-display:'Noto Sans Thai Looped','FZ Instrument Serif',Georgia,'Times New Roman',serif;
+  --fz-display-round:'Noto Sans Thai Looped','FZ Fredoka','FZ Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --fz-heading:'Noto Sans Thai Looped','FZ Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --fz-body:'Noto Sans Thai Looped','FZ Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+
+/* Lantai line-height Thai (AI-05 F03 / AI-04 F06): sara atas + tanda nada
+   menumpuk sampai 3 tingkat; di bawah ±1.35 baris display saling tabrak dan
+   terpangkas oleh leluhur overflow:hidden. Nilai Latin id TIDAK diubah.
+   letter-spacing negatif juga dinolkan — tracking rapat membuat tanda nada
+   menabrak glyph berikutnya (AI-05 F04 poin c). */
+:lang(th) .launcher-copy h1,
+:lang(th) .launcher-copy h1.login-message{line-height:1.4;letter-spacing:normal}
+:lang(th) .hero h2{line-height:1.35;letter-spacing:normal}
+:lang(th) .question{line-height:1.5;letter-spacing:normal}
+:lang(th) .section-head p{line-height:1.5}
+:lang(th) .launch-card b{line-height:1.45;letter-spacing:normal}
+:lang(th) .launch-card small{line-height:1.45}
+
+/* Jaring pengaman pembungkusan (AI-04 F01/F02): Thai tanpa spasi antar-kata;
+   segmentasi kamus peramban gagal pada nama/serapan panjang dan body punya
+   overflow-x:hidden yang MENYEMBUNYIKAN blowout. break-word (bukan anywhere)
+   supaya pemenggalan kamus tetap diutamakan; line-break:normal mengunci
+   kebijakan pemenggalan lintas peramban. */
+:lang(th) .question,:lang(th) .option,:lang(th) .card,:lang(th) .toast,
+:lang(th) .coach-body,:lang(th) .hero-line,:lang(th) .launcher-lead,
+:lang(th) .flash-face,:lang(th) .modal-panel,:lang(th) .section-head p,
+:lang(th) .launch-card,:lang(th) .classroom-id{overflow-wrap:break-word;line-break:normal}
+
+/* Micro-label (AI-05 F04): tracking lebar .1-.32em menyisipkan celah di dalam
+   kata Thai (tanpa spasi antar-kata) dan menghancurkan bentuk kata; uppercase
+   memang no-op untuk Thai jadi dibiarkan. .fiezel-splash-tag SENGAJA tidak
+   disentuh — ia hidup di blok byte-parity splash (AI-04 F10) dan tagline
+   splash tetap Latin (brand, bukan konten pelajar). */
+:lang(th) .eyebrow,
+:lang(th) .fiezel-stepper-eyebrow,
+:lang(th) .core-eyebrow,
+:lang(th) .launcher-meta,
+:lang(th) .fiezel-ob-tag{letter-spacing:normal}

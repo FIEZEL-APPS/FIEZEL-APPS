@@ -40,14 +40,29 @@ assert(/sessionAttempts:coreBrainSessionAttempts\(\)/.test(app)&&/state\.activeS
 // The all-caps kicker was removed as a design decision; the ring, the target and the
 // function are the feature. This is a stricter marker than the label it replaces.
 assert(/function dailyBrief/.test(app)&&/mission-ring/.test(app)&&/MEANINGFUL_ATTEMPTS/.test(app),'daily learning brief missing');
-assert(/Peta Belajar & Lab/.test(app)&&/Lab Kesalahan/.test(app)&&/Linimasa Kelemahan/.test(app),'learning map/labs missing');
-assert(/Jaringan Kekeliruan Kosakata/.test(app)&&/Peta Skill Reading/.test(app),'skill/confusion maps missing');
-assert(/Laporan Diagnostik/.test(app)&&/Dibuat oleh Fitrarustqi/.test(app),'diagnostic/creator product surface missing');
+// AI-20 F06 (W1-TESTPLAN 2a): naskah murid boleh PINDAH byte-identik dari app.js ke copy-map
+// features/i18n/copy-id-*.js (himpunan literal dijaga id-golden-snapshot-test.js), jadi HANYA
+// baris peta-belajar ini mencari di UNION app.js + copy-id — glob kosong = perilaku lama.
+// Semua invarian keamanan lain di berkas ini tetap memeriksa app.js langsung (DO-NOT-TOUCH).
+const i18nDir=path.join(root,'features','i18n');
+const copyIdUnion=fs.existsSync(i18nDir)?fs.readdirSync(i18nDir).filter(f=>/^copy-id-.*\.js$/.test(f)).sort().map(f=>fs.readFileSync(path.join(i18nDir,f),'utf8')).join('\n'):'';
+const appCopyUnion=app+'\n'+copyIdUnion;
+assert(/Peta Belajar & Lab/.test(appCopyUnion)&&/Lab Kesalahan/.test(appCopyUnion)&&/Linimasa Kelemahan/.test(appCopyUnion),'learning map/labs missing');
+// W2-INT (teknik union yang sama dengan baris peta-belajar di atas): kedua judul peta ini
+// PINDAH byte-identik ke features/i18n/copy-id-app-d.js (W2-APP-D) — himpunan literal tetap
+// dijaga id-golden-snapshot-test.js, jadi pencariannya ikut UNION app.js + copy-id.
+assert(/Jaringan Kekeliruan Kosakata/.test(appCopyUnion)&&/Peta Skill Reading/.test(appCopyUnion),'skill/confusion maps missing');
+// W2-INT: 'Laporan Diagnostik' juga PINDAH byte-identik ke copy-id-app-d.js (union sama).
+// Kredit pembuat tetap dicek di app.js langsung — ia bukan naskah murid yang boleh pindah.
+assert(/Laporan Diagnostik/.test(appCopyUnion)&&/Dibuat oleh Fitrarustqi/.test(app),'diagnostic/creator product surface missing');
 assert(/GRAMMAR_SESSION_SIZE=25/.test(app)&&/buildGrammarLessonQuestions/.test(app),'25-question grammar lesson contract missing');
 assert(/getCelestialState/.test(app)&&/playFeedbackSound/.test(app)&&/showAnswerBurst/.test(app),'realtime sky or answer feedback system missing');
 assert(/if\(!state\.adaptiveReady\)return \[\]/.test(app),'adaptive pool must be locked before diagnosis');
 assert(/passage:\{id:r\.id/.test(app),'reading questions do not carry their passage');
-assert(/q\.passage\?card\(.*TEKS BACAAN/s.test(app),'quiz renderer does not show passage with reading question');
+// W2-INT (teknik union): eyebrow 'TEKS BACAAN' PINDAH byte-identik ke copy-id-app-d.js
+// ('quiz.teks-bacaan'). Struktur renderer tetap dicek di app.js: kartu passage harus tetap
+// dirender — kini lewat t('quiz.teks-bacaan') — dan nilainya tetap verbatim di copy-map.
+assert((/q\.passage\?card\(.*TEKS BACAAN/s.test(app)||(/q\.passage\?card\(.*FiezelI18n\.t\('quiz\.teks-bacaan'\)/s.test(app)&&/'quiz\.teks-bacaan'\s*:\s*'TEKS BACAAN'/.test(copyIdUnion))),'quiz renderer does not show passage with reading question');
 assert(/const readiness=diagnosticReadinessMap\(state\)/.test(app)&&/state\.adaptiveReady=!!readiness\[getActiveLevel\(state\)\]/.test(app),'adaptive readiness must be evidence-based, per active level');
 assert(/window\.__getFiezelState/.test(app),'test state hook missing');
 assert(V.length===1765,'active vocabulary master count changed unexpectedly');
@@ -76,7 +91,18 @@ const fetch=async url=>{
 };
 const ctx={console,Notification,self:null,document,localStorage,fetch,location:{href:'http://localhost/'},window:{},Date,Math,URL,setTimeout,clearTimeout};
 ctx.window=ctx;ctx.self=ctx;ctx.window.scrollTo=()=>{};ctx.window.speechSynthesis={cancel(){},speak(){}};ctx.window.SpeechSynthesisUtterance=function(text){this.text=text};
-vm.createContext(ctx);vm.runInContext(app,ctx,{filename:'app.js'});
+// W2-INT (pola W1-TESTPLAN 2b, harness kondisional — sama dengan settings-cache-test.js):
+// app.js kini memanggil FiezelI18n.t(...) untuk naskah yang PINDAH byte-identik ke copy-map
+// (Wave 2), jadi runtime i18n + seluruh copy-id dimuat ke vm SEBELUM app.js — meniru urutan
+// <script defer> index.html. Kalau berkasnya belum ada, harness kosong = perilaku lama.
+vm.createContext(ctx);
+const i18nRuntimePath=path.join(i18nDir,'fiezel-i18n.js');
+if(fs.existsSync(i18nRuntimePath)){
+  vm.runInContext(fs.readFileSync(i18nRuntimePath,'utf8'),ctx,{filename:'fiezel-i18n.js'});
+  for(const f of fs.readdirSync(i18nDir).filter(f=>/^copy-id-.*\.js$/.test(f)).sort())
+    vm.runInContext(fs.readFileSync(path.join(i18nDir,f),'utf8'),ctx,{filename:f});
+}
+vm.runInContext(app,ctx,{filename:'app.js'});
 setTimeout(async()=>{
  try{
   const st=ctx.__getFiezelState();

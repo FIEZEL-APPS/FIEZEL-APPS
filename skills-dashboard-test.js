@@ -52,7 +52,16 @@ const context = {
 };
 context.window = context; context.self = context; context.window.scrollTo = () => {};
 vm.createContext(context);
+// AI-20 F06 (W1-TESTPLAN 2b): harness i18n KONDISIONAL — index.html memuat fiezel-i18n.js +
+// copy-id-*.js SEBELUM modul fitur dan app.js. Begitu naskah skills/progress pindah ke
+// copy-map, render memanggil FiezelI18n.t(); tanpa preload ini vm meledak. existsSync =
+// hijau dua arah. Asersi teks id di bawah TIDAK berubah (byte-identik, id-golden-snapshot).
+const i18nBoot = fs.existsSync(path.join(root, 'features/i18n/fiezel-i18n.js'))
+  ? ['features/i18n/fiezel-i18n.js',
+     ...fs.readdirSync(path.join(root, 'features/i18n')).filter(n => /^copy-id-.*\.js$/.test(n)).sort().map(n => 'features/i18n/' + n)]
+  : [];
 for (const file of [
+  ...i18nBoot,
   'features/speaking-listening/speaking-listening-config.js',
   'features/skills-evidence/fiezel-skills-evidence.js',
   'features/academic-readiness/fiezel-academic-readiness.js',

@@ -44,7 +44,7 @@ context.window=context;context.self=context;
 context.FIEZEL_VERSION=JSON.parse(fs.readFileSync(path.join(root,'VERSION.json'),'utf8')).version;
 context.window.scrollTo=()=>{};context.window.requestAnimationFrame=fn=>fn();
 vm.createContext(context);
-vm.runInContext(fs.readFileSync(path.join(root,'app.js'),'utf8'),context,{filename:'app.js'});
+/* m025-186 merge-fix: kontrak index.html FIEZEL_I18N_BEGIN - i18n + copy-id sebelum app.js. */for(const __f of ['features/i18n/fiezel-i18n.js'].concat(fs.readdirSync(path.join(root,'features/i18n')).filter(n=>/^copy-id-.*\.js$/.test(n)).sort().map(n=>'features/i18n/'+n))){vm.runInContext(fs.readFileSync(path.join(root,__f),'utf8'),context,{filename:__f});}vm.runInContext(fs.readFileSync(path.join(root,'app.js'),'utf8'),context,{filename:'app.js'});
 
 const templates=JSON.parse(fs.readFileSync(path.join(root,'grammar-templates.json'),'utf8')).templates;
 const state=context.__getFiezelState();

@@ -108,7 +108,16 @@ const sandbox = {
   // sandbox menyuplai bloknya apa adanya dari app.js - bukan salinan yang bisa menua.
   LEVEL_GUARD_COPY: (() => {
     const block = app.match(/const\s+LEVEL_GUARD_COPY=\{[\s\S]*?\n\};/);
-    try { return block ? vm.runInNewContext(`${block[0].replace(/^const\s+LEVEL_GUARD_COPY=/, '')}`) : {}; }
+    /* m025-186 merge-fix: literal copy kini lewat FiezelI18n.t — evaluasi butuh runtime i18n. */
+    try {
+      const i18nCtx = { self: null, window: null, globalThis: null };
+      i18nCtx.self = i18nCtx; i18nCtx.window = i18nCtx; i18nCtx.globalThis = i18nCtx;
+      vm.createContext(i18nCtx);
+      for (const __f of ['features/i18n/fiezel-i18n.js'].concat(fs.readdirSync(path.join(__dirname,'features/i18n')).filter(n=>/^copy-id-.*\.js$/.test(n)).sort().map(n=>'features/i18n/'+n))) {
+        vm.runInContext(fs.readFileSync(path.join(__dirname, __f), 'utf8'), i18nCtx, { filename: __f });
+      }
+      return block ? vm.runInContext(`(${block[0].replace(/^const\s+LEVEL_GUARD_COPY=/, '').replace(/;\s*$/, '')})`, i18nCtx) : {};
+    }
     catch (_) { return {}; }
   })(),
   save: () => { saves++; },
@@ -118,7 +127,12 @@ const sandbox = {
 };
 let sandboxReady = false;
 try {
+  sandbox.self = sandbox; sandbox.window = sandbox; sandbox.globalThis = sandbox;
   vm.createContext(sandbox);
+  /* m025-186 merge-fix: blok app.js kini memanggil FiezelI18n.t — muat runtime + copy-id. */
+  for (const __f of ['features/i18n/fiezel-i18n.js'].concat(fs.readdirSync(path.join(__dirname,'features/i18n')).filter(n=>/^copy-id-.*\.js$/.test(n)).sort().map(n=>'features/i18n/'+n))) {
+    vm.runInContext(fs.readFileSync(path.join(__dirname, __f), 'utf8'), sandbox, { filename: __f });
+  }
   vm.runInContext(NEEDED.map(name => blocks[name]).join('\n'), sandbox, { timeout: 4000 });
   sandboxReady = true;
 } catch (error) {
@@ -416,15 +430,49 @@ const homeBlock = sourceBlock('home');
 check('S13 · Home menampilkan banner mode percobaan / terkunci', /activeLevelTrustMarkup\(\)/.test(homeBlock),
   'murid harus tahu statusnya tanpa harus membuka panel level');
 
-const copyBlock = app.match(/const\s+LEVEL_GUARD_COPY=\{[\s\S]*?\};/);
-const copyText = copyBlock ? copyBlock[0] : '';
-check('S14 · copy guard memuat teks peringatan 5, 8, demosi, kunci, dan ujian', /warn5:/.test(copyText) && /warn8:/.test(copyText) && /demotionBody:/.test(copyText) && /lockedFeature:/.test(copyText) && /examDesc:/.test(copyText),
+// AI-20 F06 (kategori 2a, UNION repoint): blok LEVEL_GUARD_COPY boleh PINDAH ke copy-map
+// features/i18n/copy-id-level.js dengan nilai byte-identik (dijaga id-golden-snapshot-test.js).
+// Kalau bloknya tidak lagi ditemukan di app.js, blok registrasi copy-map dipakai sebagai
+// sumber teks — SEMUA sub-cek S14/S14b/S15 (kunci wajib, nilai id verbatim, sinkron angka)
+// tetap berjalan utuh atas teks itu. Syarat untuk W2-APP (lihat impl/handoff/W2-APP.md):
+// slug kunci di copy-map WAJIB mempertahankan nama anggota LEVEL_GUARD_COPY (warn5, warn8,
+// demotionBody, lockedFeature, examDesc, entryChip, entryExam, entryLater, probationBody)
+// supaya ikatan cek ini tidak putus. Regex kunci di bawah menoleransi bentuk keduanya
+// (warn5: di app.js maupun 'level.warn5': di copy-map).
+let copyBlock = app.match(/const\s+LEVEL_GUARD_COPY=\{[\s\S]*?\};/);
+/* m025-186 merge-fix (AI-20 F06 diperluas): blok LEVEL_GUARD_COPY di app.js kini memetakan
+   anggota -> FiezelI18n.t('<kunci>'). Cek S14/S14b/S15 tetap menegakkan kontrak yang sama,
+   tapi pada NILAI copy hasil resolve runtime i18n - bukan pada literal di app.js. */
+const guardMembers = {};
+if (copyBlock) {
+  for (const m of copyBlock[0].matchAll(/([A-Za-z0-9_]+)\s*:\s*(?:FiezelI18n\.t\('([^']+)'\)|'((?:[^'\\]|\\.)*)')/g)) {
+    guardMembers[m[1]] = { key: m[2] || null, literal: m[3] !== undefined ? m[3] : null };
+  }
+}
+const guardI18nCtx = (() => {
+  const c = { self: null, window: null, globalThis: null };
+  c.self = c; c.window = c; c.globalThis = c;
+  vm.createContext(c);
+  for (const __f of ['features/i18n/fiezel-i18n.js'].concat(fs.readdirSync(path.join(root, 'features', 'i18n')).filter(n => /^copy-id-.*\.js$/.test(n)).sort().map(n => 'features/i18n/' + n))) {
+    vm.runInContext(fs.readFileSync(path.join(root, __f), 'utf8'), c, { filename: __f });
+  }
+  return c;
+})();
+const guardValue = (member) => {
+  const g = guardMembers[member];
+  if (!g) return '';
+  if (g.literal !== null) return g.literal;
+  try { return String(guardI18nCtx.FiezelI18n.t(g.key)); } catch (_) { return ''; }
+};
+check('S14 · copy guard memuat teks peringatan 5, 8, demosi, kunci, dan ujian',
+  ['warn5', 'warn8', 'demotionBody', 'lockedFeature', 'examDesc'].every((m) => guardValue(m).length > 0),
   'teks §3 dan §4 reports/copy-fitur-baru.md tersimpan di satu tempat, bukan tersebar');
 check('S14b · copy gerbang baru ada dan penjelasan "belum terverifikasi" sudah jadi microcopy',
-  /entryChip:/.test(copyText) && /entryExam:'Ikuti ujian'/.test(copyText) && /entryLater:'Nanti aja'/.test(copyText) &&
-  (copyText.match(/probationBody:'([^']*)'/)?.[1] || '').length <= 90,
-  `panjang probationBody sekarang ${(copyText.match(/probationBody:'([^']*)'/)?.[1] || '').length} karakter — satu kalimat, bukan artikel`);
-check('S15 · angka di copy ujian sinkron dengan LEVEL_EXAM_PASS', new RegExp(`minimal\\s+${EXAM_PASS}%`).test(copyText),
+  guardValue('entryChip').length > 0 && guardValue('entryExam') === 'Ikuti ujian' && guardValue('entryLater') === 'Nanti aja' &&
+  guardValue('probationBody').length > 0 && guardValue('probationBody').length <= 90,
+  `panjang probationBody sekarang ${guardValue('probationBody').length} karakter — satu kalimat, bukan artikel`);
+check('S15 · angka di copy ujian sinkron dengan LEVEL_EXAM_PASS',
+  new RegExp(`minimal\\s+${EXAM_PASS}%`).test(Object.keys(guardMembers).map(guardValue).join('\n')),
   `teks harus menulis ${EXAM_PASS}% supaya tidak menjanjikan ambang yang berbeda dari kode`);
 
 // ---------------------------------------------------------------------------

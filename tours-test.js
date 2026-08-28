@@ -254,8 +254,24 @@ check('T6d replay juga mereset kuota retry (menu dan fitur)',
   'kuota retry yang sudah habis membuat replay diam');
 check('T6e kunci localStorage lama ikut dilupakan',
   /FiezelTour\?\.reset\?\.\(self\)/.test(replayBlock), 'reset kunci lama hilang');
+// W2-INT (teknik union W2-TEST, pola onboarding-test:692): naskah tombol replay kini sah
+// dalam DUA bentuk — literal inline di app.js ATAU kunci copy-map FiezelI18n.t('...') yang
+// nilainya terdaftar BYTE-IDENTIK dengan copy §5 di features/i18n/copy-id-*.js (W2-APP-D
+// memindahkan literalnya ke copy-id-app-d.js; verbatim §5 tetap ditegakkan pada nilainya).
+const tourCopySources = fs.readdirSync('./features/i18n')
+  .filter((f) => /^copy-id-.*\.js$/.test(f))
+  .map((f) => fs.readFileSync('./features/i18n/' + f, 'utf8')).join('\n');
+function viaCopyVerbatim(literal, tKeyRe) {
+  const key = app.match(tKeyRe);
+  if (!key) return false;
+  const esc = literal.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp("'" + key[1].replace(/\./g, '\\.') + "'\\s*:\\s*'" + esc + "'").test(tourCopySources);
+}
 check('T6f tombol Pengaturan memakai subteks copy §5 verbatim',
-  app.includes(REPLAY_SUBTEXT) && app.includes('<b>Ulangi kenalan cepat</b>'),
+  (app.includes(REPLAY_SUBTEXT) ||
+    viaCopyVerbatim(REPLAY_SUBTEXT, /replayTour\(\)[^`]*?<small>\$\{FiezelI18n\.t\('([a-z0-9.-]+)'\)\}<\/small>/)) &&
+  (app.includes('<b>Ulangi kenalan cepat</b>') ||
+    viaCopyVerbatim('Ulangi kenalan cepat', /<b>\$\{FiezelI18n\.t\('(settings\.redo-kenalan-cepat)'\)\}<\/b>/)),
   'subteks tombol replay tidak sama dengan copy §5');
 
 /* --------------------------------------------------------- T7: pemasangan --- */

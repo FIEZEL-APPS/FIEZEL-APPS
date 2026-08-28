@@ -171,7 +171,7 @@ check('The renderer honours the TOEFL hidden-questions rule',
   /questionsVisibleDuringAudio/.test(renderer) && /data-notes/.test(renderer),
   'soal disembunyikan sampai audio habis, dan murid diberi tempat mencatat');
 check('Failed audio keeps the questions locked',
-  /Soal tetap terkunci/.test(renderer) && /this\.replays--/.test(renderer),
+  (/Soal tetap terkunci/.test(renderer) || /skillslab\.audio-tidak-can-diputar-item/.test(renderer)) && /this\.replays--/.test(renderer),
   'menjawab tanpa mendengar bukan latihan, dan percobaan yang gagal tidak boleh menghabiskan jatah putar');
 check('Exam sessions are level-scoped like everything else',
   /listeningExamFor\(level\)\{const target=normalizeLevel\(level\)/.test(addon), 'kontrak level m025-136 berlaku di sini juga');

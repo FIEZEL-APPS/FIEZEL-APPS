@@ -37,6 +37,8 @@ const ADDON = fs.readFileSync(ADDON_PATH, 'utf8');
 const SAY_PATH = 'features/neural-voice/fiezel-voice-say.js';
 const SAY = read(SAY_PATH);
 const APP = read('app.js');
+/* m025-186 merge-fix: literal murid pindah ke copy-map i18n; pagar membaca gabungan copy-id. */
+const COPY_ID = fs.readdirSync(path.join(root, 'features', 'i18n')).filter((n) => /^copy-id-.*\.js$/.test(n)).sort().map((n) => fs.readFileSync(path.join(root, 'features', 'i18n', n), 'utf8')).join('\n');
 const SW = read('sw.js');
 
 const checks = [];
@@ -235,7 +237,7 @@ function failingController(reason) {
       'renderListeningExam() masih membuka soal saat say() menjawab false');
 
     check('addon: jalur ujian yang sudah benar tidak diubah',
-      /this\.replays--/.test(ADDON) && /Soal tetap terkunci/.test(ADDON),
+      /this\.replays--/.test(ADDON) && (/Soal tetap terkunci/.test(ADDON) || (/skillslab\.audio-tidak-can-diputar-item/.test(ADDON) && /Soal tetap terkunci/.test(COPY_ID))),
       'renderListeningExam() adalah acuan perbaikan ini; ia harus tetap utuh');
     const timeout = /const\s+TTS_TIMEOUT_MS\s*=\s*(\d+)/.exec(ADDON);
     check('addon: ambang tunggu audio adalah konstanta bernama, bukan angka di dalam handler',
@@ -464,7 +466,7 @@ function audioHarness(options) {
     first === null,
     `hasil=${JSON.stringify(first)}`);
   check('app.js: pemanggil listening membaca hasil pemutaran sebelum berkata "putar ulang"',
-    /const played=await audio\.play\(q\.script/.test(APP) && /played\?'Putar ulang bila perlu\.'/.test(APP),
+    /const played=await audio\.play\(q\.script/.test(APP) && /played\?FiezelI18n\.t\('quiz\.putar-ulang-bila-perlu'\)/.test(APP) && /'quiz\.putar-ulang-bila-perlu':\s*'Putar ulang bila perlu\.'/.test(COPY_ID),
     'catatan "Putar ulang bila perlu" untuk rekaman yang tidak berbunyi adalah pesan yang bohong');
 })().catch((error) => { check('app.js: harness berjalan tanpa galat', false, error.stack || String(error)); });
 

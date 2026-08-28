@@ -507,7 +507,7 @@ function bootApp() {
   context.FIEZEL_VERSION = readJson('VERSION.json').version;
   context.window.scrollTo = () => {}; context.window.requestAnimationFrame = fn => fn();
   vm.createContext(context);
-  vm.runInContext(app, context, { filename: 'app.js' });
+  /* m025-186 merge-fix: kontrak index.html FIEZEL_I18N_BEGIN - i18n + copy-id sebelum app.js. */for(const __f of ['features/i18n/fiezel-i18n.js'].concat(fs.readdirSync(path.join(root,'features/i18n')).filter(n=>/^copy-id-.*\.js$/.test(n)).sort().map(n=>'features/i18n/'+n))){vm.runInContext(fs.readFileSync(path.join(root,__f),'utf8'),context,{filename:__f});}vm.runInContext(app, context, { filename: 'app.js' });
   return context;
 }
 

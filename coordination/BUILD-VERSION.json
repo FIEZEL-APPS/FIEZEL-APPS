@@ -1,7 +1,7 @@
 {
-  "version": "m025-186",
-  "claimedBy": "perplexity-computer (braincore session, T-027)",
-  "claimedAt": "2026-08-28T17:51:47.600Z",
-  "reason": "m025: perbaikan celah feedback pasca-wave-D — bahasa classroom SMP-SMA, explain cloze kurasi, reading why A1/A2 + kunci-ganda, POS -ly, revealCloze, OLM mean, weak-skill ujian, klaim privasi speaking, tutorStuck escalate, pipeline terjemahan grammar pulih",
+  "version": "m025-187",
+  "claimedBy": "perplexity-computer (multilingual i18n wave, direbase atas m025-185)",
+  "claimedAt": "2026-08-28T19:53:32.488Z",
+  "reason": "m025: merge #241 x wave-Thai — celah feedback ditutup di dunia i18n (copy-id jujur id+th), 7 gerbang harness dipulihkan pasca-#242 (i18n preload + kunci i18n), OLM mean, cloze explain bank-first",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
