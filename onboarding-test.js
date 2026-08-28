@@ -689,7 +689,20 @@ test('nama tidak bisa menyuntik markup dan tidak bisa tumbuh tanpa batas', () =>
 test('aplikasi tidak lagi memaku nama siapa pun sebagai nilai bawaan', () => {
   assert.ok(/const DEFAULT_USER_NAME='';/.test(app),
     'nama bawaan yang berisi nama orang berarti murid lain disapa dengan nama orang itu');
-  assert.ok(/const FALLBACK_LEARNER_NAME='[^']+';/.test(app), 'sapaan cadangan harus netral, bukan nama orang');
+  // W2-APP-D (teknik union W2-TEST): sapaan cadangan kini sah dalam DUA bentuk —
+  // literal inline ATAU kunci copy-map FiezelI18n.t('...') yang nilainya terdaftar
+  // non-kosong di features/i18n/copy-id-*.js (m025-117 tetap terjaga: bukan nama orang,
+  // melainkan sapaan netral yang datang dari lapisan naskah, bukan hardcode nama).
+  const fallbackInline = /const FALLBACK_LEARNER_NAME='[^']+';/.test(app);
+  const fallbackKey = app.match(/const FALLBACK_LEARNER_NAME=FiezelI18n\.t\('([a-z0-9.-]+)'\);/);
+  let fallbackViaCopy = false;
+  if (fallbackKey) {
+    const copySources = fs.readdirSync('./features/i18n')
+      .filter((f) => /^copy-id-.*\.js$/.test(f))
+      .map((f) => fs.readFileSync('./features/i18n/' + f, 'utf8')).join('\n');
+    fallbackViaCopy = new RegExp("'" + fallbackKey[1].replace(/\./g, '\\.') + "'\\s*:\\s*'[^']+'").test(copySources);
+  }
+  assert.ok(fallbackInline || fallbackViaCopy, 'sapaan cadangan harus netral, bukan nama orang');
   assert.ok(/function setLearnerName\(value\)/.test(app), 'satu pintu masuk nama ke dalam state');
   assert.ok(/onName:\(\{name\}\)=>/.test(app), 'app.js harus menyambungkan langkah nama ke state');
   assert.ok(/function askLearnerNameIfMissing/.test(app), 'murid lama tetap harus ditanya sekali');

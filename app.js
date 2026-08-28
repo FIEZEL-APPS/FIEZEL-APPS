@@ -6180,8 +6180,8 @@ function makeVocabQuestion(v,preferType){
   if(type==='context'&&!v.example)type='meaning';
   if(type==='partOfSpeech'&&!partOfSpeechAskable(v))type='meaning';
   let q,options,answer;
-  if(type==='context'){options=shuffle([v.meaning,...distractMeaning]);q=`Dalam kalimat “${v.example}”, arti “${v.word}” yang paling pas apa?`;answer=v.meaning}
-  else if(type==='partOfSpeech'){const correctPos=indonesianPartOfSpeech(v.partOfSpeech),pos=shuffle(Object.values(PART_OF_SPEECH_ID).filter(x=>x!==correctPos)),surface=vocabSurfaceForm(v)||v.word,asal=norm(surface)===norm(v.word)?'':` (bentuk dari “${v.word}”)`;options=shuffle([correctPos,...pos.slice(0,3)]);q=`Dalam kalimat “${v.example}”, kata “${surface}”${asal} berperan sebagai jenis kata apa?`;answer=correctPos}
+  if(type==='context'){options=shuffle([v.meaning,...distractMeaning]);q=FiezelI18n.t('quiz-vocab.dalam-kalimat-arti-paling-pas',{sample:v.example,word:v.word});answer=v.meaning}
+  else if(type==='partOfSpeech'){const correctPos=indonesianPartOfSpeech(v.partOfSpeech),pos=shuffle(Object.values(PART_OF_SPEECH_ID).filter(x=>x!==correctPos)),surface=vocabSurfaceForm(v)||v.word,asal=norm(surface)===norm(v.word)?'':FiezelI18n.t('quiz-vocab.bentuk',{word:v.word});options=shuffle([correctPos,...pos.slice(0,3)]);q=FiezelI18n.t('quiz-vocab.dalam-kalimat-kata-berperan-sebagai',{sample:v.example,bentuk:surface,asal:asal});answer=correctPos}
   else if(type==='synonym'){options=shuffle([v.synonyms[0],...synonymPool().slice(0,3)]);q=`Kata mana yang maknanya paling dekat dengan “${v.word}”?`;answer=v.synonyms[0]}
   else{options=shuffle([v.meaning,...distractMeaning]);q=`Arti Bahasa Indonesia yang paling dekat dengan “${v.word}” apa?`;answer=v.meaning}
   const posLabel=indonesianPartOfSpeech(v.partOfSpeech);const why=type==='context'?`Di kalimat itu, “${v.word}” paling pas dimaknai “${v.meaning}”. Coba lihat tindakan atau situasi di sekeliling katanya.`:type==='partOfSpeech'?`“${v.word}” berfungsi sebagai ${posLabel}. Jenis kata dilihat dari tugasnya di dalam kalimat, bukan hanya dari bentuk katanya.`:type==='synonym'?`“${v.synonyms[0]}” paling dekat maknanya dengan “${v.word}”. Keduanya bisa terasa mirip, walaupun nuansa pemakaiannya dapat berbeda.`:`Intinya, “${v.word}” berarti “${v.meaning}”${v.partOfSpeech?` dan biasanya dipakai sebagai ${posLabel}`:''}.`;
@@ -6230,20 +6230,20 @@ function grammar(){const level=getActiveLevel(),entries=grammarItemsForLevel(lev
   }).join('');
   // Ujung jalur: node Ujian Skip Level bergaya emas — tujuan jangka menengah terlihat
   // dari simpul pertama. Panelnya panel ujian yang sudah ada (openActiveLevelExamPanel).
-  const examStep=`<li class="path-step path-step-exam ${examEntry?.passed?'is-mastered':'is-available'}"><button class="path-node path-node-exam" onclick="openActiveLevelExamPanel()" aria-label="Ujian Skip Level. ${examEntry?.passed?'Sudah lulus.':'Ujung jalur level ini.'}"><span class="path-ring path-ring-gold">${examEntry?.passed?'<i data-lucide="check"></i>':'<i data-lucide="award"></i>'}</span></button><div class="path-label"><b>Ujian Skip Level</b><span>${examEntry?.passed?'Lulus — level terverifikasi dari bukti.':'Ujung jalur: buktikan levelmu, tanpa petunjuk.'}</span></div></li>`;
+  const examStep=`<li class="path-step path-step-exam ${examEntry?.passed?'is-mastered':'is-available'}"><button class="path-node path-node-exam" onclick="openActiveLevelExamPanel()" aria-label="${FiezelI18n.t('grammar.ujian-skip-level',{level:examEntry?.passed?'Sudah lulus.':'Ujung jalur level ini.'})}"><span class="path-ring path-ring-gold">${examEntry?.passed?'<i data-lucide="check"></i>':'<i data-lucide="award"></i>'}</span></button><div class="path-label"><b>${FiezelI18n.t('level.ujian-judul')}</b><span>${examEntry?.passed?'Lulus — level terverifikasi dari bukti.':'Ujung jalur: buktikan levelmu, tanpa petunjuk.'}</span></div></li>`;
   // Tampilan daftar (aksesibilitas P1-1): kartu berurutan yang lama, data & penguncian sama.
-  const listBody=`<div class="grid grammar-grid">${rows.map(r=>card(`<div class="row"><b>${r.index+1}. ${esc(r.title)}</b><span>${esc(level)}</span></div><p class="muted">${esc(r.prerequisites)} · Fokus: ${esc(r.family)}.</p>${r.unlock.locked?`<p class="lesson-lock-note"><i data-lucide="lock"></i><span>${esc(lessonLockMessage(r.unlock))}</span></p>`:''}<div class="lesson-card-foot"><span>Mastery ${r.mastery}%</span>${!r.completed&&!r.examVerified?`<button type="button" class="lesson-skip-link" onclick="openLessonSkipGate('${esc(r.k)}')"><i data-lucide="fast-forward"></i> Lewati materi</button>`:''}${r.unlock.locked?`<button disabled aria-disabled="true" title="${esc(lessonLockMessage(r.unlock))}">Terkunci <i data-lucide="lock"></i></button>`:`<button onclick="openGrammarLesson('${esc(r.k)}')">Buka lesson <i data-lucide="arrow-right"></i></button>`}</div>`,r.unlock.locked?'lesson-locked':'')).join('')}</div>`;
+  const listBody=`<div class="grid grammar-grid">${rows.map(r=>card(`<div class="row"><b>${r.index+1}. ${esc(r.title)}</b><span>${esc(level)}</span></div><p class="muted">${FiezelI18n.t('grammar.fokus',{prerequisites:esc(r.prerequisites),family:esc(r.family)})}</p>${r.unlock.locked?`<p class="lesson-lock-note"><i data-lucide="lock"></i><span>${esc(lessonLockMessage(r.unlock))}</span></p>`:''}<div class="lesson-card-foot"><span>${FiezelI18n.t('grammar.mastery',{mastery:r.mastery})}</span>${!r.completed&&!r.examVerified?`<button type="button" class="lesson-skip-link" onclick="openLessonSkipGate('${esc(r.k)}')"><i data-lucide="fast-forward"></i> ${FiezelI18n.t('grammar.lewati-materi-2')}</button>`:''}${r.unlock.locked?`<button disabled aria-disabled="true" title="${esc(lessonLockMessage(r.unlock))}">${FiezelI18n.t('grammar.terkunci-2')} <i data-lucide="lock"></i></button>`:`<button onclick="openGrammarLesson('${esc(r.k)}')">${FiezelI18n.t('grammar.buka-lesson')} <i data-lucide="arrow-right"></i></button>`}</div>`,r.unlock.locked?'lesson-locked':'')).join('')}</div>`;
   const pathBody=`<ol class="lesson-path" aria-label="Jalur lesson level ${esc(level)}">${pathSteps}${examStep}</ol>`;
   // R2-1: node emas Ujian Skip Level duduk di UJUNG jalur — tak terlihat tanpa scroll
   // panjang. Chip lengket di puncak hub memanggil panel ujian yang SAMA, node ujungnya tetap.
-  const examChip=`<button type="button" class="exam-entry-chip${examEntry?.passed?' is-passed':''}" onclick="openActiveLevelExamPanel()" aria-label="Ujian Skip Level level ${esc(level)}. ${examEntry?.passed?'Sudah lulus.':'Buka panel ujian.'}"><i data-lucide="${examEntry?.passed?'badge-check':'award'}"></i><span><b>Ujian Skip Level</b><small>${examEntry?.passed?'Lulus — level terverifikasi':'Merasa sudah bisa? Buktikan kapan saja'}</small></span><i data-lucide="arrow-right"></i></button>`;
+  const examChip=`<button type="button" class="exam-entry-chip${examEntry?.passed?' is-passed':''}" onclick="openActiveLevelExamPanel()" aria-label="${FiezelI18n.t('grammar.ujian-skip-level-level',{level:esc(level),ujian:examEntry?.passed?'Sudah lulus.':'Buka panel ujian.'})}"><i data-lucide="${examEntry?.passed?'badge-check':'award'}"></i><span><b>${FiezelI18n.t('level.ujian-judul')}</b><small>${examEntry?.passed?'Lulus — level terverifikasi':'Merasa sudah bisa? Buktikan kapan saja'}</small></span><i data-lucide="arrow-right"></i></button>`;
   shell('Grammar Hub',`${skills.length} lesson terurut untuk level ${level}. Mulai dari urutan pertama agar prasyaratnya tidak terlewat.`,`<div class="grammar-level-note"><b>Jalur ${esc(level)}</b><span>${esc(levelDescriptor(level))}</span><small>Soal pilihan boleh bervariasi, tetapi urutan lesson mengikuti kurikulum dan prasyarat.</small></div><div class="grammar-hub-tools">${examChip}<div class="path-view-toggle"><button type="button" onclick="toggleGrammarHubView()" aria-pressed="${grammarHubListView}"><i data-lucide="${grammarHubListView?'route':'list'}"></i> ${grammarHubListView?'Tampilan jalur':'Tampilan daftar'}</button></div></div>${grammarHubListView?listBody:pathBody}`);
   // Auto-scroll ke node aktif — sesudah renderInner mengembalikan scroll ke atas.
   // Reduced-motion: lompat tanpa animasi (behavior 'auto'), bukan tanpa fungsi.
   if(!grammarHubListView&&current)setTimeout(()=>{try{document.querySelector('.path-step.is-current')?.scrollIntoView({block:'center',behavior:(prefersReducedMotion()||state.preferences?.motion===false)?'auto':'smooth'})}catch(_){}},140);
 }
-function openGrammarLesson(skill){const meta=GRAMMAR_ITEMS.find(x=>x.skill===skill);if(!meta||meta.level!==getActiveLevel())return showToast(`Lesson ini hanya tersedia pada level ${getActiveLevel()}.`);const unlock=lessonUnlockState(skill);if(unlock.locked)return showToast(lessonLockMessage(unlock));if(!(G[skill]||[]).length)return showToast('Lesson ini belum memiliki materi.');enterStage('grammar-lesson',()=>renderGrammarLesson(skill));renderGrammarLesson(skill)}
-function renderGrammarLesson(skill){const meta=GRAMMAR_ITEMS.find(x=>x.skill===skill);if(!meta||meta.level!==getActiveLevel())return showToast(`Lesson ini hanya tersedia pada level ${getActiveLevel()}.`);const lessonUnlock=lessonUnlockState(skill);if(lessonUnlock.locked)return showToast(lessonLockMessage(lessonUnlock));const arr=G[skill]||[];if(!arr.length)return showToast('Lesson ini belum memiliki materi.');const item=arr[0],base=item[0],opts=item[1]||[],correct=opts[item[2]],rule=grammarRuleIndonesian(item),clue=grammarClue(base),curriculum=grammarCurriculumEntry(skill)||meta;const prereq=Array.isArray(curriculum.prerequisites)&&curriculum.prerequisites.length?`Prasyarat: ${curriculum.prerequisites.map(friendlySkillName).join(', ')}`:'Ini lesson fondasi pertama.';shell(friendlySkillName(skill),`${meta.level} · urutan ${meta.sequence||'-'} · ${curriculum.unit||'fondasi'} · ${GRAMMAR_SESSION_SIZE} mode latihan`,`${card(`<div class="eyebrow">PAHAMI DULU · URUTAN ${meta.sequence||'-'}</div><h2 class="lesson-title">${esc(curriculum.title||friendlySkillName(skill))}</h2><p class="muted">${esc(prereq)}</p><p>${esc(rule)}</p><div class="lesson-example"><span>Contoh</span><h3>${esc(base)}</h3><p>Jawaban yang pas: <strong>${esc(correct)}</strong>. ${esc(clue)}</p></div><p class="memory-tip"><i data-lucide="lightbulb"></i><span>Jangan buru-buru menghafal rumus. Temukan dulu petunjuk waktu, maksud kalimat, dan hubungan antarbagian.</span></p>`,'grammar-lesson-card')}<div class="practice-contract"><div><h3>${GRAMMAR_SESSION_SIZE} mode latihan terfokus</h3><p>Semua soal tetap menguji konsep lesson ini melalui penerapan, diagnosis distraktor, perbandingan, penjelasan aturan, dan cek penguasaan.</p></div><button onclick="practiceSkill('${esc(skill)}')" class="primary">Mulai ${GRAMMAR_SESSION_SIZE} soal <i data-lucide="arrow-right"></i></button></div><div class="toolbar"><button onclick="exitStage()"><i data-lucide="arrow-left"></i> Kembali ke Grammar Hub</button></div>`)}
+function openGrammarLesson(skill){const meta=GRAMMAR_ITEMS.find(x=>x.skill===skill);if(!meta||meta.level!==getActiveLevel())return showToast(FiezelI18n.t('grammar.lesson-hanya-tersedia-pada-level',{level:getActiveLevel()}));const unlock=lessonUnlockState(skill);if(unlock.locked)return showToast(lessonLockMessage(unlock));if(!(G[skill]||[]).length)return showToast('Lesson ini belum memiliki materi.');enterStage('grammar-lesson',()=>renderGrammarLesson(skill));renderGrammarLesson(skill)}
+function renderGrammarLesson(skill){const meta=GRAMMAR_ITEMS.find(x=>x.skill===skill);if(!meta||meta.level!==getActiveLevel())return showToast(FiezelI18n.t('grammar.lesson-hanya-tersedia-pada-level',{level:getActiveLevel()}));const lessonUnlock=lessonUnlockState(skill);if(lessonUnlock.locked)return showToast(lessonLockMessage(lessonUnlock));const arr=G[skill]||[];if(!arr.length)return showToast('Lesson ini belum memiliki materi.');const item=arr[0],base=item[0],opts=item[1]||[],correct=opts[item[2]],rule=grammarRuleIndonesian(item),clue=grammarClue(base),curriculum=grammarCurriculumEntry(skill)||meta;const prereq=Array.isArray(curriculum.prerequisites)&&curriculum.prerequisites.length?FiezelI18n.t('grammar.prasyarat-2',{join:curriculum.prerequisites.map(friendlySkillName).join(', ')}):FiezelI18n.t('grammar.lesson-fondasi-pertama');shell(friendlySkillName(skill),`${meta.level} · urutan ${meta.sequence||'-'} · ${curriculum.unit||'fondasi'} · ${GRAMMAR_SESSION_SIZE} mode latihan`,`${card(`<div class="eyebrow">PAHAMI DULU · URUTAN ${meta.sequence||'-'}</div><h2 class="lesson-title">${esc(curriculum.title||friendlySkillName(skill))}</h2><p class="muted">${esc(prereq)}</p><p>${esc(rule)}</p><div class="lesson-example"><span>Contoh</span><h3>${esc(base)}</h3><p>Jawaban yang pas: <strong>${esc(correct)}</strong>. ${esc(clue)}</p></div><p class="memory-tip"><i data-lucide="lightbulb"></i><span>Jangan buru-buru menghafal rumus. Temukan dulu petunjuk waktu, maksud kalimat, dan hubungan antarbagian.</span></p>`,'grammar-lesson-card')}<div class="practice-contract"><div><h3>${GRAMMAR_SESSION_SIZE} mode latihan terfokus</h3><p>Semua soal tetap menguji konsep lesson ini melalui penerapan, diagnosis distraktor, perbandingan, penjelasan aturan, dan cek penguasaan.</p></div><button onclick="practiceSkill('${esc(skill)}')" class="primary">Mulai ${GRAMMAR_SESSION_SIZE} soal <i data-lucide="arrow-right"></i></button></div><div class="toolbar"><button onclick="exitStage()"><i data-lucide="arrow-left"></i> Kembali ke Grammar Hub</button></div>`)}
 // m025-155: seleksi mode-coverage-first. Loop lama variant-major hanya kebetulan mencapai
 // 25 mode karena tiap subskill punya SATU template; begitu ada template kedua, 25 slot akan
 // terisi mode-mode awal saja. Pass 1 mengambil SATU kartu valid+unik per variant 0..24
@@ -6276,7 +6276,7 @@ function lessonSkipGateCooldownRemaining(skill,now=Date.now()){
 }
 function openLessonSkipGate(skill){
   const meta=GRAMMAR_ITEMS.find(x=>x.skill===skill);
-  if(!meta||meta.level!==getActiveLevel())return showToast(`Lesson ini hanya tersedia pada level ${getActiveLevel()}.`);
+  if(!meta||meta.level!==getActiveLevel())return showToast(FiezelI18n.t('grammar.lesson-hanya-tersedia-pada-level',{level:getActiveLevel()}));
   const mastery=state.grammar[skill]?.mastery||0,title=grammarCurriculumEntry(skill)?.title||friendlySkillName(skill);
   if(mastery>=GRAMMAR_UNLOCK_MASTERY)return showToast('Materi ini sudah selesai — tidak ada yang perlu dilewati.');
   const gateWait=lessonSkipGateCooldownRemaining(skill);
@@ -6381,7 +6381,7 @@ function makeGrammarQuestion(skill,item,variant=0,lessonSkill=skill){const exerc
   // salah alamat: yang membuat pilihan ini benar adalah pola yang diminta kalimatnya, bukan
   // kecocokannya dengan judul fokus lesson. Rumusan baru menyebut fokus sebagai pola diminta.
   // m025-161 (F1-4): endorse kunci dibedakan per mode lewat grammarCorrectOptionReason().
-  distractors=marked.map(x=>({option:x.x,reason:x.ok?grammarCorrectOptionReason(x.x,exercise.mode,focus,grammarMeta(item)?.whyCorrect):(x.expl||(x.src.origin!=='own'?grammarBorrowedOptionReason(x.x,x.src.sourceId):grammarOptionReason(x.x,false,x.reason,misMap[x.x]))),sourceId:x.src.origin==='own'?lessonId:x.src.sourceId,own:x.src.origin==='own'}));return{id:`grammar-${item?.[8]||skill}-${exercise.mode}-${Date.now()}-${Math.random()}`,type:'grammar',level,skill,lessonSkill,sourceId:item?.[8]||'',conceptId:item?.[8]||'',practiceMode:exercise.mode,canary:item?.[14]||null,question:exercise.question,options:marked.map(x=>x.x),answerIndex:marked.findIndex(x=>x.ok),difficulty:LEVELS.indexOf(level)+1,explain:{why:exercise.correctWhy,rule:`${rule} Fokus khusus: ${focus}.`,avoid:'Pahami dulu maksud kalimatnya. Baru cek petunjuk dari lesson, terus pilih bentuknya.',memory:`Inget fokus ${focus}, ya. Cek kenapa tiap jebakan beda dari jawaban benar.`,distractors,distractor:'Tiap pilihan salah bawa jebakan mikirnya sendiri. Cek alasannya satu-satu, jangan asal pilih yang keliatan akrab.'},
+  distractors=marked.map(x=>({option:x.x,reason:x.ok?grammarCorrectOptionReason(x.x,exercise.mode,focus,grammarMeta(item)?.whyCorrect):(x.expl||(x.src.origin!=='own'?grammarBorrowedOptionReason(x.x,x.src.sourceId):grammarOptionReason(x.x,false,x.reason,misMap[x.x]))),sourceId:x.src.origin==='own'?lessonId:x.src.sourceId,own:x.src.origin==='own'}));return{id:`grammar-${item?.[8]||skill}-${exercise.mode}-${Date.now()}-${Math.random()}`,type:'grammar',level,skill,lessonSkill,sourceId:item?.[8]||'',conceptId:item?.[8]||'',practiceMode:exercise.mode,canary:item?.[14]||null,question:exercise.question,options:marked.map(x=>x.x),answerIndex:marked.findIndex(x=>x.ok),difficulty:LEVELS.indexOf(level)+1,explain:{why:exercise.correctWhy,rule:FiezelI18n.t('grammar.fokus-khusus',{rule:rule,focus:focus}),avoid:'Pahami dulu maksud kalimatnya. Baru cek petunjuk dari lesson, terus pilih bentuknya.',memory:`Inget fokus ${focus}, ya. Cek kenapa tiap jebakan beda dari jawaban benar.`,distractors,distractor:'Tiap pilihan salah bawa jebakan mikirnya sendiri. Cek alasannya satu-satu, jangan asal pilih yang keliatan akrab.'},
   // m025-118: bahan mentah Tutor Brain. optionMisconceptions memakai teks pilihan sebagai
   // kunci - bukan indeks - karena pilihan diacak setiap kali soal dibuat, dan indeks yang
   // bergeser akan mendiagnosis miskonsepsi yang salah dengan sangat meyakinkan.
@@ -6440,7 +6440,7 @@ function makeReadingQuestion(r,q,i){
   const indexedAnswer=Array.isArray(q[1])&&Number.isInteger(q[2])?q[1][q[2]]:undefined;
   const answerText=indexedAnswer!==undefined&&indexedAnswer!==null&&String(indexedAnswer).trim()?indexedAnswer:meta.answer;
   const type=meta.type||readingSkill(original);
-  const stems={main_idea:['Gagasan utama mana yang paling mewakili isi bacaan?','Sebenarnya, bacaan ini paling banyak membahas apa?'],detail:['Detail mana yang benar-benar didukung oleh bacaan?','Pernyataan mana yang disebutkan dengan jelas di dalam teks?'],inference:['Kesimpulan apa yang paling masuk akal dari petunjuk di bacaan?','Kesimpulan mana yang mengikuti bukti di dalam teks?'],vocabulary:['Arti kata atau frasa tersebut yang paling pas dalam konteks ini apa?','Makna mana yang cocok dengan pemakaian ungkapan itu?'],vocabulary_context:['Apa arti ungkapan tersebut di dalam bacaan ini?','Bagaimana istilah itu dipakai dalam konteks bacaan?'],purpose:['Apa tujuan utama penulis membuat bacaan ini?','Mengapa teks ini kemungkinan besar ditulis?'],sequence:['Peristiwa atau langkah mana yang terjadi lebih dulu?','Bagaimana urutan kejadian di dalam bacaan?'],cause_effect:['Apa yang menyebabkan perubahan tersebut?','Akibat apa yang muncul dari kondisi yang dijelaskan?'],comparison:['Perbandingan apa yang dibuat di dalam bacaan?','Perbedaan mana yang benar-benar didukung oleh teks?'],evidence:['Detail mana yang menjadi bukti paling kuat untuk kesimpulan itu?','Bukti apa di dalam bacaan yang mendukung penafsiran tersebut?'],tone:['Sikap apa yang terasa dari cara penulis menyampaikan gagasan?','Nada mana yang paling cocok dengan bacaan ini?'],paraphrase:['Pilihan mana yang menyampaikan ulang gagasan utama tanpa mengubah maknanya?','Kalimat mana yang punya makna sama dengan pernyataan penting itu?'],conclusion:['Kesimpulan mana yang paling kuat didukung oleh bacaan?','Kesimpulan apa yang paling aman diambil dari bukti yang tersedia?'],reference:['Kata rujukan itu mengarah ke apa?','Gagasan sebelumnya mana yang dirujuk oleh kata tersebut?'],true_false_not_stated:['Pernyataan mana yang benar menurut bacaan?','Klaim mana yang didukung teks, bukan hanya dugaan?'],why:['Mengapa tokoh di dalam bacaan mengambil pilihan itu?','Alasan apa yang diberikan untuk keputusan tersebut?'],how:['Bagaimana prosesnya berubah setelah bukti dikumpulkan?','Cara apa yang digunakan oleh kelompok tersebut?'],likely:['Apa yang paling mungkin terjadi jika kondisinya terus berlanjut?','Hasil berikutnya mana yang paling masuk akal?'],relationship:['Bagaimana hubungan antara dua gagasan atau tahap tersebut?','Hubungan apa antara peristiwa-peristiwa yang dijelaskan?'],detail2:['Detail pendukung mana yang menguatkan gagasan utama?','Fakta tambahan mana yang relevan dengan argumen bacaan?'],location:['Di mana kegiatan tersebut berlangsung?'],time:['Kapan peristiwa yang dimaksud terjadi?'],people:['Siapa yang terlibat langsung dalam peristiwa itu?'],quantity:['Berapa jumlah yang disebutkan di dalam bacaan?'],process:['Proses apa yang dijelaskan di dalam bacaan?'],action:['Tindakan apa yang disebutkan dengan jelas?'],record:['Informasi apa yang dicatat?']};
+  const stems={main_idea:[FiezelI18n.t('reading.gagasan-utama-mana-paling-mewakili'),FiezelI18n.t('reading.sebenarnya-bacaan-paling-banyak-membahas')],detail:['Detail mana yang benar-benar didukung oleh bacaan?','Pernyataan mana yang disebutkan dengan jelas di dalam teks?'],inference:['Kesimpulan apa yang paling masuk akal dari petunjuk di bacaan?','Kesimpulan mana yang mengikuti bukti di dalam teks?'],vocabulary:['Arti kata atau frasa tersebut yang paling pas dalam konteks ini apa?','Makna mana yang cocok dengan pemakaian ungkapan itu?'],vocabulary_context:['Apa arti ungkapan tersebut di dalam bacaan ini?',FiezelI18n.t('reading.bagaimana-istilah-dipakai-dalam-konteks')],purpose:[FiezelI18n.t('reading.apa-tujuan-utama-penulis-membuat'),FiezelI18n.t('reading.mengapa-teks-kemungkinan-besar-ditulis')],sequence:['Peristiwa atau langkah mana yang terjadi lebih dulu?',FiezelI18n.t('reading.bagaimana-urutan-kejadian-dalam-bacaan')],cause_effect:[FiezelI18n.t('reading.apa-menyebabkan-perubahan-tersebut'),'Akibat apa yang muncul dari kondisi yang dijelaskan?'],comparison:['Perbandingan apa yang dibuat di dalam bacaan?','Perbedaan mana yang benar-benar didukung oleh teks?'],evidence:['Detail mana yang menjadi bukti paling kuat untuk kesimpulan itu?','Bukti apa di dalam bacaan yang mendukung penafsiran tersebut?'],tone:['Sikap apa yang terasa dari cara penulis menyampaikan gagasan?','Nada mana yang paling cocok dengan bacaan ini?'],paraphrase:['Pilihan mana yang menyampaikan ulang gagasan utama tanpa mengubah maknanya?','Kalimat mana yang punya makna sama dengan pernyataan penting itu?'],conclusion:['Kesimpulan mana yang paling kuat didukung oleh bacaan?','Kesimpulan apa yang paling aman diambil dari bukti yang tersedia?'],reference:['Kata rujukan itu mengarah ke apa?','Gagasan sebelumnya mana yang dirujuk oleh kata tersebut?'],true_false_not_stated:['Pernyataan mana yang benar menurut bacaan?','Klaim mana yang didukung teks, bukan hanya dugaan?'],why:['Mengapa tokoh di dalam bacaan mengambil pilihan itu?','Alasan apa yang diberikan untuk keputusan tersebut?'],how:['Bagaimana prosesnya berubah setelah bukti dikumpulkan?','Cara apa yang digunakan oleh kelompok tersebut?'],likely:['Apa yang paling mungkin terjadi jika kondisinya terus berlanjut?','Hasil berikutnya mana yang paling masuk akal?'],relationship:['Bagaimana hubungan antara dua gagasan atau tahap tersebut?','Hubungan apa antara peristiwa-peristiwa yang dijelaskan?'],detail2:['Detail pendukung mana yang menguatkan gagasan utama?','Fakta tambahan mana yang relevan dengan argumen bacaan?'],location:['Di mana kegiatan tersebut berlangsung?'],time:['Kapan peristiwa yang dimaksud terjadi?'],people:['Siapa yang terlibat langsung dalam peristiwa itu?'],quantity:['Berapa jumlah yang disebutkan di dalam bacaan?'],process:['Proses apa yang dijelaskan di dalam bacaan?'],action:['Tindakan apa yang disebutkan dengan jelas?'],record:['Informasi apa yang dicatat?']};
   let stem=pick(stems[type])||stems.detail[0];
   // m025-162: stem generik tipe kosakata/rujukan tidak pernah menyebut KATA TARGETNYA -
   // q[0] (stem Inggris bank) dibuang, jadi 37 soal vocabulary_context/reference tidak
@@ -6494,7 +6494,7 @@ function makeExamReadingQuestion(set,q,i){
   const format=readingExamFormat(set),options=(q.options||[]).map(x=>String(x));
   return{id:`readingexam-${set.id}-${q.id||i}-${Date.now()}-${Math.random()}`,type:'reading',level:set.level,
     skill:`reading_${q.type||'detail'}`,target:set.id,difficulty:LEVELS.indexOf(set.level)+1,canary:null,
-    examFormat:format?format.id:'',passage:{id:set.id,title:set.title||'Bacaan',text:set.text||''},
+    examFormat:format?format.id:'',passage:{id:set.id,title:set.title||FiezelI18n.t('reading.bacaan-4'),text:set.text||''},
     question:String(q.stem||''),options,answerIndex:Number(q.answerIndex),
     explain:{evidence:String(q.explain?.evidence||''),
       why:q.explain?.why||'',
@@ -6503,7 +6503,7 @@ function makeExamReadingQuestion(set,q,i){
       memory:'Bukti dulu, jawaban belakangan.',
       distractor:String(q.explain?.whyOthersFail||'')}}
 }
-function readingExamTypeLabel(type){return({true_false_not_given:'True / False / Not Given',matching_information:'Mencocokkan informasi ke paragraf',multiple_choice:'Pilihan ganda',factual:'Fakta yang tertulis',negative_factual:'Fakta yang TIDAK tertulis (EXCEPT)',vocabulary:'Kosakata dalam konteks',inference:'Simpulan',sentence_simplification:'Menyederhanakan kalimat',rhetorical_purpose:'Tujuan penulis',insert_text:'Menyisipkan kalimat'}[String(type||'')]||'Pemahaman bacaan')}
+function readingExamTypeLabel(type){return({true_false_not_given:'True / False / Not Given',matching_information:FiezelI18n.t('reading.mencocokkan-informasi-paragraf'),multiple_choice:FiezelI18n.t('reading.pilihan-ganda'),factual:FiezelI18n.t('reading.fakta-tertulis'),negative_factual:FiezelI18n.t('reading.fakta-tidak-tertulis-except'),vocabulary:'Kosakata dalam konteks',inference:FiezelI18n.t('reading.simpulan'),sentence_simplification:FiezelI18n.t('reading.menyederhanakan-kalimat'),rhetorical_purpose:FiezelI18n.t('reading.tujuan-penulis'),insert_text:FiezelI18n.t('reading.menyisipkan-kalimat')}[String(type||'')]||FiezelI18n.t('reading.pemahaman-bacaan'))}
 function startReadingExam(id){
   const set=readingExamSetById(id);
   if(!set)return showToast('Set latihan ini belum tersedia.');
@@ -6513,7 +6513,7 @@ function startReadingExam(id){
   quizLoop({type:'reading',count:qs.length,pool:qs,factory:x=>x,context:set,preserveOrder:true});
 }
 function readingSession(r){const qs=(r.qs||[]).map((q,i)=>makeReadingQuestion(r,q,i));quizLoop({type:'reading',count:Math.min(8,qs.length),pool:qs,factory:x=>x,context:r,preserveOrder:true})}
-function placement(){shell('Tes Kemampuan Dasar','25 soal untuk memetakan kemampuan dari A1 sampai C2.',`<div class="card hero"><div class="eyebrow">PEMETAAN LEVEL</div><h2>25 soal, sekitar sepuluh menit.</h2><p>Isinya listening, grammar, dan vocabulary - tanpa teks bacaan. Soalnya diambil dari bentuk yang paling dasar di tiap level A1 sampai C2, dan urutannya diacak setiap kali kamu masuk. Setelah selesai, FIEZEL menyimpan perkiraan levelmu sebagai dasar latihan adaptif berikutnya.</p><button class="primary" onclick="startPlacement()">Mulai 25 soal <i data-lucide="arrow-right"></i></button></div><div class="level-grid">${LEVELS.map((l,i)=>card(`<button class="level-card" onclick="startLevelPractice('${l}')"><span class="level-number">${i+1}</span><div><b>${l}</b><p>Masuk ke latihan level ${l}</p></div><i data-lucide="arrow-right"></i></button>`)).join('')}</div>`)}
+function placement(){shell(FiezelI18n.t('placement.tes-kemampuan-dasar'),'25 soal untuk memetakan kemampuan dari A1 sampai C2.',`<div class="card hero"><div class="eyebrow">PEMETAAN LEVEL</div><h2>25 soal, sekitar sepuluh menit.</h2><p>Isinya listening, grammar, dan vocabulary - tanpa teks bacaan. Soalnya diambil dari bentuk yang paling dasar di tiap level A1 sampai C2, dan urutannya diacak setiap kali kamu masuk. Setelah selesai, FIEZEL menyimpan perkiraan levelmu sebagai dasar latihan adaptif berikutnya.</p><button class="primary" onclick="startPlacement()">Mulai 25 soal <i data-lucide="arrow-right"></i></button></div><div class="level-grid">${LEVELS.map((l,i)=>card(`<button class="level-card" onclick="startLevelPractice('${l}')"><span class="level-number">${i+1}</span><div><b>${l}</b><p>Masuk ke latihan level ${l}</p></div><i data-lucide="arrow-right"></i></button>`)).join('')}</div>`)}
 function grammarItemsForLevel(level=getActiveLevel()){
   const target=LEVELS.includes(String(level||''))?String(level):'A1';const bySequence=(a,b)=>Number(a.sequence||Number.MAX_SAFE_INTEGER)-Number(b.sequence||Number.MAX_SAFE_INTEGER)||a.skill.localeCompare(b.skill);return GRAMMAR_ITEMS.filter(entry=>entry.level===target).sort(bySequence);
 }
@@ -6676,10 +6676,10 @@ function makeListeningQuestion(item){
     options,
     answerIndex:item.answerIndex,
     explain:{
-      why:item.mode==='gist'?'Jawabannya adalah pokok yang dibicarakan sepanjang rekaman, bukan satu detail yang kebetulan terdengar.':'Jawabannya disebut langsung di dalam rekaman; bagian lain hanya terdengar mirip.',
+      why:item.mode==='gist'?FiezelI18n.t('placement.jawabannya-adalah-pokok-dibicarakan-sepanjang'):FiezelI18n.t('placement.jawabannya-disebut-langsung-dalam-rekaman'),
       rule:item.mode==='gist'?'Untuk pertanyaan pokok pembicaraan, tanyakan: kalau rekaman ini diringkas satu kalimat, kalimatnya apa?':'Untuk pertanyaan detail, tahan dulu jawaban yang terdengar familier; cocokkan dengan apa yang benar-benar diucapkan.',
       avoid:'Putar sekali penuh sebelum melihat pilihan. Menebak dari satu kata yang tertangkap adalah cara paling cepat salah.',
-      memory:scenario?`Situasinya: ${scenario}.`:'Bayangkan situasinya dulu, baru pilih jawabannya.',
+      memory:scenario?FiezelI18n.t('placement.situasinya',{skenario:scenario}):'Bayangkan situasinya dulu, baru pilih jawabannya.',
       distractor:'Pilihan lain memakai kata-kata yang memang terdengar di rekaman, tetapi tidak menjawab pertanyaannya.'
     }
   };
@@ -6745,7 +6745,7 @@ async function startPlacement(){
 }
 function startLevelPractice(level){
   const items=shuffle(makeLevelSource(level)).map(x=>x.q);
-  if(!items.length)return showToast(`Materi level ${level} belum tersedia.`);
+  if(!items.length)return showToast(FiezelI18n.t('placement.materi-level-belum-tersedia',{level:level}));
   quizLoop({type:'level',count:Math.min(10,items.length),pool:items,factory:x=>x})
 }
 /* ---- m025-118 sesi belajar yang diajar, bukan sekadar dijalankan ---------------------
@@ -6987,7 +6987,7 @@ function quizLoop(cfg){
   document.querySelectorAll('.option')[q.answerIndex]?.classList.add('correct');
   const turn=tutorCompose(q,j,ok,answer.scaffold||'tell',forced?'reteach':answer.move,answer.timing);
   const f=$('feedback');f.classList.remove('hidden');f.classList.add(ok?'feedback-success':'feedback-error');
-  f.innerHTML=`<div class="feedback-title"><i data-lucide="${ok?'circle-check-big':'circle-x'}"></i><b>${ok?'Benar, mantap!':'Belum tepat, tidak apa-apa.'}</b></div><p>Jawabanmu <strong>${esc(q.options[j])}</strong>. Jawaban yang paling tepat adalah <strong>${esc(q.options[q.answerIndex])}</strong>.</p><p><strong>Intinya:</strong> ${esc(q.explain?.why||'Jawaban perlu cocok dengan konteks soal.')} ${q.explain?.rule?esc(q.explain.rule):''}</p><p class="muted">${esc(q.explain?.distractor||'Pilihan lain belum didukung oleh konteks atau aturan yang relevan.')} ${esc(q.explain?.avoid||'Periksa petunjuk utama sebelum memilih.')}</p>${q.explain?.distractors?`<details class="acc"><summary>Bandingkan pilihan lain</summary><div class="distractor-breakdown">${q.explain.distractors.map(x=>`<p><b>${esc(x.option)}:</b> ${esc(x.reason)}</p>`).join('')}</div></details>`:''}<p class="memory-tip"><i data-lucide="lightbulb"></i><span>${esc(q.explain?.memory||'Cari petunjuk utama dan hubungkan dengan pola yang sedang dipelajari.')}</span></p><button class="ai-btn" id="aiExplainBtn"><i data-lucide="sparkles"></i> Jelaskan dengan cara yang lebih sederhana</button>`;
+  f.innerHTML=`<div class="feedback-title"><i data-lucide="${ok?'circle-check-big':'circle-x'}"></i><b>${ok?'Benar, mantap!':'Belum tepat, tidak apa-apa.'}</b></div><p>Jawabanmu <strong>${esc(q.options[j])}</strong>. Jawaban yang paling tepat adalah <strong>${esc(q.options[q.answerIndex])}</strong>.</p><p><strong>Intinya:</strong> ${esc(q.explain?.why||'Jawaban perlu cocok dengan konteks soal.')} ${q.explain?.rule?esc(q.explain.rule):''}</p><p class="muted">${esc(q.explain?.distractor||'Pilihan lain belum didukung oleh konteks atau aturan yang relevan.')} ${esc(q.explain?.avoid||'Periksa petunjuk utama sebelum memilih.')}</p>${q.explain?.distractors?`<details class="acc"><summary>${FiezelI18n.t('quiz.bandingkan-pilihan-lain')}</summary><div class="distractor-breakdown">${q.explain.distractors.map(x=>`<p><b>${esc(x.option)}:</b> ${esc(x.reason)}</p>`).join('')}</div></details>`:''}<p class="memory-tip"><i data-lucide="lightbulb"></i><span>${esc(q.explain?.memory||'Cari petunjuk utama dan hubungkan dengan pola yang sedang dipelajari.')}</span></p><button class="ai-btn" id="aiExplainBtn"><i data-lucide="sparkles"></i> Jelaskan dengan cara yang lebih sederhana</button>`;
   speak(turn);
   answer.locked=true;
   $('quizNext').disabled=false;
@@ -7304,7 +7304,7 @@ function finishQuiz(cfg,score,total,tutorReport){
      tidak butuh coach). Satu kalimat dari modul; prediksi sesi ini vs hasil nyatanya.
      Guarded: tanpa modul, string kosong dan layar hasil persis seperti lama. */
   const srlLine=(()=>{if(cfg.placement)return '';try{const m=srlReflect(score/Math.max(1,total));return m?`<p class="muted srl-reflect">${esc(m)}</p>`:''}catch{return ''}})();
-  const outcomeLine=outcome?`<p class="muted">Hasil sesi ini: <b>${esc(outcome.status)}</b> · skor ${Math.round(outcome.score)}/100. ${outcome.status==='positive'?'Strategi ini layak dipertahankan atau dinaikkan pelan-pelan.':outcome.status==='negative'?'Sesi berikutnya akan diperingan atau diturunkan difficulty-nya.':'Core akan pakai hasil ini sebagai evidence untuk policy berikutnya.'}</p>`:'<p class="muted">Progres sudah masuk ke profil skill dan latihan adaptif berikutnya.</p>';
+  const outcomeLine=outcome?`<p class="muted">${FiezelI18n.t('quiz.hasil-sesi')} <b>${esc(outcome.status)}</b> · skor ${Math.round(outcome.score)}/100. ${outcome.status==='positive'?'Strategi ini layak dipertahankan atau dinaikkan pelan-pelan.':outcome.status==='negative'?'Sesi berikutnya akan diperingan atau diturunkan difficulty-nya.':'Core akan pakai hasil ini sebagai evidence untuk policy berikutnya.'}</p>`:'<p class="muted">Progres sudah masuk ke profil skill dan latihan adaptif berikutnya.</p>';
   // m025-90: bunyi penutup dibunyikan di sini, satu-satunya tempat murid benar-benar
   // MELIHAT sesinya selesai. completeActiveSession() bukan tempatnya - ia fungsi data yang
   // juga berjalan pada penutupan yang tidak pernah tampil di layar.
@@ -7439,8 +7439,8 @@ function bktShadowMarkup(){
     const frontierHtml=frontier.length
       ?`<p><b>Frontier ZPD:</b> ${frontier.map(f=>`${esc(friendlySkillName(f.lesson))} (L ${Math.round(f.L*100)}% · prediksi ${Math.round(f.predicted*100)}%)`).join(', ')}</p>`
       :'<p class="muted">Frontier belum terbaca - butuh prasyarat yang lolos gerbang dan prediksi di jendela 55-90%.</p>';
-    const rootHtml=root?`<p><b>Akar masalah (BKT):</b> ${esc(friendlySkillName(root.lesson))} · penguasaan ${Math.round(root.L*100)}% · keyakinan ${Math.round(root.confidence*100)}%</p>`:'';
-    return card(`<h3>Mastery BKT <span class="muted">(bayangan - tanpa otoritas unlock)</span></h3>${frontierHtml}${rootHtml}<p class="muted">${tracked} lesson terlacak di 'fiezel-mastery-bkt-v1'. Panel ini hanya membaca; keputusan buka-kunci masih di mesin lama.</p>`)
+    const rootHtml=root?`<p><b>${FiezelI18n.t('progress.akar-masalah-bkt')}</b> ${FiezelI18n.t('progress.penguasaan-keyakinan',{skillName:esc(friendlySkillName(root.lesson)),L:Math.round(root.L*100),confidence:Math.round(root.confidence*100)})}</p>`:'';
+    return card(`<h3>${FiezelI18n.t('progress.mastery-bkt')} <span class="muted">${FiezelI18n.t('progress.bayangan-tanpa-otoritas-unlock')}</span></h3>${frontierHtml}${rootHtml}<p class="muted">${tracked} lesson terlacak di 'fiezel-mastery-bkt-v1'. Panel ini hanya membaca; keputusan buka-kunci masih di mesin lama.</p>`)
   }catch{return ''}
 }
 /* Fase 2 (B3 butir 7): seksi Open Learner Model - ringkasan yang bisa dibaca murid tentang
@@ -7465,9 +7465,9 @@ function olmPanelMarkup(){
     const cal=s.calibration||{};
     // D5 S5: kelas 'olm-panel' menjadi jangkar fokus setelah sanggahan (olmDispute
     // menggambar ulang seluruh layar Progress, tombol yang tadi diklik ikut musnah).
-    return card(`<h3>Yang sistem yakini tentangmu <span class="muted">(OLM)</span></h3>
-      ${mastery?`<p><b>Penguasaan terkuat:</b> ${mastery}</p>`:''}
-      <p><b>Miskonsepsi:</b> ${Number(mis.active?.length??mis.activeCount??0)} aktif · ${Number(mis.resolved?.length??mis.resolvedCount??0)} teratasi</p>
+    return card(`<h3>${FiezelI18n.t('progress.sistem-yakini-tentangmu')} <span class="muted">(OLM)</span></h3>
+      ${mastery?`<p><b>${FiezelI18n.t('progress.penguasaan-terkuat')}</b> ${mastery}</p>`:''}
+      <p><b>Miskonsepsi:</b> ${FiezelI18n.t('progress.aktif-teratasi',{activeCount:Number(mis.active?.length??mis.activeCount??0),resolvedCount:Number(mis.resolved?.length??mis.resolvedCount??0)})}</p>
       <p><b>Rawan lupa:</b> ${Number(review.atRiskCount||0)} materi${reviewTop?` - paling mendesak: ${reviewTop}`:''}</p>
       ${cal.status?`<p><b>Kalibrasi keyakinan:</b> ${esc(cal.message||cal.status)}</p>`:''}
       <p class="muted">Ringkasan ini dibaca dari model yang sama yang memilih soalmu - bukan penilaian tambahan.</p>`,'olm-panel')
@@ -7484,7 +7484,7 @@ function confusionInsightMarkup(){
   try{
     const rows=(M.topConfusions(confusionMatrixRead())||[]).slice(0,3);
     if(!rows.length)return '';
-    const items=rows.map(c=>`<p><b>${esc(friendlySkillName(String(c.from||'')))}</b> sering dijawab memakai aturan <b>${esc(friendlySkillName(String(c.to||'')))}</b> · ${Math.max(0,Math.round(Number(c.count)||0))}×${Number.isFinite(Number(c.share))?` (${Math.round(Number(c.share)*100)}% dari salah pinjaman lesson itu)`:''}</p>`).join('');
+    const items=rows.map(c=>`<p><b>${esc(friendlySkillName(String(c.from||'')))}</b> ${FiezelI18n.t('progress.sering-dijawab-memakai-aturan')} <b>${esc(friendlySkillName(String(c.to||'')))}</b> · ${Math.max(0,Math.round(Number(c.count)||0))}×${Number.isFinite(Number(c.share))?` (${Math.round(Number(c.share)*100)}% dari salah pinjaman lesson itu)`:''}</p>`).join('');
     return card(`<h3>Kebingungan antar-lesson</h3>${items}<p class="muted">Dihitung dari jawaban salah yang memilih opsi pinjaman lesson lain - substitusi terarah, bukan salah acak. Latihan pada pasangan ini yang paling cepat membongkar kebingungannya.</p>`)
   }catch{return ''}
 }
@@ -7498,25 +7498,25 @@ function affectSuggestionMarkup(){
   try{
     const st=AFFECT_STATE;
     if(!st||!Array.isArray(st.rows)||!st.rows.length||st.state==='neutral')return '';
-    const stateLabel={frustrated:'Terlihat frustrasi',bored:'Terlihat bosan',gaming:'Jawaban terlalu cepat untuk jadi bukti',fatigued:'Terlihat lelah'}[st.state]||'';
+    const stateLabel={frustrated:FiezelI18n.t('progress.terlihat-frustrasi'),bored:FiezelI18n.t('progress.terlihat-bosan'),gaming:'Jawaban terlalu cepat untuk jadi bukti',fatigued:FiezelI18n.t('progress.terlihat-lelah')}[st.state]||'';
     if(!stateLabel)return '';
-    const actionLabel={turunkan_target:'soal diringankan dulu supaya kamu dapat bukti bahwa kamu bisa',naikkan_tantangan:'tantangan dinaikkan supaya sesi tidak membosankan',mode_tak_tertebak:'latihan dialihkan ke bentuk yang tidak bisa dijawab dengan menebak',perpendek_sesi:'sesi diperpendek dan diisi review ringan'}[String(st.suggestion?.action||'')]||'';
-    return card(`<h3>Cuaca sesi terakhir</h3><p><b>${esc(stateLabel)}</b> · keyakinan ${Math.round((Number(st.confidence)||0)*100)}%</p>${actionLabel?`<p><b>Respons sistem:</b> ${esc(actionLabel)}.</p>`:''}<p class="muted">Afek dinilai per sesi dan hanya di memori perangkat - cuaca sesi, bukan penilaian tentang dirimu.</p>`)
+    const actionLabel={turunkan_target:'soal diringankan dulu supaya kamu dapat bukti bahwa kamu bisa',naikkan_tantangan:FiezelI18n.t('progress.tantangan-dinaikkan-supaya-sesi-tidak'),mode_tak_tertebak:'latihan dialihkan ke bentuk yang tidak bisa dijawab dengan menebak',perpendek_sesi:FiezelI18n.t('progress.sesi-diperpendek-diisi-review-ringan')}[String(st.suggestion?.action||'')]||'';
+    return card(`<h3>${FiezelI18n.t('progress.cuaca-sesi-terakhir')}</h3><p><b>${esc(stateLabel)}</b> · keyakinan ${Math.round((Number(st.confidence)||0)*100)}%</p>${actionLabel?`<p><b>Respons sistem:</b> ${esc(actionLabel)}.</p>`:''}<p class="muted">Afek dinilai per sesi dan hanya di memori perangkat - cuaca sesi, bukan penilaian tentang dirimu.</p>`)
   }catch{return ''}
 }
 function coreBrainPanelMarkup(){
   const snapshot=coreBrainSnapshot();
   if(!snapshot)return card('<h3>Core Brain v2</h3><p class="muted">Lapisan penalaran belum termuat di perangkat ini. Kebijakan adaptif tetap berjalan dengan mesin deterministik di bawahnya.</p>')+bktShadowMarkup()+olmPanelMarkup()+confusionInsightMarkup()+affectSuggestionMarkup();
   const ability=snapshot.ability||{},plan=snapshot.plan||{},move=snapshot.momentum||{},load=snapshot.fatigue||{},memory=snapshot.memory||{},chrono=snapshot.chronotype||{};
-  const moveLabel={improving:'Sedang naik',plateau:'Mendatar',declining:'Sedang turun',unknown:'Belum terbaca'}[move.state]||'Belum terbaca';
-  const loadLabel={fresh:'Masih segar',tiring:'Mulai lelah',fatigued:'Sudah lelah',unknown:'Belum terbaca'}[load.state]||'Belum terbaca';
+  const moveLabel={improving:FiezelI18n.t('progress.sedang-naik'),plateau:FiezelI18n.t('progress.mendatar'),declining:FiezelI18n.t('progress.sedang-turun'),unknown:FiezelI18n.t('diag.belum-terbaca')}[move.state]||'Belum terbaca';
+  const loadLabel={fresh:FiezelI18n.t('progress.masih-segar'),tiring:FiezelI18n.t('progress.mulai-lelah'),fatigued:FiezelI18n.t('progress.sudah-lelah'),unknown:FiezelI18n.t('diag.belum-terbaca')}[load.state]||'Belum terbaca';
   if(!plan||Number(plan.confidence||0)<0.25){
     return card(`<h3>Core Brain v2</h3><p>Masih mengumpulkan bukti. ${ability.evidence||0} jawaban terbaca; lapisan ini baru ikut memutuskan setelah polanya cukup jelas.</p><p class="muted">Sampai saat itu, kebijakan adaptif deterministik yang memilih soalmu - persis seperti sebelumnya, tidak ada yang hilang.</p>`)+bktShadowMarkup()+olmPanelMarkup()+confusionInsightMarkup()+affectSuggestionMarkup();
   }
   const rootCause=snapshot.rootCause&&snapshot.rootCause.isRoot===false
     ? `<p><b>Akar masalah:</b> kesulitan di ${esc(friendlySkillName(snapshot.rootCause.symptomSkill||snapshot.rootCause.symptomFamily))} kemungkinan besar berasal dari ${esc(friendlySkillName(snapshot.rootCause.skill))}, jadi itu yang dilatih lebih dulu.</p>`
     : '';
-  const bestWindow=chrono.confident&&chrono.best?`<div><b>Jam paling produktif</b><br>${esc(chrono.best.id)} · ${chrono.best.accuracy}% akurasi</div>`:'';
+  const bestWindow=chrono.confident&&chrono.best?FiezelI18n.t('progress.div-jam-paling-produktif-br',{id:esc(chrono.best.id),akurasi:chrono.best.accuracy}):'';
   return card(`<h3>Core Brain v2</h3>
     <div class="diag-grid">
       <div><b>Kemampuan terukur</b><br>${esc(ability.level||'-')} · indeks ${ability.ability??'-'}</div>
@@ -7529,7 +7529,7 @@ function coreBrainPanelMarkup(){
     ${rootCause}
     <p class="muted">Kesulitan dipilih dari model kemampuan (peluang benar ~80% adalah titik belajar paling efisien), jadwal ulang dari model paruh-waktu ingatan, dan fokus dari graf prasyarat skill. Semua dihitung di perangkat ini; yang dikirim ke Core hanya ringkasan keputusannya.</p>`)+bktShadowMarkup()+olmPanelMarkup()+confusionInsightMarkup()+affectSuggestionMarkup()
 }
-const PROGRESS_TABS=[['overview','Ringkasan'],['analysis','Analisis'],['adaptive','Adaptive Engine'],['readiness','Kesiapan & Skills']];
+const PROGRESS_TABS=[['overview',FiezelI18n.t('progress.ringkasan')],['analysis',FiezelI18n.t('progress.analisis')],['adaptive','Adaptive Engine'],['readiness',FiezelI18n.t('progress.kesiapan-skills')]];
 let progressTab='overview';
 function switchProgressTab(tab){if(!PROGRESS_TABS.some(([id])=>id===tab)||progressTab===tab)return;progressTab=tab;progress()}
 /**
@@ -7555,11 +7555,11 @@ function nextSessionPanelMarkup(){
   const ukuran=Number(p.sessionSize)||0,menit=Number(p.estimatedMinutes)||0;
   const takaran=ukuran?`<b>${ukuran} soal${menit?` · \u00b1${menit} menit`:''}</b>`:'';
   return `<section class="core-panel next-session">
-    <div><div class="core-eyebrow">NEXT SESSION \u00b7 DIPILIH PAW</div>
+    <div><div class="core-eyebrow">${FiezelI18n.t('progress.next-session-dipilih-paw')}</div>
     <div class="core-title">${esc(fokus)}</div>
     <div class="core-sub">${esc(p.summary||'')} ${takaran}</div>
-    <div class="core-actions"><button type="button" class="core-cta" onclick="go('${view}')">Mulai sesi</button>
-    <button type="button" class="core-ghost" onclick="switchProgressTab('adaptive')">Lihat alasannya</button></div></div></section>`;
+    <div class="core-actions"><button type="button" class="core-cta" onclick="go('${view}')">${FiezelI18n.t('progress.mulai-sesi')}</button>
+    <button type="button" class="core-ghost" onclick="switchProgressTab('adaptive')">${FiezelI18n.t('progress.lihat-alasannya')}</button></div></div></section>`;
 }
 function progress(){
  const active=getActiveLevel(),snapshot=buildLearningSnapshot(),acc=snapshot.totalAccuracy??0;const profile=getDiagnosticProfile();const map=[['Kosakata','vocab',state.vocab],['Grammar','grammar',state.grammar],['Reading','reading',state.reading]];
@@ -7573,7 +7573,7 @@ function progress(){
  const patterns=errorPatterns().slice(0,6);const conf=confidenceCalibration();const due=dueItems().sort((a,b)=>forgettingProbability(b[1])-forgettingProbability(a[1])).slice(0,8);const pairs=confusionPairs();const diag=diagnosticReport(),evidence=buildLearnerEvidenceModel();
  const readingSkills=['reading_inference','reading_detail','reading_vocabulary','reading_purpose','reading_comparison'];
  const readingHtml=readingSkills.map(k=>{const hs=(state.history||[]).filter(h=>h.skill===k&&historyMatchesActive(h,active));const a=hs.length?Math.round(hs.filter(h=>h.ok).length/hs.length*100):null;return `<div class="meter"><div class="row"><span>${esc(readingFocusLabel(k.replace('reading_','')))}</span><span>${a==null?'—':a+'%'} · ${hs.length} bukti</span></div><div class="bar"><i style="width:${a||0}%"></i></div></div>`}).join('');
- const diagHtml=diag.ready?`<p><b>Perkiraan level:</b> ${diag.level}</p><p><b>Akurasi keseluruhan:</b> ${diag.overall}%</p><div class="diag-grid">${diag.rows.map(x=>`<div><b>${x.name}</b><br>${x.accuracy==null?'Belum terukur':x.accuracy+'%'} · ${x.attempts} jawaban</div>`).join('')}</div><p class="muted">${diag.weak?`Prioritas berikutnya adalah ${esc(diag.weak.name)} karena akurasinya paling rendah di antara area yang sudah terukur.`:'Lanjutkan latihan lintas skill supaya gambarnya semakin jelas.'}</p>`:'<p class="muted">FIEZEL belum punya cukup bukti untuk membuat laporan diagnostik. Mulai tes diagnostik terlebih dahulu.</p>';
+ const diagHtml=diag.ready?`<p><b>${FiezelI18n.t('progress.perkiraan-level')}</b> ${diag.level}</p><p><b>Akurasi keseluruhan:</b> ${diag.overall}%</p><div class="diag-grid">${diag.rows.map(x=>`<div><b>${x.name}</b><br>${x.accuracy==null?'Belum terukur':x.accuracy+'%'} · ${x.attempts} jawaban</div>`).join('')}</div><p class="muted">${diag.weak?`Prioritas berikutnya adalah ${esc(diag.weak.name)} karena akurasinya paling rendah di antara area yang sudah terukur.`:'Lanjutkan latihan lintas skill supaya gambarnya semakin jelas.'}</p>`:'<p class="muted">FIEZEL belum punya cukup bukti untuk membuat laporan diagnostik. Mulai tes diagnostik terlebih dahulu.</p>';
  // m025-85: this screen used to stack 17 cards in one uninterrupted scroll - the
  // OWNER complaint was exactly that: too long, no structure, nobody reads to the
  // bottom. Same data, same cards, now grouped into four tabs so each visit only
@@ -7610,7 +7610,7 @@ function progress(){
  <div class="progress-tabs" role="tablist">${PROGRESS_TABS.map(([id,label])=>`<button type="button" class="progress-tab${progressTab===id?' active':''}" role="tab" aria-selected="${progressTab===id}" onclick="switchProgressTab('${id}')">${esc(label)}</button>`).join('')}</div>
  ${tabContent[progressTab]}
  ${card(`<div class="row"><b>Dibuat oleh Fitrarustqi</b><a href="https://instagram.com/fitrarustqi" target="_blank" rel="noopener noreferrer" class="creator-link"><img src="./instagram.svg" alt="Instagram" width="22" height="22"> @fitrarustqi</a></div>`)}
- <button class="danger" onclick="resetProgress()">Reset progres</button>`)
+ <button class="danger" onclick="resetProgress()">${FiezelI18n.t('progress.reset-progres')}</button>`)
 }
 function validReportEndpoint(value){try{const u=new URL(String(value||'').trim());return u.protocol==='https:'&&u.hostname.endsWith('.puter.work')}catch{return false}}
 function reportId(){try{return crypto.randomUUID()}catch{return`${Date.now()}-${Math.random().toString(36).slice(2)}`}}
@@ -7657,8 +7657,8 @@ function openSettings(){const p=state.preferences||defaultPreferences,endpoint=p
   openModal(`<div class="settings-head"><div class="modal-mark">FIEZEL CONTROL ROOM</div><h2>Pengalaman ${esc(learnerName())}</h2><p>Semua yang bisa diatur, dikelompokkan per topik. Ketuk kelompoknya untuk membuka.</p></div>`
     +settingsFold('Profil &amp; Level',grupProfil,true)
     +settingsFold('Belajar',grupBelajar,false)
-    +settingsFold('Suara &amp; Notifikasi',grupSuara,false)
-    +settingsFold('Data &amp; Penyimpanan',grupData,false)
+    +settingsFold(FiezelI18n.t('settings.suara-amp-notifikasi'),grupSuara,false)
+    +settingsFold(FiezelI18n.t('settings.data-amp-penyimpanan'),grupData,false)
     +settingsFold('Lanjutan',grupLanjutan,false)
     +`<div class="modal-actions settings-actions"><button id="settingsCancel">Batal</button><button class="primary" id="settingsSave">Simpan pengaturan</button></div>`);
   $('settingsCancel').onclick=closeModal;setTimeout(refreshInstallHealth,0);setTimeout(refreshAudioDiagnostics,0);$('backupExport')?.addEventListener('click',runBackupExport);$('backupPick')?.addEventListener('click',()=>$('backupFile')?.click());$('backupFile')?.addEventListener('change',event=>runBackupImport(event.currentTarget.files?.[0]));$('openFeedback')?.addEventListener('click',()=>{closeModal();openFeedback('')});$('reportPreview').onclick=openReportPreview;$('settingsSave').onclick=saveSettings;$('settingClearCache')?.addEventListener('click',()=>{confirmClearAppCache()});bindVoiceSettingControls();bindAccountSettingControls();$('settingReminders')?.addEventListener('change',event=>toggleStudyReminders(event.currentTarget));
@@ -7707,11 +7707,11 @@ async function clearAppCache(){
       else catatan=' Service worker belum terdaftar di perangkat ini, jadi hanya cache yang dibersihkan.';
     }catch{catatan=' Pembaruan service worker belum bisa diperiksa sekarang.'}
     if(typeof navigator!=='undefined'&&navigator.onLine===false)catatan+=' Kamu sedang offline: tampilan baru akan lengkap setelah tersambung internet.';
-    showToast(`${targets.length} cache dibersihkan. Progres belajarmu tetap aman.${catatan}`);
+    showToast(FiezelI18n.t('settings.cache-dibersihkan-progres-belajarmu-tetap',{jumlah:targets.length,catatan:catatan}));
     setTimeout(()=>{try{location.reload()}catch{}},700);
     return targets
   }catch(error){
-    showToast(`Gagal membersihkan cache: ${String(error?.message||error)}`);
+    showToast(FiezelI18n.t('settings.gagal-membersihkan-cache',{error:String(error?.message||error)}));
     if(button){button.disabled=false;button.innerHTML='<i data-lucide="refresh-ccw"></i> Ya, bersihkan';enhanceUI()}
     return null
   }
@@ -7944,7 +7944,7 @@ const AI_TASK_SURFACE=Object.freeze({
 const AI_TASK_COPY=Object.freeze({
   ai:Object.freeze({
     code:'QC-A1',
-    title:'AI Tutor istirahat dulu',
+    title:FiezelI18n.t('ai.quota.ai-tutor-istirahat-dulu'),
     body:'Limit AI gratis kamu hari ini sudah habis. Fiezel tetap bisa digunakan untuk belajar. AI Tutor akan tersedia lagi setelah limit diperbarui.',
     extra:'Semua materi, latihan, penjelasan bawaan, dan progresmu jalan seperti biasa — nggak ada yang ikut terkunci. Limitnya diperbarui {waktuReset}.',
     plusNote:'Upgrade Plus segera hadir.',
@@ -8106,12 +8106,12 @@ function aiTaskFetch(body,signalOptions){
 // pra-syarat SDK Puter dan perakitan prompt di klien: keduanya benar untuk jalur ini dan
 // hanya untuk jalur ini.
 async function askPuterAI(prompt,task='question'){
-  if(CORE_AI_GATEWAY!=='core-only')throw new Error('Konfigurasi AI FIEZEL tidak valid.');
+  if(CORE_AI_GATEWAY!=='core-only')throw new Error(FiezelI18n.t('ai.konfigurasi-ai-fiezel-tidak-valid'));
   if(typeof puter==='undefined'||!puter?.workers?.exec)throw new Error('AI belum siap. Login Puter dan koneksi internet diperlukan.');
   if(!CORE_WORKER_URL)throw new Error('Core Brain FIEZEL belum diaktifkan pada deployment ini. Fitur belajar tetap bisa dipakai, tetapi AI menunggu Core Worker tersambung.');
   let timer;try{
-    const request=coreWorkerExec('/api/ai/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({task:String(task||'question'),profile:aiProfileContext(),prompt})}).then(async r=>{let data={};try{data=await r.json()}catch{}if(!r.ok||!data?.text)throw new Error(data?.error||`AI core merespons ${r.status}`);return data.text});
-    const timeout=new Promise((_,reject)=>{timer=setTimeout(()=>{const e=new Error('Permintaan AI melewati batas waktu.');e.name='TimeoutError';reject(e)},FIEZEL_AI_TIMEOUT_MS)});
+    const request=coreWorkerExec('/api/ai/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({task:String(task||'question'),profile:aiProfileContext(),prompt})}).then(async r=>{let data={};try{data=await r.json()}catch{}if(!r.ok||!data?.text)throw new Error(data?.error||FiezelI18n.t('ai.ai-core-merespons',{status:r.status}));return data.text});
+    const timeout=new Promise((_,reject)=>{timer=setTimeout(()=>{const e=new Error(FiezelI18n.t('ai.permintaan-ai-melewati-batas-waktu'));e.name='TimeoutError';reject(e)},FIEZEL_AI_TIMEOUT_MS)});
     const res=await Promise.race([request,timeout]);if(typeof res==='string'&&res.trim())return res;throw new Error('AI Core tidak mengembalikan jawaban teks.');
   }finally{clearTimeout(timer)}
 }
@@ -8125,7 +8125,7 @@ async function askCloudflareAITask(clientTask,ctx){
   let timer,response;
   try{
     const request=aiTaskFetch(body).then(async r=>{let data={};try{data=await r.json()}catch{}return classifyAiTaskResponse(r.status,data)});
-    const timeout=new Promise((_,reject)=>{timer=setTimeout(()=>{const e=new Error('Permintaan AI melewati batas waktu.');e.name='TimeoutError';reject(e)},FIEZEL_AI_TIMEOUT_MS)});
+    const timeout=new Promise((_,reject)=>{timer=setTimeout(()=>{const e=new Error(FiezelI18n.t('ai.permintaan-ai-melewati-batas-waktu'));e.name='TimeoutError';reject(e)},FIEZEL_AI_TIMEOUT_MS)});
     response=await Promise.race([request,timeout]);
   }catch(networkError){
     // Jaringan mati vs provider mati adalah dua naskah berbeda (cf-b8 §2.3: naskah lama
