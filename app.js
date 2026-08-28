@@ -154,7 +154,12 @@ function validTimeZone(value){const zone=String(value||'').slice(0,80);try{new I
 // `reminders:null` berarti "murid belum memutuskan" dan itu bukan sama dengan false:
 // hanya keputusan yang sesungguhnya (true/false) yang menutup pintu tawaran. Kalau
 // bawaannya false, murid lama akan kehilangan pengingat yang sudah mereka izinkan.
-const defaultPreferences={haptics:true,feedbackSounds:true,motion:true,neuralVoice:'auto',reminders:null,reportConsent:false,reportEndpoint:DEFAULT_REPORT_ENDPOINT,selfAssessedLevel:'',activeLevel:'',levelMode:'placement',goalProfile:'general',timeZone:detectedTimeZone()};
+// m025-182 (W2-STATE, AI-11 F02/F05): `learnerLocale` adalah SATU-SATUNYA sumber kebenaran
+// bahasa antarmuka murid — field ADDITIF di preferences, mengikuti pola merge-with-defaults
+// sanitizeState (AI-11 F04 pola #3): blob lama tanpa field ini ter-merge mulus ke 'id',
+// tanpa kunci baru, tanpa bump schema. Nilainya enum tertutup FiezelI18n.SUPPORTED ('id'|'th');
+// JANGAN pernah meneruskannya ke opsi audio/voice (audio-locale-guard-test, AI-17 F02).
+const defaultPreferences={haptics:true,feedbackSounds:true,motion:true,neuralVoice:'auto',reminders:null,reportConsent:false,reportEndpoint:DEFAULT_REPORT_ENDPOINT,selfAssessedLevel:'',activeLevel:'',levelMode:'placement',goalProfile:'general',timeZone:detectedTimeZone(),learnerLocale:'id'};
 const defaultReportMeta={lastSentAnswered:0,lastSentAt:0,lastStatus:'not_configured',lastReceipt:'',lastAccessReportDay:'',queue:[]};
 const LOGIN_MESSAGES=[
   {headline:FiezelI18n.t('login.pesan-01-headline'),lead:FiezelI18n.t('login.pesan-01-lead')},
@@ -802,6 +807,18 @@ toursSeen:{menu:false,library:false,listening:false}};let stateReady=false;
 let V=[],R=[],G={},GRAMMAR_ITEMS=[],GRAMMAR_CURRICULUM={},GRAMMAR_CURRICULUM_INDEX=Object.create(null),WRITING_BANK=null,READING_EXAM=null;
 let activeStateStorageKey=LEGACY_STATE_KEY,activeAccountUuid='',state=loadState();
 stateReady=true;
+// m025-182 (W2-STATE, AI-11 F03 + AI-14 F03): locale murid diambil dari state SEBELUM render
+// pertama (render pertama baru terjadi di openApp(), jauh setelah baris ini dieksekusi).
+// <html lang="id"> statis di index.html TIDAK diubah — itu default pra-boot yang dijaga
+// a11y-test (lang-pin); atribut lang baru bergeser DINAMIS pasca-boot lewat listener onChange
+// di bawah. Listener dipasang SEKALI di sini supaya SEMUA jalur setLocale (boot ini, ganti
+// akun Puter di activateAccountStateFromPuter, saklar bahasa di Pengaturan) ikut menyeret
+// <html lang> tanpa wiring ulang. setLocale('id') saat boot murid Indonesia adalah no-op
+// (locale awal FiezelI18n memang 'id') — listener tidak terpanggil, byte halaman tak berubah.
+try{
+  self.FiezelI18n?.onChange?.(()=>{try{document.documentElement.lang=FiezelI18n.getBcp47()}catch(_){/* VM test tanpa DOM */}});
+  self.FiezelI18n?.setLocale?.(state?.preferences?.learnerLocale);
+}catch(_){/* i18n absen (harness lama) = perilaku hari ini, bukan boot gagal */}
 function placementLevel(sourceState=state){const raw=Math.max(1,Math.min(6,Math.floor(Number(sourceState?.level)||1)));return LEVELS[raw-1]||'A1'}
 function getActiveLevel(sourceState=state){const prefs=sourceState?.preferences||{};if(LEVELS.includes(String(prefs.activeLevel||'')))return String(prefs.activeLevel);if(!sourceState?.placementDone&&LEVELS.includes(String(prefs.selfAssessedLevel||'')))return String(prefs.selfAssessedLevel);return sourceState?.placementDone?placementLevel(sourceState):'A1'}
 function activeLevelIsManual(sourceState=state){return LEVELS.includes(String(sourceState?.preferences?.activeLevel||''))}
@@ -1026,7 +1043,7 @@ function sanitizeToursSeen(raw){
 }
 function sanitizeState(raw){
   const rawPreferences=raw?.preferences||{},activeLevel=LEVELS.includes(String(rawPreferences.activeLevel||''))?String(rawPreferences.activeLevel):'';
-  const next={...defaultState,...raw,view:'home',ownerUuid:String(raw?.ownerUuid||'').replace(/[^A-Za-z0-9_-]/g,'').slice(0,128),vocab:raw?.vocab||{},grammar:raw?.grammar||{},reading:raw?.reading||{},history:Array.isArray(raw?.history)?raw.history.filter(h=>h&&typeof h==='object'):[],wrongAnswers:pruneCorruptedReviewEntries(raw?.wrongAnswers),confidenceHistory:Array.isArray(raw?.confidenceHistory)?raw.confidenceHistory:[],sessionHistory:Array.isArray(raw?.sessionHistory)?raw.sessionHistory:[],learningDays:Array.isArray(raw?.learningDays)?raw.learningDays:[],daily:raw?.daily&&typeof raw.daily==='object'?raw.daily:{date:'',count:0,attempts:0,meaningful:false},preferences:{...defaultPreferences,...rawPreferences,activeLevel,levelMode:activeLevel?'manual':'placement',selfAssessedLevel:LEVELS.includes(String(rawPreferences.selfAssessedLevel||''))?String(rawPreferences.selfAssessedLevel):'',timeZone:validTimeZone(rawPreferences.timeZone||defaultPreferences.timeZone),goalProfile:String(rawPreferences.goalProfile||defaultPreferences.goalProfile).slice(0,30),reportEndpoint:String(rawPreferences.reportEndpoint||DEFAULT_REPORT_ENDPOINT).trim()},reportMeta:{...defaultReportMeta,...(raw?.reportMeta||{}),queue:Array.isArray(raw?.reportMeta?.queue)?raw.reportMeta.queue.slice(-8):[]},reminderMeta:{lastNotificationAt:0,lastNotificationDay:'',lastNotificationKind:'',lastMessageIndex:-1,lastPositiveDay:'',evidenceLog:[],...(raw?.reminderMeta||{}),evidenceLog:Array.isArray(raw?.reminderMeta?.evidenceLog)?raw.reminderMeta.evidenceLog.slice(-ALRS_EVIDENCE_LOG_LIMIT):[]},activeSession:raw?.activeSession&&typeof raw.activeSession==='object'?raw.activeSession:null,adaptivePolicyMeta:{lastPolicy:null,lastSource:'',lastAt:0,history:[],...(raw?.adaptivePolicyMeta||{}),history:Array.isArray(raw?.adaptivePolicyMeta?.history)?raw.adaptivePolicyMeta.history.slice(-30):[]},policyOutcomeMeta:{last:null,history:[],queue:[],...(raw?.policyOutcomeMeta||{}),history:Array.isArray(raw?.policyOutcomeMeta?.history)?raw.policyOutcomeMeta.history.slice(-POLICY_OUTCOME_LOG_LIMIT):[],queue:Array.isArray(raw?.policyOutcomeMeta?.queue)?raw.policyOutcomeMeta.queue.slice(-10):[]},contentCanaryMeta:CONTENT_CANARY?CONTENT_CANARY.sanitizeEvidence(raw?.contentCanaryMeta,CONTENT_CANARY_CONFIG?.canaryId||raw?.contentCanaryMeta?.canaryId||''):{...defaultState.contentCanaryMeta},coachCache:raw?.coachCache&&typeof raw.coachCache==='object'?raw.coachCache:null,levelTrust:sanitizeLevelTrust(raw?.levelTrust),gems:sanitizeGemsState(raw?.gems),toursSeen:sanitizeToursSeen(raw?.toursSeen)};
+  const next={...defaultState,...raw,view:'home',ownerUuid:String(raw?.ownerUuid||'').replace(/[^A-Za-z0-9_-]/g,'').slice(0,128),vocab:raw?.vocab||{},grammar:raw?.grammar||{},reading:raw?.reading||{},history:Array.isArray(raw?.history)?raw.history.filter(h=>h&&typeof h==='object'):[],wrongAnswers:pruneCorruptedReviewEntries(raw?.wrongAnswers),confidenceHistory:Array.isArray(raw?.confidenceHistory)?raw.confidenceHistory:[],sessionHistory:Array.isArray(raw?.sessionHistory)?raw.sessionHistory:[],learningDays:Array.isArray(raw?.learningDays)?raw.learningDays:[],daily:raw?.daily&&typeof raw.daily==='object'?raw.daily:{date:'',count:0,attempts:0,meaningful:false},preferences:{...defaultPreferences,...rawPreferences,activeLevel,levelMode:activeLevel?'manual':'placement',selfAssessedLevel:LEVELS.includes(String(rawPreferences.selfAssessedLevel||''))?String(rawPreferences.selfAssessedLevel):'',timeZone:validTimeZone(rawPreferences.timeZone||defaultPreferences.timeZone),goalProfile:String(rawPreferences.goalProfile||defaultPreferences.goalProfile).slice(0,30),reportEndpoint:String(rawPreferences.reportEndpoint||DEFAULT_REPORT_ENDPOINT).trim(),/* m025-182 W2-STATE: enum tertutup — nilai korup/asing jatuh ke default 'id', bukan lolos mentah */learnerLocale:(self.FiezelI18n?.SUPPORTED||['id','th']).includes(rawPreferences.learnerLocale)?rawPreferences.learnerLocale:defaultPreferences.learnerLocale},reportMeta:{...defaultReportMeta,...(raw?.reportMeta||{}),queue:Array.isArray(raw?.reportMeta?.queue)?raw.reportMeta.queue.slice(-8):[]},reminderMeta:{lastNotificationAt:0,lastNotificationDay:'',lastNotificationKind:'',lastMessageIndex:-1,lastPositiveDay:'',evidenceLog:[],...(raw?.reminderMeta||{}),evidenceLog:Array.isArray(raw?.reminderMeta?.evidenceLog)?raw.reminderMeta.evidenceLog.slice(-ALRS_EVIDENCE_LOG_LIMIT):[]},activeSession:raw?.activeSession&&typeof raw.activeSession==='object'?raw.activeSession:null,adaptivePolicyMeta:{lastPolicy:null,lastSource:'',lastAt:0,history:[],...(raw?.adaptivePolicyMeta||{}),history:Array.isArray(raw?.adaptivePolicyMeta?.history)?raw.adaptivePolicyMeta.history.slice(-30):[]},policyOutcomeMeta:{last:null,history:[],queue:[],...(raw?.policyOutcomeMeta||{}),history:Array.isArray(raw?.policyOutcomeMeta?.history)?raw.policyOutcomeMeta.history.slice(-POLICY_OUTCOME_LOG_LIMIT):[],queue:Array.isArray(raw?.policyOutcomeMeta?.queue)?raw.policyOutcomeMeta.queue.slice(-10):[]},contentCanaryMeta:CONTENT_CANARY?CONTENT_CANARY.sanitizeEvidence(raw?.contentCanaryMeta,CONTENT_CANARY_CONFIG?.canaryId||raw?.contentCanaryMeta?.canaryId||''):{...defaultState.contentCanaryMeta},coachCache:raw?.coachCache&&typeof raw.coachCache==='object'?raw.coachCache:null,levelTrust:sanitizeLevelTrust(raw?.levelTrust),gems:sanitizeGemsState(raw?.gems),toursSeen:sanitizeToursSeen(raw?.toursSeen)};
   /* R6 perbaikan-15/16: penghitung yang rusak TIDAK boleh menghapus bukti belajar.
      (1) Baris history yang korup (null/bukan objek) dibuang SATU-SATU di atas - dulu satu
      baris null membuat hs.map(h=>h.skill) melempar, loadState menangkapnya, dan SELURUH
@@ -1139,6 +1156,10 @@ async function activateAccountStateFromPuter(sdk=self.puter){
       }
     }
     activeAccountUuid=uuid;activeStateStorageKey=key;state=sanitizeState(raw||defaultState);state.ownerUuid=uuid;coreBrainCache=null;save();
+    /* m025-182 W2-STATE: state akun bisa membawa learnerLocale berbeda dari state legacy yang
+       dimuat saat boot — locale disinkronkan SEBELUM render() di bawah supaya cat pertama akun
+       ini sudah berbahasa miliknya (listener onChange yang dipasang di boot ikut menyetel lang). */
+    try{self.FiezelI18n?.setLocale?.(state?.preferences?.learnerLocale)}catch(_){}
     if(appOpened)render();return true;
   }catch{return false}
 }
@@ -2474,7 +2495,7 @@ function sanitizeAdaptivePolicy(raw,fallback){if(!raw||raw.schema!==ADAPTIVE_POL
 // prasyarat mendapat kata terakhir di tempat datanya benar-benar ada.
 async function resolveAdaptivePolicy(now=Date.now()){const fallback={...buildAdaptivePolicy(now),source:CORE_WORKER_URL?'local-policy-mirror-fallback':'local-policy-mirror'};if(!CORE_WORKER_URL)return fallback;try{const response=await coreWorkerExec('/api/policy/next',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(adaptivePolicyRequestPayload(now))});if(!response.ok)throw new Error(`policy_${response.status}`);const data=await response.json();if(String(data.protocol||'')!==CORE_PROTOCOL_VERSION)throw new Error('policy_protocol_mismatch');return applyCoreBrain(sanitizeAdaptivePolicy({...data.policy,source:'core-worker'},fallback),now)}catch{return fallback}}
 function recordAdaptivePolicy(policy){if(!policy)return;const summary={at:Date.now(),policyId:String(policy.policyId||''),mode:String(policy.mode||''),targetSkill:String(policy.targetSkill||''),primaryDomain:String(policy.primaryDomain||''),sessionSize:Number(policy.sessionSize||0),source:String(policy.source||'')};state.adaptivePolicyMeta={lastPolicy:summary,lastSource:summary.source,lastAt:summary.at,history:[...(state.adaptivePolicyMeta?.history||[]),summary].slice(-30)};save()}
-function localCoachSignal(){const p=buildAdaptivePolicy();if(p.mode==='diagnostic')return{title:p.title,text:p.summary,action:p.cta,ready:false};const focus=p.targetSkill?friendlySkillName(p.targetSkill):friendlySkillName(p.primaryDomain);return{title:p.title,text:FiezelI18n.t('home.coach-fokus',{ringkasan:p.summary,fokus,jumlahSoal:p.sessionSize,menit:p.estimatedMinutes}),action:p.cta,ready:true,policy:p}}
+function localCoachSignal(){const p=buildAdaptivePolicy();if(p.mode==='diagnostic')return{title:p.title,text:p.summary,action:p.cta,ready:false};const fokus=p.targetSkill?friendlySkillName(p.targetSkill):friendlySkillName(p.primaryDomain);return{title:p.title,text:FiezelI18n.t('home.coach-fokus',{ringkasan:p.summary,fokus,jumlahSoal:p.sessionSize,menit:p.estimatedMinutes}),action:p.cta,ready:true,policy:p}}
 // m025-129: greetingForNow() dihapus bersama baris sapaan serif miring yang menjadi
 // satu-satunya pemakainya. Sapaan kontekstual tetap ada - ia hidup di gelembung PAW,
 // tempat yang memang bertugas menyapa.
@@ -7644,11 +7665,43 @@ function gemsSettingsRowMarkup(){
   return `<div class="setting-row setting-row-static" id="settingGemsRow"><span class="setting-icon"><i data-lucide="sparkles"></i></span><span><b>${esc(FiezelI18n.getLocale()==='id'?g.GEMS_COPY.settingsTitle:FiezelI18n.t('gems.settings-title'))}</b><small id="settingGemsBalance">${FiezelI18n.t('settings.saldo-you',{balance:esc(g.chipLabel(balance))})}</small><small class="setting-note">${esc(FiezelI18n.getLocale()==='id'?g.GEMS_COPY.settingsBody:FiezelI18n.t('gems.settings-body'))}</small></span></div>`;
 }
 function settingsFold(title,body,open,extraClass){return `<details class="home-fold settings-fold${extraClass?' '+extraClass:''}"${open?' open':''}><summary><span>${title}</span><i data-lucide="chevron-down"></i></summary><div class="settings-fold-body">${body}</div></details>`}
+/* m025-182 (W2-STATE, AI-11 F03): baris saklar bahasa tampilan di Pengaturan → Profil.
+   Mengikuti pola .setting-row + ikon lucide yang dipakai baris lain. Labelnya hidup di
+   copy-map TERPISAH features/i18n/copy-id-settings-locale.js — kalimat id BARU sengaja
+   tidak menumpang copy-id-app-d supaya regen baseline-nya terisolasi dan teraudit
+   (bukti: impl/w2regen/batch-7-proof.json). Opsi ditulis sebagai AUTONYM (nama bahasa
+   dalam bahasanya sendiri) — konvensi pemilih bahasa: murid yang tersasar ke locale yang
+   salah tetap bisa mengenali nama bahasanya sendiri di daftar. */
+function learnerLocaleRowMarkup(){
+  const active=(self.FiezelI18n?.getLocale?.())||'id';
+  const options=[['id',FiezelI18n.t('settings.locale-opsi-id')],['th',FiezelI18n.t('settings.locale-opsi-th')]]
+    .map(([value,label])=>`<option value="${value}"${value===active?' selected':''}>${esc(label)}</option>`).join('');
+  return `<label class="setting-row"><span class="setting-icon"><i data-lucide="languages"></i></span><span><b>${FiezelI18n.t('settings.locale-judul')}</b><small>${FiezelI18n.t('settings.locale-catatan')}</small></span><select id="settingLearnerLocale" aria-label="${FiezelI18n.t('settings.locale-judul')}">${options}</select></label>`;
+}
+/* m025-182 (W2-STATE): ganti bahasa DITERAPKAN saat itu juga (pola toggle settingReminders),
+   bukan menunggu tombol Simpan — murid yang salah pilih bahasa harus bisa keluar dari bahasa
+   yang tidak ia baca tanpa mencari tombol Simpan yang berlabel bahasa itu. Urutan WAJIB
+   (AI-14 F03): tulis state lewat jalur penulisan yang ada (save) → setLocale → leaveAllStages
+   (stage stack membawa closure gambar berbahasa lama; membiarkannya = layar campur bahasa
+   saat back) → closeModal + render() penuh → toast konfirmasi yang sudah berbahasa BARU.
+   Nilai ini TIDAK PERNAH diteruskan ke opsi audio/voice (AI-17 F02, audio-locale-guard). */
+function setLearnerLocalePreference(next){
+  const supported=(self.FiezelI18n?.SUPPORTED)||['id','th'];
+  const value=supported.includes(next)?next:'id';
+  if((state.preferences?.learnerLocale||'id')===value)return true;
+  state.preferences={...state.preferences,learnerLocale:value};save();
+  try{self.FiezelI18n?.setLocale?.(value)}catch(_){}
+  try{leaveAllStages()}catch(_){}
+  closeModal();render();haptic('confirm');
+  showToast(FiezelI18n.t('settings.locale-toast'));
+  return true;
+}
+window.setLearnerLocalePreference=setLearnerLocalePreference;
 function openSettings(){const p=state.preferences||defaultPreferences,endpoint=p.reportEndpoint||'';
   // Kartu Akun Puter dibungkus lipatan bersarang, BUKAN dipindah atau dihapus: elemennya
   // tetap di DOM (bindAccountSettingControls dan refreshPuterAccountCard tetap menemukannya),
   // tetapi 330 px penjelasan akun tidak lagi ikut terbuka saat panel baru dibuka.
-  const grupProfil=`<label class="endpoint-label">${FiezelI18n.t('onboarding.name-field-label')}<input id="settingLearnerName" type="text" value="${esc(state.userName||'')}" maxlength="24" placeholder="${FiezelI18n.t('settings.nama-you')}" autocomplete="given-name"></label>`+settingsFold(FiezelI18n.t('settings.akun-puter'),accountSettingsMarkup(),false,'settings-subfold');
+  const grupProfil=`<label class="endpoint-label">${FiezelI18n.t('onboarding.name-field-label')}<input id="settingLearnerName" type="text" value="${esc(state.userName||'')}" maxlength="24" placeholder="${FiezelI18n.t('settings.nama-you')}" autocomplete="given-name"></label>${learnerLocaleRowMarkup()}`+settingsFold(FiezelI18n.t('settings.akun-puter'),accountSettingsMarkup(),false,'settings-subfold');
   const grupBelajar=`<div class="settings-list"><button type="button" class="setting-row setting-row-action" onclick="replayTour()"><span class="setting-icon"><i data-lucide="rotate-ccw"></i></span><span><b>${FiezelI18n.t('settings.redo-kenalan-cepat')}</b><small>${FiezelI18n.t('settings.menjalankan-ulang-tur-menu-awal')}</small></span><i data-lucide="chevron-right"></i></button><label class="setting-row"><span class="setting-icon"><i data-lucide="wand-sparkles"></i></span><span><b>Animasi antarmuka</b><small>${FiezelI18n.t('settings.transisi-halaman-kartu-popup-feedback')}</small></span><input id="settingMotion" type="checkbox" ${p.motion?'checked':''}></label><label class="setting-row"><span class="setting-icon"><i data-lucide="vibrate"></i></span><span><b>Getaran sentuh</b><small>${typeof navigator!=='undefined'&&typeof navigator.vibrate==='function'?'Perangkat ini mendukung getaran':'Akan aktif pada perangkat yang mendukung'}</small></span><input id="settingHaptics" type="checkbox" ${p.haptics?'checked':''}></label>${gemsSettingsRowMarkup()}</div>`;  const grupSuara=`<div class="settings-list"><label class="setting-row"><span class="setting-icon"><i data-lucide="bell-check"></i></span><span><b>${FiezelI18n.t('settings.pengingat-study')}</b><small>${esc(reminderSettingHint())}</small></span><input id="settingReminders" type="checkbox" ${remindersActive()?'checked':''} ${notificationPermission()==='denied'||notificationPermission()==='unsupported'?'disabled':''} aria-label="Pengingat belajar"></label><label class="setting-row"><span class="setting-icon"><i data-lucide="badge-check"></i></span><span><b>${FiezelI18n.t('settings.suara-answer')}</b><small>${FiezelI18n.t('settings.bunyi-naik-when-right-bunyi')}</small></span><input id="settingFeedbackSounds" type="checkbox" ${p.feedbackSounds!==false?'checked':''}></label><div class="setting-row" id="audioDiagRow"><span class="setting-icon"><i data-lucide="smartphone"></i></span><span><b>${FiezelI18n.t('settings.status-bunyi-perangkat')}</b><small id="audioDiagText">Memeriksa…</small></span></div></div><div id="voiceSettingsCard">${neuralVoiceStatusMarkup()}</div>`;
   // Tombol bersihkan-cache duduk di antara Backup dan Kesehatan Instalasi: kartu diagnosis
   // itulah yang melaporkan shell usang, jadi tombol perbaikannya berdampingan dengannya.
@@ -7661,7 +7714,7 @@ function openSettings(){const p=state.preferences||defaultPreferences,endpoint=p
     +settingsFold(FiezelI18n.t('settings.data-amp-penyimpanan'),grupData,false)
     +settingsFold(FiezelI18n.t('settings.lanjutan'),grupLanjutan,false)
     +`<div class="modal-actions settings-actions"><button id="settingsCancel">Batal</button><button class="primary" id="settingsSave">${FiezelI18n.t('settings.simpan-prefs')}</button></div>`);
-  $('settingsCancel').onclick=closeModal;setTimeout(refreshInstallHealth,0);setTimeout(refreshAudioDiagnostics,0);$('backupExport')?.addEventListener('click',runBackupExport);$('backupPick')?.addEventListener('click',()=>$('backupFile')?.click());$('backupFile')?.addEventListener('change',event=>runBackupImport(event.currentTarget.files?.[0]));$('openFeedback')?.addEventListener('click',()=>{closeModal();openFeedback('')});$('reportPreview').onclick=openReportPreview;$('settingsSave').onclick=saveSettings;$('settingClearCache')?.addEventListener('click',()=>{confirmClearAppCache()});bindVoiceSettingControls();bindAccountSettingControls();$('settingReminders')?.addEventListener('change',event=>toggleStudyReminders(event.currentTarget));
+  $('settingsCancel').onclick=closeModal;setTimeout(refreshInstallHealth,0);setTimeout(refreshAudioDiagnostics,0);$('backupExport')?.addEventListener('click',runBackupExport);$('backupPick')?.addEventListener('click',()=>$('backupFile')?.click());$('backupFile')?.addEventListener('change',event=>runBackupImport(event.currentTarget.files?.[0]));$('openFeedback')?.addEventListener('click',()=>{closeModal();openFeedback('')});$('reportPreview').onclick=openReportPreview;$('settingsSave').onclick=saveSettings;$('settingClearCache')?.addEventListener('click',()=>{confirmClearAppCache()});bindVoiceSettingControls();bindAccountSettingControls();$('settingReminders')?.addEventListener('change',event=>toggleStudyReminders(event.currentTarget));$('settingLearnerLocale')?.addEventListener('change',event=>setLearnerLocalePreference(event.currentTarget.value));
 // Runtime suara dimuat malas (lihat ./fiezel-lazy-loader.js). Kalau murid membuka
 // Pengaturan sebelum gelombang idle selesai, kartunya akan berbunyi "tidak tersedia"
 // padahal berkasnya sedang dalam perjalanan - jadi kartunya digambar ulang begitu tiba.
@@ -8074,7 +8127,11 @@ function aiTaskRequestBody(clientTask,ctx){
   if(!task)return null;
   const input=aiTaskInputFor(clientTask,ctx);
   if(!input)return null;
-  return{schema:AI_TASK_REQUEST_SCHEMA,task,input,locale:'id'};
+  /* m025-182 (W2-STATE, AI-11 F03): pin locale hardcoded dibuka — enum tertutup 'id'|'th'
+     sudah divalidasi sisi server oleh W1-API (workers/api/ai/ai-tasks.js + locale-enum-test),
+     dan FiezelI18n.getLocale() hanya pernah mengembalikan anggota SUPPORTED. Murid Indonesia
+     tetap mengirim 'id' byte-identik (getLocale() default 'id'). */
+  return{schema:AI_TASK_REQUEST_SCHEMA,task,input,locale:FiezelI18n.getLocale()};
 }
 // Klasifikasi jawaban Worker. Fungsi MURNI: tanpa DOM, tanpa fetch, tanpa Date.now - supaya
 // keempat cabang (ok / ditandai / kuota / galat) bisa diuji sebagai tabel.

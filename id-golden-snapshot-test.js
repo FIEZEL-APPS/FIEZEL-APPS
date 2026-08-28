@@ -139,7 +139,11 @@ function collectLiterals() {
 // ------------------------------------------------------------------------------------------
 const ANCHORS = [
   { name: 'html lang="id" (index.html)', file: 'index.html', re: /<html[^>]*\blang="id"/ },
-  { name: "locale:'id' pin di AI request (app.js)", file: 'app.js', re: /locale:\s*['"]id['"]/ },
+  // m025-182 (W2-STATE, AI-11 F03): pin hardcoded locale:'id' di aiTaskRequestBody dibuka
+  // secara SENGAJA — jangkar diganti menegaskan sumber baru: enum tertutup FiezelI18n
+  // (getLocale() hanya pernah 'id'|'th'; default 'id', jadi murid Indonesia tetap mengirim
+  // 'id' byte-identik). Validasi sisi server: workers/api/ai/ai-tasks.js + locale-enum-test.
+  { name: "locale AI request dari FiezelI18n.getLocale() (app.js)", file: 'app.js', re: /locale:FiezelI18n\.getLocale\(\)/ },
   { name: 'GUARD berbahasa Indonesia (ai-tasks.js)', file: 'workers/api/ai/ai-tasks.js', re: /Jawab dalam bahasa Indonesia/ },
   { name: 'utterance.lang default en-US (voice-say)', file: 'features/neural-voice/fiezel-voice-say.js', re: /utterance\.lang\s*=\s*opts\.locale\s*\|\|\s*'en-US'/ },
   { name: 'nama manifest tetap', file: 'manifest.json', re: /"FIEZEL Personal English OS"/ }
