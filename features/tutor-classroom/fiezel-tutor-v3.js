@@ -14,6 +14,18 @@
 }(typeof globalThis !== 'undefined' ? globalThis : this, function (root) {
   'use strict';
 
+  // AI-02 F01: naskah murid diambil dari lapisan i18n (copy-id-feat-b.js). Di browser
+  // runtime-nya dimuat lebih dulu (index.html); di Node modul memuatnya sendiri supaya
+  // keluaran render tetap byte-identik dengan sebelumnya.
+  var I18N = (typeof globalThis !== 'undefined' && globalThis.FiezelI18n) || null;
+  if (!I18N && typeof require === 'function') {
+    try {
+      I18N = require('../i18n/fiezel-i18n.js');
+      require('../i18n/copy-id-feat-b.js');
+    } catch (loadError) { I18N = null; }
+  }
+  function T(key, params) { return I18N ? I18N.t(key, params) : String(key); }
+
   var SCHEMA = 'fiezel-tutor-v3';
   var SESSION_KEY = 'fiezel-tutor-v3-session';
   var EVIDENCE_KEY = 'fiezel-tutor-v3-evidence';
@@ -175,7 +187,7 @@
       return {
         strategy: kind,
         en: "Let's put it on a timeline. The action starts before now, but the result reaches the present. That connection is the point.",
-        id: 'Kita taruh di garis waktu. Tindakannya dimulai sebelum sekarang, tetapi hasilnya sampai ke masa kini. Hubungan itulah poinnya.',
+        id: T('tutorv3.script-4'),
         board: { title: 'Timeline', formula: 'PAST ─────●────→ NOW', examples: ['action before now', 'result relevant now'] }
       };
     }
@@ -190,7 +202,7 @@
     return {
       strategy: 'intuition',
       en: "Let's make it concrete. Imagine the key is still missing in your hand right now. Present perfect helps connect an earlier action to the situation you have now.",
-      id: 'Kita buat konkret. Bayangkan kuncinya masih hilang sampai sekarang. Present perfect membantu menghubungkan kejadian sebelumnya dengan situasi yang masih berlaku sekarang.',
+      id: T('tutorv3.script-6'),
       board: { title: topic, formula: 'earlier action → result now', examples: [reason || 'connect the result to now'] }
     };
   }
@@ -201,21 +213,21 @@
     if (/went|gone|v2|v3|verb 3|verb three/.test(low)) {
       return {
         en: "You are separating two jobs of the same verb. Went is the normal past form. After have or has, English needs the third form, so we say I have gone, not I have went.",
-        id: 'Kamu sedang memisahkan dua fungsi dari kata kerja yang sama. Went adalah bentuk lampau biasa. Setelah have atau has, bahasa Inggris membutuhkan bentuk ketiga, jadi kita mengatakan I have gone, bukan I have went.',
+        id: T('tutorv3.script-7'),
         board: { title: 'go · went · gone', formula: 'I went.  |  I have gone.', examples: ['V2 after a past-time statement', 'V3 after have / has'] }
       };
     }
     if (/have|has/.test(low)) {
       return {
         en: "Use has with he, she and it. Use have with I, you, we and they. The meaning stays the same; only the subject controls that helper word.",
-        id: 'Gunakan has untuk he, she, dan it. Gunakan have untuk I, you, we, dan they. Maknanya tetap sama; subjek yang menentukan kata bantu itu.',
+        id: T('tutorv3.script-8'),
         board: { title: 'Have or has?', formula: 'he/she/it → has', examples: ['I/you/we/they → have'] }
       };
     }
     if (/why|kenapa|mengapa|beda|difference/.test(low)) {
       return {
         en: "The useful question is not only when the action happened. Ask whether the result is still connected to now. If yes, present perfect often becomes the better choice.",
-        id: 'Pertanyaan yang berguna bukan hanya kapan kejadiannya. Tanyakan apakah hasilnya masih terhubung dengan sekarang. Jika iya, present perfect sering menjadi pilihan yang lebih tepat.',
+        id: T('tutorv3.script-9'),
         board: { title: 'Meaning first', formula: 'past action + present relevance', examples: ['result still matters now'] }
       };
     }

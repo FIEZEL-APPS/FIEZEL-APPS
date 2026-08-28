@@ -86,12 +86,21 @@ const test = (name, fn) => { fn(); pass++; console.log('PASS', name); };
   });
 
   test('struggle messages exist and speak like a teacher, not a scold', () => {
-    assert.ok(/struggling:\[/.test(app), 'title pool exists');
+    // AI-20 F06 (W1-TESTPLAN 2a): pool naskah pengingat boleh PINDAH byte-identik dari app.js
+    // ke copy-map features/i18n/copy-id-*.js (id-golden-snapshot-test.js menjaga byte-nya),
+    // jadi korpus pencarian adalah UNION app.js + copy-id — glob kosong = perilaku lama.
+    const i18nDir = 'features/i18n';
+    const copyIdUnion = fs.existsSync(i18nDir)
+      ? fs.readdirSync(i18nDir).filter(f => /^copy-id-.*\.js$/.test(f)).sort()
+          .map(f => fs.readFileSync(i18nDir + '/' + f, 'utf8')).join('\n')
+      : '';
+    const corpus = app + '\n' + copyIdUnion;
+    assert.ok(/struggling:\[/.test(corpus), 'title pool exists');
     // Two pools share the key: a one-line title pool and a multi-line body pool. The
     // body is the one that opens on its own line.
     // Normalise line endings first: this repo checks out CRLF on Windows and LF in CI,
     // so anchoring on a raw newline would pass in one place and fail in the other.
-    const flat = app.split('\r\n').join('\n');
+    const flat = corpus.split('\r\n').join('\n');
     const bodyStart = flat.indexOf('  struggling:[\n');
     assert.ok(bodyStart > -1, 'multi-line body pool exists');
     const body = flat.slice(bodyStart, flat.indexOf('  starter:[\n'));

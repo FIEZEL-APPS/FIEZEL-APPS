@@ -43,6 +43,19 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
 
+  // AI-02 F01: naskah tur diambil dari lapisan i18n (copy-id-feat-b.js), bukan literal di
+  // titik pakai. Di browser runtime-nya dimuat lebih dulu (index.html); di Node (tour-test
+  // dan tours-test me-require modul ini langsung) modul memuatnya sendiri supaya nilai
+  // runtime tetap byte-identik dengan copy di reports/copy-tour-gems.md.
+  var I18N = (typeof globalThis !== 'undefined' && globalThis.FiezelI18n) || null;
+  if (!I18N && typeof require === 'function') {
+    try {
+      I18N = require('../i18n/fiezel-i18n.js');
+      require('../i18n/copy-id-feat-b.js');
+    } catch (loadError) { I18N = null; }
+  }
+  function T(key, params) { return I18N ? I18N.t(key, params) : String(key); }
+
   var STORAGE_KEY = 'fiezel-tour-v1';
 
   /**
@@ -88,38 +101,38 @@
     Object.freeze({
       id: 'home',
       target: '.learning-launcher',
-      title: 'Mulai dari Home',
-      body: 'Ini beranda kamu: progres harian, streak, dan saran latihan dari PAW. Semua perjalananmu berangkat dari sini.'
+      title: T('tour.menu-home-title'),
+      body: T('tour.menu-home-body')
     }),
     Object.freeze({
       id: 'vocab-grammar',
       target: '.bottomnav [data-view="vocab"]',
-      title: 'Vocab dan Grammar',
-      body: 'Tab Vocab buat nambah kosakata, tab Grammar buat materi tata bahasa \u2014 dua fondasi yang saling nguatin.'
+      title: T('tour.menu-vocab-title'),
+      body: T('tour.menu-vocab-body')
     }),
     Object.freeze({
       id: 'reading-peta',
       target: '.bottomnav [data-view="reading"]',
-      title: 'Reading dan Peta',
-      body: 'Reading isinya bacaan berjenjang plus soalnya. Peta nunjukin jalur belajarmu dari A1 sampai C2 \u2014 biar arahmu jelas.'
+      title: T('tour.menu-reading-title'),
+      body: T('tour.menu-reading-body')
     }),
     Object.freeze({
       id: 'ask',
       target: '.topbar .ask-button',
-      title: 'Tanya FIEZEL?',
-      body: 'Tombol di kanan ini pintu ke PAW, pembimbing kamu. Bingung apa pun, tanya di sini (butuh jaringan).'
+      title: T('tour.menu-ask-title'),
+      body: T('tour.menu-ask-body')
     }),
     Object.freeze({
       id: 'level',
       target: '.home-level-context',
-      title: 'Chip level kamu',
-      body: 'Chip ini nunjukin level aktifmu. Ketuk buat pindah level \u2014 materi dan latihan langsung ngikutin pilihanmu.'
+      title: T('tour.menu-level-title'),
+      body: T('tour.menu-level-body')
     }),
     Object.freeze({
       id: 'settings',
       target: '.topbar-actions [aria-label="Buka pengaturan"]',
-      title: 'Tombol Pengaturan',
-      body: 'Ini pintu ke FIEZEL Control Room: suara, gerak, tampilan, sampai data belajarmu \u2014 semuanya kamu yang pegang.'
+      title: T('tour.menu-settings-title'),
+      body: T('tour.menu-settings-body')
     }),
     // PENUTUP. Targetnya wordmark FIEZEL - benda paling netral di layar, dan bukan pintu ke
     // fitur apa pun. Di sinilah tur menu berhenti: tidak ada langkah kedelapan yang membuka
@@ -128,8 +141,8 @@
     Object.freeze({
       id: 'penutup',
       target: '.topbar .brand-button',
-      title: 'Tur menu selesai!',
-      body: 'Kamu udah kenal semua menunya. Tur lanjutan bakal muncul otomatis tiap kamu masuk fitur baru \u2014 santai aja.'
+      title: T('tour.menu-end-title'),
+      body: T('tour.menu-end-body')
     })
   ]);
 
@@ -142,14 +155,14 @@
     Object.freeze({
       id: 'putar',
       target: '#libraryPlay',
-      title: 'Ketuk buat mulai',
-      body: 'Tombol putar ini yang menghidupkan ceritanya. Ketuk sekali buat jalan, ketuk lagi buat jeda \u2014 kapan pun kamu mau.'
+      title: T('tour.lib-play-title'),
+      body: T('tour.lib-play-body')
     }),
     Object.freeze({
       id: 'subtitle',
       target: '.library-sentence',
-      title: 'Subtitle ngikutin suara',
-      body: 'Teksnya jalan bareng audionya, kalimat demi kalimat. Sambil dengar sambil baca \u2014 telinga dan mata belajar bareng.'
+      title: T('tour.lib-subtitle-title'),
+      body: T('tour.lib-subtitle-body')
     }),
     // Toggle Gem Terjemahan adalah ID KONTRAK BERSAMA dengan pekerjaan gems yang berjalan
     // paralel (#fslTranslateToggle). Selama elemennya belum ada, resolveSteps melewatinya -
@@ -157,14 +170,14 @@
     Object.freeze({
       id: 'terjemahan',
       target: '#fslTranslateToggle, #libraryTranslateToggle',
-      title: 'Terjemahan Otomatis',
-      body: 'Nyalakan toggle ini, dan tiap kalimat subtitle langsung diterjemahkan ke bahasa Indonesia. Harganya 1 Gem Terjemahan per sesi, dan butuh jaringan, ya.'
+      title: T('tour.lib-translate-title'),
+      body: T('tour.lib-translate-body')
     }),
     Object.freeze({
       id: 'kecepatan',
       target: '.topbar-actions [aria-label="Buka pengaturan"]',
-      title: 'Mau lebih pelan?',
-      body: 'Kecepatan suara bisa kamu atur di FIEZEL Control Room, lewat tombol Pengaturan. Setelannya nempel buat semua sesi berikutnya.'
+      title: T('tour.lib-speed-title'),
+      body: T('tour.lib-speed-body')
     })
   ]);
 
@@ -175,26 +188,26 @@
     Object.freeze({
       id: 'sekali-dengar',
       target: '#speakingListeningRoot .fsl-card',
-      title: 'Dengar sekali, jawab',
-      body: 'Di sini audionya cuma diputar sekali \u2014 kayak percakapan sungguhan. Pasang telinga baik-baik, baru pilih jawabanmu.'
+      title: T('tour.listen-once-title'),
+      body: T('tour.listen-once-body')
     }),
     Object.freeze({
       id: 'meleset',
       target: '#speakingListeningRoot .fsl-privacy',
-      title: 'Meleset? Nggak apa-apa',
-      body: 'Sekali-dengar memang menantang, dan salah itu bagian dari latihan. PAW nemenin kamu di tiap soalnya.'
+      title: T('tour.listen-miss-title'),
+      body: T('tour.listen-miss-body')
     }),
     Object.freeze({
       id: 'terjemahan',
       target: '#fslTranslateToggle',
-      title: 'Terjemahan Indonesia',
-      body: 'Toggle ini nampilin terjemahan tiap soal, seharga 1 Gem Terjemahan per sesi. Gem-nya kamu dapat gratis dari streak jawaban benar.'
+      title: T('tour.listen-translate-title'),
+      body: T('tour.listen-translate-body')
     }),
     Object.freeze({
       id: 'kecepatan',
       target: '.topbar-actions [aria-label="Buka pengaturan"]',
-      title: 'Atur kecepatan suara',
-      body: 'Terlalu cepat? Kecepatan suara bisa diatur di FIEZEL Control Room \u2014 buka lewat tombol Pengaturan kapan aja.'
+      title: T('tour.listen-speed-title'),
+      body: T('tour.listen-speed-body')
     })
   ]);
 

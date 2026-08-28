@@ -93,6 +93,20 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
 
+  // AI-02 F01: naskah murid diambil dari lapisan i18n (copy-id-feat-b.js). Di browser
+  // runtime-nya dimuat lebih dulu (index.html); di Node (onboarding-test me-require modul
+  // ini langsung) modul memuatnya sendiri supaya markup render tetap byte-identik.
+  // Sebagian titik pakai MASIH literal: berada di zona yang dibekukan gerbang emas per
+  // chunk (lihat impl/handoff/W2-FEAT-B.md) dan menunggu regenerasi baseline.
+  var I18N = (typeof globalThis !== 'undefined' && globalThis.FiezelI18n) || null;
+  if (!I18N && typeof require === 'function') {
+    try {
+      I18N = require('../i18n/fiezel-i18n.js');
+      require('../i18n/copy-id-feat-b.js');
+    } catch (loadError) { I18N = null; }
+  }
+  function T(key, params) { return I18N ? I18N.t(key, params) : String(key); }
+
   var STORAGE_KEY = 'fiezel-onboarding-v1';
 
   // Kerangka CEFR standar (bagian 2 spesifikasi: "CEFR Leveling: A1 hingga B2, dan beyond").
@@ -141,8 +155,8 @@
   var CAROUSEL_SLIDES = Object.freeze([
     Object.freeze({
       paw: 'lesson-start',
-      title: 'Apa aja yang bisa kamu latih?',
-      body: 'Di sini kita akan latihan bareng, sedikit demi sedikit tiap hari.',
+      title: T('onboarding.carousel-title'),
+      body: T('onboarding.carousel-1-body'),
       items: Object.freeze([
         { icon: 'vocab', label: 'Kosakata (Vocabulary)' },
         { icon: 'grammar', label: 'Grammar (Grammar Patterns)' }
@@ -150,8 +164,8 @@
     }),
     Object.freeze({
       paw: 'listening',
-      title: 'Apa aja yang bisa kamu latih?',
-      body: 'Suara neural, bukan robot — kedengeran kayak orang beneran ngomong.',
+      title: T('onboarding.carousel-title'),
+      body: T('onboarding.carousel-2-body'),
       items: Object.freeze([
         { icon: 'reading', label: 'Reading (Reading Comprehension)' },
         { icon: 'listening', label: 'Listening (Listening with Neural Voice)' }
@@ -270,11 +284,11 @@
       bars += '<i' + (i <= current ? ' class="is-done"' : '') + '></i>';
     }
     return '<div class="fiezel-stepper">'
-      + '<span class="fiezel-stepper-eyebrow">Langkah ' + current + ' dari ' + STEP_LABELS.length + '</span>'
+      + '<span class="fiezel-stepper-eyebrow">' + T('onboarding.stepper-eyebrow', { current: current, total: STEP_LABELS.length }) + '</span>'
       + '<span class="fiezel-stepper-names"><b>' + escapeHtml(STEP_LABELS[current - 1]) + '</b>'
       + (current < STEP_LABELS.length ? ' · berikutnya: ' + escapeHtml(STEP_LABELS[current]) : ' · terakhir') + '</span>'
       + '<div class="fiezel-segments" role="progressbar" aria-valuemin="1" aria-valuemax="'
-      + STEP_LABELS.length + '" aria-valuenow="' + current + '" aria-label="Kemajuan perkenalan">'
+      + STEP_LABELS.length + '" aria-valuenow="' + current + '" aria-label="' + T('onboarding.stepper-aria') + '">'
       + bars + '</div></div>';
   }
 
@@ -295,7 +309,7 @@
     var bare = !showBack && showSkip === false;
     return '<div class="fiezel-topbar' + (bare ? ' is-bare' : '') + '">'
       + '<button type="button" class="fiezel-back"' + (showBack ? '' : ' hidden') + ' data-ob-back>'
-      + glyph('chevron-left') + 'Kembali</button>'
+      + glyph('chevron-left') + T('onboarding.btn-back') + '</button>'
       + (showSkip === false ? '<span class="fiezel-skip-spacer" aria-hidden="true"></span>'
         : '<button type="button" class="fiezel-skip" data-ob-skip>Lewati</button>')
       + '</div>';
@@ -480,10 +494,10 @@
       + '<div class="fiezel-sheet" data-ob-step="name">'
       + '<h2 class="fiezel-title">Halo! Aku Fiezel. Nama kamu siapa?</h2>'
       + '<p class="fiezel-body">Aku pakai namamu buat nyapa kamu tiap hari, jadi belajarnya berasa punya kamu sendiri.</p>'
-      + '<label class="fiezel-field"><span>Nama panggilan</span>'
+      + '<label class="fiezel-field"><span>' + T('onboarding.name-field-label') + '</span>'
       + '<input type="text" data-ob-name value="' + escapeHtml(typed || '') + '" maxlength="' + NAME_MAX + '"'
-      + ' placeholder="Tulis nama kamu" autocomplete="given-name" autocapitalize="words"'
-      + ' spellcheck="false" enterkeyhint="go" aria-label="Nama panggilan kamu"></label>'
+      + ' placeholder="' + T('onboarding.name-placeholder') + '" autocomplete="given-name" autocapitalize="words"'
+      + ' spellcheck="false" enterkeyhint="go" aria-label="' + T('onboarding.name-aria') + '"></label>'
       // Janji privasi harus benar apa adanya. Nama ini memang tinggal di perangkat, TETAPI
       // ia ikut ke Core Brain di akun FIEZEL murid sendiri supaya pengingat push bisa
       // menyapa namanya. Menuliskan "nggak dikirim ke mana-mana" akan menjadi janji yang
@@ -584,11 +598,11 @@
       // Langkah pengingat bicara soal waktu istirahat dan kembali lagi; posenya calm - "at
       // ease", bukan bosan (spesifikasi 11 §2.2 langkah 5). Sebelum rig Direction C mendarat,
       // rantainya jatuh ke sleepy: state paling tenang yang komponen punya hari ini.
-      + greet(env, 'calm', 'Soal pengingat: aku yang cari waktunya, kamu tinggal belajar.')
+      + greet(env, 'calm', T('onboarding.greet-schedule'))
       + '<div class="fiezel-sheet" data-ob-step="5">'
-      + '<h2 class="fiezel-title">Kapan kamu ingin belajar?</h2>'
-      + '<p class="fiezel-body">Aku ingetin kamu belajar ya, biar streak-nya nggak putus.</p>'
-      + '<p class="fiezel-note">Notifikasi belajar: Aktif. Waktunya aku yang pilih otomatis dari kebiasaan belajarmu sendiri, bukan jadwal tetap yang kamu atur manual - jadi pengingatnya selalu pas dengan caramu belajar, bukan jam yang dipilih sekali lalu dilupakan.</p>'
+      + '<h2 class="fiezel-title">' + T('onboarding.schedule-title') + '</h2>'
+      + '<p class="fiezel-body">' + T('onboarding.schedule-body') + '</p>'
+      + '<p class="fiezel-note">' + T('onboarding.schedule-note') + '</p>'
       + btn('Lanjut', 'data-ob-advance')
       + '</div>';
   }
@@ -599,7 +613,7 @@
   function summaryMarkup(env, learnerName, selectedGoal, selectedLevel, reduceMotion) {
     var name = normalizeName(learnerName);
     var goals = goalOptions(env);
-    var goalLabel = (goals.filter(function (g) { return g.id === selectedGoal; })[0] || {}).label || 'Belum dipilih';
+    var goalLabel = (goals.filter(function (g) { return g.id === selectedGoal; })[0] || {}).label || T('onboarding.not-set');
     var confetti = '';
     if (!reduceMotion) {
       var pieces = '';
@@ -616,19 +630,19 @@
       // duduk di proud - pose yang sama, tanpa lompatan dan tanpa confetti.
       + '<div class="fiezel-stage"><div class="fiezel-stage-art">' + confetti
       + mascot(env, reduceMotion ? 'proud' : 'celebrating')
-      + '<p class="fiezel-greet-bubble">Sudah beres semua. Ini rangkumannya.</p>'
+      + '<p class="fiezel-greet-bubble">' + T('onboarding.summary-bubble') + '</p>'
       + '</div></div>'
       + '<div class="fiezel-sheet" data-ob-step="6">'
-      + '<h2 class="fiezel-title">' + (name ? escapeHtml(name) + ', siap belajar bersama FIEZEL!' : 'Siap belajar bersama FIEZEL!') + '</h2>'
+      + '<h2 class="fiezel-title">' + (name ? T('onboarding.summary-ready-named', { name: escapeHtml(name) }) : T('onboarding.summary-ready')) + '</h2>'
       + '<div class="fiezel-summary-card">'
-      + (name ? '<div class="fiezel-summary-row"><b>Nama</b><span>' + escapeHtml(name) + '</span></div>' : '')
-      + '<div class="fiezel-summary-row"><b>Tujuan</b><span>' + escapeHtml(goalLabel) + '</span></div>'
-      + '<div class="fiezel-summary-row"><b>Perkiraan level</b><span>' + escapeHtml(selectedLevel || 'Belum dipilih') + '</span></div>'
-      + '<div class="fiezel-summary-row"><b>Pengingat</b><span>Aktif</span></div>'
-      + '<div class="fiezel-summary-row"><b>Streak</b><span>0 hari · mulai sekarang!</span></div>'
+      + (name ? '<div class="fiezel-summary-row"><b>' + T('onboarding.summary-name-label') + '</b><span>' + escapeHtml(name) + '</span></div>' : '')
+      + '<div class="fiezel-summary-row"><b>' + T('onboarding.summary-goal-label') + '</b><span>' + escapeHtml(goalLabel) + '</span></div>'
+      + '<div class="fiezel-summary-row"><b>' + T('onboarding.summary-level-label') + '</b><span>' + escapeHtml(selectedLevel || T('onboarding.not-set')) + '</span></div>'
+      + '<div class="fiezel-summary-row"><b>' + T('onboarding.summary-reminder-label') + '</b><span>' + T('onboarding.reminder-on') + '</span></div>'
+      + '<div class="fiezel-summary-row"><b>Streak</b><span>' + T('onboarding.summary-streak-zero') + '</span></div>'
       + '</div>'
-      + btn('Mulai Belajar', 'data-ob-primary')
-      + btn('Lewati', 'data-ob-step-skip', 'ghost')
+      + btn(T('onboarding.btn-start'), 'data-ob-primary')
+      + btn(T('onboarding.btn-skip'), 'data-ob-step-skip', 'ghost')
       + '</div>';
   }
 

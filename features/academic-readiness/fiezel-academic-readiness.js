@@ -22,6 +22,15 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
 
+  // i18n (AI-02 F01): naskah murid modul ini pindah ke features/i18n/copy-id-feat-a.js.
+  // Di browser, fiezel-i18n.js + copy-map dimuat lebih dulu lewat urutan <script defer>
+  // di index.html (AI-01 F02), jadi FiezelI18n dipakai langsung tanpa guard. Di Node
+  // (tes print-only me-require modul ini), copy-map dimuat lewat require supaya nilai
+  // 'id' tetap SATU sumber yang byte-identik dengan naskah beku gerbang emas.
+  var I18N = (typeof FiezelI18n !== 'undefined') ? FiezelI18n
+    : ((typeof module === 'object' && module.exports) ? require('../i18n/copy-id-feat-a.js') : null);
+  function t(key, params) { return I18N.t(key, params); }
+
   var SCHEMA = 'fiezel-academic-readiness-v1';
 
   // Topik reading bertema sains/teknologi/lingkungan yang BENAR-BENAR ada di reading-bank.json.
@@ -42,18 +51,18 @@
   var SCHOLARSHIP_TASKS = [
     {
       id: 'formal_email',
-      label: 'Email formal ke kampus atau penyelenggara beasiswa',
-      practises: ['struktur pembuka dan penutup', 'permintaan yang spesifik', 'nada sopan tanpa berlebihan']
+      label: t('academic.task-formal-email-label'),
+      practises: [t('academic.task-formal-email-p1'), t('academic.task-formal-email-p2'), t('academic.task-formal-email-p3')]
     },
     {
       id: 'self_introduction',
-      label: 'Perkenalan diri singkat',
-      practises: ['latar belakang', 'alasan memilih bidang', 'rencana setelah studi']
+      label: t('academic.task-self-intro-label'),
+      practises: [t('academic.task-self-intro-p1'), t('academic.task-self-intro-p2'), t('academic.task-self-intro-p3')]
     },
     {
       id: 'interview_practice',
-      label: 'Latihan wawancara',
-      practises: ['menjawab dengan contoh konkret', 'menjelaskan kelemahan tanpa merendahkan diri', 'bertanya balik']
+      label: t('academic.task-interview-label'),
+      practises: [t('academic.task-interview-p1'), t('academic.task-interview-p2'), t('academic.task-interview-p3')]
     }
   ];
 
@@ -80,8 +89,8 @@
     var accuracy = domain.recentAccuracy != null ? clamp(domain.recentAccuracy, 0, 100)
       : (domain.accuracy != null ? clamp(domain.accuracy, 0, 100) : null);
     var measured = attempts >= 8 && accuracy != null;
-    return requirement('academic_reading', 'Reading teks panjang dengan akurasi stabil', measured, measured && accuracy >= 65,
-      measured ? attempts + ' bacaan dijawab, akurasi ' + accuracy + '%' : 'Belum cukup bukti reading (minimal 8 jawaban).');
+    return requirement('academic_reading', t('academic.req-reading-label'), measured, measured && accuracy >= 65,
+      measured ? t('academic.req-reading-basis', { attempts: attempts, accuracy: accuracy }) : t('academic.req-reading-thin'));
   }
 
   function grammarRequirement(snapshot) {
@@ -90,8 +99,8 @@
     var accuracy = domain.recentAccuracy != null ? clamp(domain.recentAccuracy, 0, 100)
       : (domain.accuracy != null ? clamp(domain.accuracy, 0, 100) : null);
     var measured = attempts >= 10 && accuracy != null;
-    return requirement('grammar_accuracy', 'Akurasi grammar untuk tulisan formal', measured, measured && accuracy >= 70,
-      measured ? attempts + ' soal grammar, akurasi ' + accuracy + '%' : 'Belum cukup bukti grammar (minimal 10 jawaban).');
+    return requirement('grammar_accuracy', t('academic.req-grammar-label'), measured, measured && accuracy >= 70,
+      measured ? t('academic.req-grammar-basis', { attempts: attempts, accuracy: accuracy }) : t('academic.req-grammar-thin'));
   }
 
   function vocabularyRequirement(snapshot) {
@@ -99,8 +108,8 @@
     var measuredItems = clamp(domain.measured, 0, 1e6) || 0;
     var mastered = clamp(domain.mastered, 0, 1e6) || 0;
     var measured = measuredItems >= 10;
-    return requirement('vocabulary_breadth', 'Kosakata akademik dasar', measured, measured && mastered >= 5,
-      measured ? mastered + ' dari ' + measuredItems + ' materi kosakata dikuasai' : 'Belum cukup materi kosakata yang terukur (minimal 10).');
+    return requirement('vocabulary_breadth', t('academic.req-vocab-label'), measured, measured && mastered >= 5,
+      measured ? t('academic.req-vocab-basis', { mastered: mastered, measured: measuredItems }) : t('academic.req-vocab-thin'));
   }
 
   /** Listening/Speaking memakai proyeksi R3; tanpa proyeksi statusnya unknown, bukan gagal. */
@@ -110,8 +119,8 @@
     var score = row && row.practiceScore != null ? clamp(row.practiceScore, 0, 100) : null;
     var measured = attempts >= minAttempts && score != null;
     return requirement(id, label, measured, measured && score >= 60,
-      measured ? attempts + ' latihan tercatat, skor latihan ' + score + '%'
-        : 'Belum cukup latihan tercatat (minimal ' + minAttempts + ').');
+      measured ? t('academic.spoken-basis', { attempts: attempts, score: score })
+        : t('academic.spoken-thin', { min: minAttempts }));
   }
 
   /**
@@ -129,8 +138,8 @@
       readingRequirement(snapshot),
       grammarRequirement(snapshot),
       vocabularyRequirement(snapshot),
-      spokenRequirement(spoken, 'listening', 'listening_notetaking', 'Listening untuk mencatat poin utama', 6),
-      spokenRequirement(spoken, 'speaking', 'academic_speaking', 'Speaking response situasi akademik', 6)
+      spokenRequirement(spoken, 'listening', 'listening_notetaking', t('academic.req-listening-label'), 6),
+      spokenRequirement(spoken, 'speaking', 'academic_speaking', t('academic.req-speaking-label'), 6)
     ];
 
     var met = requirements.filter(function (r) { return r.status === 'met'; }).length;
@@ -148,7 +157,7 @@
       // memaksanya tetap ada.
       scorePrediction: false,
       readinessClaim: false,
-      note: 'FIEZEL menjelaskan prasyarat kemampuan dan bukti yang sudah ada. FIEZEL tidak memprediksi skor IELTS/TOEFL dan tidak menyatakan kamu siap atau belum siap ujian.'
+      note: t('academic.no-prediction-note')
     };
   }
 
@@ -241,8 +250,8 @@
       status: themed.length ? 'available' : 'content_pending',
       availableTopics: themed.sort(),
       note: themed.length
-        ? 'Jalur kosakata bertema IT dan kehidupan kampus siap dipakai.'
-        : 'Bank kosakata belum punya materi bertema IT atau kehidupan kampus. Jalur ini menunggu konten, dan FIEZEL tidak akan melabeli ulang kata umum supaya terlihat bertema.'
+        ? t('academic.vocab-path-ready')
+        : t('academic.vocab-path-pending')
     };
   }
 
