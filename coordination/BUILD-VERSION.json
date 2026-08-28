@@ -1,7 +1,7 @@
 {
-  "version": "m025-187",
+  "version": "m025-190",
   "claimedBy": "perplexity-computer (multilingual i18n wave, direbase atas m025-185)",
-  "claimedAt": "2026-08-28T19:53:32.488Z",
-  "reason": "m025: merge #241 x wave-Thai — celah feedback ditutup di dunia i18n (copy-id jujur id+th), 7 gerbang harness dipulihkan pasca-#242 (i18n preload + kunci i18n), OLM mean, cloze explain bank-first",
+  "claimedAt": "2026-08-28T22:20:07.663Z",
+  "reason": "merge sosial SLOT 7 x m025-186: celah feedback + gerbang i18n selaras, baseline emas regen untuk copy jujur yang disengaja",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

@@ -306,7 +306,10 @@ const norm=s=>{
   const key=typeof s==='string'?s:String(s??'');
   const hit=NORM_MEMO.get(key);
   if(hit!==undefined)return hit;
-  const value=key.toLowerCase().replace(/[^a-z0-9 ]+/g,' ').replace(/\s+/g,' ').trim();
+  /* Hotfix th (akar bug tes-25, audit AI-03/AI-10: norm() Latin-only mengosongkan teks Thai
+     sehingga uniqueByNorm membuang SEMUA arti Thai dan pengecoh vocab placement kolaps).
+     Rentang \u0e00-\u0e7f dipertahankan; untuk teks id/en hasilnya byte-identik. */
+  const value=key.toLowerCase().replace(/[^a-z0-9\u0e00-\u0e7f ]+/g,' ').replace(/\s+/g,' ').trim();
   if(NORM_MEMO.size<NORM_MEMO_LIMIT)NORM_MEMO.set(key,value);
   return value;
 };
@@ -1294,6 +1297,139 @@ function abandonActiveSession(reason='exit'){
 function completeActiveSession(cfg,score,total){
   const now=Date.now(),a=state.activeSession,started=Number(a?.startedAt||now),accuracy=Math.round(score/Math.max(1,total)*100);state.activeSession=null;state.inflightAttempt=null;/* W1 P1-2: selesai bersih = penanda dilepas. */return{id:a?.id||`session-${now}`,at:new Date(now).toISOString(),startedAt:new Date(started).toISOString(),level:sessionLevel(a),type:cfg?.type||a?.type||'practice',planned:Number(a?.planned||total),answered:Number(a?.answered||total),score,total,accuracy,completed:true,abandoned:false,durationMs:Math.max(0,now-started),policyId:String(a?.policyId||cfg?.policy?.policyId||''),policyMode:String(a?.policyMode||cfg?.policy?.mode||''),targetSkill:String(a?.targetSkill||cfg?.policy?.targetSkill||''),primaryDomain:String(a?.primaryDomain||cfg?.policy?.primaryDomain||''),policySource:String(a?.policySource||cfg?.policy?.source||''),baselineTargetMastery:a?.baselineTargetMastery??null,baselineTargetAccuracy:a?.baselineTargetAccuracy??null}
 }
+/* ---- Gelombang 4 (Lane B): emisi telemetri belajar — OBSERVASI MURNI ---------------------
+ * KENAPA di sini: record() adalah satu-satunya pintu commit jawaban ternilai, jadi emisi yang
+ * digantung padanya tidak mungkin melewatkan jalur latihan mana pun. KONTRAK KERAS:
+ * (1) mode 'off' (default rilis ini, fiezel-telemetry-config.js) keluar di baris PERTAMA —
+ *     nol alokasi, nol operasi storage, nol penalti latensi pada jalur menjawab soal;
+ * (2) semua modul diperiksa ketersediaannya dulu (pola coreBrainAvailable) — modul absen =
+ *     fungsi diam = perilaku aplikasi hari ini, persis;
+ * (3) TANPA installId/ID stabil/timestamp presisi di payload: builder
+ *     fiezel-learning-events.js menolaknya secara konstruksi, dan pembangun payload di bawah
+ *     memang tidak pernah membaca identitas apa pun;
+ * (4) emisi TIDAK PERNAH mengubah keputusan belajar — nilainya tidak dibaca pemanggil, dan
+ *     setiap kegagalan ditelan senyap (telemetri hilang < belajar terganggu). */
+const LEARNING_TELEMETRY_DB='fiezel-learning-queue-v1',LEARNING_TELEMETRY_STORE='events',LEARNING_TELEMETRY_DAY0_KEY='fiezel-lt-day0-v1';
+let __learningTelemetryDbPromise=null,__learningTelemetryQueue=null;
+/** Mode lane dari konfigurasi BEKU (fiezel-telemetry-config.js). Nilai tak dikenal atau modul
+ *  absen dibaca 'off' — lane ini selalu gagal ke arah diam, tidak pernah ke arah mengirim. */
+function learningTelemetryMode(){
+  try{const m=self.FiezelTelemetryConfig?.CONFIG?.mode;return m==='local'||m==='shadow'||m==='on'?m:'off'}catch{return 'off'}
+}
+/** Buka database antrean SEKALI lalu pakai ulang; kegagalan membuka mengosongkan cache supaya
+ *  percobaan berikutnya bisa mencoba lagi (mis. setelah kuota storage lega). */
+function learningTelemetryDb(){
+  if(__learningTelemetryDbPromise)return __learningTelemetryDbPromise;
+  __learningTelemetryDbPromise=new Promise((resolve,reject)=>{
+    let req;
+    try{req=indexedDB.open(LEARNING_TELEMETRY_DB,1)}catch(e){reject(e);return}
+    req.onupgradeneeded=()=>{try{req.result.createObjectStore(LEARNING_TELEMETRY_STORE,{keyPath:'eventId'})}catch{}};
+    req.onsuccess=()=>resolve(req.result);
+    req.onerror=()=>reject(req.error||new Error('idb-open'));
+    req.onblocked=()=>reject(new Error('idb-blocked'));
+  });
+  __learningTelemetryDbPromise.catch(()=>{__learningTelemetryDbPromise=null});
+  return __learningTelemetryDbPromise;
+}
+/** Adaptor idbLike TIPIS di atas IndexedDB nyata — memenuhi kontrak persis yang didefinisikan
+ *  createMemoryIdb() di features/telemetry/fiezel-learning-queue.js: getAll/put/delete/clear,
+ *  semuanya Promise. `delete` mengembalikan boolean "tadinya ada" karena ack() antrean
+ *  menghitung berapa record yang benar-benar terhapus. */
+function learningTelemetryIdb(){
+  const tx=(mode,run)=>learningTelemetryDb().then(db=>new Promise((resolve,reject)=>{
+    let r;
+    try{r=run(db.transaction(LEARNING_TELEMETRY_STORE,mode).objectStore(LEARNING_TELEMETRY_STORE),resolve,reject)}catch(e){reject(e);return}
+    if(r){r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error)}
+  }));
+  return{
+    kind:'indexeddb',
+    getAll:()=>tx('readonly',s=>s.getAll()),
+    put:rec=>tx('readwrite',s=>s.put(rec)).then(()=>undefined),
+    // getKey dulu supaya nilai kembalinya jujur — IDBObjectStore.delete sendiri selalu
+    // "sukses" walau kuncinya tidak pernah ada, dan itu akan membohongi hitungan ack.
+    'delete':id=>tx('readwrite',(s,resolve,reject)=>{
+      const g=s.getKey(id);
+      g.onsuccess=()=>{const had=g.result!==undefined;const d=s.delete(id);d.onsuccess=()=>resolve(had);d.onerror=()=>reject(d.error)};
+      g.onerror=()=>reject(g.error);
+    }),
+    clear:()=>tx('readwrite',s=>s.clear()).then(()=>undefined)
+  };
+}
+/** Antrean Lane B, dibuat malas dan sekali saja. null bila modul antrean/IndexedDB absen —
+ *  pemanggil memperlakukan null sebagai "lane tidak tersedia", bukan sebagai kesalahan. */
+function learningTelemetryQueue(){
+  if(__learningTelemetryQueue)return __learningTelemetryQueue;
+  const Q=self.FiezelLearningQueue;
+  if(!Q||typeof Q.makeQueue!=='function')return null;
+  if(typeof indexedDB==='undefined'||!indexedDB)return null;
+  try{__learningTelemetryQueue=Q.makeQueue({idb:learningTelemetryIdb()})}catch{__learningTelemetryQueue=null}
+  return __learningTelemetryQueue;
+}
+/** studyDay RELATIF (hari ke-berapa sejak mulai belajar), BUKAN tanggal absolut: hari epoch
+ *  mentah akan membocorkan tanggal nyata ke event — persis yang dilarang kontrak privasi
+ *  Lane B. Jangkar hari-0 hidup di kunci localStorage BARU (fiezel-sl-v1-state TIDAK
+ *  disentuh), di-seed dari baris riwayat tertua yang masih ada supaya murid lama tidak
+ *  tampak seperti murid baru. */
+function learningTelemetryStudyDay(nowMs){
+  const today=Math.floor(Number(nowMs)/86400000);
+  if(!Number.isFinite(today)||today<0)return 0;
+  let day0=today;
+  try{
+    const saved=Number(localStorage.getItem(LEARNING_TELEMETRY_DAY0_KEY));
+    if(Number.isFinite(saved)&&saved>0&&saved<=today)day0=saved;
+    else{
+      const first=Number(state?.history?.[0]?.at);
+      if(Number.isFinite(first)&&first>0)day0=Math.min(today,Math.floor(first/86400000));
+      localStorage.setItem(LEARNING_TELEMETRY_DAY0_KEY,String(day0));
+    }
+  }catch{}
+  return Math.max(0,Math.min(100000,today-day0));
+}
+/** SATU jawaban grammar ternilai -> paling banyak SATU event answer_outcome di antrean LOKAL.
+ *  Observasi murni: pemanggil tidak membaca nilai kembaliannya dan tidak ada state belajar
+ *  yang tersentuh. Payload hanya enum/bucket/ID konten yang divalidasi builder — TANPA
+ *  installId, TANPA ID stabil, TANPA timestamp presisi (studyDay relatif satu-satunya waktu). */
+function learningTelemetryEmitAnswer(q,ok,h){
+  // Cabang 'off' PALING DULU dan PALING MURAH: default rilis ini 'off', jadi jalur panas
+  // menjawab soal hanya membayar satu pembacaan properti beku — tanpa alokasi apa pun.
+  if(learningTelemetryMode()==='off')return;
+  // Availability check (pola coreBrainAvailable): builder DAN antrean wajib hadir. Modul
+  // absen berarti index.html belum memuat lane ini — diam adalah jawaban yang benar.
+  const E=self.FiezelLearningEvents;
+  if(!E||typeof E.buildEvent!=='function')return;
+  if(!self.FiezelLearningQueue||typeof self.FiezelLearningQueue.makeQueue!=='function')return;
+  // Domain GRAMMAR saja — keputusan council: konten domain lain belum lolos QA sehingga
+  // telemetrinya adalah input rusak. Cloze (type 'cloze') sengaja ikut tertolak di sini.
+  if(String(q?.type||'')!=='grammar')return;
+  try{
+    const queue=learningTelemetryQueue();
+    if(!queue)return;
+    const nowMs=Date.now();
+    const payload={
+      domain:'grammar',
+      lessonId:String(q?.sourceId||q?.conceptId||q?.lessonSkill||q?.skill||''),
+      // Identitas item yang SAMA dengan kalibrasi (template:mode) — dua sistem yang
+      // menyebut item dengan nama berbeda tidak akan pernah bisa dicocokkan lagi.
+      itemId:calibrationItemId(q),
+      mode:String(q?.practiceMode||''),
+      correct:!!ok,
+      responseTimeBucket:E.bucketResponseTime(Math.max(0,Number(h?.ms)||0))
+    };
+    // Prediksi disalin dari baris riwayat yang SAMA (ditulis record) — bukan taksiran kedua.
+    const predicted=E.bucketPrediction(Number(h?.predicted));
+    if(predicted)payload.predictedBucket=predicted;
+    const ctx={studyDay:learningTelemetryStudyDay(nowMs)};
+    // Atribusi bundle Brain: opsional — tanpa manifest, event tetap sah tanpa field ini.
+    const bundle=self.FiezelBrainManifest?.bundleVersion;
+    if(typeof bundle==='string'&&bundle)ctx.brainBundle=bundle;
+    const built=E.buildEvent('answer_outcome',payload,ctx);
+    // Payload yang ditolak builder dibuang DIAM-DIAM di jalur murid (mis. practiceMode di
+    // luar enum telemetri): kegagalan pelaporan tidak boleh terasa. Auditnya di test Node.
+    if(!built||built.ok!==true)return;
+    const putP=queue.put(built.event,nowMs);
+    if(putP&&typeof putP.catch==='function')putP.catch(()=>{});
+  }catch{}
+}
 function record(q,ok,ms,selectedIndex){
   const now=Date.now();state.totalAnswered++;if(ok)state.totalCorrect++;state.totalTimeMs+=ms||0;if(state.activeSession)state.activeSession.answered=Math.min(Number(state.activeSession.planned||10000),Number(state.activeSession.answered||0)+1);
   /* W1 P1-2: cermin answered ke penanda percobaan-berjalan (lihat beginLearningSession). */
@@ -1334,6 +1470,10 @@ function record(q,ok,ms,selectedIndex){
     // Fase 3 (C5 butir 1): jawaban yang sama juga bukti KALIBRASI ITEM - seberapa sulit
     // soal ini sebenarnya, diukur dari murid nyata. Guarded di dalam helper-nya.
     try{itemCalibrationObserve(q,ok,h.kappa)}catch{}
+    // Gelombang 4 (Lane B): jawaban ternilai yang sama juga menjadi (paling banyak) SATU
+    // event answer_outcome di antrean telemetri LOKAL — observasi murni, guarded penuh,
+    // dan mode 'off' (default) keluar sebelum kerja apa pun di dalam helper-nya.
+    try{learningTelemetryEmitAnswer(q,ok,h)}catch{}
   }
   /* Fase 3 (C5 butir 2): jawaban cloze (produksi ketik) = bukti BKT berbobot 1.5 (produksi
      lebih kuat daripada recognition) + bukti kalibrasi item, di pintu yang sama dengan
@@ -4326,7 +4466,7 @@ function openFeedback(prefill){
 function render(){const __renderStartedAt=Date.now();try{return renderInner()}finally{window.__fiezelLastRenderMs=Date.now()-__renderStartedAt;/* [FASE-4] pasang ulang timer kantuk 90 dtk tiap layar dicat (mati sendiri di luar layar santai). */try{pawIdleArm()}catch(_){}/* [OUTFIT G5'] konteks layar untuk resolver outfit (19 §6.1) */try{self.FiezelPawOutfit?.screen?.(state.view)}catch(_){}}}
 // m025-41: render duration is recorded so the diagnostic scanner can see a slow screen,
 // which is how OWNER experienced the Classroom regression before any error was logged.
-function renderInner(){speakingListeningMountToken++;if(speakingListeningController){speakingListeningController.destroy();speakingListeningController=null;/* m026-01: satu-satunya tempat sesi dengar benar-benar bubar. Di dalam if, bukan di luar - kalau tidak, tiap navigasi biasa akan memaksa maskot kembali idle dan memotong selebrasi yang sedang jalan. */pawReact('listening-stop')}document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));setApp('');if(state.view==='home')home();if(state.view==='vocab')vocab();if(state.view==='grammar')grammar();if(state.view==='reading')reading();if(state.view==='skills')skillsLab();if(state.view==='listening')skillsLab('listening');if(state.view==='speaking')skillsLab('speaking');if(state.view==='writing')writing();if(state.view==='classroom')classroom();if(state.view==='library')library();if(state.view==='ask'||state.view==='search')askView();if(state.view==='test')placement();if(state.view==='progress')progress();document.querySelector(`[data-view="${state.view}"]`)?.classList.add('active');/* m028 fase3: bendera panggung Skills Lab. Addon listening memaku blok tombolnya ke dasar layar (speaking-listening-addon.css), jadi ia panggung kedua yang bisa ditutupi gelembung. */document.body?.classList?.toggle?.('fz-stage-sl',['skills','listening','speaking'].includes(state.view));/* m028 fase3 (QA §9): Peta Belajar ikut jadi panggung ber-kontrol sejak panel NEXT SESSION punya tombol "Mulai sesi" di dekat dasar layar - screenshot QA menunjukkan gelembung PAW menutupinya utuh. Aturannya sama dengan kuis: peek dilarang, dok mengecil, layar diberi ruang bawah. */document.body?.classList?.toggle?.('fz-stage-map',state.view==='progress');enhanceUI();syncCoachBubble();window.scrollTo(0,0)}
+function renderInner(){speakingListeningMountToken++;if(speakingListeningController){speakingListeningController.destroy();speakingListeningController=null;/* m026-01: satu-satunya tempat sesi dengar benar-benar bubar. Di dalam if, bukan di luar - kalau tidak, tiap navigasi biasa akan memaksa maskot kembali idle dan memotong selebrasi yang sedang jalan. */pawReact('listening-stop')}document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));setApp('');if(state.view==='home')home();if(state.view==='vocab')vocab();if(state.view==='grammar')grammar();if(state.view==='reading')reading();if(state.view==='skills')skillsLab();if(state.view==='listening')skillsLab('listening');if(state.view==='speaking')skillsLab('speaking');if(state.view==='writing')writing();if(state.view==='classroom')classroom();if(state.view==='library')library();if(state.view==='ask'||state.view==='search')askView();if(state.view==='test')placement();if(state.view==='progress')progress();if(state.view==='online')onlineView();document.querySelector(`[data-view="${state.view}"]`)?.classList.add('active');/* m028 fase3: bendera panggung Skills Lab. Addon listening memaku blok tombolnya ke dasar layar (speaking-listening-addon.css), jadi ia panggung kedua yang bisa ditutupi gelembung. */document.body?.classList?.toggle?.('fz-stage-sl',['skills','listening','speaking'].includes(state.view));/* m028 fase3 (QA §9): Peta Belajar ikut jadi panggung ber-kontrol sejak panel NEXT SESSION punya tombol "Mulai sesi" di dekat dasar layar - screenshot QA menunjukkan gelembung PAW menutupinya utuh. Aturannya sama dengan kuis: peek dilarang, dok mengecil, layar diberi ruang bawah. */document.body?.classList?.toggle?.('fz-stage-map',state.view==='progress');enhanceUI();syncCoachBubble();window.scrollTo(0,0)}
 // m025-115 - pembimbing yang ikut ke mana pun murid pergi (brief bagian 7).
 //
 // Gelembungnya dipasang SEKALI ke <body> dan tidak pernah ikut dicat ulang; yang dikirim
@@ -4369,7 +4509,7 @@ function syncCoachBubble(){
 // m025-115: tiga tujuan baru untuk tiga skill inti tes yang belum punya halamannya
 // sendiri. Tidak ada tujuan lama yang dihapus - brief bagian 2 menyebutnya sebagai
 // batasan pertama: "Nol fitur dihapus."
-const VALID_VIEWS=new Set(['home','vocab','grammar','reading','skills','listening','speaking','writing','test','progress','classroom','library','ask','search']);
+const VALID_VIEWS=new Set(['home','vocab','grammar','reading','skills','listening','speaking','writing','test','progress','classroom','library','ask','search','online']);
 function prefersReducedMotion(){try{return !!(self.matchMedia&&self.matchMedia('(prefers-reduced-motion: reduce)').matches)}catch(_){return false}}
 // m026-01 - maskot PAW. Tiga pembungkus di bawah ini adalah SATU-SATUNYA cara app.js
 // berbicara dengan <fiezel-mascot>. Alasannya:
@@ -5777,6 +5917,9 @@ function gemsHook(){
       // (celebrating lv2 + dada busung, TIDAK menyentuh streak jawaban maskot).
       // Menggantikan tambalan 'badge-earned' P0-3 yang lama.
       pawReact('reward',{kind:'gems'});
+      /* SOSIAL (SLOT 7): momen gem = sesi Skills Lab tuntas tanpa lewat finishQuiz — bukti
+         hariannya di-antre dari sini. Diam-diam, tidak pernah menahan hadiah gem. */
+      try{queueSocialEvidence()}catch(_){}
       return n;
     },
     spend:(cost,reason)=>{
@@ -7523,7 +7666,11 @@ function finishQuiz(cfg,score,total,tutorReport){
     else{const b=state.grammar[cfg.skipGateSkill]||{correct:0,total:0,streak:0,mastery:0};b.skipGateCooldownUntil=Date.now()+LEVEL_EXAM_COOLDOWN_MS;state.grammar[cfg.skipGateSkill]=b}
     skipVerdict={passed,message:passed?FiezelI18n.t('quiz.bukti-diterima-right-ditandai-finish',{skor:score,total:total,title:judul}):FiezelI18n.t('quiz.new-right-gerbang-butuh-minimal',{skor:score,total:total,LESSON_SKIP_GATE_PASS:LESSON_SKIP_GATE_PASS})};
   }
-  state.sessionHistory=[...(state.sessionHistory||[]),session].slice(-100);const outcome=recordPolicyOutcomeFromSession(session);save();if(outcome)queuePolicyOutcomeSync(outcome);anSessionEnded(session);/*A1-EMIT*/haptic(accuracy>=70?'success':'confirm');
+  state.sessionHistory=[...(state.sessionHistory||[]),session].slice(-100);const outcome=recordPolicyOutcomeFromSession(session);save();if(outcome)queuePolicyOutcomeSync(outcome);anSessionEnded(session);/*A1-EMIT*/
+  /* SOSIAL (SLOT 7): bukti Poin Bukti di-ANTRE, tidak pernah ditunggu — kegagalan jaringan
+     apa pun berhenti di dalam queueSocialEvidence dan layar hasil tidak tahu-menahu. */
+  try{queueSocialEvidence(cfg&&cfg.type==='level-exam'&&examVerdict?.passed?[{kind:'exam_passed',band:String(cfg.levelScope||'')}]:[])}catch(_){}
+  haptic(accuracy>=70?'success':'confirm');
   // m025-118: laporan tutor dibaca dalam bahasa GURU, bukan bahasa penilai. "12 dari 16"
   // tidak memberi tahu apa yang berubah; "kamu melewati dua hal yang tadinya bikin keliru"
   // memberi tahu, dan itu yang membuat murid tahu sesi ini ada gunanya.
@@ -7671,6 +7818,26 @@ function bktShadowMarkup(){
     return card(`<h3>${FiezelI18n.t('progress.mastery-bkt')} <span class="muted">${FiezelI18n.t('progress.bayangan-tanpa-otoritas-unlock')}</span></h3>${frontierHtml}${rootHtml}<p class="muted">${FiezelI18n.t('progress.lesson-terlacak-fiezel-mastery-bkt',{tracked:tracked})}</p>`)
   }catch{return ''}
 }
+/* Gelombang 4: identitas bundle Brain di area diagnostik yang sama dengan BKT "bayangan".
+ * TAMPILAN SAJA — manifest deskriptif murni (peta otoritasnya sendiri menyebut dirinya
+ * 'shadow'); tanpa modul, panel diagnostik persis seperti sebelum gelombang ini. Pola guard
+ * identik bktShadowMarkup: availability check dulu, try/catch mengembalikan string kosong. */
+function brainManifestMarkup(){
+  const M=self.FiezelBrainManifest;
+  if(!M||typeof M.describe!=='function')return '';
+  try{
+    const d=M.describe();
+    const map=M.authorityMap||{};
+    // Ringkas authorityMap per status supaya panel menjawab pertanyaan yang sebenarnya:
+    // "siapa yang MEMUTUSKAN untukku, dan siapa yang cuma menonton?" — bukan daftar file.
+    const names={active:[],shadow:[],off:[]};
+    for(const k of Object.keys(map)){const v=String(map[k]);if(names[v])names[v].push(k)}
+    const row=(label,list)=>list.length?`<p><b>${label} (${list.length}):</b> ${list.map(x=>esc(x)).join(', ')}</p>`:'';
+    return card(`<h3>Brain Bundle ${esc(String(d?.bundleVersion||M.bundleVersion||''))} <span class="muted">(manifest — deskriptif, tanpa otoritas)</span></h3>
+    ${row('Aktif',names.active)}${row('Bayangan',names.shadow)}${row('Off',names.off)}
+    <p class="muted">${esc(String(d?.summary||''))} Peta ini mencatat siapa yang memutuskan — ia sendiri tidak ikut memutuskan apa pun.</p>`)
+  }catch{return ''}
+}
 /* Fase 2 (B3 butir 7): seksi Open Learner Model - ringkasan yang bisa dibaca murid tentang
  * apa yang sistem yakini soal dirinya. TAMPILAN SAJA: summarize() murni membaca, tidak ada
  * keputusan yang berubah karena panel ini ada atau tidak. */
@@ -7736,12 +7903,12 @@ function affectSuggestionMarkup(){
 }
 function coreBrainPanelMarkup(){
   const snapshot=coreBrainSnapshot();
-  if(!snapshot)return card('<h3>Core Brain v2</h3><p class="muted">'+FiezelI18n.t('progress.lapisan-penalaran-belum-termuat-perangkat')+'</p>')+bktShadowMarkup()+olmPanelMarkup()+confusionInsightMarkup()+affectSuggestionMarkup();
+  if(!snapshot)return card('<h3>Core Brain v2</h3><p class="muted">'+FiezelI18n.t('progress.lapisan-penalaran-belum-termuat-perangkat')+'</p>')+bktShadowMarkup()+brainManifestMarkup()+olmPanelMarkup()+confusionInsightMarkup()+affectSuggestionMarkup();
   const ability=snapshot.ability||{},plan=snapshot.plan||{},move=snapshot.momentum||{},load=snapshot.fatigue||{},memory=snapshot.memory||{},chrono=snapshot.chronotype||{};
   const moveLabel={improving:FiezelI18n.t('progress.sedang-naik'),plateau:FiezelI18n.t('progress.mendatar'),declining:FiezelI18n.t('progress.sedang-turun'),unknown:FiezelI18n.t('diag.belum-terbaca')}[move.state]||FiezelI18n.t('diag.belum-terbaca');
   const loadLabel={fresh:FiezelI18n.t('progress.masih-segar'),tiring:FiezelI18n.t('progress.mulai-lelah'),fatigued:FiezelI18n.t('progress.sudah-lelah'),unknown:FiezelI18n.t('diag.belum-terbaca')}[load.state]||FiezelI18n.t('diag.belum-terbaca');
   if(!plan||Number(plan.confidence||0)<0.25){
-    return card(`<h3>Core Brain v2</h3><p>${FiezelI18n.t('progress.still-mengumpulkan-bukti-answer-terbaca',{evidence:ability.evidence||0})}</p><p class="muted">${FiezelI18n.t('progress.sampai-saat-kebijakan-adaptif-deterministik')}</p>`)+bktShadowMarkup()+olmPanelMarkup()+confusionInsightMarkup()+affectSuggestionMarkup();
+    return card(`<h3>Core Brain v2</h3><p>${FiezelI18n.t('progress.still-mengumpulkan-bukti-answer-terbaca',{evidence:ability.evidence||0})}</p><p class="muted">${FiezelI18n.t('progress.sampai-saat-kebijakan-adaptif-deterministik')}</p>`)+bktShadowMarkup()+brainManifestMarkup()+olmPanelMarkup()+confusionInsightMarkup()+affectSuggestionMarkup();
   }
   const rootCause=snapshot.rootCause&&snapshot.rootCause.isRoot===false
     ? `<p><b>${FiezelI18n.t('progress.akar-masalah')}</b> ${FiezelI18n.t('progress.kesulitan-kemungkinan-besar-berasal-jadi',{skillName:esc(friendlySkillName(snapshot.rootCause.symptomSkill||snapshot.rootCause.symptomFamily)),skillName:esc(friendlySkillName(snapshot.rootCause.skill))})}</p>`
@@ -7757,7 +7924,7 @@ function coreBrainPanelMarkup(){
       ${bestWindow}
     </div>
     ${rootCause}
-    <p class="muted">${FiezelI18n.t('progress.kesulitan-dipilih-model-kemampuan-peluang')}</p>`)+bktShadowMarkup()+olmPanelMarkup()+confusionInsightMarkup()+affectSuggestionMarkup()
+    <p class="muted">${FiezelI18n.t('progress.kesulitan-dipilih-model-kemampuan-peluang')}</p>`)+bktShadowMarkup()+brainManifestMarkup()+olmPanelMarkup()+confusionInsightMarkup()+affectSuggestionMarkup()
 }
 const PROGRESS_TABS=[['overview',FiezelI18n.t('progress.ringkasan')],['analysis',FiezelI18n.t('progress.analisis')],['adaptive','Adaptive Engine'],['readiness',FiezelI18n.t('progress.kesiapan-skills')]];
 let progressTab='overview';
@@ -7811,7 +7978,7 @@ function progress(){
  // out entirely - it is app/install health, not learning progress, and now lives
  // in Settings (see openSettings()).
  const tabContent={
-  overview:`<div class="grid">${nextSessionPanelMarkup()}${journeyMarkup()}<div><h3>${FiezelI18n.t('progress.peta-study')}</h3>${mapCards}</div>
+  overview:`<div class="grid">${nextSessionPanelMarkup()}${journeyMarkup()}${socialSummaryCardMarkup()}<div><h3>${FiezelI18n.t('progress.peta-study')}</h3>${mapCards}</div>
    ${card(`<h3>Ulangan Pintar</h3>${due.length?due.map(([k,x])=>`<div class="row"><span>${esc(friendlySkillName(k))}</span><span>${FiezelI18n.t('progress.dikuasai-risiko-lupa',{mastery:x.mastery||0,x:Math.round(forgettingProbability(x)*100)})}</span></div>`).join('<hr>'):'<p class="muted">'+FiezelI18n.t('progress.belum-ada-materi-perlu-diulang')+'</p>'}`)}
    ${card(`<h3>${FiezelI18n.t('progress.laporan-diagnostik')}</h3>${diagHtml}`)}
    ${card(`<h3>Prasasti</h3><p class="muted">${FiezelI18n.t('progress.lencana-bukti-study-redup-menunjukkan')}</p>${prasastiGalleryMarkup()}`,'prasasti-gallery-card')}
@@ -7916,14 +8083,19 @@ function openSettings(){const p=state.preferences||defaultPreferences,endpoint=p
   // itulah yang melaporkan shell usang, jadi tombol perbaikannya berdampingan dengannya.
   const grupData=`${continuitySettingsMarkup()}<div class="card cache-card"><h3>Bersihkan cache</h3><p class="muted">${FiezelI18n.t('settings.menghapus-berkas-aplikasi-lama-menumpuk')}</p><button id="settingClearCache" type="button"><i data-lucide="refresh-ccw"></i> ${FiezelI18n.t('settings.bersihkan-cache-amp-muat-ulang')}</button></div><div class="card"><h3>Kesehatan Instalasi</h3><div id="installHealth"><p class="muted">Memeriksa pemasangan…</p></div></div>`;
   const grupLanjutan=`<div class="report-settings"><div class="row"><div><b>Creator Learning Report</b><p class="muted">${FiezelI18n.t('settings.otomatis-setelah-sesi-selesai-hanya')}</p></div><button id="reportPreview">${FiezelI18n.t('settings.lihat-data')}</button></div><a class="setup-link" href="./creator-report-setup.html" target="_blank" rel="noopener"><i data-lucide="cloud-cog"></i> ${FiezelI18n.t('settings.pasang-creator-hub-satu-klik')}</a><label class="endpoint-label">Endpoint Puter Worker<input id="reportEndpoint" type="url" value="${esc(endpoint)}" placeholder="${FiezelI18n.t('settings.https-nama-worker-puter-work')}" autocomplete="off"></label><label class="consent-row"><input id="reportConsent" type="checkbox" ${p.reportConsent?'checked':''}><span>${FiezelI18n.t('settings.saya-menyetujui-pengiriman-ringkasan-study',{nama:esc(learnerName())})}</span></label><p class="report-state">Status: ${esc(reportStatusLabel())}</p></div><div class="card"><h3>${FiezelI18n.t('settings.masukan-untuk-pengembang')}</h3><p class="muted">${FiezelI18n.t('settings.materi-pending-ada-or-apa')}</p><button id="openFeedback"><i data-lucide="send"></i> ${FiezelI18n.t('settings.kirim-masukan')}</button></div>`;
+  /* SOSIAL (SLOT 7): pintu masuk Profil Online + sakelar Mode Privat papan. Sakelar bicara
+     ke server SAAT diubah (bukan saat Simpan) karena janjinya "hilang dari papan seketika";
+     tanpa profil/offline ia menolak jujur lewat toast dan kembali ke posisi semula. */
+  const grupOnline=`<div class="settings-list"><button type="button" class="setting-row setting-row-action" onclick="openOnlineView()"><span class="setting-icon"><i data-lucide="users"></i></span><span><b>Profil Online &amp; Teman</b><small>Nama samaran, undang teman, papan mingguan. Pseudonim, tanpa nama asli, dan sepenuhnya opsional.</small></span><i data-lucide="chevron-right"></i></button><label class="setting-row"><span class="setting-icon"><i data-lucide="eye-off"></i></span><span><b>Mode privat papan</b><small>Menyembunyikanmu dari papan teman &amp; liga seketika. Poin Buktimu tetap terlihat olehmu sendiri. Butuh profil online.</small></span><input id="settingBoardHidden" type="checkbox" ${socialProfileCache?.flags?.boardHidden?'checked':''} aria-label="Mode privat papan"></label></div>`;
   openModal(`<div class="settings-head"><div class="modal-mark">FIEZEL CONTROL ROOM</div><h2>Pengalaman ${esc(learnerName())}</h2><p>${FiezelI18n.t('settings.all-can-diatur-dikelompokkan-each')}</p></div>`
     +settingsFold(FiezelI18n.t('settings.profil-amp-level'),grupProfil,true)
     +settingsFold(FiezelI18n.t('settings.study'),grupBelajar,false)
     +settingsFold(FiezelI18n.t('settings.suara-amp-notifikasi'),grupSuara,false)
+    +settingsFold('Online &amp; Teman',grupOnline,false)
     +settingsFold(FiezelI18n.t('settings.data-amp-penyimpanan'),grupData,false)
     +settingsFold(FiezelI18n.t('settings.lanjutan'),grupLanjutan,false)
     +`<div class="modal-actions settings-actions"><button id="settingsCancel">Batal</button><button class="primary" id="settingsSave">${FiezelI18n.t('settings.simpan-prefs')}</button></div>`);
-  $('settingsCancel').onclick=closeModal;setTimeout(refreshInstallHealth,0);setTimeout(refreshAudioDiagnostics,0);$('backupExport')?.addEventListener('click',runBackupExport);$('backupPick')?.addEventListener('click',()=>$('backupFile')?.click());$('backupFile')?.addEventListener('change',event=>runBackupImport(event.currentTarget.files?.[0]));$('openFeedback')?.addEventListener('click',()=>{closeModal();openFeedback('')});$('reportPreview').onclick=openReportPreview;$('settingsSave').onclick=saveSettings;$('settingClearCache')?.addEventListener('click',()=>{confirmClearAppCache()});bindVoiceSettingControls();bindAccountSettingControls();$('settingReminders')?.addEventListener('change',event=>toggleStudyReminders(event.currentTarget));$('settingLearnerLocale')?.addEventListener('change',event=>setLearnerLocalePreference(event.currentTarget.value));
+  $('settingsCancel').onclick=closeModal;setTimeout(refreshInstallHealth,0);setTimeout(refreshAudioDiagnostics,0);$('backupExport')?.addEventListener('click',runBackupExport);$('backupPick')?.addEventListener('click',()=>$('backupFile')?.click());$('backupFile')?.addEventListener('change',event=>runBackupImport(event.currentTarget.files?.[0]));$('openFeedback')?.addEventListener('click',()=>{closeModal();openFeedback('')});$('reportPreview').onclick=openReportPreview;$('settingsSave').onclick=saveSettings;$('settingClearCache')?.addEventListener('click',()=>{confirmClearAppCache()});bindVoiceSettingControls();bindAccountSettingControls();$('settingReminders')?.addEventListener('change',event=>toggleStudyReminders(event.currentTarget));$('settingLearnerLocale')?.addEventListener('change',event=>setLearnerLocalePreference(event.currentTarget.value));$('settingBoardHidden')?.addEventListener('change',event=>socialToggleHidden(event.currentTarget));
 // Runtime suara dimuat malas (lihat ./fiezel-lazy-loader.js). Kalau murid membuka
 // Pengaturan sebelum gelombang idle selesai, kartunya akan berbunyi "tidak tersedia"
 // padahal berkasnya sedang dalam perjalanan - jadi kartunya digambar ulang begitu tiba.
@@ -8587,7 +8759,293 @@ prefetchPlacementListening();
 // baru tiba setelah layar pertama tercat. Tanpa pengulangan ini, ketukan pertama murid
 // akan menanggung seluruh ongkos inisialisasi yang justru ingin dipindahkan ke waktu idle.
 document.addEventListener?.('fiezel:lazy-group',event=>{if(event?.detail?.group==='voice')warmNeuralVoice()});
-window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,coreBrainMemory,tutorSession,tutorObserve,misconceptionLedgerRead,misconceptionLedgerActive,coreBrainAttempts,quizPredictedSuccess,evidenceKappa,bktRead,bktRecord,bktShadowMarkup,confusionMatrixRead,confusionMatrixRecord,affectObserve,affectSessionSync,affectTargetSuccess,listeningAdaptivePolicy,olmPanelMarkup,coreBrainPanelMarkup,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession,/* Fase 3 (C5): kalibrasi item, cloze, OLM negotiated, SRL, speaking adaptif, step tutor */itemCalibrationRead,itemCalibrationObserve,itemCalibrationEffective,calibrationItemId,ensureClozeBank,makeClozeQuestion,clozeAdaptivePicks,clozeSkillReady,clozeProductionRecord,olmSummarizeInput,olmDispute,olmProbeNextSkill,olmProbeConsume,olmNegotiationRead,srlSessionPlan,srlPredictPrompt,srlCaptureConfidence,srlReflect,srlSessionSync,speakingCoverageRows,speakingAdaptiveEvidence,speakingAdaptivePolicy,stepTutorGuidance,stepTutorGuidanceMarkup,record,quizLoop,startAdaptive};
+/* ================================================================================== */
+/* FIEZEL ONLINE / SOSIAL (frontend SLOT 7) — view 'online', evidence outbox, sorakan. */
+/*                                                                                    */
+/* Kontrak keras blok ini:                                                            */
+/*   1. Inti jaringan/outbox hidup di features/social/fiezel-social.js               */
+/*      (self.FiezelSocial) — blok ini HANYA UI + kait bukti. Modul yang belum tiba   */
+/*      atau gagal dimuat membuat seluruh fitur diam, bukan membuat aplikasi patah.   */
+/*   2. Fail-closed & jujur: flag server mati → "fitur online belum aktif"; offline   */
+/*      → "kamu sedang offline". Kedua keadaan itu KARTU, bukan error screen.        */
+/*   3. Nol teks bebas: yang terkirim hanya handle, enum stiker, enum bukti, count,   */
+/*      dan tanggal granularitas HARI (WIB). Sorakan = 6 stiker enum, tanpa balasan.  */
+/*   4. Bunyi lewat gerbang feedbackSounds, gerak maskot lewat pawReact yang sudah    */
+/*      menghormati reduced-motion — tidak ada gerbang baru yang bisa berbeda.        */
+const ONLINE_TABS=[['profil','Profil'],['teman','Teman'],['papan','Papan Peringkat']];
+let onlineTab='profil',onlineBoardTab='teman',onlineSeq=0,onlineHandleTimer=null;
+let socialProfileCache=null,socialInviteLast=null,socialSummaryCache=null,socialSummaryAt=0;
+function socialCore(){try{return self.FiezelSocial||null}catch(_){return null}}
+// Momen mikro sosial: SATU bunyi (gerbang feedbackSounds) + SATU reaksi maskot (gerbang
+// reduced-motion di pawReact). Tidak menumpuk dengan celebrate() — sorakan bukan prestasi belajar.
+function socialMicroMoment(kind){try{if(feedbackSoundsOn())uiSfx(kind==='cheer'?'xp_gain':'notif_achievement')}catch(_){}try{pawReact('reward',{kind:kind||'social'})}catch(_){}}
+function openOnlineView(){closeModal();go('online')}
+window.openOnlineView=openOnlineView;
+window.switchOnlineTab=id=>{if(ONLINE_TABS.some(([t])=>t===id))onlineTab=id;uiSfx('toggle');render()};
+window.switchOnlineBoard=id=>{onlineBoardTab=id==='liga'?'liga':'teman';uiSfx('toggle');render()};
+function onlineView(){
+  const tabs=`<div class="progress-tabs" role="tablist">${ONLINE_TABS.map(([id,label])=>`<button type="button" class="progress-tab${onlineTab===id?' active':''}" role="tab" aria-selected="${onlineTab===id}" onclick="switchOnlineTab('${id}')">${esc(label)}</button>`).join('')}</div>`;
+  shell('Online & Teman','Saling menyaksikan proses belajar — nama samaran, tanpa chat, dan sepenuhnya opsional.',`${tabs}<div id="onlineRoot">${card('<p class="muted">Menyiapkan fitur online…</p>')}</div>`);
+  renderOnlineTab();
+}
+// Kartu keadaan yang dijanjikan spec: dua kalimat jujur, nol nada gagal. Belajar tidak
+// pernah butuh fitur ini, dan kartunya mengatakan itu.
+function socialOfflineCard(){const pending=(()=>{try{return socialCore()?.outboxPending()||0}catch(_){return 0}})();return card(`<h3>Kamu sedang offline</h3><p class="muted">Fitur online menunggu koneksi — semua fitur belajarmu tetap jalan penuh.${pending?` ${pending} bukti belajar sudah antre dan terkirim otomatis begitu online.`:''}</p>`,'social-card')}
+function socialFlagOffCard(flag){return flag==='offline'?socialOfflineCard():card('<h3>Fitur online belum aktif</h3><p class="muted">Bagian ini sedang disiapkan dan belum dinyalakan. Tidak ada yang hilang — semua belajarmu jalan seperti biasa.</p>','social-card')}
+async function renderOnlineTab(){
+  const seq=++onlineSeq;
+  const put=html=>{if(seq!==onlineSeq||state.view!=='online')return;const el=$('onlineRoot');if(el){el.innerHTML=html;enhanceUI()}};
+  const core=socialCore();
+  if(!core)return put(card('<h3>Fitur online belum termuat</h3><p class="muted">Muat ulang aplikasi saat tersambung internet, lalu coba lagi.</p>','social-card'));
+  if(typeof navigator!=='undefined'&&navigator.onLine===false)return put(socialOfflineCard());
+  let flag='off';try{flag=await core.probeFlag()}catch(_){flag='off'}
+  if(flag!=='on')return put(socialFlagOffCard(flag));
+  try{await core.ensureAnon()}catch(_){}
+  try{
+    if(onlineTab==='teman')return put(await socialTemanMarkup(core));
+    if(onlineTab==='papan')return put(await socialPapanMarkup(core));
+    return put(await socialProfilMarkup(core));
+  }catch(_){return put(card('<h3>Jalur online lagi tersendat</h3><p class="muted">Coba lagi sebentar lagi — belajarmu tidak terganggu.</p>','social-card'))}
+}
+/* ---------------------------------------------------------------- tab PROFIL */
+async function socialProfilMarkup(core){
+  const me=await core.api.profileMe();
+  if(me.ok&&me.data?.profile){
+    socialProfileCache=me.data.profile;
+    const p=me.data.profile;
+    const board=await core.api.boardFriends();
+    const pb=board.ok&&board.data?.me?Number(board.data.me.pb)||0:null;
+    return card(`<div class="social-me"><span class="social-avatar" aria-hidden="true">${esc(String(p.handle||'?').charAt(0).toUpperCase())}</span><div><h3>@${esc(p.handle)}</h3><p class="muted">Profil pseudonim-mu — bukan nama asli, dan hanya ini yang dilihat orang lain.</p></div></div>
+      <div class="stats social-stats"><div>${stat('Poin Bukti pekan ini',pb==null?'—':pb+' PB')}</div><div>${stat('Level',esc(p.band||'—'))}</div><div>${stat('Runtun',(Number(p.streakDays)||0)+' hari')}</div></div>
+      <p class="muted">Poin Bukti dihitung server dari bukti belajarmu dan direset tiap Senin 00:00 WIB — bukan angka seumur hidup, bukan mata uang.</p>`,'social-card')
+      +card(`<h3>Privasi, hitam di atas putih</h3><p class="muted">Tanpa email, tanpa nomor HP, tanpa nama asli. Yang tersimpan di server hanya nama samaran, level, dan runtun harian (granularitas hari, tanpa jam). Sembunyikan diri dari papan kapan pun lewat Pengaturan → Online &amp; Teman → Mode privat papan.</p>`,'social-card');
+  }
+  if(me.error==='profile_required'){
+    socialProfileCache=null;
+    return card(`<h3>Buat Profil Online</h3>
+      <p class="muted">Profil = main bareng teman + papan mingguan. Pakai <b>nama samaran</b> — tanpa email, tanpa nama asli, gratis, dan sepenuhnya opsional: semua fitur belajar tetap terbuka tanpa profil.</p>
+      <label class="endpoint-label">Nama samaran (handle)<input id="socialHandle" type="text" maxlength="20" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="mis. belajar_terus" oninput="socialHandleInput(this.value)"></label>
+      <p class="social-handle-status muted" id="socialHandleStatus">3–20 karakter: huruf kecil a-z, angka, garis bawah. Mulai dengan huruf.</p>
+      <label class="consent-row"><input id="socialFriendsVisible" type="checkbox" checked><span>Teman boleh melihat progres belajarku (runtun &amp; level — granularitas hari)</span></label>
+      <label class="consent-row"><input id="socialLeagueOptIn" type="checkbox"><span>Ikut Liga Mingguan global (bisa disembunyikan kapan pun)</span></label>
+      <div class="modal-actions"><button class="primary" id="socialCreateBtn" onclick="socialCreateProfile()" disabled><i data-lucide="user-plus"></i> Buat profil</button></div>`,'social-card');
+  }
+  return card(`<h3>Profil belum bisa dibuka</h3><p class="muted">${esc(me.message)}</p>`,'social-card');
+}
+// Cek ketersediaan LIVE, debounce 500 ms (spec §2.4): validasi lokal dulu (alasan yang jelas,
+// tanpa jaringan), baru tanya server available:true/false.
+function socialHandleInput(value){
+  const status=$('socialHandleStatus'),btn=$('socialCreateBtn');
+  if(btn)btn.disabled=true;
+  clearTimeout(onlineHandleTimer);
+  const core=socialCore();if(!core||!status)return;
+  const v=core.validateHandle(value);
+  if(!v.ok){status.textContent=v.reason;status.classList.remove('social-ok');return}
+  status.textContent='Mengecek ketersediaan…';status.classList.remove('social-ok');
+  onlineHandleTimer=setTimeout(async()=>{
+    const res=await core.api.profileCheck(v.handle);
+    const cur=$('socialHandle');if(!cur||String(cur.value||'').trim().toLowerCase()!==v.handle)return; // murid sudah mengetik lagi
+    if(res.ok&&res.data?.available===true){status.textContent=`@${v.handle} tersedia ✓`;status.classList.add('social-ok');if($('socialCreateBtn'))$('socialCreateBtn').disabled=false}
+    else if(res.ok){status.textContent='Nama itu sudah dipakai atau tidak diizinkan — coba variasi lain.';status.classList.remove('social-ok')}
+    else{status.textContent=res.message;status.classList.remove('social-ok')}
+  },500);
+}
+window.socialHandleInput=socialHandleInput;
+async function socialCreateProfile(){
+  const core=socialCore();if(!core)return;
+  const v=core.validateHandle($('socialHandle')?.value);
+  if(!v.ok){showToast(v.reason);return}
+  const btn=$('socialCreateBtn');if(btn){btn.disabled=true;btn.textContent='Membuat…'}
+  const res=await core.api.profileCreate({handle:v.handle,friendsVisible:$('socialFriendsVisible')?.checked!==false,leagueOptIn:$('socialLeagueOptIn')?.checked===true});
+  if(res.ok){socialProfileCache=res.data?.profile||null;socialSummaryAt=0;showToast(`Profil online jadi. Halo, @${v.handle}!`);socialMicroMoment('profile');try{queueSocialEvidence()}catch(_){}renderOnlineTab();return}
+  if(res.error==='profile_exists'){showToast('Kamu ternyata sudah punya profil — memuat ulang.');renderOnlineTab();return}
+  if(btn){btn.disabled=false;btn.innerHTML='<i data-lucide="user-plus"></i> Buat profil';enhanceUI()}
+  const status=$('socialHandleStatus');if(status)status.textContent=res.message;
+  showToast(res.message);
+}
+window.socialCreateProfile=socialCreateProfile;
+/* ---------------------------------------------------------------- tab TEMAN */
+function socialNeedProfileCard(){return card(`<h3>Butuh profil online dulu</h3><p class="muted">Fitur teman memakai nama samaran supaya tidak ada nama asli yang beredar.</p><div class="modal-actions"><button class="primary" onclick="switchOnlineTab('profil')"><i data-lucide="user-plus"></i> Buat profil</button></div>`,'social-card')}
+async function socialTemanMarkup(core){
+  const fr=await core.api.friends();
+  if(fr.error==='profile_required')return socialNeedProfileCard();
+  if(!fr.ok)return card(`<h3>Daftar teman belum bisa dibuka</h3><p class="muted">${esc(fr.message)}</p>`,'social-card');
+  const friends=Array.isArray(fr.data?.friends)?fr.data.friends:[];
+  const cheers=Array.isArray(fr.data?.cheersToday)?fr.data.cheersToday:[];
+  // URL undangan ?invite=KODE dari share-sheet teman → prefill kolom tukar kode.
+  let urlInvite='';try{urlInvite=String(new URLSearchParams(location.search).get('invite')||'').trim()}catch(_){urlInvite=''}
+  const inviteCard=card(`<h3>Ajak teman</h3><p class="muted">Kode sekali pakai, berlaku 7 hari, maksimal 3 kode aktif. Yang memakai kodenya langsung jadi temanmu — tanpa kotak masuk, tanpa chat.</p>
+    ${socialInviteLast?`<div class="social-code" id="socialInviteCode">${esc(socialInviteLast.code)}</div><p class="muted">Berlaku sampai ${esc(socialInviteLast.expiresDay||'7 hari lagi')}.</p><div class="modal-actions"><button onclick="socialCopyInvite()"><i data-lucide="copy"></i> Salin kode</button><button class="primary" onclick="socialShareInvite()"><i data-lucide="share-2"></i> Bagikan</button></div>`:''}
+    <div class="modal-actions"><button ${socialInviteLast?'':'class="primary"'} id="socialMintBtn" onclick="socialMintInvite()"><i data-lucide="ticket"></i> ${socialInviteLast?'Cetak kode baru':'Cetak kode undangan'}</button></div>`,'social-card');
+  const redeemCard=card(`<h3>Punya kode dari teman?</h3><label class="endpoint-label">Kode undangan<input id="socialRedeemInput" type="text" maxlength="12" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="mis. K3JQ7W2A" value="${esc(urlInvite)}"></label><div class="modal-actions"><button class="primary" onclick="socialRedeem()"><i data-lucide="handshake"></i> Tukar kode</button></div>`,'social-card');
+  const cheerFeed=cheers.length?card(`<h3>Sorakan buatmu hari ini</h3>${cheers.map(c=>{const m=core.stickerMeta(c.sticker);return `<div class="row"><span>${m?m.emoji:''} ${esc(m?m.label:'Sorakan')} dari @${esc(c.handle)}</span><b>×${Math.max(1,Number(c.cnt)||1)}</b></div>`}).join('<hr>')}`,'social-card'):'';
+  const list=friends.length?friends.map(f=>{
+    const vis=f.visible!==false;
+    const milestones=vis&&Array.isArray(f.milestones)?f.milestones.slice(0,3).map(m=>`<span class="social-chip">${esc(core.milestoneLabel(m.kind))}</span>`).join(''):'';
+    return `<div class="social-friend"><span class="social-avatar" aria-hidden="true">${esc(String(f.handle||'?').charAt(0).toUpperCase())}</span><div class="social-friend-body"><b>@${esc(f.handle)}</b><small>${esc(core.presenceLabel(f))}${vis&&f.band?` · ${esc(f.band)}`:''}${vis&&Number(f.streakDays)>0?` · 🔥 ${Number(f.streakDays)} hari`:''}</small>${milestones?`<div class="social-chips">${milestones}</div>`:''}</div><button type="button" class="social-cheer-btn" onclick="socialOpenCheer('${esc(f.handle)}')" aria-label="Sorak @${esc(f.handle)}">👏 Sorak</button></div>`;
+  }).join(''):`<div class="social-empty"><p><b>Belum ada teman di sini.</b></p><p class="muted">Cetak kode di atas dan kirim ke satu teman belajarmu — pertemanan jadi otomatis begitu kodenya dipakai.</p></div>`;
+  return inviteCard+redeemCard+cheerFeed+card(`<h3>Teman belajar (${friends.length})</h3><p class="muted">Yang tampil hanya sinyal belajar harian — tanpa jam, tanpa "online sekarang".</p>${list}`,'social-card');
+}
+async function socialMintInvite(){
+  const core=socialCore();if(!core)return;
+  const btn=$('socialMintBtn');if(btn)btn.disabled=true;
+  const res=await core.api.invite();
+  if(res.ok&&res.data?.code){socialInviteLast={code:String(res.data.code),expiresDay:String(res.data.expiresDay||'')};showToast('Kode undangan tercetak — bagikan ke satu teman.');render();return}
+  if(btn)btn.disabled=false;
+  showToast(res.message);
+}
+window.socialMintInvite=socialMintInvite;
+function socialCopyInvite(){
+  const code=socialInviteLast?.code;if(!code)return;
+  try{navigator.clipboard?.writeText?.(code).then(()=>showToast('Kode tersalin.')).catch(()=>showToast('Salin manual ya: '+code))}catch(_){showToast('Salin manual ya: '+code)}
+}
+window.socialCopyInvite=socialCopyInvite;
+function socialShareInvite(){
+  const code=socialInviteLast?.code;if(!code)return;
+  // Tautan dibangun dari lokasi app yang sedang berjalan — bukan hardcode — supaya benar
+  // di fiezel.my.id/app/, mirror Pages, maupun preview (gate ai-transport-switch (h)).
+  const inviteUrl=(()=>{try{return location.origin+location.pathname}catch(_){return './'}})();
+  const text=`Aku lagi belajar bahasa Inggris di FIEZEL — kejar aku: ${inviteUrl}?invite=${code}`;
+  try{
+    if(typeof navigator!=='undefined'&&typeof navigator.share==='function'){navigator.share({title:'FIEZEL',text}).catch(()=>{});return}
+  }catch(_){}
+  socialCopyInvite();
+}
+window.socialShareInvite=socialShareInvite;
+async function socialRedeem(){
+  const core=socialCore();if(!core)return;
+  const code=String($('socialRedeemInput')?.value||'').trim();
+  if(!code)return showToast('Tulis dulu kodenya.');
+  const res=await core.api.redeem(code);
+  if(res.ok&&res.data?.friend){showToast(`Kamu dan @${res.data.friend.handle} sekarang teman belajar!`);socialMicroMoment('friend');render();return}
+  showToast(res.message);
+}
+window.socialRedeem=socialRedeem;
+function socialOpenCheer(handle){
+  const core=socialCore();if(!core)return;
+  openModal(`<div class="modal-mark">SORAKAN</div><h2>Sorak @${esc(handle)}</h2><p>Satu stiker, tanpa teks — jatah 5 per hari per teman.</p><div class="social-sticker-grid">${core.STICKERS.map(s=>`<button type="button" class="social-sticker" onclick="socialSendCheer('${esc(handle)}','${s.id}')"><span aria-hidden="true">${s.emoji}</span><small>${esc(s.label)}</small></button>`).join('')}</div><div class="modal-actions"><button onclick="closeModal()">Batal</button></div>`);
+}
+window.socialOpenCheer=socialOpenCheer;
+async function socialSendCheer(handle,sticker){
+  const core=socialCore();if(!core)return;
+  closeModal();
+  const res=await core.api.cheer(handle,sticker);
+  if(res.ok){const m=core.stickerMeta(sticker);showToast(`${m?m.emoji:'👏'} Sorakan terkirim ke @${handle}`);socialMicroMoment('cheer');return}
+  // 429 = jatah 5/hari/teman habis — dijawab ramah, bukan sebagai kesalahan murid.
+  showToast(res.error==='rate_limited'?`Jatah sorakan buat @${handle} hari ini sudah penuh — besok lagi ya.`:res.message);
+}
+window.socialSendCheer=socialSendCheer;
+/* ---------------------------------------------------------------- tab PAPAN PERINGKAT */
+function socialBoardRows(core,rows){
+  if(!Array.isArray(rows)||!rows.length)return '';
+  return rows.map((r,i)=>`<div class="social-boardrow${r.me?' social-row-me':''}"><span class="social-rank">${i+1}</span><span class="social-avatar" aria-hidden="true">${esc(String(r.handle||'?').charAt(0).toUpperCase())}</span><span class="social-board-handle">@${esc(r.handle)}${r.me?' <small>(kamu)</small>':''}</span>${r.band?`<span class="social-chip">${esc(r.band)}</span>`:''}<b class="social-pb">${Math.max(0,Number(r.pb)||0)} PB</b></div>`).join('');
+}
+async function socialPapanMarkup(core){
+  const boardTabs=`<div class="progress-tabs social-board-tabs" role="tablist"><button type="button" class="progress-tab${onlineBoardTab==='teman'?' active':''}" role="tab" aria-selected="${onlineBoardTab==='teman'}" onclick="switchOnlineBoard('teman')">Teman</button><button type="button" class="progress-tab${onlineBoardTab==='liga'?' active':''}" role="tab" aria-selected="${onlineBoardTab==='liga'}" onclick="switchOnlineBoard('liga')">Liga Mingguan</button></div>`;
+  const cd=core.leagueCountdown(Date.now());
+  const cdLine=`<p class="muted social-countdown"><i data-lucide="timer"></i> Papan direset Senin 00:00 WIB — ${esc(cd.label)}.</p>`;
+  if(onlineBoardTab==='liga'){
+    const b=await core.api.boardLeague();
+    if(b.error==='profile_required')return boardTabs+socialNeedProfileCard();
+    if(!b.ok)return boardTabs+card(`<h3>Papan liga belum bisa dibuka</h3><p class="muted">${esc(b.message)}</p>`,'social-card');
+    if(b.data?.optedIn!==true)return boardTabs+card(`<h3>Liga Mingguan</h3>${cdLine}<p class="muted">Kamu belum ikut liga global. Keikutsertaan dipilih saat membuat profil; sakelar ikut/keluar liga menyusul di paket berikutnya — papan Teman tetap terbuka penuh untukmu.</p><div class="modal-actions"><button class="primary" onclick="switchOnlineBoard('teman')">Lihat papan Teman</button></div>`,'social-card');
+    if(b.data?.leagueOpen!==true)return boardTabs+card(`<h3>Liga Mingguan</h3>${cdLine}<p class="muted">Kohor liga pekan ini belum terbentuk — ia terisi saat pesertanya cukup. Sambil menunggu, papan Teman selalu terbuka.</p>`,'social-card');
+    const rows=socialBoardRows(core,b.data?.rows);
+    const meNote=b.data?.me==null?'<p class="muted">Mode privat aktif — kamu tidak tampil di papan, dan Poin Buktimu tetap milikmu sendiri.</p>':'';
+    return boardTabs+card(`<h3>Liga Mingguan</h3><p class="muted">Lagi pada belajar apa minggu ini — maksimal 20 orang per kohor.</p>${cdLine}${rows||'<div class="social-empty"><p class="muted">Kohormu masih sepi pekan ini.</p></div>'}${meNote}`,'social-card');
+  }
+  const b=await core.api.boardFriends();
+  if(b.error==='profile_required')return boardTabs+socialNeedProfileCard();
+  if(!b.ok)return boardTabs+card(`<h3>Papan teman belum bisa dibuka</h3><p class="muted">${esc(b.message)}</p>`,'social-card');
+  const rows=socialBoardRows(core,b.data?.rows);
+  const meNote=b.data?.me==null?'<p class="muted">Mode privat aktif — kamu tidak tampil di papan. Ubah kapan pun di Pengaturan → Online &amp; Teman.</p>':'';
+  const empty=`<div class="social-empty"><p><b>Papanmu masih sepi.</b></p><p class="muted">Papan teman baru hidup setelah ada teman — undang satu dulu.</p><div class="modal-actions"><button class="primary" onclick="switchOnlineTab('teman')"><i data-lucide="ticket"></i> Undang teman</button></div></div>`;
+  return boardTabs+card(`<h3>Lagi pada belajar apa minggu ini</h3><p class="muted">Poin Bukti dihitung server dari bukti belajar — konsistensi menang lawan grinding.</p>${cdLine}${rows||empty}${meNote}`,'social-card');
+}
+/* ---------------------------------------------------------------- sakelar Mode Privat (Pengaturan) */
+async function socialToggleHidden(input){
+  const want=!!input?.checked;
+  const core=socialCore();
+  if(!core){if(input)input.checked=!want;showToast('Fitur online belum termuat.');return false}
+  if(typeof navigator!=='undefined'&&navigator.onLine===false){if(input)input.checked=!want;showToast('Butuh koneksi untuk mengubah mode privat — coba lagi saat online.');return false}
+  const res=await core.api.optout(want);
+  if(res.ok){if(socialProfileCache?.flags)socialProfileCache.flags.boardHidden=want;socialSummaryAt=0;showToast(want?'Mode privat aktif — kamu hilang dari semua papan seketika.':'Kamu kembali tampil di papan.');return true}
+  if(input)input.checked=!want;
+  showToast(res.error==='profile_required'?'Mode privat butuh profil online — buat dulu lewat tombol di atasnya.':res.message);
+  return false;
+}
+window.socialToggleHidden=socialToggleHidden;
+/* ---------------------------------------------------------------- kartu ringkas di Peta Belajar → Ringkasan */
+// Kartu digambar SINKRON dari cache (render() tidak boleh menunggu jaringan); isi segarnya
+// menyusul lewat refreshSocialSummaryCard yang menulis ulang innerHTML bila view masih sama.
+function socialSummaryCardMarkup(){
+  if(!socialCore())return '';
+  setTimeout(refreshSocialSummaryCard,0);
+  return `<div class="card social-card social-summary" id="socialSummaryCard">${socialSummaryBody()}</div>`;
+}
+function socialSummaryBody(){
+  const c=socialSummaryCache;
+  if(c?.kind==='profile')return `<h3>Online &amp; Teman</h3><div class="social-me"><span class="social-avatar" aria-hidden="true">${esc(String(c.handle||'?').charAt(0).toUpperCase())}</span><div><b>@${esc(c.handle)}</b><small class="muted"> · ${c.pb==null?'—':c.pb+' PB'} pekan ini</small></div></div><div class="modal-actions"><button class="primary" onclick="go('online')"><i data-lucide="users"></i> Buka Online &amp; Teman</button></div>`;
+  if(c?.kind==='cta')return `<h3>Online &amp; Teman</h3><p class="muted">Main bareng teman dengan nama samaran — pseudonim, tanpa nama asli, dan sepenuhnya opsional.</p><div class="modal-actions"><button class="primary" onclick="go('online')"><i data-lucide="user-plus"></i> Buat Profil Online</button></div>`;
+  if(c?.kind==='offline')return `<h3>Online &amp; Teman</h3><p class="muted">Kamu sedang offline — fitur online menunggu koneksi, belajarmu tetap jalan penuh.</p>`;
+  if(c?.kind==='off')return `<h3>Online &amp; Teman</h3><p class="muted">Fitur online belum aktif. Semua belajarmu jalan seperti biasa.</p>`;
+  return `<h3>Online &amp; Teman</h3><p class="muted">Memeriksa profil online…</p>`;
+}
+async function refreshSocialSummaryCard(){
+  const core=socialCore();if(!core)return;
+  if(socialSummaryCache&&Date.now()-socialSummaryAt<60000)return socialSummaryPaint();
+  if(typeof navigator!=='undefined'&&navigator.onLine===false){socialSummaryCache={kind:'offline'};socialSummaryAt=Date.now();return socialSummaryPaint()}
+  let flag='off';try{flag=await core.probeFlag()}catch(_){flag='off'}
+  if(flag!=='on'){socialSummaryCache={kind:flag==='offline'?'offline':'off'};socialSummaryAt=Date.now();return socialSummaryPaint()}
+  try{await core.ensureAnon()}catch(_){}
+  const me=await core.api.profileMe();
+  if(me.ok&&me.data?.profile){
+    socialProfileCache=me.data.profile;
+    const board=await core.api.boardFriends();
+    socialSummaryCache={kind:'profile',handle:me.data.profile.handle,pb:board.ok&&board.data?.me?Number(board.data.me.pb)||0:null};
+  }else if(me.error==='profile_required')socialSummaryCache={kind:'cta'};
+  else socialSummaryCache={kind:'off'};
+  socialSummaryAt=Date.now();
+  socialSummaryPaint();
+}
+function socialSummaryPaint(){const el=$('socialSummaryCard');if(el&&state.view==='progress'){el.innerHTML=socialSummaryBody();enhanceUI()}}
+/* ---------------------------------------------------------------- kait bukti (evidence ingest) */
+// Ledger lesson yang SUDAH dilaporkan lesson_mastered — di localStorage terpisah, bukan di
+// state belajar (sanitizeState tidak perlu tahu; hilang ledger = paling buruk event ganda,
+// dan server meng-cap 3/hari sehingga duplikat tidak menggelembungkan PB).
+const SOCIAL_MASTERED_KEY='fiezel-social-mastered-v1';
+function socialMasteredLedger(){try{const raw=localStorage.getItem(SOCIAL_MASTERED_KEY);const arr=raw?JSON.parse(raw):[];return Array.isArray(arr)?arr:[]}catch(_){return []}}
+/**
+ * Satu-satunya pintu bukti sosial. Mengumpulkan event enum level-hari dari state yang SUDAH
+ * dihitung mesin belajar (bukan menghitung ulang), meng-antre-kannya ke outbox offline-first,
+ * lalu mencoba flush. Setiap langkah dijaga: fungsi ini TIDAK PERNAH melempar dan TIDAK
+ * PERNAH menahan UI — pemanggilnya (finishQuiz, gemsHook) memanggilnya fire-and-forget.
+ */
+function queueSocialEvidence(extraEvents){
+  try{
+    const core=socialCore();if(!core)return null;
+    const events=[];
+    if(state.daily?.meaningful)events.push({kind:'meaningful_day'});
+    try{if(self.FiezelDailyTarget?.status?.().met)events.push({kind:'daily_target'})}catch(_){}
+    try{
+      const sent=socialMasteredLedger(),fresh=[];
+      for(const [skill,b] of Object.entries(state.grammar||{}))if((Number(b?.mastery)||0)>=GRAMMAR_UNLOCK_MASTERY&&!sent.includes(skill))fresh.push(skill);
+      if(fresh.length){events.push({kind:'lesson_mastered',count:Math.min(20,fresh.length)});try{localStorage.setItem(SOCIAL_MASTERED_KEY,JSON.stringify([...sent,...fresh].slice(-500)))}catch(_){}}
+    }catch(_){}
+    for(const e of (Array.isArray(extraEvents)?extraEvents:[]))if(e&&e.kind)events.push(e);
+    const entry=core.queueEvidence(events);
+    // Kirim sekarang kalau bisa; gagal = tetap antre. Event 'online'/'visibilitychange'
+    // milik modul yang melanjutkan — di sini tanpa await, tanpa toast, tanpa apa pun.
+    if(entry)core.flushOutbox();
+    return entry;
+  }catch(_){return null}
+}
+window.queueSocialEvidence=queueSocialEvidence;window.socialSummaryCardMarkup=socialSummaryCardMarkup;window.onlineView=onlineView;
+// Flush sisa antrean sesi sebelumnya SEKALI setelah boot tenang — bukti yang tertinggal
+// karena murid menutup aplikasi saat offline berangkat di sini.
+setTimeout(()=>{try{socialCore()?.flushOutbox()}catch(_){}},4500);
+/* ============================== akhir blok SOSIAL (SLOT 7) ========================== */
+window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,coreBrainMemory,tutorSession,tutorObserve,misconceptionLedgerRead,misconceptionLedgerActive,coreBrainAttempts,quizPredictedSuccess,evidenceKappa,bktRead,bktRecord,bktShadowMarkup,brainManifestMarkup,learningTelemetryMode,learningTelemetryEmitAnswer,learningTelemetryStudyDay,confusionMatrixRead,confusionMatrixRecord,affectObserve,affectSessionSync,affectTargetSuccess,listeningAdaptivePolicy,olmPanelMarkup,coreBrainPanelMarkup,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession,/* Fase 3 (C5): kalibrasi item, cloze, OLM negotiated, SRL, speaking adaptif, step tutor */itemCalibrationRead,itemCalibrationObserve,itemCalibrationEffective,calibrationItemId,ensureClozeBank,makeClozeQuestion,clozeAdaptivePicks,clozeSkillReady,clozeProductionRecord,olmSummarizeInput,olmDispute,olmProbeNextSkill,olmProbeConsume,olmNegotiationRead,srlSessionPlan,srlPredictPrompt,srlCaptureConfidence,srlReflect,srlSessionSync,speakingCoverageRows,speakingAdaptiveEvidence,speakingAdaptivePolicy,stepTutorGuidance,stepTutorGuidanceMarkup,record,quizLoop,startAdaptive};
 window.startVocabQuiz=startVocabQuiz;window.buildAdaptivePool=buildAdaptivePool;window.buildGrammarLessonQuestions=buildGrammarLessonQuestions;window.getScenePalette=getScenePalette;window.getCelestialState=getCelestialState;window.playFeedbackSound=playFeedbackSound;window.updateMastery=updateMastery;window.markMastered=markMastered;window.__getFiezelState=()=>state;window.__fiezelValidViews=()=>[...VALID_VIEWS];window.__fiezelDueReviews=()=>dueItems().length;window.buildAdaptivePolicy=buildAdaptivePolicy;window.studyDayKey=studyDayKey;window.startAdaptive=startAdaptive;window.showToast=showToast;window.answerFeedbackSignal=answerFeedbackSignal;window.practiceSkill=practiceSkill;window.openReadingLevel=openReadingLevel;window.startReadingRandom=startReadingRandom;window.startReadingAdaptive=startReadingAdaptive;window.startPlacement=startPlacement;window.startLevelPractice=startLevelPractice;window.startAdaptive=startAdaptive;window.resetProgress=resetProgress;window.closeModal=closeModal;window.openSettings=openSettings;window.openReportPreview=openReportPreview;window.sendCreatorReport=sendCreatorReport;window.askCoachAI=askCoachAI;window.dismissWelcome=dismissWelcome;window.requestStudyNotificationPermission=requestStudyNotificationPermission;window.declineStudyNotifications=declineStudyNotifications;window.skipPuterSignIn=skipPuterSignIn;window.shouldPresentPuterPopup=shouldPresentPuterPopup;window.notifyAppUpdateIfNew=notifyAppUpdateIfNew;window.setConfidence=setConfidence;window.explainWithAI=explainWithAI;window.explainWordWithAI=explainWordWithAI;window.olmDispute=olmDispute;/* Fase 3 (C5 butir 3): handler tombol sanggah di panel OLM */
 // m025-84: dipasang di ujung berkas, saat go()/state/VALID_VIEWS sudah ada, dan SEBELUM
 // load() supaya navigasi pertama pun sudah terekam di riwayat.
