@@ -211,6 +211,52 @@ lima sesi "mixed" yang masing-masing dilupakan begitu sesi berikutnya datang.
 
 ---
 
+## 4b. Kesiapan produksi
+
+### Urutan deploy aman DUA ARAH
+
+Aplikasi (GitHub Pages) dan Core Worker (Puter) di-deploy terpisah, jadi selalu ada jendela
+di mana hanya satu sisi yang baru. Keduanya diperiksa:
+
+| Keadaan | Akibat |
+| --- | --- |
+| Worker baru, `app.js` lama | Klien lama tetap mengirim `brain` ke `/api/policy/next` tetapi belum ke jalur pelatih, jadi pelatih memakai cermin server. Kedua rute kini sama-sama lewat Core Brain (sebelumnya pelatih lewat v1 polos), jadi ini **lebih baik dari keadaan lama pada setiap kasus** — dan menjadi identik begitu klien ikut diperbarui. |
+| `app.js` baru, Worker lama | Worker lama mengabaikan field `brain` tambahan di payload pelatih. Klien hanya membaca `data.protocol` dan `data.policy`, jadi `brainSource`/`effectiveness` yang belum ada tidak dibaca siapa pun. Nol pengaruh. |
+
+Tidak ada perubahan skema, tidak ada field wajib baru, protokol tetap `1.7`.
+
+### Preflight
+
+`node core-deploy-preflight.mjs` → seluruh pemeriksaan KODE `PASS` (Node ≥ 18, sintaks
+worker, nol secret runtime, kontrak Core 1.7). Dua entri `BLOCKED` yang tersisa —
+`Puter CLI available` dan `Puter auth token available` — adalah keadaan **lingkungan**, bukan
+kode: keduanya hanya ada di runner `deploy-core-worker.yml`, yang manual dan bergerbang
+`github.actor == 'FIEZEL-APPS'`. Deploy tetap tindakan owner.
+
+`node core-proof-build.mjs` → `proofRouteInserted: true`, penanda utuh. Keluarannya
+(`fiezel-core-worker-deploy.js`) kini masuk `.gitignore`: ia salinan penuh worker, tidak
+pernah dibaca sebagai masukan, dan sebelum ini bisa ter-`git add -A` menjadi berkas kedua
+yang terlihat sama-sama sah.
+
+### Nomor build punya EMPAT tempat, bukan tiga
+
+`coordination-guard-test.js` menangkap kekeliruan saya: build dinaikkan dengan mengetik
+nomornya langsung ke tiga berkas kode, sementara sumber tunggalnya
+(`coordination/BUILD-VERSION.json`) tetap di `m025-179`. Itu persis kelas cacat yang
+`tools/bump-build.mjs` dibangun untuk menutupnya.
+
+Diperbaiki dengan `--adopt`, bukan `bump`: ketiga penanda sudah benar dan sudah +1 dari
+`origin/main`, jadi menaikkannya lagi ke `m025-181` hanya demi menyenangkan gerbang berarti
+menaikkan `SW_REV` tanpa alasan produk — dan setiap kenaikan `SW_REV` memaksa seluruh murid
+mengunduh ulang shell cache.
+
+Yang membuat jebakan ini mahal adalah **urutan gerbang**: `install-health-test.js` dan
+`pwa-release-coherence-test.js` tetap HIJAU pada bump yang diketik tangan, dan kegagalannya
+baru muncul ~150 gerbang kemudian. `CLAUDE.md` diperbarui supaya sesi berikutnya tidak
+mengulanginya.
+
+---
+
 ## 5. Batas yang dijaga, dan yang TIDAK dikerjakan
 
 1. **Nol data baru diminta dari murid.** Cermin membaca persis field yang sudah dikirim dan
