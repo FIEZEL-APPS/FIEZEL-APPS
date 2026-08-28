@@ -98,6 +98,42 @@ if (argv[0] === '--check') {
   process.exit(0);
 }
 
+/* --adopt: CATAT versi yang sudah terpasang sebagai sumber kebenaran, tanpa menaikkan apa pun.
+ *
+ * Kasusnya nyata dan sering: sesi lain menaikkan versi lewat jalurnya sendiri, ketiga penanda
+ * di tree tetap konsisten, tetapi coordination/BUILD-VERSION.json milik kita ketinggalan. Kalau
+ * satu-satunya jalan adalah `bump`, kita akan menaikkan versi TANPA ALASAN produk hanya untuk
+ * menyenangkan gerbang - dan setiap kenaikan SW_REV memaksa seluruh murid mengunduh ulang shell
+ * cache. Jadi ada dua operasi berbeda: `bump` (versi memang harus naik) dan `--adopt` (versi
+ * sudah benar, catatannya yang perlu menyusul).
+ *
+ * Sengaja menolak jalan kalau ketiga penanda TIDAK konsisten: kalau tree-nya sendiri campur,
+ * mengadopsi salah satunya berarti mengarang. */
+if (argv[0] === '--adopt') {
+  const alasanAdopt = argv.slice(1).join(' ').trim();
+  if (!alasanAdopt) {
+    console.error('Alasan wajib. Pakai: node tools/bump-build.mjs --adopt "kenapa versi ini diadopsi"');
+    process.exit(1);
+  }
+  const t = versiTerpasang();
+  const v = Object.values(t);
+  if (!v.every((x) => x && x === v[0])) {
+    console.error('Tiga penanda build TIDAK konsisten: ' + JSON.stringify(t));
+    console.error('Adopsi ditolak - mengadopsi salah satu dari tree yang campur berarti mengarang.');
+    console.error('Selaraskan dulu, atau jalankan `bump` kalau memang versinya harus naik.');
+    process.exit(1);
+  }
+  const sumberLama = versiSumber();
+  const j = JSON.parse(fs.readFileSync(SUMBER, 'utf8'));
+  j.version = v[0];
+  j.claimedAt = new Date().toISOString();
+  j.reason = alasanAdopt;
+  fs.writeFileSync(SUMBER, JSON.stringify(j, null, 2) + '\n');
+  console.log('Diadopsi: ' + sumberLama + ' -> ' + v[0] + ' (' + alasanAdopt + ')');
+  console.log('Tidak ada penanda build yang diubah, jadi nol murid mengunduh ulang shell cache.');
+  process.exit(0);
+}
+
 const alasan = argv.join(' ').trim();
 if (!alasan) {
   console.error('Alasan wajib. Pakai: node tools/bump-build.mjs "alasan singkat"');
