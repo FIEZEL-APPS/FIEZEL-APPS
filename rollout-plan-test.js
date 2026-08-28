@@ -212,9 +212,10 @@ const PREREQS = [
     stillTrue: () => read('workers/api/wrangler.toml').includes('[triggers]')
   },
   {
-    label: 'Analytics Engine belum diaktifkan',
-    pattern: /Analytics Engine belum diaktifkan/,
-    stillTrue: () => /ANALYTICS_ENABLED\s*=\s*"off"/.test(read('workers/api/wrangler.toml'))
+    label: 'Analytics Engine belum tersedia untuk dibaca',
+    pattern: /Analytics Engine belum tersedia untuk dibaca/,
+    stillTrue: () => /ANALYTICS_ENABLED\s*=\s*"on"/.test(read('workers/api/wrangler.toml'))
+      && !/^\s*\[\[analytics_engine_datasets\]\]/m.test(read('workers/api/wrangler.toml'))
   },
   {
     label: 'workers/owner/wrangler.toml masih memuat blok route custom_domain',
