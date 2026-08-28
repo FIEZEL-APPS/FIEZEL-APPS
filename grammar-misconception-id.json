@@ -413,8 +413,6 @@
     "subject-pronoun-before-noun": "pakai kata ganti subjek sebelum kata benda, padahal posisi itu butuh bentuk kepemilikan.",
     "stand-alone-possessive-before-noun": "pakai bentuk milik yang berdiri sendiri tepat sebelum kata benda.",
     "object-pronoun-substitution": "pakai kata ganti objek di posisi yang butuh penanda kepemilikan.",
-    "movement preposition used for a static location": "pakai kata depan gerak buat posisi yang diam.",
-    "treats a route point as a surface in the first slot": "memperlakukan titik di rute sebagai permukaan, jadi celah pertamanya udah keliru.",
     "keeps the action in progress at 'now' instead of marking it completed before the past reference point": "kejadiannya dibiarin masih jalan di 'sekarang', padahal harusnya udah kelar sebelum titik acuan lampaunya.",
     "applies a perfect to-infinitive after 'remember', which English does not use for recalling a past action": "bentuk to sempurna dipasang sesudah 'remember', padahal buat ingatan lampau pola itu nggak dipakai.",
     "reduces the sentence to a fragment: an -ing form with no finite verb to carry the tense": "kalimatnya cuma disisain bentuk -ing tanpa kata kerja utama, jadi nggak ada yang megang waktunya.",
@@ -463,6 +461,8 @@
     "picking the free-choice quantifier, which selects random members rather than naming the species": "milih kata yang nunjuk anggota acak mana aja, padahal kalimatnya ngomongin spesiesnya sebagai satu kesatuan.",
     "regular 'more + adjective' pattern applied to an irregular adjective": "maksa pola 'more + kata sifat', padahal 'good' punya bentuk banding khusus, yaitu 'better'.",
     "regular -er ending forced onto an irregular adjective": "nempel akhiran -er ke kata sifat yang bentuknya khusus, jadinya muncul kata yang nggak ada.",
-    "superlative 'best' used where 'than' demands a comparative": "pakai bentuk juara kelompok, padahal 'than' minta bentuk banding buat dua hal."
+    "superlative 'best' used where 'than' demands a comparative": "pakai bentuk juara kelompok, padahal 'than' minta bentuk banding buat dua hal.",
+    "reads the turn point as an enclosed space and the static location as a destination": "anggap titik belok sebagai ruang tertutup dan posisi diam sebagai arah gerak, dua-duanya salah baca bentuk lokasinya.",
+    "turns the landmark of the turn into a destination of movement": "jadiin patokan tempat belok sebagai tujuan perpindahan, padahal 'at' cuma nandain titik beloknya."
   }
 }

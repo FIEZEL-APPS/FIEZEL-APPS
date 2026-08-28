@@ -828,17 +828,17 @@
       "howToAvoid": "Bayangin lokasinya: titik pakai at, wilayah pakai in, garis pakai on.",
       "memoryCue": "Lampu lalu lintas itu titik: at. Nama jalan itu garis: on.",
       "distractors": {
-        "in / at": {
+        "on / at": {
           "misconception": "peran kata depan buat titik dan buat garis saling ketuker.",
-          "whyFails": "dua celahnya salah baca bentuk lokasinya."
+          "whyFails": "posisinya ketuker: lampu itu titik (at), nama jalan itu garis (on)."
         },
-        "on / in": {
-          "misconception": "titik di rute diperlakukan kayak permukaan di celah pertama.",
-          "whyFails": "celah pertama udah gagal: lampu itu titik, bukan permukaan."
+        "in / to": {
+          "misconception": "titik beloknya dianggap ruang tertutup, posisi diamnya dianggap tujuan gerak.",
+          "whyFails": "“in” bikin belokannya kayak di dalam lampu, “to” malah nandain gerak padahal hotelnya diam."
         },
-        "at / to": {
-          "misconception": "kata depan perpindahan dipakai buat posisi yang diam.",
-          "whyFails": "“to” nandain perpindahan, padahal ini soal posisi diam."
+        "to / in": {
+          "misconception": "patokan tempat belok malah dijadiin tujuan perpindahan.",
+          "whyFails": "celah pertama udah gagal: lampunya jadi tujuan gerak, padahal dia titik tempat belok."
         }
       }
     },
