@@ -1,7 +1,7 @@
 {
-  "version": "m025-179",
-  "claimedBy": "perplexity-computer (braincore session, T-027)",
-  "claimedAt": "2026-08-28T06:20:50.461Z",
-  "reason": "integritas skip: 12 perbaikan jalur keputusan dari audit forensik 20 agen",
+  "version": "m025-180",
+  "claimedBy": "claude-code (core-brain-server-mirror session, branch claude/core-brain-fiezel-check-vrakga)",
+  "claimedAt": "2026-08-28T10:16:59.986Z",
+  "reason": "cermin penalaran Core Brain di sisi server: kebijakan tidak lagi jatuh ke lapisan v1 polos saat ringkasan otak klien tidak terkirim",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
