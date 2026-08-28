@@ -1,0 +1,24 @@
+{
+  "schema": "fiezel-locale-assets-v1",
+  "locale": "th",
+  "bcp47": "th-TH",
+  "cacheName": "fiezel-locale-th-v1",
+  "contentRev": 1,
+  "status": "provisional-wave1",
+  "note": "Manifest kecil lapisan cache locale Thai (Wave 1, AI-13 F06). Dibaca HALAMAN (runtime i18n) saat murid memilih th, lalu halaman mengisi CacheStorage cacheName di atas dengan semua path di assets[] - service worker TIDAK pernah mengunduh daftar ini saat install, meniru pola neural-prepare. Path di bawah adalah kontrak untuk Wave 3: berkasnya BELUM ada di repo saat manifest ini ditulis, dan itu tidak apa-apa karena pengisian on-demand yang gagal hanya berarti murid th belum offline-lengkap, bukan install gagal. Setiap penambahan/pengubahan path WAJIB dikoordinasikan lewat impl/handoff/W1-SW.md karena pencocok isLocaleThAsset di sw.js harus tetap menutupi semua path di sini. Kalau kontrak konten th berubah total, naikkan contentRev DAN angka -v pada cacheName bersama LOCALE_TH_CACHE di sw.js (activate akan membersihkan generasi lama).",
+  "assets": [
+    "./features/i18n/copy-th-login.js",
+    "./features/i18n/copy-th-home.js",
+    "./features/i18n/copy-th-grammar.js",
+    "./features/i18n/copy-th-settings.js",
+    "./features/i18n/copy-th-progress.js",
+    "./features/i18n/copy-th-quiz.js",
+    "./features/i18n/copy-th-onboarding.js",
+    "./features/i18n/copy-th-tutor.js",
+    "./grammar-explanations-th.json",
+    "./assets/fonts/NotoSansThaiLooped-400.woff2",
+    "./assets/fonts/NotoSansThaiLooped-500.woff2",
+    "./assets/fonts/NotoSansThaiLooped-600.woff2",
+    "./assets/fonts/NotoSansThaiLooped-700.woff2"
+  ]
+}

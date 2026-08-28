@@ -272,6 +272,16 @@ html.fz-booting body{overflow:hidden}
   <script defer src="./content-canary.js"></script>
   <script defer src="./content-promotion.js"></script>
   <script defer src="./content-canary-config.js"></script>
+  <!-- FIEZEL_I18N_BEGIN — runtime i18n + copy-map per domain (audit v2: AI-02 F01).
+       Urutan di blok ini adalah kontrak: fiezel-i18n.js lebih dulu (mendefinisikan
+       FiezelI18n.t), lalu SEMUA copy-id-<domain>.js, lalu copy-th-<domain>.js — semuanya
+       SEBELUM modul features/* mana pun yang memanggil t() dan SEBELUM app.js. Karena
+       `defer` mempertahankan urutan tulis, cukup tambahkan baris <script defer> berkas
+       copy domain baru DI DALAM blok ini (id dulu, th di bawahnya), lalu minta W1-SW
+       menambahkannya ke precache sw.js. -->
+  <script defer src="./features/i18n/fiezel-i18n.js"></script>
+  <script defer src="./features/i18n/copy-id-core.js"></script>
+  <!-- FIEZEL_I18N_END -->
   <script defer src="./features/diagnostics/fiezel-diagnostic-targets.js"></script>
   <script defer src="./features/diagnostics/fiezel-diagnostic-bus.js"></script>
   <script defer src="./features/diagnostics/fiezel-module-selftests.js"></script>
