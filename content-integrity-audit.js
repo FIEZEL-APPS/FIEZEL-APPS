@@ -545,13 +545,16 @@ function auditGrammarRuntime(ctx, templates) {
     // Semua teks metadata milik template ini sendiri, untuk memisahkan "kebetulan sama"
     // dari "benar-benar dipinjam".
     const ownText = new Set();
-    {
-      const e = t.explanation || {};
-      for (const v of [t.pedagogicalObjective, t.misconceptionTargeted, t.reasoningOperation, t.pedagogicalObjectiveId, t.misconceptionTargetedId, t.reasoningOperationId,
+    // V20 (wave-2, desain multi-templat per lesson): questions kini datang dari SEMUA templat
+    // se-lesson, jadi "teks milik sendiri" = union metadata seluruh sibling satu subskill.
+    for (const sib of templates) {
+      if (sib.subskill !== t.subskill) continue;
+      const e = sib.explanation || {};
+      for (const v of [sib.pedagogicalObjective, sib.misconceptionTargeted, sib.reasoningOperation, sib.pedagogicalObjectiveId, sib.misconceptionTargetedId, sib.reasoningOperationId,
         e.whyCorrect, e.rule, e.whyOthersFail, e.howToAvoid, e.memoryCue, e.whyCorrectId, e.ruleId, e.whyOthersFailId, e.howToAvoidId, e.memoryCueId]) if (v) ownText.add(norm(v));
-      for (const d of t.distractors || []) for (const v of [d.whyFails, d.whyFailsId, d.misconception, d.misconceptionId]) if (v) ownText.add(norm(v));
+      for (const d of sib.distractors || []) for (const v of [d.whyFails, d.whyFailsId, d.misconception, d.misconceptionId]) if (v) ownText.add(norm(v));
       // m025-155: teks gabungan milik lesson sendiri (teach_back/mastery_check) juga sah.
-      for (const [a, b] of [[t.pedagogicalObjective, e.rule], [t.pedagogicalObjectiveId, e.ruleId], [e.howToAvoid, e.memoryCue], [e.howToAvoidId, e.memoryCueId]]) if (a && b) ownText.add(norm(`${a} ${b}`));
+      for (const [a, b] of [[sib.pedagogicalObjective, e.rule], [sib.pedagogicalObjectiveId, e.ruleId], [e.howToAvoid, e.memoryCue], [e.howToAvoidId, e.memoryCueId]]) if (a && b) ownText.add(norm(`${a} ${b}`));
     }
     let questions = [];
     try { questions = ctx.buildGrammarLessonQuestions(t.subskill, 25) || []; }
@@ -573,6 +576,10 @@ function auditGrammarRuntime(ctx, templates) {
       for (const o of q.options || []) {
         const src = owner.get(norm(o));
         if (!src || src.id === q.sourceId) continue;
+        // V20: teks yang memang ada di metadata lesson ini sendiri bukan pinjaman — owner map
+        // first-wins salah-atribusi saat templat baru memuat teks identik dgn templat lama
+        // (prinsip yang sama dgn escape ownText di cek provenance di bawah).
+        if (ownText.has(norm(o))) continue;
         if (src.family === t.family) continue;
         // A family with fewer than four members cannot supply three sibling distractors, so
         // borrowing from another family at the SAME CEFR band is the least-bad fallback and
@@ -654,7 +661,7 @@ function auditGrammarRuntime(ctx, templates) {
           }
         }
       }
-      if (q.sourceId && q.sourceId !== t.id) {
+      if (q.sourceId && q.sourceId !== t.id && !templates.some(p => p.subskill === t.subskill && String(p.id) === String(q.sourceId))) {
         critical('grammar', 'CONCEPT_IDENTITY_LOST', t.id, `question claims sourceId=${q.sourceId} inside lesson ${t.subskill}`);
       }
     }
