@@ -3404,7 +3404,7 @@ const CF_ENABLED=CF_CONFIG.enabled===true&&CF_BASE!=='';
 // Peta path -> nama flag endpoint. Path yang TIDAK terpetakan (mis. /api/push/subscribe,
 // yang terikat VAPID dan MAX_USERS) selamanya 'off': menambah jalur CF harus keputusan
 // eksplisit di peta ini, bukan efek samping dari pencocokan longgar.
-const CF_ENDPOINT_ROUTES=[[/^\/health$/,'health'],[/^\/api\/config(?:\/|$)/,'config'],[/^\/api\/auth(?:\/|$)/,'auth'],[/^\/api\/quota(?:\/|$)/,'quota'],[/^\/api\/(?:ai|coach)(?:\/|$)/,'ai'],[/^\/api\/tts(?:\/|$)/,'tts'],[/^\/api\/(?:usage|activity|feedback|policy)(?:\/|$)/,'usage']];
+const CF_ENDPOINT_ROUTES=[[/^\/health$/,'health'],[/^\/api\/config(?:\/|$)/,'config'],[/^\/api\/auth(?:\/|$)/,'auth'],[/^\/api\/quota(?:\/|$)/,'quota'],[/^\/api\/(?:ai|coach)(?:\/|$)/,'ai'],[/^\/api\/tts(?:\/|$)/,'tts'],[/^\/api\/usage(?:\/|$)/,'usage']];
 function cfEndpointKey(path){const p=String(path||'');for(const [pattern,key] of CF_ENDPOINT_ROUTES)if(pattern.test(p))return key;return ''}
 function cfEndpointMode(path){
   if(!CF_ENABLED)return 'off';
