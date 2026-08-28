@@ -596,6 +596,16 @@ jobs:
           node speaking-adaptive-test.js
           node srl-coach-test.js
           node cors-envelope-test.js
+      - name: 'Wave E2: selftest simulator extended (mekanisme gate jujur — arah pesan, CI bootstrap, censoring)'
+        # Menjaga MEKANISME adaptivity-simulation-v3-extended.js (tulis-ulang jujur
+        # pengerasan PR #226 yang dicabut di fe62a95): arah perbandingan verdict,
+        # pesan yang tidak berbohong tentang arah (bug forensik E2: "itemBiasRMSE
+        # TIDAK turun (0.2694 → 0.2622)" padahal turun), bootstrap deterministik,
+        # aturan mutlak censoring hanya untuk varian kebijakan populasi, dan CLI
+        # byte-identik. Simulator extended-nya SENGAJA tidak dijadikan gate CI:
+        # verdict-nya merah karena TEMUAN brain (v2 tersensor 88% vs v1 50.4%,
+        # CI [0.334, 0.42]) — kandidat wave berikut, bukan alasan memblokir PR lain.
+        run: node adaptivity-simulation-v3-extended-selftest.js
       - name: 'Gerbang simulasi adaptivitas v3 (gate yatim CI — temuan D1, wave D)'
         # adaptivity-simulation-v3.js adalah gate sungguhan (exit code dari main();
         # gate residual + gate kalibrasi bisa merah), tetapi namanya lolos dari pola
