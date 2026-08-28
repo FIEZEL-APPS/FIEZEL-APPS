@@ -1,6 +1,6 @@
 {
   "protocol_version": "v1.2",
-  "updated": "2026-08-19T15:16:00+07:00",
+  "updated": "2026-08-28T07:00:00+07:00",
   "agents": [
     {
       "id": "coordinator-1",
@@ -329,6 +329,41 @@
       "status": "done",
       "evidence": "20 subagent (10 auditor D1-D10 + 10 fixer D11-D20) selesai. 169/169 gate PASS lokal (release-check fast 161 + 8 gate lambat). Perbaikan: 4 soal grammar fatal, 320 item listening A1/A2 + explain 1407 item, evidence exam reading, perf app.js (Intl cache + save koales), bug classroomBaseRenderer, a11y (fokus setApp, zoom WCAG, SRL popup, cloze attrs), precache (search.js masuk, cleanup cache basi), CSP, hardening worker (rate limit anon, edge fail-closed, feedback guard), nightwatch.yml + release-check.js, gate basi diperbaiki (release-audit needle, paw-mascot struktural, m02542 kebijakan zoom baru, owner-dashboard env).",
       "note": "SCOPE EXCLUSION: tidak menyentuh features/neural-voice/**, workflows audio*, NEURAL-VOICE-SOURCE-LOCK.json (T-026 in_progress oleh agent-5 sesi lain). Kepemilikan fixer: grammar-templates.json+misconception jsons; bank reading; bank listening/speaking data; app.js+index.html; features/brain/**; sw.js+style.css; workers/**; docs; .github/workflows/nightwatch.yml; tools/release-check.js."
+    },
+    {
+      "id": "T-028",
+      "title": "FIEZEL Nightwatch: authority guard dan PR stale pada produksi",
+      "owner": "nightwatch",
+      "status": "blocked",
+      "scope": {
+        "files_allowed": [
+          "TASKS-LEDGER.json"
+        ],
+        "files_forbidden": [
+          "features/neural-voice/**",
+          ".github/workflows/audio-*.yml",
+          "sw.js",
+          "app.js"
+        ],
+        "objective": "Catat blocker produksi tanpa menyentuh area T-026 atau Wave D T-027 yang sedang diklaim agent lain.",
+        "forbidden_actions": [
+          "Jangan bypass MASTER-only authority guard.",
+          "Jangan rebase/merge PR agent lain.",
+          "Jangan mengubah area neural voice, audio workflow, atau runtime app."
+        ],
+        "done_when": [
+          "Bukti Pages/live/local gates/CI/PR tercatat.",
+          "Owner dapat melihat opsi pemulihan yang konkret."
+        ],
+        "evidence_required": [
+          "status Pages build dan live marker",
+          "hasil empat gate lokal",
+          "hasil CI authority/quality",
+          "status PR terbuka"
+        ]
+      },
+      "evidence": "HEAD main eb5152df239219e496fc3b5231c96878e2d117a6; Pages latest built pada commit yang sama; live core-config.js menyajikan FIEZEL_PAGE_BUILD m025-176; regression-test.js, core-brain-v2-test.js, tutor-brain-v3-test.js, validator.js semuanya PASS. Quality Gate run 33126880941 masih in_progress; MASTER Authority Guard run 33126880951 gagal karena actor push FIEZEL-APPS bukan owner MASTER fitrajft-ux. PR #227 mergeable CONFLICTING meskipun quality check-nya SUCCESS; PR #226 MERGEABLE tetapi quality/authority checks gagal.",
+      "note": "BLOCKED oleh kebijakan otoritas repository dan antrean PR stale, bukan kegagalan gate kode lokal atau Pages. Opsi owner: lakukan push/merge ulang dengan identitas MASTER fitrajft-ux setelah PR yang stale direkonsiliasi; jangan bypass guard. T-026 neural voice dan T-027 Wave D tetap tidak disentuh."
     }
   ],
   "last_report": {
@@ -433,5 +468,6 @@
       "title": "Handoff neural voice 5.19.0 + rekonsiliasi ledger (T-021/M-019 dari branch)",
       "note": "FIEZEL-5.19.0-NEURAL-VOICE-HANDOFF.md v1.0 di-commit ke main + ledger T-021/M-019 (yang hanya ada di branch) dicatat + T-022. Verifier VERIFY-HANDOFF-001. Permintaan owner yang sama (08:06) tidak selesai di sesi lain - difinalisasi di sini."
     }
-  ]
+  ],
+  "master_note": "Digabung oleh sesi MASTER 28 Agu 2026 dalam prosedur P10. Entri T-027 diambil dari PR #227 dan T-028 dari PR #228 supaya laporan blocker kedua nightwatch tidak hilang ketika PR-nya ditutup. Perubahan release-audit.py di #227 DITOLAK: regex-nya lebih longgar daripada pemeriksaan struktural yang sudah ada di main (hitung minimal 2 situs penjaga + tuntut cabang cloze tervalidasi). Perbaikan paw-mascot-test.js di #227 DITERIMA karena mengikat assert ke rentang sumber fungsi, bukan ke jumlah karakter yang pasti jadi basi lagi."
 }

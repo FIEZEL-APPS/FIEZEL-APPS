@@ -1,0 +1,376 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1672 642" role="img"
+     aria-label="PAW expression proof sheet - all 14 Direction C expressions as head crops">
+  <!-- FIEZEL PAW - Direction C expression proof sheet, 14 of 14.
+       Geometry reused from directions/direction-c.svg; closed palette only.
+       Semantic ear convention: negative = perk, positive = droop-back;
+       right ear SVG rotation is mirrored: rotate(-semantic) (17 R-3).
+       Curious/Welcoming earR follows direction-c.svg literal +4 (17 R-3 flag 1). -->
+  <rect width="1672" height="642" fill="#FFF4DA"/>
+  <text x="24" y="38" font-family="Plus Jakarta Sans, Arial, sans-serif"
+        font-size="19" font-weight="800" fill="#33201F">PAW — Expression System · 14 of 14</text>
+  <svg x="36" y="68" width="208" height="216" viewBox="56 -10 208 216">
+  <defs>
+    <clipPath id="fzcEyeL-neutral"><circle cx="126" cy="98" r="16"/></clipPath>
+    <clipPath id="fzcEyeR-neutral"><circle cx="194" cy="98" r="16"/></clipPath>
+  </defs>
+  <g transform="translate(0 0)">
+    <g transform="rotate(0 108 52)">
+      <path d="M76 66 L 95 0 L 140 34 Z" fill="#FFD94F"/>
+      <path d="M90 52 L 101 17 L 125 35 Z" fill="#8C2233"/>
+    </g>
+    <g transform="rotate(0 212 52)">
+      <path d="M244 66 L 225 0 L 180 34 Z" fill="#FFD94F"/>
+      <path d="M230 52 L 219 17 L 195 35 Z" fill="#8C2233"/>
+    </g>
+    <circle cx="160" cy="106" r="88" fill="#FFD94F"/>
+    <ellipse cx="160" cy="140" rx="36" ry="25" fill="#FFF4DA"/>
+    <path d="M153 126 L 167 126 L 160 136 Z" fill="#8C2233"/>
+    <circle cx="102" cy="126" r="11" fill="#F0A0AC"/>
+    <circle cx="218" cy="126" r="11" fill="#F0A0AC"/>
+    <circle cx="126" cy="98" r="16" fill="#33201F"/><g clip-path="url(#fzcEyeL-neutral)"><g transform="translate(0 0)"><circle cx="130.5" cy="92.5" r="5.5" fill="#fff"/><circle cx="121.5" cy="104" r="2.8" fill="#fff" opacity=".7"/></g></g><circle cx="194" cy="98" r="16" fill="#33201F"/><g clip-path="url(#fzcEyeR-neutral)"><g transform="translate(0 0)"><circle cx="198.5" cy="92.5" r="5.5" fill="#fff"/><circle cx="189.5" cy="104" r="2.8" fill="#fff" opacity=".7"/></g></g>
+    
+    <path d="M148 148 C 154 155 166 155 172 148" stroke="#33201F" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+    
+  </g>
+  
+  
+  </svg><text x="140" y="306" text-anchor="middle" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="17" font-weight="700" fill="#33201F">Neutral</text><svg x="268" y="68" width="208" height="216" viewBox="56 -10 208 216">
+  <defs>
+    <clipPath id="fzcEyeL-happy"><circle cx="126" cy="98" r="16"/></clipPath>
+    <clipPath id="fzcEyeR-happy"><circle cx="194" cy="98" r="16"/></clipPath>
+  </defs>
+  <g transform="translate(0 0)">
+    <g transform="rotate(-4 108 52)">
+      <path d="M76 66 L 95 0 L 140 34 Z" fill="#FFD94F"/>
+      <path d="M90 52 L 101 17 L 125 35 Z" fill="#8C2233"/>
+    </g>
+    <g transform="rotate(4 212 52)">
+      <path d="M244 66 L 225 0 L 180 34 Z" fill="#FFD94F"/>
+      <path d="M230 52 L 219 17 L 195 35 Z" fill="#8C2233"/>
+    </g>
+    <circle cx="160" cy="106" r="88" fill="#FFD94F"/>
+    <ellipse cx="160" cy="140" rx="36" ry="25" fill="#FFF4DA"/>
+    <path d="M153 126 L 167 126 L 160 136 Z" fill="#8C2233"/>
+    <g transform="translate(102 126) scale(1.05) translate(-102 -126)"><circle cx="102" cy="126" r="11" fill="#F0A0AC"/></g>
+    <g transform="translate(218 126) scale(1.05) translate(-218 -126)"><circle cx="218" cy="126" r="11" fill="#F0A0AC"/></g>
+    <circle cx="126" cy="98" r="16" fill="#33201F"/><g clip-path="url(#fzcEyeL-happy)"><g transform="translate(0 0)"><circle cx="130.5" cy="92.5" r="5.5" fill="#fff"/><circle cx="121.5" cy="104" r="2.8" fill="#fff" opacity=".7"/></g></g><g clip-path="url(#fzcEyeL-happy)"><circle cx="126" cy="128" r="17" fill="#FFD94F"/></g><circle cx="194" cy="98" r="16" fill="#33201F"/><g clip-path="url(#fzcEyeR-happy)"><g transform="translate(0 0)"><circle cx="198.5" cy="92.5" r="5.5" fill="#fff"/><circle cx="189.5" cy="104" r="2.8" fill="#fff" opacity=".7"/></g></g><g clip-path="url(#fzcEyeR-happy)"><circle cx="194" cy="128" r="17" fill="#FFD94F"/></g>
+    
+    <path d="M148 148 C 154 155 166 155 172 148" stroke="#33201F" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+    
+  </g>
+  
+  
+  </svg><text x="372" y="306" text-anchor="middle" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="17" font-weight="700" fill="#33201F">Happy</text><svg x="500" y="68" width="208" height="216" viewBox="56 -10 208 216">
+  <defs>
+    <clipPath id="fzcEyeL-excited"><circle cx="126" cy="98" r="16"/></clipPath>
+    <clipPath id="fzcEyeR-excited"><circle cx="194" cy="98" r="16"/></clipPath>
+  </defs>
+  <g transform="translate(0 -2)">
+    <g transform="rotate(-8 108 52)">
+      <path d="M76 66 L 95 0 L 140 34 Z" fill="#FFD94F"/>
+      <path d="M90 52 L 101 17 L 125 35 Z" fill="#8C2233"/>
+    </g>
+    <g transform="rotate(8 212 52)">
+      <path d="M244 66 L 225 0 L 180 34 Z" fill="#FFD94F"/>
+      <path d="M230 52 L 219 17 L 195 35 Z" fill="#8C2233"/>
+    </g>
+    <circle cx="160" cy="106" r="88" fill="#FFD94F"/>
+    <ellipse cx="160" cy="140" rx="36" ry="25" fill="#FFF4DA"/>
+    <path d="M153 126 L 167 126 L 160 136 Z" fill="#8C2233"/>
+    <g transform="translate(102 126) scale(1.1) translate(-102 -126)"><circle cx="102" cy="126" r="11" fill="#F0A0AC"/></g>
+    <g transform="translate(218 126) scale(1.1) translate(-218 -126)"><circle cx="218" cy="126" r="11" fill="#F0A0AC"/></g>
+    <g transform="translate(160 98) scale(1.04) translate(-160 -98)"><circle cx="126" cy="98" r="16" fill="#33201F"/><g clip-path="url(#fzcEyeL-excited)"><g transform="translate(0 -2)"><circle cx="130.5" cy="92.5" r="5.5" fill="#fff"/><circle cx="121.5" cy="104" r="2.8" fill="#fff" opacity=".7"/></g></g><circle cx="194" cy="98" r="16" fill="#33201F"/><g clip-path="url(#fzcEyeR-excited)"><g transform="translate(0 -2)"><circle cx="198.5" cy="92.5" r="5.5" fill="#fff"/><circle cx="189.5" cy="104" r="2.8" fill="#fff" opacity=".7"/></g></g></g>
+    <g stroke="#33201F" stroke-linecap="round" fill="none"><g transform="translate(0 -4) rotate(0 125 67)"><path d="M115 70 Q 125 63.5 135 66.5" stroke-width="5"/></g><g transform="translate(0 -4) rotate(0 195 67)"><path d="M185 66.5 Q 195 63.5 205 70" stroke-width="5"/></g></g>
+    <path d="M145 146 C 148 162 172 162 175 146 C 165 150 155 150 145 146 Z" fill="#33201F"/>
+    
+  </g>
+  
+  
+  </svg><text x="604" y="306" text-anchor="middle" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="17" font-weight="700" fill="#33201F">Excited</text><svg x="732" y="68" width="208" height="216" viewBox="56 -10 208 216">
+  <defs>
+    <clipPath id="fzcEyeL-curious"><circle cx="126" cy="98" r="16"/></clipPath>
+    <clipPath id="fzcEyeR-curious"><circle cx="194" cy="98" r="16"/></clipPath>
+  </defs>
+  <g transform="translate(4 0)">
+    <g transform="rotate(-10 108 52)">
+      <path d="M76 66 L 95 0 L 140 34 Z" fill="#FFD94F"/>
+      <path d="M90 52 L 101 17 L 125 35 Z" fill="#8C2233"/>
+    </g>
+    <g transform="rotate(4 212 52)">
+      <path d="M244 66 L 225 0 L 180 34 Z" fill="#FFD94F"/>
+      <path d="M230 52 L 219 17 L 195 35 Z" fill="#8C2233"/>
+    </g>
+    <circle cx="160" cy="106" r="88" fill="#FFD94F"/>
+    <ellipse cx="160" cy="140" rx="36" ry="25" fill="#FFF4DA"/>
+    <path d="M153 126 L 167 126 L 160 136 Z" fill="#8C2233"/>
+    <circle cx="102" cy="126" r="11" fill="#F0A0AC"/>
+    <circle cx="218" cy="126" r="11" fill="#F0A0AC"/>
+    <circle cx="126" cy="98" r="16" fill="#33201F"/><g clip-path="url(#fzcEyeL-curious)"><g transform="translate(4 -3)"><circle cx="130.5" cy="92.5" r="5.5" fill="#fff"/><circle cx="121.5" cy="104" r="2.8" fill="#fff" opacity=".7"/></g></g><circle cx="194" cy="98" r="16" fill="#33201F"/><g clip-path="url(#fzcEyeR-curious)"><g transform="translate(4 -3)"><circle cx="198.5" cy="92.5" r="5.5" fill="#fff"/><circle cx="189.5" cy="104" r="2.8" fill="#fff" opacity=".7"/></g></g>
+    <g stroke="#33201F" stroke-linecap="round" fill="none"><g transform="translate(0 -6) rotate(-4 125 67)"><path d="M115 70 Q 125 63.5 135 66.5" stroke-width="5"/></g><g transform="translate(0 0) rotate(0 195 67)"><path d="M185 66.5 Q 195 63.5 205 70" stroke-width="5"/></g></g>
+    <path d="M152 149 C 156 153 164 153 168 149" stroke="#33201F" stroke-width="5" stroke-linecap="round" fill="none"/>
+    
+  </g>
+  
+  
+  </svg><text x="836" y="306" text-anchor="middle" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="17" font-weight="700" fill="#33201F">Curious</text><svg x="964" y="68" width="208" height="216" viewBox="56 -10 208 216">
+  <defs>
+    <clipPath id="fzcEyeL-thinking"><circle cx="126" cy="98" r="16"/></clipPath>
+    <clipPath id="fzcEyeR-thinking"><circle cx="194" cy="98" r="16"/></clipPath>
+  </defs>
+  <g transform="translate(2 -1)">
+    <g transform="rotate(2 108 52)">
+      <path d="M76 66 L 95 0 L 140 34 Z" fill="#FFD94F"/>
+      <path d="M90 52 L 101 17 L 125 35 Z" fill="#8C2233"/>
+    </g>
+    <g transform="rotate(6 212 52)">
+      <path d="M244 66 L 225 0 L 180 34 Z" fill="#FFD94F"/>
+      <path d="M230 52 L 219 17 L 195 35 Z" fill="#8C2233"/>
+    </g>
+    <circle cx="160" cy="106" r="88" fill="#FFD94F"/>
+    <ellipse cx="160" cy="140" rx="36" ry="25" fill="#FFF4DA"/>
+    <path d="M153 126 L 167 126 L 160 136 Z" fill="#8C2233"/>
+    <circle cx="102" cy="126" r="11" fill="#F0A0AC"/>
+    <circle cx="218" cy="126" r="11" fill="#F0A0AC"/>
+    <circle cx="126" cy="98" r="16" fill="#33201F"/><g clip-path="url(#fzcEyeL-thinking)"><g transform="translate(6 -5)"><circle cx="130.5" cy="92.5" r="5.5" fill="#fff"/><circle cx="121.5" cy="104" r="2.8" fill="#fff" opacity=".7"/></g></g><g clip-path="url(#fzcEyeL-thinking)"><circle cx="126" cy="72" r="17" fill="#FFD94F"/></g><circle cx="194" cy="98" r="16" fill="#33201F"/><g clip-path="url(#fzcEyeR-thinking)"><g transform="translate(6 -5)"><circle cx="198.5" cy="92.5" r="5.5" fill="#fff"/><circle cx="189.5" cy="104" r="2.8" fill="#fff" opacity=".7"/></g></g><g clip-path="url(#fzcEyeR-thinking)"><circle cx="194" cy="72" r="17" fill="#FFD94F"/></g>
+    <g stroke="#33201F" stroke-linecap="round" fill="none"><g transform="translate(0 4) rotate(6 125 67)"><path d="M115 70 Q 125 63.5 135 66.5" stroke-width="5"/></g><g transform="translate(0 4) rotate(-6 195 67)"><path d="M185 66.5 Q 195 63.5 205 70" stroke-width="5"/></g></g>
+    <path d="M150 150 L 170 150" stroke="#33201F" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+    
+  </g>
+  
+  <g transform="rotate(96 198 182)"><ellipse cx="198" cy="206" rx="14" ry="30" fill="#FFD94F"/></g>
+  </svg><text x="1068" y="306" text-anchor="middle" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="17" font-weight="700" fill="#33201F">Thinking</text><svg x="1196" y="68" width="208" height="216" viewBox="56 -10 208 216">
+  <defs>
+    <clipPath id="fzcEyeL-confused"><circle cx="126" cy="98" r="16"/></clipPath>
+    <clipPath id="fzcEyeR-confused"><circle cx="194" cy="98" r="16"/></clipPath>
+  </defs>
+  <g transform="translate(-3 0)">
+    <g transform="rotate(8 108 52)">
+      <path d="M76 66 L 95 0 L 140 34 Z" fill="#FFD94F"/>
+      <path d="M90 52 L 101 17 L 125 35 Z" fill="#8C2233"/>
+    </g>
+    <g transform="rotate(8 212 52)">
+      <path d="M244 66 L 225 0 L 180 34 Z" fill="#FFD94F"/>
+      <path d="M230 52 L 219 17 L 195 35 Z" fill="#8C2233"/>
+    </g>
+    <circle cx="160" cy="106" r="88" fill="#FFD94F"/>
+    <ellipse cx="160" cy="140" rx="36" ry="25" fill="#FFF4DA"/>
+    <path d="M153 126 L 167 126 L 160 136 Z" fill="#8C2233"/>
+    <circle cx="102" cy="126" r="11" fill="#F0A0AC"/>
+    <circle cx="218" cy="126" r="11" fill="#F0A0AC"/>
+    <circle cx="126" cy="98" r="16" fill="#33201F"/><g clip-path="url(#fzcEyeL-confused)"><g transform="translate(-3 0)"><circle cx="130.5" cy="92.5" r="5.5" fill="#fff"/><circle cx="121.5" cy="104" r="2.8" fill="#fff" opacity=".7"/></g></g><g clip-path="url(#fzcEyeL-confused)"><circle cx="126" cy="68" r="17" fill="#FFD94F"/></g><circle cx="194" cy="98" r="16" fill="#33201F"/><g clip-path="url(#fzcEyeR-confused)"><g transform="translate(-3 0)"><circle cx="198.5" cy="92.5" r="5.5" fill="#fff"/><circle cx="189.5" cy="104" r="2.8" fill="#fff" opacity=".7"/></g></g><g clip-path="url(#fzcEyeR-confused)"><circle cx="194" cy="68" r="17" fill="#FFD94F"/></g>
+    <g stroke="#33201F" stroke-linecap="round" fill="none"><g transform="translate(0 0) rotate(-10 125 67)"><path d="M115 70 Q 125 63.5 135 66.5" stroke-width="5"/></g><g transform="translate(0 0) rotate(10 195 67)"><path d="M185 66.5 Q 195 63.5 205 70" stroke-width="5"/></g></g>
+    <path d="M147 150 Q 153 145 160 150 Q 167 155 173 150" stroke="#33201F" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+    <path d="M80 72 C 88 84 90 92 90 98 A 10 10 0 1 1 70 98 C 70 92 72 84 80 72 Z" fill="#9CC7E8"/>
+  </g>
+  
+  
+  </svg><text x="1300" y="306" text-anchor="middle" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="17" font-weight="700" fill="#33201F">Confused</text><svg x="1428" y="68" width="208" height="216" viewBox="56 -10 208 216">
+  <defs>
+    <clipPath id="fzcEyeL-encourage"><circle cx="126" cy="98" r="16"/></clipPath>
+    <clipPath id="fzcEyeR-encourage"><circle cx="194" cy="98" r="16"/></clipPath>
+  </defs>
+  <g transform="translate(0 -1)">
+    <g transform="rotate(-6 108 52)">
+      <path d="M76 66 L 95 0 L 140 34 Z" fill="#FFD94F"/>
+      <path d="M90 52 L 101 17 L 125 35 Z" fill="#8C2233"/>
+    </g>
+    <g transform="rotate(6 212 52)">
+      <path d="M244 66 L 225 0 L 180 34 Z" fill="#FFD94F"/>
+      <path d="M230 52 L 219 17 L 195 35 Z" fill="#8C2233"/>
+    </g>
+    <circle cx="160" cy="106" r="88" fill="#FFD94F"/>
+    <ellipse cx="160" cy="140" rx="36" ry="25" fill="#FFF4DA"/>
+    <path d="M153 126 L 167 126 L 160 136 Z" fill="#8C2233"/>
+    <circle cx="102" cy="126" r="11" fill="#F0A0AC"/>
+    <circle cx="218" cy="126" r="11" fill="#F0A0AC"/>
+    <circle cx="126" cy="98" r="16" fill="#33201F"/><g clip-path="url(#fzcEyeL-encourage)"><g transform="translate(0 0)"><circle cx="130.5" cy="92.5" r="5.5" fill="#fff"/><circle cx="121.5" cy="104" r="2.8" fill="#fff" opacity=".7"/></g></g><circle cx="194" cy="98" r="16" fill="#33201F"/><g clip-path="url(#fzcEyeR-encourage)"><g transform="translate(0 0)"><circle cx="198.5" cy="92.5" r="5.5" fill="#fff"/><circle cx="189.5" cy="104" r="2.8" fill="#fff" opacity=".7"/></g></g>
+    <g stroke="#33201F" stroke-linecap="round" fill="none"><g transform="translate(0 -3) rotate(0 125 67)"><path d="M115 70 Q 125 63.5 135 66.5" stroke-width="5"/></g><g transform="translate(0 -3) rotate(0 195 67)"><path d="M185 66.5 Q 195 63.5 205 70" stroke-width="5"/></g></g>
+    <path d="M145 146 C 148 162 172 162 175 146 C 165 150 155 150 145 146 Z" fill="#33201F"/>
+    
+  </g>
+  
+  <g transform="rotate(-90 198 182)"><ellipse cx="198" cy="206" rx="14" ry="30" fill="#FFD94F"/></g>
+  </svg><text x="1532" y="306" text-anchor="middle" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="17" font-weight="700" fill="#33201F">Encouraging</text><svg x="36" y="343" width="208" height="216" viewBox="56 -10 208 216">
+  <defs>
+    <clipPath id="fzcEyeL-proud"><circle cx="126" cy="98" r="16"/></clipPath>
+    <clipPath id="fzcEyeR-proud"><circle cx="194" cy="98" r="16"/></clipPath>
+  </defs>
+  <g transform="translate(0 -2)">
+    <g transform="rotate(-6 108 52)">
+      <path d="M76 66 L 95 0 L 140 34 Z" fill="#FFD94F"/>
+      <path d="M90 52 L 101 17 L 125 35 Z" fill="#8C2233"/>
+    </g>
+    <g transform="rotate(6 212 52)">
+      <path d="M244 66 L 225 0 L 180 34 Z" fill="#FFD94F"/>
+      <path d="M230 52 L 219 17 L 195 35 Z" fill="#8C2233"/>
+    </g>
+    <circle cx="160" cy="106" r="88" fill="#FFD94F"/>
+    <ellipse cx="160" cy="140" rx="36" ry="25" fill="#FFF4DA"/>
+    <path d="M153 126 L 167 126 L 160 136 Z" fill="#8C2233"/>
+    <g transform="translate(102 126) scale(1.1) translate(-102 -126)"><circle cx="102" cy="126" r="11" fill="#F0A0AC"/></g>
+    <g transform="translate(218 126) scale(1.1) translate(-218 -126)"><circle cx="218" cy="126" r="11" fill="#F0A0AC"/></g>
+    <circle cx="126" cy="98" r="16" fill="#33201F"/><g clip-path="url(#fzcEyeL-proud)"><g transform="translate(0 0)"><circle cx="130.5" cy="92.5" r="5.5" fill="#fff"/><circle cx="121.5" cy="104" r="2.8" fill="#fff" opacity=".7"/></g></g><g clip-path="url(#fzcEyeL-proud)"><circle cx="126" cy="70" r="17" fill="#FFD94F"/></g><circle cx="194" cy="98" r="16" fill="#33201F"/><g clip-path="url(#fzcEyeR-proud)"><g transform="translate(0 0)"><circle cx="198.5" cy="92.5" r="5.5" fill="#fff"/><circle cx="189.5" cy="104" r="2.8" fill="#fff" opacity=".7"/></g></g><g clip-path="url(#fzcEyeR-proud)"><circle cx="194" cy="70" r="17" fill="#FFD94F"/></g>
+    
+    <path d="M152 149 C 156 153 164 153 168 149" stroke="#33201F" stroke-width="5" stroke-linecap="round" fill="none"/>
+    
+  </g>
+  
+  
+  </svg><text x="140" y="581" text-anchor="middle" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="17" font-weight="700" fill="#33201F">Proud</text><svg x="268" y="343" width="208" height="216" viewBox="56 -10 208 216">
+  <defs>
+    <clipPath id="fzcEyeL-surprised"><circle cx="126" cy="98" r="16"/></clipPath>
+    <clipPath id="fzcEyeR-surprised"><circle cx="194" cy="98" r="16"/></clipPath>
+  </defs>
+  <g transform="translate(0 -3)">
+    <g transform="rotate(-12 108 52)">
+      <path d="M76 66 L 95 0 L 140 34 Z" fill="#FFD94F"/>
+      <path d="M90 52 L 101 17 L 125 35 Z" fill="#8C2233"/>
+    </g>
+    <g transform="rotate(12 212 52)">
+      <path d="M244 66 L 225 0 L 180 34 Z" fill="#FFD94F"/>
+      <path d="M230 52 L 219 17 L 195 35 Z" fill="#8C2233"/>
+    </g>
+    <circle cx="160" cy="106" r="88" fill="#FFD94F"/>
+    <ellipse cx="160" cy="140" rx="36" ry="25" fill="#FFF4DA"/>
+    <path d="M153 126 L 167 126 L 160 136 Z" fill="#8C2233"/>
+    <circle cx="102" cy="126" r="11" fill="#F0A0AC"/>
+    <circle cx="218" cy="126" r="11" fill="#F0A0AC"/>
+    <g transform="translate(160 98) scale(1.1) translate(-160 -98)"><circle cx="126" cy="98" r="16" fill="#33201F"/><g clip-path="url(#fzcEyeL-surprised)"><g transform="translate(0 0)"><circle cx="130.5" cy="92.5" r="5.5" fill="#fff"/><circle cx="121.5" cy="104" r="2.8" fill="#fff" opacity=".7"/></g></g><circle cx="194" cy="98" r="16" fill="#33201F"/><g clip-path="url(#fzcEyeR-surprised)"><g transform="translate(0 0)"><circle cx="198.5" cy="92.5" r="5.5" fill="#fff"/><circle cx="189.5" cy="104" r="2.8" fill="#fff" opacity=".7"/></g></g></g>
+    <g stroke="#33201F" stroke-linecap="round" fill="none"><g transform="translate(0 -7) rotate(0 125 67)"><path d="M115 70 Q 125 63.5 135 66.5" stroke-width="5"/></g><g transform="translate(0 -7) rotate(0 195 67)"><path d="M185 66.5 Q 195 63.5 205 70" stroke-width="5"/></g></g>
+    <circle cx="160" cy="151" r="6.5" fill="#33201F"/>
+    
+  </g>
+  
+  
+  </svg><text x="372" y="581" text-anchor="middle" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="17" font-weight="700" fill="#33201F">Surprised</text><svg x="500" y="343" width="208" height="216" viewBox="56 -10 208 216">
+  <defs>
+    <clipPath id="fzcEyeL-celebrate"><circle cx="126" cy="98" r="16"/></clipPath>
+    <clipPath id="fzcEyeR-celebrate"><circle cx="194" cy="98" r="16"/></clipPath>
+  </defs>
+  <g transform="translate(0 0)">
+    <g transform="rotate(-10 108 52)">
+      <path d="M76 66 L 95 0 L 140 34 Z" fill="#FFD94F"/>
+      <path d="M90 52 L 101 17 L 125 35 Z" fill="#8C2233"/>
+    </g>
+    <g transform="rotate(10 212 52)">
+      <path d="M244 66 L 225 0 L 180 34 Z" fill="#FFD94F"/>
+      <path d="M230 52 L 219 17 L 195 35 Z" fill="#8C2233"/>
+    </g>
+    <circle cx="160" cy="106" r="88" fill="#FFD94F"/>
+    <ellipse cx="160" cy="140" rx="36" ry="25" fill="#FFF4DA"/>
+    <path d="M153 126 L 167 126 L 160 136 Z" fill="#8C2233"/>
+    <g transform="translate(102 126) scale(1.15) translate(-102 -126)"><circle cx="102" cy="126" r="11" fill="#F0A0AC"/></g>
+    <g transform="translate(218 126) scale(1.15) translate(-218 -126)"><circle cx="218" cy="126" r="11" fill="#F0A0AC"/></g>
+    <g transform="translate(160 98) scale(1.04) translate(-160 -98)"><circle cx="126" cy="98" r="16" fill="#33201F"/><g clip-path="url(#fzcEyeL-celebrate)"><g transform="translate(0 -2)"><circle cx="130.5" cy="92.5" r="5.5" fill="#fff"/><circle cx="121.5" cy="104" r="2.8" fill="#fff" opacity=".7"/></g></g><circle cx="194" cy="98" r="16" fill="#33201F"/><g clip-path="url(#fzcEyeR-celebrate)"><g transform="translate(0 -2)"><circle cx="198.5" cy="92.5" r="5.5" fill="#fff"/><circle cx="189.5" cy="104" r="2.8" fill="#fff" opacity=".7"/></g></g></g>
+    <g stroke="#33201F" stroke-linecap="round" fill="none"><g transform="translate(0 -5) rotate(0 125 67)"><path d="M115 70 Q 125 63.5 135 66.5" stroke-width="5"/></g><g transform="translate(0 -5) rotate(0 195 67)"><path d="M185 66.5 Q 195 63.5 205 70" stroke-width="5"/></g></g>
+    <path d="M145 146 C 148 162 172 162 175 146 C 165 150 155 150 145 146 Z" fill="#33201F"/>
+    
+  </g>
+  <g transform="rotate(115 115 185)"><ellipse cx="115" cy="211" rx="14" ry="30" fill="#FFD94F"/></g>
+  <g transform="rotate(-115 198 182)"><ellipse cx="198" cy="206" rx="14" ry="30" fill="#FFD94F"/></g>
+  </svg><text x="604" y="581" text-anchor="middle" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="17" font-weight="700" fill="#33201F">Celebrating</text><svg x="732" y="343" width="208" height="216" viewBox="56 -10 208 216">
+  <defs>
+    <clipPath id="fzcEyeL-calm"><circle cx="126" cy="98" r="16"/></clipPath>
+    <clipPath id="fzcEyeR-calm"><circle cx="194" cy="98" r="16"/></clipPath>
+  </defs>
+  <g transform="translate(0 0)">
+    <g transform="rotate(4 108 52)">
+      <path d="M76 66 L 95 0 L 140 34 Z" fill="#FFD94F"/>
+      <path d="M90 52 L 101 17 L 125 35 Z" fill="#8C2233"/>
+    </g>
+    <g transform="rotate(-4 212 52)">
+      <path d="M244 66 L 225 0 L 180 34 Z" fill="#FFD94F"/>
+      <path d="M230 52 L 219 17 L 195 35 Z" fill="#8C2233"/>
+    </g>
+    <circle cx="160" cy="106" r="88" fill="#FFD94F"/>
+    <ellipse cx="160" cy="140" rx="36" ry="25" fill="#FFF4DA"/>
+    <path d="M153 126 L 167 126 L 160 136 Z" fill="#8C2233"/>
+    <circle cx="102" cy="126" r="11" fill="#F0A0AC"/>
+    <circle cx="218" cy="126" r="11" fill="#F0A0AC"/>
+    <circle cx="126" cy="98" r="16" fill="#33201F"/><g clip-path="url(#fzcEyeL-calm)"><g transform="translate(0 1)"><circle cx="130.5" cy="92.5" r="5.5" fill="#fff"/><circle cx="121.5" cy="104" r="2.8" fill="#fff" opacity=".7"/></g></g><g clip-path="url(#fzcEyeL-calm)"><circle cx="126" cy="76" r="17" fill="#FFD94F"/></g><circle cx="194" cy="98" r="16" fill="#33201F"/><g clip-path="url(#fzcEyeR-calm)"><g transform="translate(0 1)"><circle cx="198.5" cy="92.5" r="5.5" fill="#fff"/><circle cx="189.5" cy="104" r="2.8" fill="#fff" opacity=".7"/></g></g><g clip-path="url(#fzcEyeR-calm)"><circle cx="194" cy="76" r="17" fill="#FFD94F"/></g>
+    
+    <path d="M152 149 C 156 153 164 153 168 149" stroke="#33201F" stroke-width="5" stroke-linecap="round" fill="none"/>
+    
+  </g>
+  
+  
+  </svg><text x="836" y="581" text-anchor="middle" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="17" font-weight="700" fill="#33201F">Calm</text><svg x="964" y="343" width="208" height="216" viewBox="56 -10 208 216">
+  <defs>
+    <clipPath id="fzcEyeL-sleepy"><circle cx="126" cy="98" r="16"/></clipPath>
+    <clipPath id="fzcEyeR-sleepy"><circle cx="194" cy="98" r="16"/></clipPath>
+  </defs>
+  <g transform="translate(0 2)">
+    <g transform="rotate(10 108 52)">
+      <path d="M76 66 L 95 0 L 140 34 Z" fill="#FFD94F"/>
+      <path d="M90 52 L 101 17 L 125 35 Z" fill="#8C2233"/>
+    </g>
+    <g transform="rotate(-12 212 52)">
+      <path d="M244 66 L 225 0 L 180 34 Z" fill="#FFD94F"/>
+      <path d="M230 52 L 219 17 L 195 35 Z" fill="#8C2233"/>
+    </g>
+    <circle cx="160" cy="106" r="88" fill="#FFD94F"/>
+    <ellipse cx="160" cy="140" rx="36" ry="25" fill="#FFF4DA"/>
+    <path d="M153 126 L 167 126 L 160 136 Z" fill="#8C2233"/>
+    <circle cx="102" cy="126" r="11" fill="#F0A0AC"/>
+    <circle cx="218" cy="126" r="11" fill="#F0A0AC"/>
+    <circle cx="126" cy="98" r="16" fill="#33201F"/><g clip-path="url(#fzcEyeL-sleepy)"><g transform="translate(0 3)"><circle cx="130.5" cy="92.5" r="5.5" fill="#fff"/><circle cx="121.5" cy="104" r="2.8" fill="#fff" opacity=".7"/></g></g><g clip-path="url(#fzcEyeL-sleepy)"><circle cx="126" cy="88" r="17" fill="#FFD94F"/></g><circle cx="194" cy="98" r="16" fill="#33201F"/><g clip-path="url(#fzcEyeR-sleepy)"><g transform="translate(0 3)"><circle cx="198.5" cy="92.5" r="5.5" fill="#fff"/><circle cx="189.5" cy="104" r="2.8" fill="#fff" opacity=".7"/></g></g><g clip-path="url(#fzcEyeR-sleepy)"><circle cx="194" cy="88" r="17" fill="#FFD94F"/></g>
+    
+    <path d="M150 150 L 170 150" stroke="#33201F" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+    
+  </g>
+  
+  
+  </svg><text x="1068" y="581" text-anchor="middle" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="17" font-weight="700" fill="#33201F">Sleepy</text><svg x="1196" y="343" width="208" height="216" viewBox="56 -10 208 216">
+  <defs>
+    <clipPath id="fzcEyeL-welcoming"><circle cx="126" cy="98" r="16"/></clipPath>
+    <clipPath id="fzcEyeR-welcoming"><circle cx="194" cy="98" r="16"/></clipPath>
+  </defs>
+  <g transform="translate(2 -2)">
+    <g transform="rotate(-8 108 52)">
+      <path d="M76 66 L 95 0 L 140 34 Z" fill="#FFD94F"/>
+      <path d="M90 52 L 101 17 L 125 35 Z" fill="#8C2233"/>
+    </g>
+    <g transform="rotate(4 212 52)">
+      <path d="M244 66 L 225 0 L 180 34 Z" fill="#FFD94F"/>
+      <path d="M230 52 L 219 17 L 195 35 Z" fill="#8C2233"/>
+    </g>
+    <circle cx="160" cy="106" r="88" fill="#FFD94F"/>
+    <ellipse cx="160" cy="140" rx="36" ry="25" fill="#FFF4DA"/>
+    <path d="M153 126 L 167 126 L 160 136 Z" fill="#8C2233"/>
+    <g transform="translate(102 126) scale(1.05) translate(-102 -126)"><circle cx="102" cy="126" r="11" fill="#F0A0AC"/></g>
+    <g transform="translate(218 126) scale(1.05) translate(-218 -126)"><circle cx="218" cy="126" r="11" fill="#F0A0AC"/></g>
+    <circle cx="126" cy="98" r="16" fill="#33201F"/><g clip-path="url(#fzcEyeL-welcoming)"><g transform="translate(0 0)"><circle cx="130.5" cy="92.5" r="5.5" fill="#fff"/><circle cx="121.5" cy="104" r="2.8" fill="#fff" opacity=".7"/></g></g><circle cx="194" cy="98" r="16" fill="#33201F"/><g clip-path="url(#fzcEyeR-welcoming)"><g transform="translate(0 0)"><circle cx="198.5" cy="92.5" r="5.5" fill="#fff"/><circle cx="189.5" cy="104" r="2.8" fill="#fff" opacity=".7"/></g></g>
+    <g stroke="#33201F" stroke-linecap="round" fill="none"><g transform="translate(0 -4) rotate(0 125 67)"><path d="M115 70 Q 125 63.5 135 66.5" stroke-width="5"/></g><g transform="translate(0 -4) rotate(0 195 67)"><path d="M185 66.5 Q 195 63.5 205 70" stroke-width="5"/></g></g>
+    <path d="M145 146 C 148 162 172 162 175 146 C 165 150 155 150 145 146 Z" fill="#33201F"/>
+    
+  </g>
+  <g transform="rotate(105 115 185)"><ellipse cx="115" cy="211" rx="14" ry="30" fill="#FFD94F"/></g>
+  
+  </svg><text x="1300" y="581" text-anchor="middle" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="17" font-weight="700" fill="#33201F">Welcoming</text><svg x="1428" y="343" width="208" height="216" viewBox="56 -10 208 216">
+  <defs>
+    <clipPath id="fzcEyeL-concern"><circle cx="126" cy="98" r="16"/></clipPath>
+    <clipPath id="fzcEyeR-concern"><circle cx="194" cy="98" r="16"/></clipPath>
+  </defs>
+  <g transform="translate(-2 1)">
+    <g transform="rotate(9 108 52)">
+      <path d="M76 66 L 95 0 L 140 34 Z" fill="#FFD94F"/>
+      <path d="M90 52 L 101 17 L 125 35 Z" fill="#8C2233"/>
+    </g>
+    <g transform="rotate(-9 212 52)">
+      <path d="M244 66 L 225 0 L 180 34 Z" fill="#FFD94F"/>
+      <path d="M230 52 L 219 17 L 195 35 Z" fill="#8C2233"/>
+    </g>
+    <circle cx="160" cy="106" r="88" fill="#FFD94F"/>
+    <ellipse cx="160" cy="140" rx="36" ry="25" fill="#FFF4DA"/>
+    <path d="M153 126 L 167 126 L 160 136 Z" fill="#8C2233"/>
+    <circle cx="102" cy="126" r="11" fill="#F0A0AC"/>
+    <circle cx="218" cy="126" r="11" fill="#F0A0AC"/>
+    <circle cx="126" cy="98" r="16" fill="#33201F"/><g clip-path="url(#fzcEyeL-concern)"><g transform="translate(-2 1)"><circle cx="130.5" cy="92.5" r="5.5" fill="#fff"/><circle cx="121.5" cy="104" r="2.8" fill="#fff" opacity=".7"/></g></g><g clip-path="url(#fzcEyeL-concern)"><circle cx="126" cy="70" r="17" fill="#FFD94F"/></g><circle cx="194" cy="98" r="16" fill="#33201F"/><g clip-path="url(#fzcEyeR-concern)"><g transform="translate(-2 1)"><circle cx="198.5" cy="92.5" r="5.5" fill="#fff"/><circle cx="189.5" cy="104" r="2.8" fill="#fff" opacity=".7"/></g></g><g clip-path="url(#fzcEyeR-concern)"><circle cx="194" cy="70" r="17" fill="#FFD94F"/></g>
+    <g stroke="#33201F" stroke-linecap="round" fill="none"><g transform="translate(0 2) rotate(-8 125 67)"><path d="M115 70 Q 125 63.5 135 66.5" stroke-width="5"/></g><g transform="translate(0 2) rotate(8 195 67)"><path d="M185 66.5 Q 195 63.5 205 70" stroke-width="5"/></g></g>
+    <path d="M150 152 C 155 148.5 165 148.5 170 152" stroke="#33201F" stroke-width="5" stroke-linecap="round" fill="none"/>
+    
+  </g>
+  
+  
+  </svg><text x="1532" y="581" text-anchor="middle" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="17" font-weight="700" fill="#33201F">Gentle concern</text>
+</svg>

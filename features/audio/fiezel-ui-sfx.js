@@ -1,53 +1,38 @@
 /**
- * FIEZEL — identitas bunyi: motif merek dan SFX transisi.
+ * FIEZEL — identitas bunyi: pustaka SFX terproduksi (27 berkas), pemutar sampel.
  *
- * m025-81 OWNER: "nadanya kurang dapat dan tidak membuat user akan mengingat, karena tidak
- * khas dan tidak bagus."
+ * [ADAPTASI] OA-7 / brief SFX OWNER 2026-08-28: "hapus yang lama semuanya, ganti dengan ini."
+ * Seluruh sintesis WebAudio lama (motif-quotation: mallet/PARTIALS/shimmer/breath/strike,
+ * m025-81..m025-92) DIHAPUS dari berkas ini dan digantikan pemutar sampel untuk 27 berkas
+ * OGG hasil produksi di assets/audio/sfx/ (spesifikasi: pau-redesign/systems/20-sfx-system.md,
+ * mekanika produksi: pau-redesign/sfx/SFX-CONTRACT.md). Motif merek "Ascent & Crown"
+ * (F4→A4→C5→G5) sekarang hidup DI DALAM berkas-berkas itu, bukan di osilator.
  *
- * Versi sebelumnya memakai F4->C5: kuint naik polos, interval paling umum di antarmuka
- * mana pun, dibunyikan dengan sinus murni. Tidak ada kontur, tidak ada ritme, tidak ada
- * timbre - tidak ada yang bisa diingat. Versi ini dirancang dari motif, bukan dari nada
- * lepas, dengan tiga hal yang membuat sebuah motif melekat:
+ * PUTUSAN OWNER (2026-08-28, surat lanjutan):
+ *   1. paw_greet adalah BUNYI TANDA TANGAN FIEZEL - setiap slot "signature"/sapaan/
+ *      pembukaan aplikasi memetakan ke paw_greet (termasuk playMotif() lama).
+ *   2. stamp_thud PENSIUN sebagai pemicu: tidak ada satu pun peristiwa yang membunyikannya.
+ *      Berkasnya tetap dikirim di assets/audio/sfx/ untuk kompatibilitas koreografi splash.
  *
- * 1. KONTUR. Motifnya F4 -> A4 -> D5: terts besar naik, lalu kuart naik; rentang totalnya
- *    sekst besar. Nada penutup D adalah derajat KEENAM dari F mayor, bukan tonika - jadi
- *    ia berbunyi terbuka dan menggantung, seperti kalimat yang belum selesai. Itu disengaja:
- *    aplikasi belajar tidak sedang mengucapkan titik. F dipilih sebagai pusat karena F
- *    adalah huruf mereknya sendiri.
- * 2. RITME TIMPANG. Dua langkah cepat lalu satu pendaratan panjang - "ta-ta-TAAA".
- *    Jarak yang rata terdengar seperti bip; jarak yang timpang bisa ditirukan orang.
- * 3. TIMBRE BERTUBUH. Bukan sinus murni: ada ketukan palu di serangan, harmonik ketiga
- *    yang memberi kesan kayu, satu parsial taklaras untuk kilau logam, lapisan yang sedikit
- *    dilaraskan-lepas untuk kehangatan, dan lengkung nada kecil saat dipukul - seperti bilah
- *    yang benar-benar dipukul, bukan osilator yang dinyalakan.
+ * Yang SENGAJA dipertahankan dari versi lama, karena pelajarannya dibayar mahal:
+ *   - Nama modul, bentuk API publik (play/playMotif/cancelPending/diagnostics/...), dan
+ *     nama-nama bunyi lama sebagai ALIAS - semua pemanggil tetap bekerja tanpa diubah.
+ *   - Sakelar preferensi murid "Suara jawaban" (feedbackSounds) tetap satu-satunya sakelar
+ *     (m025-90): preferencesAllow() membaca state lewat __getFiezelState.
+ *   - m025-84: JANGAN PERNAH menjadwalkan bunyi ke konteks yang belum berjalan. Bunyi yang
+ *     tidak boleh berbunyi sekarang ditolak atau disiagakan dengan tenggat, tidak diantre.
+ *   - m025-88: kurangi-gerak TIDAK membisukan bunyi - ia permintaan tentang GERAKAN.
+ *   - m025-92: sesi audio iOS diklaim sebagai 'playback' SEKALI, sebelum konteks pertama.
  *
- * Setiap SFX transisi adalah POTONGAN dari motif itu, bukan bunyi baru. Jadi seluruh
- * aplikasi terdengar sebagai kutipan dari satu kalimat yang sama.
- *
- * Dua batas yang dijaga:
- * - Preferensi murid dihormati; `feedbackSounds: false` mematikan seluruh modul ini.
- * - Browser memblokir audio sebelum ada sentuhan pengguna. Konteks dibuat malas pada bunyi
- *   pertama dan kegagalan ditelan diam-diam - antarmuka tidak pernah rusak hanya karena
- *   suaranya tidak boleh berbunyi.
- *
- * m025-84 OWNER: "sfx sounds muncul belakangan saat user menekan tombol apapun di menu".
- *
- * Ini bukan bunyi yang dipanggil telat - ini bunyi splash yang TERANTRE, lalu tumpah
- * sekaligus di sentuhan pertama. Mekanismenya persis:
- *
- *   1. Splash memanggil playMotif() tanpa sentuhan pengguna. AudioContext yang lahir di
- *      sana berada dalam keadaan `suspended`.
- *   2. Pada keadaan `suspended`, ctx.currentTime BEKU. schedule() menghitung t0 =
- *      currentTime + 0.005 = 0.005 detik dan memanggil osc.start(0.005).
- *   3. Web Audio tidak membuang jadwal yang lewat - ia menahannya. Motifnya menunggu.
- *   4. Pengguna menekan tombol apa pun di menu. ensureContext() memanggil ctx.resume(),
- *      jam mulai berjalan dari ~0, dan SELURUH motif splash - tiga nada plus sub-bass 1,05
- *      detik - berbunyi di detik itu, di layar yang salah.
- *
- * Perbaikannya satu kalimat: JANGAN PERNAH menjadwalkan ke konteks yang belum berjalan.
- * Bunyi yang tidak bisa berbunyi sekarang tidak diantre - ia ditolak (`false`) atau, khusus
- * motif splash, "disiagakan" dengan tenggat yang terikat pada umur splash lewat windowMs.
- * Lewat tenggat itu ia dibuang. Tidak ada jalan lagi bagi bunyi splash untuk muncul di menu.
+ * Yang baru di pemutar sampel:
+ *   - MANIFEST: 27 nama → {berkas, gain, cooldown, jatah sesi} - nilai penjatahan dibawa
+ *     dari systems/14-voice-sfx.md §3.2 (entrance ≥8 dtk, encourage ≥20 dtk ×2/sesi, dst).
+ *   - fetch → decodeAudioData → cache AudioBuffer, malas per bunyi; empat bunyi
+ *     berfrekuensi tertinggi (answer_correct, answer_wrong, button_tap, xp_gain)
+ *     dipanaskan setelah sentuhan pertama, sisanya menunggu giliran dipanggil.
+ *   - exam_score_tick menaiki playbackRate lewat opsi {rate} - satu aset, bukan tangga berkas.
+ *   - Nama asing: console.warn sekali per nama, lalu diam - antarmuka tidak pernah rusak
+ *     hanya karena bunyinya tidak dikenal.
  */
 (function (root, factory) {
   var api = factory();
@@ -56,9 +41,10 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
 
-  // Koreografi adalah SATU-SATUNYA sumber ritme; lihat features/brand/fiezel-choreography.js
-  // untuk alasan lengkapnya. Dimuat lebih dulu di index.html. Fallback di bawah hanya untuk
-  // lingkungan uji Node yang memuat modul ini sendirian - bukan jalur produksi.
+  // Koreografi tetap SATU-SATUNYA sumber ritme visual splash; tabel ketukannya juga masih
+  // dibaca di sini sebagai METADATA (grid ketukan yang kini tertanam di splash_intro.ogg),
+  // supaya tes koreografi dan pembaca beat grid tidak kehilangan sumbernya. Fallback di
+  // bawah hanya untuk lingkungan uji Node yang memuat modul ini sendirian.
   var CHOREO = (function () {
     try {
       var g = typeof globalThis !== 'undefined' ? globalThis : null;
@@ -73,11 +59,10 @@
   });
 
   /**
-   * Motif merek: akor F mayor add9 yang diurai naik, satu nada per ketukan visual.
-   * Bentuknya [nada, mulai (detik), panjang (detik), peran] - dan ketiganya diturunkan dari
-   * tabel koreografi, tidak ditulis ulang di sini. Panjang tiap nada sengaja MEMBESAR ke
-   * atas: nada rendah dipukul pendek supaya tidak menutupi, nada tinggi dibiarkan
-   * menggantung supaya ekornya masih hidup saat gerakan terakhir selesai.
+   * Grid ketukan splash sebagai data [nada, mulai, panjang, peran] - diturunkan dari tabel
+   * koreografi, tidak ditulis ulang di sini. Ini BUKAN lagi jadwal osilator: berkas
+   * splash_intro.ogg yang membawa bunyinya. Grid ini tinggal sebagai metadata sinkronisasi
+   * (equalizer splash & tes koreografi membacanya).
    */
   function motifFromChoreography() {
     if (!CHOREO || typeof CHOREO.audioBeats !== 'function') {
@@ -88,9 +73,6 @@
     var out = [];
     for (var i = 0; i < beats.length; i++) {
       var b = beats[i];
-      // Setiap nada harus MASIH berbunyi saat gerakan berakhir, ditambah ekor ruang.
-      // Inilah yang menutup 950 milidetik senyap yang dilaporkan owner: bukan dengan
-      // menambah nada, melainkan dengan membiarkan nada yang ada bertahan.
       var dur = Math.max(0.28, (endsAt - b.at) + 0.45);
       out.push([b.freq, b.at, dur, b.role]);
     }
@@ -99,38 +81,107 @@
 
   var MOTIF = Object.freeze(motifFromChoreography());
 
-  // SFX transisi. Semuanya nada dari akor pembuka yang sama, jadi setiap ketukan di dalam
-  // aplikasi terdengar sebagai kutipan dari sapaan pembukanya - bukan bunyi lain yang
-  // kebetulan hidup di produk yang sama.
-  var VOICES = Object.freeze({
-    tap:       [[N.C5, 0.000, 0.15]],                          // kuint akor, nada paling netral
-    toggle:    [[N.F4, 0.000, 0.17]],                          // tonika
-    nav:       [[N.F4, 0.000, 0.20], [N.C5, 0.070, 0.28]],     // tonika -> kuint: gerak
-    open:      [[N.A4, 0.000, 0.20], [N.G5, 0.070, 0.34]],     // terts -> add9: membuka
-    close:     [[N.G5, 0.000, 0.18], [N.A4, 0.070, 0.28]],     // dibalik: menutup
-    celebrate: [[N.F4, 0.000, 0.26], [N.A4, 0.080, 0.26],
-                [N.C5, 0.160, 0.34], [N.G5, 0.250, 0.90]]      // akor penuh, diurai
+  var BASE = './assets/audio/sfx/';
+
+  /**
+   * [ADAPTASI] OI-1: Safari/iOS tidak bisa mendekode Ogg Vorbis, jadi setiap bunyi dikirim
+   * kembar .ogg + .mp3 dan ekstensinya dinegosiasikan SEKALI di sini lewat canPlayType.
+   * OGG tetap format utama (lebih kecil + gapless), MP3 hanya untuk mesin yang mengaku
+   * tidak sanggup OGG tetapi sanggup MP3. Di lingkungan tanpa DOM (tes Node) jawabannya
+   * .ogg - kontrak urlFor() untuk tes berbasis fs tidak berubah.
+   */
+  var EXT = (function () {
+    try {
+      var d = typeof document !== 'undefined' ? document : null;
+      if (d && typeof d.createElement === 'function') {
+        var probe = d.createElement('audio');
+        if (probe && typeof probe.canPlayType === 'function') {
+          var ogg = probe.canPlayType('audio/ogg; codecs="vorbis"');
+          var mp3 = probe.canPlayType('audio/mpeg');
+          if (!ogg && mp3) return '.mp3';
+        }
+      }
+    } catch (_) { /* deteksi gagal = pakai format utama */ }
+    return '.ogg';
+  })();
+
+  /**
+   * Manifest 27 bunyi. `gain` relatif terhadap master (level akhir sudah ditata di master
+   * produksi lewat tangga RMS - lihat 20-sfx-system.md §6 - jadi 1.0 adalah nilai jujur).
+   * `cooldownMs`/`maxPerSession` membawa aturan penjatahan 14 §3.2. `caller` mencatat siapa
+   * yang berhak membunyikannya: 'app' (uiSfx di app.js), 'module' (fitur lain),
+   * 'splash' (koreografi splash), 'preview' (belum punya momen produk - hanya halaman
+   * audisi), 'reserved'/'retired' (tidak dipicu apa pun).
+   */
+  var MANIFEST = Object.freeze({
+    answer_correct:         { gain: 1.0, cooldownMs: 120,   caller: 'app' },
+    answer_correct_perfect: { gain: 1.0, cooldownMs: 120,   caller: 'preview' },
+    answer_wrong:           { gain: 1.0, cooldownMs: 120,   caller: 'app' },
+    answer_wrong_retry:     { gain: 1.0, cooldownMs: 120,   caller: 'preview' },
+    button_tap:             { gain: 1.0, cooldownMs: 50,    caller: 'app' },
+    page_transition:        { gain: 1.0, cooldownMs: 160,   caller: 'app' },
+    error_system:           { gain: 1.0, cooldownMs: 1500,  caller: 'app' },
+    lesson_start:           { gain: 1.0, cooldownMs: 1000,  caller: 'app' },
+    lesson_complete:        { gain: 1.0, cooldownMs: 1500,  caller: 'app' },
+    level_up:               { gain: 1.0, cooldownMs: 3000,  caller: 'preview' },
+    streak_5:               { gain: 1.0, cooldownMs: 1500,  caller: 'app' },
+    streak_10:              { gain: 1.0, cooldownMs: 1500,  caller: 'preview' },
+    xp_gain:                { gain: 1.0, cooldownMs: 80,    caller: 'app' },
+    exam_complete:          { gain: 1.0, cooldownMs: 3000,  caller: 'app' },
+    exam_pass:              { gain: 1.0, cooldownMs: 3000,  caller: 'app' },
+    exam_result_reveal:     { gain: 1.0, cooldownMs: 1500,  caller: 'preview' },
+    exam_score_tick:        { gain: 1.0, cooldownMs: 0,     caller: 'preview' },
+    notif_general:          { gain: 1.0, cooldownMs: 4000,  caller: 'app' },
+    notif_achievement:      { gain: 1.0, cooldownMs: 4000,  caller: 'preview' },
+    notif_streak_reminder:  { gain: 1.0, cooldownMs: 4000,  caller: 'app' },
+    // PUTUSAN OWNER: paw_greet = bunyi tanda tangan. Sekali per sesi cukup - sapaan yang
+    // diulang berhenti terdengar sebagai sapaan.
+    paw_greet:              { gain: 1.0, cooldownMs: 8000,  maxPerSession: 2, caller: 'app' },
+    // Entrance ≥8 dtk antar-bunyi, sekali per mount (14 §3.2) - cooldown yang menjaganya.
+    paw_appear:             { gain: 1.0, cooldownMs: 8000,  caller: 'module' },
+    // Encourage: maksimal 2/sesi, jarak ≥20 dtk (09 §4 / 14 §3.2).
+    paw_encourage:          { gain: 1.0, cooldownMs: 20000, maxPerSession: 2, caller: 'app' },
+    paw_celebrate:          { gain: 1.0, cooldownMs: 3000,  caller: 'app' },
+    splash_intro:           { gain: 1.0, cooldownMs: 3000,  caller: 'splash' },
+    // RESERVED - m025-80: splash tetap tanpa maskot, permanen. Aset ada, pemicunya tidak.
+    splash_paw_appear:      { gain: 1.0, cooldownMs: 8000,  caller: 'reserved' },
+    // PENSIUN sebagai pemicu (putusan OWNER 2026-08-28): tidak ada peristiwa yang
+    // membunyikan stamp_thud lagi; slot hentakan memetakan ke paw_greet. Berkas tetap
+    // dikirim untuk kompatibilitas koreografi splash.
+    stamp_thud:             { gain: 1.0, cooldownMs: 3000,  caller: 'retired' }
   });
 
-  // Susunan parsial satu bilah. Perbandingan inilah yang membuatnya berbunyi berkayu-
-  // berlogam alih-alih seperti bip: [pengali frekuensi, kekerasan, pengali panjang].
-  // 2.76x dan 5.40x sengaja TAKLARAS - itu perbandingan bilah logam yang dipukul, dan
-  // itulah yang membedakan bunyi "mahal" dari osilator yang dinyalakan. Parsial atas
-  // meluruh jauh lebih cepat daripada dasarnya, persis seperti benda nyata.
-  var PARTIALS = [[1.00, 1.00, 1.00], [2.00, 0.30, 0.62],
-                  [2.76, 0.15, 0.34], [3.00, 0.11, 0.44], [5.40, 0.05, 0.16]];
-  var DETUNE = 1.0029;   // +5 sen, lapisan kehangatan
-  var SPREAD = 0.34;     // lebar stereo lapisan laras-lepas
-  var DECAY_FLOOR = 0.015; // exp(-4.2): titik akhir peluruhan eksponensial
+  /**
+   * Nama-nama lama → berkas baru (peta peristiwa 20-sfx-system.md §4 + putusan OWNER).
+   * Pemanggil lama tidak diubah satu pun; alias inilah kabel penyambungnya.
+   */
+  var ALIASES = Object.freeze({
+    tap:       'button_tap',       // ketuk generik
+    toggle:    'button_tap',       // sakelar = ketuk standar (bunyi khusus toggle pensiun)
+    open:      'button_tap',       // buka/tutup panel: cukup ketuk standar (14 §3.1-5)
+    close:     'button_tap',
+    nav:       'page_transition',  // pindah layar → whoosh transisi
+    celebrate: 'lesson_complete',  // akor perayaan lama = fanfare lesson_complete
+    success:   'answer_correct',   // kosakata playFeedbackSound lama
+    error:     'answer_wrong',
+    motif:     'paw_greet'         // slot signature/sapaan → paw_greet (putusan OWNER)
+  });
 
-  var ctx = null, master = null, tailIn = null, noiseBuf = null, enabled = true;
-  // Motif yang menunggu izin audio. { notes, level, opts, expiresAt } - dan expiresAt-lah
-  // yang membuat bug di header tidak bisa terulang: lewat tenggat, ia dibuang.
+  // Empat bunyi berfrekuensi tertinggi: dipanaskan setelah sentuhan pertama supaya jawaban
+  // pertama pun berbunyi tanpa menunggu unduhan. Sisanya malas - dipanggil, baru diambil.
+  var PRELOAD = Object.freeze(['answer_correct', 'answer_wrong', 'button_tap', 'xp_gain']);
+
+  var ctx = null, master = null, enabled = true;
+  var buffers = {};   // nama → AudioBuffer yang sudah didekode
+  var loading = {};   // nama → Promise unduhan yang sedang berjalan
+  var lastPlayedAt = {}, sessionCount = {};
+  var warned = {};
+  // Sapaan signature yang menunggu izin audio (bekas motif splash). expiresAt-lah pagar
+  // yang membuat bug "bunyi splash tumpah di menu" (m025-84) tidak bisa terulang.
   var pending = null;
   var unlockBound = false;
-  // Berapa lama sebuah SFX transisi masih relevan setelah diminta. Sentuhan pertama membuka
-  // audio lewat resume() yang asinkron; menjadwalkan hasilnya setelah jeda ini berarti bunyi
-  // yang tidak lagi menyertai apa pun.
+  var preloaded = false;
+  // Berapa lama sebuah SFX transisi masih relevan setelah diminta (resume() asinkron).
   var GESTURE_GRACE_MS = 350;
   var DEFAULT_MOTIF_WINDOW_MS = 2600;
 
@@ -151,24 +202,10 @@
   }
 
   /**
-   * m025-92: KATEGORI sesi audio, bukan izin audio.
-   *
-   * iOS 16.4+ (termasuk iOS 26 yang dipakai OWNER) memberi halaman kendali atas kategori
-   * sesi audionya lewat `navigator.audioSession`. Bawaan untuk Web Audio adalah **ambient**,
-   * dan kategori itu membawa dua sifat yang salah untuk aplikasi ini: ia ikut dibungkam
-   * saklar senyap fisik, dan ia mengalah kalau aplikasi lain sedang memutar audio.
-   *
-   * FIEZEL bukan audio latar. Suara neural adalah materi belajarnya, umpan balik jawaban
-   * bagian dari penilaian, dan sapaan merek adalah identitasnya - semuanya "playback".
-   *
-   * Ini BUKAN perbaikan untuk keluhan "tidak ada bunyi" pada m025-90; OWNER sudah memastikan
-   * saklar senyapnya MATI saat itu, dan akar keluhan itu memang suara yang tidak punya
-   * pemanggil (#135). Yang diperbaiki di sini adalah kategori yang memang salah sejak awal,
-   * dan yang menggigit pada keadaan yang belum pernah diuji: saklar senyap menyala, atau ada
-   * audio aplikasi lain sedang berjalan.
-   *
-   * Diklaim SEKALI, sebelum konteks pertama dibuat, dan kegagalannya ditelan - peramban yang
-   * belum punya API ini tidak boleh membuat seluruh SFX gagal.
+   * m025-92: KATEGORI sesi audio, bukan izin audio. iOS memberi Web Audio kategori
+   * 'ambient' secara bawaan - ikut dibungkam saklar senyap dan mengalah pada audio lain.
+   * FIEZEL bukan audio latar; kategorinya 'playback'. Diklaim SEKALI, sebelum konteks
+   * pertama dibuat, dan kegagalannya ditelan.
    */
   var audioSessionClaimed = false;
   function claimAudioSession(env) {
@@ -191,186 +228,16 @@
       var Ctx = env.AudioContext || env.webkitAudioContext;
       if (!Ctx) return false;
       ctx = new Ctx();
-
       master = ctx.createGain();
-      master.gain.value = 0.5;
+      master.gain.value = 0.5;   // master 0.5 dipertahankan; tangga kekerasan hidup di master produksi
       master.connect(ctx.destination);
-
-      // Ekor ruang: satu simpul tunda dengan umpan balik teredam. Memberi kesan bilah
-      // dipukul di dalam ruangan, bukan di ruang hampa - itu yang membuatnya terdengar
-      // mahal, dan jauh lebih murah daripada menjadwalkan salinan nada berulang kali.
-      tailIn = ctx.createGain();
-      tailIn.gain.value = 0.42;
-      var delay = ctx.createDelay(0.5);
-      delay.delayTime.value = 0.112;
-      var damp = ctx.createBiquadFilter();
-      damp.type = 'lowpass';
-      damp.frequency.value = 2600;
-      var fb = ctx.createGain();
-      fb.gain.value = 0.38;
-      tailIn.connect(delay);
-      delay.connect(damp);
-      damp.connect(fb);
-      fb.connect(delay);      // lingkar umpan balik
-      delay.connect(master);
-
-      // Derau untuk ketukan palu, dibuat sekali lalu dipakai ulang.
-      var len = Math.floor(ctx.sampleRate * 0.02);
-      noiseBuf = ctx.createBuffer(1, len, ctx.sampleRate);
-      var d = noiseBuf.getChannelData(0), prev = 0;
-      for (var i = 0; i < len; i++) {
-        prev = prev * 0.72 + (Math.random() * 2 - 1) * 0.28; // tapis lolos-bawah sederhana
-        d[i] = prev;
-      }
       return true;
     } catch (_) { return false; }
   }
 
-  /** Ketukan palu: derau sangat pendek. Otak mengenali serangan sebelum mengenali nada. */
-  /** Menyalurkan satu suara ke master lewat panner, kalau browsernya punya. */
-  function pan(node, amount) {
-    try {
-      if (!amount || typeof ctx.createStereoPanner !== 'function') { node.connect(master); return; }
-      var p = ctx.createStereoPanner();
-      p.pan.value = Math.max(-1, Math.min(1, amount));
-      node.connect(p); p.connect(master);
-    } catch (_) { try { node.connect(master); } catch (__) {} }
-  }
-
-  function strike(at, level) {
-    var src = ctx.createBufferSource();
-    src.buffer = noiseBuf;
-    var bp = ctx.createBiquadFilter();
-    bp.type = 'bandpass';
-    bp.frequency.value = 2400;
-    bp.Q.value = 0.9;
-    var g = ctx.createGain();
-    g.gain.setValueAtTime(level, at);
-    g.gain.exponentialRampToValueAtTime(0.0001, at + 0.014);
-    src.connect(bp); bp.connect(g); g.connect(master);
-    src.start(at); src.stop(at + 0.02);
-  }
-
   /**
-   * Napas pembuka: derau yang disaring sangat rendah, naik lalu hilang. Nyaris tidak
-   * terdengar sebagai bunyi - ia terasa sebagai ruangan yang membuka sesaat sebelum nada
-   * pertama. Tanpa ini nada pertama datang dari kesenyapan mutlak dan terdengar "dicolok".
-   */
-  function breath(at, dur, level) {
-    var src = ctx.createBufferSource();
-    src.buffer = noiseBuf;
-    src.loop = true;
-    var lp = ctx.createBiquadFilter();
-    lp.type = 'lowpass';
-    lp.frequency.setValueAtTime(220, at);
-    lp.frequency.exponentialRampToValueAtTime(900, at + dur * 0.7);
-    var g = ctx.createGain();
-    g.gain.setValueAtTime(0.0001, at);
-    g.gain.linearRampToValueAtTime(level, at + dur * 0.45);
-    g.gain.exponentialRampToValueAtTime(0.0001, at + dur);
-    src.connect(lp); lp.connect(g); g.connect(master);
-    src.start(at); src.stop(at + dur + 0.02);
-  }
-
-  /**
-   * Kilau: satu parsial tinggi yang MELUNCUR naik selama sapuan emas di logo berjalan.
-   * Gerakan dan bunyi menempuh arah yang sama pada rentang waktu yang sama - itulah yang
-   * membuat sapuan itu terasa berbunyi, bukan sekadar ditemani bunyi.
-   */
-  function shimmer(freq, at, dur, level) {
-    var osc = ctx.createOscillator(), g = ctx.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(freq * 2, at);
-    osc.frequency.exponentialRampToValueAtTime(freq * 3, at + dur * 0.55);
-    g.gain.setValueAtTime(0.0001, at);
-    g.gain.linearRampToValueAtTime(level, at + 0.05);
-    g.gain.exponentialRampToValueAtTime(0.0001, at + dur);
-    osc.connect(g);
-    pan(g, 0.22);
-    try { g.connect(tailIn); } catch (_) {}
-    osc.start(at); osc.stop(at + dur + 0.05);
-  }
-
-  /** Satu bilah dipukul: lima parsial, dua lapisan laras yang dilebarkan ke kiri-kanan. */
-  function mallet(freq, at, dur, level, spread) {
-    var width = typeof spread === 'number' ? spread : 0;
-    for (var p = 0; p < PARTIALS.length; p++) {
-      var mult = PARTIALS[p][0], amp = PARTIALS[p][1] * level, dscale = PARTIALS[p][2];
-      for (var k = 0; k < 2; k++) {
-        var detune = k ? DETUNE : 1;
-        var a = k ? amp * 0.62 : amp;
-        var d = dur * dscale;
-        if (a < 0.0005) continue;
-        var osc = ctx.createOscillator();
-        var g = ctx.createGain();
-        osc.type = 'sine';
-        var f = freq * mult * detune;
-        // Lengkung nada: mulai ~1,2% di atas lalu turun dalam 40 ms - seperti bilah nyata.
-        osc.frequency.setValueAtTime(f * 1.012, at);
-        osc.frequency.exponentialRampToValueAtTime(f, at + 0.040);
-        g.gain.setValueAtTime(0.0001, at);
-        g.gain.linearRampToValueAtTime(a, at + 0.004);            // serangan cepat
-        g.gain.exponentialRampToValueAtTime(a * DECAY_FLOOR, at + d); // peluruhan eksponensial
-        g.gain.linearRampToValueAtTime(0.0001, at + d + 0.02);
-        osc.connect(g);
-        // Dua lapisan laras dilempar ke sisi berlawanan. Lebar stereo inilah yang paling
-        // murah membuat bunyi terdengar mahal - dan pada mono ia runtuh jadi bunyi yang
-        // sama, jadi tidak ada yang hilang di pengeras suara ponsel.
-        pan(g, k ? width : -width);
-        if (p === 0 && k === 0) g.connect(tailIn);   // hanya dasar yang masuk ekor ruang
-        osc.start(at);
-        osc.stop(at + d + 0.05);
-      }
-    }
-  }
-
-  /**
-   * Menjadwalkan sederet nada. `notes` boleh membawa peran di indeks ke-4; peran itulah
-   * yang memutuskan sebuah ketukan dibunyikan sebagai pukulan, sebagai bobot rendah, atau
-   * sebagai kilau yang meluncur. Tanpa peran, semuanya dipukul biasa - itu jalur SFX
-   * transisi, yang memang harus seragam dan pendek.
-   */
-  function schedule(notes, level, opts) {
-    var t0 = ctx.currentTime + 0.005;
-    var wide = !!(opts && opts.wide);
-    for (var i = 0; i < notes.length; i++) {
-      var freq = notes[i][0], at = t0 + notes[i][1], dur = notes[i][2], role = notes[i][3];
-      var width = wide ? SPREAD * (0.35 + 0.65 * (i / Math.max(1, notes.length - 1))) : 0;
-      if (role === 'sub') {
-        // Jangkar rendah: dipukul pelan, tanpa parsial atas, ditemani napas.
-        mallet(freq, at, dur, level * 0.78, 0);
-        breath(at, Math.min(dur, 0.55), level * 0.10);
-        continue;
-      }
-      if (role === 'shimmer') {
-        mallet(freq, at, dur, level * 0.72, width);
-        shimmer(freq, at, Math.min(dur, 0.9), level * 0.13);
-        strike(at, level * 0.18);
-        continue;
-      }
-      mallet(freq, at, dur, level * (role === 'add9' ? 0.62 : 1), width);
-      // Nada add9 sengaja paling pelan. Ia nada warna, bukan nada pengumuman; kalau
-      // dibunyikan sekeras yang lain, akornya berubah dari "mewah" jadi "ramai".
-      strike(at, level * (role === 'add9' ? 0.16 : 0.30));
-    }
-  }
-
-  /**
-   * m025-88 OWNER (iPhone 12, iOS 26, PWA terpasang): "tidak ada suara sfx yang terdengar",
-   * dengan saklar senyap fisik dalam keadaan MATI.
-   *
-   * Sebabnya baris yang baru saja dihapus dari sini: `if (!ignoreMotion && reducedMotion(env))
-   * return false`. Setiap SFX transisi dibisukan ketika perangkat meminta KURANGI GERAK.
-   *
-   * Itu salah kaprah. `prefers-reduced-motion` adalah permintaan tentang GERAKAN - vestibular,
-   * bukan pendengaran. Ia tidak pernah berarti "matikan suara"; platform punya jalur sendiri
-   * untuk itu (saklar senyap, volume, dan di aplikasi ini sakelar "Suara jawaban"). Menyamakan
-   * keduanya membuat murid yang menyalakan Kurangi Gerak - hal yang lumrah di iOS, dan sering
-   * ikut menyala sendiri di Mode Daya Rendah - kehilangan seluruh umpan balik bunyi tanpa
-   * pernah memintanya, dan tanpa ada tempat untuk mengembalikannya.
-   *
-   * Sekarang bunyi hanya tunduk pada dua hal yang memang berhak memutuskannya: sakelar
-   * preferensi murid, dan izin audio dari browser.
+   * m025-88: bunyi hanya tunduk pada dua hal yang memang berhak memutuskannya - sakelar
+   * preferensi murid dan izin audio browser. Kurangi-gerak TIDAK membisukan bunyi.
    */
   function ready(env, ignoreMotion) {
     if (!enabled) return false;
@@ -378,13 +245,119 @@
     return ensureContext(env);
   }
 
+  function running() { return !!ctx && ctx.state === 'running'; }
+
+  function resumeContext() {
+    try {
+      if (ctx && ctx.state !== 'running' && typeof ctx.resume === 'function') return ctx.resume();
+    } catch (_) { /* resume yang ditolak bukan kegagalan antarmuka */ }
+    return null;
+  }
+
+  function userActivated(env) {
+    try {
+      var ua = env && env.navigator && env.navigator.userActivation;
+      if (ua && typeof ua.hasBeenActive === 'boolean') return ua.hasBeenActive;
+    } catch (_) {}
+    return null;
+  }
+
+  function resolve(name) {
+    var key = ALIASES[name] || name;
+    return MANIFEST[key] ? key : null;
+  }
+
+  function urlFor(name) { return BASE + name + EXT; }
+
+  /** Mengambil dan mendekode satu sampel, sekali; hasil dan janji unduhannya di-cache. */
+  function loadBuffer(env, name) {
+    if (buffers[name]) return Promise.resolve(buffers[name]);
+    if (loading[name]) return loading[name];
+    var fetcher = env && env.fetch ? env.fetch.bind(env) : (typeof fetch === 'function' ? fetch : null);
+    if (!fetcher || !ctx || typeof ctx.decodeAudioData !== 'function') {
+      return Promise.reject(new Error('audio decode tidak tersedia'));
+    }
+    loading[name] = fetcher(urlFor(name))
+      .then(function (r) {
+        if (!r || !r.ok) throw new Error('sfx ' + name + ' gagal diunduh');
+        return r.arrayBuffer();
+      })
+      .then(function (raw) {
+        // decodeAudioData gaya-callback masih dipakai Safari lama; bungkus dua-duanya.
+        return new Promise(function (yes, no) {
+          try {
+            var p = ctx.decodeAudioData(raw, yes, no);
+            if (p && typeof p.then === 'function') p.then(yes, no);
+          } catch (e) { no(e); }
+        });
+      })
+      .then(function (buf) { buffers[name] = buf; delete loading[name]; return buf; })
+      .catch(function (e) { delete loading[name]; throw e; });
+    return loading[name];
+  }
+
+  /** Memanaskan empat bunyi tersibuk. Dipanggil pada sentuhan pertama, sekali. */
+  function preloadHot(env) {
+    if (preloaded || !ctx) return false;
+    preloaded = true;
+    for (var i = 0; i < PRELOAD.length; i++) {
+      try { loadBuffer(env, PRELOAD[i]).catch(function () {}); } catch (_) {}
+    }
+    return true;
+  }
+
+  /** Penjatahan: cooldown antar-bunyi dan jatah per sesi (14 §3.2). */
+  function rationAllows(name) {
+    var m = MANIFEST[name];
+    var t = Date.now();
+    if (m.cooldownMs && lastPlayedAt[name] && t - lastPlayedAt[name] < m.cooldownMs) return false;
+    if (m.maxPerSession && (sessionCount[name] || 0) >= m.maxPerSession) return false;
+    return true;
+  }
+
+  function noteRation(name) {
+    lastPlayedAt[name] = Date.now();
+    sessionCount[name] = (sessionCount[name] || 0) + 1;
+  }
+
+  /** Membunyikan buffer yang SUDAH ada, sekarang. Sumber sekali pakai + gain per bunyi. */
+  function startBuffer(name, opts) {
+    var m = MANIFEST[name];
+    var src = ctx.createBufferSource();
+    src.buffer = buffers[name];
+    if (opts && isFinite(opts.rate) && opts.rate > 0 && src.playbackRate) {
+      try { src.playbackRate.value = opts.rate; } catch (_) {}
+    }
+    var g = ctx.createGain();
+    g.gain.value = (m.gain || 1) * (opts && isFinite(opts.gain) ? opts.gain : 1);
+    src.connect(g);
+    g.connect(master);
+    src.start(ctx.currentTime);
+    return true;
+  }
+
   /**
-   * Keadaan nyata modul ini di perangkat, untuk dibaca lewat panel Diagnostics.
-   *
-   * Ini ada karena satu putaran penuh terbuang untuk menebak kenapa perangkat OWNER bisu:
-   * saklar senyap iOS tidak bisa dideteksi dari web, dan tanpa pembacaan di perangkat
-   * satu-satunya cara maju adalah menanyai pemiliknya satu per satu. Yang bisa dilihat,
-   * sekarang bisa dilihat.
+   * Jalur pemutaran inti. Buffer yang belum ada diambil dulu, lalu dibunyikan HANYA kalau
+   * masih dalam jendela relevansinya - bunyi transisi yang datang telat bukan bunyi,
+   * melainkan gangguan (pelajaran m025-84/-90).
+   */
+  function trigger(env, name, opts, windowMs) {
+    if (!rationAllows(name)) return false;
+    noteRation(name);
+    var deadline = Date.now() + (isFinite(windowMs) ? windowMs : GESTURE_GRACE_MS);
+    if (buffers[name]) {
+      try { return startBuffer(name, opts); } catch (_) { return false; }
+    }
+    loadBuffer(env, name).then(function () {
+      if (!running() || Date.now() > deadline) return;
+      try { startBuffer(name, opts); } catch (_) {}
+    }, function () { /* unduhan gagal = senyap, bukan antarmuka rusak */ });
+    return true;
+  }
+
+  /**
+   * Keadaan nyata modul ini di perangkat, untuk dibaca lewat panel Diagnostics (m025-90:
+   * yang bisa dilihat, sekarang bisa dilihat).
    */
   function diagnostics(env) {
     var target = env || (typeof globalThis !== 'undefined' ? globalThis : {});
@@ -399,9 +372,9 @@
       // Tidak bisa dideteksi dari web sama sekali; ditulis eksplisit supaya pembacanya tahu
       // ini titik buta, bukan sesuatu yang lupa diperiksa.
       saklarSenyapIOS: 'tidak dapat dideteksi dari web',
-      // m025-92: kategori sesi BISA dibaca, tidak seperti saklar senyap. Kalau di perangkat
-      // ia terbaca 'ambient' padahal sudah diklaim, artinya peramban menolak klaimnya - dan
-      // itu keterangan yang jauh lebih berguna daripada menebak lagi.
+      sampelSiap: Object.keys(buffers).length,
+      sampelTotal: Object.keys(MANIFEST).length,
+      // m025-92: kategori sesi BISA dibaca, tidak seperti saklar senyap.
       sesiAudio: (function () {
         try {
           var s = target.navigator && target.navigator.audioSession;
@@ -412,33 +385,10 @@
     return out;
   }
 
-  /** Satu-satunya keadaan di mana menjadwalkan bunyi berarti membunyikannya sekarang. */
-  function running() { return !!ctx && ctx.state === 'running'; }
-
-  function resumeContext() {
-    try {
-      if (ctx && ctx.state !== 'running' && typeof ctx.resume === 'function') return ctx.resume();
-    } catch (_) { /* resume yang ditolak bukan kegagalan antarmuka */ }
-    return null;
-  }
-
   /**
-   * Apakah dokumen ini pernah disentuh pengguna. Kalau jawabannya pasti "belum", membuat
-   * AudioContext hanya melahirkan konteks `suspended` - persis benda yang bug di header
-   * tumbuh di dalamnya. Browser tanpa API ini menjawab null: kita tidak menebak.
-   */
-  function userActivated(env) {
-    try {
-      var ua = env && env.navigator && env.navigator.userActivation;
-      if (ua && typeof ua.hasBeenActive === 'boolean') return ua.hasBeenActive;
-    } catch (_) {}
-    return null;
-  }
-
-  /**
-   * Memasang pembuka audio sekali pakai pada sentuhan pertama di dokumen. Fase CAPTURE
-   * dipakai supaya ia berjalan sebelum handler tombol aplikasi: dengan begitu SFX tombol
-   * pertama pun punya peluang berbunyi, bukan hanya tombol kedua dan seterusnya.
+   * Pembuka audio sekali pakai pada sentuhan pertama. Fase CAPTURE supaya berjalan sebelum
+   * handler tombol aplikasi - SFX tombol pertama pun punya peluang berbunyi. Sentuhan
+   * pertama juga memanaskan empat bunyi tersibuk.
    */
   function bindUnlock(env) {
     if (unlockBound) return;
@@ -448,6 +398,7 @@
     var types = ['pointerdown', 'touchend', 'mousedown', 'keydown'];
     function unlock() {
       if (!ensureContext(env)) { detach(); return; }
+      preloadHot(env);
       var p = resumeContext();
       if (p && typeof p.then === 'function') p.then(function () { firePending(env); }, function () {});
       else firePending(env);
@@ -466,17 +417,12 @@
 
   function now() { return Date.now(); }
 
-  /** Menyiagakan motif dengan TENGGAT. Tanpa tenggat ini, ia jadi bunyi liar di menu. */
+  /** Menyiagakan sapaan signature dengan TENGGAT. Lewat tenggat, ia dibuang (m025-84). */
   function armMotif(env, windowMs) {
-    pending = { notes: MOTIF, level: 0.52, opts: { wide: true }, expiresAt: now() + windowMs };
+    pending = { env: env, expiresAt: now() + windowMs };
     bindUnlock(env);
   }
 
-  /**
-   * Membunyikan motif yang disiagakan, kalau masih dalam tenggat DAN audio benar-benar
-   * sudah berjalan. Di luar itu ia dibuang - tidak pernah ditunda lagi ke kesempatan
-   * berikutnya, karena "kesempatan berikutnya" itulah bug yang diperbaiki di sini.
-   */
   function firePending(env) {
     if (!pending) return false;
     if (now() > pending.expiresAt) { pending = null; return false; }
@@ -484,41 +430,43 @@
     if (!running()) { resumeContext(); return false; }
     var armed = pending;
     pending = null;
-    try { schedule(armed.notes, armed.level, armed.opts); return true; }
+    var msLeft = Math.max(200, armed.expiresAt - now());
+    try { return trigger(env, ALIASES.motif, null, msLeft); }
     catch (_) { return false; }
   }
 
-  /** Membuang motif yang disiagakan. Dipanggil splash saat menutup. */
+  /** Membuang sapaan yang disiagakan. Dipanggil splash saat menutup. */
   function cancelPending() { pending = null; return true; }
 
   /**
-   * Membunyikan satu SFX transisi. Selalu aman dipanggil: nama asing, audio terblokir,
-   * preferensi mati, atau kurangi-gerak semuanya berakhir sebagai `false`.
+   * Membunyikan satu SFX. Selalu aman dipanggil: nama asing (warn sekali + diam), audio
+   * terblokir, atau preferensi mati semuanya berakhir sebagai `false`.
+   * opts: { rate, gain } - rate dipakai exam_score_tick untuk tangga nada count-up.
    */
-  function play(name, env) {
+  function play(name, env, opts) {
     var target = env || (typeof globalThis !== 'undefined' ? globalThis : {});
-    var voice = VOICES[name];
-    if (!voice) return false;
-    // Kurangi-gerak adalah permintaan untuk lebih sedikit kejutan sensorik; bunyi transisi
-    // termasuk di dalamnya.
-    if (!ready(target, false)) return false;
-    // OWNER: "sfx saat menekan tombol itu terlalu keras, turunkan 70%". Level lama 0.34
-    // dikali 0.3 (turun 70%, sisa 30%) - motif pembuka splash TIDAK ikut turun, sebab
-    // keluhannya khusus soal SFX tekan tombol yang terus-menerus terdengar tiap ketukan,
-    // bukan sapaan satu kali di splash.
-    if (running()) {
-      try { schedule(voice, 0.102); return true; } catch (_) { return false; }
+    var key = resolve(name);
+    if (!key) {
+      if (!warned[name]) {
+        warned[name] = true;
+        try { console.warn('[FiezelUiSfx] bunyi tidak dikenal: "' + name + '" - tidak ada di manifest 27 SFX'); } catch (_) {}
+      }
+      return false;
     }
-    // Konteks belum berjalan: menjadwalkan di sini berarti menitipkan bunyi ke masa depan
-    // yang tidak diketahui. Yang dilakukan hanyalah membuka audio, lalu membunyikan voice
-    // ini HANYA kalau izinnya turun dalam hitungan milidetik - selebihnya bunyi ini hilang,
-    // dan itu jawaban yang benar untuk sebuah SFX transisi.
+    if (!ready(target, false)) return false;
+    if (running()) {
+      preloadHot(target);
+      return trigger(target, key, opts, buffers[key] ? 0 : 1200);
+    }
+    // Konteks belum berjalan: buka audio, lalu bunyikan HANYA kalau izinnya turun dalam
+    // hitungan milidetik - selebihnya bunyi ini hilang, dan itu jawaban yang benar untuk
+    // sebuah SFX transisi.
     var deadline = now() + GESTURE_GRACE_MS;
     var resumed = resumeContext();
     if (resumed && typeof resumed.then === 'function') {
       resumed.then(function () {
         if (!running() || now() > deadline) return;
-        try { schedule(voice, 0.102); } catch (_) {}
+        try { trigger(target, key, opts, GESTURE_GRACE_MS); } catch (_) {}
       }, function () {});
     }
     bindUnlock(target);
@@ -526,13 +474,13 @@
   }
 
   /**
-   * Motif merek penuh untuk splash. Berbunyi juga saat kurangi-gerak aktif: ini sapaan
-   * sekali per peluncuran, bukan bunyi berulang, dan ia menggantikan animasi yang justru
-   * dimatikan di modus itu.
+   * Sapaan merek untuk splash (API lama dipertahankan; fiezel-splash.js memanggil ini).
+   * PUTUSAN OWNER: slot signature/sapaan = paw_greet. Berbunyi juga saat kurangi-gerak
+   * aktif: ini sapaan sekali per peluncuran, bukan bunyi berulang.
    *
-   * `options.windowMs` adalah umur splash yang memanggilnya. Di dalam jendela itu motif
-   * boleh menunggu izin audio; di luarnya ia dibuang. Itulah pagar yang membuat motif
-   * splash tidak bisa lagi muncul sebagai kejutan di layar menu.
+   * `options.windowMs` adalah umur splash yang memanggilnya. Di dalam jendela itu sapaan
+   * boleh menunggu izin audio; di luarnya ia dibuang - pagar yang membuat bunyi splash
+   * tidak bisa muncul sebagai kejutan di layar menu (m025-84).
    */
   function playMotif(env, options) {
     var target = env || (typeof globalThis !== 'undefined' ? globalThis : {});
@@ -542,13 +490,13 @@
     cancelPending();
     if (!enabled) return false;
     if (!preferencesAllow(target)) return false;
-    // Dokumen yang belum pernah disentuh PASTI diblokir. Konteksnya tidak dibuat sama
-    // sekali di sini - hanya disiagakan sampai sentuhan pertama, atau sampai tenggatnya
-    // lewat, mana yang lebih dulu.
+    // Dokumen yang belum pernah disentuh PASTI diblokir: hanya disiagakan sampai sentuhan
+    // pertama, atau sampai tenggatnya lewat, mana yang lebih dulu.
     if (userActivated(target) === false) { armMotif(target, windowMs); return false; }
     if (!ensureContext(target)) return false;
     if (running()) {
-      try { schedule(MOTIF, 0.52, { wide: true }); return true; }
+      preloadHot(target);
+      try { return trigger(target, ALIASES.motif, null, windowMs); }
       catch (_) { return false; }
     }
     armMotif(target, windowMs);
@@ -557,15 +505,29 @@
     return false;
   }
 
+  /** Membuka audio + memanaskan bunyi tersibuk. Untuk pembuka gestur milik app.js. */
+  function unlock(env) {
+    var target = env || (typeof globalThis !== 'undefined' ? globalThis : {});
+    if (!ready(target, false)) return false;
+    resumeContext();
+    preloadHot(target);
+    return true;
+  }
+
   function setEnabled(v) { enabled = v !== false; return enabled; }
 
   return {
     NOTES: N,
     MOTIF: MOTIF,
-    VOICES: VOICES,
-    names: function () { return Object.keys(VOICES); },
+    MANIFEST: MANIFEST,
+    ALIASES: ALIASES,
+    PRELOAD: PRELOAD,
+    baseUrl: function () { return BASE; },
+    urlFor: function (name) { var k = resolve(name); return k ? urlFor(k) : null; },
+    names: function () { return Object.keys(MANIFEST); },
     play: play,
     playMotif: playMotif,
+    unlock: unlock,
     cancelPending: cancelPending,
     diagnostics: diagnostics,
     pendingMotif: function () { return pending ? { expiresAt: pending.expiresAt } : null; },
@@ -573,6 +535,10 @@
     setEnabled: setEnabled,
     isEnabled: function () { return enabled; },
     // Hanya untuk pengujian: mengembalikan modul ke keadaan sebelum konteks apa pun dibuat.
-    __reset: function () { ctx = null; master = null; tailIn = null; noiseBuf = null; pending = null; unlockBound = false; enabled = true; audioSessionClaimed = false; }
+    __reset: function () {
+      ctx = null; master = null; pending = null; unlockBound = false; enabled = true;
+      audioSessionClaimed = false; buffers = {}; loading = {}; lastPlayedAt = {};
+      sessionCount = {}; warned = {}; preloaded = false;
+    }
   };
 });

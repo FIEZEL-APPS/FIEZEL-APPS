@@ -115,3 +115,26 @@ Versi protokol ini: v1.2 (2026-08-14). v1.1: Agent 5 ditetapkan sebagai Main Coo
 FIEZEL-Orkestrasi-Protokol-Pelengkap.md ditetapkan sebagai bacaan wajib (scope-lock,
 context-injection, checklist verifier 6 poin, kriteria selesai). Perubahan
 protokol hanya oleh Coordinator dengan persetujuan Owner.
+---
+
+## Penegakan mesin (ditambahkan 28 Agu 2026 oleh sesi MASTER)
+
+Protokol di atas berlaku sejak v1.2 dan tetap dilanggar: dalam satu malam dua jalur kerja
+bertabrakan LIMA KALI soal nomor build. Aturan yang tidak ditegakkan alat bukan aturan.
+Tiga penegak berikut sekarang berjalan di CI:
+
+1. **`node tools/bump-build.mjs "<alasan>"`** — satu-satunya cara menaikkan nomor build.
+   Jangan pernah mengetik nomor ke `sw.js`, `core-config.js`, atau `fiezel-diag-panel.js`.
+   Tabrakan versi sekarang jatuh di `coordination/BUILD-VERSION.json` (8 baris), bukan di
+   `sw.js`/`style.css`.
+2. **`coordination/CLAIMS.json`** — klaim path SEBELUM menulis; pindahkan ke `finished` setelah
+   merge. `coordination-guard-test.js` merah kalau dua sesi mengklaim path yang sama, kalau ada
+   klaim serakah (`.`), kalau ada penanda konflik ter-commit, atau kalau versi tidak selaras.
+3. **`gate-registry-test.js`** — berkas uji wajib terdaftar di `quality.yml` atau dikecualikan
+   dengan alasan tertulis. Gerbang yang tidak terdaftar tidak pernah merah.
+
+Prosedur tabrakan (**P10**) dan keadaan terkini ada di **`MASTER-BROADCAST.md`**. Baca itu
+setelah setiap `git fetch`.
+
+Satu jebakan yang memerahkan CI malam ini dan tidak terlihat kalau kamu hanya menjalankan
+gerbang node: langkah **`python3 release-audit.py`**. Jalankan itu juga sebelum push.
