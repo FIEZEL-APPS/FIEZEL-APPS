@@ -247,10 +247,30 @@ check('Aturan: server hanya bisa MEMATIKAN, tidak bisa MENYALAKAN',
   /hanya bisa MEMATIKAN/.test(plan), 'server hanya mematikan');
 check('Aturan: satu rilis satu endpoint',
   /[Ss]atu rilis,? satu endpoint/.test(plan), 'satu rilis satu endpoint');
-check('core-config.js repo masih SEMUA off (rencana belum dieksekusi diam-diam)',
-  /enabled:false/.test(coreConfig) && /base:''/.test(coreConfig)
-  && !/(?:health|config|auth|quota|ai|tts|usage):'(?:on|shadow)'/.test(coreConfig),
-  'FIEZEL_CF_CONFIG');
+/* A6 (28 Agu 2026) — assert ini DIUBAH, dan alasannya wajib dibaca sebelum menilai:
+ *
+ * Bentuk lama: "core-config.js repo masih SEMUA off", penjaga agar rencana tidak dieksekusi
+ * diam-diam. Masalahnya rencana yang dijaganya berbunyi "penyalaan lewat KV, bukan lewat
+ * core-config.js" + "server hanya bisa MEMATIKAN". Dua aturan itu bersama-sama TIDAK BISA
+ * menghasilkan penyalaan pertama: selama flag statis 'off', `cfStaticMode()` menjawab 'off'
+ * dan nilai KV apa pun tidak akan pernah dibaca — app.js bahkan tidak memasang timernya.
+ * Jadi penyalaan pertama HARUS satu kali lewat core-config.js; sesudah itu barulah KV
+ * menjadi sakelar mati-hidup yang sebenarnya. Ini dicatat sebagai kontradiksi rencana di
+ * reports/work-a6-client-switch.md, bukan disembunyikan.
+ *
+ * Yang tetap dijaga: penyalaan tidak boleh MELAMPAUI tahap yang disetujui. Tahap 1 =
+ * analytics (usage) + kill switch server (config). ai/tts — satu-satunya yang membelanjakan
+ * uang — wajib masih off, dan tiga sisanya juga. */
+const A6_HIDUP = ['config', 'usage'];
+const hidupDiRepo = (coreConfig.match(/(health|config|auth|quota|ai|tts|usage):'(?:on|shadow)'/g) || [])
+  .map(s => s.split(':')[0]);
+check('core-config.js repo tidak melampaui tahap rilis yang disetujui (A6 tahap 1: config+usage)',
+  hidupDiRepo.every(k => A6_HIDUP.includes(k)),
+  `hidup=${hidupDiRepo.join(',') || '0'}`);
+check('core-config.js repo: ai/tts masih off (nol rupiah dibelanjakan tanpa keputusan owner)',
+  /ai:'off'/.test(coreConfig) && /tts:'off'/.test(coreConfig)
+  && !/(?:ai|tts):'(?:on|shadow)'/.test(coreConfig),
+  'FIEZEL_CF_CONFIG ai/tts');
 
 /* =======================================================================================
  * 6. Kriteria BERHENTI TOTAL, termasuk yang menyangkut murid
