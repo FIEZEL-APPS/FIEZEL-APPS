@@ -595,6 +595,7 @@ jobs:
           node item-calibration-test.js
           node speaking-adaptive-test.js
           node srl-coach-test.js
+          node cors-envelope-test.js
       - name: 'Gerbang simulasi adaptivitas v3 (gate yatim CI — temuan D1, wave D)'
         # adaptivity-simulation-v3.js adalah gate sungguhan (exit code dari main();
         # gate residual + gate kalibrasi bisa merah), tetapi namanya lolos dari pola
