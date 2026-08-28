@@ -1,7 +1,7 @@
 {
-  "version": "m025-182",
+  "version": "m025-184",
   "claimedBy": "perplexity-computer (braincore session, T-027)",
-  "claimedAt": "2026-08-28T12:23:16.300Z",
-  "reason": "splash-sfx zero-gesture: shell berubah (app.js, fiezel-ui-sfx.js, fiezel-splash.js) - revisi naik agar PWA terpasang mengunduh ulang cangkang",
+  "claimedAt": "2026-08-28T15:56:36.881Z",
+  "reason": "splash-sfx zero-gesture di atas m025-183",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
