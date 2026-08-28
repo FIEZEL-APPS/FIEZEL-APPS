@@ -748,6 +748,253 @@ const statsRows = renderRows(statsSchema);
   check('dokumen_backup_menyatakan_urutan_pemulihan', iCore > 0 && iStats > iCore, { posisi_core: iCore, posisi_stats: iStats });
 }
 
+/* ================================================================================================
+   BAGIAN D2q: kontrak DASHBOARD OWNER (workers/owner/queries.js) vs DDL migrasi
+
+   Mengapa bagian ini ada DI SINI dan bukan gerbang baru:
+   berkas ini SUDAH memiliki parser DDL independen (schemaFromMigrations/statements/splitTop) dan
+   sudah memegang tanggung jawab "SQL di kode vs DDL migrasi" untuk workers/api/. Yang hilang
+   hanyalah CAKUPANNYA: pemindaiannya berhenti di API_DIR, sehingga workers/owner/ bisa memuat
+   kueri untuk skema yang tidak pernah ada dan seluruh gerbang tetap hijau. Itulah yang terjadi.
+   Menaruh pemeriksaan ini di owner-dashboard-test.js akan memaksa parser DDL KEDUA di repo yang
+   sama, dan dua parser yang boleh berbeda pendapat tentang bentuk tabel adalah cara paling rapi
+   untuk kehilangan kepercayaan pada keduanya. Cakupan pemindaian API_DIR yang lama TIDAK diubah;
+   bagian ini murni tambahan.
+
+   Tanpa jaringan: DDL dibaca dari berkas migrasi, kueri dibaca dari berkas sumber.
+   ============================================================================================== */
+
+const OWNER_QUERIES = path.join(REPO, 'workers', 'owner', 'queries.js');
+
+// Lima tabel yang benar-benar ada di fiezel-stats. Dikunci di sini SEBAGAI ANGKA, bukan sebagai
+// daftar yang diambil dari kode owner, supaya menambah tabel tidak bisa lolos hanya karena kode
+// owner ikut diubah. `analytics-privacy-test.js` mengunci sisi database; ini mengunci sisi kueri.
+const STATS_TABLES_EXPECTED = ['dau_dedup', 'metrics_daily', 'pepper_state', 'retention_daily', 'usage_daily'];
+
+// Tabel yang boleh DIBACA dashboard owner: hanya yang agregat. `dau_dedup` (token per-perangkat)
+// dan `pepper_state` (bahan rahasia HMAC) ada di database yang sama dan justru karena itu harus
+// dilarang eksplisit.
+const OWNER_READABLE = ['metrics_daily', 'usage_daily', 'retention_daily'];
+
+// Kata kunci SQL + nama fungsi. Token di luar daftar ini WAJIB berupa nama tabel, alias, atau
+// kolom yang benar-benar ada di DDL.
+const SQL_WORDS = new Set(('select from where group by order asc desc limit offset as and or not in '
+  + 'between is null on distinct count sum max min avg coalesce cast integer text real case when '
+  + 'then else end having union all left join inner outer nullif abs round').split(' '));
+
+// Komentar JS WAJIB dibuang lebih dulu: komentar di queries.js memuat backtick (mis. nama tabel
+// dalam kutipan miring), dan backtick itu berpasangan dengan backtick kode sehingga ekstraksi
+// literal ikut bergeser dan sebagian kueri lolos dari pemindaian tanpa ada yang sadar.
+function stripJsComments(src) {
+  return src.replace(/^[ \t]*\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '');
+}
+
+function ownerQuerySql() {
+  if (!fs.existsSync(OWNER_QUERIES)) return null;
+  // joinConcatenatedLiterals() TIDAK dipakai di sini: ia menyambung pasangan kutip yang
+  // bersebelahan, dan pada berkas ini efeknya menelan tiga kueri utuh (10 → 7). Gantinya,
+  // penyambungan string dilarang eksplisit oleh pemeriksaan `owner_queries_tanpa_sambung_string`
+  // di bawah, sehingga tidak ada SQL yang bisa disembunyikan lewat konkatenasi.
+  const src = stripJsComments(fs.readFileSync(OWNER_QUERIES, 'utf8'));
+  const out = [];
+  const re = /(`(?:[^`\\]|\\.)*`|'(?:[^'\\\n]|\\.)*'|"(?:[^"\\\n]|\\.)*")/g;
+  let m;
+  while ((m = re.exec(src))) {
+    const body = m[1].slice(1, -1);
+    if (/\bSELECT\b/i.test(body) && /\bFROM\b/i.test(body)) out.push(norm(body));
+  }
+  return out;
+}
+
+{
+  const sqls = ownerQuerySql();
+  check('owner_queries_terbaca', Array.isArray(sqls) && sqls.length >= 10, {
+    berkas: 'workers/owner/queries.js', jumlah_kueri: sqls ? sqls.length : 0,
+    catatan: 'Nol kueri terbaca berarti pemindai ini buta, bukan berarti kuerinya benar.'
+  });
+
+  // SQL wajib berupa satu literal utuh. Kalau dirakit dari potongan string, pemindai token di
+  // bawah hanya melihat pecahannya dan bisa mengaku hijau atas kueri yang tidak pernah ia baca.
+  {
+    const raw = fs.existsSync(OWNER_QUERIES) ? stripJsComments(fs.readFileSync(OWNER_QUERIES, 'utf8')) : '';
+    // Hanya literal yang BERISI SQL yang dilarang disambung. Kalimat penjelasan panjang di
+    // katalog UNMEASURABLE memang disambung antar baris dan itu tidak mengganggu pemindai SQL.
+    const sambung = [...raw.matchAll(/(['"`])([^'"`\n]*)\1\s*\+\s*(['"`])/g)]
+      .filter((m) => /\b(SELECT|FROM|WHERE|GROUP\s+BY|ORDER\s+BY)\b/i.test(m[2]))
+      .map((m) => m[0].slice(0, 80));
+    check('owner_queries_tanpa_sambung_string', sambung.length === 0, {
+      temuan: sambung,
+      alasan: 'SQL yang dirakit dari potongan string tidak bisa diverifikasi utuh oleh pemindai '
+        + 'ini; satu literal per kueri adalah prasyarat agar gerbang ini bermakna.'
+    });
+  }
+
+  // Kunci #0: parser DDL benar-benar melihat lima tabel stats. Kalau tidak, semua kesimpulan di
+  // bawah dibangun di atas skema yang tidak lengkap.
+  const statsFound = [...statsSchema.tables.keys()].sort();
+  check('skema_stats_tepat_lima_tabel',
+    statsFound.join(',') === STATS_TABLES_EXPECTED.join(','), {
+      diharapkan: STATS_TABLES_EXPECTED, ditemukan: statsFound,
+      otoritas: 'workers/api/migrations/0002_analytics.sql'
+    });
+
+  const bentuk = {};
+  for (const t of STATS_TABLES_EXPECTED) {
+    const def = statsSchema.tables.get(t);
+    bentuk[t] = def ? def.columns : null;
+  }
+
+  if (sqls && sqls.length) {
+    // Kunci #1: NOL rujukan tabel di luar tiga tabel agregat.
+    const refTables = new Map();
+    for (const sql of sqls) {
+      const re = /\b(?:FROM|JOIN|INTO|UPDATE)\s+([A-Za-z_]\w*)/gi;
+      let m;
+      while ((m = re.exec(sql))) {
+        const t = m[1].toLowerCase();
+        if (!refTables.has(t)) refTables.set(t, sql.slice(0, 90));
+      }
+    }
+    const luar = [...refTables.keys()].filter((t) => !OWNER_READABLE.includes(t));
+    check('owner_queries_nol_tabel_di_luar_tiga_agregat', luar.length === 0, {
+      boleh_dibaca: OWNER_READABLE, dirujuk: [...refTables.keys()].sort(),
+      pelanggaran: luar.map((t) => ({ tabel: t, kueri: refTables.get(t) })),
+      alasan: 'Tabel di luar daftar ini tidak ada di migrasi, atau ada tetapi memuat token '
+        + 'per-perangkat / bahan rahasia yang tidak boleh dibaca dashboard.'
+    });
+
+    // Kunci #2: setiap tabel yang dirujuk BENAR-BENAR ada di DDL stats.
+    const tabelHantu = [...refTables.keys()].filter((t) => !statsSchema.tables.has(t));
+    check('owner_queries_tabel_ada_di_ddl', tabelHantu.length === 0, {
+      tabel_tidak_ada: tabelHantu.map((t) => ({ tabel: t, kueri: refTables.get(t) })),
+      catatan: 'Inilah cacat yang paket D2q perbaiki: queries.js versi sebelumnya merujuk '
+        + '`retention_cohort` dan `cost_daily`, dua tabel yang tidak pernah dibuat.'
+    });
+
+    // Kunci #3: setiap KOLOM yang dirujuk ada di salah satu tabel yang dirujuk kueri itu.
+    // Alias (`AS x`) dikecualikan karena ia nama keluaran, bukan kolom masukan.
+    const kolomHantu = [];
+    for (const sql of sqls) {
+      const tables = [];
+      const tre = /\b(?:FROM|JOIN)\s+([A-Za-z_]\w*)/gi;
+      let tm;
+      while ((tm = tre.exec(sql))) tables.push(tm[1].toLowerCase());
+      const known = new Set();
+      for (const t of tables) {
+        const def = statsSchema.tables.get(t);
+        if (def) for (const c of def.columns) known.add(c);
+      }
+      const aliases = new Set();
+      const are = /\bAS\s+([A-Za-z_]\w*)/gi;
+      let am;
+      while ((am = are.exec(sql))) aliases.add(am[1].toLowerCase());
+      // Literal string bukan pengenal, dan `${...}` adalah interpolasi JS (daftar IN yang dirakit
+      // dari konstanta beku) — bukan kolom. Keduanya dibuang sebelum token dipindai.
+      const bare = sql.replace(/\$\{[^}]*\}/g, '?').replace(/'[^']*'/g, "''");
+      const tre2 = /\b[A-Za-z_]\w*\b/g;
+      let m;
+      while ((m = tre2.exec(bare))) {
+        const tok = m[0].toLowerCase();
+        if (SQL_WORDS.has(tok) || aliases.has(tok) || tables.includes(tok)) continue;
+        if (known.has(tok)) continue;
+        kolomHantu.push({ token: tok, tabel_dirujuk: tables, kueri: sql.slice(0, 120) });
+      }
+    }
+    check('owner_queries_kolom_ada_di_ddl', kolomHantu.length === 0, {
+      bentuk_tabel_menurut_ddl: bentuk,
+      kolom_tidak_ada: kolomHantu.slice(0, 20),
+      jumlah: kolomHantu.length,
+      alasan: 'Kolom yang tidak ada di DDL akan membuat D1 melempar begitu tabelnya berisi data. '
+        + 'Selama semua tabel kosong, cacat ini tidak terlihat sama sekali.'
+    });
+  }
+
+  // Kunci #4: nama metrik yang dipakai dashboard harus BENAR-BENAR DITULIS oleh jalur server.
+  // Metrik yang tidak pernah ditulis siapa pun = panel yang selamanya kosong, dan tidak ada
+  // pemeriksaan skema yang bisa menangkapnya karena bentuk PANJANG menerima string apa pun.
+  {
+    const writerFiles = [
+      path.join(API_DIR, 'analytics', 'analytics-core.js'),
+      path.join(API_DIR, 'analytics', 'rollup.js'),
+    ].filter((f) => fs.existsSync(f));
+    const writerSrc = writerFiles.map((f) => fs.readFileSync(f, 'utf8')).join('\n');
+    const src = fs.existsSync(OWNER_QUERIES) ? stripJsComments(fs.readFileSync(OWNER_QUERIES, 'utf8')) : '';
+
+    // Ambil daftar metrik & bucket dari queries.js secara tekstual (tanpa mengeksekusi modul ESM
+    // di dalam gerbang CommonJS ini).
+    const grabArray = (name) => {
+      const i = src.indexOf('const ' + name);
+      if (i < 0) return null;
+      const open = src.indexOf('[', i);
+      const close = closingBracket(src, open);
+      if (open < 0 || close < 0) return null;
+      return [...src.slice(open + 1, close).matchAll(/'([^']+)'/g)].map((m) => m[1]);
+    };
+    const grabKeys = (name) => {
+      const i = src.indexOf('const ' + name);
+      if (i < 0) return null;
+      const open = src.indexOf('{', i);
+      const close = closingParenGeneric(src, open, '{', '}');
+      if (open < 0 || close < 0) return null;
+      return [...src.slice(open + 1, close).matchAll(/'([^']+)'\s*:/g)].map((m) => m[1]);
+    };
+    const metrics = [
+      ...(grabArray('FLOW_METRICS') || []),
+      ...(grabArray('DAILY_STATE_METRICS') || []),
+      ...(grabArray('SERIES_METRICS') || []),
+    ];
+    const buckets = grabKeys('USAGE_BUCKETS') || [];
+
+    check('daftar_metrik_owner_terbaca', metrics.length >= 15 && buckets.length >= 5,
+      { jumlah_metrik: metrics.length, jumlah_bucket: buckets.length, penulis: writerFiles.map((f) => path.relative(REPO, f)) });
+
+    const metrikTanpaPenulis = [...new Set(metrics)].filter((m) => !writerSrc.includes("'" + m + "'"));
+    check('setiap_metrik_owner_ditulis_jalur_server', metrikTanpaPenulis.length === 0, {
+      metrik_tanpa_penulis: metrikTanpaPenulis,
+      dipindai: writerFiles.map((f) => path.relative(REPO, f)),
+      alasan: 'Bentuk PANJANG metrics_daily(day, metric, value) menerima nama metrik APA PUN, '
+        + 'jadi salah nama tidak pernah menghasilkan galat SQL — hanya panel yang kosong '
+        + 'selamanya. Hanya pemeriksaan ini yang bisa menangkapnya tanpa jaringan.'
+    });
+
+    const bucketTanpaPenulis = [...new Set(buckets)]
+      .map((b) => b.split(':')[0])
+      .filter((dim, i, a) => a.indexOf(dim) === i)
+      // Penulisnya memakai template literal (`ai_err:${e.code}`), bukan kutipan tunggal, jadi
+      // pencocokan harus atas AWALAN dimensinya, bukan atas string berkutip lengkap.
+      .filter((dim) => !new RegExp('[\'"`]' + dim + ':').test(writerSrc));
+    check('setiap_dimensi_bucket_owner_ditulis_jalur_server', bucketTanpaPenulis.length === 0, {
+      dimensi_tanpa_penulis: bucketTanpaPenulis,
+      catatan: 'usage_daily.bucket adalah enum tertutup "dimensi:nilai"; dimensi yang tidak '
+        + 'pernah ditulis berarti panel pecahannya kosong permanen.'
+    });
+  }
+
+  // Kunci #5: prasyarat indeks dinyatakan JUJUR. Indeks yang dipakai kueri owner harus sudah ada
+  // di migrasi yang SUDAH jalan di produksi (0002), bukan di 0004 yang belum diterapkan.
+  {
+    const idx = [...statsSchema.indexes.values()].map((i) => ({ nama: i.name, tabel: i.table, kolom: i.columns, berkas: i.file }));
+    const fileIdx = [...new Set(idx.map((i) => i.berkas))];
+    check('indeks_stats_berasal_dari_migrasi_yang_sudah_jalan',
+      fileIdx.every((f) => /000[12]_/.test(f)), {
+        indeks: idx, berkas: fileIdx,
+        catatan: '0004_indexes.sql adalah migrasi fiezel-core dan BELUM diterapkan; kueri owner '
+          + 'tidak boleh bergantung padanya. Nol prasyarat indeks baru.'
+      });
+  }
+}
+
+function closingBracket(text, open) { return closingParenGeneric(text, open, '[', ']'); }
+function closingParenGeneric(text, open, o, c) {
+  if (open < 0) return -1;
+  let depth = 0;
+  for (let i = open; i < text.length; i++) {
+    if (text[i] === o) depth++;
+    else if (text[i] === c) { depth--; if (depth === 0) return i; }
+  }
+  return -1;
+}
+
 /* -------------------------------------------------------------------- laporan */
 
 const failed = checks.filter((c) => !c.ok);
