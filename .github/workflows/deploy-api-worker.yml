@@ -44,6 +44,18 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           node --check index.js
+          # wrangler.toml di repo SENGAJA template: database_id/namespace id asli tidak
+          # dicatat di repo. ID bukan rahasia, tetapi sumber kebenarannya akun Cloudflare -
+          # jadi ambil saat deploy BERDASARKAN NAMA (fiezel-core, fiezel-stats, CFG) lewat
+          # API resmi, isi ke salinan kerja, dan gagal keras kalau salah satu tidak ada.
+          CORE_ID=$(npx --yes wrangler@3 d1 list --json | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const x=JSON.parse(s).find(d=>d.name==='fiezel-core');if(!x)process.exit(1);console.log(x.uuid)})")
+          STATS_ID=$(npx --yes wrangler@3 d1 list --json | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const x=JSON.parse(s).find(d=>d.name==='fiezel-stats');if(!x)process.exit(1);console.log(x.uuid)})")
+          KV_ID=$(npx --yes wrangler@3 kv namespace list | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const x=JSON.parse(s).find(n=>n.title.endsWith('CFG')||n.title==='CFG');if(!x)process.exit(1);console.log(x.id)})")
+          test -n "$CORE_ID" && test -n "$STATS_ID" && test -n "$KV_ID"
+          sed -i "s|<isi setelah: wrangler d1 create fiezel-core>|$CORE_ID|" wrangler.toml
+          sed -i "s|<isi setelah: wrangler d1 create fiezel-stats>|$STATS_ID|" wrangler.toml
+          sed -i "s|<isi setelah: wrangler kv namespace create CFG>|$KV_ID|" wrangler.toml
+          grep -c '<isi setelah' wrangler.toml && exit 1 || true
           npx --yes wrangler@3 deploy
 
       - name: Ringkasan
