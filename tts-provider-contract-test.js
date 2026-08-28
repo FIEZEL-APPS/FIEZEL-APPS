@@ -28,6 +28,7 @@
 const fs = require('fs');
 const path = require('path');
 const harness = require('./tools/cf-test-harness.js');
+const ModelCallGate = require('./workers/api/ai/model-call-gate.js');
 
 const root = __dirname;
 const checks = [];
@@ -63,7 +64,15 @@ async function render(body, options = {}) {
   });
   const quotaCalls = [];
   const deps = Object.assign({
-    enforceQuota: async (args) => { quotaCalls.push(args); return { allowed: true }; }
+    enforceQuota: async (args) => { quotaCalls.push(args); return { allowed: true }; },
+    // S2 makes the account-neuron reservation mandatory before every provider call.
+    // Keep this pure fixture receipt explicit so the contract gate reaches the provider
+    // assertions instead of failing closed before it can inspect the request body.
+    accountBudget: async () => ModelCallGate.makeReservation({
+      neurons: 1,
+      cap: 8000,
+      release: async () => true
+    })
   }, options.deps || {});
   const request = new Request('https://api.fiezel.my.id/api/tts/render', {
     method: 'POST', body: JSON.stringify(body), headers: { 'content-type': 'application/json' }
