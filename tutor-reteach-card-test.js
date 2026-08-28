@@ -128,7 +128,7 @@ test('kartu menahan alur SEBELUM soal berikutnya digambar', () => {
 });
 
 test('tombol lanjut di kartu membuang kartunya, jadi ia tidak bisa muncul dua kali', () => {
-  assert.ok(/\$\('teachNext'\)\.onclick=\(\)=>\{pendingCard=null;draw\(\)\}/.test(APP),
+  assert.ok(/\$\('teachNext'\)\.onclick=\(\)=>\{pendingCard=null;(?:start=Date\.now\(\);)?draw\(\)\}/.test(APP),
     'tombol lanjut tidak mengosongkan pendingCard sebelum menggambar');
 });
 
