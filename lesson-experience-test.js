@@ -10,12 +10,19 @@ function classList(){const values=new Set();return{add(...xs){xs.forEach(x=>valu
 function element(id){return elements[id]||=( {id,innerHTML:'',textContent:'',className:'',dataset:{},style:{setProperty(){}},classList:classList(),setAttribute(){},addEventListener(){},append(){},focus(){},onclick:null,disabled:false} )}
 const document={baseURI:'http://localhost/',body:{classList:classList()},visibilityState:'visible',getElementById:element,querySelector(){return null},querySelectorAll(){return[]},createElement(){return{className:'',textContent:'',disabled:false,onclick:null,classList:classList(),append(){},addEventListener(){}}},addEventListener(){}};
 const localStorage={getItem:k=>store[k]||null,setItem:(k,v)=>store[k]=String(v),removeItem:k=>delete store[k]};const Notification=function(title,options){this.title=title;this.options=options;this.close=()=>{};};Notification.permission='granted';Notification.requestPermission=async()=>Notification.permission;
-const fetch=async url=>{const file=String(url).split('/').pop();return{ok:true,json:async()=>JSON.parse(fs.readFileSync(path.join(root,file),'utf8'))}};
-let oscillatorStarts=0;
-class FakeAudioContext{constructor(){this.currentTime=0;this.state='running';this.destination={}}createGain(){return{gain:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){}},connect(){}}}createOscillator(){return{type:'sine',frequency:{value:0,setValueAtTime(){}},connect(){},start(){oscillatorStarts++},stop(){}}}resume(){this.state='running'}suspend(){this.state='suspended'}close(){this.state='closed'}}
+// m029 (OA-7): SFX kini sampel OGG lewat fetch+decodeAudioData, bukan osilator. Mock fetch
+// mencatat OGG mana yang diminta (sfxRequests) dan mengembalikan buffer palsu untuk didekode.
+const sfxRequests=[];
+const fetch=async url=>{const file=String(url).split('/').pop();if(file.endsWith('.ogg')){sfxRequests.push(file);return{ok:true,arrayBuffer:async()=>new ArrayBuffer(16)}}return{ok:true,json:async()=>JSON.parse(fs.readFileSync(path.join(root,file),'utf8'))}};
+let oscillatorStarts=0,bufferSourceStarts=0;
+class FakeAudioContext{constructor(){this.currentTime=0;this.state='running';this.destination={}}createGain(){return{gain:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){}},connect(){}}}createOscillator(){return{type:'sine',frequency:{value:0,setValueAtTime(){}},connect(){},start(){oscillatorStarts++},stop(){}}}createBufferSource(){return{buffer:null,playbackRate:{value:1},connect(){},start(){bufferSourceStarts++},stop(){}}}decodeAudioData(raw,ok){const buf={duration:.2,numberOfChannels:1};if(typeof ok==='function'){ok(buf);return null}return Promise.resolve(buf)}resume(){this.state='running'}suspend(){this.state='suspended'}close(){this.state='closed'}}
 const context={console,Notification,document,localStorage,fetch,window:null,self:null,navigator:{vibrate(){return true}},Date,Intl,Math,URL,Error,Promise,setTimeout,clearTimeout,setInterval:()=>({unref(){}}),clearInterval(){},SpeechSynthesisUtterance:function(){},speechSynthesis:{cancel(){},speak(){}},AudioContext:FakeAudioContext};
 context.window=context;context.self=context;context.FIEZEL_VERSION=JSON.parse(fs.readFileSync(path.join(root,'VERSION.json'),'utf8')).version;context.window.scrollTo=()=>{};context.window.requestAnimationFrame=fn=>fn();
-vm.createContext(context);vm.runInContext(app,context,{filename:'app.js'});
+vm.createContext(context);
+// m029: mesin SFX dimuat lebih dulu, persis urutan <script defer> di index.html - app.js
+// mendelegasikan playFeedbackSound ke FiezelUiSfx, jadi tanpa modul ini tesnya menguji udara.
+vm.runInContext(fs.readFileSync(path.join(root,'features/audio/fiezel-ui-sfx.js'),'utf8'),context,{filename:'features/audio/fiezel-ui-sfx.js'});
+vm.runInContext(app,context,{filename:'app.js'});
 const signature=q=>String(q.question).toLowerCase().replace(/\s+/g,' ').trim()+'||'+q.options.map(x=>String(x).toLowerCase()).sort().join('|');
 
 setTimeout(()=>{try{
@@ -60,15 +67,21 @@ setTimeout(()=>{try{
 
   assert(context.playFeedbackSound('success')===true,'correct-answer sound did not start');
   assert(context.playFeedbackSound('error')===true,'wrong-answer sound did not start');
-  // m025-43 made the cues longer (4-note C-major rise + 3-note fall = 7 tones).
-  // P0-2 (FIEZEL-GAME-INTERACTION-AUDIT.md §13, SFX spec §1.2 R2) replaced that C-major
-  // vocabulary with the F add9 brand family: correct = F4→A4→C5 (3 tones), wrong =
-  // A4→F4 soft sine (2 tones, no sawtooth) - so the expected count moved from 7 to 5.
-  assert(oscillatorStarts===5,`feedback sound produced ${oscillatorStarts}/5 expected tones`);
+  // m029 (OA-7): umpan balik jawaban kini sampel produksi answer_correct/answer_wrong.
+  // Yang bisa diperiksa sinkron: kedua berkas benar-benar DIMINTA (bukan sekadar return
+  // true dari fungsi yang diamputasi). Osilator lama harus nol - sintesisnya sudah tiada.
+  assert(sfxRequests.includes('answer_correct.ogg'),'answer_correct.ogg was never fetched');
+  assert(sfxRequests.includes('answer_wrong.ogg'),'answer_wrong.ogg was never fetched');
+  assert(oscillatorStarts===0,`old oscillator synthesis still running (${oscillatorStarts} starts)`);
   assert(html.includes('id="answerBurst"')&&css.includes('.answer-burst.show'),'answer popup surface is missing');
   assert(html.includes('id="globalSky"')&&html.includes('id="globalCelestial"'),'full-screen celestial layer is missing');
   assert(css.includes('.global-sky')&&css.includes('.sky-light')&&css.includes('.scene-night'),'day/night full-screen visual phases are incomplete');
   assert(app.includes('Hindari gaya buku teks')&&app.includes('Gunakan Bahasa Indonesia yang jernih'),'AI natural-language contract is missing');
-  console.log('FIEZEL lesson experience: PASS');
-  console.log(JSON.stringify({grammarLessons:skills.length,questionsPerLesson:25,practiceModesPerLesson:25,generatedQuestionsChecked:generated,crossLessonDuplicates:0,focusLeaks:0,correctWrongTones:oscillatorStarts,realtimeCycle:['sunrise','noon','sunset','moonrise','midnight'],naturalIndonesian:true}));
+  // Unduh+dekode sampel berjalan asinkron; beri satu putaran event loop sebelum menagih
+  // bunyinya benar-benar DIBUNYIKAN (AudioBufferSourceNode.start), bukan hanya diminta.
+  setTimeout(()=>{try{
+    assert(bufferSourceStarts>=2,`feedback samples fetched but never started (${bufferSourceStarts} starts)`);
+    console.log('FIEZEL lesson experience: PASS');
+    console.log(JSON.stringify({grammarLessons:skills.length,questionsPerLesson:25,practiceModesPerLesson:25,generatedQuestionsChecked:generated,crossLessonDuplicates:0,focusLeaks:0,correctWrongSamples:bufferSourceStarts,sfxFilesFetched:[...new Set(sfxRequests)].length,realtimeCycle:['sunrise','noon','sunset','moonrise','midnight'],naturalIndonesian:true}));
+  }catch(error){console.error('FIEZEL lesson experience: FAIL\n'+error.stack);process.exitCode=1}},120);
 }catch(error){console.error('FIEZEL lesson experience: FAIL\n'+error.stack);process.exitCode=1}},260);

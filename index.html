@@ -35,47 +35,38 @@
 html.fz-booting,html.fz-booting body{background:#1B1418}
 html.fz-booting body{overflow:hidden}
 #fiezelBootSplash:not(.is-leaving){animation:none}
-/* Ketukan koreografi. Nilai ini WAJIB sama dengan tabel di
+/* Ketukan koreografi v4. Nilai ini WAJIB sama dengan tabel di
    features/brand/fiezel-choreography.js; splash-choreography-test.js gagal kalau
-   keduanya menyimpang. Ada di sini karena splash frame-pertama bergerak sebelum
-   satu baris JavaScript pun sempat berjalan. */
-#fiezelBootSplash{--fz-b1:0ms;--fz-b2:190ms;--fz-b3:285ms;--fz-b4:430ms;--fz-b5:530ms;--fz-b6:820ms;--fz-b7:1060ms;--fz-b8:1360ms}
+   keduanya menyimpang. Ada di sini karena jalur kurangi-gerak splash frame-pertama
+   memudar pada ketukan ini sebelum satu baris JavaScript pun sempat berjalan. */
+#fiezelBootSplash{--fz-b1:0ms;--fz-b2:240ms;--fz-b3:470ms;--fz-b4:690ms;--fz-b5:870ms;--fz-b6:1060ms;--fz-b7:1150ms;--fz-b8:1400ms;--fz-b9:1520ms;--fz-b10:1655ms;--fz-b11:1780ms;--fz-b12:1900ms}
+/* Salinan APA ADANYA dari style.css (diperiksa splash-first-paint-test.js). */
 .fiezel-wordmark{display:block;width:100%;height:auto}
 .fiezel-splash,.fiezel-ob{--fz-bg:#FFF9EE;--fz-paper:#FFFFFF;--fz-ink:#241A11;--fz-ink-muted:#6E5E47;--fz-accent:#241A11;--fz-accent-deep:#120C07;--fz-gold:#E6A800;--fz-soft:#FFF3C4;--fz-line:#F0E4CF;--fz-sun:#FFC700;--fz-sun-soft:#FFF3C4;--fz-sun-press:#CC9600;--fz-sun-grad:linear-gradient(180deg,#FFDE59,#FFA500);--fz-info:#7A5F1B;--fz-core:#1B1418;--fz-core-soft:#2A2126;--fz-on-core:#FDFAF3;--fz-display:'FZ Instrument Serif',Georgia,'Times New Roman',serif;--fz-heading:'FZ Plus Jakarta Sans',-apple-system,'Segoe UI',sans-serif;--fz-body:'FZ Plus Jakarta Sans',-apple-system,'Segoe UI',sans-serif}
 .fiezel-splash,.fiezel-ob{position:fixed;inset:0;z-index:2147482000;display:flex;flex-direction:column;background:var(--fz-bg);font-family:var(--fz-body);color:var(--fz-ink);padding-top:max(18px,env(safe-area-inset-top));animation:fzm-page-in .4s cubic-bezier(.22,.61,.36,1) both}
+.fiezel-splash[hidden]{display:none}
 .fiezel-splash.is-leaving,.fiezel-ob.is-leaving{animation:fzm-page-out .3s ease-in both}
 @keyframes fzm-page-in{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
 @keyframes fzm-page-out{from{opacity:1;transform:none}to{opacity:0;transform:translateX(-16px)}}
 .fiezel-splash-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center}
+.fiezel-splash-word{font-family:var(--fz-heading);font-weight:700;font-size:2.6rem;letter-spacing:.01em;color:var(--fz-accent);margin:0;display:flex;align-items:center;gap:8px}
+.fiezel-splash-tag{font-family:var(--fz-body);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--fz-ink-muted);margin:0}
 .fiezel-splash-dark{background:#1B1418;padding-top:0}
 .fiezel-splash-brand{background:radial-gradient(circle at 30% 18%,#2A2126 0%,#1B1418 55%,#120C0F 100%);position:relative;overflow:hidden;display:grid;grid-template-rows:1fr auto auto;justify-items:center;align-items:center;gap:0;padding:24px 24px 17vh}
-@keyframes fz-splash-halo{0%,100%{opacity:.22;transform:translate(-50%,-50%) scale(1)} 50%{opacity:.42;transform:translate(-50%,-50%) scale(1.12)}}
-.fiezel-splash-brand::before{content:"";position:absolute;left:50%;top:38%;width:min(78vw,440px);aspect-ratio:1;border-radius:50%;pointer-events:none;z-index:0;background:radial-gradient(circle,rgba(255,199,0,.34) 0%,rgba(255,199,0,0) 68%);animation:fz-splash-halo 3.4s ease-in-out infinite}
-.fiezel-splash-brand>*{position:relative;z-index:1}
-.fiezel-logo-stage{display:inline-grid;place-items:center;overflow:hidden}
-.fiezel-logo-stage{position:relative}
+.fz-splash-canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 .fiezel-logo{width:min(46vw,190px);height:auto;display:block;overflow:visible}
-@keyframes fz-logo-stem{from{opacity:0;transform:scaleY(0)}to{opacity:1;transform:scaleY(1)}}
-@keyframes fz-logo-arm{from{opacity:0;transform:scaleX(0)}to{opacity:1;transform:scaleX(1)}}
-@keyframes fz-logo-bar{0%{opacity:0;transform:scaleY(.08)} 70%{opacity:1;transform:scaleY(1.035)} 100%{opacity:1;transform:scaleY(1)}}
+.fz-fgroup,.fz-barsgroup{opacity:0;will-change:opacity}
 .fiezel-logo .fz-f,.fiezel-logo .fz-bar{transform-box:fill-box}
-.fiezel-logo .fz-f1{transform-origin:top center;animation:fz-logo-stem .7s cubic-bezier(.22,.8,.28,1) var(--fz-b1,0ms) both}
-.fiezel-logo .fz-f2{transform-origin:left center;animation:fz-logo-arm .56s cubic-bezier(.22,.8,.28,1) var(--fz-b2,190ms) both}
-.fiezel-logo .fz-f3{transform-origin:left center;animation:fz-logo-arm .56s cubic-bezier(.22,.8,.28,1) var(--fz-b3,285ms) both}
-.fiezel-logo .fz-bar1{transform-origin:center bottom;animation:fz-logo-bar .76s cubic-bezier(.2,.9,.3,1) var(--fz-b4,430ms) both}
-.fiezel-logo .fz-bar2{transform-origin:center bottom;animation:fz-logo-bar .76s cubic-bezier(.2,.9,.3,1) var(--fz-b5,530ms) both}
-@keyframes fz-logo-sheen{from{transform:translateX(-130%)}to{transform:translateX(130%)}}
-.fiezel-logo-stage::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(74deg,transparent 38%,rgba(255,222,89,.30) 50%,transparent 62%);animation:fz-logo-sheen 1.2s cubic-bezier(.3,.7,.3,1) var(--fz-b6,820ms) both}
-@keyframes fz-splash-rise{from{opacity:0;transform:translateY(13px)}to{opacity:1;transform:none}}
-@keyframes fz-splash-settle{from{opacity:0;transform:translateY(15px) scaleX(1.045)} to{opacity:1;transform:none}}
-.fiezel-splash-brand .fiezel-splash-word{width:min(52vw,238px);margin:0 auto;display:block;animation:fz-splash-settle .82s cubic-bezier(.22,.8,.28,1) var(--fz-b7,1060ms) both}
-.fiezel-splash-brand .fiezel-splash-tag{font-family:var(--fz-body);font-size:12px;letter-spacing:.30em;text-transform:uppercase;color:#FFC700;margin:14px 0 0;animation:fz-splash-rise .82s cubic-bezier(.22,.8,.28,1) var(--fz-b8,1360ms) both}
+.fiezel-splash-brand .fiezel-splash-word{position:absolute;display:block;left:0;right:0;margin:0 auto;bottom:calc(7vh + env(safe-area-inset-bottom,0px));width:min(52vw,238px);text-align:center;opacity:0;transform:translateY(14px);will-change:transform,opacity;pointer-events:none}
+.fiezel-splash-brand .fiezel-wordmark{display:block;width:min(30vw,132px);height:auto;margin:0 auto}
+.fiezel-splash-brand .fiezel-splash-tag{font-family:var(--fz-body);font-size:12px;letter-spacing:.30em;text-transform:uppercase;color:#FFC700;margin:14px 0 0;white-space:nowrap}
 @keyframes fz-fade-in{from{opacity:0}to{opacity:1}}
-.fiezel-splash-still .fiezel-logo .fz-f,.fiezel-splash-still .fiezel-logo .fz-bar{transform:none!important;animation-name:fz-fade-in!important}
-.fiezel-splash-still .fiezel-splash-word{transform:none!important;animation-name:fz-fade-in!important}
-.fiezel-splash-still .fiezel-splash-tag{transform:none!important;animation-name:fz-fade-in!important}
-.fiezel-splash-still .fiezel-splash-brand::before,.fiezel-splash-still .fiezel-logo-stage::after{animation:none}
-.fiezel-splash-still .fiezel-logo-stage::after{opacity:0}
+.fiezel-splash-still .fz-splash-canvas{display:none}
+.fiezel-splash-still .fz-fgroup,.fiezel-splash-still .fz-barsgroup{opacity:1}
+.fiezel-splash-still .fiezel-logo .fz-f{transform:none!important;animation:fz-fade-in .95s ease var(--fz-b1,0ms) both}
+.fiezel-splash-still .fiezel-logo .fz-bar{transform:none!important;animation:fz-fade-in .3s ease var(--fz-b6,1060ms) both}
+.fiezel-splash-still .fiezel-splash-word{transform:none!important;animation:fz-fade-in .3s ease var(--fz-b7,1150ms) both}
+.fiezel-splash-still .fiezel-splash-tag{transform:none!important;animation:fz-fade-in .24s ease var(--fz-b12,1900ms) both;opacity:0}
   </style>
   <link rel="stylesheet" href="./style.css">
   <link rel="stylesheet" href="./features/speaking-listening/speaking-listening-addon.css">
@@ -92,8 +83,9 @@ html.fz-booting body{overflow:hidden}
        features/brand/fiezel-splash.js mengadopsi elemen ini lewat [data-fiezel-boot-splash]
        alih-alih membuat lapisan kedua, jadi animasi yang sudah berjalan diteruskan, bukan
        diulang dari awal setelah boot selesai. -->
-  <div id="fiezelBootSplash" class="fiezel-splash fiezel-splash-dark" data-fiezel-boot-splash role="dialog" aria-label="Selamat datang di FIEZEL"><div class="fiezel-splash-body fiezel-splash-brand"><div class="fiezel-logo-stage"><svg class="fiezel-logo" viewBox="0 0 512 512" role="img" aria-label="FIEZEL"><defs><linearGradient id="fzsIvory" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFFBF3"/><stop offset="100%" stop-color="#EBDBC0"/></linearGradient><linearGradient id="fzsGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFDE59"/><stop offset="45%" stop-color="#FFC700"/><stop offset="100%" stop-color="#E6A800"/></linearGradient></defs><g fill="url(#fzsIvory)"><rect class="fz-f fz-f1" x="136" y="148" width="42"  height="216" rx="20"/><rect class="fz-f fz-f2" x="136" y="148" width="128" height="42"  rx="20"/><rect class="fz-f fz-f3" x="136" y="230" width="102" height="40"  rx="19"/></g><g fill="url(#fzsGold)"><rect class="fz-bar fz-bar1" x="298" y="200" width="34" height="112" rx="17"/><rect class="fz-bar fz-bar2" x="348" y="166" width="34" height="180" rx="17"/></g></svg></div><div class="fiezel-splash-word"><svg class="fiezel-wordmark" viewBox="0 0 1000 260" role="img" aria-label="FIEZEL"><defs><linearGradient id="fzsIv" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFFBF3"/><stop offset="100%" stop-color="#EBDBC0"/></linearGradient><linearGradient id="fzsGo" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFDE59"/><stop offset="45%" stop-color="#FFC700"/><stop offset="100%" stop-color="#E6A800"/></linearGradient></defs><g fill="url(#fzsIv)"><rect x="30" y="30" width="42" height="200" rx="21"/><rect x="30" y="30" width="144" height="42" rx="21"/><rect x="30" y="109" width="116" height="42" rx="21"/><rect x="300" y="30" width="42" height="200" rx="21"/><rect x="300" y="30" width="144" height="42" rx="21"/><rect x="300" y="109" width="100" height="42" rx="21"/><rect x="300" y="188" width="130" height="42" rx="21"/><rect x="478" y="30" width="150" height="42" rx="21"/><rect x="478" y="188" width="150" height="42" rx="21"/><rect x="607" y="30" width="191.38" height="42" rx="21" transform="rotate(124.354 607 51)"/><rect x="662" y="30" width="42" height="200" rx="21"/><rect x="662" y="30" width="144" height="42" rx="21"/><rect x="662" y="109" width="100" height="42" rx="21"/><rect x="662" y="188" width="130" height="42" rx="21"/><rect x="840" y="30" width="42" height="200" rx="21"/><rect x="840" y="188" width="130" height="42" rx="21"/></g><g fill="url(#fzsGo)"><rect x="192" y="30" width="26" height="200" rx="13"/><rect x="240" y="106" width="26" height="124" rx="13"/></g></svg></div><p class="fiezel-splash-tag">ADAPTIVE ENGLISH</p></div></div>
-<script>
+  <div id="fiezelBootSplash" class="fiezel-splash fiezel-splash-dark" data-fiezel-boot-splash role="dialog" aria-label="Selamat datang di FIEZEL"><div class="fiezel-splash-body fiezel-splash-brand"><canvas class="fz-splash-canvas" aria-hidden="true"></canvas><svg class="fiezel-logo" viewBox="0 0 512 512" role="img" aria-label="FIEZEL"><defs><linearGradient id="fzsGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFD94F"/><stop offset="100%" stop-color="#F0C241"/></linearGradient></defs><g class="fz-fgroup" fill="#FFF4DA"><rect class="fz-f fz-f1" x="136" y="148" width="42"  height="216" rx="20"/><rect class="fz-f fz-f2" x="136" y="148" width="128" height="42"  rx="20"/><rect class="fz-f fz-f3" x="136" y="230" width="102" height="40"  rx="19"/></g><g class="fz-barsgroup" fill="url(#fzsGold)"><rect class="fz-bar fz-bar1" x="298" y="200" width="34" height="112" rx="17"/><rect class="fz-bar fz-bar2" x="348" y="166" width="34" height="180" rx="17"/></g></svg><div class="fiezel-splash-word"><svg class="fiezel-wordmark" viewBox="0 0 1000 260" role="img" aria-label="FIEZEL"><defs><linearGradient id="fzsIv" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFFBF3"/><stop offset="100%" stop-color="#EBDBC0"/></linearGradient><linearGradient id="fzsGo" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFDE59"/><stop offset="45%" stop-color="#FFC700"/><stop offset="100%" stop-color="#E6A800"/></linearGradient></defs><g fill="url(#fzsIv)"><rect x="30" y="30" width="42" height="200" rx="21"/><rect x="30" y="30" width="144" height="42" rx="21"/><rect x="30" y="109" width="116" height="42" rx="21"/><rect x="300" y="30" width="42" height="200" rx="21"/><rect x="300" y="30" width="144" height="42" rx="21"/><rect x="300" y="109" width="100" height="42" rx="21"/><rect x="300" y="188" width="130" height="42" rx="21"/><rect x="478" y="30" width="150" height="42" rx="21"/><rect x="478" y="188" width="150" height="42" rx="21"/><rect x="607" y="30" width="191.38" height="42" rx="21" transform="rotate(124.354 607 51)"/><rect x="662" y="30" width="42" height="200" rx="21"/><rect x="662" y="30" width="144" height="42" rx="21"/><rect x="662" y="109" width="100" height="42" rx="21"/><rect x="662" y="188" width="130" height="42" rx="21"/><rect x="840" y="30" width="42" height="200" rx="21"/><rect x="840" y="188" width="130" height="42" rx="21"/></g><g fill="url(#fzsGo)"><rect x="192" y="30" width="26" height="200" rx="13"/><rect x="240" y="106" width="26" height="124" rx="13"/></g></svg><p class="fiezel-splash-tag">ADAPTIVE ENGLISH</p></div></div></div>
+  <script>
+
     /* Jaring pengaman storage: di iframe preview yang di-sandbox tanpa allow-same-origin,
        SEMUA akses window.localStorage/sessionStorage melempar SecurityError dan aplikasi
        gagal boot. Shim ini mendeteksi kondisi itu dan memasang penyimpanan memori
@@ -391,6 +383,10 @@ html.fz-booting body{overflow:hidden}
   <script defer src="./features/academic-readiness/fiezel-academic-readiness.js"></script>
   <script defer src="./features/continuity/fiezel-continuity.js"></script>
   <script defer src="./features/health/fiezel-install-health.js"></script>
+  <!-- Splash v4 (OA-6): partikel + equalizer + cap PAW dimuat sebelum orkestratornya. -->
+  <script defer src="./features/brand/fiezel-splash-particles.js"></script>
+  <script defer src="./features/brand/fiezel-splash-equalizer.js"></script>
+  <script defer src="./features/brand/fiezel-splash-pawstamp.js"></script>
   <script defer src="./features/brand/fiezel-splash.js"></script>
   <script defer src="./features/onboarding/fiezel-onboarding.js"></script>
   <script defer src="./features/onboarding/fiezel-tour.js"></script>
