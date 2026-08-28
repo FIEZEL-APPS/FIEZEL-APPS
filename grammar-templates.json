@@ -1918,32 +1918,32 @@
       "stem": "Turn left ___ the second traffic light, then the hotel is ___ Baker Street.",
       "options": [
         "at / on",
-        "in / at",
-        "on / in",
-        "at / to"
+        "on / at",
+        "in / to",
+        "to / in"
       ],
       "correctIndex": 0,
       "distractors": [
         {
-          "option": "in / at",
+          "option": "on / at",
           "misconception": "swaps the point-preposition and surface/line-preposition roles",
-          "whyFails": "'In the second traffic light' reads the light as an enclosed space and 'at Baker Street' shrinks a whole street to a single point; both gaps misread the kind of location.",
-          "whyFailsId": "dua celahnya salah baca bentuk lokasinya.",
+          "whyFails": "'On the second traffic light' treats a route point as a surface, and 'at Baker Street' shrinks a whole street to a single point; each gap received the other one's preposition.",
+          "whyFailsId": "posisinya ketuker: lampu itu titik (at), nama jalan itu garis (on).",
           "misconceptionId": "peran kata depan buat titik dan buat garis saling ketuker."
         },
         {
-          "option": "on / in",
-          "misconception": "treats a route point as a surface in the first slot",
-          "whyFails": "'On the second traffic light' treats a point on the route as a surface, so the first gap already fails before the street phrase is even weighed.",
-          "whyFailsId": "celah pertama udah gagal: lampu itu titik, bukan permukaan.",
-          "misconceptionId": "titik di rute diperlakukan kayak permukaan di celah pertama."
+          "option": "in / to",
+          "misconception": "reads the turn point as an enclosed space and the static location as a destination",
+          "whyFails": "'In the second traffic light' places the turn inside the light itself, and 'to Baker Street' signals movement although the sentence states where the hotel sits.",
+          "whyFailsId": "“in” bikin belokannya kayak di dalam lampu, “to” malah nandain gerak padahal hotelnya diam.",
+          "misconceptionId": "titik beloknya dianggap ruang tertutup, posisi diamnya dianggap tujuan gerak."
         },
         {
-          "option": "at / to",
-          "misconception": "movement preposition used for a static location",
-          "whyFails": "'To' marks movement towards a destination, but the sentence states where the hotel is located.",
-          "whyFailsId": "“to” nandain perpindahan, padahal ini soal posisi diam.",
-          "misconceptionId": "kata depan perpindahan dipakai buat posisi yang diam."
+          "option": "to / in",
+          "misconception": "turns the landmark of the turn into a destination of movement",
+          "whyFails": "'Turn left to the second traffic light' makes the light a destination instead of the point where the turn happens, so the first gap already fails.",
+          "whyFailsId": "celah pertama udah gagal: lampunya jadi tujuan gerak, padahal dia titik tempat belok.",
+          "misconceptionId": "patokan tempat belok malah dijadiin tujuan perpindahan."
         }
       ],
       "explanation": {
