@@ -71,7 +71,10 @@ ok(/prasasti:\{schema:'fiezel-prasasti-v1',earned:\{\}\}/.test(app), 'P7: defaul
 ok(/ritualMeta:\{lastDay:''\}/.test(app), 'P7: defaultState punya ritualMeta (ritual pembuka sekali per hari)');
 ok(/checkPrasasti\('session'\)/.test(app) && /checkPrasasti\('home'\)/.test(app), 'P7: titik ukir di finishQuiz dan Home');
 ok(/function showPrasastiMoment/.test(app) && /pawReact\('badge-earned'\)/.test(app.split('function showPrasastiMoment')[1].split('\nfunction ')[0]), 'P7: momen lencana memicu maskot proud');
-ok(/uiSfx\('celebrate'\)/.test(app.split('function showPrasastiMoment')[1].split('\nfunction ')[0]), 'P7: momen lencana berbunyi lewat gerbang uiSfx');
+// [SFX-WIRING impl-11] 20 §4 baris PENCAPAIAN: bunyi lencana = notif_achievement, bukan
+// alias celebrate→lesson_complete (bisa dobel dengan penutup finishQuiz). Invarian yang
+// dijaga tetap sama: momennya berbunyi lewat gerbang uiSfx (preferensi feedbackSounds).
+ok(/uiSfx\('notif_achievement'\)/.test(app.split('function showPrasastiMoment')[1].split('\nfunction ')[0]), 'P7: momen lencana berbunyi lewat gerbang uiSfx');
 ok(/prasastiGalleryMarkup/.test(app) && /<h3>Prasasti<\/h3>/.test(app), 'P7: galeri Prasasti ada di Peta Belajar');
 ok(/features\/prasasti\/fiezel-prasasti-core\.js/.test(html), 'P7: index.html memuat inti prasasti sebelum app.js');
 ok(html.indexOf('features/prasasti/fiezel-prasasti-core.js') < html.indexOf('<script defer src="./app.js">'), 'P7: deklarasi mendahului app.js');
