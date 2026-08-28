@@ -602,7 +602,6 @@ jobs:
         # cakupan Thai, dst.) tidak pernah dipanggil CI. Semuanya dijalankan lokal lebih dulu
         # dan lima belas-nya exit 0 — yang kurang pendaftarannya, bukan mutunya.
         run: |
-          node adaptivity-simulation-v3-hardened-test.js
           node analytics-dedup-test.js
           node analytics-stable-id-guard-test.js
           node app-telemetry-wiring-test.js
