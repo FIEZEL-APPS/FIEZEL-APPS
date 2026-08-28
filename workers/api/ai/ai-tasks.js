@@ -930,6 +930,24 @@
   }
 
   /**
+   * AI-19 F05 (P1) + AI-12 F02 — enum TERTUTUP untuk locale murid. `locale` disisipkan ke zona
+   * instruksi terpercaya (di atas ---DATA---) pada 4 dari 5 prompt, dan zona itu dikecualikan
+   * dari penghitungan token; string bebas di sini = permukaan self-jailbreak + pembakar budget.
+   * HARUS identik dengan FiezelI18n.SUPPORTED di klien. Nilai di luar enum BUKAN error 400 —
+   * jatuh ke 'id' (fail-open ke baseline, bukan fail-closed ke kosong) supaya klien lama/aneh
+   * tidak mati. Kalau mau ketat, ganti jadi errors.push('locale_invalid') — keputusan owner.
+   */
+  var SUPPORTED_LOCALES = Object.freeze(['id', 'th']);
+
+  function canonicalLearnerLocale(raw) {
+    // Potong SEBELUM apa pun menyentuh prompt: string 10KB / payload injeksi tidak pernah
+    // hidup lebih jauh dari lima karakter pertama di jalur ini.
+    var v = s(raw).toLowerCase().slice(0, 5);
+    if (v.indexOf('-') > 0) v = v.split('-')[0]; // 'id-ID' → 'id', 'th-TH' → 'th'
+    return SUPPORTED_LOCALES.indexOf(v) >= 0 ? v : 'id';
+  }
+
+  /**
    * Validasi ketat, fail-closed. Task tak dikenal adalah 400 — TIDAK jatuh diam-diam ke
    * `'question'` seperti `fiezel-core-worker.js:447` hari ini, karena jatuh diam-diam berarti
    * membayar untuk task yang tidak pernah diminta siapa pun.
@@ -1005,7 +1023,8 @@
     }
 
     if (errors.length) return { ok: false, code: 400, errors: errors, task: name };
-    return { ok: true, task: name, spec: spec, input: clean, locale: s(b.locale) || 'id' };
+    // AI-19 F05: setelah baris ini, string locale yang bisa mencapai prompt HANYA 'id'/'th'.
+    return { ok: true, task: name, spec: spec, input: clean, locale: canonicalLearnerLocale(b.locale) };
   }
 
   /** Template prompt dirakit HANYA di sini. */
@@ -1177,6 +1196,8 @@
     TASKS: TASKS,
     ALIASES: ALIASES,
     FORBIDDEN_FIELDS: FORBIDDEN_FIELDS,
+    SUPPORTED_LOCALES: SUPPORTED_LOCALES,
+    canonicalLearnerLocale: canonicalLearnerLocale,
     LEVELS: LEVELS,
     list: list,
     get: get,
