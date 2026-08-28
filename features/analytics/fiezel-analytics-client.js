@@ -335,6 +335,7 @@
       rejected: 0,          // event yang ditolak (server-only / tak dikenal)
       storageTouches: 0,    // dipakai gerbang: flag off harus tetap 0
       sent: 0,
+      flushing: null,       // janji kirim yang sedang berjalan (single-flight)
       lastError: null
     };
 
@@ -703,6 +704,23 @@
      * antrean sebelum batch berikutnya, supaya tidak pernah dikirim dua kali.
      */
     function flush() {
+      // SEKALI-JALAN (single-flight). TEMUAN A1: tanpa kunci ini, dua pemanggil
+      // yang tumpang-tindih (mis. `start()` yang masih menunggu pepper, lalu
+      // `flush()` dari akhir sesi) sama-sama memotret antrean yang SAMA,
+      // sama-sama menunggu `visitorToken()`, lalu sama-sama mengirim batch yang
+      // sama. Antrean baru dibuang SETELAH kirim sukses, jadi jendela itu nyata
+      // dan akibatnya bukan sepele: server menghitung satu sesi dua kali, DAU
+      // dan pemakaian jadi gembung. Angka gembung lebih buruk daripada tidak
+      // ada angka, karena ia dipercaya. Pemanggil kedua ikut menunggu hasil
+      // pemanggil pertama, tidak memulai pengiriman baru.
+      if (memory.flushing) return memory.flushing;
+      var p = flushOnce();
+      memory.flushing = p;
+      var lepas = function (v) { memory.flushing = null; return v; };
+      return p.then(lepas, function (e) { lepas(null); throw e; });
+    }
+
+    function flushOnce() {
       if (!gateOpen()) return Promise.resolve(false);
       var q = queue();
       if (!q || q.length === 0) return Promise.resolve(true);
@@ -841,6 +859,7 @@
       memory.pepperFetchedAt = 0;
       memory.token = null;
       memory.tokenPepper = null;
+      memory.flushing = null;
       memory.started = false;
     }
 
