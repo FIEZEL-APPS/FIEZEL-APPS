@@ -76,6 +76,52 @@ export const GATE_REASONS = Object.freeze({
 });
 
 /**
+ * S3 — alasan penolakan jalur TTS. Bentuknya SENGAJA cerminan `GATE_REASONS`:
+ * nama kunci sama, prefiks nilai berbeda supaya log bisa memisahkan dua jalur
+ * berbayar tanpa menebak.
+ */
+export const TTS_GATE_REASONS = Object.freeze({
+  featureVarOff: 'tts_feature_var_off',
+  flagsUnreadable: 'tts_flags_unreadable',
+  killSwitch: 'tts_kill_switch',
+  flagOff: 'tts_flag_off'
+});
+
+/**
+ * S3 — SPESIFIKASI FITUR BERBAYAR. Satu tabel, satu mesin keputusan.
+ *
+ * CACAT YANG INI TUTUP (terukur hidup di produksi, 28 Agu 2026): dengan
+ * `cfTtsEnabled:false` DAN `enabled.tts:false` di KV `cfg:flags`,
+ * `POST https://api.fiezel.my.id/api/tts/render` tetap dijawab **200** dan tetap
+ * MENJALANKAN jalur render — amplopnya memuat `accountNeuronsReleased`, jadi ia
+ * benar-benar memesan lalu melepas neuron akun. Pada saat yang sama
+ * `POST /api/ai/task` dijawab 403 `ai_disabled` dalam 141 ms dengan nol token
+ * model. Jadi pagar flag dipasang di jalur AI dan TIDAK di jalur TTS.
+ *
+ * KENAPA TABEL, BUKAN FUNGSI KEDUA YANG DISALIN: dua mekanisme untuk satu maksud
+ * adalah cara celah berikutnya lahir. `aiAllowedFrom()` dan `ttsAllowedFrom()`
+ * di bawah adalah DUA NAMA untuk SATU fungsi (`featureAllowedFrom`) yang dibedakan
+ * hanya oleh baris tabel ini. Fitur berbayar ketiga (`coach`) menambah satu baris,
+ * bukan satu cabang logika.
+ */
+export const PAID_FEATURES = Object.freeze({
+  ai: Object.freeze({
+    name: 'ai',
+    varName: 'FEATURE_AI',
+    killKey: 'ai',
+    flagKey: 'cfAiEnabled',
+    reasons: GATE_REASONS
+  }),
+  tts: Object.freeze({
+    name: 'tts',
+    varName: 'FEATURE_TTS',
+    killKey: 'tts',
+    flagKey: 'cfTtsEnabled',
+    reasons: TTS_GATE_REASONS
+  })
+});
+
+/**
  * Gabung nilai dari KV ke default. Hanya kunci yang SUDAH dikenal yang dipakai,
  * dan hanya bertipe boolean: satu nilai sampah di KV tidak boleh bisa
  * menyuntikkan flag baru yang tidak pernah didesain klien.
@@ -144,16 +190,31 @@ export async function readServerFlags(env, defaults) {
  * @param {{ok:boolean, flags:object, enabled:object}} snapshot
  * @returns {{allowed:boolean, reason:string}}
  */
-export function aiAllowedFrom(env, snapshot) {
-  if (String((env && env.FEATURE_AI) || '') !== 'on') {
-    return { allowed: false, reason: GATE_REASONS.featureVarOff };
+export function featureAllowedFrom(env, snapshot, spec) {
+  const f = spec || PAID_FEATURES.ai;
+  if (String((env && env[f.varName]) || '') !== 'on') {
+    return { allowed: false, reason: f.reasons.featureVarOff };
   }
   if (!snapshot || snapshot.ok !== true) {
-    return { allowed: false, reason: GATE_REASONS.flagsUnreadable };
+    return { allowed: false, reason: f.reasons.flagsUnreadable };
   }
-  if (snapshot.enabled.ai !== true) return { allowed: false, reason: GATE_REASONS.killSwitch };
-  if (snapshot.flags.cfAiEnabled !== true) return { allowed: false, reason: GATE_REASONS.flagOff };
+  if (snapshot.enabled[f.killKey] !== true) return { allowed: false, reason: f.reasons.killSwitch };
+  if (snapshot.flags[f.flagKey] !== true) return { allowed: false, reason: f.reasons.flagOff };
   return { allowed: true, reason: '' };
+}
+
+export function aiAllowedFrom(env, snapshot) {
+  return featureAllowedFrom(env, snapshot, PAID_FEATURES.ai);
+}
+
+/**
+ * S3 — kebijakan penegakan jalur TTS berbayar. Sama fungsi, baris tabel berbeda.
+ * `snapshot.ok !== true` = TOLAK, sama seperti AI: mesin TTS (`@cf/deepgram/aura-1`)
+ * berjalan di binding Workers AI yang SAMA dan menghabiskan kolam neuron yang SAMA,
+ * jadi tidak ada alasan jalur ini fail-open sementara jalur AI fail-closed.
+ */
+export function ttsAllowedFrom(env, snapshot) {
+  return featureAllowedFrom(env, snapshot, PAID_FEATURES.tts);
 }
 
 /**
@@ -163,8 +224,23 @@ export function aiAllowedFrom(env, snapshot) {
  *
  * @returns {Promise<{allowed:boolean, reason:string, flagsOk:boolean}>}
  */
-export async function checkAiEnabled(env) {
+export async function checkFeatureEnabled(env, spec) {
   const snapshot = await readServerFlags(env);
-  const verdict = aiAllowedFrom(env, snapshot);
+  const verdict = featureAllowedFrom(env, snapshot, spec);
   return { allowed: verdict.allowed, reason: verdict.reason, flagsOk: snapshot.ok === true };
+}
+
+export async function checkAiEnabled(env) {
+  return checkFeatureEnabled(env, PAID_FEATURES.ai);
+}
+
+/**
+ * S3 — dipakai `route-wiring.js` untuk `POST /api/tts/render`, di tempat yang SAMA
+ * dengan gerbang AI (di dalam `wrapMetered`, SEBELUM handler). Karena ia mendahului
+ * handler, penolakannya terjadi sebelum badan permintaan diparsing, sebelum kuota
+ * murid direservasi, sebelum neuron akun dipesan, dan jelas sebelum binding model
+ * disentuh — urutan itu di-assert oleh gerbang, bukan dipercaya dari komentar ini.
+ */
+export async function checkTtsEnabled(env) {
+  return checkFeatureEnabled(env, PAID_FEATURES.tts);
 }

@@ -1,0 +1,317 @@
+{
+  "schema": "fiezel-s3-tts-honest-red-matrix-v1",
+  "gerbang": "tts-provider-contract-test.js",
+  "jumlahMutasi": 17,
+  "semuaMerah": true,
+  "semuaSasaranTertangkap": true,
+  "pulihHijau": true,
+  "matrix": [
+    {
+      "cacat": "S1 pagar flag TTS dicabut dari route-wiring (cacat produksi asli: 200 + render jalan)",
+      "exit": 1,
+      "merah": true,
+      "assertDiharapkanMerah": [
+        "S3-a1",
+        "S3-a2",
+        "S3-a6",
+        "S3-a7"
+      ],
+      "assertYangMerah": [
+        "S3-a1",
+        "S3-a2",
+        "S3-a3",
+        "S3-a5",
+        "S3-a6",
+        "S3-a7",
+        "S3-e1",
+        "S3-e2",
+        "S3-e3",
+        "S3-b5"
+      ],
+      "assertSasaranTertangkap": [
+        "S3-a1",
+        "S3-a2",
+        "S3-a6",
+        "S3-a7"
+      ]
+    },
+    {
+      "cacat": "S1b flag yang tak terbaca dianggap izin (fail-OPEN alih-alih fail-closed)",
+      "exit": 1,
+      "merah": true,
+      "assertDiharapkanMerah": [
+        "S3-a7",
+        "S3-e4"
+      ],
+      "assertYangMerah": [
+        "S3-a7",
+        "S3-e4"
+      ],
+      "assertSasaranTertangkap": [
+        "S3-a7",
+        "S3-e4"
+      ]
+    },
+    {
+      "cacat": "S1c var FEATURE_TTS di wrangler.toml diabaikan (hanya KV yang mengikat)",
+      "exit": 1,
+      "merah": true,
+      "assertDiharapkanMerah": [
+        "S3-a6"
+      ],
+      "assertYangMerah": [
+        "S3-a6"
+      ],
+      "assertSasaranTertangkap": [
+        "S3-a6"
+      ]
+    },
+    {
+      "cacat": "S1d penolakan flag TTS menjanjikan retryAfter yang tidak bisa ditepati",
+      "exit": 1,
+      "merah": true,
+      "assertDiharapkanMerah": [
+        "S3-a4"
+      ],
+      "assertYangMerah": [
+        "S3-a4"
+      ],
+      "assertSasaranTertangkap": [
+        "S3-a4"
+      ]
+    },
+    {
+      "cacat": "S1e naskah penolakan flag memakai bahasa jatah (murid disalahkan atas keputusan server)",
+      "exit": 1,
+      "merah": true,
+      "assertDiharapkanMerah": [
+        "S3-a5"
+      ],
+      "assertYangMerah": [
+        "S3-a5"
+      ],
+      "assertSasaranTertangkap": [
+        "S3-a5"
+      ]
+    },
+    {
+      "cacat": "S1f bentuk amplop penolakan TTS menyimpang dari penolakan AI (copyKey/error sendiri)",
+      "exit": 1,
+      "merah": true,
+      "assertDiharapkanMerah": [
+        "S3-e3"
+      ],
+      "assertYangMerah": [
+        "S3-e3"
+      ],
+      "assertSasaranTertangkap": [
+        "S3-e3"
+      ]
+    },
+    {
+      "cacat": "S1g penolakan flag TTS tidak lagi 403 (klien tidak bisa membedakan dari kegagalan)",
+      "exit": 1,
+      "merah": true,
+      "assertDiharapkanMerah": [
+        "S3-a1",
+        "S3-e2"
+      ],
+      "assertYangMerah": [
+        "S3-a1",
+        "S3-a6",
+        "S3-a7",
+        "S3-e2"
+      ],
+      "assertSasaranTertangkap": [
+        "S3-a1",
+        "S3-e2"
+      ]
+    },
+    {
+      "cacat": "S2 CACAT PRODUKSI: jalur nol byte / provider gagal mengaku menagih",
+      "exit": 1,
+      "merah": true,
+      "assertDiharapkanMerah": [
+        "S3-b1",
+        "S3-b4",
+        "S3-c1"
+      ],
+      "assertYangMerah": [
+        "S3-b1",
+        "S3-c1",
+        "S3-b4"
+      ],
+      "assertSasaranTertangkap": [
+        "S3-b1",
+        "S3-b4",
+        "S3-c1"
+      ]
+    },
+    {
+      "cacat": "S2b pembatalan kuota tidak dicatat, jadi chargedFor() kembali bohong",
+      "exit": 1,
+      "merah": true,
+      "assertDiharapkanMerah": [
+        "S3-b1",
+        "S3-c1"
+      ],
+      "assertYangMerah": [
+        "S3-b1",
+        "S3-c1",
+        "S3-b4"
+      ],
+      "assertSasaranTertangkap": [
+        "S3-b1",
+        "S3-c1"
+      ]
+    },
+    {
+      "cacat": "S2c jalur SUKSES mengaku tidak menagih (field jadi konstanta \"false\" yang tak berguna)",
+      "exit": 1,
+      "merah": true,
+      "assertDiharapkanMerah": [
+        "S3-b1",
+        "S3-b2"
+      ],
+      "assertYangMerah": [
+        "S3-b1",
+        "S3-b2",
+        "S3-d3"
+      ],
+      "assertSasaranTertangkap": [
+        "S3-b1",
+        "S3-b2"
+      ]
+    },
+    {
+      "cacat": "S2d cache hit R2 mengaku menagih jatah",
+      "exit": 1,
+      "merah": true,
+      "assertDiharapkanMerah": [
+        "S3-b1",
+        "S3-c1",
+        "S3-d1"
+      ],
+      "assertYangMerah": [
+        "cache hit: source \"cache\", quotaCharged false",
+        "S3-b1",
+        "S3-d1"
+      ],
+      "assertSasaranTertangkap": [
+        "S3-b1",
+        "S3-d1"
+      ]
+    },
+    {
+      "cacat": "S3 CACAT KETIGA: penggabungan permintaan dikembalikan ke SESUDAH gerbang kuota",
+      "exit": 1,
+      "merah": true,
+      "assertDiharapkanMerah": [
+        "S3-d2",
+        "S3-d3",
+        "S3-d4"
+      ],
+      "assertYangMerah": [
+        "S3-d2",
+        "S3-d3",
+        "S3-d4",
+        "S3-d5"
+      ],
+      "assertSasaranTertangkap": [
+        "S3-d2",
+        "S3-d3",
+        "S3-d4"
+      ]
+    },
+    {
+      "cacat": "S3b permintaan yang digabungkan mewarisi klaim penagihan pemimpin",
+      "exit": 1,
+      "merah": true,
+      "assertDiharapkanMerah": [
+        "S3-d3"
+      ],
+      "assertYangMerah": [
+        "S3-d3"
+      ],
+      "assertSasaranTertangkap": [
+        "S3-d3"
+      ]
+    },
+    {
+      "cacat": "S4 accountNeuronsReleased dipatok true walau pelepasan tidak pernah terjadi",
+      "exit": 1,
+      "merah": true,
+      "assertDiharapkanMerah": [
+        "S3-f2"
+      ],
+      "assertYangMerah": [
+        "S3-f2"
+      ],
+      "assertSasaranTertangkap": [
+        "S3-f2"
+      ]
+    },
+    {
+      "cacat": "S5 bytes kembali ditaksir 0,75x panjang base64 (bukan byte audio sungguhan)",
+      "exit": 1,
+      "merah": true,
+      "assertDiharapkanMerah": [
+        "S3-g1",
+        "S3-g2",
+        "S3-g3"
+      ],
+      "assertYangMerah": [
+        "S3-g1",
+        "S3-g2",
+        "S3-g3"
+      ],
+      "assertSasaranTertangkap": [
+        "S3-g1",
+        "S3-g2",
+        "S3-g3"
+      ]
+    },
+    {
+      "cacat": "S5b base64 ditulis ke R2 sebagai teks (yang dilaporkan != yang disimpan)",
+      "exit": 1,
+      "merah": true,
+      "assertDiharapkanMerah": [
+        "S3-g1",
+        "S3-g2"
+      ],
+      "assertYangMerah": [
+        "render BERHASIL (bukan source:\"unavailable\" seperti staging)",
+        "objek R2 ditulis dengan nama = kunci yang sama",
+        "render tier murah tetap berhasil (turun mutu lebih baik daripada senyap)",
+        "S3-b2",
+        "S3-b3",
+        "S3-b5",
+        "S3-d3",
+        "S3-g1",
+        "S3-g3"
+      ],
+      "assertSasaranTertangkap": [
+        "S3-g1"
+      ]
+    },
+    {
+      "cacat": "S6 R2 palsu kembali mengukur body biner lewat String() (bucket palsu yang berbohong)",
+      "exit": 1,
+      "merah": true,
+      "assertDiharapkanMerah": [
+        "S3-g2"
+      ],
+      "assertYangMerah": [
+        "S3-g2",
+        "S3-g3"
+      ],
+      "assertSasaranTertangkap": [
+        "S3-g2"
+      ]
+    }
+  ],
+  "sesudahPemulihan": {
+    "exit": 0,
+    "failed": []
+  }
+}
