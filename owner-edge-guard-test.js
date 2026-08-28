@@ -18,6 +18,20 @@
 // `workers/owner/README.md` §2 dan dipasang PER HOSTNAME — sama sekali tidak berlaku.
 //
 // YANG DIASSERT:
+// ==========================================================================================
+// 🔄 TEMUAN LAPANGAN 28 Agu 2026 — CUSTOM DOMAIN OWNER SUDAH AKTIF
+// ==========================================================================================
+// `https://owner.fiezel.my.id/` menjawab 403 `{"error":"forbidden"}` (tiga percobaan, ~75 ms)
+// padahal Worker sudah dideploy, custom domain sudah aktif, dan ketiga Secret terpasang.
+// Sebabnya: penjaga tepi menuntut header jembatan `X-Fiezel-Edge` yang HANYA bisa disuntikkan
+// proxy PHP — dan proxy itu sudah TIDAK berada di jalur permintaan. Penjaga menilai keadaan yang
+// sudah tidak berlaku. Perbaikannya BUKAN `ALLOW_NO_EDGE_SECRET=true` (itu membuka
+// `*.workers.dev`, tempat Cloudflare Access tidak berlaku), melainkan JALUR HOSTNAME KANONIK
+// seperti `workers/api/mw-edge.js`. Bab (g-*) di bawah adalah gerbang untuk jalur itu; huruf
+// (g-a)…(g-g) memetakan satu-per-satu ke butir tugas a–g dan SENGAJA dinamai berbeda dari
+// blok (a)–(e) lama di berkas ini supaya dua penomoran tidak tertukar.
+//
+// YANG DIASSERT BLOK LAMA:
 //  (a) SEMUA rute owner (termasuk `/login`, termasuk rute yang belum ada) 403 tanpa header
 //      `X-Fiezel-Edge` yang benar — bahkan dengan cookie sesi owner yang sah. Nol sentuhan D1.
 //  (b) DUA LAPIS, bukan satu: header edge yang benar TIDAK menggantikan sesi owner. Rute owner
@@ -64,6 +78,8 @@ const dataUrl = (text) => 'data:text/javascript;base64,' + Buffer.from(text, 'ut
 
 const indexSource = mustRead(path.join(OWNER_DIR, 'index.js'), 'workers/owner/index.js');
 const queriesSource = mustRead(path.join(OWNER_DIR, 'queries.js'), 'workers/owner/queries.js');
+const wranglerSource = mustRead(path.join(OWNER_DIR, 'wrangler.toml'), 'workers/owner/wrangler.toml');
+const deploySource = mustRead(path.join(OWNER_DIR, 'DEPLOY.md'), 'workers/owner/DEPLOY.md');
 const phpSource = mustRead(path.join(DEPLOY_DIR, 'owner-index.php'), 'deploy/edge/owner-index.php');
 const readmeSource = mustRead(path.join(DEPLOY_DIR, 'README.md'), 'deploy/edge/README.md');
 const workflowSource = mustRead(path.join(ROOT, '.github', 'workflows', 'quality.yml'), '.github/workflows/quality.yml');
@@ -320,7 +336,14 @@ function proxyForward(workerHeaders, list) {
       'badan penolakan fail-closed IDENTIK dengan penolakan header salah (bukan oracle konfigurasi)');
     assert(!/EDGE_SHARED_SECRET|ALLOW_NO_EDGE_SECRET|x-fiezel-edge/i.test(closedBody),
       'penolakan fail-closed tidak membocorkan nama secret/var/header');
-    assert(mod.edgeGuardStatus({ EDGE_SHARED_SECRET: '  ' }) === 'off', 'edgeGuardStatus() jujur: off untuk secret kosong');
+    // KOREKSI 28 Agu 2026: sejak jalur hostname kanonik ada, "secret kosong" TIDAK berarti
+    // "tidak ada penegakan" — hostname asing dan *.workers.dev tetap ditolak. Jadi 'on' adalah
+    // jawaban yang JUJUR di sini, dan 'off' hanya sah saat pembuka darurat memaksa gerbang
+    // terbuka. Rumusnya kini identik dengan `edgeGuardStatus()` di workers/api/mw-edge.js.
+    assert(mod.edgeGuardStatus({ EDGE_SHARED_SECRET: '  ' }) === 'on',
+      'edgeGuardStatus() jujur: tetap on tanpa secret (penegakan hostname masih jalan)');
+    assert(mod.edgeGuardStatus({ EDGE_SHARED_SECRET: '  ', ALLOW_NO_EDGE_SECRET: 'true' }) === 'off',
+      'edgeGuardStatus() jujur: off HANYA saat pembuka darurat memaksa gerbang terbuka');
     assert(mod.edgeGuardStatus({ EDGE_SHARED_SECRET: EDGE_SECRET }) === 'on', 'edgeGuardStatus() jujur: on saat terpasang');
     assert(errors.some((e) => /FAIL-CLOSED/i.test(e) && /EDGE_SHARED_SECRET/.test(e)),
       'fail-closed dicatat via console.error dan menyebut secret yang harus dipasang');
@@ -566,44 +589,355 @@ function proxyForward(workerHeaders, list) {
   }
 
   /* ==================================================================================
-   * (f) 🔄 TEMUAN LAPANGAN 28 Agu 2026 — ASIMETRI API vs OWNER (BAGIAN INI BARU).
+   * (g-*) 🔄 GERBANG JALUR HOSTNAME KANONIK — 28 Agu 2026 (BAGIAN INI BARU).
    *
-   * `api.fiezel.my.id` SUDAH terikat sebagai custom domain Worker, sehingga
-   * `workers/api/mw-edge.js` kini meloloskan HOSTNAME TEPERCAYA tanpa header.
-   * `owner.fiezel.my.id` BELUM: ia masih subdomain cPanel + `owner-index.php`.
-   * Karena itu penjaga owner TIDAK BOLEH ikut-ikutan meloloskan hostname — kalau
-   * ikut, dashboard owner terbuka di sebuah hostname yang belum pernah berdiri di
-   * Cloudflare dan belum dilindungi Cloudflare Access. Asimetri ini disengaja,
-   * dan gerbang inilah yang menjaganya tetap disengaja.
+   * Blok (f) sebelumnya meng-assert KEBALIKAN dari ini: bahwa penjaga owner TIDAK boleh
+   * punya jalur hostname, karena `owner.fiezel.my.id` belum menjadi custom domain dan
+   * masih lewat `deploy/edge/owner-index.php`. Premis itu SUDAH TIDAK BENAR: custom
+   * domain sudah aktif (id aa153ad81fbc2aee3855441900cc7bc9696f3d0c, enabled true), dan
+   * justru premis lama itulah yang membuat `owner.fiezel.my.id/` menjawab 403 pada tiga
+   * percobaan. Blok ini menggantinya, dan ia lebih ketat, bukan lebih longgar: yang
+   * dilonggarkan HANYA satu hostname yang benar-benar terikat di Cloudflare, dan
+   * `*.workers.dev` justru dijaga lebih rapat daripada sebelumnya.
    * ================================================================================ */
+
+  const reqAt = (host, route, opts) => new Request('https://' + host + route, opts || {});
+  const WORKERS_DEV_HOSTS = [
+    'fiezel-owner.fitrajft.workers.dev',
+    // Preview URL Worker berbentuk `<versi-atau-alias>-<nama>.<sub>.workers.dev` dan tetap
+    // berakhiran `.workers.dev`; ia harus ikut tertutup oleh pemeriksaan akhiran yang sama.
+    '9ad13540-fiezel-owner.fitrajft.workers.dev',
+    'FIEZEL-OWNER.FITRAJFT.WORKERS.DEV',      // huruf besar tidak boleh menolong
+    'fiezel-owner.fitrajft.workers.dev.',     // titik akhir tidak boleh menolong
+    'workers.dev',
+  ];
+  const FOREIGN_HOSTS = [
+    'owner.fiezel.my.id.penyerang.com',       // sufiks: hostname kanonik sebagai PREFIKS
+    'penyerang.com',
+    'xowner.fiezel.my.id',                    // prefiks tambahan
+    'owner.fiezel.my.id.evil',
+    'fiezel.my.id',                           // zona apex bukan hostname owner
+    'api.fiezel.my.id',                       // hostname Worker LAIN
+    'owner.fiezel.my.id:8443'.replace(':8443', '-8443.penyerang.com'),
+  ];
+
+  /* ---------- (g-a) hostname kanonik LOLOS penjaga tepi ------------------------------- */
   {
-    assert(!/TRUSTED_EDGE_HOSTS|isTrustedEdgeHost/.test(indexSource),
-      '(f) penjaga owner TIDAK punya jalur hostname-tepercaya (owner belum custom domain)');
-
-    // Permintaan yang tiba di hostname owner "resmi" TANPA header tetap 403:
-    // satu-satunya jalur sah owner hari ini adalah proxy PHP + header.
-    for (const host of ['https://owner.fiezel.my.id', 'https://fiezel-owner.fitrajft.workers.dev']) {
-      const res = await mod.handle(new Request(host + '/login'), makeEnv(), {}, NOW);
-      assert(res.status === 403,
-        '(f) ' + host + '/login tanpa header edge tetap 403 (owner belum punya jalur hostname), dapat ' + res.status);
-      const body = await res.clone().text();
-      assert(/forbidden_edge|Permintaan ini harus lewat/.test(body) || res.status === 403,
-        '(f) penolakan owner tetap satu bentuk galat');
+    // Daftar hostname tepercaya WAJIB sama dengan route custom_domain di wrangler.toml.
+    // Tanpa assert ini, daftar di kode bisa tumbuh menjadi hostname yang tidak pernah
+    // berdiri di Cloudflare — yaitu API publik kedua yang tidak dilindungi Access.
+    const patterns = [];
+    for (const block of wranglerSource.split(/\[\[routes\]\]/).slice(1)) {
+      const chunk = block.split(/\n\[\[/)[0];
+      const pat = /pattern\s*=\s*"([^"]+)"/.exec(chunk);
+      const custom = /custom_domain\s*=\s*true/.test(chunk);
+      if (pat && custom) patterns.push(pat[1].trim().toLowerCase());
     }
+    assert(patterns.length === 1 && patterns[0] === 'owner.fiezel.my.id',
+      '(g-a) wrangler.toml owner punya TEPAT satu route custom_domain owner.fiezel.my.id, dapat ' + JSON.stringify(patterns));
+    assert(JSON.stringify(Array.from(mod.TRUSTED_EDGE_HOSTS).sort()) === JSON.stringify(patterns.sort()),
+      '(g-a) TRUSTED_EDGE_HOSTS identik dengan route custom_domain di wrangler.toml, dapat '
+      + JSON.stringify(mod.TRUSTED_EDGE_HOSTS));
 
-    // Dan header sah tetap SATU-SATUNYA pembuka lapis pertama owner.
-    const viaHeader = await mod.handle(
-      makeRequest('/login', { headers: { 'x-fiezel-edge': EDGE_SECRET } }), makeEnv(), {}, NOW);
-    assert(viaHeader.status === 200,
-      '(f) jalur header sah tetap membuka lapis pertama owner, dapat ' + viaHeader.status);
+    // Sinyal hostname WAJIB diambil dari request.url, BUKAN dari header yang bisa disetel klien.
+    const codeOnly = indexSource
+      .replace(/\/\*[\s\S]*?\*\//g, ' ')
+      .replace(/(^|[^:])\/\/[^\n]*/g, '$1');
+    assert(/new URL\(request\.url\)\.hostname/.test(codeOnly),
+      '(g-a) hostname diambil dari new URL(request.url).hostname (nilai yang dipakai perutean CF)');
+    assert(!/headers\.get\(\s*['"]host['"]/i.test(codeOnly),
+      '(g-a) penjaga TIDAK PERNAH membaca header Host mentah (tidak dinormalkan, bisa ganda)');
+    assert(!/x-forwarded-host|x-host|\bforwarded\b/i.test(codeOnly),
+      '(g-a) penjaga TIDAK PERNAH membaca X-Forwarded-Host / X-Host / Forwarded');
+    assert(!/headers\.get\(\s*['"](origin|referer)['"]/i.test(codeOnly),
+      '(g-a) keputusan tepi tidak pernah bergantung pada Origin/Referer');
+    assert(/SINYAL HOSTNAME/.test(indexSource) && /forbidden header/i.test(indexSource),
+      '(g-a) index.js menuliskan MENGAPA sinyal hostname itu tidak bisa dipalsukan');
 
-    // Dokumen wajib menyatakan asimetrinya, supaya orang berikutnya tidak
-    // "menyelaraskan" kedua penjaga tanpa tahu owner belum punya hostname.
-    assert(/CADANGAN|cadangan/.test(readmeSource),
-      '(f) README menyatakan jembatan PHP kini jalur CADANGAN untuk `api`');
-    assert(/owner[^\n]*belum[^\n]*custom domain|belum menjadi custom domain/i.test(readmeSource),
-      '(f) README menyatakan `owner` BELUM custom domain (asimetri dengan `api`)');
+    // Perilaku: hostname kanonik lolos lapis pertama TANPA header, dan JALURnya dilaporkan
+    // sebagai `custom-domain` — bukan `header`, bukan `off`.
+    const env = makeEnv();
+    const login = await mod.handle(reqAt('owner.fiezel.my.id', '/login'), env, {}, NOW);
+    assert(login.status === 200,
+      '(g-a) GET /login di hostname kanonik TANPA header edge → 200, dapat ' + login.status);
+    assert(mod.edgeGuardPath(reqAt('owner.fiezel.my.id', '/login'), makeEnv(), '/login') === 'custom-domain',
+      '(g-a) jalur yang dilaporkan untuk hostname kanonik adalah custom-domain, dapat '
+      + mod.edgeGuardPath(reqAt('owner.fiezel.my.id', '/login'), makeEnv(), '/login'));
+    assert(mod.isTrustedEdgeHost('OWNER.FIEZEL.MY.ID') === true,
+      '(g-a) pencocokan hostname tidak peka huruf besar/kecil');
+    assert(mod.isTrustedEdgeHost('owner.fiezel.my.id.') === true,
+      '(g-a) titik akhir FQDN dinormalkan, bukan ditolak (hostname yang sama)');
+    // Dan dua lapis tetap dua lapis: gerbang lewat ≠ boleh melihat angka.
+    for (const route of ownerRoutes) {
+      const e2 = makeEnv();
+      const res = await mod.handle(reqAt('owner.fiezel.my.id', route + '?admin=true'), e2, {}, NOW);
+      assert(res.status === 403,
+        '(g-a) ' + route + ' di hostname kanonik TANPA sesi owner tetap 403, dapat ' + res.status);
+      assert(e2.ANALYTICS._log.length === 0, '(g-a) ' + route + ' menyentuh D1 tanpa sesi owner');
+    }
+    // Token owner tetap bisa dipakai sesudah gerbang lewat: sha256 HEX + waktu-konstan, utuh.
+    const envLogin = makeEnv();
+    const posted = await mod.handle(reqAt('owner.fiezel.my.id', '/login', {
+      method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ t: OWNER_TOKEN }),
+    }), envLogin, {}, NOW);
+    assert(posted.status === 303,
+      '(g-a) POST /login token benar di hostname kanonik → 303, dapat ' + posted.status);
+    const setCookie = posted.headers.get('set-cookie') || '';
+    assert(/fz_owner=[A-Za-z0-9_\-]+\.[0-9a-f]{64}/.test(setCookie),
+      '(g-a) sesi owner benar-benar diterbitkan (body.HMAC-hex), dapat ' + setCookie.slice(0, 40));
+    // Ekstraksi dijaga: kalau langkah sebelumnya jatuh, gerbang harus tetap melaporkan
+    // SEMUA butir merahnya, bukan melempar dan mengosongkan laporan.
+    const issued = (/fz_owner=([^;]+)/.exec(setCookie) || [, 'tidak-diterbitkan'])[1];
+    const dash = await mod.handle(reqAt('owner.fiezel.my.id', '/?period=7d', {
+      headers: { cookie: mod.SESSION_COOKIE + '=' + issued },
+    }), makeEnv(), {}, NOW);
+    assert(dash.status === 200,
+      '(g-a) sesi hasil login dipakai di hostname kanonik → 200 (alur masuk utuh dari ujung ke ujung), dapat ' + dash.status);
+    const wrong = await mod.handle(reqAt('owner.fiezel.my.id', '/login', {
+      method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ t: OWNER_TOKEN + 'x' }),
+    }), makeEnv(), {}, NOW);
+    assert(wrong.status === 403 && !/fz_owner=[A-Za-z0-9]/.test(wrong.headers.get('set-cookie') || ''),
+      '(g-a) token salah di hostname kanonik tetap 403 dan tidak menerbitkan sesi, dapat ' + wrong.status);
+    assert(/ctEq\(presentedDigest,/.test(indexSource) && /sha256Hex\(presented\)/.test(indexSource),
+      '(g-a) mekanisme masuk TIDAK diubah: sha256 HEX token dibandingkan waktu-konstan');
   }
+
+  /* ---------- (g-b) *.workers.dev DITOLAK meski secret terpasang ---------------------- */
+  {
+    for (const host of WORKERS_DEV_HOSTS) {
+      assert(mod.isWorkersDevHost(host) === true, '(g-b) ' + host + ' dikenali sebagai alamat workers.dev');
+      assert(mod.isTrustedEdgeHost(host) === false, '(g-b) ' + host + ' TIDAK PERNAH tepercaya');
+      for (const [label, headers] of [
+        ['tanpa header', {}],
+        ['sesi owner sah', { cookie: goodCookie }],
+        ['header edge salah', { 'x-fiezel-edge': 'salah' }],
+      ]) {
+        const env = makeEnv();                             // EDGE_SHARED_SECRET TERPASANG
+        const res = await mod.handle(reqAt(host, '/login', { headers }), env, {}, NOW);
+        assert(res.status === 403,
+          '(g-b) ' + host + '/login [' + label + '] → ' + res.status + ', seharusnya 403 (Access tidak berlaku di sana)');
+        assert(env.ANALYTICS._log.length === 0, '(g-b) penolakan workers.dev tidak menyentuh D1');
+      }
+      assert(mod.edgeGuardPath(reqAt(host, '/login'), makeEnv(), '/login') === 'denied',
+        '(g-b) jalur yang dilaporkan untuk ' + host + ' adalah denied');
+    }
+    // `workers.dev` sebagai SUBSTRING di tengah hostname asing bukan alamat Worker.
+    assert(mod.isWorkersDevHost('workers.dev.penyerang.com') === false,
+      '(g-b) pemeriksaan akhiran, bukan substring: workers.dev.penyerang.com bukan alamat Worker');
+    // Jalur cadangan tetap ada dan tetap berfungsi DI SANA dengan secret yang benar.
+    assert(mod.edgeGuardPath(reqAt(WORKERS_DEV_HOSTS[0], '/login',
+      { headers: { 'x-fiezel-edge': EDGE_SECRET } }), makeEnv(), '/login') === 'header',
+      '(g-b) jalur cadangan `header` masih hidup di alamat jembatan (bukan dihapus)');
+  }
+
+  /* ---------- (g-c) hostname asing/karangan ditolak ----------------------------------- */
+  {
+    const denialBodies = [];
+    for (const host of FOREIGN_HOSTS) {
+      assert(mod.isTrustedEdgeHost(host) === false, '(g-c) ' + host + ' bukan hostname tepercaya');
+      for (const [label, headers] of [
+        ['tanpa header', {}],
+        ['header edge BENAR', { 'x-fiezel-edge': EDGE_SECRET }],
+        ['header edge benar + sesi sah', { 'x-fiezel-edge': EDGE_SECRET, cookie: goodCookie }],
+      ]) {
+        const env = makeEnv();
+        const res = await mod.handle(reqAt(host, '/', { headers }), env, {}, NOW);
+        assert(res.status === 403,
+          '(g-c) ' + host + '/ [' + label + '] → ' + res.status + ', seharusnya 403 (default-deny hostname)');
+        assert(env.ANALYTICS._log.length === 0, '(g-c) penolakan hostname asing tidak menyentuh D1');
+        denialBodies.push(await res.text());
+      }
+    }
+    // Bentuk galat IDENTIK dengan sebab penolakan lain: gerbang tidak boleh dipakai memetakan
+    // hostname mana yang dikenal Worker.
+    const workersDevBody = await (await mod.handle(reqAt(WORKERS_DEV_HOSTS[0], '/'), makeEnv(), {}, NOW)).text();
+    assert(new Set(denialBodies.concat([workersDevBody])).size === 1,
+      '(g-c) satu bentuk penolakan untuk hostname asing DAN workers.dev (anti-oracle hostname), dapat '
+      + new Set(denialBodies.concat([workersDevBody])).size);
+    // URL yang tidak bisa diurai gagal ke arah aman, bukan melempar.
+    assert(mod.requestHostname({ url: 'bukan-url' }) === '', '(g-c) URL tak terurai → hostname kosong');
+    assert(mod.isTrustedEdgeHost('') === false && mod.isTrustedEdgeHost(null) === false,
+      '(g-c) hostname kosong/null tidak pernah tepercaya');
+  }
+
+  /* ---------- (g-d) header X-Fiezel-Edge palsu di hostname kanonik = nol hak ---------- */
+  {
+    const base = await mod.handle(reqAt('owner.fiezel.my.id', '/login'), makeEnv(), {}, NOW);
+    const baseBody = await base.text();
+    for (const [label, value] of [
+      ['palsu', 'header-karangan-penyerang'],
+      ['kosong', ''],
+      ['berprefiks benar', EDGE_SECRET.slice(0, -1)],
+      ['lebih panjang', EDGE_SECRET + 'x'],
+      ['benar', EDGE_SECRET],
+    ]) {
+      const res = await mod.handle(reqAt('owner.fiezel.my.id', '/login',
+        { headers: { 'x-fiezel-edge': value } }), makeEnv(), {}, NOW);
+      assert(res.status === base.status && (await res.text()) === baseBody,
+        '(g-d) header edge [' + label + '] di hostname kanonik tidak mengubah apa pun (hak sama dengan tanpa header)');
+      assert(mod.edgeGuardPath(reqAt('owner.fiezel.my.id', '/login',
+        { headers: { 'x-fiezel-edge': value } }), makeEnv(), '/login') === 'custom-domain',
+        '(g-d) jalur tetap custom-domain dengan header edge [' + label + '] — headernya tidak dibaca di sini');
+      // Dan yang paling penting: ia tidak menggantikan sesi owner.
+      const env = makeEnv();
+      const priv = await mod.handle(reqAt('owner.fiezel.my.id', '/api/summary',
+        { headers: { 'x-fiezel-edge': value } }), env, {}, NOW);
+      assert(priv.status === 403,
+        '(g-d) /api/summary di hostname kanonik dengan header edge [' + label + '] tetap 403 tanpa sesi, dapat ' + priv.status);
+      assert(env.ANALYTICS._log.length === 0, '(g-d) tidak ada baca D1 tanpa sesi owner');
+    }
+    // Hostname kanonik + tanpa secret sama sekali: header apa pun tetap tidak menaikkan hak.
+    const noSecret = await mod.handle(reqAt('owner.fiezel.my.id', '/api/summary',
+      { headers: { 'x-fiezel-edge': 'apa-saja' } }), makeEnv({ EDGE_SHARED_SECRET: undefined }), {}, NOW);
+    assert(noSecret.status === 403, '(g-d) tanpa secret, header karangan tetap tidak membuka /api/summary');
+  }
+
+  /* ---------- (g-e) ALLOW_NO_EDGE_SECRET: hanya 'true', dan tidak lagi diperlukan ----- */
+  {
+    // TIDAK LAGI DIPERLUKAN: hostname kanonik bekerja tanpa secret DAN tanpa pembuka darurat.
+    for (const env of [
+      makeEnv({ EDGE_SHARED_SECRET: undefined }),
+      makeEnv({ EDGE_SHARED_SECRET: '   ' }),
+    ]) {
+      delete env.ALLOW_NO_EDGE_SECRET;
+      const res = await mod.handle(reqAt('owner.fiezel.my.id', '/login'), env, {}, NOW);
+      assert(res.status === 200,
+        '(g-e) hostname kanonik LOLOS tanpa EDGE_SHARED_SECRET dan tanpa ALLOW_NO_EDGE_SECRET, dapat ' + res.status);
+      assert(mod.allowNoSecretOverride(env) === false,
+        '(g-e) operasi normal berjalan dengan pembuka darurat TIDAK dipasang');
+    }
+    // Hanya string persis 'true'. `'TRUE'`/`'True'` DITOLAK sejak koreksi 28 Agu 2026 — versi
+    // sebelumnya memakai toLowerCase() dan diam-diam menerima keduanya.
+    const realError = console.error;
+    console.error = () => {};      // peringatan fail-closed sudah diuji di bloknya sendiri
+    try {
+      for (const bad of ['1', 'yes', 'on', 'TRUE', 'True', 'tRue', ' true x', 'true\n0', '', 'false']) {
+        assert(mod.allowNoSecretOverride({ ALLOW_NO_EDGE_SECRET: bad }) === false,
+          '(g-e) ALLOW_NO_EDGE_SECRET=' + JSON.stringify(bad) + ' TIDAK membuka gerbang');
+        const res = await mod.handle(reqAt(WORKERS_DEV_HOSTS[0], '/login'),
+          makeEnv({ EDGE_SHARED_SECRET: '  ', ALLOW_NO_EDGE_SECRET: bad }), {}, NOW);
+        assert(res.status === 403,
+          '(g-e) workers.dev tetap 403 dengan ALLOW_NO_EDGE_SECRET=' + JSON.stringify(bad) + ', dapat ' + res.status);
+      }
+    } finally { console.error = realError; }
+    for (const bad of [true, 1, {}, ['true']]) {
+      assert(mod.allowNoSecretOverride({ ALLOW_NO_EDGE_SECRET: bad }) === false,
+        '(g-e) nilai non-string ' + JSON.stringify(bad) + ' TIDAK membuka gerbang');
+    }
+    assert(mod.allowNoSecretOverride({ ALLOW_NO_EDGE_SECRET: '  true  ' }) === true,
+      "(g-e) spasi di sekitar 'true' tetap dihitung (satu-satunya kelonggaran, dan ia disengaja)");
+    const overrideBody = /function allowNoSecretOverride\([^)]*\)\s*\{([\s\S]*?)\n\}/.exec(indexSource);
+    assert(!!overrideBody, '(g-e) badan allowNoSecretOverride bisa dibaca gerbang');
+    assert(!!overrideBody && !/toLowerCase/.test(overrideBody[1]),
+      '(g-e) allowNoSecretOverride TIDAK memakai toLowerCase (janji "string persis" ditegakkan)');
+    assert(!!overrideBody && /\.trim\(\)/.test(overrideBody[1]) && /=== 'true'/.test(overrideBody[1]),
+      "(g-e) allowNoSecretOverride membandingkan hasil trim() dengan string persis 'true'");
+    // DEPLOY.md tidak boleh lagi MENYURUH memasang pembuka darurat sebagai cara normal.
+    assert(!/ALLOW_NO_EDGE_SECRET\s*[:=]\s*"?true"?\s*\*\*dan\*\*/.test(deploySource),
+      '(g-e) DEPLOY.md tidak lagi menyuruh memasang ALLOW_NO_EDGE_SECRET untuk operasi normal');
+    assert(/--var ALLOW_NO_EDGE_SECRET/.test(deploySource) === false,
+      '(g-e) DEPLOY.md tidak lagi memuat perintah deploy yang membuka gerbang');
+  }
+
+  /* ---------- (g-f) tanpa Secret gate owner, SEMUA rute tetap 403 --------------------- */
+  {
+    for (const [label, override] of [
+      ['tanpa OWNER_TOKEN_HASH', { OWNER_TOKEN_HASH: undefined }],
+      ['tanpa OWNER_SESSION_KEY', { OWNER_SESSION_KEY: undefined }],
+      ['tanpa keduanya', { OWNER_TOKEN_HASH: undefined, OWNER_SESSION_KEY: undefined }],
+      ['OWNER_TOKEN_HASH kosong', { OWNER_TOKEN_HASH: '' }],
+    ]) {
+      for (const route of allRoutes.concat(['/api/rute-baru', '/admin'])) {
+        for (const host of ['owner.fiezel.my.id', WORKERS_DEV_HOSTS[0]]) {
+          const env = makeEnv(override);
+          const headers = host === 'owner.fiezel.my.id'
+            ? { cookie: goodCookie }
+            : { 'x-fiezel-edge': EDGE_SECRET, cookie: goodCookie };
+          const res = await mod.handle(reqAt(host, route, { headers }), env, {}, NOW);
+          assert(res.status === 403,
+            '(g-f) ' + host + route + ' [' + label + '] → ' + res.status + ', seharusnya 403 (fail-closed Secret)');
+          assert(env.ANALYTICS._log.length === 0, '(g-f) fail-closed Secret tidak menyentuh D1');
+        }
+      }
+      // Termasuk POST /login dengan token yang benar: tanpa Secret, tidak ada owner.
+      const env = makeEnv(override);
+      const res = await mod.handle(reqAt('owner.fiezel.my.id', '/login', {
+        method: 'POST', headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ t: OWNER_TOKEN }),
+      }), env, {}, NOW);
+      assert(res.status === 403 && !/fz_owner=[A-Za-z0-9]/.test(res.headers.get('set-cookie') || ''),
+        '(g-f) POST /login [' + label + '] tidak menerbitkan sesi, dapat ' + res.status);
+    }
+    assert(/function configured\(env\) \{\s*\n?\s*return !!\(env && env\.OWNER_TOKEN_HASH && env\.OWNER_SESSION_KEY\);/.test(indexSource),
+      '(g-f) fail-closed Secret ditegakkan satu tempat: configured() menuntut KEDUA Secret');
+  }
+
+  /* ---------- (g-g) NOL binding fiezel-core di wrangler.toml -------------------------- */
+  {
+    // INVARIAN PRIVASI. DEPLOY.md menyebut kemunculan binding core sebagai INSIDEN, bukan fitur:
+    // di `fiezel-core` hidup `identity`, `session`, `quota_daily` — data per-orang. Assert ini
+    // dijalankan atas BERKAS wrangler.toml, karena binding lahir dari berkas itu, bukan dari kode.
+    const CORE_ID = '7bc356dc-8aff-41e1-b682-ae2039c58c55';
+    const STATS_ID = 'c712000c-aab9-4a1d-b43d-e6d4c9b36ee8';
+    const stripComments = (toml) => toml.split('\n').filter((l) => !/^\s*#/.test(l)).join('\n');
+    const live = stripComments(wranglerSource);
+
+    const d1Blocks = live.split(/\[\[d1_databases\]\]/).slice(1)
+      .map((b) => b.split(/\n\s*\[/)[0]);
+    assert(d1Blocks.length === 1,
+      '(g-g) TEPAT satu binding D1 di workers/owner/wrangler.toml, dapat ' + d1Blocks.length);
+    const names = d1Blocks.map((b) => (/database_name\s*=\s*"([^"]+)"/.exec(b) || [, ''])[1]);
+    const ids = d1Blocks.map((b) => (/database_id\s*=\s*"([^"]+)"/.exec(b) || [, ''])[1]);
+    const bindings = d1Blocks.map((b) => (/binding\s*=\s*"([^"]+)"/.exec(b) || [, ''])[1]);
+    assert(names.join(',') === 'fiezel-stats', '(g-g) satu-satunya database D1 adalah fiezel-stats, dapat ' + names.join(','));
+    assert(ids.join(',') === STATS_ID, '(g-g) database_id-nya fiezel-stats yang benar, dapat ' + ids.join(','));
+    assert(bindings.join(',') === 'ANALYTICS', '(g-g) nama bindingnya ANALYTICS, dapat ' + bindings.join(','));
+    assert(!names.some((n) => /core/i.test(n)), '(g-g) NOL binding D1 bernama fiezel-core');
+    assert(!ids.includes(CORE_ID), '(g-g) NOL binding D1 ber-uuid fiezel-core');
+    assert(!new RegExp(CORE_ID).test(live),
+      '(g-g) uuid fiezel-core tidak muncul di baris aktif wrangler.toml mana pun');
+    assert(!/fiezel-core/.test(live), '(g-g) nama fiezel-core tidak muncul di baris aktif wrangler.toml');
+    // Jenis binding lain yang bisa menjadi pintu belakang ke data per-orang juga harus NOL.
+    for (const kind of ['kv_namespaces', 'durable_objects', 'services', 'queues', 'hyperdrive',
+      'r2_buckets', 'vectorize', 'mtls_certificates']) {
+      assert(!new RegExp('\\[\\[?' + kind).test(live),
+        '(g-g) NOL binding ' + kind + ' di Worker owner (radius ledakan tetap satu database agregat)');
+    }
+    assert(/workers_dev\s*=\s*false/.test(live),
+      '(g-g) workers_dev = false tetap terpasang (satu pintu, satu tempat memasang Access)');
+    // Pemeriksa ini harus BISA merah: daftar yang disuntik binding core wajib tertangkap.
+    const poisoned = stripComments(wranglerSource
+      + '\n[[d1_databases]]\nbinding = "CORE"\ndatabase_name = "fiezel-core"\ndatabase_id = "' + CORE_ID + '"\n');
+    assert(poisoned.split(/\[\[d1_databases\]\]/).slice(1).length === 2 && /fiezel-core/.test(poisoned),
+      '(g-g) pembaca binding TERBUKTI melihat binding core kalau ia disuntikkan');
+    // Dan DEPLOY.md wajib tetap menyebutnya INSIDEN — kalau kalimat itu hilang, invariannya
+    // kehilangan penjelasan dan orang berikutnya akan menambah binding "sebentar saja".
+    assert(/nol binding ke `?fiezel-core`?/i.test(deploySource),
+      '(g-g) DEPLOY.md tetap menyatakan nol binding ke fiezel-core');
+    assert(/bukan fitur, itu insiden/i.test(deploySource),
+      '(g-g) DEPLOY.md tetap menyebut kemunculan binding core sebagai INSIDEN');
+  }
+
+  /* ---------- (g-*) jalur jembatan dipertahankan, dengan alasan TERTULIS -------------- */
+  {
+    assert(/JALUR CADANGAN/.test(indexSource),
+      '(g-*) index.js menandai jalur header sebagai JALUR CADANGAN, bukan menghapusnya');
+    assert(/cache DNS lama/.test(indexSource) && /sabuk dan bretel/i.test(indexSource),
+      '(g-*) alasan mempertahankan jalur cadangan tertulis di kode (bukan diwariskan lisan)');
+    assert(/RISIKO SISA/.test(indexSource),
+      '(g-*) risiko sisa jalur hostname ditulis apa adanya, bukan dihilangkan');
+    assert(/Cloudflare Access/.test(indexSource) && /workers_dev = false/.test(indexSource),
+      '(g-*) kode menyebut syarat di luar kode yang membuat jalur hostname sah');
+    // README jembatan tetap benar untuk `api`, dan owner kini SUDAH custom domain: dokumen
+    // tidak boleh lagi mengklaim sebaliknya.
+    assert(/CADANGAN|cadangan/.test(readmeSource),
+      '(g-*) README jembatan tetap menyatakan dirinya jalur CADANGAN');
+    assert(/owner\.fiezel\.my\.id/.test(deploySource) && /custom domain/i.test(deploySource),
+      '(g-*) DEPLOY.md membahas custom domain owner.fiezel.my.id');
+  }
+
 
   /* ---------- README pemasangan + pembongkaran ---------------------------------------- */
   {
