@@ -24,7 +24,7 @@ const store = {};
 const fileIndex = new Map();
 (function walk(dir) {
   for (const e of fs.readdirSync(dir, { withFileTypes:true })) {
-    if (['node_modules','.git','vendor','assets','docs'].includes(e.name)) continue;
+    if (['node_modules','.git','vendor','assets','docs','.audit-tmp'].includes(e.name)) continue; /* .audit-tmp: sisa mkdtemp release-audit.py berisi snapshot data basi yang membayangi file kanonik root (preseden: level-grammar-contract-test.js) */
     const full = path.join(dir,e.name);
     if (e.isDirectory()) walk(full); else if (!fileIndex.has(e.name)) fileIndex.set(e.name,full);
   }
@@ -44,7 +44,13 @@ context.window=context;context.self=context;
 context.FIEZEL_VERSION=JSON.parse(fs.readFileSync(path.join(root,'VERSION.json'),'utf8')).version;
 context.window.scrollTo=()=>{};context.window.requestAnimationFrame=fn=>fn();
 vm.createContext(context);
-/* m025-186 merge-fix: kontrak index.html FIEZEL_I18N_BEGIN - i18n + copy-id sebelum app.js. */for(const __f of ['features/i18n/fiezel-i18n.js'].concat(fs.readdirSync(path.join(root,'features/i18n')).filter(n=>/^copy-id-.*\.js$/.test(n)).sort().map(n=>'features/i18n/'+n))){vm.runInContext(fs.readFileSync(path.join(root,__f),'utf8'),context,{filename:__f});}vm.runInContext(fs.readFileSync(path.join(root,'app.js'),'utf8'),context,{filename:'app.js'});
+/* Harness i18n (pola W1-TESTPLAN 2b, hotfix CI pasca-#242): muat runtime i18n + copy-id sebelum kode app dievaluasi. existsSync = hijau dua arah. */
+const __i18nRt=path.join(root,'features','i18n','fiezel-i18n.js');
+if(fs.existsSync(__i18nRt)){vm.runInContext(fs.readFileSync(__i18nRt,'utf8'),context,{filename:'fiezel-i18n.js'});
+for(const __n of fs.readdirSync(path.join(root,'features','i18n')).filter(n=>/^copy-id-.*\.js$/.test(n)).sort()){
+vm.runInContext(fs.readFileSync(path.join(root,'features','i18n',__n),'utf8'),context,{filename:__n});}}
+
+vm.runInContext(fs.readFileSync(path.join(root,'app.js'),'utf8'),context,{filename:'app.js'});
 
 const templates=JSON.parse(fs.readFileSync(path.join(root,'grammar-templates.json'),'utf8')).templates;
 const state=context.__getFiezelState();
