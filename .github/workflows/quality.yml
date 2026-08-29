@@ -522,6 +522,23 @@ jobs:
           # ALASAN TERTULIS di dalam gerbang itu. Ia juga meng-assert bahwa dua gerbang
           # live tidak boleh dihitung sebagai bukti.
           node gate-registry-test.js
+          # Audit rilis m025-179: repo tidak punya SATU PUN penerbit aplikasi ke
+          # `fiezel.my.id/app/` — permukaan yang benar-benar dipakai murid — sehingga
+          # setiap nomor build adalah janji, bukan fakta, dan paritas produksi tidak
+          # pernah bisa dibuktikan. `deploy-site.yml` menutupnya; gerbang ini menjaga
+          # penutupnya: urutan unggah (sw.js WAJIB terakhir, kalau tidak service worker
+          # baru mem-precache bita lama di bawah revisi baru), daftar kecualian yang
+          # tidak boleh memakan satu pun entri ASSETS sw.js, syarat Quality Gate hijau
+          # sebelum terbit, dan SKIP yang bersuara saat secret hosting belum ada.
+          # m025-186: kebijakan interaksi app-like. Dijalankan bersebelahan dengan gerbang
+          # a11y/kontras karena ia menjaga permukaan yang sama dari sisi berlawanan:
+          # yang di atas menjaga agar murid BISA melihat dan memakai, yang ini menjaga
+          # agar peramban tidak menyodorkan perilaku dokumen (seleksi teks, menu konteks,
+          # zoom-otomatis saat fokus) di atas UI aplikasi. Ia juga MEMERAH kalau ada yang
+          # 'memperbaiki' zoom dengan user-scalable=no — regresi WCAG 1.4.4/1.4.10 yang
+          # sudah pernah dicabut audit D16.
+          node app-interaction-policy-test.js
+          node deploy-site-gate-test.js
           node coordination-guard-test.js
 
       # =================================================================================

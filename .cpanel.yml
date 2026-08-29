@@ -1,0 +1,32 @@
+---
+# Resep cPanel Git Version Control — jalur penerbitan TANPA satu pun secret di GitHub.
+#
+# Kalau cPanel ArenHost sudah punya repo ini terdaftar di "Git Version Control", cPanel
+# menjalankan blok di bawah setiap kali ia menarik commit baru. Itu menjelaskan kalimat
+# "main auto-deploy ke produksi tiap 5 menit" di workers/api/wrangler.toml, yang sampai audit
+# m025-179 tidak punya mekanisme yang bisa ditunjukkan di dalam repo.
+#
+# URUTANNYA SAMA PERSIS dengan .github/workflows/deploy-site.yml, dan itu bukan kebetulan:
+# `deploy-site-gate-test.js` cek (E) menuntut kedua jalur memakai urutan yang sama dan
+# membaca daftar kecualian yang SAMA. Dua jalur penerbitan dengan dua urutan berbeda adalah
+# dua peluang berbeda untuk mengirim shell campur ke murid.
+#
+# KENAPA sw.js TERAKHIR: ia mem-precache 157 berkas lewat `caches.addAll(ASSETS)`. Kalau ia
+# mendarat sebelum aset-asetnya, service worker generasi baru menyimpan bita lama (atau 404)
+# di bawah nama revisi baru. Satu entri gagal = SELURUH precache gagal.
+deployment:
+  tasks:
+    - export DEPLOYPATH="$HOME/public_html/app"
+    - /bin/mkdir -p "$DEPLOYPATH"
+
+    # FIEZEL_DEPLOY_STEP_ASSETS — gelombang PERTAMA: semua kecuali sw.js.
+    - >-
+      /usr/bin/rsync -a --delete
+      --exclude-from=deploy/site-exclude.txt
+      --exclude='sw.js'
+      ./ "$DEPLOYPATH/"
+
+    # FIEZEL_DEPLOY_STEP_SW_LAST — gelombang KEDUA: service worker, sesudah asetnya lengkap.
+    - /usr/bin/rsync -a ./sw.js "$DEPLOYPATH/sw.js"
+
+    - /bin/echo "FIEZEL diterbitkan ke $DEPLOYPATH (aset lebih dulu, sw.js terakhir)."

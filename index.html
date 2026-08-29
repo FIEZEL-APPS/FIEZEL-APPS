@@ -2,10 +2,24 @@
 <html lang="id" class="fz-booting" data-theme="light">
 <head>
   <meta charset="utf-8">
-  <!-- D16 (D5 T1): kunci zoom dicabut - WCAG 1.4.4/1.4.10. maximum-scale naik ke 5 dan
-       user-scalable=no dihapus supaya murid low-vision bisa pinch-zoom; blok double-tap
-       tetap ditangani touch-action:manipulation di style.css + fiezel-zoom-lock.js. -->
-  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=5, viewport-fit=cover">
+  <!-- m025-186 — KEPUTUSAN OWNER, DIAMBIL SADAR, DAN INI CATATAN BIAYANYA.
+       D16 (D5 T1) dulu MENCABUT kunci zoom demi WCAG 1.4.4/1.4.10. Pada 29 Agu 2026 OWNER
+       membalikkannya setelah biayanya disampaikan: FIEZEL harus terasa aplikasi, bukan
+       dokumen, dan pinch/zoom halaman dinilai merusak pengalaman belajar.
+
+       BIAYA YANG DITERIMA, ditulis di sini supaya tidak ada yang menemukannya sebagai
+       kejutan: murid low-vision TIDAK lagi bisa memperbesar halaman. Ini penyimpangan dari
+       WCAG 1.4.4 (Resize Text) dan 1.4.10 (Reflow).
+
+       JANGAN membalik baris ini tanpa OWNER. Ia bukan kelalaian dan bukan sisa eksperimen;
+       ia keputusan produk. Gerbang `app-interaction-policy-test.js` dan
+       `m02542-experience-test.js` menegakkan keadaan TERKUNCI ini, jadi mengembalikannya
+       diam-diam akan memerahkan CI.
+
+       MITIGASI YANG DISARANKAN (belum ada, dan ini utang yang jujur): pengatur ukuran teks
+       DI DALAM aplikasi. Itu mengembalikan kemampuan membaca tanpa mengembalikan zoom
+       halaman - satu-satunya jalan menutup biaya di atas tanpa membatalkan keputusan ini. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <!-- D16 (D3 HIGH-1): CSP mode longgar via meta - GitHub Pages tidak bisa set header.
        'unsafe-inline' dipertahankan karena skrip boot splash inline + handler onclick
        memang masih dipakai; pagar utamanya adalah script-src yang membatasi skrip eksternal
