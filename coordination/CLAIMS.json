@@ -46,17 +46,24 @@
     },
     {
       "sesi": "sesi-computer-ed18fcf2",
-      "peran": "UIUX-AUDIT-REPAIR (perplexity computer)",
+      "peran": "UIUX-OVERHAUL (perplexity computer)",
       "paths": [
         "DESIGN-SYSTEM.md",
         "app.js",
+        "assets/marketing/mascot-poses/",
+        "features/mascot/",
+        "features/onboarding/fiezel-onboarding.js",
         "features/onboarding/fiezel-tour.js",
+        "features/speaking-listening/",
         "features/ui/fiezel-back-nav.js",
+        "features/ui/fiezel-coach-bubble.js",
+        "features/ui/fiezel-ui-manager.js",
         "index.html",
-        "style.css"
+        "style.css",
+        "tools/export-mascot.mjs"
       ],
       "mulai": "2026-08-28T16:55:00+07:00",
-      "catatan": "Audit forensik UI/UX 20 agen selesai (145 temuan, 12 P1). Perbaikan blocker: integritas ujian (reveal mid-test), kebijakan abandon simetris + konfirmasi keluar, race modal->stage, timeout bank JSON + kartu error, CTA hang, auto-scroll pembahasan, ikon flame 300px, kontras chip, rewrite DESIGN-SYSTEM.md. Tidak menyentuh features/neural-voice/, coordination tooling, TASKS-LEDGER."
+      "catatan": "Overhaul penuh UI/UX+maskot+lesson-mode selesai: 20 agen desain/impl/QA + 50 verifikator read-only (V01-V50, semua verdict masuk; 10 cacat genuine diperbaiki+diverifikasi ulang). Gate suite 166 hijau (7 FAIL identik pra-eksisting di main), release-audit.py PASS penuh. Siap PR; klaim dilepas setelah merge."
     }
   ],
   "finished": [

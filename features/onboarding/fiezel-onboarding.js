@@ -955,6 +955,12 @@
       host.innerHTML = html;
       applyMascot();
       bind();
+      /* v31-2 2026-08-29: transisi langkah menjatuhkan fokus ke <body> - pengguna keyboard/SR
+         kehilangan posisi. Fokus diserahkan ke heading langkah (tabindex -1 = programatik saja). */
+      try {
+        var h = host.querySelector('h1,h2,[data-step-heading]');
+        if (h) { h.setAttribute('tabindex', '-1'); h.style.outline = 'none'; h.focus({ preventScroll: false }); }
+      } catch (_) {}
     }
 
     /**
