@@ -84,6 +84,16 @@ const norm = s => String(s ?? '').toLowerCase().replace(/[^a-z0-9 ]+/g,' ').repl
 
 const templates = JSON.parse(fs.readFileSync(path.join(root,'grammar-templates.json'),'utf8')).templates;
 const templateById = new Map(templates.map(t => [String(t.id), t]));
+// #250 (skip-content wave2) memperkenalkan TEMPLATE VARIAN: beberapa template berbagi satu
+// subskill (mis. PR-101 varian dari PR-001) dan runtime sah menyajikan varian mana pun untuk
+// lesson tersebut. "Identitas lesson" karena itu = KELOMPOK subskill, bukan satu id template.
+const groupIdsBySubskill = new Map();
+for (const t of templates) {
+  const k = String(t.subskill);
+  if (!groupIdsBySubskill.has(k)) groupIdsBySubskill.set(k, new Set());
+  groupIdsBySubskill.get(k).add(String(t.id));
+}
+const inLessonGroup = (t, sid) => (groupIdsBySubskill.get(String(t.subskill)) || new Set()).has(String(sid));
 
 const REVIEW_DIR = path.join(path.dirname(root), 'review');
 
@@ -131,11 +141,11 @@ function checkEntryContract(level, t, q, i) {
   if ((entry.own === true) !== (origin === 'own'))
     violate(level, 'provenance_origin', `${where}: own===${entry.own} tetapi origin="${origin}" (own===true HANYA untuk origin 'own')`);
   if (origin === 'own') {
-    if (sid !== String(t.id))
-      violate(level, 'provenance_entry', `${where}: origin own tetapi sourceId="${sid}" != id template lesson "${t.id}" (di question final wajib id lesson)`);
+    if (!inLessonGroup(t, sid))
+      violate(level, 'provenance_entry', `${where}: origin own tetapi sourceId="${sid}" di luar kelompok subskill lesson "${t.id}" (wajib id template se-subskill)`);
   } else if (origin === 'peer') {
     if (!sid) violate(level, 'provenance_entry', `${where}: origin peer dengan sourceId kosong`);
-    else if (sid === String(t.id)) violate(level, 'provenance_entry', `${where}: origin peer tetapi sourceId menunjuk lesson ini sendiri`);
+    else if (inLessonGroup(t, sid)) violate(level, 'provenance_entry', `${where}: origin peer tetapi sourceId menunjuk kelompok lesson ini sendiri`);
     else if (!templateById.has(sid)) violate(level, 'provenance_entry', `${where}: origin peer, sourceId "${sid}" tidak resolve ke template nyata`);
     else if (String(slevel ?? '') !== String(templateById.get(sid).cefr))
       violate(level, 'provenance_entry', `${where}: sourceLevel "${slevel}" != cefr template asal "${templateById.get(sid).cefr}" (${sid})`);
@@ -168,10 +178,10 @@ function checkLesson(level, t, qs) {
     const where = `${t.id}/${q.practiceMode}`;
 
     // Identitas question (patch-independent: sudah harus benar di kode lama)
-    if (String(q.sourceId ?? '') !== String(t.id))
-      violate(level, 'question_identity', `${where}: question.sourceId="${q.sourceId}" != "${t.id}"`);
-    if (String(q.conceptId ?? '') !== String(t.id))
-      violate(level, 'question_identity', `${where}: question.conceptId="${q.conceptId}" != "${t.id}"`);
+    if (!inLessonGroup(t, q.sourceId))
+      violate(level, 'question_identity', `${where}: question.sourceId="${q.sourceId}" di luar kelompok subskill "${t.id}"`);
+    if (!inLessonGroup(t, q.conceptId))
+      violate(level, 'question_identity', `${where}: question.conceptId="${q.conceptId}" di luar kelompok subskill "${t.id}"`);
     if (String(q.lessonSkill ?? '') !== String(t.subskill))
       violate(level, 'question_identity', `${where}: question.lessonSkill="${q.lessonSkill}" != "${t.subskill}"`);
 
@@ -192,11 +202,15 @@ function checkLesson(level, t, qs) {
         violate(level, 'distractor_consistency', `${where}[opsi ${i}]: distractors[].option tidak sejajar dengan options[]`);
         return;
       }
-      const expected = entry.origin === 'own' ? String(t.id)
-        : entry.origin === 'peer' ? String(entry.sourceId ?? '')
-        : SENTINEL[entry.origin];
-      if (String(d?.sourceId ?? '') !== expected)
-        violate(level, 'distractor_consistency', `${where}[opsi ${i}]: distractors[].sourceId="${d?.sourceId}" != "${expected}" (origin ${entry.origin})`);
+      // origin 'own' = id template mana pun se-subskill (varian #250 sah menyajikan grupnya)
+      if (entry.origin === 'own') {
+        if (!inLessonGroup(t, d?.sourceId))
+          violate(level, 'distractor_consistency', `${where}[opsi ${i}]: distractors[].sourceId="${d?.sourceId}" di luar kelompok subskill "${t.id}" (origin own)`);
+      } else {
+        const expected = entry.origin === 'peer' ? String(entry.sourceId ?? '') : SENTINEL[entry.origin];
+        if (String(d?.sourceId ?? '') !== expected)
+          violate(level, 'distractor_consistency', `${where}[opsi ${i}]: distractors[].sourceId="${d?.sourceId}" != "${expected}" (origin ${entry.origin})`);
+      }
       if (entry.origin !== 'own' && d?.own === true)
         violate(level, 'distractor_consistency', `${where}[opsi ${i}]: distractors[].own true untuk origin ${entry.origin}`);
     });

@@ -103,17 +103,21 @@ const test = (name, fn) => { fn(); pass++; console.log('PASS', name); };
     const flat = corpus.split('\r\n').join('\n');
     const bodyStart = flat.indexOf('  struggling:[\n');
     assert.ok(bodyStart > -1, 'multi-line body pool exists');
-    const body = flat.slice(bodyStart, flat.indexOf('  starter:[\n'));
-    // Pasca-i18n penuh (PR #242): isi pool berupa FiezelI18n.t('push.pesan-struggling-N')
-    // dan NASKAHNYA hidup di copy-map. Rotasi dihitung dari kunci ATAU literal (dua-duanya
-    // sah), dan framing/larangan mempermalukan dinilai pada naskah copy-id kuncinya.
-    const rotasi = Math.max(body.split("',").length - 1, (body.match(/push\.pesan-struggling-/g) || []).length);
-    assert.ok(rotasi >= 3, 'several rotating messages');
-    const naskahStruggling = (copyIdUnion.match(/'push\.pesan-struggling-\d+'\s*:\s*'((?:[^'\\]|\\.)*)'/g) || []).join('\n') || body;
+    let body = flat.slice(bodyStart, flat.indexOf('  starter:[\n'));
+    /* Pasca-#242 (pola resolver bac8b8d/level-guard): isi pool kini FiezelI18n.t('kunci') —
+       ganti tiap referensi dengan nilai id VERBATIM dari copy-id supaya asersi di bawah
+       tetap menguji teks yang benar-benar dilihat murid. */
+    {
+      const map = {};
+      const reKV = /'((?:[^'\\]|\\.)+)'\s*:\s*'((?:[^'\\]|\\.)*)'/g;
+      let mkv; while ((mkv = reKV.exec(copyIdUnion))) map[mkv[1]] = mkv[2];
+      body = body.replace(/FiezelI18n\.t\('((?:[^'\\]|\\.)+)'\)/g, (w, k) => Object.prototype.hasOwnProperty.call(map, k) ? "'" + map[k] + "'" : w);
+    }
+    assert.ok(body.split("',").length >= 3, 'several rotating messages');
     // Frame the miss as the material not sticking yet, and point back to the topic.
     // The core-brain validator also rejects shaming vocabulary outright.
-    assert.ok(/belum nempel/.test(naskahStruggling), 'framing must blame the material, not the learner');
-    assert.ok(!/(bodoh|goblok|malas)/i.test(naskahStruggling), 'no shaming vocabulary');
+    assert.ok(/belum nempel/.test(body), 'framing must blame the material, not the learner');
+    assert.ok(!/(bodoh|goblok|malas)/i.test(body), 'no shaming vocabulary');
   });
 
   console.log(`FIEZEL reminder struggle trigger: PASS ${pass}/0`);

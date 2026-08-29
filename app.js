@@ -100,6 +100,13 @@ const LEVEL_GUARD_WARN_STEPS=[5,8];
 const LEVEL_EXAM_PASS=80;
 const LEVEL_EXAM_SIZE=25;
 const LEVEL_EXAM_BLUEPRINT={grammar:10,vocab:8,reading:7};
+/* m025-186 (audit A13 §6a): 20/25 bisa lulus dengan bacaan 2/7 (28,6%) — di bawah rerata tebakan
+   4 opsi (25%). Lantai per seksi menuntut tiap skill berdiri di atas garis tebakan:
+   grammar >=5/10 (P lolos dengan menebak murni 7,8%), kosakata >=4/8 (11,4%), bacaan >=3/7 (24,4%;
+   binomial p=0,25). Digabung syarat total >=80%, dekomposisi 10/8/2 dan 10/7/3-gaya tak lolos lagi.
+   F22: label seksi lewat FiezelI18n (pola LEVEL_GUARD_COPY) — pasca-migrasi i18n m025-189. */
+const LEVEL_EXAM_SECTION_FLOOR={grammar:5,vocab:4,reading:3};
+const LEVEL_EXAM_SECTION_LABEL={grammar:FiezelI18n.t('level.seksi-grammar'),vocab:FiezelI18n.t('level.seksi-kosakata'),reading:FiezelI18n.t('level.seksi-bacaan')};
 const LEVEL_EXAM_COOLDOWN_MS=86400000;
 /* Teks verbatim dari reports/copy-fitur-baru.md §3 dan §4. Satu-satunya penyesuaian:
    ambang lulus ditulis 80% (bukan 90%) karena kontrak owner mengikat LEVEL_EXAM_PASS=80,
@@ -127,7 +134,9 @@ const LEVEL_GUARD_COPY={
   examStart:FiezelI18n.t('level.ujian-mulai'),
   examPass:FiezelI18n.t('level.ujian-lulus'),
   examFail:FiezelI18n.t('level.ujian-gagal'),
-  examBadge:FiezelI18n.t('level.ujian-badge')
+  examBadge:FiezelI18n.t('level.ujian-badge'),
+  placementBadge:FiezelI18n.t('level.badge-placement-awal'),
+  baselineBadge:FiezelI18n.t('level.badge-titik-mulai')
 };
 const SUNRISE_MINUTE=6*60;
 const SUNSET_MINUTE=18*60;
@@ -483,7 +492,7 @@ function stableGrammarHash(value){let h=2166136261;for(const c of String(value))
 // m025-162 (S4/C3): pasangan lesson yang aturannya SAMA-SAMA sah untuk stem satu sama lain
 // dilarang saling meminjam meta - penolakan "itu ngejelasin kalimat di lesson lain" jadi
 // bohong untuk mereka (PA-004#25 vs b4_008#25, TA-005 vs b5_002).
-const GRAMMAR_PEER_BLOCKLIST={'PA-004':['b4_008'],'b4_008':['PA-004'],'TA-005':['b5_002'],'b5_002':['TA-005']};
+const GRAMMAR_PEER_BLOCKLIST={'A1-004':["CG-001"],'A1-005':["CG-003"],'A1-006':["CG-002"],'A1-008':["AR-007"],'A1-009':["PS-001"],'A1-011':["A1-111"],'A1-012':["NN-001"],'A1-013':["PR-006"],'A1-015':["QF-001"],'A1-016':["A1-116"],'A1-017':["PD-001"],'A1-111':["A1-011"],'A1-116':["A1-016"],'AR-001':["AR-101"],'AR-002':["AR-031"],'AR-003':["AR-103"],'AR-005':["AR-008"],'AR-007':["A1-008"],'AR-008':["AR-005"],'AR-012':["b4_013"],'AR-031':["AR-002"],'AR-101':["AR-001"],'AR-103':["AR-003"],'CG-001':["A1-004"],'CG-002':["A1-006"],'CG-003':["A1-005"],'CM-001':["CM-101"],'CM-002':["CM-006"],'CM-004':["CM-037"],'CM-006':["CM-002"],'CM-037':["CM-004"],'CM-101':["CM-001"],'CO-001':["CO-101"],'CO-005':["CO-030"],'CO-012':["b4_007"],'CO-017':["b5_006"],'CO-030':["CO-005"],'CO-101':["CO-001"],'EC-005':["EC-039"],'EC-039':["EC-005"],'GI-001':["GI-010"],'GI-003':["GI-032"],'GI-005':["GI-036"],'GI-009':["b4_017"],'GI-010':["GI-001"],'GI-011':["b4_016"],'GI-012':["b5_015"],'GI-013':["b5_016"],'GI-032':["GI-003"],'GI-036':["GI-005"],'LD-001':["b5_021"],'MO-001':["MO-101"],'MO-002':["MO-010"],'MO-003':["MO-011"],'MO-004':["MO-016"],'MO-005':["MO-012"],'MO-006':["MO-033"],'MO-007':["MO-034"],'MO-008':["MO-017"],'MO-010':["MO-002"],'MO-011':["MO-003"],'MO-012':["MO-005"],'MO-015':["b4_005"],'MO-016':["MO-004"],'MO-017':["MO-008"],'MO-018':["b5_003"],'MO-033':["MO-006"],'MO-034':["MO-007"],'MO-101':["MO-001"],'NN-001':["A1-012"],'PA-003':["PA-008"],'PA-004':["b4_008"],'PA-008':["PA-003"],'PA-009':["b4_008"],'PA-010':["b5_007"],'PA-011':["b5_008"],'PD-001':["A1-017"],'PR-001':["PR-101"],'PR-002':["PR-008"],'PR-004':["PR-035"],'PR-005':["PR-009"],'PR-006':["A1-013"],'PR-008':["PR-002"],'PR-009':["PR-005"],'PR-010':["b4_014"],'PR-012':["b4_015"],'PR-013':["b5_013"],'PR-035':["PR-004"],'PR-101':["PR-001"],'PS-001':["A1-009"],'QF-001':["A1-015"],'QN-005':["QN-038"],'QN-006':["b5_019"],'QN-038':["QN-005"],'RC-001':["RC-006"],'RC-004':["RC-007"],'RC-006':["RC-001"],'RC-007':["RC-004"],'RC-008':["b5_017"],'RS-004':["RS-008"],'RS-008':["RS-004"],'RS-009':["b5_010"],'TA-001':["TA-101"],'TA-002':["TA-016"],'TA-003':["TA-017"],'TA-004':["TA-104"],'TA-005':["TA-019", "b5_002"],'TA-007':["TA-020"],'TA-008':["TA-021"],'TA-016':["TA-002"],'TA-017':["TA-003"],'TA-018':["b5_001"],'TA-019':["TA-005"],'TA-020':["TA-007"],'TA-021':["TA-008"],'TA-022':["b4_002"],'TA-101':["TA-001"],'TA-104':["TA-004"],'b4_002':["TA-022"],'b4_005':["MO-015"],'b4_007':["CO-012"],'b4_008':["PA-004", "PA-009"],'b4_013':["AR-012"],'b4_014':["PR-010"],'b4_015':["PR-012"],'b4_016':["GI-011"],'b4_017':["GI-009"],'b5_001':["TA-018"],'b5_002':["TA-005"],'b5_003':["MO-018"],'b5_006':["CO-017"],'b5_007':["PA-010"],'b5_008':["PA-011"],'b5_010':["RS-009"],'b5_013':["PR-013"],'b5_015':["GI-012"],'b5_016':["GI-013"],'b5_017':["RC-008"],'b5_019':["QN-006"],'b5_021':["LD-001"]};
 const grammarPeerBlocked=item=>new Set(GRAMMAR_PEER_BLOCKLIST[String(item?.[8]||'')]||[]);
 function grammarAlternativeMeta(item,field,count=3,opts={}){const own=grammarMeta(item),ownLevel=String(item?.[5]||''),blocked=grammarPeerBlocked(item);
   // m025-155: salt membedakan seed antar-mode (locate_decision_cue tak lagi kembar dengan
@@ -933,7 +942,7 @@ function lessonLockMessage(unlock){if(!unlock?.locked)return'';const names=unloc
  * levelTrustState() selalu memulangkan bentuk lengkap, verified='A1', locked=false - jadi
  * fixture kontrak A1->B1 (level-grammar-contract-test.js) tetap lulus: guard menghitung,
  * bukan memblokir pindah level. Yang diblokir hanya level yang TERKUNCI akibat demosi. */
-function defaultLevelTrust(){return{schema:'fiezel-level-trust-v1',verified:'A1',locked:false,probation:{level:'',mistakesByLevel:{},startedAt:0,lastMistakeAt:0},exams:{},demotions:[],pendingNotice:null}}
+function defaultLevelTrust(){return{schema:'fiezel-level-trust-v1',verified:'A1',verifiedSource:'',locked:false,probation:{level:'',mistakesByLevel:{},startedAt:0,lastMistakeAt:0},exams:{},demotions:[],pendingNotice:null}}
 function sanitizeLevelTrust(raw){
   const base=defaultLevelTrust(),src=raw&&typeof raw==='object'?raw:{};
   const verified=LEVELS.includes(String(src.verified||''))?String(src.verified):'A1';
@@ -951,7 +960,7 @@ function sanitizeLevelTrust(raw){
   }
   const demotions=(Array.isArray(src.demotions)?src.demotions:[]).filter(x=>x&&typeof x==='object').map(x=>({from:LEVELS.includes(String(x.from||''))?String(x.from):'',to:LEVELS.includes(String(x.to||''))?String(x.to):'',at:clamp(x.at),mistakes:clamp(x.mistakes,9999)})).filter(x=>x.from).slice(-10);
   const notice=src.pendingNotice&&typeof src.pendingNotice==='object'&&LEVELS.includes(String(src.pendingNotice.from||''))?{from:String(src.pendingNotice.from),to:LEVELS.includes(String(src.pendingNotice.to||''))?String(src.pendingNotice.to):'A1',at:clamp(src.pendingNotice.at)}:null;
-  return{...base,verified,locked:!!src.locked,probation:{level:LEVELS.includes(String(probation.level||''))?String(probation.level):'',mistakesByLevel,startedAt:clamp(probation.startedAt),lastMistakeAt:clamp(probation.lastMistakeAt)},exams,demotions,pendingNotice:notice};
+  return{...base,verified,verifiedSource:['exam','placement'].includes(String(src.verifiedSource||''))?String(src.verifiedSource):'',locked:!!src.locked,probation:{level:LEVELS.includes(String(probation.level||''))?String(probation.level):'',mistakesByLevel,startedAt:clamp(probation.startedAt),lastMistakeAt:clamp(probation.lastMistakeAt)},exams,demotions,pendingNotice:notice};
 }
 function levelTrustState(s=state){return sanitizeLevelTrust(s?.levelTrust)}
 function verifiedLevel(s=state){const value=String(levelTrustState(s).verified||'A1');return LEVELS.includes(value)?value:'A1'}
@@ -1044,7 +1053,7 @@ function recordSkipExamPass(s=state,level='',detail={}){
   if(!LEVELS.includes(target))return false;
   const trust=levelTrustState(s),now=Date.now();
   if(LEVELS.indexOf(target)>LEVELS.indexOf(trust.verified)+1)return false;
-  if(LEVELS.indexOf(target)>LEVELS.indexOf(trust.verified))trust.verified=target;
+  if(LEVELS.indexOf(target)>LEVELS.indexOf(trust.verified)){trust.verified=target;trust.verifiedSource='exam'}
   const mistakes={...trust.probation.mistakesByLevel};delete mistakes[target];
   trust.probation.mistakesByLevel=mistakes;
   const previous=trust.exams[target]||{attempts:0};
@@ -1070,7 +1079,7 @@ function levelTrustAdoptPlacement(level,s=state){
   const target=String(level||'').toUpperCase();
   if(!LEVELS.includes(target))return false;
   const trust=levelTrustState(s);
-  if(LEVELS.indexOf(target)>LEVELS.indexOf(trust.verified)){trust.verified=target;trust.locked=false;trust.pendingNotice=null}
+  if(LEVELS.indexOf(target)>LEVELS.indexOf(trust.verified)){trust.verified=target;trust.verifiedSource='placement';trust.locked=false;trust.pendingNotice=null}
   const mistakes={...trust.probation.mistakesByLevel};delete mistakes[target];
   trust.probation.mistakesByLevel=mistakes;
   s.levelTrust=trust;
@@ -4460,7 +4469,7 @@ function openFeedback(prefill){
 function render(){const __renderStartedAt=Date.now();try{return renderInner()}finally{window.__fiezelLastRenderMs=Date.now()-__renderStartedAt;/* [FASE-4] pasang ulang timer kantuk 90 dtk tiap layar dicat (mati sendiri di luar layar santai). */try{pawIdleArm()}catch(_){}/* [OUTFIT G5'] konteks layar untuk resolver outfit (19 §6.1) */try{self.FiezelPawOutfit?.screen?.(state.view)}catch(_){}}}
 // m025-41: render duration is recorded so the diagnostic scanner can see a slow screen,
 // which is how OWNER experienced the Classroom regression before any error was logged.
-function renderInner(){speakingListeningMountToken++;if(speakingListeningController){speakingListeningController.destroy();speakingListeningController=null;/* m026-01: satu-satunya tempat sesi dengar benar-benar bubar. Di dalam if, bukan di luar - kalau tidak, tiap navigasi biasa akan memaksa maskot kembali idle dan memotong selebrasi yang sedang jalan. */pawReact('listening-stop')}document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));setApp('');if(state.view==='home')home();if(state.view==='vocab')vocab();if(state.view==='grammar')grammar();if(state.view==='reading')reading();if(state.view==='skills')skillsLab();if(state.view==='listening')skillsLab('listening');if(state.view==='speaking')skillsLab('speaking');if(state.view==='writing')writing();if(state.view==='classroom')classroom();if(state.view==='library')library();if(state.view==='ask'||state.view==='search')askView();if(state.view==='test')placement();if(state.view==='progress')progress();document.querySelector(`[data-view="${state.view}"]`)?.classList.add('active');/* m028 fase3: bendera panggung Skills Lab. Addon listening memaku blok tombolnya ke dasar layar (speaking-listening-addon.css), jadi ia panggung kedua yang bisa ditutupi gelembung. */document.body?.classList?.toggle?.('fz-stage-sl',['skills','listening','speaking'].includes(state.view));/* m028 fase3 (QA §9): Peta Belajar ikut jadi panggung ber-kontrol sejak panel NEXT SESSION punya tombol "Mulai sesi" di dekat dasar layar - screenshot QA menunjukkan gelembung PAW menutupinya utuh. Aturannya sama dengan kuis: peek dilarang, dok mengecil, layar diberi ruang bawah. */document.body?.classList?.toggle?.('fz-stage-map',state.view==='progress');enhanceUI();syncCoachBubble();window.scrollTo(0,0)}
+function renderInner(){speakingListeningMountToken++;if(speakingListeningController){speakingListeningController.destroy();speakingListeningController=null;/* m026-01: satu-satunya tempat sesi dengar benar-benar bubar. Di dalam if, bukan di luar - kalau tidak, tiap navigasi biasa akan memaksa maskot kembali idle dan memotong selebrasi yang sedang jalan. */pawReact('listening-stop')}document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));setApp('');if(state.view==='home')home();if(state.view==='vocab')vocab();if(state.view==='grammar')grammar();if(state.view==='reading')reading();if(state.view==='skills')skillsLab();if(state.view==='listening')skillsLab('listening');if(state.view==='speaking')skillsLab('speaking');if(state.view==='writing')writing();if(state.view==='classroom')classroom();if(state.view==='library')library();if(state.view==='ask'||state.view==='search')askView();if(state.view==='test')placement();if(state.view==='progress')progress();if(state.view==='online')onlineView();document.querySelector(`[data-view="${state.view}"]`)?.classList.add('active');/* m028 fase3: bendera panggung Skills Lab. Addon listening memaku blok tombolnya ke dasar layar (speaking-listening-addon.css), jadi ia panggung kedua yang bisa ditutupi gelembung. */document.body?.classList?.toggle?.('fz-stage-sl',['skills','listening','speaking'].includes(state.view));/* m028 fase3 (QA §9): Peta Belajar ikut jadi panggung ber-kontrol sejak panel NEXT SESSION punya tombol "Mulai sesi" di dekat dasar layar - screenshot QA menunjukkan gelembung PAW menutupinya utuh. Aturannya sama dengan kuis: peek dilarang, dok mengecil, layar diberi ruang bawah. */document.body?.classList?.toggle?.('fz-stage-map',state.view==='progress');enhanceUI();syncCoachBubble();window.scrollTo(0,0)}
 // m025-115 - pembimbing yang ikut ke mana pun murid pergi (brief bagian 7).
 //
 // Gelembungnya dipasang SEKALI ke <body> dan tidak pernah ikut dicat ulang; yang dikirim
@@ -4503,7 +4512,7 @@ function syncCoachBubble(){
 // m025-115: tiga tujuan baru untuk tiga skill inti tes yang belum punya halamannya
 // sendiri. Tidak ada tujuan lama yang dihapus - brief bagian 2 menyebutnya sebagai
 // batasan pertama: "Nol fitur dihapus."
-const VALID_VIEWS=new Set(['home','vocab','grammar','reading','skills','listening','speaking','writing','test','progress','classroom','library','ask','search']);
+const VALID_VIEWS=new Set(['home','vocab','grammar','reading','skills','listening','speaking','writing','test','progress','classroom','library','ask','search','online']);
 function prefersReducedMotion(){try{return !!(self.matchMedia&&self.matchMedia('(prefers-reduced-motion: reduce)').matches)}catch(_){return false}}
 // m026-01 - maskot PAW. Tiga pembungkus di bawah ini adalah SATU-SATUNYA cara app.js
 // berbicara dengan <fiezel-mascot>. Alasannya:
@@ -4761,7 +4770,8 @@ function openLevelPanel(){const current=getActiveLevel(),estimated=placementLeve
      "Belum terverifikasi"; hitungan salah hanya muncul kalau state lama memang menyimpannya,
      supaya murid yang masih menyandang percobaan warisan tetap melihat sisa jatahnya. */
   const mistakes=probationMistakes(level);
-  const badge=position<=0?`<em class="level-trust-badge is-verified">${esc(LEVEL_GUARD_COPY.examBadge)}</em>`:locked?'<em class="level-trust-badge is-locked">'+FiezelI18n.t('level.badge-terkunci')+'</em>':`<em class="level-trust-badge is-probation">${esc(LEVEL_GUARD_COPY.entryChip)}${mistakes>0?FiezelI18n.t('level.badge-salah',{miss:mistakes,batas:LEVEL_GUARD_WRONG_LIMIT}):''}</em>`;
+  const examProof=!!trust.exams?.[level]?.passed;
+  const badge=position<=0?`<em class="level-trust-badge is-verified">${esc(examProof?LEVEL_GUARD_COPY.examBadge:level==='A1'?LEVEL_GUARD_COPY.baselineBadge:LEVEL_GUARD_COPY.placementBadge)}</em>`:locked?'<em class="level-trust-badge is-locked">'+FiezelI18n.t('level.badge-terkunci')+'</em>':`<em class="level-trust-badge is-probation">${esc(LEVEL_GUARD_COPY.entryChip)}${mistakes>0?FiezelI18n.t('level.badge-salah',{miss:mistakes,batas:LEVEL_GUARD_WRONG_LIMIT}):''}</em>`;
   return `<button type="button" class="level-picker-card${level===current?' is-active':''}${locked?' is-locked':''}" data-active-level="${level}" aria-pressed="${level===current}"${locked?' disabled aria-disabled="true" title="'+esc(levelTrustCopy(LEVEL_GUARD_COPY.lockedFeature,verified))+'"':''}><strong>${level}</strong><span>${esc(levelDescriptor(level))}</span>${badge}</button>`;
  }).join('');
  /* m025-166: penjelasan "belum terverifikasi" dulu satu paragraf panjang bergaya artikel.
@@ -4769,7 +4779,7 @@ function openLevelPanel(){const current=getActiveLevel(),estimated=placementLeve
     modal-mark/eyebrow kartu lain. */
  const lockNote=trust.locked?`<div class="level-lock-note"><b>${esc(levelTrustCopy(LEVEL_GUARD_COPY.lockedFeature,verified))}</b></div>`:probationActive(state)?`<div class="level-lock-note is-probation"><em class="level-trust-chip">${esc(LEVEL_GUARD_COPY.entryChip)} \u00b7 ${esc(current)}</em><b>${esc(LEVEL_GUARD_COPY.probationTitle)}</b><span>${esc(levelTrustCopy(LEVEL_GUARD_COPY.probationBody,verified))}</span><button type="button" class="level-trust-chip-cta" id="levelNoteExam">${esc(LEVEL_GUARD_COPY.entryExam)} ${esc(examLevel||verified)}</button></div>`:'';
  const examCta=examLevel?`<div class="level-exam-cta"><div><b>${esc(LEVEL_GUARD_COPY.examTitle)} ${esc(examLevel)}</b><span>${FiezelI18n.t('level.cta-rincian',{jumlah:LEVEL_EXAM_SIZE,grammar:LEVEL_EXAM_BLUEPRINT.grammar,vocab:LEVEL_EXAM_BLUEPRINT.vocab,bacaan:LEVEL_EXAM_BLUEPRINT.reading,lulus:LEVEL_EXAM_PASS})}</span></div><button type="button" class="primary" id="openLevelExam"${examWait>0?' disabled aria-disabled="true"':''}>${examWait>0?FiezelI18n.t('level.tombol-cooldown',{jeda:esc(levelExamCooldownLabel(examWait))}):esc(LEVEL_GUARD_COPY.examStart)}</button></div>`:`<div class="level-exam-cta"><div><b>${FiezelI18n.t('level.badge-c2',{badge:esc(LEVEL_GUARD_COPY.examBadge)})}</b><span>${FiezelI18n.t('level.all-proven')}</span></div></div>`;
- openModal(`<div class="modal-mark">FIEZEL LEVEL CONTROL</div><h2>${FiezelI18n.t('level.judul-panel')}</h2><p>${FiezelI18n.t('level.penjelasan-panel')}</p><div class="level-picker-grid">${cards}</div>${lockNote}${examCta}<div class="level-source-note">${manual?`Level ${FiezelI18n.t('level.sumber-manual',{aktif:esc(current),placement:esc(estimated),verif:esc(verified)})}`:FiezelI18n.t('level.sumber-placement',{placement:esc(estimated),verif:esc(verified)})}</div><div class="modal-actions">${manual?`<button type="button" id="usePlacementLevel">${FiezelI18n.t('level.pakai-hasil-tes',{level:esc(estimated)})}</button>`:''}<button type="button" class="primary" id="levelPanelClose">${FiezelI18n.t('level.selesai')}</button></div>`);
+ openModal(`<div class="modal-mark">FIEZEL LEVEL CONTROL</div><h2>${FiezelI18n.t('level.judul-panel')}</h2><p>${FiezelI18n.t('level.penjelasan-panel')}</p><div class="level-picker-grid">${cards}</div>${lockNote}${examCta}<div class="level-source-note">${manual?`Level ${FiezelI18n.t('level.sumber-manual',{aktif:esc(current),placement:esc(estimated),verif:esc(verified)})}${trust.verifiedSource==='placement'?FiezelI18n.t('level.sumber-verif-awal'):''}`:FiezelI18n.t('level.sumber-placement',{placement:esc(estimated),verif:esc(verified)})+(trust.verifiedSource==='placement'?FiezelI18n.t('level.sumber-verif-awal'):'')}</div><div class="modal-actions">${manual?`<button type="button" id="usePlacementLevel">${FiezelI18n.t('level.pakai-hasil-tes',{level:esc(estimated)})}</button>`:''}<button type="button" class="primary" id="levelPanelClose">${FiezelI18n.t('level.selesai')}</button></div>`);
  /* m025-166: pintu pemilihan level sekarang lewat gerbang keputusan. Level yang belum
     terverifikasi TIDAK langsung aktif - popup gerbang yang memutuskan (ikuti ujian, atau
     nanti aja dan dialihkan ke A1). setActiveLevel() sendiri tidak diubah: ia tetap
@@ -4920,14 +4930,20 @@ function buildLevelExamQuestions(examLevel){
     vocab:shuffle(V.filter(v=>v.level===target&&v.meaning)).map(v=>makeVocabQuestion(v)),
     reading:shuffle(R.filter(r=>r.level===target)).flatMap(r=>(r.qs||[]).slice(0,2).map((q,i)=>makeReadingQuestion(r,q,i)))
   };
-  const out=[],seen=new Set();
+  const out=[],seen=new Set(),seenStems=new Set();
   for(const type of Object.keys(LEVEL_EXAM_BLUEPRINT)){
     const need=LEVEL_EXAM_BLUEPRINT[type];let added=0;
     for(const q of pools[type]||[]){
       if(!q)continue;if(!validateQuestion(q).ok)continue;
       const signature=sigQ(q);
       if(seen.has(signature))continue;
+      /* V20 wave-2: dua templat se-lesson bisa menghasilkan stem identik pada mode yang
+         stem-nya diturunkan dari nama lesson (mis. mastery_check) dengan opsi berbeda,
+         lolos sigQ tapi tampak dobel bagi pengguna. Satu ujian tidak boleh mengulang stem. */
+      const stemKey=String(q.question||'').toLowerCase().replace(/\s+/g,' ').trim();
+      if(stemKey&&seenStems.has(stemKey))continue;
       seen.add(signature);
+      if(stemKey)seenStems.add(stemKey);
       q.difficulty=LEVELS.indexOf(target)+1;
       q.level=target;
       out.push(q);
@@ -4962,10 +4978,29 @@ function levelExamWeakSkill(){
   const best=Object.entries(tally).sort((a,b)=>b[1]-a[1])[0];
   return best?friendlySkillName(best[0]):'';
 }
-function levelExamSettle(examLevel,score,total,accuracy){
+function levelExamSectionTally(answers){
+  const tally={};
+  for(const key of Object.keys(LEVEL_EXAM_SECTION_FLOOR))tally[key]={ok:0,n:0};
+  for(const a of (Array.isArray(answers)?answers:[])){const row=tally[String(a?.type||'')];if(!row)continue;row.n++;if(a?.ok)row.ok++}
+  return tally;
+}
+/* Lantai per seksi (audit A13 §6a): dinilai hanya pada seksi yang benar-benar ditanyakan (n>0),
+   dengan lantai dipotong ke n — jalur berhenti-dini "breathe" menyisakan n < blueprint, dan sesi
+   terputus yang disettle lewat recordSkipExamFail langsung tidak lewat sini. Tanpa tally (state
+   lama / pemanggil lain), shortfalls kosong dan aturan akurasi murni tetap berlaku. */
+function levelExamFloorShortfalls(tally){
+  const out=[];
+  for(const key of Object.keys(LEVEL_EXAM_SECTION_FLOOR)){
+    const row=tally?.[key]||{ok:0,n:0},floor=Math.min(LEVEL_EXAM_SECTION_FLOOR[key],row.n);
+    if(row.n>0&&row.ok<floor)out.push({key,label:LEVEL_EXAM_SECTION_LABEL[key]||key,ok:row.ok,n:row.n,floor});
+  }
+  return out;
+}
+function levelExamSettle(examLevel,score,total,accuracy,sectionAnswers){
   const target=String(examLevel||'').toUpperCase();
   if(!LEVELS.includes(target))return null;
-  const passed=Number(accuracy||0)>=LEVEL_EXAM_PASS;
+  const shortfalls=levelExamFloorShortfalls(levelExamSectionTally(sectionAnswers));
+  const passed=Number(accuracy||0)>=LEVEL_EXAM_PASS&&shortfalls.length===0;
   if(passed){
     recordSkipExamPass(state,target,{score,total,accuracy});
     try{coreBrainCache=null}catch(_){}
@@ -4973,9 +5008,11 @@ function levelExamSettle(examLevel,score,total,accuracy){
     const next=nextVerifiableLevel(state);
     return{passed:true,level:target,message:`${LEVEL_GUARD_COPY.examPass}${next?FiezelI18n.t('level.pass-next',{level:next}):''}`};
   }
-  const weak=levelExamWeakSkill();
+  const floorNote=shortfalls.map(s=>FiezelI18n.t('level.lantai-butuh',{label:s.label,ok:s.ok,n:s.n,lantai:s.floor})).join(', ');
+  const weak=shortfalls.length?shortfalls.map(s=>s.label).join(', '):levelExamWeakSkill();
   recordSkipExamFail(state,target,{score,total,accuracy,weakSkill:weak});
-  return{passed:false,level:target,message:`${LEVEL_GUARD_COPY.examFail}${FiezelI18n.t('level.gagal-skor',{skor:score,total:total,akurasi:accuracy,lulus:LEVEL_EXAM_PASS})}${weak?` Yang paling sering meleset tadi: ${weak}.`:''}`};
+  const detail=Number(accuracy||0)>=LEVEL_EXAM_PASS&&shortfalls.length?FiezelI18n.t('level.gagal-lantai',{skor:score,total:total,akurasi:accuracy,rincian:floorNote}):`${FiezelI18n.t('level.gagal-skor',{skor:score,total:total,akurasi:accuracy,lulus:LEVEL_EXAM_PASS})}${floorNote?FiezelI18n.t('level.gagal-kurang',{rincian:floorNote}):''}${!shortfalls.length&&weak?` Yang paling sering meleset tadi: ${weak}.`:''}`;
+  return{passed:false,level:target,message:`${LEVEL_GUARD_COPY.examFail}${detail}`};
 }
 function openActiveLevelExamPanel(level){
   const target=String(level||nextVerifiableLevel(state)||'').toUpperCase(),verified=verifiedLevel(state);
@@ -4984,7 +5021,7 @@ function openActiveLevelExamPanel(level){
   const history=entry.lastAt?`<p class="muted">Percobaan terakhir: ${entry.lastScore||0}/${entry.lastTotal||LEVEL_EXAM_SIZE} (${entry.lastAccuracy||0}%)${entry.weakSkill?` · yang menjatuhkan: ${esc(entry.weakSkill)}`:''}.</p>`:'';
   const chain=`<p class="muted">Ujiannya berantai: level terverifikasimu sekarang <b>${esc(verified)}</b>, jadi yang boleh diuji adalah <b>${esc(nextVerifiableLevel(state)||verified)}</b>. Satu ujian, satu anak tangga.</p>`;
   const action=availability.ok?`<button type="button" class="primary" id="levelExamStart">${esc(LEVEL_GUARD_COPY.examStart)} ${esc(target)}</button>`:availability.reason==='cooldown'?`<button type="button" class="primary" disabled aria-disabled="true">Bisa diulang ${esc(levelExamCooldownLabel(availability.waitMs))}</button>`:`<button type="button" class="primary" disabled aria-disabled="true">Buka ujian ${esc(availability.next||verified)} dulu</button>`;
-  openModal(`<div class="modal-mark">FIEZEL SKIP LEVEL</div><h2>${esc(LEVEL_GUARD_COPY.examTitle)} ${esc(target)}</h2><p>${esc(LEVEL_GUARD_COPY.examDesc)}</p><ul class="level-exam-facts"><li>${LEVEL_EXAM_SIZE} soal: grammar ${LEVEL_EXAM_BLUEPRINT.grammar}, kosakata ${LEVEL_EXAM_BLUEPRINT.vocab}, bacaan ${LEVEL_EXAM_BLUEPRINT.reading}</li><li>Soal diacak dari bank level ${esc(target)} setiap percobaan</li><li>Lulus mulai ${LEVEL_EXAM_PASS}% · tanpa petunjuk, tanpa percobaan kedua</li><li>Keluar di tengah ujian (atau menutup aplikasinya) sesudah menjawab = percobaan terpakai, jeda 24 jamnya berlaku</li><li>Kalau belum lulus, jeda 24 jam untuk level ini — progres dan streak tetap utuh</li></ul>${chain}${history}<div class="modal-actions"><button type="button" id="levelExamCancel">Nanti dulu</button>${action}</div>`);
+  openModal(`<div class="modal-mark">FIEZEL SKIP LEVEL</div><h2>${esc(LEVEL_GUARD_COPY.examTitle)} ${esc(target)}</h2><p>${esc(LEVEL_GUARD_COPY.examDesc)}</p><ul class="level-exam-facts"><li>${LEVEL_EXAM_SIZE} soal: grammar ${LEVEL_EXAM_BLUEPRINT.grammar}, kosakata ${LEVEL_EXAM_BLUEPRINT.vocab}, bacaan ${LEVEL_EXAM_BLUEPRINT.reading}</li><li>Soal diacak dari bank level ${esc(target)} setiap percobaan</li><li>Lulus mulai ${LEVEL_EXAM_PASS}%, dengan tiap seksi minimal grammar ${LEVEL_EXAM_SECTION_FLOOR.grammar}/${LEVEL_EXAM_BLUEPRINT.grammar}, kosakata ${LEVEL_EXAM_SECTION_FLOOR.vocab}/${LEVEL_EXAM_BLUEPRINT.vocab}, bacaan ${LEVEL_EXAM_SECTION_FLOOR.reading}/${LEVEL_EXAM_BLUEPRINT.reading} · tanpa petunjuk, tanpa percobaan kedua</li><li>Keluar di tengah ujian (atau menutup aplikasinya) sesudah menjawab = percobaan terpakai, jeda 24 jamnya berlaku</li><li>Kalau belum lulus, jeda 24 jam untuk level ini — progres dan streak tetap utuh</li></ul>${chain}${history}<div class="modal-actions"><button type="button" id="levelExamCancel">Nanti dulu</button>${action}</div>`);
   $('levelExamCancel').onclick=closeModal;
   $('levelExamStart')?.addEventListener('click',()=>startLevelExam(target));
   enhanceUI();
@@ -5904,6 +5941,9 @@ function gemsHook(){
       // (celebrating lv2 + dada busung, TIDAK menyentuh streak jawaban maskot).
       // Menggantikan tambalan 'badge-earned' P0-3 yang lama.
       pawReact('reward',{kind:'gems'});
+      /* SOSIAL (SLOT 7): momen gem = sesi Skills Lab tuntas tanpa lewat finishQuiz — bukti
+         hariannya di-antre dari sini. Diam-diam, tidak pernah menahan hadiah gem. */
+      try{queueSocialEvidence()}catch(_){}
       return n;
     },
     spend:(cost,reason)=>{
@@ -6560,13 +6600,13 @@ function grammar(){const level=getActiveLevel(),entries=grammarItemsForLevel(lev
   }).join('');
   // Ujung jalur: node Ujian Skip Level bergaya emas — tujuan jangka menengah terlihat
   // dari simpul pertama. Panelnya panel ujian yang sudah ada (openActiveLevelExamPanel).
-  const examStep=`<li class="path-step path-step-exam ${examEntry?.passed?'is-mastered':'is-available'}"><button class="path-node path-node-exam" onclick="openActiveLevelExamPanel()" aria-label="${FiezelI18n.t('grammar.ujian-skip-level',{level:examEntry?.passed?'Sudah lulus.':'Ujung jalur level ini.'})}"><span class="path-ring path-ring-gold">${examEntry?.passed?'<i data-lucide="check"></i>':'<i data-lucide="award"></i>'}</span></button><div class="path-label"><b>${FiezelI18n.t('level.ujian-judul')}</b><span>${examEntry?.passed?'Lulus — level terverifikasi dari bukti.':'Ujung jalur: buktikan levelmu, tanpa petunjuk.'}</span></div></li>`;
+  const examStep=`<li class="path-step path-step-exam ${examEntry?.passed?'is-mastered':'is-available'}"><button class="path-node path-node-exam" onclick="openActiveLevelExamPanel()" aria-label="${FiezelI18n.t('grammar.ujian-skip-level',{level:examEntry?.passed?'Sudah lulus.':'Ujung jalur level ini.'})}"><span class="path-ring path-ring-gold">${examEntry?.passed?'<i data-lucide="check"></i>':'<i data-lucide="award"></i>'}</span></button><div class="path-label"><b>${FiezelI18n.t('level.ujian-judul')}</b><span>${examEntry?.passed?'Lulus — terverifikasi dari bukti grammar, kosakata, dan bacaan.':'Ujung jalur: buktikan materi level ini, tanpa petunjuk.'}</span></div></li>`;
   // Tampilan daftar (aksesibilitas P1-1): kartu berurutan yang lama, data & penguncian sama.
   const listBody=`<div class="grid grammar-grid">${rows.map(r=>card(`<div class="row"><b>${r.index+1}. ${esc(r.title)}</b><span>${esc(level)}</span></div><p class="muted">${FiezelI18n.t('grammar.fokus',{prerequisites:esc(r.prerequisites),family:esc(r.family)})}</p>${r.unlock.locked?`<p class="lesson-lock-note"><i data-lucide="lock"></i><span>${esc(lessonLockMessage(r.unlock))}</span></p>`:''}<div class="lesson-card-foot"><span>${FiezelI18n.t('grammar.mastery',{mastery:r.mastery})}</span>${!r.completed&&!r.examVerified?`<button type="button" class="lesson-skip-link" onclick="openLessonSkipGate('${esc(r.k)}')"><i data-lucide="fast-forward"></i> ${FiezelI18n.t('grammar.lewati-materi-2')}</button>`:''}${r.unlock.locked?`<button disabled aria-disabled="true" title="${esc(lessonLockMessage(r.unlock))}">${FiezelI18n.t('grammar.terkunci-2')} <i data-lucide="lock"></i></button>`:`<button onclick="openGrammarLesson('${esc(r.k)}')">${FiezelI18n.t('grammar.buka-lesson')} <i data-lucide="arrow-right"></i></button>`}</div>`,r.unlock.locked?'lesson-locked':'')).join('')}</div>`;
   const pathBody=FiezelI18n.t('grammar.ol-class-lesson-path-aria',{level:esc(level),pathSteps:pathSteps,examStep:examStep});
   // R2-1: node emas Ujian Skip Level duduk di UJUNG jalur — tak terlihat tanpa scroll
   // panjang. Chip lengket di puncak hub memanggil panel ujian yang SAMA, node ujungnya tetap.
-  const examChip=`<button type="button" class="exam-entry-chip${examEntry?.passed?' is-passed':''}" onclick="openActiveLevelExamPanel()" aria-label="${FiezelI18n.t('grammar.ujian-skip-level-level',{level:esc(level),ujian:examEntry?.passed?'Sudah lulus.':'Buka panel ujian.'})}"><i data-lucide="${examEntry?.passed?'badge-check':'award'}"></i><span><b>${FiezelI18n.t('level.ujian-judul')}</b><small>${examEntry?.passed?'Lulus — level terverifikasi':'Merasa sudah bisa? Buktikan kapan saja'}</small></span><i data-lucide="arrow-right"></i></button>`;
+  const examChip=`<button type="button" class="exam-entry-chip${examEntry?.passed?' is-passed':''}" onclick="openActiveLevelExamPanel()" aria-label="${FiezelI18n.t('grammar.ujian-skip-level-level',{level:esc(level),ujian:examEntry?.passed?'Sudah lulus.':'Buka panel ujian.'})}"><i data-lucide="${examEntry?.passed?'badge-check':'award'}"></i><span><b>${FiezelI18n.t('level.ujian-judul')}</b><small>${examEntry?.passed?'Lulus — terverifikasi (ujian)':'Merasa sudah bisa? Buktikan kapan saja'}</small></span><i data-lucide="arrow-right"></i></button>`;
   shell('Grammar Hub',FiezelI18n.t('grammar.lesson-terurut-for-level-start',{jumlahLesson:skills.length,level:level}),`<div class="grammar-level-note"><b>${FiezelI18n.t('grammar.jalur',{level:esc(level)})}</b><span>${esc(levelDescriptor(level))}</span><small>${FiezelI18n.t('grammar.item-pilihan-boleh-bervariasi-tetapi')}</small></div><div class="grammar-hub-tools">${examChip}<div class="path-view-toggle"><button type="button" onclick="toggleGrammarHubView()" aria-pressed="${grammarHubListView}"><i data-lucide="${grammarHubListView?'route':'list'}"></i> ${grammarHubListView?'Tampilan jalur':'Tampilan daftar'}</button></div></div>${grammarHubListView?listBody:pathBody}`);
   // Auto-scroll ke node aktif — sesudah renderInner mengembalikan scroll ke atas.
   // Reduced-motion: lompat tanpa animasi (behavior 'auto'), bukan tanpa fungsi.
@@ -6599,7 +6639,18 @@ function practiceSkill(skill){if((GRAMMAR_ITEMS.find(x=>x.skill===skill)?.level|
  * lalu diambil LESSON_SKIP_GATE_SIZE secara ACAK, jadi klaim "diacak dari templat lessonnya"
  * di modal kini benar. Gagal (atau kabur setelah menjawab) memberi jeda 24 jam per lesson. */
 function buildLessonSkipGateQuestions(skill,count=LESSON_SKIP_GATE_SIZE){
-  return shuffle(buildGrammarLessonQuestions(skill,Number.MAX_SAFE_INTEGER)).slice(0,count);
+  /* V20 wave-2: dgn >=2 templat per lesson, pool memuat pasangan soal ber-stem identik
+     (mode yang stem-nya diturunkan dari nama lesson). Gerbang 5 soal tidak boleh
+     menampilkan stem yang sama dua kali. */
+  const out=[],seenStems=new Set();
+  for(const q of shuffle(buildGrammarLessonQuestions(skill,Number.MAX_SAFE_INTEGER))){
+    const stemKey=String(q.question||'').toLowerCase().replace(/\s+/g,' ').trim();
+    if(stemKey&&seenStems.has(stemKey))continue;
+    if(stemKey)seenStems.add(stemKey);
+    out.push(q);
+    if(out.length>=count)break;
+  }
+  return out;
 }
 function lessonSkipGateCooldownRemaining(skill,now=Date.now()){
   return Math.max(0,Math.floor(Number(state.grammar[String(skill||'')]?.skipGateCooldownUntil||0))-now);
@@ -7393,6 +7444,9 @@ function quizLoop(cfg){
    // F1 placement: bukti per band dikumpulkan di titik yang sama dengan skor, jadi tidak ada
    // jalur jawaban yang bisa lupa melaporkannya. Hanya percobaan pertama - sama seperti skor.
    if(cfg.placement)(cfg.__placementAnswers??=[]).push({level:String(q.level||''),ok:!!ok});
+   /* m025-186: tally per seksi Ujian Skip Level — dikumpulkan di titik yang sama dengan skor,
+      percobaan pertama saja, supaya lantai per seksi menilai bukti yang sama dengan akurasi. */
+   if(cfg.type==='level-exam')(cfg.__examSectionAnswers??=[]).push({type:String(q.type||''),ok:!!ok});
    /* W1 P1-1: bahan review per-soal untuk layar hasil mode ukur. */
    if(MEASURE)(cfg.__measureReview??=[]).push({q,chosen:j});
    record(q,ok,ms,j);
@@ -7611,7 +7665,7 @@ function finishQuiz(cfg,score,total,tutorReport){
      level), lulus >=LEVEL_EXAM_PASS% menaikkan verified SATU tangga dan membuka kunci;
      gagal hanya memberi jeda 24 jam untuk level itu. */
   let examVerdict=null;
-  if(cfg&&cfg.type==='level-exam'&&cfg.levelScope){try{examVerdict=levelExamSettle(cfg.levelScope,score,total,accuracy)}catch(_){examVerdict=null}}
+  if(cfg&&cfg.type==='level-exam'&&cfg.levelScope){try{examVerdict=levelExamSettle(cfg.levelScope,score,total,accuracy,cfg.__examSectionAnswers)}catch(_){examVerdict=null}}
   /* R2-2: penilaian gerbang "Lewati materi". Lulus (>=LESSON_SKIP_GATE_PASS benar) mengangkat
      mastery lesson ke ambang unlock — TIDAK menimpa bukti yang lebih tinggi; tiap jawaban
      gerbang sudah tercatat lewat updateMastery seperti jawaban biasa, jadi angka aktual yang
@@ -7625,7 +7679,11 @@ function finishQuiz(cfg,score,total,tutorReport){
     else{const b=state.grammar[cfg.skipGateSkill]||{correct:0,total:0,streak:0,mastery:0};b.skipGateCooldownUntil=Date.now()+LEVEL_EXAM_COOLDOWN_MS;state.grammar[cfg.skipGateSkill]=b}
     skipVerdict={passed,message:passed?FiezelI18n.t('quiz.bukti-diterima-right-ditandai-finish',{skor:score,total:total,title:judul}):FiezelI18n.t('quiz.new-right-gerbang-butuh-minimal',{skor:score,total:total,LESSON_SKIP_GATE_PASS:LESSON_SKIP_GATE_PASS})};
   }
-  state.sessionHistory=[...(state.sessionHistory||[]),session].slice(-100);const outcome=recordPolicyOutcomeFromSession(session);save();if(outcome)queuePolicyOutcomeSync(outcome);anSessionEnded(session);/*A1-EMIT*/haptic(accuracy>=70?'success':'confirm');
+  state.sessionHistory=[...(state.sessionHistory||[]),session].slice(-100);const outcome=recordPolicyOutcomeFromSession(session);save();if(outcome)queuePolicyOutcomeSync(outcome);anSessionEnded(session);/*A1-EMIT*/
+  /* SOSIAL (SLOT 7): bukti Poin Bukti di-ANTRE, tidak pernah ditunggu — kegagalan jaringan
+     apa pun berhenti di dalam queueSocialEvidence dan layar hasil tidak tahu-menahu. */
+  try{queueSocialEvidence(cfg&&cfg.type==='level-exam'&&examVerdict?.passed?[{kind:'exam_passed',band:String(cfg.levelScope||'')}]:[])}catch(_){}
+  haptic(accuracy>=70?'success':'confirm');
   // m025-118: laporan tutor dibaca dalam bahasa GURU, bukan bahasa penilai. "12 dari 16"
   // tidak memberi tahu apa yang berubah; "kamu melewati dua hal yang tadinya bikin keliru"
   // memberi tahu, dan itu yang membuat murid tahu sesi ini ada gunanya.
@@ -7677,7 +7735,7 @@ function finishQuiz(cfg,score,total,tutorReport){
   // hanya menampilkan persentase; nama level baru terlihat sesudah kembali ke Home lewat chip
   // level (temuan empiris §2 nomor 3). Murid berhak tahu hasil tesnya di momen pengumumannya,
   // beserta band mana yang menjadi dasarnya.
-  const placementLevelBlock=cfg.placement&&placementLevelName?`<div class="result-level"><span class="result-level-mark">LEVEL KAMU</span><b class="result-level-name">${esc(placementLevelName)}</b><span class="result-level-desc">${esc(levelDescriptor(placementLevelName))}</span></div>${placementBands?`<div class="result-bands"><small>Bukti per band (benar / ditanyakan pada percobaan pertama):</small><div class="result-band-row">${placementBandChips(placementBands)}</div><small>Level naik satu band hanya kalau band itu lulus, mulai dari A1. Menebak tidak cukup.</small></div>`:''}${placementAdopted?`<p class="muted">Level belajarmu diikutkan ke hasil tes ini, menggantikan perkiraan yang kamu pilih di awal. Kamu tetap bisa menggantinya sendiri kapan saja dari panel level.</p>`:''}${placementManualLevel?`<p class="muted">Level aktifmu sekarang <b>${esc(placementManualLevel)}</b> karena kamu memilihnya sendiri. Hasil tes ini menunjukkan <b>${esc(placementLevelName)}</b>.</p>`:''}`:'';
+  const placementLevelBlock=cfg.placement&&placementLevelName?`<div class="result-level"><span class="result-level-mark">PERKIRAAN LEVELMU</span><b class="result-level-name">${esc(placementLevelName)}</b><span class="result-level-desc">${esc(levelDescriptor(placementLevelName))}</span><span class="result-level-scope">Perkiraan dari 25 soal pilihan ganda (kosakata, grammar, listening) \u2014 bukan ukuran speaking atau writing, dan bisa bergeser seiring bukti belajarmu.</span></div>${placementBands?`<div class="result-bands"><small>Bukti per band (benar / ditanyakan pada percobaan pertama):</small><div class="result-band-row">${placementBandChips(placementBands)}</div><small>Level naik satu band hanya kalau band itu lulus, mulai dari A1. Menebak tidak cukup.</small></div>`:''}${placementAdopted?`<p class="muted">Level belajarmu diikutkan ke hasil tes ini, menggantikan perkiraan yang kamu pilih di awal. Kamu tetap bisa menggantinya sendiri kapan saja dari panel level.</p>`:''}${placementManualLevel?`<p class="muted">Level aktifmu sekarang <b>${esc(placementManualLevel)}</b> karena kamu memilihnya sendiri. Hasil tes ini menunjukkan <b>${esc(placementLevelName)}</b>.</p>`:''}`:'';
   const placementAdoptButton=cfg.placement&&placementManualLevel?`<button class="primary" onclick="usePlacementLevel()&amp;&amp;go('home')">Ikuti hasil tes (${esc(placementLevelName)}) <i data-lucide="arrow-right"></i></button>`:'';
   /* W1 P1-1 (09-001): pembahasan per-soal mode ukur HIDUP DI SINI \u2014 setelah pengukuran
      selesai, bukan di tengahnya. Nilai belajarnya utuh (jawabanmu vs kunci + intinya +
@@ -7931,7 +7989,7 @@ function progress(){
  // out entirely - it is app/install health, not learning progress, and now lives
  // in Settings (see openSettings()).
  const tabContent={
-  overview:`<div class="grid">${nextSessionPanelMarkup()}${journeyMarkup()}<div><h3>${FiezelI18n.t('progress.peta-study')}</h3>${mapCards}</div>
+  overview:`<div class="grid">${nextSessionPanelMarkup()}${journeyMarkup()}${socialSummaryCardMarkup()}<div><h3>${FiezelI18n.t('progress.peta-study')}</h3>${mapCards}</div>
    ${card(`<h3>Ulangan Pintar</h3>${due.length?due.map(([k,x])=>`<div class="row"><span>${esc(friendlySkillName(k))}</span><span>${FiezelI18n.t('progress.dikuasai-risiko-lupa',{mastery:x.mastery||0,x:Math.round(forgettingProbability(x)*100)})}</span></div>`).join('<hr>'):'<p class="muted">'+FiezelI18n.t('progress.belum-ada-materi-perlu-diulang')+'</p>'}`)}
    ${card(`<h3>${FiezelI18n.t('progress.laporan-diagnostik')}</h3>${diagHtml}`)}
    ${card(`<h3>Prasasti</h3><p class="muted">${FiezelI18n.t('progress.lencana-bukti-study-redup-menunjukkan')}</p>${prasastiGalleryMarkup()}`,'prasasti-gallery-card')}
@@ -8036,14 +8094,19 @@ function openSettings(){const p=state.preferences||defaultPreferences,endpoint=p
   // itulah yang melaporkan shell usang, jadi tombol perbaikannya berdampingan dengannya.
   const grupData=`${continuitySettingsMarkup()}<div class="card cache-card"><h3>Bersihkan cache</h3><p class="muted">${FiezelI18n.t('settings.menghapus-berkas-aplikasi-lama-menumpuk')}</p><button id="settingClearCache" type="button"><i data-lucide="refresh-ccw"></i> ${FiezelI18n.t('settings.bersihkan-cache-amp-muat-ulang')}</button></div><div class="card"><h3>Kesehatan Instalasi</h3><div id="installHealth"><p class="muted">Memeriksa pemasangan…</p></div></div>`;
   const grupLanjutan=`<div class="report-settings"><div class="row"><div><b>Creator Learning Report</b><p class="muted">${FiezelI18n.t('settings.otomatis-setelah-sesi-selesai-hanya')}</p></div><button id="reportPreview">${FiezelI18n.t('settings.lihat-data')}</button></div><a class="setup-link" href="./creator-report-setup.html" target="_blank" rel="noopener"><i data-lucide="cloud-cog"></i> ${FiezelI18n.t('settings.pasang-creator-hub-satu-klik')}</a><label class="endpoint-label">Endpoint Puter Worker<input id="reportEndpoint" type="url" value="${esc(endpoint)}" placeholder="${FiezelI18n.t('settings.https-nama-worker-puter-work')}" autocomplete="off"></label><label class="consent-row"><input id="reportConsent" type="checkbox" ${p.reportConsent?'checked':''}><span>${FiezelI18n.t('settings.saya-menyetujui-pengiriman-ringkasan-study',{nama:esc(learnerName())})}</span></label><p class="report-state">Status: ${esc(reportStatusLabel())}</p></div><div class="card"><h3>${FiezelI18n.t('settings.masukan-untuk-pengembang')}</h3><p class="muted">${FiezelI18n.t('settings.materi-pending-ada-or-apa')}</p><button id="openFeedback"><i data-lucide="send"></i> ${FiezelI18n.t('settings.kirim-masukan')}</button></div>`;
+  /* SOSIAL (SLOT 7): pintu masuk Profil Online + sakelar Mode Privat papan. Sakelar bicara
+     ke server SAAT diubah (bukan saat Simpan) karena janjinya "hilang dari papan seketika";
+     tanpa profil/offline ia menolak jujur lewat toast dan kembali ke posisi semula. */
+  const grupOnline=`<div class="settings-list"><button type="button" class="setting-row setting-row-action" onclick="openOnlineView()"><span class="setting-icon"><i data-lucide="users"></i></span><span><b>Profil Online &amp; Teman</b><small>Nama samaran, undang teman, papan mingguan. Pseudonim, tanpa nama asli, dan sepenuhnya opsional.</small></span><i data-lucide="chevron-right"></i></button><label class="setting-row"><span class="setting-icon"><i data-lucide="eye-off"></i></span><span><b>Mode privat papan</b><small>Menyembunyikanmu dari papan teman &amp; liga seketika. Poin Buktimu tetap terlihat olehmu sendiri. Butuh profil online.</small></span><input id="settingBoardHidden" type="checkbox" ${socialProfileCache?.flags?.boardHidden?'checked':''} aria-label="Mode privat papan"></label></div>`;
   openModal(`<div class="settings-head"><div class="modal-mark">FIEZEL CONTROL ROOM</div><h2>Pengalaman ${esc(learnerName())}</h2><p>${FiezelI18n.t('settings.all-can-diatur-dikelompokkan-each')}</p></div>`
     +settingsFold(FiezelI18n.t('settings.profil-amp-level'),grupProfil,true)
     +settingsFold(FiezelI18n.t('settings.study'),grupBelajar,false)
     +settingsFold(FiezelI18n.t('settings.suara-amp-notifikasi'),grupSuara,false)
+    +settingsFold('Online &amp; Teman',grupOnline,false)
     +settingsFold(FiezelI18n.t('settings.data-amp-penyimpanan'),grupData,false)
     +settingsFold(FiezelI18n.t('settings.lanjutan'),grupLanjutan,false)
     +`<div class="modal-actions settings-actions"><button id="settingsCancel">Batal</button><button class="primary" id="settingsSave">${FiezelI18n.t('settings.simpan-prefs')}</button></div>`);
-  $('settingsCancel').onclick=closeModal;setTimeout(refreshInstallHealth,0);setTimeout(refreshAudioDiagnostics,0);$('backupExport')?.addEventListener('click',runBackupExport);$('backupPick')?.addEventListener('click',()=>$('backupFile')?.click());$('backupFile')?.addEventListener('change',event=>runBackupImport(event.currentTarget.files?.[0]));$('openFeedback')?.addEventListener('click',()=>{closeModal();openFeedback('')});$('reportPreview').onclick=openReportPreview;$('settingsSave').onclick=saveSettings;$('settingClearCache')?.addEventListener('click',()=>{confirmClearAppCache()});bindVoiceSettingControls();bindAccountSettingControls();$('settingReminders')?.addEventListener('change',event=>toggleStudyReminders(event.currentTarget));$('settingLearnerLocale')?.addEventListener('change',event=>setLearnerLocalePreference(event.currentTarget.value));
+  $('settingsCancel').onclick=closeModal;setTimeout(refreshInstallHealth,0);setTimeout(refreshAudioDiagnostics,0);$('backupExport')?.addEventListener('click',runBackupExport);$('backupPick')?.addEventListener('click',()=>$('backupFile')?.click());$('backupFile')?.addEventListener('change',event=>runBackupImport(event.currentTarget.files?.[0]));$('openFeedback')?.addEventListener('click',()=>{closeModal();openFeedback('')});$('reportPreview').onclick=openReportPreview;$('settingsSave').onclick=saveSettings;$('settingClearCache')?.addEventListener('click',()=>{confirmClearAppCache()});bindVoiceSettingControls();bindAccountSettingControls();$('settingReminders')?.addEventListener('change',event=>toggleStudyReminders(event.currentTarget));$('settingLearnerLocale')?.addEventListener('change',event=>setLearnerLocalePreference(event.currentTarget.value));$('settingBoardHidden')?.addEventListener('change',event=>socialToggleHidden(event.currentTarget));
 // Runtime suara dimuat malas (lihat ./fiezel-lazy-loader.js). Kalau murid membuka
 // Pengaturan sebelum gelombang idle selesai, kartunya akan berbunyi "tidak tersedia"
 // padahal berkasnya sedang dalam perjalanan - jadi kartunya digambar ulang begitu tiba.
@@ -8707,6 +8770,292 @@ prefetchPlacementListening();
 // baru tiba setelah layar pertama tercat. Tanpa pengulangan ini, ketukan pertama murid
 // akan menanggung seluruh ongkos inisialisasi yang justru ingin dipindahkan ke waktu idle.
 document.addEventListener?.('fiezel:lazy-group',event=>{if(event?.detail?.group==='voice')warmNeuralVoice()});
+/* ================================================================================== */
+/* FIEZEL ONLINE / SOSIAL (frontend SLOT 7) — view 'online', evidence outbox, sorakan. */
+/*                                                                                    */
+/* Kontrak keras blok ini:                                                            */
+/*   1. Inti jaringan/outbox hidup di features/social/fiezel-social.js               */
+/*      (self.FiezelSocial) — blok ini HANYA UI + kait bukti. Modul yang belum tiba   */
+/*      atau gagal dimuat membuat seluruh fitur diam, bukan membuat aplikasi patah.   */
+/*   2. Fail-closed & jujur: flag server mati → "fitur online belum aktif"; offline   */
+/*      → "kamu sedang offline". Kedua keadaan itu KARTU, bukan error screen.        */
+/*   3. Nol teks bebas: yang terkirim hanya handle, enum stiker, enum bukti, count,   */
+/*      dan tanggal granularitas HARI (WIB). Sorakan = 6 stiker enum, tanpa balasan.  */
+/*   4. Bunyi lewat gerbang feedbackSounds, gerak maskot lewat pawReact yang sudah    */
+/*      menghormati reduced-motion — tidak ada gerbang baru yang bisa berbeda.        */
+const ONLINE_TABS=[['profil','Profil'],['teman','Teman'],['papan','Papan Peringkat']];
+let onlineTab='profil',onlineBoardTab='teman',onlineSeq=0,onlineHandleTimer=null;
+let socialProfileCache=null,socialInviteLast=null,socialSummaryCache=null,socialSummaryAt=0;
+function socialCore(){try{return self.FiezelSocial||null}catch(_){return null}}
+// Momen mikro sosial: SATU bunyi (gerbang feedbackSounds) + SATU reaksi maskot (gerbang
+// reduced-motion di pawReact). Tidak menumpuk dengan celebrate() — sorakan bukan prestasi belajar.
+function socialMicroMoment(kind){try{if(feedbackSoundsOn())uiSfx(kind==='cheer'?'xp_gain':'notif_achievement')}catch(_){}try{pawReact('reward',{kind:kind||'social'})}catch(_){}}
+function openOnlineView(){closeModal();go('online')}
+window.openOnlineView=openOnlineView;
+window.switchOnlineTab=id=>{if(ONLINE_TABS.some(([t])=>t===id))onlineTab=id;uiSfx('toggle');render()};
+window.switchOnlineBoard=id=>{onlineBoardTab=id==='liga'?'liga':'teman';uiSfx('toggle');render()};
+function onlineView(){
+  const tabs=`<div class="progress-tabs" role="tablist">${ONLINE_TABS.map(([id,label])=>`<button type="button" class="progress-tab${onlineTab===id?' active':''}" role="tab" aria-selected="${onlineTab===id}" onclick="switchOnlineTab('${id}')">${esc(label)}</button>`).join('')}</div>`;
+  shell('Online & Teman','Saling menyaksikan proses belajar — nama samaran, tanpa chat, dan sepenuhnya opsional.',`${tabs}<div id="onlineRoot">${card('<p class="muted">Menyiapkan fitur online…</p>')}</div>`);
+  renderOnlineTab();
+}
+// Kartu keadaan yang dijanjikan spec: dua kalimat jujur, nol nada gagal. Belajar tidak
+// pernah butuh fitur ini, dan kartunya mengatakan itu.
+function socialOfflineCard(){const pending=(()=>{try{return socialCore()?.outboxPending()||0}catch(_){return 0}})();return card(`<h3>Kamu sedang offline</h3><p class="muted">Fitur online menunggu koneksi — semua fitur belajarmu tetap jalan penuh.${pending?` ${pending} bukti belajar sudah antre dan terkirim otomatis begitu online.`:''}</p>`,'social-card')}
+function socialFlagOffCard(flag){return flag==='offline'?socialOfflineCard():card('<h3>Fitur online belum aktif</h3><p class="muted">Bagian ini sedang disiapkan dan belum dinyalakan. Tidak ada yang hilang — semua belajarmu jalan seperti biasa.</p>','social-card')}
+async function renderOnlineTab(){
+  const seq=++onlineSeq;
+  const put=html=>{if(seq!==onlineSeq||state.view!=='online')return;const el=$('onlineRoot');if(el){el.innerHTML=html;enhanceUI()}};
+  const core=socialCore();
+  if(!core)return put(card('<h3>Fitur online belum termuat</h3><p class="muted">Muat ulang aplikasi saat tersambung internet, lalu coba lagi.</p>','social-card'));
+  if(typeof navigator!=='undefined'&&navigator.onLine===false)return put(socialOfflineCard());
+  let flag='off';try{flag=await core.probeFlag()}catch(_){flag='off'}
+  if(flag!=='on')return put(socialFlagOffCard(flag));
+  try{await core.ensureAnon()}catch(_){}
+  try{
+    if(onlineTab==='teman')return put(await socialTemanMarkup(core));
+    if(onlineTab==='papan')return put(await socialPapanMarkup(core));
+    return put(await socialProfilMarkup(core));
+  }catch(_){return put(card('<h3>Jalur online lagi tersendat</h3><p class="muted">Coba lagi sebentar lagi — belajarmu tidak terganggu.</p>','social-card'))}
+}
+/* ---------------------------------------------------------------- tab PROFIL */
+async function socialProfilMarkup(core){
+  const me=await core.api.profileMe();
+  if(me.ok&&me.data?.profile){
+    socialProfileCache=me.data.profile;
+    const p=me.data.profile;
+    const board=await core.api.boardFriends();
+    const pb=board.ok&&board.data?.me?Number(board.data.me.pb)||0:null;
+    return card(`<div class="social-me"><span class="social-avatar" aria-hidden="true">${esc(String(p.handle||'?').charAt(0).toUpperCase())}</span><div><h3>@${esc(p.handle)}</h3><p class="muted">Profil pseudonim-mu — bukan nama asli, dan hanya ini yang dilihat orang lain.</p></div></div>
+      <div class="stats social-stats"><div>${stat('Poin Bukti pekan ini',pb==null?'—':pb+' PB')}</div><div>${stat('Level',esc(p.band||'—'))}</div><div>${stat('Runtun',(Number(p.streakDays)||0)+' hari')}</div></div>
+      <p class="muted">Poin Bukti dihitung server dari bukti belajarmu dan direset tiap Senin 00:00 WIB — bukan angka seumur hidup, bukan mata uang.</p>`,'social-card')
+      +card(`<h3>Privasi, hitam di atas putih</h3><p class="muted">Tanpa email, tanpa nomor HP, tanpa nama asli. Yang tersimpan di server hanya nama samaran, level, dan runtun harian (granularitas hari, tanpa jam). Sembunyikan diri dari papan kapan pun lewat Pengaturan → Online &amp; Teman → Mode privat papan.</p>`,'social-card');
+  }
+  if(me.error==='profile_required'){
+    socialProfileCache=null;
+    return card(`<h3>Buat Profil Online</h3>
+      <p class="muted">Profil = main bareng teman + papan mingguan. Pakai <b>nama samaran</b> — tanpa email, tanpa nama asli, gratis, dan sepenuhnya opsional: semua fitur belajar tetap terbuka tanpa profil.</p>
+      <label class="endpoint-label">Nama samaran (handle)<input id="socialHandle" type="text" maxlength="20" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="mis. belajar_terus" oninput="socialHandleInput(this.value)"></label>
+      <p class="social-handle-status muted" id="socialHandleStatus">3–20 karakter: huruf kecil a-z, angka, garis bawah. Mulai dengan huruf.</p>
+      <label class="consent-row"><input id="socialFriendsVisible" type="checkbox" checked><span>Teman boleh melihat progres belajarku (runtun &amp; level — granularitas hari)</span></label>
+      <label class="consent-row"><input id="socialLeagueOptIn" type="checkbox"><span>Ikut Liga Mingguan global (bisa disembunyikan kapan pun)</span></label>
+      <div class="modal-actions"><button class="primary" id="socialCreateBtn" onclick="socialCreateProfile()" disabled><i data-lucide="user-plus"></i> Buat profil</button></div>`,'social-card');
+  }
+  return card(`<h3>Profil belum bisa dibuka</h3><p class="muted">${esc(me.message)}</p>`,'social-card');
+}
+// Cek ketersediaan LIVE, debounce 500 ms (spec §2.4): validasi lokal dulu (alasan yang jelas,
+// tanpa jaringan), baru tanya server available:true/false.
+function socialHandleInput(value){
+  const status=$('socialHandleStatus'),btn=$('socialCreateBtn');
+  if(btn)btn.disabled=true;
+  clearTimeout(onlineHandleTimer);
+  const core=socialCore();if(!core||!status)return;
+  const v=core.validateHandle(value);
+  if(!v.ok){status.textContent=v.reason;status.classList.remove('social-ok');return}
+  status.textContent='Mengecek ketersediaan…';status.classList.remove('social-ok');
+  onlineHandleTimer=setTimeout(async()=>{
+    const res=await core.api.profileCheck(v.handle);
+    const cur=$('socialHandle');if(!cur||String(cur.value||'').trim().toLowerCase()!==v.handle)return; // murid sudah mengetik lagi
+    if(res.ok&&res.data?.available===true){status.textContent=`@${v.handle} tersedia ✓`;status.classList.add('social-ok');if($('socialCreateBtn'))$('socialCreateBtn').disabled=false}
+    else if(res.ok){status.textContent='Nama itu sudah dipakai atau tidak diizinkan — coba variasi lain.';status.classList.remove('social-ok')}
+    else{status.textContent=res.message;status.classList.remove('social-ok')}
+  },500);
+}
+window.socialHandleInput=socialHandleInput;
+async function socialCreateProfile(){
+  const core=socialCore();if(!core)return;
+  const v=core.validateHandle($('socialHandle')?.value);
+  if(!v.ok){showToast(v.reason);return}
+  const btn=$('socialCreateBtn');if(btn){btn.disabled=true;btn.textContent='Membuat…'}
+  const res=await core.api.profileCreate({handle:v.handle,friendsVisible:$('socialFriendsVisible')?.checked!==false,leagueOptIn:$('socialLeagueOptIn')?.checked===true});
+  if(res.ok){socialProfileCache=res.data?.profile||null;socialSummaryAt=0;showToast(`Profil online jadi. Halo, @${v.handle}!`);socialMicroMoment('profile');try{queueSocialEvidence()}catch(_){}renderOnlineTab();return}
+  if(res.error==='profile_exists'){showToast('Kamu ternyata sudah punya profil — memuat ulang.');renderOnlineTab();return}
+  if(btn){btn.disabled=false;btn.innerHTML='<i data-lucide="user-plus"></i> Buat profil';enhanceUI()}
+  const status=$('socialHandleStatus');if(status)status.textContent=res.message;
+  showToast(res.message);
+}
+window.socialCreateProfile=socialCreateProfile;
+/* ---------------------------------------------------------------- tab TEMAN */
+function socialNeedProfileCard(){return card(`<h3>Butuh profil online dulu</h3><p class="muted">Fitur teman memakai nama samaran supaya tidak ada nama asli yang beredar.</p><div class="modal-actions"><button class="primary" onclick="switchOnlineTab('profil')"><i data-lucide="user-plus"></i> Buat profil</button></div>`,'social-card')}
+async function socialTemanMarkup(core){
+  const fr=await core.api.friends();
+  if(fr.error==='profile_required')return socialNeedProfileCard();
+  if(!fr.ok)return card(`<h3>Daftar teman belum bisa dibuka</h3><p class="muted">${esc(fr.message)}</p>`,'social-card');
+  const friends=Array.isArray(fr.data?.friends)?fr.data.friends:[];
+  const cheers=Array.isArray(fr.data?.cheersToday)?fr.data.cheersToday:[];
+  // URL undangan ?invite=KODE dari share-sheet teman → prefill kolom tukar kode.
+  let urlInvite='';try{urlInvite=String(new URLSearchParams(location.search).get('invite')||'').trim()}catch(_){urlInvite=''}
+  const inviteCard=card(`<h3>Ajak teman</h3><p class="muted">Kode sekali pakai, berlaku 7 hari, maksimal 3 kode aktif. Yang memakai kodenya langsung jadi temanmu — tanpa kotak masuk, tanpa chat.</p>
+    ${socialInviteLast?`<div class="social-code" id="socialInviteCode">${esc(socialInviteLast.code)}</div><p class="muted">Berlaku sampai ${esc(socialInviteLast.expiresDay||'7 hari lagi')}.</p><div class="modal-actions"><button onclick="socialCopyInvite()"><i data-lucide="copy"></i> Salin kode</button><button class="primary" onclick="socialShareInvite()"><i data-lucide="share-2"></i> Bagikan</button></div>`:''}
+    <div class="modal-actions"><button ${socialInviteLast?'':'class="primary"'} id="socialMintBtn" onclick="socialMintInvite()"><i data-lucide="ticket"></i> ${socialInviteLast?'Cetak kode baru':'Cetak kode undangan'}</button></div>`,'social-card');
+  const redeemCard=card(`<h3>Punya kode dari teman?</h3><label class="endpoint-label">Kode undangan<input id="socialRedeemInput" type="text" maxlength="12" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="mis. K3JQ7W2A" value="${esc(urlInvite)}"></label><div class="modal-actions"><button class="primary" onclick="socialRedeem()"><i data-lucide="handshake"></i> Tukar kode</button></div>`,'social-card');
+  const cheerFeed=cheers.length?card(`<h3>Sorakan buatmu hari ini</h3>${cheers.map(c=>{const m=core.stickerMeta(c.sticker);return `<div class="row"><span>${m?m.emoji:''} ${esc(m?m.label:'Sorakan')} dari @${esc(c.handle)}</span><b>×${Math.max(1,Number(c.cnt)||1)}</b></div>`}).join('<hr>')}`,'social-card'):'';
+  const list=friends.length?friends.map(f=>{
+    const vis=f.visible!==false;
+    const milestones=vis&&Array.isArray(f.milestones)?f.milestones.slice(0,3).map(m=>`<span class="social-chip">${esc(core.milestoneLabel(m.kind))}</span>`).join(''):'';
+    return `<div class="social-friend"><span class="social-avatar" aria-hidden="true">${esc(String(f.handle||'?').charAt(0).toUpperCase())}</span><div class="social-friend-body"><b>@${esc(f.handle)}</b><small>${esc(core.presenceLabel(f))}${vis&&f.band?` · ${esc(f.band)}`:''}${vis&&Number(f.streakDays)>0?` · 🔥 ${Number(f.streakDays)} hari`:''}</small>${milestones?`<div class="social-chips">${milestones}</div>`:''}</div><button type="button" class="social-cheer-btn" onclick="socialOpenCheer('${esc(f.handle)}')" aria-label="Sorak @${esc(f.handle)}">👏 Sorak</button></div>`;
+  }).join(''):`<div class="social-empty"><p><b>Belum ada teman di sini.</b></p><p class="muted">Cetak kode di atas dan kirim ke satu teman belajarmu — pertemanan jadi otomatis begitu kodenya dipakai.</p></div>`;
+  return inviteCard+redeemCard+cheerFeed+card(`<h3>Teman belajar (${friends.length})</h3><p class="muted">Yang tampil hanya sinyal belajar harian — tanpa jam, tanpa "online sekarang".</p>${list}`,'social-card');
+}
+async function socialMintInvite(){
+  const core=socialCore();if(!core)return;
+  const btn=$('socialMintBtn');if(btn)btn.disabled=true;
+  const res=await core.api.invite();
+  if(res.ok&&res.data?.code){socialInviteLast={code:String(res.data.code),expiresDay:String(res.data.expiresDay||'')};showToast('Kode undangan tercetak — bagikan ke satu teman.');render();return}
+  if(btn)btn.disabled=false;
+  showToast(res.message);
+}
+window.socialMintInvite=socialMintInvite;
+function socialCopyInvite(){
+  const code=socialInviteLast?.code;if(!code)return;
+  try{navigator.clipboard?.writeText?.(code).then(()=>showToast('Kode tersalin.')).catch(()=>showToast('Salin manual ya: '+code))}catch(_){showToast('Salin manual ya: '+code)}
+}
+window.socialCopyInvite=socialCopyInvite;
+function socialShareInvite(){
+  const code=socialInviteLast?.code;if(!code)return;
+  // Tautan dibangun dari lokasi app yang sedang berjalan — bukan hardcode — supaya benar
+  // di fiezel.my.id/app/, mirror Pages, maupun preview (gate ai-transport-switch (h)).
+  const inviteUrl=(()=>{try{return location.origin+location.pathname}catch(_){return './'}})();
+  const text=`Aku lagi belajar bahasa Inggris di FIEZEL — kejar aku: ${inviteUrl}?invite=${code}`;
+  try{
+    if(typeof navigator!=='undefined'&&typeof navigator.share==='function'){navigator.share({title:'FIEZEL',text}).catch(()=>{});return}
+  }catch(_){}
+  socialCopyInvite();
+}
+window.socialShareInvite=socialShareInvite;
+async function socialRedeem(){
+  const core=socialCore();if(!core)return;
+  const code=String($('socialRedeemInput')?.value||'').trim();
+  if(!code)return showToast('Tulis dulu kodenya.');
+  const res=await core.api.redeem(code);
+  if(res.ok&&res.data?.friend){showToast(`Kamu dan @${res.data.friend.handle} sekarang teman belajar!`);socialMicroMoment('friend');render();return}
+  showToast(res.message);
+}
+window.socialRedeem=socialRedeem;
+function socialOpenCheer(handle){
+  const core=socialCore();if(!core)return;
+  openModal(`<div class="modal-mark">SORAKAN</div><h2>Sorak @${esc(handle)}</h2><p>Satu stiker, tanpa teks — jatah 5 per hari per teman.</p><div class="social-sticker-grid">${core.STICKERS.map(s=>`<button type="button" class="social-sticker" onclick="socialSendCheer('${esc(handle)}','${s.id}')"><span aria-hidden="true">${s.emoji}</span><small>${esc(s.label)}</small></button>`).join('')}</div><div class="modal-actions"><button onclick="closeModal()">Batal</button></div>`);
+}
+window.socialOpenCheer=socialOpenCheer;
+async function socialSendCheer(handle,sticker){
+  const core=socialCore();if(!core)return;
+  closeModal();
+  const res=await core.api.cheer(handle,sticker);
+  if(res.ok){const m=core.stickerMeta(sticker);showToast(`${m?m.emoji:'👏'} Sorakan terkirim ke @${handle}`);socialMicroMoment('cheer');return}
+  // 429 = jatah 5/hari/teman habis — dijawab ramah, bukan sebagai kesalahan murid.
+  showToast(res.error==='rate_limited'?`Jatah sorakan buat @${handle} hari ini sudah penuh — besok lagi ya.`:res.message);
+}
+window.socialSendCheer=socialSendCheer;
+/* ---------------------------------------------------------------- tab PAPAN PERINGKAT */
+function socialBoardRows(core,rows){
+  if(!Array.isArray(rows)||!rows.length)return '';
+  return rows.map((r,i)=>`<div class="social-boardrow${r.me?' social-row-me':''}"><span class="social-rank">${i+1}</span><span class="social-avatar" aria-hidden="true">${esc(String(r.handle||'?').charAt(0).toUpperCase())}</span><span class="social-board-handle">@${esc(r.handle)}${r.me?' <small>(kamu)</small>':''}</span>${r.band?`<span class="social-chip">${esc(r.band)}</span>`:''}<b class="social-pb">${Math.max(0,Number(r.pb)||0)} PB</b></div>`).join('');
+}
+async function socialPapanMarkup(core){
+  const boardTabs=`<div class="progress-tabs social-board-tabs" role="tablist"><button type="button" class="progress-tab${onlineBoardTab==='teman'?' active':''}" role="tab" aria-selected="${onlineBoardTab==='teman'}" onclick="switchOnlineBoard('teman')">Teman</button><button type="button" class="progress-tab${onlineBoardTab==='liga'?' active':''}" role="tab" aria-selected="${onlineBoardTab==='liga'}" onclick="switchOnlineBoard('liga')">Liga Mingguan</button></div>`;
+  const cd=core.leagueCountdown(Date.now());
+  const cdLine=`<p class="muted social-countdown"><i data-lucide="timer"></i> Papan direset Senin 00:00 WIB — ${esc(cd.label)}.</p>`;
+  if(onlineBoardTab==='liga'){
+    const b=await core.api.boardLeague();
+    if(b.error==='profile_required')return boardTabs+socialNeedProfileCard();
+    if(!b.ok)return boardTabs+card(`<h3>Papan liga belum bisa dibuka</h3><p class="muted">${esc(b.message)}</p>`,'social-card');
+    if(b.data?.optedIn!==true)return boardTabs+card(`<h3>Liga Mingguan</h3>${cdLine}<p class="muted">Kamu belum ikut liga global. Keikutsertaan dipilih saat membuat profil; sakelar ikut/keluar liga menyusul di paket berikutnya — papan Teman tetap terbuka penuh untukmu.</p><div class="modal-actions"><button class="primary" onclick="switchOnlineBoard('teman')">Lihat papan Teman</button></div>`,'social-card');
+    if(b.data?.leagueOpen!==true)return boardTabs+card(`<h3>Liga Mingguan</h3>${cdLine}<p class="muted">Kohor liga pekan ini belum terbentuk — ia terisi saat pesertanya cukup. Sambil menunggu, papan Teman selalu terbuka.</p>`,'social-card');
+    const rows=socialBoardRows(core,b.data?.rows);
+    const meNote=b.data?.me==null?'<p class="muted">Mode privat aktif — kamu tidak tampil di papan, dan Poin Buktimu tetap milikmu sendiri.</p>':'';
+    return boardTabs+card(`<h3>Liga Mingguan</h3><p class="muted">Lagi pada belajar apa minggu ini — maksimal 20 orang per kohor.</p>${cdLine}${rows||'<div class="social-empty"><p class="muted">Kohormu masih sepi pekan ini.</p></div>'}${meNote}`,'social-card');
+  }
+  const b=await core.api.boardFriends();
+  if(b.error==='profile_required')return boardTabs+socialNeedProfileCard();
+  if(!b.ok)return boardTabs+card(`<h3>Papan teman belum bisa dibuka</h3><p class="muted">${esc(b.message)}</p>`,'social-card');
+  const rows=socialBoardRows(core,b.data?.rows);
+  const meNote=b.data?.me==null?'<p class="muted">Mode privat aktif — kamu tidak tampil di papan. Ubah kapan pun di Pengaturan → Online &amp; Teman.</p>':'';
+  const empty=`<div class="social-empty"><p><b>Papanmu masih sepi.</b></p><p class="muted">Papan teman baru hidup setelah ada teman — undang satu dulu.</p><div class="modal-actions"><button class="primary" onclick="switchOnlineTab('teman')"><i data-lucide="ticket"></i> Undang teman</button></div></div>`;
+  return boardTabs+card(`<h3>Lagi pada belajar apa minggu ini</h3><p class="muted">Poin Bukti dihitung server dari bukti belajar — konsistensi menang lawan grinding.</p>${cdLine}${rows||empty}${meNote}`,'social-card');
+}
+/* ---------------------------------------------------------------- sakelar Mode Privat (Pengaturan) */
+async function socialToggleHidden(input){
+  const want=!!input?.checked;
+  const core=socialCore();
+  if(!core){if(input)input.checked=!want;showToast('Fitur online belum termuat.');return false}
+  if(typeof navigator!=='undefined'&&navigator.onLine===false){if(input)input.checked=!want;showToast('Butuh koneksi untuk mengubah mode privat — coba lagi saat online.');return false}
+  const res=await core.api.optout(want);
+  if(res.ok){if(socialProfileCache?.flags)socialProfileCache.flags.boardHidden=want;socialSummaryAt=0;showToast(want?'Mode privat aktif — kamu hilang dari semua papan seketika.':'Kamu kembali tampil di papan.');return true}
+  if(input)input.checked=!want;
+  showToast(res.error==='profile_required'?'Mode privat butuh profil online — buat dulu lewat tombol di atasnya.':res.message);
+  return false;
+}
+window.socialToggleHidden=socialToggleHidden;
+/* ---------------------------------------------------------------- kartu ringkas di Peta Belajar → Ringkasan */
+// Kartu digambar SINKRON dari cache (render() tidak boleh menunggu jaringan); isi segarnya
+// menyusul lewat refreshSocialSummaryCard yang menulis ulang innerHTML bila view masih sama.
+function socialSummaryCardMarkup(){
+  if(!socialCore())return '';
+  setTimeout(refreshSocialSummaryCard,0);
+  return `<div class="card social-card social-summary" id="socialSummaryCard">${socialSummaryBody()}</div>`;
+}
+function socialSummaryBody(){
+  const c=socialSummaryCache;
+  if(c?.kind==='profile')return `<h3>Online &amp; Teman</h3><div class="social-me"><span class="social-avatar" aria-hidden="true">${esc(String(c.handle||'?').charAt(0).toUpperCase())}</span><div><b>@${esc(c.handle)}</b><small class="muted"> · ${c.pb==null?'—':c.pb+' PB'} pekan ini</small></div></div><div class="modal-actions"><button class="primary" onclick="go('online')"><i data-lucide="users"></i> Buka Online &amp; Teman</button></div>`;
+  if(c?.kind==='cta')return `<h3>Online &amp; Teman</h3><p class="muted">Main bareng teman dengan nama samaran — pseudonim, tanpa nama asli, dan sepenuhnya opsional.</p><div class="modal-actions"><button class="primary" onclick="go('online')"><i data-lucide="user-plus"></i> Buat Profil Online</button></div>`;
+  if(c?.kind==='offline')return `<h3>Online &amp; Teman</h3><p class="muted">Kamu sedang offline — fitur online menunggu koneksi, belajarmu tetap jalan penuh.</p>`;
+  if(c?.kind==='off')return `<h3>Online &amp; Teman</h3><p class="muted">Fitur online belum aktif. Semua belajarmu jalan seperti biasa.</p>`;
+  return `<h3>Online &amp; Teman</h3><p class="muted">Memeriksa profil online…</p>`;
+}
+async function refreshSocialSummaryCard(){
+  const core=socialCore();if(!core)return;
+  if(socialSummaryCache&&Date.now()-socialSummaryAt<60000)return socialSummaryPaint();
+  if(typeof navigator!=='undefined'&&navigator.onLine===false){socialSummaryCache={kind:'offline'};socialSummaryAt=Date.now();return socialSummaryPaint()}
+  let flag='off';try{flag=await core.probeFlag()}catch(_){flag='off'}
+  if(flag!=='on'){socialSummaryCache={kind:flag==='offline'?'offline':'off'};socialSummaryAt=Date.now();return socialSummaryPaint()}
+  try{await core.ensureAnon()}catch(_){}
+  const me=await core.api.profileMe();
+  if(me.ok&&me.data?.profile){
+    socialProfileCache=me.data.profile;
+    const board=await core.api.boardFriends();
+    socialSummaryCache={kind:'profile',handle:me.data.profile.handle,pb:board.ok&&board.data?.me?Number(board.data.me.pb)||0:null};
+  }else if(me.error==='profile_required')socialSummaryCache={kind:'cta'};
+  else socialSummaryCache={kind:'off'};
+  socialSummaryAt=Date.now();
+  socialSummaryPaint();
+}
+function socialSummaryPaint(){const el=$('socialSummaryCard');if(el&&state.view==='progress'){el.innerHTML=socialSummaryBody();enhanceUI()}}
+/* ---------------------------------------------------------------- kait bukti (evidence ingest) */
+// Ledger lesson yang SUDAH dilaporkan lesson_mastered — di localStorage terpisah, bukan di
+// state belajar (sanitizeState tidak perlu tahu; hilang ledger = paling buruk event ganda,
+// dan server meng-cap 3/hari sehingga duplikat tidak menggelembungkan PB).
+const SOCIAL_MASTERED_KEY='fiezel-social-mastered-v1';
+function socialMasteredLedger(){try{const raw=localStorage.getItem(SOCIAL_MASTERED_KEY);const arr=raw?JSON.parse(raw):[];return Array.isArray(arr)?arr:[]}catch(_){return []}}
+/**
+ * Satu-satunya pintu bukti sosial. Mengumpulkan event enum level-hari dari state yang SUDAH
+ * dihitung mesin belajar (bukan menghitung ulang), meng-antre-kannya ke outbox offline-first,
+ * lalu mencoba flush. Setiap langkah dijaga: fungsi ini TIDAK PERNAH melempar dan TIDAK
+ * PERNAH menahan UI — pemanggilnya (finishQuiz, gemsHook) memanggilnya fire-and-forget.
+ */
+function queueSocialEvidence(extraEvents){
+  try{
+    const core=socialCore();if(!core)return null;
+    const events=[];
+    if(state.daily?.meaningful)events.push({kind:'meaningful_day'});
+    try{if(self.FiezelDailyTarget?.status?.().met)events.push({kind:'daily_target'})}catch(_){}
+    try{
+      const sent=socialMasteredLedger(),fresh=[];
+      for(const [skill,b] of Object.entries(state.grammar||{}))if((Number(b?.mastery)||0)>=GRAMMAR_UNLOCK_MASTERY&&!sent.includes(skill))fresh.push(skill);
+      if(fresh.length){events.push({kind:'lesson_mastered',count:Math.min(20,fresh.length)});try{localStorage.setItem(SOCIAL_MASTERED_KEY,JSON.stringify([...sent,...fresh].slice(-500)))}catch(_){}}
+    }catch(_){}
+    for(const e of (Array.isArray(extraEvents)?extraEvents:[]))if(e&&e.kind)events.push(e);
+    const entry=core.queueEvidence(events);
+    // Kirim sekarang kalau bisa; gagal = tetap antre. Event 'online'/'visibilitychange'
+    // milik modul yang melanjutkan — di sini tanpa await, tanpa toast, tanpa apa pun.
+    if(entry)core.flushOutbox();
+    return entry;
+  }catch(_){return null}
+}
+window.queueSocialEvidence=queueSocialEvidence;window.socialSummaryCardMarkup=socialSummaryCardMarkup;window.onlineView=onlineView;
+// Flush sisa antrean sesi sebelumnya SEKALI setelah boot tenang — bukti yang tertinggal
+// karena murid menutup aplikasi saat offline berangkat di sini.
+setTimeout(()=>{try{socialCore()?.flushOutbox()}catch(_){}},4500);
+/* ============================== akhir blok SOSIAL (SLOT 7) ========================== */
 window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,coreBrainMemory,tutorSession,tutorObserve,misconceptionLedgerRead,misconceptionLedgerActive,coreBrainAttempts,quizPredictedSuccess,evidenceKappa,bktRead,bktRecord,bktShadowMarkup,brainManifestMarkup,learningTelemetryMode,learningTelemetryEmitAnswer,learningTelemetryStudyDay,confusionMatrixRead,confusionMatrixRecord,affectObserve,affectSessionSync,affectTargetSuccess,listeningAdaptivePolicy,olmPanelMarkup,coreBrainPanelMarkup,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession,/* Fase 3 (C5): kalibrasi item, cloze, OLM negotiated, SRL, speaking adaptif, step tutor */itemCalibrationRead,itemCalibrationObserve,itemCalibrationEffective,calibrationItemId,ensureClozeBank,makeClozeQuestion,clozeAdaptivePicks,clozeSkillReady,clozeProductionRecord,olmSummarizeInput,olmDispute,olmProbeNextSkill,olmProbeConsume,olmNegotiationRead,srlSessionPlan,srlPredictPrompt,srlCaptureConfidence,srlReflect,srlSessionSync,speakingCoverageRows,speakingAdaptiveEvidence,speakingAdaptivePolicy,stepTutorGuidance,stepTutorGuidanceMarkup,record,quizLoop,startAdaptive};
 window.startVocabQuiz=startVocabQuiz;window.buildAdaptivePool=buildAdaptivePool;window.buildGrammarLessonQuestions=buildGrammarLessonQuestions;window.getScenePalette=getScenePalette;window.getCelestialState=getCelestialState;window.playFeedbackSound=playFeedbackSound;window.updateMastery=updateMastery;window.markMastered=markMastered;window.__getFiezelState=()=>state;window.__fiezelValidViews=()=>[...VALID_VIEWS];window.__fiezelDueReviews=()=>dueItems().length;window.buildAdaptivePolicy=buildAdaptivePolicy;window.studyDayKey=studyDayKey;window.startAdaptive=startAdaptive;window.showToast=showToast;window.answerFeedbackSignal=answerFeedbackSignal;window.practiceSkill=practiceSkill;window.openReadingLevel=openReadingLevel;window.startReadingRandom=startReadingRandom;window.startReadingAdaptive=startReadingAdaptive;window.startPlacement=startPlacement;window.startLevelPractice=startLevelPractice;window.startAdaptive=startAdaptive;window.resetProgress=resetProgress;window.closeModal=closeModal;window.openSettings=openSettings;window.openReportPreview=openReportPreview;window.sendCreatorReport=sendCreatorReport;window.askCoachAI=askCoachAI;window.dismissWelcome=dismissWelcome;window.requestStudyNotificationPermission=requestStudyNotificationPermission;window.declineStudyNotifications=declineStudyNotifications;window.skipPuterSignIn=skipPuterSignIn;window.shouldPresentPuterPopup=shouldPresentPuterPopup;window.notifyAppUpdateIfNew=notifyAppUpdateIfNew;window.setConfidence=setConfidence;window.explainWithAI=explainWithAI;window.explainWordWithAI=explainWordWithAI;window.olmDispute=olmDispute;/* Fase 3 (C5 butir 3): handler tombol sanggah di panel OLM */
 // m025-84: dipasang di ujung berkas, saat go()/state/VALID_VIEWS sudah ada, dan SEBELUM
