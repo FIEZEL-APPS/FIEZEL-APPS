@@ -2,7 +2,7 @@
   "schema": "fiezel-writing-prompts-v1",
   "schemaVersion": "1.0.0",
   "version": "1.0.0",
-  "promptCount": 36,
+  "promptCount": 45,
   "minPromptsPerLevel": 6,
   "honesty": "FIEZEL tidak memprediksi skor IELTS atau TOEFL. Rubrik ini alat latihan dan umpan balik; band resmi hanya keluar dari ujian resmi.",
   "rubric": {
@@ -510,6 +510,106 @@
       "en": "Professor: \"Does economic growth remain a useful measure of a country’s progress?\" A classmate argued that growth still lifts people out of poverty faster than any alternative. Write a post that engages this argument on its own terms before setting out your own position.",
       "id_hint": "Dosen: \"Apakah pertumbuhan ekonomi masih ukuran yang berguna untuk kemajuan sebuah negara?\" Seorang teman berargumen pertumbuhan tetap mengangkat orang dari kemiskinan lebih cepat daripada alternatif mana pun. Tulis tanggapan yang menanggapi argumen itu dengan seriusnya sendiri sebelum menyampaikan posisimu.",
       "focus": "TOEFL academic discussion: konsesi sebelum posisi"
+    },
+    {
+      "id": "w-a2-7",
+      "level": "A2",
+      "genre": "letter",
+      "examTask": null,
+      "minutes": 15,
+      "target": 80,
+      "en": "Your friend Rara helped you study for last week's English test, and you passed. Write a short email to thank her. In your email: say thank you and tell her how you feel, tell her your test result, and offer to help her with something too.",
+      "id_hint": "Temanmu Rara membantumu belajar untuk ulangan bahasa Inggris minggu lalu, dan kamu lulus. Tulis email singkat untuk berterima kasih padanya: ucapkan terima kasih dan ceritakan perasaanmu, beri tahu hasil ulanganmu, dan tawarkan bantuanmu untuk sesuatu juga.",
+      "focus": "email informal ucapan terima kasih: tiga poin wajib, sapaan dan penutup"
+    },
+    {
+      "id": "w-b1-7",
+      "level": "B1",
+      "genre": "narrative",
+      "examTask": null,
+      "minutes": 25,
+      "target": 150,
+      "en": "Write a story that begins with this sentence: \"When Dina opened her bag, her phone was not there.\" In your story: describe what Dina did next, explain how the phone was lost or found, and end with how she felt. Give your story a clear beginning, middle, and ending.",
+      "id_hint": "Tulis cerita yang diawali kalimat ini: \"When Dina opened her bag, her phone was not there.\" Ceritakan apa yang Dina lakukan setelah itu, bagaimana ponselnya hilang atau ditemukan, dan tutup dengan perasaannya. Pastikan ceritamu punya awal, tengah, dan akhir yang jelas.",
+      "focus": "narasi dari kalimat pembuka: past simple, past continuous, urutan kejadian"
+    },
+    {
+      "id": "w-b1-8",
+      "level": "B1",
+      "genre": "report",
+      "examTask": null,
+      "minutes": 25,
+      "target": 150,
+      "en": "You asked 24 classmates about lunch at the school canteen. Results — usually buy fried snacks: 10; buy rice meals: 8; bring food from home: 6. The change most students want: more fruit on the menu. Write a short report for the student council. In your report: describe the main results, compare the groups, and recommend one change with a reason.",
+      "id_hint": "Kamu menanyai 24 teman sekelas tentang makan siang di kantin sekolah. Hasilnya — biasa membeli gorengan: 10; membeli nasi dan lauk: 8; membawa bekal dari rumah: 6. Perubahan yang paling diinginkan murid: lebih banyak buah di menu. Tulis laporan singkat untuk OSIS: jelaskan hasil utamanya, bandingkan kelompoknya, dan rekomendasikan satu perubahan beserta alasannya.",
+      "focus": "laporan survei sederhana: melaporkan angka, membandingkan, satu rekomendasi"
+    },
+    {
+      "id": "w-b2-7",
+      "level": "B2",
+      "genre": "letter",
+      "examTask": "ielts_task1_letter",
+      "minutes": 20,
+      "target": 150,
+      "en": "You bought a backpack from an online shop, but when it arrived the zip was broken, and the seller has not replied to your messages. Write a letter to the customer service manager. In your letter: describe what you ordered and the problem, explain what you have already done to solve it, and say what you want the company to do now.",
+      "id_hint": "Kamu membeli tas ransel dari toko daring, tetapi saat tiba resletingnya rusak, dan penjualnya tidak membalas pesanmu. Tulis surat ke manajer layanan pelanggan: jelaskan apa yang kamu pesan dan masalahnya, ceritakan apa yang sudah kamu lakukan untuk menyelesaikannya, dan sampaikan apa yang kamu minta dari perusahaan sekarang.",
+      "focus": "surat komplain formal: nada tegas tetapi sopan, tiga bullet wajib dijawab"
+    },
+    {
+      "id": "w-b2-8",
+      "level": "B2",
+      "genre": "summary",
+      "examTask": "toefl_integrated_adapted",
+      "minutes": 20,
+      "target": 200,
+      "en": "Reading: Supporters of replacing printed textbooks with e-books argue three things. First, e-books cost schools less over time. Second, their content can be updated instantly. Third, students stop carrying heavy bags. Now consider the counter-argument that devices are costly to buy and repair, that constant updates leave classes unsure which version to follow, and that screens add distraction and eye strain of their own. Write a response explaining how the counter-argument challenges each point.",
+      "id_hint": "Bacaan: Pendukung penggantian buku cetak dengan buku digital mengajukan tiga hal. Pertama, buku digital lebih hemat untuk sekolah dalam jangka panjang. Kedua, isinya bisa diperbarui seketika. Ketiga, murid tidak lagi membawa tas berat. Sekarang pertimbangkan bantahan bahwa perangkatnya mahal dibeli dan diperbaiki, bahwa pembaruan terus-menerus membuat kelas bingung memakai versi yang mana, dan bahwa layar justru menambah distraksi serta mata lelah. Tulis tanggapan yang menjelaskan bagaimana bantahan itu menantang tiap poin dalam bacaan.",
+      "focus": "TOEFL integrated (adaptasi teks): memasangkan bantahan ke tiap poin sumber",
+      "sourceNote": "Adaptasi berbasis teks. TOEFL asli memakai kuliah audio; di sini bantahannya disajikan tertulis."
+    },
+    {
+      "id": "w-c1-7",
+      "level": "C1",
+      "genre": "problem_solution",
+      "examTask": "ielts_task2",
+      "minutes": 40,
+      "target": 250,
+      "en": "In many large cities, young workers can no longer afford to live near their jobs. What problems does this situation create for individuals and for the city as a whole, and what measures could governments and employers take to address them?",
+      "id_hint": "Di banyak kota besar, pekerja muda tidak lagi mampu tinggal dekat tempat kerjanya. Masalah apa yang ditimbulkan situasi ini bagi individu dan bagi kotanya secara keseluruhan, dan langkah apa yang bisa diambil pemerintah serta pemberi kerja untuk mengatasinya?",
+      "focus": "esai masalah-solusi C1: dampak dua tingkat, solusi multi-aktor"
+    },
+    {
+      "id": "w-c1-8",
+      "level": "C1",
+      "genre": "letter",
+      "examTask": "ielts_task1_letter",
+      "minutes": 20,
+      "target": 150,
+      "en": "An empty plot of land in your neighbourhood has been unused for years and is now attracting rubbish. Write a letter to the local council. In your letter: describe the current state of the land and its effect on residents, propose what the space could become, and explain how residents would help maintain it.",
+      "id_hint": "Sebidang tanah kosong di lingkunganmu terbengkalai bertahun-tahun dan kini jadi tempat orang membuang sampah. Tulis surat ke pemerintah daerah: gambarkan kondisi lahan itu dan dampaknya bagi warga, usulkan lahan itu dijadikan apa, dan jelaskan bagaimana warga akan ikut merawatnya.",
+      "focus": "surat usulan formal ke institusi: tiga bullet wajib, register formal konsisten"
+    },
+    {
+      "id": "w-c2-7",
+      "level": "C2",
+      "genre": "report",
+      "examTask": "ielts_task1_report",
+      "minutes": 20,
+      "target": 150,
+      "en": "The table below shows how one country generated its electricity in 2010 and 2025, with average household electricity prices for the same years. Share of generation — Coal: 58% then 34%; Natural gas: 24% then 28%; Renewables: 11% then 33%; Other: 7% then 5%. Average household price per kWh (index, 2010 = 100): 100 then 128. Summarise the information by selecting and reporting the main features, and make comparisons where relevant.",
+      "id_hint": "Tabel berikut menunjukkan cara satu negara membangkitkan listriknya pada 2010 dan 2025, beserta harga listrik rumah tangga rata-rata pada tahun yang sama. Porsi pembangkitan — Batu bara: 58% lalu 34%; Gas alam: 24% lalu 28%; Energi terbarukan: 11% lalu 33%; Lainnya: 7% lalu 5%. Harga rumah tangga per kWh (indeks, 2010 = 100): 100 lalu 128. Ringkas informasinya dengan memilih dan melaporkan ciri utamanya, serta bandingkan bila relevan.",
+      "focus": "IELTS Task 1 dua sumber data: sintesis lintas ukuran, tanpa opini atau menebak sebab"
+    },
+    {
+      "id": "w-c2-8",
+      "level": "C2",
+      "genre": "problem_solution",
+      "examTask": "ielts_task2",
+      "minutes": 40,
+      "target": 250,
+      "en": "In many countries, people are living longer while birth rates fall, so a shrinking working population must support a growing number of retirees. What problems does this shift create, and what policies could governments adopt to manage them?",
+      "id_hint": "Di banyak negara, orang hidup makin lama sementara angka kelahiran turun, sehingga penduduk usia kerja yang menyusut harus menopang makin banyak pensiunan. Masalah apa yang ditimbulkan pergeseran ini, dan kebijakan apa yang bisa diambil pemerintah untuk mengelolanya?",
+      "focus": "esai masalah-solusi kebijakan abstrak: presisi, menimbang trade-off antarkebijakan"
     }
   ]
 }

@@ -1,103 +1,529 @@
 {
-  "schema": "fiezel-cloze-alternates-v1",
-  "description": "Alternates terkurasi untuk cloze-bank-v1.json (repair R1, temuan P0 redteam-20 'alternates=[] sistemik'). Kunci = id item cloze. Setiap alternate 100% benar di kalimat itu (termasuk instruksi meta bila ada), dan TIDAK boleh sama dengan teks distraktor item tersebut - dilint keras oleh tools/build-cloze-bank.js saat build. Item yang tidak terdaftar di sini memang tidak punya alternate yang bisa dipertanggungjawabkan. Rasional per item: fiezel-qa/repairs/R1-alternates-rationale.md",
-  "alternates": {
-    "TA-001-cz0": ["'s preparing", "is making", "is cooking"],
-    "TA-002-cz0": ["travelled", "went", "flew"],
-    "TA-003-cz0": ["'ll get", "will answer", "'ll answer"],
-    "MO-001-cz0": ["have to", "need to", "are required to"],
-    "MO-002-cz0": ["cannot"],
-    "CO-002-cz0": ["were to win"],
-    "PA-001-cz0": ["was built", "was erected"],
-    "GI-001-cz0": ["to get", "to pick up"],
-    "CM-001-cz0": ["prettier", "more beautiful", "more picturesque"],
-    "TA-004-cz0": ["was making", "was preparing", "was having", "was eating"],
-    "TA-005-cz0": ["has completed", "has finished", "has published"],
-    "TA-006-cz0": ["had given", "had provided", "had already provided", "had administered", "had already administered"],
-    "TA-007-cz0": ["'ll be having", "will be eating", "'ll be eating"],
-    "MO-003-cz0": ["managed to get", "got"],
-    "MO-004-cz0": ["must've"],
-    "MO-005-cz0": ["need not", "don't need to", "do not need to", "don't have to", "do not have to"],
-    "CO-003-cz0": ["'d left", "had departed"],
-    "CO-004-cz0": ["would not be"],
-    "PA-002-cz0": ["has to be signed", "needs to be signed"],
-    "RS-002-cz0": ["was living", "worked", "was", "stayed", "was staying"],
-    "RS-003-cz0": ["to stop talking and to listen"],
-    "RS-004-cz0": ["proposed", "recommended"],
-    "AR-003-cz0": ["enough"],
-    "GI-002-cz0": ["having locked"],
-    "GI-003-cz0": ["in order to have", "so as to have"],
-    "CM-002-cz0": ["as quick as"],
-    "CM-003-cz0": ["increasingly busy"],
-    "QN-002-cz0": ["Couldn't"],
-    "QN-003-cz0": ["pharmacy is located", "chemist is", "drugstore is"],
-    "TA-008-cz0": ["was going to transform", "would revolutionize"],
-    "TA-009-cz0": ["had been revising", "had been cramming"],
-    "MO-006-cz0": ["'d better"],
-    "MO-007-cz0": ["may", "could"],
-    "MO-008-cz0": ["should not have stayed"],
-    "CO-007-cz0": ["would've been"],
-    "PA-005-cz0": ["It is said", "It is thought", "It's believed", "It's said", "It's thought"],
-    "PA-006-cz0": ["to be unveiled", "to be introduced", "to be launched"],
-    "RS-005-cz0": ["on that day", "that same day"],
-    "AR-005-cz0": ["the"],
-    "PR-004-cz0": ["back"],
-    "RC-004-cz0": ["to whom"],
-    "QN-004-cz0": ["a thing"],
-    "QN-005-cz0": ["Nor do"],
-    "TA-010-cz0": ["departs"],
-    "b4_001-cz0": ["'ll have been working"],
-    "b4_002-cz0": ["'d left", "had departed", "had gone"],
-    "b4_003-cz0": ["has belonged"],
-    "b4_004-cz0": ["could've taken", "could have accepted", "could've accepted"],
-    "b4_007-cz0": ["has arrived", "gets in", "comes"],
-    "b4_008-cz0": ["got"],
-    "b4_009-cz0": ["is thought to", "is said to", "is alleged to"],
-    "b4_011-cz0": ["if I had locked", "if I'd locked", "whether I'd locked"],
-    "b4_012-cz0": ["class"],
-    "b4_013-cz0": ["a friend", "my friend"],
-    "b4_014-cz0": ["in the middle of", "halfway through"],
-    "b4_016-cz0": ["To exercise", "Working out"],
-    "b4_019-cz0": ["far", "a lot", "considerably", "significantly", "way"],
-    "b4_022-cz0": ["In spite of", "Notwithstanding"],
-    "b4_024-cz0": ["It was Sarah who"],
-    "b5_001-cz0": ["lived in", "was living in"],
-    "b5_002-cz0": ["'ve sent", "have written", "'ve written"],
-    "b5_003-cz0": ["should've read", "ought to have read"],
-    "b5_005-cz0": ["were not"],
-    "b5_006-cz0": ["as long as", "so long as", "provided", "providing", "providing that", "on condition that"],
-    "b5_010-cz0": ["for arriving", "for coming"],
-    "b5_012-cz0": ["The two of"],
-    "b5_015-cz0": ["to tell", "to advise"],
-    "b5_016-cz0": ["to having broken"],
-    "b5_017-cz0": ["some of whom", "most of whom"],
-    "b5_019-cz0": ["What broke", "Who smashed"],
-    "b5_021-cz0": ["so", "in order that"],
-    "b5_022-cz0": ["Moreover", "In addition", "Additionally"],
-    "b5_023-cz0": ["Never have I been to", "Never have I seen"],
-    "b5_024-cz0": ["Such was the force", "Such was the power"],
-    "A1-003-cz0": ["has", "makes"],
-    "A1-004-cz0": ["'re", "were"],
-    "A1-005-cz0": ["were"],
-    "A1-007-cz0": ["is able to"],
-    "C2-003-cz0": ["must've been working"],
-    "C2-004-cz0": ["did the board realize", "did the board grasp"],
-    "C2-006-cz0": ["Having examined", "Having checked", "After reviewing"],
-    "A1-009-cz0": ["'s"],
-    "A1-010-cz0": ["watched"],
-    "A1-014-cz0": ["'s cooking", "is making", "'s making", "is preparing", "is having", "is eating"],
-    "A1-016-cz0": ["much", "enough", "a lot of"],
-    "A1-017-cz0": ["My"],
-    "A1-019-cz0": ["always has"],
-    "A1-020-cz0": ["her"],
-    "A1-021-cz0": ["'d like", "'ll have", "will have", "would love"],
-    "GI-006-cz0": ["hates to get", "hates waking", "hates to wake", "dislikes getting"],
-    "TA-011-cz0": ["traveled", "travelled"],
-    "TA-012-cz0": ["'ve lived", "have been living", "'ve been living"],
-    "CO-008-cz0": ["were living"],
-    "CO-009-cz0": ["'d read"],
-    "TA-013-cz0": ["'ll have heard", "must have heard", "must've heard"],
-    "PA-007-cz0": ["to have been taken", "to have been looted"],
-    "RS-007-cz0": ["should resign", "step down"]
-  }
+ "schema": "fiezel-cloze-alternates-v1",
+ "description": "Alternates terkurasi untuk cloze-bank-v1.json (repair R1, temuan P0 redteam-20 'alternates=[] sistemik'). Kunci = id item cloze. Setiap alternate 100% benar di kalimat itu (termasuk instruksi meta bila ada), dan TIDAK boleh sama dengan teks distraktor item tersebut - dilint keras oleh tools/build-cloze-bank.js saat build. Item yang tidak terdaftar di sini memang tidak punya alternate yang bisa dipertanggungjawabkan. Rasional per item: fiezel-qa/repairs/R1-alternates-rationale.md",
+ "alternates": {
+  "TA-001-cz0": [
+   "'s preparing",
+   "is making",
+   "is cooking"
+  ],
+  "TA-002-cz0": [
+   "travelled",
+   "went",
+   "flew"
+  ],
+  "TA-003-cz0": [
+   "'ll get",
+   "will answer",
+   "'ll answer"
+  ],
+  "MO-001-cz0": [
+   "have to",
+   "need to",
+   "are required to"
+  ],
+  "MO-002-cz0": [
+   "cannot"
+  ],
+  "CO-002-cz0": [
+   "were to win"
+  ],
+  "PA-001-cz0": [
+   "was built",
+   "was erected"
+  ],
+  "GI-001-cz0": [
+   "to get",
+   "to pick up"
+  ],
+  "CM-001-cz0": [
+   "prettier",
+   "more beautiful",
+   "more picturesque"
+  ],
+  "TA-004-cz0": [
+   "was making",
+   "was preparing",
+   "was having",
+   "was eating"
+  ],
+  "TA-005-cz0": [
+   "has completed",
+   "has finished",
+   "has published"
+  ],
+  "TA-006-cz0": [
+   "had given",
+   "had provided",
+   "had already provided",
+   "had administered",
+   "had already administered"
+  ],
+  "TA-007-cz0": [
+   "'ll be having",
+   "will be eating",
+   "'ll be eating"
+  ],
+  "MO-003-cz0": [
+   "managed to get",
+   "got"
+  ],
+  "MO-004-cz0": [
+   "must've"
+  ],
+  "MO-005-cz0": [
+   "need not",
+   "don't need to",
+   "do not need to",
+   "don't have to",
+   "do not have to"
+  ],
+  "CO-003-cz0": [
+   "'d left",
+   "had departed"
+  ],
+  "CO-004-cz0": [
+   "would not be"
+  ],
+  "PA-002-cz0": [
+   "has to be signed",
+   "needs to be signed"
+  ],
+  "RS-002-cz0": [
+   "was living",
+   "worked",
+   "was",
+   "stayed",
+   "was staying"
+  ],
+  "RS-003-cz0": [
+   "to stop talking and to listen"
+  ],
+  "RS-004-cz0": [
+   "proposed",
+   "recommended"
+  ],
+  "AR-003-cz0": [
+   "enough"
+  ],
+  "GI-002-cz0": [
+   "having locked"
+  ],
+  "GI-003-cz0": [
+   "in order to have",
+   "so as to have"
+  ],
+  "CM-002-cz0": [
+   "as quick as"
+  ],
+  "CM-003-cz0": [
+   "increasingly busy"
+  ],
+  "QN-002-cz0": [
+   "Couldn't"
+  ],
+  "QN-003-cz0": [
+   "pharmacy is located",
+   "chemist is",
+   "drugstore is"
+  ],
+  "TA-008-cz0": [
+   "was going to transform",
+   "would revolutionize"
+  ],
+  "TA-009-cz0": [
+   "had been revising",
+   "had been cramming"
+  ],
+  "MO-006-cz0": [
+   "'d better"
+  ],
+  "MO-007-cz0": [
+   "may",
+   "could"
+  ],
+  "MO-008-cz0": [
+   "should not have stayed"
+  ],
+  "CO-007-cz0": [
+   "would've been"
+  ],
+  "PA-005-cz0": [
+   "It is said",
+   "It is thought",
+   "It's believed",
+   "It's said",
+   "It's thought"
+  ],
+  "PA-006-cz0": [
+   "to be unveiled",
+   "to be introduced",
+   "to be launched"
+  ],
+  "RS-005-cz0": [
+   "on that day",
+   "that same day"
+  ],
+  "AR-005-cz0": [
+   "the"
+  ],
+  "PR-004-cz0": [
+   "back"
+  ],
+  "RC-004-cz0": [
+   "to whom"
+  ],
+  "QN-004-cz0": [
+   "a thing"
+  ],
+  "QN-005-cz0": [
+   "Nor do"
+  ],
+  "TA-010-cz0": [
+   "departs"
+  ],
+  "b4_001-cz0": [
+   "'ll have been working"
+  ],
+  "b4_002-cz0": [
+   "'d left",
+   "had departed",
+   "had gone"
+  ],
+  "b4_003-cz0": [
+   "has belonged"
+  ],
+  "b4_004-cz0": [
+   "could've taken",
+   "could have accepted",
+   "could've accepted"
+  ],
+  "b4_007-cz0": [
+   "has arrived",
+   "gets in",
+   "comes"
+  ],
+  "b4_008-cz0": [
+   "got"
+  ],
+  "b4_009-cz0": [
+   "is thought to",
+   "is said to",
+   "is alleged to"
+  ],
+  "b4_011-cz0": [
+   "if I had locked",
+   "if I'd locked",
+   "whether I'd locked"
+  ],
+  "b4_012-cz0": [
+   "class"
+  ],
+  "b4_013-cz0": [
+   "a friend",
+   "my friend"
+  ],
+  "b4_014-cz0": [
+   "in the middle of",
+   "halfway through"
+  ],
+  "b4_016-cz0": [
+   "To exercise",
+   "Working out"
+  ],
+  "b4_019-cz0": [
+   "far",
+   "a lot",
+   "considerably",
+   "significantly",
+   "way"
+  ],
+  "b4_022-cz0": [
+   "In spite of",
+   "Notwithstanding"
+  ],
+  "b4_024-cz0": [
+   "It was Sarah who"
+  ],
+  "b5_001-cz0": [
+   "lived in",
+   "was living in"
+  ],
+  "b5_002-cz0": [
+   "'ve sent",
+   "have written",
+   "'ve written"
+  ],
+  "b5_003-cz0": [
+   "should've read",
+   "ought to have read"
+  ],
+  "b5_005-cz0": [
+   "were not"
+  ],
+  "b5_006-cz0": [
+   "as long as",
+   "so long as",
+   "provided",
+   "providing",
+   "providing that",
+   "on condition that"
+  ],
+  "b5_010-cz0": [
+   "for arriving",
+   "for coming"
+  ],
+  "b5_012-cz0": [
+   "The two of"
+  ],
+  "b5_015-cz0": [
+   "to tell",
+   "to advise"
+  ],
+  "b5_016-cz0": [
+   "to having broken"
+  ],
+  "b5_017-cz0": [
+   "some of whom",
+   "most of whom"
+  ],
+  "b5_019-cz0": [
+   "What broke",
+   "Who smashed"
+  ],
+  "b5_021-cz0": [
+   "so",
+   "in order that"
+  ],
+  "b5_022-cz0": [
+   "Moreover",
+   "In addition",
+   "Additionally"
+  ],
+  "b5_023-cz0": [
+   "Never have I been to",
+   "Never have I seen"
+  ],
+  "b5_024-cz0": [
+   "Such was the force",
+   "Such was the power"
+  ],
+  "A1-003-cz0": [
+   "has",
+   "makes"
+  ],
+  "A1-004-cz0": [
+   "'re",
+   "were"
+  ],
+  "A1-005-cz0": [
+   "were"
+  ],
+  "A1-007-cz0": [
+   "is able to"
+  ],
+  "C2-003-cz0": [
+   "must've been working"
+  ],
+  "C2-004-cz0": [
+   "did the board realize",
+   "did the board grasp"
+  ],
+  "C2-006-cz0": [
+   "Having examined",
+   "Having checked",
+   "After reviewing"
+  ],
+  "A1-009-cz0": [
+   "'s"
+  ],
+  "A1-010-cz0": [
+   "watched"
+  ],
+  "A1-014-cz0": [
+   "'s cooking",
+   "is making",
+   "'s making",
+   "is preparing",
+   "is having",
+   "is eating"
+  ],
+  "A1-016-cz0": [
+   "much",
+   "enough",
+   "a lot of"
+  ],
+  "A1-017-cz0": [
+   "My"
+  ],
+  "A1-019-cz0": [
+   "always has"
+  ],
+  "A1-020-cz0": [
+   "her"
+  ],
+  "A1-021-cz0": [
+   "'d like",
+   "'ll have",
+   "will have",
+   "would love"
+  ],
+  "GI-006-cz0": [
+   "hates to get",
+   "hates waking",
+   "hates to wake",
+   "dislikes getting"
+  ],
+  "TA-011-cz0": [
+   "traveled",
+   "travelled"
+  ],
+  "TA-012-cz0": [
+   "'ve lived",
+   "have been living",
+   "'ve been living"
+  ],
+  "CO-008-cz0": [
+   "were living"
+  ],
+  "CO-009-cz0": [
+   "'d read"
+  ],
+  "TA-013-cz0": [
+   "'ll have heard",
+   "must have heard",
+   "must've heard"
+  ],
+  "PA-007-cz0": [
+   "to have been taken",
+   "to have been looted"
+  ],
+  "RS-007-cz0": [
+   "should resign",
+   "step down"
+  ],
+  "A1-022-cz0": [
+   "gently",
+   "slowly",
+   "with care",
+   "safely"
+  ],
+  "A1-025-cz0": [
+   "since",
+   "as"
+  ],
+  "CO-010-cz0": [
+   "'d stop",
+   "would quit",
+   "'d quit",
+   "would give up",
+   "'d give up"
+  ],
+  "GI-008-cz0": [
+   "be"
+  ],
+  "MO-009-cz0": [
+   "was supposed to",
+   "is due to",
+   "is scheduled to",
+   "should",
+   "is meant to",
+   "is set to",
+   "is to",
+   "will",
+   "is going to",
+   "was due to",
+   "was scheduled to",
+   "was meant to",
+   "was set to",
+   "was to"
+  ],
+  "CO-011-cz0": [
+   "fixed",
+   "mended",
+   "patched",
+   "filled",
+   "filled in"
+  ],
+  "CM-006-cz0": [
+   "was"
+  ],
+  "MO-010-cz0": [
+   "need not have",
+   "shouldn't have",
+   "should not have",
+   "ought not to have",
+   "oughtn't to have"
+  ],
+  "b6_003-cz0": [
+   "had we started",
+   "did we begin",
+   "did we start"
+  ],
+  "b6_004-cz0": [
+   "No matter how",
+   "Regardless of how"
+  ],
+  "b6_005-cz0": [
+   "did"
+  ],
+  "CO-012-cz0": [
+   "Without",
+   "Were it not for",
+   "Had it not been for",
+   "If it had not been for",
+   "If it hadn't been for",
+   "If not for",
+   "Absent"
+  ],
+  "MO-011-cz0": [
+   "dare not",
+   "doesn't dare",
+   "does not dare",
+   "doesn't dare to",
+   "does not dare to",
+   "wouldn't dare",
+   "wouldn't dare to",
+   "would not dare",
+   "would not dare to"
+  ],
+  "GI-009-cz0": [
+   "him releasing",
+   "releasing",
+   "the release of",
+   "her releasing",
+   "their releasing",
+   "them releasing",
+   "its releasing",
+   "my releasing",
+   "our releasing"
+  ],
+  "PR-006-cz0": [
+   "Absent",
+   "Failing",
+   "In the absence of",
+   "Without"
+  ],
+  "QN-006-cz0": [
+   "Not wishing",
+   "So as not",
+   "In order not",
+   "Unwilling",
+   "Reluctant",
+   "Trying not",
+   "Hoping not",
+   "Careful not"
+  ],
+  "C2-008-cz0": [
+   "though",
+   "if",
+   "but",
+   "yet",
+   "although"
+  ],
+  "A1-024-cz0": [
+   "no food",
+   "not a thing"
+  ]
+ }
 }

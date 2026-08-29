@@ -29798,5 +29798,1229 @@
     "author": "Adhitya Kurniasih",
     "setting": "a newly opened gallery in an old museum building",
     "focus": "gallery uncertainty curatorial hierarchy gradation"
+  },
+  {
+    "id": "r0301",
+    "level": "A1",
+    "title": "Molen the Brown Rabbit",
+    "text": "Ragil has a brown rabbit. Its name is Molen. He feeds Molen every morning. In the afternoon, Ragil opens the cage, and Molen runs on the grass. Molen hears a loud car and hides behind a flower pot. Ragil laughs and gives it a carrot. Then the rabbit sleeps in its cage.",
+    "qs": [
+      [
+        "Why does Molen hide behind the flower pot?",
+        [
+          "It wants to eat the flowers.",
+          "It is tired of running.",
+          "It is afraid of the loud sound.",
+          "It looks for its cage."
+        ],
+        2,
+        {
+          "type": "inference",
+          "evidence": "Molen hears a loud car and hides behind a flower pot.",
+          "answer": "It is afraid of the loud sound.",
+          "patternId": "a1-r0301-1-inference",
+          "why": "Molen bersembunyi tepat setelah mendengar mobil yang berisik — jadi dia kaget dan takut pada suara itu.",
+          "whyOthersFail": "Teks nggak bilang Molen makan bunga, capek, atau mencari kandang; yang terjadi sebelum ia sembunyi adalah suara mobil."
+        }
+      ],
+      [
+        "What can we say about Molen?",
+        [
+          "Molen does not play outside all day.",
+          "Molen sleeps on the grass at night.",
+          "Molen opens the cage door itself.",
+          "Molen eats grass in the morning."
+        ],
+        0,
+        {
+          "type": "inference",
+          "evidence": "In the afternoon, Ragil opens the cage, and Molen runs on the grass.",
+          "answer": "Molen does not play outside all day.",
+          "patternId": "a1-r0301-2-inference",
+          "why": "Kandangnya baru dibuka sore hari dan Molen tidur lagi di kandang — jadi dia nggak bermain di luar sepanjang hari.",
+          "whyOthersFail": "Molen tidur di kandang, bukan di rumput; yang membuka kandang adalah Ragil; kegiatan pagi yang diceritakan adalah Ragil memberi makan Molen, bukan Molen makan rumput di taman."
+        }
+      ],
+      [
+        "In the text, what does the word 'it' mean in 'Ragil laughs and gives it a carrot'?",
+        [
+          "the flower pot",
+          "Molen the rabbit",
+          "the loud car",
+          "the cage"
+        ],
+        1,
+        {
+          "type": "reference",
+          "evidence": "Ragil laughs and gives it a carrot.",
+          "answer": "Molen the rabbit",
+          "patternId": "a1-r0301-3-reference",
+          "why": "Yang diberi wortel tentu Molen, kelinci yang baru saja bersembunyi di kalimat sebelumnya.",
+          "whyOthersFail": "Pot bunga, mobil, dan kandang bukan makhluk yang bisa diberi wortel dan bukan yang sedang diceritakan."
+        }
+      ],
+      [
+        "What is the text about?",
+        [
+          "a boy who plants flowers",
+          "a car in the garden",
+          "a girl who buys a new cage",
+          "a boy and his pet rabbit"
+        ],
+        3,
+        {
+          "type": "main_idea",
+          "evidence": "Ragil has a brown rabbit.",
+          "answer": "a boy and his pet rabbit",
+          "patternId": "a1-r0301-4-main_idea",
+          "why": "Semua kalimat bercerita tentang Ragil dan kelincinya Molen: bermain, sembunyi, makan wortel, lalu tidur.",
+          "whyOthersFail": "Bunga hanya tempat sembunyi, mobil cuma lewat suaranya, dan nggak ada yang membeli kandang baru."
+        }
+      ],
+      [
+        "What does Ragil give to Molen?",
+        [
+          "a carrot",
+          "a flower",
+          "some grass",
+          "a small toy"
+        ],
+        0,
+        {
+          "type": "detail",
+          "evidence": "Ragil laughs and gives it a carrot.",
+          "answer": "a carrot",
+          "patternId": "a1-r0301-5-detail",
+          "why": "Teks menyebut langsung: Ragil memberi Molen sebuah wortel.",
+          "whyOthersFail": "Bunga dan rumput hanya tempat Molen bermain dan sembunyi; mainan nggak ada di teks."
+        }
+      ]
+    ],
+    "topic": "a pet rabbit in the garden",
+    "author": "Ragil",
+    "setting": "a home garden in the afternoon",
+    "focus": "a boy plays with his rabbit, which hides from a loud car"
+  },
+  {
+    "id": "r0302",
+    "level": "A1",
+    "title": "Andi's New Kite",
+    "text": "Andi has a new kite. It is red and yellow. On Saturday he goes to the big field with his uncle. The wind is strong, so the kite flies high. Many children look at it. Andi holds the line with two hands because the kite pulls hard.",
+    "qs": [
+      [
+        "What can we say about the kite in the strong wind?",
+        [
+          "It is easy to hold with one hand.",
+          "It is not easy to hold.",
+          "It falls to the ground fast.",
+          "It is too heavy to fly."
+        ],
+        1,
+        {
+          "type": "inference",
+          "evidence": "Andi holds the line with two hands because the kite pulls hard.",
+          "answer": "It is not easy to hold.",
+          "patternId": "a1-r0302-1-inference",
+          "why": "Andi sampai memegang benangnya dengan dua tangan karena layangannya menarik kuat — berarti nggak mudah dipegang.",
+          "whyOthersFail": "Dua tangan dipakai justru karena satu tangan nggak cukup; layangannya terbang tinggi, bukan jatuh, dan jelas bisa terbang."
+        }
+      ],
+      [
+        "In the text, what does the word 'it' mean in 'Many children look at it'?",
+        [
+          "the field",
+          "the wind",
+          "Andi's uncle",
+          "Andi's kite"
+        ],
+        3,
+        {
+          "type": "reference",
+          "evidence": "Many children look at it.",
+          "answer": "Andi's kite",
+          "patternId": "a1-r0302-2-reference",
+          "why": "Kalimat sebelumnya bercerita layangan terbang tinggi, jadi 'it' adalah layangan Andi yang dilihat anak-anak.",
+          "whyOthersFail": "Lapangan dan angin bukan hal yang sedang naik dan menarik perhatian, dan paman Andi nggak sedang dibicarakan di kalimat itu."
+        }
+      ],
+      [
+        "In the text, what does 'high' mean?",
+        [
+          "far up in the sky",
+          "close to the ground",
+          "slow and heavy",
+          "under the water"
+        ],
+        0,
+        {
+          "type": "vocabulary_context",
+          "evidence": "The wind is strong, so the kite flies high.",
+          "answer": "far up in the sky",
+          "patternId": "a1-r0302-3-vocabulary_context",
+          "why": "Angin kuat membuat layangan terbang jauh ke atas langit — itulah arti 'high' di sini.",
+          "whyOthersFail": "'high' kebalikan dari dekat tanah; teks juga nggak bilang layangan lambat, berat, atau di air."
+        }
+      ],
+      [
+        "Who goes to the field with Andi?",
+        [
+          "his father",
+          "his teacher",
+          "his uncle",
+          "his sister"
+        ],
+        2,
+        {
+          "type": "detail",
+          "evidence": "On Saturday he goes to the big field with his uncle.",
+          "answer": "his uncle",
+          "patternId": "a1-r0302-4-detail",
+          "why": "Teks menyebut langsung: Andi pergi ke lapangan besar bersama pamannya.",
+          "whyOthersFail": "Ayah, guru, dan saudara perempuan nggak disebut di teks; yang menemani adalah 'his uncle'."
+        }
+      ],
+      [
+        "What is the text about?",
+        [
+          "a boy who buys a new bag",
+          "children who play football",
+          "an uncle who works in a field",
+          "a boy who flies his new kite"
+        ],
+        3,
+        {
+          "type": "main_idea",
+          "evidence": "Andi has a new kite.",
+          "answer": "a boy who flies his new kite",
+          "patternId": "a1-r0302-5-main_idea",
+          "why": "Teks mengikuti Andi dan layangan barunya dari rumah sampai terbang tinggi di lapangan.",
+          "whyOthersFail": "Nggak ada tas baru atau sepak bola, dan pamannya menemani Andi, bukan bekerja di lapangan."
+        }
+      ]
+    ],
+    "topic": "flying a kite",
+    "author": "Andi",
+    "setting": "a big field on Saturday",
+    "focus": "a boy flies his new kite with his uncle"
+  },
+  {
+    "id": "r0303",
+    "level": "A1",
+    "title": "Haircut on Sunday",
+    "text": "Ilham's hair is very long now. On Sunday morning he walks to the barber shop with his father. The shop is busy, so they wait on a long seat. The barber cuts Ilham's hair with care. After that, Ilham looks in the mirror and says thank you.",
+    "qs": [
+      [
+        "How does Ilham feel about his new haircut?",
+        [
+          "He likes it.",
+          "He is angry about it.",
+          "He wants long hair again.",
+          "He is afraid of the mirror."
+        ],
+        0,
+        {
+          "type": "inference",
+          "evidence": "After that, Ilham looks in the mirror and says thank you.",
+          "answer": "He likes it.",
+          "patternId": "a1-r0303-1-inference",
+          "why": "Ilham melihat cermin lalu mengucapkan terima kasih — tanda dia suka hasil potongannya.",
+          "whyOthersFail": "Orang yang marah atau kecewa nggak bilang terima kasih, dan teks nggak menunjukkan dia takut pada cermin."
+        }
+      ],
+      [
+        "In the text, who does the word 'they' mean in 'they wait on a long seat'?",
+        [
+          "the barbers in the shop",
+          "Ilham and the barber",
+          "Ilham and his father",
+          "the people at home"
+        ],
+        2,
+        {
+          "type": "reference",
+          "evidence": "The shop is busy, so they wait on a long seat.",
+          "answer": "Ilham and his father",
+          "patternId": "a1-r0303-2-reference",
+          "why": "Yang datang ke tempat cukur adalah Ilham dan ayahnya, jadi merekalah yang menunggu.",
+          "whyOthersFail": "Tukang cukurnya sedang bekerja, bukan menunggu; Ilham nggak datang bersama tukang cukur; orang di rumah nggak ada di cerita."
+        }
+      ],
+      [
+        "In the text, what does 'busy' mean?",
+        [
+          "very cold inside",
+          "closed for the day",
+          "clean and new",
+          "full of people"
+        ],
+        3,
+        {
+          "type": "vocabulary_context",
+          "evidence": "The shop is busy, so they wait on a long seat.",
+          "answer": "full of people",
+          "patternId": "a1-r0303-3-vocabulary_context",
+          "why": "Karena tokonya 'busy', mereka harus menunggu — berarti tokonya penuh orang.",
+          "whyOthersFail": "Kalau toko tutup, mereka nggak bisa menunggu di dalam; dingin atau bersih nggak membuat orang harus antre."
+        }
+      ],
+      [
+        "When does Ilham go to the barber shop?",
+        [
+          "on Friday afternoon",
+          "on Sunday morning",
+          "on Monday night",
+          "after school on Tuesday"
+        ],
+        1,
+        {
+          "type": "time",
+          "evidence": "On Sunday morning he walks to the barber shop with his father.",
+          "answer": "on Sunday morning",
+          "patternId": "a1-r0303-4-time",
+          "why": "Teks menyebut waktunya langsung: Minggu pagi.",
+          "whyOthersFail": "Jumat, Senin malam, dan Selasa nggak disebut di teks sama sekali."
+        }
+      ],
+      [
+        "What does Ilham do after the haircut?",
+        [
+          "He buys a new comb.",
+          "He waits on the long seat.",
+          "He looks in the mirror.",
+          "He washes his hair at home."
+        ],
+        2,
+        {
+          "type": "detail",
+          "evidence": "After that, Ilham looks in the mirror and says thank you.",
+          "answer": "He looks in the mirror.",
+          "patternId": "a1-r0303-5-detail",
+          "why": "Setelah dicukur, Ilham melihat ke cermin dan berterima kasih.",
+          "whyOthersFail": "Menunggu di kursi terjadi sebelum dicukur, dan teks nggak menyebut sisir baru atau keramas di rumah."
+        }
+      ]
+    ],
+    "topic": "a haircut at the barber shop",
+    "author": "Ilham",
+    "setting": "a barber shop on Sunday morning",
+    "focus": "a boy gets a haircut with his father"
+  },
+  {
+    "id": "r0304",
+    "level": "A2",
+    "title": "Bees Behind the Science Room",
+    "text": "Last month our science teacher, Bu Ratna, put a small bee box behind the science room. The bees fly to the flowers near the fence and come back with food. At first some students were afraid, but the bees are calm when nobody touches the box. Every Friday two students write notes about the box. Bu Ratna says the school will get its first honey in June.",
+    "qs": [
+      [
+        "What can we say about the students now?",
+        [
+          "They are still very afraid of the box.",
+          "They want to move the box away.",
+          "They touch the bees every day.",
+          "They are less afraid than before."
+        ],
+        3,
+        {
+          "type": "inference",
+          "evidence": "At first some students were afraid, but the bees are calm when nobody touches the box.",
+          "answer": "They are less afraid than before.",
+          "patternId": "a2-r0304-1-inference",
+          "why": "Kata 'At first' menunjukkan takutnya hanya di awal; setelah tahu lebahnya tenang, rasa takut itu berkurang.",
+          "whyOthersFail": "'At first ... but' justru menandai perubahan, jadi 'masih sangat takut' bertabrakan dengan teks; nggak ada permintaan memindahkan kotak, dan lebahnya tenang justru 'when nobody touches the box'."
+        }
+      ],
+      [
+        "What can we understand about the honey?",
+        [
+          "The school sells honey every month.",
+          "The school does not have the honey yet.",
+          "The bees ate all the honey in May.",
+          "Bu Ratna buys honey at the market."
+        ],
+        1,
+        {
+          "type": "inference",
+          "evidence": "Bu Ratna says the school will get its first honey in June.",
+          "answer": "The school does not have the honey yet.",
+          "patternId": "a2-r0304-2-inference",
+          "why": "Madu pertamanya baru akan datang bulan Juni, jadi sekarang sekolah belum punya madunya.",
+          "whyOthersFail": "'first honey' berarti belum pernah ada madu untuk dijual; teks nggak menyebut lebah menghabiskan madu atau Bu Ratna membeli madu."
+        }
+      ],
+      [
+        "In the last sentence, what does the word 'its' refer to?",
+        [
+          "the bee box's",
+          "Bu Ratna's",
+          "the school's",
+          "the science room's"
+        ],
+        2,
+        {
+          "type": "reference",
+          "evidence": "Bu Ratna says the school will get its first honey in June.",
+          "answer": "the school's",
+          "patternId": "a2-r0304-3-reference",
+          "why": "'its' melekat pada 'the school' di kalimat yang sama: madu pertama milik sekolah.",
+          "whyOthersFail": "Kotak lebah dan ruang sains bukan pihak yang 'will get' madu, dan yang disebut menerima madu adalah sekolah, bukan Bu Ratna pribadi."
+        }
+      ],
+      [
+        "In the text, what does 'calm' mean?",
+        [
+          "quiet and not angry",
+          "fast and loud",
+          "hungry and cold",
+          "big and heavy"
+        ],
+        0,
+        {
+          "type": "vocabulary_context",
+          "evidence": "At first some students were afraid, but the bees are calm when nobody touches the box.",
+          "answer": "quiet and not angry",
+          "patternId": "a2-r0304-4-vocabulary_context",
+          "why": "Lawan dari rasa takut siswa: lebahnya tenang dan nggak menyerang selama kotaknya nggak disentuh.",
+          "whyOthersFail": "Kata yang menenangkan siswa nggak mungkin berarti cepat dan berisik, lapar, atau besar dan berat."
+        }
+      ],
+      [
+        "What is the text mainly about?",
+        [
+          "a teacher who sells flowers at school",
+          "a school that keeps bees in a small box",
+          "students who plant a new fence",
+          "a class that cooks with honey"
+        ],
+        1,
+        {
+          "type": "main_idea",
+          "evidence": "Last month our science teacher, Bu Ratna, put a small bee box behind the science room.",
+          "answer": "a school that keeps bees in a small box",
+          "patternId": "a2-r0304-5-main_idea",
+          "why": "Semua kalimat bercerita tentang kotak lebah di sekolah: siapa yang memasang, bagaimana lebahnya, dan madu yang ditunggu.",
+          "whyOthersFail": "Bunga hanya tempat lebah mencari makan, pagar cuma disebut sekilas, dan belum ada kegiatan memasak — madunya saja belum ada."
+        }
+      ]
+    ],
+    "topic": "school beekeeping",
+    "author": "a student at SMP",
+    "setting": "behind the science room",
+    "focus": "a small bee box will give the school its first honey"
+  },
+  {
+    "id": "r0305",
+    "level": "A2",
+    "title": "Star Night at SMP Melati",
+    "text": "Star Night at SMP Melati! Come to the school field on Saturday, 12 July, at seven in the evening. Pak Surya from the city science club will bring two big telescopes. You can look at the moon and learn star names. The moon is bright in July, so it is a good month to start. The event is free, but places are limited, so write your name at the office before Friday.",
+    "qs": [
+      [
+        "What can we understand about the places for Star Night?",
+        [
+          "Everyone in the city can come without a name list.",
+          "The office sells tickets on Saturday.",
+          "Not everyone will get a place.",
+          "Only teachers can write their names."
+        ],
+        2,
+        {
+          "type": "inference",
+          "evidence": "The event is free, but places are limited, so write your name at the office before Friday.",
+          "answer": "Not everyone will get a place.",
+          "patternId": "a2-r0305-1-inference",
+          "why": "Kalau tempatnya terbatas dan harus daftar dulu, berarti nggak semua orang kebagian tempat.",
+          "whyOthersFail": "Justru harus tulis nama dulu sebelum Jumat, jadi nggak bisa datang begitu saja; acaranya gratis, jadi nggak ada tiket yang dijual; nggak ada aturan khusus guru."
+        }
+      ],
+      [
+        "What can we say about the telescopes?",
+        [
+          "The school buys two new telescopes.",
+          "Pak Surya works at the school office.",
+          "The science club meets every Saturday.",
+          "The telescopes will come with a guest."
+        ],
+        3,
+        {
+          "type": "inference",
+          "evidence": "Pak Surya from the city science club will bring two big telescopes.",
+          "answer": "The telescopes will come with a guest.",
+          "patternId": "a2-r0305-2-inference",
+          "why": "Teleskopnya dibawa oleh Pak Surya dari klub sains kota — tamu dari luar sekolah.",
+          "whyOthersFail": "Yang membawa teleskop adalah Pak Surya, bukan sekolah yang membeli; Pak Surya dari klub kota, bukan pegawai kantor sekolah; jadwal rutin klub nggak disebut."
+        }
+      ],
+      [
+        "In the text, what does the word 'it' refer to in 'it is a good month to start'?",
+        [
+          "the month of July",
+          "the moon",
+          "the school field",
+          "Star Night"
+        ],
+        0,
+        {
+          "type": "reference",
+          "evidence": "The moon is bright in July, so it is a good month to start.",
+          "answer": "the month of July",
+          "patternId": "a2-r0305-3-reference",
+          "why": "'it' disebut 'a good month', jadi yang dimaksud adalah bulan Juli, bukan benda lain.",
+          "whyOthersFail": "Bulan di langit, lapangan, dan acara Star Night bukan 'month', jadi nggak cocok dengan kata 'a good month' di kalimat itu."
+        }
+      ],
+      [
+        "What time does Star Night start?",
+        [
+          "at five in the afternoon",
+          "at seven in the evening",
+          "at nine at night",
+          "at six in the morning"
+        ],
+        1,
+        {
+          "type": "detail",
+          "evidence": "Come to the school field on Saturday, 12 July, at seven in the evening.",
+          "answer": "at seven in the evening",
+          "patternId": "a2-r0305-4-detail",
+          "why": "Pengumumannya menyebut jelas: pukul tujuh malam.",
+          "whyOthersFail": "Pukul lima, sembilan, dan enam pagi nggak muncul di pengumuman."
+        }
+      ],
+      [
+        "Why did the school write this notice?",
+        [
+          "to sell telescopes to students",
+          "to close the school field at night",
+          "to ask for money for the science club",
+          "to invite people to a star-watching night"
+        ],
+        3,
+        {
+          "type": "purpose",
+          "evidence": "Come to the school field on Saturday, 12 July, at seven in the evening.",
+          "answer": "to invite people to a star-watching night",
+          "patternId": "a2-r0305-5-purpose",
+          "why": "Pengumuman ini mengajak orang datang ke acara melihat bintang: ada ajakan 'Come', waktu, dan cara mendaftar.",
+          "whyOthersFail": "Teleskop dibawa untuk dipakai, bukan dijual; lapangan justru dibuka untuk acara; acaranya gratis, jadi bukan mencari uang."
+        }
+      ]
+    ],
+    "topic": "school astronomy night",
+    "author": "school notice",
+    "setting": "a school field at night",
+    "focus": "a notice invites students to watch the moon and stars"
+  },
+  {
+    "id": "r0306",
+    "level": "A2",
+    "title": "Salt from the Sun",
+    "text": "In the dry season, Nadia visits her uncle in Madura. He makes salt in wide, flat fields near the sea. Sea water sits in the fields for many days. The hot sun dries the water, and white salt stays on the ground. The workers collect the salt with long wooden tools. When rain comes, the work stops, because the fields must stay dry.",
+    "qs": [
+      [
+        "What can we say about making salt?",
+        [
+          "It needs many days of sun.",
+          "It is faster in the rainy season.",
+          "It happens inside a big factory.",
+          "It needs cold sea water at night."
+        ],
+        0,
+        {
+          "type": "inference",
+          "evidence": "Sea water sits in the fields for many days. The hot sun dries the water, and white salt stays on the ground.",
+          "answer": "It needs many days of sun.",
+          "patternId": "a2-r0306-1-inference",
+          "why": "Air laut harus dijemur berhari-hari dan matahari panaslah yang mengeringkannya — jadi garam butuh banyak hari cerah.",
+          "whyOthersFail": "Hujan justru menghentikan pekerjaan, jadi musim hujan nggak mempercepat; tempatnya ladang terbuka dekat laut, bukan pabrik; yang bekerja matahari panas, bukan air dingin di malam hari."
+        }
+      ],
+      [
+        "In the text, who does the word 'He' mean in 'He makes salt'?",
+        [
+          "a worker from the fields",
+          "Nadia's uncle",
+          "Nadia's father",
+          "the salt seller"
+        ],
+        1,
+        {
+          "type": "reference",
+          "evidence": "He makes salt in wide, flat fields near the sea.",
+          "answer": "Nadia's uncle",
+          "patternId": "a2-r0306-2-reference",
+          "why": "Kalimat sebelumnya menyebut paman Nadia di Madura, jadi 'He' adalah pamannya.",
+          "whyOthersFail": "Para pekerja baru disebut belakangan, ayah Nadia nggak muncul di teks, dan nggak ada penjual garam dalam cerita."
+        }
+      ],
+      [
+        "In the text, what does 'collect' mean?",
+        [
+          "throw into the sea",
+          "wash with clean water",
+          "sell at the market",
+          "take and bring together"
+        ],
+        3,
+        {
+          "type": "vocabulary_context",
+          "evidence": "The workers collect the salt with long wooden tools.",
+          "answer": "take and bring together",
+          "patternId": "a2-r0306-3-vocabulary_context",
+          "why": "Para pekerja mengambil dan mengumpulkan garam dari tanah dengan alat kayu — itulah 'collect'.",
+          "whyOthersFail": "Garam dikumpulkan, bukan dibuang ke laut; mencuci garam dengan air justru melarutkannya; menjual nggak dilakukan dengan alat kayu panjang."
+        }
+      ],
+      [
+        "Why does the work stop when rain comes?",
+        [
+          "because the workers are tired",
+          "because the sea water is too cold",
+          "because the fields must stay dry",
+          "because the tools break in the rain"
+        ],
+        2,
+        {
+          "type": "cause_effect",
+          "evidence": "When rain comes, the work stops, because the fields must stay dry.",
+          "answer": "because the fields must stay dry",
+          "patternId": "a2-r0306-4-cause_effect",
+          "why": "Alasannya tertulis langsung: ladang garam harus tetap kering.",
+          "whyOthersFail": "Teks nggak menyebut pekerja lelah, suhu air laut, atau alat yang rusak — alasannya hanya soal ladang yang harus kering."
+        }
+      ],
+      [
+        "What is the text mainly about?",
+        [
+          "how salt is made near the sea",
+          "how Nadia swims in Madura",
+          "how workers build wooden boats",
+          "how rain helps the salt fields"
+        ],
+        0,
+        {
+          "type": "main_idea",
+          "evidence": "He makes salt in wide, flat fields near the sea.",
+          "answer": "how salt is made near the sea",
+          "patternId": "a2-r0306-5-main_idea",
+          "why": "Teks menjelaskan urutan membuat garam: air laut dijemur, mengering, lalu garamnya dikumpulkan.",
+          "whyOthersFail": "Nadia berkunjung, bukan berenang; alat kayu dipakai mengumpulkan garam, bukan membuat perahu; hujan justru menghentikan pekerjaan."
+        }
+      ]
+    ],
+    "topic": "salt farming",
+    "author": "Nadia",
+    "setting": "salt fields in Madura in the dry season",
+    "focus": "how sea water becomes salt under the hot sun"
+  },
+  {
+    "id": "r0307",
+    "level": "B1",
+    "title": "Night Guards of the North Beach",
+    "text": "Every year between May and August, sea turtles climb the north beach of Pantai Serdang at night and lay their eggs in the warm sand. For a long time, most of those eggs never became young turtles. Dogs dug up the nests, and some people quietly sold the eggs at the market.\n\nTwo years ago a group of fishermen decided to guard the beach. They walk along the sand after dark, mark each new nest with a bamboo stick, and move the eggs to a fenced corner near their post. When the eggs hatch, the men carry the young turtles to the water in wide plastic bowls. Children from the village school often come to watch, and this is exactly what the group wants. Its leader, Pak Salim, believes the nests will only be safe when every child sees the small turtles reach the sea. Last season the group protected sixty-one nests, almost twice the number in its first year.",
+    "qs": [
+      [
+        "In the first paragraph, what does 'those eggs' refer to?",
+        [
+          "the eggs sold at the village market",
+          "the eggs the turtles lay in the sand",
+          "the eggs the dogs carry to the beach",
+          "the eggs kept at the fishermen's post"
+        ],
+        1,
+        {
+          "type": "reference",
+          "evidence": "For a long time, most of those eggs never became young turtles.",
+          "answer": "the eggs the turtles lay in the sand",
+          "patternId": "b1-r0307-1-reference",
+          "why": "Kalimat sebelumnya bercerita penyu bertelur di pasir hangat, jadi 'those eggs' adalah telur-telur yang ditinggalkan penyu di pantai.",
+          "whyOthersFail": "Telur yang dijual di pasar hanya sebagian nasib akhirnya, bukan rujukan frasa itu; anjing menggali sarang, bukan membawa telur ke pantai; pojok berpagar di pos baru muncul dua tahun terakhir, bukan 'for a long time'."
+        }
+      ],
+      [
+        "In the second paragraph, what does 'this' refer to in 'this is exactly what the group wants'?",
+        [
+          "selling the eggs at the market",
+          "moving the post closer to the school",
+          "children coming to watch the turtles",
+          "marking each nest with bamboo"
+        ],
+        2,
+        {
+          "type": "reference",
+          "evidence": "Children from the village school often come to watch, and this is exactly what the group wants.",
+          "answer": "children coming to watch the turtles",
+          "patternId": "b1-r0307-2-reference",
+          "why": "'this' merangkum hal yang baru saja disebut di kalimat yang sama: anak-anak sekolah datang menonton.",
+          "whyOthersFail": "Menjual telur justru masalah yang dilawan kelompok itu; nggak ada rencana memindahkan pos; menandai sarang memang pekerjaan mereka, tapi bukan hal yang baru disebut sebelum kata 'this'."
+        }
+      ],
+      [
+        "In this article, what does 'guard' mean?",
+        [
+          "watch over and keep safe",
+          "clean before the season",
+          "close to all visitors",
+          "sell to the highest buyer"
+        ],
+        0,
+        {
+          "type": "vocabulary_context",
+          "evidence": "Two years ago a group of fishermen decided to guard the beach.",
+          "answer": "watch over and keep safe",
+          "patternId": "b1-r0307-3-vocabulary_context",
+          "why": "Kegiatan mereka sesudahnya menjelaskan artinya: berjalan malam hari, menandai sarang, dan memindahkan telur supaya aman — menjaga.",
+          "whyOthersFail": "Nggak ada kegiatan membersihkan pantai; anak-anak justru boleh datang, jadi pantai nggak ditutup; menjual telur adalah hal yang mereka lawan."
+        }
+      ],
+      [
+        "What can we conclude from the numbers in the last sentence?",
+        [
+          "The group had about the same results each year.",
+          "The group stopped counting after the first year.",
+          "Fewer turtles came to the beach last season.",
+          "The group's results improved after its first year."
+        ],
+        3,
+        {
+          "type": "inference",
+          "evidence": "Last season the group protected sixty-one nests, almost twice the number in its first year.",
+          "answer": "The group's results improved after its first year.",
+          "patternId": "b1-r0307-4-inference",
+          "why": "Enam puluh satu sarang itu hampir dua kali angka tahun pertama, jadi hasil kerja kelompok ini meningkat.",
+          "whyOthersFail": "'almost twice' berarti hasilnya jauh berbeda, bukan sama; mereka jelas masih menghitung karena angkanya ada; yang dihitung sarang yang dilindungi, bukan jumlah penyu yang datang."
+        }
+      ],
+      [
+        "What is this article mainly about?",
+        [
+          "how a school teaches children to swim with turtles",
+          "why dogs are a danger on every beach",
+          "how village fishermen protect turtle nests",
+          "why turtle eggs are popular at the market"
+        ],
+        2,
+        {
+          "type": "main_idea",
+          "evidence": "Two years ago a group of fishermen decided to guard the beach.",
+          "answer": "how village fishermen protect turtle nests",
+          "patternId": "b1-r0307-5-main_idea",
+          "why": "Inti artikelnya adalah kelompok nelayan yang menjaga pantai: menandai sarang, memindahkan telur, dan mengantar tukik ke laut.",
+          "whyOthersFail": "Anak-anak hanya menonton, bukan belajar berenang; anjing cuma salah satu ancaman di paragraf pembuka; pasar disebut sekilas sebagai masalah lama."
+        }
+      ]
+    ],
+    "topic": "turtle nest protection",
+    "author": "school magazine writer",
+    "setting": "a village beach during the laying season",
+    "focus": "fishermen guard turtle nests and show children the hatchlings"
+  },
+  {
+    "id": "r0308",
+    "level": "B1",
+    "title": "Weekends Among the Seedlings",
+    "text": "Every Saturday and Sunday, Yusuf works at a plant nursery on the edge of town. He is sixteen, and this is his first paid job. The owner, Bu Halimah, started him with the simplest tasks: watering the seedlings before the sun gets strong and sweeping the paths between the tables.\n\nAfter a month she taught him something harder. Customers often arrive with a photo of a plant and no idea of its name, so Yusuf learned to recognise the forty most common plants in the nursery. He keeps a small notebook with a leaf drawing and a price for each one. When a customer asked him last week which plants could live on a hot balcony, he answered without calling Bu Halimah, and she heard it from the next row and smiled.\n\nYusuf saves half of his wages and spends the rest on bus fares and food. He plans to study agriculture when he finishes school, and he says the nursery has already taught him more than a classroom could.",
+    "qs": [
+      [
+        "In the second paragraph, who does 'she' refer to in 'she heard it from the next row'?",
+        [
+          "the customer with the photo",
+          "Yusuf's mother",
+          "a worker at the next table",
+          "Bu Halimah"
+        ],
+        3,
+        {
+          "type": "reference",
+          "evidence": "When a customer asked him last week which plants could live on a hot balcony, he answered without calling Bu Halimah, and she heard it from the next row and smiled.",
+          "answer": "Bu Halimah",
+          "patternId": "b1-r0308-1-reference",
+          "why": "'she' melanjutkan nama yang baru disebut di kalimat itu, Bu Halimah — dia mendengar jawaban Yusuf dari deretan sebelah.",
+          "whyOthersFail": "Pelanggan yang bertanya nggak mungkin 'mendengar dari deretan sebelah' percakapannya sendiri; ibu Yusuf nggak ada di teks; pekerja lain juga nggak pernah disebut."
+        }
+      ],
+      [
+        "In this article, what does 'recognise' mean?",
+        [
+          "know something when he sees it",
+          "water something every morning",
+          "buy something for the nursery",
+          "plant something in a new pot"
+        ],
+        0,
+        {
+          "type": "vocabulary_context",
+          "evidence": "Customers often arrive with a photo of a plant and no idea of its name, so Yusuf learned to recognise the forty most common plants in the nursery.",
+          "answer": "know something when he sees it",
+          "patternId": "b1-r0308-2-vocabulary_context",
+          "why": "Pelanggan datang membawa foto tanpa nama tanaman, jadi yang dipelajari Yusuf adalah mengenali tanaman begitu melihatnya.",
+          "whyOthersFail": "Menyiram adalah tugas pertamanya yang lain, bukan arti kata ini; Yusuf nggak membeli tanaman untuk toko; menanam di pot nggak disebut sama sekali."
+        }
+      ],
+      [
+        "What can we conclude from Bu Halimah's smile?",
+        [
+          "Bu Halimah was angry that Yusuf did not call her.",
+          "Bu Halimah was pleased with Yusuf's answer.",
+          "The customer decided not to buy any plants.",
+          "Yusuf gave the customer a wrong answer."
+        ],
+        1,
+        {
+          "type": "inference",
+          "evidence": "he answered without calling Bu Halimah, and she heard it from the next row and smiled",
+          "answer": "Bu Halimah was pleased with Yusuf's answer.",
+          "patternId": "b1-r0308-3-inference",
+          "why": "Bu Halimah tersenyum justru setelah mendengar Yusuf menjawab sendiri — tanda dia puas dengan kemajuan Yusuf.",
+          "whyOthersFail": "Senyum bukan tanda marah; teks nggak bercerita apakah pelanggan jadi membeli; kalau jawabannya salah, senyum Bu Halimah nggak masuk akal dan teks pasti menyebut koreksinya."
+        }
+      ],
+      [
+        "What is Yusuf most likely to do after finishing school?",
+        [
+          "open his own bus company",
+          "stop working with plants",
+          "continue studying agriculture",
+          "become a maths teacher"
+        ],
+        2,
+        {
+          "type": "likely",
+          "evidence": "He plans to study agriculture when he finishes school, and he says the nursery has already taught him more than a classroom could.",
+          "answer": "continue studying agriculture",
+          "patternId": "b1-r0308-4-likely",
+          "why": "Rencananya disebut jelas: melanjutkan belajar pertanian setelah lulus.",
+          "whyOthersFail": "Ongkos bus hanya pengeluarannya, bukan cita-cita; dia justru makin dekat dengan tanaman; matematika nggak pernah disinggung."
+        }
+      ],
+      [
+        "What did Bu Halimah ask Yusuf to do in his first month?",
+        [
+          "serve customers with photos",
+          "water seedlings and sweep the paths",
+          "draw leaves in a notebook",
+          "carry plants to the bus stop"
+        ],
+        1,
+        {
+          "type": "detail",
+          "evidence": "The owner, Bu Halimah, started him with the simplest tasks: watering the seedlings before the sun gets strong and sweeping the paths between the tables.",
+          "answer": "water seedlings and sweep the paths",
+          "patternId": "b1-r0308-5-detail",
+          "why": "Tugas awal Yusuf disebut langsung: menyiram bibit sebelum matahari terik dan menyapu jalur di antara meja.",
+          "whyOthersFail": "Melayani pelanggan dan buku catatan daun datang setelah sebulan; membawa tanaman ke halte nggak ada di teks."
+        }
+      ]
+    ],
+    "topic": "a weekend job at a plant nursery",
+    "author": "school magazine writer",
+    "setting": "a plant nursery on the edge of town",
+    "focus": "a teenager learns the trade and plans to study agriculture"
+  },
+  {
+    "id": "r0309",
+    "level": "B2",
+    "title": "Five Thousand Rupiah, Returned",
+    "text": "For one semester, three cafés on the Universitas Cendana campus replaced disposable cups with a deposit scheme. A customer paid an extra five thousand rupiah for a hard plastic cup, and got the money back by returning the cup to any of the three counters. The student environment office, which ran the trial, published its figures last week.\n\nThe headline number looks encouraging. Across four months the cafés handed out roughly nineteen thousand cups, and eighty-four per cent came back. Waste bins near the cafés, which used to overflow by early afternoon, were emptied once a day instead of three times. The cafés also reported a small but steady saving, because a returned cup costs less to wash than a new paper cup costs to buy.\n\nThe report is honest about the scheme's weak points. Returns dropped sharply in the exam weeks, when students carried cups to the library and forgot them. Around one customer in ten refused the deposit outright and asked for a paper cup, which the cafés still kept under the counter for takeaway orders. The office concludes that the scheme survives on convenience: when a return counter was closed for renovation in October, returns at the other two fell within days. Its recommendation is therefore modest — keep the deposit, add a fourth return point near the library, and stop stocking paper cups altogether.",
+    "qs": [
+      [
+        "In this report, what does 'encouraging' mean?",
+        [
+          "giving reasons for hope",
+          "difficult to calculate",
+          "impossible to check",
+          "smaller than expected"
+        ],
+        0,
+        {
+          "type": "vocabulary_context",
+          "evidence": "The headline number looks encouraging.",
+          "answer": "giving reasons for hope",
+          "patternId": "b2-r0309-1-vocabulary_context",
+          "why": "Kalimat-kalimat berikutnya berisi kabar baik — 84 persen gelas kembali, tempat sampah jarang penuh — jadi 'encouraging' berarti memberi harapan.",
+          "whyOthersFail": "Angkanya justru disajikan rapi, jadi bukan sulit dihitung atau mustahil diperiksa; kabar sesudahnya positif, bukan lebih kecil dari harapan."
+        }
+      ],
+      [
+        "In this report, what does 'overflow' mean?",
+        [
+          "disappear from the corridor",
+          "smell strongly in the heat",
+          "fall over in the wind",
+          "become too full to hold more"
+        ],
+        3,
+        {
+          "type": "vocabulary_context",
+          "evidence": "Waste bins near the cafés, which used to overflow by early afternoon, were emptied once a day instead of three times.",
+          "answer": "become too full to hold more",
+          "patternId": "b2-r0309-2-vocabulary_context",
+          "why": "Tempat sampah yang dulu harus dikosongkan tiga kali sehari jelas kepenuhan sampai meluap — itulah 'overflow'.",
+          "whyOthersFail": "Tempat sampahnya tetap ada, bukan hilang; bau dan angin nggak disinggung teks; petunjuknya soal frekuensi pengosongan, jadi maknanya soal penuh."
+        }
+      ],
+      [
+        "In the last sentence, what does 'Its' refer to?",
+        [
+          "the library's",
+          "the third café's",
+          "the student environment office's",
+          "the university's"
+        ],
+        2,
+        {
+          "type": "reference",
+          "evidence": "Its recommendation is therefore modest — keep the deposit, add a fourth return point near the library, and stop stocking paper cups altogether.",
+          "answer": "the student environment office's",
+          "patternId": "b2-r0309-3-reference",
+          "why": "Kalimat sebelumnya berbunyi 'The office concludes...', jadi 'Its' meneruskan subjek yang sama: kantor lingkungan mahasiswa yang menjalankan uji coba.",
+          "whyOthersFail": "Perpustakaan hanya lokasi usulan titik pengembalian baru; kafe adalah pihak yang diberi rekomendasi, bukan pemberinya; universitas nggak pernah jadi subjek yang menyimpulkan."
+        }
+      ],
+      [
+        "What can be inferred from the October episode?",
+        [
+          "Students preferred the renovated counter to the old ones.",
+          "Even a small drop in convenience quickly reduced returns.",
+          "The October renovation increased returns at the library.",
+          "Most cups were lost during the renovation period."
+        ],
+        1,
+        {
+          "type": "inference",
+          "evidence": "The office concludes that the scheme survives on convenience: when a return counter was closed for renovation in October, returns at the other two fell within days.",
+          "answer": "Even a small drop in convenience quickly reduced returns.",
+          "patternId": "b2-r0309-4-inference",
+          "why": "Menutup satu loket saja sudah membuat pengembalian di dua loket lain turun dalam hitungan hari — hambatan kecil langsung menurunkan angka pengembalian.",
+          "whyOthersFail": "Teks nggak membandingkan loket lama dan baru; perpustakaan justru belum punya titik pengembalian; yang turun adalah pengembalian, bukan gelas yang hilang."
+        }
+      ],
+      [
+        "Which detail best supports the claim that the scheme saved the cafés money?",
+        [
+          "Bins were emptied once a day instead of three times.",
+          "Eighty-four per cent of the cups came back.",
+          "One customer in ten refused the deposit.",
+          "Washing a returned cup costs less than buying a paper one."
+        ],
+        3,
+        {
+          "type": "evidence",
+          "evidence": "The cafés also reported a small but steady saving, because a returned cup costs less to wash than a new paper cup costs to buy.",
+          "answer": "Washing a returned cup costs less than buying a paper one.",
+          "patternId": "b2-r0309-5-evidence",
+          "why": "Kalimat itu menyebut penghematannya sekaligus alasannya: mencuci gelas yang kembali lebih murah daripada membeli gelas kertas baru.",
+          "whyOthersFail": "Tempat sampah yang jarang penuh soal kebersihan, bukan uang kafe; angka 84 persen menunjukkan kepatuhan, bukan penghematan; pelanggan yang menolak deposit justru titik lemah skema."
+        }
+      ]
+    ],
+    "topic": "a reusable cup deposit scheme",
+    "author": "report by a student environment office",
+    "setting": "three cafés on a university campus",
+    "focus": "deposit, return rates, convenience, and a modest recommendation"
+  },
+  {
+    "id": "r0310",
+    "level": "B2",
+    "title": "A Tripod Between the Vegetables",
+    "text": "At six in the morning, Pasar Kembang looks the way it has looked for fifty years: wet floors, stacked baskets, and traders shouting prices across the aisles. Since last year, however, a dozen of the older stalls have added something new. A phone stands on a tripod between the vegetables, and the trader talks to it while serving the queue.\n\nThe idea came from Mbak Wulan, a second-generation spice seller, who noticed that her regular customers were ageing and her daily takings slowly shrinking. She began broadcasting for an hour each morning, showing the day's stock and taking orders in the comments. A motorcycle courier, paid jointly by six stalls, delivers the orders across the city before noon. Wulan's own sales have risen by a third, and the courier now makes two trips on busy days.\n\nNot every trader is convinced. Pak Hasan, who has sold fish here for thirty years, tried broadcasting twice and gave up. He argues that fish must be seen and smelled in person, and that a camera flatters vegetables but hides a fish's condition. The market cooperative takes a middle position. It has installed better lighting in the central aisle and runs a short evening class on filming and simple bookkeeping, but it refuses to make broadcasting a requirement, arguing that the market's strength has always been that each stall decides for itself how to sell.",
+    "qs": [
+      [
+        "In this article, what does 'takings' mean?",
+        [
+          "the baskets carried into the stall",
+          "the customers who come each day",
+          "the money a stall earns",
+          "the spices on the shelves"
+        ],
+        2,
+        {
+          "type": "vocabulary_context",
+          "evidence": "The idea came from Mbak Wulan, a second-generation spice seller, who noticed that her regular customers were ageing and her daily takings slowly shrinking.",
+          "answer": "the money a stall earns",
+          "patternId": "b2-r0310-1-vocabulary_context",
+          "why": "Yang menyusut dan membuat Wulan mencari akal adalah pemasukan hariannya; ini diperkuat kalimat lain bahwa 'sales have risen by a third' setelah dia siaran.",
+          "whyOthersFail": "Keranjang dan stok dagangan nggak digambarkan menyusut pelan-pelan; pelanggan disebut menua, dan itu justru dibedakan dari 'takings' oleh kata 'and' di kalimat yang sama."
+        }
+      ],
+      [
+        "In the first paragraph, what does 'it' refer to in 'the trader talks to it'?",
+        [
+          "the tripod between the vegetables",
+          "the phone on the tripod",
+          "the queue of customers",
+          "the market aisle"
+        ],
+        1,
+        {
+          "type": "reference",
+          "evidence": "A phone stands on a tripod between the vegetables, and the trader talks to it while serving the queue.",
+          "answer": "the phone on the tripod",
+          "patternId": "b2-r0310-2-reference",
+          "why": "Yang diajak bicara pedagang saat siaran adalah ponselnya — benda yang jadi subjek awal kalimat itu.",
+          "whyOthersFail": "Tripod hanya penyangga ponsel; antrean justru sedang dilayani, dibedakan oleh kata 'while'; lorong pasar nggak mungkin diajak bicara dalam konteks siaran."
+        }
+      ],
+      [
+        "In the last paragraph, what does 'It' refer to in 'It has installed better lighting'?",
+        [
+          "the evening class",
+          "the central aisle",
+          "Pak Hasan's stall",
+          "the market cooperative"
+        ],
+        3,
+        {
+          "type": "reference",
+          "evidence": "It has installed better lighting in the central aisle and runs a short evening class on filming and simple bookkeeping, but it refuses to make broadcasting a requirement, arguing that the market's strength has always been that each stall decides for itself how to sell.",
+          "answer": "the market cooperative",
+          "patternId": "b2-r0310-3-reference",
+          "why": "'It' meneruskan subjek kalimat sebelumnya, 'The market cooperative' — pihak yang memasang lampu dan membuka kelas malam.",
+          "whyOthersFail": "Kelas malam justru salah satu hal yang dijalankan 'It'; lorong tengah adalah tempat lampunya dipasang; Pak Hasan justru pedagang yang menyerah, bukan yang memasang lampu."
+        }
+      ],
+      [
+        "Which statement best restates Pak Hasan's argument about the camera?",
+        [
+          "On screen, vegetables can look better than they are, while a fish's real state cannot be judged.",
+          "Cameras make both vegetables and fish look worse than in person.",
+          "Fish sell better online because the camera improves their colour.",
+          "Vegetables must be smelled in person before anyone buys them."
+        ],
+        0,
+        {
+          "type": "paraphrase",
+          "evidence": "He argues that fish must be seen and smelled in person, and that a camera flatters vegetables but hides a fish's condition.",
+          "answer": "On screen, vegetables can look better than they are, while a fish's real state cannot be judged.",
+          "patternId": "b2-r0310-4-paraphrase",
+          "why": "'flatters vegetables' berarti sayuran tampak lebih bagus dari aslinya, dan 'hides a fish's condition' berarti keadaan ikan nggak bisa dinilai lewat layar.",
+          "whyOthersFail": "Kamera justru membuat sayuran tampak lebih baik, bukan lebih buruk; menurut Pak Hasan kamera menyembunyikan kondisi ikan, jadi ikan nggak diuntungkan; yang harus dicium langsung menurut dia adalah ikan, bukan sayuran."
+        }
+      ],
+      [
+        "What is this article mainly about?",
+        [
+          "how a traditional market is adapting to live online selling",
+          "why fish stalls earn more than vegetable stalls",
+          "how a cooperative forced traders to broadcast",
+          "why Pasar Kembang closed its oldest stalls"
+        ],
+        0,
+        {
+          "type": "main_idea",
+          "evidence": "Since last year, however, a dozen of the older stalls have added something new.",
+          "answer": "how a traditional market is adapting to live online selling",
+          "patternId": "b2-r0310-5-main_idea",
+          "why": "Artikel ini memotret pasar lama yang mulai berjualan lewat siaran langsung: pelopornya, yang menolak, dan sikap tengah koperasi.",
+          "whyOthersFail": "Nggak ada perbandingan penghasilan ikan dan sayur; koperasi justru 'refuses to make broadcasting a requirement'; nggak ada kios yang ditutup dalam teks."
+        }
+      ]
+    ],
+    "topic": "live-stream selling in a traditional market",
+    "author": "feature writer for a city newspaper",
+    "setting": "an old morning market",
+    "focus": "traders try live broadcasting while the cooperative stays neutral"
+  },
+  {
+    "id": "r0311",
+    "level": "C1",
+    "title": "Two Thousand Rupiah for the Kerb",
+    "text": "A strip of asphalt three metres wide and five metres long, in the centre of a commercial district, is expensive land by any measure. Rent a shopfront of the same size and the owner will want millions of rupiah a month. Park a car on it, in most Indonesian cities, and the price is two thousand rupiah, handed to a man in an orange vest who may or may not pass it on to the city. The gap between those two numbers is the quiet subsidy at the heart of the parking question, and it distorts more than traffic.\n\nKerbside space is not free to provide. It has been paved, drained and lit at public expense, and every square metre given to a stationary car is a square metre unavailable to a wider pavement, a loading bay, or a tree. Yet because the fee is trivial and flat, the space is rationed not by price but by luck and persistence. Drivers circle the block hunting for a gap, and studies of central districts elsewhere have found that a substantial share of congestion at busy hours consists precisely of this cruising. The cheapness that looks like a kindness to motorists is, in aggregate, a tax on everyone's time.\n\nThe standard objection is that charging a realistic price would hurt small traders, whose customers, it is said, will simply drive to a mall with free parking. The claim deserves scrutiny rather than deference. Counts in comparable shopping streets have repeatedly shown that traders overestimate the share of their customers who arrive by car, sometimes by a factor of two, and that the customers who spend most per month are those who come often, on foot or by public transport, not those who come rarely with a car boot to fill.\n\nNone of this requires a city to declare war on the motorist. It requires only that the kerb be priced as what it is: valuable public land in temporary private use. Set the fee so that one space in eight stands empty, account for the revenue transparently, and spend it on the street itself, where every user can see it.",
+    "qs": [
+      [
+        "In the first paragraph, what does 'it' refer to in 'it distorts more than traffic'?",
+        [
+          "the man in the orange vest",
+          "the gap between the shop rent and the parking fee",
+          "the commercial district's asphalt",
+          "the price of renting a shopfront"
+        ],
+        1,
+        {
+          "type": "reference",
+          "evidence": "The gap between those two numbers is the quiet subsidy at the heart of the parking question, and it distorts more than traffic.",
+          "answer": "the gap between the shop rent and the parking fee",
+          "patternId": "c1-r0311-1-reference",
+          "why": "'it' meneruskan subjek kalimat itu sendiri: 'The gap between those two numbers', yang disebut sebagai subsidi diam-diam.",
+          "whyOthersFail": "Petugas berompi oranye hanya perantara uangnya; aspal adalah lahan yang diperebutkan, bukan hal yang 'distorts'; harga sewa toko hanya salah satu dari dua angka pembentuk 'the gap'."
+        }
+      ],
+      [
+        "In the second paragraph, what does 'this cruising' refer to?",
+        [
+          "drivers circling the block in search of a space",
+          "buses stopping in the loading bay",
+          "pedestrians crossing at busy hours",
+          "couriers waiting beside the kerb"
+        ],
+        0,
+        {
+          "type": "reference",
+          "evidence": "Drivers circle the block hunting for a gap, and studies of central districts elsewhere have found that a substantial share of congestion at busy hours consists precisely of this cruising.",
+          "answer": "drivers circling the block in search of a space",
+          "patternId": "c1-r0311-2-reference",
+          "why": "'this cruising' menunjuk balik kegiatan yang baru digambarkan di awal kalimat: pengemudi berputar-putar mencari tempat kosong.",
+          "whyOthersFail": "Bus dan kurir nggak pernah disebut di teks; pejalan kaki muncul hanya lewat kata 'pavement' sebagai pihak yang kehilangan ruang, bukan sebagai sumber kemacetan."
+        }
+      ],
+      [
+        "In this essay, what does 'trivial' mean?",
+        [
+          "collected without a receipt",
+          "different on every street",
+          "too small to matter",
+          "fixed by national law"
+        ],
+        2,
+        {
+          "type": "vocabulary_context",
+          "evidence": "Yet because the fee is trivial and flat, the space is rationed not by price but by luck and persistence.",
+          "answer": "too small to matter",
+          "patternId": "c1-r0311-3-vocabulary_context",
+          "why": "Karena tarifnya terlalu kecil untuk berpengaruh, harga berhenti bekerja sebagai penyaring — ruangnya lalu diperebutkan lewat keberuntungan. Paragraf pertama memberi skalanya: dua ribu rupiah untuk lahan bernilai jutaan.",
+          "whyOthersFail": "Soal kuitansi cuma tersirat pada rompi oranye di paragraf lain, bukan makna kata ini; 'flat' justru berarti tarifnya seragam, dan nggak ada undang-undang nasional yang disebut."
+        }
+      ],
+      [
+        "What does the third paragraph suggest about a realistic parking fee?",
+        [
+          "Most shopping streets have already introduced meters.",
+          "Traders deliberately misreport how their customers travel.",
+          "Malls with free parking attract the highest-spending customers.",
+          "Higher parking fees may harm traders less than they expect."
+        ],
+        3,
+        {
+          "type": "inference",
+          "evidence": "Counts in comparable shopping streets have repeatedly shown that traders overestimate the share of their customers who arrive by car, sometimes by a factor of two, and that the customers who spend most per month are those who come often, on foot or by public transport, not those who come rarely with a car boot to fill.",
+          "answer": "Higher parking fees may harm traders less than they expect.",
+          "patternId": "c1-r0311-4-inference",
+          "why": "Kalau pelanggan bermobil lebih sedikit dari dugaan pedagang, dan pembelanja terbesar justru datang jalan kaki atau naik angkutan umum, maka kerugian akibat tarif realistis lebih kecil daripada yang ditakutkan.",
+          "whyOthersFail": "Yang disebut teks adalah penghitungan pelanggan, bukan pemasangan meteran; 'overestimate' berarti salah duga, bukan sengaja berbohong; pembelanja terbesar justru yang datang tanpa mobil, bukan pengunjung mal."
+        }
+      ],
+      [
+        "Which best describes the writer's tone towards drivers?",
+        [
+          "openly hostile to anyone who drives into the district",
+          "nostalgic for streets before the arrival of cars",
+          "reasoned and corrective, without hostility to drivers",
+          "playful and unwilling to take a clear position"
+        ],
+        2,
+        {
+          "type": "tone",
+          "evidence": "None of this requires a city to declare war on the motorist.",
+          "answer": "reasoned and corrective, without hostility to drivers",
+          "patternId": "c1-r0311-5-tone",
+          "why": "Penulis menolak permusuhan terhadap pengendara secara eksplisit dan menutup dengan usulan teknis yang terukur: tarif, meteran transparan, dan belanja yang terlihat.",
+          "whyOthersFail": "Kalimat bukti justru membantah sikap memusuhi pengemudi; nggak ada kenangan masa sebelum mobil; posisinya sangat jelas — kerb harus dihargai sebagai lahan publik — jadi bukan bermain-main tanpa sikap."
+        }
+      ]
+    ],
+    "topic": "pricing kerbside parking",
+    "author": "opinion column by an urban economics writer",
+    "setting": "a commercial district in an Indonesian city",
+    "focus": "underpriced kerb space, cruising congestion, trader fears, transparent pricing"
+  },
+  {
+    "id": "r0312",
+    "level": "C2",
+    "title": "The Wooden Knock at Nine",
+    "text": "Every trade in my grandmother's street announced itself by sound, and none of the sounds was accidental. The bakso seller struck the side of his bowl, a bright ceramic ping that carried over television noise. The putu man let his little steam whistle shriek continuously, so that his approach resembled a very small locomotive. The sate man knocked two lengths of wood together in a pattern I could reproduce today, sixty years of nights later, although I could not tell you a single advertising slogan from the same decade. These signals formed a code that nobody taught and everybody knew. A child of six could lie in bed and read the street by ear: nine o'clock, wooden knock, sate; half past nine, the whistle, putu; the ping of the bowl at any hour, because hunger for bakso obeys no schedule.\n\nI mention all this because a university team has begun recording the surviving signals, and the project has been reported, inevitably, as an act of rescue. The word irritates me, though the work itself does not. To record a thing is not to rescue it; it is to admit that the thing is dying and to arrange for a presentable corpse. The recordings will be clean, catalogued, and searchable, which is to say they will possess every quality the original sounds lacked. A signal in the street was directional, occasional and aimed at you; it interrupted your evening and demanded a decision, sandals or no sandals, before the knock faded past the neighbour's gate. A recording in an archive interrupts nobody. It waits, politely, like everything else in an archive, to be wanted.\n\nAnd yet I have listened to the team's samples, and I concede that something survives the transfer. Not the summons — that dies with the context — but the craftsmanship. Heard in isolation, each signal reveals itself as a solved problem: how to be audible over rain on tin roofs, distinctive against rival trades, cheap to produce nightly for thirty years, and pitched so as to wake the appetite without waking the baby. Nobody holding a marketing degree designed these sounds. They were refined the way river stones are rounded, by use, and the polish shows.\n\nThe knocks grow rarer each year, outcompeted by applications that deliver the same soup silently, tracked on a map. I do not romanticize the change; the soup arrives, and the seller no longer walks four hours in the rain. But a city that once spoke to its residents individually has begun addressing them in bulk, and the difference will be audible to anyone who was ever, at nine o'clock, a child deciding about sandals. The archive preserves the signal. The street kept the meaning.",
+    "qs": [
+      [
+        "In the second paragraph, what does 'The word' refer to in 'The word irritates me'?",
+        [
+          "'archive'",
+          "'project'",
+          "'recording'",
+          "'rescue'"
+        ],
+        3,
+        {
+          "type": "reference",
+          "evidence": "The word irritates me, though the work itself does not.",
+          "answer": "'rescue'",
+          "patternId": "c2-r0312-1-reference",
+          "why": "Kalimat sebelumnya menyebut proyek itu diberitakan 'as an act of rescue', lalu penulis membedakan kata itu dari pekerjaannya — jadi yang menjengkelkan adalah kata 'rescue'.",
+          "whyOthersFail": "'archive' baru dibahas beberapa kalimat kemudian; 'project' justru bagian dari 'the work itself' yang dia terima; 'recording' adalah kegiatannya, sementara yang dia persoalkan adalah label penyelamatan yang ditempelkan pada kegiatan itu."
+        }
+      ],
+      [
+        "In the third paragraph, what does 'They' refer to in 'They were refined the way river stones are rounded'?",
+        [
+          "the marketing degrees",
+          "the rival trades",
+          "the street sellers' signals",
+          "the tin roofs in the rain"
+        ],
+        2,
+        {
+          "type": "reference",
+          "evidence": "They were refined the way river stones are rounded, by use, and the polish shows.",
+          "answer": "the street sellers' signals",
+          "patternId": "c2-r0312-2-reference",
+          "why": "Kalimat sebelumnya berbunyi 'Nobody holding a marketing degree designed these sounds', dan 'They' meneruskan 'these sounds' — bunyi-bunyi isyarat para pedagang.",
+          "whyOthersFail": "Gelar pemasaran justru disebut untuk disingkirkan sebagai perancang; pedagang saingan dan atap seng hanya bagian dari daftar masalah yang dipecahkan bunyi itu, bukan hal yang 'refined by use'."
+        }
+      ],
+      [
+        "In this essay, what does 'summons' mean?",
+        [
+          "the price of the food",
+          "the call that demanded a response",
+          "the sound quality of the tape",
+          "the seller's route through the street"
+        ],
+        1,
+        {
+          "type": "vocabulary_context",
+          "evidence": "Not the summons — that dies with the context — but the craftsmanship.",
+          "answer": "the call that demanded a response",
+          "patternId": "c2-r0312-3-vocabulary_context",
+          "why": "Paragraf sebelumnya menggambarkan bunyi itu sebagai panggilan yang 'demanded a decision, sandals or no sandals' — itulah 'summons', panggilan yang menuntut jawaban, dan itulah yang mati bersama konteksnya.",
+          "whyOthersFail": "Harga makanan nggak pernah dibahas; kualitas rekaman justru hal yang bertahan di arsip; rute penjual hanya tersirat pada 'faded past the neighbour's gate' dan bukan yang dipertentangkan dengan 'craftsmanship'."
+        }
+      ],
+      [
+        "How does the writer relate the archive to the original street signal?",
+        [
+          "The archive keeps the sound but not the demand it once made on a listener.",
+          "The archive improves the signals by making them cleaner and searchable.",
+          "The recordings and the street signals serve listeners in exactly the same way.",
+          "The archive replaced the signals before the delivery apps arrived."
+        ],
+        0,
+        {
+          "type": "relationship",
+          "evidence": "The archive preserves the signal. The street kept the meaning.",
+          "answer": "The archive keeps the sound but not the demand it once made on a listener.",
+          "patternId": "c2-r0312-4-relationship",
+          "why": "Sepanjang esai penulis memisahkan dua hal: bunyinya bisa disimpan, tapi daya panggilnya — yang dulu menyela malammu dan menuntut keputusan — nggak ikut tersimpan; 'A recording in an archive interrupts nobody'.",
+          "whyOthersFail": "Kalimat tentang rekaman yang 'clean, catalogued, and searchable' bernada ironis — kualitas itu justru disebut hal yang nggak dimiliki bunyi aslinya, bukan perbaikan; rekaman 'interrupts nobody' sementara bunyi asli menuntut keputusan, jadi keduanya nggak setara; yang menggeser bunyi itu adalah aplikasi pengantar, bukan arsipnya."
+        }
+      ],
+      [
+        "What can be inferred about the writer's view of the delivery applications?",
+        [
+          "The writer believes the apps should be banned to protect the sellers.",
+          "The writer accepts that the change brings real gains, including for sellers.",
+          "The writer thinks the soup delivered by app tastes noticeably worse.",
+          "The writer expects the wooden knocks to return once the apps fail."
+        ],
+        1,
+        {
+          "type": "inference",
+          "evidence": "I do not romanticize the change; the soup arrives, and the seller no longer walks four hours in the rain.",
+          "answer": "The writer accepts that the change brings real gains, including for sellers.",
+          "patternId": "c2-r0312-5-inference",
+          "why": "Penulis menolak meromantisir perubahan dan menyebut dua keuntungan nyatanya: makanannya tetap sampai, dan penjual nggak lagi berjalan berjam-jam kehujanan.",
+          "whyOthersFail": "Nggak ada seruan melarang aplikasi; soal rasa sup nggak pernah disinggung — 'the same soup' justru menyiratkan supnya sama; dan teks cuma menyebut arah perubahannya ('grow rarer each year') tanpa meramalkan bunyi itu kembali."
+        }
+      ]
+    ],
+    "topic": "street vendor sound signals and their archive",
+    "author": "personal essay by an older city resident",
+    "setting": "a childhood street remembered from the present",
+    "focus": "vendor sound signals, a recording project, and what survives the transfer"
   }
 ]

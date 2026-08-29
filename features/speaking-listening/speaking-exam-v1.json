@@ -2,7 +2,7 @@
   "schema": "fiezel-speaking-exam-v1",
   "schemaVersion": "1.0.0",
   "version": "1.0.0",
-  "count": 11,
+  "count": 17,
   "honesty": "FIEZEL tidak memprediksi band IELTS atau skor TOEFL, dan TIDAK menilai pelafalan. Yang bisa dihitung dari transkrip hanyalah cakupan gagasan; sisanya perlu dibaca guru atau AI.",
   "examFormats": {
     "ielts_speaking_part1": {
@@ -439,6 +439,181 @@
         "persistRawTranscript": false
       },
       "sourceText": "KULIAH (tertulis): \"Animals facing a cold season have broadly two options, and they cost different things.\n\nThe first is migration - leaving before conditions get severe. The Arctic tern is the extreme case: it flies between the Arctic and the Antarctic every year, so it spends most of its life in summer. But look at the price. That is an enormous amount of energy spent on travel alone.\n\nThe second option is dormancy - staying, but slowing down. The ground squirrel drops its body temperature close to freezing and its heart rate to a few beats a minute, for months. That saves a remarkable amount of energy. The cost is that it cannot feed at all during that time, so everything depends on what it stored beforehand.\"",
+      "sourceNote": "ADAPTASI: kuliah aslinya berupa audio; di sini disajikan tertulis."
+    },
+    {
+      "id": "speakx_0012",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "A2",
+      "exam": "ielts_speaking_part1",
+      "mode": "exam_response",
+      "instruction": "Part 1. Jawab empat pertanyaan ini satu per satu, masing-masing satu sampai dua kalimat: How many people are there in your family? What do you usually eat for breakfast? What time do you get up in the morning? What do you do after school or work?",
+      "sampleAnswer": "There are four people in my family: my father, my mother, my brother, and me. My father works in a shop and my mother stays at home. For breakfast I usually eat fried rice and drink warm tea. I get up at five o'clock in the morning because my school is far from my house. After school I do my homework, and sometimes I play football with my friends near my house.",
+      "requiredKeywords": [
+        "family",
+        "usually",
+        "because",
+        "after",
+        "sometimes"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.7
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "questions": [
+        "How many people are there in your family?",
+        "What do you usually eat for breakfast?",
+        "What time do you get up in the morning?",
+        "What do you do after school or work?"
+      ]
+    },
+    {
+      "id": "speakx_0013",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "A2",
+      "exam": "toefl_speaking_task1",
+      "mode": "exam_response",
+      "instruction": "Task 1. 15 detik menyiapkan, 45 detik bicara. Some people like watching films at home; others like watching them at the cinema. Which do you prefer, and why? Nyatakan pilihanmu di kalimat pertama, lalu beri satu alasan dan satu contoh - tiga sampai empat kalimat cukup.",
+      "sampleAnswer": "I prefer watching films at home. The main reason is that it is cheaper, because a cinema ticket costs a lot for a student like me. For example, last month I watched three films at home and I did not pay anything. I can also stop the film when I want to eat or rest.",
+      "requiredKeywords": [
+        "prefer",
+        "reason",
+        "because",
+        "for example",
+        "also"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.7
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      }
+    },
+    {
+      "id": "speakx_0014",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "B1",
+      "exam": "ielts_speaking_part2",
+      "mode": "exam_response",
+      "instruction": "Part 2. Kamu punya satu menit untuk membuat catatan, lalu bicara satu sampai dua menit. Describe a journey you took that you remember well. Keempat butir di kartu wajib kamu sentuh, termasuk butir terakhir.",
+      "sampleAnswer": "The journey I remember best is a train trip from Bandung to Yogyakarta with my family about two years ago. I went with my parents and my little brother, and it was our first long trip together after my father changed jobs. During the journey many small things happened: we shared food with the family sitting across from us, my brother lost his shoe under the seats, and then the whole carriage helped us look for it, which turned into a funny conversation with strangers. When we finally arrived, we were tired, but everyone was still laughing about the shoe. I still remember this journey because it was the first time in years that I saw my parents relax for a whole day, and because it showed me that a simple trip can feel special when the people around you are friendly. Even now, when we eat on a train, my brother always mentions that shoe.",
+      "requiredKeywords": [
+        "journey",
+        "went",
+        "then",
+        "because",
+        "remember"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.7
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "cueCard": [
+        "where you went",
+        "who you travelled with",
+        "what happened during the journey",
+        "and explain why you still remember it"
+      ]
+    },
+    {
+      "id": "speakx_0015",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "C2",
+      "exam": "ielts_speaking_part2",
+      "mode": "exam_response",
+      "instruction": "Part 2. Satu menit menyiapkan catatan, lalu bicara satu sampai dua menit. Describe an assumption you once held that you have since abandoned. Keempat butir wajib disentuh, termasuk butir terakhir.",
+      "sampleAnswer": "I'd like to talk about an assumption I carried well into adulthood: that being busy was the same thing as being useful. I absorbed it gradually rather than adopting it consciously - at school, the students who were praised were the visibly exhausted ones, and in my first job the culture rewarded whoever replied to messages at midnight. What led me to question it was watching a colleague who worked far fewer hours than the rest of us yet consistently produced the work that actually mattered; what struck me was that she treated attention, not time, as the scarce resource. In retrospect, my busyness was often a way of avoiding the harder question of what deserved my effort at all, whereas her calm was a form of discipline I had mistaken for detachment. Abandoning that assumption has changed how I judge my own days: I now ask what I actually moved forward, not how tired I am, and I have become far more suspicious of effort that is easy to display.",
+      "requiredKeywords": [
+        "assumption",
+        "rather than",
+        "what struck me",
+        "in retrospect",
+        "whereas"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.7
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "cueCard": [
+        "what the assumption was",
+        "how you came to hold it",
+        "what led you to question it",
+        "and explain how abandoning it has changed the way you think"
+      ]
+    },
+    {
+      "id": "speakx_0016",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "C2",
+      "exam": "ielts_speaking_part3",
+      "mode": "exam_response",
+      "instruction": "Part 3. Diskusi lanjutan dari topik keyakinan dan asumsi. Jawab tiga pertanyaan ini, masing-masing dua sampai tiga kalimat: Should governments try to change what citizens believe, or only how they behave? If a comforting false belief does no obvious harm, should anyone challenge it? Which beliefs that are common today do you think future generations will reject?",
+      "sampleAnswer": "I would draw a distinction between open persuasion and covert manipulation. A government that argues publicly for a change in attitude is a legitimate voice in the debate, but one that engineers belief behind closed doors has crossed a line, even if what it promotes happens to be true. On the comforting falsehood, I could accept leaving it alone provided that nothing important turns on it, but very few beliefs meet that test. Beliefs rarely stay private: once millions of people act on an illusion, it starts to shape schools, budgets and laws, and at that point challenging it becomes a duty rather than a rudeness. As for the future, on balance I suspect the way we treat animals is the likeliest candidate for condemnation, followed perhaps by how casually we surrendered our attention to machines. Predicting which belief will fall is far harder than predicting that some of them must.",
+      "requiredKeywords": [
+        "distinction",
+        "even if",
+        "provided that",
+        "on balance",
+        "suspect"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.7
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "followUps": [
+        "Should governments try to change what citizens believe, or only how they behave?",
+        "If a comforting false belief does no obvious harm, should anyone challenge it?",
+        "Which beliefs that are common today do you think future generations will reject?"
+      ]
+    },
+    {
+      "id": "speakx_0017",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "C2",
+      "exam": "toefl_speaking_task4_adapted",
+      "mode": "exam_response",
+      "instruction": "Task 4. Baca kuliahnya, lalu 20 detik menyiapkan dan 60 detik bicara. Ringkas DUA mekanisme utama beserta contohnya masing-masing.",
+      "sampleAnswer": "The lecture argues that memory behaves less like a recording than like a story that is rewritten with every retelling, and it describes two mechanisms of distortion. The first is post-event information: details encountered after an event can be written back into the memory of the event itself. The example is the car-accident experiment, in which people asked about cars that 'smashed' rather than 'hit' each other later remembered broken glass that never appeared in the film. The second is imagination inflation: whereas the misleading input comes from outside in the first case, here the distortion is self-generated - adults who vividly imagined breaking a window in childhood later became more confident that it had really happened to them. In both cases, the professor's point is that remembering is an act of reconstruction, so a memory can be sincere, detailed, and wrong at the same time.",
+      "requiredKeywords": [
+        "first",
+        "second",
+        "example",
+        "whereas",
+        "in both cases"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.7
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "sourceText": "KULIAH (tertulis): \"We like to imagine memory as a recording, but it behaves more like a story that is rewritten each time it is told. Let me describe two mechanisms of distortion.\n\nThe first is post-event information. What we encounter after an event can be written back into the memory of the event itself. In a classic type of experiment, people watch a short film of a minor car accident. Those later asked how fast the cars were going when they 'smashed' into each other do not just give higher speed estimates than those asked about cars that 'hit' each other - a week later, they are also more likely to remember broken glass that was never in the film. The question has quietly edited the memory.\n\nThe second mechanism is imagination inflation. The act of imagining an event leaves a trace that can later be mistaken for the trace of a real experience. In one study, adults who spent a few minutes vividly imagining a childhood incident - breaking a window with their hand - became measurably more confident, weeks later, that it had actually happened to them. Nothing was presented as true; imagining it was enough.\"",
       "sourceNote": "ADAPTASI: kuliah aslinya berupa audio; di sini disajikan tertulis."
     }
   ]

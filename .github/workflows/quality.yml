@@ -472,6 +472,28 @@ jobs:
           # kuota, endpoint hidup tanpa kill switch yang terbaca) dan bersih pada keadaan repo
           # hari ini. Nol jaringan; fixture ditulis ke direktori temporer OS.
           node rollout-plan-test.js
+          # m025-190: 15 gerbang tertinggal belum terdaftar (temuan gate-registry saat CI
+          # main merah berlapis). 13 lulus langsung dan didaftarkan di sini; id-golden-
+          # snapshot & th-coverage didaftarkan setelah baseline diregenerasi + pendamping
+          # Thai gen2 dilengkapi dalam commit yang sama.
+          node adaptivity-simulation-v3-hardened-test.js
+          # (termasuk 3 gerbang sosial SLOT 7 yang juga belum terdaftar; ketiganya lulus)
+          node social-api-contract-test.js
+          node social-frontend-test.js
+          node social-schema-contract-test.js
+          node analytics-dedup-test.js
+          node analytics-stable-id-guard-test.js
+          node app-telemetry-wiring-test.js
+          node audio-locale-guard-test.js
+          node brain-config-test.js
+          node brain-manifest-test.js
+          node fiezel-stat-gate-test.js
+          node learning-lane-test.js
+          node learning-metrics-test.js
+          node learning-telemetry-test.js
+          node locale-enum-test.js
+          node metrics-digest-test.js
+          node id-golden-snapshot-test.js
           node workflow-actor-gate-test.js
           # F5: gerbang meta pendaftaran. Diletakkan PALING AKHIR dengan sengaja — ia
           # membaca berkas workflow ini sendiri dan membandingkannya dengan seluruh
