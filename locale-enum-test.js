@@ -127,7 +127,7 @@ const sumberKey = fs.readFileSync(path.join(ROOT, 'workers/api/tts/tts-key.js'),
 const baseline = JSON.parse(fs.readFileSync(path.join(ROOT, 'id-golden-baseline.json'), 'utf8'));
 const kunciBaseline = (baseline.files || {})['workers/api/tts/tts-key.js'];
 if (kunciBaseline) {
-  const sha = require('crypto').createHash('sha256').update(sumberKey).digest('hex');
+  const sha = require('crypto').createHash('sha256').update(sumberKey.replace(/\r\n/g, '\n')).digest('hex');
   check('tts-key.js tidak disentuh (sha256 = baseline terkunci)', sha === kunciBaseline,
     `sha: ${sha}`);
 } else {
