@@ -205,6 +205,10 @@ jobs:
           node prerequisite-graph-test.js
           node speaking-exam-test.js
           node listening-exam-test.js
+          # m025-198: terjemahan bocor ke soal listening tes penempatan - murid MEMBACA
+          # jawabannya. Gerbang ini menjalankan AudioService asli dari app.js dengan
+          # FiezelVoiceSay tiruan, jadi yang diuji perilaku pintunya, bukan pola teks.
+          node listening-subtitle-suppression-test.js
           node e2e-level-grammar-test.js
           node notification-reminder-test.js
           node remote-push-test.js
