@@ -163,6 +163,38 @@
       if (ZOOM_KEYS[event.key]) stop(event);
     }, { passive: false });
 
+    /* MODALITAS MASUKAN (m025-197, laporan OWNER kedua).
+     *
+     * m025-196 memindahkan cincin fokus dari `:focus` ke `:focus-visible` dan mengira
+     * itu cukup. Ternyata tidak, dan sebabnya ada di spesifikasi: untuk KOLOM TEKS,
+     * peramban MENCOCOKKAN `:focus-visible` walau fokusnya datang dari ketukan atau
+     * klik - karena kolom yang sedang menerima ketikan dianggap selalu layak diberi
+     * penanda. Jadi kotaknya tidak hilang; ia cuma berganti warna dari emas ke tinta,
+     * dan itu persis yang dilihat pemilik.
+     *
+     * CSS sendirian tidak bisa membedakan "fokus karena jari" dari "fokus karena Tab".
+     * Atribut di bawah yang membedakannya, dan style.css menggantungkan penyembunyian
+     * cincin padanya.
+     *
+     * Bawaannya 'touch': kalau berkas ini gagal dimuat, atribut tidak pernah ada,
+     * aturan penyembunyi tidak pernah cocok, dan cincin tetap muncul. Kegagalan
+     * jatuh ke sisi yang aman untuk aksesibilitas, bukan ke sisi yang senyap.
+     *
+     * HANYA Tab yang menyalakan mode papan tik. Mengetik huruf di dalam kolom tidak
+     * boleh memunculkan cincin - itu akan mengembalikan kotak yang sedang dibuang. */
+    var root = doc.documentElement;
+    var setModality = function (mode) {
+      if (root && root.getAttribute('data-fz-input') !== mode) root.setAttribute('data-fz-input', mode);
+    };
+    setModality('touch');
+    var toTouch = function () { setModality('touch'); };
+    doc.addEventListener('pointerdown', toTouch, true);
+    doc.addEventListener('mousedown', toTouch, true);
+    doc.addEventListener('touchstart', toTouch, { capture: true, passive: true });
+    doc.addEventListener('keydown', function (event) {
+      if (event && event.key === 'Tab') setModality('key');
+    }, true);
+
     return true;
   }
 
