@@ -230,7 +230,9 @@ const TIMEOUT_MS = new Map([
   ['release-audit.py', 1200 * 1000], // 361 s di D1 + ruang untuk mesin CI lambat
   ['release-audit-gate-test.js', 1900 * 1000], // anggaran internalnya sendiri 30 menit
   ['content-adoption-test.js', 600 * 1000],
-  ['fiezel-evolution-loop-test.js', 600 * 1000]
+  ['fiezel-evolution-loop-test.js', 600 * 1000],
+  ['content-integrity-audit.js', 600 * 1000],
+  ['content-promotion-test.js', 600 * 1000]
 ]);
 
 function main(argv) {

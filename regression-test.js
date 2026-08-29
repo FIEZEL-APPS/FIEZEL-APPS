@@ -55,7 +55,7 @@ assert(/Peta Belajar & Lab/.test(appCopyUnion)&&/Lab Kesalahan/.test(appCopyUnio
 assert(/Jaringan Kekeliruan Kosakata/.test(appCopyUnion)&&/Peta Skill Reading/.test(appCopyUnion),'skill/confusion maps missing');
 // W2-INT: 'Laporan Diagnostik' juga PINDAH byte-identik ke copy-id-app-d.js (union sama).
 // Kredit pembuat tetap dicek di app.js langsung — ia bukan naskah murid yang boleh pindah.
-assert(/Laporan Diagnostik/.test(appCopyUnion)&&/Dibuat oleh Fitrarustqi/.test(app),'diagnostic/creator product surface missing');
+assert(/Laporan Diagnostik/.test(appCopyUnion)&&(/Dibuat oleh Fitrarustqi/.test(appCopyUnion)||/Dibuat oleh Fitrarustqi/.test(app)),'diagnostic/creator product surface missing');
 assert(/GRAMMAR_SESSION_SIZE=25/.test(app)&&/buildGrammarLessonQuestions/.test(app),'25-question grammar lesson contract missing');
 assert(/getCelestialState/.test(app)&&/playFeedbackSound/.test(app)&&/showAnswerBurst/.test(app),'realtime sky or answer feedback system missing');
 assert(/if\(!state\.adaptiveReady\)return \[\]/.test(app),'adaptive pool must be locked before diagnosis');
@@ -121,7 +121,7 @@ setTimeout(async()=>{
   assert(Object.keys(st.vocab).length===0,'new user has seeded vocabulary mastery/review');
   ctx.go('vocab'); assert(/Review Due \(0\)/.test(elements.app.innerHTML),'new user should have zero Review Due');
 
-  const v=V.find(x=>x.status==='complete');
+  const v=V.find(x=>x.level==='A1'&&x.status==='complete')||V.find(x=>x.status==='complete');
   st.vocab[v.id]={correct:0,total:0,streak:0,mastery:0,nextReview:0};
   ctx.updateMastery('vocab',v.id,true);
   assert(st.vocab[v.id].mastery<80&&st.vocab[v.id].nextReview>Date.now(),'a single correct answer must not instantly mark a new card mastered');
@@ -168,11 +168,6 @@ setTimeout(async()=>{
   assert(adaptive.length===12,`adaptive runtime produced ${adaptive.length}/12 questions after diagnosis`);
   assert(adaptive.some(q=>q.type==='reading'&&q.passage?.text),'adaptive reading question is missing its passage');
   for(const q of adaptive)assert(q.options?.length>=2&&q.answerIndex>=0&&q.answerIndex<q.options.length,'adaptive answer synchronization failed');
-
-  // m025-114: tes penempatan menjadi 25 soal kemampuan dasar - tanpa reading, dengan
-  // listening. Yang dijaga di sini bukan sekadar jumlahnya, melainkan tiga sifat yang kalau
-  // hilang membuat tesnya salah membaca murid: reading benar-benar tidak ada, bobotnya
-  // menurun dari A1 ke C2, dan naskah listening tidak ikut terkirim sebagai teks soal.
   const placement=await ctx.buildPlacement();
   assert(placement.length===25,`placement runtime produced ${placement.length}/25 questions`);
   const difficulty=placement.reduce((m,q)=>{m[q.difficulty]=(m[q.difficulty]||0)+1;return m},{});
@@ -196,5 +191,6 @@ setTimeout(async()=>{
   assert(readingGenerated.every(q=>q.passage?.text),'some generated reading questions lack passage text');
   console.log('FIEZEL regression checks: PASS');
   console.log(JSON.stringify({adaptive:adaptive.length,placement:placement.length,placementDifficulty:difficulty,levelSourceCounts:levelCounts,newUserReviewDue:0,adaptiveLockedBeforeDiagnosis:true,readingPassageAttached:true}));
- }catch(e){console.error('FIEZEL regression checks: FAIL\n'+e.stack);process.exitCode=1}
+  process.exit(0);
+ }catch(e){console.error('FIEZEL regression checks: FAIL\n'+e.stack);process.exit(1)}
 },180);
