@@ -217,6 +217,24 @@ check('D pembuktian penanda dijalankan SESUDAH unggah, dan kegagalannya memerahk
   wf.search(/deploy-site-verify\.mjs/) > iSW,
   'unggah yang tidak terbukti sampai bukan unggah yang selesai');
 
+/* Sejak m025-195 ada jalur penerbitan KEDUA: `.cpanel.yml` dijalankan cPanel di hosting,
+ * di luar GitHub Actions. Cek D di atas hanya menjaga jalur SSH — jalur yang, sampai owner
+ * memasang empat secret, tidak pernah berjalan. Kalau tidak ada yang menjaga jalur cPanel,
+ * repo kembali persis ke keadaan yang membuat audit m025-179 gagal membuktikan paritas:
+ * bita berpindah, dan nol pihak membacanya kembali. */
+const iTanpaKredensial = wf.search(/steps\.creds\.outputs\.ready\s*!=\s*'true'/);
+const blokTanpaKredensial = iTanpaKredensial === -1 ? '' : wf.slice(iTanpaKredensial);
+check('D2 produksi tetap DIBACA walau secret hosting belum ada (jalur cPanel terbit di luar workflow ini)',
+  iTanpaKredensial !== -1 && /deploy-site-verify\.mjs/.test(blokTanpaKredensial),
+  'penerbitan yang tidak pernah dibaca kembali bukan penerbitan yang terbukti');
+check('D3 pembacaan tanpa-kredensial MENUNTUT bukti saat dijalankan tangan (Run workflow = gerbang)',
+  /TUNTUT:\s*\$\{\{\s*github\.event_name\s*==\s*'workflow_dispatch'/.test(blokTanpaKredensial) &&
+  /--page/.test(blokTanpaKredensial) && /--sw\b/.test(blokTanpaKredensial),
+  'tombol yang hanya melapor tidak bisa dipakai sebagai bukti rilis');
+check('D4 pada jalan otomatis ia melapor, tidak menuntut (merah yang tidak menunjuk cacat mengajari orang mengabaikan lampu)',
+  /GITHUB_STEP_SUMMARY/.test(blokTanpaKredensial) && /exit 0/.test(blokTanpaKredensial),
+  'laporan wajib tertulis, bukan senyap');
+
 /* ---------------------------------------------------------------- cPanel sejalan --------- */
 if (ada(CPANEL)) {
   const cp = baca(CPANEL);
