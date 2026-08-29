@@ -1,7 +1,7 @@
 {
-  "version": "m025-191",
+  "version": "m025-190",
   "claimedBy": "perplexity-computer (multilingual i18n wave, direbase atas m025-185)",
-  "claimedAt": "2026-08-28T23:40:58.442Z",
-  "reason": "overhaul UI/UX+maskot+lesson-mode: 50 verifikator selesai, 10 perbaikan genuine, merge main 4448d14",
+  "claimedAt": "2026-08-28T23:17:03.085Z",
+  "reason": "wave2 konten skip: 605 vocab e-z + 69 templat gap + 125 patch kunci/CEFR/kejujuran + lantai per-skill ujian level",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

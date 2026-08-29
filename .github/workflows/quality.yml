@@ -206,6 +206,25 @@ jobs:
           node fiezel-meta-learning-test.js
           node fiezel-evolution-ledger-test.js
           node fiezel-self-refine-test.js
+          # Gerbang brain-learning-infra (PR #226) + gerbang i18n yang belum terdaftar
+          # (dituntut gate-registry-test: terdaftar atau dikecualikan beralasan).
+          node fiezel-stat-gate-test.js
+          node brain-manifest-test.js
+          node brain-config-test.js
+          node learning-metrics-test.js
+          node metrics-digest-test.js
+          node learning-telemetry-test.js
+          node learning-lane-test.js
+          node app-telemetry-wiring-test.js
+          node analytics-dedup-test.js
+          node analytics-stable-id-guard-test.js
+          node adaptivity-simulation-v3-hardened-test.js
+          node audio-locale-guard-test.js
+          node id-golden-snapshot-test.js
+          node locale-enum-test.js
+          node social-api-contract-test.js
+          node social-frontend-test.js
+          node social-schema-contract-test.js
           node fiezel-evolution-loop-test.js
           node core-worker-contract-test.js
           node learner-evidence-test.js

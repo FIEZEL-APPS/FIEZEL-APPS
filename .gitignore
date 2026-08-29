@@ -66,3 +66,6 @@ SECRET-SCAN-REPORT.json
 # menambah permukaan konflik - malam ini satu di antaranya bahkan ter-commit BERISI penanda
 # konflik merge. Buktinya ada di keluaran gerbang, bukan di berkas yang tertinggal di worktree.
 *-REPORT.json
+# P10: artefak report generated tidak dilacak
+ANALYTICS-DEDUP-REPORT.json
+ANALYTICS-STABLE-ID-GUARD-REPORT.json
