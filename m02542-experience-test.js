@@ -44,17 +44,24 @@ const BEAT = { en: 'We use it when the result still matters now.', idText: 'Kita
 
 // ---- 3. zoom lock ------------------------------------------------------------------
 
-test('the viewport allows accessible zoom while double-tap stays tamed', () => {
-  // Wave D (D5 Tinggi-1): kuncian zoom total melanggar WCAG 1.4.4 (resize text sampai
-  // 200% tanpa kehilangan fungsi). Kebijakan baru: pinch-zoom DIIZINKAN sampai 5x,
-  // user-scalable tidak boleh dilarang; yang tetap dijinakkan hanya double-tap-zoom
-  // (touch-action) supaya ketukan cepat kuis tidak memicu lompatan zoom.
+test('the viewport pins page zoom, and the pin is not merely cosmetic', () => {
+  // Wave D (D5 Tinggi-1) dulu MENCABUT kunci zoom demi WCAG 1.4.4, dan assert di bawah dulu
+  // menegakkan arah itu. m025-186: OWNER MEMBALIKKANNYA pada 29 Agu 2026, sesudah biayanya
+  // disampaikan - FIEZEL harus terasa aplikasi, bukan dokumen. Arah assert dibalik secara
+  // TERBUKA di sini, bukan dihapus, supaya pembaca berikutnya tahu ini keputusan produk dan
+  // bukan regresi yang lolos.
+  //
+  // BIAYA YANG DITERIMA: murid low-vision kehilangan perbesaran halaman (WCAG 1.4.4/1.4.10).
+  // Utang: pengatur ukuran teks di dalam aplikasi. Rincian di app-interaction-policy-test.js.
   const meta = (index.match(/<meta name="viewport"[^>]*>/) || [''])[0];
-  assert.ok(!/user-scalable=no/.test(meta), 'user scaling must NOT be refused (WCAG 1.4.4)');
-  assert.match(meta, /maximum-scale=5/, 'zoom in up to 5x is allowed');
-  assert.ok(!/maximum-scale=1\b/.test(meta), 'the old 1x zoom pin must be gone');
+  assert.match(meta, /user-scalable=no/, 'page zoom is pinned by owner decision m025-186');
+  assert.match(meta, /maximum-scale=1\b/, 'the pin is 1x');
   assert.match(css, /touch-action:manipulation/, 'double-tap zoom is still removed in CSS');
   assert.match(css, /text-size-adjust:100%/, 'the OS must not rescale text either');
+  // Kunci yang hanya ada di meta adalah kunci palsu: iOS Safari mengabaikan user-scalable
+  // sejak iOS 10. Yang benar-benar mengunci pinch di iPhone adalah gesture WebKit.
+  const lock = fs.readFileSync('features/ui/fiezel-zoom-lock.js', 'utf8');
+  assert.match(lock, /addEventListener\(\s*'gesturestart'/, 'WebKit pinch must actually be blocked');
 });
 
 test('pinch and double tap are refused at the event level, because iOS ignores the tag', () => {

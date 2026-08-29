@@ -8,15 +8,30 @@
  * menjadi SATU kebijakan interaksi, sehingga tidak lahir modul kedua yang mengatur hal yang
  * sama dari sudut lain.
  *
- * Dua hal yang dijaga, dan HANYA dua:
- *   1. Double-tap tidak memperbesar halaman  (sudah ada sejak m025-42)
- *   2. Menu konteks peramban tidak muncul di UI statis  (m025-186)
+ * Empat hal yang dijaga:
+ *   1. Double-tap tidak memperbesar halaman   (m025-42)
+ *   2. Menu konteks tidak muncul di UI statis (m025-186)
+ *   3. Pinch tidak memperbesar halaman        (m025-186, keputusan OWNER)
+ *   4. ctrl+wheel dan Cmd/Ctrl +/-/0 tidak memperbesar halaman (idem)
  *
- * Yang SENGAJA TIDAK dilakukan, supaya tidak ada yang "merapikannya" nanti:
- *   - pinch-zoom TIDAK diblok (WCAG 1.4.4/1.4.10 - hak murid low-vision)
- *   - ctrl+wheel dan Cmd/Ctrl +/-/0 TIDAK diblok (alasan sama)
+ * KENAPA (3) DAN (4) ADA DI JS, BUKAN CUKUP DI VIEWPORT META.
+ * `user-scalable=no` DIABAIKAN iOS Safari sejak iOS 10. Di iPhone - platform utama FIEZEL -
+ * meta itu sendirian tidak menghentikan apa pun. Yang benar-benar menghentikan pinch di
+ * WebKit adalah membatalkan gesturestart/gesturechange/gestureend. Jadi kunci zoom yang
+ * hanya mengubah meta adalah kunci yang terlihat terpasang tetapi tidak mengunci apa pun.
+ *
+ * BIAYA AKSESIBILITAS, DICATAT BUKAN DISEMBUNYIKAN.
+ * (3) dan (4) adalah penyimpangan sadar dari WCAG 1.4.4 & 1.4.10 atas keputusan OWNER
+ * 29 Agu 2026, sesudah biayanya disampaikan: murid low-vision kehilangan kemampuan
+ * memperbesar. Utang yang belum dibayar: pengatur ukuran teks DI DALAM aplikasi. Sampai itu
+ * ada, keputusan ini punya korban yang nyata. Jangan balik tanpa OWNER - dan jangan pula
+ * menghapus paragraf ini, karena inilah satu-satunya tempat biayanya tertulis.
+ *
+ * Yang SENGAJA TIDAK dilakukan:
  *   - seleksi teks TIDAK diurus di sini; itu murni CSS (`style.css` blok kebijakan).
  *     Mengurusnya dua kali di dua lapisan adalah cara termudah membuat input rusak.
+ *   - scroll satu jari TIDAK pernah disentuh; hanya sentuhan MULTI-JARI yang dibatalkan,
+ *     atau seluruh halaman berhenti bisa digulir.
  *
  * ---------------------------------------------------------------------------------------
  * m025-42 zoom lock — D16 (audit wave D, D5 T1): dilonggarkan menjadi double-tap lock.
@@ -90,11 +105,10 @@
     var guard = createGuard(target.Date && target.Date.now ? function () { return target.Date.now(); } : null);
     var stop = function (event) { if (event && typeof event.preventDefault === 'function') event.preventDefault(); };
 
-    // D16: pinch (gesturestart/gesturechange/gestureend + touchmove multi-jari),
-    // ctrl+wheel, dan Cmd/Ctrl +/-/0 TIDAK diblok lagi - pinch-zoom adalah hak murid
-    // (WCAG 1.4.4). Hanya double-tap-zoom yang masih dibatalkan. Sebuah touchend yang
-    // merupakan bagian pinch (masih ada jari lain menempel) dibiarkan lewat, dinilai
-    // lewat guard.isPinch pada event.touches yang tersisa.
+    // m025-186 (keputusan OWNER): pinch, ctrl+wheel, dan Cmd/Ctrl +/-/0 DIBLOK lagi.
+    // Sebuah touchend yang merupakan bagian pinch (masih ada jari lain menempel) tetap
+    // dibiarkan lewat oleh guard double-tap di bawah, supaya jari terakhir yang terangkat
+    // dari sebuah pinch tidak salah dibaca sebagai ketukan kedua.
     doc.addEventListener('touchend', function (event) {
       if (guard.isPinch(event && event.touches && event.touches.length)) return;
       var touch = (event && event.changedTouches && event.changedTouches[0]) || null;
@@ -121,6 +135,33 @@
       if (allowsContextMenu(el)) return;
       stop(event);
     });
+
+    /* PINCH — jalur WebKit. Inilah yang benar-benar menghentikan pinch di iOS, bukan meta. */
+    doc.addEventListener('gesturestart', stop, { passive: false });
+    doc.addEventListener('gesturechange', stop, { passive: false });
+    doc.addEventListener('gestureend', stop, { passive: false });
+
+    /* PINCH — jalur touch generik (Android, dan WebKit saat gesture event tidak terkirim).
+     * HANYA multi-jari. Sentuhan satu jari tidak pernah disentuh: membatalkannya berarti
+     * mematikan scroll seluruh aplikasi, dan itu kerusakan yang jauh lebih besar daripada
+     * cacat yang sedang ditutup. */
+    doc.addEventListener('touchmove', function (event) {
+      if (event && event.touches && event.touches.length > 1) stop(event);
+    }, { passive: false });
+
+    /* ZOOM DESKTOP — ctrl/cmd + wheel (termasuk cubit trackpad, yang dikirim sebagai
+     * wheel ber-ctrlKey). Wheel biasa dibiarkan: itu scroll, bukan zoom. */
+    doc.addEventListener('wheel', function (event) {
+      if (event && (event.ctrlKey || event.metaKey)) stop(event);
+    }, { passive: false });
+
+    /* ZOOM PAPAN KETIK — Cmd/Ctrl dengan +, -, =, _, atau 0. Kombinasi lain tidak disentuh
+     * supaya Ctrl+A/C/V di dalam input tetap utuh. */
+    var ZOOM_KEYS = { '+': 1, '-': 1, '=': 1, '_': 1, '0': 1 };
+    doc.addEventListener('keydown', function (event) {
+      if (!event || !(event.ctrlKey || event.metaKey)) return;
+      if (ZOOM_KEYS[event.key]) stop(event);
+    }, { passive: false });
 
     return true;
   }
