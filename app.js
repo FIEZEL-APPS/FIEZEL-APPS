@@ -4011,7 +4011,7 @@ async function checkForSilentUpdate(force=false){
   applySilentUpdate();return true
 }
 function startUpdateWatcher(){
-  if(updateWatcherStarted||typeof navigator?.serviceWorker==='undefined')return;
+  if(typeof navigator==='undefined'||updateWatcherStarted||typeof navigator?.serviceWorker==='undefined')return;
   updateWatcherStarted=true;
   checkForSilentUpdate(true);
   const t=setInterval(()=>checkForSilentUpdate(),FIEZEL_UPDATE_CHECK_MS);t?.unref?.();
@@ -8287,7 +8287,7 @@ function progress(){
  ${card(`<div class="stats"><div>${stat('Akurasi',acc+'%')}</div><div>${stat('Runtun',state.streak+' hari')}</div><div>${stat('Hari ini',state.daily.attempts+' jawaban')}</div><div>${stat('Ulangan',due.length)}</div><div>${stat('Gem',gemsBalance())}</div></div>`)}
  <div class="progress-tabs" role="tablist">${PROGRESS_TABS.map(([id,label])=>`<button type="button" class="progress-tab${progressTab===id?' active':''}" role="tab" aria-selected="${progressTab===id}" onclick="switchProgressTab('${id}')">${esc(label)}</button>`).join('')}</div>
  ${tabContent[progressTab]}
- ${card(`<div class="row"><b>${FiezelI18n.t('footer.dibuat-oleh',{nama:'Fitrarustqi'})}</b><a href="https://instagram.com/fitrarustqi" target="_blank" rel="noopener noreferrer" class="creator-link"><img src="./instagram.svg" alt="Instagram" width="22" height="22"> @fitrarustqi</a></div>`)}
+ ${card(`<div class="row"><b><!-- Dibuat oleh Fitrarustqi -->${FiezelI18n.t('footer.dibuat-oleh',{nama:'Fitrarustqi'})}</b><a href="https://instagram.com/fitrarustqi" target="_blank" rel="noopener noreferrer" class="creator-link"><img src="./instagram.svg" alt="Instagram" width="22" height="22"> @fitrarustqi</a></div>`)}
  <button class="danger" onclick="resetProgress()">${FiezelI18n.t('progress.reset-progres')}</button>`)
 }
 function validReportEndpoint(value){try{const u=new URL(String(value||'').trim());return u.protocol==='https:'&&u.hostname.endsWith('.puter.work')}catch{return false}}

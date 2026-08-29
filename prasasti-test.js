@@ -75,7 +75,7 @@ ok(/function showPrasastiMoment/.test(app) && /pawReact\('badge-earned'\)/.test(
 // alias celebrate→lesson_complete (bisa dobel dengan penutup finishQuiz). Invarian yang
 // dijaga tetap sama: momennya berbunyi lewat gerbang uiSfx (preferensi feedbackSounds).
 ok(/uiSfx\('notif_achievement'\)/.test(app.split('function showPrasastiMoment')[1].split('\nfunction ')[0]), 'P7: momen lencana berbunyi lewat gerbang uiSfx');
-ok(/prasastiGalleryMarkup/.test(app) && /<h3>Prasasti<\/h3>/.test(app), 'P7: galeri Prasasti ada di Peta Belajar');
+ok(/prasastiGalleryMarkup/.test(app) && /<h3>(?:\$\{FiezelI18n\.t\('progress\.prasasti-judul'\)\}|Prasasti)<\/h3>/.test(app), 'P7: galeri Prasasti ada di Peta Belajar');
 ok(/features\/prasasti\/fiezel-prasasti-core\.js/.test(html), 'P7: index.html memuat inti prasasti sebelum app.js');
 ok(html.indexOf('features/prasasti/fiezel-prasasti-core.js') < html.indexOf('<script defer src="./app.js">'), 'P7: deklarasi mendahului app.js');
 ok(/'\.\/features\/prasasti\/fiezel-prasasti-core\.js'/.test(sw), 'P7: sw.js meng-precache inti prasasti (offline-first)');
