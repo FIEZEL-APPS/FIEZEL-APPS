@@ -50,6 +50,10 @@
   ];
   var GRAMMAR_TH = './grammar-explanations-th.json';
   var VOCAB_TH = './vocabulary-th.json';
+  var SPEAKING_TH = './features/i18n/speaking-bank-th.json';
+  var LISTENING_TH = './features/i18n/listening-bank-th.json';
+  var WRITING_TH = './features/i18n/writing-prompts-th.json';
+  var READING_TH = './features/i18n/reading-exam-th.json';
   var MANIFEST = './features/i18n/locale-assets-th.json';
 
   var activated = false;
@@ -78,7 +82,11 @@
     var d = root.FiezelThData;
     var jobs = [
       fetch(GRAMMAR_TH, { credentials: 'same-origin' }).then(function (r) { if (!r.ok) throw Error(GRAMMAR_TH + ': ' + r.status); return r.json(); }).then(function (j) { d.grammar = j; }),
-      fetch(VOCAB_TH, { credentials: 'same-origin' }).then(function (r) { if (!r.ok) throw Error(VOCAB_TH + ': ' + r.status); return r.json(); }).then(function (j) { d.vocab = j; })
+      fetch(VOCAB_TH, { credentials: 'same-origin' }).then(function (r) { if (!r.ok) throw Error(VOCAB_TH + ': ' + r.status); return r.json(); }).then(function (j) { d.vocab = j; }),
+      fetch(SPEAKING_TH, { credentials: 'same-origin' }).then(function (r) { if (!r.ok) throw Error(SPEAKING_TH + ': ' + r.status); return r.json(); }).then(function (j) { d.speaking = j.items || j; }),
+      fetch(LISTENING_TH, { credentials: 'same-origin' }).then(function (r) { if (!r.ok) throw Error(LISTENING_TH + ': ' + r.status); return r.json(); }).then(function (j) { d.listening = j.items || j; }),
+      fetch(WRITING_TH, { credentials: 'same-origin' }).then(function (r) { if (!r.ok) throw Error(WRITING_TH + ': ' + r.status); return r.json(); }).then(function (j) { d.writing = j; }),
+      fetch(READING_TH, { credentials: 'same-origin' }).then(function (r) { if (!r.ok) throw Error(READING_TH + ': ' + r.status); return r.json(); }).then(function (j) { d.reading = j; })
     ];
     // allSettled, bukan all: satu dataset gagal (offline parsial) tidak boleh menahan yang
     // lain — overlay per-dataset di app.js sudah fail-soft (null = tampilan id bertahan).
@@ -110,7 +118,7 @@
     if (activated) return;
     activated = true;
     // Baru di titik ini window.FiezelThData lahir — murid id tidak pernah sampai sini.
-    root.FiezelThData = { grammar: null, vocab: null, ready: false };
+    root.FiezelThData = { grammar: null, vocab: null, speaking: null, listening: null, writing: null, reading: null, ready: false };
     injectScripts();
     fetchDatasets();
     fillLocaleCache();

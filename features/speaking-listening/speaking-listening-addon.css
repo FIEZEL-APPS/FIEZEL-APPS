@@ -62,6 +62,7 @@ body.fz-stage-sl .fsl-feedback{padding-bottom:120px}
 .fsl-work:disabled{opacity:1}
 .fsl-work:disabled .fsl-input,.fsl-work:disabled .fsl-option{background:var(--panel-soft,#FFF3DC);color:var(--muted,#6E5E47);border-color:var(--line,#F0E4CF)}
 .fsl-work:disabled::before{content:"Terkunci — putar audio dulu";display:block;margin-bottom:9px;font-size:.75rem;font-weight:650;color:var(--muted,#6E5E47)}
+:lang(th) .fsl-work:disabled::before{content:"ล็อคอยู่ — เล่นเสียงก่อน"}
 
 /* §3 kolom dikte: garis 1,5px dan cincin fokus yang benar-benar terlihat. */
 .fsl-input{padding:12px 13px;border-width:1.5px}
