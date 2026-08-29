@@ -277,6 +277,9 @@ if (setterBlocks.length) {
     const sandbox = {
       state: progress,
       LEVELS,
+      // Refactor i18n memindahkan literal toast ke FiezelI18n.t; fixture hermetis harus
+      // menyediakan global yang sama seperti runtime, bukan menguji keberadaannya.
+      FiezelI18n: { t: (key) => String(key) },
       coreBrainCache: { stale: true },
       getActiveLevel: () => progress.preferences.activeLevel || 'A1',
       activeLevelIsManual: () => LEVELS.includes(String(progress.preferences.activeLevel || '')),
@@ -287,6 +290,18 @@ if (setterBlocks.length) {
       render: () => {},
       showToast: () => {}
     };
+    /* Harness i18n (pola bac8b8d): setter hasil ekstraksi kini memanggil FiezelI18n.t
+       (naskah toast pindah ke copy-map pasca-#242), jadi runtime i18n + copy-id dimuat ke
+       sandbox dulu. existsSync = hijau dua arah. */
+    vm.createContext(sandbox);
+    vm.runInContext("if(typeof globalThis.self==='undefined')globalThis.self=globalThis;if(typeof globalThis.window==='undefined')globalThis.window=globalThis;", sandbox);
+    const __i18nRt = path.join(root, 'features', 'i18n', 'fiezel-i18n.js');
+    if (fs.existsSync(__i18nRt)) {
+      vm.runInContext(fs.readFileSync(__i18nRt, 'utf8'), sandbox, { filename: 'fiezel-i18n.js' });
+      for (const __n of fs.readdirSync(path.join(root, 'features', 'i18n')).filter(n => /^copy-id-.*\.js$/.test(n)).sort()) {
+        vm.runInContext(fs.readFileSync(path.join(root, 'features', 'i18n', __n), 'utf8'), sandbox, { filename: __n });
+      }
+    }
     const setter = vm.runInNewContext(`(${setterBlocks[0]})`, sandbox, { timeout: 1000 });
     const result = setter('B1');
     const after = JSON.parse(JSON.stringify({

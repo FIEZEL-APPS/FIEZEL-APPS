@@ -86,6 +86,9 @@
   // Teks tombol sanggahan — satu sumber kebenaran supaya UI tidak mengarang variannya sendiri.
   var DISPUTE_HINT = Object.freeze({
     label: 'menurutku ini salah',
+    // Kunci copy-map ADDITIVE (W2-FEAT-A): presenter boleh melokalkan label lewat kunci
+    // ini; nilai 'label' yang diases tes tidak berubah (AI-02 F01).
+    labelKey: 'brain-olm.dispute-label',
     // Aksi sanggahan (naikkan varians, ukur ulang) milik aplikasi; modul ini presentasi murni.
     ownedBy: 'app'
   });
@@ -150,6 +153,7 @@
             entry.status = TEXT_INSUFFICIENT;
             entry.mean = null; entry.low = null; entry.high = null;
             entry.label = TEXT_INSUFFICIENT;
+            entry.labelKey = 'brain-olm.insufficient'; // ADDITIVE untuk presenter (W2-FEAT-A)
             entry.rationale = 'brain3_olm_mastery_insufficient';
             insufficient++;
           } else {
@@ -157,6 +161,7 @@
             entry.status = 'ok';
             entry.mean = iv.mean; entry.low = iv.low; entry.high = iv.high;
             entry.label = 'dari model BKT';
+            entry.labelKey = 'brain-olm.from-bkt'; // ADDITIVE untuk presenter (W2-FEAT-A)
             entry.rationale = 'brain3_olm_mastery_bkt';
           }
         } else if (isNum(v)) {
@@ -170,6 +175,7 @@
           entry.low = round3(clamp(p - 0.25, 0, 1));
           entry.high = round3(clamp(p + 0.25, 0, 1));
           entry.label = 'estimasi kasar';
+          entry.labelKey = 'brain-olm.rough-estimate'; // ADDITIVE untuk presenter (W2-FEAT-A)
           entry.rationale = 'brain3_olm_mastery_raw';
         } else {
           entry.status = TEXT_INSUFFICIENT;
@@ -177,6 +183,7 @@
           entry.source = 'none';
           entry.evidenceCount = 0;
           entry.label = TEXT_INSUFFICIENT;
+          entry.labelKey = 'brain-olm.insufficient'; // ADDITIVE untuk presenter (W2-FEAT-A)
           entry.rationale = 'brain3_olm_mastery_insufficient';
           insufficient++;
         }
@@ -197,28 +204,56 @@
    * tentang orangnya. Menerima ledger yang sudah diringkas ({active, resolved}) atau
    * ledger mentah bila modul FiezelMisconceptionLedger tersedia sebagai global.
    * ================================================================ */
-  function misconceptionText(m) {
+  var NASKAH_ID = Object.freeze({
+    'brain-olm.insufficient': 'belum cukup data',
+    'brain-olm.remeasuring': 'sedang diukur ulang',
+    'brain-olm.from-bkt': 'dari model BKT',
+    'brain-olm.rough-estimate': 'estimasi kasar',
+    'brain-olm.dispute-label': 'menurutku ini salah',
+    'brain-olm.concept-fallback': 'konsep ini',
+    'brain-olm.miscon-pair': 'Pada ' + '{concept}' + ', jawaban berulang kali memakai bentuk \u00ab' + '{wrong}' + '\u00bb padahal bentuk baku \u00ab' + '{right}' + '\u00bb. Pola ini akan diuji ulang pada latihan berikutnya.',
+    'brain-olm.miscon-wrong-only': 'Pada ' + '{concept}' + ', pola jawaban berulang kali mengarah ke \u00ab' + '{wrong}' + '\u00bb. Pola ini akan diuji ulang pada latihan berikutnya.',
+    'brain-olm.miscon-generic': 'Pada ' + '{concept}' + ', ada pola jawaban yang berulang dan perlu diuji ulang.',
+    'brain-olm.resolved': 'Pola keliru pada ' + '{concept}' + ' sudah tidak muncul lagi \u2014 jawaban terakhir konsisten memakai bentuk baku.',
+    'brain-olm.calib-over': 'Kamu memprediksi benar ' + '{pred}' + '% tapi aktual ' + '{actual}' + '%. Sebelum menjawab, coba sebutkan dulu alasan jawabanmu \u2014 kalau alasannya belum bisa ' + 'diucapkan, turunkan taksiran keyakinannya.',
+    'brain-olm.calib-under': 'Kamu memprediksi benar ' + '{pred}' + '% tapi aktual ' + '{actual}' + '%. Jawaban-jawabanmu lebih akurat daripada taksiranmu \u2014 saat polanya sudah dikenali, ' + 'berani naikkan taksiran keyakinannya.',
+    'brain-olm.calib-neutral': 'Taksiran keyakinan (' + '{pred}' + '%) dan hasil aktual (' + '{actual}' + '%) sudah sejalan. Pertahankan kebiasaan menaksir sebelum menjawab \u2014 kebiasaan itu yang ' + 'membuat kalibrasinya tetap tajam.'
+  });
+
+  /* Injeksi naskah OPSIONAL (W2-FEAT-A, desain W1-FEAT-A): NASKAH_ID di bawah adalah
+   * baseline byte-identik dengan naskah beku gerbang emas. Pemanggil boleh menitipkan
+   * tabel pengganti per-kunci (mis. terjemahan th yang dirakit app dari copy-map i18n).
+   * Fallback per-kunci: kunci yang tidak ada di tabel titipan jatuh ke NASKAH_ID —
+   * modul ini TIDAK menyentuh lapisan i18n, kemurnian brain dipertahankan (AI-08 F01). */
+  function lineFor(T, key) {
+    return (T && typeof T[key] === 'string') ? T[key] : NASKAH_ID[key];
+  }
+  function fill(text, params) {
+    return String(text).replace(/\{(\w+)\}/g, function (m, name) {
+      return params && Object.prototype.hasOwnProperty.call(params, name) ? String(params[name]) : m;
+    });
+  }
+
+  function misconceptionText(m, T) {
     var wrong = m && m.misconception ? String(m.misconception) : null;
     var right = m && m.canonical ? String(m.canonical) : null;
-    var concept = m && m.concept ? String(m.concept) : 'konsep ini';
+    var concept = m && m.concept ? String(m.concept) : lineFor(T, 'brain-olm.concept-fallback');
     if (wrong && right) {
-      return 'Pada ' + concept + ', jawaban berulang kali memakai bentuk \u00ab' + wrong +
-        '\u00bb padahal bentuk baku \u00ab' + right + '\u00bb. Pola ini akan diuji ulang pada latihan berikutnya.';
+      return fill(lineFor(T, 'brain-olm.miscon-pair'), { concept: concept, wrong: wrong, right: right });
     }
     if (wrong) {
-      return 'Pada ' + concept + ', pola jawaban berulang kali mengarah ke \u00ab' + wrong +
-        '\u00bb. Pola ini akan diuji ulang pada latihan berikutnya.';
+      return fill(lineFor(T, 'brain-olm.miscon-wrong-only'), { concept: concept, wrong: wrong });
     }
-    return 'Pada ' + concept + ', ada pola jawaban yang berulang dan perlu diuji ulang.';
+    return fill(lineFor(T, 'brain-olm.miscon-generic'), { concept: concept });
   }
 
-  function resolvedText(m) {
-    var concept = m && m.concept ? String(m.concept) : 'konsep ini';
+  function resolvedText(m, T) {
+    var concept = m && m.concept ? String(m.concept) : lineFor(T, 'brain-olm.concept-fallback');
     // Pujian ke tindakan (jawaban yang konsisten benar), bukan ke orang.
-    return 'Pola keliru pada ' + concept + ' sudah tidak muncul lagi \u2014 jawaban terakhir konsisten memakai bentuk baku.';
+    return fill(lineFor(T, 'brain-olm.resolved'), { concept: concept });
   }
 
-  function misconceptionSection(ledger, nowMs) {
+  function misconceptionSection(ledger, nowMs, T) {
     var summary = null;
     if (ledger && typeof ledger === 'object') {
       if (Array.isArray(ledger.active) || Array.isArray(ledger.resolved)) {
@@ -246,7 +281,7 @@
         // belief dilaporkan dengan bukti pendampingnya, bukan angka telanjang.
         belief: (m && isNum(m.belief)) ? round3(m.belief) : null,
         evidenceCount: (m && isNum(m.evidenceCount)) ? m.evidenceCount : null,
-        text: misconceptionText(m),
+        text: misconceptionText(m, T),
         canDispute: true,
         claimId: misconceptionClaimId(m),
         rationale: 'brain3_olm_misconception_active'
@@ -256,7 +291,7 @@
       return {
         concept: m && m.concept ? m.concept : null,
         misconception: m && m.misconception ? m.misconception : null,
-        text: resolvedText(m),
+        text: resolvedText(m, T),
         canDispute: true,
         claimId: misconceptionClaimId(m),
         rationale: 'brain3_olm_misconception_resolved'
@@ -337,7 +372,7 @@
    * >= 20 pasangan, karena menuduh dari sampel kecil sama buruknya dengan
    * overconfidence itu sendiri.
    * ================================================================ */
-  function calibrationSection(calibration) {
+  function calibrationSection(calibration, T) {
     var pairs = [];
     if (Array.isArray(calibration)) {
       calibration.forEach(function (p) {
@@ -377,22 +412,16 @@
     if (bias > CALIBRATION_BIAS_THRESHOLD) {
       tone = 'overconfidence';
       // Spesifik dengan angka aktual murid — bukan nasihat generik.
-      message = 'Kamu memprediksi benar ' + predP + '% tapi aktual ' + actP +
-        '%. Sebelum menjawab, coba sebutkan dulu alasan jawabanmu \u2014 kalau alasannya belum bisa ' +
-        'diucapkan, turunkan taksiran keyakinannya.';
+      message = fill(lineFor(T, 'brain-olm.calib-over'), { pred: predP, actual: actP });
       rationale = 'brain3_olm_calibration_overconfidence';
     } else if (bias < -CALIBRATION_BIAS_THRESHOLD) {
       tone = 'underconfidence';
       // Pujian ke tindakan (jawaban yang akurat), bukan ke orang.
-      message = 'Kamu memprediksi benar ' + predP + '% tapi aktual ' + actP +
-        '%. Jawaban-jawabanmu lebih akurat daripada taksiranmu \u2014 saat polanya sudah dikenali, ' +
-        'berani naikkan taksiran keyakinannya.';
+      message = fill(lineFor(T, 'brain-olm.calib-under'), { pred: predP, actual: actP });
       rationale = 'brain3_olm_calibration_underconfidence';
     } else {
       tone = 'netral';
-      message = 'Taksiran keyakinan (' + predP + '%) dan hasil aktual (' + actP +
-        '%) sudah sejalan. Pertahankan kebiasaan menaksir sebelum menjawab \u2014 kebiasaan itu yang ' +
-        'membuat kalibrasinya tetap tajam.';
+      message = fill(lineFor(T, 'brain-olm.calib-neutral'), { pred: predP, actual: actP });
       rationale = 'brain3_olm_calibration_neutral';
     }
     return {
@@ -561,6 +590,7 @@
       entry.disputed = true;
       entry.canDispute = false;
       entry.label = TEXT_REMEASURING;
+      entry.labelKey = 'brain-olm.remeasuring'; // ADDITIVE untuk presenter (W2-FEAT-A)
     }
     return entry;
   }
@@ -572,16 +602,17 @@
    * 'belum cukup data', tidak pernah melempar error — cermin yang pecah lebih buruk
    * daripada cermin yang jujur bilang buram.
    */
-  function summarize(state, nowMs) {
+  function summarize(state, nowMs, naskah) {
     var s = (state && typeof state === 'object') ? state : {};
+    var T = (naskah && typeof naskah === 'object') ? naskah : null;
     var out = {
       schema: SCHEMA,
       generatedAt: isNum(nowMs) ? nowMs : null,
       disputeHint: DISPUTE_HINT,
       mastery: masterySection(s.bkt),
-      misconceptions: misconceptionSection(s.ledger, nowMs),
+      misconceptions: misconceptionSection(s.ledger, nowMs, T),
       review: reviewSection(s.memory, nowMs),
-      calibration: calibrationSection(s.calibration),
+      calibration: calibrationSection(s.calibration, T),
       rationale: 'brain3_olm_summary'
     };
     // Field OPSIONAL baru (API lama tidak berubah): bila app menitipkan state negosiasi

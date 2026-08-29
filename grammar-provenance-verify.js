@@ -33,7 +33,7 @@ const store = {};
 const fileIndex = new Map();
 (function walk(dir) {
   for (const e of fs.readdirSync(dir, { withFileTypes:true })) {
-    if (['node_modules','.git','vendor','assets','docs'].includes(e.name)) continue;
+    if (['node_modules','.git','vendor','assets','docs','.audit-tmp'].includes(e.name)) continue; /* .audit-tmp: sisa mkdtemp release-audit.py (TMPDIR=ROOT/.audit-tmp) berisi snapshot grammar-templates.json basi — tanpa pengecualian ini, indeks basename memuat snapshot itu alih-alih file kanonik root (preseden: level-grammar-contract-test.js) */
     const full = path.join(dir,e.name);
     if (e.isDirectory()) walk(full); else if (!fileIndex.has(e.name)) fileIndex.set(e.name,full);
   }
@@ -52,7 +52,7 @@ const context = {
 context.window=context;context.self=context;
 context.FIEZEL_VERSION=JSON.parse(fs.readFileSync(path.join(root,'VERSION.json'),'utf8')).version;
 context.window.scrollTo=()=>{};context.window.requestAnimationFrame=fn=>fn();
-vm.createContext(context);
+vm.createContext(context);/* Harness i18n (pola W1-TESTPLAN 2b, hotfix CI pasca-#242 lanjutan: tiga harness terlewat bac8b8d): app.js kini memanggil FiezelI18n.t saat evaluasi, jadi runtime i18n + copy-id dimuat dulu. existsSync = hijau dua arah. */const __i18n=path.join(root,'features','i18n','fiezel-i18n.js');if(fs.existsSync(__i18n)){vm.runInContext(fs.readFileSync(__i18n,'utf8'),context,{filename:'fiezel-i18n.js'});for(const __n of fs.readdirSync(path.join(root,'features','i18n')).filter(n=>/^copy-id-.*\.js$/.test(n)).sort()){vm.runInContext(fs.readFileSync(path.join(root,'features','i18n',__n),'utf8'),context,{filename:__n});}}
 try {
   vm.runInContext(fs.readFileSync(path.join(root,'app.js'),'utf8'),context,{filename:'app.js'});
 } catch (e) {
@@ -84,6 +84,16 @@ const norm = s => String(s ?? '').toLowerCase().replace(/[^a-z0-9 ]+/g,' ').repl
 
 const templates = JSON.parse(fs.readFileSync(path.join(root,'grammar-templates.json'),'utf8')).templates;
 const templateById = new Map(templates.map(t => [String(t.id), t]));
+// #250 (skip-content wave2) memperkenalkan TEMPLATE VARIAN: beberapa template berbagi satu
+// subskill (mis. PR-101 varian dari PR-001) dan runtime sah menyajikan varian mana pun untuk
+// lesson tersebut. "Identitas lesson" karena itu = KELOMPOK subskill, bukan satu id template.
+const groupIdsBySubskill = new Map();
+for (const t of templates) {
+  const k = String(t.subskill);
+  if (!groupIdsBySubskill.has(k)) groupIdsBySubskill.set(k, new Set());
+  groupIdsBySubskill.get(k).add(String(t.id));
+}
+const inLessonGroup = (t, sid) => (groupIdsBySubskill.get(String(t.subskill)) || new Set()).has(String(sid));
 
 const REVIEW_DIR = path.join(path.dirname(root), 'review');
 
@@ -131,11 +141,11 @@ function checkEntryContract(level, t, q, i) {
   if ((entry.own === true) !== (origin === 'own'))
     violate(level, 'provenance_origin', `${where}: own===${entry.own} tetapi origin="${origin}" (own===true HANYA untuk origin 'own')`);
   if (origin === 'own') {
-    if (sid !== String(t.id))
-      violate(level, 'provenance_entry', `${where}: origin own tetapi sourceId="${sid}" != id template lesson "${t.id}" (di question final wajib id lesson)`);
+    if (!inLessonGroup(t, sid))
+      violate(level, 'provenance_entry', `${where}: origin own tetapi sourceId="${sid}" di luar kelompok subskill lesson "${t.id}" (wajib id template se-subskill)`);
   } else if (origin === 'peer') {
     if (!sid) violate(level, 'provenance_entry', `${where}: origin peer dengan sourceId kosong`);
-    else if (sid === String(t.id)) violate(level, 'provenance_entry', `${where}: origin peer tetapi sourceId menunjuk lesson ini sendiri`);
+    else if (inLessonGroup(t, sid)) violate(level, 'provenance_entry', `${where}: origin peer tetapi sourceId menunjuk kelompok lesson ini sendiri`);
     else if (!templateById.has(sid)) violate(level, 'provenance_entry', `${where}: origin peer, sourceId "${sid}" tidak resolve ke template nyata`);
     else if (String(slevel ?? '') !== String(templateById.get(sid).cefr))
       violate(level, 'provenance_entry', `${where}: sourceLevel "${slevel}" != cefr template asal "${templateById.get(sid).cefr}" (${sid})`);
@@ -168,10 +178,10 @@ function checkLesson(level, t, qs) {
     const where = `${t.id}/${q.practiceMode}`;
 
     // Identitas question (patch-independent: sudah harus benar di kode lama)
-    if (String(q.sourceId ?? '') !== String(t.id))
-      violate(level, 'question_identity', `${where}: question.sourceId="${q.sourceId}" != "${t.id}"`);
-    if (String(q.conceptId ?? '') !== String(t.id))
-      violate(level, 'question_identity', `${where}: question.conceptId="${q.conceptId}" != "${t.id}"`);
+    if (!inLessonGroup(t, q.sourceId))
+      violate(level, 'question_identity', `${where}: question.sourceId="${q.sourceId}" di luar kelompok subskill "${t.id}"`);
+    if (!inLessonGroup(t, q.conceptId))
+      violate(level, 'question_identity', `${where}: question.conceptId="${q.conceptId}" di luar kelompok subskill "${t.id}"`);
     if (String(q.lessonSkill ?? '') !== String(t.subskill))
       violate(level, 'question_identity', `${where}: question.lessonSkill="${q.lessonSkill}" != "${t.subskill}"`);
 
@@ -192,11 +202,15 @@ function checkLesson(level, t, qs) {
         violate(level, 'distractor_consistency', `${where}[opsi ${i}]: distractors[].option tidak sejajar dengan options[]`);
         return;
       }
-      const expected = entry.origin === 'own' ? String(t.id)
-        : entry.origin === 'peer' ? String(entry.sourceId ?? '')
-        : SENTINEL[entry.origin];
-      if (String(d?.sourceId ?? '') !== expected)
-        violate(level, 'distractor_consistency', `${where}[opsi ${i}]: distractors[].sourceId="${d?.sourceId}" != "${expected}" (origin ${entry.origin})`);
+      // origin 'own' = id template mana pun se-subskill (varian #250 sah menyajikan grupnya)
+      if (entry.origin === 'own') {
+        if (!inLessonGroup(t, d?.sourceId))
+          violate(level, 'distractor_consistency', `${where}[opsi ${i}]: distractors[].sourceId="${d?.sourceId}" di luar kelompok subskill "${t.id}" (origin own)`);
+      } else {
+        const expected = entry.origin === 'peer' ? String(entry.sourceId ?? '') : SENTINEL[entry.origin];
+        if (String(d?.sourceId ?? '') !== expected)
+          violate(level, 'distractor_consistency', `${where}[opsi ${i}]: distractors[].sourceId="${d?.sourceId}" != "${expected}" (origin ${entry.origin})`);
+      }
       if (entry.origin !== 'own' && d?.own === true)
         violate(level, 'distractor_consistency', `${where}[opsi ${i}]: distractors[].own true untuk origin ${entry.origin}`);
     });

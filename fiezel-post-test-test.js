@@ -17,7 +17,7 @@
  *     melempar dan tidak menghasilkan jadwal siluman.
  */
 const assert = require('assert');
-const post = require('./features/brain/fiezel-post-test.js');
+const post = require('./features/brain/fiezel-retention-probe.js');
 
 let failures = 0;
 let asserts = 0;

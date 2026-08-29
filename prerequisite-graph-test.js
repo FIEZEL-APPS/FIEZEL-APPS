@@ -33,7 +33,11 @@ const knownFamilies = families.filter(family => {
 check('Every family in the question bank exists in the graph', knownFamilies.length === families.length, `families=${families.length}`);
 
 // Pemeriksaan sebenarnya: lima keluarga yang disebut diagnosis harus benar-benar punya posisi.
-const orphanCandidates = ['nouns', 'possession', 'pronouns_determiners', 'quantifiers', 'question_formation'];
+// E5 (audit konten): keluarga satu-dua lesson dilebur ke keluarga besar supaya generator tidak
+// meminjam distraktor lintas-keluarga; keluarga yang sudah tidak dipakai bank tidak lagi wajib
+// terhubung — pemeriksaan #1 di atas tetap menjaga setiap keluarga yang MASIH ada di bank.
+const orphanCandidates = ['nouns', 'possession', 'pronouns_determiners', 'quantifiers', 'question_formation']
+  .filter(family => families.includes(family));
 const stillOrphan = orphanCandidates.filter(family => {
   const hasParents = chainOf(family).length > 0;
   const isParent = families.some(other => chainOf(other).includes(family));

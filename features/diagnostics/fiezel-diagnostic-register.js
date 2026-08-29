@@ -7,6 +7,15 @@
  */
 (function (root) {
   'use strict';
+
+  // i18n (AI-02 F01): naskah murid modul ini pindah ke features/i18n/copy-id-feat-a.js.
+  // Di browser, fiezel-i18n.js + copy-map dimuat lebih dulu lewat urutan <script defer>
+  // di index.html (AI-01 F02), jadi FiezelI18n dipakai langsung tanpa guard. Di Node
+  // (tes print-only me-require modul ini), copy-map dimuat lewat require supaya nilai
+  // 'id' tetap SATU sumber yang byte-identik dengan naskah beku gerbang emas.
+  var I18N = (typeof FiezelI18n !== 'undefined') ? FiezelI18n
+    : ((typeof module === 'object' && module.exports) ? require('../i18n/copy-id-feat-a.js') : null);
+  function t(key, params) { return I18N.t(key, params); }
   var bus = root.FiezelDiagnosticBus;
   var tests = root.FiezelModuleSelfTests;
   var targets = root.FiezelDiagnosticTargets;
@@ -32,7 +41,7 @@
       } catch (error) {
         var message = String((error && error.message) || error);
         bus.reportError(moduleId, 'error', 'DATA_LOAD_FAILED', path + ': ' + message);
-        return { status: 'fail', findings: [bus.finding('DATA_LOAD_FAILED', 'error', 'Gagal memuat ' + path + ' (' + message + ').')] };
+        return { status: 'fail', findings: [bus.finding('DATA_LOAD_FAILED', 'error', t('diag.data-load-failed', { path: path, error: message }))] };
       }
       return { findings: run(data) };
     });
@@ -145,7 +154,7 @@
   bus.registerSelfTest('leveltest', function () {
     var count = null;
     try { count = root.__fiezelLevelTestCount ? root.__fiezelLevelTestCount() : null; } catch (_) {}
-    if (count == null) return { status: 'skip', findings: [bus.finding('LEVELTEST_NOT_EXPOSED', 'warning', 'Jumlah soal level test belum diekspos ke diagnostic.')] };
+    if (count == null) return { status: 'skip', findings: [bus.finding('LEVELTEST_NOT_EXPOSED', 'warning', t('diag.leveltest-not-exposed'))] };
     return { findings: tests.leveltest(count, targets) };
   });
 
@@ -160,7 +169,7 @@
     try {
       // Full-local contract: the coach must be constructible without any key present.
       probe.requiresApiKey = !!(root.FIEZEL_CORE_CONFIG && root.FIEZEL_CORE_CONFIG.apiKeyRequired);
-      if (typeof root.askCoachAI !== 'function') return { status: 'skip', findings: [bus.finding('CHAT_NOT_LOADED', 'warning', 'Modul chat belum dimuat.')] };
+      if (typeof root.askCoachAI !== 'function') return { status: 'skip', findings: [bus.finding('CHAT_NOT_LOADED', 'warning', t('diag.chat-not-loaded'))] };
     } catch (error) { probe.threw = String((error && error.message) || error); }
     return { findings: tests.chat(probe) };
   });
@@ -177,9 +186,9 @@
   bus.registerSelfTest('core', function () {
     var findings = [];
     try {
-      if (!('caches' in root)) findings.push(bus.finding('CORE_NO_CACHE_API', 'warning', 'CacheStorage tidak tersedia.'));
+      if (!('caches' in root)) findings.push(bus.finding('CORE_NO_CACHE_API', 'warning', t('diag.cache-api-missing')));
       if (root.navigator && root.navigator.serviceWorker && !root.navigator.serviceWorker.controller) {
-        findings.push(bus.finding('CORE_SW_UNCONTROLLED', 'warning', 'Halaman belum dikontrol service worker.'));
+        findings.push(bus.finding('CORE_SW_UNCONTROLLED', 'warning', t('diag.sw-uncontrolled-page')));
       }
       // Notifikasi TIDAK lagi wajib (OWNER membalik m025-34), jadi izin yang belum granted
       // bukan cacat - itu pilihan murid yang sah. Yang tetap cacat: murid sudah menyalakan
@@ -191,7 +200,7 @@
         remindersOn = !!(learner && learner.preferences && learner.preferences.reminders === true);
       } catch (_) {}
       if (remindersOn && typeof Notification !== 'undefined' && Notification.permission !== 'granted') {
-        findings.push(bus.finding('CORE_NOTIFICATION_NOT_GRANTED', 'warning', 'Pengingat dinyalakan murid tetapi izin browser belum granted: ' + Notification.permission));
+        findings.push(bus.finding('CORE_NOTIFICATION_NOT_GRANTED', 'warning', t('diag.notification-not-granted', { permission: Notification.permission })));
       }
     } catch (error) {
       findings.push(bus.finding('CORE_PROBE_FAILED', 'error', String((error && error.message) || error)));

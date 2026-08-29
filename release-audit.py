@@ -2,6 +2,12 @@ import json,re,hashlib,subprocess,collections,os
 from pathlib import Path
 ROOT=Path(__file__).parent
 AUDIT_TMP=ROOT/'.audit-tmp'
+# Bersihkan litter run sebelumnya SEBELUM dipakai: tes adoption/rehearsal menulis snapshot
+# grammar-templates.json ke sini dan tidak cleanup, lalu harness walk basename-first-wins
+# (content-integrity-audit dkk.) menangkap snapshot basi itu alih-alih file kanonik root -
+# 14 lesson palsu 0/25 pada 2026-08-29 berasal persis dari sini.
+import shutil as _shutil
+if AUDIT_TMP.exists(): _shutil.rmtree(AUDIT_TMP, ignore_errors=True)
 AUDIT_TMP.mkdir(exist_ok=True)
 os.environ['TMPDIR']=str(AUDIT_TMP)
 PASS=True; checks=[]
@@ -99,6 +105,17 @@ blueprint={l:{'vocab':10,'grammar':7,'reading':8} for l in ['A1','A2','B1','B2',
 check('Placement blueprint defined',blueprint=={l:{'vocab':10,'grammar':7,'reading':8} for l in blueprint},'25 questions/level: 10 vocab + 7 grammar + 8 reading')
 # Integrity guard / adaptive
 app=open(ROOT/'app.js',encoding='utf8').read()
+# AI-20 F07 Tahap 1 (pra-ekstraksi): naskah Indonesia boleh PINDAH byte-identik dari app.js
+# ke copy-map features/i18n/copy-id-*.js (dijaga id-golden-snapshot-test.js). LITERAL naskah
+# karena itu dicek pada korpus gabungan app.js + seluruh copy-id-*.js; IDENTIFIER kode
+# (NATURAL_AI_STYLE, grammarRuleIndonesian, readingFocusLabel) TETAP dicek di app.js karena
+# identifier tidak ikut diekstrak (larangan rename tercatat di impl/handoff/W2-APP.md).
+# Glob yang kosong = korpus identik dengan app.js, jadi hasil audit tidak berubah hari ini.
+# Tahap 2 (setelah Wave 2): loop per-locale 'natural L1 explanations' + hitungan dataset th;
+# nama check untuk id dipertahankan supaya riwayat FINAL-AUDIT-REPORT.json tetap terbanding.
+_i18n_dir=ROOT/'features'/'i18n'
+copy_id_corpus='\n'.join(p.read_text(encoding='utf8',errors='ignore') for p in sorted(_i18n_dir.glob('copy-id-*.js'))) if _i18n_dir.exists() else ''
+id_corpus=app+'\n'+copy_id_corpus
 # Render-time integrity gate: terima kedua bentuk guard yang sah — bentuk lama
 # `if(!validateQuestion(q).ok)continue` maupun bentuk wave-D yang lebih ketat
 # `if(!q||!validateQuestion(q).ok)continue` (tambahan null-check `!q`). Regex sengaja
@@ -125,9 +142,9 @@ check('Correct/wrong audio feedback','playFeedbackSound' in app and 'answerFeedb
 check('Animated answer popup','id="answerBurst"' in (ROOT/'index.html').read_text() and 'showAnswerBurst' in app and '.answer-burst.show' in (ROOT/'style.css').read_text(),'answer feedback includes an animated status popup')
 check('Realtime sun and moon','getCelestialState' in app and 'getScenePalette' in app and 'SUNRISE_MINUTE=6*60' in app and 'SUNSET_MINUTE=18*60' in app and 'id="globalSky"' in (ROOT/'index.html').read_text() and '.sky-light' in (ROOT/'style.css').read_text(),'celestial position, light, and whole-screen palette follow device-local time across a 24-hour loop')
 check('Grammar lesson focused-25 contract','GRAMMAR_SESSION_SIZE=25' in app and 'GRAMMAR_PRACTICE_MODES' in app and 'buildGrammarLessonQuestions' in app and 'familyPeers=' not in app and 'levelPeers=' not in app,'every grammar lesson builds 25 focused pedagogical modes without importing peer concepts')
-check('Natural Indonesian explanations','NATURAL_AI_STYLE' in app and 'Hindari gaya buku teks' in app and 'grammarRuleIndonesian' in app and 'readingFocusLabel' in app,'grammar, vocabulary, reading, and AI share a natural Indonesian explanation contract')
+check('Natural Indonesian explanations','NATURAL_AI_STYLE' in app and 'Hindari gaya buku teks' in id_corpus and 'grammarRuleIndonesian' in app and 'readingFocusLabel' in app,'grammar, vocabulary, reading, and AI share a natural Indonesian explanation contract')
 check('Ambient audio lifecycle','playAmbientChord' not in app and 'visibilitychange' in app and 'silenceNeuralVoice' in app,'continuous generative soundtrack is retired; answer feedback and neural voice are silenced on tab hide')
-check('Rotating login reminders','LOGIN_MESSAGES=[' in app and 'selectLoginMessage' in app and 'LEARNER_STAGE' in app and 'fiezel-last-login-message' in app,'each app session receives a varied learner-stage reminder without immediate repetition')
+check('Rotating login reminders',('LOGIN_MESSAGES=[' in app or 'LOGIN_MESSAGES=__fzI18nTable([]' in app) and 'selectLoginMessage' in app and 'LEARNER_STAGE' in app and 'fiezel-last-login-message' in app,'each app session receives a varied learner-stage reminder without immediate repetition')
 check('Optional notification invitation','offerNotificationInvitation' in app and 'shouldInviteNotifications' in app and 'notificationPermission()' in app and 'notificationGateButton' in (ROOT/'index.html').read_text() and not re.search(r'classList\.add\([^\n]*notification-locked',app),'notification reminders are opt-in and never block the learning surface')
 check('Study reminder notification engine','checkStudyReminders' in app and 'showStudyNotification' in app and 'NOTIFICATION_REMINDER_INTERVAL_MS' in app and 'notificationclick' in (ROOT/'sw.js').read_text(),'local reminder engine covers inactivity, daily target, due review, and notification click return')
 check('ALRS escalation and fatigue guards',all(x in app for x in ['inactivity_1','inactivity_2','inactivity_3','inactivity_7','ALRS_MIN_GAP_MS','ALRS_QUIET_START_HOUR','lastNotificationDay','positive']), '1/2/3/7+ escalation, quiet hours, cooldown, one-per-day fatigue guard and reinforcement are present')
@@ -255,7 +272,7 @@ check('Canonical Adoption gate v1',content_adoption_test_run.returncode==0 and '
 grammar_audit_run=subprocess.run(['node',str(ROOT/'grammar-quality-audit.js')],capture_output=True,text=True)
 try: grammar_audit_report=json.load(open(ROOT/'GRAMMAR-QUALITY-REPORT.json'))
 except Exception: grammar_audit_report={}
-check('Dedicated grammar quality audit',grammar_audit_run.returncode==0 and grammar_audit_report.get('status')=='PASS' and grammar_audit_report.get('counts',{}).get('runtimeQuestions')==len(items)*25 and grammar_audit_report.get('counts',{}).get('crossLessonDuplicates')==0 and grammar_audit_report.get('counts',{}).get('focusLeaks')==0,grammar_audit_report.get('counts') or grammar_audit_run.stderr[-500:])
+check('Dedicated grammar quality audit',grammar_audit_run.returncode==0 and grammar_audit_report.get('status')=='PASS' and grammar_audit_report.get('counts',{}).get('runtimeQuestions')==len(GM.get('templates',[]))*25 and grammar_audit_report.get('counts',{}).get('crossLessonDuplicates')==0 and grammar_audit_report.get('counts',{}).get('focusLeaks')==0,grammar_audit_report.get('counts') or grammar_audit_run.stderr[-500:])
 # Syntax: telusuri pohon yang benar-benar ada, supaya gerbang yang dipensiunkan tidak bisa
 # terus menunjuk berkas yang sudah dihapus, dan modul runtime/tes baru ikut terlindungi
 # tanpa harus didaftarkan satu per satu.
@@ -265,6 +282,6 @@ for file_path in syntax_files:
  r=subprocess.run(['node','--check',str(file_path)],capture_output=True,text=True)
  check(f'JS syntax {rel}',r.returncode==0,r.stderr.strip() or 'PASS')
 # write report
-report={'version':version,'status':'PASS' if PASS else 'NOT READY','checks':checks,'counts':{'pass':sum(x['status']=='PASS' for x in checks),'fail':sum(x['status']=='FAIL' for x in checks)},'content':{'vocabulary':len(V),'reading_passages':len(R),'reading_questions':len(rq),'grammar_items':len(items),'grammar_runtime_questions':len(items)*25,'listening_items':36,'speaking_items':36,'reading_types':len(types),'content_qa':content_qa_report.get('counts',{}) if 'content_qa_report' in globals() else {}},'sha256':hashlib.sha256(open(ROOT/'app.js','rb').read()).hexdigest()}
+report={'version':version,'status':'PASS' if PASS else 'NOT READY','checks':checks,'counts':{'pass':sum(x['status']=='PASS' for x in checks),'fail':sum(x['status']=='FAIL' for x in checks)},'content':{'vocabulary':len(V),'reading_passages':len(R),'reading_questions':len(rq),'grammar_items':len(GM.get('templates',[])),'grammar_runtime_questions':len(GM.get('templates',[]))*25,'listening_items':36,'speaking_items':36,'reading_types':len(types),'content_qa':content_qa_report.get('counts',{}) if 'content_qa_report' in globals() else {}},'sha256':hashlib.sha256(open(ROOT/'app.js','rb').read()).hexdigest()}
 json.dump(report,open(ROOT/'FINAL-AUDIT-REPORT.json','w'),ensure_ascii=False,indent=2)
 print(json.dumps(report,ensure_ascii=False,indent=2));raise SystemExit(0 if PASS else 1)

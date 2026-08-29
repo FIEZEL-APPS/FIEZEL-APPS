@@ -65,9 +65,19 @@ import { buildExtraRoutes } from './route-wiring.js';
 // import { ROUTES as LEGACY_ROUTES } from './route-legacy.js';
 /* --- SLOT 6: STATUS CRON (cron-status.js) — /api/owner/cron-status   [TERPASANG] */
 import { ROUTES as CRON_STATUS_ROUTES } from './cron-status.js';
+/* --- SLOT 7: SOSIAL (route-social.js) — /api/social/profile/*, /api/social/friends*,
+ *             /api/social/cheer, /api/social/rank/*                  [TERPASANG]
+ * Dipasang sebagai array `ROUTES` sungguhan (jalur yang dirancang berkas ini),
+ * BUKAN lewat route-wiring.js: rute sosial tidak memanggil provider berbayar,
+ * jadi tidak butuh jembatan kuota/neuron. Gerbangnya hidup di dalam modulnya:
+ * identitas (mw-identity) -> flag FEATURE_SOCIAL+KV (fail-closed, mesin
+ * featureAllowedFrom yang sama dengan AI/TTS) -> CORE_DB. Cap byte per path
+ * terdaftar di schema.js BYTE_LIMITS seperti slot lain. */
+import { ROUTES as SOCIAL_ROUTES } from './route-social.js';
 
 export const EXTRA_ROUTES = [
   ...buildExtraRoutes(),  /* SLOT 1-4 */
   // ...LEGACY_ROUTES,    /* SLOT 5 */
   ...CRON_STATUS_ROUTES,  /* SLOT 6 */
+  ...SOCIAL_ROUTES,       /* SLOT 7 */
 ];
