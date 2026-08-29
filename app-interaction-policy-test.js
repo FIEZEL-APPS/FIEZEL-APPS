@@ -131,9 +131,65 @@ if (Policy && typeof Policy.allowsContextMenu === 'function') {
  * sudah menjaga sebagian; di sini yang dijaga adalah invarian yang lebih sempit dan tegas:
  * cincin fokus HANYA lewat :focus-visible (jadi tidak muncul saat ketukan/fokus programatik),
  * dan warnanya satu token. */
-check('E cincin fokus dipasang lewat :focus-visible, bukan :focus telanjang',
+/* Bentuk PERTAMA assert ini cuma menanyakan "apakah ADA satu aturan :focus-visible?".
+ * Ia hijau, dan sementara ia hijau DUA aturan `:focus` telanjang tetap berdiri di style.css
+ * (.fiezel-field input dan .endpoint-label input) - yang pertama memasang garis emas
+ * #E6A800 plus cahaya kuning 3px pada SETIAP ketukan. Pemilik melihat kotak kuning itu di
+ * aplikasi sesudah aku menyatakan beres. Gerbang yang bisa hijau sementara cacat yang ia
+ * namai masih berdiri bukan gerbang; ia jaminan palsu.
+ *
+ * Bentuk sekarang MEMINDAI: setiap selector `:focus` yang tidak diikuti `-visible` dan
+ * memasang penanda terlihat (outline / box-shadow / border-color) adalah kegagalan, dan
+ * pesan gagalnya menyebut selector-nya. */
+const cssTanpaKomentar = css.replace(/\/\*[\s\S]*?\*\//g, '');
+const FOKUS_TELANJANG = [];
+for (const blok of cssTanpaKomentar.match(/[^{}]+\{[^{}]*\}/g) || []) {
+  const potong = blok.indexOf('{');
+  const selector = blok.slice(0, potong).trim();
+  const isi = blok.slice(potong + 1, -1);
+  if (!/:focus\b/.test(selector.replace(/:focus-visible/g, ''))) continue;
+  if (/(^|[^-])\b(outline|box-shadow|border-color)\s*:/.test(isi)) FOKUS_TELANJANG.push(selector);
+}
+check('E NOL aturan :focus telanjang yang memasang penanda terlihat',
+  FOKUS_TELANJANG.length === 0,
+  FOKUS_TELANJANG.length ? 'masih ada: ' + FOKUS_TELANJANG.join(' | ')
+    : 'cincin hanya lewat :focus-visible, jadi ia tidak menyala saat murid MENGETUK');
+check('E cincin fokus dipasang lewat :focus-visible',
   /button:focus-visible\{outline:/.test(css),
-  'ini yang mencegah kotak muncul saat murid MENGETUK atau saat fokus dipindah program');
+  'dan tetap ada untuk navigasi papan tik');
+
+/* Warna cincin ikut dijaga, bukan cuma mekanismenya. Pemilik menolak emas DUA KALI
+ * (--gold #C9A24B, lalu #A67A00). Assert ini menolak keluarga kuning/emas secara terukur -
+ * hue 35-70 derajat DENGAN saturasi tinggi DAN kecerahan sedang - sehingga krem nyaris putih
+ * (#FDFAF3, kecerahan 0,97) tetap sah sebagai cincin di atas panel gelap, sementara
+ * #A67A00 / #FFC700 / #E6A800 tidak. */
+function hsl(hex) {
+  const m = /^#([0-9a-f]{6})$/i.exec(String(hex).trim());
+  if (!m) return null;
+  const n = parseInt(m[1], 16);
+  const r = ((n >> 16) & 255) / 255, g = ((n >> 8) & 255) / 255, b = (n & 255) / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b), l = (max + min) / 2, d = max - min;
+  if (!d) return { h: 0, s: 0, l };
+  const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+  let h;
+  if (max === r) h = ((g - b) / d + (g < b ? 6 : 0));
+  else if (max === g) h = (b - r) / d + 2;
+  else h = (r - g) / d + 4;
+  return { h: h * 60, s, l };
+}
+const emas = (hex) => {
+  const c = hsl(hex);
+  return !!c && c.h >= 35 && c.h <= 70 && c.s >= 0.5 && c.l >= 0.2 && c.l <= 0.75;
+};
+const TOKEN_CINCIN = ['--focus-ring', '--focus-ring-on-core'];
+const CINCIN_EMAS = [];
+for (const token of TOKEN_CINCIN) {
+  const m = new RegExp(token + ':\\s*(#[0-9a-fA-F]{6})').exec(cssTanpaKomentar);
+  if (m && emas(m[1])) CINCIN_EMAS.push(token + '=' + m[1]);
+}
+check('E warna cincin fokus BUKAN keluarga kuning/emas (pemilik menolaknya dua kali)',
+  CINCIN_EMAS.length === 0,
+  CINCIN_EMAS.length ? 'masih emas: ' + CINCIN_EMAS.join(', ') : TOKEN_CINCIN.join(' + ') + ' bersih');
 check('E target fokus programatik ([tabindex="-1"]) tidak menampilkan cincin',
   /\[tabindex="-1"\]:focus-visible\{outline:2px solid transparent/.test(css),
   'akar "kotak emas pada judul": app.js memindahkan fokus ke heading saat navigasi');
