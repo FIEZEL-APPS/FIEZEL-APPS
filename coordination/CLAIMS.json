@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-29T10:00:00+07:00",
+  "updated": "2026-08-30T05:45:00+07:00",
   "active": [
     {
       "sesi": "ses_0034e69d3ffes3kjiFLNDzYXUZ",
@@ -63,6 +63,25 @@
     }
   ],
   "finished": [
+    {
+      "sesi": "sesi-claude-d41cfc92/CORE-BRAIN-FIVE-GAPS",
+      "peran": "Core Brain: lima celah kebijakan + lubang gerbang manifest-vs-halaman",
+      "paths": [
+        "app.js",
+        "fiezel-core-worker.js",
+        "features/brain/fiezel-core-brain.js",
+        "features/personal-journey/fiezel-personal-journey.js",
+        "features/i18n/copy-id-feat-b.js",
+        "features/i18n/copy-th-feat-b.js",
+        "workers/api/ai/ai-tasks.js",
+        "core-policy-parity-test.js",
+        "brain-page-wiring-test.js",
+        "FIEZEL-M025201-CORE-BRAIN-FIVE-GAPS.md"
+      ],
+      "mulai": "2026-08-30T04:10:00+07:00",
+      "selesai": "2026-08-30T05:20:51+07:00",
+      "catatan": "Lima celah Core Brain ditutup: (1) cermin penalaran sisi server saat ringkasan otak tidak sampai - membaca todayAttempts yang selama ini dikirim dan tak pernah dibaca, kode berprefiks server_ bukan brain_; (2) /api/coach/context berhenti memakai kebijakan MENTAH - kedua rute lewat resolvePolicyForRequest, dijaga gerbang; (3) highRiskCount akhirnya dibaca untuk memesan porsi review sesuai beban rawan NYATA, bukan panjang antrean; (4) kode rasional dipotong berprioritas di tiga berkas, dan 21 padanan teks brain_/server_/policy_trend_/recent_policy_outcome_ ditambahkan ke personal-journey + naskah id/th - tanpa itu kode otak dibuang sebagai tidak dikenal meski lolos semua pemotongan; (5) tren efektivitas atas 10 hasil kebijakan, bukan cuma label terakhir. Dua gerbang baru dengan bukti-bisa-merah: core-policy-parity-test.js (20 uji) dan brain-page-wiring-test.js (9 uji). Bonus: gerbang paritas menemukan drift naskah lama - CTA mode diagnostic beda antara murid online dan offline; Worker disamakan ke kanon policy.diagnostic-cta. PELANGGARAN PROSES YANG DILAPORKAN APA ADANYA: klaim ini TIDAK didaftarkan sebelum menulis, sehingga kerja tersapu ke commit 13a9375 milik gelombang i18n Thai tanpa PR; nomor build diketik tangan alih-alih lewat tools/bump-build.mjs; core-config.js dan sw.js disentuh padahal diklaim sesi-computer-086e9698/A6. Riwayat main SENGAJA tidak ditulis ulang (sudah ter-push, sesi lain aktif). Rincian lengkap: FIEZEL-M025201-CORE-BRAIN-FIVE-GAPS.md"
+    },
     {
       "sesi": "sesi-computer-ed18fcf2",
       "peran": "UIUX-AUDIT-REPAIR (perplexity computer)",
