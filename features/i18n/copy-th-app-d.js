@@ -65,7 +65,8 @@
     'grammar.fokus-khusus': '{rule} โฟกัสพิเศษ: {focus}',
     'grammar.fondasi-awal': 'พื้นฐานเริ่มต้น',
     'grammar.gerbang-materi-can-dicoba-again': 'ประตูของเนื้อหานี้ลองใหม่ได้ {level}',
-    'grammar.inget-fokus-ya-cek-kenapa': 'จำโฟกัส {focus} ไว้นะ เช็กว่าทำไมกับดักแต่ละข้อต่างจากคำตอบที่ถูก',
+    /* m025-202: sejajar dengan sisi Indonesia - separuh 'ingat fokus {focus}' dibuang. */
+    'grammar.inget-fokus-ya-cek-kenapa': 'เช็กว่าทำไมกับดักแต่ละข้อต่างจากคำตอบที่ถูก',
     'grammar.item-materi-diacak-templat-lessonnya': '{jumlahSoalGerbang} ข้อจากเนื้อหานี้ สุ่มจากแม่แบบของ lesson',
     'grammar.item-pilihan-boleh-bervariasi-tetapi': 'โจทย์ที่สุ่มมาอาจต่างกันไป แต่ลำดับ lesson ยึดตามหลักสูตรและสิ่งที่ต้องเรียนก่อน',
     'grammar.jalur': 'เส้นทาง {level}',

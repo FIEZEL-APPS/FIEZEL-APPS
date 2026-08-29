@@ -65,7 +65,14 @@
     'grammar.fokus-khusus': '{rule} Fokus khusus: {focus}.',
     'grammar.fondasi-awal': 'Fondasi awal',
     'grammar.gerbang-materi-can-dicoba-again': 'Gerbang materi ini bisa dicoba lagi {level}.',
-    'grammar.inget-fokus-ya-cek-kenapa': 'Inget fokus {focus}, ya. Cek kenapa tiap jebakan beda dari jawaban benar.',
+    /* m025-202 (audit UX P1, audit naskah): separuh pertama DIBUANG. Kalimatnya dulu
+       berbunyi 'Inget fokus {focus}, ya' dengan {focus} = judul lesson - judul yang sedang
+       dibuka murid saat itu juga, dan yang sudah tercetak di eyebrow kartu soal serta di
+       layar intro satu ketuk sebelumnya. Di panel salah-jawab ia jadi paragraf kedua yang
+       tidak menambah satu keping informasi pun, sesudah paragraf pertama yang justru
+       mendiagnosis kesalahannya. Yang tersisa adalah separuh yang benar-benar menyuruh
+       murid melakukan sesuatu. 35 kata -> 14 kata pada layar yang paling sering dibaca. */
+    'grammar.inget-fokus-ya-cek-kenapa': 'Cek kenapa tiap jebakan beda dari jawaban benar.',
     'grammar.item-materi-diacak-templat-lessonnya': '{jumlahSoalGerbang} soal dari materi ini, diacak dari templat lessonnya',
     'grammar.item-pilihan-boleh-bervariasi-tetapi': 'Soal pilihan boleh bervariasi, tetapi urutan lesson mengikuti kurikulum dan prasyarat.',
     'grammar.jalur': 'Jalur {level}',

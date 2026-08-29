@@ -1356,7 +1356,12 @@ body.daily-locked{overflow:hidden}
 .journey-skill b{font-size:.78rem}.journey-skill span{color:var(--muted);font-size:.72rem}
 .journey-skill.is-unmeasured span{font-style:italic}
 .journey-goal-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-.journey-goal-chip{padding:8px 12px;border:1px solid var(--line);border-radius:var(--radius-pill);background:transparent;color:var(--text);font-size:var(--fs-caption);min-height:36px}
+/* m025-202 (audit UX): chip ini memaku min-height:36px, menimpa `button{min-height:44px}`
+   milik style.css - dan berbeda dari .lesson-skip-link, ia TIDAK punya perluasan hit-area
+   ::before yang menambalnya. Lima chip tujuan di Peta Belajar karena itu 8px di bawah
+   sasaran sentuh. Kembalikan ke 44px: barisnya sudah flex-wrap, jadi tidak ada yang
+   meluber. */
+.journey-goal-chip{padding:8px 12px;border:1px solid var(--line);border-radius:var(--radius-pill);background:transparent;color:var(--text);font-size:var(--fs-caption);min-height:44px}
 /* Chip terpilih = BIDANG kuning + tinta gelap, bukan garis+teks aksen: satu-satunya
    penanda "terpilih" sebelum ini adalah warna garis 1px - hampir tak terlihat. */
 .journey-goal-chip.is-active{background:var(--sun);border-color:var(--sun-deep);color:var(--text);font-weight:600}
@@ -3148,6 +3153,18 @@ html.fiezel-ui-v6 .launcher-shell{
 .writing-exam span{font-weight:600}
 .writing-exam small{color:var(--muted,#746958);line-height:1.4}
 .writing-focus{margin:6px 0 0;font-size:.78rem;color:var(--muted,#746958)}
+/* m025-202 (audit UX P1): rubrik penilaian dulu kartu terbuka permanen di bawah kotak
+   karangan - lima kriteria plus penafian IELTS, sekitar 120 kata, terbaca SEBELUM murid
+   menulis satu huruf pun. Isinya tidak dibuang (ia jujur dan berguna saat menyunting),
+   hanya dilipat: pola .home-fold yang sudah dipakai Peta Belajar, jadi tidak ada komponen
+   pengungkap baru yang lahir hanya untuk satu layar. Padding isi mengikuti kontrak
+   .home-fold>.journey-skills supaya ia duduk sama seperti lipatan lain. */
+.home-fold>.writing-rubric{margin:0;padding:14px 16px 16px;border:0;background:transparent}
+.home-fold>.writing-rubric>p:first-child{margin-top:0}
+/* m025-202: isi lipatan bagian-kosong Peta Belajar duduk seperti isi lipatan lain. */
+.home-fold>.fold-empty-body{margin:0;padding:14px 16px 16px;border:0;background:transparent}
+.home-fold>.fold-empty-body>p:first-child{margin-top:0}
+.fold-empty{margin:12px 0 0}
 .writing-rubric ul,.writing-checklist{display:grid;gap:8px;margin:10px 0 0;padding:0;list-style:none}
 .writing-rubric li{display:grid;gap:2px;font-size:.8rem}
 .writing-rubric li span{color:var(--muted,#746958)}

@@ -593,6 +593,67 @@ test('INVARIAN — tidak ada tinta gelap yang dipaku di atas permukaan bertema',
     bad.join('\n    '));
 });
 
+/**
+ * m025-202 (audit UX P0) — TINTA BER-SCOPE FASE.
+ *
+ * Celah yang melahirkan gerbang ini: daftar PAIRS di atas mengeja `.section-head h1`
+ * sebagai `var(--ambient-text)` — token SIANG — lalu berhenti. Penimpaan yang ber-scope
+ * pada blok fase (`body.scene-dusk`, `body.scene-night`) tidak pernah ikut dibaca, jadi
+ * satu baris di features/tutor-classroom/tutor-v3.css bisa memaku judul layar ke #f8faff
+ * dan LULUS setiap gerbang yang ada.
+ *
+ * Harganya nyata: sejak m025-115 mencabut aturan "langit malam menjadi tanah", keempat
+ * fase punya tanah TERANG (--sky-bottom #FFF9EE / #FFF6EA). #f8faff di atasnya = 1,00:1.
+ * Judul layar Grammar Hub, Vocabulary Hub, Ruang Reading, Skills Lab, Tes Kemampuan
+ * Dasar, Peta Belajar & Lab, dan Perpustakaan HILANG dari pukul 16.00 sampai 05.00 —
+ * 13 dari 24 jam, dan justru jam belajar sepulang sekolah.
+ *
+ * Invariannya, karena itu, bukan "periksa satu selektor" melainkan bentuk cacatnya:
+ * selama keempat fase bertanah terang, TIDAK ADA aturan ber-scope fase yang boleh
+ * memaku `color` ke literal terang. Kalau suatu hari sebuah fase memang digelapkan
+ * lagi, tanahnya ikut terbaca di sini dan aturan terang untuk fase itu lolos sendiri —
+ * gerbang ini mengikuti tanah, bukan daftar nama.
+ */
+test('INVARIAN — tidak ada tinta terang yang dipaku pada blok fase bertanah terang', () => {
+  const grounds = {};
+  for (const r of RULES.style) {
+    if (r.media) continue;
+    for (const part of norm(r.selector).split(',').map(x => x.trim())) {
+      const m = part.match(/^\.scene-(dawn|day|dusk|night)$/);
+      if (!m) continue;
+      for (const d of r.decls) if (d.prop === '--sky-bottom') grounds[m[1]] = d.value;
+    }
+  }
+  assert.ok(Object.keys(grounds).length === 4,
+    'blok .scene-* tidak lagi berjumlah empat: ' + JSON.stringify(Object.keys(grounds)));
+
+  const bad = [];
+  for (const file of ['style', 'tutor']) {
+    for (const r of RULES[file]) {
+      for (const part of norm(r.selector).split(',').map(x => x.trim())) {
+        const m = part.match(/\bbody\.scene-(dawn|day|dusk|night)\b/);
+        if (!m) continue;
+        const scene = m[1];
+        const ground = parseColor(grounds[scene]);
+        // Fase yang tanahnya memang gelap boleh memakai tinta terang - itu benar.
+        if (luminance(ground) < 0.5) continue;
+        let color = null;
+        for (const d of r.decls) if (d.prop === 'color') color = d.value;
+        if (!color || /var\(--/.test(color)) continue;
+        const stops = literalStops(color);
+        if (!stops.length) continue;
+        const ratio = contrast(stops[0], ground);
+        if (ratio >= 3) continue;
+        bad.push(file + '.css  ' + part + '  {color:' + color + '} di atas tanah '
+          + grounds[scene] + ' = ' + ratio.toFixed(2) + ':1');
+      }
+    }
+  }
+  assert.deepStrictEqual(bad, [],
+    'tinta terang dipaku pada fase yang tanahnya terang - teksnya tidak terlihat pada jam itu:\n    '
+    + bad.join('\n    '));
+});
+
 process.on('exit', () => {
   if (failures) {
     console.error('FIEZEL m025-85 kontras universal: FAIL (' + failures + ')');

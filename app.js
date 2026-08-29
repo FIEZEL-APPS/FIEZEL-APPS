@@ -5172,6 +5172,20 @@ function activeLevelTrustLineMarkup(){
 }
 function shell(title,sub,body){setApp(`<section class="fade"><div class="section-head"><div><h1>${esc(title)}</h1><p>${esc(sub)}</p></div>${levelControlMarkup()}</div>${body}</section>`)}
 function card(html,cls=''){return `<div class="card ${cls}">${html}</div>`}
+/* m025-202 (audit UX P1) — KARTU YANG MELIPAT DIRI SAAT KOSONG.
+   Peta Belajar setinggi 3.260px di layar 844px, dan bagian bawahnya adalah deretan kartu
+   yang isinya sama-sama "belum ada apa-apa": Ulangan Pintar ("belum ada materi yang perlu
+   diulang"), Laporan Diagnostik ("belum cukup bukti"), dan seterusnya. Masing-masing tetap
+   memakai kartu penuh berikut judul h3 - jadi murid baru menggulir melewati empat pengumuman
+   kekosongan sebelum sampai ke apa pun yang bisa dikerjakan, dan layar pertama yang ia lihat
+   dari progresnya sendiri adalah daftar hal yang belum ia punya.
+   Isinya TIDAK dibuang: bagian yang kosong dilipat memakai pola .home-fold yang sama dengan
+   Peta Belajar dan rubrik Writing, jadi ia tinggal satu baris 44px yang tetap bisa dibuka.
+   Begitu bagian itu punya isi, ia kembali menjadi kartu penuh dengan sendirinya. */
+function foldCard(title,body,empty,cls=''){
+  if(!empty)return card(`<h3>${title}</h3>${body}`,cls);
+  return `<details class="home-fold fold-empty ${cls}"><summary><span>${title}</span><i data-lucide="chevron-down"></i></summary><div class="fold-empty-body">${body}</div></details>`;
+}
 function stat(a,b){return `<small>${a}</small><strong>${b}</strong>`}
 // m025-99 (brief redesign 3.7, OWNER mengirim tangkapan layarnya). Dua hal salah sekaligus
 // di kartu AI Coach pada Home, dan keduanya kelalaian m025-97:
@@ -6210,7 +6224,7 @@ function writing(){
   <button id="writingSwap">${FiezelI18n.t('tulis.ganti-topik')}</button>
 </div>
 <div id="writingFeedback" class="writing-feedback"></div>
-${criteria.length?`<div class="card writing-rubric"><b>${FiezelI18n.t('tulis.judul-rubrik')}</b><p class="muted">${FiezelI18n.t('tulis.ket-rubrik')}</p><ul>${criteria.map(c=>`<li><b>${esc(c.label)}</b><span>${esc(c.asks)}</span></li>`).join('')}</ul><p class="muted">${esc(WRITING_BANK?.honesty||'')}</p></div>`:''}
+${criteria.length?`<details class="home-fold writing-rubric-fold"><summary><span>${FiezelI18n.t('tulis.judul-rubrik')}</span><i data-lucide="chevron-down"></i></summary><div class="writing-rubric"><p class="muted">${FiezelI18n.t('tulis.ket-rubrik')}</p><ul>${criteria.map(c=>`<li><b>${esc(c.label)}</b><span>${esc(c.asks)}</span></li>`).join('')}</ul><p class="muted">${esc(WRITING_BANK?.honesty||'')}</p></div></details>`:''}
 </section>`);
   const box=$('writingBox'),counter=$('writingCount');
   const sync=()=>{const n=countWords(box.value);counter.textContent=FiezelI18n.t('tulis.n-kata',{jumlah:n});counter.classList.toggle('is-hit',n>=target)};
@@ -7424,6 +7438,21 @@ function quizLoop(cfg){
  if(!cfg.dynamicPool)questions=questions.slice(0,cfg.count);
  if(cfg.placement&&!questions.length){showToast(FiezelI18n.t('quiz.pending-ada-item-tes-valid'));return}
  if(!questions.length){showToast(FiezelI18n.t('quiz.pending-ada-item-valid-for'));return}
+ /* m025-202 (audit UX P1) — EYEBROW SESI SATU-SKILL.
+    Kartu soal memimpin dengan satu blok KAPITAL berisi nama lesson lengkap; pada 390px ia
+    memakan TIGA baris di atas pertanyaan ("Kebiasaan atau sedang berlangsung: present simple
+    dan present continuous · dasar"). Di sesi campur (adaptive/placement/ujian) baris itu
+    memang bekerja: tiap soal datang dari skill berbeda dan murid perlu tahu yang mana.
+    Di sesi satu lesson ia MENGULANG judul yang baru saja dibaca murid di layar intro -
+    satu ketuk sebelumnya - jadi ia menggeser pertanyaan turun tanpa menambah apa pun.
+    Akar masalahnya bukan "eyebrow-nya jelek" melainkan ia dicetak tanpa peduli sesinya
+    berisi satu skill atau banyak. Jadi yang dihitung di sini adalah faktanya, bukan tipe
+    sesinya: kalau seluruh kolam soal berbagi satu skill, judulnya tidak diulang di layar -
+    hanya bandnya (dasar/menengah/mahir) yang tetap tercetak. Teks lengkapnya TIDAK hilang:
+    ia tetap jadi aria-label eyebrow, jadi pembaca layar tetap mengumumkannya utuh.
+    Kolam dinamis tumbuh saat sesi berjalan, jadi ia tidak pernah dianggap satu-skill. */
+ const eyebrowSkills=cfg.dynamicPool?null:new Set(questions.map(x=>String(x&&(x.skill||x.type)||'')));
+ const singleSkillSession=!!eyebrowSkills&&eyebrowSkills.size===1;
  questions.forEach(x=>{x.concept=quizConcept(x)});
  const planned=Math.min(Math.max(1,Number(cfg.count)||questions.length),questions.length);
  beginLearningSession(cfg,planned);
@@ -7530,7 +7559,7 @@ function quizLoop(cfg){
      ke BAWAH #feedback supaya giliran tutor yang basi tidak menumpuk di atas pembahasan.
      Semua id (quizExit/quizNext/quizListen/quizListenNote/quizStem/options/feedback/tutorTurn)
      dan literal quiz-shell/quiz-mascot TETAP — kontrak r2/paw/lesson-experience. */
-  setApp(`<section class="fade quiz-shell${pawSlot?pawSlot.shellClass:''}"><div class="quiz-topbar"><button id="quizExit" class="quiz-exit" aria-label="Keluar dari sesi"><i data-lucide="x"></i><span class="quiz-exit-label">Keluar</span></button><div class="quiz-progress" role="progressbar" aria-valuemin="0" aria-valuemax="${planned}" aria-valuenow="${asked+1}" aria-label="Soal ${asked+1} dari ${planned}"><span>${asked+1}</span><em>/ ${planned}</em><i class="quiz-progress-bar" aria-hidden="true" style="--p:${(asked/Math.max(1,planned)).toFixed(3)}"><b></b></i></div><button id="quizNext" class="quiz-next" disabled>Lanjut <i data-lucide="arrow-right"></i></button></div>${pawSlot?'':`<div class="quiz-mascot" aria-hidden="true">${pawFaceMarkup()}</div>`}${q.passage?card(`<div class="passage passage-reading"><div class="eyebrow">TEKS BACAAN</div><h3>${esc(q.passage.title)}</h3><p>${esc(q.passage.text)}</p></div>`,'card-reading'):(cfg.context?card(`<div class="passage"><b>${esc(cfg.context.title)}</b><p>${esc(cfg.context.text)}</p></div>`):'')}${pawSlot?pawSlot.above:''}${card(`${pawSlot?pawSlot.peek:''}<div class="eyebrow">${esc(friendlySkillName(q.skill||q.type))}${difficultyLabel(q.difficulty)?` · ${esc(difficultyLabel(q.difficulty))}`:''}</div>${q.focus?`<div class="vocab-focus"><span class="vocab-focus-word">${esc(q.focus.word)}</span>${q.focus.phonetic?`<span class="phonetic">${esc(q.focus.phonetic)}</span>`:''}</div>`:''}${q.type==='listening'?`<div class="quiz-listen quiz-listen-hero"><button id="quizListen" class="quiz-listen-btn quiz-listen-btn-hero"><i data-lucide="volume-2"></i> Dengarkan</button><span id="quizListenNote" class="muted">Pilihan terbuka setelah rekaman diputar.</span></div>`:''}<h2 class="question" id="quizStem">${esc(q.question)}</h2><div id="options" class="options"></div><div id="feedback" class="feedback hidden"></div><div id="tutorTurn" class="tutor-turn hidden"></div>`,pawSlot?pawSlot.cardClass:'')}${pawSlot?pawSlot.side:''} </section>`);
+  setApp(`<section class="fade quiz-shell${pawSlot?pawSlot.shellClass:''}"><div class="quiz-topbar"><button id="quizExit" class="quiz-exit" aria-label="Keluar dari sesi"><i data-lucide="x"></i><span class="quiz-exit-label">Keluar</span></button><div class="quiz-progress" role="progressbar" aria-valuemin="0" aria-valuemax="${planned}" aria-valuenow="${asked+1}" aria-label="Soal ${asked+1} dari ${planned}"><span>${asked+1}</span><em>/ ${planned}</em><i class="quiz-progress-bar" aria-hidden="true" style="--p:${(asked/Math.max(1,planned)).toFixed(3)}"><b></b></i></div><button id="quizNext" class="quiz-next" disabled>Lanjut <i data-lucide="arrow-right"></i></button></div>${pawSlot?'':`<div class="quiz-mascot" aria-hidden="true">${pawFaceMarkup()}</div>`}${q.passage?card(`<div class="passage passage-reading"><div class="eyebrow">TEKS BACAAN</div><h3>${esc(q.passage.title)}</h3><p>${esc(q.passage.text)}</p></div>`,'card-reading'):(cfg.context?card(`<div class="passage"><b>${esc(cfg.context.title)}</b><p>${esc(cfg.context.text)}</p></div>`):'')}${pawSlot?pawSlot.above:''}${card(`${pawSlot?pawSlot.peek:''}<div class="eyebrow"${singleSkillSession?` aria-label="${esc(friendlySkillName(q.skill||q.type))}${difficultyLabel(q.difficulty)?` · ${esc(difficultyLabel(q.difficulty))}`:''}"`:''}>${singleSkillSession?esc(difficultyLabel(q.difficulty)||friendlySkillName(q.skill||q.type)):`${esc(friendlySkillName(q.skill||q.type))}${difficultyLabel(q.difficulty)?` · ${esc(difficultyLabel(q.difficulty))}`:''}`}</div>${q.focus?`<div class="vocab-focus"><span class="vocab-focus-word">${esc(q.focus.word)}</span>${q.focus.phonetic?`<span class="phonetic">${esc(q.focus.phonetic)}</span>`:''}</div>`:''}${q.type==='listening'?`<div class="quiz-listen quiz-listen-hero"><button id="quizListen" class="quiz-listen-btn quiz-listen-btn-hero"><i data-lucide="volume-2"></i> Dengarkan</button><span id="quizListenNote" class="muted">Pilihan terbuka setelah rekaman diputar.</span></div>`:''}<h2 class="question" id="quizStem">${esc(q.question)}</h2><div id="options" class="options"></div><div id="feedback" class="feedback hidden"></div><div id="tutorTurn" class="tutor-turn hidden"></div>`,pawSlot?pawSlot.cardClass:'')}${pawSlot?pawSlot.side:''} </section>`);
   $('quizExit').onclick=()=>confirmQuizExit();/* W1 P1-2: keluar lewat konfirmasi, bukan seketika. */
   $('options').append(...opts.map((o,j)=>{const b=document.createElement('button');b.className='option';b.textContent=o;b.onclick=()=>answer(q,j,b);return b}));
   /* [FASE 7] m-audit-03 Tugas D: tiga event pelajaran yang didukung maskot tapi tak pernah
@@ -8318,8 +8347,8 @@ function progress(){
  // in Settings (see openSettings()).
  const tabContent={
   overview:`<div class="grid">${nextSessionPanelMarkup()}${journeyMarkup()}${socialSummaryCardMarkup()}<div><h3>${FiezelI18n.t('progress.peta-study')}</h3>${mapCards}</div>
-   ${card(`<h3>${FiezelI18n.t('progress.ulangan-pintar')}</h3>${due.length?due.map(([k,x])=>`<div class="row"><span>${esc(friendlySkillName(k))}</span><span>${FiezelI18n.t('progress.dikuasai-risiko-lupa',{mastery:x.mastery||0,x:Math.round(forgettingProbability(x)*100)})}</span></div>`).join('<hr>')+`<div style="margin-top:12px"><button class="primary" onclick="reviewVocab()"><i data-lucide="history"></i> ${FiezelI18n.t('progress.mulai-review-btn',{jumlah:due.length})}</button></div>`:'<p class="muted">'+FiezelI18n.t('progress.belum-ada-materi-perlu-diulang')+'</p>'}`)}
-   ${card(`<h3>${FiezelI18n.t('progress.laporan-diagnostik')}</h3>${diagHtml}`)}
+   ${foldCard(FiezelI18n.t('progress.ulangan-pintar'),due.length?due.map(([k,x])=>`<div class="row"><span>${esc(friendlySkillName(k))}</span><span>${FiezelI18n.t('progress.dikuasai-risiko-lupa',{mastery:x.mastery||0,x:Math.round(forgettingProbability(x)*100)})}</span></div>`).join('<hr>')+`<div style="margin-top:12px"><button class="primary" onclick="reviewVocab()"><i data-lucide="history"></i> ${FiezelI18n.t('progress.mulai-review-btn',{jumlah:due.length})}</button></div>`:'<p class="muted">'+FiezelI18n.t('progress.belum-ada-materi-perlu-diulang')+'</p>',!due.length)}
+   ${foldCard(FiezelI18n.t('progress.laporan-diagnostik'),diagHtml,!diag.ready)}
    ${card(`<h3>${FiezelI18n.t('progress.prasasti-judul')}</h3><p class="muted">${FiezelI18n.t('progress.lencana-bukti-study-redup-menunjukkan')}</p>${prasastiGalleryMarkup()}`,'prasasti-gallery-card')}
    </div>`,
   analysis:`<div class="grid">
