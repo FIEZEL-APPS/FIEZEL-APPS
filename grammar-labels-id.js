@@ -81,13 +81,13 @@
     // --------------------------------------------------- articles_determiners
     first_vs_subsequent_mention: 'Penyebutan pertama dan penyebutan berikutnya: a dan the',
     much_many_little_few_countability: 'Benda terhitung dan tak terhitung: much, many, little, few',
-    zero_article_generic_plural_vs_the_specific: 'Tanpa artikel untuk hal umum, the untuk hal tertentu',
+    zero_article_generic_plural_vs_the_specific: 'Tanpa kata sandang untuk hal umum, the untuk hal tertentu',
     definite_article_with_unique_referents_and_superlatives: 'The untuk hal yang hanya satu dan untuk bentuk superlative',
     demonstrative_reference_distance_this_these_that_those: 'Jarak rujukan: this, these, that, those',
     possessive_determiner_vs_double_genitive_of_mine: 'Kepemilikan sebelum kata benda dan bentuk of mine',
-    article_with_institutions_school_prison_hospital: 'Artikel pada lembaga: school, prison, hospital',
+    article_with_institutions_school_prison_hospital: 'Kata sandang pada lembaga: school, prison, hospital',
     quantifier_of_before_object_pronoun: 'Kata jumlah + of sebelum kata ganti objek',
-    zero_article_with_proper_nouns_exceptions_the_netherlands: 'Nama diri tanpa artikel dan pengecualiannya',
+    zero_article_with_proper_nouns_exceptions_the_netherlands: 'Nama diri tanpa kata sandang dan kekecualiannya',
 
     // ---------------------------------------------------------- prepositions
     time_prepositions_in_on_at: 'Kata depan waktu: in, on, at',
@@ -122,7 +122,8 @@
     // ------------------------------------------------------------- comparison
     comparative_vs_superlative_scope: 'Membandingkan dua hal atau menyebut yang paling: comparative dan superlative',
     as_as_equality_vs_comparative: 'Menyatakan setara dengan as ... as',
-    double_comparative_progressive_change: 'Perubahan yang terus berlanjut: busier and busier',
+    irregular_comparative_better_worse_forms: 'Better dan worse: bentuk banding tanpa -er',
+    double_comparative_progressive_change: 'Perubahan yang terus berlanjut: the more ... the more',
     less_vs_fewer_countability_agreement: 'Membandingkan jumlah: less dan fewer',
     comparative_intensifiers_much_far_a_lot_before_comparative: 'Penguat sebelum bentuk perbandingan: much, far, a lot',
     superlative_with_ever_present_perfect_combination: 'Bentuk superlative bersama ever dan present perfect',
@@ -139,7 +140,7 @@
     // ------------------------------------------------------- error_correction
     subject_verb_agreement_with_intervening_phrase: 'Kesesuaian subjek dan kata kerja saat ada sisipan',
     word_order_adverb_placement: 'Letak kata keterangan dalam kalimat',
-    article_omission_with_uncountable: 'Artikel yang tidak dipakai pada benda tak terhitung',
+    article_omission_with_uncountable: 'Kata sandang yang tidak dipakai pada benda tak terhitung',
     comma_splice_run_on_correction: 'Memperbaiki dua kalimat yang disambung hanya dengan koma',
     confusing_word_pair_affect_vs_effect: 'Pasangan kata yang mudah tertukar: affect dan effect',
     dangling_modifier_correction: 'Memperbaiki keterangan yang menggantung tanpa pelaku jelas',
@@ -176,7 +177,7 @@
     past_simple_regular_forms: 'Kata kerja lampau beraturan dan bentuk dasar sesudah did',
     past_be_was_were: 'Was dan were: bentuk lampau kata kerja be',
     plural_nouns_basic: 'Kata benda jamak dan perubahan ejaannya',
-    place_prepositions_basic: 'Kata depan tempat: in, on, dan at',
+    place_prepositions_basic: 'Preposisi tempat: in, on, dan at',
     present_continuous_basics: 'Present continuous: sedang berlangsung sekarang',
     question_words_basic: 'Kata tanya dasar: who, what, where, when, why',
     some_any_countable_uncountable: 'Some, any, many, dan much sesuai jenis kata benda',
@@ -195,8 +196,34 @@
     perfect_passive_infinitive_anteriority_reported_events: 'Pasif yang lebih dulu terjadi: to have been + past participle',
     mandative_subjunctive_after_demand_insist: 'Subjunctive bentuk dasar: demand that he resign',
     sentential_which_whole_clause_antecedent: 'Komentar untuk satu klausa utuh: koma + which',
-    generic_the_species_class_predicates: 'The generik untuk spesies: the Sumatran tiger'
-  };
+    generic_the_species_class_predicates: 'The generik untuk spesies: the Sumatran tiger',
+  'comparative_formation_er_vs_more_no_double_marking': 'Membentuk komparatif: -er atau more, tanpa penanda ganda',
+  'adverb_of_manner_ly_vs_adjective_after_verb': 'Kata sifat atau adverbia -ly?',
+  'how_much_vs_how_many_quantity_questions': 'How much atau how many?',
+  'indefinite_compounds_something_anything_nothing': 'Something, anything, atau nothing?',
+  'cause_result_connectors_because_vs_so': 'Because atau so: sebab atau akibat?',
+  'present_perfect_just_already_yet_placement': 'Just, already, yet: penempatan yang tepat',
+  'reflexive_pronouns_myself_vs_each_other': 'Myself atau each other?',
+  'substitution_one_ones_avoid_repetition': 'One dan ones untuk menghindari pengulangan kata',
+  'wish_would_annoyance_at_others_behaviour': 'Wish + would: keluhan kebiasaan orang lain',
+  'be_get_used_to_gerund_vs_used_to_infinitive': 'Be/get used to + -ing vs used to + kata dasar',
+  'would_rather_bare_infinitive_vs_prefer_to': 'Would rather + kata dasar vs prefer to',
+  'be_supposed_to_expectation_vs_obligation': 'Be supposed to: ekspektasi dan jadwal yang bisa meleset',
+  'its_high_time_past_simple_unreal': 'It\'s high time + past simple: desakan buat sekarang',
+  'as_if_as_though_unreal_past_form': 'As if / as though + past: perbandingan tak nyata',
+  'neednt_have_vs_didnt_need_to': 'Needn\'t have vs didn\'t need to: perlu-tidaknya di masa lampau',
+  'no_sooner_hardly_inversion_paired_correlatives': 'No sooner ... than / hardly ... when: inversi berpasangan',
+  'concessive_whatever_however_no_matter': 'However + adjektiva, whatever, no matter: klausa konsesif',
+  'verb_phrase_ellipsis_after_auxiliary': 'Elipsis frasa kerja: kata bantu yang menggantikan',
+  'but_for_noun_phrase_unreal_condition': 'But for: pengandaian padat dalam satu frasa',
+  'semi_modal_dare_bare_infinitive_negative': 'Daren\'t: semi-modal untuk \'tidak berani\'',
+  'possessive_subject_of_gerund_formal': 'His resigning: posesif di depan gerund',
+  'marginal_prepositions_notwithstanding_pending_barring': 'Barring: preposisi formal untuk pengecualian',
+  'all_the_more_intensified_comparative_with_cause': 'All the more: makin terasa karena ada alasannya',
+  'negated_participle_clause_not_wishing_to': 'Not wanting: negasi di depan klausa -ing',
+  'albeit_reduced_concession_phrase': 'Albeit: konsesi ringkas tanpa klausa',
+  'who_whom_hypercorrection_embedded_subject': 'Who vs whom: whom yang kelihatan formal tapi salah',
+};
 
   root.GRAMMAR_SKILL_TITLES_ID = GRAMMAR_SKILL_TITLES_ID;
   if (typeof module !== 'undefined' && module.exports) module.exports = { GRAMMAR_SKILL_TITLES_ID: GRAMMAR_SKILL_TITLES_ID };

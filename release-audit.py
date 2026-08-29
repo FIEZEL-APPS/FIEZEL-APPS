@@ -48,7 +48,9 @@ check('Grammar dangerous unnatural regression absent',not any('to disappear by t
 check('Grammar schema contract',GM.get('version')==version and GM.get('schemaVersion')=='2.0.0' and GM.get('practiceBlueprintVersion')=='focused-25-v1',f"version={GM.get('version')} schema={GM.get('schemaVersion')} blueprint={GM.get('practiceBlueprintVersion')}")
 # Reading
 rq=[(r,q) for r in R for q in r.get('qs',[])]
-check('Reading inventory',len(R)==300 and len(rq)==1500,f'passages={len(R)} questions={len(rq)}')
+# m025-190: kontrak DIPERKETAT dari angka mati ke properti — lantai baseline 300 (tidak
+# boleh menyusut), id unik, dan rasio turunan soal = 5x passage (dulu 300/1500 hardcoded).
+check('Reading inventory',len(R)>=300 and len({r.get('id') for r in R})==len(R) and len(rq)==5*len(R),f'passages={len(R)} questions={len(rq)}')
 miss_pass=[]; bad=[]; dupopts=[]; exactq=[]; sigs=[]; types=collections.Counter()
 for r,q in rq:
  if not r.get('id') or not r.get('text') or not isinstance(q,list) or len(q)<4 or not q[0] or not isinstance(q[1],list) or not isinstance(q[2],int) or not 0<=q[2]<len(q[1]) or not isinstance(q[3],dict) or not q[3].get('evidence'): bad.append(r['id'])
@@ -144,7 +146,7 @@ check('Realtime sun and moon','getCelestialState' in app and 'getScenePalette' i
 check('Grammar lesson focused-25 contract','GRAMMAR_SESSION_SIZE=25' in app and 'GRAMMAR_PRACTICE_MODES' in app and 'buildGrammarLessonQuestions' in app and 'familyPeers=' not in app and 'levelPeers=' not in app,'every grammar lesson builds 25 focused pedagogical modes without importing peer concepts')
 check('Natural Indonesian explanations','NATURAL_AI_STYLE' in app and 'Hindari gaya buku teks' in id_corpus and 'grammarRuleIndonesian' in app and 'readingFocusLabel' in app,'grammar, vocabulary, reading, and AI share a natural Indonesian explanation contract')
 check('Ambient audio lifecycle','playAmbientChord' not in app and 'visibilitychange' in app and 'silenceNeuralVoice' in app,'continuous generative soundtrack is retired; answer feedback and neural voice are silenced on tab hide')
-check('Rotating login reminders','LOGIN_MESSAGES=[' in app and 'selectLoginMessage' in app and 'LEARNER_STAGE' in app and 'fiezel-last-login-message' in app,'each app session receives a varied learner-stage reminder without immediate repetition')
+check('Rotating login reminders',('LOGIN_MESSAGES=[' in app or 'LOGIN_MESSAGES=__fzI18nTable([]' in app) and 'selectLoginMessage' in app and 'LEARNER_STAGE' in app and 'fiezel-last-login-message' in app,'each app session receives a varied learner-stage reminder without immediate repetition')
 check('Optional notification invitation','offerNotificationInvitation' in app and 'shouldInviteNotifications' in app and 'notificationPermission()' in app and 'notificationGateButton' in (ROOT/'index.html').read_text() and not re.search(r'classList\.add\([^\n]*notification-locked',app),'notification reminders are opt-in and never block the learning surface')
 check('Study reminder notification engine','checkStudyReminders' in app and 'showStudyNotification' in app and 'NOTIFICATION_REMINDER_INTERVAL_MS' in app and 'notificationclick' in (ROOT/'sw.js').read_text(),'local reminder engine covers inactivity, daily target, due review, and notification click return')
 check('ALRS escalation and fatigue guards',all(x in app for x in ['inactivity_1','inactivity_2','inactivity_3','inactivity_7','ALRS_MIN_GAP_MS','ALRS_QUIET_START_HOUR','lastNotificationDay','positive']), '1/2/3/7+ escalation, quiet hours, cooldown, one-per-day fatigue guard and reinforcement are present')

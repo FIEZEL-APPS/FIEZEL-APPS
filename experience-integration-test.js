@@ -23,7 +23,7 @@ check(/launcher-shell/.test(app)&&/launcher-shell/.test(css)&&/coach-preview/.te
 check(/VALID_VIEWS=new Set\(\['home','vocab','grammar','reading','skills'/.test(app)&&/FiezelSLAddon\.create/.test(app)&&/speakingListeningController\.destroy/.test(app),'Skills Lab route or lifecycle cleanup missing');
 check(/FiezelVoiceSay/.test(app)&&/Simpan untuk offline/.test(idCorpus)&&/Tidak ada yang perlu diunduh/.test(idCorpus),'m025-96: suara harus lewat pintu bersama, dan unduhan lokal hanya tambahan opsional');
 check(html.includes('./features/speaking-listening/speaking-listening-addon.css')&&html.includes('./features/neural-voice/fiezel-voice-say.js'),'Feature assets are not wired into the document');
-check(/LOGIN_MESSAGES=\[/.test(app)&&/selectLoginMessage/.test(app)&&/fiezel-last-login-message/.test(app)&&/LEARNER_STAGE/.test(app),'Rotating learner-stage login reminders missing');
+check(/LOGIN_MESSAGES=(?:\[|__fzI18nTable\(\[\])/.test(app)&&/* v49-F1 2026-08-29: wrapper i18n-refresh *//selectLoginMessage/.test(app)&&/fiezel-last-login-message/.test(app)&&/LEARNER_STAGE/.test(app),'Rotating learner-stage login reminders missing');
 // OWNER MEMBALIK m025-34: notifikasi DIUNDANG, tidak diwajibkan. Yang diperiksa sekarang
 // adalah undangan yang lengkap - ada tombol menerima, ada tombol menolak, dan tidak ada
 // satu pun jalur yang memasang kunci badan halaman. Dulu baris ini justru menuntut

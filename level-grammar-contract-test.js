@@ -277,6 +277,9 @@ if (setterBlocks.length) {
     const sandbox = {
       state: progress,
       LEVELS,
+      // Refactor i18n memindahkan literal toast ke FiezelI18n.t; fixture hermetis harus
+      // menyediakan global yang sama seperti runtime, bukan menguji keberadaannya.
+      FiezelI18n: { t: (key) => String(key) },
       coreBrainCache: { stale: true },
       getActiveLevel: () => progress.preferences.activeLevel || 'A1',
       activeLevelIsManual: () => LEVELS.includes(String(progress.preferences.activeLevel || '')),
@@ -286,9 +289,9 @@ if (setterBlocks.length) {
       closeModal: () => {},
       render: () => {},
       showToast: () => {},
-      /* m025-186 merge-fix: blok setter kini memanggil FiezelI18n.t untuk teks toast;
-         fixture ini tidak menguji teksnya, jadi stub kunci-mentah sudah jujur. */
-      FiezelI18n: { t: (k) => String(k) }
+      // Hotfix i18n pasca-#242 (pola bac8b8d): setter kini memanggil FiezelI18n.t untuk
+      // naskah toast — stub resolver cukup, fixture menguji transisi level, bukan copy.
+      FiezelI18n: { t: (k, v) => String(k) }
     };
     /* Harness i18n (pola bac8b8d): setter hasil ekstraksi kini memanggil FiezelI18n.t
        (naskah toast pindah ke copy-map pasca-#242), jadi runtime i18n + copy-id dimuat ke

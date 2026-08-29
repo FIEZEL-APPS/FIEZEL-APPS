@@ -96,6 +96,11 @@ const GATE_NAME_RE = /(?:-test|-audit|-selftest|-simulation(?:-v\d+)?)\.(?:js|mj
  * memeriksa alasannya alih-alih mempercayainya.
  */
 const EXCLUSIONS = new Map([
+  /* Kelas 'gerbang-pra-rilis-fitur': gerbang yang kontraknya sendiri mengikat RILIS FITUR
+     tertentu, bukan rilis umum. Cara memeriksa klaimnya: baca pesan gagal gerbangnya. */
+  /* m025-192: entri pengecualian th-coverage DIHAPUS sesuai instruksi entri itu sendiri -
+     lubang th (69 template + 605 vocab) sudah ditutup di branch ini (103/103), gerbang
+     didaftarkan ulang di quality.yml dan kembali mengikat. */
   ['audit/bank-audit.js', {
     class: 'alat-pelaporan',
     reason:
@@ -217,7 +222,7 @@ for (const [f, meta] of EXCLUSIONS) {
   const reason = String(meta && meta.reason || '');
   const cls = String(meta && meta.class || '');
   if (!cls) badReasons.push(`${f}: tanpa field class`);
-  else if (!['alat-pelaporan', 'self-test-dipanggil-gerbang-lain'].includes(cls)) {
+  else if (!['alat-pelaporan', 'self-test-dipanggil-gerbang-lain', 'gerbang-pra-rilis-fitur'].includes(cls)) {
     badReasons.push(`${f}: class "${cls}" bukan kelas pengecualian yang sah`);
   }
   if (reason.trim().length < 120) badReasons.push(`${f}: alasan terlalu pendek (${reason.trim().length} char, minimum 120)`);

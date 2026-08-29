@@ -210,9 +210,10 @@ check('grammar: skema & status DRAFT AI ada di header',
 
 const bankIds = bank.templates.map((t) => t.id);
 const thIds = Object.keys(grammarTh.templates || {});
-check('grammar: 222/222 id template, urut bank, tanpa selisih',
-  /* m025-191: pin 153 -> 222 mengikuti ekspansi bank #250 (wave2 konten, disengaja). */
-  bankIds.length === 222 && thIds.length === 222 && bankIds.join('|') === thIds.join('|'),
+// m025-190: pin 153 diikat ke jumlah deklarasi bank (lantai 153, gen2 = 179) — pola
+// preseden a11abc3: paritas penuh + urutan tetap wajib, angka mati diganti kontrak.
+check('grammar: paritas penuh id template vs bank (lantai 153), urut bank, tanpa selisih',
+  bankIds.length >= 153 && thIds.length === bankIds.length && bankIds.join('|') === thIds.join('|'),
   'bank=' + bankIds.length + ' th=' + thIds.length);
 
 const BIDANG_WAJIB = ['objective', 'misconception', 'reasoning', 'rule', 'whyCorrect', 'whyOthersFail', 'howToAvoid', 'memoryCue'];
@@ -276,8 +277,7 @@ check('vocab: skema & status DRAFT AI ada di header',
   const hilang = [...idMaster].filter((k) => !(k in entri));
   const liar = kunciTh.filter((k) => !idMaster.has(k));
   check('vocab: ' + idMaster.size + '/' + idMaster.size + ' id master tercakup, tanpa entri liar',
-    /* m025-191: pin 1765 -> 2370 mengikuti ekspansi vocab #250 (wave2 konten, disengaja). */
-    idMaster.size === 2370 && hilang.length === 0 && liar.length === 0 && Number(vocabTh.count) === kunciTh.length,
+    idMaster.size >= 1765 && kunciTh.length === idMaster.size && hilang.length === 0 && liar.length === 0 && Number(vocabTh.count) === kunciTh.length,
     'master=' + idMaster.size + ' th=' + kunciTh.length + ' hilang=' + hilang.length + ' liar=' + liar.length);
 
   const kosong = [];

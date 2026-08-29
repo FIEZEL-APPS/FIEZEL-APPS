@@ -44,16 +44,16 @@ try {
 
   // --- 1. ANGKA KANONIK 605.071 -------------------------------------------------------
   const CANON = mod.CANONICAL;
-  check('Konstanta korpus kanonik = 639.033 karakter', CANON.totalChars === 639033, String(CANON.totalChars));
+  check('Konstanta korpus kanonik = 645.330 karakter', CANON.totalChars === 645330, String(CANON.totalChars));
 
   const census = mod.censusCorpus({ content: 'all' });
-  const drift = Math.abs(census.totalChars - 639033) / 639033;
-  check('Korpus terukur dari bank cocok 639.033 ±1%',
+  const drift = Math.abs(census.totalChars - 645330) / 645330;
+  check('Korpus terukur dari bank cocok 645.330 ±1%',
     drift <= 0.01, `${census.totalChars} karakter (selisih ${(drift * 100).toFixed(3)}%)`);
   check('Korpus terukur cocok EKSAK dengan konstanta (bukan sekadar dalam toleransi)',
     census.totalChars === CANON.totalChars, `${census.totalChars} vs ${CANON.totalChars}`);
 
-  const DOMAINS = { listening: 414888, book: 101749, vocabulary_word: 17494, vocabulary_example: 104902 };
+  const DOMAINS = { listening: 414888, book: 101749, vocabulary_word: 18065, vocabulary_example: 110628 };
   for (const [domain, expected] of Object.entries(DOMAINS)) {
     const got = (census.byDomain[domain] || {}).chars || 0;
     check(`Domain ${domain} = ${expected} karakter ±1%`,
@@ -68,8 +68,8 @@ try {
 
   // --- 2. BIAYA DAN JATAH GRATIS ------------------------------------------------------
   const cost = census.totalChars * 0.015 / 1000;
-  check('Biaya sekali render ≈US$9,59 (bukan US$9,07 dari korpus lama)',
-    Math.abs(census.costUsd - cost) < 0.01 && Math.abs(census.costUsd - 9.59) < 0.05,
+  check('Biaya sekali render ≈US$9,68 (bukan US$9,07 dari korpus lama)',
+    Math.abs(census.costUsd - cost) < 0.01 && Math.abs(census.costUsd - 9.68) < 0.05,
     'US$' + census.costUsd.toFixed(2));
   check('Ukuran R2 diestimasi dan masih di dalam free tier 10 GB',
     census.estimatedBytes / 1e9 < 10, (census.estimatedBytes / 1e9).toFixed(2) + ' GB');
