@@ -49,12 +49,16 @@ export const MANIFEST_PATH = path.join(ROOT, 'audio/manifest-tts-v2.json');
 
 /** Angka kanonik cf-c1 §K1, dimutakhirkan m025-177: bank listening tumbuh +109 karakter
  * (414.779 -> 414.888; perbaikan konten skip-integrity-repair), total 604.962 -> 605.071,
- * lalu m025-188 gen2 (+100 kosakata C1 kurasi: word+example masuk korpus) total 605.071 -> 614.055,
  * pending dedup 286.851 -> 286.876 (objek tetap 5.657). Dipaku supaya penyimpangan korpus
  * berikutnya terlihat sebagai gagal uji, bukan lolos diam-diam. */
 export const CANONICAL = Object.freeze({
-  totalChars: 614055,
-  byDomain: Object.freeze({ listening: 414888, book: 101749, vocabulary_word: 13602, vocabulary_example: 74832 }),
+  /** V20 wave-2: bank vocabulary tumbuh 1.765 -> 2.370 kata (+605), sehingga vocabulary_word
+   * 13.602 -> 17.494 dan vocabulary_example 74.832 -> 104.902; total 605.071 -> 639.033,
+   * pending dedup 286.876 -> 320.816 (objek 5.657 -> 6.866). Listening dan book tidak berubah.
+   * m025-192 gen2-union: +70 kosakata C1 kurasi non-duplikat (30 duplikat kata vs wave-2 DIBUANG),
+   * vocabulary_word 17.494 -> 18.065, vocabulary_example 104.902 -> 110.628; total 639.033 -> 645.330. */
+  totalChars: 645330,
+  byDomain: Object.freeze({ listening: 414888, book: 101749, vocabulary_word: 18065, vocabulary_example: 110628 }),
   usdPer1kChars: 0.015,
   bytesPerChar: 925,
   neuronsPerChar: 825000 / 604962,
@@ -62,8 +66,8 @@ export const CANONICAL = Object.freeze({
   // Sesudah dedup kunci v2: 6.640 baris bank ⇒ 5.657 objek unik yang BELUM ada di R2,
   // 286.876 karakter. Ini angka yang benar-benar akan dibayar pada jalan pertama; 604.962
   // adalah ukuran korpus, bukan tagihan. Keduanya dipaku supaya pergeseran bank terlihat.
-  uniqueObjectsPending: 5857,
-  pendingChars: 295860,
+  uniqueObjectsPending: 7006,
+  pendingChars: 327113,
   // Estimasi durasi audio. INI ESTIMASI, bukan pengukuran: 14,5 karakter/detik ≈ 175 kata/menit
   // pada 5,9 karakter/kata, kecepatan bicara aura yang biasa. Dipakai hanya untuk memberi owner
   // rasa "berapa jam audio yang ia beli", tidak dipakai untuk menghitung biaya apa pun.

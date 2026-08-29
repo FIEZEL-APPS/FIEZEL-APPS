@@ -1,5 +1,5 @@
 /* FIEZEL Speaking + Listening sidecar. All selectors are namespaced with .fsl-. */
-.fsl-shell{display:grid;gap:14px}.fsl-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}.fsl-head h1{margin:0;font-size:1.55rem;letter-spacing:-.03em}.fsl-head p{margin:.35rem 0 0;color:var(--muted,#6b5a60);line-height:1.55}.fsl-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.fsl-card{background:var(--panel,#fff);color:var(--text,#1d1114);border:1px solid var(--line,#e9dfe1);border-radius:22px;padding:18px;box-shadow:var(--shadow-sm,0 2px 10px rgba(40,20,26,.05))}.fsl-card h2,.fsl-card h3,.fsl-card p,.fsl-card .fsl-status{color:inherit}.fsl-card h2,.fsl-card h3{margin:.2rem 0 .45rem}.fsl-card p{line-height:1.55}.fsl-kicker{display:block;font-size:.7rem;font-weight:800;letter-spacing:.1em;color:var(--muted-soft,#8a757c);text-transform:uppercase}.fsl-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}
+.fsl-shell{display:grid;gap:14px;grid-template-columns:minmax(0,1fr)}/* v41-F1 2026-08-29: track auto memakai min-content kartu (314px) dan melebarkan dokumen jadi 327px di 320 — minmax(0,1fr) memaksa track mengalah, pola sama dengan launcher-shell v6. */.fsl-shell .fsl-card{min-width:0}.fsl-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}.fsl-head h1{margin:0;font-size:1.55rem;letter-spacing:-.03em}.fsl-head p{margin:.35rem 0 0;color:var(--muted,#6b5a60);line-height:1.55}.fsl-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.fsl-card{background:var(--panel,#fff);color:var(--text,#1d1114);border:1px solid var(--line,#e9dfe1);border-radius:22px;padding:18px;box-shadow:var(--shadow-sm,0 2px 10px rgba(40,20,26,.05))}.fsl-card h2,.fsl-card h3,.fsl-card p,.fsl-card .fsl-status{color:inherit}.fsl-card h2,.fsl-card h3{margin:.2rem 0 .45rem}.fsl-card p{line-height:1.55}.fsl-kicker{display:block;font-size:.7rem;font-weight:800;letter-spacing:.1em;color:var(--muted-soft,#8a757c);text-transform:uppercase}.fsl-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}
 /* m025-110: OWNER melaporkan tombol Lanjut terkubur di bawah blok umpan balik dan
    harus dicari dengan menggulir. Blok umpan balik memuat naskah lengkap, jadi pada
    soal panjang tombolnya berada jauh di luar layar tepat ketika ia paling dibutuhkan.
@@ -105,3 +105,35 @@ body.fz-stage-sl .fsl-feedback{padding-bottom:120px}
 .fsl-mascot-strip{display:flex;justify-content:center;margin:2px 0 6px}
 .fsl-mascot-strip .fsl-mascot-slot{width:46px;height:46px}
 .fsl-mascot-strip .fsl-mascot{width:46px;height:46px}
+
+/* ===== I9 2026-08-28 (O5 §5.3 + Fase 8): sesi dengar = audio pahlawan =====
+   Nilai hanya dari token v6 - tidak ada hex mentah baru di blok ini. */
+/* Ekonomi gem keluar dari zona latihan aktif (O1-002) - markup gemBarMarkup() TETAP
+   (kontrak gems-test.js + tur: #fslGemChip, #fslTranslateToggle), posisinya turun ke
+   kaki kartu dan mengecil. Chip & toggle tetap ≥44px (aturan target sentuh). */
+.fsl-gem-footer{margin-top:14px;padding-top:12px;border-top:1px solid var(--line-soft)}
+.fsl-gem-footer .fsl-gem-bar{margin:0;font-size:.82rem;opacity:.92}
+/* Blok instruksi menyusut: satu baris kecil di bawah soal, bukan paragraf yang bersaing. */
+.fsl-card-listening .fsl-note-compact{margin:4px 0 0;font-size:.72rem;line-height:1.45}
+/* Audio adalah pahlawan: pemutar (maskot dengar + gelombang) dan tombol Dengarkan membesar. */
+.fsl-card-listening h2{margin:.3rem 0 .2rem;font-size:1.28rem;line-height:1.35}
+.fsl-card-listening .fsl-player{margin-top:12px;padding:14px 16px;border-radius:var(--radius-lg)}
+.fsl-card-listening .fsl-mascot-slot{width:48px;height:48px}
+.fsl-card-listening .fsl-mascot-slot .fsl-mascot{width:48px;height:48px}
+.fsl-card-listening .fsl-wave{height:26px}
+.fsl-audio-actions{margin-top:10px}
+.fsl-audio-actions .fsl-play-hero{flex:2 1 auto;min-height:56px;font-size:1.05rem;font-weight:700;border-radius:var(--radius-pill)}
+/* Panggung sesi addon (O1-001, cermin §1.2): topbar + bottomnav global disembunyikan
+   selama item sesi aktif tampil; kelas body dipasang addon di renderSession dan dilepas
+   di renderComplete/exit/renderHub/destroy. Blok Lanjut yang mengambang tidak perlu lagi
+   melompati bottomnav yang sudah tidak ada. */
+body.fz-stage-sl.fsl-session-active .topbar,
+body.fz-stage-sl.fsl-session-active .bottomnav{display:none}
+body.fz-stage-sl.fsl-session-active .fsl-feedback .fsl-actions{bottom:calc(14px + env(safe-area-inset-bottom,0px))}
+body.fz-stage-sl.fsl-session-active .fsl-feedback{padding-bottom:84px}
+/* Pau sudah hadir di pemutar (.fsl-player) sebagai maskot dengar; FAB pembimbing di pojok
+   menutupi teks soal pada 320px dan menjadi Pau KEDUA yang bersaing dengan soal (aturan
+   skill: Pau tidak pernah menghalangi UI). Selama item sesi aktif ia disembunyikan;
+   kembali tampil begitu sesi selesai/keluar karena kelasnya dilepas addon. */
+body.fz-stage-sl.fsl-session-active .fz-coach-peek,
+body.fz-stage-sl.fsl-session-active .fz-coach-bubble{display:none}

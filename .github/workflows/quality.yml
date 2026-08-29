@@ -206,6 +206,25 @@ jobs:
           node fiezel-meta-learning-test.js
           node fiezel-evolution-ledger-test.js
           node fiezel-self-refine-test.js
+          # Gerbang brain-learning-infra (PR #226) + gerbang i18n yang belum terdaftar
+          # (dituntut gate-registry-test: terdaftar atau dikecualikan beralasan).
+          node fiezel-stat-gate-test.js
+          node brain-manifest-test.js
+          node brain-config-test.js
+          node learning-metrics-test.js
+          node metrics-digest-test.js
+          node learning-telemetry-test.js
+          node learning-lane-test.js
+          node app-telemetry-wiring-test.js
+          node analytics-dedup-test.js
+          node analytics-stable-id-guard-test.js
+          node adaptivity-simulation-v3-hardened-test.js
+          node audio-locale-guard-test.js
+          node id-golden-snapshot-test.js
+          node locale-enum-test.js
+          node social-api-contract-test.js
+          node social-frontend-test.js
+          node social-schema-contract-test.js
           node fiezel-evolution-loop-test.js
           node core-worker-contract-test.js
           node learner-evidence-test.js
@@ -475,7 +494,6 @@ jobs:
           node locale-enum-test.js
           node metrics-digest-test.js
           node id-golden-snapshot-test.js
-          node th-coverage-test.js
           node workflow-actor-gate-test.js
           # F5: gerbang meta pendaftaran. Diletakkan PALING AKHIR dengan sengaja — ia
           # membaca berkas workflow ini sendiri dan membandingkannya dengan seluruh
@@ -619,6 +637,17 @@ jobs:
           node speaking-adaptive-test.js
           node srl-coach-test.js
           node cors-envelope-test.js
+      - name: 'Gerbang multilingual Thai m025-186 (didaftarkan saat merge 2026-08-29)'
+        # Ditemukan gate-registry-test.js saat merge work/uiux-overhaul × origin/main
+        # (29 Agu 2026): empat berkas uji Wave 1–4 multilingual Thai mendarat lewat PR #242
+        # tanpa pernah dipanggil CI — pola yang sama persis dengan lima belas gerbang
+        # braincore di step sebelumnya. Keempatnya dijalankan satu per satu lebih dulu dan
+        # exit 0 di pohon merge ini, jadi yang kurang cuma pendaftaran — bukan mutunya.
+        run: |
+          node id-golden-snapshot-test.js
+          node locale-enum-test.js
+          node audio-locale-guard-test.js
+          # th-coverage-test.js dikecualikan registry (kelas gerbang-pra-rilis-fitur, keputusan MASTER 9bf2e13): kontraknya mengikat rilis th, bukan rilis id — didaftarkan ulang sebelum saklar th dinyalakan.
       - name: 'Gerbang simulasi adaptivitas v3 (gate yatim CI — temuan D1, wave D)'
         # adaptivity-simulation-v3.js adalah gate sungguhan (exit code dari main();
         # gate residual + gate kalibrasi bisa merah), tetapi namanya lolos dari pola

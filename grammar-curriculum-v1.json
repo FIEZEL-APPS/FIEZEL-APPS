@@ -18,8 +18,8 @@
     "A2": 28,
     "B1": 52,
     "B2": 39,
-    "C1": 23,
-    "C2": 20
+    "C1": 24,
+    "C2": 19
   },
   "classroomA1SourceLessons": [
     "grammar_a1_articles",
@@ -1636,7 +1636,7 @@
         "second_conditional_unreal_present"
       ],
       "source": "grammar-templates.json",
-      "templateId": "CM-006",
+      "templateId": "CM-008",
       "titleEn": "As if / as though + past for unreal comparisons"
     },
     {
@@ -1858,7 +1858,7 @@
         "necessity_absence_neednt_vs_mustnt"
       ],
       "source": "grammar-templates.json",
-      "templateId": "MO-010",
+      "templateId": "MO-013",
       "titleEn": "Needn't have vs didn't need to"
     },
     {
@@ -1957,7 +1957,7 @@
     },
     {
       "lessonId": "participle_clause",
-      "level": "C2",
+      "level": "C1",
       "sequence": 165,
       "unit": "C2.1",
       "title": "Participle clause: meringkas kalimat dengan -ing dan -ed",
@@ -2053,7 +2053,7 @@
         "implied_conditional_otherwise"
       ],
       "source": "grammar-templates.json",
-      "templateId": "CO-012",
+      "templateId": "CO-013",
       "titleEn": "but for with a noun phrase for unreal conditions"
     },
     {
@@ -2066,7 +2066,7 @@
         "bare_infinitive_after_modal_and_causative_make_let"
       ],
       "source": "grammar-templates.json",
-      "templateId": "MO-011",
+      "templateId": "MO-014",
       "titleEn": "semi-modal daren't with a bare infinitive"
     },
     {
@@ -2080,7 +2080,7 @@
         "perfect_gerund_vs_simple_gerund_time_reference"
       ],
       "source": "grammar-templates.json",
-      "templateId": "GI-009",
+      "templateId": "GI-014",
       "titleEn": "possessive subject of a gerund in formal register"
     },
     {
@@ -2094,7 +2094,7 @@
         "conditional_with_unless_provided_that_as_long_as_distinction"
       ],
       "source": "grammar-templates.json",
-      "templateId": "PR-006",
+      "templateId": "PR-007",
       "titleEn": "marginal prepositions barring notwithstanding pending"
     },
     {
@@ -2122,7 +2122,7 @@
         "double_negative_avoidance_single_negation_rule"
       ],
       "source": "grammar-templates.json",
-      "templateId": "QN-006",
+      "templateId": "QN-007",
       "titleEn": "negated participle clauses with not before -ing"
     },
     {

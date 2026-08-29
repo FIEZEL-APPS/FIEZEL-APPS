@@ -64,7 +64,7 @@ check('ada penjaga partOfSpeechAskable',
 let map = {};
 try { map = vm.runInContext('({...PART_OF_SPEECH_ID})', ctx); } catch (e) { map = {}; }
 check('PART_OF_SPEECH_ID terdefinisi',
-  /const PART_OF_SPEECH_ID=\{/.test(app) && Object.keys(map).length > 0);
+  /const PART_OF_SPEECH_ID=(?:__fzI18nTable\(\{\},\(\)=>\()?\{/.test(app) && Object.keys(map).length > 0);/* v49-F1 2026-08-29: bentuk wrapper refresh-locale ikut sah; nilai tetap dibaca dari runtime VM */
 const missing = [...new Set(V.map(v => String(v.partOfSpeech || '').toLowerCase()))].filter(p => p && !map[p]);
 check('semua partOfSpeech di bank kosakata punya label Bahasa Indonesia',
   missing.length === 0, missing.join(', '));
