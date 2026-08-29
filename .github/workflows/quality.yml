@@ -127,6 +127,11 @@ jobs:
           node th-coverage-test.js
           node boot-order-test.js
           node splash-first-paint-test.js
+          # m025-199: m025-84 memindahkan markup splash ke frame pertama, tetapi peramban
+          # tetap menahan cat sampai style.css (286 KB) berlaku - separuh cacat yang sama
+          # bertahan sampai pemilik melaporkannya lagi. Gerbang ini menjaga separuh kedua,
+          # berikut jaminan tirai tidak terangkat sebelum lembarnya berlaku.
+          node boot-first-paint-nonblocking-test.js
           node splash-choreography-test.js
           node observability-privacy-test.js
           node analytics-privacy-test.js
@@ -205,6 +210,10 @@ jobs:
           node prerequisite-graph-test.js
           node speaking-exam-test.js
           node listening-exam-test.js
+          # m025-198: terjemahan bocor ke soal listening tes penempatan - murid MEMBACA
+          # jawabannya. Gerbang ini menjalankan AudioService asli dari app.js dengan
+          # FiezelVoiceSay tiruan, jadi yang diuji perilaku pintunya, bukan pola teks.
+          node listening-subtitle-suppression-test.js
           node e2e-level-grammar-test.js
           node notification-reminder-test.js
           node remote-push-test.js
