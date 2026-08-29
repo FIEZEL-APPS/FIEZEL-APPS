@@ -53,8 +53,12 @@ const MIG_DOC = path.join(MIG_DIR, 'MIGRATIONS.md');
  * gerbang MERAH.
  */
 function filesByDbFromDoc() {
-  const byDb = { core: [], stats: [] };
-  const alias = { 'fiezel-core': 'core', 'fiezel-stats': 'stats' };
+  // [INFRA-0007-20260829] `learning` masuk peta bersama migrasi 0007_learning.sql
+  // (database ketiga `fiezel-learning`, binding LEARNING_DB). Tanpa entri ini,
+  // 0007 menjadi berkas "tidak terpetakan" dan `semua_berkas_migrasi_terbaca`
+  // merah — arah gagal yang benar; ini perluasan jujurnya.
+  const byDb = { core: [], stats: [], learning: [] };
+  const alias = { 'fiezel-core': 'core', 'fiezel-stats': 'stats', 'fiezel-learning': 'learning' };
   const text = fs.existsSync(MIG_DOC) ? fs.readFileSync(MIG_DOC, 'utf8') : '';
   const re = /d1\s+execute\s+([A-Za-z0-9_-]+)[^\n]*?--file=migrations\/([A-Za-z0-9_.-]+\.sql)/gi;
   let m;
@@ -65,6 +69,7 @@ function filesByDbFromDoc() {
   }
   byDb.core.sort();
   byDb.stats.sort();
+  byDb.learning.sort();
   return byDb;
 }
 
@@ -259,7 +264,11 @@ function tablesFromSql(sqlList) {
 
 const coreSchema = schemaFromMigrations(FILES_BY_DB.core);
 const statsSchema = schemaFromMigrations(FILES_BY_DB.stats);
-const allMigrationTables = new Set([...coreSchema.tables.keys(), ...statsSchema.tables.keys()]);
+// [INFRA-0007-20260829] skema harapan database ketiga (fiezel-learning).
+const learningSchema = schemaFromMigrations(FILES_BY_DB.learning);
+const allMigrationTables = new Set([
+  ...coreSchema.tables.keys(), ...statsSchema.tables.keys(), ...learningSchema.tables.keys()
+]);
 const codeSql = sqlLiteralsFromCode();
 const codeTables = tablesFromSql(codeSql);
 
@@ -267,7 +276,7 @@ const codeTables = tablesFromSql(codeSql);
 // tidak membaca seluruh migrasi, setiap kesimpulan di bawahnya dibangun dari
 // skema yang tidak lengkap (inilah cacat yang membuat `cron_run` "hilang").
 {
-  const mapped = [...FILES_BY_DB.core, ...FILES_BY_DB.stats].sort();
+  const mapped = [...FILES_BY_DB.core, ...FILES_BY_DB.stats, ...FILES_BY_DB.learning].sort();
   const dupes = mapped.filter((f, i) => mapped.indexOf(f) !== i);
   const tidak_terpetakan = SQL_IN_DIR.filter((f) => !mapped.includes(f));
   const dipetakan_tapi_tidak_ada = mapped.filter((f) => !SQL_IN_DIR.includes(f));
@@ -359,9 +368,18 @@ check('inventaris_tabel_belum_dipakai_kode', true, {
 {
   const coreTableNames = new Set(coreSchema.tables.keys());
   const statsTableNames = new Set(statsSchema.tables.keys());
-  const overlap = [...coreTableNames].filter((t) => statsTableNames.has(t));
+  const learningTableNames = new Set(learningSchema.tables.keys());
+  // [INFRA-0007-20260829] tumpang tindih kini diperiksa untuk KETIGA pasangan
+  // database — nama tabel bersama adalah pintu masuk paling murah untuk
+  // menyalin data lintas domain "karena skemanya toh sama".
+  const overlap = [
+    ...[...coreTableNames].filter((t) => statsTableNames.has(t)),
+    ...[...coreTableNames].filter((t) => learningTableNames.has(t)),
+    ...[...statsTableNames].filter((t) => learningTableNames.has(t))
+  ];
   check('dua_database_tidak_punya_tabel_bersama', overlap.length === 0, {
-    core: [...coreTableNames].sort(), stats: [...statsTableNames].sort(), tumpang_tindih: overlap
+    core: [...coreTableNames].sort(), stats: [...statsTableNames].sort(),
+    learning: [...learningTableNames].sort(), tumpang_tindih: overlap
   });
 
   const leaksInStats = [];
@@ -370,6 +388,16 @@ check('inventaris_tabel_belum_dipakai_kode', true, {
   }
   check('ddl_analytics_tanpa_kolom_penghubung', leaksInStats.length === 0, {
     dipindai: [...statsSchema.tables.keys()].sort(), kolom_terlarang: LINKING_COLUMNS, temuan: leaksInStats
+  });
+
+  // [INFRA-0007-20260829] database learning memikul kontrak kolom yang sama
+  // dengan analytics: agregat + dedup UUID acak, nol kolom penghubung.
+  const leaksInLearning = [];
+  for (const [name, t] of learningSchema.tables) {
+    for (const c of t.columns) if (LINKING_COLUMNS.includes(c)) leaksInLearning.push({ tabel: name, kolom: c });
+  }
+  check('ddl_learning_tanpa_kolom_penghubung', leaksInLearning.length === 0, {
+    dipindai: [...learningSchema.tables.keys()].sort(), kolom_terlarang: LINKING_COLUMNS, temuan: leaksInLearning
   });
 
   const leaksInCore = [];
@@ -382,8 +410,15 @@ check('inventaris_tabel_belum_dipakai_kode', true, {
 
   // Tidak boleh ada REFERENCES lintas domain, dan tidak boleh ada ATTACH sama sekali.
   const crossRefs = [];
-  for (const [db, schema] of [['core', coreSchema], ['stats', statsSchema]]) {
-    const foreign = db === 'core' ? statsSchema.tables : coreSchema.tables;
+  // [INFRA-0007-20260829] `foreign` = gabungan tabel DUA database lain, supaya
+  // REFERENCES lintas domain tertangkap di ketiga arah.
+  const SCHEMAS_BY_DB = { core: coreSchema, stats: statsSchema, learning: learningSchema };
+  for (const [db, schema] of Object.entries(SCHEMAS_BY_DB)) {
+    const foreign = new Set();
+    for (const [otherDb, otherSchema] of Object.entries(SCHEMAS_BY_DB)) {
+      if (otherDb === db) continue;
+      for (const t of otherSchema.tables.keys()) foreign.add(t);
+    }
     for (const [name, t] of schema.tables) {
       const refs = t.ddl.match(/REFERENCES\s+([A-Za-z_]\w*)/gi) || [];
       for (const r of refs) {
@@ -653,6 +688,23 @@ const statsRows = renderRows(statsSchema);
     exit: r.code, beda: r.report ? r.report.beda : null
   });
 }
+// [INFRA-0007-20260829] database ketiga ikut dibuktikan dua arah: skema benar
+// harus hijau, dan tabel kuota yang nyasar ke database learning harus merah.
+{
+  const learningRows = renderRows(learningSchema);
+  const r = runChecker('learning', wranglerEnvelope(learningRows));
+  check('pembanding_hijau_untuk_skema_yang_benar_learning', r.code === 0 && r.report && r.report.cocok === true, {
+    exit: r.code, beda: r.report ? r.report.beda : null
+  });
+  const rows = renderRows(learningSchema).concat([{
+    type: 'table', name: 'quota_daily', tbl_name: 'quota_daily',
+    sql: 'CREATE TABLE quota_daily (user_id TEXT, day TEXT, used INTEGER)'
+  }]);
+  const r2 = runChecker('learning', wranglerEnvelope(rows));
+  const kinds = kindsOf(r2);
+  check('pembanding_mendeteksi_tabel_kuota_di_database_learning',
+    r2.code === 1 && kinds.includes('pelanggaran_privasi_tabel'), { exit: r2.code, kinds });
+}
 { // TABEL HILANG
   const rows = coreRows.filter((r) => r.name !== 'quota_reservation');
   const r = runChecker('core', wranglerEnvelope(rows));
@@ -769,7 +821,10 @@ const OWNER_QUERIES = path.join(REPO, 'workers', 'owner', 'queries.js');
 // Lima tabel yang benar-benar ada di fiezel-stats. Dikunci di sini SEBAGAI ANGKA, bukan sebagai
 // daftar yang diambil dari kode owner, supaya menambah tabel tidak bisa lolos hanya karena kode
 // owner ikut diubah. `analytics-privacy-test.js` mengunci sisi database; ini mengunci sisi kueri.
-const STATS_TABLES_EXPECTED = ['dau_dedup', 'metrics_daily', 'pepper_state', 'retention_daily', 'usage_daily'];
+// [INFRA-0006-20260828] batch_dedup masuk daftar: tabel dedup idempoten batch (0006,
+// PR brain-learning-infra) — dua kolom (batch_id acak, day), TTL 48 jam, BUKAN bacaan
+// owner (dilarang seperti dau_dedup/pepper_state), tidak bisa di-join ke identitas.
+const STATS_TABLES_EXPECTED = ['batch_dedup', 'dau_dedup', 'metrics_daily', 'pepper_state', 'retention_daily', 'usage_daily'];
 
 // Tabel yang boleh DIBACA dashboard owner: hanya yang agregat. `dau_dedup` (token per-perangkat)
 // dan `pepper_state` (bahan rahasia HMAC) ada di database yang sama dan justru karena itu harus
@@ -975,11 +1030,16 @@ function ownerQuerySql() {
   {
     const idx = [...statsSchema.indexes.values()].map((i) => ({ nama: i.name, tabel: i.table, kolom: i.columns, berkas: i.file }));
     const fileIdx = [...new Set(idx.map((i) => i.berkas))];
+    // [INFRA-0006-20260828] 0006 diizinkan di sini dengan syarat sempit: satu-satunya
+    // indeksnya (idx_batch_dedup_day) dipakai purge rollup — BUKAN kueri owner — dan
+    // rollup fail-soft (try/catch) di DB yang belum bermigrasi, jadi tidak ada kueri
+    // owner yang bergantung pada migrasi yang belum diterapkan.
     check('indeks_stats_berasal_dari_migrasi_yang_sudah_jalan',
-      fileIdx.every((f) => /000[12]_/.test(f)), {
+      fileIdx.every((f) => /000[126]_/.test(f)), {
         indeks: idx, berkas: fileIdx,
         catatan: '0004_indexes.sql adalah migrasi fiezel-core dan BELUM diterapkan; kueri owner '
-          + 'tidak boleh bergantung padanya. Nol prasyarat indeks baru.'
+          + 'tidak boleh bergantung padanya. 0006 hanya menyumbang indeks purge rollup '
+          + '(fail-soft), bukan prasyarat kueri owner. Nol prasyarat indeks baru.'
       });
   }
 }

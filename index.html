@@ -272,6 +272,36 @@ html.fz-booting body{overflow:hidden}
   <script defer src="./content-canary.js"></script>
   <script defer src="./content-promotion.js"></script>
   <script defer src="./content-canary-config.js"></script>
+  <!-- FIEZEL_I18N_BEGIN — runtime i18n + copy-map per domain (audit v2: AI-02 F01).
+       Urutan di blok ini adalah kontrak: fiezel-i18n.js lebih dulu (mendefinisikan
+       FiezelI18n.t), lalu SEMUA copy-id-<domain>.js, lalu copy-th-<domain>.js — semuanya
+       SEBELUM modul features/* mana pun yang memanggil t() dan SEBELUM app.js. Karena
+       `defer` mempertahankan urutan tulis, cukup tambahkan baris <script defer> berkas
+       copy domain baru DI DALAM blok ini (id dulu, th di bawahnya), lalu minta W1-SW
+       menambahkannya ke precache sw.js. -->
+  <script defer src="./features/i18n/fiezel-i18n.js"></script>
+  <script defer src="./features/i18n/copy-id-core.js"></script>
+  <!-- W2-INT: SEMUA copy-map id Gelombang 2 dimuat di sini — SESUDAH copy-id-core.js,
+       SEBELUM modul features/* dan app.js (kontrak handoff W2-APP-A..D, W2-FEAT-A/B,
+       W2-STATE; modul features non-pure memanggil t() saat definisi tabel, jadi copy
+       yang telat = kunci mentah tampil ke murid). Urutan register antar copy-id bebas
+       (fiezel-i18n.js menolak kunci ganda), tapi urutan tulis ini dipertahankan sama
+       dengan harness tes W2-TEST-A: core → app-a..d → feat-a/b → quota → settings-locale. -->
+  <script defer src="./features/i18n/copy-id-app-a.js"></script>
+  <script defer src="./features/i18n/copy-id-app-b.js"></script>
+  <script defer src="./features/i18n/copy-id-app-c.js"></script>
+  <script defer src="./features/i18n/copy-id-app-d.js"></script>
+  <script defer src="./features/i18n/copy-id-feat-a.js"></script>
+  <script defer src="./features/i18n/copy-id-feat-b.js"></script>
+  <script defer src="./features/i18n/copy-id-gems.js"></script>
+  <script defer src="./features/i18n/copy-id-quota.js"></script>
+  <script defer src="./features/i18n/copy-id-settings-locale.js"></script>
+  <!-- W4-MERGE: aset th TIDAK dimuat statis (copy-th-*, naskah-th-brain, dua dataset th) —
+       semuanya disuntik/difetch DINAMIS oleh pemuat kecil di bawah HANYA saat locale th
+       (AI-13 F02/F05: murid Indonesia nol byte th). Pemuat wajib SETELAH fiezel-i18n.js
+       (butuh getLocale/onChange) dan SEBELUM app.js (app.js memasang FiezelOnThDataReady). -->
+  <script defer src="./features/i18n/fiezel-th-loader.js"></script>
+  <!-- FIEZEL_I18N_END -->
   <script defer src="./features/diagnostics/fiezel-diagnostic-targets.js"></script>
   <script defer src="./features/diagnostics/fiezel-diagnostic-bus.js"></script>
   <script defer src="./features/diagnostics/fiezel-module-selftests.js"></script>
@@ -336,6 +366,25 @@ html.fz-booting body{overflow:hidden}
   <script defer src="./features/brain/fiezel-item-calibration.js"></script>
   <script defer src="./features/brain/fiezel-speaking-adaptive.js"></script>
   <script defer src="./features/brain/fiezel-srl-coach.js"></script>
+  <!-- brain-learning-infra: lima modul infrastruktur belajar (stat-gate, manifest, config,
+       metrik belajar, digest metrik). Pola muat identik dengan modul brain lain: defer,
+       murni fungsi, tanpa jaringan. stat-gate dimuat PERTAMA karena manifest/config/metrik
+       membacanya saat evaluasi; semua pengait di app.js dijaga availability-check +
+       try/catch - berkas yang belum tiba berarti aplikasi berjalan persis seperti hari ini. -->
+  <script defer src="./features/brain/fiezel-stat-gate.js"></script>
+  <script defer src="./features/brain/fiezel-brain-manifest.js"></script>
+  <script defer src="./features/brain/fiezel-brain-config.js"></script>
+  <script defer src="./features/brain/fiezel-learning-metrics.js"></script>
+  <script defer src="./features/brain/fiezel-metrics-digest.js"></script>
+  <!-- brain-learning-infra: lane telemetri belajar (config → events → queue → transport).
+       Urutan penting: transport membaca queue, queue membaca events, semuanya membaca
+       config, jadi config dimuat paling awal. Dimuat SEBELUM app.js dengan pola defer
+       yang sama; pengaitnya di app.js guarded - tanpa berkas ini telemetri diam,
+       aplikasi tidak berubah perilaku. -->
+  <script defer src="./features/telemetry/fiezel-telemetry-config.js"></script>
+  <script defer src="./features/telemetry/fiezel-learning-events.js"></script>
+  <script defer src="./features/telemetry/fiezel-learning-queue.js"></script>
+  <script defer src="./features/telemetry/fiezel-learning-transport.js"></script>
   <script defer src="./features/brand/fiezel-choreography.js"></script>
   <script defer src="./features/audio/fiezel-ui-sfx.js"></script>
   <script defer src="./features/library/fiezel-library.js"></script>
@@ -347,6 +396,10 @@ html.fz-booting body{overflow:hidden}
   <script defer src="./features/speaking-listening/gems-core.js"></script>
   <!-- P1 Prasasti: inti murni lencana bukti (pola gems-core) - dideklarasikan sebelum app.js. -->
   <script defer src="./features/prasasti/fiezel-prasasti-core.js"></script>
+  <!-- SOSIAL (SLOT 7): inti online/teman/papan (pola gems-core: mandiri, tanpa import).
+       Dimuat sebelum app.js supaya kait bukti finishQuiz menemukannya sejak sesi pertama;
+       kalau gagal dimuat, seluruh pengaitnya di app.js guarded dan fitur online diam. -->
+  <script defer src="./features/social/fiezel-social.js"></script>
   <script defer src="./features/speaking-listening/fiezel-speaking-listening-addon.js"></script>
   <script defer src="./fiezel-lazy-loader.js"></script>
 

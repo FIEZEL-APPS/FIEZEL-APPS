@@ -461,6 +461,25 @@
   const scaleAt = (p, sx, sy) =>
     `translate(${p[0]} ${p[1]}) scale(${sx} ${sy}) translate(${-p[0]} ${-p[1]})`;
 
+  /* [P0 rig-repair 2026-08-28, audit O3 §4] Helper transform CSS untuk kanal
+     rotasi/skala tuple. fiezel-motion.css memasang transform-box pada SELURUH
+     turunan rig (:123 fill-box global, :131-137 view-box lengan/telinga/ekor)
+     + transform-origin — dan atribut transform SVG ikut terkena origin CSS,
+     sehingga pivot yang dibake di atribut (rotate(a cx cy)) terpasang DUA KALI
+     (armR pose thinking terlempar ke x=542 pada viewBox 320). Perbaikannya:
+     kanal rotasi/skala ditulis sebagai gaya inline — transform-box:view-box +
+     transform-origin = pivot PIVOTS + fungsi transform polos tanpa pivot —
+     satu model origin dengan sistem keyframe. Kanal translate murni tetap
+     atribut (translate kebal transform-origin). Dibersihkan _rigReset/_costumeReset. */
+  const rotCss = (v) => `rotate(${v}deg)`;
+  const trCss = (x, y) => `translate(${x}px, ${y}px)`;
+  const scCss = (sx, sy) => `scale(${sx}, ${sy})`;
+  const styleAt = (el, p, v) => {
+    el.style.transformBox = "view-box";
+    el.style.transformOrigin = `${p[0]}px ${p[1]}px`;
+    el.style.transform = v;
+  };
+
   class FiezelMascot extends HTMLElement {
     /* [P0-2] connect/disconnect bisa terjadi berulang (appendChild = move
        men-trigger disconnect+connect sinkron). Init DOM hanya sekali,
@@ -749,7 +768,8 @@
           const ok = this.setState("celebrating", { level: 2, hold: 1600, confetti: 38 });
           if (ok) {
             const chest = this.querySelector(".fz-chest");
-            if (chest) chest.setAttribute("transform", scaleAt(PIVOTS.chest, 1.06, 1.06));
+            // [P0 rig-repair] gaya CSS ber-origin, bukan atribut berpivot ganda
+            if (chest) styleAt(chest, PIVOTS.chest, scCss(1.06, 1.06));
           }
           return ok;
         }
@@ -874,7 +894,11 @@
       clr(".fz-ear-l,.fz-ear-r,.fz-arm-l,.fz-arm-r,.fz-tail-base,.fz-tail-tip," +
           ".fz-head,.fz-lid-up,.fz-lid-low,.fz-pupil,.fz-eye-open,.fz-chest," +
           ".fz-blush,.fz-brow-l,.fz-brow-r,.fz-foot-l,.fz-foot-r,.fz-all,.fz-shadow",
-          el => el.removeAttribute("transform"));
+          el => {
+            el.removeAttribute("transform");
+            // [P0 rig-repair] gaya transform inline yang dipasang styleAt/_applyTuple
+            el.style.transform = ""; el.style.transformOrigin = ""; el.style.transformBox = "";
+          });
       // animasi CSS yang sempat dimatikan inline (twitch telinga, nafas)
       clr(".fz-ear-l,.fz-ear-r,.fz-all", el => { el.style.animation = ""; });
       // opacity inline (alis, aksesori, bayangan) & lid kedip yang ditahan
@@ -898,7 +922,11 @@
       clr(".fz-ear-l,.fz-ear-r,.fz-arm-l,.fz-arm-r,.fz-tail-base,.fz-tail-tip," +
           ".fz-head,.fz-lid-up,.fz-lid-low,.fz-pupil,.fz-eye-open,.fz-chest," +
           ".fz-blush,.fz-brow-l,.fz-brow-r,.fz-foot-l,.fz-foot-r,.fz-all,.fz-shadow",
-          el => el.removeAttribute("transform"));
+          el => {
+            el.removeAttribute("transform");
+            // [P0 rig-repair] gaya transform inline yang dipasang styleAt/_applyTuple
+            el.style.transform = ""; el.style.transformOrigin = ""; el.style.transformBox = "";
+          });
       clr(".fz-ear-l,.fz-ear-r,.fz-all,.fz-face,.fz-sweat,.fz-tear",
           el => { el.style.animation = ""; });
       clr(".fz-brows,.fz-acc,.fz-shadow", el => { el.style.opacity = ""; });
@@ -959,25 +987,30 @@
       }
     }
 
-    /** Serialisasi satu tuple (nilai literal 17 R-3) ke atribut/gaya rig. */
+    /** Serialisasi satu tuple (nilai literal 17 R-3) ke atribut/gaya rig.
+     *  [P0 rig-repair 2026-08-28] Kanal rotasi/skala kini gaya CSS inline
+     *  (styleAt) — bukan atribut berpivot bake — supaya tidak berpivot ganda
+     *  di bawah transform-box/transform-origin fiezel-motion.css (O3 §4). */
     _applyTuple(t) {
       const one = (sel) => this.querySelector(sel);
       const setT = (sel, v) =>
         this.querySelectorAll(sel).forEach(el => el.setAttribute("transform", v));
-      // telinga: animasi twitch CSS selalu menang atas atribut → matikan inline
+      const setC = (sel, p, v) =>
+        this.querySelectorAll(sel).forEach(el => styleAt(el, p, v));
+      // telinga: animasi twitch CSS selalu menang atas gaya inline → matikan inline
       if (t.earL != null || t.earR != null) {
         this.querySelectorAll(".fz-ear-l,.fz-ear-r")
           .forEach(el => { el.style.animation = "none"; });
-        if (t.earL != null) setT(".fz-ear-l", rotAt(t.earL, PIVOTS.earL));
-        if (t.earR != null) setT(".fz-ear-r", rotAt(t.earR, PIVOTS.earR));
+        if (t.earL != null) setC(".fz-ear-l", PIVOTS.earL, rotCss(t.earL));
+        if (t.earR != null) setC(".fz-ear-r", PIVOTS.earR, rotCss(t.earR));
       }
       // lengan (rotasi pivot bahu — satu-satunya rotasi yang legal selain
       // telinga/ekor/alis; tubuh tidak pernah dirotasi)
-      if (t.armL != null) setT(".fz-arm-l", rotAt(t.armL, PIVOTS.armL));
-      if (t.armR != null) setT(".fz-arm-r", rotAt(t.armR, PIVOTS.armR));
+      if (t.armL != null) setC(".fz-arm-l", PIVOTS.armL, rotCss(t.armL));
+      if (t.armR != null) setC(".fz-arm-r", PIVOTS.armR, rotCss(t.armR));
       // ekor 2 tulang
-      if (t.tailB != null) setT(".fz-tail-base", rotAt(t.tailB, PIVOTS.tailBase));
-      if (t.tailT != null) setT(".fz-tail-tip", rotAt(t.tailT, PIVOTS.tailTip));
+      if (t.tailB != null) setC(".fz-tail-base", PIVOTS.tailBase, rotCss(t.tailB));
+      if (t.tailT != null) setC(".fz-tail-tip", PIVOTS.tailTip, rotCss(t.tailT));
       // kepala: HANYA translate (aturan mengikat P2)
       if (t.head) setT(".fz-head", trXY(t.head[0], t.head[1]));
       // kelopak parametrik & pupil (di dalam clip per-mata)
@@ -985,21 +1018,22 @@
       if (t.lidLow != null) setT(".fz-lid-low", trXY(0, t.lidLow));
       if (t.pupil) setT(".fz-pupil", trXY(t.pupil[0], t.pupil[1]));
       // eye pop / busung dada / blush — scale di sekitar pusatnya sendiri
-      if (t.pop != null) setT(".fz-eye-open", scaleAt(PIVOTS.eyeCenter, t.pop, t.pop));
-      if (t.chest != null) setT(".fz-chest", scaleAt(PIVOTS.chest, t.chest, t.chest));
+      if (t.pop != null) setC(".fz-eye-open", PIVOTS.eyeCenter, scCss(t.pop, t.pop));
+      if (t.chest != null) setC(".fz-chest", PIVOTS.chest, scCss(t.chest, t.chest));
       if (t.blush != null) {
         const bl = this.querySelectorAll(".fz-blush");
-        if (bl[0]) bl[0].setAttribute("transform", scaleAt(PIVOTS.blushL, t.blush, t.blush));
-        if (bl[1]) bl[1].setAttribute("transform", scaleAt(PIVOTS.blushR, t.blush, t.blush));
+        if (bl[0]) styleAt(bl[0], PIVOTS.blushL, scCss(t.blush, t.blush));
+        if (bl[1]) styleAt(bl[1], PIVOTS.blushR, scCss(t.blush, t.blush));
       }
       // alis: grup muncul bila salah satu sisi didefinisikan; sisi [0,0] = istirahat
+      // (origin = pivot alis; translate lalu rotate polos = translate + rotasi di pivot)
       if (t.browL || t.browR) {
         const g = one(".fz-brows");
         if (g) g.style.opacity = "1";
-        if (t.browL) setT(".fz-brow-l",
-          `${trXY(0, t.browL[0])} ${rotAt(t.browL[1], PIVOTS.browL)}`);
-        if (t.browR) setT(".fz-brow-r",
-          `${trXY(0, t.browR[0])} ${rotAt(t.browR[1], PIVOTS.browR)}`);
+        if (t.browL) setC(".fz-brow-l", PIVOTS.browL,
+          `${trCss(0, t.browL[0])} ${rotCss(t.browL[1])}`);
+        if (t.browR) setC(".fz-brow-r", PIVOTS.browR,
+          `${trCss(0, t.browR[0])} ${rotCss(t.browR[1])}`);
       }
       // mulut
       if (t.mouth) this._setMouth(t.mouth);
@@ -1014,14 +1048,15 @@
         const a = one(".fz-all");
         if (a) {
           a.style.animation = "none";
-          a.setAttribute("transform",
-            `${trXY(t.all.tx || 0, t.all.ty || 0)} ${scaleAt(PIVOTS.ground, t.all.sx ?? 1, t.all.sy ?? 1)}`);
+          // origin inline di titik tanah menang atas 50% 88% / 95% milik kelas state
+          styleAt(a, PIVOTS.ground,
+            `${trCss(t.all.tx || 0, t.all.ty || 0)} ${scCss(t.all.sx ?? 1, t.all.sy ?? 1)}`);
         }
       }
       // kaki: translate + scale di pusat kaki (F1–F4; tanpa rotasi kaki)
       const foot = (sel, f, p) => {
         if (!f) return;
-        setT(sel, `${trXY(f.tx || 0, f.ty || 0)} ${scaleAt(p, f.sx ?? 1, f.sy ?? 1)}`);
+        setC(sel, p, `${trCss(f.tx || 0, f.ty || 0)} ${scCss(f.sx ?? 1, f.sy ?? 1)}`);
       };
       foot(".fz-foot-l", t.footL, PIVOTS.footL);
       foot(".fz-foot-r", t.footR, PIVOTS.footR);
@@ -1029,7 +1064,7 @@
       if (t.shadow) {
         const sh = one(".fz-shadow");
         if (sh) {
-          sh.setAttribute("transform", scaleAt(PIVOTS.ground, t.shadow.s ?? 1, t.shadow.s ?? 1));
+          styleAt(sh, PIVOTS.ground, scCss(t.shadow.s ?? 1, t.shadow.s ?? 1));
           if (t.shadow.o != null) sh.style.opacity = String(t.shadow.o);
         }
       }

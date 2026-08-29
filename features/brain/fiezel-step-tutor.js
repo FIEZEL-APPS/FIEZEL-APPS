@@ -75,14 +75,42 @@
    * tutoring adalah PERTANYAAN, bukan instruksi — murid yang menjawab sendiri belajar
    * lebih dalam daripada murid yang disuruh (retrieval > telling).
    */
-  function askFor(category, stepNo, obj) {
-    var n = 'Langkah ' + stepNo + ': ';
-    if (category === 'identify') return n + 'coba kenali dulu — ' + obj + ' — yang mana di kalimat ini?';
-    if (category === 'select') return n + 'dari petunjuk tadi, ' + obj + ' mana yang paling cocok?';
-    if (category === 'apply') return n + 'sekarang terapkan — ' + obj + ' — jadi bentuk apa?';
-    if (category === 'compare') return n + 'timbang dulu — ' + obj + ' — mana yang lebih sesuai?';
-    if (category === 'eliminate') return n + 'singkirkan yang tidak mungkin — ' + obj + ' — pilihan mana yang gugur?';
-    if (category === 'check') return n + 'periksa lagi — ' + obj + ' — sudah benar?';
+  var NASKAH_ID = Object.freeze({
+    'brain-step.step-prefix': 'Langkah ' + '{n}' + ': ',
+    'brain-step.ask-identify': 'coba kenali dulu — ' + '{obj}' + ' — yang mana di kalimat ini?',
+    'brain-step.ask-select': 'dari petunjuk tadi, ' + '{obj}' + ' mana yang paling cocok?',
+    'brain-step.ask-apply': 'sekarang terapkan — ' + '{obj}' + ' — jadi bentuk apa?',
+    'brain-step.ask-compare': 'timbang dulu — ' + '{obj}' + ' — mana yang lebih sesuai?',
+    'brain-step.ask-eliminate': 'singkirkan yang tidak mungkin — ' + '{obj}' + ' — pilihan mana yang gugur?',
+    'brain-step.ask-check': 'periksa lagi — ' + '{obj}' + ' — sudah benar?',
+    'brain-step.final-combine': 'Sekarang gabungkan langkah-langkah tadi' + '{quoted}' + ' — apa jawabanmu?',
+    'brain-step.final-quoted-stem': ' — j\u0061di j\u0061waban so\u0061lnya: "' + '{stem}' + '"',
+    'brain-step.final-direct': 'Jawab soalnya: "' + '{stem}' + '" — apa jawabanmu?',
+    'brain-step.final-fallback': '\u0041pa jaw\u0061banmu \u0075ntuk so\u0061l ini?'
+  });
+
+  /* Injeksi naskah OPSIONAL (W2-FEAT-A, desain W1-FEAT-A): NASKAH_ID di bawah adalah
+   * baseline byte-identik dengan naskah beku gerbang emas. Pemanggil boleh menitipkan
+   * tabel pengganti per-kunci (mis. terjemahan th yang dirakit app dari copy-map i18n).
+   * Fallback per-kunci: kunci yang tidak ada di tabel titipan jatuh ke NASKAH_ID —
+   * modul ini TIDAK menyentuh lapisan i18n, kemurnian brain dipertahankan (AI-08 F01). */
+  function lineFor(T, key) {
+    return (T && typeof T[key] === 'string') ? T[key] : NASKAH_ID[key];
+  }
+  function fill(text, params) {
+    return String(text).replace(/\{(\w+)\}/g, function (m, name) {
+      return params && Object.prototype.hasOwnProperty.call(params, name) ? String(params[name]) : m;
+    });
+  }
+
+  function askFor(category, stepNo, obj, T) {
+    var n = fill(lineFor(T, 'brain-step.step-prefix'), { n: stepNo });
+    if (category === 'identify') return n + fill(lineFor(T, 'brain-step.ask-identify'), { obj: obj });
+    if (category === 'select') return n + fill(lineFor(T, 'brain-step.ask-select'), { obj: obj });
+    if (category === 'apply') return n + fill(lineFor(T, 'brain-step.ask-apply'), { obj: obj });
+    if (category === 'compare') return n + fill(lineFor(T, 'brain-step.ask-compare'), { obj: obj });
+    if (category === 'eliminate') return n + fill(lineFor(T, 'brain-step.ask-eliminate'), { obj: obj });
+    if (category === 'check') return n + fill(lineFor(T, 'brain-step.ask-check'), { obj: obj });
     // Fallback generik untuk frasa yang tidak dikenal: frasa asli dijadikan pertanyaan
     // apa adanya. Jelek tapi JUJUR — lebih baik daripada mengarang terjemahan yang salah,
     // dan lebih baik daripada melempar error yang mematikan seluruh sesi tutoring.

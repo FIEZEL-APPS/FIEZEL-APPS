@@ -16,6 +16,13 @@
  */
 (function (root) {
   'use strict';
+
+  // i18n (W2-REGEN, pola AI-02 F01): naskah murid modul ini pindah ke
+  // features/i18n/copy-id-feat-a.js; di Node copy-map di-require agar nilai 'id'
+  // tetap SATU sumber byte-identik dengan naskah beku gerbang emas.
+  var I18N = (typeof FiezelI18n !== 'undefined') ? FiezelI18n
+    : ((typeof module === 'object' && module.exports) ? require('../i18n/copy-id-feat-a.js') : null);
+  function t(key, params) { return I18N ? I18N.t(key, params) : String(key); }
   if (!root || !root.document || root.__fiezelLibraryUiInstalled) return;
   root.__fiezelLibraryUiInstalled = true;
 
@@ -240,7 +247,7 @@
     if (!button) return;
     var rate = currentRate();
     button.textContent = speedLabel(rate);
-    button.setAttribute('aria-label', 'Kecepatan suara ' + speedLabel(rate) + ', ketuk untuk mengganti');
+    button.setAttribute('aria-label', 'Kecepatan suara ' + speedLabel(rate) + t('pustaka.tap-for-mengganti'));
     button.dataset.rate = String(rate);
   }
 
@@ -250,7 +257,7 @@
       try { root.setNeuralRatePreference(wanted); } catch (_) {}
     }
     renderSpeedButton();
-    setStatus('Kecepatan suara ' + speedLabel(currentRate()) + '. Berlaku dari kalimat berikutnya.');
+    setStatus('Kecepatan suara ' + speedLabel(currentRate()) + t('pustaka.berlaku-from-kalimat-upcoming'));
   }
 
   // Slider Settings memakai fungsi tulis yang sama, jadi satu pendengar cukup untuk
@@ -480,7 +487,7 @@
         clearHighlightTimers();
         narrating = false;
         session.pause();
-        setStatus('Suara tidak bisa dimuat. Periksa koneksi lalu tekan putar lagi.');
+        setStatus(t('pustaka.suara-tidak-bisa-dimuat'));
         updatePlayButton();
         return;
       }
@@ -495,7 +502,7 @@
         saveProgress();
         highlight(total - 1, true);
         narrating = false;
-        setStatus('Selesai. Buku ini sudah dibacakan sampai habis.');
+        setStatus(t('pustaka.finish-buku-this-done'));
         updatePlayButton();
         return;
       }
@@ -522,7 +529,7 @@
     }).join('');
     return '<section class="fade library-page"><div class="section-head"><div>' +
       '<span class="section-kicker">FIEZEL LIBRARY</span><h1>Perpustakaan</h1>' +
-      '<p>Dongeng dan novel pendek dengan audiobook dan terjemahan sekali ketuk. Ketuk kalimat mana pun untuk melihat artinya.</p>' +
+      t('pustaka.dongeng-dan-novel-pendek') +
       '</div></div><div class="library-grid">' + cards + '</div></section>';
   }
 
@@ -548,8 +555,8 @@
       '<div class="library-dock">' +
       '<div class="library-progress-line"><span id="libraryBar" style="width:' + snap.percent + '%"></span></div>' +
       '<div class="library-dock-line">' +
-      '<button type="button" class="library-speed" id="librarySpeed" aria-label="Kecepatan suara ' + esc(speedLabel(currentRate())) + ', ketuk untuk mengganti" data-rate="' + esc(currentRate()) + '">' + esc(speedLabel(currentRate())) + '</button>' +
-      '<p class="library-status" id="libraryStatus">Ketuk kalimat untuk arti, atau putar audiobook.</p>' +
+      '<button type="button" class="library-speed" id="librarySpeed" aria-label="Kecepatan suara ' + esc(speedLabel(currentRate())) + t('pustaka.tap-for-mengganti-data') + esc(currentRate()) + '">' + esc(speedLabel(currentRate())) + '</button>' +
+      t('pustaka.tap-kalimat-for-arti') +
       '</div>' +
       '<div class="library-controls">' +
       '<button type="button" id="libraryPrev" data-step="-1" aria-label="Kalimat sebelumnya"><i data-lucide="chevron-left"></i></button>' +
@@ -665,7 +672,7 @@
       try { nav.pushLayer({ id: READER_LAYER, close: closeReaderLayer }); } catch (_) {}
     }
     var progress = session.progressFor(bookId);
-    if (progress.percent) setStatus('Lanjut dari kalimat ' + (session.snapshot().sentenceIndex + 1) + '.');
+    if (progress.percent) setStatus(t('pustaka.next-from-kalimat') + (session.snapshot().sentenceIndex + 1) + '.');
     // m026-03: tur kontekstual pembaca, sekali saja per murid. Modul ini tidak tahu apa pun
     // tentang bendera tur, state, atau save() - ia hanya memberi tahu host bahwa pembaca baru
     // tergambar, dan host yang memutuskan. Gagalnya diam: tur adalah lapisan paling boleh
@@ -700,9 +707,9 @@
     layer.id = 'libraryTranslation';
     layer.className = 'library-translation-layer';
     layer.setAttribute('role', 'dialog');
-    layer.setAttribute('aria-label', 'Terjemahan kalimat');
+    layer.setAttribute('aria-label', t('pustaka.translate-kalimat'));
     layer.innerHTML = '<div class="library-translation-card">' +
-      '<span class="library-translation-mark">TERJEMAHAN</span>' +
+      t('pustaka.translate') +
       '<p class="library-translation-en">' + esc(picked.en) + '</p>' +
       '<p class="library-translation-id">' + esc(picked.id) + '</p>' +
       '<div class="library-translation-actions">' +
@@ -821,10 +828,10 @@
     ai.then(function (text) {
       var answer = String(text || '').trim();
       if (!answer && dialog) answer = dialog.respond(question, context, memory()).id;
-      if (!answer) answer = 'Fiezel belum bisa menjawab pertanyaan itu sekarang.';
+      if (!answer) answer = t('pustaka.fiezel-pending-can-menjawab');
       showAskAnswer(answer);
       return speakAnswer(answer);
-    }).catch(function () { showAskAnswer('Fiezel belum bisa menjawab pertanyaan itu sekarang.'); });
+    }).catch(function () { showAskAnswer(t('pustaka.fiezel-pending-can-menjawab')); });
   }
 
   var askMemory = null;
@@ -854,7 +861,7 @@
       await ensurePack();
       renderShelf();
     } catch (error) {
-      node.innerHTML = '<section class="fade library-page"><div class="card"><b>Perpustakaan belum bisa dimuat.</b>' +
+      node.innerHTML = t('pustaka.perpustakaan-pending-can-dimuat') +
         '<p class="muted">' + esc((error && error.message) || error) + '</p></div></section>';
     }
   }

@@ -482,7 +482,7 @@ function bootApp() {
   const index = new Map();
   (function walk(dir) {
     for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
-      if (['node_modules', '.git', 'vendor', 'assets', 'docs'].includes(e.name)) continue;
+      if (['node_modules', '.git', 'vendor', 'assets', 'docs', '.audit-tmp'].includes(e.name)) continue; // .audit-tmp: release-audit.py sets TMPDIR=ROOT/.audit-tmp; leftover adoption/rehearsal snapshots there shadow the canonical root data files in this basename index (precedent: level-grammar-contract-test.js)
       const full = path.join(dir, e.name);
       if (e.isDirectory()) walk(full); else if (!index.has(e.name)) index.set(e.name, full);
     }
@@ -506,7 +506,7 @@ function bootApp() {
   context.window = context; context.self = context;
   context.FIEZEL_VERSION = readJson('VERSION.json').version;
   context.window.scrollTo = () => {}; context.window.requestAnimationFrame = fn => fn();
-  vm.createContext(context);
+  vm.createContext(context);/* Harness i18n (pola W1-TESTPLAN 2b, hotfix CI pasca-#242 lanjutan: tiga harness terlewat bac8b8d): app.js kini memanggil FiezelI18n.t saat evaluasi, jadi runtime i18n + copy-id dimuat dulu. existsSync = hijau dua arah. */const __i18n=path.join(root,'features','i18n','fiezel-i18n.js');if(fs.existsSync(__i18n)){vm.runInContext(fs.readFileSync(__i18n,'utf8'),context,{filename:'fiezel-i18n.js'});for(const __n of fs.readdirSync(path.join(root,'features','i18n')).filter(n=>/^copy-id-.*\.js$/.test(n)).sort()){vm.runInContext(fs.readFileSync(path.join(root,'features','i18n',__n),'utf8'),context,{filename:__n});}}
   vm.runInContext(app, context, { filename: 'app.js' });
   return context;
 }
@@ -545,13 +545,16 @@ function auditGrammarRuntime(ctx, templates) {
     // Semua teks metadata milik template ini sendiri, untuk memisahkan "kebetulan sama"
     // dari "benar-benar dipinjam".
     const ownText = new Set();
-    {
-      const e = t.explanation || {};
-      for (const v of [t.pedagogicalObjective, t.misconceptionTargeted, t.reasoningOperation, t.pedagogicalObjectiveId, t.misconceptionTargetedId, t.reasoningOperationId,
+    // V20 (wave-2, desain multi-templat per lesson): questions kini datang dari SEMUA templat
+    // se-lesson, jadi "teks milik sendiri" = union metadata seluruh sibling satu subskill.
+    for (const sib of templates) {
+      if (sib.subskill !== t.subskill) continue;
+      const e = sib.explanation || {};
+      for (const v of [sib.pedagogicalObjective, sib.misconceptionTargeted, sib.reasoningOperation, sib.pedagogicalObjectiveId, sib.misconceptionTargetedId, sib.reasoningOperationId,
         e.whyCorrect, e.rule, e.whyOthersFail, e.howToAvoid, e.memoryCue, e.whyCorrectId, e.ruleId, e.whyOthersFailId, e.howToAvoidId, e.memoryCueId]) if (v) ownText.add(norm(v));
-      for (const d of t.distractors || []) for (const v of [d.whyFails, d.whyFailsId, d.misconception, d.misconceptionId]) if (v) ownText.add(norm(v));
+      for (const d of sib.distractors || []) for (const v of [d.whyFails, d.whyFailsId, d.misconception, d.misconceptionId]) if (v) ownText.add(norm(v));
       // m025-155: teks gabungan milik lesson sendiri (teach_back/mastery_check) juga sah.
-      for (const [a, b] of [[t.pedagogicalObjective, e.rule], [t.pedagogicalObjectiveId, e.ruleId], [e.howToAvoid, e.memoryCue], [e.howToAvoidId, e.memoryCueId]]) if (a && b) ownText.add(norm(`${a} ${b}`));
+      for (const [a, b] of [[sib.pedagogicalObjective, e.rule], [sib.pedagogicalObjectiveId, e.ruleId], [e.howToAvoid, e.memoryCue], [e.howToAvoidId, e.memoryCueId]]) if (a && b) ownText.add(norm(`${a} ${b}`));
     }
     let questions = [];
     try { questions = ctx.buildGrammarLessonQuestions(t.subskill, 25) || []; }
@@ -573,6 +576,10 @@ function auditGrammarRuntime(ctx, templates) {
       for (const o of q.options || []) {
         const src = owner.get(norm(o));
         if (!src || src.id === q.sourceId) continue;
+        // V20: teks yang memang ada di metadata lesson ini sendiri bukan pinjaman — owner map
+        // first-wins salah-atribusi saat templat baru memuat teks identik dgn templat lama
+        // (prinsip yang sama dgn escape ownText di cek provenance di bawah).
+        if (ownText.has(norm(o))) continue;
         if (src.family === t.family) continue;
         // A family with fewer than four members cannot supply three sibling distractors, so
         // borrowing from another family at the SAME CEFR band is the least-bad fallback and
@@ -654,7 +661,7 @@ function auditGrammarRuntime(ctx, templates) {
           }
         }
       }
-      if (q.sourceId && q.sourceId !== t.id) {
+      if (q.sourceId && q.sourceId !== t.id && !templates.some(p => p.subskill === t.subskill && String(p.id) === String(q.sourceId))) {
         critical('grammar', 'CONCEPT_IDENTITY_LOST', t.id, `question claims sourceId=${q.sourceId} inside lesson ${t.subskill}`);
       }
     }

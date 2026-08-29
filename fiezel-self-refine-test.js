@@ -14,7 +14,8 @@ const INSIGHT={id:'ins-001',domain:'vocabulary',itemId:canonical.vocabulary[0].i
 const V0=canonical.vocabulary[0];
 const AI_OUTPUT=(()=>{const base=V0.example.replace(/[.!?]+$/,'');const example=`${base}, which gives the sentence clearer context.`;return{text:'dummy',model:'test-model',generatedAt:'2026-08-14T00:00:00Z',meaning:V0.meaning,example,meanings:V0.meanings,examples:V0.examples.map((x,i)=>i===0?{en:example,id:x.id}:x),synonyms:V0.synonyms,antonyms:V0.antonyms,collocations:V0.collocations,topic:V0.topic,status:V0.status,needsReviewReason:V0.needsReviewReason,rationale:'expand context'}})();
 const PATCH_ID=`sr-ins-001-${patchGate.itemSha(INSIGHT.itemId).slice(0,8)}`;
-const EVIDENCE={schema:'fiezel-content-canary-evidence-v1',canaryId:PATCH_ID,exposureSessions:5,controlAttempts:10,controlCorrect:9,canaryAttempts:10,canaryCorrect:9,privacy:{rawAnswersIncluded:false,rawHistoryIncluded:false}};
+// [WAVE2-20260828] fixture diperbesar: gate promosi kini statistik (fiezel-stat-gate), 10 attempt/lengan = underpowered -> hold. 400/lengan cukup untuk verdict non-inferior.
+const EVIDENCE={schema:'fiezel-content-canary-evidence-v1',canaryId:PATCH_ID,exposureSessions:5,controlAttempts:400,controlCorrect:300,canaryAttempts:400,canaryCorrect:328,privacy:{rawAnswersIncluded:false,rawHistoryIncluded:false}};
 {
   const r=run({config:{autonomyLevel:'advisory'},patchGate,library:LIB,promotion,insight:INSIGHT,aiOutput:AI_OUTPUT});
   check('advisory holds before refine',!r.ok&&r.decision==='hold'&&r.reason==='advisory_mode_no_refine',JSON.stringify(r));
