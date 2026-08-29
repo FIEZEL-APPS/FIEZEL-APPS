@@ -110,6 +110,7 @@
     { file: 'fiezel-misconception-ledger.js', global: 'FiezelMisconceptionLedger', schema: 'fiezel-misconception-ledger-v1', authorityKey: 'misconceptionPrior' },
     { file: 'fiezel-olm.js', global: 'FiezelOLM', schema: 'fiezel-olm-v1', authorityKey: 'olmInsight' },
     { file: 'fiezel-production-grader.js', global: 'FiezelProductionGrader', schema: 'fiezel-production-grader-v1', authorityKey: 'productionGrader' },
+    { file: 'fiezel-retention-probe.js', global: 'FiezelPostTest', schema: 'fiezel-post-test-v1', authorityKey: 'retentionProbe' },
     { file: 'fiezel-speaking-adaptive.js', global: 'FiezelSpeakingAdaptive', schema: 'fiezel-speaking-adaptive-v1', authorityKey: 'speakingPolicy' },
     { file: 'fiezel-srl-coach.js', global: 'FiezelSrlCoach', schema: 'fiezel-srl-coach-v1', authorityKey: 'srlCoach' },
     { file: 'fiezel-stat-gate.js', global: 'FiezelStatGate', schema: null, authorityKey: 'statGate' },
@@ -147,6 +148,9 @@
     listeningPolicy: 'shadow',
     stepTutor: 'off',
     productionGrader: 'off',
+    // Wave E4 (29 Agu): probe retensi tertunda — modul murni baru, belum ada pemanggil
+    // di app.js; rekomendasi half-life-nya ADVISORY dan tidak menulis memori: 'off'.
+    retentionProbe: 'off',
     // Registry konfigurasi (fiezel-brain-config.js) menyatakan sendiri bahwa ia TIDAK
     // dibaca modul lain saat runtime dan tidak dimuat index.html — sumber kebenaran
     // untuk manusia/tooling, bukan jalur keputusan: jujurnya 'off'.
