@@ -46,7 +46,7 @@ const signature=q=>String(q.question).toLowerCase().replace(/\s+/g,' ').trim()+'
 
 setTimeout(()=>{try{
   const skills=grammar.templates.map(x=>x.subskill);
-  assert(new Set(skills).size===grammar.count,'grammar skill fixture contains duplicate or undeclared lessons');
+  assert(grammar.templates.length===grammar.count&&new Set(grammar.templates.map(x=>x.id)).size===grammar.count,'grammar skill fixture contains duplicate or undeclared lessons');
   const runtimeState=context.__getFiezelState();
   const previousActiveLevel=runtimeState.preferences.activeLevel||'';
   const previousLevelMode=runtimeState.preferences.levelMode||'placement';
@@ -62,10 +62,11 @@ setTimeout(()=>{try{
     assert(new Set(questions.map(q=>q.question)).size===25,`${skill} repeats question wording across practice modes`);
     assert(questions.every(q=>context.__fiezelAudit.validateQuestion(q).ok),`${skill} contains an invalid question`);
     assert(questions.every(q=>q.lessonSkill===skill),`${skill} lost its lesson identity`);
-    assert(questions.every(q=>q.skill===skill&&q.sourceId===template.id&&q.conceptId===template.id),`${skill} leaks a peer concept into the lesson`);
+    const lessonIds=new Set(grammar.templates.filter(t=>t.subskill===skill).map(t=>t.id));
+    assert(questions.every(q=>q.skill===skill&&lessonIds.has(q.sourceId)&&lessonIds.has(q.conceptId)),`${skill} leaks a peer concept into the lesson`);
     assert(new Set(questions.map(q=>q.practiceMode)).size===25&&expectedModes.every(mode=>questions.some(q=>q.practiceMode===mode)),`${skill} does not cover all 25 pedagogical modes`);
     for(const q of questions){
-      const sig=signature(q);assert(!globalSignatures.has(sig),`${skill} repeats a runtime question from ${globalSignatures.get(sig)}`);globalSignatures.set(sig,skill);
+      const sig=signature(q);const prevOwner=globalSignatures.get(sig);assert(!prevOwner||prevOwner===skill,`${skill} repeats a runtime question from ${prevOwner}`);globalSignatures.set(sig,skill);
       const owner=sourceOwners.get(q.sourceId);assert(!owner||owner===skill,`${skill} reuses source concept ${q.sourceId} from ${owner}`);sourceOwners.set(q.sourceId,skill);
     }
     const explanation=questions.map(q=>JSON.stringify(q.explain)).join(' ');

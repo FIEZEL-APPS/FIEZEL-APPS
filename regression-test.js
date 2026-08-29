@@ -65,8 +65,8 @@ assert(/passage:\{id:r\.id/.test(app),'reading questions do not carry their pass
 assert((/q\.passage\?card\(.*TEKS BACAAN/s.test(app)||(/q\.passage\?card\(.*FiezelI18n\.t\('quiz\.teks-bacaan'\)/s.test(app)&&/'quiz\.teks-bacaan'\s*:\s*'TEKS BACAAN'/.test(copyIdUnion))),'quiz renderer does not show passage with reading question');
 assert(/const readiness=diagnosticReadinessMap\(state\)/.test(app)&&/state\.adaptiveReady=!!readiness\[getActiveLevel\(state\)\]/.test(app),'adaptive readiness must be evidence-based, per active level');
 assert(/window\.__getFiezelState/.test(app),'test state hook missing');
-assert(V.length===1765,'active vocabulary master count changed unexpectedly');
-assert(V.filter(v=>v.status==='complete').length===1765,'active vocabulary contains incomplete records');
+assert(V.length===2370,'active vocabulary master count changed unexpectedly');
+assert(V.filter(v=>v.status==='complete').length===2370,'active vocabulary contains incomplete records');
 assert(V.some(v=>v.level==='C2'&&v.status==='complete'),'C2 vocabulary is missing');
 assert(Object.keys(G).length===153,'grammar skills changed unexpectedly');
 assert(R.length===300,'reading bank unexpectedly reduced');
