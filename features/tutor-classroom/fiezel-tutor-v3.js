@@ -181,8 +181,52 @@
     ];
   }
 
-  function strategyAnswer(kind, lesson, reason) {
+  function lessonBoard(lesson, fallbackTitle) {
+    return {
+      title: (lesson && lesson.board && lesson.board.title) || (lesson && lesson.topic) || fallbackTitle,
+      formula: (lesson && lesson.board && lesson.board.formula) || '',
+      examples: (lesson && lesson.board && lesson.board.examples) || []
+    };
+  }
+
+  function isPresentPerfect(lesson) {
+    return !!lesson && lesson.id === 'grammar_present_perfect';
+  }
+
+  // Remediasi harus bicara tentang PELAJARAN YANG SEDANG DIBUKA, bukan selalu present
+  // perfect (A11-01). Untuk 37 pelajaran lain, inti penjelasan diambil dari field
+  // remediate/explain milik soal yang barusan salah; strategi hanya membingkai caranya.
+  function strategyAnswer(kind, lesson, reason, question) {
     var topic = lesson ? lesson.topic : 'this idea';
+    if (!isPresentPerfect(lesson)) {
+      var rem = question && question.remediate ? question.remediate : null;
+      var exp = question && question.explain ? question.explain : null;
+      var coreEn = (rem && rem.en) || (exp && exp.en) || reason || ('Look again at the rule for ' + topic + '.');
+      var coreId = (rem && rem.id) || (exp && exp.id) || 'Coba lihat lagi aturan pelajaran ini.';
+      var board = lessonBoard(lesson, topic);
+      if (kind === 'timeline') {
+        return {
+          strategy: kind,
+          en: 'Slow down and check the order of ideas first. ' + coreEn,
+          id: 'Pelan-pelan, cek dulu urutan idenya. ' + coreId,
+          board: board
+        };
+      }
+      if (kind === 'form-map') {
+        return {
+          strategy: kind,
+          en: 'Look closely at the form of each word. ' + coreEn,
+          id: 'Perhatikan bentuk tiap katanya. ' + coreId,
+          board: board
+        };
+      }
+      return {
+        strategy: 'intuition',
+        en: 'Think about the meaning first, not the rule name. ' + coreEn,
+        id: 'Rasakan dulu maknanya, jangan nama aturannya. ' + coreId,
+        board: board
+      };
+    }
     if (kind === 'timeline') {
       return {
         strategy: kind,
@@ -225,16 +269,24 @@
       };
     }
     if (/why|kenapa|mengapa|beda|difference/.test(low)) {
+      if (isPresentPerfect(lesson)) {
+        return {
+          en: "The useful question is not only when the action happened. Ask whether the result is still connected to now. If yes, present perfect often becomes the better choice.",
+          id: 'Pertanyaan yang berguna bukan cuma kapan kejadiannya. Tanyakan juga: hasilnya masih terasa sekarang, nggak? Kalau iya, present perfect biasanya lebih pas.',
+          board: { title: 'Meaning first', formula: 'past action + present relevance', examples: ['result still matters now'] }
+        };
+      }
       return {
         en: "The useful question is not only when the action happened. Ask whether the result is still connected to now. If yes, present perfect often becomes the better choice.",
         id: T('tutorv3.script-9'),
         board: { title: 'Meaning first', formula: 'past action + present relevance', examples: ['result still matters now'] }
       };
     }
+    var coreIdea = lesson ? lesson.topic : 'the current rule';
     return {
-      en: "Let's connect your question to the lesson checkpoint. The core idea here is the link between an earlier action and the situation now. We can use that idea to test your example.",
-      id: 'Kita hubungkan pertanyaanmu dengan checkpoint pelajaran. Intinya adalah hubungan antara tindakan sebelumnya dan situasi sekarang. Kita bisa memakai ide itu untuk menguji contohmu.',
-      board: { title: lesson ? lesson.topic : 'Lesson checkpoint', formula: 'earlier action → present meaning', examples: [q.slice(0, 80)] }
+      en: "Let's connect your question to the lesson checkpoint. The core idea here is " + coreIdea + '. We can use that idea to test your example.',
+      id: 'Kita hubungkan pertanyaanmu dengan checkpoint pelajaran. Inti pelajaran ini: ' + coreIdea + '. Kita pakai ide itu untuk menguji contohmu.',
+      board: { title: coreIdea, formula: (lesson && lesson.board && lesson.board.formula) || 'idea \u2192 example', examples: [q.slice(0, 80)] }
     };
   }
 
@@ -376,7 +428,7 @@
         tagMisconception(q);
         state.remediating = true;
         result.retry = true;
-        var alt = strategyAnswer(STRATEGIES[state.strategyIndex], lesson(), q.remediate && q.remediate.en);
+        var alt = strategyAnswer(STRATEGIES[state.strategyIndex], lesson(), q.remediate && q.remediate.en, q);
         result.feedback = { en: alt.en, id: alt.id, board: alt.board, strategy: alt.strategy };
       } else {
         tagMisconception(q);
@@ -392,7 +444,7 @@
 
     function confused() {
       state.strategyIndex = (state.strategyIndex + 1) % STRATEGIES.length;
-      var alt = strategyAnswer(STRATEGIES[state.strategyIndex], lesson(), 'make the same idea easier to see');
+      var alt = strategyAnswer(STRATEGIES[state.strategyIndex], lesson(), 'make the same idea easier to see', currentQuestion());
       state.feedback = { en: alt.en, id: alt.id, board: alt.board, strategy: alt.strategy };
       return clone(state.feedback);
     }

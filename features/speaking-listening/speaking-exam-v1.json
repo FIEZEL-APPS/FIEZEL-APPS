@@ -186,6 +186,44 @@
         "What do you enjoy most about it?",
         "Has your daily routine changed in the last year?",
         "Would you like to live in a different city?"
+      ],
+      "targetConcepts": [
+        [
+          "study",
+          "studying",
+          "school",
+          "university",
+          "work",
+          "working",
+          "job"
+        ],
+        [
+          "enjoy",
+          "like",
+          "love",
+          "favorite",
+          "favourite"
+        ],
+        [
+          "because",
+          "since",
+          "reason"
+        ],
+        [
+          "changed",
+          "change",
+          "changes",
+          "different",
+          "the same"
+        ],
+        [
+          "would like",
+          "want to",
+          "i want",
+          "hope to",
+          "would love",
+          "plan to"
+        ]
       ]
     },
     {
@@ -278,6 +316,38 @@
         "Why do some people give up on a skill halfway?",
         "Should schools teach practical skills as well as academic subjects?",
         "Is it easier to learn new skills as an adult than it used to be?"
+      ],
+      "targetConcepts": [
+        [
+          "because",
+          "since",
+          "reason"
+        ],
+        [
+          "progress",
+          "improve",
+          "improving",
+          "improvement",
+          "results"
+        ],
+        [
+          "should",
+          "ought to",
+          "need to"
+        ],
+        [
+          "though",
+          "although",
+          "but",
+          "while"
+        ],
+        [
+          "however",
+          "but",
+          "though",
+          "although",
+          "on the other hand"
+        ]
       ]
     },
     {
@@ -308,6 +378,45 @@
         "Should young people always follow their parents' advice about their future?",
         "How much should a person's career be shaped by what their country needs?",
         "Do people regret decisions more when others warned them?"
+      ],
+      "targetConcepts": [
+        [
+          "would not",
+          "wouldnt",
+          "would never",
+          "i dont think",
+          "do not think"
+        ],
+        [
+          "because",
+          "since",
+          "reason",
+          "reasons",
+          "judging from",
+          "that is why"
+        ],
+        [
+          "however",
+          "but",
+          "though",
+          "although",
+          "on the other hand",
+          "yet"
+        ],
+        [
+          "tends to",
+          "tend to",
+          "usually",
+          "often",
+          "generally"
+        ],
+        [
+          "though",
+          "although",
+          "but",
+          "however",
+          "still"
+        ]
       ]
     },
     {
@@ -333,7 +442,43 @@
       "privacy": {
         "persistRawAudio": false,
         "persistRawTranscript": false
-      }
+      },
+      "targetConcepts": [
+        [
+          "i think",
+          "i believe",
+          "in my opinion",
+          "for me",
+          "i agree",
+          "i disagree"
+        ],
+        [
+          "reason",
+          "reasons"
+        ],
+        [
+          "for example",
+          "for instance",
+          "example",
+          "instance",
+          "such as",
+          "in my case",
+          "my cousin",
+          "my friend"
+        ],
+        [
+          "second",
+          "secondly",
+          "also",
+          "another",
+          "in addition"
+        ],
+        [
+          "because",
+          "since",
+          "the main reason"
+        ]
+      ]
     },
     {
       "id": "speakx_0008",
@@ -358,7 +503,44 @@
       "privacy": {
         "persistRawAudio": false,
         "persistRawTranscript": false
-      }
+      },
+      "targetConcepts": [
+        [
+          "disagree",
+          "agree",
+          "oppose",
+          "against",
+          "support"
+        ],
+        [
+          "first",
+          "firstly",
+          "one reason",
+          "to begin with"
+        ],
+        [
+          "second",
+          "secondly",
+          "also",
+          "another"
+        ],
+        [
+          "for example",
+          "for instance",
+          "example",
+          "such as",
+          "in my experience",
+          "at my school",
+          "my old school"
+        ],
+        [
+          "keep",
+          "would keep",
+          "still use",
+          "stay",
+          "remain"
+        ]
+      ]
     },
     {
       "id": "speakx_0009",
@@ -385,7 +567,42 @@
         "persistRawTranscript": false
       },
       "sourceText": "PENGUMUMAN UNIVERSITAS: Mulai semester depan, delapan ruang belajar kecil di lantai satu perpustakaan akan digabung menjadi satu area kerja kelompok. Alasannya: permintaan ruang kelompok meningkat, dan ruang kecil sering dipakai satu orang saja.\n\nTANGGAPAN MAHASISWA (tertulis): \"I don't think this is a good idea. Those small rooms are the only quiet place left in the evening - the main hall gets loud after six, and I can't do close reading there. And honestly, the reason they gave doesn't match what I see. There's already a group area on the second floor and it's half empty most nights. If group space were really that scarce, that floor would be full.\"",
-      "sourceNote": "ADAPTASI: percakapan mahasiswa aslinya berupa audio; di sini disajikan tertulis."
+      "sourceNote": "ADAPTASI: percakapan mahasiswa aslinya berupa audio; di sini disajikan tertulis.",
+      "targetConcepts": [
+        [
+          "disagrees",
+          "disagree",
+          "against",
+          "does not agree",
+          "doesnt agree",
+          "opposes",
+          "not a good idea"
+        ],
+        [
+          "first",
+          "firstly",
+          "one reason"
+        ],
+        [
+          "second",
+          "secondly",
+          "also",
+          "another"
+        ],
+        [
+          "reason",
+          "reasons"
+        ],
+        [
+          "because",
+          "since",
+          "so",
+          "she says",
+          "he says",
+          "she argues",
+          "he argues"
+        ]
+      ]
     },
     {
       "id": "speakx_0010",
@@ -412,7 +629,44 @@
         "persistRawTranscript": false
       },
       "sourceText": "BACAAN - Sunk Cost Fallacy: kecenderungan meneruskan sebuah usaha berdasarkan apa yang SUDAH dikeluarkan (uang, waktu, tenaga), bukan berdasarkan manfaat yang masih bisa didapat. Biaya yang sudah keluar tidak bisa ditarik kembali, sehingga secara logis ia tidak relevan untuk keputusan berikutnya.\n\nKULIAH (tertulis): \"Let me give you two examples. A software company I consulted for had spent four years on a platform. The engineers said plainly that the architecture would not scale. Management approved two more years of funding, and the argument in the meeting was, word for word, 'we've already put four years into this'. That is the fallacy, stated out loud.\n\nA smaller one, from my own life: I once sat through ninety minutes of a terrible film because I had paid for the ticket. The ticket money was gone either way. All I did was add ninety minutes to the loss.\"",
-      "sourceNote": "ADAPTASI: kuliah aslinya berupa audio; di sini disajikan tertulis."
+      "sourceNote": "ADAPTASI: kuliah aslinya berupa audio; di sini disajikan tertulis.",
+      "targetConcepts": [
+        [
+          "defines",
+          "definition",
+          "defined",
+          "means",
+          "described as",
+          "describes"
+        ],
+        [
+          "example",
+          "examples",
+          "instance",
+          "for instance",
+          "case",
+          "cases"
+        ],
+        [
+          "because",
+          "since",
+          "reason"
+        ],
+        [
+          "already spent",
+          "already paid",
+          "already put",
+          "already invested",
+          "sunk"
+        ],
+        [
+          "both",
+          "each",
+          "two cases",
+          "same pattern",
+          "in both"
+        ]
+      ]
     },
     {
       "id": "speakx_0011",

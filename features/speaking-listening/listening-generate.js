@@ -56,23 +56,29 @@ var FOCUS = {
  * dan langsung terpakai. Templatnya mengutip jawaban benar dan merujuk isi audio supaya
  * pelajar tahu KENAPA benar, bukan sekadar APA yang benar.
  */
-var EXPLAIN = {
-  gist: function (character, answer) {
-    return 'Sepanjang audio, ' + character + ' terutama membicarakan hal ini — jadi jawaban yang benar: “' + answer + '”.';
-  },
-  detail: function (character, answer) {
-    return 'Detail ini disebutkan langsung di audio: “' + answer + '”.';
-  },
-  inference: function (character, answer) {
-    return 'Jawaban ini tidak diucapkan langsung, tetapi petunjuk dalam audio mengarah ke kesimpulan: “' + answer + '”.';
-  },
-  attitude: function (character, answer) {
-    return 'Pilihan kata dan nada ' + character + ' di audio menunjukkan: “' + answer + '”.';
-  },
-  paraphrase: function (character, answer) {
-    return 'Dalam audio, kalimat yang dikutip pada soal menyampaikan makna yang sama dengan “' + answer + '”.';
+  var I18N = (typeof FiezelI18n !== 'undefined') ? FiezelI18n : null;
+  if (!I18N && typeof require === 'function') {
+    try { I18N = require('../i18n/copy-id-feat-c.js').I18N || (typeof global !== 'undefined' ? global.FiezelI18n : null); } catch (e) {}
   }
-};
+  function t(key, fallback, params) { return I18N ? I18N.t(key, params) : fallback; }
+
+  var EXPLAIN = {
+    gist: function (character, answer) {
+      return t('fsl.explain-gist', 'Sepanjang audio, ' + character + ' terutama membicarakan hal ini — jadi jawaban yang benar: “' + answer + '”.', {character: character, answer: answer});
+    },
+    detail: function (character, answer) {
+      return t('fsl.explain-detail', 'Detail ini disebutkan langsung di audio: “' + answer + '”.', {character: character, answer: answer});
+    },
+    inference: function (character, answer) {
+      return t('fsl.explain-inference', 'Jawaban ini tidak diucapkan langsung, tetapi petunjuk dalam audio mengarah ke kesimpulan: “' + answer + '”.', {character: character, answer: answer});
+    },
+    attitude: function (character, answer) {
+      return t('fsl.explain-attitude', 'Pilihan kata dan nada ' + character + ' di audio menunjukkan: “' + answer + '”.', {character: character, answer: answer});
+    },
+    paraphrase: function (character, answer) {
+      return t('fsl.explain-paraphrase', 'Dalam audio, kalimat yang dikutip pada soal menyampaikan makna yang sama dengan “' + answer + '”.', {character: character, answer: answer});
+    }
+  };
 
 /**
  * Memutar array sebanyak n langkah.
@@ -160,9 +166,9 @@ function buildLevel(level, source) {
           character: scene.character
         },
         privacy: { rawLearnerResponseRequiredForPersistence: false },
-        question: 'Ketik kalimat yang kamu dengar. Teks jawaban tidak disimpan setelah penilaian.',
+        question: t('fsl.explain-dictation-prompt', 'Ketik kalimat yang kamu dengar. Teks jawaban tidak disimpan setelah penilaian.'),
         answerText: sentence,
-        explain: 'Kalimat yang diucapkan di audio persis: “' + sentence + '”.',
+        explain: t('fsl.explain-dictation', 'Kalimat yang diucapkan di audio persis: “' + sentence + '”.', {sentence: sentence}),
         scoring: { metric: 'token_f1' }
       });
     }

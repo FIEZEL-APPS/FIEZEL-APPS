@@ -664,6 +664,30 @@
     return { say: say, ask: ask, reveal: reveal, scaffold: level, move: move };
   }
 
+  /**
+   * A11-03 — Eskalasi "Aku masih belum paham" yang menghormati tangganya sendiri.
+   *
+   * Kontrak probe→hint→worked→tell berarti: naik SATU anak tangga per permintaan, dan
+   * jawaban baru boleh terbuka di `tell`. Pemanggil yang langsung membuka jawaban pada
+   * anak tangga `worked` melanggar kontrak itu. Helper ini mengembalikan keputusan yang
+   * benar sekali jalan: scaffold barunya, giliran tutur yang sudah dikomposisi, dan flag
+   * `reveal` yang WAJIB dipatuhi — false berarti beri murid satu percobaan lagi dengan
+   * contoh yang dikerjakan, true (hanya di `tell`) berarti jawaban boleh dibuka.
+   */
+  function escalate(current, input, session) {
+    var at = LADDER.indexOf(str(current) || 'hint');
+    var next = LADDER[Math.min(LADDER.length - 1, (at < 0 ? 1 : at) + 1)];
+    var it = input || {};
+    var merged = {};
+    for (var k in it) {
+      if (Object.prototype.hasOwnProperty.call(it, k)) merged[k] = it[k];
+    }
+    merged.scaffold = next;
+    if (!merged.move) merged.move = 'hint';
+    var turn = composeTurn(merged, session);
+    return { scaffold: next, reveal: next === 'tell' && turn.reveal, turn: turn };
+  }
+
   // =====================================================================================
   // PEMILIHAN SOAL BERIKUTNYA — hidup, bukan dari kolam yang dikunci di awal
   // =====================================================================================
@@ -804,6 +828,7 @@
     record: record,
     decideMove: decideMove,
     composeTurn: composeTurn,
+    escalate: escalate,
     selectNext: selectNext,
     summarize: summarize
   };

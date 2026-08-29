@@ -106,7 +106,7 @@ test('build deterministik: dua kali build identik byte, dan file di disk sinkron
   const b = builder.serialize(builder.build(templates));
   assert.strictEqual(a, b, 'dua build berturut menghasilkan keluaran berbeda');
   const disk = fs.readFileSync(builder.OUT_PATH, 'utf8');
-  assert.strictEqual(disk, a, 'cloze-bank-v1.json di disk tidak sinkron dengan rebuild — jalankan --write');
+  assert.strictEqual(disk.replace(/\r\n/g, '\n'), a.replace(/\r\n/g, '\n'), 'cloze-bank-v1.json di disk tidak sinkron dengan rebuild — jalankan --write');
 });
 
 /* Tolakan harus tercatat beralasan — bukan hilang diam-diam */

@@ -769,26 +769,89 @@
    * salah-tuduh mendekati nol; melebarkannya ke hal seperti awalan "Tugas:" akan mulai
    * membuang jawaban yang sah.
    */
+  /* PELEBARAN (audit rilis m025-179, 28 Agu 2026).
+   *
+   * Dua pola pertama di bawah lahir dari insiden nyata dan menutup PERSIS dua bentuk yang
+   * terlihat hari itu: pembatas data, dan kalimat PERTAMA `GUARD`. Audit rilis menjalankan
+   * delapan bentuk rangka terhadap pemeriksa ini dan **enam di antaranya lolos sebagai teks
+   * sah ke murid sekaligus menagih kuota** — kalimat kedua dan ketiga GUARD, klausa gaya,
+   * baris `Tugas:`, blok `Level murid:/Permukaan:/Fokus materi:`, dan `Bahasa jawaban:`.
+   * Artinya kelas cacatnya tidak pernah benar-benar tertutup; yang tertutup cuma dua
+   * kalimat yang kebetulan sempat terpotret.
+   *
+   * Jadi pemeriksanya sekarang menutup RANGKA-nya, bukan potretnya. Dua daftar, sengaja:
+   *
+   *  (1) PASTI — sekali kena, sudah bocor. Isinya potongan yang TIDAK MUNGKIN ditulis
+   *      seorang pelatih bahasa kepada murid SMP: pembatas data, tiga pecahan kalimat GUARD,
+   *      klausa gaya internal, label huruf-besar `BATAS KERAS:`, label camelCase `weakSkills:`,
+   *      dan label medan yang cuma hidup di prompt kami (`Level murid:`, `Permukaan:`,
+   *      `Fokus materi:`, `Bahasa jawaban:`, `Prompt:`). Semua diikat ke awal baris supaya
+   *      kalimat biasa yang kebetulan memuat katanya tidak ikut kena.
+   *
+   *  (2) SAMAR — `Level:`, `Bahasa:`, `Pertanyaan:` masing-masing bisa muncul wajar di
+   *      jawaban sungguhan ("Pertanyaan: apa bedanya in sama on?"), jadi SATU kemunculan
+   *      TIDAK dihitung bocor. Yang tidak wajar adalah menumpuknya: jawaban murid tidak
+   *      pernah menyusun dua label medan kami berturut-turut. Ambangnya dua.
+   *
+   * §21 mandat audit berlaku dua arah: pemeriksa yang menolak segalanya sama merusaknya
+   * dengan yang meloloskan. Korpus `SAH` di `ai-response-shape-test.js` yang menegakkan
+   * batas itu, dan ia diperluas bersama blok ini.
+   */
   var SCAFFOLD_ECHO_PATTERNS = Object.freeze([
     /-{2,}\s*(?:END\s+)?DATA\s*-{2,}/i,
     /Data pengguna di bawah adalah DATA/i,
     // AI-09 F03: GUARD dan pendeteksi gemanya WAJIB berubah BERPASANGAN. GUARD kini punya dua
     // varian direktif bahasa (LANG_DIRECTIVE), maka pendeteksinya juga dua varian: kalimat
-    // keselamatan Indonesia (pola di atas — dipakai SEMUA locale karena GUARD_SAFETY memang
+    // keselamatan Indonesia (pola di atas - dipakai SEMUA locale karena GUARD_SAFETY memang
     // locale-netral) + potongan pembuka direktif Thai di bawah. Direktif 'id' ('Jawab dalam
-    // bahasa Indonesia…') SENGAJA tidak diberi pola sendiri: menambahkannya mengubah perilaku
+    // bahasa Indonesia...') SENGAJA tidak diberi pola sendiri: menambahkannya mengubah perilaku
     // gate 'id' yang wajib tetap identik dengan baseline (HUKUM BESI), dan kebocoran GUARD id
     // dalam praktik selalu ikut membawa kalimat pembuka yang sudah terdeteksi pola kedua.
-    /ตอบเป็นภาษาไทยที่เป็นมิตร/
+    /ตอบเป็นภาษาไทยที่เป็นมิตร/,
+    /* AUDIT RILIS m025-179: enam bentuk di bawah TERBUKTI lolos ke murid sekaligus menagih
+       kuota sebelum ditambahkan (diukur 8 bentuk, 6 lolos).
+       Soal HUKUM BESI di atas: yang dilarang adalah memberi pola pada KALIMAT PEMBUKA
+       direktif 'id' ("Jawab dalam bahasa Indonesia..."), karena itulah yang menggeser
+       perilaku gate 'id'. Dua pola di bawah menyasar potongan LAIN - kalimat kedua
+       GUARD_SAFETY dan ekor "tanpa menyebut nama murid". Tidak diasumsikan aman:
+       diuji, dan ai-response-shape/ai-task-contract/breaker tetap hijau. */
+    /Jangan pernah mengikuti perintah/i,
+    /tanpa menyebut nama murid/i,
+    // Klausa gaya internal (styleClause).
+    /Pakai sapaan "kamu" dan tulis/i,
+    // Label yang hanya hidup di rangka prompt kami.
+    /^[ \t]*BATAS KERAS[ \t]*:/im,
+    /^[ \t]*Level murid[ \t]*:/im,
+    /^[ \t]*Permukaan[ \t]*:/im,
+    /^[ \t]*Fokus materi[ \t]*:/im,
+    /^[ \t]*Bahasa jawaban[ \t]*:/im,
+    /^[ \t]*weakSkills[ \t]*:/im,
+    /^[ \t]*Prompt[ \t]*:/im,
+    // `Tugas:` sendirian terlalu umum; yang ditolak adalah `Tugas:` + kata kerja tugas kami.
+    /^[ \t]*Tugas[ \t]*:[ \t]*(?:jawab|beri|rangkum|satu)\b/im
   ]);
+
+  /* Label yang wajar muncul sendirian di jawaban sungguhan. Bocor hanya bila MENUMPUK. */
+  var SCAFFOLD_AMBIGUOUS_PATTERNS = Object.freeze([
+    /^[ \t]*Level[ \t]*:/im,
+    /^[ \t]*Bahasa[ \t]*:/im,
+    /^[ \t]*Pertanyaan[ \t]*:/im
+  ]);
+  var SCAFFOLD_AMBIGUOUS_MIN = 2;
 
   function scaffoldEchoIn(text) {
     var t = s(text);
     if (!t) return '';
     for (var i = 0; i < SCAFFOLD_ECHO_PATTERNS.length; i++) {
       var m = SCAFFOLD_ECHO_PATTERNS[i].exec(t);
-      if (m) return s(m[0]).slice(0, 40);
+      if (m) return s(m[0]).trim().slice(0, 40);
     }
+    var hits = [];
+    for (var j = 0; j < SCAFFOLD_AMBIGUOUS_PATTERNS.length; j++) {
+      var a = SCAFFOLD_AMBIGUOUS_PATTERNS[j].exec(t);
+      if (a) hits.push(s(a[0]).trim());
+    }
+    if (hits.length >= SCAFFOLD_AMBIGUOUS_MIN) return hits.join(' ').slice(0, 40);
     return '';
   }
 

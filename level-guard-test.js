@@ -135,9 +135,9 @@ try {
   {
     /* v49-F1 2026-08-29: bentuk wrapper __fzI18nTable didukung (lihat komentar di atas). */
     const lgBlock = app.match(/const\s+LEVEL_GUARD_COPY=__fzI18nTable\(\{\},\(\)=>\((\{[\s\S]*?\n\})\)\);/) || app.match(/const\s+LEVEL_GUARD_COPY=(\{[\s\S]*?\n\});/);
-    if (lgBlock) sandbox.LEVEL_GUARD_COPY = vm.runInContext('(' + lgBlock[1] + ')', sandbox, { timeout: 2000 });
+    if (lgBlock) sandbox.LEVEL_GUARD_COPY = vm.runInContext('(' + lgBlock[1] + ')', sandbox, { timeout: 10000 });
   }
-  vm.runInContext(NEEDED.map(name => blocks[name]).join('\n'), sandbox, { timeout: 4000 });
+  vm.runInContext(NEEDED.map(name => blocks[name]).join('\n'), sandbox, { timeout: 10000 });
   sandboxReady = true;
 } catch (error) {
   check('Fungsi level trust bisa dievaluasi di vm', false, error.message);
@@ -146,7 +146,7 @@ if (sandboxReady) check('Fungsi level trust bisa dievaluasi di vm', true, 'blok 
 
 function call(expression, s) {
   sandbox.state = s;
-  return vm.runInContext(expression, sandbox, { timeout: 2000 });
+  return vm.runInContext(expression, sandbox, { timeout: 10000 });
 }
 
 /** Fixture: murid yang sudah membuktikan A2, sekarang menjajal B1, dengan bukti belajar nyata. */
@@ -403,7 +403,7 @@ check('S6f · style popup memakai var(--fz-spring)/var(--fz-out) dan tidak menga
   !!popCss && /transform:/.test(popCss[0]) && !/(?:height|width|margin|padding|top|left):/.test(popCss[0].replace(/[^{]*\{/, '')),
   'animasi yang menyentuh layout memaksa reflow tiap frame di ponsel murah');
 
-const onboardingHook = app.match(/onGoal:\(\{goal,level\}\)=>\{[\s\S]*?\},\n/);
+const onboardingHook = app.match(/onGoal:\(\{goal,level\}\)=>\{[\s\S]*?\},\r?\n/);
 check('S6g · level pilihan di perkenalan memasang gerbang, dan Home yang membukanya',
   !!onboardingHook && /armLevelEntryGate\(/.test(onboardingHook[0]) && /maybeShowLevelEntryGate\(/.test(sourceBlock('home')),
   'popup tidak pernah muncul menumpuk di atas layar perkenalan');

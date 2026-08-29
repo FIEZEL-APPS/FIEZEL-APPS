@@ -74,6 +74,9 @@ var path = require('path');
 var ROOT = path.join(__dirname, '..');
 var TEMPLATES_PATH = path.join(ROOT, 'grammar-templates.json');
 var ALTERNATES_PATH = path.join(ROOT, 'cloze-alternates-v1.json');
+/* m025-186 (A08-F6): pembahasan terkurasi per item — pola yang sama dengan alternates:
+ * sumber terpisah supaya --write tidak pernah menghapus hasil kurasi. */
+var EXPLAINS_PATH = path.join(ROOT, 'cloze-explains-v1.json');
 var OUT_PATH = path.join(ROOT, 'cloze-bank-v1.json');
 
 var SCHEMA = 'fiezel-cloze-bank-v1';
@@ -310,6 +313,33 @@ function mergeAlternates(items, alternatesById) {
 }
 
 /**
+ * m025-186 (A08-F6): gabungkan pembahasan terkurasi (cloze-explains-v1.json) ke item.
+ * Lint keras seperti mergeAlternates: kunci basi atau field kosong menghentikan build,
+ * karena pembahasan yang salah sasaran adalah bug konten, bukan kosmetik.
+ */
+function mergeExplains(items, explainsById) {
+  if (!explainsById) return;
+  var itemById = {};
+  items.forEach(function (it) { itemById[it.id] = it; });
+  Object.keys(explainsById).forEach(function (id) {
+    var it = itemById[id];
+    if (!it) {
+      throw new Error('cloze-explains-v1.json: kunci "' + id + '" tidak menunjuk item cloze terkirim — kunci basi/typo, perbaiki sumbernya');
+    }
+    var e = explainsById[id];
+    if (!e || typeof e !== 'object' || typeof e.why !== 'string' || !e.why.trim() || typeof e.rule !== 'string' || !e.rule.trim()) {
+      throw new Error('cloze-explains-v1.json ' + id + ': explain wajib objek dengan why dan rule non-kosong');
+    }
+    it.explain = {
+      why: String(e.why),
+      rule: String(e.rule),
+      memory: String(e.memory || ''),
+      avoid: String(e.avoid || '')
+    };
+  });
+}
+
+/**
  * Bangun bank cloze lengkap dari daftar template. Deterministik penuh.
  * alternatesById opsional: peta id-item -> array alternates hasil kurasi;
  * bila tidak diberikan, dibaca dari cloze-alternates-v1.json (loadAlternates).
@@ -325,6 +355,7 @@ function build(templates, alternatesById) {
     else rejected.push(r.reject);
   });
   mergeAlternates(items, alternatesById === undefined ? loadAlternates() : alternatesById);
+  mergeExplains(items, loadExplains());
 
   var byLevel = {};
   items.forEach(function (it) { byLevel[it.level] = (byLevel[it.level] || 0) + 1; });
@@ -360,6 +391,18 @@ function loadAlternates() {
     throw new Error('cloze-alternates-v1.json: schema harus fiezel-cloze-alternates-v1 dengan peta .alternates');
   }
   return raw.alternates;
+}
+
+/* Sumber pembahasan terkurasi. File boleh absen (item tanpa explain memakai
+ * jaring pengaman generik di app.js), tapi kalau ada wajib berbentuk
+ * {schema, explains:{id:{why,rule,memory,avoid}}}. */
+function loadExplains() {
+  if (!fs.existsSync(EXPLAINS_PATH)) return null;
+  var raw = JSON.parse(fs.readFileSync(EXPLAINS_PATH, 'utf8'));
+  if (!raw || raw.schema !== 'fiezel-cloze-explains-v1' || typeof raw.explains !== 'object') {
+    throw new Error('cloze-explains-v1.json: schema harus fiezel-cloze-explains-v1 dengan peta .explains');
+  }
+  return raw.explains;
 }
 
 function serialize(bank) {

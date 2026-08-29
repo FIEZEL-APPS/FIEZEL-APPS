@@ -36,11 +36,16 @@
     './features/i18n/copy-th-app-b.js',
     './features/i18n/copy-th-app-c.js',
     './features/i18n/copy-th-app-d.js',
+    './features/i18n/copy-th-app-e.js',
+    './features/i18n/copy-th-app-f.js',
     './features/i18n/copy-th-feat-a.js',
     './features/i18n/copy-th-feat-b.js',
+    './features/i18n/copy-th-feat-c.js',
+    './features/i18n/copy-th-feat-d.js',
     './features/i18n/copy-th-gems.js',
     './features/i18n/copy-th-quota.js',
     './features/i18n/copy-th-settings-locale.js',
+    './features/i18n/copy-th-grammar-labels.js',
     './features/i18n/naskah-th-brain.js'
   ];
   var GRAMMAR_TH = './grammar-explanations-th.json';

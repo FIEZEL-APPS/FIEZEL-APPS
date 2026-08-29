@@ -2,10 +2,24 @@
 <html lang="id" class="fz-booting" data-theme="light">
 <head>
   <meta charset="utf-8">
-  <!-- D16 (D5 T1): kunci zoom dicabut - WCAG 1.4.4/1.4.10. maximum-scale naik ke 5 dan
-       user-scalable=no dihapus supaya murid low-vision bisa pinch-zoom; blok double-tap
-       tetap ditangani touch-action:manipulation di style.css + fiezel-zoom-lock.js. -->
-  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=5, viewport-fit=cover">
+  <!-- m025-186 — KEPUTUSAN OWNER, DIAMBIL SADAR, DAN INI CATATAN BIAYANYA.
+       D16 (D5 T1) dulu MENCABUT kunci zoom demi WCAG 1.4.4/1.4.10. Pada 29 Agu 2026 OWNER
+       membalikkannya setelah biayanya disampaikan: FIEZEL harus terasa aplikasi, bukan
+       dokumen, dan pinch/zoom halaman dinilai merusak pengalaman belajar.
+
+       BIAYA YANG DITERIMA, ditulis di sini supaya tidak ada yang menemukannya sebagai
+       kejutan: murid low-vision TIDAK lagi bisa memperbesar halaman. Ini penyimpangan dari
+       WCAG 1.4.4 (Resize Text) dan 1.4.10 (Reflow).
+
+       JANGAN membalik baris ini tanpa OWNER. Ia bukan kelalaian dan bukan sisa eksperimen;
+       ia keputusan produk. Gerbang `app-interaction-policy-test.js` dan
+       `m02542-experience-test.js` menegakkan keadaan TERKUNCI ini, jadi mengembalikannya
+       diam-diam akan memerahkan CI.
+
+       MITIGASI YANG DISARANKAN (belum ada, dan ini utang yang jujur): pengatur ukuran teks
+       DI DALAM aplikasi. Itu mengembalikan kemampuan membaca tanpa mengembalikan zoom
+       halaman - satu-satunya jalan menutup biaya di atas tanpa membatalkan keputusan ini. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <!-- D16 (D3 HIGH-1): CSP mode longgar via meta - GitHub Pages tidak bisa set header.
        'unsafe-inline' dipertahankan karena skrip boot splash inline + handler onclick
        memang masih dipakai; pagar utamanya adalah script-src yang membatasi skrip eksternal
@@ -79,7 +93,42 @@ html.fz-booting body{overflow:hidden}
 .fiezel-splash-still .fiezel-splash-word{transform:none!important;animation:fz-fade-in .3s ease var(--fz-b7,1150ms) both}
 .fiezel-splash-still .fiezel-splash-tag{transform:none!important;animation:fz-fade-in .24s ease var(--fz-b12,1900ms) both;opacity:0}
   </style>
-  <link rel="stylesheet" href="./style.css">
+  <!-- ============================================================================
+       m025-199 (laporan OWNER: "saat boot memasukin splash sangat lama sekali").
+       DIUKUR sebelum disentuh, Slow 4G + CPU 4x, median dari 3 kali jalan:
+
+         apa adanya .................................. FCP 2304 ms
+         tiga CSS fitur di bawah dibuat non-blokir ... FCP 2668 ms  (nol perbaikan)
+         style.css juga non-blokir ................... FCP  272 ms
+
+       Jadi yang menahan cat pertama BUKAN jumlah stylesheet-nya, melainkan style.css
+       SENDIRIAN: 286 KB yang wajib tiba, terurai, dan berlaku sebelum peramban boleh
+       mencat satu piksel pun. Selama itu murid menatap layar kosong - persis jeda yang
+       dilaporkan pemilik. Tiga stylesheet lain tetap blokir karena membuangnya tidak
+       membeli apa pun, dan aturan urutan token di komentar bawah tetap berlaku.
+
+       KENAPA INI TIDAK MENGHASILKAN KILATAN HTML TELANJANG. Tirai splash sudah dicat
+       dari CSS kritis yang di-INLINE di atas (blok <style> tepat di atas baris ini), dan
+       ia menutupi seluruh layar sepanjang boot. Yang berhak membubarkan tirai hanya
+       dismissBootSplash() di app.js, dan ia MENUNGGU __fzShellCss selesai lebih dulu.
+       Penantian itu berpagar 4 detik supaya lembar yang gagal tidak pernah mengunci murid
+       di balik tirai - aturan yang sama yang sudah ditulis di kepala fungsi itu.
+
+       `rel=preload as=style` lalu ditukar ke stylesheet saat onload: bentuk ini yang
+       membuat unduhannya tetap prioritas tinggi TANPA memblokir cat. <noscript> menjaga
+       peramban tanpa JS tetap mendapat lembar penuh, dan onerror menandai kegagalan
+       supaya penantian di atas tidak menunggu sesuatu yang tidak akan pernah datang.
+
+       NOL SKRIP DI SINI, dan itu bukan gaya melainkan aturan: splash-first-paint-test
+       menuntut markup splash berada di atas SETIAP elemen skrip, karena satu saja di
+       hadapannya mengembalikan urutan yang dulu membuat layar putih 3 detik. Penanda
+       kesiapan karena itu dibaca dari DOM (`link.rel` yang sudah bertukar), bukan dari
+       variabel yang butuh skrip untuk disiapkan.
+       ============================================================================ -->
+  <link rel="preload" as="style" href="./style.css"
+        onload="this.onload=null;this.rel='stylesheet';window.__fzShellCss='ready'"
+        onerror="window.__fzShellCss='error'">
+  <noscript><link rel="stylesheet" href="./style.css"></noscript>
   <link rel="stylesheet" href="./features/speaking-listening/speaking-listening-addon.css">
   <link rel="stylesheet" href="./features/tutor-classroom/tutor-v3.css">
   <!-- m026-01: motion system maskot PAW. Sengaja PALING AKHIR di antara stylesheet:
@@ -291,11 +340,16 @@ html.fz-booting body{overflow:hidden}
   <script defer src="./features/i18n/copy-id-app-b.js"></script>
   <script defer src="./features/i18n/copy-id-app-c.js"></script>
   <script defer src="./features/i18n/copy-id-app-d.js"></script>
+  <script defer src="./features/i18n/copy-id-app-e.js"></script>
+  <script defer src="./features/i18n/copy-id-app-f.js"></script>
   <script defer src="./features/i18n/copy-id-feat-a.js"></script>
   <script defer src="./features/i18n/copy-id-feat-b.js"></script>
+  <script defer src="./features/i18n/copy-id-feat-c.js"></script>
+  <script defer src="./features/i18n/copy-id-feat-d.js"></script>
   <script defer src="./features/i18n/copy-id-gems.js"></script>
   <script defer src="./features/i18n/copy-id-quota.js"></script>
   <script defer src="./features/i18n/copy-id-settings-locale.js"></script>
+  <script defer src="./features/i18n/copy-id-grammar-labels.js"></script>
   <!-- W4-MERGE: aset th TIDAK dimuat statis (copy-th-*, naskah-th-brain, dua dataset th) —
        semuanya disuntik/difetch DINAMIS oleh pemuat kecil di bawah HANYA saat locale th
        (AI-13 F02/F05: murid Indonesia nol byte th). Pemuat wajib SETELAH fiezel-i18n.js
