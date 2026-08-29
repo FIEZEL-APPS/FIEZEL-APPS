@@ -6730,6 +6730,24 @@ function AudioService(){
     * Ini menutup terjemahan APA PUN, bukan hanya Indonesia: prepareSubtitle memanggil
     * FiezelSubtitleTranslate yang mengikuti locale murid, jadi jalur Thai mati di titik yang
     * sama persis. */
+   /* m025-202: baris ini DIKEMBALIKAN. Ia terhapus di ec2b119 ("perbaiki tiga bug suara
+    * produksi dan tambah gerbang tangga suara") sementara balapan timeout 9 detik di bawah
+    * ditambahkan. Akibatnya `say` menjadi identifier yang TIDAK PERNAH DIDEKLARASIKAN di
+    * dalam AudioService - satu-satunya `const say` lain milik prefetchNextVoice() dan tidak
+    * terlihat dari sini.
+    *
+    * Kenapa ini lolos tanpa satu pun galat: `typeof say` pada identifier yang tidak
+    * dideklarasikan menjawab 'undefined', BUKAN melempar. Jadi `typeof say==='function'`
+    * cuma false, viaDoor langsung Promise.resolve(false), dan seluruh tangga suara neural
+    * dilewati diam-diam. Murid tetap mendengar sesuatu - suara bawaan perangkat lewat
+    * browserPlay - jadi tidak ada yang tampak rusak kecuali kualitasnya. Cabang
+    * `provider:'fiezel-voice-say'` di bawah menjadi kode mati.
+    *
+    * Ditemukan oleh listening-subtitle-suppression-test.js, yang MENJALANKAN AudioService
+    * dengan FiezelVoiceSay tiruan: empat assert-nya jatuh dengan "say() tidak pernah
+    * dipanggil". Gerbang berbasis pola teks tidak akan pernah melihat ini - polanya masih
+    * ada di berkas, yang hilang justru pengikatnya. */
+   const say=self.FiezelVoiceSay?.say;
    const noSubtitles=options.suppressSubtitles===true||options.contentType==='listening';
    const timeoutPromise=typeof setTimeout==='function'?new Promise(r=>setTimeout(()=>r(false),9000)):new Promise(()=>{});
    const viaDoor=typeof say==='function'
