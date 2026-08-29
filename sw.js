@@ -3,6 +3,12 @@ importScripts('./version.js');
 // mutable application-shell generations to it: prepared neural assets must survive
 // a shell release without being rewritten underneath a live document.
 const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
+/* m025-201: anggaran tunggu jaringan untuk NAVIGASI saja (bukan aset). 2,5 detik dipilih
+ * karena index.html hanya 47 KB - jaringan yang sehat menjawabnya jauh di bawah itu, jadi
+ * jalur pemulihan-otomatis praktis tidak pernah menyentuh batas ini. Yang menyentuhnya justru
+ * jaringan yang menggantung, dan di sana setiap detik tambahan adalah detik murid menatap
+ * layar kosong padahal cangkangnya sudah ada di perangkat. */
+const NAV_NETWORK_BUDGET_MS=2500;
 // m025-162: rebase di atas m026-01 (maskot PAW). DIAG_BUILD + FIEZEL_PAGE_BUILD naik ke
 // m025-159 di commit ini, jadi awalan SW_REV ikut naik; deskriptor menggabungkan kedua
 // gelombang (reading-register + maskot) supaya jejak rilisnya jujur.
@@ -40,7 +46,7 @@ const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
 // TIDAK ikut ASSETS - ia hidup di cache locale terpisah (LOCALE_TH_CACHE di bawah) yang
 // diisi halaman on-demand, meniru pola neural-prepare, sehingga murid Indonesia tidak
 // pernah membayar byte Thai.
-const SW_REV='m025-200-i18n-locale-layer-20260828';
+const SW_REV='m025-202-i18n-locale-layer-20260828';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 // m025-61: health check menanyakan revisi shell langsung ke worker yang sedang aktif.
 // Menebaknya dari nama cache tidak cukup: cache lama bisa tertinggal, sedangkan jawaban ini
@@ -257,15 +263,50 @@ self.addEventListener('fetch',e=>{
     // before trusting the revisioned shell entry. A blank/stale cached navigation
     // can therefore self-heal online; offline launch still falls back to the exact
     // current generation's index.html and never borrows legacy runtime-shell bytes.
+    // m025-201 (laporan OWNER: "PWA di iPhone yang sudah terinstal harus terhubung ke
+    // internet baru bisa jalan"). Ia benar, dan perasaannya bahwa dulu tidak begitu juga benar.
+    //
+    // Bentuk di atas menunggu jaringan TANPA BATAS WAKTU. Itu aman selama "tidak ada jaringan"
+    // berarti fetch MENOLAK - dan memang begitu saat mode pesawat. Tetapi keadaan yang paling
+    // sering dialami murid bukan itu: Wi-Fi sekolah berhalaman-login, atau sinyal seluler satu
+    // batang. Di sana koneksinya DITERIMA lalu tidak pernah dijawab, jadi fetch MENGGANTUNG,
+    // dan cangkang yang sudah rapi di cache tidak pernah disentuh sampai iOS menyerah sendiri.
+    //
+    // TERUKUR, dengan 181 berkas cangkang sudah tersimpan:
+    //   jaringan benar-benar mati ...... aplikasi jalan dalam   21 ms
+    //   jaringan MENGGANTUNG ........... aplikasi TIDAK PERNAH jalan (habis waktu di 30 s)
+    //
+    // Jadi yang ditambahkan hanyalah BATAS WAKTU, bukan pergantian strategi. Jaringan tetap
+    // didahulukan dan pemulihan-otomatis di atas tetap utuh: selama jawaban tiba dalam
+    // anggaran, jalannya sama persis dengan sebelumnya, bita demi bita.
+    //
+    // Kalau anggaran lewat, cangkang disajikan - TETAPI permintaan jaringannya TIDAK
+    // dibatalkan. Ia dijaga hidup lewat waitUntil supaya tetap menyegarkan cache, jadi
+    // peluncuran berikutnya memperoleh dokumen baru itu. Penyembuhan tidak hilang; ia hanya
+    // mundur satu peluncuran pada jaringan yang buruk - harga yang jauh lebih murah daripada
+    // aplikasi yang tidak mau terbuka sama sekali.
     const freshRequest=new Request(e.request,{cache:'reload'});
-    responsePromise=fetch(freshRequest).then(r=>{
+    const cangkang=()=>caches.match('./index.html',{cacheName:SHELL_CACHE});
+    const jaringan=fetch(freshRequest).then(r=>{
       if(r&&r.ok){
         const copy=r.clone();
         caches.open(SHELL_CACHE).then(cache=>cache.put(e.request,copy));
         return r;
       }
-      return caches.match('./index.html',{cacheName:SHELL_CACHE}).then(c=>c||r);
-    }).catch(()=>caches.match('./index.html',{cacheName:SHELL_CACHE}));
+      return cangkang().then(c=>c||r);
+    }).catch(()=>cangkang());
+    // Permintaan jaringan dijaga hidup melampaui respondWith: tanpa ini, menyajikan cangkang
+    // lebih dulu akan MEMBATALKAN penyegaran cache-nya, dan cangkang basi tidak akan pernah
+    // sembuh di perangkat yang jaringannya selalu lambat.
+    try{e.waitUntil(jaringan)}catch(_){}
+    const HABIS=Symbol('nav-timeout');
+    const anggaran=new Promise(resolve=>setTimeout(()=>resolve(HABIS),NAV_NETWORK_BUDGET_MS));
+    responsePromise=Promise.race([jaringan,anggaran]).then(hasil=>{
+      if(hasil!==HABIS)return hasil;
+      // Anggaran lewat. Cangkang kalau ada; kalau perangkat ini memang belum punya cangkang
+      // (pemasangan pertama), tidak ada pilihan selain tetap menunggu jaringan.
+      return cangkang().then(c=>c||jaringan);
+    });
   }else if(isNeuralAsset(e.request)){
     // Neural runtime/model/voice assets are owned by the neural prepare layer and
     // stay in the stable runtime cache. A shell release never precaches/rewrites them.
