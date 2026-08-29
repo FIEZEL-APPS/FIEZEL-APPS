@@ -426,6 +426,56 @@ test('popup keyakinan bukan kurungan', () => {
   }
 });
 
+/**
+ * [i8 rig-repair 2026-08-28] Perluasan kontrak: mekanisme pivot tunggal.
+ *
+ * KRONOLOGI: 27/49 aset rig (13/16 pose, 11/14 ekspresi, level-up & milestone)
+ * tampil cacat di produksi — _applyTuple menulis ATRIBUT transform dengan pivot
+ * dibake (rotate(a cx cy)) sementara fiezel-motion.css memasang transform-box
+ * (:123 fill-box global, :131-137 view-box) + transform-origin pada elemen yang
+ * sama, sehingga pivot terpasang DUA KALI (audit O3 §4: armR pose thinking
+ * terlempar ke x=542 pada viewBox 320). Perbaikannya: kanal rotasi/skala tuple
+ * kini gaya CSS inline (helper styleAt: transform-box:view-box +
+ * transform-origin=pivot + fungsi transform polos) — satu model origin dengan
+ * sistem keyframe. Tiga assert statis di bawah menjaga mekanismenya supaya
+ * tidak diam-diam kembali ke atribut berpivot bake. Verifikasi RENDER penuh
+ * (bbox per bagian, paritas A/B dengan/tanpa motion.css) ada di
+ * features/mascot/qa/bbox-probe.mjs — butuh browser, jalankan manual pada
+ * setiap perubahan fiezel-mascot.js / fiezel-motion.css.
+ */
+
+test('kanal rotasi/skala tuple memakai gaya CSS ber-origin (styleAt), bukan atribut berpivot bake', () => {
+  if (!/el\.style\.transformBox = "view-box"/.test(RIG)
+    || !/el\.style\.transformOrigin = `\$\{p\[0\]\}px \$\{p\[1\]\}px`/.test(RIG)) {
+    throw new Error('helper styleAt (transform-box:view-box + transform-origin=pivot) hilang dari rig');
+  }
+  // Kanal rotasi (lengan/telinga/ekor) tidak boleh kembali ke setT+rotAt — itu
+  // persis pola yang berpivot ganda di bawah origin CSS fiezel-motion.css.
+  if (/setT\("\.fz-(arm|ear|tail)[^"]*",\s*rotAt/.test(RIG)) {
+    throw new Error('kanal rotasi tuple kembali ditulis sebagai atribut berpivot bake (setT+rotAt)');
+  }
+  // Kanal skala (dada/blush/mata/kaki/bayangan/fz-all) juga tidak boleh kembali
+  // ke atribut scaleAt — fill-box global :123 membuatnya berpivot ganda juga.
+  if (/setAttribute\("transform",\s*scaleAt/.test(RIG) || /setT\("[^"]*",\s*scaleAt/.test(RIG)) {
+    throw new Error('kanal skala tuple kembali ditulis sebagai atribut scaleAt berpivot bake');
+  }
+});
+
+test('reset rig membersihkan gaya transform inline yang dipasang styleAt', () => {
+  // Tanpa pembersihan ini, origin/transform inline pose lama menempel ke state
+  // berikutnya — bentuk kebocoran yang tidak terlihat di frame pertama.
+  const n = (RIG.match(/el\.style\.transform = ""; el\.style\.transformOrigin = ""; el\.style\.transformBox = "";/g) || []).length;
+  if (n < 2) {
+    throw new Error('pembersihan gaya transform inline hanya ' + n + ' situs; _rigReset dan _costumeReset dua-duanya wajib membersihkan');
+  }
+});
+
+test('probe render bbox tersedia untuk QA', () => {
+  if (!fs.existsSync(path.join(__dirname, 'features/mascot/qa/bbox-probe.mjs'))) {
+    throw new Error('features/mascot/qa/bbox-probe.mjs hilang — satu-satunya verifikasi RENDER anatomi rig');
+  }
+});
+
 console.log('');
 if (failures.length) {
   console.log('FIEZEL maskot PAW: FAIL (' + failures.length + ')');

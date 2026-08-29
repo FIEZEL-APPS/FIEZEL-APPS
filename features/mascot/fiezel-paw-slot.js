@@ -16,6 +16,13 @@
    Ukuran tier TIDAK ditulis inline di sini — ia milik CSS (style.css bagian
    [FASE 7]) lewat media query, supaya rotasi/resize di antara dua render tidak
    membuat JS dan CSS berselisih soal ruang yang sudah dipesan.
+   2026-08-29 overhaul I14 (O3 §9 usulan skala): PENGECUALIAN terukur — plafon
+   responsif. Bila tier CSS akan memakan >22% tinggi viewport (jendela pendek),
+   slot menulis --fz-paw-size inline yang LEBIH KECIL (lantai 48px) saat render.
+   Ini keputusan per-cat seperti anchor (decide() memang sudah membaca viewport);
+   nilainya beku sepanjang hidup slot → nol CLS, dan dievaluasi ulang di cat
+   berikutnya persis seperti anchor. Tier CSS tetap satu-satunya sumber ukuran
+   NORMAL; inline hanya muncul untuk mengecilkan, tidak pernah membesarkan.
    ============================================================================ */
 (function (global) {
   'use strict';
@@ -52,7 +59,18 @@
      Permukaan yang TIDAK terdaftar mengembalikan null — flashcard, hub, layar
      error, dan toast memang ABSEN per tabel §4 ("PAW yang jarang adalah PAW
      yang kuat"); pemanggilnya sudah tidak memanggil plan() untuk itu. */
-  function decide(surface) {
+  /* 2026-08-29 I14: plafon ukuran responsif (lihat catatan header). Mengembalikan
+     0 bila tier CSS sudah muat (tanpa inline), atau ukuran clamp >= 48. Peek tidak
+     di-clamp: 56/48 sudah tangga terkecil dan kotaknya memotong badan. */
+  function sizeClamp(anchor, w, h) {
+    var tier = anchor === 'side' ? 148 : anchor === 'above' ? (w >= 980 ? 120 : w >= 860 ? 108 : 88) : 0;
+    if (!tier || !h) return 0;
+    var headroom = (anchor === 'above' && w >= 980) ? 32 : 20;
+    var cap = Math.floor((h * 0.22 - headroom) / 0.9375);
+    return cap >= tier ? 0 : Math.max(48, cap);
+  }
+
+  function decide(surface, opts) {
     var w = Math.max(0, global.innerWidth || 0);
     var h = Math.max(0, global.innerHeight || 0);
     var shortLandscape = w > h && h < 480;
@@ -61,14 +79,22 @@
       /* Layar buntu (belum ada materi): A · 88 (120 desktop lewat CSS),
          pose menyemangati — penempatan baru bernilai tertinggi (audit 03 A.2). */
       if (shortLandscape) return null; /* §2d: tidak ada apa pun di atas panel */
-      return { anchor: 'above', pose: 'encouraging' };
+      return { anchor: 'above', pose: 'encouraging', size: sizeClamp('above', w, h) };
     }
     if (surface === 'quiz-question') {
+      /* 2026-08-29 I14 (O3 §7): jenis soal menghidupkan kosakata yang tepat —
+         soal berbacaan memakai POSE 'reading' (buku terbuka; geometri statis dari
+         pustaka pose, BUKAN state — poseKind memberi tahu wire() untuk applyPose,
+         karena setState('reading') hanya akan console.warn lalu diam); soal
+         listening memakai STATE 'listening' yang hanya berarti di jalur statis
+         (bingkai beku "menyimak") — saat gerak hidup, state listening dinyalakan
+         app.js pada momen audio BERBUNYI (listening-start/-stop), bukan saat cat. */
+      var kind = (opts && opts.kind) || '';
+      var pose = kind === 'reading' ? 'reading' : kind === 'listening' ? 'listening' : 'curious';
+      var poseKind = kind === 'reading';
       /* Kartu soal kuis: peek di ponsel, above di tablet, kolom samping desktop. */
-      if (shortLandscape) return { anchor: 'peek', pose: 'curious' }; /* 48px via CSS */
-      if (w <= 640) return { anchor: 'peek', pose: 'curious' };      /* 56 (48 di <=420) */
-      if (w < 980) return { anchor: 'above', pose: 'curious' };      /* 88 (108 di >=860) */
-      return { anchor: 'side', pose: 'curious' };                    /* 148, kolom grid */
+      var anchor = (shortLandscape || w <= 640) ? 'peek' : w < 980 ? 'above' : 'side';
+      return { anchor: anchor, pose: pose, poseKind: poseKind, size: sizeClamp(anchor, w, h) };
     }
     return null;
   }
@@ -79,10 +105,20 @@
      memulihkannya untuk jalur kurangi-gerak (lihat bawah). */
   function slotMarkup(plan, motion) {
     var enter = motion ? ' ' + (ENTER_CLASS[plan.anchor] || '') : '';
-    var still = !motion && plan.pose ? ' st-' + plan.pose : '';
+    /* st-<pose> hanya untuk STATE (kelas koreografi CSS); pose pustaka tidak punya
+       kelas st-* — wire() memulihkannya lewat applyPose (I14). */
+    var still = !motion && plan.pose && !plan.poseKind ? ' st-' + plan.pose : '';
+    /* 2026-08-29 I14: gaya inline per-cat — plafon ukuran (lihat header) dan retune
+       top kolom samping: top:96px CSS ditala terhadap topbar global yang kini
+       DISEMBUNYIKAN body.fz-lesson-mode (impl/07 §8 butir 2) → 80px. */
+    var styles = [];
+    if (plan.size) styles.push('--fz-paw-size:' + plan.size + 'px');
+    if (plan.anchor === 'side') styles.push('top:80px');
     return '<div class="fz-paw-slot ' + ANCHOR_CLASS[plan.anchor] +
-      (motion ? '' : ' is-static') + '" data-fz-pose="' + plan.pose +
-      '" aria-hidden="true"><fiezel-mascot class="fz-paw-panel' + still + enter +
+      (motion ? '' : ' is-static') + '" data-fz-pose="' + plan.pose + '"' +
+      (plan.poseKind ? ' data-fz-pose-kind="pose"' : '') +
+      (styles.length ? ' style="' + styles.join(';') + '"' : '') +
+      ' aria-hidden="true"><fiezel-mascot class="fz-paw-panel' + still + enter +
       '"></fiezel-mascot></div>';
   }
 
@@ -129,7 +165,7 @@
      */
     plan: function (surface, opts) {
       if (!mascotReady()) return null;
-      var d = decide(surface);
+      var d = decide(surface, opts);
       if (!d) return null;
       var motion = !opts || opts.motion !== false;
       var html = slotMarkup(d, motion);
@@ -172,17 +208,65 @@
           var stills = root.querySelectorAll('.fz-paw-slot.is-static fiezel-mascot');
           for (var i = 0; i < stills.length; i++) {
             var el = stills[i];
-            var pose = (el.parentElement && el.parentElement.getAttribute('data-fz-pose')) || 'idle';
-            if (typeof el.setState === 'function') el.setState(pose, { hold: 0 });
+            var par = el.parentElement;
+            var pose = (par && par.getAttribute('data-fz-pose')) || 'idle';
+            /* I14: pose pustaka (data-fz-pose-kind="pose") lewat applyPose —
+               setState untuk nama pose hanya console.warn lalu diam. */
+            if (par && par.getAttribute('data-fz-pose-kind') === 'pose' && typeof el.applyPose === 'function') el.applyPose(pose);
+            else if (typeof el.setState === 'function') el.setState(pose, { hold: 0 });
           }
         } catch (_) { /* pose beku gagal = tetap idle, tidak pernah melempar */ }
         return;
       }
 
+      /* 2026-08-29 I14: konteks pose (soal berbacaan → 'reading'). Pose dipasang
+         pada instance slot dan question-shown TIDAK dipancarkan untuk cat ini:
+         reaksi curious akan me-reset rig (_rigReset) dan menghapus pose beberapa
+         ratus ms setelah tampil. Reaksi hover/answer berikutnya BOLEH menghapusnya
+         — murid sudah bergerak dari membaca ke menjawab, itu busur yang benar. */
+      var posed = false;
+      try {
+        var slots = root.querySelectorAll('.fz-paw-slot fiezel-mascot');
+        for (var p = 0; p < slots.length; p++) {
+          var pp = slots[p].parentElement;
+          if (pp && pp.getAttribute('data-fz-pose-kind') === 'pose' && typeof slots[p].applyPose === 'function') {
+            slots[p].applyPose(pp.getAttribute('data-fz-pose'));
+            posed = true;
+          }
+        }
+      } catch (_) { }
+
       /* Soal tampil → tatap batang soal (curious + lookAt, 12 §3a baris 1). */
-      if (ctx.stem || ctx.options) {
+      if (!posed && (ctx.stem || ctx.options)) {
         try { emit('question-shown', { target: ctx.stem || ctx.options }); } catch (_) { }
       }
+
+      /* 2026-08-29 I14 (aturan "tidak pernah menutupi CTA"): satu pemeriksaan rAF
+         pasca-cat — bila kotak maskot slot beririsan dengan CTA utama yang terlihat
+         (#quizNext / .primary), maskotnya disembunyikan (visibility) TANPA mencabut
+         kotak slot → nol CLS (C3) dan C1 tetap. Penegakan di planner, bukan hack
+         per-layar. Praktisnya tak pernah menyala (peek/above di luar alur CTA, side
+         di kolomnya sendiri) — ini jaring pengaman untuk viewport ekstrem. */
+      try {
+        global.requestAnimationFrame(function () {
+          try {
+            var ms = root.querySelectorAll('.fz-paw-slot fiezel-mascot');
+            var ctas = root.querySelectorAll('#quizNext,button.primary');
+            for (var a = 0; a < ms.length; a++) {
+              var mr = ms[a].getBoundingClientRect();
+              if (!mr.width || !mr.height) continue;
+              for (var c = 0; c < ctas.length; c++) {
+                var cr = ctas[c].getBoundingClientRect();
+                if (!cr.width || !cr.height) continue;
+                if (mr.left < cr.right && mr.right > cr.left && mr.top < cr.bottom && mr.bottom > cr.top) {
+                  ms[a].style.visibility = 'hidden';
+                  break;
+                }
+              }
+            }
+          } catch (_) { }
+        });
+      } catch (_) { }
       if (!ctx.options || typeof ctx.options.addEventListener !== 'function') {
         /* Panel tanpa siklus soal (empty-state): pose konteks dimainkan sekali
            secara transien pada instance slot saja, lalu kembali idle sendiri. */
