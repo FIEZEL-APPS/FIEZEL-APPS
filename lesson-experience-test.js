@@ -36,6 +36,11 @@ vm.runInContext(fs.readFileSync(path.join(root,'features','i18n',__n),'utf8'),co
 // m029: mesin SFX dimuat lebih dulu, persis urutan <script defer> di index.html - app.js
 // mendelegasikan playFeedbackSound ke FiezelUiSfx, jadi tanpa modul ini tesnya menguji udara.
 vm.runInContext(fs.readFileSync(path.join(root,'features/audio/fiezel-ui-sfx.js'),'utf8'),context,{filename:'features/audio/fiezel-ui-sfx.js'});
+/* m025-186 merge-fix: kontrak index.html FIEZEL_I18N_BEGIN — fiezel-i18n.js lalu SEMUA
+   copy-id-*.js dimuat SEBELUM app.js; tanpa ini app.js:16 (FiezelI18n.t) melempar. */
+for (const __f of ['features/i18n/fiezel-i18n.js'].concat(fs.readdirSync(path.join(root,'features/i18n')).filter(n=>/^copy-id-.*\.js$/.test(n)).sort().map(n=>'features/i18n/'+n))) {
+  vm.runInContext(fs.readFileSync(path.join(root, __f), 'utf8'), context, { filename: __f });
+}
 vm.runInContext(app,context,{filename:'app.js'});
 const signature=q=>String(q.question).toLowerCase().replace(/\s+/g,' ').trim()+'||'+q.options.map(x=>String(x).toLowerCase()).sort().join('|');
 

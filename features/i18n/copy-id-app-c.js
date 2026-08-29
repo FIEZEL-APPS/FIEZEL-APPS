@@ -240,7 +240,7 @@
     // app.js:5420 — SKILL_PAGE_COPY.listening.lead (getter lazy; title Inggris tetap di kode)
     'skills.lead-listening': 'Dengar dulu, baru jawab. Kalau belum nangkep, ulang - itu bagian dari latihannya.',
     // app.js:5421 — SKILL_PAGE_COPY.speaking.lead (getter lazy)
-    'skills.lead-speaking': 'Ngomong aja dulu. Rekamannya tidak pernah dikirim ke mana pun, cuma dinilai di perangkatmu.',
+    'skills.lead-speaking': 'Ngomong aja dulu. Rekaman latihanmu cuma tersimpan di perangkatmu; tapi fitur pengenal ucapan bawaan browser bisa memproses suaramu di server pembuat browser-nya. Yang FIEZEL simpan cuma teks transkrip dan skornya.',
     // app.js:5460 — skillsLab: Error runtime
     'skills.runtime-hilang': 'Speaking + Listening runtime tidak tersedia',
     // app.js:5237 — testNeuralVoice: toast belum

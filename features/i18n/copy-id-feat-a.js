@@ -265,7 +265,7 @@
     'brain-tutor.hint-default': 'Petunjuknya ada di kata yang menunjukkan kapan kejadiannya. Coba lagi.',
     'brain-tutor.worked-intro': ' Aku kerjakan satu yang mirip dulu ya, biar kelihatan langkahnya.',
     'brain-tutor.reveal-intro': ' Oke, aku buka sekarang.',
-    'brain-tutor.move-celebrate': 'Nah, itu dia. Yang tadi bikin kamu keliru, barusan kamu lewati - dan kamu melewatinya dengan alasan yang benar, bukan tebakan.',
+    'brain-tutor.move-celebrate': 'Nah, itu dia. Yang tadi bikin kamu keliru, barusan kamu lewati. Pertahankan cara mikirnya.',
     'brain-tutor.move-consolidate': 'Benar. Tapi tadi kamu perlu waktu lumayan, jadi kita mantapkan dulu di sini sebentar sebelum naik.',
     'brain-tutor.move-stretch': 'Beruntun dan cepat. Ini sudah di bawah kemampuanmu sekarang - aku naikkan sedikit.',
     'brain-tutor.move-breathe': 'Kita berhenti di sini dulu. Jawabanmu mulai melambat dan mulai meleset bareng, dan itu tanda capek, bukan tanda kamu tidak bisa. Lanjut nanti hasilnya jauh lebih nempel.',

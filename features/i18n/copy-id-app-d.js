@@ -446,6 +446,7 @@
     'progress.materi-rawan-lupa': 'Materi rawan lupa',
     // app.js:7232 — olmPanelMarkup
     'progress.menurutku-salah': 'Menurutku ini salah',
+    'progress.belum-cukup-data': 'belum cukup data',
     // app.js:7373 — progress
     'progress.model-memakai-agregat-perilaku-hasil': 'Model ini memakai agregat perilaku dan hasil belajar. Raw answer history tidak dikirim ke Core Brain.',
     // app.js:7372 — progress
