@@ -321,3 +321,70 @@ sekarang setara dengan membekukan rilis.
 
 Verdict tetap **NO-GO**, dan sekarang alasannya bertambah satu yang jauh lebih sederhana
 daripada semua temuan audit: **gerbang mutu `main` sendiri sedang merah.**
+
+---
+
+# ADENDUM C — m025-195 / `d7fe7be` — paritas produksi: UNVERIFIED (bukan PASS, bukan FAIL)
+
+## C.1 Status `main` yang lama sudah BASI
+
+Bagian di atas menutup dengan NO-GO yang salah satu alasannya "gerbang mutu `main` sendiri
+sedang merah" pada `a92e0cb`. Per Aturan A, temuan itu terikat SHA dan kini **BASI**:
+
+| SHA | Quality Gate | keterangan |
+|---|---|---|
+| `a92e0cb` | merah | temuan asli adendum B |
+| `d7fe7be` | **hijau** (run 1956, 2026-08-29T11:33Z) | merge PR #255, build `m025-195` |
+
+Interlock `deploy-site.yml` karenanya TIDAK lagi membekukan rilis. `FIEZEL Deploy Site` run #1
+(id 33250417914) memang menyala otomatis atas `d7fe7be` dan berkesimpulan `success` — tetapi
+**nol bita berpindah**: empat langkah unggah `skipped` karena secret hosting belum terpasang.
+Itu SKIP yang bersuara, sesuai rancangan; ia bukan bukti penerbitan.
+
+## C.2 Sesi ini TIDAK BISA membaca produksi — dan itu bukan kegagalan produksi
+
+Upaya membaca `https://fiezel.my.id/app/` dari lingkungan audit ini ditolak di lapisan jaringan,
+bukan di server FIEZEL:
+
+```
+curl: (56) CONNECT tunnel failed, response 403
+[agent-proxy] fiezel.my.id:443 — connect_rejected (organization policy) ×3
+WebFetch  -> {"error_type":"EGRESS_BLOCKED","domain":"fiezel.my.id"}
+```
+
+`tools/deploy-site-verify.mjs` melaporkan `HTTP 403` untuk `core-config.js` dan `sw.js`, dan
+angka itu **tidak boleh dibaca sebagai jawaban server**: ia jawaban gerbang egress sesi ini.
+
+Maka, per §23, status paritas produksi dari sesi ini adalah **UNVERIFIED**. Bukan PASS
+("situs sudah benar"), bukan pula FAIL ("situs rusak"). Keduanya akan menjadi klaim tanpa bukti.
+
+## C.3 Lubang yang ditemukan justru karena itu: jalur cPanel menerbitkan BUTA
+
+Sejak `.cpanel.yml` ada, penerbitan bisa terjadi lewat cPanel Git Version Control — dijalankan
+di hosting, **di luar GitHub Actions sepenuhnya**. Satu-satunya pembuktian penanda yang repo
+punya (`deploy-site.yml`, langkah terakhir) bergantung pada `steps.creds.outputs.ready == 'true'`,
+yaitu pada jalur SSH yang belum pernah menyala. Akibatnya jalur cPanel memindahkan bita dan
+**nol pihak pernah membacanya kembali** — persis keadaan yang membuat audit m025-179 tidak bisa
+membuktikan paritas, hanya berpindah pintu.
+
+**Penutupnya** (build ini): langkah paritas dua-mode di `deploy-site.yml`, berjalan justru ketika
+secret TIDAK ada:
+
+- `workflow_dispatch` → **GERBANG**. Menuntut `--page`/`--sw` cocok; beda = jalan MERAH.
+- `workflow_run` → **LAPORAN**. Penerbitan cPanel itu manual, jadi menuntut cocok pada setiap
+  `main` hijau akan memerahkan repo hanya karena tombol Deploy belum ditekan — merah yang tidak
+  menunjuk cacat apa pun. Melapor, exit 0, tetapi yang BENAR-BENAR disajikan produksi ditulis ke
+  ringkasan Actions. Diam adalah satu-satunya hasil yang dilarang.
+
+Runner GitHub punya egress terbuka, jadi jalan itu bisa menjawab pertanyaan yang sesi ini tidak
+bisa jawab. Ditegakkan tiga assert baru di `deploy-site-gate-test.js` (D2/D3/D4, 30/30 PASS),
+dua-duanya dibuktikan bisa merah: menghapus mode gerbang → 29/30, menghapus langkahnya →
+27/30.
+
+## C.4 Yang masih menggantung
+
+1. **Paritas produksi** — dijawab dengan menjalankan `FIEZEL Deploy Site` lewat **Run workflow**.
+   Selama jawabannya belum ada, `m025-195` tetap JANJI, bukan fakta produksi.
+2. Tiga gerbang live (`cf_live_base`, `ai_live_base`) belum pernah dijalankan pada SHA hijau.
+3. Dua kontrol diagnostik `<16px` (`#fiezelDiagSearch` 13px, `#fiezelDiagText` 11px) masih milik
+   sesi neural-voice.
