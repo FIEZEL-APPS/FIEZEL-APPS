@@ -279,7 +279,7 @@ test('ikon tab bar berbobot, bukan garis tipis', () => {
   // OWNER: "icon taskbarnya terlalu jadul kurang modern dan eye catching."
   const tab = ICONS.slice(ICONS.indexOf('/* Tab bar.'), ICONS.indexOf('/* Streak'));
   for (const name of ['home', 'vocab', 'grammar', 'reading', 'map']) {
-    const glyph = new RegExp(name + ":\\s*'([\\s\\S]*?)',\\n").exec(tab);
+    const glyph = new RegExp(name + ":\\s*([\\s\\S]*?),\\r?\\n\\s*(?:[a-z_]+:|\\/\\*)").exec(tab);
     if (!glyph) throw new Error('ikon ' + name + ' hilang dari tab bar');
     if (!/class="fz-fill"/.test(glyph[1])) {
       throw new Error('ikon ' + name + ' tanpa bidang; garis tipis saja adalah bahasa yang dikeluhkan OWNER');

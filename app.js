@@ -6550,8 +6550,12 @@ function AudioService(){
    if(!text)return Promise.resolve(null);
    this.stop();
    const say=self.FiezelVoiceSay?.say;
+   const timeoutPromise=typeof setTimeout==='function'?new Promise(r=>setTimeout(()=>r(false),9000)):new Promise(()=>{});
    const viaDoor=typeof say==='function'
-    ?Promise.resolve().then(()=>say.call(self.FiezelVoiceSay,text,{speed:options.speed??selectedNeuralRate(),contentType:options.contentType,locale:options.locale})).catch(()=>false)
+    ?Promise.race([
+      Promise.resolve().then(()=>say.call(self.FiezelVoiceSay,text,{speed:options.speed??selectedNeuralRate(),contentType:options.contentType,locale:options.locale})).catch(()=>false),
+      timeoutPromise
+    ])
     :Promise.resolve(false);
    // V6: `options.next` dihangatkan SESUDAH pemutaran diajukan - urutan ini yang menjaga
    // mesin single-flight tetap milik kalimat yang sedang didengar (inversi antrean m025-47).
@@ -8252,7 +8256,7 @@ function progress(){
  // in Settings (see openSettings()).
  const tabContent={
   overview:`<div class="grid">${nextSessionPanelMarkup()}${journeyMarkup()}${socialSummaryCardMarkup()}<div><h3>${FiezelI18n.t('progress.peta-study')}</h3>${mapCards}</div>
-   ${card(`<h3>Ulangan Pintar</h3>${due.length?due.map(([k,x])=>`<div class="row"><span>${esc(friendlySkillName(k))}</span><span>${FiezelI18n.t('progress.dikuasai-risiko-lupa',{mastery:x.mastery||0,x:Math.round(forgettingProbability(x)*100)})}</span></div>`).join('<hr>'):'<p class="muted">'+FiezelI18n.t('progress.belum-ada-materi-perlu-diulang')+'</p>'}`)}
+   ${card(`<h3>Ulangan Pintar</h3>${due.length?due.map(([k,x])=>`<div class="row"><span>${esc(friendlySkillName(k))}</span><span>${FiezelI18n.t('progress.dikuasai-risiko-lupa',{mastery:x.mastery||0,x:Math.round(forgettingProbability(x)*100)})}</span></div>`).join('<hr>')+`<div style="margin-top:12px"><button class="primary" onclick="reviewVocab()"><i data-lucide="history"></i> Mulai Review (${due.length})</button></div>`:'<p class="muted">'+FiezelI18n.t('progress.belum-ada-materi-perlu-diulang')+'</p>'}`)}
    ${card(`<h3>${FiezelI18n.t('progress.laporan-diagnostik')}</h3>${diagHtml}`)}
    ${card(`<h3>Prasasti</h3><p class="muted">${FiezelI18n.t('progress.lencana-bukti-study-redup-menunjukkan')}</p>${prasastiGalleryMarkup()}`,'prasasti-gallery-card')}
    </div>`,
@@ -8546,13 +8550,13 @@ function bindUiSfxDelegation(){
 // benar-benar BARU dibuka yang mendorong entri: openSettings -> openReportPreview ->
 // openSettings hanya menukar isi panel yang sama, dan tiga entri untuk satu dialog akan
 // membuang dua tekanan kembali pada layar yang sudah tidak ada.
-function openModal(html){const wasOpen=modalOpen;modalOpen=true;uiSfx('open');modalEpoch++;clearTimeout(modalCloseTimer);const modal=$('modal');$('modalPanel').innerHTML=html;modal.classList.remove('hidden');enhanceUI();/* q17-S1 2026-08-29: dialog wajib mengelola fokus \u2014 fokus awal ke tombol pertama, dan fokus dikembalikan saat tutup (lihat closeModalNow). Trap Tab ada di modalTrapKeydown. */if(!wasOpen)modalReturnFocus=document.activeElement;(window.requestAnimationFrame||setTimeout)(()=>{modal.classList.add('show');try{const first=modal.querySelector('#modalPanel button,#modalPanel [href],#modalPanel input,#modalPanel select,#modalPanel textarea');(first||modal.querySelector('#modalPanel'))?.focus?.({preventScroll:true})}catch(_){}});if(!wasOpen)try{self.FiezelBackNav?.pushLayer?.({id:'modal',close:closeModalNow})}catch{}return modalEpoch}
+function openModal(html){const wasOpen=modalOpen;modalOpen=true;uiSfx('open');modalEpoch++;clearTimeout(modalCloseTimer);const modal=$('modal');$('modalPanel').innerHTML=html;modal.classList.remove('hidden');enhanceUI();try{const appEl=$('app');if(appEl){appEl.setAttribute('aria-hidden','true');if('inert' in appEl)appEl.inert=true}const nav=document.querySelector?.('.bottomnav,.nav-bar');if(nav){nav.setAttribute('aria-hidden','true');if('inert' in nav)nav.inert=true}}catch(_){}/* q17-S1 2026-08-29: dialog wajib mengelola fokus \u2014 fokus awal ke tombol pertama, dan fokus dikembalikan saat tutup (lihat closeModalNow). Trap Tab ada di modalTrapKeydown. */if(!wasOpen)modalReturnFocus=document.activeElement;(window.requestAnimationFrame||setTimeout)(()=>{modal.classList.add('show');try{const first=modal.querySelector('#modalPanel button,#modalPanel [href],#modalPanel input,#modalPanel select,#modalPanel textarea');(first||modal.querySelector('#modalPanel'))?.focus?.({preventScroll:true})}catch(_){}});if(!wasOpen)try{self.FiezelBackNav?.pushLayer?.({id:'modal',close:closeModalNow})}catch{}return modalEpoch}
 // Penutup mentah. Ini yang dipegang riwayat, jadi ia TIDAK BOLEH menyentuh riwayat lagi -
 // kalau ia melakukannya, satu tekanan kembali akan memakan dua entri. Mengembalikan false
 // bila memang tidak ada modal terbuka, supaya jalur kembali tahu tekanan itu belum terpakai
 // dan boleh meneruskannya ke lapisan di bawahnya.
 let modalReturnFocus=null;
-function closeModalNow(){if(!modalOpen)return false;modalOpen=false;uiSfx('close');modalEpoch++;clearTimeout(modalCloseTimer);const modal=$('modal');modal.classList.remove('show');modalCloseTimer=setTimeout(()=>modal.classList.add('hidden'),320);/* q17-S1: kembalikan fokus ke pemicu supaya pengguna keyboard tidak terdampar di body. */try{if(modalReturnFocus&&document.contains(modalReturnFocus))modalReturnFocus.focus({preventScroll:true})}catch(_){}modalReturnFocus=null;return true}
+function closeModalNow(){if(!modalOpen)return false;modalOpen=false;uiSfx('close');modalEpoch++;clearTimeout(modalCloseTimer);const modal=$('modal');modal.classList.remove('show');modalCloseTimer=setTimeout(()=>modal.classList.add('hidden'),320);try{const appEl=$('app');if(appEl){appEl.removeAttribute('aria-hidden');if('inert' in appEl)appEl.inert=false}const nav=document.querySelector?.('.bottomnav,.nav-bar');if(nav){nav.removeAttribute('aria-hidden');if('inert' in nav)nav.inert=false}}catch(_){}/* q17-S1: kembalikan fokus ke pemicu supaya pengguna keyboard tidak terdampar di body. */try{if(modalReturnFocus&&document.contains(modalReturnFocus))modalReturnFocus.focus({preventScroll:true})}catch(_){}modalReturnFocus=null;return true}
 // Ditutup oleh aplikasi sendiri (tombol Batal/Tutup/Escape): layarnya berubah seketika, dan
 // entri riwayatnya dibuang supaya tekanan kembali berikutnya tidak jatuh pada modal yang
 // sudah tidak ada.

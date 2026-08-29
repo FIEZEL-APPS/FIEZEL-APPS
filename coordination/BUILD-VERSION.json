@@ -1,7 +1,7 @@
 {
-  "version": "m025-195",
+  "version": "m025-196",
   "claimedBy": "perplexity-computer (multilingual i18n wave, direbase atas m025-185)",
-  "claimedAt": "2026-08-29T10:39:52.220Z",
-  "reason": "interaksi app-like: kunci zoom halaman + lantai 16px + menu konteks (shell berubah, PWA wajib tarik ulang)",
+  "claimedAt": "2026-08-29T14:09:15.526Z",
+  "reason": "fix 12 test gates on Windows runtime, audio timeout watchdog, review CTA, and modal inert",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
