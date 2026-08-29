@@ -88,7 +88,10 @@ check('No item persists raw audio or transcript',
 check('The addon loads the exam bank without making it fatal', /async loadExam\(\)/.test(addon) && /catch\(_\)\{return false\}/.test(addon),
   'Skills Lab harian tidak boleh mati hanya karena berkas latihan ujian belum ada');
 check('The exam domain is a real session domain', /'speaking_exam'/.test(addon) && /renderSpeakingExam\(/.test(addon), 'domain baru harus punya renderer sendiri');
-check('Exam sessions are level-scoped like everything else', /examFor\(level\)\{const target=normalizeLevel\(level\)/.test(addon), 'kontrak level m025-136 berlaku di sini juga');
+/* m025-202: lihat catatan kembar di listening-exam-test.js. Assert ini menuntut `){const`
+   dalam SATU BARIS TANPA SPASI dan merah begitu wave i18n memformat ulang examFor() ke
+   beberapa baris - padahal kontraknya utuh. Spasi dilonggarkan; yang dijaga tetap sama. */
+check('Exam sessions are level-scoped like everything else', /examFor\(level\)\s*\{\s*const\s+target\s*=\s*normalizeLevel\(level\)/.test(addon), 'kontrak level m025-136 berlaku di sini juga');
 check('Voice controls are bound from one shared place', /bindSpeakingControls\(item\)\{/.test(addon) && (addon.match(/this\.bindSpeakingControls\(item\)/g) || []).length === 2,
   'menyalin pengikatan dua kali berarti perbaikan privasi hanya sampai ke salah satunya');
 check('The exam renderer shows the timing contract to the learner', /fsl-timing/.test(addon) && /prepSeconds/.test(addon),
