@@ -105,11 +105,37 @@ murni perbaikan cacat, dan ia menunggu OWNER.
 ## GERBANG
 
 201/205 hijau. Empat merah **PRA-ADA dan terverifikasi merah di `origin/main` bersih** (diuji di
-worktree terpisah): `voice-fallback-chain-test.js`, `listening-subtitle-suppression-test.js`,
-`speaking-exam-test.js`, `listening-exam-test.js`. Keempatnya menuntut literal Indonesia yang sudah
-pindah ke peta naskah pada gelombang i18n — harness-nya yang basi, bukan naskahnya yang hilang
-(kunci `fsl.audio-error-*` ada dan teratasi benar di aplikasi nyata). **Di luar lingkup m025-202,
-tetapi artinya `main` sedang merah dan itu perlu diketahui.**
+worktree terpisah, himpunan kegagalannya identik byte-per-byte): `voice-fallback-chain-test.js`,
+`listening-subtitle-suppression-test.js`, `speaking-exam-test.js`, `listening-exam-test.js`.
+
+**KOREKSI — dua di antaranya BUKAN harness basi.** Kesimpulan awal saya salah dan diperbaiki di
+sini. Dua assert `voice-fallback-chain-test.js` yang menyebut `app.js` melaporkan **cacat produk
+sungguhan**:
+
+`AudioService.play()` (app.js ±6749) memakai `typeof say==='function'` untuk memutuskan apakah
+pintu suara neural dipakai. **Tidak ada `say` di lingkupnya.** Ketiga `const say=` di app.js ada di
+DALAM fungsi lain (`neuralVoiceStatusMarkup` 6044, `prefetchNextVoice` 6100, `classroomSpeak` 6136),
+dan `function say` di `features/neural-voice/fiezel-voice-say.js` terkurung di dalam factory-nya —
+ia hanya keluar sebagai `FiezelVoiceSay.say`. Diperiksa juga di peramban: `typeof say` global =
+`"undefined"`.
+
+Akibatnya `typeof say==='function'` **selalu false**, `viaDoor` selalu `Promise.resolve(false)`, dan
+**setiap `audio.play()` jatuh ke `speechSynthesis` peramban.** Jalur suara neural — model 152 MB,
+sherpa-onnx wasm, seluruh rantai prefetch — tidak pernah dipanggil dari pintu ini. Untuk aplikasi
+belajar bahasa Inggris, itu berarti murid mendengar suara robotik peramban, bukan suara yang
+dibangun untuknya, di Reading, Vocabulary, Grammar, dan Listening.
+
+**Patch yang diusulkan (satu baris, sudah diuji):** ikat `say` pada waktu panggil di dalam `play()`,
+sebelum baris `viaDoor` — `const say=self.FiezelVoiceSay?.say;`. Harus di waktu panggil, bukan waktu
+konstruksi: modulnya dimuat belakangan. Diverifikasi lokal: **42 lulus/3 gagal → 44 lulus/1 gagal.**
+
+Sisa satu kegagalan (`fsl.audio-error-*` tercetak sebagai kunci mentah) memang harness: kuncinya ADA
+di `copy-id-feat-d.js` dan teratasi benar di aplikasi nyata; sandbox test-nya saja yang tidak memuat
+peta naskah.
+
+**Patch itu SENGAJA TIDAK dimasukkan ke PR ini** — ia cacat lain, di kode yang tidak disentuh audit
+ini, dan ia layak commit sendiri yang bisa direview sebagai perbaikan suara. **OWNER: ini lebih
+mendesak daripada pekerjaan UX di PR ini.**
 
 Nomor build lewat `tools/bump-build.mjs`, bukan diketik. Arbiternya mendeteksi hulu sudah di
 m025-201 dan menaikkan ke m025-202 — persis tabrakan yang alat itu ada untuk mencegah.
