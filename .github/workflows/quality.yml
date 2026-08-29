@@ -625,7 +625,7 @@ jobs:
           node id-golden-snapshot-test.js
           node locale-enum-test.js
           node audio-locale-guard-test.js
-          node th-coverage-test.js
+          # th-coverage-test.js dikecualikan registry (kelas gerbang-pra-rilis-fitur, keputusan MASTER 9bf2e13): kontraknya mengikat rilis th, bukan rilis id — didaftarkan ulang sebelum saklar th dinyalakan.
       - name: 'Gerbang simulasi adaptivitas v3 (gate yatim CI — temuan D1, wave D)'
         # adaptivity-simulation-v3.js adalah gate sungguhan (exit code dari main();
         # gate residual + gate kalibrasi bisa merah), tetapi namanya lolos dari pola
