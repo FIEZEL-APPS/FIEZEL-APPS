@@ -1,7 +1,7 @@
 {
-  "version": "m025-194",
+  "version": "m025-195",
   "claimedBy": "perplexity-computer (multilingual i18n wave, direbase atas m025-185)",
-  "claimedAt": "2026-08-29T04:22:27.652Z",
-  "reason": "rollback tersinkron ke dasar+1: A11 menuntut DIAG_BUILD tepat +1 dari merge-base (m025-193); klaim 195/196 lahir dari bump berulang saat mengejar main, bukan rilis produk terpisah",
+  "claimedAt": "2026-08-29T10:39:52.220Z",
+  "reason": "interaksi app-like: kunci zoom halaman + lantai 16px + menu konteks (shell berubah, PWA wajib tarik ulang)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
