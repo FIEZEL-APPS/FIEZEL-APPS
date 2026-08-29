@@ -15,7 +15,9 @@
         "true_false_not_given",
         "yes_no_not_given",
         "matching_information",
-        "multiple_choice"
+        "multiple_choice",
+        "matching_headings",
+        "summary_completion"
       ],
       "note": "Di ujian aslinya ada 3 bacaan dalam 60 menit. True/False/Not Given menguji FAKTA di teks; Yes/No/Not Given menguji PANDANGAN penulis - dan tertukarnya keduanya adalah salah satu sebab kehilangan nilai yang paling sering. Not Given berarti teksnya DIAM, bukan bahwa pernyataannya terasa meragukan.",
       "questionsPerPassage": [
@@ -1123,6 +1125,679 @@
       ],
       "wordCount": 700,
       "paragraphs": 10
+    },
+    {
+      "id": "rx-mangrove-heads",
+      "exam": "ielts_academic_reading",
+      "level": "B2",
+      "title": "Why Planting Mangroves So Often Fails",
+      "topic": "coastal ecology and restoration",
+      "text": "Along tropical coastlines, mangrove forests grow in the difficult zone between land and sea, flooded twice a day by salt water that would kill most trees. For decades they were treated as wasteland: drained for fish ponds, cut for charcoal, cleared for harbours. That view has now reversed. Governments that once paid to remove mangroves pledge to restore them, and the targets are announced in millions of trees. The pledges are easy to make. Keeping them has proved far harder, and the reasons are worth understanding.\n\nThe case for restoration begins with waves. A mangrove forest weakens a wave by friction: every root, trunk and branch that the water must push past takes a share of its energy. Field measurements show that a wave can lose most of its height within the first hundred metres of forest. What matters is therefore not the height of the trees but the width of the belt. A strip of forest a few metres deep is decoration; a belt several hundred metres deep is infrastructure, and villages behind such belts have repeatedly recorded less flooding than their neighbours during the same storms.\n\nProtection is not the only service. The tangle of roots shelters juvenile fish and crabs until they are large enough to survive open water, which is why fishing communities often notice their catches falling years after a nearby forest is cleared. The mud matters too. Because it is waterlogged and poor in oxygen, dead plant material rots very slowly, so carbon accumulates in the soil for centuries. Hectare for hectare, mangrove soils typically hold several times more carbon than the soils of forests inland. Both services disappear quietly when the trees do, and both are costly to replace once they are gone.\n\nEnthusiasm has produced planting campaigns on an impressive scale. Volunteers and schoolchildren have set millions of seedlings into coastal mud, sometimes hundreds of thousands in a single day, and each seedling costs very little to buy. The results have been sobering. Teams who returned to survey the sites years later found that in many large campaigns fewer than one seedling in five had survived, and that at some sites none had.\n\nThe reason is rarely the seedlings themselves. Campaigns favour one or two species whose large seeds are easy to collect and handle, whether or not those species suit the site. More damaging still is the choice of ground. Seedlings are typically planted on open mudflats in front of the existing shore, because the space is empty and no one must be asked for land. But those flats are empty for a reason: they sit too low in the tidal range, so young trees are submerged for longer each day than they can tolerate. A forest is being demanded from ground that mangroves never colonised on their own.\n\nAn alternative approach starts with water rather than trees. In many failed sites, the original forest died because embankments and abandoned ponds had blocked the daily movement of the tide. Where engineers reopen the old channels and let the sea flow in and out again, mangrove seeds float in on their own, settle where conditions suit them, and grow. Surveys of such sites report survival far higher than in planting campaigns. The method's weakness is presentational: for the first few years there is little to photograph except mud and water.\n\nThat weakness matters because of how restoration is funded. Donors and agencies must report results quickly, and the number of seedlings planted is available on the day of the event, complete with photographs of volunteers at work. The number of trees still alive after five years arrives long after the budget has closed and the officials have moved on. The system rewards the number that is easy to count, and the number that is easy to count is the wrong one.\n\nNone of this means restoration is hopeless. It means the measure of success needs changing. Projects that begin by fixing the movement of water, accept whichever species arrive naturally, and commit to counting survivors for a decade have an encouraging record. They are slower, less visible and harder to summarise in a press release — which is precisely why they need defenders who understand what the photographs of planting days do not show.",
+      "questions": [
+        {
+          "id": "rx-mangrove-heads-1",
+          "type": "matching_headings",
+          "stem": "Pilih heading yang paling tepat untuk paragraf 2.",
+          "options": [
+            "How young fish use the mangrove roots",
+            "Letting the tide bring the forest back",
+            "Large campaigns, few surviving trees",
+            "Why the width of the forest matters more than its height",
+            "The low price of a single seedling",
+            "A funding system that counts the wrong number",
+            "Benefits that go beyond defending the coast",
+            "The wrong species on the wrong ground"
+          ],
+          "answerIndex": 3,
+          "explain": {
+            "evidence": "What matters is therefore not the height of the trees but the width of the belt",
+            "why": "Gagasan utama paragraf 2 adalah bagaimana hutan melemahkan ombak, dan kesimpulannya eksplisit: yang menentukan lebar sabuknya, bukan tinggi pohonnya.",
+            "whyOthersFail": "Heading soal ikan dan harga bibit hanya menangkap detail paragraf lain; heading kampanye, spesies, pasang surut, dan pendanaan adalah gagasan utama paragraf 4-7, bukan paragraf ini."
+          },
+          "paragraph": 2
+        },
+        {
+          "id": "rx-mangrove-heads-2",
+          "type": "matching_headings",
+          "stem": "Pilih heading yang paling tepat untuk paragraf 3.",
+          "options": [
+            "How young fish use the mangrove roots",
+            "Letting the tide bring the forest back",
+            "Large campaigns, few surviving trees",
+            "Why the width of the forest matters more than its height",
+            "The low price of a single seedling",
+            "A funding system that counts the wrong number",
+            "Benefits that go beyond defending the coast",
+            "The wrong species on the wrong ground"
+          ],
+          "answerIndex": 6,
+          "explain": {
+            "evidence": "Protection is not the only service.",
+            "why": "Paragraf 3 dibuka dengan 'Protection is not the only service' lalu merinci dua manfaat lain: tempat asuhan ikan dan simpanan karbon. Gagasan utamanya adalah manfaat di luar perlindungan pantai.",
+            "whyOthersFail": "'How young fish use the mangrove roots' memang disebut, tetapi itu hanya SATU detail di dalam paragraf - jebakan klasik matching headings adalah memilih heading yang menangkap detail, bukan payungnya."
+          },
+          "paragraph": 3
+        },
+        {
+          "id": "rx-mangrove-heads-3",
+          "type": "matching_headings",
+          "stem": "Pilih heading yang paling tepat untuk paragraf 4.",
+          "options": [
+            "How young fish use the mangrove roots",
+            "Letting the tide bring the forest back",
+            "Large campaigns, few surviving trees",
+            "Why the width of the forest matters more than its height",
+            "The low price of a single seedling",
+            "A funding system that counts the wrong number",
+            "Benefits that go beyond defending the coast",
+            "The wrong species on the wrong ground"
+          ],
+          "answerIndex": 2,
+          "explain": {
+            "evidence": "in many large campaigns fewer than one seedling in five had survived",
+            "why": "Paragraf 4 menceritakan skala kampanye yang megah dan hasil survei yang mengecewakan - persis pasangan 'kampanye besar, sedikit yang bertahan'.",
+            "whyOthersFail": "'The low price of a single seedling' hanya detail kecil di paragraf ini, bukan intinya. Heading lain milik paragraf lain: lebar sabuk (2), manfaat lain (3), spesies dan lahan (5)."
+          },
+          "paragraph": 4
+        },
+        {
+          "id": "rx-mangrove-heads-4",
+          "type": "matching_headings",
+          "stem": "Pilih heading yang paling tepat untuk paragraf 5.",
+          "options": [
+            "How young fish use the mangrove roots",
+            "Letting the tide bring the forest back",
+            "Large campaigns, few surviving trees",
+            "Why the width of the forest matters more than its height",
+            "The low price of a single seedling",
+            "A funding system that counts the wrong number",
+            "Benefits that go beyond defending the coast",
+            "The wrong species on the wrong ground"
+          ],
+          "answerIndex": 7,
+          "explain": {
+            "evidence": "A forest is being demanded from ground that mangroves never colonised on their own.",
+            "why": "Paragraf 5 menjelaskan dua kesalahan: spesies dipilih karena mudah ditangani, dan lahannya mudflat yang terlalu rendah. Heading 'spesies yang salah di lahan yang salah' merangkum keduanya.",
+            "whyOthersFail": "Heading kampanye besar (paragraf 4) dan pasang surut yang dipulihkan (paragraf 6) membahas hal lain; heading detail ikan dan harga bibit tidak pernah menjadi gagasan utama paragraf mana pun."
+          },
+          "paragraph": 5
+        },
+        {
+          "id": "rx-mangrove-heads-5",
+          "type": "matching_headings",
+          "stem": "Pilih heading yang paling tepat untuk paragraf 6.",
+          "options": [
+            "How young fish use the mangrove roots",
+            "Letting the tide bring the forest back",
+            "Large campaigns, few surviving trees",
+            "Why the width of the forest matters more than its height",
+            "The low price of a single seedling",
+            "A funding system that counts the wrong number",
+            "Benefits that go beyond defending the coast",
+            "The wrong species on the wrong ground"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "evidence": "mangrove seeds float in on their own, settle where conditions suit them, and grow",
+            "why": "Paragraf 6 memaparkan pendekatan yang memulihkan aliran pasang surut lebih dulu sehingga biji datang dan tumbuh sendiri - 'membiarkan pasang membawa hutannya kembali'.",
+            "whyOthersFail": "Heading pendanaan adalah gagasan paragraf 7; heading kampanye besar milik paragraf 4. Heading detail (ikan, harga bibit) tetap pengecoh di semua soal."
+          },
+          "paragraph": 6
+        },
+        {
+          "id": "rx-mangrove-heads-6",
+          "type": "matching_headings",
+          "stem": "Pilih heading yang paling tepat untuk paragraf 7.",
+          "options": [
+            "How young fish use the mangrove roots",
+            "Letting the tide bring the forest back",
+            "Large campaigns, few surviving trees",
+            "Why the width of the forest matters more than its height",
+            "The low price of a single seedling",
+            "A funding system that counts the wrong number",
+            "Benefits that go beyond defending the coast",
+            "The wrong species on the wrong ground"
+          ],
+          "answerIndex": 5,
+          "explain": {
+            "evidence": "The system rewards the number that is easy to count, and the number that is easy to count is the wrong one.",
+            "why": "Paragraf 7 seluruhnya tentang insentif pendanaan: angka bibit tersedia hari itu juga, angka pohon yang hidup datang setelah anggaran ditutup. Sistemnya menghargai angka yang salah.",
+            "whyOthersFail": "Heading pasang surut milik paragraf 6, heading kampanye milik paragraf 4. Harga bibit disebut di paragraf 4 sebagai detail - bukan di sini, dan bukan sebagai gagasan utama."
+          },
+          "paragraph": 7
+        },
+        {
+          "id": "rx-mangrove-heads-7",
+          "type": "true_false_not_given",
+          "stem": "Villages behind wide mangrove belts have recorded less flooding than nearby villages during the same storms.",
+          "options": [
+            "True",
+            "False",
+            "Not Given"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "villages behind such belts have repeatedly recorded less flooding than their neighbours during the same storms",
+            "why": "Teks menyatakannya hampir kata per kata: desa di belakang sabuk lebar berulang kali mencatat banjir yang lebih kecil daripada tetangganya pada badai yang sama.",
+            "whyOthersFail": "False butuh teks yang membantah; Not Given butuh teks yang diam soal banjir. Keduanya tidak berlaku karena kalimatnya ada dan searah dengan pernyataan."
+          }
+        },
+        {
+          "id": "rx-mangrove-heads-8",
+          "type": "true_false_not_given",
+          "stem": "Carbon stored in mangrove mud is released quickly once plant material dies.",
+          "options": [
+            "True",
+            "False",
+            "Not Given"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "evidence": "dead plant material rots very slowly, so carbon accumulates in the soil for centuries",
+            "why": "Justru sebaliknya: karena lumpurnya tergenang dan miskin oksigen, pembusukan berjalan sangat lambat dan karbon menumpuk berabad-abad. Pernyataannya dibalik, jadi False.",
+            "whyOthersFail": "True menerima arah yang terbalik. Not Given salah karena teks membahas kecepatan pembusukan itu secara langsung - ini bukan hal yang didiamkan."
+          }
+        },
+        {
+          "id": "rx-mangrove-heads-9",
+          "type": "true_false_not_given",
+          "stem": "The seedlings used in mass planting campaigns were often damaged by disease.",
+          "options": [
+            "True",
+            "False",
+            "Not Given"
+          ],
+          "answerIndex": 2,
+          "explain": {
+            "evidence": "The reason is rarely the seedlings themselves.",
+            "why": "Teks menyebut penyebab kegagalan jarang terletak pada bibitnya, lalu membahas spesies dan lahan - tetapi penyakit tidak pernah disinggung sama sekali. Teksnya diam, jadi Not Given.",
+            "whyOthersFail": "True menambahkan sebab yang tidak tertulis. False juga salah: untuk False, teks harus MEMBANTAH adanya penyakit, dan bantahan itu pun tidak ada. Not Given berarti teksnya diam, bukan pernyataannya terasa meragukan."
+          }
+        },
+        {
+          "id": "rx-mangrove-heads-10",
+          "type": "true_false_not_given",
+          "stem": "Sites where tidal flow was restored showed far higher survival than planting campaigns did.",
+          "options": [
+            "True",
+            "False",
+            "Not Given"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "Surveys of such sites report survival far higher than in planting campaigns",
+            "why": "Teks menyatakannya langsung: survei lokasi yang aliran pasang surutnya dipulihkan melaporkan kelangsungan hidup yang jauh lebih tinggi daripada kampanye tanam.",
+            "whyOthersFail": "False butuh teks yang membantah perbandingannya; Not Given salah karena hasil surveinya disebut eksplisit, bukan didiamkan."
+          }
+        },
+        {
+          "id": "rx-mangrove-heads-11",
+          "type": "multiple_choice",
+          "stem": "Mengapa mudflat terbuka sering dipilih sebagai lokasi tanam menurut bacaan?",
+          "options": [
+            "Karena pasang surutnya paling cocok untuk bibit muda",
+            "Karena tanahnya paling kaya bahan organik",
+            "Karena ombak di sana paling tenang",
+            "Karena lahannya kosong dan tidak perlu meminta izin siapa pun"
+          ],
+          "answerIndex": 3,
+          "explain": {
+            "evidence": "because the space is empty and no one must be asked for land",
+            "why": "Alasannya administratif, bukan ekologis: ruangnya kosong dan tidak ada pemilik lahan yang harus dimintai izin.",
+            "whyOthersFail": "Teks justru menyatakan mudflat itu terlalu rendah dalam rentang pasang surut sehingga bibit terendam terlalu lama; kekayaan tanah dan ketenangan ombak tidak pernah disebut."
+          }
+        },
+        {
+          "id": "rx-mangrove-heads-12",
+          "type": "multiple_choice",
+          "stem": "Apa kelemahan utama pendekatan yang memulihkan aliran air lebih dulu?",
+          "options": [
+            "Pada tahun-tahun awal hampir tidak ada yang bisa difoto",
+            "Biayanya jauh lebih besar daripada kampanye tanam",
+            "Bibitnya harus didatangkan dari daerah lain",
+            "Tingkat kelangsungan hidup pohonnya lebih rendah"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "for the first few years there is little to photograph except mud and water",
+            "why": "Kelemahannya presentasional: bertahun-tahun pertama yang terlihat hanya lumpur dan air, padahal survei justru melaporkan kelangsungan hidup yang jauh lebih tinggi.",
+            "whyOthersFail": "Kelangsungan hidup yang lebih rendah membalik isi teks; soal biaya yang lebih besar dan bibit dari daerah lain tidak pernah dinyatakan."
+          }
+        },
+        {
+          "id": "rx-mangrove-heads-13",
+          "type": "multiple_choice",
+          "stem": "Menurut paragraf terakhir, apa yang perlu diubah?",
+          "options": [
+            "Jenis pohon yang dipakai para relawan",
+            "Lembaga yang membiayai proyek restorasi",
+            "Ukuran keberhasilan sebuah proyek",
+            "Target jumlah bibit nasional"
+          ],
+          "answerIndex": 2,
+          "explain": {
+            "evidence": "It means the measure of success needs changing.",
+            "why": "Penulis menutup dengan membalik ukuran: bukan restorasinya yang tanpa harapan, melainkan tolok ukurnya - hitung yang bertahan selama sepuluh tahun, bukan yang ditanam sehari.",
+            "whyOthersFail": "Jenis pohon justru diserahkan ke alam ('accept whichever species arrive naturally'); penggantian lembaga donor dan target bibit nasional tidak pernah diusulkan."
+          }
+        }
+      ],
+      "wordCount": 711,
+      "paragraphs": 8
+    },
+    {
+      "id": "rx-batik-summary",
+      "exam": "ielts_academic_reading",
+      "level": "C1",
+      "title": "What Makes Batik Batik",
+      "topic": "craft, authenticity and definition",
+      "text": "Ask a visitor what batik is and you will usually hear a description of a pattern: deep browns and indigos arranged into flowers, birds and geometric borders. The answer is understandable, and it is wrong in a way that matters. Batik is not a pattern but a process. A cloth is batik because its design was built up by repeatedly drawing hot wax onto the fabric and dyeing whatever the wax left exposed. A printed cloth that copies a batik motif, however faithfully, is not batik at all — and the difference, far from being a technicality, decides who earns a living from the word.\n\nThe process is a long negotiation with wax. A maker heats a blend of waxes until it flows, then lays it down wherever the cloth must stay undyed. When the cloth is dipped, the dye claims only the bare fibre. The wax is then boiled away, new lines are drawn, and the cloth is dyed again; each cycle adds a single colour, so a design in four colours means the entire sequence performed four times. Mistakes cannot be corrected, only incorporated into the design.\n\nThe wax itself is engineered. Makers blend paraffin, beeswax and tree resins, and it is the proportions of the blend that decide how the coating behaves in the dye bath: more paraffin leaves it brittle, so that dye seeps into hairline cracks and produces the fine veining prized in some traditions; more beeswax keeps the drawn line supple and clean. The dyes were historically botanical — indigo leaves for the blues, soga bark for the warm browns — and demanded days of repeated dipping for a single colour. The arrival of synthetic dyes in the late nineteenth century collapsed those days into hours and rewrote the economics of every workshop.\n\nWithin the craft there are two instruments. The canting, a small copper kettle with a spout, is held like a pen; a cloth drawn with it — batik tulis — can occupy a maker for weeks or months. The cap, a copper stamp, presses the same waxed design onto the cloth in seconds, and a stamped piece can be finished in days. Purists rank the first far above the second, but both are batik, because in both the pattern exists as wax before it exists as colour. The meaningful boundary lies elsewhere: a textile printed with a batik design involves no wax at all, and no resistance for the dye to negotiate.\n\nThe boundary matters because the imitation is cheap. A printed copy sells for a fraction of the price of the cloth it mimics, and to a hurried eye in a market the two are difficult to tell apart. Workshops that pay for weeks of skilled labour are undercut by factories that pay for none, and the price a genuine cloth can command is dragged down by objects that merely resemble it.\n\nThe cloth itself offers a defence, for those who know where to look. Because hot wax soaks through the fabric, a genuine batik carries its design almost equally on both faces; on a printed imitation the reverse side is noticeably paler, a ghost of the front. Hand-waxed lines also hesitate — they thicken where the maker paused and thin where the hand moved quickly — while printed lines are inhumanly even. On newer cloth there is often a plainer signature: a faint smell of wax that no printing press leaves behind.\n\nIn 2009, UNESCO added Indonesian batik to its list of the intangible cultural heritage of humanity. The listing raised the craft's public standing: offices adopted batik Fridays, demand rose, and the word acquired a patriotic glow. The irony is that much of the new demand has been met by printed cloth, so that a decision honouring a technique has chiefly enlarged the market for its imitation.\n\nMeanwhile the technique rests on labour that is largely invisible. Most of the waxing is done by women, paid by the piece at rates that reward speed over the patience the work demands, and many of them are past middle age. The skill takes years to acquire, and young workers who calculate what those years will pay are choosing other trades. A tradition can survive bad publicity; it cannot survive the retirement of everyone who practises it.\n\nWhat deserves protection, then, is not a set of motifs, which can be photographed and reproduced endlessly, but the knowledge held in hands — the feel for wax at the right temperature, for a line drawn at the right speed. Protecting that requires the unglamorous machinery of definition: a rule that reserves the word batik for wax-resist cloth, honest labelling for everything else, and prices that make the years of apprenticeship worth a young worker's while.",
+      "questions": [
+        {
+          "id": "rx-batik-summary-1",
+          "type": "summary_completion",
+          "stem": "Lengkapi ringkasan — pilih kata/frasa dari teks yang mengisi bagian kosong: \"According to the writer, a cloth only qualifies as batik if its design was made with ______ before any dye touched the fabric.\"",
+          "options": [
+            "a copper stamp",
+            "wax",
+            "indigo",
+            "a printing press"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "evidence": "A cloth is batik because its design was built up by repeatedly drawing hot wax onto the fabric",
+            "why": "Definisi penulis berpusat pada lilin: desain harus lahir sebagai lilin sebelum lahir sebagai warna. Canting maupun cap sama-sama sah karena keduanya memakai lilin.",
+            "whyOthersFail": "'A copper stamp' hanya salah satu alat (cap) - batik tulis tidak memakainya; 'indigo' adalah pewarna, bukan perintangnya; 'a printing press' justru penanda kain tiruan yang tanpa lilin sama sekali."
+          }
+        },
+        {
+          "id": "rx-batik-summary-2",
+          "type": "summary_completion",
+          "stem": "Lengkapi ringkasan — pilih kata/frasa dari teks yang mengisi bagian kosong: \"How the wax coating behaves in the dye bath depends on the ______ of the blend.\"",
+          "options": [
+            "temperature",
+            "colour",
+            "price",
+            "proportions"
+          ],
+          "answerIndex": 3,
+          "explain": {
+            "evidence": "it is the proportions of the blend that decide how the coating behaves in the dye bath",
+            "why": "Teks menyebutnya eksplisit: perbandingan campuran parafin, lilin lebah, dan damar yang menentukan - lebih banyak parafin membuat lapisan getas dan retak halus, lebih banyak lilin lebah membuat garis lentur.",
+            "whyOthersFail": "Suhu ('temperature') memang disebut, tetapi untuk melelehkan lilin agar mengalir saat digambar - bukan penentu perilakunya di bak celup. Warna adalah hasil pencelupan, bukan sifat campuran; harga campuran tidak dibahas sama sekali."
+          }
+        },
+        {
+          "id": "rx-batik-summary-3",
+          "type": "summary_completion",
+          "stem": "Lengkapi ringkasan — pilih kata/frasa dari teks yang mengisi bagian kosong: \"Finishing a cloth drawn with the canting can take weeks or even ______, whereas a stamped piece takes days.\"",
+          "options": [
+            "hours",
+            "seconds",
+            "months",
+            "years"
+          ],
+          "answerIndex": 2,
+          "explain": {
+            "evidence": "a cloth drawn with it — batik tulis — can occupy a maker for weeks or months",
+            "why": "Teks menyandingkan dua durasi: batik tulis memakan waktu berminggu-minggu sampai berbulan-bulan, batik cap selesai dalam hitungan hari.",
+            "whyOthersFail": "'Seconds' adalah waktu cap menekankan pola sekali tekan, bukan durasi menyelesaikan kain; 'hours' adalah efek pewarna sintetis pada pencelupan; 'years' dipakai teks untuk lama menguasai keterampilan, bukan lama membuat satu kain."
+          }
+        },
+        {
+          "id": "rx-batik-summary-4",
+          "type": "summary_completion",
+          "stem": "Lengkapi ringkasan — pilih kata/frasa dari teks yang mengisi bagian kosong: \"A quick test of authenticity: on a printed copy, the pattern viewed from the ______ of the cloth looks much fainter.\"",
+          "options": [
+            "reverse",
+            "borders",
+            "front",
+            "fibre"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "on a printed imitation the reverse side is noticeably paler, a ghost of the front",
+            "why": "Karena lilin panas meresap menembus kain, batik asli membawa desain hampir sama jelas di kedua muka; tiruan cetak hanya kuat di muka depan sehingga sisi baliknya pucat.",
+            "whyOthersFail": "'Front' membalik faktanya - sisi depan tiruan justru yang jelas; 'borders' hanya bagian motif dan 'fibre' hanya serat yang diwarnai - keduanya tidak pernah dijadikan penanda keaslian oleh teks."
+          }
+        },
+        {
+          "id": "rx-batik-summary-5",
+          "type": "summary_completion",
+          "stem": "Lengkapi ringkasan — pilih kata/frasa dari teks yang mengisi bagian kosong: \"Much of the demand created by the 2009 listing has in fact been supplied by ______ cloth.\"",
+          "options": [
+            "genuine",
+            "stamped",
+            "waxed",
+            "printed"
+          ],
+          "answerIndex": 3,
+          "explain": {
+            "evidence": "much of the new demand has been met by printed cloth",
+            "why": "Inilah ironi yang ditunjuk penulis: keputusan yang menghormati sebuah teknik justru memperbesar pasar bagi tiruannya yang dicetak tanpa lilin.",
+            "whyOthersFail": "'Genuine', 'stamped', dan 'waxed' semuanya menunjuk kain yang benar-benar memakai lilin - justru kebalikan dari yang menampung lonjakan permintaan menurut teks."
+          }
+        },
+        {
+          "id": "rx-batik-summary-6",
+          "type": "summary_completion",
+          "stem": "Lengkapi ringkasan — pilih kata/frasa dari teks yang mengisi bagian kosong: \"The writer concludes that protection requires reserving the word batik for ______ cloth.\"",
+          "options": [
+            "wax-resist",
+            "printed",
+            "patriotic",
+            "photographed"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "a rule that reserves the word batik for wax-resist cloth",
+            "why": "Penutupnya konkret: aturan yang mengunci kata 'batik' hanya untuk kain perintang lilin, pelabelan jujur untuk selainnya, dan harga yang membuat tahun-tahun magang sepadan.",
+            "whyOthersFail": "'Printed' justru kain yang HARUS dilabeli sebagai bukan batik; 'patriotic' hanya menggambarkan citra kata itu setelah 2009; 'photographed' dipakai teks untuk motif yang bisa ditiru tanpa batas."
+          }
+        },
+        {
+          "id": "rx-batik-summary-7",
+          "type": "matching_information",
+          "stem": "Paragraf mana yang menjelaskan cara mengenali batik asli dari kainnya sendiri?",
+          "options": [
+            "Paragraf 4",
+            "Paragraf 5",
+            "Paragraf 6",
+            "Paragraf 7"
+          ],
+          "answerIndex": 2,
+          "explain": {
+            "evidence": "a genuine batik carries its design almost equally on both faces",
+            "why": "Paragraf 6 memberi tiga penanda pada kainnya: sisi balik yang sama jelas, garis tangan yang menebal-menipis, dan bau lilin yang samar.",
+            "whyOthersFail": "Paragraf 4 membedakan canting dan cap; paragraf 5 soal harga tiruan; paragraf 7 soal pengakuan UNESCO."
+          },
+          "paragraph": 6
+        },
+        {
+          "id": "rx-batik-summary-8",
+          "type": "matching_information",
+          "stem": "Paragraf mana yang menjelaskan mengapa harga batik asli ikut tertekan?",
+          "options": [
+            "Paragraf 3",
+            "Paragraf 5",
+            "Paragraf 7",
+            "Paragraf 9"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "evidence": "the price a genuine cloth can command is dragged down by objects that merely resemble it",
+            "why": "Paragraf 5 memaparkan mekanismenya: tiruan cetak dijual sepersekian harga, mata yang terburu-buru sulit membedakan, dan bengkel yang membayar tenaga terampil kalah bersaing.",
+            "whyOthersFail": "Paragraf 3 soal kimia lilin dan pewarna; paragraf 7 soal dampak pengakuan UNESCO; paragraf 9 kesimpulan tentang apa yang layak dilindungi."
+          },
+          "paragraph": 5
+        },
+        {
+          "id": "rx-batik-summary-9",
+          "type": "matching_information",
+          "stem": "Paragraf mana yang membahas siapa yang mengerjakan pemalaman dan bagaimana mereka dibayar?",
+          "options": [
+            "Paragraf 5",
+            "Paragraf 6",
+            "Paragraf 7",
+            "Paragraf 8"
+          ],
+          "answerIndex": 3,
+          "explain": {
+            "evidence": "Most of the waxing is done by women, paid by the piece at rates that reward speed over the patience the work demands",
+            "why": "Paragraf 8 membuka sisi tenaga kerja yang nyaris tak terlihat: sebagian besar perempuan, dibayar borongan, dan generasi muda memilih pekerjaan lain.",
+            "whyOthersFail": "Paragraf 5 soal persaingan harga, paragraf 6 soal cara mengenali kain asli, paragraf 7 soal UNESCO - tak satu pun membahas upah perajin."
+          },
+          "paragraph": 8
+        },
+        {
+          "id": "rx-batik-summary-10",
+          "type": "yes_no_not_given",
+          "stem": "The writer believes a printed cloth with a batik motif deserves to be called batik.",
+          "options": [
+            "Yes",
+            "No",
+            "Not Given"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "evidence": "A printed cloth that copies a batik motif, however faithfully, is not batik at all",
+            "why": "Pandangan penulis dinyatakan tegas di paragraf pembuka: sesetia apa pun tiruannya, kain cetak bukan batik. Jawabannya No.",
+            "whyOthersFail": "Yes membalik pendirian penulis. Not Given salah karena ini justru tesis utama tulisannya - YNNG menguji PANDANGAN penulis, dan di sini pandangannya eksplisit."
+          }
+        },
+        {
+          "id": "rx-batik-summary-11",
+          "type": "yes_no_not_given",
+          "stem": "The writer sees an irony in what followed the UNESCO listing.",
+          "options": [
+            "Yes",
+            "No",
+            "Not Given"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "The irony is that much of the new demand has been met by printed cloth",
+            "why": "Penulis memakai kata 'irony' sendiri: pengakuan atas sebuah teknik justru memperbesar pasar tiruan yang meninggalkan teknik itu.",
+            "whyOthersFail": "No membalik sikap penulis; Not Given salah karena kalimatnya ada, lengkap dengan penilaiannya."
+          }
+        },
+        {
+          "id": "rx-batik-summary-12",
+          "type": "yes_no_not_given",
+          "stem": "The writer believes synthetic dyes made batik less beautiful than natural dyes did.",
+          "options": [
+            "Yes",
+            "No",
+            "Not Given"
+          ],
+          "answerIndex": 2,
+          "explain": {
+            "evidence": "The arrival of synthetic dyes in the late nineteenth century collapsed those days into hours and rewrote the economics of every workshop",
+            "why": "Yang dinilai penulis hanyalah dampak WAKTU dan EKONOMI pewarna sintetis. Soal mana yang lebih indah, teksnya diam sama sekali - jadi Not Given.",
+            "whyOthersFail": "Yes menambahkan penilaian estetika yang tidak pernah ditulis; No juga salah karena penulis tidak membela pewarna sintetis - ia sekadar tidak berpendapat. Not Given berarti penulisnya diam, bukan pernyataannya terdengar salah."
+          }
+        },
+        {
+          "id": "rx-batik-summary-13",
+          "type": "yes_no_not_given",
+          "stem": "The writer thinks stamped batik should not count as real batik.",
+          "options": [
+            "Yes",
+            "No",
+            "Not Given"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "evidence": "both are batik, because in both the pattern exists as wax before it exists as colour",
+            "why": "Penulis justru membela batik cap: kaum puris boleh menempatkan tulis di atas cap, tetapi keduanya batik karena polanya lahir sebagai lilin. Jawabannya No.",
+            "whyOthersFail": "Yes menyamakan pendirian penulis dengan kaum puris yang justru ia koreksi. Not Given salah karena penulis menyatakan posisinya secara langsung."
+          }
+        }
+      ],
+      "wordCount": 785,
+      "paragraphs": 9
+    },
+    {
+      "id": "rx-deepsea-c2",
+      "exam": "toefl_reading",
+      "level": "C2",
+      "title": "Chemosynthesis and the Rewriting of the Deep Sea",
+      "topic": "deep-sea biology and the limits of observation",
+      "text": "Until the late 1970s, the deep ocean floor was regarded as a biological near-desert, and the presumption seemed unassailable. Sunlight is extinguished within a few hundred meters of the surface, and every food web then known rested ultimately on photosynthesis. Whatever lived in the abyss was assumed to subsist on marine snow — the sparse, slow descent of organic particles from the sunlit layers above — a ration so meagre that scarcity appeared to be the deep sea's defining condition, and its fauna a thin scattering of scavengers adapted to permanent shortage.\n\nThat presumption did not survive the descent of a research submersible to a volcanic ridge in the eastern Pacific in 1977. Around fissures where seawater, having percolated through hot rock, re-emerged laden with dissolved minerals, the observers found not scarcity but profusion: beds of clams, thickets of tubeworms up to two meters long, and crabs and fish in densities exceeding those of the surrounding seafloor by orders of magnitude. The water sustaining this crowd was far warmer than the near-freezing abyss around it, and it carried compounds that, by every textbook then in print, should have made the neighborhood poisonous rather than fertile.\n\nThe explanation overturned a century of assumptions about where the energy for life must come from. Bacteria at these vents oxidize the hydrogen sulfide dissolved in the venting fluid and use the energy released to fix carbon — chemosynthesis, a metabolism whose primary energy source is chemical rather than solar. The giant tubeworms proved to have neither mouth nor gut; they are, in effect, housing for symbiotic bacteria, which occupy an internal organ evolved for that purpose and provision their host from within. The independence from sunlight is nonetheless partial rather than absolute: the oxidation on which the whole edifice depends consumes oxygen, and the ocean's oxygen is overwhelmingly the product of photosynthesis conducted elsewhere.\n\nThe ecology that results is shaped by impermanence. An individual vent field may remain active for decades rather than millennia; when the flow ceases, the community it sustained starves. Persistence therefore depends on dispersal: larvae must drift, or be carried by currents, to colonize new fields whose locations no adult will survive to reach. The faunas assembled this way are strikingly endemic — many vent species occur nowhere else — and their apparent rarity may say less about their abundance than about the handful of sites at which anyone has looked.\n\nThat qualification points to a methodological difficulty that attends all deep-sea biology. The environment can be reached only briefly, at great cost, and by instruments that disturb what they examine. Sampling gear crushes what it collects, and a submersible announces itself with noise and displaced water long before it arrives. Generalizations about vent ecosystems accordingly rest on repeated visits to a small number of accessible sites, and it would be imprudent to assume that the few sites so far described are truly representative of the many sites that remain unvisited.\n\nThe question has acquired regulatory urgency. Vent chimneys precipitate copper, zinc and gold in concentrations that mining interests find increasingly attractive, and licenses to prospect parts of the international seabed have already been granted. Assessing what extraction would destroy, however, presupposes a baseline inventory of what is there — precisely the inventory that the difficulty of access has prevented anyone from compiling. Regulators are thus asked to weigh a quantifiable commercial gain against a loss that cannot yet be stated, an asymmetry that tends, in practice, to favor the gain.\n\nThe larger lesson of 1977 may therefore be epistemological rather than zoological. The deep sea had not been empty; it had been unexamined, and the confident assertions of its barrenness were, in retrospect, statements about the reach of the era's instruments rather than about the distribution of life. Claims of absence deserve, on this reading, a standing discount: they report where we have looked, and with what, at least as faithfully as they report what exists.",
+      "questions": [
+        {
+          "id": "rx-deepsea-c2-1",
+          "type": "factual",
+          "stem": "According to paragraph 1, what was deep-sea life assumed to subsist on?",
+          "options": [
+            "Dissolved minerals rising from hot rock",
+            "Organic particles sinking from the sunlit layers",
+            "Bacteria carried down by ocean currents",
+            "Heat released by volcanic activity"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "evidence": "assumed to subsist on marine snow — the sparse, slow descent of organic particles from the sunlit layers above",
+            "why": "Pandangan lama: satu-satunya makanan yang sampai ke dasar adalah 'marine snow', partikel organik yang turun perlahan dari lapisan bercahaya - jatah yang sangat tipis.",
+            "whyOthersFail": "Mineral terlarut dan panas vulkanik justru bagian dari penemuan 1977 yang MENGGUGURKAN anggapan itu; bakteri yang terbawa arus tidak pernah disebut sebagai sumber makanan."
+          }
+        },
+        {
+          "id": "rx-deepsea-c2-2",
+          "type": "factual",
+          "stem": "According to paragraph 3, how do the giant tubeworms obtain their nutrition?",
+          "options": [
+            "They filter marine snow through specialized gills",
+            "They absorb dissolved minerals directly through the skin",
+            "They are provisioned from within by symbiotic bacteria",
+            "They prey on the clams and crabs around the vents"
+          ],
+          "answerIndex": 2,
+          "explain": {
+            "evidence": "housing for symbiotic bacteria, which occupy an internal organ evolved for that purpose and provision their host from within",
+            "why": "Cacing tabung raksasa tidak punya mulut maupun usus; ia pada dasarnya 'rumah' bagi bakteri simbiotik yang memberinya makan dari dalam.",
+            "whyOthersFail": "Justru ketiadaan mulut dan usus meniadakan penyaringan dan pemangsaan; penyerapan mineral lewat kulit tidak pernah dinyatakan - mineralnya diolah bakteri, bukan diserap inangnya langsung."
+          }
+        },
+        {
+          "id": "rx-deepsea-c2-3",
+          "type": "vocabulary",
+          "stem": "The word \"profusion\" in paragraph 2 is closest in meaning to",
+          "options": [
+            "confusion",
+            "abundance",
+            "variety",
+            "danger"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "evidence": "the observers found not scarcity but profusion",
+            "why": "Kata itu dipertentangkan langsung dengan 'scarcity' (kelangkaan), lalu dirinci: hamparan kerang, rumpun cacing tabung, kepadatan berkali lipat. Lawan kelangkaan adalah kelimpahan.",
+            "whyOthersFail": "'Confusion' cuma mirip bunyi; 'variety' menonjolkan keragaman padahal yang ditekankan kepadatannya; 'danger' tidak berlawanan dengan 'scarcity' sama sekali."
+          }
+        },
+        {
+          "id": "rx-deepsea-c2-4",
+          "type": "negative_factual",
+          "stem": "All of the following are stated about vent fields and their faunas EXCEPT:",
+          "options": [
+            "A field may stay active for decades rather than millennia",
+            "A community starves once the flow of fluid stops",
+            "Many vent species are found nowhere else",
+            "Vent fields are spaced evenly along every ocean ridge"
+          ],
+          "answerIndex": 3,
+          "explain": {
+            "evidence": "An individual vent field may remain active for decades rather than millennia; when the flow ceases, the community it sustained starves.",
+            "why": "Tiga pernyataan pertama ada di paragraf 4, termasuk 'many vent species occur nowhere else'. Sebaran ventilasi yang MERATA di setiap punggungan tidak pernah dinyatakan di mana pun.",
+            "whyOthersFail": "Soal EXCEPT menghukum pembaca yang berhenti begitu menemukan satu pilihan yang benar - di sini tiga pilihan memang benar, dan yang dicari justru satu-satunya yang tidak ada di teks."
+          }
+        },
+        {
+          "id": "rx-deepsea-c2-5",
+          "type": "sentence_simplification",
+          "stem": "Which sentence best expresses the essential information in: \"The independence from sunlight is nonetheless partial rather than absolute: the oxidation on which the whole edifice depends consumes oxygen, and the ocean's oxygen is overwhelmingly the product of photosynthesis conducted elsewhere\"?",
+          "options": [
+            "Vent life uses no sunlight directly, but it depends on oxygen that photosynthesis produced",
+            "Vent communities would survive even if photosynthesis stopped everywhere",
+            "Oxygen is scarcer at the vents than anywhere else in the ocean",
+            "Photosynthesis also takes place in the water surrounding the vents"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "the oxidation on which the whole edifice depends consumes oxygen",
+            "why": "Inti kalimatnya: kemerdekaan dari matahari tidak penuh, karena oksidasi yang menopang seluruh komunitas memakai oksigen - dan oksigen laut hampir seluruhnya buah fotosintesis di tempat lain.",
+            "whyOthersFail": "Pilihan kedua justru membalik akibatnya; kelangkaan oksigen di ventilasi tidak pernah dibandingkan; fotosintesis di air sekitar ventilasi bertentangan dengan 'conducted elsewhere'."
+          }
+        },
+        {
+          "id": "rx-deepsea-c2-6",
+          "type": "inference",
+          "stem": "What can be inferred from paragraph 4 about the apparent rarity of vent species?",
+          "options": [
+            "It has been confirmed by systematic surveys of every ridge",
+            "It shows that vent faunas are close to extinction",
+            "It may reflect how few sites have been examined rather than true scarcity",
+            "It is caused by larvae failing to reach new fields"
+          ],
+          "answerIndex": 2,
+          "explain": {
+            "evidence": "their apparent rarity may say less about their abundance than about the handful of sites at which anyone has looked",
+            "why": "Penulis memberi diskon pada kesan 'langka': kesan itu mungkin lebih menceritakan sedikitnya lokasi yang pernah diperiksa daripada kelimpahan sesungguhnya.",
+            "whyOthersFail": "Survei sistematis setiap punggungan justru bertentangan dengan 'handful of sites'; kepunahan dan kegagalan larva tidak pernah disimpulkan - larva justru digambarkan sebagai mekanisme bertahannya."
+          }
+        },
+        {
+          "id": "rx-deepsea-c2-7",
+          "type": "rhetorical_purpose",
+          "stem": "Why does the author mention licenses to prospect parts of the international seabed?",
+          "options": [
+            "To show that the regulatory question is no longer hypothetical",
+            "To argue that mineral concentrations have been exaggerated",
+            "To demonstrate that vent ecosystems have already been destroyed",
+            "To explain how vent chimneys precipitate metals"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "licenses to prospect parts of the international seabed have already been granted",
+            "why": "Kata 'already' menunjuk fungsinya: urgensi regulasi bukan andai-andai lagi, izin pencariannya sudah keluar sementara inventaris dasarnya belum ada.",
+            "whyOthersFail": "Penulis tidak meragukan kadar mineralnya, tidak mengklaim ekosistemnya sudah hancur, dan proses kimianya sudah dijelaskan di kalimat sebelumnya - bukan oleh penyebutan izin."
+          }
+        },
+        {
+          "id": "rx-deepsea-c2-8",
+          "type": "factual",
+          "stem": "According to paragraph 6, why is it difficult to assess what mining would destroy?",
+          "options": [
+            "Mining technology changes faster than assessments can follow",
+            "The commercial gains have never been calculated",
+            "No baseline inventory of the ecosystems exists",
+            "Regulators lack the authority to refuse licenses"
+          ],
+          "answerIndex": 2,
+          "explain": {
+            "evidence": "presupposes a baseline inventory of what is there — precisely the inventory that the difficulty of access has prevented anyone from compiling",
+            "why": "Menilai kerusakan mengandaikan tahu apa yang ada di sana lebih dulu - dan justru inventaris itulah yang belum pernah bisa disusun karena sulitnya akses.",
+            "whyOthersFail": "Keuntungan komersial justru disebut 'quantifiable'; kecepatan teknologi tambang dan kewenangan regulator menolak izin tidak pernah dibahas."
+          }
+        },
+        {
+          "id": "rx-deepsea-c2-9",
+          "type": "insert_text",
+          "stem": "A sentence has been removed from paragraph 5. Where would this sentence best fit?  \"Even the light by which the animals are observed is an intrusion into a world that has never known any.\"  Each gap sits immediately before a labeled sentence: (A) That qualification points to a methodological difficulty that attends all deep-sea biology. (B) The environment can be reached only briefly, at great cost, and by instruments that disturb what they examine. (C) Sampling gear crushes what it collects, and a submersible announces itself with noise and displaced water long before it arrives. (D) Generalizations about vent ecosystems accordingly rest on repeated visits to a small number of accessible sites.",
+          "options": [
+            "In the gap before sentence (A)",
+            "In the gap before sentence (B)",
+            "In the gap before sentence (C)",
+            "In the gap before sentence (D)"
+          ],
+          "answerIndex": 3,
+          "explain": {
+            "evidence": "a submersible announces itself with noise and displaced water long before it arrives...Generalizations about vent ecosystems accordingly rest",
+            "why": "Kata 'Even' menutup daftar gangguan yang menanjak: alat sampel merusak, kapal selam berisik, dan puncaknya - cahaya pun ikut mengganggu. Kalimat itu harus berdiri setelah daftar lengkap tersebut, di celah sebelum kesimpulan 'accordingly' pada kalimat (D).",
+            "whyOthersFail": "Di celah sebelum (A) dan (B) kesulitan metodologisnya bahkan belum dijabarkan; di celah sebelum (C) contoh konkretnya (alat sampel dan kapal selam) belum disebut - padahal 'Even' menutup sebuah daftar, dan daftar itu belum ada untuk ditutup."
+          }
+        },
+        {
+          "id": "rx-deepsea-c2-10",
+          "type": "inference",
+          "stem": "What does the final paragraph suggest about claims that a region contains no life?",
+          "options": [
+            "They have been abandoned entirely since 1977",
+            "They describe the limits of observation as much as the world observed",
+            "They are only ever made about the deep sea",
+            "They become reliable once instruments improve"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "evidence": "they report where we have looked, and with what, at least as faithfully as they report what exists",
+            "why": "Pelajaran epistemologisnya: klaim ketiadaan layak diberi 'diskon tetap' karena ia sama setianya melaporkan jangkauan instrumen kita seperti melaporkan isi dunia.",
+            "whyOthersFail": "Penulis meminta klaim semacam itu DIDISKON, bukan ditinggalkan sepenuhnya; ia tidak membatasinya pada laut dalam; dan instrumen yang membaik justru menegaskan bahwa klaim lama memang cerita soal alat."
+          }
+        }
+      ],
+      "wordCount": 653,
+      "paragraphs": 7
     }
   ]
 }

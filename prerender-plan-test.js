@@ -66,20 +66,20 @@ const near = (got, want, tolerance) => Math.abs(got - want) / want <= tolerance;
 
   // --- 1. KORPUS 604.962 dan 5.657 OBJEK UNIK ------------------------------------------
   check('Korpus terukur dari bank = 604.962 karakter ±1%',
-    near(census.totalChars, 639033, 0.01),
-    `${census.totalChars} karakter (selisih ${(Math.abs(census.totalChars - 639033) / 639033 * 100).toFixed(3)}%)`);
+    near(census.totalChars, 645330, 0.01),
+    `${census.totalChars} karakter (selisih ${(Math.abs(census.totalChars - 645330) / 645330 * 100).toFixed(3)}%)`);
   check('Angka lama 591.898 tidak dipakai di mana pun (konstanta maupun hasil hitung)',
     census.totalChars !== 591898 && mod.CANONICAL.totalChars !== 591898 && !src.includes('591898'),
     'cf-c1 §K1 yang berlaku');
   check('Objek unik yang belum ada di R2 = 5.657 ±1%',
-    near(plan.pending.length, 6866, 0.01), `${plan.pending.length} objek`);
+    near(plan.pending.length, 7006, 0.01), `${plan.pending.length} objek`);
   check('Karakter yang akan dibayar = 286.851 ±1%',
-    near(plan.plannedChars, 320816, 0.01), `${plan.plannedChars} karakter`);
+    near(plan.plannedChars, 327113, 0.01), `${plan.plannedChars} karakter`);
   check('Dedup nyata: baris bank > objek unik, dan sisanya dihitung sebagai duplikat',
     plan.rows > plan.uniqueKeys && plan.duplicates === plan.rows - plan.uniqueKeys && plan.duplicates > 0,
     `${plan.rows} baris ⇒ ${plan.uniqueKeys} objek (${plan.duplicates} duplikat)`);
   check('Konstanta dedup dipaku sesuai ukuran nyata (5.657 / 286.851)',
-    mod.CANONICAL.uniqueObjectsPending === 6866 && mod.CANONICAL.pendingChars === 320816,
+    mod.CANONICAL.uniqueObjectsPending === 7006 && mod.CANONICAL.pendingChars === 327113,
     `${mod.CANONICAL.uniqueObjectsPending} objek / ${mod.CANONICAL.pendingChars} karakter`);
 
   // --- 2. BIAYA aura-1 UNTUK MASUKAN CONTOH --------------------------------------------
@@ -96,21 +96,21 @@ const near = (got, want, tolerance) => Math.abs(got - want) / want <= tolerance;
   const samples = [
     [84, 0.00126],       // uji nyata 84 karakter
     [1000, 0.015],       // satu unit harga
-    [320816, 4.81224],   // batch pertama
-    [639033, 9.585495]   // seluruh korpus
+    [327113, 4.906695],   // batch pertama
+    [645330, 9.67995]   // seluruh korpus
   ];
   for (const [chars, want] of samples) {
     const got = (chars / 1000) * aura1.usdPer1kChars;
     check(`Biaya aura-1 untuk ${chars} karakter = US$${want}`,
       Math.abs(got - want) < 1e-9, `US$${got}`);
   }
-  check('Biaya korpus di aura-1 ≈US$9,59 dan di aura-2-en ≈US$19,17, keduanya dilaporkan',
-    Math.abs(census.costByModel[aura1.id] - 9.59) < 0.05 &&
-    Math.abs(census.costByModel[aura2.id] - 19.17) < 0.05,
+  check('Biaya korpus di aura-1 ≈US$9,68 dan di aura-2-en ≈US$19,36, keduanya dilaporkan',
+    Math.abs(census.costByModel[aura1.id] - 9.68) < 0.05 &&
+    Math.abs(census.costByModel[aura2.id] - 19.36) < 0.05,
     `US$${census.costByModel[aura1.id].toFixed(2)} / US$${census.costByModel[aura2.id].toFixed(2)}`);
-  check('Batch pertama: US$4,81 di aura-1, US$9,62 di aura-2-en',
-    Math.abs(plan.plannedCostAllAura1Usd - 4.81) < 0.02 &&
-    Math.abs(plan.plannedCostAllAura2Usd - 9.62) < 0.02,
+  check('Batch pertama: US$4,91 di aura-1, US$9,81 di aura-2-en',
+    Math.abs(plan.plannedCostAllAura1Usd - 4.91) < 0.02 &&
+    Math.abs(plan.plannedCostAllAura2Usd - 9.81) < 0.02,
     `US$${plan.plannedCostAllAura1Usd.toFixed(2)} / US$${plan.plannedCostAllAura2Usd.toFixed(2)}`);
   check('Biaya campuran = jumlah biaya per item (bukan total karakter × tarif bawaan)',
     Math.abs(plan.plannedCostUsd - plan.pending.reduce((a, e) => a + e.costUsd, 0)) < 1e-9,
@@ -133,7 +133,7 @@ const near = (got, want, tolerance) => Math.abs(got - want) / want <= tolerance;
   check('Seluruh estimasi penyimpanan tetap di dalam free tier R2 10 GB',
     census.estimatedBytes / 1e9 < 10, `${(census.estimatedBytes / 1e9).toFixed(2)} GB`);
   check('Kebutuhan neuron ≈871.000 dan jatah gratis 10.000/hari dipaku',
-    mod.CANONICAL.freeNeuronsPerDay === 10000 && near(census.estimatedNeurons, 871463, 0.01) &&
+    mod.CANONICAL.freeNeuronsPerDay === 10000 && near(census.estimatedNeurons, 880051, 0.01) &&
     census.freeDaysNeeded > 30,
     `${census.estimatedNeurons} neuron = ${census.freeDaysNeeded} hari jatah gratis`);
 
@@ -280,7 +280,7 @@ const near = (got, want, tolerance) => Math.abs(got - want) / want <= tolerance;
   check('Dry-run tidak pernah memanggil fetch/http/net/dns — nol panggilan',
     netCalls.length === 0, netCalls.length ? netCalls.join(' | ') : 'nol panggilan');
   check('Laporan mencetak jumlah objek dan jumlah karakter',
-    /belum ada\s+:\s*6866/.test(output) && /320816 karakter/.test(output), 'objek + karakter');
+    /belum ada\s+:\s*7006/.test(output) && /327113 karakter/.test(output), 'objek + karakter');
   check('Laporan mencetak biaya untuk aura-1 DAN aura-2-en',
     /@cf\/deepgram\/aura-1\s+US\$0\.015/.test(output) && /@cf\/deepgram\/aura-2-en\s+US\$0\.030/.test(output),
     'dua harga berdampingan');
@@ -288,7 +288,7 @@ const near = (got, want, tolerance) => Math.abs(got - want) / want <= tolerance;
     /durasi audio/.test(output) && /jam/.test(output) && /ukuran R2/.test(output) && /GB/.test(output),
     'durasi + penyimpanan');
   check('Laporan memuat peringatan jatah gratis 10.000 neuron/hari tidak cukup (~871.000 dibutuhkan)',
-    /10000 neuron\/hari/.test(output) && /871463/.test(output) &&
+    /10000 neuron\/hari/.test(output) && /880051/.test(output) &&
     /JATAH GRATIS TIDAK CUKUP/.test(output) && /WAJIB dibayar sekali/.test(output),
     'pra-render dibelanjakan, bukan ditunggu');
   check('Laporan menyebut model yang ditolak beserta buktinya',

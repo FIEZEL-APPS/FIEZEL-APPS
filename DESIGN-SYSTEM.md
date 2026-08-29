@@ -117,25 +117,76 @@ Tiga wajah, tiga peran, semuanya *self-host* dari `assets/fonts/` lewat `@font-f
 Serif display dipakai HANYA di ukuran besar dengan `letter-spacing:-.015em`; di ukuran kecil
 serif kontras-tinggi kehilangan keterbacaan di ponsel, jadi judul kecil tetap Jakarta.
 
+### Skala ukuran v6.1 (O4 2026-08) — enam langkah, bukan 62 nilai rem
+
+| Token | Nilai | Peran |
+|---|---|---|
+| `--fs-display` | `clamp(1.75rem,4vw,2.125rem)` (28–34) | Judul layar DI LUAR pelajaran (`.section-head h1`). |
+| `--fs-h1` | `1.5rem` (24) | `.lesson-title`; dasar clamp `.question`. |
+| `--fs-h2` | `1.125rem` (18) | Judul kartu, heading dalam pelajaran. |
+| `--fs-body` | `1rem` (16) | Paragraf, pilihan jawaban, tombol. |
+| `--fs-small` | `.875rem` (14) | Teks pendukung, baris meta, `.feedback`. |
+| `--fs-caption` | `.75rem` (12) | Eyebrow, label stats, lencana. **Lantai: tidak ada teks di bawah 12px.** |
+
+**Hukum hirarki dalam pelajaran:** soal (`.question`, clamp 24–28px) adalah teks TERBESAR
+di layar pelajaran aktif. Judul halaman didemosi saat panggung pelajaran menyala:
+`body.fz-stage-quiz .section-head h1, body.fz-stage-grammar-lesson .section-head h1`
+turun ke `--fs-h2` dengan `--fz-heading`. Ukuran bespoke yang sengaja dipertahankan:
+`.word` 2.6rem dan `.score` 3.4rem, plus semua ukuran splash/onboarding (dijaga gate).
+
 ---
 
-## 4. Bentuk dan kedalaman
+## 4. Bentuk, kedalaman, dan spasi (v6.1 CALM, O4 2026-08)
 
 | Token | Nilai | Dipakai untuk |
 |---|---|---|
-| `--radius-lg` | `24px` | Kartu, panel besar. |
-| `--radius-md` | `16px` | Kotak sekunder, kolom isian. |
-| `--radius-sm` | `12px` | Chip, lencana. |
-| `--radius-pill` | `999px` | Tombol pil, kapsul. |
-| `--shadow-sm` | `0 2px 10px rgba(36,26,17,.06)` | Kartu diam. |
-| `--shadow-md` | `0 10px 30px rgba(36,26,17,.09)` | Elemen terangkat. |
-| `--shadow-lg` | `0 24px 60px rgba(36,26,17,.15)` | Modal, gerbang. |
+| `--radius-lg` | `24px` | Kartu, panel besar (21px+ lama memetakan ke sini). |
+| `--radius-md` | `16px` | Kotak sekunder, kolom isian (15–20px lama). |
+| `--radius-sm` | `12px` | Chip, lencana (11–14px lama). |
+| `--radius-xs` | `8px` | Sudut kecil: tombol ghost, elemen mikro (6–10px lama). |
+| `--radius-pill` | `999px` | Tombol pil, kapsul (99/999 lama). |
 
-**Tanda tangan taktil FIEZEL**: permukaan interaktif utama memakai *hard offset* pekat —
-`box-shadow:0 4px 0 var(--sun-deep)` (tombol utama), `0 3px 0 var(--surface-edge)` (kartu
-tombol), `0 2px 0 var(--surface-edge)` (bottom nav) — lalu bayangan ambient lembut di
-belakangnya. Offset keras + ambient halus itulah yang membuat UI terasa "bisa ditekan";
-jangan menggantinya dengan drop-shadow biasa.
+**Hukum pemetaan radius:** ≤4px tetap mentah (nub dekoratif); 6–10→`xs`; 11–14→`sm`;
+15–20→`md`; 21+→`lg`; 99/999→`pill`. Gelembung bicara memakai token per sudut:
+`var(--radius-md) var(--radius-md) var(--sp-1) var(--radius-md)`.
+
+### Elevasi — maksimal 3 tingkat ambient
+
+| Tingkat | Token | Arti | Boleh dipakai |
+|---|---|---|---|
+| E0 rata | *(tanpa bayangan)* | konten dalam alur | baris daftar, kartu-dalam-kartu, `.option`, `.feedback`, `.stats` |
+| E1 diam | `--shadow-sm` | maks SATU keluarga permukaan istirahat per layar | `.card` utama, `.home-overview`, `.journey-panel`, kartu soal (`:has(#quizStem)`) |
+| E2 melayang | `--shadow-md` | chrome lepas dari alur | `.bottomnav`, bar sticky, `.fz-coach-bubble/peek`, `.launcher-shell` |
+| E3 overlay | `--shadow-lg` | di atas scrim | `.modal-panel`, gerbang, `.toast`, kartu prasasti/ritual |
+
+**Tanda tangan taktil FIEZEL** kini token (saluran terpisah, BUKAN elevasi):
+`--lift-sun:0 4px 0 var(--sun-deep)` / `--lift-sun-press` (tombol utama),
+`--lift-edge:0 3px 0 var(--surface-edge)` / `--lift-edge-press` (tombol biasa, launch-card).
+Boleh dikomposisi dengan SATU tingkat ambient: `box-shadow:var(--lift-sun),var(--shadow-sm)`.
+Jangan mengetik ulang offset mentah — pakai tokennya.
+
+**Aturan border "pilih dua":** permukaan diam memakai maksimal DUA dari
+{border, bayangan ambient, latar tint}. Satu-satunya triple yang sah adalah kartu utama
+layar (border+bg+`--shadow-sm`). `.feedback` = tint + stripe status inset (tanpa border);
+`.lesson-example`/`.practice-contract`/`.report-settings` = tint saja.
+
+**Tier kartu:** `.card` (utama, E1) · `.card.card-quiet` (tanpa bayangan+entrance) ·
+`.card.card-flat` (benar-benar rata). Baris `.grammar-grid .card` dan semua kartu di
+panggung kuis selain kartu soal otomatis E0.
+
+### Tiga tingkat tombol
+
+1. **Primary** — resep chunky v6 (satu-satunya sumber): `--sun`, `var(--lift-sun),var(--shadow-sm)`,
+   `--radius-md`, `min-height:52px`, tekan = `translateY(3px)`+`--lift-sun-press`. Satu per layar.
+2. **Secondary** — tombol biasa: border `--surface-edge` 1.5px + `var(--lift-edge)`, `--radius-md`.
+3. **Ghost** — `.text-button`: tanpa border/bayangan, `min-height:44px`, `--fs-small`,
+   hover = bidang `--panel-soft`. Lapisan primary era-accent dan `.luxe` raw-hex DIHAPUS (F2-16).
+
+### Skala spasi — basis 4/8
+
+`--sp-1..8` = 4/8/12/16/20/24/32/40px. Jangan mengarang gap baru; pilih salah satu langkah.
+Patokan: padding kartu `--sp-5`, gap halaman home `--sp-6`, gap `.options` `--sp-2`,
+padding `.option`/`.feedback` `--sp-4`.
 
 ---
 
@@ -146,6 +197,7 @@ jangan menggantinya dengan drop-shadow biasa.
 | `--ease` (= `--fz-out`) | `cubic-bezier(.22,.8,.28,1)` | Transisi tenang: halaman, warna, opasitas. |
 | `--ease-spring` (= `--fz-spring`) | `cubic-bezier(.34,1.4,.4,1)` | Interaksi bertenaga: tekan tombol, modal masuk. |
 | `--dur-s` / `--dur-m` / `--dur-l` | `.18s` / `.32s` / `.5s` | Pendek / sedang / panjang. |
+| `--dur-xs` / `--dur-xl` (v6.1) | `.12s` / `.6s` | Mikro (tekan tombol) / isian panjang (bar progres). |
 
 Aturan: animasi hanya `transform` dan `opacity`; splash punya **satu jam koreografi**
 (`splash-choreography-test.js` menjaganya); nama `@keyframes` harus unik seberkas penuh

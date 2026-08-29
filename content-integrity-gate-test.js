@@ -33,7 +33,9 @@ const element = id => elements[id] ||= { id, innerHTML: '', textContent: '', cla
 const fileIndex = new Map();
 (function walk(dir) {
   for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
-    if (['node_modules', '.git', 'vendor', 'assets', 'docs'].includes(e.name)) continue;
+    // '.audit-tmp' masuk skip-list per preseden 5f2b9ee: litter snapshot release-audit
+    // (grammar-templates.json basi) kalah prioritas readdir dari berkas kanonik root.
+    if (['node_modules', '.git', 'vendor', 'assets', 'docs', '.audit-tmp'].includes(e.name)) continue;
     const full = path.join(dir, e.name);
     if (e.isDirectory()) walk(full); else if (!fileIndex.has(e.name)) fileIndex.set(e.name, full);
   }

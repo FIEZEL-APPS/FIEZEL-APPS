@@ -372,15 +372,15 @@ const HEURISTIC_PATH_ALLOWLIST = [
  */
 const TOKEN_ALLOWLIST = [
   {
-    /* Ditambahkan 29 Agu 2026 (m025-191): kunci metrik researchVerdicts
-     * multiseed_residual_ + difficultyOscillationPer10 (gabungan 45 huruf, charset base64url)
-     * di adaptivity-simulation-v3-hardened-test.js — nama identifier hasil komposisi
-     * multiseed_residual_ + nama metrik, BUKAN nilai acak; tidak pernah jadi kredensial,
-     * hidup hanya sebagai kunci pencarian JSON verdict simulator. Digest per berkas
-     * sesuai pagar pemindai. */
+    /* Ditambahkan 29 Agu 2026: BUKAN token — nama kunci metrik riset simulator
+     * (gabungan kata: multiseed + residual + nama metrik osilasi, 45 huruf
+     * camelCase+underscore; sengaja TIDAK ditulis utuh di sini supaya berkas gerbang
+     * ini sendiri tetap bersih dari pola yang ia pindai) yang dipakai
+     * adaptivity-simulation-v3-hardened-test.js untuk mencari entri researchVerdicts.
+     * Kata Inggris terbaca, publik di kode simulator, bukan kredensial apa pun. */
     digest: '1a5894c9be9af264ded23d44c30c70548fa8eaa70c9829576cb8731da76936f7',
     file: 'adaptivity-simulation-v3-hardened-test.js',
-    reason: 'kunci metrik researchVerdicts simulator (identifier komposit, bukan nilai acak/kredensial) — panjang 45 kebetulan lolos penyaring struktural base64url'
+    reason: 'nama kunci metrik researchVerdicts simulator (multiseed residual oscillation), bukan nilai acak - terbaca sebagai kata, publik di adaptivity-simulation-v3.js'
   },
   {
     /* Ditambahkan 28 Agu 2026: probe anti-vakum gerbang owner-edge-guard. Nilainya acak dan

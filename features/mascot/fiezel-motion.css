@@ -56,9 +56,15 @@
          || document.body.classList.contains('reduce-motion')) return; ... }
    ============================================================ */
 .fz-mascot, .fz-motion {
-  /* motion tokens */
-  --fz-spring: cubic-bezier(.34, 1.56, .64, 1);   /* overshoot lembut — reaksi/gestur/entrance */
-  --fz-out:    cubic-bezier(.22, 1, .36, 1);       /* ease-out expo-ish — settle, gaze, akhir hold */
+  /* motion tokens
+     [i15 2026-08-29, O4 §9.3 / audit 03-002] --fz-spring/--fz-out DIGANTI NAMA jadi
+     --paw-spring/--paw-out: nama lama membayangi alias :root style.css (--fz-spring:
+     var(--ease-spring) dst.) dengan KURVA BERBEDA (.34,1.56,.64,1 vs .34,1.4,.4,1) —
+     jebakan shadowing. Tidak ada JS yang membaca nama lama (grep 2026-08-29); micro-ui.css
+     (belum dimuat index.html) masih menyebut nama lama dan kini akan jatuh ke alias :root
+     bila suatu saat dimuat — catatan untuk agen maskot. */
+  --paw-spring: cubic-bezier(.34, 1.56, .64, 1);   /* overshoot lembut — reaksi/gestur/entrance */
+  --paw-out:    cubic-bezier(.22, 1, .36, 1);       /* ease-out expo-ish — settle, gaze, akhir hold */
   --fz-calm:   cubic-bezier(.45, .05, .35, 1);     /* [PAW baru] loop ambient tak berujung (nafas, sway, drowse) */
   --fz-settle: cubic-bezier(.34, 1.12, .52, 1);    /* [PAW baru] settle serah-terima antar layar (rasa fzPawSettle) */
   --fz-fast: 120ms; --fz-base: 240ms; --fz-slow: 420ms;
@@ -156,13 +162,13 @@ body.reduce-motion .fz-mascot.st-speaking .fz-lid { transform: scale(1,.12) !imp
    Kanal lookAt (P9): --lx/--ly di-set JS lama, digeser seluruh grup mata + paralaks wajah.
    Kanal micro-gaze (P8): --px/--py di-set JS micro-gaze/preset state, digeser PUPIL saja
    (rig baru; tanpa .fz-pupil kanal ini tidur, fallback per-state ada di st-thinking). */
-.fz-eyes { transform: translate(var(--lx,0), var(--ly,0)); transition: transform .3s var(--fz-out); }
-.fz-face { transform: translate(calc(var(--lx,0)*.4), calc(var(--ly,0)*.4)); transition: transform .35s var(--fz-out); }
-.fz-pupil { transform: translate(var(--px,0), var(--py,0)); transition: transform .26s var(--fz-out); }
+.fz-eyes { transform: translate(var(--lx,0), var(--ly,0)); transition: transform .3s var(--paw-out); }
+.fz-face { transform: translate(calc(var(--lx,0)*.4), calc(var(--ly,0)*.4)); transition: transform .35s var(--paw-out); }
+.fz-pupil { transform: translate(var(--px,0), var(--py,0)); transition: transform .26s var(--paw-out); }
 .fz-lid { transform: scale(1,0); transform-origin:50% 0%; transition: transform 70ms ease-in; }
 .blink .fz-lid { transform: scale(1,1); }
 /* occluder kelopak rig baru (P5/P6): turun 0…34px lewat --fz-lidup */
-.fz-lid-up { transform: translateY(var(--fz-lidup, 0)); transition: transform .3s var(--fz-out); }
+.fz-lid-up { transform: translateY(var(--fz-lidup, 0)); transition: transform .3s var(--paw-out); }
 
 /* ====== STATE ======
    Semua kelas st-* yang dipasang komponen tetap terdefinisi di sini.
@@ -172,10 +178,10 @@ body.reduce-motion .fz-mascot.st-speaking .fz-lid { transform: scale(1,.12) !imp
 
 /* greeting: lambaian + geser kepala settle (pengganti fzTilt — badan TIDAK miring lagi) */
 .st-greeting :is(.fz-head, .fz-svg:not(:has(.fz-head)) .fz-face) {
-  animation: fzGreetShift 1.5s var(--fz-spring); }
+  animation: fzGreetShift 1.5s var(--paw-spring); }
 @keyframes fzGreetShift { 0%{transform:translate(0,0)} 25%{transform:translate(-5px,1px)}
   70%{transform:translate(-4px,1px)} 100%{transform:translate(0,0)} }
-.st-greeting .fz-arm-r { animation: fzWave 1.5s var(--fz-spring) 1; }
+.st-greeting .fz-arm-r { animation: fzWave 1.5s var(--paw-spring) 1; }
 .st-greeting .fz-pads { animation: fzPadsShow 1.5s ease-out; }
 @keyframes fzPadsShow { 0%{opacity:0} 12%{opacity:1} 86%{opacity:1} 100%{opacity:0} }
 @keyframes fzWave { 0%{transform:rotate(0)} 20%{transform:rotate(-128deg)}
@@ -185,14 +191,14 @@ body.reduce-motion .fz-mascot.st-speaking .fz-lid { transform: scale(1,.12) !imp
 /* curious: kepala condong ke depan (pengganti fzLean) + perk telinga asimetris
    (−10°/+4°, 300ms) + satu alis + kibas ujung ekor +14 */
 .st-curious :is(.fz-head, .fz-svg:not(:has(.fz-head)) .fz-face) {
-  animation: fzHeadLean .5s var(--fz-spring) forwards; }
+  animation: fzHeadLean .5s var(--paw-spring) forwards; }
 @keyframes fzHeadLean { to { transform: translate(5px,2px); } }
-.st-curious .fz-ear-l { animation:none; transform:rotate(-10deg); transition: transform .3s var(--fz-out); }
-.st-curious .fz-ear-r { animation:none; transform:rotate(4deg);  transition: transform .3s var(--fz-out); }
+.st-curious .fz-ear-l { animation:none; transform:rotate(-10deg); transition: transform .3s var(--paw-out); }
+.st-curious .fz-ear-r { animation:none; transform:rotate(4deg);  transition: transform .3s var(--paw-out); }
 .st-curious .fz-brows { opacity:1; }
 .st-curious .fz-brow-l { transform: translateY(-4px) rotate(-8deg); }
 .st-curious :where(.fz-tail-tip, .fz-svg:not(:has(.fz-tail-tip)) .fz-tail) {
-  animation: fzTailTipFlick .6s var(--fz-spring) 1; }
+  animation: fzTailTipFlick .6s var(--paw-spring) 1; }
 
 /* thinking: pupil ke sudut atas (kanal --px/--py; fallback grup mata utk rig tanpa pupil)
    + kelopak setengah + kepala (2,−1) + lengan kanan +96° ke dagu (literal, 17 R-3)
@@ -200,9 +206,9 @@ body.reduce-motion .fz-mascot.st-speaking .fz-lid { transform: scale(1,.12) !imp
 .st-thinking { --px:6px; --py:-5px; --fz-lidup:10px; }
 .st-thinking .fz-eyes:not(:has(.fz-pupil)) { transform: translate(6px,-5px); }
 .st-thinking :is(.fz-head, .fz-svg:not(:has(.fz-head)) .fz-face) { transform: translate(2px,-1px); }
-.st-thinking .fz-lid { transform: scale(1,.3); transition: transform .3s var(--fz-out); }
+.st-thinking .fz-lid { transform: scale(1,.3); transition: transform .3s var(--paw-out); }
 .st-thinking.blink .fz-lid { transform: scale(1,1); }
-.st-thinking .fz-arm-r { transform: rotate(96deg); transition: transform .7s var(--fz-spring); }
+.st-thinking .fz-arm-r { transform: rotate(96deg); transition: transform .7s var(--paw-spring); }
 .st-thinking .fz-brows { opacity:1; }
 .st-thinking .fz-dots { opacity:1; }
 .st-thinking .fz-dots circle { animation: fzDot 1.1s ease-in-out infinite; }
@@ -211,7 +217,7 @@ body.reduce-motion .fz-mascot.st-speaking .fz-lid { transform: scale(1,.12) !imp
 
 /* listening: headphone + sway kepala translate-only (pengganti fzGroove yang memutar badan)
    + kontra-sway pangkal ekor ∓4° (poros ekor = legal) + not balok */
-.st-listening .fz-headphones { opacity:1; animation: fzMascotPop .4s var(--fz-spring); }
+.st-listening .fz-headphones { opacity:1; animation: fzMascotPop .4s var(--paw-spring); }
 .st-listening :is(.fz-head, .fz-svg:not(:has(.fz-head)) .fz-face) {
   animation: fzGrooveSway .62s var(--fz-calm) infinite alternate; }
 @keyframes fzGrooveSway { from{transform:translateX(-3px)} to{transform:translateX(3px)} }
@@ -228,7 +234,7 @@ body.reduce-motion .fz-mascot.st-speaking .fz-lid { transform: scale(1,.12) !imp
 .st-listening .fz-note.n1{ transform-box:view-box }
 
 /* encouraging: menunjuk + angguk ≤3px (angguk, bukan membungkuk — 10 §1.2) + alis naik */
-.st-encouraging .fz-arm-r { animation: fzPoint 1.4s var(--fz-spring); }
+.st-encouraging .fz-arm-r { animation: fzPoint 1.4s var(--paw-spring); }
 @keyframes fzPoint { 0%{transform:rotate(0)} 25%{transform:rotate(-94deg)}
   72%{transform:rotate(-88deg)} 100%{transform:rotate(0)} }
 .st-encouraging .fz-pads { animation: fzPadsShow 1.4s ease-out; }
@@ -238,9 +244,9 @@ body.reduce-motion .fz-mascot.st-speaking .fz-lid { transform: scale(1,.12) !imp
 
 /* celebrating: lompat squash-stretch, intensitas lv-1..3 (10 §1.3) —
    telinga perk −10/+10 (literal), ujung ekor +18 flick, lv-3 lengan ±110–120 + pads */
-.st-celebrating .fz-all { animation: fzJump .85s var(--fz-spring) 1; transform-origin:50% 95%; }
-.st-celebrating.lv-2 .fz-all { animation: fzJump .8s var(--fz-spring) 2; }
-.st-celebrating.lv-3 .fz-all { animation: fzJumpBig .9s var(--fz-spring) 2; }
+.st-celebrating .fz-all { animation: fzJump .85s var(--paw-spring) 1; transform-origin:50% 95%; }
+.st-celebrating.lv-2 .fz-all { animation: fzJump .8s var(--paw-spring) 2; }
+.st-celebrating.lv-3 .fz-all { animation: fzJumpBig .9s var(--paw-spring) 2; }
 @keyframes fzJump {
   0%{transform:scale(1,1) translateY(0)} 18%{transform:scale(1.1,.82) translateY(4px)}
   45%{transform:scale(.94,1.08) translateY(-40px)} 70%{transform:scale(1.05,.92) translateY(0)}
@@ -251,28 +257,28 @@ body.reduce-motion .fz-mascot.st-speaking .fz-lid { transform: scale(1,.12) !imp
   0%{transform:scale(1,1) translateY(0)} 16%{transform:scale(1.14,.78) translateY(6px)}
   45%{transform:scale(.92,1.1) translateY(-58px)}
   70%{transform:scale(1.06,.9) translateY(0)} 100%{transform:scale(1,1)} }
-.st-celebrating .fz-arm-l { animation: fzArmsUpL .85s var(--fz-spring); }
-.st-celebrating .fz-arm-r { animation: fzArmsUpR .85s var(--fz-spring); }
+.st-celebrating .fz-arm-l { animation: fzArmsUpL .85s var(--paw-spring); }
+.st-celebrating .fz-arm-r { animation: fzArmsUpR .85s var(--paw-spring); }
 @keyframes fzArmsUpL { 30%,70%{transform:rotate(96deg)} }
 @keyframes fzArmsUpR { 30%,70%{transform:rotate(-96deg)} }
 .st-celebrating.lv-2 .fz-arm-l, .st-celebrating.lv-2 .fz-arm-r {
   animation-duration:.8s; animation-iteration-count:2; }
 /* lv-3: sorak dua lengan literal L +115 / R −115 dengan pads (17 R-3) */
-.st-celebrating.lv-3 .fz-arm-l { animation: fzArmsUpHiL .8s var(--fz-spring) 2; }
-.st-celebrating.lv-3 .fz-arm-r { animation: fzArmsUpHiR .8s var(--fz-spring) 2; }
+.st-celebrating.lv-3 .fz-arm-l { animation: fzArmsUpHiL .8s var(--paw-spring) 2; }
+.st-celebrating.lv-3 .fz-arm-r { animation: fzArmsUpHiR .8s var(--paw-spring) 2; }
 @keyframes fzArmsUpHiL { 30%,70%{transform:rotate(115deg)} }
 @keyframes fzArmsUpHiR { 30%,70%{transform:rotate(-115deg)} }
 .st-celebrating.lv-3 .fz-pads { animation: fzPadsShow .8s ease-out 2; }
-.st-celebrating .fz-ear-l { animation:none; transform:rotate(-10deg); transition: transform .3s var(--fz-out); }
-.st-celebrating .fz-ear-r { animation:none; transform:rotate(10deg);  transition: transform .3s var(--fz-out); }
+.st-celebrating .fz-ear-l { animation:none; transform:rotate(-10deg); transition: transform .3s var(--paw-out); }
+.st-celebrating .fz-ear-r { animation:none; transform:rotate(10deg);  transition: transform .3s var(--paw-out); }
 .st-celebrating :where(.fz-tail-tip, .fz-svg:not(:has(.fz-tail-tip)) .fz-tail) {
-  animation: fzTailTipFlick .85s var(--fz-spring) 1; }
+  animation: fzTailTipFlick .85s var(--paw-spring) 1; }
 .st-celebrating .fz-eye-open { opacity:0 } .st-celebrating .fz-eye-happy { opacity:1 }
 
 /* confused: geser kepala (pengganti fzConf yang memutar badan; fallback rig lama = badan,
    karena wajahnya sedang dipakai fzShakeX) + alis turun + keringat + geleng ±6px */
 .st-confused :is(.fz-head, .fz-svg:not(:has(.fz-head)) .fz-body) {
-  animation: fzConfShift .5s var(--fz-spring) forwards; }
+  animation: fzConfShift .5s var(--paw-spring) forwards; }
 @keyframes fzConfShift { to{ transform: translate(-4px,1px); } }
 .st-confused .fz-face { animation: fzShakeX .55s ease-in-out .25s 1; }
 @keyframes fzShakeX { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
@@ -285,23 +291,23 @@ body.reduce-motion .fz-mascot.st-speaking .fz-lid { transform: scale(1,.12) !imp
 .st-confused .fz-blush { opacity:.5 }
 
 /* hinting: bohlam + kedip sebelah + condong kepala (memakai fzHeadLean, bukan fzLean) */
-.st-hinting .fz-bulb { opacity:1; animation: fzMascotPop .45s var(--fz-spring); }
+.st-hinting .fz-bulb { opacity:1; animation: fzMascotPop .45s var(--paw-spring); }
 .st-hinting .fz-lid:not(.fz-lid-r) { transform:scale(1,1); }
 .st-hinting :is(.fz-head, .fz-svg:not(:has(.fz-head)) .fz-face) {
-  animation: fzHeadLean .5s var(--fz-spring) forwards; }
+  animation: fzHeadLean .5s var(--paw-spring) forwards; }
 @keyframes fzMascotPop { 0%{transform:scale(0)} 70%{transform:scale(1.15)} 100%{transform:scale(1)} }
 
 /* completion: lompat besar (tanpa rotate) + bintang + cincin ekor berkilau + perk telinga */
-.st-completion .fz-all { animation: fzJumpBig .95s var(--fz-spring) 2; transform-origin:50% 95%; }
-.st-completion .fz-arm-l { animation: fzArmsUpL 1s var(--fz-spring) 2; }
-.st-completion .fz-arm-r { animation: fzArmsUpR 1s var(--fz-spring) 2; }
-.st-completion .fz-ear-l { animation:none; transform:rotate(-10deg); transition: transform .3s var(--fz-out); }
-.st-completion .fz-ear-r { animation:none; transform:rotate(10deg);  transition: transform .3s var(--fz-out); }
+.st-completion .fz-all { animation: fzJumpBig .95s var(--paw-spring) 2; transform-origin:50% 95%; }
+.st-completion .fz-arm-l { animation: fzArmsUpL 1s var(--paw-spring) 2; }
+.st-completion .fz-arm-r { animation: fzArmsUpR 1s var(--paw-spring) 2; }
+.st-completion .fz-ear-l { animation:none; transform:rotate(-10deg); transition: transform .3s var(--paw-out); }
+.st-completion .fz-ear-r { animation:none; transform:rotate(10deg);  transition: transform .3s var(--paw-out); }
 .st-completion :where(.fz-tail-tip, .fz-svg:not(:has(.fz-tail-tip)) .fz-tail) {
-  animation: fzTailTipFlick .95s var(--fz-spring) 1; }
+  animation: fzTailTipFlick .95s var(--paw-spring) 1; }
 .st-completion .fz-eye-open { opacity:0 } .st-completion .fz-eye-happy { opacity:1 }
 .st-completion .fz-stars { opacity:1 }
-.st-completion .fz-stars path { animation: fzStar 1.2s var(--fz-spring) infinite; }
+.st-completion .fz-stars path { animation: fzStar 1.2s var(--paw-spring) infinite; }
 .st-completion .fz-stars .s2 { animation-delay:.2s } .st-completion .fz-stars .s3 { animation-delay:.4s }
 @keyframes fzStar { 0%{transform:scale(0) rotate(0)} 50%{transform:scale(1.2) rotate(18deg)} 100%{transform:scale(0) rotate(36deg)} }
 .st-completion .fz-ring { animation: fzRingGlow 1s ease-in-out infinite alternate;
@@ -311,7 +317,7 @@ body.reduce-motion .fz-mascot.st-speaking .fz-lid { transform: scale(1,.12) !imp
 /* confetti dari JS */
 .fz-confetti-layer { position:absolute; inset:0; pointer-events:none; overflow:visible; }
 .fz-confetti-layer i { position:absolute; border-radius:2px; opacity:0;
-  animation: fzConfetti 1.25s var(--fz-out) forwards; }
+  animation: fzConfetti 1.25s var(--paw-out) forwards; }
 @keyframes fzConfetti {
   0%{opacity:1; transform:translate(0,0) rotate(0)}
   55%{opacity:1; transform:translate(calc(var(--cx) * .75), var(--cy)) rotate(calc(var(--cr) * .6))}
@@ -321,20 +327,20 @@ body.reduce-motion .fz-mascot.st-speaking .fz-lid { transform: scale(1,.12) !imp
 
 /* proud: dada membusung + dagu naik + mata tertutup senang
    + tangan kiri menepuk dada. Transient (2200ms). */
-.st-proud .fz-body { animation: fzPuff .6s var(--fz-spring) forwards; transform-origin:50% 92%; }
+.st-proud .fz-body { animation: fzPuff .6s var(--paw-spring) forwards; transform-origin:50% 92%; }
 @keyframes fzPuff { 0%{transform:scale(1,1) translateY(0)}
   55%{transform:scale(1.09,1.04) translateY(-6px)}
   100%{transform:scale(1.06,1.02) translateY(-4px)} }
 .st-proud .fz-eye-open { opacity:0 } .st-proud .fz-eye-happy { opacity:1 }
-.st-proud .fz-arm-l { animation: fzChest .65s var(--fz-spring) forwards; }
+.st-proud .fz-arm-l { animation: fzChest .65s var(--paw-spring) forwards; }
 /* -40deg = telapak kiri (ujung bawah lengan, ~122,236) mendarat tepat
    di tengah dada krem (~160,226); overshoot -46deg dulu ala pegas */
 @keyframes fzChest { 0%{transform:rotate(0)} 60%{transform:rotate(-46deg)} 100%{transform:rotate(-40deg)} }
-.st-proud .fz-face { animation: fzChinUp .6s var(--fz-out) forwards; }
+.st-proud .fz-face { animation: fzChinUp .6s var(--paw-out) forwards; }
 @keyframes fzChinUp { to{ transform: translateY(-3px); } }
 /* kibas ekor bangga (pengganti fzTailProud; nilai negatif = ujung naik pada fallback) */
 .st-proud :where(.fz-tail-tip, .fz-svg:not(:has(.fz-tail-tip)) .fz-tail) {
-  animation: fzTailTipFlick 1s var(--fz-spring) 1; }
+  animation: fzTailTipFlick 1s var(--paw-spring) 1; }
 @keyframes fzTailTipFlick { 0%,100%{transform:rotate(0)} 40%{transform:rotate(-14deg)}
   70%{transform:rotate(-8deg)} }
 
@@ -352,10 +358,10 @@ body.reduce-motion .fz-mascot.st-speaking .fz-lid { transform: scale(1,.12) !imp
 .st-sleepy :is(.fz-head, .fz-svg:not(:has(.fz-head)) .fz-face) {
   transform: translateY(2px); transition: transform 1.2s var(--fz-calm); }
 /* kelopak (lid) kuning turun 62% dari atas = mata setengah tertutup */
-.st-sleepy .fz-lid { transform: scale(1,.62); transition: transform .45s var(--fz-out); }
+.st-sleepy .fz-lid { transform: scale(1,.62); transition: transform .45s var(--paw-out); }
 .st-sleepy.blink .fz-lid { transform: scale(1,1); }  /* kedip penuh tetap jalan */
 .st-sleepy .fz-eyes { transform: translate(0,2px); } /* pandangan turun */
-.st-sleepy .fz-ear-l, .st-sleepy .fz-ear-r { animation:none; transition: transform .45s var(--fz-out); }
+.st-sleepy .fz-ear-l, .st-sleepy .fz-ear-r { animation:none; transition: transform .45s var(--paw-out); }
 .st-sleepy .fz-ear-l { transform: rotate(-7deg); }
 .st-sleepy .fz-ear-r { transform: rotate(7deg); }
 .st-sleepy .fz-zzz { opacity:1 }
@@ -371,14 +377,14 @@ body.reduce-motion .fz-mascot.st-speaking .fz-lid { transform: scale(1,.12) !imp
 /* sad → gentle-concern: telinga terkulai DIPERHALUS +9/−9 literal (dulu ±17 —
    10 §1.2 tabel #14) + alis sedih (ujung dalam naik) + mulut turun (.fz-m-sad via JS)
    + badan merosot ≤6px + air mata (loop hanya selama hold). Transient (2400ms). */
-.st-sad .fz-ear-l { animation: fzEarSadL .55s var(--fz-out) forwards; }
-.st-sad .fz-ear-r { animation: fzEarSadR .55s var(--fz-out) forwards; }
+.st-sad .fz-ear-l { animation: fzEarSadL .55s var(--paw-out) forwards; }
+.st-sad .fz-ear-r { animation: fzEarSadR .55s var(--paw-out) forwards; }
 @keyframes fzEarSadL { to{ transform: rotate(9deg) translateY(3px); } }
 @keyframes fzEarSadR { to{ transform: rotate(-9deg) translateY(3px); } }
 .st-sad .fz-brows { opacity:1 }
 .st-sad .fz-brow-l { transform: rotate(-12deg) translateY(3px); }
 .st-sad .fz-brow-r { transform: rotate(12deg) translateY(3px); }
-.st-sad .fz-body { animation: fzSlump .55s var(--fz-out) forwards; transform-origin:50% 92%; }
+.st-sad .fz-body { animation: fzSlump .55s var(--paw-out) forwards; transform-origin:50% 92%; }
 @keyframes fzSlump { to{ transform: translateY(6px) scale(1.02,.96); } }
 .st-sad .fz-eyes { transform: translate(0,4px); }   /* menatap ke bawah */
 .st-sad .fz-face { transform: translateY(3px); }
@@ -388,22 +394,22 @@ body.reduce-motion .fz-mascot.st-speaking .fz-lid { transform: scale(1,.12) !imp
   22%{opacity:1} 100%{transform:translate(0,24px) scale(1); opacity:0} }
 /* ekor turun settle (pengganti fzTailDroop; ujung −10° semantik = positif pada fallback) */
 .st-sad :where(.fz-tail-tip, .fz-svg:not(:has(.fz-tail-tip)) .fz-tail) {
-  animation: fzTailTipSettle .6s var(--fz-out) forwards; }
+  animation: fzTailTipSettle .6s var(--paw-out) forwards; }
 @keyframes fzTailTipSettle { to{ transform: rotate(11deg) translateY(3px); } }
 
 /* love: mata jadi hati (.fz-eye-love, pop lalu berdegup) + goyang gemas
    translate-only ±3px (pengganti fzLoveWiggle yang memutar badan) + kedua tangan
    merapat + blush menguat + hati mengambang. Transient (2000ms). */
 .st-love .fz-eye-open { opacity:0 }
-.st-love .fz-eye-love { opacity:1; animation: fzMascotPop .4s var(--fz-spring); } /* fzMascotPop sudah ada di core */
-.st-love .fz-heart-eye { animation: fzHeartBeat .9s var(--fz-spring) infinite .35s; }
+.st-love .fz-eye-love { opacity:1; animation: fzMascotPop .4s var(--paw-spring); } /* fzMascotPop sudah ada di core */
+.st-love .fz-heart-eye { animation: fzHeartBeat .9s var(--paw-spring) infinite .35s; }
 @keyframes fzHeartBeat { 0%,100%{transform:scale(1)} 28%{transform:scale(1.18)}
   44%{transform:scale(.94)} 60%{transform:scale(1.1)} }
 .st-love .fz-body { animation: fzLoveSway .85s ease-in-out 2; transform-origin:50% 92%; }
 @keyframes fzLoveSway { 0%,100%{transform:translateX(0)} 25%{transform:translateX(3px)}
   75%{transform:translateX(-3px)} }
-.st-love .fz-arm-l { animation: fzHugL .6s var(--fz-spring) forwards; }
-.st-love .fz-arm-r { animation: fzHugR .6s var(--fz-spring) forwards; }
+.st-love .fz-arm-l { animation: fzHugL .6s var(--paw-spring) forwards; }
+.st-love .fz-arm-r { animation: fzHugR .6s var(--paw-spring) forwards; }
 @keyframes fzHugL { to{ transform: rotate(-20deg); } }
 @keyframes fzHugR { to{ transform: rotate(20deg); } }
 .st-love .fz-blush { animation: fzBlushPulse .8s ease-in-out infinite alternate; }
@@ -424,12 +430,12 @@ body.reduce-motion .fz-mascot.st-speaking .fz-lid { transform: scale(1,.12) !imp
 .st-speaking :is(.fz-head, .fz-svg:not(:has(.fz-head)) .fz-face) {
   animation: fzSpeakBob 1.6s var(--fz-calm) infinite; }
 @keyframes fzSpeakBob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-1px)} }
-.st-speaking .fz-lid { transform: scale(1,.12); transition: transform .3s var(--fz-out); } /* kelopak lembut 4/34 */
+.st-speaking .fz-lid { transform: scale(1,.12); transition: transform .3s var(--paw-out); } /* kelopak lembut 4/34 */
 .st-speaking.blink .fz-lid { transform: scale(1,1); }
 .st-speaking .fz-brows { opacity:0; }
 .st-speaking .fz-ear-l, .st-speaking .fz-ear-r { animation:none; } /* telinga hening, fokus ke mulut */
 .st-speaking :where(.fz-tail-tip, .fz-svg:not(:has(.fz-tail-tip)) .fz-tail) {
-  animation:none; transform:rotate(-3deg); transition: transform .4s var(--fz-out); } /* tip +6 semantik, tahan */
+  animation:none; transform:rotate(-3deg); transition: transform .4s var(--paw-out); } /* tip +6 semantik, tahan */
 /* Kelas beat viseme (dipasang JS di host per --fz-beat; sp1→sp2→open→sp1, jeda→soft).
    Rig lama belum punya bentuk sp1/sp2/soft — dipetakan ke bentuk mulut terdekat yang ada;
    !important perlu karena komponen menyembunyikan mulut via style inline display:none. */
@@ -442,23 +448,23 @@ body.reduce-motion .fz-mascot.st-speaking .fz-lid { transform: scale(1,.12) !imp
 
 /* welcome-back (17 R-2b, 09 §2.10; transient 2200ms di JS): perk pengenalan 300ms
    (telinga −8/+8 literal) → lambaian + kibas ekor dobel */
-.st-welcome-back .fz-ear-l { animation:none; transform:rotate(-8deg); transition: transform .3s var(--fz-out); }
-.st-welcome-back .fz-ear-r { animation:none; transform:rotate(8deg);  transition: transform .3s var(--fz-out); }
-.st-welcome-back .fz-arm-r { animation: fzWave 1.5s var(--fz-spring) .3s 1; }
+.st-welcome-back .fz-ear-l { animation:none; transform:rotate(-8deg); transition: transform .3s var(--paw-out); }
+.st-welcome-back .fz-ear-r { animation:none; transform:rotate(8deg);  transition: transform .3s var(--paw-out); }
+.st-welcome-back .fz-arm-r { animation: fzWave 1.5s var(--paw-spring) .3s 1; }
 .st-welcome-back .fz-pads { animation: fzPadsShow 1.5s ease-out .3s; }
 .st-welcome-back :is(.fz-head, .fz-svg:not(:has(.fz-head)) .fz-face) {
-  animation: fzGreetShift 1.5s var(--fz-spring) .3s; }
+  animation: fzGreetShift 1.5s var(--paw-spring) .3s; }
 .st-welcome-back :where(.fz-tail-tip, .fz-svg:not(:has(.fz-tail-tip)) .fz-tail) {
-  animation: fzTailTipFlick .5s var(--fz-spring) .3s 2; }
+  animation: fzTailTipFlick .5s var(--paw-spring) .3s 2; }
 .st-welcome-back .fz-eye-open { opacity:0 } .st-welcome-back .fz-eye-happy { opacity:1 }
 
 /* lesson-start (17 R-2c, 09 §2.11; transient 1600ms di JS): beat Curious 600ms
    (condong + perk telinga dekat + kibas ekor +14) lalu istirahat Happy → idle */
 .st-lesson-start :is(.fz-head, .fz-svg:not(:has(.fz-head)) .fz-face) {
-  animation: fzHeadLean .6s var(--fz-spring) 1; }
-.st-lesson-start .fz-ear-l { animation:none; transform:rotate(-10deg); transition: transform .3s var(--fz-out); }
+  animation: fzHeadLean .6s var(--paw-spring) 1; }
+.st-lesson-start .fz-ear-l { animation:none; transform:rotate(-10deg); transition: transform .3s var(--paw-out); }
 .st-lesson-start :where(.fz-tail-tip, .fz-svg:not(:has(.fz-tail-tip)) .fz-tail) {
-  animation: fzTailTipFlick .6s var(--fz-spring) 1; }
+  animation: fzTailTipFlick .6s var(--paw-spring) 1; }
 .st-lesson-start .fz-eye-open { opacity:0 } .st-lesson-start .fz-eye-happy { opacity:1 }
 
 /* ===== ENTER / EXIT (10 §2) =====
@@ -469,16 +475,16 @@ body.reduce-motion .fz-mascot.st-speaking .fz-lid { transform: scale(1,.12) !imp
    ditulis untuk elemen ter-dok di dalam potongan kepala (has-mascot).
    JS melepas node pada animationend DENGAN fallback setTimeout 400ms (pola [P1-1]).
    Nama sudah dicek bentrok terhadap fzPaw*/fzPop milik style.css. */
-.fz-m-enter-pop  { animation: fzMEnterPop 380ms var(--fz-spring, cubic-bezier(.34,1.56,.64,1)) both; }
+.fz-m-enter-pop  { animation: fzMEnterPop 380ms var(--paw-spring, cubic-bezier(.34,1.56,.64,1)) both; }
 @keyframes fzMEnterPop { 0%{opacity:0; transform:scale(.62)} 70%{opacity:1; transform:scale(1.07)}
   100%{opacity:1; transform:scale(1)} }
-.fz-m-enter-rise { animation: fzMEnterRise 240ms var(--fz-spring, cubic-bezier(.34,1.56,.64,1)) both; }
+.fz-m-enter-rise { animation: fzMEnterRise 240ms var(--paw-spring, cubic-bezier(.34,1.56,.64,1)) both; }
 @keyframes fzMEnterRise { from{opacity:.55; transform:translateY(8px) scale(.88)}
   to{opacity:1; transform:none} }
 .fz-m-enter-slide-l { --fz-sx:-24px; }
 .fz-m-enter-slide-r { --fz-sx:24px; }
 .fz-m-enter-slide-l, .fz-m-enter-slide-r {
-  animation: fzMEnterSlideX var(--fz-enter-dur, 320ms) var(--fz-out, cubic-bezier(.22,1,.36,1)) both; }
+  animation: fzMEnterSlideX var(--fz-enter-dur, 320ms) var(--paw-out, cubic-bezier(.22,1,.36,1)) both; }
 @keyframes fzMEnterSlideX { from{opacity:0; transform:translateX(var(--fz-sx,-24px))}
   to{opacity:1; transform:none} }
 /* peek: kepala naik ke dalam lingkaran potong (dok 38–56px); translateX(-50%)
@@ -500,7 +506,7 @@ body.reduce-motion .fz-mascot.st-speaking .fz-lid { transform: scale(1,.12) !imp
 /* ================= MICRO-INTERACTIONS UI ================= */
 .fz-btn { font:inherit; font-weight:700; border:none; cursor:pointer; border-radius:999px;
   padding:14px 28px; background:var(--fz-maroon); color:#fff;
-  transition: transform var(--fz-fast) var(--fz-spring), box-shadow var(--fz-fast) ease,
+  transition: transform var(--fz-fast) var(--paw-spring), box-shadow var(--fz-fast) ease,
               background var(--fz-fast) ease;
   box-shadow: 0 3px 0 var(--fz-maroon-d); }
 .fz-btn:hover { transform: translateY(-2px); }
@@ -509,7 +515,7 @@ body.reduce-motion .fz-mascot.st-speaking .fz-lid { transform: scale(1,.12) !imp
 .fz-btn.ghost { background:var(--fz-panel); color:var(--fz-ink); box-shadow:0 0 0 2px var(--fz-line) inset; }
 
 .fz-card { background:var(--fz-panel); border:2px solid var(--fz-line); border-radius:20px;
-  padding:18px 20px; transition: transform var(--fz-base) var(--fz-spring),
+  padding:18px 20px; transition: transform var(--fz-base) var(--paw-spring),
   border-color var(--fz-fast) ease, box-shadow var(--fz-base) ease; }
 .fz-card.clickable { cursor:pointer; }
 .fz-card.clickable:hover { transform: translateY(-3px) scale(1.015); border-color:var(--fz-gold);
@@ -517,10 +523,10 @@ body.reduce-motion .fz-mascot.st-speaking .fz-lid { transform: scale(1,.12) !imp
 .fz-card.clickable:active { transform: scale(.98); }
 
 /* pop-in berjenjang */
-.fz-motion-pop { opacity:0; animation: fzPopIn .45s var(--fz-spring) forwards; }
+.fz-motion-pop { opacity:0; animation: fzPopIn .45s var(--paw-spring) forwards; }
 @keyframes fzPopIn { from{opacity:0; transform:translateY(16px) scale(.94)}
   to{opacity:1; transform:translateY(0) scale(1)} }
-.fz-stagger > * { opacity:0; animation: fzPopIn .45s var(--fz-spring) forwards; }
+.fz-stagger > * { opacity:0; animation: fzPopIn .45s var(--paw-spring) forwards; }
 .fz-stagger > *:nth-child(1){animation-delay:.03s} .fz-stagger > *:nth-child(2){animation-delay:.09s}
 .fz-stagger > *:nth-child(3){animation-delay:.15s} .fz-stagger > *:nth-child(4){animation-delay:.21s}
 .fz-stagger > *:nth-child(5){animation-delay:.27s} .fz-stagger > *:nth-child(6){animation-delay:.33s}
@@ -529,7 +535,7 @@ body.reduce-motion .fz-mascot.st-speaking .fz-lid { transform: scale(1,.12) !imp
 .fz-answer { position:relative; }
 .fz-answer.correct, .fz-answer.wrong { opacity:1 !important; }
 .fz-answer.correct { border-color:var(--fz-green); background:var(--fz-green-soft);
-  animation: fzCorrect .5s var(--fz-spring); }
+  animation: fzCorrect .5s var(--paw-spring); }
 @keyframes fzCorrect { 30%{transform:scale(1.04)} }
 .fz-answer.wrong { border-color:var(--fz-red); background:var(--fz-red-soft);
   animation: fzShake .45s ease-in-out; }
@@ -540,14 +546,14 @@ body.reduce-motion .fz-mascot.st-speaking .fz-lid { transform: scale(1,.12) !imp
 .fz-xp { height:16px; background:#e6d5d9; border:1px solid #c9b3b8; border-radius:999px; overflow:hidden; }
 .fz-xp > b { display:block; height:100%; width:0; border-radius:999px;
   background: linear-gradient(90deg, var(--fz-gold), var(--fz-yel));
-  transition: width .8s var(--fz-spring); }
-.fz-xp.pulse > b { animation: fzXp .6s var(--fz-spring); }
+  transition: width .8s var(--paw-spring); }
+.fz-xp.pulse > b { animation: fzXp .6s var(--paw-spring); }
 @keyframes fzXp { 50%{transform:scaleY(1.3)} }
 
 /* toast / badge */
-.fz-badge-pop { animation: fzMascotPop .5s var(--fz-spring); }
+.fz-badge-pop { animation: fzMascotPop .5s var(--paw-spring); }
 .fz-float-xp { position:absolute; font-weight:800; color:var(--fz-green);
-  animation: fzFloatXp 1s var(--fz-out) forwards; pointer-events:none; }
+  animation: fzFloatXp 1s var(--paw-out) forwards; pointer-events:none; }
 @keyframes fzFloatXp { from{opacity:1; transform:translateY(0)} to{opacity:0; transform:translateY(-34px)} }
 
 /* equalizer kecil utk listening */

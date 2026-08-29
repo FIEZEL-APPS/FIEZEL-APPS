@@ -90930,5 +90930,2964 @@
     "example": "The experiment failed to yield any conclusive evidence to support the theory.",
     "masterIndex": 2370,
     "exampleTranslation": "Eksperimen itu gagal menghasilkan bukti konklusif apa pun untuk mendukung teori tersebut."
+  },
+  {
+    "id": "c1_curated_0200",
+    "word": "avert",
+    "level": "C1",
+    "partOfSpeech": "verb",
+    "phonetic": "/əˈvɜːt/",
+    "meanings": [
+      {
+        "id": "c1m_0051",
+        "meaning": "mencegah terjadinya (bahaya, krisis); menghindarkan"
+      }
+    ],
+    "examples": [
+      {
+        "en": "The two governments held urgent talks to avert a damaging trade war.",
+        "id": "Kedua pemerintah mengadakan pembicaraan mendesak untuk mencegah terjadinya perang dagang yang merugikan.",
+        "translation": "Kedua pemerintah mengadakan pembicaraan mendesak untuk mencegah terjadinya perang dagang yang merugikan."
+      }
+    ],
+    "synonyms": [
+      "prevent"
+    ],
+    "antonyms": [],
+    "collocations": [
+      "avert a crisis",
+      "avert disaster"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "mencegah terjadinya (bahaya, krisis); menghindarkan",
+    "example": "The two governments held urgent talks to avert a damaging trade war.",
+    "masterIndex": 2371,
+    "exampleTranslation": "Kedua pemerintah mengadakan pembicaraan mendesak untuk mencegah terjadinya perang dagang yang merugikan."
+  },
+  {
+    "id": "c1_curated_0201",
+    "word": "denote",
+    "level": "C1",
+    "partOfSpeech": "verb",
+    "phonetic": "/dɪˈnəʊt/",
+    "meanings": [
+      {
+        "id": "c1m_0053",
+        "meaning": "menandakan; melambangkan"
+      }
+    ],
+    "examples": [
+      {
+        "en": "On this map, the red circles denote areas with a high risk of flooding.",
+        "id": "Pada peta ini, lingkaran merah menandakan daerah dengan risiko banjir yang tinggi.",
+        "translation": "Pada peta ini, lingkaran merah menandakan daerah dengan risiko banjir yang tinggi."
+      }
+    ],
+    "synonyms": [
+      "indicate",
+      "signify"
+    ],
+    "antonyms": [],
+    "collocations": [],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "menandakan; melambangkan",
+    "example": "On this map, the red circles denote areas with a high risk of flooding.",
+    "masterIndex": 2372,
+    "exampleTranslation": "Pada peta ini, lingkaran merah menandakan daerah dengan risiko banjir yang tinggi."
+  },
+  {
+    "id": "c1_curated_0202",
+    "word": "disclose",
+    "level": "C1",
+    "partOfSpeech": "verb",
+    "phonetic": "/dɪsˈkləʊz/",
+    "meanings": [
+      {
+        "id": "c1m_0054",
+        "meaning": "mengungkapkan (informasi yang semula tertutup)"
+      }
+    ],
+    "examples": [
+      {
+        "en": "The company refused to disclose the full details of the mining contract.",
+        "id": "Perusahaan itu menolak mengungkapkan rincian lengkap kontrak pertambangan tersebut.",
+        "translation": "Perusahaan itu menolak mengungkapkan rincian lengkap kontrak pertambangan tersebut."
+      }
+    ],
+    "synonyms": [
+      "reveal"
+    ],
+    "antonyms": [
+      "conceal",
+      "withhold"
+    ],
+    "collocations": [
+      "disclose information",
+      "fully disclose"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "mengungkapkan (informasi yang semula tertutup)",
+    "example": "The company refused to disclose the full details of the mining contract.",
+    "masterIndex": 2373,
+    "exampleTranslation": "Perusahaan itu menolak mengungkapkan rincian lengkap kontrak pertambangan tersebut."
+  },
+  {
+    "id": "c1_curated_0203",
+    "word": "empower",
+    "level": "C1",
+    "partOfSpeech": "verb",
+    "phonetic": "/ɪmˈpaʊə(r)/",
+    "meanings": [
+      {
+        "id": "c1m_0056",
+        "meaning": "memberdayakan; memberi kemampuan dan wewenang"
+      }
+    ],
+    "examples": [
+      {
+        "en": "The training program aims to empower rural women to start their own businesses.",
+        "id": "Program pelatihan itu bertujuan memberdayakan perempuan desa agar dapat memulai usaha mereka sendiri.",
+        "translation": "Program pelatihan itu bertujuan memberdayakan perempuan desa agar dapat memulai usaha mereka sendiri."
+      }
+    ],
+    "synonyms": [
+      "enable"
+    ],
+    "antonyms": [],
+    "collocations": [
+      "empower women",
+      "empower communities"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "memberdayakan; memberi kemampuan dan wewenang",
+    "example": "The training program aims to empower rural women to start their own businesses.",
+    "masterIndex": 2374,
+    "exampleTranslation": "Program pelatihan itu bertujuan memberdayakan perempuan desa agar dapat memulai usaha mereka sendiri."
+  },
+  {
+    "id": "c1_curated_0204",
+    "word": "envisage",
+    "level": "C1",
+    "partOfSpeech": "verb",
+    "phonetic": "/ɪnˈvɪzɪdʒ/",
+    "meanings": [
+      {
+        "id": "c1m_0059",
+        "meaning": "membayangkan (masa depan); memperkirakan akan terjadi"
+      }
+    ],
+    "examples": [
+      {
+        "en": "The city planners envisage a future where most residents commute by public transport.",
+        "id": "Para perencana kota membayangkan masa depan ketika sebagian besar warga bepergian dengan transportasi umum.",
+        "translation": "Para perencana kota membayangkan masa depan ketika sebagian besar warga bepergian dengan transportasi umum."
+      }
+    ],
+    "synonyms": [
+      "imagine"
+    ],
+    "antonyms": [],
+    "collocations": [],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "Dalam bahasa Inggris Amerika, bentuk yang lebih umum adalah 'envision'.",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "membayangkan (masa depan); memperkirakan akan terjadi",
+    "example": "The city planners envisage a future where most residents commute by public transport.",
+    "masterIndex": 2375,
+    "exampleTranslation": "Para perencana kota membayangkan masa depan ketika sebagian besar warga bepergian dengan transportasi umum."
+  },
+  {
+    "id": "c1_curated_0205",
+    "word": "evoke",
+    "level": "C1",
+    "partOfSpeech": "verb",
+    "phonetic": "/ɪˈvəʊk/",
+    "meanings": [
+      {
+        "id": "c1m_0060",
+        "meaning": "membangkitkan (kenangan, perasaan)"
+      }
+    ],
+    "examples": [
+      {
+        "en": "Old songs by Chrisye always evoke warm memories of my childhood in Bandung.",
+        "id": "Lagu-lagu lama Chrisye selalu membangkitkan kenangan hangat masa kecil saya di Bandung.",
+        "translation": "Lagu-lagu lama Chrisye selalu membangkitkan kenangan hangat masa kecil saya di Bandung."
+      }
+    ],
+    "synonyms": [
+      "trigger",
+      "spark",
+      "cause"
+    ],
+    "antonyms": [],
+    "collocations": [
+      "evoke memories",
+      "evoke emotions"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "membangkitkan (kenangan, perasaan)",
+    "example": "Old songs by Chrisye always evoke warm memories of my childhood in Bandung.",
+    "masterIndex": 2376,
+    "exampleTranslation": "Lagu-lagu lama Chrisye selalu membangkitkan kenangan hangat masa kecil saya di Bandung."
+  },
+  {
+    "id": "c1_curated_0206",
+    "word": "exert",
+    "level": "C1",
+    "partOfSpeech": "verb",
+    "phonetic": "/ɪɡˈzɜːt/",
+    "meanings": [
+      {
+        "id": "c1m_0061",
+        "meaning": "mengerahkan; memberikan (tekanan, pengaruh)"
+      }
+    ],
+    "examples": [
+      {
+        "en": "Large foreign investors can exert considerable pressure on local government policy.",
+        "id": "Investor asing besar dapat memberikan tekanan yang cukup kuat terhadap kebijakan pemerintah daerah.",
+        "translation": "Investor asing besar dapat memberikan tekanan yang cukup kuat terhadap kebijakan pemerintah daerah."
+      }
+    ],
+    "synonyms": [],
+    "antonyms": [],
+    "collocations": [
+      "exert pressure",
+      "exert influence"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "mengerahkan; memberikan (tekanan, pengaruh)",
+    "example": "Large foreign investors can exert considerable pressure on local government policy.",
+    "masterIndex": 2377,
+    "exampleTranslation": "Investor asing besar dapat memberikan tekanan yang cukup kuat terhadap kebijakan pemerintah daerah."
+  },
+  {
+    "id": "c1_curated_0207",
+    "word": "hamper",
+    "level": "C1",
+    "partOfSpeech": "verb",
+    "phonetic": "/ˈhæmpə(r)/",
+    "meanings": [
+      {
+        "id": "c1m_0062",
+        "meaning": "menghambat kelancaran; merintangi"
+      }
+    ],
+    "examples": [
+      {
+        "en": "Strict import rules and slow customs checks hamper the delivery of medical supplies to remote clinics.",
+        "id": "Aturan impor yang ketat dan pemeriksaan bea cukai yang lambat menghambat pengiriman pasokan medis ke klinik-klinik terpencil.",
+        "translation": "Aturan impor yang ketat dan pemeriksaan bea cukai yang lambat menghambat pengiriman pasokan medis ke klinik-klinik terpencil."
+      }
+    ],
+    "synonyms": [
+      "hinder",
+      "impede",
+      "prevent"
+    ],
+    "antonyms": [],
+    "collocations": [
+      "hamper efforts",
+      "hamper progress"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "menghambat kelancaran; merintangi",
+    "example": "Strict import rules and slow customs checks hamper the delivery of medical supplies to remote clinics.",
+    "masterIndex": 2378,
+    "exampleTranslation": "Aturan impor yang ketat dan pemeriksaan bea cukai yang lambat menghambat pengiriman pasokan medis ke klinik-klinik terpencil."
+  },
+  {
+    "id": "c1_curated_0208",
+    "word": "apparatus",
+    "level": "C1",
+    "partOfSpeech": "noun",
+    "phonetic": "/ˌæpəˈreɪtəs/",
+    "meanings": [
+      {
+        "id": "c1m_0063",
+        "meaning": "peralatan (laboratorium, teknis); perangkat kelembagaan"
+      }
+    ],
+    "examples": [
+      {
+        "en": "Students must check the laboratory apparatus carefully before starting any chemistry experiment.",
+        "id": "Siswa harus memeriksa peralatan laboratorium dengan cermat sebelum memulai percobaan kimia apa pun.",
+        "translation": "Siswa harus memeriksa peralatan laboratorium dengan cermat sebelum memulai percobaan kimia apa pun."
+      }
+    ],
+    "synonyms": [
+      "equipment"
+    ],
+    "antonyms": [],
+    "collocations": [
+      "laboratory apparatus",
+      "breathing apparatus"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "peralatan (laboratorium, teknis); perangkat kelembagaan",
+    "example": "Students must check the laboratory apparatus carefully before starting any chemistry experiment.",
+    "masterIndex": 2379,
+    "exampleTranslation": "Siswa harus memeriksa peralatan laboratorium dengan cermat sebelum memulai percobaan kimia apa pun."
+  },
+  {
+    "id": "c1_curated_0209",
+    "word": "benchmark",
+    "level": "C1",
+    "partOfSpeech": "noun",
+    "phonetic": "/ˈbentʃmɑːk/",
+    "meanings": [
+      {
+        "id": "c1m_0065",
+        "meaning": "tolok ukur; patokan pembanding"
+      }
+    ],
+    "examples": [
+      {
+        "en": "National exam results are often used as a benchmark for judging school quality.",
+        "id": "Hasil ujian nasional sering digunakan sebagai tolok ukur untuk menilai kualitas sekolah.",
+        "translation": "Hasil ujian nasional sering digunakan sebagai tolok ukur untuk menilai kualitas sekolah."
+      }
+    ],
+    "synonyms": [
+      "standard",
+      "yardstick"
+    ],
+    "antonyms": [],
+    "collocations": [
+      "set a benchmark",
+      "industry benchmark"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "tolok ukur; patokan pembanding",
+    "example": "National exam results are often used as a benchmark for judging school quality.",
+    "masterIndex": 2380,
+    "exampleTranslation": "Hasil ujian nasional sering digunakan sebagai tolok ukur untuk menilai kualitas sekolah."
+  },
+  {
+    "id": "c1_curated_0210",
+    "word": "cohesion",
+    "level": "C1",
+    "partOfSpeech": "noun",
+    "phonetic": "/kəʊˈhiːʒn/",
+    "meanings": [
+      {
+        "id": "c1m_0066",
+        "meaning": "kekompakan; kepaduan antaranggota"
+      }
+    ],
+    "examples": [
+      {
+        "en": "Regular neighborhood events help strengthen social cohesion among residents of the housing complex.",
+        "id": "Kegiatan lingkungan yang rutin membantu memperkuat kekompakan sosial antarwarga kompleks perumahan.",
+        "translation": "Kegiatan lingkungan yang rutin membantu memperkuat kekompakan sosial antarwarga kompleks perumahan."
+      }
+    ],
+    "synonyms": [
+      "unity"
+    ],
+    "antonyms": [],
+    "collocations": [
+      "social cohesion",
+      "team cohesion"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "kekompakan; kepaduan antaranggota",
+    "example": "Regular neighborhood events help strengthen social cohesion among residents of the housing complex.",
+    "masterIndex": 2381,
+    "exampleTranslation": "Kegiatan lingkungan yang rutin membantu memperkuat kekompakan sosial antarwarga kompleks perumahan."
+  },
+  {
+    "id": "c1_curated_0211",
+    "word": "connotation",
+    "level": "C1",
+    "partOfSpeech": "noun",
+    "phonetic": "/ˌkɒnəˈteɪʃn/",
+    "meanings": [
+      {
+        "id": "c1m_0067",
+        "meaning": "konotasi; makna tersirat sebuah kata"
+      }
+    ],
+    "examples": [
+      {
+        "en": "In Indonesian news reports, the word 'oknum' carries a strongly negative connotation.",
+        "id": "Dalam pemberitaan Indonesia, kata 'oknum' membawa konotasi yang sangat negatif.",
+        "translation": "Dalam pemberitaan Indonesia, kata 'oknum' membawa konotasi yang sangat negatif."
+      }
+    ],
+    "synonyms": [],
+    "antonyms": [],
+    "collocations": [
+      "negative connotation",
+      "carry a connotation"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "konotasi; makna tersirat sebuah kata",
+    "example": "In Indonesian news reports, the word 'oknum' carries a strongly negative connotation.",
+    "masterIndex": 2382,
+    "exampleTranslation": "Dalam pemberitaan Indonesia, kata 'oknum' membawa konotasi yang sangat negatif."
+  },
+  {
+    "id": "c1_curated_0212",
+    "word": "criterion",
+    "level": "C1",
+    "partOfSpeech": "noun",
+    "phonetic": "/kraɪˈtɪəriən/",
+    "meanings": [
+      {
+        "id": "c1m_0068",
+        "meaning": "kriteria; patokan penilaian"
+      }
+    ],
+    "examples": [
+      {
+        "en": "Relevant work experience is the main criterion for selecting candidates in this scholarship program.",
+        "id": "Pengalaman kerja yang relevan adalah kriteria utama untuk memilih kandidat dalam program beasiswa ini.",
+        "translation": "Pengalaman kerja yang relevan adalah kriteria utama untuk memilih kandidat dalam program beasiswa ini."
+      }
+    ],
+    "synonyms": [],
+    "antonyms": [],
+    "collocations": [
+      "meet a criterion",
+      "selection criteria"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "Bentuk jamaknya tidak beraturan: satu 'criterion', banyak 'criteria'.",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "kriteria; patokan penilaian",
+    "example": "Relevant work experience is the main criterion for selecting candidates in this scholarship program.",
+    "masterIndex": 2383,
+    "exampleTranslation": "Pengalaman kerja yang relevan adalah kriteria utama untuk memilih kandidat dalam program beasiswa ini."
+  },
+  {
+    "id": "c1_curated_0213",
+    "word": "doctrine",
+    "level": "C1",
+    "partOfSpeech": "noun",
+    "phonetic": "/ˈdɒktrɪn/",
+    "meanings": [
+      {
+        "id": "c1m_0069",
+        "meaning": "doktrin; ajaran resmi"
+      }
+    ],
+    "examples": [
+      {
+        "en": "The court based its ruling on a legal doctrine that dates back decades.",
+        "id": "Pengadilan mendasarkan putusannya pada doktrin hukum yang sudah ada sejak puluhan tahun lalu.",
+        "translation": "Pengadilan mendasarkan putusannya pada doktrin hukum yang sudah ada sejak puluhan tahun lalu."
+      }
+    ],
+    "synonyms": [],
+    "antonyms": [],
+    "collocations": [
+      "legal doctrine",
+      "military doctrine"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "doktrin; ajaran resmi",
+    "example": "The court based its ruling on a legal doctrine that dates back decades.",
+    "masterIndex": 2384,
+    "exampleTranslation": "Pengadilan mendasarkan putusannya pada doktrin hukum yang sudah ada sejak puluhan tahun lalu."
+  },
+  {
+    "id": "c1_curated_0214",
+    "word": "spectrum",
+    "level": "C1",
+    "partOfSpeech": "noun",
+    "phonetic": "/ˈspektrəm/",
+    "meanings": [
+      {
+        "id": "c1m_0070",
+        "meaning": "spektrum; rentang yang luas"
+      }
+    ],
+    "examples": [
+      {
+        "en": "The new coalition represents a broad spectrum of political views across the country.",
+        "id": "Koalisi baru itu mewakili spektrum pandangan politik yang luas di seluruh negeri.",
+        "translation": "Koalisi baru itu mewakili spektrum pandangan politik yang luas di seluruh negeri."
+      }
+    ],
+    "synonyms": [
+      "range"
+    ],
+    "antonyms": [],
+    "collocations": [
+      "a broad spectrum of",
+      "across the political spectrum"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "Bentuk jamaknya 'spectra' atau 'spectrums'.",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "spektrum; rentang yang luas",
+    "example": "The new coalition represents a broad spectrum of political views across the country.",
+    "masterIndex": 2385,
+    "exampleTranslation": "Koalisi baru itu mewakili spektrum pandangan politik yang luas di seluruh negeri."
+  },
+  {
+    "id": "c1_curated_0215",
+    "word": "equity",
+    "level": "C1",
+    "partOfSpeech": "noun",
+    "phonetic": "/ˈekwəti/",
+    "meanings": [
+      {
+        "id": "c1m_0071",
+        "meaning": "keadilan perlakuan; kesetaraan akses"
+      }
+    ],
+    "examples": [
+      {
+        "en": "The new scholarship scheme aims to improve equity in access to higher education.",
+        "id": "Skema beasiswa baru itu bertujuan meningkatkan keadilan dalam akses ke pendidikan tinggi.",
+        "translation": "Skema beasiswa baru itu bertujuan meningkatkan keadilan dalam akses ke pendidikan tinggi."
+      }
+    ],
+    "synonyms": [
+      "fairness"
+    ],
+    "antonyms": [],
+    "collocations": [
+      "equity in education",
+      "social equity"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "Dalam konteks keuangan, 'equity' berarti ekuitas atau nilai kepemilikan saham.",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "keadilan perlakuan; kesetaraan akses",
+    "example": "The new scholarship scheme aims to improve equity in access to higher education.",
+    "masterIndex": 2386,
+    "exampleTranslation": "Skema beasiswa baru itu bertujuan meningkatkan keadilan dalam akses ke pendidikan tinggi."
+  },
+  {
+    "id": "c1_curated_0216",
+    "word": "setback",
+    "level": "C1",
+    "partOfSpeech": "noun",
+    "phonetic": "/ˈsetbæk/",
+    "meanings": [
+      {
+        "id": "c1m_0072",
+        "meaning": "kemunduran; hambatan yang menunda kemajuan"
+      }
+    ],
+    "examples": [
+      {
+        "en": "The team suffered a major setback when their main sponsor withdrew its funding.",
+        "id": "Tim itu mengalami kemunduran besar ketika sponsor utama mereka menarik pendanaannya.",
+        "translation": "Tim itu mengalami kemunduran besar ketika sponsor utama mereka menarik pendanaannya."
+      }
+    ],
+    "synonyms": [],
+    "antonyms": [],
+    "collocations": [
+      "suffer a setback",
+      "major setback"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "kemunduran; hambatan yang menunda kemajuan",
+    "example": "The team suffered a major setback when their main sponsor withdrew its funding.",
+    "masterIndex": 2387,
+    "exampleTranslation": "Tim itu mengalami kemunduran besar ketika sponsor utama mereka menarik pendanaannya."
+  },
+  {
+    "id": "c1_curated_0217",
+    "word": "hierarchy",
+    "level": "C1",
+    "partOfSpeech": "noun",
+    "phonetic": "/ˈhaɪərɑːki/",
+    "meanings": [
+      {
+        "id": "c1m_0073",
+        "meaning": "hierarki; jenjang tingkatan"
+      }
+    ],
+    "examples": [
+      {
+        "en": "In many large companies, important decisions have to work their way slowly up the management hierarchy.",
+        "id": "Di banyak perusahaan besar, keputusan penting harus naik perlahan melalui hierarki manajemen.",
+        "translation": "Di banyak perusahaan besar, keputusan penting harus naik perlahan melalui hierarki manajemen."
+      }
+    ],
+    "synonyms": [],
+    "antonyms": [],
+    "collocations": [
+      "corporate hierarchy",
+      "social hierarchy"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "hierarki; jenjang tingkatan",
+    "example": "In many large companies, important decisions have to work their way slowly up the management hierarchy.",
+    "masterIndex": 2388,
+    "exampleTranslation": "Di banyak perusahaan besar, keputusan penting harus naik perlahan melalui hierarki manajemen."
+  },
+  {
+    "id": "c1_curated_0218",
+    "word": "hindsight",
+    "level": "C1",
+    "partOfSpeech": "noun",
+    "phonetic": "/ˈhaɪndsaɪt/",
+    "meanings": [
+      {
+        "id": "c1m_0074",
+        "meaning": "pemahaman setelah kejadian berlalu"
+      }
+    ],
+    "examples": [
+      {
+        "en": "In hindsight, selling the house before land prices dropped was a wise decision.",
+        "id": "Setelah dipikir kembali, menjual rumah itu sebelum harga tanah turun adalah keputusan yang bijak.",
+        "translation": "Setelah dipikir kembali, menjual rumah itu sebelum harga tanah turun adalah keputusan yang bijak."
+      }
+    ],
+    "synonyms": [],
+    "antonyms": [],
+    "collocations": [
+      "in hindsight",
+      "with the benefit of hindsight"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "Hampir selalu dipakai dalam frasa 'in hindsight' atau 'with hindsight'.",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "pemahaman setelah kejadian berlalu",
+    "example": "In hindsight, selling the house before land prices dropped was a wise decision.",
+    "masterIndex": 2389,
+    "exampleTranslation": "Setelah dipikir kembali, menjual rumah itu sebelum harga tanah turun adalah keputusan yang bijak."
+  },
+  {
+    "id": "c1_curated_0219",
+    "word": "remedy",
+    "level": "C1",
+    "partOfSpeech": "noun",
+    "phonetic": "/ˈremədi/",
+    "meanings": [
+      {
+        "id": "c1m_0075",
+        "meaning": "obat; cara mengatasi masalah"
+      }
+    ],
+    "examples": [
+      {
+        "en": "Warm ginger tea is a popular traditional remedy for mild colds in Indonesia.",
+        "id": "Teh jahe hangat adalah obat tradisional yang populer untuk pilek ringan di Indonesia.",
+        "translation": "Teh jahe hangat adalah obat tradisional yang populer untuk pilek ringan di Indonesia."
+      }
+    ],
+    "synonyms": [
+      "cure",
+      "treatment"
+    ],
+    "antonyms": [],
+    "collocations": [
+      "herbal remedy",
+      "effective remedy"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "obat; cara mengatasi masalah",
+    "example": "Warm ginger tea is a popular traditional remedy for mild colds in Indonesia.",
+    "masterIndex": 2390,
+    "exampleTranslation": "Teh jahe hangat adalah obat tradisional yang populer untuk pilek ringan di Indonesia."
+  },
+  {
+    "id": "c1_curated_0220",
+    "word": "inertia",
+    "level": "C1",
+    "partOfSpeech": "noun",
+    "phonetic": "/ɪˈnɜːʃə/",
+    "meanings": [
+      {
+        "id": "c1m_0076",
+        "meaning": "kelembaman; keengganan untuk berubah"
+      }
+    ],
+    "examples": [
+      {
+        "en": "Bureaucratic inertia often delays urgent reforms in the national education system.",
+        "id": "Kelembaman birokrasi sering menunda reformasi mendesak dalam sistem pendidikan nasional.",
+        "translation": "Kelembaman birokrasi sering menunda reformasi mendesak dalam sistem pendidikan nasional."
+      }
+    ],
+    "synonyms": [],
+    "antonyms": [],
+    "collocations": [
+      "bureaucratic inertia",
+      "overcome inertia"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "kelembaman; keengganan untuk berubah",
+    "example": "Bureaucratic inertia often delays urgent reforms in the national education system.",
+    "masterIndex": 2391,
+    "exampleTranslation": "Kelembaman birokrasi sering menunda reformasi mendesak dalam sistem pendidikan nasional."
+  },
+  {
+    "id": "c1_curated_0221",
+    "word": "adverse",
+    "level": "C1",
+    "partOfSpeech": "adjective",
+    "phonetic": "/ˈædvɜːs/",
+    "meanings": [
+      {
+        "id": "c1m_0077",
+        "meaning": "merugikan (efek, dampak); tidak menguntungkan"
+      }
+    ],
+    "examples": [
+      {
+        "en": "Doctors warned that the new drug may have adverse effects on elderly patients.",
+        "id": "Para dokter memperingatkan bahwa obat baru itu dapat menimbulkan efek merugikan pada pasien lanjut usia.",
+        "translation": "Para dokter memperingatkan bahwa obat baru itu dapat menimbulkan efek merugikan pada pasien lanjut usia."
+      }
+    ],
+    "synonyms": [
+      "harmful",
+      "negative"
+    ],
+    "antonyms": [
+      "favorable"
+    ],
+    "collocations": [
+      "adverse effects",
+      "adverse weather conditions"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "merugikan (efek, dampak); tidak menguntungkan",
+    "example": "Doctors warned that the new drug may have adverse effects on elderly patients.",
+    "masterIndex": 2392,
+    "exampleTranslation": "Para dokter memperingatkan bahwa obat baru itu dapat menimbulkan efek merugikan pada pasien lanjut usia."
+  },
+  {
+    "id": "c1_curated_0222",
+    "word": "conducive",
+    "level": "C1",
+    "partOfSpeech": "adjective",
+    "phonetic": "/kənˈdjuːsɪv/",
+    "meanings": [
+      {
+        "id": "c1m_0079",
+        "meaning": "menunjang; menciptakan kondisi yang mendukung"
+      }
+    ],
+    "examples": [
+      {
+        "en": "A quiet room with good lighting is conducive to long hours of focused study.",
+        "id": "Ruangan tenang dengan pencahayaan yang baik menunjang belajar fokus selama berjam-jam.",
+        "translation": "Ruangan tenang dengan pencahayaan yang baik menunjang belajar fokus selama berjam-jam."
+      }
+    ],
+    "synonyms": [],
+    "antonyms": [],
+    "collocations": [
+      "conducive to learning",
+      "a conducive environment"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "Selalu diikuti 'to': 'conducive to something'.",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "menunjang; menciptakan kondisi yang mendukung",
+    "example": "A quiet room with good lighting is conducive to long hours of focused study.",
+    "masterIndex": 2393,
+    "exampleTranslation": "Ruangan tenang dengan pencahayaan yang baik menunjang belajar fokus selama berjam-jam."
+  },
+  {
+    "id": "c1_curated_0223",
+    "word": "contentious",
+    "level": "C1",
+    "partOfSpeech": "adjective",
+    "phonetic": "/kənˈtenʃəs/",
+    "meanings": [
+      {
+        "id": "c1m_0080",
+        "meaning": "penuh kontroversi; memicu perdebatan sengit"
+      }
+    ],
+    "examples": [
+      {
+        "en": "The plan to raise fuel prices remains a highly contentious issue in parliament.",
+        "id": "Rencana menaikkan harga bahan bakar tetap menjadi isu yang sangat kontroversial di parlemen.",
+        "translation": "Rencana menaikkan harga bahan bakar tetap menjadi isu yang sangat kontroversial di parlemen."
+      }
+    ],
+    "synonyms": [
+      "controversial"
+    ],
+    "antonyms": [],
+    "collocations": [
+      "contentious issue",
+      "highly contentious"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "penuh kontroversi; memicu perdebatan sengit",
+    "example": "The plan to raise fuel prices remains a highly contentious issue in parliament.",
+    "masterIndex": 2394,
+    "exampleTranslation": "Rencana menaikkan harga bahan bakar tetap menjadi isu yang sangat kontroversial di parlemen."
+  },
+  {
+    "id": "c1_curated_0224",
+    "word": "eloquent",
+    "level": "C1",
+    "partOfSpeech": "adjective",
+    "phonetic": "/ˈeləkwənt/",
+    "meanings": [
+      {
+        "id": "c1m_0082",
+        "meaning": "fasih dan memukau dalam menyampaikan gagasan"
+      }
+    ],
+    "examples": [
+      {
+        "en": "The young lawyer delivered an eloquent speech about justice for street vendors.",
+        "id": "Pengacara muda itu menyampaikan pidato yang fasih tentang keadilan bagi pedagang kaki lima.",
+        "translation": "Pengacara muda itu menyampaikan pidato yang fasih tentang keadilan bagi pedagang kaki lima."
+      }
+    ],
+    "synonyms": [],
+    "antonyms": [],
+    "collocations": [
+      "eloquent speech",
+      "eloquent speaker"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "fasih dan memukau dalam menyampaikan gagasan",
+    "example": "The young lawyer delivered an eloquent speech about justice for street vendors.",
+    "masterIndex": 2395,
+    "exampleTranslation": "Pengacara muda itu menyampaikan pidato yang fasih tentang keadilan bagi pedagang kaki lima."
+  },
+  {
+    "id": "c1_curated_0225",
+    "word": "erratic",
+    "level": "C1",
+    "partOfSpeech": "adjective",
+    "phonetic": "/ɪˈrætɪk/",
+    "meanings": [
+      {
+        "id": "c1m_0083",
+        "meaning": "tidak menentu; sulit diprediksi"
+      }
+    ],
+    "examples": [
+      {
+        "en": "The bus driver's erratic behavior made all the passengers extremely nervous.",
+        "id": "Perilaku sopir bus yang tidak menentu membuat semua penumpang sangat gugup.",
+        "translation": "Perilaku sopir bus yang tidak menentu membuat semua penumpang sangat gugup."
+      }
+    ],
+    "synonyms": [
+      "unpredictable"
+    ],
+    "antonyms": [
+      "consistent"
+    ],
+    "collocations": [
+      "erratic behavior",
+      "erratic weather"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "tidak menentu; sulit diprediksi",
+    "example": "The bus driver's erratic behavior made all the passengers extremely nervous.",
+    "masterIndex": 2396,
+    "exampleTranslation": "Perilaku sopir bus yang tidak menentu membuat semua penumpang sangat gugup."
+  },
+  {
+    "id": "c1_curated_0226",
+    "word": "imminent",
+    "level": "C1",
+    "partOfSpeech": "adjective",
+    "phonetic": "/ˈɪmɪnənt/",
+    "meanings": [
+      {
+        "id": "c1m_0084",
+        "meaning": "segera akan terjadi; sudah di ambang"
+      }
+    ],
+    "examples": [
+      {
+        "en": "Villagers on the volcano's slopes were evacuated because an eruption seemed imminent.",
+        "id": "Warga desa di lereng gunung berapi itu dievakuasi karena letusan tampak akan segera terjadi.",
+        "translation": "Warga desa di lereng gunung berapi itu dievakuasi karena letusan tampak akan segera terjadi."
+      }
+    ],
+    "synonyms": [],
+    "antonyms": [],
+    "collocations": [
+      "imminent threat",
+      "imminent danger"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "segera akan terjadi; sudah di ambang",
+    "example": "Villagers on the volcano's slopes were evacuated because an eruption seemed imminent.",
+    "masterIndex": 2397,
+    "exampleTranslation": "Warga desa di lereng gunung berapi itu dievakuasi karena letusan tampak akan segera terjadi."
+  },
+  {
+    "id": "c1_curated_0227",
+    "word": "indispensable",
+    "level": "C1",
+    "partOfSpeech": "adjective",
+    "phonetic": "/ˌɪndɪˈspensəbl/",
+    "meanings": [
+      {
+        "id": "c1m_0085",
+        "meaning": "sangat diperlukan; tidak tergantikan"
+      }
+    ],
+    "examples": [
+      {
+        "en": "A stable internet connection has become indispensable for employees who work from home.",
+        "id": "Koneksi internet yang stabil telah menjadi sangat diperlukan bagi karyawan yang bekerja dari rumah.",
+        "translation": "Koneksi internet yang stabil telah menjadi sangat diperlukan bagi karyawan yang bekerja dari rumah."
+      }
+    ],
+    "synonyms": [
+      "essential",
+      "vital"
+    ],
+    "antonyms": [],
+    "collocations": [
+      "indispensable part",
+      "indispensable tool"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "sangat diperlukan; tidak tergantikan",
+    "example": "A stable internet connection has become indispensable for employees who work from home.",
+    "masterIndex": 2398,
+    "exampleTranslation": "Koneksi internet yang stabil telah menjadi sangat diperlukan bagi karyawan yang bekerja dari rumah."
+  },
+  {
+    "id": "c1_curated_0228",
+    "word": "negligible",
+    "level": "C1",
+    "partOfSpeech": "adjective",
+    "phonetic": "/ˈneɡlɪdʒəbl/",
+    "meanings": [
+      {
+        "id": "c1m_0089",
+        "meaning": "sangat kecil; dapat diabaikan"
+      }
+    ],
+    "examples": [
+      {
+        "en": "The price difference between the two smartphone models is negligible for most buyers.",
+        "id": "Perbedaan harga antara kedua model ponsel pintar itu sangat kecil dan dapat diabaikan bagi kebanyakan pembeli.",
+        "translation": "Perbedaan harga antara kedua model ponsel pintar itu sangat kecil dan dapat diabaikan bagi kebanyakan pembeli."
+      }
+    ],
+    "synonyms": [
+      "insignificant",
+      "minimal"
+    ],
+    "antonyms": [
+      "significant"
+    ],
+    "collocations": [
+      "negligible effect",
+      "negligible amount"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "sangat kecil; dapat diabaikan",
+    "example": "The price difference between the two smartphone models is negligible for most buyers.",
+    "masterIndex": 2399,
+    "exampleTranslation": "Perbedaan harga antara kedua model ponsel pintar itu sangat kecil dan dapat diabaikan bagi kebanyakan pembeli."
+  },
+  {
+    "id": "c1_curated_0229",
+    "word": "allegedly",
+    "level": "C1",
+    "partOfSpeech": "adverb",
+    "phonetic": "/əˈledʒɪdli/",
+    "meanings": [
+      {
+        "id": "c1m_0090",
+        "meaning": "diduga; menurut tuduhan"
+      }
+    ],
+    "examples": [
+      {
+        "en": "The senior official allegedly received bribes from several construction companies last year.",
+        "id": "Pejabat senior itu diduga menerima suap dari beberapa perusahaan konstruksi tahun lalu.",
+        "translation": "Pejabat senior itu diduga menerima suap dari beberapa perusahaan konstruksi tahun lalu."
+      }
+    ],
+    "synonyms": [],
+    "antonyms": [],
+    "collocations": [],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "Dipakai dalam berita untuk tuduhan yang belum terbukti di pengadilan.",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "diduga; menurut tuduhan",
+    "example": "The senior official allegedly received bribes from several construction companies last year.",
+    "masterIndex": 2400,
+    "exampleTranslation": "Pejabat senior itu diduga menerima suap dari beberapa perusahaan konstruksi tahun lalu."
+  },
+  {
+    "id": "c1_curated_0230",
+    "word": "arguably",
+    "level": "C1",
+    "partOfSpeech": "adverb",
+    "phonetic": "/ˈɑːɡjuəbli/",
+    "meanings": [
+      {
+        "id": "c1m_0091",
+        "meaning": "bisa dibilang; ada dasar kuat untuk menyebutnya begitu"
+      }
+    ],
+    "examples": [
+      {
+        "en": "Rendang is arguably the most famous Indonesian dish among food lovers worldwide.",
+        "id": "Rendang bisa dibilang hidangan Indonesia paling terkenal di kalangan pecinta kuliner di seluruh dunia.",
+        "translation": "Rendang bisa dibilang hidangan Indonesia paling terkenal di kalangan pecinta kuliner di seluruh dunia."
+      }
+    ],
+    "synonyms": [],
+    "antonyms": [],
+    "collocations": [
+      "arguably the best",
+      "arguably the most"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "bisa dibilang; ada dasar kuat untuk menyebutnya begitu",
+    "example": "Rendang is arguably the most famous Indonesian dish among food lovers worldwide.",
+    "masterIndex": 2401,
+    "exampleTranslation": "Rendang bisa dibilang hidangan Indonesia paling terkenal di kalangan pecinta kuliner di seluruh dunia."
+  },
+  {
+    "id": "c1_curated_0231",
+    "word": "invariably",
+    "level": "C1",
+    "partOfSpeech": "adverb",
+    "phonetic": "/ɪnˈveəriəbli/",
+    "meanings": [
+      {
+        "id": "c1m_0092",
+        "meaning": "selalu tanpa kecuali; tidak pernah berbeda"
+      }
+    ],
+    "examples": [
+      {
+        "en": "Traffic on this main road is invariably heavy on Friday afternoons before the weekend.",
+        "id": "Lalu lintas di jalan utama ini selalu padat tanpa kecuali pada Jumat sore menjelang akhir pekan.",
+        "translation": "Lalu lintas di jalan utama ini selalu padat tanpa kecuali pada Jumat sore menjelang akhir pekan."
+      }
+    ],
+    "synonyms": [
+      "always"
+    ],
+    "antonyms": [],
+    "collocations": [
+      "almost invariably"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "selalu tanpa kecuali; tidak pernah berbeda",
+    "example": "Traffic on this main road is invariably heavy on Friday afternoons before the weekend.",
+    "masterIndex": 2402,
+    "exampleTranslation": "Lalu lintas di jalan utama ini selalu padat tanpa kecuali pada Jumat sore menjelang akhir pekan."
+  },
+  {
+    "id": "c1_curated_0232",
+    "word": "markedly",
+    "level": "C1",
+    "partOfSpeech": "adverb",
+    "phonetic": "/ˈmɑːkɪdli/",
+    "meanings": [
+      {
+        "id": "c1m_0093",
+        "meaning": "secara mencolok; dengan perbedaan yang jelas"
+      }
+    ],
+    "examples": [
+      {
+        "en": "Air quality in the capital improved markedly during the long holiday season.",
+        "id": "Kualitas udara di ibu kota membaik secara mencolok selama musim libur panjang.",
+        "translation": "Kualitas udara di ibu kota membaik secara mencolok selama musim libur panjang."
+      }
+    ],
+    "synonyms": [
+      "noticeably",
+      "significantly"
+    ],
+    "antonyms": [],
+    "collocations": [
+      "markedly different",
+      "improve markedly"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "secara mencolok; dengan perbedaan yang jelas",
+    "example": "Air quality in the capital improved markedly during the long holiday season.",
+    "masterIndex": 2403,
+    "exampleTranslation": "Kualitas udara di ibu kota membaik secara mencolok selama musim libur panjang."
+  },
+  {
+    "id": "c1_curated_0233",
+    "word": "notably",
+    "level": "C1",
+    "partOfSpeech": "adverb",
+    "phonetic": "/ˈnəʊtəbli/",
+    "meanings": [
+      {
+        "id": "c1m_0094",
+        "meaning": "terutama; secara menonjol"
+      }
+    ],
+    "examples": [
+      {
+        "en": "Several countries, notably Indonesia and Vietnam, increased their coffee exports this year.",
+        "id": "Beberapa negara, terutama Indonesia dan Vietnam, meningkatkan ekspor kopi mereka tahun ini.",
+        "translation": "Beberapa negara, terutama Indonesia dan Vietnam, meningkatkan ekspor kopi mereka tahun ini."
+      }
+    ],
+    "synonyms": [
+      "particularly",
+      "especially"
+    ],
+    "antonyms": [],
+    "collocations": [
+      "most notably"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "terutama; secara menonjol",
+    "example": "Several countries, notably Indonesia and Vietnam, increased their coffee exports this year.",
+    "masterIndex": 2404,
+    "exampleTranslation": "Beberapa negara, terutama Indonesia dan Vietnam, meningkatkan ekspor kopi mereka tahun ini."
+  },
+  {
+    "id": "c1_curated_0234",
+    "word": "readily",
+    "level": "C1",
+    "partOfSpeech": "adverb",
+    "phonetic": "/ˈredɪli/",
+    "meanings": [
+      {
+        "id": "c1m_0095",
+        "meaning": "dengan mudah; tanpa ragu-ragu"
+      }
+    ],
+    "examples": [
+      {
+        "en": "Fresh spices are readily available at the traditional market near my grandmother's house.",
+        "id": "Rempah-rempah segar mudah didapat di pasar tradisional dekat rumah nenek saya.",
+        "translation": "Rempah-rempah segar mudah didapat di pasar tradisional dekat rumah nenek saya."
+      }
+    ],
+    "synonyms": [
+      "easily"
+    ],
+    "antonyms": [],
+    "collocations": [
+      "readily available",
+      "readily accept"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "dengan mudah; tanpa ragu-ragu",
+    "example": "Fresh spices are readily available at the traditional market near my grandmother's house.",
+    "masterIndex": 2405,
+    "exampleTranslation": "Rempah-rempah segar mudah didapat di pasar tradisional dekat rumah nenek saya."
+  },
+  {
+    "id": "c1_curated_0235",
+    "word": "seemingly",
+    "level": "C1",
+    "partOfSpeech": "adverb",
+    "phonetic": "/ˈsiːmɪŋli/",
+    "meanings": [
+      {
+        "id": "c1m_0096",
+        "meaning": "tampaknya (padahal belum tentu demikian)"
+      }
+    ],
+    "examples": [
+      {
+        "en": "The seemingly simple rendang recipe actually requires many hours of patient cooking.",
+        "id": "Resep rendang yang tampaknya sederhana itu sebenarnya membutuhkan berjam-jam memasak dengan sabar.",
+        "translation": "Resep rendang yang tampaknya sederhana itu sebenarnya membutuhkan berjam-jam memasak dengan sabar."
+      }
+    ],
+    "synonyms": [
+      "apparently"
+    ],
+    "antonyms": [],
+    "collocations": [
+      "seemingly endless",
+      "seemingly impossible"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "tampaknya (padahal belum tentu demikian)",
+    "example": "The seemingly simple rendang recipe actually requires many hours of patient cooking.",
+    "masterIndex": 2406,
+    "exampleTranslation": "Resep rendang yang tampaknya sederhana itu sebenarnya membutuhkan berjam-jam memasak dengan sabar."
+  },
+  {
+    "id": "c1_curated_0236",
+    "word": "subsequently",
+    "level": "C1",
+    "partOfSpeech": "adverb",
+    "phonetic": "/ˈsʌbsɪkwəntli/",
+    "meanings": [
+      {
+        "id": "c1m_0097",
+        "meaning": "kemudian; sesudah itu"
+      }
+    ],
+    "examples": [
+      {
+        "en": "She joined the startup as an intern and subsequently became its marketing director.",
+        "id": "Ia bergabung dengan perusahaan rintisan itu sebagai pemagang dan kemudian menjadi direktur pemasarannya.",
+        "translation": "Ia bergabung dengan perusahaan rintisan itu sebagai pemagang dan kemudian menjadi direktur pemasarannya."
+      }
+    ],
+    "synonyms": [
+      "later",
+      "afterwards"
+    ],
+    "antonyms": [
+      "previously"
+    ],
+    "collocations": [],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "kemudian; sesudah itu",
+    "example": "She joined the startup as an intern and subsequently became its marketing director.",
+    "masterIndex": 2407,
+    "exampleTranslation": "Ia bergabung dengan perusahaan rintisan itu sebagai pemagang dan kemudian menjadi direktur pemasarannya."
+  },
+  {
+    "id": "c1_curated_0237",
+    "word": "thereby",
+    "level": "C1",
+    "partOfSpeech": "adverb",
+    "phonetic": "/ˌðeəˈbaɪ/",
+    "meanings": [
+      {
+        "id": "c1m_0098",
+        "meaning": "dengan demikian; melalui cara itu"
+      }
+    ],
+    "examples": [
+      {
+        "en": "The hotel installed solar panels, thereby cutting its monthly electricity costs significantly.",
+        "id": "Hotel itu memasang panel surya, dan dengan demikian memangkas biaya listrik bulanannya secara signifikan.",
+        "translation": "Hotel itu memasang panel surya, dan dengan demikian memangkas biaya listrik bulanannya secara signifikan."
+      }
+    ],
+    "synonyms": [
+      "thus"
+    ],
+    "antonyms": [],
+    "collocations": [],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "Kata formal, umum dalam tulisan akademik dan dokumen resmi.",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "dengan demikian; melalui cara itu",
+    "example": "The hotel installed solar panels, thereby cutting its monthly electricity costs significantly.",
+    "masterIndex": 2408,
+    "exampleTranslation": "Hotel itu memasang panel surya, dan dengan demikian memangkas biaya listrik bulanannya secara signifikan."
+  },
+  {
+    "id": "c1_curated_0238",
+    "word": "wholly",
+    "level": "C1",
+    "partOfSpeech": "adverb",
+    "phonetic": "/ˈhəʊlli/",
+    "meanings": [
+      {
+        "id": "c1m_0099",
+        "meaning": "sepenuhnya; secara total"
+      }
+    ],
+    "examples": [
+      {
+        "en": "The success of the annual festival is wholly dependent on hundreds of local volunteers.",
+        "id": "Keberhasilan festival tahunan itu sepenuhnya bergantung pada ratusan relawan lokal.",
+        "translation": "Keberhasilan festival tahunan itu sepenuhnya bergantung pada ratusan relawan lokal."
+      }
+    ],
+    "synonyms": [
+      "completely",
+      "entirely",
+      "purely",
+      "exclusively"
+    ],
+    "antonyms": [
+      "partly"
+    ],
+    "collocations": [
+      "wholly owned",
+      "wholly dependent on"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "sepenuhnya; secara total",
+    "example": "The success of the annual festival is wholly dependent on hundreds of local volunteers.",
+    "masterIndex": 2409,
+    "exampleTranslation": "Keberhasilan festival tahunan itu sepenuhnya bergantung pada ratusan relawan lokal."
+  },
+  {
+    "id": "c1_curated_0239",
+    "word": "induce",
+    "level": "C1",
+    "partOfSpeech": "verb",
+    "phonetic": "/ɪnˈdjuːs/",
+    "meanings": [
+      {
+        "id": "c1m_0101",
+        "meaning": "menyebabkan timbulnya; memicu (kondisi)"
+      }
+    ],
+    "examples": [
+      {
+        "en": "Stress at work can induce headaches, insomnia, and other physical symptoms.",
+        "id": "Stres di tempat kerja dapat memicu sakit kepala, susah tidur, dan gejala fisik lainnya.",
+        "translation": "Stres di tempat kerja dapat memicu sakit kepala, susah tidur, dan gejala fisik lainnya."
+      }
+    ],
+    "synonyms": [
+      "cause",
+      "trigger",
+      "encourage"
+    ],
+    "antonyms": [],
+    "collocations": [
+      "induce sleep",
+      "induce labor",
+      "induce a response"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "menyebabkan timbulnya; memicu (kondisi)",
+    "example": "Stress at work can induce headaches, insomnia, and other physical symptoms.",
+    "masterIndex": 2410,
+    "exampleTranslation": "Stres di tempat kerja dapat memicu sakit kepala, susah tidur, dan gejala fisik lainnya."
+  },
+  {
+    "id": "c1_curated_0240",
+    "word": "infer",
+    "level": "C1",
+    "partOfSpeech": "verb",
+    "phonetic": "/ɪnˈfɜː(r)/",
+    "meanings": [
+      {
+        "id": "c1m_0102",
+        "meaning": "menyimpulkan dari bukti tidak langsung"
+      }
+    ],
+    "examples": [
+      {
+        "en": "From the fossil evidence, researchers can infer how these ancient animals moved.",
+        "id": "Dari bukti fosil, para peneliti dapat menyimpulkan bagaimana hewan-hewan purba ini bergerak.",
+        "translation": "Dari bukti fosil, para peneliti dapat menyimpulkan bagaimana hewan-hewan purba ini bergerak."
+      }
+    ],
+    "synonyms": [
+      "deduce"
+    ],
+    "antonyms": [],
+    "collocations": [
+      "infer from evidence",
+      "infer meaning from context"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "menyimpulkan dari bukti tidak langsung",
+    "example": "From the fossil evidence, researchers can infer how these ancient animals moved.",
+    "masterIndex": 2411,
+    "exampleTranslation": "Dari bukti fosil, para peneliti dapat menyimpulkan bagaimana hewan-hewan purba ini bergerak."
+  },
+  {
+    "id": "c1_curated_0241",
+    "word": "inhibit",
+    "level": "C1",
+    "partOfSpeech": "verb",
+    "phonetic": "/ɪnˈhɪbɪt/",
+    "meanings": [
+      {
+        "id": "c1m_0103",
+        "meaning": "menghambat (proses atau reaksi); membuat sungkan"
+      }
+    ],
+    "examples": [
+      {
+        "en": "Some natural preservatives inhibit the growth of harmful bacteria in packaged food.",
+        "id": "Beberapa pengawet alami menghambat pertumbuhan bakteri berbahaya dalam makanan kemasan.",
+        "translation": "Beberapa pengawet alami menghambat pertumbuhan bakteri berbahaya dalam makanan kemasan."
+      }
+    ],
+    "synonyms": [
+      "suppress",
+      "restrain",
+      "hinder",
+      "prevent"
+    ],
+    "antonyms": [
+      "stimulate"
+    ],
+    "collocations": [
+      "inhibit growth",
+      "inhibit a reaction",
+      "inhibit development"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "menghambat (proses atau reaksi); membuat sungkan",
+    "example": "Some natural preservatives inhibit the growth of harmful bacteria in packaged food.",
+    "masterIndex": 2412,
+    "exampleTranslation": "Beberapa pengawet alami menghambat pertumbuhan bakteri berbahaya dalam makanan kemasan."
+  },
+  {
+    "id": "c1_curated_0242",
+    "word": "preclude",
+    "level": "C1",
+    "partOfSpeech": "verb",
+    "phonetic": "/prɪˈkluːd/",
+    "meanings": [
+      {
+        "id": "c1m_0106",
+        "meaning": "membuat mustahil; menutup peluang sejak awal"
+      }
+    ],
+    "examples": [
+      {
+        "en": "A serious criminal record may preclude you from working in the banking sector.",
+        "id": "Catatan kriminal yang berat dapat menutup peluangmu untuk bekerja di sektor perbankan.",
+        "translation": "Catatan kriminal yang berat dapat menutup peluangmu untuk bekerja di sektor perbankan."
+      }
+    ],
+    "synonyms": [],
+    "antonyms": [],
+    "collocations": [
+      "preclude the possibility",
+      "preclude someone from doing something"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "Kata formal; pola umumnya 'preclude somebody from doing something'.",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "membuat mustahil; menutup peluang sejak awal",
+    "example": "A serious criminal record may preclude you from working in the banking sector.",
+    "masterIndex": 2413,
+    "exampleTranslation": "Catatan kriminal yang berat dapat menutup peluangmu untuk bekerja di sektor perbankan."
+  },
+  {
+    "id": "c1_curated_0243",
+    "word": "safeguard",
+    "level": "C1",
+    "partOfSpeech": "verb",
+    "phonetic": "/ˈseɪfɡɑːd/",
+    "meanings": [
+      {
+        "id": "c1m_0109",
+        "meaning": "melindungi; menjaga agar tetap aman"
+      }
+    ],
+    "examples": [
+      {
+        "en": "The new regulation aims to safeguard the personal data of internet users.",
+        "id": "Peraturan baru itu bertujuan melindungi data pribadi para pengguna internet.",
+        "translation": "Peraturan baru itu bertujuan melindungi data pribadi para pengguna internet."
+      }
+    ],
+    "synonyms": [
+      "protect"
+    ],
+    "antonyms": [
+      "endanger"
+    ],
+    "collocations": [
+      "safeguard the interests of",
+      "safeguard personal data",
+      "safeguard against abuse"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "melindungi; menjaga agar tetap aman",
+    "example": "The new regulation aims to safeguard the personal data of internet users.",
+    "masterIndex": 2414,
+    "exampleTranslation": "Peraturan baru itu bertujuan melindungi data pribadi para pengguna internet."
+  },
+  {
+    "id": "c1_curated_0244",
+    "word": "stipulate",
+    "level": "C1",
+    "partOfSpeech": "verb",
+    "phonetic": "/ˈstɪpjuleɪt/",
+    "meanings": [
+      {
+        "id": "c1m_0110",
+        "meaning": "menetapkan secara tegas (dalam perjanjian atau aturan); mensyaratkan"
+      }
+    ],
+    "examples": [
+      {
+        "en": "The new labor regulations stipulate that every worker must receive written notice before dismissal.",
+        "id": "Peraturan ketenagakerjaan yang baru menetapkan bahwa setiap pekerja harus menerima pemberitahuan tertulis sebelum pemutusan hubungan kerja.",
+        "translation": "Peraturan ketenagakerjaan yang baru menetapkan bahwa setiap pekerja harus menerima pemberitahuan tertulis sebelum pemutusan hubungan kerja."
+      }
+    ],
+    "synonyms": [
+      "specify",
+      "require"
+    ],
+    "antonyms": [],
+    "collocations": [
+      "stipulate a condition",
+      "stipulate in a contract",
+      "stipulate that"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "menetapkan secara tegas (dalam perjanjian atau aturan); mensyaratkan",
+    "example": "The new labor regulations stipulate that every worker must receive written notice before dismissal.",
+    "masterIndex": 2415,
+    "exampleTranslation": "Peraturan ketenagakerjaan yang baru menetapkan bahwa setiap pekerja harus menerima pemberitahuan tertulis sebelum pemutusan hubungan kerja."
+  },
+  {
+    "id": "c1_curated_0245",
+    "word": "underpin",
+    "level": "C1",
+    "partOfSpeech": "verb",
+    "phonetic": "/ˌʌndəˈpɪn/",
+    "meanings": [
+      {
+        "id": "c1m_0112",
+        "meaning": "menopang; menjadi landasan bagi"
+      }
+    ],
+    "examples": [
+      {
+        "en": "Decades of careful field research underpin the main theory in this book.",
+        "id": "Penelitian lapangan yang cermat selama puluhan tahun menopang teori utama dalam buku ini.",
+        "translation": "Penelitian lapangan yang cermat selama puluhan tahun menopang teori utama dalam buku ini."
+      }
+    ],
+    "synonyms": [],
+    "antonyms": [],
+    "collocations": [
+      "underpin the economy",
+      "underpin an argument",
+      "underpin a theory"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "menopang; menjadi landasan bagi",
+    "example": "Decades of careful field research underpin the main theory in this book.",
+    "masterIndex": 2416,
+    "exampleTranslation": "Penelitian lapangan yang cermat selama puluhan tahun menopang teori utama dalam buku ini."
+  },
+  {
+    "id": "c1_curated_0246",
+    "word": "integrity",
+    "level": "C1",
+    "partOfSpeech": "noun",
+    "phonetic": "/ɪnˈteɡrəti/",
+    "meanings": [
+      {
+        "id": "c1m_0114",
+        "meaning": "integritas; keteguhan memegang prinsip kejujuran"
+      }
+    ],
+    "examples": [
+      {
+        "en": "People admired the judge for her integrity and her refusal to accept bribes.",
+        "id": "Orang-orang mengagumi hakim itu karena integritasnya dan penolakannya menerima suap.",
+        "translation": "Orang-orang mengagumi hakim itu karena integritasnya dan penolakannya menerima suap."
+      }
+    ],
+    "synonyms": [
+      "honesty"
+    ],
+    "antonyms": [],
+    "collocations": [
+      "personal integrity",
+      "professional integrity",
+      "question someone's integrity"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "integritas; keteguhan memegang prinsip kejujuran",
+    "example": "People admired the judge for her integrity and her refusal to accept bribes.",
+    "masterIndex": 2417,
+    "exampleTranslation": "Orang-orang mengagumi hakim itu karena integritasnya dan penolakannya menerima suap."
+  },
+  {
+    "id": "c1_curated_0247",
+    "word": "intuition",
+    "level": "C1",
+    "partOfSpeech": "noun",
+    "phonetic": "/ˌɪntjuˈɪʃn/",
+    "meanings": [
+      {
+        "id": "c1m_0115",
+        "meaning": "intuisi; kemampuan memahami tanpa penalaran sadar"
+      }
+    ],
+    "examples": [
+      {
+        "en": "Experienced nurses often rely on intuition to sense when a patient is getting worse.",
+        "id": "Perawat berpengalaman sering mengandalkan intuisi untuk merasakan kapan kondisi pasien memburuk.",
+        "translation": "Perawat berpengalaman sering mengandalkan intuisi untuk merasakan kapan kondisi pasien memburuk."
+      }
+    ],
+    "synonyms": [
+      "instinct"
+    ],
+    "antonyms": [],
+    "collocations": [
+      "rely on intuition",
+      "trust your intuition"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "intuisi; kemampuan memahami tanpa penalaran sadar",
+    "example": "Experienced nurses often rely on intuition to sense when a patient is getting worse.",
+    "masterIndex": 2418,
+    "exampleTranslation": "Perawat berpengalaman sering mengandalkan intuisi untuk merasakan kapan kondisi pasien memburuk."
+  },
+  {
+    "id": "c1_curated_0248",
+    "word": "legacy",
+    "level": "C1",
+    "partOfSpeech": "noun",
+    "phonetic": "/ˈleɡəsi/",
+    "meanings": [
+      {
+        "id": "c1m_0116",
+        "meaning": "warisan; peninggalan (pengaruh dari masa lalu)"
+      }
+    ],
+    "examples": [
+      {
+        "en": "The dictator left a legacy of fear that shaped national politics for decades.",
+        "id": "Diktator itu meninggalkan warisan ketakutan yang membentuk politik nasional selama puluhan tahun.",
+        "translation": "Diktator itu meninggalkan warisan ketakutan yang membentuk politik nasional selama puluhan tahun."
+      }
+    ],
+    "synonyms": [],
+    "antonyms": [],
+    "collocations": [
+      "leave a legacy",
+      "lasting legacy",
+      "colonial legacy"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "warisan; peninggalan (pengaruh dari masa lalu)",
+    "example": "The dictator left a legacy of fear that shaped national politics for decades.",
+    "masterIndex": 2419,
+    "exampleTranslation": "Diktator itu meninggalkan warisan ketakutan yang membentuk politik nasional selama puluhan tahun."
+  },
+  {
+    "id": "c1_curated_0249",
+    "word": "leverage",
+    "level": "C1",
+    "partOfSpeech": "noun",
+    "phonetic": "/ˈliːvərɪdʒ/",
+    "meanings": [
+      {
+        "id": "c1m_0118",
+        "meaning": "daya tawar; pengaruh untuk menekan atau mencapai tujuan"
+      }
+    ],
+    "examples": [
+      {
+        "en": "As the region's biggest buyer, the supermarket chain has enormous leverage over its suppliers.",
+        "id": "Sebagai pembeli terbesar di kawasan itu, jaringan supermarket tersebut punya daya tawar yang sangat besar atas para pemasoknya.",
+        "translation": "Sebagai pembeli terbesar di kawasan itu, jaringan supermarket tersebut punya daya tawar yang sangat besar atas para pemasoknya."
+      }
+    ],
+    "synonyms": [
+      "influence"
+    ],
+    "antonyms": [],
+    "collocations": [
+      "gain leverage",
+      "use something as leverage",
+      "political leverage"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "daya tawar; pengaruh untuk menekan atau mencapai tujuan",
+    "example": "As the region's biggest buyer, the supermarket chain has enormous leverage over its suppliers.",
+    "masterIndex": 2420,
+    "exampleTranslation": "Sebagai pembeli terbesar di kawasan itu, jaringan supermarket tersebut punya daya tawar yang sangat besar atas para pemasoknya."
+  },
+  {
+    "id": "c1_curated_0250",
+    "word": "mandate",
+    "level": "C1",
+    "partOfSpeech": "noun",
+    "phonetic": "/ˈmændeɪt/",
+    "meanings": [
+      {
+        "id": "c1m_0119",
+        "meaning": "mandat; wewenang resmi yang diberikan (biasanya lewat pemilu)"
+      }
+    ],
+    "examples": [
+      {
+        "en": "The landslide victory gave the new governor a clear mandate to reform public transport.",
+        "id": "Kemenangan telak itu memberi gubernur baru mandat yang jelas untuk mereformasi transportasi umum.",
+        "translation": "Kemenangan telak itu memberi gubernur baru mandat yang jelas untuk mereformasi transportasi umum."
+      }
+    ],
+    "synonyms": [],
+    "antonyms": [],
+    "collocations": [
+      "a mandate to do something",
+      "electoral mandate",
+      "give someone a mandate"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "mandat; wewenang resmi yang diberikan (biasanya lewat pemilu)",
+    "example": "The landslide victory gave the new governor a clear mandate to reform public transport.",
+    "masterIndex": 2421,
+    "exampleTranslation": "Kemenangan telak itu memberi gubernur baru mandat yang jelas untuk mereformasi transportasi umum."
+  },
+  {
+    "id": "c1_curated_0251",
+    "word": "pitfall",
+    "level": "C1",
+    "partOfSpeech": "noun",
+    "phonetic": "/ˈpɪtfɔːl/",
+    "meanings": [
+      {
+        "id": "c1m_0122",
+        "meaning": "jebakan tersembunyi; potensi kesalahan yang tidak terduga"
+      }
+    ],
+    "examples": [
+      {
+        "en": "Overconfidence is a common pitfall for investors who are new to online trading.",
+        "id": "Terlalu percaya diri adalah jebakan umum bagi investor yang baru mengenal perdagangan daring.",
+        "translation": "Terlalu percaya diri adalah jebakan umum bagi investor yang baru mengenal perdagangan daring."
+      }
+    ],
+    "synonyms": [
+      "trap"
+    ],
+    "antonyms": [],
+    "collocations": [
+      "common pitfall",
+      "avoid the pitfalls of",
+      "potential pitfall"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "jebakan tersembunyi; potensi kesalahan yang tidak terduga",
+    "example": "Overconfidence is a common pitfall for investors who are new to online trading.",
+    "masterIndex": 2422,
+    "exampleTranslation": "Terlalu percaya diri adalah jebakan umum bagi investor yang baru mengenal perdagangan daring."
+  },
+  {
+    "id": "c1_curated_0252",
+    "word": "premise",
+    "level": "C1",
+    "partOfSpeech": "noun",
+    "phonetic": "/ˈpremɪs/",
+    "meanings": [
+      {
+        "id": "c1m_0123",
+        "meaning": "premis; dasar pemikiran suatu argumen"
+      }
+    ],
+    "examples": [
+      {
+        "en": "The author's whole argument rests on the premise that humans are naturally selfish.",
+        "id": "Seluruh argumen penulis bertumpu pada premis bahwa manusia pada dasarnya egois.",
+        "translation": "Seluruh argumen penulis bertumpu pada premis bahwa manusia pada dasarnya egois."
+      }
+    ],
+    "synonyms": [
+      "assumption",
+      "concept"
+    ],
+    "antonyms": [],
+    "collocations": [
+      "basic premise",
+      "rest on the premise that",
+      "accept a premise"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "premis; dasar pemikiran suatu argumen",
+    "example": "The author's whole argument rests on the premise that humans are naturally selfish.",
+    "masterIndex": 2423,
+    "exampleTranslation": "Seluruh argumen penulis bertumpu pada premis bahwa manusia pada dasarnya egois."
+  },
+  {
+    "id": "c1_curated_0253",
+    "word": "proponent",
+    "level": "C1",
+    "partOfSpeech": "noun",
+    "phonetic": "/prəˈpəʊnənt/",
+    "meanings": [
+      {
+        "id": "c1m_0124",
+        "meaning": "pendukung; penganjur (gagasan atau kebijakan)"
+      }
+    ],
+    "examples": [
+      {
+        "en": "As a leading proponent of renewable energy, she often speaks at climate conferences.",
+        "id": "Sebagai pendukung utama energi terbarukan, ia sering berbicara di konferensi iklim.",
+        "translation": "Sebagai pendukung utama energi terbarukan, ia sering berbicara di konferensi iklim."
+      }
+    ],
+    "synonyms": [
+      "advocate"
+    ],
+    "antonyms": [
+      "opponent"
+    ],
+    "collocations": [
+      "a leading proponent of",
+      "proponents argue that"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "pendukung; penganjur (gagasan atau kebijakan)",
+    "example": "As a leading proponent of renewable energy, she often speaks at climate conferences.",
+    "masterIndex": 2424,
+    "exampleTranslation": "Sebagai pendukung utama energi terbarukan, ia sering berbicara di konferensi iklim."
+  },
+  {
+    "id": "c1_curated_0254",
+    "word": "threshold",
+    "level": "C1",
+    "partOfSpeech": "noun",
+    "phonetic": "/ˈθreʃhəʊld/",
+    "meanings": [
+      {
+        "id": "c1m_0125",
+        "meaning": "ambang batas; titik ketika sesuatu mulai berlaku"
+      }
+    ],
+    "examples": [
+      {
+        "en": "Noise above a certain threshold can cause permanent damage to your hearing.",
+        "id": "Kebisingan di atas ambang batas tertentu dapat menyebabkan kerusakan permanen pada pendengaranmu.",
+        "translation": "Kebisingan di atas ambang batas tertentu dapat menyebabkan kerusakan permanen pada pendengaranmu."
+      }
+    ],
+    "synonyms": [
+      "limit"
+    ],
+    "antonyms": [],
+    "collocations": [
+      "pain threshold",
+      "tax threshold",
+      "cross a threshold"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "ambang batas; titik ketika sesuatu mulai berlaku",
+    "example": "Noise above a certain threshold can cause permanent damage to your hearing.",
+    "masterIndex": 2425,
+    "exampleTranslation": "Kebisingan di atas ambang batas tertentu dapat menyebabkan kerusakan permanen pada pendengaranmu."
+  },
+  {
+    "id": "c1_curated_0255",
+    "word": "precarious",
+    "level": "C1",
+    "partOfSpeech": "adjective",
+    "phonetic": "/prɪˈkeəriəs/",
+    "meanings": [
+      {
+        "id": "c1m_0128",
+        "meaning": "genting; tidak menentu dan penuh risiko"
+      }
+    ],
+    "examples": [
+      {
+        "en": "Millions of gig workers live in a precarious financial situation without any insurance.",
+        "id": "Jutaan pekerja lepas hidup dalam situasi keuangan yang tidak menentu tanpa asuransi apa pun.",
+        "translation": "Jutaan pekerja lepas hidup dalam situasi keuangan yang tidak menentu tanpa asuransi apa pun."
+      }
+    ],
+    "synonyms": [
+      "insecure",
+      "risky",
+      "unstable",
+      "vulnerable"
+    ],
+    "antonyms": [
+      "secure"
+    ],
+    "collocations": [
+      "precarious position",
+      "precarious employment",
+      "a precarious balance"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "genting; tidak menentu dan penuh risiko",
+    "example": "Millions of gig workers live in a precarious financial situation without any insurance.",
+    "masterIndex": 2426,
+    "exampleTranslation": "Jutaan pekerja lepas hidup dalam situasi keuangan yang tidak menentu tanpa asuransi apa pun."
+  },
+  {
+    "id": "c1_curated_0256",
+    "word": "prone",
+    "level": "C2",
+    "partOfSpeech": "adjective",
+    "phonetic": "/prəʊn/",
+    "meanings": [
+      {
+        "id": "c1m_0129",
+        "meaning": "cenderung mengalami (hal buruk); rawan"
+      }
+    ],
+    "examples": [
+      {
+        "en": "People who sleep less than six hours are more prone to infections.",
+        "id": "Orang yang tidur kurang dari enam jam lebih rawan terkena infeksi.",
+        "translation": "Orang yang tidur kurang dari enam jam lebih rawan terkena infeksi."
+      }
+    ],
+    "synonyms": [
+      "susceptible",
+      "liable"
+    ],
+    "antonyms": [],
+    "collocations": [
+      "prone to injury",
+      "accident-prone",
+      "error-prone"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "Selalu diikuti 'to': 'prone to infections', 'prone to error'.",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "cenderung mengalami (hal buruk); rawan",
+    "example": "People who sleep less than six hours are more prone to infections.",
+    "masterIndex": 2427,
+    "exampleTranslation": "Orang yang tidur kurang dari enam jam lebih rawan terkena infeksi."
+  },
+  {
+    "id": "c1_curated_0257",
+    "word": "superficial",
+    "level": "C1",
+    "partOfSpeech": "adjective",
+    "phonetic": "/ˌsuːpəˈfɪʃl/",
+    "meanings": [
+      {
+        "id": "c1m_0131",
+        "meaning": "dangkal; hanya di permukaan"
+      }
+    ],
+    "examples": [
+      {
+        "en": "The report offers only a superficial analysis of why so many students drop out.",
+        "id": "Laporan itu hanya menyajikan analisis dangkal tentang alasan begitu banyak siswa putus sekolah.",
+        "translation": "Laporan itu hanya menyajikan analisis dangkal tentang alasan begitu banyak siswa putus sekolah."
+      }
+    ],
+    "synonyms": [
+      "shallow"
+    ],
+    "antonyms": [
+      "thorough"
+    ],
+    "collocations": [
+      "superficial analysis",
+      "superficial knowledge",
+      "superficial resemblance"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "dangkal; hanya di permukaan",
+    "example": "The report offers only a superficial analysis of why so many students drop out.",
+    "masterIndex": 2428,
+    "exampleTranslation": "Laporan itu hanya menyajikan analisis dangkal tentang alasan begitu banyak siswa putus sekolah."
+  },
+  {
+    "id": "c1_curated_0258",
+    "word": "susceptible",
+    "level": "C1",
+    "partOfSpeech": "adjective",
+    "phonetic": "/səˈseptəbl/",
+    "meanings": [
+      {
+        "id": "c1m_0132",
+        "meaning": "rentan; mudah terkena atau terpengaruh"
+      }
+    ],
+    "examples": [
+      {
+        "en": "Children under five are highly susceptible to dengue fever during the wet season.",
+        "id": "Anak-anak di bawah lima tahun sangat rentan terhadap demam berdarah selama musim hujan.",
+        "translation": "Anak-anak di bawah lima tahun sangat rentan terhadap demam berdarah selama musim hujan."
+      }
+    ],
+    "synonyms": [
+      "vulnerable",
+      "prone"
+    ],
+    "antonyms": [
+      "immune",
+      "resistant"
+    ],
+    "collocations": [
+      "susceptible to disease",
+      "susceptible to infection"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "Diikuti 'to': 'susceptible to infection', 'susceptible to pressure'.",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "rentan; mudah terkena atau terpengaruh",
+    "example": "Children under five are highly susceptible to dengue fever during the wet season.",
+    "masterIndex": 2429,
+    "exampleTranslation": "Anak-anak di bawah lima tahun sangat rentan terhadap demam berdarah selama musim hujan."
+  },
+  {
+    "id": "c1_curated_0259",
+    "word": "prudent",
+    "level": "C1",
+    "partOfSpeech": "adjective",
+    "phonetic": "/ˈpruːdnt/",
+    "meanings": [
+      {
+        "id": "c1m_0139",
+        "meaning": "bijaksana dan berhati-hati (dalam mengambil keputusan)"
+      }
+    ],
+    "examples": [
+      {
+        "en": "Keeping an emergency fund is a prudent step for any young family.",
+        "id": "Menyiapkan dana darurat adalah langkah bijaksana bagi keluarga muda mana pun.",
+        "translation": "Menyiapkan dana darurat adalah langkah bijaksana bagi keluarga muda mana pun."
+      }
+    ],
+    "synonyms": [
+      "sensible",
+      "wise"
+    ],
+    "antonyms": [
+      "reckless"
+    ],
+    "collocations": [
+      "prudent investment",
+      "prudent management",
+      "it would be prudent to"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "bijaksana dan berhati-hati (dalam mengambil keputusan)",
+    "example": "Keeping an emergency fund is a prudent step for any young family.",
+    "masterIndex": 2430,
+    "exampleTranslation": "Menyiapkan dana darurat adalah langkah bijaksana bagi keluarga muda mana pun."
+  },
+  {
+    "id": "c1_curated_0260",
+    "word": "radically",
+    "level": "C1",
+    "partOfSpeech": "adverb",
+    "phonetic": "/ˈrædɪkli/",
+    "meanings": [
+      {
+        "id": "c1m_0140",
+        "meaning": "secara radikal; secara mendasar (berubah total)"
+      }
+    ],
+    "examples": [
+      {
+        "en": "The internet has radically changed the way Indonesians shop and pay their bills.",
+        "id": "Internet telah mengubah secara mendasar cara orang Indonesia berbelanja dan membayar tagihan.",
+        "translation": "Internet telah mengubah secara mendasar cara orang Indonesia berbelanja dan membayar tagihan."
+      }
+    ],
+    "synonyms": [
+      "drastically"
+    ],
+    "antonyms": [],
+    "collocations": [
+      "radically different",
+      "radically changed"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "secara radikal; secara mendasar (berubah total)",
+    "example": "The internet has radically changed the way Indonesians shop and pay their bills.",
+    "masterIndex": 2431,
+    "exampleTranslation": "Internet telah mengubah secara mendasar cara orang Indonesia berbelanja dan membayar tagihan."
+  },
+  {
+    "id": "c1_curated_0261",
+    "word": "systematically",
+    "level": "C1",
+    "partOfSpeech": "adverb",
+    "phonetic": "/ˌsɪstəˈmætɪkli/",
+    "meanings": [
+      {
+        "id": "c1m_0141",
+        "meaning": "secara sistematis; menurut sistem yang teratur"
+      }
+    ],
+    "examples": [
+      {
+        "en": "The team systematically reviewed every published study on the vaccine's side effects.",
+        "id": "Tim itu secara sistematis meninjau setiap studi yang diterbitkan tentang efek samping vaksin tersebut.",
+        "translation": "Tim itu secara sistematis meninjau setiap studi yang diterbitkan tentang efek samping vaksin tersebut."
+      }
+    ],
+    "synonyms": [
+      "methodically"
+    ],
+    "antonyms": [],
+    "collocations": [
+      "systematically analyze",
+      "systematically reviewed"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "secara sistematis; menurut sistem yang teratur",
+    "example": "The team systematically reviewed every published study on the vaccine's side effects.",
+    "masterIndex": 2432,
+    "exampleTranslation": "Tim itu secara sistematis meninjau setiap studi yang diterbitkan tentang efek samping vaksin tersebut."
+  },
+  {
+    "id": "c1_curated_0262",
+    "word": "scarcely",
+    "level": "C1",
+    "partOfSpeech": "adverb",
+    "phonetic": "/ˈskeəsli/",
+    "meanings": [
+      {
+        "id": "c1m_0142",
+        "meaning": "nyaris tidak; hampir tidak sama sekali"
+      }
+    ],
+    "examples": [
+      {
+        "en": "The concert hall was so crowded that we could scarcely move our arms.",
+        "id": "Gedung konser itu begitu penuh sesak sampai kami nyaris tidak bisa menggerakkan lengan.",
+        "translation": "Gedung konser itu begitu penuh sesak sampai kami nyaris tidak bisa menggerakkan lengan."
+      }
+    ],
+    "synonyms": [
+      "barely",
+      "hardly"
+    ],
+    "antonyms": [],
+    "collocations": [
+      "could scarcely move",
+      "scarcely believe",
+      "scarcely any"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "nyaris tidak; hampir tidak sama sekali",
+    "example": "The concert hall was so crowded that we could scarcely move our arms.",
+    "masterIndex": 2433,
+    "exampleTranslation": "Gedung konser itu begitu penuh sesak sampai kami nyaris tidak bisa menggerakkan lengan."
+  },
+  {
+    "id": "c1_curated_0263",
+    "word": "solely",
+    "level": "C1",
+    "partOfSpeech": "adverb",
+    "phonetic": "/ˈsəʊlli/",
+    "meanings": [
+      {
+        "id": "c1m_0143",
+        "meaning": "semata-mata; hanya (satu-satunya)"
+      }
+    ],
+    "examples": [
+      {
+        "en": "The scholarship is awarded solely on the basis of academic achievement, not family income.",
+        "id": "Beasiswa itu diberikan semata-mata berdasarkan prestasi akademik, bukan pendapatan keluarga.",
+        "translation": "Beasiswa itu diberikan semata-mata berdasarkan prestasi akademik, bukan pendapatan keluarga."
+      }
+    ],
+    "synonyms": [
+      "exclusively",
+      "purely"
+    ],
+    "antonyms": [],
+    "collocations": [
+      "solely responsible",
+      "based solely on",
+      "rely solely on"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "semata-mata; hanya (satu-satunya)",
+    "example": "The scholarship is awarded solely on the basis of academic achievement, not family income.",
+    "masterIndex": 2434,
+    "exampleTranslation": "Beasiswa itu diberikan semata-mata berdasarkan prestasi akademik, bukan pendapatan keluarga."
+  },
+  {
+    "id": "c1_curated_0264",
+    "word": "unduly",
+    "level": "C1",
+    "partOfSpeech": "adverb",
+    "phonetic": "/ˌʌnˈdjuːli/",
+    "meanings": [
+      {
+        "id": "c1m_0144",
+        "meaning": "secara berlebihan; melebihi batas yang wajar"
+      }
+    ],
+    "examples": [
+      {
+        "en": "The judge agreed that the punishment should not be unduly harsh on the teenager.",
+        "id": "Hakim setuju bahwa hukuman itu tidak boleh keras secara berlebihan terhadap remaja tersebut.",
+        "translation": "Hakim setuju bahwa hukuman itu tidak boleh keras secara berlebihan terhadap remaja tersebut."
+      }
+    ],
+    "synonyms": [
+      "excessively"
+    ],
+    "antonyms": [],
+    "collocations": [
+      "unduly harsh",
+      "unduly influenced",
+      "not unduly worried"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "secara berlebihan; melebihi batas yang wajar",
+    "example": "The judge agreed that the punishment should not be unduly harsh on the teenager.",
+    "masterIndex": 2435,
+    "exampleTranslation": "Hakim setuju bahwa hukuman itu tidak boleh keras secara berlebihan terhadap remaja tersebut."
+  },
+  {
+    "id": "c1_curated_0265",
+    "word": "respectively",
+    "level": "C1",
+    "partOfSpeech": "adverb",
+    "phonetic": "/rɪˈspektɪvli/",
+    "meanings": [
+      {
+        "id": "c1m_0145",
+        "meaning": "masing-masing sesuai urutan penyebutan"
+      }
+    ],
+    "examples": [
+      {
+        "en": "Gold and silver went to Indonesia and Thailand, respectively, in the badminton final.",
+        "id": "Emas dan perak masing-masing diraih Indonesia dan Thailand dalam final bulu tangkis itu.",
+        "translation": "Emas dan perak masing-masing diraih Indonesia dan Thailand dalam final bulu tangkis itu."
+      }
+    ],
+    "synonyms": [],
+    "antonyms": [],
+    "collocations": [],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "Dipakai setelah dua daftar berpasangan: urutan kedua mengikuti urutan pertama.",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "masing-masing sesuai urutan penyebutan",
+    "example": "Gold and silver went to Indonesia and Thailand, respectively, in the badminton final.",
+    "masterIndex": 2436,
+    "exampleTranslation": "Emas dan perak masing-masing diraih Indonesia dan Thailand dalam final bulu tangkis itu."
+  },
+  {
+    "id": "c1_curated_0266",
+    "word": "simultaneously",
+    "level": "C1",
+    "partOfSpeech": "adverb",
+    "phonetic": "/ˌsɪmlˈteɪniəsli/",
+    "meanings": [
+      {
+        "id": "c1m_0146",
+        "meaning": "secara bersamaan; pada saat yang sama"
+      }
+    ],
+    "examples": [
+      {
+        "en": "The film will be released simultaneously in cinemas and on streaming platforms.",
+        "id": "Film itu akan dirilis secara serentak di bioskop dan di platform streaming.",
+        "translation": "Film itu akan dirilis secara serentak di bioskop dan di platform streaming."
+      }
+    ],
+    "synonyms": [
+      "concurrently"
+    ],
+    "antonyms": [],
+    "collocations": [
+      "broadcast simultaneously",
+      "happen simultaneously"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "secara bersamaan; pada saat yang sama",
+    "example": "The film will be released simultaneously in cinemas and on streaming platforms.",
+    "masterIndex": 2437,
+    "exampleTranslation": "Film itu akan dirilis secara serentak di bioskop dan di platform streaming."
+  },
+  {
+    "id": "c1_curated_0267",
+    "word": "duly",
+    "level": "C1",
+    "partOfSpeech": "adverb",
+    "phonetic": "/ˈdjuːli/",
+    "meanings": [
+      {
+        "id": "c1m_0147",
+        "meaning": "sebagaimana mestinya; tepat sesuai aturan atau harapan"
+      }
+    ],
+    "examples": [
+      {
+        "en": "All the documents were duly signed and returned to the notary before the deadline.",
+        "id": "Semua dokumen telah ditandatangani sebagaimana mestinya dan dikembalikan ke notaris sebelum tenggat.",
+        "translation": "Semua dokumen telah ditandatangani sebagaimana mestinya dan dikembalikan ke notaris sebelum tenggat."
+      }
+    ],
+    "synonyms": [],
+    "antonyms": [],
+    "collocations": [
+      "duly signed",
+      "duly noted",
+      "duly elected"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "Kata formal; jangan tertukar dengan 'unduly' yang artinya 'secara berlebihan'.",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "sebagaimana mestinya; tepat sesuai aturan atau harapan",
+    "example": "All the documents were duly signed and returned to the notary before the deadline.",
+    "masterIndex": 2438,
+    "exampleTranslation": "Semua dokumen telah ditandatangani sebagaimana mestinya dan dikembalikan ke notaris sebelum tenggat."
+  },
+  {
+    "id": "c1_curated_0268",
+    "word": "sparingly",
+    "level": "C1",
+    "partOfSpeech": "adverb",
+    "phonetic": "/ˈspeərɪŋli/",
+    "meanings": [
+      {
+        "id": "c1m_0148",
+        "meaning": "secara hemat; dalam jumlah sedikit saja"
+      }
+    ],
+    "examples": [
+      {
+        "en": "Use this homemade chili sauce sparingly because it is extremely hot.",
+        "id": "Gunakan sambal buatan rumah ini sedikit saja karena rasanya sangat pedas.",
+        "translation": "Gunakan sambal buatan rumah ini sedikit saja karena rasanya sangat pedas."
+      }
+    ],
+    "synonyms": [],
+    "antonyms": [],
+    "collocations": [
+      "use sparingly",
+      "apply sparingly"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "secara hemat; dalam jumlah sedikit saja",
+    "example": "Use this homemade chili sauce sparingly because it is extremely hot.",
+    "masterIndex": 2439,
+    "exampleTranslation": "Gunakan sambal buatan rumah ini sedikit saja karena rasanya sangat pedas."
+  },
+  {
+    "id": "c1_curated_0269",
+    "word": "presumably",
+    "level": "C1",
+    "partOfSpeech": "adverb",
+    "phonetic": "/prɪˈzjuːməbli/",
+    "meanings": [
+      {
+        "id": "c1m_0149",
+        "meaning": "agaknya; kemungkinan besar (berdasarkan dugaan yang wajar)"
+      }
+    ],
+    "examples": [
+      {
+        "en": "The office lights are still on, so presumably someone is still working late.",
+        "id": "Lampu kantor masih menyala, jadi kemungkinan besar seseorang masih lembur.",
+        "translation": "Lampu kantor masih menyala, jadi kemungkinan besar seseorang masih lembur."
+      }
+    ],
+    "synonyms": [
+      "probably",
+      "apparently"
+    ],
+    "antonyms": [],
+    "collocations": [
+      "presumably because"
+    ],
+    "commonMistakes": [],
+    "relatedWords": [],
+    "usageNotes": "",
+    "topic": "advanced",
+    "difficulty": 5,
+    "status": "complete",
+    "source": {
+      "origin": "FIEZEL curated C1 expansion (gen2)",
+      "sourceFile": "curated-c1-gen2"
+    },
+    "meaning": "agaknya; kemungkinan besar (berdasarkan dugaan yang wajar)",
+    "example": "The office lights are still on, so presumably someone is still working late.",
+    "masterIndex": 2440,
+    "exampleTranslation": "Lampu kantor masih menyala, jadi kemungkinan besar seseorang masih lembur."
   }
 ]
