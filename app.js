@@ -387,6 +387,10 @@ function grammarSkillTitleMap(){
 }
 function friendlySkillName(skill){
   const key=String(skill||'grammar');
+  try{
+    const i18nTitle=self.FiezelI18n?.t?.('grammar.title.'+key);
+    if(i18nTitle&&i18nTitle!=='grammar.title.'+key)return String(i18nTitle);
+  }catch(_){}
   const titles=grammarSkillTitleMap();
   if(titles[key])return String(titles[key]);
   let curriculumTitle='';
@@ -402,8 +406,8 @@ function friendlySkillName(skill){
     const sub=compound[2];
     if(compound[1]==='reading')return `${head} · ${readingFocusLabel(sub)}`;
     const subLabel=(compound[1]==='vocabulary'
-      ?{meaning:'arti kata',context:'konteks kata',partOfSpeech:'jenis kata',synonym:'sinonim'}
-      :{gist:'ide utama',detail:'detail',dictation:'dikte',inference:'kesimpulan',paraphrase:'parafrasa',attitude:'sikap pembicara'})[sub];
+      ?{meaning:FiezelI18n.t('skill.arti-kata'),context:FiezelI18n.t('skill.konteks-kata'),partOfSpeech:FiezelI18n.t('skill.jenis-kata'),synonym:FiezelI18n.t('skill.sinonim')}
+      :{gist:FiezelI18n.t('skill.ide-utama'),detail:FiezelI18n.t('skill.detail'),dictation:FiezelI18n.t('skill.dikte'),inference:FiezelI18n.t('skill.kesimpulan'),paraphrase:FiezelI18n.t('skill.parafrasa'),attitude:FiezelI18n.t('skill.sikap-pembicara')})[sub];
     return `${head} · ${subLabel||sub.replace(/_/g,' ').replace(/([a-z])([A-Z])/g,'$1 $2').toLowerCase()}`;
   }
   return key.replace(/_/g,' ').replace(/([a-z])([A-Z])/g,'$1 $2').replace(/^\w/,m=>m.toUpperCase());
@@ -411,7 +415,7 @@ function friendlySkillName(skill){
 /* i10 2026-08-28 (O5 §1.5): q.difficulty adalah bilangan internal 1–6 — "· 1" di eyebrow
    tidak bermakna bagi murid. Dipetakan ke tiga label manusiawi; nilai kosong/asing = ''
    sehingga eyebrow cukup menampilkan nama materi saja. */
-function difficultyLabel(d){return({1:'dasar',2:'dasar',3:'menengah',4:'menengah',5:'lanjut',6:'lanjut'})[Number(d)]||''}
+function difficultyLabel(d){return({1:FiezelI18n.t('diff.dasar'),2:FiezelI18n.t('diff.dasar'),3:FiezelI18n.t('diff.menengah'),4:FiezelI18n.t('diff.menengah'),5:FiezelI18n.t('diff.lanjut'),6:FiezelI18n.t('diff.lanjut')})[Number(d)]||''}
 function grammarFamilyLabel(item){return GRAMMAR_FAMILY_LABELS[item?.[6]]||FiezelI18n.t('grammar.keluarga-fallback')}
 function grammarRuleIndonesian(item){return GRAMMAR_FAMILY_RULES[item?.[6]]||GRAMMAR_FAMILY_RULES.core_grammar}
 function grammarClue(base){const text=String(base||'');const hit=text.match(/\b(look|now|right now|every day|usually|always|yesterday|last [a-z]+|in \d{4}|since|for \d+|tomorrow|next [a-z]+|already|yet|if|unless|than|said|told|must|should|might|because|although)\b/i)?.[0];return hit?FiezelI18n.t('grammar.petunjuk-clue',{petunjuk:hit}):FiezelI18n.t('grammar.petunjuk-umum')}
@@ -6411,7 +6415,7 @@ function showPrasastiMoment(fresh){
   if(!Array.isArray(fresh)||!fresh.length)return false;
   if(document.getElementById('fzPrasasti'))return false;
   const host=document.createElement('div');host.id='fzPrasasti';host.className='fz-prasasti-moment';host.setAttribute('role','dialog');host.setAttribute('aria-label',FiezelI18n.t('prasasti.aria-baru'));
-  host.innerHTML=`<div class="fz-prasasti-card"><div class="modal-mark">PRASASTI BARU</div>${fresh.map(b=>`<div class="fz-prasasti-hero"><span class="prasasti-icon">${prasastiIconSvg(b.id)}</span><b>${esc(b.title)}</b><p>${esc(b.desc)}</p></div>`).join('')}<p class="fz-prasasti-note">${FiezelI18n.t('prasasti.catatan')}</p><button class="primary" onclick="dismissPrasastiMoment()">${FiezelI18n.t('prasasti.simpan')} <i data-lucide="arrow-right"></i></button></div>`;
+  host.innerHTML=`<div class="fz-prasasti-card"><div class="modal-mark">${FiezelI18n.t('prasasti.modal-mark')}</div>${fresh.map(b=>{const bTitle=FiezelI18n.t('prasasti.title.'+b.id)||b.title;const bDesc=FiezelI18n.t('prasasti.desc.'+b.id)||b.desc;return `<div class="fz-prasasti-hero"><span class="prasasti-icon">${prasastiIconSvg(b.id)}</span><b>${esc(bTitle)}</b><p>${esc(bDesc)}</p></div>`;}).join('')}<p class="fz-prasasti-note">${FiezelI18n.t('prasasti.catatan')}</p><button class="primary" onclick="dismissPrasastiMoment()">${FiezelI18n.t('prasasti.simpan')} <i data-lucide="arrow-right"></i></button></div>`;
   host.addEventListener('click',e=>{if(e.target===host)dismissPrasastiMoment()});
   document.body.appendChild(host);enhanceUI();
   try{host.querySelector('button.primary')?.focus()}catch(_){}
@@ -6450,7 +6454,7 @@ function checkPrasasti(origin='app'){
 function prasastiGalleryMarkup(){
   const core=prasastiCore();if(!core)return '<p class="muted">'+FiezelI18n.t('prasasti.gagal-muat')+'</p>';
   const earned=prasastiState().earned||{};
-  const cells=core.BADGES.map(b=>{const at=earned[b.id];const when=at?new Date(at).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'}):'';return `<div class="prasasti-badge ${at?'is-earned':'is-locked'}" role="img" aria-label="${esc(b.title)}: ${at?FiezelI18n.t('prasasti.aria-terukir',{kapan:when}):FiezelI18n.t('prasasti.aria-belum',{hint:b.hint})}"><span class="prasasti-icon">${prasastiIconSvg(b.id)}</span><b>${esc(b.title)}</b><span class="prasasti-hint">${esc(at?when:b.hint)}</span></div>`}).join('');
+  const cells=core.BADGES.map(b=>{const at=earned[b.id];const when=at?new Date(at).toLocaleDateString(FiezelI18n.getLocale()==='th'?'th-TH':'id-ID',{day:'numeric',month:'short',year:'numeric'}):'';const bTitle=FiezelI18n.t('prasasti.title.'+b.id)||b.title;const bHint=FiezelI18n.t('prasasti.hint.'+b.id)||b.hint;return `<div class="prasasti-badge ${at?'is-earned':'is-locked'}" role="img" aria-label="${esc(bTitle)}: ${at?FiezelI18n.t('prasasti.aria-terukir',{kapan:when}):FiezelI18n.t('prasasti.aria-belum',{hint:bHint})}"><span class="prasasti-icon">${prasastiIconSvg(b.id)}</span><b>${esc(bTitle)}</b><span class="prasasti-hint">${esc(at?when:bHint)}</span></div>`}).join('');
   return `<div class="prasasti-grid">${cells}</div><p class="map-note"><span>${FiezelI18n.t('prasasti.catatan-galeri')}</span></p>`;
 }
 /* W1 P0-2 (20-001): CTA utama tidak boleh menggantung menunggu popup sign-in. Dua pagar:
@@ -6777,7 +6781,7 @@ function grammar(){const level=getActiveLevel(),entries=grammarItemsForLevel(lev
   const pathBody=FiezelI18n.t('grammar.ol-class-lesson-path-aria',{level:esc(level),pathSteps:pathSteps,examStep:examStep});
   // R2-1: node emas Ujian Skip Level duduk di UJUNG jalur — tak terlihat tanpa scroll
   // panjang. Chip lengket di puncak hub memanggil panel ujian yang SAMA, node ujungnya tetap.
-  const examChip=`<button type="button" class="exam-entry-chip${examEntry?.passed?' is-passed':''}" onclick="openActiveLevelExamPanel()" aria-label="${FiezelI18n.t('grammar.ujian-skip-level-level',{level:esc(level),ujian:examEntry?.passed?'Sudah lulus.':'Buka panel ujian.'})}"><i data-lucide="${examEntry?.passed?'badge-check':'award'}"></i><span><b>${FiezelI18n.t('level.ujian-judul')}</b><small>${examEntry?.passed?'Lulus — terverifikasi (ujian)':'Merasa sudah bisa? Buktikan kapan saja'}</small></span><i data-lucide="arrow-right"></i></button>`;
+  const examChip=`<button type="button" class="exam-entry-chip${examEntry?.passed?' is-passed':''}" onclick="openActiveLevelExamPanel()" aria-label="${FiezelI18n.t('grammar.ujian-skip-level-level',{level:esc(level),ujian:examEntry?.passed?FiezelI18n.t('level.ujian-sudah-lulus'):FiezelI18n.t('level.ujian-buka-panel')})}"><i data-lucide="${examEntry?.passed?'badge-check':'award'}"></i><span><b>${FiezelI18n.t('level.ujian-judul')}</b><small>${examEntry?.passed?FiezelI18n.t('level.ujian-lulus-terverifikasi'):FiezelI18n.t('level.ujian-merasa-bisa')}</small></span><i data-lucide="arrow-right"></i></button>`;
   shell('Grammar Hub',FiezelI18n.t('grammar.lesson-terurut-for-level-start',{jumlahLesson:skills.length,level:level}),`<div class="grammar-level-note"><b>${FiezelI18n.t('grammar.jalur',{level:esc(level)})}</b><span>${esc(levelDescriptor(level))}</span><small>${FiezelI18n.t('grammar.item-pilihan-boleh-bervariasi-tetapi')}</small></div><div class="grammar-hub-tools">${examChip}<div class="path-view-toggle"><button type="button" onclick="toggleGrammarHubView()" aria-pressed="${grammarHubListView}"><i data-lucide="${grammarHubListView?'route':'list'}"></i> ${grammarHubListView?'Tampilan jalur':'Tampilan daftar'}</button></div></div>${grammarHubListView?listBody:pathBody}`);
   // Auto-scroll ke node aktif — sesudah renderInner mengembalikan scroll ke atas.
   // Reduced-motion: lompat tanpa animasi (behavior 'auto'), bukan tanpa fungsi.
@@ -8256,9 +8260,9 @@ function progress(){
  // in Settings (see openSettings()).
  const tabContent={
   overview:`<div class="grid">${nextSessionPanelMarkup()}${journeyMarkup()}${socialSummaryCardMarkup()}<div><h3>${FiezelI18n.t('progress.peta-study')}</h3>${mapCards}</div>
-   ${card(`<h3>Ulangan Pintar</h3>${due.length?due.map(([k,x])=>`<div class="row"><span>${esc(friendlySkillName(k))}</span><span>${FiezelI18n.t('progress.dikuasai-risiko-lupa',{mastery:x.mastery||0,x:Math.round(forgettingProbability(x)*100)})}</span></div>`).join('<hr>')+`<div style="margin-top:12px"><button class="primary" onclick="reviewVocab()"><i data-lucide="history"></i> Mulai Review (${due.length})</button></div>`:'<p class="muted">'+FiezelI18n.t('progress.belum-ada-materi-perlu-diulang')+'</p>'}`)}
+   ${card(`<h3>${FiezelI18n.t('progress.ulangan-pintar')}</h3>${due.length?due.map(([k,x])=>`<div class="row"><span>${esc(friendlySkillName(k))}</span><span>${FiezelI18n.t('progress.dikuasai-risiko-lupa',{mastery:x.mastery||0,x:Math.round(forgettingProbability(x)*100)})}</span></div>`).join('<hr>')+`<div style="margin-top:12px"><button class="primary" onclick="reviewVocab()"><i data-lucide="history"></i> ${FiezelI18n.t('progress.mulai-review-btn',{jumlah:due.length})}</button></div>`:'<p class="muted">'+FiezelI18n.t('progress.belum-ada-materi-perlu-diulang')+'</p>'}`)}
    ${card(`<h3>${FiezelI18n.t('progress.laporan-diagnostik')}</h3>${diagHtml}`)}
-   ${card(`<h3>Prasasti</h3><p class="muted">${FiezelI18n.t('progress.lencana-bukti-study-redup-menunjukkan')}</p>${prasastiGalleryMarkup()}`,'prasasti-gallery-card')}
+   ${card(`<h3>${FiezelI18n.t('progress.prasasti-judul')}</h3><p class="muted">${FiezelI18n.t('progress.lencana-bukti-study-redup-menunjukkan')}</p>${prasastiGalleryMarkup()}`,'prasasti-gallery-card')}
    </div>`,
   analysis:`<div class="grid">
    ${card(`<h3>${FiezelI18n.t('progress.lab-kesalahan')}</h3>${patterns.length?patterns.map(x=>`<div class="row"><span>${esc(friendlySkillName(x.key))}</span><b>${FiezelI18n.t('progress.salah',{errors:x.errors,rate:Math.round(x.rate*100)})}</b></div>${x.common?`<p class="muted">${FiezelI18n.t('progress.pilihan-paling-sering-muncul-kali',{common:esc(x.common),count:x.count})}</p>`:''}`).join('<hr>'):'<p class="muted">'+FiezelI18n.t('progress.belum-ada-pola-kesalahan-berulang')+'</p>'}`)}
@@ -8283,7 +8287,7 @@ function progress(){
  ${card(`<div class="stats"><div>${stat('Akurasi',acc+'%')}</div><div>${stat('Runtun',state.streak+' hari')}</div><div>${stat('Hari ini',state.daily.attempts+' jawaban')}</div><div>${stat('Ulangan',due.length)}</div><div>${stat('Gem',gemsBalance())}</div></div>`)}
  <div class="progress-tabs" role="tablist">${PROGRESS_TABS.map(([id,label])=>`<button type="button" class="progress-tab${progressTab===id?' active':''}" role="tab" aria-selected="${progressTab===id}" onclick="switchProgressTab('${id}')">${esc(label)}</button>`).join('')}</div>
  ${tabContent[progressTab]}
- ${card(`<div class="row"><b>Dibuat oleh Fitrarustqi</b><a href="https://instagram.com/fitrarustqi" target="_blank" rel="noopener noreferrer" class="creator-link"><img src="./instagram.svg" alt="Instagram" width="22" height="22"> @fitrarustqi</a></div>`)}
+ ${card(`<div class="row"><b>${FiezelI18n.t('footer.dibuat-oleh',{nama:'Fitrarustqi'})}</b><a href="https://instagram.com/fitrarustqi" target="_blank" rel="noopener noreferrer" class="creator-link"><img src="./instagram.svg" alt="Instagram" width="22" height="22"> @fitrarustqi</a></div>`)}
  <button class="danger" onclick="resetProgress()">${FiezelI18n.t('progress.reset-progres')}</button>`)
 }
 function validReportEndpoint(value){try{const u=new URL(String(value||'').trim());return u.protocol==='https:'&&u.hostname.endsWith('.puter.work')}catch{return false}}
@@ -8358,7 +8362,7 @@ function openSettings(){const p=state.preferences||defaultPreferences,endpoint=p
   const grupBelajar=`<div class="settings-list"><button type="button" class="setting-row setting-row-action" onclick="replayTour()"><span class="setting-icon"><i data-lucide="rotate-ccw"></i></span><span><b>${FiezelI18n.t('settings.redo-kenalan-cepat')}</b><small>${FiezelI18n.t('settings.menjalankan-ulang-tur-menu-awal')}</small></span><i data-lucide="chevron-right"></i></button><label class="setting-row"><span class="setting-icon"><i data-lucide="wand-sparkles"></i></span><span><b>Animasi antarmuka</b><small>${FiezelI18n.t('settings.transisi-halaman-kartu-popup-feedback')}</small></span><input id="settingMotion" type="checkbox" ${p.motion?'checked':''}></label><label class="setting-row"><span class="setting-icon"><i data-lucide="vibrate"></i></span><span><b>Getaran sentuh</b><small>${typeof navigator!=='undefined'&&typeof navigator.vibrate==='function'?'Perangkat ini mendukung getaran':'Akan aktif pada perangkat yang mendukung'}</small></span><input id="settingHaptics" type="checkbox" ${p.haptics?'checked':''}></label>${gemsSettingsRowMarkup()}</div>`;  const grupSuara=`<div class="settings-list"><label class="setting-row"><span class="setting-icon"><i data-lucide="bell-check"></i></span><span><b>${FiezelI18n.t('settings.pengingat-study')}</b><small>${esc(reminderSettingHint())}</small></span><input id="settingReminders" type="checkbox" ${remindersActive()?'checked':''} ${notificationPermission()==='denied'||notificationPermission()==='unsupported'?'disabled':''} aria-label="Pengingat belajar"></label><label class="setting-row"><span class="setting-icon"><i data-lucide="badge-check"></i></span><span><b>${FiezelI18n.t('settings.suara-answer')}</b><small>${FiezelI18n.t('settings.bunyi-naik-when-right-bunyi')}</small></span><input id="settingFeedbackSounds" type="checkbox" ${p.feedbackSounds!==false?'checked':''}></label><div class="setting-row" id="audioDiagRow"><span class="setting-icon"><i data-lucide="smartphone"></i></span><span><b>${FiezelI18n.t('settings.status-bunyi-perangkat')}</b><small id="audioDiagText">Memeriksa…</small></span></div></div><div id="voiceSettingsCard">${neuralVoiceStatusMarkup()}</div>`;
   // Tombol bersihkan-cache duduk di antara Backup dan Kesehatan Instalasi: kartu diagnosis
   // itulah yang melaporkan shell usang, jadi tombol perbaikannya berdampingan dengannya.
-  const grupData=`${continuitySettingsMarkup()}<div class="card cache-card"><h3>Bersihkan cache</h3><p class="muted">${FiezelI18n.t('settings.menghapus-berkas-aplikasi-lama-menumpuk')}</p><button id="settingClearCache" type="button"><i data-lucide="refresh-ccw"></i> ${FiezelI18n.t('settings.bersihkan-cache-amp-muat-ulang')}</button></div><div class="card"><h3>Kesehatan Instalasi</h3><div id="installHealth"><p class="muted">Memeriksa pemasangan…</p></div></div>`;
+  const grupData=`${continuitySettingsMarkup()}<div class="card cache-card"><h3>${FiezelI18n.t('settings.bersihkan-cache-judul')}</h3><p class="muted">${FiezelI18n.t('settings.menghapus-berkas-aplikasi-lama-menumpuk')}</p><button id="settingClearCache" type="button"><i data-lucide="refresh-ccw"></i> ${FiezelI18n.t('settings.bersihkan-cache-amp-muat-ulang')}</button></div><div class="card"><h3>${FiezelI18n.t('settings.kesehatan-instalasi-judul')}</h3><div id="installHealth"><p class="muted">${FiezelI18n.t('settings.memeriksa-pemasangan')}</p></div></div>`;
   const grupLanjutan=`<div class="report-settings"><div class="row"><div><b>Creator Learning Report</b><p class="muted">${FiezelI18n.t('settings.otomatis-setelah-sesi-selesai-hanya')}</p></div><button id="reportPreview">${FiezelI18n.t('settings.lihat-data')}</button></div><a class="setup-link" href="./creator-report-setup.html" target="_blank" rel="noopener"><i data-lucide="cloud-cog"></i> ${FiezelI18n.t('settings.pasang-creator-hub-satu-klik')}</a><label class="endpoint-label">Endpoint Puter Worker<input id="reportEndpoint" type="url" value="${esc(endpoint)}" placeholder="${FiezelI18n.t('settings.https-nama-worker-puter-work')}" autocomplete="off"></label><label class="consent-row"><input id="reportConsent" type="checkbox" ${p.reportConsent?'checked':''}><span>${FiezelI18n.t('settings.saya-menyetujui-pengiriman-ringkasan-study',{nama:esc(learnerName())})}</span></label><p class="report-state">Status: ${esc(reportStatusLabel())}</p></div><div class="card"><h3>${FiezelI18n.t('settings.masukan-untuk-pengembang')}</h3><p class="muted">${FiezelI18n.t('settings.materi-pending-ada-or-apa')}</p><button id="openFeedback"><i data-lucide="send"></i> ${FiezelI18n.t('settings.kirim-masukan')}</button></div>`;
   /* SOSIAL (SLOT 7): pintu masuk Profil Online + sakelar Mode Privat papan. Sakelar bicara
      ke server SAAT diubah (bukan saat Simpan) karena janjinya "hilang dari papan seketika";
@@ -8391,7 +8395,7 @@ enhanceUI()}
 // terisi ulang sendiri dari jaringan tanpa sintesis berbayar.
 function confirmClearAppCache(){
   const offline=typeof navigator!=='undefined'&&navigator.onLine===false;
-  openModal(`<div class="modal-mark">FIEZEL</div><h2>Bersihkan cache?</h2><p>${FiezelI18n.t('settings.aplikasi-akan-memuat-ulang-sebentar')}</p>${offline?'<p class="muted">'+FiezelI18n.t('settings.you-now-offline-sekarang-tampilan')+'</p>':''}<div class="modal-actions"><button id="cacheClearCancel" type="button">Batal</button><button class="primary" id="cacheClearOk" type="button"><i data-lucide="refresh-ccw"></i> Ya, bersihkan</button></div>`);
+  openModal(`<div class="modal-mark">FIEZEL</div><h2>${FiezelI18n.t('settings.bersihkan-cache-tanya')}</h2><p>${FiezelI18n.t('settings.aplikasi-akan-memuat-ulang-sebentar')}</p>${offline?'<p class="muted">'+FiezelI18n.t('settings.you-now-offline-sekarang-tampilan')+'</p>':''}<div class="modal-actions"><button id="cacheClearCancel" type="button">${FiezelI18n.t('modal.batal')}</button><button class="primary" id="cacheClearOk" type="button">${FiezelI18n.t('settings.data-lucide-refresh-ccw-ya')}</button></div>`);
   $('cacheClearCancel').onclick=openSettings;
   $('cacheClearOk').onclick=clearAppCache;
   enhanceUI()

@@ -44,7 +44,7 @@ const ROOT = process.env.FIEZEL_ROOT || __dirname;
 const BASELINE_PATH = process.env.FIEZEL_BASELINE || path.join(__dirname, 'id-golden-baseline.json');
 const WRITE_MODE = process.argv.includes('--write-baseline');
 
-const sha256 = (buf) => crypto.createHash('sha256').update(buf).digest('hex');
+const sha256 = (buf) => crypto.createHash('sha256').update(Buffer.isBuffer(buf) ? buf.toString('utf8').replace(/\r\n/g, '\n') : String(buf).replace(/\r\n/g, '\n')).digest('hex');
 const rel = (p) => path.join(ROOT, p);
 const exists = (p) => fs.existsSync(rel(p));
 
@@ -126,7 +126,7 @@ function collectLiterals() {
   const set = new Set();
   for (const f of LITERAL_SOURCES()) {
     if (!exists(f)) continue;
-    for (const s of extractStrings(fs.readFileSync(rel(f), 'utf8'))) {
+    for (const s of extractStrings(fs.readFileSync(rel(f), 'utf8').replace(/\r\n/g, '\n'))) {
       if (isIndonesian(s)) set.add(s);
     }
   }

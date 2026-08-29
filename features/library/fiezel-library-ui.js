@@ -562,7 +562,7 @@
       '<button type="button" id="libraryPrev" data-step="-1" aria-label="Kalimat sebelumnya"><i data-lucide="chevron-left"></i></button>' +
       '<button type="button" class="primary" id="libraryPlay"><i data-lucide="play"></i> Audiobook</button>' +
       '<button type="button" id="libraryNext" data-step="1" aria-label="Kalimat berikutnya"><i data-lucide="chevron-right"></i></button>' +
-      '<button type="button" id="libraryAsk"><i data-lucide="message-circle-question"></i> Tanya Fiezel</button>' +
+      '<button type="button" id="libraryAsk"><i data-lucide="message-circle-question"></i> ' + t('ask.judul') + '</button>' +
       '</div></div></section>';
   }
 
@@ -713,9 +713,9 @@
       '<p class="library-translation-en">' + esc(picked.en) + '</p>' +
       '<p class="library-translation-id">' + esc(picked.id) + '</p>' +
       '<div class="library-translation-actions">' +
-      '<button type="button" id="librarySpeakOne"><i data-lucide="volume-2"></i> Dengar</button>' +
-      '<button type="button" id="libraryAskOne"><i data-lucide="message-circle-question"></i> Tanya Fiezel</button>' +
-      '<button type="button" id="libraryCloseOne" aria-label="Tutup terjemahan"><i data-lucide="x"></i></button>' +
+      '<button type="button" id="librarySpeakOne"><i data-lucide="volume-2"></i> ' + t('quiz.tombol-dengar') + '</button>' +
+      '<button type="button" id="libraryAskOne"><i data-lucide="message-circle-question"></i> ' + t('ask.judul') + '</button>' +
+      '<button type="button" id="libraryCloseOne" aria-label="' + t('modal.tutup') + '"><i data-lucide="x"></i></button>' +
       '</div></div>';
     doc.body.appendChild(layer);
     layer.addEventListener('click', function (event) {
@@ -767,12 +767,12 @@
     var sheet = doc.createElement('div');
     sheet.id = 'libraryAskSheet';
     sheet.className = 'library-ask-sheet';
-    sheet.innerHTML = '<form class="library-ask-panel"><span class="library-ask-mark">TANYA FIEZEL</span>' +
-      '<h2>Tanya tentang bacaan ini</h2>' +
+    sheet.innerHTML = '<form class="library-ask-panel"><span class="library-ask-mark">' + t('tutor.ask-kicker') + '</span>' +
+      '<h2>' + t('ask.tanya-tentang-bacaan') + '</h2>' +
       (picked ? '<p class="library-ask-quote">“' + esc(picked.en) + '”</p>' : '') +
-      '<textarea name="question" rows="3" maxlength="240" placeholder="Contoh: kenapa pakai kata was di sini?" required></textarea>' +
-      '<div class="library-ask-actions"><button type="button" data-cancel>Tutup</button>' +
-      '<button type="submit" class="primary">Tanya</button></div>' +
+      '<textarea name="question" rows="3" maxlength="240" placeholder="' + t('ask.placeholder-contoh-kenapa') + '" required></textarea>' +
+      '<div class="library-ask-actions"><button type="button" data-cancel>' + t('modal.tutup') + '</button>' +
+      '<button type="submit" class="primary">' + t('ask.tombol-tanya') + '</button></div>' +
       '<p class="library-ask-answer" id="libraryAskAnswer"></p></form>';
     doc.body.appendChild(sheet);
     sheet.querySelector('[data-cancel]').addEventListener('click', function () { sheet.remove(); });
