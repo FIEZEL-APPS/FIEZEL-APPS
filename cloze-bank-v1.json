@@ -2,11 +2,11 @@
   "schema": "fiezel-cloze-bank-v1",
   "generatedFrom": "grammar-templates.json",
   "counts": {
-    "templates": 248,
-    "items": 209,
+    "templates": 249,
+    "items": 210,
     "rejected": 39,
     "byLevel": {
-      "A2": 34,
+      "A2": 35,
       "B1": 62,
       "B2": 48,
       "C1": 26,
@@ -3698,6 +3698,32 @@
       ]
     },
     {
+      "id": "CM-005-cz0",
+      "templateId": "CM-005",
+      "skill": "irregular_comparative_better_worse_forms",
+      "level": "A2",
+      "sentence": "I think basketball is ___ than volleyball because the game never slows down.",
+      "blank": {
+        "answer": "better",
+        "alternates": [],
+        "position": 22
+      },
+      "distractors": [
+        {
+          "text": "more good",
+          "misconception": "regular 'more + adjective' pattern applied to an irregular adjective"
+        },
+        {
+          "text": "gooder",
+          "misconception": "regular -er ending forced onto an irregular adjective"
+        },
+        {
+          "text": "best",
+          "misconception": "superlative 'best' used where 'than' demands a comparative"
+        }
+      ]
+    },
+    {
       "id": "PD-001-cz0",
       "templateId": "PD-001",
       "skill": "subject_object_pronouns_and_possessives",
@@ -5334,8 +5360,8 @@
       ]
     },
     {
-      "id": "CM-005-cz0",
-      "templateId": "CM-005",
+      "id": "CM-009-cz0",
+      "templateId": "CM-009",
       "skill": "comparative_formation_er_vs_more_no_double_marking",
       "level": "A2",
       "sentence": "The bus to Bandung is ___ (cheap) than the train, so Andi always takes the bus.",

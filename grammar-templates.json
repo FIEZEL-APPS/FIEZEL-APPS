@@ -1,6 +1,6 @@
 {
   "version": "5.19.0",
-  "count": 248,
+  "count": 249,
   "templates": [
     {
       "id": "TA-001",
@@ -906,7 +906,7 @@
       "questionType": "multiple_choice",
       "pedagogicalObjective": "Select past continuous for a longer background action interrupted by a shorter past-simple event",
       "misconceptionTargeted": "Learner picks past simple for both clauses because both events are 'in the past', ignoring which action was already in progress",
-      "reasoningOperation": "identify background/interrupting relationship -> assign aspect to each clause",
+      "reasoningOperation": "identify background/interrupting relationship -> match the aspect to each clause",
       "stem": "I ___ dinner when the power suddenly went out.",
       "options": [
         "cooked",
@@ -1918,32 +1918,32 @@
       "stem": "Turn left ___ the second traffic light, then the hotel is ___ Baker Street.",
       "options": [
         "at / on",
-        "in / at",
-        "on / in",
-        "at / to"
+        "on / at",
+        "in / to",
+        "to / in"
       ],
       "correctIndex": 0,
       "distractors": [
         {
-          "option": "in / at",
+          "option": "on / at",
           "misconception": "swaps the point-preposition and surface/line-preposition roles",
-          "whyFails": "'In the second traffic light' reads the light as an enclosed space and 'at Baker Street' shrinks a whole street to a single point; both gaps misread the kind of location.",
-          "whyFailsId": "dua celahnya salah baca bentuk lokasinya.",
+          "whyFails": "'On the second traffic light' treats a route point as a surface, and 'at Baker Street' shrinks a whole street to a single point; each gap received the other one's preposition.",
+          "whyFailsId": "posisinya ketuker: lampu itu titik (at), nama jalan itu garis (on).",
           "misconceptionId": "peran kata depan buat titik dan buat garis saling ketuker."
         },
         {
-          "option": "on / in",
-          "misconception": "treats a route point as a surface in the first slot",
-          "whyFails": "'On the second traffic light' treats a point on the route as a surface, so the first gap already fails before the street phrase is even weighed.",
-          "whyFailsId": "celah pertama udah gagal: lampu itu titik, bukan permukaan.",
-          "misconceptionId": "titik di rute diperlakukan kayak permukaan di celah pertama."
+          "option": "in / to",
+          "misconception": "reads the turn point as an enclosed space and the static location as a destination",
+          "whyFails": "'In the second traffic light' places the turn inside the light itself, and 'to Baker Street' signals movement although the sentence states where the hotel sits.",
+          "whyFailsId": "“in” bikin belokannya kayak di dalam lampu, “to” malah nandain gerak padahal hotelnya diam.",
+          "misconceptionId": "titik beloknya dianggap ruang tertutup, posisi diamnya dianggap tujuan gerak."
         },
         {
-          "option": "at / to",
-          "misconception": "movement preposition used for a static location",
-          "whyFails": "'To' marks movement towards a destination, but the sentence states where the hotel is located.",
-          "whyFailsId": "“to” nandain perpindahan, padahal ini soal posisi diam.",
-          "misconceptionId": "kata depan perpindahan dipakai buat posisi yang diam."
+          "option": "to / in",
+          "misconception": "turns the landmark of the turn into a destination of movement",
+          "whyFails": "'Turn left to the second traffic light' makes the light a destination instead of the point where the turn happens, so the first gap already fails.",
+          "whyFailsId": "celah pertama udah gagal: lampunya jadi tujuan gerak, padahal dia titik tempat belok.",
+          "misconceptionId": "patokan tempat belok malah dijadiin tujuan perpindahan."
         }
       ],
       "explanation": {
@@ -2082,7 +2082,7 @@
       "questionType": "multiple_choice",
       "pedagogicalObjective": "Use the gerund after a preposition and the to-infinitive to express purpose, without confusing the two structures",
       "misconceptionTargeted": "Learner inserts 'to' directly after a preposition instead of switching to the gerund form required after prepositions",
-      "reasoningOperation": "decide whether the phrase answers 'why' (purpose -> to-infinitive) or follows a preposition (-> gerund) -> choose the form",
+      "reasoningOperation": "decide whether the phrase answers 'why' with a purpose to-infinitive or follows a preposition with a gerund -> choose the form",
       "stem": "She left work early ___ time to prepare for the interview.",
       "options": [
         "for having",
@@ -4322,7 +4322,7 @@
       "questionType": "multiple_choice",
       "pedagogicalObjective": "Learner distinguishes causative 'have something done' (arranging for someone else to do it) from ordinary passive voice.",
       "misconceptionTargeted": "Learners use plain passive when the sentence actually needs the causative structure to show the subject arranged the action.",
-      "reasoningOperation": "First test whether this is a plain passive with was/were + past participle; if the subject arranged the service, switch the auxiliary to 'had' in the causative frame had + object + past participle.",
+      "reasoningOperation": "check whether this is a plain passive with was/were + past participle; convert the auxiliary to 'had' in the causative frame had + object + past participle when the subject arranged the service",
       "stem": "We ___ our roof repaired last week after the storm damaged it.",
       "options": [
         "had",
@@ -5778,7 +5778,7 @@
       "questionType": "multiple_choice",
       "pedagogicalObjective": "Learner selects the correct complementation pattern for reporting verbs that require a gerund or preposition + gerund (deny + gerund; apologize for + gerund).",
       "misconceptionTargeted": "Learners apply the generic 'reporting verb + that-clause' pattern to verbs that actually require gerund complementation.",
-      "reasoningOperation": "Recognize the specific complementation pattern fixed to each reporting verb (deny + gerund; apologize for + gerund) rather than defaulting to 'that'.",
+      "reasoningOperation": "Recognize the specific complementation pattern fixed to each reporting verb (deny + gerund, apologize for + gerund) rather than defaulting to 'that'.",
       "stem": "He apologized ____ late to the meeting.",
       "options": [
         "for being",
@@ -6730,7 +6730,7 @@
       "questionType": "multiple_choice",
       "pedagogicalObjective": "A plural noun phrase, two books, requires are.",
       "misconceptionTargeted": "Learner keeps singular 'is' after 'there' even though the real subject 'two books' is plural, or reaches for the bare form 'be' or the past form 'was'.",
-      "reasoningOperation": "look past 'there' to the noun phrase that follows -> identify 'two books' as plural -> select are",
+      "reasoningOperation": "locate the noun phrase after 'there' -> identify 'two books' as plural -> select are",
       "stem": "There ___ two books on the table.",
       "options": [
         "is",
@@ -6898,7 +6898,7 @@
       "questionType": "multiple_choice",
       "pedagogicalObjective": "Construct a mixed conditional in which an unreal past decision controls a hypothetical future event.",
       "misconceptionTargeted": "Learner forces both clauses into the same time frame and loses the past-to-future relationship.",
-      "reasoningOperation": "date the unreal condition in the past -> date the consequence in the future -> combine past perfect with would be + -ing",
+      "reasoningOperation": "place the unreal condition in the past -> place the consequence in the future -> combine past perfect with would be + -ing",
       "stem": "Which completion presents the start as something that would still be under way on that future day? If the board had approved the budget last month, construction ___ next Monday.",
       "options": [
         "would be starting",
@@ -7906,7 +7906,7 @@
       "questionType": "multiple_choice",
       "pedagogicalObjective": "Mark ownership with apostrophe + s attached to the owner's name",
       "misconceptionTargeted": "Learner shows possession by putting two nouns side by side as in 'tas Sinta', or writes a plural-looking -s without the apostrophe",
-      "reasoningOperation": "identify the owner and the thing owned -> attach 's to the owner's name and place it before the noun",
+      "reasoningOperation": "identify the owner and the thing owned -> add 's to the owner's name and place it before the noun",
       "stem": "Is this ___ bag? She was sitting here a minute ago.",
       "options": [
         "Sinta",
@@ -8466,7 +8466,7 @@
       "questionType": "multiple_choice",
       "pedagogicalObjective": "Use sentential 'which' after a comma to comment on a whole preceding clause",
       "misconceptionTargeted": "Learner reaches for 'what', 'that', or a fresh pronoun to refer back to a whole clause, mapping Indonesian 'yang' onto the wrong English word",
-      "reasoningOperation": "check what the relative points back to, a noun or the whole previous clause -> after a comma, select 'which' for a clause antecedent",
+      "reasoningOperation": "check what the relative points back to, a noun or the whole previous clause -> select 'which' after the comma for a clause antecedent",
       "stem": "The shipment arrived nine days late, ___ forced the plant to halt its assembly line.",
       "options": [
         "what",
@@ -8522,7 +8522,7 @@
       "questionType": "multiple_choice",
       "pedagogicalObjective": "Use generic 'the' with a singular noun for statements about a species or class as a whole",
       "misconceptionTargeted": "Learner picks an article or determiner that quantifies individual animals, although extinction is a property of the class itself",
-      "reasoningOperation": "test whether the predicate applies to individuals or to the class as one unit -> select generic 'the' for class-level statements",
+      "reasoningOperation": "check whether the predicate applies to individuals or to the class as one unit -> select generic 'the' for class-level statements",
       "stem": "___ Sumatran tiger is now on the brink of extinction, with fewer than four hundred individuals left in the wild.",
       "options": [
         "A",
@@ -8569,6 +8569,62 @@
       "pedagogicalObjectiveId": "Pakai “the” generik dengan kata benda tunggal buat pernyataan soal spesies atau kelas secara utuh.",
       "misconceptionTargetedId": "Kamu milih artikel atau penentu yang ngitung ekor per ekor, padahal kepunahan itu sifat kelasnya sendiri.",
       "reasoningOperationId": "uji predikatnya berlaku buat individu atau buat kelas sebagai satu unit → pilih “the” generik buat pernyataan level kelas"
+    },
+    {
+      "id": "CM-005",
+      "family": "comparison",
+      "subskill": "irregular_comparative_better_worse_forms",
+      "cefr": "A2",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Recall that good and bad take the irregular comparatives better and worse instead of regular -er or more patterns",
+      "misconceptionTargeted": "Learner builds comparatives of good and bad with regular patterns such as more good or gooder",
+      "reasoningOperation": "spot an irregular adjective -> retrieve its memorized comparative form",
+      "stem": "I think basketball is ___ than volleyball because the game never slows down.",
+      "options": [
+        "better",
+        "more good",
+        "gooder",
+        "best"
+      ],
+      "correctIndex": 0,
+      "distractors": [
+        {
+          "option": "more good",
+          "misconception": "regular 'more + adjective' pattern applied to an irregular adjective",
+          "whyFails": "'Good' never pairs with 'more'; its comparative is the single irregular word 'better'.",
+          "whyFailsId": "“good” nggak pernah digandeng “more”, bentuk bandingnya memang kata khusus “better”.",
+          "misconceptionId": "pola “more + kata sifat” dipakai padahal kata sifatnya punya bentuk banding khusus."
+        },
+        {
+          "option": "gooder",
+          "misconception": "regular -er ending forced onto an irregular adjective",
+          "whyFails": "'Gooder' does not exist in English; 'good' changes its whole form to 'better'.",
+          "whyFailsId": "kata “gooder” nggak ada di bahasa Inggris, “good” berubah total jadi “better”.",
+          "misconceptionId": "akhiran -er dipaksakan ke kata sifat yang bentuk bandingnya khusus."
+        },
+        {
+          "option": "best",
+          "misconception": "superlative 'best' used where 'than' demands a comparative",
+          "whyFails": "'Best' names the champion of a whole group and cannot pair with 'than' between two items.",
+          "whyFailsId": "“best” nunjuk juara satu kelompok, nggak bisa digandeng “than” buat dua hal.",
+          "misconceptionId": "bentuk juara kelompok dipakai padahal “than” minta bentuk banding dua hal."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "'Better ... than' is the memorized irregular comparative of 'good', built exactly for comparing two things.",
+        "rule": "A few adjectives have irregular comparatives: good -> better, bad -> worse, far -> farther; they refuse -er and 'more'.",
+        "whyOthersFail": "'More good' and 'gooder' force regular patterns onto an irregular adjective, while 'best' picks a group champion instead of comparing two items.",
+        "howToAvoid": "Before adding -er or 'more', check whether the adjective is on the short irregular list; if it is, retrieve its special form.",
+        "memoryCue": "Good-better, bad-worse: memorize them as pairs, like opposites.",
+        "ruleId": "Beberapa kata sifat punya bentuk banding khusus: good jadi better, bad jadi worse, far jadi farther. Kata-kata ini nolak akhiran -er dan kata “more”.",
+        "whyCorrectId": "“Better ... than” itu bentuk banding khusus dari “good”, pas banget buat mbandingin dua olahraga.",
+        "whyOthersFailId": "“More good” dan “gooder” maksa pola biasa ke kata yang bentuknya khusus. “Best” malah nunjuk juara kelompok, bukan mbandingin dua hal.",
+        "howToAvoidId": "Sebelum nambah -er atau “more”, cek dulu: kata sifatnya masuk daftar bentuk khusus atau nggak. Kalau iya, panggil bentuk hafalannya.",
+        "memoryCueId": "Good jadi better, bad jadi worse. Hafalin pasangannya kayak hafal lawan kata."
+      },
+      "pedagogicalObjectiveId": "Ingat kalau good dan bad punya bentuk banding khusus: better dan worse, bukan pola -er atau “more” biasa.",
+      "misconceptionTargetedId": "Kamu bikin bentuk banding good dan bad pakai pola biasa kayak “more good” atau “gooder”.",
+      "reasoningOperationId": "kenali kata sifat yang bentuk bandingnya khusus → panggil bentuk banding hafalannya"
     },
     {
       "id": "PD-001",
@@ -12435,7 +12491,7 @@
       "reasoningOperationId": "cek dulu pola kata jumlahnya nunjuk balik ke apa — benda pakai some of which, orang pakai some of whom"
     },
     {
-      "id": "CM-005",
+      "id": "CM-009",
       "family": "comparison",
       "subskill": "comparative_formation_er_vs_more_no_double_marking",
       "cefr": "A2",
