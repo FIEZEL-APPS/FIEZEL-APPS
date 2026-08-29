@@ -712,7 +712,11 @@ function vocabWordForms(word){
     if(b.endsWith('y')){const t=b.slice(0,-1);out.add(t+'ies');out.add(t+'ied');out.add(t+'ier');out.add(t+'iest')}
     if(b.endsWith('e')){const t=b.slice(0,-1);out.add(t+'ing');out.add(t+'ed');out.add(t+'er');out.add(t+'est')}
     if(/[^aeiou][aeiou][bdgklmnprt]$/.test(b)){const c=b+b.slice(-1);out.add(c+'ing');out.add(c+'ed');out.add(c+'er');out.add(c+'est')}
-    out.add(b+'er');out.add(b+'est');out.add(b+'ly');out.add(b+'ally');
+    out.add(b+'er');out.add(b+'est');
+    // m025-186 (A03-F01): -ly/-ally DIHAPUS dari daftar "bentuk kata yang sama".
+    // 'automatically' bukan bentuk lain dari adjektiva 'automatic' - kelas katanya beda
+    // (adverbia), dan kuis part-of-speech sempat menyalahkan jawaban yang benar karenanya.
+    // Kalau contoh kalimatnya cuma memuat bentuk -ly, soal POS untuk kata itu tidak dibuat.
   }
   // bentuk terpanjang lebih dulu supaya "studies" menang atas "studie"
   return [...out].sort((a,b)=>b.length-a.length);
@@ -2212,7 +2216,9 @@ function makeClozeQuestion(item){
     clozeAnswer:String(item.blank.answer),clozeAlternates:(item.blank.alternates||[]).map(x=>String(x)),
     clozeDistractors:(item.distractors||[]).filter(d=>d&&d.text).map(d=>({text:String(d.text),misconception:String(d.misconception||'')})),
     options:[],answerIndex:-1,difficulty:LEVELS.indexOf(level)+1,
-    explain:{why:FiezelI18n.t('quiz.cloze-why',{isian:String(item.blank.answer)}),rule:FiezelI18n.t('quiz.cloze-rule',{isian:String(item.blank.answer)}),memory:FiezelI18n.t('quiz.cloze-memory'),avoid:FiezelI18n.t('quiz.cloze-avoid')}};
+    /* m025-186 (A08-F6) x i18n: explain bank (kurasi per item) dipakai duluan;
+       kunci i18n quiz.cloze-* tinggal jaring pengaman untuk item tanpa kurasi. */
+    explain:{why:String(item.explain?.why||FiezelI18n.t('quiz.cloze-why',{isian:String(item.blank.answer)})),rule:String(item.explain?.rule||FiezelI18n.t('quiz.cloze-rule',{isian:String(item.blank.answer)})),memory:String(item.explain?.memory||FiezelI18n.t('quiz.cloze-memory')),avoid:String(item.explain?.avoid||FiezelI18n.t('quiz.cloze-avoid'))}};
   try{const prior=Number(self.FiezelItemPrior?.difficultyFor?.({level,mode:'complete_sentence',domain:'grammar'}));if(Number.isFinite(prior)&&prior>0)q.difficulty=prior}catch{}
   q.__priorDifficulty=q.difficulty;
   try{const eff=itemCalibrationEffective(q,q.difficulty);if(eff)q.difficulty=eff}catch{}
@@ -5063,12 +5069,19 @@ function startLevelExam(level){
      Riwayat dan tumpukan tidak pernah berpisah, dan tekanan kembali di tengah ujian jatuh
      ke penutup stage (leave -> abandonActiveSession), bukan keluar dari dokumen. */
   if(closeModalNow())armStageLayerSwap();
+  // m025-186 (A12-F2): tandai batas log kesalahan saat ujian mulai, supaya umpan balik
+  // "yang paling sering meleset" dihitung dari jawaban UJIAN INI saja - bukan dari sesi
+  // lain yang kebetulan menumpuk di state.wrongAnswers.
+  levelExamWeakSkill.mark=Array.isArray(state.wrongAnswers)?state.wrongAnswers.length:0;
   showToast(`${LEVEL_GUARD_COPY.examTitle} ${target} · ${LEVEL_EXAM_SIZE} soal tanpa petunjuk`);
   quizLoop({type:'level-exam',count:LEVEL_EXAM_SIZE,pool:questions,factory:x=>x,levelScope:target,noHints:true,preserveOrder:false});
   disarmStageLayerSwap();
 }
 function levelExamWeakSkill(){
-  const rows=(state.wrongAnswers||[]).slice(-LEVEL_EXAM_SIZE),tally={};
+  // m025-186 (A12-F2): hitung hanya kesalahan yang tercatat SETELAH ujian dimulai.
+  // Fallback slice lama dipertahankan bila penanda tidak ada (mis. reload di tengah ujian).
+  const all=state.wrongAnswers||[];
+  const rows=Number.isInteger(levelExamWeakSkill.mark)?all.slice(levelExamWeakSkill.mark):all.slice(-LEVEL_EXAM_SIZE),tally={};
   for(const row of rows){const key=String(row?.skill||row?.errorTag||'');if(!key)continue;tally[key]=(tally[key]||0)+1}
   const best=Object.entries(tally).sort((a,b)=>b[1]-a[1])[0];
   return best?friendlySkillName(best[0]):'';
@@ -7529,7 +7542,28 @@ function quizLoop(cfg){
    // Murid yang bilang belum paham TIDAK diberi soal lagi - ia dinaikkan satu anak tangga
    // bantuan. Mengulang pertanyaan yang sama kepada orang yang baru saja mengaku bingung
    // adalah cara tercepat membuat dia berhenti mengaku.
-   answer.scaffold=tutorEscalate(answer.scaffold);
+   /* m025-186 (A11-03): dulu handler ini SELALU membuka jawaban, jadi anak tangga 'worked'
+      tidak pernah dapat percobaan sungguhan - melanggar kontrak probe->hint->worked->tell
+      milik tutor-brain sendiri. Sekarang eskalasi diputuskan FiezelTutorBrain.escalate():
+      reveal hanya di anak tangga 'tell'; selain itu giliran bantuan yang lebih tebal
+      digambar ulang dan murid boleh mencoba lagi. Fallback ke perilaku lama bila modul absen. */
+   let out=null;
+   try{
+    if(tutorAvailable()&&typeof self.FiezelTutorBrain.escalate==='function'){
+     const picked=String(q?.options?.[answer.lastPick]??'');
+     out=self.FiezelTutorBrain.escalate(answer.scaffold,{
+      explanation:{rule:tutorIndonesian(q?.explain?.rule),whyCorrect:tutorIndonesian(q?.explain?.why),memoryCue:tutorIndonesian(q?.explain?.memory),howToAvoid:tutorIndonesian(q?.explain?.avoid)},
+      whyFails:tutorWhyFails(q,picked),
+      conceptLabel:friendlySkillName(q?.lessonSkill||q?.skill||q?.type)
+     },tutor);
+    }
+   }catch{out=null}
+   if(out&&out.scaffold&&!out.reveal&&out.turn&&(out.turn.say||out.turn.ask)){
+    answer.scaffold=out.scaffold;
+    speak(out.turn,{retry:true});
+    return;
+   }
+   answer.scaffold=out?.scaffold||tutorEscalate(answer.scaffold);
    reveal(q,answer.lastPick,false,{forced:true});
   };
   // D5 S10: #tutorTurn duduk DI BAWAH #options - di layar HP, giliran tutor yang menahan
@@ -7798,6 +7832,10 @@ function quizLoop(cfg){
   $('quizNext').disabled=false;
   /* W1 P1-4 (11-001 saudara cloze): pembahasan cloze juga harus terlihat, aturan yang sama. */
   try{f.scrollIntoView({block:'nearest',behavior:(prefersReducedMotion()||state.preferences?.motion===false)?'auto':'smooth'})}catch{}
+  /* m025-186 (A16-F1): tanpa titipan ini, kedua tombol popup jatuh ke quizNext.click()
+     dan MELOMPATI pembahasan yang barusan dicat. Kelanjutannya cukup menutup popup dan
+     mengantar mata ke panel pembahasan di baliknya - persis yang dijanjikan tombolnya. */
+  confidencePopThen=()=>{try{$('feedback')?.scrollIntoView({block:'nearest',behavior:'auto'})}catch{}};
   openConfidencePop(ok);
   enhanceUI();
  };
@@ -8088,7 +8126,9 @@ function olmPanelMarkup(){
     // membawa claimId. Tombolnya kecil dan opsional - tanpa negotiate, panel persis lama.
     const canNegotiate=olmNegotiateAvailable();
     const disputeBtn=e=>canNegotiate&&e?.canDispute&&e?.claimId?` <button type="button" class="core-ghost olm-dispute" onclick="olmDispute('${esc(String(e.claimId))}')">${FiezelI18n.t('progress.menurutku-salah')}</button>`:'';
-    const mastery=(s.mastery?.entries||[]).slice(0,3).map(e=>`${esc(friendlySkillName(e.lesson||e.id))} ${Math.round(Number(e.L??e.value??0)*100)}%${disputeBtn(e)}`).join(', ');
+    // m025-186 (A12-F1): summarize() menaruh estimasi di `mean`; pembacaan lama membuat panel selalu 0%.
+    const masteryEntries=(s.mastery?.entries||[]).slice().sort((x,y)=>Number(y.mean??y.L??y.value??0)-Number(x.mean??x.L??x.value??0));
+    const mastery=masteryEntries.slice(0,3).map(e=>{const v=e.mean??e.L??e.value;const label=(v===null||v===undefined||Number.isNaN(Number(v)))?FiezelI18n.t('progress.belum-cukup-data'):`${Math.round(Number(v)*100)}%`;return `${esc(friendlySkillName(e.lesson||e.id))} ${label}${disputeBtn(e)}`}).join(', ');
     const mis=s.misconceptions||{};
     const review=s.review||{};
     const reviewTop=(review.top||[]).slice(0,3).map(r=>esc(friendlySkillName(String(r.id||'').replace(/^\w+:/,'')))).join(', ');

@@ -107,6 +107,24 @@ jobs:
           node onboarding-test.js
           node tour-test.js
           node tours-test.js
+          node adaptivity-simulation-v3-hardened-test.js
+          node analytics-dedup-test.js
+          node analytics-stable-id-guard-test.js
+          node app-telemetry-wiring-test.js
+          node brain-config-test.js
+          node brain-manifest-test.js
+          node fiezel-stat-gate-test.js
+          node learning-lane-test.js
+          node learning-metrics-test.js
+          node learning-telemetry-test.js
+          node metrics-digest-test.js
+          node social-api-contract-test.js
+          node social-frontend-test.js
+          node social-schema-contract-test.js
+          node audio-locale-guard-test.js
+          node id-golden-snapshot-test.js
+          node locale-enum-test.js
+          node th-coverage-test.js
           node boot-order-test.js
           node splash-first-paint-test.js
           node splash-choreography-test.js

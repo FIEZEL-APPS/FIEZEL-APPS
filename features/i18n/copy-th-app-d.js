@@ -234,6 +234,7 @@
     'progress.materi-done-punya-bukti-study': '{length} เนื้อหา {active} มีหลักฐานการเรียนแล้ว',
     'progress.materi-rawan-lupa': 'เนื้อหาเสี่ยงลืม',
     'progress.menurutku-salah': 'ฉันว่าอันนี้ไม่ถูกนะ',
+    'progress.belum-cukup-data': 'ข้อมูลยังไม่พอ',
     'progress.model-memakai-agregat-perilaku-hasil': 'โมเดลนี้ใช้ข้อมูลรวมของพฤติกรรมและผลการเรียน ประวัติคำตอบดิบไม่ถูกส่งไปยัง Core Brain',
     'progress.outcome-menjadi-evidence-policy-upcoming': 'ผลลัพธ์นี้จะเป็นหลักฐานให้นโยบายครั้งถัดไป คำตอบดิบไม่ถูกส่งไปยัง Core',
     'progress.peta-kemampuanmu-bukan-rapor-rendah': 'นี่คือแผนที่ความสามารถของคุณ ไม่ใช่สมุดพก ค่าที่ต่ำแค่แปลว่ายังฝึกไม่มาก',

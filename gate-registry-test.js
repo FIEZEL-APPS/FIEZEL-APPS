@@ -98,15 +98,9 @@ const GATE_NAME_RE = /(?:-test|-audit|-selftest|-simulation(?:-v\d+)?)\.(?:js|mj
 const EXCLUSIONS = new Map([
   /* Kelas 'gerbang-pra-rilis-fitur': gerbang yang kontraknya sendiri mengikat RILIS FITUR
      tertentu, bukan rilis umum. Cara memeriksa klaimnya: baca pesan gagal gerbangnya. */
-  ['th-coverage-test.js', {
-    class: 'gerbang-pra-rilis-fitur',
-    reason:
-      'Gerbang PRA-RILIS locale th; pesan gagalnya sendiri: \"jangan rilis th sebelum hijau\". ' +
-      'Wave2 (#250) memperluas vocabulary-master 1765->2370; cakupan th berlubang 605 entri - ' +
-      'utang konten jalur th, keputusan rilis th milik MASTER (BRAIN-ACTIVATION-RUNBOOK pola ' +
-      'saklar bertahap). WAJIB dijalankan manual dan didaftarkan ulang ke quality.yml sebelum ' +
-      'saklar th pertama; sampai itu, ia tidak boleh memblokir rilis id.'
-  }],
+  /* m025-192: entri pengecualian th-coverage DIHAPUS sesuai instruksi entri itu sendiri -
+     lubang th (69 template + 605 vocab) sudah ditutup di branch ini (103/103), gerbang
+     didaftarkan ulang di quality.yml dan kembali mengikat. */
   ['audit/bank-audit.js', {
     class: 'alat-pelaporan',
     reason:
