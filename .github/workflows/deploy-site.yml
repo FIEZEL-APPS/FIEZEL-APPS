@@ -173,6 +173,74 @@ jobs:
             --page "${{ steps.markers.outputs.page }}" \
             --sw   "${{ steps.markers.outputs.sw }}"
 
+      # ── PARITAS PRODUKSI WALAU TANPA KREDENSIAL ────────────────────────────────────────
+      # Sejak m025-195 ada JALUR PENERBITAN KEDUA: cPanel Git Version Control menjalankan
+      # `.cpanel.yml` langsung di hosting, tanpa pernah menyentuh GitHub Actions. Jalur itu
+      # memindahkan bita dengan benar, tetapi ia menerbitkan BUTA: tidak ada satu pun langkah
+      # yang membaca kembali `https://fiezel.my.id/app/` untuk membuktikan bahwa yang tersaji
+      # memang build ini. Itu lubang yang SAMA PERSIS yang membuat audit rilis m025-179
+      # berhenti pada "paritas produksi TIDAK TERBUKTI" — hanya berpindah jalur.
+      #
+      # Langkah di atas hanya berjalan saat secret SSH ada. Langkah ini mengisi jalan yang
+      # lain, dan sengaja punya DUA MODE:
+      #
+      #   workflow_dispatch -> GERBANG. Owner (atau agen atas namanya) menekan "Run workflow"
+      #                        untuk MENUNTUT bukti. Produksi tidak menyajikan build ini =
+      #                        jalan ini MERAH. Inilah tombol "buktikan sekarang".
+      #
+      #   workflow_run      -> LAPORAN. Penerbitan cPanel itu manual (Update from Remote →
+      #                        Deploy HEAD Commit). Menuntut cocok pada setiap main hijau akan
+      #                        memerahkan repo hanya karena owner belum sempat menekan tombol
+      #                        itu — merah yang tidak menunjuk cacat apa pun, dan merah semacam
+      #                        itu mengajari orang mengabaikan lampu. Jadi: melapor, tidak
+      #                        menuntut. Tetapi apa yang BENAR-BENAR disajikan produksi tetap
+      #                        ditulis ke ringkasan, jadi selisih repo-vs-produksi terlihat.
+      #                        Diam adalah satu-satunya hasil yang dilarang di sini.
+      #
+      # `set -e` sengaja TIDAK dipakai: kalau pembuktian gagal, ringkasannya harus tetap
+      # tertulis lebih dulu. Kode keluar dipegang tangan di baris terakhir.
+      - name: Baca produksi walau tanpa kredensial (jalur cPanel tidak boleh terbit buta)
+        if: steps.creds.outputs.ready != 'true'
+        shell: bash
+        env:
+          FIEZEL_SITE_BASE: ${{ secrets.FIEZEL_SITE_BASE }}
+          PAGE: ${{ steps.markers.outputs.page }}
+          SW: ${{ steps.markers.outputs.sw }}
+          TUNTUT: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          set -uo pipefail
+          BASE="${FIEZEL_SITE_BASE:-https://fiezel.my.id/app}"
+          OUT="$RUNNER_TEMP/paritas.txt"
+          if [ "$TUNTUT" = "true" ]; then
+            node tools/deploy-site-verify.mjs --base "$BASE" --page "$PAGE" --sw "$SW" 2>&1 | tee "$OUT"
+          else
+            node tools/deploy-site-verify.mjs --base "$BASE" 2>&1 | tee "$OUT"
+          fi
+          RC=${PIPESTATUS[0]}
+          {
+            if [ "$TUNTUT" = "true" ]; then
+              echo '### Paritas produksi — **GERBANG** (dijalankan tangan)'
+            else
+              echo '### Paritas produksi — **LAPORAN** (bukan gerbang)'
+            fi
+            echo ''
+            echo "Repo pada commit ini menjanjikan build \`$PAGE\` dengan shell \`$SW\`."
+            echo ''
+            echo '```'
+            cat "$OUT"
+            echo '```'
+            if [ "$TUNTUT" != "true" ]; then
+              echo ''
+              echo 'Mode laporan: selisih di atas TIDAK memerahkan jalan ini, karena penerbitan'
+              echo 'cPanel dilakukan tangan. Untuk MENUNTUT bukti, jalankan workflow ini lewat'
+              echo '**Run workflow** — mode itu memerahkan jalan kalau produksi belum sepadan.'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$TUNTUT" = "true" ]; then
+            exit "$RC"
+          fi
+          exit 0
+
       - name: Ringkas hasil penerbitan
         if: steps.creds.outputs.ready == 'true'
         shell: bash

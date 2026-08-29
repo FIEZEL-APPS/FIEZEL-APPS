@@ -93,7 +93,42 @@ html.fz-booting body{overflow:hidden}
 .fiezel-splash-still .fiezel-splash-word{transform:none!important;animation:fz-fade-in .3s ease var(--fz-b7,1150ms) both}
 .fiezel-splash-still .fiezel-splash-tag{transform:none!important;animation:fz-fade-in .24s ease var(--fz-b12,1900ms) both;opacity:0}
   </style>
-  <link rel="stylesheet" href="./style.css">
+  <!-- ============================================================================
+       m025-199 (laporan OWNER: "saat boot memasukin splash sangat lama sekali").
+       DIUKUR sebelum disentuh, Slow 4G + CPU 4x, median dari 3 kali jalan:
+
+         apa adanya .................................. FCP 2304 ms
+         tiga CSS fitur di bawah dibuat non-blokir ... FCP 2668 ms  (nol perbaikan)
+         style.css juga non-blokir ................... FCP  272 ms
+
+       Jadi yang menahan cat pertama BUKAN jumlah stylesheet-nya, melainkan style.css
+       SENDIRIAN: 286 KB yang wajib tiba, terurai, dan berlaku sebelum peramban boleh
+       mencat satu piksel pun. Selama itu murid menatap layar kosong - persis jeda yang
+       dilaporkan pemilik. Tiga stylesheet lain tetap blokir karena membuangnya tidak
+       membeli apa pun, dan aturan urutan token di komentar bawah tetap berlaku.
+
+       KENAPA INI TIDAK MENGHASILKAN KILATAN HTML TELANJANG. Tirai splash sudah dicat
+       dari CSS kritis yang di-INLINE di atas (blok <style> tepat di atas baris ini), dan
+       ia menutupi seluruh layar sepanjang boot. Yang berhak membubarkan tirai hanya
+       dismissBootSplash() di app.js, dan ia MENUNGGU __fzShellCss selesai lebih dulu.
+       Penantian itu berpagar 4 detik supaya lembar yang gagal tidak pernah mengunci murid
+       di balik tirai - aturan yang sama yang sudah ditulis di kepala fungsi itu.
+
+       `rel=preload as=style` lalu ditukar ke stylesheet saat onload: bentuk ini yang
+       membuat unduhannya tetap prioritas tinggi TANPA memblokir cat. <noscript> menjaga
+       peramban tanpa JS tetap mendapat lembar penuh, dan onerror menandai kegagalan
+       supaya penantian di atas tidak menunggu sesuatu yang tidak akan pernah datang.
+
+       NOL SKRIP DI SINI, dan itu bukan gaya melainkan aturan: splash-first-paint-test
+       menuntut markup splash berada di atas SETIAP elemen skrip, karena satu saja di
+       hadapannya mengembalikan urutan yang dulu membuat layar putih 3 detik. Penanda
+       kesiapan karena itu dibaca dari DOM (`link.rel` yang sudah bertukar), bukan dari
+       variabel yang butuh skrip untuk disiapkan.
+       ============================================================================ -->
+  <link rel="preload" as="style" href="./style.css"
+        onload="this.onload=null;this.rel='stylesheet';window.__fzShellCss='ready'"
+        onerror="window.__fzShellCss='error'">
+  <noscript><link rel="stylesheet" href="./style.css"></noscript>
   <link rel="stylesheet" href="./features/speaking-listening/speaking-listening-addon.css">
   <link rel="stylesheet" href="./features/tutor-classroom/tutor-v3.css">
   <!-- m026-01: motion system maskot PAW. Sengaja PALING AKHIR di antara stylesheet:

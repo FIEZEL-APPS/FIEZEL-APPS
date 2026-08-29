@@ -5658,7 +5658,46 @@ window.__fiezelHealth={readInstallHealth,installHealthReportMarkup,refreshInstal
 // index.html). Setiap jalan keluar dari fungsi ini WAJIB lewat dismissBootSplash(): kalau
 // modul splash hilang atau melempar, elemen statis itu akan tetap menutupi seluruh layar
 // dan aplikasi terkunci di balik layar sambutan yang tidak pernah menutup.
+/* m025-199: apakah style.css sudah benar-benar berlaku?
+ *
+ * Dibaca dari DOM, BUKAN dari variabel yang disiapkan skrip inline: splash-first-paint-test
+ * menuntut markup splash berada di atas setiap <script>, jadi menambah satu skrip penanda di
+ * <head> akan memerahkan gerbang yang justru menjaga cacat ini tidak kembali.
+ *
+ * Pola `rel=preload` -> `rel=stylesheet` sudah menyimpan jawabannya di elemennya sendiri:
+ * begitu lembarnya termuat, onload menukar rel-nya. Jadi `rel==='stylesheet'` ADALAH tanda
+ * berlakunya. `__fzShellCss` tetap dibaca karena onerror memakainya untuk menandai lembar
+ * yang gagal - dan menunggu lembar yang gagal adalah menunggu selamanya.
+ *
+ * Ragu = SUDAH (elemennya tidak ketemu, peramban tanpa querySelector, apa pun): tirai yang
+ * tidak pernah terangkat lebih buruk daripada satu frame yang belum bergaya. */
+function shellCssSettled(){
+  try{
+    if(self.__fzShellCss==='ready'||self.__fzShellCss==='error')return true;
+    var lembar=self.document?.querySelector?.('link[href="./style.css"]');
+    return !lembar||lembar.rel==='stylesheet';
+  }catch(_){return true}
+}
 function dismissBootSplash(){
+  /* m025-199: style.css kini dimuat NON-BLOKIR (lihat alasan terukur di index.html), jadi
+   * secara teori tirai bisa terangkat sebelum lembarnya berlaku dan murid melihat HTML
+   * telanjang - kilatan yang jauh lebih buruk daripada layar kosong yang baru saja dibuang.
+   *
+   * Dalam praktiknya itu tidak akan terjadi: app.js 835 KB, style.css 286 KB, dan keduanya
+   * berangkat bersamaan dari origin yang sama dengan CSS berprioritas lebih tinggi. Tetapi
+   * "tidak akan terjadi menurut hitungan waktu" bukan jaminan, jadi ini jaminannya.
+   *
+   * Pagar 4 detik disengaja dan mengikuti aturan yang sudah tertulis di kepala fungsi ini:
+   * lembar yang gagal atau lambat tidak boleh MENGUNCI murid di balik tirai. Sesudah pagar
+   * lewat, tirai tetap dibuka - layar seadanya masih lebih baik daripada aplikasi yang
+   * tidak pernah terbuka. Nilai 'error' juga langsung lolos, karena menunggu sesuatu yang
+   * sudah gagal adalah menunggu selamanya.
+   *
+   * Jalur normal (lembar sudah berlaku) tidak melewati satu pun baris tambahan di bawah. */
+  if(!shellCssSettled()&&(self.performance?.now?.()||4000)<4000){
+    setTimeout(dismissBootSplash,60);
+    return true;
+  }
   try{if(self.FiezelSplash?.disposeBootSplash?.(self))return true}catch(_){}
   try{
     self.__fiezelBootSplash?.dismiss?.();
@@ -6553,11 +6592,30 @@ function AudioService(){
   play(text,options={}){
    if(!text)return Promise.resolve(null);
    this.stop();
-   const say=self.FiezelVoiceSay?.say;
+   /* m025-198 (laporan OWNER: FATAL). FiezelVoiceSay.say() memanggil prepareSubtitle() -
+    * terjemahan bahasa murid muncul di layar sambil rekaman berbunyi - kecuali diberi
+    * `suppressSubtitles`. m025-148 sudah memasang tombol itu dan memakainya di Skills Lab,
+    * tetapi DUA mata rantai di jalur kuis tetap menjatuhkannya:
+    *   1. pintu ini hanya meneruskan speed/contentType/locale, jadi `suppressSubtitles` dari
+    *      pemanggil mana pun HILANG di sini - tombolnya tidak pernah sampai;
+    *   2. soal listening tes penempatan memang tidak pernah mengirimnya.
+    * Akibatnya murid MEMBACA terjemahan naskah sambil "mendengarkan". Soal listening berubah
+    * jadi soal membaca, dan seluruh band listening tes penempatan kehilangan validitasnya.
+    *
+    * Diperbaiki di DUA lapis dengan sengaja. Meneruskan bendera saja hanya menambal satu
+    * pemanggil; MENURUNKANNYA dari contentType menutup KELASNYA - setiap pemutaran listening
+    * lewat pintu ini bisu subtitle, sekarang dan untuk pemanggil yang ditulis nanti, walau
+    * penulisnya tidak tahu benderanya ada. Bendera eksplisit tetap dihormati untuk permukaan
+    * lain yang perlu membisukan subtitle tanpa memakai contentType 'listening'.
+    *
+    * Ini menutup terjemahan APA PUN, bukan hanya Indonesia: prepareSubtitle memanggil
+    * FiezelSubtitleTranslate yang mengikuti locale murid, jadi jalur Thai mati di titik yang
+    * sama persis. */
+   const noSubtitles=options.suppressSubtitles===true||options.contentType==='listening';
    const timeoutPromise=typeof setTimeout==='function'?new Promise(r=>setTimeout(()=>r(false),9000)):new Promise(()=>{});
    const viaDoor=typeof say==='function'
     ?Promise.race([
-      Promise.resolve().then(()=>say.call(self.FiezelVoiceSay,text,{speed:options.speed??selectedNeuralRate(),contentType:options.contentType,locale:options.locale})).catch(()=>false),
+      Promise.resolve().then(()=>say.call(self.FiezelVoiceSay,text,{speed:options.speed??selectedNeuralRate(),contentType:options.contentType,locale:options.locale,suppressSubtitles:noSubtitles})).catch(()=>false),
       timeoutPromise
     ])
     :Promise.resolve(false);
@@ -7517,7 +7575,7 @@ function quizLoop(cfg){
     // tebakan yang murah. Diajukan sesudah audio soal sekarang berangkat, bukan di draw(),
     // supaya tidak pernah bersaing dengan rekaman yang sedang ditunggu murid.
     const nextListening=remaining.find(x=>x&&x.type==='listening'&&x.script&&x.script!==q.script);
-    try{const played=await audio.play(q.script,{contentType:'listening',next:nextListening?nextListening.script:''});
+    try{const played=await audio.play(q.script,{contentType:'listening',suppressSubtitles:true,next:nextListening?nextListening.script:''});
      // Fase 2 (B3 butir 6): replay dihitung hanya untuk pemutaran yang BERBUNYI - putaran
      // pertama bukan replay, dan pemutaran gagal bukan bukti apa pun. Nilainya dibaca
      // evidenceKappa (diskon jawaban benar berbekal banyak replay) dan riwayat listening.
