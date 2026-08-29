@@ -69,6 +69,20 @@ if (mulai !== -1 && tutup > mulai) {
 
   const opsiTerakhir = () => (dicatat.length ? dicatat[dicatat.length - 1].options || {} : null);
 
+  /* m025-202: assert PENGIKAT, ditambahkan sesudah gerbang ini menangkap penghapusannya.
+   *
+   * `const say=self.FiezelVoiceSay?.say` sempat terhapus dari AudioService di ec2b119, dan
+   * tidak ada satu pun galat yang muncul: `typeof say` pada identifier tak-dideklarasikan
+   * menjawab 'undefined' alih-alih melempar, jadi seluruh tangga suara neural dilewati
+   * DIAM-DIAM dan murid mendengar suara bawaan perangkat. Empat assert di bawah memang
+   * memerah karenanya, tetapi pesannya ("say() tidak pernah dipanggil") butuh penyelidikan
+   * untuk dipahami. Assert ini menamai sebabnya langsung, supaya diagnosis berikutnya
+   * memakan detik, bukan setengah jam. */
+  const potongan = src.slice(mulai, tutup + 1);
+  check('PENGIKAT `say` terdeklarasi DI DALAM AudioService (tanpa ini tangga suara neural mati senyap)',
+    /\b(?:const|let|var)\s+say\s*=\s*self\.FiezelVoiceSay/.test(potongan),
+    'typeof pada identifier tak-dideklarasikan menjawab undefined, bukan melempar - jadi tidak ada galat yang menandainya');
+
   return Promise.resolve()
     /* (A) INTI LAPORAN OWNER: pemutaran listening tanpa bendera eksplisit pun harus bisu
      * subtitle. Ini yang menutup KELASNYA - pemanggil yang ditulis nanti tidak perlu tahu
