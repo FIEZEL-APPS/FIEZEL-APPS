@@ -99,6 +99,15 @@ html,body{touch-action:manipulation}
    field you cannot select text in is broken. */
 html,body,button,a,.card,section,article,div,p,span,h1,h2,h3,h4,b,strong,em,small,li{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 input,textarea,select,[contenteditable="true"]{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
+/* PAGAR ANTI-ZOOM-OTOMATIS iOS (m025-186) - satu aturan, bukan tambalan per komponen.
+   iOS Safari memperbesar SELURUH halaman saat kontrol teks ber-font-size < 16px difokus,
+   dan tidak mengembalikannya. Itu gejala "terasa seperti website" yang paling sering
+   terlihat, dan akarnya fokus - bukan pinch. 16px adalah ambang perilaku Safari: 15,9px
+   tetap memicu. Deklarasi ini didahulukan sebagai LANTAI; komponen boleh menaikkan, tidak
+   boleh menurunkan. Ukuran visual yang ringkas dicapai lewat padding/tinggi, bukan huruf
+   kecil. Ditegakkan `app-interaction-policy-test.js` di peramban sungguhan, bukan di teks
+   CSS - jadi override dari berkas mana pun tetap tertangkap. */
+input,textarea,select{font-size:16px}
 ::selection{background:var(--accent);color:#fff}
 
 body{
@@ -2542,9 +2551,17 @@ html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.tex
   border:1.5px solid var(--surface-edge);background:var(--panel-soft);color:var(--text)}
 .fz-coach-chip:active{transform:translateY(1px)}
 .fz-coach-form{display:flex;gap:8px;align-items:flex-end}
+/* KEBIJAKAN ANTI-ZOOM-OTOMATIS iOS (m025-186).
+   font-size di bawah 16px pada kontrol teks membuat iOS Safari MEMPERBESAR seluruh halaman
+   saat kontrolnya difokus - lalu tidak mengembalikannya. Itulah gejala "terasa seperti
+   website, bukan aplikasi" yang paling sering terlihat, dan akarnya BUKAN pinch: ia dipicu
+   oleh fokus. Diukur sebelum perbaikan: textarea ini 13,76px (`.86rem`).
+   Nilainya dipaku 16px, BUKAN dinaikkan sedikit, karena 16px adalah ambang perilaku Safari -
+   15,9px tetap memicu zoom. Ukuran tampil dijaga tetap ringkas lewat padding dan tinggi,
+   bukan lewat mengecilkan huruf. `app-interaction-policy-test.js` menegakkan ambang ini. */
 .fz-coach-form textarea{
   flex:1;min-height:44px;max-height:110px;padding:11px 13px;border-radius:var(--radius-md);resize:none;
-  border:1.5px solid var(--surface-edge);background:var(--panel);color:var(--text);font:inherit;font-size:.86rem}
+  border:1.5px solid var(--surface-edge);background:var(--panel);color:var(--text);font:inherit;font-size:16px}
 .fz-coach-send{width:46px;height:46px;flex:0 0 auto;border-radius:var(--radius-md);border:0;background:var(--yellow);color:var(--ink);
   box-shadow:0 3px 0 var(--yellow-deep);display:grid;place-items:center;cursor:pointer}
 .fz-coach-send:active{transform:translateY(2px);box-shadow:0 1px 0 var(--yellow-deep)}

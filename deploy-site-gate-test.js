@@ -61,7 +61,13 @@ const wf = baca(WF);
 function assetsSW() {
   const m = /const ASSETS\s*=\s*\[([\s\S]*?)\];/.exec(baca('sw.js'));
   if (!m) return [];
-  return [...m[1].matchAll(/'([^']+)'/g)].map((x) => x[1].replace(/^\.\//, '')).filter((p) => p !== '');
+  /* Komentar DI DALAM daftar harus dibuang lebih dulu. Ditemukan nyata: catatan locale
+   * Thai di tengah ASSETS memuat kata berkutip ('th', 'voice'), dan ekstraktor naif
+   * membacanya sebagai nama berkas lalu menuduh keduanya "tidak ada di repo". Yang salah
+   * pemeriksanya, bukan repo-nya - persis kelas kesalahan yang membuat gerbang tidak
+   * dipercaya. */
+  const bersih = m[1].replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/[^\n]*/g, '$1');
+  return [...bersih.matchAll(/'([^']+)'/g)].map((x) => x[1].replace(/^\.\//, '')).filter((p) => p !== '');
 }
 
 /** Terjemahan pola rsync -> penilaian "apakah path ini dibuang?". Sengaja SEDERHANA dan

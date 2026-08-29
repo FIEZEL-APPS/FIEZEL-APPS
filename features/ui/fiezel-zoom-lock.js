@@ -1,4 +1,24 @@
 /**
+ * KEBIJAKAN INTERAKSI APLIKASI FIEZEL — satu tempat, bukan tambalan tersebar.
+ *
+ * m025-186: modul ini TIDAK dihapus meski namanya "zoom lock", dan itu keputusan sadar.
+ * Audit interaksi app-like menemukan ia BUKAN kode mati: ia satu-satunya yang membatalkan
+ * double-tap-zoom pada mesin yang mengabaikan `touch-action:manipulation`. Menghapusnya
+ * berarti mengembalikan cacat yang sudah tertutup. Yang dilakukan sebaliknya: ia diperluas
+ * menjadi SATU kebijakan interaksi, sehingga tidak lahir modul kedua yang mengatur hal yang
+ * sama dari sudut lain.
+ *
+ * Dua hal yang dijaga, dan HANYA dua:
+ *   1. Double-tap tidak memperbesar halaman  (sudah ada sejak m025-42)
+ *   2. Menu konteks peramban tidak muncul di UI statis  (m025-186)
+ *
+ * Yang SENGAJA TIDAK dilakukan, supaya tidak ada yang "merapikannya" nanti:
+ *   - pinch-zoom TIDAK diblok (WCAG 1.4.4/1.4.10 - hak murid low-vision)
+ *   - ctrl+wheel dan Cmd/Ctrl +/-/0 TIDAK diblok (alasan sama)
+ *   - seleksi teks TIDAK diurus di sini; itu murni CSS (`style.css` blok kebijakan).
+ *     Mengurusnya dua kali di dua lapisan adalah cara termudah membuat input rusak.
+ *
+ * ---------------------------------------------------------------------------------------
  * m025-42 zoom lock — D16 (audit wave D, D5 T1): dilonggarkan menjadi double-tap lock.
  *
  * Versi lama menolak SEMUA gesture zoom (pinch WebKit via gesturestart/gesturechange/
@@ -81,11 +101,42 @@
       if (guard.isDoubleTap(touch ? touch.clientX : 0, touch ? touch.clientY : 0)) stop(event);
     }, { passive: false });
 
+    /* MENU KONTEKS (m025-186).
+     *
+     * `-webkit-touch-callout:none` di style.css sudah menutup gelembung "Copy / Look Up /
+     * Translate" pada long-press iOS. Yang TIDAK ditutupnya: klik-kanan desktop dan menu
+     * konteks Android - keduanya masih memunculkan menu dokumen di atas UI yang bukan
+     * dokumen. Diukur sebelum perbaikan: contextmenu pada <h2>/<p>/<button> tidak pernah
+     * dicegah.
+     *
+     * Yang dicegah HANYA menu tanpa fungsi. Elemen tempat menu itu benar-benar berguna
+     * dikecualikan lewat `allowsContextMenu`, dan daftarnya sengaja pendek dan eksplisit:
+     * kolom teks, area editable, tautan sungguhan (murid berhak "buka di tab baru" dan
+     * "salin alamat"), serta gambar (simpan gambar). Satu selector meleset di sini berarti
+     * murid kehilangan paste - jadi keputusannya dibuat per-elemen dari titik sentuh,
+     * bukan dengan mematikan event di document lalu berharap.
+     */
+    doc.addEventListener('contextmenu', function (event) {
+      var el = event && event.target;
+      if (allowsContextMenu(el)) return;
+      stop(event);
+    });
+
     return true;
+  }
+
+  /** Elemen yang menu konteks perambannya PUNYA fungsi nyata dan wajib dibiarkan. */
+  var CONTEXT_MENU_OK = 'input,textarea,select,option,[contenteditable="true"],[contenteditable=""],a[href],img,video,audio';
+
+  function allowsContextMenu(el) {
+    if (!el || typeof el.closest !== 'function') return true; // ragu = biarkan peramban
+    try { return !!el.closest(CONTEXT_MENU_OK); } catch (_) { return true; }
   }
 
   var api = Object.freeze({
     schema: 'fiezel-zoom-lock-v1',
+    CONTEXT_MENU_OK: CONTEXT_MENU_OK,
+    allowsContextMenu: allowsContextMenu,
     DOUBLE_TAP_MS: DOUBLE_TAP_MS,
     DOUBLE_TAP_SLOP_PX: DOUBLE_TAP_SLOP_PX,
     createGuard: createGuard,

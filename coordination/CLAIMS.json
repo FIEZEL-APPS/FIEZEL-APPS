@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-28T23:00:00+07:00",
+  "updated": "2026-08-29T10:00:00+07:00",
   "active": [
     {
       "sesi": "ses_0034e69d3ffes3kjiFLNDzYXUZ",
@@ -45,37 +45,21 @@
       "catatan": "Sakelar klien masih enabled:false base:'' usage:'off'. Perlu penyalaan BERTAHAP: analytics saja, AI tetap Puter. Harus memperhitungkan core-config.js ikut precache cache-first."
     },
     {
-      "sesi": "sesi-claude-1ttcdp/RELEASE-AUDIT",
-      "peran": "release commander / remediasi identitas akun + kebocoran prompt",
+      "sesi": "sesi-claude-1ttcdp/APP-INTERACTION",
+      "peran": "app-like interaction hardening (zoom/seleksi/context menu/fokus)",
       "paths": [
-        ".github/workflows/master-authority-guard.yml",
-        ".github/workflows/quality.yml",
-        ".github/workflows/deploy-core-worker.yml",
-        ".github/workflows/configure-core.yml",
-        ".github/workflows/audio-generate.yml",
-        ".github/workflows/audio-deploy-worker.yml",
-        ".github/workflows/audio-prerender-cf.yml",
-        ".github/workflows/push-reminders.yml",
-        "workflow-actor-gate-test.js",
-        "prerender-plan-test.js",
-        "workers/api/wrangler.toml",
-        "workers/api/ai/ai-tasks.js",
-        "ai-response-shape-test.js",
+        "style.css",
+        "features/ui/fiezel-zoom-lock.js",
+        "app-interaction-policy-test.js",
         "reports/production-release-command-report.md",
-        "prerender-dryrun-test.js",
-        "diag-search-test.js",
-        "sw-corp-test.js",
-        "puter-auth-coop-test.js",
-        "diag-panel-test.js",
-        "puter-auth-diagnostics-test.js",
         ".github/workflows/deploy-site.yml",
         ".cpanel.yml",
-        "deploy/site-exclude.txt",
+        "deploy/",
         "tools/deploy-site-verify.mjs",
         "deploy-site-gate-test.js"
       ],
-      "mulai": "2026-08-28T18:10:00+07:00",
-      "catatan": "Akun GitHub owner BERGANTI fitrajft-ux -> FIEZEL-APPS. Nama lama masih dipaku di 8 workflow + 2 gerbang + ALLOWED_ORIGINS, membuat master-authority-guard merah di tiap push DAN membuat 3 gerbang live quality.yml mustahil dijalankan siapa pun. Plus F-1: pendeteksi gema rangka prompt cuma menutup 2 dari 8 bentuk. TIDAK menyentuh wilayah S2 (ai-account-budget.js, route-ai.js, route-wiring.js), UIUX (app.js/style.css/index.html), neural-voice/, TASKS-LEDGER.json, atau coordination/ selain entri ini. MENAMBAH penerbit situs (deploy-site.yml + .cpanel.yml + verifier) karena repo tidak punya satu pun jalur ke fiezel.my.id/app."
+      "mulai": "2026-08-29T10:00:00+07:00",
+      "catatan": "TIDAK menyentuh features/neural-voice/ (diag panel, diklaim opencode), sw.js atau core-config.js (diklaim A6). Kontrol <16px di diag panel dilaporkan ke pemiliknya, tidak diperbaiki dari sini. index.html TIDAK disentuh: viewport zoom 5x dipertahankan demi WCAG 1.4.4/1.4.10."
     }
   ],
   "finished": [
