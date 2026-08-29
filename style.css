@@ -3554,6 +3554,9 @@ body.fz-lesson-mode .topline{position:sticky;top:0;z-index:30;
    dua baris pada layar sempit, dan tag mengambang akan menabraknya. */
 .option.correct::after{content:"BENAR";background:var(--good);color:var(--on-core)}
 .option.wrong::after{content:"PILIHANMU";background:var(--bad);color:var(--on-core)}
+:lang(th) .option.correct::after{content:"ถูกต้อง"}
+:lang(th) .option.wrong::after{content:"คำตอบของคุณ"}
+:lang(th) .option.was-tried::after{content:"ลองแล้ว"}
 /* i10 2026-08-28 (O5 §6.3-1): PILIHANMU menunjuk SATU pilihan — percobaan pertama yang
    gagal diturunkan answer() ke .was-tried: tanda teks netral DICOBA (kontrak non-warna
    m025 terjaga: state tetap terbaca tanpa membedakan warna). */
