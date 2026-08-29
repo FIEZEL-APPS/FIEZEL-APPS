@@ -2,16 +2,16 @@
   "schema": "fiezel-cloze-bank-v1",
   "generatedFrom": "grammar-templates.json",
   "counts": {
-    "templates": 222,
-    "items": 184,
-    "rejected": 38,
+    "templates": 248,
+    "items": 209,
+    "rejected": 39,
     "byLevel": {
-      "A2": 29,
-      "B1": 59,
-      "B2": 42,
-      "C1": 22,
+      "A2": 34,
+      "B1": 62,
+      "B2": 48,
+      "C1": 26,
       "A1": 22,
-      "C2": 10
+      "C2": 17
     }
   },
   "rejected": [
@@ -204,6 +204,11 @@
       "templateId": "PR-013",
       "reason": "answer_too_short",
       "detail": "jawaban \"on\" <3 karakter — grading edit-distance tidak andal"
+    },
+    {
+      "templateId": "EC-006",
+      "reason": "no_blank_marker",
+      "detail": "stem tidak memuat ___ — jawaban template bukan token/frasa di dalam kalimat target"
     }
   ],
   "items": [
@@ -3830,7 +3835,12 @@
       "sentence": "The cat is ___ the bed, so we cannot see it.",
       "blank": {
         "answer": "under",
-        "alternates": [],
+        "alternates": [
+          "Absent",
+          "Failing",
+          "In the absence of",
+          "Without"
+        ],
         "position": 11
       },
       "distractors": [
@@ -4090,7 +4100,9 @@
       "sentence": "The sequel is fun, but it is ___ the first film — the first one still makes people laugh more.",
       "blank": {
         "answer": "not as funny as",
-        "alternates": [],
+        "alternates": [
+          "was"
+        ],
         "position": 29
       },
       "distractors": [
@@ -4168,7 +4180,16 @@
       "sentence": "A: I met one of your neighbours at the market this morning. B: Oh, really? ___ exactly?",
       "blank": {
         "answer": "Who did you meet",
-        "alternates": [],
+        "alternates": [
+          "Not wishing",
+          "So as not",
+          "In order not",
+          "Unwilling",
+          "Reluctant",
+          "Trying not",
+          "Hoping not",
+          "Careful not"
+        ],
         "position": 75
       },
       "distractors": [
@@ -4246,7 +4267,13 @@
       "sentence": "Which option expresses the strongest positive deduction supported by the evidence? The kitchen smells of garlic and I can hear pans clattering, so Dad ___ be cooking dinner.",
       "blank": {
         "answer": "must",
-        "alternates": [],
+        "alternates": [
+          "need not have",
+          "shouldn't have",
+          "should not have",
+          "ought not to have",
+          "oughtn't to have"
+        ],
         "position": 151
       },
       "distractors": [
@@ -4272,7 +4299,17 @@
       "sentence": "Even from the back row, we ___ hear every note at the concert last night.",
       "blank": {
         "answer": "could",
-        "alternates": [],
+        "alternates": [
+          "dare not",
+          "doesn't dare",
+          "does not dare",
+          "doesn't dare to",
+          "does not dare to",
+          "wouldn't dare",
+          "wouldn't dare to",
+          "would not dare",
+          "would not dare to"
+        ],
         "position": 27
       },
       "distractors": [
@@ -4584,7 +4621,15 @@
       "sentence": "When the meeting ends, I ___ you my notes straight away.",
       "blank": {
         "answer": "will send",
-        "alternates": [],
+        "alternates": [
+          "Without",
+          "Were it not for",
+          "Had it not been for",
+          "If it had not been for",
+          "If it hadn't been for",
+          "If not for",
+          "Absent"
+        ],
         "position": 25
       },
       "distractors": [
@@ -4662,7 +4707,17 @@
       "sentence": "The coach made the whole team ____ an extra lap after training.",
       "blank": {
         "answer": "run",
-        "alternates": [],
+        "alternates": [
+          "him releasing",
+          "releasing",
+          "the release of",
+          "her releasing",
+          "their releasing",
+          "them releasing",
+          "its releasing",
+          "my releasing",
+          "our releasing"
+        ],
         "position": 30
       },
       "distractors": [
@@ -5664,9 +5719,7 @@
       "sentence": "Rian spends money as if he ___ a millionaire, but his bank balance tells a very different story.",
       "blank": {
         "answer": "were",
-        "alternates": [
-          "was"
-        ],
+        "alternates": [],
         "position": 27
       },
       "distractors": [
@@ -5692,13 +5745,7 @@
       "sentence": "You ___ printed the whole report — the committee reads everything on screen these days.",
       "blank": {
         "answer": "needn't have",
-        "alternates": [
-          "need not have",
-          "shouldn't have",
-          "should not have",
-          "ought not to have",
-          "oughtn't to have"
-        ],
+        "alternates": [],
         "position": 4
       },
       "distractors": [
@@ -5811,15 +5858,7 @@
       "sentence": "___ the surgeon's quick thinking, the patient would not have survived the night.",
       "blank": {
         "answer": "But for",
-        "alternates": [
-          "Without",
-          "Were it not for",
-          "Had it not been for",
-          "If it had not been for",
-          "If it hadn't been for",
-          "If not for",
-          "Absent"
-        ],
+        "alternates": [],
         "position": 0
       },
       "distractors": [
@@ -5845,17 +5884,7 @@
       "sentence": "She ___ tell her manager the real reason for the delay, so she keeps blaming the traffic instead.",
       "blank": {
         "answer": "daren't",
-        "alternates": [
-          "dare not",
-          "doesn't dare",
-          "does not dare",
-          "doesn't dare to",
-          "does not dare to",
-          "wouldn't dare",
-          "wouldn't dare to",
-          "would not dare",
-          "would not dare to"
-        ],
+        "alternates": [],
         "position": 4
       },
       "distractors": [
@@ -5881,17 +5910,7 @@
       "sentence": "The committee objected to ___ the findings before the external audit was complete.",
       "blank": {
         "answer": "his releasing",
-        "alternates": [
-          "him releasing",
-          "releasing",
-          "the release of",
-          "her releasing",
-          "their releasing",
-          "them releasing",
-          "its releasing",
-          "my releasing",
-          "our releasing"
-        ],
+        "alternates": [],
         "position": 26
       },
       "distractors": [
@@ -5917,12 +5936,7 @@
       "sentence": "___ any further objections from the regulator, the takeover will be completed on Friday; if objections do come in, the deal will slip to March.",
       "blank": {
         "answer": "Barring",
-        "alternates": [
-          "Absent",
-          "Failing",
-          "In the absence of",
-          "Without"
-        ],
+        "alternates": [],
         "position": 0
       },
       "distractors": [
@@ -5974,16 +5988,7 @@
       "sentence": "___ to cause a scene in front of the clients, Maya quietly slipped out of the meeting room.",
       "blank": {
         "answer": "Not wanting",
-        "alternates": [
-          "Not wishing",
-          "So as not",
-          "In order not",
-          "Unwilling",
-          "Reluctant",
-          "Trying not",
-          "Hoping not",
-          "Careful not"
-        ],
+        "alternates": [],
         "position": 0
       },
       "distractors": [
