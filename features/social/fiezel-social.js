@@ -26,6 +26,9 @@
   'use strict';
 
   // ---------------------------------------------------------------- konstanta beku
+  var I18N = root.FiezelI18n;
+  function t(key, fallback, params) { return I18N ? I18N.t(key, params) : fallback; }
+  
   var API_PATHS=Object.freeze({
     config:'/api/config',
     anon:'/api/auth/anon',
@@ -43,23 +46,23 @@
   });
   // Enum stiker sorakan (token mesin dari server; emoji + label urusan sini).
   var STICKERS=Object.freeze([
-    Object.freeze({id:'clap',emoji:'\uD83D\uDC4F',label:'Gaskeun!'}),
-    Object.freeze({id:'fire',emoji:'\uD83D\uDD25',label:'Rata!'}),
-    Object.freeze({id:'gem',emoji:'\uD83D\uDC8E',label:'Kinclong!'}),
-    Object.freeze({id:'target',emoji:'\uD83C\uDFAF',label:'Tepat sasaran!'}),
-    Object.freeze({id:'sunrise',emoji:'\uD83C\uDF05',label:'Pagi amat!'}),
-    Object.freeze({id:'finish',emoji:'\uD83C\uDFC1',label:'Finis!'})
+    Object.freeze({id:'clap',emoji:'\uD83D\uDC4F',label:t('social.sticker-1', 'Gaskeun!')}),
+    Object.freeze({id:'fire',emoji:'\uD83D\uDD25',label:t('social.sticker-2', 'Rata!')}),
+    Object.freeze({id:'gem',emoji:'\uD83D\uDC8E',label:t('social.sticker-3', 'Kinclong!')}),
+    Object.freeze({id:'target',emoji:'\uD83C\uDFAF',label:t('social.sticker-4', 'Tepat sasaran!')}),
+    Object.freeze({id:'sunrise',emoji:'\uD83C\uDF05',label:t('social.sticker-5', 'Pagi amat!')}),
+    Object.freeze({id:'finish',emoji:'\uD83C\uDFC1',label:t('social.sticker-6', 'Finis!')})
   ]);
   // Enum kind evidence yang dikenal server (PB dihitung server, bukan di sini).
   var EVIDENCE_KINDS=Object.freeze(['meaningful_day','daily_target','lesson_mastered','srs_review','exam_passed','book_finished','weekly_mission']);
   var MILESTONE_LABELS=Object.freeze({
-    meaningful_day:'Belajar bermakna',
-    daily_target:'Target harian tercapai',
-    lesson_mastered:'Menguasai lesson baru',
-    srs_review:'Menyelesaikan pengulangan',
-    exam_passed:'Lulus ujian level',
-    book_finished:'Menamatkan buku',
-    weekly_mission:'Menyelesaikan misi mingguan'
+    meaningful_day:t('social.milestone-meaningful-day', 'Belajar bermakna'),
+    daily_target:t('social.milestone-daily-target', 'Target harian tercapai'),
+    lesson_mastered:t('social.milestone-lesson-mastered', 'Menguasai lesson baru'),
+    srs_review:t('social.milestone-srs-review', 'Menyelesaikan pengulangan'),
+    exam_passed:t('social.milestone-exam-passed', 'Lulus ujian level'),
+    book_finished:t('social.milestone-book-finished', 'Menamatkan buku'),
+    weekly_mission:t('social.milestone-weekly-mission', 'Menyelesaikan misi mingguan')
   });
   // Blocklist klien = subset kecil anti-peniruan; daftar penuh milik server.
   var HANDLE_BLOCKLIST=Object.freeze(['fiezel','admin','official','owner','moderator']);
@@ -100,15 +103,15 @@
   }
   // Sisa waktu menuju Senin 00:00 WIB berikutnya (reset liga), dalam ms + label ramah.
   function leagueCountdown(nowMs){
-    var t=Number(nowMs);if(!isFinite(t))t=Date.now();
-    var w=t+WIB_OFFSET_MS;
+    var t_val=Number(nowMs);if(!isFinite(t_val))t_val=Date.now();
+    var w=t_val+WIB_OFFSET_MS;
     var d=new Date(w);
     var dow=(d.getUTCDay()+6)%7;
     var startToday=Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate());
     var nextMonday=startToday+(7-dow)*86400000;
     var ms=Math.max(0,nextMonday-w);
     var days=Math.floor(ms/86400000),hours=Math.floor(ms%86400000/3600000),minutes=Math.floor(ms%3600000/60000);
-    var label=days>0?(days+' hari '+hours+' jam lagi'):hours>0?(hours+' jam '+minutes+' menit lagi'):(Math.max(1,minutes)+' menit lagi');
+    var label=days>0?t('social.countdown-days', days+' hari '+hours+' jam lagi', {days:days, hours:hours}):hours>0?t('social.countdown-hours', hours+' jam '+minutes+' menit lagi', {hours:hours, minutes:minutes}):t('social.countdown-minutes', Math.max(1,minutes)+' menit lagi', {minutes:Math.max(1,minutes)});
     return {ms:ms,days:days,hours:hours,minutes:minutes,label:label};
   }
 
@@ -120,15 +123,15 @@
    */
   function validateHandle(raw){
     var h=String(raw==null?'':raw).trim().toLowerCase();
-    if(!h)return {ok:false,handle:h,reason:'Tulis dulu nama samarannya.'};
-    if(h.length<3)return {ok:false,handle:h,reason:'Kependekan — minimal 3 karakter.'};
-    if(h.length>20)return {ok:false,handle:h,reason:'Kepanjangan — maksimal 20 karakter.'};
-    if(!/^[a-z0-9_]+$/.test(h))return {ok:false,handle:h,reason:'Hanya huruf kecil a-z, angka, dan garis bawah (_).'};
-    if(!/^[a-z]/.test(h))return {ok:false,handle:h,reason:'Mulai dengan huruf, bukan angka atau _.'};
-    if(h.indexOf('__')>=0)return {ok:false,handle:h,reason:'Garis bawah ganda (__) tidak boleh.'};
-    if(/_$/.test(h))return {ok:false,handle:h,reason:'Jangan diakhiri garis bawah.'};
-    if(/[0-9]{6,}/.test(h))return {ok:false,handle:h,reason:'Deret angka panjang mirip nomor HP — demi keamananmu, itu tidak boleh.'};
-    for(var i=0;i<HANDLE_BLOCKLIST.length;i++)if(h.indexOf(HANDLE_BLOCKLIST[i])>=0)return {ok:false,handle:h,reason:'Nama itu terkesan akun resmi — pilih yang lain ya.'};
+    if(!h)return {ok:false,handle:h,reason:t('social.validate-empty', 'Tulis dulu nama samarannya.')};
+    if(h.length<3)return {ok:false,handle:h,reason:t('social.validate-too-short', 'Kependekan — minimal 3 karakter.')};
+    if(h.length>20)return {ok:false,handle:h,reason:t('social.validate-too-long', 'Kepanjangan — maksimal 20 karakter.')};
+    if(!/^[a-z0-9_]+$/.test(h))return {ok:false,handle:h,reason:t('social.validate-chars', 'Hanya huruf kecil a-z, angka, dan garis bawah (_).')};
+    if(!/^[a-z]/.test(h))return {ok:false,handle:h,reason:t('social.validate-start', 'Mulai dengan huruf, bukan angka atau _.')};
+    if(h.indexOf('__')>=0)return {ok:false,handle:h,reason:t('social.validate-double-underscore', 'Garis bawah ganda (__) tidak boleh.')};
+    if(/_$/.test(h))return {ok:false,handle:h,reason:t('social.validate-end-underscore', 'Jangan diakhiri garis bawah.')};
+    if(/[0-9]{6,}/.test(h))return {ok:false,handle:h,reason:t('social.validate-phone-like', 'Deret angka panjang mirip nomor HP — demi keamananmu, itu tidak boleh.')};
+    for(var i=0;i<HANDLE_BLOCKLIST.length;i++)if(h.indexOf(HANDLE_BLOCKLIST[i])>=0)return {ok:false,handle:h,reason:t('social.validate-impersonation', 'Nama itu terkesan akun resmi — pilih yang lain ya.')};
     return {ok:true,handle:h,reason:''};
   }
 
@@ -139,28 +142,28 @@
   }
   /** Kartu teman server → label presence Indonesia. HANYA granularitas hari (spec §3.3). */
   function presenceLabel(friend){
-    if(!friend||friend.visible===false)return 'Progresnya disembunyikan';
-    if(friend.studiedToday===true)return 'Belajar hari ini \u2713';
-    return 'Belum belajar hari ini';
+    if(!friend||friend.visible===false)return t('social.presence-hidden', 'Progresnya disembunyikan');
+    if(friend.studiedToday===true)return t('social.presence-active', 'Belajar hari ini \u2713');
+    return t('social.presence-inactive', 'Belum belajar hari ini');
   }
-  function milestoneLabel(kind){return MILESTONE_LABELS[kind]||'Pencapaian baru'}
+  function milestoneLabel(kind){return MILESTONE_LABELS[kind]||t('social.milestone-default', 'Pencapaian baru')}
 
   // ---------------------------------------------------------------- galat → kalimat ramah
   /** Kode `data.error` server → kalimat Indonesia. retryAfter (detik) opsional untuk 429. */
   function errorCopy(code,retryAfter){
     switch(String(code||'')){
-      case 'social_disabled':return 'Fitur online belum aktif. Semua belajarmu tetap jalan seperti biasa.';
-      case 'profile_required':return 'Buat dulu profil online-mu untuk memakai fitur ini.';
-      case 'profile_exists':return 'Kamu sudah punya profil online.';
-      case 'handle_taken':return 'Nama itu sudah dipakai orang lain — coba variasi lain.';
-      case 'schema_invalid':return 'Isian belum sesuai aturan. Periksa lagi ya.';
-      case 'code_invalid':return 'Kode tidak berlaku. Minta kode baru dari temanmu.';
-      case 'limit_reached':return 'Batas tercapai. Tunggu kode lama kedaluwarsa atau coba lagi nanti.';
-      case 'rate_limited':return retryAfter?('Pelan-pelan dulu ya — coba lagi dalam '+Math.max(1,Math.ceil(Number(retryAfter)/60))+' menit.'):'Pelan-pelan dulu ya — coba lagi sebentar lagi.';
-      case 'unavailable':return 'Server sedang tidak bisa dihubungi. Coba lagi nanti.';
-      case 'offline':return 'Kamu sedang offline. Fitur online menunggu koneksi — belajarmu tetap aman.';
-      case 'unauthorized':return 'Sesi online-mu belum siap. Coba buka lagi halaman ini.';
-      default:return 'Ada yang belum beres di jalur online. Belajarmu tidak terganggu — coba lagi nanti.';
+      case 'social_disabled':return t('social.error-social-disabled', 'Fitur online belum aktif. Semua belajarmu tetap jalan seperti biasa.');
+      case 'profile_required':return t('social.error-profile-required', 'Buat dulu profil online-mu untuk memakai fitur ini.');
+      case 'profile_exists':return t('social.error-profile-exists', 'Kamu sudah punya profil online.');
+      case 'handle_taken':return t('social.error-handle-taken', 'Nama itu sudah dipakai orang lain — coba variasi lain.');
+      case 'schema_invalid':return t('social.error-schema-invalid', 'Isian belum sesuai aturan. Periksa lagi ya.');
+      case 'code_invalid':return t('social.error-code-invalid', 'Kode tidak berlaku. Minta kode baru dari temanmu.');
+      case 'limit_reached':return t('social.error-limit-reached', 'Batas tercapai. Tunggu kode lama kedaluwarsa atau coba lagi nanti.');
+      case 'rate_limited':return retryAfter?t('social.error-rate-limited-with-retry', 'Pelan-pelan dulu ya — coba lagi dalam '+Math.max(1,Math.ceil(Number(retryAfter)/60))+' menit.', {minutes:Math.max(1,Math.ceil(Number(retryAfter)/60))}):t('social.error-rate-limited', 'Pelan-pelan dulu ya — coba lagi sebentar lagi.');
+      case 'unavailable':return t('social.error-unavailable', 'Server sedang tidak bisa dihubungi. Coba lagi nanti.');
+      case 'offline':return t('social.error-offline', 'Kamu sedang offline. Fitur online menunggu koneksi — belajarmu tetap aman.');
+      case 'unauthorized':return t('social.error-unauthorized', 'Sesi online-mu belum siap. Coba buka lagi halaman ini.');
+      default:return t('social.error-default', 'Ada yang belum beres di jalur online. Belajarmu tidak terganggu — coba lagi nanti.');
     }
   }
 

@@ -102,10 +102,11 @@ if (!scoringMatch || !placementLevelSource || !PLACEMENT_SIZE) {
 // 2. Runner hermetis
 // ---------------------------------------------------------------------------
 /** Menjalankan pernyataan skoring apa adanya atas satu nilai akurasi. */
+const scoringFn = new Function('state', 'accuracy', scoringMatch[1] + 'state.placementDone=true;');
 function levelForAccuracy(accuracy) {
-  const sandbox = { state: {}, accuracy };
-  vm.runInNewContext(scoringMatch[1] + 'state.placementDone=true;', sandbox, { timeout: 1000 });
-  return sandbox.state;
+  const state = {};
+  scoringFn(state, accuracy);
+  return state;
 }
 /** placementLevel() dijalankan tanpa `state` global — hanya LEVELS yang dibutuhkannya. */
 const placementLevel = vm.runInNewContext(`${placementLevelSource}\nplacementLevel`, { LEVELS, state: null }, { timeout: 1000 });
@@ -138,9 +139,9 @@ function levelForAnswers(answers) {
   const bandLevel = ladder.level(bands);
   const correct = answers.filter(a => a.ok).length;
   const accuracy = Math.round(correct / Math.max(1, answers.length) * 100);
-  const sandbox = { state: { placementBandLevel: bandLevel }, accuracy };
-  vm.runInNewContext(scoringMatch[1] + 'state.placementDone=true;', sandbox, { timeout: 1000 });
-  return { level: placementLevel({ level: sandbox.state.level }), bands, bandLevel, accuracy, correct };
+  const state = { placementBandLevel: bandLevel };
+  scoringFn(state, accuracy);
+  return { level: placementLevel({ level: state.level }), bands, bandLevel, accuracy, correct };
 }
 /** Satu peserta simulasi: peluang benar ditentukan per band. */
 function simulate(rand, probForBand) {
