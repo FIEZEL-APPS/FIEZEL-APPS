@@ -1,7 +1,7 @@
 {
-  "version": "m025-194",
+  "version": "m025-195",
   "claimedBy": "perplexity-computer (multilingual i18n wave, direbase atas m025-185)",
-  "claimedAt": "2026-08-29T03:38:01.747Z",
-  "reason": "merge m025-194 (GEN-2 249 template + E3/E4/E5) ke jalur feedback: union 69+605 draf Thai-ku dipulihkan, CEFR crab/die/call dipasang lagi",
+  "claimedAt": "2026-08-29T03:55:52.079Z",
+  "reason": "arbiter ulang: hindari tabrakan m025-194 dengan main; jalur feedback naik ke m025-195",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
