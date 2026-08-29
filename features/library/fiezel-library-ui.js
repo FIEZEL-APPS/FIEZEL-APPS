@@ -518,17 +518,18 @@
     var cards = session.books().map(function (b) {
       var progress = session.progressFor(b.id);
       var accent = esc((b.cover && b.cover.accent) || '#8C2233');
+      var metaStr = t('library.book-meta', esc(b.level) + ' · ' + esc(b.minutes) + ' menit · ' + esc(b.sentences) + ' kalimat', {level: esc(b.level), minutes: esc(b.minutes), sentences: esc(b.sentences)});
       return '<button type="button" class="library-card" data-book="' + esc(b.id) + '" style="--book-accent:' + accent + '">' +
         '<span class="library-cover">' + esc((b.cover && b.cover.emoji) || '📖') + '</span>' +
         '<span class="library-meta"><b>' + esc(b.title) + '</b>' +
-        '<small>' + esc(b.level) + ' · ' + esc(b.minutes) + ' menit · ' + esc(b.sentences) + ' kalimat</small>' +
+        '<small>' + metaStr + '</small>' +
         '<em>' + esc(b.about.id) + '</em>' +
-        (b.original ? '' : '<span class="library-badge">Ringkasan FIEZEL</span>') +
+        (b.original ? '' : '<span class="library-badge">' + t('library.fiezel-summary-badge', 'Ringkasan FIEZEL') + '</span>') +
         (progress.percent ? '<span class="library-progress"><span style="width:' + progress.percent + '%"></span></span>' : '') +
         '</span></button>';
     }).join('');
     return '<section class="fade library-page"><div class="section-head"><div>' +
-      '<span class="section-kicker">FIEZEL LIBRARY</span><h1>Perpustakaan</h1>' +
+      '<span class="section-kicker">FIEZEL LIBRARY</span><h1>' + t('library.title', 'Perpustakaan') + '</h1>' +
       t('pustaka.dongeng-dan-novel-pendek') +
       '</div></div><div class="library-grid">' + cards + '</div></section>';
   }
@@ -547,7 +548,7 @@
         (s.index === snap.sentenceIndex ? ' data-active="1"' : '') + '>' + esc(s.en) + '</button>';
     }).join('');
     return '<section class="fade library-page library-reader">' +
-      '<div class="library-reader-head"><button type="button" class="library-back" data-shelf="1">← Rak buku</button>' +
+      '<div class="library-reader-head"><button type="button" class="library-back" data-shelf="1">← ' + t('library.back-to-shelf', 'Rak buku') + '</button>' +
       '<div><span class="section-kicker">' + esc(summary.level || '') + ' · ' + esc(snap.chapterTitle || '') + '</span>' +
       '<h1>' + esc(snap.title || '') + '</h1></div></div>' +
       (summary.original ? '' : '<p class="library-note">' + esc(summary.source) + '</p>') +
@@ -555,13 +556,13 @@
       '<div class="library-dock">' +
       '<div class="library-progress-line"><span id="libraryBar" style="width:' + snap.percent + '%"></span></div>' +
       '<div class="library-dock-line">' +
-      '<button type="button" class="library-speed" id="librarySpeed" aria-label="Kecepatan suara ' + esc(speedLabel(currentRate())) + t('pustaka.tap-for-mengganti-data') + esc(currentRate()) + '">' + esc(speedLabel(currentRate())) + '</button>' +
+      '<button type="button" class="library-speed" id="librarySpeed" aria-label="' + t('library.speed-label', 'Kecepatan suara') + ' ' + esc(speedLabel(currentRate())) + t('pustaka.tap-for-mengganti-data') + esc(currentRate()) + '">' + esc(speedLabel(currentRate())) + '</button>' +
       t('pustaka.tap-kalimat-for-arti') +
       '</div>' +
       '<div class="library-controls">' +
-      '<button type="button" id="libraryPrev" data-step="-1" aria-label="Kalimat sebelumnya"><i data-lucide="chevron-left"></i></button>' +
+      '<button type="button" id="libraryPrev" data-step="-1" aria-label="' + t('library.prev-sentence-aria', 'Kalimat sebelumnya') + '"><i data-lucide="chevron-left"></i></button>' +
       '<button type="button" class="primary" id="libraryPlay"><i data-lucide="play"></i> Audiobook</button>' +
-      '<button type="button" id="libraryNext" data-step="1" aria-label="Kalimat berikutnya"><i data-lucide="chevron-right"></i></button>' +
+      '<button type="button" id="libraryNext" data-step="1" aria-label="' + t('library.next-sentence-aria', 'Kalimat berikutnya') + '"><i data-lucide="chevron-right"></i></button>' +
       '<button type="button" id="libraryAsk"><i data-lucide="message-circle-question"></i> ' + t('ask.judul') + '</button>' +
       '</div></div></section>';
   }
@@ -639,7 +640,7 @@
     var button = doc.getElementById('libraryPlay');
     if (!button) return;
     button.innerHTML = narrating
-      ? '<i data-lucide="pause"></i> Jeda'
+      ? '<i data-lucide="pause"></i> ' + t('library.pause-label', 'Jeda')
       : '<i data-lucide="play"></i> Audiobook';
     icons();
   }
@@ -739,8 +740,8 @@
 
   function togglePlay() {
     closeTranslation();
-    if (narrating) { stopNarration(); setStatus('Dijeda.'); return; }
-    setStatus('Membacakan…');
+    if (narrating) { stopNarration(); setStatus(t('library.status-paused', 'Dijeda.')); return; }
+    setStatus(t('library.status-reading', 'Membacakan…'));
     narrate();
   }
 
@@ -751,7 +752,7 @@
     var picked = snap.selected || session.current();
     return {
       lesson: {
-        topic: snap.title || 'bacaan ini',
+        topic: snap.title || t('library.ask-default-topic', 'bacaan ini'),
         level: 'A2',
         board: { title: snap.title || '', formula: picked ? picked.en : '', examples: picked ? [picked.en] : [] }
       },
@@ -819,7 +820,7 @@
    * engine when it is unreachable, and the reply is spoken, never silently printed.
    */
   function answerQuestion(question) {
-    showAskAnswer('Fiezel sedang menjawab…');
+    showAskAnswer(t('library.ask-thinking', 'Fiezel sedang menjawab…'));
     var dialog = root.FiezelTutorDialog;
     var context = askContext();
     var ai = (typeof root.askFiezelAI === 'function' && dialog)
@@ -856,7 +857,7 @@
   async function library() {
     var node = mount();
     if (!node) return;
-    node.innerHTML = '<section class="fade library-page"><div class="card">Memuat perpustakaan…</div></section>';
+    node.innerHTML = '<section class="fade library-page"><div class="card">' + t('library.loading', 'Memuat perpustakaan…') + '</div></section>';
     try {
       await ensurePack();
       renderShelf();

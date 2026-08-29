@@ -88,7 +88,7 @@ function nilaiThTercakup(thValue, idValue) {
 /* ===================================== 1 · COPY-MAP ====================================== */
 
 // Daftar domain FINAL Wave 2 (W2-INT §1) — pasangan copy-id/copy-th 1:1 per berkas.
-const DOMAINS = ['core', 'app-a', 'app-b', 'app-c', 'app-d', 'feat-a', 'feat-b', 'gems', 'quota', 'settings-locale', 'grammar-labels'];
+const DOMAINS = ['core', 'app-a', 'app-b', 'app-c', 'app-d', 'app-e', 'app-f', 'feat-a', 'feat-b', 'feat-c', 'feat-d', 'gems', 'quota', 'settings-locale', 'grammar-labels'];
 // th-only yang SAH (W2-INT §3): padanan id kedua kunci ini adalah fungsi perakit
 // (chipAria/streakToast) di gems-core.js — mendaftarkannya di copy-id = kalimat id BARU
 // di mata gerbang emas. Selain dua ini, kunci th tanpa pasangan id = lubang kontrak.
