@@ -1,7 +1,7 @@
 {
-  "version": "m025-191",
+  "version": "m025-192",
   "claimedBy": "perplexity-computer (multilingual i18n wave, direbase atas m025-185)",
-  "claimedAt": "2026-08-29T00:30:43.916Z",
-  "reason": "merge main 12c1bbc (sosial SLOT 7 + penutup hijau) ke overhaul + verifikasi 50 agen tuntas",
+  "claimedAt": "2026-08-29T02:29:03.963Z",
+  "reason": "Wave E: konten 223 template (E3+E5+#250), kontrak provenance kelompok subskill, modul retensi post-test, harness riset simulator — sinkron PWA",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
