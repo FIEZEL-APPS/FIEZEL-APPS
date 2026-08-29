@@ -23,8 +23,8 @@ check(
 );
 check(
   'Curriculum inventory matches grammar master',
-  curriculum.lessonCount === grammar.templates.length && curriculum.lessons.length === grammar.templates.length,
-  `curriculum=${curriculum.lessons.length} templates=${grammar.templates.length}`
+  curriculum.lessonCount === templateBySkill.size && curriculum.lessons.length === templateBySkill.size,
+  `curriculum=${curriculum.lessons.length} lessonSubskills=${templateBySkill.size} (templates=${grammar.templates.length}, multi-templat per lesson sejak wave-2)`
 );
 check(
   'Unique lesson identities',
