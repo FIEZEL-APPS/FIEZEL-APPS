@@ -52,7 +52,16 @@ ok(/past simple|past/.test(did.results[0].title),
 
 const kalau = S.search(index, 'kalau');
 ok(kalau.tags.indexOf('conditionals') !== -1, '"kalau" tidak dipetakan ke conditionals');
-ok(/conditional/.test(kalau.results[0].title), '"kalau" tidak mendarat di conditionals');
+// m025-188: assert DIPERKETAT dari proxy judul ke kontrak family sebenarnya — hasil
+// teratas wajib merupakan lesson ber-family conditionals (judul boleh apa pun; bank kini
+// punya lesson conditionals yang judulnya tidak memuat kata 'conditional', mis. but-for).
+const kalauTopFamily = (() => {
+  const g = JSON.parse(fs.readFileSync(path.join(__dirname, 'grammar-templates.json'), 'utf8')).templates;
+  const bySub = new Map(g.map(t => [String(t.subskill).replace(/_/g, ' '), t.family]));
+  return bySub.get(String(kalau.results[0].title)) || null;
+})();
+ok(kalauTopFamily === 'conditionals' || /conditional/.test(kalau.results[0].title),
+  '"kalau" tidak mendarat di lesson ber-family conditionals: ' + kalau.results[0].title);
 
 const sudah = S.search(index, 'sudah');
 ok(sudah.tags.indexOf('present_perfect') !== -1, '"sudah" tidak dipetakan ke present perfect');

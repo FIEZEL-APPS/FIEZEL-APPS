@@ -25,7 +25,7 @@ server.listen(0,'127.0.0.1',async()=>{
     const [index,version,grammar]=await Promise.all([indexResponse.text(),versionResponse.text(),grammarResponse.json()]);
     if(!index.includes('app.js')||!index.includes('version.js'))throw new Error('index.html did not expose required runtime assets');
     if(!version.includes(`self.FIEZEL_VERSION='${expectedVersion}'`))throw new Error(`HTTP runtime version is not ${expectedVersion}`);
-    if(grammar.version!==expectedVersion||grammar.schemaVersion!=='2.0.0'||grammar.practiceBlueprintVersion!=='focused-25-v1'||grammar.templates?.length!==require('./grammar-templates.json').templates.length)throw new Error(`HTTP grammar payload violates the ${expectedVersion} schema contract`);
+    if(grammar.version!==expectedVersion||grammar.schemaVersion!=='2.0.0'||grammar.practiceBlueprintVersion!=='focused-25-v1'||grammar.templates?.length!==grammar.count||grammar.templates.length<153||new Set(grammar.templates.map(t=>t.id)).size!==grammar.templates.length)throw new Error(`HTTP grammar payload violates the ${expectedVersion} schema contract (m025-188: length==declared count, floor 153, unique ids)`);
     console.log('FIEZEL HTTP smoke test: PASS');
     console.log(JSON.stringify({status:'PASS',httpAssets:3,version:grammar.version,grammarLessons:grammar.templates.length,blueprint:grammar.practiceBlueprintVersion}));
   }catch(error){console.error(`FIEZEL HTTP smoke test: FAIL\n${error.stack}`);process.exitCode=1}

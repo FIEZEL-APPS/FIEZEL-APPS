@@ -288,7 +288,10 @@ if (setterBlocks.length) {
       save: () => { saves++; },
       closeModal: () => {},
       render: () => {},
-      showToast: () => {}
+      showToast: () => {},
+      // Hotfix i18n pasca-#242 (pola bac8b8d): setter kini memanggil FiezelI18n.t untuk
+      // naskah toast — stub resolver cukup, fixture menguji transisi level, bukan copy.
+      FiezelI18n: { t: (k, v) => String(k) }
     };
     /* Harness i18n (pola bac8b8d): setter hasil ekstraksi kini memanggil FiezelI18n.t
        (naskah toast pindah ke copy-map pasca-#242), jadi runtime i18n + copy-id dimuat ke

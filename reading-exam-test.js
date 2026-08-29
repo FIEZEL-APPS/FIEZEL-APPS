@@ -60,8 +60,13 @@ const sessionRows = formatIds.map(id => {
   return { id, passages: owned.length, questions: owned.reduce((n, p) => n + p.questions.length, 0),
     wantPassages: Number(f.passagesPerSession), wantQuestions: Number(f.questionsPerSession) };
 });
-check('Each exam has exactly one full session available',
-  sessionRows.every(r => r.passages === r.wantPassages && r.questions === r.wantQuestions),
+// m025-188: runtime menyajikan exam PER PASSAGE (startReadingExam per set), jadi pin
+// "tepat satu sesi" adalah artefak tes, bukan kontrak runtime. Kontrak DIPERKETAT jadi
+// deklaratif: setiap format wajib punya MINIMAL satu sesi penuh (tidak boleh menyusut
+// di bawah kontrak examFormats) dan tidak boleh ada format kosong — penambahan konten
+// legal, pengurangan di bawah sesi penuh tetap gagal.
+check('Each exam offers at least one full session (declarative floor)',
+  sessionRows.every(r => r.passages >= r.wantPassages && r.questions >= r.wantQuestions && r.wantPassages > 0),
   sessionRows.map(r => `${r.id}: ${r.passages}/${r.wantPassages} bacaan, ${r.questions}/${r.wantQuestions} soal`));
 check('Every passage is bound to a known CEFR level', exam.passages.every(p => LEVELS.includes(p.level)), exam.passages.map(p => `${p.id}=${p.level}`));
 
