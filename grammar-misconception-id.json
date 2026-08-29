@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "note": "Diagnosis Indonesia untuk tiap nama miskonsepsi di grammar-templates.json. Kunci = nama miskonsepsi apa adanya dari bank soal (bahasa Inggris, tidak pernah ditampilkan ke murid). Nilai = klausa Indonesia berhuruf kecil di awal, dirangkai sebagai `\"pilihan\" <klausa>` di panel jawaban dan sebagai `Ini yang bikin pilihan tadi gagal - <klausa>` oleh tutor.",
-  "count": 571,
+  "count": 570,
   "diagnoses": {
     "adds a dummy cleft subject and creates two competing subjects": "nambah 'it', padahal klausa 'what'-nya udah jadi subjek, akibatnya subjeknya dobel.",
     "adds emphatic do but does not invert it with the subject": "udah pakai kata bantu penegas, tapi posisinya masih sesudah subjek, jadi inversinya belum terjadi.",
@@ -414,7 +414,6 @@
     "stand-alone-possessive-before-noun": "pakai bentuk milik yang berdiri sendiri tepat sebelum kata benda.",
     "object-pronoun-substitution": "pakai kata ganti objek di posisi yang butuh penanda kepemilikan.",
     "movement preposition used for a static location": "pakai kata depan gerak buat posisi yang diam.",
-    "treats a route point as a surface in the first slot": "memperlakukan titik di rute sebagai permukaan, jadi celah pertamanya udah keliru.",
     "keeps the action in progress at 'now' instead of marking it completed before the past reference point": "kejadiannya dibiarin masih jalan di 'sekarang', padahal harusnya udah kelar sebelum titik acuan lampaunya.",
     "applies a perfect to-infinitive after 'remember', which English does not use for recalling a past action": "bentuk to sempurna dipasang sesudah 'remember', padahal buat ingatan lampau pola itu nggak dipakai.",
     "reduces the sentence to a fragment: an -ing form with no finite verb to carry the tense": "kalimatnya cuma disisain bentuk -ing tanpa kata kerja utama, jadi nggak ada yang megang waktunya.",
