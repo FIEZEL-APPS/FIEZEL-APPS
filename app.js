@@ -6550,8 +6550,28 @@ function AudioService(){
    if(!text)return Promise.resolve(null);
    this.stop();
    const say=self.FiezelVoiceSay?.say;
+   /* m025-198 (laporan OWNER: FATAL). FiezelVoiceSay.say() memanggil prepareSubtitle() -
+    * terjemahan bahasa murid muncul di layar sambil rekaman berbunyi - kecuali diberi
+    * `suppressSubtitles`. m025-148 sudah memasang tombol itu dan memakainya di Skills Lab,
+    * tetapi DUA mata rantai di jalur kuis tetap menjatuhkannya:
+    *   1. pintu ini hanya meneruskan speed/contentType/locale, jadi `suppressSubtitles` dari
+    *      pemanggil mana pun HILANG di sini - tombolnya tidak pernah sampai;
+    *   2. soal listening tes penempatan memang tidak pernah mengirimnya.
+    * Akibatnya murid MEMBACA terjemahan naskah sambil "mendengarkan". Soal listening berubah
+    * jadi soal membaca, dan seluruh band listening tes penempatan kehilangan validitasnya.
+    *
+    * Diperbaiki di DUA lapis dengan sengaja. Meneruskan bendera saja hanya menambal satu
+    * pemanggil; MENURUNKANNYA dari contentType menutup KELASNYA - setiap pemutaran listening
+    * lewat pintu ini bisu subtitle, sekarang dan untuk pemanggil yang ditulis nanti, walau
+    * penulisnya tidak tahu benderanya ada. Bendera eksplisit tetap dihormati untuk permukaan
+    * lain yang perlu membisukan subtitle tanpa memakai contentType 'listening'.
+    *
+    * Ini menutup terjemahan APA PUN, bukan hanya Indonesia: prepareSubtitle memanggil
+    * FiezelSubtitleTranslate yang mengikuti locale murid, jadi jalur Thai mati di titik yang
+    * sama persis. */
+   const noSubtitles=options.suppressSubtitles===true||options.contentType==='listening';
    const viaDoor=typeof say==='function'
-    ?Promise.resolve().then(()=>say.call(self.FiezelVoiceSay,text,{speed:options.speed??selectedNeuralRate(),contentType:options.contentType,locale:options.locale})).catch(()=>false)
+    ?Promise.resolve().then(()=>say.call(self.FiezelVoiceSay,text,{speed:options.speed??selectedNeuralRate(),contentType:options.contentType,locale:options.locale,suppressSubtitles:noSubtitles})).catch(()=>false)
     :Promise.resolve(false);
    // V6: `options.next` dihangatkan SESUDAH pemutaran diajukan - urutan ini yang menjaga
    // mesin single-flight tetap milik kalimat yang sedang didengar (inversi antrean m025-47).
@@ -7509,7 +7529,7 @@ function quizLoop(cfg){
     // tebakan yang murah. Diajukan sesudah audio soal sekarang berangkat, bukan di draw(),
     // supaya tidak pernah bersaing dengan rekaman yang sedang ditunggu murid.
     const nextListening=remaining.find(x=>x&&x.type==='listening'&&x.script&&x.script!==q.script);
-    try{const played=await audio.play(q.script,{contentType:'listening',next:nextListening?nextListening.script:''});
+    try{const played=await audio.play(q.script,{contentType:'listening',suppressSubtitles:true,next:nextListening?nextListening.script:''});
      // Fase 2 (B3 butir 6): replay dihitung hanya untuk pemutaran yang BERBUNYI - putaran
      // pertama bukan replay, dan pemutaran gagal bukan bukti apa pun. Nilainya dibaca
      // evidenceKappa (diskon jawaban benar berbekal banyak replay) dan riwayat listening.
