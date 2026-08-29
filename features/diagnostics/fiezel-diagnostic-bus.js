@@ -16,6 +16,15 @@
 }(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
 
+  // i18n (AI-02 F01): naskah murid modul ini pindah ke features/i18n/copy-id-feat-a.js.
+  // Di browser, fiezel-i18n.js + copy-map dimuat lebih dulu lewat urutan <script defer>
+  // di index.html (AI-01 F02), jadi FiezelI18n dipakai langsung tanpa guard. Di Node
+  // (tes print-only me-require modul ini), copy-map dimuat lewat require supaya nilai
+  // 'id' tetap SATU sumber yang byte-identik dengan naskah beku gerbang emas.
+  var I18N = (typeof FiezelI18n !== 'undefined') ? FiezelI18n
+    : ((typeof module === 'object' && module.exports) ? require('../i18n/copy-id-feat-a.js') : null);
+  function t(key, params) { return I18N.t(key, params); }
+
   var MODULES = ['core', 'vocabulary', 'reading', 'grammar', 'leveltest', 'listening', 'speaking',
     'chat', 'neuralVoice', 'classroom', 'adaptive',
     // m025-41: the scan covers the layers that actually broke in production -
@@ -111,7 +120,7 @@
 
   async function runSelfTest(moduleId) {
     var fn = selfTests[moduleId];
-    if (!fn) return { module: moduleId, status: 'skip', findings: [finding('NO_SELFTEST', 'warning', 'Modul belum punya self-test.', null)] };
+    if (!fn) return { module: moduleId, status: 'skip', findings: [finding('NO_SELFTEST', 'warning', t('diag.no-selftest'), null)] };
     try {
       var raw = await fn();
       var findings = (raw && Array.isArray(raw.findings)) ? raw.findings : [];
@@ -120,7 +129,7 @@
       // The whole point of the orchestrator: a module that throws is a finding.
       var message = String((error && error.message) || error);
       reportError(moduleId, 'error', 'SELFTEST_THREW', message, { stack: error && error.stack });
-      return { module: moduleId, status: 'fail', findings: [finding('SELFTEST_THREW', 'error', 'Self-test gagal dijalankan: ' + message, null)] };
+      return { module: moduleId, status: 'fail', findings: [finding('SELFTEST_THREW', 'error', t('diag.selftest-threw', { error: message }), null)] };
     }
   }
 

@@ -20,6 +20,14 @@ export const ANALYTICS_TABLES = Object.freeze([
 export const PERMANENT_TABLES = Object.freeze(['metrics_daily', 'usage_daily', 'retention_daily']);
 
 /** Tabel yang WAJIB dihapus berkala oleh rollup harian. */
-export const EPHEMERAL_TABLES = Object.freeze(['dau_dedup']);
+export const EPHEMERAL_TABLES = Object.freeze(['dau_dedup', 'batch_dedup']);
 
-export default { ANALYTICS_TABLES, PERMANENT_TABLES, EPHEMERAL_TABLES };
+/**
+ * Tabel dedup idempotensi (migrasi 0003, DI LUAR ANALYTICS_TABLES karena
+ * daftar itu memotret migrasi 0002 dan dipindai gerbang privasi apa adanya).
+ * `batch_dedup` berisi UUID acak per-batch — bukan identitas — dan barisnya
+ * dihapus rollup setelah jendela retry 48 jam (RETENTION_DAYS.BATCH_DEDUP).
+ */
+export const DEDUP_TABLES = Object.freeze(['batch_dedup']);
+
+export default { ANALYTICS_TABLES, PERMANENT_TABLES, EPHEMERAL_TABLES, DEDUP_TABLES };

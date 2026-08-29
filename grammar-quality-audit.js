@@ -27,7 +27,7 @@ check('Grammar data version',grammar.version===expectedVersion&&grammar.schemaVe
 const lessonCount=grammar.templates.length;
 check('Grammar lesson inventory',grammar.count===lessonCount,`declared=${grammar.count} actual=${lessonCount}`);
 const ids=grammar.templates.map(x=>x.id),skills=grammar.templates.map(x=>x.subskill);
-check('Unique lesson identities',new Set(ids).size===lessonCount&&new Set(skills).size===lessonCount,`ids=${new Set(ids).size} subskills=${new Set(skills).size}`);
+check('Unique lesson identities (V18: multi-template per lesson)',new Set(ids).size===lessonCount,`ids=${new Set(ids).size} templates=${lessonCount} lessons=${new Set(skills).size}`);
 
 const malformed=[],generic=[],badDistractors=[],badOptions=[],badCefr=[],unconstrainedAmbiguity=[];
 const bannedGeneric=/Each distractor conflicts|Check the subject, time reference|Match form to function and context|identify grammatical cue\s*->\s*select form/i;
@@ -52,13 +52,13 @@ const normalizedStems=grammar.templates.map(x=>norm(x.stem)),normalizedObjective
 check('Unique authored stems',new Set(normalizedStems).size===normalizedStems.length,`unique=${new Set(normalizedStems).size}/${normalizedStems.length}`);
 check('Unique pedagogical objectives',new Set(normalizedObjectives).size===normalizedObjectives.length,`unique=${new Set(normalizedObjectives).size}/${normalizedObjectives.length}`);
 
-const collisionFamilies={
-  zero_vs_first:skills.filter(x=>/zero.*first|first.*zero/.test(x)),
-  one_time_past_ability:skills.filter(x=>/ability_past_could_vs_was_able_to|ability_general_vs_specific_achievement/.test(x)),
-  reported_time_shift:skills.filter(x=>/time_and_place_reference_shift|reporting_time_expression_shift/.test(x)),
-  it_cleft:skills.filter(x=>/^cleft_sentences_it_|^cleft_emphasis$/.test(x)),
-  negative_adverbial_inversion:skills.filter(x=>/negative_adverbial_inversion|inversion_after_negative/.test(x)),
-  basic_past_modal_deduction:skills.filter(x=>/deduction_past_must_have_vs_cant_have|^advanced_modal_deduction$/.test(x))
+const uniqueSkillsV18=[...new Set(skills)];const collisionFamilies={
+  zero_vs_first:uniqueSkillsV18.filter(x=>/zero.*first|first.*zero/.test(x)),
+  one_time_past_ability:uniqueSkillsV18.filter(x=>/ability_past_could_vs_was_able_to|ability_general_vs_specific_achievement/.test(x)),
+  reported_time_shift:uniqueSkillsV18.filter(x=>/time_and_place_reference_shift|reporting_time_expression_shift/.test(x)),
+  it_cleft:uniqueSkillsV18.filter(x=>/^cleft_sentences_it_|^cleft_emphasis$/.test(x)),
+  negative_adverbial_inversion:uniqueSkillsV18.filter(x=>/negative_adverbial_inversion|inversion_after_negative/.test(x)),
+  basic_past_modal_deduction:uniqueSkillsV18.filter(x=>/deduction_past_must_have_vs_cant_have|^advanced_modal_deduction$/.test(x))
 };
 const collisions=Object.entries(collisionFamilies).filter(([,matches])=>matches.length>1);
 check('Known pedagogical collision regressions absent',collisions.length===0,collisions.length?collisions:Object.fromEntries(Object.entries(collisionFamilies).map(([key,value])=>[key,value.length])));
@@ -72,6 +72,7 @@ for(let i=0;i<grammar.templates.length;i++){
     const b=grammar.templates[j],bt=tokens(`${b.subskill} ${b.pedagogicalObjective} ${b.reasoningOperation}`),bs=tokens(b.subskill);
     const jac=(x,y)=>{const union=new Set([...x,...y]);return union.size?[...x].filter(v=>y.has(v)).length/union.size:0};
     const score=.62*jac(at,bt)+.38*jac(as,bs);
+    if(a.subskill===b.subskill)continue; // V18: dua templat satu lesson memang seobjektif
     if(score>=.60)semanticPairs.push({a:a.id,b:b.id,score:Number(score.toFixed(3))});
   }
 }
@@ -89,7 +90,7 @@ seededMath.random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed
 class FakeAudioContext{constructor(){this.currentTime=0;this.state='running';this.destination={}}createGain(){return{gain:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){}},connect(){}}}createOscillator(){return{type:'sine',frequency:{value:0,setValueAtTime(){}},connect(){},start(){},stop(){}}}resume(){this.state='running'}suspend(){this.state='suspended'}close(){this.state='closed'}}
 const context={console,Notification,document,localStorage,fetch,window:null,self:null,navigator:{vibrate(){return true}},Date,Intl,Math:seededMath,URL,Error,Promise,setTimeout,clearTimeout,setInterval:()=>({unref(){}}),clearInterval(){},SpeechSynthesisUtterance:function(){},speechSynthesis:{cancel(){},speak(){}},AudioContext:FakeAudioContext};
 context.window=context;context.self=context;context.FIEZEL_VERSION='5.19.0';context.window.scrollTo=()=>{};context.window.requestAnimationFrame=fn=>fn();
-vm.createContext(context);vm.runInContext(app,context,{filename:'app.js'});
+vm.createContext(context);const __i18nRt=path.join(root,'features','i18n','fiezel-i18n.js');/* Harness i18n hotfix CI pasca-#242 */if(fs.existsSync(__i18nRt)){vm.runInContext(fs.readFileSync(__i18nRt,'utf8'),context,{filename:'fiezel-i18n.js'});for(const __n of fs.readdirSync(path.join(root,'features','i18n')).filter(n=>/^copy-id-.*\.js$/.test(n)).sort()){vm.runInContext(fs.readFileSync(path.join(root,'features','i18n',__n),'utf8'),context,{filename:__n});}}vm.runInContext(app,context,{filename:'app.js'});
 
 setTimeout(()=>{
   try{
@@ -109,6 +110,7 @@ setTimeout(()=>{
     const bannedJargonA=/(miskonsepsi|distraktor|polaritas|takrif|kuantifier|pemunduran)/i;
     const stripQuoted=s=>String(s||'').replace(/“[^”]*”/g,'').replace(/'[^']*'/g,'');
     const templateById=new Map(grammar.templates.map(t=>[t.id,t]));
+    const lessonTemplateIdsV18=new Map();for(const t of grammar.templates){if(!lessonTemplateIdsV18.has(t.subskill))lessonTemplateIdsV18.set(t.subskill,new Set());lessonTemplateIdsV18.get(t.subskill).add(String(t.id));}
     const validOrigins=new Set(['own','peer','taxonomy','fallback']);
     // m025-155: kalimat fallback heuristik bentuk kata kerja - tidak boleh muncul sebagai
     // alasan untuk label keluarga grammar (v21).
@@ -140,7 +142,7 @@ setTimeout(()=>{
       for(const q of questions){
         modeCounts[q.practiceMode]=(modeCounts[q.practiceMode]||0)+1;
         if(!context.__fiezelAudit.validateQuestion(q).ok)invalidRuntime.push(q.id);
-        if(q.skill!==template.subskill||q.lessonSkill!==template.subskill||q.sourceId!==template.id||q.conceptId!==template.id)focusLeak.push({lesson:template.subskill,question:q.id,source:q.sourceId});
+        {const sib=lessonTemplateIdsV18.get(template.subskill)||new Set([template.id]);if(q.skill!==template.subskill||q.lessonSkill!==template.subskill||!sib.has(String(q.sourceId))||!sib.has(String(q.conceptId)))focusLeak.push({lesson:template.subskill,question:q.id,source:q.sourceId});}
         // m025-155: validasi kontrak provenance tiap entry optionSources (sejajar indeks opsi).
         // own -> sourceId===id template lesson; peer -> sourceId non-kosong milik template lain
         // yang benar-benar ada dan sourceLevel===cefr template asal; taxonomy/fallback ->
@@ -153,7 +155,8 @@ setTimeout(()=>{
           if(!validOrigins.has(entry.origin))return flag('origin_tidak_valid');
           if(entry.own===true&&entry.origin!=='own')flag('own_true_hanya_boleh_untuk_origin_own');
           if(entry.origin==='own'){
-            if(entry.sourceId!==template.id)flag('own_sourceId_bukan_id_template_lesson');
+            const sibV18=lessonTemplateIdsV18.get(template.subskill)||new Set([template.id]);
+            if(!sibV18.has(String(entry.sourceId)))flag('own_sourceId_bukan_id_template_lesson');
           }else if(entry.origin==='peer'){
             const peer=templateById.get(String(entry.sourceId||''));
             if(!entry.sourceId||entry.sourceId===template.id)flag('peer_sourceId_kosong_atau_menunjuk_lesson_sendiri');

@@ -36,12 +36,47 @@
   var HOST_ID = 'fiezelSubtitle';
 
   /**
+   * Locale murid untuk PEMECAHAN TEKS subtitle, dibaca dari atribut <html lang> yang
+   * diset app.js (m025-182 W2-STATE). SENGAJA bukan dari modul i18n: berkas ini tinggal
+   * di zona audio, dan gerbang audio-locale-guard melarang zona ini menyentuh plumbing
+   * locale UI supaya tidak ada jalur yang bisa membocorkannya ke opsi audio (AI-17 F02 —
+   * kunci cache korpus berbayar memuat locale). Nilai ini HANYA dipakai memilih aturan
+   * segmentasi teks; ia tidak pernah menyentuh kunci audio mana pun.
+   */
+  function docLocale() {
+    try {
+      var raw = root.document && root.document.documentElement && root.document.documentElement.lang;
+      return /^th(-|$)/i.test(String(raw || '')) ? 'th' : 'id';
+    } catch (_) { return 'id'; }
+  }
+
+  /**
    * Memecah teks jadi kalimat. Memakai FiezelProsody bila ada; kalau tidak, satu
    * pemecah minimal supaya subtitle tetap muncul di lingkungan tanpa modul itu.
+   *
+   * AI-17 F08 (audit v2): prosa Thai tidak memakai terminator [.!?…] dan tidak memberi
+   * spasi antar-kata, jadi jalur lama mengembalikan SATU isyarat raksasa yang membeku
+   * sepanjang audio. Untuk lang th dipakai Intl.Segmenter granularitas kalimat (dengan
+   * feature-detect — tidak semua mesin punya); kalau absen atau gagal, jatuh kembali ke
+   * pemecah lama: satu baris beku tetap lebih baik daripada subtitle mati. Jalur id
+   * TIDAK disentuh sama sekali — keluaran untuk murid Indonesia byte-identik.
    */
   function sentencesOf(text, lang) {
     var value = String(text == null ? '' : text).replace(/\s+/g, ' ').trim();
     if (!value) return [];
+    if (/^th(-|$)/i.test(String(lang || '')) &&
+        typeof Intl !== 'undefined' && typeof Intl.Segmenter === 'function') {
+      try {
+        var segmenter = new Intl.Segmenter('th', { granularity: 'sentence' });
+        var pieces = [];
+        var iterator = segmenter.segment(value)[Symbol.iterator]();
+        for (var step = iterator.next(); !step.done; step = iterator.next()) {
+          var piece = String(step.value && step.value.segment || '').trim();
+          if (piece) pieces.push(piece);
+        }
+        if (pieces.length) return pieces;
+      } catch (_) { /* Segmenter cacat → jalur lama di bawah */ }
+    }
     var P = root.FiezelProsody;
     if (P && typeof P.phrases === 'function') {
       try {
@@ -136,12 +171,14 @@
 
     return {
       /**
-       * @param {string} indonesianText terjemahan Indonesia dari yang sedang diucapkan
+       * @param {string} subtitleText terjemahan bahasa-ibu dari yang sedang diucapkan
+       * @param {string} [lang] tag bahasa teks subtitle; bila kosong dibaca dari <html lang>
+       *   (fallback id) — additive, pemanggil lama tanpa argumen kedua tetap benar.
        */
-      begin: function (indonesianText) {
+      begin: function (subtitleText, lang) {
         cues = [];
         shownIndex = -1;
-        var lines = sentencesOf(indonesianText, 'id');
+        var lines = sentencesOf(subtitleText, lang || docLocale());
         if (!lines.length) { clear(); return 0; }
         // Durasi belum diketahui sampai audio termuat; cuesFor menangani itu, dan
         // isyaratnya dihitung ulang begitu durasi yang sebenarnya datang.

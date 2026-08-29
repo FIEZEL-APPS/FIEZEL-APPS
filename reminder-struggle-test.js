@@ -86,15 +86,33 @@ const test = (name, fn) => { fn(); pass++; console.log('PASS', name); };
   });
 
   test('struggle messages exist and speak like a teacher, not a scold', () => {
-    assert.ok(/struggling:\[/.test(app), 'title pool exists');
+    // AI-20 F06 (W1-TESTPLAN 2a): pool naskah pengingat boleh PINDAH byte-identik dari app.js
+    // ke copy-map features/i18n/copy-id-*.js (id-golden-snapshot-test.js menjaga byte-nya),
+    // jadi korpus pencarian adalah UNION app.js + copy-id — glob kosong = perilaku lama.
+    const i18nDir = 'features/i18n';
+    const copyIdUnion = fs.existsSync(i18nDir)
+      ? fs.readdirSync(i18nDir).filter(f => /^copy-id-.*\.js$/.test(f)).sort()
+          .map(f => fs.readFileSync(i18nDir + '/' + f, 'utf8')).join('\n')
+      : '';
+    const corpus = app + '\n' + copyIdUnion;
+    assert.ok(/struggling:\[/.test(corpus), 'title pool exists');
     // Two pools share the key: a one-line title pool and a multi-line body pool. The
     // body is the one that opens on its own line.
     // Normalise line endings first: this repo checks out CRLF on Windows and LF in CI,
     // so anchoring on a raw newline would pass in one place and fail in the other.
-    const flat = app.split('\r\n').join('\n');
+    const flat = corpus.split('\r\n').join('\n');
     const bodyStart = flat.indexOf('  struggling:[\n');
     assert.ok(bodyStart > -1, 'multi-line body pool exists');
-    const body = flat.slice(bodyStart, flat.indexOf('  starter:[\n'));
+    let body = flat.slice(bodyStart, flat.indexOf('  starter:[\n'));
+    /* Pasca-#242 (pola resolver bac8b8d/level-guard): isi pool kini FiezelI18n.t('kunci') —
+       ganti tiap referensi dengan nilai id VERBATIM dari copy-id supaya asersi di bawah
+       tetap menguji teks yang benar-benar dilihat murid. */
+    {
+      const map = {};
+      const reKV = /'((?:[^'\\]|\\.)+)'\s*:\s*'((?:[^'\\]|\\.)*)'/g;
+      let mkv; while ((mkv = reKV.exec(copyIdUnion))) map[mkv[1]] = mkv[2];
+      body = body.replace(/FiezelI18n\.t\('((?:[^'\\]|\\.)+)'\)/g, (w, k) => Object.prototype.hasOwnProperty.call(map, k) ? "'" + map[k] + "'" : w);
+    }
     assert.ok(body.split("',").length >= 3, 'several rotating messages');
     // Frame the miss as the material not sticking yet, and point back to the topic.
     // The core-brain validator also rejects shaming vocabulary outright.

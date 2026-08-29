@@ -15,7 +15,19 @@ for(let i=0;i<5;i++)hist.push({id:'today'+i,type:'grammar',skill:'present_simple
 // the report checks error-pattern aggregation independently from review lookup.
 const seeded={version:runtimeVersion,userName:'Jahran',view:'progress',level:3,placementDone:false,totalAnswered:hist.length,totalCorrect:hist.filter(x=>x.ok).length,totalTimeMs:200000,history:hist,wrongAnswers:hist.filter(x=>!x.ok),vocab:{vocab_00003:{total:4,correct:2,mastery:50,nextReview:now-day,stability:1,lastSeen:now-3*day,lapses:1}},grammar:{present_simple_basics:{total:8,correct:4,mastery:50,nextReview:now-day,stability:2,lastSeen:now-4*day,lapses:2}},reading:{reading_00001:{total:4,correct:1,mastery:25,nextReview:now-day,stability:1,lastSeen:now-5*day,lapses:2}},daily:{date:'',count:0,attempts:0,meaningful:false},streak:0,adaptiveReady:false,confidenceHistory:hist.map(h=>({confidence:h.confidence,ok:h.ok,at:h.at,skill:h.skill,type:h.type,errorTag:h.errorTag})),learningDays:[],sessionHistory:[]};
 localStorage.setItem('fiezel-v4-state',JSON.stringify(seeded));
-const code=fs.readFileSync(path.join(root,'app.js'),'utf8');vm.runInNewContext(code,context,{filename:'app.js'});
+const code=fs.readFileSync(path.join(root,'app.js'),'utf8');
+vm.createContext(context);
+// AI-20 F06 (W1-TESTPLAN 2b): harness i18n KONDISIONAL — meniru urutan <script> index.html
+// (fiezel-i18n.js lalu copy-id-*.js SEBELUM app.js). Begitu naskah home/map pindah ke copy-map,
+// app.js memanggil FiezelI18n.t() saat render; tanpa preload ini vm meledak. existsSync
+// menjaga hijau dua arah. Asersi teks id di bawah TETAP byte-identik (id-golden-snapshot).
+const i18nDir=path.join(root,'features','i18n');
+if(fs.existsSync(path.join(i18nDir,'fiezel-i18n.js'))){
+  vm.runInContext(fs.readFileSync(path.join(i18nDir,'fiezel-i18n.js'),'utf8'),context,{filename:'fiezel-i18n.js'});
+  for(const f of fs.readdirSync(i18nDir).filter(n=>/^copy-id-.*\.js$/.test(n)).sort())
+    vm.runInContext(fs.readFileSync(path.join(i18nDir,f),'utf8'),context,{filename:f});
+}
+vm.runInContext(code,context,{filename:'app.js'});
 setTimeout(()=>{
   // m025-85: Peta Belajar is now tabbed (Ringkasan/Analisis/Adaptive Engine/Kesiapan
   // & Skills) instead of one long scroll, so the sections this test checks are spread
