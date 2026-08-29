@@ -80,7 +80,7 @@
           "option": "has traveled",
           "misconception": "present-perfect-for-any-past-event",
           "whyFails": "The specific year '2019' anchors the action to a finished point in the past, which blocks present perfect in standard usage.",
-          "whyFailsId": "tahun “2019” maku kejadiannya di titik lampau yang udah kelar.",
+          "whyFailsId": "bentuk present perfect “has + V3” bentrok sama tanggal pasti kayak “in 2019”, jadi pilihan itu gugur.",
           "misconceptionId": "present perfect dipakai buat sembarang kejadian lampau."
         },
         {
@@ -374,7 +374,7 @@
           "option": "will win",
           "misconception": "real/likely framing applied to an admittedly unlikely event",
           "whyFails": "The speaker explicitly signals this is not going to happen, which calls for the unreal second conditional, not 'will'.",
-          "whyFailsId": "pembicaranya sendiri bilang hal itu nggak akan kejadian.",
+          "whyFailsId": "“will win” ngesankan menangnya masih beneran mungkin, padahal pembicaranya udah nutup kemungkinan itu.",
           "misconceptionId": "kejadian yang diakui mustahil diperlakukan kayak kemungkinan nyata."
         }
       ],
@@ -472,7 +472,7 @@
           "option": "is",
           "misconception": "no backshift applied",
           "whyFails": "Since the reporting verb 'said' is past, the reported present tense must shift back to past.",
-          "whyFailsId": "laporannya netral dan keadaannya udah lewat, jadi bentuk presentnya mundur.",
+          "whyFailsId": "“is” ngotot tetap di bentuk sekarang, padahal capeknya diceritain dari kemarin yang udah lewat.",
           "misconceptionId": "pergeseran bentuk waktunya nggak dilakuin sama sekali."
         },
         {
@@ -528,7 +528,7 @@
           "option": "A",
           "misconception": "indefinite article reused for an already-identified noun",
           "whyFails": "'A' introduces the dog as if it were brand-new information, even though the first sentence already made it identifiable.",
-          "whyFailsId": "anjingnya udah disebut, jadi bukan info baru lagi.",
+          "whyFailsId": "“A” ngenalin anjingnya seolah baru pertama muncul, padahal kalimat pertama udah nyebutnya.",
           "misconceptionId": "kata buat penyebutan pertama diulang di benda yang udah dikenal."
         },
         {
@@ -647,7 +647,7 @@
           "option": "buy",
           "misconception": "bare infinitive used instead of the required to-infinitive",
           "whyFails": "The purpose sense of 'stop' requires a to-infinitive, not a bare form.",
-          "whyFailsId": "makna tujuan di “stop” minta bentuk pakai to, bukan bentuk dasar.",
+          "whyFailsId": "“buy” polosan nggak bisa langsung nempel di belakang “stopped”; mampirnya butuh penanda tujuan.",
           "misconceptionId": "bentuk dasar dipakai padahal yang diminta bentuk to."
         },
         {
@@ -752,7 +752,7 @@
           "option": "the most scenic",
           "misconception": "superlative used for a two-item comparison",
           "whyFails": "Superlatives compare three or more items; here only two routes are being compared.",
-          "whyFailsId": "bentuk “paling” nunjuk juara kelompok, di sini cuma dua jalur.",
+          "whyFailsId": "“the most scenic” pakai bentuk “paling”, padahal bentuk itu buat juara dari tiga hal atau lebih.",
           "misconceptionId": "bentuk “paling” dipakai buat perbandingan dua hal."
         },
         {
@@ -808,21 +808,21 @@
           "option": "haven't you",
           "misconception": "tag polarity copied instead of reversed",
           "whyFails": "The main clause is already negative, so the tag must be positive, not also negative.",
-          "whyFailsId": "di kalimat ini induknya udah negatif, jadi ekor negatif lagi nggak pas.",
+          "whyFailsId": "“haven’t you” ngekor negatif lagi, padahal induknya udah negatif duluan.",
           "misconceptionId": "positif-negatif ekornya disalin, bukan dibalik."
         },
         {
           "option": "did you",
           "misconception": "wrong auxiliary borrowed from a different tense",
           "whyFails": "The main clause uses present perfect ('haven't'), so the tag must use 'have', not 'did'.",
-          "whyFailsId": "induk kalimatnya pakai present perfect, jadi kata bantunya nggak nyambung.",
+          "whyFailsId": "“did you” loncat ke kata bantu “did”, padahal nggak ada past simple di pernyataannya.",
           "misconceptionId": "kata bantunya diambil dari bentuk waktu yang beda."
         },
         {
           "option": "don't you",
           "misconception": "wrong auxiliary substituted (present simple instead of present perfect)",
           "whyFails": "The auxiliary in the tag must match the auxiliary in the statement, which is 'have', not 'do'.",
-          "whyFailsId": "kata bantu di ekornya wajib sama kayak yang di pernyataannya.",
+          "whyFailsId": "“don’t you” ganti kata bantunya jadi “do”, padahal pernyataannya nggak pakai “do” sama sekali.",
           "misconceptionId": "kata bantunya diganti punya present simple."
         }
       ],
@@ -1032,7 +1032,7 @@
           "option": "already gave",
           "misconception": "uses past simple for the earlier event, flattening the sequence",
           "whyFails": "Without past perfect, 'by the time' loses its meaning of 'before this later point'.",
-          "whyFailsId": "“by the time” jadi kehilangan maknanya “sebelum titik itu”.",
+          "whyFailsId": "“already gave” naruh dua kejadian itu sejajar begitu aja, nggak nunjukin mana yang kelar duluan.",
           "misconceptionId": "past simple dipakai buat kejadian yang lebih dulu, jadi urutannya rata."
         },
         {
@@ -1095,7 +1095,7 @@
           "option": "will have had",
           "misconception": "wrongly applies future perfect, implying the dinner is finished by 8pm",
           "whyFails": "The context says dinner is happening AT 8pm, so it isn't finished yet at that point.",
-          "whyFailsId": "konteksnya bilang makan malamnya jalan PADA jam delapan, jadi belum kelar.",
+          "whyFailsId": "“will have had” nyatain acaranya udah rampung sebelum jam segitu — kebalikan dari yang diminta soalnya.",
           "misconceptionId": "future perfect dipakai keliru, makan malamnya jadi seolah kelar sebelum jam delapan."
         },
         {
@@ -1312,14 +1312,14 @@
           "option": "left",
           "misconception": "uses second-conditional past simple in an if-clause that needs third-conditional past perfect",
           "whyFails": "The main clause 'wouldn't have missed' signals a third conditional, which requires 'had left' in the if-clause, not simple past.",
-          "whyFailsId": "induk kalimat “wouldn’t have missed” nandain third conditional, bukan past simple.",
+          "whyFailsId": "“left” cuma past simple biasa, kurang satu langkah mundur buat pengandaian yang udah kelewat itu.",
           "misconceptionId": "past simple punya second conditional dipakai di bagian yang minta past perfect."
         },
         {
           "option": "would leave",
           "misconception": "duplicates 'would' in both clauses",
           "whyFails": "The if-clause of a conditional never takes 'would'; that belongs only in the main clause.",
-          "whyFailsId": "anak kalimat if dalam susunan conditional nggak pernah pakai “would”.",
+          "whyFailsId": "“would leave” naruh “would” di bagian if, padahal jatah “would” cuma di induk kalimat hasilnya.",
           "misconceptionId": "“would” dipakai di dua-dua bagian kalimatnya."
         },
         {
@@ -1592,14 +1592,14 @@
           "option": "have / repair",
           "misconception": "uses the base form instead of the past participle in the causative structure",
           "whyFails": "The causative pattern needs 'have + object + past participle', not the base verb form.",
-          "whyFailsId": "pola causative minta have + objek + past participle, bukan kata kerja dasar.",
+          "whyFailsId": "“have / repair” ngebiarin kata kerja keduanya telanjang, jadi nggak kebaca kalau laptopnya digarap orang lain.",
           "misconceptionId": "bentuk dasar dipakai ganti past participle di dalam pola causative."
         },
         {
           "option": "get / repairing",
           "misconception": "uses the -ing form instead of the past participle after 'get'",
           "whyFails": "The 'get' causative also requires the past participle ('get something repaired'), not the -ing form.",
-          "whyFailsId": "pola “get” juga minta past participle, bukan bentuk -ing.",
+          "whyFailsId": "“get / repairing” salah ekor: bentuk -ing bikin laptopnya kedengeran lagi ngerjain sendiri, bukan dikerjain tukang.",
           "misconceptionId": "bentuk -ing dipakai sesudah “get”, padahal yang diminta past participle."
         },
         {
@@ -1774,7 +1774,7 @@
           "option": "suggested us",
           "misconception": "copies the object pattern of 'tell/ask' (verb + object) onto 'suggest', which doesn't take a direct personal object this way",
           "whyFails": "'Suggest' does not take a personal object directly like 'suggested us'; it takes '-ing', a 'that' clause, or 'to someone that...'.",
-          "whyFailsId": "kata kerja ini nggak nerima objek orang langsung kayak “us” di tengahnya.",
+          "whyFailsId": "nyelipin “us” di belakang kata kerja usulnya bikin polanya rusak — usulan di kalimat ini nggak butuh sasaran orang.",
           "misconceptionId": "pola objek punya tell dan ask ditempelin ke “suggest”."
         }
       ],
@@ -1872,7 +1872,7 @@
           "option": "much",
           "misconception": "applies the uncountable-noun quantifier to a countable plural noun",
           "whyFails": "'Much' presupposes an uncountable mass noun, but 'chairs' names things you can count one by one, so the pairing collapses.",
-          "whyFailsId": "“chairs” bisa dihitung satu-satu, “much” minta yang nggak bisa.",
+          "whyFailsId": "“much” cuma jodoh sama benda tak terhitung kayak water atau time, bukan sama benda jamak.",
           "misconceptionId": "kata jumlah buat benda yang nggak bisa dihitung dipakai di benda jamak."
         },
         {
@@ -2264,14 +2264,14 @@
           "option": "faster than",
           "misconception": "defaults to the comparative form even though the context implies equality, not difference",
           "whyFails": "The sentence states both laptops take exactly the same time, so a comparative claiming one is faster contradicts the given fact.",
-          "whyFailsId": "kalimatnya bilang waktunya sama persis, bukan ada yang lebih cepat.",
+          "whyFailsId": "“faster than” ngeklaim laptop yang satu menang cepet, padahal nggak ada selisih yang bisa diklaim.",
           "misconceptionId": "bentuk “lebih” dipakai padahal konteksnya bilang setara."
         },
         {
           "option": "the fastest",
           "misconception": "confuses a two-item comparison with a superlative among three or more items",
           "whyFails": "Only two laptops are being compared, and the superlative wrongly implies a comparison among a larger group.",
-          "whyFailsId": "cuma dua laptop yang dibandingin, ini bentuk “paling”.",
+          "whyFailsId": "“the fastest” ngangkat satu barang jadi juara kelompok, padahal yang diadu di sini cuma sepasang.",
           "misconceptionId": "perbandingan dua hal ketuker sama bentuk “paling” buat satu kelompok."
         },
         {
@@ -3216,7 +3216,7 @@
           "option": "a",
           "misconception": "treating a superlative noun phrase as an ordinary indefinite first mention",
           "whyFails": "'A' introduces one unspecified item among several, but the superlative 'tallest' singles out the only member of its category, which cannot be presented as merely one of many.",
-          "whyFailsId": "“tallest” nunjuk satu-satunya, nggak bisa jadi salah satu.",
+          "whyFailsId": "“a” ngenalin gunungnya sebagai salah satu di antara banyak, jadi bentrok sama makna “tallest”.",
           "misconceptionId": "frasa bentuk “paling” diperlakukan kayak penyebutan pertama biasa."
         },
         {
@@ -3230,7 +3230,7 @@
           "option": "(no article)",
           "misconception": "assuming proper-noun-adjacent phrases never take an article",
           "whyFails": "Dropping the article treats 'tallest mountain' like a proper name, but it is an ordinary noun phrase whose uniqueness has to be marked; leaving it bare leaves that uniqueness unexpressed.",
-          "whyFailsId": "“tallest mountain” itu benda biasa, keunikannya wajib ditandai.",
+          "whyFailsId": "ngosongin artikelnya bikin “tallest mountain” kebaca kayak nama diri, padahal dia frasa benda biasa.",
           "misconceptionId": "frasa di sebelah nama diri dikira nggak pernah pakai kata di depannya."
         }
       ],
@@ -3552,7 +3552,7 @@
           "option": "with who",
           "misconception": "using subject-form 'who' after a fronted preposition, which requires the object form",
           "whyFails": "A preposition placed immediately before the relative pronoun must be followed by the object form 'whom', not the subject form 'who'.",
-          "whyFailsId": "kata depan yang persis di depan kata penghubung minta bentuk objek, bukan bentuk subjek.",
+          "whyFailsId": "“with who” masang bentuk pelaku “who” tepat di belakang kata depannya — kombinasi yang justru dilarang di gaya formal.",
           "misconceptionId": "bentuk subjek “who” dipakai sesudah kata depan yang dimajuin, padahal yang diminta bentuk objek."
         },
         {
@@ -3664,7 +3664,7 @@
           "option": "nothing",
           "misconception": "combining a negated verb ('didn't') with a negative pronoun, creating a non-standard double negative",
           "whyFails": "Standard English negates a clause only once; 'didn't find nothing' doubles the negation, which is non-standard.",
-          "whyFailsId": "“didn’t find nothing” bawa dua kata negatif sekaligus.",
+          "whyFailsId": "“nothing” nempelin negasi kedua ke kalimat yang kata kerjanya udah disangkal, jadi sangkalannya dobel.",
           "misconceptionId": "kata kerja negatif digabung kata ganti negatif, jadi dobel."
         },
         {
@@ -4056,7 +4056,7 @@
           "option": "is belonging",
           "misconception": "Assumes present time always requires present continuous.",
           "whyFails": "'Belong' is a stative verb expressing a permanent relationship, not an action in progress, so it cannot take continuous form.",
-          "whyFailsId": "“belong” itu keadaan menetap, bukan proses yang jalan.",
+          "whyFailsId": "“is belonging” maksa kata keadaan masuk bentuk lagi-berlangsung, kombinasi yang nggak pernah sah buat makna punya.",
           "misconceptionId": "waktu sekarang dianggap selalu nuntut bentuk -ing."
         },
         {
@@ -4280,14 +4280,14 @@
           "option": "will arrive",
           "misconception": "duplicates future marking inside the time clause",
           "whyFails": "After 'as soon as', English normally uses present simple for future reference; 'will' belongs in the main clause.",
-          "whyFailsId": "“will” biasanya ditaruh di induk kalimatnya.",
+          "whyFailsId": "“will arrive” naruh “will” di anak kalimat waktu, padahal tempatnya di induk kalimat.",
           "misconceptionId": "tanda waktu nanti digandain di dalam anak kalimat waktu."
         },
         {
           "option": "arrived",
           "misconception": "shifts the time clause into a completed past event",
           "whyFails": "The call and arrival are still future events, so past simple does not fit the timeline.",
-          "whyFailsId": "menelepon dan kedatangannya sama-sama masih nanti.",
+          "whyFailsId": "“arrived” ngelempar kedatangan keretanya ke masa lalu, padahal dua-duanya belum kejadian.",
           "misconceptionId": "anak kalimat waktunya digeser jadi kejadian lampau yang udah selesai."
         },
         {
@@ -4504,14 +4504,14 @@
           "option": "did I lock",
           "misconception": "keeps direct-question inversion and omits if/whether",
           "whyFails": "A reported question uses statement order and needs if/whether when the original question has no question word.",
-          "whyFailsId": "pertanyaan yang dilaporin pakai urutan pernyataan.",
+          "whyFailsId": "“did I lock” masih niru pembalikan kalimat tanya aslinya, padahal laporan nggak boleh mempertahankan pembalikan itu.",
           "misconceptionId": "pembalikan khas pertanyaan langsung dipertahanin dan pembukanya dihilangin."
         },
         {
           "option": "that I had locked",
           "misconception": "uses 'that' for a yes/no reported question",
           "whyFails": "'That' introduces reported statements, while a yes/no question requires 'if' or 'whether'.",
-          "whyFailsId": "“that” buat pernyataan yang dilaporin.",
+          "whyFailsId": "“that I had locked” ngelaporin kayak kalimat berita, padahal yang dilaporin di sini pertanyaan iya-atau-nggak.",
           "misconceptionId": "“that” dipakai buat pertanyaan “yes” atau “no” yang dilaporin."
         },
         {
@@ -4560,7 +4560,7 @@
           "option": "the school",
           "misconception": "focuses on a particular building instead of institutional attendance",
           "whyFails": "The prompt explicitly asks for the institutional-purpose reading, which uses zero article in 'go to school'.",
-          "whyFailsId": "soalnya udah tegas minta makna lembaganya, dan itu pakainya bentuk tanpa artikel: “go to school”.",
+          "whyFailsId": "nambahin “the” bikin maknanya gedung tertentu yang dituju, bukan kegiatan belajarnya.",
           "misconceptionId": "perhatian dialihin ke satu gedung tertentu, bukan ke kegiatan belajarnya."
         },
         {
@@ -4840,7 +4840,7 @@
           "option": "to go",
           "misconception": "Applies the to-infinitive pattern used after 'allow' to the different verb 'let'.",
           "whyFails": "'Let' takes a bare infinitive (let her go), unlike 'allow', which does take 'to' (allow her to go).",
-          "whyFailsId": "“let” minta bentuk dasar tanpa “to”.",
+          "whyFailsId": "nyelipin “to” sesudah “let her” bikin susunannya nggak sah — izin lewat “let” nggak pakai kata perangkai itu.",
           "misconceptionId": "pola bentuk “to” milik “allow” diterapin ke “let”."
         },
         {
@@ -5232,7 +5232,7 @@
           "option": "It Sarah was that",
           "misconception": "Misorders the fixed cleft frame, inserting the emphasized element before 'was'.",
           "whyFails": "The cleft frame requires 'It was' to stay together immediately before the emphasized element: 'It was Sarah', not 'It Sarah was'.",
-          "whyFailsId": "kerangka cleft minta “It was” tetap nyatu persis sebelum bagian yang ditonjolin.",
+          "whyFailsId": "“It Sarah was that” nyempilin nama di antara “It” dan “was”, jadi pasangan pembukanya kepisah.",
           "misconceptionId": "kerangka cleft yang baku diacak dengan naruh bagian yang ditonjolin sebelum “was”."
         },
         {
@@ -5246,7 +5246,7 @@
           "option": "It was that Sarah",
           "misconception": "Places 'that' before the emphasized noun instead of after it.",
           "whyFails": "'That' must come after the emphasized element (It was Sarah that...), introducing the rest of the clause, not before it.",
-          "whyFailsId": "“that” wajib berdiri sesudah bagian yang ditonjolin buat mbuka sisa anak kalimatnya.",
+          "whyFailsId": "“It was that Sarah” ngeloncatin “that” ke depan namanya, padahal urutan bakunya nama dulu baru kata sambungnya.",
           "misconceptionId": "“that” ditaruh sebelum kata benda yang ditonjolin, bukan sesudahnya."
         }
       ],
@@ -5848,21 +5848,21 @@
           "option": "a",
           "misconception": "Treats the country name as an ordinary countable noun needing an indefinite article.",
           "whyFails": "Country names are proper nouns and don't take indefinite articles; 'the Netherlands' is a fixed exception requiring the definite article specifically.",
-          "whyFailsId": "nama negara itu nama diri, jadi nggak pakai artikel tak tentu; “the Netherlands” kekecualian tetap yang emang minta “the”.",
+          "whyFailsId": "“a” itu artikel tak tentu buat benda umum satuan, nggak pernah dipasang ke nama negara.",
           "misconceptionId": "nama negara diperlakukan sebagai kata benda terhitung biasa yang butuh artikel tak tentu."
         },
         {
           "option": "an",
           "misconception": "Applies the indefinite article rule based on the following vowel sound, ignoring that country names don't take indefinite articles at all.",
           "whyFails": "Country names do not take the indefinite article 'an'; this fixed name requires the definite article in 'the Netherlands'.",
-          "whyFailsId": "nama negara nggak pakai artikel tak tentu “an”; nama tetap ini mintanya artikel tentu: “the Netherlands”.",
+          "whyFailsId": "“an” cuma dipakai sebelum bunyi vokal di benda umum, bukan buat nama negara.",
           "misconceptionId": "aturan artikel tak tentu diterapkan berdasarkan bunyi vokal, tanpa melihat bahwa nama negara memang tidak memakainya."
         },
         {
           "option": "[no article]",
           "misconception": "Overgeneralizes the common 'no article before country names' rule to every country name.",
           "whyFails": "'The Netherlands' is one of a fixed set of plural-form or descriptive country names (the Philippines, the United States) that require 'the' as an exception.",
-          "whyFailsId": "nama negara ini masuk kelompok kekecualian yang celahnya nggak boleh kosong.",
+          "whyFailsId": "milih [no article] nyamain nama ini sama nama negara biasa kayak “France” atau “Japan”.",
           "misconceptionId": "aturan umum tanpa artikel di depan nama negara diberlakukan untuk semua nama negara."
         }
       ],
@@ -5967,7 +5967,7 @@
           "option": "on; in",
           "misconception": "Confuses the fixed 'by + transport' collocation with literal physical position prepositions (on a bus vs in a taxi).",
           "whyFails": "'On the bus' and 'in the taxi' describe physical location inside the vehicle, not the general method of travel, which uses 'by bus'/'by taxi' without an article.",
-          "whyFailsId": "“on the bus” dan “in the taxi” ngomongin posisi di dalam kendaraannya, bukan cara bepergian umum yang pakai “by bus” dan “by taxi” tanpa artikel.",
+          "whyFailsId": "“on the bus” dan “in the taxi” ngomongin posisi penumpang di kendaraannya, bukan jawaban buat soal ongkos perjalanan yang lebih murah.",
           "misconceptionId": "pasangan tetap buat cara bepergian ketuker sama kata depan posisi fisik."
         },
         {
@@ -6534,7 +6534,7 @@
           "option": "Have never I attended",
           "misconception": "Places 'never' after the auxiliary instead of at the very front of the sentence.",
           "whyFails": "For this emphatic pattern, 'Never' must be the fronted first word, with the auxiliary and subject inverted after it, not 'have' first.",
-          "whyFailsId": "di pola penekanan ini “Never” wajib jadi kata pertama, bukan kata bantunya.",
+          "whyFailsId": "“Have never I attended” ngedepanin kata bantunya, padahal justru kata ingkarnya yang harus mimpin kalimat.",
           "misconceptionId": "“never” ditaruh sesudah kata bantunya, bukan di posisi paling depan kalimat."
         }
       ],
@@ -6576,7 +6576,7 @@
           "option": "Such the impact was",
           "misconception": "Fronts 'such' but fails to invert the verb 'was' before the subject.",
           "whyFails": "This emphatic pattern requires full inversion of verb and subject after fronted 'such' (Such was the impact), not just fronting 'such' alone.",
-          "whyFailsId": "pola ini minta pembalikan penuh kata kerja dan subjek sesudah “such” dimajuin.",
+          "whyFailsId": "“Such the impact was” lupa naruh “was” sebelum subjeknya, jadi nggak ada pembalikan sama sekali.",
           "misconceptionId": "“such” udah dimajuin tapi kata kerja “was” nggak dibalik ke depan subjeknya."
         },
         {
@@ -6695,7 +6695,7 @@
           "option": "is",
           "misconception": "singular be",
           "whyFails": "is is not used with they.",
-          "whyFailsId": "buat satu orang, sedangkan they itu jamak.",
+          "whyFailsId": "“Is” cuma cocok buat subjek tunggal kayak he atau she, bukan buat they.",
           "misconceptionId": "bentuk be buat subjek tunggal."
         },
         {
@@ -6968,7 +6968,7 @@
           "option": "must have worked",
           "misconception": "uses a completed-event deduction instead of an ongoing past activity",
           "whyFails": "The phrase 'at that moment' and the audible activity frame the work as in progress, which requires the progressive form.",
-          "whyFailsId": "“at that moment” dan suara kegiatannya mbingkai pekerjaannya sedang jalan, jadi butuh bentuk berkelanjutan.",
+          "whyFailsId": "“must have worked” nyampein kesimpulan soal kegiatan yang udah rampung, bukan yang lagi berlangsung.",
           "misconceptionId": "kesimpulan soal kejadian tuntas dipakai gantiin kegiatan lampau yang sedang jalan."
         },
         {
@@ -6982,7 +6982,7 @@
           "option": "cannot have been working",
           "misconception": "reverses the polarity of the evidence",
           "whyFails": "The lights and keyboard sounds support, rather than rule out, the conclusion that the team was working.",
-          "whyFailsId": "lampu nyala dan suara papan ketik justru ndukung kesimpulan bahwa timnya kerja.",
+          "whyFailsId": "“cannot have been working” malah nyangkal timnya kerja, kebalikan dari yang ditunjukin buktinya.",
           "misconceptionId": "arah kesimpulan dari buktinya dibalik."
         }
       ],
@@ -7192,7 +7192,7 @@
           "option": "appeals",
           "misconception": "present mismatch",
           "whyFails": "The marker 'at last month's meeting' fixes the evaluation in finished past time, so the present-tense 'appeals' clashes with it.",
-          "whyFailsId": "frasa “at last month's meeting” maku penilaiannya di masa lampau, jadi bentuk present bentrok.",
+          "whyFailsId": "“appeals” bentuk present, jadi bentrok sama cerita rapat bulan lalu yang udah lewat.",
           "misconceptionId": "bentuk present dipakai padahal frasa “at last month's meeting” maku penilaiannya di masa lampau."
         },
         {
@@ -7808,7 +7808,7 @@
           "option": "Opens",
           "misconception": "adding -s as if the command needed subject-verb agreement with a singular subject",
           "whyFails": "An imperative speaks directly to 'you', so the verb never takes third-person -s; 'Opens your books' has no subject to agree with.",
-          "whyFailsId": "perintah ngomong langsung ke “you”, jadi nggak ada subjek yang butuh akhiran -s.",
+          "whyFailsId": "“Opens your books” nambahin -s seolah ada subjek orang ketiga, padahal kalimat perintah nggak pernah pakai subjek.",
           "misconceptionId": "nambah -s seolah perintahnya harus nyocokin subjek tunggal."
         },
         {
@@ -7871,7 +7871,7 @@
           "option": "always drink",
           "misconception": "leaving the bare verb with no third-person marking after a singular subject",
           "whyFails": "The subject 'my sister' is third-person singular, so the verb must be 'drinks'; the bare form drops obligatory agreement.",
-          "whyFailsId": "subjeknya “my sister”, jadi kata kerjanya wajib “drinks” pakai -s.",
+          "whyFailsId": "“always drink” kehilangan akhiran -s padahal subjeknya “my sister” — posisi “always”-nya udah bener, bentuk kata kerjanya yang salah.",
           "misconceptionId": "kata kerja dasar dibiarin polos padahal subjeknya orang ketiga tunggal."
         },
         {
@@ -8312,7 +8312,7 @@
           "option": "will hear",
           "misconception": "reading 'by now' as a point still ahead and choosing a plain prediction about the future",
           "whyFails": "The memo circulated days ago, so 'by now' demands an inference about a done deal, not a forecast of a coming event.",
-          "whyFailsId": "memonya udah nyebar dari Senin; “by now” minta simpulan soal hal yang udah beres, bukan ramalan.",
+          "whyFailsId": "“will hear” ngeramal kejadian yang belum terjadi, padahal memonya udah nyebar dari Senin — bentuk ini nggak cocok sama “by now”.",
           "misconceptionId": "“by now” dibaca kayak titik yang masih di depan."
         },
         {
@@ -8431,7 +8431,7 @@
           "option": "resigned",
           "misconception": "backshifting the verb as ordinary reported speech instead of keeping the base subjunctive",
           "whyFails": "Backshift suits neutral reports; a demand freezes its embedded verb in the base form regardless of the past reporting verb.",
-          "whyFailsId": "mundurin kata kerja cocoknya buat laporan netral; tuntutan ngunci bentuk dasar walau kata pelaporannya lampau.",
+          "whyFailsId": "“resigned” mundurin kata kerja kayak laporan netral biasa, padahal klausa sesudah “demanded that” nggak ikut mundur.",
           "misconceptionId": "kata kerjanya dimundurin kayak laporan netral."
         },
         {
@@ -8760,7 +8760,7 @@
           "option": "A",
           "misconception": "first-mention article reused",
           "whyFails": "The book was already introduced in the first sentence, so a second mention needs 'the', not another first-mention 'a'.",
-          "whyFailsId": "bukunya udah disebut di kalimat pertama, jadi udah tertentu.",
+          "whyFailsId": "“A” ngenalin bukunya seolah barang baru, padahal buku itu bukan barang baru lagi di kalimat kedua.",
           "misconceptionId": "kata sandang penyebutan pertama dipakai lagi buat benda yang udah dikenal."
         },
         {
@@ -8816,14 +8816,14 @@
           "option": "childs",
           "misconception": "simple-s-overgeneralization",
           "whyFails": "'Child' is irregular, so adding -s produces the non-existent form 'childs'.",
-          "whyFailsId": "kata ini nggak beraturan, jadi nggak bisa cuma ditambah -s.",
+          "whyFailsId": "“childs” asal nambahin -s ke kata yang punya jalur jamak sendiri, jadi bentuk itu nggak ada di kamus.",
           "misconceptionId": "akhiran -s dipakai buat semua kata."
         },
         {
           "option": "childes",
           "misconception": "add-es-overgeneralization",
           "whyFails": "The -es ending is for nouns ending in s, x, ch, or sh sounds like 'boxes', not for the irregular noun 'child'.",
-          "whyFailsId": "akhiran -es buat kata kayak “boxes”, bukan buat kata nggak beraturan ini.",
+          "whyFailsId": "“childes” maksa akhiran -es yang jatahnya kata kayak “boxes”, padahal kata satu ini nggak ikut aturan tambah akhiran.",
           "misconceptionId": "akhiran -es ditambah ke kata yang nggak beraturan."
         },
         {
@@ -9376,7 +9376,7 @@
           "option": "is taking",
           "misconception": "Assumes present time always requires present continuous.",
           "whyFails": "'Every day' marks a repeated routine, so present simple is needed, not an action unfolding right now.",
-          "whyFailsId": "bentuk lagi berlangsung, padahal “every day” nunjuk rutinitas.",
+          "whyFailsId": "“is taking” ngegambarin aksi yang lagi jalan saat ini doang, bukan kebiasaan yang keulang tiap hari.",
           "misconceptionId": "waktu sekarang dianggap selalu butuh bentuk -ing, padahal ini kebiasaan."
         },
         {
@@ -9600,7 +9600,7 @@
           "option": "cheaper",
           "misconception": "comparative used for a ranking within a group of three or more",
           "whyFails": "'Cheaper' compares only two things, but this sentence ranks one hotel against a group of five.",
-          "whyFailsId": "cuma buat bandingin dua hal, padahal ini ranking dari lima hotel.",
+          "whyFailsId": "“cheaper” cuma sanggup ngadu sepasang barang; buat nunjuk juara satu kelompok, bentuk itu nggak cukup.",
           "misconceptionId": "bentuk perbandingan dua hal dipakai buat ranking satu kelompok."
         },
         {
@@ -9992,7 +9992,7 @@
           "option": "Who met you",
           "misconception": "reads an object question as a subject question, reversing who did what",
           "whyFails": "Speaker A already did the meeting ('I met one of your neighbours'), so the unknown person is the one A met — 'who' is the object and the question needs 'did you meet'.",
-          "whyFailsId": "A yang ketemu duluan (“I met ...”), jadi yang ditanya itu orang yang A temui — “who” jadi objek dan butuh “did you meet”.",
+          "whyFailsId": "“Who met you” malah nanya siapa yang nemuin B, kebalik dari cerita A yang ketemu tetangga itu.",
           "misconceptionId": "pertanyaan objek dibaca kayak pertanyaan subjek, jadi peran pelakunya kebalik."
         },
         {
@@ -10335,7 +10335,7 @@
           "option": "won't rain",
           "misconception": "stacks both a future 'will' and a negative inside the condition clause after 'unless'",
           "whyFails": "Condition clauses after 'unless' use the present simple, and the negative is already inside 'unless' — 'won't' adds both errors at once.",
-          "whyFailsId": "sesudah “unless” pakai present simple, dan negatifnya udah ada di “unless”.",
+          "whyFailsId": "“won’t rain” dobel salahnya: bawa “will” masuk anak kalimat syarat sekaligus ngulang sangkalan yang udah kebawa “unless”.",
           "misconceptionId": "bentuk “will” masa depan plus negatif ditumpuk di dalam anak kalimat syarat."
         },
         {
@@ -10440,7 +10440,7 @@
           "option": "to deal",
           "misconception": "inserts a to-infinitive right after the preposition 'at', treating every verb complement as needing 'to'",
           "whyFails": "After a preposition like 'at', a verb must take the -ing form; 'good at to deal' is never grammatical in English.",
-          "whyFailsId": "sesudah kata depan “at”, kata kerjanya wajib bentuk -ing.",
+          "whyFailsId": "“to deal” nyelipin bentuk tujuan pakai “to”, padahal “at” di depannya nggak bisa disusul “to” lagi.",
           "misconceptionId": "bentuk “to” ditaruh persis sesudah kata depan, seolah semua kata kerja butuh “to”."
         },
         {
@@ -10776,7 +10776,7 @@
           "option": "So do",
           "misconception": "treating 'So do I' as a frozen chunk instead of matching the auxiliary of the original statement",
           "whyFails": "A's statement uses the present perfect ('I've seen'), so the agreement must reuse 'have', not the default 'do'.",
-          "whyFailsId": "kalimat “A” pakai “have seen”, jadi persetujuannya juga harus pakai “have”.",
+          "whyFailsId": "“So do” ngambil kata bantu “do”, padahal nggak ada “do” di ucapan “A” yang bisa diikutin.",
           "misconceptionId": "“So do I” dihafal mati, kata bantunya nggak dicocokin sama kalimat aslinya."
         },
         {
@@ -10944,7 +10944,7 @@
           "option": "send",
           "misconception": "present simple used for a one-off future act",
           "whyFails": "The sending is a single future action in the main clause, so it needs 'will'; present simple belongs only inside the time clause after 'when'.",
-          "whyFailsId": "Ngirimnya kejadian sekali di masa depan dan ada di induk kalimat, jadi butuh “will”. Present simple cuma buat anak kalimat setelah “when”.",
+          "whyFailsId": "“send” polos ninggalin janji kirimnya tanpa penanda nanti, padahal slot ini induk kalimat, bukan bagian “when”-nya.",
           "misconceptionId": "present simple dipakai buat satu kejadian nanti di induk kalimat."
         },
         {
@@ -12176,14 +12176,14 @@
           "option": "to take",
           "misconception": "Uses an infinitive complement after 'deny', a verb that takes a gerund, not an infinitive.",
           "whyFails": "'Deny to take' is not a standard English pattern; 'deny' must be followed directly by the -ing form of the reported action.",
-          "whyFailsId": "“deny to take” bukan pola yang baku; “deny” wajib langsung diikuti bentuk -ing.",
+          "whyFailsId": "“deny to take” bukan susunan yang dikenal; bentuk to-nya bikin bantahannya kedengeran kayak rencana.",
           "misconceptionId": "pelengkap bentuk to dipakai sesudah “deny” yang justru minta bentuk -ing."
         },
         {
           "option": "for taking",
           "misconception": "Copies the preposition from 'apologize for' onto 'deny', which takes its gerund directly.",
           "whyFails": "'For' belongs to patterns like 'apologize for'; 'deny' links straight to the gerund with no preposition in between.",
-          "whyFailsId": "“for” itu miliknya pola kayak “apologize for”; “deny” langsung nempel ke bentuk -ing tanpa kata depan.",
+          "whyFailsId": "nyelipin “for” di sini niru pola minta maaf kayak “apologize for”, padahal bantahan nggak pakai kata depan apa pun.",
           "misconceptionId": "kata depan dari “apologize for” dipindahin ke “deny” yang nggak butuh kata depan."
         },
         {
@@ -12456,7 +12456,7 @@
           "option": "some of whom",
           "misconception": "Uses the personal relative pronoun 'whom' inside the quantifier pattern for a non-human antecedent.",
           "whyFails": "'Whom' refers to people, but this clause points back to 'paintings', which are things and therefore require 'which' after the quantifier.",
-          "whyFailsId": "“whom” buat orang, padahal anak kalimatnya nunjuk balik ke “paintings” yang jelas benda.",
+          "whyFailsId": "“some of whom” salah sasaran: “whom” khusus buat manusia, sedangkan yang diomongin di sini lukisan-lukisan.",
           "misconceptionId": "kata penghubung buat orang dipakai di pola kata jumlah padahal yang ditunjuk benda."
         },
         {
