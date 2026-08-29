@@ -1160,7 +1160,13 @@
       addCode('brain_root_cause');
     }
 
-    out.rationaleCodes = codes.slice(0, 12);
+    var PRIORITY = /^(brain_|server_|policy_trend_|recent_policy_outcome_)/;
+    out.rationaleCodes = (function (list) {
+      if (list.length <= 12) return list;
+      var keep = list.filter(function (c) { return PRIORITY.test(c); });
+      var rest = list.filter(function (c) { return !PRIORITY.test(c); });
+      return rest.slice(0, Math.max(0, 12 - keep.length)).concat(keep).slice(0, 12);
+    })(codes);
     out.estimatedMinutes = Math.max(5, Math.round(out.sessionSize * (out.pace === 'calm' ? 1.25 : 1)));
     digest.applied = true;
     out.brain = digest;
