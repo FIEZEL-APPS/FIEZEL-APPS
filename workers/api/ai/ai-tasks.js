@@ -961,6 +961,12 @@
     return guardFor(locale) + styleClause(locale) + '\nTugas: satu paragraf saran belajar untuk hari ini, maksimal ' +
       sentenceLimitFor('context_coach') + ' kalimat, ' +
       'berdasarkan ringkasan kemajuan agregat di bawah. Jangan menyebut angka mentah.' +
+      // m025-201: sepuluh hasil kebijakan tersimpan dan sampai rilis ini hanya label terakhir
+      // yang pernah dibaca. `policy.policyEffectiveness` membawa trennya; klausa ini yang
+      // membuat model benar-benar MEMAKAINYA, bukan sekadar menerimanya di dalam JSON.
+      '\nKalau policy.policyEffectiveness.trend bukan unknown, sebut apa adanya apakah cara ' +
+      'belajar ini benar-benar berhasil beberapa sesi terakhir; kalau unknown, bilang buktinya ' +
+      'belum cukup dan jangan menebak.' +
       '\nBahasa: ' + answerLanguageFor(locale) + '\n' + DATA_DELIM + '\n' + JSON.stringify({
         snapshot: input.snapshot, evidence: input.evidence, policy: input.policy,
         outcomes: input.outcomes, profile: input.profile
@@ -1090,7 +1096,12 @@
       input: Object.freeze({
         snapshot: { type: 'object', required: true, maxBytes: 3000 },
         evidence: { type: 'object', maxBytes: 2000 },
-        policy: { type: 'object', maxBytes: 1200 },
+        // m025-201: 1.200 B sudah TERLALU KETAT sebelum rilis ini - kebijakan dengan 12 kode
+        // rasional saja sudah 1.213 B, jadi murid yang paling banyak bendera merahnya adalah
+        // justru murid yang permintaan pelatihnya ditolak `too_big:policy`. Ditambah
+        // `policyEffectiveness` (tren efektivitas kebijakan) batas jujurnya 1.800 B.
+        // `maxPayloadBytes` 8.000 B tidak diubah dan tetap menjadi pagar biaya yang mengikat.
+        policy: { type: 'object', maxBytes: 1800 },
         outcomes: { type: 'array', maxItems: 5, maxBytes: 1200 },
         profile: { type: 'object', maxBytes: 600 },
         privacy: { type: 'object', required: true, maxBytes: 200 }

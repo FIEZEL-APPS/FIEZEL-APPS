@@ -208,7 +208,7 @@ html.fz-booting body{overflow:hidden}
              TANPA data-view, dengan sengaja. renderInner() menambahkan kelas active ke
              elemen ber-data-view tetapi hanya membersihkannya dari .nav, jadi atribut itu
              akan membuat ikon ini tersangkut menyala selamanya setelah sekali dibuka. -->
-        <button type="button" class="icon-button ask-button" onclick="go('ask')" aria-label="Tanya FIEZEL"><svg class="fiezel-ask-mark" viewBox="0 0 74 200" aria-hidden="true"><defs><linearGradient id="fztAsk" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFDE59"/><stop offset="45%" stop-color="#FFC700"/><stop offset="100%" stop-color="#E6A800"/></linearGradient></defs><g fill="url(#fztAsk)"><rect x="0" y="0" width="26" height="200" rx="13"/><rect x="48" y="76" width="26" height="124" rx="13"/></g></svg><span class="ask-label">Tanya FIEZEL?</span></button>
+        <button type="button" class="icon-button ask-button" onclick="go('ask')" aria-label="Tanya FIEZEL"><svg class="fiezel-ask-mark" viewBox="0 0 74 200" aria-hidden="true"><defs><linearGradient id="fztAsk" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFDE59"/><stop offset="45%" stop-color="#FFC700"/><stop offset="100%" stop-color="#E6A800"/></linearGradient></defs><g fill="url(#fztAsk)"><rect x="0" y="0" width="26" height="200" rx="13"/><rect x="48" y="76" width="26" height="124" rx="13"/></g></svg><span class="ask-label" data-i18n="topbar.ask">Tanya FIEZEL?</span></button>
         <button type="button" class="icon-button" onclick="openSettings()" aria-label="Buka pengaturan"><i data-lucide="sliders-horizontal"></i></button>
         <div class="version" id="version"></div>
       </div>
@@ -282,14 +282,14 @@ html.fz-booting body{overflow:hidden}
        untuk pengukuran yang mendasarinya. Dekoratif murni, karena itu aria-hidden. -->
   <div class="nav-scrim" aria-hidden="true"></div>
   <nav class="bottomnav" aria-label="Navigasi utama">
-    <button type="button" class="nav active" data-view="home" onclick="go('home')" aria-label="Beranda"><i class="fz-i" data-fz-icon="home" aria-hidden="true"></i><span>Home</span></button>
-    <button type="button" class="nav" data-view="vocab" onclick="go('vocab')" aria-label="Vocabulary"><i class="fz-i" data-fz-icon="vocab" aria-hidden="true"></i><span>Vocab</span></button>
-    <button type="button" class="nav" data-view="grammar" onclick="go('grammar')" aria-label="Grammar"><i class="fz-i" data-fz-icon="grammar" aria-hidden="true"></i><span>Grammar</span></button>
-    <button type="button" class="nav" data-view="reading" onclick="go('reading')" aria-label="Reading"><i class="fz-i" data-fz-icon="reading" aria-hidden="true"></i><span>Reading</span></button>
+    <button type="button" class="nav active" data-view="home" onclick="go('home')" aria-label="Beranda"><i class="fz-i" data-fz-icon="home" aria-hidden="true"></i><span data-i18n="nav.home">Home</span></button>
+    <button type="button" class="nav" data-view="vocab" onclick="go('vocab')" aria-label="Vocabulary"><i class="fz-i" data-fz-icon="vocab" aria-hidden="true"></i><span data-i18n="nav.vocab">Vocab</span></button>
+    <button type="button" class="nav" data-view="grammar" onclick="go('grammar')" aria-label="Grammar"><i class="fz-i" data-fz-icon="grammar" aria-hidden="true"></i><span data-i18n="nav.grammar">Grammar</span></button>
+    <button type="button" class="nav" data-view="reading" onclick="go('reading')" aria-label="Reading"><i class="fz-i" data-fz-icon="reading" aria-hidden="true"></i><span data-i18n="nav.reading">Reading</span></button>
     <!-- Audit UX Bagian 4: ikon lama (grafik batang) membaca sebagai "statistik", bukan
          "jalur belajar". Ikon route adalah jalur berkelok dengan simpul - persis makna
          yang harus dibawa tab ini, sejajar dengan Path/Jalur Belajar di Duolingo. -->
-    <button type="button" class="nav" data-view="progress" onclick="go('progress')" aria-label="Peta belajar"><i class="fz-i" data-fz-icon="map" aria-hidden="true"></i><span>Peta</span></button>
+    <button type="button" class="nav" data-view="progress" onclick="go('progress')" aria-label="Peta belajar"><i class="fz-i" data-fz-icon="map" aria-hidden="true"></i><span data-i18n="nav.peta">Peta</span></button>
   </nav>
 
   <!-- OWNER: "Terlalu banyak script terpisah (30+ file JS) dimuat sinkron di <head>/<body>

@@ -97,8 +97,53 @@
     calm_pacing: 'journey.rat-calm-pacing',
     session_interrupted: 'journey.rat-session-interrupted',
     balanced_progression: 'journey.rat-balanced-progression',
-    evidence_thin: 'journey.rat-evidence-thin'
+    evidence_thin: 'journey.rat-evidence-thin',
+    // m025-201 — beban memori yang NYATA (highRiskCount), bukan panjang antrean jatuh tempo.
+    memory_high_risk_load: 'journey.rat-memory-high-risk-load',
+    due_backlog_low_risk: 'journey.rat-due-backlog-low-risk',
+    // m025-201 — penilaian hasil kebijakan terakhir. Sudah dikirim policy sejak lama dan
+    // TIDAK PERNAH punya padanan teks di sini, jadi murid tidak pernah diberi tahu bahwa
+    // rencana kemarin ikut menentukan rencana hari ini.
+    recent_policy_outcome_negative: 'journey.rat-outcome-negative',
+    recent_policy_outcome_mixed: 'journey.rat-outcome-mixed',
+    recent_policy_outcome_positive: 'journey.rat-outcome-positive',
+    // m025-201 — tren efektivitas atas SEPULUH hasil, bukan satu.
+    policy_trend_declining: 'journey.rat-trend-declining',
+    policy_trend_improving: 'journey.rat-trend-improving',
+    policy_trend_flat: 'journey.rat-trend-flat',
+    // m025-201 — alasan Core Brain di perangkat murid.
+    brain_optimal_challenge: 'journey.rat-brain-optimal-challenge',
+    brain_trend_improving: 'journey.rat-brain-trend-improving',
+    brain_trend_plateau: 'journey.rat-brain-trend-plateau',
+    brain_trend_declining: 'journey.rat-brain-trend-declining',
+    brain_cognitive_load: 'journey.rat-brain-cognitive-load',
+    brain_memory_at_risk: 'journey.rat-brain-memory-at-risk',
+    brain_root_cause: 'journey.rat-brain-root-cause',
+    // m025-201 — cermin penalaran sisi server, dipakai HANYA saat ringkasan Core Brain
+    // tidak sampai. Diberi kata-kata sendiri supaya tidak mengaku sebagai Core Brain.
+    server_cognitive_load: 'journey.rat-server-cognitive-load',
+    server_pacing_watch: 'journey.rat-server-pacing-watch',
+    server_memory_at_risk: 'journey.rat-server-memory-at-risk',
+    server_trend_improving: 'journey.rat-server-trend-improving',
+    server_trend_plateau: 'journey.rat-server-trend-plateau',
+    server_trend_declining: 'journey.rat-server-trend-declining'
   };
+
+  /** Kode PENALARAN: ditambahkan lapisan di atas v1 dan karena itu selalu berada di ekor. */
+  var PRIORITY_RATIONALE = /^(brain_|server_|policy_trend_|recent_policy_outcome_)/;
+
+  /**
+   * Potong daftar kode dengan PRIORITAS, bukan posisi. Memotong `n` teratas secara
+   * posisional berarti membuang kode penalaran setiap kali daftarnya penuh — dan daftar
+   * paling sering penuh justru pada murid yang paling butuh dijelaskan.
+   */
+  function capCodes(list, n) {
+    var codes = Array.isArray(list) ? list : [];
+    if (codes.length <= n) return codes.slice();
+    var keep = codes.filter(function (c) { return PRIORITY_RATIONALE.test(c); });
+    var rest = codes.filter(function (c) { return !PRIORITY_RATIONALE.test(c); });
+    return rest.slice(0, Math.max(0, n - keep.length)).concat(keep).slice(0, n);
+  }
 
   function clamp(value, min, max) {
     var n = Number(value);
@@ -226,7 +271,14 @@
   function rationaleText(codes) {
     var known = codes.filter(function (c) { return RATIONALE_TEXT[c]; });
     if (!known.length) return T('journey.rat-all-clear');
-    var reasons = known.slice(0, 3).map(function (c) { return T(RATIONALE_TEXT[c]); });
+    // m025-201: tiga alasan yang ditampilkan dipilih supaya murid mendengar DUA HAL —
+    // satu alasan penalaran (kenapa rencananya begini) dan bukti konkretnya. Sebelum ini
+    // pemilihan murni posisional, dan karena lapisan penalaran selalu menambah di ekor,
+    // alasan Core Brain tidak pernah sekali pun sampai ke layar.
+    var reasoning = known.filter(function (c) { return PRIORITY_RATIONALE.test(c); });
+    var evidence = known.filter(function (c) { return !PRIORITY_RATIONALE.test(c); });
+    var picked = reasoning.slice(0, 1).concat(evidence).concat(reasoning.slice(1));
+    var reasons = picked.slice(0, 3).map(function (c) { return T(RATIONALE_TEXT[c]); });
     return T('journey.rat-reasons', { reasons: reasons.join(', ') });
   }
 
@@ -243,7 +295,7 @@
     if (!isFinite(now)) throw new Error('buildWeeklyMission: now wajib diisi (deterministic)');
 
     var start = weekStart(now);
-    var codes = Array.isArray(policy.rationaleCodes) ? policy.rationaleCodes.slice(0, 6) : [];
+    var codes = capCodes(policy.rationaleCodes, 6);
     var mode = String(policy.mode || 'diagnostic');
     var focusDomain = String(policy.primaryDomain || 'grammar');
     var focusSkill = String(policy.targetSkill || '').slice(0, 80);
@@ -379,7 +431,7 @@
 
     var codes = recovery.needed
       ? recovery.rationale.codes
-      : (Array.isArray(policy.rationaleCodes) ? policy.rationaleCodes.slice(0, 6) : []);
+      : capCodes(policy.rationaleCodes, 6);
 
     var totalQuestions = blocks.reduce(function (n, b) { return n + b.questions; }, 0);
     return {
