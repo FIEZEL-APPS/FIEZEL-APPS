@@ -55,5 +55,5 @@ confirmed by reading the computed colour (`rgb(248,250,255)` on `#FFF9EE`) and t
 | File | Contents |
 |---|---|
 | `analysis-before.json` | Per-screen a11y/structure sweep **before** m025-202 |
-| `metrics-after.json` | Per-screen density **after** m025-202 |
+| `metrics-after.json` | Per-screen density **after** m025-202, measured on the merged tree (so it also carries upstream m025-201's Thai-localization text growth on Skills and Listening — those two grew for reasons unrelated to this change) |
 | `capture.js`, `analyze.js`, `phases.js`, `seed.json` | The harness |
