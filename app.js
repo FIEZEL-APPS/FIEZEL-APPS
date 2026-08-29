@@ -5654,7 +5654,46 @@ window.__fiezelHealth={readInstallHealth,installHealthReportMarkup,refreshInstal
 // index.html). Setiap jalan keluar dari fungsi ini WAJIB lewat dismissBootSplash(): kalau
 // modul splash hilang atau melempar, elemen statis itu akan tetap menutupi seluruh layar
 // dan aplikasi terkunci di balik layar sambutan yang tidak pernah menutup.
+/* m025-199: apakah style.css sudah benar-benar berlaku?
+ *
+ * Dibaca dari DOM, BUKAN dari variabel yang disiapkan skrip inline: splash-first-paint-test
+ * menuntut markup splash berada di atas setiap <script>, jadi menambah satu skrip penanda di
+ * <head> akan memerahkan gerbang yang justru menjaga cacat ini tidak kembali.
+ *
+ * Pola `rel=preload` -> `rel=stylesheet` sudah menyimpan jawabannya di elemennya sendiri:
+ * begitu lembarnya termuat, onload menukar rel-nya. Jadi `rel==='stylesheet'` ADALAH tanda
+ * berlakunya. `__fzShellCss` tetap dibaca karena onerror memakainya untuk menandai lembar
+ * yang gagal - dan menunggu lembar yang gagal adalah menunggu selamanya.
+ *
+ * Ragu = SUDAH (elemennya tidak ketemu, peramban tanpa querySelector, apa pun): tirai yang
+ * tidak pernah terangkat lebih buruk daripada satu frame yang belum bergaya. */
+function shellCssSettled(){
+  try{
+    if(self.__fzShellCss==='ready'||self.__fzShellCss==='error')return true;
+    var lembar=self.document?.querySelector?.('link[href="./style.css"]');
+    return !lembar||lembar.rel==='stylesheet';
+  }catch(_){return true}
+}
 function dismissBootSplash(){
+  /* m025-199: style.css kini dimuat NON-BLOKIR (lihat alasan terukur di index.html), jadi
+   * secara teori tirai bisa terangkat sebelum lembarnya berlaku dan murid melihat HTML
+   * telanjang - kilatan yang jauh lebih buruk daripada layar kosong yang baru saja dibuang.
+   *
+   * Dalam praktiknya itu tidak akan terjadi: app.js 835 KB, style.css 286 KB, dan keduanya
+   * berangkat bersamaan dari origin yang sama dengan CSS berprioritas lebih tinggi. Tetapi
+   * "tidak akan terjadi menurut hitungan waktu" bukan jaminan, jadi ini jaminannya.
+   *
+   * Pagar 4 detik disengaja dan mengikuti aturan yang sudah tertulis di kepala fungsi ini:
+   * lembar yang gagal atau lambat tidak boleh MENGUNCI murid di balik tirai. Sesudah pagar
+   * lewat, tirai tetap dibuka - layar seadanya masih lebih baik daripada aplikasi yang
+   * tidak pernah terbuka. Nilai 'error' juga langsung lolos, karena menunggu sesuatu yang
+   * sudah gagal adalah menunggu selamanya.
+   *
+   * Jalur normal (lembar sudah berlaku) tidak melewati satu pun baris tambahan di bawah. */
+  if(!shellCssSettled()&&(self.performance?.now?.()||4000)<4000){
+    setTimeout(dismissBootSplash,60);
+    return true;
+  }
   try{if(self.FiezelSplash?.disposeBootSplash?.(self))return true}catch(_){}
   try{
     self.__fiezelBootSplash?.dismiss?.();
