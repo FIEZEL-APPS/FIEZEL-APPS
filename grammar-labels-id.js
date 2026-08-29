@@ -122,6 +122,7 @@
     // ------------------------------------------------------------- comparison
     comparative_vs_superlative_scope: 'Membandingkan dua hal atau menyebut yang paling: comparative dan superlative',
     as_as_equality_vs_comparative: 'Menyatakan setara dengan as ... as',
+    irregular_comparative_better_worse_forms: 'Better dan worse: bentuk banding tanpa -er',
     double_comparative_progressive_change: 'Perubahan yang terus berlanjut: the more ... the more',
     less_vs_fewer_countability_agreement: 'Membandingkan jumlah: less dan fewer',
     comparative_intensifiers_much_far_a_lot_before_comparative: 'Penguat sebelum bentuk perbandingan: much, far, a lot',

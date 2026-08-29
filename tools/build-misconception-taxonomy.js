@@ -575,6 +575,9 @@ var OVERRIDES = {
   // 'bare/base' generik vs mekanisme spesifik
   'bare infinitive used instead of the required to-infinitive': 'complementation.bare_form_error',
   'base adjective used without comparative marking': 'comparison.form_intensifier',
+  // CM-005 (irregular comparatives, wave E5): '-er' di label ini tanpa tanda kutip sehingga
+  // lolos dari heuristik /'-er'/ — dipetakan manual ke mekanisme bentuk yang sama.
+  'regular -er ending forced onto an irregular adjective': 'comparison.form_intensifier',
   // 'indefinite/article' generik vs mekanisme spesifik
   'using a positive indefinite pronoun that contradicts the negative context': 'question.polarity_negation',
   'Inserts an article as if a noun were about to follow.': 'linking.connector_choice',
