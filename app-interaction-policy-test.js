@@ -190,6 +190,65 @@ for (const token of TOKEN_CINCIN) {
 check('E warna cincin fokus BUKAN keluarga kuning/emas (pemilik menolaknya dua kali)',
   CINCIN_EMAS.length === 0,
   CINCIN_EMAS.length ? 'masih emas: ' + CINCIN_EMAS.join(', ') : TOKEN_CINCIN.join(' + ') + ' bersih');
+
+/* MODALITAS (m025-197). Memindahkan cincin ke `:focus-visible` TIDAK menghilangkannya dari
+ * kolom teks: peramban mencocokkan `:focus-visible` pada kolom teks walau fokusnya datang
+ * dari ketukan jari. m025-196 hijau di seluruh gerbang sementara pemilik masih melihat
+ * kotaknya - hanya berganti warna dari emas ke tinta. Assert di bawah menjaga mekanisme yang
+ * BENAR-BENAR menghilangkannya, dan mengujinya sebagai perilaku, bukan sebagai pola teks. */
+check('E CSS menyembunyikan cincin saat modalitas sentuh',
+  /html\[data-fz-input="touch"\][^{]*:focus-visible\{[^}]*outline-color:\s*transparent/.test(css),
+  'ini yang membuat ketukan jari tidak memunculkan kotak apa pun');
+check('E penyembunyian memakai outline-color:transparent, BUKAN outline:none',
+  !/html\[data-fz-input="touch"\][^{]*\{[^}]*outline:\s*none/.test(css),
+  'outline:none menggeser tata letak DAN melanggar aturan pengganti di a11y-test');
+
+if (Policy && typeof Policy.install === 'function') {
+  const pendengar = {};
+  const akar = {
+    _attr: {},
+    getAttribute(k) { return Object.prototype.hasOwnProperty.call(this._attr, k) ? this._attr[k] : null; },
+    setAttribute(k, v) { this._attr[k] = v; }
+  };
+  const env = {
+    Date,
+    document: {
+      documentElement: akar,
+      addEventListener(jenis, fn) { (pendengar[jenis] = pendengar[jenis] || []).push(fn); }
+    }
+  };
+  const dipasang = Policy.install(env);
+  const tembak = (jenis, ev) => (pendengar[jenis] || []).forEach((fn) => fn(ev));
+
+  check('E modul kebijakan terpasang pada lingkungan tiruan', dipasang === true);
+  check('E bawaannya SENTUH (jadi cincin tersembunyi sejak muat pertama)',
+    akar.getAttribute('data-fz-input') === 'touch',
+    'nilai=' + akar.getAttribute('data-fz-input'));
+
+  tembak('keydown', { key: 'Tab' });
+  check('E Tab menyalakan mode papan tik (pengguna keyboard TIDAK kehilangan cincinnya)',
+    akar.getAttribute('data-fz-input') === 'key',
+    'nilai=' + akar.getAttribute('data-fz-input'));
+
+  tembak('pointerdown', {});
+  check('E menyentuh/mengklik mengembalikan mode sentuh',
+    akar.getAttribute('data-fz-input') === 'touch',
+    'nilai=' + akar.getAttribute('data-fz-input'));
+
+  /* Urutannya PENTING dan bentuk pertama assert ini salah karenanya: ia menembak huruf
+   * SESUDAH Tab, lalu memeriksa nilainya masih 'key' - yang benar walau setiap tombol
+   * menyalakan mode papan tik. Assert itu tidak bisa merah, jadi ia tidak menjaga apa pun.
+   * Huruf harus ditembak dari garis dasar SENTUH: kalau ia menyalakan mode papan tik, kotak
+   * kembali muncul begitu murid mulai mengetik namanya - persis cacat yang sedang dibuang. */
+  tembak('keydown', { key: 'a' });
+  check('E mengetik huruf TIDAK menyalakan cincin (kalau ya, kotaknya kembali saat murid mengetik)',
+    akar.getAttribute('data-fz-input') === 'touch',
+    'nilai=' + akar.getAttribute('data-fz-input'));
+
+  tembak('touchstart', {});
+  check('E touchstart juga mode sentuh (peramban tanpa Pointer Events)',
+    akar.getAttribute('data-fz-input') === 'touch');
+}
 check('E target fokus programatik ([tabindex="-1"]) tidak menampilkan cincin',
   /\[tabindex="-1"\]:focus-visible\{outline:2px solid transparent/.test(css),
   'akar "kotak emas pada judul": app.js memindahkan fokus ke heading saat navigasi');

@@ -989,7 +989,7 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 .setup-link{display:inline-flex;align-items:center;gap:8px;margin:0 -10px -14px;padding:14px 10px;color:var(--accent-strong);font-size:.74rem;font-weight:700;text-decoration:none}.setup-link:hover{text-decoration:underline}.setup-link svg{width:16px;height:16px}
 .endpoint-label input{width:100%;min-height:48px;padding:13px 14px;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--panel);font:inherit;color:var(--text)}
 /* :focus-visible, bukan :focus - lihat alasan di .fiezel-field input. */
-.endpoint-label input:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px;border-color:var(--focus-ring)}
+.endpoint-label input:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
 .consent-row{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;font-size:.72rem;line-height:1.5;color:var(--muted);cursor:pointer}
 .report-state{font-size:.7rem!important;margin:13px 0 0!important;padding-top:11px;border-top:1px solid var(--line)}
 .report-preview{text-align:left;display:grid;gap:0;margin:18px 0;padding:15px 18px;background:var(--surface-warm);border:1px solid var(--line);border-radius:var(--radius-md)}.report-preview p{margin:5px 0;font-size:.8rem}
@@ -1645,8 +1645,7 @@ body.daily-locked{overflow:hidden}
    muncul setiap kali murid MENGETUK kolom nama di ponsel. `:focus-visible` tidak menyala untuk
    ketukan atau fokus programatik, jadi indikatornya kembali ke tempat yang memang membutuhkannya:
    navigasi papan tik. */
-.fiezel-field input:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px;
-  border-color:var(--focus-ring)}
+.fiezel-field input:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
 /* Step 1 tidak punya tombol "Lewati" (langkah wajib). Penahan ini menjaga tombol "Kembali"
    tetap di kolom kiri, supaya kepala layarnya tidak bergeser antar-langkah. */
 .fiezel-skip-spacer{display:inline-block;min-width:44px;min-height:44px}
@@ -4348,3 +4347,31 @@ body.fz-stage-grammar-lesson .section-head h1{font-family:var(--fz-heading);font
 
 /* G15-07 (wave2): scope instrumen di bawah nama level hasil placement */
 .result-level-scope{display:block;font-size:.72rem;font-weight:500;opacity:.75;margin-top:2px;letter-spacing:.01em}
+
+/* ---------------------------------------------------------------------------------------
+   CINCIN FOKUS HANYA UNTUK PAPAN TIK (m025-197 - laporan OWNER kedua)
+
+   m025-196 memindahkan semua cincin dari `:focus` ke `:focus-visible` dan itu tidak cukup.
+   Sebabnya ada di spesifikasi, bukan di kode ini: untuk KOLOM TEKS peramban MENCOCOKKAN
+   `:focus-visible` walau fokusnya datang dari ketukan jari, karena kolom yang sedang
+   menerima ketikan dianggap selalu layak diberi penanda. Hasilnya kotaknya tidak hilang -
+   ia cuma berganti warna dari emas ke tinta. Pemilik melihatnya, dan ia benar.
+
+   CSS sendirian tidak bisa membedakan "fokus karena jari" dari "fokus karena Tab".
+   `features/ui/fiezel-zoom-lock.js` yang membedakannya lewat data-fz-input, dan aturan
+   di bawah ini yang memakainya.
+
+   `outline-color:transparent`, BUKAN `outline:none`: lebar dan offset cincin tetap ada,
+   jadi tidak ada satu piksel pun yang bergeser saat mode berpindah - dan aturan
+   a11y-test "setiap outline yang dimatikan punya penanda pengganti" tidak dilanggar,
+   karena tidak ada outline yang dimatikan.
+
+   `!important` dipakai sadar: ini kebijakan tingkat aplikasi yang harus menang atas
+   setiap aturan komponen, sekarang dan yang ditulis nanti. Tanpa itu, komponen
+   berikutnya yang menulis cincinnya sendiri akan diam-diam mengembalikan kotaknya.
+
+   Kalau JS gagal dimuat, atribut tidak pernah ada, aturan ini tidak pernah cocok, dan
+   cincin tetap muncul. Kegagalan jatuh ke sisi aman aksesibilitas.
+   --------------------------------------------------------------------------------------- */
+html[data-fz-input="touch"] :focus-visible{outline-color:transparent!important;box-shadow:none!important}
+html[data-fz-input="touch"] :focus{outline-color:transparent!important}
