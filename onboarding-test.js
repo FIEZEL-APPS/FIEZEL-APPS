@@ -693,8 +693,10 @@ test('aplikasi tidak lagi memaku nama siapa pun sebagai nilai bawaan', () => {
   // literal inline ATAU kunci copy-map FiezelI18n.t('...') yang nilainya terdaftar
   // non-kosong di features/i18n/copy-id-*.js (m025-117 tetap terjaga: bukan nama orang,
   // melainkan sapaan netral yang datang dari lapisan naskah, bukan hardcode nama).
-  const fallbackInline = /const FALLBACK_LEARNER_NAME='[^']+';/.test(app);
-  const fallbackKey = app.match(/const FALLBACK_LEARNER_NAME=FiezelI18n\.t\('([a-z0-9.-]+)'\);/);
+  // v49-F1 2026-08-29: sapaan cadangan kini `let` supaya bisa dibangun ulang saat locale
+  // berganti (tabel i18n eager membeku di locale boot). Bentuk & kenetralannya tetap diuji.
+  const fallbackInline = /(?:const|let) FALLBACK_LEARNER_NAME='[^']+';/.test(app);
+  const fallbackKey = app.match(/(?:const|let) FALLBACK_LEARNER_NAME=FiezelI18n\.t\('([a-z0-9.-]+)'\);/);
   let fallbackViaCopy = false;
   if (fallbackKey) {
     const copySources = fs.readdirSync('./features/i18n')

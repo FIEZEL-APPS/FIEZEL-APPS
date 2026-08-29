@@ -118,12 +118,22 @@ body{
   transition:background 1.2s var(--ease);
 }
 .sky-light{position:absolute;inset:-12%;background:radial-gradient(circle at var(--orbit-x) var(--orbit-y),var(--scene-light) 0%,transparent 42%);transition:background 1.2s var(--ease)}
+/* i15 2026-08-29 (audit 12-004): drift matahari/bulan dulu transisi left/top 30s — layout
+   ulang di main thread selama 30 detik tiap ganti adegan. Kini elemen jadi lapisan seukuran
+   viewport (pointer-events sudah none via .global-sky) dan drift pindah ke transform:
+   translate(%) relatif ke box sendiri = viewport, jadi var(--orbit-x/y) (persen dari app.js)
+   tetap berarti sama. Ikon + kilau diposisikan absolut di titik origin lapisan; drop-shadow
+   pindah ke svg supaya region filter tidak membengkak seukuran layar. Visual identik. */
 .global-celestial{
-  position:fixed;left:var(--orbit-x);top:var(--orbit-y);width:clamp(52px,6vw,76px);height:clamp(52px,6vw,76px);
-  display:grid;place-items:center;transform:translate(-50%,-50%);transition:left 30s linear,top 30s linear,color .9s var(--ease),filter .9s var(--ease)
+  --celestial-size:clamp(52px,6vw,76px);
+  position:fixed;left:0;top:0;width:100%;height:100%;display:block;
+  transform:translate(var(--orbit-x),var(--orbit-y));
+  transition:transform 30s linear,color .9s var(--ease)
 }
-.global-celestial::before{content:"";position:absolute;inset:-160%;border-radius:50%;background:radial-gradient(circle,var(--scene-light) 0%,transparent 68%);filter:blur(8px)}
-.global-celestial svg{position:relative;width:100%;height:100%;stroke-width:1.45}.global-celestial.sun{color:#fff0b3;filter:drop-shadow(0 0 14px rgba(255,222,145,.78))}.global-celestial.moon{color:#edf2ff;filter:drop-shadow(0 0 15px rgba(202,218,255,.72))}
+.global-celestial::before{content:"";position:absolute;left:0;top:0;width:calc(var(--celestial-size)*4.2);height:calc(var(--celestial-size)*4.2);transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,var(--scene-light) 0%,transparent 68%);filter:blur(8px)}
+.global-celestial svg{position:absolute;left:0;top:0;width:var(--celestial-size);height:var(--celestial-size);transform:translate(-50%,-50%);stroke-width:1.45;transition:filter .9s var(--ease)}
+.global-celestial.sun{color:#fff0b3}.global-celestial.sun svg{filter:drop-shadow(0 0 14px rgba(255,222,145,.78))}
+.global-celestial.moon{color:#edf2ff}.global-celestial.moon svg{filter:drop-shadow(0 0 15px rgba(202,218,255,.72))}
 /* Glass has to invert with the sky, or a white pane at midnight is a lamp in the face.
    Each phase carries its own material weights; every surface below reads them. */
 .scene-day,.scene-dawn{--sky-top:#FFE9B8;--sky-bottom:#FFF9EE;--scene-light:rgba(255,224,126,.42)}
@@ -139,7 +149,7 @@ button{
   border:1px solid var(--line);
   background:var(--surface-solid);
   padding:13px 18px;
-  border-radius:14px;
+  border-radius:var(--radius-sm);
   cursor:pointer;
   transition:transform var(--dur-s) var(--ease-spring),
              box-shadow var(--dur-s) var(--ease),
@@ -159,7 +169,18 @@ button:disabled{background:var(--panel-soft);color:var(--text-disabled);border-c
 button:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
 /* m025-63 accessibility pass. Sebelumnya hanya tombol yang punya cincin fokus, sehingga
    pengguna keyboard kehilangan jejak begitu berpindah ke tautan atau kolom isian. */
-a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible,summary:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
+/* i10 2026-08-28 (O5 §8): [tabindex] dipersempit ke :not([tabindex="-1"]) — setApp
+   memindahkan fokus PROGRAMATIK ke judul/stem (tabindex=-1) demi pembaca layar, dan
+   sebagian browser tetap menganggapnya :focus-visible sehingga stem soal dicat kotak emas
+   seolah bisa diklik. Tab keyboard sungguhan tidak pernah mendarat di elemen tabindex=-1,
+   jadi cincin fokus keyboard (tautan, isian, summary, tabindex="0") tetap utuh; tidak ada
+   outline:none baru — cincinnya memang tidak pernah berlaku untuk target programatik. */
+a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:not([tabindex="-1"]):focus-visible,summary:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
+/* i10 2026-08-28 (O5 §8, lanjutan): tanpa aturan sendiri, target programatik jatuh ke cincin
+   fokus BAWAAN browser (kotak hitam di stem soal). Outline transparan — bukan none — adalah
+   idiom yang tetap terlihat di forced-colors/high-contrast (transparent dipaksa jadi warna
+   sistem), jadi pengguna mode kontras tinggi tidak kehilangan jejak fokus. */
+[tabindex="-1"]:focus-visible{outline:2px solid transparent;outline-offset:2px}
 /* Ukuran sentuh minimum ditegaskan, bukan hanya kebetulan hasil padding: satu perubahan
    ukuran huruf tidak boleh diam-diam menyusutkan sasaran sentuh di bawah 44px. */
 button,.nav,input[type="url"],input[type="text"],input[type="password"],input[type="email"],input[type="number"],select{min-height:44px}
@@ -177,7 +198,7 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 .version{font-size:.68rem;color:var(--muted-soft);font-variant-numeric:tabular-nums}
 
 /* ---------- section head ---------- */
-.section-head{display:flex;justify-content:space-between;gap:16px;margin:6px 0 20px}
+.section-head{display:flex;justify-content:space-between;gap:var(--sp-4);margin:var(--sp-1) 0 var(--sp-5)}
 .section-head h1{font-size:1.65rem;margin:0 0 4px;letter-spacing:-.03em;font-weight:700;color:var(--ambient-text)}
 .section-head p{color:var(--ambient-muted)}.muted{color:var(--muted)}.section-head p,.muted{font-size:.86rem;line-height:1.55}
 
@@ -187,8 +208,8 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
   color:var(--text);
   border:1px solid var(--line);
   border-radius:var(--radius-lg);
-  padding:20px;
-  margin-bottom:12px;
+  padding:var(--sp-5);
+  margin-bottom:var(--sp-3);
   box-shadow:var(--shadow-sm);
   animation:riseIn var(--dur-m) var(--ease) both;
   transition:box-shadow var(--dur-m) var(--ease),transform var(--dur-m) var(--ease);
@@ -200,16 +221,16 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 .fade .card:nth-of-type(5){animation-delay:.22s}
 .fade .card:nth-of-type(n+6){animation-delay:.26s}
 
-.hero{padding:26px;background:linear-gradient(150deg,var(--surface-solid) 0%,var(--sun-soft) 130%);border-color:var(--line)}
-.hero h2{font-size:1.85rem;line-height:1.12;letter-spacing:-.035em;margin:8px 0 8px;font-weight:700}
+.hero{padding:var(--sp-6);background:linear-gradient(150deg,var(--surface-solid) 0%,var(--sun-soft) 130%);border-color:var(--line)}
+.hero h2{font-size:clamp(1.5rem,3vw,1.85rem);line-height:1.12;letter-spacing:-.035em;margin:8px 0 8px;font-weight:700}
 .hero p{color:var(--muted);line-height:1.6;font-size:.92rem;margin:0 0 16px}
-.eyebrow{font-size:12px;letter-spacing:.1em;color:var(--info);font-weight:700;text-transform:uppercase}
+.eyebrow{font-size:var(--fs-caption);letter-spacing:.1em;color:var(--info);font-weight:700;text-transform:uppercase}
 
 .status-pill{
   display:inline-flex;align-items:center;gap:6px;margin-top:14px;
-  font-size:12px;font-weight:700;color:var(--accent-strong);
+  font-size:var(--fs-caption);font-weight:700;color:var(--accent-strong);
   background:rgba(var(--surface-pure-rgb),.7);border:1px solid var(--surface-edge);
-  padding:6px 12px;border-radius:999px;
+  padding:6px 12px;border-radius:var(--radius-pill);
 }
 
 .actions,.toolbar,.three{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
@@ -219,7 +240,7 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 .primary.danger{background:var(--bad);color:var(--on-core);border-color:var(--bad)}
 
 /* ---------- stats ---------- */
-.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:var(--sp-3);margin-bottom:var(--sp-3)} /* i12/Peta: 5 butir stat (Gem turun ke sini) — auto-fit supaya tak ada butir yatim */
 .stats>div{
   background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-md);
   padding:16px;animation:riseIn var(--dur-m) var(--ease) both;
@@ -228,19 +249,20 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 .stats>div:nth-child(2){animation-delay:.06s}
 .stats>div:nth-child(3){animation-delay:.10s}
 .stats>div:nth-child(4){animation-delay:.14s}
-.stats small{display:block;color:var(--muted-soft);font-size:.66rem;text-transform:uppercase;letter-spacing:.09em;font-weight:700}
+/* v6.1 (O4 §5): .66rem≈10,6px ada di bawah lantai 12px — naik ke --fs-caption. */
+.stats small{display:block;color:var(--muted-soft);font-size:var(--fs-caption);text-transform:uppercase;letter-spacing:.09em;font-weight:700}
 .stats strong{display:block;font-size:1.4rem;margin-top:6px;letter-spacing:-.02em}
 
 .grid{display:grid;gap:12px}
 .grid .card{margin:0}
 .row{display:flex;justify-content:space-between;align-items:center;gap:12px}
-.row span{color:var(--muted);font-size:.78rem}
+.row span{color:var(--muted);font-size:var(--fs-caption)}
 .row b{font-weight:700}
 
 .library{display:flex;flex-wrap:wrap;gap:9px;color:var(--ink-soft);font-size:.78rem;margin-top:12px}
-.library span{background:var(--panel-soft);padding:6px 11px;border-radius:999px}
+.library span{background:var(--panel-soft);padding:6px 11px;border-radius:var(--radius-pill)}
 
-.pill,.notice{display:inline-block;border:1px solid var(--surface-edge);border-radius:999px;padding:5px 11px;color:var(--accent-strong);background:var(--accent-soft);font-size:12px;min-height:24px;font-weight:600}
+.pill,.notice{display:inline-block;border:1px solid var(--surface-edge);border-radius:var(--radius-pill);padding:5px 11px;color:var(--accent-strong);background:var(--accent-soft);font-size:var(--fs-caption);min-height:24px;font-weight:600}
 
 /* m025-85: Peta Belajar tab switcher - keeps the 17 sections that used to be one
    long scroll grouped and reachable without turning this into a separate route. */
@@ -257,18 +279,29 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 .card hr{border:0;border-top:1px solid var(--line);margin:18px 0}
 
 /* ---------- quiz ---------- */
-.question{font-size:1.35rem;line-height:1.34;margin:8px 0 18px;font-weight:700;letter-spacing:-.01em}
-.options{display:grid;gap:9px}
+/* i10 2026-08-28 (O5 §1.5): soal = teks terbesar di layar sesi — clamp naik ke 1.6rem di
+   layar lebar supaya hierarki soal > pilihan > pembahasan terbaca tanpa membaca. */
+/* v6.1 (O4 §5): soal = teks TERBESAR di pelajaran aktif (24–28px, di atas .lesson-title
+   24px dan h1 halaman yang didemosi ke h2). Menggantikan nilai interim i10 2026-08-28. */
+.question{font-size:clamp(var(--fs-h1),1.1rem + 1.8vw,1.75rem);line-height:var(--lh-tight);margin:8px 0 18px;font-weight:700;letter-spacing:-.01em}
+/* i10 2026-08-28 (O5 §3a): banner kata target soal vocab — KATA-nya memimpin layar dengan
+   serif display (sekeluarga dengan .word di flashcard), pelafalan menumpang di baseline. */
+.vocab-focus{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:2px 0 0}
+.vocab-focus-word{font-family:"Instrument Serif",serif;font-size:2rem;line-height:1.1;letter-spacing:-.01em}
+.options{display:grid;gap:var(--sp-2)}
 .option{
   text-align:left;background:var(--panel);border:1.5px solid var(--line);
-  min-height:52px;padding:15px 16px;border-radius:var(--radius-md);
+  min-height:52px;padding:var(--sp-4);border-radius:var(--radius-md);
   position:relative;transition:transform var(--dur-s) var(--ease-spring),
   background var(--dur-s) var(--ease),border-color var(--dur-s) var(--ease),
   box-shadow var(--dur-s) var(--ease);
 }
-.option:not(:disabled):hover{background:var(--panel-soft);border-color:var(--sun-deep)}
-.option.correct{border-color:var(--good-bright);background:var(--good-soft);animation:pop .32s var(--ease-spring)}
-.option.wrong{border-color:var(--bad);background:var(--bad-soft);animation:shake .32s var(--ease)}
+/* i10 2026-08-28 (O5 §2): pilihan jawaban = baris pilihan yang tenang, bukan kartu chunky
+   (resep tebal v6 di bawah kini mengecualikan .option); umpan hover cukup bayangan lembut. */
+.option{font-size:1rem}
+.option:not(:disabled):hover{background:var(--panel-soft);border-color:var(--sun-deep);box-shadow:var(--shadow-sm)}
+.option.correct{border-color:var(--good-bright);background:var(--good-soft);animation:pop var(--dur-m) var(--ease-spring)}
+.option.wrong{border-color:var(--bad);background:var(--bad-soft);animation:shake var(--dur-m) var(--ease)}
 /* Mode review mematikan tombol pilihan. Resep disabled global mengubah permukaan +
    tinta - untuk pilihan jawaban itu SALAH: jawabannya masih harus dibaca. Di sini
    disabled hanya melepas interaksi, warna state benar/salah tetap. */
@@ -276,12 +309,13 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 .option.correct:disabled{border-color:var(--good-bright);background:var(--good-soft)}
 .option.wrong:disabled{border-color:var(--bad);background:var(--bad-soft)}
 .feedback{
-  margin-top:14px;padding:18px;border:1px solid var(--line);border-radius:18px;
-  background:var(--surface-cool);line-height:1.6;font-size:.87rem;
+  /* v6.1 (O4 §3): border dilepas — ia duduk DI DALAM kartu; tint + stripe status cukup. */
+  margin-top:var(--sp-3);padding:var(--sp-4);border-radius:var(--radius-md);
+  background:var(--surface-cool);line-height:1.6;font-size:var(--fs-small);
   animation:riseIn var(--dur-m) var(--ease) both;
 }
 .feedback.hidden{display:none}
-.feedback b{font-size:1rem}
+.feedback b{font-size:var(--fs-body)}
 .feedback p{margin:9px 0}
 .distractor-breakdown{margin-top:6px;padding-top:6px;border-top:1px dashed var(--line)}
 .distractor-breakdown p{font-size:.83rem;margin:6px 0}
@@ -290,12 +324,12 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 .center{text-align:center}
 .emoji{font-size:2.6rem}
 .score{font-size:3.4rem;font-weight:700;color:var(--green);margin:10px 0;letter-spacing:-.03em;animation:pop .5s var(--ease-spring)}
-.meter{margin:13px 0}
+.meter{margin:var(--sp-3) 0}
 /* Track = --line-soft (garis, bukan bidang biru dingin #e9eef5 yang tidak ada di
    palet sama sekali). Isi = keluarga sun, gelap ke arah kanan supaya arah majunya
    terbaca tanpa membaca angkanya. */
-.bar{height:8px;background:var(--line-soft);border-radius:999px;overflow:hidden;margin-top:7px}
-.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--sun),var(--sun-deep));border-radius:999px;transition:width .6s var(--ease)}
+.bar{height:8px;background:var(--line-soft);border-radius:var(--radius-pill);overflow:hidden;margin-top:7px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--sun),var(--sun-deep));border-radius:var(--radius-pill);transition:width var(--dur-xl) var(--ease)}
 
 /* ---------- toast ---------- */
 .toast{
@@ -305,20 +339,23 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
      dengan krem di atasnya: 14,7:1, dan sekeluarga dengan panggung splash. */
   background:var(--core);color:var(--on-core);padding:13px 20px;border-radius:var(--radius-pill);font-weight:700;font-size:.86rem;
   transition:opacity var(--dur-m) var(--ease),transform var(--dur-m) var(--ease-spring);
-  z-index:80;box-shadow:0 18px 40px rgba(0,0,0,.22);max-width:88%;text-align:center
+  z-index:80;box-shadow:var(--shadow-lg);max-width:88%;text-align:center
 }
 .toast.show{opacity:1;transform:translate(-50%,0) scale(1)}
 
+/* i10 2026-08-28 (O5 §6.1): kilas jawaban dulu panel 330px di tengah layar — tepat menutup
+   soal + pilihan yang sedang dibicarakan oleh panel pembahasan. Kini pil status ringkas di
+   tepi atas (aman dari soal), pointer-events tetap none, ritme .show/1500ms tak berubah. */
 .answer-burst{
-  position:fixed;left:50%;top:clamp(92px,18vh,170px);z-index:130;pointer-events:none;
-  width:min(330px,calc(100% - 32px));display:grid;justify-items:center;gap:5px;padding:20px 24px;
-  border:1px solid rgba(var(--surface-pure-rgb),.7);border-radius:22px;background:rgba(var(--surface-pure-rgb),.96);
-  box-shadow:0 26px 70px rgba(36,26,17,.24);opacity:0;transform:translate(-50%,-18px) scale(.84);
-  transition:opacity .25s var(--ease),transform .38s var(--ease-spring);backdrop-filter:blur(16px)
+  position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top,0px));z-index:130;pointer-events:none;
+  width:auto;max-width:min(320px,calc(100% - 32px));display:grid;grid-auto-flow:column;align-items:center;gap:8px;padding:10px 16px;
+  border:1px solid rgba(var(--surface-pure-rgb),.7);border-radius:var(--radius-pill);background:rgba(var(--surface-pure-rgb),.96);
+  box-shadow:var(--shadow-md);opacity:0;transform:translate(-50%,-18px) scale(.9);
+  transition:opacity var(--dur-m) var(--ease),transform var(--dur-m) var(--ease-spring);backdrop-filter:blur(16px) /* i15: reveal = resep --dur-m, spring hanya di transform (O4 §9) */
 }
 .answer-burst.hidden{display:none}.answer-burst.show{opacity:1;transform:translate(-50%,0) scale(1)}
-.answer-burst-icon{width:54px;height:54px;display:grid;place-items:center;border-radius:17px;margin-bottom:3px}.answer-burst-icon svg{width:30px;height:30px}
-.answer-burst strong{font-size:1.24rem;letter-spacing:-.02em}.answer-burst small{color:var(--muted);font-size:.76rem;text-align:center}
+.answer-burst-icon{width:26px;height:26px;display:grid;place-items:center;border-radius:var(--radius-xs)}.answer-burst-icon svg{width:16px;height:16px}
+.answer-burst strong{font-size:.95rem;letter-spacing:-.01em;white-space:nowrap}.answer-burst small{color:var(--muted);font-size:.76rem;text-align:center}
 .answer-burst.success .answer-burst-icon{color:var(--good);background:var(--good-soft)}
 .answer-burst.error .answer-burst-icon{color:var(--bad);background:var(--bad-soft)}
 
@@ -326,15 +363,15 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 .bottomnav{
   position:fixed;bottom:max(12px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);width:min(560px,calc(100% - 24px));
   padding:7px;background:rgba(var(--surface-pure-rgb),.86);
-  border:1px solid rgba(239,231,232,.9);border-radius:22px;
+  border:1px solid rgba(239,231,232,.9);border-radius:var(--radius-lg);
   display:grid;grid-template-columns:repeat(5,1fr);gap:4px;z-index:40;
-  box-shadow:0 16px 40px rgba(36,26,17,.10);
+  /* v6.1 (O4 §2): bayangan pill pindah ke satu definisi v6 di bawah — tiga def lama bersaing. */
 }
 .nav{
   /* m028: lantai 12px. Label navigasi 10,4px adalah teks yang harus dibaca setiap hari;
      di bawah 12px ia berhenti terbaca sebagai kata dan hanya jadi bentuk. */
-  border:0;background:transparent;padding:9px 4px;font-size:12px;font-weight:600;color:var(--muted);
-  border-radius:15px;line-height:1.5;transition:color var(--dur-s) var(--ease),background var(--dur-m) var(--ease),transform var(--dur-s) var(--ease-spring)
+  border:0;background:transparent;padding:9px 4px;font-size:var(--fs-caption);font-weight:600;color:var(--muted);
+  border-radius:var(--radius-md);line-height:1.5;transition:color var(--dur-s) var(--ease),background var(--dur-m) var(--ease),transform var(--dur-s) var(--ease-spring)
 }
 .nav:hover{transform:none;box-shadow:none;border-color:transparent}
 .nav.active{color:var(--black);background:var(--panel-soft);transform:translateY(-2px)}
@@ -346,13 +383,13 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 @keyframes pop{0%{transform:scale(.94)}55%{transform:scale(1.015)}100%{transform:scale(1)}}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
 
-.error{margin-top:26px;padding:20px;border:1px solid #f3c3cf;background:var(--red-soft);border-radius:18px;color:var(--ink-danger)}
+.error{margin-top:26px;padding:20px;border:1px solid #f3c3cf;background:var(--red-soft);border-radius:var(--radius-md);color:var(--ink-danger)}
 
 /* ---------- flashcards ---------- */
-.flashcard{width:100%;min-height:340px;cursor:pointer;perspective:1400px;border:1px solid var(--line);border-radius:24px;background:transparent;color:inherit;outline:none;box-shadow:var(--shadow-sm)}
+.flashcard{width:100%;min-height:340px;cursor:pointer;perspective:1400px;border:1px solid var(--line);border-radius:var(--radius-lg);background:transparent;color:inherit;outline:none;box-shadow:var(--shadow-sm)}
 .flash-inner{position:relative;width:100%;min-height:340px;transition:transform .55s var(--ease-spring);transform-style:preserve-3d}
 .flashcard.flipped .flash-inner{transform:rotateY(180deg)}
-.flash-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:24px;padding:30px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;background:var(--surface-solid)}
+.flash-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:var(--radius-lg);padding:30px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;background:var(--surface-solid)}
 .flash-front{transform:rotateY(0deg)}
 .flash-back{transform:rotateY(180deg);overflow:auto}
 .flash-face .word{margin:.4rem 0}
@@ -365,13 +402,25 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 
 /* ---------- quiz shell ---------- */
 .quiz-shell{padding-bottom:20px}
+/* O2/i7: header sesi minimal. Grid auto 1fr auto (bukan 1fr auto 1fr) supaya kolom tengah
+   melar dan bar progres punya lebar. Saat lesson-mode aktif, header ini satu-satunya krom
+   atas: ia yang memikul notch (viewport-fit=cover) lewat env(safe-area-inset-top). */
 .quiz-topbar{
-  position:sticky;top:0;z-index:30;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;
-  padding:10px 0 14px;background:rgba(var(--bg-rgb),.9);backdrop-filter:blur(14px)
+  position:sticky;top:0;z-index:30;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:var(--sp-3);
+  padding:max(10px,env(safe-area-inset-top)) 0 var(--sp-3);background:rgba(var(--bg-rgb),.9);backdrop-filter:blur(14px)
 }
-.quiz-progress{text-align:center;font-weight:700}
-.quiz-progress span{font-size:1.1rem}
+.quiz-exit{min-width:44px;min-height:44px}
+.quiz-progress{display:grid;grid-template-columns:auto auto;justify-content:center;align-items:baseline;gap:2px 4px;text-align:center;font-weight:700;font-variant-numeric:tabular-nums}
+.quiz-progress span{font-size:var(--fs-body)}
 .quiz-progress em{font-style:normal;color:var(--muted-soft)}
+/* bar 4px --sun di bawah teks n/25: lapisan sekilas-pandang, teksnya tetap yang utama.
+   Isi = soal TERJAWAB (scaleX var(--p) dipasang inline oleh draw()/teach). */
+.quiz-progress-bar{grid-column:1/-1;display:block;height:4px;width:min(220px,100%);margin:4px auto 0;
+  background:var(--line-soft);border-radius:var(--radius-pill);overflow:hidden}
+.quiz-progress-bar b{display:block;height:100%;background:linear-gradient(90deg,var(--sun),var(--sun-deep));
+  border-radius:var(--radius-pill);transform:scaleX(var(--p,0));transform-origin:left;transition:transform var(--dur-xl) var(--ease)} /* i15: isi progres = resep --dur-xl (O4 §9) */
+@media(max-width:359px){.quiz-exit-label{display:none}} /* 320px: Keluar jadi ikon saja; aria-label tetap menyandang namanya */
+@media(max-height:430px){.quiz-topbar{padding:max(6px,env(safe-area-inset-top)) 0 8px;gap:10px}.quiz-progress-bar{margin-top:2px}} /* lanskap: header kompak */
 .quiz-next{justify-self:end;background:var(--sun);color:var(--text);border-color:var(--sun-deep);min-width:92px}
 /* m028: keadaan nonaktif dulu memakai opacity global .42 di atas permukaan redup - hasilnya
    teks 2,4:1, tidak terbaca. Sekarang keadaan nonaktif punya warnanya sendiri (4,8:1):
@@ -392,7 +441,7 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
   border:0;border-radius:var(--radius-md);background:var(--text);color:var(--on-core);
   font-weight:700;letter-spacing:-.01em;cursor:pointer;
   box-shadow:0 4px 0 var(--ink-press),0 10px 22px rgba(36,26,17,.13);
-  transition:transform .12s var(--ease),box-shadow .12s var(--ease),background .2s var(--ease)}
+  transition:transform var(--dur-xs) var(--ease),box-shadow var(--dur-xs) var(--ease),background var(--dur-s) var(--ease)}
 .quiz-listen-btn:hover:not(:disabled){background:var(--ink-hover)}
 .quiz-listen-btn:active:not(:disabled){
   transform:translateY(3px);box-shadow:0 1px 0 var(--ink-press),0 4px 10px rgba(36,26,17,.12)}
@@ -401,11 +450,18 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
   cursor:progress;transform:translateY(3px);
   box-shadow:0 1px 0 var(--line)}
 .quiz-listen .muted{font-size:13px}
+/* i10 2026-08-28 (O5 §5.1): panggung dengar di ATAS stem (urutan markup diatur draw()):
+   tombol Dengarkan jadi hero satu panggung terpusat — satu-satunya bahan soal listening
+   memang tombol ini, resep tinta m028 di atas diwarisi apa adanya. */
+.quiz-listen-hero{display:grid;justify-items:center;gap:8px;margin:6px 0 16px;padding:18px 16px;
+  border:1px solid var(--line-soft);border-radius:var(--radius-lg);background:var(--panel-soft)}
+.quiz-listen-btn-hero{padding:16px 30px;font-size:1.05rem;border-radius:var(--radius-pill)}
+.quiz-listen-hero .muted{text-align:center}
 
 /* ---------- level grid ---------- */
 .level-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:11px}
 .level-card{width:100%;display:flex;align-items:center;gap:12px;text-align:left;padding:16px;background:var(--surface-solid)}
-.level-number{width:32px;height:32px;border-radius:11px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent-strong);font-weight:700}
+.level-number{width:32px;height:32px;border-radius:var(--radius-sm);display:grid;place-items:center;background:var(--accent-soft);color:var(--accent-strong);font-weight:700}
 .level-card p{margin:2px 0 0;color:var(--muted);font-size:.75rem}
 
 /* ---------- welcome / modal overlays ---------- */
@@ -428,10 +484,10 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 .notification-locked .app,.notification-locked .bottomnav{visibility:hidden;pointer-events:none;user-select:none}
 .notification-gate{display:grid;place-items:center;opacity:1;pointer-events:auto;background:rgba(26,12,18,.82);backdrop-filter:blur(18px)}
 .notification-gate.hidden{display:none}.notification-gate.show{opacity:1}
-.notification-panel{box-shadow:0 28px 90px rgba(0,0,0,.28)}
-.notification-requirement{display:flex;gap:10px;align-items:flex-start;margin:18px 0 14px;padding:13px 14px;border:1px solid rgba(184,69,47,.18);border-radius:14px;background:var(--accent-soft);color:var(--text);font-size:.78rem;line-height:1.5;text-align:left}
+.notification-panel{box-shadow:var(--shadow-lg)}
+.notification-requirement{display:flex;gap:10px;align-items:flex-start;margin:18px 0 14px;padding:13px 14px;border:1px solid rgba(184,69,47,.18);border-radius:var(--radius-sm);background:var(--accent-soft);color:var(--text);font-size:.78rem;line-height:1.5;text-align:left}
 .notification-requirement svg{width:18px;flex:0 0 auto;margin-top:1px;color:var(--accent-strong)}
-.notification-status{margin:10px 0 0!important;padding:10px 12px;border-radius:12px;background:var(--surface-warm);color:var(--muted)!important;font-size:.76rem!important;font-weight:700}
+.notification-status{margin:10px 0 0!important;padding:10px 12px;border-radius:var(--radius-sm);background:var(--surface-warm);color:var(--muted)!important;font-size:.76rem!important;font-weight:700}
 .notification-status.success{background:#edf8f3;color:#277f68!important}.notification-status.error{background:#fff0f2;color:#b04b5f!important}
 .notification-help{font-size:.72rem!important;margin:12px 0 0!important}.notification-panel .primary[disabled]{opacity:.72;cursor:not-allowed;transform:none}
 /* ---------- Gerbang akun Puter, digubah mengikuti Audit UX Bagian 3 ----------
@@ -446,12 +502,12 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
   width:min(400px,100%);
   padding:44px 34px 36px;
   border:1px solid var(--line);
-  border-radius:26px;
+  border-radius:var(--radius-lg);
   background:var(--panel);
   box-shadow:var(--shadow-lg);
   text-align:center;
 }
-.auth-gate .auth-mark{display:block;width:72px;height:72px;margin:0 auto 26px;border-radius:20px;object-fit:contain}
+.auth-gate .auth-mark{display:block;width:72px;height:72px;margin:0 auto 26px;border-radius:var(--radius-md);object-fit:contain}
 .auth-gate .auth-panel h2{
   margin:0 0 10px;
   font-family:var(--fz-heading);
@@ -464,7 +520,7 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 }
 /* Status dirancang sebagai komponen sendiri, bukan alert bawaan browser (Bagian 3). */
 .auth-gate .auth-status{
-  margin:0 0 16px;padding:10px 14px;border-radius:12px;
+  margin:0 0 16px;padding:10px 14px;border-radius:var(--radius-sm);
   background:var(--panel-soft);color:var(--muted);
   font-size:.76rem;font-weight:700;line-height:1.45;
 }
@@ -475,7 +531,7 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 .auth-gate .auth-primary{
   display:flex;align-items:center;justify-content:center;gap:9px;
   width:100%;min-height:52px;padding:0 20px;
-  border:0;border-radius:999px;
+  border:0;border-radius:var(--radius-pill);
   background:var(--sun);color:var(--text);
   font-family:var(--fz-body);font-size:.96rem;font-weight:600;letter-spacing:-.01em;
   box-shadow:0 10px 26px rgba(36,26,17,.14);
@@ -497,7 +553,7 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 .auth-gate #authGateSkipHelp{margin:10px 0 0}
 .auth-gate .auth-help{margin:18px 0 0;color:var(--muted);font-size:.76rem;line-height:1.55}
 .auth-gate .auth-legal{margin:14px 0 0;color:var(--muted-soft);font-size:.68rem;line-height:1.5}
-@media (max-width:420px){.auth-gate .auth-panel{padding:36px 24px 30px;border-radius:22px}.auth-gate .auth-mark{width:60px;height:60px;margin-bottom:20px}}
+@media (max-width:420px){.auth-gate .auth-panel{padding:36px 24px 30px;border-radius:var(--radius-lg)}.auth-gate .auth-mark{width:60px;height:60px;margin-bottom:20px}}
 .auth-panel .primary[disabled]{opacity:.6;cursor:not-allowed;transform:none}
 .welcome-mark,.modal-mark{font-weight:700;letter-spacing:-.06em;font-size:1.02rem;color:var(--black)}
 .welcome-panel h2,.modal-panel h2{font-size:1.9rem;letter-spacing:-.03em;margin:12px 0 8px;font-weight:700}
@@ -545,14 +601,19 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
    preferensi in-app (.reduce-motion) - murid yang menyetel kurangi-gerak di OS tidak
    boleh tetap mendapat smooth-scroll dari html{scroll-behavior:smooth}. */
 @media(prefers-reduced-motion:reduce){
-  *{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+  *{animation-duration:.001ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}/* q17-M1: delay ikut nol — kartu riseIn tidak boleh muncul berurutan di bawah reduce */
 }
 
 /* ---------- misc feature blocks (progress / diagnostics) ---------- */
 .adaptive-note{margin-top:8px}
-.passage{background:var(--surface-cool);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:14px}
+.passage{background:var(--surface-cool);border:1px solid var(--line);border-radius:var(--radius-md);padding:18px;margin-bottom:14px}
 .passage h3{margin:5px 0 8px;font-size:1.02rem}
 .passage p{white-space:pre-wrap}
+/* i10 2026-08-28 (O5 §4a): kartu bacaan = halaman buku, bukan kartu UI — judul serif
+   display, ukuran baca 1rem, jarak baris 1.85, lebar baris dibatasi 62ch. */
+.card-reading{background:var(--panel);box-shadow:none;border:1px solid var(--line-soft)}
+.passage-reading h3{font-family:"Instrument Serif",serif;font-size:1.45rem;line-height:1.2;margin:6px 0 10px}
+.passage-reading p{font-size:1rem;line-height:1.85;color:var(--text);max-width:62ch}
 .flash-back .muted{margin-top:12px}
 /* ==========================================================================
    Popup keyakinan (m025-133)
@@ -577,7 +638,7 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 }
 .confidence-card{
   width:min(420px,100%);
-  padding:16px;border-radius:24px;
+  padding:16px;border-radius:var(--radius-lg);
   border:1.5px solid var(--ink);background:rgba(var(--surface-pure-rgb),.98);
   box-shadow:0 3px 0 var(--ink),0 22px 50px rgba(36,26,17,.3);
 }
@@ -590,7 +651,7 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 .confidence-scale{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
 .confidence-scale button{
   flex-direction:column;gap:2px;min-height:62px;padding:9px 4px;
-  font-size:.7rem;font-weight:700;line-height:1.25;text-align:center;border-radius:15px;
+  font-size:.7rem;font-weight:700;line-height:1.25;text-align:center;border-radius:var(--radius-md);
 }
 .confidence-scale button span{font-size:1.15rem;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
 /* Tiga tingkat, tiga warna - supaya terbaca sebagai SKALA, bukan tiga tombol yang
@@ -624,15 +685,15 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 }
 .confidence-pop.is-out{opacity:0;pointer-events:none}
 .creator-credit{display:flex;align-items:center;gap:9px;margin-top:10px;color:var(--muted);font-size:.82rem}
-.instagram-mark{width:22px;height:22px;border:2px solid var(--black);border-radius:7px;display:inline-grid;place-items:center;font-size:16px;line-height:1}
+.instagram-mark{width:22px;height:22px;border:2px solid var(--black);border-radius:var(--radius-xs);display:inline-grid;place-items:center;font-size:16px;line-height:1}
 .grid>div>h3{margin:4px 2px 12px;font-size:1rem}
 .grid hr{border:0;border-top:1px solid var(--line);margin:10px 0}
 .timeline-row{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--line-soft);font-size:.82rem}
 .timeline-row span:last-child{color:var(--muted);text-align:right}
 .diag-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0}
-.diag-grid>div{padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--surface-tint)}
+.diag-grid>div{padding:12px;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--surface-tint)}
 .confusion-network{display:grid;gap:9px}
-.confusion-node{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:14px}
+.confusion-node{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:var(--radius-sm)}
 .confusion-node span:nth-child(3){text-align:right}
 .confusion-node small{grid-column:1/-1;color:var(--muted)}
 .creator-link{display:inline-flex;align-items:center;gap:7px;color:inherit;text-decoration:none}
@@ -779,6 +840,21 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
   --fz-display-round:'FZ Fredoka','FZ Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   --fz-heading:'FZ Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   --fz-body:'FZ Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  /* ===== v6.1 CALM delta (O4 2026-08) — spacing, type scale, lift, micro-durations.
+     EXTENDS the v6 root; --shadow-sm/md/lg + --radius-sm/md/lg/pill + --dur-s/m/l
+     sudah ada di atas dan TIDAK diduplikasi di sini. */
+  --sp-1:4px;  --sp-2:8px;  --sp-3:12px; --sp-4:16px;
+  --sp-5:20px; --sp-6:24px; --sp-7:32px; --sp-8:40px;
+  --fs-display:clamp(1.75rem,4vw,2.125rem);
+  --fs-h1:1.5rem; --fs-h2:1.125rem; --fs-body:1rem;
+  --fs-small:.875rem; --fs-caption:.75rem;
+  --lh-tight:1.2; --lh-body:1.55;
+  --radius-xs:8px;
+  --lift-sun:0 4px 0 var(--sun-deep);
+  --lift-sun-press:0 1px 0 var(--sun-deep);
+  --lift-edge:0 3px 0 var(--surface-edge);
+  --lift-edge-press:0 1px 0 var(--surface-edge);
+  --dur-xs:.12s; --dur-xl:.6s;
 }
 
 /* Font merek berlaku di SELURUH aplikasi, termasuk gerbang izin, gerbang akun, modal,
@@ -790,18 +866,18 @@ h1,h2,h3,h4,.welcome-mark,.modal-mark{font-family:var(--fz-heading)}
 .section-head h1,.welcome-panel h2,.modal-panel h2,.fiezel-title{
   font-family:var(--fz-display);font-weight:400;letter-spacing:-.015em}
 
-.app{max-width:1120px;padding:22px 24px calc(126px + env(safe-area-inset-bottom))}
+.app{max-width:1120px;padding:var(--sp-5) var(--sp-6) calc(126px + env(safe-area-inset-bottom))}
 button{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:600}
 button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 .wide{width:100%}
 
 .topbar{
   position:sticky;top:0;z-index:35;margin:0 -10px 24px;padding:12px 10px;
-  background:var(--chrome-bg);border-radius:0 0 18px 18px;
+  background:var(--chrome-bg);border-radius:0 0 var(--radius-md) var(--radius-md);
 }
 .brand-button{display:flex;align-items:center;gap:12px;border:0;background:transparent;padding:6px 2px;box-shadow:none;color:var(--ambient-text)}
 .brand-button:hover{transform:none;border-color:transparent;box-shadow:none}
-.brand{width:112px}.brand-edition{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ambient-muted);font-weight:700;border-left:1px solid rgba(255,255,255,.24);padding-left:12px}
+.brand{width:112px}.brand-edition{font-size:var(--fs-caption);letter-spacing:.14em;text-transform:uppercase;color:var(--ambient-muted);font-weight:700;border-left:1px solid rgba(255,255,255,.24);padding-left:12px}
 /* Audit 20-003: di 280px topbar-actions menolak menyusut dan mendorong scroll horizontal.
    min-width:0 mengizinkan flex item ini mengecil di bawah lebar konten minimumnya. */
 .topbar-actions{display:flex;align-items:center;gap:8px;min-width:0}
@@ -813,41 +889,41 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 .icon-button.active{color:var(--accent-strong);border-color:#cfc8f6;background:var(--accent-soft)}
 .version{min-width:40px;text-align:right}
 
-.section-kicker{display:block;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent-on-glass);font-weight:700;margin-bottom:6px}
-.section-head{padding:10px 0 4px;margin-bottom:18px}.section-head h1{font-size:clamp(1.75rem,4vw,2.4rem)}
+.section-kicker{display:block;font-size:var(--fs-caption);letter-spacing:.16em;text-transform:uppercase;color:var(--accent-on-glass);font-weight:700;margin-bottom:6px}
+.section-head{padding:10px 0 4px;margin-bottom:18px}/* v6.1 (O4 §5): dup h1 clamp yang terbayangi dihapus — sumber tunggal = var(--fs-display). */
 .card{background:rgba(var(--surface-rgb),.93);box-shadow:var(--shadow-sm)}
 .primary{background:var(--sun);color:var(--text);border-color:var(--sun-deep)}
 .primary:hover{background:var(--sun-deep);border-color:var(--sun-deep)}
 
 /* Premium Home Launcher */
-.home-page{display:grid;gap:26px}
+.home-page{display:grid;gap:var(--sp-6)}
 .launcher-shell{
   position:relative;overflow:hidden;display:grid;grid-template-columns:minmax(0,1.42fr) minmax(300px,.72fr);gap:36px;
   grid-template-rows:1fr;
-  min-height:500px;padding:clamp(34px,5vw,62px);border-radius:30px;color:#f8f8fb;
+  min-height:500px;padding:clamp(34px,5vw,62px);border-radius:var(--radius-lg);color:#f8f8fb;
   background:linear-gradient(135deg,var(--launcher-start) 0%,rgba(21,26,56,.72) 56%,var(--launcher-end) 132%);
-  box-shadow:0 34px 80px rgba(10,14,31,.2);
+  /* v6.1 (O4 §2): satu bayangan launcher saja — def v6 di bawah memegang var(--shadow-md). */
 }
 .launcher-shell::after{content:"";position:absolute;width:320px;height:320px;border-radius:50%;right:-170px;top:-180px;background:rgba(216,179,107,.16);filter:blur(2px);pointer-events:none}
 .launcher-copy{position:relative;z-index:1;align-self:center}
 .launcher-meta{display:flex;align-items:center;flex-wrap:wrap;gap:10px;color:#c8cad8;font-size:.65rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700}
-.celestial-status{display:inline-flex;align-items:center;gap:7px;margin-left:auto;padding:7px 10px;border:1px solid rgba(255,255,255,.14);border-radius:999px;background:rgba(255,255,255,.07);letter-spacing:0;text-transform:none;color:#faf5f6}.celestial-status svg{width:14px;height:14px}.celestial-status span{color:#cdbcc1;font-weight:600}
+.celestial-status{display:inline-flex;align-items:center;gap:7px;margin-left:auto;padding:7px 10px;border:1px solid rgba(255,255,255,.14);border-radius:var(--radius-pill);background:rgba(255,255,255,.07);letter-spacing:0;text-transform:none;color:#faf5f6}.celestial-status svg{width:14px;height:14px}.celestial-status span{color:#cdbcc1;font-weight:600}
 .live-signal{width:7px;height:7px;border-radius:50%;background:#8fd8b8;box-shadow:0 0 0 6px rgba(143,216,184,.1);animation:signalPulse 2.4s ease-in-out infinite}
 .launcher-greeting{color:var(--gold);font:500 1rem Georgia,"Times New Roman",serif;font-style:italic;margin:30px 0 8px}
 .launcher-copy h1{font-size:clamp(2.5rem,5.7vw,5rem);line-height:.98;letter-spacing:-.06em;margin:0;max-width:850px;font-weight:700}.launcher-copy h1.login-message{font-size:clamp(2.15rem,4.5vw,4.25rem);line-height:1.02}
 .launcher-copy h1 span{color:#e8a3ad}
 .launcher-lead{font-size:1rem;line-height:1.7;color:#cdbcc1;max-width:680px;margin:22px 0 0}.learner-stage{display:flex;align-items:center;gap:8px;margin:13px 0 0;color:#c0aeb3;font-size:.72rem}.learner-stage svg{width:16px;height:16px;color:#d8b36b}
 .launcher-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
-.launcher-actions .luxe{background:#f7f6f1;color:#241A11;border-color:#f7f6f1}
-.launcher-actions .luxe:hover{background:#fff;color:#241A11;box-shadow:0 14px 34px rgba(0,0,0,.22)}
+/* v6.1 (O4 §8): varian .luxe putih raw-hex era launcher DIHAPUS (03-003) — .luxe kini
+   murni alias primary lewat daftar selektor resep chunky v6. Kelas di markup tetap. */
 .ghost-dark{background:transparent;color:#faf5f6;border-color:rgba(255,255,255,.2)}
 .ghost-dark:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.34)}
 .launcher-trust{display:flex;flex-wrap:wrap;gap:18px;margin-top:26px;color:#9fa3b6;font-size:.72rem}
 .launcher-trust span{display:flex;align-items:center;gap:7px}.launcher-trust svg{width:15px}
 
-.coach-preview{position:relative;z-index:1;align-self:stretch;display:flex;flex-direction:column;padding:25px;border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.075);border-radius:22px}
-.coach-head{display:flex;align-items:center;gap:11px}.coach-head>div{display:grid;gap:3px}.coach-head small{color:#c0aeb3;font-size:12px;letter-spacing:.14em}.coach-head b{font-size:.86rem}
-.coach-icon{width:42px;height:42px;display:grid;place-items:center;border-radius:13px;color:#171d31;background:#d8b36b}.coach-icon svg{width:21px;height:21px}
+.coach-preview{position:relative;z-index:1;align-self:stretch;display:flex;flex-direction:column;padding:25px;border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.075);border-radius:var(--radius-lg)}
+.coach-head{display:flex;align-items:center;gap:11px}.coach-head>div{display:grid;gap:3px}.coach-head small{color:#c0aeb3;font-size:var(--fs-caption);letter-spacing:.14em}.coach-head b{font-size:.86rem}
+.coach-icon{width:42px;height:42px;display:grid;place-items:center;border-radius:var(--radius-sm);color:#171d31;background:#d8b36b}.coach-icon svg{width:21px;height:21px}
 .coach-level{display:flex;justify-content:space-between;align-items:end;margin:34px 0 22px;padding-bottom:18px;border-bottom:1px solid rgba(255,255,255,.12)}
 .coach-level span{color:#afb2c4;font-size:.72rem}.coach-level strong{font:600 2.4rem Georgia,"Times New Roman",serif;color:#d9d3ff}
 /* m025-99 (brief 3.7): kartu Coach kini menampilkan RINGKASAN, dan detailnya ada di balik
@@ -862,35 +938,35 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 .coach-link{margin-top:auto;padding:0;justify-content:flex-start;color:#f6f5fa;background:transparent;border:0;box-shadow:none}.coach-link:hover{transform:translateX(3px);box-shadow:none;border-color:transparent}
 
 .home-overview{display:grid;grid-template-columns:minmax(320px,.92fr) minmax(0,1.08fr);gap:12px}
-.mission-panel{display:flex;align-items:center;gap:19px;padding:22px;border:1px solid var(--glass-line);background:var(--glass-thick);border-radius:20px;color:var(--glass-text)}
+.mission-panel{display:flex;align-items:center;gap:19px;padding:22px;border:1px solid var(--glass-line);background:var(--glass-thick);border-radius:var(--radius-md);color:var(--glass-text)}
 .mission-panel h3{margin:2px 0 4px;font-size:1.05rem}.mission-panel p{margin:0;color:var(--glass-muted);font-size:.78rem;line-height:1.55}
 .mission-ring{--ring-size:76px;width:var(--ring-size);height:var(--ring-size);flex:0 0 auto;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--sun-deep) var(--mission),var(--line-soft) 0)}
 .mission-ring::before{content:"";grid-area:1/1;width:60px;height:60px;border-radius:50%;background:var(--panel)}
 .mission-ring div{grid-area:1/1;z-index:1;display:flex;align-items:baseline}.mission-ring strong{font-size:1.2rem}.mission-ring span{font-size:.65rem;color:var(--muted)}
-.home-stats{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--glass-line);border-radius:20px;background:var(--glass-thick);overflow:hidden;color:var(--glass-text)}
-.home-stats>div{padding:22px 16px;border-right:1px solid var(--glass-line)}.home-stats>div:last-child{border:0}.home-stats small{display:block;color:var(--glass-muted);font-size:12px;text-transform:uppercase;letter-spacing:.1em}.home-stats strong{display:block;font-size:1.15rem;margin-top:8px}
+.home-stats{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--glass-line);border-radius:var(--radius-md);background:var(--glass-thick);overflow:hidden;color:var(--glass-text)}
+.home-stats>div{padding:22px 16px;border-right:1px solid var(--glass-line)}.home-stats>div:last-child{border:0}.home-stats small{display:block;color:var(--glass-muted);font-size:var(--fs-caption);text-transform:uppercase;letter-spacing:.1em}.home-stats strong{display:block;font-size:1.15rem;margin-top:8px}
 
-.home-section-head{display:flex;align-items:end;justify-content:space-between;gap:20px;margin-top:14px}.home-section-head h2{font-size:1.65rem;margin:0;letter-spacing:-.035em}.text-button{border:0;background:transparent;padding:6px;color:var(--accent-strong);box-shadow:none}.text-button:hover{box-shadow:none;border-color:transparent;transform:translateX(2px)}
+.home-section-head{display:flex;align-items:end;justify-content:space-between;gap:20px;margin-top:14px}.home-section-head h2{font-size:var(--fs-h1);margin:0;letter-spacing:-.035em}.text-button{border:0;background:transparent;padding:6px;color:var(--accent-strong);box-shadow:none}.text-button:hover{box-shadow:none;border-color:transparent;transform:translateX(2px)}
 .learning-launcher{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
 .launch-card{position:relative;min-height:220px;padding:24px;display:grid;grid-template-columns:1fr auto;grid-template-rows:auto 1fr;text-align:left;align-items:start;justify-content:stretch;background:var(--panel);border-color:var(--line);overflow:hidden}
 .launch-card>span:nth-child(2){grid-column:1/-1;align-self:end;display:grid;gap:6px}.launch-card>svg{grid-column:2;grid-row:1;width:18px;color:var(--muted)}
-.launch-icon{width:46px;height:46px;display:grid;place-items:center;border-radius:14px;background:var(--accent-soft);color:var(--accent-strong)}.launch-icon svg{width:22px;height:22px}
-.launch-card small{color:var(--muted);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase}.launch-card b{font-size:1.3rem;letter-spacing:-.025em}.launch-card em{font-style:normal;font-weight:500;color:var(--muted);font-size:.78rem;line-height:1.5}
+.launch-icon{width:46px;height:46px;display:grid;place-items:center;border-radius:var(--radius-sm);background:var(--accent-soft);color:var(--accent-strong)}.launch-icon svg{width:22px;height:22px}
+.launch-card small{color:var(--muted);font-size:var(--fs-caption);letter-spacing:.1em;text-transform:uppercase}.launch-card b{font-size:var(--fs-body);letter-spacing:-.025em}.launch-card em{font-style:normal;font-weight:500;color:var(--muted);font-size:.78rem;line-height:1.5}
 .launch-card:hover{transform:translateY(-5px);box-shadow:var(--shadow-md)}
 .grammar-launch .launch-icon{background:var(--sun-soft);color:var(--info)}.reading-launch .launch-icon{background:var(--good-soft);color:var(--good)}.skills-launch .launch-icon{background:var(--info-soft);color:var(--info)}
-.skills-page{display:grid;gap:18px}.voice-setup-card{display:flex;align-items:center;justify-content:space-between;gap:22px;padding:22px;border:1px solid var(--line);border-radius:20px;background:rgba(var(--surface-rgb),.93);color:var(--text)}.voice-setup-copy{min-width:0;flex:1}.voice-setup-card h2{margin:0 0 7px;font-size:1.15rem}.voice-setup-card p{max-width:720px;margin:0;color:var(--muted);font-size:.8rem;line-height:1.55}.voice-setup-actions{display:flex;gap:10px;align-items:center;flex:0 0 auto}.voice-setup-card button{flex:0 0 auto}.neural-voice-choice{display:grid;gap:5px;margin-top:14px;max-width:360px}.neural-voice-choice span{font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.neural-voice-choice select{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface-solid);color:var(--text);font:inherit}.neural-voice-choice small{color:var(--muted);font-size:.72rem;line-height:1.4}.skills-loading{padding:24px}
-.privacy-strip{display:flex;justify-content:space-between;align-items:center;gap:18px;padding:20px 22px;border:1px solid var(--line);border-radius:20px;background:rgba(var(--surface-rgb),.9);color:var(--text)}
-.privacy-strip>div{display:flex;align-items:center;gap:13px}.privacy-strip b{font-size:.86rem}.privacy-strip p{margin:3px 0 0;color:var(--muted);font-size:.74rem}.privacy-icon{width:40px;height:40px;display:grid;place-items:center;border-radius:13px;color:var(--accent-strong);background:var(--accent-soft)}
+.skills-page{display:grid;gap:18px}.voice-setup-card{display:flex;align-items:center;justify-content:space-between;gap:22px;padding:22px;border:1px solid var(--line);border-radius:var(--radius-md);background:rgba(var(--surface-rgb),.93);color:var(--text)}.voice-setup-copy{min-width:0;flex:1}.voice-setup-card h2{margin:0 0 7px;font-size:1.15rem}.voice-setup-card p{max-width:720px;margin:0;color:var(--muted);font-size:.8rem;line-height:1.55}.voice-setup-actions{display:flex;gap:10px;align-items:center;flex:0 0 auto}.voice-setup-card button{flex:0 0 auto}.neural-voice-choice{display:grid;gap:5px;margin-top:14px;max-width:360px}.neural-voice-choice span{font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.neural-voice-choice select{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--surface-solid);color:var(--text);font:inherit}.neural-voice-choice small{color:var(--muted);font-size:.72rem;line-height:1.4}.skills-loading{padding:24px}
+.privacy-strip{display:flex;justify-content:space-between;align-items:center;gap:18px;padding:20px 22px;border:1px solid var(--line);border-radius:var(--radius-md);background:rgba(var(--surface-rgb),.9);color:var(--text)}
+.privacy-strip>div{display:flex;align-items:center;gap:13px}.privacy-strip b{font-size:.86rem}.privacy-strip p{margin:3px 0 0;color:var(--muted);font-size:.74rem}.privacy-icon{width:40px;height:40px;display:grid;place-items:center;border-radius:var(--radius-sm);color:var(--accent-strong);background:var(--accent-soft)}
 
 /* Controls, reports, result states */
 .settings-list{display:grid;margin:22px 0;text-align:left;border-top:1px solid var(--line)}
 .setting-row{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;padding:15px 0;border-bottom:1px solid var(--line);cursor:pointer}
-.setting-icon{width:38px;height:38px;display:grid;place-items:center;border-radius:12px;background:var(--panel-soft);color:var(--accent-strong)}
+.setting-icon{width:38px;height:38px;display:grid;place-items:center;border-radius:var(--radius-sm);background:var(--panel-soft);color:var(--accent-strong)}
 .setting-row span:nth-child(2){display:grid;gap:3px}.setting-row small{color:var(--glass-muted);font-size:.7rem;line-height:1.4}
 /* Centang bawaan browser digambar PUTIH di atas accent-color. --sun gagal di situ
    (putih di atas kuning 1,4:1); tinta memberi 10:1+ tanpa menggambar apa pun. */
 .setting-row input,.consent-row input{accent-color:var(--text);width:20px;height:20px}
-.report-settings{margin:4px 0 18px;padding:18px;text-align:left;background:var(--surface-warm);border:1px solid var(--line);border-radius:18px}.report-settings .row{align-items:start}.report-settings .row p{margin:3px 0 0}
+.report-settings{margin:4px 0 18px;padding:18px;text-align:left;background:var(--surface-warm);border-radius:var(--radius-md)}.report-settings .row{align-items:start}.report-settings .row p{margin:3px 0 0}
 .endpoint-label{display:grid;gap:7px;margin:16px 0 12px;font-size:.72rem;font-weight:700;color:var(--muted)}
 /* Audit 04-005: tautan ini cuma setinggi 16px - jauh di bawah sasaran sentuh 44px.
    Padding vertikal 14px menaikkan kotak sentuhnya jadi 44px; margin negatif menelan
@@ -900,11 +976,11 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 .endpoint-label input:focus{outline:2px solid var(--focus-ring);outline-offset:2px;border-color:var(--focus-ring)}
 .consent-row{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;font-size:.72rem;line-height:1.5;color:var(--muted);cursor:pointer}
 .report-state{font-size:.7rem!important;margin:13px 0 0!important;padding-top:11px;border-top:1px solid var(--line)}
-.report-preview{text-align:left;display:grid;gap:0;margin:18px 0;padding:15px 18px;background:var(--surface-warm);border:1px solid var(--line);border-radius:16px}.report-preview p{margin:5px 0;font-size:.8rem}
+.report-preview{text-align:left;display:grid;gap:0;margin:18px 0;padding:15px 18px;background:var(--surface-warm);border:1px solid var(--line);border-radius:var(--radius-md)}.report-preview p{margin:5px 0;font-size:.8rem}
 .memory-tip,.ai-disclosure{display:flex;align-items:flex-start;gap:9px}.memory-tip svg,.ai-disclosure svg{width:17px;flex:0 0 auto;margin-top:2px;color:var(--accent-strong)}
-.result-stage{padding-top:7vh}.result-card{max-width:620px;margin:0 auto}.result-icon{width:62px;height:62px;display:grid;place-items:center;margin:0 auto 15px;border-radius:18px;color:#765824;background:#f4e7ca}.result-icon svg{width:29px;height:29px}
+.result-stage{padding-top:7vh}.result-card{max-width:620px;margin:0 auto}.result-icon{width:62px;height:62px;display:grid;place-items:center;margin:0 auto 15px;border-radius:var(--radius-md);color:#765824;background:#f4e7ca}.result-icon svg{width:29px;height:29px}
 
-.welcome-icon{width:54px;height:54px;display:grid;place-items:center;margin:0 auto 16px;border-radius:17px;background:var(--accent-soft);color:var(--accent-strong)}.welcome-icon svg{width:25px;height:25px}
+.welcome-icon{width:54px;height:54px;display:grid;place-items:center;margin:0 auto 16px;border-radius:var(--radius-md);background:var(--accent-soft);color:var(--accent-strong)}.welcome-icon svg{width:25px;height:25px}
 .welcome-mark,.modal-mark{font-size:.65rem;letter-spacing:.16em;color:var(--accent-strong)}
 /* Audit UX Bagian 5: warna panel diambil dari token, bukan dipaku. Nilai lamanya
    rgba(255,254,250,.98) - putih hangat - membuat SETIAP modal dan gerbang tetap terang
@@ -912,7 +988,7 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 .welcome-panel,.modal-panel{width:min(520px,100%);border-color:var(--line);background:var(--panel);color:var(--text)}
 .modal-panel{max-height:min(760px,88vh);overflow:auto}
 
-.bottomnav{width:min(620px,calc(100% - 24px));padding:7px;border-color:rgba(223,221,214,.82);background:rgba(var(--surface-rgb),.88);box-shadow:0 20px 50px rgba(17,23,42,.13);color:var(--text)}
+.bottomnav{width:min(620px,calc(100% - 24px));padding:7px;border-color:rgba(223,221,214,.82);background:rgba(var(--surface-rgb),.88);color:var(--text)}
 .nav{display:flex;flex-direction:column;gap:3px;min-height:54px}.nav svg{width:18px;height:18px}.nav.active{color:var(--text);background:var(--sun-soft)}
 .topline button,.toolbar button,.flash-actions button,.quiz-topbar button{display:inline-flex;align-items:center;gap:7px}
 .feedback{background:var(--panel);color:var(--text)}
@@ -920,14 +996,16 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
    menggeser padding dan membuat teks banner melompat saat state berubah. */
 .feedback.feedback-success{border-color:var(--line);box-shadow:inset 4px 0 0 var(--good)}
 .feedback.feedback-error{border-color:var(--line);box-shadow:inset 4px 0 0 var(--bad)}
-.feedback-title{display:flex;align-items:center;gap:9px}.feedback-title svg{width:21px;height:21px}.feedback-success .feedback-title{color:var(--good)}.feedback-error .feedback-title{color:var(--bad)}
-.grammar-grid .card{display:grid;gap:10px}.lesson-card-foot{display:flex;align-items:center;justify-content:space-between;gap:12px}.lesson-card-foot>span{font-size:.72rem;color:var(--muted)}
-.lesson-title{font-size:1.55rem;margin:8px 0 10px}.grammar-lesson-card>p{line-height:1.7}
-.lesson-example{margin:20px 0;padding:18px;border:1px solid var(--line);border-radius:17px;background:var(--surface-warm)}.lesson-example>span{font-size:.63rem;letter-spacing:.13em;text-transform:uppercase;color:var(--accent-strong);font-weight:700}.lesson-example h3{margin:7px 0 8px;font-size:1rem;line-height:1.5}.lesson-example p{margin:0;color:var(--muted);font-size:.82rem;line-height:1.55}
-.practice-contract{display:flex;align-items:center;justify-content:space-between;gap:24px;margin:14px 0;padding:22px;border:1px solid var(--line);border-radius:20px;background:rgba(var(--surface-rgb),.9);color:var(--text)}.practice-contract h3{margin:0 0 5px}.practice-contract p{margin:0;max-width:600px;color:var(--muted);font-size:.8rem;line-height:1.55}.practice-contract button{flex:0 0 auto}
+.feedback-title{display:flex;align-items:center;gap:9px;margin-bottom:6px}.feedback-title svg{width:21px;height:21px}.feedback-success .feedback-title{color:var(--good)}.feedback-error .feedback-title{color:var(--bad)}
+.grammar-grid .card{display:grid;gap:10px}.lesson-card-foot{display:flex;align-items:center;justify-content:space-between;gap:12px}.lesson-card-foot>span{font-size:var(--fs-caption);color:var(--muted)}
+.lesson-title{font-size:var(--fs-h1);margin:8px 0 10px}.grammar-lesson-card>p{line-height:1.7}
+/* v6.1 (O4 §3): maks DUA dari {border, bayangan, bg tint} — panel inset cukup tint. */
+.lesson-example{margin:var(--sp-5) 0;padding:var(--sp-4);border-radius:var(--radius-md);background:var(--surface-warm)}.lesson-example>span{font-size:var(--fs-caption);letter-spacing:.13em;text-transform:uppercase;color:var(--accent-strong);font-weight:700}.lesson-example h3{margin:7px 0 8px;font-size:1rem;line-height:1.5}.lesson-example p{margin:0;color:var(--muted);font-size:.82rem;line-height:1.55}
+.practice-contract{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-6);margin:var(--sp-3) 0;padding:var(--sp-5);border-radius:var(--radius-md);background:rgba(var(--surface-rgb),.9);color:var(--text)}.practice-contract h3{margin:0 0 5px}.practice-contract p{margin:0;max-width:600px;color:var(--muted);font-size:.8rem;line-height:1.55}.practice-contract button{flex:0 0 auto}
 
 @keyframes signalPulse{0%,100%{opacity:.7;transform:scale(.92)}50%{opacity:1;transform:scale(1.08)}}
-.reduce-motion *{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+.reduce-motion *{animation-duration:.001ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+html:has(body.reduce-motion){scroll-behavior:auto!important}/* v30 2026-08-29: toggle in-app harus setara jalur OS \u2014 riseIn delay dinolkan + smooth-scroll dimatikan (html di luar jangkauan selektor ber-scope body). */
 
 @media(min-width:900px){.topbar{padding-top:14px}.section-head{padding-top:22px}}
 @media(max-width:860px){
@@ -936,7 +1014,7 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 }
 @media(max-width:640px){
   .app{padding:12px 14px calc(116px + env(safe-area-inset-bottom))}.topbar{margin:0 -2px 16px;padding:9px 2px}.brand-edition{display:none}.version{display:none}
-  .icon-button{width:44px;height:44px}.launcher-shell{padding:24px 18px 30px;border-radius:24px;gap:24px}.celestial-status{width:100%;margin-left:17px;justify-content:flex-start}.launcher-copy h1{font-size:2.65rem}.launcher-copy h1.login-message{font-size:2.25rem}.launcher-lead{font-size:.88rem}.launcher-actions{display:grid}.launcher-actions button{width:100%}.launcher-trust{gap:10px}
+  .icon-button{width:44px;height:44px}.launcher-shell{padding:24px 18px 30px;border-radius:var(--radius-lg);gap:24px}.celestial-status{width:100%;margin-left:17px;justify-content:flex-start}.launcher-copy h1{font-size:2.65rem}.launcher-copy h1.login-message{font-size:2.25rem}.launcher-lead{font-size:.88rem}.launcher-actions{display:grid}.launcher-actions button{width:100%}.launcher-trust{gap:10px}
   .coach-preview{padding:20px}.home-stats{grid-template-columns:1fr 1fr}.home-stats>div:nth-child(2){border-right:0}.home-stats>div:nth-child(-n+2){border-bottom:1px solid var(--line)}
   /* m025-98 (brief redesign 3.7). Hero diukur 966px di 375x812 - lebih tinggi dari satu
      layar penuh, untuk satu sapaan. Yang dipotong di sini RUANG dan pengulangan, bukan kata:
@@ -969,7 +1047,7 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
   .learning-launcher{grid-template-columns:1fr 1fr;gap:10px}.launch-card{min-height:118px}
   .voice-setup-card{align-items:stretch;flex-direction:column}.voice-setup-actions{width:100%;display:grid;grid-template-columns:1fr}.voice-setup-card button{width:100%}
   .home-section-head{align-items:flex-start;flex-direction:column}.privacy-strip{align-items:flex-start;flex-direction:column}.privacy-strip>button{width:100%}
-  .bottomnav{bottom:max(8px,env(safe-area-inset-bottom));width:calc(100% - 16px)}.nav{font-size:12px;padding:8px 2px}
+  .bottomnav{bottom:max(8px,env(safe-area-inset-bottom));width:calc(100% - 16px)}.nav{font-size:var(--fs-caption);padding:8px 2px}
   .welcome-panel,.modal-panel{padding:26px 20px;border-radius:var(--radius-lg)}.modal{padding:12px}.setting-row{grid-template-columns:auto 1fr auto}.practice-contract{align-items:stretch;flex-direction:column}.practice-contract button{width:100%}.lesson-card-foot{align-items:flex-start;flex-direction:column}.lesson-card-foot button{width:100%}
 }
 
@@ -984,48 +1062,48 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 /* m025-33 FIEZEL Classroom */
 .classroom-page{display:grid;gap:14px}
 .classroom-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
-.classroom-cat{display:grid;gap:4px;justify-items:start;text-align:left;padding:16px;border-radius:18px;border:1px solid var(--line,#F0E4CF);background:var(--panel,#fff);color:var(--text,#241A11);min-height:88px}
+.classroom-cat{display:grid;gap:4px;justify-items:start;text-align:left;padding:16px;border-radius:var(--radius-md);border:1px solid var(--line,#F0E4CF);background:var(--panel,#fff);color:var(--text,#241A11);min-height:88px}
 .classroom-cat small{color:var(--muted,#6E5E47)}
-.classroom-board{padding:18px;border-radius:20px;background:var(--panel,#fff);color:var(--text,#241A11);border:1px solid var(--line,#F0E4CF)}
+.classroom-board{padding:18px;border-radius:var(--radius-md);background:var(--panel,#fff);color:var(--text,#241A11);border:1px solid var(--line,#F0E4CF)}
 .classroom-board h2{margin:.2rem 0 .5rem}
-.classroom-formula{font:600 1.05rem/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;padding:10px 12px;border-radius:12px;background:var(--panel-soft,#f6eef0)}
+.classroom-formula{font:600 1.05rem/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;padding:10px 12px;border-radius:var(--radius-sm);background:var(--panel-soft,#f6eef0)}
 .classroom-board ul{margin:.6rem 0 0;padding-left:1.1rem;line-height:1.6}
-.classroom-subtitle-card{padding:16px;border-radius:20px;background:var(--panel,#fff);color:var(--text,#241A11);border:1px solid var(--line,#F0E4CF)}
+.classroom-subtitle-card{padding:16px;border-radius:var(--radius-md);background:var(--panel,#fff);color:var(--text,#241A11);border:1px solid var(--line,#F0E4CF)}
 .classroom-en{font-weight:600;line-height:1.5;margin:.3rem 0}
 .classroom-id{color:var(--accent,#C2402C);font-weight:600;line-height:1.5;margin:.2rem 0;min-height:1.4em}
 .classroom-options{display:grid;gap:9px}
-.classroom-option{text-align:left;padding:14px;border-radius:14px;min-height:48px}
+.classroom-option{text-align:left;padding:14px;border-radius:var(--radius-sm);min-height:48px}
 .classroom-option.is-correct{border-color:var(--good-bright);background:var(--good-soft)}
 .classroom-option.is-wrong{border-color:var(--bad);background:var(--bad-soft)}
 .classroom-actions{display:flex;flex-wrap:wrap;gap:9px}
-.classroom-actions button{min-height:46px;padding:0 16px;border-radius:14px}
+.classroom-actions button{min-height:46px;padding:0 16px;border-radius:var(--radius-sm)}
 
 /* m025-43 mandatory one-batch neural voice download — stays until it finishes */
 .voice-bundle-sheet{position:fixed;inset:0;z-index:95;display:grid;place-items:center;padding:16px;background:linear-gradient(160deg,rgba(7,13,29,.95),rgba(45,37,86,.95));backdrop-filter:blur(10px)}
 body.voice-bundle-locked{overflow:hidden}
 body.voice-bundle-locked .bottomnav,body.voice-bundle-locked .app-header{pointer-events:none;opacity:.3}
-.voice-bundle-panel{width:min(520px,100%);display:grid;gap:10px;padding:20px;border-radius:24px;background:var(--panel,#fff);color:var(--text,#241A11);border:1px solid var(--line,#F0E4CF);box-shadow:0 24px 60px rgba(7,13,29,.28)}
+.voice-bundle-panel{width:min(520px,100%);display:grid;gap:10px;padding:20px;border-radius:var(--radius-lg);background:var(--panel,#fff);color:var(--text,#241A11);border:1px solid var(--line,#F0E4CF);box-shadow:var(--shadow-lg)}
 .voice-bundle-mark{font:700 11px/1.4 -apple-system,system-ui,sans-serif;letter-spacing:.12em;color:var(--accent,#C2402C)}
 .voice-bundle-panel h2{margin:0}
 .voice-bundle-panel p{margin:0;color:var(--muted,#6E5E47);line-height:1.55}
-.voice-bundle-track{height:8px;border-radius:999px;background:var(--line-soft,var(--panel-soft));overflow:hidden}
-.voice-bundle-track span{display:block;height:100%;width:0;border-radius:999px;background:var(--sun-deep);transition:width .3s ease}
+.voice-bundle-track{height:8px;border-radius:var(--radius-pill);background:var(--line-soft,var(--panel-soft));overflow:hidden}
+.voice-bundle-track span{display:block;height:100%;width:0;border-radius:var(--radius-pill);background:var(--sun-deep);transition:width .3s ease}
 .voice-bundle-progress{font-size:.92rem}
 .voice-bundle-actions{display:flex;gap:9px;justify-content:flex-end;flex-wrap:wrap}
-.voice-bundle-actions button{min-height:48px;padding:0 18px;border-radius:14px}
-.voice-bundle-pill{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0));z-index:60;padding:9px 16px;border-radius:999px;background:var(--panel,#fff);color:var(--text,#241A11);border:1px solid var(--line,#F0E4CF);box-shadow:0 10px 30px rgba(7,13,29,.18);font:600 .86rem/1.3 -apple-system,system-ui,sans-serif}
+.voice-bundle-actions button{min-height:48px;padding:0 18px;border-radius:var(--radius-sm)}
+.voice-bundle-pill{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0));z-index:60;padding:9px 16px;border-radius:var(--radius-pill);background:var(--panel,#fff);color:var(--text,#241A11);border:1px solid var(--line,#F0E4CF);box-shadow:0 10px 30px rgba(7,13,29,.18);font:600 .86rem/1.3 -apple-system,system-ui,sans-serif}
 @media (prefers-reduced-motion:reduce){.voice-bundle-track span{transition:none}}
 
 /* m025-42 mandatory daily target lock */
 .daily-lock{position:fixed;inset:0;z-index:90;display:grid;place-items:center;padding:18px;background:linear-gradient(160deg,rgba(7,13,29,.94),rgba(45,37,86,.94));backdrop-filter:blur(10px)}
-.daily-lock-panel{width:min(460px,100%);display:grid;gap:12px;padding:24px;border-radius:26px;background:var(--panel,#fff);color:var(--text,#241A11);text-align:center;box-shadow:0 30px 70px rgba(7,13,29,.4)}
+.daily-lock-panel{width:min(460px,100%);display:grid;gap:12px;padding:24px;border-radius:var(--radius-lg);background:var(--panel,#fff);color:var(--text,#241A11);text-align:center;box-shadow:var(--shadow-lg)}
 .daily-lock-mark{font:700 11px/1.4 -apple-system,system-ui,sans-serif;letter-spacing:.12em;color:var(--accent,#C2402C)}
 .daily-lock-panel h2{margin:0}
 .daily-lock-panel p{margin:0;color:var(--muted,#6E5E47);line-height:1.55}
-.daily-lock-track{height:10px;border-radius:999px;background:var(--line-soft,var(--panel-soft));overflow:hidden}
-.daily-lock-track span{display:block;height:100%;border-radius:999px;background:var(--sun-deep);transition:width .35s ease}
+.daily-lock-track{height:10px;border-radius:var(--radius-pill);background:var(--line-soft,var(--panel-soft));overflow:hidden}
+.daily-lock-track span{display:block;height:100%;border-radius:var(--radius-pill);background:var(--sun-deep);transition:width .35s ease}
 .daily-lock-count{font-weight:700;color:var(--text,#241A11)}
-.daily-lock-panel .wide{width:100%;min-height:52px;border-radius:16px}
+.daily-lock-panel .wide{width:100%;min-height:52px;border-radius:var(--radius-md)}
 .daily-lock-note{font-size:.86rem}
 /* While the lock is armed every escape route inside the app is inert, including the
    bottom navigation and the header controls. */
@@ -1036,40 +1114,40 @@ body.daily-locked{overflow:hidden}
 /* m025-44 FIEZEL Library: shelf, reader, audiobook, tap-to-translate */
 .library-page{display:grid;gap:14px}
 .library-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:11px}
-.library-card{display:grid;grid-template-columns:56px 1fr;gap:12px;align-items:start;text-align:left;padding:15px;border-radius:20px;border:1px solid var(--line,#F0E4CF);background:var(--panel,#fff);color:var(--text,#241A11);border-left:4px solid var(--book-accent,#C2402C)}
+.library-card{display:grid;grid-template-columns:56px 1fr;gap:12px;align-items:start;text-align:left;padding:15px;border-radius:var(--radius-md);border:1px solid var(--line,#F0E4CF);background:var(--panel,#fff);color:var(--text,#241A11);border-left:4px solid var(--book-accent,#C2402C)}
 .library-cover{font-size:2rem;line-height:1}
 .library-meta{display:grid;gap:3px}
 .library-meta b{font-size:1.02rem}
 .library-meta small{color:var(--muted,#6E5E47)}
 .library-meta em{color:var(--muted,#6E5E47);font-style:normal;line-height:1.45}
-.library-badge{justify-self:start;margin-top:3px;padding:2px 8px;border-radius:999px;background:var(--panel-soft,#f6eef0);color:var(--muted,#6E5E47);font:600 10px/1.6 -apple-system,system-ui,sans-serif;letter-spacing:.04em}
+.library-badge{justify-self:start;margin-top:3px;padding:2px 8px;border-radius:var(--radius-pill);background:var(--panel-soft,#f6eef0);color:var(--muted,#6E5E47);font:600 10px/1.6 -apple-system,system-ui,sans-serif;letter-spacing:.04em}
 /* --book-accent (aksen per buku dari JS) tetap dihormati; hanya fallback-nya pindah. */
-.library-progress{display:block;height:5px;margin-top:7px;border-radius:999px;background:var(--line-soft,var(--panel-soft));overflow:hidden}
+.library-progress{display:block;height:5px;margin-top:7px;border-radius:var(--radius-pill);background:var(--line-soft,var(--panel-soft));overflow:hidden}
 .library-progress span{display:block;height:100%;background:var(--book-accent,var(--sun-deep))}
 .library-reader{padding-bottom:190px}
 .library-reader-head{display:flex;gap:12px;align-items:flex-start}
-.library-back{min-height:44px;padding:0 14px;border-radius:12px}
-.library-note{margin:0;padding:10px 12px;border-radius:12px;background:var(--panel-soft,#f6eef0);color:var(--muted,#6E5E47);font-size:.88rem;line-height:1.5}
+.library-back{min-height:44px;padding:0 14px;border-radius:var(--radius-sm)}
+.library-note{margin:0;padding:10px 12px;border-radius:var(--radius-sm);background:var(--panel-soft,#f6eef0);color:var(--muted,#6E5E47);font-size:.88rem;line-height:1.5}
 .library-text{display:grid;gap:2px}
 .library-chapter{margin:16px 0 6px;font-size:1.05rem}
-.library-sentence{display:block;width:100%;text-align:left;padding:7px 10px;border:none;border-radius:10px;background:transparent;color:var(--text,#241A11);font:500 1.06rem/1.72 -apple-system,system-ui,sans-serif}
+.library-sentence{display:block;width:100%;text-align:left;padding:7px 10px;border:none;border-radius:var(--radius-xs);background:transparent;color:var(--text,#241A11);font:500 1.06rem/1.72 -apple-system,system-ui,sans-serif}
 .library-sentence[data-active]{background:var(--panel-soft,#f6eef0);box-shadow:inset 3px 0 0 var(--accent,#C2402C)}
 /* m025-45: the translation floats in the middle of the screen. The book stays visible
    behind it and a tap outside dismisses it - a reader, not a modal. */
 .library-translation-layer{position:fixed;inset:0;z-index:78;display:grid;place-items:center;padding:20px;background:rgba(7,13,29,.28);backdrop-filter:blur(2px)}
-.library-translation-card{width:min(460px,100%);display:grid;gap:7px;padding:18px 18px 14px;border-radius:22px;background:var(--panel,#fff);border:1px solid var(--line,#F0E4CF);box-shadow:0 26px 60px rgba(7,13,29,.32)}
+.library-translation-card{width:min(460px,100%);display:grid;gap:7px;padding:18px 18px 14px;border-radius:var(--radius-lg);background:var(--panel,#fff);border:1px solid var(--line,#F0E4CF);box-shadow:var(--shadow-lg)}
 .library-translation-mark{font:700 10px/1.4 -apple-system,system-ui,sans-serif;letter-spacing:.12em;color:var(--accent,#C2402C)}
 .library-translation-en{margin:0;font-weight:600;line-height:1.5}
 .library-translation-id{margin:0;color:var(--accent,#C2402C);font-weight:600;line-height:1.5}
 .library-translation-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 #libraryCloseOne{margin-left:auto;width:44px;padding:0}
-.library-translation-actions button{min-height:42px;padding:0 13px;border-radius:12px}
+.library-translation-actions button{min-height:42px;padding:0 13px;border-radius:var(--radius-sm)}
 .library-dock{position:fixed;left:0;right:0;bottom:calc(64px + env(safe-area-inset-bottom,0));z-index:40;display:grid;gap:7px;padding:11px 14px;background:var(--chrome-bg,rgba(250,247,247,.94));backdrop-filter:blur(12px);border-top:1px solid var(--line,#F0E4CF)}
-.library-progress-line{height:5px;border-radius:999px;background:var(--line-soft,var(--panel-soft));overflow:hidden}
+.library-progress-line{height:5px;border-radius:var(--radius-pill);background:var(--line-soft,var(--panel-soft));overflow:hidden}
 .library-progress-line span{display:block;height:100%;background:var(--sun-deep);transition:width .25s ease}
 .library-status{margin:0;font-size:.84rem;color:var(--muted,#6E5E47)}
 .library-controls{display:flex;gap:8px;align-items:center}
-.library-controls button{min-height:48px;padding:0 14px;border-radius:14px}
+.library-controls button{min-height:48px;padding:0 14px;border-radius:var(--radius-sm)}
 .library-controls .primary{flex:1}
 /* m028 fase4: tombol kecepatan duduk di baris status di KIRI, bukan di .library-controls.
    Terukur di 390x844: baris kontrol sudah penuh (mundur + Audiobook + maju + Tanya Fiezel
@@ -1080,15 +1158,15 @@ body.daily-locked{overflow:hidden}
    Lebarnya dipaku supaya siklus 0.75x -> 1x -> 1.25x tidak menggeser teks statusnya. */
 .library-dock-line{display:flex;align-items:center;gap:8px}
 .library-dock-line .library-status{flex:1;min-width:0}
-.library-speed{flex:0 0 auto;min-width:62px;padding:0 12px;border-radius:12px;text-align:center;font-weight:700;font-variant-numeric:tabular-nums}
+.library-speed{flex:0 0 auto;min-width:62px;padding:0 12px;border-radius:var(--radius-sm);text-align:center;font-weight:700;font-variant-numeric:tabular-nums}
 .library-ask-sheet{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:16px;background:rgba(7,13,29,.5)}
-.library-ask-panel{width:min(480px,100%);display:grid;gap:9px;padding:20px;border-radius:22px;background:var(--panel,#fff);color:var(--text,#241A11)}
+.library-ask-panel{width:min(480px,100%);display:grid;gap:9px;padding:20px;border-radius:var(--radius-lg);background:var(--panel,#fff);color:var(--text,#241A11)}
 .library-ask-mark{font:700 11px/1.4 -apple-system,system-ui,sans-serif;letter-spacing:.12em;color:var(--accent,#C2402C)}
 .library-ask-panel h2{margin:0}
-.library-ask-quote{margin:0;padding:9px 11px;border-radius:12px;background:var(--panel-soft,#f6eef0);line-height:1.5}
-.library-ask-panel textarea{width:100%;padding:11px;border-radius:13px;border:1px solid var(--line,#F0E4CF);font:inherit;resize:vertical}
+.library-ask-quote{margin:0;padding:9px 11px;border-radius:var(--radius-sm);background:var(--panel-soft,#f6eef0);line-height:1.5}
+.library-ask-panel textarea{width:100%;padding:11px;border-radius:var(--radius-sm);border:1px solid var(--line,#F0E4CF);font:inherit;resize:vertical}
 .library-ask-actions{display:flex;gap:8px;justify-content:flex-end}
-.library-ask-actions button{min-height:46px;padding:0 16px;border-radius:13px}
+.library-ask-actions button{min-height:46px;padding:0 16px;border-radius:var(--radius-sm)}
 .library-ask-answer{margin:0;line-height:1.55;color:var(--accent,#C2402C);font-weight:600}
 .library-ask-answer:empty{display:none}
 @media (max-width:620px){.library-sentence{font-size:1.02rem}}
@@ -1108,33 +1186,29 @@ body.daily-locked{overflow:hidden}
   color:var(--glass-text);
   box-shadow:0 1px 1px rgba(36,26,17,.03),0 8px 24px rgba(36,26,17,.07);
 }
-.card{border-radius:22px;padding:18px}
+.card{border-radius:var(--radius-lg);padding:18px}
 .card p.muted,.launch-card small,.coach-preview p{color:var(--glass-muted)}
 
 /* Large title. This is what replaces the capitals the screens used to shout with. */
-.section-head h1{font-size:clamp(28px,7vw,34px);line-height:1.18;font-weight:700;letter-spacing:-.6px;margin:0}
-.section-head p{font-size:15px;line-height:20px;color:var(--ambient-muted);margin:.25rem 0 0}
+.section-head h1{font-size:var(--fs-display);line-height:1.18;font-weight:700;letter-spacing:-.6px;margin:0}
+.section-head p{font-size:var(--fs-small);line-height:1.4;color:var(--ambient-muted);margin:.25rem 0 0}
 .section-head{margin-bottom:18px}
 
-/* One primary action per screen, and it is unmistakable. */
-button.primary,.primary.wide,.primary.luxe{
-  min-height:52px;border-radius:26px;background:var(--accent);color:#fff;border:0;
-  font-size:17px;font-weight:600;letter-spacing:-.2px;
-  box-shadow:0 8px 22px rgba(184,69,47,.30);
-}
-button.primary:hover,.primary.luxe:hover{background:var(--sun-deep);color:var(--text)}
+/* One primary action per screen, and it is unmistakable.
+   v6.1 (O4 §8, preseden F2-16): lapisan primary era-accent yang dulu di sini DIHAPUS —
+   ia kalah kaskade dari resep chunky v6 (blok "1. Tombol chunky") dan tidak pernah
+   ter-render; menyimpannya hanya memaksa fase berikutnya menebak mana yang hidup. */
 
-.launcher-shell{border-radius:26px}
-.coach-preview{border-radius:22px}
-.launch-card{border-radius:20px;min-height:84px}
-.launch-card b{font-size:15px;line-height:20px;font-weight:600;letter-spacing:-.2px}
-.launch-card small{font-size:13px;line-height:17px}
+.launcher-shell{border-radius:var(--radius-lg)}
+.coach-preview{border-radius:var(--radius-lg)}
+.launch-card{border-radius:var(--radius-md);min-height:84px}
+/* v6.1 (O4 §5): pasangan px 15/13 dihapus — .launch-card b/small kini dari skala --fs. */
 
 /* m025-98 (brief redesign 3.7): pembungkus expand/collapse untuk blok yang tidak perlu
    dibuka bersamaan. Dipakai di Home untuk peta kemampuan dan pemilih tujuan belajar.
    Target sentuhnya 44px penuh, dan panahnya berputar supaya keadaannya terbaca tanpa
    perlu membaca label. */
-.home-fold{border:1px solid var(--glass-line);border-radius:18px;background:var(--glass-thick);color:var(--glass-text);margin:12px 0 0;overflow:hidden}
+.home-fold{border:1px solid var(--glass-line);border-radius:var(--radius-md);background:var(--glass-thick);color:var(--glass-text);margin:12px 0 0;overflow:hidden}
 .home-fold>summary{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:44px;padding:11px 16px;cursor:pointer;list-style:none;font-size:.82rem;font-weight:700;color:var(--glass-text)}
 .home-fold>summary::-webkit-details-marker{display:none}
 .home-fold>summary svg{width:17px;height:17px;flex:0 0 auto;color:var(--glass-muted);transition:transform .2s var(--ease)}
@@ -1157,10 +1231,10 @@ button.primary:hover,.primary.luxe:hover{background:var(--sun-deep);color:var(--
 .setting-row-action>svg:last-child{width:17px;height:17px;color:var(--muted);justify-self:end}
 
 .fz-tour{position:fixed;inset:0;z-index:2147481800;color:var(--glass-text,#fff)}
-.fz-tour-hole{position:fixed;border-radius:18px;pointer-events:none;
+.fz-tour-hole{position:fixed;border-radius:var(--radius-md);pointer-events:none;
   box-shadow:0 0 0 9999px rgba(10,5,8,.78),0 0 0 2px rgba(255,255,255,.55) inset;
   transition:top .26s var(--ease,ease),left .26s var(--ease,ease),width .26s var(--ease,ease),height .26s var(--ease,ease)}
-.fz-tour-card{position:fixed;left:16px;right:16px;padding:20px 20px 16px;border-radius:22px;
+.fz-tour-card{position:fixed;left:16px;right:16px;padding:20px 20px 16px;border-radius:var(--radius-lg);
   background:var(--glass-solid,#fff);color:var(--text,#241A11);box-shadow:0 24px 70px rgba(0,0,0,.34);
   animation:fz-tour-in .28s cubic-bezier(.22,.8,.28,1) both}
 .fz-tour-card.is-top{top:max(22px,env(safe-area-inset-top))}
@@ -1173,7 +1247,7 @@ button.primary:hover,.primary.luxe:hover{background:var(--sun-deep);color:var(--
 .fz-tour-dot.is-active{background:var(--accent,#C2402C);width:18px;border-radius:3px}
 .fz-tour-actions{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px}
 .fz-tour-skip{min-height:44px;padding:10px 14px;border:0;background:transparent;color:var(--muted,#6E5E47);font:inherit;font-size:.82rem;font-weight:700;cursor:pointer}
-.fz-tour-next{min-height:44px;padding:11px 22px;border:0;border-radius:14px;background:var(--accent,#C2402C);color:#fff;font:inherit;font-size:.86rem;font-weight:700;cursor:pointer}
+.fz-tour-next{min-height:44px;padding:11px 22px;border:0;border-radius:var(--radius-sm);background:var(--accent,#C2402C);color:#fff;font:inherit;font-size:.86rem;font-weight:700;cursor:pointer}
 /* Kurangi-gerak: sorotannya tetap ada, hanya perpindahannya yang tidak dianimasikan. */
 .fz-tour-still .fz-tour-hole{transition:none}
 .fz-tour-still .fz-tour-card{animation:none}
@@ -1199,8 +1273,7 @@ button.primary:hover,.primary.luxe:hover{background:var(--sun-deep);color:var(--
    pekat sehingga tidak pernah bisa dibaca tembus. Keduanya nol biaya render. */
 .bottomnav{
   background:var(--glass-solid);
-  border:.5px solid var(--glass-edge);border-radius:30px;padding:6px;
-  box-shadow:0 1px 1px rgba(36,26,17,.05),0 14px 34px rgba(36,26,17,.14);
+  border:.5px solid var(--glass-edge);border-radius:var(--radius-lg);padding:6px;
 }
 /* Peredup di dasar layar. pointer-events:none supaya ia tidak pernah menelan sentuhan, dan
    ia duduk DI BAWAH pill (z-index 39 lawan 40) supaya tab tetap tajam di atasnya. */
@@ -1210,14 +1283,14 @@ button.primary:hover,.primary.luxe:hover{background:var(--sun-deep);color:var(--
   background:linear-gradient(to top,var(--bg) 34%,rgba(0,0,0,0));
 }
 @media (prefers-reduced-transparency:reduce){.nav-scrim{background:var(--bg)}}
-.nav{min-height:44px;color:var(--glass-muted);border-radius:24px}
+.nav{min-height:44px;color:var(--glass-muted);border-radius:var(--radius-lg)}
 .nav.active{color:var(--accent-on-glass);background:transparent;transform:none;font-weight:600}
 
 /* Sheets sit on the heavier material, because they take the whole screen. */
 .modal-panel,.welcome-panel{
   background:var(--glass-thick);
   -webkit-backdrop-filter:var(--glass-blur-heavy);backdrop-filter:var(--glass-blur-heavy);
-  border:.5px solid var(--glass-edge);border-radius:34px;color:var(--glass-text);
+  border:.5px solid var(--glass-edge);border-radius:var(--radius-lg);color:var(--glass-text);
   box-shadow:0 1px 2px rgba(36,26,17,.06),0 -8px 60px rgba(36,26,17,.18);
 }
 
@@ -1244,30 +1317,30 @@ button.primary:hover,.primary.luxe:hover{background:var(--sun-deep);color:var(--
 .section-head p{color:var(--ambient-muted)}
 
 /* The stat labels were the last capitals left on Home. */
-.home-stats small,.stats small{text-transform:none;letter-spacing:.01em;font-size:.7rem}
+.home-stats small,.stats small{text-transform:none;letter-spacing:.01em;font-size:var(--fs-caption)}
 
 /* R2 Personal Learning Journey. Memakai token yang sama dengan home-overview supaya panel ini
    terbaca sebagai bagian dari Home, bukan tempelan. */
 .journey-week{color:var(--ambient-muted);font-size:.7rem;letter-spacing:.04em}
 .journey-panel{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
-.journey-mission,.journey-today,.journey-goal{padding:22px;border:1px solid var(--glass-line);border-radius:20px;background:var(--glass-thick);color:var(--glass-text)}
+.journey-mission,.journey-today,.journey-goal{padding:22px;border:1px solid var(--glass-line);border-radius:var(--radius-md);background:var(--glass-thick);color:var(--glass-text)}
 .journey-mission small,.journey-today small,.journey-goal small{display:block;color:var(--glass-muted);font-size:.62rem;text-transform:uppercase;letter-spacing:.1em}
 .journey-mission h3{margin:8px 0 6px;font-size:1.05rem;text-transform:capitalize}
 .journey-target{margin:6px 0 0;font-size:.78rem;color:var(--glass-text)}
 .journey-why,.journey-note{margin:8px 0 0;color:var(--glass-muted);font-size:.74rem;line-height:1.55}
 .journey-blocks{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:8px}
-.journey-block{display:grid;gap:2px;padding:10px 12px;border:1px solid var(--glass-line);border-radius:14px}
+.journey-block{display:grid;gap:2px;padding:10px 12px;border:1px solid var(--glass-line);border-radius:var(--radius-sm)}
 .journey-block b{font-size:.8rem}.journey-block span{color:var(--glass-muted);font-size:.72rem;line-height:1.5}
 .journey-block-review{border-color:var(--accent-on-glass)}
 .journey-recovery{margin:8px 0 0;font-size:.74rem;color:var(--accent-on-glass)}
 .journey-today button{margin-top:12px;width:100%}
-.journey-skills{display:grid;grid-template-columns:repeat(5,1fr);border:1px solid var(--glass-line);border-radius:20px;background:var(--glass-thick);color:var(--glass-text);overflow:hidden;margin-bottom:14px}
+.journey-skills{display:grid;grid-template-columns:repeat(5,1fr);border:1px solid var(--glass-line);border-radius:var(--radius-md);background:var(--glass-thick);color:var(--glass-text);overflow:hidden;margin-bottom:14px}
 .journey-skill{padding:16px 12px;border-right:1px solid var(--glass-line);display:grid;gap:6px}
 .journey-skill:last-child{border-right:0}
 .journey-skill b{font-size:.78rem}.journey-skill span{color:var(--muted);font-size:.72rem}
 .journey-skill.is-unmeasured span{font-style:italic}
 .journey-goal-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-.journey-goal-chip{padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--text);font-size:12px;min-height:36px}
+.journey-goal-chip{padding:8px 12px;border:1px solid var(--line);border-radius:var(--radius-pill);background:transparent;color:var(--text);font-size:var(--fs-caption);min-height:36px}
 /* Chip terpilih = BIDANG kuning + tinta gelap, bukan garis+teks aksen: satu-satunya
    penanda "terpilih" sebelum ini adalah warna garis 1px - hampir tak terlihat. */
 .journey-goal-chip.is-active{background:var(--sun);border-color:var(--sun-deep);color:var(--text);font-weight:600}
@@ -1376,7 +1449,7 @@ button.primary:hover,.primary.luxe:hover{background:var(--sun-deep);color:var(--
 .fiezel-ob-reveal .fiezel-wordmark{position:relative;width:min(46vw,178px);margin:0 auto;display:block}
 .fiezel-ob-word{position:relative;margin:0;font-family:var(--fz-heading);font-weight:700;
   font-size:1.8rem;letter-spacing:.02em;color:var(--fz-on-core)}
-.fiezel-ob-tag{position:relative;margin:10px 0 0;font-size:12px;font-weight:700;
+.fiezel-ob-tag{position:relative;margin:10px 0 0;font-size:var(--fs-caption);font-weight:700;
   letter-spacing:.32em;text-indent:.32em;text-transform:uppercase;color:var(--fz-sun)}
 
 /* ---------- m028: stepper enam langkah ----------
@@ -1384,7 +1457,7 @@ button.primary:hover,.primary.luxe:hover{background:var(--sun-deep);color:var(--
    carousel - dan hanya di satu langkah. Sekarang posisinya selalu terbaca: nomor langkah,
    nama langkah, dan enam segmen. Jumlah langkah dan urutannya TIDAK berubah. */
 .fiezel-stepper{padding:16px 16px 4px;flex:0 0 auto}
-.fiezel-stepper-eyebrow{display:block;font-size:12px;font-weight:700;letter-spacing:.09em;
+.fiezel-stepper-eyebrow{display:block;font-size:var(--fs-caption);font-weight:700;letter-spacing:.09em;
   text-transform:uppercase;color:var(--fz-info)}
 .fiezel-stepper-names{display:block;margin-top:3px;font-size:13px;font-weight:600;
   line-height:1.4;color:var(--fz-ink-muted)}
@@ -1545,7 +1618,7 @@ button.primary:hover,.primary.luxe:hover{background:var(--sun-deep);color:var(--
    zoom itu menggeser seluruh lapisan perkenalan dan terbaca sebagai layar yang melompat. */
 .fiezel-field{display:flex;flex-direction:column;align-items:flex-start;gap:8px;
   width:100%;text-align:left}
-.fiezel-field>span{font-size:12px;letter-spacing:.09em;text-transform:uppercase;
+.fiezel-field>span{font-size:var(--fs-caption);letter-spacing:.09em;text-transform:uppercase;
   font-weight:700;color:var(--fz-info)}
 .fiezel-field input{width:100%;min-height:52px;font-size:16px;font-weight:600;font-family:var(--fz-body);
   color:var(--fz-ink);background:var(--fz-bg);border:1.5px solid var(--fz-line);border-radius:var(--radius-md);
@@ -1570,7 +1643,7 @@ button.primary:hover,.primary.luxe:hover{background:var(--sun-deep);color:var(--
 .fiezel-splash-tag{font-family:var(--fz-body);font-size:.72rem;letter-spacing:.14em;
   text-transform:uppercase;color:var(--fz-ink-muted);margin:0}
 .fiezel-splash-bubble{position:relative;max-width:20rem;background:#fff;border:1px solid var(--fz-line);
-  border-radius:16px;padding:12px 16px;color:var(--fz-ink);font-size:.86rem;line-height:1.5;
+  border-radius:var(--radius-md);padding:12px 16px;color:var(--fz-ink);font-size:.86rem;line-height:1.5;
   box-shadow:0 4px 14px rgba(74,17,25,.12)}
 .fiezel-splash-bubble::after{content:"";position:absolute;left:50%;bottom:-9px;width:16px;height:16px;
   transform:translateX(-50%) rotate(45deg);background:#fff;border-right:1px solid var(--fz-line);
@@ -1712,7 +1785,11 @@ body.reduce-motion .fiezel-ob-mascot *{animation:none!important;transition:none!
 
 /* ========== SKELETON LOADING STATES (Polished, Premium Feel) ========== */
 /* Shimmer animation: Creates the premium "loading" feel like Spotify/Duolingo */
-@keyframes shimmer {
+/* i15 2026-08-29 (audit 12-005): keyframe ini dulu bernama `shimmer` dan bertabrakan global
+   dengan @keyframes shimmer milik tutor-v3.css (dimuat belakangan, jadi menang di mana-mana;
+   varian persen-nya no-op untuk .skeleton yang mengandalkan background-size 1000px).
+   Di-namespace jadi fzSkeletonShimmer di sisi style.css — tutor-v3.css tak disentuh. */
+@keyframes fzSkeletonShimmer {
   0% { background-position: -1000px 0; }
   100% { background-position: 1000px 0; }
 }
@@ -1727,7 +1804,7 @@ body.reduce-motion .fiezel-ob-mascot *{animation:none!important;transition:none!
      Skeleton yang tidak terlihat berkedip sama dengan tidak ada skeleton. */
   background: linear-gradient(90deg, var(--line-soft) 25%, var(--panel-soft) 50%, var(--line-soft) 75%);
   background-size: 1000px 100%;
-  animation: shimmer 2s infinite;
+  animation: fzSkeletonShimmer 2s infinite;
   border-radius: var(--radius-md);
   height: 16px;
 }
@@ -1869,17 +1946,17 @@ body.reduce-motion .fiezel-ob-mascot *{animation:none!important;transition:none!
   height: 100%;
   width: 30%;
   background: linear-gradient(90deg, transparent, var(--sun), transparent);
-  animation: shimmer 1.5s infinite;
+  animation: fzSkeletonShimmer 1.5s infinite;
 }
 
 /* ========== MICRO-ANIMATIONS FOR TRANSITIONS & INTERACTIONS ========== */
 /* Page view transitions */
 ::view-transition-old(root) {
-  animation: pageOut 0.4s var(--ease) forwards;
+  animation: pageOut var(--dur-l) var(--ease) forwards;
 }
 
 ::view-transition-new(root) {
-  animation: pageIn 0.4s var(--ease) forwards;
+  animation: pageIn var(--dur-l) var(--ease) forwards;
 }
 
 @keyframes pageOut {
@@ -1887,9 +1964,14 @@ body.reduce-motion .fiezel-ob-mascot *{animation:none!important;transition:none!
   to { opacity: 0; }
 }
 
-@keyframes pageIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+/* [TOMBSTONE i15 2026-08-29, audit 12-003] @keyframes pageIn kedua (opacity-saja) DIHAPUS.
+   Nama keyframe itu global; definisi belakangan menang, jadi kembar ini diam-diam MEMATIKAN
+   animasi masuk-layar yang dirancang (rise+fade) untuk 15 layar .fade. Kini hanya ada SATU
+   pageIn (rise+fade, dekat .fade di atas) dan ::view-transition-new memakainya juga —
+   satu bahasa masuk-layar. Reduced-motion: pseudo ::view-transition tidak kena selector `*`
+   global, jadi digerbangi eksplisit di bawah. */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
 }
 
 /* Card entrance animation */
@@ -1996,7 +2078,7 @@ button:active {
   z-index:70;
   max-width:min(680px,calc(100vw - 32px));
   padding:10px 16px;
-  border-radius:12px;
+  border-radius:var(--radius-sm);
   background:rgba(20,16,18,.88);
   color:#fdf6f5;
   font-size:clamp(15px,4vw,18px);
@@ -2039,7 +2121,7 @@ button:active {
 /* Audit 14-002 (satu-satunya pelanggaran axe): opacity .75 menurunkan --muted jadi
    #928673 efektif - 3,4:1 di atas krem topbar, di bawah ambang 4,5:1. --muted penuh
    (#6E5E47) sudah cukup kalem; kontrasnya ±5,7:1 tanpa mengubah kesan visualnya. */
-.ask-button .ask-label{font-size:12px;font-weight:500;letter-spacing:0;
+.ask-button .ask-label{font-size:12px;/* q20-B1: literal dipin search-feedback-test.js:239 — jangan tokenkan */font-weight:500;letter-spacing:0;
   color:var(--muted);white-space:nowrap}
 
 .ask-box{display:flex;gap:8px;align-items:center;margin:4px 0 16px}
@@ -2049,7 +2131,7 @@ button:active {
 /* outline dimatikan di atas demi sudut membulat, jadi penanda fokusnya WAJIB ada di
    sini: tanpa ini pengguna keyboard kehilangan jejak posisinya sama sekali. */
 .ask-box input:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px;border-color:var(--focus-ring)}
-.ask-box button{flex-shrink:0;padding:12px 16px;border-radius:14px}
+.ask-box button{flex-shrink:0;padding:12px 16px;border-radius:var(--radius-sm)}
 .ask-answer{padding:16px;margin-bottom:16px}
 /* Jawaban model datang sebagai satu blok teks; tanpa ini baris barunya hilang dan
    penjelasan enam kalimat terbaca sebagai satu paragraf padat. */
@@ -2062,9 +2144,9 @@ button:active {
    telanjang. Tes sekarang menjaga token warnanya. */
 .search-hit{display:flex;justify-content:space-between;align-items:center;gap:12px;
   width:100%;text-align:left;padding:14px;margin-bottom:8px;border:1px solid var(--line);
-  border-radius:12px;background:var(--panel);color:var(--text);font:inherit;cursor:pointer}
+  border-radius:var(--radius-sm);background:var(--panel);color:var(--text);font:inherit;cursor:pointer}
 .search-hit-title{font-weight:600;text-transform:capitalize}
-.search-hit-view{font-size:12px;opacity:.6;text-transform:uppercase;letter-spacing:.06em;flex-shrink:0}
+.search-hit-view{font-size:var(--fs-caption);opacity:.6;text-transform:uppercase;letter-spacing:.06em;flex-shrink:0}
 
 /* ==========================================================================
    m025-113 - Home minimalis dan eksklusif (brief redesign 4)
@@ -2124,7 +2206,7 @@ button:active {
 /* Kartu Coach berhenti menjadi kotak di dalam kotak; ia menjadi bagian bawah hero yang
    dipisahkan satu garis rambut. */
 .coach-preview{padding:20px 0 0;border:0;border-radius:0;background:transparent}
-.coach-icon{width:36px;height:36px;border-radius:12px}
+.coach-icon{width:36px;height:36px;border-radius:var(--radius-sm)}
 .coach-icon svg{width:18px;height:18px}
 .coach-head small{letter-spacing:.16em}
 .coach-level{margin:18px 0 14px;padding-bottom:14px}
@@ -2138,7 +2220,7 @@ button:active {
    Selektor sengaja diturunkan lewat .home-overview supaya deklarasi latar milik
    .mission-panel dan .home-stats sendiri tetap utuh - contrast-test membaca deklarasi itu
    sebagai sumber kebenaran untuk mengukur pasangan tinta/latarnya. */
-.home-overview{gap:0;border:1px solid var(--glass-line);border-radius:20px;background:var(--glass-thick);color:var(--glass-text);overflow:hidden;box-shadow:0 1px 1px rgba(36,26,17,.03),0 8px 24px rgba(36,26,17,.06)}
+.home-overview{gap:0;border:1px solid var(--glass-line);border-radius:var(--radius-md);background:var(--glass-thick);color:var(--glass-text);overflow:hidden;box-shadow:var(--shadow-sm)}
 .home-overview .mission-panel,.home-overview .home-stats{border:0;border-radius:0;background:transparent;box-shadow:none}
 .home-overview .mission-panel{border-bottom:1px solid var(--glass-line)}
 .mission-panel h3{font-family:var(--fz-body);font-size:.95rem;font-weight:600;letter-spacing:-.01em}
@@ -2151,7 +2233,7 @@ button:active {
 
 /* 4. Perjalanan belajar: dua panel menjadi satu bidang dengan satu garis pemisah, dan
    blok rencana berhenti menjadi kotak-kotak kecil di dalam kotak. */
-.journey-panel{grid-template-columns:1fr;gap:0;margin:0;border:1px solid var(--glass-line);border-radius:20px;background:var(--glass-thick);color:var(--glass-text);overflow:hidden;box-shadow:0 1px 1px rgba(36,26,17,.03),0 8px 24px rgba(36,26,17,.06)}
+.journey-panel{grid-template-columns:1fr;gap:0;margin:0;border:1px solid var(--glass-line);border-radius:var(--radius-md);background:var(--glass-thick);color:var(--glass-text);overflow:hidden;box-shadow:var(--shadow-sm)}
 .journey-panel .journey-mission,.journey-panel .journey-today{border:0;border-radius:0;background:transparent;box-shadow:none}
 .journey-panel .journey-mission{border-bottom:1px solid var(--glass-line)}
 .journey-mission small,.journey-today small{font-size:.6rem;letter-spacing:.16em}
@@ -2176,15 +2258,15 @@ button:active {
 .launch-card{padding:16px}
 .launch-card>span:nth-child(2){display:flex;flex-direction:column-reverse;gap:3px}
 .launch-card b{font-family:var(--fz-body);font-weight:600;letter-spacing:-.01em}
-.launch-card small{text-transform:none;letter-spacing:.01em;font-size:12px}
+.launch-card small{text-transform:none;letter-spacing:.01em;font-size:var(--fs-caption)}
 .launch-card>svg{opacity:.4;width:15px}
-.launch-icon{width:38px;height:38px;border-radius:12px}
+.launch-icon{width:38px;height:38px;border-radius:var(--radius-sm)}
 .launch-icon svg{width:19px;height:19px}
 
 /* 7. Ponsel: satu irama jarak, satu kolom untuk yang panjang, dua kolom untuk yang pendek. */
 @media(max-width:640px){
   .home-page{gap:14px}
-  .launcher-shell{padding:22px 18px 24px;gap:18px;border-radius:22px}
+  .launcher-shell{padding:22px 18px 24px;gap:18px;border-radius:var(--radius-lg)}
   .launcher-greeting{margin:18px 0 8px;font-size:.78rem}
   .launcher-copy h1.login-message{font-size:1.72rem}
   .launcher-lead{font-size:.84rem;line-height:1.6;margin:12px 0 0}
@@ -2203,7 +2285,7 @@ button:active {
   .home-section-head h2{font-size:1.2rem}
   .home-section-head .text-button{padding:6px 0;font-size:.76rem;white-space:nowrap}
   .launch-card{min-height:100px;padding:14px}
-  .launch-icon{width:34px;height:34px;border-radius:11px}
+  .launch-icon{width:34px;height:34px;border-radius:var(--radius-sm)}
 }
 
 /* 8. Aksi utama di atas material malam. Gradien marun gelap milik lapisan v6
@@ -2247,16 +2329,16 @@ button:active {
    3px dan bayangannya ikut memendek, persis seperti benda yang ditekan.
    -------------------------------------------------------------------------- */
 button.primary,.primary.wide,.primary.luxe,html.fiezel-ui-v6 body .primary{
-  background:var(--sun);color:var(--text);border:0;border-radius:18px;
-  font-weight:700;letter-spacing:-.01em;
-  box-shadow:0 4px 0 var(--sun-deep),0 10px 22px rgba(36,26,17,.13);
-  transition:transform .12s var(--ease),box-shadow .12s var(--ease),background .2s var(--ease);
+  background:var(--sun);color:var(--text);border:0;border-radius:var(--radius-md);
+  min-height:52px;font-size:var(--fs-body);font-weight:700;letter-spacing:-.01em;
+  box-shadow:var(--lift-sun),var(--shadow-sm);
+  transition:transform var(--dur-xs) var(--ease),box-shadow var(--dur-xs) var(--ease),background var(--dur-s) var(--ease);
 }
 /* Hover MENGGELAP, bukan menerang: #FFE896 lebih terang dari --sun sehingga tombol
    terasa "menghilang" saat disentuh. Resep components.css §1: sun -> sun-deep. */
 button.primary:hover,.primary.luxe:hover,html.fiezel-ui-v6 body .primary:hover{background:var(--sun-deep);color:var(--text)}
 button.primary:active,.primary.luxe:active,html.fiezel-ui-v6 body .primary:active{
-  transform:translateY(3px);box-shadow:0 1px 0 var(--sun-deep),0 4px 10px rgba(36,26,17,.12)}
+  transform:translateY(3px);box-shadow:var(--lift-sun-press)}
 /* .primary.is-coral DIHAPUS di F2-16: grep pada app.js + index.html memberi NOL
    pemakaian. Ia sudah mati sebelum rebrand ini; menyimpan selector mati berarti
    fase berikutnya harus menebak apakah ia masih dipakai. Aksi kedua sekarang punya
@@ -2264,13 +2346,16 @@ button.primary:active,.primary.luxe:active,html.fiezel-ui-v6 body .primary:activ
    memerlukannya. */
 
 /* Tombol biasa ikut punya tebal, hanya lebih tenang. */
-html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.text-button):not(.coach-link):not(.fz-coach-bubble):not(.launch-card):not(.skill-card){
-  border:1.5px solid var(--surface-edge);border-radius:16px;
-  box-shadow:0 3px 0 var(--surface-edge);
-  transition:transform .12s var(--ease),box-shadow .12s var(--ease);
+/* i10 2026-08-28 (O5 §2): + :not(.option) — empat tombol jawaban berbayang tebal membuat
+   layar soal terasa seperti empat kartu bersaing dengan soalnya; pilihan kembali ke resep
+   dasar .option yang tenang (garis --line, tanpa bayangan lantai). */
+html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.text-button):not(.coach-link):not(.fz-coach-bubble):not(.launch-card):not(.skill-card):not(.option){
+  border:1.5px solid var(--surface-edge);border-radius:var(--radius-md);
+  box-shadow:var(--lift-edge);
+  transition:transform var(--dur-xs) var(--ease),box-shadow var(--dur-xs) var(--ease);
 }
-html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.text-button):not(.coach-link):not(.fz-coach-bubble):not(.launch-card):not(.skill-card):active{
-  transform:translateY(2px);box-shadow:0 1px 0 var(--surface-edge)}
+html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.text-button):not(.coach-link):not(.fz-coach-bubble):not(.launch-card):not(.skill-card):not(.option):active{
+  transform:translateY(2px);box-shadow:var(--lift-edge-press)}
 
 /* --------------------------------------------------------------------------
    2. Hero. Dasar maroon gelap diganti total oleh gradien kuning pastel, dan
@@ -2281,7 +2366,7 @@ html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.tex
   background:linear-gradient(155deg,var(--launcher-start) 0%,var(--launcher-end) 118%);
   color:var(--ink);
   border:1px solid rgba(217,188,126,.45);
-  box-shadow:0 18px 44px rgba(36,26,17,.14);
+  box-shadow:var(--shadow-md);
 }
 /* Matahari sudut: satu lingkaran krem, bukan kabut emas yang tidak terbaca. */
 .launcher-shell::after{
@@ -2329,7 +2414,7 @@ html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.tex
 /* --------------------------------------------------------------------------
    4. Tab bar. Tab aktif jadi kapsul kuning pastel, bukan hanya teks berwarna.
    -------------------------------------------------------------------------- */
-.bottomnav{border:1px solid var(--surface-edge);box-shadow:0 2px 0 var(--surface-edge),0 16px 36px rgba(36,26,17,.16)}
+.bottomnav{border:1px solid var(--surface-edge);box-shadow:0 2px 0 var(--surface-edge),var(--shadow-md)}
 .nav{color:var(--muted);font-weight:600}
 .nav .fz-i{--fz-i-fill:var(--surface-mute);--fz-i-line:var(--muted)}
 .nav.active{color:var(--text);background:var(--sun-soft);font-weight:700}
@@ -2343,7 +2428,7 @@ html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.tex
 .skill-hub{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .skill-card{
   position:relative;display:grid;gap:10px;padding:16px;text-align:left;align-content:start;
-  min-height:132px;border-radius:22px;border:1.5px solid var(--skill-line,var(--surface-edge));
+  min-height:132px;border-radius:var(--radius-lg);border:1.5px solid var(--skill-line,var(--surface-edge));
   background:var(--skill-bg,var(--panel-soft));color:var(--ink);
   box-shadow:0 4px 0 var(--skill-line,var(--surface-edge)),0 12px 26px rgba(36,26,17,.10);
   transition:transform .14s var(--ease),box-shadow .14s var(--ease);
@@ -2353,7 +2438,7 @@ html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.tex
 .skill-card-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .skill-card b{font-size:1rem;font-weight:700;letter-spacing:-.01em}
 .skill-card small{display:block;color:var(--ink);opacity:.66;font-size:.72rem;line-height:1.45}
-.skill-badge{font-size:.6rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);opacity:.55}
+.skill-badge{font-size:.6rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);opacity:.78}/* q17-S4: 3.8:1 -> >=4.5:1 */
 /* Cincin progres: satu conic-gradient, tanpa satu pun elemen tambahan. */
 .skill-ring{
   width:38px;height:38px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto;
@@ -2380,7 +2465,8 @@ html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.tex
 .grammar-launch .launch-icon{background:var(--sun-soft)}
 .reading-launch .launch-icon{background:var(--good-soft)}
 .skills-launch .launch-icon{background:var(--info-soft)}
-.launch-card{border:1.5px solid var(--surface-edge);box-shadow:0 3px 0 var(--surface-edge),0 10px 22px rgba(36,26,17,.08)}
+/* v6.1 (O4 §3): grid home sudah punya shell ber-elevasi — kartu cukup lift taktil. */
+.launch-card{border:1.5px solid var(--surface-edge);box-shadow:var(--lift-edge)}
 .launch-card:active{transform:translateY(2px);box-shadow:0 1px 0 var(--surface-edge)}
 
 /* --------------------------------------------------------------------------
@@ -2392,12 +2478,21 @@ html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.tex
   position:fixed;right:16px;bottom:calc(104px + env(safe-area-inset-bottom));z-index:41;
   width:58px;height:58px;padding:0;border-radius:50%;border:2px solid var(--ink);
   background:var(--yellow);color:var(--ink);cursor:pointer;
-  box-shadow:0 4px 0 var(--yellow-deep),0 14px 30px rgba(36,26,17,.24);
+  box-shadow:0 4px 0 var(--yellow-deep),var(--shadow-md);
   display:grid;place-items:center;
   transition:transform .16s var(--ease-spring),box-shadow .16s var(--ease);
 }
 .fz-coach-bubble:active{transform:translateY(3px) scale(.97);box-shadow:0 1px 0 var(--yellow-deep),0 6px 16px rgba(36,26,17,.2)}
 .fz-coach-bubble .fz-coach-face{width:30px;height:30px}
+/* v6.1 (I8 §6 / O3 §6 P0-2): sabuk-pengaman ukuran — anak maskot TIDAK boleh melebihi
+   FAB 58×58; tanpa ini ia pernah render 96×90 dan menimpa CTA/nav di bawahnya. */
+.fz-coach-bubble .fz-coach-mascot{width:100%;height:100%}
+/* v6.1 (I11 residu 768px): di layar ≥768 pill nav 620px menyisakan selokan 74px di kanan —
+   FAB turun sejajar baris nav, berhenti menumpangi sudut kartu skill/chip level. */
+@media(min-width:768px){
+  .fz-coach-bubble{bottom:max(16px,env(safe-area-inset-bottom))}
+  .fz-coach-peek{bottom:calc(28px + env(safe-area-inset-bottom))}
+}
 .fz-coach-bubble .fz-coach-pulse{
   position:absolute;inset:-6px;border-radius:50%;border:2px solid var(--yellow);
   opacity:0;animation:fzCoachBreath 3.4s var(--ease) infinite}
@@ -2405,16 +2500,16 @@ html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.tex
 .fz-coach-dot{
   position:absolute;top:-3px;right:-3px;width:20px;height:20px;border-radius:50%;
   background:var(--bad);border:2px solid var(--bg);
-  display:grid;place-items:center;font-size:12px;font-weight:700;color:var(--on-core)}
+  display:grid;place-items:center;font-size:var(--fs-caption);font-weight:700;color:var(--on-core)}
 .fz-coach-bubble[hidden]{display:none}
 
 /* Sapaan singkat yang muncul sendiri di samping gelembung. Ia menghilang sendiri;
    tidak ada tombol tutup, karena menutup sesuatu yang menyapa itu pekerjaan. */
 .fz-coach-peek{
   position:fixed;right:84px;bottom:calc(116px + env(safe-area-inset-bottom));z-index:41;
-  max-width:min(230px,62vw);padding:10px 13px;border-radius:16px 16px 4px 16px;
+  max-width:min(230px,62vw);padding:10px 13px;border-radius:var(--radius-md) var(--radius-md) var(--sp-1) var(--radius-md);
   border:1.5px solid var(--surface-edge);background:var(--glass-solid);color:var(--text);
-  font-size:.78rem;line-height:1.45;box-shadow:0 10px 26px rgba(36,26,17,.16);
+  font-size:.78rem;line-height:1.45;box-shadow:var(--shadow-md);
   animation:fzCoachPeek .34s var(--ease-spring) both}
 @keyframes fzCoachPeek{from{opacity:0;transform:translateY(6px) scale(.96)}to{opacity:1;transform:none}}
 .fz-coach-peek[hidden]{display:none}
@@ -2426,7 +2521,7 @@ html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.tex
 @keyframes fzCoachFade{from{opacity:0}to{opacity:1}}
 .fz-coach-panel{
   width:min(560px,100%);max-height:min(78vh,640px);display:flex;flex-direction:column;
-  padding:16px 16px calc(14px + env(safe-area-inset-bottom));border-radius:26px;
+  padding:16px 16px calc(14px + env(safe-area-inset-bottom));border-radius:var(--radius-lg);
   border:1.5px solid var(--surface-edge);background:var(--glass-solid);color:var(--text);
   box-shadow:0 -6px 60px rgba(36,26,17,.24);animation:fzCoachRise .28s var(--ease-spring) both}
 @keyframes fzCoachRise{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
@@ -2437,20 +2532,20 @@ html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.tex
 .fz-coach-avatar .fz-coach-face{width:22px;height:22px}
 .fz-coach-close{margin-left:auto;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;border:1.5px solid var(--surface-edge);background:transparent;color:var(--text);cursor:pointer}
 .fz-coach-log{flex:1;overflow-y:auto;display:grid;gap:10px;padding:14px 2px;align-content:start}
-.fz-coach-msg{max-width:88%;padding:10px 13px;font-size:.84rem;line-height:1.55;border-radius:16px}
-.fz-coach-msg.is-coach{justify-self:start;border-radius:16px 16px 16px 4px;background:var(--yellow-soft);border:1px solid var(--surface-edge)}
-.fz-coach-msg.is-user{justify-self:end;border-radius:16px 16px 4px 16px;background:var(--panel-soft);border:1px solid var(--surface-edge)}
+.fz-coach-msg{max-width:88%;padding:10px 13px;font-size:.84rem;line-height:1.55;border-radius:var(--radius-md)}
+.fz-coach-msg.is-coach{justify-self:start;border-radius:var(--radius-md) var(--radius-md) var(--radius-md) var(--sp-1);background:var(--yellow-soft);border:1px solid var(--surface-edge)}
+.fz-coach-msg.is-user{justify-self:end;border-radius:var(--radius-md) var(--radius-md) var(--sp-1) var(--radius-md);background:var(--panel-soft);border:1px solid var(--surface-edge)}
 .fz-coach-msg p{margin:0 0 6px}.fz-coach-msg p:last-child{margin:0}
 .fz-coach-chips{display:flex;flex-wrap:wrap;gap:7px;padding:2px 0 10px}
 .fz-coach-chip{
-  min-height:36px;padding:7px 12px;border-radius:999px;font-size:.76rem;font-weight:600;cursor:pointer;
+  min-height:36px;padding:7px 12px;border-radius:var(--radius-pill);font-size:.76rem;font-weight:600;cursor:pointer;
   border:1.5px solid var(--surface-edge);background:var(--panel-soft);color:var(--text)}
 .fz-coach-chip:active{transform:translateY(1px)}
 .fz-coach-form{display:flex;gap:8px;align-items:flex-end}
 .fz-coach-form textarea{
-  flex:1;min-height:44px;max-height:110px;padding:11px 13px;border-radius:16px;resize:none;
+  flex:1;min-height:44px;max-height:110px;padding:11px 13px;border-radius:var(--radius-md);resize:none;
   border:1.5px solid var(--surface-edge);background:var(--panel);color:var(--text);font:inherit;font-size:.86rem}
-.fz-coach-send{width:46px;height:46px;flex:0 0 auto;border-radius:16px;border:0;background:var(--yellow);color:var(--ink);
+.fz-coach-send{width:46px;height:46px;flex:0 0 auto;border-radius:var(--radius-md);border:0;background:var(--yellow);color:var(--ink);
   box-shadow:0 3px 0 var(--yellow-deep);display:grid;place-items:center;cursor:pointer}
 .fz-coach-send:active{transform:translateY(2px);box-shadow:0 1px 0 var(--yellow-deep)}
 body.fz-coach-open{overflow:hidden}
@@ -2474,14 +2569,14 @@ body.reduce-motion .fz-coach-bubble .fz-coach-pulse,body.reduce-motion .fz-confe
    dengan Reading/Grammar supaya tidak ada pola baru yang harus dipelajari.
    -------------------------------------------------------------------------- */
 .skill-page-hero{
-  display:grid;gap:8px;padding:18px;border-radius:22px;margin-bottom:14px;
+  display:grid;gap:8px;padding:18px;border-radius:var(--radius-lg);margin-bottom:14px;
   border:1.5px solid var(--skill-line,var(--surface-edge));background:var(--skill-bg,var(--panel-soft));color:var(--ink)}
-.skill-page-hero .skill-badge{opacity:.6}
+.skill-page-hero .skill-badge{opacity:.78}
 .skill-page-hero h1{margin:0;font-size:1.5rem;letter-spacing:-.02em}
 .skill-page-hero p{margin:0;font-size:.84rem;line-height:1.6;color:var(--ink);opacity:.76}
 .writing-prompt{display:grid;gap:10px}
 .writing-prompt textarea{
-  width:100%;min-height:150px;padding:14px;border-radius:18px;resize:vertical;font:inherit;font-size:.9rem;line-height:1.6;
+  width:100%;min-height:150px;padding:14px;border-radius:var(--radius-md);resize:vertical;font:inherit;font-size:.9rem;line-height:1.6;
   border:1.5px solid var(--surface-edge);background:var(--panel);color:var(--text)}
 .writing-meta{display:flex;justify-content:space-between;gap:10px;font-size:.74rem;color:var(--muted)}
 .writing-feedback{display:grid;gap:8px}
@@ -2491,7 +2586,7 @@ body.reduce-motion .fz-coach-bubble .fz-coach-pulse,body.reduce-motion .fz-confe
    "badge streak yang terasa didapat"). Ikon api ikut ukuran teksnya, bukan sebaliknya. */
 .home-stats .streak-badge{
   display:inline-flex;align-items:center;gap:6px;margin-top:4px;padding:4px 10px 4px 7px;
-  border-radius:999px;background:var(--sun-soft);border:1.5px solid var(--sun-deep);
+  border-radius:var(--radius-pill);background:var(--sun-soft);border:1.5px solid var(--sun-deep);
   font-size:1rem;line-height:1.2}
 .home-stats .streak-badge .fz-i{width:17px;height:17px;--fz-i-fill:var(--sun);--fz-i-line:var(--ink)}
 
@@ -2501,7 +2596,7 @@ body.reduce-motion .fz-coach-bubble .fz-coach-pulse,body.reduce-motion .fz-confe
    harus bisa membedakan "ini petunjuk, soalnya masih terbuka" dari "ini jawabannya". */
 /* Petunjuk BUKAN kesalahan. Aksen marun membuat setiap giliran tutor terbaca sebagai
    peringatan; keluarga info (kuning tua) menandainya sebagai bantuan. */
-.tutor-turn{margin-top:14px;padding:14px 16px;border-radius:16px;
+.tutor-turn{margin-top:14px;padding:14px 16px;border-radius:var(--radius-md);
   background:var(--panel-soft);border:1px solid var(--line);
   border-left:3px solid var(--info)}
 .tutor-turn.hidden{display:none}
@@ -2516,7 +2611,7 @@ body.reduce-motion .fz-coach-bubble .fz-coach-pulse,body.reduce-motion .fz-confe
 .tutor-turn-actions{margin-top:12px}
 /* Tinggi sentuh 44px, sama dengan seluruh kontrol lain - tombol ini justru ditekan oleh
    murid yang sedang bingung, jadi ia tidak boleh jadi target yang sulit dikenai. */
-.tutor-stuck{min-height:44px;padding:10px 16px;border-radius:12px;font-size:.86rem;
+.tutor-stuck{min-height:44px;padding:10px 16px;border-radius:var(--radius-sm);font-size:.86rem;
   background:transparent;border:1px solid var(--line);color:var(--muted)}
 .tutor-stuck:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
 .tutor-report{display:flex;align-items:center;justify-content:center;gap:8px;margin:10px 0 0;
@@ -2530,14 +2625,14 @@ eteach) dan tawaran berhenti (reathe).
    kartunya ikut berbalik dengan benar di mode gelap. */
 .tutor-card{display:grid;gap:12px}
 .tutor-card-head{display:flex;align-items:center;gap:10px}
-.tutor-card-head small{display:block;font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
-.tutor-card-head b{font-size:1.05rem;letter-spacing:-.01em}
-.tutor-card-why{margin:0;padding:10px 12px;border-radius:12px;font-size:.86rem;line-height:1.55;
+.tutor-card-head small{display:block;font-size:var(--fs-caption);letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.tutor-card-head b{font-size:var(--fs-h2);letter-spacing:-.01em}
+.tutor-card-why{margin:0;padding:10px 12px;border-radius:var(--radius-sm);font-size:.86rem;line-height:1.55;
   background:var(--panel-soft);border-left:3px solid var(--info)}
 .tutor-card-rule{margin:0;font-size:.98rem;line-height:1.6;font-weight:600}
 .tutor-card-cue{display:flex;align-items:flex-start;gap:8px;margin:0;font-size:.88rem;line-height:1.55;color:var(--muted)}
 .tutor-card-cue svg{width:16px;height:16px;flex:0 0 auto;margin-top:2px}
-.quiz-teach-flag{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.quiz-teach-flag{font-size:var(--fs-caption);font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 /* Dua jalan keluar berdampingan, dan yang "berhenti" justru jadi tombol utamanya:
    pada titik ini FIEZEL memang sedang menyarankan berhenti, bukan sekadar mengizinkan. */
 .tutor-breathe{display:flex;flex-wrap:wrap;gap:8px}
@@ -2770,7 +2865,7 @@ eteach) dan tawaran berhenti (reathe).
 .nav .fz-i .fz-line{stroke-width:2}
 
 html.fiezel-ui-v6 .nav{
-  gap:5px;border-radius:17px;
+  gap:5px;border-radius:var(--radius-md);
   transition:transform .18s var(--ease-spring),background .16s var(--ease),color .16s var(--ease),box-shadow .16s var(--ease);
 }
 html.fiezel-ui-v6 .nav.active{
@@ -2808,11 +2903,17 @@ html.fiezel-ui-v6 .nav.active::after{
 .hero-stats{display:flex;flex-wrap:wrap;gap:8px;margin:26px 0 14px}
 .hero-stat{
   display:flex;flex-direction:column;gap:1px;
-  padding:8px 13px;border-radius:15px;
+  padding:8px 13px;border-radius:var(--radius-md);
   background:rgba(var(--surface-pure-rgb),.96);border:1.5px solid var(--ink);
   box-shadow:0 2px 0 var(--ink);
   color:var(--ink);
 }
+/* i12/C3 2026-08-28: keping strip kini bisa <button> (LEVEL, REVIEW) \u2014 warisi tampilan chip. */
+button.hero-stat{font:inherit;text-align:left;cursor:pointer}
+button.hero-stat:active{transform:translateY(1px)}
+@media(max-width:640px){.launcher-copy{min-width:0}.hero-stats{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;max-width:100%;min-width:0}.hero-stats .hero-stat{flex:0 0 auto}}/* v05 2026-08-29: jebakan min-content grid — .launcher-copy menolak menciut di bawah lebar keping, membuat strip bocor 29px keluar viewport 320 dan keping REVIEW tak tergapai; min-width:0 membuat kolom mengalah dan strip menggulir penuh. *//* q16-P2-1: keping tidak boleh menciut — biarkan strip menggulir di 320px */
+/* i12/C4: baris trust satu-baris pengganti banner 200px. */
+.trust-line{display:flex;gap:var(--sp-2);align-items:baseline;font-size:var(--fs-small);color:var(--accent-strong);margin:var(--sp-2) 0 0}
 .hero-stat b{
   display:flex;align-items:center;gap:5px;
   font-size:1.02rem;font-weight:700;line-height:1.15;letter-spacing:-.02em;
@@ -2824,6 +2925,8 @@ html.fiezel-ui-v6 .nav.active::after{
 /* Ikon kecil butuh >=3:1. --sun-deep hanya 1,9:1 di atas sun-soft, jadi tintanya --info. */
 .hero-stat.is-streak svg{color:var(--info)}
 .hero-stat.is-level{background:var(--sun)}
+/* q17-M2: label kecil di atas emas butuh >=4.5:1 — tinta penuh, bukan muted (4.0:1). */
+.hero-stat.is-level small{color:var(--ink)}
 
 /* Cincin harian. Sudut conic dihitung dari --v (0-100), jadi satu variabel saja yang
    berpindah dari data ke bentuk - tidak ada perhitungan derajat yang tersebar di JS. */
@@ -2887,7 +2990,7 @@ html.fiezel-ui-v6 .nav.active::after{
 /* Strip Coach: satu kalimat, satu tombol besar, satu tautan kecil. */
 .coach-strip{
   display:grid;grid-template-columns:auto 1fr;gap:12px 13px;align-items:center;
-  padding:15px;border-radius:22px;
+  padding:15px;border-radius:var(--radius-lg);
   background:rgba(var(--surface-pure-rgb),.94);
   border:1.5px solid var(--ink);box-shadow:0 3px 0 var(--ink);
 }
@@ -2978,18 +3081,19 @@ html.fiezel-ui-v6 .launcher-shell{
 }
 
 /* Global learner-level contract */
-.active-level-control,.home-level-context{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line,#eadfce);border-radius:14px;background:var(--panel,#fff);color:var(--ink,#241a11);cursor:pointer;box-shadow:none}
+.active-level-control,.home-level-context{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line,#eadfce);border-radius:var(--radius-sm);background:var(--panel,#fff);color:var(--ink,#241a11);cursor:pointer;box-shadow:none}
 .active-level-control{flex:0 0 auto;flex-direction:column;align-items:flex-start;padding:10px 13px;min-width:118px;text-align:left}
 .active-level-control span,.active-level-control small{font-size:.66rem;color:var(--muted,#746958);line-height:1.1}
 .active-level-control strong{font-size:1rem;line-height:1.1;color:var(--accent,#c2402c)}
-.active-level-control:hover,.home-level-context:hover{border-color:var(--accent,#c2402c);box-shadow:0 4px 14px rgba(67,43,25,.08);transform:translateY(-1px)}
+/* v6.1 (O4 §2.5): glow hover dihapus — umpan balik hover sudah dibawa border-color. */
+.active-level-control:hover,.home-level-context:hover{border-color:var(--accent,#c2402c);transform:translateY(-1px)}
 .home-level-context{padding:4px 9px;font-size:.68rem;font-weight:700;white-space:nowrap}
 .level-picker-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:18px 0}
-.level-picker-card{display:grid;gap:5px;min-height:88px;padding:13px;text-align:left;border:1px solid var(--line,#eadfce);border-radius:16px;background:var(--panel,#fff);color:var(--ink,#241a11);cursor:pointer}
+.level-picker-card{display:grid;gap:5px;min-height:88px;padding:13px;text-align:left;border:1px solid var(--line,#eadfce);border-radius:var(--radius-md);background:var(--panel,#fff);color:var(--ink,#241a11);cursor:pointer}
 .level-picker-card strong{font-size:1.15rem;color:var(--accent,#c2402c)}
 .level-picker-card span{font-size:.72rem;line-height:1.35;color:var(--muted,#746958)}
 .level-picker-card.is-active{border-color:var(--accent,#c2402c);background:color-mix(in srgb,var(--accent,#c2402c) 8%,var(--panel,#fff));box-shadow:0 0 0 2px color-mix(in srgb,var(--accent,#c2402c) 16%,transparent)}
-.level-source-note,.level-scope-note,.grammar-level-note{display:flex;flex-wrap:wrap;gap:5px 10px;align-items:baseline;padding:12px 14px;margin:0 0 16px;border-radius:15px;background:var(--panel-soft,#f8f1e7);color:var(--ink,#241a11);font-size:.83rem}
+.level-source-note,.level-scope-note,.grammar-level-note{display:flex;flex-wrap:wrap;gap:5px 10px;align-items:baseline;padding:12px 14px;margin:0 0 16px;border-radius:var(--radius-md);background:var(--panel-soft,#f8f1e7);color:var(--ink,#241a11);font-size:.83rem}
 .level-source-note{display:block;margin-top:10px}
 .level-source-note b{color:var(--accent,#c2402c)}
 .level-scope-note span,.grammar-level-note span,.grammar-level-note small{color:var(--muted,#746958)}
@@ -3012,7 +3116,7 @@ html.fiezel-ui-v6 .launcher-shell{
 .lesson-lock-note i{flex:none;width:14px;height:14px;margin-top:2px}
 /* m025-138: kontrak ujian dan rubrik Writing. Batas kata sengaja dibuat menonjol -
    di IELTS, tulisan di bawah batas kena penalti sebelum isinya sempat dinilai. */
-.writing-exam{display:grid;gap:3px;margin:0 0 10px;padding:11px 13px;border-radius:14px;background:var(--panel-soft,#f8f1e7);font-size:.8rem}
+.writing-exam{display:grid;gap:3px;margin:0 0 10px;padding:11px 13px;border-radius:var(--radius-sm);background:var(--panel-soft,#f8f1e7);font-size:.8rem}
 .writing-exam b{color:var(--accent,#c2402c)}
 .writing-exam span{font-weight:600}
 .writing-exam small{color:var(--muted,#746958);line-height:1.4}
@@ -3020,7 +3124,7 @@ html.fiezel-ui-v6 .launcher-shell{
 .writing-rubric ul,.writing-checklist{display:grid;gap:8px;margin:10px 0 0;padding:0;list-style:none}
 .writing-rubric li{display:grid;gap:2px;font-size:.8rem}
 .writing-rubric li span{color:var(--muted,#746958)}
-.writing-checklist li{display:grid;gap:2px;padding:9px 11px;border-radius:12px;border-left:3px solid var(--line,#eadfce);background:var(--panel-soft,#f8f1e7);font-size:.79rem}
+.writing-checklist li{display:grid;gap:2px;padding:9px 11px;border-radius:var(--radius-sm);border-left:3px solid var(--line,#eadfce);background:var(--panel-soft,#f8f1e7);font-size:.79rem}
 .writing-checklist li span{color:var(--muted,#746958);line-height:1.45}
 .writing-check.is-ok{border-left-color:#3f8f5f}
 .writing-check.is-perhatikan{border-left-color:var(--accent,#c2402c)}
@@ -3028,7 +3132,7 @@ html.fiezel-ui-v6 .launcher-shell{
 /* m025-139: jalur Reading berformat ujian. Kontraknya (panjang, jumlah soal, waktu)
    ditaruh di muka karena itulah yang membedakannya dari bacaan latihan biasa. */
 .reading-exam{display:grid;gap:11px;margin:0 0 16px}
-.reading-exam-set{display:grid;gap:4px;padding:12px 13px;border-radius:14px;background:var(--panel-soft,#f8f1e7)}
+.reading-exam-set{display:grid;gap:4px;padding:12px 13px;border-radius:var(--radius-sm);background:var(--panel-soft,#f8f1e7)}
 .reading-exam-set span{font-size:.75rem;font-weight:600;color:var(--accent,#c2402c)}
 .reading-exam-set small{font-size:.74rem;line-height:1.45;color:var(--muted,#746958)}
 .reading-exam-set button{justify-self:start;margin-top:5px}
@@ -3044,7 +3148,7 @@ html.fiezel-ui-v6 .launcher-shell{
   padding:14px 16px;display:grid;gap:10px}
 .hint-step{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text)}
 .hint-step .hint-num{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;
-  font-size:12px;font-weight:700;background:var(--panel-soft);color:var(--muted);
+  font-size:var(--fs-caption);font-weight:700;background:var(--panel-soft);color:var(--muted);
   border:1.5px solid var(--line)}
 .hint-step.is-done .hint-num{background:var(--sun-soft);border-color:var(--sun);color:var(--text)}
 .hint-step.is-current .hint-num{background:var(--text);border-color:var(--text);color:var(--on-core)}
@@ -3065,16 +3169,16 @@ html.fiezel-ui-v6 .launcher-shell{
 
 /* §13 field — tinggi 48px, cincin fokus satu resep, state error/success by teks+warna */
 .field{display:grid;gap:6px}
-.field label{font-size:12px;font-weight:600;color:var(--muted)}
+.field label{font-size:var(--fs-caption);font-weight:600;color:var(--muted)}
 .field input,.field textarea,.field select{min-height:48px;padding:12px 14px;
   border:1.5px solid var(--line);border-radius:var(--radius-sm);background:var(--panel);
   color:var(--text);font:inherit}
 .field input:focus-visible,.field textarea:focus-visible,.field select:focus-visible{
   outline:2px solid var(--focus-ring);outline-offset:2px;border-color:var(--focus-ring)}
 .field.is-error input{border-color:var(--bad)}
-.field.is-error .field-msg{color:var(--bad);font-size:12px}
+.field.is-error .field-msg{color:var(--bad);font-size:var(--fs-caption)}
 .field.is-success input{border-color:var(--good)}
-.field.is-success .field-msg{color:var(--good);font-size:12px}
+.field.is-success .field-msg{color:var(--good);font-size:var(--fs-caption)}
 .field input:disabled{background:var(--panel-soft);color:var(--text-disabled)}
 
 
@@ -3111,7 +3215,7 @@ html.fiezel-ui-v6 .launcher-shell{
   font-size:12px;
 }
 /* Dua pelanggar memaku ukurannya dengan !important, jadi lantainya harus sama keras. */
-.notification-help,.report-state{font-size:12px!important}
+.notification-help,.report-state{font-size:var(--fs-caption)!important}
 /* Label huruf besar yang membesar: tracking dirapatkan supaya tidak memaksa baris kedua. */
 .launcher-meta,.skill-badge,.tutor-turn-head{letter-spacing:.08em}
 .fiezel-splash-tag{letter-spacing:.11em}
@@ -3217,7 +3321,7 @@ html.fiezel-ui-v6 .launcher-shell{
 .modal-actions.settings-actions button{
   flex:1 1 0;min-width:0;min-height:44px;height:44px;
   padding:0 12px;font-size:.86rem;line-height:1.2;white-space:nowrap;
-  border-radius:14px
+  border-radius:var(--radius-sm)
 }
 /* Audit 04-001: di 320px "Simpan pengaturan" (nowrap, tombol 122px) mencat teksnya KELUAR
    kotak dan menimpa "Batal". Di layar sesempit itu labelnya diizinkan membungkus DI DALAM
@@ -3278,10 +3382,14 @@ html.fiezel-ui-v6 .launcher-shell{
 .core-eyebrow{font-size:.75rem;font-weight:700;letter-spacing:.18em;color:var(--sun)}
 .core-title{margin-top:6px;font-size:1rem;font-weight:700;color:var(--on-core)}
 .core-sub{margin-top:5px;font-size:.82rem;line-height:1.5;color:var(--on-core-muted)}
-.core-bar{position:relative;margin-top:14px;height:5px;border-radius:99px;background:rgba(253,250,243,.22);overflow:hidden}
-.core-bar i{position:absolute;inset:0 auto 0 0;width:46%;border-radius:99px;background:linear-gradient(90deg,var(--sun),var(--sun-deep))}
-.core-bar::after{content:"";position:absolute;inset:0 auto 0 0;width:18%;border-radius:99px;background:rgba(253,250,243,.35);animation:coreScan 1.6s var(--ease) infinite}
-@keyframes coreScan{from{left:-18%}to{left:100%}}
+.core-bar{position:relative;margin-top:14px;height:5px;border-radius:var(--radius-pill);background:rgba(253,250,243,.22);overflow:hidden}
+.core-bar i{position:absolute;inset:0 auto 0 0;width:46%;border-radius:var(--radius-pill);background:linear-gradient(90deg,var(--sun),var(--sun-deep))}
+.core-bar::after{content:"";position:absolute;inset:0 auto 0 0;width:18%;border-radius:var(--radius-pill);background:rgba(253,250,243,.35);animation:coreScan 1.6s var(--ease) infinite}
+/* i15 2026-08-29 (audit 12-004): coreScan dulu menganimasikan `left` — layout ulang tiap
+   frame, selamanya, di Home. Kini translateX di kanal kompositor. Visual identik: elemen
+   selebar 18% kontainer dengan left:0 statis; left:-18%≡translateX(-100%), left:100%≡
+   translateX(555.6%) (100/18 lebar elemen). */
+@keyframes coreScan{from{transform:translateX(-100%)}to{transform:translateX(555.6%)}}
 .core-panel :focus-visible{outline:2px solid var(--focus-ring-on-core);outline-offset:2px}
 .core-analyzing{margin:12px 0}
 /* Sapuan pemindai adalah satu-satunya gerak di panel ini, jadi ia yang dimatikan -
@@ -3297,12 +3405,29 @@ html.fiezel-ui-v6 .launcher-shell{
    Z-index tidak diubah: .fz-coach-sheet dan #confidencePop tetap menang. */
 body.fz-stage-quiz .fz-coach-peek,
 body.fz-stage-sl .fz-coach-peek,
-body.fz-stage-map .fz-coach-peek{display:none}
+body.fz-stage-hub .fz-coach-peek,/* q16-P2-2: hub punya CTA dekat dasar layar juga */
+body.fz-stage-map .fz-coach-peek,
+body.fz-stage-writing .fz-coach-peek{display:none}
+body.fz-stage-writing .fz-coach-bubble{display:none}/* v24-F2 2026-08-29: FAB 58px menutupi textarea Writing di 390 (42x58px) \u2014 layar mengarang bebas gangguan, coach tetap ada di view lain. */
+/* i12/C5 2026-08-28 (O6 "satu Pau di Home"): di Home, Pau hero coach-strip adalah satu-satunya
+   Pau; gelembung FAB + peek disembunyikan penuh (bukan diciutkan seperti sl/map). */
+body.fz-stage-home .fz-coach-peek,
+body.fz-stage-home .fz-coach-bubble{display:none}
+/* i12/C2: chip celestial hanya bermakna di layar lega \u2014 desktop-only. */
+@media(max-width:899px){.home-page .celestial-status{display:none}}
+/* i12/C6: judul seksi Home tidak boleh membawa kotak fokus programatik.
+   [i15 2026-08-29] Ditulis ulang agar lolos gerbang a11y "outline:none butuh pengganti":
+   outline mati di level elemen, lalu :focus-visible mengembalikan cincin standar —
+   fokus programatik (tabindex=-1) tetap tanpa kotak, fokus keyboard tetap terlihat. */
+.home-section-head h2{text-wrap:balance;outline:none}
+.home-section-head h2:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
 body.fz-stage-quiz .fz-coach-bubble,
 body.fz-stage-sl .fz-coach-bubble,
-body.fz-stage-map .fz-coach-bubble{width:46px;height:46px;bottom:calc(88px + env(safe-area-inset-bottom))}
+body.fz-stage-hub .fz-coach-bubble,
+body.fz-stage-map .fz-coach-bubble{width:46px;height:46px;bottom:calc(92px + env(safe-area-inset-bottom))}/* v24-F1 2026-08-29: 88px membuat FAB menyerempet tab Peta 1px di 390 \u2014 dinaikkan 4px. */
 body.fz-stage-quiz .fz-coach-bubble .fz-coach-face,
 body.fz-stage-sl .fz-coach-bubble .fz-coach-face,
+body.fz-stage-hub .fz-coach-bubble .fz-coach-face,
 body.fz-stage-map .fz-coach-bubble .fz-coach-face{width:24px;height:24px}
 /* Ruang bawah supaya kartu terakhir Peta Belajar bisa lewat di atas pita dok. */
 body.fz-stage-map .app{padding-bottom:104px}
@@ -3322,11 +3447,13 @@ body.fz-stage-quiz .quiz-shell{padding-bottom:96px}
    .quiz-topbar sticky), jadi memindahkannya ke atas di kuis hanya menukar satu tabrakan
    dengan tabrakan baru. Yang dianimasikan hanya transform+opacity - top/bottom tidak pernah
    ikut, supaya perpindahannya tidak memaksa layout ulang tiap frame. */
+@media (max-width:767px){/* v24-F3 2026-08-29: relokasi kanan-atas hanya untuk layar sempit \u2014 di >=768 top:88px justru menimpa kontrol "Level belajar" (terukur 40x13/40x22px), sedangkan lajur kanan-bawah di 768 terbukti bersih (gutter nav 74px). */
 body.fz-stage-sl .fz-coach-bubble,
 body.fz-stage-map .fz-coach-bubble{
   bottom:auto;
   top:calc(88px + env(safe-area-inset-top,0px));
   animation:fzCoachRelocate .28s var(--ease-spring) both;
+}
 }
 @keyframes fzCoachRelocate{
   from{opacity:0;transform:translateY(-10px) scale(.9)}
@@ -3339,20 +3466,54 @@ body.fz-stage-map .fz-coach-bubble{
 body.reduce-motion.fz-stage-sl .fz-coach-bubble,
 body.reduce-motion.fz-stage-map .fz-coach-bubble{animation:none}
 
+/* ---------- O2/i7 lesson-mode: sesi tanpa gangguan ----------
+   Selama stage pelajaran aktif (body.fz-lesson-mode disetel HANYA oleh syncLessonMode
+   di modul stage app.js - turunan murni stageStack) SEMUA krom global minggir; yang
+   tersisa cuma header sesi minimal (.quiz-topbar / .topline). display:none dipilih atas
+   visibility:hidden karena .topbar in-flow: ruangnya harus ikut hilang. */
+body.fz-lesson-mode main.app>.topbar{display:none}
+body.fz-lesson-mode .nav-scrim{display:none}
+/* Aturan .bottomnav SENGAJA berdiri sendiri: ui-structure-test menggabungkan semua blok
+   .bottomnav{...} dan menolak backdrop-filter - blok satu-properti ini lolos apa adanya. */
+body.fz-lesson-mode .bottomnav{display:none}
+/* padding bawah .app tidak perlu lagi menyisakan 118px untuk pill nav.
+   main.app (bukan .app): html.fiezel-ui-v6 .app di tutor-v3.css dimuat SETELAH berkas ini
+   dengan spesifisitas sama - selektor ini harus menang tanpa !important. */
+body.fz-lesson-mode main.app{padding-bottom:calc(28px + env(safe-area-inset-bottom))}
+/* Pau ganda: gelembung pembimbing menyingkir - kuis sudah punya Paw-nya sendiri
+   (quiz-mascot / PawSlot). Kontrak m025-115 (anak <body>) tidak tersentuh. */
+body.fz-lesson-mode .fz-coach-bubble,
+body.fz-lesson-mode .fz-coach-peek{display:none}
+/* ruang 96px untuk gelembung (aturan fz-stage-quiz di atas) tidak diperlukan lagi */
+body.fz-lesson-mode.fz-stage-quiz .quiz-shell{padding-bottom:28px}
+/* toast tidak lagi melayang 96px di atas nav yang sudah tidak ada */
+body.fz-lesson-mode .toast{bottom:calc(24px + env(safe-area-inset-bottom))}
+/* Header flashcards/ulangan (.topline) disatukan ke kontrak header sesi yang sama:
+   sticky + memikul safe-area atas, karena topbar global yang dulu memikul notch hilang. */
+body.fz-lesson-mode .topline{position:sticky;top:0;z-index:30;
+  padding:max(10px,env(safe-area-inset-top)) 0 10px;margin-bottom:12px;
+  background:rgba(var(--bg-rgb),.9);backdrop-filter:blur(14px)}
+
 /* ---------- §2 kuis: benar / salah / pijakan ----------
    Banner benar-salah, kartu sebab, dan tip ingatan SUDAH ada 1:1 di reveal(); yang
    kurang cuma dua hal yang bisa dibaca dalam sekejap: mana jawaban yang benar, dan
    mana yang tadi dipilih. Keduanya dipasang sebagai pseudo-element - nol perubahan
    pada answer()/reveal(), jadi tidak ada kontrak markup yang bergeser. */
 .option.correct::after,
-.option.wrong::after{
-  display:block;width:fit-content;margin-top:9px;padding:3px 9px;border-radius:999px;
+.option.wrong::after,
+.option.was-tried::after{
+  display:block;width:fit-content;margin-top:9px;padding:3px 9px;border-radius:var(--radius-pill);
   font-size:.75rem;font-weight:700;letter-spacing:.08em
 }
 /* Tag ditaruh DI BAWAH teks pilihan, bukan mengambang di sudut: pilihan jawaban bisa
    dua baris pada layar sempit, dan tag mengambang akan menabraknya. */
 .option.correct::after{content:"BENAR";background:var(--good);color:var(--on-core)}
 .option.wrong::after{content:"PILIHANMU";background:var(--bad);color:var(--on-core)}
+/* i10 2026-08-28 (O5 §6.3-1): PILIHANMU menunjuk SATU pilihan — percobaan pertama yang
+   gagal diturunkan answer() ke .was-tried: tanda teks netral DICOBA (kontrak non-warna
+   m025 terjaga: state tetap terbaca tanpa membedakan warna). */
+.option.was-tried::after{content:"DICOBA";background:var(--panel);color:var(--muted);border:1px solid var(--line)}
+.option.was-tried:disabled{border-color:var(--line);background:var(--panel-soft);color:var(--muted)}
 
 /* Rincian pengecoh dulu selalu terbentang. Pada soal empat pilihan itu empat paragraf
    tambahan tepat di bawah kesimpulan yang justru paling penting dibaca; sekarang ia
@@ -3362,7 +3523,7 @@ body.reduce-motion.fz-stage-map .fz-coach-bubble{animation:none}
 .acc>summary::-webkit-details-marker{display:none}
 .acc>summary::after{content:"\2304";margin-left:6px;font-weight:700}
 .acc[open]>summary::after{content:"\2303"}
-.acc>summary:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px;border-radius:6px}
+.acc>summary:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px;border-radius:var(--radius-xs)}
 .acc .distractor-breakdown{margin-top:2px;border-top:0;padding-top:0}
 
 /* Tombol Lanjut yang terkunci: Fase 2 sudah membuat tintanya terbaca (4,8:1). Yang
@@ -3386,7 +3547,7 @@ body.reduce-motion.fz-stage-map .fz-coach-bubble{animation:none}
 .tutor-turn-face{background:var(--sun);color:var(--text)}
 /* Penanda "Jeda mengajar" jadi bidang, bukan teks abu di antara teks abu lain: ia
    satu-satunya keterangan bahwa layar ini BUKAN soal. --info di atas --sun-soft 5,9:1. */
-.quiz-teach-flag{padding:4px 10px;border-radius:999px;font-size:.75rem;background:var(--sun-soft);color:var(--info)}
+.quiz-teach-flag{padding:4px 10px;border-radius:var(--radius-pill);font-size:.75rem;background:var(--sun-soft);color:var(--info)}
 
 /* ---------- §4 flashcard: chip level + "Kelas kata" ----------
    indonesianPartOfSpeech() sudah menerjemahkan kuncinya sejak lama, jadi ini bukan
@@ -3394,7 +3555,7 @@ body.reduce-motion.fz-stage-map .fz-coach-bubble{animation:none}
    satu baris eyebrow abu tidak memberi tahu bahwa yang kedua adalah KELAS KATA;
    dua chip dengan labelnya sendiri memberi tahu. */
 .chips-row{display:flex;gap:7px;flex-wrap:wrap;justify-content:center}
-.chip{display:inline-flex;align-items:center;min-height:24px;padding:3px 10px;border-radius:999px;font-size:.75rem;font-weight:600}
+.chip{display:inline-flex;align-items:center;min-height:24px;padding:3px 10px;border-radius:var(--radius-pill);font-size:.75rem;font-weight:600}
 .chip-level{background:var(--sun-soft);color:var(--text);border:1px solid var(--sun-deep)}
 .chip-cat{background:var(--panel-soft);border:1px solid var(--line);color:var(--muted)}
 .chip-cat b{color:var(--text);font-weight:700}
@@ -3402,7 +3563,7 @@ body.reduce-motion.fz-stage-map .fz-coach-bubble{animation:none}
 /* ---------- §5 peta belajar satu kartu + panel NEXT SESSION ---------- */
 .map-rows{display:grid;gap:13px}
 .map-row{display:grid;grid-template-columns:22px 84px 1fr 40px;align-items:center;gap:10px}
-.map-row .mi{width:22px;height:22px;display:grid;place-items:center;border-radius:7px;background:var(--sun-soft);color:var(--text)}
+.map-row .mi{width:22px;height:22px;display:grid;place-items:center;border-radius:var(--radius-xs);background:var(--sun-soft);color:var(--text)}
 .map-row .mi svg{width:14px;height:14px}
 .map-row .mn{font-weight:700;font-size:.86rem}
 .map-row .bar{margin-top:0}
@@ -3433,18 +3594,22 @@ body.reduce-motion.fz-stage-map .fz-coach-bubble{animation:none}
    dan memakainya untuk skor 34% berarti mengucapkan "bagus" pada sesi yang justru perlu
    diulang. Angkanya jadi tinta biasa; yang merayakan adalah piala, maskot, dan bunyinya. */
 .result-card .score{color:var(--text)}
+/* i10 2026-08-28 (O5 §7): baris naratif hasil dibatasi lebar bacanya dan angka skor
+   memakai digit tabular supaya count-up 0→n% tidak bergoyang lebarnya. */
+.result-stage .muted{max-width:44ch;margin-left:auto;margin-right:auto}
+.result-stage .score{font-variant-numeric:tabular-nums}
 .ring-row{display:flex;align-items:center;justify-content:center;gap:14px}
 .ring-row .coach-strip-face{flex:0 0 auto;width:52px;height:52px}
 .result-actions{display:grid;gap:9px;margin-top:4px}
 /* F1 placement: layar hasil tes penempatan menyebut levelnya secara eksplisit. */
-.result-level{display:grid;gap:2px;justify-items:center;margin:10px 0 4px;padding:12px 14px;border-radius:16px;background:var(--panel-soft,rgba(255,255,255,.06));border:1px solid var(--line,rgba(255,255,255,.12))}
+.result-level{display:grid;gap:2px;justify-items:center;margin:10px 0 4px;padding:12px 14px;border-radius:var(--radius-md);background:var(--panel-soft,rgba(255,255,255,.06));border:1px solid var(--line,rgba(255,255,255,.12))}
 .result-level-mark{font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;opacity:.7}
 .result-level-name{font-size:1.9rem;line-height:1.1;font-weight:800}
 .result-level-desc{font-size:.8rem;opacity:.78;text-align:center}
 .result-bands{display:grid;gap:6px;justify-items:center;margin-bottom:6px}
 .result-bands small{opacity:.7;font-size:.7rem;text-align:center}
 .result-band-row{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
-.result-band{font-size:.72rem;padding:3px 9px;border-radius:999px;border:1px solid var(--line,rgba(255,255,255,.14));opacity:.72}
+.result-band{font-size:.72rem;padding:3px 9px;border-radius:var(--radius-pill);border:1px solid var(--line,rgba(255,255,255,.14));opacity:.72}
 .result-band-pass{opacity:1;font-weight:700;border-color:var(--accent,#5eead4);color:var(--accent,#5eead4)}
 .result-actions .ghost{min-height:44px;background:transparent;border:1.5px solid var(--line);color:var(--muted)}
 
@@ -3456,7 +3621,7 @@ body.reduce-motion.fz-stage-map .fz-coach-bubble{animation:none}
 .setting-row{min-height:44px}
 .setting-row input[type=checkbox]{
   appearance:none;-webkit-appearance:none;position:relative;
-  width:50px;height:30px;flex:0 0 auto;border-radius:99px;
+  width:50px;height:30px;flex:0 0 auto;border-radius:var(--radius-pill);
   background:var(--line);border:1.5px solid var(--line);cursor:pointer;
   transition:background var(--dur-s) var(--ease),border-color var(--dur-s) var(--ease)
 }
@@ -3477,7 +3642,7 @@ body.reduce-motion.fz-stage-map .fz-coach-bubble{animation:none}
 .setting-row:has(input:disabled) small{color:var(--muted)}
 /* Ikon baris pindah ke keluarga sun: marun --accent-strong di dalam kotak kecil
    membuat setiap baris pengaturan terbaca seperti peringatan. */
-.setting-icon{background:var(--sun-soft);color:var(--text);border-radius:10px}
+.setting-icon{background:var(--sun-soft);color:var(--text);border-radius:var(--radius-xs)}
 
 /* ---- m028-06 LEVEL GUARD & UJIAN SKIP LEVEL --------------------------------------------
  *
@@ -3485,18 +3650,18 @@ body.reduce-motion.fz-stage-map .fz-coach-bubble{animation:none}
  * jujur di Home saat mode percobaan atau saat terkunci, dan tangga verifikasi yang
  * menunjukkan pintu mana yang sedang kebuka. Semua warna memakai variabel tema yang sudah
  * ada supaya mode gelap dan kontras tinggi ikut benar tanpa aturan tambahan. */
-.level-trust-badge{display:inline-block;justify-self:start;padding:3px 8px;border-radius:999px;font-size:.64rem;font-style:normal;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.level-trust-badge{display:inline-block;justify-self:start;padding:3px 8px;border-radius:var(--radius-pill);font-size:.64rem;font-style:normal;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
 .level-trust-badge.is-verified{background:color-mix(in srgb,var(--good,#3f7d4e) 16%,transparent);color:var(--good,#3f7d4e)}
 .level-trust-badge.is-probation{background:color-mix(in srgb,var(--yellow-deep,#b8862b) 18%,transparent);color:var(--yellow-deep,#b8862b)}
 .level-trust-badge.is-locked{background:color-mix(in srgb,var(--muted,#746958) 16%,transparent);color:var(--muted,#746958)}
 .level-picker-card.is-locked{opacity:.62;cursor:not-allowed;border-style:dashed}
-.level-lock-note{display:grid;gap:5px;padding:12px 14px;margin-top:12px;border-radius:15px;border:1px solid color-mix(in srgb,var(--muted,#746958) 32%,transparent);background:var(--panel-soft,#f8f1e7);font-size:.8rem;line-height:1.45}
+.level-lock-note{display:grid;gap:5px;padding:12px 14px;margin-top:12px;border-radius:var(--radius-md);border:1px solid color-mix(in srgb,var(--muted,#746958) 32%,transparent);background:var(--panel-soft,#f8f1e7);font-size:.8rem;line-height:1.45}
 .level-lock-note.is-probation{border-color:color-mix(in srgb,var(--yellow-deep,#b8862b) 42%,transparent)}
-.level-exam-cta{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;justify-content:space-between;padding:13px 14px;margin-top:12px;border-radius:16px;border:1px solid var(--line,#eadfce);background:var(--panel,#fff)}
+.level-exam-cta{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;justify-content:space-between;padding:13px 14px;margin-top:12px;border-radius:var(--radius-md);border:1px solid var(--line,#eadfce);background:var(--panel,#fff)}
 .level-exam-cta div{display:grid;gap:3px}
 .level-exam-cta span{font-size:.74rem;color:var(--muted,#746958)}
 .level-exam-facts{display:grid;gap:6px;margin:12px 0;padding-left:18px;font-size:.8rem;line-height:1.45}
-.level-trust-banner{display:grid;gap:10px;padding:15px 16px;margin:0 0 16px;border-radius:18px;border:1px solid var(--line,#eadfce);background:var(--panel,#fff)}
+.level-trust-banner{display:grid;gap:10px;padding:15px 16px;margin:0 0 16px;border-radius:var(--radius-md);border:1px solid var(--line,#eadfce);background:var(--panel,#fff)}
 .level-trust-banner.is-locked{border-color:color-mix(in srgb,var(--accent,#c2402c) 40%,transparent);background:color-mix(in srgb,var(--accent,#c2402c) 6%,var(--panel,#fff))}
 .level-trust-banner.is-probation{border-color:color-mix(in srgb,var(--yellow-deep,#b8862b) 42%,transparent);background:color-mix(in srgb,var(--yellow-deep,#b8862b) 7%,var(--panel,#fff))}
 .level-trust-head{display:grid;gap:4px}
@@ -3504,7 +3669,7 @@ body.reduce-motion.fz-stage-map .fz-coach-bubble{animation:none}
 .level-trust-head span,.level-trust-count{font-size:.79rem;line-height:1.5;color:var(--muted,#746958)}
 .level-trust-count{margin:0;font-weight:600;color:var(--ink,#241a11)}
 .level-trust-ladder{display:flex;flex-wrap:wrap;gap:8px;margin:0;padding:0;list-style:none}
-.level-trust-ladder li{display:grid;gap:2px;min-width:82px;padding:8px 10px;border-radius:13px;border:1px solid var(--line,#eadfce);background:var(--panel-soft,#f8f1e7);font-size:.68rem;color:var(--muted,#746958)}
+.level-trust-ladder li{display:grid;gap:2px;min-width:82px;padding:8px 10px;border-radius:var(--radius-sm);border:1px solid var(--line,#eadfce);background:var(--panel-soft,#f8f1e7);font-size:.68rem;color:var(--muted,#746958)}
 .level-trust-ladder li b{font-size:.88rem;color:var(--ink,#241a11)}
 .level-trust-ladder li.is-done{border-color:color-mix(in srgb,var(--good,#3f7d4e) 45%,transparent)}
 .level-trust-ladder li.is-done b{color:var(--good,#3f7d4e)}
@@ -3525,20 +3690,20 @@ body.reduce-motion.fz-stage-map .fz-coach-bubble{animation:none}
 .level-entry-pop .level-entry-line{margin:0;text-align:left;animation-delay:.2s;font-size:.86rem;line-height:1.5;color:var(--muted,#746958)}
 .level-entry-pop .modal-actions{width:100%;animation-delay:.24s}
 .level-entry-face{display:flex;align-items:center;justify-content:center;width:56px;height:56px;border-radius:50%;background:var(--panel-soft,#f8f1e7);border:1px solid var(--line,#eadfce)}
-.level-entry-chip,.level-trust-chip{display:inline-block;padding:4px 10px;border-radius:999px;border:1px solid color-mix(in srgb,var(--yellow-deep,#b8862b) 40%,transparent);background:color-mix(in srgb,var(--yellow-deep,#b8862b) 14%,transparent);color:var(--yellow-deep,#b8862b);font-style:normal;font-size:.66rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.level-entry-chip,.level-trust-chip{display:inline-block;padding:4px 10px;border-radius:var(--radius-pill);border:1px solid color-mix(in srgb,var(--yellow-deep,#b8862b) 40%,transparent);background:color-mix(in srgb,var(--yellow-deep,#b8862b) 14%,transparent);color:var(--yellow-deep,#b8862b);font-style:normal;font-size:.66rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
 /* Audit 02-003: teks chip 10,56px memakai --yellow-deep di atas krem (±2:1) - melanggar
    aturan berkas ini sendiri: kuning adalah warna BIDANG, bukan warna teks. --info adalah
    SATU-SATUNYA kuning-tinta yang boleh jadi teks (lihat komentar token v6), dan ukurannya
    dinaikkan ke lantai 12px. Bidang chip (border/latar kuning tipis) tidak berubah. */
 .level-trust-chip{justify-self:start;color:var(--info,#7A5F1B);font-size:.75rem}
-.level-trust-chip-cta{justify-self:start;margin-top:4px;padding:7px 13px;border-radius:999px;border:1px solid color-mix(in srgb,var(--accent,#c2402c) 42%,transparent);background:transparent;color:var(--accent,#c2402c);font-size:.76rem;font-weight:700}
+.level-trust-chip-cta{justify-self:start;margin-top:4px;padding:7px 13px;border-radius:var(--radius-pill);border:1px solid color-mix(in srgb,var(--accent,#c2402c) 42%,transparent);background:transparent;color:var(--accent,#c2402c);font-size:.76rem;font-weight:700}
 @keyframes fzLevelEntryPop{from{opacity:0;transform:scale(.9) translate3d(0,10px,0)}60%{opacity:1;transform:scale(1.01) translate3d(0,0,0)}to{opacity:1;transform:scale(1) translate3d(0,0,0)}}
 @keyframes fzLevelEntryRise{from{opacity:0;transform:translate3d(0,7px,0)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){
   .level-entry-pop,.level-entry-pop>*{animation:none!important;opacity:1;transform:none}
 }
 .level-entry-pop.is-static,.level-entry-pop.is-static>*{animation:none;opacity:1;transform:none}
-.level-exam-verdict{padding:12px 14px;margin:10px 0;border-radius:15px;font-size:.85rem;line-height:1.5}
+.level-exam-verdict{padding:12px 14px;margin:10px 0;border-radius:var(--radius-md);font-size:.85rem;line-height:1.5}
 .level-exam-verdict.is-pass{background:color-mix(in srgb,var(--good,#3f7d4e) 12%,transparent);color:var(--good,#3f7d4e)}
 .level-exam-verdict.is-fail{background:color-mix(in srgb,var(--yellow-deep,#b8862b) 14%,transparent);color:var(--ink,#241a11)}
 @media (max-width:520px){.level-exam-cta{flex-direction:column;align-items:stretch}.level-exam-cta button{width:100%}}
@@ -3591,7 +3756,7 @@ body.reduce-motion.fz-stage-map .fz-coach-bubble{animation:none}
 
 /* ---- P1 Prasasti: galeri + momen ---------------------------------------------- */
 .prasasti-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:10px;margin-top:10px}
-.prasasti-badge{display:grid;justify-items:center;gap:6px;text-align:center;padding:14px 10px;border-radius:16px;background:#FFFDF6;box-shadow:inset 0 0 0 1px rgba(36,26,17,.08)}
+.prasasti-badge{display:grid;justify-items:center;gap:6px;text-align:center;padding:14px 10px;border-radius:var(--radius-md);background:#FFFDF6;box-shadow:inset 0 0 0 1px rgba(36,26,17,.08)}
 .prasasti-badge b{font-size:.82rem;line-height:1.25}
 .prasasti-badge .prasasti-hint{font-size:.7rem;color:rgba(36,26,17,.55)}
 .prasasti-icon{display:grid;place-items:center;width:52px;height:52px;border-radius:50%}
@@ -3603,13 +3768,13 @@ body.reduce-motion.fz-stage-map .fz-coach-bubble{animation:none}
 .prasasti-badge.is-locked .prasasti-icon{background:#F1EADB;color:rgba(36,26,17,.35)}
 .prasasti-badge.is-locked b{color:rgba(36,26,17,.5)}
 .fz-prasasti-moment{position:fixed;inset:0;z-index:96;display:grid;place-items:center;padding:22px;background:rgba(36,26,17,.34)}
-.fz-prasasti-card{width:min(340px,92vw);display:grid;justify-items:center;gap:10px;text-align:center;padding:26px 22px 20px;border-radius:22px;background:var(--bg);box-shadow:0 18px 44px rgba(36,26,17,.28)}
+.fz-prasasti-card{width:min(340px,92vw);display:grid;justify-items:center;gap:10px;text-align:center;padding:26px 22px 20px;border-radius:var(--radius-lg);background:var(--bg);box-shadow:var(--shadow-lg)}
 .fz-prasasti-hero{display:grid;justify-items:center;gap:6px}
 .fz-prasasti-hero .prasasti-icon{width:72px;height:72px;background:linear-gradient(140deg,#FFF2C9,#FCE3B0);color:#8A6A24;box-shadow:0 3px 12px rgba(201,162,75,.4)}
 .fz-prasasti-hero .prasasti-icon svg{width:38px;height:38px}
 .fz-prasasti-hero b{font-size:1.1rem}
 .fz-prasasti-hero p{margin:0;font-size:.86rem;color:rgba(36,26,17,.68)}
-.fz-prasasti-note{margin:0;font-size:.74rem;color:rgba(36,26,17,.5)}
+.fz-prasasti-note{margin:0;font-size:.74rem;color:rgba(36,26,17,.74)}/* q17-S3: 3.27:1 -> >=4.5:1 */
 .fz-prasasti-moment.is-leaving{opacity:0;transition:opacity var(--dur-m) var(--ease)}
 @media (prefers-reduced-motion:no-preference){
   .fz-prasasti-card{animation:riseIn var(--dur-m) var(--ease-spring) both}
@@ -3617,7 +3782,7 @@ body.reduce-motion.fz-stage-map .fz-coach-bubble{animation:none}
 
 /* ---- P1-2 Ritual Pembuka Harian ------------------------------------------------ */
 .fz-ritual{position:fixed;inset:0;z-index:95;display:grid;place-items:end center;padding:0 16px 92px;background:rgba(36,26,17,.28)}
-.fz-ritual-card{width:min(380px,94vw);display:grid;gap:8px;padding:22px 20px 18px;border-radius:22px;background:var(--bg);box-shadow:0 16px 40px rgba(36,26,17,.26)}
+.fz-ritual-card{width:min(380px,94vw);display:grid;gap:8px;padding:22px 20px 18px;border-radius:var(--radius-lg);background:var(--bg);box-shadow:var(--shadow-lg)}
 .fz-ritual-paw{width:48px;height:48px}
 .fz-ritual-paw :is(svg,img,canvas){width:48px;height:48px}
 .fz-ritual-hi{margin:0;font-size:1.16rem;font-weight:700}
@@ -3627,7 +3792,7 @@ body.reduce-motion.fz-stage-map .fz-coach-bubble{animation:none}
 .fz-ritual-streak .fz-i{width:20px;height:20px}
 .fz-ritual-mark{letter-spacing:.14em;font-size:.66rem;color:rgba(36,26,17,.5);margin-top:4px}
 .fz-ritual-blocks{list-style:none;margin:0;padding:0;display:grid;gap:6px}
-.fz-ritual-block{display:grid;gap:2px;padding:9px 12px;border-radius:12px;background:#FFFDF6;box-shadow:inset 0 0 0 1px rgba(36,26,17,.07)}
+.fz-ritual-block{display:grid;gap:2px;padding:9px 12px;border-radius:var(--radius-sm);background:#FFFDF6;box-shadow:inset 0 0 0 1px rgba(36,26,17,.07)}
 .fz-ritual-block b{font-size:.86rem}
 .fz-ritual-block span{font-size:.74rem;color:rgba(36,26,17,.6)}
 .fz-ritual-empty{margin:0;font-size:.84rem;color:rgba(36,26,17,.65)}
@@ -3654,7 +3819,7 @@ body.reduce-motion.fz-stage-map .fz-coach-bubble{animation:none}
    satunya sebagai literal) — pasangan sun/text yang sudah diaudit di .primary. */
 .exam-entry-chip{
   display:inline-flex;align-items:center;gap:10px;min-height:44px;
-  padding:9px 14px;border-radius:16px;text-align:left;
+  padding:9px 14px;border-radius:var(--radius-md);text-align:left;
   background:var(--sun);
   border:1.5px solid var(--sun-deep);box-shadow:0 2px 0 var(--sun-deep);
   color:var(--text);
@@ -3674,7 +3839,7 @@ body.reduce-motion.fz-stage-map .fz-coach-bubble{animation:none}
 .lesson-skip-link{
   display:inline-flex;align-items:center;gap:5px;min-height:0;width:max-content;
   position:relative;
-  margin-top:5px;padding:4px 8px;border-radius:10px;
+  margin-top:5px;padding:4px 8px;border-radius:var(--radius-xs);
   background:none;border:1px dashed rgba(36,26,17,.35);box-shadow:none;
   color:var(--muted);font-size:.7rem;font-weight:700;
 }
@@ -3694,7 +3859,7 @@ body.reduce-motion.fz-stage-map .fz-coach-bubble{animation:none}
 .launch-card.is-coming-soon{opacity:.62;cursor:not-allowed;box-shadow:none;transform:none}
 .launch-card.is-coming-soon:hover{transform:none;box-shadow:none}
 .coming-soon-tag{
-  flex:none;padding:3px 8px;border-radius:999px;
+  flex:none;padding:3px 8px;border-radius:var(--radius-pill);
   background:var(--sun-soft);border:1px solid rgba(36,26,17,.25);
   font-size:.58rem;font-weight:700;letter-spacing:.1em;color:var(--text);
 }
@@ -3732,20 +3897,20 @@ body.reduce-motion.fz-stage-map .fz-coach-bubble{animation:none}
       sebagai KETIADAAN jalan untuk menghilang.
    4. LEBAR 390px. Panelnya mengalir dalam satu kolom pada layar tersempit yang didukung; nggak
       ada baris tombol berdampingan yang bisa jatuh di bawah 44px. */
-.fz-notice{display:flex;flex-direction:column;gap:8px;margin:0;padding:14px 16px;border-radius:16px;
+.fz-notice{display:flex;flex-direction:column;gap:8px;margin:0;padding:14px 16px;border-radius:var(--radius-md);
   background:var(--panel-soft,#FFF3DC);color:var(--ink,#241A11);
   border:1px solid var(--yellow-deep,#E6A800);text-align:left}
 .fz-notice-title{margin:0;font-size:1.02rem;line-height:1.3;color:var(--ink,#241A11)}
 .fz-notice-body{margin:0;font-size:.9rem;line-height:1.55;color:var(--ink,#241A11)}
 .fz-notice-note{margin:0;font-size:.82rem;line-height:1.5;color:var(--muted,#6E5E47)}
 .fz-notice-actions{display:flex;flex-direction:column;gap:8px;margin-top:4px}
-.fz-notice-btn{min-height:44px;min-width:44px;width:100%;padding:11px 16px;border-radius:14px;
+.fz-notice-btn{min-height:44px;min-width:44px;width:100%;padding:11px 16px;border-radius:var(--radius-sm);
   border:1px solid var(--yellow-deep,#E6A800);background:var(--yellow,#FFC700);
   color:var(--ink,#241A11);font-weight:700;font-size:.9rem}
 .fz-notice-btn:focus-visible{outline:3px solid var(--ink,#241A11);outline-offset:2px}
 /* Panel jatah. Selama pembayaran mati ia sengaja NGGAK punya satu pun elemen yang bisa
    ditekan - jadi nggak ada gaya tombol/tautan di sini, dan itu bukan kelupaan. */
-.fz-plan{display:flex;flex-direction:column;gap:6px;padding:14px 16px;border-radius:16px;
+.fz-plan{display:flex;flex-direction:column;gap:6px;padding:14px 16px;border-radius:var(--radius-md);
   background:var(--panel,#FFFFFF);color:var(--ink,#241A11);border:1px solid var(--line,#F0E4CF);text-align:left}
 .fz-plan-title{margin:0;font-size:1.02rem;line-height:1.3}
 .fz-plan-line{margin:0;font-size:.88rem;line-height:1.55;color:var(--ink,#241A11)}
@@ -3789,7 +3954,7 @@ body.reduce-motion.fz-stage-map .fz-coach-bubble{animation:none}
    membuat 3 paragraf terbaca sebagai LANGKAH berurut, bukan esai. Nomor memakai pasangan
    sun-soft/info (5,42:1) dan teks langkah --ink di surface-warm (15,65:1). */
 .tutor-steps{
-  margin:12px 0 2px;padding:12px 14px;border-radius:12px;
+  margin:12px 0 2px;padding:12px 14px;border-radius:var(--radius-sm);
   background:var(--surface-warm);border:1px solid var(--line);
   counter-reset:tutor-step;
 }
@@ -4015,6 +4180,35 @@ body.reduce-motion .fz-coach-bubble.is-paw-birth{animation:fzBubbleBirthFade .24
 .map-note .coach-strip-face fiezel-mascot :is(.fz-m-wave,.fz-m-flat,.fz-m-concern,.fz-m-sad){display:none!important}
 .map-note .coach-strip-face fiezel-mascot:has(:is(.fz-m-wave,.fz-m-flat,.fz-m-concern,.fz-m-sad):not([style*="none"])) .fz-m-smile{display:block!important}
 
+/* ============================================================================
+   v6.1 CALM (O4 §2 + §4, 2026-08-28) — hirarki bayangan & tier kartu.
+   Model elevasi: E0 konten dalam alur = TANPA bayangan; E1 --shadow-sm hanya
+   untuk SATU keluarga permukaan istirahat per layar; E2 --shadow-md untuk
+   chrome yang lepas dari alur (nav, launcher); E3 --shadow-lg di atas scrim.
+   Saluran taktil (--lift-sun/--lift-edge) terpisah dan bukan elevasi.
+   .feedback tidak pernah punya bayangan ambient — garis status inset di
+   .feedback-success/error (di atas) adalah stripe status, BUKAN elevasi; tetap.
+   .stats>div juga sudah bebas bayangan — biarkan begitu.
+   ========================================================================= */
+/* Tier kartu (O4 §4): quiet = tanpa bayangan+entrance, flat = benar-benar rata. */
+.card.card-quiet{box-shadow:none;animation:none}
+.card.card-flat{box-shadow:none;animation:none;border-color:var(--line)}
+/* Grammar Hub: baris daftar dalam satu daftar, bukan kartu-kartu melayang. */
+.grammar-grid .card{box-shadow:none;animation:none}
+/* Panggung kuis: hanya kartu soal yang memegang E1; kartu lain (passage,
+   tutor host, dsb.) turun ke E0 supaya layar soal berhenti bersaing. */
+body.fz-stage-quiz .card{box-shadow:none}
+body.fz-stage-quiz .card:has(#quizStem){box-shadow:var(--shadow-sm)}
+/* Tier GHOST (O4 §8): .text-button diresmikan sebagai tingkat ketiga tombol —
+   target sentuh 44px, tanpa border/bayangan, hover cukup bidang lembut. */
+.text-button{min-height:44px;padding:var(--sp-2) var(--sp-3);border-radius:var(--radius-xs);
+  font-size:var(--fs-small);font-weight:700}
+.text-button:hover{background:var(--panel-soft)}
+/* Hukum hirarki tipografi (O4 §5): DI DALAM pelajaran, judul halaman didemosi ke h2
+   supaya soal (.question) dan .lesson-title yang memimpin — aturan display global
+   di blok Fredoka tidak disentuh. */
+body.fz-stage-quiz .section-head h1,
+body.fz-stage-grammar-lesson .section-head h1{font-family:var(--fz-heading);font-weight:700;font-size:var(--fs-h2)}
 /* ==========================================================================
    ===== FASE3 / W3-FONT — TIPOGRAFI THAI (semua aturan HANYA :lang(th)) =====
    Ditambahkan append-only di bawah marker FASE3 sesuai konvensi (style.css
@@ -4122,3 +4316,6 @@ body.reduce-motion .fz-coach-bubble.is-paw-birth{animation:fzBubbleBirthFade .24
 .social-empty{text-align:center;padding:18px 8px}
 .social-countdown{display:flex;align-items:center;gap:6px}
 .social-summary .modal-actions{margin-top:8px}
+
+/* G15-07 (wave2): scope instrumen di bawah nama level hasil placement */
+.result-level-scope{display:block;font-size:.72rem;font-weight:500;opacity:.75;margin-top:2px;letter-spacing:.01em}

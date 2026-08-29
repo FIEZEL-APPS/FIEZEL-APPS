@@ -448,9 +448,9 @@
           "misconception": "past simple dipakai buat kejadian yang lebih dulu, jadi urutannya rata.",
           "whyFails": "“by the time” jadi kehilangan maknanya “sebelum titik itu”."
         },
-        "are already giving": {
-          "misconception": "kejadiannya dibiarin jalan di “sekarang”, padahal harusnya udah kelar sebelum titik acuan lampau.",
-          "whyFails": "“arrived” udah naruh ceritanya di masa lalu, jadi bentuk sekarang nggak nyambung; pertolongannya harus udah kelar sebelum titik itu."
+        "were already giving": {
+          "misconception": "kejadian yang udah kelar ketuker sama yang masih jalan di titik acuan.",
+          "whyFails": "bentuk continuous bilang pertolongannya masih jalan pas ambulans dateng, padahal “only had to check the bandages” nunjukin udah kelar."
         },
         "already give": {
           "misconception": "bentuk dasar present dipakai di dalam cerita lampau.",
@@ -884,9 +884,9 @@
           "misconception": "bentuk dasar dipakai padahal bukan pola yang sah sesudah “remember”.",
           "whyFails": "“remember” cuma diikuti bentuk -ing atau bentuk to, nggak pernah bentuk dasar."
         },
-        "to have locked": {
-          "misconception": "bentuk to sempurna dipasang ke “remember”, padahal buat ingatan lampau pola itu nggak dipakai.",
-          "whyFails": "“remember to have locked” bukan pola yang dipakai bahasa Inggris; buat inget tindakan yang udah lewat, bentuknya “locking”."
+        "having to lock": {
+          "misconception": "nambahin makna kewajiban yang nggak diminta kalimatnya.",
+          "whyFails": "kalimatnya inget tindakan nguncinya, bukan inget adanya kewajiban ngunci."
         }
       }
     },
@@ -1744,9 +1744,9 @@
           "misconception": "waktu sekarang dianggap selalu nuntut bentuk -ing.",
           "whyFails": "“belong” itu keadaan menetap, bukan proses yang jalan."
         },
-        "belonging": {
-          "misconception": "kalimatnya cuma dikasih bentuk -ing tanpa kata kerja utama yang megang waktunya.",
-          "whyFails": "“belonging” doang bikin kalimatnya nggak punya kata kerja utama, jadi kalimatnya nggak utuh."
+        "belonged": {
+          "misconception": "pindah ke bentuk lampau padahal konteksnya sekarang.",
+          "whyFails": "rumahnya masih milik mereka sampai sekarang."
         },
         "is being belonged": {
           "misconception": "susunan pasif dipaksain ke kata kerja keadaan tanpa objek.",
@@ -2100,17 +2100,17 @@
       "howToAvoid": "Uji kata penghubungnya berkedudukan objek dari kata kerja anak kalimatnya atau bukan.",
       "memoryCue": "Kalau bisa diucapin “I borrowed it”, kata penghubungnya boleh menghilang.",
       "distractors": {
-        "The book who I borrowed from the library was due back yesterday.": {
+        "who": {
           "misconception": "kata penghubung buat orang dipakai pada kata benda yang bukan orang.",
-          "whyFails": "“who” buat orang, padahal “the book” itu benda; kata penghubungnya di sini malah bisa dihilangin."
+          "whyFails": "“Who” merujuk pada orang, sedangkan “the book” adalah benda."
         },
-        "The book whose I borrowed from the library was due back yesterday.": {
-          "misconception": "kata kepemilikan “whose” dipasang padahal nggak ada makna punya-punyaan di kalimatnya.",
-          "whyFails": "“whose” nandain kepemilikan dan harus diikuti kata benda; di sini nggak ada makna punya-punyaan sama sekali."
+        "whom": {
+          "misconception": "“whom”, kata ganti objek khusus orang, malah disisipin buat benda, padahal kata penghubung objeknya boleh dihilangin.",
+          "whyFails": "“whom” cuma buat orang, jadi nggak bisa gantiin “the book”. Lagipula kata penghubungnya berkedudukan objek, jadi paling wajar dihilangin aja."
         },
-        "The book what I borrowed from the library was due back yesterday.": {
+        "what": {
           "misconception": "“what” dipakai sebagai kata penghubung, kekeliruan yang lazim kebawa dari bahasa lain.",
-          "whyFails": "“what” nggak dipakai sebagai kata penghubung sesudah kata benda kayak “the book”."
+          "whyFails": "“what” bukan kata penghubung sesudah kata benda dalam Bahasa Inggris baku."
         }
       }
     },
@@ -3534,6 +3534,1662 @@
         }
       }
     },
+    "PD-001": {
+      "objective": "Pakai bentuk objek him sesudah kata kerja, bukan bentuk subjek atau kepemilikan",
+      "misconception": "Kamu gampang naruh he atau his sesudah kata kerja. Padahal posisi objek harus pakai him.",
+      "reasoning": "lihat bagian kosongnya jadi objek kata kerja “see” → pilih bentuk objeknya",
+      "rule": "Kata ganti subjek jadi subjek. Kata ganti objek berdiri sesudah kata kerja. Bentuk kepemilikan kayak his nunjukin punya.",
+      "whyCorrect": "Bagian kosongnya sesudah kata kerja “see” dan nunjuk Tom. Jadi pakai bentuk objek “him”.",
+      "whyOthersFail": "“He” dan “she” bentuk subjek, dan “she” buat perempuan. “His” nyatain kepemilikan, bukan orangnya.",
+      "howToAvoid": "Lihat posisi bagian kosongnya. Kalau sesudah kata kerja, pakai bentuk objek: me, him, her, us, them.",
+      "memoryCue": "“I see him”, tapi “he sees me”.",
+      "distractors": {
+        "he": {
+          "misconception": "kata ganti subjek ditaruh di posisi objek.",
+          "whyFails": "bentuk subjek, nggak bisa berdiri sesudah kata kerja sebagai objek."
+        },
+        "his": {
+          "misconception": "bentuk kepemilikan dipakai buat gantiin orangnya.",
+          "whyFails": "bentuk kepemilikan, nggak bisa gantiin Tom sebagai objek."
+        },
+        "she": {
+          "misconception": "kata ganti subjek buat perempuan dipakai di posisi objek buat laki-laki.",
+          "whyFails": "bentuk subjek dan buat perempuan, padahal yang dicari objek buat Tom."
+        }
+      }
+    },
+    "CG-001": {
+      "objective": "Kata ganti I pakai bentuk orang pertama am",
+      "misconception": "Kamu gampang masangin I sama is atau are. Kadang be dibiarin bentuk dasar.",
+      "reasoning": "cocokin I sama bentuk be sekarang → pilih am",
+      "rule": "Bentuk be sekarang: I am. He, she, it is. You, we, they are.",
+      "whyCorrect": "Subjeknya “I”. Pasangan “I” cuma satu: “am”.",
+      "whyOthersFail": "“Is” punyanya he, she, it. “Are” punyanya you, we, they. “Be” bentuk dasar, nggak bisa jalan sendiri.",
+      "howToAvoid": "Sebut pasangannya dulu: “I am”, “she is”, “they are”.",
+      "memoryCue": "“I” selalu sama “am”: “I am a student”.",
+      "distractors": {
+        "is": {
+          "misconception": "bentuk be buat orang ketiga tunggal dipakai buat I.",
+          "whyFails": "dipakai bareng he, she, atau it, bukan bareng I."
+        },
+        "are": {
+          "misconception": "bentuk be buat jamak dipakai buat I.",
+          "whyFails": "dipakai bareng you, we, dan they, bukan bareng I."
+        },
+        "be": {
+          "misconception": "bentuk dasar.",
+          "whyFails": "bentuk dasar, nggak bisa jadi kata kerja utama."
+        }
+      }
+    },
+    "AR-007": {
+      "objective": "Pakai the buat benda yang udah disebut sebelumnya dan udah dikenal",
+      "misconception": "Kamu gampang ngulang a buat benda yang udah disebut. Padahal penyebutan kedua pakai the.",
+      "reasoning": "cek bendanya udah disebut atau belum → pilih kata sandangnya",
+      "rule": "Pakai a atau an buat penyebutan pertama. Pakai the kalau bendanya udah disebut atau udah jelas yang mana.",
+      "whyCorrect": "Bukunya udah disebut di kalimat pertama. Penyebutan kedua pakai “the”.",
+      "whyOthersFail": "“A” buat penyebutan pertama. “An” nggak cocok sama bunyi konsonan “book”. “Some” nggak buat satu benda yang udah tertentu.",
+      "howToAvoid": "Tanya dulu: bendanya udah pernah disebut atau belum? Kalau udah, pakai “the”.",
+      "memoryCue": "Sebut pertama pakai “a”, sebut kedua pakai “the”.",
+      "distractors": {
+        "A": {
+          "misconception": "kata sandang penyebutan pertama dipakai lagi buat benda yang udah dikenal.",
+          "whyFails": "bukunya udah disebut di kalimat pertama, jadi udah tertentu."
+        },
+        "An": {
+          "misconception": "an dipakai tanpa cek bunyi awal katanya.",
+          "whyFails": "buat bunyi vokal, padahal “book” mulai dengan bunyi konsonan. Bukunya juga udah tertentu."
+        },
+        "Some": {
+          "misconception": "kata jumlah buat banyak benda dipakai ke benda tunggal yang udah tertentu.",
+          "whyFails": "buat banyak benda, bukan buat satu buku yang udah jelas yang mana."
+        }
+      }
+    },
+    "NN-001": {
+      "objective": "Hafal bentuk jamak nggak beraturan children, bukan nambahin -s atau -es",
+      "misconception": "Kamu gampang nambahin -s ke semua kata. Padahal beberapa kata punya bentuk jamak sendiri yang harus dihafal.",
+      "reasoning": "cek katanya beraturan atau nggak → ingat bentuk jamak hafalannya",
+      "rule": "Beberapa kata benda punya bentuk jamak nggak beraturan yang harus dihafal: child jadi children, man jadi men, foot jadi feet.",
+      "whyCorrect": "“Child” termasuk kata nggak beraturan. Bentuk jamaknya “children”.",
+      "whyOthersFail": "“Childs” dan “childes” maksa aturan biasa ke kata nggak beraturan. “Child” masih tunggal.",
+      "howToAvoid": "Sebelum nambah -s atau -es, cek dulu katanya masuk daftar nggak beraturan atau nggak.",
+      "memoryCue": "Satu “child”, dua “children”.",
+      "distractors": {
+        "childs": {
+          "misconception": "akhiran -s dipakai buat semua kata.",
+          "whyFails": "kata ini nggak beraturan, jadi nggak bisa cuma ditambah -s."
+        },
+        "childes": {
+          "misconception": "akhiran -es ditambah ke kata yang nggak beraturan.",
+          "whyFails": "akhiran -es buat kata kayak “boxes”, bukan buat kata nggak beraturan ini."
+        },
+        "child": {
+          "misconception": "bentuk tunggal dibiarin.",
+          "whyFails": "masih bentuk tunggal, padahal yang diminta lebih dari satu."
+        }
+      }
+    },
+    "AR-008": {
+      "objective": "Pakai this buat satu benda yang dekat sama pembicara",
+      "misconception": "Kamu sering cuma cocokin jumlahnya, jaraknya kelupaan. Atau kebalikannya.",
+      "reasoning": "cek jumlah kata bendanya dan petunjuk jaraknya → pilih kata penunjuk yang pas",
+      "rule": "this buat satu benda dekat. that buat satu benda jauh. these buat banyak benda dekat. those buat banyak benda jauh.",
+      "whyCorrect": "“Photo” cuma satu. “In my hand” bilang bendanya dekat. “This” pas buat dua-duanya.",
+      "whyOthersFail": "“That” nunjuk yang jauh. “These” buat banyak benda. “Those” salah dua-duanya.",
+      "howToAvoid": "Cek dua hal: bendanya satu atau banyak? Dekat atau jauh?",
+      "memoryCue": "Satu dan dekat: “this photo in my hand”.",
+      "distractors": {
+        "that": {
+          "misconception": "jumlahnya udah cocok tapi petunjuk dekatnya kelupaan.",
+          "whyFails": "jumlahnya udah pas, tapi nunjuk benda yang jauh, padahal fotonya di tangan."
+        },
+        "these": {
+          "misconception": "jaraknya udah cocok tapi jumlahnya kelupaan.",
+          "whyFails": "dekatnya udah pas, tapi buat banyak benda, padahal fotonya cuma satu."
+        },
+        "those": {
+          "misconception": "kata penunjuk jamak jauh dipakai buat satu benda yang dekat.",
+          "whyFails": "buat banyak benda yang jauh, padahal fotonya satu dan ada di tangan."
+        }
+      }
+    },
+    "CG-002": {
+      "objective": "Pakai kata kepemilikan their buat nunjukin house-nya punya dua orang",
+      "misconception": "Kamu gampang naruh they, theirs, atau them di depan kata benda. Padahal posisi itu buat kata kepemilikan.",
+      "reasoning": "kenali pemiliknya dua orang → lihat “house” sesudah bagian kosongnya → pilih kata kepemilikan",
+      "rule": "Sebelum kata benda pakai kata kepemilikan. Contohnya my, your, his, her, its, our, their.",
+      "whyCorrect": "Pemiliknya dua orang: Mr. dan Mrs. Lee. Sebelum “house” pakai “Their”.",
+      "whyOthersFail": "“They” itu subjek. “Theirs” berdiri sendiri. “Them” itu objek.",
+      "howToAvoid": "Kalau sesudahnya masih ada kata benda, jangan pakai “theirs”.",
+      "memoryCue": "“Their house”, tapi “the house is theirs”.",
+      "distractors": {
+        "They": {
+          "misconception": "kata ganti subjek.",
+          "whyFails": "bentuk subjek, nggak bisa langsung nerangin “house”."
+        },
+        "Theirs": {
+          "misconception": "kata ganti kepemilikan mandiri.",
+          "whyFails": "berdiri sendiri, nggak pernah diikuti kata benda."
+        },
+        "Them": {
+          "misconception": "kata ganti objek.",
+          "whyFails": "bentuk objek, bukan kata kepemilikan."
+        }
+      }
+    },
+    "PS-001": {
+      "objective": "Bikin pertanyaan have got dengan majuin have ke depan subjek, tanpa do",
+      "misconception": "Kamu gampang nambahin do ke pertanyaan have got. Kadang has kepakai buat you.",
+      "reasoning": "kenali pola pertanyaan have got → majuin have ke depan “you” → got tetap di belakang",
+      "rule": "Pertanyaan have got: majuin have atau has ke depan subjek, got tetap di belakang. Jangan tambah do.",
+      "whyCorrect": "Subjeknya “you”, jadi pakai “have”. Buat nanya, “have” maju ke depan: “Have you got ...?”",
+      "whyOthersFail": "“Has” buat he, she, it. “Do” dan “are” nggak bisa digabung sama “got” di pola ini.",
+      "howToAvoid": "Kalau ada “got”, jangan pakai “do”. Majuin “have” atau “has” ke depan subjeknya.",
+      "memoryCue": "“Have you got ...?” — nggak perlu “do”.",
+      "distractors": {
+        "Has": {
+          "misconception": "bentuk buat orang ketiga tunggal dipakai ke you.",
+          "whyFails": "buat he, she, dan it, bukan buat “you”."
+        },
+        "Do": {
+          "misconception": "do ditambahin ke pola have got.",
+          "whyFails": "“do you got” nggak pernah bener. Pola have got nanya dengan majuin have, tanpa do."
+        },
+        "Are": {
+          "misconception": "be dipakai buat pola punya.",
+          "whyFails": "bentuk be, jadi “are you got” nggak nyatain punya."
+        }
+      }
+    },
+    "CG-003": {
+      "objective": "Frasa benda tunggal kayak a big park pakai is",
+      "misconception": "Kamu gampang pakai are sesudah there, padahal bendanya cuma satu. Kadang malah kepakai am atau be.",
+      "reasoning": "lewati kata “there” → lihat benda sesudahnya → tentuin tunggal atau jamak",
+      "rule": "There is plus kata benda tunggal. There are plus kata benda jamak.",
+      "whyCorrect": "Bendanya “a big park”, cuma satu. Jadi pakai “is”.",
+      "whyOthersFail": "“Are” buat banyak benda. “Am” cuma buat I. “Be” nggak bisa berdiri sendiri di sini.",
+      "howToAvoid": "Jangan cocokin kata kerjanya sama “there”. Lihat benda pertama sesudahnya.",
+      "memoryCue": "Satu: “there is”. Banyak: “there are”.",
+      "distractors": {
+        "are": {
+          "misconception": "bentuk jamak dipakai buat benda tunggal.",
+          "whyFails": "buat banyak benda, sedangkan “a big park” cuma satu."
+        },
+        "am": {
+          "misconception": "bentuk be buat orang pertama.",
+          "whyFails": "cuma dipakai bareng I, nggak pernah sesudah “there”."
+        },
+        "be": {
+          "misconception": "bentuk dasar.",
+          "whyFails": "bentuk dasar, nggak bisa jadi kata kerja utama."
+        }
+      }
+    },
+    "PR-006": {
+      "objective": "Pakai under buat benda yang letaknya di bawah benda lain",
+      "misconception": "Kamu gampang nerjemahin langsung dari kata “di”. Bahasa Indonesia sering nggak misahin di atas dan di bawah sejelas ini.",
+      "reasoning": "bayangin posisi kucingnya yang nggak kelihatan → pilih kata depan buat posisi di bawah",
+      "rule": "Pakai in buat di dalam. Pakai on buat di permukaan. Pakai under buat di bawah sesuatu. Pakai at buat satu titik tempat.",
+      "whyCorrect": "Kucingnya nggak kelihatan karena ada di bawah kasur. Buat posisi di bawah pakai “under”.",
+      "whyOthersFail": "“On” bikin kucingnya kelihatan di atas kasur. “At” nunjuk satu titik. “To” nunjuk gerakan.",
+      "howToAvoid": "Bayangin posisinya: di dalam, di atas, di bawah, atau di satu titik?",
+      "memoryCue": "In a bag, on a table, under a bed.",
+      "distractors": {
+        "on": {
+          "misconception": "letak tersembunyi di bawah dibaca sebagai di permukaan.",
+          "whyFails": "artinya di atas kasur, padahal kucingnya nggak kelihatan."
+        },
+        "at": {
+          "misconception": "kata at dipakai buat semua letak.",
+          "whyFails": "nunjuk titik atau tempat ketemuan secara umum, bukan posisi di bawah."
+        },
+        "to": {
+          "misconception": "kata depan gerakan dipakai buat letak yang diam.",
+          "whyFails": "nunjuk gerakan ke tujuan, padahal kucingnya diam."
+        }
+      }
+    },
+    "QF-001": {
+      "objective": "Milih kata tanya when kalau jawabannya soal waktu",
+      "misconception": "Kamu gampang milih kata tanya dari kebiasaan, bukan dari isi jawabannya.",
+      "reasoning": "baca jawabannya “At seven o'clock” → kenali itu waktu → pilih “When”",
+      "rule": "Who buat orang. What buat benda. Where buat tempat. When buat waktu. Why buat alasan.",
+      "whyCorrect": "Jawabannya “At seven o'clock”, itu jam. Jadi kata tanyanya “When”.",
+      "whyOthersFail": "Kata tanya lain minta benda, tempat, atau orang. Jawabannya waktu.",
+      "howToAvoid": "Baca jawabannya dulu. Baru pilih kata tanya yang cocok sama isinya.",
+      "memoryCue": "When buat waktu, where buat tempat, who buat orang.",
+      "distractors": {
+        "What": {
+          "misconception": "kata tanya benda dipakai buat nanya waktu.",
+          "whyFails": "nanya benda atau kegiatan, padahal jawabannya jam."
+        },
+        "Where": {
+          "misconception": "kata tanya tempat dipakai buat nanya waktu.",
+          "whyFails": "nanya tempat, padahal jawabannya jam."
+        },
+        "Who": {
+          "misconception": "kata tanya orang dipakai buat nanya waktu.",
+          "whyFails": "nanya orang, padahal jawabannya jam."
+        }
+      }
+    },
+    "A1-111": {
+      "objective": "Bikin kalimat tanya lampau dengan was atau were tanpa nambah did",
+      "misconception": "Kamu gampang nambah “did” di kalimat tanya, padahal “was/were” cukup dibalik. Kadang “was” juga kepakai buat subjek jamak.",
+      "reasoning": "kenali kata kerjanya “be” → balik “was/were” ke depan → cocokkan sama jumlah subjeknya",
+      "rule": "Kalimat tanya lampau dengan “be” dibikin dengan naruh “was” atau “were” di depan subjek. Jangan tambah “did”.",
+      "whyCorrect": "“Your parents” itu jamak dan waktunya lampau. Jadi pertanyaannya mulai dengan “Were”.",
+      "whyOthersFail": "“Was” buat subjek tunggal. “Did” nggak bisa gabung sama “be”. “Are” bentuk sekarang.",
+      "howToAvoid": "Cek dulu kata kerjanya. Kalau “be”, tinggal pindahin “was” atau “were” ke depan tanpa “did”.",
+      "memoryCue": "Tanya lampau pakai “be”: balik “were”-nya, lupakan “did”.",
+      "distractors": {
+        "Was": {
+          "misconception": "bentuk lampau tunggal dipakai buat subjek jamak.",
+          "whyFails": "buat subjek tunggal, padahal “your parents” itu jamak."
+        },
+        "Did": {
+          "misconception": "kata bantu “did” ditambah di pertanyaan “be”, padahal “was/were” cukup dibalik sendiri.",
+          "whyFails": "nggak dipakai buat kalimat tanya dengan “be”; cukup taruh “were” di depan."
+        },
+        "Are": {
+          "misconception": "bentuk sekarang dipakai buat masa lalu.",
+          "whyFails": "bentuk sekarang, padahal “last night” nunjuk masa lalu."
+        }
+      }
+    },
+    "A1-116": {
+      "objective": "Pakai some buat benda jamak di kalimat positif, bukan a, an, atau much",
+      "misconception": "Kamu gampang masang “a” atau “much” di depan benda jamak, padahal kalimat positif jamak minta “some”.",
+      "reasoning": "cek kalimatnya positif → cek bendanya jamak dan bisa dihitung → pilih some",
+      "rule": "“Some” dipakai di kalimat positif buat benda jamak atau benda tak terhitung. “A/an” cuma buat satu benda. “Much” cuma buat benda tak terhitung.",
+      "whyCorrect": "Kalimatnya positif dan “bananas” itu jamak. Pasangannya “some”.",
+      "whyOthersFail": "“A” dan “an” cuma buat satu benda. “Much” nggak bisa dipasang ke benda yang bisa dihitung.",
+      "howToAvoid": "Cek dulu kalimatnya positif atau negatif, lalu cek bendanya jamak atau tunggal.",
+      "memoryCue": "Positif plus jamak: We bought some bananas.",
+      "distractors": {
+        "a": {
+          "misconception": "artikel tunggal dipasang ke kata benda jamak.",
+          "whyFails": "cuma buat satu benda, padahal “bananas” jamak."
+        },
+        "an": {
+          "misconception": "artikel tunggal dipakai buat benda jamak, aturan bunyi vokalnya juga meleset.",
+          "whyFails": "buat satu benda dan bunyi vokal, padahal “bananas” jamak dan mulai dengan bunyi “b”."
+        },
+        "much": {
+          "misconception": "penanda benda tak terhitung dipakai buat benda jamak yang bisa dihitung.",
+          "whyFails": "buat benda yang nggak bisa dihitung, padahal pisang bisa dihitung satu-satu."
+        }
+      }
+    },
+    "PR-101": {
+      "objective": "Pakai at buat jam yang persis, beda dari in buat rentang luas dan on buat hari",
+      "misconception": "Kamu gampang pakai “in” atau “on” buat jam, karena semua kata depan waktu kerasa sama.",
+      "reasoning": "kenali keterangannya jam yang persis → pilih at",
+      "rule": "in buat bulan, tahun, dan musim. on buat hari dan tanggal. at buat jam dan titik waktu kayak at noon.",
+      "whyCorrect": "“7:45” itu jam yang persis. Jam selalu pakai “at”.",
+      "whyOthersFail": "“In” dan “on” buat waktu yang lebih luas. “By” malah nambah makna tenggat.",
+      "howToAvoid": "Tanya dulu: ini bulan, hari, atau jam? Kalau jam, langsung pakai “at”.",
+      "memoryCue": "Jarum jam nunjuk AT: at 7:45.",
+      "distractors": {
+        "in": {
+          "misconception": "keterangan jam dianggap rentang waktu yang luas.",
+          "whyFails": "buat rentang luas kayak bulan dan tahun, bukan jam yang persis."
+        },
+        "on": {
+          "misconception": "keterangan jam dianggap hari di kalender.",
+          "whyFails": "buat hari dan tanggal, bukan jam."
+        },
+        "by": {
+          "misconception": "kata depan waktu tertukar sama kata depan batas akhir.",
+          "whyFails": "artinya paling lambat, jadi maknanya berubah jadi tenggat."
+        }
+      }
+    },
+    "TA-101": {
+      "objective": "Pakai present simple buat rutinitas yang ditandai kata frekuensi kayak every day",
+      "misconception": "Kamu pakai bentuk -ing buat kebiasaan, cuma karena kejadiannya di masa sekarang.",
+      "reasoning": "cari kata frekuensinya → kenali ini rutinitas → pilih present simple",
+      "rule": "Kebiasaan pakai present simple, apalagi kalau ada “every day” atau “usually”. Kejadian yang lagi jalan sekarang baru pakai am/is/are + -ing.",
+      "whyCorrect": "“Every day” nunjuk rutinitas. Jadi bentuknya “takes”.",
+      "whyOthersFail": "“Is taking” artinya lagi jalan saat ini. “Take” nggak cocok sama subjeknya. “Took” mundur ke masa lalu.",
+      "howToAvoid": "Cari kata frekuensi kayak “every day”, “usually”, atau “often”. Itu tanda present simple.",
+      "memoryCue": "Ada “every day”, pakai bentuk -s: she takes.",
+      "distractors": {
+        "is taking": {
+          "misconception": "waktu sekarang dianggap selalu butuh bentuk -ing, padahal ini kebiasaan.",
+          "whyFails": "bentuk lagi berlangsung, padahal “every day” nunjuk rutinitas."
+        },
+        "take": {
+          "misconception": "bentuk dasar nggak disesuaikan sama subjeknya.",
+          "whyFails": "bentuk dasar nggak cocok sama subjek orang ketiga tunggal."
+        },
+        "took": {
+          "misconception": "bentuk lampau dipakai buat kebiasaan yang berlaku kapan aja.",
+          "whyFails": "bentuk lampau, padahal rutinitasnya masih jalan sampai sekarang."
+        }
+      }
+    },
+    "MO-101": {
+      "objective": "Bedain nggak wajib (don't have to) dari dilarang (mustn't) dan nggak boleh (can't)",
+      "misconception": "Kamu ngira mustn't, can't, dan don't have to sama aja, jadi “nggak perlu” kebaca “nggak boleh”.",
+      "reasoning": "cek aturannya ngilangin kewajiban atau ngelarang tindakan → pilih modal negatifnya",
+      "rule": "“Don't have to” artinya nggak perlu. “Mustn't” artinya dilarang. “Can't” artinya nggak boleh atau nggak bisa. “Shouldn't” artinya sebaiknya jangan.",
+      "whyCorrect": "Busnya gratis, jadi kewajiban bayarnya hilang. Itu persis makna “don't have to”.",
+      "whyOthersFail": "Pilihan lain artinya dilarang, nggak boleh, atau saran jangan. Padahal kalimatnya cuma bilang nggak perlu.",
+      "howToAvoid": "Tanya dulu: tindakannya dilarang, atau cuma nggak perlu? Kalau gratis, berarti nggak perlu.",
+      "memoryCue": "Gratis = don't have to. Tanda bahaya = mustn't.",
+      "distractors": {
+        "mustn't": {
+          "misconception": "bentuk negatif ini dibaca “nggak wajib”, padahal artinya “dilarang”.",
+          "whyFails": "artinya dilarang, padahal bayar cuma nggak perlu, bukan dilarang."
+        },
+        "can't": {
+          "misconception": "“nggak wajib” dibaca sebagai “nggak boleh”.",
+          "whyFails": "bilang nggak boleh atau nggak bisa, padahal kalimatnya cuma bilang nggak perlu."
+        },
+        "shouldn't": {
+          "misconception": "“nggak perlu” dibaca sebagai “sebaiknya jangan”.",
+          "whyFails": "cuma saran jangan, padahal kalimatnya nyatain aturan bebas biaya."
+        }
+      }
+    },
+    "CO-101": {
+      "objective": "Pakai will di klausa akibat first conditional buat kejadian masa depan yang mungkin",
+      "misconception": "Kamu gampang ngilangin “will” di klausa akibat, atau malah kepeleset ke “would” dan bentuk lampau.",
+      "reasoning": "kenali syaratnya nyata buat masa depan → tandai klausa akibat dengan will",
+      "rule": "First conditional: if + present simple, lalu will + kata kerja dasar. Zero conditional cuma buat hal yang selalu benar.",
+      "whyCorrect": "Syaratnya nyata dan soal satu malam tertentu. Jadi klausa akibatnya pakai “will watch”.",
+      "whyOthersFail": "“Watch” polos kebaca fakta umum. “Would watch” jadi andai-andai. “Watched” malah lampau.",
+      "howToAvoid": "Tanya dulu: ini soal satu kejadian masa depan yang mungkin? Kalau iya, taruh “will” di klausa akibat.",
+      "memoryCue": "Janji malam ini: if you finish, we WILL watch.",
+      "distractors": {
+        "watch": {
+          "misconception": "penanda masa depan dibuang, jadi kalimatnya kebaca fakta umum.",
+          "whyFails": "penanda masa depannya hilang, padahal ini soal satu malam tertentu."
+        },
+        "would watch": {
+          "misconception": "syarat yang nyata diperlakukan kayak andai-andai.",
+          "whyFails": "bikin rencananya jadi andai-andai, padahal syaratnya nyata dan mungkin."
+        },
+        "watched": {
+          "misconception": "bentuk lampau dipakai buat akibat yang jelas di masa depan.",
+          "whyFails": "bentuk lampau, padahal “tonight” nunjuk masa depan."
+        }
+      }
+    },
+    "AR-101": {
+      "objective": "Pakai a buat benda yang baru pertama disebut, sebelum disebut ulang pakai the",
+      "misconception": "Kamu langsung pakai “the” di sebutan pertama, karena bendanya kerasa spesifik buat kamu sendiri.",
+      "reasoning": "cek bendanya udah pernah disebut atau belum → sebutan pertama pakai a",
+      "rule": "Pakai “a/an” waktu benda pertama kali disebut. Setelah pendengar tahu yang mana, baru ganti ke “the”.",
+      "whyCorrect": "Anak kucingnya baru pertama disebut di sini. Jadi pakai “a”, dan kalimat berikutnya boleh pakai “the kitten”.",
+      "whyOthersFail": "“The” nganggep udah dikenal. “An” salah karena “kitten” mulai bunyi konsonan. “Some” kesannya lebih dari satu.",
+      "howToAvoid": "Lihat ke belakang: kalau bendanya belum pernah disebut, kenalkan dulu pakai “a” atau “an”.",
+      "memoryCue": "Baru muncul = a kitten. Muncul lagi = the kitten.",
+      "distractors": {
+        "the": {
+          "misconception": "artikel tentu dipakai padahal bendanya baru pertama disebut.",
+          "whyFails": "buat benda yang udah dikenal, padahal ini sebutan pertamanya."
+        },
+        "an": {
+          "misconception": "salah bentuk artikel karena aturan bunyi vokal dipakai buat bunyi konsonan.",
+          "whyFails": "buat bunyi vokal, padahal “kitten” mulai dengan bunyi “k”."
+        },
+        "some": {
+          "misconception": "kata jumlah dipakai buat banyak benda, padahal yang ditunjuk satu benda.",
+          "whyFails": "kesannya lebih dari satu, padahal yang diadopsi cuma satu ekor."
+        }
+      }
+    },
+    "CM-101": {
+      "objective": "Pakai the + bentuk paling waktu ngeranking satu hal di kelompok berisi tiga hal atau lebih",
+      "misconception": "Kamu bertahan di bentuk “-er”, padahal yang dibandingkan satu kelompok berisi lima hal.",
+      "reasoning": "hitung jumlah yang dibandingkan → tiga atau lebih berarti the + bentuk paling",
+      "rule": "Bentuk -er atau more buat bandingin dua hal. Bentuk the + -est atau the most buat ranking di kelompok berisi tiga hal atau lebih.",
+      "whyCorrect": "Lima hotel itu satu kelompok, lebih dari dua. Jadi pakai “the cheapest”.",
+      "whyOthersFail": "“Cheaper” cuma buat dua hal. “The most cheap” salah pola buat kata sifat pendek. “Cheap” polos nggak membandingkan apa-apa.",
+      "howToAvoid": "Hitung dulu yang dibandingkan. Frasa kayak “of the five” nunjuk kelompok, jadi pakai the + bentuk paling.",
+      "memoryCue": "Ada “of the five”, pakai the + -est.",
+      "distractors": {
+        "cheaper": {
+          "misconception": "bentuk perbandingan dua hal dipakai buat ranking satu kelompok.",
+          "whyFails": "cuma buat bandingin dua hal, padahal ini ranking dari lima hotel."
+        },
+        "the most cheap": {
+          "misconception": "pola “more/most” dipakai buat kata sifat pendek yang harusnya berakhiran.",
+          "whyFails": "kata sifat pendek kayak “cheap” harusnya pakai akhiran “-est”, bukan “most”."
+        },
+        "cheap": {
+          "misconception": "kata sifat bentuk dasar dipakai padahal kalimatnya minta bentuk perbandingan.",
+          "whyFails": "bentuk dasar cuma mendeskripsikan, nggak bisa bikin ranking."
+        }
+      }
+    },
+    "TA-104": {
+      "objective": "Pakai past simple buat kejadian pendek yang motong aksi latar past continuous",
+      "misconception": "Kamu ikut manjangin kejadian pemotongnya jadi bentuk -ing, karena kalimat sekitarnya bentuk -ing.",
+      "reasoning": "temukan kejadian pendek yang motong → tandai dengan past simple",
+      "rule": "Past continuous buat aksi latar yang lebih lama. Kejadian pendek yang motong, biasanya setelah “when”, pakai past simple.",
+      "whyCorrect": "Hujan yang tiba-tiba mulai itu kejadian pendek yang motong jalannya Sara. Jadi pakai “started”.",
+      "whyOthersFail": "“Was starting” manjangin kejadian yang tiba-tiba. “Starts” bentuk sekarang. “Has started” narik cerita ke saat ini.",
+      "howToAvoid": "Cari klausa “when”-nya. Kejadian tiba-tiba setelah “when” biasanya pakai past simple.",
+      "memoryCue": "Jalan lama = was walking. Hujan tiba-tiba = started.",
+      "distractors": {
+        "was starting": {
+          "misconception": "bentuk lagi berlangsung dipakai buat satu kejadian yang udah selesai.",
+          "whyFails": "bentuk lagi berlangsung, padahal hujannya mulai sekali dan langsung selesai."
+        },
+        "starts": {
+          "misconception": "bentuk sekarang dipakai buat masa lalu.",
+          "whyFails": "bentuk sekarang, padahal ceritanya udah dikunci di masa lampau."
+        },
+        "has started": {
+          "misconception": "bentuk yang nggak bisa jalan bareng penanda waktu lampau tegas.",
+          "whyFails": "ngait ke sekarang, padahal adegannya murni masa lampau."
+        }
+      }
+    },
+    "AR-103": {
+      "objective": "Pakai much buat benda tak terhitung di kalimat negatif, bukan many, some, atau a",
+      "misconception": "Kamu gampang masang “many” atau “a” ke “time”, atau ninggalin “some” di kalimat negatif.",
+      "reasoning": "cek bendanya tak terhitung dan kalimatnya negatif → pilih much",
+      "rule": "“Much” buat benda tak terhitung, “many” buat benda jamak yang bisa dihitung. Di kalimat negatif dan tanya, dua-duanya paling wajar.",
+      "whyCorrect": "“Time” nggak bisa dihitung satu-satu dan kalimatnya negatif. Jadi pasangannya “much”.",
+      "whyOthersFail": "“Many” butuh benda jamak. “Some” nabrak kalimat negatif. “A” nggak bisa nempel ke “time”.",
+      "howToAvoid": "Tanya dua hal: bendanya bisa dihitung atau nggak, dan kalimatnya negatif atau nggak.",
+      "memoryCue": "Not much time — waktu mengalir, kursi dihitung.",
+      "distractors": {
+        "many": {
+          "misconception": "penanda jumlah benda terhitung dipakai buat benda yang nggak bisa dihitung.",
+          "whyFails": "buat benda jamak yang bisa dihitung, padahal “time” nggak bisa."
+        },
+        "some": {
+          "misconception": "kata jumlah versi positif dipakai di kalimat negatif.",
+          "whyFails": "bilang jumlahnya ada, padahal kalimatnya nyangkal."
+        },
+        "a": {
+          "misconception": "kata a dipasang ke benda yang nggak bisa dihitung.",
+          "whyFails": "cuma buat benda satuan, dan “time” di sini bukan begitu."
+        }
+      }
+    },
+    "PR-008": {
+      "objective": "Pilih “in” buat benda yang ada di dalam wadah atau ruang tertutup, bukan titik atau permukaan.",
+      "misconception": "Kamu nganggep at, in, on bisa saling ganti, jadi lupa pakai “in” waktu tempatnya ngurung bendanya.",
+      "reasoning": "cek apakah tempatnya mengurung bendanya → kalau terkurung, pilih “in”",
+      "rule": "“In” buat bagian dalam ruang atau wadah tertutup (in the fridge). “At” buat titik tertentu (at the door). “On” buat permukaan (on the table).",
+      "whyCorrect": "“Right behind the orange juice” nunjukin susunya ada di dalam kulkas yang tertutup, dan ruang tertutup pakai “in”.",
+      "whyOthersFail": "“At” bikin kulkas jadi titik ketemu, “on” mindahin susunya ke atas kulkas, dan “to” nandain gerakan, bukan posisi.",
+      "howToAvoid": "Tanya: tempatnya ngurung bendanya nggak? Kalau terkurung pakai in, titik pakai at, permukaan pakai on.",
+      "memoryCue": "Kulkas itu kotak yang nutup susunya: in the fridge.",
+      "distractors": {
+        "at": {
+          "misconception": "kata depan titik lokasi dipakai buat benda yang ada di dalam ruang tertutup.",
+          "whyFails": "“at” bikin kulkas jadi titik ketemu, padahal susunya ada di dalam ruang yang tertutup."
+        },
+        "on": {
+          "misconception": "kata depan permukaan datar dipakai buat ruang tertutup.",
+          "whyFails": "“on” naruh susunya di atas kulkas, padahal petunjuk “di belakang jus jeruk” jelas nunjukin dia ada di dalam."
+        },
+        "to": {
+          "misconception": "kata depan perpindahan dipakai buat posisi yang diam.",
+          "whyFails": "“to” nandain gerakan menuju tempat, padahal kalimatnya cuma bilang posisi diam."
+        }
+      }
+    },
+    "CM-006": {
+      "objective": "Pakai bingkai “not as ... as” buat bilang sesuatu kalah level, dengan dua “as” tetap di tempatnya.",
+      "misconception": "Kamu ngerusak bingkai “not as ... as”: nutupnya pakai “than”, atau tetap pakai bentuk sama rata padahal kalimatnya nyebut perbedaan.",
+      "reasoning": "sadari konteksnya bilang kalah level → rakit “not as + kata sifat + as” dengan dua “as” lengkap",
+      "rule": "“Not as + kata sifat + as” artinya kalah dibanding yang satunya. Bingkainya selalu buka dan tutup pakai “as”, bukan “than”.",
+      "whyCorrect": "“The first one still makes people laugh more” artinya sekuelnya kalah lucu, dan level yang lebih rendah itu diungkap pakai “not as funny as”.",
+      "whyOthersFail": "“Funnier than” malah bikin sekuelnya menang, “as funny as” bilang setara, dan “not as funny than” nutup bingkainya pakai kata yang salah.",
+      "howToAvoid": "Kalau kalimatnya bilang ada yang kalah, rakit “not as ... as” dan cek dua slotnya: “as” sebelum kata sifat dan “as” sesudahnya.",
+      "memoryCue": "as ... as itu pasangan kembar: buka pakai as, tutup pakai as. “Than” bukan kembarannya.",
+      "distractors": {
+        "funnier than": {
+          "misconception": "arah perbandingannya kebalik dari yang diceritain kalimatnya.",
+          "whyFails": "“funnier than” bilang sekuelnya menang, padahal kalimatnya bilang film pertama masih lebih bikin ketawa."
+        },
+        "as funny as": {
+          "misconception": "bingkai sama rata tetap dipakai, padahal kalimatnya nyebut perbedaan yang jelas.",
+          "whyFails": "“as funny as” bilang dua filmnya setara, padahal ujung kalimatnya jelas bilang ada yang lebih lucu."
+        },
+        "not as funny than": {
+          "misconception": "bingkai “as ... as” dicampur sama “than” punya bentuk perbandingan.",
+          "whyFails": "bingkai “as ... as” harus ditutup pakai “as” kedua; “than” cuma buat bentuk perbandingan kayak “funnier than”."
+        }
+      }
+    },
+    "PR-009": {
+      "objective": "Pilih “along” buat gerakan yang nyusurin panjang garis kayak pantai, jalan, atau sungai.",
+      "misconception": "Kamu pakai kata depan nyeberang (across, over) atau “through” buat gerakan yang cuma nyusurin garis tanpa nyeberang apa pun.",
+      "reasoning": "telusuri bentuk jalurnya → kalau ngikutin panjang garis tanpa nyeberang, pilih “along”",
+      "rule": "“Along” buat nyusurin garis (pantai, jalan, sungai). “Across” buat nyeberang sisi ke sisi. “Through” buat nembus ruang yang ngelilingin. “Over” buat lewat di atas rintangan.",
+      "whyCorrect": "“Keeping the sea on their right the whole time” nunjukin mereka ngikutin panjang pantai tanpa nyeberang, dan itu persis makna “along”.",
+      "whyOthersFail": "“Across” motong pantai dari sisi ke sisi, “through” butuh ruang yang ngurung, dan “over” ngangkat jalurnya ke atas pantai.",
+      "howToAvoid": "Gambar jalurnya di kepala: garis yang diikutin pakai along, garis yang dipotong pakai across, ruang yang dimasukin pakai through, rintangan yang dilewatin atasnya pakai over.",
+      "memoryCue": "Lautnya tetap di satu sisi terus = nyusurin garis → along.",
+      "distractors": {
+        "across": {
+          "misconception": "kata depan buat nyeberang dipakai buat gerakan yang nyusurin garis.",
+          "whyFails": "“across” artinya motong dari sisi satu ke sisi lain, padahal lautnya terus di kanan selama sejam — mereka nyusurin pantai."
+        },
+        "through": {
+          "misconception": "kata depan buat nembus ruang dipakai buat jalur yang nyusurin garis terbuka.",
+          "whyFails": "“through” butuh ruang yang ngelilingin orangnya, kayak hutan atau terowongan; pantai terbuka yang disusurin pakai “along”."
+        },
+        "over": {
+          "misconception": "kata depan lewat-atas dipakai buat gerakan yang nyusurin garis, bukan ngelewatin rintangan.",
+          "whyFails": "“over” kesannya lewat di atas pantai kayak burung, padahal mereka jalan kaki nyusurin pinggirnya selama sejam."
+        }
+      }
+    },
+    "PR-010": {
+      "objective": "Pilih “since” di depan titik mulai (tahun, tanggal) waktu kata kerjanya present perfect dan keadaannya masih berlanjut.",
+      "misconception": "Kamu nandain titik mulai pakai “for” atau “during” karena ngerasa semua kata waktu setelah present perfect bisa saling ganti.",
+      "reasoning": "golongkan ungkapan waktunya → titik mulai + present perfect pakai “since”, lamanya pakai “for”, periode acara pakai “during”",
+      "rule": "“Since” + titik mulai (since 2021). “For” + lamanya (for three years). “During” + acara atau periode tempat kejadiannya berlangsung (during the meeting).",
+      "whyCorrect": "2021 itu titik mulai kerjaan yang masih berlanjut (“has worked”), dan titik mulai setelah present perfect pakai “since”.",
+      "whyOthersFail": "“For” nunggu lamanya waktu, “during” ngunci kejadian di satu periode tertutup, dan “while” butuh anak kalimat utuh, bukan angka tahun doang.",
+      "howToAvoid": "Lihat yang ngikutin celahnya: titik kalender pakai since, jumlah waktu pakai for, nama acara pakai during.",
+      "memoryCue": "Since = titik start. For = panjang durasi. During = di dalam acara.",
+      "distractors": {
+        "for": {
+          "misconception": "penanda lamanya waktu dipakai buat titik awal yang cuma satu titik waktu.",
+          "whyFails": "“for” butuh lamanya waktu kayak “for three years”; 2021 itu titik mulainya, bukan lamanya."
+        },
+        "during": {
+          "misconception": "kata depan “di dalam periode” dipakai buat titik awal yang butuh “since”.",
+          "whyFails": "“during 2021” ngunci kerjaannya cuma di tahun itu, padahal “has worked” nunjukin kerjanya mulai saat itu dan masih jalan sampai sekarang."
+        },
+        "while": {
+          "misconception": "kata sambung dipakai di posisi yang butuh kata depan sebelum frasa benda.",
+          "whyFails": "“while” harus diikuti anak kalimat yang ada kata kerjanya; dia nggak bisa langsung nempel di depan angka tahun 2021."
+        }
+      }
+    },
+    "QN-006": {
+      "objective": "Rakit pertanyaan objek dengan “who”: pakai “did” dan kata kerja bentuk dasar waktu yang ditanya itu penerima aksinya.",
+      "misconception": "Kamu ngilangin “did” atau tetap pakai kata kerja lampau setelah “did”, karena kebiasaan dari pertanyaan subjek kayak “Who broke ...” yang memang nggak butuh keduanya.",
+      "reasoning": "tentukan “who” itu pelaku atau penerima → kalau penerima, tambahkan “did” + subjek + kata kerja bentuk dasar",
+      "rule": "Pertanyaan objek: Who + did + subjek + kata kerja dasar (“Who did you meet?”). Pertanyaan subjek: Who + kata kerja lampau tanpa “did” (“Who met you?”).",
+      "whyCorrect": "A bilang “I met one of your neighbours”, jadi B nanya orang yang A temui — “who” jadi objek, dan pertanyaan objek butuh “did” + subjek + kata kerja dasar: “Who did you meet”.",
+      "whyOthersFail": "“Who met you” muter peran pelakunya, “Who you met” masih urutan kalimat berita tanpa “did”, dan “Who did you met” nandain lampau dua kali.",
+      "howToAvoid": "Cari dulu pelakunya: kalau pelakunya udah jelas dan yang ditanya penerimanya, panggil “did” dan balikin kata kerjanya ke bentuk dasar.",
+      "memoryCue": "Pelaku udah jelas, yang ditanya penerimanya → pakai “did”, kata kerja balik ke bentuk dasar.",
+      "distractors": {
+        "Who met you": {
+          "misconception": "pertanyaan objek dibaca kayak pertanyaan subjek, jadi peran pelakunya kebalik.",
+          "whyFails": "A yang ketemu duluan (“I met ...”), jadi yang ditanya itu orang yang A temui — “who” jadi objek dan butuh “did you meet”."
+        },
+        "Who you met": {
+          "misconception": "kata bantu “did” yang wajib ada di pertanyaan objek malah dihilangkan.",
+          "whyFails": "Pertanyaan objek soal masa lampau butuh “did” sebelum subjek; “Who you met” masih urutan kalimat berita, belum jadi pertanyaan."
+        },
+        "Who did you met": {
+          "misconception": "kata bantu lampau dan kata kerja lampau dipakai barengan, jadi penanda lampaunya dobel.",
+          "whyFails": "“Did” udah bawa makna lampau, jadi kata kerjanya balik ke bentuk dasar “meet”; “did you met” nandain lampau dua kali."
+        }
+      }
+    },
+    "TA-016": {
+      "objective": "Pilih present perfect buat hitungan aksi yang selesai di dalam periode waktu yang jelas-jelas masih terbuka.",
+      "misconception": "Kamu denger angka pasti terus langsung ambil past simple, padahal periode “today”-nya belum tutup.",
+      "reasoning": "cek periode waktunya udah tutup atau masih buka → periode terbuka dengan hitungan berjalan pakai present perfect",
+      "rule": "Periode terbuka (today, this week, so far) + hitungan berjalan → present perfect. Periode tertutup (yesterday, in 2019, last week) → past simple.",
+      "whyCorrect": "“Today, and the day isn't over yet” nandain periode yang belum selesai, dan total yang dihitung di dalam periode terbuka pakai present perfect: “have drunk three cups”.",
+      "whyOthersFail": "“Drank” nutup periode yang kata kalimatnya masih buka, “was drinking” ngelukisin satu aksi yang lagi jalan, dan “drink” ngubah hitungannya jadi kebiasaan.",
+      "howToAvoid": "Sebelum milih, tanya: periodenya udah selesai belum? Kalau masih bisa nambah (“the day isn't over yet”), tetap pakai present perfect walau ada angka pasti.",
+      "memoryCue": "Periode masih buka + hitungan berjalan = have/has + V3. Angka pasti bukan alasan pindah ke past simple.",
+      "distractors": {
+        "drank": {
+          "misconception": "periode waktu yang belum selesai malah ditutup pakai past simple.",
+          "whyFails": "“The day isn't over yet” bikin “today” masih terbuka, jadi hitungan sampai sekarang butuh present perfect; “drank” malah nutup periodenya."
+        },
+        "was drinking": {
+          "misconception": "bentuk berlangsung dipakai cuma karena ada rentang waktu, padahal yang dihitung hasilnya.",
+          "whyFails": "“was drinking” ngelukisin satu aksi yang lagi jalan di masa lampau, padahal kalimatnya ngitung tiga cangkir yang udah habis di periode yang masih jalan."
+        },
+        "drink": {
+          "misconception": "hitungan yang udah tercapai sejauh ini malah dinyatakan pakai present simple kebiasaan.",
+          "whyFails": "“drink” cocoknya buat kebiasaan umum, padahal kalimat ini lapor berapa cangkir yang udah habis hari ini."
+        }
+      }
+    },
+    "TA-017": {
+      "objective": "Pilih “be going to” buat niat yang udah diputuskan sebelum ngomong, ditandai bukti persiapan yang udah jalan.",
+      "misconception": "Kamu pakai “will” buat semua makna masa depan, padahal rencana yang udah disiapin sebelum ngomong butuh “be going to”.",
+      "reasoning": "cari kapan keputusannya diambil → kalau sebelum ngomong (persiapan udah jalan), pakai “be going to”",
+      "rule": "“Be going to” + kata kerja dasar = rencana yang diputuskan sebelum ngomong. “Will” = keputusan di detik bicara atau perkiraan biasa.",
+      "whyCorrect": "“We booked the flights last week” nunjukin keputusannya diambil sebelum ngomong, dan niat yang persiapannya udah jalan pakai “are going to visit”.",
+      "whyOthersFail": "“Will visit” seolah keputusannya baru diambil sekarang, “visit” minjem bentuk jadwal resmi, dan “are going to visiting” ngerusak aturan kata kerja dasar setelah “going to”.",
+      "howToAvoid": "Cari bukti persiapan (tiket dibeli, tanggal disepakati): kalau ada, rencananya udah lama dan butuh “be going to”.",
+      "memoryCue": "Tiket udah di tangan = rencana lama → going to. Keputusan detik ini → will.",
+      "distractors": {
+        "will visit": {
+          "misconception": "bentuk keputusan spontan dipakai buat rencana yang udah diputuskan sebelum ngomong.",
+          "whyFails": "“will” nandain keputusan yang baru diambil saat ngomong, padahal tiketnya udah dibeli minggu lalu — dan soalnya jelas minta rencana yang udah ada."
+        },
+        "visit": {
+          "misconception": "bentuk jadwal resmi dipakai buat rencana pribadi.",
+          "whyFails": "Present simple buat masa depan cuma dipakai buat jadwal resmi dari luar (“the train leaves at six”), bukan rencana jalan-jalan keluarga sendiri."
+        },
+        "are going to visiting": {
+          "misconception": "pakai bentuk “-ing” setelah penanda rencana, padahal sesudahnya kata kerja bentuk dasar.",
+          "whyFails": "Setelah “going to”, kata kerjanya tetap bentuk dasar “visit”; nambahin “-ing” lagi bikin strukturnya rusak."
+        }
+      }
+    },
+    "MO-010": {
+      "objective": "Pilih “must” buat kesimpulan positif yang kuat waktu bukti di depan mata bikin kesimpulannya nyaris pasti.",
+      "misconception": "Kamu ngelemahin kesimpulan yang buktinya kuat jadi sekadar kemungkinan, atau malah pakai modal saran, padahal kesimpulan yakin butuh “must”.",
+      "reasoning": "timbang buktinya → bukti kuat yang mendukung dengan arah positif pakai “must”",
+      "rule": "Skala kesimpulan sekarang: “must” = hampir pasti benar; “might/could” = mungkin; “can't” = hampir pasti salah. “Can” dan “should” nggak ada di skala ini.",
+      "whyCorrect": "Dua bukti langsung — bau bawang dan bunyi panci — bikin kesimpulannya nyaris pasti, dan kesimpulan yakin yang positif pakai “must”.",
+      "whyOthersFail": "“Can” cuma kemungkinan umum, “can't” ngarahin kesimpulan ke arah yang salah, dan “should” malah jadi harapan atau saran.",
+      "howToAvoid": "Daftar dulu buktinya, terus cocokin kekuatannya: bukti kuat mendukung → must, lemah atau campur → might, bukti kuat menolak → can't.",
+      "memoryCue": "Bukti kuat mendukung = must. Bukti kuat menolak = can't. Ragu = might.",
+      "distractors": {
+        "can": {
+          "misconception": "pakai modal kemungkinan umum, padahal ini dugaan soal satu keadaan tertentu sekarang.",
+          "whyFails": "“can” cuma bilang kemungkinan umum, bukan kesimpulan soal momen ini; bau bawang dan bunyi panci nunjukin kesimpulan yakin pakai “must”."
+        },
+        "can't": {
+          "misconception": "membalik arah kesimpulannya, padahal bukti di kalimat mendukung kejadian itu.",
+          "whyFails": "“can't be cooking” nyimpulin kebalikannya, padahal bau bawang dan bunyi panci justru dukung kesimpulan lagi masak."
+        },
+        "should": {
+          "misconception": "menyatakan harapan atau saran, padahal kalimatnya lagi menyimpulkan dari bukti.",
+          "whyFails": "“should be cooking” nyatain harapan atau saran, padahal kalimatnya narik kesimpulan dari bukti yang kecium dan kedengeran — dan soalnya jelas minta kesimpulan terkuat."
+        }
+      }
+    },
+    "MO-011": {
+      "objective": "Kenali kalau “could” itu bentuk lampau standar buat kata kerja panca indera kayak hear dan see, bahkan buat satu kejadian tertentu.",
+      "misconception": "Kamu pindah ke bentuk sekarang atau nambahin “to” setelah modal, padahal panca indera di masa lampau cukup “could” + kata kerja dasar.",
+      "reasoning": "temukan kata kerja panca indera dengan penanda waktu lampau → pakai “could” + kata kerja dasar",
+      "rule": "Buat kata kerja panca indera dan pikiran (see, hear, smell, understand, remember), kemampuan lampau di kejadian apa pun pakai “could” + kata kerja dasar; aturan pencapaian yang maksa “was able to” berlaku buat aksi, bukan panca indera.",
+      "whyCorrect": "“Hear” itu kata kerja panca indera, dan buat kata kerja panca indera bahasa Inggris pakai “could” polos di masa lampau — termasuk buat satu kejadian tertentu kayak konser semalam.",
+      "whyOthersFail": "“Can” dan “are able to” bentuk sekarang di cerita masa lampau, dan “could to” ngerusak pola modal + kata kerja dasar.",
+      "howToAvoid": "Cek dulu jenis kata kerjanya: kalau see/hear/smell/understand, langsung pakai “could” dan sambungkan ke kata kerja dasar tanpa “to”.",
+      "memoryCue": "Panca indera di masa lampau = could + kata kerja dasar, tanpa “to”.",
+      "distractors": {
+        "can": {
+          "misconception": "pakai modal bentuk sekarang, padahal latar kalimatnya jelas masa lampau.",
+          "whyFails": "“last night” ngunci kalimatnya di masa lampau, jadi modal sekarang “can” bentrok sama waktunya; bentuk lampaunya “could”."
+        },
+        "could to": {
+          "misconception": "nambahin “to” setelah modal, padahal modal langsung diikuti kata kerja bentuk dasar.",
+          "whyFails": "“could” itu modal dan langsung nyambung ke kata kerja dasar (“could hear”); nyelipin “to” setelahnya nggak pernah benar."
+        },
+        "are able to": {
+          "misconception": "mengganti latar lampau dengan bentuk sekarang, padahal waktunya udah dikunci lampau.",
+          "whyFails": "“are able to” bentuk sekarang, padahal konsernya “last night”; kalimatnya butuh bentuk kemampuan masa lampau."
+        }
+      }
+    },
+    "MO-012": {
+      "objective": "Pilih “mustn't” buat larangan beneran, waktu ngelakuin aksinya bakal ngelanggar syarat yang disebut kalimatnya.",
+      "misconception": "Kamu ngelunakin larangan beneran jadi ‘nggak perlu’ atau saran ringan, padahal cuma “mustn't” yang bener-bener ngelarang aksinya.",
+      "reasoning": "uji akibatnya → kalau ngelakuin aksinya ngelanggar aturan yang disebut, larangannya pakai “mustn't”",
+      "rule": "“Mustn't” = dilarang, jangan lakukan. “Needn't” / “don't have to” = nggak perlu, bebas milih. Bentuk negatif ngebalik maknanya: “must” dan “have to” mirip, tapi “mustn't” dan “needn't” beda jauh.",
+      "whyCorrect": "“It has to stay a secret until Saturday” bikin cerita ke siapa pun jadi pelanggaran aturan, dan larangan beneran diungkap pakai “mustn't”.",
+      "whyOthersFail": "“Needn't” ngubah larangan jadi pilihan bebas, “shouldn't” ngecilin jadi saran, dan “couldn't” mindahin aturannya ke masa lampau.",
+      "howToAvoid": "Tanya: kalau tetap dilakukan, ada aturan yang dilanggar nggak? Kalau ada, pakai “mustn't”; kalau nggak ada yang dilanggar, baru “needn't”.",
+      "memoryCue": "Mustn't = dilarang. Needn't = bebas, nggak wajib. Bentuk negatifnya nggak kembar.",
+      "distractors": {
+        "needn't": {
+          "misconception": "larangan beneran dibaca cuma sebagai ‘nggak perlu’, padahal aksinya memang dilarang.",
+          "whyFails": "“needn't tell” bikin ceritanya jadi opsional — boleh tapi nggak wajib — padahal “has to stay a secret” ngelarang cerita sama sekali."
+        },
+        "shouldn't": {
+          "misconception": "pakai modal saran umum, padahal kalimatnya nyebut akibat tegas kalau diabaikan.",
+          "whyFails": "“shouldn't” itu saran halus yang bisa diabaikan, padahal “has to stay a secret” nyebut syarat tegas, jadi larangannya butuh “mustn't”."
+        },
+        "couldn't": {
+          "misconception": "pakai bentuk lampau yang melunakkan, padahal aturannya berlaku sekarang.",
+          "whyFails": "“couldn't” nunjuk ketidakmampuan di masa lampau, padahal aturannya berlaku sekarang sampai Sabtu; larangan sekarang pakai “mustn't”."
+        }
+      }
+    },
+    "CO-030": {
+      "objective": "Lengkapi anak kalimat “unless” pakai kata kerja positif bentuk present simple, tanpa ngulang negatif di dalamnya.",
+      "misconception": "Kamu tetap pakai kata kerja negatif (atau nambah “will”) di dalam anak kalimat “unless” waktu ngubah dari “if ... not”, jadi logika kalimatnya kebalik.",
+      "reasoning": "ingat “unless” udah bawa negatifnya sendiri → isi anak kalimatnya pakai kata kerja positif present simple",
+      "rule": "“Unless” + subjek + kata kerja positif bentuk present simple sama artinya dengan “if ... not” buat masa depan. Nggak boleh ada negatif kedua atau “will” di dalam anak kalimatnya.",
+      "whyCorrect": "“Unless it rains” artinya “kalau nggak hujan”. Negatifnya udah kebawa di “unless”, jadi kata kerjanya tetap positif dan present simple walau piknikannya besok.",
+      "whyOthersFail": "“Doesn't rain” ngulang negatifnya dan muter logikanya. “Won't rain” numpuk negatif plus “will” yang dilarang. “Will rain” naruh bentuk masa depan di tempat present simple.",
+      "howToAvoid": "Ubah dulu jadi “if ... not” dalam hati. Kalau kata kerjamu masih negatif setelah “unless”, buang negatif tambahannya dan tetap pakai present simple.",
+      "memoryCue": "Habis “unless”, kata kerjanya positif dan present: unless it rains.",
+      "distractors": {
+        "doesn't rain": {
+          "misconception": "kata kerja negatif dari versi “if ... not” ikut kebawa masuk ke anak kalimat “unless”.",
+          "whyFails": "“unless” udah negatif, jadi kata kerja negatif malah muter logikanya."
+        },
+        "won't rain": {
+          "misconception": "bentuk “will” masa depan plus negatif ditumpuk di dalam anak kalimat syarat.",
+          "whyFails": "sesudah “unless” pakai present simple, dan negatifnya udah ada di “unless”."
+        },
+        "will rain": {
+          "misconception": "“will” dipakai di anak kalimat syarat karena kejadiannya besok.",
+          "whyFails": "anak kalimat syarat tetap pakai present simple walau maknanya masa depan."
+        }
+      }
+    },
+    "AR-031": {
+      "objective": "Pilih “the” di depan kata benda jamak yang udah jelas kelompoknya dari konteks kalimat.",
+      "misconception": "Kamu buang artikel di depan semua kata jamak, padahal kata jamak yang kelompoknya udah dikenali tetap butuh “the”.",
+      "reasoning": "cek konteksnya udah nunjuk kelompok yang mana atau belum → kalau udah jelas pakai “the”, kalau umum tanpa artikel",
+      "rule": "“The” + kata benda jamak nunjuk kelompok tertentu yang bisa dikenali, sering dijelasin anak kalimat kayak “we saw there”. Kata jamak tanpa artikel bicara soal kategorinya secara umum.",
+      "whyCorrect": "“The animals we saw there” nunjuk satu kelompok hewan tertentu, yaitu yang ada di peternakan itu. Jadi kata jamaknya wajib pakai “the”.",
+      "whyOthersFail": "Tanpa artikel, kalimatnya jadi soal hewan secara umum, padahal ada “we saw there”. “A” dan “an” itu artikel tunggal yang nggak bisa berdiri di depan kata jamak.",
+      "howToAvoid": "Tanya dulu: pembaca bisa nunjuk persis yang mana yang kumaksud? Kalau bisa, pakai “the”.",
+      "memoryCue": "Kelompok yang udah jelas pakai “the”; kategori umum tanpa artikel.",
+      "distractors": {
+        "(no article)": {
+          "misconception": "aturan tanpa artikel buat kata jamak dipukul rata ke kelompok yang udah jelas yang mana.",
+          "whyFails": "“we saw there” udah nunjuk hewan yang mana, jadi wajib pakai “the”."
+        },
+        "a": {
+          "misconception": "artikel tunggal dipasang di depan kata benda jamak.",
+          "whyFails": "“a” cuma buat kata benda tunggal, nggak bisa di depan “animals”."
+        },
+        "an": {
+          "misconception": "artikel tunggal dipakai buat kata jamak yang malah udah jelas kelompoknya.",
+          "whyFails": "“an” juga artikel tunggal, nggak mungkin di depan kata jamak “animals”."
+        }
+      }
+    },
+    "GI-032": {
+      "objective": "Pakai bentuk -ing buat kata kerja yang nyusul kata depan di pola kata sifat + kata depan.",
+      "misconception": "Kamu naruh bentuk “to” atau kata kerja telanjang persis sesudah kata depan, padahal kata depan minta bentuk -ing.",
+      "reasoning": "temuin kata depan sebelum titik-titiknya → pilih kata kerja bentuk -ing",
+      "rule": "Kata sifat + kata depan, kayak “good at”, “interested in”, atau “tired of”, disusul kata kerja bentuk -ing. Kata kerja sesudah kata depan selalu pakai -ing.",
+      "whyCorrect": "“Good at” berakhir di kata depan “at”. Kata kerja sesudah kata depan wajib bentuk -ing, jadi “good at dealing” yang pas.",
+      "whyOthersFail": "“To deal” naruh bentuk “to” di tempat yang minta -ing. “Deal” telanjang nggak bisa nempel di kata depan. “To dealing” numpuk “to” padahal kata depannya udah “at”.",
+      "howToAvoid": "Lihat kata persis sebelum titik-titiknya. Kalau itu kata depan kayak “at”, “in”, “of”, atau “about”, kata kerjanya harus -ing.",
+      "memoryCue": "Kata depan ketemu kata kerja, hasilnya -ing: good at dealing.",
+      "distractors": {
+        "to deal": {
+          "misconception": "bentuk “to” ditaruh persis sesudah kata depan, seolah semua kata kerja butuh “to”.",
+          "whyFails": "sesudah kata depan “at”, kata kerjanya wajib bentuk -ing."
+        },
+        "deal": {
+          "misconception": "bentuk dasar dibiarin polos sesudah kata depan.",
+          "whyFails": "kata kerja telanjang nggak bisa nempel di belakang kata depan."
+        },
+        "to dealing": {
+          "misconception": "“to” ditempel di depan bentuk -ing padahal kata depannya udah ada.",
+          "whyFails": "kata depannya udah “at”, nambah “to” malah numpuk dua kata depan."
+        }
+      }
+    },
+    "MO-033": {
+      "objective": "Kenali kalau di antara modal saran, cuma “ought” yang gandeng “to” sebelum kata kerja dasar.",
+      "misconception": "Kamu nganggep “should”, “ought to”, dan “had better” bisa saling tukar bentuk, padahal cuma “ought” yang disusul “to”.",
+      "reasoning": "lihat “to” yang udah ada di kalimat → pilih modal saran yang polanya memang bawa “to”",
+      "rule": "“Ought” + “to” + kata kerja dasar. “Should”, “had better”, dan “must” langsung disusul kata kerja telanjang. Makna sarannya mirip, tapi pola bakunya beda.",
+      "whyCorrect": "Kalimatnya udah punya “to see”. Dari semua modal saran, cuma “ought” yang polanya bawa “to”: “you ought to see a doctor”.",
+      "whyOthersFail": "“Should”, “had better”, dan “must” semuanya langsung ketemu kata kerja telanjang. Kalau dipasang di sini, semuanya nabrak “to” yang udah ada.",
+      "howToAvoid": "Sebelum milih modal, lihat kata sesudah titik-titiknya. Ada “to”? Berarti cuma “ought” yang muat. Kata kerjanya telanjang? Pakai “should”, “had better”, atau “must”.",
+      "memoryCue": "“Ought” nggak pernah jalan tanpa “to”.",
+      "distractors": {
+        "should": {
+          "misconception": "pola “ought to” dicampur ke “should”, jadi muncul “should to” yang nggak ada.",
+          "whyFails": "“should” langsung disusul kata kerja dasar, nggak pernah pakai “to”."
+        },
+        "had better": {
+          "misconception": "“had better” dikira ikut bawa “to” kayak “ought to”.",
+          "whyFails": "“had better” disusul kata kerja telanjang, tanpa “to”."
+        },
+        "must": {
+          "misconception": "modal kewajiban berpola kata kerja telanjang dipaksa masuk pola yang ada “to”-nya.",
+          "whyFails": "“must” juga minta kata kerja telanjang, jadi nggak bisa ketemu “to”."
+        }
+      }
+    },
+    "MO-034": {
+      "objective": "Pilih “will” buat ramalan yakin yang didukung tanda kepastian, bukan modal dugaan.",
+      "misconception": "Kamu ngasih “may”, “might”, atau “could” ke semua kalimat masa depan, padahal konteksnya udah nyebut bukti pasti dan keyakinan penuh.",
+      "reasoning": "temuin tanda kepastian di konteksnya → pilih modal ramalan yang yakin, bukan yang menduga-duga",
+      "rule": "“Will” buat ramalan yang yakin. “May”, “might”, dan “could” buat tingkat dugaan yang lebih lemah. Cocokin modalnya sama seyakin apa buktinya.",
+      "whyCorrect": "“I've checked ... twice” dan “I'm completely sure” itu tanda keyakinan yang kuat. Jadi modal ramalan yakin “will” yang pas.",
+      "whyOthersFail": "“Might”, “could”, dan “may” semuanya nyelipin keraguan. Padahal kalimatnya udah nutup keraguan itu lewat jadwal yang dicek dua kali.",
+      "howToAvoid": "Cari kata-kata keyakinan kayak “I'm sure” atau fakta yang udah dicek. Kalau ada, jangan ragu-ragu — pakai “will”.",
+      "memoryCue": "“Completely sure” pasangannya “will”, bukan “might”.",
+      "distractors": {
+        "might": {
+          "misconception": "modal kemungkinan lemah dipakai walau buktinya udah pasti.",
+          "whyFails": "“might” bilang tebakan ragu, padahal penuturnya bilang yakin banget."
+        },
+        "could": {
+          "misconception": "fakta jadwal yang udah diverifikasi disajiin kayak kemungkinan belaka.",
+          "whyFails": "“could” nawarin jam itu sebagai kemungkinan doang, padahal jadwalnya udah dicek dua kali."
+        },
+        "may": {
+          "misconception": "semua kalimat masa depan otomatis dikasih modal kemungkinan lemah.",
+          "whyFails": "“may” bilang setengah yakin setengah nggak, bentrok sama “completely sure”."
+        }
+      }
+    },
+    "PR-035": {
+      "objective": "Pilih partikel yang bikin “turn” berarti ngecilin volume, dan bedain dari partikel yang maknanya kebalik atau total.",
+      "misconception": "Kamu asal pilih partikel yang akrab buat “turn” tanpa ngecek kalau tiap partikel bikin makna beda: ngegedein, matiin, atau ngebalik.",
+      "reasoning": "cocokin makna yang dimaksud, yaitu ngecilin suara dikit → pilih partikel yang bikin makna persis itu",
+      "rule": "Sama kata “turn”, tiap partikel bikin kata kerja yang beda: “turn down” ngecilin, “turn up” ngegedein, “turn off” matiin total, “turn over” ngebalik.",
+      "whyCorrect": "“Turn down” berarti ngurangin volume sebagian. Itu cocok sama “too loud” sekaligus permintaan halus “a little”.",
+      "whyOthersFail": "“Up” muter arah yang dimaksud. “Off” itu aksi total yang nggak bisa “a little”. “Over” urusannya ngebalik, bukan volume.",
+      "howToAvoid": "Hafalin tiap “turn + partikel” sebagai kosakata sendiri. Cek juga petunjuk bertingkat kayak “a little” — itu nyingkirin partikel total kayak “off”.",
+      "memoryCue": "Kegedean suaranya? “Turn it down”. Ada “a little”, berarti bukan “off”.",
+      "distractors": {
+        "up": {
+          "misconception": "partikel penambah volume ketuker sama partikel pengurangnya.",
+          "whyFails": "“turn up” malah ngegedein suaranya, kebalikan dari yang diminta."
+        },
+        "off": {
+          "misconception": "“turn off” yang total dikira bisa dipakai buat ngecilin dikit.",
+          "whyFails": "“turn off” matiin total, nggak cocok sama permintaan “a little”."
+        },
+        "over": {
+          "misconception": "“turn over” dikira nyambung ke urusan keras-pelannya suara.",
+          "whyFails": "“turn over” berarti ngebalik sesuatu atau ganti saluran."
+        }
+      }
+    },
+    "GI-036": {
+      "objective": "Taruh “enough” di belakang kata sifat pada pola kata sifat + “enough” + bentuk “to”.",
+      "misconception": "Kamu naruh “enough” di depan kata sifat kayak “too”, atau malah pakai “too” padahal maksudnya kecukupan, bukan kelebihan.",
+      "reasoning": "kenali makna kecukupannya → taruh “enough” di belakang kata sifat, sebelum bentuk “to”",
+      "rule": "Kata sifat + “enough” + bentuk “to” berarti kecukupan: “old enough to watch”. “Too” + kata sifat + bentuk “to” berarti kelebihan. “Enough” di belakang kata sifat, “too” di depannya.",
+      "whyCorrect": "“Isn't old enough to watch” pakai pola kata sifat + “enough” + bentuk “to”. Umurnya belum nyampe syarat buat nonton film itu.",
+      "whyOthersFail": "“Enough old” muter urutan yang baku. “Too old” bilang kelebihan padahal maksudnya belum cukup. “Old too” naruh “too” di posisi yang nggak pernah ada.",
+      "howToAvoid": "Ingat aturan cerminnya: “too” jalan di depan kata sifat, “enough” jalan di belakangnya. Habis itu baru “to” + kata kerja.",
+      "memoryCue": "“Old enough”, tapi “too young” — “enough” di belakang, “too” di depan.",
+      "distractors": {
+        "enough old": {
+          "misconception": "posisi “enough” disamain kayak “too”, ditaruh di depan kata sifatnya.",
+          "whyFails": "sama kata sifat, “enough” selalu di belakang: “old enough”."
+        },
+        "too old": {
+          "misconception": "makna kelebihan “too” ketuker sama makna kecukupan “enough”.",
+          "whyFails": "“too old” bilang umurnya kelewat, padahal “yet” nunjukin dia belum nyampe."
+        },
+        "old too": {
+          "misconception": "urutan katanya diacak — “too” ditempel di belakang kayak aturan “enough”.",
+          "whyFails": "“too” wajib di depan kata sifatnya; ditaruh di belakang, polanya rusak."
+        }
+      }
+    },
+    "CM-037": {
+      "objective": "Pilih “less” buat benda yang nggak bisa dihitung satu-satu, dan jangan kebablasan pakai “fewer” di sana.",
+      "misconception": "Kamu kebablasan nerapin aturan “fewer” yang udah dihafal ke benda tak terhitung, jadi “less coffee” malah ditulis “fewer coffee”.",
+      "reasoning": "pastiin bendanya nggak bisa dihitung satu-satu → pilih “less”, bukan “fewer”",
+      "rule": "“Less” + benda yang nggak bisa dihitung satu-satu, kayak “less coffee” atau “less time”. “Fewer” + benda jamak terhitung, kayak “fewer cups”. Jangan ketuker dua arah.",
+      "whyCorrect": "“Coffee” di sini zat yang nggak dihitung satu-satu. Bentuk perbandingan jumlah buat benda begitu ya “less”: drink less coffee.",
+      "whyOthersFail": "“Fewer” nuntut benda jamak terhitung. “Few” bukan bentuk perbandingan dan nggak cocok sama benda tak terhitung. “Lesser” bandingin tingkat, bukan jumlah zat.",
+      "howToAvoid": "Uji bendanya: bisa nggak bilang “satu kopi, dua kopi” dalam makna ini? Buat zat yang diminum, nggak bisa — jadi pakai “less”.",
+      "memoryCue": "Zat yang dituang pakai “less”; barang yang dihitung pakai “fewer”.",
+      "distractors": {
+        "fewer": {
+          "misconception": "aturan “fewer” yang dihafal malah dipaksain ke benda yang nggak bisa dihitung.",
+          "whyFails": "“coffee” di sini zat yang nggak bisa dihitung satu-satu, jadi bukan pasangan “fewer”."
+        },
+        "few": {
+          "misconception": "kata jumlah dasar buat benda terhitung dipakai menggantikan bentuk perbandingannya.",
+          "whyFails": "“few” bukan bentuk perbandingan dan cuma buat benda jamak yang bisa dihitung."
+        },
+        "lesser": {
+          "misconception": "“lesser” yang soal tingkat kepentingan ketuker sama “less” yang soal jumlah.",
+          "whyFails": "“lesser” buat mutu atau tingkat, kayak “a lesser problem”, bukan jumlah minuman."
+        }
+      }
+    },
+    "QN-038": {
+      "objective": "Balas kalimat positif berbentuk present perfect pakai kata bantu yang sama: “So have I”.",
+      "misconception": "Kamu ngafalin “So do I” sebagai satu paket mati dan pakai “do” buat semua persetujuan, padahal kata bantunya harus niru kalimat aslinya.",
+      "reasoning": "cek kutub dan kata bantu kalimat aslinya → majuin “so” + kata bantu yang sama + subjek",
+      "rule": "“So” atau “Neither” + kata bantu + subjek: kutubnya ngikutin kalimat asli (“so” positif, “neither” negatif), dan kata bantunya harus niru yang dipakai kalimat itu, entah “have”, “do”, “be”, atau modal.",
+      "whyCorrect": "Kalimat “A” positif dan pakai kata bantu “have” di “I've seen”. Jadi persetujuannya majuin kata bantu yang sama: “So have I”.",
+      "whyOthersFail": "“So do” niru kata bantu yang salah. “Neither have” muter kutub kalimat yang positif. “So am” minjem bentuk “be” yang nggak pernah muncul.",
+      "howToAvoid": "Garisbawahi kata bantu di kalimat penutur pertama, terus salin persis kata bantu itu di belakang “so” atau “neither”.",
+      "memoryCue": "“I've seen” dibalas “So HAVE I” — salin kata bantunya, jangan otomatis “do”.",
+      "distractors": {
+        "So do": {
+          "misconception": "“So do I” dihafal mati, kata bantunya nggak dicocokin sama kalimat aslinya.",
+          "whyFails": "kalimat “A” pakai “have seen”, jadi persetujuannya juga harus pakai “have”."
+        },
+        "Neither have": {
+          "misconception": "kata bantunya udah bener, tapi kutub persetujuannya kebalik.",
+          "whyFails": "“neither” buat nyetujuin kalimat negatif, padahal kalimat “A” positif."
+        },
+        "So am": {
+          "misconception": "kata bantu “be” dipakai padahal kalimat aslinya pakai “have”.",
+          "whyFails": "kalimat “A” nggak ada bentuk “be”-nya sama sekali, adanya “have”."
+        }
+      }
+    },
+    "EC-039": {
+      "objective": "Pilih “effect” sebagai kata benda yang berarti akibat di posisi sesudah “the” + kata sifat, dan bedain dari kata kerja “affect”.",
+      "misconception": "Kamu nulis “affect” di posisi kata benda. Posisi sesudah “the long-term” cuma bisa diisi kata benda “effect”.",
+      "reasoning": "sadari posisi sesudah “the long-term” minta kata benda → pilih “effect”, bukan kata kerja “affect”",
+      "rule": "“Effect” itu kata benda yang berarti akibat. “Affect” itu kata kerja yang berarti memengaruhi. Sesudah “the” + kata sifat, cuma kata benda yang bisa berdiri.",
+      "whyCorrect": "Posisi sesudah “the long-term” itu posisi kata benda. Kata benda yang berarti akibat ya “effect”, dan bentuk jamaknya “effects” cocok sama “of the new medicine”.",
+      "whyOthersFail": "“Affect” tetap kata kerja, ada -s atau nggak. “Effections” kata karangan yang nggak ada. “Affecting” bentuk kata kerja yang nggak berubah jadi kata benda yang diminta.",
+      "howToAvoid": "Lihat kata sebelum posisinya: “the” + kata sifat nandain kata benda, jadi pilih “effect(s)”. Kalau posisinya butuh tindakan sesudah subjek atau modal, di situ tempatnya “affect”.",
+      "memoryCue": "Habis “the” butuh kata benda — kata bendanya “effect”, pakai E.",
+      "distractors": {
+        "Scientists are still studying the long-term affect of the new medicine.": {
+          "misconception": "yang dibenerin cuma akhiran jamaknya, salah jenis katanya dibiarin.",
+          "whyFails": "ngilangin -s nggak nyembuhin salahnya; posisi itu tetap minta kata benda “effect”."
+        },
+        "Scientists are still studying the long-term effections of the new medicine.": {
+          "misconception": "akhiran pembentuk kata benda ditempel padahal katanya udah kata benda.",
+          "whyFails": "“effections” bukan kata Bahasa Inggris; “effect” udah kata benda."
+        },
+        "Scientists are still studying the long-term affecting of the new medicine.": {
+          "misconception": "bentuk -ing dikira otomatis nyulap kata kerja jadi kata benda yang dibutuhin.",
+          "whyFails": "“the long-term affecting of” nggak lazim; kata benda bakunya “effect”."
+        }
+      }
+    },
+    "MO-015": {
+      "objective": "Pilih “May I”, bukan “Can I”, waktu minta izin paling resmi ke orang asing.",
+      "misconception": "Kamu ngira “Can I” sama resminya dengan “May I” waktu minta izin ke orang asing.",
+      "reasoning": "rasain seberapa resmi situasinya dan siapa lawan bicaranya → pilih kata bantu izin yang pas sama tingkat resminya",
+      "rule": "Buat minta izin, “may” itu bentuk paling resmi. “Can” lebih santai buat teman. Kalau situasinya resmi atau lawan bicaranya orang asing, pilih “May I”.",
+      "whyCorrect": "“May I...?” itu cara paling resmi buat minta izin ke orang asing, cocok sama nada sopan “please” di kalimatnya.",
+      "whyOthersFail": "“Can I” terlalu santai buat permintaan paling resmi. “Must I” nanyain kewajiban. “Would I” malah bukan kalimat minta izin.",
+      "howToAvoid": "Bayangin lawan bicaranya dulu: orang asing atau situasi resmi berarti “May I”, teman dekat boleh “Can I”.",
+      "memoryCue": "Ketemu orang asing plus “please”? Pakai “May I”.",
+      "distractors": {
+        "Can": {
+          "misconception": "“can” dikira sama resminya dengan “may” waktu minta izin ke orang asing.",
+          "whyFails": "“Can I” nggak salah, tapi kesannya santai, padahal yang diminta bentuk paling resmi ke orang asing."
+        },
+        "Must": {
+          "misconception": "kewajiban ketuker sama izin yang resmi.",
+          "whyFails": "“Must I” nanyain kewajiban, bukan minta izin."
+        },
+        "Would": {
+          "misconception": "“would” + “I” dikira otomatis jadi kalimat minta izin.",
+          "whyFails": "Permintaan sopan pakai “Would you”, bukan “Would I”. “Would I” malah nanya perilaku diri sendiri."
+        }
+      }
+    },
+    "CO-012": {
+      "objective": "Taruh “will” di induk kalimat waktu kalimatnya dibuka anak kalimat waktu dengan “when”.",
+      "misconception": "Kamu ngira larangan “will” di anak kalimat waktu berlaku buat seluruh kalimat, jadi induk kalimatnya ikut kehilangan “will”.",
+      "reasoning": "temukan anak kalimat waktunya → biarin dia present simple → taruh “will” di induk kalimatnya",
+      "rule": "Pembagian tugasnya tetap: anak kalimat setelah “when” atau “as soon as” pakai present simple, induk kalimatnya yang bawa “will”.",
+      "whyCorrect": "“When the meeting ends” itu anak kalimat waktunya, udah present simple. Jadi tanda nanti “will send” harus ada di induk kalimatnya.",
+      "whyOthersFail": "“Send” bikin kalimatnya kehilangan tanda nanti sama sekali. “Sent” ngedorong kejadian nanti ke masa lampau. “Would send” bikin pengandaian yang nggak ada di kalimat.",
+      "howToAvoid": "Garisbawahi dua bagiannya: yang setelah “when” tetap present simple, bagian satunya yang bawa “will”.",
+      "memoryCue": "Setelah “when” present, “will”-nya di induk kalimat.",
+      "distractors": {
+        "send": {
+          "misconception": "present simple dipakai buat satu kejadian nanti di induk kalimat.",
+          "whyFails": "Ngirimnya kejadian sekali di masa depan dan ada di induk kalimat, jadi butuh “will”. Present simple cuma buat anak kalimat setelah “when”."
+        },
+        "sent": {
+          "misconception": "kejadian yang masih nanti ditulis pakai bentuk lampau.",
+          "whyFails": "Rapatnya aja belum selesai, jadi ngirimnya nggak mungkin udah lampau."
+        },
+        "would send": {
+          "misconception": "rangkaian nanti yang nyata diperlakuin kayak pengandaian.",
+          "whyFails": "Nggak ada pengandaian atau bingkai lampau di kalimat ini, jadi “would” nggak punya pijakan."
+        }
+      }
+    },
+    "AR-012": {
+      "objective": "Bentuk milik ganda pakai nama orang: a + kata benda + of + nama dengan 's, contohnya “a cousin of Maria's”.",
+      "misconception": "Kamu buang 's setelah “of” waktu pemiliknya nama orang, atau numpuk “a” langsung di depan nama bertanda milik.",
+      "reasoning": "lihat kata sandang “a” pembukanya → pertahanin “of” → ubah namanya jadi bentuk milik dengan 's",
+      "rule": "Pola milik ganda: a/an + kata benda + of + bentuk milik. Kalau ganti orangnya pakai kata ganti, bentuknya mine/yours/hers. Kalau pakai nama, namanya ditambah 's, contohnya “a friend of Tom's”.",
+      "whyCorrect": "“A cousin of Maria's” persis ngikutin polanya: a + kata benda + of + nama bertanda milik. Artinya salah satu sepupunya Maria.",
+      "whyOthersFail": "“A cousin of Maria” kehilangan 's yang wajib. “A Maria's cousin” numpuk dua penentu di satu tempat. “Cousin of Maria's” malah nggak punya kata sandang.",
+      "howToAvoid": "Cocokkan sama model “a friend of mine”: yang setelah “of” harus bentuk milik, dan frasanya harus dibuka “a” atau “an”.",
+      "memoryCue": "“Of” + nama butuh 's: a friend of Tom's.",
+      "distractors": {
+        "a cousin of Maria": {
+          "misconception": "tanda milik 's setelah “of” dibuang, padahal polanya butuh itu.",
+          "whyFails": "Di pola milik ganda, nama setelah “of” tetap pakai bentuk milik: “a cousin of Maria's”, sejajar sama “a friend of mine”, bukan nama polos."
+        },
+        "a Maria's cousin": {
+          "misconception": "kata sandang “a” ditumpuk langsung di depan nama bertanda milik.",
+          "whyFails": "“A” dan “Maria's” rebutan satu tempat sebelum “cousin”. Bahasa Inggris cuma bolehin satu, jadi nggak bisa ditumpuk."
+        },
+        "cousin of Maria's": {
+          "misconception": "kata sandang “a” yang dibutuhin polanya malah dibuang.",
+          "whyFails": "Pola milik ganda butuh kata sandang di depan kata bendanya. Tanpa “a”, frasa “cousin of Maria's” jadi nggak lengkap."
+        }
+      }
+    },
+    "PR-012": {
+      "objective": "Pasangkan kata sifat emosi sama “about” waktu penyebabnya situasi atau fakta, bukan orang atau hasil yang dinilai.",
+      "misconception": "Kamu bawa “with” dari “pleased with” ke semua kata sifat emosi, padahal sebagian butuh “about” sebelum situasi.",
+      "reasoning": "lihat yang ngikut setelah kata sifatnya: situasi atau fakta → “about”, orang atau hasil yang dinilai → “with”",
+      "rule": "Kata depan setelah kata sifat emosi ngikut yang ada di belakangnya: situasi atau fakta pakai “about” (worried/excited/happy about), sedangkan hasil atau hal yang dinilai setelah kata kayak “pleased” pakai “with”.",
+      "whyCorrect": "Hasil ujian itu situasi yang lagi dipikirin, dan “worried” pasangannya “about” kalau ngomongin situasi: worried about the results.",
+      "whyOthersFail": "“With” punya kata sifat penilaian kayak “pleased with”. “At” punya kata sifat kaget kayak “surprised at”. “For” buat orang yang kamu khawatirkan, bukan situasi.",
+      "howToAvoid": "Cek yang duduk setelah kata sifatnya: situasi yang kepikiran pakai “about”, hal yang kamu nilai pakai “with”.",
+      "memoryCue": "Khawatir soal situasi pakai “about”, puas sama hasil pakai “with”.",
+      "distractors": {
+        "with": {
+          "misconception": "“with” dari “pleased with” dibawa ke kata sifat yang butuh “about”.",
+          "whyFails": "“Worried” nunjuk situasi yang dipikirin dan pasangannya “about”. “With” itu punya kata sifat penilaian kayak “pleased with”."
+        },
+        "at": {
+          "misconception": "“at” dari kata sifat kaget kayak “surprised at” dipinjam sembarangan.",
+          "whyFails": "“At” pasangannya kata sifat kaget kayak “surprised at”. “Worried at” bukan pasangan yang ada di bahasa Inggris."
+        },
+        "for": {
+          "misconception": "“for” yang buat mengkhawatirkan orang dipakai buat situasi.",
+          "whyFails": "“Worried for” buat orang yang kamu khawatirkan nasibnya, misalnya “worried for his sister”, bukan buat situasi kayak hasil ujian."
+        }
+      }
+    },
+    "GI-009": {
+      "objective": "Pertahanin bentuk dasar setelah “make” aktif: made the team run, tanpa “to”.",
+      "misconception": "Kamu nambahin “to” setelah “make” karena niru pola “force someone to do”.",
+      "reasoning": "kenali “make” aktif sebagai kata kerja penyebab → sambungin bentuk dasar tanpa “to”",
+      "rule": "“Make” dan “let” di kalimat aktif pakai bentuk dasar: make/let + objek + kata kerja tanpa “to” dan tanpa -ing. Kata kayak force, order, dan allow yang pakai objek + to-infinitive.",
+      "whyCorrect": "“Make” aktif polanya objek + bentuk dasar, jadi “made the whole team run” satu-satunya yang bentuknya benar.",
+      "whyOthersFail": "“To run” niru pola “force”. “Running” masukin bentuk -ing yang ditolak polanya. “Ran” ngedobelin tanda lampau yang udah dibawa “made”.",
+      "howToAvoid": "Ketemu “make” atau “let”? Tutup kata kerja pertamanya, terus cek yang kedua: harus persis bentuk kamusnya.",
+      "memoryCue": "“Make” dan “let” buang “to”-nya.",
+      "distractors": {
+        "to run": {
+          "misconception": "pola “to” dari “force” dipindahin ke “make”, padahal “make” nggak pakai “to”.",
+          "whyFails": "“Force” dan “order” memang pakai to-infinitive, tapi “make” aktif pakai bentuk dasar: made the team run, bukan made the team to run."
+        },
+        "running": {
+          "misconception": "bentuk -ing dipakai, padahal polanya minta bentuk dasar.",
+          "whyFails": "Setelah “make + objek”, kata kerja keduanya tetap bentuk dasar. Bentuk -ing nggak masuk pola ini."
+        },
+        "ran": {
+          "misconception": "kata kerja keduanya ikut ditandai lampau, padahal cukup “made” yang bawa.",
+          "whyFails": "Tanda lampaunya udah dibawa “made”. Kata kerja setelah objek harus tetap bentuk dasar, bukan ikut-ikutan lampau."
+        }
+      }
+    },
+    "TA-018": {
+      "objective": "Pilih past simple, bukan “used to” atau “would”, buat satu kejadian lampau yang bertanggal.",
+      "misconception": "Kamu nempelin “used to” atau “would” ke kejadian sekali karena kejadiannya terasa lama, padahal dua bentuk itu butuh kebiasaan berulang.",
+      "reasoning": "cek penanda waktunya → satu kejadian tertentu berarti past simple, kebiasaan lama yang berulang baru boleh used to atau would",
+      "rule": "Past simple buat kejadian lampau yang sekali atau bertanggal. “Used to” butuh kebiasaan berulang atau keadaan lama, dan “would” kebiasaan butuh aksi yang berulang. Dua-duanya nggak cocok buat kejadian sekali.",
+      "whyCorrect": "“Last Saturday afternoon” nyebut satu kejadian tertentu, dan kejadian lampau bertanggal pakai past simple: we visited.",
+      "whyOthersFail": "“Used to visit” dan “would visit” sama-sama ngaku ada pengulangan, padahal tanggalnya nolak itu. “Use to visit” cuma ada setelah did atau didn't.",
+      "howToAvoid": "Cari tanggal atau penanda kayak “once” dan “last...”: kalau kejadiannya sekali, langsung coret “used to” dan “would”.",
+      "memoryCue": "Ada tanggalnya, berarti past simple polos.",
+      "distractors": {
+        "used to visit": {
+          "misconception": "satu kejadian bertanggal dibaca kayak kebiasaan lama.",
+          "whyFails": "“Last Saturday afternoon” ngunci kunjungannya ke satu kejadian, padahal “used to” cuma buat kebiasaan berulang atau keadaan lama."
+        },
+        "would visit": {
+          "misconception": "“would” kebiasaan dipakai buat kejadian yang cuma sekali.",
+          "whyFails": "“Would” kebiasaan butuh rangkaian aksi yang berulang. Kunjungan yang kejadiannya cuma sekali di satu sore harus pakai past simple."
+        },
+        "use to visit": {
+          "misconception": "bentuk “use to” dari kalimat tanya atau negatif dipindah ke kalimat positif.",
+          "whyFails": "“Use to” polos cuma muncul setelah did/didn't. Di kalimat positif bentuknya “used to”, dan itu pun maknanya tetap salah di sini."
+        }
+      }
+    },
+    "PR-013": {
+      "objective": "Pakai frasa tetap “on foot” buat jalan kaki, jangan kebawa pola “by + kendaraan”.",
+      "misconception": "Kamu narik “by” dari kendaraan (by bus, by car) ke jalan kaki, jadinya “by foot”, padahal frasa tetapnya “on foot”.",
+      "reasoning": "cek kata transportasinya: kendaraan pasangannya “by”, jalan kaki pakai frasa tetap “on foot”",
+      "rule": "Alat transportasi pakai “by” + nama kendaraannya: by bus, by train. Tapi jalan kaki pakai frasa tetap “on foot”. “With” khusus alat yang dipegang tangan.",
+      "whyCorrect": "Jalan kaki diungkapin pakai frasa tetap “on foot”, jadi “we climbed all six floors on foot” satu-satunya susunan yang baku.",
+      "whyOthersFail": "“By foot” maksa pola kendaraan ke frasa yang udah tetap bentuknya. “With” buat alat pegangan. “In” buat ruang tertutup.",
+      "howToAvoid": "Hafalin “on foot” sebagai satu potongan kosakata utuh, jangan dirakit dari aturan “by”.",
+      "memoryCue": "Kaki napak di atas tanah: on foot.",
+      "distractors": {
+        "by": {
+          "misconception": "aturan “by + kendaraan” diseret ke frasa tetap “on foot”.",
+          "whyFails": "“By” pasangannya kendaraan: by bus, by taxi, by plane. Jalan kaki satu-satunya yang punya frasa tetap sendiri, “on foot”."
+        },
+        "with": {
+          "misconception": "cara bepergian diperlakuin kayak alat yang dipegang pakai “with”.",
+          "whyFails": "“With” buat alat yang dipegang, kayak “with a knife”. Cara bepergian kayak jalan kaki nggak pernah pakai “with”."
+        },
+        "in": {
+          "misconception": "“foot” dianggap ruang tertutup yang bisa dipasangin “in”.",
+          "whyFails": "“In” nandain berada di dalam ruang tertutup, kayak “in a taxi”. “Foot” bukan ruang yang bisa dimasukin, jadi “in foot” mustahil."
+        }
+      }
+    },
+    "LD-001": {
+      "objective": "Pilih “in order to” + kata kerja dasar waktu tujuannya masih milik subjek yang sama.",
+      "misconception": "Kamu naruh “so that” atau “for” langsung di depan kata kerja polos, padahal tempat itu punya “in order to” atau “so as to”.",
+      "reasoning": "cek tujuannya punya subjek sendiri atau nggak: nggak ada → in order to + infinitif, ada → so that + klausa utuh",
+      "rule": "Kalau tujuannya sama subjeknya: pakai in order to / so as to / to + kata kerja dasar. Kalau tujuannya punya subjek sendiri: pakai so that atau in order that + klausa utuh, biasanya ditemenin kata bantu.",
+      "whyCorrect": "Tujuan “catch the first train” nggak punya subjek sendiri, yang ngejar tetap “he”. Jadi penghubung infinitif “in order to” yang pas.",
+      "whyOthersFail": "“So that” dan “in order that” sama-sama nuntut klausa utuh bersubjek. “For” cuma bisa diikutin kata benda atau bentuk -ing, nggak pernah kata kerja polos.",
+      "howToAvoid": "Lirik yang persis setelah titik-titiknya: kata kerja polos manggil “in order to” atau “to”, subjek baru manggil “so that”.",
+      "memoryCue": "Nggak ada subjek baru? In order to. Ada subjek baru? So that.",
+      "distractors": {
+        "so that": {
+          "misconception": "“so that” yang butuh klausa utuh ditaruh langsung di depan kata kerja polos.",
+          "whyFails": "“So that” harus buka klausa utuh yang punya subjek dan kata kerja sendiri, misalnya “so that he could catch...”. Dia nggak bisa nempel langsung ke “catch”."
+        },
+        "for": {
+          "misconception": "“for” ditaruh di depan kata kerja polos, kebawa pola “untuk” dari bahasa Indonesia.",
+          "whyFails": "Bahasa Inggris nggak kenal “for + kata kerja polos” buat tujuan. “For” pasangannya kata benda atau bentuk -ing, dan tempat ini punya “in order to” atau “to”."
+        },
+        "in order that": {
+          "misconception": "“in order that” yang minta klausa utuh dipasang ke kata kerja polos.",
+          "whyFails": "“In order that” itu versi klausanya dan butuh subjek plus kata kerja setelahnya, misalnya “in order that he could...”. Di depan “catch” polos dia rontok."
+        }
+      }
+    },
+    "GI-010": {
+      "objective": "Pilih stop + bentuk -ing buat bilang kegiatannya disetop total.",
+      "misconception": "Kamu pilih “stop + to” buat berhenti dari kebiasaan, padahal pola itu artinya jeda buat ngelakuin hal lain.",
+      "reasoning": "tentuin dulu maknanya → berhenti total pakai bentuk -ing, jeda buat tujuan baru pakai “to”",
+      "rule": "Stop + bentuk -ing artinya kegiatannya sendiri yang disetop (berhenti total). Stop + to artinya jeda dari satu kegiatan buat ngelakuin yang lain. Kalimat lanjutannya yang nentuin makna mana yang hidup.",
+      "whyCorrect": "“He hasn't touched a cigarette since” nunjukin kegiatannya beneran tamat. Berhenti total dari kegiatan pakai stop + -ing: stopped smoking.",
+      "whyOthersFail": "“To smoke” malah ngubah kalimatnya jadi jeda buat merokok. “Smoke” bentuk polos yang nggak pernah nempel ke “stop”. “To smoking” campuran dua pola yang nggak ada.",
+      "howToAvoid": "Baca sampai lewat kata kerjanya: kalau konteksnya bilang kebiasaannya hilang, kunci bentuk -ing. Kalau muncul tujuan baru, ambil “to”.",
+      "memoryCue": "Berhenti total pakai -ing, jeda pakai “to”.",
+      "distractors": {
+        "to smoke": {
+          "misconception": "pola “stop + to” yang artinya jeda buat ngelakuin sesuatu dipakai buat konteks berhenti total.",
+          "whyFails": "“Stopped to smoke” artinya dia berhenti sebentar justru buat merokok. Itu bertabrakan langsung sama “he hasn't touched a cigarette since”."
+        },
+        "smoke": {
+          "misconception": "kata kerja polos ditempel ke “stop”, padahal pola itu nggak ada.",
+          "whyFails": "“Stop” nggak pernah ketemu kata kerja polos. Dua polanya cuma stop + -ing (berhenti total) dan stop + to (jeda buat tujuan)."
+        },
+        "to smoking": {
+          "misconception": "bentuk -ing dan “to” dicampur jadi satu pola yang nggak pernah ada.",
+          "whyFails": "“To smoking” ngegabungin dua pola asli jadi bentuk campuran yang nggak dikenal “stop”. Makna berhenti total cukup pakai “smoking”."
+        }
+      }
+    },
+    "RC-006": {
+      "objective": "Pilih “which”, jangan pernah “that”, buat buka klausa tambahan berkoma tentang benda.",
+      "misconception": "Kamu naruh “that” setelah koma buat nambahin info, padahal “that” cuma boleh buka klausa inti.",
+      "reasoning": "lihat koma penanda info tambahannya → pilih “which” karena yang dirujuk benda, bukan orang",
+      "rule": "Klausa tambahan duduk di antara koma dan pakai which buat benda atau who buat orang. “That” cuma boleh di klausa inti yang tanpa koma.",
+      "whyCorrect": "Komanya nandain klausa itu info ekstra tentang benda, dan kombinasi itu cuma ngizinin “which”: The Eiffel Tower, which was completed in 1889, ...",
+      "whyOthersFail": "“That” nggak boleh ngikut koma masuk klausa tambahan. “What” nggak pernah nunjuk balik ke kata benda yang udah disebut. “Who” khusus orang.",
+      "howToAvoid": "Anggap komanya gerbang: begitu koma buka klausanya, “that” terkunci di luar dan benda pakai “which”.",
+      "memoryCue": "Ada koma, pintu buat “that” ketutup.",
+      "distractors": {
+        "that": {
+          "misconception": "“that” dipakai setelah koma buat info tambahan, padahal dia cuma buat klausa inti.",
+          "whyFails": "“That” dilarang masuk klausa tambahan. Di antara koma, info ekstra tentang benda harus dibuka “which”."
+        },
+        "what": {
+          "misconception": "“what” dipakai kayak kata penghubung, padahal dia nggak bisa nunjuk balik ke kata sebelumnya.",
+          "whyFails": "“What” artinya “hal yang” dan nggak pernah nunjuk balik ke kata benda yang udah disebut kayak “the Eiffel Tower”."
+        },
+        "who": {
+          "misconception": "kata penghubung buat orang dipakai buat benda.",
+          "whyFails": "“Who” cuma buat orang. Menara Eiffel itu bangunan, jadi klausa tambahannya butuh “which”."
+        }
+      }
+    },
+    "TA-019": {
+      "objective": "Kamu pilih present perfect continuous pas jejak kegiatan dan lamanya yang disorot. Bukan hitungan hasil yang udah kelar.",
+      "misconception": "Kamu buru-buru pakai present perfect simple tiap ada kata kerja bikin sesuatu. Padahal konteksnya bilang kegiatannya belum kelar dan jejaknya masih keliatan.",
+      "reasoning": "cari jejak kegiatan dan rentang waktu sampai sekarang → pilih continuous buat yang belum kelar, simple buat hasil yang kehitung",
+      "rule": "Present perfect continuous pakai has atau have been + kata kerja -ing buat nyorot lamanya atau jejak kegiatan yang masih jalan. Present perfect simple buat hasil yang udah kelar.",
+      "whyCorrect": "“All afternoon” plus tepung di tangan dan roti yang belum masuk oven nunjukin kegiatannya sendiri yang disorot, bukan hasilnya. Jadi “has been baking” yang pas.",
+      "whyOthersFail": "“Has baked” ngaku rotinya udah jadi. “Is baking” nggak bisa bawa rentang dari siang tadi, dan “baked” mutusin hubungan sama saat ini.",
+      "howToAvoid": "Lihat kalimatnya nunjuk apa: jejak kegiatan yang masih jalan pakai continuous, hasil yang udah kehitung pakai simple.",
+      "memoryCue": "Tangan belepotan tepung dan belum ada yang jadi: pakai has been + -ing.",
+      "distractors": {
+        "has baked": {
+          "misconception": "proses yang masih jalan ketuker sama hasil yang udah kelar.",
+          "whyFails": "“has baked” ngumumin roti yang udah jadi, padahal adonan pertamanya aja belum masuk oven."
+        },
+        "is baking": {
+          "misconception": "bentuk lagi-berlangsung dipilih, padahal rentang waktunya nyambung dari tadi ke sekarang.",
+          "whyFails": "“is baking” cuma motret detik ini, padahal “all afternoon” narik dari siang tadi sampai sekarang."
+        },
+        "baked": {
+          "misconception": "cerita pindah ke bentuk lampau yang waktunya udah dipatok.",
+          "whyFails": "“baked” ngunci kegiatannya di masa lalu yang udah tutup, padahal jejaknya masih keliatan sekarang."
+        }
+      }
+    },
+    "TA-020": {
+      "objective": "Kamu pakai future perfect buat tindakan yang harus udah kelar di titik “by the time”. Bukan future continuous atau bentuk masa depan polos.",
+      "misconception": "Kamu baca “by the time” kayak keterangan waktu nanti biasa. Makna udah-kelar-sebelum-titik-itu jadi ilang.",
+      "reasoning": "temuin patokan “by the time” → tanya tindakannya harus udah kelar di titik itu atau belum → pilih will have + bentuk ke-3",
+      "rule": "Future perfect “will have” + past participle (bentuk ke-3 kata kerja) nandain tindakan yang udah kelar sebelum satu titik nanti, biasanya ada “by the time” atau “by + waktu”. Future continuous “will be” + -ing malah bikin tindakannya masih jalan di titik itu.",
+      "whyCorrect": "Mendaratnya pesawat itu titik acuannya, dan laporannya harus udah kelar sebelum itu biar langsung bisa dibaca. Makna kelar-sebelum-titik itu punya “will have finished”.",
+      "whyOthersFail": "“Will be finishing” bikin kerjaannya masih jalan pas mendarat. “Will finish” ngabaikan tenggat dari “by the time”, dan “finish” nggak punya tanda masa depan sama sekali.",
+      "howToAvoid": "Lihat “by the time” plus kejadian nanti, terus tanya: tindakannya harus kelar sebelum itu? Kalau iya, pakai will have + bentuk ke-3.",
+      "memoryCue": "Ada “by the time”, berarti will have + bentuk ke-3.",
+      "distractors": {
+        "will be finishing": {
+          "misconception": "future continuous dipilih buat kejadian yang di garis waktunya udah harus kelar.",
+          "whyFails": "“will be finishing” bikin laporannya masih setengah jalan pas pesawatnya mendarat, padahal janjinya udah bisa dibaca."
+        },
+        "will finish": {
+          "misconception": "kalimatnya dibaca kayak ramalan masa depan biasa, patokan “by the time”-nya kelewat.",
+          "whyFails": "“will finish” cuma nebak kejadian nanti, nggak nandain kelarnya sebelum pesawat mendarat."
+        },
+        "finish": {
+          "misconception": "tanda masa depannya ilang sama sekali dan jatuh ke present simple.",
+          "whyFails": "“finish” bentuk sekarang polos, padahal induk kalimatnya butuh bentuk masa depan."
+        }
+      }
+    },
+    "MO-016": {
+      "objective": "Kamu pilih “can't have” pas buktinya dengan yakin nyangkal kejadian lampau. Jangan kegoda “must have”, “needn't have”, atau “might have” yang ragu.",
+      "misconception": "Kamu ngambil “must have” atau modal yang lebih lembek, padahal saksi matanya jelas nunjukin kejadiannya nggak pernah terjadi.",
+      "reasoning": "cek buktinya ngonfirmasi atau nyangkal kejadiannya → pilih “can't have” buat kesimpulan nggak yang yakin",
+      "rule": "“Can't have” + bentuk ke-3 berarti yakin sesuatu NGGAK kejadian. “Must have” berarti yakin kejadian, “might have” cuma kemungkinan, dan “needn't have” buat tindakan nyata yang ternyata nggak perlu.",
+      "whyCorrect": "Ada orang yang berdiri di peron dari awal sampai akhir dan nggak pernah lihat Anna. Buktinya nyangkal kejadiannya dengan yakin, jadi “can't have” yang pas.",
+      "whyOthersFail": "“Must have” mbalik kesimpulan lawan buktinya. “Needn't have” ngomongin tindakan nyata yang nggak perlu, dan “might have” masih ragu padahal saksinya nggak nyisain keraguan.",
+      "howToAvoid": "Tentuin dulu buktinya mbuktiin apa: yakin iya pakai “must have”, yakin nggak pakai “can't have”, ragu beneran baru “might have”.",
+      "memoryCue": "Bukti bilang mustahil: pakai “can't have”.",
+      "distractors": {
+        "must have": {
+          "misconception": "arah buktinya kebalik pas ditarik jadi kesimpulan.",
+          "whyFails": "“must have” nyimpulin dia MEMANG naik kereta itu, padahal saksinya mbuktiin kebalikannya."
+        },
+        "needn't have": {
+          "misconception": "kewajiban yang nggak perlu ketuker sama kesimpulan bahwa sesuatu nggak kejadian.",
+          "whyFails": "“needn't have” bilang tindakan yang beneran dia lakuin itu nggak perlu, bukan nyangkal kejadiannya."
+        },
+        "might have": {
+          "misconception": "tingkat keyakinannya diturunin padahal buktinya tegas.",
+          "whyFails": "“might have” masih buka kemungkinan, padahal saksi mata yang nungguin peron dari awal sampai akhir udah nutup keraguan itu."
+        }
+      }
+    },
+    "PA-008": {
+      "objective": "Kamu bentuk pasif “get” dengan bener di kebiasaan masa kini. Kata kerjanya tetap ada dan cocok sama subjek tunggal “everyone”.",
+      "misconception": "Kamu tahu pasif “get”, tapi bentuknya rusak di kalimat rutinitas: akhiran -s ilang, kata kerja utamanya ilang, atau kepleset ke bentuk lampau.",
+      "reasoning": "temuin keterangan rutinitasnya → tahan pasif “get” di present simple → cocokin bentuk kata kerjanya sama subjek tunggal",
+      "rule": "Pasif “get” itu get + past participle (bentuk ke-3 kata kerja). Di pernyataan rutin masa kini, “get”-nya harus bentuk present yang nyesuaiin subjek: everyone gets paid, they get paid.",
+      "whyCorrect": "“On the last Friday of the month” plus saran yang berlaku sekarang nandain ini kebiasaan yang masih jalan. Subjek “everyone” itu tunggal, jadi “gets paid” yang pas.",
+      "whyOthersFail": "“Get” kelupaan akhiran -s buat “everyone”. “Being” ninggalin kalimatnya tanpa kata kerja utama, dan “was” mindahin rutinitas yang masih hidup ke masa lalu.",
+      "howToAvoid": "Di pasif “get”, cek dua hal berurutan: “get”-nya udah bentuk dan waktu yang bener, dan udah cocok sama subjeknya?",
+      "memoryCue": "Rutinitas plus “everyone”: everyone gets + bentuk ke-3.",
+      "distractors": {
+        "get": {
+          "misconception": "kata kerjanya dibiarin polos tanpa akhiran -s padahal subjeknya tunggal.",
+          "whyFails": "“everyone” itu orang ketiga tunggal, jadi butuh “gets”, bukan “get” polos."
+        },
+        "being": {
+          "misconception": "bentuk -ing dibiarin sendirian tanpa kata kerja utama yang megang waktu kalimat.",
+          "whyFails": "“everyone being paid” bikin kalimatnya nggak punya kata kerja utama yang bawa waktunya."
+        },
+        "was": {
+          "misconception": "kebiasaan yang masih jalan digeser ke bentuk lampau yang udah tutup.",
+          "whyFails": "“was paid” ndorong rutinitas gajiannya ke masa lalu, padahal sarannya berlaku sekarang."
+        }
+      }
+    },
+    "RS-008": {
+      "objective": "Kamu nglaporin perintah langsung pakai “tell” + orang + bentuk to. Jangan minjem “suggest” atau bentuk -ing buat perintah.",
+      "misconception": "Kamu ngehindarin pola tell + orang + bentuk to pas nglaporin perintah. Kamu malah maksa “suggest” buat perintah atau nempelin bentuk -ing habis “told”.",
+      "reasoning": "kenali ucapannya sebagai perintah langsung → pilih “told” → pasang pola orang + bentuk to",
+      "rule": "“Tell”, “ask”, dan “order” + orang + bentuk to buat nglaporin perintah atau permintaan. “Suggest” + bentuk -ing atau anak kalimat that buat nglaporin usulan, dan nggak pernah “suggest orang + to”.",
+      "whyCorrect": "Ucapan aslinya perintah langsung dengan tenggat, jadi kata pelapornya “told”. Habis “tell” wajib ada orangnya terus bentuk to: told us to hand in.",
+      "whyOthersFail": "“Suggested us to hand” maksa pola objek punya tell ke “suggest”. “Told us handing” nuker bentuk to yang wajib sama -ing, dan “suggested to hand” masangin “suggest” sama bentuk to yang nggak pernah dia terima.",
+      "howToAvoid": "Kasih label dulu ucapannya: perintah atau usulan? Baru kunci pola kata kerjanya sendiri: told + orang + to + kata kerja, tapi suggested + bentuk -ing.",
+      "memoryCue": "Perintah yang dilaporin: told + orang + to + kata kerja.",
+      "distractors": {
+        "suggested us to hand": {
+          "misconception": "pola objek punya tell dan ask ditempelin ke “suggest”.",
+          "whyFails": "“suggest” nggak pernah nerima “us” + bentuk to; pola objek itu punya “tell” dan “ask”."
+        },
+        "told us handing": {
+          "misconception": "bentuk -ing dipakai sendirian, jadi cuma nggambarin kegiatan, bukan nyuruh orang bertindak.",
+          "whyFails": "“told us handing” bukan pola yang sah; habis “tell” + orang, harus bentuk to."
+        },
+        "suggested to hand": {
+          "misconception": "bentuk to dipasang di belakang kata kerja yang maunya bentuk -ing.",
+          "whyFails": "sama kayak “admit”, kata “suggest” minta bentuk -ing atau anak kalimat that, bukan bentuk to; lagian ucapan aslinya perintah, bukan usulan."
+        }
+      }
+    },
+    "TA-021": {
+      "objective": "Kamu pakai “was going to” buat niat lampau yang keburu kepotong sebelum sempat jalan. Kalimatnya tetap napak di masa lalu.",
+      "misconception": "Kamu nglaporin niat lampau yang kepotong pakai “would” polos atau bentuk masa depan yang berpijak masa kini. Padahal slotnya punya “was going to”.",
+      "reasoning": "temuin niat lampaunya plus penghalangnya → pilih was atau were going to + kata kerja",
+      "rule": "“Was” atau “were going to” + kata kerja nglaporin niat di masa lalu, biasanya yang keburu batal atau kepotong. “Would” polos di posisi ini punya kalimat pengandaian atau kebiasaan lampau, bukan rencana sekali yang gagal.",
+      "whyCorrect": "Semalam penuturnya punya niat nyata yang kepotong gara-gara ponselnya mati. Rencana lampau yang keburu batal itu persis kerjaannya “was going to” + kata kerja.",
+      "whyOthersFail": "“Would” ngubah rencananya jadi hasil pengandaian yang ngambang. “Will” dan “am going to” sama-sama majak niatnya ke masa kini dan ngerusak bingkai “last night”.",
+      "howToAvoid": "Kalau ada rencana lampau yang ketemu “but” penghalangnya, ambil “was going to”, bukan “would” atau bentuk masa depan masa kini.",
+      "memoryCue": "Rencana gagal di masa lalu: was going to ... but ...",
+      "distractors": {
+        "would": {
+          "misconception": "“would” diselipin seolah kalimatnya hasil pengandaian, padahal ini niat nyata.",
+          "whyFails": "“would call” kebaca kayak anak kalimat pengandaian yang syaratnya nggak ada; niat nyata semalam butuh “was going to”."
+        },
+        "will": {
+          "misconception": "bentuk masa depan yang berpijak masa kini dipakai di bingkai cerita lampau.",
+          "whyFails": "“will” nunjuk ke depan dari saat ini, padahal “last night” ngunci ceritanya di masa lalu."
+        },
+        "am going to": {
+          "misconception": "bentuk niat masa kini dipakai buat cerita yang jelas-jelas lampau.",
+          "whyFails": "“am going to” ngumumin niat yang dipegang sekarang, nggak nyambung sama rencana yang udah gagal semalam."
+        }
+      }
+    },
+    "MO-017": {
+      "objective": "Kamu pakai “should have” + bentuk ke-3 tanpa negatif buat nyesalin tindakan baik yang nggak jadi dilakuin.",
+      "misconception": "Kamu salah kutub atau salah modal buat nyesalin yang kelewat: “should have”-nya dinegatifin atau malah kepleset ke kesimpulan, padahal kalimatnya nyesalin yang nggak dilakuin.",
+      "reasoning": "tentuin tindakan yang disorot itu dilakuin atau kelewat → buat yang kelewat pilih “should have” + bentuk ke-3 tanpa negatif",
+      "rule": "“Should have” + bentuk ke-3 nyesalin kebaikan yang NGGAK jadi dilakuin. “Shouldn't have” + bentuk ke-3 negur tindakan keliru yang kejadian, dan “must have” buat nyimpulin, bukan nyesal.",
+      "whyCorrect": "Timnya nggak pernah ngasih peringatan, kan “we kept quiet”. Kalimatnya nyesalin tindakan yang kelewat itu, jadi butuh “should have warned” tanpa negatif.",
+      "whyOthersFail": "“Shouldn't have warned” nyalahin tindakan yang nggak pernah ada. “Should warn” kehilangan kacamata masa lalunya, dan “must have warned” ngubah penyesalan jadi kesimpulan yang bentrok sama konteksnya.",
+      "howToAvoid": "Tanya dulu: tindakannya kejadian atau nggak? Kalau kelewat dan pengin banget udah dilakuin, pakai “should have” + bentuk ke-3 tanpa negatif.",
+      "memoryCue": "“We kept quiet” berarti peringatannya nggak pernah ada, jadi “should have warned”.",
+      "distractors": {
+        "shouldn't have warned": {
+          "misconception": "kesempatan yang kelewat ketuker sama teguran atas tindakan yang kejadian.",
+          "whyFails": "“shouldn't have warned” negur tindakan yang dilakuin, padahal “we kept quiet” nunjukin peringatannya nggak pernah ada."
+        },
+        "should warn": {
+          "misconception": "modal nasihat bentuk present dipakai ganti susunan penyesalan lampau.",
+          "whyFails": "“should warn” ngasih saran buat sekarang atau nanti, padahal kalimatnya lagi nilai kegagalan yang udah lewat."
+        },
+        "must have warned": {
+          "misconception": "kesimpulan dari bukti ketuker sama penyesalan atas yang seharusnya dilakuin.",
+          "whyFails": "“must have warned” nyimpulin peringatannya beneran kejadian, padahal “we kept quiet” bilang sebaliknya."
+        }
+      }
+    },
+    "TA-022": {
+      "objective": "Kamu tahan past simple buat langkah-langkah setara yang maju berurutan di cerita. Jangan ada satu langkah yang dinaikin jadi past perfect.",
+      "misconception": "Kamu naburin past perfect ke kejadian berurutan biasa, dianggap bentuk lampau yang lebih keren. Padahal dia penanda kilas balik buat kejadian yang lebih dulu.",
+      "reasoning": "cek kejadiannya maju di alur utama atau lompat ke sebelumnya → langkah maju tetap past simple",
+      "rule": "Di rangkaian cerita, past simple bawa tiap langkah maju sesuai urutan. Past perfect disimpen buat kejadian yang lebih dulu dari titik cerita saat itu.",
+      "whyCorrect": "Buka jendela itu cuma langkah kedua dari tiga langkah setara di alur utama. Langkah maju di cerita tetap pakai past simple: unlocked, opened, switched on.",
+      "whyOthersFail": "“Had opened” malsuin kilas balik yang nggak ada. “Was opening” ngegantungin langkah yang udah tuntas, dan “has opened” ngerusak bingkai lampau pakai bentuk masa kini.",
+      "howToAvoid": "Tanyain tiap kejadian: dia majuin cerita, atau kejadian sebelum cerita nyampe titik ini? Cuma yang lompat mundur yang dapet past perfect.",
+      "memoryCue": "Langkah urut pakai past simple; lompatan mundur pakai past perfect.",
+      "distractors": {
+        "had opened": {
+          "misconception": "bentuk waktunya nggak cocok sama garis waktu ceritanya.",
+          "whyFails": "“had opened” narik buka-jendelanya ke sebelum pintu dibuka, padahal ini tiga langkah maju berurutan."
+        },
+        "was opening": {
+          "misconception": "past continuous dipakai buat rangkaian tindakan yang udah tuntas.",
+          "whyFails": "“was opening” ngegantungin langkah keduanya di tengah jalan, padahal rangkaiannya nyeritain langkah-langkah yang tuntas."
+        },
+        "has opened": {
+          "misconception": "present perfect yang berorientasi masa kini nyelonong ke cerita lampau.",
+          "whyFails": "“has opened” nyeret bentuk yang nempel ke masa kini ke cerita yang udah dipaku di jam tujuh pagi yang lampau."
+        }
+      }
+    },
+    "PA-009": {
+      "objective": "Kamu ngelengkapin kerangka nyuruh pakai “get” dengan naruh bentuk ke-3 di slot habis bendanya.",
+      "misconception": "Kamu udah bener nyusun “get” + benda, tapi slot terakhirnya diisi bentuk -ing, bentuk dasar, atau bentuk lampau biasa. Padahal slot itu cuma nerima bentuk ke-3.",
+      "reasoning": "kenali makna jasa yang diatur → kunci kerangka get + benda + bentuk ke-3 → isi slot terakhirnya dengan bentuk ke-3",
+      "rule": "Pola nyuruh pakai get: subjek + get + benda + past participle (bentuk ke-3 kata kerja), artinya ngatur biar jasanya dikerjain orang lain. Kata kerja habis bendanya selalu bentuk ke-3, apa pun waktunya “get”.",
+      "whyCorrect": "Dia yang ngatur biar studionya motret, jadi kerangka nyuruh get + benda + bentuk ke-3 berlaku. Slot terakhirnya diisi “taken”.",
+      "whyOthersFail": "“Taking” mbalik fotonya jadi pelaku. “Take” ninggalin slotnya di bentuk dasar, dan “took” nanem kata kerja lampau kedua di tempat yang cuma muat bentuk ke-3.",
+      "howToAvoid": "Begitu ketemu get atau have + benda sebagai jasa yang diatur, bekuin kata kerja berikutnya jadi bentuk ke-3. Biar “get” aja yang bawa waktunya.",
+      "memoryCue": "Got + bendanya + bentuk ke-3: got her photo taken, got his hair cut.",
+      "distractors": {
+        "taking": {
+          "misconception": "bentuk -ing dipakai di belakang “get” padahal slotnya minta bentuk ke-3.",
+          "whyFails": "“taking” bikin fotonya seolah yang motret, bukan yang dipotret."
+        },
+        "take": {
+          "misconception": "bentuk dasar dipakai di susunan nyuruh yang minta bentuk ke-3.",
+          "whyFails": "kerangka nyuruhnya get + benda + bentuk ke-3, jadi “take” polos nggak bisa ngisi slot terakhirnya."
+        },
+        "took": {
+          "misconception": "bentuk lampau biasa ketuker sama bentuk ke-3 yang diminta slotnya.",
+          "whyFails": "“took” itu bentuk lampau berdiri sendiri, padahal slot habis “got her passport photo” cuma nerima bentuk ke-3 “taken”."
+        }
+      }
+    },
+    "GI-011": {
+      "objective": "Kamu masangin subjek gerund (bentuk -ing) sama kata kerja tunggal orang ketiga. Kata benda jamak di dalam frasanya jangan sampai ngecoh.",
+      "misconception": "Kamu kegoda kata benda jamak di dalam frasa subjek, atau bingung sama bentuk -ing-nya sendiri. Padahal seluruh subjek gerund dihitung satu kesatuan tunggal.",
+      "reasoning": "temuin kepala subjeknya, yaitu bentuk -ing → hitung seluruh frasanya sebagai tunggal → kasih kata kerjanya akhiran -s",
+      "rule": "Frasa gerund (bentuk -ing) sebagai subjek dihitung tunggal dan minta kata kerja orang ketiga tunggal, berapa pun kata benda jamak di dalamnya. Subjek bentuk to yang formal (“To take short breaks...”) kelakuannya persis sama.",
+      "whyCorrect": "Seluruh frasa “Taking short breaks between study sessions” jalan sebagai satu subjek tunggal. Jadi kata kerjanya “improves” dengan akhiran -s.",
+      "whyOthersFail": "“Improve” malah nyesuaiin diri sama kata benda jamak di dekatnya, bukan sama kepala subjeknya. “Improving” dan “to improving” sama-sama ninggalin kalimat tanpa kata kerja utama.",
+      "howToAvoid": "Kupas subjeknya sampai kepalanya: kalau mulainya bentuk -ing, anggap sisanya hiasan dan kasih kata kerjanya akhiran -s.",
+      "memoryCue": "Subjek bentuk -ing dihitung satu: Taking breaks improves.",
+      "distractors": {
+        "improve": {
+          "misconception": "kata benda jamak di dalam frasa subjek ngecoh kesesuaian kata kerjanya.",
+          "whyFails": "kepala subjeknya itu “taking” yang tunggal, bukan “breaks” atau “sessions” yang jamak, jadi kata kerjanya wajib “improves”."
+        },
+        "improving": {
+          "misconception": "kalimatnya nyusut jadi potongan: bentuk -ing doang tanpa kata kerja utama.",
+          "whyFails": "pakai “improving”, kalimatnya numpuk dua bentuk -ing tanpa kata kerja utama yang megang waktunya."
+        },
+        "to improving": {
+          "misconception": "penanda “to” dicampur akhiran -ing jadi bentuk gado-gado yang nggak sah.",
+          "whyFails": "“to improving” ngelas penanda “to” ke akhiran -ing, bentuk campuran yang nggak sah, dan kalimatnya tetap tanpa kata kerja utama."
+        }
+      }
+    },
+    "MO-018": {
+      "objective": "Kamu milih “could have” buat peluang masa lalu yang nggak kepakai dan netral, walau godaannya milih “should have”.",
+      "misconception": "Kamu otomatis pakai “should have” buat semua tindakan lampau yang nggak kejadian, padahal konteksnya bilang pilihannya sama-sama oke.",
+      "reasoning": "cek nada penilaiannya — “either way was fine” berarti nggak ada yang disalahin → tandain peluang yang nggak kepakai itu dengan could have + bentuk ke-3",
+      "rule": "Could have + bentuk ke-3 nyebut peluang masa lalu yang nggak kepakai, tanpa menghakimi. Should have + bentuk ke-3 nambahin teguran atau penyesalan.",
+      "whyCorrect": "“Could have taken” nyebut taksi sebagai peluang nyata yang nggak kepakai. Itu cocok sama “either way was fine” yang nutup pintu buat nyalahin.",
+      "whyOthersFail": "“Should have” masukin teguran yang ditolak konteksnya, “must have” nyatain kesimpulan yang bentrok sama faktanya, dan “would have” minta pasangan pengandaian.",
+      "howToAvoid": "Sebelum milih, cek ada nada nyalahin atau nggak. Kalau kalimatnya bilang hasilnya baik-baik aja, pakai could have, jangan should have.",
+      "memoryCue": "Nggak ada yang disalahin? Berarti could have, bukan should have.",
+      "distractors": {
+        "should have taken": {
+          "misconception": "teguran ditambahin ke pilihan lampau yang konteksnya jelas-jelas bilang sama-sama oke.",
+          "whyFails": "“should have taken” negur pilihan naik bus sebagai kesalahan, padahal “either way was fine” bilang nggak ada yang disesalin."
+        },
+        "must have taken": {
+          "misconception": "kesimpulan soal masa lalu ketuker sama nyebut peluang yang nggak kepakai.",
+          "whyFails": "“must have taken” nyimpulin mereka kemungkinan besar naik taksi, padahal kalimatnya bilang mereka naik bus."
+        },
+        "would have taken": {
+          "misconception": "“would have” dipakai seolah ini hasil pengandaian, padahal cuma peluang yang nggak kepakai.",
+          "whyFails": "“would have taken” butuh pasangan anak kalimat if; kalimat ini cuma nyebut pilihan nyata yang nggak kepakai."
+        }
+      }
+    },
+    "CO-017": {
+      "objective": "Kamu milih “unless” sebagai kekecualian negatif yang jadi satu-satunya jalan keluar dari hasil buruk, bukan penghubung syarat positif.",
+      "misconception": "Kamu nuker “unless” sama “provided that” atau “as long as” tanpa ngecek bahwa “unless” berarti kecuali kalau.",
+      "reasoning": "uji logikanya — hasil buruknya kejadian di semua kasus kecuali kalau syaratnya dipenuhi → pilih unless, penghubung kekecualian negatif",
+      "rule": "Unless berarti kecuali kalau, alias kekecualian negatif. Provided that dan as long as nyatain syarat positif yang wajib dipenuhi. Arah logikanya berlawanan.",
+      "whyCorrect": "“Unless you leave right now” berarti kecuali kalau kamu berangkat sekarang. Berangkat sekarang itu satu-satunya jalan biar nggak ketinggalan kereta, pas sama peringatannya.",
+      "whyOthersFail": "“Provided that” dan “as long as” mbalik logikanya jadi berangkat sekarang malah bikin ketinggalan. “In case” nyatain kesiapsiagaan, bukan kekecualian.",
+      "howToAvoid": "Coba parafrase: kalau “kecuali kalau” bikin kalimatnya masuk akal, jawabannya unless. Kalau “cuma kalau” yang pas, pakai provided that atau as long as.",
+      "memoryCue": "Unless = kecuali kalau — satu-satunya pintu keluar dari hasil buruk.",
+      "distractors": {
+        "provided that": {
+          "misconception": "penghubung syarat positif dipakai padahal yang dimaksud kekecualian negatif.",
+          "whyFails": "“provided that” malah bikin berangkat sekarang jadi syarat buat ketinggalan kereta — kebalikan dari maksud peringatannya."
+        },
+        "as long as": {
+          "misconception": "“as long as” dianggap bisa gantiin “unless” tanpa ngecek arah positif-negatifnya.",
+          "whyFails": "“as long as” nyatain syarat positif, jadi kalimatnya malah bilang berangkat sekarang bikin ketinggalan kereta."
+        },
+        "in case": {
+          "misconception": "“in case” yang nyatain kesiapsiagaan dipakai gantiin kekecualian negatif yang nyegah hasil buruknya.",
+          "whyFails": "“in case” nyatain persiapan buat kemungkinan, bukan satu-satunya jalan keluar biar nggak ketinggalan kereta."
+        }
+      }
+    },
+    "PA-010": {
+      "objective": "Kamu nyusun kalimat pasif dari kata kerja berobjek dua dengan bendanya sebagai subjek, terus masang lagi “to” sebelum penerimanya.",
+      "misconception": "Kamu ngebuang “to” yang wajib ada sebelum penerima waktu benda yang dikasih, bukan penerimanya, yang jadi subjek pasif.",
+      "reasoning": "kenali objek mana yang sekarang jadi subjek — kalau bendanya → pertahanin be + bentuk ke-3 dan pasang lagi to sebelum penerimanya",
+      "rule": "Di kata kerja berobjek dua, kalau objek langsungnya alias bendanya yang jadi subjek pasif, penerimanya wajib disambung lagi pakai to. Contoh: A bonus was sent to the staff.",
+      "whyCorrect": "“Was given to” bikin “an award” jadi subjek pasif dan nyambungin penerimanya pakai “to”. Itu pola wajib waktu bendanya yang mimpin kalimat.",
+      "whyOthersFail": "Ngebuang “to” bikin penerimanya ngambang, “were” ngerusak kesesuaian sama subjek tunggal, dan “gave to” masih bentuk aktif.",
+      "howToAvoid": "Tanya dulu objek mana yang mimpin kalimat pasifnya. Penerima di depan nggak butuh “to”; benda di depan butuh “to” sebelum penerimanya.",
+      "memoryCue": "Bendanya jadi subjek? Tambahin “to”: An award was given TO the scientist.",
+      "distractors": {
+        "was given": {
+          "misconception": "kata depan “to” yang wajib ngenalin penerimanya dibuang waktu benda yang dikasih jadi subjek pasif.",
+          "whyFails": "begitu “an award” jadi subjek, penerimanya nggak boleh nempel langsung; wajib disambung pakai “to”."
+        },
+        "were given to": {
+          "misconception": "kesesuaian subjeknya gagal karena subjek tunggal diperlakuin sebagai jamak.",
+          "whyFails": "“an award” bentuknya tunggal, jadi kata bantunya harus “was”, bukan “were”."
+        },
+        "gave to": {
+          "misconception": "bentuk aktifnya dipertahanin, padahal pasif butuh kata bantu be + bentuk ke-3.",
+          "whyFails": "“an award gave” bikin penghargaannya seolah jadi pemberi; pasif wajib pakai “was” sebelum “given”."
+        }
+      }
+    },
+    "RS-009": {
+      "objective": "Kamu milih bentuk -ing langsung sesudah “deny” tanpa kata depan, beda dari “apologize” yang butuh “for” dulu.",
+      "misconception": "Kamu masang bentuk to di belakang “deny”, atau niru kata depan dari “apologize for”, padahal “deny” langsung diikuti bentuk -ing.",
+      "reasoning": "inget pola tetap kata kerja pelapornya — deny + bentuk -ing tanpa kata depan → tempel bentuk -ing langsung sesudah kata kerjanya",
+      "rule": "Deny + bentuk -ing langsung tanpa kata depan; apologize for + bentuk -ing pakai kata depan dulu; admit + bentuk -ing langsung. Tiap kata kerja pelapor ngunci polanya sendiri.",
+      "whyCorrect": "“Denied taking” pakai pola tetap deny + bentuk -ing: tindakan yang dibantah langsung nempel sebagai bentuk -ing, tanpa kata depan dan tanpa “to”.",
+      "whyOthersFail": "Bentuk to sesudah “deny” nggak lazim, “for” itu miliknya pola apologize, dan kata kerja dasar nggak punya sambungan yang sah ke kata kerja pelapornya.",
+      "howToAvoid": "Hafalin tiap kata kerja pelapor bareng polanya sebagai satu paket: deny doing, admit doing, apologize FOR doing.",
+      "memoryCue": "Deny + bentuk -ing langsung — tanpa “to”, tanpa “for”.",
+      "distractors": {
+        "to take": {
+          "misconception": "pelengkap bentuk to dipakai sesudah “deny” yang justru minta bentuk -ing.",
+          "whyFails": "“deny to take” bukan pola yang baku; “deny” wajib langsung diikuti bentuk -ing."
+        },
+        "for taking": {
+          "misconception": "kata depan dari “apologize for” dipindahin ke “deny” yang nggak butuh kata depan.",
+          "whyFails": "“for” itu miliknya pola kayak “apologize for”; “deny” langsung nempel ke bentuk -ing tanpa kata depan."
+        },
+        "take": {
+          "misconception": "kata kerja bentuk dasar dipakai padahal pelengkap bentuk -ing yang diwajibin.",
+          "whyFails": "“denied take” nggak punya susunan yang sah; “deny” nggak pernah diikuti kata kerja dasar."
+        }
+      }
+    },
+    "RC-007": {
+      "objective": "Kamu milih anak kalimat penjelas ragam santai yang naruh kata depannya di akhir dan ngebuang kata penghubungnya.",
+      "misconception": "Kamu bawa pola formal “to whom” ke obrolan santai, atau ninggalin “whom” ngegantung di belakang kata depan yang udah ditaruh di akhir.",
+      "reasoning": "baca petunjuk ragamnya — obrolan santai → taruh kata depannya di akhir anak kalimat dan buang kata penghubungnya",
+      "rule": "Ragam santai naruh kata depannya di akhir anak kalimat dan boleh ngebuang kata penghubung objeknya: the neighbour I was chatting to. Ragam formal majuin kata depannya sebelum whom: the neighbour to whom I was chatting.",
+      "whyCorrect": "“I was chatting to” naruh kata depan di akhir dan ngebuang kata penghubungnya. Itu persis pola obrolan santai yang diminta soalnya.",
+      "whyOthersFail": "“To whom” itu formal dan bentrok sama ragam yang diminta, “to who” masangin kata depan yang dimajuin sama bentuk subjek, dan ninggalin “whom” di belakang “to” bikin slot objeknya dobel.",
+      "howToAvoid": "Cocokkan polanya sama ragamnya dulu: obrolan santai berakhir di kata depan; tulisan formal majuin kata depan + whom.",
+      "memoryCue": "Lagi ngobrol santai? Akhiri di kata depannya: “…the neighbour I was chatting to.”",
+      "distractors": {
+        "to whom I was chatting": {
+          "misconception": "pola formal yang majuin kata depan dibawa ke obrolan santai, padahal soalnya jelas minta ragam santai.",
+          "whyFails": "“to whom I was chatting” bener buat tulisan formal, tapi soalnya jelas minta versi obrolan santai yang naruh kata depannya di akhir."
+        },
+        "to who I was chatting": {
+          "misconception": "bentuk subjek “who” dipakai sesudah kata depan yang dimajuin, padahal yang diminta bentuk objek.",
+          "whyFails": "kata depan yang dimajuin minta bentuk objek “whom”; “to who” nggak sah di ragam mana pun."
+        },
+        "I was chatting to whom": {
+          "misconception": "kata depannya udah ditaruh di akhir, tapi “whom” malah ditinggal ngegantung di belakangnya.",
+          "whyFails": "“whom” nyantol di belakang “to” jadi slot objeknya dobel; kalau kata depannya di akhir, kata penghubungnya dibuang atau pindah ke depan."
+        }
+      }
+    },
+    "PA-011": {
+      "objective": "Kamu milih bentuk pasif to be + bentuk ke-3 sesudah kata kerja kayak “expect” yang minta pelengkap bentuk to.",
+      "misconception": "Kamu pakai bentuk -ing pasif sesudah kata kerja yang justru minta pelengkap bentuk to.",
+      "reasoning": "kenali dulu jenis pelengkap yang dituntut kata kerjanya — expect minta bentuk to → pasang pasifnya sebagai to be + bentuk ke-3",
+      "rule": "Bentuk to pasif to be + bentuk ke-3 nyusul kata kerja yang minta pelengkap bentuk to, kayak expect, hope, dan want. Bentuk -ing pasif being + bentuk ke-3 nyusul kata kerja kayak resent dan avoid.",
+      "whyCorrect": "“To be considered” itu bentuk to pasif yang pas jadi pelengkap “expect”, dan tetap bikin dia yang dipertimbangkan, bukan yang mempertimbangkan.",
+      "whyOthersFail": "“Being considered” pakai pola -ing yang ditolak “expect”, “to be considering” mbalik jadi aktif, dan “to considered” ngebuang “be” yang diwajibin.",
+      "howToAvoid": "Kunci dulu jenis pelengkap dari kata kerjanya (expect → bentuk to), baru bangun pasifnya di dalam pola itu: to be + bentuk ke-3.",
+      "memoryCue": "Expect, hope, dan want diikuti to be + bentuk ke-3, nggak pernah “being”.",
+      "distractors": {
+        "being considered": {
+          "misconception": "pola bentuk -ing pasif dipakai di “expect” yang khusus minta pelengkap bentuk to.",
+          "whyFails": "“expect” diikuti bentuk to, bukan bentuk -ing, jadi pola pasifnya ikut salah."
+        },
+        "to be considering": {
+          "misconception": "bentuk aktif -ing dipertahanin jadi subjeknya seolah yang nimbang, bukan yang ditimbang.",
+          "whyFails": "“to be considering” bentuknya aktif: dia yang jadi penimbang, padahal maksudnya dia yang dipertimbangkan."
+        },
+        "to considered": {
+          "misconception": "penanda “to” langsung ditempel ke bentuk ke-3, padahal “be” yang diwajibin malah dibuang.",
+          "whyFails": "“to considered” ngelewatin “be” yang bawa makna pasifnya; bentuk to pasif selalu to + be + bentuk ke-3."
+        }
+      }
+    },
+    "GI-012": {
+      "objective": "Kamu bedain “go on” + bentuk to yang pindah ke babak baru, dari “go on” + bentuk -ing yang nerusin kegiatan yang sama.",
+      "misconception": "Kamu nganggep “go on doing” dan “go on to do” sama aja, padahal maknanya beda: nerusin yang sama atau mulai yang baru.",
+      "reasoning": "tanya dulu: kata kerja sesudah “go on” nerusin kegiatan yang sama atau mulai babak baru → babak baru pakai bentuk to",
+      "rule": "Go on + bentuk to berarti selesai satu hal, lanjut ke tindakan BARU. Go on + bentuk -ing berarti nerusin kegiatan yang SAMA tanpa berhenti. “Regret” dan “mean” ikut keluarga pola yang sama, tapi kartu ini nguji “go on”.",
+      "whyCorrect": "“Went on to become” nandain jadi hakim sebagai babak baru sesudah lulus kuliah hukum. Itu persis makna go on + bentuk to.",
+      "whyOthersFail": "“Becoming” ngeklaim dia nerusin kegiatan yang udah jalan, “become” kehilangan “to” yang wajib, dan “to becoming” ngegabung penanda bentuk to sama bentuk -ing.",
+      "howToAvoid": "Cek tindakan sesudah “go on”: kegiatan yang sama yang diterusin (bentuk -ing) atau langkah baru sesudahnya (bentuk to)?",
+      "memoryCue": "Go on TO do = bab baru; go on DOING = bab yang sama masih lanjut.",
+      "distractors": {
+        "becoming": {
+          "misconception": "pola go on + bentuk -ing yang nerusin kegiatan yang sama dipakai padahal kalimatnya nandain babak baru.",
+          "whyFails": "“went on becoming” berarti dia lagi di tengah proses itu terus lanjut, padahal kalimatnya mbuka babak baru sesudah lulus."
+        },
+        "become": {
+          "misconception": "penanda bentuk to dibuang sama sekali dari pola go on + to.",
+          "whyFails": "“went on become” bukan rangkaian yang sah; “go on” butuh “to” sebelum kata kerja dasarnya."
+        },
+        "to becoming": {
+          "misconception": "penanda bentuk to digabung sama akhiran -ing jadi bentuk campuran yang nggak sah.",
+          "whyFails": "sesudah “go on”, “to” di sini penanda bentuk to yang wajib diikuti kata kerja dasar, bukan bentuk -ing."
+        }
+      }
+    },
+    "GI-013": {
+      "objective": "Kamu pakai bentuk -ing sederhana waktu tindakannya barengan sama kata kerja utama, dan nyimpen having + bentuk ke-3 buat tindakan yang jelas duluan.",
+      "misconception": "Kamu kebanyakan pakai bentuk -ing perfect having + bentuk ke-3, padahal dua tindakannya kejadian barengan.",
+      "reasoning": "bandingin waktu dua tindakannya — barengan sama kata kerja utama → bentuk -ing sederhana; jelas duluan → bentuk -ing perfect",
+      "rule": "Bentuk -ing sederhana dipakai kalau tindakannya barengan sama kata kerja utama. Bentuk -ing perfect having + bentuk ke-3 khusus negesin tindakannya terjadi lebih dulu.",
+      "whyCorrect": "“Listening” itu bentuk -ing sederhana yang pas, karena “while she cooks dinner” nunjukin dengernya barengan sama masaknya. Nggak perlu nandain mana yang duluan.",
+      "whyOthersFail": "“Having listened” keliru ndorong tindakan yang barengan ke masa sebelumnya. “To listen” dan “listen” bukan pelengkap yang sah buat “enjoy”.",
+      "howToAvoid": "Pakai having + bentuk ke-3 cuma kalau kalimatnya perlu negesin satu tindakan duluan. Kalau barengan, cukup bentuk -ing sederhana.",
+      "memoryCue": "Barengan = bentuk -ing sederhana; duluan = having + bentuk ke-3.",
+      "distractors": {
+        "having listened": {
+          "misconception": "bentuk -ing perfect dipakai jadi tindakannya seolah udah kelar duluan.",
+          "whyFails": "“having listened” nandain dengernya udah selesai sebelum senengnya muncul, padahal “while she cooks dinner” nunjukin dua-duanya barengan."
+        },
+        "to listen": {
+          "misconception": "pelengkap bentuk to dipakai sesudah “enjoy” yang justru minta bentuk -ing.",
+          "whyFails": "“enjoy to listen” bukan pola yang baku; “enjoy” wajib diikuti bentuk -ing."
+        },
+        "listen": {
+          "misconception": "bentuk dasar telanjang dipakai tanpa tanda apa pun.",
+          "whyFails": "“enjoys listen” nggak punya fungsi tata bahasa yang sah; “enjoy” nggak pernah diikuti kata kerja dasar."
+        }
+      }
+    },
+    "RC-008": {
+      "objective": "Kamu milih “which”, bukan “whom”, di pola kata jumlah + of + kata penghubung waktu kelompok yang ditunjuk itu benda, bukan orang.",
+      "misconception": "Kamu asal pakai “whom” di pola kata jumlah + of tanpa ngecek yang ditunjuk itu orang atau benda.",
+      "reasoning": "cek dulu pola kata jumlahnya nunjuk balik ke apa — benda pakai some of which, orang pakai some of whom",
+      "rule": "Di pola kata jumlah + of + kata penghubung, kata penghubungnya harus cocok sama yang ditunjuk: which buat benda (some of which), whom buat orang (many of whom).",
+      "whyCorrect": "“Some of which” madukan kata jumlah sama kata penghubung buat benda, “which”, buat nunjuk balik ke “paintings” di anak kalimat penjelas tambahan.",
+      "whyOthersFail": "“Whom” khusus buat orang, “them” itu kata ganti biasa yang nggak bisa nyambung antar anak kalimat, dan ngacak urutan katanya ngerusak pola tetapnya.",
+      "howToAvoid": "Cek dulu anak kalimatnya nunjuk balik ke apa: benda pakai which, orang pakai whom. Terus jaga urutannya: kata jumlah + of + kata penghubung.",
+      "memoryCue": "Lukisan, buku, ide — “some of WHICH”; relawan, murid — “many of WHOM”.",
+      "distractors": {
+        "some of whom": {
+          "misconception": "kata penghubung buat orang dipakai di pola kata jumlah padahal yang ditunjuk benda.",
+          "whyFails": "“whom” buat orang, padahal anak kalimatnya nunjuk balik ke “paintings” yang jelas benda."
+        },
+        "some of them": {
+          "misconception": "kata ganti biasa “them” dipakai gantiin kata penghubung, padahal nggak bisa nyambung dua anak kalimat.",
+          "whyFails": "“them” bukan kata penghubung, jadi dua anak kalimatnya cuma nempel koma tanpa sambungan yang sah."
+        },
+        "which some of": {
+          "misconception": "urutan pola tetap kata jumlah + of + which diacak jadi “which” nongol duluan.",
+          "whyFails": "urutannya wajib kata jumlah dulu, terus “of”, baru “which”; naruh “which” di depan bikin polanya rusak."
+        }
+      }
+    },
     "CM-005": {
       "objective": "Bikin komparatif dua benda yang bener: “-er” buat kata sifat pendek, “more” buat yang panjang, tanpa penanda dobel.",
       "misconception": "Kamu nerjemahin “lebih murah” kata per kata, jadi keluarnya “more cheap” atau malah dobel “more cheaper”.",
@@ -3846,7 +5502,7 @@
         }
       }
     },
-    "CM-006": {
+    "CM-008": {
       "objective": "Nandain perbandingan yang jelas-jelas nggak nyata sesudah “as if” pakai past tak nyata “were”.",
       "misconception": "Kamu nahan bentuk kini yang nyata sesudah “as if” padahal kalimatnya sendiri bilang perbandingannya nggak benar.",
       "reasoning": "kenali sinyal penyangkalan “a very different story” sesudah “as if” → pilih past tak nyata “were”",
@@ -3870,7 +5526,7 @@
         }
       }
     },
-    "MO-010": {
+    "MO-013": {
       "objective": "Bilang kalau tindakan yang terlanjur dilakukan ternyata nggak perlu pakai “needn't have + past participle”.",
       "misconception": "Kamu nganggep “didn't need to” dan “needn't have” bisa saling tukar, jadi sinyal bahwa tindakannya terlanjur dilakukan sia-sia ikut hilang.",
       "reasoning": "kenali bahwa tindakannya udah terjadi (“printed”) tapi sia-sia (“reads everything on screen”) → pilih “needn't have” di depan past participle",
@@ -3966,7 +5622,7 @@
         }
       }
     },
-    "CO-012": {
+    "CO-013": {
       "objective": "Pakai “but for” + frasa benda buat madatin pengandaian “kalau bukan karena” di kalimat formal.",
       "misconception": "Kamu nyari konjungsi kayak “unless” atau motong “if not” karena “kalau bukan karena” kerasa butuh anak kalimat, padahal Inggris formal cukup satu preposisi.",
       "reasoning": "lihat frasa benda polos sebelum koma + “would not have survived” di klausa hasil → pilih “But for”, satu-satunya opsi yang bisa bawa pengandaian lewat frasa benda",
@@ -3990,7 +5646,7 @@
         }
       }
     },
-    "MO-011": {
+    "MO-014": {
       "objective": "Pakai semi-modal “daren't” + kata kerja dasar buat bilang nggak berani ngelakuin sesuatu.",
       "misconception": "Kamu nerjemahin “tidak berani” kata per kata atau ngasih “to” ke modal “dare”, jadi negasinya nggak punya operator yang bener.",
       "reasoning": "baca akibatnya di klausa kedua (dia terus nyalahin macet) → titik kosong artinya “nggak berani” → pilih “daren't”: negasi udah nempel, kata kerjanya bentuk dasar tanpa “to”",
@@ -4014,7 +5670,7 @@
         }
       }
     },
-    "GI-009": {
+    "GI-014": {
       "objective": "Pakai kata ganti posesif di depan gerund buat nyebut pelakunya di kalimat formal.",
       "misconception": "Kamu ngerangkai “keberatan dia merilis” kata per kata, jadi gerund-nya kehilangan bentuk -ing atau pelakunya salah kasus.",
       "reasoning": "lihat preposisi “to” setelah “objected” → yang boleh ngikut cuma klausa -ing yang kayak benda, lengkap sama pelakunya → pilih posesif + gerund “his releasing”",
@@ -4038,7 +5694,7 @@
         }
       }
     },
-    "PR-006": {
+    "PR-007": {
       "objective": "Pakai preposisi formal “barring” + frasa benda buat bilang “kalau nggak ada X”.",
       "misconception": "Kamu nuker kategori: “meskipun ada” (despite) sama “kecuali kalau ada” (barring) kerasa mirip-mirip formal, padahal artinya kebalik.",
       "reasoning": "cek klausa lanjutannya: kalau ada keberatan, deal-nya mundur ke Maret → titik kosong harus berarti “kalau nggak ada keberatan” → pilih “Barring”",
@@ -4086,7 +5742,7 @@
         }
       }
     },
-    "QN-006": {
+    "QN-007": {
       "objective": "Negasiin klausa partisip dengan naruh “not” persis di depan bentuk -ing.",
       "misconception": "Kamu bawa pola “tidak/bukan” ke Inggris — negatornya berubah jadi “no”, kehilangan -ing, atau malah manggil “didn't” yang nggak boleh mimpin adjunct tanpa subjek.",
       "reasoning": "lihat adjunct tanpa subjek sebelum koma yang maksudnya “karena nggak mau bikin ribut” → taruh “not” persis sebelum partisip → pilih “Not wanting”",

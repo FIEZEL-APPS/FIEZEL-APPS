@@ -2,7 +2,7 @@
 //
 // Dua hal dijaga di sini, dan keduanya soal uang nyata.
 //
-// PERTAMA, angka korpus. Seluruh keputusan pra-render bersandar pada satu bilangan: 614.055
+// PERTAMA, angka korpus. Seluruh keputusan pra-render bersandar pada satu bilangan: 605.071
 // karakter kanonik ⇒ US$9,07 sekali bayar untuk menghapus ~99% biaya TTS runtime. cf-b4 dan
 // cf-a10 mewarisi angka lama 591.898 dari draf awal; cf-c1 §K1 mengoreksinya. Kalau angka itu
 // bergeser tanpa ada yang sadar, keputusan "bayar sekali" dibuat di atas anggaran yang salah.
@@ -42,18 +42,18 @@ try {
   const mod = await import('./tools/prerender-tts.mjs');
   const TtsKey = require(path.join(root, 'workers/api/tts/tts-key.js'));
 
-  // --- 1. ANGKA KANONIK 614.055 -------------------------------------------------------
+  // --- 1. ANGKA KANONIK 605.071 -------------------------------------------------------
   const CANON = mod.CANONICAL;
-  check('Konstanta korpus kanonik = 614.055 karakter', CANON.totalChars === 614055, String(CANON.totalChars));
+  check('Konstanta korpus kanonik = 645.330 karakter', CANON.totalChars === 645330, String(CANON.totalChars));
 
   const census = mod.censusCorpus({ content: 'all' });
-  const drift = Math.abs(census.totalChars - 614055) / 614055;
-  check('Korpus terukur dari bank cocok 614.055 ±1%',
+  const drift = Math.abs(census.totalChars - 645330) / 645330;
+  check('Korpus terukur dari bank cocok 645.330 ±1%',
     drift <= 0.01, `${census.totalChars} karakter (selisih ${(drift * 100).toFixed(3)}%)`);
   check('Korpus terukur cocok EKSAK dengan konstanta (bukan sekadar dalam toleransi)',
     census.totalChars === CANON.totalChars, `${census.totalChars} vs ${CANON.totalChars}`);
 
-  const DOMAINS = { listening: 414779, book: 101749, vocabulary_word: 14419, vocabulary_example: 82999 }; // m025-188: +100 kosakata C1 gen2
+  const DOMAINS = { listening: 414888, book: 101749, vocabulary_word: 18065, vocabulary_example: 110628 };
   for (const [domain, expected] of Object.entries(DOMAINS)) {
     const got = (census.byDomain[domain] || {}).chars || 0;
     check(`Domain ${domain} = ${expected} karakter ±1%`,
@@ -68,8 +68,8 @@ try {
 
   // --- 2. BIAYA DAN JATAH GRATIS ------------------------------------------------------
   const cost = census.totalChars * 0.015 / 1000;
-  check('Biaya sekali render ≈US$9,21 (bukan US$8,88 dari angka lama)',
-    Math.abs(census.costUsd - cost) < 0.01 && Math.abs(census.costUsd - 9.21) < 0.05,
+  check('Biaya sekali render ≈US$9,68 (bukan US$9,07 dari korpus lama)',
+    Math.abs(census.costUsd - cost) < 0.01 && Math.abs(census.costUsd - 9.68) < 0.05,
     'US$' + census.costUsd.toFixed(2));
   check('Ukuran R2 diestimasi dan masih di dalam free tier 10 GB',
     census.estimatedBytes / 1e9 < 10, (census.estimatedBytes / 1e9).toFixed(2) + ' GB');

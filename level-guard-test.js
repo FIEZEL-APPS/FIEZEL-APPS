@@ -107,8 +107,10 @@ const sandbox = {
   // m025-166: teks gerbang masuk level dibangun dari copy yang sama seperti UI, jadi
   // sandbox menyuplai bloknya apa adanya dari app.js - bukan salinan yang bisa menua.
   LEVEL_GUARD_COPY: (() => {
-    const block = app.match(/const\s+LEVEL_GUARD_COPY=\{[\s\S]*?\n\};/);
-    try { return block ? vm.runInNewContext(`${block[0].replace(/^const\s+LEVEL_GUARD_COPY=/, '')}`) : {}; }
+    // v49-F1 2026-08-29: tabel kini dibungkus __fzI18nTable({},()=>({...})) agar terbangun
+    // ulang saat locale berganti; gate mengekstrak literal builder-nya \u2014 assertion tetap utuh.
+    const block = app.match(/const\s+LEVEL_GUARD_COPY=__fzI18nTable\(\{\},\(\)=>\((\{[\s\S]*?\n\})\)\);/) || app.match(/const\s+LEVEL_GUARD_COPY=(\{[\s\S]*?\n\});/);
+    try { return block ? vm.runInNewContext(`(${block[1]})`) : {}; }
     catch (_) { return {}; }
   })(),
   save: () => { saves++; },
@@ -119,13 +121,22 @@ const sandbox = {
 let sandboxReady = false;
 try {
   vm.createContext(sandbox);
-vm.runInContext("if(typeof globalThis.self==='undefined')globalThis.self=globalThis;if(typeof globalThis.window==='undefined')globalThis.window=globalThis;",sandbox);
-/* Harness i18n (pola W1-TESTPLAN 2b, hotfix CI pasca-#242): muat runtime i18n + copy-id sebelum kode app dievaluasi. existsSync = hijau dua arah. */
-const __i18nRt=path.join(root,'features','i18n','fiezel-i18n.js');
-if(fs.existsSync(__i18nRt)){vm.runInContext(fs.readFileSync(__i18nRt,'utf8'),sandbox,{filename:'fiezel-i18n.js'});
-for(const __n of fs.readdirSync(path.join(root,'features','i18n')).filter(n=>/^copy-id-.*\.js$/.test(n)).sort()){
-vm.runInContext(fs.readFileSync(path.join(root,'features','i18n',__n),'utf8'),sandbox,{filename:__n});}}
-
+  // 2026-08-29 merge overhaul×m025-186 (Wave 2 i18n): blok level guard kini membangun
+  // teksnya lewat FiezelI18n.t() (mis. 'level.entry-pilih-judul'), jadi sandbox memuat
+  // runtime i18n + copy-map id SUNGGUHAN lebih dulu — copy yang sama dengan UI, prinsip
+  // m025-166 di atas; tanpa ini evaluasi blok mati (merah yang sama ada di origin/main).
+  sandbox.self = sandbox;
+  vm.runInContext(fs.readFileSync(path.join(root, 'features/i18n/fiezel-i18n.js'), 'utf8'), sandbox, { filename: 'features/i18n/fiezel-i18n.js' });
+  for (const f of fs.readdirSync(path.join(root, 'features/i18n')).filter(n => /^copy-id-.*\.js$/.test(n)).sort())
+    vm.runInContext(fs.readFileSync(path.join(root, 'features/i18n', f), 'utf8'), sandbox, { filename: 'features/i18n/' + f });
+  // …dan LEVEL_GUARD_COPY dievaluasi ULANG di sandbox ber-i18n: IIFE di atas berjalan
+  // sebelum copy-map ada (runInNewContext tanpa FiezelI18n) sehingga menghasilkan {} —
+  // di sini bloknya diselesaikan seperti yang dilihat murid.
+  {
+    /* v49-F1 2026-08-29: bentuk wrapper __fzI18nTable didukung (lihat komentar di atas). */
+    const lgBlock = app.match(/const\s+LEVEL_GUARD_COPY=__fzI18nTable\(\{\},\(\)=>\((\{[\s\S]*?\n\})\)\);/) || app.match(/const\s+LEVEL_GUARD_COPY=(\{[\s\S]*?\n\});/);
+    if (lgBlock) sandbox.LEVEL_GUARD_COPY = vm.runInContext('(' + lgBlock[1] + ')', sandbox, { timeout: 2000 });
+  }
   vm.runInContext(NEEDED.map(name => blocks[name]).join('\n'), sandbox, { timeout: 4000 });
   sandboxReady = true;
 } catch (error) {
@@ -420,7 +431,11 @@ check('S12 · finishQuiz menyambungkan ujian dan placement ke level trust', /lev
   'hasil ujian dan hasil placement sama-sama tersimpan sebagai bukti');
 
 const homeBlock = sourceBlock('home');
-check('S13 · Home menampilkan banner mode percobaan / terkunci', /activeLevelTrustMarkup\(\)/.test(homeBlock),
+/* 2026-08-29 overhaul I12 (O6 #5, O1-005): banner trust 200px di Home diciutkan menjadi baris
+   activeLevelTrustLineMarkup() — status tetap tampil tanpa membuka panel level (niat asli S13),
+   tapi tombol primernya pindah ke CTA hero supaya Home tidak pernah punya dua tombol primer.
+   Assertion diperluas STRUKTURAL (menerima varian Line), tidak dihapus. */
+check('S13 · Home menampilkan status mode percobaan / terkunci', /activeLevelTrust(Line)?Markup\(\)/.test(homeBlock),
   'murid harus tahu statusnya tanpa harus membuka panel level');
 
 // AI-20 F06 (kategori 2a, UNION repoint): blok LEVEL_GUARD_COPY boleh PINDAH ke copy-map
@@ -455,14 +470,23 @@ if (!copyBlock) {
     copyBlock = fs.readFileSync(levelCopyPath, 'utf8').match(/registerCopy\(\s*'id'\s*,\s*\{[\s\S]*?\}\s*\)/);
   }
 }
-const copyText = resolveI18nRefs(copyBlock ? copyBlock[0] : '');
-check('S14 · copy guard memuat teks peringatan 5, 8, demosi, kunci, dan ujian', /warn5['"]?:/.test(copyText) && /warn8['"]?:/.test(copyText) && /demotionBody['"]?:/.test(copyText) && /lockedFeature['"]?:/.test(copyText) && /examDesc['"]?:/.test(copyText),
+const copyText = copyBlock ? copyBlock[0] : '';
+// 2026-08-29 merge overhaul×m025-186 (Wave 2 i18n): LEVEL_GUARD_COPY kini merujuk
+// FiezelI18n.t() dan kalimatnya tinggal di features/i18n/copy-id-app-a.js dengan slug baru
+// (level.entry-ikuti-ujian, …) — bukan copy-id-level.js dengan nama anggota seperti yang
+// diantisipasi blok komentar W2-APP di atas, jadi regex bentuk-sumber tidak pernah bisa
+// hijau lagi (merah yang sama ada di origin/main pra-merge). Kontrak S14/S14b/S15 TIDAK
+// berubah: ia kini diukur pada NILAI copy yang benar-benar diselesaikan runtime lewat
+// sandbox ber-i18n (lebih ketat dari cek bentuk sumber — kunci yang salah ketik pun merah).
+const LGC = (sandbox.LEVEL_GUARD_COPY && typeof sandbox.LEVEL_GUARD_COPY === 'object') ? sandbox.LEVEL_GUARD_COPY : {};
+const lgcResolved = name => typeof LGC[name] === 'string' && LGC[name].trim().length > 0 && !/^level\./.test(LGC[name]);
+check('S14 · copy guard memuat teks peringatan 5, 8, demosi, kunci, dan ujian', ['warn5', 'warn8', 'demotionBody', 'lockedFeature', 'examDesc'].every(lgcResolved),
   'teks §3 dan §4 reports/copy-fitur-baru.md tersimpan di satu tempat, bukan tersebar');
 check('S14b · copy gerbang baru ada dan penjelasan "belum terverifikasi" sudah jadi microcopy',
-  /entryChip['"]?:/.test(copyText) && /entryExam['"]?:\s*'Ikuti ujian'/.test(copyText) && /entryLater['"]?:\s*'Nanti aja'/.test(copyText) &&
-  (copyText.match(/probationBody['"]?:\s*'([^']*)'/)?.[1] || '').length <= 90,
-  `panjang probationBody sekarang ${(copyText.match(/probationBody['"]?:\s*'([^']*)'/)?.[1] || '').length} karakter — satu kalimat, bukan artikel`);
-check('S15 · angka di copy ujian sinkron dengan LEVEL_EXAM_PASS', new RegExp(`minimal\\s+${EXAM_PASS}%`).test(copyText),
+  lgcResolved('entryChip') && LGC.entryExam === 'Ikuti ujian' && LGC.entryLater === 'Nanti aja' &&
+  lgcResolved('probationBody') && String(LGC.probationBody || '').length <= 90,
+  `panjang probationBody sekarang ${String(LGC.probationBody || '').length} karakter — satu kalimat, bukan artikel`);
+check('S15 · angka di copy ujian sinkron dengan LEVEL_EXAM_PASS', new RegExp(`minimal\\s+${EXAM_PASS}%`).test(Object.values(LGC).join('\n') + '\n' + copyText),
   `teks harus menulis ${EXAM_PASS}% supaya tidak menjanjikan ambang yang berbeda dari kode`);
 
 // ---------------------------------------------------------------------------

@@ -129,9 +129,9 @@
     // app.js:809 — levelDescriptor() A1
     'level.deskripsi-a1': 'Pemula · fondasi kalimat sederhana',
     // app.js:809 — levelDescriptor() A2
-    'level.deskripsi-a2': 'Dasar · percakapan sehari-hari',
+    'level.deskripsi-a2': 'Dasar · kosakata dan teks keseharian',
     // app.js:809 — levelDescriptor() B1
-    'level.deskripsi-b1': 'Menengah · komunikasi mandiri',
+    'level.deskripsi-b1': 'Menengah · memahami teks umum secara mandiri',
     // app.js:809 — levelDescriptor() B2
     'level.deskripsi-b2': 'Menengah atas · ide yang lebih kompleks',
     // app.js:809 — levelDescriptor() C1
@@ -161,9 +161,12 @@
     // app.js:808 — activeLevelLabel()
     'level.sufiks-pilihanmu': ' · pilihanmu',
     // app.js:130 — LEVEL_GUARD_COPY.examBadge
-    'level.ujian-badge': 'Terverifikasi',
+    'level.ujian-badge': 'Terverifikasi (ujian)',
+    // G15-03 wave2 (F22): dua badge sumber-bukti baru untuk LEVEL_GUARD_COPY (two-tier)
+    'level.badge-placement-awal': 'Level awal (placement)',
+    'level.badge-titik-mulai': 'Titik mulai',
     // app.js:126 — LEVEL_GUARD_COPY.examDesc
-    'level.ujian-deskripsi': 'Ujian singkat berisi soal campuran \u2014 grammar, kosakata, dan bacaan \u2014 dari level yang mau kamu lompati. Jawab benar minimal 80% tanpa petunjuk, dan level itu langsung terverifikasi buat kamu.',
+    'level.ujian-deskripsi': 'Ujian singkat berisi soal campuran \u2014 grammar, kosakata, dan bacaan \u2014 dari level yang mau kamu lompati. Jawab benar minimal 80% tanpa petunjuk, dengan tiap seksi di atas garis tebakan, dan materi level itu terverifikasi buat kamu. Catatan jujur: speaking dan listening belum ikut diuji di sini \u2014 tetap kamu asah lewat latihan.',
     // app.js:1185 — nilai state/kontrak TETAP di sumber; render-map di titik render (lihat handoff)
     'level.ujian-ditinggalkan': 'ujian ditinggalkan sebelum selesai',
     // app.js:129 — LEVEL_GUARD_COPY.examFail
@@ -171,7 +174,7 @@
     // app.js:125 — LEVEL_GUARD_COPY.examTitle
     'level.ujian-judul': 'Ujian Skip Level',
     // app.js:128 — LEVEL_GUARD_COPY.examPass
-    'level.ujian-lulus': 'Lulus! Level ini sekarang terverifikasi buat kamu \u2014 PAW sampai lompat-lompat. Fondasimu terbukti kuat; semua fitur di level ini kebuka, lanjut!',
+    'level.ujian-lulus': 'Lulus! Level ini sekarang terverifikasi buat kamu \u2014 PAW sampai lompat-lompat. Grammar, kosakata, dan bacaanmu di level ini terbukti kuat; semua fitur di level ini kebuka. Speaking dan listening belum ikut diuji \u2014 itu medan seru berikutnya, lanjut!',
     // app.js:127 — LEVEL_GUARD_COPY.examStart
     'level.ujian-mulai': 'Mulai ujian',
     // app.js:160 — LOGIN_MESSAGES[] (top-level const)
