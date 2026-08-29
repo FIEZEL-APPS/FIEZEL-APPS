@@ -496,7 +496,7 @@
     // app.js:5380 — renderClassroom: tombol topik lain
     'kelas.topik-lain': 'Pilih topik lain',
     // app.js:4318 — kalimat penutup CTA ujian
-    'level.all-proven': 'Semua level sudah kamu buktikan.',
+    'level.all-proven': 'Semua level sudah kamu buktikan lewat ujian grammar, kosakata, dan bacaan. Speaking dan listening belum ikut diuji \u2014 tetap asah lewat latihan.',
     // app.js:4292 — levelControlMarkup: aria-label tombol
     'level.aria-ganti': 'Ganti level belajar',
     // app.js:4318 — CTA saat semua level terverifikasi (badge=examBadge)
@@ -504,7 +504,7 @@
     // app.js:4415 — levelGuardWarn: tombol lanjut
     'level.continue-practice': 'Lanjut latihan',
     // app.js:4318 — openLevelPanel: rincian CTA ujian
-    'level.cta-rincian': '{jumlah} soal · grammar {grammar}, kosakata {vocab}, bacaan {bacaan} · lulus {lulus}%',
+    'level.cta-rincian': '{jumlah} soal · grammar {grammar}, kosakata {vocab}, bacaan {bacaan} · lulus {lulus}% + lantai per seksi',
     // app.js:4444 — openDemotionModal: paragraf kunci
     'level.demosi-terkunci': 'Level {from} dan semua level di atas {verif} terkunci sampai kamu lulus {judul}.',
     // app.js:4481 — buildLevelExamQuestions: Error bank kurang
@@ -518,7 +518,14 @@
     // app.js:4527 — openActiveLevelExamPanel: fakta 3
     'level.fakta-lulus': 'Lulus mulai {lulus}% · tanpa petunjuk, tanpa percobaan kedua',
     // app.js:4518 — levelExamSettle: pesan gagal
-    'level.gagal-skor': ' Skor kamu {skor}/{total} ({akurasi}%), lulusnya mulai {lulus}%.',
+    'level.gagal-skor': ' Skor kamu {skor}/{total} ({akurasi}%), lulusnya mulai {lulus}% dengan tiap seksi di atas garis tebakan.',
+    // G15-16 wave2 (F22): lantai per seksi Ujian Skip Level — pesan gagal-karena-lantai + fragmen rinciannya
+    'level.gagal-lantai': ' Skor totalmu {skor}/{total} ({akurasi}%) sebenarnya sudah sampai, tapi ujian ini juga minta tiap seksi berdiri di atas garis tebakan \u2014 yang masih kurang: {rincian}. Kuatkan bagian itu dulu; besok ujiannya kebuka lagi, dan progresmu aman.',
+    'level.gagal-kurang': ' Yang masih kurang: {rincian}.',
+    'level.lantai-butuh': '{label} {ok}/{n} (butuh minimal {lantai})',
+    'level.seksi-grammar': 'grammar',
+    'level.seksi-kosakata': 'kosakata',
+    'level.seksi-bacaan': 'bacaan',
     // app.js:4292 — levelControlMarkup: sub-label
     'level.ganti': 'Ganti',
     // app.js:4319 — openLevelPanel: judul modal
@@ -533,6 +540,8 @@
     'level.penjelasan-panel': 'Semua materi, latihan, tutor AI, dan rekomendasi akan mengikuti level yang kamu pilih.',
     // app.js:4319 — openLevelPanel: sumber level (placement)
     'level.sumber-placement': 'Saat ini mengikuti hasil placement: <b>{placement}</b>. Level terverifikasi: <b>{verif}</b>.',
+    // G15-12d/e wave2 (F22): suffix kondisional saat verified bersumber placement (two-tier)
+    'level.sumber-verif-awal': ' (level awal dari placement \u2014 kokohkan lewat Ujian Skip Level)',
     // app.js:4296 — setActiveLevel: toast sukses
     'level.toast-aktif': 'Level belajar aktif: {level}',
     // app.js:4522 — toast semua level terverifikasi
