@@ -38,7 +38,7 @@
       "distractors": {
         "has traveled": {
           "misconception": "present perfect dipakai buat sembarang kejadian lampau.",
-          "whyFails": "tahun “2019” maku kejadiannya di titik lampau yang udah kelar."
+          "whyFails": "bentuk present perfect “has + V3” bentrok sama tanggal pasti kayak “in 2019”, jadi pilihan itu gugur."
         },
         "was traveling": {
           "misconception": "bentuk yang lagi jalan dipakai buat perjalanan yang udah kelar.",
@@ -166,7 +166,7 @@
         },
         "will win": {
           "misconception": "kejadian yang diakui mustahil diperlakukan kayak kemungkinan nyata.",
-          "whyFails": "pembicaranya sendiri bilang hal itu nggak akan kejadian."
+          "whyFails": "“will win” ngesankan menangnya masih beneran mungkin, padahal pembicaranya udah nutup kemungkinan itu."
         }
       }
     },
@@ -206,7 +206,7 @@
       "distractors": {
         "is": {
           "misconception": "pergeseran bentuk waktunya nggak dilakuin sama sekali.",
-          "whyFails": "laporannya netral dan keadaannya udah lewat, jadi bentuk presentnya mundur."
+          "whyFails": "“is” ngotot tetap di bentuk sekarang, padahal capeknya diceritain dari kemarin yang udah lewat."
         },
         "has been": {
           "misconception": "bentuk sasaran gesernya ketuker sama present perfect.",
@@ -230,7 +230,7 @@
       "distractors": {
         "A": {
           "misconception": "kata buat penyebutan pertama diulang di benda yang udah dikenal.",
-          "whyFails": "anjingnya udah disebut, jadi bukan info baru lagi."
+          "whyFails": "“A” ngenalin anjingnya seolah baru pertama muncul, padahal kalimat pertama udah nyebutnya."
         },
         "An": {
           "misconception": "aturan bunyi vokal dipakai di tempat yang salah.",
@@ -282,7 +282,7 @@
         },
         "buy": {
           "misconception": "bentuk dasar dipakai padahal yang diminta bentuk to.",
-          "whyFails": "makna tujuan di “stop” minta bentuk pakai to, bukan bentuk dasar."
+          "whyFails": "“buy” polosan nggak bisa langsung nempel di belakang “stopped”; mampirnya butuh penanda tujuan."
         },
         "having bought": {
           "misconception": "bentuk -ing perfect dipakai padahal yang diminta anak kalimat tujuan biasa.",
@@ -326,7 +326,7 @@
       "distractors": {
         "the most scenic": {
           "misconception": "bentuk “paling” dipakai buat perbandingan dua hal.",
-          "whyFails": "bentuk “paling” nunjuk juara kelompok, di sini cuma dua jalur."
+          "whyFails": "“the most scenic” pakai bentuk “paling”, padahal bentuk itu buat juara dari tiga hal atau lebih."
         },
         "scenic": {
           "misconception": "kata sifat dasar dipakai tanpa kata kunci perbandingan.",
@@ -350,15 +350,15 @@
       "distractors": {
         "haven't you": {
           "misconception": "positif-negatif ekornya disalin, bukan dibalik.",
-          "whyFails": "di kalimat ini induknya udah negatif, jadi ekor negatif lagi nggak pas."
+          "whyFails": "“haven’t you” ngekor negatif lagi, padahal induknya udah negatif duluan."
         },
         "did you": {
           "misconception": "kata bantunya diambil dari bentuk waktu yang beda.",
-          "whyFails": "induk kalimatnya pakai present perfect, jadi kata bantunya nggak nyambung."
+          "whyFails": "“did you” loncat ke kata bantu “did”, padahal nggak ada past simple di pernyataannya."
         },
         "don't you": {
           "misconception": "kata bantunya diganti punya present simple.",
-          "whyFails": "kata bantu di ekornya wajib sama kayak yang di pernyataannya."
+          "whyFails": "“don’t you” ganti kata bantunya jadi “do”, padahal pernyataannya nggak pakai “do” sama sekali."
         }
       }
     },
@@ -446,7 +446,7 @@
       "distractors": {
         "already gave": {
           "misconception": "past simple dipakai buat kejadian yang lebih dulu, jadi urutannya rata.",
-          "whyFails": "“by the time” jadi kehilangan maknanya “sebelum titik itu”."
+          "whyFails": "“already gave” naruh dua kejadian itu sejajar begitu aja, nggak nunjukin mana yang kelar duluan."
         },
         "are already giving": {
           "misconception": "kejadiannya dibiarin jalan di “sekarang”, padahal harusnya udah kelar sebelum titik acuan lampau.",
@@ -474,7 +474,7 @@
         },
         "will have had": {
           "misconception": "future perfect dipakai keliru, makan malamnya jadi seolah kelar sebelum jam delapan.",
-          "whyFails": "konteksnya bilang makan malamnya jalan PADA jam delapan, jadi belum kelar."
+          "whyFails": "“will have had” nyatain acaranya udah rampung sebelum jam segitu — kebalikan dari yang diminta soalnya."
         },
         "have": {
           "misconception": "tanda masa depannya ilang sama sekali dan jatuh ke present simple.",
@@ -566,11 +566,11 @@
       "distractors": {
         "left": {
           "misconception": "past simple punya second conditional dipakai di bagian yang minta past perfect.",
-          "whyFails": "induk kalimat “wouldn’t have missed” nandain third conditional, bukan past simple."
+          "whyFails": "“left” cuma past simple biasa, kurang satu langkah mundur buat pengandaian yang udah kelewat itu."
         },
         "would leave": {
           "misconception": "“would” dipakai di dua-dua bagian kalimatnya.",
-          "whyFails": "anak kalimat if dalam susunan conditional nggak pernah pakai “would”."
+          "whyFails": "“would leave” naruh “would” di bagian if, padahal jatah “would” cuma di induk kalimat hasilnya."
         },
         "leaves": {
           "misconception": "bentuk present punya zero atau first conditional dipakai buat masa lalu yang nggak nyata.",
@@ -686,11 +686,11 @@
       "distractors": {
         "have / repair": {
           "misconception": "bentuk dasar dipakai ganti past participle di dalam pola causative.",
-          "whyFails": "pola causative minta have + objek + past participle, bukan kata kerja dasar."
+          "whyFails": "“have / repair” ngebiarin kata kerja keduanya telanjang, jadi nggak kebaca kalau laptopnya digarap orang lain."
         },
         "get / repairing": {
           "misconception": "bentuk -ing dipakai sesudah “get”, padahal yang diminta past participle.",
-          "whyFails": "pola “get” juga minta past participle, bukan bentuk -ing."
+          "whyFails": "“get / repairing” salah ekor: bentuk -ing bikin laptopnya kedengeran lagi ngerjain sendiri, bukan dikerjain tukang."
         },
         "make / repair": {
           "misconception": "pola causative ketuker sama pola kalimat “make someone do something”.",
@@ -766,7 +766,7 @@
         },
         "suggested us": {
           "misconception": "pola objek punya tell dan ask ditempelin ke “suggest”.",
-          "whyFails": "kata kerja ini nggak nerima objek orang langsung kayak “us” di tengahnya."
+          "whyFails": "nyelipin “us” di belakang kata kerja usulnya bikin polanya rusak — usulan di kalimat ini nggak butuh sasaran orang."
         }
       }
     },
@@ -806,7 +806,7 @@
       "distractors": {
         "much": {
           "misconception": "kata jumlah buat benda yang nggak bisa dihitung dipakai di benda jamak.",
-          "whyFails": "“chairs” bisa dihitung satu-satu, “much” minta yang nggak bisa."
+          "whyFails": "“much” cuma jodoh sama benda tak terhitung kayak water atau time, bukan sama benda jamak."
         },
         "little": {
           "misconception": "kata jumlah salah jenis benda, sekaligus salah pilih arti kelangkaannya.",
@@ -974,11 +974,11 @@
       "distractors": {
         "faster than": {
           "misconception": "bentuk “lebih” dipakai padahal konteksnya bilang setara.",
-          "whyFails": "kalimatnya bilang waktunya sama persis, bukan ada yang lebih cepat."
+          "whyFails": "“faster than” ngeklaim laptop yang satu menang cepet, padahal nggak ada selisih yang bisa diklaim."
         },
         "the fastest": {
           "misconception": "perbandingan dua hal ketuker sama bentuk “paling” buat satu kelompok.",
-          "whyFails": "cuma dua laptop yang dibandingin, ini bentuk “paling”."
+          "whyFails": "“the fastest” ngangkat satu barang jadi juara kelompok, padahal yang diadu di sini cuma sepasang."
         },
         "more fast than": {
           "misconception": "pola “more + kata sifat” dipakai di kata sifat pendek.",
@@ -1382,7 +1382,7 @@
       "distractors": {
         "a": {
           "misconception": "frasa bentuk “paling” diperlakukan kayak penyebutan pertama biasa.",
-          "whyFails": "“tallest” nunjuk satu-satunya, nggak bisa jadi salah satu."
+          "whyFails": "“a” ngenalin gunungnya sebagai salah satu di antara banyak, jadi bentrok sama makna “tallest”."
         },
         "an": {
           "misconception": "salah yang sama kayak “a”, plus bingung soal bunyi vokal.",
@@ -1390,7 +1390,7 @@
         },
         "(no article)": {
           "misconception": "frasa di sebelah nama diri dikira nggak pernah pakai kata di depannya.",
-          "whyFails": "“tallest mountain” itu benda biasa, keunikannya wajib ditandai."
+          "whyFails": "ngosongin artikelnya bikin “tallest mountain” kebaca kayak nama diri, padahal dia frasa benda biasa."
         }
       }
     },
@@ -1526,7 +1526,7 @@
       "distractors": {
         "with who": {
           "misconception": "bentuk subjek “who” dipakai sesudah kata depan yang dimajuin, padahal yang diminta bentuk objek.",
-          "whyFails": "kata depan yang persis di depan kata penghubung minta bentuk objek, bukan bentuk subjek."
+          "whyFails": "“with who” masang bentuk pelaku “who” tepat di belakang kata depannya — kombinasi yang justru dilarang di gaya formal."
         },
         "who with": {
           "misconception": "urutan kata depan dan kata gantinya kebalik jadi “with” jatuh persis sesudah “who” di tengah kalimat.",
@@ -1574,7 +1574,7 @@
       "distractors": {
         "nothing": {
           "misconception": "kata kerja negatif digabung kata ganti negatif, jadi dobel.",
-          "whyFails": "“didn’t find nothing” bawa dua kata negatif sekaligus."
+          "whyFails": "“nothing” nempelin negasi kedua ke kalimat yang kata kerjanya udah disangkal, jadi sangkalannya dobel."
         },
         "something": {
           "misconception": "kata ganti positif dipakai padahal konteksnya negatif.",
@@ -1742,7 +1742,7 @@
       "distractors": {
         "is belonging": {
           "misconception": "waktu sekarang dianggap selalu nuntut bentuk -ing.",
-          "whyFails": "“belong” itu keadaan menetap, bukan proses yang jalan."
+          "whyFails": "“is belonging” maksa kata keadaan masuk bentuk lagi-berlangsung, kombinasi yang nggak pernah sah buat makna punya."
         },
         "belonging": {
           "misconception": "kalimatnya cuma dikasih bentuk -ing tanpa kata kerja utama yang megang waktunya.",
@@ -1838,11 +1838,11 @@
       "distractors": {
         "will arrive": {
           "misconception": "tanda waktu nanti digandain di dalam anak kalimat waktu.",
-          "whyFails": "“will” biasanya ditaruh di induk kalimatnya."
+          "whyFails": "“will arrive” naruh “will” di anak kalimat waktu, padahal tempatnya di induk kalimat."
         },
         "arrived": {
           "misconception": "anak kalimat waktunya digeser jadi kejadian lampau yang udah selesai.",
-          "whyFails": "menelepon dan kedatangannya sama-sama masih nanti."
+          "whyFails": "“arrived” ngelempar kedatangan keretanya ke masa lalu, padahal dua-duanya belum kejadian."
         },
         "would arrive": {
           "misconception": "rangkaian nanti yang nyata diperlakuin kayak pengandaian.",
@@ -1934,11 +1934,11 @@
       "distractors": {
         "did I lock": {
           "misconception": "pembalikan khas pertanyaan langsung dipertahanin dan pembukanya dihilangin.",
-          "whyFails": "pertanyaan yang dilaporin pakai urutan pernyataan."
+          "whyFails": "“did I lock” masih niru pembalikan kalimat tanya aslinya, padahal laporan nggak boleh mempertahankan pembalikan itu."
         },
         "that I had locked": {
           "misconception": "“that” dipakai buat pertanyaan “yes” atau “no” yang dilaporin.",
-          "whyFails": "“that” buat pernyataan yang dilaporin."
+          "whyFails": "“that I had locked” ngelaporin kayak kalimat berita, padahal yang dilaporin di sini pertanyaan iya-atau-nggak."
         },
         "whether had I locked": {
           "misconception": "pembukanya udah bener tapi pembalikan kata bantunya dipertahanin.",
@@ -1958,7 +1958,7 @@
       "distractors": {
         "the school": {
           "misconception": "perhatian dialihin ke satu gedung tertentu, bukan ke kegiatan belajarnya.",
-          "whyFails": "soalnya udah tegas minta makna lembaganya, dan itu pakainya bentuk tanpa artikel: “go to school”."
+          "whyFails": "nambahin “the” bikin maknanya gedung tertentu yang dituju, bukan kegiatan belajarnya."
         },
         "a school": {
           "misconception": "satu gedung yang nggak jelas dikenalin, bukan ungkapan kegiatan belajarnya.",
@@ -2078,7 +2078,7 @@
       "distractors": {
         "to go": {
           "misconception": "pola bentuk “to” milik “allow” diterapin ke “let”.",
-          "whyFails": "“let” minta bentuk dasar tanpa “to”."
+          "whyFails": "nyelipin “to” sesudah “let her” bikin susunannya nggak sah — izin lewat “let” nggak pakai kata perangkai itu."
         },
         "going": {
           "misconception": "pelengkap bentuk -ing dipakai padahal yang diwajibin bentuk dasar.",
@@ -2246,7 +2246,7 @@
       "distractors": {
         "It Sarah was that": {
           "misconception": "kerangka cleft yang baku diacak dengan naruh bagian yang ditonjolin sebelum “was”.",
-          "whyFails": "kerangka cleft minta “It was” tetap nyatu persis sebelum bagian yang ditonjolin."
+          "whyFails": "“It Sarah was that” nyempilin nama di antara “It” dan “was”, jadi pasangan pembukanya kepisah."
         },
         "Sarah it was that": {
           "misconception": "kata benda yang ditonjolin dimajuin bahkan sebelum kata “it” pembuka kerangka cleft.",
@@ -2254,7 +2254,7 @@
         },
         "It was that Sarah": {
           "misconception": "“that” ditaruh sebelum kata benda yang ditonjolin, bukan sesudahnya.",
-          "whyFails": "“that” wajib berdiri sesudah bagian yang ditonjolin buat mbuka sisa anak kalimatnya."
+          "whyFails": "“It was that Sarah” ngeloncatin “that” ke depan namanya, padahal urutan bakunya nama dulu baru kata sambungnya."
         }
       }
     },
@@ -2510,15 +2510,15 @@
       "distractors": {
         "a": {
           "misconception": "nama negara diperlakukan sebagai kata benda terhitung biasa yang butuh artikel tak tentu.",
-          "whyFails": "nama negara itu nama diri, jadi nggak pakai artikel tak tentu; “the Netherlands” kekecualian tetap yang emang minta “the”."
+          "whyFails": "“a” itu artikel tak tentu buat benda umum satuan, nggak pernah dipasang ke nama negara."
         },
         "an": {
           "misconception": "aturan artikel tak tentu diterapkan berdasarkan bunyi vokal, tanpa melihat bahwa nama negara memang tidak memakainya.",
-          "whyFails": "nama negara nggak pakai artikel tak tentu “an”; nama tetap ini mintanya artikel tentu: “the Netherlands”."
+          "whyFails": "“an” cuma dipakai sebelum bunyi vokal di benda umum, bukan buat nama negara."
         },
         "[no article]": {
           "misconception": "aturan umum tanpa artikel di depan nama negara diberlakukan untuk semua nama negara.",
-          "whyFails": "nama negara ini masuk kelompok kekecualian yang celahnya nggak boleh kosong."
+          "whyFails": "milih [no article] nyamain nama ini sama nama negara biasa kayak “France” atau “Japan”."
         }
       }
     },
@@ -2562,7 +2562,7 @@
         },
         "on; in": {
           "misconception": "pasangan tetap buat cara bepergian ketuker sama kata depan posisi fisik.",
-          "whyFails": "“on the bus” dan “in the taxi” ngomongin posisi di dalam kendaraannya, bukan cara bepergian umum yang pakai “by bus” dan “by taxi” tanpa artikel."
+          "whyFails": "“on the bus” dan “in the taxi” ngomongin posisi penumpang di kendaraannya, bukan jawaban buat soal ongkos perjalanan yang lebih murah."
         },
         "by; with": {
           "misconception": "kata depan yang lazim cuma diterapin ke salah satu dari dua cara sejajar.",
@@ -2806,7 +2806,7 @@
         },
         "Have never I attended": {
           "misconception": "“never” ditaruh sesudah kata bantunya, bukan di posisi paling depan kalimat.",
-          "whyFails": "di pola penekanan ini “Never” wajib jadi kata pertama, bukan kata bantunya."
+          "whyFails": "“Have never I attended” ngedepanin kata bantunya, padahal justru kata ingkarnya yang harus mimpin kalimat."
         }
       }
     },
@@ -2822,7 +2822,7 @@
       "distractors": {
         "Such the impact was": {
           "misconception": "“such” udah dimajuin tapi kata kerja “was” nggak dibalik ke depan subjeknya.",
-          "whyFails": "pola ini minta pembalikan penuh kata kerja dan subjek sesudah “such” dimajuin."
+          "whyFails": "“Such the impact was” lupa naruh “was” sebelum subjeknya, jadi nggak ada pembalikan sama sekali."
         },
         "The impact such was": {
           "misconception": "urutan biasa dengan subjek di depan dipertahanin dan “such” ditaruh di tengah.",
@@ -2874,7 +2874,7 @@
         },
         "is": {
           "misconception": "bentuk be buat subjek tunggal.",
-          "whyFails": "buat satu orang, sedangkan they itu jamak."
+          "whyFails": "“Is” cuma cocok buat subjek tunggal kayak he atau she, bukan buat they."
         },
         "be": {
           "misconception": "bentuk dasar.",
@@ -2990,7 +2990,7 @@
       "distractors": {
         "must have worked": {
           "misconception": "kesimpulan soal kejadian tuntas dipakai gantiin kegiatan lampau yang sedang jalan.",
-          "whyFails": "“at that moment” dan suara kegiatannya mbingkai pekerjaannya sedang jalan, jadi butuh bentuk berkelanjutan."
+          "whyFails": "“must have worked” nyampein kesimpulan soal kegiatan yang udah rampung, bukan yang lagi berlangsung."
         },
         "should work": {
           "misconception": "kesimpulan berdasarkan bukti diubah jadi nasihat atau harapan masa kini.",
@@ -2998,7 +2998,7 @@
         },
         "cannot have been working": {
           "misconception": "arah kesimpulan dari buktinya dibalik.",
-          "whyFails": "lampu nyala dan suara papan ketik justru ndukung kesimpulan bahwa timnya kerja."
+          "whyFails": "“cannot have been working” malah nyangkal timnya kerja, kebalikan dari yang ditunjukin buktinya."
         }
       }
     },
@@ -3086,7 +3086,7 @@
       "distractors": {
         "appeals": {
           "misconception": "bentuk present dipakai padahal frasa “at last month's meeting” maku penilaiannya di masa lampau.",
-          "whyFails": "frasa “at last month's meeting” maku penilaiannya di masa lampau, jadi bentuk present bentrok."
+          "whyFails": "“appeals” bentuk present, jadi bentrok sama cerita rapat bulan lalu yang udah lewat."
         },
         "appealing": {
           "misconception": "penggalan participle dipakai di posisi yang minta kata kerja bertense.",
@@ -3106,7 +3106,21 @@
       "whyCorrect": "“Engineer” dibaca mulai bunyi vokal. Jadi pasangannya “an”.",
       "whyOthersFail": "“A” nggak cocok sama bunyi vokal. “The” bikin kesannya udah tertentu. “Some” nggak buat satu benda.",
       "howToAvoid": "Ucapin bunyi awalnya dulu. Baru tanya: bendanya udah jelas yang mana?",
-      "memoryCue": "Dengerin bunyinya: an engineer."
+      "memoryCue": "Dengerin bunyinya: an engineer.",
+      "distractors": {
+        "a": {
+          "misconception": "milih dari huruf, bukan dari bunyi.",
+          "whyFails": "“a” dipakai sebelum bunyi konsonan, jadi nggak cocok sama “engineer”."
+        },
+        "the": {
+          "misconception": "kata the dipakai buat penyebutan pertama.",
+          "whyFails": "bikin kesan bendanya udah tertentu, padahal baru disebut."
+        },
+        "some": {
+          "misconception": "kata jumlah buat banyak benda dipakai ke benda tunggal.",
+          "whyFails": "nggak dipakai buat satu benda tunggal."
+        }
+      }
     },
     "A1-009": {
       "objective": "Masangin have got dan has got sama subjeknya buat nunjukin punya",
@@ -3116,7 +3130,21 @@
       "whyCorrect": "“She” sekelompok sama he dan it. Kelompok itu pakai “has got”.",
       "whyOthersFail": "“Have” nggak cocok sama “she”. “Is” dan “does” nggak bikin pola punya ini.",
       "howToAvoid": "Tentuin have atau has dari subjeknya dulu. Baru taruh got.",
-      "memoryCue": "“He”, “she”, “it”: has got. “I”, “you”, “we”, “they”: have got."
+      "memoryCue": "“He”, “she”, “it”: has got. “I”, “you”, “we”, “they”: have got.",
+      "distractors": {
+        "have": {
+          "misconception": "bentuk buat subjek jamak dipakai ke subjek tunggal.",
+          "whyFails": "buat I, you, we, dan they, bukan “she”."
+        },
+        "is": {
+          "misconception": "be dipakai buat pola punya.",
+          "whyFails": "bentuk be, jadi is got nggak nyatain punya."
+        },
+        "does": {
+          "misconception": "dua kata bantu ditumpuk.",
+          "whyFails": "does got nggak pernah bener di bahasa Inggris."
+        }
+      }
     },
     "A1-010": {
       "objective": "Bikin bentuk lampau beraturan pakai akhiran -ed. Sesudah did, kata kerjanya balik ke bentuk dasar.",
@@ -3126,7 +3154,21 @@
       "whyCorrect": "“Yesterday” bilang kejadiannya udah selesai. Kata kerjanya jadi “played”.",
       "whyOthersFail": "“Play” nggak nandain lampau. “Plays” buat he, she, it sekarang. “Playing” butuh kata bantu.",
       "howToAvoid": "Cari kata waktunya dulu. Kalau ada did, kata kerjanya balik ke bentuk dasar.",
-      "memoryCue": "Yesterday: play jadi played. Ingat did plus play."
+      "memoryCue": "Yesterday: play jadi played. Ingat did plus play.",
+      "distractors": {
+        "play": {
+          "misconception": "waktu lampau nggak ditandai.",
+          "whyFails": "bentuk dasar sekarang, padahal “yesterday” nunjuk masa lalu."
+        },
+        "plays": {
+          "misconception": "bentuk sekarang orang ketiga dipakai buat masa lalu.",
+          "whyFails": "buat he, she, atau it di masa sekarang."
+        },
+        "playing": {
+          "misconception": "bentuk -ing dipakai tanpa kata bantu.",
+          "whyFails": "butuh kata bantu kayak “were”, nggak bisa sendiri."
+        }
+      }
     },
     "A1-011": {
       "objective": "Milih was atau were sesuai subjeknya di kalimat lampau",
@@ -3136,7 +3178,21 @@
       "whyCorrect": "“They” itu jamak. Bentuk lampaunya “were”.",
       "whyOthersFail": "“Was” buat subjek tunggal. “Are” bentuk sekarang. “Be” bentuk dasar, nggak bisa sendiri.",
       "howToAvoid": "Sebut pasangannya dengan suara: I was, she was, they were.",
-      "memoryCue": "“They” pakai “were”. “She” pakai “was”."
+      "memoryCue": "“They” pakai “were”. “She” pakai “was”.",
+      "distractors": {
+        "was": {
+          "misconception": "bentuk lampau tunggal dipakai buat subjek jamak.",
+          "whyFails": "“was” jatahnya subjek tunggal kayak he atau she, nggak bisa dipasang sama “they” yang jamak."
+        },
+        "are": {
+          "misconception": "bentuk sekarang dipakai buat masa lalu.",
+          "whyFails": "bentuk sekarang, padahal “yesterday” nunjuk masa lalu."
+        },
+        "be": {
+          "misconception": "bentuk dasar dipakai di posisi kata kerja utama.",
+          "whyFails": "bentuk dasar, nggak bisa jadi kata kerja utama."
+        }
+      }
     },
     "A1-012": {
       "objective": "Bikin bentuk jamak kata benda, termasuk perubahan ejaan konsonan plus y",
@@ -3146,7 +3202,21 @@
       "whyCorrect": "“City” berakhiran konsonan lalu y. Bentuk jamaknya “cities”.",
       "whyOthersFail": "“Citys” dan “cityes” nggak ngikutin aturan konsonan plus y. “City” masih tunggal.",
       "howToAvoid": "Lihat huruf terakhirnya dulu. Kata yang nggak beraturan dihafal terpisah.",
-      "memoryCue": "Konsonan plus y: ganti y jadi i, baru tambah es."
+      "memoryCue": "Konsonan plus y: ganti y jadi i, baru tambah es.",
+      "distractors": {
+        "citys": {
+          "misconception": "akhiran -s dipakai buat semua kata.",
+          "whyFails": "huruf y dibiarin utuh sesudah konsonan."
+        },
+        "cityes": {
+          "misconception": "akhiran -es ditambah tanpa ngubah ejaan.",
+          "whyFails": "“cityes” masih nyimpen huruf y sambil nambah -es, jadi ejaannya nggak baku."
+        },
+        "city": {
+          "misconception": "bentuk tunggal dibiarin.",
+          "whyFails": "masih bentuk tunggal, padahal yang diminta lebih dari satu."
+        }
+      }
     },
     "A1-013": {
       "objective": "Milih in, on, atau at buat nunjukin letak benda",
@@ -3156,7 +3226,21 @@
       "whyCorrect": "Bukunya nempel di permukaan meja. Buat permukaan pakai “on”.",
       "whyOthersFail": "“In” bikin artinya di dalam meja. “At” nunjuk satu titik. “To” nunjuk gerakan.",
       "howToAvoid": "Tanya satu hal: bendanya di dalam, di permukaan, atau di satu titik?",
-      "memoryCue": "In a bag, on a table, at a bus stop."
+      "memoryCue": "In a bag, on a table, at a bus stop.",
+      "distractors": {
+        "in": {
+          "misconception": "letak di permukaan dibaca sebagai di dalam.",
+          "whyFails": "artinya di dalam meja, bukan nempel di permukaannya."
+        },
+        "at": {
+          "misconception": "kata at dipakai buat semua letak.",
+          "whyFails": "nunjuk titik atau tempat ketemuan secara umum."
+        },
+        "to": {
+          "misconception": "kata depan gerakan dipakai buat letak yang diam.",
+          "whyFails": "nunjuk gerakan ke tujuan, padahal bukunya diam."
+        }
+      }
     },
     "A1-014": {
       "objective": "Bikin present continuous utuh: bentuk be yang cocok plus kata kerja -ing",
@@ -3166,7 +3250,21 @@
       "whyCorrect": "“Right now” nunjuk saat ini juga. Jadi bentuknya “is cooking”.",
       "whyOthersFail": "“Cook” dan “cooking” kurang kata bantunya. “Cooks” buat kebiasaan, bukan saat ini.",
       "howToAvoid": "Cek dua bagian: bentuk be buat subjeknya, dan akhiran -ing.",
-      "memoryCue": "Lagi berlangsung: be plus -ing, kayak she is cooking."
+      "memoryCue": "Lagi berlangsung: be plus -ing, kayak she is cooking.",
+      "distractors": {
+        "cook": {
+          "misconception": "kata kerja dasar dipakai tanpa kata bantu.",
+          "whyFails": "bentuk dasar sendirian, kurang kata bantunya."
+        },
+        "cooks": {
+          "misconception": "bentuk kebiasaan dipakai buat kejadian saat ini.",
+          "whyFails": "“cooks” bentuknya buat kebiasaan tiap hari, bukan buat aksi yang lagi jalan detik ini."
+        },
+        "cooking": {
+          "misconception": "kata bantu be nggak dipasang.",
+          "whyFails": "kurang kata bantu di depannya."
+        }
+      }
     },
     "A1-015": {
       "objective": "Milih kata tanya sesuai jenis informasi yang dicari",
@@ -3176,7 +3274,21 @@
       "whyCorrect": "Jawaban buat kalimat ini nama tempat. Jadi kata tanyanya “Where”.",
       "whyOthersFail": "Kata tanya lain minta benda, waktu, atau alasan. Bukan tempat.",
       "howToAvoid": "Tentuin dulu isi jawabannya. Baru pilih kata tanyanya.",
-      "memoryCue": "Where buat tempat, when buat waktu, who buat orang."
+      "memoryCue": "Where buat tempat, when buat waktu, who buat orang.",
+      "distractors": {
+        "What": {
+          "misconception": "kata tanya benda dipakai buat nanya tempat.",
+          "whyFails": "nanya benda atau kegiatan, bukan tempat tinggal."
+        },
+        "When": {
+          "misconception": "kata tanya waktu dipakai buat nanya tempat.",
+          "whyFails": "nanya waktu, bukan lokasi tinggalnya."
+        },
+        "Why": {
+          "misconception": "kata tanya alasan dipakai buat nanya tempat.",
+          "whyFails": "nanya alasan, bukan lokasi tinggalnya."
+        }
+      }
     },
     "A1-016": {
       "objective": "Milih some, any, many, atau much sesuai bentuk kalimat dan jenis bendanya",
@@ -3186,7 +3298,21 @@
       "whyCorrect": "Ada “don’t”, jadi kalimatnya negatif. “Money” juga nggak bisa dihitung satu-satu. Pasangan buat dua-duanya “any”.",
       "whyOthersFail": "“Some” maunya kalimat positif. “A” dan “many” cuma buat benda yang bisa dihitung.",
       "howToAvoid": "Cek dua hal: kalimatnya nyangkal atau nggak? Bendanya bisa dihitung atau nggak?",
-      "memoryCue": "Negatif plus nggak bisa dihitung: I do not have any money."
+      "memoryCue": "Negatif plus nggak bisa dihitung: I do not have any money.",
+      "distractors": {
+        "some": {
+          "misconception": "kata jumlah versi positif dipakai di kalimat negatif.",
+          "whyFails": "bilang jumlahnya ada, padahal kalimatnya nyangkal."
+        },
+        "a": {
+          "misconception": "kata a dipasang ke benda yang nggak bisa dihitung.",
+          "whyFails": "cuma buat benda satuan, dan “money” bukan begitu."
+        },
+        "many": {
+          "misconception": "kata jumlah buat benda yang bisa dihitung dipakai ke yang nggak bisa.",
+          "whyFails": "buat benda banyak yang bisa dihitung satu-satu."
+        }
+      }
     },
     "A1-017": {
       "objective": "Bedain kata ganti subjek, kata ganti objek, dan dua bentuk kepemilikan",
@@ -3196,7 +3322,21 @@
       "whyCorrect": "Sesudah bagian kosong ada kata benda “name”. Jadi pakai “Her”.",
       "whyOthersFail": "“She” bentuk subjek. “Hers” berdiri sendiri. “Me” bentuk objek.",
       "howToAvoid": "Cek posisinya: subjek, sesudah kata kerja, atau sebelum kata benda.",
-      "memoryCue": "“Her name”, tapi “the name is hers”."
+      "memoryCue": "“Her name”, tapi “the name is hers”.",
+      "distractors": {
+        "She": {
+          "misconception": "kata ganti subjek ditaruh sebelum kata benda.",
+          "whyFails": "bentuk subjek, nggak bisa berdiri sebelum kata benda."
+        },
+        "Hers": {
+          "misconception": "kepemilikan mandiri ditaruh sebelum kata benda.",
+          "whyFails": "berdiri sendiri, nggak bisa nerangin kata benda sesudahnya."
+        },
+        "Me": {
+          "misconception": "kata ganti objek dipakai buat kepemilikan.",
+          "whyFails": "bentuk objek, nggak nyatain kepemilikan."
+        }
+      }
     },
     "A1-018": {
       "objective": "Kasih perintah atau instruksi langsung pakai kata kerja bentuk dasar.",
@@ -3210,7 +3350,7 @@
       "distractors": {
         "Opens": {
           "misconception": "nambah -s seolah perintahnya harus nyocokin subjek tunggal.",
-          "whyFails": "perintah ngomong langsung ke “you”, jadi nggak ada subjek yang butuh akhiran -s."
+          "whyFails": "“Opens your books” nambahin -s seolah ada subjek orang ketiga, padahal kalimat perintah nggak pernah pakai subjek."
         },
         "Opening": {
           "misconception": "bentuk -ing dipakai sendirian, jadinya cuma nyebut kegiatan.",
@@ -3238,7 +3378,7 @@
         },
         "always drink": {
           "misconception": "kata kerja dasar dibiarin polos padahal subjeknya orang ketiga tunggal.",
-          "whyFails": "subjeknya “my sister”, jadi kata kerjanya wajib “drinks” pakai -s."
+          "whyFails": "“always drink” kehilangan akhiran -s padahal subjeknya “my sister” — posisi “always”-nya udah bener, bentuk kata kerjanya yang salah."
         },
         "is always drink": {
           "misconception": "nyelipin “is” di depan kata kerja utama.",
@@ -3426,7 +3566,7 @@
       "distractors": {
         "will hear": {
           "misconception": "“by now” dibaca kayak titik yang masih di depan.",
-          "whyFails": "memonya udah nyebar dari Senin; “by now” minta simpulan soal hal yang udah beres, bukan ramalan."
+          "whyFails": "“will hear” ngeramal kejadian yang belum terjadi, padahal memonya udah nyebar dari Senin — bentuk ini nggak cocok sama “by now”."
         },
         "are hearing": {
           "misconception": "bentuk lagi-berlangsung dipaksa buat hasil yang udah numpuk.",
@@ -3478,7 +3618,7 @@
         },
         "resigned": {
           "misconception": "kata kerjanya dimundurin kayak laporan netral.",
-          "whyFails": "mundurin kata kerja cocoknya buat laporan netral; tuntutan ngunci bentuk dasar walau kata pelaporannya lampau."
+          "whyFails": "“resigned” mundurin kata kerja kayak laporan netral biasa, padahal klausa sesudah “demanded that” nggak ikut mundur."
         },
         "would resign": {
           "misconception": "tuntutan dilembutin pakai “would”.",
@@ -3618,7 +3758,7 @@
       "distractors": {
         "A": {
           "misconception": "kata sandang penyebutan pertama dipakai lagi buat benda yang udah dikenal.",
-          "whyFails": "bukunya udah disebut di kalimat pertama, jadi udah tertentu."
+          "whyFails": "“A” ngenalin bukunya seolah barang baru, padahal buku itu bukan barang baru lagi di kalimat kedua."
         },
         "An": {
           "misconception": "an dipakai tanpa cek bunyi awal katanya.",
@@ -3642,11 +3782,11 @@
       "distractors": {
         "childs": {
           "misconception": "akhiran -s dipakai buat semua kata.",
-          "whyFails": "kata ini nggak beraturan, jadi nggak bisa cuma ditambah -s."
+          "whyFails": "“childs” asal nambahin -s ke kata yang punya jalur jamak sendiri, jadi bentuk itu nggak ada di kamus."
         },
         "childes": {
           "misconception": "akhiran -es ditambah ke kata yang nggak beraturan.",
-          "whyFails": "akhiran -es buat kata kayak “boxes”, bukan buat kata nggak beraturan ini."
+          "whyFails": "“childes” maksa akhiran -es yang jatahnya kata kayak “boxes”, padahal kata satu ini nggak ikut aturan tambah akhiran."
         },
         "child": {
           "misconception": "bentuk tunggal dibiarin.",
@@ -3882,7 +4022,7 @@
       "distractors": {
         "is taking": {
           "misconception": "waktu sekarang dianggap selalu butuh bentuk -ing, padahal ini kebiasaan.",
-          "whyFails": "bentuk lagi berlangsung, padahal “every day” nunjuk rutinitas."
+          "whyFails": "“is taking” ngegambarin aksi yang lagi jalan saat ini doang, bukan kebiasaan yang keulang tiap hari."
         },
         "take": {
           "misconception": "bentuk dasar nggak disesuaikan sama subjeknya.",
@@ -3978,7 +4118,7 @@
       "distractors": {
         "cheaper": {
           "misconception": "bentuk perbandingan dua hal dipakai buat ranking satu kelompok.",
-          "whyFails": "cuma buat bandingin dua hal, padahal ini ranking dari lima hotel."
+          "whyFails": "“cheaper” cuma sanggup ngadu sepasang barang; buat nunjuk juara satu kelompok, bentuk itu nggak cukup."
         },
         "the most cheap": {
           "misconception": "pola “more/most” dipakai buat kata sifat pendek yang harusnya berakhiran.",
@@ -4146,7 +4286,7 @@
       "distractors": {
         "Who met you": {
           "misconception": "pertanyaan objek dibaca kayak pertanyaan subjek, jadi peran pelakunya kebalik.",
-          "whyFails": "A yang ketemu duluan (“I met ...”), jadi yang ditanya itu orang yang A temui — “who” jadi objek dan butuh “did you meet”."
+          "whyFails": "“Who met you” malah nanya siapa yang nemuin B, kebalik dari cerita A yang ketemu tetangga itu."
         },
         "Who you met": {
           "misconception": "kata bantu “did” yang wajib ada di pertanyaan objek malah dihilangkan.",
@@ -4294,7 +4434,7 @@
         },
         "won't rain": {
           "misconception": "bentuk “will” masa depan plus negatif ditumpuk di dalam anak kalimat syarat.",
-          "whyFails": "sesudah “unless” pakai present simple, dan negatifnya udah ada di “unless”."
+          "whyFails": "“won’t rain” dobel salahnya: bawa “will” masuk anak kalimat syarat sekaligus ngulang sangkalan yang udah kebawa “unless”."
         },
         "will rain": {
           "misconception": "“will” dipakai di anak kalimat syarat karena kejadiannya besok.",
@@ -4338,7 +4478,7 @@
       "distractors": {
         "to deal": {
           "misconception": "bentuk “to” ditaruh persis sesudah kata depan, seolah semua kata kerja butuh “to”.",
-          "whyFails": "sesudah kata depan “at”, kata kerjanya wajib bentuk -ing."
+          "whyFails": "“to deal” nyelipin bentuk tujuan pakai “to”, padahal “at” di depannya nggak bisa disusul “to” lagi."
         },
         "deal": {
           "misconception": "bentuk dasar dibiarin polos sesudah kata depan.",
@@ -4482,7 +4622,7 @@
       "distractors": {
         "So do": {
           "misconception": "“So do I” dihafal mati, kata bantunya nggak dicocokin sama kalimat aslinya.",
-          "whyFails": "kalimat “A” pakai “have seen”, jadi persetujuannya juga harus pakai “have”."
+          "whyFails": "“So do” ngambil kata bantu “do”, padahal nggak ada “do” di ucapan “A” yang bisa diikutin."
         },
         "Neither have": {
           "misconception": "kata bantunya udah bener, tapi kutub persetujuannya kebalik.",
@@ -4554,7 +4694,7 @@
       "distractors": {
         "send": {
           "misconception": "present simple dipakai buat satu kejadian nanti di induk kalimat.",
-          "whyFails": "Ngirimnya kejadian sekali di masa depan dan ada di induk kalimat, jadi butuh “will”. Present simple cuma buat anak kalimat setelah “when”."
+          "whyFails": "“send” polos ninggalin janji kirimnya tanpa penanda nanti, padahal slot ini induk kalimat, bukan bagian “when”-nya."
         },
         "sent": {
           "misconception": "kejadian yang masih nanti ditulis pakai bentuk lampau.",
@@ -5082,11 +5222,11 @@
       "distractors": {
         "to take": {
           "misconception": "pelengkap bentuk to dipakai sesudah “deny” yang justru minta bentuk -ing.",
-          "whyFails": "“deny to take” bukan pola yang baku; “deny” wajib langsung diikuti bentuk -ing."
+          "whyFails": "“deny to take” bukan susunan yang dikenal; bentuk to-nya bikin bantahannya kedengeran kayak rencana."
         },
         "for taking": {
           "misconception": "kata depan dari “apologize for” dipindahin ke “deny” yang nggak butuh kata depan.",
-          "whyFails": "“for” itu miliknya pola kayak “apologize for”; “deny” langsung nempel ke bentuk -ing tanpa kata depan."
+          "whyFails": "nyelipin “for” di sini niru pola minta maaf kayak “apologize for”, padahal bantahan nggak pakai kata depan apa pun."
         },
         "take": {
           "misconception": "kata kerja bentuk dasar dipakai padahal pelengkap bentuk -ing yang diwajibin.",
@@ -5202,7 +5342,7 @@
       "distractors": {
         "some of whom": {
           "misconception": "kata penghubung buat orang dipakai di pola kata jumlah padahal yang ditunjuk benda.",
-          "whyFails": "“whom” buat orang, padahal anak kalimatnya nunjuk balik ke “paintings” yang jelas benda."
+          "whyFails": "“some of whom” salah sasaran: “whom” khusus buat manusia, sedangkan yang diomongin di sini lukisan-lukisan."
         },
         "some of them": {
           "misconception": "kata ganti biasa “them” dipakai gantiin kata penghubung, padahal nggak bisa nyambung dua anak kalimat.",
