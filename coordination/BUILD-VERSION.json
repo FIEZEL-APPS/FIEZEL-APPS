@@ -1,7 +1,7 @@
 {
-  "version": "m025-196",
+  "version": "m025-197",
   "claimedBy": "perplexity-computer (multilingual i18n wave, direbase atas m025-185)",
-  "claimedAt": "2026-08-29T14:38:03.274Z",
-  "reason": "hapus cincin fokus emas: :focus telanjang jadi :focus-visible + token cincin tinta",
+  "claimedAt": "2026-08-29T15:32:10.218Z",
+  "reason": "cincin fokus hanya untuk papan tik: deteksi modalitas data-fz-input",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
