@@ -185,7 +185,15 @@ test('E. vocabulary-th.count === jumlah entri nyata (bukti celah: th-coverage-te
 
 test('alat perbaikan dan gate ini satu mata uang: tools/sync-grammar-explanations-id.js menilai SINKRON pada data nyata', () => {
   const { source: rebuilt } = sync.buildSynced(bank, source);
-  assert.strictEqual(sync.serialize(rebuilt), fs.readFileSync(sync.SOURCE_PATH, 'utf8'),
+  /* m025-202: akhir baris dinormalkan sebelum dibandingkan. Di checkout Windows dengan
+     core.autocrlf, berkas di disk ber-CRLF sementara serialize() selalu menulis LF, jadi
+     assert byte-identik ini MERAH di mesin pemilik dan HIJAU di CI Linux - untuk data yang
+     isinya sama persis (A-E semuanya hijau; selisihnya 5.981 byte = jumlah baris). Gerbang
+     yang hanya bisa hijau di satu sistem operasi mengajari orang mengabaikan suite lokal,
+     padahal CLAUDE.md justru mewajibkan suite itu hijau sebelum sesuatu disebut selesai.
+     Yang dijaga tetap sama: ISI hasil buildSynced harus identik dengan isi di disk. */
+  const norm = (s) => s.replace(/\r\n/g, '\n');
+  assert.strictEqual(norm(sync.serialize(rebuilt)), norm(fs.readFileSync(sync.SOURCE_PATH, 'utf8')),
     'buildSynced menghasilkan berkas berbeda dari disk — jalankan: node tools/sync-grammar-explanations-id.js --write');
 });
 
