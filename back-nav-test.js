@@ -558,7 +558,7 @@ test('stage menyimpan cara menggambar DIRINYA, bukan cara kembali ke induk', () 
   // bisa dimulai dari hub mana pun - tidak bisa tahu. Menutup satu stage cukup menggambar
   // apa pun yang KINI di puncak.
   assert.ok(/function drawTopScreen\(\)/.test(app));
-  assert.ok(/runStageLeave\(stageStack\.splice\(i\)\.reverse\(\)\);\n  drawTopScreen\(\);/.test(app));
+  assert.ok(/runStageLeave\(stageStack\.splice\(i\)\.reverse\(\)\);\r?\n  drawTopScreen\(\);/.test(app));
 });
 
 test('perpindahan view membuang pembukuan stage, tanpa memutar riwayat mundur', () => {

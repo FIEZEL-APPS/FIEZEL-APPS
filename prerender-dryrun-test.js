@@ -98,8 +98,9 @@ try {
   const fnBody = (name) => {
     const at = code.indexOf('export function ' + name);
     if (at < 0) return '';
-    const end = code.indexOf('\n}\n', at);
-    return code.slice(at, end < 0 ? code.length : end + 3);
+    const slice = code.slice(at);
+    const m = slice.match(/\r?\n\}\r?\n/);
+    return m ? slice.slice(0, m.index + m[0].length) : slice;
   };
   const planFns = ['collectCorpus', 'censusCorpus', 'buildPlan', 'loadManifest'];
   check('Fungsi jalur rencana tidak memuat satu pun fetch/R2/AI di kodenya',

@@ -97,7 +97,7 @@ const SECRET_WORD = '(token|hash|digest|secret|password|pepper|signature|sig)';
 const LEFT_SIDE = new RegExp('[A-Za-z0-9_.$]*' + SECRET_WORD + '[A-Za-z0-9_.$]*\\s*[!=]==?', 'i');
 const RIGHT_SIDE = new RegExp('[!=]==?\\s*[A-Za-z0-9_.$(\'"]*' + SECRET_WORD, 'i');
 for (const line of indexSource.split('\n')) {
-  const code = line.replace(/\/\/.*$/, '');
+  const code = line.replace(/\r/g, '').replace(/\/\/.*$/, '');
   assert(!LEFT_SIDE.test(code), 'perbandingan langsung atas nilai rahasia: ' + line.trim());
   assert(!RIGHT_SIDE.test(code), 'perbandingan langsung atas nilai rahasia: ' + line.trim());
 }

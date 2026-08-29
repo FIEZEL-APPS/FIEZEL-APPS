@@ -5,7 +5,7 @@
   "scope": "./",
   "display": "standalone",
   "background_color": "#FFF9EE",
-  "theme_color": "#FFC700",
+  "theme_color": "#FFF9EE",
   "description": "Ruang belajar bahasa Inggris personal dengan Vocabulary, Grammar, Reading, Speaking, Listening, neural voice lokal opsional, FIEZEL Core Brain, dan release gates yang terverifikasi.",
   "version": "5.19.0",
   "icons": [

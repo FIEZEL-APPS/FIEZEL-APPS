@@ -614,7 +614,7 @@ function scanDropIndex(label, raw) {
   let blocks = 0;
   if (ok) {
     const text = fs.readFileSync(doc, 'utf8');
-    const re = /```sql\n([\s\S]*?)```/g;
+    const re = /```sql\r?\n([\s\S]*?)```/g;
     let m;
     while ((m = re.exec(text))) {
       blocks += 1;
