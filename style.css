@@ -99,6 +99,15 @@ html,body{touch-action:manipulation}
    field you cannot select text in is broken. */
 html,body,button,a,.card,section,article,div,p,span,h1,h2,h3,h4,b,strong,em,small,li{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 input,textarea,select,[contenteditable="true"]{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
+/* PAGAR ANTI-ZOOM-OTOMATIS iOS (m025-186) - satu aturan, bukan tambalan per komponen.
+   iOS Safari memperbesar SELURUH halaman saat kontrol teks ber-font-size < 16px difokus,
+   dan tidak mengembalikannya. Itu gejala "terasa seperti website" yang paling sering
+   terlihat, dan akarnya fokus - bukan pinch. 16px adalah ambang perilaku Safari: 15,9px
+   tetap memicu. Deklarasi ini didahulukan sebagai LANTAI; komponen boleh menaikkan, tidak
+   boleh menurunkan. Ukuran visual yang ringkas dicapai lewat padding/tinggi, bukan huruf
+   kecil. Ditegakkan `app-interaction-policy-test.js` di peramban sungguhan, bukan di teks
+   CSS - jadi override dari berkas mana pun tetap tertangkap. */
+input,textarea,select{font-size:16px}
 ::selection{background:var(--accent);color:#fff}
 
 body{
@@ -780,9 +789,15 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
   /* --info adalah SATU-SATUNYA kuning yang boleh jadi teks: #7A5F1B di atas cream 5,9:1. */
   --info:#7A5F1B;
   --info-soft:#FFF3C4;
-  /* Cincin fokus tunggal untuk seluruh aplikasi. --gold (#C9A24B) yang dipakai sebelumnya
-     hanya 1,9:1 terhadap cream - cincin yang tidak terlihat sama dengan tidak ada cincin. */
-  --focus-ring:#A67A00;
+  /* Cincin fokus tunggal untuk seluruh aplikasi.
+     RIWAYAT, supaya tidak ada yang memutarnya balik ke emas untuk ketiga kalinya:
+       --gold #C9A24B  -> hanya 1,9:1 terhadap cream; cincin yang tidak terlihat = tidak ada cincin.
+       #A67A00         -> 3,71:1, lolos WCAG 1.4.11 tetapi MASIH emas (hue 44 deg, saturasi penuh),
+                          dan pemilik menolaknya: "kotak kuning / outline emas".
+     #241A11 = --ink. Bukan emas (hue 28 deg, saturasi 0,36) DAN jauh lebih terbaca:
+     16,28:1 di atas cream, 17,06:1 di atas putih. Menuruti pemilik di sini justru
+     menaikkan kontras, bukan menukarnya dengan aksesibilitas. */
+  --focus-ring:#241A11;
   --text-disabled:#75654C;
   --ink-hover:#3A2B1C;
   --ink-press:#120C07;
@@ -973,7 +988,8 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
    pertumbuhannya supaya tata letak fold Lanjutan tidak bergeser satu piksel pun. */
 .setup-link{display:inline-flex;align-items:center;gap:8px;margin:0 -10px -14px;padding:14px 10px;color:var(--accent-strong);font-size:.74rem;font-weight:700;text-decoration:none}.setup-link:hover{text-decoration:underline}.setup-link svg{width:16px;height:16px}
 .endpoint-label input{width:100%;min-height:48px;padding:13px 14px;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--panel);font:inherit;color:var(--text)}
-.endpoint-label input:focus{outline:2px solid var(--focus-ring);outline-offset:2px;border-color:var(--focus-ring)}
+/* :focus-visible, bukan :focus - lihat alasan di .fiezel-field input. */
+.endpoint-label input:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
 .consent-row{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;font-size:.72rem;line-height:1.5;color:var(--muted);cursor:pointer}
 .report-state{font-size:.7rem!important;margin:13px 0 0!important;padding-top:11px;border-top:1px solid var(--line)}
 .report-preview{text-align:left;display:grid;gap:0;margin:18px 0;padding:15px 18px;background:var(--surface-warm);border:1px solid var(--line);border-radius:var(--radius-md)}.report-preview p{margin:5px 0;font-size:.8rem}
@@ -1624,9 +1640,12 @@ body.daily-locked{overflow:hidden}
   color:var(--fz-ink);background:var(--fz-bg);border:1.5px solid var(--fz-line);border-radius:var(--radius-md);
   padding:12px 16px;transition:border-color .14s ease-out,box-shadow .14s ease-out}
 .fiezel-field input::placeholder{color:var(--fz-ink-muted);font-weight:500;opacity:1}
+/* SATU aturan, dan HANYA :focus-visible. Sebelumnya ada aturan `:focus` telanjang kedua
+   yang memasang garis --fz-gold #E6A800 plus cahaya kuning 3px - itulah "kotak kuning" yang
+   muncul setiap kali murid MENGETUK kolom nama di ponsel. `:focus-visible` tidak menyala untuk
+   ketukan atau fokus programatik, jadi indikatornya kembali ke tempat yang memang membutuhkannya:
+   navigasi papan tik. */
 .fiezel-field input:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
-.fiezel-field input:focus{border-color:var(--fz-gold);
-  box-shadow:0 0 0 3px rgba(230,168,0,.22)}
 /* Step 1 tidak punya tombol "Lewati" (langkah wajib). Penahan ini menjaga tombol "Kembali"
    tetap di kolom kiri, supaya kepala layarnya tidak bergeser antar-langkah. */
 .fiezel-skip-spacer{display:inline-block;min-width:44px;min-height:44px}
@@ -2542,9 +2561,17 @@ html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.tex
   border:1.5px solid var(--surface-edge);background:var(--panel-soft);color:var(--text)}
 .fz-coach-chip:active{transform:translateY(1px)}
 .fz-coach-form{display:flex;gap:8px;align-items:flex-end}
+/* KEBIJAKAN ANTI-ZOOM-OTOMATIS iOS (m025-186).
+   font-size di bawah 16px pada kontrol teks membuat iOS Safari MEMPERBESAR seluruh halaman
+   saat kontrolnya difokus - lalu tidak mengembalikannya. Itulah gejala "terasa seperti
+   website, bukan aplikasi" yang paling sering terlihat, dan akarnya BUKAN pinch: ia dipicu
+   oleh fokus. Diukur sebelum perbaikan: textarea ini 13,76px (`.86rem`).
+   Nilainya dipaku 16px, BUKAN dinaikkan sedikit, karena 16px adalah ambang perilaku Safari -
+   15,9px tetap memicu zoom. Ukuran tampil dijaga tetap ringkas lewat padding dan tinggi,
+   bukan lewat mengecilkan huruf. `app-interaction-policy-test.js` menegakkan ambang ini. */
 .fz-coach-form textarea{
   flex:1;min-height:44px;max-height:110px;padding:11px 13px;border-radius:var(--radius-md);resize:none;
-  border:1.5px solid var(--surface-edge);background:var(--panel);color:var(--text);font:inherit;font-size:.86rem}
+  border:1.5px solid var(--surface-edge);background:var(--panel);color:var(--text);font:inherit;font-size:16px}
 .fz-coach-send{width:46px;height:46px;flex:0 0 auto;border-radius:var(--radius-md);border:0;background:var(--yellow);color:var(--ink);
   box-shadow:0 3px 0 var(--yellow-deep);display:grid;place-items:center;cursor:pointer}
 .fz-coach-send:active{transform:translateY(2px);box-shadow:0 1px 0 var(--yellow-deep)}
@@ -3358,11 +3385,12 @@ html.fiezel-ui-v6 .launcher-shell{
    restyle di sini menang tanpa perlu !important.
    ========================================================================== */
 :root{
-  /* Fase 2 sudah memasang keluarga --sun/--core/--good/--bad/--focus-ring di
-     blok :root kedua. Yang belum ada hanya cincin fokus DI ATAS permukaan core:
-     --focus-ring #A67A00 cuma 1,9:1 di atas --core #1B1418, jadi fokus di dalam
-     panel gelap butuh kuningnya sendiri (#FFC700 = 11,4:1 di atas --core). */
-  --focus-ring-on-core:#FFC700;
+  /* Cincin fokus DI ATAS permukaan core. --focus-ring (tinta) hilang di atas
+     --core #1B1418, jadi panel gelap butuh cincinnya sendiri - tetapi bukan kuning.
+     #FDFAF3 adalah --on-core, tinta yang MEMANG sudah dipakai panel ini, dan ia
+     17,37:1 di atas --core (vs 11,57:1 milik #FFC700 yang digantikan). Sekali lagi:
+     membuang kuningnya menaikkan kontras. */
+  --focus-ring-on-core:#FDFAF3;
 }
 
 /* ---------- §9.2 toast: ikon + sejajar ----------
@@ -4319,3 +4347,31 @@ body.fz-stage-grammar-lesson .section-head h1{font-family:var(--fz-heading);font
 
 /* G15-07 (wave2): scope instrumen di bawah nama level hasil placement */
 .result-level-scope{display:block;font-size:.72rem;font-weight:500;opacity:.75;margin-top:2px;letter-spacing:.01em}
+
+/* ---------------------------------------------------------------------------------------
+   CINCIN FOKUS HANYA UNTUK PAPAN TIK (m025-197 - laporan OWNER kedua)
+
+   m025-196 memindahkan semua cincin dari `:focus` ke `:focus-visible` dan itu tidak cukup.
+   Sebabnya ada di spesifikasi, bukan di kode ini: untuk KOLOM TEKS peramban MENCOCOKKAN
+   `:focus-visible` walau fokusnya datang dari ketukan jari, karena kolom yang sedang
+   menerima ketikan dianggap selalu layak diberi penanda. Hasilnya kotaknya tidak hilang -
+   ia cuma berganti warna dari emas ke tinta. Pemilik melihatnya, dan ia benar.
+
+   CSS sendirian tidak bisa membedakan "fokus karena jari" dari "fokus karena Tab".
+   `features/ui/fiezel-zoom-lock.js` yang membedakannya lewat data-fz-input, dan aturan
+   di bawah ini yang memakainya.
+
+   `outline-color:transparent`, BUKAN `outline:none`: lebar dan offset cincin tetap ada,
+   jadi tidak ada satu piksel pun yang bergeser saat mode berpindah - dan aturan
+   a11y-test "setiap outline yang dimatikan punya penanda pengganti" tidak dilanggar,
+   karena tidak ada outline yang dimatikan.
+
+   `!important` dipakai sadar: ini kebijakan tingkat aplikasi yang harus menang atas
+   setiap aturan komponen, sekarang dan yang ditulis nanti. Tanpa itu, komponen
+   berikutnya yang menulis cincinnya sendiri akan diam-diam mengembalikan kotaknya.
+
+   Kalau JS gagal dimuat, atribut tidak pernah ada, aturan ini tidak pernah cocok, dan
+   cincin tetap muncul. Kegagalan jatuh ke sisi aman aksesibilitas.
+   --------------------------------------------------------------------------------------- */
+html[data-fz-input="touch"] :focus-visible{outline-color:transparent!important;box-shadow:none!important}
+html[data-fz-input="touch"] :focus{outline-color:transparent!important}

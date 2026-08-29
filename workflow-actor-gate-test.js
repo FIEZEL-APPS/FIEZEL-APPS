@@ -199,7 +199,7 @@ function stripCommentLines(text) {
  * berkas yang sebenarnya sudah benar.
  */
 function walkJobs(text) {
-  const lines = text.split('\n');
+  const lines = text.replace(/\r/g, '').split('\n');
   const found = [];
   const jobs = [];
 

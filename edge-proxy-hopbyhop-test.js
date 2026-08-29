@@ -385,7 +385,7 @@ const POISON = [
     butir: '(a)',
     detector: 'hopFilteredDownstream',
     label: 'saringan arah TURUN dihapus',
-    poison: (raw) => raw.replace('  if (hopByHop($name)) continue;\n', '')
+    poison: (raw) => raw.replace(/  if \(hopByHop\(\$name\)\) continue;\r?\n/, '')
   },
   {
     butir: '(a)',
@@ -416,7 +416,7 @@ const POISON = [
     detector: 'sessionSafe',
     label: 'session_start() disisipkan tanpa session_write_close()',
     poison: (raw) => raw
-      .replace(/if \(function_exists\('session_status'\)[\s\S]*?\n\}\n/, '')
+      .replace(/if \(function_exists\('session_status'\)[\s\S]*?\r?\n\}\r?\n/, '')
       .replace('$url = UPSTREAM', "session_start();\n$url = UPSTREAM")
   },
   {
@@ -435,7 +435,7 @@ const POISON = [
     butir: '(f)',
     detector: 'bodyWrittenOnceAndFlushed',
     label: 'badan ditulis dua kali (dan tanpa flush di antaranya)',
-    poison: (raw) => raw.replace('echo $payload;\nflush();', 'echo $payload;\necho $payload;')
+    poison: (raw) => raw.replace(/echo \$payload;\r?\nflush\(\);/, 'echo $payload;\necho $payload;')
   }
 ];
 

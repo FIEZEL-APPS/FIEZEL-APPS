@@ -43,18 +43,27 @@
 
   /* ---- teks (verbatim reports/copy-tour-gems.md §4) --------------------- */
 
+  function getI18n() {
+    try {
+      if (typeof self !== 'undefined' && self && self.FiezelI18n) return self.FiezelI18n;
+      if (typeof globalThis !== 'undefined' && globalThis && globalThis.FiezelI18n) return globalThis.FiezelI18n;
+    } catch (_) {}
+    return null;
+  }
+  function t(key, fallback, params) { var i18n = getI18n(); return i18n ? i18n.t(key, params) : fallback; }
+
   var GEMS_COPY = Object.freeze({
-    name: 'Gem Terjemahan',
-    toastStreak: 'Streak 5! +2 Gem Terjemahan buat kamu — simpan atau langsung pakai, bebas.',
-    toggleLabel: 'Terjemahan Indonesia',
-    emptyTitle: 'Gem kamu lagi kosong',
-    emptyBody: 'Tenang, ini bukan tembok bayar — Gem Terjemahan memang nggak dijual, dan nggak akan pernah. Cara dapatnya cuma satu: belajar. Kumpulin streak jawaban benar, dan gem-nya ngalir sendiri. PAW yakin nggak butuh lama, kok.',
-    settingsTitle: 'Gem Terjemahan',
-    settingsBody: 'Gem Terjemahan adalah mata uang belajarmu: kamu dapat gratis tiap streak jawaban benar, dan dipakai buat membuka terjemahan otomatis di sesi Listening (1 gem per sesi, butuh jaringan). Gem nggak dijual dan nggak bisa dibeli — satu-satunya jalan mendapatkannya ya belajar.',
+    name: t('gems.name', 'Gem Terjemahan'),
+    toastStreak: t('gems.toast-streak', 'Streak 5! +2 Gem Terjemahan buat kamu — simpan atau langsung pakai, bebas.', {streak: 5, count: 2}),
+    toggleLabel: t('gems.toggle-label', 'Terjemahan Indonesia'),
+    emptyTitle: t('gems.empty-title', 'Gem kamu lagi kosong'),
+    emptyBody: t('gems.empty-body', 'Tenang, ini bukan tembok bayar — Gem Terjemahan memang nggak dijual, dan nggak akan pernah. Cara dapatnya cuma satu: belajar. Kumpulin streak jawaban benar, dan gem-nya ngalir sendiri. PAW yakin nggak butuh lama, kok.'),
+    settingsTitle: t('gems.settings-title', 'Gem Terjemahan'),
+    settingsBody: t('gems.settings-body', 'Gem Terjemahan adalah mata uang belajarmu: kamu dapat gratis tiap streak jawaban benar, dan dipakai buat membuka terjemahan otomatis di sesi Listening (1 gem per sesi, butuh jaringan). Gem nggak dijual dan nggak bisa dibeli — satu-satunya jalan mendapatkannya ya belajar.'),
     // Kejujuran jaringan (recon-audiobook.md §b): terjemahan = AI online lewat Worker,
     // jatah 40 permintaan/jam, gagal senyap. Kalau tidak tampil, gem tidak boleh hangus.
-    unavailable: 'Terjemahan belum bisa diambil — butuh jaringan dan jatah AI masih terbatas. Gem kamu nggak terpakai.',
-    autoNote: 'terjemahan otomatis'
+    unavailable: t('gems.unavailable', 'Terjemahan belum bisa diambil — butuh jaringan dan jatah AI masih terbatas. Gem kamu nggak terpakai.'),
+    autoNote: t('gems.auto-note', 'terjemahan otomatis')
   });
 
   /**
@@ -66,17 +75,17 @@
   function toastFor(streak, amount) {
     var s = toCount(streak), n = toCount(amount);
     if (s === GEMS_RULES.streakTarget && n === GEMS_RULES.perAward) return GEMS_COPY.toastStreak;
-    return 'Streak ' + s + '! +' + n + ' Gem Terjemahan buat kamu — simpan atau langsung pakai, bebas.';
+    return t('gems.toast-streak', 'Streak ' + s + '! +' + n + ' Gem Terjemahan buat kamu — simpan atau langsung pakai, bebas.', {streak: s, count: n});
   }
 
   function priceHint(balance) {
-    return '1 gem per sesi · saldo kamu: ' + toCount(balance) + ' gem';
+    return t('gems.price-hint', '1 gem per sesi · saldo kamu: ' + toCount(balance) + ' gem', {balance: toCount(balance)});
   }
   function chipLabel(balance) {
-    return toCount(balance) + ' gem';
+    return t('gems.chip-balance', toCount(balance) + ' gem', {balance: toCount(balance)});
   }
   function chipAria(balance) {
-    return 'Gem Terjemahan kamu: ' + toCount(balance) + '. Didapat gratis dari streak jawaban benar, dipakai buat terjemahan otomatis.';
+    return t('gems.chip-aria-balance', 'Gem Terjemahan kamu: ' + toCount(balance) + '. Didapat gratis dari streak jawaban benar, dipakai buat terjemahan otomatis.', {balance: toCount(balance)});
   }
 
   /**
@@ -95,8 +104,8 @@
     var maxAwards = Math.max(0, Math.floor(Number(r.maxAwardsPerSession)) || GEMS_RULES.maxAwardsPerSession);
     var s = Math.max(0, Math.floor(Number(streak)) || 0);
     var a = Math.max(0, Math.floor(Number(awardsThisSession)) || 0);
-    if (a >= maxAwards) return 'Runtun ' + s;
-    return 'Runtun ' + (s % target) + '/' + target;
+    if (a >= maxAwards) return t('gems.streak-prefix', 'Runtun ') + s;
+    return t('gems.streak-progress', 'Runtun ' + (s % target) + '/' + target, {current: s % target, target: target});
   }
 
   /* ---- utilitas -------------------------------------------------------- */

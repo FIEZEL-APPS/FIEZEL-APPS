@@ -516,6 +516,7 @@ async function runScenario(scn) {
     });
     return report;
   } finally {
+    if (typeof server.closeAllConnections === 'function') server.closeAllConnections();
     await new Promise(resolve => server.close(resolve));
   }
 }
@@ -538,7 +539,8 @@ async function main() {
     if (!scn) { process.stderr.write('skenario tidak dikenal: ' + SCENARIO_NAME + '\nada: ' + SCENARIOS.map(s => s.name).join(', ') + '\n'); process.exit(2); }
     const report = await runScenario(scn);
     emit(report);
-    process.exit(report.exitCode);
+    process.exitCode = report.exitCode;
+    return;
   }
 
   if (MODE_SELFTEST) {
@@ -565,14 +567,15 @@ async function main() {
       process.stdout.write('----- JSON -----\n' + JSON.stringify(out, null, 2) + '\n');
     }
     if (OUT_PATH) fs.writeFileSync(OUT_PATH, JSON.stringify(out, null, 2) + '\n');
-    process.exit(gagal === 0 ? 0 : 1);
+    process.exitCode = gagal === 0 ? 0 : 1;
+    return;
   }
 
   const io = makeRealIo();
   const checks = await runChecks(io, TARGETS);
   const report = buildReport(checks, { mode: 'produksi', jaringan: { kind: io.kind, nonLoopbackAttempts: null, nonLoopback: [], targets: io.attempts } });
   emit(report);
-  process.exit(report.exitCode);
+  process.exitCode = report.exitCode;
 }
 
 main().catch(err => {

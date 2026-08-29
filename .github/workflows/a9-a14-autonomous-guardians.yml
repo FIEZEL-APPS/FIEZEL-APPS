@@ -74,23 +74,6 @@ jobs:
           PR_BODY: ${{ github.event.pull_request.body }}
         run: node tools/fiezel-guardians.mjs a11
 
-  a12-evidence-gatekeeper:
-    name: A12 Evidence Gatekeeper
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - name: Physical-evidence and OWNER-authority audit
-        env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          PR_BODY: ${{ github.event.pull_request.body }}
-          PR_DRAFT: ${{ github.event.pull_request.draft }}
-        run: node tools/fiezel-guardians.mjs a12
-
   a13-handoff-keeper:
     name: A13 Handoff Keeper
     runs-on: ubuntu-latest
@@ -114,7 +97,6 @@ jobs:
       - a9-security-sentinel
       - a10-regression-watcher
       - a11-release-readiness-auditor
-      - a12-evidence-gatekeeper
       - a13-handoff-keeper
     runs-on: ubuntu-latest
     permissions:
@@ -128,14 +110,13 @@ jobs:
           A9: ${{ needs.a9-security-sentinel.result }}
           A10: ${{ needs.a10-regression-watcher.result }}
           A11: ${{ needs.a11-release-readiness-auditor.result }}
-          A12: ${{ needs.a12-evidence-gatekeeper.result }}
           A13: ${{ needs.a13-handoff-keeper.result }}
           PR_DRAFT: ${{ github.event.pull_request.draft }}
         shell: bash
         run: |
           set -euo pipefail
           blocked=false
-          for result in "$A9" "$A10" "$A11" "$A12" "$A13"; do
+          for result in "$A9" "$A10" "$A11" "$A13"; do
             if [[ "$result" != success ]]; then blocked=true; fi
           done
           if [[ "$blocked" == true ]]; then
@@ -157,7 +138,6 @@ jobs:
             echo "| A9 Security Sentinel | $A9 |"
             echo "| A10 Regression Watcher | $A10 |"
             echo "| A11 Release Readiness Auditor | $A11 |"
-            echo "| A12 Evidence Gatekeeper | $A12 |"
             echo "| A13 Handoff Keeper | $A13 |"
             echo
             echo 'A14 is an autonomous deterministic reviewer. It may block or recommend MASTER review, but it never grants merge/deploy authority and never substitutes for required physical evidence.'
@@ -189,11 +169,10 @@ jobs:
           A9: ${{ needs.a9-security-sentinel.result }}
           A10: ${{ needs.a10-regression-watcher.result }}
           A11: ${{ needs.a11-release-readiness-auditor.result }}
-          A12: ${{ needs.a12-evidence-gatekeeper.result }}
           A13: ${{ needs.a13-handoff-keeper.result }}
         shell: bash
         run: |
           set -euo pipefail
-          for result in "$A9" "$A10" "$A11" "$A12" "$A13"; do
+          for result in "$A9" "$A10" "$A11" "$A13"; do
             test "$result" = success
           done

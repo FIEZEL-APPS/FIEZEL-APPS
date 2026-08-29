@@ -1,0 +1,136 @@
+// m025-198 — gerbang: soal listening TIDAK BOLEH menampilkan terjemahan.
+//
+// LAPORAN OWNER, dan ia menyebutnya fatal: saat ujian tes kemampuan, bagian listening
+// memunculkan terjemahan Indonesia di layar sambil rekaman berbunyi. Murid MEMBACA
+// jawabannya alih-alih mendengarnya, jadi enam soal listening tes penempatan berhenti
+// mengukur listening dan berubah menjadi soal membaca - persis yang tes ini dibuat untuk
+// dihindari (`makeListeningQuestion` sendiri menulis: "Naskahnya TIDAK ikut ke question").
+//
+// KENAPA m025-148 TIDAK CUKUP. Rilis itu memasang tombol `suppressSubtitles` di
+// FiezelVoiceSay dan memakainya di Skills Lab. Tombolnya benar; jalur kuisnya yang tidak
+// pernah menekannya, di DUA mata rantai:
+//   1. AudioService.play() hanya meneruskan speed/contentType/locale ke say(), jadi bendera
+//      dari pemanggil mana pun HILANG di pintu itu;
+//   2. titik panggil listening tes penempatan memang tidak pernah mengirimnya.
+// Menambal salah satu saja meninggalkan cacatnya hidup lewat yang lain.
+//
+// Gerbang ini MENJALANKAN AudioService yang asli - diekstrak dari app.js, bukan disalin -
+// dengan FiezelVoiceSay tiruan yang mencatat options yang benar-benar diterimanya. Jadi yang
+// diuji adalah PERILAKU pintunya, bukan ada-tidaknya sebuah kata di dalam berkas. Assert
+// berbasis pola teks persis yang membuat cacat ini lolos dua rilis berturut-turut.
+'use strict';
+
+const fs = require('fs');
+const path = require('path');
+const vm = require('vm');
+
+const ROOT = __dirname;
+const APP = 'app.js';
+const src = fs.readFileSync(path.join(ROOT, APP), 'utf8');
+
+const checks = [];
+let failed = false;
+const check = (name, ok, details) => {
+  checks.push({ name, status: ok ? 'PASS' : 'FAIL', details: details || '' });
+  if (!ok) failed = true;
+};
+
+/* ---------------------------------------------------------------- ekstraksi AudioService --
+ * Diambil dari `function AudioService(){` sampai `}const audio=AudioService();` yang menutupnya.
+ * Kalau penanda itu berubah, gerbang ini GAGAL keras alih-alih diam-diam berhenti menguji. */
+const mulai = src.indexOf('function AudioService(){');
+const tutup = src.indexOf('}const audio=AudioService();');
+check('AudioService ditemukan di ' + APP, mulai !== -1 && tutup > mulai,
+  mulai === -1 ? 'penanda awal hilang' : (tutup <= mulai ? 'penanda akhir hilang' : 'baris ' + (src.slice(0, mulai).split('\n').length)));
+
+if (mulai !== -1 && tutup > mulai) {
+  const kode = src.slice(mulai, tutup + 1);
+
+  /* Semua yang dipakai AudioService di luar dirinya sendiri distub. Yang PENTING adalah
+   * FiezelVoiceSay.say tiruan: ia mencatat options apa adanya, lalu menjawab true supaya
+   * jalur cadangan peramban tidak ikut jalan dan mengaburkan pengukuran. */
+  const dicatat = [];
+  const prefetched = [];
+  const sandbox = {
+    window: {},                    // tanpa speechSynthesis -> browserSupported=false
+    self: { FiezelVoiceSay: { say: (text, options) => { dicatat.push({ text, options }); return true; } } },
+    selectedNeuralRate: () => 1,
+    prefetchNextVoice: (teks, opsi) => { prefetched.push({ teks, opsi }); return Promise.resolve(false); },
+    showToast: () => {},
+    cancelVoicePrefetch: () => {},
+    console
+  };
+  sandbox.globalThis = sandbox;
+  vm.createContext(sandbox);
+  vm.runInContext(kode + '\nvar audio = AudioService();', sandbox, { filename: APP });
+
+  const audio = sandbox.audio;
+  check('AudioService dapat dijalankan di luar peramban', audio && typeof audio.play === 'function');
+
+  const opsiTerakhir = () => (dicatat.length ? dicatat[dicatat.length - 1].options || {} : null);
+
+  return Promise.resolve()
+    /* (A) INTI LAPORAN OWNER: pemutaran listening tanpa bendera eksplisit pun harus bisu
+     * subtitle. Ini yang menutup KELASNYA - pemanggil yang ditulis nanti tidak perlu tahu
+     * benderanya ada. */
+    .then(() => audio.play('the train leaves at nine', { contentType: 'listening' }))
+    .then(() => {
+      const o = opsiTerakhir();
+      check('A listening TANPA bendera eksplisit tetap bisu subtitle (kelasnya tertutup, bukan satu pemanggil)',
+        !!o && o.suppressSubtitles === true,
+        o ? 'suppressSubtitles=' + o.suppressSubtitles : 'say() tidak pernah dipanggil');
+    })
+    /* (B) Bendera eksplisit dari pemanggil harus SAMPAI. Sebelum m025-198 pintu ini
+     * menjatuhkannya diam-diam, jadi Skills Lab pun bergantung pada jalurnya sendiri. */
+    .then(() => audio.play('a quiet sentence', { suppressSubtitles: true }))
+    .then(() => {
+      const o = opsiTerakhir();
+      check('B bendera suppressSubtitles dari pemanggil DITERUSKAN, tidak dijatuhkan pintu',
+        !!o && o.suppressSubtitles === true,
+        o ? 'suppressSubtitles=' + o.suppressSubtitles : 'say() tidak pernah dipanggil');
+    })
+    /* (C) Batasnya nyata. Kalau subtitle mati untuk SEMUA hal, Vocabulary dan Reading
+     * kehilangan terjemahan yang memang gunanya - "perbaikan" yang merusak tiga layar lain
+     * bukan perbaikan. */
+    .then(() => audio.play('umbrella', { contentType: 'word' }))
+    .then(() => {
+      const o = opsiTerakhir();
+      check('C Vocabulary (contentType word) TETAP menampilkan terjemahan',
+        !!o && o.suppressSubtitles !== true,
+        o ? 'suppressSubtitles=' + o.suppressSubtitles : 'say() tidak pernah dipanggil');
+    })
+    .then(() => audio.play('She takes the bus every morning.', { contentType: 'sentence' }))
+    .then(() => {
+      const o = opsiTerakhir();
+      check('C Reading/contoh kalimat TETAP menampilkan terjemahan',
+        !!o && o.suppressSubtitles !== true,
+        o ? 'suppressSubtitles=' + o.suppressSubtitles : 'say() tidak pernah dipanggil');
+    })
+    /* (D) Titik panggil tes penempatan mengirim benderanya sendiri juga. Bukan mubazir:
+     * ia yang membuat maksudnya terbaca di tempat soalnya dibangun, dan ia bertahan kalau
+     * suatu hari contentType di sana diganti. */
+    .then(() => {
+      check('D soal listening tes penempatan mengirim suppressSubtitles secara eksplisit',
+        /audio\.play\(q\.script,\{contentType:'listening',suppressSubtitles:true/.test(src),
+        'lapisan kedua, supaya maksudnya terbaca di titik soalnya dibangun');
+      /* (E) Naskah tidak boleh bocor lewat pintu lain: question/options soal listening tidak
+       * pernah memuat skripnya. Ini invarian yang sudah ditulis app.js sebagai komentar;
+       * di sini ia jadi assert. */
+      check('E naskah listening TIDAK ikut ke badan soal (kalau ikut, ia jadi soal membaca)',
+        /Naskahnya TIDAK ikut ke question/.test(src) && /script:item\.script/.test(src),
+        'script disimpan terpisah untuk diputar, bukan untuk ditampilkan');
+      selesai();
+    })
+    .catch((e) => { check('gerbang berjalan sampai selesai', false, String(e && e.message || e)); selesai(); });
+}
+
+selesai();
+
+function selesai() {
+  fs.writeFileSync(path.join(ROOT, 'LISTENING-SUBTITLE-SUPPRESSION-REPORT.json'),
+    JSON.stringify({ schema: 'fiezel-listening-subtitle-suppression-v1', pass: !failed, checks }, null, 2));
+  const lulus = checks.filter((c) => c.status === 'PASS').length;
+  for (const c of checks) if (c.status === 'FAIL') console.error('FAIL ' + c.name + (c.details ? ' — ' + c.details : ''));
+  console.log('listening-subtitle-suppression-test: ' + lulus + '/' + checks.length + ' assert ' + (failed ? 'ADA YANG FAIL' : 'PASS'));
+  process.exit(failed ? 1 : 0);
+}

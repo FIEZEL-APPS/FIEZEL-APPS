@@ -418,6 +418,14 @@
       "evidence": "Semua gate konten PASS lokal; artefak lengkap di Perplexity project files (gen2/); ledger F2 141 entri; red team S19 38 temuan diterapkan + S20 GO.",
       "build": "m025-192",
       "finishedAt": "2026-08-28T22:30:57.773161+00:00"
+    },
+    {
+      "id": "T-033",
+      "title": "Hapus total gerbang A12 Evidence Gatekeeper atas perintah OWNER",
+      "status": "done",
+      "owner": "perplexity-computer (m025-186-feedback-gaps)",
+      "evidence": "Perintah eksplisit owner 2026-08-29: 'matikan A12 di repoku dan hapus total'. Job a12-evidence-gatekeeper dihapus dari a9-a14-autonomous-guardians.yml (needs + verdict + enforce), runA12 dihapus dari tools/fiezel-guardians.mjs. A12 versi quality.yml (kontrak provider TTS, penomoran berbeda) dan tools/a12-red-proof.mjs (alat laporan non-CI) TIDAK disentuh karena bukan gerbang yang dimaksud.",
+      "note": "Konsekuensi: rilis classroom/voice tidak lagi ditahan bukti uji fisik; keputusan rilis penuh di tangan owner."
     }
   ],
   "last_report": {

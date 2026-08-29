@@ -188,6 +188,39 @@
       if (alt && candidates.indexOf(alt) === -1) candidates.push(alt);
     }
 
+    // Pass 1 — kecocokan PERSIS pada kandidat sah selalu menang, apa pun isi distraktor.
+    for (var e = 0; e < candidates.length; e++) {
+      if (normAnswer === candidates[e]) {
+        return {
+          ok: true,
+          distance: 0,
+          matchedDistractor: null,
+          rationale: e === 0 ? 'brain3_production_exact' : 'brain3_production_alternate_accepted',
+          confidence: 1
+        };
+      }
+    }
+
+    // Pass 2 — jawaban yang PERSIS sama dengan distraktor berlabel adalah miskonsepsi yang
+    // diketik sendiri, bukan typo. Ini dicek SEBELUM toleransi jarak-1 ke target: "these"
+    // saat target "those" bukan jari meleset kalau "these" memang distraktor item itu
+    // (A08-F1) — menerimanya sebagai near-match menghapus sinyal diagnostik paling kuat.
+    var distractors = Array.isArray(opts.distractors) ? opts.distractors : [];
+    for (var x = 0; x < distractors.length; x++) {
+      var exactDis = distractors[x];
+      if (!exactDis || typeof exactDis.text !== 'string') continue;
+      var normExactDis = normalize(exactDis.text);
+      if (normExactDis && normAnswer === normExactDis) {
+        return {
+          ok: false,
+          distance: levenshtein(normAnswer, normTarget),
+          matchedDistractor: { text: exactDis.text, misconception: exactDis.misconception },
+          rationale: 'brain3_production_distractor_match',
+          confidence: 0.9
+        };
+      }
+    }
+
     var primary = null;
     for (var c = 0; c < candidates.length; c++) {
       var verdict = matchAgainst(normAnswer, candidates[c]);
@@ -209,7 +242,6 @@
     // sendiri oleh murid bisa masuk ledger. Toleransi distance<=1 yang sama dipakai di sini
     // karena murid yang typo saat menulis miskonsepsinya tetap murid dengan miskonsepsi itu.
     var matchedDistractor = null;
-    var distractors = Array.isArray(opts.distractors) ? opts.distractors : [];
     for (var d = 0; d < distractors.length; d++) {
       var item = distractors[d];
       if (!item || typeof item.text !== 'string') continue;

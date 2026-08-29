@@ -201,7 +201,7 @@ for (const [name, detector] of Object.entries(DETECT)) {
  * ======================================================================================= */
 const POISON = [
   { butir: '(1)', detector: 'remoteTimeoutExplicit', file: 'config', label: 'timeoutMs dihapus dari FIEZEL_CF_REMOTE',
-    poison: s => s.replace(/timeoutMs:8000,\n/, '') },
+    poison: s => s.replace(/timeoutMs:8000,\r?\n/, '') },
   { butir: '(2)', detector: 'remoteTimeoutHonest', file: 'config', label: 'timeoutMs dikembalikan ke 2500 ms',
     poison: s => s.replace('timeoutMs:8000', 'timeoutMs:2500') },
   { butir: '(2)', detector: 'remoteOutlivesEdge', file: 'config', label: 'timeoutMs dipangkas ke bawah TIMEOUT_FAST_S proksi',

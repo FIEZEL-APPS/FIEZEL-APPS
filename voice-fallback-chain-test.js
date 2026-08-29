@@ -480,7 +480,7 @@ check('penjaga: localEngine() tetap menolak mesin neural yang asetnya belum leng
   /st\.prepared \|\| st\.ready/.test(SAY),
   'tanpa pemeriksaan ini satu kalimat gagal memicu inisialisasi 152 MB di tengah pelajaran');
 
-const browserBlock = (/function speakWithBrowser\([\s\S]*?\n  \}\n/.exec(SAY) || [''])[0];
+const browserBlock = (/function speakWithBrowser\([\s\S]*?\r?\n  \}\r?\n/.exec(SAY) || [''])[0];
 check('penjaga: cabang peramban tidak menyentuh aset neural sama sekali',
   Boolean(browserBlock) && !/prepare\(|ensureReady\(|warmAssets|FiezelVoiceRuntime|vendor\//.test(browserBlock),
   browserBlock ? 'speakWithBrowser() berdiri sendiri' : 'speakWithBrowser() tidak ditemukan');
