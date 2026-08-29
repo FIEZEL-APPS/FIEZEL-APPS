@@ -178,8 +178,14 @@ const copyFeatB = require('fs').readFileSync(require('path').join(__dirname,'fea
 check('Failed audio keeps the questions locked',
   /audio-tidak-can-diputar-item/.test(renderer) && /this\.replays--/.test(renderer) && /Soal tetap terkunci/.test(copyFeatB),
   'menjawab tanpa mendengar bukan latihan, dan percobaan yang gagal tidak boleh menghabiskan jatah putar');
+/* m025-202: assert ini dulu menuntut `){const` DALAM SATU BARIS TANPA SPASI, jadi ia merah
+   begitu wave i18n memformat ulang fungsinya ke beberapa baris - padahal kontraknya utuh
+   (listeningExamFor masih menormalkan level di baris pertamanya). Gerbang yang merah karena
+   pemformatan mengajari orang mengabaikan gerbang. Spasi dilonggarkan; yang dijaga tetap sama:
+   level MASUK dan langsung dinormalkan sebelum dipakai menyaring. Kelas temuan D20 (assert
+   proximity -> struktural). */
 check('Exam sessions are level-scoped like everything else',
-  /listeningExamFor\(level\)\{const target=normalizeLevel\(level\)/.test(addon), 'kontrak level m025-136 berlaku di sini juga');
+  /listeningExamFor\(level\)\s*\{\s*const\s+target\s*=\s*normalizeLevel\(level\)/.test(addon), 'kontrak level m025-136 berlaku di sini juga');
 check('The listening exam bank is precached for offline use', /listening-exam-v1\.json/.test(sw), 'shell offline harus membawanya juga');
 
 const report = {
