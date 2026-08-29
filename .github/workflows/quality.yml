@@ -127,6 +127,11 @@ jobs:
           node th-coverage-test.js
           node boot-order-test.js
           node splash-first-paint-test.js
+          # m025-199: m025-84 memindahkan markup splash ke frame pertama, tetapi peramban
+          # tetap menahan cat sampai style.css (286 KB) berlaku - separuh cacat yang sama
+          # bertahan sampai pemilik melaporkannya lagi. Gerbang ini menjaga separuh kedua,
+          # berikut jaminan tirai tidak terangkat sebelum lembarnya berlaku.
+          node boot-first-paint-nonblocking-test.js
           node splash-choreography-test.js
           node observability-privacy-test.js
           node analytics-privacy-test.js
