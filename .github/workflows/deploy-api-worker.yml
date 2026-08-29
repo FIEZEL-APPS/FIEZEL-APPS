@@ -49,16 +49,47 @@ jobs:
           # ID-nya adalah worker fiezel-api yang SEDANG live: endpoint settings script
           # mengembalikan binding produksi hari ini (CORE_DB, STATS_DB, CFG). Deploy ulang
           # dengan ID yang sama persis = perilaku data tidak berubah, hanya kode+vars.
-          SETTINGS=$(curl -sf -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
-            "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/scripts/fiezel-api/settings")
-          CORE_ID=$(echo "$SETTINGS" | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const b=JSON.parse(s).result.bindings.find(b=>b.name==='CORE_DB');if(!b)process.exit(1);console.log(b.id||b.database_id)})")
-          STATS_ID=$(echo "$SETTINGS" | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const b=JSON.parse(s).result.bindings.find(b=>b.name==='STATS_DB');if(!b)process.exit(1);console.log(b.id||b.database_id)})")
-          KV_ID=$(echo "$SETTINGS" | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const b=JSON.parse(s).result.bindings.find(b=>b.name==='CFG');if(!b)process.exit(1);console.log(b.namespace_id||b.id)})")
-          test -n "$CORE_ID" && test -n "$STATS_ID" && test -n "$KV_ID"
-          sed -i "s|<isi setelah: wrangler d1 create fiezel-core>|$CORE_ID|" wrangler.toml
-          sed -i "s|<isi setelah: wrangler d1 create fiezel-stats>|$STATS_ID|" wrangler.toml
-          sed -i "s|<isi setelah: wrangler kv namespace create CFG>|$KV_ID|" wrangler.toml
-          grep -c '<isi setelah' wrangler.toml && exit 1 || true
+          curl -sf -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/scripts/fiezel-api/settings" > /tmp/settings.json
+          node <<'JS'
+          const fs = require('fs');
+          const bindings = JSON.parse(fs.readFileSync('/tmp/settings.json','utf8')).result.bindings;
+          const find = n => bindings.find(b => b.name === n);
+          const id = b => b && (b.id || b.database_id || b.namespace_id);
+          let toml = fs.readFileSync('wrangler.toml','utf8');
+          // Tiga binding WAJIB: kalau tidak ada di worker live, deploy harus gagal keras.
+          for (const [name, ph] of [
+            ['CORE_DB',  '<isi setelah: wrangler d1 create fiezel-core>'],
+            ['STATS_DB', '<isi setelah: wrangler d1 create fiezel-stats>'],
+            ['CFG',      '<isi setelah: wrangler kv namespace create CFG>'],
+          ]) {
+            const v = id(find(name));
+            if (!v) { console.error(`binding wajib ${name} tidak ada di worker live`); process.exit(1); }
+            toml = toml.replace(ph, v);
+          }
+          // LEARNING_DB OPSIONAL: modul learning membaca env.LEARNING_DB dan fail-closed
+          // saat null (route-wiring.js:learningEnv). Kalau database belum pernah dibuat di
+          // akun, lepas bloknya supaya deploy tidak gagal; endpoint learning tetap mati
+          // sampai owner membuat fiezel-learning lalu deploy ulang.
+          const lv = id(find('LEARNING_DB'));
+          if (lv) {
+            toml = toml.replace('<isi setelah: wrangler d1 create fiezel-learning>', lv);
+          } else {
+            const blok = /\[\[d1_databases\]\]\s*\nbinding\s*=\s*"LEARNING_DB"[\s\S]*?<isi setelah: wrangler d1 create fiezel-learning>"\s*\n/;
+            if (!blok.test(toml)) { console.error('blok LEARNING_DB tidak ditemukan untuk dilepas'); process.exit(1); }
+            toml = toml.replace(blok, '# (blok LEARNING_DB dilepas saat deploy: database fiezel-learning belum ada di akun)\n');
+            console.log('LEARNING_DB tidak ada di worker live: blok dilepas, modul learning tetap mati (fail-closed).');
+          }
+          // ROUTES: custom domain api.fiezel.my.id SUDAH menempel pada worker live dan
+          // lampiran itu bertahan lintas deploy. Token CI tidak berizin Zone->Workers
+          // Routes (error 10000), jadi blok routes dilepas saat deploy: kode+vars tetap
+          // terkirim, alamat publik tidak berubah. Mengubah route tetap urusan owner.
+          const rblok = /routes\s*=\s*\[[\s\S]*?\]\s*\n/;
+          if (!rblok.test(toml)) { console.error('blok routes tidak ditemukan untuk dilepas'); process.exit(1); }
+          toml = toml.replace(rblok, '# (blok routes dilepas saat deploy: token CI tanpa izin zona; custom domain live tetap menempel)\n');
+          if (toml.includes('<isi setelah')) { console.error('masih ada placeholder yang tidak tertangani'); process.exit(1); }
+          fs.writeFileSync('wrangler.toml', toml);
+          JS
           npx --yes wrangler@3 deploy
 
       - name: Ringkasan

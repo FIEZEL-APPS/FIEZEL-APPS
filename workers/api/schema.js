@@ -52,7 +52,21 @@ export const BYTE_LIMITS = Object.freeze({
   '/api/quota': 512,            // GET, tanpa body
   '/api/usage/events': 16384,   // batch event klien; sama dengan /api/usage/event (tunggal) yang digantikannya
   '/api/usage/retention': 2048, // {cohort_day, day_index} + amplop
-  '/api/usage/pepper': 512      // GET, tanpa body
+  '/api/usage/pepper': 512,     // GET, tanpa body
+  // --- SLOT 7: lapisan sosial (route-social.js). Payload kecil = CPU kecil;
+  // satu-satunya yang besar adalah evidence batch (maks 20 event, pola LIMITS
+  // analytics 8KB — spec sosial §4.4.2).
+  '/api/social/profile/create': 1024,
+  '/api/social/profile/check': 512,
+  '/api/social/profile/me': 512,        // GET, tanpa body
+  '/api/social/friends/invite': 512,
+  '/api/social/friends/redeem': 512,
+  '/api/social/friends': 512,           // GET, tanpa body
+  '/api/social/cheer': 512,
+  '/api/social/rank/evidence': 8192,
+  '/api/social/rank/board/friends': 512, // GET, tanpa body
+  '/api/social/rank/board/league': 512,  // GET, tanpa body
+  '/api/social/rank/optout': 512
 });
 
 /** Cap terakhir untuk path yang tidak terdaftar: kecil, sengaja. */
@@ -111,7 +125,8 @@ export const CLIENT_FLAG_DEFAULTS = Object.freeze({
   cfTtsEnabled: false,     // TTS lewat gateway CF
   cfQuotaEnabled: false,   // tampilkan/patuhi kuota server
   cfAnalyticsEnabled: false,
-  cfIdentityEnabled: false // terbitkan identitas cookie
+  cfIdentityEnabled: false, // terbitkan identitas cookie
+  cfSocialEnabled: false    // lapisan sosial (profil/teman/leaderboard) — SLOT 7
 });
 
 /** Kill switch tingkat server (bukan flag klien): mematikan jalur mahal. */
@@ -119,7 +134,8 @@ export const KILL_SWITCH_DEFAULTS = Object.freeze({
   ai: false,
   tts: false,
   coach: false,
-  analytics: false
+  analytics: false,
+  social: false
 });
 
 /* --------------------------------------------------------------------------

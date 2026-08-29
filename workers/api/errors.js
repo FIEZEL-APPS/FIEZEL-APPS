@@ -28,7 +28,15 @@ export const ERR = {
   CLAIM_INVALID: 'claim_invalid',
   RATE_LIMITED: 'rate_limited',
   UNAVAILABLE: 'unavailable',
-  INTERNAL: 'internal_error'
+  INTERNAL: 'internal_error',
+  // --- lapisan sosial (SLOT 7, route-social.js) ---------------------------
+  // Satu tabel tetap satu-satunya tempat kode galat lahir (aturan berkas ini).
+  SOCIAL_DISABLED: 'social_disabled',   // gerbang flag sosial menolak (fail-closed)
+  PROFILE_EXISTS: 'profile_exists',     // sub ini sudah punya profil
+  PROFILE_REQUIRED: 'profile_required', // rute sosial butuh profil (belum dibuat)
+  HANDLE_TAKEN: 'handle_taken',         // handle sudah diklaim (unik case-insensitive)
+  CODE_INVALID: 'code_invalid',         // SATU galat untuk SEMUA sebab kode undangan (anti-oracle)
+  LIMIT_REACHED: 'limit_reached'        // batas struktural (3 kode aktif / 50 teman)
 };
 
 /**
