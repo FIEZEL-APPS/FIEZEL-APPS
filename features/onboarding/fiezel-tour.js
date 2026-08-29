@@ -43,6 +43,19 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
 
+  // AI-02 F01: naskah tur diambil dari lapisan i18n (copy-id-feat-b.js), bukan literal di
+  // titik pakai. Di browser runtime-nya dimuat lebih dulu (index.html); di Node (tour-test
+  // dan tours-test me-require modul ini langsung) modul memuatnya sendiri supaya nilai
+  // runtime tetap byte-identik dengan copy di reports/copy-tour-gems.md.
+  var I18N = (typeof globalThis !== 'undefined' && globalThis.FiezelI18n) || null;
+  if (!I18N && typeof require === 'function') {
+    try {
+      I18N = require('../i18n/fiezel-i18n.js');
+      require('../i18n/copy-id-feat-b.js');
+    } catch (loadError) { I18N = null; }
+  }
+  function T(key, params) { return I18N ? I18N.t(key, params) : String(key); }
+
   var STORAGE_KEY = 'fiezel-tour-v1';
 
   /**
@@ -88,38 +101,38 @@
     Object.freeze({
       id: 'home',
       target: '.learning-launcher',
-      title: 'Mulai dari Home',
-      body: 'Ini beranda kamu: progres harian, streak, dan saran latihan dari PAW. Semua perjalananmu berangkat dari sini.'
+      title: T('tour.menu-home-title'),
+      body: T('tour.menu-home-body')
     }),
     Object.freeze({
       id: 'vocab-grammar',
       target: '.bottomnav [data-view="vocab"]',
-      title: 'Vocab dan Grammar',
-      body: 'Tab Vocab buat nambah kosakata, tab Grammar buat materi tata bahasa \u2014 dua fondasi yang saling nguatin.'
+      title: T('tour.menu-vocab-title'),
+      body: T('tour.menu-vocab-body')
     }),
     Object.freeze({
       id: 'reading-peta',
       target: '.bottomnav [data-view="reading"]',
-      title: 'Reading dan Peta',
-      body: 'Reading isinya bacaan berjenjang plus soalnya. Peta nunjukin jalur belajarmu dari A1 sampai C2 \u2014 biar arahmu jelas.'
+      title: T('tour.menu-reading-title'),
+      body: T('tour.menu-reading-body')
     }),
     Object.freeze({
       id: 'ask',
       target: '.topbar .ask-button',
-      title: 'Tanya FIEZEL?',
-      body: 'Tombol di kanan ini pintu ke PAW, pembimbing kamu. Bingung apa pun, tanya di sini (butuh jaringan).'
+      title: T('tour.menu-ask-title'),
+      body: T('tour.menu-ask-body')
     }),
     Object.freeze({
       id: 'level',
       target: '.home-level-context',
-      title: 'Chip level kamu',
-      body: 'Chip ini nunjukin level aktifmu. Ketuk buat pindah level \u2014 materi dan latihan langsung ngikutin pilihanmu.'
+      title: T('tour.menu-level-title'),
+      body: T('tour.menu-level-body')
     }),
     Object.freeze({
       id: 'settings',
       target: '.topbar-actions [aria-label="Buka pengaturan"]',
-      title: 'Tombol Pengaturan',
-      body: 'Ini pintu ke FIEZEL Control Room: suara, gerak, tampilan, sampai data belajarmu \u2014 semuanya kamu yang pegang.'
+      title: T('tour.menu-settings-title'),
+      body: T('tour.menu-settings-body')
     }),
     // PENUTUP. Targetnya wordmark FIEZEL - benda paling netral di layar, dan bukan pintu ke
     // fitur apa pun. Di sinilah tur menu berhenti: tidak ada langkah kedelapan yang membuka
@@ -128,8 +141,8 @@
     Object.freeze({
       id: 'penutup',
       target: '.topbar .brand-button',
-      title: 'Tur menu selesai!',
-      body: 'Kamu udah kenal semua menunya. Tur lanjutan bakal muncul otomatis tiap kamu masuk fitur baru \u2014 santai aja.'
+      title: T('tour.menu-end-title'),
+      body: T('tour.menu-end-body')
     })
   ]);
 
@@ -142,14 +155,14 @@
     Object.freeze({
       id: 'putar',
       target: '#libraryPlay',
-      title: 'Ketuk buat mulai',
-      body: 'Tombol putar ini yang menghidupkan ceritanya. Ketuk sekali buat jalan, ketuk lagi buat jeda \u2014 kapan pun kamu mau.'
+      title: T('tour.lib-play-title'),
+      body: T('tour.lib-play-body')
     }),
     Object.freeze({
       id: 'subtitle',
       target: '.library-sentence',
-      title: 'Subtitle ngikutin suara',
-      body: 'Teksnya jalan bareng audionya, kalimat demi kalimat. Sambil dengar sambil baca \u2014 telinga dan mata belajar bareng.'
+      title: T('tour.lib-subtitle-title'),
+      body: T('tour.lib-subtitle-body')
     }),
     // Toggle Gem Terjemahan adalah ID KONTRAK BERSAMA dengan pekerjaan gems yang berjalan
     // paralel (#fslTranslateToggle). Selama elemennya belum ada, resolveSteps melewatinya -
@@ -157,14 +170,14 @@
     Object.freeze({
       id: 'terjemahan',
       target: '#fslTranslateToggle, #libraryTranslateToggle',
-      title: 'Terjemahan Otomatis',
-      body: 'Nyalakan toggle ini, dan tiap kalimat subtitle langsung diterjemahkan ke bahasa Indonesia. Harganya 1 Gem Terjemahan per sesi, dan butuh jaringan, ya.'
+      title: T('tour.lib-translate-title'),
+      body: T('tour.lib-translate-body')
     }),
     Object.freeze({
       id: 'kecepatan',
       target: '.topbar-actions [aria-label="Buka pengaturan"]',
-      title: 'Mau lebih pelan?',
-      body: 'Kecepatan suara bisa kamu atur di FIEZEL Control Room, lewat tombol Pengaturan. Setelannya nempel buat semua sesi berikutnya.'
+      title: T('tour.lib-speed-title'),
+      body: T('tour.lib-speed-body')
     })
   ]);
 
@@ -175,26 +188,26 @@
     Object.freeze({
       id: 'sekali-dengar',
       target: '#speakingListeningRoot .fsl-card',
-      title: 'Dengar sekali, jawab',
-      body: 'Di sini audionya cuma diputar sekali \u2014 kayak percakapan sungguhan. Pasang telinga baik-baik, baru pilih jawabanmu.'
+      title: T('tour.listen-once-title'),
+      body: T('tour.listen-once-body')
     }),
     Object.freeze({
       id: 'meleset',
       target: '#speakingListeningRoot .fsl-privacy',
-      title: 'Meleset? Nggak apa-apa',
-      body: 'Sekali-dengar memang menantang, dan salah itu bagian dari latihan. PAW nemenin kamu di tiap soalnya.'
+      title: T('tour.listen-miss-title'),
+      body: T('tour.listen-miss-body')
     }),
     Object.freeze({
       id: 'terjemahan',
       target: '#fslTranslateToggle',
-      title: 'Terjemahan Indonesia',
-      body: 'Toggle ini nampilin terjemahan tiap soal, seharga 1 Gem Terjemahan per sesi. Gem-nya kamu dapat gratis dari streak jawaban benar.'
+      title: T('tour.listen-translate-title'),
+      body: T('tour.listen-translate-body')
     }),
     Object.freeze({
       id: 'kecepatan',
       target: '.topbar-actions [aria-label="Buka pengaturan"]',
-      title: 'Atur kecepatan suara',
-      body: 'Terlalu cepat? Kecepatan suara bisa diatur di FIEZEL Control Room \u2014 buka lewat tombol Pengaturan kapan aja.'
+      title: T('tour.listen-speed-title'),
+      body: T('tour.listen-speed-body')
     })
   ]);
 
@@ -219,6 +232,26 @@
   function prefersReducedMotion(env) {
     try {
       return !!(env && env.matchMedia && env.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    } catch (_) { return false; }
+  }
+
+  /**
+   * I11 (O1-003): mode pelajaran aktif. Tur TIDAK BOLEH mulai, maju, atau tercat di atas
+   * pelajaran yang sedang berjalan - lapisan apa pun di atas soal melanggar hukum hierarki
+   * (pertanyaan > opsi > segalanya). Sumber kebenarannya ekspor FiezelStage.lessonMode()
+   * dari app.js (turunan murni stageStack, dipasang khusus untuk penjaga ini); kelas
+   * body.fz-lesson-mode dipakai sebagai cadangan kalau ekspornya belum termuat.
+   */
+  function lessonModeActive(env) {
+    try {
+      var stage = env && env.FiezelStage;
+      if (!stage && typeof self !== 'undefined') stage = self.FiezelStage;
+      if (stage && typeof stage.lessonMode === 'function') return stage.lessonMode() === true;
+    } catch (_) {}
+    try {
+      var body = env && env.document && env.document.body;
+      return !!(body && body.classList && typeof body.classList.contains === 'function'
+        && body.classList.contains('fz-lesson-mode'));
     } catch (_) { return false; }
   }
 
@@ -296,6 +329,15 @@
     if (!doc || typeof doc.createElement !== 'function') return { shown: false, reason: 'no_document' };
     if (opts.force !== true && completed(target)) return { shown: false, reason: 'completed' };
 
+    // I11 (O1-003): PELAJARAN MENANG ATAS TUR. Diperiksa SEBELUM resolveSteps, dan alasannya
+    // bukan gaya: mode pelajaran menyembunyikan topbar/bottomnav (display:none), jadi
+    // resolveSteps akan membuang target-target itu dan menyegel tur sebagai 'no_target' -
+    // jatah sekali-tampilnya hangus di tengah pelajaran murid. Kembali TANPA markCompleted:
+    // tur yang tertunda pelajaran BERHAK ditawarkan lagi nanti (adil untuk pemanggil yang
+    // membaca completed() maupun untuk bendera state.toursSeen milik app.js, yang hanya
+    // dicatat ketika shown/no_target).
+    if (lessonModeActive(target)) return { shown: false, reason: 'lesson_active' };
+
     var resolved = resolveSteps(target, Array.isArray(opts.steps) ? opts.steps : STEPS);
     // Tidak ada yang bisa ditunjuk berarti tidak ada yang bisa diajarkan. Ditandai selesai
     // supaya tur tidak mencoba lagi setiap kali Home dirender ulang.
@@ -309,6 +351,21 @@
 
     var index = 0;
     var closed = false;
+    // I11 penahanan lapisan (O1-003): tur lama tidak punya kait perubahan layar - renderInner
+    // mengganti seluruh #app dan kartunya tetap tercat di atas layar baru (terbukti live:
+    // kartu tur listening menutupi Peta, Pengaturan, bahkan soal grammar di 320px).
+    //   - paused: pelajaran mulai di tengah tur -> tur DITUNDA sopan (disembunyikan), bukan
+    //     dibakar; kalau layarnya kembali setelah pelajaran usai, tur dilanjutkan.
+    //   - jangkar lingkup: target langkah PERTAMA yang lolos resolve. Ia selalu elemen di
+    //     dalam view yang dijelaskan tur (`.learning-launcher`, `.fsl-card`, `#libraryPlay`),
+    //     jadi hilangnya jangkar = view berganti = tur ditutup, bukan dibiarkan bocor di
+    //     atas layar lain.
+    var paused = false;
+    var anchorSel = resolved[0] ? resolved[0].target : null;
+    var contextTimer = null;
+    var resumeTimer = null;
+    var bodyObserver = null;
+    var appObserver = null;
 
     function finish(via) {
       if (closed) return false;
@@ -323,6 +380,9 @@
     }
 
     function paint() {
+      // I11: tidak pernah mengecat di atas pelajaran - kalau mode pelajaran menyala di antara
+      // dua cat (resize, orientasi, lanjut), turnya menunda dirinya alih-alih menimpa soal.
+      if (lessonModeActive(target)) { pauseTour(); return; }
       var current = resolved[index];
       var node = null;
       try { node = doc.querySelector(current.target); } catch (_) { node = null; }
@@ -378,7 +438,7 @@
         + '<p>' + escapeHtml(current.body) + '</p>'
         + '<div class="fz-tour-actions">'
         + '<button type="button" class="fz-tour-skip" data-tour-skip>Lewati</button>'
-        + '<button type="button" class="fz-tour-next" data-tour-next>' + (isLast ? 'Siap!' : 'Lanjut') + '</button>'
+        + '<button type="button" class="fz-tour-next" data-tour-next>' + (isLast ? 'Siap!' : T('tour.next')) + '</button>'
         + '</div></div>';
 
       // Kartu penjelasan diletakkan di paruh layar yang BERLAWANAN dengan target, supaya ia
@@ -396,9 +456,80 @@
     }
 
     function next() {
+      // I11: tur tidak pernah MAJU di atas pelajaran - Enter/klik yang nyasar saat mode
+      // pelajaran menunda, tidak memajukan.
+      if (lessonModeActive(target)) { pauseTour(); return; }
       if (index >= resolved.length - 1) { finish('finish'); return; }
       index += 1;
       paint();
+    }
+
+    /* ---- I11: tunda / lanjut / tutup-sopan (tanpa membakar jatah tampil) ---- */
+
+    function anchorAlive() {
+      if (!anchorSel) return false;
+      var node = null;
+      try { node = doc.querySelector(anchorSel); } catch (_) { node = null; }
+      if (!node) return false;
+      try {
+        var box = typeof node.getBoundingClientRect === 'function' ? node.getBoundingClientRect() : null;
+        return !box || (box.width > 0 && box.height > 0);
+      } catch (_) { return true; }
+    }
+
+    function pauseTour() {
+      if (closed || paused) return;
+      paused = true;
+      // Inline, bukan kelas CSS: style.css milik agen lain, dan penundaan ini harus bekerja
+      // apa pun isi stylesheet-nya.
+      try { host.style.display = 'none'; } catch (_) {}
+    }
+
+    function resumeTour() {
+      if (closed || !paused) return;
+      paused = false;
+      try { host.style.display = ''; } catch (_) {}
+      paint();
+    }
+
+    // Ditutup karena DIINTERUPSI (ganti view / pelajaran tidak kembali ke layar tur), bukan
+    // karena murid menolaknya - jadi TANPA markCompleted: kelayakan tampil tidak dibakar.
+    // Pemanggil tetap diberi tahu lewat onFinish supaya tidak ada yang menebak dari efek samping.
+    function dismissQuietly(via) {
+      if (closed) return;
+      closed = true;
+      detach();
+      try { if (host.parentNode) host.parentNode.removeChild(host); } catch (_) {}
+      if (typeof opts.onFinish === 'function') {
+        try { opts.onFinish({ via: via, step: index }); } catch (_) {}
+      }
+    }
+
+    function onContextChange() {
+      if (closed) return;
+      if (lessonModeActive(target)) { pauseTour(); return; }
+      if (paused) {
+        // Pelajaran usai. Layar berikutnya digambar SETELAH kelas body berganti, jadi beri
+        // satu jeda pendek sebelum memutuskan: jangkar kembali -> lanjut; tidak -> tutup sopan.
+        if (resumeTimer) clearTimeout(resumeTimer);
+        resumeTimer = setTimeout(function () {
+          if (closed || lessonModeActive(target)) return;
+          if (anchorAlive()) resumeTour();
+          else dismissQuietly('lesson_interrupt');
+        }, 360);
+        if (resumeTimer && typeof resumeTimer.unref === 'function') resumeTimer.unref();
+        return;
+      }
+      if (!anchorAlive()) dismissQuietly('view_change');
+    }
+
+    function scheduleContextCheck() {
+      if (closed) return;
+      // Pelajaran menunda SEKETIKA; keputusan lain menunggu render-nya selesai dulu.
+      if (lessonModeActive(target)) { pauseTour(); return; }
+      if (contextTimer) clearTimeout(contextTimer);
+      contextTimer = setTimeout(onContextChange, 240);
+      if (contextTimer && typeof contextTimer.unref === 'function') contextTimer.unref();
     }
 
     function bind() {
@@ -418,23 +549,48 @@
     // tombolnya sendiri gagal terpasang - lapisan penuh layar tanpa cara maju adalah jebakan.
     function onOverlayClick() { next(); }
     function onKey(event) {
+      if (paused) return; /* I11: keyboard milik pelajaran selama tur tertunda */
       var key = event && event.key;
       if (key === 'Escape') finish('escape');
       else if (key === 'Enter' || key === ' ') next();
     }
-    function onReflow() { if (!closed) paint(); }
+    function onReflow() { if (!closed && !paused) paint(); }
 
     function detach() {
       try { host.removeEventListener('click', onOverlayClick); } catch (_) {}
       try { if (target.removeEventListener) target.removeEventListener('resize', onReflow); } catch (_) {}
       try { if (target.removeEventListener) target.removeEventListener('orientationchange', onReflow); } catch (_) {}
       try { if (doc.removeEventListener) doc.removeEventListener('keydown', onKey); } catch (_) {}
+      try { if (bodyObserver) bodyObserver.disconnect(); } catch (_) {}
+      try { if (appObserver) appObserver.disconnect(); } catch (_) {}
+      try { if (contextTimer) clearTimeout(contextTimer); } catch (_) {}
+      try { if (resumeTimer) clearTimeout(resumeTimer); } catch (_) {}
     }
 
     try { host.addEventListener('click', onOverlayClick); } catch (_) {}
     try { if (target.addEventListener) target.addEventListener('resize', onReflow); } catch (_) {}
     try { if (target.addEventListener) target.addEventListener('orientationchange', onReflow); } catch (_) {}
     try { if (doc.addEventListener) doc.addEventListener('keydown', onKey); } catch (_) {}
+
+    // I11: dua pengamat penahanan. (1) kelas <body> - fz-lesson-mode disetel syncLessonMode
+    // SEBELUM layar pelajaran digambar, jadi turnya sudah tersembunyi saat soal muncul.
+    // (2) anak-anak #app - renderInner/setApp mengganti seluruh isinya pada tiap navigasi;
+    // begitu jangkar lingkupnya hilang, tur menutup dirinya alih-alih bocor ke layar lain.
+    // Keduanya opsional (MutationObserver tidak ada di harness Node murni) - tanpa pengamat,
+    // penjaga di paint()/next()/show() tetap berdiri.
+    try {
+      var MO = target.MutationObserver
+        || (typeof MutationObserver !== 'undefined' ? MutationObserver : null);
+      if (typeof MO === 'function' && doc.body) {
+        bodyObserver = new MO(scheduleContextCheck);
+        bodyObserver.observe(doc.body, { attributes: true, attributeFilter: ['class'] });
+        var appHost = doc.querySelector('#app');
+        if (appHost) {
+          appObserver = new MO(scheduleContextCheck);
+          appObserver.observe(appHost, { childList: true });
+        }
+      }
+    } catch (_) { bodyObserver = null; appObserver = null; }
 
     paint();
     try { doc.body.appendChild(host); } catch (_) { detach(); return { shown: false, reason: 'append_failed' }; }
@@ -445,6 +601,7 @@
       steps: resolved.length,
       stepIndex: function () { return index; },
       next: next,
+      paused: function () { return paused; },
       close: function () { return finish('close'); }
     };
   }

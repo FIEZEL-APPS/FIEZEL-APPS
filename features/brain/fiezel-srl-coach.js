@@ -153,9 +153,40 @@
    *   2. review materi yang mendekati jadwal lupa,
    *   3. bebas (murid terkalibrasi baik layak diberi otonomi — opus C9).
    */
+  var NASKAH_ID = Object.freeze({
+    'brain-srl.focus-named': 'Perkuat ' + '{focus}' + ' — di situ jawabanmu paling sering meleset belakangan ini',
+    'brain-srl.focus-generic': 'Perkuat bagian yang jawabannya paling sering meleset belakangan ini',
+    'brain-srl.goal-ask': 'Mau ke mana sesi ini' + '{size}' + '?',
+    'brain-srl.goal-size': ' (' + '{n}' + ' soal)',
+    'brain-srl.option-review': 'Ulang materi yang mendekati jadwal lupa, supaya tidak perlu dipelajari dari nol lagi',
+    'brain-srl.option-free': 'Bebas — campuran materi, kamu yang pegang kemudi',
+    'brain-srl.predict-ask': 'Seberapa yakin jawabanmu akan benar?',
+    'brain-srl.group-fallback': 'materi sesi ini',
+    'brain-srl.calib-over': 'Kamu yakin ' + '{conf}' + ' di ' + '{name}' + ' tapi benar ' + '{acc}' + '. Taksiranmu lebih tinggi dari hasilnya — sebelum memilih jawaban, sebutkan dulu ' + 'aturannya dalam satu kalimat; kalau kalimat itu tidak keluar, turunkan taksiranmu.',
+    'brain-srl.calib-under': 'Kamu menaksir ' + '{conf}' + ' di ' + '{name}' + ' padahal benar ' + '{acc}' + '. Jawabanmu lebih tepat dari taksiranmu — saat pola soalnya sudah pernah kamu ' + 'kerjakan dengan benar, berani pasang taksiran yang lebih tinggi.',
+    'brain-srl.calib-good': 'Taksiranmu di ' + '{name}' + ' (' + '{conf}' + ') cocok dengan hasilnya (' + '{acc}' + '). Cara menaksir seperti ini layak dipertahankan — lanjutkan menaksir sebelum melihat kunci.',
+    'brain-srl.reflect-no-data': 'Sesi ini tidak ada taksiran keyakinan yang bisa dibandingkan dengan hasil.',
+    'brain-srl.faded-note': ' Tiga sesi berturut-turut taksiranmu akurat, jadi pertanyaan ' + 'keyakinan akan berhenti muncul selama ' + '{n}' + ' sesi ke depan.'
+  });
+
+  /* Injeksi naskah OPSIONAL (W2-FEAT-A, desain W1-FEAT-A): NASKAH_ID di bawah adalah
+   * baseline byte-identik dengan naskah beku gerbang emas. Pemanggil boleh menitipkan
+   * tabel pengganti per-kunci (mis. terjemahan th yang dirakit app dari copy-map i18n).
+   * Fallback per-kunci: kunci yang tidak ada di tabel titipan jatuh ke NASKAH_ID —
+   * modul ini TIDAK menyentuh lapisan i18n, kemurnian brain dipertahankan (AI-08 F01). */
+  function lineFor(T, key) {
+    return (T && typeof T[key] === 'string') ? T[key] : NASKAH_ID[key];
+  }
+  function fill(text, params) {
+    return String(text).replace(/\{(\w+)\}/g, function (m, name) {
+      return params && Object.prototype.hasOwnProperty.call(params, name) ? String(params[name]) : m;
+    });
+  }
+
   function sessionPlan(state, opts, nowMs) {
     var st = sanitizeState(state);
     var o = opts && typeof opts === 'object' ? opts : {};
+    var T = (o.naskah && typeof o.naskah === 'object') ? o.naskah : null;
     var focusRaw = Array.isArray(o.suggestedFocus) ? o.suggestedFocus[0] : o.suggestedFocus;
     var focus = humanize(focusRaw);
     var size = intIn(o.sessionSize, 0, 200);
@@ -163,19 +194,19 @@
     // Naskah spesifik-konten: bila ada titik rawan bernama, sebut namanya. Kalimatnya
     // menunjuk POLA JAWABAN ("paling sering meleset"), bukan sifat orangnya.
     var focusLabel = focus
-      ? 'Perkuat ' + focus + ' — di situ jawabanmu paling sering meleset belakangan ini'
-      : 'Perkuat bagian yang jawabannya paling sering meleset belakangan ini';
+      ? fill(lineFor(T, 'brain-srl.focus-named'), { focus: focus })
+      : lineFor(T, 'brain-srl.focus-generic');
 
     var goalPrompt = {
-      ask: 'Mau ke mana sesi ini' + (size > 0 ? ' (' + size + ' soal)' : '') + '?',
+      ask: fill(lineFor(T, 'brain-srl.goal-ask'), { size: size > 0 ? fill(lineFor(T, 'brain-srl.goal-size'), { n: size }) : '' }),
       options: [
         { id: 'focus_weak', label: focusLabel, target: focus || null },
         {
           id: 'review_due',
-          label: 'Ulang materi yang mendekati jadwal lupa, supaya tidak perlu dipelajari dari nol lagi',
+          label: lineFor(T, 'brain-srl.option-review'),
           target: null
         },
-        { id: 'free', label: 'Bebas — campuran materi, kamu yang pegang kemudi', target: null }
+        { id: 'free', label: lineFor(T, 'brain-srl.option-free'), target: null }
       ]
     };
 
@@ -206,6 +237,7 @@
     var o = opts && typeof opts === 'object' ? opts : {};
     var itemIndex = intIn(o.itemIndex, 0, 100000);
     var size = intIn(o.sessionSize, 0, 100000);
+    var T = (o.naskah && typeof o.naskah === 'object') ? o.naskah : null;
 
     if (str(o.affect) === 'frustrated') return null;   // jangan tambah muatan saat gagal
     if (st.fadedRemaining > 0) return null;            // scaffold sedang dilepas (faded)
@@ -217,7 +249,7 @@
     if (itemIndex !== targetIndex) return null;        // hanya SATU indeks per sesi
 
     return freeze({
-      ask: 'Seberapa yakin jawabanmu akan benar?',
+      ask: lineFor(T, 'brain-srl.predict-ask'),
       scale: SCALE.slice(),
       rationale: 'brain3_srl_predict_once'
     });
@@ -244,10 +276,10 @@
   /** Kelompokkan per konsep lalu pilih kelompok dengan |bias| terbesar: pesan kalibrasi
    *  wajib menunjuk konten BERNAMA, dan kelompok paling meleset adalah yang paling layak
    *  disebut. Baris tanpa nama konsep tetap dihitung sebagai kelompok 'materi sesi ini'. */
-  function worstGroup(rows) {
+  function worstGroup(rows, T) {
     var groups = {};
     for (var i = 0; i < rows.length; i++) {
-      var key = rows[i].concept || 'materi sesi ini';
+      var key = rows[i].concept || lineFor(T, 'brain-srl.group-fallback');
       if (!groups[key]) groups[key] = { concept: key, n: 0, conf: 0, hit: 0 };
       groups[key].n++;
       groups[key].conf += rows[i].confidence;
@@ -266,26 +298,21 @@
 
   /** Pesan kalibrasi: selalu konten bernama + dua angka + satu tindakan berikutnya.
    *  Tidak pernah menilai orangnya — hanya taksiran dan cara memperbaikinya. */
-  function calibrationMessage(group, bias) {
+  function calibrationMessage(group, bias, T) {
     var name = group.concept;
     var confTxt = pct(group.meanConf);
     var accTxt = pct(group.accuracy);
     if (bias >= BIAS_GOOD) {
       // Terlalu yakin: kuadran paling berbahaya (opus C9) — taksiran tinggi menutup
       // kebutuhan belajar. Tindakannya: uji alasan sebelum memilih jawaban.
-      return 'Kamu yakin ' + confTxt + ' di ' + name + ' tapi benar ' + accTxt +
-        '. Taksiranmu lebih tinggi dari hasilnya — sebelum memilih jawaban, sebutkan dulu ' +
-        'aturannya dalam satu kalimat; kalau kalimat itu tidak keluar, turunkan taksiranmu.';
+      return fill(lineFor(T, 'brain-srl.calib-over'), { conf: confTxt, name: name, acc: accTxt });
     }
     if (bias <= -BIAS_GOOD) {
       // Kurang yakin: buktinya lebih baik dari taksirannya — eksplisitkan bukti keberhasilan.
-      return 'Kamu menaksir ' + confTxt + ' di ' + name + ' padahal benar ' + accTxt +
-        '. Jawabanmu lebih tepat dari taksiranmu — saat pola soalnya sudah pernah kamu ' +
-        'kerjakan dengan benar, berani pasang taksiran yang lebih tinggi.';
+      return fill(lineFor(T, 'brain-srl.calib-under'), { conf: confTxt, name: name, acc: accTxt });
     }
     // Terkalibrasi: yang dipuji CARA MENAKSIR (tindakan yang bisa diulang), bukan orangnya.
-    return 'Taksiranmu di ' + name + ' (' + confTxt + ') cocok dengan hasilnya (' + accTxt +
-      '). Cara menaksir seperti ini layak dipertahankan — lanjutkan menaksir sebelum melihat kunci.';
+    return fill(lineFor(T, 'brain-srl.calib-good'), { conf: confTxt, name: name, acc: accTxt });
   }
 
   /**
@@ -301,8 +328,9 @@
    *   - sesi tanpa data taksiran (faded/frustrasi) tidak menggerakkan streak ke mana pun —
    *     ketiadaan bukti bukan bukti kalibrasi baik ataupun buruk.
    */
-  function reflect(state, result, nowMs) {
+  function reflect(state, result, nowMs, naskah) {
     var st = sanitizeState(state);
+    var T = (naskah && typeof naskah === 'object') ? naskah : null;
     var o = result && typeof result === 'object' ? result : {};
     var rows = sanitizePredictions(o.predictions);
     var at = num(nowMs, 0);
@@ -314,15 +342,15 @@
     var message, rationale, bias = 0, good = false;
 
     if (rows.length === 0) {
-      message = 'Sesi ini tidak ada taksiran keyakinan yang bisa dibandingkan dengan hasil.';
+      message = lineFor(T, 'brain-srl.reflect-no-data');
       rationale = 'brain3_srl_reflect_no_data';
     } else {
       var sumBias = 0;
       for (var i = 0; i < rows.length; i++) sumBias += rows[i].confidence - (rows[i].correct ? 1 : 0);
       bias = sumBias / rows.length;
       good = Math.abs(bias) < BIAS_GOOD;
-      var group = worstGroup(rows);
-      message = calibrationMessage(group, group.bias);
+      var group = worstGroup(rows, T);
+      message = calibrationMessage(group, group.bias, T);
 
       if (good) {
         goodStreak = Math.min(GOOD_STREAK_TO_FADE, goodStreak + 1);
@@ -333,8 +361,7 @@
           faded = FADE_SESSIONS;
           goodStreak = 0;
           rationale = 'brain3_srl_faded';
-          message += ' Tiga sesi berturut-turut taksiranmu akurat, jadi pertanyaan ' +
-            'keyakinan akan berhenti muncul selama ' + FADE_SESSIONS + ' sesi ke depan.';
+          message += fill(lineFor(T, 'brain-srl.faded-note'), { n: FADE_SESSIONS });
         }
       } else {
         // Kalibrasi memburuk: streak gugur dan tidur dibatalkan — scaffold bangun lagi.

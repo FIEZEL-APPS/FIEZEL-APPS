@@ -526,14 +526,56 @@
    * bentuk kontras jawaban murid vs bentuk benar. Yang kosong dilewati, supaya rotasi tidak
    * pernah jatuh ke frasa hampa.
    */
-  function explanationVariants(ex, it) {
+  var NASKAH_ID = Object.freeze({
+    'brain-tutor.concept-fallback': 'materi ini',
+    'brain-tutor.compare-direct': 'Bandingkan langsung: jawabanmu "' + '{chosen}' + '" vs bentuk benar "' + '{right}' + '"',
+    'brain-tutor.worked-step1': 'Langkah 1 - pegang aturannya: ' + '{rule}' + '.',
+    'brain-tutor.worked-step2': 'Langkah 2 - terapkan ke kalimatnya: "' + '{sentence}' + '".',
+    'brain-tutor.worked-step3': 'Langkah 3 - jadi bentuk yang dipakai: "' + '{answer}' + '".',
+    'brain-tutor.worked-fallback': 'Inti ' + '{concept}' + ': ikuti bentuk yang diminta konteksnya.',
+    'brain-tutor.timing-guess': 'Tadi cepat sekali jawabnya. Coba baca ulang kalimatnya pelan-pelan dulu ya - separuh soal ini dimenangkan di bacaannya, bukan di pilihannya.',
+    'brain-tutor.why-fails': 'Ini yang bikin pilihan tadi gagal - ' + '{why}' + '.',
+    'brain-tutor.not-yet': 'Belum tepat, dan itu wajar di bagian ini.',
+    'brain-tutor.probe-rotated': '{rotated}' + '. Coba pikirkan lagi dari situ.',
+    'brain-tutor.probe-default': 'Sebelum lihat pilihannya lagi - petunjuk waktu di kalimat itu yang mana?',
+    'brain-tutor.hint-rotated': 'Cara lain melihatnya: ' + '{rotated}' + '. Sekarang coba lagi.',
+    'brain-tutor.hint-cue': 'Pegangan singkatnya: ' + '{cue}' + '. Sekarang coba lagi.',
+    'brain-tutor.hint-default': 'Petunjuknya ada di kata yang menunjukkan kapan kejadiannya. Coba lagi.',
+    'brain-tutor.worked-intro': ' Aku kerjakan satu yang mirip dulu ya, biar kelihatan langkahnya.',
+    'brain-tutor.reveal-intro': ' Oke, aku buka sekarang.',
+    'brain-tutor.move-celebrate': 'Nah, itu dia. Yang tadi bikin kamu keliru, barusan kamu lewati - dan kamu melewatinya dengan alasan yang benar, bukan tebakan.',
+    'brain-tutor.move-consolidate': 'Benar. Tapi tadi kamu perlu waktu lumayan, jadi kita mantapkan dulu di sini sebentar sebelum naik.',
+    'brain-tutor.move-stretch': 'Beruntun dan cepat. Ini sudah di bawah kemampuanmu sekarang - aku naikkan sedikit.',
+    'brain-tutor.move-breathe': 'Kita berhenti di sini dulu. Jawabanmu mulai melambat dan mulai meleset bareng, dan itu tanda capek, bukan tanda kamu tidak bisa. Lanjut nanti hasilnya jauh lebih nempel.',
+    'brain-tutor.move-wrapup': 'Soalnya habis. Kita tutup sesi ini.',
+    'brain-tutor.headline-resolved': 'Sesi ini kamu benar-benar melewati ' + '{count}' + ' hal yang tadinya bikin keliru.',
+    'brain-tutor.headline-persistent': 'Ada ' + '{count}' + ' pola yang masih mengganjal - itu yang kita kejar sesi berikutnya.',
+    'brain-tutor.headline-empty': 'Belum ada jawaban di sesi ini.',
+    'brain-tutor.headline-clean': 'Sesi bersih, tanpa pola salah yang berulang.'
+  });
+
+  /* Injeksi naskah OPSIONAL (W2-FEAT-A, desain W1-FEAT-A): NASKAH_ID di bawah adalah
+   * baseline byte-identik dengan naskah beku gerbang emas. Pemanggil boleh menitipkan
+   * tabel pengganti per-kunci (mis. terjemahan th yang dirakit app dari copy-map i18n).
+   * Fallback per-kunci: kunci yang tidak ada di tabel titipan jatuh ke NASKAH_ID —
+   * modul ini TIDAK menyentuh lapisan i18n, kemurnian brain dipertahankan (AI-08 F01). */
+  function lineFor(T, key) {
+    return (T && typeof T[key] === 'string') ? T[key] : NASKAH_ID[key];
+  }
+  function fill(text, params) {
+    return String(text).replace(/\{(\w+)\}/g, function (m, name) {
+      return params && Object.prototype.hasOwnProperty.call(params, name) ? String(params[name]) : m;
+    });
+  }
+
+  function explanationVariants(ex, it, T) {
     var list = [];
     if (clause(ex.rule)) list.push(clause(ex.rule));
     var why = clause(ex.whyFails) || clause(it.whyFails);
     if (why) list.push(why);
     var chosen = clause(it.chosenOption);
     var right = clause(it.correctAnswer || ex.correct);
-    if (chosen && right) list.push('Bandingkan langsung: jawabanmu "' + chosen + '" vs bentuk benar "' + right + '"');
+    if (chosen && right) list.push(fill(lineFor(T, 'brain-tutor.compare-direct'), { chosen: chosen, right: right }));
     return list;
   }
 
@@ -544,26 +586,27 @@
    * tunjukkan bentuk yang keluar. Payload-nya dengan sendirinya berbeda dari `tell`, yang
    * hanya membuka alasan jawaban benar tanpa langkah.
    */
-  function workedExample(ex, it, ruleOverride, conceptLabel) {
+  function workedExample(ex, it, ruleOverride, conceptLabel, T) {
     var steps = [];
     var rule = clause(ruleOverride) || clause(ex.rule);
-    if (rule) steps.push('Langkah 1 - pegang aturannya: ' + rule + '.');
+    if (rule) steps.push(fill(lineFor(T, 'brain-tutor.worked-step1'), { rule: rule }));
     var contoh = clause(it.sentence || ex.example);
-    if (contoh) steps.push('Langkah 2 - terapkan ke kalimatnya: "' + contoh + '".');
+    if (contoh) steps.push(fill(lineFor(T, 'brain-tutor.worked-step2'), { sentence: contoh }));
     var benar = clause(it.correctAnswer || ex.correct);
-    if (benar) steps.push('Langkah 3 - jadi bentuk yang dipakai: "' + benar + '".');
-    if (!steps.length) return 'Inti ' + conceptLabel + ': ikuti bentuk yang diminta konteksnya.';
+    if (benar) steps.push(fill(lineFor(T, 'brain-tutor.worked-step3'), { answer: benar }));
+    if (!steps.length) return fill(lineFor(T, 'brain-tutor.worked-fallback'), { concept: conceptLabel });
     return steps.join(' ');
   }
 
-  function composeTurn(input, session) {
+  function composeTurn(input, session, naskah) {
     var it = input || {};
     var s = session && typeof session === 'object' ? session : null;
+    var T = (naskah && typeof naskah === 'object') ? naskah : null;
     var move = str(it.move);
     var level = str(it.scaffold) || 'hint';
     var ex = it.explanation && typeof it.explanation === 'object' ? it.explanation : {};
     var whyFails = str(it.whyFails);
-    var concept = str(it.conceptLabel) || 'materi ini';
+    var concept = str(it.conceptLabel) || lineFor(T, 'brain-tutor.concept-fallback');
     // Kunci penjelasan memakai id konsep (bukan label tampilannya) supaya cocok dengan yang
     // dicatat record(); label hanya jatuh sebagai cadangan untuk pemanggil lama.
     var conceptKey = str(it.concept) || str(it.conceptLabel);
@@ -574,31 +617,31 @@
     // Berapa kali penjelasan pada (konsep, tangga) ini sudah GAGAL - menentukan variasi frasa.
     var expKey = conceptKey ? (conceptKey + '::' + level) : '';
     var failed = s && expKey && s.explanationsUsed ? num(s.explanationsUsed[expKey], 0) : 0;
-    var variants = explanationVariants(ex, it);
+    var variants = explanationVariants(ex, it, T);
     // Kegagalan pertama menggeser ke varian pertama, berikutnya berputar - tidak pernah
     // kembali ke frasa yang persis sama dua kali berturut-turut selama masih ada varian lain.
     var rotated = failed > 0 && variants.length ? variants[(failed - 1) % variants.length] : '';
 
     if (move === 'hint' || move === 'reteach') {
       if (it.timing === 'guess') {
-        say = 'Tadi cepat sekali jawabnya. Coba baca ulang kalimatnya pelan-pelan dulu ya - separuh soal ini dimenangkan di bacaannya, bukan di pilihannya.';
+        say = lineFor(T, 'brain-tutor.timing-guess');
       } else if (whyFails) {
-        say = 'Ini yang bikin pilihan tadi gagal - ' + clause(whyFails) + '.';
+        say = fill(lineFor(T, 'brain-tutor.why-fails'), { why: clause(whyFails) });
       } else {
-        say = 'Belum tepat, dan itu wajar di bagian ini.';
+        say = lineFor(T, 'brain-tutor.not-yet');
       }
       if (level === 'probe') {
-        ask = rotated ? (rotated + '. Coba pikirkan lagi dari situ.')
-          : (str(ex.howToAvoid) || 'Sebelum lihat pilihannya lagi - petunjuk waktu di kalimat itu yang mana?');
+        ask = rotated ? fill(lineFor(T, 'brain-tutor.probe-rotated'), { rotated: rotated })
+          : (str(ex.howToAvoid) || lineFor(T, 'brain-tutor.probe-default'));
       } else if (level === 'hint') {
-        ask = rotated ? ('Cara lain melihatnya: ' + rotated + '. Sekarang coba lagi.')
-          : clause(ex.memoryCue) ? ('Pegangan singkatnya: ' + clause(ex.memoryCue) + '. Sekarang coba lagi.')
-            : 'Petunjuknya ada di kata yang menunjukkan kapan kejadiannya. Coba lagi.';
+        ask = rotated ? fill(lineFor(T, 'brain-tutor.hint-rotated'), { rotated: rotated })
+          : clause(ex.memoryCue) ? fill(lineFor(T, 'brain-tutor.hint-cue'), { cue: clause(ex.memoryCue) })
+            : lineFor(T, 'brain-tutor.hint-default');
       } else if (level === 'worked') {
-        say += ' Aku kerjakan satu yang mirip dulu ya, biar kelihatan langkahnya.';
-        ask = workedExample(ex, it, rotated, concept);
+        say += lineFor(T, 'brain-tutor.worked-intro');
+        ask = workedExample(ex, it, rotated, concept, T);
       } else {
-        say += ' Oke, aku buka sekarang.';
+        say += lineFor(T, 'brain-tutor.reveal-intro');
         ask = rotated || str(ex.whyCorrect) || str(ex.rule) || '';
         reveal = true;
       }
@@ -606,15 +649,15 @@
       // yang sama yang memutuskan nasibnya: murid tetap salah = penjelasan ini gagal.
       if (s && expKey) s.lastExplanation = { concept: conceptKey, scaffold: level, key: expKey };
     } else if (move === 'celebrate') {
-      say = 'Nah, itu dia. Yang tadi bikin kamu keliru, barusan kamu lewati - dan kamu melewatinya dengan alasan yang benar, bukan tebakan.';
+      say = lineFor(T, 'brain-tutor.move-celebrate');
     } else if (move === 'consolidate') {
-      say = 'Benar. Tapi tadi kamu perlu waktu lumayan, jadi kita mantapkan dulu di sini sebentar sebelum naik.';
+      say = lineFor(T, 'brain-tutor.move-consolidate');
     } else if (move === 'stretch') {
-      say = 'Beruntun dan cepat. Ini sudah di bawah kemampuanmu sekarang - aku naikkan sedikit.';
+      say = lineFor(T, 'brain-tutor.move-stretch');
     } else if (move === 'breathe') {
-      say = 'Kita berhenti di sini dulu. Jawabanmu mulai melambat dan mulai meleset bareng, dan itu tanda capek, bukan tanda kamu tidak bisa. Lanjut nanti hasilnya jauh lebih nempel.';
+      say = lineFor(T, 'brain-tutor.move-breathe');
     } else if (move === 'wrapup') {
-      say = 'Soalnya habis. Kita tutup sesi ini.';
+      say = lineFor(T, 'brain-tutor.move-wrapup');
     } else {
       say = '';
     }
@@ -718,7 +761,8 @@
    * Ringkasan sesi untuk layar akhir dan untuk bukti belajar - dalam bahasa guru, bukan
    * bahasa penilai. Yang dilaporkan bukan "12 dari 16", melainkan apa yang berubah.
    */
-  function summarize(state) {
+  function summarize(state, naskah) {
+    var T = (naskah && typeof naskah === 'object') ? naskah : null;
     var s = state || {};
     var mis = s.misconceptions || {};
     var resolved = s.resolved || {};
@@ -739,11 +783,11 @@
       timings: timings,
       // Satu kalimat yang boleh dibacakan apa adanya kepada murid.
       headline: fixed.length
-        ? 'Sesi ini kamu benar-benar melewati ' + fixed.length + ' hal yang tadinya bikin keliru.'
+        ? fill(lineFor(T, 'brain-tutor.headline-resolved'), { count: fixed.length })
         : persistent.length
-          ? 'Ada ' + persistent.length + ' pola yang masih mengganjal - itu yang kita kejar sesi berikutnya.'
-          : accuracy == null ? 'Belum ada jawaban di sesi ini.'
-            : 'Sesi bersih, tanpa pola salah yang berulang.'
+          ? fill(lineFor(T, 'brain-tutor.headline-persistent'), { count: persistent.length })
+          : accuracy == null ? lineFor(T, 'brain-tutor.headline-empty')
+            : lineFor(T, 'brain-tutor.headline-clean')
     };
   }
 

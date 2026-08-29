@@ -12,14 +12,14 @@
     "C1",
     "C2"
   ],
-  "lessonCount": 153,
+  "lessonCount": 154,
   "levelCounts": {
     "A1": 17,
-    "A2": 23,
+    "A2": 24,
     "B1": 49,
     "B2": 33,
-    "C1": 19,
-    "C2": 12
+    "C1": 20,
+    "C2": 11
   },
   "classroomA1SourceLessons": [
     "grammar_a1_articles",
@@ -1719,9 +1719,9 @@
     },
     {
       "lessonId": "participle_clause",
-      "level": "C2",
+      "level": "C1",
       "sequence": 147,
-      "unit": "C2.1",
+      "unit": "C1.3",
       "title": "Participle clause: meringkas kalimat dengan -ing dan -ed",
       "prerequisites": [],
       "source": "grammar-templates.json",
@@ -1803,6 +1803,19 @@
       "source": "grammar-templates.json",
       "templateId": "AR-006",
       "titleEn": "generic the for species and classes"
+    },
+    {
+      "lessonId": "irregular_comparative_better_worse_forms",
+      "level": "A2",
+      "sequence": 154,
+      "unit": "A2.3",
+      "title": "Better dan worse: bentuk banding tanpa -er",
+      "prerequisites": [
+        "comparative_vs_superlative_scope"
+      ],
+      "source": "grammar-templates.json",
+      "templateId": "CM-005",
+      "titleEn": "irregular comparatives better and worse"
     }
   ]
 }
