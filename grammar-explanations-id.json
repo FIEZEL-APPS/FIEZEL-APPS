@@ -439,8 +439,8 @@
       "misconception": "Kamu pakai past simple buat dua kejadiannya dan cuma nyandar ke “before” atau “after”. Padahal urutannya perlu ditegasin.",
       "reasoning": "temuin “by the time” yang naruh titik acuannya → tandain kejadian yang udah kelar sebelum titik itu",
       "rule": "Past perfect pakai had + bentuk ketiga kata kerja (past participle). Bentuk ini nandain kejadian yang lebih dulu di antara dua kejadian lampau.",
-      "whyCorrect": "“By the time” plus kejadian past simple bikin titik acuan. “Only had to check the bandages” nunjukin pertolongannya udah kelar sebelum titik itu, jadi pakai past perfect.",
-      "whyOthersFail": "Past simple buat dua-duanya bikin urutannya rancu. Bentuk continuous bilang pertolongannya belum kelar, padahal petugasnya tinggal meriksa perbannya. Bentuk dasar present nabrak cerita lampaunya.",
+      "whyCorrect": "“By the time” plus kejadian past simple bikin titik acuan. Kejadian yang kelar sebelum titik itu pakai past perfect.",
+      "whyOthersFail": "Past simple buat dua-duanya bikin urutannya rancu. Bentuk present malah tabrakan sama titik acuan lampau yang dipasang “arrived”.",
       "howToAvoid": "Begitu lihat “by the time X happened”, jadiin X titik acuannya. Terus tanya apa yang udah kelar sebelum X.",
       "memoryCue": "Ada “by the time X happened”, kejadian satunya butuh “had” di depan.",
       "distractors": {
@@ -448,9 +448,9 @@
           "misconception": "past simple dipakai buat kejadian yang lebih dulu, jadi urutannya rata.",
           "whyFails": "“by the time” jadi kehilangan maknanya “sebelum titik itu”."
         },
-        "were already giving": {
-          "misconception": "kejadian yang udah kelar ketuker sama yang masih jalan di titik acuan.",
-          "whyFails": "bentuk continuous bilang pertolongannya masih jalan pas ambulans dateng, padahal “only had to check the bandages” nunjukin udah kelar."
+        "are already giving": {
+          "misconception": "kejadiannya dibiarin jalan di “sekarang”, padahal harusnya udah kelar sebelum titik acuan lampau.",
+          "whyFails": "“arrived” udah naruh ceritanya di masa lalu, jadi bentuk sekarang nggak nyambung; pertolongannya harus udah kelar sebelum titik itu."
         },
         "already give": {
           "misconception": "bentuk dasar present dipakai di dalam cerita lampau.",
@@ -790,7 +790,7 @@
         },
         "An": {
           "misconception": "artikel tunggal dipakai untuk kata benda jamak sekaligus mengabaikan bunyi awalnya.",
-          "whyFails": "“An” adalah artikel tunggal dan tidak bisa berdiri di depan kata benda jamak “elephants”."
+          "whyFails": "“an” itu artikel tunggal, nggak bisa berdiri di depan kata benda jamak “elephants”."
         }
       }
     },
@@ -828,17 +828,17 @@
       "howToAvoid": "Bayangin lokasinya: titik pakai at, wilayah pakai in, garis pakai on.",
       "memoryCue": "Lampu lalu lintas itu titik: at. Nama jalan itu garis: on.",
       "distractors": {
-        "in / at": {
+        "on / at": {
           "misconception": "peran kata depan buat titik dan buat garis saling ketuker.",
-          "whyFails": "dua celahnya salah baca bentuk lokasinya."
+          "whyFails": "posisinya ketuker: lampu itu titik (at), nama jalan itu garis (on)."
         },
-        "on / in": {
-          "misconception": "titik di rute diperlakukan kayak permukaan di celah pertama.",
-          "whyFails": "celah pertama udah gagal: lampu itu titik, bukan permukaan."
+        "in / to": {
+          "misconception": "titik beloknya dianggap ruang tertutup, posisi diamnya dianggap tujuan gerak.",
+          "whyFails": "“in” bikin belokannya kayak di dalam lampu, “to” malah nandain gerak padahal hotelnya diam."
         },
-        "at / to": {
-          "misconception": "kata depan perpindahan dipakai buat posisi yang diam.",
-          "whyFails": "“to” nandain perpindahan, padahal ini soal posisi diam."
+        "to / in": {
+          "misconception": "patokan tempat belok malah dijadiin tujuan perpindahan.",
+          "whyFails": "celah pertama udah gagal: lampunya jadi tujuan gerak, padahal dia titik tempat belok."
         }
       }
     },
@@ -872,7 +872,7 @@
       "reasoning": "tentuin kalimatnya soal ingatan masa lalu atau kewajiban nanti → pilih bentuk -ing atau bentuk to",
       "rule": "“Remember” + -ing berarti inget sesuatu yang udah kejadian. “Remember” + to berarti nggak lupa ngerjain sesuatu nanti.",
       "whyCorrect": "Bentuk -ing “locking” nyatain ingatan atas tindakan yang udah kelar, dan itu pas sama “this morning”.",
-      "whyOthersFail": "Bentuk to mbalik acuan waktunya jadi kewajiban nanti. Bentuk dasar dan “having to lock” bukan pola yang sah buat makna ini.",
+      "whyOthersFail": "Bentuk to mbalik acuan waktunya jadi kewajiban nanti. Bentuk dasar dan “to have locked” nggak dipakai sesudah “remember”.",
       "howToAvoid": "Tanya: ini ingatan soal masa lalu, atau pengingat buat nanti?",
       "memoryCue": "“Remember doing” itu ingatan lampau; “remember to do” itu tugas nanti.",
       "distractors": {
@@ -884,9 +884,9 @@
           "misconception": "bentuk dasar dipakai padahal bukan pola yang sah sesudah “remember”.",
           "whyFails": "“remember” cuma diikuti bentuk -ing atau bentuk to, nggak pernah bentuk dasar."
         },
-        "having to lock": {
-          "misconception": "nambahin makna kewajiban yang nggak diminta kalimatnya.",
-          "whyFails": "kalimatnya inget tindakan nguncinya, bukan inget adanya kewajiban ngunci."
+        "to have locked": {
+          "misconception": "bentuk to sempurna dipasang ke “remember”, padahal buat ingatan lampau pola itu nggak dipakai.",
+          "whyFails": "“remember to have locked” bukan pola yang dipakai bahasa Inggris; buat inget tindakan yang udah lewat, bentuknya “locking”."
         }
       }
     },
@@ -1736,7 +1736,7 @@
       "reasoning": "cek kata kerjanya soal keadaan atau tindakan → pilih bentuk simple atau bentuk -ing",
       "rule": "Kata kerja keadaan kayak belong, own, believe, dan know biasanya nggak pakai bentuk -ing.",
       "whyCorrect": "“Belong” bilang keadaan kepemilikan yang menetap. Jadi present simple yang dibutuhin, walaupun konteksnya sekarang.",
-      "whyOthersFail": "Bentuk -ing buat tindakan yang lagi berproses. “Belong” nggak punya proses, dan nggak dipakai bentuk pasif.",
+      "whyOthersFail": "Bentuk -ing buat tindakan yang lagi berproses. Bentuk -ing doang bikin kalimatnya kehilangan kata kerja utama, dan “belong” nggak dipakai bentuk pasif.",
       "howToAvoid": "Sebelum nambah -ing, cek dulu kata kerjanya soal perasaan, kepemilikan, atau pendapat.",
       "memoryCue": "Keadaan nggak berproses: belong, own, dan believe tanpa -ing.",
       "distractors": {
@@ -1744,9 +1744,9 @@
           "misconception": "waktu sekarang dianggap selalu nuntut bentuk -ing.",
           "whyFails": "“belong” itu keadaan menetap, bukan proses yang jalan."
         },
-        "belonged": {
-          "misconception": "pindah ke bentuk lampau padahal konteksnya sekarang.",
-          "whyFails": "rumahnya masih milik mereka sampai sekarang."
+        "belonging": {
+          "misconception": "kalimatnya cuma dikasih bentuk -ing tanpa kata kerja utama yang megang waktunya.",
+          "whyFails": "“belonging” doang bikin kalimatnya nggak punya kata kerja utama, jadi kalimatnya nggak utuh."
         },
         "is being belonged": {
           "misconception": "susunan pasif dipaksain ke kata kerja keadaan tanpa objek.",
@@ -1958,7 +1958,7 @@
       "distractors": {
         "the school": {
           "misconception": "perhatian dialihin ke satu gedung tertentu, bukan ke kegiatan belajarnya.",
-          "whyFails": "Soalnya secara tegas meminta pembacaan fungsi lembaganya, dan itu memakai bentuk tanpa artikel pada “go to school”."
+          "whyFails": "soalnya udah tegas minta makna lembaganya, dan itu pakainya bentuk tanpa artikel: “go to school”."
         },
         "a school": {
           "misconception": "satu gedung yang nggak jelas dikenalin, bukan ungkapan kegiatan belajarnya.",
@@ -1990,7 +1990,7 @@
         },
         "the friend of mine": {
           "misconception": "artikel tertentu dipakai padahal yang diminta artikel tak tentu untuk memperkenalkan salah satu dari beberapa teman.",
-          "whyFails": "Pola kepemilikan ganda tidak memakai “the”, dan “the” di sini juga menyiratkan pembicaranya hanya punya satu teman."
+          "whyFails": "pola kepemilikan ganda nggak pakai “the”, dan “the” di sini malah bikin kesannya temannya cuma satu."
         }
       }
     },
@@ -2096,21 +2096,21 @@
       "reasoning": "cek kata penghubungnya berkedudukan subjek, yang wajib ditulis, atau objek, yang boleh dihilangin",
       "rule": "Kata penghubung yang berkedudukan objek boleh dihilangin di anak kalimat penjelas yang wajib. Kata itu bisa “that”, “which”, “who”, atau “whom”.",
       "whyCorrect": "Kata penghubungnya berkedudukan objek dari “borrowed”, yaitu “I borrowed it”. Jadi kata itu boleh menghilang.",
-      "whyOthersFail": "“Who” nunjuk orang, bukan benda. “Whom” juga khusus orang dan nyisipin kata yang harusnya boleh dihilangin. “What” nggak pernah jadi kata penghubung di posisi ini.",
+      "whyOthersFail": "“Who” nunjuk orang, bukan benda. “Whose” malah nandain kepemilikan yang nggak ada di kalimatnya. “What” nggak pernah jadi kata penghubung sesudah kata benda.",
       "howToAvoid": "Uji kata penghubungnya berkedudukan objek dari kata kerja anak kalimatnya atau bukan.",
       "memoryCue": "Kalau bisa diucapin “I borrowed it”, kata penghubungnya boleh menghilang.",
       "distractors": {
-        "who": {
+        "The book who I borrowed from the library was due back yesterday.": {
           "misconception": "kata penghubung buat orang dipakai pada kata benda yang bukan orang.",
-          "whyFails": "“Who” merujuk pada orang, sedangkan “the book” adalah benda."
+          "whyFails": "“who” buat orang, padahal “the book” itu benda; kata penghubungnya di sini malah bisa dihilangin."
         },
-        "whom": {
-          "misconception": "“whom”, kata ganti objek khusus orang, malah disisipin buat benda, padahal kata penghubung objeknya boleh dihilangin.",
-          "whyFails": "“whom” cuma buat orang, jadi nggak bisa gantiin “the book”. Lagipula kata penghubungnya berkedudukan objek, jadi paling wajar dihilangin aja."
+        "The book whose I borrowed from the library was due back yesterday.": {
+          "misconception": "kata kepemilikan “whose” dipasang padahal nggak ada makna punya-punyaan di kalimatnya.",
+          "whyFails": "“whose” nandain kepemilikan dan harus diikuti kata benda; di sini nggak ada makna punya-punyaan sama sekali."
         },
-        "what": {
+        "The book what I borrowed from the library was due back yesterday.": {
           "misconception": "“what” dipakai sebagai kata penghubung, kekeliruan yang lazim kebawa dari bahasa lain.",
-          "whyFails": "“what” bukan kata penghubung sesudah kata benda dalam Bahasa Inggris baku."
+          "whyFails": "“what” nggak dipakai sebagai kata penghubung sesudah kata benda kayak “the book”."
         }
       }
     },
@@ -2510,11 +2510,11 @@
       "distractors": {
         "a": {
           "misconception": "nama negara diperlakukan sebagai kata benda terhitung biasa yang butuh artikel tak tentu.",
-          "whyFails": "Nama negara adalah nama diri dan tidak memakai artikel tak tentu; “the Netherlands” adalah kekecualian tetap yang khusus menuntut artikel tertentu."
+          "whyFails": "nama negara itu nama diri, jadi nggak pakai artikel tak tentu; “the Netherlands” kekecualian tetap yang emang minta “the”."
         },
         "an": {
           "misconception": "aturan artikel tak tentu diterapkan berdasarkan bunyi vokal, tanpa melihat bahwa nama negara memang tidak memakainya.",
-          "whyFails": "Nama negara tidak memakai artikel tak tentu “an”; nama tetap ini menuntut artikel tertentu dalam bentuk “the Netherlands”."
+          "whyFails": "nama negara nggak pakai artikel tak tentu “an”; nama tetap ini mintanya artikel tentu: “the Netherlands”."
         },
         "[no article]": {
           "misconception": "aturan umum tanpa artikel di depan nama negara diberlakukan untuk semua nama negara.",
@@ -2562,7 +2562,7 @@
         },
         "on; in": {
           "misconception": "pasangan tetap buat cara bepergian ketuker sama kata depan posisi fisik.",
-          "whyFails": "“On the bus” dan “in the taxi” menggambarkan posisi di dalam kendaraannya, bukan cara bepergian secara umum yang memakai “by bus” dan “by taxi” tanpa artikel."
+          "whyFails": "“on the bus” dan “in the taxi” ngomongin posisi di dalam kendaraannya, bukan cara bepergian umum yang pakai “by bus” dan “by taxi” tanpa artikel."
         },
         "by; with": {
           "misconception": "kata depan yang lazim cuma diterapin ke salah satu dari dua cara sejajar.",
@@ -2826,7 +2826,7 @@
         },
         "The impact such was": {
           "misconception": "urutan biasa dengan subjek di depan dipertahanin dan “such” ditaruh di tengah.",
-          "whyFails": "“The impact such was” mempertahankan subjek di depan dan menyelipkan “such” di tengah, sehingga tidak ada pemajuan maupun pembalikan sama sekali."
+          "whyFails": "pilihan ini tetep naruh subjek di depan dan cuma nyelipin “such” di tengah, jadi nggak ada pemajuan maupun pembalikan sama sekali."
         },
         "Was such the impact": {
           "misconception": "kalimatnya diperlakukan sebagai kalimat tanya dengan majuin kata kerjanya saja.",
@@ -3038,7 +3038,7 @@
       "distractors": {
         "were": {
           "misconception": "kata kerjanya dicocokin sama kata benda jamak terdekat, yaitu team.",
-          "whyFails": "Pilihan “were” menyesuaikan kata kerjanya dengan “team”, padahal subjeknya seluruh anak kalimat “What the team needed most”."
+          "whyFails": "“were” nyamain kata kerjanya sama “team”, padahal subjek sebenarnya seluruh anak kalimat “What the team needed most”."
         },
         "that was": {
           "misconception": "penghubung milik it-cleft disisipin ke pola anak kalimat what.",
@@ -5187,6 +5187,30 @@
         "which some of": {
           "misconception": "urutan pola tetap kata jumlah + of + which diacak jadi “which” nongol duluan.",
           "whyFails": "urutannya wajib kata jumlah dulu, terus “of”, baru “which”; naruh “which” di depan bikin polanya rusak."
+        }
+      }
+    },
+    "CM-005": {
+      "objective": "Ingat kalau good dan bad punya bentuk banding khusus: better dan worse, bukan pola -er atau “more” biasa.",
+      "misconception": "Kamu bikin bentuk banding good dan bad pakai pola biasa kayak “more good” atau “gooder”.",
+      "reasoning": "kenali kata sifat yang bentuk bandingnya khusus → panggil bentuk banding hafalannya",
+      "rule": "Beberapa kata sifat punya bentuk banding khusus: good jadi better, bad jadi worse, far jadi farther. Kata-kata ini nolak akhiran -er dan kata “more”.",
+      "whyCorrect": "“Better ... than” itu bentuk banding khusus dari “good”, pas banget buat mbandingin dua olahraga.",
+      "whyOthersFail": "“More good” dan “gooder” maksa pola biasa ke kata yang bentuknya khusus. “Best” malah nunjuk juara kelompok, bukan mbandingin dua hal.",
+      "howToAvoid": "Sebelum nambah -er atau “more”, cek dulu: kata sifatnya masuk daftar bentuk khusus atau nggak. Kalau iya, panggil bentuk hafalannya.",
+      "memoryCue": "Good jadi better, bad jadi worse. Hafalin pasangannya kayak hafal lawan kata.",
+      "distractors": {
+        "more good": {
+          "misconception": "pola “more + kata sifat” dipakai padahal kata sifatnya punya bentuk banding khusus.",
+          "whyFails": "“good” nggak pernah digandeng “more”, bentuk bandingnya memang kata khusus “better”."
+        },
+        "gooder": {
+          "misconception": "akhiran -er dipaksakan ke kata sifat yang bentuk bandingnya khusus.",
+          "whyFails": "kata “gooder” nggak ada di bahasa Inggris, “good” berubah total jadi “better”."
+        },
+        "best": {
+          "misconception": "bentuk juara kelompok dipakai padahal “than” minta bentuk banding dua hal.",
+          "whyFails": "“best” nunjuk juara satu kelompok, nggak bisa digandeng “than” buat dua hal."
         }
       }
     }
