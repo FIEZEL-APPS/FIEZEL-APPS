@@ -1,6 +1,6 @@
 {
   "protocol_version": "v1.2",
-  "updated": "2026-08-28T22:30:57.773180+00:00",
+  "updated": "2026-08-29T01:24:07.128986+00:00",
   "agents": [
     {
       "id": "coordinator-1",
@@ -414,9 +414,9 @@
       "owner": "perplexity-computer (assessment-qa-2 session cb0013c5)",
       "status": "done",
       "title": "GEN-2 ekspansi bank soal: +26 grammar, +100 vocab C1, +12 reading, +3 reading-exam, +2 listening-exam, +9 writing, +6 speaking",
-      "summary": "Pipeline 20 subagent (2 rekon, 10 generator kandidat di luar repo, 6 QA independen, 2 red team) + fix-integrator; 303 record baru, 141+38 fix ter-ledger, gatekeeper GO; integrasi: kopling 6-file grammar, resequence kurikulum 1..179, cloze rebuild 148 item/293 alternates, 26 judul ID, korpus TTS re-census 605071->614055 (preseden m025-177), gate diperketat ke kontrak deklaratif (regression/http-smoke/reading-exam/product pattern), 3 harness i18n pasca-#242 yang terlewat ditambal (bank-soal-audit, listening-exam, level-grammar-contract).",
+      "summary": "Pipeline 20 subagent (2 rekon, 10 generator kandidat di luar repo, 6 QA independen, 2 red team) + fix-integrator; 303 record baru, 141+38 fix ter-ledger, gatekeeper GO; integrasi: kopling 6-file grammar, resequence kurikulum 1..179, cloze rebuild 148 item/293 alternates, 26 judul ID, korpus TTS re-census 605071->614055 (preseden m025-177), gate diperketat ke kontrak deklaratif (regression/http-smoke/reading-exam/product pattern), 3 harness i18n pasca-#242 yang terlewat ditambal (bank-soal-audit, listening-exam, level-grammar-contract). | m025-192: merge tingkat-record dgn wave-2 (#250/#251): 7 template+7 cloze rekey, 30 vocab duplikat dibuang, 70 rekey c1_curated_0200+, union 248/2440/209/640; Thai companions gen2 (26 grammar+70 vocab, QA GO 0 defect) terintegrasi; C2-006 re-level C1 diikuti.",
       "evidence": "Semua gate konten PASS lokal; artefak lengkap di Perplexity project files (gen2/); ledger F2 141 entri; red team S19 38 temuan diterapkan + S20 GO.",
-      "build": "m025-188",
+      "build": "m025-192",
       "finishedAt": "2026-08-28T22:30:57.773161+00:00"
     }
   ],

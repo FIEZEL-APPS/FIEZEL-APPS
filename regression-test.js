@@ -74,7 +74,12 @@ assert(V.length>=1765,'active vocabulary master shrank below baseline 1765');
 assert(new Set(V.map(v=>v.id)).size===V.length,'vocabulary ids are not unique');
 assert(V.filter(v=>v.status==='complete').length===V.length,'active vocabulary contains incomplete records');
 assert(V.some(v=>v.level==='C2'&&v.status==='complete'),'C2 vocabulary is missing');
-assert(Object.keys(G).length===GRAMMAR_DECLARED_COUNT&&Object.keys(G).length>=153,'grammar skills out of declared-count contract (m025-188: terikat count deklaratif + lantai 153)');
+/* m025-192: wave-2 memperkenalkan MULTI-ITEM per subskill (69 varian latihan untuk subskill
+   lama), jadi skill runtime != jumlah template. Kontrak dipisah dua-duanya diperketat:
+   (a) jumlah template == count deklaratif && >= lantai 153, id unik;
+   (b) subskill runtime >= lantai 179 (153 basis + 26 gen2) dan tiap subskill punya >=1 item. */
+assert(GM.templates.length===GRAMMAR_DECLARED_COUNT&&GM.templates.length>=153&&new Set(GM.templates.map(t=>t.id)).size===GM.templates.length,'grammar templates out of declared-count contract (m025-192)');
+assert(Object.keys(G).length>=179&&Object.values(G).every(a=>a.length>=1),'grammar runtime subskills below floor 179 or empty subskill (m025-192)');
 assert(R.length>=300&&new Set(R.map(r=>r.id)).size===R.length,'reading bank shrank below baseline 300 or has duplicate ids (m025-188)');
 for(const r of R)for(const q of r.qs||[]){assert(Array.isArray(q[1])&&q[1].length>=2,'reading question has too few options');const opts=q[1].map(x=>String(x).trim().toLowerCase());assert(new Set(opts).size===opts.length,`duplicate reading options in ${r.id}`);assert(Number.isInteger(q[2])&&q[2]>=0&&q[2]<q[1].length,`invalid reading answer in ${r.id}`)}
 
