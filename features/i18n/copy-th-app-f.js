@@ -125,6 +125,8 @@
     'progress.calibration-label-2': 'การสอบเทียบความมั่นใจ:',
     'progress.ability-label': 'ความสามารถที่วัดได้',
     'progress.difficulty-label': 'ความยากที่เหมาะสม',
-    'progress.response-label': 'การตอบสนองของระบบ:'
+    'progress.response-label': 'การตอบสนองของระบบ:',
+    'progress.keyakinan-persen': 'ความมั่นใจ {persen}%',
+    'progress.indeks-ability': 'ดัชนี {ability}'
   });
 }());
