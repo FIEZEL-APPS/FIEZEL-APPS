@@ -118,7 +118,14 @@ async function dispatchFetch(t,request){
   const nav={url:t.abs('./'),method:'GET',mode:'navigate'};
   t.stores.get(shellName).set(t.abs('./'),new ResponseMock(''));
   const navResponse=await dispatchFetch(t,nav);
-  assert.ok(navResponse&&String(navResponse.body).startsWith('network:'),'online startup must prefer a freshly validated network document over a blank/stale shell entry');
+  /* m025-211: dulu assert ini berbunyi "dokumen jaringan harus menang atas entri cangkang
+     yang kosong/usang". Itu benar untuk mekanisme lama dan SALAH sebagai sifat: dokumen dari
+     jaringan berpasangan dengan aset cache-first generasi lama, sehingga murid menjalankan
+     index.html build N+1 di atas JavaScript build N (terukur di peramban). Sekarang dokumen
+     dilayani dari cangkang generasi ini, dan penyembuhannya pindah ke revalidasi latar -
+     dua baris di bawah yang menegakkannya. PERTUKARAN YANG DISENGAJA dan ditulis terbuka:
+     entri cangkang yang kosong tersaji SEKALI, lalu tergantikan pada peluncuran berikutnya. */
+  assert.ok(navResponse&&String(navResponse.body)==='','startup must serve this generation shell entry, keeping document and assets on the same build');
   const navFetch=t.fetchCalls.find(call=>call.url===t.abs('./'));
   assert.ok(navFetch,'startup navigation must hit the network');
   assert.equal(navFetch.cache,'reload','startup navigation must bypass stale HTTP cache');
@@ -128,7 +135,14 @@ async function dispatchFetch(t,request){
 
   t.setNetworkMode('throw');
   const offlineNav=await dispatchFetch(t,nav);
-  assert.ok(offlineNav&&String(offlineNav.body).startsWith('shell:'),'offline startup must fall back to current revisioned index.html');
+  /* m025-211: dulu assert ini menuntut awalan 'shell:' - yaitu entri hasil install. Itu
+     mengunci artefak penyemaian harness, bukan sifat yang kita mau. Sesudah revalidasi latar
+     bekerja, entri cangkang generasi ini MEMANG sudah tersegarkan, dan menyajikannya justru
+     yang benar. Yang ditegakkan sekarang lebih kuat dan bebas mekanisme: luring dijawab dari
+     cangkang GENERASI INI, dan yang dijawab sama persis dengan yang tersimpan di sana. */
+  const tersimpanCangkang=t.stores.get(shellName).get(t.abs('./'));
+  assert.ok(offlineNav,'offline startup must be answered from cache, not left to a network error');
+  assert.equal(String(offlineNav.body),String(tersimpanCangkang.body),'offline startup must serve exactly this generation cached document');
 
   const neural={url:neuralKey,method:'GET',mode:'same-origin'};
   const neuralResponse=await dispatchFetch(t,neural);
