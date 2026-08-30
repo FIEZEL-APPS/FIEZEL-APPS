@@ -291,8 +291,18 @@ const NAMA_SHELL = 'fiezel-shell-' + (revMatch ? revMatch[1] : '???');
 
   /* (I) Model generasi tidak boleh bergeser: dokumen lama tidak boleh direbut paksa. */
   {
-    check('I tidak ada skipWaiting() - dokumen yang sedang terbuka tidak direbut generasi baru',
-      !/skipWaiting\s*\(/.test(kodeSaja));
+    /* m025-212: yang dijaga bukan ketiadaan kata, melainkan siapa yang MEMUTUSKAN. Dokumen
+     * yang sedang terbuka tidak boleh direbut oleh worker atas kemauannya sendiri - itulah
+     * yang menghasilkan pasangan dokumen-baru/JS-lama yang jadi alasan berkas ini ada. Tetapi
+     * murid yang menekan "Perbarui sekarang" di kartu pembaruan justru MEMINTA perpindahan
+     * itu, dan halamannya sudah menunggu untuk memuat ulang di controllerchange - di situ
+     * pasangan campur tadi tidak mungkin terjadi, karena seluruh dokumen diganti. Jadi satu
+     * pemanggilan berpagar diizinkan; install dan activate tetap nol. */
+    check('I skipWaiting() hanya di balik pagar FIEZEL_SKIP_WAITING - dokumen tidak pernah direbut atas kemauan worker sendiri',
+      (kodeSaja.match(/skipWaiting/g) || []).length === 1
+      && /if\(event\?\.data\?\.type==='FIEZEL_SKIP_WAITING'\)\{self\.skipWaiting\(\);return\}/.test(kodeSaja)
+      && !/skipWaiting/.test((kodeSaja.match(/addEventListener\('install'[\s\S]{0,400}/) || [''])[0])
+      && !/skipWaiting/.test((kodeSaja.match(/addEventListener\('activate'[\s\S]{0,800}/) || [''])[0]));
     check('I tidak ada clients.claim() - klien generasi lama tidak diambil alih di tengah jalan',
       !/clients\.claim\s*\(/.test(kodeSaja));
   }
