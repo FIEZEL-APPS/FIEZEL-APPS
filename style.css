@@ -278,7 +278,23 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 /* Segmented control, bukan deretan tombol lepas: kapsulnya SATU bidang --panel-soft
    dan tab-nya kehilangan garisnya sendiri, jadi yang terbaca adalah satu kontrol
    dengan satu bagian terpilih. Tab aktif = bidang tinta (resep components.css §6). */
-.progress-tabs{display:flex;gap:6px;overflow-x:auto;margin:14px 0 18px;padding:4px;background:var(--panel-soft);border-radius:var(--radius-pill);-webkit-overflow-scrolling:touch}
+/* Audit UI/UX 2026-08-30 - SETENGAH PETA BELAJAR TIDAK PERNAH DITEMUKAN.
+   Strip ini overflow-x:auto sejak m025-85, tetapi tidak pernah MENGATAKAN bahwa ia bisa
+   digeser. Terukur di 320px: lebar isi 482px dalam kotak 294px - hanya 2 dari 4 tab yang
+   terlihat ("Ringkasan", "Analisis"), 188px tersembunyi tanpa satu pun petunjuk, jadi
+   "Adaptive Engine" dan "Kesiapan & Skills" praktis tidak ada bagi murid di ponsel kecil.
+   Obatnya bayangan-gulir CSS murni (background-attachment: local vs scroll): dua lapis
+   penutup sewarna kapsul di kedua tepi, dua lapis bayangan di belakangnya. Bayangan hanya
+   MUNCUL kalau memang ada yang tersembunyi di sisi itu, dan menghilang sendiri begitu tepi
+   tercapai - tanpa JS, tanpa listener scroll, dan tanpa memakan ruang saat keempat tab muat. */
+.progress-tabs{display:flex;gap:6px;overflow-x:auto;margin:14px 0 18px;padding:4px;background-color:var(--panel-soft);border-radius:var(--radius-pill);-webkit-overflow-scrolling:touch;
+  background-image:linear-gradient(to right,var(--panel-soft),var(--panel-soft)),linear-gradient(to left,var(--panel-soft),var(--panel-soft)),linear-gradient(to right,rgba(36,26,17,.22),rgba(36,26,17,0)),linear-gradient(to left,rgba(36,26,17,.22),rgba(36,26,17,0));
+  background-position:left center,right center,left center,right center;
+  background-repeat:no-repeat;
+  background-size:26px 100%,26px 100%,15px 100%,15px 100%;
+  background-attachment:local,local,scroll,scroll;
+  scroll-snap-type:x proximity}
+.progress-tabs .progress-tab{scroll-snap-align:center}
 .progress-tab{flex:0 0 auto;padding:9px 16px;border-radius:var(--radius-pill);border:0;background:transparent;color:var(--muted);font-size:.82rem;font-weight:600;min-height:44px;white-space:nowrap}
 .progress-tab.active{background:var(--text);border-color:var(--text);color:var(--on-core)}
 
@@ -3926,8 +3942,12 @@ body.fz-lesson-mode .topline{position:sticky;top:0;z-index:30;
 /* Audit 04-003: tautan ini setinggi 24px - 45% di bawah sasaran sentuh 44px - dan
    berulang 16x per jalur. Perpanjangan hit-area transparan menaikkan kotak sentuh
    efektifnya ke 44px tanpa membesarkan tampilannya; ruang di atas (label) dan di bawah
-   (padding 22px .path-step) tidak berisi target lain. */
-.lesson-skip-link::before{content:'';position:absolute;left:0;right:0;top:-10px;bottom:-10px}
+   (padding 22px .path-step) tidak berisi target lain.
+   Audit UI/UX 2026-08-30: -10px ternyata MASIH kurang. Kotaknya 23,x px (bukan 24 bulat),
+   jadi 23,x + 20 = 41px terukur lewat elementFromPoint - tiga piksel di bawah lantai, dan
+   angka itu yang dirasakan jempol, bukan angka di komentar. Dinaikkan ke 12px per sisi
+   (=48px) supaya lantainya dilewati dengan margin, bukan dipepet. */
+.lesson-skip-link::before{content:'';position:absolute;left:0;right:0;top:-12px;bottom:-12px}
 .lesson-skip-link svg{width:12px;height:12px}
 .lesson-skip-link:hover{background:var(--sun-soft);color:var(--text);transform:none;box-shadow:none}
 /* Node terkunci: tombol node-nya disabled, tetapi tautan lewati TIDAK ikut redup -
