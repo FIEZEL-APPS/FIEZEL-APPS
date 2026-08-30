@@ -38,7 +38,7 @@ function __fzSyncShellElements(){
     });
   }catch(_){}
 }
-function __fzRefreshI18nTables(){__fzI18nTables.forEach(([t,b])=>{try{const v=b();if(Array.isArray(t)){t.length=0;t.push(...v)}else{Object.keys(t).forEach(k=>delete t[k]);Object.assign(t,v)}}catch(_){}});try{FALLBACK_LEARNER_NAME=FiezelI18n.t('common.sapaan-netral')}catch(_){};__fzSyncShellElements()}
+function __fzRefreshI18nTables(){__fzI18nTables.forEach(([t,b])=>{try{const v=b();if(Array.isArray(t)){t.length=0;t.push(...v)}else{Object.keys(t).forEach(k=>delete t[k]);Object.assign(t,v)}}catch(_){}});try{FALLBACK_LEARNER_NAME=FiezelI18n.t('common.sapaan-netral')}catch(_){};try{loginMessageCache=null}catch(_){};__fzSyncShellElements()}
 try{self.FiezelI18n?.onChange?.(()=>__fzRefreshI18nTables())}catch(_){}
 let FALLBACK_LEARNER_NAME=FiezelI18n.t('common.sapaan-netral');
 function learnerName(){try{const name=String(state?.userName||'').trim();return name||FALLBACK_LEARNER_NAME}catch{return FALLBACK_LEARNER_NAME}}
@@ -6932,7 +6932,7 @@ window.toggleGrammarHubView=toggleGrammarHubView;
 function grammar(){const level=getActiveLevel(),entries=grammarItemsForLevel(level).slice().sort((a,b)=>Number(a.sequence||Number.MAX_SAFE_INTEGER)-Number(b.sequence||Number.MAX_SAFE_INTEGER)),skills=entries.map(x=>x.skill).filter((x,i,a)=>a.indexOf(x)===i);
   const examEntry=levelTrustState(state).exams[level]||null;
   const rows=skills.map((k,index)=>{
-    const entry=entries.find(x=>x.skill===k)||{},item=entry.item||G[k]?.[0]||[],family=grammarFamilyLabel(item),meta=grammarCurriculumEntry(k)||entry,title=meta?.title||friendlySkillName(k),prerequisites=Array.isArray(meta?.prerequisites)&&meta.prerequisites.length?FiezelI18n.t('grammar.prasyarat',{join:meta.prerequisites.map(friendlySkillName).join(', ')}):FiezelI18n.t('grammar.fondasi-awal');
+    const entry=entries.find(x=>x.skill===k)||{},item=entry.item||G[k]?.[0]||[],family=grammarFamilyLabel(item),meta=grammarCurriculumEntry(k)||entry,title=friendlySkillName(k),prerequisites=Array.isArray(meta?.prerequisites)&&meta.prerequisites.length?FiezelI18n.t('grammar.prasyarat',{join:meta.prerequisites.map(friendlySkillName).join(', ')}):FiezelI18n.t('grammar.fondasi-awal');
     const unlock=lessonUnlockState(k),mastery=state.grammar[k]?.mastery||0,touched=!!state.grammar[k]?.total;
     return{k,index,title,family,prerequisites,unlock,mastery,
       mastered:mastery>=MASTERY_THRESHOLD,
@@ -6981,7 +6981,7 @@ function grammar(){const level=getActiveLevel(),entries=grammarItemsForLevel(lev
   pawPathWatch={level,done:pawPathDone};
 }
 function openGrammarLesson(skill){const meta=GRAMMAR_ITEMS.find(x=>x.skill===skill);if(!meta||meta.level!==getActiveLevel())return showToast(FiezelI18n.t('grammar.lesson-hanya-tersedia-pada-level',{level:getActiveLevel()}));const unlock=lessonUnlockState(skill);if(unlock.locked)return showToast(lessonLockMessage(unlock));if(!(G[skill]||[]).length)return showToast(FiezelI18n.t('grammar.lesson-belum-memiliki-materi'));enterStage('grammar-lesson',()=>renderGrammarLesson(skill));renderGrammarLesson(skill)}
-function renderGrammarLesson(skill){const meta=GRAMMAR_ITEMS.find(x=>x.skill===skill);if(!meta||meta.level!==getActiveLevel())return showToast(FiezelI18n.t('grammar.lesson-hanya-tersedia-pada-level',{level:getActiveLevel()}));const lessonUnlock=lessonUnlockState(skill);if(lessonUnlock.locked)return showToast(lessonLockMessage(lessonUnlock));const arr=G[skill]||[];if(!arr.length)return showToast(FiezelI18n.t('grammar.lesson-belum-memiliki-materi'));const item=arr[0],base=item[0],opts=item[1]||[],correct=opts[item[2]],rule=grammarRuleIndonesian(item),clue=grammarClue(base),curriculum=grammarCurriculumEntry(skill)||meta;const prereq=Array.isArray(curriculum.prerequisites)&&curriculum.prerequisites.length?FiezelI18n.t('grammar.prasyarat-2',{join:curriculum.prerequisites.map(friendlySkillName).join(', ')}):FiezelI18n.t('grammar.lesson-fondasi-pertama');shell(friendlySkillName(skill),FiezelI18n.t('grammar.urutan-mode-practice',{level:meta.level,sequence:meta.sequence||'-',fondasi:curriculum.unit||'fondasi',jumlahSoal:GRAMMAR_SESSION_SIZE}),`${card(`<div class="eyebrow">${FiezelI18n.t('grammar.pahami-dulu-urutan',{sequence:meta.sequence||'-'})}</div><h2 class="lesson-title">${esc(curriculum.title||friendlySkillName(skill))}</h2><p class="muted">${esc(prereq)}</p><p>${esc(rule)}</p><div class="lesson-example"><span>${FiezelI18n.t('grammar.contoh')}</span><h3>${esc(base)}</h3><p>${FiezelI18n.t('grammar.answer-pas')} <strong>${esc(correct)}</strong>. ${esc(clue)}</p></div><p class="memory-tip"><i data-lucide="lightbulb"></i><span>${FiezelI18n.t('grammar.jangan-buru-buru-menghafal-rumus')}</span></p>`,'grammar-lesson-card')}<div class="practice-contract"><div><h3>${FiezelI18n.t('grammar.mode-practice-terfokus',{jumlahSoal:GRAMMAR_SESSION_SIZE})}</h3><p>${FiezelI18n.t('grammar.all-item-tetap-menguji-konsep')}</p></div><button onclick="practiceSkill('${esc(skill)}')" class="primary">${FiezelI18n.t('grammar.start-item',{jumlahSoal:GRAMMAR_SESSION_SIZE})} <i data-lucide="arrow-right"></i></button></div><div class="toolbar"><button onclick="exitStage()"><i data-lucide="arrow-left"></i> ${FiezelI18n.t('grammar.kembali-grammar-hub')}</button></div>`)}
+function renderGrammarLesson(skill){const meta=GRAMMAR_ITEMS.find(x=>x.skill===skill);if(!meta||meta.level!==getActiveLevel())return showToast(FiezelI18n.t('grammar.lesson-hanya-tersedia-pada-level',{level:getActiveLevel()}));const lessonUnlock=lessonUnlockState(skill);if(lessonUnlock.locked)return showToast(lessonLockMessage(lessonUnlock));const arr=G[skill]||[];if(!arr.length)return showToast(FiezelI18n.t('grammar.lesson-belum-memiliki-materi'));const item=arr[0],base=item[0],opts=item[1]||[],correct=opts[item[2]],rule=grammarRuleIndonesian(item),clue=grammarClue(base),curriculum=grammarCurriculumEntry(skill)||meta;const prereq=Array.isArray(curriculum.prerequisites)&&curriculum.prerequisites.length?FiezelI18n.t('grammar.prasyarat-2',{join:curriculum.prerequisites.map(friendlySkillName).join(', ')}):FiezelI18n.t('grammar.lesson-fondasi-pertama');shell(friendlySkillName(skill),FiezelI18n.t('grammar.urutan-mode-practice',{level:meta.level,sequence:meta.sequence||'-',fondasi:curriculum.unit||'fondasi',jumlahSoal:GRAMMAR_SESSION_SIZE}),`${card(`<div class="eyebrow">${FiezelI18n.t('grammar.pahami-dulu-urutan',{sequence:meta.sequence||'-'})}</div><h2 class="lesson-title">${esc(friendlySkillName(skill))}</h2><p class="muted">${esc(prereq)}</p><p>${esc(rule)}</p><div class="lesson-example"><span>${FiezelI18n.t('grammar.contoh')}</span><h3>${esc(base)}</h3><p>${FiezelI18n.t('grammar.answer-pas')} <strong>${esc(correct)}</strong>. ${esc(clue)}</p></div><p class="memory-tip"><i data-lucide="lightbulb"></i><span>${FiezelI18n.t('grammar.jangan-buru-buru-menghafal-rumus')}</span></p>`,'grammar-lesson-card')}<div class="practice-contract"><div><h3>${FiezelI18n.t('grammar.mode-practice-terfokus',{jumlahSoal:GRAMMAR_SESSION_SIZE})}</h3><p>${FiezelI18n.t('grammar.all-item-tetap-menguji-konsep')}</p></div><button onclick="practiceSkill('${esc(skill)}')" class="primary">${FiezelI18n.t('grammar.start-item',{jumlahSoal:GRAMMAR_SESSION_SIZE})} <i data-lucide="arrow-right"></i></button></div><div class="toolbar"><button onclick="exitStage()"><i data-lucide="arrow-left"></i> ${FiezelI18n.t('grammar.kembali-grammar-hub')}</button></div>`)}
 // m025-155: seleksi mode-coverage-first. Loop lama variant-major hanya kebetulan mencapai
 // 25 mode karena tiap subskill punya SATU template; begitu ada template kedua, 25 slot akan
 // terisi mode-mode awal saja. Pass 1 mengambil SATU kartu valid+unik per variant 0..24
@@ -7026,7 +7026,7 @@ function lessonSkipGateCooldownRemaining(skill,now=Date.now()){
 function openLessonSkipGate(skill){
   const meta=GRAMMAR_ITEMS.find(x=>x.skill===skill);
   if(!meta||meta.level!==getActiveLevel())return showToast(FiezelI18n.t('grammar.lesson-hanya-tersedia-pada-level',{level:getActiveLevel()}));
-  const mastery=state.grammar[skill]?.mastery||0,title=grammarCurriculumEntry(skill)?.title||friendlySkillName(skill);
+  const mastery=state.grammar[skill]?.mastery||0,title=friendlySkillName(skill);
   if(mastery>=GRAMMAR_UNLOCK_MASTERY)return showToast(FiezelI18n.t('grammar.materi-done-finish-tidak-ada'));
   const gateWait=lessonSkipGateCooldownRemaining(skill);
   if(gateWait>0)return showToast(FiezelI18n.t('grammar.gerbang-materi-can-dicoba-again',{level:levelExamCooldownLabel(gateWait)}));
@@ -8101,7 +8101,7 @@ function finishQuiz(cfg,score,total,tutorReport){
      lebih besar menang. Gagal tidak menghukum apa pun: buktinya tetap tersimpan sebagai bukti. */
   let skipVerdict=null;
   if(cfg&&cfg.type==='grammar-skip'&&cfg.skipGateSkill){
-    const passed=score>=LESSON_SKIP_GATE_PASS,judul=grammarCurriculumEntry(cfg.skipGateSkill)?.title||friendlySkillName(cfg.skipGateSkill);
+    const passed=score>=LESSON_SKIP_GATE_PASS,judul=friendlySkillName(cfg.skipGateSkill);
     if(passed){const b=state.grammar[cfg.skipGateSkill]||{correct:0,total:0,streak:0,mastery:0};b.mastery=Math.max(Number(b.mastery)||0,GRAMMAR_UNLOCK_MASTERY);b.skippedAt=Date.now();b.skipGateCooldownUntil=0;state.grammar[cfg.skipGateSkill]=b}
     /* m025-177 (audit skip A13/A20): gagal kini memberi jeda 24 jam per lesson (anti hafal-
        set + coba lagi detik itu juga); progres dan bukti jawaban tetap utuh. */
@@ -8392,7 +8392,7 @@ function coreBrainPanelMarkup(){
     ${rootCause}
     <p class="muted">${FiezelI18n.t('progress.kesulitan-dipilih-model-kemampuan-peluang')}</p>`)+bktShadowMarkup()+brainManifestMarkup()+olmPanelMarkup()+confusionInsightMarkup()+affectSuggestionMarkup()
 }
-const PROGRESS_TABS=[['overview',FiezelI18n.t('progress.ringkasan')],['analysis',FiezelI18n.t('progress.analisis')],['adaptive','Adaptive Engine'],['readiness',FiezelI18n.t('progress.kesiapan-skills')]];
+const PROGRESS_TABS=__fzI18nTable([],()=>([['overview',FiezelI18n.t('progress.ringkasan')],['analysis',FiezelI18n.t('progress.analisis')],['adaptive','Adaptive Engine'],['readiness',FiezelI18n.t('progress.kesiapan-skills')]]));
 let progressTab='overview';
 function switchProgressTab(tab){if(!PROGRESS_TABS.some(([id])=>id===tab)||progressTab===tab)return;progressTab=tab;progress()}
 /**
@@ -8416,7 +8416,7 @@ function nextSessionPanelMarkup(){
   // R2 bug-hunt #1 (tempat kedua): 'vocabulary' adalah ejaan resmi domain policy.
   const view=(p.primaryDomain==='vocab'||p.primaryDomain==='vocabulary')?'vocab':p.primaryDomain==='reading'?'reading':'grammar';
   const ukuran=Number(p.sessionSize)||0,menit=Number(p.estimatedMinutes)||0;
-  const takaran=ukuran?`<b>${ukuran} soal${menit?` · \u00b1${menit} menit`:''}</b>`:'';
+  const takaran=ukuran?`<b>${menit?FiezelI18n.t('progress.item-menit-2',{sessionSize:ukuran,estimatedMinutes:menit}):`${ukuran} soal`}</b>`:'';
   return `<section class="core-panel next-session">
     <div><div class="core-eyebrow">${FiezelI18n.t('progress.next-session-dipilih-paw')}</div>
     <div class="core-title">${esc(fokus)}</div>
@@ -8469,7 +8469,7 @@ function progress(){
    </div>`
  };
  shell(FiezelI18n.t('progress.peta-study-lab'),FiezelI18n.t('progress.lihat-bagian-sudah-kuat-pola'),`
- ${card(`<div class="stats"><div>${stat('Akurasi',acc+'%')}</div><div>${stat('Runtun',state.streak+' hari')}</div><div>${stat('Hari ini',state.daily.attempts+' jawaban')}</div><div>${stat('Ulangan',due.length)}</div><div>${stat('Gem',gemsBalance())}</div></div>`)}
+ ${card(`<div class="stats"><div>${stat(FiezelI18n.t('progress.stat-accuracy'),acc+'%')}</div><div>${stat(FiezelI18n.t('progress.stat-streak'),FiezelI18n.t('progress.stat-streak-days',{days:state.streak}))}</div><div>${stat(FiezelI18n.t('progress.stat-today'),FiezelI18n.t('progress.stat-today-value',{count:state.daily.attempts}))}</div><div>${stat(FiezelI18n.t('progress.stat-review'),due.length)}</div><div>${stat(FiezelI18n.t('progress.stat-gem'),gemsBalance())}</div></div>`)}
  <div class="progress-tabs" role="tablist">${PROGRESS_TABS.map(([id,label])=>`<button type="button" class="progress-tab${progressTab===id?' active':''}" role="tab" aria-selected="${progressTab===id}" onclick="switchProgressTab('${id}')">${esc(label)}</button>`).join('')}</div>
  ${tabContent[progressTab]}
  ${card(`<div class="row"><b><!-- Dibuat oleh Fitrarustqi -->${FiezelI18n.t('footer.dibuat-oleh',{nama:'Fitrarustqi'})}</b><a href="https://instagram.com/fitrarustqi" target="_blank" rel="noopener noreferrer" class="creator-link"><img src="./instagram.svg" alt="Instagram" width="22" height="22"> @fitrarustqi</a></div>`)}
