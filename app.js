@@ -6740,6 +6740,19 @@ function AudioService(){
     * sama persis. */
    const noSubtitles=options.suppressSubtitles===true||options.contentType==='listening';
    const timeoutPromise=typeof setTimeout==='function'?new Promise(r=>setTimeout(()=>r(false),9000)):new Promise(()=>{});
+   /* m025-201 (REGRESI PRODUKSI). `say` di baris berikutnya adalah identifier BEBAS - tidak
+    * pernah dideklarasikan di AudioService(). `typeof` pada identifier tak dideklarasikan
+    * TIDAK melempar, ia mengembalikan 'undefined' dengan tenang, jadi viaDoor selalu false
+    * dan SETIAP pemutaran Reading/Vocabulary/Grammar jatuh ke speechSynthesis peramban tanpa
+    * pernah menyentuh pintu suara neural. Bisu-nya tidak terlihat justru karena cadangannya
+    * bekerja: murid tetap mendengar sesuatu, hanya bukan suara yang dijanjikan.
+    *
+    * `const say=self.FiezelVoiceSay?.say` ada di dalam AudioService pada ec2b119 (commit yang
+    * memperkenalkan gerbang tangga suara) dan hilang entah di wave mana sesudahnya. Dikembalikan
+    * di sini - di dalam play(), bukan di badan AudioService() - supaya pintunya dicari pada saat
+    * PEMUTARAN, bukan pada saat konstruksi: modulnya dimuat lewat script tag terpisah, jadi
+    * penangkapan saat konstruksi bisa mengunci undefined selamanya kalau urutan muat bergeser. */
+   const say=self.FiezelVoiceSay?.say;
    const viaDoor=typeof say==='function'
     ?Promise.race([
       Promise.resolve().then(()=>say.call(self.FiezelVoiceSay,text,{speed:options.speed??selectedNeuralRate(),contentType:options.contentType,locale:options.locale,suppressSubtitles:noSubtitles})).catch(()=>false),
