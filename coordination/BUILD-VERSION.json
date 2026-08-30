@@ -1,7 +1,7 @@
 {
-  "version": "m025-201",
+  "version": "m025-202",
   "claimedBy": "perplexity-computer (multilingual i18n wave, direbase atas m025-185)",
-  "claimedAt": "2026-08-29T22:18:59.682Z",
-  "reason": "feat(i18n): complete Thai localization — speaking, listening, writing, reading datasets + UI/UX leak removal",
+  "claimedAt": "2026-08-29T23:15:47.109Z",
+  "reason": "Fix i18n raw keys leak, AI coach locale context, and quiz loop localization",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

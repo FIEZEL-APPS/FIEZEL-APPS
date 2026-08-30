@@ -44,6 +44,12 @@
     // app.js:2757 — status kartu Akun Puter saat murid memilih tanpa akun.
     'core.auth-skip-status': 'Oke, lanjut tanpa akun.',
     // app.js:3837 dan app.js:7512 — toast saat izin pengingat diberikan.
-    'core.reminder-on-toast': 'Pengingat belajar aktif.'
+    'core.reminder-on-toast': 'Pengingat belajar aktif.',
+    'topbar.ask': 'Tanya FIEZEL?',
+    'nav.peta': 'Peta',
+    'nav.home': 'Home',
+    'nav.vocab': 'Vocab',
+    'nav.grammar': 'Grammar',
+    'nav.reading': 'Reading'
   });
 }());
