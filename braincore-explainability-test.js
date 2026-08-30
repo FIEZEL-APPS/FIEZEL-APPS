@@ -126,6 +126,31 @@ test('§1 SETIAP keputusan membawa sedikitnya satu kode alasan', () => {
     'keputusan tanpa alasan (inilah keadaan sebelum Fase F): ' + JSON.stringify(kosong));
 });
 
+test('§1 alasan datang dari SEMUA modul pengukur, bukan dari satu yang selalu menyala', () => {
+  // DITEMUKAN DENGAN MENGUJI GERBANG INI, BUKAN DENGAN MEMERCAYAINYA. Mutasi yang
+  // mengembalikan pengumpul ke versi Fase C — persis cacat yang melahirkan fase ini — TIDAK
+  // membuat assert "setiap keputusan membawa sedikitnya satu kode" merah, karena satu kode
+  // yang selalu menyala (brain3_item_prior_*) sudah cukup memuaskannya. Cakupan yang dipenuhi
+  // satu sumber tunggal adalah cakupan yang tidak menjaga apa pun.
+  //
+  // Daftar keluarga di bawah SENGAJA ditulis tangan, bukan diturunkan dari sumber pengumpul:
+  // gerbang yang membaca daftarnya sendiri dari kode yang diuji akan ikut hilang saat kodenya
+  // dihapus. Ini adalah harapan yang berdiri sendiri.
+  const WAJIB = ['brain3_item_prior_', 'brain3_item_calibration_', 'brain3_memory_', 'brain3_affect_'];
+  const semua = new Set();
+  for (const row of RUN) for (const c of row.trace.reasonCodes) semua.add(c);
+  const hilang = WAJIB.filter((fam) => ![...semua].some((c) => c.indexOf(fam) === 0));
+  assert.deepStrictEqual(hilang, [],
+    'tidak ada satu pun alasan dari keluarga ini sepanjang sesi — modulnya dihitung lalu dibuang lagi: '
+    + hilang.join(', '));
+  // Miskonsepsi dan diskon bukti hanya terbit pada bukti tertentu, jadi diperiksa pada
+  // jawaban yang memang memicunya, bukan dituntut ada di setiap jawaban.
+  for (const fam of ['brain3_misconception_', 'brain3_evidence_']) {
+    assert.ok([...semua].some((c) => c.indexOf(fam) === 0),
+      'sesi bergelombang ini memicu "' + fam + '" tetapi tidak satu pun tercatat');
+  }
+});
+
 test('§1 SETIAP keputusan membawa alasan verbatim dari modul pemutus', () => {
   for (let i = 0; i < RUN.length; i++) {
     const t = RUN[i].trace;

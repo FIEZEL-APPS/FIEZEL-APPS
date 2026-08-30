@@ -168,6 +168,36 @@ complete map to an unreachable road measures nothing.
 
 ---
 
+## 4b. The gate was tested, not trusted — and it had a hole
+
+A gate is a claim about what it would catch. That claim is worth nothing until it is checked, so
+each defect this phase fixed was re-introduced into a copy of the tree and the gate re-run:
+
+| mutation | caught by |
+|---|---|
+| M1 — collector reverted to the Phase C four-object list | *(initially only §3, by accident)* |
+| M2 — move map emptied back to 3 of 8 | §2, naming all five unmapped moves |
+| M3 — tutor reasons prefixed into `brain3_tutor_*` | §0, naming each fabricated code |
+| M4 — `decideMove` context reduced to `{remaining: 10}` | §7, naming `breathe` and `wrapup` as unreachable |
+| M5 — fake `'mcq'` mode restored | §4, both assertions |
+
+**M1 exposed a real hole in this gate, and it is worth stating plainly.** Re-introducing the
+*exact defect this phase exists to fix* did **not** turn the coverage assertion red. Because
+`brain3_item_prior_*` fires on every answer, "every decision carries at least one reason code"
+was satisfied by a single always-on source while memory, affect and calibration reasons were
+being discarded again. **Coverage met by one source guards nothing** — the same trap as the
+hollow manifest test from Phase A, in a new costume.
+
+Fixed by asserting **per-source** coverage: reasons must arrive from each measuring family
+(`item_prior`, `item_calibration`, `memory`, `affect`) across the session, plus `misconception`
+and `evidence` on the answers that trigger them. That list is written by hand rather than derived
+from the collector's own source — a gate that reads its expectations out of the code it tests
+disappears together with that code. M1 re-run now fails on the assertion that names it:
+*"tidak ada satu pun alasan dari keluarga ini sepanjang sesi — modulnya dihitung lalu dibuang
+lagi: brain3_item_calibration_, brain3_memory_, brain3_affect_"*.
+
+---
+
 ## 5. What is NOT proven
 
 1. **Coverage is not informativeness.** Early in a learner's life most codes report *insufficient
