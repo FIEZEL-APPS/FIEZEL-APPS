@@ -177,8 +177,35 @@ file. That was the concrete defect behind finding #9, and it is closed.
 
 | Step | Why |
 |---|---|
-| `release-audit-gate-test.js` | Drives a browser and reaches for `api.fiezel.my.id`; the egress proxy denies it by policy, so it hangs until the timeout. **EXPECTED FAILURE** in this environment — not a product defect, and not measurable here. |
 | `tools/fiezel-health-probe.mjs` | Probes the live production site. Unreachable from here. |
+
+### Correction (Phase F): `release-audit-gate-test.js` was misclassified, by me, twice over
+
+This document previously listed it as an **EXPECTED FAILURE** that "hangs until the timeout" and
+is "not measurable here". **That was wrong.** Measured on 2026-08-30:
+
+```
+exit=0  runtime=461s
+"Status audit rilis = PASS"                    status=PASS
+"Exit code audit sepakat dengan isi laporannya" exit=0 blockers=0
+"release-audit.py exit 0"                       exit=0
+"reusedFreshReport": false
+FIEZEL release-audit gate: PASS (audit rilis dijalankan sungguhan, 0 blocker, 461 s)
+```
+
+It does not hang and it is not blocked by the egress proxy. It **passes in 461 seconds**, and
+`reusedFreshReport: false` confirms it really ran the audit rather than reusing a cached report.
+
+**This is the second time I have turned a too-short timeout into a diagnosis.** The first was
+`content-adoption-test.js` (row 10 above), reclassified from "unmeasured" to PASS at 272 s. Both
+times the harness gave up before the test did, and both times the honest-sounding label
+("expected failure in this environment") was doing the work that a measurement should have done.
+The rule I should have followed the first time, written down now: **a timeout is a statement
+about the observer, not the observed.** Nothing may be classified from one until the runtime has
+actually been measured against a ceiling generous enough to be exceeded only by a real hang.
+
+With this corrected, the suite's standing result on this branch is **263 steps run, 0 genuine
+failures** — the one non-zero exit was code 124 from my own 400 s cap on this step.
 
 ### The stronger consistency evidence is CI's, not this audit's
 
