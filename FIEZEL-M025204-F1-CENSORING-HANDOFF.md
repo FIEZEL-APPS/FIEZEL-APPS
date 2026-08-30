@@ -1,6 +1,6 @@
-# FIEZEL m025-203 â€” F1: jebakan jangkar censoring mastery
+# FIEZEL m025-204 â€” F1: jebakan jangkar censoring mastery
 
-**Build:** m025-203 Â· **Basis:** 5.19.0 Â· **Tanggal:** 2026-08-30 Â· **PR:** #253
+**Build:** m025-204 Â· **Basis:** 5.19.0 Â· **Tanggal:** 2026-08-30 Â· **PR:** #253
 **Otoritas:** keputusan trade-off di bawah adalah **keputusan OWNER/MASTER**, diambil
 2026-08-30. Wave tidak berwenang memutuskannya sendiri â€” aturan itu ditulis di
 [BRAIN-EVOLUTION-DECISIONS.md](BRAIN-EVOLUTION-DECISIONS.md) butir #10 dan sengaja dipatuhi.
@@ -53,9 +53,9 @@ Varian yang ditolak: `share >= 0.875` (melanggar konstrain false-decline seed-42
 
 ## Bump versi
 
-m025-200 â†’ **m025-203** lewat `node tools/bump-build.mjs`. Wajib, bukan kosmetik: A7 menuntut
+m025-200 â†’ **m025-204** lewat `node tools/bump-build.mjs`. Wajib, bukan kosmetik: A7 menuntut
 `DIAG_BUILD = base+1` setiap kali berkas berpola `features/` berubah, dan F1 mengubah
-`fiezel-core-brain.js` yang ikut precache. `SW_REV` membawa prefiks `m025-203-` supaya PWA
+`fiezel-core-brain.js` yang ikut precache. `SW_REV` membawa prefiks `m025-204-` supaya PWA
 terpasang menarik ulang shell.
 
 ## Yang menghalangi (bukan dari perubahan ini)

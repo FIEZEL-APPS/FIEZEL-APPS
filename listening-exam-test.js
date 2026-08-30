@@ -178,7 +178,7 @@ const copyFeatB = require('fs').readFileSync(require('path').join(__dirname,'fea
 check('Failed audio keeps the questions locked',
   /audio-tidak-can-diputar-item/.test(renderer) && /this\.replays--/.test(renderer) && /Soal tetap terkunci/.test(copyFeatB),
   'menjawab tanpa mendengar bukan latihan, dan percobaan yang gagal tidak boleh menghabiskan jatah putar');
-/* m025-203: assert ini dulu menuntut `){const` DALAM SATU BARIS TANPA SPASI, jadi ia merah
+/* 2026-08-30: assert ini dulu menuntut `){const` DALAM SATU BARIS TANPA SPASI, jadi ia merah
    begitu wave i18n memformat ulang fungsinya ke beberapa baris - padahal kontraknya utuh
    (listeningExamFor masih menormalkan level di baris pertamanya). Gerbang yang merah karena
    pemformatan mengajari orang mengabaikan gerbang. Spasi dilonggarkan; yang dijaga tetap sama:

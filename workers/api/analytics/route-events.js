@@ -366,7 +366,7 @@ export const ROUTES = Object.freeze([
 export function registerAnalyticsRoutes(router) {
   if (!router) throw new Error('registerAnalyticsRoutes: router wajib');
 
-  /* m025-203: jam DITERUSKAN sebagai argumen keempat.
+  /* 2026-08-30: jam DITERUSKAN sebagai argumen keempat.
    *
    * Sebelumnya wrap() memanggil fn(request, env, ctx) saja, sehingga handleEvents jatuh ke
    * default `now = Date.now()` dan MENGABAIKAN `TEST_CLOCK_MS` — padahal env sudah membawanya

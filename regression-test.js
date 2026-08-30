@@ -63,7 +63,7 @@ assert(/passage:\{id:r\.id/.test(app),'reading questions do not carry their pass
 // W2-INT (teknik union): eyebrow 'TEKS BACAAN' PINDAH byte-identik ke copy-id-app-d.js
 // ('quiz.teks-bacaan'). Struktur renderer tetap dicek di app.js: kartu passage harus tetap
 // dirender — kini lewat t('quiz.teks-bacaan') — dan nilainya tetap verbatim di copy-map.
-// m025-203: assert ini dulu memaku NAMA KUNCI i18n ('quiz.teks-bacaan') dan jadi merah di
+// 2026-08-30: assert ini dulu memaku NAMA KUNCI i18n ('quiz.teks-bacaan') dan jadi merah di
 // m025-202 ketika kunci itu diganti nama jadi 'quiz.reading-eyebrow' — padahal kartu bacaan
 // tetap dirender dan naskahnya tetap 'TEKS BACAAN'. Yang perlu dijaga adalah KONTRAKNYA
 // (soal reading selalu ditemani passage-nya, ber-eyebrow berbahasa Indonesia yang benar),

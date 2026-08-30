@@ -12,7 +12,7 @@ const speaking=JSON.parse(fs.readFileSync(path.join(feature,'speaking-bank-v1.js
 const runtimeText=fs.readFileSync(path.join(feature,'fiezel-speaking-listening-addon.js'),'utf8');
 let pass=0;
 function test(name,fn){fn();pass++;console.log('PASS',name)}
-/* m025-203: akhir baris dinormalkan sebelum di-hash. Di checkout Windows dengan core.autocrlf
+/* 2026-08-30: akhir baris dinormalkan sebelum di-hash. Di checkout Windows dengan core.autocrlf
    berkas bank di disk ber-CRLF, sementara rebuild-speaking-listening-data.js selalu menulis LF -
    jadi 'data rebuild is idempotent' MERAH di mesin pemilik pada pohon BERSIH, lalu HIJAU pada
    run kedua setelah rebuild-nya sendiri menulis ulang berkasnya. Gagal-lalu-lulus seperti itu
