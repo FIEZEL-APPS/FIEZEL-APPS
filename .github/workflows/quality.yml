@@ -806,6 +806,12 @@ jobs:
           # memang belum menang. §4 mengunci satu temuan produk (persistent_misconception yang
           # diklaim tanpa bukti miskonsepsi) sebagai characterization, bukan restu; lihat AUDIT/10.
           node braincore-comparison-test.js
+          # Fase 2 / Phase I: lima metrik hasil belajar sebagai KODE, bukan prosa. Gerbangnya
+          # menjaga MISTARNYA, bukan angkanya: "tidak terukur" wajib null bukan nol (cacat yang
+          # pernah terjadi di Fase B), setiap angka membawa n, metrik yang mustahil gagal harus
+          # disebut tautologi, dan hasilnya deterministik. Tidak ada ambang mutu yang di-assert —
+          # belum ada yang berhak menetapkannya tanpa murid sungguhan.
+          node braincore-metrics-test.js
           node fiezel-stat-gate-test.js
           node id-golden-snapshot-test.js
           node learning-lane-test.js
