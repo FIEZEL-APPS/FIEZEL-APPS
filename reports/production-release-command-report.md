@@ -889,3 +889,88 @@ Satu hal yang tetap harus disebut: perubahan splash/boot di m025-210 datang dari
 saya **tidak** mengauditnya baris demi baris — yang saya ukur adalah akibatnya (CI, paritas,
 asap runtime), dan ketiganya bersih. Itu batas yang jujur, bukan jaminan yang lebih luas
 daripada buktinya.
+
+---
+
+## Catatan HEAD kedua (Aturan A) — vonis diperpanjang ke `aaaa298` / m025-211
+
+OWNER menguji PWA terpasang di iPhone-nya sesudah m025-206 dan melapor: **"aman tapi sedikit
+lambat."** Dua kalimat, dua konsekuensi berbeda untuk audit ini.
+
+### "Aman" — bukti WebKit PERTAMA, dan ia menutup sebagian utang F.8
+
+Sepanjang audit ini seluruh bukti peramban datang dari Chromium, dan itu dilaporkan sebagai
+UNVERIFIED, bukan PASS. Laporan OWNER adalah **pengujian iOS Safari sungguhan di perangkat
+sungguhan**, dan ia mengonfirmasi hal yang paling penting: PWA terpasang **jalan** — cacat
+"tersandera jaringan menggantung" (F-2) benar-benar tertutup di WebKit, bukan hanya di
+Chromium.
+
+Batasnya tetap harus disebut: yang terkonfirmasi adalah perbaikan **m025-206**. Jalur
+cangkang-dulu m025-211 di bawah **belum** diuji di WebKit oleh siapa pun.
+
+### "Sedikit lambat" — dan menelusurinya menemukan cacat kedua
+
+Keluhan kecepatan itu benar dan terukur. Tetapi penelusurannya membuka cacat yang **tidak
+dilaporkan siapa pun dan lebih serius daripada lambat**: seluruh aset cangkang non-navigasi
+dilayani cache-first di dalam generasinya, sementara hanya DOKUMEN yang diambil dari jaringan.
+Begitu build baru terbit sementara SW lama masih aktif — dan ia memang masih aktif, karena
+`sw.js` sengaja tidak pernah memanggil `skipWaiting()` — murid menerima `index.html` build N+1
+yang berjalan di atas JavaScript build N.
+
+Terukur di peramban: dengan `SW_REV` tidak berubah, dokumen membawa penanda terbitan baru
+sementara `core-config.js` masih membawa penanda lama. Cabang yang dimaksudkan mencegah
+cangkang tak sepadan justru **membuatnya** — persis keadaan yang §22 larang.
+
+Keduanya ditutup m025-211:
+
+| | sebelum | sesudah |
+|---|---|---|
+| FCP, jaringan sehat | 60 ms | 88 ms |
+| FCP, jaringan lambat | 752 ms | **92 ms** |
+| FCP, jaringan menggantung | 2556 ms | **40 ms** |
+| dokumen ⇄ aset segenerasi | **TIDAK** | **YA** |
+
+### Gerbang yang membela cacatnya sendiri
+
+`pwa-startup-white-screen-recovery-test.js` meng-assert
+`indexOf('fetch(') < indexOf('caches.match(')`. Assert semacam itu mengunci satu MEKANISME,
+bukan sifat — dan ketika mekanisme itu sendiri yang keliru, gerbangnya **ikut membela
+kekeliruan**. Ia hijau di sepanjang audit ini sementara cacat yang baru saja diukur berdiri
+tepat di bawahnya.
+
+Itu pelajaran yang lebih besar daripada satu cacat, dan ia memperkuat §19: gerbang hijau
+bukan hanya "belum cukup", ia bisa **aktif menyesatkan** kalau yang diuji cara menulis kode
+alih-alih sifat yang ingin dipunyai. Ketiga assert mekanisme diganti dengan sifat yang diuji
+lewat EKSEKUSI, dan gerbang navigasinya naik 8 → 15 assert dengan bukti merah empat arah.
+
+### Diukur ulang di `aaaa298`
+
+| | |
+|---|---|
+| CI di HEAD | **HIJAU** — `quality`, `build`, `safari26`, `deploy`, nol gagal |
+| Paritas produksi | **TERBUKTI** — situs menyajikan `m025-211` (run `33330010392`). **Keenam berturut-turut.** |
+| Navigasi PWA | **15/15 assert** eksekusi, merah terbukti empat arah |
+| Gerbang live (CF + AI) | tetap berlaku — `workers/` tidak disentuh |
+| Braincore v3 E2E | tetap berlaku — `app.js` dan `features/brain/` tidak disentuh |
+
+### Regresi yang hampir terkirim, dicatat karena ia hampir lolos
+
+Bentuk pertama perbaikan m025-211 menyajikan `./index.html` untuk **setiap** navigasi — yang
+akan membuat `creator-report-dashboard.html` dan `creator-report-setup.html` tidak pernah bisa
+dibuka lagi. Ia tertangkap saat memeriksa asimetri baca/tulis, **bukan** oleh gerbang mana pun
+yang sudah ada, dan bukan oleh pengukuran boot yang semuanya hijau. Assert (J) kini
+menjaganya. Dicatat di sini karena audit yang hanya melaporkan temuan orang lain, tanpa
+melaporkan yang nyaris dikirimnya sendiri, tidak jujur.
+
+### VONIS TETAP: **GO**
+
+Kini terikat **`aaaa298` / m025-211**, dengan **ketiga larangan yang sama persis dan tidak
+berkurang satu pun**:
+
+1. **JANGAN buka `endpoints.ai`** sampai `tutor_turn`, `writing_feedback`, dan `context_coach`
+   lulus kontrak mutu terhadap model hidup.
+2. **JANGAN buka `cfTtsEnabled` / `FEATURE_TTS`.**
+3. **JANGAN sebut kuota / cache TTS / cron "terverifikasi produksi"** sampai ada staging.
+
+Satu utang BARU yang jujur: jalur cangkang-dulu m025-211 diukur di Chromium saja. Perbaikan
+sebelumnya sudah dikonfirmasi OWNER di iPhone; yang ini belum.
