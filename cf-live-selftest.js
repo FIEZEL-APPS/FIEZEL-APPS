@@ -60,11 +60,18 @@ const check = (name, ok, details) => {
 /* =======================================================================================
  * Worker tiruan. `mut` adalah kumpulan mutasi bernama; skenario BENAR = mut kosong.
  * ===================================================================================== */
-const FLAGS_OFF = {
-  cfApiEnabled: false, cfAiEnabled: false, cfTtsEnabled: false,
-  cfQuotaEnabled: false, cfAnalyticsEnabled: false, cfIdentityEnabled: false
+/* m025-207: fixture "jawaban benar" TIDAK lagi semua-mati. Gerbangnya berhenti bertanya
+ * "adakah flag yang menyala" (pertanyaan yang mati sendiri begitu owner menyalakan fitur
+ * pertamanya) dan mulai bertanya "apakah setiap flag sama persis dengan keadaan yang
+ * dideklarasikan repo". Jadi jawaban benar di sini WAJIB mencerminkan deklarasi itu — kalau
+ * tidak, skenario BENAR pun merah dan matriksnya berhenti berarti.
+ * Sumbernya satu: FLAGS_DIHARAPKAN/KILL_DIHARAPKAN di cf-live-contract-test.js. */
+const FLAGS_BENAR = {
+  cfApiEnabled: true, cfAiEnabled: true, cfTtsEnabled: false,
+  cfQuotaEnabled: true, cfAnalyticsEnabled: true, cfIdentityEnabled: true,
+  cfSocialEnabled: false
 };
-const KILL_OFF = { ai: false, tts: false, coach: false, analytics: false };
+const KILL_BENAR = { ai: true, tts: false, coach: false, analytics: true, social: false };
 
 function buildCookie(mut) {
   const bits = ['fz_id=eyJ2IjoxfQ.tandatangan'];
@@ -128,8 +135,8 @@ function makeServer(mut) {
       });
     }
     if (pathname === '/api/config') {
-      const flags = Object.assign({}, FLAGS_OFF, mut.flagsOverride || {});
-      const enabled = Object.assign({}, KILL_OFF, mut.killOverride || {});
+      const flags = Object.assign({}, FLAGS_BENAR, mut.flagsOverride || {});
+      const enabled = Object.assign({}, KILL_BENAR, mut.killOverride || {});
       return send(200, {
         protocol: '1.7',
         flags: mut.flagsEmpty ? {} : flags,
@@ -224,9 +231,16 @@ const SCENARIOS = [
   { name: 'protocol 1.6 di /health', mut: { protocol: '1.6' }, expect: 'health-protocol' },
   { name: '/health menjawab 404 (rute tidak terpasang)', mut: { health404: true }, expect: 'health-not-404' },
 
-  { name: '/api/config menyalakan satu flag', mut: { flagsOverride: { cfAiEnabled: true } }, expect: 'config-flags-false' },
+  /* Kontrak flag diuji ke EMPAT arah, bukan satu. Bentuk lama ("adakah yang menyala") hanya
+     bisa melihat arah pertama, dan justru buta pada arah kedua — fitur yang seharusnya hidup
+     ternyata mati di produksi adalah pemadaman senyap, bukan keadaan aman. */
+  { name: '/api/config menyalakan flag yang seharusnya MATI (cfTtsEnabled)', mut: { flagsOverride: { cfTtsEnabled: true } }, expect: 'config-flags-match' },
+  { name: '/api/config MEMATIKAN flag yang seharusnya hidup (cfAiEnabled)', mut: { flagsOverride: { cfAiEnabled: false } }, expect: 'config-flags-match' },
+  { name: '/api/config memuat flag yang belum pernah dideklarasikan', mut: { flagsOverride: { cfFiturBaruEnabled: true } }, expect: 'config-flags-declared' },
   { name: '/api/config mengirim flags kosong (uji anti-vakum)', mut: { flagsEmpty: true }, expect: 'config-flags-present' },
-  { name: '/api/config menyalakan kill switch ai', mut: { killOverride: { ai: true } }, expect: 'config-killswitch-false' },
+  { name: '/api/config MEMATIKAN kill switch yang seharusnya hidup (ai)', mut: { killOverride: { ai: false } }, expect: 'config-killswitch-match' },
+  { name: '/api/config menyalakan kill switch yang seharusnya mati (tts)', mut: { killOverride: { tts: true } }, expect: 'config-killswitch-match' },
+  { name: '/api/config memuat kill switch yang belum pernah dideklarasikan', mut: { killOverride: { fiturBaru: true } }, expect: 'config-killswitch-declared' },
 
   { name: '/api/quota 200 tanpa cookie', mut: { quotaLeak: true }, expect: 'quota-401' },
   { name: '/api/user/me 200 tanpa cookie', mut: { meLeak: true }, expect: 'me-401' },
