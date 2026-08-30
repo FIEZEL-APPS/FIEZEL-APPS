@@ -126,6 +126,8 @@
     'progress.calibration-label-2': 'Kalibrasi keyakinan:',
     'progress.ability-label': 'Kemampuan terukur',
     'progress.difficulty-label': 'Kesulitan optimal',
-    'progress.response-label': 'Respons sistem:'
+    'progress.response-label': 'Respons sistem:',
+    'progress.keyakinan-persen': 'keyakinan {persen}%',
+    'progress.indeks-ability': 'indeks {ability}'
   });
 }());
