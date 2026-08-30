@@ -1,6 +1,7 @@
 /**
- * FIEZEL — onboarding enam langkah (Step 1-6). Step 0 (splash) hidup terpisah di
- * `fiezel-splash.js`. Step 2-6 mengikuti Step 1-5 pada
+ * FIEZEL — pemilih bahasa pertama + onboarding enam langkah (Step 1-6). Splash hidup
+ * terpisah di `fiezel-splash.js`. Pemilih bahasa bukan langkah profil: ia muncul sebelum
+ * Step 1 hanya pada onboarding pertama, lalu pilihan disimpan. Step 2-6 mengikuti Step 1-5 pada
  * `FIEZEL_Complete_Design_Specification.pdf` bagian 3; Step 1 adalah tambahan m025-117.
  *
  * m025-78: dibangun ulang dari nol mengikuti spesifikasi lengkap, menggantikan versi m025-77
@@ -118,6 +119,10 @@
   // "sudah di ujung" pada tombol lewati-langkah tidak bisa menyimpang satu sama lain -
   // ketidaksamaan itulah yang membuat tombol di langkah terakhir mati diam-diam.
   var LAST_STEP = 6;
+  // Pemilih bahasa adalah gerbang pra-langkah, bukan bagian dari enam langkah profil.
+  // Nilai 0 membuat stepper tetap jujur (Step 1 masih nama) dan menghindari pergeseran
+  // kontrak placement/summary yang sudah dipakai aplikasi serta gate regresi.
+  var LANGUAGE_STEP = 0;
   // Step 1 (m025-117): nama murid. Langkah wajib, dan satu-satunya langkah tanpa "Lewati".
   var NAME_STEP = 1;
   // Langkah tes penempatan. Tombol utamanya BUKAN "Lanjut" melainkan "Mulai tes penempatan",
@@ -155,20 +160,20 @@
   var CAROUSEL_SLIDES = Object.freeze([
     Object.freeze({
       paw: 'lesson-start',
-      title: T('onboarding.carousel-title'),
-      body: T('onboarding.carousel-1-body'),
+      titleKey: 'onboarding.carousel-title',
+      bodyKey: 'onboarding.carousel-1-body',
       items: Object.freeze([
-        { icon: 'vocab', label: 'Kosakata (Vocabulary)' },
-        { icon: 'grammar', label: 'Grammar (Grammar Patterns)' }
+        { icon: 'vocab', labelKey: 'onboarding.carousel-vocab' },
+        { icon: 'grammar', labelKey: 'onboarding.carousel-grammar' }
       ])
     }),
     Object.freeze({
       paw: 'listening',
-      title: T('onboarding.carousel-title'),
-      body: T('onboarding.carousel-2-body'),
+      titleKey: 'onboarding.carousel-title',
+      bodyKey: 'onboarding.carousel-2-body',
       items: Object.freeze([
-        { icon: 'reading', label: 'Reading (Reading Comprehension)' },
-        { icon: 'listening', label: 'Listening (Listening with Neural Voice)' }
+        { icon: 'reading', labelKey: 'onboarding.carousel-reading' },
+        { icon: 'listening', labelKey: 'onboarding.carousel-listening' }
       ])
     })
   ]);
@@ -192,6 +197,35 @@
   function storedName(env) {
     var record = readRecord(env);
     return normalizeName(record && record.name);
+  }
+
+  function normalizeLocale(value) {
+    var locale = String(value || '');
+    var supported = I18N && Array.isArray(I18N.SUPPORTED) ? I18N.SUPPORTED : ['id', 'th'];
+    return supported.indexOf(locale) >= 0 ? locale : '';
+  }
+
+  /** Locale yang sudah dipilih pada popup pertama, atau '' bila popup belum pernah dijawab. */
+  function storedLocale(env) {
+    var record = readRecord(env);
+    return normalizeLocale(record && record.locale);
+  }
+
+  /**
+   * Simpan segera setelah pilihan diketuk. `done` tidak diubah: memuat ulang sesudah memilih
+   * bahasa harus melanjutkan ke nama, bukan mengulang popup dan bukan menandai onboarding selesai.
+   */
+  function markLocaleSelected(env, locale) {
+    try {
+      var store = env && env.localStorage;
+      if (!store || typeof store.setItem !== 'function') return '';
+      var selected = normalizeLocale(locale);
+      if (!selected) return '';
+      var previous = readRecord(env) || {};
+      previous.locale = selected;
+      store.setItem(STORAGE_KEY, JSON.stringify(previous));
+      return selected;
+    } catch (_) { return ''; }
   }
 
   /** Sudah pernah selesai ATAU pernah dilewati. Keduanya berarti jangan menghadang lagi. */
@@ -220,6 +254,7 @@
         done: true,
         at: Number(detail && detail.at) || 0,
         via: String((detail && detail.via) || 'finish'),
+        locale: normalizeLocale((detail && detail.locale) || previous.locale),
         name: name,
         goal: String((detail && detail.goal) || ''),
         level: String((detail && detail.level) || '')
@@ -260,7 +295,14 @@
 
   // Nama langkah untuk breadcrumb stepper. Urutannya WAJIB mengikuti step 1..LAST_STEP di
   // render() - kalau suatu hari langkah ditambah, daftar ini yang pertama harus ikut.
-  var STEP_LABELS = ['Nama', 'Kenalan', 'Tujuan', 'Level', 'Pengingat', 'Selesai'];
+  var STEP_LABEL_KEYS = [
+    'onboarding.step-name', 'onboarding.step-intro', 'onboarding.step-goal',
+    'onboarding.step-level', 'onboarding.step-reminder', 'onboarding.step-done'
+  ];
+
+  function stepLabels() {
+    return STEP_LABEL_KEYS.map(function (key) { return T(key); });
+  }
 
   // Band gelap pembawa merek. Warnanya sama dengan panggung splash yang baru saja tutup,
   // jadi peralihan splash -> onboarding terbaca sebagai satu gerakan, bukan dua layar yang
@@ -272,23 +314,24 @@
       ? env.FiezelSplash.wordmarkMarkup('fzob')
       : '<p class="fiezel-ob-word">FIEZEL</p>';
     return '<div class="fiezel-ob-reveal">' + brand
-      + '<p class="fiezel-ob-tag">Adaptive English</p></div>';
+      + '<p class="fiezel-ob-tag">' + escapeHtml(T('onboarding.brand-tag')) + '</p></div>';
   }
 
   // Stepper enam segmen. Murni turunan dari nomor langkah yang sudah ada - ia tidak
   // menyimpan keadaan apa pun, jadi tidak bisa melenceng dari langkah yang sebenarnya.
   function stepper(step) {
-    var current = Math.min(STEP_LABELS.length, Math.max(1, Number(step) || 1));
+    var labels = stepLabels();
+    var current = Math.min(labels.length, Math.max(1, Number(step) || 1));
     var bars = '';
-    for (var i = 1; i <= STEP_LABELS.length; i++) {
+    for (var i = 1; i <= labels.length; i++) {
       bars += '<i' + (i <= current ? ' class="is-done"' : '') + '></i>';
     }
     return '<div class="fiezel-stepper">'
-      + '<span class="fiezel-stepper-eyebrow">' + T('onboarding.stepper-eyebrow', { current: current, total: STEP_LABELS.length }) + '</span>'
-      + '<span class="fiezel-stepper-names"><b>' + escapeHtml(STEP_LABELS[current - 1]) + '</b>'
-      + (current < STEP_LABELS.length ? T('onboarding.upcoming') + escapeHtml(STEP_LABELS[current]) : ' · terakhir') + '</span>'
+      + '<span class="fiezel-stepper-eyebrow">' + T('onboarding.stepper-eyebrow', { current: current, total: labels.length }) + '</span>'
+      + '<span class="fiezel-stepper-names"><b>' + escapeHtml(labels[current - 1]) + '</b>'
+      + (current < labels.length ? T('onboarding.upcoming') + escapeHtml(labels[current]) : T('onboarding.last-step')) + '</span>'
       + '<div class="fiezel-segments" role="progressbar" aria-valuemin="1" aria-valuemax="'
-      + STEP_LABELS.length + '" aria-valuenow="' + current + '" aria-label="' + T('onboarding.stepper-aria') + '">'
+      + labels.length + '" aria-valuenow="' + current + '" aria-label="' + T('onboarding.stepper-aria') + '">'
       + bars + '</div></div>';
   }
 
@@ -311,7 +354,7 @@
       + '<button type="button" class="fiezel-back"' + (showBack ? '' : ' hidden') + ' data-ob-back>'
       + glyph('chevron-left') + T('onboarding.btn-back') + '</button>'
       + (showSkip === false ? '<span class="fiezel-skip-spacer" aria-hidden="true"></span>'
-        : '<button type="button" class="fiezel-skip" data-ob-skip>Lewati</button>')
+        : '<button type="button" class="fiezel-skip" data-ob-skip>' + T('onboarding.btn-skip-all') + '</button>')
       + '</div>';
   }
 
@@ -477,6 +520,36 @@
   }
 
   // ---------------------------------------------------------------------------------------
+  // Pra-langkah: pilihan bahasa. Sengaja bilingual dan TIDAK memakai T(): pada cat pertama
+  // belum ada locale pilihan, dan copy Thai memang belum dimuat untuk menjaga bundle id tetap
+  // ringan. Nama kedua bahasa selalu ditulis sebagai autonym supaya tetap dapat dikenali.
+  // ---------------------------------------------------------------------------------------
+  function languageMarkup(env, selected, busy) {
+    function choice(locale, flag, title, subtitle) {
+      var active = selected === locale;
+      var waiting = busy === locale;
+      return '<button type="button" class="fiezel-goal-card fiezel-language-choice'
+        + (active ? ' is-selected' : '') + '" data-ob-locale="' + locale + '"'
+        + (waiting ? ' aria-busy="true" disabled' : '') + '>'
+        + '<span class="fiezel-language-flag" aria-hidden="true">' + flag + '</span>'
+        + '<span class="fiezel-language-copy"><b>' + title + '</b><small>' + subtitle + '</small></span>'
+        + '</button>';
+    }
+    return reveal(env)
+      + topbar(false, false)
+      + '<div class="fiezel-sheet fiezel-language-sheet" data-ob-step="language">'
+      + '<span class="fiezel-language-kicker">LANGUAGE · BAHASA · ภาษา</span>'
+      + '<h2 class="fiezel-title">Choose your language</h2>'
+      + '<p class="fiezel-body">Pilih bahasa untuk melanjutkan<br><span lang="th">เลือกภาษาเพื่อดำเนินการต่อ</span></p>'
+      + '<div class="fiezel-goal-grid fiezel-language-grid" role="group" aria-label="Language / Bahasa / ภาษา">'
+      + choice('id', '🇮🇩', 'Bahasa Indonesia', 'Indonesia')
+      + choice('th', '🇹🇭', 'ภาษาไทย', 'ไทย')
+      + '</div>'
+      + (busy === 'th' ? '<p class="fiezel-note" role="status">Menyiapkan Bahasa Thai · <span lang="th">กำลังเตรียมภาษาไทย…</span></p>' : '')
+      + '</div>';
+  }
+
+  // ---------------------------------------------------------------------------------------
   // Step 1 (m025-117): nama murid. WAJIB.
   //
   // Satu pertanyaan, satu kolom, satu tombol. Tidak ada "Lewati" di sini - lihat catatan di
@@ -514,7 +587,7 @@
     var slide = CAROUSEL_SLIDES[slideIndex];
     var items = slide.items.map(function (it) {
       return '<div class="fiezel-carousel-item">' + glyph(it.icon)
-        + '<span>' + escapeHtml(it.label) + '</span></div>';
+        + '<span>' + escapeHtml(T(it.labelKey)) + '</span></div>';
     }).join('');
     var isLast = slideIndex === CAROUSEL_SLIDES.length - 1;
     return reveal(env)
@@ -523,10 +596,10 @@
       // Pose mengikuti ISI slide: slide latihan = curious, slide suara neural = listening.
       // Sumbernya slide itu sendiri, jadi tidak bisa menyimpang dari apa yang tertulis.
       + greet(env, MASCOT_SLIDES[slideIndex] || slide.paw || 'curious',
-        'Ini isi aplikasinya. Sebentar saja, dua layar.')
+        T('onboarding.carousel-greet'))
       + '<div class="fiezel-sheet" data-ob-step="2">'
-      + '<h2 class="fiezel-title">' + escapeHtml(slide.title) + '</h2>'
-      + '<p class="fiezel-body">' + escapeHtml(slide.body) + '</p>'
+      + '<h2 class="fiezel-title">' + escapeHtml(T(slide.titleKey)) + '</h2>'
+      + '<p class="fiezel-body">' + escapeHtml(T(slide.bodyKey)) + '</p>'
       + '<div class="fiezel-carousel-track">' + items + '</div>'
       + '<div class="fiezel-carousel-arrows">'
       + '<button type="button" class="fiezel-carousel-arrow" data-ob-carousel-prev' + (slideIndex === 0 ? ' disabled' : '') + '>'
@@ -567,7 +640,7 @@
       + (selectedGoal ? T('onboarding.berapa-perkiraan-level-lang-inggrismu') + levelRow
         + T('onboarding.ini-cuma-perkiraan-awal-darimu') : '')
       + btn(T('onboarding.next-l554'), 'data-ob-advance' + (selectedGoal ? '' : ' disabled'))
-      + btn('Lewati langkah ini', 'data-ob-step-skip', 'ghost')
+      + btn(T('onboarding.btn-skip-step'), 'data-ob-step-skip', 'ghost')
       + '</div>';
   }
 
@@ -583,8 +656,8 @@
       + T('onboarding.apa-level-lang-you')
       + T('onboarding.kerjakan-santai-aja-ini-bukan')
       + T('onboarding.isinya-item-listening-grammar-and')
-      + btn('Mulai tes penempatan', 'data-ob-primary')
-      + btn('Lewati langkah ini', 'data-ob-step-skip', 'ghost')
+      + btn(T('onboarding.btn-placement'), 'data-ob-primary')
+      + btn(T('onboarding.btn-skip-step'), 'data-ob-step-skip', 'ghost')
       + '</div>';
   }
 
@@ -639,7 +712,7 @@
       + '<div class="fiezel-summary-row"><b>' + T('onboarding.summary-goal-label') + '</b><span>' + escapeHtml(goalLabel) + '</span></div>'
       + '<div class="fiezel-summary-row"><b>' + T('onboarding.summary-level-label') + '</b><span>' + escapeHtml(selectedLevel || T('onboarding.not-set')) + '</span></div>'
       + '<div class="fiezel-summary-row"><b>' + T('onboarding.summary-reminder-label') + '</b><span>' + T('onboarding.reminder-on') + '</span></div>'
-      + '<div class="fiezel-summary-row"><b>Streak</b><span>' + T('onboarding.summary-streak-zero') + '</span></div>'
+      + '<div class="fiezel-summary-row"><b>' + T('onboarding.summary-streak-label') + '</b><span>' + T('onboarding.summary-streak-zero') + '</span></div>'
       + '</div>'
       + btn(T('onboarding.btn-start'), 'data-ob-primary')
       + btn(T('onboarding.btn-skip'), 'data-ob-step-skip', 'ghost')
@@ -651,7 +724,7 @@
    * apa yang terjadi, bukan menebaknya dari efek samping.
    *
    * @param {object} env global tempat DOM, modul maskot, dan modul perjalanan belajar berada
-   * @param {{now?:number, force?:boolean, nameOnly?:boolean, onName?:Function, onGoal?:Function, onPlacement?:Function, onFinish?:Function}} options
+   * @param {{now?:number, force?:boolean, nameOnly?:boolean, onLocale?:Function, onName?:Function, onGoal?:Function, onPlacement?:Function, onFinish?:Function}} options
    */
   function show(env, options) {
     var target = env || (typeof globalThis !== 'undefined' ? globalThis : {});
@@ -672,14 +745,28 @@
     if (reduceMotion) host.className += ' fiezel-ob-still';
     host.setAttribute('role', 'dialog');
     host.setAttribute('aria-modal', 'true');
-    host.setAttribute('aria-label', 'Perkenalan FIEZEL');
+    host.setAttribute('aria-label', 'FIEZEL · Language / Bahasa / ภาษา');
 
-    var step = 1;
+    // Pemilih hanya boleh lahir bila pemanggil menyediakan pintu persistensi locale.
+    // Harness/pemanggil lama tanpa onLocale tetap kompatibel dan langsung masuk Step 1.
+    var savedLocale = storedLocale(target);
+    var askLocale = !nameOnly && typeof opts.onLocale === 'function' && !savedLocale;
+    var step = askLocale ? LANGUAGE_STEP : NAME_STEP;
     var slide = 0;
+    var selectedLocale = savedLocale;
+    var localeBusy = '';
+    var localeToken = 0;
+    var localeWaitT = null;
     var typedName = storedName(target);
     var selectedGoal = '';
     var selectedLevel = '';
     var closed = false;
+
+    // Bila sesi sebelumnya ditutup setelah bahasa dipilih tetapi sebelum nama selesai,
+    // pulihkan locale aplikasi dulu lalu lanjut langsung ke Step 1 tanpa menanyakan ulang.
+    if (savedLocale && typeof opts.onLocale === 'function') {
+      try { opts.onLocale({ locale: savedLocale, restored: true }); } catch (_) {}
+    }
 
     /* ---------------------------------------------------------------------------------
      * MASKOT: satu wajah per langkah, state-nya ditentukan langkahnya sendiri.
@@ -726,9 +813,11 @@
           if (microT != null) target.clearTimeout(microT);
           if (pointT != null) target.clearTimeout(pointT);
           if (slideGazeT != null) target.clearTimeout(slideGazeT);
+          if (localeWaitT != null) target.clearTimeout(localeWaitT);
         }
       } catch (_) {}
       settleT = null; entranceT = null; microT = null; pointT = null; slideGazeT = null;
+      localeWaitT = null;
     }
 
     function mascotBox() {
@@ -946,13 +1035,17 @@
 
     function paint() {
       var html;
-      if (step === 1) html = nameMarkup(target, typedName);
+      if (step === LANGUAGE_STEP) html = languageMarkup(target, selectedLocale, localeBusy);
+      else if (step === 1) html = nameMarkup(target, typedName);
       else if (step === 2) html = carouselMarkup(target, slide);
       else if (step === 3) html = goalMarkup(target, selectedGoal, selectedLevel);
       else if (step === 4) html = placementMarkup(target);
       else if (step === 5) html = scheduleMarkup(target);
       else html = summaryMarkup(target, typedName, selectedGoal, selectedLevel, reduceMotion);
       host.innerHTML = html;
+      host.setAttribute('aria-label', step === LANGUAGE_STEP
+        ? 'FIEZEL · Language / Bahasa / ภาษา'
+        : T('onboarding.dialog-aria'));
       applyMascot();
       bind();
       /* v31-2 2026-08-29: transisi langkah menjatuhkan fokus ke <body> - pengguna keyboard/SR
@@ -1043,7 +1136,7 @@
       if (closed) return;
       closed = true;
       clearMascotTimers();
-      markCompleted(target, { at: now, via: via, name: typedName, goal: selectedGoal, level: selectedLevel });
+      markCompleted(target, { at: now, via: via, locale: selectedLocale, name: typedName, goal: selectedGoal, level: selectedLevel });
       // Serah terima hanya pada penyelesaian sungguhan; skip/placement keluar lewat fade
       // lama (§2.3: dilewati pada kurangi-gerak dan pada jalur tes penempatan).
       var handedOff = via === 'finish' ? beginHandoff() : false;
@@ -1067,6 +1160,50 @@
     function goStep(next) {
       step = Math.min(LAST_STEP, Math.max(1, next));
       paint();
+    }
+
+    function localeReady(locale, token) {
+      if (closed || step !== LANGUAGE_STEP || token !== localeToken) return;
+      if (localeWaitT != null && typeof target.clearTimeout === 'function') {
+        try { target.clearTimeout(localeWaitT); } catch (_) {}
+      }
+      localeWaitT = null;
+      localeBusy = '';
+      goStep(NAME_STEP);
+    }
+
+    function selectLocale(value) {
+      var locale = normalizeLocale(value);
+      if (!locale || closed) return;
+      selectedLocale = locale;
+      var token = ++localeToken;
+      if (localeWaitT != null && typeof target.clearTimeout === 'function') {
+        try { target.clearTimeout(localeWaitT); } catch (_) {}
+        localeWaitT = null;
+      }
+      try { opts.onLocale({ locale: locale, restored: false }); } catch (_) {}
+      markLocaleSelected(target, locale);
+
+      // Bundle Indonesia sudah ada sejak boot. Copy Thai sengaja dinamis; jangan munculkan
+      // Step 1 dengan fallback Indonesia sambil unduhannya berjalan. Menunggu SATU kunci
+      // onboarding cukup untuk membuktikan domain feat-b sudah siap. Tenggat tetap ada agar
+      // kegagalan jaringan tidak mengurung pengguna pada layar penuh.
+      if (locale === 'th' && I18N && typeof I18N.hasCopy === 'function'
+          && typeof I18N.whenAvailable === 'function'
+          && !I18N.hasCopy('th', 'onboarding.dialog-aria')) {
+        localeBusy = 'th';
+        paint();
+        try {
+          I18N.whenAvailable('th', 'onboarding.dialog-aria').then(function () {
+            localeReady(locale, token);
+          }, function () { localeReady(locale, token); });
+        } catch (_) { localeReady(locale, token); return; }
+        if (typeof target.setTimeout === 'function') {
+          localeWaitT = target.setTimeout(function () { localeReady(locale, token); }, 5000);
+        }
+        return;
+      }
+      localeReady(locale, token);
     }
 
     /** Menyerahkan nama ke aplikasi. Dipanggil sekali, saat langkah nama ditinggalkan. */
@@ -1110,6 +1247,15 @@
 
     function bind() {
       try {
+        var localeButtons = host.querySelectorAll('[data-ob-locale]');
+        for (var l = 0; l < localeButtons.length; l++) {
+          (function (button) {
+            if (button.hasAttribute('disabled')) return;
+            button.addEventListener('click', function () {
+              selectLocale(button.getAttribute('data-ob-locale') || '');
+            });
+          })(localeButtons[l]);
+        }
         var nameInput = host.querySelector('[data-ob-name]');
         if (nameInput) {
           // Mengecat ulang seluruh langkah pada setiap ketikan akan mencabut fokus papan
@@ -1242,12 +1388,15 @@
     MASCOT_CHAIN: MASCOT_CHAIN,
     MASCOT_SIZE: MASCOT_SIZE,
     resolveMascotState: resolveMascotState,
+    LANGUAGE_STEP: LANGUAGE_STEP,
     LAST_STEP: LAST_STEP,
     NAME_STEP: NAME_STEP,
     PLACEMENT_STEP: PLACEMENT_STEP,
     NAME_MAX: NAME_MAX,
     normalizeName: normalizeName,
+    normalizeLocale: normalizeLocale,
     goalOptions: goalOptions,
+    languageMarkup: languageMarkup,
     nameMarkup: nameMarkup,
     carouselMarkup: carouselMarkup,
     goalMarkup: goalMarkup,
@@ -1256,6 +1405,7 @@
     summaryMarkup: summaryMarkup,
     completed: completed,
     storedName: storedName,
+    storedLocale: storedLocale,
     needsName: needsName,
     show: show
   };
