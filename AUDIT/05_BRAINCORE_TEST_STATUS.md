@@ -21,6 +21,13 @@ prior report, or a CI summary. Where a test was not run, it says so.
 | Not applicable / live-infra | 1 | 0.5% |
 | **Total steps executed** | **214** | |
 
+> **⚠️ Two corrections to this table, both established in Phase 2 and both detailed below.**
+> The real gate has **211** steps, not 214 — three of the entries above came from an
+> extraction bug that swept up commented-out lines (§4.1). And one of the three timeouts
+> (`content-adoption-test.js`) is a **PASS at 272 s**, not an unmeasured step (§4.4). The
+> table is left as originally recorded so the correction is visible rather than quietly
+> overwritten.
+
 **Plain language:** the great majority of this project's own checks genuinely pass when you
 run them. That is a real and unusual strength — most projects this size cannot make that
 claim. But it is **not** "all green", and the differences matter. They are itemised below,
@@ -106,21 +113,40 @@ Exactly as the brief requires — implemented, tested, and result kept as separa
 - **Verified both ways:** the file was restored to its committed state and the test re-run
   alone → `HIJAU: baseline emas Indonesia utuh` (green, baseline intact).
 
-**This is a real defect, and it is a process defect rather than a product defect.**
-
-> **⚠️ Finding: the test suite is not read-only. Running it modifies tracked files.**
+> ## ⚠️ CORRECTION (Phase 2, 30 Aug 2026) — this finding was half wrong, and the wrong half was mine
 >
-> Confirmed and reproducible: `ai-account-cap-gate-test.js` rewrites
-> `AI-ACCOUNT-CAP-GATE.json` (its own report artefact) every time it runs, updating embedded
-> timestamps. Something in the run also rewrites `grammar-templates.json`'s `updatedAt` — the
-> exact writer was **not isolated** and is recorded here as **UNKNOWN** rather than guessed.
+> The original text of this section claimed the Quality Gate itself rewrites
+> `grammar-templates.json`, and recorded the writer as UNKNOWN. **Phase 2 traced it, and the
+> cause was this audit's own harness, not the gate.**
 >
-> **Plain language:** running the tests leaves fingerprints on the project's own files. One
-> test's fingerprints then make a *different* test fail. That second failure is not a real
-> bug — it is the first test's mess. A buyer's engineer running the suite on day one will
-> hit exactly this and will not know it is harmless. It should be fixed before any technical
-> demonstration, and it is cheap to fix: gates should write their reports outside the tracked
-> tree, or the reports should be untracked.
+> To run "every gate step", Phase 1 extracted commands from `quality.yml` with a `grep` for
+> `node <file>`. That grep also matched **two commented-out remediation hints** — lines that
+> tell a maintainer what to run *if* a gate goes red:
+>
+> ```yaml
+> # Perbaikan bila merah: node tools/sync-grammar-explanations-id.js --write
+> # && node audit/merge-grammar-id.js.
+> ```
+>
+> `audit/merge-grammar-id.js:60` stamps `updatedAt: new Date()...` and rewrites
+> `grammar-templates.json`. **CI never runs it.** This audit did, because of the extraction
+> bug, and that is what changed the file and made `id-golden-snapshot-test.js` fail.
+>
+> A corrected extractor that ignores comment lines yields **211 real gate steps**, not 214.
+>
+> **What survives the correction, verified and reproducible:** `ai-account-cap-gate-test.js`
+> genuinely did rewrite the tracked `AI-ACCOUNT-CAP-GATE.json` on every run. That is a real
+> defect and it is **now fixed** — the report prints to stdout always and writes only under
+> `FIEZEL_WRITE_GATE_REPORT=1`.
+>
+> **What does not survive:** the broader claim that "the test suite is not read-only." With
+> that one gate fixed, the suite does not modify tracked files. All eight other gate proof
+> artefacts (`CONTENT-ADOPTION-PROOF.json` and friends) were already gitignored — the repo's
+> convention was right; one file had escaped it.
+>
+> **Plain language:** the audit accused the test suite of something the audit itself did. The
+> accusation is withdrawn, the one genuine part of it is fixed, and the count of gate steps is
+> corrected from 214 to 211.
 
 ### 4.2 Failures that need live infrastructure (expected in this environment)
 
@@ -206,13 +232,24 @@ this is reassuring; for the FIEZEL product as a whole, these are open bugs that 
 
 | Step | Behaviour |
 |---|---|
-| `content-adoption-test.js` | Exceeded 180 s, then exceeded 200 s on a second isolated attempt |
+| `content-adoption-test.js` | Exceeded 180 s, then 200 s |
 | `fiezel-evolution-loop-test.js` | Exceeded 120 s |
 | `release-audit-gate-test.js` | Exceeded 120 s |
 
-**Status: UNKNOWN, not FAIL.** These may be genuinely long-running (heavy simulations) or
-they may hang. This audit did not run them to completion and therefore **does not claim they
-pass and does not claim they fail.** A buyer should be told they are unmeasured.
+**Status at the time: UNKNOWN, not FAIL.** Correctly refused to claim a pass or a fail.
+
+> ## ✅ RESOLVED (Phase 2) — `content-adoption-test.js` passes; the timeout was the harness
+>
+> Re-run with a 900-second allowance: **exit 0, `FIEZEL canonical adoption gate: PASS`, in
+> 272 seconds.** It was never hanging. The audit's 150–180 s ceiling was simply below its
+> real runtime.
+>
+> **Why it takes 4½ minutes**, traced rather than guessed: `content-canary-config-builder.js`
+> calls `gate.validateCandidate()`, which re-runs the full content QA over a ~4.3 MB corpus —
+> **18.4 s per call, measured**. The test calls it twice and runs a dozen further evaluations.
+>
+> So the honest classification is **EXPECTED (slow) / PASS**, not unmeasured. The remaining
+> two are still genuinely **UNKNOWN** — they were not re-run to completion.
 
 ---
 

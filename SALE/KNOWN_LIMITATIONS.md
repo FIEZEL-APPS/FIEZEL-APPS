@@ -146,21 +146,32 @@ reviewer who finds a green test guarding nothing will start doubting every other
 
 ---
 
-## 6. The test suite is not read-only
+## 6. ~~The test suite is not read-only~~ — CORRECTED AND FIXED
 
-🟡 **Minor — but a buyer will hit it on day one**
+✅ **Resolved in Phase 2. The original finding was half wrong, and the wrong half was this
+audit's own doing.**
 
-Running the suite **modifies tracked files.** Confirmed and reproducible:
-`ai-account-cap-gate-test.js` rewrites `AI-ACCOUNT-CAP-GATE.json` on every run. Something in
-the run also rewrites `grammar-templates.json`'s `updatedAt` (exact writer **UNKNOWN**).
+**What was claimed:** running the suite rewrites tracked files, including
+`grammar-templates.json`, causing `id-golden-snapshot-test.js` to fail.
 
-**The consequence is worse than the cause:** `id-golden-snapshot-test.js` then fails because the
-file's hash no longer matches. It **passes in isolation on a clean tree** — verified both ways.
+**What was actually true.** The `grammar-templates.json` write was caused by **this audit's own
+harness**, not by CI. Phase 1 extracted gate commands from `quality.yml` with a `grep` for
+`node <file>`, which also matched **two commented-out remediation hints** — advice to a
+maintainer about what to run *if* a gate goes red. One of them, `audit/merge-grammar-id.js`,
+stamps today's date into `grammar-templates.json`. **CI never runs it.** The audit did.
 
-**Plain language:** one test's mess makes a different test fail. A buyer running the suite will
-see a red failure that is not a real bug and will not know that.
+A corrected extractor that skips comment lines gives **211 real gate steps, not 214.**
 
-**Fix: about a day.** Gates should write reports outside the tracked tree.
+**What was genuinely true, and is now fixed:** `ai-account-cap-gate-test.js` really did rewrite
+the tracked `AI-ACCOUNT-CAP-GATE.json` on every run. It now prints its report to stdout always
+and writes the file only under `FIEZEL_WRITE_GATE_REPORT=1`. Both modes verified.
+
+**Why that one file was the only offender:** all eight other gate proof artefacts
+(`CONTENT-ADOPTION-PROOF.json` and friends) are already gitignored. The repo's convention was
+correct; a single file had escaped it.
+
+**Plain language:** the audit accused the tests of a mess the audit itself made. The accusation
+is withdrawn, the one real part of it is fixed, and the step count is corrected.
 
 *Source: `AUDIT/05_BRAINCORE_TEST_STATUS.md` §4.1.*
 
@@ -196,8 +207,16 @@ stops at `regression-test.js` and never reaches the later steps. **CI reports on
 are five.** A buyer reading the CI badge alone would materially understate the open bug count —
 which is exactly why this audit ran all 214 steps directly instead of trusting the gate.
 
-Additionally, **three steps time out** and are therefore **unmeasured, not passing**:
-`content-adoption-test.js`, `fiezel-evolution-loop-test.js`, `release-audit-gate-test.js`.
+Additionally, three steps timed out under the audit's 120–180 s ceiling. One has since been
+resolved:
+
+- ✅ **`content-adoption-test.js` PASSES** — exit 0 in **272 seconds**, re-run with a 900 s
+  allowance. It was never hanging; the ceiling was below its real runtime. It is slow for a
+  traced reason: `validateCandidate()` re-runs the full content QA over a ~4.3 MB corpus at
+  **18.4 s per call, measured**, and the test calls it twice plus a dozen further evaluations.
+  Classification: **EXPECTED (slow) / PASS**.
+- ⚠️ `fiezel-evolution-loop-test.js` and `release-audit-gate-test.js` remain genuinely
+  **UNKNOWN** — not re-run to completion, so neither a pass nor a fail is claimed.
 
 *Source: `AUDIT/05_BRAINCORE_TEST_STATUS.md` §4.3, §4.4.*
 
