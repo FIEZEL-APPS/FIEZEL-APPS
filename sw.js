@@ -261,21 +261,21 @@ self.addEventListener('fetch',e=>{
   /* ================== m025-201: ANGGARAN JARINGAN UNTUK NAVIGASI ==================
     m025-201 (laporan OWNER: "PWA di iPhone yang sudah terinstal harus terhubung ke
     internet baru bisa jalan"). Ia benar, dan perasaannya bahwa dulu tidak begitu juga benar.
-   
+
     Bentuk di atas menunggu jaringan TANPA BATAS WAKTU. Itu aman selama "tidak ada jaringan"
     berarti fetch MENOLAK - dan memang begitu saat mode pesawat. Tetapi keadaan yang paling
     sering dialami murid bukan itu: Wi-Fi sekolah berhalaman-login, atau sinyal seluler satu
     batang. Di sana koneksinya DITERIMA lalu tidak pernah dijawab, jadi fetch MENGGANTUNG,
     dan cangkang yang sudah rapi di cache tidak pernah disentuh sampai iOS menyerah sendiri.
-   
+
     TERUKUR, dengan 181 berkas cangkang sudah tersimpan:
       jaringan benar-benar mati ...... aplikasi jalan dalam   21 ms
       jaringan MENGGANTUNG ........... aplikasi TIDAK PERNAH jalan (habis waktu di 30 s)
-   
+
     Jadi yang ditambahkan hanyalah BATAS WAKTU, bukan pergantian strategi. Jaringan tetap
     didahulukan dan pemulihan-otomatis di atas tetap utuh: selama jawaban tiba dalam
     anggaran, jalannya sama persis dengan sebelumnya, bita demi bita.
-   
+
     Kalau anggaran lewat, cangkang disajikan - TETAPI permintaan jaringannya TIDAK
     dibatalkan. Ia dijaga hidup lewat waitUntil supaya tetap menyegarkan cache, jadi
     peluncuran berikutnya memperoleh dokumen baru itu. Penyembuhan tidak hilang; ia hanya
