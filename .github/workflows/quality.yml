@@ -696,6 +696,7 @@ jobs:
           node core-brain-v3-upgrade-test.js
           node evidence-credibility-test.js
           node item-prior-test.js
+          node level-source-difficulty-variance-test.js
           node listening-adaptive-test.js
           node mastery-bkt-test.js
           node misconception-ledger-test.js
