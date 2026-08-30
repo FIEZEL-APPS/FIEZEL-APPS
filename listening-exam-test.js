@@ -178,8 +178,14 @@ const copyFeatB = require('fs').readFileSync(require('path').join(__dirname,'fea
 check('Failed audio keeps the questions locked',
   /audio-tidak-can-diputar-item/.test(renderer) && /this\.replays--/.test(renderer) && /Soal tetap terkunci/.test(copyFeatB),
   'menjawab tanpa mendengar bukan latihan, dan percobaan yang gagal tidak boleh menghabiskan jatah putar');
+/* m025-202 (audit Fase 2, 30 Agu 2026): pola ini DULU menuntut `{const` tanpa spasi, jadi ia
+ * memerah begitu metode-nya dirapikan dari satu baris menjadi banyak baris pada gelombang
+ * i18n m025-199/m025-201. TIDAK ADA cacat produk di baliknya: penjagaan levelnya masih ada
+ * dan masih baris PERTAMA di dalam metode. Yang dilonggarkan HANYA spasi/baris-baru; yang
+ * dituntut tetap sama kerasnya — metode itu wajib memanggil normalizeLevel(level) sebagai
+ * pernyataan pertamanya, bukan sekadar menyebutnya di suatu tempat. */
 check('Exam sessions are level-scoped like everything else',
-  /listeningExamFor\(level\)\{const target=normalizeLevel\(level\)/.test(addon), 'kontrak level m025-136 berlaku di sini juga');
+  /listeningExamFor\(level\)\s*\{\s*const target=normalizeLevel\(level\)/.test(addon), 'kontrak level m025-136 berlaku di sini juga');
 check('The listening exam bank is precached for offline use', /listening-exam-v1\.json/.test(sw), 'shell offline harus membawanya juga');
 
 const report = {
