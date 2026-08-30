@@ -19,10 +19,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Run isolated repair harness v2
+      - name: Run isolated repair harness v3
         shell: bash
         run: |
           cp tools/evidence/neural-voice-zero-defects-repair-v2.sh /tmp/neural-voice-zero-defects-repair-v2.sh
+          cp tools/evidence/neural-voice-zero-defects-repair-v3.sh /tmp/neural-voice-zero-defects-repair-v3.sh
           cp tools/evidence/voice-audio-race-test.js /tmp/voice-audio-race-test.js
           cp tools/evidence/tutor-voice-chat-race-test.js /tmp/tutor-voice-chat-race-test.js
-          bash /tmp/neural-voice-zero-defects-repair-v2.sh /tmp/voice-audio-race-test.js /tmp/tutor-voice-chat-race-test.js
+          cp tools/evidence/listening-timeout-ownership-test.js /tmp/listening-timeout-ownership-test.js
+          bash /tmp/neural-voice-zero-defects-repair-v3.sh /tmp/neural-voice-zero-defects-repair-v2.sh /tmp/listening-timeout-ownership-test.js
