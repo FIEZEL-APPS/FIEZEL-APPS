@@ -799,6 +799,13 @@ jobs:
           # §4-nya menyatakan HUBUNGAN yang harus benar apa pun angkanya, jadi merekam ulang
           # ekspektasi sesudah sebuah regresi TIDAK bisa membuatnya hijau.
           node braincore-benchmark-test.js
+          # Fase 2 / Phase H: pembanding Braincore lawan mesin dasar sepuluh baris, pada bukti
+          # yang IDENTIK (berpasangan). Gerbangnya menjaga kejujuran perbandingannya — baseline
+          # benar-benar bodoh, buktinya dibagi, hasilnya deterministik, metriknya tidak
+          # degenerate — dan SENGAJA tidak menuntut Braincore menang, karena pada ukuran ini ia
+          # memang belum menang. §4 mengunci satu temuan produk (persistent_misconception yang
+          # diklaim tanpa bukti miskonsepsi) sebagai characterization, bukan restu; lihat AUDIT/10.
+          node braincore-comparison-test.js
           node fiezel-stat-gate-test.js
           node id-golden-snapshot-test.js
           node learning-lane-test.js
