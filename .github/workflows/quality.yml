@@ -757,6 +757,11 @@ jobs:
           # yang diuji bukan "apakah Braincore membantu murid" (itu belum terjawab), tetapi
           # apakah mesinnya BEREAKSI BERBEDA terhadap pola belajar yang berbeda.
           node braincore-learner-profiles-test.js
+          # Fase 2 / Phase E: counterfactual. SATU keadaan awal, dicabangkan, satu hal
+          # diubah. Menutup celah yang tersisa sesudah Fase C/D: bahwa perbedaan hasil
+          # datang dari MURID yang berbeda, bukan dari BUKTI yang berbeda. §0 menguji
+          # isolasi cabang LEBIH DULU — tanpa itu setiap perbandingan rapi tetapi salah.
+          node braincore-counterfactual-test.js
           node fiezel-stat-gate-test.js
           node id-golden-snapshot-test.js
           node learning-lane-test.js
