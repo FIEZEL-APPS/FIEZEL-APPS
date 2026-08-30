@@ -58,6 +58,7 @@
   var registry = { id: Object.create(null), th: Object.create(null) };
   var current = DEFAULT_LOCALE;
   var listeners = [];
+  var availabilityWaiters = [];
 
   function normalize(loc) {
     return SUPPORTED.indexOf(loc) >= 0 ? loc : DEFAULT_LOCALE;
@@ -66,12 +67,43 @@
   /** Daftarkan copy-map untuk satu locale. Dipanggil oleh berkas copy per-domain
    *  (copy-id-<domain>.js, copy-th-<domain>.js) saat boot, sebelum app.js. */
   function registerCopy(locale, map) {
-    var box = registry[normalize(locale)];
+    var normalizedLocale = normalize(locale);
+    var box = registry[normalizedLocale];
     Object.keys(map).forEach(function (k) {
       if (Object.prototype.hasOwnProperty.call(box, k)) {
         throw new Error('fiezel-i18n: kunci ganda "' + k + '" (locale ' + locale + ')');
       }
       box[k] = map[k];
+    });
+    // Copy Thai dimuat dinamis. Konsumen yang harus menunggu satu permukaan tertentu
+    // (mis. onboarding setelah pengguna memilih Thai) tidak boleh menebak waktu jaringan
+    // atau menampilkan fallback Indonesia lebih dulu. Bangunkan hanya penunggu yang
+    // kuncinya benar-benar sudah terdaftar; kegagalan skrip lain tetap fail-soft.
+    for (var i = availabilityWaiters.length - 1; i >= 0; i--) {
+      var waiter = availabilityWaiters[i];
+      if (waiter.locale !== normalizedLocale || !hasCopy(waiter.locale, waiter.key)) continue;
+      availabilityWaiters.splice(i, 1);
+      try { waiter.resolve(box[waiter.key]); } catch (_) {}
+    }
+  }
+
+  function hasCopy(locale, key) {
+    var box = registry[normalize(locale)];
+    return Object.prototype.hasOwnProperty.call(box, String(key));
+  }
+
+  /**
+   * Promise yang selesai saat satu kunci tersedia pada locale ASLINYA (tanpa fallback id).
+   * Dipakai layar yang memilih locale sebelum bundle dinamis locale itu sempat mendarat.
+   */
+  function whenAvailable(locale, key) {
+    var normalizedLocale = normalize(locale);
+    var normalizedKey = String(key);
+    if (hasCopy(normalizedLocale, normalizedKey)) {
+      return Promise.resolve(registry[normalizedLocale][normalizedKey]);
+    }
+    return new Promise(function (resolve) {
+      availabilityWaiters.push({ locale: normalizedLocale, key: normalizedKey, resolve: resolve });
     });
   }
 
@@ -119,6 +151,8 @@
     SUPPORTED: SUPPORTED.slice(),
     STATE_FIELD: STATE_FIELD,
     registerCopy: registerCopy,
+    hasCopy: hasCopy,
+    whenAvailable: whenAvailable,
     t: t,
     getLocale: getLocale,
     getBcp47: getBcp47,

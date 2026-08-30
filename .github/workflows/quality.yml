@@ -794,43 +794,16 @@ jobs:
         # secara ADDITIVE per peta koordinasi D10 (quality.yml disentuh 5 PR terbuka).
         run: node adaptivity-simulation-v3.js
       - name: 'Cetak ulang bukti live di AKHIR log (bukan hanya di artefak)'
-        # Kenapa dicetak DUA KALI. Artefak `fiezel-bukti-live` sudah menyimpan kedua laporan,
-        # tetapi mengunduh artefak butuh perkakas; membaca log tidak. Dan letaknya penting:
-        # keluaran asli kedua gerbang live terkubur di TENGAH log, di belakang simulasi
-        # adaptivitas yang puluhan ribu baris, sehingga siapa pun yang membuka log dari
-        # bawah — manusia maupun pembaca otomatis — tidak akan pernah sampai ke sana.
-        # Dicetak ulang di paling akhir, laporan ini menjadi hal PERTAMA yang terlihat.
-        # `if: always()` disengaja: jalan yang merah justru yang paling perlu dibaca.
+        # Artefak `fiezel-bukti-live` sudah menyimpan kedua laporan, tetapi mengunduh artefak
+        # butuh perkakas; membaca log tidak. Dan letaknya menentukan: keluaran asli kedua
+        # gerbang live terkubur di TENGAH log, di belakang simulasi adaptivitas yang puluhan
+        # ribu baris, jadi pembaca yang membuka log dari bawah tidak akan pernah sampai ke
+        # sana. Dicetak ulang di paling akhir, laporan itu jadi hal pertama yang terlihat.
+        #
+        # Skripnya berkas repo, BUKAN skrip sebaris: runner menggemakan badan setiap `run:`
+        # ke log, jadi skrip sebaris 40 baris justru mendorong bukti yang mau diselamatkan
+        # keluar dari jendela ekor log. Obatnya jangan jadi penyakitnya.
+        #
+        # `if: always()` disengaja: jalan yang MERAH justru yang paling perlu dibaca.
         if: always() && github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'
-        run: |
-          for berkas in "$RUNNER_TEMP/CF-LIVE-REPORT.json" "$RUNNER_TEMP/AI-LIVE-REPORT.json"; do
-            echo "=============================================================="
-            echo "BUKTI LIVE: $(basename "$berkas")"
-            echo "=============================================================="
-            if [ -f "$berkas" ]; then
-              node -e '
-                const fs=require("fs");
-                const laporan=JSON.parse(fs.readFileSync(process.argv[1],"utf8"));
-                const ringkas=(o,dalam)=>{
-                  for(const [k,v] of Object.entries(o||{})){
-                    if(Array.isArray(v)){
-                      console.log(dalam+k+": "+v.length+" entri");
-                      for(const x of v.slice(0,60)){
-                        if(x&&typeof x==="object"){
-                          const nama=x.id??x.name??x.assert??x.task??"(tanpa nama)";
-                          const status=x.status??(x.pass===true?"PASS":x.pass===false?"FAIL":"");
-                          const nota=String(x.detail??x.note??x.reason??"").slice(0,150);
-                          console.log(dalam+"  ["+status+"] "+nama+(nota?" :: "+nota:""));
-                        } else console.log(dalam+"  "+String(x).slice(0,150));
-                      }
-                      if(v.length>60) console.log(dalam+"  ... "+(v.length-60)+" lagi (lihat artefak)");
-                    } else if(v&&typeof v==="object") { console.log(dalam+k+":"); ringkas(v,dalam+"  "); }
-                    else console.log(dalam+k+": "+String(v).slice(0,200));
-                  }
-                };
-                ringkas(laporan,"");
-              ' "$berkas"
-            else
-              echo "(tidak ada — langkahnya SKIP pada jalan ini; SKIP bukan PASS)"
-            fi
-          done
+        run: node tools/print-live-evidence.mjs "$RUNNER_TEMP/CF-LIVE-REPORT.json" "$RUNNER_TEMP/AI-LIVE-REPORT.json"
