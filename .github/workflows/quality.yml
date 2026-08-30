@@ -729,6 +729,12 @@ jobs:
           node audio-locale-guard-test.js
           node brain-config-test.js
           node brain-manifest-test.js
+          # Fase 2 / Phase B: Decision Trace — catatan diagnosis internal "apa yang dilihat
+          # Braincore dan apa yang diputuskannya". Gerbangnya MENJALANKAN modulnya (bukan
+          # membaca sumbernya) dan menegakkan pagar privasinya: field identitas ditolak
+          # dengan melempar, bukan dibersihkan diam-diam, supaya trace tidak pernah bisa
+          # berubah menjadi jalur telemetri.
+          node decision-trace-test.js
           node fiezel-stat-gate-test.js
           node id-golden-snapshot-test.js
           node learning-lane-test.js

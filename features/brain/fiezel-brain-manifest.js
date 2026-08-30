@@ -109,6 +109,7 @@
     { file: 'fiezel-brain-manifest.js', global: 'FiezelBrainManifest', schema: SCHEMA, authorityKey: 'manifest' },
     { file: 'fiezel-confusion-matrix.js', global: 'FiezelConfusionMatrix', schema: 'fiezel-confusion-matrix-v1', authorityKey: 'confusionMap' },
     { file: 'fiezel-core-brain.js', global: 'FiezelCoreBrain', schema: 'fiezel-core-brain-v2', authorityKey: 'memory' },
+    { file: 'fiezel-decision-trace.js', global: 'FiezelDecisionTrace', schema: 'fiezel-decision-trace-v1', authorityKey: 'decisionTrace' },
     { file: 'fiezel-evidence-credibility.js', global: 'FiezelEvidenceCredibility', schema: 'fiezel-evidence-credibility-v1', authorityKey: 'evidenceCredibility' },
     { file: 'fiezel-item-calibration.js', global: 'FiezelItemCalibration', schema: 'fiezel-item-calibration-v1', authorityKey: 'itemCalibration' },
     { file: 'fiezel-item-prior.js', global: 'FiezelItemPrior', schema: null, authorityKey: 'itemDifficultyPrior' },
@@ -186,6 +187,12 @@
     // konfigurasi dari menjadi aktif. Kalau canary dinyalakan, entri ini WAJIB jadi
     // 'active' di gelombang bundle yang sama.
     statGate: 'off',
+    // Decision Trace (Fase 2 / Phase B): catatan diagnosis internal "apa yang dilihat Braincore
+    // dan apa yang diputuskannya". Ia DESKRIPTIF MURNI — ia tidak memutuskan apa pun untuk
+    // murid, dan sengaja belum dimuat index.html. 'off' adalah klasifikasi yang jujur hari ini:
+    // modul ada, teruji, dan belum satu pun jalur aplikasi memanggilnya. Fase C yang
+    // menyambungkannya; entri ini WAJIB ikut berubah di commit yang sama.
+    decisionTrace: 'off',
     // Manifest sendiri deskriptif murni: ia tidak memutuskan apa-apa untuk murid,
     // maka jujurnya 'shadow' (informasi diagnostik), bukan 'active'.
     manifest: 'shadow'
