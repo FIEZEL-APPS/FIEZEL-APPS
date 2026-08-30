@@ -95,6 +95,35 @@ test('correct null BERBEDA dari false — pemanggil yang tidak tahu tidak diteba
   assert.strictEqual(T.build({ ...base, evidence: { correct: false } }).evidence.correct, false);
 });
 
+test('REGRESI: null/\'\'/[]/bool TIDAK boleh luruh menjadi 0 (Number(null)===0)', () => {
+  // Cacat NYATA di versi pertama modul ini, ketahuan saat pipeline Fase C membangun trace
+  // pertamanya: `predicted` dilaporkan 0 — "murid ini pasti salah" — padahal yang benar
+  // adalah "belum ada bukti untuk memprediksi". Nol yang mengaku sebagai pengukuran lebih
+  // berbahaya daripada field kosong, dan ini persis pembedaan yang modul ini ada untuk jaga.
+  for (const bad of [null, undefined, '', [], true, false, 'abc', {}]) {
+    const t = T.build({ ...base, evidence: { correct: true, kappa: bad, predicted: bad }, confidence: bad });
+    assert.strictEqual(t.evidence.kappa, null, 'kappa dari ' + JSON.stringify(bad) + ' harus null, bukan ' + t.evidence.kappa);
+    assert.strictEqual(t.evidence.predicted, null, 'predicted dari ' + JSON.stringify(bad) + ' harus null');
+    assert.strictEqual(t.confidence, null, 'confidence dari ' + JSON.stringify(bad) + ' harus null');
+  }
+  // ...tetapi nol yang SUNGGUHAN tetap nol.
+  const real = T.build({ ...base, evidence: { correct: true, kappa: 0, predicted: 0 }, confidence: 0 });
+  assert.strictEqual(real.evidence.kappa, 0);
+  assert.strictEqual(real.evidence.predicted, 0);
+  assert.strictEqual(real.confidence, 0);
+});
+
+test('REGRESI: angka yang sah di difficultyState tidak ikut ditolak penjaga blank()', () => {
+  const t = T.build({ ...base, difficultyState: { prior: 2, effective: 2.5, target: 0.8 } });
+  assert.strictEqual(t.difficultyState.prior, 2);
+  assert.strictEqual(t.difficultyState.effective, 2.5);
+  assert.strictEqual(t.difficultyState.target, 0.8);
+  const empty = T.build({ ...base, difficultyState: { prior: null, effective: '', target: undefined } });
+  assert.strictEqual(empty.difficultyState.prior, null);
+  assert.strictEqual(empty.difficultyState.effective, null);
+  assert.strictEqual(empty.difficultyState.target, null);
+});
+
 test('movedState: mendeteksi state yang BERGERAK', () => {
   assert.strictEqual(T.movedState(T.build(base)), true, 'mastery 0.40->0.55 harus terbaca bergerak');
 });

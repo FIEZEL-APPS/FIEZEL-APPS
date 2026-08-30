@@ -69,9 +69,27 @@
     'unknown'          // pemanggil tidak tahu — JUJUR, bukan ditebak jadi 'continue'
   ]);
 
-  function num(v, fallback) { var n = Number(v); return isFinite(n) ? n : (fallback === undefined ? null : fallback); }
+  /* PENTING — kenapa null/''/[] ditolak SEBELUM Number().
+   *
+   * `Number(null)` adalah 0, `Number('')` adalah 0, `Number([])` adalah 0. Tanpa penjaga ini,
+   * "tidak diukur" berubah diam-diam menjadi "nol" — persis pembedaan yang modul ini ADA untuk
+   * menjaganya (kappa 0 berarti bukti DIBUANG; kappa null berarti tidak pernah ditimbang).
+   * Cacat ini nyata: versi pertama berkas ini melakukannya, dan trace pertama yang dibangun
+   * pipeline melaporkan `predicted: 0` — "murid ini pasti salah" — padahal yang benar adalah
+   * "belum ada bukti untuk memprediksi". Nol yang mengaku sebagai pengukuran lebih berbahaya
+   * daripada field yang kosong. */
+  function blank(v) { return v === null || v === undefined || v === '' || typeof v === 'boolean' || Array.isArray(v); }
+  function num(v, fallback) {
+    if (blank(v)) return fallback === undefined ? null : fallback;
+    var n = Number(v);
+    return isFinite(n) ? n : (fallback === undefined ? null : fallback);
+  }
   function str(v) { return v == null ? '' : String(v); }
-  function clamp01(v) { var n = Number(v); return isFinite(n) ? Math.max(0, Math.min(1, n)) : null; }
+  function clamp01(v) {
+    if (blank(v)) return null;
+    var n = Number(v);
+    return isFinite(n) ? Math.max(0, Math.min(1, n)) : null;
+  }
   function round3(v) { var n = Number(v); return isFinite(n) ? Math.round(n * 1000) / 1000 : null; }
 
   function deepFreeze(obj) {

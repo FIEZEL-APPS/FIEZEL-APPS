@@ -735,6 +735,12 @@ jobs:
           # dengan melempar, bukan dibersihkan diam-diam, supaya trace tidak pernah bisa
           # berubah menjadi jalur telemetri.
           node decision-trace-test.js
+          # Fase 2 / Phase C: Braincore hidup. Gerbang ini MENJALANKAN modul Braincore
+          # sungguhan lewat satu interaksi belajar penuh dan menuntut bukti bahwa keadaan
+          # internal BERGERAK dan keputusannya BERBEDA karena apa yang diamati. Ia juga
+          # memeriksa titik-titik sambung app.js yang ditirunya masih ada — alat ukur yang
+          # diam-diam mengukur hal lain lebih berbahaya daripada tidak ada alat ukur.
+          node braincore-pipeline-test.js
           node fiezel-stat-gate-test.js
           node id-golden-snapshot-test.js
           node learning-lane-test.js
