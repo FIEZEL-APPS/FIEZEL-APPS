@@ -634,6 +634,9 @@
     var now = Number(opts.now) || Date.now();
     var doc = target.document;
     if (!doc || typeof doc.createElement !== 'function') return { shown: false, reason: 'no_document' };
+    try {
+      if (target.__fiezelBootSplash && typeof target.__fiezelBootSplash.clearRecovery === 'function') target.__fiezelBootSplash.clearRecovery();
+    } catch (_) {}
     if (opts.force !== true && seenToday(target, now)) {
       // Splash frame-pertama TIDAK boleh tertinggal hanya karena sapaan hari ini dilewati.
       disposeBootSplash(target);
