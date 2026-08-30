@@ -165,6 +165,7 @@
     'progress.akar-masalah': 'Akar masalah:',
     'progress.akar-masalah-bkt': 'Akar masalah (BKT):',
     'progress.aktif-teratasi': '{activeCount} aktif · {resolvedCount} teratasi',
+    'progress.akurasi-keseluruhan': 'Akurasi keseluruhan:',
     'progress.analisis': 'Analisis',
     'progress.answer': '{akurasi} · {attempts} jawaban',
     'progress.answer-terlalu-cepat-for-jadi': 'Jawaban terlalu cepat untuk jadi bukti',

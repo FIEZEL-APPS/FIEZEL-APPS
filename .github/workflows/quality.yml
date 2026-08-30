@@ -283,7 +283,18 @@ jobs:
           node academic-readiness-test.js
           node library-integrity-test.js
           node pwa-cache-test.js
+          # m025-201: navigasi network-first tanpa batas waktu membuat PWA terpasang
+          # tersandera jaringan yang MENGGANTUNG (Wi-Fi berhalaman-login, sinyal satu
+          # batang) walau cangkangnya sudah ada di perangkat. Gerbang ini menjalankan
+          # pendengar fetch sungguhan dari sw.js, bukan mencocokkan pola teks.
+          node sw-nav-budget-test.js
           node pwa-release-coherence-test.js
+          # pwa-release-coherence memeriksa keempat penanda SELARAS satu sama lain; ia tidak
+          # bisa tahu nomornya sudah dipakai jalur lain. Itu celah yang meloloskan tabrakan
+          # m025-196..199 (BUILD-NUMBER-COLLISION-2026-08-30.md). --strict: di CI, dasar yang
+          # tak terverifikasi = merah, karena gerbang yang diam saat tidak bisa memeriksa
+          # tidak menjaga apa pun.
+          node build-number-uniqueness-test.js --strict
           node pwa-startup-white-screen-recovery-test.js
           node http-smoke-test.js
           node speaking-listening-test.js
@@ -592,6 +603,9 @@ jobs:
           # `no-network-test.js`: satu `|| 'https://…'` akan mengubah CI publik menjadi
           # penembak produksi pada setiap push.
           FIEZEL_CF_LIVE_BASE: ${{ github.event.inputs.cf_live_base }}
+          # Laporan diarahkan keluar dari working tree (gerbang lain memeriksa pohon tetap
+          # bersih) dan ke tempat yang bisa diunggah sebagai artefak.
+          FIEZEL_CF_LIVE_REPORT: ${{ runner.temp }}/CF-LIVE-REPORT.json
         run: |
           if [ -z "${FIEZEL_CF_LIVE_BASE}" ]; then
             echo '::notice title=cf-live-contract-test.js SKIP::FIEZEL_CF_LIVE_BASE kosong — gerbang ini TIDAK menguji runtime Cloudflare pada jalan ini dan TIDAK boleh dikutip sebagai bukti runtime.'
@@ -609,7 +623,7 @@ jobs:
             echo "Menjalankan gerbang live SUNGGUHAN terhadap ${FIEZEL_CF_LIVE_BASE} (dipilih manual lewat workflow_dispatch)."
             echo "### cf-live-contract-test.js — dijalankan terhadap \`${FIEZEL_CF_LIVE_BASE}\`" >> "$GITHUB_STEP_SUMMARY"
           fi
-          node cf-live-contract-test.js
+          node cf-live-contract-test.js --report
       - name: 'Staging live gate (SKIP kecuali workflow_dispatch dengan staging_base)'
         # Penjaga aktor per-LANGKAH, bukan per-workflow. `quality.yml` harus tetap
         # berjalan untuk setiap push dan setiap PR dari siapa pun - itu justru gunanya.
@@ -652,6 +666,7 @@ jobs:
         env:
           # Pada push/PR `inputs` tidak ada, jadi nilainya string kosong = SKIP.
           FIEZEL_AI_LIVE_BASE: ${{ github.event.inputs.ai_live_base }}
+          FIEZEL_AI_LIVE_REPORT: ${{ runner.temp }}/AI-LIVE-REPORT.json
         run: |
           if [ -z "${FIEZEL_AI_LIVE_BASE}" ]; then
             echo '::notice title=ai-live-verify SKIP::FIEZEL_AI_LIVE_BASE kosong — kontrak AI Cloudflare TIDAK diuji terhadap model sungguhan pada jalan ini dan TIDAK boleh dikutip sebagai bukti runtime.'
@@ -672,6 +687,23 @@ jobs:
             echo "### tools/ai-live-verify.mjs — dijalankan terhadap \`${FIEZEL_AI_LIVE_BASE}\` (BERBAYAR)" >> "$GITHUB_STEP_SUMMARY"
           fi
           node tools/ai-live-verify.mjs --report
+      - name: 'Bukti gerbang live (artefak — supaya hasilnya bisa DIBACA, bukan hanya hijau)'
+        # Kenapa langkah ini ada: kedua gerbang live di atas menghasilkan bukti terkaya di
+        # seluruh workflow ini — assert per assert terhadap sistem yang sungguhan hidup —
+        # lalu bukti itu tenggelam di tengah log job yang panjang, di belakang keluaran
+        # simulasi adaptivitas yang berukuran puluhan ribu baris. Centang hijau BUKAN bukti:
+        # ia tidak memberi tahu assert mana yang lulus, berapa panggilan model yang terjadi,
+        # atau berapa kuota yang terpakai. Audit rilis 30 Agu 2026 tersandung persis di situ.
+        # `if: always()` disengaja: jalan yang MERAH justru yang paling perlu dibaca.
+        if: always() && github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'
+        uses: actions/upload-artifact@v4
+        with:
+          name: fiezel-bukti-live
+          path: |
+            ${{ runner.temp }}/CF-LIVE-REPORT.json
+            ${{ runner.temp }}/AI-LIVE-REPORT.json
+          if-no-files-found: ignore
+          retention-days: 30
       - name: 'Gerbang hulu yang sempat tidak terdaftar (braincore fase 2 + lapisan game/UX)'
         # Ditemukan gate-registry-test.js saat merge 28 Agu 2026: lima belas berkas uji
         # mendarat bersama braincore fase 2 dan lapisan game/UX tanpa pernah dipanggil CI.
@@ -685,6 +717,7 @@ jobs:
           node core-brain-v3-upgrade-test.js
           node evidence-credibility-test.js
           node item-prior-test.js
+          node level-source-difficulty-variance-test.js
           node listening-adaptive-test.js
           node mastery-bkt-test.js
           node misconception-ledger-test.js
@@ -747,6 +780,12 @@ jobs:
         # Perbaikan bila merah: node tools/sync-grammar-explanations-id.js --write
         # && node audit/merge-grammar-id.js. Detail: header content-drift-test.js.
         run: node content-drift-test.js
+      - name: 'Wave F1: gerbang overperformance berkelanjutan (regresi censoring mastery)'
+        # Mengawal perbaikan F1 di fiezel-core-brain.js: residualPositiveShare (momentum
+        # basis residual) + cabang 'sustained_overperformance' planSession. Tanpa gate ini
+        # cabang tersebut bisa dicabut diam-diam dan jebakan jangkar censoring (mastery v2
+        # ~13% vs v1 ~44% dalam 35 hari, research_hold simulasi v3) kembali tanpa alarm.
+        run: node wave-f1-censoring-test.js
       - name: 'Gerbang simulasi adaptivitas v3 (gate yatim CI — temuan D1, wave D)'
         # adaptivity-simulation-v3.js adalah gate sungguhan (exit code dari main();
         # gate residual + gate kalibrasi bisa merah), tetapi namanya lolos dari pola
@@ -754,3 +793,17 @@ jobs:
         # pernah dipanggil CI (temuan D1 gate-sweep, 28 Agu 2026). Didaftarkan di sini
         # secara ADDITIVE per peta koordinasi D10 (quality.yml disentuh 5 PR terbuka).
         run: node adaptivity-simulation-v3.js
+      - name: 'Cetak ulang bukti live di AKHIR log (bukan hanya di artefak)'
+        # Artefak `fiezel-bukti-live` sudah menyimpan kedua laporan, tetapi mengunduh artefak
+        # butuh perkakas; membaca log tidak. Dan letaknya menentukan: keluaran asli kedua
+        # gerbang live terkubur di TENGAH log, di belakang simulasi adaptivitas yang puluhan
+        # ribu baris, jadi pembaca yang membuka log dari bawah tidak akan pernah sampai ke
+        # sana. Dicetak ulang di paling akhir, laporan itu jadi hal pertama yang terlihat.
+        #
+        # Skripnya berkas repo, BUKAN skrip sebaris: runner menggemakan badan setiap `run:`
+        # ke log, jadi skrip sebaris 40 baris justru mendorong bukti yang mau diselamatkan
+        # keluar dari jendela ekor log. Obatnya jangan jadi penyakitnya.
+        #
+        # `if: always()` disengaja: jalan yang MERAH justru yang paling perlu dibaca.
+        if: always() && github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'
+        run: node tools/print-live-evidence.mjs "$RUNNER_TEMP/CF-LIVE-REPORT.json" "$RUNNER_TEMP/AI-LIVE-REPORT.json"

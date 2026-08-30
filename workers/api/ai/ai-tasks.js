@@ -958,6 +958,16 @@
   }
 
   function promptContextCoach(input, locale) {
+    if (s(locale) === 'th') {
+      return guardFor(locale) + styleClause(locale) + '\nภารกิจ: เขียนคำแนะนำการเรียนรู้ 1 ย่อหน้าสำหรับวันนี้ ไม่เกิน ' +
+        sentenceLimitFor('context_coach') + ' ประโยค ' +
+        'โดยอิงจากข้อมูลสรุปความก้าวหน้าด้านล่าง ห้ามระบุตัวเลขดิบ ' +
+        'ถ้า policy.policyEffectiveness.trend ไม่ใช่ unknown ให้บอกตามตรงว่าวิธีการเรียนนี้ได้ผลจริงหรือไม่ในช่วงสองสามเซสชันที่ผ่านมา ถ้าเป็น unknown ให้บอกว่าหลักฐานยังไม่เพียงพอและห้ามเดา' +
+        '\nภาษา: ภาษาไทย (Thai)\n' + DATA_DELIM + '\n' + JSON.stringify({
+          snapshot: input.snapshot, evidence: input.evidence, policy: input.policy,
+          outcomes: input.outcomes, profile: input.profile
+        });
+    }
     return guardFor(locale) + styleClause(locale) + '\nTugas: satu paragraf saran belajar untuk hari ini, maksimal ' +
       sentenceLimitFor('context_coach') + ' kalimat, ' +
       'berdasarkan ringkasan kemajuan agregat di bawah. Jangan menyebut angka mentah.' +

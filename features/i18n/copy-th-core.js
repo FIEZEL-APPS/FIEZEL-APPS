@@ -22,6 +22,12 @@
     // pasangan copy-id-core.js 'core.auth-skip-status'
     'core.auth-skip-status': 'โอเค ไปต่อแบบไม่มีบัญชีนะ',
     // pasangan copy-id-core.js 'core.reminder-on-toast'
-    'core.reminder-on-toast': 'เปิดการแจ้งเตือนการเรียนแล้ว'
+    'core.reminder-on-toast': 'เปิดการแจ้งเตือนการเรียนแล้ว',
+    'topbar.ask': 'ถาม FIEZEL?',
+    'nav.peta': 'แผนที่',
+    'nav.home': 'Home',
+    'nav.vocab': 'Vocab',
+    'nav.grammar': 'Grammar',
+    'nav.reading': 'Reading'
   });
 }());
