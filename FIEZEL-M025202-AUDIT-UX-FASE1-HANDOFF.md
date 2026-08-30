@@ -16,7 +16,8 @@ Dokumen lengkap: `design/ux-2026/` (11 berkas + `evidence/`)
 | P0 judul layar tak terlihat | **SELESAI + bergerbang** |
 | P1 eyebrow kuis, umpan balik, rubrik Writing, bagian kosong Peta Belajar | **SELESAI** |
 | P2 sasaran sentuh chip tujuan | **SELESAI** |
-| Fase 2 (Grammar Hub, overlay Home, zero-state Peta Belajar, konsolidasi kontrol level) | **BELUM — terurut di `design/ux-2026/09-IMPLEMENTATION.md`** |
+| Fase 2c layar intro lesson | **SELESAI** — aturan dilipat, CONTOH tetap terlihat, 1300px → 1081px (−17%), CTA naik ke atas lipatan |
+| Fase 2 sisanya (Grammar Hub, overlay Home, zero-state Peta Belajar, konsolidasi kontrol level) | **BELUM — terurut di `design/ux-2026/09-IMPLEMENTATION.md`** |
 | Fase 3 (lantai 12px, Library, Skills, Classroom) | **BELUM** |
 | Fase 4 (pengatur ukuran teks dalam aplikasi) | **BELUM — utang aksesibilitas yang dijanjikan `index.html`** |
 | Naskah murid berubah (1 string) | **MENUNGGU OWNER** |

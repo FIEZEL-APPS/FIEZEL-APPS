@@ -44,10 +44,14 @@ as two `.home-fold` rows.
 `lesson-experience-test.js` all read this markup. **Ship alone.**
 **Success:** 4118px → ~1300px; 62 controls → ~12.
 
-### 2c. Lesson intro: stop being a documentation page
-Title once; one sentence; keep `CONTOH`; fold the rule and practice-mode text under
-`Pelajari dulu`.
-**Risk:** low–medium. **Success:** ~110 words → ~25 before the CTA.
+### 2c. Lesson intro: stop being a documentation page — **SHIPPED m025-202**
+Rule explanation + memory tip folded into `.home-fold`, `CONTOH` kept visible, summary
+reuses the existing `PAHAMI DULU · URUTAN n` label so **no new student-visible string**
+was introduced (golden baseline stayed green).
+**Measured:** 1300px → 1081px (−17%); primary CTA y=1051 → y=832, now above the fold.
+**Left open:** the duplicated hero/card title — blocked on an IA decision, and on the
+Fredoka-block gate regex that requires `.lesson-title` to stay in the CSS selector list.
+Detail in `05-SCREENS.md`.
 
 ### 2d. Peta Belajar zero-state
 Five zero tiles → one line for a learner with no data; un-nest `Rencana kamu`;

@@ -62,7 +62,7 @@ Must be done as its own change with its own test pass.
 
 ---
 
-## Grammar lesson intro — the "pre-lesson documentation page"  **[PHASE 2]**
+## Grammar lesson intro — the "pre-lesson documentation page"  **[DONE m025-202 · phase 2c]**
 
 **BEFORE.** Hero title in Instrument Serif; `A2 · urutan 23 · A2.1 · 25 mode latihan`; the
 level control card; a `PAHAMI DULU · URUTAN 23` eyebrow; **the same title again** as an
@@ -73,12 +73,32 @@ paragraph; a `25 mode latihan terfokus` card with its own 30-word paragraph; the
 **WHY.** The brief's §11 case exactly. The title appears twice, the sequence number three
 times, and the learner reads ~110 words before the button that starts the practice.
 
-**AFTER.** Title once. One sentence of what this lesson is about. The `CONTOH` example
-(it is the highest-value element — it shows rather than tells). `Mulai 25 soal` as the
-single primary. The rule explanation and the practice-mode description fold into
-`Pelajari dulu` — available, not mandatory. Back is the topbar's job.
+**AFTER (shipped).** The card now leads with the lesson title, one line of context, and
+the **`CONTOH` example kept visible** — it is the highest-value element on the screen
+because it *shows* instead of telling. The 45-word rule explanation and the memory tip
+fold into a `.home-fold` whose summary **reuses the existing `PAHAMI DULU · URUTAN n`
+label** that used to be the eyebrow. That reuse is deliberate: it means this change
+introduced **zero new student-visible strings**, so `id-golden-snapshot-test.js` stays
+green and no owner copy review is needed.
 
-**IMPACT.** ~110 words → ~25 before the primary action.
+**IMPACT (measured, 390×844).** Scroll height **1300px → 1081px (−17%)**. The primary
+CTA `Mulai 25 soal` moved from y=1051 to **y=832** — from below the fold to within the
+first screen.
+
+**STILL OPEN — the duplicated title.** The hero (`.section-head h1`, serif) prints
+`friendlySkillName(skill)` and the card (`h2.lesson-title`, Fredoka) prints
+`curriculum.title`. They are two phrasings of the same thing, adjacent. It was left in
+place because removing either has a real cost:
+
+- Dropping `h2.lesson-title` orphans one of only **two** Fredoka display surfaces, and
+  `splash-choreography-test.js` matches the Fredoka block with the regex
+  `/\.word,[^{]*\{…/` — it requires the **comma**, so a lone `.word{…}` fails the gate.
+- Dropping the hero title removes the standard screen title every other screen has (and
+  the one P0-1 just made visible).
+
+Resolving it well needs a product call about what the h1 should say instead (the unit? the
+level?), which is an IA decision, not a styling fix. Carried into Phase 2b, where the
+Grammar Hub restructure decides how lessons are named and entered anyway.
 
 ---
 

@@ -3163,6 +3163,14 @@ html.fiezel-ui-v6 .launcher-shell{
 .home-fold>.writing-rubric>p:first-child{margin-top:0}
 /* m025-202: isi lipatan bagian-kosong Peta Belajar duduk seperti isi lipatan lain. */
 .home-fold>.fold-empty-body{margin:0;padding:14px 16px 16px;border:0;background:transparent}
+/* m025-202 fase 2c: aturan lesson dilipat di layar intro. Ringkasannya memakai ULANG
+   label 'PAHAMI DULU' yang tadinya eyebrow, jadi tidak ada satu pun naskah murid baru
+   yang lahir dari perubahan ini - hanya momennya yang berpindah. CONTOH tetap terlihat:
+   ia elemen paling berharga di layar itu karena MENUNJUKKAN, bukan menjelaskan. */
+.home-fold>.lesson-rule-body{margin:0;padding:14px 16px 16px;border:0;background:transparent}
+.home-fold>.lesson-rule-body>p:first-child{margin-top:0}
+.lesson-rule-fold{margin:14px 0 0}
+.lesson-rule-fold>summary{text-transform:uppercase;letter-spacing:.1em;font-size:var(--fs-caption);color:var(--info)}
 .home-fold>.fold-empty-body>p:first-child{margin-top:0}
 .fold-empty{margin:12px 0 0}
 .writing-rubric ul,.writing-checklist{display:grid;gap:8px;margin:10px 0 0;padding:0;list-style:none}
