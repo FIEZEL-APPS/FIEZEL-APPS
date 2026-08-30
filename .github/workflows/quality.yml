@@ -284,6 +284,12 @@ jobs:
           node library-integrity-test.js
           node pwa-cache-test.js
           node pwa-release-coherence-test.js
+          # pwa-release-coherence memeriksa keempat penanda SELARAS satu sama lain; ia tidak
+          # bisa tahu nomornya sudah dipakai jalur lain. Itu celah yang meloloskan tabrakan
+          # m025-196..199 (BUILD-NUMBER-COLLISION-2026-08-30.md). --strict: di CI, dasar yang
+          # tak terverifikasi = merah, karena gerbang yang diam saat tidak bisa memeriksa
+          # tidak menjaga apa pun.
+          node build-number-uniqueness-test.js --strict
           node pwa-startup-white-screen-recovery-test.js
           node http-smoke-test.js
           node speaking-listening-test.js
