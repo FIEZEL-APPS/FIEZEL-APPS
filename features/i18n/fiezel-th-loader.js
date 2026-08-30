@@ -26,7 +26,8 @@
     './features/i18n/copy-th-settings-locale.js',
     './features/i18n/copy-th-grammar-labels.js',
     './features/i18n/naskah-th-brain.js',
-    './features/i18n/th-bank-sanitizer.js'
+    './features/i18n/th-bank-sanitizer.js',
+    './features/i18n/th-bank-sanitizer-extra.js'
   ];
   var GRAMMAR_TH = './grammar-explanations-th.json';
   var VOCAB_TH = './vocabulary-th.json';
