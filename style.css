@@ -1701,7 +1701,7 @@ body.daily-locked{overflow:hidden}
       particles.init: kotak 512 terpusat, 62% sisi terpendek) supaya SVG
       menumpuk piksel-persis di atas target partikel. Grup F & batang mulai
       tak terlihat; JS meng-crossfade-nya per timing partikel. */
-.fiezel-logo{width:min(46vw,190px);height:auto;display:block;overflow:visible}
+.fiezel-logo{width:62vmin;height:auto;display:block;overflow:visible;transform:translateX(-0.5859375%)}
 .fz-fgroup,.fz-barsgroup{opacity:0;will-change:opacity}
 .fiezel-logo .fz-f,.fiezel-logo .fz-bar{transform-box:fill-box}
 /* 3. Wordmark KECIL di bawah - ruang kosong yang lapang adalah bagian desain.

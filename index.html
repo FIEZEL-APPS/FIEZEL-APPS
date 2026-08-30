@@ -79,7 +79,7 @@ html.fz-booting body{overflow:hidden}
 .fiezel-splash-dark{background:#1B1418;padding-top:0}
 .fiezel-splash-brand{background:radial-gradient(circle at 30% 18%,#2A2126 0%,#1B1418 55%,#120C0F 100%);position:relative;overflow:hidden;display:grid;grid-template-rows:1fr auto auto;justify-items:center;align-items:center;gap:0;padding:24px 24px 17vh}
 .fz-splash-canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
-.fiezel-logo{width:min(46vw,190px);height:auto;display:block;overflow:visible}
+.fiezel-logo{width:62vmin;height:auto;display:block;overflow:visible;transform:translateX(-0.5859375%)}
 .fz-fgroup,.fz-barsgroup{opacity:0;will-change:opacity}
 .fiezel-logo .fz-f,.fiezel-logo .fz-bar{transform-box:fill-box}
 .fiezel-splash-brand .fiezel-splash-word{position:absolute;display:block;left:0;right:0;margin:0 auto;bottom:calc(7vh + env(safe-area-inset-bottom,0px));width:min(52vw,238px);text-align:center;opacity:0;transform:translateY(14px);will-change:transform,opacity;pointer-events:none}
@@ -165,6 +165,65 @@ html.fz-booting body{overflow:hidden}
        ada lagi yang akan menutupnya. */
     (function () {
       var doc = document, el = doc.getElementById('fiezelBootSplash');
+      /* Boot JSON must not be allowed to wait forever on a mobile radio. This wrapper
+         covers both the response headers and the body consumed by response.json(). */
+      try {
+        if (!window.__fiezelBootFetchGuard && typeof window.fetch === 'function') {
+          var nativeFetch = window.fetch.bind(window);
+          var bootFetchTimeoutMs = 12000;
+          var settleBootFetch = function (promise, controller) {
+            var timeout = 0;
+            var guard = new Promise(function (_, reject) {
+              timeout = setTimeout(function () {
+                try { if (controller) controller.abort(); } catch (e) {}
+                reject(new Error());
+              }, bootFetchTimeoutMs);
+            });
+            return Promise.race([promise, guard]).then(function (value) {
+              if (timeout) clearTimeout(timeout);
+              return value;
+            }, function (error) {
+              if (timeout) clearTimeout(timeout);
+              throw error;
+            });
+          };
+          window.fetch = function (input, init) {
+            var raw = '';
+            try { raw = String((input && input.url) || input || ''); } catch (e) {}
+            if (!/\.json(?:[?#]|$)/i.test(raw)) return nativeFetch(input, init);
+            var controller = null;
+            try { if (typeof AbortController === 'function') controller = new AbortController(); } catch (e) {}
+            var options = init;
+            if (controller) {
+              options = {};
+              if (init) for (var key in init) options[key] = init[key];
+              options.signal = controller.signal;
+              var sourceSignal = (init && init.signal) || (input && input.signal);
+              try {
+                if (sourceSignal) {
+                  if (sourceSignal.aborted) controller.abort();
+                  else sourceSignal.addEventListener('abort', function () {
+                    try { controller.abort(); } catch (e) {}
+                  }, { once: true });
+                }
+              } catch (e) {}
+            }
+            var responsePromise = settleBootFetch(nativeFetch(input, options), controller);
+            return responsePromise.then(function (response) {
+              if (!response || typeof response.json !== 'function') return response;
+              var originalJson = response.json.bind(response);
+              var guardedJson = function () { return settleBootFetch(originalJson(), controller); };
+              try {
+                Object.defineProperty(response, 'json', { configurable: true, value: guardedJson });
+              } catch (e) {
+                try { response.json = guardedJson; } catch (ignore) {}
+              }
+              return response;
+            });
+          };
+          window.__fiezelBootFetchGuard = true;
+        }
+      } catch (e) {}
       if (!el) return;
       try { if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) el.className += ' fiezel-splash-still'; } catch (e) {}
       var startedAt = 0;
@@ -178,10 +237,47 @@ html.fz-booting body{overflow:hidden}
         try { if (el.parentNode) el.parentNode.removeChild(el); } catch (e) {}
       }
       timer = setTimeout(function () {
-        try { if (el.getAttribute('data-fiezel-boot-claimed')) return; } catch (e) {}
+        try { if (!el.parentNode) return; } catch (e) {}
+        showRecovery();
         dismiss();
       }, 15000);
-      window.__fiezelBootSplash = { at: startedAt, dismiss: dismiss };
+      var recoveryId = 'fiezelBootRecovery';
+      function clearRecovery() {
+        try {
+          var recovery = doc.getElementById(recoveryId);
+          if (recovery && recovery.parentNode) recovery.parentNode.removeChild(recovery);
+        } catch (e) {}
+      }
+      function showRecovery() {
+        try {
+          if (doc.getElementById(recoveryId)) return;
+          var recovery = doc.createElement('div');
+          recovery.id = recoveryId;
+          recovery.setAttribute('role', 'alert');
+          recovery.style.cssText = 'position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;padding:24px;background:#1B1418;color:#FFF4DA;text-align:center;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif';
+          var card = doc.createElement('div');
+          card.style.cssText = 'width:min(320px,100%);padding:24px 20px;border:1px solid rgba(255,244,218,.22);border-radius:20px;background:#2A2126';
+          var title = doc.createElement('strong');
+          title.textContent = 'FIEZEL belum siap';
+          title.style.cssText = 'display:block;font-size:20px;line-height:1.25;margin-bottom:10px';
+          var message = doc.createElement('p');
+          message.textContent = 'Koneksi atau data belum selesai dimuat.';
+          message.style.cssText = 'margin:0;color:#E8D9C5;font-size:15px;line-height:1.5';
+          var retry = doc.createElement('button');
+          retry.type = 'button';
+          retry.textContent = 'Muat ulang';
+          retry.style.cssText = 'margin-top:18px;min-height:48px;padding:0 20px;border:0;border-radius:12px;background:#FFC700;color:#241A11;font:700 16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif';
+          retry.addEventListener('click', function () {
+            try { window.location.reload(); } catch (e) { window.location.href = window.location.href; }
+          });
+          card.appendChild(title);
+          card.appendChild(message);
+          card.appendChild(retry);
+          recovery.appendChild(card);
+          (doc.body || doc.documentElement).appendChild(recovery);
+        } catch (e) {}
+      }
+      window.__fiezelBootSplash = { at: startedAt, dismiss: dismiss, clearRecovery: clearRecovery };
     })();
   </script>
   <div id="globalSky" class="global-sky phase-day" aria-hidden="true">
@@ -516,12 +612,6 @@ html.fz-booting body{overflow:hidden}
        app.js karena presentQuotaNotice() memakainya, dan kalau ia belum ada app.js akan
        terpaksa memakai naskah cadangan yang lebih miskin. -->
   <script defer src="./features/quota/quota-copy.js"></script>
-  <script defer src="./app.js"></script>
-  <script defer src="./features/daily-target/fiezel-daily-target.js"></script>
-  <script defer src="./features/skills-evidence/fiezel-skills-evidence.js"></script>
-  <script defer src="./features/academic-readiness/fiezel-academic-readiness.js"></script>
-  <script defer src="./features/continuity/fiezel-continuity.js"></script>
-  <script defer src="./features/health/fiezel-install-health.js"></script>
   <!-- Splash v4 (OA-6): partikel + equalizer + cap PAW dimuat sebelum orkestratornya. -->
   <script defer src="./features/brand/fiezel-splash-particles.js"></script>
   <script defer src="./features/brand/fiezel-splash-equalizer.js"></script>
@@ -530,6 +620,12 @@ html.fz-booting body{overflow:hidden}
   <script defer src="./features/onboarding/fiezel-onboarding.js"></script>
   <script defer src="./features/onboarding/fiezel-tour.js"></script>
   <script defer src="./features/personal-journey/fiezel-personal-journey.js"></script>
+  <script defer src="./app.js"></script>
+  <script defer src="./features/daily-target/fiezel-daily-target.js"></script>
+  <script defer src="./features/skills-evidence/fiezel-skills-evidence.js"></script>
+  <script defer src="./features/academic-readiness/fiezel-academic-readiness.js"></script>
+  <script defer src="./features/continuity/fiezel-continuity.js"></script>
+  <script defer src="./features/health/fiezel-install-health.js"></script>
   <script defer src="./features/ui/fiezel-report-gesture-isolation.js"></script>
   <script defer src="./features/ui/fiezel-ui-manager.js"></script>
   <!-- T-031: berkas ini memasang `window.FiezelABAnalytics` (pipa eksperimen UI). Ia TIDAK
