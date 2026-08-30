@@ -73,7 +73,30 @@ function finish(extra) {
     ...extra,
     checks
   };
-  fs.writeFileSync(path.join(root, 'AI-ACCOUNT-CAP-GATE.json'), JSON.stringify(report, null, 2) + '\n');
+  /* ISOLASI GERBANG (audit Fase 2, 30 Agu 2026).
+   *
+   * Baris ini dulu MENULIS `AI-ACCOUNT-CAP-GATE.json` — berkas TERLACAK git — pada
+   * SETIAP kali gerbang berjalan. Isinya membawa stempel waktu, jadi tiap eksekusi
+   * mengotori pohon kerja meski tidak ada satu pun perilaku yang berubah.
+   *
+   * Kenapa itu bukan sekadar berantakan: kontributor yang menjalankan suite lokal
+   * mendapati berkas termodifikasi tanpa ia menyentuh apa pun, lalu ikut meng-commit
+   * derau stempel waktu; dan `git status` berhenti bisa dipakai untuk menjawab
+   * "apakah saya sudah mengubah sesuatu?". Gerbang harus MEMBACA dunia, bukan
+   * meninggalkan jejak di dalamnya.
+   *
+   * Perilaku baru, mengikuti konvensi env-flag yang sudah dipakai repo ini
+   * (`FIEZEL_RELEASE_AUDIT_REPORT_FRESH`, `FIEZEL_ROOT`, dst.):
+   *   - default            : TIDAK menulis apa pun. Laporan tetap dicetak ke stdout,
+   *                          jadi CI dan manusia tetap melihat hasil lengkapnya.
+   *   - FIEZEL_WRITE_GATE_REPORT=1 : menulis berkas bukti seperti dulu, untuk saat
+   *                          owner memang SENGAJA ingin memperbarui artefak bukti.
+   *
+   * Artefak buktinya TIDAK dihapus dari git — ia tetap catatan rilis yang sah;
+   * yang berubah hanya: pembaruannya kini disengaja, bukan efek samping. */
+  if (process.env.FIEZEL_WRITE_GATE_REPORT === '1') {
+    fs.writeFileSync(path.join(root, 'AI-ACCOUNT-CAP-GATE.json'), JSON.stringify(report, null, 2) + '\n');
+  }
   console.log(JSON.stringify(report, null, 2));
   if (failed) process.exitCode = 1;
 }

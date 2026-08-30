@@ -44,8 +44,17 @@
  * - listeningPolicy (listening-adaptive): BAYANGAN — policy() dihitung dan
  *   ditempel sebagai metadata q.__listeningPolicy, tetapi tidak ada satu baris
  *   pun yang membacanya kembali untuk mengubah playback.
- * - stepTutor & productionGrader: OFF — dimuat index.html/sw.js tetapi NOL
- *   referensi di app.js; belum ada jalur yang memanggilnya.
+ * - stepTutor: AKTIF (dikoreksi audit Fase 2, 30 Agu 2026) — app.js:7732 merender
+ *   stepTutorGuidanceMarkup(q) saat murid mengulang di anak tangga scaffold 'worked',
+ *   dan markup itu memanggil FiezelStepTutor.decompose() lewat stepTutorGuidance()
+ *   (app.js:2712). Dulu tercatat 'off'; wiring berubah, manifest tidak ikut.
+ * - productionGrader: AKTIF (dikoreksi audit Fase 2) — app.js:6651 menyisipkan soal
+ *   cloze ke pool sesi adaptif (posisi 2 dan 5) lewat clozeAdaptivePicks(), dan
+ *   answerCloze() memanggil FiezelProductionGrader.grade() (app.js:7944) untuk
+ *   MEMUTUSKAN benar/salah jawaban ketik murid. Keputusan itu lalu menjadi bukti BKT
+ *   (bobot 1,5), kalibrasi item, dan ledger miskonsepsi. Ini otoritas penuh, bukan
+ *   bayangan. Dulu tercatat 'off' dengan alasan 'nol referensi di app.js' — alasan itu
+ *   sudah tidak benar sejak jalur cloze masuk.
  *
  * BATAS YANG DIJAGA
  * -----------------
@@ -146,8 +155,13 @@
     confusionMap: 'shadow',
     olmInsight: 'shadow',
     listeningPolicy: 'shadow',
-    stepTutor: 'off',
-    productionGrader: 'off',
+    // KOREKSI audit Fase 2 (30 Agu 2026): keduanya DULU 'off' dengan alasan tertulis
+    // "nol referensi di app.js". Alasan itu sudah basi — lihat komentar kepala berkas.
+    // productionGrader memutuskan benar/salah jawaban ketik; stepTutor merender tuntunan
+    // langkah yang dilihat murid. Gerbang brain-manifest-test.js kini MEMBACA app.js dan
+    // memverifikasi klasifikasi ini terhadap wiring nyata, bukan terhadap konstanta.
+    stepTutor: 'active',
+    productionGrader: 'active',
     // Wave E4 (29 Agu): probe retensi tertunda — modul murni baru, belum ada pemanggil
     // di app.js; rekomendasi half-life-nya ADVISORY dan tidak menulis memori: 'off'.
     retentionProbe: 'off',
@@ -162,6 +176,15 @@
     // sama-sama nol pemanggil di app.js/index.html pada bundle ini — 'off' sampai
     // ada wiring nyata yang bisa ditunjuk.
     metricsDigest: 'off',
+    // statGate TETAP 'off', dan itu diverifikasi bukan diasumsikan (audit Fase 2).
+    // content-promotion.js MEMANG memasang FiezelStatGate.verdict sebagai pemutus
+    // promote/rollback konten, dan app.js:3004 memanggil CONTENT_PROMOTION.evaluate()
+    // tiap kali aplikasi dimuat. TETAPI konfigurasi canary yang benar-benar dikirim
+    // (content-canary-config.js: enabled:false, mode:'off') membuat evaluate() keluar
+    // lebih dulu dengan reason 'canary_not_active' — probe empiris: verdict dipanggil
+    // NOL kali. Jadi 'off' benar UNTUK KONFIGURASI YANG DIKIRIM; modul ini satu sakelar
+    // konfigurasi dari menjadi aktif. Kalau canary dinyalakan, entri ini WAJIB jadi
+    // 'active' di gelombang bundle yang sama.
     statGate: 'off',
     // Manifest sendiri deskriptif murni: ia tidak memutuskan apa-apa untuk murid,
     // maka jujurnya 'shadow' (informasi diagnostik), bukan 'active'.
