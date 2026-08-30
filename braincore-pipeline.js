@@ -201,9 +201,32 @@ function answer(learner, question, answerInput, now) {
   }
 
   // ---- 8. KALIBRASI ITEM (app.js itemCalibrationObserve) ------------------------------
-  const calibrationNext = guard('calibration', () => Calibration.observe(learner.calibration,
-    { itemId: String(q.id || ''), correct, weight: kappa == null ? 1 : kappa, prior: priorValue }, nowMs),
-    learner.calibration);
+  //
+  // TEMUAN FASE G, DAN INI CACAT SAYA SENDIRI YANG PALING LAMA HIDUP. Versi pertama memanggil
+  // observe() dengan nama field karangan — {correct, weight, prior} — padahal modulnya menuntut
+  // {ok, kappa, priorDifficulty, ability}. observe() memvalidasi masukannya lalu MENGEMBALIKAN
+  // STATE UTUH tanpa mencatat apa pun bila satu saja field wajib hilang (degradasi yang
+  // disengaja, bukan bug modul). Jadi ia dipanggil pada setiap jawaban, mengembalikan objek
+  // yang tampak sah, dan TIDAK PERNAH menyimpan satu pun bukti: `items` tetap {} selamanya.
+  //
+  // Akibatnya kalibrasi item adalah NO-OP di sepanjang Fase C, D, E, dan F. Kode alasan
+  // brain3_item_calibration_prior_only yang muncul di setiap trace itu JUJUR — ia memang
+  // melaporkan "belum ada data kalibrasi" — tetapi sebabnya bukan awal yang dingin, melainkan
+  // berkas ini. Penjaga tidak bisa melihatnya karena tidak ada yang dilempar.
+  //
+  // app.js:2315 memanggilnya BENAR. Jadi ini murni cacat harness, bukan cacat produk, dan
+  // tidak boleh dilaporkan sebagai "kalibrasi item rusak". Bentuk panggilan di bawah sekarang
+  // sama persis dengan app.js:2315, termasuk syarat ability yang harus berhingga — pada
+  // jawaban pertama seorang murid, ability memang belum ada, dan tidak mencatat di situ adalah
+  // perilaku produksi, bukan kekurangan.
+  const calibrationNext = guard('calibration', () => (abilityNow === null ? learner.calibration
+    : Calibration.observe(learner.calibration, {
+        itemId: String(q.id || ''),
+        priorDifficulty: priorValue,
+        ability: abilityNow,
+        ok: correct,
+        kappa: kappa == null ? 1 : kappa
+      }, nowMs)), learner.calibration);
 
   // ---- 9. AFEK (app.js:2234 affectObserve) -------------------------------------------
   const affectRows = learner.affectRows.concat([{

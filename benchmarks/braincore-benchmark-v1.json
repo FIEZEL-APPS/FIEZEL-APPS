@@ -1,0 +1,2360 @@
+{
+  "schema": "fiezel-braincore-benchmark-v1",
+  "braincoreVersion": "3.0.0",
+  "measuredLayer": "per-answer decision path (18 modules) via braincore-pipeline.js",
+  "notMeasuredHere": "item-selection policy — owned by adaptivity-simulation-v3.js (see AUDIT/08)",
+  "readThisFirst": [
+    "Nilai `expect` DIREKAM DARI MESIN INI. Ia tidak diturunkan dari teori belajar dan tidak",
+    "divalidasi terhadap murid nyata. Karena itu tolok ukur ini membuktikan STABILITAS dan",
+    "KETERBANDINGAN antar rilis — dan ia TIDAK membuktikan KEBENARAN keputusannya.",
+    "'Seluruh skenario cocok' berarti 'mesin ini memutuskan persis seperti saat direkam',",
+    "BUKAN 'mesin ini mengajar dengan benar'. Salah baca itu adalah risiko utama berkas ini.",
+    "Setiap skenario membawa field `asks` — pertanyaan yang ia ajukan. Bila suatu saat nilai",
+    "`expect` tidak lagi menjawab `asks`, yang salah bisa jadi mesinnya, bisa jadi skenarionya;",
+    "keduanya harus dibaca, dan tidak boleh ada yang diberkati hanya karena ia yang sekarang."
+  ],
+  "measurements": [
+    "mastery_response",
+    "memory_response",
+    "misconception_persistence",
+    "difficulty_adaptation",
+    "evidence_credibility",
+    "next_action_selection",
+    "consistency",
+    "regression_safety"
+  ],
+  "measurementsHeldByRunner": {
+    "consistency": "braincore-benchmark-test.js menjalankan seluruh tolok ukur DUA KALI dan menuntut sidik jari identik.",
+    "regression_safety": "Perbandingan terhadap `expect` inilah gerbang regresinya."
+  },
+  "scenarios": [
+    {
+      "id": "mastery-01-naik-pada-benar-andal",
+      "measures": [
+        "mastery_response"
+      ],
+      "asks": "Apakah keyakinan BKT NAIK ketika bukti benar yang andal datang berturut-turut?",
+      "level": "A2",
+      "startMs": 1700000000000,
+      "question": {
+        "id": "g-past-simple-1",
+        "concept": "past-simple",
+        "lesson": "past-simple",
+        "level": "A2",
+        "domain": "grammar",
+        "mode": "complete_sentence",
+        "stemLength": 40
+      },
+      "events": [
+        {
+          "day": 1,
+          "correct": true,
+          "ms": 7000,
+          "session": 0
+        },
+        {
+          "day": 2,
+          "correct": true,
+          "ms": 7000,
+          "session": 0
+        },
+        {
+          "day": 3,
+          "correct": true,
+          "ms": 7000,
+          "session": 0
+        },
+        {
+          "day": 4,
+          "correct": true,
+          "ms": 7000,
+          "session": 1
+        },
+        {
+          "day": 5,
+          "correct": true,
+          "ms": 7000,
+          "session": 1
+        },
+        {
+          "day": 6,
+          "correct": true,
+          "ms": 7000,
+          "session": 1
+        }
+      ],
+      "expect": {
+        "masteryL": 0.999,
+        "masteryN": 6,
+        "stabilityDays": 40.477,
+        "retrievability": 1,
+        "activeMisconceptions": 0,
+        "topMisconception": null,
+        "difficulty": {
+          "prior": 2.35,
+          "effective": 2.35,
+          "target": 0.8
+        },
+        "decisions": [
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "continue"
+        ],
+        "decisionRaw": [
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "continue"
+        ],
+        "decisionReasons": [
+          "on_track",
+          "on_track",
+          "on_track",
+          "on_track",
+          "on_track",
+          "on_track"
+        ],
+        "kappas": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "reasonCodes": [
+          "brain3_affect_insufficient_evidence",
+          "brain3_item_calibration_prior_only",
+          "brain3_item_prior_mode",
+          "brain3_memory_gain_spacing"
+        ],
+        "guardErrors": 0
+      }
+    },
+    {
+      "id": "mastery-02-turun-pada-salah-andal",
+      "measures": [
+        "mastery_response"
+      ],
+      "asks": "Apakah keyakinan BKT TURUN ketika bukti salah yang andal datang berturut-turut?",
+      "level": "A2",
+      "startMs": 1700000000000,
+      "question": {
+        "id": "g-past-simple-1",
+        "concept": "past-simple",
+        "lesson": "past-simple",
+        "level": "A2",
+        "domain": "grammar",
+        "mode": "complete_sentence",
+        "stemLength": 40
+      },
+      "events": [
+        {
+          "day": 1,
+          "correct": false,
+          "ms": 7000,
+          "session": 0
+        },
+        {
+          "day": 2,
+          "correct": false,
+          "ms": 7000,
+          "session": 0
+        },
+        {
+          "day": 3,
+          "correct": false,
+          "ms": 7000,
+          "session": 0
+        },
+        {
+          "day": 4,
+          "correct": false,
+          "ms": 7000,
+          "session": 1
+        },
+        {
+          "day": 5,
+          "correct": false,
+          "ms": 7000,
+          "session": 1
+        },
+        {
+          "day": 6,
+          "correct": false,
+          "ms": 7000,
+          "session": 1
+        }
+      ],
+      "expect": {
+        "masteryL": 0.173,
+        "masteryN": 6,
+        "stabilityDays": 0.05,
+        "retrievability": 1,
+        "activeMisconceptions": 0,
+        "topMisconception": null,
+        "difficulty": {
+          "prior": 2.35,
+          "effective": 2.35,
+          "target": 0.8
+        },
+        "decisions": [
+          "hint",
+          "reteach",
+          "reteach",
+          "hint",
+          "reteach",
+          "reteach"
+        ],
+        "decisionRaw": [
+          "hint",
+          "reteach",
+          "reteach",
+          "hint",
+          "reteach",
+          "reteach"
+        ],
+        "decisionReasons": [
+          "first_miss",
+          "persistent_misconception",
+          "persistent_misconception",
+          "first_miss",
+          "persistent_misconception",
+          "persistent_misconception"
+        ],
+        "kappas": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "reasonCodes": [
+          "brain3_affect_insufficient_evidence",
+          "brain3_item_calibration_prior_only",
+          "brain3_item_prior_mode",
+          "brain3_memory_lapse_partial"
+        ],
+        "guardErrors": 0
+      }
+    },
+    {
+      "id": "mastery-03-gerbang-tidak-terbuka-oleh-satu-jawaban",
+      "measures": [
+        "mastery_response"
+      ],
+      "asks": "Satu jawaban benar TIDAK boleh membuka gerbang penguasaan (L>=0.95 DAN n>=5).",
+      "level": "A2",
+      "startMs": 1700000000000,
+      "question": {
+        "id": "g-past-simple-1",
+        "concept": "past-simple",
+        "lesson": "past-simple",
+        "level": "A2",
+        "domain": "grammar",
+        "mode": "complete_sentence",
+        "stemLength": 40
+      },
+      "events": [
+        {
+          "day": 1,
+          "correct": true,
+          "ms": 7000,
+          "session": 0
+        }
+      ],
+      "expect": {
+        "masteryL": 0.553,
+        "masteryN": 1,
+        "stabilityDays": 2.637,
+        "retrievability": 1,
+        "activeMisconceptions": 0,
+        "topMisconception": null,
+        "difficulty": {
+          "prior": 2.35,
+          "effective": 2.35,
+          "target": 0.8
+        },
+        "decisions": [
+          "continue"
+        ],
+        "decisionRaw": [
+          "continue"
+        ],
+        "decisionReasons": [
+          "on_track"
+        ],
+        "kappas": [
+          1
+        ],
+        "reasonCodes": [
+          "brain3_affect_insufficient_evidence",
+          "brain3_item_calibration_prior_only",
+          "brain3_item_prior_mode",
+          "brain3_memory_gain_spacing"
+        ],
+        "guardErrors": 0
+      }
+    },
+    {
+      "id": "memory-01-jeda-panjang-lalu-benar",
+      "measures": [
+        "memory_response"
+      ],
+      "asks": "Sesudah jeda 30 hari, apakah stabilitas ingatan naik jauh lebih besar (efek spasi)?",
+      "level": "A2",
+      "startMs": 1700000000000,
+      "question": {
+        "id": "g-past-simple-1",
+        "concept": "past-simple",
+        "lesson": "past-simple",
+        "level": "A2",
+        "domain": "grammar",
+        "mode": "complete_sentence",
+        "stemLength": 40
+      },
+      "events": [
+        {
+          "day": 1,
+          "correct": true,
+          "ms": 7000,
+          "session": 0
+        },
+        {
+          "day": 31,
+          "correct": true,
+          "ms": 7000,
+          "session": 1
+        }
+      ],
+      "expect": {
+        "masteryL": 0.844,
+        "masteryN": 2,
+        "stabilityDays": 102.579,
+        "retrievability": 1,
+        "activeMisconceptions": 0,
+        "topMisconception": null,
+        "difficulty": {
+          "prior": 2.35,
+          "effective": 2.35,
+          "target": 0.8
+        },
+        "decisions": [
+          "continue",
+          "continue"
+        ],
+        "decisionRaw": [
+          "continue",
+          "continue"
+        ],
+        "decisionReasons": [
+          "on_track",
+          "on_track"
+        ],
+        "kappas": [
+          1,
+          1
+        ],
+        "reasonCodes": [
+          "brain3_affect_insufficient_evidence",
+          "brain3_item_calibration_prior_only",
+          "brain3_item_prior_mode",
+          "brain3_memory_gain_spacing"
+        ],
+        "guardErrors": 0
+      }
+    },
+    {
+      "id": "memory-02-jeda-pendek-lalu-benar",
+      "measures": [
+        "memory_response"
+      ],
+      "asks": "Pembanding memory-01: rangkaian yang sama dengan jeda satu hari.",
+      "level": "A2",
+      "startMs": 1700000000000,
+      "question": {
+        "id": "g-past-simple-1",
+        "concept": "past-simple",
+        "lesson": "past-simple",
+        "level": "A2",
+        "domain": "grammar",
+        "mode": "complete_sentence",
+        "stemLength": 40
+      },
+      "events": [
+        {
+          "day": 1,
+          "correct": true,
+          "ms": 7000,
+          "session": 0
+        },
+        {
+          "day": 2,
+          "correct": true,
+          "ms": 7000,
+          "session": 1
+        }
+      ],
+      "expect": {
+        "masteryL": 0.844,
+        "masteryN": 2,
+        "stabilityDays": 12.856,
+        "retrievability": 1,
+        "activeMisconceptions": 0,
+        "topMisconception": null,
+        "difficulty": {
+          "prior": 2.35,
+          "effective": 2.35,
+          "target": 0.8
+        },
+        "decisions": [
+          "continue",
+          "continue"
+        ],
+        "decisionRaw": [
+          "continue",
+          "continue"
+        ],
+        "decisionReasons": [
+          "on_track",
+          "on_track"
+        ],
+        "kappas": [
+          1,
+          1
+        ],
+        "reasonCodes": [
+          "brain3_affect_insufficient_evidence",
+          "brain3_item_calibration_prior_only",
+          "brain3_item_prior_mode",
+          "brain3_memory_gain_spacing"
+        ],
+        "guardErrors": 0
+      }
+    },
+    {
+      "id": "memory-03-lupa-lalu-salah",
+      "measures": [
+        "memory_response"
+      ],
+      "asks": "Apakah kegagalan sesudah jeda panjang MERUNTUHKAN stabilitas, bukan menaikkannya?",
+      "level": "A2",
+      "startMs": 1700000000000,
+      "question": {
+        "id": "g-past-simple-1",
+        "concept": "past-simple",
+        "lesson": "past-simple",
+        "level": "A2",
+        "domain": "grammar",
+        "mode": "complete_sentence",
+        "stemLength": 40
+      },
+      "events": [
+        {
+          "day": 1,
+          "correct": true,
+          "ms": 7000,
+          "session": 0
+        },
+        {
+          "day": 31,
+          "correct": false,
+          "ms": 7000,
+          "session": 1
+        }
+      ],
+      "expect": {
+        "masteryL": 0.27,
+        "masteryN": 2,
+        "stabilityDays": 0.387,
+        "retrievability": 1,
+        "activeMisconceptions": 0,
+        "topMisconception": null,
+        "difficulty": {
+          "prior": 2.35,
+          "effective": 2.35,
+          "target": 0.8
+        },
+        "decisions": [
+          "continue",
+          "hint"
+        ],
+        "decisionRaw": [
+          "continue",
+          "hint"
+        ],
+        "decisionReasons": [
+          "on_track",
+          "first_miss"
+        ],
+        "kappas": [
+          1,
+          1
+        ],
+        "reasonCodes": [
+          "brain3_affect_insufficient_evidence",
+          "brain3_item_calibration_prior_only",
+          "brain3_item_prior_mode",
+          "brain3_memory_gain_spacing",
+          "brain3_memory_lapse_partial"
+        ],
+        "guardErrors": 0
+      }
+    },
+    {
+      "id": "misconception-01-jadi-aktif-lintas-sesi",
+      "measures": [
+        "misconception_persistence"
+      ],
+      "asks": "Miskonsepsi yang sama, cukup bukti DAN lintas sesi: apakah ia menjadi AKTIF?",
+      "level": "A2",
+      "startMs": 1700000000000,
+      "question": {
+        "id": "g-past-simple-1",
+        "concept": "past-simple",
+        "lesson": "past-simple",
+        "level": "A2",
+        "domain": "grammar",
+        "mode": "complete_sentence",
+        "stemLength": 40
+      },
+      "events": [
+        {
+          "day": 1,
+          "correct": false,
+          "ms": 7000,
+          "session": 0,
+          "chosenMisconception": "m_ed_ending"
+        },
+        {
+          "day": 2,
+          "correct": false,
+          "ms": 7000,
+          "session": 0,
+          "chosenMisconception": "m_ed_ending"
+        },
+        {
+          "day": 3,
+          "correct": false,
+          "ms": 7000,
+          "session": 1,
+          "chosenMisconception": "m_ed_ending"
+        },
+        {
+          "day": 4,
+          "correct": false,
+          "ms": 7000,
+          "session": 1,
+          "chosenMisconception": "m_ed_ending"
+        }
+      ],
+      "expect": {
+        "masteryL": 0.173,
+        "masteryN": 4,
+        "stabilityDays": 0.05,
+        "retrievability": 1,
+        "activeMisconceptions": 1,
+        "topMisconception": "m_ed_ending",
+        "difficulty": {
+          "prior": 2.35,
+          "effective": 2.35,
+          "target": 0.8
+        },
+        "decisions": [
+          "hint",
+          "reteach",
+          "hint",
+          "reteach"
+        ],
+        "decisionRaw": [
+          "hint",
+          "reteach",
+          "hint",
+          "reteach"
+        ],
+        "decisionReasons": [
+          "first_miss",
+          "persistent_misconception",
+          "first_miss",
+          "persistent_misconception"
+        ],
+        "kappas": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "reasonCodes": [
+          "brain3_affect_insufficient_evidence",
+          "brain3_item_calibration_prior_only",
+          "brain3_item_prior_mode",
+          "brain3_memory_lapse_partial",
+          "brain3_misconception_active"
+        ],
+        "guardErrors": 0
+      }
+    },
+    {
+      "id": "misconception-02-satu-sesi-saja-belum-cukup",
+      "measures": [
+        "misconception_persistence"
+      ],
+      "asks": "Pagar MIN_SESSIONS: bukti yang menumpuk dalam SATU sesi belum boleh menuduh murid.",
+      "level": "A2",
+      "startMs": 1700000000000,
+      "question": {
+        "id": "g-past-simple-1",
+        "concept": "past-simple",
+        "lesson": "past-simple",
+        "level": "A2",
+        "domain": "grammar",
+        "mode": "complete_sentence",
+        "stemLength": 40
+      },
+      "events": [
+        {
+          "day": 1,
+          "correct": false,
+          "ms": 7000,
+          "session": 0,
+          "chosenMisconception": "m_ed_ending"
+        },
+        {
+          "day": 2,
+          "correct": false,
+          "ms": 7000,
+          "session": 0,
+          "chosenMisconception": "m_ed_ending"
+        },
+        {
+          "day": 3,
+          "correct": false,
+          "ms": 7000,
+          "session": 0,
+          "chosenMisconception": "m_ed_ending"
+        },
+        {
+          "day": 4,
+          "correct": false,
+          "ms": 7000,
+          "session": 0,
+          "chosenMisconception": "m_ed_ending"
+        }
+      ],
+      "expect": {
+        "masteryL": 0.173,
+        "masteryN": 4,
+        "stabilityDays": 0.05,
+        "retrievability": 1,
+        "activeMisconceptions": 0,
+        "topMisconception": null,
+        "difficulty": {
+          "prior": 2.35,
+          "effective": 2.35,
+          "target": 0.8
+        },
+        "decisions": [
+          "hint",
+          "reteach",
+          "reteach",
+          "reteach"
+        ],
+        "decisionRaw": [
+          "hint",
+          "reteach",
+          "reteach",
+          "reteach"
+        ],
+        "decisionReasons": [
+          "first_miss",
+          "persistent_misconception",
+          "persistent_misconception",
+          "persistent_misconception"
+        ],
+        "kappas": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "reasonCodes": [
+          "brain3_affect_insufficient_evidence",
+          "brain3_item_calibration_prior_only",
+          "brain3_item_prior_mode",
+          "brain3_memory_lapse_partial"
+        ],
+        "guardErrors": 0
+      }
+    },
+    {
+      "id": "misconception-03-pulih-tetapi-hanya-sesudah-bukti-panjang",
+      "measures": [
+        "misconception_persistence"
+      ],
+      "asks": "Apakah miskonsepsi yang aktif BISA pulih — dan berapa banyak bukti benar yang dituntut?",
+      "level": "A2",
+      "startMs": 1700000000000,
+      "question": {
+        "id": "g-past-simple-1",
+        "concept": "past-simple",
+        "lesson": "past-simple",
+        "level": "A2",
+        "domain": "grammar",
+        "mode": "complete_sentence",
+        "stemLength": 40
+      },
+      "events": [
+        {
+          "day": 1,
+          "correct": false,
+          "ms": 7000,
+          "session": 0,
+          "chosenMisconception": "m_ed_ending"
+        },
+        {
+          "day": 2,
+          "correct": false,
+          "ms": 7000,
+          "session": 1,
+          "chosenMisconception": "m_ed_ending"
+        },
+        {
+          "day": 3,
+          "correct": false,
+          "ms": 7000,
+          "session": 2,
+          "chosenMisconception": "m_ed_ending"
+        },
+        {
+          "day": 4,
+          "correct": false,
+          "ms": 7000,
+          "session": 3,
+          "chosenMisconception": "m_ed_ending"
+        },
+        {
+          "day": 5,
+          "correct": true,
+          "ms": 7000,
+          "session": 4
+        },
+        {
+          "day": 8,
+          "correct": true,
+          "ms": 7000,
+          "session": 5
+        },
+        {
+          "day": 11,
+          "correct": true,
+          "ms": 7000,
+          "session": 6
+        },
+        {
+          "day": 14,
+          "correct": true,
+          "ms": 7000,
+          "session": 7
+        },
+        {
+          "day": 17,
+          "correct": true,
+          "ms": 7000,
+          "session": 8
+        },
+        {
+          "day": 20,
+          "correct": true,
+          "ms": 7000,
+          "session": 9
+        },
+        {
+          "day": 23,
+          "correct": true,
+          "ms": 7000,
+          "session": 10
+        },
+        {
+          "day": 26,
+          "correct": true,
+          "ms": 7000,
+          "session": 11
+        },
+        {
+          "day": 29,
+          "correct": true,
+          "ms": 7000,
+          "session": 12
+        }
+      ],
+      "expect": {
+        "masteryL": 1,
+        "masteryN": 13,
+        "stabilityDays": 162.404,
+        "retrievability": 1,
+        "activeMisconceptions": 0,
+        "topMisconception": null,
+        "difficulty": {
+          "prior": 2.35,
+          "effective": 1.75,
+          "target": 0.8
+        },
+        "decisions": [
+          "hint",
+          "hint",
+          "hint",
+          "hint",
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "continue"
+        ],
+        "decisionRaw": [
+          "hint",
+          "hint",
+          "hint",
+          "hint",
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "continue"
+        ],
+        "decisionReasons": [
+          "first_miss",
+          "first_miss",
+          "first_miss",
+          "first_miss",
+          "on_track",
+          "on_track",
+          "on_track",
+          "on_track",
+          "on_track",
+          "on_track",
+          "on_track",
+          "on_track",
+          "on_track"
+        ],
+        "kappas": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "reasonCodes": [
+          "brain3_affect_insufficient_evidence",
+          "brain3_item_calibration_applied",
+          "brain3_item_calibration_prior_only",
+          "brain3_item_prior_mode",
+          "brain3_memory_gain_spacing",
+          "brain3_memory_lapse_partial",
+          "brain3_misconception_active"
+        ],
+        "guardErrors": 0
+      }
+    },
+    {
+      "id": "misconception-04-pemulihan-SENGAJA-lambat",
+      "measures": [
+        "misconception_persistence"
+      ],
+      "asks": "Non-reaksi yang jujur: beberapa jawaban benar saja TIDAK boleh langsung menghapus tuduhan.",
+      "level": "A2",
+      "startMs": 1700000000000,
+      "question": {
+        "id": "g-past-simple-1",
+        "concept": "past-simple",
+        "lesson": "past-simple",
+        "level": "A2",
+        "domain": "grammar",
+        "mode": "complete_sentence",
+        "stemLength": 40
+      },
+      "events": [
+        {
+          "day": 1,
+          "correct": false,
+          "ms": 7000,
+          "session": 0,
+          "chosenMisconception": "m_ed_ending"
+        },
+        {
+          "day": 2,
+          "correct": false,
+          "ms": 7000,
+          "session": 1,
+          "chosenMisconception": "m_ed_ending"
+        },
+        {
+          "day": 3,
+          "correct": false,
+          "ms": 7000,
+          "session": 2,
+          "chosenMisconception": "m_ed_ending"
+        },
+        {
+          "day": 4,
+          "correct": false,
+          "ms": 7000,
+          "session": 3,
+          "chosenMisconception": "m_ed_ending"
+        },
+        {
+          "day": 5,
+          "correct": true,
+          "ms": 7000,
+          "session": 4
+        },
+        {
+          "day": 8,
+          "correct": true,
+          "ms": 7000,
+          "session": 5
+        },
+        {
+          "day": 11,
+          "correct": true,
+          "ms": 7000,
+          "session": 6
+        }
+      ],
+      "expect": {
+        "masteryL": 0.952,
+        "masteryN": 7,
+        "stabilityDays": 54.299,
+        "retrievability": 1,
+        "activeMisconceptions": 1,
+        "topMisconception": "m_ed_ending",
+        "difficulty": {
+          "prior": 2.35,
+          "effective": 2.35,
+          "target": 0.8
+        },
+        "decisions": [
+          "hint",
+          "hint",
+          "hint",
+          "hint",
+          "continue",
+          "continue",
+          "continue"
+        ],
+        "decisionRaw": [
+          "hint",
+          "hint",
+          "hint",
+          "hint",
+          "continue",
+          "continue",
+          "continue"
+        ],
+        "decisionReasons": [
+          "first_miss",
+          "first_miss",
+          "first_miss",
+          "first_miss",
+          "on_track",
+          "on_track",
+          "on_track"
+        ],
+        "kappas": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "reasonCodes": [
+          "brain3_affect_insufficient_evidence",
+          "brain3_item_calibration_prior_only",
+          "brain3_item_prior_mode",
+          "brain3_memory_gain_spacing",
+          "brain3_memory_lapse_partial",
+          "brain3_misconception_active"
+        ],
+        "guardErrors": 0
+      }
+    },
+    {
+      "id": "difficulty-01-mode-mengubah-prior",
+      "measures": [
+        "difficulty_adaptation"
+      ],
+      "asks": "Mode yang lebih menuntut (teach_back) memberi prior lebih tinggi daripada complete_sentence?",
+      "level": "A2",
+      "startMs": 1700000000000,
+      "question": {
+        "id": "g-teach-back-1",
+        "concept": "past-simple",
+        "lesson": "past-simple",
+        "level": "A2",
+        "domain": "grammar",
+        "mode": "teach_back",
+        "stemLength": 40
+      },
+      "events": [
+        {
+          "day": 1,
+          "correct": true,
+          "ms": 7000,
+          "session": 0
+        }
+      ],
+      "expect": {
+        "masteryL": 0.553,
+        "masteryN": 1,
+        "stabilityDays": 2.488,
+        "retrievability": 1,
+        "activeMisconceptions": 0,
+        "topMisconception": null,
+        "difficulty": {
+          "prior": 2.9,
+          "effective": 2.9,
+          "target": 0.8
+        },
+        "decisions": [
+          "continue"
+        ],
+        "decisionRaw": [
+          "continue"
+        ],
+        "decisionReasons": [
+          "on_track"
+        ],
+        "kappas": [
+          1
+        ],
+        "reasonCodes": [
+          "brain3_affect_insufficient_evidence",
+          "brain3_item_calibration_prior_only",
+          "brain3_item_prior_mode",
+          "brain3_memory_gain_spacing"
+        ],
+        "guardErrors": 0
+      }
+    },
+    {
+      "id": "difficulty-02-level-mengubah-prior",
+      "measures": [
+        "difficulty_adaptation"
+      ],
+      "asks": "Level CEFR lebih tinggi memberi prior lebih tinggi pada mode yang sama?",
+      "level": "C1",
+      "startMs": 1700000000000,
+      "question": {
+        "id": "g-c1-1",
+        "concept": "past-simple",
+        "lesson": "past-simple",
+        "level": "C1",
+        "domain": "grammar",
+        "mode": "complete_sentence",
+        "stemLength": 40
+      },
+      "events": [
+        {
+          "day": 1,
+          "correct": true,
+          "ms": 7000,
+          "session": 0
+        }
+      ],
+      "expect": {
+        "masteryL": 0.553,
+        "masteryN": 1,
+        "stabilityDays": 1.922,
+        "retrievability": 1,
+        "activeMisconceptions": 0,
+        "topMisconception": null,
+        "difficulty": {
+          "prior": 5.35,
+          "effective": 5.35,
+          "target": 0.8
+        },
+        "decisions": [
+          "continue"
+        ],
+        "decisionRaw": [
+          "continue"
+        ],
+        "decisionReasons": [
+          "on_track"
+        ],
+        "kappas": [
+          1
+        ],
+        "reasonCodes": [
+          "brain3_affect_insufficient_evidence",
+          "brain3_item_calibration_prior_only",
+          "brain3_item_prior_mode",
+          "brain3_memory_gain_spacing"
+        ],
+        "guardErrors": 0
+      }
+    },
+    {
+      "id": "difficulty-03-kalibrasi-menaikkan-item-yang-ternyata-sulit",
+      "measures": [
+        "difficulty_adaptation"
+      ],
+      "asks": "Item yang KONSISTEN gagal, sesudah MIN_N_APPLY bukti: apakah kesulitan efektifnya NAIK di atas prior?",
+      "level": "A2",
+      "startMs": 1700000000000,
+      "question": {
+        "id": "g-past-simple-1",
+        "concept": "past-simple",
+        "lesson": "past-simple",
+        "level": "A2",
+        "domain": "grammar",
+        "mode": "complete_sentence",
+        "stemLength": 40
+      },
+      "events": [
+        {
+          "day": 1,
+          "correct": false,
+          "ms": 7000,
+          "session": 0
+        },
+        {
+          "day": 2,
+          "correct": false,
+          "ms": 7000,
+          "session": 0
+        },
+        {
+          "day": 3,
+          "correct": false,
+          "ms": 7000,
+          "session": 0
+        },
+        {
+          "day": 4,
+          "correct": false,
+          "ms": 7000,
+          "session": 0
+        },
+        {
+          "day": 5,
+          "correct": false,
+          "ms": 7000,
+          "session": 1
+        },
+        {
+          "day": 6,
+          "correct": false,
+          "ms": 7000,
+          "session": 1
+        },
+        {
+          "day": 7,
+          "correct": false,
+          "ms": 7000,
+          "session": 1
+        },
+        {
+          "day": 8,
+          "correct": false,
+          "ms": 7000,
+          "session": 1
+        },
+        {
+          "day": 9,
+          "correct": false,
+          "ms": 7000,
+          "session": 2
+        },
+        {
+          "day": 10,
+          "correct": false,
+          "ms": 7000,
+          "session": 2
+        },
+        {
+          "day": 11,
+          "correct": false,
+          "ms": 7000,
+          "session": 2
+        },
+        {
+          "day": 12,
+          "correct": false,
+          "ms": 7000,
+          "session": 2
+        },
+        {
+          "day": 13,
+          "correct": false,
+          "ms": 7000,
+          "session": 3
+        },
+        {
+          "day": 14,
+          "correct": false,
+          "ms": 7000,
+          "session": 3
+        }
+      ],
+      "expect": {
+        "masteryL": 0.173,
+        "masteryN": 14,
+        "stabilityDays": 0.05,
+        "retrievability": 1,
+        "activeMisconceptions": 0,
+        "topMisconception": null,
+        "difficulty": {
+          "prior": 2.35,
+          "effective": 2.95,
+          "target": 0.8
+        },
+        "decisions": [
+          "hint",
+          "reteach",
+          "reteach",
+          "reteach",
+          "hint",
+          "reteach",
+          "reteach",
+          "reteach",
+          "hint",
+          "reteach",
+          "reteach",
+          "reteach",
+          "hint",
+          "reteach"
+        ],
+        "decisionRaw": [
+          "hint",
+          "reteach",
+          "reteach",
+          "reteach",
+          "hint",
+          "reteach",
+          "reteach",
+          "reteach",
+          "hint",
+          "reteach",
+          "reteach",
+          "reteach",
+          "hint",
+          "reteach"
+        ],
+        "decisionReasons": [
+          "first_miss",
+          "persistent_misconception",
+          "persistent_misconception",
+          "persistent_misconception",
+          "first_miss",
+          "persistent_misconception",
+          "persistent_misconception",
+          "persistent_misconception",
+          "first_miss",
+          "persistent_misconception",
+          "persistent_misconception",
+          "persistent_misconception",
+          "first_miss",
+          "persistent_misconception"
+        ],
+        "kappas": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "reasonCodes": [
+          "brain3_affect_insufficient_evidence",
+          "brain3_item_calibration_applied",
+          "brain3_item_calibration_prior_only",
+          "brain3_item_prior_mode",
+          "brain3_memory_lapse_partial"
+        ],
+        "guardErrors": 0
+      }
+    },
+    {
+      "id": "difficulty-04-kalibrasi-menurunkan-item-yang-ternyata-mudah",
+      "measures": [
+        "difficulty_adaptation"
+      ],
+      "asks": "Kebalikannya: item yang KONSISTEN dijawab benar — apakah kesulitan efektifnya TURUN di bawah prior?",
+      "level": "A2",
+      "startMs": 1700000000000,
+      "question": {
+        "id": "g-past-simple-1",
+        "concept": "past-simple",
+        "lesson": "past-simple",
+        "level": "A2",
+        "domain": "grammar",
+        "mode": "complete_sentence",
+        "stemLength": 40
+      },
+      "events": [
+        {
+          "day": 1,
+          "correct": true,
+          "ms": 7000,
+          "session": 0
+        },
+        {
+          "day": 2,
+          "correct": true,
+          "ms": 7000,
+          "session": 0
+        },
+        {
+          "day": 3,
+          "correct": true,
+          "ms": 7000,
+          "session": 0
+        },
+        {
+          "day": 4,
+          "correct": true,
+          "ms": 7000,
+          "session": 0
+        },
+        {
+          "day": 5,
+          "correct": true,
+          "ms": 7000,
+          "session": 1
+        },
+        {
+          "day": 6,
+          "correct": true,
+          "ms": 7000,
+          "session": 1
+        },
+        {
+          "day": 7,
+          "correct": true,
+          "ms": 7000,
+          "session": 1
+        },
+        {
+          "day": 8,
+          "correct": true,
+          "ms": 7000,
+          "session": 1
+        },
+        {
+          "day": 9,
+          "correct": true,
+          "ms": 7000,
+          "session": 2
+        },
+        {
+          "day": 10,
+          "correct": true,
+          "ms": 7000,
+          "session": 2
+        },
+        {
+          "day": 11,
+          "correct": true,
+          "ms": 7000,
+          "session": 2
+        },
+        {
+          "day": 12,
+          "correct": true,
+          "ms": 7000,
+          "session": 2
+        },
+        {
+          "day": 13,
+          "correct": true,
+          "ms": 7000,
+          "session": 3
+        },
+        {
+          "day": 14,
+          "correct": true,
+          "ms": 7000,
+          "session": 3
+        }
+      ],
+      "expect": {
+        "masteryL": 1,
+        "masteryN": 14,
+        "stabilityDays": 91.368,
+        "retrievability": 1,
+        "activeMisconceptions": 0,
+        "topMisconception": null,
+        "difficulty": {
+          "prior": 2.35,
+          "effective": 1.75,
+          "target": 0.8
+        },
+        "decisions": [
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "continue"
+        ],
+        "decisionRaw": [
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "continue"
+        ],
+        "decisionReasons": [
+          "on_track",
+          "on_track",
+          "on_track",
+          "on_track",
+          "on_track",
+          "on_track",
+          "on_track",
+          "on_track",
+          "on_track",
+          "on_track",
+          "on_track",
+          "on_track",
+          "on_track",
+          "on_track"
+        ],
+        "kappas": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "reasonCodes": [
+          "brain3_affect_insufficient_evidence",
+          "brain3_item_calibration_applied",
+          "brain3_item_calibration_prior_only",
+          "brain3_item_prior_mode",
+          "brain3_memory_gain_spacing"
+        ],
+        "guardErrors": 0
+      }
+    },
+    {
+      "id": "difficulty-05-bukti-tipis-tidak-menggeser-apa-pun",
+      "measures": [
+        "difficulty_adaptation"
+      ],
+      "asks": "Pagar MIN_N_APPLY: bukti di bawah ambang TIDAK boleh menggeser kesulitan sama sekali.",
+      "level": "A2",
+      "startMs": 1700000000000,
+      "question": {
+        "id": "g-past-simple-1",
+        "concept": "past-simple",
+        "lesson": "past-simple",
+        "level": "A2",
+        "domain": "grammar",
+        "mode": "complete_sentence",
+        "stemLength": 40
+      },
+      "events": [
+        {
+          "day": 1,
+          "correct": false,
+          "ms": 7000,
+          "session": 0
+        },
+        {
+          "day": 2,
+          "correct": false,
+          "ms": 7000,
+          "session": 0
+        },
+        {
+          "day": 3,
+          "correct": false,
+          "ms": 7000,
+          "session": 0
+        },
+        {
+          "day": 4,
+          "correct": false,
+          "ms": 7000,
+          "session": 0
+        }
+      ],
+      "expect": {
+        "masteryL": 0.173,
+        "masteryN": 4,
+        "stabilityDays": 0.05,
+        "retrievability": 1,
+        "activeMisconceptions": 0,
+        "topMisconception": null,
+        "difficulty": {
+          "prior": 2.35,
+          "effective": 2.35,
+          "target": 0.8
+        },
+        "decisions": [
+          "hint",
+          "reteach",
+          "reteach",
+          "reteach"
+        ],
+        "decisionRaw": [
+          "hint",
+          "reteach",
+          "reteach",
+          "reteach"
+        ],
+        "decisionReasons": [
+          "first_miss",
+          "persistent_misconception",
+          "persistent_misconception",
+          "persistent_misconception"
+        ],
+        "kappas": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "reasonCodes": [
+          "brain3_affect_insufficient_evidence",
+          "brain3_item_calibration_prior_only",
+          "brain3_item_prior_mode",
+          "brain3_memory_lapse_partial"
+        ],
+        "guardErrors": 0
+      }
+    },
+    {
+      "id": "credibility-01-tebakan-cepat-didiskon",
+      "measures": [
+        "evidence_credibility"
+      ],
+      "asks": "Jawaban benar yang sangat cepat: apakah kappa turun dan mastery bergerak lebih sedikit?",
+      "level": "A2",
+      "startMs": 1700000000000,
+      "question": {
+        "id": "g-past-simple-1",
+        "concept": "past-simple",
+        "lesson": "past-simple",
+        "level": "A2",
+        "domain": "grammar",
+        "mode": "complete_sentence",
+        "stemLength": 40
+      },
+      "events": [
+        {
+          "day": 1,
+          "correct": true,
+          "ms": 600,
+          "session": 0
+        }
+      ],
+      "expect": {
+        "masteryL": 0.288,
+        "masteryN": 1,
+        "stabilityDays": 2.637,
+        "retrievability": 1,
+        "activeMisconceptions": 0,
+        "topMisconception": null,
+        "difficulty": {
+          "prior": 2.35,
+          "effective": 2.35,
+          "target": 0.8
+        },
+        "decisions": [
+          "continue"
+        ],
+        "decisionRaw": [
+          "continue"
+        ],
+        "decisionReasons": [
+          "on_track"
+        ],
+        "kappas": [
+          0.3
+        ],
+        "reasonCodes": [
+          "brain3_affect_insufficient_evidence",
+          "brain3_evidence_discounted_guess",
+          "brain3_item_calibration_prior_only",
+          "brain3_item_prior_mode",
+          "brain3_memory_gain_spacing"
+        ],
+        "guardErrors": 0
+      }
+    },
+    {
+      "id": "credibility-02-jawaban-andal-penuh",
+      "measures": [
+        "evidence_credibility"
+      ],
+      "asks": "Pembanding credibility-01: jawaban benar yang sama pada waktu yang wajar.",
+      "level": "A2",
+      "startMs": 1700000000000,
+      "question": {
+        "id": "g-past-simple-1",
+        "concept": "past-simple",
+        "lesson": "past-simple",
+        "level": "A2",
+        "domain": "grammar",
+        "mode": "complete_sentence",
+        "stemLength": 40
+      },
+      "events": [
+        {
+          "day": 1,
+          "correct": true,
+          "ms": 7000,
+          "session": 0
+        }
+      ],
+      "expect": {
+        "masteryL": 0.553,
+        "masteryN": 1,
+        "stabilityDays": 2.637,
+        "retrievability": 1,
+        "activeMisconceptions": 0,
+        "topMisconception": null,
+        "difficulty": {
+          "prior": 2.35,
+          "effective": 2.35,
+          "target": 0.8
+        },
+        "decisions": [
+          "continue"
+        ],
+        "decisionRaw": [
+          "continue"
+        ],
+        "decisionReasons": [
+          "on_track"
+        ],
+        "kappas": [
+          1
+        ],
+        "reasonCodes": [
+          "brain3_affect_insufficient_evidence",
+          "brain3_item_calibration_prior_only",
+          "brain3_item_prior_mode",
+          "brain3_memory_gain_spacing"
+        ],
+        "guardErrors": 0
+      }
+    },
+    {
+      "id": "credibility-03-beban-bahasa-mendiskon",
+      "measures": [
+        "evidence_credibility"
+      ],
+      "asks": "Soal Inggris penuh untuk pemula: apakah bukti didiskon, bukan dihitung penuh?",
+      "level": "A1",
+      "startMs": 1700000000000,
+      "question": {
+        "id": "g-a1-1",
+        "concept": "past-simple",
+        "lesson": "past-simple",
+        "level": "A1",
+        "domain": "grammar",
+        "mode": "complete_sentence",
+        "stemLength": 40
+      },
+      "events": [
+        {
+          "day": 1,
+          "correct": false,
+          "ms": 7000,
+          "session": 0,
+          "langLoad": "full_en"
+        }
+      ],
+      "expect": {
+        "masteryL": 0.19,
+        "masteryN": 1,
+        "stabilityDays": 0.227,
+        "retrievability": 1,
+        "activeMisconceptions": 0,
+        "topMisconception": null,
+        "difficulty": {
+          "prior": 1.35,
+          "effective": 1.35,
+          "target": 0.8
+        },
+        "decisions": [
+          "hint"
+        ],
+        "decisionRaw": [
+          "hint"
+        ],
+        "decisionReasons": [
+          "first_miss"
+        ],
+        "kappas": [
+          0.45
+        ],
+        "reasonCodes": [
+          "brain3_affect_insufficient_evidence",
+          "brain3_evidence_discounted_language",
+          "brain3_item_calibration_prior_only",
+          "brain3_item_prior_mode",
+          "brain3_memory_lapse_partial"
+        ],
+        "guardErrors": 0
+      }
+    },
+    {
+      "id": "credibility-04-integritas-membuang-bukti",
+      "measures": [
+        "evidence_credibility"
+      ],
+      "asks": "Bukti dari item yang cacat (evidence_mismatch): apakah ia DIBUANG (kappa 0), bukan dikurangi?",
+      "level": "A2",
+      "startMs": 1700000000000,
+      "question": {
+        "id": "g-past-simple-1",
+        "concept": "past-simple",
+        "lesson": "past-simple",
+        "level": "A2",
+        "domain": "grammar",
+        "mode": "complete_sentence",
+        "stemLength": 40
+      },
+      "events": [
+        {
+          "day": 1,
+          "correct": true,
+          "ms": 7000,
+          "session": 0,
+          "integrity": "evidence_mismatch"
+        }
+      ],
+      "expect": {
+        "masteryL": 0.2,
+        "masteryN": 0,
+        "stabilityDays": 2.637,
+        "retrievability": 1,
+        "activeMisconceptions": 0,
+        "topMisconception": null,
+        "difficulty": {
+          "prior": 2.35,
+          "effective": 2.35,
+          "target": 0.8
+        },
+        "decisions": [
+          "continue"
+        ],
+        "decisionRaw": [
+          "continue"
+        ],
+        "decisionReasons": [
+          "on_track"
+        ],
+        "kappas": [
+          0
+        ],
+        "reasonCodes": [
+          "brain3_affect_insufficient_evidence",
+          "brain3_evidence_rejected_integrity",
+          "brain3_item_calibration_prior_only",
+          "brain3_item_prior_mode",
+          "brain3_memory_gain_spacing"
+        ],
+        "guardErrors": 0
+      }
+    },
+    {
+      "id": "action-01-rentetan-salah-menjauh-dari-lanjut",
+      "measures": [
+        "next_action_selection"
+      ],
+      "asks": "Rentetan salah: apakah tindakannya bergerak menjauh dari sekadar 'lanjut'?",
+      "level": "A2",
+      "startMs": 1700000000000,
+      "question": {
+        "id": "g-past-simple-1",
+        "concept": "past-simple",
+        "lesson": "past-simple",
+        "level": "A2",
+        "domain": "grammar",
+        "mode": "complete_sentence",
+        "stemLength": 40
+      },
+      "events": [
+        {
+          "day": 1,
+          "correct": false,
+          "ms": 7000,
+          "session": 0
+        },
+        {
+          "day": 2,
+          "correct": false,
+          "ms": 7000,
+          "session": 0
+        },
+        {
+          "day": 3,
+          "correct": false,
+          "ms": 7000,
+          "session": 0
+        },
+        {
+          "day": 4,
+          "correct": false,
+          "ms": 7000,
+          "session": 0
+        }
+      ],
+      "expect": {
+        "masteryL": 0.173,
+        "masteryN": 4,
+        "stabilityDays": 0.05,
+        "retrievability": 1,
+        "activeMisconceptions": 0,
+        "topMisconception": null,
+        "difficulty": {
+          "prior": 2.35,
+          "effective": 2.35,
+          "target": 0.8
+        },
+        "decisions": [
+          "hint",
+          "reteach",
+          "reteach",
+          "reteach"
+        ],
+        "decisionRaw": [
+          "hint",
+          "reteach",
+          "reteach",
+          "reteach"
+        ],
+        "decisionReasons": [
+          "first_miss",
+          "persistent_misconception",
+          "persistent_misconception",
+          "persistent_misconception"
+        ],
+        "kappas": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "reasonCodes": [
+          "brain3_affect_insufficient_evidence",
+          "brain3_item_calibration_prior_only",
+          "brain3_item_prior_mode",
+          "brain3_memory_lapse_partial"
+        ],
+        "guardErrors": 0
+      }
+    },
+    {
+      "id": "action-02-melambat-dan-meleset-menyudahi-sesi",
+      "measures": [
+        "next_action_selection"
+      ],
+      "asks": "Melambat DAN meleset bersamaan: apakah sesi disudahi, bukan dipermudah?",
+      "level": "A2",
+      "startMs": 1700000000000,
+      "question": {
+        "id": "g-past-simple-1",
+        "concept": "past-simple",
+        "lesson": "past-simple",
+        "level": "A2",
+        "domain": "grammar",
+        "mode": "complete_sentence",
+        "stemLength": 40
+      },
+      "events": [
+        {
+          "day": 1,
+          "correct": true,
+          "ms": 7000,
+          "session": 0
+        },
+        {
+          "day": 2,
+          "correct": true,
+          "ms": 7000,
+          "session": 0
+        },
+        {
+          "day": 3,
+          "correct": true,
+          "ms": 7000,
+          "session": 0
+        },
+        {
+          "day": 4,
+          "correct": true,
+          "ms": 7000,
+          "session": 0
+        },
+        {
+          "day": 5,
+          "correct": true,
+          "ms": 7000,
+          "session": 0
+        },
+        {
+          "day": 6,
+          "correct": true,
+          "ms": 7000,
+          "session": 0
+        },
+        {
+          "day": 7,
+          "correct": false,
+          "ms": 40000,
+          "session": 0
+        },
+        {
+          "day": 8,
+          "correct": false,
+          "ms": 40000,
+          "session": 0
+        },
+        {
+          "day": 9,
+          "correct": false,
+          "ms": 40000,
+          "session": 0
+        },
+        {
+          "day": 10,
+          "correct": false,
+          "ms": 40000,
+          "session": 0
+        }
+      ],
+      "expect": {
+        "masteryL": 0.56,
+        "masteryN": 10,
+        "stabilityDays": 0.05,
+        "retrievability": 1,
+        "activeMisconceptions": 0,
+        "topMisconception": null,
+        "difficulty": {
+          "prior": 2.35,
+          "effective": 2.002,
+          "target": 0.8
+        },
+        "decisions": [
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "hint",
+          "stop",
+          "stop",
+          "stop"
+        ],
+        "decisionRaw": [
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "hint",
+          "breathe",
+          "breathe",
+          "breathe"
+        ],
+        "decisionReasons": [
+          "on_track",
+          "on_track",
+          "on_track",
+          "on_track",
+          "on_track",
+          "on_track",
+          "first_miss",
+          "cognitive_load_high",
+          "cognitive_load_high",
+          "cognitive_load_high"
+        ],
+        "kappas": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "reasonCodes": [
+          "brain3_affect_fatigued",
+          "brain3_affect_insufficient_evidence",
+          "brain3_item_calibration_applied",
+          "brain3_item_calibration_prior_only",
+          "brain3_item_prior_mode",
+          "brain3_memory_gain_spacing",
+          "brain3_memory_lapse_partial"
+        ],
+        "guardErrors": 0
+      }
+    },
+    {
+      "id": "action-03-cepat-mengingat-menaikkan-tingkat",
+      "measures": [
+        "next_action_selection"
+      ],
+      "asks": "Benar beruntun dan cepat KARENA MENGINGAT (bukan menebak): apakah tingkatnya dinaikkan?",
+      "level": "A2",
+      "startMs": 1700000000000,
+      "question": {
+        "id": "g-past-simple-1",
+        "concept": "past-simple",
+        "lesson": "past-simple",
+        "level": "A2",
+        "domain": "grammar",
+        "mode": "complete_sentence",
+        "stemLength": 40
+      },
+      "events": [
+        {
+          "day": 1,
+          "correct": true,
+          "ms": 12000,
+          "session": 0
+        },
+        {
+          "day": 2,
+          "correct": true,
+          "ms": 12000,
+          "session": 0
+        },
+        {
+          "day": 3,
+          "correct": true,
+          "ms": 12000,
+          "session": 0
+        },
+        {
+          "day": 4,
+          "correct": true,
+          "ms": 12000,
+          "session": 0
+        },
+        {
+          "day": 5,
+          "correct": true,
+          "ms": 5000,
+          "session": 0
+        },
+        {
+          "day": 6,
+          "correct": true,
+          "ms": 5000,
+          "session": 0
+        },
+        {
+          "day": 7,
+          "correct": true,
+          "ms": 5000,
+          "session": 0
+        }
+      ],
+      "expect": {
+        "masteryL": 1,
+        "masteryN": 7,
+        "stabilityDays": 46.749,
+        "retrievability": 1,
+        "activeMisconceptions": 0,
+        "topMisconception": null,
+        "difficulty": {
+          "prior": 2.35,
+          "effective": 2.35,
+          "target": 0.8
+        },
+        "decisions": [
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "advance",
+          "advance",
+          "advance"
+        ],
+        "decisionRaw": [
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "stretch",
+          "stretch",
+          "stretch"
+        ],
+        "decisionReasons": [
+          "on_track",
+          "on_track",
+          "on_track",
+          "on_track",
+          "too_easy",
+          "too_easy",
+          "too_easy"
+        ],
+        "kappas": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "reasonCodes": [
+          "brain3_affect_insufficient_evidence",
+          "brain3_item_calibration_prior_only",
+          "brain3_item_prior_mode",
+          "brain3_memory_gain_spacing"
+        ],
+        "guardErrors": 0
+      }
+    },
+    {
+      "id": "action-04-soal-habis-menutup-sesi",
+      "measures": [
+        "next_action_selection"
+      ],
+      "asks": "Kolam soal habis: apakah sesi ditutup, bukan dilanjutkan ke soal yang tidak ada?",
+      "level": "A2",
+      "startMs": 1700000000000,
+      "question": {
+        "id": "g-past-simple-1",
+        "concept": "past-simple",
+        "lesson": "past-simple",
+        "level": "A2",
+        "domain": "grammar",
+        "mode": "complete_sentence",
+        "stemLength": 40
+      },
+      "events": [
+        {
+          "day": 1,
+          "correct": true,
+          "ms": 7000,
+          "session": 0
+        },
+        {
+          "day": 2,
+          "correct": true,
+          "ms": 7000,
+          "session": 0,
+          "remaining": 0
+        }
+      ],
+      "expect": {
+        "masteryL": 0.844,
+        "masteryN": 2,
+        "stabilityDays": 12.856,
+        "retrievability": 1,
+        "activeMisconceptions": 0,
+        "topMisconception": null,
+        "difficulty": {
+          "prior": 2.35,
+          "effective": 2.35,
+          "target": 0.8
+        },
+        "decisions": [
+          "continue",
+          "stop"
+        ],
+        "decisionRaw": [
+          "continue",
+          "wrapup"
+        ],
+        "decisionReasons": [
+          "on_track",
+          "pool_exhausted"
+        ],
+        "kappas": [
+          1,
+          1
+        ],
+        "reasonCodes": [
+          "brain3_affect_insufficient_evidence",
+          "brain3_item_calibration_prior_only",
+          "brain3_item_prior_mode",
+          "brain3_memory_gain_spacing"
+        ],
+        "guardErrors": 0
+      }
+    },
+    {
+      "id": "action-05-tebakan-beruntun-TIDAK-menaikkan-tingkat",
+      "measures": [
+        "next_action_selection",
+        "evidence_credibility"
+      ],
+      "asks": "Non-reaksi yang jujur: empat tebakan benar bukan penguasaan, jadi tingkatnya TIDAK boleh naik.",
+      "level": "A2",
+      "startMs": 1700000000000,
+      "question": {
+        "id": "g-past-simple-1",
+        "concept": "past-simple",
+        "lesson": "past-simple",
+        "level": "A2",
+        "domain": "grammar",
+        "mode": "complete_sentence",
+        "stemLength": 40
+      },
+      "events": [
+        {
+          "day": 1,
+          "correct": true,
+          "ms": 900,
+          "session": 0
+        },
+        {
+          "day": 2,
+          "correct": true,
+          "ms": 900,
+          "session": 0
+        },
+        {
+          "day": 3,
+          "correct": true,
+          "ms": 900,
+          "session": 0
+        },
+        {
+          "day": 4,
+          "correct": true,
+          "ms": 900,
+          "session": 0
+        },
+        {
+          "day": 5,
+          "correct": true,
+          "ms": 900,
+          "session": 0
+        },
+        {
+          "day": 6,
+          "correct": true,
+          "ms": 900,
+          "session": 0
+        }
+      ],
+      "expect": {
+        "masteryL": 0.791,
+        "masteryN": 6,
+        "stabilityDays": 40.477,
+        "retrievability": 1,
+        "activeMisconceptions": 0,
+        "topMisconception": null,
+        "difficulty": {
+          "prior": 2.35,
+          "effective": 2.35,
+          "target": 0.8
+        },
+        "decisions": [
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "continue"
+        ],
+        "decisionRaw": [
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "continue",
+          "continue"
+        ],
+        "decisionReasons": [
+          "on_track",
+          "on_track",
+          "on_track",
+          "streak_but_guessing",
+          "streak_but_guessing",
+          "streak_but_guessing"
+        ],
+        "kappas": [
+          0.3,
+          0.3,
+          0.3,
+          0.3,
+          0.3,
+          0.3
+        ],
+        "reasonCodes": [
+          "brain3_affect_insufficient_evidence",
+          "brain3_evidence_discounted_guess",
+          "brain3_item_calibration_prior_only",
+          "brain3_item_prior_mode",
+          "brain3_memory_gain_spacing"
+        ],
+        "guardErrors": 0
+      }
+    }
+  ]
+}

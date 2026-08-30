@@ -792,6 +792,13 @@ jobs:
           # penting — menolak alasan KARANGAN: setiap kode brain3_* yang keluar harus bisa
           # ditemukan sebagai literal di dalam sumber features/brain/.
           node braincore-explainability-test.js
+          # Fase 2 / Phase G: tolok ukur jalur keputusan per-jawaban — delapan pengukuran
+          # (mastery, ingatan, miskonsepsi, kesulitan, kredibilitas, tindakan, konsistensi,
+          # keamanan regresi) pada skenario deterministik. Ia SENGAJA tidak menyentuh lapisan
+          # pemilihan soal, yang sudah dimiliki adaptivity-simulation-v3.js.
+          # §4-nya menyatakan HUBUNGAN yang harus benar apa pun angkanya, jadi merekam ulang
+          # ekspektasi sesudah sebuah regresi TIDAK bisa membuatnya hijau.
+          node braincore-benchmark-test.js
           node fiezel-stat-gate-test.js
           node id-golden-snapshot-test.js
           node learning-lane-test.js
