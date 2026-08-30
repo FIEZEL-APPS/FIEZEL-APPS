@@ -1,4 +1,4 @@
-// m025-145 — gate untuk Speaking berformat ujian.
+// m025-145 â€” gate untuk Speaking berformat ujian.
 //
 // Dua hal yang dijaga, dan keduanya lebih mudah dilanggar daripada terlihat:
 // 1. Kontrak waktunya harus benar. Latihan yang memberi 60 detik untuk TOEFL Task 1 melatih
@@ -88,13 +88,10 @@ check('No item persists raw audio or transcript',
 check('The addon loads the exam bank without making it fatal', /async loadExam\(\)/.test(addon) && /catch\(_\)\{return false\}/.test(addon),
   'Skills Lab harian tidak boleh mati hanya karena berkas latihan ujian belum ada');
 check('The exam domain is a real session domain', /'speaking_exam'/.test(addon) && /renderSpeakingExam\(/.test(addon), 'domain baru harus punya renderer sendiri');
-/* m025-202 (audit Fase 2, 30 Agu 2026): pola ini DULU menuntut `{const` tanpa spasi, jadi ia
- * memerah begitu metode-nya dirapikan dari satu baris menjadi banyak baris pada gelombang
- * i18n m025-199/m025-201. TIDAK ADA cacat produk di baliknya: penjagaan levelnya masih ada
- * dan masih baris PERTAMA di dalam metode. Yang dilonggarkan HANYA spasi/baris-baru; yang
- * dituntut tetap sama kerasnya — metode itu wajib memanggil normalizeLevel(level) sebagai
- * pernyataan pertamanya, bukan sekadar menyebutnya di suatu tempat. */
-check('Exam sessions are level-scoped like everything else', /examFor\(level\)\s*\{\s*const target=normalizeLevel\(level\)/.test(addon), 'kontrak level m025-136 berlaku di sini juga');
+/* 2026-08-30: lihat catatan kembar di listening-exam-test.js. Assert ini menuntut `){const`
+   dalam SATU BARIS TANPA SPASI dan merah begitu wave i18n memformat ulang examFor() ke
+   beberapa baris - padahal kontraknya utuh. Spasi dilonggarkan; yang dijaga tetap sama. */
+check('Exam sessions are level-scoped like everything else', /examFor\(level\)\s*\{\s*const\s+target\s*=\s*normalizeLevel\(level\)/.test(addon), 'kontrak level m025-136 berlaku di sini juga');
 check('Voice controls are bound from one shared place', /bindSpeakingControls\(item\)\{/.test(addon) && (addon.match(/this\.bindSpeakingControls\(item\)/g) || []).length === 2,
   'menyalin pengikatan dua kali berarti perbaikan privasi hanya sampai ke salah satunya');
 check('The exam renderer shows the timing contract to the learner', /fsl-timing/.test(addon) && /prepSeconds/.test(addon),
