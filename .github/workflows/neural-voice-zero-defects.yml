@@ -1,0 +1,351 @@
+name: Neural Voice Zero Defects Repair
+
+on:
+  push:
+    branches:
+      - evidence/neural-voice-zero-defects
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: fix/neural-voice-multichunk-prefetch
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Lock target head and import stale-completion red proof
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main fix/neural-voice-multichunk-prefetch fix/neural-voice-continuous-playback --no-tags
+          git checkout -B repair origin/fix/neural-voice-multichunk-prefetch
+          test "$(git rev-parse HEAD)" = "f2e70145bdf98d33548e2b85cbfa4db0b9d724ca"
+          git show origin/fix/neural-voice-continuous-playback:listening-subtitle-suppression-test.js > listening-subtitle-suppression-test.js
+          set +e
+          node listening-subtitle-suppression-test.js > /tmp/stale-red.log 2>&1
+          code=$?
+          set -e
+          cat /tmp/stale-red.log
+          test "$code" -ne 0
+          grep -F "completion dari play LAMA sesudah interrupt DIABAIKAN" /tmp/stale-red.log
+          echo "RED PROOF CONFIRMED: stale completion reaches fallback on defective AudioService"
+
+      - name: Patch AudioService race and timeout ownership
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('app.js')
+          s=p.read_text()
+
+          def one(old,new,label):
+              global s
+              n=s.count(old)
+              if n != 1:
+                  raise SystemExit(f'{label}: expected exactly 1 match, got {n}')
+              s=s.replace(old,new,1)
+
+          one(
+              " let silenceNoticed=false;\n const rateFor=options=>Number(options.speed??selectedNeuralRate())||1;",
+              " let silenceNoticed=false;\n // m025-213: satu generasi playback per giliran. Promise neural lama boleh selesai kapan saja,\n // tetapi setelah stop()/play() baru ia tidak lagi berhak memulai fallback atau toast.\n let playbackGeneration=0,activeDoorTimer=null;\n const rateFor=options=>Number(options.speed??selectedNeuralRate())||1;",
+              'AudioService generation state')
+
+          one(
+              "  stop(){cancelVoicePrefetch();self.FiezelVoiceSay?.stop?.();if(browserSupported)speechSynthesis.cancel()},",
+              "  stop(){\n   playbackGeneration++;\n   if(activeDoorTimer){try{clearTimeout(activeDoorTimer)}catch{}activeDoorTimer=null}\n   cancelVoicePrefetch();self.FiezelVoiceSay?.stop?.();if(browserSupported)speechSynthesis.cancel()\n  },",
+              'AudioService stop')
+
+          one(
+              "   this.stop();\n   /* m025-198",
+              "   this.stop();\n   const generation=playbackGeneration;\n   /* m025-198",
+              'AudioService play generation capture')
+
+          one(
+              "   const timeoutPromise=typeof setTimeout==='function'?new Promise(r=>setTimeout(()=>r(false),9000)):new Promise(()=>{});\n",
+              "   let doorTimer=null;\n",
+              'old uncancellable timeout')
+
+          old_via="""   const viaDoor=typeof say==='function'
+    ?Promise.race([
+      Promise.resolve().then(()=>say.call(self.FiezelVoiceSay,text,{speed:options.speed??selectedNeuralRate(),contentType:options.contentType,locale:options.locale,suppressSubtitles:noSubtitles})).catch(()=>false),
+      timeoutPromise
+    ])
+    :Promise.resolve(false);"""
+          new_via="""   const doorPromise=typeof say==='function'
+    ?Promise.resolve()
+      .then(()=>say.call(self.FiezelVoiceSay,text,{speed:options.speed??selectedNeuralRate(),contentType:options.contentType,locale:options.locale,suppressSubtitles:noSubtitles}))
+      .then(value=>({kind:'door',value}),()=>({kind:'door',value:false}))
+    :Promise.resolve({kind:'door',value:false});
+   const timeoutPromise=typeof say==='function'&&typeof setTimeout==='function'
+    ?new Promise(resolve=>{
+      doorTimer=setTimeout(()=>resolve({kind:'timeout',value:false}),9000);
+      activeDoorTimer=doorTimer;
+     })
+    :new Promise(()=>{});
+   const viaDoor=typeof say==='function'?Promise.race([doorPromise,timeoutPromise]):doorPromise;"""
+          one(old_via,new_via,'AudioService door race')
+
+          old_return="""   return viaDoor.then(result=>{
+    if(result!==false&&result!==null&&result!==undefined)return result===true?{provider:'fiezel-voice-say'}:result;
+    return Promise.resolve(browserPlay(text,options)).then(fallback=>{
+     if(fallback)return fallback;
+     noteSilence();
+     return null;
+    });
+   });"""
+          new_return="""   return viaDoor.then(outcome=>{
+    // Timer milik giliran ini dibersihkan, tetapi completion lama tidak pernah boleh
+    // menghapus timer milik giliran baru yang sudah mengambil alih activeDoorTimer.
+    if(activeDoorTimer===doorTimer)activeDoorTimer=null;
+    if(doorTimer&&typeof clearTimeout==='function')try{clearTimeout(doorTimer)}catch{}
+    if(generation!==playbackGeneration)return null;
+    // Bila timeout yang menang, hentikan pintu neural SEBELUM browser fallback. Tanpa ini
+    // neural yang terlambat bisa ikut berbunyi sesudah fallback dan menghasilkan dua suara.
+    if(outcome?.kind==='timeout')try{self.FiezelVoiceSay?.stop?.()}catch{}
+    const result=outcome?.value;
+    if(result!==false&&result!==null&&result!==undefined)return result===true?{provider:'fiezel-voice-say'}:result;
+    if(generation!==playbackGeneration)return null;
+    return Promise.resolve(browserPlay(text,options)).then(fallback=>{
+     if(generation!==playbackGeneration)return null;
+     if(fallback)return fallback;
+     noteSilence();
+     return null;
+    });
+   });"""
+          one(old_return,new_return,'AudioService stale completion guard')
+
+          p.write_text(s)
+          PY
+
+          cat > voice-audio-race-test.js <<'EOF'
+          #!/usr/bin/env node
+          'use strict';
+          const fs=require('fs');
+          const path=require('path');
+          const vm=require('vm');
+          const src=fs.readFileSync(path.join(__dirname,'app.js'),'utf8');
+          const a=src.indexOf('function AudioService(){');
+          const b=src.indexOf('}const audio=AudioService();');
+          const code=a>=0&&b>a?src.slice(a,b+1):'';
+          const checks=[];let failed=false;
+          function check(name,ok,details=''){checks.push({name,status:ok?'PASS':'FAIL',details});if(!ok){failed=true;console.error('FAIL - '+name+(details?' :: '+details:''))}else console.log('ok   - '+name)}
+          const tick=()=>new Promise(r=>setImmediate(r));
+
+          function harness(){
+            const pending=[],speaks=[],timers=new Map();
+            let nextTimer=1,stopCalls=0,cancelCalls=0,toasts=0;
+            function Utterance(text){this.text=String(text);this.lang='';this.rate=1}
+            const speechSynthesis={
+              speak(u){speaks.push(String(u&&u.text||''))},
+              cancel(){cancelCalls++}
+            };
+            const fakeSetTimeout=(fn,ms)=>{const id=nextTimer++;timers.set(id,{id,fn,ms,cleared:false,fired:false});return id};
+            const fakeClearTimeout=id=>{const t=timers.get(id);if(t)t.cleared=true};
+            const sandbox={
+              window:{speechSynthesis},speechSynthesis,SpeechSynthesisUtterance:Utterance,
+              self:{FiezelVoiceSay:{
+                say:(text,options)=>new Promise(resolve=>pending.push({text,options,resolve})),
+                stop:()=>{stopCalls++}
+              }},
+              selectedNeuralRate:()=>1,
+              prefetchNextVoice:()=>Promise.resolve(false),
+              cancelVoicePrefetch:()=>{},
+              showToast:()=>{toasts++},
+              setTimeout:fakeSetTimeout,clearTimeout:fakeClearTimeout,console
+            };
+            sandbox.globalThis=sandbox;
+            vm.createContext(sandbox);
+            vm.runInContext(code+'\nvar raceAudio=AudioService();',sandbox,{filename:'app.js#voice-audio-race'});
+            return {
+              audio:sandbox.raceAudio,pending,speaks,timers,
+              stopCalls:()=>stopCalls,cancelCalls:()=>cancelCalls,toasts:()=>toasts,
+              timer9000:()=>[...timers.values()].filter(t=>t.ms===9000).at(-1),
+              fire:(t,force=false)=>{if(!t)return false;if(t.cleared&&!force)return false;t.fired=true;t.fn();return true}
+            };
+          }
+
+          (async()=>{
+            check('AudioService production block is extractable',!!code,'start='+a+' end='+b);
+            check('source owns playback generation token',/playbackGeneration/.test(code));
+            check('source owns cancellable door timeout',/activeDoorTimer/.test(code));
+
+            {
+              const h=harness();
+              const old=h.audio.play('old sentence',{contentType:'sentence'});await tick();
+              const newer=h.audio.play('new sentence',{contentType:'sentence'});await tick();
+              check('interrupt harness has two independent neural promises',h.pending.length===2,'pending='+h.pending.length);
+              h.pending[1].resolve(true);const nr=await newer;
+              h.pending[0].resolve(false);const or=await old;await tick();
+              check('new playback remains the owner',nr&&nr.provider==='fiezel-voice-say',JSON.stringify(nr));
+              check('stale false completion resolves inert',or===null,'old='+JSON.stringify(or));
+              check('stale completion starts zero browser speech and zero silence toast',h.speaks.length===0&&h.toasts()===0,'speaks='+h.speaks.length+' toasts='+h.toasts());
+            }
+
+            {
+              const h=harness();
+              const p=h.audio.play('explicitly stopped');await tick();
+              h.audio.stop();h.pending[0].resolve(false);const r=await p;await tick();
+              check('explicit stop invalidates later completion',r===null&&h.speaks.length===0&&h.toasts()===0,'result='+JSON.stringify(r)+' speaks='+h.speaks.length);
+            }
+
+            {
+              const h=harness();
+              const p=h.audio.play('current false fallback');await tick();
+              const t=h.timer9000();h.pending[0].resolve(false);const r=await p;
+              check('current-generation neural failure still falls back exactly once',r&&r.provider==='browser-speech-synthesis'&&h.speaks.length===1,'result='+JSON.stringify(r)+' speaks='+h.speaks.length);
+              check('door timer is cleared when neural settles first',!!t&&t.cleared===true,'timer='+JSON.stringify(t));
+            }
+
+            {
+              const h=harness();
+              const p=h.audio.play('timeout fallback');await tick();
+              const t=h.timer9000(),before=h.stopCalls();
+              check('9000ms timeout is armed only for an active neural door',!!t&&!t.cleared,'timer='+JSON.stringify(t));
+              h.fire(t);const r=await p;
+              check('timeout stops neural door before browser fallback',h.stopCalls()===before+1&&h.speaks.length===1,'stops='+h.stopCalls()+' before='+before+' speaks='+h.speaks.length);
+              check('timeout fallback returns browser provider',r&&r.provider==='browser-speech-synthesis',JSON.stringify(r));
+              h.pending[0].resolve(true);await tick();
+              check('late neural completion after timeout cannot create a second fallback effect',h.speaks.length===1&&h.toasts()===0,'speaks='+h.speaks.length+' toasts='+h.toasts());
+            }
+
+            {
+              const h=harness();
+              const p=h.audio.play('fast neural success');await tick();
+              const t=h.timer9000();h.pending[0].resolve(true);const r=await p;
+              check('fast neural success preserves neural provider',r&&r.provider==='fiezel-voice-say'&&h.speaks.length===0,JSON.stringify(r));
+              check('fast success clears its 9s timeout',!!t&&t.cleared===true,'timer='+JSON.stringify(t));
+            }
+
+            {
+              const h=harness();
+              const old=h.audio.play('old timer owner');await tick();const oldTimer=h.timer9000();
+              const newer=h.audio.play('new timer owner');await tick();const newTimer=h.timer9000();
+              const stopsBefore=h.stopCalls();
+              h.fire(oldTimer,true);const oldResult=await old;await tick();
+              check('forced stale timeout is inert and cannot stop the new neural generation',oldResult===null&&h.stopCalls()===stopsBefore,'old='+JSON.stringify(oldResult)+' stops='+h.stopCalls()+' before='+stopsBefore);
+              check('stale cleanup does not clear the new generation timer',!!newTimer&&newTimer.cleared===false,'newTimer='+JSON.stringify(newTimer));
+              h.pending[1].resolve(true);const nr=await newer;
+              check('new generation completes normally after stale timer race',nr&&nr.provider==='fiezel-voice-say'&&newTimer.cleared===true,JSON.stringify(nr));
+            }
+
+            fs.writeFileSync(path.join(__dirname,'VOICE-AUDIO-RACE-REPORT.json'),JSON.stringify({schema:'fiezel-voice-audio-race-v1',pass:!failed,checks},null,2));
+            console.log(`voice-audio-race-test: ${checks.filter(x=>x.status==='PASS').length}/${checks.length} ${failed?'FAIL':'PASS'}`);
+            process.exit(failed?1:0);
+          })().catch(e=>{console.error(e);process.exit(1)});
+          EOF
+
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('.github/workflows/quality.yml')
+          s=p.read_text()
+          needle='          node listening-subtitle-suppression-test.js\n'
+          if s.count(needle)!=1:
+              raise SystemExit('quality registration anchor not unique')
+          s=s.replace(needle,needle+'          node voice-audio-race-test.js\n',1)
+          p.write_text(s)
+          PY
+
+      - name: Run voice repair regression suite
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check app.js
+          node --check features/neural-voice/fiezel-neural-voice.js
+          node voice-audio-race-test.js
+          node listening-subtitle-suppression-test.js
+          node voice-chunker-test.js
+          node prosody-test.js
+          node voice-pipeline-gap-test.js
+          node voice-prefetch-neural-test.js
+          node voice-callsite-prefetch-test.js
+          node voice-fallback-chain-test.js
+          node voice-offline-fallback-test.js
+          node tts-provider-contract-test.js
+          node tts-transport-switch-test.js --strict
+          node speaking-listening-test.js
+          node listening-exam-test.js
+          node speaking-exam-test.js
+
+      - name: Claim build through repository arbiter and write handoff
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/bump-build.mjs "neural voice multi-chunk prefetch + stale playback guard"
+          node tools/bump-build.mjs --check
+          BUILD="$(node -e "process.stdout.write(require('./coordination/BUILD-VERSION.json').version)")"
+          test "$BUILD" = "m025-213"
+          cat > "FIEZEL-M025213-NEURAL-VOICE-CONTINUITY-HANDOFF.md" <<EOF
+          # FIEZEL ${BUILD} — Neural Voice Continuity Handoff
+
+          ## Status
+
+          **READY FOR OWNER/MASTER REVIEW after CI.** This handoff closes two independently reproduced continuity defects without changing the public `FiezelVoiceSay.say()` completion contract.
+
+          ## Defects closed
+
+          1. Multi-chunk prefetch was rejected whenever `planChunks()` returned more than one chunk. Library and other long narration therefore paid a cold first-chunk synthesis cost even though callers already requested look-ahead. The runtime now warms only chunk 0 and keys that warm result by the utterance's `position.total`.
+          2. `AudioService.play()` had no playback generation token. An interrupted neural promise could settle `false` after a newer utterance took ownership and start stale browser fallback. Its 9-second timeout was also uncancellable and could begin browser fallback without stopping the still-running neural door. The door now has generation ownership, a cancellable timeout, and timeout-before-fallback cancellation.
+
+          ## Red/green evidence
+
+          - Multi-chunk prefetch: defective runtime **33 pass / 4 fail**; repaired runtime **37 pass / 0 fail**.
+          - Stale completion: PR #280 behavioural red proof fails on the pre-repair `AudioService`; the same proof passes after this repair.
+          - `voice-audio-race-test.js` additionally covers explicit stop, current-generation fallback, timeout cancellation, fast-success timer cleanup, stale timeout ownership, and no double fallback.
+
+          ## Preserved invariants
+
+          - No `prepare()`, `ensureReady()`, or model download is introduced by prefetch.
+          - Prefetch concurrency remains bounded by the existing single warm slot.
+          - Listening subtitles remain suppressed while Reading/Vocabulary subtitles remain available.
+          - Fallback browser speech still runs for a **current** neural failure; only obsolete generations are suppressed.
+          - `say()` still resolves when its audio path completes; callers do not receive an early-completion semantic change.
+
+          ## Release boundary
+
+          Build markers are changed only by `tools/bump-build.mjs`; no marker is hand-edited. Product runtime, service-worker generation, page build, diagnostics build, and `coordination/BUILD-VERSION.json` must remain coherent at ${BUILD}.
+
+          ## Evidence limits / next
+
+          Automated deterministic Web Audio and provider regressions are mandatory and run in CI. Physical iOS raw-vs-conditioned T-026 evidence remains a separate **device evidence task**, not silently reclassified as a code defect or as proof supplied by this patch. OWNER/MASTER should keep that diagnostic task open until a physical device observation exists.
+          EOF
+
+      - name: Commit candidate locally and run release/security guardians
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "FIEZEL-APPS"
+          git config user.email "fitrajft@gmail.com"
+          git add app.js features/neural-voice/fiezel-neural-voice.js voice-prefetch-neural-test.js listening-subtitle-suppression-test.js voice-audio-race-test.js .github/workflows/quality.yml sw.js core-config.js features/neural-voice/fiezel-diag-panel.js coordination/BUILD-VERSION.json FIEZEL-M025213-NEURAL-VOICE-CONTINUITY-HANDOFF.md
+          git diff --cached --check
+          git commit -m "fix(voice): close multi-chunk prefetch and stale playback races"
+          export BASE_SHA="$(git rev-parse origin/main)"
+          export PR_BODY="Handoff: FIEZEL-M025213-NEURAL-VOICE-CONTINUITY-HANDOFF.md"
+          node tools/fiezel-guardians.mjs a9
+          node tools/fiezel-guardians.mjs a10
+          node tools/fiezel-guardians.mjs a11
+          node tools/fiezel-guardians.mjs a13
+          node secret-scan-test.js
+          node coordination-guard-test.js
+          node gate-registry-test.js
+          node build-number-uniqueness-test.js --strict
+          node pwa-release-coherence-test.js
+          node pwa-cache-test.js
+          node install-health-test.js
+          node no-network-test.js
+          python release-audit.py
+
+      - name: Push only after all proof is green
+        shell: bash
+        run: |
+          set -euo pipefail
+          git push origin HEAD:fix/neural-voice-multichunk-prefetch
