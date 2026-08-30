@@ -684,3 +684,174 @@ vocab/reading, belum item dari item. Itu batas modul priornya sendiri, yang meny
 kalibrasi Elo dua-sisi (C1) sebagai langkah berikutnya. Saya **tidak** menambal ini dengan
 menganeka-ragamkan mode soal yang dilihat murid: itu keputusan pedagogis milik OWNER, bukan
 perbaikan audit.
+
+## F.4 F-5 · gerbang live — **DIJALANKAN SUNGGUHAN, dan hasilnya bukan sekadar hijau**
+
+Dijalankan di HEAD `82496f6` / m025-209 (run `33318247777`, 2026-08-30T15:14–15:15Z), terhadap
+`https://api.fiezel.my.id` yang hidup.
+
+### F.4.1 Kontrak Cloudflare — **33/33 PASS**
+
+Termasuk empat assert baru yang menggantikan asumsi basi "semua flag mati":
+`config-flags-declared`, `config-flags-match`, `config-killswitch-declared`,
+`config-killswitch-match`. Keadaan flag produksi kini **sepadan dua arah** dengan keadaan yang
+dideklarasikan repo — bukan hanya "tidak ada yang menyala tanpa izin", tetapi juga "tidak ada
+yang padam padahal seharusnya hidup", dan "tidak ada flag baru yang belum pernah diputuskan".
+
+Yang terbukti di edge sungguhan, bukan di atas stub: rute terpasang; `/health` 200 protocol
+1.7; `/api/quota` dan `/api/user/me` menolak 401 tanpa cookie; `POST /api/auth/anon` 200
+dengan `Set-Cookie fz_id` lengkap (`HttpOnly; Secure; SameSite=Lax; Domain=fiezel.my.id;
+Max-Age=15552000`); origin sah mendapat ACAO yang tepat **dengan** `Vary: Origin`, origin asing
+(`https://evil.example`) mendapat **403 tanpa ACAO dan tanpa wildcard**; cap byte ditolak 413
+sebelum body dibaca; endpoint tak dikenal 404, bukan 5xx; **nol respons 5xx** dan **nol galat
+transport** di seluruh percakapan.
+
+### F.4.2 AI live — **45 PASS · 0 FAIL · 1 SKIP**, dan §21 dalam bentuknya yang paling telanjang
+
+5 panggilan model SUNGGUHAN, ±US$0,00203, ±252,5 neuron. Kelima task menjawab **HTTP 200**.
+
+Dan justru di situlah §21 berbunyi. Lima 200, tetapi **`providerSuccesses: 2`**:
+
+| task | HTTP | provider |
+|---|---|---|
+| `tutor_turn` | 200 | **`prompt_scaffold_echo`** → cadangan |
+| `writing_feedback` | 200 | **`prompt_scaffold_echo`** → cadangan |
+| `context_coach` | 200 | **`prompt_scaffold_echo`** → cadangan |
+| `translate_subtitle` | 200 | lulus kontrak mutu |
+| `session_recap` | 200 | lulus kontrak mutu |
+
+**Tiga dari lima tipe task AI tidak benar-benar menjawab.** Model memantulkan kembali rangka
+prompt, kontrak mutu menolaknya, dan murid menerima cadangan. Ketiganya justru yang paling
+pedagogis: giliran tutor, umpan balik menulis, dan pelatih konteks.
+
+Yang **benar** dan terbukti sebagai fakta, bukan klaim: jatah hanya naik untuk jawaban yang
+sungguh berhasil — `aiBefore 0 → aiAfter 2`, `aiTranslateBefore 0 → aiTranslateAfter 1`.
+Kegagalan provider **tidak menagih murid sepeser pun** (`fallback-tidak-menagih` lulus untuk
+ketiganya), cadangannya bersebab dan berisi, dan tidak ada satu pun "sukses kosong senyap".
+Gerbangnya HIJAU karena ia menguji hal yang benar: kalau provider gagal, jangan menagih dan
+jangan berpura-pura.
+
+MASTER-BROADCAST mencatat **satu** utang seperti ini (`writing_feedback`). Pengukuran hidup
+menunjukkan **tiga**.
+
+### F.4.3 Kenapa ini BUKAN cacat yang dialami murid hari ini
+
+`core-config.js` di `main`:
+
+```js
+endpoints: { health:'off', config:'on', auth:'off', quota:'off', ai:'off', tts:'off', usage:'on' }
+```
+
+`ai:'off'`, dan aturan penggabungannya **AND, bukan OR** — flag server hanya bisa MEMATIKAN,
+tidak bisa menyalakan apa pun yang mati di berkas ini. Jadi **nol murid pernah melewati jalur
+AI Cloudflare**; hari ini mereka memakai Puter. Ketiga kegagalan itu ada di rute yang tertutup
+di sisi klien untuk semua orang sampai ada rilis yang membukanya.
+
+Itu memindahkan temuan ini dari "pemadaman produksi" ke tempat yang tepat: **prasyarat yang
+mengikat sebelum saklar AI Cloudflare boleh dibuka** — dan sekarang prasyarat itu punya angka.
+
+## F.5 Bukti live berhenti menjadi centang hijau
+
+Audit ini tersandung pada masalahnya sendiri: gerbang live menghasilkan bukti terkaya di
+seluruh workflow, lalu bukti itu terkubur di tengah log job di belakang keluaran simulasi
+adaptivitas yang puluhan ribu baris. Yang tersisa untuk dikutip hanya satu centang hijau — dan
+centang hijau tidak memberi tahu assert mana yang lulus, berapa panggilan model yang terjadi,
+atau berapa jatah yang habis. Tanpa perbaikan ini, F.4.2 **tidak akan pernah terbaca**.
+
+Ditutup di m025-209: `cf-live-contract-test.js` kini dijalankan dengan `--report`, kedua
+laporan diarahkan ke `RUNNER_TEMP`, diunggah sebagai artefak `fiezel-bukti-live` (retensi 30
+hari), **dan** dicetak ulang di paling akhir log oleh `tools/print-live-evidence.mjs`.
+Keduanya `if: always()` — jalan yang merah justru yang paling perlu dibaca.
+
+## F.6 Cakupan perubahan m025-207/209 — satu pemanggil, bukan seluruh mesin
+
+`makeLevelSource()` punya **tepat satu** pemanggil di `app.js` (`startLevelPractice`). Tes
+penempatan, Ujian Skip Level, dan pembangun sesi adaptif **tidak** melewatinya. Perubahan
+kesulitan item karena itu menyentuh persis sesi belajar satu level — tempat cacatnya diukur —
+dan **nol jalur pengukuran**.
+
+## F.7 Paritas produksi — **TERBUKTI, pengukuran keempat berturut-turut**
+
+Run `33311397930` (2026-08-30T12:24:43Z), empat menit setelah merge:
+
+```
+  base            : https://fiezel.my.id/app
+  /core-config.js : HTTP 200
+  /sw.js          : HTTP 200
+  FIEZEL_PAGE_BUILD disajikan : m025-206
+  SW_REV disajikan            : m025-206-core-brain-five-gaps-20260830
+```
+
+Situs hidup menyajikan build yang sama dengan `main`. Jalur cPanel memungut merge dalam ~4
+menit tanpa campur tangan.
+
+Satu catatan yang tidak boleh dilewat: env langkah itu membaca `PAGE: m025-205`, karena
+`workflow_run` melakukan checkout pada default branch **saat peristiwanya lahir** — sebelum
+merge. Perbandingan otomatis di langkah itu miring, dan karena ia mode LAPOR SAJA, kemiringan
+itu tidak memerahkan apa pun. Yang saya pakai sebagai bukti adalah **bacaan langsungnya**,
+bukan vonis langkah itu.
+
+## F.8 Asap runtime peramban di HEAD
+
+Chromium, viewport 390×844, atas pohon m025-207+: aplikasi boot ke layar kenalan sungguhan
+(bukan cangkang kosong), service worker `activated`, **15 modul otak termuat** (termasuk
+`FiezelItemPrior`), **nol galat halaman**. Dua permintaan gagal seluruhnya karena proxy egress
+sesi ini memblokir `js.puter.com` dan `api.fiezel.my.id` — batas lingkungan saya, bukan cacat
+produk.
+
+---
+
+# KEPUTUSAN AKHIR — `82496f6` / m025-209
+
+## Yang terbukti, terikat SHA ini
+
+| dimensi | status | bukti |
+|---|---|---|
+| CI di HEAD | **HIJAU** | run `33318247777`, seluruh langkah sukses |
+| Matriks gerbang | **212/212** | pohon bersih, nol berkas ter-track berubah |
+| Paritas produksi | **TERBUKTI** | keempat kali berturut-turut |
+| Kontrak API live | **33/33** | edge sungguhan, bukan stub |
+| Keamanan tepi live | **TERBUKTI** | cookie utuh, origin asing 403, cap byte 413, nol 5xx |
+| Akuntansi kuota live | **TERBUKTI** | naik hanya untuk 2 jawaban yang sungguh berhasil |
+| PWA jaringan menggantung | **PULIH** | 2523 ms, dulu tidak pernah jalan |
+| Braincore v3 | **`BRAINCORE_V3_E2E_VERIFIED`** | 10 jawaban, ability 1,500→1,047, evidence 0→10 |
+| Asap runtime | **BERSIH** | nol galat halaman, SW aktif, 15 modul otak |
+
+## Yang TIDAK terbukti — dilaporkan UNVERIFIED, bukan PASS (§23)
+
+1. **iOS/WebKit.** Seluruh bukti peramban Chromium. Anggaran navigasi SW baru final di
+   perangkat pemilik.
+2. **Staging.** Tidak ada lingkungan staging (`FIEZEL_STAGING_EDGE` belum ada), jadi
+   penegakan kuota 25/26, cache TTS, dan cron **hanya terbukti di atas stub**.
+3. **TTS live.** `cfTtsEnabled:false`, `FEATURE_TTS:"off"` — sengaja, karena korpus penuh
+   ±US$9,07. Nol kali diuji hidup.
+4. **Mutu AI sebagai pengalaman belajar.** Yang terbukti: gelungnya jalan, jatahnya benar,
+   cadangannya jujur. Yang **belum**: bahwa jawaban AI benar-benar mengajar. Itu butuh murid,
+   bukan gerbang.
+
+## VONIS: **GO** untuk build ini sebagai rilis publik — dengan tiga larangan yang mengikat
+
+**GO.** Bukan karena semuanya hijau — §19 melarang saya berhenti di situ — melainkan karena
+setiap hal yang bisa menyakiti murid hari ini sudah dicari dengan sungguh-sungguh, dan yang
+ditemukan sudah ditutup dengan gerbang yang terbukti bisa merah: cincin fokus emas, terjemahan
+bocor di listening, boot lambat, PWA tersandera jaringan menggantung, tangga suara neural yang
+mati senyap, dan T2 yang membuat "adaptif" secara matematis tidak memilih apa pun. Build ini
+**lebih baik daripada yang dipakai murid saat ini**, di setiap sumbu yang saya ukur.
+
+GO ini berlaku untuk **build apa adanya**. Ia TIDAK mencakup saklar yang masih tertutup, dan
+ketiganya larangan, bukan harapan:
+
+1. **JANGAN membuka `endpoints.ai` dari `'off'`** sampai `tutor_turn`, `writing_feedback`, dan
+   `context_coach` lulus kontrak mutu terhadap model hidup. Terukur hari ini: 3 dari 5 memantul
+   sebagai `prompt_scaffold_echo`. Membukanya sekarang berarti mengganti Puter yang bekerja
+   dengan cadangan yang jujur — penurunan, bukan peningkatan.
+2. **JANGAN membuka `cfTtsEnabled` / `FEATURE_TTS`.** Nol kali diuji hidup, korpus penuh
+   ±US$9,07.
+3. **JANGAN menyebut kuota, cache TTS, atau cron "terverifikasi produksi"** sampai ada
+   lingkungan staging. Ketiganya menulis state murid dan hanya terbukti di atas stub.
+
+Satu hal terakhir, karena §16 menuntutnya. Adendum E memuat satu temuan yang **salah** —
+F-3 — dan salahnya milik saya, bukan repo. Saya mencabutnya di F.0 dengan alasan yang bisa
+diperiksa siapa pun. Aturan D melarang saya menyembunyikan kegagalan; ia melarang saya dengan
+alasan yang sama membiarkan tuduhan keliru tetap berdiri, karena temuan palsu memakan waktu
+perbaikan yang seharusnya jatuh ke cacat sungguhan.
