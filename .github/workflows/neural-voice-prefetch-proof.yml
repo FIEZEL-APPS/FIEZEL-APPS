@@ -1,0 +1,22 @@
+name: Neural Voice Prefetch Proof
+
+on:
+  push:
+    branches:
+      - evidence/neural-voice-prefetch-red
+      - evidence/neural-voice-prefetch-green
+
+permissions:
+  contents: read
+
+jobs:
+  proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Run neural voice prefetch regression gate
+        run: node voice-prefetch-neural-test.js
