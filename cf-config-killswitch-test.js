@@ -811,9 +811,26 @@ async function boot(harness) { harness.runIdle(); await harness.api.cfConfigRefr
      * (`skipWaiting(`), jadi penyisipan `self.skipWaiting;` — atau `const f=self.skipWaiting`
      * yang dipanggil belakangan lewat alias — tetap hijau. Sekarang SETIAP penyebutan nama
      * itu di kode (komentar sudah dibuang) merah. */
-    check('(e) sw.js: NOL penyebutan skipWaiting/clients.claim — inilah sebabnya config baru menunggu',
-      !/skipWaiting/.test(swCode) && !/clients\s*\.\s*claim/.test(swCode),
-      'sw.js tidak mengambil alih klien yang sedang jalan');
+    /* m025-212 mempersempit assert ini, dan alasannya perlu dicatat supaya tidak dilonggarkan
+     * lagi tanpa sadar. Yang dijaga sejak awal bukan kata "skipWaiting" melainkan SATU sifat:
+     * service worker tidak boleh mengambil alih klien yang sedang jalan ATAS KEMAUANNYA
+     * SENDIRI — itulah sebabnya config baru menunggu, dan itulah yang mencegah generasi
+     * controller bertukar di tengah sesi murid. Sifat itu utuh sekarang: install dan activate
+     * tetap NOL skipWaiting, clients.claim tetap NOL, dan satu-satunya penyebutan yang sah
+     * duduk di dalam handler message di belakang pagar FIEZEL_SKIP_WAITING — yaitu ketika
+     * murid sendiri menekan "Perbarui sekarang" di kartu pembaruan. Larangan buta atas kata
+     * itu akan memaksa kartu pembaruan mustahil dibuat, padahal kartu itulah yang membuat
+     * penantian ini bisa berakhir atas keputusan murid, bukan diam-diam. */
+    const swTanpaKomentar = swCode.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[^:])\/\/[^\n]*/g, '$1 ');
+    const penyebutanSkip = (swTanpaKomentar.match(/skipWaiting/g) || []).length;
+    const pagarSkip = /if\(event\?\.data\?\.type==='FIEZEL_SKIP_WAITING'\)\{self\.skipWaiting\(\);return\}/.test(swTanpaKomentar);
+    const installBlok = (swTanpaKomentar.match(/addEventListener\('install'[\s\S]{0,400}/) || [''])[0];
+    const activateBlok = (swTanpaKomentar.match(/addEventListener\('activate'[\s\S]{0,800}/) || [''])[0];
+    check('(e) sw.js: perpindahan generasi HANYA atas permintaan murid, tidak pernah atas kemauan SW sendiri',
+      penyebutanSkip === 1 && pagarSkip
+      && !/skipWaiting/.test(installBlok) && !/skipWaiting/.test(activateBlok)
+      && !/clients\s*\.\s*claim/.test(swCode),
+      `penyebutan skipWaiting=${penyebutanSkip} (harus 1, di balik pagar FIEZEL_SKIP_WAITING)`);
     check('(e) sw.js: ada jalur pemeriksaan pembaruan (registration.update) supaya SW_REV baru terdeteksi',
       /registration\.update\(\)/.test(swCode), 'cari registration.update() di sw.js');
     // Invarian penanda versi: config baru hanya sampai kalau SW_REV naik, dan yang menaikkan

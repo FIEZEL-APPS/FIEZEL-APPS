@@ -30,6 +30,18 @@ assert.match(src,/const COEP_POLICY=['"]credentialless['"]/,'COEP credentialless
    bukan pemanggilan skipWaiting(), dan gerbang yang tidak bisa membedakannya akan memerah
    karena prosanya sendiri. Yang diuji PEMANGGILAN, bukan kemunculan kata. */
 const kodeSaja=src.replace(/\/\*[\s\S]*?\*\//g,' ').replace(/(^|[^:])\/\/[^\n]*/g,'$1 ');
-assert.doesNotMatch(kodeSaja,/skipWaiting\s*\(/,'startup recovery must not force eager worker takeover');
+/* m025-212 meneruskan pemikiran itu satu langkah. Yang dijaga bukan ketiadaan pemanggilan
+   skipWaiting(), melainkan SIFAT: worker tidak pernah mengambil alih klien yang sedang jalan
+   ATAS KEMAUANNYA SENDIRI - itulah yang menukar generasi controller di tengah sesi dan
+   melahirkan layar putih yang jadi alasan regresi ini ada. Murid yang menekan "Perbarui
+   sekarang" di kartu pembaruan adalah kebalikannya: perpindahan itu justru yang ia minta, dan
+   halaman sudah menunggu untuk memuat ulang di controllerchange. Jadi satu pemanggilan yang
+   berpagar diizinkan, sementara install dan activate tetap terlarang. Larangan buta atas kata
+   itu membuat kartu pembaruan mustahil dibuat - padahal kartu itulah yang membuat penantian
+   ini berakhir atas keputusan murid, bukan diam-diam. */
+assert.strictEqual((kodeSaja.match(/skipWaiting/g)||[]).length,1,'skipWaiting must appear exactly once, behind the FIEZEL_SKIP_WAITING gate');
+assert.match(kodeSaja,/if\(event\?\.data\?\.type==='FIEZEL_SKIP_WAITING'\)\{self\.skipWaiting\(\);return\}/,'the sole skipWaiting must sit behind the student-triggered message gate');
+assert.doesNotMatch((kodeSaja.match(/addEventListener\('install'[\s\S]{0,400}/)||[''])[0],/skipWaiting/,'install must not force eager worker takeover');
+assert.doesNotMatch((kodeSaja.match(/addEventListener\('activate'[\s\S]{0,800}/)||[''])[0],/skipWaiting/,'activate must not force eager worker takeover');
 assert.doesNotMatch(kodeSaja,/clients\.claim\s*\(/,'startup recovery must not claim live old-generation clients');
 console.log('FIEZEL PWA white-screen startup recovery regression: PASS');

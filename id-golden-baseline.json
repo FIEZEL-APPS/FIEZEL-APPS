@@ -1,6 +1,6 @@
 {
   "schema": "id-golden-baseline/1",
-  "generatedAt": "2026-08-30T14:31:31.337Z",
+  "generatedAt": "2026-08-30T19:25:09.527Z",
   "root": "/home/user/FIEZEL-APPS",
   "files": {
     "grammar-explanations-id.json": "4ce816145b77a86ed6d9ec9b366f70c1bbf1859283f667207eada762fccccb17",
@@ -18,8 +18,8 @@
     "features/audio-assets/fiezel-audio-key.js": "11624e303917fe0df881ac3f410911587766fd6f4d2491ca6687ec42de8d457d"
   },
   "literals": {
-    "count": 2094,
-    "sha256": "cbf3f0b82eb87e56674d90fa58147d54e5dcb4d93ff2a4aeee4e7d475b34c310",
+    "count": 2095,
+    "sha256": "d752192e400efa1a6ac364278d357d6905f6b0f319cb3b6c08ac55a8c38b5f8a",
     "list": [
       "\n      SETELAH beat concern ≤1000ms selesai (13 §2.2), bukan menimpanya. Tanpa bunyi:\n      SFX hint sudah dipensiunkan (20 §4); cooldown 8 detiknya dijaga komponen. */\n   setTimeout(()=>{try{pawReact(",
       "\n      case 'silent':                        // L5: kalau mulut sempat mulai (taksiran L3 kandas), tutup SEKARANG\n        degradedLatch = false;\n        closeTurn(false);\n        break;\n      case 'interrupt':                     // stop(): snap tutup\n        degradedLatch = false;\n        closeTurn(true);\n        break;\n      default:\n        break;                              // fase asing dari versi fasad lebih baru: diabaikan tanpa suara\n    }\n  }\n\n  try { doc.addEventListener('fiezel-speech', onSpeech); } catch (_) {}\n\n  /* Suara terdegradasi (audibility-fix): mulut mati SEKETIKA dan tidak boleh\n     hidup lagi untuk sisa giliran — apa pun yang masih dikirim lapisan bawah. */\n  try {\n    root.addEventListener('fiezel-neural-voice-degraded', function () {\n      if (turn) closeTurn(true);\n      degradedLatch = true;                 // dilepas oleh end/silent/interrupt fasad berikutnya\n    });\n  } catch (_) {}\n\n  /* Permukaan kecil untuk Diagnostics/tes — bukan API pemanggil biasa:\n     satu-satunya pintu bicara tetap FiezelVoiceSay.say(). */\n  root.FiezelSpeechBridge = Object.freeze({\n    SCHEMA: SCHEMA,\n    speaking: function () { return !!turn; },\n    degraded: function () { return !!degradedLatch; },\n    motionAllowed: motionAllowed\n  });\n})(typeof self !== 'undefined' ? self : (typeof window !== 'undefined' ? window : this));\n",
@@ -95,6 +95,7 @@
       " · berikutnya: ",
       " · coba lagi setelah penjelasan",
       " · kamu di sini",
+      " · kamu sekarang memakai ",
       " · skor latihan",
       " — di situ jawabanmu paling sering meleset belakangan ini",
       " — perbandingan lama tidak pernah cocok, jadi murid berpolicy kosakata\n  // selalu diarahkan ke Grammar. Kedua ejaan diterima supaya kompatibel dua arah.\n  if(!cfg.placement){try{const p=buildAdaptivePolicy();nextDomain=(p?.primaryDomain===",
