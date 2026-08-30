@@ -603,6 +603,9 @@ jobs:
           # `no-network-test.js`: satu `|| 'https://…'` akan mengubah CI publik menjadi
           # penembak produksi pada setiap push.
           FIEZEL_CF_LIVE_BASE: ${{ github.event.inputs.cf_live_base }}
+          # Laporan diarahkan keluar dari working tree (gerbang lain memeriksa pohon tetap
+          # bersih) dan ke tempat yang bisa diunggah sebagai artefak.
+          FIEZEL_CF_LIVE_REPORT: ${{ runner.temp }}/CF-LIVE-REPORT.json
         run: |
           if [ -z "${FIEZEL_CF_LIVE_BASE}" ]; then
             echo '::notice title=cf-live-contract-test.js SKIP::FIEZEL_CF_LIVE_BASE kosong — gerbang ini TIDAK menguji runtime Cloudflare pada jalan ini dan TIDAK boleh dikutip sebagai bukti runtime.'
@@ -620,7 +623,7 @@ jobs:
             echo "Menjalankan gerbang live SUNGGUHAN terhadap ${FIEZEL_CF_LIVE_BASE} (dipilih manual lewat workflow_dispatch)."
             echo "### cf-live-contract-test.js — dijalankan terhadap \`${FIEZEL_CF_LIVE_BASE}\`" >> "$GITHUB_STEP_SUMMARY"
           fi
-          node cf-live-contract-test.js
+          node cf-live-contract-test.js --report
       - name: 'Staging live gate (SKIP kecuali workflow_dispatch dengan staging_base)'
         # Penjaga aktor per-LANGKAH, bukan per-workflow. `quality.yml` harus tetap
         # berjalan untuk setiap push dan setiap PR dari siapa pun - itu justru gunanya.
@@ -663,6 +666,7 @@ jobs:
         env:
           # Pada push/PR `inputs` tidak ada, jadi nilainya string kosong = SKIP.
           FIEZEL_AI_LIVE_BASE: ${{ github.event.inputs.ai_live_base }}
+          FIEZEL_AI_LIVE_REPORT: ${{ runner.temp }}/AI-LIVE-REPORT.json
         run: |
           if [ -z "${FIEZEL_AI_LIVE_BASE}" ]; then
             echo '::notice title=ai-live-verify SKIP::FIEZEL_AI_LIVE_BASE kosong — kontrak AI Cloudflare TIDAK diuji terhadap model sungguhan pada jalan ini dan TIDAK boleh dikutip sebagai bukti runtime.'
@@ -683,6 +687,23 @@ jobs:
             echo "### tools/ai-live-verify.mjs — dijalankan terhadap \`${FIEZEL_AI_LIVE_BASE}\` (BERBAYAR)" >> "$GITHUB_STEP_SUMMARY"
           fi
           node tools/ai-live-verify.mjs --report
+      - name: 'Bukti gerbang live (artefak — supaya hasilnya bisa DIBACA, bukan hanya hijau)'
+        # Kenapa langkah ini ada: kedua gerbang live di atas menghasilkan bukti terkaya di
+        # seluruh workflow ini — assert per assert terhadap sistem yang sungguhan hidup —
+        # lalu bukti itu tenggelam di tengah log job yang panjang, di belakang keluaran
+        # simulasi adaptivitas yang berukuran puluhan ribu baris. Centang hijau BUKAN bukti:
+        # ia tidak memberi tahu assert mana yang lulus, berapa panggilan model yang terjadi,
+        # atau berapa kuota yang terpakai. Audit rilis 30 Agu 2026 tersandung persis di situ.
+        # `if: always()` disengaja: jalan yang MERAH justru yang paling perlu dibaca.
+        if: always() && github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'
+        uses: actions/upload-artifact@v4
+        with:
+          name: fiezel-bukti-live
+          path: |
+            ${{ runner.temp }}/CF-LIVE-REPORT.json
+            ${{ runner.temp }}/AI-LIVE-REPORT.json
+          if-no-files-found: ignore
+          retention-days: 30
       - name: 'Gerbang hulu yang sempat tidak terdaftar (braincore fase 2 + lapisan game/UX)'
         # Ditemukan gate-registry-test.js saat merge 28 Agu 2026: lima belas berkas uji
         # mendarat bersama braincore fase 2 dan lapisan game/UX tanpa pernah dipanggil CI.
