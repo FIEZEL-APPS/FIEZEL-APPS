@@ -1,4 +1,4 @@
-// m025-146 — gate untuk Listening berformat ujian.
+// m025-146 â€” gate untuk Listening berformat ujian.
 //
 // Tiga hal yang dijaga, dan ketiganya lebih mudah dilanggar daripada terlihat:
 // 1. Audio diputar SEKALI. IELTS dan TOEFL tidak pernah mengulang. Bank harian memberi
@@ -24,7 +24,7 @@ const check = (name, ok, details) => {
   if (!ok) failed = true;
 };
 const words = t => (String(t || '').match(/[A-Za-z']+/g) || []).length;
-const normalize = s => String(s || '').toLowerCase().normalize('NFKD').replace(/[’']/g, '').replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
+const normalize = s => String(s || '').toLowerCase().normalize('NFKD').replace(/[â€™']/g, '').replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
 
 // --- 1. skema dan cakupan ----------------------------------------------------------------
 check('Listening exam schema', bank.schema === 'fiezel-listening-exam-v1' && Array.isArray(bank.sets) && bank.sets.length > 0, `schema=${bank.schema} sets=${bank.sets?.length}`);
@@ -178,8 +178,14 @@ const copyFeatB = require('fs').readFileSync(require('path').join(__dirname,'fea
 check('Failed audio keeps the questions locked',
   /audio-tidak-can-diputar-item/.test(renderer) && /this\.replays--/.test(renderer) && /Soal tetap terkunci/.test(copyFeatB),
   'menjawab tanpa mendengar bukan latihan, dan percobaan yang gagal tidak boleh menghabiskan jatah putar');
+/* 2026-08-30: assert ini dulu menuntut `){const` DALAM SATU BARIS TANPA SPASI, jadi ia merah
+   begitu wave i18n memformat ulang fungsinya ke beberapa baris - padahal kontraknya utuh
+   (listeningExamFor masih menormalkan level di baris pertamanya). Gerbang yang merah karena
+   pemformatan mengajari orang mengabaikan gerbang. Spasi dilonggarkan; yang dijaga tetap sama:
+   level MASUK dan langsung dinormalkan sebelum dipakai menyaring. Kelas temuan D20 (assert
+   proximity -> struktural). */
 check('Exam sessions are level-scoped like everything else',
-  /listeningExamFor\(level\)\{const target=normalizeLevel\(level\)/.test(addon), 'kontrak level m025-136 berlaku di sini juga');
+  /listeningExamFor\(level\)\s*\{\s*const\s+target\s*=\s*normalizeLevel\(level\)/.test(addon), 'kontrak level m025-136 berlaku di sini juga');
 check('The listening exam bank is precached for offline use', /listening-exam-v1\.json/.test(sw), 'shell offline harus membawanya juga');
 
 const report = {

@@ -17,7 +17,27 @@
   if (!I18N && typeof require === 'function') {
     try {
       I18N = require('../i18n/fiezel-i18n.js');
-      require('../i18n/copy-id-feat-b.js');
+      /* m025-202. Dua cacat di jalur Node ini, keduanya membuat T() jatuh ke `String(key)`
+       * sehingga render mengeluarkan "fsl.audio-error-title" mentah - memecah gerbang tangga
+       * suara DAN membatalkan janji "byte-identik dengan sebelumnya" di komentar di atas.
+       *
+       * (1) Hanya copy-id-feat-b.js yang dimuat, padahal kunci berkas ini tersebar di beberapa
+       *     peta - `fsl.audio-error-*` ada di copy-id-feat-d.js. Sekarang dimuat per-daftar-isi,
+       *     bukan per-nama, supaya perpindahan kunci antar-peta tidak diam-diam memutusnya lagi.
+       * (2) Setiap peta membuka dengan `(typeof self!=='undefined'?self:this).FiezelI18n` di
+       *     dalam IIFE 'use strict'. Di Node `self` tidak ada dan `this` adalah undefined, jadi
+       *     baris itu MELEMPAR - bukan gagal lunak seperti yang dimaksudkan `if(!I18N)return`
+       *     satu baris di bawahnya. Lemparan itu ditangkap catch di bawah, yang lalu menyetel
+       *     I18N=null dan membisukan SEMUA kunci. Disediakan `self` dan `FiezelI18n` di global
+       *     lebih dulu supaya peta menemukan yang dicarinya, persis seperti di index.html. */
+      const g = globalThis;
+      if (typeof g.self === 'undefined') g.self = g;
+      if (!g.FiezelI18n) g.FiezelI18n = I18N;
+      const i18nPath = require('path');
+      const i18nDir = i18nPath.join(__dirname, '..', 'i18n');
+      for (const name of require('fs').readdirSync(i18nDir).filter((n) => /^copy-id-.*\.js$/.test(n)).sort()) {
+        try { require(i18nPath.join(i18nDir, name)); } catch (_) { /* satu peta rusak tidak boleh membisukan sisanya */ }
+      }
     } catch (loadError) { I18N = null; }
   }
   function T(key, params) { return I18N ? I18N.t(key, params) : String(key); }
