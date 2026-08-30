@@ -1,32 +1,32 @@
 #!/usr/bin/env node
 /**
- * content-drift-test.js — Pemilik: F2 (wave F, gate anti-drift konten)
+ * content-drift-test.js â€” Pemilik: F2 (wave F, gate anti-drift konten)
  *
  * ==========================================================================
- * KENAPA GATE INI ADA — tiga wave berturut, pola kerusakan yang sama
+ * KENAPA GATE INI ADA â€” tiga wave berturut, pola kerusakan yang sama
  * ==========================================================================
  * Berkas konten turunan tertinggal dari sumbernya, CI tetap hijau, dan
  * kerusakannya baru ketahuan berhari-hari kemudian lewat audit tangan:
  *
  *   (1) b0d983c (Wave D): 4 soal fatal (TA-006, GI-002, b4_003, b4_018)
- *       diperbaiki di grammar-templates.json — grammar-explanations-id.json
+ *       diperbaiki di grammar-templates.json â€” grammar-explanations-id.json
  *       0 baris berubah. Tidak ada gerbang yang merah.
- *   (2) c3e02f3 (E3, ±18 jam kemudian): 11 entri penjelasan basi (b4_018 dkk)
+ *   (2) c3e02f3 (E3, Â±18 jam kemudian): 11 entri penjelasan basi (b4_018 dkk)
  *       ditemukan oleh AUDIT TANGAN 153 lesson, bukan oleh gerbang.
  *   (3) 5643a32 (wave2, 20 agen QA): menulis ulang puluhan whyFailsId
- *       langsung di bank; berkas sumber terakhir disentuh m025-162 —
+ *       langsung di bank; berkas sumber terakhir disentuh m025-162 â€”
  *       59 nilai distraktor melenceng diam-diam.
- *   (4) f87a39a (GEN-2, 29 Agu): 27 template baru (222→249). Entri sumber
+ *   (4) f87a39a (GEN-2, 29 Agu): 27 template baru (222â†’249). Entri sumber
  *       untuk 10 template (A1-008..A1-017) dibuat TANPA blok distractors,
  *       dan indonesianCoverage dibiarkan 222/222 padahal templates.length=249.
- *       Seluruh CI hijau — bank-soal-audit-test hanya memeriksa
+ *       Seluruh CI hijau â€” bank-soal-audit-test hanya memeriksa
  *       translated===total, bukan total===templates.length.
  *
  * Setiap assert di bawah menunjuk commit historis yang akan ia tangkap LEBIH
  * AWAL. Gate ini murni baca-JSON, deterministik, tanpa jaringan, < 5 detik.
  *
  * ==========================================================================
- * YANG SENGAJA TIDAK DIJAGA DI SINI — sudah dijaga gerbang lain (JANGAN duplikat)
+ * YANG SENGAJA TIDAK DIJAGA DI SINI â€” sudah dijaga gerbang lain (JANGAN duplikat)
  * ==========================================================================
  *   - Diagnosis yatim / label misconception tanpa diagnosis Indonesia
  *     (grammar-misconception-id.json): misconception-diagnosis-test.js,
@@ -49,13 +49,13 @@
  * ==========================================================================
  *   A. Setiap template punya entri di grammar-explanations-id.json.
  *   B. Kunci distraktor entri itu = PERSIS himpunan opsi distraktor template
- *      SAAT INI (nol kunci basi, nol kunci hilang). — menangkap (1),(2),(4)
+ *      SAAT INI (nol kunci basi, nol kunci hilang). â€” menangkap (1),(2),(4)
  *   C. Nilai berkas sumber identik dengan field ...Id bank (8 field template
  *      + 2 field per distraktor): sinkron dua arah, siapa pun yang diedit
- *      duluan. — menangkap (3)
+ *      duluan. â€” menangkap (3)
  *   D. indonesianCoverage.translated === .total === templates.length ===
- *      jumlah entri sumber. — menangkap (4)
- *   E. vocabulary-th.count === jumlah entri — satu-satunya field count bank
+ *      jumlah entri sumber. â€” menangkap (4)
+ *   E. vocabulary-th.count === jumlah entri â€” satu-satunya field count bank
  *      yang kehilangan penjaganya saat th-coverage-test.js dikecualikan dari
  *      CI (keputusan MASTER 9bf2e13, kelas gerbang-pra-rilis-fitur).
  *
@@ -63,7 +63,7 @@
  *   node tools/sync-grammar-explanations-id.js --write && node audit/merge-grammar-id.js
  *
  * Setiap detektor dibuktikan bisa MERAH lewat matriks racun in-memory di
- * bagian akhir (pola edge-proxy-hopbyhop-test) — bukan hanya hijau di data benar.
+ * bagian akhir (pola edge-proxy-hopbyhop-test) â€” bukan hanya hijau di data benar.
  */
 'use strict';
 
@@ -85,7 +85,7 @@ const source = JSON.parse(fs.readFileSync(path.join(ROOT, 'grammar-explanations-
 const vth = JSON.parse(fs.readFileSync(path.join(ROOT, 'vocabulary-th.json'), 'utf8'));
 
 /* =========================================================================
- * DETEKTOR MURNI — dipakai pada data nyata DAN pada matriks racun di bawah.
+ * DETEKTOR MURNI â€” dipakai pada data nyata DAN pada matriks racun di bawah.
  * ======================================================================= */
 
 /** A: template tanpa entri sumber. */
@@ -151,7 +151,7 @@ function vthCountDrift(vthObj) {
 }
 
 /* =========================================================================
- * GATE — data nyata
+ * GATE â€” data nyata
  * ======================================================================= */
 
 test('A. setiap template punya entri di grammar-explanations-id.json (bukti: f87a39a menambah 27 template; 10 entrinya lahir cacat)', () => {
@@ -166,26 +166,26 @@ test('B. kunci distraktor sumber = persis opsi template SAAT INI (bukti: b0d983c
     + '\n    Perbaiki: node tools/sync-grammar-explanations-id.js --write && node audit/merge-grammar-id.js');
 });
 
-test('C. nilai sumber identik dengan field ...Id bank — sinkron dua arah (bukti: 5643a32 menulis ulang whyFailsId di bank; 59 nilai sumber melenceng diam-diam sampai f87a39a)', () => {
+test('C. nilai sumber identik dengan field ...Id bank â€” sinkron dua arah (bukti: 5643a32 menulis ulang whyFailsId di bank; 59 nilai sumber melenceng diam-diam sampai f87a39a)', () => {
   const drift = valueDrift(bank, source);
   assert.strictEqual(drift.length, 0, drift.length + ' field melenceng, mis. ' + JSON.stringify(drift.slice(0, 5))
     + '\n    Perbaiki: node tools/sync-grammar-explanations-id.js --write && node audit/merge-grammar-id.js');
 });
 
-test('D. indonesianCoverage.translated === total === templates.length === jumlah entri sumber (bukti: 222/222 vs 249 template lolos hijau di f87a39a — gerbang lama hanya cek translated===total)', () => {
+test('D. indonesianCoverage.translated === total === templates.length === jumlah entri sumber (bukti: 222/222 vs 249 template lolos hijau di f87a39a â€” gerbang lama hanya cek translated===total)', () => {
   const drift = coverageDrift(bank, source);
   assert.strictEqual(drift.length, 0, drift.join('; ')
     + '\n    Perbaiki: node audit/merge-grammar-id.js (menghitung ulang indonesianCoverage)');
 });
 
-test('E. vocabulary-th.count === jumlah entri nyata (bukti celah: th-coverage-test.js keluar dari CI per 9bf2e13 — sejak itu TIDAK ADA gerbang CI yang membaca count ini; kelas cacat sama dengan indonesianCoverage di f87a39a)', () => {
+test('E. vocabulary-th.count === jumlah entri nyata (bukti celah: th-coverage-test.js keluar dari CI per 9bf2e13 â€” sejak itu TIDAK ADA gerbang CI yang membaca count ini; kelas cacat sama dengan indonesianCoverage di f87a39a)', () => {
   const drift = vthCountDrift(vth);
   assert.strictEqual(drift, null, drift + '\n    Perbaiki: samakan field count dengan jumlah entri saat mengubah vocabulary-th.json');
 });
 
 test('alat perbaikan dan gate ini satu mata uang: tools/sync-grammar-explanations-id.js menilai SINKRON pada data nyata', () => {
   const { source: rebuilt } = sync.buildSynced(bank, source);
-  /* m025-202: akhir baris dinormalkan sebelum dibandingkan. Di checkout Windows dengan
+  /* m025-203: akhir baris dinormalkan sebelum dibandingkan. Di checkout Windows dengan
      core.autocrlf, berkas di disk ber-CRLF sementara serialize() selalu menulis LF, jadi
      assert byte-identik ini MERAH di mesin pemilik dan HIJAU di CI Linux - untuk data yang
      isinya sama persis (A-E semuanya hijau; selisihnya 5.981 byte = jumlah baris). Gerbang
@@ -194,11 +194,11 @@ test('alat perbaikan dan gate ini satu mata uang: tools/sync-grammar-explanation
      Yang dijaga tetap sama: ISI hasil buildSynced harus identik dengan isi di disk. */
   const norm = (s) => s.replace(/\r\n/g, '\n');
   assert.strictEqual(norm(sync.serialize(rebuilt)), norm(fs.readFileSync(sync.SOURCE_PATH, 'utf8')),
-    'buildSynced menghasilkan berkas berbeda dari disk — jalankan: node tools/sync-grammar-explanations-id.js --write');
+    'buildSynced menghasilkan berkas berbeda dari disk â€” jalankan: node tools/sync-grammar-explanations-id.js --write');
 });
 
 /* =========================================================================
- * MATRIKS RACUN — setiap detektor dibuktikan bisa MERAH (in-memory, nol I/O)
+ * MATRIKS RACUN â€” setiap detektor dibuktikan bisa MERAH (in-memory, nol I/O)
  * ======================================================================= */
 const clone = (x) => JSON.parse(JSON.stringify(x));
 
@@ -208,7 +208,7 @@ test('racun A: menghapus satu entri sumber terdeteksi', () => {
   assert.strictEqual(missingEntries(bank, p).length, 1, 'detektor A buta');
 });
 
-test('racun B1: opsi template diganti (pola perbaikan b0d983c) → kunci sumber jadi basi + hilang', () => {
+test('racun B1: opsi template diganti (pola perbaikan b0d983c) â†’ kunci sumber jadi basi + hilang', () => {
   const p = clone(bank);
   const t = p.templates.find((x) => (x.distractors || []).length > 0);
   t.distractors[0].option = '__opsi-baru-hasil-perbaikan__';
