@@ -544,3 +544,143 @@ dan 214 gerbang hijau. Melainkan karena tiga hal yang belum boleh disebut PASS:
 
 Jarak ke GO: F-2 tinggal merge; F-5 tinggal satu kali jalan tangan oleh OWNER; F-6 butuh
 putaran verifikasi tersendiri.
+
+---
+
+# ADENDUM F — PENUTUPAN TEMUAN E, `9a60f99` / m025-206 → m025-207 (2026-08-30)
+
+Perintah OWNER: *"perbaiki semuanya hingga menghasilkan produk rilis GO."* Adendum ini
+menutup temuan Adendum E satu per satu, **membatalkan satu temuan yang ternyata milik saya
+sendiri**, dan mencatat satu temuan baru yang muncul justru ketika F-6 dikerjakan sungguhan.
+
+## F.0 KOREKSI — **F-3 DICABUT: itu bug harness saya, bukan bahaya repo**
+
+Adendum E melaporkan `audit/merge-grammar-id.js` sebagai gerbang CI yang menulis
+`grammar-templates.json` dan karenanya bisa memerahkan gerbang sesudahnya. **Itu salah, dan
+salahnya milik saya.**
+
+Daftar gerbang yang saya pakai dibangun dengan `grep -oE "node .*\.js" quality.yml`
+**tanpa membuang baris komentar**. Di `quality.yml` kedua berkas itu muncul HANYA di dalam
+komentar — baris 759–760, sebagai petunjuk perbaikan bila `content-drift-test.js` merah:
+
+```
+# Perbaikan bila merah: node tools/sync-grammar-explanations-id.js --write
+# && node audit/merge-grammar-id.js. Detail: header content-drift-test.js.
+```
+
+Keduanya **bukan gerbang** dan tidak pernah dijalankan CI. Yang menjalankannya adalah suite
+saya. Jadi berkas konten yang berubah di tengah suite, lalu memerahkan
+`id-golden-snapshot-test.js`, adalah akibat perkakas saya sendiri.
+
+Konsekuensinya dua, dan keduanya harus disebut:
+
+1. **Jumlah gerbang sebenarnya 212, bukan 214.** Angka 214 di Adendum E memuat dua baris
+   komentar.
+2. **F-3 tidak ada.** Tidak ada bahaya urutan laten di repo ini.
+
+Suite 212 gerbang dijalankan ulang di atas worktree bersih: **212/212 PASS, nol merah.**
+Tanpa satu pun berkas ter-track berubah selama suite berjalan.
+
+> Aturan D melarang saya menyembunyikan kegagalan. Ia juga, dengan alasan yang sama,
+> melarang saya membiarkan tuduhan yang keliru tetap berdiri: temuan palsu memakan waktu
+> perbaikan yang seharusnya jatuh ke cacat sungguhan.
+
+## F.1 F-2 · PWA tersandera jaringan menggantung — **DITUTUP**
+
+PR #264 digabung ke `main` sebagai `9a60f99` (m025-206) dengan 11/11 check hijau, termasuk
+dua run `quality`. Anggaran navigasi 2.500 ms sekarang ada di `main`.
+
+## F.2 F-6 · Braincore v3 — **`BRAINCORE_V3_E2E_VERIFIED`** (dengan satu batas tertulis)
+
+§20 melarang saya menyebut Braincore v3 siap produksi tanpa membuktikan gelung penuhnya.
+`fiezel-core-brain.js` MURNI — ia tidak membaca state, tidak menulis penyimpanan, tidak
+memanggil jaringan — jadi menguji modulnya tidak menjawab apa pun; yang harus dibuktikan
+**kabelnya**.
+
+Dijalankan di Chromium sungguhan atas `main`, sesi belajar A1 sungguhan, jawaban diketuk
+lewat DOM seperti murid (opsi dipilih **acak**, jadi campuran benar–salahnya nyata):
+
+| | sebelum sesi | sesudah 10 jawaban |
+|---|---|---|
+| `ability.ability` | 1,500 | 1,047 |
+| `ability.confidence` | 0 | 0,417 |
+| `ability.evidence` | 0 | **10** |
+| `state.history` | 0 | 10 |
+| galat halaman | — | **0** |
+
+Jejak per jawaban: `1,288 → 1,246 → 1,213 → 1,236 → 1,179 → 1,156 → 1,109 → 1,066 → 1,026 →
+1,047`. **Sepuluh nilai berbeda untuk sepuluh jawaban**, dan `evidence` naik 1:1 dengan
+`history`. 15 ketukan menghasilkan 10 jawaban terhitung — lima sisanya percobaan kedua, yang
+memang **tidak** boleh menaikkan skor (aturan "penilaian hanya pada percobaan pertama"),
+jadi selisih itu sendiri bukti bahwa aturan tersebut hidup.
+
+Bahwa angkanya benar-benar **sampai** ke pembaca produksinya diuji lewat kode produksi, bukan
+tiruannya — `quizPredictedSuccess()` (app.js:2153) pada probe kesulitan TETAP:
+
+| kesulitan probe | sebelum sesi | sesudah sesi |
+|---|---|---|
+| 0,5 | 0,8632 | 0,7246 |
+| 1,0 | 0,7594 | 0,5866 |
+| 1,5 | 0,6250 | 0,4583 |
+| 2,0 | 0,4906 | 0,3653 |
+| 2,5 | 0,3868 | 0,3093 |
+
+Item tidak berubah; yang berubah hanya `ability` hasil jawaban murid. Gelungnya tertutup.
+
+**Batas yang tetap harus disebut:** ini Chromium, bukan WebKit; dan satu sesi 10 soal, bukan
+kohor. Yang diklaim di sini persis sebesar buktinya — **gelung keputusannya hidup**, bukan
+"modelnya akurat".
+
+## F.3 TEMUAN BARU · **T2 masih hidup di sesi belajar** — ditemukan saat mengerjakan F-6, **sudah diperbaiki**
+
+Bukti E2E di atas melahirkan pertanyaan lanjutan yang tidak boleh dilewati: kalau `ability`
+bergerak, apakah ia mengubah **soal berikutnya**? Diukur, dan jawabannya **tidak**.
+
+`FiezelTutorBrain.selectNext` dipanggil di atas kolam A1 sungguhan dengan sesi yang sama,
+berbeda **hanya** pada ability yang membangun closure `predict`-nya:
+
+| ability | item terpilih (sebelum perbaikan) |
+|---|---|
+| 0,5 | `vocab-vocab_00003-partOfSpeech…` |
+| 0,863 | item yang **sama** |
+| 1,5 | item yang **sama** |
+| 2,5 | item yang **sama** |
+| 3,5 | item yang **sama** |
+
+Sebabnya terukur: **seluruh 634 item A1 berkesulitan tepat 1**, dan tiap level satu nilai
+konstan (A2=2, B1=3, B2=4, C1=5, C2=6). Dengan `difficulty` konstan, term penalti
+`|difficulty − target|` adalah konstanta aditif di setiap skor dan **lenyap saat sorting**.
+
+Yang membuat ini berat: **`features/brain/fiezel-item-prior.js` ditulis khusus untuk
+menghapus cacat ini**, dan docstring-nya menamainya sendiri sebagai T1/T2. Modul itu ada,
+dimuat `index.html`, dan unit-nya (`item-prior-test.js`) hijau. Yang tidak pernah
+disambungkan: `makeLevelSource()` — kolam yang dipakai `startLevelPractice`, yaitu **sesi
+belajar biasa** — masih menimpa `difficulty` dengan basis level. Priornya hanya terpasang di
+pembangun sesi adaptif dan jalur cloze.
+
+> Inilah §19 dalam bentuknya yang paling murni. Gerbang modulnya hijau dan **benar**. Yang
+> putus kabelnya, dan tidak ada gerbang berbasis pola teks yang bisa melihatnya — polanya
+> masih ada di berkas, yang hilang justru sambungannya.
+
+**Diperbaiki di m025-207.** Prior disambungkan ke ketiga cabang `makeLevelSource` dengan pola
+guard yang **disalin** dari pembangun sesi adaptif, bukan varian baru:
+
+| | sebelum | sesudah |
+|---|---|---|
+| nilai kesulitan berbeda di A1 | **1** (semua 634 item) | **3** (1 ×601, 1,15 ×3, 1,45 ×30) |
+| pilihan `selectNext` @ ability 0,5–1,5 | vocab d=1 | vocab d=1 |
+| pilihan `selectNext` @ ability 2,5–3,5 | vocab d=1 (**sama**) | **grammar d=1,45** |
+
+Gerbang baru `level-source-difficulty-variance-test.js` **menjalankan** `makeLevelSource`
+yang sesungguhnya (diambil dari `app.js`, dieksekusi di VM) di atas modul prior yang
+sesungguhnya. Terbukti **merah** di kode lama (`"T2 hidup lagi: seluruh 26 item satu level
+berkesulitan sama"`) dan hijau di kode baru. Assert F menguncinya dari sisi lain: tanpa modul
+prior, difficulty **wajib** jatuh ke basis level lama — perangkat yang gagal memuat modul
+harus tetap belajar seperti hari ini.
+
+**Utang jujur yang tersisa:** 601 dari 634 item A1 masih berbagi difficulty 1. Diskriminasinya
+kini **kasar tapi tidak lagi nol** — ia memisahkan beban mode grammar dari massa
+vocab/reading, belum item dari item. Itu batas modul priornya sendiri, yang menyebut
+kalibrasi Elo dua-sisi (C1) sebagai langkah berikutnya. Saya **tidak** menambal ini dengan
+menganeka-ragamkan mode soal yang dilihat murid: itu keputusan pedagogis milik OWNER, bukan
+perbaikan audit.
