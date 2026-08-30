@@ -63,7 +63,15 @@ assert(/passage:\{id:r\.id/.test(app),'reading questions do not carry their pass
 // W2-INT (teknik union): eyebrow 'TEKS BACAAN' PINDAH byte-identik ke copy-id-app-d.js
 // ('quiz.teks-bacaan'). Struktur renderer tetap dicek di app.js: kartu passage harus tetap
 // dirender — kini lewat t('quiz.teks-bacaan') — dan nilainya tetap verbatim di copy-map.
-assert((/q\.passage\?card\(.*TEKS BACAAN/s.test(app)||(/q\.passage\?card\(.*FiezelI18n\.t\('quiz\.teks-bacaan'\)/s.test(app)&&/'quiz\.teks-bacaan'\s*:\s*'TEKS BACAAN'/.test(copyIdUnion))),'quiz renderer does not show passage with reading question');
+// 2026-08-30: assert ini dulu memaku NAMA KUNCI i18n ('quiz.teks-bacaan') dan jadi merah di
+// m025-202 ketika kunci itu diganti nama jadi 'quiz.reading-eyebrow' — padahal kartu bacaan
+// tetap dirender dan naskahnya tetap 'TEKS BACAAN'. Yang perlu dijaga adalah KONTRAKNYA
+// (soal reading selalu ditemani passage-nya, ber-eyebrow berbahasa Indonesia yang benar),
+// bukan ejaan kunci yang boleh berubah kapan saja. Jadi kuncinya sekarang DIBACA dari
+// renderer, lalu nilainya diverifikasi di copy-map — rename lolos, kartu yang hilang tidak.
+const passageEyebrow=/q\.passage\?card\(`<div class="passage passage-reading"><div class="eyebrow">\$\{([^}]+)\}/.exec(app);
+const eyebrowKey=passageEyebrow&&/FiezelI18n\.t\('([^']+)'\)/.exec(passageEyebrow[1]);
+assert(!!passageEyebrow&&(/TEKS BACAAN/.test(passageEyebrow[1])||(!!eyebrowKey&&new RegExp("'"+eyebrowKey[1].replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+"'\\s*:\\s*'TEKS BACAAN'").test(copyIdUnion))),'quiz renderer does not show passage with reading question');
 assert(/const readiness=diagnosticReadinessMap\(state\)/.test(app)&&/state\.adaptiveReady=!!readiness\[getActiveLevel\(state\)\]/.test(app),'adaptive readiness must be evidence-based, per active level');
 assert(/window\.__getFiezelState/.test(app),'test state hook missing');
 /* m025-188: kontrak inventori DIPERKETAT dari angka mati ke properti — lantai baseline

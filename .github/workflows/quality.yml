@@ -254,6 +254,24 @@ jobs:
           node social-schema-contract-test.js
           node fiezel-evolution-loop-test.js
           node core-worker-contract-test.js
+          # m025-201: dua gerbang penutup lima celah Core Brain (audit m025-201).
+          # core-policy-parity-test.js mengadu kebijakan app.js dengan kebijakan Worker atas
+          # matriks skenario yang sama - dua salinan yang seharusnya identik dan selama ini
+          # tidak pernah dibandingkan, sehingga setiap perbaikan yang mendarat di satu sisi
+          # saja lolos tanpa terlihat. Ia juga menuntut tidak ada rute Worker yang memakai
+          # kebijakan MENTAH (celah pelatih AI), bahwa highRiskCount/todayAttempts benar-benar
+          # mengubah keluaran, bahwa pemotong kode rasional berprioritas (alasan otak berhenti
+          # dibuang sebelum sampai ke layar), dan bahwa tren efektivitas dihitung atas sepuluh
+          # hasil - masing-masing dengan bukti-bisa-merah terhadap sumber yang sengaja dirusak.
+          # Diletakkan tepat sesudah core-worker-contract-test.js karena keduanya memuat Worker
+          # yang sama di dalam vm: yang di atas menjaga KONTRAK rutenya, yang ini menjaga
+          # KEBIJAKAN yang mengalir lewat rute itu.
+          node core-policy-parity-test.js
+          # brain-page-wiring-test.js menutup lubang yang brain-manifest-test.js tidak jangkau:
+          # manifest mengadu dirinya dengan isi direktori, tetapi NOL gerbang mengadunya dengan
+          # index.html/sw.js. Modul yang dinyatakan berwenang tetapi tidak pernah dimuat halaman
+          # adalah kelas cacat yang membunuh analytics murid secara senyap di T-031.
+          node brain-page-wiring-test.js
           node learner-evidence-test.js
           node alrs-behavior-test.js
           node adaptive-policy-test.js
@@ -735,6 +753,12 @@ jobs:
         # Perbaikan bila merah: node tools/sync-grammar-explanations-id.js --write
         # && node audit/merge-grammar-id.js. Detail: header content-drift-test.js.
         run: node content-drift-test.js
+      - name: 'Wave F1: gerbang overperformance berkelanjutan (regresi censoring mastery)'
+        # Mengawal perbaikan F1 di fiezel-core-brain.js: residualPositiveShare (momentum
+        # basis residual) + cabang 'sustained_overperformance' planSession. Tanpa gate ini
+        # cabang tersebut bisa dicabut diam-diam dan jebakan jangkar censoring (mastery v2
+        # ~13% vs v1 ~44% dalam 35 hari, research_hold simulasi v3) kembali tanpa alarm.
+        run: node wave-f1-censoring-test.js
       - name: 'Gerbang simulasi adaptivitas v3 (gate yatim CI — temuan D1, wave D)'
         # adaptivity-simulation-v3.js adalah gate sungguhan (exit code dari main();
         # gate residual + gate kalibrasi bisa merah), tetapi namanya lolos dari pola

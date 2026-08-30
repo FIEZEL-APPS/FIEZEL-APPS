@@ -633,6 +633,16 @@
         }
       }
       out.residualStreak = lastSign * streak;
+      // Wave F1: porsi blok yang MENGALAHKAN prediksi di seluruh jendela (0..1).
+      // Sinyal overperformance yang lebih tenang daripada streak: streak jatuh ke 0
+      // oleh SATU blok derau (memicu keputusan yang bolak-balik), sedangkan porsi
+      // hanya bergeser 1/blocks per blok baru. Di bawah nol-hipotesis blok setanda
+      // acak, porsi >= 0.75 pada 8 blok berpeluang ~14% - pada murid yang sungguh
+      // mengalahkan model secara sistematis, nyaris pasti. Hanya basis residual
+      // (tanpa `predicted`, keluaran identik dengan versi sebelumnya angka per angka).
+      var positif = 0;
+      for (var ps = 0; ps < series.length; ps++) if (series[ps] > 0) positif++;
+      out.residualPositiveShare = round(positif / series.length, 3);
     }
     return out;
   }
@@ -971,6 +981,7 @@
    * pace), supaya lapisan ini bisa memperkuat kebijakan yang ada tanpa memaksa protokolnya
    * berubah - dan supaya ia bisa dimatikan tanpa mematikan aplikasi.
    */
+  var PLAN_OVERPERFORMANCE_SHARE = 0.75; // >=75% blok jendela residual mengalahkan prediksi
   function planSession(signals) {
     var s = signals || {};
     var ability = s.ability || { ability: 1.5, confidence: 0 };
@@ -998,6 +1009,41 @@
     if (move.state === 'declining' && move.confidence >= 0.4) { difficulty = Math.max(window_.floor, difficulty - 1); rationale.push('trend_declining'); }
     else if (move.state === 'plateau' && move.confidence >= 0.5) { difficulty = Math.min(window_.ceiling, difficulty + 1); rationale.push('plateau_break'); }
     else if (move.state === 'improving' && move.confidence >= 0.6) { difficulty = Math.min(window_.ceiling, difficulty + 1); rationale.push('trend_improving'); }
+    // Wave F1 — GERBANG OVERPERFORMANCE BERKELANJUTAN (basis residual saja).
+    //
+    // Temuan censoring E2/F1 (adaptivity-simulation-v3, research_hold
+    // brain3_riset_censoring_shipped_tradeoff): v2 menahan murid jauh lebih lama dari
+    // perlu — mastery-35-hari hanya ~12-13% run vs v1 ~44%. Akar masalahnya loop
+    // tertutup: target kesulitan dijangkarkan ke optimalDifficulty(THETA-TAKSIRAN, 0.80)
+    // = taksiran - 0.674 (a=1.5), padahal taksiran sendiri tertinggal di bawah theta
+    // sesungguhnya pada murid yang sedang naik. Item yang tersaji jadi ~1.5 level di
+    // bawah kemampuan nyata; di sana informasi Fisher dan kejutan Elo sama-sama kecil,
+    // taksiran makin lambat menyusul, dan jangkar tidak pernah naik - murid ditahan di
+    // zona nyaman tanpa ada satu keputusan pun yang salah secara lokal.
+    //
+    // Jalan keluar yang eksplisit (bukan efek samping): saat >= 75% blok residual di
+    // jendela momentum MENGALAHKAN prediksi model (residualPositiveShare >= 0.75, yaitu
+    // >= 6 dari 8 blok x 5 jawaban) dan murid TIDAK sedang menurun, kesulitan dinaikkan
+    // satu tingkat DI DALAM pita (ceiling p=0.55 tetap pagarnya) - sehingga taksiran
+    // mendapat item informatif untuk menyusul, dan jangkar bergerak. Overperformance
+    // sistematis nyaris pasti melewati ambang itu; di bawah nol-hipotesis blok setanda
+    // acak peluangnya hanya ~14% (binomial 8 blok).
+    //
+    // Sinyalnya PORSI blok yang mengalahkan prediksi (residualPositiveShare), bukan
+    // streak mentah: streak jatuh ke nol oleh SATU blok derau, sehingga ambang streak
+    // membuat kesulitan bolak-balik harian (terbukti di simulator: osilasi v2_residual
+    // 2.98 -> 4.08 per 10 sesi, regresi keras vs v1). Porsi bergeser paling cepat
+    // 1/blocks per blok baru - keputusan yang sama bertahan berhari-hari.
+    //
+    // Kenapa ini TIDAK menyentuh false-decline: klasifikasi momentum (termasuk ambang
+    // asimetris -0.06/r^2 0.4 untuk 'declining') tidak diubah satu angka pun; cabang ini
+    // hanya membaca keluarannya. Kenapa basis accuracy tidak ikut: residualPositiveShare
+    // hanya ada di basis residual - tanpa `predicted`, perilaku lama utuh angka per angka.
+    // Bukti simulator (50 seed x 9 profil, CI bootstrap berpasangan) di PR wave-f-1.
+    else if (move.state !== 'declining' && num(move.residualPositiveShare) >= PLAN_OVERPERFORMANCE_SHARE) {
+      difficulty = Math.min(window_.ceiling, difficulty + 1);
+      rationale.push('sustained_overperformance');
+    }
     difficulty = clamp(difficulty, 1, 6);
     // Label dihitung ULANG setelah pergeseran. Memakai label dari jendela awal berarti sesi
     // yang sengaja diturunkan tetap berbunyi "standard" kepada murid.
@@ -1160,7 +1206,13 @@
       addCode('brain_root_cause');
     }
 
-    out.rationaleCodes = codes.slice(0, 12);
+    var PRIORITY = /^(brain_|server_|policy_trend_|recent_policy_outcome_)/;
+    out.rationaleCodes = (function (list) {
+      if (list.length <= 12) return list;
+      var keep = list.filter(function (c) { return PRIORITY.test(c); });
+      var rest = list.filter(function (c) { return !PRIORITY.test(c); });
+      return rest.slice(0, Math.max(0, 12 - keep.length)).concat(keep).slice(0, 12);
+    })(codes);
     out.estimatedMinutes = Math.max(5, Math.round(out.sessionSize * (out.pace === 'calm' ? 1.25 : 1)));
     digest.applied = true;
     out.brain = digest;
