@@ -24,6 +24,7 @@
     "./features/i18n/copy-th-grammar-labels.js",
     "./features/i18n/naskah-th-brain.js",
     "./features/i18n/th-bank-sanitizer.js",
+    "./features/i18n/th-bank-sanitizer-extra.js",
     "./features/i18n/speaking-bank-th.json",
     "./features/i18n/listening-bank-th.json",
     "./features/i18n/writing-prompts-th.json",
