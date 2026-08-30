@@ -5863,6 +5863,17 @@ function showOnboarding(now=Date.now()){
   if(!onboarding||typeof onboarding.show!=='function')return null;
   try{
     return onboarding.show(self,{now,
+      // Popup PERTAMA onboarding memilih bahasa. Simpan segera sebelum Step 1 supaya
+      // reload di tengah onboarding mempertahankan pilihan, lalu setLocale membangunkan
+      // fiezel-th-loader. Onboarding sendiri menunggu copy feat-b Thai sebelum mengecat
+      // langkah nama, sehingga tidak ada kilatan/fallback Bahasa Indonesia.
+      onLocale:({locale})=>{
+        const supported=(self.FiezelI18n?.SUPPORTED)||['id','th'];
+        const value=supported.includes(locale)?locale:'id';
+        state.preferences={...state.preferences,learnerLocale:value};state.coachCache=null;save();
+        try{self.FiezelI18n?.setLocale?.(value)}catch(_){}
+        return value
+      },
       // m025-117: langkah pertama perkenalan. Namanya masuk ke state SEKETIKA, bukan di
       // ujung alur - murid yang menutup aplikasi di tengah perkenalan tetap punya namanya
       // saat kembali, dan Home tidak pernah tercat dengan sapaan netral setelah dijawab.

@@ -137,14 +137,31 @@
     'tour.listen-speed-body': 'Terlalu cepat? Kecepatan suara bisa diatur di FIEZEL Control Room \u2014 buka lewat tombol Pengaturan kapan aja.',
 
     // ---------- features/onboarding/fiezel-onboarding.js ----------
-    // Sebagian naskah onboarding MASIH literal di modulnya: berada di zona chunk beku
-    // gerbang emas (lihat impl/handoff/W2-FEAT-B.md), menunggu regenerasi baseline.
+    // Seluruh naskah yang terlihat di enam langkah onboarding hidup di sini. Satu-satunya
+    // pengecualian adalah pemilih bahasa pertama yang sengaja bilingual sebelum locale ada.
+    'onboarding.brand-tag': 'Adaptive English',
+    'onboarding.dialog-aria': 'Perkenalan FIEZEL',
+    'onboarding.step-name': 'Nama',
+    'onboarding.step-intro': 'Kenalan',
+    'onboarding.step-goal': 'Tujuan',
+    'onboarding.step-level': 'Level',
+    'onboarding.step-reminder': 'Pengingat',
+    'onboarding.step-done': 'Selesai',
+    'onboarding.last-step': ' · terakhir',
     'onboarding.carousel-title': 'Apa aja yang bisa kamu latih?',
     'onboarding.carousel-1-body': 'Di sini kita akan latihan bareng, sedikit demi sedikit tiap hari.',
     'onboarding.carousel-2-body': 'Suara neural, bukan robot \u2014 kedengeran kayak orang beneran ngomong.',
+    'onboarding.carousel-greet': 'Ini isi aplikasinya. Sebentar saja, dua layar.',
+    'onboarding.carousel-vocab': 'Kosakata (Vocabulary)',
+    'onboarding.carousel-grammar': 'Grammar (Grammar Patterns)',
+    'onboarding.carousel-reading': 'Reading (Reading Comprehension)',
+    'onboarding.carousel-listening': 'Listening (Listening with Neural Voice)',
     'onboarding.stepper-eyebrow': 'Langkah {current} dari {total}',
     'onboarding.stepper-aria': 'Kemajuan perkenalan',
     'onboarding.btn-back': 'Kembali',
+    'onboarding.btn-skip-all': 'Lewati',
+    'onboarding.btn-skip-step': 'Lewati langkah ini',
+    'onboarding.btn-placement': 'Mulai tes penempatan',
     'onboarding.name-field-label': 'Nama panggilan',
     'onboarding.name-placeholder': 'Tulis nama kamu',
     'onboarding.name-aria': 'Nama panggilan kamu',
@@ -160,6 +177,7 @@
     'onboarding.summary-goal-label': 'Tujuan',
     'onboarding.summary-level-label': 'Perkiraan level',
     'onboarding.summary-reminder-label': 'Pengingat',
+    'onboarding.summary-streak-label': 'Streak',
     'onboarding.reminder-on': 'Aktif',
     'onboarding.summary-streak-zero': '0 hari · mulai sekarang!',
     'onboarding.btn-start': 'Mulai Belajar',
