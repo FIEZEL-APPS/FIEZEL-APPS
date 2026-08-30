@@ -120,6 +120,54 @@ if (mulai !== -1 && tutup > mulai) {
         !!o && o.suppressSubtitles !== true,
         o ? 'suppressSubtitles=' + o.suppressSubtitles : 'say() tidak pernah dipanggil');
     })
+    /* (F) REGRESI RACE INTERRUPT -> STALE COMPLETION.
+     *
+     * Ini sengaja behavioural: AudioService PRODUKSI dijalankan lagi dengan say() yang
+     * penyelesaiannya bisa kita tahan. Panggilan kedua memanggil stop() seperti produksi,
+     * lalu selesai sukses. Setelah itu panggilan LAMA dipaksa resolve(false). Panggilan lama
+     * tidak boleh lagi masuk ke fallback/no-audio milik giliran baru. Di browser yang punya
+     * speechSynthesis cabang yang sama akan mencoba membunyikan fallback lama; di sandbox
+     * tanpa speechSynthesis jejak cabang itu tetap terukur lewat showToast(). */
+    .then(async () => {
+      const pending = [];
+      let staleToast = 0;
+      let stopCalls = 0;
+      const raceSandbox = {
+        window: {},
+        self: { FiezelVoiceSay: {
+          say: (text, options) => new Promise((resolve) => pending.push({ text, options, resolve })),
+          stop: () => { stopCalls += 1; }
+        } },
+        selectedNeuralRate: () => 1,
+        prefetchNextVoice: () => Promise.resolve(false),
+        showToast: () => { staleToast += 1; },
+        cancelVoicePrefetch: () => {},
+        console
+      };
+      raceSandbox.globalThis = raceSandbox;
+      vm.createContext(raceSandbox);
+      vm.runInContext(kode + '\nvar raceAudio = AudioService();', raceSandbox, { filename: APP + '#race' });
+      const raceAudio = raceSandbox.raceAudio;
+
+      const oldPlay = raceAudio.play('old sentence that must stay cancelled', { contentType: 'sentence' });
+      await new Promise((resolve) => setImmediate(resolve));
+      const newPlay = raceAudio.play('new sentence that owns playback now', { contentType: 'sentence' });
+      await new Promise((resolve) => setImmediate(resolve));
+
+      check('F harness menahan dua say() berbeda dan play kedua benar-benar menginterupsi yang lama',
+        pending.length === 2 && stopCalls >= 2,
+        'pending=' + pending.length + ' stopCalls=' + stopCalls);
+
+      pending[1].resolve(true);
+      await newPlay;
+      pending[0].resolve(false);
+      await oldPlay;
+      await new Promise((resolve) => setImmediate(resolve));
+
+      check('F completion dari play LAMA sesudah interrupt DIABAIKAN (tidak masuk fallback/no-audio)',
+        staleToast === 0,
+        'showToast dipanggil ' + staleToast + 'x oleh promise lama; di browser bersuara cabang yang sama dapat memulai speechSynthesis stale');
+    })
     /* (D) Titik panggil tes penempatan mengirim benderanya sendiri juga. Bukan mubazir:
      * ia yang membuat maksudnya terbaca di tempat soalnya dibangun, dan ia bertahan kalau
      * suatu hari contentType di sana diganti. */
