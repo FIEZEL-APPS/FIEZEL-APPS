@@ -117,15 +117,27 @@ function answer(learner, question, answerInput, now) {
   // ItemPrior.difficultyFor() mengembalikan ANGKA, bukan objek — diverifikasi dengan
   // memanggilnya, bukan diasumsikan dari namanya. (Asumsi pertama saya salah, dan
   // `prior.difficulty` yang undefined diam-diam menjadi 0 di trace.)
-  const priorRaw = ItemPrior.difficultyFor({
+  //
+  // FASE F. Versi pertama memanggil `difficultyFor()`, yang mengembalikan ANGKA saja, lalu
+  // menaruh `const prior = { rationale: [] }` sebagai penampung kosong dan menyerahkannya ke
+  // pengumpul alasan. Penampung itu tidak pernah terisi apa pun: pipeline bertanya "kenapa
+  // segini?" kepada objek yang memang tidak tahu. `ItemPrior.explain()` adalah fungsi yang
+  // SUDAH ADA di modul yang sama dan mengembalikan angka yang sama BESERTA rationale-nya.
+  // Jadi alasannya tidak perlu dikarang — ia hanya perlu diminta.
+  const prior = ItemPrior.explain({
     level: q.level || learner.level, domain: q.domain || 'grammar',
-    mode: q.mode || 'mcq', stemLength: Number(q.stemLength) || 0
+    // 'complete_sentence' adalah mode default jalur polos di app.js:2354 — BUKAN 'mcq'.
+    // Lihat catatan TEMUAN FASE F di bawah: 'mcq' bukan anggota MODE_COST sama sekali.
+    mode: q.mode || 'complete_sentence', stemLength: Number(q.stemLength) || 0
   });
-  const prior = { rationale: [] };
-  const priorValue = isFinite(Number(priorRaw)) ? Number(priorRaw) : null;
+  const priorValue = isFinite(Number(prior && prior.difficulty)) ? Number(prior.difficulty) : null;
   let effective = priorValue;
+  // `eff` DIANGKAT keluar dari try. Sebelumnya ia hidup dan mati di dalam blok itu, jadi
+  // `brain3_item_calibration_*` — yang terbit pada SETIAP jawaban — dihitung lalu dibuang
+  // satu baris kemudian. Yang diambil hanya angkanya.
+  let eff = null;
   try {
-    const eff = Calibration.effective(learner.calibration, String(q.id || ''), priorValue);
+    eff = Calibration.effective(learner.calibration, String(q.id || ''), priorValue);
     const effNum = (eff && typeof eff === 'object') ? Number(eff.difficulty) : Number(eff);
     if (isFinite(effNum)) effective = effNum;
   } catch (_) { /* modul absen = prior dipakai apa adanya, persis guard app.js */ }
@@ -200,14 +212,18 @@ function answer(learner, question, answerInput, now) {
   }]).slice(-64);
   let affectState = learner.affectState, affectConfidence = learner.affectConfidence,
       affectChanged = learner.affectChanged;
+  // `affectAssessment` diangkat keluar dari try untuk alasan yang sama seperti `eff`: modul
+  // afek menerbitkan brain3_affect_* pada setiap jawaban, dan sebelumnya kode itu lenyap
+  // bersama variabel lokal blok try.
+  let affectAssessment = null;
   try {
-    const res = Affect.assess(affectRows, {
+    affectAssessment = Affect.assess(affectRows, {
       previous: learner.affectState, previousConfidence: learner.affectConfidence,
       changedAlready: learner.affectChanged
     });
-    const nextState = String((res && res.state) || 'neutral');
+    const nextState = String((affectAssessment && affectAssessment.state) || 'neutral');
     if (nextState !== affectState) { affectState = nextState; affectChanged = true; }
-    affectConfidence = Math.max(0, Math.min(1, Number(res && res.confidence) || 0));
+    affectConfidence = Math.max(0, Math.min(1, Number(affectAssessment && affectAssessment.confidence) || 0));
   } catch (_) { /* guard */ }
 
   // Target sukses digeser afek — app.js:2255 affectTargetSuccess()
@@ -231,8 +247,28 @@ function answer(learner, question, answerInput, now) {
     ...(a.chosenMisconception ? { optionMisconceptions: { chosen: String(a.chosenMisconception) },
                                   chosenOption: 'chosen' } : {})
   });
+  //
+  // TEMUAN FASE F, DARI KELUARGA YANG SAMA DENGAN KODE ALASAN YANG DIBUANG. Versi Fase C
+  // memanggil decideMove dengan `{ remaining: 10 }` saja. app.js:2808 mengirim TIGA hal:
+  // remaining yang nyata, keadaan lelah dari CoreBrain, dan keadaan afek bila bukan netral.
+  // Akibat kekurangan itu, afek dihitung dengan rapi di langkah 9 lalu TIDAK PERNAH sampai ke
+  // pemutus, dan tiga cabang decideMove yang ada di produksi — breathe/affect_frustrated,
+  // stretch/affect_bored, wrapup/pool_exhausted — tidak bisa dicapai sama sekali oleh harness.
+  // Mengukur mesin pada jalur yang lebih sempit daripada jalur produksinya, lalu melaporkan
+  // cakupan, adalah cara paling halus untuk salah lapor. Sekarang bentuk konteksnya sama
+  // persis dengan app.js:2808.
+  const fatigueState = guard('fatigue', () => {
+    const f = CoreBrain.fatigue(affectRows);
+    return f && f.state ? String(f.state) : '';
+  }, '');
   let move = null;
-  try { move = TutorBrain.decideMove(tutorSession, diagnosis, { remaining: 10 }); } catch (_) { move = null; }
+  try {
+    move = TutorBrain.decideMove(tutorSession, diagnosis, {
+      remaining: Number(a.remaining) >= 0 ? Number(a.remaining) : 10,
+      fatigue: fatigueState === 'unknown' ? '' : fatigueState,
+      ...(affectState && affectState !== 'neutral' ? { affect: { state: affectState } } : {})
+    });
+  } catch (_) { move = null; }
 
   // ---- 11. KEADAAN SESUDAH -----------------------------------------------------------
   const masteryAfter = BKT.mastery(bktNext, lesson);
@@ -248,7 +284,27 @@ function answer(learner, question, answerInput, now) {
 
   // ---- 12. TRACE ---------------------------------------------------------------------
   const decision = normalizeDecision(move);
-  const reasonCodes = collectReasons([weighed, diagnosis, move, prior]);
+  // FASE F — DARI MANA ALASAN DIKUMPULKAN.
+  //
+  // Daftar ini adalah temuan Fase F, bukan pilihan gaya. Versi Fase C mengumpulkan dari EMPAT
+  // objek — [weighed, diagnosis, move, prior] — dan dari keempatnya hanya `weighed` yang
+  // benar-benar membawa kode brain3_*, itu pun HANYA saat bukti didiskon. Akibatnya jawaban
+  // benar biasa dan jawaban salah biasa — dua kejadian paling sering di seluruh produk —
+  // tercatat dengan reasonCodes KOSONG. Mesin yang tidak bisa menjelaskan kasus yang paling
+  // sering terjadi tidak bisa disebut bisa menjelaskan.
+  //
+  // Yang hilang bukan kodenya. Kodenya sudah dihitung, di langkah-langkah di atas, lalu
+  // dibuang sebelum sampai ke trace: rationale ingatan (`updated`), afek, kalibrasi (`eff`),
+  // prior, dan baris-baris ledger. Perbaikannya karena itu adalah MENDENGARKAN, bukan
+  // menambah kecerdasan: tidak ada satu pun kode baru yang lahir di berkas ini.
+  const reasonCodes = collectReasons([
+    prior,                  // brain3_item_prior_*          (ItemPrior.explain)
+    eff,                    // brain3_item_calibration_*    (Calibration.effective)
+    weighed,                // brain3_evidence_*            (EvidenceCredibility.weigh)
+    updated,                // brain3_memory_*              (CoreBrain.updateMemory)
+    affectAssessment,       // brain3_affect_*              (Affect.assess)
+    diagnosis, move         // tutor: lihat catatan di collectReasons()
+  ].concat(activeMisconceptions));  // brain3_misconception_active (Ledger.active)
   const trace = Trace.build({
     braincoreVersion: Manifest.bundleVersion,
     sessionId: tutorSession.startedAt,
@@ -263,6 +319,10 @@ function answer(learner, question, answerInput, now) {
     },
     difficultyState: { prior: priorValue, effective, target: targetSuccess },
     decision,
+    // Kata asli tutor, disimpan berdampingan dengan enum. Pemetaan `stretch -> advance` adalah
+    // klaim; dengan dua field ini klaim itu bisa diperiksa balik, bukan dipercaya begitu saja.
+    decisionRaw: String((move && move.move) || ''),
+    decisionReason: String((move && move.reason) || ''),
     reasonCodes,
     confidence: (move && isFinite(move.confidence)) ? move.confidence
               : (diagnosis && isFinite(diagnosis.confidence)) ? diagnosis.confidence : null
@@ -283,18 +343,67 @@ function answer(learner, question, answerInput, now) {
   return { trace, learner: nextLearner, decision: move, diagnosis, guardErrors };
 }
 
-/** Petakan keputusan tutor ke enum tertutup Decision Trace. Nilai asing menjadi 'unknown' —
- *  JUJUR, bukan ditebak jadi 'continue'. */
+/**
+ * Petakan keputusan tutor ke enum tertutup Decision Trace.
+ *
+ * TEMUAN FASE F, DIUKUR BUKAN DIBACA. Peta versi Fase C hanya mengenal continue/hint/reteach
+ * plus dua alias. `TutorBrain.decideMove()` menerbitkan DELAPAN gerakan. Lima di antaranya —
+ * breathe, consolidate, celebrate, stretch, wrapup — jatuh ke 'unknown'. Artinya untuk mayoritas
+ * kosakata tutor, trace mencatat "saya tidak tahu apa yang diputuskan" padahal tutornya
+ * menyebutkan keputusannya dengan jelas. 'unknown' seperti itu bukan kejujuran, itu kebutaan
+ * yang menyamar sebagai kejujuran.
+ *
+ * Peta di bawah karena itu LENGKAP terhadap kedelapan gerakan, dan gerbangnya
+ * (braincore-explainability-test.js) membaca literal `move: '...'` langsung dari sumber
+ * fiezel-tutor-brain.js lalu meng-assert tidak ada satu pun yang tak terpetakan. Kalau tutor
+ * menumbuhkan gerakan kesembilan besok, gerbangnya merah — bukan trace-nya yang diam-diam
+ * menulis 'unknown'.
+ *
+ * SETIAP BARIS ADALAH KLAIM, dan klaimnya ditulis supaya bisa dibantah:
+ *   stretch     -> advance  naikkan tingkat: soalnya di bawah kemampuan sekarang
+ *   consolidate -> review   benar tapi lambat: mantapkan dulu di sini, itu pengulangan
+ *   celebrate   -> continue miskonsepsi terpecahkan; secara alur, ini tetap lanjut
+ *   breathe     -> stop     berhenti karena lelah/beban — sesi disudahi
+ *   wrapup      -> stop     soal habis — sesi disudahi
+ * Yang hilang oleh pemetaan (celebrate vs continue TIDAK sama secara pedagogis) tersimpan utuh
+ * di trace.decisionRaw, jadi tidak ada bukti yang menguap demi kerapian enum.
+ */
+const MOVE_TO_DECISION = Object.freeze({
+  continue: 'continue', hint: 'hint', reteach: 'reteach',
+  stretch: 'advance', consolidate: 'review',
+  celebrate: 'continue', breathe: 'stop', wrapup: 'stop',
+  // alias jalur lain di app.js, dipertahankan dari Fase C
+  teach: 'reteach', reteach_concept: 'reteach', next: 'continue'
+});
+
 function normalizeDecision(move) {
   const raw = String((move && (move.move || move.decision)) || '').toLowerCase();
+  if (Object.prototype.hasOwnProperty.call(MOVE_TO_DECISION, raw)) return MOVE_TO_DECISION[raw];
   if (Trace.DECISIONS.indexOf(raw) !== -1) return raw;
-  if (raw === 'teach' || raw === 'reteach_concept') return 'reteach';
-  if (raw === 'next') return 'continue';
-  return raw ? 'unknown' : 'unknown';
+  return 'unknown';   // benar-benar tidak dikenal — JUJUR, bukan ditebak jadi 'continue'
 }
 
-/** Kumpulkan kode brain3_* dari keluaran modul. Hanya kode yang BENAR-BENAR dikembalikan
- *  modul — pipeline tidak pernah mengarang alasan. */
+/**
+ * Kumpulkan kode brain3_* dari keluaran modul. Hanya kode yang BENAR-BENAR dikembalikan
+ * modul — pipeline tidak pernah mengarang alasan.
+ *
+ * KENAPA KOSAKATA TUTOR TIDAK DINAIKKAN KE brain3_. `TutorBrain.decideMove()` selalu memberi
+ * alasan, dan alasannya bagus: on_track, miss_streak, persistent_misconception, too_easy,
+ * cognitive_load_high, dan sembilan lainnya. Tetapi kosakatanya BUKAN brain3_*, jadi saringan
+ * di bawah membuangnya. Godaannya jelas: tempel awalan, jadikan 'brain3_tutor_on_track', dan
+ * cakupan alasan langsung 100%.
+ *
+ * Itu tidak dilakukan. Kode brain3_* adalah klaim bahwa modul yang memutuskan menerbitkan kode
+ * itu; kode hasil tempelan akan terlihat persis sama di trace, dan pembeli yang memeriksa tidak
+ * punya cara membedakan kode asli dari kode buatan pencatat. Kontrak trace menyebutnya lebih
+ * dulu: "trace mencatat alasan, ia tidak menciptakannya." Sebagai gantinya alasan tutor dicatat
+ * APA ADANYA di `trace.decisionReason` — tanpa pemetaan, tanpa awalan, hilang nol.
+ *
+ * Maka trace punya dua lapis penjelasan yang berbeda asalnya, dan perbedaan itu disengaja:
+ *   reasonCodes     — kode brain3_* dari modul-modul PENGUKUR (bukti, mastery, ingatan,
+ *                     afek, kalibrasi, prior, miskonsepsi). Kosakata terkunci, bisa dihitung.
+ *   decisionReason  — satu alasan verbatim dari modul PEMUTUS. Selalu ada, tidak diterjemahkan.
+ */
 function collectReasons(outputs) {
   const out = [];
   for (const o of outputs) {
@@ -330,4 +439,5 @@ function newSession(learner, now) {
   };
 }
 
-module.exports = { createLearner, newSession, answer, ability, normalizeDecision, collectReasons };
+module.exports = {
+  MOVE_TO_DECISION, createLearner, newSession, answer, ability, normalizeDecision, collectReasons };

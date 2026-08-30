@@ -27,7 +27,7 @@ const T0 = 1_700_000_000_000;
 const DAY = 86_400_000;
 const Q = {
   id: 'g-past-simple-1', concept: 'past-simple', lesson: 'past-simple',
-  level: 'A2', domain: 'grammar', mode: 'mcq', stemLength: 40
+  level: 'A2', domain: 'grammar', mode: 'complete_sentence', stemLength: 40
 };
 
 /**

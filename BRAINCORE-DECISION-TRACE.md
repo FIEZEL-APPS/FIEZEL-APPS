@@ -64,7 +64,9 @@ that read source as text. It is only visible if the decisions actually taken can
 | `misconceptionState` | `FiezelMisconceptionLedger.active()` → count + top code | What it thought was wrong |
 | `difficultyState` | `{prior, effective, target}` — ItemPrior / ItemCalibration / `affectTargetSuccess()` | How hard it aimed |
 | `decision` | closed enum (§5) | What it chose |
-| `reasonCodes` | existing `brain3_*` vocabulary | **Why** |
+| `decisionRaw` | `decideMove().move`, verbatim | *(Phase F)* The word before the enum flattened it |
+| `decisionReason` | `decideMove().reason`, verbatim | *(Phase F)* **Why**, in the decider's own vocabulary |
+| `reasonCodes` | existing `brain3_*` vocabulary | **Why**, from the measuring modules |
 | `confidence` | 0–1 | How sure it was |
 
 **Nothing was invented.** Every field maps to a value that already exists. Fields that answer no
@@ -85,11 +87,48 @@ useless as no trace.
 
 Taken from what `fiezel-tutor-brain.js` actually returns (`decideMove`/`escalate`). Anything else
 throws. `unknown` exists on purpose: a caller that doesn't know says so, rather than being
-defaulted to `continue`.
+defaulted to `continue`. **The enum is not where the Phase F gap was** — see limit 6 in §8: the
+vocabulary was fine, the *pipeline's map into it* covered 3 of 8 tutor moves.
 
 **`reasonCodes`** — must match `^brain3_[a-z0-9_]+$`. There are already **142 distinct
 `brain3_*` codes** across `features/brain/`. The trace **records** reasons; it does not invent
 them. A new code must be born in the module that makes the decision.
+
+**`decisionRaw` / `decisionReason`** *(added in Phase F; additive, so a v1 reader that ignores
+unknown fields is unaffected — and nothing had consumed v1 outside this branch)* — both are
+locked to `^[a-z][a-z0-9_]{0,63}$`. A value that isn't a short slug **throws**; it is not
+trimmed to fit. These fields take strings from another module, which makes them exactly the kind
+of channel a learner's name eventually slips through, so the shape is enforced rather than
+sanitised.
+
+### Why the tutor's reasons were not promoted into `brain3_*`
+
+`TutorBrain.decideMove()` always gives a reason — `on_track`, `miss_streak`,
+`persistent_misconception`, `too_easy`, `cognitive_load_high`, and nine more. None of them are
+`brain3_*` codes, so the `reasonCodes` filter drops all of them. The one-line fix is obvious:
+prefix them, and reason coverage jumps to 100%.
+
+That was not done. A `brain3_*` code is a claim that *the deciding module published this code*.
+A prefixed code looks **identical** in the trace, and no outside reviewer could tell the two
+apart. So the tutor's reason is recorded **verbatim** in `decisionReason` instead — no mapping,
+no prefix, nothing lost. The trace therefore carries two layers of explanation with deliberately
+different provenance:
+
+- `reasonCodes` — `brain3_*` codes from the **measuring** modules (evidence, memory, affect,
+  calibration, prior, misconception ledger). Locked vocabulary, countable across releases.
+- `decisionReason` — one verbatim reason from the **deciding** module. Always present, untranslated.
+
+`braincore-explainability-test.js` §0 enforces this mechanically: every code the pipeline emits
+must be findable as a literal inside `features/brain/` source, and no code may equal
+`brain3_tutor_<any tutor reason>`.
+
+### Why `decisionRaw` exists
+
+The enum is deliberately coarse so two Braincore releases can be compared on one vocabulary. But
+mapping `stretch` → `advance` is a **claim**, and `celebrate` → `continue` genuinely loses
+information (they are not the same pedagogically). `decisionRaw` keeps the original word, so the
+mapping can be *checked* rather than trusted — the gate asserts
+`normalizeDecision(decisionRaw) === decision` on every trace.
 
 ## 6. `movedState()` — the question Phase C and E will ask
 
@@ -123,7 +162,20 @@ are built on exactly this.
    module that reads the clock is not deterministic and cannot be compared across runs.
 4. **It is not a store.** Retention, capping and where traces live are Phase C's decisions, not
    this contract's.
+5. **Coverage is not the same as informativeness** *(measured in Phase F, worth saying plainly)*.
+   Every decision now carries reason codes, but in a short run most of those codes report
+   *insufficient data* — `brain3_item_calibration_prior_only` and
+   `brain3_affect_insufficient_evidence` fire on nearly every answer, because calibration needs
+   `MIN_N_APPLY` observations and affect needs a filled window. Those codes are accurate, not
+   filler: "I do not have enough evidence yet" is a real reason. But a buyer reading "10/10
+   decisions explained" should know that a large share of the explanation, early in a learner's
+   life, is the engine correctly saying it does not know enough yet.
+6. **The enum mapping lived outside this module and was incomplete until Phase F.** The closed
+   vocabulary in §5 was never wrong; the *pipeline's* map into it covered only 3 of the tutor's
+   8 moves, so `breathe`, `consolidate`, `celebrate`, `stretch` and `wrapup` were recorded as
+   `unknown`. That is now total, and read from tutor source by the gate so a ninth move turns it
+   red instead of quietly becoming `unknown` again.
 
 ---
 
-*End of contract v1.*
+*End of contract v1. Fields `decisionRaw` and `decisionReason` added in Phase F (additive).*

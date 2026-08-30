@@ -140,6 +140,30 @@
     return out;
   }
 
+  /**
+   * Nilai MENTAH dari modul yang memutuskan, dicatat apa adanya.
+   *
+   * KENAPA FIELD INI ADA. `decision` adalah enum tertutup dan portabel — sengaja kasar, supaya
+   * dua rilis Braincore (dan kelak mesin lain) bisa dibandingkan pada kosakata yang sama.
+   * Tetapi memetakan `stretch` menjadi `advance` adalah sebuah KLAIM, dan klaim yang tidak
+   * bisa ditelusuri balik adalah kehilangan bukti. Dua field ini menyimpan kata aslinya:
+   * `decisionRaw` = `TutorBrain.decideMove().move`, `decisionReason` = `.reason`. Dengan
+   * keduanya, pemetaan enum bisa DIPERIKSA, bukan dipercaya.
+   *
+   * KENAPA DILEMPAR, BUKAN DIBERSIHKAN DIAM-DIAM. Field ini menerima string dari modul lain,
+   * jadi ia adalah kanal yang bisa disalahgunakan untuk menitipkan teks bebas (dan lewat teks
+   * bebas, identitas murid). Karena itu bentuknya dikunci ke slug pendek: bukan slug = galat,
+   * bukan "dipotong sampai muat". Nilai kosong sah dan menjadi null.
+   */
+  function slugOrNull(v, field) {
+    var t = str(v).trim();
+    if (!t) return null;
+    if (!/^[a-z][a-z0-9_]{0,63}$/.test(t)) {
+      throw new Error(SCHEMA + ': ' + field + ' "' + t + '" bukan slug pendek [a-z][a-z0-9_]{0,63}');
+    }
+    return t;
+  }
+
   /** Potret mastery SEBELUM/SESUDAH. Bentuknya mengikuti FiezelMasteryBKT.mastery(): {L,n}. */
   function masterySnapshot(m) {
     if (!m || typeof m !== 'object') return null;
@@ -178,6 +202,8 @@
    * @param {object} [input.misconceptionState] {activeCount, topCode}
    * @param {object} [input.difficultyState] {prior, effective, target}
    * @param {string} input.decision          salah satu DECISIONS
+   * @param {string} input.decisionRaw       kata asli modul pemutus, sebelum dipetakan (opsional)
+   * @param {string} input.decisionReason    alasan verbatim modul pemutus (opsional)
    * @param {string[]} input.reasonCodes     kode brain3_*
    * @param {number} input.confidence        0..1
    */
@@ -224,6 +250,9 @@
         target: clamp01(diff.target) === null ? null : round3(clamp01(diff.target))
       } : null,
       decision: decision,
+      // Kata asli modul pemutus, sebelum dipetakan ke enum. null = pemanggil tidak memberinya.
+      decisionRaw: slugOrNull(src.decisionRaw, 'decisionRaw'),
+      decisionReason: slugOrNull(src.decisionReason, 'decisionReason'),
       reasonCodes: normalizeReasonCodes(src.reasonCodes),
       confidence: clamp01(src.confidence) === null ? null : round3(clamp01(src.confidence))
     };
@@ -254,7 +283,9 @@
       'concept=' + (trace.conceptId || '?'),
       'ok=' + (trace.evidence && trace.evidence.correct === null ? '?' : String(trace.evidence.correct)),
       'kappa=' + (trace.evidence && trace.evidence.kappa === null ? '?' : String(trace.evidence.kappa)),
-      'decision=' + trace.decision,
+      'decision=' + trace.decision
+        + (trace.decisionRaw && trace.decisionRaw !== trace.decision ? '(' + trace.decisionRaw + ')' : '')
+        + (trace.decisionReason ? ':' + trace.decisionReason : ''),
       'moved=' + (movedState(trace) ? 'yes' : 'no')
     ];
     if (trace.reasonCodes && trace.reasonCodes.length) parts.push('why=' + trace.reasonCodes.join(','));

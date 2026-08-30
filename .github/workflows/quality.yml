@@ -762,6 +762,14 @@ jobs:
           # datang dari MURID yang berbeda, bukan dari BUKTI yang berbeda. §0 menguji
           # isolasi cabang LEBIH DULU — tanpa itu setiap perbandingan rapi tetapi salah.
           node braincore-counterfactual-test.js
+          # Fase 2 / Phase F: keterjelasan. Sebelum fase ini, jawaban benar biasa dan salah
+          # biasa — dua kejadian paling sering di seluruh produk — tercatat TANPA satu pun
+          # kode alasan; hanya bukti yang didiskon yang menghasilkan penjelasan. Gerbang ini
+          # menuntut setiap keputusan membawa alasan, menuntut kedelapan gerakan tutor
+          # benar-benar tercapai lewat pipeline (bukan hanya terpetakan), dan — yang paling
+          # penting — menolak alasan KARANGAN: setiap kode brain3_* yang keluar harus bisa
+          # ditemukan sebagai literal di dalam sumber features/brain/.
+          node braincore-explainability-test.js
           node fiezel-stat-gate-test.js
           node id-golden-snapshot-test.js
           node learning-lane-test.js
