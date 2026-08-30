@@ -224,9 +224,18 @@ const SCENARIOS = [
   { name: 'protocol 1.6 di /health', mut: { protocol: '1.6' }, expect: 'health-protocol' },
   { name: '/health menjawab 404 (rute tidak terpasang)', mut: { health404: true }, expect: 'health-not-404' },
 
-  { name: '/api/config menyalakan satu flag', mut: { flagsOverride: { cfAiEnabled: true } }, expect: 'config-flags-false' },
+  /* 2026-08-30: racunnya mengikuti kontrak baru. Dulu MENYALAKAN cfAiEnabled dianggap racun,
+     karena gerbang menuntut "semua flag false" - keadaan sebelum rollout. Sejak
+     wrangler.toml menyatakan FEATURE_AI="on" dan ANALYTICS_ENABLED="on", menyalakan AI
+     bukan lagi pelanggaran, jadi memakainya sebagai racun berarti menuntut gerbang merah
+     terhadap keadaan produksi yang benar.
+     Racun yang sah sekarang: menyalakan sesuatu yang BELUM dirilis. Skenario 'sesuai rollout'
+     ditambahkan supaya arah sebaliknya juga terbukti - AI menyala TIDAK boleh membuat gerbang
+     merah, kalau tidak kita cuma memindahkan kesalahan yang sama ke tempat lain. */
+  { name: '/api/config menyalakan tts yang belum dirilis', mut: { flagsOverride: { cfTtsEnabled: true } }, expect: 'config-flags-staged' },
+  { name: '/api/config sesuai rollout (ai+analytics menyala) HARUS lulus', mut: { flagsOverride: { cfAiEnabled: true, cfAnalyticsEnabled: true } }, expect: null },
   { name: '/api/config mengirim flags kosong (uji anti-vakum)', mut: { flagsEmpty: true }, expect: 'config-flags-present' },
-  { name: '/api/config menyalakan kill switch ai', mut: { killOverride: { ai: true } }, expect: 'config-killswitch-false' },
+  { name: '/api/config menyalakan kill switch coach yang belum dirilis', mut: { killOverride: { coach: true } }, expect: 'config-killswitch-staged' },
 
   { name: '/api/quota 200 tanpa cookie', mut: { quotaLeak: true }, expect: 'quota-401' },
   { name: '/api/user/me 200 tanpa cookie', mut: { meLeak: true }, expect: 'me-401' },
@@ -310,9 +319,18 @@ const SCENARIOS = [
     matrix.every(m => Array.isArray(m.assertGagal)), matrix.length + ' skenario');
   check('Berkas laporan diarahkan ke temp, working tree tidak dikotori',
     !fs.existsSync(path.join(__dirname, 'CF-LIVE-REPORT.json')), 'CF-LIVE-REPORT.json tidak ada di akar');
-  check('Matriks memuat satu skenario benar dan ≥15 variasi salah',
-    SCENARIOS.filter(s => s.expect === null).length === 1 && SCENARIOS.filter(s => s.expect !== null).length >= 15,
-    SCENARIOS.length + ' skenario total');
+  /* 2026-08-30: batasnya dulu "TEPAT satu skenario benar". Maksud aslinya jelas dan tetap
+     dijaga - matriks tidak boleh berisi banyak skenario lulus yang menutupi kurangnya racun.
+     Tetapi "tepat satu" juga melarang hal yang justru berharga: membuktikan gerbang TIDAK
+     merah pada keadaan yang benar tapi tidak sepele, mis. rollout AI+analytics yang disengaja.
+     Tanpa skenario semacam itu, satu-satunya cara membuat gerbang hijau adalah melonggarkannya,
+     dan tidak ada yang membuktikan ia masih membedakan "benar" dari "salah".
+     Jadi: minimal satu skenario benar, rasio racun tetap dituntut (>=15 dan mayoritas). */
+  const benar = SCENARIOS.filter(s => s.expect === null).length;
+  const racun = SCENARIOS.filter(s => s.expect !== null).length;
+  check('Matriks memuat skenario benar (>=1) dan didominasi variasi salah (>=15)',
+    benar >= 1 && racun >= 15 && racun > benar * 3,
+    SCENARIOS.length + ' skenario total: ' + benar + ' benar, ' + racun + ' racun');
 
   console.log('\n=== MATRIKS SELF-TEST cf-live-contract-test.js ===');
   for (const row of matrix) {

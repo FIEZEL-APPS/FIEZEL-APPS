@@ -281,12 +281,37 @@ async function run() {
   // hampa. Objek kosong = gerbang merah, bukan gerbang senang.
   check('config-flags-present', '/api/config memuat objek `flags` yang tidak kosong',
     !!flags && Object.keys(flags).length > 0, flags ? Object.keys(flags).join(',') : '(tidak ada)');
-  const flagsOn = flags ? Object.keys(flags).filter(k => flags[k] !== false) : [];
-  check('config-flags-false', 'Semua flag klien masih false (FEATURE_* off)',
-    !!flags && flagsOn.length === 0, flagsOn.length ? 'menyala: ' + flagsOn.join(',') : 'semua false');
-  const killOn = kill ? Object.keys(kill).filter(k => kill[k] !== false) : [];
-  check('config-killswitch-false', 'Semua kill switch server masih false',
-    !!kill && killOn.length === 0, killOn.length ? 'menyala: ' + killOn.join(',') : 'semua false');
+  /* 2026-08-30: dua assert ini dulu berbunyi "SEMUA flag/kill switch masih false", yaitu
+   * keadaan SEBELUM rollout. Keadaan itu sudah tidak benar dan repo sendiri sudah
+   * mengatakannya: workers/api/wrangler.toml menyatakan FEATURE_AI="on",
+   * ANALYTICS_ENABLED="on", FEATURE_SOCIAL="on", dengan komentar yang mengakui
+   * "Baris ini dulu berbunyi 'SEMUA MATI' - sudah tidak benar sejak FEATURE_AI dinyalakan."
+   * Jadi gerbang ini merah terhadap penyalaan yang DISENGAJA dan sudah ter-commit.
+   *
+   * Melonggarkannya jadi "apa saja boleh" akan membuang penjagaannya. Yang dilakukan:
+   * assert dibalik menjadi DAFTAR YANG MASIH HARUS MATI. Itu justru lebih ketat daripada
+   * bentuk lama untuk keadaan hari ini - ia menangkap penyalaan tak sengaja pada tts,
+   * coach, dan lane pembelajaran, sesuatu yang bentuk lama tidak bisa lakukan karena ia
+   * sudah merah oleh AI/analytics dan tenggelam sebagai gerbang yang "memang selalu merah".
+   *
+   * Menambah nama ke daftar ini adalah keputusan rollout OWNER, bukan keputusan wave. */
+  const HARUS_MATI = ['tts', 'coach', 'learning'];
+  const menyalaTerlarang = (obj) => obj
+    ? Object.keys(obj).filter(k => obj[k] !== false
+        && HARUS_MATI.some(m => k.toLowerCase().includes(m)))
+    : [];
+
+  const flagsTerlarang = menyalaTerlarang(flags);
+  check('config-flags-staged', 'Flag klien: yang belum dirilis (tts/coach/learning) tetap mati',
+    !!flags && flagsTerlarang.length === 0,
+    flagsTerlarang.length ? 'menyala padahal belum dirilis: ' + flagsTerlarang.join(',')
+      : 'menyala sesuai rollout: ' + (Object.keys(flags || {}).filter(k => flags[k] !== false).join(',') || '(nihil)'));
+
+  const killTerlarang = menyalaTerlarang(kill);
+  check('config-killswitch-staged', 'Kill switch server: yang belum dirilis tetap mati',
+    !!kill && killTerlarang.length === 0,
+    killTerlarang.length ? 'menyala padahal belum dirilis: ' + killTerlarang.join(',')
+      : 'menyala sesuai rollout: ' + (Object.keys(kill || {}).filter(k => kill[k] !== false).join(',') || '(nihil)'));
   check('config-protocol', '/api/config mengembalikan protocol="' + PROTOCOL_EXPECTED + '"',
     !!config.json && config.json.protocol === PROTOCOL_EXPECTED,
     'protocol=' + JSON.stringify(config.json && config.json.protocol));
