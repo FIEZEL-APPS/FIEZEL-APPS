@@ -1,0 +1,506 @@
+{
+ "home": {
+  "boxes": 12,
+  "maxBoxDepth": 2,
+  "contrastFails": [],
+  "contrastFailCount": 0,
+  "tiny": [
+   {
+    "txt": "Belum diukur · mulai di sini",
+    "fs": 11.5
+   },
+   {
+    "txt": "Belum diukur · mulai di sini",
+    "fs": 11.5
+   },
+   {
+    "txt": "Belum diukur · mulai di sini",
+    "fs": 11.5
+   },
+   {
+    "txt": "Belum diukur · mulai di sini",
+    "fs": 11.5
+   },
+   {
+    "txt": "SEGERA",
+    "fs": 9.3
+   }
+  ],
+  "tinyCount": 5,
+  "smallTargets": [],
+  "smallCount": 0,
+  "capsCount": 5,
+  "longCount": 0
+ },
+ "vocab": {
+  "boxes": 6,
+  "maxBoxDepth": 1,
+  "contrastFails": [
+   {
+    "txt": "Vocabulary Hub",
+    "cr": 1,
+    "fs": 26.4,
+    "fw": 700,
+    "need": 3,
+    "cls": ""
+   }
+  ],
+  "contrastFailCount": 1,
+  "tiny": [
+   {
+    "txt": "Ganti",
+    "fs": 10.6
+   }
+  ],
+  "tinyCount": 1,
+  "smallTargets": [],
+  "smallCount": 0,
+  "capsCount": 0,
+  "longCount": 0
+ },
+ "grammar": {
+  "boxes": 4,
+  "maxBoxDepth": 0,
+  "contrastFails": [
+   {
+    "txt": "Grammar Hub",
+    "cr": 1,
+    "fs": 26.4,
+    "fw": 700,
+    "need": 3,
+    "cls": ""
+   }
+  ],
+  "contrastFailCount": 1,
+  "tiny": [
+   {
+    "txt": "Ganti",
+    "fs": 10.6
+   },
+   {
+    "txt": "Soal pilihan boleh bervariasi, tet",
+    "fs": 11.1
+   },
+   {
+    "txt": "Merasa sudah bisa? Buktikan kapan ",
+    "fs": 10.6
+   },
+   {
+    "txt": "Lewati materi",
+    "fs": 11.2
+   },
+   {
+    "txt": "Lewati materi",
+    "fs": 11.2
+   },
+   {
+    "txt": "Lewati materi",
+    "fs": 11.2
+   }
+  ],
+  "tinyCount": 32,
+  "smallTargets": [
+   {
+    "t": "Lewati materi",
+    "h": 24,
+    "w": 97,
+    "cls": "lesson-skip-link"
+   },
+   {
+    "t": "Lewati materi",
+    "h": 24,
+    "w": 97,
+    "cls": "lesson-skip-link"
+   },
+   {
+    "t": "Lewati materi",
+    "h": 24,
+    "w": 97,
+    "cls": "lesson-skip-link"
+   },
+   {
+    "t": "Lewati materi",
+    "h": 24,
+    "w": 97,
+    "cls": "lesson-skip-link"
+   },
+   {
+    "t": "Lewati materi",
+    "h": 24,
+    "w": 97,
+    "cls": "lesson-skip-link"
+   },
+   {
+    "t": "Lewati materi",
+    "h": 24,
+    "w": 97,
+    "cls": "lesson-skip-link"
+   },
+   {
+    "t": "Lewati materi",
+    "h": 24,
+    "w": 97,
+    "cls": "lesson-skip-link"
+   },
+   {
+    "t": "Lewati materi",
+    "h": 24,
+    "w": 97,
+    "cls": "lesson-skip-link"
+   },
+   {
+    "t": "Lewati materi",
+    "h": 24,
+    "w": 97,
+    "cls": "lesson-skip-link"
+   },
+   {
+    "t": "Lewati materi",
+    "h": 24,
+    "w": 97,
+    "cls": "lesson-skip-link"
+   }
+  ],
+  "smallCount": 29,
+  "capsCount": 0,
+  "longCount": 0
+ },
+ "reading": {
+  "boxes": 7,
+  "maxBoxDepth": 1,
+  "contrastFails": [
+   {
+    "txt": "Ruang Reading",
+    "cr": 1,
+    "fs": 26.4,
+    "fw": 700,
+    "need": 3,
+    "cls": ""
+   }
+  ],
+  "contrastFailCount": 1,
+  "tiny": [
+   {
+    "txt": "Ganti",
+    "fs": 10.6
+   }
+  ],
+  "tinyCount": 1,
+  "smallTargets": [],
+  "smallCount": 0,
+  "capsCount": 0,
+  "longCount": 2
+ },
+ "skills": {
+  "boxes": 11,
+  "maxBoxDepth": 1,
+  "contrastFails": [
+   {
+    "txt": "Skills Lab",
+    "cr": 1,
+    "fs": 26.4,
+    "fw": 700,
+    "need": 3,
+    "cls": ""
+   }
+  ],
+  "contrastFailCount": 1,
+  "tiny": [
+   {
+    "txt": "Ganti",
+    "fs": 10.6
+   },
+   {
+    "txt": "FIEZEL SKILLS LAB",
+    "fs": 11.2
+   },
+   {
+    "txt": "Listening",
+    "fs": 11.2
+   },
+   {
+    "txt": "Listening berformat ujian",
+    "fs": 11.2
+   },
+   {
+    "txt": "Speaking",
+    "fs": 11.2
+   },
+   {
+    "txt": "Latihan berformat ujian",
+    "fs": 11.2
+   }
+  ],
+  "tinyCount": 8,
+  "smallTargets": [],
+  "smallCount": 0,
+  "capsCount": 7,
+  "longCount": 2
+ },
+ "listening": {
+  "boxes": 12,
+  "maxBoxDepth": 2,
+  "contrastFails": [],
+  "contrastFailCount": 0,
+  "tiny": [
+   {
+    "txt": "Listening · A2 · inference",
+    "fs": 11.2
+   },
+   {
+    "txt": "fsl.listening-disclaimer",
+    "fs": 11.5
+   },
+   {
+    "txt": "Belum diputar",
+    "fs": 11.5
+   },
+   {
+    "txt": "Runtun 0/5",
+    "fs": 11.2
+   },
+   {
+    "txt": "gems.price-hint",
+    "fs": 11.2
+   }
+  ],
+  "tinyCount": 5,
+  "smallTargets": [],
+  "smallCount": 0,
+  "capsCount": 2,
+  "longCount": 0
+ },
+ "speaking": {
+  "boxes": 5,
+  "maxBoxDepth": 1,
+  "contrastFails": [
+   {
+    "txt": "A2",
+    "cr": 4.24,
+    "fs": 13.1,
+    "fw": 700,
+    "need": 4.5,
+    "cls": ""
+   }
+  ],
+  "contrastFailCount": 1,
+  "tiny": [
+   {
+    "txt": "Speaking · A2 · guided_response",
+    "fs": 11.2
+   }
+  ],
+  "tinyCount": 1,
+  "smallTargets": [],
+  "smallCount": 0,
+  "capsCount": 2,
+  "longCount": 1
+ },
+ "writing": {
+  "boxes": 7,
+  "maxBoxDepth": 1,
+  "contrastFails": [],
+  "contrastFailCount": 0,
+  "tiny": [
+   {
+    "txt": "Ganti",
+    "fs": 10.6
+   },
+   {
+    "txt": "0 kata",
+    "fs": 11.8
+   },
+   {
+    "txt": "Target sekitar 70 kata",
+    "fs": 11.8
+   }
+  ],
+  "tinyCount": 3,
+  "smallTargets": [],
+  "smallCount": 0,
+  "capsCount": 2,
+  "longCount": 1
+ },
+ "test": {
+  "boxes": 15,
+  "maxBoxDepth": 1,
+  "contrastFails": [
+   {
+    "txt": "Tes Kemampuan Dasar",
+    "cr": 1,
+    "fs": 26.4,
+    "fw": 700,
+    "need": 3,
+    "cls": ""
+   }
+  ],
+  "contrastFailCount": 1,
+  "tiny": [
+   {
+    "txt": "Ganti",
+    "fs": 10.6
+   }
+  ],
+  "tinyCount": 1,
+  "smallTargets": [],
+  "smallCount": 0,
+  "capsCount": 1,
+  "longCount": 1
+ },
+ "progress": {
+  "boxes": 32,
+  "maxBoxDepth": 1,
+  "contrastFails": [
+   {
+    "txt": "Peta Belajar & Lab",
+    "cr": 1,
+    "fs": 26.4,
+    "fw": 700,
+    "need": 3,
+    "cls": ""
+   },
+   {
+    "txt": "Mulai sesi",
+    "cr": 1.06,
+    "fs": 13.8,
+    "fw": 700,
+    "need": 4.5,
+    "cls": "core-cta"
+   }
+  ],
+  "contrastFailCount": 2,
+  "tiny": [
+   {
+    "txt": "Ganti",
+    "fs": 10.6
+   },
+   {
+    "txt": "Selesaikan 1 sesi lesson grammar",
+    "fs": 11.2
+   },
+   {
+    "txt": "Lulus 1 Ujian Skip Level",
+    "fs": 11.2
+   },
+   {
+    "txt": "Tamatkan 1 buku Perpustakaan",
+    "fs": 11.2
+   },
+   {
+    "txt": "Jaga runtun 7 hari",
+    "fs": 11.2
+   },
+   {
+    "txt": "Jaga runtun 30 hari",
+    "fs": 11.2
+   }
+  ],
+  "tinyCount": 9,
+  "smallTargets": [
+   {
+    "t": "Sekolah",
+    "h": 36,
+    "w": 73,
+    "cls": "journey-goal-chip is-active"
+   },
+   {
+    "t": "IT dan teknologi",
+    "h": 36,
+    "w": 117,
+    "cls": "journey-goal-chip"
+   },
+   {
+    "t": "Beasiswa",
+    "h": 36,
+    "w": 81,
+    "cls": "journey-goal-chip"
+   },
+   {
+    "t": "Persiapan IELTS/TOEFL",
+    "h": 36,
+    "w": 159,
+    "cls": "journey-goal-chip"
+   },
+   {
+    "t": "@fitrarustqi",
+    "h": 22,
+    "w": 118,
+    "cls": "creator-link"
+   }
+  ],
+  "smallCount": 5,
+  "capsCount": 3,
+  "longCount": 0
+ },
+ "classroom": {
+  "boxes": 9,
+  "maxBoxDepth": 1,
+  "contrastFails": [],
+  "contrastFailCount": 0,
+  "tiny": [
+   {
+    "txt": "FIEZEL · ADAPTIVE HUMAN TUTOR",
+    "fs": 10.4
+   },
+   {
+    "txt": "CHOOSE A SUBJECT",
+    "fs": 10.4
+   },
+   {
+    "txt": "To be, tenses, articles",
+    "fs": 11.2
+   },
+   {
+    "txt": "16 lessons · 15 × A1",
+    "fs": 11.2
+   },
+   {
+    "txt": "Numbers, family, food, jobs",
+    "fs": 11.2
+   },
+   {
+    "txt": "9 lessons · 8 × A1",
+    "fs": 11.2
+   }
+  ],
+  "tinyCount": 14,
+  "smallTargets": [],
+  "smallCount": 0,
+  "capsCount": 2,
+  "longCount": 0
+ },
+ "library": {
+  "boxes": 9,
+  "maxBoxDepth": 0,
+  "contrastFails": [
+   {
+    "txt": "Perpustakaan",
+    "cr": 1,
+    "fs": 26.4,
+    "fw": 700,
+    "need": 3,
+    "cls": ""
+   }
+  ],
+  "contrastFailCount": 1,
+  "tiny": [
+   {
+    "txt": "Ringkasan FIEZEL",
+    "fs": 10
+   },
+   {
+    "txt": "Ringkasan FIEZEL",
+    "fs": 10
+   },
+   {
+    "txt": "Ringkasan FIEZEL",
+    "fs": 10
+   }
+  ],
+  "tinyCount": 3,
+  "smallTargets": [],
+  "smallCount": 0,
+  "capsCount": 1,
+  "longCount": 2
+ }
+}
