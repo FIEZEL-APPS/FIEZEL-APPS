@@ -974,3 +974,87 @@ berkurang satu pun**:
 
 Satu utang BARU yang jujur: jalur cangkang-dulu m025-211 diukur di Chromium saja. Perbaikan
 sebelumnya sudah dikonfirmasi OWNER di iPhone; yang ini belum.
+
+---
+
+# KEPUTUSAN OWNER — Puter dipertahankan utuh (2026-08-30)
+
+Ditanyakan OWNER: *"kapan AI Puter siap untuk diputuskan, dan disambungkan ke Cloudflare?"*
+Sesudah bukti di bawah dipaparkan, OWNER memutuskan: **"biarkan Puter utuh."**
+
+## Status keputusan
+
+**Larangan 1 di vonis akhir berubah sifat, bukan isinya.** Ia ditulis sebagai syarat teknis
+yang menunggu ("jangan buka `endpoints.ai` SAMPAI ketiga task lulus"). Ia kini **keputusan
+OWNER yang berdiri sendiri**: jalur AI Cloudflare tetap tertutup, dan murid tetap dilayani
+Puter.
+
+Tidak ada tindakan yang tertunda. `core-config.js` sudah menyetel `endpoints.ai:'off'`, dan
+aturan penggabungannya AND — flag server tidak bisa menyalakan apa yang mati di berkas itu.
+Keadaan yang diputuskan OWNER adalah keadaan yang sudah berjalan.
+
+## Kenapa ini keputusan yang berdiri di atas bukti
+
+### Gerbang 1 — mutu: penyebabnya BELUM TERUKUR, dan itu sendiri temuan
+
+Jalan live 2026-08-30 (run `33318247777`): 5 task menjawab HTTP 200, **`providerSuccesses: 2`**.
+`tutor_turn`, `writing_feedback`, dan `context_coach` memantul `prompt_scaffold_echo`.
+
+Sebabnya **tidak bisa ditentukan dari bukti yang ada**, karena Worker membuang buktinya:
+`AiTasks.checkOutputContract()` mengembalikan potongan teks yang memicu penolakan (field
+`echo`), tetapi `workers/api/ai/route-ai.js` hanya menyimpan NAMA kegagalannya
+(`failureReason`) dan membuang potongannya — baik di respons maupun di `recordFailure()`.
+
+Upaya menyimpulkannya dari kode saja **gagal, dan gagalnya informatif**: `session_recap`
+LOLOS padahal rangka promptnya hampir selengkap ketiga yang gagal (GUARD, klausa gaya,
+`weakSkills:`, `Tugas:`). Jadi hipotesis "rangkanya bocor" tidak menjelaskan pembelahannya,
+dan tersisa tiga sebab dengan biaya sangat berbeda:
+
+| kemungkinan | biaya |
+|---|---|
+| detektornya salah tuduh | kecil — perketat pola |
+| bentuk prompt memancing model memantulkan label | kecil–sedang |
+| model tidak sanggup | sedang — ganti model / few-shot |
+
+`ai-tasks.js` memperingatkan kemungkinan pertama dengan kalimatnya sendiri: *"pemeriksa yang
+menolak segalanya sama merusaknya dengan yang meloloskan."*
+
+**Jarak ke jawaban: satu perubahan kecil** — bawa `echo` ke catatan kegagalan — lalu satu
+jalan live (±US$0,002). Tidak dikerjakan: men-deploy Worker adalah tindakan produksi ke luar,
+di luar pra-izin OWNER yang mencakup git/GitHub di repo.
+
+**Temuan sampingan:** `promptTutorTurn()` (`ai-tasks.js:903`) mengirim `Permukaan: ` dan
+`Fokus materi: ` sebagai **label kosong menggantung** bila klien tidak mengisinya.
+
+### Gerbang 2 — kapasitas: ini yang sesungguhnya mengunci
+
+Aritmetika, bukan mutu. Ia **tidak hilang** walau gerbang 1 selesai besok.
+
+Diukur pada jalan live yang sama: **5 panggilan model = ±252,5 neuron** ⇒ **±50 neuron per
+panggilan**.
+
+| | |
+|---|---|
+| plafon akun (`GLOBAL_NEURON_CAP`, harian UTC) | **8.000 neuron/hari** |
+| ⇒ kapasitas seluruh aplikasi | **±160 panggilan AI/hari** |
+| jatah per murid (`AI_LIMIT_PER_DAY`) | **25 panggilan/hari** |
+| ⇒ murid yang memakai jatahnya penuh | **±6 orang** menghabiskan kuota SELURUH akun |
+| `MAX_USERS` yang disetel | **250** |
+
+Memutus Puter pada angka ini berarti murid ke-7 dan seterusnya kehilangan AI setiap hari.
+
+**Batas kejujuran angka itu:** 50 neuron/panggilan adalah PERKIRAAN — laporan alatnya sendiri
+menyebut perhitungannya memakai setengah plafon token, dan keluaran yang ditolak kontrak mutu
+tetap dibayar. Yang bisa memastikannya hanya dashboard Cloudflare milik OWNER.
+
+## Syarat kalau keputusan ini ditinjau ulang
+
+Bukan tanggal, dua syarat:
+
+1. **5/5 task lulus kontrak mutu terhadap model hidup** (sekarang 2/5, dan sebabnya belum
+   terukur).
+2. **Kapasitas cukup untuk jumlah murid yang ditargetkan.** Pada jatah gratis, angkanya ±6
+   murid aktif penuh per hari. Menaikkannya adalah keputusan BIAYA, milik OWNER.
+
+Selama keduanya belum terpenuhi, mempertahankan Puter bukan penundaan — ia pilihan yang
+lebih baik: murid mendapat AI yang bekerja, alih-alih cadangan yang jujur.
