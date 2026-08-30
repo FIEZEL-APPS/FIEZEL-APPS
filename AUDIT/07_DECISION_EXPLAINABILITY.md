@@ -120,6 +120,15 @@ provenance:
 findable as a **literal** in `features/brain/` source, and no code may equal
 `brain3_tutor_<any tutor reason>`. A fabricated code fails the build.
 
+### One reason source deliberately left uncollected
+
+`BKT.rootCause()` publishes `brain3_bkt_root_cause` and would add a good mastery-level reason
+here. It is **not** called — because `app.js` does not call it on this path either. Its only call
+site (`app.js:8338`) sits in the progress-panel **reading** path, not the per-answer **deciding**
+path this pipeline mirrors. Adding it would raise the coverage number while making the harness
+less faithful to the path it claims to measure — exactly the trade this phase refused. Recorded
+here so its absence reads as a decision rather than an oversight.
+
 ---
 
 ## 3. What changed

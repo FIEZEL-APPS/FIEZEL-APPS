@@ -403,6 +403,14 @@ function normalizeDecision(move) {
  *   reasonCodes     — kode brain3_* dari modul-modul PENGUKUR (bukti, mastery, ingatan,
  *                     afek, kalibrasi, prior, miskonsepsi). Kosakata terkunci, bisa dihitung.
  *   decisionReason  — satu alasan verbatim dari modul PEMUTUS. Selalu ada, tidak diterjemahkan.
+ *
+ * YANG SENGAJA TIDAK DIKUMPULKAN, supaya ketiadaannya tidak terbaca sebagai kelalaian.
+ * `BKT.rootCause()` menerbitkan brain3_bkt_root_cause dan akan menambah satu alasan bertingkat
+ * mastery yang bagus di sini. Ia TIDAK dipanggil, karena app.js juga tidak memanggilnya di jalur
+ * ini: satu-satunya pemanggilnya (app.js:8338) ada di jalur BACA panel kemajuan, bukan di jalur
+ * PUTUS per jawaban yang ditiru pipeline ini. Menambahkannya akan menaikkan angka cakupan sambil
+ * membuat pipeline kurang setia pada jalur yang diukurnya — persis pertukaran yang ditolak
+ * fase ini.
  */
 function collectReasons(outputs) {
   const out = [];
