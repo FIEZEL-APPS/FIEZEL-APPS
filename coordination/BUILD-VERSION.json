@@ -1,7 +1,7 @@
 {
-  "version": "m025-213",
+  "version": "m025-212",
   "claimedBy": "perplexity-computer (multilingual i18n wave, direbase atas m025-185)",
-  "claimedAt": "2026-08-30T19:35:45.735Z",
-  "reason": "Fase 2/G: tolok ukur jalur keputusan Braincore + perbaikan panggilan kalibrasi",
+  "claimedAt": "2026-08-30T19:37:58.985Z",
+  "reason": "A11 menuntut DIAG_BUILD tepat +1 dari base (211); dua kenaikan berturut membuatnya +2",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
