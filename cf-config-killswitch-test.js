@@ -559,8 +559,22 @@ async function boot(harness) { harness.runIdle(); await harness.api.cfConfigRefr
   await new Promise(resolve => setTimeout(() => { bootContinuationMs = Date.now() - bootStart; resolve(); }, 0));
   const configState = await bootProbe.api.cfConfigRefresh();
   const configMs = Date.now() - bootStart;
+  /* 2026-08-30: ambang bawah configMs diberi toleransi 15ms terhadap configDelayMs.
+     Bentuk lama menuntut `configMs >= 300` untuk penundaan 300ms, dan itu FLAKY: setTimeout
+     dijamin menunggu SEKURANG-KURANGNYA durasinya menurut jam timer, tetapi diukur dengan
+     Date.now() ia sah tiba di 299ms karena pembulatan/koalesensi timer. Terbukti di CI
+     2026-08-30 pada satu commit yang sama: run push HIJAU, run pull_request MERAH dengan
+     `boot=1ms config=299ms` - selisih 1ms, bukan perubahan perilaku.
+     Yang dijaga tidak berubah dan tetap berjarak ratusan milidetik: kelanjutan boot (<100ms)
+     selesai JAUH sebelum jawaban config tiba (~300ms). Gerbang yang merah karena undian
+     mengajari orang menjalankan ulang sampai hijau. */
+  const CONFIG_DELAY_MS = 300;
+  const TOLERANSI_TIMER_MS = 15;
   check('(g) diukur: kelanjutan boot selesai jauh sebelum jawaban /api/config tiba',
-    bootContinuationMs >= 0 && bootContinuationMs < 100 && configMs >= 300 && configState.status === 'ok',
+    bootContinuationMs >= 0 && bootContinuationMs < 100
+      && configMs >= CONFIG_DELAY_MS - TOLERANSI_TIMER_MS
+      && configMs > bootContinuationMs + 100
+      && configState.status === 'ok',
     `boot=${bootContinuationMs}ms config=${configMs}ms`);
   /* Keadaan repo hari ini. Bentuk lama assert ini: "semua statis off ⇒ NOL permintaan dan
    * NOL tugas terjadwal". Sejak A6 justru KEBALIKANNYA yang harus benar, dan ini inti
