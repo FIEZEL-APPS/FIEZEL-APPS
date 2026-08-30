@@ -48,23 +48,25 @@
   // Urutan tingkat untuk mini-path. Naik hanya kalau tingkat sebelumnya punya bukti.
   var PATH_LEVELS = ['A2', 'B1', 'B2'];
 
-  var SCHOLARSHIP_TASKS = [
-    {
-      id: 'formal_email',
-      label: t('academic.task-formal-email-label'),
-      practises: [t('academic.task-formal-email-p1'), t('academic.task-formal-email-p2'), t('academic.task-formal-email-p3')]
-    },
-    {
-      id: 'self_introduction',
-      label: t('academic.task-self-intro-label'),
-      practises: [t('academic.task-self-intro-p1'), t('academic.task-self-intro-p2'), t('academic.task-self-intro-p3')]
-    },
-    {
-      id: 'interview_practice',
-      label: t('academic.task-interview-label'),
-      practises: [t('academic.task-interview-p1'), t('academic.task-interview-p2'), t('academic.task-interview-p3')]
-    }
-  ];
+  function getScholarshipTasks() {
+    return [
+      {
+        id: 'formal_email',
+        label: t('academic.task-formal-email-label'),
+        practises: [t('academic.task-formal-email-p1'), t('academic.task-formal-email-p2'), t('academic.task-formal-email-p3')]
+      },
+      {
+        id: 'self_introduction',
+        label: t('academic.task-self-intro-label'),
+        practises: [t('academic.task-self-intro-p1'), t('academic.task-self-intro-p2'), t('academic.task-self-intro-p3')]
+      },
+      {
+        id: 'interview_practice',
+        label: t('academic.task-interview-label'),
+        practises: [t('academic.task-interview-p1'), t('academic.task-interview-p2'), t('academic.task-interview-p3')]
+      }
+    ];
+  }
 
   function clamp(value, min, max) {
     var n = Number(value);
@@ -218,7 +220,7 @@
       schema: SCHEMA,
       kind: 'scholarship-lab',
       generatedAt: new Date(now).toISOString(),
-      tasks: SCHOLARSHIP_TASKS.map(function (task) {
+      tasks: getScholarshipTasks().map(function (task) {
         return {
           id: task.id, label: task.label, practises: task.practises.slice(),
           // Menulis email formal memakai grammar; wawancara memakai kosakata. Prasyarat
@@ -259,7 +261,7 @@
     SCHEMA: SCHEMA,
     ACADEMIC_READING_TOPICS: ACADEMIC_READING_TOPICS,
     PATH_LEVELS: PATH_LEVELS,
-    SCHOLARSHIP_TASKS: SCHOLARSHIP_TASKS,
+    get SCHOLARSHIP_TASKS() { return getScholarshipTasks(); },
     buildFoundationMap: buildFoundationMap,
     buildAcademicReadingPath: buildAcademicReadingPath,
     buildScholarshipLab: buildScholarshipLab,
