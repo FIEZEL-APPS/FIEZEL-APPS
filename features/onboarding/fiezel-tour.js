@@ -56,6 +56,19 @@
   }
   function T(key, params) { return I18N ? I18N.t(key, params) : String(key); }
 
+  // Copy Thai dimuat setelah pemilih bahasa pertama selesai. Menyimpan hasil T() langsung
+  // saat modul dievaluasi membekukan copy Indonesia untuk seluruh umur halaman, walaupun
+  // locale kemudian sudah berubah ke `th`. Getter menjaga selector/identitas langkah tetap
+  // beku, tetapi mengambil judul dan isi dari locale AKTIF setiap kali tur dicat.
+  function localizedStep(id, target, titleKey, bodyKey) {
+    var step = { id: id, target: target };
+    Object.defineProperties(step, {
+      title: { enumerable: true, get: function () { return T(titleKey); } },
+      body: { enumerable: true, get: function () { return T(bodyKey); } }
+    });
+    return Object.freeze(step);
+  }
+
   var STORAGE_KEY = 'fiezel-tour-v1';
 
   /**
@@ -98,52 +111,17 @@
    * (reports/fix-tour.md §selector), bukan dibaca dari CSS.
    */
   var MENU_STEPS = Object.freeze([
-    Object.freeze({
-      id: 'home',
-      target: '.learning-launcher',
-      title: T('tour.menu-home-title'),
-      body: T('tour.menu-home-body')
-    }),
-    Object.freeze({
-      id: 'vocab-grammar',
-      target: '.bottomnav [data-view="vocab"]',
-      title: T('tour.menu-vocab-title'),
-      body: T('tour.menu-vocab-body')
-    }),
-    Object.freeze({
-      id: 'reading-peta',
-      target: '.bottomnav [data-view="reading"]',
-      title: T('tour.menu-reading-title'),
-      body: T('tour.menu-reading-body')
-    }),
-    Object.freeze({
-      id: 'ask',
-      target: '.topbar .ask-button',
-      title: T('tour.menu-ask-title'),
-      body: T('tour.menu-ask-body')
-    }),
-    Object.freeze({
-      id: 'level',
-      target: '.home-level-context',
-      title: T('tour.menu-level-title'),
-      body: T('tour.menu-level-body')
-    }),
-    Object.freeze({
-      id: 'settings',
-      target: '.topbar-actions [aria-label="Buka pengaturan"]',
-      title: T('tour.menu-settings-title'),
-      body: T('tour.menu-settings-body')
-    }),
+    localizedStep('home', '.learning-launcher', 'tour.menu-home-title', 'tour.menu-home-body'),
+    localizedStep('vocab-grammar', '.bottomnav [data-view="vocab"]', 'tour.menu-vocab-title', 'tour.menu-vocab-body'),
+    localizedStep('reading-peta', '.bottomnav [data-view="reading"]', 'tour.menu-reading-title', 'tour.menu-reading-body'),
+    localizedStep('ask', '.topbar .ask-button', 'tour.menu-ask-title', 'tour.menu-ask-body'),
+    localizedStep('level', '.home-level-context', 'tour.menu-level-title', 'tour.menu-level-body'),
+    localizedStep('settings', '.topbar-actions [aria-label="Buka pengaturan"]', 'tour.menu-settings-title', 'tour.menu-settings-body'),
     // PENUTUP. Targetnya wordmark FIEZEL - benda paling netral di layar, dan bukan pintu ke
     // fitur apa pun. Di sinilah tur menu berhenti: tidak ada langkah kedelapan yang membuka
     // Perpustakaan atau Listening, karena tur yang memindahkan layar sendiri berhenti menjadi
     // penjelasan dan berubah menjadi remote control.
-    Object.freeze({
-      id: 'penutup',
-      target: '.topbar .brand-button',
-      title: T('tour.menu-end-title'),
-      body: T('tour.menu-end-body')
-    })
+    localizedStep('penutup', '.topbar .brand-button', 'tour.menu-end-title', 'tour.menu-end-body')
   ]);
 
   // Pembaca buku. Langkah 2 TIDAK menunjuk pita subtitle `#fiezelSubtitle`: pita itu `hidden`
@@ -152,63 +130,23 @@
   // `.library-sentence` (364x72) - kontainer yang BENAR-BENAR terlihat dan memang yang nanti
   // ikut disorot saat dibacakan.
   var LIBRARY_STEPS = Object.freeze([
-    Object.freeze({
-      id: 'putar',
-      target: '#libraryPlay',
-      title: T('tour.lib-play-title'),
-      body: T('tour.lib-play-body')
-    }),
-    Object.freeze({
-      id: 'subtitle',
-      target: '.library-sentence',
-      title: T('tour.lib-subtitle-title'),
-      body: T('tour.lib-subtitle-body')
-    }),
+    localizedStep('putar', '#libraryPlay', 'tour.lib-play-title', 'tour.lib-play-body'),
+    localizedStep('subtitle', '.library-sentence', 'tour.lib-subtitle-title', 'tour.lib-subtitle-body'),
     // Toggle Gem Terjemahan adalah ID KONTRAK BERSAMA dengan pekerjaan gems yang berjalan
     // paralel (#fslTranslateToggle). Selama elemennya belum ada, resolveSteps melewatinya -
     // itu memang perilaku yang diinginkan, bukan kegagalan: tur menunjukkan apa yang ada.
-    Object.freeze({
-      id: 'terjemahan',
-      target: '#fslTranslateToggle, #libraryTranslateToggle',
-      title: T('tour.lib-translate-title'),
-      body: T('tour.lib-translate-body')
-    }),
-    Object.freeze({
-      id: 'kecepatan',
-      target: '.topbar-actions [aria-label="Buka pengaturan"]',
-      title: T('tour.lib-speed-title'),
-      body: T('tour.lib-speed-body')
-    })
+    localizedStep('terjemahan', '#fslTranslateToggle, #libraryTranslateToggle', 'tour.lib-translate-title', 'tour.lib-translate-body'),
+    localizedStep('kecepatan', '.topbar-actions [aria-label="Buka pengaturan"]', 'tour.lib-speed-title', 'tour.lib-speed-body')
   ]);
 
   // Sesi listening. Langkah 2 menunjuk `.fsl-privacy` (baris kejujuran di atas blok feedback)
   // dan bukan `[data-feedback]`: blok feedback ADA di DOM tetapi tingginya 0 px sampai jawaban
   // dinilai (diukur di probe: 326x0), jadi menyorotnya berarti menyorot garis tak terlihat.
   var LISTENING_STEPS = Object.freeze([
-    Object.freeze({
-      id: 'sekali-dengar',
-      target: '#speakingListeningRoot .fsl-card',
-      title: T('tour.listen-once-title'),
-      body: T('tour.listen-once-body')
-    }),
-    Object.freeze({
-      id: 'meleset',
-      target: '#speakingListeningRoot .fsl-privacy',
-      title: T('tour.listen-miss-title'),
-      body: T('tour.listen-miss-body')
-    }),
-    Object.freeze({
-      id: 'terjemahan',
-      target: '#fslTranslateToggle',
-      title: T('tour.listen-translate-title'),
-      body: T('tour.listen-translate-body')
-    }),
-    Object.freeze({
-      id: 'kecepatan',
-      target: '.topbar-actions [aria-label="Buka pengaturan"]',
-      title: T('tour.listen-speed-title'),
-      body: T('tour.listen-speed-body')
-    })
+    localizedStep('sekali-dengar', '#speakingListeningRoot .fsl-card', 'tour.listen-once-title', 'tour.listen-once-body'),
+    localizedStep('meleset', '#speakingListeningRoot .fsl-privacy', 'tour.listen-miss-title', 'tour.listen-miss-body'),
+    localizedStep('terjemahan', '#fslTranslateToggle', 'tour.listen-translate-title', 'tour.listen-translate-body'),
+    localizedStep('kecepatan', '.topbar-actions [aria-label="Buka pengaturan"]', 'tour.listen-speed-title', 'tour.listen-speed-body')
   ]);
 
   var TOURS = Object.freeze({
@@ -347,7 +285,7 @@
     host.className = 'fz-tour';
     if (prefersReducedMotion(target)) host.className += ' fz-tour-still';
     host.setAttribute('role', 'dialog');
-    host.setAttribute('aria-label', 'Kenalan cepat dengan FIEZEL');
+    host.setAttribute('aria-label', T('tour.dialog-aria'));
 
     var index = 0;
     var closed = false;
@@ -437,8 +375,8 @@
         + '<h2>' + escapeHtml(current.title) + '</h2>'
         + '<p>' + escapeHtml(current.body) + '</p>'
         + '<div class="fz-tour-actions">'
-        + '<button type="button" class="fz-tour-skip" data-tour-skip>Lewati</button>'
-        + '<button type="button" class="fz-tour-next" data-tour-next>' + (isLast ? 'Siap!' : T('tour.next')) + '</button>'
+        + '<button type="button" class="fz-tour-skip" data-tour-skip>' + escapeHtml(T('tour.skip')) + '</button>'
+        + '<button type="button" class="fz-tour-next" data-tour-next>' + escapeHtml(isLast ? T('tour.ready') : T('tour.next')) + '</button>'
         + '</div></div>';
 
       // Kartu penjelasan diletakkan di paruh layar yang BERLAWANAN dengan target, supaya ia
