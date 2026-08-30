@@ -81,6 +81,50 @@ const DEFAULT_ORIGIN = 'https://fiezel.my.id';
 const DEFAULT_COOKIE_DOMAIN = 'fiezel.my.id';
 // Origin yang HARUS ditolak. Bukan domain yang bisa dibeli orang secara nyata:
 // `.example` dijamin RFC 2606 tidak pernah teregistrasi.
+/* =======================================================================================
+ * KEADAAN FLAG PRODUKSI YANG DIDEKLARASIKAN
+ * =====================================================================================
+ * Sampai m025-207 blok 2 gerbang ini berbunyi "semua flag klien masih false (FEATURE_* off)".
+ * Itu benar ketika berkas ini ditulis — peluncuran Cloudflare masih gelap dan alamat Worker-nya
+ * belum dibuka. Sejak 28 Agustus 2026 repo sendiri meninggalkan asumsi itu, di dua tempat yang
+ * dapat diperiksa: `MASTER-BROADCAST.md` §"Keadaan 28 Ags 18:20 — AI Cloudflare HIDUP"
+ * (`flags.cfAiEnabled=true`, 47 assert, 5 panggilan model) dan commit `692bc5c`
+ * "nyalakan ANALYTICS_ENABLED" (`workers/api/wrangler.toml` → `ANALYTICS_ENABLED = "on"`).
+ * Bahkan `wrangler.toml:52` menuliskannya sendiri: "Baris ini dulu berbunyi SEMUA MATI — sudah
+ * tidak benar sejak FEATURE_AI dinyalakan."
+ *
+ * Jadi gerbangnya yang basi, bukan produksinya yang menyimpang. Yang DILARANG di sini adalah
+ * melonggarkan assert supaya hijau (MASTER-BROADCAST §"Yang TIDAK boleh dilakukan" butir 3).
+ * Karena itu asumsi lama diganti dengan properti yang LEBIH KETAT, bukan yang lebih longgar:
+ *
+ *   lama : "tidak ada flag yang menyala"      -> hanya bisa melihat satu arah, dan mati sendiri
+ *                                                begitu owner menyalakan fitur pertamanya.
+ *   baru : "setiap flag sama persis dengan     -> melihat KEDUA arah (fitur menyala tanpa izin
+ *          keadaan yang dideklarasikan repo"      DAN fitur yang seharusnya hidup ternyata mati),
+ *                                                plus flag BARU yang belum pernah diputuskan.
+ *
+ * Nilainya sengaja HANYA bisa diubah dengan mengedit repo — tidak ada env override. Flag hidup
+ * di KV `cfg:flags` yang disetel owner dari dashboard, jadi tanpa aturan ini sebuah fitur bisa
+ * menyala di produksi tanpa satu baris pun tercatat di mana saja. Dengan aturan ini, setiap
+ * pemutaran sakelar wajib meninggalkan jejak di sini, berikut alasannya.
+ */
+const FLAGS_DIHARAPKAN = Object.freeze({
+  cfApiEnabled: true,       // MASTER-BROADCAST.md:97 — gateway CF hidup untuk /api/*
+  cfIdentityEnabled: true,  // MASTER-BROADCAST.md:97 — identitas cookie hidup
+  cfQuotaEnabled: true,     // MASTER-BROADCAST.md:97 — kuota server hidup
+  cfAiEnabled: true,        // MASTER-BROADCAST.md:124 — dinyalakan 28 Ags 18:20, terverifikasi
+  cfTtsEnabled: false,      // MASTER-BROADCAST.md:127 — TETAP mati; korpus penuh +-US$9,07
+  cfAnalyticsEnabled: true, // commit 692bc5c + wrangler.toml ANALYTICS_ENABLED="on"
+  cfSocialEnabled: false    // SLOT 7 belum diputuskan owner
+});
+const KILL_DIHARAPKAN = Object.freeze({
+  ai: true,        // sepadan dengan cfAiEnabled
+  tts: false,      // sepadan dengan cfTtsEnabled
+  coach: false,    // belum diputuskan owner
+  analytics: true, // sepadan dengan cfAnalyticsEnabled
+  social: false    // sepadan dengan cfSocialEnabled
+});
+
 const FOREIGN_ORIGIN = 'https://evil.example';
 const REQUEST_TIMEOUT_MS = 15000;
 
@@ -271,22 +315,39 @@ async function run() {
     !!health.json && health.json.protocol === PROTOCOL_EXPECTED,
     'protocol=' + JSON.stringify(health.json && health.json.protocol));
 
-  /* --- 2. /api/config: semua flag masih off ----------------------------------------- */
+  /* --- 2. /api/config: keadaan flag SESUAI YANG DIDEKLARASIKAN ---------------------- */
   const config = await call('GET', '/api/config');
   check('config-not-404', '/api/config BUKAN 404', config.status !== 404, 'status=' + config.status);
   check('config-200', '/api/config mengembalikan 200', config.status === 200, 'status=' + config.status);
   const flags = config.json && config.json.flags && typeof config.json.flags === 'object' ? config.json.flags : null;
   const kill = config.json && config.json.enabled && typeof config.json.enabled === 'object' ? config.json.enabled : null;
-  // Non-vakum lebih dulu: `flags` kosong akan membuat "semua false" benar secara
-  // hampa. Objek kosong = gerbang merah, bukan gerbang senang.
+  // Non-vakum lebih dulu: `flags` kosong akan membuat pencocokan apa pun benar
+  // secara hampa. Objek kosong = gerbang merah, bukan gerbang senang.
   check('config-flags-present', '/api/config memuat objek `flags` yang tidak kosong',
     !!flags && Object.keys(flags).length > 0, flags ? Object.keys(flags).join(',') : '(tidak ada)');
-  const flagsOn = flags ? Object.keys(flags).filter(k => flags[k] !== false) : [];
-  check('config-flags-false', 'Semua flag klien masih false (FEATURE_* off)',
-    !!flags && flagsOn.length === 0, flagsOn.length ? 'menyala: ' + flagsOn.join(',') : 'semua false');
-  const killOn = kill ? Object.keys(kill).filter(k => kill[k] !== false) : [];
-  check('config-killswitch-false', 'Semua kill switch server masih false',
-    !!kill && killOn.length === 0, killOn.length ? 'menyala: ' + killOn.join(',') : 'semua false');
+
+  // Kunci yang muncul di produksi tetapi tidak dideklarasikan di atas adalah flag
+  // yang belum pernah diputuskan siapa pun. Ia MERAH, bukan diabaikan: flag baru
+  // yang lolos diam-diam persis cara sebuah fitur menyala tanpa ada yang tahu.
+  const flagsAsing = flags ? Object.keys(flags).filter(k => !(k in FLAGS_DIHARAPKAN)) : [];
+  check('config-flags-declared', 'Setiap flag klien produksi sudah dideklarasikan di gerbang ini',
+    flagsAsing.length === 0, flagsAsing.length ? 'tak dideklarasikan: ' + flagsAsing.join(',') : 'semua dikenal');
+  const flagsBeda = flags
+    ? Object.keys(FLAGS_DIHARAPKAN).filter(k => flags[k] !== FLAGS_DIHARAPKAN[k])
+        .map(k => k + '=' + JSON.stringify(flags[k]) + ' (diharapkan ' + FLAGS_DIHARAPKAN[k] + ')')
+    : ['(tidak ada objek flags)'];
+  check('config-flags-match', 'Setiap flag klien sama dengan keadaan yang dideklarasikan repo',
+    !!flags && flagsBeda.length === 0, flagsBeda.length ? 'selisih: ' + flagsBeda.join(' | ') : 'sepadan');
+
+  const killAsing = kill ? Object.keys(kill).filter(k => !(k in KILL_DIHARAPKAN)) : [];
+  check('config-killswitch-declared', 'Setiap kill switch produksi sudah dideklarasikan di gerbang ini',
+    killAsing.length === 0, killAsing.length ? 'tak dideklarasikan: ' + killAsing.join(',') : 'semua dikenal');
+  const killBeda = kill
+    ? Object.keys(KILL_DIHARAPKAN).filter(k => kill[k] !== KILL_DIHARAPKAN[k])
+        .map(k => k + '=' + JSON.stringify(kill[k]) + ' (diharapkan ' + KILL_DIHARAPKAN[k] + ')')
+    : ['(tidak ada objek enabled)'];
+  check('config-killswitch-match', 'Setiap kill switch sama dengan keadaan yang dideklarasikan repo',
+    !!kill && killBeda.length === 0, killBeda.length ? 'selisih: ' + killBeda.join(' | ') : 'sepadan');
   check('config-protocol', '/api/config mengembalikan protocol="' + PROTOCOL_EXPECTED + '"',
     !!config.json && config.json.protocol === PROTOCOL_EXPECTED,
     'protocol=' + JSON.stringify(config.json && config.json.protocol));
