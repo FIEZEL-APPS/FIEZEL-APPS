@@ -366,17 +366,37 @@ export const ROUTES = Object.freeze([
 export function registerAnalyticsRoutes(router) {
   if (!router) throw new Error('registerAnalyticsRoutes: router wajib');
 
+  /* m025-203: jam DITERUSKAN sebagai argumen keempat.
+   *
+   * Sebelumnya wrap() memanggil fn(request, env, ctx) saja, sehingga handleEvents jatuh ke
+   * default `now = Date.now()` dan MENGABAIKAN `TEST_CLOCK_MS` — padahal env sudah membawanya
+   * dan workers/api/index.js:144 punya nowFrom() persis untuk maksud ini. Akibatnya jalur
+   * analytics membaca jam dinding, melanggar disiplin yang ditulis harness-nya sendiri
+   * ("Waktu SELALU masuk sebagai parameter; tidak ada Date.now() di jalur keputusan").
+   *
+   * Yang meledak karenanya: `day` ditolak di luar ±2 hari, jadi cf-wiring-test.js dengan
+   * DAY tetap '2026-08-27' HIJAU sampai 29 Agu lalu MERAH sendiri pada 30 Agu tanpa satu
+   * baris kode pun berubah. Gerbang yang pecah karena kalender tidak menguji apa pun.
+   *
+   * Produksi tidak berubah: TEST_CLOCK_MS tidak ada di wrangler.toml (dan
+   * cf-api-contract-test.js meng-assert ia tidak boleh ada), jadi nilainya tetap Date.now(). */
+  const nowFrom = (env) => {
+    const injected = Number(env && env.TEST_CLOCK_MS);
+    return Number.isFinite(injected) && injected > 0 ? injected : Date.now();
+  };
+
   const wrap = fn => async (...args) => {
     const a = args[0];
     if (a && a.req && typeof a.req.raw === 'object') {
       // Hono: c.req.raw = Request, c.env, c.executionCtx
-      return fn(a.req.raw, a.env, a.executionCtx || a.ctx || null);
+      return fn(a.req.raw, a.env, a.executionCtx || a.ctx || null, nowFrom(a.env));
     }
     if (a instanceof Request || (a && typeof a.headers === 'object' && typeof a.text === 'function')) {
-      return fn(a, args[1], args[2]);
+      return fn(a, args[1], args[2], nowFrom(args[1]));
     }
     // Konteks gaya objek: { request, env, ctx }
-    return fn(a && a.request, (a && a.env) || args[1], (a && a.ctx) || args[2]);
+    const env = (a && a.env) || args[1];
+    return fn(a && a.request, env, (a && a.ctx) || args[2], nowFrom(env));
   };
 
   const add = (method, path, fn) => {
