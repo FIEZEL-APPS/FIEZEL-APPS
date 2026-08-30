@@ -140,7 +140,7 @@ these test files and their subjects is byte-identical to `main`.
 
 | Step | Failing assertion |
 |---|---|
-| `regression-test.js` | `quiz renderer does not show passage with reading question` |
+| `regression-test.js` | `quiz renderer does not show passage with reading question` — **root-caused below; it is a stale test, not a product bug** |
 | `listening-subtitle-suppression-test.js` | 4 of 8 assertions fail — `say() tidak pernah dipanggil` (say() is never called) across A, B and two C cases |
 | `listening-exam-test.js` | 1 failure — `Failed audio keeps the questions locked` |
 | `speaking-exam-test.js` | 1 failure — `Exam sessions are level-scoped like everything else` |
@@ -148,8 +148,55 @@ these test files and their subjects is byte-identical to `main`.
 
 **Pattern worth naming:** four of the five cluster around **voice, audio and subtitles** —
 `say()`, speech synthesis fallback, listening audio, subtitle suppression. That is one
-subsystem, not five unrelated bugs, and it is **not Braincore**. The fifth (`regression-test`)
-is a reading-passage rendering issue in the quiz UI.
+subsystem, not five unrelated bugs, and it is **not Braincore**.
+
+#### The fifth, `regression-test.js`, root-caused: the test is stale, the product is correct
+
+This one was investigated further after CI reproduced it, and the finding is worth stating
+carefully because it is the opposite of what the error message suggests.
+
+The assertion (`regression-test.js:66`) accepts either of two forms:
+
+1. `q.passage?card(...TEKS BACAAN` — the literal string in `app.js`; or
+2. `q.passage?card(...FiezelI18n.t('quiz.teks-bacaan')` **and** `'quiz.teks-bacaan': 'TEKS BACAAN'`
+   in the copy map.
+
+What `app.js:7660` actually renders is:
+
+```js
+q.passage?card(`<div class="passage passage-reading"><div class="eyebrow">${FiezelI18n.t('quiz.reading-eyebrow')}</div>...
+```
+
+During the i18n migration the key was **renamed** from `quiz.teks-bacaan` to
+`quiz.reading-eyebrow`. The test still pins the old name, so neither branch matches.
+
+**The product is fine.** The new key is properly defined in both locales:
+
+| Key | File | Value |
+|---|---|---|
+| `quiz.reading-eyebrow` | `features/i18n/copy-id-app-e.js:42` | `'TEKS BACAAN'` |
+| `quiz.reading-eyebrow` | `features/i18n/copy-th-app-e.js:42` | `'บทอ่าน'` |
+
+The passage card renders, with the correct eyebrow, in Indonesian and Thai. The old key
+`quiz.teks-bacaan` survives in `copy-id-app-d.js:316` / `copy-th-app-d.js:316` as an **orphan**
+— referenced by nothing in the codebase except the stale test's own comment.
+
+**Plain language:** the test is looking for a label by its old name. The label was renamed and
+still works correctly on screen. Nothing a student sees is broken. **This is test maintenance
+left behind by a rename, not a defect in the app.**
+
+**Why this matters for the count:** it means the five "genuine" failures are really **four
+voice/audio product failures plus one stale test.** It also means the *product* health of this
+repository is slightly better than the raw red/green count suggests.
+
+**Proposed fix** (not applied here — this audit does not modify product or test files):
+update the second branch of the assertion to the current key name, and delete the orphaned
+`quiz.teks-bacaan` entries from `copy-id-app-d.js` and `copy-th-app-d.js`.
+
+**A note on the CI gate's behaviour.** The Quality Gate runs its steps sequentially under
+`bash -e`, so it **halts at `regression-test.js`** and never reaches the later steps. CI
+therefore reports exactly one failure, and the other four are invisible to it. Anyone reading
+CI alone would conclude there is a single problem. There are five.
 
 **Plain language:** the adaptive engine — the thing being prepared for sale — is fully green.
 The failures sit in the voice/audio layer of the surrounding application. For a Braincore sale

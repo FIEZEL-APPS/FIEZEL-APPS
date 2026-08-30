@@ -174,7 +174,7 @@ All verified as failing on a clean, unmodified tree, and confirmed pre-existing 
 
 | Test | Failure |
 |---|---|
-| `regression-test.js` | `quiz renderer does not show passage with reading question` |
+| `regression-test.js` | `quiz renderer does not show passage with reading question` — **stale test, not a product bug; see below** |
 | `listening-subtitle-suppression-test.js` | 4 of 8 assertions — `say() never called` |
 | `listening-exam-test.js` | `Failed audio keeps the questions locked` |
 | `speaking-exam-test.js` | `Exam sessions are level-scoped like everything else` |
@@ -182,6 +182,19 @@ All verified as failing on a clean, unmodified tree, and confirmed pre-existing 
 
 **Four of five cluster in the voice/audio subsystem.** That is one broken area, not five
 unrelated bugs — **and none of them is Braincore.** All 24 Braincore tests pass.
+
+**The fifth is not a product bug at all.** `regression-test.js` fails because an i18n key was
+renamed from `quiz.teks-bacaan` to `quiz.reading-eyebrow` and the test still pins the old name.
+The reading-passage card renders correctly in both Indonesian (`copy-id-app-e.js:42` →
+`'TEKS BACAAN'`) and Thai (`copy-th-app-e.js:42` → `'บทอ่าน'`). Nothing a student sees is
+broken. The old key survives as an orphan in `copy-id-app-d.js:316` / `copy-th-app-d.js:316`,
+referenced by nothing but the stale test. **Fix: update the assertion to the current key name
+and delete the two orphaned entries.** *(Detail: `AUDIT/05_BRAINCORE_TEST_STATUS.md` §4.3.)*
+
+⚠️ **The Quality Gate halts at the first failure.** It runs sequentially under `bash -e`, so it
+stops at `regression-test.js` and never reaches the later steps. **CI reports one failure; there
+are five.** A buyer reading the CI badge alone would materially understate the open bug count —
+which is exactly why this audit ran all 214 steps directly instead of trusting the gate.
 
 Additionally, **three steps time out** and are therefore **unmeasured, not passing**:
 `content-adoption-test.js`, `fiezel-evolution-loop-test.js`, `release-audit-gate-test.js`.
