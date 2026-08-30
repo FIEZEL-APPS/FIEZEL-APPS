@@ -207,6 +207,35 @@ actually been measured against a ceiling generous enough to be exceeded only by 
 With this corrected, the suite's standing result on this branch is **263 steps run, 0 genuine
 failures** — the one non-zero exit was code 124 from my own 400 s cap on this step.
 
+### Third local artifact (Phase J): the suite is not idempotent on a reused working tree
+
+`cf-live-selftest.js` exited 1 on my **second** full local run. Reproduced deterministically:
+
+```
+node cf-live-selftest.js                    -> exit 0   (clean tree)
+node cf-live-contract-test.js --report      -> writes CF-LIVE-REPORT.json to the repo root
+node cf-live-selftest.js                    -> exit 1   ("working tree not dirtied" now false)
+```
+
+`cf-live-contract-test.js` defaults its report path to the repository root unless
+`FIEZEL_CF_LIVE_REPORT` is set (`cf-live-contract-test.js:134`). `cf-live-selftest.js:325` then
+asserts no such file exists at the root.
+
+**CI is unaffected and this is not a product defect.** In `quality.yml` the selftest is step 189
+and the contract test is step 222, so a clean checkout always runs them in the safe order — and
+CI checkouts are always clean. What fails is a *second* local run over the same tree, which
+inherits the file from the first.
+
+It is still a real latent fragility, and the same class as the `ai-account-cap-gate-test.js`
+defect fixed in Phase 2A: a gate that dirties the tree and another that asserts the tree is
+clean. **Proposed one-line fix, not applied** (the file belongs to another workstream): default
+the report path to the OS temp directory rather than `__dirname`, so `--report` never writes
+into the repository.
+
+**Rule for reading this ledger, now three cases deep:** two of the three "failures" I have hit
+locally were my own timeouts, and the third was a leftover file from my own previous run. Before
+classifying anything from a local run, check whether the observer — not the code — produced it.
+
 ### The stronger consistency evidence is CI's, not this audit's
 
 A3 asks for the same result run individually, in the suite, and in the suite again. This audit's
