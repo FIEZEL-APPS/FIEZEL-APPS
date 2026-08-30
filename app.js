@@ -38,7 +38,7 @@ function __fzSyncShellElements(){
     });
   }catch(_){}
 }
-function __fzRefreshI18nTables(){__fzI18nTables.forEach(([t,b])=>{try{const v=b();if(Array.isArray(t)){t.length=0;t.push(...v)}else{Object.keys(t).forEach(k=>delete t[k]);Object.assign(t,v)}}catch(_){}});try{FALLBACK_LEARNER_NAME=FiezelI18n.t('common.sapaan-netral')}catch(_){};try{loginMessageCache=null}catch(_){};__fzSyncShellElements()}
+function __fzRefreshI18nTables(){__fzI18nTables.forEach(([t,b])=>{try{const v=b();if(Array.isArray(t)){t.length=0;t.push(...v)}else{Object.keys(t).forEach(k=>delete t[k]);Object.assign(t,v)}}catch(_){}});try{FALLBACK_LEARNER_NAME=FiezelI18n.t('common.sapaan-netral')}catch(_){};try{loginMessageCache=null}catch(_){};try{if(typeof state==='object'&&state)state.coachCache=null}catch(_){};__fzSyncShellElements()}
 try{self.FiezelI18n?.onChange?.(()=>__fzRefreshI18nTables())}catch(_){}
 let FALLBACK_LEARNER_NAME=FiezelI18n.t('common.sapaan-netral');
 function learnerName(){try{const name=String(state?.userName||'').trim();return name||FALLBACK_LEARNER_NAME}catch{return FALLBACK_LEARNER_NAME}}
@@ -8313,7 +8313,7 @@ function brainManifestMarkup(){
     for(const k of Object.keys(map)){const v=String(map[k]);if(names[v])names[v].push(k)}
     const row=(label,list)=>list.length?`<p><b>${label} (${list.length}):</b> ${list.map(x=>esc(x)).join(', ')}</p>`:'';
     return card(`<h3>Brain Bundle ${esc(String(d?.bundleVersion||M.bundleVersion||''))} <span class="muted">(manifest — deskriptif, tanpa otoritas)</span></h3>
-    ${row('Aktif',names.active)}${row('Bayangan',names.shadow)}${row('Off',names.off)}
+    ${row(FiezelI18n.t('progress.brain-active'),names.active)}${row(FiezelI18n.t('progress.brain-shadow'),names.shadow)}${row(FiezelI18n.t('progress.brain-off'),names.off)}
     <p class="muted">${esc(String(d?.summary||''))} Peta ini mencatat siapa yang memutuskan — ia sendiri tidak ikut memutuskan apa pun.</p>`)
   }catch{return ''}
 }
@@ -8343,9 +8343,9 @@ function olmPanelMarkup(){
     // menggambar ulang seluruh layar Progress, tombol yang tadi diklik ikut musnah).
     return card(`<h3>${FiezelI18n.t('progress.sistem-yakini-tentangmu')} <span class="muted">(OLM)</span></h3>
       ${mastery?`<p><b>${FiezelI18n.t('progress.penguasaan-terkuat')}</b> ${mastery}</p>`:''}
-      <p><b>Miskonsepsi:</b> ${FiezelI18n.t('progress.aktif-teratasi',{activeCount:Number(mis.active?.length??mis.activeCount??0),resolvedCount:Number(mis.resolved?.length??mis.resolvedCount??0)})}</p>
-      <p><b>Rawan lupa:</b> ${Number(review.atRiskCount||0)} materi${reviewTop?` - paling mendesak: ${reviewTop}`:''}</p>
-      ${cal.status?`<p><b>Kalibrasi keyakinan:</b> ${esc(cal.message||cal.status)}</p>`:''}
+      <p><b>${FiezelI18n.t('progress.misconception-label')}</b> ${FiezelI18n.t('progress.aktif-teratasi',{activeCount:Number(mis.active?.length??mis.activeCount??0),resolvedCount:Number(mis.resolved?.length??mis.resolvedCount??0)})}</p>
+      <p><b>${FiezelI18n.t('progress.at-risk-label')}</b> ${FiezelI18n.t('progress.at-risk-detail',{count:Number(review.atRiskCount||0),urgent:reviewTop?FiezelI18n.t('progress.at-risk-urgent',{top:reviewTop}):''})}</p>
+      ${cal.status?`<p><b>${FiezelI18n.t('progress.calibration-label-2')}</b> ${esc(cal.message||cal.status)}</p>`:''}
       <p class="muted">${FiezelI18n.t('progress.ringkasan-dibaca-model-sama-memilih')}</p>`,'olm-panel')
   }catch{return ''}
 }
@@ -8377,7 +8377,7 @@ function affectSuggestionMarkup(){
     const stateLabel={frustrated:FiezelI18n.t('progress.terlihat-frustrasi'),bored:FiezelI18n.t('progress.terlihat-bosan'),gaming:FiezelI18n.t('progress.answer-terlalu-cepat-for-jadi'),fatigued:FiezelI18n.t('progress.terlihat-lelah')}[st.state]||'';
     if(!stateLabel)return '';
     const actionLabel={turunkan_target:FiezelI18n.t('progress.item-diringankan-dulu-supaya-you'),naikkan_tantangan:FiezelI18n.t('progress.tantangan-dinaikkan-supaya-sesi-tidak'),mode_tak_tertebak:FiezelI18n.t('progress.practice-dialihkan-bentuk-tidak-can'),perpendek_sesi:FiezelI18n.t('progress.sesi-diperpendek-diisi-review-ringan')}[String(st.suggestion?.action||'')]||'';
-    return card(`<h3>${FiezelI18n.t('progress.cuaca-sesi-terakhir')}</h3><p><b>${esc(stateLabel)}</b> · keyakinan ${Math.round((Number(st.confidence)||0)*100)}%</p>${actionLabel?`<p><b>Respons sistem:</b> ${esc(actionLabel)}.</p>`:''}<p class="muted">${FiezelI18n.t('progress.afek-dinilai-per-sesi-hanya')}</p>`)
+    return card(`<h3>${FiezelI18n.t('progress.cuaca-sesi-terakhir')}</h3><p><b>${esc(stateLabel)}</b> · ${FiezelI18n.t('progress.keyakinan-persen',{persen:Math.round((Number(st.confidence)||0)*100)})}</p>${actionLabel?`<p><b>${FiezelI18n.t('progress.response-label')}</b> ${esc(actionLabel)}.</p>`:''}<p class="muted">${FiezelI18n.t('progress.afek-dinilai-per-sesi-hanya')}</p>`)
   }catch{return ''}
 }
 function coreBrainPanelMarkup(){
@@ -8395,10 +8395,10 @@ function coreBrainPanelMarkup(){
   const bestWindow=chrono.confident&&chrono.best?FiezelI18n.t('progress.div-jam-paling-produktif-br',{id:esc(chrono.best.id),akurasi:chrono.best.accuracy}):'';
   return card(`<h3>Core Brain v2</h3>
     <div class="diag-grid">
-      <div><b>Kemampuan terukur</b><br>${esc(ability.level||'-')} · indeks ${ability.ability??'-'}</div>
+      <div><b>${FiezelI18n.t('progress.ability-label')}</b><br>${esc(ability.level||'-')} · ${FiezelI18n.t('progress.indeks-ability',{ability:ability.ability??'-'})}</div>
       <div><b>${FiezelI18n.t('progress.arah-study')}</b><br>${esc(moveLabel)}</div>
       <div><b>${FiezelI18n.t('progress.beban-dalam-sesi')}</b><br>${esc(loadLabel)}</div>
-      <div><b>Kesulitan optimal</b><br>${FiezelI18n.t('progress.tingkat-peluang-benar',{targetDifficulty:plan.targetDifficulty,predictedSuccess:Math.round((plan.predictedSuccess||0)*100)})}</div>
+      <div><b>${FiezelI18n.t('progress.difficulty-label')}</b><br>${FiezelI18n.t('progress.tingkat-peluang-benar',{targetDifficulty:plan.targetDifficulty,predictedSuccess:Math.round((plan.predictedSuccess||0)*100)})}</div>
       <div><b>${FiezelI18n.t('progress.materi-rawan-lupa')}</b><br>${FiezelI18n.t('progress.frag',{relearn:Number(memory.atRisk||0)+Number(memory.relearn||0),total:memory.total||0})}</div>
       ${bestWindow}
     </div>
@@ -8544,7 +8544,7 @@ function setLearnerLocalePreference(next){
   const supported=(self.FiezelI18n?.SUPPORTED)||['id','th'];
   const value=supported.includes(next)?next:'id';
   if((state.preferences?.learnerLocale||'id')===value)return true;
-  state.preferences={...state.preferences,learnerLocale:value};save();
+  state.preferences={...state.preferences,learnerLocale:value};state.coachCache=null;save();
   try{self.FiezelI18n?.setLocale?.(value)}catch(_){}
   try{leaveAllStages()}catch(_){}
   closeModal();render();haptic('confirm');
