@@ -297,7 +297,9 @@
       // proporsi sama dengan .fz-logo-slot pada splash terintegrasi.
       var box = Math.min(cssW, cssH) * 0.62;
       scale = box / 512;
-      offX = (cssW - 512 * scale) / 2;
+      // ViewBox center is x=256, but the visible mark center is LOGO_CX=259.
+      // Match the SVG optical correction so particles and sharp logo share one center.
+      offX = (cssW - 512 * scale) / 2 - (LOGO_CX - 256) * scale;
       offY = (cssH - 512 * scale) / 2;
 
       if (typeof opts.seed === 'number') seed = opts.seed >>> 0;
