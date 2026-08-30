@@ -12,7 +12,14 @@ const speaking=JSON.parse(fs.readFileSync(path.join(feature,'speaking-bank-v1.js
 const runtimeText=fs.readFileSync(path.join(feature,'fiezel-speaking-listening-addon.js'),'utf8');
 let pass=0;
 function test(name,fn){fn();pass++;console.log('PASS',name)}
-function hash(file){return crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex')}
+/* 2026-08-30: akhir baris dinormalkan sebelum di-hash. Di checkout Windows dengan core.autocrlf
+   berkas bank di disk ber-CRLF, sementara rebuild-speaking-listening-data.js selalu menulis LF -
+   jadi 'data rebuild is idempotent' MERAH di mesin pemilik pada pohon BERSIH, lalu HIJAU pada
+   run kedua setelah rebuild-nya sendiri menulis ulang berkasnya. Gagal-lalu-lulus seperti itu
+   lebih buruk daripada gagal terus: ia mengajari orang menjalankan ulang sampai hijau. Di CI
+   Linux keduanya LF dan gerbang ini memang selalu hijau. Yang dijaga tetap sama: ISI hasil
+   rebuild harus identik dengan isi di disk. */
+function hash(file){return crypto.createHash('sha256').update(fs.readFileSync(file,'utf8').replace(/\r\n/g,'\n')).digest('hex')}
 const levels=['A1','A2','B1','B2','C1','C2'];
 // m025-31: OWNER reduced the English catalog to Bella and Heart.
 const voices=['af_bella','af_heart'];
