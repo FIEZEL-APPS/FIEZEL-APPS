@@ -69,6 +69,23 @@ function refHulu() {
   return coba('git rev-parse --verify origin/main').ok ? 'origin/main' : 'FETCH_HEAD';
 }
 
+/* Apakah nenek moyang HEAD benar-benar bisa ditelusuri?
+ *
+ * Ini bukan detail: pada checkout dangkal (actions/checkout fetch-depth 1) HEAD TIDAK punya
+ * induk secara lokal, sehingga `git merge-base --is-ancestor X HEAD` mengembalikan "bukan
+ * leluhur" untuk commit yang sebenarnya leluhur — riwayatnya cuma tidak ada. Versi pertama
+ * gerbang ini tidak membedakan keduanya dan menuduh commit 0d82037 sebagai penabrak padahal
+ * ia induk dari merge yang sedang berdiri di HEAD (PR #261, 2026-08-30). Menuduh salah lebih
+ * merusak daripada diam: sekali gerbang berbohong, orang berhenti percaya kepadanya.
+ *
+ * Jadi: coba perdalam dulu; kalau tetap dangkal, jangan keluarkan vonis ancestry sama sekali. */
+function riwayatPenuh() {
+  const dangkal = () => (coba('git rev-parse --is-shallow-repository').out || '').trim() === 'true';
+  if (!dangkal()) return true;
+  coba('git fetch --unshallow --quiet') || coba('git fetch --deepen=500 --quiet');
+  return !dangkal();
+}
+
 const versiLokal = JSON.parse(fs.readFileSync(SUMBER, 'utf8')).version;
 
 if (!/^m025-\d+$/.test(String(versiLokal))) {
@@ -118,9 +135,20 @@ if (!adaHulu) {
     /* Diklaim di hulu itu WAJAR kalau yang mengklaim adalah leluhur kita sendiri: artinya
      * pekerjaan kita sudah ter-merge dan kita sedang berdiri di atasnya. Yang berbahaya
      * adalah pengklaim yang BUKAN leluhur - itu jalur lain yang mencetak nomor yang sama. */
-    const asing = pencetak.filter((c) => !coba('git merge-base --is-ancestor ' + c + ' HEAD').ok);
+    const bisaTelusuriLeluhur = riwayatPenuh();
+    const asing = !bisaTelusuriLeluhur ? []
+      : pencetak.filter((c) => !coba('git merge-base --is-ancestor ' + c + ' HEAD').ok);
 
-    if (asing.length === 0) {
+    if (!bisaTelusuriLeluhur) {
+      /* Sengaja BUKAN kegagalan, bahkan di --strict: pemeriksaan monotonik di bawah tetap
+       * berjalan dan tetap mengikat, jadi gerbang ini masih menjaga sesuatu yang nyata.
+       * Yang hilang hanya kemampuan membedakan "jalur lain mencetak nomor ini" dari
+       * "pekerjaanku sendiri yang sudah ter-merge", dan menebak di antara keduanya adalah
+       * cara gerbang kehilangan kepercayaan. */
+      console.warn('PERINGATAN - ' + versiLokal + ' diklaim di ' + ref + ' oleh ' + pencetak.length
+        + ' commit, tetapi riwayat HEAD dangkal dan tidak bisa diperdalam, jadi ancestry TIDAK '
+        + 'bisa dinilai. Vonis tabrakan ditahan; pemeriksaan monotonik di bawah tetap mengikat.');
+    } else if (asing.length === 0) {
       ok(versiLokal + ' diklaim di ' + ref + ' hanya oleh leluhur sendiri (' + pencetak.length
         + ' commit) - bukan tabrakan.');
     } else {
