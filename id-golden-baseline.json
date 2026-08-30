@@ -1,7 +1,7 @@
 {
   "schema": "id-golden-baseline/1",
-  "generatedAt": "2026-08-30T13:06:01.026Z",
-  "root": "C:\\Users\\WINDOWS\\Desktop\\FIEZEL-APPS",
+  "generatedAt": "2026-08-30T14:03:43.315Z",
+  "root": "/home/user/FIEZEL-APPS",
   "files": {
     "grammar-explanations-id.json": "4ce816145b77a86ed6d9ec9b366f70c1bbf1859283f667207eada762fccccb17",
     "grammar-misconception-id.json": "a75ed237a66eba91919ecbc2cd0e128c8202205c59676450d6df605f7293e469",
@@ -18,8 +18,8 @@
     "features/audio-assets/fiezel-audio-key.js": "11624e303917fe0df881ac3f410911587766fd6f4d2491ca6687ec42de8d457d"
   },
   "literals": {
-    "count": 2085,
-    "sha256": "2ab67622e63efe0df8f113df40733cb1d15512bb44a11b5fcac8b2901826e3a5",
+    "count": 2086,
+    "sha256": "032621bd018a574bfca1e9a526ba2f1ba8f94015ac1786d30bc6ab75c7f84da2",
     "list": [
       "\n      SETELAH beat concern ≤1000ms selesai (13 §2.2), bukan menimpanya. Tanpa bunyi:\n      SFX hint sudah dipensiunkan (20 §4); cooldown 8 detiknya dijaga komponen. */\n   setTimeout(()=>{try{pawReact(",
       "\n      case 'silent':                        // L5: kalau mulut sempat mulai (taksiran L3 kandas), tutup SEKARANG\n        degradedLatch = false;\n        closeTurn(false);\n        break;\n      case 'interrupt':                     // stop(): snap tutup\n        degradedLatch = false;\n        closeTurn(true);\n        break;\n      default:\n        break;                              // fase asing dari versi fasad lebih baru: diabaikan tanpa suara\n    }\n  }\n\n  try { doc.addEventListener('fiezel-speech', onSpeech); } catch (_) {}\n\n  /* Suara terdegradasi (audibility-fix): mulut mati SEKETIKA dan tidak boleh\n     hidup lagi untuk sisa giliran — apa pun yang masih dikirim lapisan bawah. */\n  try {\n    root.addEventListener('fiezel-neural-voice-degraded', function () {\n      if (turn) closeTurn(true);\n      degradedLatch = true;                 // dilepas oleh end/silent/interrupt fasad berikutnya\n    });\n  } catch (_) {}\n\n  /* Permukaan kecil untuk Diagnostics/tes — bukan API pemanggil biasa:\n     satu-satunya pintu bicara tetap FiezelVoiceSay.say(). */\n  root.FiezelSpeechBridge = Object.freeze({\n    SCHEMA: SCHEMA,\n    speaking: function () { return !!turn; },\n    degraded: function () { return !!degradedLatch; },\n    motionAllowed: motionAllowed\n  });\n})(typeof self !== 'undefined' ? self : (typeof window !== 'undefined' ? window : this));\n",
@@ -100,6 +100,7 @@
       " — perbandingan lama tidak pernah cocok, jadi murid berpolicy kosakata\n  // selalu diarahkan ke Grammar. Kedua ejaan diterima supaya kompatibel dua arah.\n  if(!cfg.placement){try{const p=buildAdaptivePolicy();nextDomain=(p?.primaryDomain===",
       " — sudah benar?",
       " — yang mana di kalimat ini?",
+      "\" tidak mengikuti kosakata brain3_*",
       "$/.test(t)?t:`“${t}”`};\n// m025-161 (F1-5c): PEMBUKA KUTIPAN VERBATIM (139 kartu A2). Di dalam alasan, kutipan opsi\n// dipotong ke ±8 kata pertama plus ",
       "${T('fsl.dictation-placeholder', 'Ketik yang kamu dengar…')}",
       "%) sudah sejalan. Pertahankan kebiasaan menaksir sebelum menjawab \\u2014 kebiasaan itu yang ",
