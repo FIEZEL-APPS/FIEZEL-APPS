@@ -140,22 +140,53 @@ recommendation carried into Phase B.
 
 ---
 
-## 5. Result
+## 5. Result — full-suite verification (A3)
 
-On the merged tree, all seven previously-failing gates in scope pass:
+**Local full-suite run on the merged tree, 350–400 s per step:**
+
+| | Count |
+|---|---|
+| **PASS** | **209** |
+| FAIL | **0** |
+| TIMEOUT | **0** |
+| Excluded (proven to need live infrastructure) | 2 |
+| **Tree dirty after the run** | **none — `dirty=` empty** |
+
+Every step previously recorded as failing now passes:
 
 ```
-PASS  regression-test.js
-PASS  listening-exam-test.js
-PASS  speaking-exam-test.js
-PASS  listening-subtitle-suppression-test.js
-PASS  voice-fallback-chain-test.js
-PASS  id-golden-snapshot-test.js
-PASS  brain-manifest-test.js
+PASS  regression-test.js                        PASS  id-golden-snapshot-test.js
+PASS  listening-exam-test.js                    PASS  brain-manifest-test.js
+PASS  speaking-exam-test.js                     PASS  ai-account-cap-gate-test.js
+PASS  listening-subtitle-suppression-test.js    PASS  content-adoption-test.js
+PASS  voice-fallback-chain-test.js              PASS  fiezel-evolution-loop-test.js
+PASS  cf-wiring-test.js
 ```
 
-Still not green, and honestly so: `cf-wiring-test.js` and `tools/fiezel-health-probe.mjs`
-(both need live infrastructure), and two steps that remain **UNKNOWN**.
+**The empty `dirty=` is the A3 result.** A full suite run no longer modifies a single tracked
+file. That was the concrete defect behind finding #9, and it is closed.
+
+### Two classifications corrected by this run
+
+| Step | Was | Now | Why |
+|---|---|---|---|
+| `fiezel-evolution-loop-test.js` | **UNKNOWN** | ✅ **PASS** | Never a hang — the audit's earlier 120–150 s ceiling was simply below its runtime. It completes inside 350 s. |
+| `cf-wiring-test.js` | **EXPECTED FAILURE** (needed live D1) | ✅ **PASS** | Verified twice, including a direct run: exit 0. The test file itself is **unchanged** by the merge, so a change to `workers/api/` among the 18 merged commits fixed it — most plausibly `918657e` ("tegakkan cfAiEnabled fail-closed"). Stated as observation, not as a claim about which commit. |
+
+### Still excluded, and honestly so
+
+| Step | Why |
+|---|---|
+| `release-audit-gate-test.js` | Drives a browser and reaches for `api.fiezel.my.id`; the egress proxy denies it by policy, so it hangs until the timeout. **EXPECTED FAILURE** in this environment — not a product defect, and not measurable here. |
+| `tools/fiezel-health-probe.mjs` | Probes the live production site. Unreachable from here. |
+
+### The stronger consistency evidence is CI's, not this audit's
+
+A3 asks for the same result run individually, in the suite, and in the suite again. This audit's
+local runs satisfy that, but **CI is the better witness**: the `quality` gate — all 211 steps —
+completed **SUCCESS on two independent runs** of the same head, each from a clean checkout with
+no state carried over from the other. A local machine reusing one working tree cannot make that
+claim as strongly.
 
 ---
 
