@@ -442,3 +442,105 @@ Jalur cPanel tidak lagi menerbitkan buta. Jalur SSH tetap tersedia dan tidak diu
 4. Penerbitan cPanel masih **manual**. Yang otomatis sekarang adalah PEMERIKSAANNYA, bukan
    pengunggahannya: setiap `main` hijau menulis versi produksi ke ringkasan Actions, jadi
    selisih repo-vs-produksi terlihat tanpa ada yang perlu ingat memeriksanya.
+
+---
+
+# ADENDUM E — AUDIT RILIS ULANG, `8b0ada3` / m025-205 (2026-08-30)
+
+Diminta OWNER: menjalankan ulang audit rilis produksi dari awal.
+
+## E.1 Identitas kandidat rilis
+
+| | |
+|---|---|
+| `main` HEAD | `8b0ada35c25f3d5aaf0f807e8885a4a85bf41c05` |
+| tanggal | 2026-08-30 17:06:30 +0700 |
+| build | **m025-205** |
+| CI Quality Gate di SHA ini | **hijau** (run 2025) |
+
+## E.2 Paritas produksi — **TERBUKTI**
+
+Dibaca dari runner GitHub, mode gerbang, run `33308901951` (2026-08-30T11:26:04Z):
+
+```
+  base            : https://fiezel.my.id/app
+  /core-config.js : HTTP 200
+  /sw.js          : HTTP 200
+  FIEZEL_PAGE_BUILD disajikan : m025-205
+  SW_REV disajikan            : m025-205-core-brain-five-gaps-20260830
+TERBUKTI: situs hidup menyajikan build dan shell yang baru diterbitkan, dan keduanya sepadan.
+```
+
+Lulus percobaan pertama. Ini pengukuran ketiga berturut-turut yang berhasil sejak jalur
+pembuktian dipasang di m025-195, jadi paritas produksi bukan lagi kebetulan.
+
+## E.3 Matriks gerbang — 214/214 PASS di pohon bersih
+
+Seluruh 214 gerbang terdaftar `quality.yml` dijalankan atas **worktree bersih** di `8b0ada3`.
+
+Satu merah muncul (`id-golden-snapshot-test.js`) dan **terbukti bukan cacat main**:
+`grammar-templates.json` diubah selama suite berjalan. Sesudah berkas itu dipulihkan, gerbang
+PASS. Penulisnya dilacak satu per satu atas 214 gerbang: **`audit/merge-grammar-id.js`**.
+
+## E.4 Temuan
+
+### F-1 · KRITIS · tangga suara neural mati SENYAP — sudah pulih di main
+
+`const say=self.FiezelVoiceSay?.say` terhapus dari `AudioService` di `ec2b119`. Karena
+`typeof` pada identifier tak-dideklarasikan menjawab `'undefined'` alih-alih melempar, nol
+galat muncul: setiap pemutaran jatuh ke suara bawaan perangkat. Ditemukan
+`listening-subtitle-suppression-test.js` (gerbang yang MENJALANKAN kodenya). Sesi lain sudah
+mengembalikannya di main secara mandiri.
+
+**Risiko sisa:** dua perbaikan mandiri untuk cacat yang sama nyaris menghasilkan
+`SyntaxError: Identifier 'say' has already been declared` saat digabung — berkas yang tidak
+bisa diurai = aplikasi mati total. Tertangkap sebelum keluar dari mesin ini.
+
+### F-2 · TINGGI · PWA terpasang tersandera jaringan yang MENGGANTUNG — **MASIH TERBUKA di main**
+
+Navigasi `sw.js` network-first tanpa batas waktu sejak 2026-08-26. Terukur, 181 berkas
+cangkang tersimpan:
+
+| kondisi | hasil |
+|---|---|
+| jaringan mati (mode pesawat) | jalan 21 ms |
+| **jaringan menggantung** | **tidak pernah jalan** (habis waktu 30 s) |
+
+Perbaikannya ada di PR #264, **belum masuk main**.
+
+### F-3 · SEDANG · suite bisa merah karena urutan, bukan karena cacat
+
+`audit/merge-grammar-id.js` menulis ke `grammar-templates.json` — berkas konten ter-track —
+saat dijalankan sebagai gerbang. Setiap gerbang sesudahnya yang membaca berkas itu bisa merah
+tanpa satu pun bug produk. Belum menggigit CI (urutannya kebetulan aman di sana), tetapi ia
+laten dan akan menggigit begitu urutannya bergeser.
+
+### F-4 · SEDANG · `main` merah lima commit berturut-turut
+
+m025-200 sampai m025-204 seluruhnya gagal Quality Gate; hijau baru di `8b0ada3`. Interlock
+`deploy-site.yml` menahan penerbitan otomatis selama itu, jadi tidak ada build merah yang
+terbit sendiri. Yang perlu dicatat: penerbitan cPanel MANUAL tidak lewat interlock itu.
+
+### F-5 · UNVERIFIED · gerbang live tidak pernah dijalankan
+
+`cf_live_base` dan `ai_live_base` masih nol kali dijalankan. Kebenaran API dan AI di produksi
+karena itu **UNVERIFIED**, bukan PASS (§23).
+
+### F-6 · `BRAINCORE_V3_UNIT_VERIFIED_ONLY`
+
+Loop keputusan Braincore v3 tidak diverifikasi ulang di putaran ini. Status tetap
+unit-verified, bukan E2E-verified (§20).
+
+## E.5 Keputusan
+
+**NO-GO untuk rilis publik.** Bukan karena aplikasinya rusak — ia hidup, paritasnya terbukti,
+dan 214 gerbang hijau. Melainkan karena tiga hal yang belum boleh disebut PASS:
+
+1. **F-2 masih terbuka di main.** Murid dengan sinyal buruk tidak bisa membuka aplikasi yang
+   sudah terpasang di HP-nya. Itu cacat yang dialami pengguna, bukan teori.
+2. **F-5 UNVERIFIED.** Nol bukti bahwa API dan AI produksi menjawab benar. HTTP 200 bukan
+   bukti kebenaran AI (§21).
+3. **F-6 belum E2E.** Klaim "Braincore v3 siap produksi" belum boleh diucapkan (§20).
+
+Jarak ke GO: F-2 tinggal merge; F-5 tinggal satu kali jalan tangan oleh OWNER; F-6 butuh
+putaran verifikasi tersendiri.

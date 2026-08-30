@@ -141,10 +141,55 @@ if (!alasan) {
   process.exit(1);
 }
 
+/* Sudahkah nomor ini pernah DIKLAIM di origin/main oleh siapa pun?
+ *
+ * Menaikkan satu dari hulu TIDAK cukup, dan lapangan membuktikannya 29-30 Agu 2026: dua jalur
+ * bercabang dari m025-195, keduanya membaca hulu = 195 pada hari yang berbeda, keduanya
+ * mencetak 196, lalu 197, 198, 199. Tidak satu pun panggilan bump yang salah pada saat ia
+ * dijalankan - yang salah adalah asumsi bahwa "hulu saat ini + 1" belum dipakai orang lain.
+ * Setelah kedua jalur di-merge, empat nomor memayungi dua isi berbeda.
+ *
+ * Jadi sebelum mencetak, tanyakan pada riwayat: apakah ada commit di hulu yang pernah
+ * menuliskan nomor ini ke berkas sumber? Kalau ada, lompati - dan katakan kenapa.
+ *
+ * Sengaja TANPA `-S<string>`: di Windows execSync berjalan lewat cmd.exe, yang tidak mengenal
+ * kutip tunggal, sehingga pola -S berkutip pecah jadi argumen harfiah dan pencarian selalu
+ * mengembalikan nol - "aman" secara palsu, persis kegagalan yang alat ini seharusnya cegah.
+ * Jadi patch-nya diurai sendiri, satu kali, lalu dipakai untuk semua kandidat. */
+function versiYangPernahDiklaimDiHulu() {
+  try {
+    const patch = execSync(
+      'git log origin/main -p --format=%H -- coordination/BUILD-VERSION.json',
+      { cwd: ROOT, encoding: 'utf8', timeout: 60000, stdio: ['ignore', 'pipe', 'ignore'] }
+    );
+    const set = new Set();
+    for (const baris of patch.split('\n')) {
+      const m = baris.match(/^\+\s*"version":\s*"(m025-\d+)"/);
+      if (m) set.add(m[1]);
+    }
+    return set;
+  } catch {
+    return null; // hulu tak terbaca; peringatan soal itu sudah dicetak di bawah
+  }
+}
+
 const hulu = versiHulu();
 const lokal = versiSumber();
 const dasar = hulu && nomor(hulu) >= nomor(lokal) ? hulu : lokal;
-const versiBaru = 'm025-' + (nomor(dasar) + 1);
+
+const diklaim = versiYangPernahDiklaimDiHulu();
+let kandidat = nomor(dasar) + 1;
+const dilompati = [];
+while (diklaim && diklaim.has('m025-' + kandidat) && dilompati.length < 50) {
+  dilompati.push('m025-' + kandidat);
+  kandidat += 1;
+}
+const versiBaru = 'm025-' + kandidat;
+
+if (dilompati.length > 0) {
+  console.warn('DILOMPATI: ' + dilompati.join(', ') + ' sudah diklaim di origin/main oleh jalur lain.');
+  console.warn('Nomor ini naik ke ' + versiBaru + ' supaya satu SW_REV tidak memayungi dua isi berbeda.');
+}
 
 if (!hulu) {
   console.warn('PERINGATAN: versi origin/main tidak bisa dibaca, jadi dasar diambil dari berkas lokal.');
