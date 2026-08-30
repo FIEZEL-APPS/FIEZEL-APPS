@@ -172,7 +172,10 @@ function tulisRingkasan(studi) {
   L.push('3. **Latent ability is static.** Nothing here measures whether Braincore *causes* learning.');
   L.push('4. **One layer.** Item selection is measured by `adaptivity-simulation-v3.js`, whose own');
   L.push('   verdict is a different trade-off (`AUDIT/08`). Do not merge the two into one headline.');
-  L.push('');
+  // Tepat SATU baris baru di akhir. Versi pertama menutup dengan L.push('') lalu menambah '\n'
+  // lagi, jadi berkasnya berakhir dengan baris kosong — `git diff --check` menandainya, `sh()`
+  // di tools/fiezel-guardians.mjs melempar, dan A9 SERTA A10 ikut jatuh dengan stack trace.
+  // Penjaganya benar; berkas sayalah yang cacat.
   return L.join('\n') + '\n';
 }
 

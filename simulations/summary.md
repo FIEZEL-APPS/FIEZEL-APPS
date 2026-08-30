@@ -63,4 +63,3 @@ a behavioural one in what it does — and fixing the first will not move this me
 3. **Latent ability is static.** Nothing here measures whether Braincore *causes* learning.
 4. **One layer.** Item selection is measured by `adaptivity-simulation-v3.js`, whose own
    verdict is a different trade-off (`AUDIT/08`). Do not merge the two into one headline.
-

@@ -122,6 +122,23 @@ test('§4 keempat berkas keluaran ada dan sejalan dengan versi Braincore sekaran
                      'vonis di berkas berbeda dari vonis sekarang — berkasnya basi');
 });
 
+test('§4 berkas keluaran tidak melanggar `git diff --check` (spasi/baris kosong di akhir)', () => {
+  // TEMUAN NYATA, bukan kerapian. Versi pertama tulisRingkasan() menutup dengan baris kosong,
+  // jadi summary.md berakhir dengan '\n\n'. `git diff --check` menandainya, dan sh() di
+  // tools/fiezel-guardians.mjs MELEMPAR ketika git keluar bukan-nol — sehingga A9 Security
+  // Sentinel DAN A10 Regression Watcher sama-sama jatuh dengan stack trace, bukan dengan pesan
+  // yang menyebut penyebabnya. Satu baris kosong menjatuhkan dua penjaga.
+  for (const f of ['results.json', 'baseline-results.json', 'braincore-results.json', 'summary.md']) {
+    const teks = fs.readFileSync(path.join(S.OUT_DIR, f), 'utf8');
+    assert.ok(teks.endsWith('\n'), f + ' tidak berakhir dengan baris baru');
+    assert.ok(!teks.endsWith('\n\n'), f + ' berakhir dengan baris KOSONG — A9 dan A10 akan jatuh');
+    const baris = teks.split('\n');
+    for (let i = 0; i < baris.length; i++) {
+      assert.ok(!/[ \t]+$/.test(baris[i]), f + ':' + (i + 1) + ' berakhir dengan spasi tergantung');
+    }
+  }
+});
+
 /* ---- vonis dicetak, tidak di-assert ---- */
 console.log('');
 console.log('     ' + studi.konfigurasi.jalanBerpasangan + ' jalan berpasangan, '
