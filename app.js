@@ -5863,6 +5863,17 @@ function showOnboarding(now=Date.now()){
   if(!onboarding||typeof onboarding.show!=='function')return null;
   try{
     return onboarding.show(self,{now,
+      // Popup PERTAMA onboarding memilih bahasa. Simpan segera sebelum Step 1 supaya
+      // reload di tengah onboarding mempertahankan pilihan, lalu setLocale membangunkan
+      // fiezel-th-loader. Onboarding sendiri menunggu copy feat-b Thai sebelum mengecat
+      // langkah nama, sehingga tidak ada kilatan/fallback Bahasa Indonesia.
+      onLocale:({locale})=>{
+        const supported=(self.FiezelI18n?.SUPPORTED)||['id','th'];
+        const value=supported.includes(locale)?locale:'id';
+        state.preferences={...state.preferences,learnerLocale:value};state.coachCache=null;save();
+        try{self.FiezelI18n?.setLocale?.(value)}catch(_){}
+        return value
+      },
       // m025-117: langkah pertama perkenalan. Namanya masuk ke state SEKETIKA, bukan di
       // ujung alur - murid yang menutup aplikasi di tengah perkenalan tetap punya namanya
       // saat kembali, dan Home tidak pernah tercat dengan sapaan netral setelah dijawab.
@@ -7286,11 +7297,37 @@ function placement(){shell(FiezelI18n.t('placement.tes-kemampuan-dasar'),FiezelI
 function grammarItemsForLevel(level=getActiveLevel()){
   const target=LEVELS.includes(String(level||''))?String(level):'A1';const bySequence=(a,b)=>Number(a.sequence||Number.MAX_SAFE_INTEGER)-Number(b.sequence||Number.MAX_SAFE_INTEGER)||a.skill.localeCompare(b.skill);return GRAMMAR_ITEMS.filter(entry=>entry.level===target).sort(bySequence);
 }
+/* Braincore v3, temuan T1/T2 council - lihat features/brain/fiezel-item-prior.js.
+ *
+ * Sampai m025-206 ketiga baris di bawah MENIMPA difficulty dengan indeks level CEFR, jadi
+ * seluruh item satu level berkesulitan identik. Akibatnya persis dua hal yang ditulis modul
+ * prior sebagai cacat yang ingin dihapusnya:
+ *
+ *   T2. Term penalti |difficulty - target| bernilai sama untuk SEMUA kandidat, lalu lenyap
+ *       saat sorting. Seleksi soal MENGAKU adaptif terhadap kesulitan sementara secara
+ *       matematis ia tidak pernah memilih berdasarkan kesulitan.
+ *   T1. Informasi Fisher hanya sebanding dengan JUMLAH soal, bukan kecocokan soal, jadi
+ *       estimasi kemampuan IRT tidak pernah lebih pintar daripada persen benar.
+ *
+ * Bukan teori: terukur di peramban pada m025-205 lewat kolam yang dikembalikan fungsi ini -
+ * 634 item A1 SELURUHNYA difficulty 1 (dan tiap level satu nilai konstan: A2=2 .. C2=6), dan
+ * FiezelTutorBrain.selectNext memilih item yang SAMA persis pada ability 0,5 / 0,863 / 1,5 /
+ * 2,5 / 3,5. Kolam inilah yang dipakai startLevelPractice, yaitu sesi belajar biasa.
+ *
+ * Modul priornya sudah ada, sudah dimuat index.html, dan sudah dipakai pembangun sesi
+ * adaptif - hanya jalur ini yang tidak pernah disambungkan. Pola guard di bawah DISALIN dari
+ * sana, bukan varian baru: tanpa modul, difficulty tetap basis level yang lama, jadi
+ * perilaku tanpa Braincore identik dengan hari ini. */
 function makeLevelSource(level){
   const out=[];
-  V.filter(v=>v.level===level).forEach(v=>{const q=makeVocabQuestion(v);q.difficulty=LEVELS.indexOf(level)+1;out.push({q,source:'vocabulary'})});
-  R.filter(r=>r.level===level).forEach(r=>(r.qs||[]).forEach((q,i)=>out.push({q:makeReadingQuestion(r,q,i),difficulty:LEVELS.indexOf(level)+1,source:'reading'})));
-  grammarItemsForLevel(level).forEach(({skill,item})=>{const q=makeGrammarQuestion(skill,item);q.difficulty=LEVELS.indexOf(level)+1;out.push({q,source:'grammar'})});
+  const dasar=LEVELS.indexOf(level)+1;
+  const prior=(q,domain)=>{
+    try{const p=Number(self.FiezelItemPrior?.difficultyFor?.({level,domain,mode:String(q?.practiceMode||''),stemLength:String(q?.question||'').length}));
+      return Number.isFinite(p)&&p>0?p:dasar}catch{return dasar}
+  };
+  V.filter(v=>v.level===level).forEach(v=>{const q=makeVocabQuestion(v);q.difficulty=prior(q,'vocabulary');out.push({q,source:'vocabulary'})});
+  R.filter(r=>r.level===level).forEach(r=>(r.qs||[]).forEach((q,i)=>{const soal=makeReadingQuestion(r,q,i);soal.difficulty=prior(soal,'reading');out.push({q:soal,difficulty:soal.difficulty,source:'reading'})}));
+  grammarItemsForLevel(level).forEach(({skill,item})=>{const q=makeGrammarQuestion(skill,item);q.difficulty=prior(q,'grammar');out.push({q,source:'grammar'})});
   return out;
 }
 // m025-114: OWNER mengubah tes 150 soal menjadi 25 SOAL TES KEMAMPUAN DASAR.

@@ -161,8 +161,91 @@ function advanceTo(run, targetStep) {
 
 test('enam langkah nyata (Step 1 nama + Step 2-6), carousel tetap dua slide', () => {
   assert.ok(Array.isArray(onboarding.CAROUSEL_SLIDES) && onboarding.CAROUSEL_SLIDES.length === 2);
+  assert.strictEqual(onboarding.LANGUAGE_STEP, 0);
   assert.strictEqual(onboarding.LAST_STEP, 6);
   assert.strictEqual(onboarding.NAME_STEP, 1);
+});
+
+test('popup pertama onboarding memilih Bahasa Indonesia atau Thai sebelum Step 1', () => {
+  const env = fakeEnv();
+  const selected = [];
+  const run = onboarding.show(env, { now: NOW, force: true, onLocale: ({ locale }) => {
+    selected.push(locale);
+    global.FiezelI18n.setLocale(locale);
+  } });
+  assert.strictEqual(run.stepIndex(), onboarding.LANGUAGE_STEP);
+  assert.ok(/Choose your language/.test(run.element.innerHTML));
+  assert.ok(/Bahasa Indonesia/.test(run.element.innerHTML));
+  assert.ok(/ภาษาไทย/.test(run.element.innerHTML));
+  const choices = run.element.querySelectorAll('[data-ob-locale]');
+  assert.deepStrictEqual(choices.map(b => b.getAttribute('data-ob-locale')), ['id', 'th']);
+  choices[0].listeners.click[0]();
+  assert.deepStrictEqual(selected, ['id']);
+  assert.strictEqual(onboarding.storedLocale(env), 'id');
+  assert.strictEqual(run.stepIndex(), onboarding.NAME_STEP);
+  assert.ok(/data-ob-name/.test(run.element.innerHTML));
+
+  // Reload sebelum nama dijawab tidak boleh menanyakan bahasa lagi. Callback dipanggil
+  // dengan locale tersimpan agar state aplikasi dan runtime i18n kembali sinkron.
+  const resumed = onboarding.show(env, { now: NOW, force: true, onLocale: ({ locale }) => {
+    selected.push(locale);
+    global.FiezelI18n.setLocale(locale);
+  } });
+  assert.strictEqual(resumed.stepIndex(), onboarding.NAME_STEP);
+  assert.deepStrictEqual(selected, ['id', 'id']);
+  assert.ok(!/Choose your language/.test(resumed.element.innerHTML));
+});
+
+test('pilihan Thai menunggu bundle Thai tanpa sempat mengecat fallback Indonesia', () => {
+  const pendingTimers = [];
+  const env = fakeEnv({
+    setTimeout: fn => { pendingTimers.push(fn); return pendingTimers.length; },
+    clearTimeout: id => { pendingTimers[id - 1] = null; }
+  });
+  const run = onboarding.show(env, { now: NOW, force: true, onLocale: ({ locale }) => {
+    global.FiezelI18n.setLocale(locale);
+  } });
+  run.element.querySelector('[data-ob-locale="th"]').listeners.click[0]();
+  assert.strictEqual(run.stepIndex(), onboarding.LANGUAGE_STEP, 'tetap di pemilih sampai copy Thai siap');
+  assert.strictEqual(onboarding.storedLocale(env), 'th', 'pilihan disimpan segera untuk reload');
+  assert.ok(/aria-busy="true"/.test(run.element.innerHTML));
+  assert.ok(/กำลังเตรียมภาษาไทย/.test(run.element.innerHTML));
+  assert.ok(!/Nama panggilan|Tulis nama kamu/.test(run.element.innerHTML),
+    'Step 1 fallback Indonesia belum boleh dicat selama bundle Thai ditunggu');
+  run.close();
+});
+
+test('memilih Thai mengecat SELURUH onboarding dengan copy Thai, bukan campuran Indonesia', () => {
+  // Produksi memuat copy Thai dinamis. Di gate ini daftarkan domain onboarding lalu buktikan
+  // semua layar mengambil T() saat render (bukan membekukan copy Indonesia saat require).
+  const thPath = require.resolve('./features/i18n/copy-th-feat-b.js');
+  const hadSelf = Object.prototype.hasOwnProperty.call(global, 'self');
+  const previousSelf = hadSelf ? global.self : undefined;
+  global.self = global;
+  try { if (!require.cache[thPath]) require(thPath); }
+  finally { if (hadSelf) global.self = previousSelf; else delete global.self; }
+
+  const env = fakeEnv();
+  try {
+    const run = onboarding.show(env, { now: NOW, force: true, onLocale: ({ locale }) => {
+      global.FiezelI18n.setLocale(locale);
+    } });
+    run.element.querySelector('[data-ob-locale="th"]').listeners.click[0]();
+    assert.strictEqual(run.stepIndex(), onboarding.NAME_STEP);
+    assert.strictEqual(onboarding.storedLocale(env), 'th');
+    assert.ok(/ชื่อเล่น|คุณชื่ออะไร/.test(run.element.innerHTML), 'langkah nama harus Thai');
+
+    const thaiScreens = [
+      onboarding.carouselMarkup(env, 0), onboarding.carouselMarkup(env, 1),
+      onboarding.goalMarkup(env, 'school', 'B1'), onboarding.placementMarkup(env),
+      onboarding.scheduleMarkup(env), onboarding.summaryMarkup(env, 'Ayu', 'school', 'B1', true)
+    ].join(' ');
+    assert.ok(/[\u0E00-\u0E7F]/.test(thaiScreens), 'layar onboarding harus mengandung aksara Thai');
+    assert.ok(!/Lewati langkah ini|Mulai tes penempatan|Ini isi aplikasinya|Nama panggilan|Pengingat/.test(thaiScreens),
+      'literal Indonesia tidak boleh bocor ke onboarding Thai');
+  } finally {
+    global.FiezelI18n.setLocale('id');
+  }
 });
 
 test('goal selection memakai profil tujuan ASLI aplikasi, bukan Travel/Work/Fun spesifikasi', () => {
