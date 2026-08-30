@@ -855,3 +855,37 @@ F-3 — dan salahnya milik saya, bukan repo. Saya mencabutnya di F.0 dengan alas
 diperiksa siapa pun. Aturan D melarang saya menyembunyikan kegagalan; ia melarang saya dengan
 alasan yang sama membiarkan tuduhan keliru tetap berdiri, karena temuan palsu memakan waktu
 perbaikan yang seharusnya jatuh ke cacat sungguhan.
+
+---
+
+## Catatan HEAD (Aturan A) — vonis diperpanjang ke `2a00853` / m025-210
+
+Vonis di atas terikat `82496f6` / m025-209. Sementara adendum ini digabung, `main` bergerak ke
+**`2a00853` / m025-210** lewat PR #269 (sesi lain: pemulihan boot PWA mobile + penengahan optis
+splash), yang menyentuh `index.html`, `style.css`, `sw.js`, dan `features/brand/fiezel-splash.js`
+— **tepat jalur boot yang saya ukur sesi ini**. Membiarkan vonis menggantung di SHA yang sudah
+dilewati akan melanggar Aturan A, jadi ia diperiksa ulang.
+
+**Diukur ulang di `2a00853`:**
+
+| | |
+|---|---|
+| CI di HEAD | **HIJAU** — `quality`, `build`, `safari26`, `deploy`, nol gagal |
+| Paritas produksi | **TERBUKTI** — situs hidup menyajikan `m025-210` dan `SW_REV m025-210-mobile-pwa-boot-splash-20260830` (run `33323489109`, 16:48:42Z). **Pengukuran kelima berturut-turut.** |
+| Asap runtime | **BERSIH** — boot, `serviceWorker: activated`, 15 modul otak, **nol galat halaman**, nol luapan horizontal (390/390) |
+| Matriks gerbang | **hijau di HEAD** — job `quality` menjalankan seluruh 212 gerbang |
+
+**Yang TIDAK diukur ulang di m025-210, dan kenapa itu tidak memindahkan vonisnya:**
+
+- **Gerbang live (CF + AI).** Keduanya menguji **Worker** `fiezel-api`, bukan halaman. PR #269
+  tidak menyentuh `workers/`, jadi bukti di F.4 tetap berlaku apa adanya.
+- **Braincore v3 E2E.** PR #269 tidak menyentuh `app.js` maupun `features/brain/`, jadi kabel
+  yang dibuktikan di F.2 tidak dilewati perubahan itu.
+
+**VONIS TETAP: GO**, kini terikat **`2a00853` / m025-210**, dengan ketiga larangan yang sama
+persis dan tidak berkurang satu pun.
+
+Satu hal yang tetap harus disebut: perubahan splash/boot di m025-210 datang dari sesi lain dan
+saya **tidak** mengauditnya baris demi baris — yang saya ukur adalah akibatnya (CI, paritas,
+asap runtime), dan ketiganya bersih. Itu batas yang jujur, bukan jaminan yang lebih luas
+daripada buktinya.
