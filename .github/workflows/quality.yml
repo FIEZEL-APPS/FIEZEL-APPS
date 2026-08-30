@@ -752,6 +752,11 @@ jobs:
           # memeriksa titik-titik sambung app.js yang ditirunya masih ada — alat ukur yang
           # diam-diam mengukur hal lain lebih berbahaya daripada tidak ada alat ukur.
           node braincore-pipeline-test.js
+          # Fase 2 / Phase D: lima profil murid sintetis (kuat, kesulitan, lupa, penebak
+          # cepat, beban bahasa) lewat Braincore sungguhan. TIDAK ADA data murid nyata —
+          # yang diuji bukan "apakah Braincore membantu murid" (itu belum terjawab), tetapi
+          # apakah mesinnya BEREAKSI BERBEDA terhadap pola belajar yang berbeda.
+          node braincore-learner-profiles-test.js
           node fiezel-stat-gate-test.js
           node id-golden-snapshot-test.js
           node learning-lane-test.js

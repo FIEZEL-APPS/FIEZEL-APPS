@@ -85,6 +85,33 @@ function answer(learner, question, answerInput, now) {
   const nowMs = Number(now) || 0;
   const correct = a.correct === true;
 
+  /* Sesi tutor DISALIN DI SINI, di paling atas — bukan di langkah 10 tempat ia dipakai.
+   *
+   * Versi pertama mendeklarasikannya di langkah 10 tetapi memakainya di langkah 7 (ledger
+   * miskonsepsi). Itu temporal dead zone: `ReferenceError: Cannot access 'tutorSession'
+   * before initialization`. Dan penjaga try/catch di langkah 7 MENELANNYA — jadi ledger
+   * diam-diam tidak pernah terisi, dan profil "murid kesulitan" terlihat seperti ledger
+   * Braincore yang rusak. Braincore-nya baik-baik saja; harness ini yang cacat, dan
+   * cacatnya disembunyikan oleh penjaganya sendiri.
+   *
+   * Ini persis kelas cacat yang audit Fase 1 catat sebagai risiko (`catch{}` senyap di
+   * app.js membuat modul yang gagal berhenti bekerja tanpa bersuara) — direproduksi di sini
+   * oleh penulis catatan itu sendiri. Lihat guardErrors di bawah untuk penutupnya. */
+
+  /* PENJAGA YANG TIDAK BOLEH SENYAP.
+   * Penjaga per-langkah dipertahankan karena app.js memang begitu — modul absen harus
+   * mendegradasi, bukan meledak. Tetapi harness yang menyembunyikan galatnya sendiri tidak
+   * berguna: setiap galat yang tertangkap DICATAT dan ikut dikembalikan, dan gerbangnya
+   * meng-assert daftar itu KOSONG untuk masukan normal. Degradasi yang disengaja tetap
+   * mungkin; degradasi yang tidak disadari tidak. */
+  const tutorSession = JSON.parse(JSON.stringify(learner.tutor));
+
+  const guardErrors = [];
+  const guard = (stage, fn, fallback) => {
+    try { return fn(); }
+    catch (e) { guardErrors.push(stage + ': ' + (e && e.message ? e.message : String(e))); return fallback; }
+  };
+
   // ---- 1. KESULITAN SEBELUM MENJAWAB (app.js:2958 buildAdaptivePool) -----------------
   // Prior menimpa difficulty soal; kalibrasi mengoreksinya dari murid nyata.
   // ItemPrior.difficultyFor() mengembalikan ANGKA, bukan objek — diverifikasi dengan
@@ -153,22 +180,18 @@ function answer(learner, question, answerInput, now) {
   // ---- 7. MISKONSEPSI (app.js:2136 MisconceptionLedger.update) ------------------------
   let ledgerNext = learner.ledger;
   if (!correct && a.chosenMisconception) {
-    try {
-      ledgerNext = Ledger.update(learner.ledger, {
-        concept: String(q.concept || lesson),
-        misconception: String(a.chosenMisconception),
-        sessionId: String(tutorSession.startedAt),
-        timing: String(a.timing || 'normal')
-      }, nowMs);
-    } catch (_) { /* guard, persis app.js */ }
+    ledgerNext = guard('ledger', () => Ledger.update(learner.ledger, {
+      concept: String(q.concept || lesson),
+      misconception: String(a.chosenMisconception),
+      sessionId: String(tutorSession.startedAt),
+      timing: String(a.timing || 'normal')
+    }, nowMs), learner.ledger);
   }
 
   // ---- 8. KALIBRASI ITEM (app.js itemCalibrationObserve) ------------------------------
-  let calibrationNext = learner.calibration;
-  try {
-    calibrationNext = Calibration.observe(learner.calibration,
-      { itemId: String(q.id || ''), correct, weight: kappa == null ? 1 : kappa, prior: priorValue }, nowMs);
-  } catch (_) { /* guard */ }
+  const calibrationNext = guard('calibration', () => Calibration.observe(learner.calibration,
+    { itemId: String(q.id || ''), correct, weight: kappa == null ? 1 : kappa, prior: priorValue }, nowMs),
+    learner.calibration);
 
   // ---- 9. AFEK (app.js:2234 affectObserve) -------------------------------------------
   const affectRows = learner.affectRows.concat([{
@@ -202,7 +225,6 @@ function answer(learner, question, answerInput, now) {
   // Ditangkap gerbangnya sendiri ("keadaan murid TIDAK dimutasi di tempat"), bukan ditemukan
   // belakangan setelah Fase E terlanjur melaporkan hasil. Sesi disalin dulu; salinan itulah
   // yang dimutasi dan dikembalikan bersama murid barunya.
-  const tutorSession = JSON.parse(JSON.stringify(learner.tutor));
   const diagnosis = TutorBrain.record(tutorSession, {
     correct, skill: lesson, concept: String(q.concept || lesson),
     ms: Math.max(0, Number(a.ms) || 0), now: nowMs,
@@ -258,7 +280,7 @@ function answer(learner, question, answerInput, now) {
     tutor: tutorSession
   };
 
-  return { trace, learner: nextLearner, decision: move, diagnosis };
+  return { trace, learner: nextLearner, decision: move, diagnosis, guardErrors };
 }
 
 /** Petakan keputusan tutor ke enum tertutup Decision Trace. Nilai asing menjadi 'unknown' —
@@ -286,4 +308,26 @@ function collectReasons(outputs) {
   return out;
 }
 
-module.exports = { createLearner, answer, ability, normalizeDecision, collectReasons };
+/**
+ * Mulai SESI baru untuk murid yang sama — meniru app.js, yang memanggil
+ * TutorBrain.createSession() sekali per kuis, bukan sekali seumur hidup murid.
+ *
+ * KENAPA INI PENTING, dan kenapa ia ditambahkan sesudah gerbang menangkap ketiadaannya:
+ * fiezel-misconception-ledger.js menuntut MIN_SESSIONS >= 2 sebelum sebuah miskonsepsi
+ * boleh disebut aktif — pagar yang sengaja ada supaya satu sore yang buruk tidak cukup
+ * untuk menuduh murid. Pipeline versi pertama memakai SATU sessionId selamanya, jadi
+ * pagar itu MUSTAHIL dilewati dan profil "murid kesulitan" terlihat seperti ledger yang
+ * rusak. Ledgernya benar; harness-nya yang tidak setia pada produksi.
+ */
+function newSession(learner, now) {
+  return {
+    ...learner,
+    tutor: TutorBrain.createSession({ now: Number(now) || 0, baselineMs: 0 }),
+    affectRows: [],            // jendela afek adalah per-sesi (app.js:2227 affectSessionSync)
+    affectState: 'neutral',
+    affectConfidence: 0,
+    affectChanged: false
+  };
+}
+
+module.exports = { createLearner, newSession, answer, ability, normalizeDecision, collectReasons };

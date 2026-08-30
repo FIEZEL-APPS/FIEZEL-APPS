@@ -181,6 +181,37 @@ test('keadaan murid TIDAK dimutasi di tempat — pemanggil memegang salinan baru
  * 8. PIPELINE MASIH MENUNJUK KODE PRODUKSI YANG SAMA
  * ===================================================================================== */
 
+test('PENJAGA TIDAK SENYAP: masukan normal tidak menghasilkan satu pun galat tertangkap', () => {
+  // Kenapa gerbang ini ada, dan ia lahir dari kesalahan penulisnya sendiri: versi pertama
+  // pipeline memakai `tutorSession` di langkah 7 padahal ia baru dideklarasikan di langkah 10
+  // — temporal dead zone. try/catch di langkah itu MENELAN ReferenceError-nya, jadi ledger
+  // miskonsepsi diam-diam tidak pernah terisi dan profil "murid kesulitan" terlihat seperti
+  // Braincore yang rusak. Braincore-nya benar; harness-nya cacat, dan penjaganya sendiri yang
+  // menyembunyikan cacat itu selama dua fase.
+  //
+  // Penjaganya TETAP ADA (app.js memang mendegradasi saat modul absen), tetapi sekarang ia
+  // MENCATAT. Gerbang ini menuntut catatan itu kosong untuk masukan yang sehat — degradasi
+  // yang disengaja tetap mungkin, degradasi yang tidak disadari tidak.
+  for (const [label, ans] of [
+    ['benar', { correct: true, ms: 6000, timing: 'normal' }],
+    ['salah', { correct: false, ms: 7000, timing: 'normal' }],
+    ['salah + miskonsepsi', { correct: false, ms: 7000, timing: 'normal', chosenMisconception: 'm1' }],
+    ['tebakan cepat', { correct: true, ms: 700, timing: 'guess' }],
+    ['beban bahasa', { correct: false, ms: 7000, timing: 'normal', langLoad: 'full_en' }]
+  ]) {
+    const r = P.answer(fresh(), Q, ans, T0);
+    assert.deepStrictEqual(r.guardErrors, [],
+      `penjaga menelan galat pada masukan "${label}": ${JSON.stringify(r.guardErrors)}`);
+  }
+});
+
+test('ledger miskonsepsi BENAR-BENAR terisi lewat pipeline (bukan null diam-diam)', () => {
+  const r = P.answer(fresh(), Q, { correct: false, ms: 7000, timing: 'normal', chosenMisconception: 'm1' }, T0);
+  assert.ok(r.learner.ledger && r.learner.ledger.entries,
+    'ledger tetap null sesudah jawaban salah ber-miskonsepsi — jalurnya putus tanpa bersuara');
+  assert.ok(Object.keys(r.learner.ledger.entries).length >= 1, 'ledger terisi tetapi tanpa entri');
+});
+
 test('titik sambung app.js yang dirujuk pipeline masih ada di app.js', () => {
   const fs = require('fs'), path = require('path');
   const app = fs.readFileSync(path.join(__dirname, 'app.js'), 'utf8');
