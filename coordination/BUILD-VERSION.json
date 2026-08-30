@@ -1,7 +1,7 @@
 {
-  "version": "m025-210",
+  "version": "m025-211",
   "claimedBy": "perplexity-computer (multilingual i18n wave, direbase atas m025-185)",
-  "claimedAt": "2026-08-30T15:03:46.674Z",
-  "reason": "mobile PWA boot recovery and splash optical centering",
+  "claimedAt": "2026-08-30T18:40:23.143Z",
+  "reason": "Thai quick-tour copy follows the active locale after onboarding",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
