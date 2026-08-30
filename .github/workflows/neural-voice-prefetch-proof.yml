@@ -12,7 +12,7 @@ permissions:
 jobs:
   proof:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -20,3 +20,15 @@ jobs:
           node-version: '20'
       - name: Run neural voice prefetch regression gate
         run: node voice-prefetch-neural-test.js
+      - name: Run required neural voice regression suite
+        run: |
+          node voice-chunker-test.js
+          node prosody-test.js
+          node voice-pipeline-gap-test.js
+          node voice-prefetch-neural-test.js
+          node voice-callsite-prefetch-test.js
+          node voice-fallback-chain-test.js
+          node voice-offline-fallback-test.js
+          node tts-provider-contract-test.js
+          node tts-transport-switch-test.js
+          node listening-subtitle-suppression-test.js
