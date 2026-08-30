@@ -59,7 +59,7 @@ function harness(){
     check('stale timeout/local fallback is inert',oldResult===false&&h.spoken.length===0&&!/ID old/.test(h.subtitle.textContent),'result='+oldResult+' spoken='+h.spoken.length+' subtitle='+h.subtitle.textContent);
     h.fire(newTimer);const newResult=await newer;await tick();
     check('current timeout/local fallback still speaks',newResult===true&&h.spoken.length===1&&h.spoken[0].en==='EN new','result='+newResult+' spoken='+JSON.stringify(h.spoken));
-    check('current local answer still paints its subtitle',h.subtitle.textContent==='ID new','subtitle='+h.subtitle.textContent);
+    check('current local answer still paints the current subtitle plus its intentional availability note',h.subtitle.textContent.startsWith('ID new')&&!/ID old/.test(h.subtitle.textContent),'subtitle='+h.subtitle.textContent);
   }
 
   {
