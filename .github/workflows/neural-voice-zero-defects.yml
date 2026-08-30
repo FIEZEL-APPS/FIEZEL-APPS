@@ -26,5 +26,4 @@ jobs:
           cp tools/evidence/neural-voice-zero-defects-repair-v3.sh /tmp/neural-voice-zero-defects-repair-v3.sh
           cp tools/evidence/voice-audio-race-test.js /tmp/voice-audio-race-test.js
           cp tools/evidence/tutor-voice-chat-race-test.js /tmp/tutor-voice-chat-race-test.js
-          cp tools/evidence/listening-timeout-ownership-test.js /tmp/listening-timeout-ownership-test.js
-          bash /tmp/neural-voice-zero-defects-repair-v3.sh /tmp/neural-voice-zero-defects-repair-v2.sh /tmp/listening-timeout-ownership-test.js
+          bash /tmp/neural-voice-zero-defects-repair-v3.sh /tmp/neural-voice-zero-defects-repair-v2.sh tools/evidence/listening-timeout-ownership-test.js
