@@ -258,35 +258,36 @@ self.addEventListener('fetch',e=>{
     return;
   }
   let responsePromise;
+  /* ================== m025-201: ANGGARAN JARINGAN UNTUK NAVIGASI ==================
+    m025-201 (laporan OWNER: "PWA di iPhone yang sudah terinstal harus terhubung ke
+    internet baru bisa jalan"). Ia benar, dan perasaannya bahwa dulu tidak begitu juga benar.
+   
+    Bentuk di atas menunggu jaringan TANPA BATAS WAKTU. Itu aman selama "tidak ada jaringan"
+    berarti fetch MENOLAK - dan memang begitu saat mode pesawat. Tetapi keadaan yang paling
+    sering dialami murid bukan itu: Wi-Fi sekolah berhalaman-login, atau sinyal seluler satu
+    batang. Di sana koneksinya DITERIMA lalu tidak pernah dijawab, jadi fetch MENGGANTUNG,
+    dan cangkang yang sudah rapi di cache tidak pernah disentuh sampai iOS menyerah sendiri.
+   
+    TERUKUR, dengan 181 berkas cangkang sudah tersimpan:
+      jaringan benar-benar mati ...... aplikasi jalan dalam   21 ms
+      jaringan MENGGANTUNG ........... aplikasi TIDAK PERNAH jalan (habis waktu di 30 s)
+   
+    Jadi yang ditambahkan hanyalah BATAS WAKTU, bukan pergantian strategi. Jaringan tetap
+    didahulukan dan pemulihan-otomatis di atas tetap utuh: selama jawaban tiba dalam
+    anggaran, jalannya sama persis dengan sebelumnya, bita demi bita.
+   
+    Kalau anggaran lewat, cangkang disajikan - TETAPI permintaan jaringannya TIDAK
+    dibatalkan. Ia dijaga hidup lewat waitUntil supaya tetap menyegarkan cache, jadi
+    peluncuran berikutnya memperoleh dokumen baru itu. Penyembuhan tidak hilang; ia hanya
+    mundur satu peluncuran pada jaringan yang buruk - harga yang jauh lebih murah daripada
+    aplikasi yang tidak mau terbuka sama sekali.
+     ============================================================================== */
   if(e.request.mode==='navigate'){
     // Installed-PWA startup is recovery-first: validate a fresh network document
     // before trusting the revisioned shell entry. A blank/stale cached navigation
     // can therefore self-heal online; offline launch still falls back to the exact
     // current generation's index.html and never borrows legacy runtime-shell bytes.
-    // m025-201 (laporan OWNER: "PWA di iPhone yang sudah terinstal harus terhubung ke
-    // internet baru bisa jalan"). Ia benar, dan perasaannya bahwa dulu tidak begitu juga benar.
-    //
-    // Bentuk di atas menunggu jaringan TANPA BATAS WAKTU. Itu aman selama "tidak ada jaringan"
-    // berarti fetch MENOLAK - dan memang begitu saat mode pesawat. Tetapi keadaan yang paling
-    // sering dialami murid bukan itu: Wi-Fi sekolah berhalaman-login, atau sinyal seluler satu
-    // batang. Di sana koneksinya DITERIMA lalu tidak pernah dijawab, jadi fetch MENGGANTUNG,
-    // dan cangkang yang sudah rapi di cache tidak pernah disentuh sampai iOS menyerah sendiri.
-    //
-    // TERUKUR, dengan 181 berkas cangkang sudah tersimpan:
-    //   jaringan benar-benar mati ...... aplikasi jalan dalam   21 ms
-    //   jaringan MENGGANTUNG ........... aplikasi TIDAK PERNAH jalan (habis waktu di 30 s)
-    //
-    // Jadi yang ditambahkan hanyalah BATAS WAKTU, bukan pergantian strategi. Jaringan tetap
-    // didahulukan dan pemulihan-otomatis di atas tetap utuh: selama jawaban tiba dalam
-    // anggaran, jalannya sama persis dengan sebelumnya, bita demi bita.
-    //
-    // Kalau anggaran lewat, cangkang disajikan - TETAPI permintaan jaringannya TIDAK
-    // dibatalkan. Ia dijaga hidup lewat waitUntil supaya tetap menyegarkan cache, jadi
-    // peluncuran berikutnya memperoleh dokumen baru itu. Penyembuhan tidak hilang; ia hanya
-    // mundur satu peluncuran pada jaringan yang buruk - harga yang jauh lebih murah daripada
-    // aplikasi yang tidak mau terbuka sama sekali.
     const freshRequest=new Request(e.request,{cache:'reload'});
-    const cangkang=()=>caches.match('./index.html',{cacheName:SHELL_CACHE});
     const jaringan=fetch(freshRequest).then(r=>{
       if(r&&r.ok){
         const copy=r.clone();
@@ -295,16 +296,12 @@ self.addEventListener('fetch',e=>{
       }
       return cangkang().then(c=>c||r);
     }).catch(()=>cangkang());
-    // Permintaan jaringan dijaga hidup melampaui respondWith: tanpa ini, menyajikan cangkang
-    // lebih dulu akan MEMBATALKAN penyegaran cache-nya, dan cangkang basi tidak akan pernah
-    // sembuh di perangkat yang jaringannya selalu lambat.
+    const cangkang=()=>caches.match('./index.html',{cacheName:SHELL_CACHE});
     try{e.waitUntil(jaringan)}catch(_){}
     const HABIS=Symbol('nav-timeout');
     const anggaran=new Promise(resolve=>setTimeout(()=>resolve(HABIS),NAV_NETWORK_BUDGET_MS));
     responsePromise=Promise.race([jaringan,anggaran]).then(hasil=>{
       if(hasil!==HABIS)return hasil;
-      // Anggaran lewat. Cangkang kalau ada; kalau perangkat ini memang belum punya cangkang
-      // (pemasangan pertama), tidak ada pilihan selain tetap menunggu jaringan.
       return cangkang().then(c=>c||jaringan);
     });
   }else if(isNeuralAsset(e.request)){
