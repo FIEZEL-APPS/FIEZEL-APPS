@@ -261,9 +261,10 @@ Braincore-only sale.
 
 | # | Item | Severity |
 |---|---|---|
-| 1 | **Silent `catch{}` everywhere.** If a Braincore module started failing, the app would keep running, quietly stop being adaptive, and **nothing would report it.** No alarm exists. | 🟠 |
+| 1 | **Silent `catch{}` everywhere.** If a Braincore module started failing, the app would keep running, quietly stop being adaptive, and **nothing would report it.** No alarm exists. **This is not theoretical:** Phase F found four separate cases where a module's output — its reason codes, its affect assessment, its calibration result — was computed correctly and then discarded by the code around it, with nothing red anywhere. See `AUDIT/07_DECISION_EXPLAINABILITY.md`. | 🟠 |
 | 2 | **`GUESS_FLOOR = 0.25` assumes exactly 4 options.** 3- or 5-option questions are mis-modelled. | 🟡 |
 | 3 | **Confusion matrix computes `suggestPrerequisiteEdges()` and nothing reads it.** Built, tested, ignored — arguably the most under-exploited asset in Braincore. | 🟡 |
+| 3b | **Braincore's own explanations mostly say "not enough data yet" for a new learner.** Every decision now carries reason codes (Phase F), but calibration needs `MIN_N_APPLY` observations and affect needs a filled window, so early on the honest answer *is* `..._insufficient_evidence`. Accurate, but a buyer should not read "100% of decisions explained" as "100% richly explained." | 🟡 |
 | 4 | **Indonesian strings frozen inside pure modules.** `app.js` reassembles Thai externally. A buyer in another language must externalise these. | 🟡 |
 | 5 | **Cloudflare database IDs are placeholders.** The repository alone cannot deploy the API without a setup step. | ℹ️ |
 | 6 | **No `package-lock.json`.** Low practical risk (one dependency, server-side only) but reviewers ask. | ℹ️ |
