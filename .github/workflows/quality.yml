@@ -812,6 +812,13 @@ jobs:
           # disebut tautologi, dan hasilnya deterministik. Tidak ada ambang mutu yang di-assert —
           # belum ada yang berhak menetapkannya tanpa murid sungguhan.
           node braincore-metrics-test.js
+          # Fase 2 / Phase J: studi murid simulasi, 540 jalan berpasangan dengan CI bootstrap
+          # yang DIPINJAM dari adaptivity-simulation-v3-extended (bukan ditulis ulang). Gerbang
+          # ini menjaga METODENYA, bukan vonisnya: vonis studi ini saat ini tidak menyenangkan,
+          # dan gerbang yang menuntut vonis tertentu memaksa orang mengarangnya. Yang di-assert:
+          # reprodusibel, lengannya benar-benar berpasangan, dan `inconclusive` tidak pernah
+          # ditulis sebagai "lebih baik".
+          node braincore-study-test.js
           node fiezel-stat-gate-test.js
           node id-golden-snapshot-test.js
           node learning-lane-test.js
