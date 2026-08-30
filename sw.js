@@ -8,7 +8,6 @@ const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
  * jalur pemulihan-otomatis praktis tidak pernah menyentuh batas ini. Yang menyentuhnya justru
  * jaringan yang menggantung, dan di sana setiap detik tambahan adalah detik murid menatap
  * layar kosong padahal cangkangnya sudah ada di perangkat. */
-const NAV_NETWORK_BUDGET_MS=2500;
 // m025-162: rebase di atas m026-01 (maskot PAW). DIAG_BUILD + FIEZEL_PAGE_BUILD naik ke
 // m025-159 di commit ini, jadi awalan SW_REV ikut naik; deskriptor menggabungkan kedua
 // gelombang (reading-register + maskot) supaya jejak rilisnya jujur.
@@ -46,7 +45,7 @@ const NAV_NETWORK_BUDGET_MS=2500;
 // TIDAK ikut ASSETS - ia hidup di cache locale terpisah (LOCALE_TH_CACHE di bawah) yang
 // diisi halaman on-demand, meniru pola neural-prepare, sehingga murid Indonesia tidak
 // pernah membayar byte Thai.
-const SW_REV='m025-210-mobile-pwa-boot-splash-20260830';
+const SW_REV='m025-211-mobile-pwa-boot-splash-20260830';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 // m025-61: health check menanyakan revisi shell langsung ke worker yang sedang aktif.
 // Menebaknya dari nama cache tidak cukup: cache lama bisa tertinggal, sedangkan jawaban ini
@@ -258,52 +257,68 @@ self.addEventListener('fetch',e=>{
     return;
   }
   let responsePromise;
-  /* ================== m025-201: ANGGARAN JARINGAN UNTUK NAVIGASI ==================
-    m025-201 (laporan OWNER: "PWA di iPhone yang sudah terinstal harus terhubung ke
-    internet baru bisa jalan"). Ia benar, dan perasaannya bahwa dulu tidak begitu juga benar.
+  /* ============ m025-211: NAVIGASI DILAYANI CANGKANG DULU, JARINGAN MENYUSUL ============
+    Laporan OWNER sesudah m025-206: "aman tapi sedikit lambat."
 
-    Bentuk di atas menunggu jaringan TANPA BATAS WAKTU. Itu aman selama "tidak ada jaringan"
-    berarti fetch MENOLAK - dan memang begitu saat mode pesawat. Tetapi keadaan yang paling
-    sering dialami murid bukan itu: Wi-Fi sekolah berhalaman-login, atau sinyal seluler satu
-    batang. Di sana koneksinya DITERIMA lalu tidak pernah dijawab, jadi fetch MENGGANTUNG,
-    dan cangkang yang sudah rapi di cache tidak pernah disentuh sampai iOS menyerah sendiri.
+    Ia benar, dan sebabnya terukur. Bentuk sebelumnya mengambil dokumen dari JARINGAN lebih
+    dulu (dengan anggaran 2,5 detik), padahal salinan yang sempurna sudah ada di perangkat.
+    Jadi setiap peluncuran membayar satu perjalanan jaringan penuh sebelum satu piksel pun
+    tercat. Diukur dengan 181 berkas cangkang sudah tersimpan:
 
-    TERUKUR, dengan 181 berkas cangkang sudah tersimpan:
-      jaringan benar-benar mati ...... aplikasi jalan dalam   21 ms
-      jaringan MENGGANTUNG ........... aplikasi TIDAK PERNAH jalan (habis waktu di 30 s)
+      jaringan sehat ......... FCP    60 ms
+      jaringan lambat ........ FCP   752 ms
+      jaringan menggantung ... FCP  2556 ms   (habis anggaran, baru cangkang disajikan)
 
-    Jadi yang ditambahkan hanyalah BATAS WAKTU, bukan pergantian strategi. Jaringan tetap
-    didahulukan dan pemulihan-otomatis di atas tetap utuh: selama jawaban tiba dalam
-    anggaran, jalannya sama persis dengan sebelumnya, bita demi bita.
+    Tetapi kecepatan bukan alasan utama perubahan ini. Alasan utamanya KOHERENSI, dan ia
+    cacat yang lebih serius daripada lambat.
 
-    Kalau anggaran lewat, cangkang disajikan - TETAPI permintaan jaringannya TIDAK
-    dibatalkan. Ia dijaga hidup lewat waitUntil supaya tetap menyegarkan cache, jadi
-    peluncuran berikutnya memperoleh dokumen baru itu. Penyembuhan tidak hilang; ia hanya
-    mundur satu peluncuran pada jaringan yang buruk - harga yang jauh lebih murah daripada
-    aplikasi yang tidak mau terbuka sama sekali.
+    SELURUH aset cangkang non-navigasi dilayani cache-first di dalam generasinya
+    (`isShellRequest` di bawah). Hanya DOKUMEN yang diambil dari jaringan. Akibatnya, begitu
+    build baru terbit sementara SW lama masih aktif - dan ia memang masih aktif, karena
+    berkas ini sengaja tidak pernah memanggil skipWaiting() - murid menerima
+    `index.html` build N+1 yang dijalankan di atas JavaScript build N.
+
+    Terukur, bukan dugaan: dengan SW_REV tidak berubah, dokumen membawa penanda terbitan baru
+    sementara `core-config.js` masih membawa penanda terbitan lama. TIDAK SEPADAN. Itu persis
+    cangkang tak sepadan yang cabang ini justru dimaksudkan mencegah.
+
+    Karena itu dokumen kini dilayani dari SHELL_CACHE, sama seperti setiap aset lain. Nama
+    cache-nya berkunci SW_REV dan `activate` menghapus generasi lain, jadi cangkang yang
+    ditemukan di sini DIJAMIN segenerasi dengan SW yang melayaninya - dokumen dan aset tidak
+    lagi bisa berselisih generasi.
+
+    Jaringan tidak ditinggalkan, ia hanya pindah ke belakang: setiap peluncuran tetap
+    mengambil dokumen segar lewat waitUntil dan menimpanya ke cache generasi ini, jadi
+    dokumen yang rusak atau usang tersembuhkan pada peluncuran berikutnya. Yang hilang hanya
+    penyembuhan pada peluncuran yang SAMA - dan itu jalur yang nyaris mustahil dimasuki
+    (`cache.put` hanya menulis respons `ok`, `addAll` menolak yang tidak `ok`), ditukar
+    dengan menghapus satu perjalanan jaringan dari SETIAP peluncuran dan satu ketaksepadanan
+    generasi yang terbukti nyata.
+
+    BATAS YANG DISENGAJA, sama seperti sebelumnya: perangkat yang BELUM punya cangkang
+    (pemasangan pertama, atau cache tergusur tekanan penyimpanan iOS) tetap menunggu
+    jaringan. Di sana tidak ada apa pun untuk disajikan, jadi anggaran waktu tidak akan
+    menolong - ia hanya akan mengganti menunggu dengan layar kosong.
      ============================================================================== */
   if(e.request.mode==='navigate'){
-    // Installed-PWA startup is recovery-first: validate a fresh network document
-    // before trusting the revisioned shell entry. A blank/stale cached navigation
-    // can therefore self-heal online; offline launch still falls back to the exact
-    // current generation's index.html and never borrows legacy runtime-shell bytes.
-    const freshRequest=new Request(e.request,{cache:'reload'});
-    const jaringan=fetch(freshRequest).then(r=>{
+    /* Entri permintaan ITU SENDIRI lebih dulu, `./index.html` hanya sebagai cadangan rute
+       tak dikenal. Bentuk pertama perbaikan ini menyajikan `./index.html` untuk SETIAP
+       navigasi - dan itu akan membuat `creator-report-dashboard.html` dan
+       `creator-report-setup.html` (keduanya ada di ASSETS, keduanya halaman sungguhan)
+       tidak pernah bisa dibuka lagi. Membaca kunci yang sama dengan yang ditulis juga
+       membuat revalidasi latar benar-benar menyegarkan yang disajikan, bukan kunci lain
+       yang tidak pernah dibaca. */
+    const cangkang=()=>caches.match(e.request,{cacheName:SHELL_CACHE})
+      .then(c=>c||caches.match('./index.html',{cacheName:SHELL_CACHE}));
+    const segarkan=fetch(new Request(e.request,{cache:'reload'})).then(r=>{
       if(r&&r.ok){
         const copy=r.clone();
         caches.open(SHELL_CACHE).then(cache=>cache.put(e.request,copy));
-        return r;
       }
-      return cangkang().then(c=>c||r);
-    }).catch(()=>cangkang());
-    const cangkang=()=>caches.match('./index.html',{cacheName:SHELL_CACHE});
-    try{e.waitUntil(jaringan)}catch(_){}
-    const HABIS=Symbol('nav-timeout');
-    const anggaran=new Promise(resolve=>setTimeout(()=>resolve(HABIS),NAV_NETWORK_BUDGET_MS));
-    responsePromise=Promise.race([jaringan,anggaran]).then(hasil=>{
-      if(hasil!==HABIS)return hasil;
-      return cangkang().then(c=>c||jaringan);
+      return r;
     });
+    try{e.waitUntil(segarkan.catch(()=>{}))}catch(_){}
+    responsePromise=cangkang().then(c=>c||segarkan);
   }else if(isNeuralAsset(e.request)){
     // Neural runtime/model/voice assets are owned by the neural prepare layer and
     // stay in the stable runtime cache. A shell release never precaches/rewrites them.

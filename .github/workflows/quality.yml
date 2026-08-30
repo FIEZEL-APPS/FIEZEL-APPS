@@ -287,7 +287,7 @@ jobs:
           # tersandera jaringan yang MENGGANTUNG (Wi-Fi berhalaman-login, sinyal satu
           # batang) walau cangkangnya sudah ada di perangkat. Gerbang ini menjalankan
           # pendengar fetch sungguhan dari sw.js, bukan mencocokkan pola teks.
-          node sw-nav-budget-test.js
+          node sw-nav-shell-first-test.js
           node pwa-release-coherence-test.js
           # pwa-release-coherence memeriksa keempat penanda SELARAS satu sama lain; ia tidak
           # bisa tahu nomornya sudah dipakai jalur lain. Itu celah yang meloloskan tabrakan
