@@ -4212,7 +4212,41 @@ body.fz-lesson-mode.fz-stage-quiz .quiz-shell{padding-bottom:calc(28px + env(saf
    penanda, terlalu kecil untuk layar kuis yang punya ~400px ruang menganggur di
    bawahnya. Di panggung kuis ia naik mengikuti tinggi layar (min 108px, sampai 168px),
    jadi ia besar di ponsel tinggi dan tidak pernah menindas soal di ponsel pendek. */
-.quiz-shell .fz-paw-above{--fz-paw-size:clamp(104px,19dvh,164px);--fz-paw-headroom:2px;margin-bottom:-6px}
+/* PANGGUNG SOAL: MASKOT KIRI, SOAL DI GELEMBUNG KANAN (OWNER 2026-08-31: "semua sesi
+   selain listening masih belum berubah").
+   Susunan yang sama persis dengan sesi dengar, dan berlaku untuk SEMUA tipe kuis - vocab,
+   grammar, reading, penempatan, ujian - karena semuanya melewati satu jalur cat yang sama.
+   Maskot yang tadinya berdiri sendirian DI ATAS kartu kini duduk DI DALAMNYA, sejajar
+   dengan soal, sehingga ia terbaca sebagai tokoh yang MENGUCAPKAN soalnya - bukan gambar
+   yang kebetulan ditempel di atas panel. */
+.quiz-stage{display:flex;align-items:center;gap:10px;margin:0 0 12px}
+.quiz-stage .fz-paw-above{flex:0 0 auto;height:auto;margin:0;width:clamp(96px,34%,156px)}
+.quiz-stage .fz-paw-above fiezel-mascot{width:100%;height:auto}
+.quiz-bubble{
+  position:relative;flex:1 1 auto;min-width:0;
+  padding:12px 14px;border:1.5px solid var(--line);border-radius:18px;background:var(--panel-soft);
+}
+.quiz-bubble .question{margin:0;font-size:clamp(1.02rem,4.4vw,1.24rem);line-height:1.35}
+/* Ekor gelembung dari border transparan - ikut tema, nol aset tambahan. */
+.quiz-bubble::before,.quiz-bubble::after{content:'';position:absolute;top:50%;transform:translateY(-50%);border:9px solid transparent}
+.quiz-bubble::before{left:-19px;border-right-color:var(--line)}
+.quiz-bubble::after{left:-16px;border-right-color:var(--panel-soft)}
+@media (max-height:640px){.quiz-stage .fz-paw-above{width:clamp(64px,20%,96px)}.quiz-stage{margin-bottom:8px}}
+
+/* URUTAN LAPIS: KARTU DI ATAS MASKOT.
+   .fz-paw-slot memasang z-index:1 dan .fz-mascot .fz-svg memakai overflow:visible - jadi
+   gambar maskot boleh melukis DI LUAR kotak layoutnya, dan karena z-index-nya lebih tinggi
+   daripada kartu (auto), lukisan itu jatuh DI ATAS teks. Di layar tanpa aksesori lewatnya
+   cuma 6px dan tidak terlihat; begitu Pau memakai topi, lewatnya jauh lebih besar dan ia
+   menutupi "Benar, mantap!" beserta kalimat pembahasannya - dilaporkan owner dengan
+   tangkapan layar.
+   Diperbaiki di urutan lapis, BUKAN dengan memotong maskot (overflow:hidden akan memenggal
+   telinga dan topinya) dan bukan dengan menebak tinggi aksesori yang bisa berubah kapan
+   saja: kartu dinaikkan di atas maskot. Bagian bawah tokoh tersembunyi di balik tepi atas
+   kartu - itu justru pose "berdiri di belakang kartu" yang memang dituju, dan teks tidak
+   akan pernah tertimpa apa pun yang digambar maskot. */
+.quiz-shell .fz-paw-above{--fz-paw-size:clamp(104px,19dvh,164px);--fz-paw-headroom:2px;margin-bottom:-6px;z-index:0}
+body.fz-stage-quiz .quiz-shell>.card{position:relative;z-index:1}
 /* Ponsel pendek: tokoh tetap hadir tapi tidak boleh mendorong pilihan jawaban keluar
    layar. 667px terukur meluber 12px pada tangga 26dvh, jadi tangganya diturunkan di sini,
    bukan lantai sasaran sentuh yang dipangkas. */
