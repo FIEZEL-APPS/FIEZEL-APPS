@@ -291,6 +291,7 @@ jobs:
           node brain-sync-failclosed-test.js
           node brain-sync-rebuild-test.js
           node policy-verdict-test.js
+          node nof1-test.js
           node learner-evidence-test.js
           node alrs-behavior-test.js
           node adaptive-policy-test.js
