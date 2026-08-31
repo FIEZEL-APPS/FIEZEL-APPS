@@ -554,6 +554,9 @@ html.fz-booting body{overflow:hidden}
   <!-- Langkah 1 roadmap otonomi: probe retensi tertunda. Dimuat SETELAH mastery-bkt
        karena penjadwalnya membaca gerbang mastery; modul murni, tanpa jaringan. -->
   <script defer src="./features/brain/fiezel-retention-probe.js"></script>
+  <!-- S5b: pemangkas bukti untuk sinkron antar-perangkat. Tanpa modul ini sinkron mati
+       total, karena satu-satunya yang bisa dikirim tinggal baris riwayat mentah. -->
+  <script defer src="./features/brain/fiezel-attempt-record.js"></script>
   <!-- brain-learning-infra: lane telemetri belajar (config → events → queue → transport).
        Urutan penting: transport membaca queue, queue membaca events, semuanya membaca
        config, jadi config dimuat paling awal. Dimuat SEBELUM app.js dengan pola defer
