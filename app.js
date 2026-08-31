@@ -1520,6 +1520,28 @@ function learningTelemetryEmitAnswer(q,ok,h){
     if(putP&&typeof putP.catch==='function')putP.catch(()=>{});
   }catch{}
 }
+/* ---- S3 sync antar-device: setiap PERCOBAAN punya identitas sendiri -------------------
+ *
+ * MASALAH YANG DITUTUP. Baris riwayat selama ini membawa `id` = id SOAL. Penggabung progres
+ * (fiezel-continuity mergeProgress) memakai `id` itu sebagai kunci dedup, jadi menjawab soal
+ * yang SAMA dua kali menghasilkan dua baris ber-id sama dan yang kedua dibuang. Akibatnya
+ * bukan sepele: latihan berulang adalah inti spaced repetition, jadi justru bukti yang paling
+ * bernilai yang paling mungkin hilang saat digabung. Ini sudah berlaku pada restore backup
+ * hari ini, sebelum sync antar-perangkat ada.
+ *
+ * BENTUK IDENTITAS. Stempel waktu (basis 36) + penanda pemuatan halaman + nomor urut. Tiga
+ * bagian itu menjawab tiga sumber tabrakan yang berbeda: dua percobaan pada milidetik yang
+ * sama di satu perangkat dibedakan nomor urut; dua perangkat yang menjawab pada milidetik
+ * yang sama dibedakan penanda pemuatan; dan waktu membuat id terurut secara alami.
+ *
+ * Penanda pemuatan sengaja hidup DI MEMORI saja, bukan di localStorage: ia tidak perlu
+ * bertahan (id yang sudah ditulis ikut tersimpan di barisnya sendiri), dan menambah kunci
+ * penyimpanan berarti menambah satu lagi hal yang harus diputuskan nasibnya saat reset. */
+const ATTEMPT_TAG=Math.random().toString(36).slice(2,7)||'x0';
+let attemptSeq=0;
+function nextAttemptId(now){
+  return Number(now||Date.now()).toString(36)+'-'+ATTEMPT_TAG+'-'+(attemptSeq++).toString(36);
+}
 function record(q,ok,ms,selectedIndex){
   const now=Date.now();state.totalAnswered++;if(ok)state.totalCorrect++;state.totalTimeMs+=ms||0;if(state.activeSession)state.activeSession.answered=Math.min(Number(state.activeSession.planned||10000),Number(state.activeSession.answered||0)+1);
   /* W1 P1-2: cermin answered ke penanda percobaan-berjalan (lihat beginLearningSession). */
@@ -1530,7 +1552,7 @@ function record(q,ok,ms,selectedIndex){
      jadi jawaban listening/speaking diam-diam menulis ke state.reading. */
   const reviewBucket=q.type==='vocab'?'vocab':q.type==='grammar'?'grammar':q.type==='reading'?'reading':'';
   const reviewKey=q.type==='grammar'?(q.lessonSkill||q.skill||''):(q.target||q.id||'');
-  const h={id:q.id||sigQ(q),type:q.type||'unknown',level:q.level||getActiveLevel(),skill:q.skill||'general',target:q.target||q.lessonSkill||q.skill||q.id||'',reviewBucket,reviewKey,difficulty:q.difficulty||null,ok,ms:Math.max(0,ms||0),confidence:null,selectedIndex,selectedAnswer:selected||null,correctAnswer:q.options?.[q.answerIndex]||null,errorTag:q.errorTag||q.skill||q.type||'general',at:now};
+  const h={attemptId:nextAttemptId(now),id:q.id||sigQ(q),type:q.type||'unknown',level:q.level||getActiveLevel(),skill:q.skill||'general',target:q.target||q.lessonSkill||q.skill||q.id||'',reviewBucket,reviewKey,difficulty:q.difficulty||null,ok,ms:Math.max(0,ms||0),confidence:null,selectedIndex,selectedAnswer:selected||null,correctAnswer:q.options?.[q.answerIndex]||null,errorTag:q.errorTag||q.skill||q.type||'general',at:now};
   /* Fase 2 (B3 butir 1): prediksi P saat PENYAJIAN (ditulis draw() ke q.__predicted) dan
      bobot kredibilitas kappa disimpan di baris riwayat itu sendiri - coreBrainAttempts
      meneruskannya ke momentum (residual) dan estimateAbility (credibility). Dihitung di
