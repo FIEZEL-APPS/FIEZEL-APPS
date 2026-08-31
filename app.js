@@ -1582,6 +1582,35 @@ function record(q,ok,ms,selectedIndex){
    bukan menjadwalkan ulang di atas hasilnya. Tanpa itu satu jawaban salah dihitung dua kali:
    dua lapse, dan interval yang memendek dua kali. Embernya dibaca dari riwayat (reviewBucket)
    alih-alih ditebak, karena tebakan lama membuat jawaban listening menulis ke state.reading. */
+/* POPUP KEYAKINAN DIHAPUS (OWNER 2026-08-31: "popup keyakinan dihapus semua di semua
+   sesi, itu sangat mengganggu"). Ia berdiri di antara jawaban dan pembahasan pada SETIAP
+   soal - 25 kali per sesi - dan meminta murid menilai dirinya sendiri sebelum ia boleh
+   tahu benar atau salah.
+   Yang TIDAK boleh ikut terhapus: setConfidence() ternyata bukan sekadar pencatat
+   keyakinan, ia juga satu-satunya pemanggil scheduleNext() di jalur ini. Menghapus
+   popupnya begitu saja akan mematikan PENJADWALAN ULANGAN untuk setiap item yang dijawab -
+   kartu tidak pernah dijadwalkan lagi dan "Review Due" berhenti terisi. Cacat senyap yang
+   baru ketahuan berhari-hari kemudian.
+   Karena itu penjadwalannya dipisah ke sini dan tetap berjalan, dengan keyakinan netral 2.
+   Yang SENGAJA tidak dilakukan fungsi ini: mendorong baris ke state.confidenceHistory dan
+   memanggil srlCaptureConfidence(). Keduanya merekam PENILAIAN MURID; menuliskan angka
+   yang tidak pernah ia ucapkan berarti mengarang data, dan kalibrasi yang dihitung darinya
+   akan berbohong. Lebih jujur: kita berhenti bertanya, jadi kita berhenti mengaku tahu.
+   setConfidence() sendiri DIPERTAHANKAN utuh - ia masih dipakai jalur lain dan menjadi
+   jalan masuk kalau suatu saat pertanyaannya dikembalikan. */
+function settleReviewScheduleSilently(){
+  const h=state.history[state.history.length-1];
+  if(!h||h.confidence!=null)return false;
+  const bucket=String(h.reviewBucket||(h.type==='vocab'?'vocab':h.type==='grammar'?'grammar':'')),key=String(h.reviewKey||h.target||'');
+  if(bucket&&key&&state[bucket]?.[key]){
+    const b=state[bucket][key],event=b.lastSchedule;
+    if(event&&Number(event.at)===Number(h.at)){
+      scheduleNext(b,h.ok,h.ms,2,{now:event.at,baseStability:event.baseStability,baseLapses:event.baseLapses,baseLapseBurden:event.baseLapseBurden,baseStabilityDays:event.baseStabilityDays,baseLastSeen:event.baseLastSeen,difficulty:event.difficulty});
+      state[bucket][key]=b;
+    }
+  }
+  save();return true;
+}
 function setConfidence(value){const h=state.history[state.history.length-1];if(!h||h.confidence!=null)return;h.confidence=value;state.confidenceHistory.push({confidence:value,ok:h.ok,at:h.at,level:h.level||getActiveLevel(),skill:h.skill,type:h.type,errorTag:h.errorTag});if(state.confidenceHistory.length>500)state.confidenceHistory.shift();/* Fase 3 (C5 butir 4): bila item ini ditandai prompt prediksi SRL, keyakinan yang sama
    menjadi prediksi coach - MEKANISME EXISTING dipakai ulang, bukan popup kedua. */try{srlCaptureConfidence(h,value)}catch{}const bucket=String(h.reviewBucket||(h.type==='vocab'?'vocab':h.type==='grammar'?'grammar':'')),key=String(h.reviewKey||h.target||'');if(bucket&&key&&state[bucket]?.[key]){const b=state[bucket][key],event=b.lastSchedule;if(event&&Number(event.at)===Number(h.at)){scheduleNext(b,h.ok,h.ms,value,{now:event.at,baseStability:event.baseStability,baseLapses:event.baseLapses,baseLapseBurden:event.baseLapseBurden,baseStabilityDays:event.baseStabilityDays,baseLastSeen:event.baseLastSeen,difficulty:event.difficulty});state[bucket][key]=b}}save();confidencePopAnswered(value)}
 /* ==========================================================================
@@ -1653,21 +1682,18 @@ function openConfidencePop(ok){
   pop.innerHTML=`<div class="confidence-card">
     <div class="confidence-verdict ${ok?'is-ok':'is-no'}"><i data-lucide="${ok?'circle-check-big':'circle-x'}"></i><b>${ok?FiezelI18n.t('quiz.vonis-benar'):FiezelI18n.t('quiz.vonis-salah')}</b></div>
     <div id="confidenceAsk">
-      <p class="confidence-q">${FiezelI18n.t('quiz.confidence-title')}</p>
-      <div class="confidence-scale">
-        <button type="button" onclick="setConfidence(1)"><span>1</span>${FiezelI18n.t('quiz.confidence-1')}</button>
-        <button type="button" onclick="setConfidence(2)"><span>2</span>${FiezelI18n.t('quiz.confidence-2')}</button>
-        <button type="button" onclick="setConfidence(3)"><span>3</span>${FiezelI18n.t('quiz.confidence-3')}</button>
-      </div>
-      <button type="button" class="confidence-skip" onclick="confidencePopNext()">${FiezelI18n.t('quiz.confidence-skip')}</button>
+      <button type="button" class="primary luxe confidence-go" onclick="confidencePopNext()">${FiezelI18n.t('quiz.keyakinan-lihat-pembahasan')} <i data-lucide="arrow-right"></i></button>
     </div>
   </div>`;
   document.body.appendChild(pop);
+  /* Penjadwalan ulangan dulu menumpang pada klik skala keyakinan. Skalanya sudah tidak
+     ada, jadi ia diselesaikan di sini - satu kali, saat vonis tampil. */
+  try{settleReviewScheduleSilently()}catch(_){}
   enhanceUI();
   // R2 bug-hunt #2: dialog aria-modal dibuka tanpa memindahkan fokus - pengguna keyboard
   // tertinggal di tombol pilihan yang baru saja dimatikan. Fokus diantar ke skala pertama,
   // pola waktu yang sama dengan confidencePopAnswered.
-  setTimeout(()=>{try{pop.querySelector('.confidence-scale button')?.focus()}catch(_){}},60);
+  setTimeout(()=>{try{pop.querySelector('.confidence-go')?.focus()}catch(_){}},60);
 }
 /** Pilihan diambil: skalanya diganti tombol Lanjut, di popup yang sama. */
 function confidencePopAnswered(value){

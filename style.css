@@ -4183,6 +4183,53 @@ body.fz-lesson-mode .topline{position:sticky;top:0;z-index:30;
   --fz-paw-size:56px;--fz-paw-headroom:0px;
 }
 .fz-paw-peek fiezel-mascot{position:absolute;left:50%;top:0;transform:translate(-50%,0)}
+/* MASKOT KUIS DI PONSEL (OWNER 2026-08-31: "mascotnya terlalu kecil").
+   Tangga ukuran bawaan 'above' adalah 88px - benar untuk layar kosong yang cuma butuh
+   penanda, terlalu kecil untuk layar kuis yang punya ~400px ruang menganggur di
+   bawahnya. Di panggung kuis ia naik mengikuti tinggi layar (min 108px, sampai 168px),
+   jadi ia besar di ponsel tinggi dan tidak pernah menindas soal di ponsel pendek. */
+.quiz-shell .fz-paw-above{--fz-paw-size:clamp(112px,26dvh,224px);--fz-paw-headroom:8px}
+/* Ponsel pendek: tokoh tetap hadir tapi tidak boleh mendorong pilihan jawaban keluar
+   layar. 667px terukur meluber 12px pada tangga 26dvh, jadi tangganya diturunkan di sini,
+   bukan lantai sasaran sentuh yang dipangkas. */
+@media (max-height:740px){.quiz-shell .fz-paw-above{--fz-paw-size:clamp(88px,17dvh,128px)}
+  .quiz-shell .options{gap:10px}.quiz-shell .options button{min-height:48px}}
+@media (max-height:600px){.quiz-shell .fz-paw-above{--fz-paw-size:80px}}
+
+/* Sisa ruang diberikan ke ISI, bukan dibiarkan menganggur: pilihan jawaban di layar kuis
+   mendapat tinggi dan jarak sedikit lebih lega. Lantai 44px tidak diturunkan - ini
+   menaikkan, bukan memampatkan. */
+.quiz-shell .options{gap:12px}
+.quiz-shell .options button{min-height:56px}
+
+/* PENJELASAN SEBAGAI LEMBAR BAWAH (OWNER: "untuk penjelasan buatkan seperti duolingo,
+   munculnya sebagai popup jadi tidak akan memenuhi ruang layar. layar cukup di penuhi
+   mascot, soal, dan jawaban").
+   Blok penjelasan TIDAK dipindah di JS - isinya tetap ditulis ke #feedback/#tutorTurn
+   oleh jalur yang sama. Yang berubah hanya tempat ia berdiri saat TERLIHAT: dari blok
+   di dalam kartu yang mendorong soal dan pilihan jawaban ke atas, menjadi lembar yang
+   naik dari dasar layar. Karena itu ia tidak lagi memakan ruang layar sebelum dijawab,
+   dan tidak menggeser apa pun sesudah dijawab.
+   Dipakai position:fixed, jadi tinggi kartu soal tidak berubah sedikit pun saat lembar
+   ini muncul - itu yang membuat "tidak memenuhi ruang layar" benar-benar terjadi,
+   bukan sekadar terlihat lebih kecil. */
+body.fz-stage-quiz #feedback:not(.hidden),
+body.fz-stage-quiz #tutorTurn:not(.hidden){
+  position:fixed;left:0;right:0;bottom:0;z-index:60;
+  margin:0;max-height:62dvh;overflow:auto;
+  border-radius:22px 22px 0 0;
+  padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px));
+  box-shadow:0 -18px 48px rgba(36,26,17,.22);
+  animation:fzQuizSheetUp .26s cubic-bezier(.2,.8,.2,1) both;
+}
+@keyframes fzQuizSheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@media (prefers-reduced-motion:reduce){
+  body.fz-stage-quiz #feedback:not(.hidden),
+  body.fz-stage-quiz #tutorTurn:not(.hidden){animation:none}
+}
+body.reduce-motion.fz-stage-quiz #feedback:not(.hidden),
+body.reduce-motion.fz-stage-quiz #tutorTurn:not(.hidden){animation:none}
+
 /* ruang telinga dipesan di kartu, bukan didorong setelah cat (C3) */
 .card.has-paw-peek{position:relative;margin-top:calc(56px*.44 + 8px)}
 /* tier 48 di ponsel sempit & landscape pendek (tabel §2d) */
