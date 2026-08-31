@@ -4183,12 +4183,36 @@ body.fz-lesson-mode .topline{position:sticky;top:0;z-index:30;
   --fz-paw-size:56px;--fz-paw-headroom:0px;
 }
 .fz-paw-peek fiezel-mascot{position:absolute;left:50%;top:0;transform:translate(-50%,0)}
+/* HEADER SESI KUIS: KAPSUL, BUKAN SLAB (OWNER 2026-08-31: "perhatikan panel paling atas
+   dan paling bawah, sangat jelek sekali").
+   .quiz-topbar berdiri sejak lama sebagai bidang translusen selebar konten, tanpa
+   border-radius, tanpa garis tepi, menempel di top:0 - jadi ia terbaca sebagai potongan
+   kertas yang terpotong lurus di kedua sisi, bukan sebagai kontrol. Di layar sempit
+   tingginya 71px dan tepi bawahnya berhenti mendadak tepat di atas maskot, membuat
+   layarnya terbelah dua.
+   Diperbaiki dengan meminjam resep yang SUDAH dipakai topbar utama aplikasi
+   (tutor-v3.css: sticky, radius 18px, garis --glass-edge, bayangan lembut). Hasilnya satu
+   bahasa visual di seluruh produk, bukan dua. Turun sedikit dari tepi (top:8px) supaya
+   pembulatannya benar-benar terlihat saat menempel. */
+body.fz-stage-quiz .quiz-topbar{
+  top:8px;padding:8px 10px;margin:0 0 6px;
+  border:1px solid var(--glass-edge);border-radius:18px;
+  background:var(--chrome-bg);
+  box-shadow:0 10px 30px rgba(36,26,17,.08);
+}
+/* Layar sangat pendek: kapsulnya tetap, paddingnya yang mengalah. */
+@media(max-height:430px){body.fz-stage-quiz .quiz-topbar{top:4px;padding:6px 8px;margin-bottom:4px}}
+
+/* PANEL TERAKHIR TIDAK MENEMPEL DI TEPI BAWAH LAYAR. Tanpa ini kartu tutor berakhir rata
+   dengan tepi layar dan terbaca seperti isi yang terpotong, bukan yang selesai. */
+body.fz-lesson-mode.fz-stage-quiz .quiz-shell{padding-bottom:calc(28px + env(safe-area-inset-bottom,0px))}
+
 /* MASKOT KUIS DI PONSEL (OWNER 2026-08-31: "mascotnya terlalu kecil").
    Tangga ukuran bawaan 'above' adalah 88px - benar untuk layar kosong yang cuma butuh
    penanda, terlalu kecil untuk layar kuis yang punya ~400px ruang menganggur di
    bawahnya. Di panggung kuis ia naik mengikuti tinggi layar (min 108px, sampai 168px),
    jadi ia besar di ponsel tinggi dan tidak pernah menindas soal di ponsel pendek. */
-.quiz-shell .fz-paw-above{--fz-paw-size:clamp(112px,26dvh,224px);--fz-paw-headroom:8px}
+.quiz-shell .fz-paw-above{--fz-paw-size:clamp(104px,19dvh,164px);--fz-paw-headroom:2px;margin-bottom:-6px}
 /* Ponsel pendek: tokoh tetap hadir tapi tidak boleh mendorong pilihan jawaban keluar
    layar. 667px terukur meluber 12px pada tangga 26dvh, jadi tangganya diturunkan di sini,
    bukan lantai sasaran sentuh yang dipangkas. */
