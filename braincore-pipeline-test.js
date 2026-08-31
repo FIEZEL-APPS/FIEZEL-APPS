@@ -18,6 +18,7 @@
  */
 const assert = require('assert');
 const P = require('./braincore-pipeline.js');
+const State = require('./braincore-state.js');
 const Trace = require('./features/brain/fiezel-decision-trace.js');
 
 let failures = 0;
@@ -191,7 +192,7 @@ test('PENJAGA TIDAK SENYAP: masukan normal tidak menghasilkan satu pun galat ter
   //
   // Penjaganya TETAP ADA (app.js memang mendegradasi saat modul absen), tetapi sekarang ia
   // MENCATAT. Gerbang ini menuntut catatan itu kosong untuk masukan yang sehat — degradasi
-  // yang disengaja tetap mungkin, degradasi yang tidak disadari tidak.
+  // yang disengaja tetap mungkin; degradasi yang tidak disadari tidak.
   for (const [label, ans] of [
     ['benar', { correct: true, ms: 6000, timing: 'normal' }],
     ['salah', { correct: false, ms: 7000, timing: 'normal' }],
@@ -279,6 +280,85 @@ test('modul MENYIMPAN: kalibrasi item benar-benar menumpuk bukti, bukan mengemba
   assert.ok(items.length > 0,
     'sesudah 14 jawaban pada satu item, state kalibrasi masih KOSONG — observe() dipanggil tetapi '
     + 'tidak menyimpan apa pun (cacat Fase G)');
+});
+
+/* ========================================================================================
+ * STATE FRONT DOOR — roadmap sale-readiness: satu state object masuk, satu state object keluar
+ * ===================================================================================== */
+
+function learnedState() {
+  let L = fresh();
+  for (let i = 0; i < 14; i++) {
+    const t = T0 + (i + 1) * DAY;
+    if (i % 4 === 0) L = P.newSession(L, t);
+    L = P.answer(L, Q, {
+      correct: i % 3 !== 0,
+      ms: 5500 + i * 170,
+      timing: i % 5 === 0 ? 'slow' : 'normal',
+      ...(i % 3 === 0 ? { chosenMisconception: 'past-simple-vs-present-perfect' } : {})
+    }, t).learner;
+  }
+  return L;
+}
+
+test('exportState/importState: state belajar kompleks round-trip byte-identik', () => {
+  const original = learnedState();
+  const snapshot = State.exportState(original, { braincoreVersion: '3.0.0', at: T0 + 14 * DAY });
+  assert.strictEqual(snapshot.schema, 'fiezel-braincore-state-v1');
+  assert.strictEqual(snapshot.braincoreVersion, '3.0.0');
+  const restored = State.importState(snapshot);
+  assert.strictEqual(JSON.stringify(restored), JSON.stringify(original),
+    'state setelah import berbeda dari state yang diekspor');
+});
+
+test('importState menghasilkan graph BARU — mutasi hasil import tidak mencemari snapshot/original', () => {
+  const original = learnedState();
+  const snapshot = State.exportState(original, { braincoreVersion: '3.0.0' });
+  const restored = State.importState(snapshot);
+  restored.level = 'C2';
+  restored.history.push({ poison: true });
+  restored.memory['past-simple'].stabilityDays = 999;
+  assert.notStrictEqual(restored.level, original.level);
+  assert.notStrictEqual(restored.history.length, original.history.length);
+  assert.notStrictEqual(restored.memory['past-simple'].stabilityDays, original.memory['past-simple'].stabilityDays);
+  assert.strictEqual(snapshot.learner.level, original.level, 'snapshot ikut termutasi');
+});
+
+test('state yang di-import MELANJUTKAN keputusan persis seperti state sebelum diekspor', () => {
+  const original = learnedState();
+  const snapshot = State.exportState(original, { braincoreVersion: '3.0.0' });
+  const restored = State.importState(snapshot);
+  const t = T0 + 15 * DAY;
+  const ans = { correct: false, ms: 7100, timing: 'normal', chosenMisconception: 'past-simple-vs-present-perfect' };
+  const a = P.answer(original, Q, ans, t);
+  const b = P.answer(restored, Q, ans, t);
+  assert.strictEqual(JSON.stringify(b.trace), JSON.stringify(a.trace),
+    'trace berubah setelah persistence round-trip — import bukan kelanjutan state yang sama');
+  assert.strictEqual(JSON.stringify(b.learner), JSON.stringify(a.learner),
+    'learner berikutnya berubah setelah persistence round-trip');
+});
+
+test('serialize/parse memberi state learner yang sama tanpa jam atau I/O tersembunyi', () => {
+  const original = learnedState();
+  const text = State.serialize(original, { braincoreVersion: '3.0.0', at: T0 });
+  const restored = State.parse(text);
+  assert.strictEqual(JSON.stringify(restored), JSON.stringify(original));
+});
+
+test('state rusak/versi asing FAIL CLOSED, bukan didiamkan atau ditebak migrasinya', () => {
+  const good = State.exportState(fresh(), { braincoreVersion: '3.0.0' });
+  assert.throws(() => State.importState({ ...good, schema: 'fiezel-braincore-state-v99' }), /unsupported schema/);
+  const missing = { ...good, learner: { ...good.learner } };
+  delete missing.learner.bkt;
+  assert.throws(() => State.importState(missing), /learner\.bkt is required/);
+  const nonFinite = { ...good, learner: { ...good.learner, affectConfidence: Infinity } };
+  assert.throws(() => State.importState(nonFinite), /affectConfidence/);
+  const withFunction = fresh();
+  withFunction.memory.bad = { fn() {} };
+  assert.throws(() => State.exportState(withFunction), /unsupported value type function/);
+  const cyclic = fresh();
+  cyclic.memory.loop = cyclic.memory;
+  assert.throws(() => State.exportState(cyclic), /contains a cycle/);
 });
 
 console.log(failures ? 'BraincorePipeline: FAIL (' + failures + ' kegagalan)' : 'BraincorePipeline: PASS');
