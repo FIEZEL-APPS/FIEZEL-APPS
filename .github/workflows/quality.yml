@@ -822,6 +822,12 @@ jobs:
           # reprodusibel, lengannya benar-benar berpasangan, dan `inconclusive` tidak pernah
           # ditulis sebagai "lebih baik".
           node braincore-study-test.js
+          # Fase 2 / Phase K: skema bukti MINIMUM untuk menilai mesin — bukan untuk menjelaskan
+          # murid (itu milik fiezel-learner-evidence-v1 di app.js, yang sudah ada gerbangnya).
+          # Pagarnya menolak dengan MELEMPAR: identitas, stempel waktu (pemaut sesi), milidetik
+          # mentah, dan kunci miskonsepsi sintetis 'unclassified:*' semuanya ditolak. Gerbang ini
+          # juga meng-assert modulnya TIDAK punya jalan untuk mengirim apa pun ke mana pun.
+          node braincore-evidence-test.js
           node fiezel-stat-gate-test.js
           node id-golden-snapshot-test.js
           node learning-lane-test.js

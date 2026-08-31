@@ -109,6 +109,7 @@
     { file: 'fiezel-brain-manifest.js', global: 'FiezelBrainManifest', schema: SCHEMA, authorityKey: 'manifest' },
     { file: 'fiezel-confusion-matrix.js', global: 'FiezelConfusionMatrix', schema: 'fiezel-confusion-matrix-v1', authorityKey: 'confusionMap' },
     { file: 'fiezel-core-brain.js', global: 'FiezelCoreBrain', schema: 'fiezel-core-brain-v2', authorityKey: 'memory' },
+    { file: 'fiezel-braincore-evidence.js', global: 'FiezelBraincoreEvidence', schema: 'fiezel-braincore-evidence-v1', authorityKey: 'braincoreEvidence' },
     { file: 'fiezel-decision-trace.js', global: 'FiezelDecisionTrace', schema: 'fiezel-decision-trace-v1', authorityKey: 'decisionTrace' },
     { file: 'fiezel-evidence-credibility.js', global: 'FiezelEvidenceCredibility', schema: 'fiezel-evidence-credibility-v1', authorityKey: 'evidenceCredibility' },
     { file: 'fiezel-item-calibration.js', global: 'FiezelItemCalibration', schema: 'fiezel-item-calibration-v1', authorityKey: 'itemCalibration' },
@@ -192,6 +193,11 @@
     // murid, dan sengaja belum dimuat index.html. 'off' adalah klasifikasi yang jujur hari ini:
     // modul ada, teruji, dan belum satu pun jalur aplikasi memanggilnya. Fase C yang
     // menyambungkannya; entri ini WAJIB ikut berubah di commit yang sama.
+    // Fase 2 / Phase K. Skema bukti untuk MENILAI MESIN (bukan menjelaskan murid — itu
+    // milik fiezel-learner-evidence-v1 di app.js). 'off' adalah klasifikasi yang JUJUR
+    // hari ini: modulnya membentuk catatan, dan TIDAK ADA satu pun pemanggil di produksi.
+    // Tidak ada baris di dalamnya yang tahu cara bicara dengan server, dan itu disengaja.
+    braincoreEvidence: 'off',
     decisionTrace: 'off',
     // Manifest sendiri deskriptif murni: ia tidak memutuskan apa-apa untuk murid,
     // maka jujurnya 'shadow' (informasi diagnostik), bukan 'active'.
