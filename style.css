@@ -2433,12 +2433,12 @@ button.primary:active,.primary.luxe:active,html.fiezel-ui-v6 body .primary:activ
 /* i10 2026-08-28 (O5 §2): + :not(.option) — empat tombol jawaban berbayang tebal membuat
    layar soal terasa seperti empat kartu bersaing dengan soalnya; pilihan kembali ke resep
    dasar .option yang tenang (garis --line, tanpa bayangan lantai). */
-html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.text-button):not(.coach-link):not(.fz-coach-bubble):not(.launch-card):not(.skill-card):not(.option):not(.skill-help-dot){
+html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.text-button):not(.coach-link):not(.fz-coach-bubble):not(.launch-card):not(.skill-card):not(.option):not(.skill-help-dot):not(.olm-dispute){
   border:1.5px solid var(--surface-edge);border-radius:var(--radius-md);
   box-shadow:var(--lift-edge);
   transition:transform var(--dur-xs) var(--ease),box-shadow var(--dur-xs) var(--ease);
 }
-html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.text-button):not(.coach-link):not(.fz-coach-bubble):not(.launch-card):not(.skill-card):not(.option):not(.skill-help-dot):active{
+html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.text-button):not(.coach-link):not(.fz-coach-bubble):not(.launch-card):not(.skill-card):not(.option):not(.skill-help-dot):not(.olm-dispute):active{
   transform:translateY(2px);box-shadow:var(--lift-edge-press)}
 
 /* --------------------------------------------------------------------------
@@ -3751,6 +3751,27 @@ body.fz-lesson-mode .topline{position:sticky;top:0;z-index:30;
    TEKS di sistem ini; di sini ia bidang, dan itu memang perannya. */
 .core-cta{background:linear-gradient(135deg,var(--sun),var(--sun-deep));color:var(--text);border:1.5px solid var(--sun-deep)}
 .core-ghost{background:var(--core-soft);border:1.5px solid var(--core-line);color:var(--on-core)}
+/* Baris klaim OLM (2026-08-31). Tombol sanggah dulu memakai ukuran .core-ghost penuh
+   (min-height 44, padding 10/18, font 700) di dalam kalimat berjalan - ia jadi objek
+   paling berat di kartu, padahal ia aksi SEKUNDER yang jarang dipakai. Di dalam baris
+   klaim ia dikecilkan jadi tautan-tombol: tetap 44px area sentuh lewat padding vertikal
+   + margin negatif (C1 aksesibilitas tidak dikorbankan demi rapi), tapi bobot visualnya
+   turun di bawah nama materi dan angkanya. */
+.olm-claim{padding:7px 0;border-bottom:1px solid var(--line,rgba(0,0,0,.08))}
+.olm-claim:last-of-type{border-bottom:0}
+.olm-claim>span{flex:1 1 auto;min-width:0;color:var(--text);font-size:var(--fs-body,1rem)}
+.olm-claim>b{flex:0 0 auto;font-variant-numeric:tabular-nums}
+.olm-claim .olm-dispute{position:relative;flex:0 0 auto;min-height:0;padding:11px 10px;margin:-11px 0;
+  background:none;border:0;font-size:.74rem;font-weight:600;text-decoration:underline;
+  text-underline-offset:3px;color:var(--muted)}
+.olm-claim .olm-dispute:hover{color:var(--text)}
+/* Area sentuh 44px DIKEMBALIKAN lewat ::after, bukan lewat tinggi tombolnya sendiri:
+   mengecilkan bobot visual tidak boleh sekalian mengecilkan sasaran jari. Kotaknya
+   tidak ikut menata (position:absolute), jadi tinggi barisnya tetap 37px seperti yang
+   terlihat, sementara yang bisa ditekan 44px. Diukur, bukan diasumsikan. */
+.olm-claim .olm-dispute::after{content:"";position:absolute;left:0;right:0;top:50%;
+  transform:translateY(-50%);height:44px}
+
 /* D15 (audit D5-T4): --focus-ring-on-core didesain untuk permukaan gelap --core, tetapi
    tombol sanggah OLM (.core-ghost.olm-dispute) dirender di dalam card() PUTIH - #FFC700
    di atas #FFFFFF hanya 1,56:1, gagal WCAG 1.4.11. Default kini --focus-ring (#A67A00 =
