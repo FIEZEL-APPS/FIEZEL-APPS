@@ -8550,36 +8550,52 @@ function learningMetricsMarkup(){
   // Modul metrik menolak berpendapat di bawah ambang bukti (insufficient/censored). Angka
   // yang ditahan ditulis "belum cukup bukti", BUKAN diisi nol - nol yang dikarang lebih
   // berbahaya daripada kolom kosong, karena ia terlihat seperti pengukuran.
-  const cell=(label,value,note)=>`<div><b>${esc(label)}</b><br>${value?esc(String(value)):'<span class="muted">belum cukup bukti</span>'}${note?` <span class="muted">${esc(note)}</span>`:''}</div>`;
+  // Dirakit dengan concat, BUKAN template bersarang. Alasannya bukan gaya: lexer
+  // id-golden-snapshot-test.js berjalan karakter demi karakter dan tidak mengenal ${...},
+  // jadi backtick di dalam interpolasi membuatnya berhenti di backtick yang salah lalu
+  // membekukan potongan KODE sebagai "kalimat murid Indonesia".
+  // JUJURNYA: menulis rata di sini TIDAK menyembuhkan gerbangnya, karena desync-nya sudah
+  // dimulai di fungsi markup lama di atas (affectSuggestionMarkup juga bersarang) - ia hanya
+  // berhenti MENAMBAH pecahan baru dari blok ini. Perbaikan sebenarnya adalah membuat lexer
+  // itu paham ${...}, dan itu memaksa regenerasi baseline menyeluruh: pekerjaan tersendiri
+  // yang butuh review owner, bukan efek samping gelombang ini.
+  const cell=(label,value,note)=>{
+    const shown=value?esc(String(value)):'<span class="muted">belum cukup bukti</span>';
+    const tail=note?' <span class="muted">'+esc(note)+'</span>':'';
+    return '<div><b>'+esc(label)+'</b><br>'+shown+tail+'</div>';
+  };
   // learningGain melaporkan PER LESSON, bukan satu angka global - dan itu benar, karena
   // gain rata-rata lintas lesson yang jumlah buktinya timpang adalah angka yang menipu.
   // Yang ditampilkan: rentang gain pada lesson yang lolos gerbang bukti.
   const gainRows=(Array.isArray(m?.gain?.lessons)?m.gain.lessons:[]).filter(x=>x&&!x.insufficient&&Number.isFinite(Number(x.gain)));
-  const gain=gainRows.length
-    ?(gainRows.length===1?pct(gainRows[0].gain)
-      :`${pct(Math.min(...gainRows.map(x=>Number(x.gain))))} → ${pct(Math.max(...gainRows.map(x=>Number(x.gain))))} (${gainRows.length} lesson)`)
-    :null;
+  const gainValues=gainRows.map(x=>Number(x.gain));
+  const gain=!gainRows.length?null
+    :gainRows.length===1?pct(gainValues[0])
+    :pct(Math.min(...gainValues))+' → '+pct(Math.max(...gainValues))+' ('+gainRows.length+' lesson)';
   const brier=m?.brier&&!m.brier.insufficient?num3(m.brier.brier):null;
   const hint=m?.hint&&!m.hint.insufficient?pct(m.hint.hintRate):null;
   const misc=m?.misconception&&!m.misconception.insufficient?pct(m.misconception.persistenceRate):null;
   const retBuckets=Array.isArray(m?.retention?.buckets)?m.retention.buckets:[];
   const ret=retBuckets.filter(b=>b&&!b.insufficient&&Number.isFinite(Number(b.accuracy)))
-    .map(b=>`${esc(String(b.gapDays))}h ${pct(b.accuracy)}`).join(' · ');
+    .map(b=>esc(String(b.gapDays))+'h '+pct(b.accuracy)).join(' · ');
+  const probeBrier=probe&&Number.isFinite(Number(probe.evaluation?.brier))
+    ?' · Brier probe '+num3(probe.evaluation.brier):'';
+  const probeFragile=probe&&probe.evaluation?.fragileLessons?.length
+    ?' · '+probe.evaluation.fragileLessons.length+' mastery rapuh':'';
   const probeLine=probe
-    ? `<p class="muted">Probe retensi: ${probe.lessons} lesson terjadwal (${probe.scheduled} titik), ${probe.due} jatuh tempo, ${probe.measured} sudah terukur dari jawaban nyata${
-        Number.isFinite(Number(probe.evaluation?.brier))?` · Brier probe ${num3(probe.evaluation.brier)}`:''}${
-        probe.evaluation?.fragileLessons?.length?` · ${probe.evaluation.fragileLessons.length} mastery rapuh`:''}.</p>`
+    ? '<p class="muted">Probe retensi: '+probe.lessons+' lesson terjadwal ('+probe.scheduled+
+      ' titik), '+probe.due+' jatuh tempo, '+probe.measured+' sudah terukur dari jawaban nyata'+
+      probeBrier+probeFragile+'.</p>'
     : '<p class="muted">Probe retensi: belum ada lesson yang menembus gerbang mastery.</p>';
-  return card(`<h3>Metrik Belajar <span class="muted">(bayangan — mengukur, tidak memutuskan)</span></h3>
-    <div class="diag-grid">
-      ${cell('Learning gain',gain)}
-      ${cell('Kalibrasi (Brier)',brier,'makin kecil makin jujur')}
-      ${cell('Ketergantungan bantuan',hint)}
-      ${cell('Miskonsepsi bertahan',misc)}
-      ${cell('Retensi per jarak',ret||null)}
-    </div>
-    ${probeLine}
-    <p class="muted">Angka di sini tidak mengubah satu pun keputusan hari ini. Ia ada supaya otak punya hasil untuk dinilai — dan supaya klaim perbaikan bisa dibantah dengan angka, bukan dengan perasaan.</p>`)
+  return card('<h3>Metrik Belajar <span class="muted">(bayangan — mengukur, tidak memutuskan)</span></h3>'+
+    '<div class="diag-grid">'+
+    cell('Learning gain',gain)+
+    cell('Kalibrasi (Brier)',brier,'makin kecil makin jujur')+
+    cell('Ketergantungan bantuan',hint)+
+    cell('Miskonsepsi bertahan',misc)+
+    cell('Retensi per jarak',ret||null)+
+    '</div>'+probeLine+
+    '<p class="muted">Angka di sini tidak mengubah satu pun keputusan hari ini. Ia ada supaya otak punya hasil untuk dinilai — dan supaya klaim perbaikan bisa dibantah dengan angka, bukan dengan perasaan.</p>')
 }
 function coreBrainPanelMarkup(){
   const snapshot=coreBrainSnapshot();
