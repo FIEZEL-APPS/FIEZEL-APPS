@@ -352,6 +352,42 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 }
 .toast.show{opacity:1;transform:translate(-50%,0) scale(1)}
 
+/* ---------- kartu pembaruan (m025-212) ----------
+   Duduk di atas tab bar, bukan menutupi layar: murid boleh menunda dan terus belajar.
+   Bukan .toast karena kartu ini menunggu keputusan - ia tidak boleh pergi sendiri. */
+.update-banner{
+  position:fixed;left:0;right:0;bottom:calc(84px + env(safe-area-inset-bottom,0px));
+  z-index:120;display:flex;justify-content:center;padding:0 14px;pointer-events:none;
+  opacity:0;transform:translateY(14px);
+  transition:opacity var(--dur-m) var(--ease),transform var(--dur-m) var(--ease-spring)
+}
+.update-banner.show{opacity:1;transform:translateY(0)}
+.update-banner.hidden{display:none}
+.update-banner-card{
+  pointer-events:auto;width:100%;max-width:420px;
+  background:var(--core);color:var(--on-core);border-radius:20px;
+  box-shadow:var(--shadow-lg);padding:15px 17px;
+  display:grid;grid-template-columns:auto 1fr;gap:6px 12px;align-items:start
+}
+.update-banner-icon{color:var(--sun);display:flex;align-items:center;justify-content:center;padding-top:2px}
+.update-banner-text{min-width:0}
+.update-banner-title{margin:0;font-weight:800;font-size:.95rem}
+.update-banner-body{margin:5px 0 0;font-size:.8rem;line-height:1.45;opacity:.86}
+.update-banner-body b{font-weight:800;opacity:1}
+.update-banner-version{margin:6px 0 0;font-size:.72rem;opacity:.6;letter-spacing:.02em}
+.update-banner-version:empty{display:none}
+.update-banner-actions{grid-column:1 / -1;display:flex;gap:9px;margin-top:11px}
+.update-banner-apply,.update-banner-later{
+  flex:1;min-height:44px;border:0;border-radius:var(--radius-pill);
+  font-weight:800;font-size:.85rem;cursor:pointer
+}
+.update-banner-apply{background:var(--sun);color:var(--text)}
+.update-banner-later{background:transparent;color:var(--on-core);border:1.5px solid rgba(255,255,255,.28)}
+@media (prefers-reduced-motion:reduce){
+  .update-banner{transition:opacity var(--dur-m) linear;transform:none}
+  .update-banner.show{transform:none}
+}
+
 /* i10 2026-08-28 (O5 §6.1): kilas jawaban dulu panel 330px di tengah layar — tepat menutup
    soal + pilihan yang sedang dibicarakan oleh panel pembahasan. Kini pil status ringkas di
    tepi atas (aman dari soal), pointer-events tetap none, ritme .show/1500ms tak berubah. */
