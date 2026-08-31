@@ -272,6 +272,7 @@ jobs:
           # index.html/sw.js. Modul yang dinyatakan berwenang tetapi tidak pernah dimuat halaman
           # adalah kelas cacat yang membunuh analytics murid secara senyap di T-031.
           node brain-page-wiring-test.js
+          node reset-side-state-test.js
           node learner-evidence-test.js
           node alrs-behavior-test.js
           node adaptive-policy-test.js

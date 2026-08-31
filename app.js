@@ -9397,10 +9397,16 @@ async function explainWordWithAI(v){const id=++aiRequestSeq,epoch=openAILoading(
 function resetProgress(){openModal(`<div class="modal-mark">FIEZEL</div><h2>${FiezelI18n.t('settings.reset-progres')}</h2><p>${FiezelI18n.t('settings.semua-level-penguasaan-materi-riwayat')}</p><div class="modal-actions"><button id="modalCancel">${FiezelI18n.t('modal.reset-cancel-btn')}</button><button class="primary danger" id="modalOk">${FiezelI18n.t('modal.reset-confirm-btn')}</button></div>`);$('modalCancel').onclick=closeModal;$('modalOk').onclick=()=>{localStorage.removeItem(activeStateStorageKey);
   /* R6 perbaikan-15: "dihapus permanen" harus benar-benar permanen. Model bukti murid hidup
      di kunci samping (BKT, ledger miskonsepsi, kalibrasi item, matriks konfusi, negosiasi
-     OLM, SRL coach) - tanpa baris ini, reset meninggalkan model penguasaan lama yang tetap
-     menggerbang cloze/adaptif dan menyimpan diagnosis miskonsepsi milik progres yang katanya
-     sudah dihapus. */
-  for(const k of [BKT_KEY,MISCONCEPTION_LEDGER_KEY,ITEM_CALIBRATION_KEY,CONFUSION_MATRIX_KEY,OLM_NEGOTIATION_KEY,SRL_KEY])try{localStorage.removeItem(k)}catch{}
+     OLM, SRL coach, probe retensi) - tanpa baris ini, reset meninggalkan model penguasaan lama
+     yang tetap menggerbang cloze/adaptif dan menyimpan diagnosis miskonsepsi milik progres yang
+     katanya sudah dihapus.
+     Temuan OWNER (audit cross-device, head e68b59c): RETENTION_PROBE_KEY mendarat di Langkah 1
+     TANPA ikut daftar ini. Akibatnya jadwal probe DAN userSeed murid lama selamat dari reset,
+     lalu ikut membentuk state probe sesudahnya - persis kebocoran yang komentar di atas
+     bilang tidak boleh ada. Gerbang reset-side-state-test.js sekarang menuntut setiap kunci
+     bukti murid baru masuk daftar ini (atau didaftarkan sebagai pengecualian beralasan),
+     supaya kelas cacat ini tidak bisa mendarat diam-diam lagi. */
+  for(const k of [BKT_KEY,MISCONCEPTION_LEDGER_KEY,ITEM_CALIBRATION_KEY,CONFUSION_MATRIX_KEY,OLM_NEGOTIATION_KEY,SRL_KEY,RETENTION_PROBE_KEY])try{localStorage.removeItem(k)}catch{}
   state=loadState();if(activeAccountUuid)state.ownerUuid=activeAccountUuid;coreBrainCache=null;save();closeModal();go('home');showToast(FiezelI18n.t('settings.progres-akun-berhasil-direset'))}}
 document.addEventListener?.('keydown',e=>{if(e.key==='Escape'&&!$('modal')?.classList.contains('hidden'))closeModal()});
 /* q17-S1 2026-08-29: trap Tab di dalam dialog \u2014 latar tidak boleh bisa dijelajah selama modal terbuka (aria-modal jujur). Siklus manual first<->last, tanpa inert supaya kompatibel luas. */
