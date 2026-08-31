@@ -73,7 +73,22 @@ html.fiezel-ui-v6 .primary{background:var(--yellow);color:var(--ink);border-colo
 .tutor-ask-sheet{position:fixed;inset:0;z-index:500;display:grid;place-items:end center;padding:18px;background:rgba(11,18,31,.42);backdrop-filter:blur(9px)}
 .tutor-ask-panel{width:min(680px,100%);padding:22px;border-radius:24px;background:var(--ui-surface-strong);box-shadow:0 30px 90px rgba(6,13,25,.32);animation:sheetUp .28s cubic-bezier(.2,.8,.2,1) both}.tutor-ask-panel h2{margin:.35rem 0 .2rem}.tutor-ask-panel p{color:var(--ui-muted);margin:.2rem 0 14px}.tutor-ask-panel textarea{width:100%;resize:vertical;min-height:90px;padding:13px;border:1px solid #cad5e5;border-radius:14px;font:inherit;outline:none;background:var(--ui-surface-strong);color:var(--ui-text)}.tutor-ask-panel textarea:focus{border-color:var(--ui-accent);box-shadow:0 0 0 3px rgba(40,103,216,.12)}.tutor-ask-panel>div{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
 .tutor-loading,.tutor-error{padding:35px;border-radius:26px;background:var(--ui-surface-strong)}.tutor-skeleton{height:140px;border-radius:22px;background:linear-gradient(90deg,var(--ui-shimmer-a),var(--ui-shimmer-b),var(--ui-shimmer-a));background-size:220% 100%;animation:shimmer 1.2s linear infinite}
-html.fiezel-ui-v6 body.scene-dusk .topbar,html.fiezel-ui-v6 body.scene-night .topbar{background:var(--ui-chrome-dusk)}html.fiezel-ui-v6 body.scene-dusk .section-head h1,html.fiezel-ui-v6 body.scene-night .section-head h1{color:#f8faff}
+html.fiezel-ui-v6 body.scene-dusk .topbar,html.fiezel-ui-v6 body.scene-night .topbar{background:var(--ui-chrome-dusk)}
+/* Audit UI/UX 2026-08-30 - JUDUL HALAMAN TIDAK TERBACA SENJA & MALAM.
+   Di sini dulu berdiri: body.scene-dusk/.scene-night .section-head h1{color:#f8faff}.
+   Hex itu mengandaikan langit senja dan malam GELAP. Ia tidak. style.css:149-150
+   memasang .scene-dusk --sky-top:#FFD3B4 (persik terang) dan .scene-night
+   --sky-top:#EFE0C4 (krem terang), lalu html.fiezel-ui-v6 .global-sky meredamnya lagi
+   ke opacity .58 di atas --ui-bg:#FFF9EE. Tanahnya TERANG di keempat fase, jadi tinta
+   hampir-putih di atasnya terukur 1,18:1 - "Vocabulary Hub", "Ruang Reading", "Peta
+   Belajar & Lab", "Skills Lab", dan "Perpustakaan" praktis hilang tiap sore.
+   Ini persis kelas bug yang blok m025-113 di atas sudah perbaiki untuk .launch-card
+   ("kartunya putih dan tintanya juga hampir putih"); perbaikan itu tidak pernah sampai
+   ke judulnya. Override dicabut, bukan diganti hex lain: .section-head h1 kembali ke
+   var(--ambient-text) (style.css:211) yang memang tinta tanah aplikasi ini.
+   contrast-test.js:353 sudah punya kasus untuk pemilih ini, tetapi ia MEMODELKAN
+   warnanya sebagai var(--ambient-text) alih-alih menghitung kaskade, sehingga override
+   ini lolos. Gerbang render ui-render-audit-test.js kini menutup celah itu. */
 @media (min-width:1000px){html.fiezel-ui-v6 .app{padding-left:118px;padding-bottom:38px}html.fiezel-ui-v6 .bottomnav{left:20px;top:50%;bottom:auto;transform:translateY(-50%);width:78px;padding:8px;grid-template-columns:1fr;gap:5px;border-radius:24px;background:rgba(var(--ui-surface-rgb),.90);box-shadow:0 18px 55px rgba(36,26,17,.12)}html.fiezel-ui-v6 .nav{min-height:62px;display:grid;place-items:center;gap:3px;padding:8px 5px}html.fiezel-ui-v6 .nav span{font-size:.6rem}html.fiezel-ui-v6 .launch-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:900px){.tutor-subject-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.tutor-classroom-grid{grid-template-columns:1fr}.tutor-teacher{position:relative;top:auto;display:grid;grid-template-columns:58px 1fr;gap:10px}.tutor-teacher-actions,.tutor-caption{grid-column:1/-1}}
 @media (max-width:620px){html.fiezel-ui-v6 .app{padding-inline:13px}html.fiezel-ui-v6 .topbar{top:6px;border-radius:15px;padding:8px}.tutor-head{align-items:flex-start;flex-direction:column}.tutor-head-actions{width:100%;justify-content:flex-start}.tutor-bundle{align-items:flex-start;flex-direction:column}.tutor-bundle button{width:100%}.tutor-subject-grid,.tutor-topic-grid,.tutor-summary-grid{grid-template-columns:1fr}.tutor-subject{min-height:88px}.tutor-board{min-height:230px;border-radius:23px;padding:22px}.tutor-teacher-actions{grid-template-columns:1fr 1fr}.tutor-next-row .primary{width:100%}.tutor-ask-sheet{padding:10px}.tutor-ask-panel{border-radius:22px 22px 16px 16px}}

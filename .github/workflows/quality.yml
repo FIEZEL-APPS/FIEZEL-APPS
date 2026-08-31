@@ -157,6 +157,17 @@ jobs:
           node global-name-collision-test.js
           node a11y-test.js
           node contrast-test.js
+          # Gerbang di atas dan di bawah baris ini semuanya membaca TEKS SUMBER dengan regex.
+          # Itu sengaja - mereka murah dan berjalan di mana saja - tetapi ada satu kelas cacat
+          # yang secara struktural TIDAK BISA mereka lihat, karena cacatnya baru lahir setelah
+          # kaskade CSS dihitung dan DOM disusun. Contoh yang benar-benar lolos ke murid:
+          # contrast-test.js SUDAH menguji `.section-head h1`, tetapi memodelkan warnanya sebagai
+          # var(--ambient-text); warna sungguhannya ditimpa #f8faff dari tutor-v3.css, dan judul
+          # tiap layar hilang setiap senja pada 1,18:1 dengan gerbang tetap hijau.
+          # ui-render-audit-test.js menutup celah itu dengan MENJALANKAN aplikasinya di Chromium.
+          # Ia SKIP (keluar 0) kalau Playwright/Chromium tidak ada, jadi CI publik tidak berubah;
+          # ia merah hanya kalau browsernya ada DAN invariannya benar-benar patah.
+          node ui-render-audit-test.js
           node pastel-field-contrast-test.js
           node topbar-logo-contrast-test.js
           node paw-mascot-test.js
