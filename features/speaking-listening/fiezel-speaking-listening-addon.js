@@ -55,11 +55,23 @@
   // Wajah maskot memakai pola fallback yang sama dengan coach-bubble pawFace(): kalau
   // custom element belum siap, ikon paw yang tampil - tidak pernah kotak kosong.
   function slPawReady(){try{return !!global.FiezelPaw?.ready?.()}catch(_){return false}}
+  /* PANGGUNG DENGAR (permintaan OWNER 2026-08-31, rujukan bahasa visual Duolingo).
+     Sebelum ini maskotnya 48px, dipotong bulat, dan berdiri sebaris dengan gelombang -
+     jadi ia terbaca sebagai IKON di samping status, bukan sebagai tokoh. Duolingo menaruh
+     karakternya sebagai jangkar emosi layar: besar, di tengah, tidak terpotong.
+     Tiga perubahan yang membuatnya jadi tokoh, bukan ikon:
+       1. Susunannya tegak (mascot di atas, gelombang, lalu status), bukan mendatar.
+       2. Kotaknya TIDAK overflow:hidden dan TIDAK bulat, jadi telinga, ekor, dan bayangan
+          lantai ikut terlihat - itulah yang membedakan "tokoh" dari "avatar".
+       3. Ukurannya ikut lebar layar (clamp di CSS), bukan piksel mati.
+     Gelombangnya tetap STATIS dan tetap aria-hidden: addon TTS tidak mengekspos buffer
+     audio, jadi visualisasi yang "mengikuti suara" akan jadi kebohongan yang digambar. */
   function slPlayerMarkup(){
     const face=slPawReady()
       ?'<fiezel-mascot class="fsl-mascot"></fiezel-mascot>'
       :'<span class="fz-i" data-fz-icon="paw"></span>';
-    return '<div class="fsl-player" aria-hidden="true"><span class="fsl-mascot-slot">'+face+'</span>'
+    return '<div class="fsl-player fsl-player-stage" aria-hidden="true">'
+      +'<span class="fsl-mascot-slot">'+face+'</span>'
       +'<svg class="fsl-wave" viewBox="0 0 120 24" preserveAspectRatio="none"><path d="M0 12 Q 6 2 12 12 T 24 12 T 36 12 T 48 12 T 60 12 T 72 12 T 84 12 T 96 12 T 108 12 T 120 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'
       +'<span class="fsl-replays" data-replays>'+T('skillslab.not-played')+'</span></div>';
   }
@@ -565,13 +577,22 @@
        menjalankan renderSession tanpa DOM dan itu bukan kesalahan. */
     setSessionStage(on){try{const doc=typeof document!=='undefined'?document:(hostScope().document||null);if(doc&&doc.body&&doc.body.classList)doc.body.classList.toggle('fsl-session-active',!!on)}catch(_){}return !!on}
     renderSession(){if(!this.root)return;const item=this.current();if(!item){this.renderComplete();return}this.setSessionStage(true);this.startedAt=now();this.replays=0;this.ephemeralTranscript='';this.noAudio=false;const progress=Math.round(this.index/Math.max(1,this.items.length)*100);if(this.domain==='listening_exam')this.renderListeningExam(item,progress);else if(this.domain==='listening')this.renderListening(item,progress);else if(this.domain==='speaking_exam')this.renderSpeakingExam(item,progress);else this.renderSpeaking(item,progress)}
-    /* I9 2026-08-28 (O5 §5.3, O1-002): urutan baca sesi dengar = kicker › soal › pemutar ›
-       jawaban. Ekonomi gem TIDAK boleh berdiri di antara kicker dan soal — gemBarMarkup()
+    /* I9 2026-08-28 (O5 §5.3, O1-002): urutan baca sesi dengar = soal › pemutar › jawaban.
+       2026-08-31 (permintaan OWNER): kicker "Listening · A1 · inference" DIHAPUS dari kartu.
+       Ia mengulang apa yang sudah diketahui murid (ia baru saja menekan Listening) dan
+       membocorkan kosakata internal - "inference" adalah nama mode di listening-generate.js,
+       bukan kata yang dipakai anak SMA. Levelnya tidak hilang, ia pindah ke panel bantuan
+       "?" di pojok kanan atas bersama disclaimer lain (app.js openSkillHelp).
+       Paragraf fsl.script-privacy ikut pindah ke sana dengan alasan yang sama: ia disclaimer,
+       bukan instruksi, dan ia berdiri tepat di antara soal dan pemutar. Keadaan terkunci
+       tetap terbaca di layar lewat baris "Terkunci — putar audio dulu" (fsl-locked-note),
+       jadi tidak ada informasi yang benar-benar hilang dari alur.
+       Ekonomi gem TIDAK boleh berdiri di antara soal dan pemutar — gemBarMarkup()
        turun ke kaki kartu di dalam .fsl-gem-footer. Markup-nya sendiri TETAP byte-identik
        (kontrak gems-test.js + tur: #fslGemChip, #fslTranslateToggle); hanya POSISI panggilan
        yang pindah, dan ia tetap satu baris sumber dengan kicker karena gems-test.js G8
        menjangkarkan keduanya pada baris yang sama. */
-    renderListening(item,progress){const isDict=item.mode==='dictation';this.root.innerHTML=`<section class="fsl-shell"><div class="fsl-progress"><span style="width:${progress}%"></span></div><article class="fsl-card fsl-card-listening"><span class="fsl-kicker">Listening · ${esc(item.level)} · ${esc(item.mode)}</span><h2>${esc(item.question)}</h2><p class="fsl-privacy fsl-note-compact">${T('fsl.script-privacy', 'Script disembunyikan sampai jawaban dinilai. Jawaban terkunci sampai audio berhasil diputar.')}</p>${slPlayerMarkup()}<div class="fsl-actions fsl-audio-actions"><button class="fsl-primary fsl-play-hero" data-play>${T('fsl.play-btn', 'Dengarkan')}</button><button data-exit>${T('fsl.exit-btn', 'Keluar')}</button></div><fieldset class="fsl-work" data-work disabled>${isDict?`<input class="fsl-input" data-dictation autocomplete="off" spellcheck="false" placeholder="${T('fsl.dictation-placeholder', 'Ketik yang kamu dengar…')}"><div class="fsl-actions"><button class="fsl-primary" data-submit>${T('fsl.submit-btn', 'Nilai jawaban')}</button></div>`:`<div class="fsl-options">${item.options.map((o,i)=>`<button class="fsl-option" data-choice="${i}">${esc(o)}</button>`).join('')}</div>`}</fieldset><div data-feedback></div><div class="fsl-gem-footer">${this.gemBarMarkup()}</div></article></section>`;
+    renderListening(item,progress){const isDict=item.mode==='dictation';this.root.innerHTML=`<section class="fsl-shell"><div class="fsl-progress"><span style="width:${progress}%"></span></div><article class="fsl-card fsl-card-listening"><h2>${esc(item.question)}</h2>${slPlayerMarkup()}<div class="fsl-actions fsl-audio-actions"><button class="fsl-primary fsl-play-hero" data-play>${T('fsl.play-btn', 'Dengarkan')}</button><button data-exit>${T('fsl.exit-btn', 'Keluar')}</button></div><fieldset class="fsl-work" data-work disabled>${isDict?`<input class="fsl-input" data-dictation autocomplete="off" spellcheck="false" placeholder="${T('fsl.dictation-placeholder', 'Ketik yang kamu dengar…')}"><div class="fsl-actions"><button class="fsl-primary" data-submit>${T('fsl.submit-btn', 'Nilai jawaban')}</button></div>`:`<div class="fsl-options">${item.options.map((o,i)=>`<button class="fsl-option" data-choice="${i}">${esc(o)}</button>`).join('')}</div>`}</fieldset><div data-feedback></div><div class="fsl-gem-footer">${this.gemBarMarkup()}</div></article></section>`;
       this.root.querySelector('[data-play]').addEventListener('click',async event=>{
         const limit=Number(item.maxReplays||this.config.maxListeningReplays);
         if(this.replays>=limit){this.setFeedback(T('skillslab.replay-limit'));return}
