@@ -421,6 +421,19 @@
    */
   var MISS_STREAK_STOP = 3;
   var FAST_CORRECT_STRETCH = 4;
+  /**
+   * Di atas ambang ini, dua kali salah dibaca sebagai KESELEO, bukan miskonsepsi.
+   *
+   * 0,8 dipilih supaya lebih longgar daripada gerbang penguasaan BKT (L >= 0,95 DAN n >= 5):
+   * murid tidak perlu sudah "lulus" sebuah konsep untuk berhak tidak diajari ulang gara-gara
+   * dua jawaban meleset. Ambang yang sama ketatnya dengan gerbang penguasaan akan membuat
+   * pagar ini hampir tidak pernah menyala.
+   *
+   * Yang TIDAK dilonggarkan: miskonsepsi yang memang ada buktinya tetap diajar ulang berapa
+   * pun mastery-nya. Murid yang sudah mahir pun bisa memegang satu keyakinan keliru, dan
+   * itulah justru yang paling layak disentuh.
+   */
+  var MASTERY_NO_RETEACH = 0.8;
   function decideMove(state, diagnosis, context) {
     var s = state || {};
     var d = diagnosis || {};
@@ -435,8 +448,38 @@
     }
     // 2. Miskonsepsi yang sama dua kali bukan kebetulan. Soal berikutnya dengan pola yang
     //    sama akan salah lagi; yang perlu disentuh keyakinannya, bukan itemnya.
+    //
+    //    DUA SYARAT, dan keduanya ditambahkan sesudah pengukuran — bukan sesudah dugaan.
+    //
+    //    (a) "Miskonsepsi" hanya boleh disebut bila memang ADA buktinya. Ketika soal tidak
+    //        membawa optionMisconceptions (item vocabulary dan reading TIDAK membawanya;
+    //        app.js:2799 mengirim null), diagnose() mengarang kunci `unclassified:<skill>`
+    //        dan pengulangannya terhitung di sini. Yang sebenarnya kita tahu cuma "salah dua
+    //        kali pada keterampilan yang sama" — dan diagnosisnya sendiri sudah jujur soal
+    //        itu lewat `precision: 'skill'`. Cabang ini dulu membuang field itu lalu mengklaim
+    //        ketepatan yang tidak dimilikinya.
+    //
+    //    (b) Dua kali salah dari murid yang SUDAH TERBUKTI BISA adalah keseleo, bukan
+    //        miskonsepsi. Diukur pada 39 kejadian mengajar-ulang terhadap murid yang
+    //        kemampuan sejatinya tinggi: mastery BKT mereka rata-rata 0,931 dengan 21 jawaban
+    //        sebagai bukti, dan 85% di antaranya di atas 0,80. Jadi mesinnya SUDAH TAHU murid
+    //        itu bisa — informasinya ada di sistem — dan tetap mengajar ulang, karena
+    //        keputusan ini tidak pernah diberi tahu. Mengajar ulang orang yang sudah bisa
+    //        bukan sekadar mubazir: ia membuang sesi belajar, dan ia memberi tahu murid bahwa
+    //        mesinnya tidak memperhatikan.
+    //
+    //    `ctx.mastery` OPSIONAL: tanpa field itu (mastery < 0) perilakunya persis seperti
+    //    sebelumnya, jadi pemanggil lama tidak berubah artinya.
     if (!d.correct && num(d.repeats) >= 2) {
-      return { move: 'reteach', reason: 'persistent_misconception', urgency: 'high', misconception: d.misconception };
+      var berbukti = d.precision === 'misconception';
+      if (berbukti) {
+        return { move: 'reteach', reason: 'persistent_misconception', urgency: 'high', misconception: d.misconception };
+      }
+      var mastery = num(ctx.mastery, -1);
+      if (mastery >= MASTERY_NO_RETEACH) {
+        return { move: 'hint', reason: 'likely_slip_high_mastery', urgency: 'normal' };
+      }
+      return { move: 'reteach', reason: 'repeated_miss_same_skill', urgency: 'high' };
     }
     // 3. Tiga salah berturut-turut: berhenti menguji, mulai mengajar.
     if (num(s.missStreak) >= MISS_STREAK_STOP) {

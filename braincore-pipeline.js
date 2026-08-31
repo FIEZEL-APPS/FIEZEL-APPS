@@ -299,6 +299,8 @@ function answer(learner, question, answerInput, now) {
   // Mengukur mesin pada jalur yang lebih sempit daripada jalur produksinya, lalu melaporkan
   // cakupan, adalah cara paling halus untuk salah lapor. Sekarang bentuk konteksnya sama
   // persis dengan app.js:2808.
+  const mAfterTutor = BKT.mastery(bktNext, lesson);
+  const masteryAfterForTutor = mAfterTutor && isFinite(mAfterTutor.L) ? mAfterTutor.L : null;
   const fatigueState = guard('fatigue', () => {
     const f = CoreBrain.fatigue(affectRows);
     return f && f.state ? String(f.state) : '';
@@ -308,6 +310,9 @@ function answer(learner, question, answerInput, now) {
     move = TutorBrain.decideMove(tutorSession, diagnosis, {
       remaining: Number(a.remaining) >= 0 ? Number(a.remaining) : 10,
       fatigue: fatigueState === 'unknown' ? '' : fatigueState,
+      // Mastery BKT SESUDAH jawaban ini — cermin app.js, yang membaca state BKT yang sudah
+      // ditulis bktRecord() sebelum tutorObserve() berjalan.
+      ...(masteryAfterForTutor === null ? {} : { mastery: masteryAfterForTutor }),
       ...(affectState && affectState !== 'neutral' ? { affect: { state: affectState } } : {})
     });
   } catch (_) { move = null; }

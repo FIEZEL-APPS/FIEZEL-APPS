@@ -90,36 +90,84 @@ test('§3 kedua mesin memang mengambil keputusan yang berbeda', () => {
 });
 
 /* ========================================================================================
- * §4 — TEMUAN YANG DIKUNCI (characterization), BUKAN DIBERKATI
+ * §4 — TEMUAN YANG SUDAH DIPERBAIKI, DIKUNCI DARI SISI SEBALIKNYA
  *
- * BACA INI SEBELUM MENGIRA GERBANG INI MERESTUI PERILAKUNYA.
+ * RIWAYATNYA, karena ia menjelaskan kenapa assert di bawah berbentuk begini.
  *
- * `FiezelTutorBrain` melaporkan reason `persistent_misconception` untuk murid yang sekadar
- * salah dua kali pada keterampilan yang sama TANPA satu pun bukti miskonsepsi. Ketika soal
- * tidak membawa `optionMisconceptions` — dan app.js:2799 memang mengirim `null` untuk item
- * vocabulary/reading — `diagnose()` mengarang kunci `unclassified:<skill>`, `decideMove()`
- * menghitung pengulangannya, lalu menamai hasilnya "miskonsepsi yang menetap".
+ * Bagian ini dulu MENGUNCI SEBUAH CACAT sebagai characterization test: tutor melaporkan
+ * `persistent_misconception` untuk murid yang sekadar salah dua kali pada keterampilan yang
+ * sama TANPA satu pun bukti miskonsepsi. Waktu itu perbaikannya sengaja TIDAK diterapkan —
+ * mengubah tindakan tutor di produksi adalah keputusan pemilik, bukan keputusan audit — dan
+ * gerbang ini ditulis supaya perbaikannya membuat bagian ini MERAH dan memaksa dokumennya ikut
+ * diperbarui.
  *
- * Diagnosisnya sendiri JUJUR: ia menyertakan `precision: 'skill'`. Yang tidak jujur adalah
- * ALASAN keputusannya, yang membuang field itu dan mengklaim ketepatan yang tidak dimilikinya.
+ * Pemilik memutuskan. Perbaikannya diterapkan. Bagian ini merah, seperti yang dijanjikan, dan
+ * sekarang mengunci arah sebaliknya.
  *
- * Assert di bawah MENGUNCI perilaku itu supaya ia tidak berubah diam-diam, dan supaya
- * perbaikannya membuat gerbang ini MERAH — memaksa AUDIT/10 ikut diperbarui. Ia bukan
- * pernyataan bahwa perilaku ini benar. Usul perbaikannya ada di AUDIT/10 §4; ia TIDAK
- * diterapkan di sini karena mengubah tindakan tutor di produksi adalah keputusan pemilik,
- * bukan keputusan audit.
+ * DUA SYARAT yang sekarang berlaku sebelum sebuah keputusan boleh disebut mengajar ulang
+ * karena miskonsepsi:
+ *   (a) harus ADA bukti miskonsepsi (`precision === 'misconception'`), dan
+ *   (b) murid yang mastery-nya sudah tinggi tidak diajar ulang gara-gara dua kali keseleo.
  * ===================================================================================== */
-test('§4 TEMUAN TERKUNCI: dua kali salah tanpa bukti miskonsepsi tetap disebut persistent_misconception', () => {
+test('§4 tanpa bukti miskonsepsi, namanya BUKAN lagi persistent_misconception', () => {
   const sesi = Tutor.createSession({ now: 0, baselineMs: 0 });
-  let terakhir = null;
+  let akhir = null;
   for (let i = 0; i < 2; i++) {
     const d = Tutor.record(sesi, { correct: false, skill: 'vocab_x', concept: 'vocab_x', ms: 7000, now: i * 1000 });
-    terakhir = { d, m: Tutor.decideMove(sesi, d, { remaining: 10 }) };
+    akhir = { d, m: Tutor.decideMove(sesi, d, { remaining: 10 }) };
   }
-  assert.strictEqual(terakhir.d.precision, 'skill',
-    'diagnosis tidak lagi melaporkan precision=skill — temuan AUDIT/10 §4 sudah bergeser, perbarui dokumennya');
-  assert.strictEqual(terakhir.m.reason, 'persistent_misconception',
-    'reason sudah berubah — kalau ini PERBAIKAN, bagus: perbarui AUDIT/10 §4 dan assert ini');
+  assert.strictEqual(akhir.d.precision, 'skill', 'diagnosis tidak lagi melaporkan precision=skill');
+  assert.strictEqual(akhir.m.reason, 'repeated_miss_same_skill',
+    'alasannya mengklaim ketepatan yang tidak dimiliki buktinya lagi');
+  assert.strictEqual(akhir.m.move, 'reteach',
+    'murid yang belum bisa TETAP harus diajar ulang — perbaikan ini bukan tentang berhenti mengajar');
+});
+
+test('§4 murid yang SUDAH BISA tidak diajar ulang karena dua kali keseleo', () => {
+  const sesi = Tutor.createSession({ now: 0, baselineMs: 0 });
+  let m = null;
+  for (let i = 0; i < 2; i++) {
+    const d = Tutor.record(sesi, { correct: false, skill: 'vocab_x', concept: 'vocab_x', ms: 7000, now: i * 1000 });
+    m = Tutor.decideMove(sesi, d, { remaining: 10, mastery: 0.93 });
+  }
+  assert.strictEqual(m.move, 'hint', 'murid dengan mastery 0,93 masih diajar ulang');
+  assert.strictEqual(m.reason, 'likely_slip_high_mastery');
+});
+
+test('§4 BUKTI miskonsepsi nyata tetap diajar ulang, setinggi apa pun mastery-nya', () => {
+  // Pagar terpenting perbaikan ini. Murid mahir pun bisa memegang satu keyakinan keliru, dan
+  // itulah justru yang paling layak disentuh. Kalau assert ini merah, perbaikannya sudah
+  // berubah menjadi "berhenti mengajar", dan itu bukan perbaikan.
+  const sesi = Tutor.createSession({ now: 0, baselineMs: 0 });
+  let m = null;
+  for (let i = 0; i < 2; i++) {
+    const d = Tutor.record(sesi, { correct: false, skill: 'g', concept: 'g', ms: 7000, now: i * 1000,
+      chosenOption: 'A', optionMisconceptions: { A: 'm_ed_ending' } });
+    m = Tutor.decideMove(sesi, d, { remaining: 10, mastery: 0.99 });
+  }
+  assert.strictEqual(m.move, 'reteach', 'miskonsepsi bernama TIDAK lagi diajar ulang — pagarnya jebol');
+  assert.strictEqual(m.reason, 'persistent_misconception');
+});
+
+test('§4 pemanggil lama yang tidak mengirim mastery TIDAK berubah perilakunya', () => {
+  const sesi = Tutor.createSession({ now: 0, baselineMs: 0 });
+  let m = null;
+  for (let i = 0; i < 2; i++) {
+    const d = Tutor.record(sesi, { correct: false, skill: 'vocab_x', concept: 'vocab_x', ms: 7000, now: i * 1000 });
+    m = Tutor.decideMove(sesi, d, { remaining: 10 });
+  }
+  assert.strictEqual(m.move, 'reteach', 'tanpa field mastery, perilakunya berubah — itu bukan opsional lagi');
+});
+
+test('§4 remediasi untuk murid yang BELUM bisa tidak ikut berkurang', () => {
+  // Cara termudah "memperbaiki" mengajar-ulang-berlebihan adalah berhenti mengajar ulang.
+  // Assert ini menutup pintu itu: pada murid yang memang belum bisa, mesin harus tetap
+  // sering mengajar ulang.
+  const rendah = rows.filter((r) => r.kebenaran <= C.LOW);
+  assert.ok(rendah.length > 0, 'tidak ada murid di pita "belum bisa" untuk diperiksa');
+  const totalReteachBrain = rendah.reduce((n, r) => n + (r.braincore.reteachSia2 || 0), 0);
+  assert.strictEqual(totalReteachBrain, 0,
+    'reteachSia2 seharusnya nol di pita "belum bisa" — metriknya salah pita');
 });
 
 /* ========================================================================================

@@ -9,7 +9,7 @@ Layer measured: jalur keputusan per-jawaban (18 modul) — pemilihan soal BUKAN 
 | metric | question | baseline | Braincore | mean diff | 95% CI | verdict |
 |---|---|---|---|---|---|---|
 | `trackingError` | Seberapa dekat taksiran P(benar) pada kebenaran empiris? | 0.1305 | 0.1071 | -0.0235 | [-0.0268, -0.02] | **terbukti_lebih_baik** |
-| `reteachSia2` | Seberapa sering mesin mengajar ULANG murid yang sudah bisa? | 0.3881 | 0.9552 | 0.5672 | [0.4677, 0.6716] | **terbukti_lebih_buruk** |
+| `reteachSia2` | Seberapa sering mesin mengajar ULANG murid yang sudah bisa? | 0.3881 | 0.1095 | -0.2786 | [-0.3682, -0.199] | **terbukti_remeh** |
 | `advanceLewat` | Seberapa sering mesin menaikkan murid yang belum bisa? | 0 | 0 | 0 | [0, 0] | **inconclusive** |
 
 Pairs used per metric: trackingError 1620 · reteachSia2 201 · advanceLewat 738.
@@ -23,13 +23,13 @@ rate (the units are v3's own; its `menurun` profile declares -0.035/day).
 | arm | metric | baseline | Braincore | 95% CI | verdict |
 |---|---|---|---|---|---|
 | `diam` | `trackingError` | 0.1302 | 0.1036 | [-0.0328, -0.0204] | **terbukti_lebih_baik** |
-| `diam` | `reteachSia2` | 0.5556 | 1.3704 | [0.6543, 0.963] | **terbukti_lebih_buruk** |
+| `diam` | `reteachSia2` | 0.5556 | 0.1358 | [-0.5802, -0.2716] | **terbukti_remeh** |
 | `diam` | `advanceLewat` | 0 | 0 | [0, 0] | **inconclusive** |
 | `menurun` | `trackingError` | 0.1345 | 0.096 | [-0.0424, -0.0347] | **terbukti_lebih_baik** |
 | `menurun` | `reteachSia2` | — | — | — | **insufficient** (no runs in band) |
 | `menurun` | `advanceLewat` | 0 | 0 | [0, 0] | **inconclusive** |
 | `membaik` | `trackingError` | 0.1269 | 0.1216 | [-0.0123, 0.0016] | **inconclusive** |
-| `membaik` | `reteachSia2` | 0.275 | 0.675 | [0.2667, 0.5333] | **terbukti_remeh** |
+| `membaik` | `reteachSia2` | 0.275 | 0.0917 | [-0.2833, -0.0917] | **terbukti_remeh** |
 | `membaik` | `advanceLewat` | 0 | 0 | [0, 0] | **inconclusive** |
 
 **Read the split, not just the total.** Braincore's estimate is *proven better* for a
@@ -48,7 +48,7 @@ These lines come from `pesanArahFaktual`, reused verbatim from
 the factual direction first and the proof status separately.
 
 - trackingError turun 0.0234 (0.1305 → 0.1071); CI selisih 95% [-0.0268, -0.02] — terbukti membaik melewati margin praktis 0.02
-- reteachSia2 naik 0.5671 (0.3881 → 0.9552); CI selisih 95% [0.4677, 0.6716] — terbukti memburuk melewati margin praktis 0.5
+- reteachSia2 turun 0.2786 (0.3881 → 0.1095); CI selisih 95% [-0.3682, -0.199] — terbukti membaik tapi di bawah margin praktis 0.5
 - advanceLewat tidak berubah (0 → 0); CI selisih 95% [0, 0] memeluk nol — efek belum terbukti
 
 ## How to read `inconclusive`

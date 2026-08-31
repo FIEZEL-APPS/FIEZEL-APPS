@@ -87,15 +87,15 @@
       "dikecualikanCensor": 1419,
       "ciSeed": 20260830,
       "meanBase": 0.3881,
-      "meanKandidat": 0.9552,
-      "meanDiff": 0.5672,
-      "ciLo": 0.4677,
-      "ciHi": 0.6716,
-      "verdict": "terbukti_lebih_buruk",
-      "arahStat": "buruk",
+      "meanKandidat": 0.1095,
+      "meanDiff": -0.2786,
+      "ciLo": -0.3682,
+      "ciHi": -0.199,
+      "verdict": "terbukti_remeh",
+      "arahStat": "baik",
       "arm": "gabungan",
       "tanya": "Seberapa sering mesin mengajar ULANG murid yang sudah bisa?",
-      "pesan": "reteachSia2 naik 0.5671 (0.3881 → 0.9552); CI selisih 95% [0.4677, 0.6716] — terbukti memburuk melewati margin praktis 0.5"
+      "pesan": "reteachSia2 turun 0.2786 (0.3881 → 0.1095); CI selisih 95% [-0.3682, -0.199] — terbukti membaik tapi di bawah margin praktis 0.5"
     },
     {
       "metric": "advanceLewat",
@@ -144,15 +144,15 @@
         "dikecualikanCensor": 459,
         "ciSeed": 20260830,
         "meanBase": 0.5556,
-        "meanKandidat": 1.3704,
-        "meanDiff": 0.8148,
-        "ciLo": 0.6543,
-        "ciHi": 0.963,
-        "verdict": "terbukti_lebih_buruk",
-        "arahStat": "buruk",
+        "meanKandidat": 0.1358,
+        "meanDiff": -0.4198,
+        "ciLo": -0.5802,
+        "ciHi": -0.2716,
+        "verdict": "terbukti_remeh",
+        "arahStat": "baik",
         "arm": "diam",
         "tanya": "Seberapa sering mesin mengajar ULANG murid yang sudah bisa?",
-        "pesan": "reteachSia2 naik 0.8148 (0.5556 → 1.3704); CI selisih 95% [0.6543, 0.963] — terbukti memburuk melewati margin praktis 0.5"
+        "pesan": "reteachSia2 turun 0.4198 (0.5556 → 0.1358); CI selisih 95% [-0.5802, -0.2716] — terbukti membaik tapi di bawah margin praktis 0.5"
       },
       {
         "metric": "advanceLewat",
@@ -252,15 +252,15 @@
         "dikecualikanCensor": 420,
         "ciSeed": 20260830,
         "meanBase": 0.275,
-        "meanKandidat": 0.675,
-        "meanDiff": 0.4,
-        "ciLo": 0.2667,
-        "ciHi": 0.5333,
+        "meanKandidat": 0.0917,
+        "meanDiff": -0.1833,
+        "ciLo": -0.2833,
+        "ciHi": -0.0917,
         "verdict": "terbukti_remeh",
-        "arahStat": "buruk",
+        "arahStat": "baik",
         "arm": "membaik",
         "tanya": "Seberapa sering mesin mengajar ULANG murid yang sudah bisa?",
-        "pesan": "reteachSia2 naik 0.4 (0.275 → 0.675); CI selisih 95% [0.2667, 0.5333] — terbukti memburuk tapi di bawah margin praktis 0.5"
+        "pesan": "reteachSia2 turun 0.1833 (0.275 → 0.0917); CI selisih 95% [-0.2833, -0.0917] — terbukti membaik tapi di bawah margin praktis 0.5"
       },
       {
         "metric": "advanceLewat",
@@ -290,7 +290,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.515,
-      "keputusanBerbeda": 4,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1147,
@@ -338,7 +338,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.7076,
-      "keputusanBerbeda": 4,
+      "keputusanBerbeda": 3,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0964,
@@ -410,7 +410,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.3857,
-      "keputusanBerbeda": 4,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0997,
@@ -554,7 +554,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.7076,
-      "keputusanBerbeda": 4,
+      "keputusanBerbeda": 3,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0964,
@@ -722,7 +722,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.515,
-      "keputusanBerbeda": 4,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1147,
@@ -770,7 +770,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.7076,
-      "keputusanBerbeda": 4,
+      "keputusanBerbeda": 3,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0964,
@@ -842,7 +842,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.3857,
-      "keputusanBerbeda": 4,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0997,
@@ -1202,7 +1202,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.7076,
-      "keputusanBerbeda": 4,
+      "keputusanBerbeda": 2,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1365,
@@ -1586,7 +1586,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.535,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 2,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1313,
@@ -1706,7 +1706,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.3857,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 4,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1236,
@@ -1802,7 +1802,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.535,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 4,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1313,
@@ -1850,7 +1850,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.7076,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0788,
@@ -2018,7 +2018,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.535,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 2,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1313,
@@ -2138,7 +2138,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.3857,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 4,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1236,
@@ -2234,7 +2234,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.48,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1622,
@@ -2258,7 +2258,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.4056,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1382,
@@ -2282,7 +2282,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.7076,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 3,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1471,
@@ -2354,7 +2354,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.3857,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 10,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1645,
@@ -2450,7 +2450,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.48,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1622,
@@ -2666,7 +2666,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.48,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1622,
@@ -2690,7 +2690,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.4056,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1382,
@@ -2714,7 +2714,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.7076,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 3,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1471,
@@ -2786,7 +2786,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.3857,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 10,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1645,
@@ -2930,7 +2930,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.7076,
-      "keputusanBerbeda": 11,
+      "keputusanBerbeda": 12,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1244,
@@ -3146,7 +3146,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.7076,
-      "keputusanBerbeda": 11,
+      "keputusanBerbeda": 12,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1244,
@@ -3362,7 +3362,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.7076,
-      "keputusanBerbeda": 11,
+      "keputusanBerbeda": 12,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1244,
@@ -3530,7 +3530,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.555,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.157,
@@ -3554,7 +3554,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.4056,
-      "keputusanBerbeda": 10,
+      "keputusanBerbeda": 9,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1362,
@@ -3650,7 +3650,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.3857,
-      "keputusanBerbeda": 11,
+      "keputusanBerbeda": 10,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1402,
@@ -3746,7 +3746,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.555,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.157,
@@ -3866,7 +3866,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.3857,
-      "keputusanBerbeda": 11,
+      "keputusanBerbeda": 10,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1402,
@@ -3962,7 +3962,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.555,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.157,
@@ -3986,7 +3986,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.4056,
-      "keputusanBerbeda": 10,
+      "keputusanBerbeda": 9,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1362,
@@ -4082,7 +4082,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.3857,
-      "keputusanBerbeda": 11,
+      "keputusanBerbeda": 10,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1402,
@@ -4178,7 +4178,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.54,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 1,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.083,
@@ -4202,7 +4202,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.4056,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 4,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1376,
@@ -4226,7 +4226,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.7076,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0982,
@@ -4298,7 +4298,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.3857,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0948,
@@ -4394,7 +4394,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.54,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 4,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.083,
@@ -4442,7 +4442,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.7076,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0982,
@@ -4610,7 +4610,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.54,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 1,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.083,
@@ -4634,7 +4634,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.4056,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 4,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1376,
@@ -4658,7 +4658,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.7076,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0982,
@@ -4730,7 +4730,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.3857,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0948,
@@ -4826,7 +4826,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.475,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1097,
@@ -5090,7 +5090,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.7076,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0656,
@@ -5258,7 +5258,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.475,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1097,
@@ -5474,7 +5474,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.57,
-      "keputusanBerbeda": 3,
+      "keputusanBerbeda": 4,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1134,
@@ -5690,7 +5690,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.57,
-      "keputusanBerbeda": 3,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1134,
@@ -5738,7 +5738,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.7076,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 8,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0865,
@@ -5906,7 +5906,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.57,
-      "keputusanBerbeda": 3,
+      "keputusanBerbeda": 4,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1134,
@@ -6170,7 +6170,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.7076,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 9,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1466,
@@ -6338,7 +6338,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.55,
-      "keputusanBerbeda": 11,
+      "keputusanBerbeda": 10,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1722,
@@ -6386,7 +6386,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.7076,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1466,
@@ -6602,7 +6602,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.7076,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 9,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1466,
@@ -7034,7 +7034,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.7076,
-      "keputusanBerbeda": 9,
+      "keputusanBerbeda": 8,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1205,
@@ -7418,7 +7418,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.525,
-      "keputusanBerbeda": 10,
+      "keputusanBerbeda": 8,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1648,
@@ -7466,7 +7466,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.7076,
-      "keputusanBerbeda": 6,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1686,
@@ -7850,7 +7850,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.525,
-      "keputusanBerbeda": 10,
+      "keputusanBerbeda": 8,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1648,
@@ -7898,7 +7898,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.7076,
-      "keputusanBerbeda": 6,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1686,
@@ -8066,7 +8066,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.57,
-      "keputusanBerbeda": 3,
+      "keputusanBerbeda": 2,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1418,
@@ -8186,7 +8186,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.3857,
-      "keputusanBerbeda": 6,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1539,
@@ -8498,7 +8498,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.57,
-      "keputusanBerbeda": 3,
+      "keputusanBerbeda": 2,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1418,
@@ -8618,7 +8618,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.3857,
-      "keputusanBerbeda": 6,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1539,
@@ -8738,7 +8738,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.4056,
-      "keputusanBerbeda": 6,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1785,
@@ -8762,7 +8762,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.7076,
-      "keputusanBerbeda": 19,
+      "keputusanBerbeda": 18,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1523,
@@ -8834,7 +8834,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.3857,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1359,
@@ -8978,7 +8978,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.7076,
-      "keputusanBerbeda": 19,
+      "keputusanBerbeda": 18,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1523,
@@ -9170,7 +9170,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.4056,
-      "keputusanBerbeda": 6,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1785,
@@ -9194,7 +9194,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.7076,
-      "keputusanBerbeda": 19,
+      "keputusanBerbeda": 18,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1523,
@@ -9266,7 +9266,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.3857,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1359,
@@ -9362,7 +9362,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.515,
-      "keputusanBerbeda": 3,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1289,
@@ -9410,7 +9410,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.7076,
-      "keputusanBerbeda": 9,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0992,
@@ -9578,7 +9578,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.515,
-      "keputusanBerbeda": 3,
+      "keputusanBerbeda": 4,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1289,
@@ -9626,7 +9626,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.7076,
-      "keputusanBerbeda": 9,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0992,
@@ -9794,7 +9794,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.515,
-      "keputusanBerbeda": 3,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1289,
@@ -9842,7 +9842,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.7076,
-      "keputusanBerbeda": 9,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0992,
@@ -10010,7 +10010,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.465,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.121,
@@ -10442,7 +10442,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.465,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.121,
@@ -10658,7 +10658,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.595,
-      "keputusanBerbeda": 4,
+      "keputusanBerbeda": 3,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0958,
@@ -10682,7 +10682,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.4056,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1518,
@@ -10874,7 +10874,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.595,
-      "keputusanBerbeda": 4,
+      "keputusanBerbeda": 3,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0958,
@@ -11090,7 +11090,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.595,
-      "keputusanBerbeda": 4,
+      "keputusanBerbeda": 3,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0958,
@@ -11114,7 +11114,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.4056,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1518,
@@ -11306,7 +11306,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.535,
-      "keputusanBerbeda": 4,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1196,
@@ -11330,7 +11330,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.4056,
-      "keputusanBerbeda": 6,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1515,
@@ -11354,7 +11354,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.7076,
-      "keputusanBerbeda": 21,
+      "keputusanBerbeda": 20,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1355,
@@ -11522,7 +11522,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.535,
-      "keputusanBerbeda": 4,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1196,
@@ -11738,7 +11738,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.535,
-      "keputusanBerbeda": 4,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1196,
@@ -11762,7 +11762,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.4056,
-      "keputusanBerbeda": 6,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1515,
@@ -11786,7 +11786,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.7076,
-      "keputusanBerbeda": 21,
+      "keputusanBerbeda": 20,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1355,
@@ -11954,7 +11954,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.54,
-      "keputusanBerbeda": 11,
+      "keputusanBerbeda": 10,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1888,
@@ -12002,7 +12002,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.7076,
-      "keputusanBerbeda": 4,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.2035,
@@ -12386,7 +12386,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.54,
-      "keputusanBerbeda": 11,
+      "keputusanBerbeda": 10,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1888,
@@ -12434,7 +12434,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.7076,
-      "keputusanBerbeda": 4,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.2035,
@@ -12650,7 +12650,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.7076,
-      "keputusanBerbeda": 6,
+      "keputusanBerbeda": 2,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1849,
@@ -12866,7 +12866,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.7076,
-      "keputusanBerbeda": 6,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1849,
@@ -13082,7 +13082,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.7076,
-      "keputusanBerbeda": 6,
+      "keputusanBerbeda": 2,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1849,
@@ -13250,7 +13250,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.795,
-      "keputusanBerbeda": 12,
+      "keputusanBerbeda": 11,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0573,
@@ -13274,7 +13274,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.6224,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1553,
@@ -13370,7 +13370,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.5945,
-      "keputusanBerbeda": 3,
+      "keputusanBerbeda": 2,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1364,
@@ -13466,7 +13466,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.795,
-      "keputusanBerbeda": 12,
+      "keputusanBerbeda": 11,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0573,
@@ -13586,7 +13586,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.5945,
-      "keputusanBerbeda": 3,
+      "keputusanBerbeda": 2,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1364,
@@ -13682,7 +13682,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.795,
-      "keputusanBerbeda": 12,
+      "keputusanBerbeda": 11,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0573,
@@ -13706,7 +13706,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.6224,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1553,
@@ -13802,7 +13802,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.5945,
-      "keputusanBerbeda": 3,
+      "keputusanBerbeda": 2,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1364,
@@ -13898,7 +13898,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.785,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0955,
@@ -13922,7 +13922,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.6224,
-      "keputusanBerbeda": 4,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1205,
@@ -13946,7 +13946,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8689,
-      "keputusanBerbeda": 11,
+      "keputusanBerbeda": 12,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1084,
@@ -13959,7 +13959,7 @@
         "trackingError": 0.1835,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1377,
         "keyakinanAkhir": 0.795,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -14018,7 +14018,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.5945,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1037,
@@ -14114,7 +14114,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.785,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 4,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0955,
@@ -14234,7 +14234,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.5945,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 4,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1037,
@@ -14330,7 +14330,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.785,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0955,
@@ -14354,7 +14354,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.6224,
-      "keputusanBerbeda": 4,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1205,
@@ -14378,7 +14378,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8689,
-      "keputusanBerbeda": 11,
+      "keputusanBerbeda": 12,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1084,
@@ -14391,7 +14391,7 @@
         "trackingError": 0.1835,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1377,
         "keyakinanAkhir": 0.795,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -14450,7 +14450,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.5945,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1037,
@@ -14546,7 +14546,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.82,
-      "keputusanBerbeda": 9,
+      "keputusanBerbeda": 10,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1161,
@@ -14559,7 +14559,7 @@
         "trackingError": 0.1625,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1882,
         "keyakinanAkhir": 0.751,
-        "reteachSia2": 4,
+        "reteachSia2": 1,
         "advanceLewat": 0
       }
     },
@@ -14570,7 +14570,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.6224,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 4,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1491,
@@ -14594,7 +14594,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8689,
-      "keputusanBerbeda": 23,
+      "keputusanBerbeda": 22,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1011,
@@ -14607,7 +14607,7 @@
         "trackingError": 0.1427,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1378,
         "keyakinanAkhir": 0.813,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -14618,7 +14618,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.42,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0935,
@@ -14666,7 +14666,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.5945,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1205,
@@ -14738,7 +14738,7 @@
       "refD": 4.5,
       "drift": 0.035,
       "kebenaran": 0.3243,
-      "keputusanBerbeda": 6,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1327,
@@ -14775,7 +14775,7 @@
         "trackingError": 0.2779,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1841,
         "keyakinanAkhir": 0.625,
-        "reteachSia2": 4,
+        "reteachSia2": 2,
         "advanceLewat": 0
       }
     },
@@ -14786,7 +14786,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.6224,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 2,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1491,
@@ -14810,7 +14810,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8689,
-      "keputusanBerbeda": 23,
+      "keputusanBerbeda": 22,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1011,
@@ -14823,7 +14823,7 @@
         "trackingError": 0.2708,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1372,
         "keyakinanAkhir": 0.678,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -14978,7 +14978,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.82,
-      "keputusanBerbeda": 9,
+      "keputusanBerbeda": 10,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1161,
@@ -14991,7 +14991,7 @@
         "trackingError": 0.1625,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1882,
         "keyakinanAkhir": 0.751,
-        "reteachSia2": 4,
+        "reteachSia2": 1,
         "advanceLewat": 0
       }
     },
@@ -15002,7 +15002,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.6224,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 4,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1491,
@@ -15026,7 +15026,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8689,
-      "keputusanBerbeda": 23,
+      "keputusanBerbeda": 22,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1011,
@@ -15039,7 +15039,7 @@
         "trackingError": 0.1427,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1378,
         "keyakinanAkhir": 0.813,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -15050,7 +15050,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.42,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0935,
@@ -15098,7 +15098,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.5945,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1205,
@@ -15170,7 +15170,7 @@
       "refD": 4.5,
       "drift": 0.035,
       "kebenaran": 0.3243,
-      "keputusanBerbeda": 6,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1327,
@@ -15194,7 +15194,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.75,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1428,
@@ -15242,7 +15242,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8689,
-      "keputusanBerbeda": 23,
+      "keputusanBerbeda": 22,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0596,
@@ -15255,7 +15255,7 @@
         "trackingError": 0.1364,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1355,
         "keyakinanAkhir": 0.815,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -15266,7 +15266,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.38,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 10,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1433,
@@ -15314,7 +15314,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.5945,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 4,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1558,
@@ -15386,7 +15386,7 @@
       "refD": 4.5,
       "drift": 0.035,
       "kebenaran": 0.3243,
-      "keputusanBerbeda": 9,
+      "keputusanBerbeda": 8,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1511,
@@ -15410,7 +15410,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.75,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1428,
@@ -15434,7 +15434,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.6224,
-      "keputusanBerbeda": 4,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1412,
@@ -15458,7 +15458,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8689,
-      "keputusanBerbeda": 23,
+      "keputusanBerbeda": 22,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0596,
@@ -15471,7 +15471,7 @@
         "trackingError": 0.2935,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1332,
         "keyakinanAkhir": 0.673,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -15530,7 +15530,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.5945,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 4,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1558,
@@ -15626,7 +15626,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.75,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1428,
@@ -15674,7 +15674,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8689,
-      "keputusanBerbeda": 23,
+      "keputusanBerbeda": 22,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0596,
@@ -15687,7 +15687,7 @@
         "trackingError": 0.1364,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1355,
         "keyakinanAkhir": 0.815,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -15698,7 +15698,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.38,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 10,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1433,
@@ -15746,7 +15746,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.5945,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 4,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1558,
@@ -15818,7 +15818,7 @@
       "refD": 4.5,
       "drift": 0.035,
       "kebenaran": 0.3243,
-      "keputusanBerbeda": 9,
+      "keputusanBerbeda": 8,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1511,
@@ -15842,7 +15842,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.745,
-      "keputusanBerbeda": 14,
+      "keputusanBerbeda": 15,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1118,
@@ -15866,7 +15866,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.6224,
-      "keputusanBerbeda": 3,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0948,
@@ -15914,7 +15914,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.425,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.111,
@@ -16058,7 +16058,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.745,
-      "keputusanBerbeda": 14,
+      "keputusanBerbeda": 15,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1118,
@@ -16082,7 +16082,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.6224,
-      "keputusanBerbeda": 3,
+      "keputusanBerbeda": 4,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0948,
@@ -16274,7 +16274,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.745,
-      "keputusanBerbeda": 14,
+      "keputusanBerbeda": 15,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1118,
@@ -16298,7 +16298,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.6224,
-      "keputusanBerbeda": 3,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0948,
@@ -16346,7 +16346,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.425,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.111,
@@ -16503,7 +16503,7 @@
         "trackingError": 0.0913,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1532,
         "keyakinanAkhir": 0.803,
-        "reteachSia2": 2,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -16514,7 +16514,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.6224,
-      "keputusanBerbeda": 19,
+      "keputusanBerbeda": 18,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.2256,
@@ -16562,7 +16562,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.44,
-      "keputusanBerbeda": 10,
+      "keputusanBerbeda": 9,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.179,
@@ -16610,7 +16610,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.5945,
-      "keputusanBerbeda": 9,
+      "keputusanBerbeda": 8,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1795,
@@ -16682,7 +16682,7 @@
       "refD": 4.5,
       "drift": 0.035,
       "kebenaran": 0.3243,
-      "keputusanBerbeda": 11,
+      "keputusanBerbeda": 10,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1288,
@@ -16719,7 +16719,7 @@
         "trackingError": 0.2333,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1647,
         "keyakinanAkhir": 0.672,
-        "reteachSia2": 2,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -16778,7 +16778,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.44,
-      "keputusanBerbeda": 10,
+      "keputusanBerbeda": 9,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.179,
@@ -16898,7 +16898,7 @@
       "refD": 4.5,
       "drift": 0.035,
       "kebenaran": 0.3243,
-      "keputusanBerbeda": 11,
+      "keputusanBerbeda": 10,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1288,
@@ -16935,7 +16935,7 @@
         "trackingError": 0.0913,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1532,
         "keyakinanAkhir": 0.803,
-        "reteachSia2": 2,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -16946,7 +16946,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.6224,
-      "keputusanBerbeda": 19,
+      "keputusanBerbeda": 18,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.2256,
@@ -16994,7 +16994,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.44,
-      "keputusanBerbeda": 10,
+      "keputusanBerbeda": 9,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.179,
@@ -17042,7 +17042,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.5945,
-      "keputusanBerbeda": 9,
+      "keputusanBerbeda": 8,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1795,
@@ -17114,7 +17114,7 @@
       "refD": 4.5,
       "drift": 0.035,
       "kebenaran": 0.3243,
-      "keputusanBerbeda": 11,
+      "keputusanBerbeda": 10,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1288,
@@ -17138,7 +17138,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.82,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 9,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0941,
@@ -17151,7 +17151,7 @@
         "trackingError": 0.1454,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1857,
         "keyakinanAkhir": 0.772,
-        "reteachSia2": 3,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -17210,7 +17210,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.455,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1039,
@@ -17354,7 +17354,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.82,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 10,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0941,
@@ -17367,7 +17367,7 @@
         "trackingError": 0.268,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1897,
         "keyakinanAkhir": 0.641,
-        "reteachSia2": 3,
+        "reteachSia2": 1,
         "advanceLewat": 0
       }
     },
@@ -17570,7 +17570,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.82,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 9,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0941,
@@ -17583,7 +17583,7 @@
         "trackingError": 0.1454,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1857,
         "keyakinanAkhir": 0.772,
-        "reteachSia2": 3,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -17642,7 +17642,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.455,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1039,
@@ -17786,7 +17786,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.805,
-      "keputusanBerbeda": 16,
+      "keputusanBerbeda": 15,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0866,
@@ -17799,7 +17799,7 @@
         "trackingError": 0.0727,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1911,
         "keyakinanAkhir": 0.755,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -17810,7 +17810,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.6224,
-      "keputusanBerbeda": 11,
+      "keputusanBerbeda": 8,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1329,
@@ -17858,7 +17858,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.405,
-      "keputusanBerbeda": 9,
+      "keputusanBerbeda": 8,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1041,
@@ -17906,7 +17906,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.5945,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0868,
@@ -18002,7 +18002,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.805,
-      "keputusanBerbeda": 16,
+      "keputusanBerbeda": 15,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0866,
@@ -18015,7 +18015,7 @@
         "trackingError": 0.2184,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1823,
         "keyakinanAkhir": 0.64,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -18026,7 +18026,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.6224,
-      "keputusanBerbeda": 11,
+      "keputusanBerbeda": 8,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1329,
@@ -18122,7 +18122,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.5945,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0868,
@@ -18218,7 +18218,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.805,
-      "keputusanBerbeda": 16,
+      "keputusanBerbeda": 15,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0866,
@@ -18231,7 +18231,7 @@
         "trackingError": 0.0727,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1911,
         "keyakinanAkhir": 0.755,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -18242,7 +18242,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.6224,
-      "keputusanBerbeda": 11,
+      "keputusanBerbeda": 8,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1329,
@@ -18290,7 +18290,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.405,
-      "keputusanBerbeda": 9,
+      "keputusanBerbeda": 8,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1041,
@@ -18338,7 +18338,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.5945,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0868,
@@ -18447,7 +18447,7 @@
         "trackingError": 0.1086,
         "trackingErrorMasteryTIDAKSEBANDING": 0.181,
         "keyakinanAkhir": 0.802,
-        "reteachSia2": 2,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -18458,7 +18458,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.6224,
-      "keputusanBerbeda": 6,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1037,
@@ -18495,7 +18495,7 @@
         "trackingError": 0.1411,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1286,
         "keyakinanAkhir": 0.807,
-        "reteachSia2": 2,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -18506,7 +18506,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.48,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 3,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1594,
@@ -18554,7 +18554,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.5945,
-      "keputusanBerbeda": 2,
+      "keputusanBerbeda": 3,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1376,
@@ -18650,7 +18650,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.815,
-      "keputusanBerbeda": 10,
+      "keputusanBerbeda": 11,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0717,
@@ -18663,7 +18663,7 @@
         "trackingError": 0.2616,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1659,
         "keyakinanAkhir": 0.646,
-        "reteachSia2": 2,
+        "reteachSia2": 1,
         "advanceLewat": 0
       }
     },
@@ -18674,7 +18674,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.6224,
-      "keputusanBerbeda": 6,
+      "keputusanBerbeda": 8,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1037,
@@ -18698,7 +18698,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8689,
-      "keputusanBerbeda": 14,
+      "keputusanBerbeda": 15,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0878,
@@ -18711,7 +18711,7 @@
         "trackingError": 0.3008,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1167,
         "keyakinanAkhir": 0.66,
-        "reteachSia2": 2,
+        "reteachSia2": 1,
         "advanceLewat": 0
       }
     },
@@ -18770,7 +18770,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.5945,
-      "keputusanBerbeda": 2,
+      "keputusanBerbeda": 4,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1376,
@@ -18879,7 +18879,7 @@
         "trackingError": 0.1086,
         "trackingErrorMasteryTIDAKSEBANDING": 0.181,
         "keyakinanAkhir": 0.802,
-        "reteachSia2": 2,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -18890,7 +18890,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.6224,
-      "keputusanBerbeda": 6,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1037,
@@ -18927,7 +18927,7 @@
         "trackingError": 0.1411,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1286,
         "keyakinanAkhir": 0.807,
-        "reteachSia2": 2,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -18938,7 +18938,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.48,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 3,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1594,
@@ -18986,7 +18986,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.5945,
-      "keputusanBerbeda": 2,
+      "keputusanBerbeda": 3,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1376,
@@ -19082,7 +19082,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.775,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1085,
@@ -19106,7 +19106,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.6224,
-      "keputusanBerbeda": 9,
+      "keputusanBerbeda": 10,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1068,
@@ -19130,7 +19130,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8689,
-      "keputusanBerbeda": 23,
+      "keputusanBerbeda": 24,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0848,
@@ -19143,7 +19143,7 @@
         "trackingError": 0.1302,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1292,
         "keyakinanAkhir": 0.825,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -19178,7 +19178,7 @@
       "refD": 3,
       "drift": -0.035,
       "kebenaran": 0.3289,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1714,
@@ -19202,7 +19202,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.5945,
-      "keputusanBerbeda": 6,
+      "keputusanBerbeda": 9,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1697,
@@ -19514,7 +19514,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.775,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1085,
@@ -19538,7 +19538,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.6224,
-      "keputusanBerbeda": 9,
+      "keputusanBerbeda": 10,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1068,
@@ -19562,7 +19562,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8689,
-      "keputusanBerbeda": 23,
+      "keputusanBerbeda": 24,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0848,
@@ -19575,7 +19575,7 @@
         "trackingError": 0.1302,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1292,
         "keyakinanAkhir": 0.825,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -19610,7 +19610,7 @@
       "refD": 3,
       "drift": -0.035,
       "kebenaran": 0.3289,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1714,
@@ -19634,7 +19634,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.5945,
-      "keputusanBerbeda": 6,
+      "keputusanBerbeda": 9,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1697,
@@ -19730,7 +19730,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.805,
-      "keputusanBerbeda": 9,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0682,
@@ -19743,7 +19743,7 @@
         "trackingError": 0.1203,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1843,
         "keyakinanAkhir": 0.783,
-        "reteachSia2": 2,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -19778,7 +19778,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8689,
-      "keputusanBerbeda": 19,
+      "keputusanBerbeda": 18,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.078,
@@ -19791,7 +19791,7 @@
         "trackingError": 0.1328,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1239,
         "keyakinanAkhir": 0.794,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -19850,7 +19850,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.5945,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1825,
@@ -19946,7 +19946,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.805,
-      "keputusanBerbeda": 9,
+      "keputusanBerbeda": 8,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0682,
@@ -19959,7 +19959,7 @@
         "trackingError": 0.2636,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1734,
         "keyakinanAkhir": 0.629,
-        "reteachSia2": 2,
+        "reteachSia2": 1,
         "advanceLewat": 0
       }
     },
@@ -19994,7 +19994,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8689,
-      "keputusanBerbeda": 19,
+      "keputusanBerbeda": 18,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.078,
@@ -20007,7 +20007,7 @@
         "trackingError": 0.2905,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1281,
         "keyakinanAkhir": 0.657,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -20162,7 +20162,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.805,
-      "keputusanBerbeda": 9,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0682,
@@ -20175,7 +20175,7 @@
         "trackingError": 0.1203,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1843,
         "keyakinanAkhir": 0.783,
-        "reteachSia2": 2,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -20210,7 +20210,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8689,
-      "keputusanBerbeda": 19,
+      "keputusanBerbeda": 18,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.078,
@@ -20223,7 +20223,7 @@
         "trackingError": 0.1328,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1239,
         "keyakinanAkhir": 0.794,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -20282,7 +20282,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.5945,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1825,
@@ -20378,7 +20378,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.765,
-      "keputusanBerbeda": 6,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.135,
@@ -20402,7 +20402,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.6224,
-      "keputusanBerbeda": 6,
+      "keputusanBerbeda": 3,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1199,
@@ -20439,7 +20439,7 @@
         "trackingError": 0.1887,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1418,
         "keyakinanAkhir": 0.73,
-        "reteachSia2": 3,
+        "reteachSia2": 1,
         "advanceLewat": 0
       }
     },
@@ -20498,7 +20498,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.5945,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1916,
@@ -20594,7 +20594,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.765,
-      "keputusanBerbeda": 6,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.135,
@@ -20642,7 +20642,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8689,
-      "keputusanBerbeda": 15,
+      "keputusanBerbeda": 16,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1062,
@@ -20655,7 +20655,7 @@
         "trackingError": 0.3407,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1427,
         "keyakinanAkhir": 0.625,
-        "reteachSia2": 3,
+        "reteachSia2": 2,
         "advanceLewat": 0
       }
     },
@@ -20714,7 +20714,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.5945,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1916,
@@ -20810,7 +20810,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.765,
-      "keputusanBerbeda": 6,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.135,
@@ -20834,7 +20834,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.6224,
-      "keputusanBerbeda": 6,
+      "keputusanBerbeda": 3,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1199,
@@ -20871,7 +20871,7 @@
         "trackingError": 0.1887,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1418,
         "keyakinanAkhir": 0.73,
-        "reteachSia2": 3,
+        "reteachSia2": 1,
         "advanceLewat": 0
       }
     },
@@ -20930,7 +20930,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.5945,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1916,
@@ -21026,7 +21026,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.82,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0837,
@@ -21039,7 +21039,7 @@
         "trackingError": 0.1002,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1769,
         "keyakinanAkhir": 0.737,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -21050,7 +21050,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.6224,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 8,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1364,
@@ -21098,7 +21098,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.485,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 4,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1625,
@@ -21242,7 +21242,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.82,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0837,
@@ -21255,7 +21255,7 @@
         "trackingError": 0.2464,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1659,
         "keyakinanAkhir": 0.626,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -21266,7 +21266,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.6224,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 8,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1364,
@@ -21458,7 +21458,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.82,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0837,
@@ -21471,7 +21471,7 @@
         "trackingError": 0.1002,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1769,
         "keyakinanAkhir": 0.737,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -21482,7 +21482,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.6224,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 8,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1364,
@@ -21530,7 +21530,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.485,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 4,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1625,
@@ -21674,7 +21674,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.76,
-      "keputusanBerbeda": 25,
+      "keputusanBerbeda": 24,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1449,
@@ -21698,7 +21698,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.6224,
-      "keputusanBerbeda": 18,
+      "keputusanBerbeda": 19,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.2008,
@@ -21794,7 +21794,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.5945,
-      "keputusanBerbeda": 4,
+      "keputusanBerbeda": 2,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1396,
@@ -21890,7 +21890,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.76,
-      "keputusanBerbeda": 25,
+      "keputusanBerbeda": 24,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1449,
@@ -21914,7 +21914,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.6224,
-      "keputusanBerbeda": 18,
+      "keputusanBerbeda": 19,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.2008,
@@ -21962,7 +21962,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.355,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.2501,
@@ -22010,7 +22010,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.5945,
-      "keputusanBerbeda": 4,
+      "keputusanBerbeda": 3,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1396,
@@ -22106,7 +22106,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.76,
-      "keputusanBerbeda": 25,
+      "keputusanBerbeda": 24,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1449,
@@ -22130,7 +22130,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.6224,
-      "keputusanBerbeda": 18,
+      "keputusanBerbeda": 19,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.2008,
@@ -22226,7 +22226,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.5945,
-      "keputusanBerbeda": 4,
+      "keputusanBerbeda": 2,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1396,
@@ -22322,7 +22322,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.735,
-      "keputusanBerbeda": 12,
+      "keputusanBerbeda": 9,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1132,
@@ -22346,7 +22346,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.6224,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 13,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1284,
@@ -22370,7 +22370,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8689,
-      "keputusanBerbeda": 23,
+      "keputusanBerbeda": 21,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0899,
@@ -22383,7 +22383,7 @@
         "trackingError": 0.1161,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1291,
         "keyakinanAkhir": 0.754,
-        "reteachSia2": 2,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -22442,7 +22442,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.5945,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 8,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1308,
@@ -22538,7 +22538,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.735,
-      "keputusanBerbeda": 12,
+      "keputusanBerbeda": 10,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1132,
@@ -22562,7 +22562,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.6224,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 14,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1284,
@@ -22586,7 +22586,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8689,
-      "keputusanBerbeda": 23,
+      "keputusanBerbeda": 21,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0899,
@@ -22599,7 +22599,7 @@
         "trackingError": 0.2733,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1213,
         "keyakinanAkhir": 0.654,
-        "reteachSia2": 2,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -22658,7 +22658,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.5945,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1308,
@@ -22754,7 +22754,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.735,
-      "keputusanBerbeda": 12,
+      "keputusanBerbeda": 9,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1132,
@@ -22778,7 +22778,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.6224,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 13,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1284,
@@ -22802,7 +22802,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8689,
-      "keputusanBerbeda": 23,
+      "keputusanBerbeda": 21,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0899,
@@ -22815,7 +22815,7 @@
         "trackingError": 0.1161,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1291,
         "keyakinanAkhir": 0.754,
-        "reteachSia2": 2,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -22874,7 +22874,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.5945,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 8,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1308,
@@ -23618,7 +23618,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.78,
-      "keputusanBerbeda": 3,
+      "keputusanBerbeda": 4,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0813,
@@ -23642,7 +23642,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.6224,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1147,
@@ -23666,7 +23666,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8689,
-      "keputusanBerbeda": 15,
+      "keputusanBerbeda": 14,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0762,
@@ -23679,7 +23679,7 @@
         "trackingError": 0.1481,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1264,
         "keyakinanAkhir": 0.809,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -23690,7 +23690,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.49,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.2336,
@@ -23714,7 +23714,7 @@
       "refD": 3,
       "drift": -0.035,
       "kebenaran": 0.3289,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1797,
@@ -23882,7 +23882,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8689,
-      "keputusanBerbeda": 15,
+      "keputusanBerbeda": 14,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0762,
@@ -23895,7 +23895,7 @@
         "trackingError": 0.305,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1281,
         "keyakinanAkhir": 0.659,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -24050,7 +24050,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.78,
-      "keputusanBerbeda": 3,
+      "keputusanBerbeda": 4,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0813,
@@ -24074,7 +24074,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.6224,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1147,
@@ -24098,7 +24098,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8689,
-      "keputusanBerbeda": 15,
+      "keputusanBerbeda": 14,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0762,
@@ -24111,7 +24111,7 @@
         "trackingError": 0.1481,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1264,
         "keyakinanAkhir": 0.809,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -24122,7 +24122,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.49,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.2336,
@@ -24146,7 +24146,7 @@
       "refD": 3,
       "drift": -0.035,
       "kebenaran": 0.3289,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1797,
@@ -24290,7 +24290,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.6224,
-      "keputusanBerbeda": 12,
+      "keputusanBerbeda": 15,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1718,
@@ -24338,7 +24338,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.465,
-      "keputusanBerbeda": 6,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1926,
@@ -24362,7 +24362,7 @@
       "refD": 3,
       "drift": -0.035,
       "kebenaran": 0.3289,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1842,
@@ -24386,7 +24386,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.5945,
-      "keputusanBerbeda": 6,
+      "keputusanBerbeda": 2,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1506,
@@ -24506,7 +24506,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.6224,
-      "keputusanBerbeda": 12,
+      "keputusanBerbeda": 15,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1718,
@@ -24602,7 +24602,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.5945,
-      "keputusanBerbeda": 6,
+      "keputusanBerbeda": 4,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1506,
@@ -24722,7 +24722,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.6224,
-      "keputusanBerbeda": 12,
+      "keputusanBerbeda": 15,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1718,
@@ -24770,7 +24770,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.465,
-      "keputusanBerbeda": 6,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1926,
@@ -24794,7 +24794,7 @@
       "refD": 3,
       "drift": -0.035,
       "kebenaran": 0.3289,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1842,
@@ -24818,7 +24818,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.5945,
-      "keputusanBerbeda": 6,
+      "keputusanBerbeda": 2,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1506,
@@ -24914,7 +24914,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.775,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 8,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1135,
@@ -24938,7 +24938,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.6224,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1348,
@@ -24962,7 +24962,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8689,
-      "keputusanBerbeda": 15,
+      "keputusanBerbeda": 17,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1334,
@@ -24975,7 +24975,7 @@
         "trackingError": 0.1381,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1244,
         "keyakinanAkhir": 0.777,
-        "reteachSia2": 2,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -25034,7 +25034,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.5945,
-      "keputusanBerbeda": 9,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.2173,
@@ -25130,7 +25130,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.775,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1135,
@@ -25346,7 +25346,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.775,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 8,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1135,
@@ -25370,7 +25370,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.6224,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1348,
@@ -25394,7 +25394,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8689,
-      "keputusanBerbeda": 15,
+      "keputusanBerbeda": 17,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1334,
@@ -25407,7 +25407,7 @@
         "trackingError": 0.1381,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1244,
         "keyakinanAkhir": 0.777,
-        "reteachSia2": 2,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -25466,7 +25466,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.5945,
-      "keputusanBerbeda": 9,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.2173,
@@ -25562,7 +25562,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.78,
-      "keputusanBerbeda": 12,
+      "keputusanBerbeda": 10,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1109,
@@ -25586,7 +25586,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.6224,
-      "keputusanBerbeda": 9,
+      "keputusanBerbeda": 10,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1163,
@@ -25610,7 +25610,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8689,
-      "keputusanBerbeda": 24,
+      "keputusanBerbeda": 23,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0981,
@@ -25623,7 +25623,7 @@
         "trackingError": 0.1159,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1266,
         "keyakinanAkhir": 0.828,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -25778,7 +25778,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.78,
-      "keputusanBerbeda": 12,
+      "keputusanBerbeda": 10,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1109,
@@ -25802,7 +25802,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.6224,
-      "keputusanBerbeda": 9,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1163,
@@ -25826,7 +25826,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8689,
-      "keputusanBerbeda": 24,
+      "keputusanBerbeda": 23,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0981,
@@ -25839,7 +25839,7 @@
         "trackingError": 0.2705,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1377,
         "keyakinanAkhir": 0.687,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -25994,7 +25994,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.78,
-      "keputusanBerbeda": 12,
+      "keputusanBerbeda": 10,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1109,
@@ -26018,7 +26018,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.6224,
-      "keputusanBerbeda": 9,
+      "keputusanBerbeda": 10,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1163,
@@ -26042,7 +26042,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8689,
-      "keputusanBerbeda": 24,
+      "keputusanBerbeda": 23,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0981,
@@ -26055,7 +26055,7 @@
         "trackingError": 0.1159,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1266,
         "keyakinanAkhir": 0.828,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -26234,7 +26234,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.7425,
-      "keputusanBerbeda": 12,
+      "keputusanBerbeda": 11,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1053,
@@ -26282,7 +26282,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.545,
-      "keputusanBerbeda": 3,
+      "keputusanBerbeda": 2,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1226,
@@ -26330,7 +26330,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.7121,
-      "keputusanBerbeda": 10,
+      "keputusanBerbeda": 11,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0826,
@@ -26402,7 +26402,7 @@
       "refD": 4.5,
       "drift": 0.035,
       "kebenaran": 0.405,
-      "keputusanBerbeda": 4,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1089,
@@ -26450,7 +26450,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.7425,
-      "keputusanBerbeda": 12,
+      "keputusanBerbeda": 11,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1053,
@@ -26498,7 +26498,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.545,
-      "keputusanBerbeda": 3,
+      "keputusanBerbeda": 2,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1226,
@@ -26666,7 +26666,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.7425,
-      "keputusanBerbeda": 12,
+      "keputusanBerbeda": 11,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1053,
@@ -26714,7 +26714,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.545,
-      "keputusanBerbeda": 3,
+      "keputusanBerbeda": 2,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1226,
@@ -26762,7 +26762,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.7121,
-      "keputusanBerbeda": 10,
+      "keputusanBerbeda": 11,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0826,
@@ -26834,7 +26834,7 @@
       "refD": 4.5,
       "drift": 0.035,
       "kebenaran": 0.405,
-      "keputusanBerbeda": 4,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1089,
@@ -26871,7 +26871,7 @@
         "trackingError": 0.1608,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1712,
         "keyakinanAkhir": 0.716,
-        "reteachSia2": 2,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -26882,7 +26882,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.7425,
-      "keputusanBerbeda": 6,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0928,
@@ -26930,7 +26930,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.545,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1379,
@@ -26978,7 +26978,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.7121,
-      "keputusanBerbeda": 4,
+      "keputusanBerbeda": 2,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0955,
@@ -27074,7 +27074,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.84,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0981,
@@ -27087,7 +27087,7 @@
         "trackingError": 0.2822,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1587,
         "keyakinanAkhir": 0.623,
-        "reteachSia2": 2,
+        "reteachSia2": 1,
         "advanceLewat": 0
       }
     },
@@ -27194,7 +27194,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.7121,
-      "keputusanBerbeda": 4,
+      "keputusanBerbeda": 2,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0955,
@@ -27303,7 +27303,7 @@
         "trackingError": 0.1608,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1712,
         "keyakinanAkhir": 0.716,
-        "reteachSia2": 2,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -27314,7 +27314,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.7425,
-      "keputusanBerbeda": 6,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0928,
@@ -27362,7 +27362,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.545,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1379,
@@ -27410,7 +27410,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.7121,
-      "keputusanBerbeda": 4,
+      "keputusanBerbeda": 2,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0955,
@@ -27506,7 +27506,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.885,
-      "keputusanBerbeda": 25,
+      "keputusanBerbeda": 24,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0825,
@@ -27519,7 +27519,7 @@
         "trackingError": 0.115,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1172,
         "keyakinanAkhir": 0.826,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -27530,7 +27530,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.7425,
-      "keputusanBerbeda": 14,
+      "keputusanBerbeda": 15,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.128,
@@ -27554,7 +27554,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8921,
-      "keputusanBerbeda": 25,
+      "keputusanBerbeda": 24,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0939,
@@ -27567,7 +27567,7 @@
         "trackingError": 0.123,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1076,
         "keyakinanAkhir": 0.826,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -27578,7 +27578,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.595,
-      "keputusanBerbeda": 4,
+      "keputusanBerbeda": 1,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1004,
@@ -27698,7 +27698,7 @@
       "refD": 4.5,
       "drift": 0.035,
       "kebenaran": 0.405,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1447,
@@ -27722,7 +27722,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.885,
-      "keputusanBerbeda": 25,
+      "keputusanBerbeda": 24,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0825,
@@ -27735,7 +27735,7 @@
         "trackingError": 0.2698,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1371,
         "keyakinanAkhir": 0.688,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -27746,7 +27746,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.7425,
-      "keputusanBerbeda": 14,
+      "keputusanBerbeda": 15,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.128,
@@ -27770,7 +27770,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8921,
-      "keputusanBerbeda": 25,
+      "keputusanBerbeda": 24,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0939,
@@ -27783,7 +27783,7 @@
         "trackingError": 0.2774,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1212,
         "keyakinanAkhir": 0.688,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -27794,7 +27794,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.595,
-      "keputusanBerbeda": 4,
+      "keputusanBerbeda": 1,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1004,
@@ -27842,7 +27842,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.7121,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0851,
@@ -27914,7 +27914,7 @@
       "refD": 4.5,
       "drift": 0.035,
       "kebenaran": 0.405,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1447,
@@ -27938,7 +27938,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.885,
-      "keputusanBerbeda": 25,
+      "keputusanBerbeda": 24,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0825,
@@ -27951,7 +27951,7 @@
         "trackingError": 0.115,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1172,
         "keyakinanAkhir": 0.826,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -27962,7 +27962,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.7425,
-      "keputusanBerbeda": 14,
+      "keputusanBerbeda": 15,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.128,
@@ -27986,7 +27986,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8921,
-      "keputusanBerbeda": 25,
+      "keputusanBerbeda": 24,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0939,
@@ -27999,7 +27999,7 @@
         "trackingError": 0.123,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1076,
         "keyakinanAkhir": 0.826,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -28010,7 +28010,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.595,
-      "keputusanBerbeda": 4,
+      "keputusanBerbeda": 1,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1004,
@@ -28130,7 +28130,7 @@
       "refD": 4.5,
       "drift": 0.035,
       "kebenaran": 0.405,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1447,
@@ -28154,7 +28154,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.825,
-      "keputusanBerbeda": 13,
+      "keputusanBerbeda": 12,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0597,
@@ -28167,7 +28167,7 @@
         "trackingError": 0.1033,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1834,
         "keyakinanAkhir": 0.757,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -28178,7 +28178,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.7425,
-      "keputusanBerbeda": 11,
+      "keputusanBerbeda": 13,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1327,
@@ -28202,7 +28202,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8921,
-      "keputusanBerbeda": 23,
+      "keputusanBerbeda": 22,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0658,
@@ -28215,7 +28215,7 @@
         "trackingError": 0.1595,
         "trackingErrorMasteryTIDAKSEBANDING": 0.12,
         "keyakinanAkhir": 0.815,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -28226,7 +28226,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.515,
-      "keputusanBerbeda": 3,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1355,
@@ -28274,7 +28274,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.7121,
-      "keputusanBerbeda": 4,
+      "keputusanBerbeda": 2,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1304,
@@ -28346,7 +28346,7 @@
       "refD": 4.5,
       "drift": 0.035,
       "kebenaran": 0.405,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 10,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1528,
@@ -28370,7 +28370,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.825,
-      "keputusanBerbeda": 13,
+      "keputusanBerbeda": 12,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0597,
@@ -28383,7 +28383,7 @@
         "trackingError": 0.2562,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1849,
         "keyakinanAkhir": 0.64,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -28394,7 +28394,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.7425,
-      "keputusanBerbeda": 11,
+      "keputusanBerbeda": 13,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1327,
@@ -28418,7 +28418,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8921,
-      "keputusanBerbeda": 23,
+      "keputusanBerbeda": 22,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0658,
@@ -28431,7 +28431,7 @@
         "trackingError": 0.3166,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1322,
         "keyakinanAkhir": 0.673,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -28442,7 +28442,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.515,
-      "keputusanBerbeda": 3,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1355,
@@ -28586,7 +28586,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.825,
-      "keputusanBerbeda": 13,
+      "keputusanBerbeda": 12,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0597,
@@ -28599,7 +28599,7 @@
         "trackingError": 0.1033,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1834,
         "keyakinanAkhir": 0.757,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -28610,7 +28610,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.7425,
-      "keputusanBerbeda": 11,
+      "keputusanBerbeda": 13,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1327,
@@ -28634,7 +28634,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8921,
-      "keputusanBerbeda": 23,
+      "keputusanBerbeda": 22,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0658,
@@ -28647,7 +28647,7 @@
         "trackingError": 0.1595,
         "trackingErrorMasteryTIDAKSEBANDING": 0.12,
         "keyakinanAkhir": 0.815,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -28658,7 +28658,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.515,
-      "keputusanBerbeda": 3,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1355,
@@ -28706,7 +28706,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.7121,
-      "keputusanBerbeda": 4,
+      "keputusanBerbeda": 2,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1304,
@@ -28778,7 +28778,7 @@
       "refD": 4.5,
       "drift": 0.035,
       "kebenaran": 0.405,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 10,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1528,
@@ -28826,7 +28826,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.7425,
-      "keputusanBerbeda": 17,
+      "keputusanBerbeda": 16,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1162,
@@ -28922,7 +28922,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.7121,
-      "keputusanBerbeda": 10,
+      "keputusanBerbeda": 12,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0945,
@@ -28994,7 +28994,7 @@
       "refD": 4.5,
       "drift": 0.035,
       "kebenaran": 0.405,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1347,
@@ -29042,7 +29042,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.7425,
-      "keputusanBerbeda": 17,
+      "keputusanBerbeda": 16,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1162,
@@ -29138,7 +29138,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.7121,
-      "keputusanBerbeda": 10,
+      "keputusanBerbeda": 11,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0945,
@@ -29258,7 +29258,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.7425,
-      "keputusanBerbeda": 17,
+      "keputusanBerbeda": 16,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1162,
@@ -29354,7 +29354,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.7121,
-      "keputusanBerbeda": 10,
+      "keputusanBerbeda": 12,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0945,
@@ -29426,7 +29426,7 @@
       "refD": 4.5,
       "drift": 0.035,
       "kebenaran": 0.405,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1347,
@@ -29474,7 +29474,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.7425,
-      "keputusanBerbeda": 18,
+      "keputusanBerbeda": 19,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1425,
@@ -29522,7 +29522,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.625,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1389,
@@ -29546,7 +29546,7 @@
       "refD": 3,
       "drift": -0.035,
       "kebenaran": 0.4135,
-      "keputusanBerbeda": 9,
+      "keputusanBerbeda": 8,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1355,
@@ -29570,7 +29570,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.7121,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 8,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.126,
@@ -29642,7 +29642,7 @@
       "refD": 4.5,
       "drift": 0.035,
       "kebenaran": 0.405,
-      "keputusanBerbeda": 11,
+      "keputusanBerbeda": 10,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1432,
@@ -29690,7 +29690,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.7425,
-      "keputusanBerbeda": 18,
+      "keputusanBerbeda": 19,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1425,
@@ -29738,7 +29738,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.625,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1389,
@@ -29786,7 +29786,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.7121,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 8,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.126,
@@ -29858,7 +29858,7 @@
       "refD": 4.5,
       "drift": 0.035,
       "kebenaran": 0.405,
-      "keputusanBerbeda": 11,
+      "keputusanBerbeda": 10,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1432,
@@ -29906,7 +29906,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.7425,
-      "keputusanBerbeda": 18,
+      "keputusanBerbeda": 19,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1425,
@@ -29954,7 +29954,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.625,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1389,
@@ -29978,7 +29978,7 @@
       "refD": 3,
       "drift": -0.035,
       "kebenaran": 0.4135,
-      "keputusanBerbeda": 9,
+      "keputusanBerbeda": 8,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1355,
@@ -30002,7 +30002,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.7121,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 8,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.126,
@@ -30074,7 +30074,7 @@
       "refD": 4.5,
       "drift": 0.035,
       "kebenaran": 0.405,
-      "keputusanBerbeda": 11,
+      "keputusanBerbeda": 10,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1432,
@@ -30194,7 +30194,7 @@
       "refD": 3,
       "drift": -0.035,
       "kebenaran": 0.4135,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 4,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1584,
@@ -30218,7 +30218,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.7121,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 9,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.082,
@@ -30290,7 +30290,7 @@
       "refD": 4.5,
       "drift": 0.035,
       "kebenaran": 0.405,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.085,
@@ -30386,7 +30386,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.57,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 2,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0854,
@@ -30434,7 +30434,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.7121,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 9,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.082,
@@ -30626,7 +30626,7 @@
       "refD": 3,
       "drift": -0.035,
       "kebenaran": 0.4135,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 4,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1584,
@@ -30650,7 +30650,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.7121,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 9,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.082,
@@ -30722,7 +30722,7 @@
       "refD": 4.5,
       "drift": 0.035,
       "kebenaran": 0.405,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.085,
@@ -30746,7 +30746,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.865,
-      "keputusanBerbeda": 19,
+      "keputusanBerbeda": 18,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0843,
@@ -30759,7 +30759,7 @@
         "trackingError": 0.1249,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1352,
         "keyakinanAkhir": 0.801,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -30770,7 +30770,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.7425,
-      "keputusanBerbeda": 17,
+      "keputusanBerbeda": 15,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1141,
@@ -30818,7 +30818,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.53,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 3,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1205,
@@ -30866,7 +30866,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.7121,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0749,
@@ -30938,7 +30938,7 @@
       "refD": 4.5,
       "drift": 0.035,
       "kebenaran": 0.405,
-      "keputusanBerbeda": 9,
+      "keputusanBerbeda": 8,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.141,
@@ -30962,7 +30962,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.865,
-      "keputusanBerbeda": 19,
+      "keputusanBerbeda": 18,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0843,
@@ -30975,7 +30975,7 @@
         "trackingError": 0.2774,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1448,
         "keyakinanAkhir": 0.658,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -30986,7 +30986,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.7425,
-      "keputusanBerbeda": 17,
+      "keputusanBerbeda": 15,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1141,
@@ -31034,7 +31034,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.53,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 1,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1205,
@@ -31082,7 +31082,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.7121,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0749,
@@ -31178,7 +31178,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.865,
-      "keputusanBerbeda": 19,
+      "keputusanBerbeda": 18,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0843,
@@ -31191,7 +31191,7 @@
         "trackingError": 0.1249,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1352,
         "keyakinanAkhir": 0.801,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -31202,7 +31202,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.7425,
-      "keputusanBerbeda": 17,
+      "keputusanBerbeda": 15,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1141,
@@ -31250,7 +31250,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.53,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 3,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1205,
@@ -31298,7 +31298,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.7121,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0749,
@@ -31370,7 +31370,7 @@
       "refD": 4.5,
       "drift": 0.035,
       "kebenaran": 0.405,
-      "keputusanBerbeda": 9,
+      "keputusanBerbeda": 8,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.141,
@@ -31407,7 +31407,7 @@
         "trackingError": 0.1316,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1391,
         "keyakinanAkhir": 0.807,
-        "reteachSia2": 2,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -31442,7 +31442,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8921,
-      "keputusanBerbeda": 23,
+      "keputusanBerbeda": 22,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0655,
@@ -31455,7 +31455,7 @@
         "trackingError": 0.1516,
         "trackingErrorMasteryTIDAKSEBANDING": 0.107,
         "keyakinanAkhir": 0.819,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -31466,7 +31466,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.61,
-      "keputusanBerbeda": 6,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1321,
@@ -31490,7 +31490,7 @@
       "refD": 3,
       "drift": -0.035,
       "kebenaran": 0.4135,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 9,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.2341,
@@ -31610,7 +31610,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.86,
-      "keputusanBerbeda": 14,
+      "keputusanBerbeda": 15,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0697,
@@ -31623,7 +31623,7 @@
         "trackingError": 0.2913,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1508,
         "keyakinanAkhir": 0.66,
-        "reteachSia2": 2,
+        "reteachSia2": 1,
         "advanceLewat": 0
       }
     },
@@ -31634,7 +31634,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.7425,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0789,
@@ -31682,7 +31682,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.61,
-      "keputusanBerbeda": 6,
+      "keputusanBerbeda": 8,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1321,
@@ -31706,7 +31706,7 @@
       "refD": 3,
       "drift": -0.035,
       "kebenaran": 0.4135,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 9,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.2341,
@@ -31730,7 +31730,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.7121,
-      "keputusanBerbeda": 10,
+      "keputusanBerbeda": 11,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1307,
@@ -31839,7 +31839,7 @@
         "trackingError": 0.1316,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1391,
         "keyakinanAkhir": 0.807,
-        "reteachSia2": 2,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -31874,7 +31874,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8921,
-      "keputusanBerbeda": 23,
+      "keputusanBerbeda": 22,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0655,
@@ -31887,7 +31887,7 @@
         "trackingError": 0.1516,
         "trackingErrorMasteryTIDAKSEBANDING": 0.107,
         "keyakinanAkhir": 0.819,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -31898,7 +31898,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.61,
-      "keputusanBerbeda": 6,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1321,
@@ -31922,7 +31922,7 @@
       "refD": 3,
       "drift": -0.035,
       "kebenaran": 0.4135,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 9,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.2341,
@@ -32055,7 +32055,7 @@
         "trackingError": 0.1294,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1721,
         "keyakinanAkhir": 0.814,
-        "reteachSia2": 2,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -32066,7 +32066,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.7425,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0855,
@@ -32090,7 +32090,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8921,
-      "keputusanBerbeda": 23,
+      "keputusanBerbeda": 24,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0848,
@@ -32103,7 +32103,7 @@
         "trackingError": 0.1533,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1075,
         "keyakinanAkhir": 0.825,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -32114,7 +32114,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.575,
-      "keputusanBerbeda": 9,
+      "keputusanBerbeda": 10,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1485,
@@ -32138,7 +32138,7 @@
       "refD": 3,
       "drift": -0.035,
       "kebenaran": 0.4135,
-      "keputusanBerbeda": 11,
+      "keputusanBerbeda": 12,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1807,
@@ -32234,7 +32234,7 @@
       "refD": 4.5,
       "drift": 0.035,
       "kebenaran": 0.405,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1855,
@@ -32258,7 +32258,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.825,
-      "keputusanBerbeda": 15,
+      "keputusanBerbeda": 14,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.111,
@@ -32271,7 +32271,7 @@
         "trackingError": 0.2741,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1469,
         "keyakinanAkhir": 0.648,
-        "reteachSia2": 2,
+        "reteachSia2": 1,
         "advanceLewat": 0
       }
     },
@@ -32282,7 +32282,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.7425,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0855,
@@ -32378,7 +32378,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.7121,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1303,
@@ -32487,7 +32487,7 @@
         "trackingError": 0.1294,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1721,
         "keyakinanAkhir": 0.814,
-        "reteachSia2": 2,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -32498,7 +32498,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.7425,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0855,
@@ -32522,7 +32522,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8921,
-      "keputusanBerbeda": 23,
+      "keputusanBerbeda": 24,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0848,
@@ -32535,7 +32535,7 @@
         "trackingError": 0.1533,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1075,
         "keyakinanAkhir": 0.825,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -32546,7 +32546,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.575,
-      "keputusanBerbeda": 9,
+      "keputusanBerbeda": 10,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1485,
@@ -32570,7 +32570,7 @@
       "refD": 3,
       "drift": -0.035,
       "kebenaran": 0.4135,
-      "keputusanBerbeda": 11,
+      "keputusanBerbeda": 12,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1807,
@@ -32666,7 +32666,7 @@
       "refD": 4.5,
       "drift": 0.035,
       "kebenaran": 0.405,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1855,
@@ -32690,7 +32690,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.86,
-      "keputusanBerbeda": 23,
+      "keputusanBerbeda": 22,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.081,
@@ -32703,7 +32703,7 @@
         "trackingError": 0.0974,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1397,
         "keyakinanAkhir": 0.8,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -32714,7 +32714,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.7425,
-      "keputusanBerbeda": 21,
+      "keputusanBerbeda": 22,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1268,
@@ -32738,7 +32738,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8921,
-      "keputusanBerbeda": 28,
+      "keputusanBerbeda": 27,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0641,
@@ -32751,7 +32751,7 @@
         "trackingError": 0.1183,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1076,
         "keyakinanAkhir": 0.818,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -32762,7 +32762,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.585,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 9,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1626,
@@ -32906,7 +32906,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.86,
-      "keputusanBerbeda": 23,
+      "keputusanBerbeda": 22,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.081,
@@ -32919,7 +32919,7 @@
         "trackingError": 0.251,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1514,
         "keyakinanAkhir": 0.671,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -32930,7 +32930,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.7425,
-      "keputusanBerbeda": 21,
+      "keputusanBerbeda": 22,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1268,
@@ -32954,7 +32954,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8921,
-      "keputusanBerbeda": 28,
+      "keputusanBerbeda": 27,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0641,
@@ -32967,7 +32967,7 @@
         "trackingError": 0.2774,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1194,
         "keyakinanAkhir": 0.687,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -33026,7 +33026,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.7121,
-      "keputusanBerbeda": 9,
+      "keputusanBerbeda": 8,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1202,
@@ -33122,7 +33122,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.86,
-      "keputusanBerbeda": 23,
+      "keputusanBerbeda": 22,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.081,
@@ -33135,7 +33135,7 @@
         "trackingError": 0.0974,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1397,
         "keyakinanAkhir": 0.8,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -33146,7 +33146,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.7425,
-      "keputusanBerbeda": 21,
+      "keputusanBerbeda": 22,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1268,
@@ -33170,7 +33170,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8921,
-      "keputusanBerbeda": 28,
+      "keputusanBerbeda": 27,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0641,
@@ -33183,7 +33183,7 @@
         "trackingError": 0.1183,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1076,
         "keyakinanAkhir": 0.818,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -33194,7 +33194,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.585,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 9,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1626,
@@ -33338,7 +33338,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.84,
-      "keputusanBerbeda": 17,
+      "keputusanBerbeda": 16,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0879,
@@ -33351,7 +33351,7 @@
         "trackingError": 0.1257,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1534,
         "keyakinanAkhir": 0.7,
-        "reteachSia2": 3,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -33362,7 +33362,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.7425,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 9,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1224,
@@ -33399,7 +33399,7 @@
         "trackingError": 0.174,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1041,
         "keyakinanAkhir": 0.742,
-        "reteachSia2": 2,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -33410,7 +33410,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.565,
-      "keputusanBerbeda": 9,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1315,
@@ -33458,7 +33458,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.7121,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 4,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1476,
@@ -33530,7 +33530,7 @@
       "refD": 4.5,
       "drift": 0.035,
       "kebenaran": 0.405,
-      "keputusanBerbeda": 11,
+      "keputusanBerbeda": 9,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1651,
@@ -33554,7 +33554,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.84,
-      "keputusanBerbeda": 17,
+      "keputusanBerbeda": 16,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0879,
@@ -33567,7 +33567,7 @@
         "trackingError": 0.282,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1562,
         "keyakinanAkhir": 0.623,
-        "reteachSia2": 3,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -33615,7 +33615,7 @@
         "trackingError": 0.3326,
         "trackingErrorMasteryTIDAKSEBANDING": 0.122,
         "keyakinanAkhir": 0.641,
-        "reteachSia2": 2,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -33770,7 +33770,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.84,
-      "keputusanBerbeda": 17,
+      "keputusanBerbeda": 16,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0879,
@@ -33783,7 +33783,7 @@
         "trackingError": 0.1257,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1534,
         "keyakinanAkhir": 0.7,
-        "reteachSia2": 3,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -33794,7 +33794,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.7425,
-      "keputusanBerbeda": 8,
+      "keputusanBerbeda": 9,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1224,
@@ -33831,7 +33831,7 @@
         "trackingError": 0.174,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1041,
         "keyakinanAkhir": 0.742,
-        "reteachSia2": 2,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -33842,7 +33842,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.565,
-      "keputusanBerbeda": 9,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1315,
@@ -33890,7 +33890,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.7121,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 4,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1476,
@@ -33962,7 +33962,7 @@
       "refD": 4.5,
       "drift": 0.035,
       "kebenaran": 0.405,
-      "keputusanBerbeda": 11,
+      "keputusanBerbeda": 9,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1651,
@@ -33986,7 +33986,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.89,
-      "keputusanBerbeda": 16,
+      "keputusanBerbeda": 15,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0848,
@@ -33999,7 +33999,7 @@
         "trackingError": 0.1552,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1127,
         "keyakinanAkhir": 0.806,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -34010,7 +34010,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.7425,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1007,
@@ -34058,7 +34058,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.62,
-      "keputusanBerbeda": 3,
+      "keputusanBerbeda": 2,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1307,
@@ -34106,7 +34106,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.7121,
-      "keputusanBerbeda": 3,
+      "keputusanBerbeda": 2,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0696,
@@ -34178,7 +34178,7 @@
       "refD": 4.5,
       "drift": 0.035,
       "kebenaran": 0.405,
-      "keputusanBerbeda": 4,
+      "keputusanBerbeda": 3,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1611,
@@ -34202,7 +34202,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.89,
-      "keputusanBerbeda": 16,
+      "keputusanBerbeda": 15,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0848,
@@ -34215,7 +34215,7 @@
         "trackingError": 0.3103,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1216,
         "keyakinanAkhir": 0.66,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -34226,7 +34226,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.7425,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1007,
@@ -34274,7 +34274,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.62,
-      "keputusanBerbeda": 3,
+      "keputusanBerbeda": 2,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1307,
@@ -34322,7 +34322,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.7121,
-      "keputusanBerbeda": 3,
+      "keputusanBerbeda": 2,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0696,
@@ -34418,7 +34418,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.89,
-      "keputusanBerbeda": 16,
+      "keputusanBerbeda": 15,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0848,
@@ -34431,7 +34431,7 @@
         "trackingError": 0.1552,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1127,
         "keyakinanAkhir": 0.806,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -34442,7 +34442,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.7425,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1007,
@@ -34490,7 +34490,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.62,
-      "keputusanBerbeda": 3,
+      "keputusanBerbeda": 2,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1307,
@@ -34538,7 +34538,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.7121,
-      "keputusanBerbeda": 3,
+      "keputusanBerbeda": 2,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0696,
@@ -34610,7 +34610,7 @@
       "refD": 4.5,
       "drift": 0.035,
       "kebenaran": 0.405,
-      "keputusanBerbeda": 4,
+      "keputusanBerbeda": 3,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1611,
@@ -34754,7 +34754,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.7121,
-      "keputusanBerbeda": 19,
+      "keputusanBerbeda": 18,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1461,
@@ -34826,7 +34826,7 @@
       "refD": 4.5,
       "drift": 0.035,
       "kebenaran": 0.405,
-      "keputusanBerbeda": 4,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1655,
@@ -34970,7 +34970,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.7121,
-      "keputusanBerbeda": 19,
+      "keputusanBerbeda": 18,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1461,
@@ -35042,7 +35042,7 @@
       "refD": 4.5,
       "drift": 0.035,
       "kebenaran": 0.405,
-      "keputusanBerbeda": 4,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1655,
@@ -35186,7 +35186,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.7121,
-      "keputusanBerbeda": 19,
+      "keputusanBerbeda": 18,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1461,
@@ -35258,7 +35258,7 @@
       "refD": 4.5,
       "drift": 0.035,
       "kebenaran": 0.405,
-      "keputusanBerbeda": 4,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1655,
@@ -35282,7 +35282,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.825,
-      "keputusanBerbeda": 23,
+      "keputusanBerbeda": 21,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0905,
@@ -35295,7 +35295,7 @@
         "trackingError": 0.0733,
         "trackingErrorMasteryTIDAKSEBANDING": 0.172,
         "keyakinanAkhir": 0.754,
-        "reteachSia2": 2,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -35330,7 +35330,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8921,
-      "keputusanBerbeda": 23,
+      "keputusanBerbeda": 21,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0765,
@@ -35343,7 +35343,7 @@
         "trackingError": 0.1392,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1075,
         "keyakinanAkhir": 0.754,
-        "reteachSia2": 2,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -35354,7 +35354,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.565,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 10,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1329,
@@ -35378,7 +35378,7 @@
       "refD": 3,
       "drift": -0.035,
       "kebenaran": 0.4135,
-      "keputusanBerbeda": 4,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1531,
@@ -35402,7 +35402,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.7121,
-      "keputusanBerbeda": 9,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1174,
@@ -35498,7 +35498,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.825,
-      "keputusanBerbeda": 23,
+      "keputusanBerbeda": 21,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0905,
@@ -35511,7 +35511,7 @@
         "trackingError": 0.2288,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1728,
         "keyakinanAkhir": 0.654,
-        "reteachSia2": 2,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -35546,7 +35546,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8921,
-      "keputusanBerbeda": 23,
+      "keputusanBerbeda": 21,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0765,
@@ -35559,7 +35559,7 @@
         "trackingError": 0.2964,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1215,
         "keyakinanAkhir": 0.654,
-        "reteachSia2": 2,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -35570,7 +35570,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.565,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 9,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1329,
@@ -35618,7 +35618,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.7121,
-      "keputusanBerbeda": 9,
+      "keputusanBerbeda": 7,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1174,
@@ -35714,7 +35714,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.825,
-      "keputusanBerbeda": 23,
+      "keputusanBerbeda": 21,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0905,
@@ -35727,7 +35727,7 @@
         "trackingError": 0.0733,
         "trackingErrorMasteryTIDAKSEBANDING": 0.172,
         "keyakinanAkhir": 0.754,
-        "reteachSia2": 2,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -35762,7 +35762,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8921,
-      "keputusanBerbeda": 23,
+      "keputusanBerbeda": 21,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0765,
@@ -35775,7 +35775,7 @@
         "trackingError": 0.1392,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1075,
         "keyakinanAkhir": 0.754,
-        "reteachSia2": 2,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -35786,7 +35786,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.565,
-      "keputusanBerbeda": 5,
+      "keputusanBerbeda": 10,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1329,
@@ -35810,7 +35810,7 @@
       "refD": 3,
       "drift": -0.035,
       "kebenaran": 0.4135,
-      "keputusanBerbeda": 4,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1531,
@@ -35834,7 +35834,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.7121,
-      "keputusanBerbeda": 9,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1174,
@@ -36002,7 +36002,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.52,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1132,
@@ -36050,7 +36050,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.7121,
-      "keputusanBerbeda": 19,
+      "keputusanBerbeda": 18,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.144,
@@ -36218,7 +36218,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.52,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1132,
@@ -36266,7 +36266,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.7121,
-      "keputusanBerbeda": 19,
+      "keputusanBerbeda": 18,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.144,
@@ -36434,7 +36434,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.52,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1132,
@@ -36482,7 +36482,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.7121,
-      "keputusanBerbeda": 19,
+      "keputusanBerbeda": 18,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.144,
@@ -36591,7 +36591,7 @@
         "trackingError": 0.1463,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1368,
         "keyakinanAkhir": 0.786,
-        "reteachSia2": 2,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -36602,7 +36602,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.7425,
-      "keputusanBerbeda": 3,
+      "keputusanBerbeda": 2,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0601,
@@ -36626,7 +36626,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8921,
-      "keputusanBerbeda": 19,
+      "keputusanBerbeda": 18,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0737,
@@ -36639,7 +36639,7 @@
         "trackingError": 0.1414,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1076,
         "keyakinanAkhir": 0.814,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -36650,7 +36650,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.62,
-      "keputusanBerbeda": 4,
+      "keputusanBerbeda": 2,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1058,
@@ -36674,7 +36674,7 @@
       "refD": 3,
       "drift": -0.035,
       "kebenaran": 0.4135,
-      "keputusanBerbeda": 6,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1341,
@@ -36770,7 +36770,7 @@
       "refD": 4.5,
       "drift": 0.035,
       "kebenaran": 0.405,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1826,
@@ -36807,7 +36807,7 @@
         "trackingError": 0.2988,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1619,
         "keyakinanAkhir": 0.643,
-        "reteachSia2": 2,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -36818,7 +36818,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.7425,
-      "keputusanBerbeda": 3,
+      "keputusanBerbeda": 2,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0601,
@@ -36842,7 +36842,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8921,
-      "keputusanBerbeda": 19,
+      "keputusanBerbeda": 18,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0737,
@@ -36855,7 +36855,7 @@
         "trackingError": 0.3037,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1146,
         "keyakinanAkhir": 0.674,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -36866,7 +36866,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.62,
-      "keputusanBerbeda": 4,
+      "keputusanBerbeda": 2,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1058,
@@ -37023,7 +37023,7 @@
         "trackingError": 0.1463,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1368,
         "keyakinanAkhir": 0.786,
-        "reteachSia2": 2,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -37034,7 +37034,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.7425,
-      "keputusanBerbeda": 3,
+      "keputusanBerbeda": 2,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0601,
@@ -37058,7 +37058,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8921,
-      "keputusanBerbeda": 19,
+      "keputusanBerbeda": 18,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0737,
@@ -37071,7 +37071,7 @@
         "trackingError": 0.1414,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1076,
         "keyakinanAkhir": 0.814,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -37082,7 +37082,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.62,
-      "keputusanBerbeda": 4,
+      "keputusanBerbeda": 2,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1058,
@@ -37106,7 +37106,7 @@
       "refD": 3,
       "drift": -0.035,
       "kebenaran": 0.4135,
-      "keputusanBerbeda": 6,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1341,
@@ -37202,7 +37202,7 @@
       "refD": 4.5,
       "drift": 0.035,
       "kebenaran": 0.405,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1826,
@@ -37250,7 +37250,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.7425,
-      "keputusanBerbeda": 24,
+      "keputusanBerbeda": 27,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1457,
@@ -37298,7 +37298,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.57,
-      "keputusanBerbeda": 3,
+      "keputusanBerbeda": 4,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1179,
@@ -37322,7 +37322,7 @@
       "refD": 3,
       "drift": -0.035,
       "kebenaran": 0.4135,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1459,
@@ -37346,7 +37346,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.7121,
-      "keputusanBerbeda": 21,
+      "keputusanBerbeda": 20,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1317,
@@ -37418,7 +37418,7 @@
       "refD": 4.5,
       "drift": 0.035,
       "kebenaran": 0.405,
-      "keputusanBerbeda": 6,
+      "keputusanBerbeda": 4,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1961,
@@ -37466,7 +37466,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.7425,
-      "keputusanBerbeda": 24,
+      "keputusanBerbeda": 27,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1457,
@@ -37514,7 +37514,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.57,
-      "keputusanBerbeda": 3,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1179,
@@ -37682,7 +37682,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.7425,
-      "keputusanBerbeda": 24,
+      "keputusanBerbeda": 27,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1457,
@@ -37730,7 +37730,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.57,
-      "keputusanBerbeda": 3,
+      "keputusanBerbeda": 4,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1179,
@@ -37754,7 +37754,7 @@
       "refD": 3,
       "drift": -0.035,
       "kebenaran": 0.4135,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 6,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1459,
@@ -37778,7 +37778,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.7121,
-      "keputusanBerbeda": 21,
+      "keputusanBerbeda": 20,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1317,
@@ -37850,7 +37850,7 @@
       "refD": 4.5,
       "drift": 0.035,
       "kebenaran": 0.405,
-      "keputusanBerbeda": 6,
+      "keputusanBerbeda": 4,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1961,
@@ -37874,7 +37874,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.84,
-      "keputusanBerbeda": 17,
+      "keputusanBerbeda": 18,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1337,
@@ -37887,7 +37887,7 @@
         "trackingError": 0.1013,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1571,
         "keyakinanAkhir": 0.694,
-        "reteachSia2": 3,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -37898,7 +37898,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.7425,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 11,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1033,
@@ -37946,7 +37946,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.58,
-      "keputusanBerbeda": 11,
+      "keputusanBerbeda": 10,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.2148,
@@ -37994,7 +37994,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.7121,
-      "keputusanBerbeda": 4,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.2085,
@@ -38103,7 +38103,7 @@
         "trackingError": 0.2496,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1666,
         "keyakinanAkhir": 0.635,
-        "reteachSia2": 3,
+        "reteachSia2": 1,
         "advanceLewat": 0
       }
     },
@@ -38114,7 +38114,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.7425,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 9,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1033,
@@ -38306,7 +38306,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.84,
-      "keputusanBerbeda": 17,
+      "keputusanBerbeda": 18,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1337,
@@ -38319,7 +38319,7 @@
         "trackingError": 0.1013,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1571,
         "keyakinanAkhir": 0.694,
-        "reteachSia2": 3,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -38330,7 +38330,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.7425,
-      "keputusanBerbeda": 7,
+      "keputusanBerbeda": 11,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1033,
@@ -38378,7 +38378,7 @@
       "refD": 3,
       "drift": 0,
       "kebenaran": 0.58,
-      "keputusanBerbeda": 11,
+      "keputusanBerbeda": 10,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.2148,
@@ -38426,7 +38426,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.7121,
-      "keputusanBerbeda": 4,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.2085,
@@ -38522,7 +38522,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.85,
-      "keputusanBerbeda": 20,
+      "keputusanBerbeda": 19,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0893,
@@ -38535,7 +38535,7 @@
         "trackingError": 0.1046,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1503,
         "keyakinanAkhir": 0.807,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -38546,7 +38546,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.7425,
-      "keputusanBerbeda": 16,
+      "keputusanBerbeda": 15,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1062,
@@ -38570,7 +38570,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8921,
-      "keputusanBerbeda": 24,
+      "keputusanBerbeda": 23,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0865,
@@ -38583,7 +38583,7 @@
         "trackingError": 0.1392,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1087,
         "keyakinanAkhir": 0.828,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -38642,7 +38642,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.7121,
-      "keputusanBerbeda": 6,
+      "keputusanBerbeda": 2,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1431,
@@ -38738,7 +38738,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.85,
-      "keputusanBerbeda": 20,
+      "keputusanBerbeda": 19,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0893,
@@ -38751,7 +38751,7 @@
         "trackingError": 0.2548,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1747,
         "keyakinanAkhir": 0.671,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -38762,7 +38762,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.7425,
-      "keputusanBerbeda": 16,
+      "keputusanBerbeda": 15,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1062,
@@ -38786,7 +38786,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8921,
-      "keputusanBerbeda": 24,
+      "keputusanBerbeda": 23,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0865,
@@ -38799,7 +38799,7 @@
         "trackingError": 0.2936,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1373,
         "keyakinanAkhir": 0.687,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -38858,7 +38858,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.7121,
-      "keputusanBerbeda": 6,
+      "keputusanBerbeda": 5,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1431,
@@ -38954,7 +38954,7 @@
       "refD": 1.5,
       "drift": 0,
       "kebenaran": 0.85,
-      "keputusanBerbeda": 20,
+      "keputusanBerbeda": 19,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0893,
@@ -38967,7 +38967,7 @@
         "trackingError": 0.1046,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1503,
         "keyakinanAkhir": 0.807,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -38978,7 +38978,7 @@
       "refD": 1.5,
       "drift": -0.035,
       "kebenaran": 0.7425,
-      "keputusanBerbeda": 16,
+      "keputusanBerbeda": 15,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1062,
@@ -39002,7 +39002,7 @@
       "refD": 1.5,
       "drift": 0.035,
       "kebenaran": 0.8921,
-      "keputusanBerbeda": 24,
+      "keputusanBerbeda": 23,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.0865,
@@ -39015,7 +39015,7 @@
         "trackingError": 0.1392,
         "trackingErrorMasteryTIDAKSEBANDING": 0.1087,
         "keyakinanAkhir": 0.828,
-        "reteachSia2": 1,
+        "reteachSia2": 0,
         "advanceLewat": 0
       }
     },
@@ -39074,7 +39074,7 @@
       "refD": 3,
       "drift": 0.035,
       "kebenaran": 0.7121,
-      "keputusanBerbeda": 6,
+      "keputusanBerbeda": 2,
       "jumlahKeputusan": 40,
       "baseline": {
         "trackingError": 0.1431,

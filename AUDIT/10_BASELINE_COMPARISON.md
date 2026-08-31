@@ -107,7 +107,10 @@ support.
 — vocabulary and reading items have no map, so every learner who gets the same vocabulary skill
 wrong twice is recorded as having a persistent misconception.
 
-**Proposed fix (not applied).** In `decideMove`, gate the claim on the diagnosis' own precision:
+**UPDATE: this fix has since been applied**, at the owner's instruction, together with a second
+guard on mastery. See `AUDIT/13`. The proposal as originally written follows.
+
+**Proposed fix (not applied at the time).** In `decideMove`, gate the claim on the diagnosis' own precision:
 
 ```js
 if (!d.correct && num(d.repeats) >= 2) {
