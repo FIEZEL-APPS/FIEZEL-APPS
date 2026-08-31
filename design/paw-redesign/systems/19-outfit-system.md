@@ -32,6 +32,19 @@ Documented as an **amendment, not a violation**: earlier same-day documents (08 
 5. **The emotive `fz-acc` set is untouched** — headphones, notes, dots, bulb, stars, zzz, tear, hearts, sweat remain the *ephemeral emotive* vocabulary with their existing rules. Outfits are a **separate, worn** layer (`fz-outfit-*`, §4). One interaction rule: an `fz-acc` item that occupies the head slot (headphones) counts as a HEAD-slot occupant for the §6.2 concurrency cap.
 6. **Everything else survives** — G1 palette (§3), G2 grammar (§3), G4 rotation-free body, G6 tail ring, G9 reduced motion, chest-only paw glyph (hands stay plain), pose legality (08). An outfit that cannot satisfy these does not enter the registry.
 
+
+### 1.3 OWNER AMENDMENT (2026-08-31) — OF-08 retired; outfits bound to sessions
+
+> **OWNER decision, 2026-08-31 (verbatim, translated):** "The nightcap mascot — remove it completely from the application, no exception." And, in the same message: the Test session wears **OF-01 ransel + OF-03 bunga**, Grammar wears **OF-07 pensil**, Reading wears **OF-04 syal**, Writing wears **OF-02 topi**, "the rest as appropriate", and **Listening is already correct with the headset — do not change it again**.
+
+This is the explicit OWNER decision line that §1.2 rule 2 requires for **retiring** a registry item and for **changing** one visually. Three normative consequences:
+
+1. **OF-08 topi tidur is RETIRED.** Not flag-disabled — its registry row is deleted from `features/mascot/fiezel-paw-outfit.js`, and both resolver branches that reached it (`state === 'sleepy'`, and `idle` during night hours ≥21/<5) are deleted with it. Its §5 column below is kept only as a **historical record** and is no longer legal to render. *Why it was so visible:* the night-hour branch dressed nearly every idle screen, and the OWNER studies around 01.50–02.17, so in practice PAW wore the nightcap almost everywhere. The `sleepy` **state** itself (closed lids, `zzz` emotive `fz-acc`) is untouched — only the worn item is gone.
+2. **Selection is now bound to the learning SESSION, not to the clock.** §6.1's context function gains a screen→item map ahead of the session/ambient tiers (milestone OF-05 still outranks everything). The literal OWNER rows are test→OF-01+OF-03, grammar→OF-07, reading→OF-04, writing→OF-02; "the rest as appropriate" resolves to home→OF-03, vocab/skills/library/progress→OF-01, classroom→OF-02. **Listening and speaking are deliberately absent from the map**: `fz-headphones` is a HEAD-slot occupant (§1.2 rule 5), so a second head item would collide, and the OWNER instructed that screen not be touched.
+3. **OF-04 syal renders as the neck band only.** The §5 drape (tail capsule + fringe) is **retired from the runtime item**, verified by render at both 124px and 156px: the §4.1 insert point puts `fz-outfit-front` inside `fz-body` *before* the arms, and in the app's **sitting** pose the arms and legs swallow the whole drape — all that survives is its tip peeking below the paws, which reads as a loose pink smudge rather than a scarf. The §5 proof sheet was drawn in a standing pose, so the defect is invisible there. The band is the part that says "scarf", it is clean at every tier, and it touches no identity organ. Restoring the drape needs a standing pose, not a new number.
+
+**Implementation floors this exposed (recorded so they are not re-discovered):** the §6.5 identity floor (88px) and the §6.2 combo tier (120px) are real gates, and three surfaces sat just under them — the Grammar lesson stage rendered 86px, the quiz stage 111px, and Writing used a *circle-cropped* 85px coach cap that would have clipped a hat regardless of size. All three were raised/replaced so the OWNER's instruction is actually visible rather than silently dropped by the tier ladder.
+
 ---
 
 ## 2. Design language
@@ -104,6 +117,8 @@ Common columns. *Geometry* is exact sheet geometry in rig coordinates (see `gen_
 | **Poses allowed (08)** | 1.14 walking, 1.1 idle, 1.4 looking, 1.3 pointing | 1.1, 1.4, 1.2 waving, 1.3, 1.10 | 1.2 waving, 1.1, 1.9 presenting, 1.13 sitting | 1.13 sitting, 1.6 reading, 1.1, 1.5 thinking |
 | **Poses banned** | jumping, celebrating, running, sleeping (bag + flung arms clutter) | sleeping, listening (head-slot clash w/ headphones) | running, jumping, sleeping | jumping, running, celebrating (drape would need physics) |
 | **Tier survival** | Medium+ (needs full body). Small/Tiny: drop | Small+ (head crop keeps dome+brim; drop button <42px). Tiny: drop | Small+ (≥42px full cluster; 30–41px simplify to 1 blush disc + gold center). Tiny: drop | Medium+ full; Small: band only (no drape/fringe). Tiny: drop |
+
+> **§1.3 (2026-08-31): the OF-08 column below is a HISTORICAL RECORD.** The item is retired by OWNER decision and is no longer legal to render; its row is deleted from the runtime registry. Kept here so the retirement is auditable, not so it can be revived.
 
 | | OF-05 toga (graduation cap) | OF-06 beret | OF-07 pensil (pencil) | OF-08 topi tidur (nightcap) |
 |---|---|---|---|---|

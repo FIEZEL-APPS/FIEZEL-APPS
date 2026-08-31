@@ -476,6 +476,147 @@ test('probe render bbox tersedia untuk QA', () => {
   }
 });
 
+/* ============================================================
+   LAPISAN OUTFIT (G5') — dijalankan sungguhan, bukan diregex.
+   Berkasnya adalah IIFE yang menempel ke `window`, jadi cukup diberi
+   dokumen palsu: resolver `outfitFor` lalu bisa dipanggil langsung dan
+   yang diuji adalah PERILAKUNYA, bukan penampakan sumbernya.
+
+   Kenapa perlu gerbang: keputusan OWNER 2026-08-31 ("mascot pakai topi
+   tidur hilangkan sepenuhnya dari aplikasi tanpa terkecuali", dan tiap
+   sesi memakai item tertentu) tidak dijaga apa pun sebelum ini. OF-08
+   sendiri dulu terpasang lewat DUA cabang - state 'sleepy' dan idle di
+   jam malam - jadi mencabut satu baris saja tidak cukup, dan tidak ada
+   yang akan memberi tahu kalau salah satunya kembali.
+   ============================================================ */
+function loadOutfitLayer() {
+  const doc = {
+    readyState: 'complete', body: {}, documentElement: {},
+    querySelectorAll: () => [], addEventListener: () => {}
+  };
+  const win = { document: doc };
+  const before = global.window;
+  global.window = win;
+  try {
+    delete require.cache[require.resolve('./features/mascot/fiezel-paw-outfit.js')];
+    require('./features/mascot/fiezel-paw-outfit.js');
+  } finally {
+    if (before === undefined) delete global.window; else global.window = before;
+  }
+  if (!win.FiezelPawOutfit) throw new Error('lapisan outfit tidak menempel ke window');
+  return win.FiezelPawOutfit;
+}
+
+const OUTFIT = loadOutfitLayer();
+/* Semua layar nyata app.js (VALID_VIEWS) + semua state komponen yang bisa
+   dilihat resolver. Sapuan penuh, bukan contoh yang dipilih-pilih. */
+const VIEWS = ['home', 'vocab', 'grammar', 'reading', 'skills', 'listening', 'speaking',
+  'writing', 'test', 'progress', 'classroom', 'library', 'ask', 'search', 'online', ''];
+const STATES = ['idle', 'sleepy', 'listening', 'lesson-start', 'welcome-back', 'level-up',
+  'milestone', 'celebrating', 'completion', 'curious', 'proud', 'sad'];
+
+test('topi tidur OF-08 tidak punya SATU pun jalan tersisa di aplikasi', () => {
+  // Sapuan penuh layar x state x 24 jam. Cabang jam-malam itulah yang dulu
+  // membuat OWNER melihat topi tidur di hampir tiap layar (ia belajar 01.50-02.17),
+  // jadi jamnya ikut disapu - bukan hanya siang hari yang kebetulan lolos.
+  if (OUTFIT.registry['OF-08']) throw new Error('OF-08 masih ada barisnya di registry');
+  const bocor = [];
+  for (const v of VIEWS) for (const st of STATES) for (let jam = 0; jam < 24; jam++) {
+    const id = OUTFIT.outfitFor(st, v, jam);
+    for (const one of (Array.isArray(id) ? id : [id])) {
+      if (one === 'OF-08') bocor.push(st + '/' + (v || '(kosong)') + '/' + jam);
+    }
+  }
+  if (bocor.length) throw new Error('topi tidur masih muncul di ' + bocor.length + ' kombinasi, mis. ' + bocor[0]);
+});
+
+test('resolver tidak pernah memulangkan item yang tidak ada barisnya', () => {
+  // Registry TERTUTUP (19 §1.2): id yang tidak terdaftar berarti PAW telanjang
+  // secara diam-diam, bukan error - persis kelas bug yang bikin maskot "hilang".
+  for (const v of VIEWS) for (const st of STATES) for (const jam of [3, 9, 15, 22]) {
+    const id = OUTFIT.outfitFor(st, v, jam);
+    if (id === null) continue;
+    for (const one of (Array.isArray(id) ? id : [id])) {
+      if (!OUTFIT.registry[one]) throw new Error('outfitFor(' + st + ',' + v + ',' + jam + ') -> ' + one + ' yang tidak ada di registry');
+    }
+  }
+});
+
+test('tiap sesi memakai outfit yang diminta OWNER, dan tidak berubah menurut jam', () => {
+  // Kalimat OWNER 2026-08-31, harfiah: test = ransel + bunga, grammar = pensil,
+  // reading = syal, writing = topi. "Tidak berubah menurut jam" bagian penting:
+  // sebelum ini pakaian bisa berganti sendiri di malam hari.
+  const minta = { test: ['OF-01', 'OF-03'], grammar: 'OF-07', reading: 'OF-04', writing: 'OF-02' };
+  for (const [layar, harap] of Object.entries(minta)) {
+    for (const jam of [0, 6, 13, 21, 23]) {
+      const dapat = OUTFIT.outfitFor('idle', layar, jam);
+      const a = JSON.stringify(Array.isArray(harap) ? harap : [harap]);
+      const b = JSON.stringify(Array.isArray(dapat) ? dapat : [dapat]);
+      if (a !== b) throw new Error('layar ' + layar + ' jam ' + jam + ': harap ' + a + ' dapat ' + b);
+    }
+  }
+});
+
+test('kombo sesi Tes tidak menabrakkan dua item di slot yang sama', () => {
+  // 19 SS6.2: hard max dua, dan tidak pernah dua penghuni slot yang sama -
+  // kalau tabrakan, item kedua menimpa item pertama dan salah satunya lenyap.
+  const dipakai = {};
+  for (const id of OUTFIT.outfitFor('idle', 'test', 12)) {
+    const slot = OUTFIT.registry[id].slot;
+    for (const nama of ['head', 'front', 'back']) {
+      if (!slot[nama]) continue;
+      if (dipakai[nama]) throw new Error('slot ' + nama + ' diperebutkan ' + dipakai[nama] + ' dan ' + id);
+      dipakai[nama] = id;
+    }
+  }
+});
+
+test('state listening tidak pernah dapat outfit — headset penghuni slot kepala', () => {
+  // OWNER: "LISTENING SUDAH BENAR PAKAI HEADSET, JANGAN DIUBAH LAGI".
+  //
+  // Aturan 19 SS6.2 yang sebenarnya: tidak boleh dua penghuni slot KEPALA, dan
+  // headphone (fz-acc) ikut dihitung penghuni kepala. Headphone hanya hidup
+  // selama STATE 'listening' - bukan selama layar Listening terbuka - jadi
+  // gerbangnya pun terikat state, di SEMUA layar, bukan hanya dua layar itu.
+  // (Menuntut layar Listening telanjang total justru salah sasaran: ransel
+  // duduk di slot back+front dan tidak pernah bisa menimpa headset.)
+  const bocor = [];
+  for (const v of VIEWS) for (const jam of [2, 14, 22]) {
+    const id = OUTFIT.outfitFor('listening', v, jam);
+    if (id !== null) bocor.push(v + '/' + jam + ' -> ' + JSON.stringify(id));
+  }
+  if (bocor.length) throw new Error('slot kepala direbut dari headset: ' + bocor[0] + ' (total ' + bocor.length + ')');
+});
+
+test('peta layar sendiri tidak pernah menaruh item kepala di listening/speaking', () => {
+  // Cabang terpisah dari yang di atas: kalau suatu saat seseorang menambahkan
+  // baris listening/speaking ke peta LAYAR, tes di atas masih bisa lolos lewat
+  // state tertentu. Ini menagih petanya langsung.
+  const src = read('features/mascot/fiezel-paw-outfit.js');
+  const peta = /var LAYAR = \{([\s\S]*?)\n  \};/.exec(src);
+  if (!peta) throw new Error('peta LAYAR tidak ditemukan — struktur resolver berubah, gerbang ini buta');
+  if (/\b(listening|speaking)\s*:/.test(peta[1])) {
+    throw new Error('listening/speaking masuk peta LAYAR; OWNER menyuruh layar itu tidak diubah lagi');
+  }
+});
+
+test('maks dua item, dan hanya sesi Tes yang memakai dua', () => {
+  for (const v of VIEWS) for (const st of STATES) for (const jam of [4, 11, 20]) {
+    const id = OUTFIT.outfitFor(st, v, jam);
+    const n = Array.isArray(id) ? id.length : (id ? 1 : 0);
+    if (n > 2) throw new Error('layar ' + v + ' state ' + st + ' memakai ' + n + ' item (cap 19 SS6.2 = 2)');
+    if (n === 2 && v !== 'test') throw new Error('kombo dua item bocor ke layar ' + v);
+  }
+});
+
+test('milestone tetap mengalahkan peta layar — toga tidak boleh tertutup pakaian sesi', () => {
+  // Anti-inflasi 13: toga hanya muncul di milestone nyata. Kalau peta layar
+  // menang, toga tidak akan pernah terlihat lagi karena tiap sesi punya pakaian.
+  for (const v of VIEWS) for (const st of ['level-up', 'milestone']) {
+    if (OUTFIT.outfitFor(st, v, 12) !== 'OF-05') throw new Error('toga kalah oleh peta layar di ' + v + '/' + st);
+  }
+});
+
 console.log('');
 if (failures.length) {
   console.log('FIEZEL maskot PAW: FAIL (' + failures.length + ')');
