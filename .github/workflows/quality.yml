@@ -848,6 +848,16 @@ jobs:
           # tetap 'off'. Plus Fase P: setiap trace, catatan bukti, tolok ukur, dan hasil studi
           # wajib membawa braincoreVersion yang cocok dengan manifest.
           node braincore-version-safety-test.js
+          # Fase 2 / Phase Q: demonstrasi pembeli. braincore-demo.js menjawab empat pertanyaan
+          # pembeli dengan MENJALANKAN Braincore lewat pintu depannya (braincore-runtime.js) —
+          # tanpa UI, tanpa tangkapan layar, tanpa angka yang disalin dari jalan sebelumnya.
+          # Setiap skenario adalah PASANGAN lengan yang berbeda pada satu hal saja, karena
+          # satu lengan cuma menunjukkan mesinnya mengeluarkan sesuatu, bukan bahwa ia
+          # memutuskan BERBEDA karena yang diamatinya. Gerbang ini menguji klaimnya masih
+          # benar, membuktikan klaim itu BISA gagal lewat 4 mutasi, dan mencocokkan angkanya
+          # dengan braincore-pipeline.js langsung supaya runtime tidak diam-diam menumbuhkan
+          # jalur khusus demonstrasi.
+          node braincore-demo-test.js
           node fiezel-stat-gate-test.js
           node id-golden-snapshot-test.js
           node learning-lane-test.js
