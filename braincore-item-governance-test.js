@@ -36,6 +36,9 @@ test('difficulty mismatch yields review hold; two healthy qualified windows reco
 test('stale empirical evidence fails closed',()=>{
   const s=G.admitFromQa(G.createState(),item('q1'),cleanQa,T0); assert.throws(()=>G.observeAggregate(s,'q1',agg({contentRevision:'old'}),T0+1),e=>e.code==='BRAINCORE_ITEM_STALE_EVIDENCE');
 });
+test('corrupt optional empirical counters fail closed instead of counting as healthy zeros',()=>{
+  const s=G.admitFromQa(G.createState(),item('q1'),cleanQa,T0); for(const key of ['graderDisagreements','answerDisputes','renderFailures']) { const broken=agg({exposures:80,independentLearners:20,[key]:NaN}); assert.throws(()=>G.observeAggregate(s,'q1',broken,T0+1),/non-negative integer/,key+' NaN must be rejected'); }
+});
 test('manual review is explicit, referenced and auditable',()=>{
   let s=G.admitFromQa(G.createState(),item('q1'),qa([{itemId:'q1',category:'ambiguity',severity:'blocker'}],[]),T0); s=G.reviewItem(s,'q1',{approved:true,reviewRef:'review-42',note:'answer key independently checked'},T0+1); assert.strictEqual(G.statusFor(s,'q1').status,G.STATUS.ACTIVE); assert.strictEqual(s.items.q1.history.at(-1).source,'manual_review'); assert.strictEqual(s.items.q1.history.at(-1).evidence.reviewRef,'review-42');
 });
