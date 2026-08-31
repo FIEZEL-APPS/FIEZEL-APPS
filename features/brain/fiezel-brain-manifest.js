@@ -77,7 +77,7 @@
 
   // Versi BUNDLE kebijakan belajar — terpisah dari versi produk. 3.0.0 menandai
   // gelombang Braincore v3 pertama yang punya identitas bundle eksplisit.
-  var BUNDLE_VERSION = '3.5.0';
+  var BUNDLE_VERSION = '3.6.0';
 
   // Disalin apa adanya dari version.js (self.FIEZEL_VERSION). Bundle ini mengandalkan
   // wiring app.js 5.19.0 (guard modul-absen, sidecar stabilityDays, dsb.) — versi
@@ -121,6 +121,7 @@
     { file: 'fiezel-mastery-bkt.js', global: 'FiezelMasteryBKT', schema: 'fiezel-mastery-bkt-v1', authorityKey: 'bktUnlock' },
     { file: 'fiezel-metrics-digest.js', global: 'FiezelMetricsDigest', schema: 'fiezel-metrics-digest-v1', authorityKey: 'metricsDigest' },
     { file: 'fiezel-misconception-ledger.js', global: 'FiezelMisconceptionLedger', schema: 'fiezel-misconception-ledger-v1', authorityKey: 'misconceptionPrior' },
+    { file: 'fiezel-param-ledger.js', global: 'FiezelParamLedger', schema: 'fiezel-param-ledger-v1', authorityKey: 'paramLedger' },
     { file: 'fiezel-policy-verdict.js', global: 'FiezelPolicyVerdict', schema: 'fiezel-policy-verdict-v1', authorityKey: 'policyVerdict' },
     { file: 'fiezel-nof1.js', global: 'FiezelNof1', schema: 'fiezel-nof1-v1', authorityKey: 'nof1' },
     { file: 'fiezel-olm.js', global: 'FiezelOLM', schema: 'fiezel-olm-v1', authorityKey: 'olmInsight' },
@@ -190,6 +191,9 @@
     // Langkah 3 roadmap otonomi: pembagi lengan eksperimen N-of-1. Modul murni yang belum
     // punya pemanggil di app.js — eksperimen pertama belum dibuka. Jujurnya 'off'.
     nof1: 'off',
+    // Langkah 4: rantai hash perubahan parameter. Prasyarat penyetelan-diri, belum ada
+    // pemanggil di app.js karena belum ada parameter yang boleh bergerak sendiri: 'off'.
+    paramLedger: 'off',
     // Digest metrik tetap 'off' dengan sengaja: ia adalah PENGUNGGAH, dan menyalakannya
     // tanpa keputusan produk soal telemetri berarti menambah permukaan privasi diam-diam.
     metricsDigest: 'off',
