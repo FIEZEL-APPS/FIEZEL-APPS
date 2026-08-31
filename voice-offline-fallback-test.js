@@ -44,10 +44,6 @@ test('pengunduh latar tidak punya satu pun jalan ke layar', () => {
 });
 
 test('kemajuan disimpan per potongan, bukan per berkas', () => {
-  // Ukuran potongan dipaku ke nilai yang diminta OWNER (m025-122: 20 MB). Yang dijaga
-  // bukan angkanya sebagai selera, melainkan bahwa perubahannya disengaja: menurunkannya
-  // diam-diam memperlambat unduhan, menaikkannya diam-diam memperbesar yang terbuang saat
-  // satu potongan putus.
   const chunk = /CHUNK_BYTES\s*=\s*(\d+)\s*\*\s*1024\s*\*\s*1024/.exec(AUTOLOAD);
   if (!chunk) throw new Error('ukuran potongan tidak ditemukan');
   if (Number(chunk[1]) !== 20) throw new Error('ukuran potongan ' + chunk[1] + ' MB; OWNER menetapkan 20 MB');
@@ -56,8 +52,6 @@ test('kemajuan disimpan per potongan, bukan per berkas', () => {
 });
 
 test('potongan tidak pernah dirakit dari data yang tidak utuh', () => {
-  // Perakitan yang menerima ukuran salah menghasilkan model rusak yang baru terdeteksi
-  // saat mesin gagal menyala - jauh dari tempat kesalahannya.
   if (!AUTOLOAD.includes('chunk_size_mismatch')) throw new Error('ukuran potongan tidak diperiksa');
   if (!/if \(size !== item\.bytes\) return false;/.test(AUTOLOAD)) throw new Error('ukuran hasil rakitan tidak diperiksa');
   if (!AUTOLOAD.includes('range_unsupported')) throw new Error('server yang mengabaikan Range tidak ditolak; hasilnya aset rusak diam-diam');
@@ -69,8 +63,6 @@ test('pengunduh menghormati Mode Hemat Data dan keadaan luring', () => {
 });
 
 test('pengunduh dan bootstrap memakai SATU nama cache', () => {
-  // Dua salinan nama cache berarti aset terunduh dua kali dan yang kedua tidak pernah
-  // dianggap sah oleh verifikasi bootstrap.
   if (!/cacheName:\s*cacheName/.test(BOOTSTRAP)) throw new Error('bootstrap tidak mengekspor cacheName');
   if (!AUTOLOAD.includes('rt.cacheName')) throw new Error('pengunduh tidak membaca cacheName dari bootstrap');
   if (/cacheName\s*=\s*[`'"]/.test(AUTOLOAD)) throw new Error('pengunduh menyusun sendiri nama cache; itu salinan yang bisa menyimpang');
@@ -79,7 +71,6 @@ test('pengunduh dan bootstrap memakai SATU nama cache', () => {
 test('cadangan hanya dipanggil di jalur gagal', () => {
   const idx = SAY.indexOf('localEngine()');
   if (idx < 0) throw new Error('tidak ada mesin cadangan di pintu bicara');
-  // Panggilan speak() cadangan harus berada di dalam .catch(), bukan di jalur .then().
   const call = SAY.indexOf('local.speak(');
   const errCatch = SAY.indexOf('}).catch(function (error) {');
   if (call < 0 || errCatch < 0 || call < errCatch) {
@@ -117,18 +108,12 @@ test('kartu akun menawarkan keluar DAN ganti akun', () => {
 });
 
 test('pengaturan tidak lagi menjual unduhan kepada murid', () => {
-  // Keberatan m025-100. Cadangan menyiapkan dirinya sendiri; tombol yang menawarkan
-  // pekerjaan yang sudah berjalan hanya membuat murid mengira ada yang harus ia lakukan.
   if (/id="prepareNeuralVoice"/.test(APP)) throw new Error('tombol "Simpan untuk offline" hidup lagi');
-  // Komentar boleh menyebut tombol lama untuk menjelaskan kenapa ia hilang; yang dilarang
-  // adalah naskahnya masih dirender.
   const live = APP.split('\n').filter((l) => !/^\s*(\/\/|\*|\/\*)/.test(l)).join('\n');
   if (/Simpan untuk offline/.test(live)) throw new Error('naskah penjual unduhan masih dirender di kartu pengaturan');
 });
 
 test('mesin cadangan bukan kokoro, dan alasannya tertulis', () => {
-  // Ini pagar keselamatan, bukan selera. Catatan m025-26 di bootstrap mencatat kokoro
-  // MEMBUNUH content process iOS, dan murid FIEZEL memakai iPhone.
   if (!/supertonic-3/.test(CONFIG)) throw new Error('mesin cadangan bukan supertonic-3');
   if (/kokoro/i.test(CONFIG) && !/content process iOS/.test(CONFIG)) {
     throw new Error('kokoro disebut tanpa alasan kenapa ia TIDAK dipakai');
@@ -139,10 +124,6 @@ test('mesin cadangan bukan kokoro, dan alasannya tertulis', () => {
 });
 
 test('kemajuan unduhan bisa diperiksa, dan dihitung dari isi cache', () => {
-  // OWNER bertanya "sudah berapa persen". Jawaban yang dihitung dari penghitung di
-  // localStorage akan terus bertambah walaupun cache-nya sudah dibersihkan browser -
-  // laporan yang meyakinkan tentang sesuatu yang tidak ada. Persentasenya harus dibaca
-  // dari cache yang sebenarnya.
   if (!/async function progress\(\)/.test(AUTOLOAD)) throw new Error('tidak ada cara membaca kemajuan');
   if (!AUTOLOAD.includes('caches.open')) throw new Error('kemajuan tidak dibaca dari cache');
   const fn = /async function progress\(\)\{?[\s\S]*?\n  \}/.exec(AUTOLOAD);
@@ -158,8 +139,6 @@ test('kemajuan muncul di Diagnostics, bukan di layar murid', () => {
   const diag = read('features/neural-voice/fiezel-diag-panel.js');
   if (!diag.includes('offlineVoiceBackup')) throw new Error('kemajuan tidak dilaporkan di panel diagnostik');
   if (!diag.includes('addOfflineVoiceBackup(dump)')) throw new Error('laporannya tidak pernah dipanggil saat panel disegarkan');
-  // Pagar yang sama seperti sebelumnya, dari sisi lain: menambah cara MEMERIKSA tidak
-  // boleh berubah menjadi cara MEMBERITAHU.
   const live = APP.split('\n').filter((l) => !/^\s*(\/\/|\*|\/\*)/.test(l)).join('\n');
   if (/OfflineAutoload[\s\S]{0,80}showToast/.test(live)) throw new Error('kemajuan unduhan bocor ke toast di layar murid');
 });
@@ -170,3 +149,7 @@ if (failures.length) {
   process.exit(1);
 }
 console.log('FIEZEL suara cadangan + akun: PASS ' + pass);
+
+// NV-08/NV-09: regression perilaku dijalankan dari gate yang SUDAH terdaftar di quality.yml,
+// sehingga repair ini tidak perlu (dan tidak boleh) mengubah workflow hanya untuk registrasi.
+require('./voice-turn-ownership-regression.js');
