@@ -44,8 +44,20 @@
  * - listeningPolicy (listening-adaptive): BAYANGAN — policy() dihitung dan
  *   ditempel sebagai metadata q.__listeningPolicy, tetapi tidak ada satu baris
  *   pun yang membacanya kembali untuk mengubah playback.
- * - stepTutor & productionGrader: OFF — dimuat index.html/sw.js tetapi NOL
- *   referensi di app.js; belum ada jalur yang memanggilnya.
+ * - stepTutor: AKTIF — stepTutorGuidance()/stepTutorGuidanceMarkup() memecah soal
+ *   ber-reasoningOperation jadi tuntunan langkah yang DITAMPILKAN ke murid saat
+ *   scaffold mencapai 'worked' (app.js, jalur render jawaban).
+ * - productionGrader: AKTIF — grade() adalah penilai jawaban mode cloze; hasilnya
+ *   menentukan benar/salah murid dan matchedDistractor-nya masuk ledger miskonsepsi.
+ * - retentionProbe: BAYANGAN — schedule() dipanggil saat mastery BKT tembus dan
+ *   evaluate() menilai kalibrasi dari jawaban NYATA setelah jatuh tempo, tetapi
+ *   rekomendasi half-life-nya ADVISORY: penulis nextReview tetap tunggal (FSRS).
+ * - learningMetrics: BAYANGAN — lima metrik longitudinal dihitung di perangkat dan
+ *   dirender di panel diagnostik; nol keputusan yang bergantung padanya.
+ * - statGate: OFF di jalur aplikasi (nol referensi app.js), tetapi BERWENANG di jalur
+ *   pipeline konten — content-promotion.js memakai verdict()-nya untuk memutus
+ *   promote/hold/reject. Peta ini memetakan otoritas DI PERANGKAT, jadi 'off' di sini
+ *   bukan berarti modul mati; lihat catatan di entri authorityMap-nya.
  *
  * BATAS YANG DIJAGA
  * -----------------
@@ -65,7 +77,7 @@
 
   // Versi BUNDLE kebijakan belajar — terpisah dari versi produk. 3.0.0 menandai
   // gelombang Braincore v3 pertama yang punya identitas bundle eksplisit.
-  var BUNDLE_VERSION = '3.0.0';
+  var BUNDLE_VERSION = '3.1.0';
 
   // Disalin apa adanya dari version.js (self.FIEZEL_VERSION). Bundle ini mengandalkan
   // wiring app.js 5.19.0 (guard modul-absen, sidecar stabilityDays, dsb.) — versi
@@ -146,22 +158,30 @@
     confusionMap: 'shadow',
     olmInsight: 'shadow',
     listeningPolicy: 'shadow',
-    stepTutor: 'off',
-    productionGrader: 'off',
-    // Wave E4 (29 Agu): probe retensi tertunda — modul murni baru, belum ada pemanggil
-    // di app.js; rekomendasi half-life-nya ADVISORY dan tidak menulis memori: 'off'.
-    retentionProbe: 'off',
+    // Langkah 1 roadmap otonomi: keduanya BERWENANG dan sudah lama berwenang — peta
+    // lama menyebutnya 'off' dengan alasan 'nol referensi di app.js' yang tidak lagi
+    // benar. Gerbang W8 di brain-page-wiring-test.js sekarang menangkap drift arah ini.
+    stepTutor: 'active',
+    productionGrader: 'active',
+    // Langkah 1 roadmap otonomi: probe retensi kini dimuat halaman dan dipanggil —
+    // schedule() saat mastery BKT tembus, evaluate() atas jawaban nyata sesudah jatuh
+    // tempo. Ia MENGUKUR dan tidak memutuskan (rekomendasi half-life tetap advisory,
+    // penulis nextReview tetap tunggal), maka jujurnya 'shadow', bukan 'active'.
+    retentionProbe: 'shadow',
     // Registry konfigurasi (fiezel-brain-config.js) menyatakan sendiri bahwa ia TIDAK
     // dibaca modul lain saat runtime dan tidak dimuat index.html — sumber kebenaran
     // untuk manusia/tooling, bukan jalur keputusan: jujurnya 'off'.
     brainConfig: 'off',
-    // Learning metrics menghitung metrik longitudinal on-device untuk pelaporan —
-    // belum ada satu pun pemanggil di app.js/index.html pada bundle ini: 'off'.
-    learningMetrics: 'off',
-    // Dua modul infrastruktur gelombang v3 lain (digest metrik dan gerbang statistik):
-    // sama-sama nol pemanggil di app.js/index.html pada bundle ini — 'off' sampai
-    // ada wiring nyata yang bisa ditunjuk.
+    // Langkah 1 roadmap otonomi: learningMetricsSnapshot() di app.js menghitung lima
+    // metrik longitudinal dari riwayat lokal dan merendernya di panel diagnostik.
+    // Tampilan saja — nol keputusan sesi yang bergantung padanya: 'shadow'.
+    learningMetrics: 'shadow',
+    // Digest metrik tetap 'off' dengan sengaja: ia adalah PENGUNGGAH, dan menyalakannya
+    // tanpa keputusan produk soal telemetri berarti menambah permukaan privasi diam-diam.
     metricsDigest: 'off',
+    // 'off' DI PERANGKAT saja. content-promotion.js memakai FiezelStatGate.verdict untuk
+    // memutus promote/hold/reject kandidat konten — modul ini hidup, hanya belum di jalur
+    // keputusan otak. Langkah 2 roadmap otonomi yang memindahkannya ke sini.
     statGate: 'off',
     // Manifest sendiri deskriptif murni: ia tidak memutuskan apa-apa untuk murid,
     // maka jujurnya 'shadow' (informasi diagnostik), bukan 'active'.

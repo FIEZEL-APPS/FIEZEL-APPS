@@ -2195,6 +2195,10 @@ function bktRecord(q,ok,kappa,boost=1){
   const b=Number.isFinite(Number(boost))?Math.max(1,Math.min(1.5,Number(boost))):1;
   const weight=(Number.isFinite(Number(kappa))?Math.max(0,Math.min(1,Number(kappa))):1)*b;
   bktWrite(self.FiezelMasteryBKT.update(bktRead(),{lesson,correct:!!ok,weight},Date.now()));
+  // Langkah 1 roadmap otonomi: momen mastery adalah SATU-SATUNYA pemicu jadwal probe
+  // retensi. Modul idempoten per lesson, jadi memanggilnya tiap jawaban tidak menumpuk
+  // jadwal; guard di dalamnya membuat perilaku tanpa modul persis seperti sebelum ini.
+  retentionProbeSync(Date.now(),lesson);
 }
 /* ---- Butir 4: confusion matrix lesson-x-lesson dari opsi pinjaman ---- */
 const CONFUSION_MATRIX_KEY='fiezel-confusion-matrix-v1';
@@ -2218,6 +2222,131 @@ function confusionMatrixRecord(q,selectedIndex){
   confusionMatrixWrite(self.FiezelConfusionMatrix.record(confusionMatrixRead(),{
     activeLesson:active,activeFamily:fam(active),sourceLesson:source,sourceFamily:fam(source),picked:true,correct:false
   },Date.now()));
+}
+/* ---- Langkah 1 roadmap otonomi: SENSOR JANGKA PANJANG -------------------------------
+ *
+ * Dua modul yang sudah ditulis, sudah diuji, dan sudah dimuat halaman, tetapi selama ini
+ * NOL PEMANGGIL: fiezel-retention-probe.js dan fiezel-learning-metrics.js. Akibatnya otak
+ * tahu murid menjawab benar hari ini, tetapi tidak pernah menanyakan apakah yang dikuasai
+ * kemarin masih ada minggu depan - dan "mastery" yang tidak pernah diukur tertunda tidak
+ * bisa dibedakan dari pola jawaban yang menguap semalam.
+ *
+ * KENAPA KEDUANYA BAYANGAN, BUKAN AKTIF. Blok ini MENGUKUR, tidak memutuskan: tidak ada
+ * satu baris pun di bawah yang mengubah soal yang tampil, jadwal ulangan, atau kesulitan.
+ * Rekomendasi half-life dari evaluate() sengaja TIDAK ditulis ke memori - penulis nextReview
+ * tetap tunggal (single-writer FSRS, kontrak B3), dan sensor yang diam-diam ikut menyetir
+ * adalah persis kelas cacat yang membuat dua model memori v2 saling menimpa.
+ *
+ * PROBE DINILAI DARI JAWABAN YANG MEMANG TERJADI. Penjadwal menandai kapan sebuah lesson
+ * layak diukur ulang (3/7/21 hari setelah mastery, jitter berseed); evaluator membaca
+ * jawaban NYATA pada lesson itu setelah tanggal jatuh tempo. Tidak ada soal tambahan yang
+ * disisipkan ke sesi murid - menambah ujian demi mengukur retensi akan mengubah hal yang
+ * sedang diukur, dan itu bukan pengukuran, itu intervensi.
+ */
+const RETENTION_PROBE_KEY='fiezel-post-test-v1';
+function retentionProbeAvailable(){return !!(self.FiezelPostTest&&typeof self.FiezelPostTest.schedule==='function')}
+function retentionProbeRead(){
+  if(!retentionProbeAvailable())return null;
+  try{const raw=localStorage.getItem(RETENTION_PROBE_KEY);return raw?JSON.parse(raw):null}catch{return null}
+}
+function retentionProbeWrite(st){if(!st)return;try{localStorage.setItem(RETENTION_PROBE_KEY,JSON.stringify(st))}catch{}}
+/** Seed jitter LOKAL. Diacak sekali di perangkat lalu disimpan di state probe (modul murni
+ *  tidak boleh punya sumber acak sendiri). Angka ini tidak pernah ikut telemetri apa pun -
+ *  ia hanya menyebar jatuh tempo antar lesson supaya probe tidak menumpuk di satu hari. */
+function retentionProbeSeed(st){
+  const existing=Number(st?.userSeed)>>>0;
+  if(existing)return existing;
+  return (Math.floor(Math.random()*0xFFFFFFFF)>>>0)||1;
+}
+/** Lesson yang BARU menembus gerbang mastery BKT jadi kandidat probe. L dibaca dari modul
+ *  BKT yang sama dengan panel bayangan - bukan taksiran kedua. Modul sendiri menolak L di
+ *  bawah 0,95 dan bersifat idempoten, jadi memanggil ini tiap jawaban aman. */
+function retentionProbeMasteryEvents(now,onlyLesson){
+  const B=self.FiezelMasteryBKT;
+  const st=bktRead();
+  if(!B||typeof B.mastery!=='function'||!st||!st.lessons)return [];
+  // Satu lesson saja bila pemanggilnya tahu lesson mana yang baru bergerak: menyapu 139
+  // lesson pada SETIAP jawaban adalah kerja sia-sia, dan modulnya idempoten per lesson
+  // sehingga menjadwalkan satu-satu memberi hasil yang identik dengan menyapu semuanya.
+  const keys=onlyLesson?(st.lessons[onlyLesson]?[onlyLesson]:[]):Object.keys(st.lessons);
+  const out=[];
+  for(const lesson of keys){
+    try{
+      const m=B.mastery(st,lesson);
+      if(m&&Number(m.L)>=0.95)out.push({lesson,L:Number(m.L),n:Number(m.n)||0,at:now});
+    }catch{}
+  }
+  return out;
+}
+function retentionProbeSync(now=Date.now(),onlyLesson=''){
+  if(!retentionProbeAvailable())return null;
+  try{
+    const events=retentionProbeMasteryEvents(now,onlyLesson);
+    if(!events.length)return null;
+    const before=retentionProbeRead();
+    const res=self.FiezelPostTest.schedule({...(before||{}),userSeed:retentionProbeSeed(before)},events,now);
+    if(res&&res.state)retentionProbeWrite(res.state);
+    return res;
+  }catch{return null}
+}
+/** Hasil probe dari jawaban NYATA: untuk tiap probe yang sudah jatuh tempo, jawaban pertama
+ *  pada lesson itu setelah dueAt yang membawa `predicted` (peluang benar saat penyajian).
+ *  Tanpa predicted tidak ada kalibrasi yang bisa dihitung, jadi baris itu memang dilewat. */
+function retentionProbeResults(st,now=Date.now()){
+  const probes=st&&st.probes&&typeof st.probes==='object'?st.probes:null;
+  if(!probes)return [];
+  const rows=(state.history||[]).filter(h=>h&&Number(h.at)>0&&Number.isFinite(Number(h.predicted)));
+  const out=[];
+  for(const lesson of Object.keys(probes)){
+    const list=Array.isArray(probes[lesson]?.probes)?probes[lesson].probes:[];
+    for(const p of list){
+      const due=Number(p?.dueAt);
+      if(!Number.isFinite(due)||due>now)continue;
+      const hit=rows.find(h=>String(h.skill||'')===lesson&&Number(h.at)>=due);
+      if(!hit)continue;
+      out.push({lesson,predicted:Math.max(0,Math.min(1,Number(hit.predicted))),correct:hit.ok===true});
+    }
+  }
+  return out;
+}
+/** Ringkasan untuk panel diagnostik. ADVISORY MURNI - `adjustments` dari modul sengaja
+ *  tidak diteruskan ke mana pun. */
+function retentionProbeSnapshot(now=Date.now()){
+  if(!retentionProbeAvailable())return null;
+  try{
+    const st=retentionProbeRead();
+    if(!st||!st.probes||!Object.keys(st.probes).length)return null;
+    const results=retentionProbeResults(st,now);
+    const evalOut=results.length&&typeof self.FiezelPostTest.evaluate==='function'
+      ?self.FiezelPostTest.evaluate(st,results):null;
+    let dueCount=0,scheduledCount=0;
+    for(const lesson of Object.keys(st.probes)){
+      const list=Array.isArray(st.probes[lesson]?.probes)?st.probes[lesson].probes:[];
+      scheduledCount+=list.length;
+      for(const p of list)if(Number(p?.dueAt)<=now)dueCount++;
+    }
+    return {lessons:Object.keys(st.probes).length,scheduled:scheduledCount,due:dueCount,measured:results.length,evaluation:evalOut};
+  }catch{return null}
+}
+/* ---- Langkah 1: metrik belajar longitudinal, dihitung DI PERANGKAT ------------------
+ * Riwayat lengkap memang sudah hidup di localStorage; modul ini mengubahnya jadi lima
+ * angka yang bisa dipakai otak untuk menilai dirinya sendiri nanti (Langkah 2 dan 3).
+ * Hari ini: TAMPILAN SAJA. Tidak ada digest yang naik ke mana pun - fiezel-metrics-digest.js
+ * tetap 'off' sampai ada keputusan produk soal telemetri, dan menyalakan pengunggah tanpa
+ * keputusan itu adalah menambah permukaan privasi diam-diam. */
+function learningMetricsSnapshot(now=Date.now()){
+  const M=self.FiezelLearningMetrics;
+  if(!M)return null;
+  const history=Array.isArray(state.history)?state.history:[];
+  const call=(fn,...args)=>{try{return typeof fn==='function'?fn(...args):null}catch{return null}};
+  const out={
+    gain:call(M.learningGain,history,5,now),
+    retention:call(M.retentionAtGap,history,[3,7,21],now),
+    brier:call(M.brierCalibration,history,now),
+    hint:call(M.hintDependency,history,now),
+    misconception:call(M.misconceptionPersistence,misconceptionLedgerRead(),now)
+  };
+  return Object.values(out).some(Boolean)?out:null;
 }
 /* ---- Butir 5: afek sesi dengan histeresis ---- */
 /* Keadaan afek per SESI, di memori saja (bukan localStorage): afek adalah cuaca sesi, bukan
@@ -8406,14 +8535,60 @@ function affectSuggestionMarkup(){
     return card(`<h3>${FiezelI18n.t('progress.cuaca-sesi-terakhir')}</h3><p><b>${esc(stateLabel)}</b> · ${FiezelI18n.t('progress.keyakinan-persen',{persen:Math.round((Number(st.confidence)||0)*100)})}</p>${actionLabel?`<p><b>${FiezelI18n.t('progress.response-label')}</b> ${esc(actionLabel)}.</p>`:''}<p class="muted">${FiezelI18n.t('progress.afek-dinilai-per-sesi-hanya')}</p>`)
   }catch{return ''}
 }
+/* Langkah 1 roadmap otonomi: seksi "otak menilai dirinya sendiri". Lima angka yang selama
+ * ini bisa dihitung tetapi tidak pernah dihitung, plus status probe retensi. TAMPILAN SAJA
+ * - pola guard identik bktShadowMarkup: availability check dulu, try/catch mengembalikan
+ * string kosong, dan tanpa modul panel persis seperti sebelum langkah ini. */
+function learningMetricsMarkup(){
+  const now=Date.now();
+  let m=null,probe=null;
+  try{m=learningMetricsSnapshot(now)}catch{}
+  try{probe=retentionProbeSnapshot(now)}catch{}
+  if(!m&&!probe)return '';
+  const pct=v=>Number.isFinite(Number(v))?`${Math.round(Number(v)*100)}%`:null;
+  const num3=v=>Number.isFinite(Number(v))?Number(v).toFixed(3):null;
+  // Modul metrik menolak berpendapat di bawah ambang bukti (insufficient/censored). Angka
+  // yang ditahan ditulis "belum cukup bukti", BUKAN diisi nol - nol yang dikarang lebih
+  // berbahaya daripada kolom kosong, karena ia terlihat seperti pengukuran.
+  const cell=(label,value,note)=>`<div><b>${esc(label)}</b><br>${value?esc(String(value)):'<span class="muted">belum cukup bukti</span>'}${note?` <span class="muted">${esc(note)}</span>`:''}</div>`;
+  // learningGain melaporkan PER LESSON, bukan satu angka global - dan itu benar, karena
+  // gain rata-rata lintas lesson yang jumlah buktinya timpang adalah angka yang menipu.
+  // Yang ditampilkan: rentang gain pada lesson yang lolos gerbang bukti.
+  const gainRows=(Array.isArray(m?.gain?.lessons)?m.gain.lessons:[]).filter(x=>x&&!x.insufficient&&Number.isFinite(Number(x.gain)));
+  const gain=gainRows.length
+    ?(gainRows.length===1?pct(gainRows[0].gain)
+      :`${pct(Math.min(...gainRows.map(x=>Number(x.gain))))} → ${pct(Math.max(...gainRows.map(x=>Number(x.gain))))} (${gainRows.length} lesson)`)
+    :null;
+  const brier=m?.brier&&!m.brier.insufficient?num3(m.brier.brier):null;
+  const hint=m?.hint&&!m.hint.insufficient?pct(m.hint.hintRate):null;
+  const misc=m?.misconception&&!m.misconception.insufficient?pct(m.misconception.persistenceRate):null;
+  const retBuckets=Array.isArray(m?.retention?.buckets)?m.retention.buckets:[];
+  const ret=retBuckets.filter(b=>b&&!b.insufficient&&Number.isFinite(Number(b.accuracy)))
+    .map(b=>`${esc(String(b.gapDays))}h ${pct(b.accuracy)}`).join(' · ');
+  const probeLine=probe
+    ? `<p class="muted">Probe retensi: ${probe.lessons} lesson terjadwal (${probe.scheduled} titik), ${probe.due} jatuh tempo, ${probe.measured} sudah terukur dari jawaban nyata${
+        Number.isFinite(Number(probe.evaluation?.brier))?` · Brier probe ${num3(probe.evaluation.brier)}`:''}${
+        probe.evaluation?.fragileLessons?.length?` · ${probe.evaluation.fragileLessons.length} mastery rapuh`:''}.</p>`
+    : '<p class="muted">Probe retensi: belum ada lesson yang menembus gerbang mastery.</p>';
+  return card(`<h3>Metrik Belajar <span class="muted">(bayangan — mengukur, tidak memutuskan)</span></h3>
+    <div class="diag-grid">
+      ${cell('Learning gain',gain)}
+      ${cell('Kalibrasi (Brier)',brier,'makin kecil makin jujur')}
+      ${cell('Ketergantungan bantuan',hint)}
+      ${cell('Miskonsepsi bertahan',misc)}
+      ${cell('Retensi per jarak',ret||null)}
+    </div>
+    ${probeLine}
+    <p class="muted">Angka di sini tidak mengubah satu pun keputusan hari ini. Ia ada supaya otak punya hasil untuk dinilai — dan supaya klaim perbaikan bisa dibantah dengan angka, bukan dengan perasaan.</p>`)
+}
 function coreBrainPanelMarkup(){
   const snapshot=coreBrainSnapshot();
-  if(!snapshot)return card('<h3>Core Brain v2</h3><p class="muted">'+FiezelI18n.t('progress.lapisan-penalaran-belum-termuat-perangkat')+'</p>')+bktShadowMarkup()+brainManifestMarkup()+olmPanelMarkup()+confusionInsightMarkup()+affectSuggestionMarkup();
+  if(!snapshot)return card('<h3>Core Brain v2</h3><p class="muted">'+FiezelI18n.t('progress.lapisan-penalaran-belum-termuat-perangkat')+'</p>')+bktShadowMarkup()+brainManifestMarkup()+olmPanelMarkup()+confusionInsightMarkup()+affectSuggestionMarkup()+learningMetricsMarkup();
   const ability=snapshot.ability||{},plan=snapshot.plan||{},move=snapshot.momentum||{},load=snapshot.fatigue||{},memory=snapshot.memory||{},chrono=snapshot.chronotype||{};
   const moveLabel={improving:FiezelI18n.t('progress.sedang-naik'),plateau:FiezelI18n.t('progress.mendatar'),declining:FiezelI18n.t('progress.sedang-turun'),unknown:FiezelI18n.t('diag.belum-terbaca')}[move.state]||FiezelI18n.t('diag.belum-terbaca');
   const loadLabel={fresh:FiezelI18n.t('progress.masih-segar'),tiring:FiezelI18n.t('progress.mulai-lelah'),fatigued:FiezelI18n.t('progress.sudah-lelah'),unknown:FiezelI18n.t('diag.belum-terbaca')}[load.state]||FiezelI18n.t('diag.belum-terbaca');
   if(!plan||Number(plan.confidence||0)<0.25){
-    return card(`<h3>Core Brain v2</h3><p>${FiezelI18n.t('progress.still-mengumpulkan-bukti-answer-terbaca',{evidence:ability.evidence||0})}</p><p class="muted">${FiezelI18n.t('progress.sampai-saat-kebijakan-adaptif-deterministik')}</p>`)+bktShadowMarkup()+brainManifestMarkup()+olmPanelMarkup()+confusionInsightMarkup()+affectSuggestionMarkup();
+    return card(`<h3>Core Brain v2</h3><p>${FiezelI18n.t('progress.still-mengumpulkan-bukti-answer-terbaca',{evidence:ability.evidence||0})}</p><p class="muted">${FiezelI18n.t('progress.sampai-saat-kebijakan-adaptif-deterministik')}</p>`)+bktShadowMarkup()+brainManifestMarkup()+olmPanelMarkup()+confusionInsightMarkup()+affectSuggestionMarkup()+learningMetricsMarkup();
   }
   const rootCause=snapshot.rootCause&&snapshot.rootCause.isRoot===false
     ? `<p><b>${FiezelI18n.t('progress.akar-masalah')}</b> ${FiezelI18n.t('progress.kesulitan-kemungkinan-besar-berasal-jadi',{skillName:esc(friendlySkillName(snapshot.rootCause.symptomSkill||snapshot.rootCause.symptomFamily)),skillName:esc(friendlySkillName(snapshot.rootCause.skill))})}</p>`
@@ -8429,7 +8604,7 @@ function coreBrainPanelMarkup(){
       ${bestWindow}
     </div>
     ${rootCause}
-    <p class="muted">${FiezelI18n.t('progress.kesulitan-dipilih-model-kemampuan-peluang')}</p>`)+bktShadowMarkup()+brainManifestMarkup()+olmPanelMarkup()+confusionInsightMarkup()+affectSuggestionMarkup()
+    <p class="muted">${FiezelI18n.t('progress.kesulitan-dipilih-model-kemampuan-peluang')}</p>`)+bktShadowMarkup()+brainManifestMarkup()+olmPanelMarkup()+confusionInsightMarkup()+affectSuggestionMarkup()+learningMetricsMarkup()
 }
 const PROGRESS_TABS=__fzI18nTable([],()=>([['overview',FiezelI18n.t('progress.ringkasan')],['analysis',FiezelI18n.t('progress.analisis')],['adaptive','Adaptive Engine'],['readiness',FiezelI18n.t('progress.kesiapan-skills')]]));
 let progressTab='overview';

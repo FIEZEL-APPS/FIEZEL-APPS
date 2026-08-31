@@ -67,8 +67,12 @@ test('bundleVersion dan minAppVersion bisa diparse semver-ish', () => {
   assert.ok(SEMVERISH.test(manifest.minAppVersion), 'minAppVersion tidak semver-ish: ' + manifest.minAppVersion);
 });
 
-test('bundleVersion dimulai dari 3.0.0 (identitas bundle Braincore v3 pertama)', () => {
-  assert.strictEqual(manifest.bundleVersion, '3.0.0');
+test('bundleVersion 3.1.0 (peta otoritas berubah: sensor jangka panjang dihidupkan)', () => {
+  // Literal ini sengaja dipatok, bukan dilonggarkan jadi pola semver: gunanya memaksa
+  // perubahan versi bundle menjadi keputusan SADAR yang ikut dalam diff, bukan efek
+  // samping. 3.0.0 -> 3.1.0 karena peta otoritas bergerak (Langkah 1 roadmap otonomi:
+  // stepTutor/productionGrader diakui aktif, retentionProbe/learningMetrics jadi shadow).
+  assert.strictEqual(manifest.bundleVersion, '3.1.0');
 });
 
 test('minAppVersion sama dengan FIEZEL_VERSION di version.js (dibaca, bukan dikarang)', () => {
@@ -99,11 +103,32 @@ test('klaim otoritas kunci sesuai temuan council: memory aktif, bktUnlock bayang
   assert.strictEqual(manifest.authorityMap.bktUnlock, 'shadow');
 });
 
-test('modul tanpa satu pun referensi di app.js dinyatakan off, bukan diaku-aku aktif', () => {
-  // step-tutor dan production-grader dimuat index.html tetapi nol pemanggil di app.js —
-  // manifest wajib jujur menyebutnya off.
-  assert.strictEqual(manifest.authorityMap.stepTutor, 'off');
-  assert.strictEqual(manifest.authorityMap.productionGrader, 'off');
+test('otoritas off DITURUNKAN dari app.js, bukan dihafal sebagai literal', () => {
+  // KENAPA GATE INI DITULIS ULANG. Versi lama memasak jawabannya ke dalam assert:
+  // `stepTutor === 'off'` dan `productionGrader === 'off'`, dengan komentar "nol pemanggil
+  // di app.js". Klaim itu berhenti benar ketika C5 menyambungkan keduanya (tuntunan langkah
+  // di jalur render jawaban, penilaian jawaban cloze) — dan karena gate-nya MENGHAFAL fakta
+  // alih-alih MENGUKURNYA, ia tetap hijau sambil menegakkan peta yang sudah bohong. Gate
+  // yang memaku klaim adalah gate yang membusuk bersama klaimnya.
+  //
+  // Bentuk sekarang membaca app.js dan menuntut kesepakatan dua arah: 'off' berarti benar-
+  // benar nol pemanggil, dan nol pemanggil berarti bukan 'active'. (Pembacaan halaman/
+  // precache-nya ada di brain-page-wiring-test.js W8 — di sini yang diuji isi petanya.)
+  const appSource = fs.readFileSync(path.join(__dirname, 'app.js'), 'utf8');
+  const stripped = appSource
+    .replace(/\/\*[\s\S]*?\*\//g, ' ')
+    .replace(/(^|[^:])\/\/[^\n]*/g, '$1 ');
+  const callSites = (name) => !name ? 0 : (stripped.match(
+    new RegExp('(?:self|window|globalThis)\\s*\\.\\s*' + name + '\\b|\\b' + name + '\\s*\\.\\s*[A-Za-z_$]', 'g')) || []).length;
+
+  const lying = [];
+  for (const m of manifest.modules) {
+    const authority = manifest.authorityMap[m.authorityKey];
+    const hits = callSites(m.global);
+    if (authority === 'off' && hits > 0) lying.push(m.file + ': off tetapi dipanggil ' + hits + '×');
+    if (authority === 'active' && hits === 0) lying.push(m.file + ': active tetapi nol pemanggil di app.js');
+  }
+  assert.deepStrictEqual(lying, [], 'peta otoritas tidak cocok dengan app.js — ' + lying.join('; '));
 });
 
 test('contentCompatibility cocok dengan deklarasi schemaVersion grammar-templates.json', () => {
