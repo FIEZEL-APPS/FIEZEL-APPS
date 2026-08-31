@@ -10,6 +10,7 @@ on:
       - 'braincore-state.js'
       - 'braincore-pipeline.js'
       - 'features/brain/**'
+      - 'examples/braincore-standalone-demo.js'
       - '.github/workflows/braincore-runtime.yml'
   pull_request:
     paths:
@@ -18,6 +19,7 @@ on:
       - 'braincore-state.js'
       - 'braincore-pipeline.js'
       - 'features/brain/**'
+      - 'examples/braincore-standalone-demo.js'
       - '.github/workflows/braincore-runtime.yml'
 
 permissions:
@@ -37,5 +39,10 @@ jobs:
           node --check braincore-state.js
           node --check braincore-runtime.js
           node --check braincore-runtime-test.js
+          node --check examples/braincore-standalone-demo.js
       - name: Standalone runtime behavior
         run: node braincore-runtime-test.js
+      - name: Standalone integration demo
+        run: |
+          node examples/braincore-standalone-demo.js > /tmp/braincore-demo.json
+          node -e "const d=require('/tmp/braincore-demo.json'); if(!d.healthy||d.restoredRevision!==5||d.runtimeSchema!=='fiezel-braincore-runtime-v1'||d.stateSchema!=='fiezel-braincore-state-v1') process.exit(1); console.log('BraincoreDemo: PASS · revision='+d.restoredRevision+' · persistedBytes='+d.persistedBytes)"
