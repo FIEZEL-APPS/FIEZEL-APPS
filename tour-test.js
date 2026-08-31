@@ -230,6 +230,48 @@ test('teks tur tidak bisa menyuntik markup', () => {
   assert.ok(/&lt;img|&lt;script&gt;/.test(run.element.innerHTML));
 });
 
+test('pilihan Thai setelah modul termuat mengganti langkah dan seluruh chrome tur', () => {
+  // Regresi produksi m025-208: modul tur dievaluasi saat locale masih `id`, sehingga hasil
+  // T() tersimpan permanen di MENU_STEPS. Setelah murid memilih Thai, Home sudah Thai tetapi
+  // tur tetap membuka "Kenalan cepat / Mulai dari Home / Lewati" dalam Indonesia.
+  const i18n = require('./features/i18n/fiezel-i18n.js');
+  const thPath = require.resolve('./features/i18n/copy-th-feat-b.js');
+  const hadSelf = Object.prototype.hasOwnProperty.call(global, 'self');
+  const previousSelf = hadSelf ? global.self : undefined;
+  const hadI18n = Object.prototype.hasOwnProperty.call(global, 'FiezelI18n');
+  const previousI18n = hadI18n ? global.FiezelI18n : undefined;
+  global.self = global;
+  global.FiezelI18n = i18n;
+  try {
+    if (!require.cache[thPath]) require(thPath);
+    i18n.setLocale('th');
+
+    assert.strictEqual(tour.stepsFor('menu')[0].title, 'เริ่มจาก Home',
+      'judul harus dibaca ulang dari locale aktif, bukan hasil T() saat require');
+    const env = fakeEnv();
+    const run = tour.show(env, { force: true });
+    assert.strictEqual(run.element.getAttribute('aria-label'), 'ทำความรู้จัก FIEZEL แบบสั้น ๆ');
+    assert.ok(/เริ่มจาก Home/.test(run.element.innerHTML), 'judul langkah pertama harus Thai');
+    assert.ok(/ข้าม/.test(run.element.innerHTML), 'tombol lewati harus Thai');
+    assert.ok(/ต่อไป/.test(run.element.innerHTML), 'tombol lanjut harus Thai');
+    assert.ok(!/Kenalan cepat|Mulai dari Home|Lewati/.test(run.element.innerHTML),
+      'copy Indonesia tidak boleh bocor ke tur Thai');
+    run.close();
+
+    const last = tour.show(env, {
+      force: true,
+      steps: [{ id: 'last', target: '.learning-launcher', title: 'หัวข้อ', body: 'เนื้อหา' }]
+    });
+    assert.ok(/พร้อม!/.test(last.element.innerHTML), 'tombol langkah terakhir harus Thai');
+    assert.ok(!/Siap!/.test(last.element.innerHTML), 'label selesai Indonesia tidak boleh bocor');
+    last.close();
+  } finally {
+    i18n.setLocale('id');
+    if (hadSelf) global.self = previousSelf; else delete global.self;
+    if (hadI18n) global.FiezelI18n = previousI18n; else delete global.FiezelI18n;
+  }
+});
+
 test('kurangi-gerak mematikan animasinya, bukan turnya', () => {
   const env = fakeEnv();
   env.matchMedia = () => ({ matches: true });
