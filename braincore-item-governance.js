@@ -105,6 +105,10 @@ function validateCount(v, label) {
   return v;
 }
 
+function optionalCount(v, label) {
+  return v == null ? 0 : validateCount(v, label);
+}
+
 function validateState(raw) {
   if (!raw || typeof raw !== 'object' || Array.isArray(raw) || raw.schema !== SCHEMA) {
     fail('unsupported or missing state schema');
@@ -236,9 +240,9 @@ function normalizeAggregate(raw) {
   const contentRevision = boundedString(raw.contentRevision, 'aggregate.contentRevision', 128);
   const exposures = validateCount(raw.exposures, 'aggregate.exposures');
   const independentLearners = validateCount(raw.independentLearners, 'aggregate.independentLearners');
-  const graderDisagreements = validateCount(raw.graderDisagreements || 0, 'aggregate.graderDisagreements');
-  const answerDisputes = validateCount(raw.answerDisputes || 0, 'aggregate.answerDisputes');
-  const renderFailures = validateCount(raw.renderFailures || 0, 'aggregate.renderFailures');
+  const graderDisagreements = optionalCount(raw.graderDisagreements, 'aggregate.graderDisagreements');
+  const answerDisputes = optionalCount(raw.answerDisputes, 'aggregate.answerDisputes');
+  const renderFailures = optionalCount(raw.renderFailures, 'aggregate.renderFailures');
   if (graderDisagreements > exposures || answerDisputes > exposures || renderFailures > exposures) fail('aggregate event counts cannot exceed exposures');
   const correctRate = validateRate(raw.correctRate, 'aggregate.correctRate', true);
   const expectedCorrectRate = validateRate(raw.expectedCorrectRate, 'aggregate.expectedCorrectRate', true);
