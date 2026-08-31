@@ -1,7 +1,7 @@
 {
-  "version": "m025-220",
+  "version": "m025-222",
   "claimedBy": "perplexity-computer (multilingual i18n wave, direbase atas m025-185)",
-  "claimedAt": "2026-08-31T19:14:43.838Z",
-  "reason": "sinkron S1-S5a: fondasi sync antar-device (satu kenaikan rilis untuk seluruh PR)",
+  "claimedAt": "2026-08-31T23:24:17.130Z",
+  "reason": "sinkron S1-S6: fondasi sync antar-device lengkap (satu kenaikan rilis)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
