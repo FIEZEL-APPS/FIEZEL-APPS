@@ -60,7 +60,16 @@ const root = __dirname;
 // CATATAN CAKUPAN: pemindaian di bawah diperluas ke berkas `*-selftest.js`. Tanpa itu,
 // `cf-live-selftest.js` lolos hanya karena namanya tidak berakhiran `-test.js` — dan
 // "lolos karena nama berkas" adalah kebalikan dari daftar yang disengaja.
-const SOCKET_ALLOWLIST = new Set(['http-smoke-test.js', 'e2e-level-grammar-test.js', 'cf-live-selftest.js', 'e2e-bridge-selftest.js']);
+//   ui-render-audit-test.js  - require('http') untuk MENYAJIKAN repo ini sendiri di
+//                              127.0.0.1 pada porta acak (server.listen(0,'127.0.0.1')),
+//                              karena satu-satunya cara menguji kaskade CSS dan pengurungan
+//                              fokus adalah membuka halamannya di browser sungguhan, dan
+//                              file:// tidak bisa melakukannya. Ia BUKAN pengecualian yang
+//                              melemahkan gerbang ini: konteks Chromium-nya memasang
+//                              ctx.route('**/*') yang MEMBATALKAN setiap request yang bukan
+//                              ke porta loopback itu, jadi SDK Puter dan api.fiezel.my.id
+//                              ditolak di dalam tes, bukan sekadar tidak dipanggil.
+const SOCKET_ALLOWLIST = new Set(['http-smoke-test.js', 'e2e-level-grammar-test.js', 'cf-live-selftest.js', 'e2e-bridge-selftest.js', 'ui-render-audit-test.js']);
 
 // Kelas kedua yang berbeda secara MAKNA, bukan sekadar pengecualian kedua:
 //   prerender-dryrun-test.js - :33-38 require('https')/require('http') SEMATA-MATA untuk
@@ -325,11 +334,12 @@ check('Pola mock-lokal masih dipakai gerbang existing (≥8 berkas, koreksi cf-b
   shadowSafe.length >= 8, `${shadowSafe.length} berkas: ${shadowSafe.join(', ')}`);
 check('Setiap berkas allowlist benar-benar loopback dan masih benar-benar butuh socket',
   allowlistProblems.length === 0, allowlistProblems.join(' | ') || '0');
-// Jumlahnya di-assert supaya penambahan nama tidak bisa menyelinap: 4 = tiga nama lama
-// ditambah `e2e-bridge-selftest.js` (paket A5, alasannya di header berkas ini). Menaikkan
-// angka ini tanpa menulis alasannya di header adalah pelonggaran, bukan keputusan.
-check('Allowlist tetap empat nama dan semuanya ada di repo',
-  SOCKET_ALLOWLIST.size === 4 && [...SOCKET_ALLOWLIST].every(f => fs.existsSync(path.join(root, f))),
+// Jumlahnya di-assert supaya penambahan nama tidak bisa menyelinap: 5 = tiga nama lama,
+// `e2e-bridge-selftest.js` (paket A5), dan `ui-render-audit-test.js` (audit UI/UX
+// 2026-08-30) - alasan keduanya ditulis di header berkas ini. Menaikkan angka ini tanpa
+// menulis alasannya di header adalah pelonggaran, bukan keputusan.
+check('Allowlist tetap lima nama dan semuanya ada di repo',
+  SOCKET_ALLOWLIST.size === 5 && [...SOCKET_ALLOWLIST].every(f => fs.existsSync(path.join(root, f))),
   [...SOCKET_ALLOWLIST].join(', '));
 // Cakupan pemindaian ikut di-assert: kalau pola berkas dipersempit lagi, berkas
 // `*-selftest.js` akan kembali lolos karena namanya, dan allowlist di atas menjadi hiasan.
