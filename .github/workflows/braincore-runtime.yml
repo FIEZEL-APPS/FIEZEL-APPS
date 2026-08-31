@@ -1,0 +1,41 @@
+name: Braincore Standalone Runtime Gate
+
+on:
+  push:
+    branches:
+      - claude/braincore-ip-audit-d3uk0o
+    paths:
+      - 'braincore-runtime.js'
+      - 'braincore-runtime-test.js'
+      - 'braincore-state.js'
+      - 'braincore-pipeline.js'
+      - 'features/brain/**'
+      - '.github/workflows/braincore-runtime.yml'
+  pull_request:
+    paths:
+      - 'braincore-runtime.js'
+      - 'braincore-runtime-test.js'
+      - 'braincore-state.js'
+      - 'braincore-pipeline.js'
+      - 'features/brain/**'
+      - '.github/workflows/braincore-runtime.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  runtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Syntax
+        run: |
+          node --check braincore-state.js
+          node --check braincore-runtime.js
+          node --check braincore-runtime-test.js
+      - name: Standalone runtime behavior
+        run: node braincore-runtime-test.js
