@@ -66,6 +66,7 @@ const DIHAPUS_SAAT_RESET = [
 const SENGAJA_TIDAK_DIRESET = {
   LEGACY_STATE_KEY: { literal: 'fiezel-v4-state', alasan: 'state v4 pra-akun; jalur migrasi, bukan bukti murid akun ini' },
   LEGACY_STATE_OWNER_KEY: { literal: 'fiezel-v5-legacy-owner', alasan: 'penanda kepemilikan migrasi — menghapusnya membuat data lama bisa diklaim akun lain' },
+  SIDE_STATE_OWNER_KEY: { literal: 'fiezel-side-state-owner-v1', alasan: 'penanda kepemilikan migrasi side-state — alasan sama persis: menghapusnya membuat sisa data datar bisa diklaim akun lain' },
   PUTER_AUTH_SKIP_KEY: { literal: 'fiezel-puter-auth-skipped', alasan: 'preferensi perangkat soal popup login, bukan progres belajar' },
   PUTER_POPUP_LAST_KEY: { literal: 'fiezel-puter-popup-last', alasan: 'anti-spam popup per perangkat, bukan progres belajar' },
   REMINDER_INVITE_KEY: { literal: 'fiezel-reminder-invite-v1', alasan: 'penghitung tawaran notifikasi per perangkat, bukan progres belajar' },
@@ -79,12 +80,21 @@ const SENGAJA_TIDAK_DIRESET = {
 };
 
 /** Isi daftar removeItem di dalam resetProgress(), dibaca dari sumber sungguhan. */
+function resetBlock() {
+  const mulai = appSource.indexOf('function resetProgress()');
+  assert.ok(mulai >= 0, 'resetProgress() tidak ditemukan — pola gerbang sudah basi');
+  // Ambil badan fungsi apa adanya sampai penanda akhir yang stabil (toast reset). Membatasi
+  // dengan hitungan kurung rapuh: `catch{}` di dalamnya membuat pencocokan non-greedy berhenti
+  // di kurung yang salah — itu justru yang membuat versi pertama gerbang ini salah lulus.
+  const akhir = appSource.indexOf('progres-akun-berhasil-direset', mulai);
+  assert.ok(akhir > mulai, 'penanda akhir resetProgress() tidak ditemukan — pola gerbang sudah basi');
+  const badan = appSource.slice(mulai, akhir);
+  const m = badan.match(/for\s*\(\s*const\s+k\s+of\s*\[([^\]]*)\]/);
+  assert.ok(m, 'daftar kunci di resetProgress() tidak terbaca — pola gerbang sudah basi');
+  return { daftar: m[1], badan: badan };
+}
 function resetKeyList() {
-  const fn = appSource.slice(appSource.indexOf('function resetProgress()'));
-  assert.ok(fn, 'resetProgress() tidak ditemukan — pola gerbang sudah basi');
-  const m = fn.match(/for\s*\(\s*const\s+k\s+of\s*\[([^\]]*)\]\s*\)\s*try\s*\{\s*localStorage\.removeItem\(k\)/);
-  assert.ok(m, 'daftar removeItem di resetProgress() tidak terbaca — pola gerbang sudah basi');
-  return m[1].split(',').map(s => s.trim()).filter(Boolean);
+  return resetBlock().daftar.split(',').map(s => s.trim()).filter(Boolean);
 }
 
 /** Konstanta kunci yang benar-benar DITULIS ke localStorage oleh app.js. */
@@ -137,6 +147,19 @@ test('R3 · pengecualian membawa alasan, terkunci ke literalnya, dan bukan kunci
     'kunci model otak dikecualikan dari reset — itu bukan pengecualian, itu kebocoran: ' + brainish.join(', '));
 });
 
+test('R4 · reset menghapus kunci milik AKUN, bukan hanya kunci datar perangkat', () => {
+  // Sejak side-state otak dibuat per akun (fiezel-mastery-bkt-v1:<uuid>, dst.), reset yang
+  // hanya menghapus kunci datar akan meninggalkan model penguasaan akun yang sedang login
+  // hidup utuh — "dihapus permanen" yang menghapus milik orang yang salah. Blok reset wajib
+  // menyebut sideStateKey(...) DAN kunci datarnya (perangkat yang belum pernah login menyimpan
+  // di sana, dan melewatkannya membuat reset bohong untuk murid tanpa akun).
+  const { badan } = resetBlock();
+  assert.ok(/localStorage\.removeItem\(\s*sideStateKey\(\s*k\s*\)\s*\)/.test(badan),
+    'reset tidak menghapus kunci berakun — sideStateKey(k) tidak ditemukan di blok reset');
+  assert.ok(/localStorage\.removeItem\(\s*k\s*\)/.test(badan),
+    'reset tidak menghapus kunci datar — murid yang belum login tidak ikut ter-reset');
+});
+
 // ==========================================================================
 // BUKTI-BISA-MERAH
 // ==========================================================================
@@ -154,6 +177,13 @@ test('RED · detektor terbukti merah saat kunci dikeluarkan dari daftar reset / 
   expectRed('RETENTION_PROBE_KEY hilang dari daftar reset', () => {
     const missing = DIHAPUS_SAAT_RESET.filter(k => !dicabut.includes(k));
     assert.deepStrictEqual(missing, []);
+  });
+
+  // (R4) blok reset kehilangan sideStateKey — bentuk regresi kalau seseorang menyederhanakan
+  // blok itu kembali ke kunci datar setelah side-state dibuat per akun.
+  const badanTanpaScope = resetBlock().badan.replace(/localStorage\.removeItem\(\s*sideStateKey\(\s*k\s*\)\s*\)/, 'localStorage.removeItem(k)');
+  expectRed('reset kembali ke kunci datar saja', () => {
+    assert.ok(/localStorage\.removeItem\(\s*sideStateKey\(\s*k\s*\)\s*\)/.test(badanTanpaScope));
   });
 
   // (R2) kunci bukti murid baru muncul, tidak dihapus dan tidak dikecualikan.

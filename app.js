@@ -1301,7 +1301,11 @@ async function activateAccountStateFromPuter(sdk=self.puter){
         localStorage.setItem(key,JSON.stringify(raw));localStorage.removeItem(LEGACY_STATE_KEY);
       }
     }
-    activeAccountUuid=uuid;activeStateStorageKey=key;state=sanitizeState(raw||defaultState);state.ownerUuid=uuid;coreBrainCache=null;save();
+    activeAccountUuid=uuid;activeStateStorageKey=key;
+    /* S1: side-state otak ikut pindah ke ruang akun ini SEBELUM state dibaca, supaya
+       pembaca pertama (coreBrainCache di bawah) sudah melihat kunci yang benar. */
+    migrateSideStateToAccount(uuid);
+    state=sanitizeState(raw||defaultState);state.ownerUuid=uuid;coreBrainCache=null;save();
     /* m025-182 W2-STATE: state akun bisa membawa learnerLocale berbeda dari state legacy yang
        dimuat saat boot — locale disinkronkan SEBELUM render() di bawah supaya cat pertama akun
        ini sudah berbahasa miliknya (listener onChange yang dipasang di boot ikut menyetel lang). */
@@ -2136,15 +2140,64 @@ function quizConcept(q){return String(q?.lessonSkill||q?.conceptId||q?.skill||q?
  * persistensinya di kunci localStorage BARU 'fiezel-misconception-ledger-v1' - terpisah dari
  * state utama dan dari fiezel-sl-v1-state, sesuai kontrak Braincore v3. Setiap pengait
  * dijaga availability-check + try/catch: tanpa modul, perilaku identik hari ini. */
+/* ---- S1 sync antar-device: side-state otak milik AKUN, bukan milik perangkat ---------
+ *
+ * MASALAH YANG DITUTUP. State utama sudah lama milik akun (`fiezel-v5-state:<uuid>` lewat
+ * accountStateKey), tetapi SELURUH side-state otak memakai kunci datar tanpa uuid. Akibatnya
+ * bukan teoretis: dua akun di satu perangkat berbagi model penguasaan BKT, ledger diagnosis
+ * miskonsepsi, kalibrasi item, dan jadwal probe. Murid B mewarisi keyakinan sistem tentang
+ * murid A, dan tidak ada satu pun gerbang yang mengatakannya. Ini juga blokir pertama sync
+ * antar-perangkat: selama kunci tidak tahu miliknya siapa, tidak ada yang bisa disinkronkan.
+ *
+ * BENTUK PERBAIKAN. Satu helper, dipakai SEMUA pembaca/penulis side-state. Tanpa akun (belum
+ * login) kunci datar tetap dipakai apa adanya - murid yang belum pernah login tidak boleh
+ * kehilangan progresnya hanya karena perbaikan ini mendarat.
+ *
+ * MIGRASI SEKALI JALAN, DAN KENAPA IA MENCATAT PEMILIK. Data lama tidak membawa identitas,
+ * jadi ia menjadi milik akun PERTAMA yang login setelah pembaruan ini - pola dan alasan yang
+ * sama persis dengan LEGACY_STATE_OWNER_KEY untuk state utama. Tanpa pencatatan itu, akun
+ * kedua di perangkat yang sama akan ikut mengklaim data yang sama, yaitu kebocoran yang
+ * sedang kita tutup, hanya berpindah tempat. */
+const SIDE_STATE_OWNER_KEY='fiezel-side-state-owner-v1';
+/** Dibaca LAZY (fungsi, bukan const array): sebagian kunci dideklarasikan jauh di bawah
+ *  berkas ini, dan daftar yang dievaluasi saat top-level masih berjalan akan kena TDZ. */
+function sideStateBaseKeys(){
+  return [BKT_KEY,MISCONCEPTION_LEDGER_KEY,CONFUSION_MATRIX_KEY,RETENTION_PROBE_KEY,
+          ITEM_CALIBRATION_KEY,OLM_NEGOTIATION_KEY,SRL_KEY,SOCIAL_MASTERED_KEY];
+}
+function sideStateKey(base){return activeAccountUuid?base+':'+activeAccountUuid:base}
+/** Pindahkan side-state datar ke ruang akun yang baru login. Idempoten: kunci berakun yang
+ *  sudah ada tidak pernah ditimpa, dan data yang sudah diklaim akun lain tidak ikut pindah. */
+function migrateSideStateToAccount(uuid){
+  const id=String(uuid||'');
+  if(!id)return 0;
+  let pemilik='';
+  try{pemilik=String(localStorage.getItem(SIDE_STATE_OWNER_KEY)||'')}catch{}
+  if(pemilik&&pemilik!==id)return 0;
+  let dipindah=0;
+  for(const base of sideStateBaseKeys()){
+    try{
+      const tujuan=base+':'+id;
+      if(localStorage.getItem(tujuan)!==null)continue;
+      const lama=localStorage.getItem(base);
+      if(lama===null)continue;
+      localStorage.setItem(tujuan,lama);
+      localStorage.removeItem(base);
+      dipindah++;
+    }catch{}
+  }
+  try{if(!pemilik)localStorage.setItem(SIDE_STATE_OWNER_KEY,id)}catch{}
+  return dipindah;
+}
 const MISCONCEPTION_LEDGER_KEY='fiezel-misconception-ledger-v1';
 function misconceptionLedgerAvailable(){return !!self.FiezelMisconceptionLedger}
 function misconceptionLedgerRead(){
   if(!misconceptionLedgerAvailable())return null;
-  try{const raw=localStorage.getItem(MISCONCEPTION_LEDGER_KEY);return raw?JSON.parse(raw):null}catch{return null}
+  try{const raw=localStorage.getItem(sideStateKey(MISCONCEPTION_LEDGER_KEY));return raw?JSON.parse(raw):null}catch{return null}
 }
 function misconceptionLedgerWrite(ledger){
   if(!ledger)return;
-  try{localStorage.setItem(MISCONCEPTION_LEDGER_KEY,JSON.stringify(ledger))}catch{}
+  try{localStorage.setItem(sideStateKey(MISCONCEPTION_LEDGER_KEY),JSON.stringify(ledger))}catch{}
 }
 /** Miskonsepsi yang masih AKTIF menurut buku besar (gate modul: >=3 bukti, >=2 sesi, belief>=0.7). */
 function misconceptionLedgerActive(now=Date.now()){
@@ -2206,9 +2259,9 @@ const BKT_KEY='fiezel-mastery-bkt-v1';
 function bktAvailable(){return !!self.FiezelMasteryBKT}
 function bktRead(){
   if(!bktAvailable())return null;
-  try{const raw=localStorage.getItem(BKT_KEY);return raw?JSON.parse(raw):null}catch{return null}
+  try{const raw=localStorage.getItem(sideStateKey(BKT_KEY));return raw?JSON.parse(raw):null}catch{return null}
 }
-function bktWrite(st){if(!st)return;try{localStorage.setItem(BKT_KEY,JSON.stringify(st))}catch{}}
+function bktWrite(st){if(!st)return;try{localStorage.setItem(sideStateKey(BKT_KEY),JSON.stringify(st))}catch{}}
 /** Satu jawaban grammar = satu bukti BKT. weight=kappa: jawaban tebakan/berbantuan tidak
  *  boleh menggeser keyakinan penguasaan sekuat jawaban yang jujur.
  *  Fase 3 (C5 butir 2): `boost` untuk bukti PRODUKSI (cloze ketik) = 1.5 - mengetik bentuk
@@ -2231,9 +2284,9 @@ const CONFUSION_MATRIX_KEY='fiezel-confusion-matrix-v1';
 function confusionMatrixAvailable(){return !!self.FiezelConfusionMatrix}
 function confusionMatrixRead(){
   if(!confusionMatrixAvailable())return null;
-  try{const raw=localStorage.getItem(CONFUSION_MATRIX_KEY);return raw?JSON.parse(raw):null}catch{return null}
+  try{const raw=localStorage.getItem(sideStateKey(CONFUSION_MATRIX_KEY));return raw?JSON.parse(raw):null}catch{return null}
 }
-function confusionMatrixWrite(m){if(!m)return;try{localStorage.setItem(CONFUSION_MATRIX_KEY,JSON.stringify(m))}catch{}}
+function confusionMatrixWrite(m){if(!m)return;try{localStorage.setItem(sideStateKey(CONFUSION_MATRIX_KEY),JSON.stringify(m))}catch{}}
 /** Jawaban grammar SALAH yang memilih opsi pinjaman lesson lain = satu sel kebingungan.
  *  Sumber kebenarannya q.optionSources (paralel dengan q.options); soal tanpa metadata itu
  *  tidak dicatat - lebih baik matrix kurang data daripada berisi tebakan. */
@@ -2273,16 +2326,32 @@ const RETENTION_PROBE_KEY='fiezel-post-test-v1';
 function retentionProbeAvailable(){return !!(self.FiezelPostTest&&typeof self.FiezelPostTest.schedule==='function')}
 function retentionProbeRead(){
   if(!retentionProbeAvailable())return null;
-  try{const raw=localStorage.getItem(RETENTION_PROBE_KEY);return raw?JSON.parse(raw):null}catch{return null}
+  try{const raw=localStorage.getItem(sideStateKey(RETENTION_PROBE_KEY));return raw?JSON.parse(raw):null}catch{return null}
 }
-function retentionProbeWrite(st){if(!st)return;try{localStorage.setItem(RETENTION_PROBE_KEY,JSON.stringify(st))}catch{}}
-/** Seed jitter LOKAL. Diacak sekali di perangkat lalu disimpan di state probe (modul murni
- *  tidak boleh punya sumber acak sendiri). Angka ini tidak pernah ikut telemetri apa pun -
- *  ia hanya menyebar jatuh tempo antar lesson supaya probe tidak menumpuk di satu hari. */
+function retentionProbeWrite(st){if(!st)return;try{localStorage.setItem(sideStateKey(RETENTION_PROBE_KEY),JSON.stringify(st))}catch{}}
+/** Seed jitter probe. DITURUNKAN dari identitas akun, bukan diacak.
+ *
+ *  S2 sync antar-device: versi pertama mengacak seed sekali per perangkat lalu menyimpannya.
+ *  Akibatnya HP dan laptop milik murid yang SAMA menghasilkan jitter berbeda, jadi lesson
+ *  yang sama jatuh tempo pada hari berbeda di tiap perangkat - dan pengukuran retensi
+ *  kehilangan artinya kalau jadwalnya sendiri tidak sepakat. Seed yang diturunkan dari uuid
+ *  akun menyelesaikannya TANPA perlu disinkronkan sama sekali: ia fungsi murni dari identitas,
+ *  jadi setiap perangkat menghitung angka yang sama sendiri-sendiri.
+ *
+ *  Seed yang sudah tersimpan tetap menang, supaya murid yang sudah punya jadwal tidak
+ *  mengalami jadwalnya bergeser saat pembaruan ini mendarat. Tanpa akun (belum login) seed
+ *  jatuh ke turunan dari kunci penyimpanan perangkat - deterministik juga, sekadar tidak
+ *  bisa sama dengan perangkat lain karena memang belum ada identitas yang menghubungkannya.
+ *
+ *  FNV-1a, hash yang sama dengan jitter di dalam modul probe - bukan pilihan estetis: dua
+ *  fungsi hash berbeda pada rantai yang sama membuat sebaran jitter sulit dinalar. */
 function retentionProbeSeed(st){
   const existing=Number(st?.userSeed)>>>0;
   if(existing)return existing;
-  return (Math.floor(Math.random()*0xFFFFFFFF)>>>0)||1;
+  const identitas=String(activeAccountUuid||activeStateStorageKey||'fiezel-anon');
+  let h=0x811c9dc5;
+  for(let i=0;i<identitas.length;i++){h^=identitas.charCodeAt(i);h=Math.imul(h,0x01000193)>>>0}
+  return (h>>>0)||1;
 }
 /** Lesson yang BARU menembus gerbang mastery BKT jadi kandidat probe. L dibaca dari modul
  *  BKT yang sama dengan panel bayangan - bukan taksiran kedua. Modul sendiri menolak L di
@@ -2445,9 +2514,9 @@ const ITEM_CALIBRATION_KEY='fiezel-item-calibration-v1';
 function itemCalibrationAvailable(){const M=self.FiezelItemCalibration;return !!(M&&typeof M.observe==='function'&&typeof M.effective==='function')}
 function itemCalibrationRead(){
   if(!itemCalibrationAvailable())return null;
-  try{const raw=localStorage.getItem(ITEM_CALIBRATION_KEY);return raw?JSON.parse(raw):null}catch{return null}
+  try{const raw=localStorage.getItem(sideStateKey(ITEM_CALIBRATION_KEY));return raw?JSON.parse(raw):null}catch{return null}
 }
-function itemCalibrationWrite(st){if(!st)return;try{localStorage.setItem(ITEM_CALIBRATION_KEY,JSON.stringify(st))}catch{}}
+function itemCalibrationWrite(st){if(!st)return;try{localStorage.setItem(sideStateKey(ITEM_CALIBRATION_KEY),JSON.stringify(st))}catch{}}
 /** Identitas item untuk kalibrasi: template + mode latihan. Mode ikut serta karena item
  *  yang sama jauh lebih berat sebagai teach_back daripada sebagai recognition - satu delta
  *  untuk keduanya akan mengaburkan dua kesulitan yang memang berbeda. */
@@ -2588,9 +2657,9 @@ function clozeSuffixSwap(a,b){
 const OLM_NEGOTIATION_KEY='fiezel-olm-negotiation-v1';
 function olmNegotiateAvailable(){const O=self.FiezelOLM;return !!(O&&typeof O.negotiate==='function')}
 function olmNegotiationRead(){
-  try{const raw=localStorage.getItem(OLM_NEGOTIATION_KEY);const st=raw?JSON.parse(raw):null;return st&&typeof st==='object'?st:null}catch{return null}
+  try{const raw=localStorage.getItem(sideStateKey(OLM_NEGOTIATION_KEY));const st=raw?JSON.parse(raw):null;return st&&typeof st==='object'?st:null}catch{return null}
 }
-function olmNegotiationWrite(st){if(!st)return;try{localStorage.setItem(OLM_NEGOTIATION_KEY,JSON.stringify(st))}catch{}}
+function olmNegotiationWrite(st){if(!st)return;try{localStorage.setItem(sideStateKey(OLM_NEGOTIATION_KEY),JSON.stringify(st))}catch{}}
 /** Input summarize/negotiate OLM - SATU pembangun untuk panel dan dispute supaya dua
  *  pembaca tidak pelan-pelan melihat model yang berbeda. */
 function olmSummarizeInput(){
@@ -2726,9 +2795,9 @@ const SRL_KEY='fiezel-srl-coach-v1';
 function srlAvailable(){return !!self.FiezelSrlCoach}
 function srlRead(){
   if(!srlAvailable())return null;
-  try{const raw=localStorage.getItem(SRL_KEY);return raw?JSON.parse(raw):null}catch{return null}
+  try{const raw=localStorage.getItem(sideStateKey(SRL_KEY));return raw?JSON.parse(raw):null}catch{return null}
 }
-function srlWrite(st){if(!st)return;try{localStorage.setItem(SRL_KEY,JSON.stringify(st))}catch{}}
+function srlWrite(st){if(!st)return;try{localStorage.setItem(sideStateKey(SRL_KEY),JSON.stringify(st))}catch{}}
 /* Keadaan SRL per sesi, di memori: prediksi keyakinan sesi ini dan apakah prompt sudah
  * dipakai (MAKSIMAL 1 per sesi - modul juga menegakkannya, ini sabuk kedua). */
 let SRL_SESSION={sessionKey:'',prompted:false,pendingAt:0,ask:'',predictions:[],goal:null};
@@ -9559,7 +9628,13 @@ function resetProgress(){openModal(`<div class="modal-mark">FIEZEL</div><h2>${Fi
      bilang tidak boleh ada. Gerbang reset-side-state-test.js sekarang menuntut setiap kunci
      bukti murid baru masuk daftar ini (atau didaftarkan sebagai pengecualian beralasan),
      supaya kelas cacat ini tidak bisa mendarat diam-diam lagi. */
-  for(const k of [BKT_KEY,MISCONCEPTION_LEDGER_KEY,ITEM_CALIBRATION_KEY,CONFUSION_MATRIX_KEY,OLM_NEGOTIATION_KEY,SRL_KEY,RETENTION_PROBE_KEY])try{localStorage.removeItem(k)}catch{}
+  /* S1: hapus kunci milik AKUN INI. Kunci datar ikut dihapus karena perangkat yang belum
+     pernah login memang menyimpan di sana - melewatkannya membuat 'reset' bohong untuk
+     murid yang belum punya akun. */
+  for(const k of [BKT_KEY,MISCONCEPTION_LEDGER_KEY,ITEM_CALIBRATION_KEY,CONFUSION_MATRIX_KEY,OLM_NEGOTIATION_KEY,SRL_KEY,RETENTION_PROBE_KEY]){
+    try{localStorage.removeItem(sideStateKey(k))}catch{}
+    try{localStorage.removeItem(k)}catch{}
+  }
   state=loadState();if(activeAccountUuid)state.ownerUuid=activeAccountUuid;coreBrainCache=null;save();closeModal();go('home');showToast(FiezelI18n.t('settings.progres-akun-berhasil-direset'))}}
 document.addEventListener?.('keydown',e=>{if(e.key==='Escape'&&!$('modal')?.classList.contains('hidden'))closeModal()});
 /* q17-S1 2026-08-29: trap Tab di dalam dialog \u2014 latar tidak boleh bisa dijelajah selama modal terbuka (aria-modal jujur). Siklus manual first<->last, tanpa inert supaya kompatibel luas. */
@@ -9872,7 +9947,7 @@ function socialSummaryPaint(){const el=$('socialSummaryCard');if(el&&state.view=
 // state belajar (sanitizeState tidak perlu tahu; hilang ledger = paling buruk event ganda,
 // dan server meng-cap 3/hari sehingga duplikat tidak menggelembungkan PB).
 const SOCIAL_MASTERED_KEY='fiezel-social-mastered-v1';
-function socialMasteredLedger(){try{const raw=localStorage.getItem(SOCIAL_MASTERED_KEY);const arr=raw?JSON.parse(raw):[];return Array.isArray(arr)?arr:[]}catch(_){return []}}
+function socialMasteredLedger(){try{const raw=localStorage.getItem(sideStateKey(SOCIAL_MASTERED_KEY));const arr=raw?JSON.parse(raw):[];return Array.isArray(arr)?arr:[]}catch(_){return []}}
 /**
  * Satu-satunya pintu bukti sosial. Mengumpulkan event enum level-hari dari state yang SUDAH
  * dihitung mesin belajar (bukan menghitung ulang), meng-antre-kannya ke outbox offline-first,
@@ -9888,7 +9963,7 @@ function queueSocialEvidence(extraEvents){
     try{
       const sent=socialMasteredLedger(),fresh=[];
       for(const [skill,b] of Object.entries(state.grammar||{}))if((Number(b?.mastery)||0)>=GRAMMAR_UNLOCK_MASTERY&&!sent.includes(skill))fresh.push(skill);
-      if(fresh.length){events.push({kind:'lesson_mastered',count:Math.min(20,fresh.length)});try{localStorage.setItem(SOCIAL_MASTERED_KEY,JSON.stringify([...sent,...fresh].slice(-500)))}catch(_){}}
+      if(fresh.length){events.push({kind:'lesson_mastered',count:Math.min(20,fresh.length)});try{localStorage.setItem(sideStateKey(SOCIAL_MASTERED_KEY),JSON.stringify([...sent,...fresh].slice(-500)))}catch(_){}}
     }catch(_){}
     for(const e of (Array.isArray(extraEvents)?extraEvents:[]))if(e&&e.kind)events.push(e);
     const entry=core.queueEvidence(events);
