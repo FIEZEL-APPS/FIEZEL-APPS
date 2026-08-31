@@ -231,5 +231,55 @@ test('titik sambung app.js yang dirujuk pipeline masih ada di app.js', () => {
   }
 });
 
+/* ========================================================================================
+ * MODUL HARUS BERGERAK, BUKAN SEKADAR MENJAWAB
+ *
+ * TIGA KALI dalam fase ini, sebuah modul murni menerima catatan bercacat, mendegradasi persis
+ * seperti rancangannya, dan mengembalikan nilai yang tampak masuk akal:
+ *
+ *   Fase F  ItemPrior          mode 'mcq' bukan anggota MODE_COST -> prior jatuh ke basis
+ *   Fase G  Calibration.observe nama field karangan               -> kalibrasi jadi NO-OP
+ *   Fase J  estimateAbility     `correct` vs `ok`                 -> taksiran terpaku di lantai
+ *
+ * Tidak satu pun melempar. Penjaga senyap tidak bisa melihatnya, karena tidak ada yang gagal —
+ * masukan bercacat itu MASUKAN YANG SAH yang artinya sesuatu yang lain.
+ *
+ * Pelajarannya bukan "lebih teliti". Pelajarannya: gerbang harus meng-assert modulnya BERGERAK
+ * dan MENYIMPAN, bukan sekadar MENGEMBALIKAN. Assert di bawah menguji arah, dan arah adalah hal
+ * yang tidak bisa dipalsukan oleh masukan yang salah nama.
+ * ===================================================================================== */
+test('modul BERGERAK: jawaban benar menaikkan taksiran kemampuan, salah menurunkannya', () => {
+  const q = { ...Q };
+  const jalankan = (benar) => {
+    let L = P.createLearner({ level: 'A2', now: T0 });
+    let t = T0;
+    for (let i = 0; i < 12; i++) {
+      t += DAY;
+      if (i % 4 === 0) L = P.newSession(L, t);
+      L = P.answer(L, q, { correct: benar, ms: 7000 }, t).learner;
+    }
+    return P.ability(L);
+  };
+  const naik = jalankan(true), turun = jalankan(false);
+  assert.ok(naik !== null && turun !== null, 'taksiran kemampuan tidak pernah terhitung');
+  assert.ok(naik > turun,
+    'dua belas jawaban BENAR tidak menghasilkan taksiran lebih tinggi daripada dua belas jawaban '
+    + 'SALAH (' + naik + ' vs ' + turun + ') — penaksir tidak menerima hasil jawaban sama sekali');
+});
+
+test('modul MENYIMPAN: kalibrasi item benar-benar menumpuk bukti, bukan mengembalikan state kosong', () => {
+  let L = P.createLearner({ level: 'A2', now: T0 });
+  let t = T0;
+  for (let i = 0; i < 14; i++) {
+    t += DAY;
+    if (i % 4 === 0) L = P.newSession(L, t);
+    L = P.answer(L, Q, { correct: false, ms: 7000 }, t).learner;
+  }
+  const items = L.calibration && L.calibration.items ? Object.keys(L.calibration.items) : [];
+  assert.ok(items.length > 0,
+    'sesudah 14 jawaban pada satu item, state kalibrasi masih KOSONG — observe() dipanggil tetapi '
+    + 'tidak menyimpan apa pun (cacat Fase G)');
+});
+
 console.log(failures ? 'BraincorePipeline: FAIL (' + failures + ' kegagalan)' : 'BraincorePipeline: PASS');
 process.exit(failures ? 1 : 0);

@@ -45,7 +45,60 @@ const RUN_N = 40;              // panjang deret bukti per murid
 const HIGH = 0.8;              // "murid ini jelas sudah bisa"
 const LOW = 0.4;               // "murid ini jelas belum bisa"
 
-/** Kebenaran empiris: jalankan PROBE_N soal di kesulitan rujukan pada aliran acak terpisah. */
+/**
+ * LAJU GERAK KEMAMPUAN MURID, dalam satuan theta per hari — satuan milik v3 sendiri.
+ *
+ * KENAPA ARM INI ADA. Studi versi pertama menahan kemampuan murid DIAM sepanjang jalan, dan di
+ * lintasan itu Braincore kalah telak dari rata-rata bergulir. Kekalahan itu nyata, tetapi
+ * lintasannya memang memihak: untuk murid yang tidak berubah, "rata-rata 10 jawaban terakhir"
+ * nyaris jawaban terbaik yang mungkin — tidak ada yang perlu dikejar. Sedangkan BKT, diskon
+ * kredibilitas, dan model ingatan seluruhnya ada untuk mengikuti murid yang BERUBAH.
+ *
+ * Mengadu keduanya HANYA di lintasan yang memihak salah satu bukan pengukuran, itu pemilihan
+ * lintasan. Arm ini menutup celah itu.
+ *
+ * Geraknya diterapkan sebagai MANIPULASI STUDI, bukan dengan menulis ulang `belajar()` milik v3
+ * (yang tidak diekspor). Angkanya memakai satuan v3: profil "menurun" membawa driftHarian
+ * -0,035/hari, jadi ketiga laju di bawah adalah nol, laju itu, dan kebalikannya.
+ */
+const DRIFT_SWEEP = Object.freeze([0, -0.035, 0.035]);
+
+/** Theta murid pada hari ke-`day` bila kemampuannya bergerak `drift` per hari. */
+function thetaPadaHari(profil, drift, day) {
+  var t = profil.thetaAwal[FAMILY] + drift * day;
+  return Math.max(0.3, Math.min(6.7, t));   // pagar sama dengan belajar() milik v3
+}
+
+/**
+ * Kebenaran empiris: proporsi benar pada PROBE_N soal di kesulitan rujukan, dari aliran acak
+ * TERPISAH supaya tidak mengganggu jalannya.
+ *
+ * Di-memo pada (profil, theta dibulatkan, refD) karena arm bergerak menuntut kebenaran PER
+ * LANGKAH: theta berpindah tiap hari, jadi satu angka kebenaran untuk seluruh jalan sudah tidak
+ * sah lagi. Tanpa memo, 40 langkah x 200 probe x ratusan jalan menjadi mahal tanpa guna.
+ */
+const _memoKebenaran = new Map();
+function kebenaranPadaTheta(profil, theta, refD) {
+  const key = profil.id + '|' + theta.toFixed(3) + '|' + refD;
+  if (_memoKebenaran.has(key)) return _memoKebenaran.get(key);
+  // Murid tiruan dengan theta yang dipaksa; RNG diturunkan dari kuncinya supaya deterministik.
+  const murid = V3.buatMurid(profil, V3.mulberry32(hashKunci(key)));
+  murid.theta[FAMILY] = theta;
+  let benar = 0;
+  for (let i = 0; i < PROBE_N; i++) if (V3.jawab(murid, FAMILY, refD)) benar++;
+  const v = benar / PROBE_N;
+  _memoKebenaran.set(key, v);
+  return v;
+}
+
+/** FNV-1a: kunci string -> seed deterministik. Tanpa jam, tanpa acak. */
+function hashKunci(str) {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; }
+  return h >>> 0;
+}
+
+/** Kebenaran untuk murid yang DIAM — dipertahankan supaya arm statis tidak berubah maknanya. */
 function kebenaran(profil, seed, refD = REF_DIFFICULTY) {
   const murid = V3.buatMurid(profil, V3.mulberry32(seed ^ 0x9e3779b9));
   let benar = 0;
@@ -61,16 +114,25 @@ function kebenaran(profil, seed, refD = REF_DIFFICULTY) {
  * dan perbandingannya berhenti berpasangan — dan pertanyaan "siapa memilih soal lebih baik"
  * memang bukan pertanyaan berkas ini.
  */
-function deretBukti(profil, seed, gaya, refD = REF_DIFFICULTY) {
+function deretBukti(profil, seed, gaya, refD = REF_DIFFICULTY, drift = 0) {
   const murid = V3.buatMurid(profil, V3.mulberry32(seed));
   const rows = [];
   for (let i = 0; i < RUN_N; i++) {
+    const day = i + 1;
     const d = refD;
+    // Kemampuan digerakkan SEBELUM menjawab: jawaban hari ini datang dari murid hari ini.
+    if (drift !== 0) murid.theta[FAMILY] = thetaPadaHari(profil, drift, day);
     const benar = V3.jawab(murid, FAMILY, d);
     // Gaya menjawab mengubah BUKTI-nya, bukan kebenarannya: murid yang sama, cara menjawab
     // berbeda. Di sinilah kredibilitas bukti seharusnya berbicara — atau terbukti tidak.
     const ms = gaya === 'menebak' ? 700 : gaya === 'lambat' ? 26000 : 9000;
-    rows.push({ correct: benar, ms, day: i + 1, session: Math.floor(i / 5) });
+    rows.push({
+      correct: benar, ms, day, session: Math.floor(i / 5),
+      // Kebenaran PADA LANGKAH INI. Untuk drift 0 ia konstan dan metriknya identik dengan
+      // versi lama; untuk drift bukan nol, membandingkan taksiran terhadap kebenaran AKHIR
+      // akan menghukum kedua mesin atas gerak yang belum terjadi.
+      truthAtStep: drift === 0 ? null : kebenaranPadaTheta(profil, thetaPadaHari(profil, drift, day), refD)
+    });
   }
   return rows;
 }
@@ -81,9 +143,13 @@ const Q = {
 };
 
 /** Jalankan SATU deret bukti lewat kedua mesin dan kumpulkan metriknya. */
-function bandingkan(profil, seed, gaya, refD = REF_DIFFICULTY) {
-  const bukti = deretBukti(profil, seed, gaya, refD);
-  const truth = kebenaran(profil, seed, refD);
+function bandingkan(profil, seed, gaya, refD = REF_DIFFICULTY, drift = 0) {
+  const bukti = deretBukti(profil, seed, gaya, refD, drift);
+  // Untuk arm bergerak, "kebenaran" satu angka tidak ada lagi; yang dipakai pita HIGH/LOW
+  // adalah kebenaran RATA-RATA sepanjang jalan, dan galat pelacakan memakai kebenaran
+  // PER LANGKAH. Untuk arm statis keduanya sama, jadi hasil lama tidak bergeser.
+  const truth = drift === 0 ? kebenaran(profil, seed, refD)
+    : bukti.reduce((n, r) => n + r.truthAtStep, 0) / bukti.length;
 
   let bl = Baseline.createLearner({ level: 'A2' });
   let bc = Brain.createLearner({ level: 'A2', now: T0 });
@@ -97,6 +163,7 @@ function bandingkan(profil, seed, gaya, refD = REF_DIFFICULTY) {
   for (const ev of bukti) {
     const now = T0 + ev.day * DAY;
     const a = { correct: ev.correct, ms: ev.ms };
+    const truthNow = ev.truthAtStep === null ? truth : ev.truthAtStep;
 
     const rb = Baseline.answer(bl, Q, a, now); bl = rb.learner;
     if (ev.session !== sesiBc) { bc = Brain.newSession(bc, now); sesiBc = ev.session; }
@@ -115,9 +182,9 @@ function bandingkan(profil, seed, gaya, refD = REF_DIFFICULTY) {
       const s = m[nama];
       s.keputusan.push(putusan);
       if (sebanding !== null && sebanding !== undefined) {
-        s.err += Math.abs(sebanding - truth); s.n++; s.akhir = sebanding;
+        s.err += Math.abs(sebanding - truthNow); s.n++; s.akhir = sebanding;
       }
-      if (mastery !== null && mastery !== undefined) { s.errM += Math.abs(mastery - truth); s.nM++; }
+      if (mastery !== null && mastery !== undefined) { s.errM += Math.abs(mastery - truthNow); s.nM++; }
       // TEMUAN METODOLOGIS, dan metrik lamanya dibuang karena ini. Menghitung SEMUA remediasi
       // (hint + reteach) menghasilkan angka yang identik untuk kedua mesin — 114 lawan 114,
       // 786 lawan 786 — dan itu bukan kebetulan: keduanya meremediasi tepat ketika jawabannya
@@ -147,7 +214,7 @@ function bandingkan(profil, seed, gaya, refD = REF_DIFFICULTY) {
   });
 
   return {
-    profil: profil.id, seed, gaya, refD,
+    profil: profil.id, seed, gaya, refD, drift,
     kebenaran: Number(truth.toFixed(4)),
     keputusanBerbeda: beda,
     jumlahKeputusan: m.baseline.keputusan.length,
@@ -184,7 +251,9 @@ function jalankanSemua(seeds = [42, 43, 44, 45, 46]) {
   for (const profil of V3.PROFILES) {
     for (const seed of seeds) {
       for (const gaya of ['normal', 'menebak', 'lambat']) {
-        for (const refD of REF_SWEEP) out.push(bandingkan(profil, seed, gaya, refD));
+        for (const refD of REF_SWEEP) {
+          for (const drift of DRIFT_SWEEP) out.push(bandingkan(profil, seed, gaya, refD, drift));
+        }
       }
     }
   }
@@ -216,7 +285,8 @@ function agregat(rows) {
   return acc;
 }
 
-module.exports = { REF_DIFFICULTY, REF_SWEEP, PROBE_N, RUN_N, HIGH, LOW, kebenaran, deretBukti,
+module.exports = { REF_DIFFICULTY, REF_SWEEP, DRIFT_SWEEP, PROBE_N, RUN_N, HIGH, LOW,
+                   kebenaran, kebenaranPadaTheta, thetaPadaHari, deretBukti,
                    bandingkan, jalankanSemua, agregat };
 
 // =========================================================================================

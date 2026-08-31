@@ -50,7 +50,9 @@ function jalankanMatriks() {
   for (const profil of V3.PROFILES) {
     for (const seed of SEEDS) {
       for (const gaya of ['normal', 'menebak', 'lambat']) {
-        for (const refD of Cmp.REF_SWEEP) rows.push(Cmp.bandingkan(profil, seed, gaya, refD));
+        for (const refD of Cmp.REF_SWEEP) {
+          for (const drift of Cmp.DRIFT_SWEEP) rows.push(Cmp.bandingkan(profil, seed, gaya, refD, drift));
+        }
       }
     }
   }
@@ -80,15 +82,32 @@ const SPEK = [
     tanya: 'Seberapa sering mesin menaikkan murid yang belum bisa?' }
 ];
 
-function jalankanStudi() {
-  const rows = jalankanMatriks();
+/** Nama manusiawi untuk laju gerak kemampuan murid. */
+function namaArm(drift) { return drift === 0 ? 'diam' : drift < 0 ? 'menurun' : 'membaik'; }
+
+function ciUntuk(rows, label) {
   const arm = belah(rows);
-  const ci = SPEK.map((s) => {
+  return SPEK.map((s) => {
     const row = Ext.ciBerpasangan(arm.baseline, arm.braincore, s, CI_SEED);
+    row.arm = label;
     row.tanya = s.tanya;
     row.pesan = Ext.pesanArahFaktual(s.nama, row.meanBase, row.meanKandidat, row);
     return row;
   });
+}
+
+function jalankanStudi() {
+  const rows = jalankanMatriks();
+  const arm = belah(rows);
+  // CI DIPISAH PER ARM GERAK. Menggabungkan murid yang diam, menurun, dan membaik ke dalam
+  // satu angka akan menyembunyikan justru perbedaan yang paling menarik — dan pada versi
+  // pertama studi ini, satu-satunya arm yang ada (diam) adalah arm yang paling memihak mesin
+  // dasar. Satu angka gabungan akan mengulangi kesalahan itu dengan bentuk yang lebih rapi.
+  const ciPerArm = {};
+  for (const drift of Cmp.DRIFT_SWEEP) {
+    ciPerArm[namaArm(drift)] = ciUntuk(rows.filter((r) => r.drift === drift), namaArm(drift));
+  }
+  const ci = ciUntuk(rows, 'gabungan');
   return {
     schema: 'fiezel-braincore-study-v1',
     braincoreVersion: Manifest.bundleVersion,
@@ -96,10 +115,11 @@ function jalankanStudi() {
     konfigurasi: {
       profil: V3.PROFILES.map((p) => p.id), seeds: SEEDS,
       gaya: ['normal', 'menebak', 'lambat'], refDifficulty: Cmp.REF_SWEEP,
+      driftSweep: Cmp.DRIFT_SWEEP, armGerak: Cmp.DRIFT_SWEEP.map(namaArm),
       jalanBerpasangan: rows.length, interaksiSimulasi: rows.length * Cmp.RUN_N,
       bootstrapIters: Ext.BOOT_ITERS, ciSeed: CI_SEED, praktis: PRAKTIS
     },
-    ci, rows, arm
+    ci, ciPerArm, rows, arm
   };
 }
 
@@ -125,6 +145,33 @@ function tulisRingkasan(studi) {
   L.push('');
   L.push('Pairs used per metric: ' + studi.ci.map((c) => c.metric + ' ' + c.nPasangan).join(' · ') + '.');
   L.push('');
+  L.push('## Per arm: does the learner move?');
+  L.push('');
+  L.push('The combined row above hides the most interesting split, so it is broken out. `diam` =');
+  L.push('ability static, `menurun` = declining 0.035 theta/day, `membaik` = improving at the same');
+  L.push('rate (the units are v3\'s own; its `menurun` profile declares -0.035/day).');
+  L.push('');
+  L.push('| arm | metric | baseline | Braincore | 95% CI | verdict |');
+  L.push('|---|---|---|---|---|---|');
+  for (const arm of Object.keys(studi.ciPerArm)) {
+    for (const c of studi.ciPerArm[arm]) {
+      if (c.insufficient) {
+        L.push('| `' + arm + '` | `' + c.metric + '` | — | — | — | **insufficient** (no runs in band) |');
+      } else {
+        L.push('| `' + arm + '` | `' + c.metric + '` | ' + c.meanBase + ' | ' + c.meanKandidat
+          + ' | [' + c.ciLo + ', ' + c.ciHi + '] | **' + c.verdict + '** |');
+      }
+    }
+  }
+  L.push('');
+  L.push('**Read the split, not just the total.** Braincore\'s estimate is *proven better* for a');
+  L.push('learner who is static or declining, and **inconclusive for a learner who is improving** —');
+  L.push('its weakest case, and the one a learning product most wants to get right. A residual');
+  L.push('negative bias remains: it still tends to under-estimate the learner, so it is slowest to');
+  L.push('notice someone getting better.');
+  L.push('');
+  L.push('The over-reteaching finding survives every arm where it can be measured.');
+  L.push('');
   L.push('## Direction and proof status, stated separately');
   L.push('');
   L.push('These lines come from `pesanArahFaktual`, reused verbatim from');
@@ -141,17 +188,15 @@ function tulisRingkasan(studi) {
   L.push('and it must never be written up as "better". A metric marked `inconclusive` is an open');
   L.push('question, not a result.');
   L.push('');
-  L.push('## The single most important caveat: the learner does not move');
+  L.push('## This study previously reported the opposite, and the cause was a defect in the harness');
   L.push('');
-  L.push('Latent ability is **static** for the whole run. That is the best possible case for a');
-  L.push('rolling average and the worst possible showcase for an adaptive model: BKT, evidence');
-  L.push('credibility and the memory model all exist to track a learner who *changes*, and this');
-  L.push('study holds the learner still. The `trackingError` verdict should be read with that');
-  L.push('firmly in mind — it is a real result about a narrow condition, not a general one.');
-  L.push('');
-  L.push('This is a limitation of the study, not an excuse for the engine. The honest next step is');
-  L.push('a second arm with moving ability (v3 profiles already declare `driftHarian`, and');
-  L.push('`menurun` carries -0.035/day), which is **not built here** and is named as open work.');
+  L.push('An earlier version of this study concluded that Braincore was **proven worse** than the');
+  L.push('baseline on `trackingError`. That conclusion was wrong, and the reason was a bug in');
+  L.push('`braincore-pipeline.js`, not in Braincore: the ability estimator was fed rows carrying');
+  L.push('`correct`, while `FiezelCoreBrain.estimateAbility` reads `ok`. Every row therefore read');
+  L.push('as a wrong answer. The estimate ran to its floor (0.40) and stayed pinned there while');
+  L.push('true ability was 2.3-3.7 — and `predicted`, the quantity this whole comparison rests on,');
+  L.push('is derived from that estimate. See `AUDIT/12`.');
   L.push('');
   L.push('## The over-reteaching is a design property, not the labelling defect');
   L.push('');
@@ -184,7 +229,7 @@ function tulisSemua(studi) {
   const J = (o) => JSON.stringify(o, null, 2) + '\n';
   fs.writeFileSync(path.join(OUT_DIR, 'results.json'),
     J({ schema: studi.schema, braincoreVersion: studi.braincoreVersion, lapisan: studi.lapisan,
-        konfigurasi: studi.konfigurasi, ci: studi.ci, rows: studi.rows }));
+        konfigurasi: studi.konfigurasi, ci: studi.ci, ciPerArm: studi.ciPerArm, rows: studi.rows }));
   fs.writeFileSync(path.join(OUT_DIR, 'baseline-results.json'),
     J({ arm: 'baseline', braincoreVersion: studi.braincoreVersion, rows: studi.arm.baseline }));
   fs.writeFileSync(path.join(OUT_DIR, 'braincore-results.json'),
@@ -192,7 +237,7 @@ function tulisSemua(studi) {
   fs.writeFileSync(path.join(OUT_DIR, 'summary.md'), tulisRingkasan(studi));
 }
 
-module.exports = { SEEDS, PRAKTIS, SPEK, OUT_DIR, jalankanStudi, tulisRingkasan, tulisSemua, belah };
+module.exports = { SEEDS, PRAKTIS, SPEK, OUT_DIR, namaArm, jalankanStudi, tulisRingkasan, tulisSemua, belah };
 
 // =========================================================================================
 if (require.main === module) {

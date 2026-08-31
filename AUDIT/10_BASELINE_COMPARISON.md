@@ -1,5 +1,17 @@
 # 10 — Baseline Comparison (Phase 2 / Phase H)
 
+> ## ⚠️ RETRACTED IN PART — see `AUDIT/12`
+>
+> The tracking-error half of this document's headline was **wrong**. It was measured through a
+> defect in my own harness: the ability estimator was fed `correct` where it reads `ok`, so it
+> saw every answer as wrong and pinned at its floor. Corrected across 1,620 paired runs,
+> `trackingError` is **proven better**, not worse.
+>
+> **The over-reteaching finding below stands** — it never depended on the ability estimate.
+>
+> The original text is kept unaltered, because deleting a wrong conclusion also deletes the
+> evidence that it was reached and how.
+
 **The headline, stated before the caveats so it cannot be missed:**
 
 > On the decision path, against a ten-line baseline, **Braincore is not better on these

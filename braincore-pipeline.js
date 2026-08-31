@@ -59,8 +59,27 @@ function createLearner(opts = {}) {
 
 /** Kemampuan laten dari riwayat — cermin coreBrainAttempts/estimateAbility (app.js:2155). */
 function ability(learner) {
+  //
+  // CACAT SAYA YANG PALING MAHAL, dan ia keluarga yang sama dengan cacat kalibrasi di Fase G:
+  // NAMA FIELD YANG SALAH. Versi pertama mengirim `correct`; `estimateAbility` membaca `ok`
+  // (fiezel-core-brain.js:206 — `var actual = row.ok ? 1 : 0`). `row.ok` selalu undefined,
+  // jadi `actual` selalu 0: penaksir diberi tahu murid SELALU SALAH, pada setiap jawaban,
+  // selamanya. Taksirannya lari ke lantai 0,40 dan terpaku di sana sementara kemampuan sejati
+  // murid 2,3-3,7.
+  //
+  // Akibatnya jauh lebih besar daripada satu angka yang meleset. `predicted` di trace dihitung
+  // dari taksiran ini, dan `predicted` adalah besaran yang dipakai SELURUH perbandingan Fase H
+  // dan studi Fase J. Vonis "Braincore terbukti lebih buruk daripada mesin dasar" diukur
+  // dengan penaksir kemampuan Braincore yang tidak pernah diberi satu pun jawaban benar.
+  // Vonis itu batal, dan penggantinya diukur ulang di AUDIT/12.
+  //
+  // Sekali lagi penjaga tidak bisa melihatnya: tidak ada yang dilempar. Modulnya menerima
+  // baris tanpa `ok` sebagai baris yang jawabannya salah — itu masukan yang sah, bukan galat.
+  // app.js:1974 mengirim `ok:!!h?.ok` dengan benar; bentuk di bawah sekarang mengikutinya.
   const rows = learner.history.map((h) => ({
-    correct: h.correct, difficulty: h.difficulty, level: learner.level,
+    at: h.at,
+    ok: h.correct === true,
+    difficulty: h.difficulty,
     credibility: h.kappa == null ? 1 : h.kappa
   }));
   if (!rows.length) return null;

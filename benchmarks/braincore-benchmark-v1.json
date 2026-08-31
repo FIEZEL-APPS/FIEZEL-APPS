@@ -796,7 +796,7 @@
       "expect": {
         "masteryL": 1,
         "masteryN": 13,
-        "stabilityDays": 162.404,
+        "stabilityDays": 161.68,
         "retrievability": 1,
         "activeMisconceptions": 0,
         "topMisconception": null,
@@ -1996,7 +1996,7 @@
         "topMisconception": null,
         "difficulty": {
           "prior": 2.35,
-          "effective": 2.002,
+          "effective": 2.35,
           "target": 0.8
         },
         "decisions": [
@@ -2050,7 +2050,7 @@
         "reasonCodes": [
           "brain3_affect_fatigued",
           "brain3_affect_insufficient_evidence",
-          "brain3_item_calibration_applied",
+          "brain3_item_calibration_deadzone",
           "brain3_item_calibration_prior_only",
           "brain3_item_prior_mode",
           "brain3_memory_gain_spacing",
