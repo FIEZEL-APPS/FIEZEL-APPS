@@ -76,8 +76,26 @@ gerbang notifikasi (z100, scrim .82) — dua scrim bertumpuk — lalu memanggil 
 primernya sendiri, **mencuri fokus ke kartu yang tertutup**. Lebih buruk: `state.ritualMeta`
 ditandai **sebelum** kartunya tampil, jadi rencana hari itu hangus tanpa pernah terlihat murid.
 
-**Perbaikan:** keluar lebih awal kalau ada lapisan dialog terbuka — dan keluar **sebelum**
-`ritualMeta` ditandai, supaya ritualnya ditawarkan lagi setelah gerbang turun.
+**Perbaikan (dua sisi, dan sisi kedua nyaris terlewat):** `maybeShowDailyRitual()` keluar lebih
+awal kalau ada lapisan dialog terbuka, dan keluar **sebelum** `ritualMeta` ditandai supaya jatah
+harian tidak hangus.
+
+Versi pertama perbaikan ini hanya punya sisi itu, dan **itu membuat keadaan lebih buruk daripada
+cacat aslinya.** Diukur berdampingan dengan `main` pada kondisi identik:
+
+| | ritual menumpuk di balik gerbang | ritual sampai ke murid |
+|---|---|---|
+| `main` | ya (cacat) | ya, 0 ms setelah gerbang ditutup |
+| perbaikan versi pertama | tidak | **tidak pernah** |
+| perbaikan final | tidak | ya, 1000 ms setelah gerbang ditutup |
+
+Menahan tanpa menawarkan ulang bukan perbaikan — ia menghilangkan rencana hari itu diam-diam.
+Karena itu `releaseGateFocus()` (dipanggil kedua gerbang saat menutup) kini mencoba ulang
+ritualnya. `maybeShowDailyRitual()` menjaga syaratnya sendiri, jadi pemanggilan itu idempoten.
+
+Yang membuat cacat versi-pertama ini lolos: gerbang T5 saat itu hanya meng-assert "tidak
+menumpuk" — dan cabang yang tidak pernah menampilkan apa pun **lolos assert itu**. T5b kini
+menjaga HASIL bagi murid (rencananya benar-benar sampai), bukan sekadar ketiadaan penumpukan.
 
 ### P1-1 — Setengah Peta Belajar tidak pernah ditemukan di ponsel kecil
 `.progress-tabs` `overflow-x:auto` sejak m025-85, tetapi tidak pernah **mengatakan** bahwa ia
@@ -127,13 +145,21 @@ menggulir untuk menemukannya. Panelnya `overflow-y:auto` sehingga tetap terjangk
 ## 5. Gerbang baru
 
 `ui-render-audit-test.js`, terdaftar di `quality.yml` tepat setelah `contrast-test.js`.
-Ia menjalankan aplikasi di Chromium dan menjaga tujuh invarian (T1 nilai mentah, T2a/T2b
-pengurungan fokus, T3 kontras judul lintas fase langit, T4 area sentuh efektif, T5 penumpukan
-dialog, T6 scroll horizontal).
+Ia menjalankan aplikasi di Chromium dan menjaga sembilan invarian (T1 nilai mentah, T2a/T2b
+pengurungan fokus, T3 kontras judul lintas fase langit, T4 area sentuh efektif, T5/T5a/T5b
+penumpukan dialog **dan** hasil ritualnya, T6 scroll horizontal).
 
-**Dibuktikan bergigi:** dengan ketiga cacat dikembalikan sementara, gerbang ini MERAH tepat pada
-ketiganya (`classroom: [object Object]`; `15/18 perhentian` bocor; `1.18:1 < 3`), lalu HIJAU
-kembali setelah perbaikan dipulihkan.
+**Dua pemeriksaan sengaja dibuat memaksa keadaannya sendiri** (T2 dan T5 membuka gerbangnya
+lewat `setNotificationGateState('default')` alih-alih menunggu heuristik "undangan layak
+tampil"). Sebabnya konkret: versi pertama T5 memakai localStorage kosong, sehingga yang muncul
+adalah perkenalan, gerbangnya tidak pernah tercapai, dan cabang T5b **dilewati diam-diam**
+sambil tetap mencetak hijau. Pemeriksaan yang bisa melewati dirinya sendiri adalah pemeriksaan
+yang tidak ada.
+
+**Dibuktikan bergigi, empat kali.** Dengan ketiga cacat asli dikembalikan sementara, gerbang ini
+MERAH tepat pada ketiganya (`classroom: [object Object]`; `15/18 perhentian` bocor;
+`1.18:1 < 3`). Dan ketika tawaran ulang ritual dimatikan, T5b MERAH sendirian dengan pesan yang
+menyebut akibatnya bagi murid. Semuanya HIJAU kembali setelah perbaikan dipulihkan.
 
 Ia **SKIP dan keluar 0** kalau Playwright/Chromium tidak ada, jadi CI publik tidak berubah
 perilakunya; ia merah hanya kalau browsernya ada DAN invariannya benar-benar patah.
