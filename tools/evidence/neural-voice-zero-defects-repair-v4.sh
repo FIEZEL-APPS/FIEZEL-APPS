@@ -21,14 +21,14 @@ def one(old,new,label):
     s=s.replace(old,new,1)
 
 # Product candidate can lag main while evidence is running. Reconstruct it on current main,
-# carrying only the target branch's commits since the real merge-base. This gives A11 a
-# candidate that contains origin/main while preserving the audited multi-chunk work.
+# carrying only substantive non-merge commits since the real merge-base. The branch tip is a
+# merge commit that only joins the already-replayed test+fix commits; replaying it adds no code.
 one(
     'git checkout -B repair "origin/$TARGET"\ntest "$(git rev-parse HEAD)" = "$EXPECTED"',
     '''PRODUCT_SHA="$(git rev-parse "origin/$TARGET")"
 test "$PRODUCT_SHA" = "$EXPECTED"
 PRODUCT_BASE="$(git merge-base origin/main "origin/$TARGET")"
-mapfile -t PRODUCT_COMMITS < <(git rev-list --reverse "$PRODUCT_BASE".."origin/$TARGET")
+mapfile -t PRODUCT_COMMITS < <(git rev-list --reverse --no-merges "$PRODUCT_BASE".."origin/$TARGET")
 test "${#PRODUCT_COMMITS[@]}" -gt 0
 git config user.name "FIEZEL-APPS"
 git config user.email "fitrajft@gmail.com"
