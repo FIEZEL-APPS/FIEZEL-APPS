@@ -428,8 +428,20 @@ test('G7 terjemahan hanya dirender dari blok feedback pasca-jawab', () => {
 test('G8 id kontrak bersama #fslTranslateToggle dan chip saldo ada di header sesi', () => {
   assert.ok(addonSource.includes('id="fslTranslateToggle"'), 'id kontrak #fslTranslateToggle hilang');
   assert.ok(addonSource.includes('id="fslGemChip"'), 'chip saldo #fslGemChip hilang');
-  assert.ok(/<span class="fsl-kicker">Listening[^\n]*?\$\{this\.gemBarMarkup\(\)\}/.test(addonSource),
-    'baris gem tidak duduk di header kartu sesi listening');
+  /* 2026-08-31: jangkar pemeriksaan ini DIPINDAH, bukan dilonggarkan. Sebelumnya ia
+     mencari literal `<span class="fsl-kicker">Listening` pada baris yang sama dengan
+     gemBarMarkup(). Kicker itu kini dihapus atas permintaan OWNER (ia mengulang pilihan
+     yang baru saja dibuat murid dan membocorkan nama mode internal "inference"), jadi
+     jangkar lama menguji sesuatu yang memang sudah tidak ada.
+     Yang DIJAGA tetap sama persis dan tidak berkurang: baris gem harus berada di dalam
+     kartu sesi listening yang sama - bukan mengambang di layar lain, dan bukan berdiri
+     di antara soal dan pemutar. Jangkarnya sekarang kelas kartunya sendiri
+     (`fsl-card-listening`), yang justru lebih stabil daripada teks kicker: ia tidak ikut
+     berubah setiap kali naskahnya diperbarui. */
+  assert.ok(/<article class="fsl-card fsl-card-listening">[^\n]*?\$\{this\.gemBarMarkup\(\)\}/.test(addonSource),
+    'baris gem tidak duduk di dalam kartu sesi listening');
+  assert.ok(!/<span class="fsl-kicker">Listening ·/.test(addonSource),
+    'kicker "Listening · level · mode" kembali muncul di kartu sesi (dihapus 2026-08-31)');
   assert.ok(/aria-pressed="\$\{String\(on\)\}"/.test(addonSource), 'toggle tanpa aria-pressed');
 });
 test('G8 teks keadaan habis mengajak belajar dan menolak menjual', () => {

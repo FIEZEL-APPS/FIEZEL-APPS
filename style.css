@@ -2433,12 +2433,12 @@ button.primary:active,.primary.luxe:active,html.fiezel-ui-v6 body .primary:activ
 /* i10 2026-08-28 (O5 §2): + :not(.option) — empat tombol jawaban berbayang tebal membuat
    layar soal terasa seperti empat kartu bersaing dengan soalnya; pilihan kembali ke resep
    dasar .option yang tenang (garis --line, tanpa bayangan lantai). */
-html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.text-button):not(.coach-link):not(.fz-coach-bubble):not(.launch-card):not(.skill-card):not(.option){
+html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.text-button):not(.coach-link):not(.fz-coach-bubble):not(.launch-card):not(.skill-card):not(.option):not(.skill-help-dot){
   border:1.5px solid var(--surface-edge);border-radius:var(--radius-md);
   box-shadow:var(--lift-edge);
   transition:transform var(--dur-xs) var(--ease),box-shadow var(--dur-xs) var(--ease);
 }
-html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.text-button):not(.coach-link):not(.fz-coach-bubble):not(.launch-card):not(.skill-card):not(.option):active{
+html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.text-button):not(.coach-link):not(.fz-coach-bubble):not(.launch-card):not(.skill-card):not(.option):not(.skill-help-dot):active{
   transform:translateY(2px);box-shadow:var(--lift-edge-press)}
 
 /* --------------------------------------------------------------------------
@@ -2660,6 +2660,42 @@ body.reduce-motion .fz-coach-bubble .fz-coach-pulse,body.reduce-motion .fz-confe
    9. Halaman skill baru (Listening, Speaking, Writing) memakai pola yang sama
    dengan Reading/Grammar supaya tidak ada pola baru yang harus dipelajari.
    -------------------------------------------------------------------------- */
+/* Baris atas halaman skill (permintaan OWNER 2026-08-31). Menggantikan kartu hero
+   ~200px yang isinya pindah ke dialog "?" (app.js openSkillHelp). Barisnya hanya
+   setinggi tombolnya, jadi kartu soal naik hampir satu layar penuh di ponsel.
+   Tombolnya 44px penuh - lantai sasaran sentuh, bukan "kecil" secara harfiah; yang
+   diminta kecil adalah kehadiran VISUALnya, dan itu dicapai lewat warna tenang dan
+   lingkaran ramping, bukan dengan mengecilkan kotak sentuhnya di bawah lantai. */
+/* Sticky, bukan statis. Selama sesi Skills Lab topbar aplikasi DISEMBUNYIKAN
+   (setSessionStage), jadi tombol ini adalah satu-satunya jalan ke keterangan latihan -
+   dan kalau ia ikut tergulir, ia hilang tepat saat murid menggulir daftar pilihan
+   jawaban. Terukur di preview: y=-16px setelah gulir kecil, tepiannya terpotong.
+   top:6px menyamai --sp yang dipakai topbar v6 di lebar ponsel (tutor-v3.css:94). */
+.skill-page-topbar{display:flex;justify-content:flex-end;margin:0 0 4px;position:sticky;top:6px;z-index:34}
+.skill-help-dot{
+  width:44px;height:44px;min-height:44px;padding:0;
+  display:grid;place-items:center;
+  border-radius:50%;border:1px solid var(--line);
+  background:var(--panel-soft);color:var(--ink);
+  font-size:1.05rem;font-weight:800;line-height:1;
+  box-shadow:none;
+}
+.skill-help-dot:hover{background:var(--sun-soft);transform:none}
+/* DUA aturan menimpa bentuk tombol ini, dan keduanya harus dijawab - preview mencatnya
+   dulu 16px, lalu 13px setelah yang pertama diatasi:
+     1. style.css:2436 `html.fiezel-ui-v6 body button:not(...)` (0,4,3) -> radius-md 16px.
+        Dijawab dengan MENAMBAHKAN .skill-help-dot ke rantai :not()-nya, mengikuti konvensi
+        yang sudah dipakai .primary/.nav/.icon-button di repo ini.
+     2. tutor-v3.css:33 `html.fiezel-ui-v6 button` (0,1,1) -> 13px, dan berkas itu dimuat
+        SESUDAH style.css. Dijawab dengan menyamai bentuk pemilihnya di bawah ini (0,2,1).
+   Keduanya lewat spesifisitas, bukan !important: !important juga akan mengalahkan tema
+   yang memang berhak menimpa nanti. */
+html.fiezel-ui-v6 .skill-help-dot{border-radius:50%}
+/* Isi dialog bantuan: naskah yang dulu berdiri sebagai hero. */
+.skill-help-panel h2{margin:.35rem 0 .5rem;font-size:1.35rem;letter-spacing:-.02em}
+.skill-help-panel p{margin:0 0 .6rem;font-size:.92rem;line-height:1.6}
+.skill-help-panel .skill-level-note{margin-top:12px}
+.skill-help-panel .modal-actions{margin-top:18px}
 .skill-page-hero{
   display:grid;gap:8px;padding:18px;border-radius:var(--radius-lg);margin-bottom:14px;
   border:1.5px solid var(--skill-line,var(--surface-edge));background:var(--skill-bg,var(--panel-soft));color:var(--ink)}
