@@ -1568,9 +1568,10 @@ function record(q,ok,ms,selectedIndex){
     if(Number.isFinite(kappa))h.kappa=Math.round(Math.max(0,Math.min(1,kappa))*1000)/1000;
   }catch{}
   state.history.push(h);if(state.history.length>1000)state.history.shift();
-  /* S5b: antrekan bukti untuk sinkron. Mati secara default — brainSyncQueue sendiri yang
-     memeriksa ketiga syaratnya, jadi jalur ini tidak menambah cabang keputusan di sini. */
-  try{brainSyncQueue(h)}catch{}
+  /* S6: tandai soalnya dengan identitas percobaan supaya bukti yang lahir belakangan
+     (diagnosis miskonsepsi di tutorObserve) bisa dicap ke baris yang BENAR.
+     Sinkron TIDAK diantrekan di sini: pada titik ini bukti ledger belum ada. */
+  try{if(q)q.__attemptId=h.attemptId}catch{}
   /* Fase 3 (C5 butir 4): item yang ditandai prompt prediksi SRL mencatat stempel waktu baris
      riwayatnya - setConfidence mencocokkannya supaya keyakinan yang diklik murid menjadi
      prediksi SRL untuk JAWABAN INI, bukan jawaban lain. Guarded: tanpa modul, tanda __srlPredict
@@ -2248,6 +2249,30 @@ function misconceptionLedgerRecord(session,q,diagnosis,ok){
       sessionId:String(session?.startedAt||state.activeSession?.startedAt||'')
     },now);
     misconceptionLedgerWrite(ledger);
+    /* S6: cap bukti yang SAMA ke baris riwayatnya sendiri.
+     *
+     * KENAPA INI PERLU, dan kenapa ia nyaris terlewat. Bukti ledger (concept, family,
+     * misconception, timing) lahir di sini — di tutorObserve — BUKAN di record(). Artinya
+     * baris riwayat tidak pernah membawanya, dan proyeksi sinkron yang membaca baris riwayat
+     * akan mengirim percobaan TANPA diagnosis miskonsepsinya. Model BKT tetap bisa diputar
+     * ulang di perangkat lain, tetapi ledger-nya akan lahir kosong: seluruh diagnosis
+     * miskonsepsi murid hilang saat pindah perangkat, tanpa satu pun galat.
+     *
+     * Gerbang kecukupan S5a (P5) tidak menangkapnya karena ia diberi baris SINTETIS yang
+     * sudah membawa field-field ini. Ia membuktikan proyeksi tidak membuang apa yang ada di
+     * baris — bukan bahwa barisnya memuat semua yang dibutuhkan model. Dua klaim berbeda.
+     *
+     * Dicap lewat attemptId, identitas yang baru ada sejak S3. */
+    const at=String(q?.__attemptId||'');
+    if(at){
+      const baris=(state.history||[]).find(h=>h&&h.attemptId===at);
+      if(baris){
+        baris.concept=quizConcept(q);
+        baris.family=quizFamily(q);
+        if(diagnosis?.misconception)baris.misconception=String(diagnosis.misconception);
+        if(diagnosis?.timing)baris.timing=String(diagnosis.timing);
+      }
+    }
   }catch{}
 }
 /* ---- Fase 2 (B3): kredibilitas bukti, BKT, confusion matrix, afek, listening adaptif ----
@@ -2509,30 +2534,39 @@ function brainSyncRead(){
     return st&&typeof st==='object'?st:{queue:[],lastPushedAt:0}}catch{return {queue:[],lastPushedAt:0}}
 }
 function brainSyncWrite(st){try{localStorage.setItem(sideStateKey(BRAIN_SYNC_KEY),JSON.stringify(st))}catch{}}
-/** Antrekan SATU baris riwayat sebagai bukti. Dipanggil dari record(), pintu tunggal jawaban. */
-function brainSyncQueue(row){
-  if(!brainSyncEnabled())return false;
+/**
+ * Percobaan yang BELUM tersinkron, diproyeksikan langsung dari riwayat.
+ *
+ * KENAPA TIDAK ADA ANTREAN TERPISAH. Versi pertama mengantre di record(), dan itu salah
+ * secara urutan: bukti ledger miskonsepsi baru lahir belakangan di tutorObserve, sehingga
+ * yang terantre adalah percobaan TANPA diagnosisnya. Riwayat sendiri sudah menjadi antrean
+ * yang benar — ia satu-satunya tempat yang memuat baris setelah semua bukti dicap. Menyimpan
+ * salinan kedua hanya menambah satu sumber kebenaran yang bisa menyimpang.
+ */
+function brainSyncPending(limit=BRAIN_SYNC_BATCH){
+  if(!brainSyncEnabled())return [];
   try{
-    const rec=brainSyncModule().project(row);
-    if(!rec)return false;
-    const st=brainSyncRead(),q=Array.isArray(st.queue)?st.queue:[];
-    // Dedup di antrean juga: retry lokal tidak boleh menumpuk catatan yang sama.
-    if(q.some(x=>x&&x.attemptId===rec.attemptId))return false;
-    brainSyncWrite({...st,queue:[...q,rec].slice(-BRAIN_SYNC_QUEUE_MAX)});
-    return true;
-  }catch{return false}
+    const st=brainSyncRead(),terkirim=new Set(Array.isArray(st.sent)?st.sent:[]);
+    const M=brainSyncModule(),out=[];
+    for(const row of (state.history||[])){
+      if(!row||!row.attemptId||terkirim.has(row.attemptId))continue;
+      const rec=M.project(row);
+      if(rec)out.push(rec);
+      if(out.length>=limit)break;
+    }
+    return out;
+  }catch{return []}
 }
-/** Kirim antrean. Hanya membuang yang benar-benar diterima server. */
+/** Kirim yang tertunda. Hanya menandai terkirim yang benar-benar diterima server. */
 async function brainSyncFlush(){
   if(!brainSyncEnabled())return false;
-  const st=brainSyncRead(),q=Array.isArray(st.queue)?st.queue:[];
-  if(!q.length)return true;
-  const batch=q.slice(0,BRAIN_SYNC_BATCH);
+  const batch=brainSyncPending();
+  if(!batch.length)return true;
   try{
     const r=await coreWorkerExec('/api/brain/attempts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({attempts:batch})});
     if(!r||!r.ok)return false;
-    const sisa=q.slice(batch.length);
-    brainSyncWrite({...st,queue:sisa,lastPushedAt:Date.now()});
+    const st=brainSyncRead(),terkirim=Array.isArray(st.sent)?st.sent:[];
+    brainSyncWrite({...st,sent:[...terkirim,...batch.map(x=>x.attemptId)].slice(-BRAIN_SYNC_QUEUE_MAX),lastPushedAt:Date.now()});
     return true;
   }catch{return false}
 }
