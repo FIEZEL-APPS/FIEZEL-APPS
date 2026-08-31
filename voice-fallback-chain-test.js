@@ -90,7 +90,33 @@ function fakeNode(selector, owner) {
     click() { (this.handlers.click || []).forEach((fn) => fn({ currentTarget: this })); },
     setAttribute() {}, getAttribute() { return null; }, hasAttribute() { return false; },
     querySelector() { return null; }, querySelectorAll() { return []; },
-    append() {}, remove() {}
+    append() {}, remove() {},
+    /* classList DITAMBAHKAN karena produk tumbuh melewati tiruannya, bukan karena gerbang ini
+       menuntut sesuatu yang baru.
+       #288 ("equalizer hidup saat memutar") menambah `stage.classList.add('is-playing')` di
+       fiezel-speaking-listening-addon.js:627. Di peramban sungguhan querySelector() menjawab
+       null atau Element yang PASTI punya classList, jadi baris itu aman di produksi. Di sini
+       ia menjawab fakeNode yang tidak punya classList sama sekali, jadi gerbangnya MELEDAK
+       (TypeError) di tengah jalan — bukan gagal dengan assert, melainkan mati.
+       Bedanya penting: kematian di tengah membuat 26 assert SESUDAHNYA tidak pernah berjalan,
+       dan yang terbaca cuma "19 pass". Gerbang yang mati diam-diam kehilangan cakupan justru
+       ketika ia paling dibutuhkan. Sesudah tiruan ini dilengkapi, 45 assert berjalan penuh.
+       Ini melengkapi TIRUAN agar setia pada DOM, bukan melonggarkan assert: tidak ada satu pun
+       assert yang diubah, dan set kelasnya nyata (add/remove/contains/toggle) supaya gerbang
+       berikutnya bisa memeriksanya kalau memang perlu. */
+    classList: (() => {
+      const set = new Set();
+      return {
+        add(...names) { names.forEach((n) => set.add(String(n))); },
+        remove(...names) { names.forEach((n) => set.delete(String(n))); },
+        contains(name) { return set.has(String(name)); },
+        toggle(name, force) {
+          const on = force === undefined ? !set.has(String(name)) : !!force;
+          if (on) set.add(String(name)); else set.delete(String(name));
+          return on;
+        }
+      };
+    })()
   };
   return node;
 }
