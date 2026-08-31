@@ -834,6 +834,13 @@ jobs:
           # dijalankan di dalamnya. Satu sentuhan jaringan = ReferenceError = gerbang merah.
           # Membuktikannya dengan grep sama lemahnya dengan uji manifest berongga di Fase A.
           node braincore-local-first-test.js
+          # Fase 2 / Phase M: antrean bukti bersifat OPSIONAL. Antreannya sudah ada
+          # (features/analytics/fiezel-analytics-client.js, dijaga analytics-client-test.js
+          # dengan 190 assert); gerbang ini TIDAK mengulanginya. Yang ditambahkan cuma satu
+          # properti yang belum dijaga siapa pun: sesi belajar yang sama dijalankan di empat
+          # dunia — normal, jaringan mati, server 500, tanpa transport — dan keputusannya wajib
+          # IDENTIK. Bukan "tetap ada keputusan": identik.
+          node braincore-evidence-queue-test.js
           node fiezel-stat-gate-test.js
           node id-golden-snapshot-test.js
           node learning-lane-test.js
