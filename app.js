@@ -3264,6 +3264,17 @@ function releaseGateFocus(){
   try{syncDialogContainment()}catch(_){}
   try{if(gateReturnFocus&&document.contains(gateReturnFocus)&&!gateReturnFocus.inert)gateReturnFocus.focus({preventScroll:true})}catch(_){}
   gateReturnFocus=null;
+  /* SISI KEDUA dari penjaga di maybeShowDailyRitual(). Penjaga itu menolak menerbitkan
+     ritual di belakang gerbang dan sengaja keluar SEBELUM menandai ritualMeta, supaya
+     jatah "sekali sehari" tidak hangus. Tapi menahan saja tidak cukup: tanpa tawaran
+     ulang di sini, murid yang boot-nya melewati gerbang tidak akan melihat rencana
+     harinya SAMA SEKALI - lebih buruk daripada cacat aslinya, yang setidaknya masih
+     menampilkannya begitu gerbang turun. Diukur berdampingan dengan main saat menulis
+     ini: main "ritual kembali 0ms", cabang ini "TIDAK PERNAH" sebelum baris ini ada.
+     maybeShowDailyRitual() menjaga syaratnya sendiri (view home, belum ada kartu, tidak
+     ada dialog lain, jatah hari ini belum terpakai), jadi pemanggilan ini idempoten dan
+     aman dipanggil dari kedua gerbang. */
+  setTimeout(()=>{try{maybeShowDailyRitual()}catch(_){}},360);
 }
 function hideNotificationGate(){const gate=$('welcome');if(!gate)return;gate.classList.remove('show');setTimeout(()=>{gate.classList.add('hidden');releaseGateFocus()},300)}
 // m025-79: a second mandatory gate, Puter account sign-in, sits right after the

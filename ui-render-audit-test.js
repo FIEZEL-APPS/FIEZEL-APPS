@@ -317,17 +317,63 @@ async function main() {
 
     // ---- T5: ritual harian tidak pernah terbit di belakang dialog lain --------------------
     {
-      const { ctx, page } = await open(VIEWPORTS[1], { keepGates: true });
+      /* Seed yang MEMBIARKAN gerbang notifikasi muncul: perkenalan sudah lewat dan akun
+         sudah dilewati, tetapi undangan pengingat sengaja TIDAK ditekan. Versi pertama
+         pemeriksaan ini memakai keepGates tanpa seed sama sekali - artinya localStorage
+         kosong, perkenalan yang muncul, gerbangnya tidak pernah tercapai, dan cabang
+         T5b DILEWATI diam-diam. Pemeriksaan yang melewati dirinya sendiri adalah
+         pemeriksaan yang tidak ada. */
+      const ctxPage = await browser.newContext({ viewport: { width: VIEWPORTS[1][1], height: VIEWPORTS[1][2] }, deviceScaleFactor: 1 });
+      await ctxPage.route('**/*', route => route.request().url().startsWith(`http://127.0.0.1:${port}/`)
+        ? route.continue() : route.abort());
+      const page = await ctxPage.newPage();
+      await page.addInitScript(() => {
+        try {
+          localStorage.clear();
+          localStorage.setItem('fiezel-onboarding-v1', JSON.stringify({ done: true, at: Date.now(), via: 'finish', locale: 'id', name: 'Rani' }));
+          localStorage.setItem('fiezel-puter-auth-skipped', '1');
+        } catch (_) {}
+      });
+      await page.goto(BASE, { waitUntil: 'load', timeout: 60000 });
+      await settle(page);
+      const ctx = ctxPage;
+      /* Kalau heuristik "undangan layak tampil" tidak terpenuhi di lingkungan ini,
+         gerbangnya DIBUKA paksa - sama seperti T2 - supaya invariannya tetap teruji. */
+      await page.evaluate(() => {
+        const g = document.getElementById('welcome');
+        if (g && g.classList.contains('hidden')) { try { window.setNotificationGateState('default'); } catch (_) {} }
+      });
+      await page.waitForTimeout(600);
       const stacked = await page.evaluate(() => {
         const open = ['authGate', 'modal', 'welcome'].filter(id => {
           const e = document.getElementById(id); return e && !e.classList.contains('hidden');
         });
         return { open, ritual: !!document.getElementById('fzRitual') };
       });
+      check(stacked.open.length > 0, 'T5 gerbang terbuka untuk diuji',
+        'T5 tidak ada gerbang yang terbuka - invarian penumpukan dialog tidak teruji.');
       check(!(stacked.ritual && stacked.open.length),
-        'T5 kartu ritual tidak pernah terbit di belakang dialog lain',
-        'T5 kartu ritual terbit di belakang dialog yang sedang terbuka (' + stacked.open.join(',') +
+        'T5a kartu ritual tidak pernah terbit di belakang dialog lain',
+        'T5a kartu ritual terbit di belakang dialog yang sedang terbuka (' + stacked.open.join(',') +
         ') - fokusnya dicuri dan jatah "sekali sehari" hangus tanpa pernah terlihat.');
+
+      /* SISI KEDUA, dan alasan pemeriksaan ini ada. Versi pertama gerbang ini hanya
+         meng-assert "tidak menumpuk" - dan itu HIJAU untuk cabang yang menahan ritualnya
+         lalu tidak pernah menawarkannya lagi, yaitu keadaan yang LEBIH BURUK daripada
+         cacat aslinya. Menahan tanpa menawarkan ulang bukan perbaikan; ia kehilangan
+         rencana hari itu diam-diam. Jadi yang dijaga di sini adalah HASIL bagi murid:
+         begitu gerbang turun, rencananya benar-benar sampai. */
+      if (stacked.open.length) {
+        await page.evaluate(() => document.getElementById('notificationGateSkip')?.click());
+        let backAt = null;
+        for (let t = 0; t < 9000; t += 250) {
+          if (await page.evaluate(() => !!document.getElementById('fzRitual')).catch(() => false)) { backAt = t; break; }
+          await page.waitForTimeout(250);
+        }
+        check(backAt !== null,
+          'T5b ritual ditawarkan lagi setelah gerbang ditutup (rencana hari itu tidak hangus)',
+          'T5b setelah gerbang ditutup ritual TIDAK pernah muncul dalam 9 detik - ditahan tetapi tidak pernah ditawarkan ulang, jadi murid kehilangan rencana harinya sama sekali.');
+      }
       await ctx.close();
     }
 
