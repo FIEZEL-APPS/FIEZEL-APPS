@@ -92,8 +92,19 @@
       var kind = (opts && opts.kind) || '';
       var pose = kind === 'reading' ? 'reading' : kind === 'listening' ? 'listening' : 'curious';
       var poseKind = kind === 'reading';
-      /* Kartu soal kuis: peek di ponsel, above di tablet, kolom samping desktop. */
-      var anchor = (shortLandscape || w <= 640) ? 'peek' : w < 980 ? 'above' : 'side';
+      /* Kartu soal kuis: above di ponsel & tablet, kolom samping desktop.
+         2026-08-31 (OWNER: "mascotnya terlalu kecil, space di bawah masih terlalu
+         kosong"): ponsel tegak DULU memakai 'peek' - hanya puncak kepala yang muncul
+         dari balik tepi kartu, sengaja dipotong karena "cap paw adalah tanda, bukan
+         karakter". Keputusan itu masuk akal ketika kartu soal memenuhi layar; ia tidak
+         lagi masuk akal sekarang, karena di bawah kartu tersisa ~400px kosong dan yang
+         mengisi layar justru ketiadaan. 'above' memakai markup yang sama dan tidak
+         dipotong, jadi tokohnya utuh - dan ukurannya dinaikkan lewat CSS shell kuis.
+         shortLandscape TETAP tanpa maskot sama sekali (§2d): di sana tinggi layar
+         benar-benar langka dan tokoh setinggi apa pun akan memakan soal.
+         wire() menargetkan '.fz-paw-slot fiezel-mascot' tanpa peduli anchor, jadi
+         reaksi benar/salah tidak tersentuh perubahan ini. */
+      var anchor = shortLandscape ? 'peek' : w < 980 ? 'above' : 'side';
       return { anchor: anchor, pose: pose, poseKind: poseKind, size: sizeClamp(anchor, w, h) };
     }
     return null;
