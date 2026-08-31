@@ -3233,6 +3233,12 @@ function setNotificationGateState(status){
   const wasHidden=gate.classList.contains('hidden');
   if(!(wasHidden&&(status==='granted'||status==='declined'))){
     gate.classList.remove('hidden');(window.requestAnimationFrame||setTimeout)(()=>gate.classList.add('show'));
+    /* Audit UI/UX 2026-08-30 (D9): dialog wajib mengurung fokus. Terukur sebelum ini:
+       22 dari 26 perhentian Tab mendarat DI LUAR gerbang, pada kontrol yang tertutup
+       scrim .82 dan tidak bisa diklik. Resepnya kini sama untuk semua lapisan. */
+    if(wasHidden){gateReturnFocus=document.activeElement;
+      (window.requestAnimationFrame||setTimeout)(()=>{try{syncDialogContainment();$('notificationGateButton')?.focus?.({preventScroll:true})}catch(_){}})}
+    else try{syncDialogContainment()}catch(_){}
   }
   // Naskah di bawah ini adalah inti pembalikan m025-34. Tidak ada lagi "terkunci", "syarat
   // masuk", atau "belum bisa dibuka": setiap cabang - termasuk ditolak dan tidak didukung -
@@ -3250,7 +3256,27 @@ function setNotificationGateState(status){
   }
   refreshIcons();
 }
-function hideNotificationGate(){const gate=$('welcome');if(!gate)return;gate.classList.remove('show');setTimeout(()=>gate.classList.add('hidden'),300)}
+let gateReturnFocus=null;
+/* Fokus dikembalikan ke pemicu supaya pengguna keyboard tidak terdampar di <body> -
+   pola yang sama dengan closeModalNow(). syncDialogContainment() dipanggil SETELAH
+   kelas .hidden terpasang, karena ia membaca kelas itu untuk tahu apa yang masih terbuka. */
+function releaseGateFocus(){
+  try{syncDialogContainment()}catch(_){}
+  try{if(gateReturnFocus&&document.contains(gateReturnFocus)&&!gateReturnFocus.inert)gateReturnFocus.focus({preventScroll:true})}catch(_){}
+  gateReturnFocus=null;
+  /* SISI KEDUA dari penjaga di maybeShowDailyRitual(). Penjaga itu menolak menerbitkan
+     ritual di belakang gerbang dan sengaja keluar SEBELUM menandai ritualMeta, supaya
+     jatah "sekali sehari" tidak hangus. Tapi menahan saja tidak cukup: tanpa tawaran
+     ulang di sini, murid yang boot-nya melewati gerbang tidak akan melihat rencana
+     harinya SAMA SEKALI - lebih buruk daripada cacat aslinya, yang setidaknya masih
+     menampilkannya begitu gerbang turun. Diukur berdampingan dengan main saat menulis
+     ini: main "ritual kembali 0ms", cabang ini "TIDAK PERNAH" sebelum baris ini ada.
+     maybeShowDailyRitual() menjaga syaratnya sendiri (view home, belum ada kartu, tidak
+     ada dialog lain, jatah hari ini belum terpakai), jadi pemanggilan ini idempoten dan
+     aman dipanggil dari kedua gerbang. */
+  setTimeout(()=>{try{maybeShowDailyRitual()}catch(_){}},360);
+}
+function hideNotificationGate(){const gate=$('welcome');if(!gate)return;gate.classList.remove('show');setTimeout(()=>{gate.classList.add('hidden');releaseGateFocus()},300)}
 // m025-79: a second mandatory gate, Puter account sign-in, sits right after the
 // notification gate clears. It reuses the same lock/overlay pattern (a body class that
 // hides .app/.bottomnav, plus a full-screen panel) and aiErrorMessage() for failure copy,
@@ -3276,6 +3302,9 @@ function setAuthGateState(status,detail){
   const wasHidden=gate.classList.contains('hidden');
   if(!(wasHidden&&status==='signed_in')){
     gate.classList.remove('hidden');(window.requestAnimationFrame||setTimeout)(()=>gate.classList.add('show'));
+    if(wasHidden){gateReturnFocus=document.activeElement;
+      (window.requestAnimationFrame||setTimeout)(()=>{try{syncDialogContainment();$('authGateButton')?.focus?.({preventScroll:true})}catch(_){}})}
+    else try{syncDialogContainment()}catch(_){}
   }
   // Audit UX Bagian 3: status login adalah komponen sendiri (.auth-status), bukan alert
   // bawaan browser, dan naskahnya tidak menyapa nama murid.
@@ -3288,7 +3317,7 @@ function setAuthGateState(status,detail){
   else{stateText.textContent=FiezelI18n.t('auth.status-idle');stateText.className='auth-status';button.disabled=false;button.innerHTML=`<i data-lucide="user-round"></i><span>${FiezelI18n.t('auth.tombol-lanjutkan')}</span>`;if(skip)skip.disabled=false}
   refreshIcons()
 }
-function hideAuthGate(){const gate=$('authGate');if(!gate)return;gate.classList.remove('show');setTimeout(()=>gate.classList.add('hidden'),300)}
+function hideAuthGate(){const gate=$('authGate');if(!gate)return;gate.classList.remove('show');setTimeout(()=>{gate.classList.add('hidden');releaseGateFocus()},300)}
 async function completeAuthGate(){await activateAccountStateFromPuter();document.body?.classList?.remove?.('auth-locked');setAuthGateState('signed_in');setTimeout(hideAuthGate,220);showToast(FiezelI18n.t('auth.toast-tersambung'));armOfflineVoiceAutoload();runPendingAfterGateFn()}
 function runPendingAfterGateFn(){if(!pendingAfterGateFn)return;const fn=pendingAfterGateFn;pendingAfterGateFn=null;setTimeout(fn,240)/* v06: tunggu gerbang benar-benar turun sebelum kuis mendorong stage */}
 // m026-02 AKAR: gerbang akun dipasang di SETIAP boot tanpa memori apa pun, dan satu-satunya
@@ -5467,11 +5496,45 @@ ${skillHubMarkup()}
    menyambut dengan rasa bersalah. Kunjungan kedua di hari yang sama langsung Home biasa. */
 function dismissDailyRitual(){const el=document.getElementById('fzRitual');if(!el)return false;clearTimeout(el._fzAutoClose);el.classList.add('is-leaving');setTimeout(()=>{try{el.remove()}catch(_){}},280);return true}
 window.dismissDailyRitual=dismissDailyRitual;
+/* Audit UI/UX 2026-08-30 (D9/D5) - LAPISAN DIALOG PUNYA SATU DAFTAR.
+   Sebelum ini tiap lapisan menilai sendiri apakah ia boleh muncul, dan tidak satu pun
+   bertanya "apakah sudah ada dialog di layar?". Akibatnya terukur di harness render:
+   gerbang notifikasi (#welcome, z100, scrim .82) terbuka BERSAMAAN dengan kartu ritual
+   (#fzRitual, z95, scrim .28) - dua scrim bertumpuk, dan ritual memanggil focus() pada
+   tombol primernya sendiri sehingga fokus mendarat di kartu yang tertutup gerbang.
+   Urutannya dari z-index tertinggi ke terendah, jadi [0] selalu lapisan teratas. */
+const DIALOG_LAYER_IDS=['authGate','modal','welcome','fzRitual'];
+function openDialogLayers(){const out=[];for(const id of DIALOG_LAYER_IDS){const el=document.getElementById?.(id);if(el&&!el.classList.contains('hidden'))out.push(el)}return out}
+function topDialogLayer(){return openDialogLayers()[0]||null}
+/* Cangkang aplikasi dimatikan seluruhnya (topbar IKUT - ia tabbable dan sama-sama
+   tertutup scrim), bukan hanya #app seperti yang dilakukan openModal() sejak q17-S1. */
+function syncDialogContainment(){
+  const top=topDialogLayer();
+  const shell=document.querySelector?.('main.app'),nav=document.querySelector?.('.bottomnav,.nav-bar');
+  for(const el of [shell,nav]){
+    if(!el)continue;
+    const off=!!top;
+    try{if(off){el.setAttribute('aria-hidden','true');if('inert' in el)el.inert=true}
+        else{el.removeAttribute('aria-hidden');if('inert' in el)el.inert=false}}catch(_){}
+  }
+  /* Lapisan yang TIDAK teratas juga dimatikan: itulah yang dulu membiarkan Tab mendarat
+     di tombol kartu ritual di balik gerbang. */
+  for(const el of openDialogLayers()){
+    try{if(el!==top){el.setAttribute('aria-hidden','true');if('inert' in el)el.inert=true}
+        else{el.removeAttribute('aria-hidden');if('inert' in el)el.inert=false}}catch(_){}
+  }
+}
+window.syncDialogContainment=syncDialogContainment;
 function startFromRitual(){dismissDailyRitual();if(state.adaptiveReady)startAdaptive();else go('test');return true}
 window.startFromRitual=startFromRitual;
 function maybeShowDailyRitual(now=Date.now()){
   if(state.view!=='home')return false;
   if(document.getElementById('fzRitual'))return false;
+  /* Audit UI/UX 2026-08-30: ritual TIDAK boleh terbit di belakang gerbang yang sedang
+     terbuka. Penting: keluar SEBELUM state.ritualMeta ditandai - kalau ditandai lebih
+     dulu, kartu yang tak pernah terlihat tetap menghabiskan jatah "sekali sehari" dan
+     murid kehilangan rencana harinya. Ia akan ditawarkan lagi setelah gerbang turun. */
+  if(topDialogLayer())return false;
   const today=studyDayKey(now);
   const meta=state.ritualMeta&&typeof state.ritualMeta==='object'?state.ritualMeta:{lastDay:''};
   if(meta.lastDay===today)return false;
@@ -6215,6 +6278,28 @@ function wireClassroom(){
 // supaya user tidak belajar pola baru dari nol" - jadi yang ditambah pintunya, bukan mesin
 // kedua yang harus dirawat terpisah.
 const SKILLS_LAB_VIEWS=new Set(['skills','listening','speaking']);
+/* PANEL BANTUAN "?" (permintaan OWNER 2026-08-31).
+   Yang berdiri di sini dulu adalah kartu hero setinggi ~200px: badge "SKILL INTI TES",
+   judul "Listening", dua kalimat pengantar, dan baris "Level aktif: A1". Empat baris itu
+   memakan sepertiga layar pertama dan TIDAK satupun membantu murid menjawab soal - ia
+   mengulang apa yang baru saja ia pilih sendiri dari Home.
+   Isinya tidak dibuang, ia dilipat: satu tombol bundar "?" di pojok kanan atas membukanya
+   sebagai dialog. Yang dipakai adalah openModal() milik aplikasi, bukan panel baru, karena
+   openModal sudah mengurung fokus, punya trap Tab, dan mengembalikan fokus ke pemicunya -
+   membuat lapisan kedua berarti menulis ulang semua itu dan pasti melewatkan sebagiannya.
+   Naskahnya memakai kunci i18n yang SUDAH ADA (skills.lead-*, skills.catatan-level,
+   fsl.script-privacy), jadi cabang Thai ikut lengkap tanpa terjemahan baru. */
+function skillHelpMarkup(domain){
+  const copy=SKILL_PAGE_COPY[domain];if(!copy)return '';
+  return `<div class="skill-help-panel"><span class="skill-badge">${FiezelI18n.t('skills.badge')}</span>`
+    +`<h2>${esc(copy.title)}</h2>`
+    +`<p>${esc(copy.lead)}</p>`
+    +(domain==='listening'?`<p class="muted">${esc(FiezelI18n.t('fsl.script-privacy'))}</p>`:'')
+    +`<div class="skill-level-note">${FiezelI18n.t('skills.catatan-level',{level:esc(getActiveLevel())})}</div>`
+    +`<div class="modal-actions"><button type="button" class="primary wide" onclick="closeModal()">${FiezelI18n.t('modal.tutup')}</button></div></div>`;
+}
+function openSkillHelp(domain){const html=skillHelpMarkup(domain);if(html)openModal(html);return !!html}
+window.openSkillHelp=openSkillHelp;
 const SKILL_PAGE_COPY={
   listening:{title:'Listening',get lead(){return FiezelI18n.t('skills.lead-listening')}},
   speaking:{title:'Speaking',get lead(){return FiezelI18n.t('skills.lead-speaking')}}
@@ -6259,7 +6344,7 @@ function gemsHook(){
     }
   };
 }
-async function skillsLab(domain){const token=speakingListeningMountToken;const copy=SKILL_PAGE_COPY[domain];const head=copy?`<div class="skill-page-hero skill-${esc(domain)}"><span class="skill-badge">${FiezelI18n.t('skills.badge')}</span><h1>${esc(copy.title)}</h1><p>${esc(copy.lead)}</p><div class="skill-level-note">${FiezelI18n.t('skills.catatan-level',{level:esc(getActiveLevel())})}</div></div>`:`<div class="section-head"><div><h1>Skills Lab</h1><p>${FiezelI18n.t('skills.lead-hub')}</p></div>${levelControlMarkup()}</div>`;setApp(`<section class="fade skills-page">${head}<div id="speakingListeningRoot"><div class="card skills-loading">${FiezelI18n.t('skills.memuat')}</div></div></section>`);enhanceUI();await ensureVoiceRuntime();try{if(!self.FiezelSLAddon)throw new Error(FiezelI18n.t('skills.runtime-hilang'));const tts={play:(text,options={})=>self.FiezelVoiceSay?.say?.(text,{speed:options.speed??selectedNeuralRate(),suppressSubtitles:!!options.suppressSubtitles})||Promise.reject(new Error('tts_unavailable')),/* V6: adaptor ini hanya meneruskan (voice-v5-prefetch.md §3 baris 10); keputusan APA yang dihangatkan - dan larangan menghangatkan item ujian - tetap milik addon. */prefetch:(text,options={})=>prefetchNextVoice(text,{speed:options.speed??selectedNeuralRate()}),stop:()=>{cancelVoicePrefetch();self.FiezelVoiceSay?.stop?.()}};const controller=await self.FiezelSLAddon.create({root:$('speakingListeningRoot'),baseUrl:'./features/speaking-listening/',config:self.FIEZEL_SPEAKING_LISTENING_CONFIG,getActiveLevel,activeLevel:getActiveLevel(),tts,/* m026-02: satu-satunya titik pemberitahuan Puter boleh muncul - sesi dengar sudah bubar (renderComplete/exit di addon). */onSessionEnd:()=>{try{maybePresentPuterCreditNotice()}catch{}},/* R2-4: ekspresi maskot dalam sesi Skills Lab — lewat pawReact host supaya gerbang reduced-motion/preferensi animasinya SATU. */onAnswerFeedback:ok=>{try{pawReact(ok?'correct':'wrong')}catch(_){}},/* Fase 3 (C5 butir 5): kait kebijakan speaking adaptif untuk addon - addon yang memutuskan kapan memakainya; kunci asing diabaikan addon lama, jadi ini aman untuk versi mana pun. */speakingAdaptive:speakingAdaptiveAvailable()?{evidence:speakingAdaptiveEvidence,policy:speakingAdaptivePolicy}:null,gems:gemsHook()});if(token!==speakingListeningMountToken||!SKILLS_LAB_VIEWS.has(state.view)){controller.destroy();return}speakingListeningController=controller;/* m026-03: kait tur listening. Addon-nya TIDAK diubah - renderListening dibungkus dari luar, pola yang sama dengan hook lain milik host. Tur diberi tahu setelah kartu soal tercat. */try{const baseRenderListening=controller.renderListening?.bind(controller);if(baseRenderListening)controller.renderListening=(...args)=>{const out=baseRenderListening(...args);notifyFeatureTour('listening');return out}}catch(_){}controller.mount($('speakingListeningRoot'));if(SKILL_PAGE_COPY[domain]){try{controller.open(domain)}catch(_){}}/* m026-01: hanya Listening yang memicu state dengar; Speaking dan lainnya cukup penasaran. */pawReact(domain==='listening'?'listening-start':'question-shown');enhanceUI()}catch(error){const root=$('speakingListeningRoot');if(root)root.innerHTML=`<div class="card"><b>${FiezelI18n.t('skills.gagal-muat')}</b><p class="muted">${esc(error?.message||error)}</p></div>`;/* [ADAPTASI] OA-7 §4: error_system hanya untuk kegagalan sistem, bukan jawaban salah. */uiSfx('error_system')}}// m025-115 - Writing: satu-satunya dari empat skill inti tes yang belum punya mesin sama
+async function skillsLab(domain){const token=speakingListeningMountToken;const copy=SKILL_PAGE_COPY[domain];const head=copy?`<div class="skill-page-topbar"><button type="button" class="skill-help-dot" onclick="openSkillHelp('${esc(domain)}')" aria-label="${esc(FiezelI18n.t('skills.bantuan'))}" title="${esc(FiezelI18n.t('skills.bantuan'))}"><span aria-hidden="true">?</span></button></div>`:`<div class="section-head"><div><h1>Skills Lab</h1><p>${FiezelI18n.t('skills.lead-hub')}</p></div>${levelControlMarkup()}</div>`;setApp(`<section class="fade skills-page">${head}<div id="speakingListeningRoot"><div class="card skills-loading">${FiezelI18n.t('skills.memuat')}</div></div></section>`);enhanceUI();await ensureVoiceRuntime();try{if(!self.FiezelSLAddon)throw new Error(FiezelI18n.t('skills.runtime-hilang'));const tts={play:(text,options={})=>self.FiezelVoiceSay?.say?.(text,{speed:options.speed??selectedNeuralRate(),suppressSubtitles:!!options.suppressSubtitles})||Promise.reject(new Error('tts_unavailable')),/* V6: adaptor ini hanya meneruskan (voice-v5-prefetch.md §3 baris 10); keputusan APA yang dihangatkan - dan larangan menghangatkan item ujian - tetap milik addon. */prefetch:(text,options={})=>prefetchNextVoice(text,{speed:options.speed??selectedNeuralRate()}),stop:()=>{cancelVoicePrefetch();self.FiezelVoiceSay?.stop?.()}};const controller=await self.FiezelSLAddon.create({root:$('speakingListeningRoot'),baseUrl:'./features/speaking-listening/',config:self.FIEZEL_SPEAKING_LISTENING_CONFIG,getActiveLevel,activeLevel:getActiveLevel(),tts,/* m026-02: satu-satunya titik pemberitahuan Puter boleh muncul - sesi dengar sudah bubar (renderComplete/exit di addon). */onSessionEnd:()=>{try{maybePresentPuterCreditNotice()}catch{}},/* R2-4: ekspresi maskot dalam sesi Skills Lab — lewat pawReact host supaya gerbang reduced-motion/preferensi animasinya SATU. */onAnswerFeedback:ok=>{try{pawReact(ok?'correct':'wrong')}catch(_){}},/* Fase 3 (C5 butir 5): kait kebijakan speaking adaptif untuk addon - addon yang memutuskan kapan memakainya; kunci asing diabaikan addon lama, jadi ini aman untuk versi mana pun. */speakingAdaptive:speakingAdaptiveAvailable()?{evidence:speakingAdaptiveEvidence,policy:speakingAdaptivePolicy}:null,gems:gemsHook()});if(token!==speakingListeningMountToken||!SKILLS_LAB_VIEWS.has(state.view)){controller.destroy();return}speakingListeningController=controller;/* m026-03: kait tur listening. Addon-nya TIDAK diubah - renderListening dibungkus dari luar, pola yang sama dengan hook lain milik host. Tur diberi tahu setelah kartu soal tercat. */try{const baseRenderListening=controller.renderListening?.bind(controller);if(baseRenderListening)controller.renderListening=(...args)=>{const out=baseRenderListening(...args);notifyFeatureTour('listening');return out}}catch(_){}controller.mount($('speakingListeningRoot'));if(SKILL_PAGE_COPY[domain]){try{controller.open(domain)}catch(_){}}/* m026-01: hanya Listening yang memicu state dengar; Speaking dan lainnya cukup penasaran. */pawReact(domain==='listening'?'listening-start':'question-shown');enhanceUI()}catch(error){const root=$('speakingListeningRoot');if(root)root.innerHTML=`<div class="card"><b>${FiezelI18n.t('skills.gagal-muat')}</b><p class="muted">${esc(error?.message||error)}</p></div>`;/* [ADAPTASI] OA-7 §4: error_system hanya untuk kegagalan sistem, bukan jawaban salah. */uiSfx('error_system')}}// m025-115 - Writing: satu-satunya dari empat skill inti tes yang belum punya mesin sama
 // sekali. Yang dibangun di sini sengaja yang paling kecil tapi utuh: satu topik sesuai
 // level, satu kotak tulis, satu masukan yang bisa dipakai. Bukan editor esai.
 //
@@ -9213,7 +9298,7 @@ function resetProgress(){openModal(`<div class="modal-mark">FIEZEL</div><h2>${Fi
   state=loadState();if(activeAccountUuid)state.ownerUuid=activeAccountUuid;coreBrainCache=null;save();closeModal();go('home');showToast(FiezelI18n.t('settings.progres-akun-berhasil-direset'))}}
 document.addEventListener?.('keydown',e=>{if(e.key==='Escape'&&!$('modal')?.classList.contains('hidden'))closeModal()});
 /* q17-S1 2026-08-29: trap Tab di dalam dialog \u2014 latar tidak boleh bisa dijelajah selama modal terbuka (aria-modal jujur). Siklus manual first<->last, tanpa inert supaya kompatibel luas. */
-document.addEventListener?.('keydown',function modalTrapKeydown(e){if(e.key==='Enter'&&e.target?.type==='checkbox'){const m=$('modal');if(m&&!m.classList.contains('hidden')&&m.contains(e.target)){e.preventDefault();e.target.click()}return}/* v31-3 2026-08-29: sakelar setelan bisa dioperasikan Enter, setara Space */if(e.key!=='Tab')return;const modal=$('modal');if(!modal||modal.classList.contains('hidden'))return;const focusables=Array.from(modal.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])')).filter(el=>el.offsetParent!==null&&!el.disabled);if(!focusables.length)return;const first=focusables[0],last=focusables[focusables.length-1];if(!modal.contains(document.activeElement)){e.preventDefault();first.focus();return}if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}});
+document.addEventListener?.('keydown',function modalTrapKeydown(e){if(e.key==='Enter'&&e.target?.type==='checkbox'){const m=$('modal');if(m&&!m.classList.contains('hidden')&&m.contains(e.target)){e.preventDefault();e.target.click()}return}/* v31-3 2026-08-29: sakelar setelan bisa dioperasikan Enter, setara Space */if(e.key!=='Tab')return;/* Audit UI/UX 2026-08-30 (D9): trap dulu hanya mengenal #modal, sehingga gerbang notifikasi dan gerbang akun - dua dialog PERTAMA yang dilihat murid baru - membiarkan Tab berjalan ke topbar, Home, dan bottom-nav di balik scrim. Sekarang ia mengunci lapisan TERATAS mana pun yang sedang terbuka. */const modal=(typeof topDialogLayer==='function'?topDialogLayer():null)||$('modal');if(!modal||modal.classList.contains('hidden'))return;const focusables=Array.from(modal.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])')).filter(el=>el.offsetParent!==null&&!el.disabled);if(!focusables.length)return;const first=focusables[0],last=focusables[focusables.length-1];if(!modal.contains(document.activeElement)){e.preventDefault();first.focus();return}if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}});
 let reportGestureRetryAt=0;
 document.addEventListener?.('click',e=>{const el=e.target?.closest?.('button,a,[role="button"]');if(!el||el.disabled)return;if(!el.classList?.contains?.('option'))haptic(el.classList?.contains?.('nav')?'navigate':el.classList?.contains?.('primary')?'confirm':'tap');if(state.reportMeta?.queue?.length&&Date.now()-reportGestureRetryAt>5000){reportGestureRetryAt=Date.now();flushReportQueue()}},{capture:true});
 document.addEventListener?.('pointerdown',()=>{try{self.FiezelUiSfx?.unlock?.(self)}catch{}},{once:true,passive:true});

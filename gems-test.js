@@ -417,7 +417,16 @@ test('G7 terjemahan hanya dirender dari blok feedback pasca-jawab', () => {
     'renderTranslationLine tidak dipanggil dari finishItem');
   assert.ok(/data-translation hidden><\/div>/.test(addonSource),
     'wadah [data-translation] tidak hidup di dalam markup feedback');
-  const playHandler = (addonSource.match(/\[data-play\]'\)\.addEventListener\([\s\S]*?finally\{button\.disabled=false\}\}\)/) || [''])[0];
+  /* 2026-08-31: jangkar akhir handler dibuat TOLERAN terhadap isi blok finally.
+     Sebelumnya ia menuntut literal `finally{button.disabled=false}})`, jadi setiap
+     penambahan sah di blok itu memutus tangkapan dan membuat pemeriksaan ini gagal dengan
+     pesan "penangan tidak ditemukan" - sebab yang tidak ada hubungannya dengan apa yang
+     sebenarnya dijaga. Pemicunya: pelepasan kelas .is-playing equalizer harus duduk di
+     finally supaya batangnya tidak tertinggal menyala saat pemutaran gagal.
+     Yang dijaga TIDAK berubah dan tidak berkurang: seluruh badan penangan [data-play]
+     tetap ditangkap utuh, dan larangannya tetap sama - ia tidak boleh menyentuh
+     terjemahan. Yang dilonggarkan hanya bentuk kurung penutupnya, bukan cakupannya. */
+  const playHandler = (addonSource.match(/\[data-play\]'\)\.addEventListener\([\s\S]*?finally\{[^}]*\}\}\)/) || [''])[0];
   assert.ok(playHandler, 'penangan tombol Dengarkan tidak ditemukan');
   assert.ok(!/renderTranslationLine|translationOn/.test(playHandler),
     'penangan pemutar audio menyentuh terjemahan — pelanggaran m025-148');
@@ -428,8 +437,20 @@ test('G7 terjemahan hanya dirender dari blok feedback pasca-jawab', () => {
 test('G8 id kontrak bersama #fslTranslateToggle dan chip saldo ada di header sesi', () => {
   assert.ok(addonSource.includes('id="fslTranslateToggle"'), 'id kontrak #fslTranslateToggle hilang');
   assert.ok(addonSource.includes('id="fslGemChip"'), 'chip saldo #fslGemChip hilang');
-  assert.ok(/<span class="fsl-kicker">Listening[^\n]*?\$\{this\.gemBarMarkup\(\)\}/.test(addonSource),
-    'baris gem tidak duduk di header kartu sesi listening');
+  /* 2026-08-31: jangkar pemeriksaan ini DIPINDAH, bukan dilonggarkan. Sebelumnya ia
+     mencari literal `<span class="fsl-kicker">Listening` pada baris yang sama dengan
+     gemBarMarkup(). Kicker itu kini dihapus atas permintaan OWNER (ia mengulang pilihan
+     yang baru saja dibuat murid dan membocorkan nama mode internal "inference"), jadi
+     jangkar lama menguji sesuatu yang memang sudah tidak ada.
+     Yang DIJAGA tetap sama persis dan tidak berkurang: baris gem harus berada di dalam
+     kartu sesi listening yang sama - bukan mengambang di layar lain, dan bukan berdiri
+     di antara soal dan pemutar. Jangkarnya sekarang kelas kartunya sendiri
+     (`fsl-card-listening`), yang justru lebih stabil daripada teks kicker: ia tidak ikut
+     berubah setiap kali naskahnya diperbarui. */
+  assert.ok(/<article class="fsl-card fsl-card-listening">[^\n]*?\$\{this\.gemBarMarkup\(\)\}/.test(addonSource),
+    'baris gem tidak duduk di dalam kartu sesi listening');
+  assert.ok(!/<span class="fsl-kicker">Listening ·/.test(addonSource),
+    'kicker "Listening · level · mode" kembali muncul di kartu sesi (dihapus 2026-08-31)');
   assert.ok(/aria-pressed="\$\{String\(on\)\}"/.test(addonSource), 'toggle tanpa aria-pressed');
 });
 test('G8 teks keadaan habis mengajak belajar dan menolak menjual', () => {

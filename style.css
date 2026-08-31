@@ -278,7 +278,23 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 /* Segmented control, bukan deretan tombol lepas: kapsulnya SATU bidang --panel-soft
    dan tab-nya kehilangan garisnya sendiri, jadi yang terbaca adalah satu kontrol
    dengan satu bagian terpilih. Tab aktif = bidang tinta (resep components.css §6). */
-.progress-tabs{display:flex;gap:6px;overflow-x:auto;margin:14px 0 18px;padding:4px;background:var(--panel-soft);border-radius:var(--radius-pill);-webkit-overflow-scrolling:touch}
+/* Audit UI/UX 2026-08-30 - SETENGAH PETA BELAJAR TIDAK PERNAH DITEMUKAN.
+   Strip ini overflow-x:auto sejak m025-85, tetapi tidak pernah MENGATAKAN bahwa ia bisa
+   digeser. Terukur di 320px: lebar isi 482px dalam kotak 294px - hanya 2 dari 4 tab yang
+   terlihat ("Ringkasan", "Analisis"), 188px tersembunyi tanpa satu pun petunjuk, jadi
+   "Adaptive Engine" dan "Kesiapan & Skills" praktis tidak ada bagi murid di ponsel kecil.
+   Obatnya bayangan-gulir CSS murni (background-attachment: local vs scroll): dua lapis
+   penutup sewarna kapsul di kedua tepi, dua lapis bayangan di belakangnya. Bayangan hanya
+   MUNCUL kalau memang ada yang tersembunyi di sisi itu, dan menghilang sendiri begitu tepi
+   tercapai - tanpa JS, tanpa listener scroll, dan tanpa memakan ruang saat keempat tab muat. */
+.progress-tabs{display:flex;gap:6px;overflow-x:auto;margin:14px 0 18px;padding:4px;background-color:var(--panel-soft);border-radius:var(--radius-pill);-webkit-overflow-scrolling:touch;
+  background-image:linear-gradient(to right,var(--panel-soft),var(--panel-soft)),linear-gradient(to left,var(--panel-soft),var(--panel-soft)),linear-gradient(to right,rgba(36,26,17,.22),rgba(36,26,17,0)),linear-gradient(to left,rgba(36,26,17,.22),rgba(36,26,17,0));
+  background-position:left center,right center,left center,right center;
+  background-repeat:no-repeat;
+  background-size:26px 100%,26px 100%,15px 100%,15px 100%;
+  background-attachment:local,local,scroll,scroll;
+  scroll-snap-type:x proximity}
+.progress-tabs .progress-tab{scroll-snap-align:center}
 .progress-tab{flex:0 0 auto;padding:9px 16px;border-radius:var(--radius-pill);border:0;background:transparent;color:var(--muted);font-size:.82rem;font-weight:600;min-height:44px;white-space:nowrap}
 .progress-tab.active{background:var(--text);border-color:var(--text);color:var(--on-core)}
 
@@ -2417,12 +2433,12 @@ button.primary:active,.primary.luxe:active,html.fiezel-ui-v6 body .primary:activ
 /* i10 2026-08-28 (O5 §2): + :not(.option) — empat tombol jawaban berbayang tebal membuat
    layar soal terasa seperti empat kartu bersaing dengan soalnya; pilihan kembali ke resep
    dasar .option yang tenang (garis --line, tanpa bayangan lantai). */
-html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.text-button):not(.coach-link):not(.fz-coach-bubble):not(.launch-card):not(.skill-card):not(.option){
+html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.text-button):not(.coach-link):not(.fz-coach-bubble):not(.launch-card):not(.skill-card):not(.option):not(.skill-help-dot){
   border:1.5px solid var(--surface-edge);border-radius:var(--radius-md);
   box-shadow:var(--lift-edge);
   transition:transform var(--dur-xs) var(--ease),box-shadow var(--dur-xs) var(--ease);
 }
-html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.text-button):not(.coach-link):not(.fz-coach-bubble):not(.launch-card):not(.skill-card):not(.option):active{
+html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.text-button):not(.coach-link):not(.fz-coach-bubble):not(.launch-card):not(.skill-card):not(.option):not(.skill-help-dot):active{
   transform:translateY(2px);box-shadow:var(--lift-edge-press)}
 
 /* --------------------------------------------------------------------------
@@ -2644,6 +2660,42 @@ body.reduce-motion .fz-coach-bubble .fz-coach-pulse,body.reduce-motion .fz-confe
    9. Halaman skill baru (Listening, Speaking, Writing) memakai pola yang sama
    dengan Reading/Grammar supaya tidak ada pola baru yang harus dipelajari.
    -------------------------------------------------------------------------- */
+/* Baris atas halaman skill (permintaan OWNER 2026-08-31). Menggantikan kartu hero
+   ~200px yang isinya pindah ke dialog "?" (app.js openSkillHelp). Barisnya hanya
+   setinggi tombolnya, jadi kartu soal naik hampir satu layar penuh di ponsel.
+   Tombolnya 44px penuh - lantai sasaran sentuh, bukan "kecil" secara harfiah; yang
+   diminta kecil adalah kehadiran VISUALnya, dan itu dicapai lewat warna tenang dan
+   lingkaran ramping, bukan dengan mengecilkan kotak sentuhnya di bawah lantai. */
+/* Sticky, bukan statis. Selama sesi Skills Lab topbar aplikasi DISEMBUNYIKAN
+   (setSessionStage), jadi tombol ini adalah satu-satunya jalan ke keterangan latihan -
+   dan kalau ia ikut tergulir, ia hilang tepat saat murid menggulir daftar pilihan
+   jawaban. Terukur di preview: y=-16px setelah gulir kecil, tepiannya terpotong.
+   top:6px menyamai --sp yang dipakai topbar v6 di lebar ponsel (tutor-v3.css:94). */
+.skill-page-topbar{display:flex;justify-content:flex-end;margin:0 0 4px;position:sticky;top:6px;z-index:34}
+.skill-help-dot{
+  width:44px;height:44px;min-height:44px;padding:0;
+  display:grid;place-items:center;
+  border-radius:50%;border:1px solid var(--line);
+  background:var(--panel-soft);color:var(--ink);
+  font-size:1.05rem;font-weight:800;line-height:1;
+  box-shadow:none;
+}
+.skill-help-dot:hover{background:var(--sun-soft);transform:none}
+/* DUA aturan menimpa bentuk tombol ini, dan keduanya harus dijawab - preview mencatnya
+   dulu 16px, lalu 13px setelah yang pertama diatasi:
+     1. style.css:2436 `html.fiezel-ui-v6 body button:not(...)` (0,4,3) -> radius-md 16px.
+        Dijawab dengan MENAMBAHKAN .skill-help-dot ke rantai :not()-nya, mengikuti konvensi
+        yang sudah dipakai .primary/.nav/.icon-button di repo ini.
+     2. tutor-v3.css:33 `html.fiezel-ui-v6 button` (0,1,1) -> 13px, dan berkas itu dimuat
+        SESUDAH style.css. Dijawab dengan menyamai bentuk pemilihnya di bawah ini (0,2,1).
+   Keduanya lewat spesifisitas, bukan !important: !important juga akan mengalahkan tema
+   yang memang berhak menimpa nanti. */
+html.fiezel-ui-v6 .skill-help-dot{border-radius:50%}
+/* Isi dialog bantuan: naskah yang dulu berdiri sebagai hero. */
+.skill-help-panel h2{margin:.35rem 0 .5rem;font-size:1.35rem;letter-spacing:-.02em}
+.skill-help-panel p{margin:0 0 .6rem;font-size:.92rem;line-height:1.6}
+.skill-help-panel .skill-level-note{margin-top:12px}
+.skill-help-panel .modal-actions{margin-top:18px}
 .skill-page-hero{
   display:grid;gap:8px;padding:18px;border-radius:var(--radius-lg);margin-bottom:14px;
   border:1.5px solid var(--skill-line,var(--surface-edge));background:var(--skill-bg,var(--panel-soft));color:var(--ink)}
@@ -3926,8 +3978,12 @@ body.fz-lesson-mode .topline{position:sticky;top:0;z-index:30;
 /* Audit 04-003: tautan ini setinggi 24px - 45% di bawah sasaran sentuh 44px - dan
    berulang 16x per jalur. Perpanjangan hit-area transparan menaikkan kotak sentuh
    efektifnya ke 44px tanpa membesarkan tampilannya; ruang di atas (label) dan di bawah
-   (padding 22px .path-step) tidak berisi target lain. */
-.lesson-skip-link::before{content:'';position:absolute;left:0;right:0;top:-10px;bottom:-10px}
+   (padding 22px .path-step) tidak berisi target lain.
+   Audit UI/UX 2026-08-30: -10px ternyata MASIH kurang. Kotaknya 23,x px (bukan 24 bulat),
+   jadi 23,x + 20 = 41px terukur lewat elementFromPoint - tiga piksel di bawah lantai, dan
+   angka itu yang dirasakan jempol, bukan angka di komentar. Dinaikkan ke 12px per sisi
+   (=48px) supaya lantainya dilewati dengan margin, bukan dipepet. */
+.lesson-skip-link::before{content:'';position:absolute;left:0;right:0;top:-12px;bottom:-12px}
 .lesson-skip-link svg{width:12px;height:12px}
 .lesson-skip-link:hover{background:var(--sun-soft);color:var(--text);transform:none;box-shadow:none}
 /* Node terkunci: tombol node-nya disabled, tetapi tautan lewati TIDAK ikut redup -
