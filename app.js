@@ -1891,11 +1891,42 @@ function withSpokenSkills(model,now){
 }
 function remoteLearnerEvidenceSnapshot(now=Date.now()){const e=buildLearnerEvidenceModel(now);return{schema:e.schema,generatedAt:e.generatedAt,behavior:{activeDays14:e.behavior.activeDays14,consistency14d:e.behavior.consistency14d,streakDays:e.behavior.streakDays,todayAttempts:e.behavior.todayAttempts,abandonmentRate:e.behavior.abandonmentRate,medianResponseMs:e.behavior.medianResponseMs,preferredStudyWindow:e.behavior.preferredStudyWindow},confidence:{evidence:e.confidence.evidence,gap:e.confidence.gap},memory:{dueReviews:e.memory.dueReviews,maxForgettingRisk:e.memory.maxForgettingRisk,highRiskCount:e.memory.highRiskCount},skills:{measured:e.skills.measured,recurringErrorSkills:e.skills.recurringErrorSkills,weakest:e.skills.weakest.slice(0,3).map(x=>({skill:x.skill,type:x.type,attempts:x.attempts,accuracy:x.accuracy,errorRate:x.errorRate,recurringErrors:x.recurringErrors})),...(e.skills.speakingAdaptive?{speakingAdaptive:e.skills.speakingAdaptive}:{})},privacy:e.privacy}}
 function policyOutcomeSessionRows(session){const start=Date.parse(session?.startedAt||'')||0,end=Date.parse(session?.at||'')||Date.now(),active=sessionLevel(session);return(state.history||[]).filter(h=>Number(h?.at||0)>=start&&Number(h?.at||0)<=end&&historyMatchesActive(h,active))}
+/* ---- Langkah 2 roadmap otonomi: nasib kebijakan diputus INTERVAL, bukan ambang --------
+ *
+ * evaluatePolicyOutcome dulu memutus 'positive'/'negative' dari skor komposit bobot-tangan
+ * (0,30·completion + 0,35·accuracy + 0,15·adherence + 0,10·kalibrasi + 0,10·improvement)
+ * dengan ambang score<45 / score>=72. Bobot itu tidak pernah divalidasi dan ambangnya tidak
+ * membawa ketidakpastian — kelas cacat yang SAMA dengan gerbang promosi 8-attempt yang
+ * dibuktikan council lempar-koin lewat 200.000 trial Monte Carlo.
+ *
+ * Skornya TETAP dihitung dan tetap dilaporkan: ia deskripsi yang berguna. Yang dicabut
+ * hanyalah statusnya sebagai PEMUTUS.
+ *
+ * Lengan kontrol = jawaban pada sasaran yang sama di outcome-outcome sebelumnya; lengan
+ * kandidat = sesi yang baru selesai. Saat bukti belum cukup membedakan sinyal dari derau,
+ * verdict mengembalikan 'hold' dan status jatuh ke 'insufficient' — "belum tahu", yang memang
+ * jawaban jujurnya. deriveAdaptivePolicy sudah lama memperlakukan status itu sebagai
+ * "kumpulkan bukti lagi" alih-alih mengubah kebijakan, jadi diamnya verdict berarti
+ * kebijakan lama dipertahankan utuh. */
+function policyVerdictAvailable(){return !!(self.FiezelPolicyVerdict&&typeof self.FiezelPolicyVerdict.verdict==='function')}
+/** Lengan kontrol: akumulasi attempt+benar pada sasaran yang sama dari riwayat outcome. */
+function policyControlArm(target,domain){
+  const rows=(state.policyOutcomeMeta?.history||[]).filter(o=>o&&Number(o.targetAttempts)>0&&
+    (target?String(o.targetSkill||'')===String(target):String(o.primaryDomain||'')===String(domain||'')));
+  let n=0,ok=0;
+  for(const o of rows){
+    const a=Math.max(0,Number(o.targetAttempts)||0);
+    const acc=Number(o.targetAccuracy);
+    if(!a||!Number.isFinite(acc))continue;
+    n+=a;ok+=Math.round(a*Math.max(0,Math.min(100,acc))/100);
+  }
+  return n>0?{n,ok}:null;
+}
 function evaluatePolicyOutcome(session,now=Date.now()){
   if(!session?.policyId)return null;const rows=policyOutcomeSessionRows(session),planned=Math.max(1,Number(session.planned||session.total||1)),answered=Math.max(0,Number(session.answered??rows.length)),completionRate=Math.round(Math.min(1,answered/planned)*100),accuracy=session.accuracy==null?(rows.length?Math.round(rows.filter(x=>x.ok).length/rows.length*100):null):Math.max(0,Math.min(100,Number(session.accuracy)||0)),target=String(session.targetSkill||''),domain=normalizePolicyDomain(session.primaryDomain)||normalizePolicyDomain(rows[0]?.type),targetRows=target?rows.filter(h=>String(h.skill||'')===target||String(h.target||'')===target):rows.filter(h=>normalizePolicyDomain(h.type)===domain),targetAccuracy=targetRows.length?Math.round(targetRows.filter(x=>x.ok).length/targetRows.length*100):null,targetAdherence=rows.length?Math.round(targetRows.length/rows.length*100):0,masteryAfter=policyTargetMastery({primaryDomain:domain,targetSkill:target}),masteryBefore=session.baselineTargetMastery==null?null:Number(session.baselineTargetMastery),masteryDelta=masteryAfter==null||masteryBefore==null?null:Math.round((masteryAfter-masteryBefore)*10)/10,baselineAccuracy=session.baselineTargetAccuracy==null?null:Number(session.baselineTargetAccuracy),accuracyDelta=targetAccuracy==null||baselineAccuracy==null?null:targetAccuracy-baselineAccuracy;
   const confRows=rows.filter(x=>[1,2,3].includes(Number(x.confidence))),expected=confRows.length?confRows.reduce((n,x)=>n+Number(x.confidence)/3,0)/confRows.length:null,actual=confRows.length?confRows.filter(x=>x.ok).length/confRows.length:null,confidenceGap=expected==null?null:Math.round(Math.abs(expected-actual)*100),medianResponseMs=medianNumber(rows.map(x=>x.ms));
-  const improvement=masteryDelta!=null?Math.max(0,Math.min(100,50+masteryDelta*8)):accuracyDelta!=null?Math.max(0,Math.min(100,50+accuracyDelta*2)):50,calibration=confidenceGap==null?50:100-confidenceGap,score=Math.round(completionRate*.30+(accuracy??0)*.35+targetAdherence*.15+calibration*.10+improvement*.10);let status='mixed',recommendation='adjust';if(answered<Math.min(3,planned)||completionRate<40)status='insufficient',recommendation='collect_more_evidence';else if(session.abandoned||score<45)status='negative',recommendation='reduce_load';else if(score>=72&&completionRate>=80)status='positive',recommendation='keep_or_progress';
-  return{schema:POLICY_OUTCOME_SCHEMA,outcomeId:`${String(session.id||session.policyId)}-${Math.floor(now/1000)}`.slice(0,160),sessionId:String(session.id||'').slice(0,120),policyId:String(session.policyId||'').slice(0,120),evaluatedAt:new Date(now).toISOString(),policyMode:String(session.policyMode||'').slice(0,30),targetSkill:target.slice(0,80),primaryDomain:domain,completed:!!session.completed,abandoned:!!session.abandoned,planned,answered,completionRate,accuracy,targetAttempts:targetRows.length,targetAccuracy,targetAdherence,medianResponseMs,confidenceGap,masteryBefore,masteryAfter,masteryDelta,baselineTargetAccuracy:baselineAccuracy,accuracyDelta,score:Math.max(0,Math.min(100,score)),status,recommendation,privacy:{rawAnswersIncluded:false,rawHistoryIncluded:false}}
+  const improvement=masteryDelta!=null?Math.max(0,Math.min(100,50+masteryDelta*8)):accuracyDelta!=null?Math.max(0,Math.min(100,50+accuracyDelta*2)):50,calibration=confidenceGap==null?50:100-confidenceGap,score=Math.round(completionRate*.30+(accuracy??0)*.35+targetAdherence*.15+calibration*.10+improvement*.10);let status='mixed',recommendation='adjust',verdict=null;if(answered<Math.min(3,planned)||completionRate<40)status='insufficient',recommendation='collect_more_evidence';else if(session.abandoned)status='negative',recommendation='reduce_load';else{const kandidat=targetRows.length&&targetAccuracy!=null?{n:targetRows.length,ok:Math.round(targetRows.length*targetAccuracy/100)}:null;const kontrol=policyControlArm(target,domain);if(policyVerdictAvailable()&&kandidat&&kontrol){try{verdict=self.FiezelPolicyVerdict.verdict({control:kontrol,candidate:kandidat})}catch{verdict=null}}if(verdict&&verdict.decision==='promote')status='positive',recommendation='keep_or_progress';else if(verdict&&verdict.decision==='reject')status='negative',recommendation='reduce_load';else status='insufficient',recommendation='collect_more_evidence';}
+  return{schema:POLICY_OUTCOME_SCHEMA,outcomeId:`${String(session.id||session.policyId)}-${Math.floor(now/1000)}`.slice(0,160),sessionId:String(session.id||'').slice(0,120),policyId:String(session.policyId||'').slice(0,120),evaluatedAt:new Date(now).toISOString(),policyMode:String(session.policyMode||'').slice(0,30),targetSkill:target.slice(0,80),primaryDomain:domain,completed:!!session.completed,abandoned:!!session.abandoned,planned,answered,completionRate,accuracy,targetAttempts:targetRows.length,targetAccuracy,targetAdherence,medianResponseMs,confidenceGap,masteryBefore,masteryAfter,masteryDelta,baselineTargetAccuracy:baselineAccuracy,accuracyDelta,score:Math.max(0,Math.min(100,score)),status,recommendation,...(verdict?{verdict:{decision:verdict.decision,rationale:verdict.rationale,basis:verdict.basis,confidence:verdict.confidence,diff:verdict.diff??null,ci:verdict.ci||null,n:verdict.n||null}}:{}),privacy:{rawAnswersIncluded:false,rawHistoryIncluded:false}}
 }
 function sanitizePolicyOutcome(raw){if(!raw||raw.schema!==POLICY_OUTCOME_SCHEMA)return null;const statuses=new Set(['positive','mixed','negative','insufficient']),recs=new Set(['keep_or_progress','adjust','reduce_load','collect_more_evidence']);if(!statuses.has(raw.status)||!recs.has(raw.recommendation))return null;const clamp=(v,min,max)=>Math.max(min,Math.min(max,Number(v)||0));return{schema:POLICY_OUTCOME_SCHEMA,outcomeId:String(raw.outcomeId||'').slice(0,160),sessionId:String(raw.sessionId||'').slice(0,120),policyId:String(raw.policyId||'').slice(0,120),evaluatedAt:String(raw.evaluatedAt||'').slice(0,40),policyMode:String(raw.policyMode||'').slice(0,30),targetSkill:String(raw.targetSkill||'').slice(0,80),primaryDomain:normalizePolicyDomain(raw.primaryDomain),completed:!!raw.completed,abandoned:!!raw.abandoned,planned:clamp(raw.planned,0,100),answered:clamp(raw.answered,0,100),completionRate:clamp(raw.completionRate,0,100),accuracy:raw.accuracy==null?null:clamp(raw.accuracy,0,100),targetAttempts:clamp(raw.targetAttempts,0,100),targetAccuracy:raw.targetAccuracy==null?null:clamp(raw.targetAccuracy,0,100),targetAdherence:clamp(raw.targetAdherence,0,100),medianResponseMs:raw.medianResponseMs==null?null:clamp(raw.medianResponseMs,0,300000),confidenceGap:raw.confidenceGap==null?null:clamp(raw.confidenceGap,0,100),masteryBefore:raw.masteryBefore==null?null:clamp(raw.masteryBefore,0,100),masteryAfter:raw.masteryAfter==null?null:clamp(raw.masteryAfter,0,100),masteryDelta:raw.masteryDelta==null?null:Math.max(-100,Math.min(100,Number(raw.masteryDelta)||0)),baselineTargetAccuracy:raw.baselineTargetAccuracy==null?null:clamp(raw.baselineTargetAccuracy,0,100),accuracyDelta:raw.accuracyDelta==null?null:Math.max(-100,Math.min(100,Number(raw.accuracyDelta)||0)),score:clamp(raw.score,0,100),status:raw.status,recommendation:raw.recommendation,privacy:{rawAnswersIncluded:false,rawHistoryIncluded:false}}
 }
@@ -8915,18 +8946,64 @@ function olmPanelMarkup(){
     const disputeBtn=e=>canNegotiate&&e?.canDispute&&e?.claimId?` <button type="button" class="core-ghost olm-dispute" onclick="olmDispute('${esc(String(e.claimId))}')">${FiezelI18n.t('progress.menurutku-salah')}</button>`:'';
     // m025-186 (A12-F1): summarize() menaruh estimasi di `mean`; pembacaan lama membuat panel selalu 0%.
     const masteryEntries=(s.mastery?.entries||[]).slice().sort((x,y)=>Number(y.mean??y.L??y.value??0)-Number(x.mean??x.L??x.value??0));
-    const mastery=masteryEntries.slice(0,3).map(e=>{const v=e.mean??e.L??e.value;const label=(v===null||v===undefined||Number.isNaN(Number(v)))?FiezelI18n.t('progress.belum-cukup-data'):`${Math.round(Number(v)*100)}%`;return `${esc(friendlySkillName(e.lesson||e.id))} ${label}${disputeBtn(e)}`}).join(', ');
+    /* 2026-08-31 - dulu ketiga baris ini digabung dengan `.join(', ')` menjadi SATU
+       kalimat, dan tombol sanggah ikut tersisip di tengahnya. Hasilnya (terlihat di
+       screenshot panel): "Present simple 100% [Menurutku ini salah], Artikel a, an, dan
+       the: memilih dari bunyi awal 100% [Menurutku ini salah], ..." - kalimat sambung
+       yang membungkus baris, dengan tombol gelap yang lebih berat daripada isinya, dan
+       tidak ada cara membaca tombol mana milik materi mana.
+       Sekarang tiap klaim jadi BARISNYA SENDIRI (pola .row yang sudah dipakai kartu lain
+       di layar ini): nama materi, angkanya, lalu tombol sanggahnya - jelas kepunyaan
+       siapa. Tidak ada data baru, hanya susunan yang bisa dibaca. */
+    const masteryRows=masteryEntries.slice(0,3).map(e=>{
+      const v=e.mean??e.L??e.value;
+      const label=(v===null||v===undefined||Number.isNaN(Number(v)))?FiezelI18n.t('progress.belum-cukup-data'):`${Math.round(Number(v)*100)}%`;
+      return `<div class="row olm-claim"><span>${esc(friendlySkillName(e.lesson||e.id))}</span><b>${label}</b>${disputeBtn(e)}</div>`;
+    }).join('');
+    const mastery=masteryRows;
     const mis=s.misconceptions||{};
     const review=s.review||{};
     const reviewTop=(review.top||[]).slice(0,3).map(r=>esc(friendlySkillName(String(r.id||'').replace(/^\w+:/,'')))).join(', ');
     const cal=s.calibration||{};
+    /* 2026-08-31 - KEBOCORAN TOKEN MESIN. Baris kalibrasi dulu berbunyi
+       `esc(cal.message||cal.status)`, dan itu mencetak "insufficient_data" mentah-mentah
+       ke layar murid. Bukan salah modulnya: fiezel-olm.js memang SENGAJA memulangkan
+       status tanpa pesan di bawah 20 pasangan ("tanpa angka yang berlagak tahu"), dan
+       olm-test.js:91 mengunci token itu sebagai KONTRAK. Jadi status adalah bahasa mesin,
+       dan menerjemahkannya adalah tugas lapisan tampilan - di sini.
+       Aturannya: token yang TIDAK dikenali tidak pernah dicetak, barisnya yang dibuang.
+       Lebih baik kehilangan satu baris daripada memamerkan enum internal ke murid. */
+    const bukanTokenMesin=v=>{const k=String(v||'').trim();return k&&!/[_:]/.test(k)?k:''};
+    /* Baris kalibrasi hanya dirender kalau modul benar-benar PUNYA hasil (status 'ok',
+       yang selalu disertai message). Tidak ada hasil = tidak ada baris.
+       Kenapa bukan "belum cukup data" yang ditampilkan terus: sejak popup keyakinan
+       dicabut dari semua sesi atas permintaan OWNER, tidak ada lagi jalur UI yang
+       memanggil setConfidence(), jadi state.confidenceHistory TIDAK PERNAH bertambah
+       lagi. Ambangnya 20 pasangan. Barisnya karena itu tidak akan pernah terisi untuk
+       murid baru mana pun - dan baris yang berbunyi "belum cukup data" selamanya adalah
+       janji palsu: ia menyuruh murid terus belajar untuk sesuatu yang tidak lagi diukur.
+       Murid lama yang terlanjur punya riwayat keyakinan tetap melihat hasilnya. */
+    const calText=cal.status==='ok'?bukanTokenMesin(cal.message):'';
+    const misAktif=Number(mis.active?.length??mis.activeCount??0);
+    const misSelesai=Number(mis.resolved?.length??mis.resolvedCount??0);
+    const atRisk=Number(review.atRiskCount||0);
+    /* Panggung kosong. Sebelumnya panel ini tetap mencetak deretan "0 aktif · 0 teratasi ·
+       0 materi" untuk murid yang memang belum punya riwayat - terbaca seperti panel rusak,
+       bukan seperti panel yang jujur. Kalau BELUM ADA satu pun bukti, katakan itu sekali
+       dengan kalimat manusia dan berhenti di situ. */
+    const adaBukti=!!mastery||misAktif>0||misSelesai>0||atRisk>0||!!calText;
+    /* catatan: calText hanya benar bila status 'ok', jadi "belum cukup data" tidak pernah
+       terhitung sebagai bukti - kalau tidak, panggung kosong tidak akan pernah muncul. */
     // D5 S5: kelas 'olm-panel' menjadi jangkar fokus setelah sanggahan (olmDispute
     // menggambar ulang seluruh layar Progress, tombol yang tadi diklik ikut musnah).
-    return card(`<h3>${FiezelI18n.t('progress.sistem-yakini-tentangmu')} <span class="muted">(OLM)</span></h3>
-      ${mastery?`<p><b>${FiezelI18n.t('progress.penguasaan-terkuat')}</b> ${mastery}</p>`:''}
-      <p><b>${FiezelI18n.t('progress.misconception-label')}</b> ${FiezelI18n.t('progress.aktif-teratasi',{activeCount:Number(mis.active?.length??mis.activeCount??0),resolvedCount:Number(mis.resolved?.length??mis.resolvedCount??0)})}</p>
-      <p><b>${FiezelI18n.t('progress.at-risk-label')}</b> ${FiezelI18n.t('progress.at-risk-detail',{count:Number(review.atRiskCount||0),urgent:reviewTop?FiezelI18n.t('progress.at-risk-urgent',{top:reviewTop}):''})}</p>
-      ${cal.status?`<p><b>${FiezelI18n.t('progress.calibration-label-2')}</b> ${esc(cal.message||cal.status)}</p>`:''}
+    // "(OLM)" dicabut dari judul 2026-08-31: akronim internal di layar murid adalah
+    // temuan U4 audit ini sendiri. Nama panelnya sudah menjelaskan dirinya.
+    return card(`<h3>${FiezelI18n.t('progress.sistem-yakini-tentangmu')}</h3>
+      ${!adaBukti?`<p class="muted">${FiezelI18n.t('progress.olm-belum-ada-bukti')}</p>`:`
+      ${mastery?`<p class="olm-claim-head"><b>${FiezelI18n.t('progress.penguasaan-terkuat')}</b></p>${mastery}`:''}
+      <p><b>${FiezelI18n.t('progress.misconception-label')}</b> ${FiezelI18n.t('progress.aktif-teratasi',{activeCount:misAktif,resolvedCount:misSelesai})}</p>
+      <p><b>${FiezelI18n.t('progress.at-risk-label')}</b> ${FiezelI18n.t('progress.at-risk-detail',{count:atRisk,urgent:reviewTop?FiezelI18n.t('progress.at-risk-urgent',{top:reviewTop}):''})}</p>
+      ${calText?`<p><b>${FiezelI18n.t('progress.calibration-label-2')}</b> ${esc(calText)}</p>`:''}`}
       <p class="muted">${FiezelI18n.t('progress.ringkasan-dibaca-model-sama-memilih')}</p>`,'olm-panel')
   }catch{return ''}
 }

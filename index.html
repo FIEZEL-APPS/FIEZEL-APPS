@@ -557,6 +557,9 @@ html.fz-booting body{overflow:hidden}
   <!-- S5b: pemangkas bukti untuk sinkron antar-perangkat. Tanpa modul ini sinkron mati
        total, karena satu-satunya yang bisa dikirim tinggal baris riwayat mentah. -->
   <script defer src="./features/brain/fiezel-attempt-record.js"></script>
+  <!-- Langkah 2: pemutus nasib kebijakan dari INTERVAL, bukan ambang. Dimuat setelah
+       stat-gate karena ia adapter di atasnya. -->
+  <script defer src="./features/brain/fiezel-policy-verdict.js"></script>
   <!-- brain-learning-infra: lane telemetri belajar (config → events → queue → transport).
        Urutan penting: transport membaca queue, queue membaca events, semuanya membaca
        config, jadi config dimuat paling awal. Dimuat SEBELUM app.js dengan pola defer

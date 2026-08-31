@@ -174,6 +174,37 @@ test('C6 · seed probe tidak memakai sumber acak', () => {
   assert.ok(/activeAccountUuid/.test(src), 'seed tidak diturunkan dari identitas akun');
 });
 
+test('C7 · celah yang MASIH terbuka dicatat, bukan dilupakan', () => {
+  // fiezel-sl-v1-state (bukti speaking/listening) MASIH device-global. Ia kelas kebocoran
+  // yang sama dengan delapan kunci di atas, tetapi ditulis dan dibaca oleh EMPAT titik di
+  // lane yang berbeda — konfigurasi dan addon speaking/listening, skills-evidence, dan
+  // satu pembaca di app.js — sementara lima berkas gerbang memakai kunci datarnya sebagai
+  // fixture.
+  //
+  // Scoping SEPARUH lebih buruk daripada tidak sama sekali: addon menulis ke kunci datar
+  // sementara pembaca mencari kunci berakun berarti bukti speaking murid hilang diam-diam.
+  // Jadi ia ditunda sebagai satu langkah tersendiri — dan gerbang ini memastikan
+  // penundaannya TERLACAK, bukan terlupakan.
+  //
+  // Yang di-assert: jumlah titik produksinya tidak bertambah. Kalau ada pembaca baru
+  // mendarat, gerbang merah dan keputusan scoping harus diambil saat itu juga.
+  const berkas = ['app.js',
+    'features/speaking-listening/speaking-listening-config.js',
+    'features/speaking-listening/fiezel-speaking-listening-addon.js',
+    'features/skills-evidence/fiezel-skills-evidence.js'];
+  let titik = 0;
+  for (const f of berkas) {
+    const src = fs.readFileSync(path.join(ROOT, f), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, ' ')
+      .replace(/(^|[^:])\/\/[^\n]*/g, '$1 ');
+    titik += (src.match(/'fiezel-sl-v1-state'/g) || []).length;
+  }
+  assert.strictEqual(titik, 4,
+    'jumlah titik produksi fiezel-sl-v1-state berubah (' + titik + ', diharapkan 4). ' +
+    'Kalau bertambah: putuskan scoping-nya sekarang, jangan tambah pembaca ke kunci ' +
+    'device-global. Kalau berkurang: scoping mungkin sudah dikerjakan — perbarui gerbang ini.');
+});
+
 // ==========================================================================
 // BUKTI-BISA-MERAH
 // ==========================================================================
