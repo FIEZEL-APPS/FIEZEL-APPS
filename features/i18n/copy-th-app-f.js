@@ -123,6 +123,7 @@
     'progress.at-risk-detail': '{count} เนื้อหา{urgent}',
     'progress.at-risk-urgent': ' - เร่งด่วนที่สุด: {top}',
     'progress.calibration-label-2': 'การสอบเทียบความมั่นใจ:',
+    'progress.olm-belum-ada-bukti': 'ยังสรุปอะไรไม่ได้ ลองทำแบบฝึกหัดสักสองสามครั้งก่อน แล้วสรุปนี้จะขึ้นเอง',
     'progress.ability-label': 'ความสามารถที่วัดได้',
     'progress.difficulty-label': 'ความยากที่เหมาะสม',
     'progress.response-label': 'การตอบสนองของระบบ:',

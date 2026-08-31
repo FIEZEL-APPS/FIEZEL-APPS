@@ -395,6 +395,63 @@ async function main() {
         'T6 nol scroll horizontal di 4 viewport x 6 layar',
         'T6 halaman menggeser horizontal: ' + over.join(', '));
     }
+
+    /* ---- T7: tidak ada TOKEN MESIN di layar Peta Belajar, di SEMUA tab -----------------
+     * Kenapa terpisah dari T1. T1 sudah menyapu 12 layar, tapi dua lubangnya persis
+     * bertemu di sini:
+     *   (a) T1 hanya melihat tab DEFAULT layar Progress. Panel OLM hidup di tab
+     *       "Adaptive Engine", jadi ia tidak pernah masuk jangkauan T1 sama sekali.
+     *   (b) daftar kata T1 hanya ['[object Object]','undefined','NaN'] - enum snake_case
+     *       bukan salah satunya, jadi walau tabnya terbuka T1 tetap diam.
+     * Bug yang melahirkan pemeriksaan ini: panel OLM mencetak "insufficient_data" mentah
+     * ke layar murid, karena fiezel-olm.js SENGAJA memulangkan status tanpa pesan di
+     * bawah 20 pasangan kalibrasi (dan olm-test.js:91 mengunci token itu sebagai kontrak
+     * modul). Token mesin adalah bahasa modul; menerjemahkannya tugas lapisan tampilan.
+     * Detektornya diverifikasi DUA arah sebelum dipasang: MERAH di origin/main pra-perbaikan
+     * (menemukan insufficient_data di tab adaptive, di kedua keadaan murid), HIJAU di
+     * cabang ini - nol positif palsu di 4 tab x 2 keadaan. Sebuah gerbang yang tidak
+     * pernah ditunjukkan bisa merah bukan gerbang.
+     * ------------------------------------------------------------------------------ */
+    {
+      const { ctx, page } = await open(VIEWPORTS[1]);
+      await page.evaluate(() => ['welcome', 'authGate', 'fzRitual'].forEach(i => document.getElementById(i)?.remove()));
+      /* Dua keadaan murid: yang belum punya riwayat (panggung kosong) dan yang sudah -
+         cabang kosong/terisi menulis markup berbeda, jadi keduanya harus disapu. */
+      const keadaan = [
+        ['murid baru', () => {}],
+        ['murid berbukti', () => {
+          const A = window.__fiezelAudit || {};
+          const sk = ['present_simple', 'articles_a_an_the', 'plural_nouns'];
+          for (let i = 0; i < 40; i++) {
+            try { A.bktRecord?.({ skill: sk[i % 3], lessonSkill: sk[i % 3] }, i % 4 !== 0, 1); } catch (_) {}
+          }
+          const st = window.__getFiezelState?.(); if (!st) return;
+          st.grammar = st.grammar || {};
+          sk.forEach((k, i) => { st.grammar[k] = { stabilityDays: 2 + i, lastSeen: Date.now() - (9 + i * 4) * 86400000, total: 12, correct: 8 }; });
+        }]
+      ];
+      const bocor = [];
+      for (const [label, seed] of keadaan) {
+        await page.evaluate(seed);
+        await page.evaluate(() => { try { window.go('progress'); } catch (_) {} });
+        await page.waitForTimeout(700);
+        for (const tab of ['overview', 'analysis', 'adaptive', 'readiness']) {
+          await page.evaluate(t => { try { window.switchProgressTab?.(t); } catch (_) {} }, tab);
+          await page.waitForTimeout(560);
+          const tok = await page.evaluate(() => {
+            const t = document.getElementById('app')?.innerText || '';
+            /* bentuk token mesin: snake_case huruf kecil (insufficient_data,
+               brain3_olm_calibration_insufficient, present_simple yang gagal diramahkan). */
+            return [...new Set(t.match(/\b[a-z][a-z0-9]*(?:_[a-z0-9]+)+\b/g) || [])];
+          });
+          if (tok.length) bocor.push(`${label}/${tab}: ${tok.join(', ')}`);
+        }
+      }
+      check(bocor.length === 0,
+        'T7 nol token mesin di 4 tab Peta Belajar x 2 keadaan murid',
+        'T7 token mesin bocor ke layar murid: ' + bocor.join(' | '));
+      await ctx.close();
+    }
   } finally {
     await browser.close().catch(() => {});
     server.close();
