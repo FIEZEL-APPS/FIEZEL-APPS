@@ -3,7 +3,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const P = require('./features/brain/fiezel-brain-sync-protocol.js');
+const P = require('./brain-sync-protocol.js');
 let checks = 0;
 function assert(cond, msg) { checks++; if (!cond) throw new Error(msg); }
 function eq(a, b, msg) { assert(JSON.stringify(a) === JSON.stringify(b), msg + '\n' + JSON.stringify(a) + '\n!=\n' + JSON.stringify(b)); }
@@ -151,7 +151,7 @@ function event(overrides = {}) {
 }
 
 {
-  const source = fs.readFileSync(path.join(__dirname, 'features/brain/fiezel-brain-sync-protocol.js'), 'utf8');
+  const source = fs.readFileSync(path.join(__dirname, 'brain-sync-protocol.js'), 'utf8');
   const banned = ['Date' + '.now', 'Math' + '.random', 'fetch' + '(', 'local' + 'Storage', 'indexed' + 'DB', 'document' + '.', 'window' + '.'];
   for (const token of banned) assert(!source.includes(token), 'pure protocol must not contain hidden I/O/time/random token: ' + token);
   console.log('ok - pure module owns no I/O, storage, clock, or RNG');
