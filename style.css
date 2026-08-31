@@ -2698,7 +2698,20 @@ html.fiezel-ui-v6 .skill-help-dot{border-radius:50%}
    berhubungan dengan isi layarnya. Judulnya juga tercetak dua kali (hero + kartu); kini
    sekali, di tempat tokohnya mengucapkannya. */
 .lesson-stage{display:flex;align-items:center;gap:10px;margin:0 0 12px}
-.lesson-stage-paw{flex:0 0 auto;width:clamp(64px,22vw,96px);display:block}
+/* Panggung maskot Writing: satu-satunya bedanya dengan panggung materi Grammar adalah
+   tidak ada gelembung - judul dan lead sudah ada di hero tepat di atasnya, jadi gelembung
+   hanya akan mengulang kalimat yang sama. Ukurannya dipinjam dari .lesson-stage-paw. */
+.writing-stage{display:flex;justify-content:center;margin:0 0 12px}
+.writing-stage .writing-mascot{width:100%;height:auto;display:block}
+.lesson-stage-paw{flex:0 0 auto;width:clamp(104px,30vw,136px);display:block}
+/* Ukuran naik dari clamp(64,22vw,96) 2026-08-31. Dua sebab, keduanya terukur:
+   (1) OWNER dua kali menyebut maskot Grammar terlalu kecil dan ruang di bawahnya
+       terlalu kosong; (2) di 390px lebar, rumus lama menghasilkan 86px render -
+       DUA piksel di bawah lantai identitas 88px lapisan outfit (19 SS6.5), jadi
+       pensil OF-07 yang diminta OWNER untuk sesi Grammar tidak akan pernah
+       terpasang di layar materi. Rumus baru memberi 117px di 390px: di atas lantai
+       88px, dan di ponsel lebar/tablet menembus 128px sehingga grafit pensil
+       (bagian halus) ikut tampil. */
 .lesson-stage-paw :is(fiezel-mascot,svg,img,canvas){width:100%;height:auto;display:block}
 /* .fz-mascot di dalam custom element dipaku 200px (fiezel-motion.css:127); tanpa baris ini
    ia tidak ikut mengecil dan hanya meluber keluar kotaknya. */
@@ -4220,7 +4233,14 @@ body.fz-lesson-mode.fz-stage-quiz .quiz-shell{padding-bottom:calc(28px + env(saf
    dengan soal, sehingga ia terbaca sebagai tokoh yang MENGUCAPKAN soalnya - bukan gambar
    yang kebetulan ditempel di atas panel. */
 .quiz-stage{display:flex;align-items:center;gap:10px;margin:0 0 12px}
-.quiz-stage .fz-paw-above{flex:0 0 auto;height:auto;margin:0;width:clamp(96px,34%,156px)}
+/* Lantai naik 96 -> 120px 2026-08-31. Diukur, bukan ditebak: 34% dari lebar-dalam
+   kartu di ponsel 390px = 110,8px, dan 110,8 ada DI BAWAH ambang kombo 120px
+   (19 SS6.2/SS6.5) - jadi bunga OF-03 yang diminta OWNER untuk sesi Tes diam-diam
+   luruh dan hanya ranselnya yang terpasang. Persentasenya ikut naik ke 38% supaya
+   angka minimum itu tidak jadi satu-satunya yang bekerja di layar lebih lebar.
+   CATATAN kaskade: --fz-paw-size TIDAK berlaku di mode panggung - aturan width di
+   sinilah yang menang, jadi menaikkan variabel itu di .quiz-shell tidak berefek. */
+.quiz-stage .fz-paw-above{flex:0 0 auto;height:auto;margin:0;width:clamp(120px,38%,156px)}
 .quiz-stage .fz-paw-above fiezel-mascot{width:100%;height:auto}
 .quiz-bubble{
   position:relative;flex:1 1 auto;min-width:0;
