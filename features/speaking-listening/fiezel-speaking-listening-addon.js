@@ -63,10 +63,17 @@
      jadi ia terbaca sebagai IKON di samping status, bukan sebagai tokoh. Duolingo menaruh
      karakternya sebagai jangkar emosi layar: besar, di tengah, tidak terpotong.
      Tiga perubahan yang membuatnya jadi tokoh, bukan ikon:
-       1. Susunannya tegak (mascot di atas, gelombang, lalu status), bukan mendatar.
-       2. Kotaknya TIDAK overflow:hidden dan TIDAK bulat, jadi telinga, ekor, dan bayangan
+       1. Kotaknya TIDAK overflow:hidden dan TIDAK bulat, jadi telinga, ekor, dan bayangan
           lantai ikut terlihat - itulah yang membedakan "tokoh" dari "avatar".
-       3. Ukurannya ikut lebar layar (clamp di CSS), bukan piksel mati.
+       2. Ukurannya ikut ruang yang tersisa, bukan piksel mati.
+       3. SUSUNANNYA MENDATAR (revisi 2026-08-31 setelah owner mengirim rujukan Duolingo):
+          maskot di KIRI, gelembung ucap di KANAN, sejajar - bukan bertumpuk di tengah.
+          Dua alasan, dan keduanya sama kuat. Pertama, itu memang bahasa visual yang
+          diminta: tokoh yang sedang BERBICARA kepada murid, bukan maskot yang dipajang.
+          Kedua, ia jauh lebih murah secara tinggi - satu baris mendatar memakai tinggi
+          maskot saja, sementara susunan tegak memakai tinggi maskot DITAMBAH gelombang
+          DITAMBAH status. Ruang yang dihemat jatuh ke pilihan jawaban, yang justru bagian
+          yang harus selalu terlihat.
      EQUALIZER (OWNER 2026-08-31: "buatkan equalizernya hidup ketika audio diputar").
      Batasnya nyata dan tidak berubah: tidak ada createAnalyser di mana pun di repo ini,
      dan FiezelVoiceSay tidak memapar AudioContext-nya - jadi bentuk gelombang SUNGGUHAN
@@ -85,8 +92,10 @@
       :'<span class="fz-i" data-fz-icon="paw"></span>';
     return '<div class="fsl-player fsl-player-stage" aria-hidden="true">'
       +'<span class="fsl-mascot-slot">'+face+'</span>'
-      +'<span class="fsl-wave fsl-eq">'+EQ_BARS+'</span>'
-      +'<span class="fsl-replays" data-replays>'+T('skillslab.not-played')+'</span></div>';
+      +'<span class="fsl-bubble">'
+        +'<span class="fsl-wave fsl-eq">'+EQ_BARS+'</span>'
+        +'<span class="fsl-replays" data-replays>'+T('skillslab.not-played')+'</span>'
+      +'</span></div>';
   }
   /* R2-4: sesi speaking dan latihan ujian tidak punya fsl-player (tidak ada audio yang
      dimainkan maskot), tetapi maskotnya tetap harus hadir DI ATAS panel soal seperti di
