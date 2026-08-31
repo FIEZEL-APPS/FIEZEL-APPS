@@ -208,7 +208,7 @@ Checkpoint adalah akselerator/recovery point. Append-only event adalah bukti yan
 
 ## 7. Event envelope v1
 
-Fase A memperkenalkan modul murni `features/brain/fiezel-brain-sync-protocol.js`.
+Fase A memperkenalkan modul murni standalone `brain-sync-protocol.js` di root repo. Ia sengaja belum berada di `features/` karena belum dimuat produk; wiring ke browser baru boleh masuk pada Phase B/D setelah protocol dan release boundary terbukti.
 
 Event attempt minimum:
 
