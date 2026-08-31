@@ -30,6 +30,8 @@ test "$PRODUCT_SHA" = "$EXPECTED"
 PRODUCT_BASE="$(git merge-base origin/main "origin/$TARGET")"
 mapfile -t PRODUCT_COMMITS < <(git rev-list --reverse "$PRODUCT_BASE".."origin/$TARGET")
 test "${#PRODUCT_COMMITS[@]}" -gt 0
+git config user.name "FIEZEL-APPS"
+git config user.email "fitrajft@gmail.com"
 git checkout -B repair origin/main
 for commit in "${PRODUCT_COMMITS[@]}"; do
   git cherry-pick "$commit"
