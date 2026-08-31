@@ -32,7 +32,7 @@ for v in V:
 check('Vocabulary completeness',not missing,f'missing={len(missing)}')
 check('All CEFR levels active',all(levels[l]>0 for l in ['A1','A2','B1','B2','C1','C2']),dict(levels))
 check('C2 active content',levels['C2']>=100,f'C2={levels["C2"]}')
-check('No runtime quarantine',not (ROOT/'vocabulary-quarantine.json').exists() or len(json.load(open(ROOT/'vocabulary-quarantine.json')))==0,'quarantine is non-runtime and empty')
+check('No runtime quarantine',not (ROOT/'vocabulary-quarantine.json').exists() or len(json.load(open(ROOT/'vocabulary-quarantine.json',encoding='utf-8')))==0,'quarantine is non-runtime and empty')
 # Grammar
 items=[(skill,q) for skill,arr in G.items() for q in arr]
 invalid=[]; dg=[]; exact=set()
@@ -239,40 +239,40 @@ policy_outcome_run=subprocess.run(['node',str(ROOT/'policy-outcome-test.js')],ca
 check('Policy Outcome Evaluation v1',policy_outcome_run.returncode==0 and 'FIEZEL policy outcome: PASS' in policy_outcome_run.stdout,policy_outcome_run.stdout.strip()[-800:] or policy_outcome_run.stderr.strip()[-800:])
 content_qa_run=subprocess.run(['node',str(ROOT/'content-qa-agent.js')],capture_output=True,text=True)
 content_qa_test_run=subprocess.run(['node',str(ROOT/'content-qa-agent-test.js')],capture_output=True,text=True)
-try: content_qa_report=json.load(open(ROOT/'CONTENT-QA-REPORT.json'))
+try: content_qa_report=json.load(open(ROOT/'CONTENT-QA-REPORT.json',encoding='utf-8'))
 except Exception: content_qa_report={}
 check('Content QA Agent v1',content_qa_run.returncode==0 and content_qa_test_run.returncode==0 and content_qa_report.get('schema')=='fiezel-content-qa-v1' and content_qa_report.get('status')=='PASS' and content_qa_report.get('readOnlyVerified') is True and content_qa_report.get('counts',{}).get('blockers')==0,content_qa_report.get('counts') or content_qa_test_run.stderr[-800:])
 content_patch_test_run=subprocess.run(['node',str(ROOT/'content-patch-gate-test.js')],capture_output=True,text=True)
 check('Guarded Content Patch gate v1',content_patch_test_run.returncode==0 and 'proofPass' in content_patch_test_run.stdout and 'canonicalImmutable' in content_patch_test_run.stdout,content_patch_test_run.stdout.strip()[-800:] or content_patch_test_run.stderr.strip()[-800:])
 content_canary_test_run=subprocess.run(['node',str(ROOT/'content-canary-test.js')],capture_output=True,text=True)
-try: content_canary_proof=json.load(open(ROOT/'CONTENT-CANARY-PROOF.json'))
+try: content_canary_proof=json.load(open(ROOT/'CONTENT-CANARY-PROOF.json',encoding='utf-8'))
 except Exception: content_canary_proof={}
 check('Shadow/Canary overlay gate v1',content_canary_test_run.returncode==0 and 'FIEZEL content canary: PASS' in content_canary_test_run.stdout and content_canary_proof.get('status')=='PASS' and content_canary_proof.get('canonicalImmutable') is True and content_canary_proof.get('boundedEvidence') is True,content_canary_proof or content_canary_test_run.stderr[-800:])
 content_promotion_test_run=subprocess.run(['node',str(ROOT/'content-promotion-test.js')],capture_output=True,text=True)
-try: content_promotion_proof=json.load(open(ROOT/'CONTENT-PROMOTION-PROOF.json'))
+try: content_promotion_proof=json.load(open(ROOT/'CONTENT-PROMOTION-PROOF.json',encoding='utf-8'))
 except Exception: content_promotion_proof={}
 check('Autonomous Promotion gate v1',content_promotion_test_run.returncode==0 and 'FIEZEL content promotion: PASS' in content_promotion_test_run.stdout and content_promotion_proof.get('status')=='PASS' and content_promotion_proof.get('canonicalImmutable') is True and content_promotion_proof.get('activeOverlayOnly') is True and content_promotion_proof.get('postPromotionRollback') is True and content_promotion_proof.get('auditableBoundedLedger') is True,content_promotion_proof or content_promotion_test_run.stderr[-800:])
 content_attestation_test_run=subprocess.run(['node',str(ROOT/'content-adoption-evidence-test.js')],capture_output=True,text=True)
-try: content_attestation_proof=json.load(open(ROOT/'CONTENT-ADOPTION-EVIDENCE-PROOF.json'))
+try: content_attestation_proof=json.load(open(ROOT/'CONTENT-ADOPTION-EVIDENCE-PROOF.json',encoding='utf-8'))
 except Exception: content_attestation_proof={}
 check('Adoption Evidence Attestation gate v1',content_attestation_test_run.returncode==0 and 'FIEZEL adoption evidence attestation: PASS' in content_attestation_test_run.stdout and content_attestation_proof.get('status')=='PASS' and content_attestation_proof.get('deterministicExport') is True and content_attestation_proof.get('importVerification') is True and content_attestation_proof.get('sourceVersionLocked') is True and content_attestation_proof.get('candidateHashLocked') is True and content_attestation_proof.get('privacyWhitelist') is True and content_attestation_proof.get('ownerApprovalSeparate') is True and content_attestation_proof.get('canonicalImmutable') is True,content_attestation_proof or content_attestation_test_run.stderr[-800:])
 content_origin_test_run=subprocess.run(['node',str(ROOT/'content-evidence-origin-test.js')],capture_output=True,text=True)
-try: content_origin_proof=json.load(open(ROOT/'CONTENT-EVIDENCE-ORIGIN-PROOF.json'))
+try: content_origin_proof=json.load(open(ROOT/'CONTENT-EVIDENCE-ORIGIN-PROOF.json',encoding='utf-8'))
 except Exception: content_origin_proof={}
 check('Production Evidence Origin Verification v1',content_origin_test_run.returncode==0 and 'FIEZEL evidence origin verification: PASS' in content_origin_test_run.stdout and content_origin_proof.get('status')=='PASS' and content_origin_proof.get('algorithm')=='ed25519' and content_origin_proof.get('separateOperatorTrustPolicy') is True and content_origin_proof.get('trustPolicyNotEmbedded') is True and content_origin_proof.get('publicKeyFingerprintLocked') is True and content_origin_proof.get('controlledOriginRejectedForProduction') is True and content_origin_proof.get('privateKeyStoredInSource') is False and content_origin_proof.get('canonicalImmutable') is True,content_origin_proof or content_origin_test_run.stderr[-800:])
 content_rehearsal_test_run=subprocess.run(['node',str(ROOT/'content-adoption-rehearsal-test.js')],capture_output=True,text=True)
-try: content_rehearsal_proof=json.load(open(ROOT/'CONTENT-ADOPTION-REHEARSAL-PROOF.json'))
+try: content_rehearsal_proof=json.load(open(ROOT/'CONTENT-ADOPTION-REHEARSAL-PROOF.json',encoding='utf-8'))
 except Exception: content_rehearsal_proof={}
 check('Operator Adoption Rehearsal v1',content_rehearsal_test_run.returncode==0 and 'FIEZEL operator adoption rehearsal: PASS' in content_rehearsal_test_run.stdout and content_rehearsal_proof.get('status')=='PASS' and content_rehearsal_proof.get('signedOriginRequired') is True and content_rehearsal_proof.get('separateOperatorTrustPolicy') is True and content_rehearsal_proof.get('stagingVerified') is True and content_rehearsal_proof.get('rollbackVerified') is True and content_rehearsal_proof.get('productionRehearsalPerformed') is False and content_rehearsal_proof.get('actualCanonicalAdoptionPerformed') is False and content_rehearsal_proof.get('canonicalImmutable') is True,content_rehearsal_proof or content_rehearsal_test_run.stderr[-800:])
 content_adoption_test_run=subprocess.run(['node',str(ROOT/'content-adoption-test.js')],capture_output=True,text=True)
-try: content_adoption_proof=json.load(open(ROOT/'CONTENT-ADOPTION-PROOF.json'))
+try: content_adoption_proof=json.load(open(ROOT/'CONTENT-ADOPTION-PROOF.json',encoding='utf-8'))
 except Exception: content_adoption_proof={}
 check('Canonical Adoption gate v1',content_adoption_test_run.returncode==0 and 'FIEZEL canonical adoption gate: PASS' in content_adoption_test_run.stdout and content_adoption_proof.get('status')=='PASS' and content_adoption_proof.get('canonicalAdoptionPerformed') is False and content_adoption_proof.get('proofFixtureRejected') is True and content_adoption_proof.get('canaryGateDigestLocked') is True and content_adoption_proof.get('evidenceAttestationRequired') is True and content_adoption_proof.get('evidenceAttestationDigestLocked') is True and content_adoption_proof.get('evidenceOriginRequired') is True and content_adoption_proof.get('evidenceOriginSignatureVerified') is True and content_adoption_proof.get('originTrustPolicySeparate') is True and content_adoption_proof.get('originTrustPolicyDigestLocked') is True and content_adoption_proof.get('ownerApprovalStillSeparate') is True and content_adoption_proof.get('deterministicRebuild') is True and content_adoption_proof.get('rollbackArtifact') is True and content_adoption_proof.get('sourceRootWriteRejected') is True and content_adoption_proof.get('canonicalImmutable') is True,content_adoption_proof or content_adoption_test_run.stderr[-800:])
 # Dedicated grammar audit executes the full runtime matrix (139 lesson x 25 = 3.475 saat ini;
 # diturunkan dari len(items)*25 supaya bank yang bertambah tidak lagi memerahkan audit karena
 # angka mati yang basi - temuan cf-c1 K13) and writes a machine-readable report.
 grammar_audit_run=subprocess.run(['node',str(ROOT/'grammar-quality-audit.js')],capture_output=True,text=True)
-try: grammar_audit_report=json.load(open(ROOT/'GRAMMAR-QUALITY-REPORT.json'))
+try: grammar_audit_report=json.load(open(ROOT/'GRAMMAR-QUALITY-REPORT.json',encoding='utf-8'))
 except Exception: grammar_audit_report={}
 check('Dedicated grammar quality audit',grammar_audit_run.returncode==0 and grammar_audit_report.get('status')=='PASS' and grammar_audit_report.get('counts',{}).get('runtimeQuestions')==len(GM.get('templates',[]))*25 and grammar_audit_report.get('counts',{}).get('crossLessonDuplicates')==0 and grammar_audit_report.get('counts',{}).get('focusLeaks')==0,grammar_audit_report.get('counts') or grammar_audit_run.stderr[-500:])
 # Syntax: telusuri pohon yang benar-benar ada, supaya gerbang yang dipensiunkan tidak bisa
