@@ -86,6 +86,21 @@ function fakeNode(selector, owner) {
     // yang harus ditiru, karena tanpa itu satu tombol yang dirender berulang kali akan
     // terlihat memiliki empat pendengar klik dan gerbang ini akan lulus untuk alasan salah.
     set innerHTML(value) { markup = String(value); if (owner) owner.dropDetached(); },
+    /* classList lengkap. Kode produksi memakai stage.classList.add('is-playing') di
+       fiezel-speaking-listening-addon.js; stub tanpa classList membuat gerbang ini MELEDAK
+       dengan TypeError alih-alih menguji tangga suara — kegagalan harness yang menyamar
+       jadi kegagalan produk. Metodenya nyata (menyimpan kelas), bukan no-op, supaya
+       assert tentang kelas tetap mungkin ditulis nanti. */
+    classList: (function () {
+      const set = new Set();
+      return {
+        add(...names) { names.forEach((n) => set.add(String(n))); },
+        remove(...names) { names.forEach((n) => set.delete(String(n))); },
+        toggle(name, force) { const n = String(name); const on = force === undefined ? !set.has(n) : !!force; if (on) set.add(n); else set.delete(n); return on; },
+        contains(name) { return set.has(String(name)); },
+        get length() { return set.size; }
+      };
+    })(),
     addEventListener(type, fn) { (this.handlers[type] = this.handlers[type] || []).push(fn); },
     click() { (this.handlers.click || []).forEach((fn) => fn({ currentTarget: this })); },
     setAttribute() {}, getAttribute() { return null; }, hasAttribute() { return false; },
