@@ -134,6 +134,9 @@
     'tour.listen-translate-body': 'สวิตช์นี้แสดงคำแปลของทุกข้อ ราคา 1 เพชรคำแปลต่อเซสชัน เพชรได้มาฟรีจากสตรีคตอบถูกของคุณ',
     'tour.listen-speed-title': 'ปรับความเร็วเสียง',
     'tour.listen-speed-body': 'เร็วเกินไปหรือเปล่า? ความเร็วเสียงปรับได้ใน FIEZEL Control Room — เปิดผ่านปุ่มการตั้งค่าได้ตลอดเวลา',
+    'tour.dialog-aria': 'ทำความรู้จัก FIEZEL แบบสั้น ๆ',
+    'tour.skip': 'ข้าม',
+    'tour.ready': 'พร้อม!',
 
     // ---------- onboarding.* ----------
     'onboarding.brand-tag': 'ภาษาอังกฤษที่ปรับตามผู้เรียน',
