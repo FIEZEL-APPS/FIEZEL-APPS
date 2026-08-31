@@ -24,6 +24,8 @@
  *   (e) deduplikasi kunci teks kanonik: teks yang sama tidak dihangatkan dua kali.
  *   (f) batas konkurensi dihormati — ponsel kelas bawah tidak menjalankan tiga generasi.
  *   (g) urutan lapisan aset R2 → Puter → neural lokal dipertahankan, sama seperti say().
+ *   (h) runtime neural menghangatkan CHUNK PERTAMA dari utterance multi-chunk, dengan
+ *       position.total yang sama seperti saat utterance benar-benar dimainkan.
  *
  * Sumber: reports/voice-v1-audit.md §1/§4/§5, reports/cf-c1-konsistensi.md K10,
  * reports/cf-b4-ai-tts.md §5.
@@ -36,7 +38,9 @@ const vm = require('vm');
 
 const root = __dirname;
 const SAY_PATH = 'features/neural-voice/fiezel-voice-say.js';
+const RUNTIME_PATH = 'features/neural-voice/fiezel-neural-voice.js';
 const SAY = fs.readFileSync(path.join(root, SAY_PATH), 'utf8');
+const RUNTIME = require(path.join(root, RUNTIME_PATH));
 
 const checks = [];
 let failed = false;
@@ -147,6 +151,62 @@ const settled = (promise) => promise.then(
   (error) => ({ ok: false, error: String((error && error.message) || error) })
 );
 const idle = () => new Promise((resolve) => setTimeout(resolve, 5));
+
+/**
+ * Harness runtime neural sungguhan. Prosody palsu hanya menentukan rencana chunk secara
+ * deterministik; yang diuji tetap createVoiceService().prefetch()/speak() produksi.
+ */
+function runtimeHarness() {
+  const FIRST = 'First chunk ends naturally.';
+  const SECOND = 'Second chunk continues without loading at the seam.';
+  const THIRD = 'Third chunk closes the longer passage.';
+  const TWO = `${FIRST} ${SECOND}`;
+  const THREE = `${FIRST} ${SECOND} ${THIRD}`;
+  const calls = [];
+  const plans = new Map([
+    [TWO, [
+      { text: FIRST, boundary: 'sentence' },
+      { text: SECOND, boundary: 'paragraph' }
+    ]],
+    [THREE, [
+      { text: FIRST, boundary: 'sentence' },
+      { text: SECOND, boundary: 'sentence' },
+      { text: THIRD, boundary: 'paragraph' }
+    ]]
+  ]);
+  const prosody = {
+    CHUNK_CHARS: { target: 220, max: 260 },
+    groupChunks(text) {
+      const plan = plans.get(String(text));
+      if (plan) return plan.map((entry) => ({ ...entry }));
+      return [{ text: String(text), boundary: 'paragraph' }];
+    },
+    gapAfter() { return 220; },
+    punctuate(text) { return String(text); },
+    planUtterance(text) {
+      const plan = plans.get(String(text)) || [{ text: String(text), boundary: 'paragraph' }];
+      return { stats: { sentences: plan.length } };
+    }
+  };
+  const adapter = {
+    kind: 'test-neural',
+    generate(text, options) {
+      calls.push({ text: String(text), position: { ...(options && options.position) } });
+      return Promise.resolve({ audio: Float32Array.from([0, 0.1, -0.1, 0]), sampling_rate: 24000 });
+    }
+  };
+  const service = RUNTIME.createVoiceService({
+    config: {
+      voices: { fiezelPrimary: 'test-voice' },
+      limits: { maxInputChars: 3600, chunkMaxChars: 260, chunkTargetChars: 220 }
+    },
+    adapter,
+    env: { FIEZEL_VERSION: 'prefetch-regression' },
+    streamSentences: true,
+    prosody
+  });
+  return { service, calls, FIRST, SECOND, THIRD, TWO, THREE };
+}
 
 (async function run() {
   // -------------------------------------------------------------------------------------
@@ -311,6 +371,45 @@ const idle = () => new Promise((resolve) => setTimeout(resolve, 5));
   check('(f) slot konkurensi dikembalikan setelah selesai (prefetch tidak mati sesudah 2 kalimat)',
     cycling.calls.neural === limit + 3,
     `neural=${cycling.calls.neural} diharapkan=${limit + 3}`);
+
+  // -------------------------------------------------------------------------------------
+  // (h) runtime neural: prefetch utterance multi-chunk harus menghangatkan chunk PERTAMA
+  // -------------------------------------------------------------------------------------
+  const multi = runtimeHarness();
+  const multiWarm = await settled(multi.service.prefetch(multi.TWO, {
+    voice: 'test-voice', speed: 1, lang: 'en-US'
+  }));
+  check('(h1) runtime prefetch multi-chunk berhasil, bukan menolak karena chunks.length > 1',
+    multiWarm.ok && multiWarm.value === true,
+    JSON.stringify(multiWarm));
+  check('(h2) prefetch multi-chunk merender HANYA chunk pertama, bukan seluruh blok',
+    multi.calls.length === 1 && multi.calls[0].text === multi.FIRST,
+    JSON.stringify(multi.calls));
+  check('(h3) render hangat membawa position.total utterance asli agar prosodi tidak berubah',
+    multi.calls.length === 1 && multi.calls[0].position.index === 0 && multi.calls[0].position.total === 2,
+    JSON.stringify(multi.calls[0]));
+  const played = await settled(multi.service.speak(multi.TWO, {
+    voice: 'test-voice', speed: 1, lang: 'en-US', allowFallback: false
+  }));
+  check('(h4) speak() mengonsumsi chunk hangat tanpa mensintesis chunk pertama dua kali',
+    played.ok && multi.calls.length === 2 &&
+      multi.calls[0].text === multi.FIRST && multi.calls[1].text === multi.SECOND,
+    JSON.stringify(multi.calls));
+
+  // Kunci hangat juga harus mengandung total posisi. Teks pembuka yang kebetulan sama tidak
+  // boleh memakai audio dari utterance 2-chunk ketika sekarang ia membuka utterance 3-chunk.
+  const collision = runtimeHarness();
+  await settled(collision.service.prefetch(collision.TWO, {
+    voice: 'test-voice', speed: 1, lang: 'en-US'
+  }));
+  const collisionPlayed = await settled(collision.service.speak(collision.THREE, {
+    voice: 'test-voice', speed: 1, lang: 'en-US', allowFallback: false
+  }));
+  check('(h5) warm key membedakan position.total: audio pembuka 2-chunk tidak dipakai untuk utterance 3-chunk',
+    collisionPlayed.ok && collision.calls.length === 4 &&
+      collision.calls[0].text === collision.FIRST && collision.calls[0].position.total === 2 &&
+      collision.calls[1].text === collision.FIRST && collision.calls[1].position.total === 3,
+    JSON.stringify(collision.calls));
 
   // -------------------------------------------------------------------------------------
   // Penjaga statis: jalur prefetch tidak menyebut satu pun pemicu unduhan
