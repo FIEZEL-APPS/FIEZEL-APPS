@@ -588,6 +588,10 @@
     'siap.h-vocab': 'Jalur kosakata IT dan kampus',
     // app.js:4882 — academicReadinessMarkup: keterangan jalur
     'siap.ket-jalur': '{jumlah} bacaan bertema sains, lingkungan, dan teknologi dari bank yang sudah ada.',
+    // app.js — skillsLab: nama tombol bundar "?" di pojok kanan atas halaman skill.
+    // Dipakai sebagai aria-label DAN title, jadi ia harus berdiri sendiri tanpa konteks
+    // visual: pembaca layar hanya mendengar kalimat ini, bukan melihat tanda tanyanya.
+    'skills.bantuan': 'Tentang latihan ini',
     // app.js:5460 — skillsLab: badge
     'skills.badge': 'SKILL INTI TES',
     // app.js:5460 — skillsLab: catatan level

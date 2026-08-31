@@ -359,70 +359,70 @@ test('kelahiran logo menunggu splash pergi, bukan menunggu jam', () => {
   }
 });
 
-test('pertanyaan yakin muncul sebagai popup, dan membawa tombol Lanjutnya sendiri', () => {
-  // OWNER: "mendingan muncul pop up aja di layar dan langsung diikuti tombol next di pop
-  // up itu juga, setelah user menjawab 3 pilihan itu langsung muncul tombol next."
+/* 2026-08-31 — PERTANYAAN KEYAKINAN DIHAPUS ATAS PERMINTAAN OWNER.
+   Dua pemeriksaan yang berdiri di sini sebelumnya ("pertanyaan yakin muncul sebagai popup,
+   dan membawa tombol Lanjutnya sendiri" + "popup keyakinan bukan kurungan") menjaga
+   permintaan owner yang LEBIH LAMA: popup keyakinan harus punya tombol Lanjut sendiri, dan
+   tombol itu tidak boleh ada sebelum murid memilih. Owner membalikkan keputusan itu:
+   "popup keyakinan dihapus semua di semua sesi, itu sangat mengganggu".
+   Invarian lama tidak dilonggarkan - ia SUDAH TIDAK ADA, karena fiturnya tidak ada. Yang
+   menggantikannya di bawah adalah aturan baru, plus satu penjaga yang JUSTRU LEBIH KERAS
+   daripada sebelumnya: penjadwalan ulangan tidak boleh ikut mati. setConfidence() ternyata
+   satu-satunya pemanggil scheduleNext() di jalur jawaban; menghapus popupnya tanpa
+   menyelamatkan bagian itu akan membuat "Review Due" berhenti terisi diam-diam. */
+test('pertanyaan keyakinan tidak pernah muncul lagi di jalur jawaban', () => {
   const app = read('app.js');
-  if (!/\.confidence-pop\{[^}]*position:fixed;inset:0/.test(CSS)) {
-    throw new Error('bukan popup; ia masih menempel di aliran halaman');
-  }
-  if (!/function openConfidencePop\(ok\)/.test(app)) throw new Error('popup tidak pernah dibuka');
-  if (!/openConfidencePop\(ok\);/.test(app)) throw new Error('popup tidak dipicu saat jawaban terbuka');
-
-  // Tombol Lanjut TIDAK boleh sudah ada saat popup pertama muncul - itu inti permintaannya.
   const open = /function openConfidencePop\(ok\)\{[\s\S]*?\n\}/.exec(app);
   if (!open) throw new Error('openConfidencePop tidak terbaca');
-  if (/confidence-go/.test(open[0])) {
-    throw new Error('tombol Lanjut sudah ada sebelum pilihan diambil; pertanyaannya jadi bisa dilewati begitu saja');
+  if (/confidence-scale/.test(open[0])) {
+    throw new Error('skala keyakinan 1/2/3 kembali muncul di popup vonis');
   }
-  const answered = /function confidencePopAnswered\(value\)\{[\s\S]*?\n\}/.exec(app);
-  if (!answered || !/confidence-go/.test(answered[0])) {
-    throw new Error('tombol Lanjut tidak muncul setelah pilihan diambil');
+  if (/setConfidence\(1\)|setConfidence\(2\)|setConfidence\(3\)/.test(open[0])) {
+    throw new Error('tombol yang menanyakan keyakinan kembali dipasang');
   }
-  // Struktural, bukan jarak karakter: assert lama menuntut confidencePopAnswered(value)
-  // muncul dalam <=900 karakter setelah setConfidence(value){ dan langsung rapuh begitu
-  // badan fungsi tumbuh (wave-D menambah pengayaan confidenceHistory dan gagal pada 1.085
-  // karakter padahal perilakunya benar). Yang sebenarnya dijaga: panggilan itu berada DI
-  // DALAM badan fungsi setConfidence. Maka batas fungsinya di-parse dengan hitung brace.
-  const setConfidenceHead = /function setConfidence\(value\)\{/.exec(app);
-  if (!setConfidenceHead) throw new Error('setConfidence(value) tidak ditemukan');
-  let scDepth = 1;
-  let scEnd = setConfidenceHead.index + setConfidenceHead[0].length;
-  while (scDepth > 0 && scEnd < app.length) {
-    const ch = app[scEnd];
-    if (ch === '{') scDepth += 1;
-    else if (ch === '}') scDepth -= 1;
-    scEnd += 1;
-  }
-  if (scDepth !== 0) throw new Error('badan setConfidence tidak seimbang kurungnya; tidak bisa diverifikasi');
-  const setConfidenceBody = app.slice(setConfidenceHead.index, scEnd);
-  if (!setConfidenceBody.includes('confidencePopAnswered(value)')) {
-    throw new Error('popup tidak pernah tahu pilihannya sudah diambil');
+  if (!/confidence-go/.test(open[0])) {
+    throw new Error('popup vonis tidak punya jalan maju ke pembahasan');
   }
 });
 
-test('popup keyakinan bukan kurungan', () => {
-  // Batas yang dipegang seluruh aplikasi sejak m025-126: "layar yang menahan alur tanpa
-  // jalan keluar adalah kurungan, bukan pelajaran". Yang ditahan hanya jalan PINTASNYA.
+test('penjadwalan ulangan tetap berjalan tanpa pertanyaan keyakinan', () => {
+  // Ini penjaga terpenting dari perubahan itu. Kalau seseorang kelak merapikan
+  // openConfidencePop dan ikut membuang panggilan ini, kartu berhenti dijadwalkan dan
+  // tidak ada satu pun galat yang muncul - murid hanya kehilangan review-nya, perlahan.
   const app = read('app.js');
-  if (!/confidence-skip/.test(app)) {
-    throw new Error('tidak ada jalan keluar dari popup tanpa memilih');
+  if (!/function settleReviewScheduleSilently\(\)/.test(app)) {
+    throw new Error('settleReviewScheduleSilently hilang');
   }
-  // Dan ia harus ikut tertutup saat murid pindah soal atau keluar kuis - popup yang
-  // tertinggal akan menutupi layar berikutnya.
-  // m025-180: Keluar kini lewat dialog konfirmasi (audit UI/UX 09-002/10-001), jadi
-  // kontraknya diperiksa STRUKTURAL, bukan cocok-string pada handler: (1) handler Keluar
-  // memanggil confirmQuizExit, dan (2) jalur keluar yang dikonfirmasi (doExit) menutup
-  // popup sebelum meninggalkan layar. Menutup popup pada TAP pertama salah: kalau murid
-  // memilih "Lanjut belajar", kelanjutan popup yang dibatalkan membuat tombol Lanjut mati.
-  if (!/quizExit'\)\.onclick=\(\)=>confirmQuizExit\(\)/.test(app)) {
-    throw new Error('Keluar kuis harus lewat confirmQuizExit \u2014 dialog konfirmasi m025-180');
+  if (!/settleReviewScheduleSilently\(\)/.test((/function openConfidencePop\(ok\)\{[\s\S]*?\n\}/.exec(app) || [''])[0])) {
+    throw new Error('penjadwalan ulangan tidak lagi diselesaikan saat vonis tampil');
   }
-  if (!/const doExit=\(\)=>\{try\{closeConfidencePop\(\)\}/.test(app)) {
-    throw new Error('popup tidak ditutup saat keluar kuis (doExit wajib menutup popup)');
+  const body = (/function settleReviewScheduleSilently\(\)\{[\s\S]*?\n\}/.exec(app) || [''])[0];
+  if (!/scheduleNext\(/.test(body)) throw new Error('scheduleNext tidak dipanggil - review berhenti dijadwalkan');
+  // Data kalibrasi TIDAK boleh dikarang: kita berhenti bertanya, jadi berhenti mencatat.
+  if (/confidenceHistory\.push/.test(body)) {
+    throw new Error('keyakinan yang tidak pernah diucapkan murid dicatat sebagai penilaiannya');
   }
-  if (!/quizNext'\)\.onclick=\(\)=>\{if\(answer\.locked\)\{closeConfidencePop\(\)/.test(app)) {
-    throw new Error('popup tidak ditutup saat pindah soal');
+  if (/srlCaptureConfidence/.test(body)) {
+    throw new Error('prediksi SRL dikarang dari keyakinan yang tidak pernah ditanyakan');
+  }
+});
+
+test('popup yang tersisa di kuis tetap punya jalan keluar', () => {
+  // Batas yang dipegang seluruh aplikasi sejak m025-126: "layar yang menahan alur tanpa
+  // jalan keluar adalah kurungan, bukan pelajaran".
+  // 2026-08-31: pemeriksaan ini DULU mencari literal 'confidence-skip' untuk membuktikan
+  // popup KEYAKINAN bisa dilewati. Pertanyaan keyakinannya sudah dihapus, dan literal itu
+  // kini hanya tersisa di popup TUJUAN SRL - jadi pemeriksaan lama tetap hijau sambil
+  // menguji elemen yang sama sekali berbeda dari yang disebut namanya. Lolos palsu.
+  // Diganti dengan dua hal yang benar-benar ada sekarang.
+  const app = read('app.js');
+  const open = /function openConfidencePop\(ok\)\{[\s\S]*?\n\}/.exec(app);
+  if (!open || !/confidencePopNext\(\)/.test(open[0])) {
+    throw new Error('popup vonis tidak punya jalan maju - itu kurungan');
+  }
+  const srl = /pop\.id='srlGoalPop'[\s\S]*?document\.body\.appendChild\(pop\)/.exec(app);
+  if (srl && !/srlGoalDismiss\(\)/.test(srl[0])) {
+    throw new Error('popup tujuan SRL tidak bisa dilewati tanpa memilih');
   }
 });
 

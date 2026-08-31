@@ -118,10 +118,191 @@ body.fz-stage-sl .fsl-feedback{padding-bottom:120px}
 .fsl-card-listening .fsl-note-compact{margin:4px 0 0;font-size:.72rem;line-height:1.45}
 /* Audio adalah pahlawan: pemutar (maskot dengar + gelombang) dan tombol Dengarkan membesar. */
 .fsl-card-listening h2{margin:.3rem 0 .2rem;font-size:1.28rem;line-height:1.35}
-.fsl-card-listening .fsl-player{margin-top:12px;padding:14px 16px;border-radius:var(--radius-lg)}
-.fsl-card-listening .fsl-mascot-slot{width:48px;height:48px}
-.fsl-card-listening .fsl-mascot-slot .fsl-mascot{width:48px;height:48px}
-.fsl-card-listening .fsl-wave{height:26px}
+/* PANGGUNG DENGAR — maskot sebagai TOKOH, bukan ikon (OWNER 2026-08-31, rujukan Duolingo).
+   Sebelum ini: baris mendatar, maskot 48px di dalam lingkaran overflow:hidden. Hasilnya
+   hanya kepala yang terlihat, seukuran favicon, di samping teks status - persis bahasa
+   visual "avatar di baris daftar", bukan "karakter yang menemani belajar".
+   Yang membuatnya berubah bukan sekadar angka px:
+     - kolom, bukan baris  -> maskot dapat lebar penuh kartu untuk dirinya sendiri;
+     - border-radius/overflow lingkaran DILEPAS -> telinga, ekor, dan bayangan lantai
+       ikut terlihat; itu yang membedakan tokoh dari avatar;
+     - .fz-mascot di dalam custom element dipaksa width:100% -> tanpa ini ia tetap
+       200px mati (fiezel-motion.css:127) dan hanya ikut terpotong lebih besar.
+   Ukurannya clamp() supaya ia tetap tokoh di 320px dan tidak jadi raksasa di tablet. */
+/* PANGGUNG MENDATAR: maskot KIRI, gelembung ucap KANAN (rujukan Duolingo dari owner).
+   Latar kotaknya dilepas - di rujukannya tokoh berdiri langsung di atas halaman, dan
+   bidang berwarna di belakangnya justru membuatnya terbaca sebagai "gambar yang
+   ditempel", bukan tokoh yang hadir. */
+.fsl-card-listening .fsl-player{
+  margin-top:14px;padding:4px 0 0;border:0;background:none;border-radius:0;
+  display:flex;flex-direction:row;align-items:center;gap:10px;
+}
+.fsl-card-listening .fsl-mascot-slot{
+  flex:0 0 auto;width:auto;height:auto;aspect-ratio:320/300;
+  border-radius:0;background:none;overflow:visible;
+}
+/* Gelembung ucap: ekornya dibuat dari border transparan, bukan gambar - ia ikut warna
+   tema dan tidak menambah satu pun permintaan jaringan. */
+.fsl-card-listening .fsl-bubble{
+  position:relative;flex:1 1 auto;min-width:0;align-self:center;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  padding:14px 12px;border:1.5px solid var(--line,#F0E4CF);
+  border-radius:18px;background:var(--panel-soft,#FFF3DC);
+}
+.fsl-card-listening .fsl-bubble::before,
+.fsl-card-listening .fsl-bubble::after{
+  content:'';position:absolute;top:50%;transform:translateY(-50%);
+  border:9px solid transparent;
+}
+.fsl-card-listening .fsl-bubble::before{left:-19px;border-right-color:var(--line,#F0E4CF)}
+.fsl-card-listening .fsl-bubble::after{left:-16px;border-right-color:var(--panel-soft,#FFF3DC)}
+.fsl-card-listening .fsl-mascot-slot .fsl-mascot{width:100%;height:100%}
+.fsl-card-listening .fsl-mascot-slot .fsl-mascot .fz-mascot{width:100%}
+.fsl-card-listening .fsl-mascot-slot .fz-i{width:clamp(64px,20vw,92px);height:clamp(64px,20vw,92px)}
+/* GEM BAR DI SESI LISTENING: satu baris, bukan dua. Kedua kontrolnya min-height 44px
+   (benar, itu lantai sasaran sentuh dan tidak diturunkan), tetapi flex:1 1 140px pada
+   toggle memaksanya TURUN BARIS di lebar ponsel - 119px untuk dua kontrol yang sebenarnya
+   muat berdampingan. min-width:0 mengizinkan keduanya menyusut sampai muat sebaris.
+   Hanya berlaku di kartu sesi listening; hub dan layar ujian tidak disentuh. */
+.fsl-card-listening .fsl-gem-bar{gap:7px;margin:8px 0 0}
+.fsl-card-listening .fsl-gem-chip{flex:1 1 140px;min-width:0}
+.fsl-card-listening .fsl-gem-toggle{flex:1 1 150px;min-width:0}
+/* Teks kedua kontrol dipaksa satu baris + ellipsis. Tanpa ini, menyempitkan keduanya
+   hanya memindahkan masalah: labelnya membungkus ke bawah dan tingginya justru NAIK.
+   Percobaan pertama memakai flex-wrap:nowrap dan hasilnya lebih buruk lagi - toggle
+   terjepit jadi 28px dan teksnya menumpuk vertikal setinggi 94px. */
+.fsl-card-listening .fsl-gem-chip b,
+.fsl-card-listening .fsl-gem-chip small,
+.fsl-card-listening .fsl-gem-toggle .fsl-gem-toggle-label,
+.fsl-card-listening .fsl-gem-toggle small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+/* TANPA margin-top:auto di sini. Ia sempat dipasang untuk "mendorong gem bar ke bawah",
+   dan di dalam kolom fleks efeknya jauh lebih besar daripada itu: margin auto menyerap
+   SELURUH sisa ruang kolom, jadi panggung maskot tidak pernah kebagian dan tetap mentok
+   di min-height-nya (terukur 130px padahal kartunya 688px). Sisa ruang memang milik
+   panggung - itu inti susunan ini. */
+
+/* Baris tombol "?" tidak lagi memakan barisnya sendiri SELAMA SESI. Ia 44px tinggi
+   ditambah 4px margin - 48px yang, di layar yang sisa ruangnya terukur 2px, seluruhnya
+   diambil dari maskot. Selama sesi ia dipaku ke viewport (topbar dan bottom-nav memang
+   sudah disembunyikan, jadi tidak ada yang ditabraknya) dan biaya layoutnya nol.
+   h2 diberi ruang kanan supaya soal tidak pernah berjalan di bawah tombolnya. */
+body.fz-stage-sl.fsl-session-active .skill-page-topbar{
+  position:fixed;top:calc(10px + env(safe-area-inset-top,0px));right:14px;
+  margin:0;height:0;overflow:visible;z-index:36;
+}
+body.fz-stage-sl.fsl-session-active .fsl-card-listening>h2{padding-right:46px}
+
+/* SATU LAYAR: MASKOT SEBAGAI PEREDAM.
+   Memangkas blok satu per satu (padding, gem bar, tinggi opsi) menutup 390x844 tetapi
+   TIDAK akan pernah menutup 375x667 - soal + 4 pilihan + dua tombol + gem bar saja sudah
+   hampir memenuhi layar pendek, dan sisa ruangnya lebih kecil daripada maskot yang baru
+   saja diminta besar. Jadi ukurannya tidak lagi ditebak lewat clamp: kartunya dibuat
+   setinggi layar dan PANGGUNGNYA yang menyerap sisa ruang. Maskotnya menjadi sebesar
+   yang layar izinkan - besar di ponsel tinggi, mengecil sendiri di ponsel pendek -
+   sementara soal dan pilihan jawaban tidak pernah terdorong keluar.
+   min-height (bukan height) dipakai supaya kegagalannya AMAN: kalau isinya benar-benar
+   tidak muat (soal sangat panjang, 5 pilihan, teks Thai yang lebih tinggi), halamannya
+   kembali menggulir seperti biasa alih-alih memotong kontrol. */
+body.fz-stage-sl.fsl-session-active .app{min-height:100dvh;display:flex;flex-direction:column}
+/* Rantai tinggi harus TERSAMBUNG UTUH; satu simpul yang tidak ikut memutus semuanya.
+   Percobaan pertama melewatkan #app dan .skills-page, jadi main.app memang setinggi layar
+   tetapi tingginya berhenti di situ - kartu tetap setinggi isinya dan panggung tidak
+   pernah menerima sisa ruang (terukur: kartu mentok 660px, sisa ruang 2px, sementara
+   48px yang baru direbut dari baris "?" hilang entah ke mana). */
+body.fz-stage-sl.fsl-session-active #app{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+body.fz-stage-sl.fsl-session-active .skills-page{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+body.fz-stage-sl.fsl-session-active #speakingListeningRoot{flex:1 1 auto;min-height:0;display:flex}
+/* .fsl-shell aslinya display:grid (baris 2). Grid item TIDAK meregang mengikuti tinggi
+   induk fleksnya tanpa track baris yang mengisi, jadi kartunya tetap setinggi isinya dan
+   panggung tidak pernah menerima sisa ruang - terukur: panggung mentok 130px di 844px
+   padahal masih ada ruang. Selama sesi ia menjadi kolom fleks supaya rantai
+   app > root > shell > card > panggung tersambung utuh dari atas sampai bawah. */
+body.fz-stage-sl.fsl-session-active .fsl-shell{flex:1 1 auto;min-height:0;width:100%;display:flex;flex-direction:column}
+body.fz-stage-sl.fsl-session-active .fsl-card-listening{
+  flex:1 1 auto;min-height:0;display:flex;flex-direction:column;
+}
+.fsl-card-listening .fsl-player{padding:4px 0 0;gap:10px;flex:1 1 auto;min-height:96px}
+/* Maskot mengisi tinggi panggung; lebarnya mengikuti aspect-ratio. Dibatasi 46% lebar
+   kartu supaya gelembung selalu punya ruang baca, sesuai proporsi di rujukannya. */
+/* align-self:center, bukan stretch. Dengan stretch, kotak maskot setinggi panggung
+   sementara gambarnya dibatasi max-width 46% - jadi tokohnya menempel ke ATAS dan
+   ruang kosongnya menumpuk di bawah kakinya. Center membuat maskot dan gelembung
+   duduk di garis yang sama, seperti di rujukannya. */
+.fsl-card-listening .fsl-mascot-slot{
+  align-self:center;height:auto;width:auto;
+  min-height:76px;max-height:230px;max-width:46%;flex-basis:46%;
+  aspect-ratio:320/300;
+}
+
+/* Rapat terakhir untuk menutup 37px sisa di 375x667 (iPhone SE/8). Yang dirapatkan HANYA
+   ruang kosong - margin, padding, dan lantai tinggi panggung. Tinggi tombol dan tinggi
+   pilihan jawaban TIDAK disentuh: keduanya sudah duduk di lantai sasaran sentuh 44px, dan
+   memangkas itu berarti membayar layar yang muat dengan jempol yang meleset. */
+body.fz-stage-sl.fsl-session-active .fsl-card-listening{padding:14px}
+body.fz-stage-sl.fsl-session-active .fsl-card-listening>h2{margin:.15rem 0 .1rem}
+body.fz-stage-sl.fsl-session-active .fsl-card-listening .fsl-audio-actions{margin-top:8px}
+body.fz-stage-sl.fsl-session-active .fsl-card-listening .fsl-work{margin-top:8px}
+body.fz-stage-sl.fsl-session-active .fsl-card-listening .fsl-gem-footer{margin-top:8px}
+body.fz-stage-sl.fsl-session-active .fsl-card-listening .fsl-player{margin-top:8px;min-height:88px}
+
+/* LAYAR PENDEK: lantai panggung diturunkan. Di 375x667 kartunya sudah mentok - panggung
+   ada di ukuran minimumnya dan halaman masih lebih tinggi 35px daripada layar. Satu-satunya
+   sisa yang bisa diberikan tanpa menyentuh tinggi tombol atau tinggi pilihan jawaban adalah
+   lantai maskot dan tinggi equalizer. Di sini maskot memang kembali kecil, dan itu pertukaran
+   yang disengaja: di layar sependek ini "semua pilihan jawaban terlihat" lebih berharga
+   daripada "maskot besar". Ponsel tinggi (>=760px, termasuk 390x844) tidak tersentuh aturan
+   ini sama sekali dan tetap mendapat maskot penuh. */
+@media (max-height:759px){
+  body.fz-stage-sl.fsl-session-active .fsl-card-listening .fsl-player{min-height:0;padding:2px 0 0}
+  body.fz-stage-sl.fsl-session-active .fsl-card-listening .fsl-mascot-slot{min-height:56px}
+  body.fz-stage-sl.fsl-session-active .fsl-card-listening .fsl-bubble{padding:10px}
+  /* Di layar pendek maskotnya dibatasi lebih ketat. Dengan align-self:center ia tumbuh
+     mengikuti flex-basis 46%, dan di 375x667 itu cukup untuk mendorong 17px keluar layar.
+     Yang dibatasi lebarnya, bukan tinggi barisnya - gelembung tetap punya ruang baca. */
+  body.fz-stage-sl.fsl-session-active .fsl-card-listening .fsl-mascot-slot{max-width:33%;flex-basis:33%}
+  body.fz-stage-sl.fsl-session-active .fsl-card-listening .fsl-wave{height:16px}
+  body.fz-stage-sl.fsl-session-active .fsl-card-listening .fsl-replays{font-size:.72rem}
+}
+
+/* EQUALIZER. Sembilan batang, animasi hanya lewat transform:scaleY - BUKAN height:
+   height memicu layout tiap frame untuk sembilan elemen sekaligus, scaleY hanya compositing.
+   Diam (scaleY .18) saat tidak memutar, jadi ia tidak pernah mengaku ada suara yang tidak ada. */
+.fsl-card-listening .fsl-wave{width:min(240px,80%);flex:0 0 auto;height:26px}
+.fsl-eq{display:flex;align-items:flex-end;justify-content:center;gap:clamp(3px,1.4vw,6px)}
+.fsl-eq i{
+  display:block;width:clamp(4px,1.5vw,6px);height:100%;
+  border-radius:999px;background:currentColor;
+  transform:scaleY(.18);transform-origin:bottom;
+  transition:transform .18s var(--ease,ease)
+}
+@keyframes fslEqBar{0%,100%{transform:scaleY(.2)}50%{transform:scaleY(1)}}
+/* Durasi sedikit berbeda per batang supaya polanya tidak berdenyut serempak seperti
+   metronom - itu yang membuat equalizer terbaca "hidup", bukan kecepatannya. */
+.fsl-player.is-playing .fsl-eq i{animation:fslEqBar .82s ease-in-out infinite;animation-delay:calc(var(--i,0)*.07s)}
+.fsl-player.is-playing .fsl-eq i:nth-child(3n){animation-duration:1.06s}
+.fsl-player.is-playing .fsl-eq i:nth-child(3n+2){animation-duration:.66s}
+/* Reduced-motion: batangnya TIDAK bergerak, tetapi tetap naik ke tinggi tetap selama
+   memutar. Keadaannya tetap tersampaikan lewat bentuk, bukan lewat gerak - dan chip
+   [data-replays] tetap menjadi sumber kabar untuk pembaca layar. */
+@media (prefers-reduced-motion:reduce){
+  .fsl-player.is-playing .fsl-eq i{animation:none;transform:scaleY(.62)}
+}
+body.reduce-motion .fsl-player.is-playing .fsl-eq i{animation:none;transform:scaleY(.62)}
+.fsl-card-listening .fsl-replays{font-size:.8rem}
+/* Napas pelan supaya panggung tidak terbaca sebagai gambar mati. Hanya transform:
+   tidak memaksa layout, jadi tidak ada reflow per frame. Dimatikan penuh di blok
+   prefers-reduced-motion milik berkas ini. */
+@keyframes fslStageBreathe{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.fsl-card-listening .fsl-mascot-slot{animation:fslStageBreathe 3.6s ease-in-out infinite}
+/* DUA gerbang, bukan satu, karena keduanya sumber kebenaran yang berbeda: media query
+   menjawab setelan sistem operasi, dan body.reduce-motion menjawab sakelar Pengaturan di
+   dalam aplikasi (app.js enhanceUI). Murid yang mematikan animasi lewat FIEZEL tidak
+   mengubah setelan iOS-nya, jadi menjaga satu saja akan meleset untuk salah satu dari
+   mereka. */
+@media (prefers-reduced-motion:reduce){
+  .fsl-card-listening .fsl-mascot-slot{animation:none}
+}
+body.reduce-motion .fsl-card-listening .fsl-mascot-slot{animation:none}
 .fsl-audio-actions{margin-top:10px}
 .fsl-audio-actions .fsl-play-hero{flex:2 1 auto;min-height:56px;font-size:1.05rem;font-weight:700;border-radius:var(--radius-pill)}
 /* Panggung sesi addon (O1-001, cermin §1.2): topbar + bottomnav global disembunyikan
@@ -130,6 +311,15 @@ body.fz-stage-sl .fsl-feedback{padding-bottom:120px}
    melompati bottomnav yang sudah tidak ada. */
 body.fz-stage-sl.fsl-session-active .topbar,
 body.fz-stage-sl.fsl-session-active .bottomnav{display:none}
+/* SATU LAYAR TANPA GULIR (OWNER 2026-08-31). Baris di atas sudah menyembunyikan topbar
+   DAN bottom-nav selama sesi - tetapi padding bawah .app tetap 112px + safe-area, ruang
+   yang HANYA ada untuk memberi tempat bottom-nav yang sekarang tidak ada. Terukur: 112px
+   ruang mati di bawah kartu, penyumbang tunggal terbesar dari 163px gulir di 390x844.
+   Ini dikembalikan lebih dulu karena ia tidak memotong apa pun yang dilihat murid. */
+body.fz-stage-sl.fsl-session-active .app{
+  padding-top:10px;
+  padding-bottom:calc(12px + env(safe-area-inset-bottom,0px));
+}
 body.fz-stage-sl.fsl-session-active .fsl-feedback .fsl-actions{bottom:calc(14px + env(safe-area-inset-bottom,0px))}
 body.fz-stage-sl.fsl-session-active .fsl-feedback{padding-bottom:84px}
 /* Pau sudah hadir di pemutar (.fsl-player) sebagai maskot dengar; FAB pembimbing di pojok
