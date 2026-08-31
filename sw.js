@@ -45,7 +45,7 @@ const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
 // TIDAK ikut ASSETS - ia hidup di cache locale terpisah (LOCALE_TH_CACHE di bawah) yang
 // diisi halaman on-demand, meniru pola neural-prepare, sehingga murid Indonesia tidak
 // pernah membayar byte Thai.
-const SW_REV='m025-215-core-brain-five-gaps-20260830';
+const SW_REV='m025-216-core-brain-five-gaps-20260830';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 // m025-61: health check menanyakan revisi shell langsung ke worker yang sedang aktif.
 // Menebaknya dari nama cache tidak cukup: cache lama bisa tertinggal, sedangkan jawaban ini
@@ -99,7 +99,7 @@ const ASSETS=['./','./index.html','./style.css','./features/mascot/fiezel-motion
   // baru boleh dirilis setelah SEMUA berkas ini benar-benar ada di repo. Aset Thai
   // (copy-th-*, grammar-explanations-th, font Thai) SENGAJA tidak di sini - lihat
   // LOCALE_TH_CACHE di bawah. (Catatan alat yang sama dengan blok lain: jangan menaruh
-  // titik koma di dalam komentar array ini - pwa-cache-test memotong daftar di situ.)
+  // titik koma di komentar array ini - pwa-cache-test memotong daftar di situ.)
   './features/i18n/fiezel-i18n.js','./features/i18n/copy-id-core.js','./features/i18n/copy-id-app-a.js','./features/i18n/copy-id-app-b.js','./features/i18n/copy-id-app-c.js','./features/i18n/copy-id-app-d.js','./features/i18n/copy-id-feat-a.js','./features/i18n/copy-id-feat-b.js','./features/i18n/copy-id-gems.js','./features/i18n/copy-id-quota.js','./features/i18n/copy-id-settings-locale.js',
   // W4-QA (handoff W4-MERGE butir 3): loader th dimuat SEMUA locale dari index.html (guard
   // locale ada DI DALAM berkasnya, ia baru bertindak saat getLocale()==='th') — jadi ia
