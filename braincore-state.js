@@ -11,9 +11,14 @@
  * layer and returns a versioned JSON-safe snapshot. `importState()` validates that snapshot
  * and returns a detached learner object ready to continue learning.
  *
+ * `governance` is an optional root extension. It is intentionally outside `learner`: item
+ * quality is a property of content, not of one student's mastery. Old v1 snapshots without
+ * governance remain valid; runtimes that understand item governance validate that extension
+ * through the dedicated governance module after this generic JSON-safe boundary.
+ *
  * Deliberate non-goals:
  * - no migration guessing: unknown schema versions fail closed;
- * - no hidden defaults for missing required state: corrupt/incomplete snapshots fail loudly;
+ * - no hidden defaults for missing required learner state: corrupt snapshots fail loudly;
  * - no JSON stringification as validation: unsupported values are rejected before data can be
  *   silently dropped by JSON.stringify();
  * - no mutation: both directions return fresh object graphs.
@@ -110,6 +115,15 @@ function validateLearner(learner) {
   }
 }
 
+function validateSnapshot(snapshot) {
+  if (!snapshot || typeof snapshot !== 'object' || Array.isArray(snapshot)) fail('snapshot must be an object');
+  if (snapshot.schema !== SCHEMA) fail('unsupported schema ' + JSON.stringify(snapshot.schema));
+  if (typeof snapshot.braincoreVersion !== 'string') fail('braincoreVersion must be a string');
+  if (snapshot.at != null && (!Number.isFinite(snapshot.at) || snapshot.at < 0)) fail('snapshot.at is invalid');
+  validateLearner(snapshot.learner);
+  if (snapshot.governance != null) cloneJson(snapshot.governance, '$.governance');
+}
+
 function exportState(learner, options) {
   validateLearner(learner);
   const opts = options || {};
@@ -123,22 +137,34 @@ function exportState(learner, options) {
     if (!Number.isFinite(at) || at < 0) fail('options.at must be a non-negative finite number');
     snapshot.at = at;
   }
+  if (opts.governance != null) snapshot.governance = cloneJson(opts.governance, '$.governance');
   return snapshot;
 }
 
 function importState(snapshot) {
-  if (!snapshot || typeof snapshot !== 'object' || Array.isArray(snapshot)) fail('snapshot must be an object');
-  if (snapshot.schema !== SCHEMA) fail('unsupported schema ' + JSON.stringify(snapshot.schema));
-  if (typeof snapshot.braincoreVersion !== 'string') fail('braincoreVersion must be a string');
-  if (snapshot.at != null && (!Number.isFinite(snapshot.at) || snapshot.at < 0)) fail('snapshot.at is invalid');
-  validateLearner(snapshot.learner);
+  validateSnapshot(snapshot);
   return cloneJson(snapshot.learner, '$.learner');
 }
 
+function importGovernance(snapshot) {
+  validateSnapshot(snapshot);
+  return snapshot.governance == null ? null : cloneJson(snapshot.governance, '$.governance');
+}
+
 function serialize(snapshotOrLearner, options) {
-  const snapshot = snapshotOrLearner && snapshotOrLearner.schema === SCHEMA
-    ? { ...snapshotOrLearner, learner: importState(snapshotOrLearner) }
-    : exportState(snapshotOrLearner, options);
+  let snapshot;
+  if (snapshotOrLearner && snapshotOrLearner.schema === SCHEMA) {
+    validateSnapshot(snapshotOrLearner);
+    snapshot = {
+      schema: SCHEMA,
+      braincoreVersion: snapshotOrLearner.braincoreVersion,
+      learner: cloneJson(snapshotOrLearner.learner, '$.learner')
+    };
+    if (snapshotOrLearner.at != null) snapshot.at = snapshotOrLearner.at;
+    if (snapshotOrLearner.governance != null) snapshot.governance = cloneJson(snapshotOrLearner.governance, '$.governance');
+  } else {
+    snapshot = exportState(snapshotOrLearner, options);
+  }
   return JSON.stringify(snapshot);
 }
 
@@ -155,6 +181,7 @@ module.exports = Object.freeze({
   REQUIRED_LEARNER_KEYS,
   exportState,
   importState,
+  importGovernance,
   serialize,
   parse
 });
