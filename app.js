@@ -2805,7 +2805,16 @@ function tutorObserve(session,q,pickedIndex,ok,ms,ctx={}){
     // dan decideMove menerima opts yang sama persis seperti sebelum Fase 2.
     const affect=affectObserve(q,ok,ms,diagnosis?.timing);
     const affectState=String(affect?.state||affectSessionSync()?.state||'');
-    const decision=T.decideMove(session,diagnosis,{remaining:Number(ctx.remaining)||0,fatigue:coreBrainSnapshot()?.fatigue?.state||'',...(affectState&&affectState!=='neutral'?{affect:{state:affectState}}:{})});
+    /* Fase 2/H: mastery BKT diteruskan ke decideMove supaya keputusan MENGAJAR ULANG tahu
+       apakah muridnya memang belum bisa. Diukur sebelum ditambahkan: pada 39 kejadian
+       mengajar-ulang terhadap murid yang kemampuannya tinggi, mastery BKT mereka rata-rata
+       0,931 dengan 21 jawaban sebagai bukti - mesinnya SUDAH tahu, keputusannya saja yang
+       tidak pernah diberi tahu. Guarded: tanpa modul BKT field-nya tidak dikirim sama
+       sekali, dan decideMove menerima opts yang sama persis seperti sebelumnya. */
+    const tutorLesson=String(q?.lessonSkill||q?.skill||'');
+    let tutorMastery=null;
+    try{if(bktAvailable()&&tutorLesson){const mm=self.FiezelMasteryBKT.mastery(bktRead(),tutorLesson);if(Number.isFinite(Number(mm?.L)))tutorMastery=Number(mm.L)}}catch{}
+    const decision=T.decideMove(session,diagnosis,{remaining:Number(ctx.remaining)||0,fatigue:coreBrainSnapshot()?.fatigue?.state||'',...(tutorMastery!==null?{mastery:tutorMastery}:{}),...(affectState&&affectState!=='neutral'?{affect:{state:affectState}}:{})});
     // Braincore v3 (T5): setiap diagnosis juga menjadi bukti di buku besar lintas sesi.
     // Hanya jawaban ternilai (bukan retry) - retry adalah bukti scaffolding, bukan bukti
     // keyakinan murid. Fungsi ini punya try/catch sendiri: gagal menulis ledger tidak boleh

@@ -44,8 +44,17 @@
  * - listeningPolicy (listening-adaptive): BAYANGAN — policy() dihitung dan
  *   ditempel sebagai metadata q.__listeningPolicy, tetapi tidak ada satu baris
  *   pun yang membacanya kembali untuk mengubah playback.
- * - stepTutor & productionGrader: OFF — dimuat index.html/sw.js tetapi NOL
- *   referensi di app.js; belum ada jalur yang memanggilnya.
+ * - stepTutor: AKTIF (dikoreksi audit Fase 2, 30 Agu 2026) — app.js:7732 merender
+ *   stepTutorGuidanceMarkup(q) saat murid mengulang di anak tangga scaffold 'worked',
+ *   dan markup itu memanggil FiezelStepTutor.decompose() lewat stepTutorGuidance()
+ *   (app.js:2712). Dulu tercatat 'off'; wiring berubah, manifest tidak ikut.
+ * - productionGrader: AKTIF (dikoreksi audit Fase 2) — app.js:6651 menyisipkan soal
+ *   cloze ke pool sesi adaptif (posisi 2 dan 5) lewat clozeAdaptivePicks(), dan
+ *   answerCloze() memanggil FiezelProductionGrader.grade() (app.js:7944) untuk
+ *   MEMUTUSKAN benar/salah jawaban ketik murid. Keputusan itu lalu menjadi bukti BKT
+ *   (bobot 1,5), kalibrasi item, dan ledger miskonsepsi. Ini otoritas penuh, bukan
+ *   bayangan. Dulu tercatat 'off' dengan alasan 'nol referensi di app.js' — alasan itu
+ *   sudah tidak benar sejak jalur cloze masuk.
  *
  * BATAS YANG DIJAGA
  * -----------------
@@ -100,6 +109,8 @@
     { file: 'fiezel-brain-manifest.js', global: 'FiezelBrainManifest', schema: SCHEMA, authorityKey: 'manifest' },
     { file: 'fiezel-confusion-matrix.js', global: 'FiezelConfusionMatrix', schema: 'fiezel-confusion-matrix-v1', authorityKey: 'confusionMap' },
     { file: 'fiezel-core-brain.js', global: 'FiezelCoreBrain', schema: 'fiezel-core-brain-v2', authorityKey: 'memory' },
+    { file: 'fiezel-braincore-evidence.js', global: 'FiezelBraincoreEvidence', schema: 'fiezel-braincore-evidence-v1', authorityKey: 'braincoreEvidence' },
+    { file: 'fiezel-decision-trace.js', global: 'FiezelDecisionTrace', schema: 'fiezel-decision-trace-v1', authorityKey: 'decisionTrace' },
     { file: 'fiezel-evidence-credibility.js', global: 'FiezelEvidenceCredibility', schema: 'fiezel-evidence-credibility-v1', authorityKey: 'evidenceCredibility' },
     { file: 'fiezel-item-calibration.js', global: 'FiezelItemCalibration', schema: 'fiezel-item-calibration-v1', authorityKey: 'itemCalibration' },
     { file: 'fiezel-item-prior.js', global: 'FiezelItemPrior', schema: null, authorityKey: 'itemDifficultyPrior' },
@@ -146,8 +157,13 @@
     confusionMap: 'shadow',
     olmInsight: 'shadow',
     listeningPolicy: 'shadow',
-    stepTutor: 'off',
-    productionGrader: 'off',
+    // KOREKSI audit Fase 2 (30 Agu 2026): keduanya DULU 'off' dengan alasan tertulis
+    // "nol referensi di app.js". Alasan itu sudah basi — lihat komentar kepala berkas.
+    // productionGrader memutuskan benar/salah jawaban ketik; stepTutor merender tuntunan
+    // langkah yang dilihat murid. Gerbang brain-manifest-test.js kini MEMBACA app.js dan
+    // memverifikasi klasifikasi ini terhadap wiring nyata, bukan terhadap konstanta.
+    stepTutor: 'active',
+    productionGrader: 'active',
     // Wave E4 (29 Agu): probe retensi tertunda — modul murni baru, belum ada pemanggil
     // di app.js; rekomendasi half-life-nya ADVISORY dan tidak menulis memori: 'off'.
     retentionProbe: 'off',
@@ -162,7 +178,27 @@
     // sama-sama nol pemanggil di app.js/index.html pada bundle ini — 'off' sampai
     // ada wiring nyata yang bisa ditunjuk.
     metricsDigest: 'off',
+    // statGate TETAP 'off', dan itu diverifikasi bukan diasumsikan (audit Fase 2).
+    // content-promotion.js MEMANG memasang FiezelStatGate.verdict sebagai pemutus
+    // promote/rollback konten, dan app.js:3004 memanggil CONTENT_PROMOTION.evaluate()
+    // tiap kali aplikasi dimuat. TETAPI konfigurasi canary yang benar-benar dikirim
+    // (content-canary-config.js: enabled:false, mode:'off') membuat evaluate() keluar
+    // lebih dulu dengan reason 'canary_not_active' — probe empiris: verdict dipanggil
+    // NOL kali. Jadi 'off' benar UNTUK KONFIGURASI YANG DIKIRIM; modul ini satu sakelar
+    // konfigurasi dari menjadi aktif. Kalau canary dinyalakan, entri ini WAJIB jadi
+    // 'active' di gelombang bundle yang sama.
     statGate: 'off',
+    // Decision Trace (Fase 2 / Phase B): catatan diagnosis internal "apa yang dilihat Braincore
+    // dan apa yang diputuskannya". Ia DESKRIPTIF MURNI — ia tidak memutuskan apa pun untuk
+    // murid, dan sengaja belum dimuat index.html. 'off' adalah klasifikasi yang jujur hari ini:
+    // modul ada, teruji, dan belum satu pun jalur aplikasi memanggilnya. Fase C yang
+    // menyambungkannya; entri ini WAJIB ikut berubah di commit yang sama.
+    // Fase 2 / Phase K. Skema bukti untuk MENILAI MESIN (bukan menjelaskan murid — itu
+    // milik fiezel-learner-evidence-v1 di app.js). 'off' adalah klasifikasi yang JUJUR
+    // hari ini: modulnya membentuk catatan, dan TIDAK ADA satu pun pemanggil di produksi.
+    // Tidak ada baris di dalamnya yang tahu cara bicara dengan server, dan itu disengaja.
+    braincoreEvidence: 'off',
+    decisionTrace: 'off',
     // Manifest sendiri deskriptif murni: ia tidak memutuskan apa-apa untuk murid,
     // maka jujurnya 'shadow' (informasi diagnostik), bukan 'active'.
     manifest: 'shadow'

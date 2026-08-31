@@ -1,0 +1,365 @@
+/**
+ * FIEZEL gerbang — Braincore hidup: satu interaksi belajar, ujung ke ujung (Fase 2 / Phase C).
+ *
+ * PERTANYAAN YANG DIJAWAB GERBANG INI, dan ia satu-satunya pertanyaan yang penting:
+ *
+ *   "Ketika murid menjawab, apakah Braincore BENAR-BENAR mengamati, MENGUBAH keadaan
+ *    internalnya, dan mengambil keputusan yang BERBEDA karena apa yang ia amati?"
+ *
+ * Audit Fase 1 hanya bisa menjawab "sebagian". Gerbang ini memaksa jawabannya menjadi ya-atau-
+ * tidak yang bisa dibuktikan, dengan menjalankan modul Braincore SUNGGUHAN — bukan tiruan —
+ * lewat perkabelan yang meniru app.js (braincore-pipeline.js).
+ *
+ * KENAPA MENJALANKAN, BUKAN MEMBACA. Dua temuan Fase 1 melarang jalan pintas berbasis pola
+ * teks. Sebuah gerbang hijau berbulan-bulan karena membandingkan konstanta dengan konstanta.
+ * Sebuah cacat produk (pengikat `say` hilang) lolos SEMUA gerbang teks karena polanya masih
+ * ada di berkas — yang hilang justru pengikatnya. Satu-satunya obat adalah menjalankan
+ * keputusannya dan memeriksa hasilnya.
+ */
+const assert = require('assert');
+const P = require('./braincore-pipeline.js');
+const State = require('./braincore-state.js');
+const Trace = require('./features/brain/fiezel-decision-trace.js');
+
+let failures = 0;
+function test(name, fn) {
+  try { fn(); console.log('ok - ' + name); }
+  catch (e) { failures++; console.error('FAIL - ' + name + '\n    ' + e.message); }
+}
+
+const T0 = 1_700_000_000_000;
+const DAY = 86_400_000;
+const Q = {
+  id: 'g-past-simple-1', concept: 'past-simple', lesson: 'past-simple',
+  level: 'A2', domain: 'grammar', mode: 'complete_sentence', stemLength: 40
+};
+const fresh = () => P.createLearner({ level: 'A2', now: T0 });
+
+/* ========================================================================================
+ * 1. JALUR LENGKAP BERJALAN, DAN MENINGGALKAN CATATAN YANG BISA DIBACA
+ * ===================================================================================== */
+
+test('satu jawaban melewati SELURUH jalur dan menghasilkan trace yang sah', () => {
+  const { trace } = P.answer(fresh(), Q, { correct: true, ms: 6000, timing: 'normal' }, T0);
+  assert.strictEqual(trace.schema, 'fiezel-decision-trace-v1');
+  assert.strictEqual(trace.conceptId, 'past-simple');
+  assert.ok(trace.braincoreVersion, 'trace tidak membawa versi bundle — dua rilis tidak bisa dibandingkan');
+  assert.ok(trace.masteryBefore && trace.masteryAfter, 'mastery tidak terpotret');
+  assert.ok(trace.memoryAfter, 'ingatan tidak terpotret');
+  assert.ok(Trace.DECISIONS.indexOf(trace.decision) !== -1, 'keputusan di luar enum');
+});
+
+test('SETIAP tahap jalur benar-benar menyumbang, bukan diam', () => {
+  const { trace } = P.answer(fresh(), Q, { correct: true, ms: 6000, timing: 'normal' }, T0);
+  assert.notStrictEqual(trace.evidence.kappa, null, 'kredibilitas bukti tidak dihitung');
+  assert.notStrictEqual(trace.difficultyState.prior, null, 'prior kesulitan tidak dihitung');
+  assert.notStrictEqual(trace.difficultyState.target, null, 'target sukses tidak ditetapkan');
+  assert.ok(trace.masteryAfter.n >= 1, 'BKT tidak mencatat observasi');
+  assert.ok(trace.memoryAfter.stabilityDays > 0, 'model ingatan tidak menulis stabilitas');
+});
+
+/* ========================================================================================
+ * 2. KEADAAN INTERNAL BENAR-BENAR BERGERAK KARENA BUKTI
+ * ===================================================================================== */
+
+test('jawaban BENAR menaikkan mastery', () => {
+  const { trace } = P.answer(fresh(), Q, { correct: true, ms: 6000, timing: 'normal' }, T0);
+  assert.ok(trace.masteryAfter.L > trace.masteryBefore.L,
+    `mastery tidak naik: ${trace.masteryBefore.L} -> ${trace.masteryAfter.L}`);
+  assert.strictEqual(Trace.movedState(trace), true);
+});
+
+test('jawaban SALAH tidak menaikkan mastery seperti jawaban benar', () => {
+  const ok = P.answer(fresh(), Q, { correct: true, ms: 6000, timing: 'normal' }, T0).trace;
+  const no = P.answer(fresh(), Q, { correct: false, ms: 6000, timing: 'normal' }, T0).trace;
+  assert.ok(no.masteryAfter.L < ok.masteryAfter.L,
+    `salah (${no.masteryAfter.L}) seharusnya di bawah benar (${ok.masteryAfter.L})`);
+});
+
+test('mastery menumpuk lintas jawaban — bukan dihitung ulang dari nol tiap kali', () => {
+  let L = fresh(); const seen = [];
+  for (let i = 0; i < 5; i++) {
+    const r = P.answer(L, Q, { correct: true, ms: 6000, timing: 'normal' }, T0 + i * DAY);
+    L = r.learner; seen.push(r.trace.masteryAfter.L);
+  }
+  for (let i = 1; i < seen.length; i++) {
+    assert.ok(seen[i] >= seen[i - 1], `mastery mundur di langkah ${i}: ${seen.join(' -> ')}`);
+  }
+  assert.ok(seen[seen.length - 1] > seen[0], `mastery tidak menumpuk: ${seen.join(' -> ')}`);
+});
+
+/* ========================================================================================
+ * 3. KREDIBILITAS BUKTI BENAR-BENAR MENGUBAH BOBOTNYA (bukan sekadar dicatat)
+ * ===================================================================================== */
+
+test('tebakan cepat DIDISKON: benar-tapi-2-detik menggerakkan mastery lebih sedikit', () => {
+  const slow = P.answer(fresh(), Q, { correct: true, ms: 8000, timing: 'normal' }, T0).trace;
+  const fast = P.answer(fresh(), Q, { correct: true, ms: 900, timing: 'guess' }, T0).trace;
+  assert.ok(fast.evidence.kappa < slow.evidence.kappa,
+    `kappa tebakan (${fast.evidence.kappa}) tidak di bawah kappa jawaban dipikirkan (${slow.evidence.kappa})`);
+  assert.ok(fast.masteryAfter.L < slow.masteryAfter.L,
+    `bukti lemah menggerakkan mastery sama jauh dengan bukti kuat: ${fast.masteryAfter.L} vs ${slow.masteryAfter.L}`);
+});
+
+test('BEBAN BAHASA didiskon: pemula pada soal Inggris penuh dinilai lebih hati-hati', () => {
+  const plain = P.answer(fresh(), Q, { correct: false, ms: 7000, timing: 'normal' }, T0).trace;
+  const heavy = P.answer(fresh(), Q, { correct: false, ms: 7000, timing: 'normal', langLoad: 'full_en' }, T0).trace;
+  assert.ok(heavy.evidence.kappa <= plain.evidence.kappa,
+    `beban bahasa tidak mendiskon bukti: ${heavy.evidence.kappa} vs ${plain.evidence.kappa}`);
+});
+
+/* ========================================================================================
+ * 4. INGATAN BEREAKSI PADA HASIL DAN PADA WAKTU
+ * ===================================================================================== */
+
+test('benar memperpanjang stabilitas ingatan, salah memendekkannya', () => {
+  const ok = P.answer(fresh(), Q, { correct: true, ms: 6000, timing: 'normal' }, T0).trace;
+  const no = P.answer(fresh(), Q, { correct: false, ms: 6000, timing: 'normal' }, T0).trace;
+  assert.ok(ok.memoryAfter.stabilityDays > no.memoryAfter.stabilityDays,
+    `stabilitas benar (${ok.memoryAfter.stabilityDays}) tidak di atas salah (${no.memoryAfter.stabilityDays})`);
+});
+
+test('jeda panjang menurunkan retrievability SEBELUM review (murid memang lupa)', () => {
+  const first = P.answer(fresh(), Q, { correct: true, ms: 6000, timing: 'normal' }, T0);
+  const soon = P.answer(first.learner, Q, { correct: true, ms: 6000, timing: 'normal' }, T0 + DAY).trace;
+  const late = P.answer(first.learner, Q, { correct: true, ms: 6000, timing: 'normal' }, T0 + 60 * DAY).trace;
+  assert.ok(late.memoryBefore.retrievability < soon.memoryBefore.retrievability,
+    `jeda 60 hari tidak menurunkan retrievability: ${late.memoryBefore.retrievability} vs ${soon.memoryBefore.retrievability}`);
+});
+
+/* ========================================================================================
+ * 5. MISKONSEPSI TERCATAT — DAN TIDAK DITUDUHKAN DARI SATU KESALAHAN
+ * ===================================================================================== */
+
+test('satu kesalahan TIDAK langsung menuduh murid punya miskonsepsi', () => {
+  const { trace } = P.answer(fresh(), Q,
+    { correct: false, ms: 7000, timing: 'normal', chosenMisconception: 'past-simple-vs-present-perfect' }, T0);
+  assert.strictEqual(trace.misconceptionState.activeCount, 0,
+    'satu slip sudah cukup menuduh — pagar MIN_EVIDENCE/MIN_SESSIONS tidak bekerja');
+});
+
+/* ========================================================================================
+ * 6. KEPUTUSAN BERUBAH KARENA APA YANG DIAMATI  ← inti Fase C
+ * ===================================================================================== */
+
+test('KEPUTUSAN BERBEDA untuk bukti berbeda pada keadaan awal yang SAMA', () => {
+  const right = P.answer(fresh(), Q, { correct: true, ms: 6000, timing: 'normal' }, T0);
+  const wrong = P.answer(fresh(), Q, { correct: false, ms: 6000, timing: 'normal' }, T0);
+  assert.notStrictEqual(right.trace.decision, wrong.trace.decision,
+    `Braincore memilih tindakan yang sama ("${right.trace.decision}") untuk benar dan salah — ` +
+    'itu berarti keputusannya tidak dipengaruhi bukti');
+});
+
+test('rentetan salah mengubah tindakan menjauh dari sekadar "lanjut"', () => {
+  let L = fresh(); let last = null;
+  for (let i = 0; i < 4; i++) {
+    const r = P.answer(L, Q, { correct: false, ms: 7000, timing: 'normal' }, T0 + i * 60000);
+    L = r.learner; last = r.trace;
+  }
+  assert.notStrictEqual(last.decision, 'continue',
+    'empat jawaban salah beruntun dan Braincore tetap "lanjut saja"');
+});
+
+/* ========================================================================================
+ * 7. DETERMINISTIK — syarat mutlak untuk membandingkan dua rilis
+ * ===================================================================================== */
+
+test('DETERMINISTIK: masukan identik -> trace identik byte demi byte', () => {
+  const a = P.answer(fresh(), Q, { correct: true, ms: 6000, timing: 'normal' }, T0).trace;
+  const b = P.answer(fresh(), Q, { correct: true, ms: 6000, timing: 'normal' }, T0).trace;
+  assert.strictEqual(JSON.stringify(a), JSON.stringify(b));
+});
+
+test('keadaan murid TIDAK dimutasi di tempat — pemanggil memegang salinan barunya', () => {
+  const L = fresh();
+  const before = JSON.stringify(L);
+  P.answer(L, Q, { correct: true, ms: 6000, timing: 'normal' }, T0);
+  assert.strictEqual(JSON.stringify(L), before,
+    'answer() memutasi keadaan masukan — dua skenario counterfactual akan saling mencemari');
+});
+
+/* ========================================================================================
+ * 8. PIPELINE MASIH MENUNJUK KODE PRODUKSI YANG SAMA
+ * ===================================================================================== */
+
+test('PENJAGA TIDAK SENYAP: masukan normal tidak menghasilkan satu pun galat tertangkap', () => {
+  // Kenapa gerbang ini ada, dan ia lahir dari kesalahan penulisnya sendiri: versi pertama
+  // pipeline memakai `tutorSession` di langkah 7 padahal ia baru dideklarasikan di langkah 10
+  // — temporal dead zone. try/catch di langkah itu MENELAN ReferenceError-nya, jadi ledger
+  // miskonsepsi diam-diam tidak pernah terisi dan profil "murid kesulitan" terlihat seperti
+  // Braincore yang rusak. Braincore-nya benar; harness-nya cacat, dan penjaganya sendiri yang
+  // menyembunyikan cacat itu selama dua fase.
+  //
+  // Penjaganya TETAP ADA (app.js memang mendegradasi saat modul absen), tetapi sekarang ia
+  // MENCATAT. Gerbang ini menuntut catatan itu kosong untuk masukan yang sehat — degradasi
+  // yang disengaja tetap mungkin; degradasi yang tidak disadari tidak.
+  for (const [label, ans] of [
+    ['benar', { correct: true, ms: 6000, timing: 'normal' }],
+    ['salah', { correct: false, ms: 7000, timing: 'normal' }],
+    ['salah + miskonsepsi', { correct: false, ms: 7000, timing: 'normal', chosenMisconception: 'm1' }],
+    ['tebakan cepat', { correct: true, ms: 700, timing: 'guess' }],
+    ['beban bahasa', { correct: false, ms: 7000, timing: 'normal', langLoad: 'full_en' }]
+  ]) {
+    const r = P.answer(fresh(), Q, ans, T0);
+    assert.deepStrictEqual(r.guardErrors, [],
+      `penjaga menelan galat pada masukan "${label}": ${JSON.stringify(r.guardErrors)}`);
+  }
+});
+
+test('ledger miskonsepsi BENAR-BENAR terisi lewat pipeline (bukan null diam-diam)', () => {
+  const r = P.answer(fresh(), Q, { correct: false, ms: 7000, timing: 'normal', chosenMisconception: 'm1' }, T0);
+  assert.ok(r.learner.ledger && r.learner.ledger.entries,
+    'ledger tetap null sesudah jawaban salah ber-miskonsepsi — jalurnya putus tanpa bersuara');
+  assert.ok(Object.keys(r.learner.ledger.entries).length >= 1, 'ledger terisi tetapi tanpa entri');
+});
+
+test('titik sambung app.js yang dirujuk pipeline masih ada di app.js', () => {
+  const fs = require('fs'), path = require('path');
+  const app = fs.readFileSync(path.join(__dirname, 'app.js'), 'utf8');
+  // Kalau salah satu hilang, pipeline sedang meniru kode yang sudah tidak ada, dan seluruh
+  // angka di atas berhenti berarti. Ini yang membuat alat ukur ini tidak diam-diam basi.
+  for (const [what, re] of [
+    ['record() pintu bukti tunggal', /function record\(q,ok,ms,selectedIndex\)/],
+    ['evidenceKappa -> EvidenceCredibility', /FiezelEvidenceCredibility/],
+    ['bktRecord -> MasteryBKT.update', /FiezelMasteryBKT\.update/],
+    ['scheduleNext -> CoreBrain.updateMemory', /brain\.updateMemory\(/],
+    ['MisconceptionLedger.update', /FiezelMisconceptionLedger/],
+    ['ItemPrior.difficultyFor', /FiezelItemPrior/],
+    ['tutor selectNext/decideMove', /FiezelTutorBrain/],
+    ['affectTargetSuccess 0.90/0.75/0.80', /frustrated'\)return \.90[\s\S]{0,80}bored'\)return \.75/]
+  ]) {
+    assert.ok(re.test(app), `titik sambung hilang dari app.js: ${what}`);
+  }
+});
+
+/* ========================================================================================
+ * MODUL HARUS BERGERAK, BUKAN SEKADAR MENJAWAB
+ *
+ * TIGA KALI dalam fase ini, sebuah modul murni menerima catatan bercacat, mendegradasi persis
+ * seperti rancangannya, dan mengembalikan nilai yang tampak masuk akal:
+ *
+ *   Fase F  ItemPrior          mode 'mcq' bukan anggota MODE_COST -> prior jatuh ke basis
+ *   Fase G  Calibration.observe nama field karangan               -> kalibrasi jadi NO-OP
+ *   Fase J  estimateAbility     `correct` vs `ok`                 -> taksiran terpaku di lantai
+ *
+ * Tidak satu pun melempar. Penjaga senyap tidak bisa melihatnya, karena tidak ada yang gagal —
+ * masukan bercacat itu MASUKAN YANG SAH yang artinya sesuatu yang lain.
+ *
+ * Pelajarannya bukan "lebih teliti". Pelajarannya: gerbang harus meng-assert modulnya BERGERAK
+ * dan MENYIMPAN, bukan sekadar MENGEMBALIKAN. Assert di bawah menguji arah, dan arah adalah hal
+ * yang tidak bisa dipalsukan oleh masukan yang salah nama.
+ * ===================================================================================== */
+test('modul BERGERAK: jawaban benar menaikkan taksiran kemampuan, salah menurunkannya', () => {
+  const q = { ...Q };
+  const jalankan = (benar) => {
+    let L = P.createLearner({ level: 'A2', now: T0 });
+    let t = T0;
+    for (let i = 0; i < 12; i++) {
+      t += DAY;
+      if (i % 4 === 0) L = P.newSession(L, t);
+      L = P.answer(L, q, { correct: benar, ms: 7000 }, t).learner;
+    }
+    return P.ability(L);
+  };
+  const naik = jalankan(true), turun = jalankan(false);
+  assert.ok(naik !== null && turun !== null, 'taksiran kemampuan tidak pernah terhitung');
+  assert.ok(naik > turun,
+    'dua belas jawaban BENAR tidak menghasilkan taksiran lebih tinggi daripada dua belas jawaban '
+    + 'SALAH (' + naik + ' vs ' + turun + ') — penaksir tidak menerima hasil jawaban sama sekali');
+});
+
+test('modul MENYIMPAN: kalibrasi item benar-benar menumpuk bukti, bukan mengembalikan state kosong', () => {
+  let L = P.createLearner({ level: 'A2', now: T0 });
+  let t = T0;
+  for (let i = 0; i < 14; i++) {
+    t += DAY;
+    if (i % 4 === 0) L = P.newSession(L, t);
+    L = P.answer(L, Q, { correct: false, ms: 7000 }, t).learner;
+  }
+  const items = L.calibration && L.calibration.items ? Object.keys(L.calibration.items) : [];
+  assert.ok(items.length > 0,
+    'sesudah 14 jawaban pada satu item, state kalibrasi masih KOSONG — observe() dipanggil tetapi '
+    + 'tidak menyimpan apa pun (cacat Fase G)');
+});
+
+/* ========================================================================================
+ * STATE FRONT DOOR — roadmap sale-readiness: satu state object masuk, satu state object keluar
+ * ===================================================================================== */
+
+function learnedState() {
+  let L = fresh();
+  for (let i = 0; i < 14; i++) {
+    const t = T0 + (i + 1) * DAY;
+    if (i % 4 === 0) L = P.newSession(L, t);
+    L = P.answer(L, Q, {
+      correct: i % 3 !== 0,
+      ms: 5500 + i * 170,
+      timing: i % 5 === 0 ? 'slow' : 'normal',
+      ...(i % 3 === 0 ? { chosenMisconception: 'past-simple-vs-present-perfect' } : {})
+    }, t).learner;
+  }
+  return L;
+}
+
+test('exportState/importState: state belajar kompleks round-trip byte-identik', () => {
+  const original = learnedState();
+  const snapshot = State.exportState(original, { braincoreVersion: '3.0.0', at: T0 + 14 * DAY });
+  assert.strictEqual(snapshot.schema, 'fiezel-braincore-state-v1');
+  assert.strictEqual(snapshot.braincoreVersion, '3.0.0');
+  const restored = State.importState(snapshot);
+  assert.strictEqual(JSON.stringify(restored), JSON.stringify(original),
+    'state setelah import berbeda dari state yang diekspor');
+});
+
+test('importState menghasilkan graph BARU — mutasi hasil import tidak mencemari snapshot/original', () => {
+  const original = learnedState();
+  const snapshot = State.exportState(original, { braincoreVersion: '3.0.0' });
+  const restored = State.importState(snapshot);
+  restored.level = 'C2';
+  restored.history.push({ poison: true });
+  restored.memory['past-simple'].stabilityDays = 999;
+  assert.notStrictEqual(restored.level, original.level);
+  assert.notStrictEqual(restored.history.length, original.history.length);
+  assert.notStrictEqual(restored.memory['past-simple'].stabilityDays, original.memory['past-simple'].stabilityDays);
+  assert.strictEqual(snapshot.learner.level, original.level, 'snapshot ikut termutasi');
+});
+
+test('state yang di-import MELANJUTKAN keputusan persis seperti state sebelum diekspor', () => {
+  const original = learnedState();
+  const snapshot = State.exportState(original, { braincoreVersion: '3.0.0' });
+  const restored = State.importState(snapshot);
+  const t = T0 + 15 * DAY;
+  const ans = { correct: false, ms: 7100, timing: 'normal', chosenMisconception: 'past-simple-vs-present-perfect' };
+  const a = P.answer(original, Q, ans, t);
+  const b = P.answer(restored, Q, ans, t);
+  assert.strictEqual(JSON.stringify(b.trace), JSON.stringify(a.trace),
+    'trace berubah setelah persistence round-trip — import bukan kelanjutan state yang sama');
+  assert.strictEqual(JSON.stringify(b.learner), JSON.stringify(a.learner),
+    'learner berikutnya berubah setelah persistence round-trip');
+});
+
+test('serialize/parse memberi state learner yang sama tanpa jam atau I/O tersembunyi', () => {
+  const original = learnedState();
+  const text = State.serialize(original, { braincoreVersion: '3.0.0', at: T0 });
+  const restored = State.parse(text);
+  assert.strictEqual(JSON.stringify(restored), JSON.stringify(original));
+});
+
+test('state rusak/versi asing FAIL CLOSED, bukan didiamkan atau ditebak migrasinya', () => {
+  const good = State.exportState(fresh(), { braincoreVersion: '3.0.0' });
+  assert.throws(() => State.importState({ ...good, schema: 'fiezel-braincore-state-v99' }), /unsupported schema/);
+  const missing = { ...good, learner: { ...good.learner } };
+  delete missing.learner.bkt;
+  assert.throws(() => State.importState(missing), /learner\.bkt is required/);
+  const nonFinite = { ...good, learner: { ...good.learner, affectConfidence: Infinity } };
+  assert.throws(() => State.importState(nonFinite), /affectConfidence/);
+  const withFunction = fresh();
+  withFunction.memory.bad = { fn() {} };
+  assert.throws(() => State.exportState(withFunction), /unsupported value type function/);
+  const cyclic = fresh();
+  cyclic.memory.loop = cyclic.memory;
+  assert.throws(() => State.exportState(cyclic), /contains a cycle/);
+});
+
+console.log(failures ? 'BraincorePipeline: FAIL (' + failures + ' kegagalan)' : 'BraincorePipeline: PASS');
+process.exit(failures ? 1 : 0);

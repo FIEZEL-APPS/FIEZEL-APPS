@@ -99,11 +99,177 @@ test('klaim otoritas kunci sesuai temuan council: memory aktif, bktUnlock bayang
   assert.strictEqual(manifest.authorityMap.bktUnlock, 'shadow');
 });
 
-test('modul tanpa satu pun referensi di app.js dinyatakan off, bukan diaku-aku aktif', () => {
-  // step-tutor dan production-grader dimuat index.html tetapi nol pemanggil di app.js —
-  // manifest wajib jujur menyebutnya off.
-  assert.strictEqual(manifest.authorityMap.stepTutor, 'off');
-  assert.strictEqual(manifest.authorityMap.productionGrader, 'off');
+/* ============================================================================
+ * GERBANG WIRING NYATA (audit Fase 2, 30 Agu 2026) — MENGGANTI TES BERONGGA.
+ *
+ * KENAPA TES LAMA DIHAPUS. Tes di tempat ini dulu bernama "modul tanpa satu pun
+ * referensi di app.js dinyatakan off" tetapi SELURUH ISINYA adalah:
+ *
+ *     assert.strictEqual(manifest.authorityMap.stepTutor, 'off');
+ *     assert.strictEqual(manifest.authorityMap.productionGrader, 'off');
+ *
+ * Itu membandingkan konstanta beku dengan konstanta beku. Ia TIDAK PERNAH membaca
+ * app.js, jadi ia setuju dengan dirinya sendiri selamanya. Ia HIJAU selama berbulan-
+ * bulan sementara fakta yang ia klaim jaga sudah salah: productionGrader memutuskan
+ * benar/salah jawaban ketik murid (app.js:7944) dan stepTutor merender tuntunan yang
+ * dilihat murid (app.js:7732). Gerbang hijau yang tidak menjaga apa pun lebih buruk
+ * daripada tidak ada gerbang: ia membuat orang berhenti memeriksa.
+ *
+ * YANG DILAKUKAN GERBANG BARU. Ia MEMBACA SUMBER — app.js plus setiap berkas yang
+ * benar-benar dimuat index.html — lalu memverifikasi klasifikasi manifest terhadap
+ * bukti yang bisa ditunjuk:
+ *
+ *   'off'              => NOL referensi global modul di seluruh permukaan runtime.
+ *   'active'/'shadow'  => MINIMAL SATU referensi. Modul yang tidak pernah disebut
+ *                         tidak bisa sedang memutuskan apa pun.
+ *
+ * BATAS JUJUR GERBANG INI, dinyatakan supaya tidak ada yang mengira ia lebih kuat
+ * daripada yang sebenarnya: ia membedakan "dipanggil" dari "tidak dipanggil". Ia TIDAK
+ * bisa membedakan 'active' dari 'shadow' — perbedaan itu soal apakah keluarannya
+ * mengubah pengalaman murid atau dibuang, dan itu butuh penilaian manusia atas jalur
+ * keputusan. Batas itu ditandai eksplisit di bawah, bukan disembunyikan.
+ * ========================================================================== */
+
+/** Permukaan runtime = app.js + semua <script src="./..."> di index.html, minus
+ *  berkas modul Brain itu sendiri (sebuah modul menyebut namanya sendiri saat
+ *  mendaftar ke global; itu bukan bukti ada yang memanggilnya). */
+function runtimeSurfaceSources() {
+  const indexHtml = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
+  const files = new Set(['app.js']);
+  const re = /<script[^>]*src="\.\/([^"]+)"/g;
+  let m;
+  while ((m = re.exec(indexHtml)) !== null) {
+    const rel = m[1];
+    if (rel.startsWith('features/brain/')) continue;
+    files.add(rel);
+  }
+  const out = [];
+  for (const rel of files) {
+    const abs = path.join(__dirname, rel);
+    if (fs.existsSync(abs)) out.push({ file: rel, src: fs.readFileSync(abs, 'utf8') });
+  }
+  return out;
+}
+
+/** Hitung referensi global modul di seluruh permukaan runtime. */
+function runtimeReferences(globalName, sources) {
+  const re = new RegExp('\\b' + globalName + '\\b', 'g');
+  const hits = [];
+  for (const { file, src } of sources) {
+    const n = (src.match(re) || []).length;
+    if (n > 0) hits.push(file + '(' + n + ')');
+  }
+  return hits;
+}
+
+/* ---------------------------------------------------------------------------
+ * PENGECUALIAN 'off' YANG BERALASAN — dan yang MEMBATALKAN DIRINYA SENDIRI.
+ *
+ * Sebuah REFERENSI bukan sebuah PANGGILAN. Satu modul bisa disebut di berkas yang
+ * dimuat runtime dan tetap tidak pernah dieksekusi karena konfigurasi yang benar-benar
+ * dikirim menutup jalurnya lebih dulu. Menolak fakta itu akan memaksa manifest berbohong
+ * ke arah sebaliknya (menandai 'active' sesuatu yang tidak pernah jalan).
+ *
+ * Maka pengecualian diizinkan, dengan dua syarat keras, meniru pola allowlist
+ * secret-scan-test.js:
+ *   1. alasan tertulis >= 40 karakter, bisa dinilai orang lain;
+ *   2. predikat `stillGatedOff()` yang MEMERIKSA ULANG prasyaratnya tiap kali gerbang
+ *      berjalan. Begitu prasyarat runtuh, gerbang MERAH dan manifest wajib dinaikkan.
+ * Pengecualian tanpa syarat ke-2 hanyalah gerbang yang dimatikan dengan sopan.
+ * ------------------------------------------------------------------------- */
+const OFF_EXCEPTIONS = {
+  FiezelStatGate: {
+    reason:
+      "content-promotion.js memasang FiezelStatGate.verdict sebagai pemutus promote/rollback " +
+      "konten, dan app.js:3004 memanggil CONTENT_PROMOTION.evaluate() tiap kali aplikasi dimuat. " +
+      "TETAPI konfigurasi canary yang dikirim (content-canary-config.js: enabled:false, mode:'off') " +
+      "membuat evaluate() keluar lebih dulu dengan reason 'canary_not_active', sebelum baris gate " +
+      "mana pun. Probe empiris audit Fase 2: verdict dipanggil NOL kali. Jadi 'off' benar UNTUK " +
+      "KONFIGURASI YANG DIKIRIM — modul ini satu sakelar konfigurasi dari menjadi aktif.",
+    /** Prasyarat: canary MASIH mati di konfigurasi yang dikirim. */
+    stillGatedOff() {
+      const cfgSrc = fs.readFileSync(path.join(__dirname, 'content-canary-config.js'), 'utf8');
+      return /enabled\s*:\s*false/.test(cfgSrc) && /mode\s*:\s*'off'/.test(cfgSrc);
+    }
+  }
+};
+
+function offExceptionHolds(globalName) {
+  const ex = OFF_EXCEPTIONS[globalName];
+  return !!ex && ex.stillGatedOff();
+}
+
+test('authorityMap diverifikasi terhadap wiring NYATA di app.js + index.html, bukan terhadap konstanta', () => {
+  const sources = runtimeSurfaceSources();
+  assert.ok(sources.length > 1,
+    'permukaan runtime tidak terbaca — index.html tidak memuat satu pun script?');
+
+  const problems = [];
+  for (const mod of manifest.modules) {
+    const authority = manifest.authorityMap[mod.authorityKey];
+    const hits = runtimeReferences(mod.global, sources);
+
+    if (authority === 'off' && hits.length > 0 && !offExceptionHolds(mod.global)) {
+      problems.push(
+        mod.global + " ditandai 'off' (= tidak pernah dipanggil jalur aplikasi mana pun) " +
+        'tetapi DIRUJUK di: ' + hits.join(', ') +
+        ' — perbarui authorityMap dari bukti, jangan biarkan manifest basi.');
+    }
+    if ((authority === 'active' || authority === 'shadow') && hits.length === 0) {
+      problems.push(
+        mod.global + " ditandai '" + authority + "' tetapi NOL referensi di seluruh " +
+        'permukaan runtime — modul yang tidak pernah disebut tidak bisa sedang memutuskan apa pun.');
+    }
+  }
+  assert.strictEqual(problems.length, 0, '\n  - ' + problems.join('\n  - '));
+});
+
+test("modul 'off' benar-benar nol referensi runtime (daftar dibuktikan, bukan dihafal)", () => {
+  const sources = runtimeSurfaceSources();
+  const offModules = manifest.modules.filter(m => manifest.authorityMap[m.authorityKey] === 'off');
+  assert.ok(offModules.length > 0, "tidak ada modul 'off' — daftar off tidak boleh kosong diam-diam");
+  for (const mod of offModules) {
+    if (offExceptionHolds(mod.global)) continue;
+    const hits = runtimeReferences(mod.global, sources);
+    assert.strictEqual(hits.length, 0,
+      mod.global + " diklaim 'off' tetapi muncul di " + hits.join(', '));
+  }
+});
+
+test('setiap pengecualian off masih SAH — prasyaratnya diperiksa ulang, bukan dipercaya', () => {
+  // Pengecualian yang tidak pernah diperiksa ulang adalah lubang permanen. Tes ini
+  // menjalankan predikat tiap pengecualian dan MEMERAH begitu prasyaratnya runtuh —
+  // itulah yang membuat pengecualian ini berbeda dari sekadar mematikan gerbang.
+  for (const [globalName, ex] of Object.entries(OFF_EXCEPTIONS)) {
+    assert.ok(ex.reason.length >= 40,
+      globalName + ': alasan pengecualian terlalu pendek untuk bisa dinilai orang lain');
+    assert.ok(ex.stillGatedOff(),
+      globalName + ': PRASYARAT PENGECUALIAN SUDAH TIDAK BERLAKU.\n      ' + ex.reason +
+      '\n      => modul ini sekarang benar-benar bisa dipanggil. Naikkan authorityMap.' +
+      globalName.replace(/^Fiezel/, '').replace(/^./, c => c.toLowerCase()) +
+      " dari 'off' ke klasifikasi yang benar, di commit yang sama dengan perubahan yang membukanya.");
+  }
+});
+
+test('stepTutor dan productionGrader: klasifikasi dibaca dari app.js, bukan dipatok konstanta', () => {
+  // Regresi khusus untuk drift yang ditemukan audit Fase 2. Sengaja TIDAK menuliskan
+  // 'active' sebagai konstanta yang dibandingkan dengan konstanta — itu kesalahan tes
+  // lama. Yang di-assert: app.js benar-benar memanggil keduanya, DAN manifest tidak
+  // menyebutnya 'off'.
+  const app = fs.readFileSync(path.join(__dirname, 'app.js'), 'utf8');
+
+  assert.ok(/FiezelProductionGrader\s*\.\s*grade\s*\(|FiezelProductionGrader;[\s\S]{0,400}?\.grade\(/.test(app)
+        || /self\.FiezelProductionGrader\.grade\(/.test(app),
+    'app.js tidak lagi memanggil FiezelProductionGrader.grade() — kalau jalur cloze memang ' +
+    'dicabut, turunkan manifest ke off DI COMMIT YANG SAMA.');
+  assert.notStrictEqual(manifest.authorityMap.productionGrader, 'off',
+    "app.js memanggil FiezelProductionGrader.grade() tetapi manifest masih menyebutnya 'off'");
+
+  assert.ok(/FiezelStepTutor/.test(app) && /decompose\s*\(/.test(app),
+    'app.js tidak lagi memakai FiezelStepTutor.decompose() — kalau tuntunan langkah memang ' +
+    'dicabut, turunkan manifest ke off DI COMMIT YANG SAMA.');
+  assert.notStrictEqual(manifest.authorityMap.stepTutor, 'off',
+    "app.js memanggil FiezelStepTutor.decompose() tetapi manifest masih menyebutnya 'off'");
 });
 
 test('contentCompatibility cocok dengan deklarasi schemaVersion grammar-templates.json', () => {

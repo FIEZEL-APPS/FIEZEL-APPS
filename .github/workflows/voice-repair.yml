@@ -1,0 +1,47 @@
+name: Voice Repair Focus Gate
+
+on:
+  push:
+    branches:
+      - claude/braincore-ip-audit-d3uk0o
+    paths:
+      - 'app.js'
+      - 'sw.js'
+      - 'features/neural-voice/**'
+      - 'features/speaking-listening/**'
+      - 'voice-*-test.js'
+      - 'tts-transport-switch-test.js'
+      - 'audio-asset-pipeline-test.js'
+      - '.github/workflows/voice-repair.yml'
+  pull_request:
+    paths:
+      - 'app.js'
+      - 'sw.js'
+      - 'features/neural-voice/**'
+      - 'features/speaking-listening/**'
+      - 'voice-*-test.js'
+      - 'tts-transport-switch-test.js'
+      - 'audio-asset-pipeline-test.js'
+      - '.github/workflows/voice-repair.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  voice:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Voice and audio regressions
+        run: |
+          node voice-offline-fallback-test.js
+          node voice-fallback-chain-test.js
+          node voice-pipeline-gap-test.js
+          node voice-prefetch-neural-test.js
+          node voice-callsite-prefetch-test.js
+          node tts-transport-switch-test.js
+          node audio-asset-pipeline-test.js

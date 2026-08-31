@@ -731,6 +731,17 @@ const PENANDA = ['Jahran', 'jahran@example.com', '0f8fad5b', 'u_123', '203.0.113
       return { sandbox, storage, transport, jejak, emitter: sandbox.FiezelAnalyticsEmitter };
     }
     const settle = async (n) => { for (let i = 0; i < (n || 60); i++) await new Promise(r => setImmediate(r)); };
+    // Untuk bukti yang bergantung pada hasil asinkron, tunggu KONDISI, bukan
+    // jumlah giliran event-loop tetap. Runner CPU-heavy boleh lambat tanpa mengubah
+    // kebenaran yang sedang diuji; kondisi yang tidak pernah terjadi tetap berakhir
+    // setelah batas giliran dan akan dijatuhkan oleh assert perilaku di bawahnya.
+    const settleUntil = async (predicate, maxTurns) => {
+      for (let i = 0; i < (maxTurns || 2000); i++) {
+        if (predicate()) return true;
+        await new Promise(r => setImmediate(r));
+      }
+      return Boolean(predicate());
+    };
 
     check('Blok mengekspor `self.FiezelAnalyticsEmitter`', typeof makeWorld({}).emitter === 'object', 'ok');
 
@@ -919,7 +930,14 @@ const PENANDA = ['Jahran', 'jahran@example.com', '0f8fad5b', 'u_123', '203.0.113
         w.sandbox.localStorage = bersama;
         w.emitter._resetForGate();
         w.emitter.boot();
-        await settle(80);
+        // WebCrypto/HMAC dan flush berjalan asinkron. Membaca setelah 80 giliran
+        // tetap adalah race di runner sibuk; tunggu sampai bukti yang diuji benar-
+        // benar ada. Kalau app_open tak pernah muncul, batas 2.000 giliran habis
+        // dan assert token.length di bawah tetap merah.
+        await settleUntil(() => w.transport.bodies().some((b) => {
+          const p = JSON.parse(b);
+          return Array.isArray(p.events) && p.events.some(e => e.name === 'app_open');
+        }), 2000);
         const semua = w.transport.bodies().map(b => JSON.parse(b));
         const ev = [].concat(...semua.filter(p => p.events).map(p => p.events));
         const app = ev.find(e => e.name === 'app_open');

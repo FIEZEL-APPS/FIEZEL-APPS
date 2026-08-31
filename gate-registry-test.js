@@ -177,6 +177,7 @@ const gateFiles = tracked
 const wfPath = path.join(ROOT, WORKFLOW);
 check('workflow-ada', fs.existsSync(wfPath), WORKFLOW);
 if (!fs.existsSync(wfPath)) { process.exit(1); }
+
 const wfRaw = fs.readFileSync(wfPath, 'utf8');
 
 // Buang komentar YAML sebelum mencari invokasi: penjelasan panjang di workflow ini menyebut
@@ -187,9 +188,34 @@ const wfCode = wfRaw
   .map(line => line.replace(/(^|\s)#.*$/, '$1'))
   .join('\n');
 
+const RE_INVOKE = /(?:^|[;&|\s])node\s+(?:--[\w-]+\s+)*([A-Za-z0-9_./-]+\.m?js)\b/g;
+const buangKomentarYaml = (teks) => teks.split('\n').map((l) => l.replace(/(^|\s)#.*$/, '$1')).join('\n');
+
+/** Dipanggil oleh quality.yml. Dipakai pemeriksaan HANTU dan PENGECUALIAN-BASI, yang keduanya
+ *  memang khusus tentang berkas ini: jalurnya relatif akar repo dan bisa diperiksa keberadaannya. */
 const invoked = new Set();
-for (const m of wfCode.matchAll(/(?:^|[;&|\s])node\s+(?:--[\w-]+\s+)*([A-Za-z0-9_./-]+\.m?js)\b/g)) {
-  invoked.add(m[1]);
+for (const m of wfCode.matchAll(RE_INVOKE)) invoked.add(m[1]);
+
+/* Dipanggil oleh workflow MANA PUN. Dipakai pemeriksaan TERDAFTAR.
+ *
+ * Aturan "setiap gerbang terdaftar" ada supaya tidak ada gerbang yang menganggur tanpa
+ * dijalankan CI — dan tujuan itu dipenuhi oleh workflow mana pun yang menjalankannya. Repo ini
+ * memang punya workflow terfokus (`braincore-runtime.yml`, `voice-repair.yml`) yang sengaja
+ * dipisah supaya kegagalan satu wilayah tidak menyeret seluruh suite.
+ *
+ * Sebelumnya hanya quality.yml yang dibaca, jadi gerbang yang didaftarkan dengan BENAR di
+ * workflow lain dilaporkan "tidak terdaftar" — memaksa dua pilihan yang sama-sama buruk:
+ * mendaftarkan ulang di quality.yml (menghapus alasan pemisahannya), atau menambah
+ * pengecualian (berbohong bahwa gerbang itu tidak dijalankan).
+ *
+ * Pemeriksaan HANTU sengaja TIDAK ikut diperluas: workflow lain memanggil berkas dengan jalur
+ * relatif terhadap direktori kerjanya sendiri, jadi "berkasnya tidak ada di akar repo" bukan
+ * lagi pertanyaan yang bermakna di sana. Satu pelonggaran, satu alasan. */
+const invokedAnyWorkflow = new Set(invoked);
+const WORKFLOW_DIR = path.join(ROOT, '.github', 'workflows');
+for (const f of fs.readdirSync(WORKFLOW_DIR).filter((n) => /\.ya?ml$/.test(n)).sort()) {
+  const teks = buangKomentarYaml(fs.readFileSync(path.join(WORKFLOW_DIR, f), 'utf8'));
+  for (const m of teks.matchAll(RE_INVOKE)) invokedAnyWorkflow.add(m[1]);
 }
 
 /* =======================================================================================
@@ -197,7 +223,7 @@ for (const m of wfCode.matchAll(/(?:^|[;&|\s])node\s+(?:--[\w-]+\s+)*([A-Za-z0-9
  * ===================================================================================== */
 const unregistered = [];
 for (const f of gateFiles) {
-  if (invoked.has(f)) continue;
+  if (invokedAnyWorkflow.has(f)) continue;   // workflow MANA PUN — lihat catatan di atas
   if (EXCLUSIONS.has(f)) continue;
   unregistered.push(f);
 }
