@@ -135,6 +135,9 @@
     'tour.listen-translate-body': 'Toggle ini nampilin terjemahan tiap soal, seharga 1 Gem Terjemahan per sesi. Gem-nya kamu dapat gratis dari streak jawaban benar.',
     'tour.listen-speed-title': 'Atur kecepatan suara',
     'tour.listen-speed-body': 'Terlalu cepat? Kecepatan suara bisa diatur di FIEZEL Control Room \u2014 buka lewat tombol Pengaturan kapan aja.',
+    'tour.dialog-aria': 'Kenalan cepat dengan FIEZEL',
+    'tour.skip': 'Lewati',
+    'tour.ready': 'Siap!',
 
     // ---------- features/onboarding/fiezel-onboarding.js ----------
     // Seluruh naskah yang terlihat di enam langkah onboarding hidup di sini. Satu-satunya
