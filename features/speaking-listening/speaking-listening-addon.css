@@ -129,14 +129,33 @@ body.fz-stage-sl .fsl-feedback{padding-bottom:120px}
      - .fz-mascot di dalam custom element dipaksa width:100% -> tanpa ini ia tetap
        200px mati (fiezel-motion.css:127) dan hanya ikut terpotong lebih besar.
    Ukurannya clamp() supaya ia tetap tokoh di 320px dan tidak jadi raksasa di tablet. */
+/* PANGGUNG MENDATAR: maskot KIRI, gelembung ucap KANAN (rujukan Duolingo dari owner).
+   Latar kotaknya dilepas - di rujukannya tokoh berdiri langsung di atas halaman, dan
+   bidang berwarna di belakangnya justru membuatnya terbaca sebagai "gambar yang
+   ditempel", bukan tokoh yang hadir. */
 .fsl-card-listening .fsl-player{
-  margin-top:14px;padding:18px 16px 14px;border-radius:var(--radius-lg);
-  display:flex;flex-direction:column;align-items:center;gap:6px;
+  margin-top:14px;padding:4px 0 0;border:0;background:none;border-radius:0;
+  display:flex;flex-direction:row;align-items:center;gap:10px;
 }
 .fsl-card-listening .fsl-mascot-slot{
-  width:clamp(132px,42vw,188px);height:auto;aspect-ratio:320/300;
+  flex:0 0 auto;width:auto;height:auto;aspect-ratio:320/300;
   border-radius:0;background:none;overflow:visible;
 }
+/* Gelembung ucap: ekornya dibuat dari border transparan, bukan gambar - ia ikut warna
+   tema dan tidak menambah satu pun permintaan jaringan. */
+.fsl-card-listening .fsl-bubble{
+  position:relative;flex:1 1 auto;min-width:0;align-self:center;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  padding:14px 12px;border:1.5px solid var(--line,#F0E4CF);
+  border-radius:18px;background:var(--panel-soft,#FFF3DC);
+}
+.fsl-card-listening .fsl-bubble::before,
+.fsl-card-listening .fsl-bubble::after{
+  content:'';position:absolute;top:50%;transform:translateY(-50%);
+  border:9px solid transparent;
+}
+.fsl-card-listening .fsl-bubble::before{left:-19px;border-right-color:var(--line,#F0E4CF)}
+.fsl-card-listening .fsl-bubble::after{left:-16px;border-right-color:var(--panel-soft,#FFF3DC)}
 .fsl-card-listening .fsl-mascot-slot .fsl-mascot{width:100%;height:100%}
 .fsl-card-listening .fsl-mascot-slot .fsl-mascot .fz-mascot{width:100%}
 .fsl-card-listening .fsl-mascot-slot .fz-i{width:clamp(64px,20vw,92px);height:clamp(64px,20vw,92px)}
@@ -202,10 +221,17 @@ body.fz-stage-sl.fsl-session-active .fsl-shell{flex:1 1 auto;min-height:0;width:
 body.fz-stage-sl.fsl-session-active .fsl-card-listening{
   flex:1 1 auto;min-height:0;display:flex;flex-direction:column;
 }
-.fsl-card-listening .fsl-player{padding:12px 14px 10px;gap:4px;flex:1 1 auto;min-height:104px}
+.fsl-card-listening .fsl-player{padding:4px 0 0;gap:10px;flex:1 1 auto;min-height:96px}
+/* Maskot mengisi tinggi panggung; lebarnya mengikuti aspect-ratio. Dibatasi 46% lebar
+   kartu supaya gelembung selalu punya ruang baca, sesuai proporsi di rujukannya. */
+/* align-self:center, bukan stretch. Dengan stretch, kotak maskot setinggi panggung
+   sementara gambarnya dibatasi max-width 46% - jadi tokohnya menempel ke ATAS dan
+   ruang kosongnya menumpuk di bawah kakinya. Center membuat maskot dan gelembung
+   duduk di garis yang sama, seperti di rujukannya. */
 .fsl-card-listening .fsl-mascot-slot{
-  flex:1 1 auto;width:auto;height:auto;min-height:56px;max-height:188px;
-  aspect-ratio:320/300;margin-inline:auto;
+  align-self:center;height:auto;width:auto;
+  min-height:76px;max-height:230px;max-width:46%;flex-basis:46%;
+  aspect-ratio:320/300;
 }
 
 /* Rapat terakhir untuk menutup 37px sisa di 375x667 (iPhone SE/8). Yang dirapatkan HANYA
@@ -227,8 +253,13 @@ body.fz-stage-sl.fsl-session-active .fsl-card-listening .fsl-player{margin-top:8
    daripada "maskot besar". Ponsel tinggi (>=760px, termasuk 390x844) tidak tersentuh aturan
    ini sama sekali dan tetap mendapat maskot penuh. */
 @media (max-height:759px){
-  body.fz-stage-sl.fsl-session-active .fsl-card-listening .fsl-player{min-height:0;padding:8px 12px 6px}
-  body.fz-stage-sl.fsl-session-active .fsl-card-listening .fsl-mascot-slot{min-height:34px}
+  body.fz-stage-sl.fsl-session-active .fsl-card-listening .fsl-player{min-height:0;padding:2px 0 0}
+  body.fz-stage-sl.fsl-session-active .fsl-card-listening .fsl-mascot-slot{min-height:56px}
+  body.fz-stage-sl.fsl-session-active .fsl-card-listening .fsl-bubble{padding:10px}
+  /* Di layar pendek maskotnya dibatasi lebih ketat. Dengan align-self:center ia tumbuh
+     mengikuti flex-basis 46%, dan di 375x667 itu cukup untuk mendorong 17px keluar layar.
+     Yang dibatasi lebarnya, bukan tinggi barisnya - gelembung tetap punya ruang baca. */
+  body.fz-stage-sl.fsl-session-active .fsl-card-listening .fsl-mascot-slot{max-width:33%;flex-basis:33%}
   body.fz-stage-sl.fsl-session-active .fsl-card-listening .fsl-wave{height:16px}
   body.fz-stage-sl.fsl-session-active .fsl-card-listening .fsl-replays{font-size:.72rem}
 }
