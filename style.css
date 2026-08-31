@@ -4202,35 +4202,24 @@ body.fz-lesson-mode .topline{position:sticky;top:0;z-index:30;
 .quiz-shell .options{gap:12px}
 .quiz-shell .options button{min-height:56px}
 
-/* PENJELASAN SEBAGAI LEMBAR BAWAH (OWNER: "untuk penjelasan buatkan seperti duolingo,
-   munculnya sebagai popup jadi tidak akan memenuhi ruang layar. layar cukup di penuhi
-   mascot, soal, dan jawaban").
-   Blok penjelasan TIDAK dipindah di JS - isinya tetap ditulis ke #feedback/#tutorTurn
-   oleh jalur yang sama. Yang berubah hanya tempat ia berdiri saat TERLIHAT: dari blok
-   di dalam kartu yang mendorong soal dan pilihan jawaban ke atas, menjadi lembar yang
-   naik dari dasar layar. Karena itu ia tidak lagi memakan ruang layar sebelum dijawab,
-   dan tidak menggeser apa pun sesudah dijawab.
-   Dipakai position:fixed, jadi tinggi kartu soal tidak berubah sedikit pun saat lembar
-   ini muncul - itu yang membuat "tidak memenuhi ruang layar" benar-benar terjadi,
-   bukan sekadar terlihat lebih kecil. */
-body.fz-stage-quiz #feedback:not(.hidden),
-body.fz-stage-quiz #tutorTurn:not(.hidden){
-  position:fixed;left:0;right:0;bottom:0;z-index:60;
-  margin:0;max-height:62dvh;overflow:auto;
-  border-radius:22px 22px 0 0;
-  padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px));
-  box-shadow:0 -18px 48px rgba(36,26,17,.22);
-  animation:fzQuizSheetUp .26s cubic-bezier(.2,.8,.2,1) both;
-}
-@keyframes fzQuizSheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-@media (prefers-reduced-motion:reduce){
-  body.fz-stage-quiz #feedback:not(.hidden),
-  body.fz-stage-quiz #tutorTurn:not(.hidden){animation:none}
-}
-body.reduce-motion.fz-stage-quiz #feedback:not(.hidden),
-body.reduce-motion.fz-stage-quiz #tutorTurn:not(.hidden){animation:none}
+/* PEMBAHASAN TIDAK LAGI DIPAKSA JADI LEMBAR MENGAMBANG - DICABUT 2026-08-31.
+   Di sini sempat berdiri aturan yang membuat #feedback dan #tutorTurn position:fixed di
+   dasar layar, untuk memenuhi permintaan "penjelasan muncul sebagai popup". Itu SALAH,
+   dan owner menemukannya sebagai bug di semua sesi: panelnya MENUTUPI pilihan jawaban
+   yang masih ada di bawahnya. Terukur setelah dicabut-uji: tiga tombol jawaban tertimpa
+   #tutorTurn di satu sesi vocab.
+   Sebab kesalahannya, supaya tidak diulang: #tutorTurn BUKAN teks pembahasan yang pasif.
+   Ia panel tutor yang punya kontrolnya sendiri ("Aku masih belum paham", tutor-turn-ask,
+   #tutorStuck) dan berdiri DI DALAM alur kartu bersama pilihan jawaban yang masih hidup.
+   Melayangkannya di atas alur itu berarti menutupi bagian yang masih dipakai murid -
+   position:fixed mengeluarkan elemen dari aliran, jadi tidak ada yang memberi ruang
+   untuknya dan tidak ada satu pun yang bergeser.
+   Kalau permintaan "popup" itu dikerjakan ulang, ia harus dikerjakan di JS: memindahkan
+   isinya ke lapisan dialog yang benar (openModal, yang sudah punya scrim dan pengurungan
+   fokus) SETELAH pilihan jawaban tidak lagi relevan - bukan menggeser satu properti CSS
+   pada elemen yang masih bertetangga dengan kontrol hidup. */
 
-/* ruang telinga dipesan di kartu, bukan didorong setelah cat (C3) */
+/* ruang telinga dipesan di kartu, bukan didorong setelah cat (C3) *//* ruang telinga dipesan di kartu, bukan didorong setelah cat (C3) */
 .card.has-paw-peek{position:relative;margin-top:calc(56px*.44 + 8px)}
 /* tier 48 di ponsel sempit & landscape pendek (tabel §2d) */
 @media (max-width:420px){
