@@ -323,7 +323,24 @@
     }catch(_){return {sent:sent,kept:outboxRead().length,reason:'error'}}
     finally{flushing=false}
   }
-  function outboxPending(){return outboxPrune(outboxRead(),Date.now()).length}
+  /**
+   * Berapa batch yang masih menunggu kirim.
+   *
+   * `nowMs` OPSIONAL dan mencerminkan dua saudaranya tepat di atas — outboxPrune(items,nowMs)
+   * dan flushOutbox(nowMs) — yang keduanya sudah menerima waktu suntikan. Fungsi ini satu-satunya
+   * di modul yang dulu membaca jam langsung, dan justru itu yang membuat gerbangnya jadi BOM
+   * WAKTU: social-frontend-test menstempel item dengan tanggal fiktif (2026-08-28) lalu
+   * memeriksanya lewat fungsi yang membaca jam ASLI, jadi gerbangnya dijamin merah tepat tiga
+   * hari sesudah tanggal fiktif itu — dan memang merah pada 2026-08-31T18:00:00Z, tanpa satu
+   * baris kode pun berubah.
+   *
+   * Pemanggil tanpa argumen (app.js:9437) tidak berubah artinya: tanpa nowMs, jam dipakai
+   * seperti dulu. Yang ditambah cuma kemampuan menyuntik waktu, sesuai kontrak modul ini.
+   */
+  function outboxPending(nowMs){
+    var t=Number(nowMs);
+    return outboxPrune(outboxRead(),isFinite(t)?t:Date.now()).length;
+  }
 
   // Flush otomatis: saat kembali online dan saat tab kembali terlihat. Keduanya jalur
   // latar — tanpa await dari UI, tanpa toast, tanpa yang bisa mengganggu sesi belajar.
