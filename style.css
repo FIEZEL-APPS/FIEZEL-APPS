@@ -2691,6 +2691,31 @@ body.reduce-motion .fz-coach-bubble .fz-coach-pulse,body.reduce-motion .fz-confe
    Keduanya lewat spesifisitas, bukan !important: !important juga akan mengalahkan tema
    yang memang berhak menimpa nanti. */
 html.fiezel-ui-v6 .skill-help-dot{border-radius:50%}
+/* PANGGUNG MATERI GRAMMAR (OWNER 2026-08-31: "design ulang grammar seperti listening").
+   Susunan yang sama dengan sesi dengar: tokoh di KIRI, gelembung ucap di KANAN, dan
+   judul materi duduk DI DALAM gelembung itu. Sebelum ini layar materi tidak punya maskot
+   sama sekali - satu-satunya Pau adalah FAB mengambang di pojok, yang tidak pernah
+   berhubungan dengan isi layarnya. Judulnya juga tercetak dua kali (hero + kartu); kini
+   sekali, di tempat tokohnya mengucapkannya. */
+.lesson-stage{display:flex;align-items:center;gap:10px;margin:0 0 12px}
+.lesson-stage-paw{flex:0 0 auto;width:clamp(64px,22vw,96px);display:block}
+.lesson-stage-paw :is(fiezel-mascot,svg,img,canvas){width:100%;height:auto;display:block}
+/* .fz-mascot di dalam custom element dipaku 200px (fiezel-motion.css:127); tanpa baris ini
+   ia tidak ikut mengecil dan hanya meluber keluar kotaknya. */
+.lesson-stage-paw .lesson-mascot .fz-mascot{width:100%}
+.lesson-stage-paw .fz-i{width:100%;height:auto;aspect-ratio:1;color:var(--accent-strong)}
+.lesson-bubble{
+  position:relative;flex:1 1 auto;min-width:0;
+  padding:12px 14px;border:1.5px solid var(--line);border-radius:18px;background:var(--panel-soft);
+}
+.lesson-bubble b{display:block;font-family:var(--fz-display);font-weight:400;font-size:1.18rem;line-height:1.25;letter-spacing:-.01em}
+/* Ekor gelembung dari border transparan - ikut warna tema, nol aset tambahan. */
+.lesson-bubble::before,.lesson-bubble::after{content:'';position:absolute;top:50%;transform:translateY(-50%);border:9px solid transparent}
+.lesson-bubble::before{left:-19px;border-right-color:var(--line)}
+.lesson-bubble::after{left:-16px;border-right-color:var(--panel-soft)}
+/* Kontrol Level belajar di dalam dialog bantuan butuh ruang napasnya sendiri. */
+.skill-help-level{margin:14px 0 0}
+
 /* Isi dialog bantuan: naskah yang dulu berdiri sebagai hero. */
 .skill-help-panel h2{margin:.35rem 0 .5rem;font-size:1.35rem;letter-spacing:-.02em}
 .skill-help-panel p{margin:0 0 .6rem;font-size:.92rem;line-height:1.6}
