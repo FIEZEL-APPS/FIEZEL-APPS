@@ -12,7 +12,22 @@ const result={
   version,
   runtimeCacheStable:sw.includes('const CACHE=`fiezel-v${self.FIEZEL_VERSION}`'),
   revisionedShellCache:sw.includes('const SHELL_CACHE=`fiezel-shell-${SW_REV}`'),
-  eagerActivationDisabled:!sw.includes('self.skipWaiting()')&&!sw.includes('self.clients.claim()'),
+  /* m025-212: yang dijaga di sini bukan kata "skipWaiting" melainkan satu sifat - service
+   * worker tidak boleh mengambil alih klien yang sedang jalan ATAS KEMAUANNYA SENDIRI, karena
+   * itulah yang menukar generasi controller di tengah sesi murid. Sifat itu utuh: install dan
+   * activate tetap nol, clients.claim tetap nol, dan satu-satunya penyebutan duduk di balik
+   * pagar FIEZEL_SKIP_WAITING - yaitu saat murid sendiri menekan "Perbarui sekarang" di kartu
+   * pembaruan. Larangan buta atas kata itu membuat kartu pembaruan mustahil dibuat, padahal
+   * kartu itulah yang membuat penantian ini berakhir atas keputusan murid, bukan diam-diam. */
+  eagerActivationDisabled:(()=>{
+    const kode=sw.replace(/\/\*[\s\S]*?\*\//g,' ').replace(/(^|[^:])\/\/[^\n]*/g,'$1 ');
+    const pagar=/if\(event\?\.data\?\.type==='FIEZEL_SKIP_WAITING'\)\{self\.skipWaiting\(\);return\}/.test(kode);
+    const install=(kode.match(/addEventListener\('install'[\s\S]{0,400}/)||[''])[0];
+    const activate=(kode.match(/addEventListener\('activate'[\s\S]{0,800}/)||[''])[0];
+    return (kode.match(/skipWaiting/g)||[]).length===1&&pagar
+      &&!/skipWaiting/.test(install)&&!/skipWaiting/.test(activate)
+      &&!/clients\s*\.\s*claim/.test(kode);
+  })(),
   staleShellOnlyInvalidation:sw.includes("k.startsWith('fiezel-shell-')&&k!==SHELL_CACHE"),
   stableRuntimeNotInvalidated:!sw.includes("k.startsWith('fiezel-')&&k!==CACHE"),
   navigationFallbackCurrentShell:sw.includes("caches.match('./index.html',{cacheName:SHELL_CACHE})"),

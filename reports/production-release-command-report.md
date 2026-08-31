@@ -889,3 +889,172 @@ Satu hal yang tetap harus disebut: perubahan splash/boot di m025-210 datang dari
 saya **tidak** mengauditnya baris demi baris — yang saya ukur adalah akibatnya (CI, paritas,
 asap runtime), dan ketiganya bersih. Itu batas yang jujur, bukan jaminan yang lebih luas
 daripada buktinya.
+
+---
+
+## Catatan HEAD kedua (Aturan A) — vonis diperpanjang ke `aaaa298` / m025-211
+
+OWNER menguji PWA terpasang di iPhone-nya sesudah m025-206 dan melapor: **"aman tapi sedikit
+lambat."** Dua kalimat, dua konsekuensi berbeda untuk audit ini.
+
+### "Aman" — bukti WebKit PERTAMA, dan ia menutup sebagian utang F.8
+
+Sepanjang audit ini seluruh bukti peramban datang dari Chromium, dan itu dilaporkan sebagai
+UNVERIFIED, bukan PASS. Laporan OWNER adalah **pengujian iOS Safari sungguhan di perangkat
+sungguhan**, dan ia mengonfirmasi hal yang paling penting: PWA terpasang **jalan** — cacat
+"tersandera jaringan menggantung" (F-2) benar-benar tertutup di WebKit, bukan hanya di
+Chromium.
+
+Batasnya tetap harus disebut: yang terkonfirmasi adalah perbaikan **m025-206**. Jalur
+cangkang-dulu m025-211 di bawah **belum** diuji di WebKit oleh siapa pun.
+
+### "Sedikit lambat" — dan menelusurinya menemukan cacat kedua
+
+Keluhan kecepatan itu benar dan terukur. Tetapi penelusurannya membuka cacat yang **tidak
+dilaporkan siapa pun dan lebih serius daripada lambat**: seluruh aset cangkang non-navigasi
+dilayani cache-first di dalam generasinya, sementara hanya DOKUMEN yang diambil dari jaringan.
+Begitu build baru terbit sementara SW lama masih aktif — dan ia memang masih aktif, karena
+`sw.js` sengaja tidak pernah memanggil `skipWaiting()` — murid menerima `index.html` build N+1
+yang berjalan di atas JavaScript build N.
+
+Terukur di peramban: dengan `SW_REV` tidak berubah, dokumen membawa penanda terbitan baru
+sementara `core-config.js` masih membawa penanda lama. Cabang yang dimaksudkan mencegah
+cangkang tak sepadan justru **membuatnya** — persis keadaan yang §22 larang.
+
+Keduanya ditutup m025-211:
+
+| | sebelum | sesudah |
+|---|---|---|
+| FCP, jaringan sehat | 60 ms | 88 ms |
+| FCP, jaringan lambat | 752 ms | **92 ms** |
+| FCP, jaringan menggantung | 2556 ms | **40 ms** |
+| dokumen ⇄ aset segenerasi | **TIDAK** | **YA** |
+
+### Gerbang yang membela cacatnya sendiri
+
+`pwa-startup-white-screen-recovery-test.js` meng-assert
+`indexOf('fetch(') < indexOf('caches.match(')`. Assert semacam itu mengunci satu MEKANISME,
+bukan sifat — dan ketika mekanisme itu sendiri yang keliru, gerbangnya **ikut membela
+kekeliruan**. Ia hijau di sepanjang audit ini sementara cacat yang baru saja diukur berdiri
+tepat di bawahnya.
+
+Itu pelajaran yang lebih besar daripada satu cacat, dan ia memperkuat §19: gerbang hijau
+bukan hanya "belum cukup", ia bisa **aktif menyesatkan** kalau yang diuji cara menulis kode
+alih-alih sifat yang ingin dipunyai. Ketiga assert mekanisme diganti dengan sifat yang diuji
+lewat EKSEKUSI, dan gerbang navigasinya naik 8 → 15 assert dengan bukti merah empat arah.
+
+### Diukur ulang di `aaaa298`
+
+| | |
+|---|---|
+| CI di HEAD | **HIJAU** — `quality`, `build`, `safari26`, `deploy`, nol gagal |
+| Paritas produksi | **TERBUKTI** — situs menyajikan `m025-211` (run `33330010392`). **Keenam berturut-turut.** |
+| Navigasi PWA | **15/15 assert** eksekusi, merah terbukti empat arah |
+| Gerbang live (CF + AI) | tetap berlaku — `workers/` tidak disentuh |
+| Braincore v3 E2E | tetap berlaku — `app.js` dan `features/brain/` tidak disentuh |
+
+### Regresi yang hampir terkirim, dicatat karena ia hampir lolos
+
+Bentuk pertama perbaikan m025-211 menyajikan `./index.html` untuk **setiap** navigasi — yang
+akan membuat `creator-report-dashboard.html` dan `creator-report-setup.html` tidak pernah bisa
+dibuka lagi. Ia tertangkap saat memeriksa asimetri baca/tulis, **bukan** oleh gerbang mana pun
+yang sudah ada, dan bukan oleh pengukuran boot yang semuanya hijau. Assert (J) kini
+menjaganya. Dicatat di sini karena audit yang hanya melaporkan temuan orang lain, tanpa
+melaporkan yang nyaris dikirimnya sendiri, tidak jujur.
+
+### VONIS TETAP: **GO**
+
+Kini terikat **`aaaa298` / m025-211**, dengan **ketiga larangan yang sama persis dan tidak
+berkurang satu pun**:
+
+1. **JANGAN buka `endpoints.ai`** sampai `tutor_turn`, `writing_feedback`, dan `context_coach`
+   lulus kontrak mutu terhadap model hidup.
+2. **JANGAN buka `cfTtsEnabled` / `FEATURE_TTS`.**
+3. **JANGAN sebut kuota / cache TTS / cron "terverifikasi produksi"** sampai ada staging.
+
+Satu utang BARU yang jujur: jalur cangkang-dulu m025-211 diukur di Chromium saja. Perbaikan
+sebelumnya sudah dikonfirmasi OWNER di iPhone; yang ini belum.
+
+---
+
+# KEPUTUSAN OWNER — Puter dipertahankan utuh (2026-08-30)
+
+Ditanyakan OWNER: *"kapan AI Puter siap untuk diputuskan, dan disambungkan ke Cloudflare?"*
+Sesudah bukti di bawah dipaparkan, OWNER memutuskan: **"biarkan Puter utuh."**
+
+## Status keputusan
+
+**Larangan 1 di vonis akhir berubah sifat, bukan isinya.** Ia ditulis sebagai syarat teknis
+yang menunggu ("jangan buka `endpoints.ai` SAMPAI ketiga task lulus"). Ia kini **keputusan
+OWNER yang berdiri sendiri**: jalur AI Cloudflare tetap tertutup, dan murid tetap dilayani
+Puter.
+
+Tidak ada tindakan yang tertunda. `core-config.js` sudah menyetel `endpoints.ai:'off'`, dan
+aturan penggabungannya AND — flag server tidak bisa menyalakan apa yang mati di berkas itu.
+Keadaan yang diputuskan OWNER adalah keadaan yang sudah berjalan.
+
+## Kenapa ini keputusan yang berdiri di atas bukti
+
+### Gerbang 1 — mutu: penyebabnya BELUM TERUKUR, dan itu sendiri temuan
+
+Jalan live 2026-08-30 (run `33318247777`): 5 task menjawab HTTP 200, **`providerSuccesses: 2`**.
+`tutor_turn`, `writing_feedback`, dan `context_coach` memantul `prompt_scaffold_echo`.
+
+Sebabnya **tidak bisa ditentukan dari bukti yang ada**, karena Worker membuang buktinya:
+`AiTasks.checkOutputContract()` mengembalikan potongan teks yang memicu penolakan (field
+`echo`), tetapi `workers/api/ai/route-ai.js` hanya menyimpan NAMA kegagalannya
+(`failureReason`) dan membuang potongannya — baik di respons maupun di `recordFailure()`.
+
+Upaya menyimpulkannya dari kode saja **gagal, dan gagalnya informatif**: `session_recap`
+LOLOS padahal rangka promptnya hampir selengkap ketiga yang gagal (GUARD, klausa gaya,
+`weakSkills:`, `Tugas:`). Jadi hipotesis "rangkanya bocor" tidak menjelaskan pembelahannya,
+dan tersisa tiga sebab dengan biaya sangat berbeda:
+
+| kemungkinan | biaya |
+|---|---|
+| detektornya salah tuduh | kecil — perketat pola |
+| bentuk prompt memancing model memantulkan label | kecil–sedang |
+| model tidak sanggup | sedang — ganti model / few-shot |
+
+`ai-tasks.js` memperingatkan kemungkinan pertama dengan kalimatnya sendiri: *"pemeriksa yang
+menolak segalanya sama merusaknya dengan yang meloloskan."*
+
+**Jarak ke jawaban: satu perubahan kecil** — bawa `echo` ke catatan kegagalan — lalu satu
+jalan live (±US$0,002). Tidak dikerjakan: men-deploy Worker adalah tindakan produksi ke luar,
+di luar pra-izin OWNER yang mencakup git/GitHub di repo.
+
+**Temuan sampingan:** `promptTutorTurn()` (`ai-tasks.js:903`) mengirim `Permukaan: ` dan
+`Fokus materi: ` sebagai **label kosong menggantung** bila klien tidak mengisinya.
+
+### Gerbang 2 — kapasitas: ini yang sesungguhnya mengunci
+
+Aritmetika, bukan mutu. Ia **tidak hilang** walau gerbang 1 selesai besok.
+
+Diukur pada jalan live yang sama: **5 panggilan model = ±252,5 neuron** ⇒ **±50 neuron per
+panggilan**.
+
+| | |
+|---|---|
+| plafon akun (`GLOBAL_NEURON_CAP`, harian UTC) | **8.000 neuron/hari** |
+| ⇒ kapasitas seluruh aplikasi | **±160 panggilan AI/hari** |
+| jatah per murid (`AI_LIMIT_PER_DAY`) | **25 panggilan/hari** |
+| ⇒ murid yang memakai jatahnya penuh | **±6 orang** menghabiskan kuota SELURUH akun |
+| `MAX_USERS` yang disetel | **250** |
+
+Memutus Puter pada angka ini berarti murid ke-7 dan seterusnya kehilangan AI setiap hari.
+
+**Batas kejujuran angka itu:** 50 neuron/panggilan adalah PERKIRAAN — laporan alatnya sendiri
+menyebut perhitungannya memakai setengah plafon token, dan keluaran yang ditolak kontrak mutu
+tetap dibayar. Yang bisa memastikannya hanya dashboard Cloudflare milik OWNER.
+
+## Syarat kalau keputusan ini ditinjau ulang
+
+Bukan tanggal, dua syarat:
+
+1. **5/5 task lulus kontrak mutu terhadap model hidup** (sekarang 2/5, dan sebabnya belum
+   terukur).
+2. **Kapasitas cukup untuk jumlah murid yang ditargetkan.** Pada jatah gratis, angkanya ±6
+   murid aktif penuh per hari. Menaikkannya adalah keputusan BIAYA, milik OWNER.
+
+Selama keduanya belum terpenuhi, mempertahankan Puter bukan penundaan — ia pilihan yang
+lebih baik: murid mendapat AI yang bekerja, alih-alih cadangan yang jujur.
