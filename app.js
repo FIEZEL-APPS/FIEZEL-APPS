@@ -196,7 +196,7 @@ function validTimeZone(value){const zone=String(value||'').slice(0,80);try{new I
 // sanitizeState (AI-11 F04 pola #3): blob lama tanpa field ini ter-merge mulus ke 'id',
 // tanpa kunci baru, tanpa bump schema. Nilainya enum tertutup FiezelI18n.SUPPORTED ('id'|'th');
 // JANGAN pernah meneruskannya ke opsi audio/voice (audio-locale-guard-test, AI-17 F02).
-const defaultPreferences={haptics:true,feedbackSounds:true,motion:true,neuralVoice:'auto',reminders:null,reportConsent:false,reportEndpoint:DEFAULT_REPORT_ENDPOINT,selfAssessedLevel:'',activeLevel:'',levelMode:'placement',goalProfile:'general',timeZone:detectedTimeZone(),learnerLocale:'id'};
+const defaultPreferences={haptics:true,feedbackSounds:true,motion:true,neuralVoice:'auto',reminders:null,reportConsent:false,reportEndpoint:DEFAULT_REPORT_ENDPOINT,selfAssessedLevel:'',activeLevel:'',levelMode:'placement',goalProfile:'general',timeZone:detectedTimeZone(),learnerLocale:'id',/* S5b: sinkron otak antar-perangkat. BAWAAN false dan sengaja begitu — bukti belajar tidak boleh mulai meninggalkan perangkat karena sebuah pembaruan mendarat, hanya karena murid memilihnya. */brainSync:false};
 const defaultReportMeta={lastSentAnswered:0,lastSentAt:0,lastStatus:'not_configured',lastReceipt:'',lastAccessReportDay:'',queue:[]};
 const LOGIN_MESSAGES=__fzI18nTable([],()=>([
   {headline:FiezelI18n.t('login.pesan-01-headline'),lead:FiezelI18n.t('login.pesan-01-lead')},
@@ -1189,7 +1189,7 @@ function sanitizeToursSeen(raw){
 }
 function sanitizeState(raw){
   const rawPreferences=raw?.preferences||{},activeLevel=LEVELS.includes(String(rawPreferences.activeLevel||''))?String(rawPreferences.activeLevel):'';
-  const next={...defaultState,...raw,view:'home',ownerUuid:String(raw?.ownerUuid||'').replace(/[^A-Za-z0-9_-]/g,'').slice(0,128),vocab:raw?.vocab||{},grammar:raw?.grammar||{},reading:raw?.reading||{},history:Array.isArray(raw?.history)?raw.history.filter(h=>h&&typeof h==='object'):[],wrongAnswers:pruneCorruptedReviewEntries(raw?.wrongAnswers),confidenceHistory:Array.isArray(raw?.confidenceHistory)?raw.confidenceHistory:[],sessionHistory:Array.isArray(raw?.sessionHistory)?raw.sessionHistory:[],learningDays:Array.isArray(raw?.learningDays)?raw.learningDays:[],daily:raw?.daily&&typeof raw.daily==='object'?raw.daily:{date:'',count:0,attempts:0,meaningful:false},preferences:{...defaultPreferences,...rawPreferences,activeLevel,levelMode:activeLevel?'manual':'placement',selfAssessedLevel:LEVELS.includes(String(rawPreferences.selfAssessedLevel||''))?String(rawPreferences.selfAssessedLevel):'',timeZone:validTimeZone(rawPreferences.timeZone||defaultPreferences.timeZone),goalProfile:String(rawPreferences.goalProfile||defaultPreferences.goalProfile).slice(0,30),reportEndpoint:String(rawPreferences.reportEndpoint||DEFAULT_REPORT_ENDPOINT).trim(),/* m025-182 W2-STATE: enum tertutup — nilai korup/asing jatuh ke default 'id', bukan lolos mentah */learnerLocale:(self.FiezelI18n?.SUPPORTED||['id','th']).includes(rawPreferences.learnerLocale)?rawPreferences.learnerLocale:defaultPreferences.learnerLocale},reportMeta:{...defaultReportMeta,...(raw?.reportMeta||{}),queue:Array.isArray(raw?.reportMeta?.queue)?raw.reportMeta.queue.slice(-8):[]},reminderMeta:{lastNotificationAt:0,lastNotificationDay:'',lastNotificationKind:'',lastMessageIndex:-1,lastPositiveDay:'',evidenceLog:[],...(raw?.reminderMeta||{}),evidenceLog:Array.isArray(raw?.reminderMeta?.evidenceLog)?raw.reminderMeta.evidenceLog.slice(-ALRS_EVIDENCE_LOG_LIMIT):[]},activeSession:raw?.activeSession&&typeof raw.activeSession==='object'?raw.activeSession:null,adaptivePolicyMeta:{lastPolicy:null,lastSource:'',lastAt:0,history:[],...(raw?.adaptivePolicyMeta||{}),history:Array.isArray(raw?.adaptivePolicyMeta?.history)?raw.adaptivePolicyMeta.history.slice(-30):[]},policyOutcomeMeta:{last:null,history:[],queue:[],...(raw?.policyOutcomeMeta||{}),history:Array.isArray(raw?.policyOutcomeMeta?.history)?raw.policyOutcomeMeta.history.slice(-POLICY_OUTCOME_LOG_LIMIT):[],queue:Array.isArray(raw?.policyOutcomeMeta?.queue)?raw.policyOutcomeMeta.queue.slice(-10):[]},contentCanaryMeta:CONTENT_CANARY?CONTENT_CANARY.sanitizeEvidence(raw?.contentCanaryMeta,CONTENT_CANARY_CONFIG?.canaryId||raw?.contentCanaryMeta?.canaryId||''):{...defaultState.contentCanaryMeta},coachCache:raw?.coachCache&&typeof raw.coachCache==='object'?raw.coachCache:null,levelTrust:sanitizeLevelTrust(raw?.levelTrust),gems:sanitizeGemsState(raw?.gems),toursSeen:sanitizeToursSeen(raw?.toursSeen)};
+  const next={...defaultState,...raw,view:'home',ownerUuid:String(raw?.ownerUuid||'').replace(/[^A-Za-z0-9_-]/g,'').slice(0,128),vocab:raw?.vocab||{},grammar:raw?.grammar||{},reading:raw?.reading||{},history:Array.isArray(raw?.history)?raw.history.filter(h=>h&&typeof h==='object'):[],wrongAnswers:pruneCorruptedReviewEntries(raw?.wrongAnswers),confidenceHistory:Array.isArray(raw?.confidenceHistory)?raw.confidenceHistory:[],sessionHistory:Array.isArray(raw?.sessionHistory)?raw.sessionHistory:[],learningDays:Array.isArray(raw?.learningDays)?raw.learningDays:[],daily:raw?.daily&&typeof raw.daily==='object'?raw.daily:{date:'',count:0,attempts:0,meaningful:false},preferences:{...defaultPreferences,...rawPreferences,activeLevel,levelMode:activeLevel?'manual':'placement',selfAssessedLevel:LEVELS.includes(String(rawPreferences.selfAssessedLevel||''))?String(rawPreferences.selfAssessedLevel):'',timeZone:validTimeZone(rawPreferences.timeZone||defaultPreferences.timeZone),goalProfile:String(rawPreferences.goalProfile||defaultPreferences.goalProfile).slice(0,30),reportEndpoint:String(rawPreferences.reportEndpoint||DEFAULT_REPORT_ENDPOINT).trim(),/* m025-182 W2-STATE: enum tertutup — nilai korup/asing jatuh ke default 'id', bukan lolos mentah */learnerLocale:(self.FiezelI18n?.SUPPORTED||['id','th']).includes(rawPreferences.learnerLocale)?rawPreferences.learnerLocale:defaultPreferences.learnerLocale,/* fail-closed: apa pun selain true persis -> false. State korup tidak boleh bisa menyalakan pengiriman data. */brainSync:rawPreferences.brainSync===true},reportMeta:{...defaultReportMeta,...(raw?.reportMeta||{}),queue:Array.isArray(raw?.reportMeta?.queue)?raw.reportMeta.queue.slice(-8):[]},reminderMeta:{lastNotificationAt:0,lastNotificationDay:'',lastNotificationKind:'',lastMessageIndex:-1,lastPositiveDay:'',evidenceLog:[],...(raw?.reminderMeta||{}),evidenceLog:Array.isArray(raw?.reminderMeta?.evidenceLog)?raw.reminderMeta.evidenceLog.slice(-ALRS_EVIDENCE_LOG_LIMIT):[]},activeSession:raw?.activeSession&&typeof raw.activeSession==='object'?raw.activeSession:null,adaptivePolicyMeta:{lastPolicy:null,lastSource:'',lastAt:0,history:[],...(raw?.adaptivePolicyMeta||{}),history:Array.isArray(raw?.adaptivePolicyMeta?.history)?raw.adaptivePolicyMeta.history.slice(-30):[]},policyOutcomeMeta:{last:null,history:[],queue:[],...(raw?.policyOutcomeMeta||{}),history:Array.isArray(raw?.policyOutcomeMeta?.history)?raw.policyOutcomeMeta.history.slice(-POLICY_OUTCOME_LOG_LIMIT):[],queue:Array.isArray(raw?.policyOutcomeMeta?.queue)?raw.policyOutcomeMeta.queue.slice(-10):[]},contentCanaryMeta:CONTENT_CANARY?CONTENT_CANARY.sanitizeEvidence(raw?.contentCanaryMeta,CONTENT_CANARY_CONFIG?.canaryId||raw?.contentCanaryMeta?.canaryId||''):{...defaultState.contentCanaryMeta},coachCache:raw?.coachCache&&typeof raw.coachCache==='object'?raw.coachCache:null,levelTrust:sanitizeLevelTrust(raw?.levelTrust),gems:sanitizeGemsState(raw?.gems),toursSeen:sanitizeToursSeen(raw?.toursSeen)};
   /* R6 perbaikan-15/16: penghitung yang rusak TIDAK boleh menghapus bukti belajar.
      (1) Baris history yang korup (null/bukan objek) dibuang SATU-SATU di atas - dulu satu
      baris null membuat hs.map(h=>h.skill) melempar, loadState menangkapnya, dan SELURUH
@@ -1568,6 +1568,9 @@ function record(q,ok,ms,selectedIndex){
     if(Number.isFinite(kappa))h.kappa=Math.round(Math.max(0,Math.min(1,kappa))*1000)/1000;
   }catch{}
   state.history.push(h);if(state.history.length>1000)state.history.shift();
+  /* S5b: antrekan bukti untuk sinkron. Mati secara default — brainSyncQueue sendiri yang
+     memeriksa ketiga syaratnya, jadi jalur ini tidak menambah cabang keputusan di sini. */
+  try{brainSyncQueue(h)}catch{}
   /* Fase 3 (C5 butir 4): item yang ditandai prompt prediksi SRL mencatat stempel waktu baris
      riwayatnya - setConfidence mencocokkannya supaya keyakinan yang diklik murid menjadi
      prediksi SRL untuk JAWABAN INI, bukan jawaban lain. Guarded: tanpa modul, tanda __srlPredict
@@ -2464,6 +2467,74 @@ function learningMetricsSnapshot(now=Date.now()){
     misconception:call(M.misconceptionPersistence,misconceptionLedgerRead(),now)
   };
   return Object.values(out).some(Boolean)?out:null;
+}
+/* ---- S5b sinkron antar-device: antrean bukti, MATI SECARA DEFAULT ---------------------
+ *
+ * Ini titik pertama dalam sejarah aplikasi ini di mana bukti belajar bisa meninggalkan
+ * perangkat. Karena itu bentuknya fail-closed, dan default-nya mati.
+ *
+ * TIGA SYARAT YANG HARUS TERPENUHI SEKALIGUS sebelum satu byte pun dikirim:
+ *   1. murid menyalakannya sendiri (preferences.brainSync === true; bawaan false);
+ *   2. ada akun yang login (tanpa uuid, tidak ada tujuan sinkron yang bermakna);
+ *   3. ada worker yang dikonfigurasi.
+ * Satu saja absen -> antrean tidak diisi dan tidak ada permintaan yang dibuat. Bukan
+ * "dicoba lalu gagal": tidak pernah dimulai. Laporan audit sinkron menuliskan syaratnya
+ * begini: sinkron tidak boleh pernah menyalakan dirinya sendiri.
+ *
+ * YANG DIKIRIM ADALAH PROYEKSI, BUKAN BARIS RIWAYAT. FiezelAttemptRecord memangkas baris
+ * menjadi allowlist tertutup - tanpa kalimat soal, tanpa jawaban murid, tanpa teks bebas.
+ * Modul absen = sinkron mati total, karena tanpa pemangkas itu satu-satunya hal yang bisa
+ * dikirim adalah baris mentah, dan itu justru yang dilarang.
+ *
+ * ANTREAN, BUKAN PENGIRIMAN LANGSUNG. Sesi belajar tidak boleh menunggu jaringan. Gagal
+ * kirim = tetap di antrean; endpoint-nya idempoten lewat attemptId, jadi kirim ulang aman
+ * dan tidak pernah menggandakan bukti.
+ */
+const BRAIN_SYNC_KEY='fiezel-brain-sync-v1';
+const BRAIN_SYNC_BATCH=50;
+const BRAIN_SYNC_QUEUE_MAX=300;
+function brainSyncModule(){return self.FiezelAttemptRecord}
+/** Tiga syarat di atas, dievaluasi di satu tempat supaya tidak ada jalur yang lupa satu. */
+function brainSyncEnabled(){
+  try{
+    if(state?.preferences?.brainSync!==true)return false;
+    if(!activeAccountUuid)return false;
+    if(!CORE_WORKER_URL)return false;
+    const M=brainSyncModule();
+    return !!(M&&typeof M.project==='function');
+  }catch{return false}
+}
+function brainSyncRead(){
+  try{const raw=localStorage.getItem(sideStateKey(BRAIN_SYNC_KEY));const st=raw?JSON.parse(raw):null;
+    return st&&typeof st==='object'?st:{queue:[],lastPushedAt:0}}catch{return {queue:[],lastPushedAt:0}}
+}
+function brainSyncWrite(st){try{localStorage.setItem(sideStateKey(BRAIN_SYNC_KEY),JSON.stringify(st))}catch{}}
+/** Antrekan SATU baris riwayat sebagai bukti. Dipanggil dari record(), pintu tunggal jawaban. */
+function brainSyncQueue(row){
+  if(!brainSyncEnabled())return false;
+  try{
+    const rec=brainSyncModule().project(row);
+    if(!rec)return false;
+    const st=brainSyncRead(),q=Array.isArray(st.queue)?st.queue:[];
+    // Dedup di antrean juga: retry lokal tidak boleh menumpuk catatan yang sama.
+    if(q.some(x=>x&&x.attemptId===rec.attemptId))return false;
+    brainSyncWrite({...st,queue:[...q,rec].slice(-BRAIN_SYNC_QUEUE_MAX)});
+    return true;
+  }catch{return false}
+}
+/** Kirim antrean. Hanya membuang yang benar-benar diterima server. */
+async function brainSyncFlush(){
+  if(!brainSyncEnabled())return false;
+  const st=brainSyncRead(),q=Array.isArray(st.queue)?st.queue:[];
+  if(!q.length)return true;
+  const batch=q.slice(0,BRAIN_SYNC_BATCH);
+  try{
+    const r=await coreWorkerExec('/api/brain/attempts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({attempts:batch})});
+    if(!r||!r.ok)return false;
+    const sisa=q.slice(batch.length);
+    brainSyncWrite({...st,queue:sisa,lastPushedAt:Date.now()});
+    return true;
+  }catch{return false}
 }
 /* ---- Butir 5: afek sesi dengan histeresis ---- */
 /* Keadaan afek per SESI, di memori saja (bukan localStorage): afek adalah cuaca sesi, bukan

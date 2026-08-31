@@ -77,7 +77,7 @@
 
   // Versi BUNDLE kebijakan belajar — terpisah dari versi produk. 3.0.0 menandai
   // gelombang Braincore v3 pertama yang punya identitas bundle eksplisit.
-  var BUNDLE_VERSION = '3.2.0';
+  var BUNDLE_VERSION = '3.3.0';
 
   // Disalin apa adanya dari version.js (self.FIEZEL_VERSION). Bundle ini mengandalkan
   // wiring app.js 5.19.0 (guard modul-absen, sidecar stabilityDays, dsb.) — versi
@@ -177,10 +177,10 @@
     // metrik longitudinal dari riwayat lokal dan merendernya di panel diagnostik.
     // Tampilan saja — nol keputusan sesi yang bergantung padanya: 'shadow'.
     learningMetrics: 'shadow',
-    // Proyeksi bukti untuk sinkron antar-perangkat (S5). Modul murni yang MEMBATASI apa
-    // yang boleh meninggalkan perangkat; belum ada pemanggil di app.js sampai transport
-    // mendarat, jadi jujurnya 'off'.
-    attemptRecord: 'off',
+    // Proyeksi bukti sinkron (S5b). Dipanggil app.js lewat brainSyncQueue, tetapi ia
+    // MEMBATASI apa yang boleh keluar — ia tidak memutuskan apa pun tentang belajar murid,
+    // dan sinkronnya sendiri mati secara default. Jujurnya 'shadow', bukan 'active'.
+    attemptRecord: 'shadow',
     // Digest metrik tetap 'off' dengan sengaja: ia adalah PENGUNGGAH, dan menyalakannya
     // tanpa keputusan produk soal telemetri berarti menambah permukaan privasi diam-diam.
     metricsDigest: 'off',
