@@ -54,6 +54,9 @@
   //
   // Wajah maskot memakai pola fallback yang sama dengan coach-bubble pawFace(): kalau
   // custom element belum siap, ikon paw yang tampil - tidak pernah kotak kosong.
+  /* Sembilan batang: cukup untuk terbaca sebagai equalizer di 320px, masih cukup jarang
+     untuk tidak jadi bubur di 188px. --i dipakai CSS sebagai jeda animasi per batang. */
+  const EQ_BARS=Array.from({length:9},(_,i)=>'<i style="--i:'+i+'"></i>').join('');
   function slPawReady(){try{return !!global.FiezelPaw?.ready?.()}catch(_){return false}}
   /* PANGGUNG DENGAR (permintaan OWNER 2026-08-31, rujukan bahasa visual Duolingo).
      Sebelum ini maskotnya 48px, dipotong bulat, dan berdiri sebaris dengan gelombang -
@@ -64,15 +67,25 @@
        2. Kotaknya TIDAK overflow:hidden dan TIDAK bulat, jadi telinga, ekor, dan bayangan
           lantai ikut terlihat - itulah yang membedakan "tokoh" dari "avatar".
        3. Ukurannya ikut lebar layar (clamp di CSS), bukan piksel mati.
-     Gelombangnya tetap STATIS dan tetap aria-hidden: addon TTS tidak mengekspos buffer
-     audio, jadi visualisasi yang "mengikuti suara" akan jadi kebohongan yang digambar. */
+     EQUALIZER (OWNER 2026-08-31: "buatkan equalizernya hidup ketika audio diputar").
+     Batasnya nyata dan tidak berubah: tidak ada createAnalyser di mana pun di repo ini,
+     dan FiezelVoiceSay tidak memapar AudioContext-nya - jadi bentuk gelombang SUNGGUHAN
+     memang tidak tersedia tanpa membongkar tumpukan neural-voice milik tim lain.
+     Karena itu batangnya TIDAK mengaku sebagai bentuk gelombang audio. Ia penanda
+     keadaan: bergerak PERSIS selama pemutaran berlangsung, diam sebelum dan sesudahnya.
+     Pernyataan yang dibuatnya - "suaranya sedang berjalan sekarang" - benar, dan itulah
+     bedanya dengan visualisasi palsu yang dulu sengaja dihindari di sini: yang dilarang
+     bukan geraknya, melainkan mengklaim gerak itu berasal dari audio yang tidak dibaca.
+     Kelas .is-playing dipasang dan dilepas di handler [data-play] (blok try/finally),
+     jadi ia tidak bisa tertinggal menyala kalau pemutaran gagal atau kehabisan waktu.
+     Tetap aria-hidden: pembaca layar mendapat kabarnya dari chip [data-replays]. */
   function slPlayerMarkup(){
     const face=slPawReady()
       ?'<fiezel-mascot class="fsl-mascot"></fiezel-mascot>'
       :'<span class="fz-i" data-fz-icon="paw"></span>';
     return '<div class="fsl-player fsl-player-stage" aria-hidden="true">'
       +'<span class="fsl-mascot-slot">'+face+'</span>'
-      +'<svg class="fsl-wave" viewBox="0 0 120 24" preserveAspectRatio="none"><path d="M0 12 Q 6 2 12 12 T 24 12 T 36 12 T 48 12 T 60 12 T 72 12 T 84 12 T 96 12 T 108 12 T 120 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'
+      +'<span class="fsl-wave fsl-eq">'+EQ_BARS+'</span>'
       +'<span class="fsl-replays" data-replays>'+T('skillslab.not-played')+'</span></div>';
   }
   /* R2-4: sesi speaking dan latihan ujian tidak punya fsl-player (tidak ada audio yang
@@ -598,6 +611,11 @@
         if(this.replays>=limit){this.setFeedback(T('skillslab.replay-limit'));return}
         const button=event.currentTarget;
         button.disabled=true;this.replays++;
+        /* Equalizer hidup PERSIS selama pemutaran. Dipasang sebelum try supaya jalur
+           gagal pun tetap masuk finally di bawah - kalau ia dipasang di dalam try setelah
+           baris yang bisa melempar, batangnya bisa tertinggal menyala selamanya. */
+        const stage=this.root.querySelector('.fsl-player');
+        if(stage)stage.classList.add('is-playing');
         try{
           const playing=this.tts.play(item.script,{voice:item.voice,rate:this.config.ttsRate,suppressSubtitles:true});
           /* V6: diajukan sesudah pemutaran berangkat dan SEBELUM ditunggu. Menunggu dulu
@@ -633,7 +651,7 @@
            mengambil seluruh penangan tombol Dengarkan dengan pola itu untuk membuktikan ia
            tidak menyentuh terjemahan. Merapikannya menjadi baris terpisah membuat gerbang
            itu kehilangan handler-nya dan gagal tanpa sebab yang terlihat. */
-        }finally{button.disabled=false}});
+        }finally{button.disabled=false;if(stage)stage.classList.remove('is-playing')}});
       this.root.querySelector('[data-exit]').addEventListener('click',()=>this.confirmExit());
       if(isDict)this.root.querySelector('[data-submit]').addEventListener('click',()=>{const input=this.root.querySelector('[data-dictation]'),value=input.value;const result=scoreListening(item,value);input.value='';this.finishItem(item,result)});else this.root.querySelectorAll('[data-choice]').forEach(b=>b.addEventListener('click',()=>this.finishItem(item,scoreListening(item,Number(b.getAttribute('data-choice'))))));
       this.bindGemBar(item);

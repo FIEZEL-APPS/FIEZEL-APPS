@@ -417,7 +417,16 @@ test('G7 terjemahan hanya dirender dari blok feedback pasca-jawab', () => {
     'renderTranslationLine tidak dipanggil dari finishItem');
   assert.ok(/data-translation hidden><\/div>/.test(addonSource),
     'wadah [data-translation] tidak hidup di dalam markup feedback');
-  const playHandler = (addonSource.match(/\[data-play\]'\)\.addEventListener\([\s\S]*?finally\{button\.disabled=false\}\}\)/) || [''])[0];
+  /* 2026-08-31: jangkar akhir handler dibuat TOLERAN terhadap isi blok finally.
+     Sebelumnya ia menuntut literal `finally{button.disabled=false}})`, jadi setiap
+     penambahan sah di blok itu memutus tangkapan dan membuat pemeriksaan ini gagal dengan
+     pesan "penangan tidak ditemukan" - sebab yang tidak ada hubungannya dengan apa yang
+     sebenarnya dijaga. Pemicunya: pelepasan kelas .is-playing equalizer harus duduk di
+     finally supaya batangnya tidak tertinggal menyala saat pemutaran gagal.
+     Yang dijaga TIDAK berubah dan tidak berkurang: seluruh badan penangan [data-play]
+     tetap ditangkap utuh, dan larangannya tetap sama - ia tidak boleh menyentuh
+     terjemahan. Yang dilonggarkan hanya bentuk kurung penutupnya, bukan cakupannya. */
+  const playHandler = (addonSource.match(/\[data-play\]'\)\.addEventListener\([\s\S]*?finally\{[^}]*\}\}\)/) || [''])[0];
   assert.ok(playHandler, 'penangan tombol Dengarkan tidak ditemukan');
   assert.ok(!/renderTranslationLine|translationOn/.test(playHandler),
     'penangan pemutar audio menyentuh terjemahan — pelanggaran m025-148');
