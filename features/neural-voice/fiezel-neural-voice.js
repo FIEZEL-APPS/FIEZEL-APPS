@@ -457,23 +457,29 @@
     }
 
     // m025-45 cross-call warm cache. One entry is enough: the Library warms exactly the
-    // next sentence, and holding more would pin megabytes of PCM for no benefit.
+    // next utterance, and holding more would pin megabytes of PCM for no benefit.
     let warmed = null;
 
     function warmKey(text, options) {
       const o = options || {};
-      return [text, o.voice || '', o.speed || 1, o.lang || '', o.intent || ''].join('\u0000');
+      const positionTotal = Number(o.positionTotal) > 0 ? Math.floor(Number(o.positionTotal)) : 1;
+      return [text, o.voice || '', o.speed || 1, o.lang || '', o.intent || '', positionTotal].join('\u0000');
     }
 
     function dropWarm() { warmed = null; }
 
     /**
-     * Generates one utterance ahead of time. m025-47 deliberately yields one macrotask
-     * before reserving the engine. The product wraps speak() in two async readiness
-     * layers; without this yield Library prefetch(N+1) could enter the engine queue before
-     * speak(N) had reached the already-ready service. That inverted the queue, destroyed
-     * the N+1 warm entry on the next loop, and made a sentence transition pay for two
+     * Generates the FIRST chunk of one utterance ahead of time. m025-47 deliberately yields
+     * one macrotask before reserving the engine. The product wraps speak() in two async
+     * readiness layers; without this yield Library prefetch(N+1) could enter the engine queue
+     * before speak(N) had reached the already-ready service. That inverted the queue,
+     * destroyed the N+1 warm entry on the next loop, and made a transition pay for two
      * generations (the observed 10-15 second gap).
+     *
+     * Multi-chunk utterances must not be rejected here. Only their FIRST chunk needs to be
+     * ready at the cross-call seam; once it starts playing, speak() already pipelines later
+     * chunks internally. Keeping one warm slot therefore preserves the memory/concurrency
+     * bound while hiding the generation cost that otherwise lands exactly between blocks.
      */
     async function prefetch(input, speakOptions) {
       const options = speakOptions || {};
@@ -481,28 +487,28 @@
       const text = normalizeText(input, maxChars);
       if (!text) return false;
       const chunks = planChunks(text).map((entry) => entry.text);
-      // Multi-chunk text already prefetches internally once it starts playing.
-      if (chunks.length !== 1) return false;
+      if (!chunks.length) return false;
+      const firstChunk = chunks[0];
       const voice = options.voice || (config.voices && config.voices.fiezelPrimary) || 'af_heart';
-      const resolvedOptions = { ...options, voice };
-      const key = warmKey(text, resolvedOptions);
+      const resolvedOptions = { ...options, voice, positionTotal: chunks.length };
+      const key = warmKey(firstChunk, resolvedOptions);
       if (warmed && warmed.key === key) return true;
       const epoch = stopEpoch;
       await new Promise(resolve => setTimeout(resolve, 0));
       if (epoch !== stopEpoch) {
-        diag({ phase: 'prefetch_cancelled_before_reserve', voice, chars: text.length });
+        diag({ phase: 'prefetch_cancelled_before_reserve', voice, chars: firstChunk.length, utteranceChars: text.length, chunks: chunks.length });
         return false;
       }
       if (warmed) {
         if (warmed.key === key) return true;
         // Never evict an unconsumed next-line warm entry. A caller asking for another
         // line can retry after the current speak() consumes or drops this reservation.
-        diag({ phase: 'prefetch_skip_occupied', voice, chars: text.length });
+        diag({ phase: 'prefetch_skip_occupied', voice, chars: firstChunk.length, utteranceChars: text.length, chunks: chunks.length });
         return false;
       }
       const startedAt = Date.now();
-      diag({ phase: 'prefetch_start', chars: text.length, voice });
-      const pending = runOnEngine(() => adapter.generate(text, {
+      diag({ phase: 'prefetch_start', chars: firstChunk.length, utteranceChars: text.length, chunks: chunks.length, voice });
+      const pending = runOnEngine(() => adapter.generate(firstChunk, {
         voice,
         speed: options.speed || 1,
         lang: options.lang || '',
@@ -517,7 +523,7 @@
         diag({ phase: 'prefetch_failed', elapsedMs: Date.now() - startedAt, error: String(outcome.error && outcome.error.message || outcome.error) });
         return false;
       }
-      diag({ phase: 'prefetch_ready', elapsedMs: Date.now() - startedAt });
+      diag({ phase: 'prefetch_ready', elapsedMs: Date.now() - startedAt, chars: firstChunk.length, utteranceChars: text.length, chunks: chunks.length });
       return true;
     }
 
@@ -703,7 +709,8 @@
               voice,
               speed: speakOptions.speed || 1,
               lang: speakOptions.lang || '',
-              intent: speakOptions.intent || ''
+              intent: speakOptions.intent || '',
+              positionTotal: chunks.length
             }) : null;
             if (warmAudio) {
               diag({ phase: 'prefetch_hit', requestId, chunkIndex, voice });
