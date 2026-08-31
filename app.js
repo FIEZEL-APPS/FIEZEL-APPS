@@ -2570,6 +2570,83 @@ async function brainSyncFlush(){
     return true;
   }catch{return false}
 }
+/* ---- S6 sinkron: TARIK lalu PUTAR ULANG, bukan gabungkan model -----------------------
+ *
+ * Inilah panen dari bukti S4. Model otak tidak punya operasi gabungan yang bermakna — BKT
+ * adalah pembaruan Bayesian berurutan, ledger akumulasi log-odds dengan peluruhan waktu.
+ * Yang digabung adalah ALIRAN BUKTI-nya; modelnya dihitung ulang dari nol di atas aliran
+ * gabungan itu. brain-replay-equivalence-test.js sudah membuktikan hasilnya identik dengan
+ * pembaruan bertahap, dan tidak bergantung pada perangkat mana yang menyetor duluan.
+ *
+ * TIDAK PERNAH DITERAPKAN DIAM-DIAM. brainSyncRebuild() menghitung dan MENGEMBALIKAN model
+ * baru beserta ringkasan perubahannya; ia tidak menulis apa pun. Penulisan adalah panggilan
+ * terpisah yang dipakai setelah murid melihat ringkasannya - disiplin yang sama dengan
+ * previewRestore() di modul continuity, dan alasannya sama: menimpa progres belajar seseorang
+ * tanpa ia melihat dulu adalah kehilangan yang tidak bisa dibatalkan.
+ */
+async function brainSyncPull(){
+  if(!brainSyncEnabled())return null;
+  try{
+    const r=await coreWorkerExec('/api/brain/attempts',{method:'GET'});
+    if(!r||!r.ok)return null;
+    const data=await r.json().catch(()=>null);
+    const rows=Array.isArray(data?.attempts)?data.attempts:[];
+    // Catatan dari server tetap TIDAK TEPERCAYA: divalidasi ulang dengan modul yang sama
+    // yang memangkasnya saat dikirim.
+    const M=brainSyncModule();
+    return rows.filter(x=>M.validate&&M.validate(x));
+  }catch{return null}
+}
+/** Aliran gabungan: bukti lokal (proyeksi riwayat) UNION bukti remote, urut waktu lalu id. */
+function brainSyncMergedStream(remote){
+  const M=brainSyncModule();
+  const byId=new Map();
+  const tambah=rec=>{if(rec&&rec.attemptId&&!byId.has(rec.attemptId))byId.set(rec.attemptId,rec)};
+  try{for(const row of (state.history||[]))tambah(M.project(row))}catch{}
+  for(const rec of (Array.isArray(remote)?remote:[]))tambah(rec);
+  return [...byId.values()].sort((a,b)=>a.at-b.at||(a.attemptId<b.attemptId?-1:a.attemptId>b.attemptId?1:0));
+}
+/**
+ * Hitung ulang model otak dari aliran gabungan. MURNI terhadap penyimpanan: tidak menulis.
+ * Mengembalikan {stream, bkt, ledger, ringkasan} supaya pemanggil bisa memperlihatkan dulu.
+ */
+function brainSyncRebuild(remote,nowMs=Date.now()){
+  if(!brainSyncEnabled())return null;
+  try{
+    const stream=brainSyncMergedStream(remote);
+    if(!stream.length)return null;
+    const B=self.FiezelMasteryBKT,L=self.FiezelMisconceptionLedger;
+    let bkt=null,ledger=null;
+    for(const rec of stream){
+      const lesson=rec.lesson||rec.skill||'';
+      if(B&&lesson)bkt=B.update(bkt,{lesson,correct:rec.ok===true,weight:Number.isFinite(rec.kappa)?rec.kappa:1},rec.at);
+      if(L&&rec.concept&&rec.misconception){
+        ledger=L.update(ledger,{concept:rec.concept,family:'grammar',misconception:rec.misconception,
+          correct:rec.ok===true,timing:rec.timing||'',sessionId:rec.sessionId||''},rec.at);
+      }
+    }
+    const lokal=(state.history||[]).length;
+    return {stream,bkt,ledger,ringkasan:{
+      total:stream.length,
+      dariPerangkatIni:lokal,
+      baruDariPerangkatLain:stream.length-brainSyncMergedStream(null).length,
+      lessonTerlacak:bkt&&bkt.lessons?Object.keys(bkt.lessons).length:0,
+      rationale:'brain4_sync_rebuild'
+    }};
+  }catch{return null}
+}
+/** Terapkan hasil hitung ulang. Dipanggil TERPISAH, setelah ringkasannya dilihat murid. */
+function brainSyncApplyRebuild(hasil){
+  if(!brainSyncEnabled()||!hasil)return false;
+  try{
+    if(hasil.bkt)bktWrite(hasil.bkt);
+    if(hasil.ledger)misconceptionLedgerWrite(hasil.ledger);
+    const st=brainSyncRead();
+    brainSyncWrite({...st,lastRebuiltAt:Date.now()});
+    coreBrainCache=null;
+    return true;
+  }catch{return false}
+}
 /* ---- Butir 5: afek sesi dengan histeresis ---- */
 /* Keadaan afek per SESI, di memori saja (bukan localStorage): afek adalah cuaca sesi, bukan
  * sifat murid. changed=true setelah perubahan pertama - modul lalu menahan keadaan itu
