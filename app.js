@@ -8513,18 +8513,64 @@ function olmPanelMarkup(){
     const disputeBtn=e=>canNegotiate&&e?.canDispute&&e?.claimId?` <button type="button" class="core-ghost olm-dispute" onclick="olmDispute('${esc(String(e.claimId))}')">${FiezelI18n.t('progress.menurutku-salah')}</button>`:'';
     // m025-186 (A12-F1): summarize() menaruh estimasi di `mean`; pembacaan lama membuat panel selalu 0%.
     const masteryEntries=(s.mastery?.entries||[]).slice().sort((x,y)=>Number(y.mean??y.L??y.value??0)-Number(x.mean??x.L??x.value??0));
-    const mastery=masteryEntries.slice(0,3).map(e=>{const v=e.mean??e.L??e.value;const label=(v===null||v===undefined||Number.isNaN(Number(v)))?FiezelI18n.t('progress.belum-cukup-data'):`${Math.round(Number(v)*100)}%`;return `${esc(friendlySkillName(e.lesson||e.id))} ${label}${disputeBtn(e)}`}).join(', ');
+    /* 2026-08-31 - dulu ketiga baris ini digabung dengan `.join(', ')` menjadi SATU
+       kalimat, dan tombol sanggah ikut tersisip di tengahnya. Hasilnya (terlihat di
+       screenshot panel): "Present simple 100% [Menurutku ini salah], Artikel a, an, dan
+       the: memilih dari bunyi awal 100% [Menurutku ini salah], ..." - kalimat sambung
+       yang membungkus baris, dengan tombol gelap yang lebih berat daripada isinya, dan
+       tidak ada cara membaca tombol mana milik materi mana.
+       Sekarang tiap klaim jadi BARISNYA SENDIRI (pola .row yang sudah dipakai kartu lain
+       di layar ini): nama materi, angkanya, lalu tombol sanggahnya - jelas kepunyaan
+       siapa. Tidak ada data baru, hanya susunan yang bisa dibaca. */
+    const masteryRows=masteryEntries.slice(0,3).map(e=>{
+      const v=e.mean??e.L??e.value;
+      const label=(v===null||v===undefined||Number.isNaN(Number(v)))?FiezelI18n.t('progress.belum-cukup-data'):`${Math.round(Number(v)*100)}%`;
+      return `<div class="row olm-claim"><span>${esc(friendlySkillName(e.lesson||e.id))}</span><b>${label}</b>${disputeBtn(e)}</div>`;
+    }).join('');
+    const mastery=masteryRows;
     const mis=s.misconceptions||{};
     const review=s.review||{};
     const reviewTop=(review.top||[]).slice(0,3).map(r=>esc(friendlySkillName(String(r.id||'').replace(/^\w+:/,'')))).join(', ');
     const cal=s.calibration||{};
+    /* 2026-08-31 - KEBOCORAN TOKEN MESIN. Baris kalibrasi dulu berbunyi
+       `esc(cal.message||cal.status)`, dan itu mencetak "insufficient_data" mentah-mentah
+       ke layar murid. Bukan salah modulnya: fiezel-olm.js memang SENGAJA memulangkan
+       status tanpa pesan di bawah 20 pasangan ("tanpa angka yang berlagak tahu"), dan
+       olm-test.js:91 mengunci token itu sebagai KONTRAK. Jadi status adalah bahasa mesin,
+       dan menerjemahkannya adalah tugas lapisan tampilan - di sini.
+       Aturannya: token yang TIDAK dikenali tidak pernah dicetak, barisnya yang dibuang.
+       Lebih baik kehilangan satu baris daripada memamerkan enum internal ke murid. */
+    const bukanTokenMesin=v=>{const k=String(v||'').trim();return k&&!/[_:]/.test(k)?k:''};
+    /* Baris kalibrasi hanya dirender kalau modul benar-benar PUNYA hasil (status 'ok',
+       yang selalu disertai message). Tidak ada hasil = tidak ada baris.
+       Kenapa bukan "belum cukup data" yang ditampilkan terus: sejak popup keyakinan
+       dicabut dari semua sesi atas permintaan OWNER, tidak ada lagi jalur UI yang
+       memanggil setConfidence(), jadi state.confidenceHistory TIDAK PERNAH bertambah
+       lagi. Ambangnya 20 pasangan. Barisnya karena itu tidak akan pernah terisi untuk
+       murid baru mana pun - dan baris yang berbunyi "belum cukup data" selamanya adalah
+       janji palsu: ia menyuruh murid terus belajar untuk sesuatu yang tidak lagi diukur.
+       Murid lama yang terlanjur punya riwayat keyakinan tetap melihat hasilnya. */
+    const calText=cal.status==='ok'?bukanTokenMesin(cal.message):'';
+    const misAktif=Number(mis.active?.length??mis.activeCount??0);
+    const misSelesai=Number(mis.resolved?.length??mis.resolvedCount??0);
+    const atRisk=Number(review.atRiskCount||0);
+    /* Panggung kosong. Sebelumnya panel ini tetap mencetak deretan "0 aktif · 0 teratasi ·
+       0 materi" untuk murid yang memang belum punya riwayat - terbaca seperti panel rusak,
+       bukan seperti panel yang jujur. Kalau BELUM ADA satu pun bukti, katakan itu sekali
+       dengan kalimat manusia dan berhenti di situ. */
+    const adaBukti=!!mastery||misAktif>0||misSelesai>0||atRisk>0||!!calText;
+    /* catatan: calText hanya benar bila status 'ok', jadi "belum cukup data" tidak pernah
+       terhitung sebagai bukti - kalau tidak, panggung kosong tidak akan pernah muncul. */
     // D5 S5: kelas 'olm-panel' menjadi jangkar fokus setelah sanggahan (olmDispute
     // menggambar ulang seluruh layar Progress, tombol yang tadi diklik ikut musnah).
-    return card(`<h3>${FiezelI18n.t('progress.sistem-yakini-tentangmu')} <span class="muted">(OLM)</span></h3>
-      ${mastery?`<p><b>${FiezelI18n.t('progress.penguasaan-terkuat')}</b> ${mastery}</p>`:''}
-      <p><b>${FiezelI18n.t('progress.misconception-label')}</b> ${FiezelI18n.t('progress.aktif-teratasi',{activeCount:Number(mis.active?.length??mis.activeCount??0),resolvedCount:Number(mis.resolved?.length??mis.resolvedCount??0)})}</p>
-      <p><b>${FiezelI18n.t('progress.at-risk-label')}</b> ${FiezelI18n.t('progress.at-risk-detail',{count:Number(review.atRiskCount||0),urgent:reviewTop?FiezelI18n.t('progress.at-risk-urgent',{top:reviewTop}):''})}</p>
-      ${cal.status?`<p><b>${FiezelI18n.t('progress.calibration-label-2')}</b> ${esc(cal.message||cal.status)}</p>`:''}
+    // "(OLM)" dicabut dari judul 2026-08-31: akronim internal di layar murid adalah
+    // temuan U4 audit ini sendiri. Nama panelnya sudah menjelaskan dirinya.
+    return card(`<h3>${FiezelI18n.t('progress.sistem-yakini-tentangmu')}</h3>
+      ${!adaBukti?`<p class="muted">${FiezelI18n.t('progress.olm-belum-ada-bukti')}</p>`:`
+      ${mastery?`<p class="olm-claim-head"><b>${FiezelI18n.t('progress.penguasaan-terkuat')}</b></p>${mastery}`:''}
+      <p><b>${FiezelI18n.t('progress.misconception-label')}</b> ${FiezelI18n.t('progress.aktif-teratasi',{activeCount:misAktif,resolvedCount:misSelesai})}</p>
+      <p><b>${FiezelI18n.t('progress.at-risk-label')}</b> ${FiezelI18n.t('progress.at-risk-detail',{count:atRisk,urgent:reviewTop?FiezelI18n.t('progress.at-risk-urgent',{top:reviewTop}):''})}</p>
+      ${calText?`<p><b>${FiezelI18n.t('progress.calibration-label-2')}</b> ${esc(calText)}</p>`:''}`}
       <p class="muted">${FiezelI18n.t('progress.ringkasan-dibaca-model-sama-memilih')}</p>`,'olm-panel')
   }catch{return ''}
 }
