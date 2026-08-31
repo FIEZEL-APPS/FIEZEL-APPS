@@ -78,8 +78,18 @@ intended.
 });
 ```
 
-**UMD.** Works as a browser global, a CommonJS module, or a bundler import — unchanged. Exports
-are frozen, so nothing can be monkey-patched at runtime.
+**UMD.** Works as a browser global, a CommonJS module, or a bundler import — unchanged.
+
+> **Correction (Phase P).** An earlier version of this line read *"Exports are frozen, so nothing
+> can be monkey-patched at runtime."* **That was false.** Measured: **4 of 23 modules** freeze
+> their exports (`fiezel-brain-config`, `fiezel-brain-manifest`, `fiezel-braincore-evidence`,
+> `fiezel-decision-trace`). The other 19 return a plain object literal and **can** be patched at
+> runtime. A gate (`braincore-version-safety-test.js`) now pins the real count, so this document
+> cannot drift away from it again.
+>
+> In practice this is modest: in a browser, any script on the page can patch anything, so freezing
+> is hardening rather than a security boundary. But it was stated as a fact to a prospective
+> buyer, and it was not one.
 
 **Already proven portable:** these files run today in the browser (`index.html`), in Node.js
 (the test suite), and in the simulation harness. Three environments, no modification.

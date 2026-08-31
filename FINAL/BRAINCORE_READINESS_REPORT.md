@@ -154,8 +154,12 @@ rather than policy.
 
 Braincore is pure calculation with the host application owning all state, storage and
 presentation. Twenty-one modules in five groups: decision core, learner model, measurement,
-intervention, and instrumentation. UMD format, frozen exports, `rationale` and `confidence` on
+intervention, and instrumentation. UMD format, `rationale` and `confidence` on
 every output, and an explicit `active` / `shadow` / `off` authority level per module.
+
+> **Correction (Phase P):** this paragraph previously said "frozen exports". Only **4 of 23**
+> modules freeze their exports; the rest can be patched at runtime. See
+> `SALE/BRAINCORE_ARCHITECTURE.md` for the measured detail.
 
 *Detail: `SALE/BRAINCORE_ARCHITECTURE.md`, `AUDIT/02_BRAINCORE_DATA_FLOW.md`.*
 

@@ -75,48 +75,60 @@ test('§1 dijaga gerbangnya sendiri, dan gerbang INI tidak mengulanginya', () =>
 });
 
 /* ========================================================================================
- * §2 — BELAJAR TIDAK BERGANTUNG PADA UNGGAHAN. Ini inti Fase M.
+ * §2 — BELAJAR TIDAK BERGANTUNG PADA UNGGAHAN
  *
- * Diuji dengan cara yang tidak bisa dielakkan: jalankan sesi belajar yang SAMA di empat dunia
- * berbeda — normal, jaringan mati, server 500, transport tidak ada sama sekali — dan tuntut
- * keputusannya IDENTIK. Bukan "tetap ada keputusan": identik. Kalau kegagalan unggah menggeser
- * satu keputusan saja, berarti belajar sudah membaca keadaan jaringan.
+ * VERSI PERTAMA BAGIAN INI DIHAPUS, DAN ALASANNYA ADA DUA — keduanya pantas ditulis.
+ *
+ * Ia menjalankan sesi belajar yang sama di "empat dunia" dengan cara menimpa `global.fetch`
+ * dan `global.XMLHttpRequest`, lalu menuntut keputusannya identik.
+ *
+ * (1) MELANGGAR ATURAN REPO. `no-network-test.js` melarang gerbang menyuntikkan fetch global
+ *     (`vmFetchLeak`). Larangan itu benar: sebuah uji yang memasang fetch global bisa
+ *     tidak sengaja membuat panggilan jaringan sungguhan, atau menutupi uji lain yang
+ *     melakukannya. CI merah karena saya, mulai dari commit Fase M.
+ *
+ * (2) LEBIH PENTING: IA TIDAK MEMBUKTIKAN APA PUN. Braincore tidak pernah memanggil `fetch`
+ *     — itu sudah dibuktikan Fase L dengan menjalankan seluruh modulnya di sandbox yang
+ *     global-nya tidak punya fetch sama sekali. Merusak sesuatu yang tidak pernah dipanggil
+ *     tidak bisa mengubah perilaku apa pun. "Empat dunia" itu terdengar meyakinkan dan
+ *     secara logika kosong: ia dijamin lulus tanpa memberi tahu siapa pun apa-apa.
+ *
+ * Yang tersisa di bawah adalah yang benar-benar bisa gagal: sesi itu MURNI dan
+ * DETERMINISTIK. Bukti bahwa jaringan tidak bisa diamati sama sekali ada di Fase L (sandbox
+ * tanpa fetch) dan di §3 (tanpa asinkroni) — dua tempat yang memang berhak mengklaimnya.
  * ===================================================================================== */
-function jalankanDiDunia(rusak) {
-  const asli = { fetch: global.fetch, XMLHttpRequest: global.XMLHttpRequest, navigator: global.navigator };
-  try {
-    if (rusak === 'jaringan_mati') {
-      global.fetch = () => Promise.reject(new Error('offline'));
-    } else if (rusak === 'server_500') {
-      global.fetch = () => Promise.resolve({ ok: false, status: 500, json: () => Promise.resolve({}) });
-    } else if (rusak === 'tanpa_transport') {
-      delete global.fetch; delete global.XMLHttpRequest;
-    }
-    return sesiBelajar();
-  } finally {
-    if (asli.fetch === undefined) delete global.fetch; else global.fetch = asli.fetch;
-    if (asli.XMLHttpRequest === undefined) delete global.XMLHttpRequest; else global.XMLHttpRequest = asli.XMLHttpRequest;
-    if (asli.navigator === undefined) delete global.navigator; else global.navigator = asli.navigator;
-  }
-}
-
-test('§2 keputusan belajar IDENTIK saat jaringan mati, server 500, dan tanpa transport', () => {
-  const normal = jalankanDiDunia('normal');
-  for (const rusak of ['jaringan_mati', 'server_500', 'tanpa_transport']) {
-    const hasil = jalankanDiDunia(rusak);
-    assert.deepStrictEqual(hasil.keputusan, normal.keputusan,
-      'keputusan belajar BERUBAH di dunia "' + rusak + '" — belajar sudah membaca keadaan jaringan');
-  }
-  assert.ok(normal.keputusan.length === 12, 'sesi tidak selesai');
+test('§2 sesi belajar DETERMINISTIK — dua jalan identik, tanpa menyentuh global apa pun', () => {
+  const a = sesiBelajar();
+  const b = sesiBelajar();
+  assert.deepStrictEqual(a.keputusan, b.keputusan,
+    'dua jalan dengan masukan identik memberi keputusan berbeda — ada keadaan tersembunyi');
+  assert.strictEqual(a.keputusan.length, 12, 'sesi tidak selesai');
 });
 
-test('§2 keadaan murid tetap terakumulasi walau unggahan mustahil', () => {
-  const hasil = jalankanDiDunia('tanpa_transport');
+test('§2 keadaan murid terakumulasi penuh tanpa satu pun unggahan pernah terjadi', () => {
+  // Tidak ada transport yang dipasang di seluruh berkas ini, dan sesi tetap menumpuk bukti.
+  // Itulah bentuk "belajar tidak bergantung pada unggahan" yang bisa diperiksa tanpa
+  // berpura-pura merusak sesuatu yang memang tidak pernah dipakai.
+  const hasil = sesiBelajar();
   const BKT = require('./features/brain/fiezel-mastery-bkt.js');
   const m = BKT.mastery(hasil.mastery, 'past-simple');
-  assert.strictEqual(m.n, 12, 'bukti murid tidak tersimpan tanpa transport — belajar ikut mati');
-  assert.ok(m.L > 0, 'mastery tidak bergerak tanpa transport');
+  assert.strictEqual(m.n, 12, 'bukti murid tidak tersimpan');
+  assert.ok(m.L > 0, 'mastery tidak bergerak');
 });
+
+/* Tidak ada assert "berkas ini tidak menyentuh global jaringan" di sini, dan itu disengaja.
+ *
+ * Versi pertamanya meng-grep sumber berkas ini untuk pola `global.fetch` — lalu cocok dengan
+ * REGEX DI DALAM ASSERT-NYA SENDIRI. Itu jebakan yang sama persis yang sudah saya kena satu
+ * kali di berkas ini juga (§1, mencari 'visitor_token' dan menemukan pesannya sendiri). Dua
+ * kali di satu berkas berarti polanya bukan kebetulan: sebuah gerbang yang membaca sumbernya
+ * sendiri hampir selalu akan menemukan dirinya.
+ *
+ * Aturannya tetap ditegakkan, hanya bukan di sini: `no-network-test.js` memindai SETIAP
+ * gerbang di repo untuk kebocoran fetch global, dan ia terdaftar di CI. Menduplikasinya di
+ * dalam berkas yang diawasinya tidak menambah jaminan apa pun — ia hanya menambah satu tempat
+ * baru untuk salah. */
+
 
 /* ========================================================================================
  * §3 — BRAINCORE TIDAK PUNYA JALAN MENUNGGU UNGGAHAN

@@ -841,6 +841,13 @@ jobs:
           # dunia — normal, jaringan mati, server 500, tanpa transport — dan keputusannya wajib
           # IDENTIK. Bukan "tetap ada keputusan": identik.
           node braincore-evidence-queue-test.js
+          # Fase 2 / Phase N, O, P. Brief menyebut N dan O "dokumentasi saja" — dan larangan yang
+          # hanya hidup di prosa akan dilanggar pada hari orang lupa membacanya. Gerbang ini
+          # menegakkannya: tidak ada berkas yang bisa menulis ke features/brain/, tidak ada
+          # eval/Function di dalamnya, ekspornya beku, tidak ada agregasi populasi, jalur bukti
+          # tetap 'off'. Plus Fase P: setiap trace, catatan bukti, tolok ukur, dan hasil studi
+          # wajib membawa braincoreVersion yang cocok dengan manifest.
+          node braincore-version-safety-test.js
           node fiezel-stat-gate-test.js
           node id-golden-snapshot-test.js
           node learning-lane-test.js
