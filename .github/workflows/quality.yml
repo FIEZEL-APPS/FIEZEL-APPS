@@ -828,6 +828,12 @@ jobs:
           # mentah, dan kunci miskonsepsi sintetis 'unclassified:*' semuanya ditolak. Gerbang ini
           # juga meng-assert modulnya TIDAK punya jalan untuk mengirim apa pun ke mana pun.
           node braincore-evidence-test.js
+          # Fase 2 / Phase L: local-first, DIBUKTIKAN DENGAN MENJALANKAN. Seluruh modul Braincore
+          # dimuat ke sandbox VM yang sama sekali tidak punya fetch/XHR/navigator/localStorage/
+          # document/Date — bukan dimatikan, tidak pernah ada — lalu satu sesi belajar penuh
+          # dijalankan di dalamnya. Satu sentuhan jaringan = ReferenceError = gerbang merah.
+          # Membuktikannya dengan grep sama lemahnya dengan uji manifest berongga di Fase A.
+          node braincore-local-first-test.js
           node fiezel-stat-gate-test.js
           node id-golden-snapshot-test.js
           node learning-lane-test.js
