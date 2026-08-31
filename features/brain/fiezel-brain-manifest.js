@@ -77,7 +77,7 @@
 
   // Versi BUNDLE kebijakan belajar — terpisah dari versi produk. 3.0.0 menandai
   // gelombang Braincore v3 pertama yang punya identitas bundle eksplisit.
-  var BUNDLE_VERSION = '3.1.0';
+  var BUNDLE_VERSION = '3.2.0';
 
   // Disalin apa adanya dari version.js (self.FIEZEL_VERSION). Bundle ini mengandalkan
   // wiring app.js 5.19.0 (guard modul-absen, sidecar stabilityDays, dsb.) — versi
@@ -108,6 +108,7 @@
    */
   var MODULES = [
     { file: 'fiezel-affect.js', global: 'FiezelAffect', schema: 'fiezel-affect-v1', authorityKey: 'affectTargetSuccess' },
+    { file: 'fiezel-attempt-record.js', global: 'FiezelAttemptRecord', schema: 'fiezel-attempt-record-v1', authorityKey: 'attemptRecord' },
     { file: 'fiezel-brain-config.js', global: 'FiezelBrainConfig', schema: 'fiezel-brain-config-v1', authorityKey: 'brainConfig' },
     { file: 'fiezel-brain-manifest.js', global: 'FiezelBrainManifest', schema: SCHEMA, authorityKey: 'manifest' },
     { file: 'fiezel-confusion-matrix.js', global: 'FiezelConfusionMatrix', schema: 'fiezel-confusion-matrix-v1', authorityKey: 'confusionMap' },
@@ -176,6 +177,10 @@
     // metrik longitudinal dari riwayat lokal dan merendernya di panel diagnostik.
     // Tampilan saja — nol keputusan sesi yang bergantung padanya: 'shadow'.
     learningMetrics: 'shadow',
+    // Proyeksi bukti untuk sinkron antar-perangkat (S5). Modul murni yang MEMBATASI apa
+    // yang boleh meninggalkan perangkat; belum ada pemanggil di app.js sampai transport
+    // mendarat, jadi jujurnya 'off'.
+    attemptRecord: 'off',
     // Digest metrik tetap 'off' dengan sengaja: ia adalah PENGUNGGAH, dan menyalakannya
     // tanpa keputusan produk soal telemetri berarti menambah permukaan privasi diam-diam.
     metricsDigest: 'off',

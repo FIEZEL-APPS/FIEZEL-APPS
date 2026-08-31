@@ -287,6 +287,7 @@ jobs:
           node side-state-scope-test.js
           node attempt-identity-test.js
           node brain-replay-equivalence-test.js
+          node attempt-record-test.js
           node learner-evidence-test.js
           node alrs-behavior-test.js
           node adaptive-policy-test.js
