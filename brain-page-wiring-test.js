@@ -68,6 +68,7 @@ function test(name, fn) {
 
 const indexHtml = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 const swSource = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
+const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 
 /**
  * Berkas otak yang benar-benar dimuat HALAMAN. Dibaca dari `src=` sungguhan, bukan
@@ -91,6 +92,20 @@ function precachedBySw(source) {
   let m;
   while ((m = re.exec(source))) found.add(m[1]);
   return found;
+}
+/**
+ * Pemanggil nyata sebuah modul di app.js. Yang dihitung HANYA bentuk pemanggilan sungguhan
+ * — `self.FiezelX`, `window.FiezelX`, atau `FiezelX.` diikuti properti — bukan penyebutan
+ * nama di komentar. Kalau komentar ikut dihitung, gerbang ini akan merah karena sebuah
+ * penjelasan, dan gerbang yang merah karena prosa akan segera dimatikan orang.
+ */
+function appCallSites(source, globalName) {
+  if (!globalName) return 0;
+  const stripped = source
+    .replace(/\/\*[\s\S]*?\*\//g, ' ')   // komentar blok
+    .replace(/(^|[^:])\/\/[^\n]*/g, '$1 '); // komentar baris (bukan '://' pada URL)
+  const re = new RegExp('(?:self|window|globalThis)\\s*\\.\\s*' + globalName + '\\b|\\b' + globalName + '\\s*\\.\\s*[A-Za-z_$]', 'g');
+  return (stripped.match(re) || []).length;
 }
 /** Modul manifest yang otoritasnya benar-benar mengubah pengalaman murid atau tercatat. */
 function authoritativeModules(map) {
@@ -162,6 +177,25 @@ test('W6 · modul off yang tidak dimuat halaman dilaporkan sebagai keputusan sad
   assert.ok(offAbsent.length <= manifest.modules.length, 'perhitungan modul off tidak masuk akal');
 });
 
+test('W8 · modul berotoritas OFF tidak boleh punya pemanggil di app.js (drift arah balik)', () => {
+  // LUBANG YANG DITUTUP GERBANG INI. W1-W6 semuanya menguji satu arah: yang manifest
+  // sebut BERWENANG harus benar-benar sampai ke perangkat. Arah sebaliknya — modul yang
+  // manifest sebut 'off' ternyata DIPANGGIL app.js — tidak dijaga siapa pun, dan itu
+  // persis yang terjadi: peta menyebut stepTutor dan productionGrader 'off' dengan alasan
+  // tertulis "nol referensi di app.js" sementara keduanya sudah merender tuntunan langkah
+  // dan menilai jawaban cloze murid. Peta yang bohong ke arah ini lebih berbahaya daripada
+  // ke arah mana pun: ia membuat modul yang MENYENTUH MURID tercatat sebagai tidak aktif,
+  // sehingga tidak pernah masuk perhitungan saat otoritas ditinjau.
+  const liars = manifest.modules
+    .filter(mod => manifest.authorityMap[mod.authorityKey] === 'off')
+    .map(mod => ({ file: mod.file, global: mod.global, hits: appCallSites(appSource, mod.global) }))
+    .filter(x => x.hits > 0)
+    .map(x => x.file + ' (' + x.global + ' dipanggil ' + x.hits + '×, tetapi dipeta off)');
+  assert.deepStrictEqual(liars, [],
+    'modul berotoritas off yang ternyata dipanggil app.js — naikkan otoritasnya di manifest, ' +
+    'jangan biarkan petanya bohong: ' + liars.join(', '));
+});
+
 // ==========================================================================
 // BUKTI-BISA-MERAH
 // ==========================================================================
@@ -199,6 +233,18 @@ test('RED · setiap detektor terbukti bisa MERAH terhadap peta/halaman yang seng
       assert.deepStrictEqual(missingFromPage(promoted, indexHtml), []);
     });
   }
+
+  // (W8) modul yang benar-benar dipanggil app.js diturunkan jadi 'off' — bentuk drift
+  // yang sudah pernah terjadi di repo ini, jadi detektornya wajib terbukti merah.
+  const called = manifest.modules.find(mod => appCallSites(appSource, mod.global) > 0);
+  assert.ok(called, 'tidak ada modul otak yang dipanggil app.js — W8 tidak terbukti apa-apa');
+  const demoted = Object.assign({}, manifest.authorityMap, { [called.authorityKey]: 'off' });
+  expectRed('modul yang dipanggil app.js diturunkan jadi off', () => {
+    const liars = manifest.modules
+      .filter(mod => demoted[mod.authorityKey] === 'off')
+      .filter(mod => appCallSites(appSource, mod.global) > 0);
+    assert.deepStrictEqual(liars, []);
+  });
 
   // (W3) skrip otak hantu disisipkan ke halaman
   const htmlGhost = indexHtml.replace('</body>', '  <script defer src="./features/brain/fiezel-hantu.js"></script>\n</body>');

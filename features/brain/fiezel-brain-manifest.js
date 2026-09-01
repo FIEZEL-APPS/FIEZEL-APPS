@@ -44,8 +44,20 @@
  * - listeningPolicy (listening-adaptive): BAYANGAN — policy() dihitung dan
  *   ditempel sebagai metadata q.__listeningPolicy, tetapi tidak ada satu baris
  *   pun yang membacanya kembali untuk mengubah playback.
- * - stepTutor & productionGrader: OFF — dimuat index.html/sw.js tetapi NOL
- *   referensi di app.js; belum ada jalur yang memanggilnya.
+ * - stepTutor: AKTIF — stepTutorGuidance()/stepTutorGuidanceMarkup() memecah soal
+ *   ber-reasoningOperation jadi tuntunan langkah yang DITAMPILKAN ke murid saat
+ *   scaffold mencapai 'worked' (app.js, jalur render jawaban).
+ * - productionGrader: AKTIF — grade() adalah penilai jawaban mode cloze; hasilnya
+ *   menentukan benar/salah murid dan matchedDistractor-nya masuk ledger miskonsepsi.
+ * - retentionProbe: BAYANGAN — schedule() dipanggil saat mastery BKT tembus dan
+ *   evaluate() menilai kalibrasi dari jawaban NYATA setelah jatuh tempo, tetapi
+ *   rekomendasi half-life-nya ADVISORY: penulis nextReview tetap tunggal (FSRS).
+ * - learningMetrics: BAYANGAN — lima metrik longitudinal dihitung di perangkat dan
+ *   dirender di panel diagnostik; nol keputusan yang bergantung padanya.
+ * - statGate: OFF di jalur aplikasi (nol referensi app.js), tetapi BERWENANG di jalur
+ *   pipeline konten — content-promotion.js memakai verdict()-nya untuk memutus
+ *   promote/hold/reject. Peta ini memetakan otoritas DI PERANGKAT, jadi 'off' di sini
+ *   bukan berarti modul mati; lihat catatan di entri authorityMap-nya.
  *
  * BATAS YANG DIJAGA
  * -----------------
@@ -65,7 +77,7 @@
 
   // Versi BUNDLE kebijakan belajar — terpisah dari versi produk. 3.0.0 menandai
   // gelombang Braincore v3 pertama yang punya identitas bundle eksplisit.
-  var BUNDLE_VERSION = '3.0.0';
+  var BUNDLE_VERSION = '3.8.0';
 
   // Disalin apa adanya dari version.js (self.FIEZEL_VERSION). Bundle ini mengandalkan
   // wiring app.js 5.19.0 (guard modul-absen, sidecar stabilityDays, dsb.) — versi
@@ -96,6 +108,7 @@
    */
   var MODULES = [
     { file: 'fiezel-affect.js', global: 'FiezelAffect', schema: 'fiezel-affect-v1', authorityKey: 'affectTargetSuccess' },
+    { file: 'fiezel-attempt-record.js', global: 'FiezelAttemptRecord', schema: 'fiezel-attempt-record-v1', authorityKey: 'attemptRecord' },
     { file: 'fiezel-brain-config.js', global: 'FiezelBrainConfig', schema: 'fiezel-brain-config-v1', authorityKey: 'brainConfig' },
     { file: 'fiezel-brain-manifest.js', global: 'FiezelBrainManifest', schema: SCHEMA, authorityKey: 'manifest' },
     { file: 'fiezel-confusion-matrix.js', global: 'FiezelConfusionMatrix', schema: 'fiezel-confusion-matrix-v1', authorityKey: 'confusionMap' },
@@ -108,10 +121,15 @@
     { file: 'fiezel-mastery-bkt.js', global: 'FiezelMasteryBKT', schema: 'fiezel-mastery-bkt-v1', authorityKey: 'bktUnlock' },
     { file: 'fiezel-metrics-digest.js', global: 'FiezelMetricsDigest', schema: 'fiezel-metrics-digest-v1', authorityKey: 'metricsDigest' },
     { file: 'fiezel-misconception-ledger.js', global: 'FiezelMisconceptionLedger', schema: 'fiezel-misconception-ledger-v1', authorityKey: 'misconceptionPrior' },
+    { file: 'fiezel-param-ledger.js', global: 'FiezelParamLedger', schema: 'fiezel-param-ledger-v1', authorityKey: 'paramLedger' },
+    { file: 'fiezel-content-chain.js', global: 'FiezelContentChain', schema: 'fiezel-content-chain-v1', authorityKey: 'contentChain' },
+    { file: 'fiezel-policy-verdict.js', global: 'FiezelPolicyVerdict', schema: 'fiezel-policy-verdict-v1', authorityKey: 'policyVerdict' },
+    { file: 'fiezel-nof1.js', global: 'FiezelNof1', schema: 'fiezel-nof1-v1', authorityKey: 'nof1' },
     { file: 'fiezel-olm.js', global: 'FiezelOLM', schema: 'fiezel-olm-v1', authorityKey: 'olmInsight' },
     { file: 'fiezel-production-grader.js', global: 'FiezelProductionGrader', schema: 'fiezel-production-grader-v1', authorityKey: 'productionGrader' },
     { file: 'fiezel-retention-probe.js', global: 'FiezelPostTest', schema: 'fiezel-post-test-v1', authorityKey: 'retentionProbe' },
     { file: 'fiezel-speaking-adaptive.js', global: 'FiezelSpeakingAdaptive', schema: 'fiezel-speaking-adaptive-v1', authorityKey: 'speakingPolicy' },
+    { file: 'fiezel-self-tune.js', global: 'FiezelSelfTune', schema: 'fiezel-self-tune-v1', authorityKey: 'selfTune' },
     { file: 'fiezel-srl-coach.js', global: 'FiezelSrlCoach', schema: 'fiezel-srl-coach-v1', authorityKey: 'srlCoach' },
     { file: 'fiezel-stat-gate.js', global: 'FiezelStatGate', schema: null, authorityKey: 'statGate' },
     { file: 'fiezel-step-tutor.js', global: 'FiezelStepTutor', schema: null, authorityKey: 'stepTutor' },
@@ -146,36 +164,50 @@
     confusionMap: 'shadow',
     olmInsight: 'shadow',
     listeningPolicy: 'shadow',
-    /* m025-225: KOREKSI. Keduanya dulu ditulis 'off' dengan alasan "nol pemanggil di
-       app.js", dan alasan itu SUDAH TIDAK BENAR — wiring-nya mendarat belakangan tanpa
-       manifest ikut diperbarui, dan gerbangnya tidak bisa menangkapnya karena hanya
-       memeriksa satu arah (nol referensi => wajib off). Sekarang dua arah.
-         stepTutor       : stepTutorGuidance -> stepTutorGuidanceMarkup dirender di
-                           app.js:7964 saat `retry && answer.scaffold==='worked'` — murid
-                           MEMBACA tuntunan langkahnya sebelum menjawab lagi.
-         productionGrader: grade() dipanggil app.js:8169 di jalur cloze produksi; ia yang
-                           memutus BENAR/SALAH atas jawaban ketikan murid dan memilih
-                           umpan baliknya.
-       Keduanya memenuhi definisi 'active' di atas: keluarannya benar-benar mengubah
-       pengalaman murid. Manifest yang menyebut mesin penilai sebagai 'off' bukan sekadar
-       label meleset — ia membuat panel diagnostik dan pembaca laporan menyimpulkan bahwa
-       jawaban murid dinilai mesin lama. */
     stepTutor: 'active',
     productionGrader: 'active',
-    // Wave E4 (29 Agu): probe retensi tertunda — modul murni baru, belum ada pemanggil
-    // di app.js; rekomendasi half-life-nya ADVISORY dan tidak menulis memori: 'off'.
-    retentionProbe: 'off',
+    // Langkah 1 roadmap otonomi: probe retensi kini dimuat halaman dan dipanggil —
+    // schedule() saat mastery BKT tembus, evaluate() atas jawaban nyata sesudah jatuh
+    // tempo. Ia MENGUKUR dan tidak memutuskan (rekomendasi half-life tetap advisory,
+    // penulis nextReview tetap tunggal), maka jujurnya 'shadow', bukan 'active'.
+    retentionProbe: 'shadow',
     // Registry konfigurasi (fiezel-brain-config.js) menyatakan sendiri bahwa ia TIDAK
     // dibaca modul lain saat runtime dan tidak dimuat index.html — sumber kebenaran
     // untuk manusia/tooling, bukan jalur keputusan: jujurnya 'off'.
     brainConfig: 'off',
-    // Learning metrics menghitung metrik longitudinal on-device untuk pelaporan —
-    // belum ada satu pun pemanggil di app.js/index.html pada bundle ini: 'off'.
-    learningMetrics: 'off',
-    // Dua modul infrastruktur gelombang v3 lain (digest metrik dan gerbang statistik):
-    // sama-sama nol pemanggil di app.js/index.html pada bundle ini — 'off' sampai
-    // ada wiring nyata yang bisa ditunjuk.
+    // Langkah 1 roadmap otonomi: learningMetricsSnapshot() di app.js menghitung lima
+    // metrik longitudinal dari riwayat lokal dan merendernya di panel diagnostik.
+    // Tampilan saja — nol keputusan sesi yang bergantung padanya: 'shadow'.
+    learningMetrics: 'shadow',
+    // Proyeksi bukti sinkron (S5b). Dipanggil app.js lewat brainSyncQueue, tetapi ia
+    // MEMBATASI apa yang boleh keluar — ia tidak memutuskan apa pun tentang belajar murid,
+    // dan sinkronnya sendiri mati secara default. Jujurnya 'shadow', bukan 'active'.
+    attemptRecord: 'shadow',
+    // Langkah 2 roadmap otonomi: pemutus nasib kebijakan belajar. Ia BENAR-BENAR
+    // memutuskan — hasilnya menentukan status outcome yang membentuk kebijakan sesi
+    // berikutnya lewat deriveAdaptivePolicy. Jujurnya 'active'.
+    policyVerdict: 'active',
+    // Langkah 3 roadmap otonomi: pembagi lengan eksperimen N-of-1. Modul murni yang belum
+    // punya pemanggil di app.js — eksperimen pertama belum dibuka. Jujurnya 'off'.
+    nof1: 'off',
+    // Langkah 4: rantai hash perubahan parameter. Prasyarat penyetelan-diri, belum ada
+    // pemanggil di app.js karena belum ada parameter yang boleh bergerak sendiri: 'off'.
+    paramLedger: 'off',
+    // Langkah 5: pengusul penyetelan-diri. 'off' dan HARUS tetap 'off' sampai OWNER
+    // memutuskan kelas perubahan apa yang boleh berjalan tanpa manusia. Modulnya siap dan
+    // pagarnya terbukti; yang belum ada adalah izinnya, dan izin bukan pekerjaan kode.
+    selfTune: 'off',
+    // Langkah 6 (separuh kode): pelapor posisi kandidat konten dalam rantainya. Ia tidak
+    // pernah menerbitkan apa pun — tahap terjauh yang bisa ia laporkan adalah
+    // 'owner_decision' — tetapi ia tetap 'off' karena belum ada pemanggil di app.js, dan
+    // 'active' tanpa pemanggil adalah persis kebohongan yang Langkah 1 ada untuk menutup.
+    contentChain: 'off',
+    // Digest metrik tetap 'off' dengan sengaja: ia adalah PENGUNGGAH, dan menyalakannya
+    // tanpa keputusan produk soal telemetri berarti menambah permukaan privasi diam-diam.
     metricsDigest: 'off',
+    // 'off' DI PERANGKAT saja. content-promotion.js memakai FiezelStatGate.verdict untuk
+    // memutus promote/hold/reject kandidat konten — modul ini hidup, hanya belum di jalur
+    // keputusan otak. Langkah 2 roadmap otonomi yang memindahkannya ke sini.
     statGate: 'off',
     // Manifest sendiri deskriptif murni: ia tidak memutuskan apa-apa untuk murid,
     // maka jujurnya 'shadow' (informasi diagnostik), bukan 'active'.
