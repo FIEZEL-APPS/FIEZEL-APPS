@@ -74,10 +74,19 @@ import { ROUTES as CRON_STATUS_ROUTES } from './cron-status.js';
  * featureAllowedFrom yang sama dengan AI/TTS) -> CORE_DB. Cap byte per path
  * terdaftar di schema.js BYTE_LIMITS seperti slot lain. */
 import { ROUTES as SOCIAL_ROUTES } from './route-social.js';
+/* --- SLOT 8: BUKTI BRAINCORE (evidence/route-evidence.js) - BACA owner saja:
+ *             GET /api/owner/braincore-evidence                      [TERPASANG]
+ * Rute TULIS lane ini (POST /api/braincore/evidence) TIDAK di sini: ia butuh
+ * penyempitan env ke EVIDENCE_DB, jadi ia dipasang lewat route-wiring.js persis
+ * seperti lane analytics dan learning. Yang ada di sini hanya jalur BACA
+ * owner-gated, yang tidak butuh jembatan kuota maupun identitas murid - pola
+ * yang sama dengan SLOT 6. */
+import { ROUTES as EVIDENCE_OWNER_ROUTES } from './evidence/route-evidence.js';
 
 export const EXTRA_ROUTES = [
   ...buildExtraRoutes(),  /* SLOT 1-4 */
   // ...LEGACY_ROUTES,    /* SLOT 5 */
   ...CRON_STATUS_ROUTES,  /* SLOT 6 */
   ...SOCIAL_ROUTES,       /* SLOT 7 */
+  ...EVIDENCE_OWNER_ROUTES, /* SLOT 8 */
 ];

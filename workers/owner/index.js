@@ -608,6 +608,94 @@ function sanitizeRows(rows, droppedInto) {
   return (Array.isArray(rows) ? rows : []).map((r) => sanitizeRow(r, droppedInto));
 }
 
+/* ==========================================================================================
+ * BUKTI BELAJAR BRAINCORE — dibaca lewat SUBREQUEST, BUKAN lewat binding D1 baru
+ * ==========================================================================================
+ * Godaannya jelas: tambahkan `[[d1_databases]] binding = "EVIDENCE_DB"` di wrangler Worker ini
+ * dan SELECT langsung. Itu ditolak, dan bukan karena gerbang `owner-edge-guard-test.js` butir
+ * (g-g) melarang binding D1 kedua — melainkan karena gerbang itu BENAR: satu Worker owner, satu
+ * database agregat, radius ledakan tetap sekecil hari ini. Menambah binding kedua akan menaruh
+ * database yang memuat SATU-SATUNYA pengenal perangkat (`evidence_learner_day.cohort`) di
+ * isolate yang sama dengan seluruh kode dashboard.
+ *
+ * Maka jalurnya: Worker ini memanggil `GET /api/owner/braincore-evidence` di Worker `fiezel-api`
+ * (owner-gated di sana dengan pola `cron-status.js`), yang sudah HANYA membaca `evidence_daily`
+ * dan secara struktur tidak bisa mengembalikan cohort. Konsekuensinya jujur: dashboard menjadi
+ * bergantung pada satu subrequest yang bisa gagal — dan kegagalan itu dicetak apa adanya
+ * sebagai "pengukuran tidak tersedia", bukan sebagai nol.
+ *
+ * DUA SECRET BARU, keduanya OPSIONAL (tanpa keduanya panel berbunyi "belum dikonfigurasi",
+ * dashboard lama tetap utuh):
+ *   EVIDENCE_API_BASE  — basis URL Worker api, mis. https://api.fiezel.my.id
+ *   EVIDENCE_API_TOKEN — token owner yang sama yang di-hash di OWNER_TOKEN_HASH Worker api.
+ */
+const EVIDENCE_PERIOD_DAYS = { today: 1, '7d': 7, '30d': 30, '90d': 90 };
+
+async function readEvidence(env, period, fetchImpl) {
+  const base = env && typeof env.EVIDENCE_API_BASE === 'string' ? env.EVIDENCE_API_BASE.trim().replace(/\/+$/, '') : '';
+  // Token dibaca lewat variabel perantara: ia hanya DIKIRIM sebagai header, tidak pernah
+  // dibandingkan di sini (perbandingan rahasia di Worker ini wajib waktu-konstan lewat ctEq).
+  const rawKey = env ? env.EVIDENCE_API_TOKEN : null;
+  const apiKey = typeof rawKey === 'string' ? rawKey.trim() : '';
+  if (!base || !apiKey) return { state: 'unconfigured', summary: null };
+  if (!/^https:\/\//.test(base)) return { state: 'unconfigured', summary: null };
+  const days = EVIDENCE_PERIOD_DAYS[period] || 7;
+  const doFetch = typeof fetchImpl === 'function' ? fetchImpl : (typeof fetch === 'function' ? fetch : null);
+  if (!doFetch) return { state: 'unavailable', summary: null };
+  try {
+    const res = await doFetch(base + '/api/owner/braincore-evidence?days=' + days, {
+      method: 'GET',
+      headers: { 'x-fiezel-owner-token': apiKey, 'cache-control': 'no-store' },
+    });
+    if (!res || !res.ok) return { state: 'unavailable', summary: null, status: (res && res.status) || 0 };
+    const body = await res.json();
+    if (!body || body.migrated === false || !body.summary) return { state: 'not-migrated', summary: null };
+    // Sabuk pengaman terakhir. Rute sumber memang tidak bisa mengembalikan cohort, tetapi
+    // dashboard tidak boleh bergantung pada janji Worker lain: apa pun yang tidak dikenal
+    // dibuang di sini, bukan dirender.
+    return { state: 'measured', range: body.range || null, summary: sanitizeEvidenceSummary(body.summary) };
+  } catch {
+    return { state: 'unavailable', summary: null };
+  }
+}
+
+/** Daftar putih bentuk ringkasan bukti. Field di luar ini TIDAK PERNAH sampai ke HTML. */
+function sanitizeEvidenceSummary(raw) {
+  const int = (v) => (Number.isFinite(Number(v)) ? Math.max(0, Math.trunc(Number(v))) : 0);
+  const dist = (v) => {
+    const out = {};
+    if (!v || typeof v !== 'object') return out;
+    for (const [k, n] of Object.entries(v)) {
+      // Kunci distribusi WAJIB berbentuk nilai enum (huruf/angka/-/_ , maks 40 char). Cohort
+      // 16-hex pun akan lolos pola itu, jadi pagar sesungguhnya adalah: hanya distribusi yang
+      // NAMANYA terdaftar di bawah yang pernah dibaca.
+      if (typeof k === 'string' && /^[A-Za-z0-9_-]{1,40}$/.test(k)) out[k] = int(n);
+    }
+    return out;
+  };
+  return {
+    learnersMeasured: int(raw.learnersMeasured),
+    evidenceCount: int(raw.evidenceCount),
+    decisionCount: int(raw.decisionCount),
+    measured: raw.measured === true,
+    mastery: dist(raw.mastery),
+    masteryTrend: dist(raw.masteryTrend),
+    misconception: dist(raw.misconception),
+    misconceptionSkill: dist(raw.misconceptionSkill),
+    difficultyCalibration: dist(raw.difficultyCalibration),
+    calibrationError: dist(raw.calibrationError),
+    decision: dist(raw.decision),
+    outcome: dist(raw.outcome),
+    recommendation: dist(raw.recommendation),
+    improvementTrend: dist(raw.improvementTrend),
+    level: dist(raw.level),
+    days: (Array.isArray(raw.days) ? raw.days : []).slice(0, 90).map((d) => ({
+      day: typeof d.day === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d.day) ? d.day : '',
+      learners: int(d.learners), evidence: int(d.evidence), decisions: int(d.decisions),
+    })).filter((d) => d.day),
+  };
+}
+
 async function readModel(env, period, nowMs) {
   const db = env && env.ANALYTICS;
   // Kegagalan baca dicatat per-query dan TIDAK diubah menjadi nol. "Tidak tahu" adalah jawaban
@@ -789,6 +877,9 @@ async function readModel(env, period, nowMs) {
     periodDays: periodDays || {},
     cost,
     collection: start || {},
+    // Bukti belajar Braincore: satu subrequest, tidak pernah melempar, tidak pernah
+    // menjatuhkan panel lain (lihat readEvidence).
+    evidence: await readEvidence(env, period),
     // Batas pengukuran ikut ke model — jadi HTML dan JSON menceritakan batas yang SAMA.
     unmeasurable: UNMEASURABLE,
     generatedAtIso: new Date(Number(nowMs)).toISOString(),
@@ -972,6 +1063,76 @@ function fmtRateRange(m, part, wholeLo, wholeHi) {
 }
 
 const DEVICE_TRUTH = 'Angka ini ESTIMASI PERANGKAT, bukan orang. Satu orang dengan dua perangkat = dua hitungan; menghapus data browser = perangkat baru; dua orang satu perangkat = satu hitungan.';
+
+/**
+ * Distribusi bucket -> baris tabel. Peta KOSONG dicetak "belum ada pengukuran", BUKAN "0" —
+ * aturan kejujuran yang sama dengan seluruh halaman ini: nol adalah klaim, dan klaim butuh
+ * pengukuran. `order` menjaga urutan bermakna (m0-40 sebelum m80-100) alih-alih alfabetis.
+ */
+function evidenceDist(map, order) {
+  const src = map || {};
+  const keys = (order ? order.filter((k) => src[k] != null) : Object.keys(src).sort());
+  if (!keys.length) return `<div class="note">${esc(NO_DATA_TEXT)}</div>`;
+  const total = keys.reduce((n, k) => n + (Number(src[k]) || 0), 0) || 1;
+  return keys.map((k) => row(esc(k), `${esc(fmtInt(src[k]))} (${esc(Math.round(src[k] / total * 100))}%)`)).join('');
+}
+
+/**
+ * Panel BUKTI BELAJAR BRAINCORE di dalam dashboard yang SUDAH ADA — bukan halaman kedua.
+ * Yang dirender hanya agregat berenum tertutup; endpoint sumbernya secara struktur tidak bisa
+ * mengembalikan identitas murid (rute owner di Worker api dilarang membaca tabel yang memuat
+ * cohort), dan `sanitizeEvidenceSummary` membuang apa pun di luar daftar putih.
+ */
+function renderEvidenceSection(m) {
+  const e = m.evidence || { state: 'unconfigured', summary: null };
+  const head = '<section><h2>\u{1F9E0} Braincore evidence</h2>';
+  if (e.state === 'unconfigured') {
+    return head + `<div class="note">BELUM DIKONFIGURASI. Secret <code>EVIDENCE_API_BASE</code> dan
+      <code>EVIDENCE_API_TOKEN</code> belum dipasang di Worker ini, jadi panel ini tidak pernah memanggil
+      apa pun. Ini BUKAN "nol murid".</div></section>`;
+  }
+  if (e.state === 'unavailable') {
+    return head + `<div class="warn">${esc(UNAVAILABLE_TEXT.toUpperCase())}. Subrequest ke
+      <code>/api/owner/braincore-evidence</code> gagal${e.status ? ` (status ${esc(e.status)})` : ''}.
+      Kegagalan baca TIDAK PERNAH dirender sebagai angka nol.</div></section>`;
+  }
+  if (e.state === 'not-migrated' || !e.summary) {
+    return head + `<div class="note">PENGUKURAN BELUM TERSEDIA. Database bukti (<code>fiezel-evidence</code>)
+      belum dimigrasi atau binding <code>EVIDENCE_DB</code> belum terpasang di Worker api. Ini BUKAN
+      "nol murid".</div></section>`;
+  }
+  const s = e.summary;
+  if (!s.measured) {
+    return head + `<div class="note">BELUM ADA PENGUKURAN pada periode ini. Tidak ada satu pun batch bukti
+      yang mendarat${e.range ? ` antara ${esc(e.range.from)} dan ${esc(e.range.to)}` : ''}.</div></section>`;
+  }
+  const dayRows = (s.days || []).map((d) =>
+    `<tr><td>${esc(d.day)}</td><td>${esc(fmtInt(d.learners))}</td><td>${esc(fmtInt(d.evidence))}</td><td>${esc(fmtInt(d.decisions))}</td></tr>`
+  ).join('');
+  return head + `
+    <div class="big">${esc(fmtInt(s.learnersMeasured))}</div>
+    ${row('Murid terukur (periode)', fmtInt(s.learnersMeasured), 'cohort acak berotasi 14 hari')}
+    ${row('Bukti belajar terkirim', fmtInt(s.evidenceCount), 'event learner_evidence')}
+    ${row('Keputusan Braincore', fmtInt(s.decisionCount), 'event braincore_decision')}
+    <h3>Tren mastery</h3>${evidenceDist(s.masteryTrend, ['up', 'flat', 'down'])}
+    <h3>Sebaran mastery</h3>${evidenceDist(s.mastery, ['m0-40', 'm40-60', 'm60-80', 'm80-100'])}
+    <h3>Tren miskonsepsi</h3>${evidenceDist(s.misconception, ['none', 'mc1', 'mc2-3', 'mc4p'])}
+    <h3>Famili skill miskonsepsi</h3>${evidenceDist(s.misconceptionSkill)}
+    <h3>Kalibrasi kesulitan</h3>${evidenceDist(s.difficultyCalibration, ['too_easy', 'calibrated', 'too_hard'])}
+    <h3>Galat kalibrasi</h3>${evidenceDist(s.calibrationError, ['e0-10', 'e10-20', 'e20-40', 'e40p'])}
+    <h3>Alasan keputusan Braincore</h3>${evidenceDist(s.decision)}
+    <h3>Hasil kebijakan</h3>${evidenceDist(s.outcome, ['positive', 'mixed', 'negative', 'insufficient'])}
+    <h3>Rekomendasi kebijakan</h3>${evidenceDist(s.recommendation)}
+    <h3>Tren perbaikan belajar</h3>${evidenceDist(s.improvementTrend, ['improving', 'steady', 'declining'])}
+    <h3>Per hari</h3>
+    <table><tr><th>hari</th><th>murid baru</th><th>bukti</th><th>keputusan</th></tr>${dayRows}</table>
+    <div class="note">"Murid terukur" dijumlahkan dari murid BARU per hari; satu murid yang aktif tiga hari
+      terhitung tiga kali. Angka unik lintas-hari TIDAK dihitung, dan itu disengaja: menghitungnya menuntut
+      menyimpan pengenal lebih lama daripada yang dibenarkan.</div>
+    <div class="note">NOL identitas di panel ini. Yang tersimpan di server hanyalah bucket berenum tertutup;
+      nama murid, jawaban, dan riwayat tidak pernah meninggalkan perangkat.</div>
+  </section>`;
+}
 
 function renderDashboard(m) {
   const t = m.totals || {}, l = m.latest || {}, c = m.cost || {}, a = (c.assumptions || {});
@@ -1170,6 +1331,8 @@ ${emptyBanner}${staleBanner}
     <div class="note">Semua angka historis dimulai dari tanggal pengumpulan di atas. Sebelum tanggal itu tidak ada data — bukan nol, tetapi tidak diketahui.</div>
     ${limitRows(m, 'Data quality')}
   </section>
+
+  ${renderEvidenceSection(m)}
 
 </main>
 <footer>Sumber: TIGA tabel agregat saja — metrik harian (bentuk panjang: hari × nama metrik × nilai), dimensi pemakaian berenum tertutup, dan retensi kohor. Tabel token perangkat dan bahan rahasia rotasi ADA di database yang sama tetapi TIDAK PERNAH dibaca halaman ini. Dashboard ini tidak punya jalan untuk membaca baris per-orang, dan tidak menampilkan identitas, surel, isi jawaban, maupun percakapan AI.
@@ -1707,6 +1870,9 @@ async function handle(request, env, ctx, nowMs) {
       // Batas pengukuran ikut di JSON juga: pembaca mesin tidak boleh menyimpulkan "nol" dari
       // panel yang memang tidak pernah bisa diisi.
       unmeasurable: model.unmeasurable,
+      // Bukti belajar Braincore ikut di JSON juga, dengan KEADAAN-nya, supaya pembaca mesin
+      // tidak menyimpulkan "nol murid" dari panel yang belum dikonfigurasi.
+      evidence: model.evidence,
       honesty: DEVICE_TRUTH,
       dataHonesty: model.measurement.state === STATE_MEASURED
         ? 'Angka di bawah TERUKUR; nol berarti nol yang terukur.'
@@ -1772,6 +1938,9 @@ export {
   allowNoSecretOverride,
   EDGE_HEADER, EDGE_FREE_PATHS, sha256Hex, hmacHex, issueSession, verifySession, estimateCost,
   renderDashboard, renderLogin, readModel, periodRange, wibDay, dayShift,
+  // Panel bukti Braincore: diekspor supaya gerbang bisa mengadu render + sanitasi TANPA
+  // menjalankan Worker (dan tanpa jaringan — `readEvidence` menerima fetch yang di-inject).
+  readEvidence, sanitizeEvidenceSummary, renderEvidenceSection, EVIDENCE_PERIOD_DAYS,
   // Rem penebakan halaman masuk: diekspor supaya gerbang bisa memodelkan ISOLATE BARU per
   // permintaan (cacat yang tidak pernah diuji) dan mengassert angka jendelanya sebagai kontrak.
   LOGIN_MAX, LOGIN_MAX_SHARED, LOGIN_BUCKET_MS, LOGIN_WINDOW_BUCKETS, LOGIN_WINDOW_MS,
