@@ -428,6 +428,13 @@ async function main() {
           const st = window.__getFiezelState?.(); if (!st) return;
           st.grammar = st.grammar || {};
           sk.forEach((k, i) => { st.grammar[k] = { stabilityDays: 2 + i, lastSeen: Date.now() - (9 + i * 4) * 86400000, total: 12, correct: 8 }; });
+          /* Outcome sesi WAJIB ikut diseed: kartu "Hasil sesi terakhirmu" adalah satu-satunya
+             tempat enum snake_case kebijakan (keep_or_progress, collect_more_evidence,
+             reduce_load) benar-benar dirender. Tanpa baris ini T7 hijau bukan karena bersih,
+             melainkan karena kartunya tidak pernah terisi - persis lubang yang membuat
+             kebocoran ini lolos sekian lama. */
+          st.policyOutcomeMeta = { last: { status: 'positive', score: 82, completionRate: 100,
+            accuracy: 78, targetAdherence: 91, recommendation: 'keep_or_progress', policyId: 'gate' } };
         }]
       ];
       const bocor = [];
@@ -450,6 +457,55 @@ async function main() {
       check(bocor.length === 0,
         'T7 nol token mesin di 4 tab Peta Belajar x 2 keadaan murid',
         'T7 token mesin bocor ke layar murid: ' + bocor.join(' | '));
+      await ctx.close();
+    }
+
+    /* ---- T8: tiap nilai enum kebijakan punya terjemahan, dan yang asing DIBUANG --------
+     * OWNER: "bahasa dan cara penyampaian di Adaptive Engine sangat susah dipahami oleh
+     * murid, bahasanya terlalu akademis." Akar teknisnya: tab itu mencetak nilai enum apa
+     * adanya - Mode "diagnostic", Difficulty "standard", Rekomendasi "keep_or_progress".
+     * T7 hanya melihat apa yang KEBETULAN terender saat itu; T8 menyapu SELURUH domain enum
+     * langsung lewat penerjemahnya, jadi cabang yang jarang muncul (mode 'repair',
+     * band 'foundation', saran 'reduce_load') tetap tertagih.
+     * Baris terakhir yang paling penting: enum yang TIDAK dikenali harus memulangkan string
+     * kosong. Kalau suatu saat mesin kebijakan menambah nilai baru, layar murid kehilangan
+     * satu baris - bukan menampilkan nama variabel.
+     * --------------------------------------------------------------------------------- */
+    {
+      const { ctx, page } = await open(VIEWPORTS[1]);
+      const DOMAIN = {
+        mode: ['diagnostic', 'balance', 'review', 'repair', 'recovery'],
+        band: ['foundation', 'standard', 'stretch'],
+        pace: ['calm', 'normal'],
+        hasil: ['positive', 'mixed', 'negative', 'insufficient'],
+        saran: ['adjust', 'collect_more_evidence', 'keep_or_progress', 'reduce_load']
+      };
+      const hasil = await page.evaluate(dom => {
+        if (typeof window.istilahMurid !== 'function') return { adaHelper: false };
+        const kosong = [], masihToken = [];
+        for (const [pre, vals] of Object.entries(dom)) {
+          for (const v of vals) {
+            const teks = window.istilahMurid(pre, v);
+            if (!teks) kosong.push(pre + '/' + v);
+            else if (teks === v || /_/.test(teks)) masihToken.push(pre + '/' + v + ' -> ' + teks);
+          }
+        }
+        return { adaHelper: true, kosong, masihToken,
+          asing: window.istilahMurid('mode', 'enum_yang_belum_pernah_ada') };
+      }, DOMAIN);
+      check(hasil.adaHelper === true, 'T8 penerjemah istilah terpapar untuk disapu',
+        'T8 window.istilahMurid tidak ada - penerjemah enum tidak bisa diuji sama sekali');
+      if (hasil.adaHelper) {
+        check((hasil.kosong || []).length === 0,
+          'T8 seluruh 18 nilai enum kebijakan punya terjemahan',
+          'T8 nilai enum tanpa terjemahan (barisnya akan hilang dari layar): ' + (hasil.kosong || []).join(', '));
+        check((hasil.masihToken || []).length === 0,
+          'T8 tidak ada terjemahan yang masih berbentuk token',
+          'T8 terjemahan masih berbau nama variabel: ' + (hasil.masihToken || []).join(', '));
+        check(hasil.asing === '',
+          'T8 enum asing dibuang, bukan dicetak sebagai nama variabel',
+          'T8 enum yang tidak dikenal ikut tercetak ke layar murid: ' + JSON.stringify(hasil.asing));
+      }
       await ctx.close();
     }
   } finally {

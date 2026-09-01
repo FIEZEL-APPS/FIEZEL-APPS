@@ -3757,6 +3757,18 @@ body.fz-lesson-mode .topline{position:sticky;top:0;z-index:30;
    klaim ia dikecilkan jadi tautan-tombol: tetap 44px area sentuh lewat padding vertikal
    + margin negatif (C1 aksesibilitas tidak dikorbankan demi rapi), tapi bobot visualnya
    turun di bawah nama materi dan angkanya. */
+/* Lipatan detail teknis di tab "Cara soal dipilih". Tertutup secara default:
+   isinya nama modul internal dan kunci penyimpanan, bukan umpan balik belajar. */
+.tech-details{margin:0}
+.tech-details>summary{cursor:pointer;list-style:none;padding:13px 16px;border-radius:var(--radius-md);
+  background:var(--surface-warm,rgba(0,0,0,.03));color:var(--muted);font-size:.86rem;font-weight:600;
+  min-height:44px;display:flex;align-items:center;gap:8px}
+.tech-details>summary::-webkit-details-marker{display:none}
+.tech-details>summary::before{content:"\25B8";display:inline-block;transition:transform .15s ease}
+.tech-details[open]>summary::before{transform:rotate(90deg)}
+.tech-details>summary:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
+.tech-details-isi{display:grid;gap:12px;margin-top:12px}
+@media (prefers-reduced-motion:reduce){.tech-details>summary::before{transition:none}}
 .olm-claim{padding:7px 0;border-bottom:1px solid var(--line,rgba(0,0,0,.08))}
 .olm-claim:last-of-type{border-bottom:0}
 .olm-claim>span{flex:1 1 auto;min-width:0;color:var(--text);font-size:var(--fs-body,1rem)}
