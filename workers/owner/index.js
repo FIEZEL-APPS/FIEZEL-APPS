@@ -24,7 +24,7 @@
 // = perangkat baru. Label itu bukan catatan kaki opsional — ia dirender di setiap panel
 // pengguna dan diassert gerbang test. Owner harus tahu ini, jangan dipoles.
 
-import { QUERIES, UNMEASURABLE } from './queries.js';
+import { QUERIES, UNMEASURABLE, SERIES_METRICS } from './queries.js';
 
 /* ============================ Konstanta yang boleh dilihat ================================= */
 
@@ -105,7 +105,14 @@ const ALLOWED_ROW_FIELDS = Object.freeze(new Set([
 
 // Inventaris rute. Semua rute di daftar ini WAJIB lewat ownerGate(). Rute yang tidak dikenal
 // juga 403 (default deny), sehingga menambah rute tanpa gate tidak mungkin lolos diam-diam.
-const OWNER_ROUTES = ['/', '/api/summary', '/api/series', '/api/retention', '/api/cost', '/logout'];
+const OWNER_ROUTES = [
+  '/', '/api/summary', '/api/series', '/api/retention', '/api/cost', '/logout',
+  // Ekspor CSV. Ber-gate sama persis dengan rute lain: satu inventaris, satu lapis sesi —
+  // rute unduhan yang "cuma CSV" tetap membawa angka yang sama dan tidak boleh punya
+  // pintu sendiri.
+  '/api/export/summary.csv', '/api/export/series.csv',
+  '/api/export/retention.csv', '/api/export/evidence.csv',
+];
 // Hanya halaman masuk yang publik. Ia tidak pernah memuat satu angka metrik pun.
 const PUBLIC_ROUTES = ['/login'];
 
@@ -1186,6 +1193,23 @@ ${emptyBanner}${staleBanner}
 <main>
 
   <section>
+    <h2>⬇️ Ekspor data (CSV)</h2>
+    <div class="note">Berkas mengikuti periode yang sedang dipilih (<b>${esc(periodLabel)}</b>) dan
+    berisi angka yang SAMA dengan yang dirender di halaman ini — nol data tambahan, nol dimensi
+    baru. Setiap berkas membawa baris <code>measurement_state</code> supaya "belum diukur" tidak
+    pernah terbaca sebagai "nol" setelah berkas ini beredar terlepas dari dashboard.</div>
+    <p>
+      <a href="/api/export/summary.csv?period=${esc(m.period)}">Ringkasan metrik</a> ·
+      <a href="/api/export/series.csv?period=${esc(m.period)}">Deret harian (tren)</a> ·
+      <a href="/api/export/retention.csv?period=${esc(m.period)}">Retensi per kohor</a> ·
+      <a href="/api/export/evidence.csv?period=${esc(m.period)}">Bukti belajar Braincore</a>
+    </p>
+    <div class="note">Untuk pembaca mesin, JSON yang setara sudah ada di
+    <code>/api/summary</code>, <code>/api/series</code>, dan <code>/api/retention</code>.</div>
+  </section>
+
+
+  <section>
     <h2>👥 User growth</h2>
     <div class="big">${esc(fmtCount(m, t.new_users))}</div>
     ${row('Perangkat baru (periode)', fmtCount(m, t.new_users))}
@@ -1375,6 +1399,75 @@ function json(payload, status) {
     status: status || 200,
     headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' },
   });
+}
+
+/* ============================ Ekspor CSV ================================================== */
+//
+// KENAPA ADA, padahal /api/summary sudah mengembalikan JSON yang sama: JSON dibaca mesin,
+// CSV dibaca ORANG di spreadsheet. Pembaca yang paling penting untuk angka-angka ini —
+// calon pembeli yang melakukan due diligence, guru, akuntan — memeriksa angka di Excel /
+// Google Sheets, bukan dengan `curl | jq`. Menyuruh mereka mengubah JSON bersarang menjadi
+// tabel sendiri adalah hambatan yang tidak perlu, dan hambatan itu terbaca sebagai
+// "angkanya tidak mau diperiksa".
+//
+// APA YANG TIDAK BERUBAH: nol data baru. Setiap baris CSV berasal dari model yang SAMA yang
+// sudah dirender di HTML dan sudah dikembalikan /api/*. Tidak ada kueri baru, tidak ada
+// tabel baru, tidak ada dimensi baru — jadi permukaan privasinya identik dengan halaman yang
+// sudah dilihat owner. Ekspor yang menambah kolom baru akan melanggar kontrak lima tabel;
+// ekspor ini hanya mengubah BENTUK penyajian.
+//
+// KEADAAN PENGUKURAN IKUT DIEKSPOR, bukan hanya angkanya. Baris `measurement_state` dan
+// `measurement_notice` selalu ada di setiap berkas. Alasannya sama dengan alasan panel HTML
+// tidak pernah merender nol polos: CSV yang hanya berisi angka membuat "belum diukur" dan
+// "nol" tidak bisa dibedakan lagi begitu ia terlepas dari dashboard — dan berkas CSV JUSTRU
+// dibuat untuk beredar terlepas dari dashboard.
+
+// RFC 4180: bungkus dengan kutip ganda bila memuat pemisah/kutip/baris baru, dan gandakan
+// kutip di dalamnya. Nilai null/undefined menjadi sel KOSONG, bukan string "null" —
+// "null" di spreadsheet terbaca sebagai teks dan merusak kolom angka.
+function csvCell(value) {
+  if (value === null || value === undefined) return '';
+  const s = String(value);
+  return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+}
+
+function csvRows(rows) {
+  return rows.map((row) => row.map(csvCell).join(',')).join('\r\n') + '\r\n';
+}
+
+// Nama berkas membawa periode dan rentang tanggal supaya dua unduhan tidak saling menimpa di
+// folder Unduhan, dan supaya berkas yang beredar lepas dari dashboard tetap menyebutkan
+// dirinya sendiri.
+function csv(rows, namaDasar, model) {
+  const nama = `fiezel-${namaDasar}-${model.period}-${model.from}_${model.to}.csv`;
+  return new Response(csvRows(rows), {
+    status: 200,
+    headers: {
+      'content-type': 'text/csv; charset=utf-8',
+      'content-disposition': `attachment; filename="${nama}"`,
+      'cache-control': 'no-store',
+      'x-robots-tag': 'noindex, nofollow',
+      'x-content-type-options': 'nosniff',
+    },
+  });
+}
+
+// Kepala yang sama untuk SETIAP ekspor: apa ini, periode mana, dan — yang terpenting —
+// keadaan pengukurannya.
+function csvKepala(model, judul) {
+  return [
+    ['fiezel_export', judul],
+    ['schema', 'fiezel-owner-export-v1'],
+    ['period', model.period],
+    ['from', model.from],
+    ['to', model.to],
+    ['generated_at', model.generatedAtIso],
+    ['measurement_state', model.measurement.state],
+    ['measurement_notice', model.measurement.notice || ''],
+    ['measurement_basis', 'perangkat-estimasi'],
+    ['honesty', DEVICE_TRUTH],
+    [],
+  ];
 }
 
 /* ============================ Rem penebakan halaman masuk ================================= */
@@ -1899,6 +1992,100 @@ async function handle(request, env, ctx, nowMs) {
         + 'retensi tidak menyimpannya sebagai kolom sendiri. Penyebut per offset hanya '
         + 'menjumlahkan kohor yang punya pengamatan di offset itu.',
     });
+  }
+
+  // --- EKSPOR CSV. Rute terpisah per berkas, bukan satu rute ber-parameter `?jenis=`:
+  //     nama berkas unduhan lahir dari jalurnya, dan jalur tertutup lebih mudah dijaga
+  //     gerbang default-deny daripada parameter yang harus divalidasi.
+  if (path === '/api/export/summary.csv') {
+    const model = await readModel(env, period, now);
+    const rows = csvKepala(model, 'Ringkasan metrik periode');
+    rows.push(['bagian', 'metrik', 'nilai', 'hari_terukur']);
+    for (const [metric, agg] of Object.entries(model.totals || {})) {
+      rows.push(['totals', metric, agg, (model.totalDays || {})[metric]]);
+    }
+    for (const [metric, value] of Object.entries(model.latest || {})) {
+      rows.push(['latest_rollup_day', metric, value, '']);
+    }
+    for (const [bucket, value] of Object.entries(model.usage || {})) {
+      rows.push(['usage_bucket', bucket, value, '']);
+    }
+    // Batas pengukuran ikut sebagai BARIS, bukan catatan kaki yang hilang saat berkas beredar.
+    for (const u of model.unmeasurable || []) {
+      rows.push(['tidak_bisa_diukur', `${u.panel}: ${u.hal}`, '', u.sebab]);
+    }
+    return csv(rows, 'ringkasan', model);
+  }
+
+  if (path === '/api/export/series.csv') {
+    const model = await readModel(env, period, now);
+    const rows = csvKepala(model, 'Deret harian (tren)');
+    // `collection_ok` sengaja ikut sebagai kolom: pembaca CSV harus bisa melihat hari mana
+    // yang rollup-nya gagal, persis seperti grafik HTML menggambarnya PUTUS di hari itu.
+    const metrics = SERIES_METRICS.slice();
+    rows.push(['day'].concat(metrics));
+    for (const titik of model.series || []) {
+      rows.push([titik.day].concat(metrics.map((m) => titik[m])));
+    }
+    return csv(rows, 'deret-harian', model);
+  }
+
+  if (path === '/api/export/retention.csv') {
+    const model = await readModel(env, period, now);
+    const rows = csvKepala(model, 'Retensi per kohor');
+    rows.push(['min_cohort_untuk_persen', RETENTION_MIN_COHORT]);
+    rows.push([]);
+    // Baris MENTAH per kohor, apa adanya dari tabel — pembaca yang mau menghitung ulang
+    // persentasenya sendiri bisa melakukannya tanpa mempercayai aritmetika kami.
+    rows.push(['bagian', 'cohort_day', 'day_index', 'count']);
+    for (const r of model.retention || []) {
+      rows.push(['kohor_mentah', r.cohort_day, r.day_index, r.count]);
+    }
+    rows.push([]);
+    // Rekap per offset, dengan PENYEBUT dan JUMLAH KOHOR ikut dicetak: tanpa keduanya
+    // persentase tidak bisa diaudit, dan persentase yang tidak bisa diaudit tidak berguna
+    // untuk due diligence.
+    rows.push(['bagian', 'day_index', 'retained', 'base_penyebut', 'kohor_menyumbang', 'rate']);
+    for (const o of model.retentionRollup || []) {
+      const rate = o.base > 0 ? (o.retained / o.base) : '';
+      rows.push(['rekap_offset', o.day_index, o.retained, o.base, o.cohorts, rate]);
+    }
+    return csv(rows, 'retensi', model);
+  }
+
+  if (path === '/api/export/evidence.csv') {
+    const model = await readModel(env, period, now);
+    const e = model.evidence || { state: 'unconfigured', summary: null };
+    const rows = csvKepala(model, 'Bukti belajar Braincore (agregat)');
+    rows.push(['evidence_state', e.state]);
+    rows.push([]);
+    if (!e.summary) {
+      // Keadaan BUKAN nol. Berkas tetap diterbitkan supaya pembaca tahu panel ini ada dan
+      // kenapa ia kosong — CSV kosong tanpa penjelasan akan dibaca sebagai "nol murid".
+      rows.push(['catatan', 'Tidak ada ringkasan: lihat evidence_state di atas. '
+        + 'Ini BUKAN nol murid.']);
+      return csv(rows, 'bukti-belajar', model);
+    }
+    const s = e.summary;
+    rows.push(['ringkasan', 'nilai']);
+    rows.push(['measured', s.measured]);
+    rows.push(['learner_count', s.learnerCount]);
+    rows.push(['evidence_count', s.evidenceCount]);
+    rows.push(['decision_count', s.decisionCount]);
+    rows.push([]);
+    rows.push(['dimensi', 'nilai', 'n']);
+    for (const [dimensi, peta] of Object.entries({
+      masteryTrend: s.masteryTrend, mastery: s.mastery, misconception: s.misconception,
+      misconceptionSkill: s.misconceptionSkill, difficultyCalibration: s.difficultyCalibration,
+      calibrationError: s.calibrationError, improvement: s.improvement,
+      decision: s.decision, decisionOutcome: s.decisionOutcome,
+    })) {
+      for (const [nilai, n] of Object.entries(peta || {})) rows.push([dimensi, nilai, n]);
+    }
+    rows.push([]);
+    rows.push(['day', 'learners', 'evidence', 'decisions']);
+    for (const d of s.daily || []) rows.push([d.day, d.learners, d.evidence, d.decisions]);
+    return csv(rows, 'bukti-belajar', model);
   }
   if (path === '/api/cost') {
     const model = await readModel(env, period, now);
