@@ -30,7 +30,12 @@ const RE_LATIN = /[A-Za-z]/;
 // memasukkan keduanya ke kelas ekor, jadi kata di dalam kutip menyerap kutip penutupnya:
 // kunci "onto 'deny'," menghasilkan token "deny'" alih-alih "deny", sehingga kata Inggris itu
 // tidak pernah masuk korpus Inggris dan penerjemahnya dituduh menulis bahasa Indonesia.
-const TOKEN = /[A-Za-z]+(?:['-][A-Za-z]+)*/g;
+// Apostrof KURUS (') dan TIPOGRAFIS (\u2019) diperlakukan sama: "mustn\u2019t" dan "mustn't"
+// adalah kata yang sama. Sebelum ini hanya (') yang dikenal, jadi "mustn\u2019t" pecah jadi
+// "mustn" + "t"; "mustn" tidak pernah masuk korpus Inggris (yang memakai apostrof kurus),
+// hanya korpus Indonesia, sehingga kalimat Thai yang mengutip "mustn\u2019t" dituduh berbahasa
+// Indonesia. Nyata: 31 bidang cloze-th tertuduh karena ini.
+const TOKEN = /[A-Za-z]+(?:['\u2019-][A-Za-z]+)*/g;
 const tokens = (s) => String(s == null ? '' : s).match(TOKEN) || [];
 
 /** Istilah teknis/ujian yang sah muncul apa adanya di permukaan Thai mana pun. */
@@ -39,7 +44,13 @@ const ALLOWLIST = new Set([
   // Nama TIPE SOAL ujian. Ia muncul apa adanya di teks Indonesia juga ("jebakan klasik
   // matching headings"), jadi leksikon menghitungnya sebagai kata Indonesia-saja padahal ia
   // istilah Inggris yang memang tidak diterjemahkan di locale mana pun.
-  'matching', 'headings', 'heading', 'summary', 'completion'
+  'matching', 'headings', 'heading', 'summary', 'completion',
+  // Kata INGGRIS yang di repo ini hanya pernah DIKUTIP di dalam teks penjelasan Indonesia
+  // ("good jadi better, far jadi farther"), tidak pernah muncul di bidang berbahasa Inggris
+  // mana pun, sehingga selisih korpus salah menggolongkannya Indonesia-saja. Penjelasan tata
+  // bahasa Thai mengutip kata yang sama persis, jadi tanpa ini kalimat Thai yang benar
+  // dituduh berbahasa Indonesia.
+  'farther', 'further', 'republic'
 ]);
 
 function buildLexicon(ROOT) {
@@ -63,6 +74,18 @@ function buildLexicon(ROOT) {
     ((it.blank && it.blank.alternates) || []).forEach(addEN);
     for (const d of it.distractors || []) { addEN(d.text); addEN(d.misconception); addID(d.whyFailsId); addID(d.misconceptionId); }
     for (const k of ['why', 'rule', 'memory', 'avoid']) addID(it.explain && it.explain[k]);
+  }
+  // vocabulary-master.json: 2.440 entri kosakata INGGRIS (kata, sinonim, antonim, kolokasi,
+  // kalimat contoh en). Korpus Inggris murni terbesar di repo, dan tanpa ia kata Inggris yang
+  // hanya pernah DIKUTIP di dalam teks penjelasan Indonesia — 'farther', 'excited' — jatuh ke
+  // selisih "Indonesia-saja" dan menuduh kalimat Thai yang mengutipnya.
+  for (const v of Object.values(J('vocabulary-master.json'))) {
+    if (!v || typeof v !== 'object') continue;
+    addEN(v.word); addEN(v.partOfSpeech); addEN(v.topic);
+    (v.synonyms || []).forEach(addEN);
+    (v.antonyms || []).forEach(addEN);
+    (v.collocations || []).forEach(addEN);
+    (v.examples || []).forEach((ex) => addEN(ex && ex.en));
   }
   for (const e of Object.values(J('cloze-explains-v1.json').explains)) {
     for (const k of ['why', 'rule', 'memory', 'avoid']) addID(e[k]);
@@ -157,9 +180,32 @@ function residuIndonesia(value, lexicon) {
  * gugus tanpa ada yang salah. ๆ (mai yamok) disatukan dulu ke kata sebelumnya — "เล็ก ๆ"
  * adalah satu kata, bukan dua.
  */
+/**
+ * Kalimat Thai yang SUDAH DITINJAU MANUSIA dan benar, tetapi bentuknya kebetulan sama persis
+ * dengan keluaran penerjemah token: daftar berisi kata-kata Thai pendek yang dipisah spasi
+ * ("ภาพวาด หนังสือ ความคิด" = lukisan, buku, gagasan). Tidak ada aturan mekanis yang bisa
+ * memisahkan daftar sah semacam itu dari "เขา โกรธ โจทย์ เงิน" (omong kosong keluaran token) —
+ * keduanya tiga gugus Thai pendek; yang membedakan hanya MAKNA.
+ *
+ * Kenapa daftar-kecualian, bukan ambang yang dilonggarkan: sudah diukur. Menaikkan ambang
+ * tier-1 dari >=3 ke >=4 gugus memang memulihkan tiga kalimat di bawah, TAPI daya tangkap
+ * pada keluaran token nyata jatuh dari 77 ke 37 string; ke >=5 gugus jatuh ke 8. Menukar
+ * separuh daya tangkap demi empat kalimat adalah tukar yang buruk, jadi ambangnya dibiarkan
+ * setajam aslinya dan pengecualiannya ditulis satu per satu di sini — terlihat di diff,
+ * bisa ditinjau, dan tidak diam-diam melemahkan gerbang untuk string lain mana pun.
+ */
+const KATA_PER_KATA_DITINJAU = new Set([
+  '\u201cAlong\u201d \u0e43\u0e0a\u0e49\u0e01\u0e31\u0e1a\u0e01\u0e32\u0e23\u0e44\u0e1b\u0e15\u0e32\u0e21\u0e41\u0e19\u0e27\u0e40\u0e2a\u0e49\u0e19 (\u0e0a\u0e32\u0e22\u0e2b\u0e32\u0e14 \u0e16\u0e19\u0e19 \u0e41\u0e21\u0e48\u0e19\u0e49\u0e33) \u201cAcross\u201d \u0e43\u0e0a\u0e49\u0e01\u0e31\u0e1a\u0e01\u0e32\u0e23\u0e02\u0e49\u0e32\u0e21\u0e08\u0e32\u0e01\u0e1d\u0e31\u0e48\u0e07\u0e2b\u0e19\u0e36\u0e48\u0e07\u0e44\u0e1b\u0e2d\u0e35\u0e01\u0e1d\u0e31\u0e48\u0e07 \u201cThrough\u201d \u0e43\u0e0a\u0e49\u0e01\u0e31\u0e1a\u0e01\u0e32\u0e23\u0e17\u0e30\u0e25\u0e38\u0e1c\u0e48\u0e32\u0e19\u0e1e\u0e37\u0e49\u0e19\u0e17\u0e35\u0e48\u0e17\u0e35\u0e48\u0e42\u0e2d\u0e1a\u0e25\u0e49\u0e2d\u0e21\u0e2d\u0e22\u0e39\u0e48 \u201cOver\u201d \u0e43\u0e0a\u0e49\u0e01\u0e31\u0e1a\u0e01\u0e32\u0e23\u0e1c\u0e48\u0e32\u0e19\u0e02\u0e49\u0e32\u0e21\u0e40\u0e2b\u0e19\u0e37\u0e2d\u0e2a\u0e34\u0e48\u0e07\u0e01\u0e35\u0e14\u0e02\u0e27\u0e32\u0e07',
+
+  "“Mustn't” = ห้าม อย่าทำ ส่วน “Needn't” / “don't have to” = ไม่จำเป็น เลือกได้ตามใจ รูปปฏิเสธพลิกความหมาย เพราะ “must” กับ “have to” คล้ายกัน แต่ “mustn't” กับ “needn't” ต่างกันมาก",
+  "ภาพวาด หนังสือ ความคิด ใช้ “some of WHICH” ส่วนอาสาสมัคร นักเรียน ใช้ “many of WHOM”",
+  "“Because” ใช้บอกเหตุผล ส่วน “so” ใช้บอกผล คือ เหตุผล + “so” + ผล หรือ ผล + “because” + เหตุผล ให้ใช้อย่างใดอย่างหนึ่งต่อหนึ่งประโยคเท่านั้น",
+]);
+
 function thaiKataPerKata(value) {
   const s = String(value == null ? '' : value).replace(/ +ๆ/g, 'ๆ');
   if (!RE_THAI.test(s)) return false;
+  if (KATA_PER_KATA_DITINJAU.has(String(value == null ? '' : value).trim())) return false;
   for (const rentetan of s.match(/[฀-๿]+(?: [฀-๿]+)+/g) || []) {
     const gugus = rentetan.split(' ').map((x) => x.length);
     const rerata = gugus.reduce((a, b) => a + b, 0) / gugus.length;
@@ -172,6 +218,13 @@ function thaiKataPerKata(value) {
     // 4-gugus dengan rerata 8-13 lolos. Itu bisa diterima karena bukan pertahanan utama —
     // pertahanan utamanya adalah pemeriksaan residu Indonesia di atas, dan sidecar listening
     // kini dibangun dari peta KALIMAT UTUH sehingga cacat ini tidak punya jalan lahir lagi.
+    // Tidak ada kata Thai sepanjang 16 aksara. Rentetan yang memuat gugus sepanjang itu
+    // PASTI bukan keluaran kata-per-kata (penerjemah token memuntahkan satu kata kamus per
+    // spasi), jadi rentetan begitu dilewati. Diukur, bukan ditebak: pada 77 string keluaran
+    // token yang HANYA pemeriksaan ini yang menangkapnya, gugus terpanjang di dalam rentetan
+    // yang memicu adalah 12 aksara — jadi ambang 16 tidak menurunkan daya tangkap sama
+    // sekali, dan ia memulihkan kalimat Thai sah yang mengutip istilah panjang.
+    if (Math.max(...gugus) >= 16) continue;
     if (gugus.length >= 3 && rerata < 8) return true;
     if (gugus.length >= 5 && rerata < 13) return true;
   }
