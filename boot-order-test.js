@@ -118,7 +118,23 @@ test('tumpukan berat ditandai malas, dan tidak diambil browser saat mengurai', (
     assert.ok(s.group, s.src + ' harus menyebut grupnya');
   }
   const groups = [...new Set(lazy.map(s => s.group))];
-  assert.deepStrictEqual(groups, ['voice', 'classroom'], 'grup malas: ' + groups.join(', '));
+  /* Daftar grup DIPAKU dengan sengaja: memindahkan berkas dari eager ke malas mengubah
+     kapan ia ada, jadi ia harus jadi keputusan sadar dan bukan efek samping. Grup ketiga
+     'library' ditambahkan pada m025-224 (P1 performa) atas keputusan OWNER: perluas
+     mekanisme lazy yang sudah terbukti alih-alih membedah arsitektur boot app.js.
+     Kenapa fiezel-library-ui.js aman dimalaskan, dan kenapa dua kandidat lain TIDAK:
+       - library-ui  : nol pemanggil di luar dirinya sendiri (`FiezelLibraryUi` tidak
+                       pernah disebut app.js maupun modul lain), ia memasang dirinya
+                       sendiri ke DOM layar Perpustakaan. Rute yang butuh beberapa ketukan
+                       untuk dicapai, sementara gelombang malas berangkat saat idle tepat
+                       sesudah cat pertama - pola yang sama persis dengan grup 'classroom'.
+       - tutor-brain : DITOLAK. app.js memanggil FiezelTutorBrain.createSession/selectNext/
+                       composeTurn/LADDER TANPA satu pun pemeriksaan ketersediaan (0 dari 8
+                       titik panggil). Memalaskannya = ReferenceError di jalur tutor.
+                       Prasyaratnya: pasang pola `coreBrainAvailable` dulu di delapan titik itu.
+       - diag-panel  : DITOLAK oleh gerbang di bawah ini sendiri ('Diagnostics TIDAK ikut
+                       malas - nilainya justru ada lebih dulu'). */
+  assert.deepStrictEqual(groups, ['voice', 'classroom', 'library'], 'grup malas: ' + groups.join(', '));
 });
 
 test('urutan di dalam grup suara adalah kontrak, bukan selera', () => {

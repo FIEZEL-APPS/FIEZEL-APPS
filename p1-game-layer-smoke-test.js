@@ -19,42 +19,34 @@ const gems=fs.readFileSync(path.join(root,'features/speaking-listening/gems-core
 const grammarRuntime=gm=>{const out={};for(const t of (gm.templates||[])){const opts=t.options||[];const reasons=opts.map((o,i)=>i===t.correctIndex?'Correct':((t.distractors||[]).find(d=>d.option===o)?.whyFails||'Distractor invalid'));(out[t.subskill]??=[]).push([t.stem,opts,t.correctIndex,t.explanation?.rule||t.pedagogicalObjective,reasons,t.cefr]);}return out};
 const elements={};
 const bodyChildren=[];
-/* classList stub yang NYATA (menyimpan kelas), bukan no-op.
- *
- * Versi lama hanya punya add/remove/toggle yang tidak melakukan apa-apa, tanpa contains.
- * Begitu kode produksi membaca kelas — el.classList.contains(...) — gerbang ini meledak
- * dengan TypeError alih-alih menguji lapisan game. Itu kegagalan HARNESS yang menyamar jadi
- * kegagalan produk, dan ia menahan `quality` di setiap PR. Menyimpan kelasnya juga membuat
- * assert tentang kelas mungkin ditulis, bukan cuma mencegah ledakan. */
-function fakeClassList(){
-  const set=new Set();
+// DOMTokenList tiruan yang MENYIMPAN token, bukan yang menelannya diam-diam.
+// Stub lama hanya punya add/remove/toggle no-op, jadi `el.classList.contains(...)`
+// (dipakai openDialogLayers di app.js untuk memutuskan lapisan mana yang terbuka)
+// meledak sebagai TypeError. No-op juga akan menjawab SALAH: sebuah kelas yang
+// baru saja ditambahkan harus terbaca kembali, atau gerbang ini lulus/gagal
+// karena alasan yang tidak ada hubungannya dengan perilaku yang diuji.
+function fakeClassList(el){
+  const tokens=new Set(String(el.className||'').split(/\s+/).filter(Boolean));
+  const sync=()=>{el.className=[...tokens].join(' ')};
   return {
-    add(...n){n.forEach(x=>set.add(String(x)))},
-    remove(...n){n.forEach(x=>set.delete(String(x)))},
-    toggle(n,force){const k=String(n),on=force===undefined?!set.has(k):!!force;if(on)set.add(k);else set.delete(k);return on},
-    contains(n){return set.has(String(n))},
-    get length(){return set.size}
+    add(...names){names.filter(Boolean).forEach(n=>tokens.add(n));sync()},
+    remove(...names){names.forEach(n=>tokens.delete(n));sync()},
+    contains(name){return tokens.has(name)},
+    toggle(name,force){const on=force===undefined?!tokens.has(name):!!force;if(on)tokens.add(name);else tokens.delete(name);sync();return on}
   };
 }
-function fakeEl(tag){const el={tagName:String(tag||'div').toUpperCase(),id:'',className:'',innerHTML:'',textContent:'',style:{setProperty(){}},disabled:false,onclick:null,children:[],classList:fakeClassList(),setAttribute(){},appendChild(c){el.children.push(c)},append(){},remove(){const i=bodyChildren.indexOf(el);if(i>=0)bodyChildren.splice(i,1)},addEventListener(){},querySelector(){return null},focus(){}};return el}
-/* Lapisan dialog LAHIR ber-kelas `hidden` di index.html — authGate, modal, dan welcome
- * semuanya begitu. openDialogLayers() di app.js menganggap sebuah lapisan TERBUKA ketika
- * elemennya ada dan TIDAK ber-kelas hidden, jadi stub yang membuatnya tanpa kelas apa pun
- * membuat SELURUH lapisan dialog terbaca terbuka. Akibatnya ritual harian ditahan
- * `topDialogLayer()` dan gerbang ini gagal pada perilaku yang sebenarnya benar.
- *
- * Ini pelajaran yang sama dengan classList di atas: stub yang tidak setia pada markup nyata
- * tidak menguji produk, ia menguji dirinya sendiri. */
-const LAPISAN_DIALOG_TERSEMBUNYI=new Set(['authGate','modal','welcome']);
-function element(id){
-  if(!elements[id]){
-    const el={...fakeEl('div'),id};
-    if(LAPISAN_DIALOG_TERSEMBUNYI.has(id)){el.className='hidden';el.classList.add('hidden')}
-    elements[id]=el;
-  }
-  return elements[id];
-}
-const document={baseURI:'http://localhost/',body:{classList:fakeClassList(),appendChild(el){bodyChildren.push(el)}},getElementById:id=>{
+function fakeEl(tag){const el={tagName:String(tag||'div').toUpperCase(),id:'',className:'',innerHTML:'',textContent:'',style:{setProperty(){}},disabled:false,onclick:null,children:[],setAttribute(){},removeAttribute(){},appendChild(c){el.children.push(c)},append(){},remove(){const i=bodyChildren.indexOf(el);if(i>=0)bodyChildren.splice(i,1)},addEventListener(){},querySelector(){return null},focus(){}};el.classList=fakeClassList(el);return el}
+// Lapisan dialog LAHIR ber-.hidden di index.html (baris 336/353/372) - dan
+// openDialogLayers() membaca justru kelas itu untuk memutuskan mana yang terbuka.
+// Tanpa seed ini harness memunculkan tiga dialog yang di halaman nyata tertutup,
+// lalu ritual harian ditolak karena "sudah ada gerbang di layar" - gerbang hantu.
+const INITIAL_CLASS={welcome:'welcome notification-gate hidden',authGate:'welcome auth-gate hidden',modal:'modal hidden'};
+// Tidak lagi disebar dengan {...}: penyebaran menyalin classList milik el ASLI,
+// sehingga el.remove() dan el.classList menunjuk objek yang berbeda dari yang
+// dikembalikan ke pemanggil.
+function element(id){if(!elements[id]){const el=fakeEl('div');el.id=id;el.className=INITIAL_CLASS[id]||'';el.classList=fakeClassList(el);elements[id]=el}return elements[id]}
+const fakeBody={className:'',appendChild(el){bodyChildren.push(el)}};fakeBody.classList=fakeClassList(fakeBody);
+const document={baseURI:'http://localhost/',body:fakeBody,getElementById:id=>{
   if(id==='fzRitual'||id==='fzPrasasti')return bodyChildren.find(e=>e.id===id)||null;
   return element(id);
 },querySelector(){return null},querySelectorAll(){return []},createElement:t=>fakeEl(t),addEventListener(){},startViewTransition:undefined};
