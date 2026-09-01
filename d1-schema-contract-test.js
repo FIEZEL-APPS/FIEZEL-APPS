@@ -57,8 +57,9 @@ function filesByDbFromDoc() {
   // (database ketiga `fiezel-learning`, binding LEARNING_DB). Tanpa entri ini,
   // 0007 menjadi berkas "tidak terpetakan" dan `semua_berkas_migrasi_terbaca`
   // merah — arah gagal yang benar; ini perluasan jujurnya.
-  const byDb = { core: [], stats: [], learning: [] };
-  const alias = { 'fiezel-core': 'core', 'fiezel-stats': 'stats', 'fiezel-learning': 'learning' };
+  // [INFRA-0008-20260901] `evidence` = database keempat (fiezel-evidence, 0008_evidence.sql).
+  const byDb = { core: [], stats: [], learning: [], evidence: [] };
+  const alias = { 'fiezel-core': 'core', 'fiezel-stats': 'stats', 'fiezel-learning': 'learning', 'fiezel-evidence': 'evidence' };
   const text = fs.existsSync(MIG_DOC) ? fs.readFileSync(MIG_DOC, 'utf8') : '';
   const re = /d1\s+execute\s+([A-Za-z0-9_-]+)[^\n]*?--file=migrations\/([A-Za-z0-9_.-]+\.sql)/gi;
   let m;
@@ -70,6 +71,7 @@ function filesByDbFromDoc() {
   byDb.core.sort();
   byDb.stats.sort();
   byDb.learning.sort();
+  byDb.evidence.sort();
   return byDb;
 }
 
@@ -266,8 +268,11 @@ const coreSchema = schemaFromMigrations(FILES_BY_DB.core);
 const statsSchema = schemaFromMigrations(FILES_BY_DB.stats);
 // [INFRA-0007-20260829] skema harapan database ketiga (fiezel-learning).
 const learningSchema = schemaFromMigrations(FILES_BY_DB.learning);
+// [INFRA-0008-20260901] skema harapan database keempat (fiezel-evidence).
+const evidenceSchema = schemaFromMigrations(FILES_BY_DB.evidence);
 const allMigrationTables = new Set([
-  ...coreSchema.tables.keys(), ...statsSchema.tables.keys(), ...learningSchema.tables.keys()
+  ...coreSchema.tables.keys(), ...statsSchema.tables.keys(), ...learningSchema.tables.keys(),
+  ...evidenceSchema.tables.keys()
 ]);
 const codeSql = sqlLiteralsFromCode();
 const codeTables = tablesFromSql(codeSql);
@@ -276,7 +281,7 @@ const codeTables = tablesFromSql(codeSql);
 // tidak membaca seluruh migrasi, setiap kesimpulan di bawahnya dibangun dari
 // skema yang tidak lengkap (inilah cacat yang membuat `cron_run` "hilang").
 {
-  const mapped = [...FILES_BY_DB.core, ...FILES_BY_DB.stats, ...FILES_BY_DB.learning].sort();
+  const mapped = [...FILES_BY_DB.core, ...FILES_BY_DB.stats, ...FILES_BY_DB.learning, ...FILES_BY_DB.evidence].sort();
   const dupes = mapped.filter((f, i) => mapped.indexOf(f) !== i);
   const tidak_terpetakan = SQL_IN_DIR.filter((f) => !mapped.includes(f));
   const dipetakan_tapi_tidak_ada = mapped.filter((f) => !SQL_IN_DIR.includes(f));
@@ -412,7 +417,7 @@ check('inventaris_tabel_belum_dipakai_kode', true, {
   const crossRefs = [];
   // [INFRA-0007-20260829] `foreign` = gabungan tabel DUA database lain, supaya
   // REFERENCES lintas domain tertangkap di ketiga arah.
-  const SCHEMAS_BY_DB = { core: coreSchema, stats: statsSchema, learning: learningSchema };
+  const SCHEMAS_BY_DB = { core: coreSchema, stats: statsSchema, learning: learningSchema, evidence: evidenceSchema };
   for (const [db, schema] of Object.entries(SCHEMAS_BY_DB)) {
     const foreign = new Set();
     for (const [otherDb, otherSchema] of Object.entries(SCHEMAS_BY_DB)) {

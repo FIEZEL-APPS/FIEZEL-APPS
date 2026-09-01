@@ -17,6 +17,7 @@ sini yang menjadi urutan resmi.
 | `0005_ai_account_budget.sql` | `fiezel-core` (binding `CORE_DB`) | `ai_account_day` |
 | `0006_analytics_batch_dedup.sql` | `fiezel-stats` (binding `STATS_DB`, dibaca kode sebagai `ANALYTICS_DB`) | `batch_dedup` |
 | `0007_learning.sql` | `fiezel-learning` (binding `LEARNING_DB`) | `learning_daily`, `learning_dedup` |
+| `0008_evidence.sql` | `fiezel-evidence` (binding `EVIDENCE_DB`) | `evidence_daily`, `evidence_dedup`, `evidence_learner_day` |
 | `0006_social.sql` | `fiezel-core` (binding `CORE_DB`) | `social_profile`, `social_handle`, `social_invite`, `social_friend`, `social_counter`, `rank_week`, `social_cohort`, `milestone_feed`, `cheer_feed`, `rank_jti` |
 
 Tabel di atas adalah **satu-satunya** daftar berkas→database yang ditulis manusia.
@@ -82,6 +83,8 @@ wrangler d1 execute fiezel-stats --remote --file=migrations/0006_analytics_batch
 
 # --- fiezel-learning: lane telemetri belajar agregat (wave brain-learning-infra, server lane) ---
 wrangler d1 execute fiezel-learning --remote --file=migrations/0007_learning.sql
+# --- fiezel-evidence: lane bukti belajar Braincore (SLOT 8) ---
+wrangler d1 execute fiezel-evidence --remote --file=migrations/0008_evidence.sql
 # --- fiezel-core: lapisan sosial (SLOT 7) ---
 wrangler d1 execute fiezel-core --remote --file=migrations/0006_social.sql
 ```
@@ -185,6 +188,14 @@ aslinya hidup di `analytics/migrations/` (dibaca gerbang `analytics-dedup-test.j
 salinan di direktori ini wajib **byte-identik**. Catatan jujur: pasangan `0006`
 belum terdaftar di cek byte-identik `cf-wiring-test.js` — penambahan pasangan itu
 milik pemilik gerbang wiring.
+
+`evidence/migrations/0008_evidence.sql` mengikuti pola yang sama: aslinya hidup
+di `evidence/migrations/` (dibaca gerbang `braincore-evidence-test.js`), salinan
+di direktori ini wajib **byte-identik**. `0008` masuk database KEEMPAT
+(`fiezel-evidence`), bukan `fiezel-learning`, karena inilah satu-satunya database
+yang menyimpan pengenal per-perangkat (`evidence_learner_day.cohort`, TTL 14
+hari); selama ia berdiri sendiri, "cohort tidak bisa disambungkan ke identitas,
+kuota, kehadiran, atau jawaban" adalah sifat yang tidak bisa ditulis dalam SQL.
 
 `learning/migrations/0007_learning.sql` mengikuti pola yang sama lagi: aslinya
 hidup di `learning/migrations/` (dibaca gerbang `learning-lane-test.js` untuk
