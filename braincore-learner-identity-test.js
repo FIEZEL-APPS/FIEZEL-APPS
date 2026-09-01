@@ -499,6 +499,13 @@ function babKlien() {
     /EVIDENCE_DB_NAME='fiezel-braincore-evidence-v1'/.test(app));
   check('(A) klien: TIDAK PERNAH mengirim sub/userId sendiri',
     !/sub:\s*(state|activeAccountUuid)/.test(app));
+  // Menyalakan lane per-murid TIDAK boleh menyalakan pengenal lane anonim: saat lane
+  // agregat 'off', cohort yang dipakai pembangun adalah sekali pakai dan TIDAK ditulis
+  // ke localStorage.
+  check('(I) klien: cohort tidak dipersistenkan saat lane agregat mati',
+    /function braincoreEvidenceCohortForBuild/.test(app) &&
+    /if\(braincoreEvidenceMode\(\)!=='off'\)return braincoreEvidenceCohort\(nowMs\);/.test(app) &&
+    !/const cohort=braincoreEvidenceCohort\(nowMs\);/.test(app));
   check('(D) klien: identitas lane ini datang dari cookie (POST /api/auth/anon), bukan dari state',
     /identityEvidenceEnsureAnon/.test(app) && /anonEndpoint/.test(app));
 

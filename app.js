@@ -1654,6 +1654,19 @@ function braincoreEvidenceCohort(nowMs=Date.now()){
   if(next.rotated){try{localStorage.setItem(EVIDENCE_COHORT_KEY,JSON.stringify({cohort:next.cohort,epoch:next.epoch}))}catch{}}
   return next.cohort;
 }
+/**
+ * Cohort UNTUK PEMBANGUN EVENT. Pembangun lane C menuntut 16 hex yang sah, tetapi lane D
+ * membuangnya (`toIdentityEvent`). Kalau lane agregat MATI dan hanya lane D yang hidup,
+ * memanggil `braincoreEvidenceCohort()` akan MENULIS pengenal berotasi ke localStorage untuk
+ * sesuatu yang tidak akan pernah dikirim — menyalakan lane per-murid diam-diam menyalakan
+ * pengenal lane anonim. Maka: lane agregat hidup -> cohort sungguhan (persisten, berotasi);
+ * lane agregat mati -> 16 hex sekali pakai yang TIDAK PERNAH disimpan dan tidak pernah keluar.
+ */
+function braincoreEvidenceCohortForBuild(nowMs=Date.now()){
+  if(braincoreEvidenceMode()!=='off')return braincoreEvidenceCohort(nowMs);
+  const throwaway=braincoreRandomHex(16);
+  return /^[0-9a-f]{16}$/.test(throwaway)?throwaway:null;
+}
 /** Hari UTC amplop batch. SATU-SATUNYA penanda waktu yang keluar dari perangkat. */
 function braincoreEvidenceDay(nowMs=Date.now()){return new Date(Number(nowMs)||0).toISOString().slice(0,10)}
 /** Antre satu event. Tidak pernah melempar; nilai kembalinya tidak dibaca jalur belajar. */
@@ -1679,7 +1692,7 @@ function braincoreEvidenceEmitSnapshot(nowMs=Date.now()){
     let min=86400000;try{min=Number(self.FiezelTelemetryConfig?.CONFIG?.evidence?.minIntervalMs)||86400000}catch{}
     const last=Number(localStorage.getItem(EVIDENCE_LAST_KEY)||0);
     if(Number.isFinite(last)&&last>0&&nowMs-last<min)return null;
-    const cohort=braincoreEvidenceCohort(nowMs);
+    const cohort=braincoreEvidenceCohortForBuild(nowMs);
     if(!cohort)return null;
     const snapshot=remoteLearnerEvidenceSnapshot(nowMs),outcomes=recentPolicyOutcomes(5),latest=outcomes.at(-1)||null;
     const input=M.fromSnapshot(snapshot,{
@@ -1693,8 +1706,9 @@ function braincoreEvidenceEmitSnapshot(nowMs=Date.now()){
     });
     const built=M.buildLearnerEvidenceEvent(Object.assign({eventId:braincoreEvidenceUuid(),cohort},input));
     if(!built||built.ok!==true)return null;
-    // Dua lane, dua antrean, satu event sumber. Lane agregat dilewati kalau modenya
-    // 'off' — menyalakan lane per-murid TIDAK boleh menyalakan pengenal cohort.
+    // Dua lane, dua antrean, satu event sumber. Lane agregat dilewati kalau modenya 'off',
+    // dan cohort-nya pun tidak pernah dipersistenkan (braincoreEvidenceCohortForBuild):
+    // menyalakan lane per-murid TIDAK boleh menyalakan pengenal lane anonim.
     const queued=braincoreEvidenceMode()==='off'?true:braincoreEvidenceEnqueue(built.event,nowMs);
     identityEvidenceMirror(built.event,nowMs);
     if(!queued)return null;
@@ -1718,7 +1732,7 @@ function braincoreEvidenceEmitDecision(outcome,nowMs=Date.now()){
   const M=self.FiezelBraincoreEvidence;
   if(!M||typeof M.buildDecisionEvent!=='function'||!outcome)return null;
   try{
-    const cohort=braincoreEvidenceCohort(nowMs);
+    const cohort=braincoreEvidenceCohortForBuild(nowMs);
     if(!cohort)return null;
     const built=M.buildDecisionEvent({
       eventId:braincoreEvidenceUuid(),
@@ -10811,7 +10825,7 @@ window.queueSocialEvidence=queueSocialEvidence;window.socialSummaryCardMarkup=so
 // karena murid menutup aplikasi saat offline berangkat di sini.
 setTimeout(()=>{try{socialCore()?.flushOutbox()}catch(_){}},4500);
 /* ============================== akhir blok SOSIAL (SLOT 7) ========================== */
-window.istilahMurid=istilahMurid;/* dipapar untuk gerbang QA: penerjemah enum harus bisa disapu penuh */window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,/* m025-201: dipapar untuk core-policy-parity-test.js - gerbang paritas tidak bisa membandingkan apa yang tidak bisa ia panggil */capRationaleCodes,policyEffectiveness,sanitizePolicyEffectiveness,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,coreBrainMemory,tutorSession,tutorObserve,misconceptionLedgerRead,misconceptionLedgerActive,coreBrainAttempts,quizPredictedSuccess,evidenceKappa,bktRead,bktRecord,bktShadowMarkup,brainManifestMarkup,learningTelemetryMode,learningTelemetryEmitAnswer,learningTelemetryStudyDay,braincoreEvidenceMode,braincoreEvidenceCohort,braincoreEvidenceDay,braincoreEvidenceEmitSnapshot,braincoreEvidenceEmitDecision,braincoreEvidenceFlush,braincoreEvidenceObserveSession,braincoreDecisionReason,braincoreEvidenceAnyLaneActive,identityEvidenceMode,identityEvidenceConsented,identityEvidenceActive,identityEvidenceMirror,identityEvidenceFlush,identityEvidenceSyncConsent,setLearnerEvidenceConsent,confusionMatrixRead,confusionMatrixRecord,affectObserve,affectSessionSync,affectTargetSuccess,listeningAdaptivePolicy,olmPanelMarkup,coreBrainPanelMarkup,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession,/* Fase 3 (C5): kalibrasi item, cloze, OLM negotiated, SRL, speaking adaptif, step tutor */itemCalibrationRead,itemCalibrationObserve,itemCalibrationEffective,calibrationItemId,ensureClozeBank,makeClozeQuestion,clozeAdaptivePicks,clozeSkillReady,clozeProductionRecord,olmSummarizeInput,olmDispute,olmProbeNextSkill,olmProbeConsume,olmNegotiationRead,srlSessionPlan,srlPredictPrompt,srlCaptureConfidence,srlReflect,srlSessionSync,speakingCoverageRows,speakingAdaptiveEvidence,speakingAdaptivePolicy,stepTutorGuidance,stepTutorGuidanceMarkup,record,quizLoop,startAdaptive};
+window.istilahMurid=istilahMurid;/* dipapar untuk gerbang QA: penerjemah enum harus bisa disapu penuh */window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,/* m025-201: dipapar untuk core-policy-parity-test.js - gerbang paritas tidak bisa membandingkan apa yang tidak bisa ia panggil */capRationaleCodes,policyEffectiveness,sanitizePolicyEffectiveness,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,coreBrainMemory,tutorSession,tutorObserve,misconceptionLedgerRead,misconceptionLedgerActive,coreBrainAttempts,quizPredictedSuccess,evidenceKappa,bktRead,bktRecord,bktShadowMarkup,brainManifestMarkup,learningTelemetryMode,learningTelemetryEmitAnswer,learningTelemetryStudyDay,braincoreEvidenceMode,braincoreEvidenceCohort,braincoreEvidenceCohortForBuild,braincoreEvidenceDay,braincoreEvidenceEmitSnapshot,braincoreEvidenceEmitDecision,braincoreEvidenceFlush,braincoreEvidenceObserveSession,braincoreDecisionReason,braincoreEvidenceAnyLaneActive,identityEvidenceMode,identityEvidenceConsented,identityEvidenceActive,identityEvidenceMirror,identityEvidenceFlush,identityEvidenceSyncConsent,setLearnerEvidenceConsent,confusionMatrixRead,confusionMatrixRecord,affectObserve,affectSessionSync,affectTargetSuccess,listeningAdaptivePolicy,olmPanelMarkup,coreBrainPanelMarkup,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession,/* Fase 3 (C5): kalibrasi item, cloze, OLM negotiated, SRL, speaking adaptif, step tutor */itemCalibrationRead,itemCalibrationObserve,itemCalibrationEffective,calibrationItemId,ensureClozeBank,makeClozeQuestion,clozeAdaptivePicks,clozeSkillReady,clozeProductionRecord,olmSummarizeInput,olmDispute,olmProbeNextSkill,olmProbeConsume,olmNegotiationRead,srlSessionPlan,srlPredictPrompt,srlCaptureConfidence,srlReflect,srlSessionSync,speakingCoverageRows,speakingAdaptiveEvidence,speakingAdaptivePolicy,stepTutorGuidance,stepTutorGuidanceMarkup,record,quizLoop,startAdaptive};
 window.startVocabQuiz=startVocabQuiz;window.buildAdaptivePool=buildAdaptivePool;window.buildGrammarLessonQuestions=buildGrammarLessonQuestions;window.getScenePalette=getScenePalette;window.getCelestialState=getCelestialState;window.playFeedbackSound=playFeedbackSound;window.updateMastery=updateMastery;window.markMastered=markMastered;window.__getFiezelState=()=>state;window.__fiezelValidViews=()=>[...VALID_VIEWS];window.__fiezelDueReviews=()=>dueItems().length;window.buildAdaptivePolicy=buildAdaptivePolicy;window.studyDayKey=studyDayKey;window.startAdaptive=startAdaptive;window.showToast=showToast;window.answerFeedbackSignal=answerFeedbackSignal;window.practiceSkill=practiceSkill;window.openReadingLevel=openReadingLevel;window.startReadingRandom=startReadingRandom;window.startReadingAdaptive=startReadingAdaptive;window.startPlacement=startPlacement;window.startLevelPractice=startLevelPractice;window.startAdaptive=startAdaptive;window.resetProgress=resetProgress;window.closeModal=closeModal;window.openSettings=openSettings;window.openReportPreview=openReportPreview;window.sendCreatorReport=sendCreatorReport;window.askCoachAI=askCoachAI;window.dismissWelcome=dismissWelcome;window.requestStudyNotificationPermission=requestStudyNotificationPermission;window.declineStudyNotifications=declineStudyNotifications;window.skipPuterSignIn=skipPuterSignIn;window.shouldPresentPuterPopup=shouldPresentPuterPopup;window.notifyAppUpdateIfNew=notifyAppUpdateIfNew;window.setConfidence=setConfidence;window.explainWithAI=explainWithAI;window.explainWordWithAI=explainWordWithAI;window.olmDispute=olmDispute;/* Fase 3 (C5 butir 3): handler tombol sanggah di panel OLM */
 // m025-84: dipasang di ujung berkas, saat go()/state/VALID_VIEWS sudah ada, dan SEBELUM
 // load() supaya navigasi pertama pun sudah terekam di riwayat.
