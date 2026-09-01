@@ -164,9 +164,6 @@
     confusionMap: 'shadow',
     olmInsight: 'shadow',
     listeningPolicy: 'shadow',
-    // Langkah 1 roadmap otonomi: keduanya BERWENANG dan sudah lama berwenang — peta
-    // lama menyebutnya 'off' dengan alasan 'nol referensi di app.js' yang tidak lagi
-    // benar. Gerbang W8 di brain-page-wiring-test.js sekarang menangkap drift arah ini.
     stepTutor: 'active',
     productionGrader: 'active',
     // Langkah 1 roadmap otonomi: probe retensi kini dimuat halaman dan dipanggil —

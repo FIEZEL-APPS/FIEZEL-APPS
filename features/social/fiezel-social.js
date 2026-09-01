@@ -323,15 +323,6 @@
     }catch(_){return {sent:sent,kept:outboxRead().length,reason:'error'}}
     finally{flushing=false}
   }
-  /* Waktu adalah ARGUMEN, bukan jam dinding.
-   *
-   * Versi lama memakai Date.now() langsung, sementara gerbangnya memakai fixture waktu yang
-   * dipatok mati. Entri fixture ikut terpangkas begitu waktu nyata melewati
-   * fixture + OUTBOX_MAX_AGE_MS, jadi gerbangnya lulus sampai kalender menyusulnya lalu
-   * merah selamanya — dan merahnya menahan `quality` di SETIAP PR, bukan hanya PR yang
-   * menyentuh lane sosial. Itu benar-benar terjadi pada 31 Agu 2026 pukul 18:00 UTC.
-   *
-   * Tanpa argumen, perilakunya persis seperti sebelumnya untuk pemanggil runtime. */
   function outboxPending(nowMs){
     var t=Number(nowMs);
     return outboxPrune(outboxRead(), isFinite(t)&&t>0 ? t : Date.now()).length;

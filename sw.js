@@ -45,7 +45,7 @@ const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
 // TIDAK ikut ASSETS - ia hidup di cache locale terpisah (LOCALE_TH_CACHE di bawah) yang
 // diisi halaman on-demand, meniru pola neural-prepare, sehingga murid Indonesia tidak
 // pernah membayar byte Thai.
-const SW_REV='m025-225-core-brain-five-gaps-20260830';
+const SW_REV='m025-226-core-brain-five-gaps-20260830';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 // m025-61: health check menanyakan revisi shell langsung ke worker yang sedang aktif.
 // Menebaknya dari nama cache tidak cukup: cache lama bisa tertinggal, sedangkan jawaban ini
@@ -237,6 +237,28 @@ self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise
     }catch{}
   }
 })))));
+/* Halaman luring yang DISINTESIS, bukan diambil dari cache.
+   Disengaja: kalau ia berupa berkas ter-precache, ia akan hilang persis pada satu-satunya
+   keadaan yang membutuhkannya (cache kosong). Naskahnya Indonesia karena murid FIEZEL
+   membacanya dalam keadaan paling bingung - luring, layar asing, tidak ada yang jalan.
+   Tanpa skrip, tanpa aset luar, tanpa font: ia harus bisa tampil ketika tidak ada apa pun
+   yang bisa diambil. */
+function halamanLuring(){
+  const html='<!doctype html><html lang="id"><meta charset="utf-8">'
+    +'<meta name="viewport" content="width=device-width,initial-scale=1">'
+    +'<title>FIEZEL - sedang luring</title>'
+    +'<style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;'
+    +'background:#0f1729;color:#e8eefc;font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding:24px}'
+    +'.k{max-width:32rem;text-align:center}h1{font-size:1.35rem;margin:0 0 .6rem}p{margin:0 0 1rem;color:#b7c4de}'
+    +'button{min-height:44px;min-width:44px;padding:12px 22px;border:0;border-radius:12px;'
+    +'background:#5b8cff;color:#fff;font-size:1rem;font-weight:600;cursor:pointer}</style>'
+    +'<div class="k"><h1>Kamu sedang luring</h1>'
+    +'<p>FIEZEL belum sempat menyimpan pelajaranmu di perangkat ini, jadi belum ada yang bisa '
+    +'dibuka tanpa internet. Sambungkan internet sebentar saja - sesudah itu FIEZEL bisa '
+    +'dipakai penuh walau jaringannya putus.</p>'
+    +'<button onclick="location.reload()">Coba lagi</button></div></html>';
+  return new Response(html,{status:503,statusText:'Offline',headers:new Headers({'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'})});
+}
 self.addEventListener('fetch',e=>{
   if(e.request.method!=='GET')return;
   const requestUrl=new URL(e.request.url);
@@ -323,7 +345,20 @@ self.addEventListener('fetch',e=>{
       return r;
     });
     try{e.waitUntil(segarkan.catch(()=>{}))}catch(_){}
-    responsePromise=cangkang().then(c=>c||segarkan);
+    /* JARING PENGAMAN LURING (P1 keandalan PWA).
+       Sampai sini cangkang selalu menang bila ada. Yang tersisa adalah satu batas yang
+       sebelumnya dijawab dengan penolakan mentah: LURING dan BELUM punya cangkang sama
+       sekali (pemasangan pertama, atau cache tergusur tekanan penyimpanan iOS). Di sana
+       murid mendapat halaman galat peramban - layar putih berbahasa Inggris tanpa satu
+       petunjuk pun.
+       Keberatan asli terhadap "fallback" tetap dihormati dan TIDAK dilanggar: yang dulu
+       dilarang adalah menyajikan CANGKANG KOSONG, karena itu menghasilkan layar kosong
+       permanen yang tidak bisa dibedakan dari aplikasi rusak. Halaman di bawah bukan
+       cangkang: ia disintesis di dalam service worker (tidak butuh satu byte pun dari
+       cache, jadi ia tetap ada justru pada kasus cache kosong), mengaku apa adanya, dan
+       tidak berpura-pura menjadi aplikasi. Statusnya 503 supaya peramban maupun alat ukur
+       tidak salah menghitungnya sebagai halaman yang berhasil dimuat. */
+    responsePromise=cangkang().then(c=>c||segarkan).catch(()=>halamanLuring());
   }else if(isNeuralAsset(e.request)){
     // Neural runtime/model/voice assets are owned by the neural prepare layer and
     // stay in the stable runtime cache. A shell release never precaches/rewrites them.
