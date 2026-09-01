@@ -196,6 +196,7 @@
   /* ---------- giliran bicara ---------- */
   var turn = null;          // state satu giliran; null = diam
   var degradedLatch = false; // sesudah 'degraded': tolak masuk kembali sampai fasad menutup giliran
+  var latestGeneration = 0; // NV-08: completion/progress generasi lama tidak boleh memiliki turn baru
   var raf = 0;
 
   function schedule() {
@@ -324,8 +325,18 @@
   }
 
   /* ---------- terjemahan kabel R-2a → kosakata react() ---------- */
+  function acceptGeneration(d) {
+    var generation = Number(d && d.generation) || 0;
+    // Event lawas tanpa generation tetap diterima untuk kompatibilitas test/page lama.
+    if (!generation) return true;
+    if (generation < latestGeneration) return false;
+    if (generation > latestGeneration) latestGeneration = generation;
+    return true;
+  }
+
   function onSpeech(ev) {
     var d = (ev && ev.detail) || {};
+    if (!acceptGeneration(d)) return;        // NV-08: stale progress/end tidak boleh menyentuh turn baru
     switch (d.phase) {
       case 'progress':                      // L1/L2: jam audio adalah kebenaran
         feedClock(Number(d.layer) === 2 ? 2 : 1, Number(d.currentTime) || 0);

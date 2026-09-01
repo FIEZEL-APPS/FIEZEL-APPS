@@ -4432,7 +4432,7 @@ function armPuterAuthGate(){
  */
 function armOfflineVoiceAutoload(){
   if(!puterSignedIn())return false;
-  const go=()=>{try{return self.FiezelVoiceOfflineAutoload?.noteSignedIn?.()===true}catch{return false}};
+  const go=()=>{try{return(self.FiezelVoiceOfflineAutoload?.arm?.()??self.FiezelVoiceOfflineAutoload?.noteSignedIn?.())===true}catch{return false}};
   if(go())return true;
   ensureVoiceRuntime().then(go).catch(()=>{});
   return false

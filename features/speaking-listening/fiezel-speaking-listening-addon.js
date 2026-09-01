@@ -620,28 +620,16 @@
         if(this.replays>=limit){this.setFeedback(T('skillslab.replay-limit'));return}
         const button=event.currentTarget;
         button.disabled=true;this.replays++;
-        /* Equalizer hidup PERSIS selama pemutaran. Dipasang sebelum try supaya jalur
-           gagal pun tetap masuk finally di bawah - kalau ia dipasang di dalam try setelah
-           baris yang bisa melempar, batangnya bisa tertinggal menyala selamanya. */
         const stage=this.root.querySelector('.fsl-player');
-        if(stage)stage.classList.add('is-playing');
+        if(stage&&stage.classList&&stage.classList.add)stage.classList.add('is-playing');
         try{
           const playing=this.tts.play(item.script,{voice:item.voice,rate:this.config.ttsRate,suppressSubtitles:true});
-          /* V6: diajukan sesudah pemutaran berangkat dan SEBELUM ditunggu. Menunggu dulu
-             berarti item berikutnya baru digenerasi setelah bunyi sekarang habis - pola
-             yang audit V1 ukur sebagai jeda 4,5 detik. Jalur ujian tidak lewat sini. */
           this.prefetchNextScript();
           const result=await Promise.race([playing,new Promise((_,reject)=>setTimeout(()=>reject(new Error('tts_timeout')),TTS_TIMEOUT_MS))]);
-          /* m026-BUG1b. Kegagalan suara tidak selalu datang sebagai throw: FiezelVoiceSay
-             MENJAWAB false ketika seluruh tangganya habis (aset R2 -> Puter -> neural lokal
-             -> speechSynthesis), dan host membungkusnya sebagai promise yang RESOLVE. Tanpa
-             baris ini, false terhitung sukses: jawaban dibuka, kapabilitas dicatat 'ok', dan
-             murid diminta menjawab soal dengar yang tidak pernah berbunyi. */
           if(result===false||result==null)throw new Error('tts_silent');
           this.noAudio=false;
           this.root.querySelector('[data-work]').disabled=false;
           this.store.noteCapability('tts',String(result?.provider||'ok'));
-          /* m028 fase3: chip pemutar diikat ke this.replays yang MEMANG dihitung addon - bukan angka hiasan. */
           const chip=this.root.querySelector('[data-replays]');if(chip)chip.textContent=`Diputar ${this.replays}\u00d7`;
           this.setFeedback(`Audio siap \u00b7 replay ${this.replays}/${limit}.`);
         }catch(_){
@@ -660,7 +648,7 @@
            mengambil seluruh penangan tombol Dengarkan dengan pola itu untuk membuktikan ia
            tidak menyentuh terjemahan. Merapikannya menjadi baris terpisah membuat gerbang
            itu kehilangan handler-nya dan gagal tanpa sebab yang terlihat. */
-        }finally{button.disabled=false;if(stage)stage.classList.remove('is-playing')}});
+        }finally{button.disabled=false;if(stage&&stage.classList&&stage.classList.remove)stage.classList.remove('is-playing')}});
       this.root.querySelector('[data-exit]').addEventListener('click',()=>this.confirmExit());
       if(isDict)this.root.querySelector('[data-submit]').addEventListener('click',()=>{const input=this.root.querySelector('[data-dictation]'),value=input.value;const result=scoreListening(item,value);input.value='';this.finishItem(item,result)});else this.root.querySelectorAll('[data-choice]').forEach(b=>b.addEventListener('click',()=>this.finishItem(item,scoreListening(item,Number(b.getAttribute('data-choice'))))));
       this.bindGemBar(item);
