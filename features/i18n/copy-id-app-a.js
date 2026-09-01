@@ -446,45 +446,45 @@
     // app.js:1515 — deriveAdaptivePolicy() labels
     'policy.balance-judul': 'Naik level dengan ritme aman',
     // app.js:1515 — deriveAdaptivePolicy() labels
-    'policy.balance-ringkas': 'Bukti belajar cukup stabil. Core Brain menyeimbangkan fokus lemah, review, dan transfer lintas skill.',
+    'policy.balance-ringkas': 'Belajarmu sudah stabil. Latihan berikutnya dibagi rata: yang masih lemah, yang perlu diulang, dan yang belum pernah dicoba.',
     // app.js:1515 — deriveAdaptivePolicy() labels
     'policy.diagnostic-cta': 'Cari tahu level kamu',
     // app.js:1515 — deriveAdaptivePolicy() labels
     'policy.diagnostic-judul': 'Bangun bukti dulu, bro',
     // app.js:1515 — deriveAdaptivePolicy() labels
-    'policy.diagnostic-ringkas': 'FIEZEL butuh bukti lintas skill sebelum ngatur latihan secara presisi.',
+    'policy.diagnostic-ringkas': 'FIEZEL masih mengenali kamu. Coba dulu vocab, grammar, dan reading biar latihanmu bisa dipaskan.',
     // app.js:1516 — deriveAdaptivePolicy() steps
-    'policy.langkah-balance': `Prioritaskan {fokus}, lalu jaga variasi lintas skill.`,
+    'policy.langkah-balance': 'Utamakan {fokus}, lalu selingi materi lain biar nggak monoton.',
     // app.js:1516 — deriveAdaptivePolicy() steps
-    'policy.langkah-boleh-baru': 'Boleh sisipkan sedikit transfer atau materi baru bila pool aman.',
+    'policy.langkah-boleh-baru': 'Boleh diselingi sedikit materi baru.',
     // app.js:1516 — deriveAdaptivePolicy() steps
     'policy.langkah-diagnostic': 'Kumpulkan bukti vocabulary, grammar, dan reading secara seimbang.',
     // app.js:1516 — deriveAdaptivePolicy() steps
     'policy.langkah-fokus': `Fokus utama: {fokus}.`,
     // app.js:1516 — deriveAdaptivePolicy() steps
-    'policy.langkah-keyakinan': 'Aktifkan cek keyakinan karena rasa yakin dan hasil nyata masih cukup berjauhan.',
+    'policy.langkah-keyakinan': 'Dulu rasa yakinmu dan hasilnya sering berjauhan, jadi soalnya dipilih lebih hati-hati.',
     // app.js:1516 — deriveAdaptivePolicy() steps
     'policy.langkah-recovery': 'Sesi pendek dulu supaya selesai tanpa bikin beban terasa gede.',
     // app.js:1516 — deriveAdaptivePolicy() steps
-    'policy.langkah-tahan-baru': 'Tahan materi baru sampai area prioritas lebih stabil.',
+    'policy.langkah-tahan-baru': 'Materi baru ditahan dulu sampai bagian ini lebih mantap.',
     // app.js:1515 — deriveAdaptivePolicy() labels
     'policy.recovery-cta': 'Mulai comeback',
     // app.js:1515 — deriveAdaptivePolicy() labels
     'policy.recovery-judul': 'Comeback pendek dulu',
     // app.js:1515 — deriveAdaptivePolicy() labels
-    'policy.recovery-ringkas': 'Ritme lagi rapuh, jadi Core Brain sengaja bikin sesi lebih pendek biar gampang dituntaskan.',
+    'policy.recovery-ringkas': 'Belakangan ini agak berat, ya. Sesinya sengaja dibikin lebih pendek biar gampang diselesaikan.',
     // app.js:1515 — deriveAdaptivePolicy() labels
     'policy.repair-cta': 'Perbaiki skill ini',
     // app.js:1515 — deriveAdaptivePolicy() labels
     'policy.repair-judul': 'Benerin titik bocor dulu',
     // app.js:1515 — deriveAdaptivePolicy() labels
-    'policy.repair-ringkas': 'Ada pola salah yang berulang. Sesi berikutnya difokuskan ke skill itu sebelum pindah jauh.',
+    'policy.repair-ringkas': 'Ada satu hal yang salahnya berulang. Sesi berikutnya fokus ke situ dulu sebelum lanjut jauh.',
     // app.js:1515 — deriveAdaptivePolicy() labels
     'policy.review-cta': 'Mulai Smart Review',
     // app.js:1515 — deriveAdaptivePolicy() labels
     'policy.review-judul': 'Review dulu sebelum nambah',
     // app.js:1515 — deriveAdaptivePolicy() labels
-    'policy.review-ringkas': 'Ada materi yang mulai rawan lupa. Core Brain tahan materi baru dan prioritaskan recall.',
+    'policy.review-ringkas': 'Ada materi yang mulai kamu lupakan. Materi baru ditahan dulu, yang lama diulang biar nempel.',
     // app.js:1454 — nilai state/kontrak TETAP di sumber; render-map di titik render (lihat handoff)
     'progress.jendela-belum-terbaca': 'belum terbaca',
     // app.js:1445 — nilai state/kontrak TETAP di sumber; render-map di titik render (lihat handoff)
@@ -868,9 +868,9 @@
     // app.js:917 — levelEntryChoiceCopy() deferToast
     'level.entry-tunda-toast': `Oke, kita mulai dari {levelAwal} dulu. {level} nungguin kamu abis lulus ujian {ujian}.`,
     // app.js:1516 — deriveAdaptivePolicy() steps
-    'policy.langkah-review': `Mulai dari review berisiko tinggi ({persenReview}% sesi).`,
+    'policy.langkah-review': 'Mulai dari yang paling rawan lupa ({persenReview}% sesi).',
     // app.js:1516 — deriveAdaptivePolicy() steps
-    'policy.langkah-target': `Target {jumlahSoal} soal · difficulty {tingkat} · pace {tempo}.`,
+    'policy.langkah-target': 'Sesi ini {jumlahSoal} soal.',
     // app.js:1918 — makeClozeQuestion() explain.rule
     'quiz.cloze-rule': `Jawaban yang tepat: "{isian}".`,
     // app.js:1302 — openConfidencePop() vonis benar
