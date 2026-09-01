@@ -153,7 +153,13 @@ function expectRed(label, fn) {
 }
 
 test('RED · detektor merah bila bawaan dibalik jadi true', () => {
-  const racun = appSource.replace('brainSync:false}', 'brainSync:true}');
+  // Jangkar racun sengaja TIDAK memakai `brainSync:false}` lagi: sejak SLOT 9,
+  // `learnerEvidenceConsent:false` berdiri di belakang `brainSync` di dalam
+  // defaultPreferences, jadi kurung tutupnya bukan lagi tetangga langsungnya.
+  // `assert.notStrictEqual` di bawah adalah yang menangkap pergeseran itu — dan ia
+  // memang menangkapnya. Jangkar baru (`brainSync:false,`) tetap satu-satunya tempat
+  // bawaan itu ditulis, jadi bukti "detektor bisa merah" tidak berubah kekuatannya.
+  const racun = appSource.replace('brainSync:false,', 'brainSync:true,');
   assert.notStrictEqual(racun, appSource, 'racun tidak menempel — pola gerbang sudah basi');
   expectRed('bawaan brainSync dibalik jadi true', () => {
     const m = racun.match(/const defaultPreferences=\{[\s\S]*?\};/);
