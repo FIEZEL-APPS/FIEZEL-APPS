@@ -281,6 +281,29 @@ S1b (sidecar Speaking/Listening) sengaja ditunda saat S1 karena satu-satunya pen
 luar `app.js`; ia ditutup pada 2026-09-01, dan gerbangnya (`side-state-scope-test.js` C7–C7d)
 menjalankan penulis dan pembaca ASLI lalu menuntut keduanya bertemu di kunci yang sama.
 
+### Rantai konten akhirnya berjalan atas data nyata
+
+`fiezel-content-chain.js` menghitung posisi kandidat, tetapi ia modul murni: ia hanya menerima
+laporan yang sudah jadi. Selama tidak ada yang memberinya laporan dari bank soal sungguhan, ia
+hidup dari fixture — dan `gateStatus:'UNVERIFIED_LOCAL_GATES_REQUIRED'` yang dikembalikan
+worker tetap menggantung dalam praktik.
+
+`tools/content-chain-report.mjs` menutup itu. Ia menjalankan gerbang lokal deterministik atas
+`vocabulary-master.json` asli lalu menyusun laporannya, dan hasilnya bisa dilihat siapa pun:
+
+```
+FIEZEL content chain — proof-vocab_00006-5.19.0
+  gerbang lokal: LULUS (guarded-patch-v1, kanonik utuh: true)
+  gateStatus  : LOCAL_GATES_PASSED
+  tahap       : local_gate
+  penghalang  : chain_canary_not_configured
+  keputusan OWNER diperlukan: true
+```
+
+Alat itu HANYA MEMBACA, dan itu diperiksa dari luar: `content-chain-report-test.js` menghitung
+sha256 ketiga bank kanonik sebelum dan sesudah, karena jaminan yang dihitung oleh pihak yang
+dijaga bukan jaminan. Blok RED-nya membuktikan pengukuran itu sensitif terhadap satu byte.
+
 ### Kenapa Langkah 5 berhenti di `off`
 
 Modulnya siap dan pagarnya terbukti. Yang belum ada adalah **izinnya**. Menyalakan

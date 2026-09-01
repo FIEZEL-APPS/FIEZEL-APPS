@@ -295,6 +295,7 @@ jobs:
           node param-ledger-test.js
           node self-tune-test.js
           node content-chain-test.js
+          node content-chain-report-test.js
           node learner-evidence-test.js
           node alrs-behavior-test.js
           node adaptive-policy-test.js
