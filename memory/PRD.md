@@ -27,6 +27,16 @@ manual (di onboarding & Pengaturan) TETAP ada.
 - Verified via Playwright: US IP → lang=id; mocked TH IP → lang=th-TH, locale='th'.
 - Regression: id-golden-snapshot-test PASS, th-coverage-test 143/143 PASS.
 
+### 2026-06 — Landing page (website/) IP auto-redirect to Thai (DONE, tested)
+- Landing pages: `/` = website/index.html (ID), `/th/` = website/th/index.html (Thai, pre-existing).
+  The PWA lives at `/app/`. hreflang id/th already present.
+- Added inline <head> geo-redirect script in `website/index.html`:
+  - localStorage `fiezel-site-locale`: 'id' → no redirect (manual ID wins); 'th' → instant redirect to `th/`.
+  - unset → fetch `https://ipwho.is/?fields=success,country_code` (2s AbortController timeout, fail-soft).
+    country_code==='TH' → save 'th' + `location.replace('th/')`. Non-TH/err → stay ID, no flag set.
+- Manual language switcher pill (`.lang-switch` in style.css) added to topnav on BOTH pages:
+  - ID page → "ไทย" (sets localStorage 'th', → th/). TH page → "Indonesia" (sets 'id', → ../).
+- TH page does NOT redirect (loop-safe). Verified via Playwright: US IP stays `/` (id); mocked TH IP
+  redirects `/` → `/th/` (lang=th, localStorage='th'); switcher present both sides.
+
 ## Backlog / Future (P2)
-- Optional: persist a one-time toast informing auto-detected Thai users they can switch back.
-- Optional: cache country_code to skip fetch entirely on repeat first-run edge cases.
