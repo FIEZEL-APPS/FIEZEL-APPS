@@ -113,6 +113,14 @@ const ALLOW = [
   '/api/series'      => ['GET'],
   '/api/retention'   => ['GET'],
   '/api/cost'        => ['GET'],
+  // Ekspor CSV. GET saja: ini unduhan baca-saja atas angka yang sudah dirender halaman,
+  // bukan pintu tulis. Ber-gate sesi owner di Worker, sama seperti rute data di atas —
+  // allowlist ini hanya menentukan apa yang boleh MELINTAS jembatan, bukan siapa yang boleh
+  // melihatnya.
+  '/api/export/summary.csv'   => ['GET'],
+  '/api/export/series.csv'    => ['GET'],
+  '/api/export/retention.csv' => ['GET'],
+  '/api/export/evidence.csv'  => ['GET'],
 ];
 
 /**

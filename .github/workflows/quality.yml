@@ -481,6 +481,13 @@ jobs:
           # aura-2-en, daftar frasa berisiko "On balance", override model per-item).
           node prerender-plan-test.js
           node owner-dashboard-test.js
+          # Ekspor CSV dashboard owner. Gerbang TERPISAH dari owner-dashboard-test.js karena
+          # yang dijaga beda: berkas CSV BEREDAR LEPAS dari dashboard, jadi konteks kejujuran
+          # (measurement_state, notice, batas UNMEASURABLE) wajib ikut TERTULIS DI DALAM
+          # berkasnya — kalau tidak, 'belum diukur' terbaca sebagai 'nol' begitu berkas itu
+          # sampai ke tangan calon pembeli. Ia juga mengunci escaping RFC 4180 (alasan
+          # UNMEASURABLE penuh koma) dan paritas angka CSV vs /api/summary.
+          node owner-export-csv-test.js
           # S4: gerbang jembatan `owner.fiezel.my.id`. Ditempatkan TEPAT sesudah
           # `owner-dashboard-test.js` karena keduanya menguji `workers/owner/index.js`, tetapi
           # dari dua sisi berbeda: yang di atas menjaga siapa yang boleh MELIHAT angka (sesi
