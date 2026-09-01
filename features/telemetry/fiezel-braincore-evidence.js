@@ -39,6 +39,11 @@
   'use strict';
 
   var SCHEMA = 'fiezel-braincore-evidence-v1';
+  /* Lane KEDUA: bukti yang sama, dikirim ke endpoint terautentikasi supaya
+   * server bisa menempelkan `identity.sub` sendiri. Skema TERPISAH karena
+   * amplopnya memang berbeda maksud — dan supaya satu batch tidak pernah bisa
+   * mendarat di lane yang salah kalau endpoint tertukar. */
+  var IDENTITY_SCHEMA = 'fiezel-braincore-learner-evidence-v1';
   var COHORT_EPOCH_DAYS = 14;
   var DAY_MS = 86400000;
 
@@ -348,11 +353,49 @@
     };
   }
 
+  /* ---------------------------------------------- lane bukti PER-MURID */
+
+  /**
+   * toIdentityEvent(event, newEventId) -> event lane per-murid | null
+   *
+   * Lane kedua (`fiezel-braincore-learner-evidence-v1`) mengirim BUCKET YANG
+   * SAMA ke endpoint yang terautentikasi, tempat server menempelkan
+   * `identity.sub` sendiri dari cookie. Fungsi ini yang membuat kedua lane
+   * TIDAK BISA disambungkan satu sama lain, dan itu satu-satunya alasannya ada:
+   *
+   *   1. `cohort` DIBUANG. Kalau satu baris membawa cohort DAN duduk di sebelah
+   *      sub, maka lane agregat yang anonim bisa dipetakan ke akun lewat satu
+   *      SELECT — seluruh jaminan 0008_evidence.sql hilang dalam satu kolom.
+   *   2. `eventId` DIGANTI dengan UUID BARU yang di-inject pemanggil. eventId
+   *      bersama adalah kunci join yang sama berbahayanya dengan kolom bersama:
+   *      `evidence_dedup.event_id` (database agregat) dan `learner_evidence.event_id`
+   *      (database inti) akan cocok baris-per-baris.
+   *
+   * Mengembalikan null (bukan melempar) untuk masukan yang tidak sah — jalur
+   * belajar tidak pernah membaca nilai kembali fungsi ini.
+   */
+  function toIdentityEvent(event, newEventId) {
+    var e = event && typeof event === 'object' ? event : null;
+    if (!e || !e.payload || typeof e.payload !== 'object') return null;
+    if (e.type !== 'learner_evidence' && e.type !== 'braincore_decision') return null;
+    if (!validId(newEventId)) return null;
+    // eventId lane agregat dan lane per-murid TIDAK BOLEH sama, walau pemanggil
+    // salah dan mengoper id yang itu-itu juga.
+    if (String(newEventId) === String(e.eventId)) return null;
+    var payload = {};
+    for (var k in e.payload) {
+      if (Object.prototype.hasOwnProperty.call(e.payload, k)) payload[k] = e.payload[k];
+    }
+    return { eventId: String(newEventId), type: e.type, payload: payload };
+  }
+
   return Object.freeze({
     SCHEMA: SCHEMA,
     COHORT_EPOCH_DAYS: COHORT_EPOCH_DAYS,
     ENUMS: ENUMS,
+    IDENTITY_SCHEMA: IDENTITY_SCHEMA,
     cohortState: cohortState,
+    toIdentityEvent: toIdentityEvent,
     bucketMastery: bucketMastery,
     bucketTrend: bucketTrend,
     bucketMisconception: bucketMisconception,

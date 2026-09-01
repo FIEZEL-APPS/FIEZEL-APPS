@@ -68,6 +68,13 @@ FEATURE_COACH     = "off"
 # Menyalakannya butuh TIGA sakelar AND: var ini "on" + KV cfg:flags
 # enabled.social=true + flags.cfSocialEnabled=true. Fail-closed bila KV tak terbaca.
 FEATURE_SOCIAL    = "on"
+# SLOT 9 lane bukti belajar PER-MURID (evidence/route-learner-evidence.js): LAHIR MATI.
+# Ini satu-satunya lane FIEZEL yang menyimpan bukti belajar terikat `identity.sub`, jadi
+# "lahir mati" di sini bukan formalitas rilis melainkan pagar privasi: menyalakannya butuh
+# TIGA sakelar AND (var ini "on" + KV cfg:flags enabled.learnerEvidence=true +
+# flags.cfLearnerEvidenceEnabled=true) DAN persetujuan per-murid di
+# `learner_evidence_consent`. Tanpa persetujuan itu, lane yang menyala pun menulis NOL baris.
+FEATURE_LEARNER_EVIDENCE = "off"
 # Angka limit hanya untuk NASKAH UX (bab 12); penegakan tetap di server.
 #
 # 🔄 TEMUAN LAPANGAN 28 Agu 2026 — DUA ANGKA UNTUK HAL YANG SAMA, SUDAH DISELARASKAN.
