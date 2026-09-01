@@ -146,8 +146,22 @@
     confusionMap: 'shadow',
     olmInsight: 'shadow',
     listeningPolicy: 'shadow',
-    stepTutor: 'off',
-    productionGrader: 'off',
+    /* m025-225: KOREKSI. Keduanya dulu ditulis 'off' dengan alasan "nol pemanggil di
+       app.js", dan alasan itu SUDAH TIDAK BENAR — wiring-nya mendarat belakangan tanpa
+       manifest ikut diperbarui, dan gerbangnya tidak bisa menangkapnya karena hanya
+       memeriksa satu arah (nol referensi => wajib off). Sekarang dua arah.
+         stepTutor       : stepTutorGuidance -> stepTutorGuidanceMarkup dirender di
+                           app.js:7964 saat `retry && answer.scaffold==='worked'` — murid
+                           MEMBACA tuntunan langkahnya sebelum menjawab lagi.
+         productionGrader: grade() dipanggil app.js:8169 di jalur cloze produksi; ia yang
+                           memutus BENAR/SALAH atas jawaban ketikan murid dan memilih
+                           umpan baliknya.
+       Keduanya memenuhi definisi 'active' di atas: keluarannya benar-benar mengubah
+       pengalaman murid. Manifest yang menyebut mesin penilai sebagai 'off' bukan sekadar
+       label meleset — ia membuat panel diagnostik dan pembaca laporan menyimpulkan bahwa
+       jawaban murid dinilai mesin lama. */
+    stepTutor: 'active',
+    productionGrader: 'active',
     // Wave E4 (29 Agu): probe retensi tertunda — modul murni baru, belum ada pemanggil
     // di app.js; rekomendasi half-life-nya ADVISORY dan tidak menulis memori: 'off'.
     retentionProbe: 'off',
