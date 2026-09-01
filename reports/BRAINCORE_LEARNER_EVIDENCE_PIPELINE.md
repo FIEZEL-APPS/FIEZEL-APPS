@@ -202,6 +202,17 @@ isolasi terhadap pipeline lama, dan paritas enum klien↔server. Ditambah
 keempat dan arah larangan tabelnya, serta `owner-dashboard-test.js` /
 `owner-edge-guard-test.js` yang tetap hijau tanpa dilonggarkan.
 
+Seluruh 233 gerbang di `quality.yml` dijalankan pada branch ini. Dua merah, dan
+keduanya sudah dibuktikan BUKAN akibat perubahan ini:
+
+- `release-audit-gate-test.js` — merah juga pada checkout bersih tanpa perubahan
+  ini (diverifikasi dengan `git stash`).
+- `id-golden-snapshot-test.js` — merah hanya kalau seluruh suite dijalankan
+  berurutan di satu working tree: gerbang konten lain menulis ulang
+  `grammar-templates.json` (`indonesianCoverage.updatedAt`) sebagai efek samping,
+  dan snapshot golden mengunci hash berkas itu. Hijau kembali begitu berkasnya
+  dipulihkan; CI menjalankan tiap job di checkout baru sehingga tidak terkena.
+
 ---
 
 ## 9. Apa yang masih belum tersedia
@@ -213,10 +224,12 @@ keempat dan arah larangan tabelnya, serta `owner-dashboard-test.js` /
 2. **Klien belum pernah mengirim satu batch pun.** `CONFIG.evidence.mode` masih `off`
    dan `endpoint` masih kosong; urutan menyalakannya: migrasi → `EVIDENCE_ENABLED=on` →
    `mode:'local'` (verifikasi skema di perangkat nyata) → `mode:'on'`.
-3. **Purge TTL belum terjadwal.** `purgeEvidence()` ada dan diuji, tetapi belum
-   dipasang ke cron `route-wiring.js`. Sampai itu dipasang, cohort tidak akan pernah
-   kedaluwarsa di produksi — dan cohort yang tidak pernah dipurge adalah identitas
-   dengan nama lain. **Ini blocker rilis, bukan pekerjaan lanjutan.**
+3. **Hasil purge belum terlihat di observabilitas cron.** `purgeEvidence()` SUDAH
+   dipasang ke jalur cron harian (`runScheduled` → `runEvidencePurge`), tetapi SENGAJA
+   belum dibungkus `withCronRun`: daftar job cron adalah enum tertutup yang dikunci
+   `cron-contract-test.js` sampai ke jumlah baris per putaran, dan menambah job ketiga
+   adalah perubahan kontrak tersendiri. Akibatnya purge yang GAGAL tidak akan muncul di
+   `/api/owner/cron-status` — lubang yang diketahui, bukan yang tersembunyi.
 4. **Consent belum ada.** Belum ada pintu di UI tempat murid/wali menyetujui pengiriman
    bukti, dan belum ada tombol opt-out yang memanggil `queue.purge()`.
 5. **Hanya grammar-adjacent.** Famili skill mengikuti taksonomi grammar; bukti dari
