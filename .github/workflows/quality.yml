@@ -746,6 +746,14 @@ jobs:
           node speaking-adaptive-test.js
           node srl-coach-test.js
           node cors-envelope-test.js
+      - name: 'Braincore v3: jalur save() diukur (regresi performa D4)'
+        # Perbaikan D4 (#1 formatter Intl per baris, #2 tiga save() per jawaban) sampai kini
+        # hanya dijaga tiga blok komentar. Regresi performa adalah regresi paling sunyi:
+        # tidak ada yang merah, aplikasinya cuma pelan — dan pelan di HP murid berarti sesi
+        # yang ditinggalkan. Gerbang ini menjalankan app.js di vm dengan Intl.DateTimeFormat
+        # dan localStorage.setItem yang DIHITUNG, jadi kode boleh ditulis ulang sesuka hati
+        # selama angkanya tetap. Terbukti bisa merah: bentuk pra-perbaikan = 3.006 konstruksi.
+        run: node save-path-perf-test.js
       - name: 'Braincore v3: kemurnian modul brain (lint kustom)'
         # Definition of Done Braincore v3: NOL Math.random / Date.now / DOM / storage /
         # jaringan di features/brain/**. Sampai gerbang ini ada, kemurnian itu hanya
