@@ -696,7 +696,168 @@ function sanitizeEvidenceSummary(raw) {
   };
 }
 
-async function readModel(env, period, nowMs) {
+/* ==========================================================================================
+ * MURID PER ORANG — subrequest ke Worker api, POLA YANG SAMA dengan readEvidence di atas
+ * ==========================================================================================
+ * Yang berubah dibanding panel agregat: data yang dibaca di sini BERIDENTITAS. Justru karena
+ * itu jalannya TIDAK boleh berubah menjadi "tambahkan binding CORE_DB di sini". Binding itu
+ * dilarang butir (g-g) `owner-edge-guard-test.js`, dan larangan itu BENAR: `fiezel-core`
+ * memegang `identity`, `session`, dan `quota_daily`. Menariknya ke isolate dashboard akan
+ * menaruh seluruh tabel identitas di Worker yang merender HTML, demi dua daftar.
+ *
+ * Maka jalurnya sama seperti bukti agregat: `GET /api/owner/learners` dan
+ * `GET /api/owner/learner-evidence?sub=…` di Worker `fiezel-api`, keduanya owner-gated di
+ * SANA dengan token yang sama (`EVIDENCE_API_TOKEN` = token yang di-hash di
+ * `OWNER_TOKEN_HASH`). Nol Secret baru, nol binding baru, nol dashboard kedua — hanya dua
+ * bacaan tambahan pada dashboard yang sudah ada.
+ */
+async function ownerApiFetch(env, pathAndQuery, fetchImpl) {
+  const base = env && typeof env.EVIDENCE_API_BASE === 'string' ? env.EVIDENCE_API_BASE.trim().replace(/\/+$/, '') : '';
+  const rawKey = env ? env.EVIDENCE_API_TOKEN : null;
+  const apiKey = typeof rawKey === 'string' ? rawKey.trim() : '';
+  if (!base || !apiKey) return { state: 'unconfigured', body: null };
+  if (!/^https:\/\//.test(base)) return { state: 'unconfigured', body: null };
+  const doFetch = typeof fetchImpl === 'function' ? fetchImpl : (typeof fetch === 'function' ? fetch : null);
+  if (!doFetch) return { state: 'unavailable', body: null };
+  try {
+    const res = await doFetch(base + pathAndQuery, {
+      method: 'GET',
+      headers: { 'x-fiezel-owner-token': apiKey, 'cache-control': 'no-store' },
+    });
+    if (!res || !res.ok) return { state: 'unavailable', body: null, status: (res && res.status) || 0 };
+    return { state: 'ok', body: await res.json() };
+  } catch {
+    return { state: 'unavailable', body: null };
+  }
+}
+
+/** `sub` yang sah = UUID. Dipakai DUA arah: sebelum dikirim ke API, dan sebelum dirender. */
+const SUB_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+
+/** Nama tampilan: karakter kendali dibuang, spasi dirapikan, panjang dipotong. `esc()` tetap
+ *  yang menangani HTML — ini lapis kedua supaya satu baris tabel tidak bisa dirusak. */
+function safeName(value, max) {
+  if (typeof value !== 'string') return null;
+  const clean = value.replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim();
+  return clean ? clean.slice(0, max || 64) : null;
+}
+
+const ENUM_RE = /^[A-Za-z0-9_-]{1,40}$/;
+function safeEnum(value) {
+  return typeof value === 'string' && ENUM_RE.test(value) ? value : null;
+}
+function safeDay(value) {
+  return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : null;
+}
+function safeInt(value) {
+  return Number.isFinite(Number(value)) ? Math.max(0, Math.trunc(Number(value))) : 0;
+}
+
+/**
+ * Daftar putih baris direktori. Sabuk pengaman yang sama dengan `sanitizeEvidenceSummary`:
+ * rute sumber memang tidak mengembalikan apa pun di luar ini, tetapi dashboard tidak boleh
+ * bergantung pada janji Worker lain.
+ */
+function sanitizeLearnerRow(raw) {
+  if (!raw || typeof raw !== 'object') return null;
+  const sub = typeof raw.sub === 'string' && SUB_RE.test(raw.sub) ? raw.sub : null;
+  if (!sub) return null;
+  return {
+    sub,
+    displayName: safeName(raw.displayName, 64),
+    handle: safeName(raw.handle, 64),
+    firstDay: safeDay(raw.firstDay),
+    lastDay: safeDay(raw.lastDay),
+    evidenceCount: safeInt(raw.evidenceCount),
+    decisionCount: safeInt(raw.decisionCount),
+    lastLevel: safeEnum(raw.lastLevel),
+    lastMastery: safeEnum(raw.lastMastery),
+    lastTrend: safeEnum(raw.lastTrend),
+    lastOutcome: safeEnum(raw.lastOutcome),
+  };
+}
+
+async function readLearners(env, period, fetchImpl) {
+  const days = EVIDENCE_PERIOD_DAYS[period] || 7;
+  const res = await ownerApiFetch(env, '/api/owner/learners?days=' + days, fetchImpl);
+  if (res.state !== 'ok') return { state: res.state, status: res.status, learners: null };
+  const body = res.body;
+  if (!body || body.migrated === false || !Array.isArray(body.learners)) {
+    return { state: 'not-migrated', learners: null };
+  }
+  return {
+    state: 'measured',
+    range: body.range || null,
+    learners: body.learners.map(sanitizeLearnerRow).filter(Boolean),
+  };
+}
+
+/** Distribusi {nilai: n} -> hanya kunci berbentuk enum. Sama dengan `dist` panel agregat. */
+function safeDist(v) {
+  const out = {};
+  if (!v || typeof v !== 'object') return out;
+  for (const [k, n] of Object.entries(v)) if (safeEnum(k)) out[k] = safeInt(n);
+  return out;
+}
+
+function sanitizeLearnerSummary(raw) {
+  if (!raw || typeof raw !== 'object') return null;
+  return {
+    measured: raw.measured === true,
+    evidenceCount: safeInt(raw.evidenceCount),
+    decisionCount: safeInt(raw.decisionCount),
+    activeDays: safeInt(raw.activeDays),
+    firstDay: safeDay(raw.firstDay),
+    lastDay: safeDay(raw.lastDay),
+    level: safeDist(raw.level),
+    mastery: safeDist(raw.mastery),
+    masteryTrend: safeDist(raw.masteryTrend),
+    misconception: safeDist(raw.misconception),
+    misconceptionSkill: safeDist(raw.misconceptionSkill),
+    difficultyCalibration: safeDist(raw.difficultyCalibration),
+    calibrationError: safeDist(raw.calibrationError),
+    improvementTrend: safeDist(raw.improvementTrend),
+    decision: safeDist(raw.decision),
+    outcome: safeDist(raw.outcome),
+    recommendation: safeDist(raw.recommendation),
+    masteryDelta: safeDist(raw.masteryDelta),
+    masteryFirst: safeEnum(raw.masteryFirst),
+    masteryLast: safeEnum(raw.masteryLast),
+    // null yang DIPERTAHANKAN: "belum ada pengukuran kalibrasi" tidak boleh menjadi 0%.
+    calibratedShare: Number.isFinite(Number(raw.calibratedShare))
+      ? Math.max(0, Math.min(100, Math.trunc(Number(raw.calibratedShare))))
+      : null,
+    recentDecisions: (Array.isArray(raw.recentDecisions) ? raw.recentDecisions : []).slice(0, 30).map((d) => ({
+      day: safeDay(d && d.day),
+      level: safeEnum(d && d.level),
+      decision: safeEnum(d && d.decision),
+      outcome: safeEnum(d && d.outcome),
+      recommendation: safeEnum(d && d.recommendation),
+      masteryDelta: safeEnum(d && d.masteryDelta),
+      adherence: safeEnum(d && d.adherence),
+    })).filter((d) => d.day),
+    days: (Array.isArray(raw.days) ? raw.days : []).slice(0, 180).map((d) => ({
+      day: safeDay(d && d.day), evidence: safeInt(d && d.evidence), decisions: safeInt(d && d.decisions),
+    })).filter((d) => d.day),
+  };
+}
+
+async function readLearnerDetail(env, period, sub, fetchImpl) {
+  if (!SUB_RE.test(String(sub || ''))) return null;
+  const days = EVIDENCE_PERIOD_DAYS[period] || 7;
+  const res = await ownerApiFetch(env, '/api/owner/learner-evidence?sub=' + encodeURIComponent(sub) + '&days=' + days, fetchImpl);
+  if (res.state !== 'ok') return { state: res.state, status: res.status, learner: null, summary: null };
+  const body = res.body;
+  if (!body || body.migrated === false) return { state: 'not-migrated', learner: null, summary: null };
+  return {
+    state: 'measured',
+    range: body.range || null,
+    learner: sanitizeLearnerRow(Object.assign({ sub }, body.learner || {})),
+    summary: sanitizeLearnerSummary(body.summary),
+  };
+}
+
+async function readModel(env, period, nowMs, learnerSub) {
   const db = env && env.ANALYTICS;
   // Kegagalan baca dicatat per-query dan TIDAK diubah menjadi nol. "Tidak tahu" adalah jawaban
   // yang sah; "nol" adalah klaim, dan klaim itu butuh pengukuran.
@@ -880,6 +1041,11 @@ async function readModel(env, period, nowMs) {
     // Bukti belajar Braincore: satu subrequest, tidak pernah melempar, tidak pernah
     // menjatuhkan panel lain (lihat readEvidence).
     evidence: await readEvidence(env, period),
+    // Murid per orang. Dua subrequest, keduanya fail-soft persis seperti `evidence`:
+    // kegagalan baca dicetak sebagai "tidak tersedia", TIDAK PERNAH sebagai "nol murid".
+    learners: await readLearners(env, period),
+    learnerSub: SUB_RE.test(String(learnerSub || '')) ? String(learnerSub) : null,
+    learnerDetail: SUB_RE.test(String(learnerSub || '')) ? await readLearnerDetail(env, period, learnerSub) : null,
     // Batas pengukuran ikut ke model — jadi HTML dan JSON menceritakan batas yang SAMA.
     unmeasurable: UNMEASURABLE,
     generatedAtIso: new Date(Number(nowMs)).toISOString(),
@@ -920,6 +1086,8 @@ section h2{margin:0 0 10px;font-size:13px;text-transform:uppercase;letter-spacin
 table{width:100%;border-collapse:collapse;font-size:14px}
 th,td{text-align:right;padding:5px 4px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
 th:first-child,td:first-child{text-align:left}
+tr.sel td{background:#FFF3CE}
+h4{margin:12px 0 4px;font-size:13px;letter-spacing:.02em;text-transform:uppercase;color:var(--muted)}
 svg{display:block;width:100%;height:52px;margin:6px 0 2px}
 footer{padding:0 16px 34px;color:var(--muted);font-size:12px}
 form{padding:16px;max-width:420px}
@@ -1134,6 +1302,141 @@ function renderEvidenceSection(m) {
   </section>`;
 }
 
+/**
+ * Panel MURID PER ORANG, di dalam dashboard yang SUDAH ADA — bukan halaman kedua, bukan
+ * Worker kedua, bukan rute baru. Pemilihan murid adalah TAUTAN biasa (`/?learner=<sub>`),
+ * konsisten dengan pemilihan periode di halaman ini: nol JavaScript, nol kerangka kerja.
+ *
+ * KEJUJURAN YANG DIPERTAHANKAN DARI PANEL AGREGAT:
+ *   - "belum dikonfigurasi" != "nol murid" != "gagal membaca". Tiga keadaan, tiga kalimat.
+ *   - distribusi kosong dicetak "belum ada pengukuran", bukan "0".
+ *
+ * KEJUJURAN YANG BARU, DAN KHUSUS PANEL INI:
+ *   - Murid TANPA profil sosial muncul TANPA nama, bukan disembunyikan. Nama tampilan
+ *     satu-satunya yang otoritatif di server adalah `social_profile.display_name/handle`;
+ *     nama yang diketik murid saat perkenalan hidup di localStorage perangkat dan TIDAK
+ *     pernah sampai ke server. Menyembunyikan yang tak bernama akan membuat owner mengira
+ *     murid itu tidak ada; menampilkan `sub`-nya jujur dan tetap bisa dibuka.
+ */
+function learnerLabel(row) {
+  if (!row) return 'murid tanpa nama';
+  if (row.displayName) return row.displayName;
+  if (row.handle) return '@' + row.handle;
+  // Delapan hex pertama `sub`. Cukup untuk membedakan baris di layar, dan memang bukan nama.
+  return 'murid ' + String(row.sub || '').slice(0, 8);
+}
+
+function renderLearnerDirectory(m) {
+  const d = m.learners || { state: 'unconfigured', learners: null };
+  if (d.state === 'unconfigured') {
+    return `<div class="note">BELUM DIKONFIGURASI. Secret <code>EVIDENCE_API_BASE</code> dan
+      <code>EVIDENCE_API_TOKEN</code> belum dipasang, jadi daftar murid tidak pernah dipanggil.
+      Ini BUKAN "nol murid".</div>`;
+  }
+  if (d.state === 'unavailable') {
+    return `<div class="warn">${esc(UNAVAILABLE_TEXT.toUpperCase())}. Subrequest ke
+      <code>/api/owner/learners</code> gagal${d.status ? ` (status ${esc(d.status)})` : ''}.
+      Kegagalan baca TIDAK PERNAH dirender sebagai daftar kosong.</div>`;
+  }
+  if (d.state === 'not-migrated' || !d.learners) {
+    return `<div class="note">PENGUKURAN BELUM TERSEDIA. Migrasi
+      <code>0009_learner_evidence.sql</code> belum diterapkan di <code>fiezel-core</code>, atau
+      lane bukti per-murid belum dinyalakan. Ini BUKAN "nol murid".</div>`;
+  }
+  if (!d.learners.length) {
+    return `<div class="note">BELUM ADA MURID yang mengirim bukti per-murid pada periode ini.
+      Lane ini menuntut PERSETUJUAN tiap murid (Pengaturan &rsaquo; Bukti belajar per murid);
+      daftar kosong berarti belum ada yang menyetujuinya, bukan belum ada yang belajar.</div>`;
+  }
+  const rows = d.learners.map((x) => {
+    const selected = m.learnerSub === x.sub;
+    const href = `/?period=${esc(m.period)}&amp;learner=${esc(x.sub)}`;
+    return `<tr${selected ? ' class="sel"' : ''}>
+      <td><a href="${href}">${esc(learnerLabel(x))}</a></td>
+      <td>${esc(x.lastDay || '—')}</td>
+      <td>${esc(fmtInt(x.evidenceCount))}</td>
+      <td>${esc(fmtInt(x.decisionCount))}</td>
+      <td>${esc(x.lastLevel || '—')}</td>
+      <td>${esc(x.lastMastery || '—')}</td>
+      <td>${esc(x.lastTrend || '—')}</td>
+    </tr>`;
+  }).join('');
+  return `<table><tr><th>murid</th><th>aktivitas terakhir</th><th>bukti</th><th>keputusan</th>
+    <th>level</th><th>mastery</th><th>tren</th></tr>${rows}</table>
+    <div class="note">Nama diambil dari profil sosial murid (<code>social_profile</code>) lewat
+      <code>sub</code>. Murid yang belum membuat profil muncul sebagai "murid &lt;8 hex sub&gt;" —
+      itu identitas internalnya, bukan nama yang pernah ia ketik.</div>`;
+}
+
+function renderLearnerDetail(m) {
+  if (!m.learnerSub) {
+    return `<div class="note">Pilih satu murid di daftar untuk membuka bukti Braincore-nya.</div>`;
+  }
+  const d = m.learnerDetail;
+  if (!d || d.state === 'unconfigured') {
+    return `<div class="note">BELUM DIKONFIGURASI — lihat catatan di daftar murid.</div>`;
+  }
+  if (d.state === 'unavailable') {
+    return `<div class="warn">${esc(UNAVAILABLE_TEXT.toUpperCase())}. Subrequest ke
+      <code>/api/owner/learner-evidence</code> gagal${d.status ? ` (status ${esc(d.status)})` : ''}.</div>`;
+  }
+  if (d.state === 'not-migrated' || !d.summary) {
+    return `<div class="note">PENGUKURAN BELUM TERSEDIA untuk murid ini.</div>`;
+  }
+  const name = esc(learnerLabel(d.learner));
+  const s2 = d.summary;
+  if (!s2.measured) {
+    return `<h3>${name}</h3><div class="note">BELUM ADA PENGUKURAN pada periode ini untuk murid
+      ini. Ia mungkin aktif di periode lain — coba rentang yang lebih panjang.</div>`;
+  }
+  const decisionRows = (s2.recentDecisions || []).map((x) =>
+    `<tr><td>${esc(x.day)}</td><td>${esc(x.decision || '—')}</td><td>${esc(x.level || '—')}</td>
+      <td>${esc(x.outcome || '—')}</td><td>${esc(x.recommendation || '—')}</td>
+      <td>${esc(x.masteryDelta || '—')}</td><td>${esc(x.adherence || '—')}</td></tr>`
+  ).join('');
+  // "68% -> 78%" tidak bisa dicetak dan TIDAK dikarang: yang meninggalkan perangkat adalah
+  // BUCKET (m60-80), bukan persen. Yang jujur adalah bucket pertama -> bucket terakhir.
+  const masteryMove = s2.masteryFirst && s2.masteryLast
+    ? `${esc(s2.masteryFirst)} &rarr; ${esc(s2.masteryLast)}`
+    : NO_DATA_TEXT;
+  return `<h3>${name}</h3>
+    <div class="big">${esc(fmtInt(s2.decisionCount))}</div>
+    ${row('Keputusan Braincore (periode)', fmtInt(s2.decisionCount))}
+    ${row('Bukti belajar (periode)', fmtInt(s2.evidenceCount))}
+    ${row('Hari aktif (periode)', fmtInt(s2.activeDays))}
+    ${row('Rentang terukur', s2.firstDay && s2.lastDay ? s2.firstDay + ' – ' + s2.lastDay : NO_DATA_TEXT)}
+    ${row('Perpindahan mastery', masteryMove, 'bucket pertama → bucket terakhir pada periode ini')}
+    ${row('Kalibrasi kesulitan', s2.calibratedShare === null ? NO_DATA_TEXT : s2.calibratedShare + '%', 'bagian bukti yang menilai kesulitan "calibrated"')}
+    ${row('Miskonsepsi (bucket terakhir)', Object.keys(s2.misconception).length ? Object.keys(s2.misconception).join(', ') : NO_DATA_TEXT)}
+    <h4>Tren mastery</h4>${evidenceDist(s2.masteryTrend, ['up', 'flat', 'down'])}
+    <h4>Sebaran mastery</h4>${evidenceDist(s2.mastery, ['m0-40', 'm40-60', 'm60-80', 'm80-100'])}
+    <h4>Famili skill miskonsepsi</h4>${evidenceDist(s2.misconceptionSkill)}
+    <h4>Kalibrasi kesulitan</h4>${evidenceDist(s2.difficultyCalibration, ['too_easy', 'calibrated', 'too_hard'])}
+    <h4>Alasan keputusan</h4>${evidenceDist(s2.decision)}
+    <h4>Hasil kebijakan</h4>${evidenceDist(s2.outcome, ['positive', 'mixed', 'negative', 'insufficient'])}
+    <h4>Rekomendasi</h4>${evidenceDist(s2.recommendation)}
+    <h4>Tren perbaikan belajar</h4>${evidenceDist(s2.improvementTrend, ['improving', 'steady', 'declining'])}
+    <h4>Keputusan Braincore terakhir</h4>
+    <table><tr><th>hari</th><th>keputusan</th><th>level</th><th>hasil</th><th>rekomendasi</th>
+      <th>Δ mastery</th><th>kepatuhan</th></tr>${decisionRows}</table>`;
+}
+
+/**
+ * Satu section, dua bagian: direktori + murid terpilih. Ditempel SETELAH panel agregat
+ * supaya urutan bacanya "populasi dulu, lalu orang" — dan supaya panel agregat tetap
+ * menjadi hal pertama yang dilihat owner, seperti sebelum perubahan ini.
+ */
+function renderLearnerSection(m) {
+  return `<section><h2>\u{1F9D1}\u{200D}\u{1F393} Murid per orang (Braincore)</h2>
+    ${renderLearnerDirectory(m)}
+    ${renderLearnerDetail(m)}
+    <div class="note">Panel ini memuat data BERIDENTITAS, atas persetujuan tiap murid, dan
+      terpisah dari panel agregat di atas (yang tetap anonim dan tetap memakai cohort acak
+      14 hari). Retensi bukti per-murid <b>180 hari</b>; murid yang mencabut persetujuannya
+      menghapus buktinya, dan barisnya hilang dari daftar ini.</div>
+  </section>`;
+}
+
 function renderDashboard(m) {
   const t = m.totals || {}, l = m.latest || {}, c = m.cost || {}, a = (c.assumptions || {});
   const periodLabel = { today: 'Hari ini', '7d': '7 hari', '30d': '30 hari', '90d': '90 hari' }[m.period] || m.period;
@@ -1333,6 +1636,7 @@ ${emptyBanner}${staleBanner}
   </section>
 
   ${renderEvidenceSection(m)}
+  ${renderLearnerSection(m)}
 
 </main>
 <footer>Sumber: TIGA tabel agregat saja — metrik harian (bentuk panjang: hari × nama metrik × nilai), dimensi pemakaian berenum tertutup, dan retensi kohor. Tabel token perangkat dan bahan rahasia rotasi ADA di database yang sama tetapi TIDAK PERNAH dibaca halaman ini. Dashboard ini tidak punya jalan untuk membaca baris per-orang, dan tidak menampilkan identitas, surel, isi jawaban, maupun percakapan AI.
@@ -1853,7 +2157,11 @@ async function handle(request, env, ctx, nowMs) {
   const refreshed = sessionCookieHeader(await issueSession(env, now), Math.floor(SESSION_TTL_MS / 1000));
 
   if (path === '/') {
-    const model = await readModel(env, period, now);
+    // Murid terpilih adalah PARAMETER KUERI pada rute yang sudah ada, bukan rute baru.
+    // Konsekuensinya disengaja: OWNER_ROUTES tidak berubah, allowlist proxy
+    // `deploy/edge/owner-index.php` tidak berubah, dan tidak ada satu pun permukaan owner
+    // baru yang harus dipagari ulang. Validasi bentuk `sub` terjadi di readModel.
+    const model = await readModel(env, period, now, url.searchParams.get('learner'));
     return html(renderDashboard(model), 200, { 'set-cookie': refreshed });
   }
   if (path === '/api/summary') {
@@ -1941,6 +2249,8 @@ export {
   // Panel bukti Braincore: diekspor supaya gerbang bisa mengadu render + sanitasi TANPA
   // menjalankan Worker (dan tanpa jaringan — `readEvidence` menerima fetch yang di-inject).
   readEvidence, sanitizeEvidenceSummary, renderEvidenceSection, EVIDENCE_PERIOD_DAYS,
+  readLearners, readLearnerDetail, sanitizeLearnerRow, sanitizeLearnerSummary,
+  renderLearnerSection, renderLearnerDirectory, renderLearnerDetail, learnerLabel, SUB_RE,
   // Rem penebakan halaman masuk: diekspor supaya gerbang bisa memodelkan ISOLATE BARU per
   // permintaan (cacat yang tidak pernah diuji) dan mengassert angka jendelanya sebagai kontrak.
   LOGIN_MAX, LOGIN_MAX_SHARED, LOGIN_BUCKET_MS, LOGIN_WINDOW_BUCKETS, LOGIN_WINDOW_MS,

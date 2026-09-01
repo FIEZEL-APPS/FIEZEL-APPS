@@ -60,6 +60,9 @@ lewat `EXPLAIN QUERY PLAN` — bukti per kueri ada di
 | `usage_daily` | `fiezel-stats` | permanen (opsional 400 hari) | `purgeUsageOlderThan()` bila dipakai | tidak dipanggil |
 | `retention_daily` | `fiezel-stats` | permanen | `purgeRetentionOlderThan()` bila dipakai | tidak dipanggil |
 | `identity` (barisnya) | `fiezel-core` | **TIDAK PERNAH dihapus** | — | lihat catatan 6 |
+| `learner_evidence` | `fiezel-core` | **180 hari** (`day < hari_ini − 180`) | `runLearnerEvidencePurge()` — cron `5 17 * * *` | **YA** (lihat §2.7) |
+| `learner_evidence_state` | `fiezel-core` | **180 hari** (`last_day < hari_ini − 180`) | `runLearnerEvidencePurge()` — cron `5 17 * * *` | **YA** (lihat §2.7) |
+| `learner_evidence_consent` | `fiezel-core` | selama akun ada; dicabut = baris bukti DIHAPUS seketika | `revokeConsent()` di jalur permintaan | **YA** |
 
 **Tidak ada trigger cron baru yang dibutuhkan.** Kedua ekspresi cron di
 `workers/api/wrangler.toml` sudah ada (`*/5 * * * *` dan `5 17 * * *`).
@@ -185,6 +188,63 @@ dari perangkat murid mana pun.
 `analytics-store-d1.js` sebagai alat kalau suatu hari `bucket` meledak (mis.
 enum bocor jadi teks bebas). Keduanya **tidak dipanggil** hari ini, dan itu
 keputusan, bukan kelupaan.
+
+### 2.7 `learner_evidence` / `learner_evidence_state` — 180 hari
+
+Lane bukti belajar **per-murid** (SLOT 9, `evidence/route-learner-evidence.js`)
+adalah satu-satunya tempat di FIEZEL yang menyimpan dimensi belajar terikat
+`identity.sub`. Karena itu retensinya adalah keputusan yang ditulis, bukan
+default yang lahir diam-diam:
+
+- **180 hari**, bukan 14 hari seperti lane agregat. Alasan 14 hari di lane
+  agregat adalah `cohort` yang tidak dipurge berubah menjadi identitas seumur
+  hidup dengan nama lain; di lane ini identitasnya memang sudah ada **atas
+  persetujuan murid**, jadi argumen itu tidak berlaku.
+- **180 hari, bukan selamanya.** Dua semester sekolah cukup untuk melihat
+  perkembangan satu tahun ajaran, dan tetap punya ujung. Angkanya hidup di
+  `LEARNER_EVIDENCE_LIMITS.RETENTION_DAYS`
+  (`workers/api/evidence/learner-evidence-core.js`); menaikkannya berarti
+  mengubah baris itu **dan** tabel di §1 **dan** bagian ini — bukan menambah
+  data diam-diam.
+
+Dua jalur penghapusan, dan keduanya harus ada:
+
+1. **Retensi berkala** — SUDAH TERPASANG: `runLearnerEvidencePurge()` di
+   `workers/api/route-wiring.js`, dijalankan `runScheduled()` pada trigger 00:05
+   WIB yang sudah ada, memakai binding `CORE_DB` langsung (aturan 0.1). Ia berdiri
+   di luar `withCronRun` rollup analytics: kegagalan purge tidak boleh menandai
+   rollup gagal, dan sebaliknya. Batas kejujuran yang sama dengan `runEvidencePurge`
+   berlaku — hasilnya hanya muncul di nilai balik `runScheduled`, jadi purge yang
+   gagal TIDAK terlihat di `/api/owner/cron-status`.
+2. **Pencabutan persetujuan** — `POST /api/braincore/learner-evidence/consent`
+   dengan `{"granted":false}` menjalankan `revokeConsent()`, yang **menghapus**
+   baris bukti murid itu, bukan sekadar menandainya. "Boleh berhenti
+   dikumpulkan tetapi yang lama tetap disimpan" bukan pencabutan.
+
+```sql
+-- Retensi 180 hari. Pola rowid+LIMIT yang sama dengan §2.1: D1 tidak mendukung
+-- `DELETE … LIMIT`, dan satu DELETE tak terbatas di tabel yang tumbuh adalah
+-- cara termudah melewati batas waktu pernyataan. Ulangi sampai changes = 0.
+DELETE FROM learner_evidence WHERE rowid IN (
+  SELECT rowid FROM learner_evidence WHERE day < :batas LIMIT 500);
+DELETE FROM learner_evidence_state WHERE rowid IN (
+  SELECT rowid FROM learner_evidence_state WHERE last_day < :batas LIMIT 500);
+```
+
+```sql
+-- "Hapus bukti belajar saya" (pencabutan persetujuan). Dijalankan otomatis oleh
+-- revokeConsent(); disalin di sini supaya bisa dijalankan tangan bila perlu.
+DELETE FROM learner_evidence WHERE rowid IN (
+  SELECT rowid FROM learner_evidence WHERE sub = :sub LIMIT 500);
+DELETE FROM learner_evidence_state WHERE rowid IN (
+  SELECT rowid FROM learner_evidence_state WHERE sub = :sub LIMIT 1);
+UPDATE learner_evidence_consent SET revoked_at = :now WHERE sub = :sub;
+```
+
+Baris `learner_evidence_consent` sengaja **tidak** ikut dihapus: catatan bahwa
+seseorang pernah memberi lalu mencabut izin adalah satu-satunya hal yang
+mencegah lane menulis lagi diam-diam, dan isinya hanyalah `sub` + dua stempel
+waktu + versi teks persetujuan — nol dimensi belajar.
 
 ---
 

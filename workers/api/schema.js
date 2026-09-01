@@ -73,7 +73,15 @@ export const BYTE_LIMITS = Object.freeze({
   // menegakkannya SEBELUM routing, dan DEFAULT_BYTE_LIMIT 4096 akan memotong
   // batch sah 20 event menjadi 413 yang tidak bisa dijelaskan ke klien.
   '/api/braincore/evidence': 8192,
-  '/api/owner/braincore-evidence': 512  // GET, tanpa body
+  '/api/owner/braincore-evidence': 512,  // GET, tanpa body
+  // --- SLOT 9: lane bukti belajar PER-MURID (evidence/route-learner-evidence.js).
+  // 8192 = LEARNER_EVIDENCE_LIMITS.MAX_BODY_BYTES, angka yang SAMA dengan lane
+  // agregat: dua lane yang memakai transport klien yang sama tidak boleh punya
+  // dua batas batch, karena klien membentuk batch SEBELUM tahu ke mana ia pergi.
+  '/api/braincore/learner-evidence': 8192,
+  '/api/braincore/learner-evidence/consent': 512,
+  '/api/owner/learners': 512,          // GET, tanpa body
+  '/api/owner/learner-evidence': 512   // GET, tanpa body
 });
 
 /** Cap terakhir untuk path yang tidak terdaftar: kecil, sengaja. */
@@ -133,7 +141,12 @@ export const CLIENT_FLAG_DEFAULTS = Object.freeze({
   cfQuotaEnabled: false,   // tampilkan/patuhi kuota server
   cfAnalyticsEnabled: false,
   cfIdentityEnabled: false, // terbitkan identitas cookie
-  cfSocialEnabled: false    // lapisan sosial (profil/teman/leaderboard) — SLOT 7
+  cfSocialEnabled: false,   // lapisan sosial (profil/teman/leaderboard) — SLOT 7
+  // SLOT 9. Lane bukti belajar PER-MURID (beridentitas, atas persetujuan murid).
+  // Default false seperti semua yang lain, dan di sini default itu bukan formalitas:
+  // lane ini menyimpan bukti yang terikat `identity.sub`, jadi ia lahir MATI dan
+  // hanya menyala kalau owner benar-benar menuliskannya di KV.
+  cfLearnerEvidenceEnabled: false
 });
 
 /** Kill switch tingkat server (bukan flag klien): mematikan jalur mahal. */
@@ -142,7 +155,8 @@ export const KILL_SWITCH_DEFAULTS = Object.freeze({
   tts: false,
   coach: false,
   analytics: false,
-  social: false
+  social: false,
+  learnerEvidence: false   // SLOT 9 — kill switch lane bukti per-murid
 });
 
 /* --------------------------------------------------------------------------

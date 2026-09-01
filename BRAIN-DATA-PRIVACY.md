@@ -136,6 +136,69 @@ dan wajib diperluas ke rute telemetri belajar:
 Satu-satunya jalur pengecualian adalah Lane B §6 — terpisah, ber-consent, ber-rotasi 90 hari,
 dan hari ini berstatus tidak-dibangun.
 
+## 7b. Lane bukti belajar PER-MURID (SLOT 9) — pengecualian yang DITULIS, bukan bocor
+
+§7 melarang identifier stabil di lane telemetri. Lane ini adalah **pengecualian yang
+diputuskan owner secara eksplisit**, dan ia dibangun sebagai lane keempat yang terpisah
+justru supaya §7 tetap berlaku utuh untuk tiga lane yang lain.
+
+**Apa yang disimpan** (`learner_evidence`, database `fiezel-core`, migrasi
+`0009_learner_evidence.sql`):
+
+| Kolom | Isi | Kenapa |
+|---|---|---|
+| `sub` | `identity.sub` — UUID yang diterbitkan SERVER (`mw-identity.js`) | kunci internal; bukan nama, bukan email, bukan uuid penyedia |
+| `event_id` | UUID v4 acak sekali pakai, KHUSUS lane ini | idempotensi retry |
+| `day` | `YYYY-MM-DD` | satu-satunya penanda tanggal |
+| `received_at` | epoch ms jam server | urutan kejadian dalam satu hari |
+| `event` | `learner_evidence` \| `braincore_decision` | enum tertutup |
+| `dims` | JSON berisi HANYA bucket berenum tertutup dari `EVIDENCE_EVENT_SPEC` | mastery, tren, miskonsepsi, kalibrasi, keputusan, hasil, rekomendasi |
+
+**Apa yang TIDAK disimpan, dan tidak bisa disimpan:** nama murid, email, nomor, sekolah,
+IP, user-agent, sidik perangkat, `installId`, uuid Puter, token/kredensial apa pun, jawaban
+murid, teks soal, riwayat, transkrip AI, isi localStorage, timestamp presisi selain
+`received_at`. Validator `learner-evidence-core.js` menolak field asing dengan **400
+`foreign_field`** — bukan mengabaikannya.
+
+**Nama murid untuk dashboard** dibaca dari `social_profile.display_name` / `.handle`
+(lane sosial, database yang sama, dibaca lewat `sub`). Ia **tidak disalin** ke lane ini:
+satu sumber nama, dan mencabut/mengganti profil sosial langsung terlihat di dashboard.
+Nama yang diketik murid saat perkenalan tinggal di `localStorage` perangkat dan **tidak
+pernah** sampai ke server — murid tanpa profil sosial muncul di dashboard tanpa nama, dan
+itu dicetak apa adanya alih-alih dikarang.
+
+**Persetujuan.** Lane ini menulis HANYA bila ada baris aktif di
+`learner_evidence_consent` untuk `sub` itu, dengan `policy` = versi teks persetujuan yang
+sedang berlaku (`learner-evidence-consent-v1`). Tanpa itu: **403 `consent_required`, nol
+baris**. Memasang aplikasi bukan persetujuan; sakelarnya ada di Pengaturan
+(`preferences.learnerEvidenceConsent`, bawaan `false`, fail-closed di dua tempat).
+Menaikkan versi `policy` membuat persetujuan lama berhenti berlaku.
+
+**Retensi 180 hari** (`LEARNER_EVIDENCE_LIMITS.RETENTION_DAYS`), bukan 14 hari seperti lane
+agregat dan bukan tak terbatas. Perintah purge dan alasannya di
+[docs/D1-RETENTION.md](docs/D1-RETENTION.md) §2.7.
+
+**Penghapusan.** Mencabut persetujuan (`POST /api/braincore/learner-evidence/consent`
+dengan `{"granted":false}`) **menghapus** baris bukti murid itu seketika (`revokeConsent`),
+bukan menandainya, dan barisnya hilang dari direktori owner.
+
+**Siapa yang bisa membaca.** Hanya Owner Dashboard yang sudah ada, lewat dua rute
+owner-gated di Worker `fiezel-api` (`GET /api/owner/learners`,
+`GET /api/owner/learner-evidence?sub=…`) yang menuntut token owner ber-hash
+(`OWNER_TOKEN_HASH`, banding waktu-konstan, fail-closed). Cookie murid yang sah **tidak
+pernah** cukup: murid yang meminta rute owner dijawab 403, dengan atau tanpa `?sub=` orang
+lain.
+
+**Lane agregat tidak berubah.** `evidence_daily`, `evidence_dedup`, dan
+`evidence_learner_day` tetap di database `fiezel-evidence`, tetap anonim, tetap ber-TTL 14
+hari. Dua lane itu **tidak punya satu kunci pun yang sama**: klien membuang `cohort` dan
+menerbitkan `eventId` BARU untuk lane per-murid (`toIdentityEvent`), sehingga
+`evidence_dedup.event_id` tidak akan pernah cocok dengan `learner_evidence.event_id`.
+Tanpa aturan itu, satu SELECT akan memetakan cohort anonim ke akun — dan §7 batal untuk
+seluruh populasi, bukan hanya untuk yang menyetujui.
+
+Gerbang: `braincore-learner-identity-test.js`.
+
 ## 8. Batas kejujuran dokumen ini
 
 Dokumen ini menjelaskan kontrak untuk sistem yang **belum menyala**: `ANALYTICS_ENABLED = "off"`

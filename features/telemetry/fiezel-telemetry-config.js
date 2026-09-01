@@ -50,6 +50,33 @@
       // tidak menambah informasi (bucketnya kasar) tapi menambah permukaan
       // korelasi hari-ke-hari untuk cohort yang sama.
       minIntervalMs: 86400000
+    }),
+    /* Lane KEEMPAT: bukti belajar PER-MURID (`fiezel-braincore-learner-evidence-v1`).
+     *
+     * SAKELARNYA SENDIRI LAGI, dan kali ini jaraknya dari lane di atas paling
+     * jauh: lane `evidence` membawa pengenal ACAK yang dipurge 14 hari; lane ini
+     * membawa identitas AKUN yang diturunkan SERVER dari cookie fz_id dan
+     * disimpan 180 hari. Menyalakan satu tidak boleh pernah menyalakan yang lain.
+     *
+     * TIGA SYARAT, bukan satu:
+     *   1. `mode: 'on'` di sini (rilis);
+     *   2. gerbang server (FEATURE_LEARNER_EVIDENCE + KV cfg:flags, fail-closed);
+     *   3. PERSETUJUAN murid di Pengaturan (preferences.learnerEvidenceConsent),
+     *      yang dikirim ke `consentEndpoint` dan disimpan server per-`sub`.
+     * Tanpa (3), lane yang menyala pun menulis NOL baris — dan klien tidak
+     * mengantre apa pun sejak awal.
+     *
+     * Default 'off' + endpoint terisi: endpoint boleh diketahui klien sebelum
+     * lane dinyalakan, karena tanpa mode 'on' tidak ada yang pernah memanggilnya. */
+    identityEvidence: Object.freeze({
+      schema: 'fiezel-braincore-learner-evidence-v1',
+      mode: 'off',
+      endpoint: 'https://api.fiezel.my.id/api/braincore/learner-evidence',
+      consentEndpoint: 'https://api.fiezel.my.id/api/braincore/learner-evidence/consent',
+      anonEndpoint: 'https://api.fiezel.my.id/api/auth/anon',
+      // Sama dengan lane agregat: sekali sehari sudah memuat seluruh informasi
+      // yang bucket sekasar ini bisa bawa.
+      minIntervalMs: 86400000
     })
   });
   return Object.freeze({ CONFIG: CONFIG, SCHEMA: CONFIG.schema });
