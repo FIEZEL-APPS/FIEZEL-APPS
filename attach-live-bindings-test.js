@@ -104,10 +104,19 @@ async function main() {
     check('D · nol kandidat CFG -> melempar (bukan menulis toml rusak)', threw instanceof AttachError, threw);
   }
   {
-    const kvDobel = [{ title: 'fiezel-api-CFG', id: 'a' }, { title: 'fiezel-staging-CFG', id: 'b' }];
+    // Dua kandidat yang SAMA-SAMA bukan staging -> tetap ambigu, tetap melempar.
+    const kvDobel = [{ title: 'fiezel-api-CFG', id: 'a' }, { title: 'fiezel-web-CFG', id: 'b' }];
     let threw = null;
     try { computeAttachedToml(TOML, d1Full, kvDobel); } catch (e) { threw = e; }
-    check('D · dua kandidat CFG -> melempar (tidak menebak salah satu)', threw instanceof AttachError, threw);
+    check('D · dua kandidat produksi CFG -> melempar (tidak menebak salah satu)', threw instanceof AttachError, threw);
+  }
+  {
+    // Skenario nyata yang dialami Owner: `fiezel-CFG` + `fiezel-CFG-staging` di akun
+    // yang sama. Staging disingkirkan otomatis, hanya produksi yang tersisa -> sukses.
+    const kvStagingBerdampingan = [{ title: 'fiezel-CFG', id: 'cfg-prod-9999' }, { title: 'fiezel-CFG-staging', id: 'cfg-STAGING-8888' }];
+    const { toml } = computeAttachedToml(TOML, d1Full, kvStagingBerdampingan);
+    check('D2 · fiezel-CFG + fiezel-CFG-staging -> otomatis pilih yang produksi', toml.includes('"cfg-prod-9999"'));
+    check('D2 · UUID staging tidak pernah masuk ke hasil', !toml.includes('cfg-STAGING-8888'));
   }
 
   /* ===================== E. PENJAGA placeholder tersisa ===================== */
