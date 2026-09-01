@@ -22,6 +22,8 @@
  *   C2  sideStateKey benar-benar memakai identitas akun aktif, bukan konstanta;
  *   C3  migrasi dipanggil saat akun diaktifkan, dan mencatat pemilik (anti-klaim ganda);
  *   C4  daftar kunci side-state dibaca lazy — daftar yang dievaluasi top-level kena TDZ;
+ *   C7  sidecar Speaking/Listening: penulis ASLI dan pembaca ASLI dijalankan dan harus
+ *       bertemu di kunci yang sama — satu-satunya kunci yang penulisnya di luar app.js;
  *   RED setiap detektor terbukti MERAH terhadap sumber yang sengaja dirusak.
  *
  * Konvensi repo: tanpa dependensi, exit 1 saat gagal, baris akhir '<Nama>: PASS'.
@@ -51,7 +53,8 @@ const KUNCI_SIDE_STATE = [
   'ITEM_CALIBRATION_KEY',
   'OLM_NEGOTIATION_KEY',
   'SRL_KEY',
-  'SOCIAL_MASTERED_KEY'
+  'SOCIAL_MASTERED_KEY',
+  'SL_STATE_KEY'
 ];
 
 /**
@@ -174,40 +177,124 @@ test('C6 · seed probe tidak memakai sumber acak', () => {
   assert.ok(/activeAccountUuid/.test(src), 'seed tidak diturunkan dari identitas akun');
 });
 
-test('C7 · celah yang MASIH terbuka dicatat, bukan dilupakan', () => {
-  // fiezel-sl-v1-state (bukti speaking/listening) MASIH device-global. Ia kelas kebocoran
-  // yang sama dengan delapan kunci di atas, tetapi ditulis dan dibaca oleh EMPAT titik di
-  // lane yang berbeda — konfigurasi dan addon speaking/listening, skills-evidence, dan
-  // satu pembaca di app.js — sementara lima berkas gerbang memakai kunci datarnya sebagai
-  // fixture.
-  //
-  // Scoping SEPARUH lebih buruk daripada tidak sama sekali: addon menulis ke kunci datar
-  // sementara pembaca mencari kunci berakun berarti bukti speaking murid hilang diam-diam.
-  // Jadi ia ditunda sebagai satu langkah tersendiri — dan gerbang ini memastikan
-  // penundaannya TERLACAK, bukan terlupakan.
-  //
-  // Yang di-assert: jumlah titik produksinya tidak bertambah. Kalau ada pembaca baru
-  // mendarat, gerbang merah dan keputusan scoping harus diambil saat itu juga.
-  const berkas = ['app.js',
-    'features/speaking-listening/speaking-listening-config.js',
-    'features/speaking-listening/fiezel-speaking-listening-addon.js',
-    'features/skills-evidence/fiezel-skills-evidence.js'];
-  let titik = 0;
-  for (const f of berkas) {
-    const src = fs.readFileSync(path.join(ROOT, f), 'utf8')
-      .replace(/\/\*[\s\S]*?\*\//g, ' ')
-      .replace(/(^|[^:])\/\/[^\n]*/g, '$1 ');
-    titik += (src.match(/'fiezel-sl-v1-state'/g) || []).length;
+/* ------------------------------------------------------------------------------------
+ * C7 — SIDECAR SPEAKING/LISTENING: PENULIS DAN PEMBACA HARUS BERTEMU
+ *
+ * Kunci ini ditunda di S1, dan alasan penundaannya persis yang diuji di sini. Ia beda dari
+ * delapan kunci lain: SATU-SATUNYA penulisnya (StateStore di addon) hidup DI LUAR app.js dan
+ * tidak tahu apa-apa soal akun, sementara dua pembacanya ada di app.js. Scoping SEPARUH —
+ * penulis ke kunci datar, pembaca ke kunci berakun — tidak melempar, tidak memerahkan layar,
+ * dan tidak meninggalkan jejak: bukti speaking murid hanya berhenti muncul.
+ *
+ * Karena itu C7 tidak memeriksa teks sumber. Ia MENJALANKAN penulis aslinya dan pembaca
+ * aslinya, lalu menuntut bukti yang ditulis satu sisi terbaca oleh sisi lain.
+ * ------------------------------------------------------------------------------------ */
+function localStorageTiruan() {
+  const box = new Map();
+  return {
+    box: box,
+    getItem: (k) => (box.has(k) ? box.get(k) : null),
+    setItem: (k, v) => { box.set(k, String(v)); },
+    removeItem: (k) => { box.delete(k); }
+  };
+}
+
+/**
+ * Memuat addon aslinya dengan DOM secukupnya, dan mengembalikan permukaan ujinya.
+ *
+ * `self` HARUS diset sebelum require: pembungkus UMD addon memilih `typeof self!=='undefined'
+ * ? self : this`, dan di CommonJS `this` adalah module.exports — objek kosong yang TRUTHY.
+ * Tanpa baris itu addon berjalan dengan scope tiruan yang tidak punya localStorage, lalu
+ * save() gagal diam-diam di dalam try/catch: gerbangnya akan menguji StateStore yang tidak
+ * menulis ke mana pun, dan hijaunya tidak berarti apa-apa.
+ */
+function muatAddon(store) {
+  const g = globalThis;
+  g.self = g;
+  g.window = g;
+  g.localStorage = store;
+  if (!g.document) {
+    const el = () => ({ style: {}, classList: { add() {}, remove() {}, contains: () => false },
+      appendChild() {}, querySelector: () => null, querySelectorAll: () => [] });
+    g.document = { addEventListener() {}, createElement: el, querySelector: () => null, querySelectorAll: () => [] };
   }
-  assert.strictEqual(titik, 4,
-    'jumlah titik produksi fiezel-sl-v1-state berubah (' + titik + ', diharapkan 4). ' +
-    'Kalau bertambah: putuskan scoping-nya sekarang, jangan tambah pembaca ke kunci ' +
-    'device-global. Kalau berkurang: scoping mungkin sudah dikerjakan — perbarui gerbang ini.');
+  delete require.cache[require.resolve('./features/speaking-listening/fiezel-speaking-listening-addon.js')];
+  return require('./features/speaking-listening/fiezel-speaking-listening-addon.js').__test;
+}
+
+const ITEM_UJI = { id: 'sp-1', level: 'A2', mode: 'describe' };
+const HASIL_UJI = { score: 88, passed: true, metric: 'coverage' };
+
+/** Tulis satu bukti speaking lewat StateStore ASLI, ke kunci yang diminta. */
+function tulisBukti(storageKey) {
+  const store = localStorageTiruan();
+  const T = muatAddon(store);
+  const cfg = T.mergeConfig(storageKey ? { storageKey: storageKey } : {});
+  new T.StateStore(cfg).record('speaking', ITEM_UJI, HASIL_UJI, 4200, 0);
+  return store;
+}
+
+/** Baca lewat proyektor ASLI, dari kunci yang diminta. */
+function bacaBukti(store, storageKey) {
+  const P = require('./features/skills-evidence/fiezel-skills-evidence.js');
+  const st = P.readSidecarState({ localStorage: store }, storageKey);
+  const proj = P.projectSkillsEvidence({ state: st, now: 1000, bankCounts: { listening: 10, speaking: 10 } });
+  return proj.domains.speaking.attempts;
+}
+
+const UUID_UJI = 'akun-c7-0001';
+const SL_BERAKUN = 'fiezel-sl-v1-state:' + UUID_UJI;
+
+test('C7 · penulis sidecar menulis ke ruang akun, bukan ke kunci datar', () => {
+  const store = tulisBukti(SL_BERAKUN);
+  assert.ok(store.box.has(SL_BERAKUN),
+    'StateStore tidak menulis ke kunci berakun walau storageKey di-override — ' +
+    'override config.storageKey adalah SATU-SATUNYA jalur app.js untuk memindahkan penulis');
+  assert.strictEqual(store.box.has('fiezel-sl-v1-state'), false,
+    'penulis MASIH menyentuh kunci datar — dua akun di satu perangkat akan berbagi bukti speaking');
 });
 
-// ==========================================================================
-// BUKTI-BISA-MERAH
-// ==========================================================================
+test('C7b · bukti yang ditulis penulis terbaca oleh pembaca pada kunci yang sama', () => {
+  const store = tulisBukti(SL_BERAKUN);
+  // Prasyarat, bukan basa-basi: kalau penulisnya diam (scope tiruan tanpa localStorage),
+  // pembaca membaca kosong dan uji ini bisa hijau tanpa satu byte pun berpindah.
+  assert.ok(store.box.size > 0, 'penulis tidak menulis apa pun — uji di bawahnya tidak berarti');
+  assert.strictEqual(bacaBukti(store, SL_BERAKUN), 1,
+    'penulis dan pembaca menunjuk kunci yang sama tetapi buktinya tidak sampai');
+});
+
+test('C7c · ketiga titik produksi mengambil kuncinya dari sideStateKey(SL_STATE_KEY)', () => {
+  // Penulis: override di titik mount addon. Tanpa ini penulis tetap di kunci datar
+  // sementara pembaca sudah pindah — justru bentuk kegagalan yang C7d buktikan senyap.
+  assert.ok(/storageKey:\s*sideStateKey\(SL_STATE_KEY\)/.test(appSource),
+    'addon di-mount tanpa storageKey berakun — penulisnya tertinggal di kunci datar');
+  // Dua pembaca.
+  assert.ok(/localStorage\.getItem\(sideStateKey\(SL_STATE_KEY\)\)/.test(appSource),
+    'pembaca speaking adaptif tidak lewat sideStateKey');
+  assert.ok(/readSidecarState\(self,\s*sideStateKey\(SL_STATE_KEY\)\)/.test(appSource),
+    'proyeksi skills-evidence tidak diberi kunci berakun');
+  // Dan ia ikut migrasi + reset, seperti delapan kunci lain.
+  assert.ok(/sideStateBaseKeys\(\)\s*\{[\s\S]*?SL_STATE_KEY[\s\S]*?\}/.test(appSource),
+    'SL_STATE_KEY tidak ikut daftar migrasi — bukti murid lama tertinggal di kunci datar saat login');
+  assert.ok(/RETENTION_PROBE_KEY,\s*SL_STATE_KEY\]/.test(appSource),
+    'SL_STATE_KEY tidak ikut daftar reset — reset progres yang meninggalkan bukti speaking adalah reset yang bohong');
+});
+
+test('C7d · RED: scoping SEPARUH menghilangkan bukti DIAM-DIAM, dan gerbang ini melihatnya', () => {
+  // Inilah alasan S1b ditunda alih-alih dikerjakan setengah. Penulis memakai default
+  // (kunci datar), pembaca mencari kunci berakun. Tidak ada galat sama sekali.
+  const store = tulisBukti(null);
+  assert.ok(store.box.has('fiezel-sl-v1-state'), 'prasyarat racun tidak terpenuhi');
+  let lempar = false;
+  let terbaca = null;
+  try { terbaca = bacaBukti(store, SL_BERAKUN); } catch (_) { lempar = true; }
+  assert.strictEqual(lempar, false,
+    'scoping separuh MELEMPAR — kalau begitu ia tidak senyap, dan C7b saja sudah cukup');
+  assert.strictEqual(terbaca, 0,
+    'scoping separuh seharusnya menghasilkan NOL bukti terbaca; kalau tidak, racunnya salah ' +
+    'dan C7b hijau tanpa membuktikan apa pun');
+});
+
 function expectRed(label, fn) {
   let threw = false;
   try { fn(); } catch { threw = true; }
