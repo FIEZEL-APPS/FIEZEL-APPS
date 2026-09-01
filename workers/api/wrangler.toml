@@ -124,7 +124,7 @@ LEARNING_ENABLED = "off"
 # cohort terbukti jalan. "off" = `POST /api/braincore/evidence` tetap TERDAFTAR
 # (menjawab 202 `{disabled:true}`, bukan 404) tetapi tidak satu baris pun
 # ditulis.
-EVIDENCE_ENABLED = "off"
+EVIDENCE_ENABLED = "on"
 # CATATAN: TIDAK ADA `TEST_CLOCK_MS` di sini, dan tidak boleh pernah ada.
 # Var itu hanya untuk harness gerbang; gerbang cf-api-contract-test.js
 # meng-assert ketiadaannya di berkas ini.
