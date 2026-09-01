@@ -288,4 +288,3 @@ penyetelan-diri berarti memutuskan kelas perubahan apa yang boleh berjalan tanpa
 keputusan OWNER, bukan pekerjaan kode, dan ia satu-satunya langkah di peta ini yang tidak bisa
 dibatalkan dengan `git revert`: parameter yang sudah bergeser di perangkat murid tidak ikut
 kembali saat kodenya dikembalikan.
-
