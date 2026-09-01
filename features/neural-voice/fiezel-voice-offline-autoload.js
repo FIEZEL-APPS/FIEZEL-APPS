@@ -336,9 +336,14 @@
     root.addEventListener('online', function () { schedule(); });
   } catch (_) {}
 
+  function arm() {
+    return noteSignedIn();
+  }
+
   root.FiezelVoiceOfflineAutoload = Object.freeze({
     SCHEMA: SCHEMA,
     CHUNK_BYTES: CHUNK_BYTES,
+    arm: arm,
     noteSignedIn: noteSignedIn,
     status: status,
     progress: progress,
