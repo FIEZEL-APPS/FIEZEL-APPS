@@ -1,6 +1,6 @@
 {
   "schema": "id-golden-baseline/1",
-  "generatedAt": "2026-08-31T23:29:09.388Z",
+  "generatedAt": "2026-09-01T10:16:13.184Z",
   "root": "/home/user/FIEZEL-APPS",
   "files": {
     "grammar-explanations-id.json": "4ce816145b77a86ed6d9ec9b366f70c1bbf1859283f667207eada762fccccb17",
@@ -19,7 +19,7 @@
   },
   "literals": {
     "count": 2109,
-    "sha256": "8317dfa6c331f2233908482944cf6e811c1cb43df185918a2e07bd9200aec806",
+    "sha256": "a2a323a841089dfb7bf59b37cf508b1eb0fd44e90168979c1181917b105eca52",
     "list": [
       "\n      SETELAH beat concern ≤1000ms selesai (13 §2.2), bukan menimpanya. Tanpa bunyi:\n      SFX hint sudah dipensiunkan (20 §4); cooldown 8 detiknya dijaga komponen. */\n   setTimeout(()=>{try{pawReact(",
       "\n      case 'silent':                        // L5: kalau mulut sempat mulai (taksiran L3 kandas), tutup SEKARANG\n        degradedLatch = false;\n        closeTurn(false);\n        break;\n      case 'interrupt':                     // stop(): snap tutup\n        degradedLatch = false;\n        closeTurn(true);\n        break;\n      default:\n        break;                              // fase asing dari versi fasad lebih baru: diabaikan tanpa suara\n    }\n  }\n\n  try { doc.addEventListener('fiezel-speech', onSpeech); } catch (_) {}\n\n  /* Suara terdegradasi (audibility-fix): mulut mati SEKETIKA dan tidak boleh\n     hidup lagi untuk sisa giliran — apa pun yang masih dikirim lapisan bawah. */\n  try {\n    root.addEventListener('fiezel-neural-voice-degraded', function () {\n      if (turn) closeTurn(true);\n      degradedLatch = true;                 // dilepas oleh end/silent/interrupt fasad berikutnya\n    });\n  } catch (_) {}\n\n  /* Permukaan kecil untuk Diagnostics/tes — bukan API pemanggil biasa:\n     satu-satunya pintu bicara tetap FiezelVoiceSay.say(). */\n  root.FiezelSpeechBridge = Object.freeze({\n    SCHEMA: SCHEMA,\n    speaking: function () { return !!turn; },\n    degraded: function () { return !!degradedLatch; },\n    motionAllowed: motionAllowed\n  });\n})(typeof self !== 'undefined' ? self : (typeof window !== 'undefined' ? window : this));\n",
@@ -299,7 +299,7 @@
       ",{level:level}));\n  // m025-117: kartu flashcard adalah layar DI DALAM view vocabulary. Tanpa entri stage,\n  // tekanan kembali dari sini mengambil entri view Vocabulary dan melempar murid ke Home.\n  let i=0,flipped=false;\n  const draw=()=>{\n    const v=pool[i];if(!v){audio.stop();return exitStage()}flipped=false;\n    setApp(`<section class=\"fade\"><div class=\"topline\"><button id=\"backVocab\"><i data-lucide=\"arrow-left\"></i> Vocabulary</button><b>${i+1}/${pool.length}</b></div>${card(`<div class=\"flashcard ${flipped?",
       ",{m:m[1]});\n  }\n  // m025-163: TFNS jujur - klaim Inggris (objek yang diuji) tampil verbatim di stem;\n  // tanpa klaim, soal TFNS cuma pilihan ganda tanpa soal.\n  if(type===",
       ",{mastery:r.mastery});\n    // Alasan prasyarat ditampilkan utuh hanya pada gerbang PERTAMA yang tertutup — sisanya\n    // cukup lewat title/aria; menuliskan kalimat yang sama di sepuluh node adalah kebisingan.\n    const showLockNote=r.unlock.locked&&!lockNoteShown;if(showLockNote)lockNoteShown=true;\n    const nodeButton=r.unlock.locked\n      ?`<button class=\"path-node\" disabled aria-disabled=\"true\" title=\"${esc(lessonLockMessage(r.unlock))}\" aria-label=\"${FiezelI18n.t(",
-      ",{ringkasan:p.summary,fokus,jumlahSoal:p.sessionSize,menit:p.estimatedMinutes}),action:p.cta,ready:true,policy:p}}\n// m025-129: greetingForNow() dihapus bersama baris sapaan serif miring yang menjadi\n// satu-satunya pemakainya. Sapaan kontekstual tetap ada - ia hidup di gelembung PAW,\n// tempat yang memang bertugas menyapa.\nfunction todayLabel(){try{return new Intl.DateTimeFormat(FiezelI18n.getBcp47(),{weekday:",
+      ",{ringkasan:p.summary,fokus,jumlahSoal:p.sessionSize,menit:p.estimatedMinutes}),action:p.cta,ready:true,policy:p}}\n// m025-129: greetingForNow() dihapus bersama baris sapaan serif miring yang menjadi\n// satu-satunya pemakainya. Sapaan kontekstual tetap ada - ia hidup di gelembung PAW,\n// tempat yang memang bertugas menyapa.\nfunction todayLabel(){try{return uiFormatter(FiezelI18n.getBcp47(),{weekday:",
       ",{sessionSize:ukuran,estimatedMinutes:menit}):`${ukuran} soal`}</b>`:",
       ",{skillName:friendlySkillName(skill)}))/* m025-160; m025-162: ujung lama \"bukan pola yang lagi diuji\" bisa keliru pada pasangan cermin sepola — kini menunjuk kalimat jangkar, yang selalu benar */\n    : joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t(",
       ",{skor:Math.round(outcome.score),berikutnya:outcome.status===",
