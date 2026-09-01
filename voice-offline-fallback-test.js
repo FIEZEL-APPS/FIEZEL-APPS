@@ -170,3 +170,6 @@ if (failures.length) {
   process.exit(1);
 }
 console.log('FIEZEL suara cadangan + akun: PASS ' + pass);
+
+// NV-08/NV-09: jalankan regression baru melalui gate yang sudah terdaftar, tanpa mengubah quality.yml.
+require('./voice-turn-ownership-regression.js');
