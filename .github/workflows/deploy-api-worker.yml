@@ -80,6 +80,25 @@ jobs:
             toml = toml.replace(blok, '# (blok LEARNING_DB dilepas saat deploy: database fiezel-learning belum ada di akun)\n');
             console.log('LEARNING_DB tidak ada di worker live: blok dilepas, modul learning tetap mati (fail-closed).');
           }
+          // EVIDENCE_DB OPSIONAL, aturan PERSIS sama dengan LEARNING_DB di atas dan
+          // alasannya lebih keras lagi: database `fiezel-evidence` adalah satu-satunya
+          // yang menyimpan pengenal per-perangkat (cohort), jadi ia baru boleh ada setelah
+          // owner sengaja membuatnya. Selama belum ada di worker live, bloknya DILEPAS —
+          // `route-evidence.js` membaca `env.EVIDENCE_DB` tanpa fallback dan menjawab 202
+          // `{disabled:true}` saat null, jadi lane bukti tetap mati dengan tenang.
+          //
+          // Tanpa cabang ini, penjaga placeholder di bawah akan MENJATUHKAN seluruh deploy
+          // fiezel-api — gateway yang dipakai murid — hanya karena satu lane opsional yang
+          // memang belum disiapkan. Itu kegagalan yang salah sasaran.
+          const ev = id(find('EVIDENCE_DB'));
+          if (ev) {
+            toml = toml.replace('<isi setelah: wrangler d1 create fiezel-evidence>', ev);
+          } else {
+            const eblok = /\[\[d1_databases\]\]\s*\nbinding\s*=\s*"EVIDENCE_DB"[\s\S]*?<isi setelah: wrangler d1 create fiezel-evidence>"\s*\n/;
+            if (!eblok.test(toml)) { console.error('blok EVIDENCE_DB tidak ditemukan untuk dilepas'); process.exit(1); }
+            toml = toml.replace(eblok, '# (blok EVIDENCE_DB dilepas saat deploy: database fiezel-evidence belum ada di akun)\n');
+            console.log('EVIDENCE_DB tidak ada di worker live: blok dilepas, lane bukti tetap mati (fail-closed).');
+          }
           // ROUTES: custom domain api.fiezel.my.id SUDAH menempel pada worker live dan
           // lampiran itu bertahan lintas deploy. Token CI tidak berizin Zone->Workers
           // Routes (error 10000), jadi blok routes dilepas saat deploy: kode+vars tetap
