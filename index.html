@@ -563,7 +563,6 @@ html.fz-booting body{overflow:hidden}
   <script defer src="./features/brand/fiezel-choreography.js"></script>
   <script defer src="./features/audio/fiezel-ui-sfx.js"></script>
   <script defer src="./features/library/fiezel-library.js"></script>
-  <script defer src="./features/library/fiezel-library-ui.js"></script>
   <script defer src="./features/speaking-listening/speaking-listening-config.js"></script>
   <!-- Gem Terjemahan. Dimuat SEBELUM addon dan app.js, dan tidak malas: defaultState app.js
        memanggil freshGems() saat berkas itu dieksekusi, jadi modulnya harus sudah ada.
@@ -628,6 +627,13 @@ html.fz-booting body{overflow:hidden}
   <script type="fiezel/lazy" data-fiezel-lazy="classroom" src="./features/tutor-classroom/fiezel-tutor-v3.js"></script>
   <script type="fiezel/lazy" data-fiezel-lazy="classroom" src="./features/tutor-classroom/fiezel-tutor-dialog.js"></script>
   <script type="fiezel/lazy" data-fiezel-lazy="classroom" src="./features/tutor-classroom/fiezel-tutor-voice-chat.js"></script>
+  <!-- m025-224 (P1 performa, keputusan OWNER: perluas mekanisme lazy yang sudah ada).
+       fiezel-library-ui.js (43 KB) tidak dibutuhkan untuk mencetak layar pertama: nol
+       pemanggil di luar dirinya sendiri, dan ia memasang dirinya ke DOM layar Perpustakaan
+       yang butuh beberapa ketukan untuk dicapai - sementara gelombang malas berangkat saat
+       idle tepat sesudah cat pertama. Pola dan alasannya sama persis dengan grup classroom.
+       Tetap ada di ASSETS sw.js, jadi peluncuran offline tidak kehilangan apa pun. -->
+  <script type="fiezel/lazy" data-fiezel-lazy="library" data-fiezel-lazy-when="idle" src="./features/library/fiezel-library-ui.js"></script>
   <!-- FIEZEL_LAZY_END -->
 
   <!-- m025-125: judul lesson grammar Bahasa Indonesia. Wajib sebelum app.js karena
