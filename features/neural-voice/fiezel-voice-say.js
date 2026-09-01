@@ -72,11 +72,27 @@
 
   var SCHEMA = 'fiezel-voice-say-v1';
   var band = null;
+  var turnGeneration = 0; // NV-08: satu ownership token untuk subtitle + event visual async.
   // m026-BUG2: breaker L4. Ia MENDINGIN, tidak melatch seumur sesi - lihat speakWithBrowser().
   var BROWSER_BREAKER_MS = 10000;
   var BROWSER_COOLDOWN_MS = 60000;
   var browserBreakerUntil = 0;
   function browserBreakerIsOpen() { return browserBreakerUntil > Date.now(); }
+
+  function nextTurnGeneration() {
+    turnGeneration += 1;
+    return turnGeneration;
+  }
+
+  function turnOptions(options, generation) {
+    var out = {};
+    var source = options || {};
+    for (var k in source) {
+      if (Object.prototype.hasOwnProperty.call(source, k)) out[k] = source[k];
+    }
+    out._turnGeneration = generation;
+    return out;
+  }
 
   /**
    * m025-150 aset ElevenLabs mendahului mesin apa pun.
@@ -176,19 +192,22 @@
    * Selalu selesai dengan tenang: kalau tidak ada terjemahan, tidak ada baris, dan
    * kalimat Inggrisnya tetap berbunyi seperti biasa.
    */
-  function prepareSubtitle(english, indonesian) {
+  function prepareSubtitle(english, indonesian, generation) {
     var band_ = subtitles();
     if (!band_) return Promise.resolve('');
 
     var ready = text(indonesian);
-    if (ready) { band_.begin(ready); return Promise.resolve(ready); }
+    if (ready) {
+      if (generation === turnGeneration) band_.begin(ready);
+      return Promise.resolve(ready);
+    }
 
     var t = translator();
     if (!t || typeof t.translate !== 'function') return Promise.resolve('');
 
     return t.translate(english).then(function (value) {
       var line = text(value);
-      if (line) band_.begin(line);
+      if (line && generation === turnGeneration) band_.begin(line);
       return line;
     }).catch(function () { return ''; });
   }
@@ -198,7 +217,7 @@
      CustomEvent 'fiezel-speech' di document; ia tidak menunggu pendengar, tidak pernah
      melempar, dan TIDAK mengubah tangga suara satu keputusan pun (G8: sistem suara tidak
      pernah diganti). detail = { phase:'start'|'progress'|'end'|'interrupt'|'silent',
-     layer:0..5, currentTime?, duration? }; layer 0 = level fasad (resolusi janji/stop),
+     layer:0..5, currentTime?, duration?, generation? }; layer 0 = level fasad (resolusi janji/stop),
      bukan lapisan audio tertentu. Jembatan: features/neural-voice/fiezel-speech-bridge.js.
      ======================================================================================== */
   function emitSpeech(phase, layer, extra) {
@@ -211,7 +230,12 @@
   /* Resolusi janji say() adalah otoritas "giliran bicara selesai" (14 §1.4): true → end,
      false → silent (L5 teks-tanpa-suara: mulut TIDAK PERNAH dianimasikan). Nilai janji
      diteruskan apa adanya — pengamat murni, bukan percabangan tangga. */
-  function reportTurn(spoke) { emitSpeech(spoke === true ? 'end' : 'silent', spoke === true ? 0 : 5); return spoke; }
+  function reportTurn(generation, spoke) {
+    if (generation === turnGeneration) {
+      emitSpeech(spoke === true ? 'end' : 'silent', spoke === true ? 0 : 5, { generation: generation });
+    }
+    return spoke;
+  }
 
   /**
    * @param {string|object} input teks Inggris, atau {en, id} bila terjemahannya
@@ -221,25 +245,26 @@
    * @returns {Promise<boolean>} true bila kalimatnya selesai diucapkan
    */
   function say(input, options) {
-    var opts = options || {};
     var english = text(typeof input === 'string' ? input : (input && input.en));
     var indonesian = text(input && typeof input === 'object' ? input.id : '');
 
     if (!english) return Promise.resolve(false);
 
+    var generation = nextTurnGeneration();
+    var opts = turnOptions(options, generation);
     var band_ = subtitles();
 
     // Subtitle diminta lebih dulu tetapi tidak ditunggu; lihat catatan kepala berkas.
     // m025-147: suppressSubtitles menonaktifkan subtitle untuk listening exam, supaya
     // students tidak bisa baca jawaban sambil mendengar.
     if (!opts.suppressSubtitles) {
-      prepareSubtitle(english, indonesian);
+      prepareSubtitle(english, indonesian, generation);
     }
 
     // Saat flag 'off' baris ini adalah SATU-SATUNYA percabangan tambahan di seluruh jalur
     // bicara, dan ia langsung masuk ke L1 seperti hari ini.
-    if (!cfEnabled()) return speakFromAssets(english, opts, band_).then(reportTurn, function (e) { reportTurn(false); throw e; }); // FASE 11: pengamat resolusi, bukan cabang
-    return cfCachedFirst(english, opts, band_).then(reportTurn, function (e) { reportTurn(false); throw e; }); // FASE 11: pengamat resolusi, bukan cabang
+    if (!cfEnabled()) return speakFromAssets(english, opts, band_).then(function (spoke) { return reportTurn(generation, spoke); }, function (e) { reportTurn(generation, false); throw e; }); // FASE 11: pengamat resolusi, bukan cabang
+    return cfCachedFirst(english, opts, band_).then(function (spoke) { return reportTurn(generation, spoke); }, function (e) { reportTurn(generation, false); throw e; }); // FASE 11: pengamat resolusi, bukan cabang
   }
 
   /**
@@ -279,11 +304,11 @@
       return Promise.resolve(store.playUrl(url, {
         speed: opts.speed,
         onProgress: function (currentTime, duration) {
-          if (band_) band_.update(currentTime, duration);
-          emitSpeech('progress', 1, { currentTime: currentTime, duration: duration }); // FASE 11: jam audio C0/C1/L1
+          if (band_ && opts._turnGeneration === turnGeneration) band_.update(currentTime, duration);
+          emitSpeech('progress', 1, { currentTime: currentTime, duration: duration, generation: opts._turnGeneration }); // FASE 11: jam audio C0/C1/L1
         }
       })).then(function (played) {
-        if (played) { if (band_) band_.end(); return true; }
+        if (played) { if (band_ && opts._turnGeneration === turnGeneration) band_.end(); return true; }
         return false;
       }, function () { return false; });
     } catch (_) {
@@ -308,14 +333,14 @@
       return store.playUrl(found.url, {
         speed: opts.speed,
         onProgress: function (currentTime, duration) {
-          if (band_) band_.update(currentTime, duration);
-          emitSpeech('progress', 1, { currentTime: currentTime, duration: duration }); // FASE 11: jam audio L1
+          if (band_ && opts._turnGeneration === turnGeneration) band_.update(currentTime, duration);
+          emitSpeech('progress', 1, { currentTime: currentTime, duration: duration, generation: opts._turnGeneration }); // FASE 11: jam audio L1
         }
       }).then(function (played) {
         // Berkas ada di manifest tetapi gagal diputar - jaringan putus, atau autoplay
         // ditolak. Mesin runtime masih boleh mencoba: yang dijaga mandat adalah kredit,
         // dan mesin itu tidak memakainya.
-        if (played) { if (band_) band_.end(); return true; }
+        if (played) { if (band_ && opts._turnGeneration === turnGeneration) band_.end(); return true; }
         return afterAssets(english, opts, band_);
       });
     }).catch(function () {
@@ -418,8 +443,8 @@
       speed: opts.speed,
       voice: opts.voice,
       onProgress: function (currentTime, duration) {
-        if (band_) band_.update(currentTime, duration);
-        emitSpeech('progress', 2, { currentTime: currentTime, duration: duration }); // FASE 11: jam audio L2
+        if (band_ && opts._turnGeneration === turnGeneration) band_.update(currentTime, duration);
+        emitSpeech('progress', 2, { currentTime: currentTime, duration: duration, generation: opts._turnGeneration }); // FASE 11: jam audio L2
       }
     }).then(function (done) {
       // m026-BUG2b. Mesin Puter tidak selalu MELEMPAR ketika ia gagal - pada kehabisan waktu
@@ -428,7 +453,7 @@
       // senyap total sesudah menunggu belasan detik. Kegagalan yang resolve harus turun ke
       // jalur yang sama dengan kegagalan yang melempar.
       if (done === false) return speakWithLocal(english, opts, band_);
-      if (band_) band_.end();
+      if (band_ && opts._turnGeneration === turnGeneration) band_.end();
       return true;
     }).catch(function (error) {
       // Puter gagal - termasuk 'puter_out_of_credit' pada kalimat PERTAMA yang kandas.
@@ -450,13 +475,13 @@
     // gagal. Yang berubah hanya apa yang terjadi SESUDAH null - dulu jalurnya berhenti di
     // sini dengan false, dan itulah kenapa murid baru mendapat SENYAP TOTAL (cf-c1 K10).
     if (!local) return speakWithBrowser(english, opts, band_);
-    emitSpeech('start', 3, { duration: english.length / (14.5 * (Number(opts.speed) > 0 ? Number(opts.speed) : 1)) }); // FASE 11: L3 tanpa onProgress — durasi taksiran 14 §1.3
+    emitSpeech('start', 3, { duration: english.length / (14.5 * (Number(opts.speed) > 0 ? Number(opts.speed) : 1)), generation: opts._turnGeneration }); // FASE 11: L3 tanpa onProgress — durasi taksiran 14 §1.3
     return local.speak(english, {
       speed: opts.speed,
       voice: opts.voice
     }).then(function (done) {
       if (done === false) return speakWithBrowser(english, opts, band_);
-      if (band_) band_.end();
+      if (band_ && opts._turnGeneration === turnGeneration) band_.end();
       return true;
     }).catch(function () {
       return speakWithBrowser(english, opts, band_);
@@ -478,7 +503,7 @@
    * memutusnya di tengah akan mengubah pagar keselamatan menjadi bug baru.
    */
   function speakWithBrowser(english, opts, band_) {
-    var closeBand = function () { if (band_) { try { band_.end(); } catch (_) {} } };
+    var closeBand = function () { if (band_ && opts._turnGeneration === turnGeneration) { try { band_.end(); } catch (_) {} } };
     // Breaker yang melatch seumur sesi akan mendiamkan murid untuk selamanya setelah SATU
     // kemacetan - dan kemacetan itu sering hanya soal daftar voice yang belum selesai dimuat
     // atau iOS yang menunggu gesture. Karena itu ia mendingin: klik berikutnya sesudah
@@ -512,7 +537,7 @@
       var rate = Number(opts.speed);
       utterance.rate = rate > 0 ? rate : 1;
       if (opts.voice && typeof opts.voice === 'object') { try { utterance.voice = opts.voice; } catch (_) {} }
-      utterance.onstart = function () { started = true; if (timer) { clearTimeout(timer); timer = null; } emitSpeech('start', 4); }; // FASE 11: L4 bicara HANYA sejak onstart (14 §1.3)
+      utterance.onstart = function () { started = true; if (timer) { clearTimeout(timer); timer = null; } emitSpeech('start', 4, { generation: opts._turnGeneration }); }; // FASE 11: L4 bicara HANYA sejak onstart (14 §1.3)
       utterance.onend = function () { settle(true); };
       utterance.onerror = function () { settle(false); };
       timer = setTimeout(function () { settle(false); }, BROWSER_BREAKER_MS);
@@ -727,11 +752,16 @@
   }
 
   function stop() {
-    emitSpeech('interrupt', 0); // FASE 11: stop() = interupsi giliran — mulut snap tutup (14 §1.4)
+    var generation = nextTurnGeneration(); // NV-08: semua completion/subtitle turn lama menjadi inert.
+    emitSpeech('interrupt', 0, { generation: generation }); // FASE 11: stop() = interupsi giliran — mulut snap tutup (14 §1.4)
     var store = assets();
     if (store && typeof store.stop === 'function') { try { store.stop(); } catch (_) {} }
     var voice = engine();
     if (voice && typeof voice.stop === 'function') { try { voice.stop(); } catch (_) {} }
+    // NV-09: shared façade harus menghentikan L3 juga. Memanggil stop() tidak menyiapkan
+    // model dan tidak menyentuh status()/prepare(); runtime yang absen cukup diabaikan.
+    var local = root.FiezelVoiceRuntime;
+    if (local && typeof local.stop === 'function') { try { local.stop(); } catch (_) {} }
     // L4 punya pemutar sendiri; tanpa baris ini "Keluar" meninggalkan kalimat yang masih
     // berbunyi di layar berikutnya.
     if (root.speechSynthesis && typeof root.speechSynthesis.cancel === 'function') { try { root.speechSynthesis.cancel(); } catch (_) {} }
