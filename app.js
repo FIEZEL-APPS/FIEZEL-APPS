@@ -10194,10 +10194,17 @@ function resetProgress(){openModal(`<div class="modal-mark">FIEZEL</div><h2>${Fi
   /* S1: hapus kunci milik AKUN INI. Kunci datar ikut dihapus karena perangkat yang belum
      pernah login memang menyimpan di sana - melewatkannya membuat 'reset' bohong untuk
      murid yang belum punya akun. */
-  for(const k of [BKT_KEY,MISCONCEPTION_LEDGER_KEY,ITEM_CALIBRATION_KEY,CONFUSION_MATRIX_KEY,OLM_NEGOTIATION_KEY,SRL_KEY,RETENTION_PROBE_KEY,SL_STATE_KEY]){
+  /* Lane C (bukti Braincore): EVIDENCE_COHORT_KEY + EVIDENCE_LAST_KEY + EVIDENCE_ATTEMPT_KEY
+     ikut dihapus. Alasannya sama kerasnya dengan RETENTION_PROBE_KEY di atas: "reset progres"
+     yang meninggalkan cohort lama akan menyambungkan murid sesudah reset ke murid sebelum
+     reset di penghitung server. Antrean IndexedDB-nya ikut dikosongkan tepat di bawah -
+     menghapus kuncinya saja tidak cukup, karena event yang masih menunggu upload membawa
+     cohort lama di dalam dirinya. */
+  for(const k of [BKT_KEY,MISCONCEPTION_LEDGER_KEY,ITEM_CALIBRATION_KEY,CONFUSION_MATRIX_KEY,OLM_NEGOTIATION_KEY,SRL_KEY,EVIDENCE_COHORT_KEY,EVIDENCE_LAST_KEY,EVIDENCE_ATTEMPT_KEY,RETENTION_PROBE_KEY,SL_STATE_KEY]){
     try{localStorage.removeItem(sideStateKey(k))}catch{}
     try{localStorage.removeItem(k)}catch{}
   }
+  try{const q=braincoreEvidenceQueue();if(q&&typeof q.purge==='function'){const p=q.purge();if(p&&typeof p.catch==='function')p.catch(()=>{})}}catch{}
   state=loadState();if(activeAccountUuid)state.ownerUuid=activeAccountUuid;coreBrainCache=null;save();closeModal();go('home');showToast(FiezelI18n.t('settings.progres-akun-berhasil-direset'))}}
 document.addEventListener?.('keydown',e=>{if(e.key==='Escape'&&!$('modal')?.classList.contains('hidden'))closeModal()});
 /* q17-S1 2026-08-29: trap Tab di dalam dialog \u2014 latar tidak boleh bisa dijelajah selama modal terbuka (aria-modal jujur). Siklus manual first<->last, tanpa inert supaya kompatibel luas. */
