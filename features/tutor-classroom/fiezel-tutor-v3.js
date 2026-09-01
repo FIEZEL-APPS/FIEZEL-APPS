@@ -733,7 +733,7 @@
       mount().innerHTML = shell(
         '<div class="tutor-hub"><section><span class="tutor-kicker">CHOOSE A SUBJECT</span><h2>What do you want to learn' + (learnerName(root) ? ', ' + esc(learnerName(root)) : '') + '?</h2>' +
         '<p>Kurikulum A1 lengkap dulu, lalu naik ke jalur TOEFL / IELTS. Fiezel mengingat checkpoint, bukan audio mentah.</p></section>' +
-        '<div class="tutor-subject-grid">' + cards + '</div></div>' +
+        '<div class="tutor-subject-grid">' + cards + '</div></div>',
         session.snapshot());
       wire();
     }

@@ -359,70 +359,70 @@ test('kelahiran logo menunggu splash pergi, bukan menunggu jam', () => {
   }
 });
 
-test('pertanyaan yakin muncul sebagai popup, dan membawa tombol Lanjutnya sendiri', () => {
-  // OWNER: "mendingan muncul pop up aja di layar dan langsung diikuti tombol next di pop
-  // up itu juga, setelah user menjawab 3 pilihan itu langsung muncul tombol next."
+/* 2026-08-31 — PERTANYAAN KEYAKINAN DIHAPUS ATAS PERMINTAAN OWNER.
+   Dua pemeriksaan yang berdiri di sini sebelumnya ("pertanyaan yakin muncul sebagai popup,
+   dan membawa tombol Lanjutnya sendiri" + "popup keyakinan bukan kurungan") menjaga
+   permintaan owner yang LEBIH LAMA: popup keyakinan harus punya tombol Lanjut sendiri, dan
+   tombol itu tidak boleh ada sebelum murid memilih. Owner membalikkan keputusan itu:
+   "popup keyakinan dihapus semua di semua sesi, itu sangat mengganggu".
+   Invarian lama tidak dilonggarkan - ia SUDAH TIDAK ADA, karena fiturnya tidak ada. Yang
+   menggantikannya di bawah adalah aturan baru, plus satu penjaga yang JUSTRU LEBIH KERAS
+   daripada sebelumnya: penjadwalan ulangan tidak boleh ikut mati. setConfidence() ternyata
+   satu-satunya pemanggil scheduleNext() di jalur jawaban; menghapus popupnya tanpa
+   menyelamatkan bagian itu akan membuat "Review Due" berhenti terisi diam-diam. */
+test('pertanyaan keyakinan tidak pernah muncul lagi di jalur jawaban', () => {
   const app = read('app.js');
-  if (!/\.confidence-pop\{[^}]*position:fixed;inset:0/.test(CSS)) {
-    throw new Error('bukan popup; ia masih menempel di aliran halaman');
-  }
-  if (!/function openConfidencePop\(ok\)/.test(app)) throw new Error('popup tidak pernah dibuka');
-  if (!/openConfidencePop\(ok\);/.test(app)) throw new Error('popup tidak dipicu saat jawaban terbuka');
-
-  // Tombol Lanjut TIDAK boleh sudah ada saat popup pertama muncul - itu inti permintaannya.
   const open = /function openConfidencePop\(ok\)\{[\s\S]*?\n\}/.exec(app);
   if (!open) throw new Error('openConfidencePop tidak terbaca');
-  if (/confidence-go/.test(open[0])) {
-    throw new Error('tombol Lanjut sudah ada sebelum pilihan diambil; pertanyaannya jadi bisa dilewati begitu saja');
+  if (/confidence-scale/.test(open[0])) {
+    throw new Error('skala keyakinan 1/2/3 kembali muncul di popup vonis');
   }
-  const answered = /function confidencePopAnswered\(value\)\{[\s\S]*?\n\}/.exec(app);
-  if (!answered || !/confidence-go/.test(answered[0])) {
-    throw new Error('tombol Lanjut tidak muncul setelah pilihan diambil');
+  if (/setConfidence\(1\)|setConfidence\(2\)|setConfidence\(3\)/.test(open[0])) {
+    throw new Error('tombol yang menanyakan keyakinan kembali dipasang');
   }
-  // Struktural, bukan jarak karakter: assert lama menuntut confidencePopAnswered(value)
-  // muncul dalam <=900 karakter setelah setConfidence(value){ dan langsung rapuh begitu
-  // badan fungsi tumbuh (wave-D menambah pengayaan confidenceHistory dan gagal pada 1.085
-  // karakter padahal perilakunya benar). Yang sebenarnya dijaga: panggilan itu berada DI
-  // DALAM badan fungsi setConfidence. Maka batas fungsinya di-parse dengan hitung brace.
-  const setConfidenceHead = /function setConfidence\(value\)\{/.exec(app);
-  if (!setConfidenceHead) throw new Error('setConfidence(value) tidak ditemukan');
-  let scDepth = 1;
-  let scEnd = setConfidenceHead.index + setConfidenceHead[0].length;
-  while (scDepth > 0 && scEnd < app.length) {
-    const ch = app[scEnd];
-    if (ch === '{') scDepth += 1;
-    else if (ch === '}') scDepth -= 1;
-    scEnd += 1;
-  }
-  if (scDepth !== 0) throw new Error('badan setConfidence tidak seimbang kurungnya; tidak bisa diverifikasi');
-  const setConfidenceBody = app.slice(setConfidenceHead.index, scEnd);
-  if (!setConfidenceBody.includes('confidencePopAnswered(value)')) {
-    throw new Error('popup tidak pernah tahu pilihannya sudah diambil');
+  if (!/confidence-go/.test(open[0])) {
+    throw new Error('popup vonis tidak punya jalan maju ke pembahasan');
   }
 });
 
-test('popup keyakinan bukan kurungan', () => {
-  // Batas yang dipegang seluruh aplikasi sejak m025-126: "layar yang menahan alur tanpa
-  // jalan keluar adalah kurungan, bukan pelajaran". Yang ditahan hanya jalan PINTASNYA.
+test('penjadwalan ulangan tetap berjalan tanpa pertanyaan keyakinan', () => {
+  // Ini penjaga terpenting dari perubahan itu. Kalau seseorang kelak merapikan
+  // openConfidencePop dan ikut membuang panggilan ini, kartu berhenti dijadwalkan dan
+  // tidak ada satu pun galat yang muncul - murid hanya kehilangan review-nya, perlahan.
   const app = read('app.js');
-  if (!/confidence-skip/.test(app)) {
-    throw new Error('tidak ada jalan keluar dari popup tanpa memilih');
+  if (!/function settleReviewScheduleSilently\(\)/.test(app)) {
+    throw new Error('settleReviewScheduleSilently hilang');
   }
-  // Dan ia harus ikut tertutup saat murid pindah soal atau keluar kuis - popup yang
-  // tertinggal akan menutupi layar berikutnya.
-  // m025-180: Keluar kini lewat dialog konfirmasi (audit UI/UX 09-002/10-001), jadi
-  // kontraknya diperiksa STRUKTURAL, bukan cocok-string pada handler: (1) handler Keluar
-  // memanggil confirmQuizExit, dan (2) jalur keluar yang dikonfirmasi (doExit) menutup
-  // popup sebelum meninggalkan layar. Menutup popup pada TAP pertama salah: kalau murid
-  // memilih "Lanjut belajar", kelanjutan popup yang dibatalkan membuat tombol Lanjut mati.
-  if (!/quizExit'\)\.onclick=\(\)=>confirmQuizExit\(\)/.test(app)) {
-    throw new Error('Keluar kuis harus lewat confirmQuizExit \u2014 dialog konfirmasi m025-180');
+  if (!/settleReviewScheduleSilently\(\)/.test((/function openConfidencePop\(ok\)\{[\s\S]*?\n\}/.exec(app) || [''])[0])) {
+    throw new Error('penjadwalan ulangan tidak lagi diselesaikan saat vonis tampil');
   }
-  if (!/const doExit=\(\)=>\{try\{closeConfidencePop\(\)\}/.test(app)) {
-    throw new Error('popup tidak ditutup saat keluar kuis (doExit wajib menutup popup)');
+  const body = (/function settleReviewScheduleSilently\(\)\{[\s\S]*?\n\}/.exec(app) || [''])[0];
+  if (!/scheduleNext\(/.test(body)) throw new Error('scheduleNext tidak dipanggil - review berhenti dijadwalkan');
+  // Data kalibrasi TIDAK boleh dikarang: kita berhenti bertanya, jadi berhenti mencatat.
+  if (/confidenceHistory\.push/.test(body)) {
+    throw new Error('keyakinan yang tidak pernah diucapkan murid dicatat sebagai penilaiannya');
   }
-  if (!/quizNext'\)\.onclick=\(\)=>\{if\(answer\.locked\)\{closeConfidencePop\(\)/.test(app)) {
-    throw new Error('popup tidak ditutup saat pindah soal');
+  if (/srlCaptureConfidence/.test(body)) {
+    throw new Error('prediksi SRL dikarang dari keyakinan yang tidak pernah ditanyakan');
+  }
+});
+
+test('popup yang tersisa di kuis tetap punya jalan keluar', () => {
+  // Batas yang dipegang seluruh aplikasi sejak m025-126: "layar yang menahan alur tanpa
+  // jalan keluar adalah kurungan, bukan pelajaran".
+  // 2026-08-31: pemeriksaan ini DULU mencari literal 'confidence-skip' untuk membuktikan
+  // popup KEYAKINAN bisa dilewati. Pertanyaan keyakinannya sudah dihapus, dan literal itu
+  // kini hanya tersisa di popup TUJUAN SRL - jadi pemeriksaan lama tetap hijau sambil
+  // menguji elemen yang sama sekali berbeda dari yang disebut namanya. Lolos palsu.
+  // Diganti dengan dua hal yang benar-benar ada sekarang.
+  const app = read('app.js');
+  const open = /function openConfidencePop\(ok\)\{[\s\S]*?\n\}/.exec(app);
+  if (!open || !/confidencePopNext\(\)/.test(open[0])) {
+    throw new Error('popup vonis tidak punya jalan maju - itu kurungan');
+  }
+  const srl = /pop\.id='srlGoalPop'[\s\S]*?document\.body\.appendChild\(pop\)/.exec(app);
+  if (srl && !/srlGoalDismiss\(\)/.test(srl[0])) {
+    throw new Error('popup tujuan SRL tidak bisa dilewati tanpa memilih');
   }
 });
 
@@ -473,6 +473,147 @@ test('reset rig membersihkan gaya transform inline yang dipasang styleAt', () =>
 test('probe render bbox tersedia untuk QA', () => {
   if (!fs.existsSync(path.join(__dirname, 'features/mascot/qa/bbox-probe.mjs'))) {
     throw new Error('features/mascot/qa/bbox-probe.mjs hilang — satu-satunya verifikasi RENDER anatomi rig');
+  }
+});
+
+/* ============================================================
+   LAPISAN OUTFIT (G5') — dijalankan sungguhan, bukan diregex.
+   Berkasnya adalah IIFE yang menempel ke `window`, jadi cukup diberi
+   dokumen palsu: resolver `outfitFor` lalu bisa dipanggil langsung dan
+   yang diuji adalah PERILAKUNYA, bukan penampakan sumbernya.
+
+   Kenapa perlu gerbang: keputusan OWNER 2026-08-31 ("mascot pakai topi
+   tidur hilangkan sepenuhnya dari aplikasi tanpa terkecuali", dan tiap
+   sesi memakai item tertentu) tidak dijaga apa pun sebelum ini. OF-08
+   sendiri dulu terpasang lewat DUA cabang - state 'sleepy' dan idle di
+   jam malam - jadi mencabut satu baris saja tidak cukup, dan tidak ada
+   yang akan memberi tahu kalau salah satunya kembali.
+   ============================================================ */
+function loadOutfitLayer() {
+  const doc = {
+    readyState: 'complete', body: {}, documentElement: {},
+    querySelectorAll: () => [], addEventListener: () => {}
+  };
+  const win = { document: doc };
+  const before = global.window;
+  global.window = win;
+  try {
+    delete require.cache[require.resolve('./features/mascot/fiezel-paw-outfit.js')];
+    require('./features/mascot/fiezel-paw-outfit.js');
+  } finally {
+    if (before === undefined) delete global.window; else global.window = before;
+  }
+  if (!win.FiezelPawOutfit) throw new Error('lapisan outfit tidak menempel ke window');
+  return win.FiezelPawOutfit;
+}
+
+const OUTFIT = loadOutfitLayer();
+/* Semua layar nyata app.js (VALID_VIEWS) + semua state komponen yang bisa
+   dilihat resolver. Sapuan penuh, bukan contoh yang dipilih-pilih. */
+const VIEWS = ['home', 'vocab', 'grammar', 'reading', 'skills', 'listening', 'speaking',
+  'writing', 'test', 'progress', 'classroom', 'library', 'ask', 'search', 'online', ''];
+const STATES = ['idle', 'sleepy', 'listening', 'lesson-start', 'welcome-back', 'level-up',
+  'milestone', 'celebrating', 'completion', 'curious', 'proud', 'sad'];
+
+test('topi tidur OF-08 tidak punya SATU pun jalan tersisa di aplikasi', () => {
+  // Sapuan penuh layar x state x 24 jam. Cabang jam-malam itulah yang dulu
+  // membuat OWNER melihat topi tidur di hampir tiap layar (ia belajar 01.50-02.17),
+  // jadi jamnya ikut disapu - bukan hanya siang hari yang kebetulan lolos.
+  if (OUTFIT.registry['OF-08']) throw new Error('OF-08 masih ada barisnya di registry');
+  const bocor = [];
+  for (const v of VIEWS) for (const st of STATES) for (let jam = 0; jam < 24; jam++) {
+    const id = OUTFIT.outfitFor(st, v, jam);
+    for (const one of (Array.isArray(id) ? id : [id])) {
+      if (one === 'OF-08') bocor.push(st + '/' + (v || '(kosong)') + '/' + jam);
+    }
+  }
+  if (bocor.length) throw new Error('topi tidur masih muncul di ' + bocor.length + ' kombinasi, mis. ' + bocor[0]);
+});
+
+test('resolver tidak pernah memulangkan item yang tidak ada barisnya', () => {
+  // Registry TERTUTUP (19 §1.2): id yang tidak terdaftar berarti PAW telanjang
+  // secara diam-diam, bukan error - persis kelas bug yang bikin maskot "hilang".
+  for (const v of VIEWS) for (const st of STATES) for (const jam of [3, 9, 15, 22]) {
+    const id = OUTFIT.outfitFor(st, v, jam);
+    if (id === null) continue;
+    for (const one of (Array.isArray(id) ? id : [id])) {
+      if (!OUTFIT.registry[one]) throw new Error('outfitFor(' + st + ',' + v + ',' + jam + ') -> ' + one + ' yang tidak ada di registry');
+    }
+  }
+});
+
+test('tiap sesi memakai outfit yang diminta OWNER, dan tidak berubah menurut jam', () => {
+  // Kalimat OWNER 2026-08-31, harfiah: test = ransel + bunga, grammar = pensil,
+  // reading = syal, writing = topi. "Tidak berubah menurut jam" bagian penting:
+  // sebelum ini pakaian bisa berganti sendiri di malam hari.
+  const minta = { test: ['OF-01', 'OF-03'], grammar: 'OF-07', reading: 'OF-04', writing: 'OF-02' };
+  for (const [layar, harap] of Object.entries(minta)) {
+    for (const jam of [0, 6, 13, 21, 23]) {
+      const dapat = OUTFIT.outfitFor('idle', layar, jam);
+      const a = JSON.stringify(Array.isArray(harap) ? harap : [harap]);
+      const b = JSON.stringify(Array.isArray(dapat) ? dapat : [dapat]);
+      if (a !== b) throw new Error('layar ' + layar + ' jam ' + jam + ': harap ' + a + ' dapat ' + b);
+    }
+  }
+});
+
+test('kombo sesi Tes tidak menabrakkan dua item di slot yang sama', () => {
+  // 19 SS6.2: hard max dua, dan tidak pernah dua penghuni slot yang sama -
+  // kalau tabrakan, item kedua menimpa item pertama dan salah satunya lenyap.
+  const dipakai = {};
+  for (const id of OUTFIT.outfitFor('idle', 'test', 12)) {
+    const slot = OUTFIT.registry[id].slot;
+    for (const nama of ['head', 'front', 'back']) {
+      if (!slot[nama]) continue;
+      if (dipakai[nama]) throw new Error('slot ' + nama + ' diperebutkan ' + dipakai[nama] + ' dan ' + id);
+      dipakai[nama] = id;
+    }
+  }
+});
+
+test('state listening tidak pernah dapat outfit — headset penghuni slot kepala', () => {
+  // OWNER: "LISTENING SUDAH BENAR PAKAI HEADSET, JANGAN DIUBAH LAGI".
+  //
+  // Aturan 19 SS6.2 yang sebenarnya: tidak boleh dua penghuni slot KEPALA, dan
+  // headphone (fz-acc) ikut dihitung penghuni kepala. Headphone hanya hidup
+  // selama STATE 'listening' - bukan selama layar Listening terbuka - jadi
+  // gerbangnya pun terikat state, di SEMUA layar, bukan hanya dua layar itu.
+  // (Menuntut layar Listening telanjang total justru salah sasaran: ransel
+  // duduk di slot back+front dan tidak pernah bisa menimpa headset.)
+  const bocor = [];
+  for (const v of VIEWS) for (const jam of [2, 14, 22]) {
+    const id = OUTFIT.outfitFor('listening', v, jam);
+    if (id !== null) bocor.push(v + '/' + jam + ' -> ' + JSON.stringify(id));
+  }
+  if (bocor.length) throw new Error('slot kepala direbut dari headset: ' + bocor[0] + ' (total ' + bocor.length + ')');
+});
+
+test('peta layar sendiri tidak pernah menaruh item kepala di listening/speaking', () => {
+  // Cabang terpisah dari yang di atas: kalau suatu saat seseorang menambahkan
+  // baris listening/speaking ke peta LAYAR, tes di atas masih bisa lolos lewat
+  // state tertentu. Ini menagih petanya langsung.
+  const src = read('features/mascot/fiezel-paw-outfit.js');
+  const peta = /var LAYAR = \{([\s\S]*?)\n  \};/.exec(src);
+  if (!peta) throw new Error('peta LAYAR tidak ditemukan — struktur resolver berubah, gerbang ini buta');
+  if (/\b(listening|speaking)\s*:/.test(peta[1])) {
+    throw new Error('listening/speaking masuk peta LAYAR; OWNER menyuruh layar itu tidak diubah lagi');
+  }
+});
+
+test('maks dua item, dan hanya sesi Tes yang memakai dua', () => {
+  for (const v of VIEWS) for (const st of STATES) for (const jam of [4, 11, 20]) {
+    const id = OUTFIT.outfitFor(st, v, jam);
+    const n = Array.isArray(id) ? id.length : (id ? 1 : 0);
+    if (n > 2) throw new Error('layar ' + v + ' state ' + st + ' memakai ' + n + ' item (cap 19 SS6.2 = 2)');
+    if (n === 2 && v !== 'test') throw new Error('kombo dua item bocor ke layar ' + v);
+  }
+});
+
+test('milestone tetap mengalahkan peta layar — toga tidak boleh tertutup pakaian sesi', () => {
+  // Anti-inflasi 13: toga hanya muncul di milestone nyata. Kalau peta layar
+  // menang, toga tidak akan pernah terlihat lagi karena tiap sesi punya pakaian.
+  for (const v of VIEWS) for (const st of ['level-up', 'milestone']) {
+    if (OUTFIT.outfitFor(st, v, 12) !== 'OF-05') throw new Error('toga kalah oleh peta layar di ' + v + '/' + st);
   }
 });
 

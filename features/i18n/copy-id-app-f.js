@@ -124,6 +124,7 @@
     'progress.at-risk-detail': '{count} materi{urgent}',
     'progress.at-risk-urgent': ' - paling mendesak: {top}',
     'progress.calibration-label-2': 'Kalibrasi keyakinan:',
+    'progress.olm-belum-ada-bukti': 'Belum ada yang bisa disimpulkan. Kerjakan beberapa sesi dulu, lalu ringkasan ini terisi sendiri.',
     'progress.ability-label': 'Kemampuan terukur',
     'progress.difficulty-label': 'Kesulitan optimal',
     'progress.response-label': 'Respons sistem:',
