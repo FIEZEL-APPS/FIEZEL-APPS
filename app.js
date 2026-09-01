@@ -214,7 +214,7 @@ function validTimeZone(value){
 // sanitizeState (AI-11 F04 pola #3): blob lama tanpa field ini ter-merge mulus ke 'id',
 // tanpa kunci baru, tanpa bump schema. Nilainya enum tertutup FiezelI18n.SUPPORTED ('id'|'th');
 // JANGAN pernah meneruskannya ke opsi audio/voice (audio-locale-guard-test, AI-17 F02).
-const defaultPreferences={haptics:true,feedbackSounds:true,motion:true,neuralVoice:'auto',reminders:null,reportConsent:false,reportEndpoint:DEFAULT_REPORT_ENDPOINT,selfAssessedLevel:'',activeLevel:'',levelMode:'placement',goalProfile:'general',timeZone:detectedTimeZone(),learnerLocale:'id',/* S5b: sinkron otak antar-perangkat. BAWAAN false dan sengaja begitu — bukti belajar tidak boleh mulai meninggalkan perangkat karena sebuah pembaruan mendarat, hanya karena murid memilihnya. */brainSync:false};
+const defaultPreferences={haptics:true,feedbackSounds:true,motion:true,neuralVoice:'auto',reminders:null,reportConsent:false,reportEndpoint:DEFAULT_REPORT_ENDPOINT,selfAssessedLevel:'',activeLevel:'',levelMode:'placement',goalProfile:'general',timeZone:detectedTimeZone(),learnerLocale:'id',/* m026 GEO-IP: penanda pilihan bahasa MANUAL murid. Sekali true (murid memilih di onboarding/Pengaturan), deteksi IP tidak pernah menimpanya lagi. localeAutoDetected: sudah pernah dicek lokasi sekali per perangkat supaya tidak fetch tiap buka. */learnerLocaleExplicit:false,localeAutoDetected:false,/* S5b: sinkron otak antar-perangkat. BAWAAN false dan sengaja begitu — bukti belajar tidak boleh mulai meninggalkan perangkat karena sebuah pembaruan mendarat, hanya karena murid memilihnya. */brainSync:false};
 const defaultReportMeta={lastSentAnswered:0,lastSentAt:0,lastStatus:'not_configured',lastReceipt:'',lastAccessReportDay:'',queue:[]};
 const LOGIN_MESSAGES=__fzI18nTable([],()=>([
   {headline:FiezelI18n.t('login.pesan-01-headline'),lead:FiezelI18n.t('login.pesan-01-lead')},
@@ -6653,7 +6653,7 @@ function showOnboarding(now=Date.now()){
       onLocale:({locale})=>{
         const supported=(self.FiezelI18n?.SUPPORTED)||['id','th'];
         const value=supported.includes(locale)?locale:'id';
-        state.preferences={...state.preferences,learnerLocale:value};state.coachCache=null;save();
+        state.preferences={...state.preferences,learnerLocale:value,learnerLocaleExplicit:true};state.coachCache=null;save();
         try{self.FiezelI18n?.setLocale?.(value)}catch(_){}
         return value
       },
@@ -9594,7 +9594,7 @@ function setLearnerLocalePreference(next){
   const supported=(self.FiezelI18n?.SUPPORTED)||['id','th'];
   const value=supported.includes(next)?next:'id';
   if((state.preferences?.learnerLocale||'id')===value)return true;
-  state.preferences={...state.preferences,learnerLocale:value};state.coachCache=null;save();
+  state.preferences={...state.preferences,learnerLocale:value,learnerLocaleExplicit:true};state.coachCache=null;save();
   try{self.FiezelI18n?.setLocale?.(value)}catch(_){}
   try{leaveAllStages()}catch(_){}
   closeModal();render();haptic('confirm');
@@ -10653,7 +10653,42 @@ try{self.FiezelUiSfx?.prepare?.('splash_intro',self)}catch(_){}
    bercabang menurut penyebab yang bisa diperiksa (offline / file:// / server-jaringan),
    isi galat mentah ("Failed to fetch") dibuang ke console.debug, dan ada tombol "Coba lagi"
    yang menjalankan ulang load() tanpa memaksa murid me-reload halaman sendiri. */
-function bootFiezel(){return load().catch(e=>{dismissBootSplash();
+// m026 GEO-IP: deteksi negara berbasis IP untuk murid BARU. Kontrak owner: pengunjung dari
+// Thailand yang belum pernah memilih bahasa manual → antarmuka otomatis Thai; selain itu tetap
+// 'id'. Pilihan MANUAL (onboarding/Pengaturan) selalu menang — sekali learnerLocaleExplicit
+// true, fungsi ini langsung mundur. Fetch dijaga timeout pendek + fail-soft: offline, jaringan
+// lambat, atau layanan mati TIDAK PERNAH memblokir boot PWA (jatuh ke 'id'). Dicek sekali per
+// perangkat (localeAutoDetected) supaya tidak fetch tiap buka; kegagalan tidak menandai selesai
+// supaya bisa dicoba lagi kunjungan berikutnya.
+function fetchCountryCode(timeoutMs){
+  if(typeof fetch!=='function')return Promise.resolve(null);
+  var ctrl=typeof AbortController!=='undefined'?new AbortController():null;
+  var timer=setTimeout(function(){try{ctrl&&ctrl.abort()}catch(_){}},timeoutMs);
+  return fetch('https://ipwho.is/?fields=success,country_code',ctrl?{signal:ctrl.signal}:{})
+    .then(function(res){return res&&res.ok?res.json():null})
+    .then(function(data){
+      if(data&&data.success!==false&&typeof data.country_code==='string')return data.country_code.toUpperCase();
+      return null;
+    })
+    .catch(function(){return null})
+    .then(function(cc){clearTimeout(timer);return cc});
+}
+function maybeAutoDetectLocale(){
+  try{
+    var prefs=state&&state.preferences||{};
+    if(prefs.learnerLocaleExplicit===true)return Promise.resolve();
+    if(prefs.localeAutoDetected===true)return Promise.resolve();
+  }catch(_){return Promise.resolve()}
+  return fetchCountryCode(2000).then(function(cc){
+    if(cc===null)return; // gagal/timeout → jangan tandai, coba lagi nanti; tetap 'id'
+    var next={...state.preferences,localeAutoDetected:true};
+    if(cc==='TH')next.learnerLocale='th';
+    state.preferences=next;state.coachCache=null;
+    try{save()}catch(_){}
+    if(cc==='TH'){try{self.FiezelI18n?.setLocale?.('th')}catch(_){}}
+  }).catch(function(){});
+}
+function bootFiezel(){return maybeAutoDetectLocale().then(function(){return load()}).catch(e=>{dismissBootSplash();
   try{console.debug('FIEZEL boot error:',e)}catch(_){}
   const offline=typeof navigator!=='undefined'&&navigator.onLine===false,fileProto=typeof location!=='undefined'&&location.protocol==='file:';
   const msg=offline?FiezelI18n.t('boot.offline-msg')
