@@ -746,6 +746,15 @@ jobs:
           node speaking-adaptive-test.js
           node srl-coach-test.js
           node cors-envelope-test.js
+      - name: 'Braincore v3: kemurnian modul brain (lint kustom)'
+        # Definition of Done Braincore v3: NOL Math.random / Date.now / DOM / storage /
+        # jaringan di features/brain/**. Sampai gerbang ini ada, kemurnian itu hanya
+        # dijanjikan di header tiap modul — dan janji di komentar tidak menghentikan
+        # commit siapa pun. Ia memakai lexer yang membuang komentar & string lebih dulu,
+        # supaya kalimat dokumentasi ("tidak pernah memanggil Date.now()") tidak dihukum
+        # sebagai pelanggaran; gerbang yang merah karena alasan salah akan dimatikan orang.
+        # Berdiri di step sendiri agar kegagalannya punya lampu merah sendiri.
+        run: node braincore-purity-test.js
       - name: 'Wave E4: post-test tertunda / probe retensi (fiezel-post-test)'
         # Modul murni baru features/brain/fiezel-retention-probe.js: penjadwal probe retensi
         # deterministik (offset 3/7/21 hari, jitter seeded per lessonId+userSeed) +

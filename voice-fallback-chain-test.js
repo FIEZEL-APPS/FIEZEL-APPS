@@ -92,6 +92,17 @@ function fakeNode(selector, owner) {
     querySelector() { return null; }, querySelectorAll() { return []; },
     append() {}, remove() {}
   };
+  // DOMTokenList tiruan yang MENYIMPAN token. Addon menandai panggung dengan
+  // `.is-playing` selama pemutaran (baris 627/663) dan pilihan dengan `.is-picked`;
+  // tanpa classList di sini gerbang mati sebagai TypeError, dan dengan no-op ia akan
+  // menjawab salah - kelas yang ditambahkan harus bisa dibaca kembali.
+  const tokens = new Set();
+  node.classList = {
+    add(...names) { names.filter(Boolean).forEach((n) => tokens.add(n)); node.className = [...tokens].join(' '); },
+    remove(...names) { names.forEach((n) => tokens.delete(n)); node.className = [...tokens].join(' '); },
+    contains(name) { return tokens.has(name); },
+    toggle(name, force) { const on = force === undefined ? !tokens.has(name) : !!force; if (on) tokens.add(name); else tokens.delete(name); node.className = [...tokens].join(' '); return on; }
+  };
   return node;
 }
 
