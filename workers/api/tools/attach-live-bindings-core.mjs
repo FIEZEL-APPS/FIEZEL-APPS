@@ -25,11 +25,15 @@ function d1IdByExactName(d1List, name) {
 export function computeAttachedToml(toml, d1List, kvList) {
   const applied = [];
 
-  const cfgCandidates = kvList.filter((ns) => /(^|[-_])CFG([-_]|$)/i.test(ns.title || ''));
+  const cfgAll = kvList.filter((ns) => /(^|[-_])CFG([-_]|$)/i.test(ns.title || ''));
+  // Anti-staging, sama seperti D1 di atas: "fiezel-CFG-staging" tidak boleh pernah
+  // tersubstitusi ke binding produksi hanya karena ia satu-satunya kandidat kalau
+  // yang produksi kebetulan belum dibuat/terlihat.
+  const cfgCandidates = cfgAll.filter((ns) => !/staging/i.test(ns.title || ''));
   if (cfgCandidates.length !== 1) {
     throw new AttachError(
-      `namespace KV untuk CFG tidak jelas (ditemukan ${cfgCandidates.length} kandidat: ` +
-      `${cfgCandidates.map((c) => c.title).join(', ') || '(tidak ada)'})`
+      `namespace KV untuk CFG tidak jelas (ditemukan ${cfgCandidates.length} kandidat produksi ` +
+      `dari total ${cfgAll.length}: ${cfgAll.map((c) => c.title).join(', ') || '(tidak ada)'})`
     );
   }
   const cfgId = cfgCandidates[0].id;
