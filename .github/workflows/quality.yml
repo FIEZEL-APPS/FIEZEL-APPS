@@ -581,6 +581,26 @@ jobs:
           node metrics-digest-test.js
           node id-golden-snapshot-test.js
           node workflow-actor-gate-test.js
+          # Pasangan workflow-actor-gate-test.js dari sisi isi, bukan aktor: ia
+          # MENJALANKAN skrip substitusi binding yang tertanam di
+          # deploy-api-worker.yml (diekstrak dari heredoc, bukan disalin) terhadap
+          # workers/api/wrangler.toml yang asli. Tanpa gerbang ini, penjaga
+          # placeholder di dalam workflow hanya berbunyi SAAT DEPLOY — dan
+          # korbannya adalah gateway yang dipakai murid. Blok binding opsional baru
+          # yang ditambahkan ke wrangler.toml tanpa cabang pelepasannya kini
+          # memerah di sini, bukan di tengah deploy (cacat EVIDENCE_DB, PR #304).
+          node deploy-api-binding-guard-test.js
+          # Pasangan gerbang di atas dari sisi PENEMPELAN MANUAL PERTAMA (bukan CI):
+          # workers/api/tools/attach-live-bindings.mjs adalah skrip yang Owner
+          # jalankan sekali dari laptop untuk menempel ID D1/KV live ke wrangler.toml
+          # sebelum `wrangler deploy` pertama kali (mis. sesudah database baru
+          # dibuat). Logikanya (workers/api/tools/attach-live-bindings-core.mjs)
+          # memakai pencocokan nama EKSAK, bukan substring — tanpa itu
+          # "fiezel-core-staging" bisa lolos ke binding CORE_DB dan gateway murid
+          # menulis identitas ke database staging tanpa satu pun error. Gerbang ini
+          # membuktikan pencocokan itu berpegang pada nama persis dengan data akun
+          # tiruan yang sengaja memuat pasangan staging/produksi berdampingan.
+          node attach-live-bindings-test.js
           # F5: gerbang meta pendaftaran. Diletakkan PALING AKHIR dengan sengaja — ia
           # membaca berkas workflow ini sendiri dan membandingkannya dengan seluruh
           # berkas uji yang dilacak git, jadi ia hanya berarti setelah semua entri di
