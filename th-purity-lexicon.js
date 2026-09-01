@@ -26,7 +26,11 @@ const path = require('path');
 
 const RE_THAI = /[฀-๿]/;
 const RE_LATIN = /[A-Za-z]/;
-const TOKEN = /[A-Za-z][A-Za-z'-]*/g;
+// Apostrof dan hubung hanya SAH DI ANTARA huruf ("don't", "so-called"). Versi sebelumnya
+// memasukkan keduanya ke kelas ekor, jadi kata di dalam kutip menyerap kutip penutupnya:
+// kunci "onto 'deny'," menghasilkan token "deny'" alih-alih "deny", sehingga kata Inggris itu
+// tidak pernah masuk korpus Inggris dan penerjemahnya dituduh menulis bahasa Indonesia.
+const TOKEN = /[A-Za-z]+(?:['-][A-Za-z]+)*/g;
 const tokens = (s) => String(s == null ? '' : s).match(TOKEN) || [];
 
 /** Istilah teknis/ujian yang sah muncul apa adanya di permukaan Thai mana pun. */
@@ -63,6 +67,16 @@ function buildLexicon(ROOT) {
   for (const e of Object.values(J('cloze-explains-v1.json').explains)) {
     for (const k of ['why', 'rule', 'memory', 'avoid']) addID(e[k]);
   }
+  // grammar-templates.json: bank grammar itu sendiri. Seluruh isinya berbahasa INGGRIS
+  // (kalimat soal, pilihan, nama objektif dan miskonsepsi) dan ia korpus Inggris terbesar
+  // kedua di repo setelah reading-bank. Tanpa ia, istilah tata bahasa yang hanya muncul di
+  // sini — 'phrasal', 'particle' — dihitung Indonesia-saja oleh selisih korpus.
+  for (const t of J('grammar-templates.json').templates || []) {
+    addEN(t.stem); addEN(t.pedagogicalObjective); addEN(t.misconceptionTargeted);
+    addEN(t.reasoningOperation); addEN(t.explanation); addEN(t.subskill); addEN(t.family);
+    (t.options || []).forEach(addEN);
+    for (const d of t.distractors || []) { addEN(d.option); addEN(d.misconception); addEN(d.whyFails); }
+  }
   for (const t of Object.values(J('grammar-explanations-id.json').templates || {})) {
     for (const k of ['objective', 'misconception', 'reasoning', 'rule', 'whyCorrect', 'whyOthersFail', 'howToAvoid', 'memoryCue']) addID(t[k]);
     for (const d of Object.values(t.distractors || {})) { addID(d.misconception); addID(d.whyFails); }
@@ -83,8 +97,14 @@ function buildLexicon(ROOT) {
       }
     }
   }
-  for (const v of Object.values(J('grammar-misconception-id.json').diagnoses)) addID(v);
-  for (const c of Object.values(J('misconception-taxonomy-v1.json').codes)) { addID(c.label); addID(c.description_id); }
+  // KUNCI kedua berkas ini berbahasa INGGRIS (nama miskonsepsi yang dipakai bank soal untuk
+  // menjodohkan); hanya NILAINYA yang Indonesia. Tanpa memasukkan kuncinya ke korpus Inggris,
+  // istilah tata bahasa yang memang tidak diterjemahkan — 'phrasal', 'deny', 'gerund' — jatuh
+  // ke himpunan Indonesia-saja dan penerjemahnya dituduh menyelundupkan bahasa Indonesia.
+  for (const [k, v] of Object.entries(J('grammar-misconception-id.json').diagnoses)) { addEN(k); addID(v); }
+  for (const [k, c] of Object.entries(J('misconception-taxonomy-v1.json').codes)) {
+    addEN(k); addEN(c.familyHint); addID(c.label); addID(c.description_id);
+  }
   for (const it of J('features/speaking-listening/listening-bank-v1.json').items || []) {
     addEN(it.script); addEN(it.answerText);
     if (it.pedagogy) { addEN(it.pedagogy.character); addEN(it.pedagogy.scenario); addEN(it.pedagogy.focus); }
@@ -143,13 +163,17 @@ function thaiKataPerKata(value) {
   for (const rentetan of s.match(/[฀-๿]+(?: [฀-๿]+)+/g) || []) {
     const gugus = rentetan.split(' ').map((x) => x.length);
     const rerata = gugus.reduce((a, b) => a + b, 0) / gugus.length;
-    // Dua ambang, karena Thai yang SAH juga memakai spasi untuk memisahkan butir daftar
-    // pendek ("สั้น กระชับ และตอบกลับผู้อื่น" → 3 gugus, rerata 9,0). Diukur terhadap kedua
-    // korpus: keluaran penerjemah token hampir selalu ≥4 gugus (rerata 5,2–9,0), sedangkan
-    // daftar Thai yang benar berhenti di 3 gugus dengan rerata ≥8,7. Rentetan 3 gugus baru
-    // dituduh bila gugusnya benar-benar seukuran kata tunggal (rerata <8).
-    if (gugus.length >= 4 && rerata < 13) return true;
+    // SENGAJA konservatif. Thai yang sah memakai spasi untuk memisahkan butir daftar, dan
+    // daftar 4 butir yang benar ("(ความจำเป็น การอนุญาต คำแนะนำ การอนุมาน)", rerata 8,75)
+    // bertabrakan dengan keluaran penerjemah token 4 gugus (rerata 9,0) — tidak ada ambang
+    // numerik yang memisahkan keduanya. Karena satu tuduhan keliru membuat orang mematikan
+    // gerbang, ambangnya ditarik ke wilayah yang tidak mungkin ditulis manusia: rerata <8 di
+    // panjang berapa pun, ATAU rentetan >=5 gugus pendek. Konsekuensinya jujur: rentetan
+    // 4-gugus dengan rerata 8-13 lolos. Itu bisa diterima karena bukan pertahanan utama —
+    // pertahanan utamanya adalah pemeriksaan residu Indonesia di atas, dan sidecar listening
+    // kini dibangun dari peta KALIMAT UTUH sehingga cacat ini tidak punya jalan lahir lagi.
     if (gugus.length >= 3 && rerata < 8) return true;
+    if (gugus.length >= 5 && rerata < 13) return true;
   }
   return false;
 }
