@@ -126,6 +126,11 @@ jobs:
           node id-golden-snapshot-test.js
           node locale-enum-test.js
           node th-coverage-test.js
+          # th-coverage-test.js menghitung copy-map/naskah/grammar/vocabulary; ia hijau
+          # 143/143 sementara murid Thai membaca bahasa Indonesia sepanjang sesi, karena
+          # BANK SOAL punya jalur hidrasi sendiri yang tidak pernah lewat copy-map.
+          # th-bank-purity-test.js menutup celah itu (lihat THAI-BANK-PURITY-HANDOFF.md).
+          node th-bank-purity-test.js
           node boot-order-test.js
           node splash-first-paint-test.js
           # m025-199: m025-84 memindahkan markup splash ke frame pertama, tetapi peramban
