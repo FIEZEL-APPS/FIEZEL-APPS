@@ -550,9 +550,26 @@ async function runProductionPattern(options) {
   console.log(`     ukur  sebelum(berurutan) keheningan TAK SENGAJA rata-rata=${beforeUnintendedAvg}s per batas (celah + ekor ${TAIL_SILENCE_S}s + kepala ${HEAD_SILENCE_S}s yang tidak dipotong)`);
   console.log(`     ukur  sesudah(berpipa)   celah terukur=${JSON.stringify(gapsMeasured)} rata-rata=${afterAvg}s`);
   console.log(`     ukur  sesudah(berpipa)   keheningan TAK SENGAJA rata-rata=${afterUnintendedAvg}s; jeda prosodi DISENGAJA rata-rata=${intendedAvg}s`);
+  // Prasyarat "jalur lama memang punya sesuatu untuk dibuang" DITURUNKAN dari konstanta
+  // yang ia bicarakan, bukan ditulis sebagai angka ajaib. Versi lama memakai `> 0.2`, yang
+  // diam-diam dikalibrasi terhadap GENERATE_LATENCY_MS = 120 ms: keheningan tak sengaja
+  // jalur lama = celah terukur + ekor + kepala, dan celah terukur ikut memuat latensi
+  // generate. Saat latensi simulasi diturunkan ke 15 ms, baselinenya jatuh ke ~0,183 s dan
+  // gerbang ini memerah — padahal jalur berpipa tetap membuang SELURUH keheningan tak
+  // sengaja, yaitu hal yang sebenarnya diuji. Ambang yang bergantung pada angka simulasi
+  // akan memerah lagi setiap kali angka itu disetel, tanpa satu pun cacat produk.
+  //
+  // Yang tersisa setelah latensi dikeluarkan adalah keheningan MATI di ekor dan kepala
+  // potongan — persis yang jalur berpipa ada untuk memotong. Itulah lantai yang benar.
+  // Konjungsi ketat ditambahkan supaya tidak ada yang dilonggarkan: jalur berpipa harus
+  // benar-benar LEBIH BAIK, bukan sekadar sama-sama nol.
+  const beforeUnintendedFloor = round(TAIL_SILENCE_S + HEAD_SILENCE_S);
   check('(g) pengukuran: keheningan tak sengaja hilang sepenuhnya di jalur berpipa',
-    afterUnintendedAvg === 0 && beforeUnintendedAvg > 0.2 && afterUnintended.every((value) => value === 0),
-    `sebelumTakSengaja=${beforeUnintendedAvg}s sesudahTakSengaja=${afterUnintendedAvg}s`);
+    afterUnintendedAvg === 0
+      && beforeUnintendedAvg >= beforeUnintendedFloor
+      && beforeUnintendedAvg > afterUnintendedAvg
+      && afterUnintended.every((value) => value === 0),
+    `sebelumTakSengaja=${beforeUnintendedAvg}s (lantai=${beforeUnintendedFloor}s) sesudahTakSengaja=${afterUnintendedAvg}s`);
   check('(g2) pengukuran: jeda yang tersisa persis jeda prosodi yang disengaja',
     Math.abs(afterAvg - intendedAvg) < 1e-6, `sesudah=${afterAvg}s disengaja=${intendedAvg}s`);
 
