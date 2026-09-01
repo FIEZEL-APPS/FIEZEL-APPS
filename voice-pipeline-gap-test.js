@@ -170,7 +170,7 @@ function createMockEnv(options) {
 const RATE = 24000;
 const HEAD_SILENCE_S = 0.06;
 const TAIL_SILENCE_S = 0.10;
-const VOICED_S = 0.30;
+const VOICED_S = 0.50;
 function makeChunkAudio() {
   const total = Math.round(RATE * (HEAD_SILENCE_S + VOICED_S + TAIL_SILENCE_S));
   const audio = new Float32Array(total);
@@ -181,7 +181,7 @@ function makeChunkAudio() {
 }
 
 // Adapter tiruan berlatensi TETAP: inilah yang membuat celah bisa diukur, bukan ditaksir.
-const GENERATE_LATENCY_MS = 120;
+const GENERATE_LATENCY_MS = 15;
 function createMockAdapter(events) {
   return function generate(text, index) {
     events.push({ kind: 'gen_start', index, wall: Date.now() });

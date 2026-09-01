@@ -1146,6 +1146,7 @@
         endsAt: pipelineCursor,
         underrun,
         settled: false,
+        done,
         release,
         // Dipanggil oleh stopAll(): potongan sudah ditandai settled di sana, jadi jalur ini
         // hanya perlu memastikan `done` TETAP selesai - kalau tidak, pemanggil yang menunggu
@@ -1257,10 +1258,14 @@
         while (queued.filter((entry) => entry.kind === 'pipeline' && !entry.settled).length >= PIPELINE_MAX_QUEUED_CHUNKS) {
           const oldest = queued.find((entry) => entry.kind === 'pipeline' && !entry.settled);
           if (!oldest) break;
-          await new Promise((resolve) => {
-            const at = Math.max(1, Math.round((oldest.endsAt - contextTime(env.__fiezelWebAudioContext)) * 1000));
-            setTimeout(resolve, at);
-          });
+          if (oldest.done && typeof oldest.done.then === 'function') {
+            await oldest.done;
+          } else {
+            await new Promise((resolve) => {
+              const at = Math.max(1, Math.round((oldest.endsAt - contextTime(env.__fiezelWebAudioContext)) * 1000) + FADE_OUT_MS + 2);
+              setTimeout(resolve, at);
+            });
+          }
           if (cancelled()) return { chunks: list.length, scheduled, cancelled: true };
         }
       }
