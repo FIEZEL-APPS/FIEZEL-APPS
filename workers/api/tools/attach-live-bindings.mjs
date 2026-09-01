@@ -44,7 +44,14 @@ const here = dirname(fileURLToPath(import.meta.url));
 const TOML_PATH = join(here, '..', 'wrangler.toml');
 
 function run(cmd, args) {
-  return execFileSync(cmd, args, { encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 });
+  // shell: true WAJIB di Windows: `npx` di sana adalah npx.cmd/npx.ps1, bukan biner
+  // langsung, dan execFileSync tanpa shell gagal dengan ENOENT walau sudah login
+  // (bukan gejala belum login — murni cara Windows menyelesaikan nama perintah).
+  return execFileSync(cmd, args, {
+    encoding: 'utf8',
+    maxBuffer: 16 * 1024 * 1024,
+    shell: process.platform === 'win32',
+  });
 }
 
 function fail(msg) {
