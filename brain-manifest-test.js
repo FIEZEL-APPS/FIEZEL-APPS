@@ -67,12 +67,12 @@ test('bundleVersion dan minAppVersion bisa diparse semver-ish', () => {
   assert.ok(SEMVERISH.test(manifest.minAppVersion), 'minAppVersion tidak semver-ish: ' + manifest.minAppVersion);
 });
 
-test('bundleVersion 3.7.0 (pengusul penyetelan-diri masuk bundle, masih off)', () => {
+test('bundleVersion 3.8.0 (pelapor rantai konten masuk bundle, masih off)', () => {
   // Literal ini sengaja dipatok, bukan dilonggarkan jadi pola semver: gunanya memaksa
   // perubahan versi bundle menjadi keputusan SADAR yang ikut dalam diff, bukan efek
   // samping. 3.0.0 -> 3.1.0 karena peta otoritas bergerak (Langkah 1 roadmap otonomi:
   // stepTutor/productionGrader diakui aktif, retentionProbe/learningMetrics jadi shadow).
-  assert.strictEqual(manifest.bundleVersion, '3.7.0');
+  assert.strictEqual(manifest.bundleVersion, '3.8.0');
 });
 
 test('minAppVersion sama dengan FIEZEL_VERSION di version.js (dibaca, bukan dikarang)', () => {
