@@ -1,4 +1,4 @@
-# Handoff m025-223 — Braincore v3 P0/P1: gerbang hijau, dekontaminasi bacaan, kemurnian brain
+# Handoff m025-225 — Braincore v3 P0/P1: gerbang hijau, dekontaminasi bacaan, kemurnian brain
 
 **Kewenangan: OWNER.** Dikerjakan dari mega-prompt "BRAINCORE FIEZEL v3 — FULL PRODUCTION
 BUILD" (P0 → test → P1 → test → P2). Dokumen ini mencatat apa yang berubah, apa yang
@@ -6,12 +6,12 @@ sengaja TIDAK diubah, dan apa yang tersisa — supaya sesi berikutnya tidak mene
 
 ## Status
 
-**P0 SELESAI. P1 sebagian.** Rinciannya di §6 (yang tersisa), ditulis sebagai utang terbuka,
+**P0 SELESAI. P1 sebagian, P2 sebagian.** Rinciannya di §6 (yang tersisa), ditulis sebagai utang terbuka,
 bukan sebagai klaim selesai.
 
 ## Sentuhan pada `features/neural-voice/`
 
-**Hanya nomor build** (`DIAG_BUILD` m025-222 → m025-223 lewat `tools/bump-build.mjs`).
+**Hanya nomor build** (`DIAG_BUILD` m025-224 → m025-225 lewat `tools/bump-build.mjs`).
 **Nol baris logika suara neural berubah.** Kunci T-026 tidak disentuh.
 
 Bump-nya wajib, bukan kosmetik: `reading-bank.json` dan `cloze-bank-v1.json` ikut ter-precache
@@ -114,12 +114,18 @@ yang tidak menguji apa pun.
 
 ## Lanjutan (roadmap sesi berikutnya)
 
-1. Perluas grup lazy: `features/library/fiezel-library-ui.js` (43 KB),
-   `features/brain/fiezel-tutor-brain.js` (44 KB), `features/neural-voice/fiezel-diag-panel.js`
-   (32 KB) — semuanya bukan kebutuhan cat pertama. Tiap pemindahan wajib lewat
-   `boot-order-test.js` + daftar `ASSETS` `sw.js` (offline harus tetap utuh).
-2. P2 end-to-end: OLM panel, Cloze production mode, Step-tutor rendering diverifikasi di
-   perangkat, bukan hanya lewat gerbang unit.
+1. `fiezel-library-ui.js` (43 KB) SUDAH dipindah ke grup lazy ketiga di rilis ini.
+   Dua kandidat lain ditolak berikut alasannya, dan alasan itu ditulis di
+   `boot-order-test.js` supaya tidak perlu diselidiki ulang: `fiezel-tutor-brain.js`
+   butuh pola `coreBrainAvailable` di 8 titik panggil app.js lebih dulu (kalau tidak,
+   memalaskannya = ReferenceError di jalur tutor), dan `fiezel-diag-panel.js` ditolak
+   gerbang boot-order sendiri. Hasil terukur: eager 2.514 KB -> 2.470 KB (-44 KB, 1,7%);
+   target <150 KB TIDAK tercapai dan tidak akan tercapai tanpa memecah `app.js` (854 KB).
+2. P2: penelusuran end-to-end menemukan satu cacat nyata dan sudah ditutup di rilis ini —
+   umpan balik distraktor cloze menampilkan tag Inggris (`habitual-aspect
+   overgeneralization`) ke murid SMP Indonesia; datanya sudah ada di bank, yang kurang
+   jalannya di app.js. Yang BELUM: verifikasi ketiga fitur (OLM panel, Cloze, Step-tutor)
+   di perangkat sungguhan, bukan hanya lewat gerbang.
 3. Lighthouse (Performance ≥90, Accessibility ≥95) belum diukur di sesi ini — butuh browser.
 4. Coverage engine inti ≥90% belum diukur; belum ada alat coverage terpasang di repo.
 
