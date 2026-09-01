@@ -260,12 +260,39 @@ test('every grammar template ships its Indonesian counterpart', () => {
       if (e[en] && !e[id]) missing.push(`${t.id}.explanation.${id}`);
     }
     for (const f of ['pedagogicalObjective', 'misconceptionTargeted', 'reasoningOperation']) if (t[f] && !t[`${f}Id`]) missing.push(`${t.id}.${f}Id`);
+    /* Dikencangkan (Braincore v3 P0): syaratnya BUKAN LAGI "kalau ada versi Inggris,
+       harus ada versi Indonesia" melainkan "setiap pengecoh WAJIB punya keduanya".
+       Bentuk lama punya lubang yang diam: pengecoh yang lahir tanpa `whyFails`
+       sama sekali lolos hijau, padahal itu justru kasus terburuknya — murid yang
+       memilihnya tidak diberi penjelasan apa pun, dalam bahasa apa pun. Hari ini
+       cakupannya sudah 747/747, jadi mengencangkan ini tidak menuntut satu baris
+       konten baru; ia hanya menutup pintu supaya tidak bisa turun lagi. */
     for (const d of t.distractors || []) {
-      if (d.whyFails && !d.whyFailsId) missing.push(`${t.id}[${d.option}].whyFailsId`);
-      if (d.misconception && !d.misconceptionId) missing.push(`${t.id}[${d.option}].misconceptionId`);
+      if (!String(d.whyFailsId || '').trim()) missing.push(`${t.id}[${d.option}].whyFailsId`);
+      if (!String(d.misconceptionId || '').trim()) missing.push(`${t.id}[${d.option}].misconceptionId`);
     }
   }
   assert(!missing.length, `${missing.length} student-facing fields have no Indonesian (${missing.slice(0, 4).join(', ')})`);
+});
+
+/* Bank cloze diturunkan MEKANIS dari grammar-templates.json (tools/build-cloze-bank.js),
+   dan sampai Braincore v3 konversinya menjatuhkan `whyFailsId` di jalan: 626 pengecoh
+   cloze tidak punya satu kalimat pun untuk murid yang salah, padahal sumbernya lengkap.
+   Gerbang ini menjaga jalur konversinya, bukan hanya sumbernya — cakupan yang hilang di
+   tengah pipa sama tidak terlihatnya dengan cakupan yang tidak pernah ada. */
+test('every cloze distractor and item carries its Indonesian explanation', () => {
+  const bank = JSON.parse(fs.readFileSync(path.join(root, 'cloze-bank-v1.json'), 'utf8'));
+  const missing = [];
+  for (const it of bank.items || []) {
+    const e = it.explain;
+    if (!e || typeof e !== 'object' || !String(e.why || '').trim() || !String(e.rule || '').trim()) {
+      missing.push(`${it.id}.explain`);
+    }
+    for (const d of it.distractors || []) {
+      if (!String(d.whyFailsId || '').trim()) missing.push(`${it.id}[${d.text}].whyFailsId`);
+    }
+  }
+  assert(!missing.length, `${missing.length} cloze fields have no Indonesian (${missing.slice(0, 4).join(', ')})`);
 });
 
 test('no two distractors in a template share one misconception label', () => {

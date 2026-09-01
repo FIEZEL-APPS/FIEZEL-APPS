@@ -187,7 +187,25 @@ const LEGACY_STATE_KEY='fiezel-v4-state';
 const ACCOUNT_STATE_PREFIX='fiezel-v5-state:';
 const LEGACY_STATE_OWNER_KEY='fiezel-v5-legacy-owner';
 function detectedTimeZone(){try{return Intl.DateTimeFormat().resolvedOptions().timeZone||'Asia/Jakarta'}catch{return'Asia/Jakarta'}}
-function validTimeZone(value){const zone=String(value||'').slice(0,80);try{new Intl.DateTimeFormat('en',{timeZone:zone}).format();return zone}catch{return detectedTimeZone()}}
+/* D4 bottleneck #1 (sisa yang belum tertutup): validasi zona waktu di-MEMO.
+   studyDayKey sudah memo hasilnya, TETAPI kunci memonya sendiri dibangun dari
+   studyTimeZone() -> validTimeZone(), dan versi lama membangun `new Intl.DateTimeFormat`
+   di setiap panggilan — termasuk pada memo HIT. Jadi 1.000 baris riwayat tetap membayar
+   1.000 konstruksi formatter di recomputeMeaningfulDays, persis biaya yang dikira sudah
+   hilang. Fungsinya murni (string -> string) dan himpunan zona yang mungkin dilihat satu
+   perangkat sangat kecil, jadi memo di sini aman; cap 8 seperti cache formatter lain. */
+var TZ_VALID_MEMO=null;
+function validTimeZone(value){
+  const zone=String(value||'').slice(0,80);
+  if(!TZ_VALID_MEMO)TZ_VALID_MEMO=new Map();
+  const hit=TZ_VALID_MEMO.get(zone);
+  if(hit!==undefined)return hit;
+  let out;
+  try{new Intl.DateTimeFormat('en',{timeZone:zone}).format();out=zone}catch{out=detectedTimeZone()}
+  if(TZ_VALID_MEMO.size>=8)TZ_VALID_MEMO.clear();
+  TZ_VALID_MEMO.set(zone,out);
+  return out;
+}
 // `reminders:null` berarti "murid belum memutuskan" dan itu bukan sama dengan false:
 // hanya keputusan yang sesungguhnya (true/false) yang menutup pintu tawaran. Kalau
 // bawaannya false, murid lama akan kehilangan pengingat yang sudah mereka izinkan.
@@ -1320,6 +1338,21 @@ function studyTimeZone(sourceState=null){const prefs=sourceState?.preferences||(
 // saat skrip masih dieksekusi top-level - const di bawahnya masih TDZ dan akan melempar.
 var STUDY_PARTS_FMT=null;
 function studyPartsFormatter(tz){if(!STUDY_PARTS_FMT)STUDY_PARTS_FMT=new Map();let f=STUDY_PARTS_FMT.get(tz);if(!f){if(STUDY_PARTS_FMT.size>=8)STUDY_PARTS_FMT.clear();f=new Intl.DateTimeFormat('en-GB',{timeZone:tz,hour:'2-digit',year:'numeric',month:'2-digit',day:'2-digit',hourCycle:'h23'});STUDY_PARTS_FMT.set(tz,f)}return f}
+/* D4 bottleneck #1 (lanjutan kedua): formatter yang dipakai UI juga di-cache, dengan
+   idiom yang sama supaya tidak lahir dua cara mengurus hal yang sama. Yang ditutup di sini
+   bukan baris riwayat melainkan JAM: startCelestialClock memanggil getCelestialState setiap
+   30 detik selama sesi hidup, dan tiap panggilan membangun `new Intl.DateTimeFormat` baru —
+   biaya kecil yang dibayar ribuan kali dan tidak pernah berhenti. Kuncinya menyertakan
+   locale karena FiezelI18n bisa berganti bahasa saat runtime (id/th); tanpa itu murid yang
+   berganti bahasa akan melihat format lama sampai reload. Cap 8 sama seperti di atas. */
+var UI_FMT=null;
+function uiFormatter(locale,opts,key){
+  if(!UI_FMT)UI_FMT=new Map();
+  const k=key+'|'+locale;
+  let f=UI_FMT.get(k);
+  if(!f){if(UI_FMT.size>=8)UI_FMT.clear();f=new Intl.DateTimeFormat(locale,opts);UI_FMT.set(k,f)}
+  return f;
+}
 function jakartaStudyParts(ts=Date.now(),sourceState=null){const parts=studyPartsFormatter(studyTimeZone(sourceState)).formatToParts(new Date(ts));const g=t=>Number(parts.find(x=>x.type===t)?.value||0);return{year:g('year'),month:g('month'),day:g('day'),hour:g('hour')}}
 /* D4 bottleneck #1 (lanjutan): kunci hari per stempel waktu di-MEMO - h.at tidak pernah
    berubah, jadi hasilnya juga tidak. Kunci memo menyertakan zona waktu supaya murid yang
@@ -2372,7 +2405,14 @@ function makeClozeQuestion(item){
     sourceId:String(item.templateId||item.id||''),conceptId:String(item.templateId||item.id||''),practiceMode:'cloze_production',
     question:FiezelI18n.t('quiz.cloze-stem',{kalimat:item.sentence}),
     clozeAnswer:String(item.blank.answer),clozeAlternates:(item.blank.alternates||[]).map(x=>String(x)),
-    clozeDistractors:(item.distractors||[]).filter(d=>d&&d.text).map(d=>({text:String(d.text),misconception:String(d.misconception||'')})),
+    /* Label Indonesia IKUT DIBAWA (Braincore v3 P0). `misconception` tetap tag Inggris
+       kanonik karena itulah KUNCI ledger miskonsepsi lintas sesi - mengubahnya memecah
+       agregasi. Yang ditambahkan adalah dua field untuk DIBACA murid: sebelum ini, murid
+       Indonesia yang mengetik distraktor berlabel menerima kalimat "Jawaban itu jebakan
+       yang umum: habitual-aspect overgeneralization." — istilah linguistik berbahasa
+       Inggris di layar anak SMP. Teksnya sudah ada di bank sejak konversi cloze membawa
+       whyFailsId; yang kurang cuma jalannya ke sini. */
+    clozeDistractors:(item.distractors||[]).filter(d=>d&&d.text).map(d=>({text:String(d.text),misconception:String(d.misconception||''),misconceptionId:String(d.misconceptionId||''),whyFailsId:String(d.whyFailsId||'')})),
     options:[],answerIndex:-1,difficulty:LEVELS.indexOf(level)+1,
     /* m025-186 (A08-F6) x i18n: explain bank (kurasi per item) dipakai duluan;
        kunci i18n quiz.cloze-* tinggal jaring pengaman untuk item tanpa kurasi. */
@@ -2977,7 +3017,7 @@ function localCoachSignal(){const p=buildAdaptivePolicy();if(p.mode==='diagnosti
 // m025-129: greetingForNow() dihapus bersama baris sapaan serif miring yang menjadi
 // satu-satunya pemakainya. Sapaan kontekstual tetap ada - ia hidup di gelembung PAW,
 // tempat yang memang bertugas menyapa.
-function todayLabel(){try{return new Intl.DateTimeFormat(FiezelI18n.getBcp47(),{weekday:'long',day:'numeric',month:'long'}).format(new Date())}catch{return dayKey(Date.now())}}
+function todayLabel(){try{return uiFormatter(FiezelI18n.getBcp47(),{weekday:'long',day:'numeric',month:'long'},'tanggal').format(new Date())}catch{return dayKey(Date.now())}}
 function reportStatusLabel(){if(!state.preferences?.reportConsent)return FiezelI18n.t('settings.laporan-privat');if(!state.preferences?.reportEndpoint)return FiezelI18n.t('settings.laporan-hub-belum');if(state.reportMeta?.lastStatus==='sent'){const tanggal=state.reportMeta.lastSentAt?new Date(state.reportMeta.lastSentAt).toLocaleDateString(FiezelI18n.getBcp47()):'';return tanggal?FiezelI18n.t('settings.laporan-terkirim',{tanggal}):FiezelI18n.t('settings.laporan-terkirim-polos')}if(state.reportMeta?.lastStatus==='queued')return FiezelI18n.t('settings.laporan-antrean');if(state.reportMeta?.lastStatus==='error')return FiezelI18n.t('settings.laporan-menunggu-koneksi');return FiezelI18n.t('settings.laporan-siap')}
 /* `reservoirMultiplier`: kolam yang lebih besar dari jumlah soal sesi. Tutor Brain memilih
    soal berikutnya dari SISA kolam, jadi kolam sebesar sesi berarti pilihan terakhir tidak
@@ -3095,7 +3135,7 @@ function getCelestialState(input=new Date()){
   const elapsed=isDay?minutes-SUNRISE_MINUTE:(minutes>=SUNSET_MINUTE?minutes-SUNSET_MINUTE:minutes+24*60-SUNSET_MINUTE);
   const progress=Math.max(0,Math.min(1,elapsed/(12*60)));const x=3+94*progress;const y=88-Math.sin(Math.PI*progress)*78;
   const phase=minutes>=5*60&&minutes<8*60?'dawn':minutes>=8*60&&minutes<16*60?'day':minutes>=16*60&&minutes<19*60?'dusk':'night';
-  const time=new Intl.DateTimeFormat(FiezelI18n.getBcp47(),{hour:'2-digit',minute:'2-digit'}).format(date);const body=isDay?'sun':'moon';
+  const time=uiFormatter(FiezelI18n.getBcp47(),{hour:'2-digit',minute:'2-digit'},'jam').format(date);const body=isDay?'sun':'moon';
   const position=progress<.18?FiezelI18n.t('home.celestial-posisi-terbit'):progress<.42?FiezelI18n.t('home.celestial-posisi-naik'):progress<.58?FiezelI18n.t('home.celestial-posisi-puncak'):progress<.82?FiezelI18n.t('home.celestial-posisi-turun'):FiezelI18n.t('home.celestial-posisi-tenggelam');
   const palette=getScenePalette(minutes),intensity=isDay ? .56+Math.sin(Math.PI*progress)*.44 : .28+Math.sin(Math.PI*progress)*.2;
   const light=isDay?`rgba(255,214,132,${(.2+intensity*.38).toFixed(3)})`:`rgba(190,211,255,${(.14+intensity*.28).toFixed(3)})`;
@@ -8150,7 +8190,7 @@ function quizLoop(cfg){
     if(na&&!exactCandidate){
       const hit=(q.clozeDistractors||[]).find(d=>d&&d.text&&nz(d.text)===na);
       if(hit){
-        res={ok:false,distance:Number.isFinite(res.distance)?res.distance:null,matchedDistractor:{text:hit.text,misconception:String(hit.misconception||'')},rationale:'brain3_production_distractor_match',confidence:0.9};
+        res={ok:false,distance:Number.isFinite(res.distance)?res.distance:null,matchedDistractor:{text:hit.text,misconception:String(hit.misconception||''),misconceptionId:String(hit.misconceptionId||''),whyFailsId:String(hit.whyFailsId||'')},rationale:'brain3_production_distractor_match',confidence:0.9};
       }else if(res.ok&&(String(res.rationale||'')==='brain3_production_near_match'||String(res.rationale||'')==='brain3_production_alternate_accepted')){
         /* F1 (P1 redteam-20 round2): guard morfem berlaku terhadap KANDIDAT YANG MENERIMA
            jawaban — target utama ATAU alternate. Dulu hanya near_match vs target yang dicek,
@@ -8208,7 +8248,7 @@ function quizLoop(cfg){
   const detail=ok&&rationale==='brain3_production_near_match'
    ?FiezelI18n.t('quiz.hampir-persis-me-hitung-right',{answer:`<strong>${esc(q.clozeAnswer)}</strong>`})
    :ok?FiezelI18n.t('quiz.cloze-correct',{answer:`<strong>${esc(q.clozeAnswer)}</strong>`})
-   :res?.matchedDistractor?FiezelI18n.t('quiz.cloze-distractor',{misconception:esc(res.matchedDistractor.misconception||FiezelI18n.t('quiz.cloze-distractor-default')),answer:`<strong>${esc(q.clozeAnswer)}</strong>`})
+   :res?.matchedDistractor?FiezelI18n.t('quiz.cloze-distractor',{misconception:esc(res.matchedDistractor.misconceptionId||res.matchedDistractor.whyFailsId||res.matchedDistractor.misconception||FiezelI18n.t('quiz.cloze-distractor-default')),answer:`<strong>${esc(q.clozeAnswer)}</strong>`})
    :rationale==='brain3_production_morpheme_miss'?FiezelI18n.t('quiz.kata-dasarnya-right-bentuknya-pending',{answer:`<strong>${esc(q.clozeAnswer)}</strong>`})
    :FiezelI18n.t('quiz.tepat-strong-strong',{clozeAnswer:esc(q.clozeAnswer)});
   const f=$('feedback');f.classList.remove('hidden');f.classList.add(ok?'feedback-success':'feedback-error');

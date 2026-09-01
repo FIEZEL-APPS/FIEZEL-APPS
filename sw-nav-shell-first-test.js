@@ -258,14 +258,37 @@ const NAMA_SHELL = 'fiezel-shell-' + (revMatch ? revMatch[1] : '???');
       hasil.habis ? 'habis waktu' : 'body=' + (hasil.v && hasil.v.body));
   }
 
-  /* (H) Batas jujur: luring DAN belum punya cangkang. Tidak ada yang bisa disajikan, dan
-   *     berpura-pura punya sesuatu akan menghasilkan layar kosong permanen. Ia harus MENOLAK
-   *     supaya peramban menampilkan galat jaringannya sendiri - jujur, bukan diam. */
+  /* (H) Batas jujur: luring DAN belum punya cangkang.
+   *
+   *     KONTRAK INI DIPERBARUI (P1 keandalan PWA), dan alasannya ditulis di sini supaya
+   *     perubahannya bisa dibantah alih-alih ditemukan orang sebagai kejutan.
+   *
+   *     Bentuk lama: MENOLAK, supaya peramban menampilkan galat jaringannya sendiri.
+   *     Keberatan yang melahirkannya tetap benar dan tetap dijaga di bawah — menyajikan
+   *     CANGKANG KOSONG menghasilkan layar kosong permanen yang tidak bisa dibedakan dari
+   *     aplikasi rusak. Yang berubah adalah kesimpulannya: penolakan mentah memberi murid
+   *     halaman galat peramban berbahasa Inggris tanpa satu petunjuk pun, padahal satu-satunya
+   *     hal yang perlu ia tahu ("sambungkan internet sekali, sesudah itu bisa luring penuh")
+   *     muat dalam dua kalimat.
+   *
+   *     Karena itu yang di-assert sekarang ADA TIGA, bukan satu: halaman luring benar-benar
+   *     disajikan, ia BUKAN cangkang (jaminan lama, tidak dilonggarkan), dan statusnya bukan
+   *     200 supaya tidak pernah terhitung sebagai halaman yang berhasil dimuat. Halamannya
+   *     disintesis di dalam sw.js — kalau ia berupa berkas ter-precache, ia akan hilang
+   *     persis pada satu-satunya keadaan yang membutuhkannya. */
   {
     const sw = bikinSW({ jaringan: 'tolak', adaCangkang: false, namaShell: NAMA_SHELL });
     const hasil = await balapan(sw.tembakNavigasi(), 3000);
-    check('H luring + belum punya cangkang => menolak jujur, bukan menyajikan kosong',
-      !!hasil.tolak, hasil.habis ? 'menggantung' : (hasil.v ? 'body=' + hasil.v.body : 'menolak'));
+    const body = hasil.v ? String(hasil.v.body || '') : '';
+    check('H luring + belum punya cangkang => halaman luring berbahasa Indonesia, bukan galat mentah',
+      !hasil.habis && !hasil.tolak && /Kamu sedang luring/.test(body),
+      hasil.habis ? 'menggantung' : (hasil.tolak ? 'masih menolak mentah' : 'body=' + body.slice(0, 60)));
+    check('H halaman luring BUKAN cangkang (larangan layar kosong permanen tetap berlaku)',
+      !/CANGKANG-GENERASI-INI/.test(body) && /<button/.test(body),
+      'body=' + body.slice(0, 60));
+    check('H halaman luring tidak mengaku 200 (tidak terhitung sebagai muat berhasil)',
+      !!hasil.v && hasil.v.status === 503,
+      hasil.v ? 'status=' + hasil.v.status : 'tanpa respons');
   }
 
   /* (J) Setiap navigasi menerima HALAMANNYA SENDIRI. `creator-report-dashboard.html` dan

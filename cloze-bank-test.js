@@ -87,6 +87,16 @@ test('setiap distractor membawa text + label misconception (umpan grader + ledge
       assert.ok(typeof d.misconception === 'string' && d.misconception.length > 0,
         it.id + ' distraktor#' + i + ': label misconception kosong — ledger tidak bisa mengumpulkan bukti');
       assert.notStrictEqual(d.text, it.blank.answer, it.id + ' distraktor#' + i + ': distraktor sama dengan jawaban');
+      /* Braincore v3 P0: label yang DIBACA MURID wajib ada, bukan hanya label ledger.
+         `misconception` di atas adalah tag Inggris kanonik — kunci agregasi lintas sesi,
+         dan memang harus tetap Inggris. Tetapi sampai commit ini ia juga satu-satunya
+         yang dimiliki item, jadi murid yang mengetik distraktor berlabel menerima
+         "Jawaban itu jebakan yang umum: habitual-aspect overgeneralization." Dua field
+         di bawah ini yang membuat kalimat itu bisa berbahasa Indonesia. */
+      assert.ok(typeof d.whyFailsId === 'string' && d.whyFailsId.length > 0,
+        it.id + ' distraktor#' + i + ': whyFailsId kosong — murid yang salah tidak diberi alasan apa pun');
+      assert.ok(typeof d.misconceptionId === 'string' && d.misconceptionId.length > 0,
+        it.id + ' distraktor#' + i + ': misconceptionId kosong — umpan balik jatuh ke tag Inggris');
     });
   });
 });

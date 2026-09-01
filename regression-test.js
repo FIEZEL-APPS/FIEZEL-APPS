@@ -74,6 +74,19 @@ const eyebrowKey=passageEyebrow&&/FiezelI18n\.t\('([^']+)'\)/.exec(passageEyebro
 assert(!!passageEyebrow&&(/TEKS BACAAN/.test(passageEyebrow[1])||(!!eyebrowKey&&new RegExp("'"+eyebrowKey[1].replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+"'\\s*:\\s*'TEKS BACAAN'").test(copyIdUnion))),'quiz renderer does not show passage with reading question');
 assert(/const readiness=diagnosticReadinessMap\(state\)/.test(app)&&/state\.adaptiveReady=!!readiness\[getActiveLevel\(state\)\]/.test(app),'adaptive readiness must be evidence-based, per active level');
 assert(/window\.__getFiezelState/.test(app),'test state hook missing');
+/* Braincore v3 P0 (umpan balik cloze berbahasa Indonesia). DUA sifat dijaga bersama, karena
+   memperbaiki satu tanpa yang lain menghasilkan cacat yang berbeda:
+     (a) yang DITAMPILKAN ke murid mengutamakan label Indonesia. Sebelum ini slot itu diisi
+         `matchedDistractor.misconception` — tag Inggris kanonik seperti
+         "habitual-aspect overgeneralization" — jadi murid SMP Indonesia yang mengetik
+         distraktor berlabel membaca istilah linguistik berbahasa Inggris.
+     (b) yang DICATAT ke ledger tetap tag Inggris kanonik. Ia kunci agregasi bukti lintas
+         sesi; menggantinya dengan teks Indonesia memecah seluruh riwayat miskonsepsi
+         sekaligus membuat dua label lokal yang sama maknanya terhitung sebagai dua masalah. */
+assert(/matchedDistractor\.misconceptionId\|\|res\.matchedDistractor\.whyFailsId\|\|res\.matchedDistractor\.misconception/.test(app),
+  'umpan balik distraktor cloze tidak mengutamakan label Indonesia (murid membaca tag Inggris)');
+assert(/misconceptionLedgerRecord\(session,q,\{misconception:String\(res\.matchedDistractor\.misconception\)/.test(app),
+  'ledger miskonsepsi tidak lagi memakai tag kanonik Inggris - agregasi lintas sesi pecah');
 /* m025-188: kontrak inventori DIPERKETAT dari angka mati ke properti — lantai baseline
    (tidak boleh menyusut), keunikan id penuh, dan SEMUA record wajib complete (dulu cek
    kesetaraan dengan angka yang sama diam-diam membiarkan record incomplete masuk asal

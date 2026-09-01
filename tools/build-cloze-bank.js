@@ -266,8 +266,22 @@ function convertTemplate(tpl) {
         alternates: alternates,
         position: tpl.stem.indexOf(BLANK)
       },
+      /* whyFailsId IKUT DIBAWA, tidak dijatuhkan di sini.
+       *
+       * Versi lama hanya menyalin {text, misconception}: label miskonsepsi
+       * berbahasa Inggris untuk telemetri, dan TIDAK satu kalimat pun yang
+       * bisa dibaca murid. Akibatnya 626 pengecoh cloze tidak punya jawaban
+       * atas satu-satunya pertanyaan yang murid ajukan sesudah salah —
+       * "kenapa punyaku salah?" — padahal 249 template sumbernya sudah punya
+       * `whyFailsId` lengkap (100%, dijaga content-integrity-gate).
+       * Membuangnya adalah kehilangan data cuma-cuma di jalur konversi. */
       distractors: tpl.distractors.map(function (d) {
-        return { text: d.option, misconception: d.misconception };
+        return {
+          text: d.option,
+          misconception: d.misconception,
+          whyFailsId: String(d.whyFailsId || ''),
+          misconceptionId: String(d.misconceptionId || '')
+        };
       })
     }
   };
@@ -317,6 +331,30 @@ function mergeAlternates(items, alternatesById) {
  * Lint keras seperti mergeAlternates: kunci basi atau field kosong menghentikan build,
  * karena pembahasan yang salah sasaran adalah bug konten, bukan kosmetik.
  */
+/**
+ * Pembahasan bawaan template: dipakai untuk item yang TIDAK punya entri kurasi.
+ *
+ * Bentuk cloze-explains-v1.json ({why, rule, memory, avoid}) adalah cerminan
+ * satu-lawan-satu dari blok `explanation` berbahasa Indonesia di template
+ * sumbernya, dan ke-249 template punya keempat field itu terisi. Sebelum ini
+ * hanya 123 dari 210 item yang dikurasi, jadi 87 item cloze tampil TANPA
+ * pembahasan apa pun — murid yang salah tidak diberi tahu apa-apa, padahal
+ * kalimatnya sudah tersedia satu tabel di sebelahnya. Kurasi tetap MENANG bila
+ * ada (mergeExplains menimpanya); ini hanya menutup lubangnya.
+ */
+function explainFromTemplate(tpl) {
+  var e = tpl.explanation || {};
+  var why = String(e.whyCorrectId || '').trim();
+  var rule = String(e.ruleId || '').trim();
+  if (!why || !rule) return null;   // tanpa dua field inti, jangan karang apa pun
+  return {
+    why: why,
+    rule: rule,
+    memory: String(e.memoryCueId || '').trim(),
+    avoid: String(e.howToAvoidId || '').trim()
+  };
+}
+
 function mergeExplains(items, explainsById) {
   if (!explainsById) return;
   var itemById = {};
@@ -355,6 +393,14 @@ function build(templates, alternatesById) {
     else rejected.push(r.reject);
   });
   mergeAlternates(items, alternatesById === undefined ? loadAlternates() : alternatesById);
+  /* Urutannya disengaja: bawaan template dulu, kurasi sesudahnya — supaya
+   * pembahasan hasil kurasi tetap menang di item yang punya keduanya. */
+  var tplById = {};
+  templates.forEach(function (tpl) { tplById[tpl.id] = tpl; });
+  items.forEach(function (it) {
+    var fallback = explainFromTemplate(tplById[it.templateId] || {});
+    if (fallback) it.explain = fallback;
+  });
   mergeExplains(items, loadExplains());
 
   var byLevel = {};
