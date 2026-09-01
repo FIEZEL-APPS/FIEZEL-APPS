@@ -44,8 +44,8 @@
      * migrasi 0008_evidence.sql diterapkan dan EVIDENCE_ENABLED dinyalakan. */
     evidence: Object.freeze({
       schema: 'fiezel-braincore-evidence-v1',
-      mode: 'off',
-      endpoint: '',
+      mode: 'on',
+      endpoint: 'https://api.fiezel.my.id/api/braincore/evidence',
       // Interval minimum antar-emisi snapshot: SEKALI SEHARI. Lebih sering
       // tidak menambah informasi (bucketnya kasar) tapi menambah permukaan
       // korelasi hari-ke-hari untuk cohort yang sama.

@@ -504,7 +504,14 @@ const COHORT = 'a1b2c3d4e5f60718';
     check('(H) cap byte terdaftar di schema.js, bukan di handler',
       /'\/api\/braincore\/evidence': 8192/.test(schema));
     const toml = fs.readFileSync(path.join(root, 'workers/api/wrangler.toml'), 'utf8');
-    check('(H) EVIDENCE_ENABLED default off di wrangler', /EVIDENCE_ENABLED\s*=\s*"off"/.test(toml));
+    // m025-229: Owner sudah menyelesaikan aktivasi (fiezel-evidence dibuat + migrasi
+    // 0008 diterapkan + binding EVIDENCE_DB menempel di worker live + OWNER_TOKEN_HASH
+    // & secret owner terpasang, semua diverifikasi lewat dashboard sebelum commit ini),
+    // jadi kill switch server sengaja "on" sekarang. Cek yang tersisa: harus salah
+    // satu dari dua nilai sah ("off" pra-aktivasi, "on" pasca-aktivasi) — tidak boleh
+    // string lain (typo/nilai rusak lolos tanpa terlihat).
+    check('(H) EVIDENCE_ENABLED bernilai sah ("off" pra-aktivasi atau "on" pasca-aktivasi)',
+      /EVIDENCE_ENABLED\s*=\s*"(off|on)"/.test(toml));
     check('(H) database bukti terpisah dari empat database lain',
       /binding\s*=\s*"EVIDENCE_DB"/.test(toml) && /database_name\s*=\s*"fiezel-evidence"/.test(toml));
     // Komentar `--` menjelaskan kolom terlarang; yang dilarang adalah DDL-nya.
@@ -515,10 +522,17 @@ const COHORT = 'a1b2c3d4e5f60718';
     }
     check('(H) migrasi memuat tiga tabel lane bukti',
       store.EVIDENCE_TABLES.every(t => mig.includes('CREATE TABLE IF NOT EXISTS ' + t)));
-    // Kill switch klien: lane bukti punya saklarnya SENDIRI.
+    // Kill switch klien: lane bukti punya saklarnya SENDIRI, terpisah dari lane
+    // learning. m025-229: sama seperti EVIDENCE_ENABLED di atas, mode klien sengaja
+    // 'on' pasca-aktivasi — endpoint-nya harus konsisten dengan itu (URL https terisi
+    // kalau 'on'/'local' menyala dari sisi mekanisme, kosong kalau benar-benar 'off').
     const cfg = require('./features/telemetry/fiezel-telemetry-config.js').CONFIG;
-    check('(H) saklar klien lane bukti terpisah dan default off',
-      cfg.evidence && cfg.evidence.mode === 'off' && cfg.evidence.endpoint === '');
+    check('(H) saklar klien lane bukti terpisah dari lane learning',
+      cfg.evidence && ['off', 'local', 'on'].includes(cfg.evidence.mode));
+    check('(H) endpoint bukti terisi https kalau mode on, kosong kalau off',
+      cfg.evidence.mode === 'on' ? /^https:\/\//.test(cfg.evidence.endpoint) : true);
+    check('(H) endpoint bukti kosong kalau mode off (tidak ada URL menggantung tanpa terpakai)',
+      cfg.evidence.mode === 'off' ? cfg.evidence.endpoint === '' : true);
     check('(H) saklar lane learning tidak berubah', cfg.mode === 'off');
     // app.js: lane bukti tidak boleh mengubah keputusan belajar.
     const appSrc = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
