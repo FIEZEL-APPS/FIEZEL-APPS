@@ -124,7 +124,7 @@ LEARNING_ENABLED = "off"
 # cohort terbukti jalan. "off" = `POST /api/braincore/evidence` tetap TERDAFTAR
 # (menjawab 202 `{disabled:true}`, bukan 404) tetapi tidak satu baris pun
 # ditulis.
-EVIDENCE_ENABLED = "off"
+EVIDENCE_ENABLED = "on"
 # CATATAN: TIDAK ADA `TEST_CLOCK_MS` di sini, dan tidak boleh pernah ada.
 # Var itu hanya untuk harness gerbang; gerbang cf-api-contract-test.js
 # meng-assert ketiadaannya di berkas ini.
@@ -290,6 +290,14 @@ crons = ["*/5 * * * *", "5 17 * * *"]
 #   wrangler secret put PUTER_CLAIM_SECRET_PREVIOUS  # rotasi tiket klaim
 #   wrangler secret put IDENTITY_PEPPER              # HMAC pengenal turunan (ip_hmac, ref)
 #   wrangler secret put OWNER_SUBJECT                # identitas owner untuk Worker owner
+#   wrangler secret put OWNER_TOKEN_HASH             # sha256 HEX token owner; gerbang rute
+#                                                    # /api/owner/* (cron-status + bukti
+#                                                    # Braincore). NILAI YANG SAMA dengan
+#                                                    # OWNER_TOKEN_HASH di Worker owner -
+#                                                    # satu token untuk dua Worker. Tanpa ini
+#                                                    # kedua rute owner 403 SELALU
+#                                                    # (fail-closed), dan gejalanya identik
+#                                                    # dengan "token saya salah".
 #   wrangler secret put CRON_TOKEN                   # pengganti FIEZEL_REMINDER_CRON_TOKEN
 #   wrangler secret put EDGE_SHARED_SECRET           # header X-Fiezel-Edge dari proxy jembatan
 #
