@@ -75,6 +75,7 @@ import { registerLearningRoutes } from './learning/route-learning-events.js';
 // Lane KETIGA (bukti belajar Braincore): schema lain, database lain
 // (EVIDENCE_DB), kill switch lain (EVIDENCE_ENABLED).
 import { registerEvidenceRoutes } from './evidence/route-evidence.js';
+import { purgeEvidence } from './evidence/evidence-store-d1.js';
 import { jsonResponse, jsonError, unauthenticated, ERR } from './errors.js';
 // A3: pencatat hasil cron. Satu-satunya alasan berkas ini diubah paket kerja A3.
 import { withCronRun, CRON_JOBS } from './cron-status.js';
@@ -710,6 +711,27 @@ export async function runAnalyticsRollup(event, env, executionCtx) {
 }
 
 /**
+ * (c) Purge TTL lane bukti: dedup + `evidence_learner_day` yang lebih tua dari 14
+ *     hari. BUKAN pemeliharaan opsional — `cohort` yang tidak pernah dipurge adalah
+ *     identitas seumur hidup dengan nama lain, dan seluruh klaim privasi lane ini
+ *     berdiri di atas jendela 14 hari itu.
+ *
+ * CATATAN JUJUR SOAL OBSERVABILITAS: job ini SENGAJA belum dibungkus `withCronRun`.
+ * Daftar job cron (`CRON_JOBS` di cron-status.js) adalah enum tertutup yang dikunci
+ * `cron-contract-test.js` sampai ke JUMLAH baris yang ditinggalkan satu putaran cron;
+ * menambah job ketiga adalah perubahan kontrak tersendiri. Sampai itu dikerjakan,
+ * hasil purge hanya muncul di nilai balik `runScheduled` — artinya purge yang gagal
+ * TIDAK akan terlihat di `/api/owner/cron-status`. Itu lubang yang diketahui, bukan
+ * yang tersembunyi, dan tercatat di reports/BRAINCORE_LEARNER_EVIDENCE_PIPELINE.md.
+ */
+export async function runEvidencePurge(env, now) {
+  const db = (env && env.EVIDENCE_DB) || null;
+  if (!db) return { skipped: 'no_binding' };
+  const today = new Date(Number.isFinite(now) ? now : Date.now()).toISOString().slice(0, 10);
+  return purgeEvidence(db, today);
+}
+
+/**
  * Pemetaan cron -> job. Cron yang tidak dikenal (atau kosong, seperti saat
  * dipanggil gerbang) menjalankan KEDUANYA: lebih baik satu job jalan dua kali
  * (keduanya idempoten) daripada tidak jalan karena ekspresi cron diubah di
@@ -721,7 +743,7 @@ export const CRON_ANALYTICS_ROLLUP = '5 17 * * *';
 export async function runScheduled(event, env, executionCtx, now) {
   const cron = String((event && event.cron) || '');
   const at = Number.isFinite(now) ? now : Number((event && event.scheduledTime)) || Date.now();
-  const out = { cron, quotaSweep: null, analyticsRollup: null };
+  const out = { cron, quotaSweep: null, analyticsRollup: null, evidencePurge: null };
 
   const wantSweep = cron === CRON_QUOTA_SWEEP || cron !== CRON_ANALYTICS_ROLLUP;
   const wantRollup = cron === CRON_ANALYTICS_ROLLUP || cron !== CRON_QUOTA_SWEEP;
@@ -742,6 +764,12 @@ export async function runScheduled(event, env, executionCtx, now) {
       out.analyticsRollup = await withCronRun(quotaDb(env), CRON_JOBS.ANALYTICS_ROLLUP, at,
         () => runAnalyticsRollup(event, env, executionCtx));
     } catch (e) { out.analyticsRollup = { error: e && e.name }; }
+    // Purge bukti mengikuti irama HARIAN yang sama dengan rollup, tetapi berdiri di
+    // luar `withCronRun` rollup: kegagalan purge tidak boleh menandai rollup analytics
+    // gagal, dan sebaliknya. Dua lane, dua kegagalan yang berbeda artinya.
+    try {
+      out.evidencePurge = await runEvidencePurge(env, at);
+    } catch (e) { out.evidencePurge = { error: e && e.name }; }
   }
   return out;
 }

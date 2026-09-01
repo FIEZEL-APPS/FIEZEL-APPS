@@ -1415,7 +1415,7 @@ function abandonActiveSession(reason='exit'){
      menutup gerbang lesson itu 24 jam. Membuka lalu keluar sebelum menjawab tetap gratis. */
   if(String(a.type||'')==='level-exam'&&answered>0){try{recordSkipExamFail(state,String(a.levelScope||''),{score:0,total:Number(a.planned||LEVEL_EXAM_SIZE),accuracy:0,weakSkill:'ujian ditinggalkan sebelum selesai'})}catch(_){}}
   if(String(a.type||'')==='grammar-skip'&&answered>0&&a.skipGateSkill){try{const g=state.grammar[a.skipGateSkill]||{correct:0,total:0,streak:0,mastery:0};g.skipGateCooldownUntil=Date.now()+LEVEL_EXAM_COOLDOWN_MS;state.grammar[a.skipGateSkill]=g}catch(_){}}
-  state.sessionHistory=[...(state.sessionHistory||[]),session].slice(-100);state.activeSession=null;state.inflightAttempt=null;/* W1 P1-2: penalti sudah diputuskan di atas \u2014 penandanya selesai. */const outcome=recordPolicyOutcomeFromSession(session,now);save();queueRemoteActivitySync();if(outcome)queuePolicyOutcomeSync(outcome);anSessionEnded(session);/*A1-EMIT*/return true
+  state.sessionHistory=[...(state.sessionHistory||[]),session].slice(-100);state.activeSession=null;state.inflightAttempt=null;/* W1 P1-2: penalti sudah diputuskan di atas \u2014 penandanya selesai. */const outcome=recordPolicyOutcomeFromSession(session,now);save();queueRemoteActivitySync();if(outcome)queuePolicyOutcomeSync(outcome);braincoreEvidenceObserveSession(outcome,now);/*Lane C*/anSessionEnded(session);/*A1-EMIT*/return true
 }
 function completeActiveSession(cfg,score,total){
   const now=Date.now(),a=state.activeSession,started=Number(a?.startedAt||now),accuracy=Math.round(score/Math.max(1,total)*100);state.activeSession=null;state.inflightAttempt=null;/* W1 P1-2: selesai bersih = penanda dilepas. */return{id:a?.id||`session-${now}`,at:new Date(now).toISOString(),startedAt:new Date(started).toISOString(),level:sessionLevel(a),type:cfg?.type||a?.type||'practice',planned:Number(a?.planned||total),answered:Number(a?.answered||total),score,total,accuracy,completed:true,abandoned:false,durationMs:Math.max(0,now-started),policyId:String(a?.policyId||cfg?.policy?.policyId||''),policyMode:String(a?.policyMode||cfg?.policy?.mode||''),targetSkill:String(a?.targetSkill||cfg?.policy?.targetSkill||''),primaryDomain:String(a?.primaryDomain||cfg?.policy?.primaryDomain||''),policySource:String(a?.policySource||cfg?.policy?.source||''),baselineTargetMastery:a?.baselineTargetMastery??null,baselineTargetAccuracy:a?.baselineTargetAccuracy??null}
@@ -1551,6 +1551,229 @@ function learningTelemetryEmitAnswer(q,ok,h){
     if(!built||built.ok!==true)return;
     const putP=queue.put(built.event,nowMs);
     if(putP&&typeof putP.catch==='function')putP.catch(()=>{});
+  }catch{}
+}
+/* ---- Lane C: BUKTI BELAJAR BRAINCORE (fiezel-braincore-evidence-v1) ---------------------
+ *
+ * KENAPA LANE SENDIRI, BUKAN MENUMPANG LANE B DI ATAS. Lane B mengirim hasil SATU jawaban dan
+ * sengaja tidak punya pengenal apa pun. Lane ini mengirim KEADAAN BELAJAR seorang murid pada
+ * satu hari (mastery, miskonsepsi, kalibrasi kesulitan, keputusan+hasil Braincore, arah
+ * perbaikan) supaya Braincore bisa DIEVALUASI, dan pertanyaan "berapa murid yang terukur"
+ * mustahil dijawab tanpa satu pengenal. Maka lane ini punya pengenal — dan karena itu ia
+ * punya SAKLAR SENDIRI (FiezelTelemetryConfig.CONFIG.evidence.mode, default 'off'). Menyalakan
+ * Lane B tidak boleh diam-diam menyalakan pengenal.
+ *
+ * KONTRAK KERAS, sama dengan Lane B:
+ * (1) mode 'off' keluar di baris PERTAMA — nol alokasi di jalur belajar;
+ * (2) modul absen = fungsi diam (pola coreBrainAvailable);
+ * (3) yang dikirim HANYA bucket berenum tertutup: tanpa nama murid, tanpa jawaban, tanpa
+ *     riwayat, tanpa timestamp presisi. Personal Brain tetap local-first — berkas ini hanya
+ *     MEMBACA angka yang sudah dihitung Brain di perangkat;
+ * (4) offline adalah keadaan NORMAL, bukan galat: event ditulis ke antrean IndexedDB lebih
+ *     dulu, upload menyusul, dan penghapusan hanya terjadi setelah server mengonfirmasi.
+ *     Braincore sendiri tidak pernah menunggu jaringan.
+ */
+const EVIDENCE_DB_NAME='fiezel-braincore-evidence-v1',EVIDENCE_STORE='events',EVIDENCE_COHORT_KEY='fiezel-ev-cohort-v1',EVIDENCE_LAST_KEY='fiezel-ev-last-v1',EVIDENCE_ATTEMPT_KEY='fiezel-ev-attempt-v1';
+let __evidenceDbPromise=null,__evidenceQueue=null;
+/** Mode lane dari konfigurasi BEKU. Nilai tak dikenal / modul absen = 'off'. */
+function braincoreEvidenceMode(){
+  try{const m=self.FiezelTelemetryConfig?.CONFIG?.evidence?.mode;return m==='local'||m==='on'?m:'off'}catch{return 'off'}
+}
+function braincoreEvidenceEndpoint(){
+  try{return String(self.FiezelTelemetryConfig?.CONFIG?.evidence?.endpoint||'')}catch{return ''}
+}
+/** Database antrean TERPISAH dari Lane B: dua lane yang berbagi satu object store akan
+ *  saling menghapus event lewat ack() satu sama lain. */
+function braincoreEvidenceDb(){
+  if(__evidenceDbPromise)return __evidenceDbPromise;
+  __evidenceDbPromise=new Promise((resolve,reject)=>{
+    let req;
+    try{req=indexedDB.open(EVIDENCE_DB_NAME,1)}catch(e){reject(e);return}
+    req.onupgradeneeded=()=>{try{req.result.createObjectStore(EVIDENCE_STORE,{keyPath:'eventId'})}catch{}};
+    req.onsuccess=()=>resolve(req.result);
+    req.onerror=()=>reject(req.error||new Error('idb-open'));
+    req.onblocked=()=>reject(new Error('idb-blocked'));
+  });
+  __evidenceDbPromise.catch(()=>{__evidenceDbPromise=null});
+  return __evidenceDbPromise;
+}
+/** Adaptor idbLike (kontrak createMemoryIdb di fiezel-learning-queue.js). */
+function braincoreEvidenceIdb(){
+  const tx=(mode,run)=>braincoreEvidenceDb().then(db=>new Promise((resolve,reject)=>{
+    let r;
+    try{r=run(db.transaction(EVIDENCE_STORE,mode).objectStore(EVIDENCE_STORE),resolve,reject)}catch(e){reject(e);return}
+    if(r){r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error)}
+  }));
+  return{
+    kind:'indexeddb',
+    getAll:()=>tx('readonly',s=>s.getAll()),
+    put:rec=>tx('readwrite',s=>s.put(rec)).then(()=>undefined),
+    'delete':id=>tx('readwrite',(s,resolve,reject)=>{
+      const g=s.getKey(id);
+      g.onsuccess=()=>{const had=g.result!==undefined;const d=s.delete(id);d.onsuccess=()=>resolve(had);d.onerror=()=>reject(d.error)};
+      g.onerror=()=>reject(g.error);
+    }),
+    clear:()=>tx('readwrite',s=>s.clear()).then(()=>undefined)
+  };
+}
+function braincoreEvidenceQueue(){
+  if(__evidenceQueue)return __evidenceQueue;
+  const Q=self.FiezelLearningQueue;
+  if(!Q||typeof Q.makeQueue!=='function')return null;
+  if(typeof indexedDB==='undefined'||!indexedDB)return null;
+  try{__evidenceQueue=Q.makeQueue({idb:braincoreEvidenceIdb()})}catch{__evidenceQueue=null}
+  return __evidenceQueue;
+}
+/** Hex acak dari CSPRNG. Tanpa crypto -> null (dan lane diam): Math.random() TIDAK dipakai
+ *  sebagai cadangan, karena pengenal yang bisa ditebak lebih buruk daripada tidak ada
+ *  pengenal sama sekali. */
+function braincoreRandomHex(chars){
+  try{
+    const c=self.crypto;if(!c||typeof c.getRandomValues!=='function')return '';
+    const n=Math.ceil(Number(chars||16)/2),buf=new Uint8Array(n);c.getRandomValues(buf);
+    let out='';for(const b of buf)out+=b.toString(16).padStart(2,'0');
+    return out.slice(0,Number(chars||16));
+  }catch{return ''}
+}
+function braincoreEvidenceUuid(){
+  try{if(self.crypto?.randomUUID)return self.crypto.randomUUID()}catch{}
+  const h=braincoreRandomHex(32);
+  if(h.length<32)return '';
+  return h.slice(0,8)+'-'+h.slice(8,12)+'-4'+h.slice(13,16)+'-8'+h.slice(17,20)+'-'+h.slice(20,32);
+}
+/** Cohort berotasi 14 hari, disimpan di kunci localStorage SENDIRI (state belajar tidak
+ *  disentuh). Nilai lama tidak pernah diarsipkan: perangkat sendiri pun tidak boleh bisa
+ *  menyambung epoch lama ke epoch baru. */
+function braincoreEvidenceCohort(nowMs=Date.now()){
+  const M=self.FiezelBraincoreEvidence;
+  if(!M||typeof M.cohortState!=='function')return null;
+  let stored=null;
+  try{stored=JSON.parse(localStorage.getItem(EVIDENCE_COHORT_KEY)||'null')}catch{stored=null}
+  const next=M.cohortState({stored,nowMs,randomHex:braincoreRandomHex});
+  if(!next||!next.cohort)return null;
+  if(next.rotated){try{localStorage.setItem(EVIDENCE_COHORT_KEY,JSON.stringify({cohort:next.cohort,epoch:next.epoch}))}catch{}}
+  return next.cohort;
+}
+/** Hari UTC amplop batch. SATU-SATUNYA penanda waktu yang keluar dari perangkat. */
+function braincoreEvidenceDay(nowMs=Date.now()){return new Date(Number(nowMs)||0).toISOString().slice(0,10)}
+/** Antre satu event. Tidak pernah melempar; nilai kembalinya tidak dibaca jalur belajar. */
+function braincoreEvidenceEnqueue(event,nowMs){
+  try{
+    const queue=braincoreEvidenceQueue();
+    if(!queue)return false;
+    const p=queue.put(event,nowMs);
+    if(p&&typeof p.catch==='function')p.catch(()=>{});
+    return true;
+  }catch{return false}
+}
+/**
+ * Snapshot keadaan belajar -> SATU event `learner_evidence`, PALING BANYAK SEKALI SEHARI
+ * (minIntervalMs). Lebih sering tidak menambah informasi (bucketnya kasar) tetapi menambah
+ * permukaan korelasi hari-ke-hari untuk cohort yang sama.
+ */
+function braincoreEvidenceEmitSnapshot(nowMs=Date.now()){
+  if(braincoreEvidenceMode()==='off')return null;
+  const M=self.FiezelBraincoreEvidence;
+  if(!M||typeof M.buildLearnerEvidenceEvent!=='function')return null;
+  try{
+    let min=86400000;try{min=Number(self.FiezelTelemetryConfig?.CONFIG?.evidence?.minIntervalMs)||86400000}catch{}
+    const last=Number(localStorage.getItem(EVIDENCE_LAST_KEY)||0);
+    if(Number.isFinite(last)&&last>0&&nowMs-last<min)return null;
+    const cohort=braincoreEvidenceCohort(nowMs);
+    if(!cohort)return null;
+    const snapshot=remoteLearnerEvidenceSnapshot(nowMs),outcomes=recentPolicyOutcomes(5),latest=outcomes.at(-1)||null;
+    const input=M.fromSnapshot(snapshot,{
+      level:getActiveLevel(),
+      // Mastery + delta datang dari outcome kebijakan terakhir (satu-satunya tempat kedua
+      // angka itu dihitung dari sesi yang SAMA), bukan dari dua taksiran terpisah.
+      mastery:latest?.masteryAfter,
+      masteryDelta:latest?.masteryDelta,
+      accuracy:latest?.accuracy,
+      improvementDelta:latest?.accuracyDelta
+    });
+    const built=M.buildLearnerEvidenceEvent(Object.assign({eventId:braincoreEvidenceUuid(),cohort},input));
+    if(!built||built.ok!==true)return null;
+    if(!braincoreEvidenceEnqueue(built.event,nowMs))return null;
+    try{localStorage.setItem(EVIDENCE_LAST_KEY,String(nowMs))}catch{}
+    return built.event;
+  }catch{return null}
+}
+/** Mode kebijakan -> alasan keputusan berenum tertutup. Yang tak dikenal jadi 'fallback',
+ *  BUKAN dibuang: keputusan tanpa alasan yang terdaftar tetap keputusan yang terjadi. */
+function braincoreDecisionReason(mode){
+  const m=String(mode||'').toLowerCase();
+  if(m==='review')return 'due_review';
+  if(m==='repair')return 'weak_skill';
+  if(m==='recovery'||m==='balance')return 'target_difficulty';
+  if(m==='diagnostic')return 'new_content';
+  return 'fallback';
+}
+/** Satu outcome kebijakan -> satu event `braincore_decision`. */
+function braincoreEvidenceEmitDecision(outcome,nowMs=Date.now()){
+  if(braincoreEvidenceMode()==='off')return null;
+  const M=self.FiezelBraincoreEvidence;
+  if(!M||typeof M.buildDecisionEvent!=='function'||!outcome)return null;
+  try{
+    const cohort=braincoreEvidenceCohort(nowMs);
+    if(!cohort)return null;
+    const built=M.buildDecisionEvent({
+      eventId:braincoreEvidenceUuid(),
+      cohort,
+      level:getActiveLevel(),
+      // Daftar policyId lane ini TERTUTUP (satu nilai hari ini). policyId lain ditolak
+      // builder, dan itu benar: kebijakan yang tidak terdaftar di manifest tidak bisa
+      // dievaluasi lintas murid.
+      policyId:'core-brain-v3-default',
+      decision:braincoreDecisionReason(outcome.policyMode),
+      outcome:String(outcome.status||''),
+      recommendation:String(outcome.recommendation||''),
+      masteryDelta:outcome.masteryDelta,
+      adherence:outcome.targetAdherence
+    });
+    if(!built||built.ok!==true)return null;
+    if(!braincoreEvidenceEnqueue(built.event,nowMs))return null;
+    return built.event;
+  }catch{return null}
+}
+/**
+ * Flush antrean -> POST batch ke endpoint. Mode 'local' TIDAK PERNAH mengirim (antre saja),
+ * dan tanpa endpoint pun tidak ada yang dikirim. Kegagalan apa pun (offline, 5xx, timeout)
+ * meninggalkan event di antrean dengan eventId yang sama, sehingga percobaan berikutnya
+ * adalah kiriman ULANG yang dide-dup server — bukan event kedua.
+ */
+function braincoreEvidenceFlush(nowMs=Date.now()){
+  if(braincoreEvidenceMode()!=='on')return Promise.resolve(null);
+  const T=self.FiezelLearningTransport;
+  const endpoint=braincoreEvidenceEndpoint();
+  if(!T||typeof T.flush!=='function'||!endpoint)return Promise.resolve(null);
+  const queue=braincoreEvidenceQueue();
+  if(!queue)return Promise.resolve(null);
+  let attempt=0;
+  try{attempt=Number(localStorage.getItem(EVIDENCE_ATTEMPT_KEY))||0}catch{}
+  return T.flush(queue,{
+    fetchFn:(u,init)=>fetch(u,init),
+    url:endpoint,
+    nowMs,
+    seed:Math.floor(nowMs/1000)%100000,
+    attempt,
+    batchSchema:'fiezel-braincore-evidence-v1',
+    day:braincoreEvidenceDay(nowMs),
+    batchIdFn:braincoreEvidenceUuid
+  }).then(res=>{
+    // Hitungan kegagalan beruntun disimpan supaya backoff eksponensial bertahan lintas
+    // reload — backoff yang lupa berapa kali ia gagal bukan backoff.
+    try{localStorage.setItem(EVIDENCE_ATTEMPT_KEY,String(res&&res.ok?0:attempt+1))}catch{}
+    return res;
+  }).catch(()=>null);
+}
+/** Satu pintu untuk jalur akhir sesi: emisi + flush, keduanya senyap. */
+function braincoreEvidenceObserveSession(outcome,nowMs=Date.now()){
+  if(braincoreEvidenceMode()==='off')return;
+  try{
+    braincoreEvidenceEmitDecision(outcome,nowMs);
+    braincoreEvidenceEmitSnapshot(nowMs);
+    const p=braincoreEvidenceFlush(nowMs);
+    if(p&&typeof p.catch==='function')p.catch(()=>{});
   }catch{}
 }
 /* ---- S3 sync antar-device: setiap PERCOBAAN punya identitas sendiri -------------------
@@ -8792,7 +9015,7 @@ function finishQuiz(cfg,score,total,tutorReport){
     else{const b=state.grammar[cfg.skipGateSkill]||{correct:0,total:0,streak:0,mastery:0};b.skipGateCooldownUntil=Date.now()+LEVEL_EXAM_COOLDOWN_MS;state.grammar[cfg.skipGateSkill]=b}
     skipVerdict={passed,message:passed?FiezelI18n.t('quiz.bukti-diterima-right-ditandai-finish',{skor:score,total:total,title:judul}):FiezelI18n.t('quiz.new-right-gerbang-butuh-minimal',{skor:score,total:total,LESSON_SKIP_GATE_PASS:LESSON_SKIP_GATE_PASS})};
   }
-  state.sessionHistory=[...(state.sessionHistory||[]),session].slice(-100);const outcome=recordPolicyOutcomeFromSession(session);save();if(outcome)queuePolicyOutcomeSync(outcome);anSessionEnded(session);/*A1-EMIT*/
+  state.sessionHistory=[...(state.sessionHistory||[]),session].slice(-100);const outcome=recordPolicyOutcomeFromSession(session);save();if(outcome)queuePolicyOutcomeSync(outcome);braincoreEvidenceObserveSession(outcome);/*Lane C*/anSessionEnded(session);/*A1-EMIT*/
   /* SOSIAL (SLOT 7): bukti Poin Bukti di-ANTRE, tidak pernah ditunggu — kegagalan jaringan
      apa pun berhenti di dalam queueSocialEvidence dan layar hasil tidak tahu-menahu. */
   try{queueSocialEvidence(cfg&&cfg.type==='level-exam'&&examVerdict?.passed?[{kind:'exam_passed',band:String(cfg.levelScope||'')}]:[])}catch(_){}
@@ -10318,7 +10541,7 @@ window.queueSocialEvidence=queueSocialEvidence;window.socialSummaryCardMarkup=so
 // karena murid menutup aplikasi saat offline berangkat di sini.
 setTimeout(()=>{try{socialCore()?.flushOutbox()}catch(_){}},4500);
 /* ============================== akhir blok SOSIAL (SLOT 7) ========================== */
-window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,/* m025-201: dipapar untuk core-policy-parity-test.js - gerbang paritas tidak bisa membandingkan apa yang tidak bisa ia panggil */capRationaleCodes,policyEffectiveness,sanitizePolicyEffectiveness,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,coreBrainMemory,tutorSession,tutorObserve,misconceptionLedgerRead,misconceptionLedgerActive,coreBrainAttempts,quizPredictedSuccess,evidenceKappa,bktRead,bktRecord,bktShadowMarkup,brainManifestMarkup,learningTelemetryMode,learningTelemetryEmitAnswer,learningTelemetryStudyDay,confusionMatrixRead,confusionMatrixRecord,affectObserve,affectSessionSync,affectTargetSuccess,listeningAdaptivePolicy,olmPanelMarkup,coreBrainPanelMarkup,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession,/* Fase 3 (C5): kalibrasi item, cloze, OLM negotiated, SRL, speaking adaptif, step tutor */itemCalibrationRead,itemCalibrationObserve,itemCalibrationEffective,calibrationItemId,ensureClozeBank,makeClozeQuestion,clozeAdaptivePicks,clozeSkillReady,clozeProductionRecord,olmSummarizeInput,olmDispute,olmProbeNextSkill,olmProbeConsume,olmNegotiationRead,srlSessionPlan,srlPredictPrompt,srlCaptureConfidence,srlReflect,srlSessionSync,speakingCoverageRows,speakingAdaptiveEvidence,speakingAdaptivePolicy,stepTutorGuidance,stepTutorGuidanceMarkup,record,quizLoop,startAdaptive};
+window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,/* m025-201: dipapar untuk core-policy-parity-test.js - gerbang paritas tidak bisa membandingkan apa yang tidak bisa ia panggil */capRationaleCodes,policyEffectiveness,sanitizePolicyEffectiveness,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,coreBrainMemory,tutorSession,tutorObserve,misconceptionLedgerRead,misconceptionLedgerActive,coreBrainAttempts,quizPredictedSuccess,evidenceKappa,bktRead,bktRecord,bktShadowMarkup,brainManifestMarkup,learningTelemetryMode,learningTelemetryEmitAnswer,learningTelemetryStudyDay,braincoreEvidenceMode,braincoreEvidenceCohort,braincoreEvidenceDay,braincoreEvidenceEmitSnapshot,braincoreEvidenceEmitDecision,braincoreEvidenceFlush,braincoreEvidenceObserveSession,braincoreDecisionReason,confusionMatrixRead,confusionMatrixRecord,affectObserve,affectSessionSync,affectTargetSuccess,listeningAdaptivePolicy,olmPanelMarkup,coreBrainPanelMarkup,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession,/* Fase 3 (C5): kalibrasi item, cloze, OLM negotiated, SRL, speaking adaptif, step tutor */itemCalibrationRead,itemCalibrationObserve,itemCalibrationEffective,calibrationItemId,ensureClozeBank,makeClozeQuestion,clozeAdaptivePicks,clozeSkillReady,clozeProductionRecord,olmSummarizeInput,olmDispute,olmProbeNextSkill,olmProbeConsume,olmNegotiationRead,srlSessionPlan,srlPredictPrompt,srlCaptureConfidence,srlReflect,srlSessionSync,speakingCoverageRows,speakingAdaptiveEvidence,speakingAdaptivePolicy,stepTutorGuidance,stepTutorGuidanceMarkup,record,quizLoop,startAdaptive};
 window.startVocabQuiz=startVocabQuiz;window.buildAdaptivePool=buildAdaptivePool;window.buildGrammarLessonQuestions=buildGrammarLessonQuestions;window.getScenePalette=getScenePalette;window.getCelestialState=getCelestialState;window.playFeedbackSound=playFeedbackSound;window.updateMastery=updateMastery;window.markMastered=markMastered;window.__getFiezelState=()=>state;window.__fiezelValidViews=()=>[...VALID_VIEWS];window.__fiezelDueReviews=()=>dueItems().length;window.buildAdaptivePolicy=buildAdaptivePolicy;window.studyDayKey=studyDayKey;window.startAdaptive=startAdaptive;window.showToast=showToast;window.answerFeedbackSignal=answerFeedbackSignal;window.practiceSkill=practiceSkill;window.openReadingLevel=openReadingLevel;window.startReadingRandom=startReadingRandom;window.startReadingAdaptive=startReadingAdaptive;window.startPlacement=startPlacement;window.startLevelPractice=startLevelPractice;window.startAdaptive=startAdaptive;window.resetProgress=resetProgress;window.closeModal=closeModal;window.openSettings=openSettings;window.openReportPreview=openReportPreview;window.sendCreatorReport=sendCreatorReport;window.askCoachAI=askCoachAI;window.dismissWelcome=dismissWelcome;window.requestStudyNotificationPermission=requestStudyNotificationPermission;window.declineStudyNotifications=declineStudyNotifications;window.skipPuterSignIn=skipPuterSignIn;window.shouldPresentPuterPopup=shouldPresentPuterPopup;window.notifyAppUpdateIfNew=notifyAppUpdateIfNew;window.setConfidence=setConfidence;window.explainWithAI=explainWithAI;window.explainWordWithAI=explainWordWithAI;window.olmDispute=olmDispute;/* Fase 3 (C5 butir 3): handler tombol sanggah di panel OLM */
 // m025-84: dipasang di ujung berkas, saat go()/state/VALID_VIEWS sudah ada, dan SEBELUM
 // load() supaya navigasi pertama pun sudah terekam di riwayat.
