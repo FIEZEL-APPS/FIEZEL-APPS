@@ -66,7 +66,14 @@ export const BYTE_LIMITS = Object.freeze({
   '/api/social/rank/evidence': 8192,
   '/api/social/rank/board/friends': 512, // GET, tanpa body
   '/api/social/rank/board/league': 512,  // GET, tanpa body
-  '/api/social/rank/optout': 512
+  '/api/social/rank/optout': 512,
+  // --- SLOT 8: lane bukti belajar Braincore (evidence/route-evidence.js).
+  // 8192 = LIMITS.MAX_BODY_BYTES di evidence-core.js, angka yang sama dengan
+  // batas batch analytics/learning. Cap di sini, bukan di handler: mw-guard
+  // menegakkannya SEBELUM routing, dan DEFAULT_BYTE_LIMIT 4096 akan memotong
+  // batch sah 20 event menjadi 413 yang tidak bisa dijelaskan ke klien.
+  '/api/braincore/evidence': 8192,
+  '/api/owner/braincore-evidence': 512  // GET, tanpa body
 });
 
 /** Cap terakhir untuk path yang tidak terdaftar: kecil, sengaja. */

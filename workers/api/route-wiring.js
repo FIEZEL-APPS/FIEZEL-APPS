@@ -72,6 +72,9 @@ import { scheduledAnalytics } from './analytics/rollup.js';
 // Lane telemetri BELAJAR (BRAIN-TELEMETRY-SCHEMA.md) — SENGAJA modul terpisah
 // dari analytics: skema lain, database lain (LEARNING_DB), kill switch lain.
 import { registerLearningRoutes } from './learning/route-learning-events.js';
+// Lane KETIGA (bukti belajar Braincore): schema lain, database lain
+// (EVIDENCE_DB), kill switch lain (EVIDENCE_ENABLED).
+import { registerEvidenceRoutes } from './evidence/route-evidence.js';
 import { jsonResponse, jsonError, unauthenticated, ERR } from './errors.js';
 // A3: pencatat hasil cron. Satu-satunya alasan berkas ini diubah paket kerja A3.
 import { withCronRun, CRON_JOBS } from './cron-status.js';
@@ -153,6 +156,17 @@ export function analyticsEnv(env) {
  */
 export function learningEnv(env) {
   return env || { LEARNING_DB: null };
+}
+
+/**
+ * D1 lane bukti belajar Braincore. Aturan yang sama dengan `learningEnv`:
+ * TIDAK ADA alias/fallback. `route-evidence.js` membaca `env.EVIDENCE_DB`
+ * persis seperti nama bindingnya, sehingga satu typo binding berakhir sebagai
+ * lane diam (202 tanpa tulis) dan BUKAN sebagai bukti belajar yang mendarat di
+ * database kuota, analytics, atau learning.
+ */
+export function evidenceEnv(env) {
+  return env || { EVIDENCE_DB: null };
 }
 
 /* ============================================================ ctx adapters ========= */
@@ -495,6 +509,12 @@ function wrapLearning(handler) {
     handler({ request: requestFor(ctx), env: learningEnv(ctx.env), ctx: ctx.executionCtx });
 }
 
+// Konvensi handler lane bukti = konvensi learning ({request, env, ctx}).
+function wrapEvidence(handler) {
+  return async (ctx) =>
+    handler({ request: requestFor(ctx), env: evidenceEnv(ctx.env), ctx: ctx.executionCtx });
+}
+
 /**
  * AI/TTS: identitas WAJIB (tanpa subjek tidak ada kuota yang bisa ditagih, dan
  * tanpa kuota jalur ini adalah pintu biaya terbuka), lalu handler dipanggil
@@ -547,6 +567,15 @@ export function buildExtraRoutes() {
   //      berhenti sopan. Identitas SENGAJA tidak dituntut: payload-nya memang
   //      tidak boleh punya identitas (BRAIN-TELEMETRY-SCHEMA.md §1.3).
   registerLearningRoutes(collector(routes, wrapLearning));
+
+  // [BRAIN] LANE BUKTI BELAJAR BRAINCORE - POST /api/braincore/evidence.
+  //      Alasan pendaftaran-selalu identik dengan dua lane di atas: modulnya
+  //      sendiri yang menjawab 202 `{disabled:true}` saat `EVIDENCE_ENABLED`
+  //      mati (default), supaya klien berhenti sopan alih-alih retry atas 404.
+  //      Identitas SENGAJA tidak dituntut: payloadnya memang tidak boleh punya
+  //      identitas - satu-satunya pengenal adalah `cohort` acak berotasi yang
+  //      dibuat perangkat.
+  registerEvidenceRoutes(collector(routes, wrapEvidence));
 
   // [E5] AI + TTS. `deps.enforceQuota` diselesaikan PER PERMINTAAN.
   const aiSink = [];
