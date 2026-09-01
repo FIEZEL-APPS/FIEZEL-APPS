@@ -278,7 +278,23 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 /* Segmented control, bukan deretan tombol lepas: kapsulnya SATU bidang --panel-soft
    dan tab-nya kehilangan garisnya sendiri, jadi yang terbaca adalah satu kontrol
    dengan satu bagian terpilih. Tab aktif = bidang tinta (resep components.css §6). */
-.progress-tabs{display:flex;gap:6px;overflow-x:auto;margin:14px 0 18px;padding:4px;background:var(--panel-soft);border-radius:var(--radius-pill);-webkit-overflow-scrolling:touch}
+/* Audit UI/UX 2026-08-30 - SETENGAH PETA BELAJAR TIDAK PERNAH DITEMUKAN.
+   Strip ini overflow-x:auto sejak m025-85, tetapi tidak pernah MENGATAKAN bahwa ia bisa
+   digeser. Terukur di 320px: lebar isi 482px dalam kotak 294px - hanya 2 dari 4 tab yang
+   terlihat ("Ringkasan", "Analisis"), 188px tersembunyi tanpa satu pun petunjuk, jadi
+   "Adaptive Engine" dan "Kesiapan & Skills" praktis tidak ada bagi murid di ponsel kecil.
+   Obatnya bayangan-gulir CSS murni (background-attachment: local vs scroll): dua lapis
+   penutup sewarna kapsul di kedua tepi, dua lapis bayangan di belakangnya. Bayangan hanya
+   MUNCUL kalau memang ada yang tersembunyi di sisi itu, dan menghilang sendiri begitu tepi
+   tercapai - tanpa JS, tanpa listener scroll, dan tanpa memakan ruang saat keempat tab muat. */
+.progress-tabs{display:flex;gap:6px;overflow-x:auto;margin:14px 0 18px;padding:4px;background-color:var(--panel-soft);border-radius:var(--radius-pill);-webkit-overflow-scrolling:touch;
+  background-image:linear-gradient(to right,var(--panel-soft),var(--panel-soft)),linear-gradient(to left,var(--panel-soft),var(--panel-soft)),linear-gradient(to right,rgba(36,26,17,.22),rgba(36,26,17,0)),linear-gradient(to left,rgba(36,26,17,.22),rgba(36,26,17,0));
+  background-position:left center,right center,left center,right center;
+  background-repeat:no-repeat;
+  background-size:26px 100%,26px 100%,15px 100%,15px 100%;
+  background-attachment:local,local,scroll,scroll;
+  scroll-snap-type:x proximity}
+.progress-tabs .progress-tab{scroll-snap-align:center}
 .progress-tab{flex:0 0 auto;padding:9px 16px;border-radius:var(--radius-pill);border:0;background:transparent;color:var(--muted);font-size:.82rem;font-weight:600;min-height:44px;white-space:nowrap}
 .progress-tab.active{background:var(--text);border-color:var(--text);color:var(--on-core)}
 
@@ -2417,12 +2433,12 @@ button.primary:active,.primary.luxe:active,html.fiezel-ui-v6 body .primary:activ
 /* i10 2026-08-28 (O5 §2): + :not(.option) — empat tombol jawaban berbayang tebal membuat
    layar soal terasa seperti empat kartu bersaing dengan soalnya; pilihan kembali ke resep
    dasar .option yang tenang (garis --line, tanpa bayangan lantai). */
-html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.text-button):not(.coach-link):not(.fz-coach-bubble):not(.launch-card):not(.skill-card):not(.option){
+html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.text-button):not(.coach-link):not(.fz-coach-bubble):not(.launch-card):not(.skill-card):not(.option):not(.skill-help-dot):not(.olm-dispute){
   border:1.5px solid var(--surface-edge);border-radius:var(--radius-md);
   box-shadow:var(--lift-edge);
   transition:transform var(--dur-xs) var(--ease),box-shadow var(--dur-xs) var(--ease);
 }
-html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.text-button):not(.coach-link):not(.fz-coach-bubble):not(.launch-card):not(.skill-card):not(.option):active{
+html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.text-button):not(.coach-link):not(.fz-coach-bubble):not(.launch-card):not(.skill-card):not(.option):not(.skill-help-dot):not(.olm-dispute):active{
   transform:translateY(2px);box-shadow:var(--lift-edge-press)}
 
 /* --------------------------------------------------------------------------
@@ -2644,6 +2660,80 @@ body.reduce-motion .fz-coach-bubble .fz-coach-pulse,body.reduce-motion .fz-confe
    9. Halaman skill baru (Listening, Speaking, Writing) memakai pola yang sama
    dengan Reading/Grammar supaya tidak ada pola baru yang harus dipelajari.
    -------------------------------------------------------------------------- */
+/* Baris atas halaman skill (permintaan OWNER 2026-08-31). Menggantikan kartu hero
+   ~200px yang isinya pindah ke dialog "?" (app.js openSkillHelp). Barisnya hanya
+   setinggi tombolnya, jadi kartu soal naik hampir satu layar penuh di ponsel.
+   Tombolnya 44px penuh - lantai sasaran sentuh, bukan "kecil" secara harfiah; yang
+   diminta kecil adalah kehadiran VISUALnya, dan itu dicapai lewat warna tenang dan
+   lingkaran ramping, bukan dengan mengecilkan kotak sentuhnya di bawah lantai. */
+/* Sticky, bukan statis. Selama sesi Skills Lab topbar aplikasi DISEMBUNYIKAN
+   (setSessionStage), jadi tombol ini adalah satu-satunya jalan ke keterangan latihan -
+   dan kalau ia ikut tergulir, ia hilang tepat saat murid menggulir daftar pilihan
+   jawaban. Terukur di preview: y=-16px setelah gulir kecil, tepiannya terpotong.
+   top:6px menyamai --sp yang dipakai topbar v6 di lebar ponsel (tutor-v3.css:94). */
+.skill-page-topbar{display:flex;justify-content:flex-end;margin:0 0 4px;position:sticky;top:6px;z-index:34}
+.skill-help-dot{
+  width:44px;height:44px;min-height:44px;padding:0;
+  display:grid;place-items:center;
+  border-radius:50%;border:1px solid var(--line);
+  background:var(--panel-soft);color:var(--ink);
+  font-size:1.05rem;font-weight:800;line-height:1;
+  box-shadow:none;
+}
+.skill-help-dot:hover{background:var(--sun-soft);transform:none}
+/* DUA aturan menimpa bentuk tombol ini, dan keduanya harus dijawab - preview mencatnya
+   dulu 16px, lalu 13px setelah yang pertama diatasi:
+     1. style.css:2436 `html.fiezel-ui-v6 body button:not(...)` (0,4,3) -> radius-md 16px.
+        Dijawab dengan MENAMBAHKAN .skill-help-dot ke rantai :not()-nya, mengikuti konvensi
+        yang sudah dipakai .primary/.nav/.icon-button di repo ini.
+     2. tutor-v3.css:33 `html.fiezel-ui-v6 button` (0,1,1) -> 13px, dan berkas itu dimuat
+        SESUDAH style.css. Dijawab dengan menyamai bentuk pemilihnya di bawah ini (0,2,1).
+   Keduanya lewat spesifisitas, bukan !important: !important juga akan mengalahkan tema
+   yang memang berhak menimpa nanti. */
+html.fiezel-ui-v6 .skill-help-dot{border-radius:50%}
+/* PANGGUNG MATERI GRAMMAR (OWNER 2026-08-31: "design ulang grammar seperti listening").
+   Susunan yang sama dengan sesi dengar: tokoh di KIRI, gelembung ucap di KANAN, dan
+   judul materi duduk DI DALAM gelembung itu. Sebelum ini layar materi tidak punya maskot
+   sama sekali - satu-satunya Pau adalah FAB mengambang di pojok, yang tidak pernah
+   berhubungan dengan isi layarnya. Judulnya juga tercetak dua kali (hero + kartu); kini
+   sekali, di tempat tokohnya mengucapkannya. */
+.lesson-stage{display:flex;align-items:center;gap:10px;margin:0 0 12px}
+/* Panggung maskot Writing: satu-satunya bedanya dengan panggung materi Grammar adalah
+   tidak ada gelembung - judul dan lead sudah ada di hero tepat di atasnya, jadi gelembung
+   hanya akan mengulang kalimat yang sama. Ukurannya dipinjam dari .lesson-stage-paw. */
+.writing-stage{display:flex;justify-content:center;margin:0 0 12px}
+.writing-stage .writing-mascot{width:100%;height:auto;display:block}
+.lesson-stage-paw{flex:0 0 auto;width:clamp(104px,30vw,136px);display:block}
+/* Ukuran naik dari clamp(64,22vw,96) 2026-08-31. Dua sebab, keduanya terukur:
+   (1) OWNER dua kali menyebut maskot Grammar terlalu kecil dan ruang di bawahnya
+       terlalu kosong; (2) di 390px lebar, rumus lama menghasilkan 86px render -
+       DUA piksel di bawah lantai identitas 88px lapisan outfit (19 SS6.5), jadi
+       pensil OF-07 yang diminta OWNER untuk sesi Grammar tidak akan pernah
+       terpasang di layar materi. Rumus baru memberi 117px di 390px: di atas lantai
+       88px, dan di ponsel lebar/tablet menembus 128px sehingga grafit pensil
+       (bagian halus) ikut tampil. */
+.lesson-stage-paw :is(fiezel-mascot,svg,img,canvas){width:100%;height:auto;display:block}
+/* .fz-mascot di dalam custom element dipaku 200px (fiezel-motion.css:127); tanpa baris ini
+   ia tidak ikut mengecil dan hanya meluber keluar kotaknya. */
+.lesson-stage-paw .lesson-mascot .fz-mascot{width:100%}
+.lesson-stage-paw .fz-i{width:100%;height:auto;aspect-ratio:1;color:var(--accent-strong)}
+.lesson-bubble{
+  position:relative;flex:1 1 auto;min-width:0;
+  padding:12px 14px;border:1.5px solid var(--line);border-radius:18px;background:var(--panel-soft);
+}
+.lesson-bubble b{display:block;font-family:var(--fz-display);font-weight:400;font-size:1.18rem;line-height:1.25;letter-spacing:-.01em}
+/* Ekor gelembung dari border transparan - ikut warna tema, nol aset tambahan. */
+.lesson-bubble::before,.lesson-bubble::after{content:'';position:absolute;top:50%;transform:translateY(-50%);border:9px solid transparent}
+.lesson-bubble::before{left:-19px;border-right-color:var(--line)}
+.lesson-bubble::after{left:-16px;border-right-color:var(--panel-soft)}
+/* Kontrol Level belajar di dalam dialog bantuan butuh ruang napasnya sendiri. */
+.skill-help-level{margin:14px 0 0}
+
+/* Isi dialog bantuan: naskah yang dulu berdiri sebagai hero. */
+.skill-help-panel h2{margin:.35rem 0 .5rem;font-size:1.35rem;letter-spacing:-.02em}
+.skill-help-panel p{margin:0 0 .6rem;font-size:.92rem;line-height:1.6}
+.skill-help-panel .skill-level-note{margin-top:12px}
+.skill-help-panel .modal-actions{margin-top:18px}
 .skill-page-hero{
   display:grid;gap:8px;padding:18px;border-radius:var(--radius-lg);margin-bottom:14px;
   border:1.5px solid var(--skill-line,var(--surface-edge));background:var(--skill-bg,var(--panel-soft));color:var(--ink)}
@@ -3661,6 +3751,27 @@ body.fz-lesson-mode .topline{position:sticky;top:0;z-index:30;
    TEKS di sistem ini; di sini ia bidang, dan itu memang perannya. */
 .core-cta{background:linear-gradient(135deg,var(--sun),var(--sun-deep));color:var(--text);border:1.5px solid var(--sun-deep)}
 .core-ghost{background:var(--core-soft);border:1.5px solid var(--core-line);color:var(--on-core)}
+/* Baris klaim OLM (2026-08-31). Tombol sanggah dulu memakai ukuran .core-ghost penuh
+   (min-height 44, padding 10/18, font 700) di dalam kalimat berjalan - ia jadi objek
+   paling berat di kartu, padahal ia aksi SEKUNDER yang jarang dipakai. Di dalam baris
+   klaim ia dikecilkan jadi tautan-tombol: tetap 44px area sentuh lewat padding vertikal
+   + margin negatif (C1 aksesibilitas tidak dikorbankan demi rapi), tapi bobot visualnya
+   turun di bawah nama materi dan angkanya. */
+.olm-claim{padding:7px 0;border-bottom:1px solid var(--line,rgba(0,0,0,.08))}
+.olm-claim:last-of-type{border-bottom:0}
+.olm-claim>span{flex:1 1 auto;min-width:0;color:var(--text);font-size:var(--fs-body,1rem)}
+.olm-claim>b{flex:0 0 auto;font-variant-numeric:tabular-nums}
+.olm-claim .olm-dispute{position:relative;flex:0 0 auto;min-height:0;padding:11px 10px;margin:-11px 0;
+  background:none;border:0;font-size:.74rem;font-weight:600;text-decoration:underline;
+  text-underline-offset:3px;color:var(--muted)}
+.olm-claim .olm-dispute:hover{color:var(--text)}
+/* Area sentuh 44px DIKEMBALIKAN lewat ::after, bukan lewat tinggi tombolnya sendiri:
+   mengecilkan bobot visual tidak boleh sekalian mengecilkan sasaran jari. Kotaknya
+   tidak ikut menata (position:absolute), jadi tinggi barisnya tetap 37px seperti yang
+   terlihat, sementara yang bisa ditekan 44px. Diukur, bukan diasumsikan. */
+.olm-claim .olm-dispute::after{content:"";position:absolute;left:0;right:0;top:50%;
+  transform:translateY(-50%);height:44px}
+
 /* D15 (audit D5-T4): --focus-ring-on-core didesain untuk permukaan gelap --core, tetapi
    tombol sanggah OLM (.core-ghost.olm-dispute) dirender di dalam card() PUTIH - #FFC700
    di atas #FFFFFF hanya 1,56:1, gagal WCAG 1.4.11. Default kini --focus-ring (#A67A00 =
@@ -3926,8 +4037,12 @@ body.fz-lesson-mode .topline{position:sticky;top:0;z-index:30;
 /* Audit 04-003: tautan ini setinggi 24px - 45% di bawah sasaran sentuh 44px - dan
    berulang 16x per jalur. Perpanjangan hit-area transparan menaikkan kotak sentuh
    efektifnya ke 44px tanpa membesarkan tampilannya; ruang di atas (label) dan di bawah
-   (padding 22px .path-step) tidak berisi target lain. */
-.lesson-skip-link::before{content:'';position:absolute;left:0;right:0;top:-10px;bottom:-10px}
+   (padding 22px .path-step) tidak berisi target lain.
+   Audit UI/UX 2026-08-30: -10px ternyata MASIH kurang. Kotaknya 23,x px (bukan 24 bulat),
+   jadi 23,x + 20 = 41px terukur lewat elementFromPoint - tiga piksel di bawah lantai, dan
+   angka itu yang dirasakan jempol, bukan angka di komentar. Dinaikkan ke 12px per sisi
+   (=48px) supaya lantainya dilewati dengan margin, bukan dipepet. */
+.lesson-skip-link::before{content:'';position:absolute;left:0;right:0;top:-12px;bottom:-12px}
 .lesson-skip-link svg{width:12px;height:12px}
 .lesson-skip-link:hover{background:var(--sun-soft);color:var(--text);transform:none;box-shadow:none}
 /* Node terkunci: tombol node-nya disabled, tetapi tautan lewati TIDAK ikut redup -
@@ -4102,7 +4217,108 @@ body.fz-lesson-mode .topline{position:sticky;top:0;z-index:30;
   --fz-paw-size:56px;--fz-paw-headroom:0px;
 }
 .fz-paw-peek fiezel-mascot{position:absolute;left:50%;top:0;transform:translate(-50%,0)}
-/* ruang telinga dipesan di kartu, bukan didorong setelah cat (C3) */
+/* HEADER SESI KUIS: KAPSUL, BUKAN SLAB (OWNER 2026-08-31: "perhatikan panel paling atas
+   dan paling bawah, sangat jelek sekali").
+   .quiz-topbar berdiri sejak lama sebagai bidang translusen selebar konten, tanpa
+   border-radius, tanpa garis tepi, menempel di top:0 - jadi ia terbaca sebagai potongan
+   kertas yang terpotong lurus di kedua sisi, bukan sebagai kontrol. Di layar sempit
+   tingginya 71px dan tepi bawahnya berhenti mendadak tepat di atas maskot, membuat
+   layarnya terbelah dua.
+   Diperbaiki dengan meminjam resep yang SUDAH dipakai topbar utama aplikasi
+   (tutor-v3.css: sticky, radius 18px, garis --glass-edge, bayangan lembut). Hasilnya satu
+   bahasa visual di seluruh produk, bukan dua. Turun sedikit dari tepi (top:8px) supaya
+   pembulatannya benar-benar terlihat saat menempel. */
+body.fz-stage-quiz .quiz-topbar{
+  top:8px;padding:8px 10px;margin:0 0 6px;
+  border:1px solid var(--glass-edge);border-radius:18px;
+  background:var(--chrome-bg);
+  box-shadow:0 10px 30px rgba(36,26,17,.08);
+}
+/* Layar sangat pendek: kapsulnya tetap, paddingnya yang mengalah. */
+@media(max-height:430px){body.fz-stage-quiz .quiz-topbar{top:4px;padding:6px 8px;margin-bottom:4px}}
+
+/* PANEL TERAKHIR TIDAK MENEMPEL DI TEPI BAWAH LAYAR. Tanpa ini kartu tutor berakhir rata
+   dengan tepi layar dan terbaca seperti isi yang terpotong, bukan yang selesai. */
+body.fz-lesson-mode.fz-stage-quiz .quiz-shell{padding-bottom:calc(28px + env(safe-area-inset-bottom,0px))}
+
+/* MASKOT KUIS DI PONSEL (OWNER 2026-08-31: "mascotnya terlalu kecil").
+   Tangga ukuran bawaan 'above' adalah 88px - benar untuk layar kosong yang cuma butuh
+   penanda, terlalu kecil untuk layar kuis yang punya ~400px ruang menganggur di
+   bawahnya. Di panggung kuis ia naik mengikuti tinggi layar (min 108px, sampai 168px),
+   jadi ia besar di ponsel tinggi dan tidak pernah menindas soal di ponsel pendek. */
+/* PANGGUNG SOAL: MASKOT KIRI, SOAL DI GELEMBUNG KANAN (OWNER 2026-08-31: "semua sesi
+   selain listening masih belum berubah").
+   Susunan yang sama persis dengan sesi dengar, dan berlaku untuk SEMUA tipe kuis - vocab,
+   grammar, reading, penempatan, ujian - karena semuanya melewati satu jalur cat yang sama.
+   Maskot yang tadinya berdiri sendirian DI ATAS kartu kini duduk DI DALAMNYA, sejajar
+   dengan soal, sehingga ia terbaca sebagai tokoh yang MENGUCAPKAN soalnya - bukan gambar
+   yang kebetulan ditempel di atas panel. */
+.quiz-stage{display:flex;align-items:center;gap:10px;margin:0 0 12px}
+/* Lantai naik 96 -> 120px 2026-08-31. Diukur, bukan ditebak: 34% dari lebar-dalam
+   kartu di ponsel 390px = 110,8px, dan 110,8 ada DI BAWAH ambang kombo 120px
+   (19 SS6.2/SS6.5) - jadi bunga OF-03 yang diminta OWNER untuk sesi Tes diam-diam
+   luruh dan hanya ranselnya yang terpasang. Persentasenya ikut naik ke 38% supaya
+   angka minimum itu tidak jadi satu-satunya yang bekerja di layar lebih lebar.
+   CATATAN kaskade: --fz-paw-size TIDAK berlaku di mode panggung - aturan width di
+   sinilah yang menang, jadi menaikkan variabel itu di .quiz-shell tidak berefek. */
+.quiz-stage .fz-paw-above{flex:0 0 auto;height:auto;margin:0;width:clamp(120px,38%,156px)}
+.quiz-stage .fz-paw-above fiezel-mascot{width:100%;height:auto}
+.quiz-bubble{
+  position:relative;flex:1 1 auto;min-width:0;
+  padding:12px 14px;border:1.5px solid var(--line);border-radius:18px;background:var(--panel-soft);
+}
+.quiz-bubble .question{margin:0;font-size:clamp(1.02rem,4.4vw,1.24rem);line-height:1.35}
+/* Ekor gelembung dari border transparan - ikut tema, nol aset tambahan. */
+.quiz-bubble::before,.quiz-bubble::after{content:'';position:absolute;top:50%;transform:translateY(-50%);border:9px solid transparent}
+.quiz-bubble::before{left:-19px;border-right-color:var(--line)}
+.quiz-bubble::after{left:-16px;border-right-color:var(--panel-soft)}
+@media (max-height:640px){.quiz-stage .fz-paw-above{width:clamp(64px,20%,96px)}.quiz-stage{margin-bottom:8px}}
+
+/* URUTAN LAPIS: KARTU DI ATAS MASKOT.
+   .fz-paw-slot memasang z-index:1 dan .fz-mascot .fz-svg memakai overflow:visible - jadi
+   gambar maskot boleh melukis DI LUAR kotak layoutnya, dan karena z-index-nya lebih tinggi
+   daripada kartu (auto), lukisan itu jatuh DI ATAS teks. Di layar tanpa aksesori lewatnya
+   cuma 6px dan tidak terlihat; begitu Pau memakai topi, lewatnya jauh lebih besar dan ia
+   menutupi "Benar, mantap!" beserta kalimat pembahasannya - dilaporkan owner dengan
+   tangkapan layar.
+   Diperbaiki di urutan lapis, BUKAN dengan memotong maskot (overflow:hidden akan memenggal
+   telinga dan topinya) dan bukan dengan menebak tinggi aksesori yang bisa berubah kapan
+   saja: kartu dinaikkan di atas maskot. Bagian bawah tokoh tersembunyi di balik tepi atas
+   kartu - itu justru pose "berdiri di belakang kartu" yang memang dituju, dan teks tidak
+   akan pernah tertimpa apa pun yang digambar maskot. */
+.quiz-shell .fz-paw-above{--fz-paw-size:clamp(104px,19dvh,164px);--fz-paw-headroom:2px;margin-bottom:-6px;z-index:0}
+body.fz-stage-quiz .quiz-shell>.card{position:relative;z-index:1}
+/* Ponsel pendek: tokoh tetap hadir tapi tidak boleh mendorong pilihan jawaban keluar
+   layar. 667px terukur meluber 12px pada tangga 26dvh, jadi tangganya diturunkan di sini,
+   bukan lantai sasaran sentuh yang dipangkas. */
+@media (max-height:740px){.quiz-shell .fz-paw-above{--fz-paw-size:clamp(88px,17dvh,128px)}
+  .quiz-shell .options{gap:10px}.quiz-shell .options button{min-height:48px}}
+@media (max-height:600px){.quiz-shell .fz-paw-above{--fz-paw-size:80px}}
+
+/* Sisa ruang diberikan ke ISI, bukan dibiarkan menganggur: pilihan jawaban di layar kuis
+   mendapat tinggi dan jarak sedikit lebih lega. Lantai 44px tidak diturunkan - ini
+   menaikkan, bukan memampatkan. */
+.quiz-shell .options{gap:12px}
+.quiz-shell .options button{min-height:56px}
+
+/* PEMBAHASAN TIDAK LAGI DIPAKSA JADI LEMBAR MENGAMBANG - DICABUT 2026-08-31.
+   Di sini sempat berdiri aturan yang membuat #feedback dan #tutorTurn position:fixed di
+   dasar layar, untuk memenuhi permintaan "penjelasan muncul sebagai popup". Itu SALAH,
+   dan owner menemukannya sebagai bug di semua sesi: panelnya MENUTUPI pilihan jawaban
+   yang masih ada di bawahnya. Terukur setelah dicabut-uji: tiga tombol jawaban tertimpa
+   #tutorTurn di satu sesi vocab.
+   Sebab kesalahannya, supaya tidak diulang: #tutorTurn BUKAN teks pembahasan yang pasif.
+   Ia panel tutor yang punya kontrolnya sendiri ("Aku masih belum paham", tutor-turn-ask,
+   #tutorStuck) dan berdiri DI DALAM alur kartu bersama pilihan jawaban yang masih hidup.
+   Melayangkannya di atas alur itu berarti menutupi bagian yang masih dipakai murid -
+   position:fixed mengeluarkan elemen dari aliran, jadi tidak ada yang memberi ruang
+   untuknya dan tidak ada satu pun yang bergeser.
+   Kalau permintaan "popup" itu dikerjakan ulang, ia harus dikerjakan di JS: memindahkan
+   isinya ke lapisan dialog yang benar (openModal, yang sudah punya scrim dan pengurungan
+   fokus) SETELAH pilihan jawaban tidak lagi relevan - bukan menggeser satu properti CSS
+   pada elemen yang masih bertetangga dengan kontrol hidup. */
+
+/* ruang telinga dipesan di kartu, bukan didorong setelah cat (C3) *//* ruang telinga dipesan di kartu, bukan didorong setelah cat (C3) */
 .card.has-paw-peek{position:relative;margin-top:calc(56px*.44 + 8px)}
 /* tier 48 di ponsel sempit & landscape pendek (tabel §2d) */
 @media (max-width:420px){
