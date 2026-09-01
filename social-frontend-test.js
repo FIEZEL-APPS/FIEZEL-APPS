@@ -23,8 +23,17 @@ function freshCore(opts={}){
   // Mock fetch LOKAL (pola no-network-test: nol jaringan nyata di gerbang mana pun) —
   // setiap konteks vm menerima mock ini atau mock milik kasus ujinya sendiri.
   const fetchMock=opts.fetch||(async()=>({ok:false,status:503,json:async()=>({})}));
+  const MockDate = class extends Date {
+    constructor(...args) {
+      if (args.length === 0 && opts.now !== undefined) super(opts.now);
+      else super(...args);
+    }
+    static now() {
+      return opts.now !== undefined ? opts.now : Date.now();
+    }
+  };
   const ctx={
-    console,Date,Math,JSON,Object,Array,Number,String,Promise,isFinite,parseInt,parseFloat,
+    console,Date:MockDate,Math,JSON,Object,Array,Number,String,Promise,isFinite,parseInt,parseFloat,
     setTimeout,clearTimeout,
     localStorage:{getItem:k=>store[k]??null,setItem:(k,v)=>{store[k]=String(v)},removeItem:k=>{delete store[k]}},
     navigator:{onLine:opts.onLine!==false},
@@ -67,7 +76,7 @@ function freshCore(opts={}){
  assert(/belum aktif/i.test(core.errorCopy('social_disabled')),'naskah social_disabled tidak jujur');
  assert(/offline/i.test(core.errorCopy('offline')),'naskah offline salah');
  // ---- outbox: antre = enum disaring, count di-clamp, jti uuid, day WIB
- const q=freshCore();
+ const q=freshCore({now:t});
  const entry=q.core.queueEvidence([
    {kind:'meaningful_day'},{kind:'srs_review',count:99},{kind:'exam_passed',band:'B1'},
    {kind:'hack_pb',count:1},{kind:'lesson_mastered',band:'Z9'}
@@ -78,32 +87,32 @@ function freshCore(opts={}){
  assert(entry.events[1].count===20,'count tidak di-clamp ke 20');
  assert(entry.events[2].band==='B1'&&entry.events[3].band===undefined,'band tidak divalidasi');
  assert(q.core.outboxPending()===1,'antrean tidak tersimpan');
- assert(q.core.queueEvidence([{kind:'bukan_enum'}])===null,'batch tanpa event sah ikut antre');
+ assert(q.core.queueEvidence([{kind:'bukan_enum'}],t)===null,'batch tanpa event sah ikut antre');
  assert(q.store[q.core._outboxKey].indexOf(entry.jti)>=0,'jti tidak disimpan bersama item (retry tidak idempoten)');
  // ---- flush: 5xx/putus = SIMPAN dengan jti sama; ack = buang; 400 = buang racun
  let calls=[];
  q.ctx.fetch=async(url,opts)=>{calls.push({url:String(url),body:opts&&opts.body?JSON.parse(opts.body):null});return {ok:false,status:503,json:async()=>({error:'unavailable'})}};
- let r=await q.core.flushOutbox();
+ let r=await q.core.flushOutbox(t);
  assert(r.sent===0&&q.core.outboxPending()===1,'batch hilang padahal server 5xx');
  q.ctx.fetch=async(url,opts)=>{calls.push({url:String(url),body:opts&&opts.body?JSON.parse(opts.body):null});return {ok:true,status:200,json:async()=>({accepted:2,pbWeek:12,week:'2026-08-24'})}};
- r=await q.core.flushOutbox();
+ r=await q.core.flushOutbox(t);
  assert(r.sent===1&&q.core.outboxPending()===0,'ack server tidak membuang item');
  const evidenceCalls=calls.filter(c=>c.url.indexOf('/api/social/rank/evidence')>=0);
  assert(evidenceCalls.length===2&&evidenceCalls[0].body.jti===evidenceCalls[1].body.jti,'retry memakai jti berbeda - replay guard server jadi sia-sia');
  assert(evidenceCalls[1].body.day==='2026-08-29'&&Array.isArray(evidenceCalls[1].body.events),'payload evidence tidak sesuai kontrak');
- r=await q.core.flushOutbox();
+ r=await q.core.flushOutbox(t);
  assert(r.sent===0&&q.core.outboxPending()===0,'flush antrean kosong tidak boleh mengirim apa pun');
- q.core.queueEvidence([{kind:'meaningful_day'}]);
+ q.core.queueEvidence([{kind:'meaningful_day'}],t);
  q.ctx.fetch=async()=>({ok:false,status:400,json:async()=>({error:'schema_invalid'})});
- await q.core.flushOutbox();
+ await q.core.flushOutbox(t);
  assert(q.core.outboxPending()===0,'batch beracun (400) menyumbat antrean');
  // ---- offline: flush menolak halus, antrean utuh
- const off=freshCore({onLine:false,fetch:async()=>{throw new Error('tidak boleh ada jaringan saat offline')}});
- off.core.queueEvidence([{kind:'daily_target'}]);
- r=await off.core.flushOutbox();
+ const off=freshCore({now:t,onLine:false,fetch:async()=>{throw new Error('tidak boleh ada jaringan saat offline')}});
+ off.core.queueEvidence([{kind:'daily_target'}],t);
+ r=await off.core.flushOutbox(t);
  assert(r.reason==='offline'&&off.core.outboxPending()===1,'flush offline tidak menyimpan antrean');
  // ---- item kedaluwarsa (>3 hari) dibuang saat antre berikutnya
- const old=freshCore();
+ const old=freshCore({now:t});
  old.core.queueEvidence([{kind:'meaningful_day'}],t-4*86400000);
  old.core.queueEvidence([{kind:'daily_target'}],t);
  assert(JSON.parse(old.store[old.core._outboxKey]).length===1,'bukti kedaluwarsa (pasti hangus di server) tidak dibuang');
