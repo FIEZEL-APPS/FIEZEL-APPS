@@ -29,7 +29,28 @@
     // Batas antrean disalin dari kontrak fiezel-learning-queue.js.
     queue: Object.freeze({ maxEvents: 2000, maxBytes: 2 * 1024 * 1024, maxAgeDays: 45 }),
     // Scope domain: grammar-only sesuai keputusan council (BRAIN-EVOLUTION-DECISIONS.md).
-    domains: Object.freeze(['grammar'])
+    domains: Object.freeze(['grammar']),
+    /* Lane KETIGA: bukti belajar Braincore (fiezel-braincore-evidence-v1).
+     * Saklarnya SENDIRI, bukan menumpang `mode` di atas, karena lane ini
+     * membawa pengenal (cohort acak berotasi) yang tidak dibawa lane learning —
+     * menyalakan dua lane dengan satu saklar berarti orang yang menyalakan lane
+     * learning tidak sadar ia juga menyalakan pengenal.
+     *
+     * mode: 'off'    - tidak ada event dibangun, tidak ada tulisan antrean;
+     *       'local'  - dibangun + antre LOKAL saja (verifikasi skema di
+     *                  perangkat nyata tanpa jaringan);
+     *       'on'     - antre + upload ke `endpoint`.
+     * Default 'off' dan endpoint KOSONG: lane ini baru boleh menyala setelah
+     * migrasi 0008_evidence.sql diterapkan dan EVIDENCE_ENABLED dinyalakan. */
+    evidence: Object.freeze({
+      schema: 'fiezel-braincore-evidence-v1',
+      mode: 'off',
+      endpoint: '',
+      // Interval minimum antar-emisi snapshot: SEKALI SEHARI. Lebih sering
+      // tidak menambah informasi (bucketnya kasar) tapi menambah permukaan
+      // korelasi hari-ke-hari untuk cohort yang sama.
+      minIntervalMs: 86400000
+    })
   });
   return Object.freeze({ CONFIG: CONFIG, SCHEMA: CONFIG.schema });
 });

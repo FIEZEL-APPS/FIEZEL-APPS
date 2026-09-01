@@ -115,6 +115,7 @@ jobs:
           node brain-manifest-test.js
           node fiezel-stat-gate-test.js
           node learning-lane-test.js
+          node braincore-evidence-test.js
           node learning-metrics-test.js
           node learning-telemetry-test.js
           node metrics-digest-test.js
@@ -253,6 +254,7 @@ jobs:
           node metrics-digest-test.js
           node learning-telemetry-test.js
           node learning-lane-test.js
+          node braincore-evidence-test.js
           node app-telemetry-wiring-test.js
           node analytics-dedup-test.js
           node analytics-stable-id-guard-test.js
@@ -572,6 +574,7 @@ jobs:
           node brain-manifest-test.js
           node fiezel-stat-gate-test.js
           node learning-lane-test.js
+          node braincore-evidence-test.js
           node learning-metrics-test.js
           node learning-telemetry-test.js
           node locale-enum-test.js
@@ -809,6 +812,7 @@ jobs:
           node fiezel-stat-gate-test.js
           node id-golden-snapshot-test.js
           node learning-lane-test.js
+          node braincore-evidence-test.js
           node learning-metrics-test.js
           node learning-telemetry-test.js
           node locale-enum-test.js

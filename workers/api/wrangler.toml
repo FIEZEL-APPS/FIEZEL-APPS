@@ -116,6 +116,15 @@ ANALYTICS_ENABLED = "on"
 # "off" = `POST /api/learning/events` tetap TERDAFTAR (menjawab 202
 # `{disabled:true}`, bukan 404) tetapi tidak satu baris pun ditulis.
 LEARNING_ENABLED = "off"
+# Kill switch lane BUKTI BELAJAR Braincore (fiezel-braincore-evidence-v1).
+# Default "off" DENGAN SENGAJA, dan alasannya sama kerasnya dengan lane
+# learning: lane ini adalah SATU-SATUNYA yang membawa pengenal murid (cohort
+# acak berotasi 14 hari), jadi ia baru boleh menyala setelah migrasi
+# 0008_evidence.sql diterapkan, database_id EVIDENCE_DB terisi, dan purge TTL
+# cohort terbukti jalan. "off" = `POST /api/braincore/evidence` tetap TERDAFTAR
+# (menjawab 202 `{disabled:true}`, bukan 404) tetapi tidak satu baris pun
+# ditulis.
+EVIDENCE_ENABLED = "off"
 # CATATAN: TIDAK ADA `TEST_CLOCK_MS` di sini, dan tidak boleh pernah ada.
 # Var itu hanya untuk harness gerbang; gerbang cf-api-contract-test.js
 # meng-assert ketiadaannya di berkas ini.
@@ -164,6 +173,20 @@ database_id   = "<isi setelah: wrangler d1 create fiezel-stats>"
 binding       = "LEARNING_DB"
 database_name = "fiezel-learning"
 database_id   = "<isi setelah: wrangler d1 create fiezel-learning>"
+
+# D1 KEEMPAT untuk lane BUKTI BELAJAR Braincore. Alasan pemisahannya satu
+# tingkat lebih keras daripada tiga database di atas: inilah satu-satunya
+# database yang menyimpan pengenal per-perangkat (`evidence_learner_day.cohort`,
+# 16 hex acak, TTL 14 hari). Selama ia hidup di database sendiri, "cohort tidak
+# bisa disambungkan ke identitas, kuota, kehadiran, atau jawaban" adalah sifat
+# yang tidak bisa ditulis dalam SQL — D1 tidak bisa JOIN lintas database.
+# Tabel: evidence_daily (agregat), evidence_dedup (UUID sekali pakai),
+# evidence_learner_day (hari+cohort) — migrasi 0008_evidence.sql. Modul bukti
+# membaca `env.EVIDENCE_DB` TANPA fallback (route-wiring.js:evidenceEnv).
+[[d1_databases]]
+binding       = "EVIDENCE_DB"
+database_name = "fiezel-evidence"
+database_id   = "<isi setelah: wrangler d1 create fiezel-evidence>"
 
 # --- KV: HANYA config/flag/state breaker + penanda anti-replay ber-TTL -------
 # PLAN GRATIS: 1.000 TULIS/HARI. Karena itu jalur panas DILARANG menulis ke KV.

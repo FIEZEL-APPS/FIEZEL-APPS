@@ -55,8 +55,13 @@ const REPO = path.resolve(HERE, '..');
  *  `LEARNING_DB`). Tanpa entri ini, `filesByDbFromDoc` menganggap 0007 "tidak
  *  terpetakan" dan KELUAR 2 — arah gagal yang benar, tapi yang diminta di sini
  *  adalah memperluas gerbang dengan jujur, bukan membiarkannya merah. */
-const DB_NAMES = ['core', 'stats', 'learning'];
-const DB_ALIAS = { 'fiezel-core': 'core', 'fiezel-stats': 'stats', 'fiezel-learning': 'learning' };
+/* [INFRA-0008-20260901] `evidence` = database KEEMPAT (`fiezel-evidence`, binding
+ * EVIDENCE_DB, migrasi 0008_evidence.sql). Satu-satunya database yang menyimpan
+ * pengenal per-perangkat (`evidence_learner_day.cohort`, TTL 14 hari), jadi arah
+ * larangannya paling ketat: tidak boleh memuat identitas, kuota, analytics, MAUPUN
+ * tabel lane learning. */
+const DB_NAMES = ['core', 'stats', 'learning', 'evidence'];
+const DB_ALIAS = { 'fiezel-core': 'core', 'fiezel-stats': 'stats', 'fiezel-learning': 'learning', 'fiezel-evidence': 'evidence' };
 
 /**
  * Berkas migrasi per database — DITURUNKAN, bukan ditulis tangan.
@@ -98,7 +103,7 @@ export function filesByDbFromDoc(dir) {
   if (!inDir.length) throw new Error('tidak ada berkas .sql di ' + dir);
   if (unmapped.length) {
     throw new Error('berkas migrasi tanpa database tujuan di MIGRATIONS.md: ' + unmapped.join(', ') +
-      ' — tambahkan perintah `wrangler d1 execute <fiezel-core|fiezel-stats|fiezel-learning> --remote --file=migrations/<berkas>`');
+      ' — tambahkan perintah `wrangler d1 execute <fiezel-core|fiezel-stats|fiezel-learning|fiezel-evidence> --remote --file=migrations/<berkas>`');
   }
   if (missing.length) {
     throw new Error('MIGRATIONS.md menyebut berkas yang tidak ada di ' + dir + ': ' + missing.join(', '));
@@ -117,11 +122,15 @@ export function filesByDbFromDoc(dir) {
  *  kalau ketiga arahnya dijaga, bukan dua. */
 const FORBIDDEN_BY_DB = {
   core: ['metrics_daily', 'usage_daily', 'retention_daily', 'dau_dedup', 'pepper_state',
-    'learning_daily', 'learning_dedup'],
+    'learning_daily', 'learning_dedup', 'evidence_daily', 'evidence_dedup', 'evidence_learner_day'],
   stats: ['identity', 'session', 'anon_issue', 'quota_daily', 'quota_reservation',
-    'learning_daily', 'learning_dedup'],
+    'learning_daily', 'learning_dedup', 'evidence_daily', 'evidence_dedup', 'evidence_learner_day'],
   learning: ['identity', 'session', 'anon_issue', 'quota_daily', 'quota_reservation',
-    'metrics_daily', 'usage_daily', 'retention_daily', 'dau_dedup', 'pepper_state', 'batch_dedup']
+    'metrics_daily', 'usage_daily', 'retention_daily', 'dau_dedup', 'pepper_state', 'batch_dedup',
+    'evidence_daily', 'evidence_dedup', 'evidence_learner_day'],
+  evidence: ['identity', 'session', 'anon_issue', 'quota_daily', 'quota_reservation',
+    'metrics_daily', 'usage_daily', 'retention_daily', 'dau_dedup', 'pepper_state', 'batch_dedup',
+    'learning_daily', 'learning_dedup']
 };
 
 /** Kolom penghubung yang tidak boleh muncul di database analytics. */
@@ -372,7 +381,7 @@ export function compare(expected, actual, db) {
   // [INFRA-0007-20260829] pemeriksaan kolom penghubung kini berlaku untuk KEDUA
   // database agregat: stats (analytics) dan learning. Keduanya sama-sama haram
   // memuat kolom yang bisa menautkan baris ke orang/perangkat.
-  if (db === 'stats' || db === 'learning') {
+  if (db === 'stats' || db === 'learning' || db === 'evidence') {
     for (const [name, t] of actual.tables) {
       const leaks = t.columns.filter((c) => LINKING_COLUMNS.includes(c));
       if (leaks.length) add('pelanggaran_privasi_kolom', { tabel: name, kolom: leaks });

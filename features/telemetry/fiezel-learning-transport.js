@@ -134,20 +134,38 @@
    * dilaporkan di oversizedIds agar pemanggil bisa meng-ack-nya sebagai buangan
    * (membiarkannya di antrean hanya menyumbat kepala antrean selamanya).
    */
-  function makeBatches(entries) {
+  function makeBatches(entries, opts) {
+    var o = opts || {};
     var list = Array.isArray(entries) ? entries : [];
     var batches = [];
     var oversizedIds = [];
-    // Amplop tetap: {"schema":"...","events":[]} — dihitung sekali supaya batas
-    // byte dihitung terhadap BODY UTUH yang server ukur, bukan events saja.
-    var envelope = utf8Len(JSON.stringify({ schema: BATCH_SCHEMA, events: [] }));
+    // Skema amplop bisa DIGANTI (lane bukti Braincore memakai
+    // `fiezel-braincore-evidence-v1`), tetapi mekanika batch, batas byte, dan
+    // backoff tetap SATU implementasi: dua salinan transport akan menjadi dua
+    // perilaku retry yang berbeda, dan yang kedua tidak akan pernah diuji.
+    var schema = typeof o.batchSchema === 'string' && o.batchSchema ? o.batchSchema : BATCH_SCHEMA;
+    // Amplop opsional (WAJIB untuk lane bukti: server menuntut batchId + day).
+    // `batchIdFn` di-inject; modul ini tidak boleh punya sumber keacakan sendiri.
+    var day = typeof o.day === 'string' && o.day ? o.day : null;
+    var newBatchId = typeof o.batchIdFn === 'function' ? o.batchIdFn : null;
+    function envelopeFor(events, batchId) {
+      var env = { schema: schema };
+      if (batchId) env.batchId = batchId;
+      if (day) env.day = day;
+      env.events = events;
+      return env;
+    }
+    // Amplop TERBESAR yang mungkin (dengan batchId + day terisi) dipakai untuk
+    // menghitung batas byte: menghitung terhadap amplop kosong akan meloloskan
+    // batch yang baru melampaui batas SETELAH batchId dipasang.
+    var envelope = utf8Len(JSON.stringify(envelopeFor([], newBatchId ? '00000000-0000-4000-8000-000000000000' : null)));
     var cur = [];
     var curIds = [];
     var curBytes = envelope;
 
     function closeCurrent() {
       if (cur.length === 0) return;
-      var body = JSON.stringify({ schema: BATCH_SCHEMA, events: cur });
+      var body = JSON.stringify(envelopeFor(cur, newBatchId ? String(newBatchId()) : null));
       batches.push({ eventIds: curIds, body: body, bytes: utf8Len(body) });
       cur = [];
       curIds = [];
@@ -231,7 +249,7 @@
           result.rationale = 'brain3_lt_transport_empty';
           return result;
         }
-        var made = makeBatches(entries);
+        var made = makeBatches(entries, o);
 
         // Event yang mustahil terkirim di-ack sebagai buangan sadar — lihat
         // alasan di makeBatches. Ini keputusan drop, bukan kehilangan senyap:
