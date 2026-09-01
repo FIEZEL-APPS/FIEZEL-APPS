@@ -77,7 +77,7 @@
 
   // Versi BUNDLE kebijakan belajar — terpisah dari versi produk. 3.0.0 menandai
   // gelombang Braincore v3 pertama yang punya identitas bundle eksplisit.
-  var BUNDLE_VERSION = '3.7.0';
+  var BUNDLE_VERSION = '3.8.0';
 
   // Disalin apa adanya dari version.js (self.FIEZEL_VERSION). Bundle ini mengandalkan
   // wiring app.js 5.19.0 (guard modul-absen, sidecar stabilityDays, dsb.) — versi
@@ -122,6 +122,7 @@
     { file: 'fiezel-metrics-digest.js', global: 'FiezelMetricsDigest', schema: 'fiezel-metrics-digest-v1', authorityKey: 'metricsDigest' },
     { file: 'fiezel-misconception-ledger.js', global: 'FiezelMisconceptionLedger', schema: 'fiezel-misconception-ledger-v1', authorityKey: 'misconceptionPrior' },
     { file: 'fiezel-param-ledger.js', global: 'FiezelParamLedger', schema: 'fiezel-param-ledger-v1', authorityKey: 'paramLedger' },
+    { file: 'fiezel-content-chain.js', global: 'FiezelContentChain', schema: 'fiezel-content-chain-v1', authorityKey: 'contentChain' },
     { file: 'fiezel-policy-verdict.js', global: 'FiezelPolicyVerdict', schema: 'fiezel-policy-verdict-v1', authorityKey: 'policyVerdict' },
     { file: 'fiezel-nof1.js', global: 'FiezelNof1', schema: 'fiezel-nof1-v1', authorityKey: 'nof1' },
     { file: 'fiezel-olm.js', global: 'FiezelOLM', schema: 'fiezel-olm-v1', authorityKey: 'olmInsight' },
@@ -199,6 +200,11 @@
     // memutuskan kelas perubahan apa yang boleh berjalan tanpa manusia. Modulnya siap dan
     // pagarnya terbukti; yang belum ada adalah izinnya, dan izin bukan pekerjaan kode.
     selfTune: 'off',
+    // Langkah 6 (separuh kode): pelapor posisi kandidat konten dalam rantainya. Ia tidak
+    // pernah menerbitkan apa pun — tahap terjauh yang bisa ia laporkan adalah
+    // 'owner_decision' — tetapi ia tetap 'off' karena belum ada pemanggil di app.js, dan
+    // 'active' tanpa pemanggil adalah persis kebohongan yang Langkah 1 ada untuk menutup.
+    contentChain: 'off',
     // Digest metrik tetap 'off' dengan sengaja: ia adalah PENGUNGGAH, dan menyalakannya
     // tanpa keputusan produk soal telemetri berarti menambah permukaan privasi diam-diam.
     metricsDigest: 'off',
