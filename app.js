@@ -2405,7 +2405,14 @@ function makeClozeQuestion(item){
     sourceId:String(item.templateId||item.id||''),conceptId:String(item.templateId||item.id||''),practiceMode:'cloze_production',
     question:FiezelI18n.t('quiz.cloze-stem',{kalimat:item.sentence}),
     clozeAnswer:String(item.blank.answer),clozeAlternates:(item.blank.alternates||[]).map(x=>String(x)),
-    clozeDistractors:(item.distractors||[]).filter(d=>d&&d.text).map(d=>({text:String(d.text),misconception:String(d.misconception||'')})),
+    /* Label Indonesia IKUT DIBAWA (Braincore v3 P0). `misconception` tetap tag Inggris
+       kanonik karena itulah KUNCI ledger miskonsepsi lintas sesi - mengubahnya memecah
+       agregasi. Yang ditambahkan adalah dua field untuk DIBACA murid: sebelum ini, murid
+       Indonesia yang mengetik distraktor berlabel menerima kalimat "Jawaban itu jebakan
+       yang umum: habitual-aspect overgeneralization." — istilah linguistik berbahasa
+       Inggris di layar anak SMP. Teksnya sudah ada di bank sejak konversi cloze membawa
+       whyFailsId; yang kurang cuma jalannya ke sini. */
+    clozeDistractors:(item.distractors||[]).filter(d=>d&&d.text).map(d=>({text:String(d.text),misconception:String(d.misconception||''),misconceptionId:String(d.misconceptionId||''),whyFailsId:String(d.whyFailsId||'')})),
     options:[],answerIndex:-1,difficulty:LEVELS.indexOf(level)+1,
     /* m025-186 (A08-F6) x i18n: explain bank (kurasi per item) dipakai duluan;
        kunci i18n quiz.cloze-* tinggal jaring pengaman untuk item tanpa kurasi. */
@@ -8183,7 +8190,7 @@ function quizLoop(cfg){
     if(na&&!exactCandidate){
       const hit=(q.clozeDistractors||[]).find(d=>d&&d.text&&nz(d.text)===na);
       if(hit){
-        res={ok:false,distance:Number.isFinite(res.distance)?res.distance:null,matchedDistractor:{text:hit.text,misconception:String(hit.misconception||'')},rationale:'brain3_production_distractor_match',confidence:0.9};
+        res={ok:false,distance:Number.isFinite(res.distance)?res.distance:null,matchedDistractor:{text:hit.text,misconception:String(hit.misconception||''),misconceptionId:String(hit.misconceptionId||''),whyFailsId:String(hit.whyFailsId||'')},rationale:'brain3_production_distractor_match',confidence:0.9};
       }else if(res.ok&&(String(res.rationale||'')==='brain3_production_near_match'||String(res.rationale||'')==='brain3_production_alternate_accepted')){
         /* F1 (P1 redteam-20 round2): guard morfem berlaku terhadap KANDIDAT YANG MENERIMA
            jawaban — target utama ATAU alternate. Dulu hanya near_match vs target yang dicek,
@@ -8241,7 +8248,7 @@ function quizLoop(cfg){
   const detail=ok&&rationale==='brain3_production_near_match'
    ?FiezelI18n.t('quiz.hampir-persis-me-hitung-right',{answer:`<strong>${esc(q.clozeAnswer)}</strong>`})
    :ok?FiezelI18n.t('quiz.cloze-correct',{answer:`<strong>${esc(q.clozeAnswer)}</strong>`})
-   :res?.matchedDistractor?FiezelI18n.t('quiz.cloze-distractor',{misconception:esc(res.matchedDistractor.misconception||FiezelI18n.t('quiz.cloze-distractor-default')),answer:`<strong>${esc(q.clozeAnswer)}</strong>`})
+   :res?.matchedDistractor?FiezelI18n.t('quiz.cloze-distractor',{misconception:esc(res.matchedDistractor.misconceptionId||res.matchedDistractor.whyFailsId||res.matchedDistractor.misconception||FiezelI18n.t('quiz.cloze-distractor-default')),answer:`<strong>${esc(q.clozeAnswer)}</strong>`})
    :rationale==='brain3_production_morpheme_miss'?FiezelI18n.t('quiz.kata-dasarnya-right-bentuknya-pending',{answer:`<strong>${esc(q.clozeAnswer)}</strong>`})
    :FiezelI18n.t('quiz.tepat-strong-strong',{clozeAnswer:esc(q.clozeAnswer)});
   const f=$('feedback');f.classList.remove('hidden');f.classList.add(ok?'feedback-success':'feedback-error');
