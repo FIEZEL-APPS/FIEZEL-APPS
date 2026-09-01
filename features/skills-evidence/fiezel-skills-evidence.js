@@ -63,11 +63,15 @@
    * menghasilkan null - tidak pernah melempar, karena kegagalan membaca bukti latihan tidak
    * boleh menjatuhkan Home.
    */
-  function readSidecarState(env) {
+  function readSidecarState(env, key) {
     try {
       var store = env && env.localStorage;
       if (!store || typeof store.getItem !== 'function') return null;
-      var raw = JSON.parse(store.getItem(SOURCE_KEY) || 'null');
+      /* S1b: kunci boleh di-override supaya host bisa membacanya dari ruang akun
+         (`<kunci>:<uuid>`). Default-nya tetap kunci datar: perangkat yang belum pernah
+         login memang menyimpan di sana, dan modul ini tidak tahu apa-apa soal akun. */
+      var sourceKey = typeof key === 'string' && key ? key : SOURCE_KEY;
+      var raw = JSON.parse(store.getItem(sourceKey) || 'null');
       return raw && typeof raw === 'object' ? raw : null;
     } catch (_) { return null; }
   }

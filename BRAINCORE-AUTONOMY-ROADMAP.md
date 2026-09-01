@@ -243,7 +243,7 @@ Kejujuran ini bagian dari peta, bukan catatan kaki:
 
 ---
 
-## 7. Jawaban singkatnya
+## 7. Jawaban singkatnya *(posisi saat peta ini ditulis, 2026-08-30)*
 
 **Posisi:** L1 penuh + L2 parsial. **Sisa: enam langkah** menuju L5 — lima kode, satu keputusan
 OWNER. Titik di mana kata "autonomous brain" mulai jujur dipakai adalah **Langkah 5**; Langkah 6
@@ -251,3 +251,41 @@ menambahkan konten, bukan otonomi. Langkah 1 dan 2 bisa dimulai hari ini dan ked
 mengaktifkan modul yang **sudah ditulis, sudah diuji, dan sudah dimuat halaman** — biaya
 terbesarnya bukan menulis kode baru, melainkan menyambungkan yang sudah ada dan berhenti
 memakai skor bobot-tangan sebagai pemutus.
+
+---
+
+## 8. Status pelaksanaan (diperbarui 2026-09-01)
+
+Bagian ini dicatat DI PETA, bukan hanya di PR, supaya siapa pun yang membuka berkas ini tidak
+membaca §7 sebagai keadaan hari ini.
+
+| Langkah | Status | Bukti |
+|---|---|---|
+| 1 — jujurkan peta, hidupkan sensor | selesai | `brain-manifest-test.js` (otoritas DITURUNKAN dari app.js, dua arah), `brain-page-wiring-test.js` W8 |
+| 2 — interval menggantikan vibes | selesai | `fiezel-policy-verdict.js` + `policy-verdict-test.js`; verdict hanya menimpa saat ia punya bukti |
+| 3 — eksperimen N-of-1 | selesai | `fiezel-nof1.js` + `nof1-test.js` (blok RED: hash lama seimbang SEMPURNA dan tetap cacat) |
+| 4 — parameter jadi permukaan + ledger | selesai | `fiezel-param-ledger.js` + `param-ledger-test.js` |
+| 5 — penyetelan-diri berbatas | **modulnya selesai, otoritasnya `off`** | `fiezel-self-tune.js` + `self-tune-test.js` (7 pagar, tiap pagar terbukti bisa merah) |
+| 6 — perpanjangan-diri konten | **diblokir keputusan OWNER, bukan kode** | lihat §5 Langkah 6 |
+
+### Sisipan yang tidak ada di peta asli: sinkron antar-perangkat (S1–S6)
+
+Peta ini ditulis sebelum OWNER menambahkan syarat "Braincore harus bisa sinkron antar-perangkat
+sebelum masuk self-tuning lebih jauh". Enam sub-langkah itu selesai, dan satu hasilnya mengubah
+cara memikirkan sisanya: **model otak tidak punya operasi merge yang bermakna, tetapi karena
+modul v3 murni, model adalah fungsi deterministik dari aliran percobaan** — jadi yang di-merge
+adalah ALIRANNYA, diurutkan waktu, lalu diputar ulang (`brain-replay-equivalence-test.js`).
+Sinkron tidak butuh identitas baru dan tidak menyentuh analytics anonim sama sekali.
+
+S1b (sidecar Speaking/Listening) sengaja ditunda saat S1 karena satu-satunya penulisnya ada di
+luar `app.js`; ia ditutup pada 2026-09-01, dan gerbangnya (`side-state-scope-test.js` C7–C7d)
+menjalankan penulis dan pembaca ASLI lalu menuntut keduanya bertemu di kunci yang sama.
+
+### Kenapa Langkah 5 berhenti di `off`
+
+Modulnya siap dan pagarnya terbukti. Yang belum ada adalah **izinnya**. Menyalakan
+penyetelan-diri berarti memutuskan kelas perubahan apa yang boleh berjalan tanpa manusia — itu
+keputusan OWNER, bukan pekerjaan kode, dan ia satu-satunya langkah di peta ini yang tidak bisa
+dibatalkan dengan `git revert`: parameter yang sudah bergeser di perangkat murid tidak ikut
+kembali saat kodenya dikembalikan.
+
