@@ -178,9 +178,11 @@ function periksaPermukaan(nama, entri) {
       }
     }
   }
-  const examTasks = Array.isArray(bank.examTasks) ? bank.examTasks : Object.values(bank.examTasks || {});
-  for (const t of examTasks) {
-    const key = String(t && (t.id || t.task) || '');
+  // examTasks: PETA ber-kunci id ujian, bukan larik ber-field id.
+  const examTasks = Array.isArray(bank.examTasks)
+    ? bank.examTasks.map((t) => [String((t && (t.id || t.task)) || ''), t])
+    : Object.entries(bank.examTasks || {});
+  for (const [key, t] of examTasks) {
     const tt = (th.examTasks || {})[key];
     if (!tt) { hilang.push('examTask ' + key); continue; }
     for (const [k, v] of Object.entries(t)) {

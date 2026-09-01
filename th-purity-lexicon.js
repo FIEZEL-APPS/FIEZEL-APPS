@@ -30,7 +30,13 @@ const TOKEN = /[A-Za-z][A-Za-z'-]*/g;
 const tokens = (s) => String(s == null ? '' : s).match(TOKEN) || [];
 
 /** Istilah teknis/ujian yang sah muncul apa adanya di permukaan Thai mana pun. */
-const ALLOWLIST = new Set(['part', 'task', 'independent', 'integrated', 'ielts', 'toefl', 'fiezel', 'cefr']);
+const ALLOWLIST = new Set([
+  'part', 'task', 'independent', 'integrated', 'ielts', 'toefl', 'fiezel', 'cefr',
+  // Nama TIPE SOAL ujian. Ia muncul apa adanya di teks Indonesia juga ("jebakan klasik
+  // matching headings"), jadi leksikon menghitungnya sebagai kata Indonesia-saja padahal ia
+  // istilah Inggris yang memang tidak diterjemahkan di locale mana pun.
+  'matching', 'headings', 'heading', 'summary', 'completion'
+]);
 
 function buildLexicon(ROOT) {
   const J = (p) => JSON.parse(fs.readFileSync(path.join(ROOT, p), 'utf8'));
@@ -136,7 +142,14 @@ function thaiKataPerKata(value) {
   if (!RE_THAI.test(s)) return false;
   for (const rentetan of s.match(/[฀-๿]+(?: [฀-๿]+)+/g) || []) {
     const gugus = rentetan.split(' ').map((x) => x.length);
-    if (gugus.length >= 3 && gugus.reduce((a, b) => a + b, 0) / gugus.length < 13) return true;
+    const rerata = gugus.reduce((a, b) => a + b, 0) / gugus.length;
+    // Dua ambang, karena Thai yang SAH juga memakai spasi untuk memisahkan butir daftar
+    // pendek ("สั้น กระชับ และตอบกลับผู้อื่น" → 3 gugus, rerata 9,0). Diukur terhadap kedua
+    // korpus: keluaran penerjemah token hampir selalu ≥4 gugus (rerata 5,2–9,0), sedangkan
+    // daftar Thai yang benar berhenti di 3 gugus dengan rerata ≥8,7. Rentetan 3 gugus baru
+    // dituduh bila gugusnya benar-benar seukuran kata tunggal (rerata <8).
+    if (gugus.length >= 4 && rerata < 13) return true;
+    if (gugus.length >= 3 && rerata < 8) return true;
   }
   return false;
 }
