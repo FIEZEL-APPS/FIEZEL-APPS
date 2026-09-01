@@ -77,7 +77,7 @@
 
   // Versi BUNDLE kebijakan belajar — terpisah dari versi produk. 3.0.0 menandai
   // gelombang Braincore v3 pertama yang punya identitas bundle eksplisit.
-  var BUNDLE_VERSION = '3.6.0';
+  var BUNDLE_VERSION = '3.7.0';
 
   // Disalin apa adanya dari version.js (self.FIEZEL_VERSION). Bundle ini mengandalkan
   // wiring app.js 5.19.0 (guard modul-absen, sidecar stabilityDays, dsb.) — versi
@@ -128,6 +128,7 @@
     { file: 'fiezel-production-grader.js', global: 'FiezelProductionGrader', schema: 'fiezel-production-grader-v1', authorityKey: 'productionGrader' },
     { file: 'fiezel-retention-probe.js', global: 'FiezelPostTest', schema: 'fiezel-post-test-v1', authorityKey: 'retentionProbe' },
     { file: 'fiezel-speaking-adaptive.js', global: 'FiezelSpeakingAdaptive', schema: 'fiezel-speaking-adaptive-v1', authorityKey: 'speakingPolicy' },
+    { file: 'fiezel-self-tune.js', global: 'FiezelSelfTune', schema: 'fiezel-self-tune-v1', authorityKey: 'selfTune' },
     { file: 'fiezel-srl-coach.js', global: 'FiezelSrlCoach', schema: 'fiezel-srl-coach-v1', authorityKey: 'srlCoach' },
     { file: 'fiezel-stat-gate.js', global: 'FiezelStatGate', schema: null, authorityKey: 'statGate' },
     { file: 'fiezel-step-tutor.js', global: 'FiezelStepTutor', schema: null, authorityKey: 'stepTutor' },
@@ -194,6 +195,10 @@
     // Langkah 4: rantai hash perubahan parameter. Prasyarat penyetelan-diri, belum ada
     // pemanggil di app.js karena belum ada parameter yang boleh bergerak sendiri: 'off'.
     paramLedger: 'off',
+    // Langkah 5: pengusul penyetelan-diri. 'off' dan HARUS tetap 'off' sampai OWNER
+    // memutuskan kelas perubahan apa yang boleh berjalan tanpa manusia. Modulnya siap dan
+    // pagarnya terbukti; yang belum ada adalah izinnya, dan izin bukan pekerjaan kode.
+    selfTune: 'off',
     // Digest metrik tetap 'off' dengan sengaja: ia adalah PENGUNGGAH, dan menyalakannya
     // tanpa keputusan produk soal telemetri berarti menambah permukaan privasi diam-diam.
     metricsDigest: 'off',
