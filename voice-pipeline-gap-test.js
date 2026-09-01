@@ -550,9 +550,21 @@ async function runProductionPattern(options) {
   console.log(`     ukur  sebelum(berurutan) keheningan TAK SENGAJA rata-rata=${beforeUnintendedAvg}s per batas (celah + ekor ${TAIL_SILENCE_S}s + kepala ${HEAD_SILENCE_S}s yang tidak dipotong)`);
   console.log(`     ukur  sesudah(berpipa)   celah terukur=${JSON.stringify(gapsMeasured)} rata-rata=${afterAvg}s`);
   console.log(`     ukur  sesudah(berpipa)   keheningan TAK SENGAJA rata-rata=${afterUnintendedAvg}s; jeda prosodi DISENGAJA rata-rata=${intendedAvg}s`);
+  /* Suku TENGAH adalah KONTROL, bukan sifat produk: ia membuktikan jalur "sebelum" memang
+     membawa keheningan tak sengaja yang berarti, supaya `sesudah === 0` tidak lulus secara
+     hampa. Ambangnya dulu ditulis sebagai angka mati 0,2 — dan angka itu diam-diam mengunci
+     asumsi tentang GENERATE_LATENCY_MS. Begitu latensi tiruan diturunkan 120 -> 15 ms,
+     celah "sebelum" ikut turun ke ~0,023 s sehingga beforeUnintended = 0,023 + 0,10 + 0,06
+     = ~0,183 — TEPAT DI BAWAH 0,2, dan gerbang merah untuk semua orang di main padahal
+     sisi "sesudah" justru sempurna (0 s). Yang gagal ambangnya, bukan produknya.
+     Sekarang ambangnya DITURUNKAN DARI KONSTANTA yang sama yang membentuk nilainya, jadi
+     menyetel latensi tiruan lain kali tidak bisa memerahkannya lagi; kontrolnya tetap
+     bergigi karena beforeUnintended hanya melewati TAIL+HEAD bila ada celah terukur nyata
+     di atasnya. Dua suku lain (rata-rata NOL dan setiap batas NOL) tidak dilonggarkan —
+     merekalah yang menangkap regresi jalur berpipa yang sesungguhnya. */
   check('(g) pengukuran: keheningan tak sengaja hilang sepenuhnya di jalur berpipa',
-    afterUnintendedAvg === 0 && beforeUnintendedAvg > 0.2 && afterUnintended.every((value) => value === 0),
-    `sebelumTakSengaja=${beforeUnintendedAvg}s sesudahTakSengaja=${afterUnintendedAvg}s`);
+    afterUnintendedAvg === 0 && beforeUnintendedAvg > TAIL_SILENCE_S + HEAD_SILENCE_S && afterUnintended.every((value) => value === 0),
+    `sebelumTakSengaja=${beforeUnintendedAvg}s sesudahTakSengaja=${afterUnintendedAvg}s (kontrol: > ${round(TAIL_SILENCE_S + HEAD_SILENCE_S)}s)`);
   check('(g2) pengukuran: jeda yang tersisa persis jeda prosodi yang disengaja',
     Math.abs(afterAvg - intendedAvg) < 1e-6, `sesudah=${afterAvg}s disengaja=${intendedAvg}s`);
 

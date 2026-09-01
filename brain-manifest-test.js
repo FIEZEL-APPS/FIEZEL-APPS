@@ -99,11 +99,52 @@ test('klaim otoritas kunci sesuai temuan council: memory aktif, bktUnlock bayang
   assert.strictEqual(manifest.authorityMap.bktUnlock, 'shadow');
 });
 
-test('modul tanpa satu pun referensi di app.js dinyatakan off, bukan diaku-aku aktif', () => {
-  // step-tutor dan production-grader dimuat index.html tetapi nol pemanggil di app.js —
-  // manifest wajib jujur menyebutnya off.
-  assert.strictEqual(manifest.authorityMap.stepTutor, 'off');
-  assert.strictEqual(manifest.authorityMap.productionGrader, 'off');
+/* Otoritas diperiksa DUA ARAH, dan diturunkan dari app.js — bukan dipaku sebagai daftar.
+ *
+ * Bentuk lama memaku `stepTutor === 'off'` dan `productionGrader === 'off'` berikut alasan
+ * "nol pemanggil di app.js". Alasan itu benar saat ditulis dan berhenti benar begitu wiring
+ * keduanya mendarat, tetapi assert-nya tidak ikut berubah — jadi gerbang ini MEMAKU KLAIM
+ * YANG SALAH: manifest menyebut mesin penilai jawaban cloze 'off' selama berbulan-bulan,
+ * dan satu-satunya gerbang yang mengawasinya justru menolak kebenaran.
+ *
+ * Yang salah bukan angkanya melainkan arahnya: memeriksa hanya "nol referensi => off"
+ * membiarkan arah sebaliknya (dipanggil, tapi diaku 'off') lolos selamanya. Sekarang
+ * keduanya ditagih, dan daftarnya DITURUNKAN dari manifest + sumber app.js sehingga modul
+ * berikutnya yang di-wire ikut terjaga tanpa ada yang perlu ingat memperbarui berkas ini.
+ *
+ * Batas yang disengaja: beda 'active' vs 'shadow' TIDAK bisa disimpulkan dari jumlah
+ * referensi (satu referensi bisa saja cuma memberi makan panel diagnostik). Jadi yang
+ * ditegakkan di sini hanya batas 'off' — yang memang bisa dibuktikan mekanis. Penilaian
+ * active/shadow tetap milik manusia, dan bukti tiap klasifikasi ada di komentar manifest. */
+test('otoritas manifest konsisten dua arah dengan referensi nyata di app.js', () => {
+  const appSrc = fs.readFileSync(path.join(__dirname, 'app.js'), 'utf8');
+  // Komentar dan isi string dibuang lebih dulu: penyebutan nama global di dalam komentar
+  // bukan pemanggilan, dan menghitungnya akan menyatakan modul mati sebagai hidup.
+  let code = '', i = 0;
+  while (i < appSrc.length) {
+    const c = appSrc[i], d = appSrc[i + 1];
+    if (c === '/' && d === '/') { const j = appSrc.indexOf('\n', i); if (j < 0) break; i = j; continue; }
+    if (c === '/' && d === '*') { const j = appSrc.indexOf('*/', i + 2); if (j < 0) break; i = j + 2; continue; }
+    if (c === '"' || c === "'" || c === '`') {
+      const q = c; let j = i + 1;
+      while (j < appSrc.length) { if (appSrc[j] === '\\') { j += 2; continue; } if (appSrc[j] === q) break; j++; }
+      code += ' '; i = j + 1; continue;
+    }
+    code += c; i++;
+  }
+  const salah = [];
+  for (const mod of manifest.modules) {
+    if (!mod.global || !mod.authorityKey) continue;
+    const refs = (code.match(new RegExp('\\b' + mod.global + '\\b', 'g')) || []).length;
+    const otoritas = manifest.authorityMap[mod.authorityKey];
+    if (refs === 0 && otoritas !== 'off') {
+      salah.push(`${mod.authorityKey}: nol referensi di app.js tetapi diaku '${otoritas}'`);
+    }
+    if (refs > 0 && otoritas === 'off') {
+      salah.push(`${mod.authorityKey}: ${refs} referensi di app.js tetapi diaku 'off'`);
+    }
+  }
+  assert.deepStrictEqual(salah, [], 'otoritas manifest tidak jujur:\n  ' + salah.join('\n  '));
 });
 
 test('contentCompatibility cocok dengan deklarasi schemaVersion grammar-templates.json', () => {
