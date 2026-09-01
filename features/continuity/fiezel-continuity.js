@@ -328,6 +328,19 @@
     var local = localState || {};
     var backup = backupPayload || {};
 
+    // S3: KUNCI DEDUP ADALAH IDENTITAS PERCOBAAN, BUKAN IDENTITAS SOAL.
+    //
+    // Versi sebelumnya memakai `row.id`, dan `row.id` adalah id SOAL. Artinya menjawab soal
+    // yang sama dua kali menghasilkan dua baris ber-kunci sama, dan yang kedua dibuang diam-
+    // diam. Latihan berulang adalah inti spaced repetition, jadi yang paling mungkin hilang
+    // justru bukti yang paling bernilai — dan itu sudah berlaku pada restore backup, jauh
+    // sebelum sync antar-perangkat ada.
+    //
+    // Baris baru membawa `attemptId` yang unik per percobaan. Baris LAMA tidak punya, jadi
+    // cadangannya adalah sidik isi (waktu + soal + skill + hasil + durasi): dua baris dengan
+    // kelimanya identik memang percobaan yang sama yang datang lewat dua jalan. Indeks array
+    // TIDAK ikut — versi lama menyertakannya, sehingga baris lama tanpa id tidak pernah
+    // dedup antar-sumber karena posisinya berbeda di tiap sisi.
     var byId = {};
     var order = [];
     var sources = [Array.isArray(local.history) ? local.history : [], Array.isArray(backup.history) ? backup.history : []];
@@ -335,7 +348,9 @@
       for (var i = 0; i < sources[s].length; i++) {
         var row = sources[s][i];
         if (!row || typeof row !== 'object') continue;
-        var id = String(row.id || ('' + (row.at || '') + (row.skill || '') + i));
+        var id = row.attemptId
+          ? 'a:' + String(row.attemptId)
+          : 'c:' + [row.at, row.id, row.skill, row.ok, row.ms].map(function (v) { return String(v == null ? '' : v); }).join('|');
         if (!byId[id]) { byId[id] = row; order.push(id); }
       }
     }

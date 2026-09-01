@@ -323,18 +323,10 @@
     }catch(_){return {sent:sent,kept:outboxRead().length,reason:'error'}}
     finally{flushing=false}
   }
-  /**
-   * Berapa batch yang masih menunggu kirim pada jam `nowMs`.
-   *
-   * Waktu adalah ARGUMEN, seperti `queueEvidence`/`outboxPrune`/`flushOutbox` — dan itu
-   * bukan kerapian belaka. Versi lama memanggil `Date.now()` sendiri, jadi antrean yang
-   * di-antre dengan jam sesi (mis. gerbang yang membekukan waktunya) dinilai memakai jam
-   * dinding: satu-satunya fungsi outbox yang tidak bisa diberi tahu jam mana yang berlaku.
-   * Akibatnya terbukti — `social-frontend-test.js` menjadi bom waktu yang MERAH pada hari
-   * ke-3 sesudah `t` bekunya, karena item yang baru saja di-antre langsung dinilai hangus.
-   * Argumen kosong tetap berarti "jam sekarang", jadi seluruh pemanggil lama tidak berubah.
-   */
-  function outboxPending(nowMs){var t=Number(nowMs);if(!isFinite(t))t=Date.now();return outboxPrune(outboxRead(),t).length}
+  function outboxPending(nowMs){
+    var t=Number(nowMs);
+    return outboxPrune(outboxRead(), isFinite(t)&&t>0 ? t : Date.now()).length;
+  }
 
   // Flush otomatis: saat kembali online dan saat tab kembali terlihat. Keduanya jalur
   // latar — tanpa await dari UI, tanpa toast, tanpa yang bisa mengganggu sesi belajar.

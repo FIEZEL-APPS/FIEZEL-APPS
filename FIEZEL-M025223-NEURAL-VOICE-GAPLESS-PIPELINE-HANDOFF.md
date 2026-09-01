@@ -1,1 +1,33 @@
-# FIEYEL M025-223 NEURAL VOICE GAPLESS PIPELINE REPAIR J)�'��D�d`�����7FGW2���4���UDRbdU$�d�TB�&V����r�77VW2�����WF��&�G�����t�U"��5DU"gV��WF��&�G�����FFR���##b�������'V��BfW'6��⢣��#R�##0��22�6��FW�B�B&�&�V�7FFV�V�@���&Wf��W2'V��G2WF��#R�##"�f�W�V�vV$VF����W"���6WVV�6R��7VffW&VBg&��&6�&W77W&RF�֖�r��GFW#���v�V���fƖv�BVWVRW�6VVFVB�TĔ�U����TUTTE�4�T�2���6WVV�6R��GFV�FVBF�v�Bf�"��FW7B�V�G4Bf�6WEF��V�WB����vWfW"�V�VWVR��V�G'�6���WF���v2FV��VB'�dDU��UE��2�#f�2���V��rF�RV�G'�v2��B�WB�&�VB6WGF�VC�G'VRv�V�F�RF��W"v��RW��F��26W6VB&WWF�F�fR�26WEF��V�WB7����r�Bv���6��6�G&�gB�&W7V�F��r��'F�f�6��V�FW''V�2�B~(	3��2&�6�G�v�fg6WG2��f��6R��VƖ�R�v�FW7B�2ࠢ22"�&��B6W6R�B6��vW2�FP����F�&V7B&�֗6Rv�F��r�����W��6VBV�G'��F��R&�֗6R��VWVVB�VƖ�R��&6�V�G&�W2��WFFVB��6WVV�6R��&6�&W77W&R���F�F�&V7Fǒv�B��FW7B�F��R&F�W"F��&Vǖ��r��GW&F���W7F��F���F��V�WG2�"���FWFW&֖�7F�2FW7B76W'F���2������&FV�VBf��6R��VƖ�R�v�FW7B�2F�wV&�FVR&VƖ&�R%Db�VG&�������W�V7WF���V�f�&���V�G2�2����W&�WF�2FW7BF��W'2������&FV�VB6�6���g&��FV�B�FW7B�2F���6�FFR���r���W&�WF�6�ǒ�B���'V��B����F��6�G�b&V��FR7��6�&�旦F��⢣���Gf�6VB'V��B&Wf�6���F��#R�##27&�727r�2�6�&R�6��f�r�2�6��&F��F����%T��B�dU%4����6����Bf�W�V��F�r��V��2ࠣ222�fW&�f�6F���bFW7BWf�FV�6P���f��6R�B�WW&�FW7B7V�FW2726�V�ǒ�R52����f��6R��VƖ�R�v�FW7B�3�52�3b�3b6�V6�2���f��6R�6��6�FR�&VfWF6��FW7B�3�52�c��c�6�V6�2���VF���76WB��VƖ�R�FW7B�3�52�S�S6�V6�2���GG2�G&�7�'B�7v�F6��FW7B�3�52�32�326�V6�2���'V��B��V�&W"�V�VV�W72�FW7B�3�52��#R�##2fW&�f�VB���22B��W�B7FW2�&�F���6��F��VR���F�&��r&V��F��RVF����&6��FV�7��WG&�72��&�GV7F�����V�7W&R6��VFf�&R�4D�VFvR66�W26W'fR7W'&V�B76WG26V��W76ǒ�
+# FIEZEL M025-223 — Neural Voice Gapless Pipeline Handoff
+
+**Handoff version:** 1.0
+**Target Build:** m025-223 / m025-225
+**Fitur:** Neural Voice Gapless Pipeline & Backpressure Repair
+
+---
+
+## 1. Ringkasan Perubahan
+
+Perbaikan pada jalur pemutaran suara neural (eatures/neural-voice/fiezel-web-audio-player.js, iezel-voice-say.js, dan oice-pipeline-gap-test.js):
+
+1. **Backpressure & PlaySequence Underrun Fix**:
+   - Menghilangkan celah keheningan tak disengaja di antara potongan audio (*PCM transient discontinuities*).
+   - Penjadwalan segmen audio dengan waktu presisi menggunakan Web Audio API AudioContext.currentTime cursor.
+   - Pipa pemutaran multi-chunk yang mengisi diri secara asinkron sebelum buffer habis (*lookahead generation*).
+
+2. **Pengondisian Sinyal Bersih**:
+   - Pemangkasan keheningan di kepala dan ekor potongan (*trim silence*).
+   - Pemeliharaan jeda prosodi alami antar batas tanda baca (koma, titik, paragraf).
+   - Pencegahan *underrun* pada latensi inferensi variabel.
+
+3. **Verifikasi Gerbang**:
+   - Gerbang oice-pipeline-gap-test.js diperkuat (36/36 invariant PASS).
+   - oice-fallback-chain-test.js dan oice-offline-fallback-test.js lulus 100%.
+
+---
+
+## 2. Poin Penting untuk Sesi Berikutnya
+
+- **AudioContext Singleton**: Selalu gunakan satu instans AudioContext bersama yang diaktivasi melalui *user gesture* resmi.
+- **Fail-closed Fallback**: Jika sintesis neural lokal belum siap atau gagal, alihkan dengan tenang ke cadangan (Puter TTS -> browser SpeechSynthesis) tanpa melempar galat ke antarmuka murid.
+- **Precache Integrity**: Semua berkas suara dan pembungkus diagnostik wajib terdaftar di sw.js precache list.
