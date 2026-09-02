@@ -3,118 +3,104 @@
   <defs>
     <clipPath id="fzcEyeL"><circle cx="126" cy="98" r="16"/></clipPath>
     <clipPath id="fzcEyeR"><circle cx="194" cy="98" r="16"/></clipPath>
-    <linearGradient id="pawGradGold" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#FFE57F"/>
-      <stop offset="100%" stop-color="#FFD94F"/>
-    </linearGradient>
-    <linearGradient id="pawGradAmber" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#F5C442"/>
-      <stop offset="100%" stop-color="#EDB93A"/>
-    </linearGradient>
-    <linearGradient id="pawGradMaroon" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#A83246"/>
-      <stop offset="100%" stop-color="#8C2233"/>
-    </linearGradient>
-    <linearGradient id="leafGrad1" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#4CAF50"/><stop offset="100%" stop-color="#1B5E20"/>
-    </linearGradient>
-    <linearGradient id="leafGrad2" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#81C784"/><stop offset="100%" stop-color="#2E7D32"/>
-    </linearGradient>
-    <linearGradient id="flowerPlumeria" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#FFFFFF"/><stop offset="60%" stop-color="#FFF9C4"/><stop offset="100%" stop-color="#FBC02D"/>
-    </linearGradient>
-    <linearGradient id="flowerHibiscus" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#FF5252"/><stop offset="100%" stop-color="#C2185B"/>
-    </linearGradient>
     <linearGradient id="shadesGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#2D3748"/><stop offset="100%" stop-color="#1A202C"/>
+      <stop offset="0%" stop-color="#334155"/>
+      <stop offset="100%" stop-color="#0F172A"/>
     </linearGradient>
     <linearGradient id="vrGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#00E5FF"/><stop offset="100%" stop-color="#7C4DFF"/>
+      <stop offset="0%" stop-color="#06B6D4"/>
+      <stop offset="100%" stop-color="#8B5CF6"/>
     </linearGradient>
     <linearGradient id="batikGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#6D4C41"/><stop offset="50%" stop-color="#8D6E63"/><stop offset="100%" stop-color="#4E342E"/>
+      <stop offset="0%" stop-color="#78350F"/>
+      <stop offset="50%" stop-color="#92400E"/>
+      <stop offset="100%" stop-color="#451A03"/>
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDE047"/>
+      <stop offset="100%" stop-color="#CA8A04"/>
+    </linearGradient>
+    <linearGradient id="waterGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="100%" stop-color="#0284C7"/>
     </linearGradient>
   </defs>
 
-  <!-- Ground Shadow -->
-  <ellipse class="fz-shadow" cx="160" cy="296" rx="88" ry="11" fill="#33201F" opacity="0.12"/>
   
-  <g class="fz-all">
-    <!-- Back Props -->
-    
-
-    <!-- Tail -->
+    <ellipse class="fz-shadow" cx="160" cy="296" rx="88" ry="11" fill="#33201F" opacity="0.13"/>
+  
+  
+  
     <g class="fz-tail">
-      <path d="M 212 244 C 266 258 298 238 296 200 C 294 178 282 163 268 158" stroke="#EDB93A" stroke-width="25" stroke-linecap="round" fill="none"/>
-      <path d="M 284 172 C 276 163 270 159 268 158" stroke="#8C2233" stroke-width="25" stroke-linecap="round" fill="none"/>
+      <path d="M 215 235 C 270 215 295 180 260 160" stroke="#EDB93A" stroke-width="25" stroke-linecap="round" fill="none"/>
+      <path d="M 275 170 C 265 160 255 160 250 160" stroke="#8C2233" stroke-width="25" stroke-linecap="round" fill="none"/>
     </g>
-
-    <!-- Torso -->
-    <g class="fz-body">
-      <g class="fz-torso">
-        <rect x="102" y="164" width="116" height="96" rx="42" fill="#FFD94F"/>
-        
-  <g class="fz-chest">
-    <ellipse cx="160" cy="226" rx="36" ry="28" fill="#FFF4DA"/>
-    <g class="fz-emblem" transform="translate(160,225) scale(1.75) translate(-12.6,-12.45)" fill="#8C2233">
-      <rect x="4.6" y="7.5" width="3.1" height="4.6" rx="1.55"/>
-      <rect x="8.9" y="5.1" width="3.1" height="7" rx="1.55"/>
-      <rect x="13.2" y="3.4" width="3.1" height="8.7" rx="1.55"/>
-      <rect x="17.5" y="6.2" width="3.1" height="5.9" rx="1.55"/>
-      <path d="M12.6 14c3.5 0 5.9 1.9 5.9 4.1 0 2-2 3.4-5.9 3.4s-5.9-1.4-5.9-3.4c0-2.2 2.4-4.1 5.9-4.1Z"/>
-    </g>
-  </g>
-
-        
-        <g class="fz-legs">
-    <rect class="fz-foot fz-foot-l" x="108" y="246" width="48" height="22" rx="11" fill="#EDB93A"/>
-    <rect class="fz-foot fz-foot-r" x="164" y="246" width="48" height="22" rx="11" fill="#EDB93A"/>
-  </g>
-      </g>
-
-      <!-- Head & Expression -->
+  
+  <g class="fz-character">
+    
+    <g class="fz-torso" transform="rotate(4 156 209)">
+      <rect x="96" y="162" width="120" height="94" rx="42" fill="#FFD94F"/>
       
-    <g class="fz-head">
-      <!-- Ears -->
-      <g class="fz-ear fz-ear-l">
-        <path d="M76 66 L95 0 L140 34 Q104 66 76 66 Z" fill="#FFD94F"/>
-        <path d="M90 52 L 101 17 L 125 35 Z" fill="#8C2233"/>
-      </g>
-      <g class="fz-ear fz-ear-r">
-        <path d="M244 66 L225 0 L180 34 Q216 66 244 66 Z" fill="#FFD94F"/>
-        <path d="M230 52 L 219 17 L 195 35 Z" fill="#8C2233"/>
-      </g>
-
-      <!-- Head Circle -->
+        <ellipse cx="156" cy="222.16" rx="36" ry="28" fill="#FFF4DA"/>
+        <g class="fz-emblem" transform="translate(156,221.22) scale(1.75) translate(-12.6,-12.45)" fill="#8C2233">
+          <rect x="4.6" y="7.5" width="3.1" height="4.6" rx="1.55"/>
+          <rect x="8.9" y="5.1" width="3.1" height="7" rx="1.55"/>
+          <rect x="13.2" y="3.4" width="3.1" height="8.7" rx="1.55"/>
+          <rect x="17.5" y="6.2" width="3.1" height="5.9" rx="1.55"/>
+          <path d="M12.6 14c3.5 0 5.9 1.9 5.9 4.1 0 2-2 3.4-5.9 3.4s-5.9-1.4-5.9-3.4c0-2.2 2.4-4.1 5.9-4.1Z"/>
+        </g>
+      
+    </g>
+  
+    
+    
+          <rect x="100" y="248" width="46" height="22" rx="11" fill="#EDB93A"/>
+          <rect x="168" y="248" width="46" height="22" rx="11" fill="#EDB93A"/>
+        
+    
+    <g class="fz-head-wrapper" transform="rotate(10 160 106)">
+      <g class="fz-ears"><path d="M76 66 L95 0 L140 34 Q104 66 76 66 Z" fill="#FFD94F"/><path d="M90 52 L 101 17 L 125 35 Z" fill="#8C2233"/><path d="M248 55 L235 -10 L185 25 Q224 55 248 55 Z" fill="#FFD94F"/><path d="M235 42 L 228 8 L 200 28 Z" fill="#8C2233"/></g>
       <circle cx="160" cy="106" r="88" fill="#FFD94F"/>
-
-      <!-- Face -->
       <g class="fz-face">
         <ellipse cx="160" cy="140" rx="36" ry="25" fill="#FFF4DA"/>
         <path d="M153 126 L 167 126 L 160 136 Z" fill="#8C2233"/>
-        <circle class="fz-blush" cx="102" cy="126" r="11" fill="#F0A0AC"/>
-        <circle class="fz-blush" cx="218" cy="126" r="11" fill="#F0A0AC"/>
+        
+    <circle class="fz-blush" cx="102" cy="126" r="11" fill="#F0A0AC"/>
+    <circle class="fz-blush" cx="218" cy="126" r="11" fill="#F0A0AC"/>
+  
+        
         <g class="fz-eyes">
-    <g class="fz-eye fz-eye-l"><circle cx="126" cy="98" r="16" fill="#33201F"/><g class="fz-pupil" clip-path="url(#fzcEyeL)"><circle cx="130.5" cy="92.5" r="5.5" fill="#fff"/><circle cx="121.5" cy="104" r="2.8" fill="#fff" opacity=".7"/></g></g>
-    <g class="fz-eye fz-eye-r"><circle cx="194" cy="98" r="16" fill="#33201F"/><g class="fz-pupil" clip-path="url(#fzcEyeR)"><circle cx="198.5" cy="92.5" r="5.5" fill="#fff"/><circle cx="189.5" cy="104" r="2.8" fill="#fff" opacity=".7"/></g></g>
-  </g>
-        <g class="fz-mouth"><path d="M150 148 L 170 148" stroke="#33201F" stroke-width="5" stroke-linecap="round" fill="none"/></g>
+      <path d="M112 85 L140 92" stroke="#33201F" stroke-width="5" stroke-linecap="round"/>
+      <path d="M208 85 L180 92" stroke="#33201F" stroke-width="5" stroke-linecap="round"/>
+      <circle cx="126" cy="100" r="14" fill="#33201F"/><circle cx="129" cy="96" r="4.5" fill="#fff"/>
+      <circle cx="194" cy="100" r="14" fill="#33201F"/><circle cx="197" cy="96" r="4.5" fill="#fff"/>
+    </g>
+        <g class="fz-mouth"><path d="M144 145 Q160 160 178 142" stroke="#33201F" stroke-width="5.5" stroke-linecap="round" fill="none"/></g>
         
       </g>
       
     </g>
   
-
-      <!-- Arms & Fore Props -->
-      <g class="fz-arm-left"><ellipse cx="118" cy="225" rx="14" ry="26" transform="rotate(15 118 225)" fill="#FFD94F"/></g>
-      <g class="fz-arm-right"><ellipse cx="195" cy="210" rx="14" ry="26" transform="rotate(-30 195 210)" fill="#FFD94F"/></g>
-      
-      <rect x="125" y="215" width="45" height="55" rx="4" fill="#3B82F6" transform="rotate(-10 125 215)"/>
-      <rect x="130" y="220" width="35" height="45" rx="2" fill="#FFFFFF" transform="rotate(-10 125 215)"/>
-      <rect x="180" y="200" width="6" height="30" rx="3" fill="#F59E0B" transform="rotate(35 180 200)"/>
     
-    </g>
+          <ellipse cx="118" cy="220" rx="14" ry="26" transform="rotate(25 118 220)" fill="#FFD94F"/>
+          <ellipse cx="205" cy="205" rx="14" ry="28" transform="rotate(-40 205 205)" fill="#FFD94F"/>
+        
   </g>
+  
+          <!-- Notebook & Pencil Grip -->
+          <g transform="translate(145, 230) rotate(-12)">
+            <rect x="-25" y="-30" width="50" height="60" rx="5" fill="#3B82F6"/>
+            <rect x="-20" y="-25" width="40" height="50" rx="3" fill="#FFF"/>
+            <line x1="-15" y1="-15" x2="15" y2="-15" stroke="#93C5FD" stroke-width="2"/>
+            <line x1="-15" y1="-5" x2="15" y2="-5" stroke="#93C5FD" stroke-width="2"/>
+            <line x1="-15" y1="5" x2="5" y2="5" stroke="#93C5FD" stroke-width="2"/>
+          </g>
+          <g transform="translate(198, 205) rotate(35)">
+            <rect x="-4" y="-25" width="8" height="40" rx="3" fill="#F59E0B"/>
+            <polygon points="-4,-25 4,-25 0,-35" fill="#DC2626"/>
+            <polygon points="-4,15 4,15 0,22" fill="#FFEAA0"/>
+            <circle cx="0" cy="18" r="2" fill="#1E293B"/>
+            <circle cx="0" cy="-5" r="9" fill="#FFD94F"/>
+          </g>
+        
 </svg>
