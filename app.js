@@ -36,6 +36,27 @@ function __fzSyncShellElements(){
         if(text&&text!==k)el.textContent=text;
       }
     });
+    document.querySelectorAll('[data-i18n-html]').forEach(el=>{
+      const k=el.getAttribute('data-i18n-html');
+      if(k&&self.FiezelI18n&&typeof self.FiezelI18n.t==='function'){
+        const text=self.FiezelI18n.t(k);
+        if(text&&text!==k)el.innerHTML=text;
+      }
+    });
+    document.querySelectorAll('[data-i18n-aria-label]').forEach(el=>{
+      const k=el.getAttribute('data-i18n-aria-label');
+      if(k&&self.FiezelI18n&&typeof self.FiezelI18n.t==='function'){
+        const text=self.FiezelI18n.t(k);
+        if(text&&text!==k)el.setAttribute('aria-label',text);
+      }
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
+      const k=el.getAttribute('data-i18n-placeholder');
+      if(k&&self.FiezelI18n&&typeof self.FiezelI18n.t==='function'){
+        const text=self.FiezelI18n.t(k);
+        if(text&&text!==k)el.setAttribute('placeholder',text);
+      }
+    });
   }catch(_){}
 }
 function __fzRefreshI18nTables(){__fzI18nTables.forEach(([t,b])=>{try{const v=b();if(Array.isArray(t)){t.length=0;t.push(...v)}else{Object.keys(t).forEach(k=>delete t[k]);Object.assign(t,v)}}catch(_){}});try{FALLBACK_LEARNER_NAME=FiezelI18n.t('common.sapaan-netral')}catch(_){};try{loginMessageCache=null}catch(_){};try{if(typeof state==='object'&&state)state.coachCache=null}catch(_){};__fzSyncShellElements()}
@@ -138,7 +159,7 @@ const LEVEL_EXAM_BLUEPRINT={grammar:10,vocab:8,reading:7};
    binomial p=0,25). Digabung syarat total >=80%, dekomposisi 10/8/2 dan 10/7/3-gaya tak lolos lagi.
    F22: label seksi lewat FiezelI18n (pola LEVEL_GUARD_COPY) — pasca-migrasi i18n m025-189. */
 const LEVEL_EXAM_SECTION_FLOOR={grammar:5,vocab:4,reading:3};
-const LEVEL_EXAM_SECTION_LABEL={grammar:FiezelI18n.t('level.seksi-grammar'),vocab:FiezelI18n.t('level.seksi-kosakata'),reading:FiezelI18n.t('level.seksi-bacaan')};
+const LEVEL_EXAM_SECTION_LABEL=__fzI18nTable({},()=>({grammar:FiezelI18n.t('level.seksi-grammar'),vocab:FiezelI18n.t('level.seksi-kosakata'),reading:FiezelI18n.t('level.seksi-bacaan')}));
 const LEVEL_EXAM_COOLDOWN_MS=86400000;
 /* Teks verbatim dari reports/copy-fitur-baru.md §3 dan §4. Satu-satunya penyesuaian:
    ambang lulus ditulis 80% (bukan 90%) karena kontrak owner mengikat LEVEL_EXAM_PASS=80,
@@ -4305,7 +4326,7 @@ function shouldInviteNotifications(){
   return reminderInviteOffers()<REMINDER_INVITE_MAX_OFFERS;
 }
 function setNotificationGateState(status){
-  const gate=$('welcome'),button=$('notificationGateButton'),body=$('notificationGateBody'),stateText=$('notificationGateStatus'),help=$('notificationGateHelp');if(!gate)return;
+  const gate=$('welcome'),button=$('notificationGateButton'),body=$('notificationGateBody'),stateText=$('notificationGateStatus'),help=$('notificationGateHelp'),title=$('welcomeTitle'),skip=$('notificationGateSkip');if(!gate)return;
   // m025-80 OWNER: "walaupun notifikasi dan puter sudah diaktifkan, setiap kali masuk apps
   // selalu muncul popup cepat". Panel yang sedang tersembunyi dan sudah dijawab tidak perlu
   // dibuka sama sekali hanya untuk ditutup lagi 220ms kemudian.
@@ -4319,6 +4340,10 @@ function setNotificationGateState(status){
       (window.requestAnimationFrame||setTimeout)(()=>{try{syncDialogContainment();$('notificationGateButton')?.focus?.({preventScroll:true})}catch(_){}})}
     else try{syncDialogContainment()}catch(_){}
   }
+  if(title)title.textContent=FiezelI18n.t('notif.gate-title');
+  if(skip)skip.textContent=FiezelI18n.t('notif.skip-link');
+  const badge=gate.querySelector('.welcome-mark');if(badge)badge.textContent=FiezelI18n.t('notif.gate-badge');
+  const req=gate.querySelector('.notification-requirement span');if(req)req.textContent=FiezelI18n.t('notif.gate-terms');
   // Naskah di bawah ini adalah inti pembalikan m025-34. Tidak ada lagi "terkunci", "syarat
   // masuk", atau "belum bisa dibuka": setiap cabang - termasuk ditolak dan tidak didukung -
   // berakhir dengan murid tetap bisa belajar.
@@ -4331,7 +4356,7 @@ function setNotificationGateState(status){
   }else if(status==='declined'){
     stateText.textContent=FiezelI18n.t('notif.status-nanti');stateText.className='notification-status';button.disabled=true;button.innerHTML=`<i data-lucide="bell"></i> ${FiezelI18n.t('notif.tombol-nanti')}`;help.textContent=FiezelI18n.t('notif.bantuan-nanti');
   }else{
-    stateText.textContent=FiezelI18n.t('notif.status-default');stateText.className='notification-status';button.disabled=false;button.innerHTML=`${FiezelI18n.t('notif.tombol-ingatkan')} <i data-lucide="bell-ring"></i>`;help.textContent=FiezelI18n.t('notif.bantuan-default');
+    stateText.textContent=FiezelI18n.t('notif.status-default');stateText.className='notification-status';button.disabled=false;button.innerHTML=`${FiezelI18n.t('notif.tombol-ingatkan')} <i data-lucide="bell-ring"></i>`;body.textContent=FiezelI18n.t('notif.gate-desc');help.textContent=FiezelI18n.t('notif.help-init');
   }
   refreshIcons();
 }
@@ -4385,6 +4410,12 @@ function setAuthGateState(status,detail){
       (window.requestAnimationFrame||setTimeout)(()=>{try{syncDialogContainment();$('authGateButton')?.focus?.({preventScroll:true})}catch(_){}})}
     else try{syncDialogContainment()}catch(_){}
   }
+  if($('authGateTitle'))$('authGateTitle').textContent=FiezelI18n.t('auth.gate-title');
+  if($('authGateBody'))$('authGateBody').textContent=FiezelI18n.t('auth.gate-body');
+  if(skip)skip.textContent=FiezelI18n.t('auth.skip-btn');
+  if($('authGateSkipHelp'))$('authGateSkipHelp').textContent=FiezelI18n.t('auth.skip-help');
+  if($('authGateHelp'))$('authGateHelp').textContent=FiezelI18n.t('auth.puter-help');
+  const legal=gate.querySelector('.auth-legal');if(legal)legal.textContent=FiezelI18n.t('auth.legal-note');
   // Audit UX Bagian 3: status login adalah komponen sendiri (.auth-status), bukan alert
   // bawaan browser, dan naskahnya tidak menyapa nama murid.
   if(status==='signed_in'){stateText.textContent=FiezelI18n.t('auth.status-tersambung');stateText.className='auth-status success';button.disabled=true;button.innerHTML=`<i data-lucide="circle-check-big"></i><span>${FiezelI18n.t('auth.tombol-tersambung')}</span>`}
@@ -7809,7 +7840,7 @@ function prasastiGalleryMarkup(){
    batas 4 detik \u2014 lewat itu sesi berjalan dengan kebijakan kolam lokal (jalur fallback
    yang sudah ada dan teruji) plus satu toast jujur. Render soal pertama tidak pernah lagi
    digerbangi jaringan/auth. */
-async function startAdaptive(){if(!state.adaptiveReady){showToast('Latihan terbuka setelah tes awal selesai.');return}
+async function startAdaptive(){if(!state.adaptiveReady){showToast(FiezelI18n.t('adaptif.toast-not-ready'));return}
  if(startAdaptive.pending)return;startAdaptive.pending=true;
  const busyBtns=[...document.querySelectorAll('button')].filter(b=>String(b.getAttribute('onclick')||'').includes('startAdaptive'));
  busyBtns.forEach(b=>{b.disabled=true;b.setAttribute('aria-busy','true')});
@@ -7818,9 +7849,9 @@ async function startAdaptive(){if(!state.adaptiveReady){showToast('Latihan terbu
   policy=await Promise.race([resolveAdaptivePolicy(),new Promise(res=>{const t=setTimeout(()=>res(null),4000);t?.unref?.()})]);
   /* Toast fallback ditunda sedikit: toast judul sesi (di bawah) menimpa elemen toast yang
      sama, jadi tanpa jeda pesan kejujuran ini tidak sempat terbaca. */
-  if(!policy){policy={...buildAdaptivePolicy(),source:'local-policy-timeout'};setTimeout(()=>showToast('Servernya lambat merespons \u2014 sesi ini pakai profil lokalmu dulu.'),2800)}
+  if(!policy){policy={...buildAdaptivePolicy(),source:'local-policy-timeout'};setTimeout(()=>showToast(FiezelI18n.t('adaptif.toast-server-slow')),2800)}
  }finally{startAdaptive.pending=false;busyBtns.forEach(b=>{try{b.disabled=false;b.removeAttribute('aria-busy')}catch(_){}})}
- const count=Math.max(5,Math.min(16,Number(policy.sessionSize||12))),pool=buildAdaptivePool(count,policy,4);if(!pool.length)return showToast('Profil adaptif belum memiliki area yang cukup terukur. Lanjutkan latihan level terlebih dahulu.');
+ const count=Math.max(5,Math.min(16,Number(policy.sessionSize||12))),pool=buildAdaptivePool(count,policy,4);if(!pool.length)return showToast(FiezelI18n.t('adaptif.toast-pool-empty'));
  /* Fase 3 (C5 butir 2): sesi adaptif menyisipkan 1-2 soal cloze PRODUKSI bila bank tersedia
     dan skill-nya lolos gerbang BKT L>=0.6 - recall produksi hanya untuk materi yang
     recognition-nya sudah stabil. Disisipkan di posisi 2 dan 5 (bukan soal pembuka: sesi
@@ -7868,7 +7899,7 @@ function AudioService(){
  const noteSilence=()=>{
   if(silenceNoticed)return false;
   silenceNoticed=true;
-  showToast('Suara sedang bermasalah di perangkatmu. Teksnya tetap bisa kamu baca, dan kamu boleh mencoba lagi nanti.');
+  showToast(FiezelI18n.t('suara.toast-device-issue'));
   return true;
  };
  return{
@@ -9905,7 +9936,7 @@ function reportId(){try{return crypto.randomUUID()}catch{return`${Date.now()}-${
 function buildCreatorReport(reason='manual'){const latest=state.sessionHistory?.[state.sessionHistory.length-1]||null;return{id:reportId(),schema:'fiezel-creator-report-v1',appVersion:APP_VERSION,createdAt:new Date().toISOString(),reason,consent:true,learnerLabel:learnerName(),summary:buildLearningSnapshot(),latestSession:latest?{at:latest.at,type:latest.type,score:latest.score,total:latest.total,accuracy:latest.accuracy}:null}}
 async function deliverCreatorReport(report){const endpoint=state.preferences?.reportEndpoint;if(!validReportEndpoint(endpoint))throw new Error('Endpoint Creator Hub belum valid.');if(typeof puter==='undefined'||!puter?.workers?.exec)throw new Error('Puter Worker belum siap. Pastikan koneksi aktif dan login Puter selesai.');const response=await puter.workers.exec(`${endpoint.replace(/\/+$/,'')}/api/report`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(report),keepalive:true});let data={};try{data=await response.json()}catch{}if(!response.ok||data.ok===false)throw new Error(data.message||data.error||`Creator Hub merespons ${response.status}.`);state.reportMeta.lastSentAnswered=Math.max(Number(state.reportMeta.lastSentAnswered||0),Number(report.summary?.totalAttempts||0));state.reportMeta.lastSentAt=Date.now();state.reportMeta.lastStatus='sent';state.reportMeta.lastReceipt=String(data.receipt||'');save();return data}
 function queueCreatorReport(report){const q=state.reportMeta.queue||[];if(!q.some(x=>x.id===report.id))q.push(report);state.reportMeta.queue=q.slice(-8);state.reportMeta.lastStatus='queued';save()}
-async function sendCreatorReport(reason='manual',force=false){if(!state.preferences?.reportConsent||!validReportEndpoint(state.preferences?.reportEndpoint))return false;if(!force&&state.totalAnswered<=Number(state.reportMeta?.lastSentAnswered||0))return false;const report=buildCreatorReport(reason);try{await deliverCreatorReport(report);state.reportMeta.queue=(state.reportMeta.queue||[]).filter(x=>x.id!==report.id);save();if(reason==='manual')showToast('Laporan agregat terkirim ke Creator Hub');return true}catch(e){queueCreatorReport(report);state.reportMeta.lastStatus='error';save();if(reason==='manual')showToast('Laporan disimpan di antrean dan akan dicoba lagi');return false}}
+async function sendCreatorReport(reason='manual',force=false){if(!state.preferences?.reportConsent||!validReportEndpoint(state.preferences?.reportEndpoint))return false;if(!force&&state.totalAnswered<=Number(state.reportMeta?.lastSentAnswered||0))return false;const report=buildCreatorReport(reason);try{await deliverCreatorReport(report);state.reportMeta.queue=(state.reportMeta.queue||[]).filter(x=>x.id!==report.id);save();if(reason==='manual')showToast(FiezelI18n.t('settings.toast-report-sent'));return true}catch(e){queueCreatorReport(report);state.reportMeta.lastStatus='error';save();if(reason==='manual')showToast(FiezelI18n.t('settings.toast-report-queued'));return false}}
 async function flushReportQueue(){if(!state.preferences?.reportConsent||!validReportEndpoint(state.preferences?.reportEndpoint)||!state.reportMeta?.queue?.length)return false;const pending=[...state.reportMeta.queue];for(const report of pending){try{await deliverCreatorReport(report);state.reportMeta.queue=state.reportMeta.queue.filter(x=>x.id!==report.id);save()}catch{state.reportMeta.lastStatus='error';save();return false}}return true}
 async function maybeSendAccessReport(){if(!state.preferences?.reportConsent||!validReportEndpoint(state.preferences?.reportEndpoint))return false;const today=dayKey(Date.now());if(state.reportMeta?.lastAccessReportDay===today)return false;state.reportMeta.lastAccessReportDay=today;save();return sendCreatorReport('daily_access',true)}
 function openReportPreview(){const report=buildCreatorReport('preview');openModal(`<div class="modal-mark">${FiezelI18n.t('settings.privacy-mark')}</div><h2>${FiezelI18n.t('settings.privacy-title')}</h2><p>${FiezelI18n.t('settings.privacy-body')}</p><div class="report-preview"><p><b>${FiezelI18n.t('settings.privacy-level')}</b> ${esc(report.summary.estimatedLevel)}</p><p><b>${FiezelI18n.t('settings.privacy-total-practice')}</b> ${esc(report.summary.totalAttempts)}</p><p><b>${FiezelI18n.t('settings.privacy-accuracy')}</b> ${report.summary.totalAccuracy==null?FiezelI18n.t('settings.privacy-unmeasured'):esc(report.summary.totalAccuracy)+'%'}</p><p><b>${FiezelI18n.t('settings.privacy-weak-area')}</b> ${esc(report.summary.weakSkills.map(x=>x.skill.replace(/_/g,' ')).join(', ')||FiezelI18n.t('settings.privacy-unmeasured'))}</p><p><b>${FiezelI18n.t('settings.privacy-last-report')}</b> ${esc(reportStatusLabel())}</p></div><div class="modal-actions"><button class="primary" id="previewClose"><i data-lucide="arrow-left"></i> ${FiezelI18n.t('settings.privacy-back-btn')}</button></div>`);$('previewClose').onclick=openSettings;enhanceUI()}
