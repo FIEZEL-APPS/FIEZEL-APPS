@@ -132,6 +132,56 @@ test('Background Fetch mengambil alih, dan jalur potongan berhenti saat itu', ()
   }
 });
 
+/* KONTRAK DUA UJUNG - gerbang paling berharga di berkas ini.
+ *
+ * Halaman merakit id pendaftaran `fiezel-neural-voice::<namaCache>`; service worker
+ * membongkarnya lagi saat 'backgroundfetchsuccess' tiba, mungkin berjam-jam kemudian ketika
+ * aplikasinya sudah lama ditutup. Kalau kedua ujung tidak sepakat, tidak ada yang melempar
+ * dan tidak ada yang merah: unduhan latar selesai, hasilnya DIBUANG diam-diam, dan murid
+ * cuma merasa suaranya "tidak pernah siap". Kegagalan senyap seperti itu justru yang paling
+ * mahal, karena tidak ada satu pun sinyal yang mengarah ke sini.
+ *
+ * Uji ini menjalankan pembongkar milik sw.js apa adanya - diambil dari sumbernya, bukan
+ * disalin - terhadap nama cache yang benar-benar dipakai lapisan neural. */
+test('id Background Fetch: halaman dan service worker sepakat, dan cache lain ditolak', () => {
+  const fs = require('fs'), path = require('path');
+  const read = f => fs.readFileSync(path.join(__dirname, f), 'utf8');
+  const SW = read('sw.js');
+  const BOOT = read('features/neural-voice/fiezel-neural-voice-bootstrap.js');
+
+  // Nama cache neural yang SEBENARNYA, dirakit sama seperti bootstrap merakitnya.
+  const verSrc = read('version.js');
+  const version = (/FIEZEL_VERSION\s*=\s*'([^']+)'/.exec(verSrc) || [])[1];
+  if (!version) throw new Error('FIEZEL_VERSION tidak terbaca dari version.js');
+  if (!/const cacheName=`fiezel-v\$\{version\}`/.test(BOOT)) {
+    throw new Error('bentuk nama cache neural berubah di bootstrap; kontrak id Background Fetch ikut harus ditinjau');
+  }
+  const cacheNeural = 'fiezel-v' + version;
+
+  // Ambil pembongkar milik sw.js dari sumbernya dan jalankan apa adanya.
+  const pre = (/const BGF_NEURAL_PREFIX='([^']+)'/.exec(SW) || [])[1];
+  const pola = (/return (\/\^fiezel-v[^\/]*\/)\.test\(nama\)/.exec(SW) || [])[1];
+  if (!pre || !pola) throw new Error('pembongkar id di sw.js tidak ditemukan; kontraknya tidak bisa diuji');
+  const re = eval(pola);
+  const dariId = id => {
+    const t = String(id || '');
+    if (!t.startsWith(pre)) return '';
+    const n = t.slice(pre.length);
+    return re.test(n) ? n : '';
+  };
+
+  // Ujung halaman merakit id persis seperti ini (lihat handOffToBackgroundFetch).
+  if (dariId(pre + cacheNeural) !== cacheNeural) {
+    throw new Error('sw.js MENOLAK id yang dirakit halaman untuk ' + cacheNeural + ': unduhan latar selesai lalu dibuang diam-diam');
+  }
+  // Cache lain tidak boleh bisa dibujuk masuk - salah tulis = ratusan MB di tempat salah.
+  for (const salah of ['fiezel-shell-m025-235', 'fiezel-locale-th-1', '', '../../etc']) {
+    if (dariId(pre + salah) !== '') {
+      throw new Error('sw.js menerima cache yang bukan milik lapisan neural: ' + JSON.stringify(salah));
+    }
+  }
+});
+
 test('"Ganti akun" keluar dulu, baru masuk', () => {
   const fn = /async function runPuterSwitchAccount\(\)\{[\s\S]*?\n\}/.exec(APP);
   if (!fn) throw new Error('runPuterSwitchAccount tidak ditemukan');
