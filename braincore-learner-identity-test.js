@@ -694,14 +694,34 @@ function babKlien() {
     /identityEvidenceEnsureAnon/.test(app) && /anonEndpoint/.test(app));
 
   const cfg = read('features/telemetry/fiezel-telemetry-config.js');
-  check('(G) konfigurasi klien lane per-murid LAHIR MATI (mode off)',
-    /identityEvidence: Object\.freeze\(\{[\s\S]{0,400}mode: 'off'/.test(cfg));
+  /* AKTIVASI m025-232. Sampai rilis ini, gerbang menuntut `mode: 'off'` — invarian
+   * PRA-AKTIVASI yang benar selama migrasi 0009/0010 belum jalan di remote. Sesudah
+   * Owner menyelesaikan langkah 1-3 (§7 handoff m025-230), invarian itu berubah, dan
+   * gerbangnya ikut berubah dengan sadar — pola yang sama seperti m025-229 waktu lane
+   * agregat dinyalakan. Yang TIDAK boleh berkurang: nilai di luar dua fase itu (typo,
+   * nilai rusak) tetap harus merah, dan `mode: 'on'` tanpa endpoint terisi juga merah —
+   * sebab lane hidup yang menunjuk endpoint kosong adalah lane yang gagal dalam diam. */
+  const identityBlok = (cfg.match(/identityEvidence: Object\.freeze\(\{[\s\S]*?\}\)/) || [''])[0];
+  const identityMode = (identityBlok.match(/mode: '([^']*)'/) || [, ''])[1];
+  check('(G) mode klien lane per-murid bernilai sah (off pra-aktivasi / on pasca-aktivasi)',
+    identityMode === 'off' || identityMode === 'on', identityMode);
+  check('(G) mode on WAJIB berpasangan dengan keempat endpoint https yang terisi',
+    identityMode !== 'on' || ['endpoint', 'consentEndpoint', 'anonEndpoint', 'nameEndpoint']
+      .every((k) => new RegExp(k + ": 'https://[^']+'").test(identityBlok)), identityBlok.slice(0, 200));
   check('(H) lane agregat tetap punya sakelarnya sendiri (tidak ikut dimatikan)',
     /evidence: Object\.freeze\(\{[\s\S]{0,200}mode: 'on'/.test(cfg));
 
   const toml = read('workers/api/wrangler.toml');
-  check('(G) FEATURE_LEARNER_EVIDENCE lahir "off" di wrangler.toml',
-    /FEATURE_LEARNER_EVIDENCE\s*=\s*"off"/.test(toml));
+  /* Alasan yang sama seperti di atas: dua nilai sah menurut fase, string lain merah. */
+  check('(G) FEATURE_LEARNER_EVIDENCE bernilai sah ("off" pra-aktivasi atau "on" pasca-aktivasi)',
+    /FEATURE_LEARNER_EVIDENCE\s*=\s*"(off|on)"/.test(toml), (toml.match(/FEATURE_LEARNER_EVIDENCE.*/) || [''])[0]);
+  /* Sakelar server dan sakelar klien harus sefase. Server 'off' + klien 'on' berarti
+   * setiap perangkat murid memanggil endpoint yang menjawab 403 selamanya; server 'on' +
+   * klien 'off' berarti infrastruktur hidup tanpa satu pun yang mengisinya. Keduanya
+   * gagal dalam diam, dan keduanya lolos kalau masing-masing hanya diperiksa sendiri. */
+  const tomlMode = (toml.match(/FEATURE_LEARNER_EVIDENCE\s*=\s*"(off|on)"/) || [, ''])[1];
+  check('(G) sakelar server dan klien lane per-murid sefase',
+    tomlMode === identityMode, 'wrangler=' + tomlMode + ' klien=' + identityMode);
 }
 
 /* ==========================================================================
