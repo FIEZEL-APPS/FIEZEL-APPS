@@ -93,12 +93,93 @@ test('cadangan menolak menyala bila asetnya belum lengkap', () => {
   }
 });
 
-test('unduhan menyala hanya setelah login terdeteksi', () => {
+/* m025-235: gerbang ini DIBALIK, bukan dihapus.
+ *
+ * Sampai m025-232 ia menuntut kebalikannya - `if(!puterSignedIn())return false;` wajib ada,
+ * karena saat itu OWNER menetapkan login Puter sebagai pemicu unduhan. Keputusan itu masuk
+ * akal selama TTS peramban masih menampung murid yang belum login. Lapisan itu dihapus, dan
+ * OWNER mencabut gerbangnya: mesin neural kini lapisan terakhir yang bersuara, jadi murid
+ * yang tidak pernah login Puter justru yang paling butuh unduhan ini.
+ *
+ * Yang dijaga sekarang adalah arah sebaliknya, dan itu yang berharga: gerbang login tidak
+ * boleh MERAYAP KEMBALI. Menghapus uji ini akan membuat penambahan `if(!puterSignedIn())`
+ * lolos tanpa seorang pun melihatnya. */
+test('unduhan menyala untuk SEMUA murid, tanpa menunggu login', () => {
   if (!/function armOfflineVoiceAutoload\(\)/.test(APP)) throw new Error('tidak ada penyala unduhan di app.js');
-  if (!/armOfflineVoiceAutoload\(\)\{\s*\n?\s*if\(!puterSignedIn\(\)\)return false;/.test(APP)) {
-    throw new Error('unduhan bisa menyala tanpa login; OWNER menetapkan login sebagai pemicunya');
+  const fn = /function armOfflineVoiceAutoload\(\)\{[\s\S]*?\n\}/.exec(APP);
+  if (!fn) throw new Error('badan armOfflineVoiceAutoload tidak terbaca');
+  if (/puterSignedIn\(\)/.test(fn[0])) {
+    throw new Error('gerbang login kembali: sejak m025-235 unduhan menyala untuk semua murid, bukan hanya yang login Puter');
   }
   if (!APP.includes('noteSignedIn')) throw new Error('penyala tidak pernah memberi tahu pengunduhnya');
+});
+
+/* Serah terima Background Fetch: satu-satunya cara unduhan lanjut setelah aplikasi ditutup.
+ * Hanya ada di Chromium - di iOS Safari cabang ini selalu gagal dan jalur potongan yang
+ * bekerja. Yang dijaga di sini: jalur potongan TIDAK ikut berjalan saat Background Fetch
+ * mengambil alih, karena dua pengunduh atas berkas yang sama membayar kuota murid dua kali. */
+test('Background Fetch mengambil alih, dan jalur potongan berhenti saat itu', () => {
+  const SRC = require('fs').readFileSync(require('path').join(__dirname, 'features/neural-voice/fiezel-voice-offline-autoload.js'), 'utf8');
+  if (!/handOffToBackgroundFetch/.test(SRC)) throw new Error('tidak ada serah terima Background Fetch');
+  if (!/if \(await handOffToBackgroundFetch\(rt, cache, items\)\) return;/.test(SRC)) {
+    throw new Error('jalur potongan tidak berhenti saat Background Fetch mengambil alih: kuota murid terbayar dua kali');
+  }
+  if (!/'fiezel-neural-voice::' \+ String\(rt\.cacheName/.test(SRC)) {
+    throw new Error('id registrasi tidak membawa nama cache; service worker tidak akan tahu ke mana hasilnya disimpan');
+  }
+  if (!/backgroundFetch\.get/.test(SRC)) {
+    throw new Error('pendaftaran yang masih hidup tidak diperiksa; mendaftar ulang membatalkan kemajuan sesi sebelumnya');
+  }
+});
+
+/* KONTRAK DUA UJUNG - gerbang paling berharga di berkas ini.
+ *
+ * Halaman merakit id pendaftaran `fiezel-neural-voice::<namaCache>`; service worker
+ * membongkarnya lagi saat 'backgroundfetchsuccess' tiba, mungkin berjam-jam kemudian ketika
+ * aplikasinya sudah lama ditutup. Kalau kedua ujung tidak sepakat, tidak ada yang melempar
+ * dan tidak ada yang merah: unduhan latar selesai, hasilnya DIBUANG diam-diam, dan murid
+ * cuma merasa suaranya "tidak pernah siap". Kegagalan senyap seperti itu justru yang paling
+ * mahal, karena tidak ada satu pun sinyal yang mengarah ke sini.
+ *
+ * Uji ini menjalankan pembongkar milik sw.js apa adanya - diambil dari sumbernya, bukan
+ * disalin - terhadap nama cache yang benar-benar dipakai lapisan neural. */
+test('id Background Fetch: halaman dan service worker sepakat, dan cache lain ditolak', () => {
+  const fs = require('fs'), path = require('path');
+  const read = f => fs.readFileSync(path.join(__dirname, f), 'utf8');
+  const SW = read('sw.js');
+  const BOOT = read('features/neural-voice/fiezel-neural-voice-bootstrap.js');
+
+  // Nama cache neural yang SEBENARNYA, dirakit sama seperti bootstrap merakitnya.
+  const verSrc = read('version.js');
+  const version = (/FIEZEL_VERSION\s*=\s*'([^']+)'/.exec(verSrc) || [])[1];
+  if (!version) throw new Error('FIEZEL_VERSION tidak terbaca dari version.js');
+  if (!/const cacheName=`fiezel-v\$\{version\}`/.test(BOOT)) {
+    throw new Error('bentuk nama cache neural berubah di bootstrap; kontrak id Background Fetch ikut harus ditinjau');
+  }
+  const cacheNeural = 'fiezel-v' + version;
+
+  // Ambil pembongkar milik sw.js dari sumbernya dan jalankan apa adanya.
+  const pre = (/const BGF_NEURAL_PREFIX='([^']+)'/.exec(SW) || [])[1];
+  const pola = (/return (\/\^fiezel-v[^\/]*\/)\.test\(nama\)/.exec(SW) || [])[1];
+  if (!pre || !pola) throw new Error('pembongkar id di sw.js tidak ditemukan; kontraknya tidak bisa diuji');
+  const re = eval(pola);
+  const dariId = id => {
+    const t = String(id || '');
+    if (!t.startsWith(pre)) return '';
+    const n = t.slice(pre.length);
+    return re.test(n) ? n : '';
+  };
+
+  // Ujung halaman merakit id persis seperti ini (lihat handOffToBackgroundFetch).
+  if (dariId(pre + cacheNeural) !== cacheNeural) {
+    throw new Error('sw.js MENOLAK id yang dirakit halaman untuk ' + cacheNeural + ': unduhan latar selesai lalu dibuang diam-diam');
+  }
+  // Cache lain tidak boleh bisa dibujuk masuk - salah tulis = ratusan MB di tempat salah.
+  for (const salah of ['fiezel-shell-m025-235', 'fiezel-locale-th-1', '', '../../etc']) {
+    if (dariId(pre + salah) !== '') {
+      throw new Error('sw.js menerima cache yang bukan milik lapisan neural: ' + JSON.stringify(salah));
+    }
+  }
 });
 
 test('"Ganti akun" keluar dulu, baru masuk', () => {
