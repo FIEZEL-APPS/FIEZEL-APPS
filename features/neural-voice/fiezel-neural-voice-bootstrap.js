@@ -16,13 +16,21 @@
   // sementara empat kali lipat langkah menembusnya, lalu permintaannya dibatalkan. Tanpa
   // override diagnostik, nilainya sama persis seperti sebelumnya.
   const neuralGenerationTimeoutMs=()=>{try{const p=root.FiezelWebAudioPlayer;return p&&typeof p.denoiseTimeoutMs==='function'?p.denoiseTimeoutMs(NEURAL_GENERATION_TIMEOUT_BASE_MS,root):NEURAL_GENERATION_TIMEOUT_BASE_MS}catch(_){return NEURAL_GENERATION_TIMEOUT_BASE_MS}};
-  const BROWSER_TTS_TIMEOUT_MS=Number(root.FIEZEL_BROWSER_TTS_TIMEOUT_MS)||12000;
   const INITIALIZE_TIMEOUT_MS=Number(root.FIEZEL_INIT_TIMEOUT_MS)||20000;
   // m025-26 replaces the m025-25 Apple dispatch block. m025-25 refused Kokoro inference on
   // Apple standalone because it killed the WebKit content process (OWNER capture
   // 2026-08-17T16:40:43Z: three consecutive process deaths, zero successes, >30s for a
   // 49-char chunk). The sherpa VITS worker engine removes that failure mode at the source,
-  // so neural dispatch is live again everywhere and no browser-TTS substitution remains.
+  // so neural dispatch is live again everywhere.
+  //
+  // m025-231: lapisan TTS peramban (L4) DIHAPUS TOTAL atas keputusan OWNER. Tangga suara
+  // sekarang berhenti di L3 - aset ElevenLabs/R2 (L1), Cloudflare (C1), Puter (L2), lalu
+  // mesin neural di perangkat ini (L3); di bawah L3 hanya ada L5 TEKS SENYAP, tidak ada satu
+  // pun lapisan yang berbunyi. Konsekuensinya untuk berkas ini cuma satu kalimat, tapi
+  // kalimat itu mengikat: kalau neural tidak bisa berbunyi, speak() WAJIB MENOLAK. Resolve
+  // true di jalur gagal adalah bug yang tidak boleh kembali - pemanggil di fiezel-voice-say.js
+  // membaca resolve sebagai "audio sudah berbunyi", jadi ia tidak akan turun ke L5 dan murid
+  // mendapat keheningan TANPA teks sebagai gantinya.
   const NEURAL_ENGINE_ID='supertonic-3';
   const PREPARED_MARKER_KEY='fiezel-neural-voice-prepared-v1';
   // m025-42 Supertonic 3 asset set. One press of the download button fetches exactly
@@ -48,7 +56,7 @@
     {path:'vendor/supertonic-3/voice.bin',bytes:517168}
   ]);
   const totalBytes=assets.reduce((sum,item)=>sum+item.bytes,0);
-  let phase='idle',lastError='',lastFallbackReason='',storage='',service=null,adapter=null,preparePromise=null,initializePromise=null,backendInitPromise=null,verifiedForSession=false,lastStorageEstimate=null,preparedFlag=readStatus().prepared,assetsCached=false,playerRef=null,speechActive=false,initFailedThisSession=false,initTimedOutThisSession=false,circuitOpen=false,audibleVerified=false,wasmPolicy='default';
+  let phase='idle',lastError='',lastFallbackReason='',storage='',service=null,adapter=null,preparePromise=null,initializePromise=null,backendInitPromise=null,verifiedForSession=false,lastStorageEstimate=null,preparedFlag=readStatus().prepared,assetsCached=false,playerRef=null,initFailedThisSession=false,initTimedOutThisSession=false,circuitOpen=false,audibleVerified=false,wasmPolicy='default';
   function diag(entry){try{const record={t:Date.now(),v:version,...entry};const sink=root.FiezelVoiceDiagnostics;if(sink&&typeof sink.record==='function'){sink.record(record,root);return}const key='fiezel-neural-voice-diagnostics-v1';const list=JSON.parse(root.localStorage?.getItem(key)||'[]');list.push(record);root.localStorage?.setItem(key,JSON.stringify(list.slice(-200)))}catch{}}
   // m025-48 delivery settings, read from the one config both engines share so the
   // English and Indonesian voices can never drift apart.
@@ -80,18 +88,15 @@
   installBootstrapLifecycleDiagnostics();
   const VENDOR_STAGE_PHASES=new Set(['espeak_module_loaded','espeak_worker_promise_create','espeak_runtime_already_ready','espeak_runtime_wait','espeak_runtime_ready','espeak_worker_construct_enter','espeak_worker_construct_ready','espeak_initcache_enter','espeak_list_voices_enter','espeak_list_voices_return','espeak_initcache_ready','espeak_phonemize_enter','espeak_worker_await_ready','espeak_initcache_await_ready','espeak_set_voice_enter','espeak_set_voice_return','espeak_synthesize_enter','espeak_synthesize_return','espeak_synthesize_error']);
   root.__fiezelNeuralVendorStage=entry=>{try{const vendorPhase=String(entry?.phase||'');if(VENDOR_STAGE_PHASES.has(vendorPhase))diag({phase:vendorPhase})}catch{}};
+  // m025-231: yang dibuka kuncinya di dalam gestur tinggal SATU, dan memang hanya itu yang
+  // pernah dipakai lagi - AudioContext milik pemutar neural. Blok kedua yang dulu ada di sini
+  // mengantrekan utterance volume-0 supaya TTS peramban ikut terbuka; setelah L4 dihapus blok
+  // itu bukan cuma mubazir, ia merugikan, karena menduduki antrean bicara Safari untuk
+  // lapisan yang tidak akan pernah dipanggil.
   function warmAudioGesture(){
     try{
       if(!playerRef&&root.FiezelWebAudioPlayer)playerRef=root.FiezelWebAudioPlayer.createPlayer(root);
       playerRef?.warm?.();
-    }catch{}
-    try{
-      if(root.speechSynthesis&&root.SpeechSynthesisUtterance&&!root.__fiezelTtsUnlocked){
-        const warm=new root.SpeechSynthesisUtterance(' ');
-        warm.volume=0;warm.rate=1;
-        root.speechSynthesis.speak(warm);
-        root.__fiezelTtsUnlocked=true;
-      }
     }catch{}
   }
 
@@ -117,9 +122,14 @@
     }catch{}
     preparedFlag=false;return false;
   }
+  // m025-231: kunci `speechSynthesis` SENGAJA dipertahankan dan dipatok false, bukan dihapus.
+  // Panel diagnostik membuang objek status apa adanya, jadi menghilangkan kuncinya membuat
+  // baris itu lenyap tanpa keterangan dan orang yang membaca dump lama mengira datanya rusak.
+  // False adalah jawaban yang JUJUR sekarang: tidak ada cadangan peramban lagi, sehingga
+  // ada-tidaknya speechSynthesis di perangkat tidak lagi mengubah apa pun di jalur suara.
   function status(){
     const stored=readStatus();
-    return Object.freeze({schema:STATUS_SCHEMA,version,phase,prepared:stored.prepared||preparedFlag,assetsCached:stored.prepared||preparedFlag,initialized:!!service,ready:!!service&&!circuitOpen,audibleVerified,circuitOpen,error:lastError,storage:preparedStorage(),totalBytes,assetCount:assets.length,zeroPaidRuntime:true,crossOriginInference:false,crossOriginIsolated:!!root.crossOriginIsolated,speechSynthesis:!!(root.speechSynthesis&&root.SpeechSynthesisUtterance),storageEstimate:lastStorageEstimate,timeoutMs:neuralGenerationTimeoutMs(),generationTimeoutMs:neuralGenerationTimeoutMs(),initializeTimeoutMs:INITIALIZE_TIMEOUT_MS,lastFallbackReason,wasmPolicy,engine:NEURAL_ENGINE_ID,engineModel:root.FiezelSherpaVitsAdapter?.MODEL_ID||''});
+    return Object.freeze({schema:STATUS_SCHEMA,version,phase,prepared:stored.prepared||preparedFlag,assetsCached:stored.prepared||preparedFlag,initialized:!!service,ready:!!service&&!circuitOpen,audibleVerified,circuitOpen,error:lastError,storage:preparedStorage(),totalBytes,assetCount:assets.length,zeroPaidRuntime:true,crossOriginInference:false,crossOriginIsolated:!!root.crossOriginIsolated,speechSynthesis:false,storageEstimate:lastStorageEstimate,timeoutMs:neuralGenerationTimeoutMs(),generationTimeoutMs:neuralGenerationTimeoutMs(),initializeTimeoutMs:INITIALIZE_TIMEOUT_MS,lastFallbackReason,wasmPolicy,engine:NEURAL_ENGINE_ID,engineModel:root.FiezelSherpaVitsAdapter?.MODEL_ID||''});
   }
   function emit(progress,callback){
     const payload=Object.freeze({...progress,totalBytes,assetCount:assets.length,phase});
@@ -396,22 +406,6 @@
     preparePromise=(async()=>{await warmAssets(options.onProgress);await initialize();diag({phase:'prepared'});return status()})().catch(error=>{if(!(backendInitPromise&&initTimedOutThisSession))phase='error';lastError=errorText(error);diag({phase:'prepare_error',error:lastError});if(!assetsCached){storage='';preparedFlag=false;writeStatus(false)}throw error}).finally(()=>{preparePromise=null});
     return preparePromise;
   }
-  function browserSpeak(text,options={}){
-    if(!root.speechSynthesis||!root.SpeechSynthesisUtterance){diag({phase:'tts_unavailable'});return Promise.reject(new Error('Browser TTS unavailable'))}
-    return new Promise((resolve,reject)=>{
-      let done=false,started=false,timer=null;
-      const settle=(ok,value)=>{if(done)return;done=true;if(timer)clearTimeout(timer);speechActive=false;ok?resolve(value):reject(value)};
-      const utterance=new root.SpeechSynthesisUtterance(String(text||''));
-      utterance.lang=options.lang||'en-US';utterance.rate=Number(options.speed||options.rate||.88);
-      utterance.onstart=()=>{started=true};
-      utterance.onend=()=>settle(true,{provider:'browser-speech-synthesis',started:true});
-      utterance.onerror=event=>settle(false,new Error(`browser_tts_${String(event?.error||'error')}`));
-      if(speechActive){try{root.speechSynthesis.cancel()}catch{}}
-      speechActive=true;
-      timer=setTimeout(()=>settle(false,new Error(started?'browser_tts_timeout':'browser_tts_not_started')),BROWSER_TTS_TIMEOUT_MS);
-      try{root.speechSynthesis.speak(utterance)}catch(error){settle(false,error)}
-    });
-  }
   async function ensureReady(){
     warmAudioGesture();
     if(circuitOpen)throw new Error(`neural_circuit_open:${lastFallbackReason||lastError||'previous_failure'}`);
@@ -426,22 +420,23 @@
     await initialize();
     return status();
   }
+  // m025-231: KONTRAK BARU. speak() hanya punya dua akhir - berbunyi lewat neural, atau
+  // MENOLAK. Tidak ada lagi `allowFallback`/`fallbackOrThrow` yang menukar galat dengan suara
+  // peramban, karena tidak ada lagi suara peramban. Setiap jalur gagal di bawah ini melempar
+  // galat ASLINYA supaya dua hal tetap utuh: pembukuan circuitOpen/lastFallbackReason yang
+  // sudah ada, dan kemampuan fiezel-voice-say.js membedakan sebab kegagalan sebelum ia turun
+  // ke L5 teks senyap. `options.allowFallback` masih boleh dikirim pemanggil lama, tapi kini
+  // tidak berpengaruh apa pun: hasilnya sama dengan atau tanpa opsi itu.
   async function speak(text,options={}){
     warmAudioGesture();
-    const allowFallback=options.allowFallback!==false;
-    const fallbackOrThrow=async(error)=>{
-      if(!allowFallback)throw error;
-      return browserSpeak(text,options);
-    };
-    if(!readStatus().prepared&&!preparedFlag&&allowFallback)return browserSpeak(text,options);
     if(!readStatus().prepared&&!preparedFlag)throw new Error('Neural voice assets are not prepared');
-    if(circuitOpen)return fallbackOrThrow(new Error(`neural_circuit_open:${lastFallbackReason||lastError||'previous_failure'}`));
-    if(initFailedThisSession||(initTimedOutThisSession&&backendInitPromise))return fallbackOrThrow(new Error(lastError||'Neural voice initialization is still running'));
+    if(circuitOpen)throw new Error(`neural_circuit_open:${lastFallbackReason||lastError||'previous_failure'}`);
+    if(initFailedThisSession||(initTimedOutThisSession&&backendInitPromise))throw new Error(lastError||'Neural voice initialization is still running');
     // m025-26 removes the m025-25 Apple dispatch block. That block existed only because
     // Kokoro q8 killed the WebKit content process; the sherpa VITS worker engine that
     // replaces it is proven sub-realtime on the same Safari, so neural runs again here.
     if(!verifiedForSession){
-      if(!(await verifyCachedAssets())){writeStatus(false);preparedFlag=false;phase='idle';return fallbackOrThrow(new Error('Offline voice cache verification failed'))}
+      if(!(await verifyCachedAssets())){writeStatus(false);preparedFlag=false;phase='idle';throw new Error('Offline voice cache verification failed')}
       verifiedForSession=true;
     }
     let local;
@@ -452,7 +447,7 @@
     }catch(error){
       lastError=errorText(error);lastFallbackReason=lastError;audibleVerified=false;
       diag({phase:'speak_init_error',error:lastError,elapsedMs:Date.now()-speakInitStartedAt});
-      return fallbackOrThrow(error);
+      throw error;
     }
     const voice=options.voice||root.FiezelNeuralVoiceConfig.voices.fiezelPrimary;
     const neuralStartedAt=Date.now();
@@ -468,9 +463,14 @@
       // faults. OWNER cache-0 capture recorded circuitOpen=true with reason
       // "TTS request superseded" -- switching listening item A1 to A2 cancels the
       // in-flight request, which was being classified as a hard failure and latched the
-      // circuit for the page lifetime. Every later request then failed closed and the
-      // app degraded to browser TTS until a reload, which is exactly the "A1 works, A2
-      // goes back to browser TTS, fixed only after several reloads" report.
+      // circuit for the page lifetime. Every later request then failed closed, which is
+      // exactly the "A1 works, A2 goes back to the fallback, fixed only after several
+      // reloads" report.
+      // m025-231: akibat salah-klasifikasi itu sekarang LEBIH BERAT, bukan lebih ringan.
+      // Dulu sirkuit yang terlanjur terkunci masih menjatuhkan aplikasi ke TTS peramban -
+      // tetap ada bunyi. Sesudah L4 dihapus, di bawah L3 hanya ada L5 teks senyap, jadi
+      // menandai kegagalan transien (superseded/stop/busy/timeout) sebagai kegagalan keras
+      // berarti murid benar-benar kehilangan suara sampai halaman dimuat ulang.
       const generationSuperseded=/superseded/i.test(lastError);
       const generationStopped=lastError==='neural_generation_stopped';
       const transientFailure=generationBusy||generationTimeout||generationSuperseded||generationStopped;
@@ -478,7 +478,7 @@
       diag({phase:'speak_fallback',reason:lastError,circuitOpen:shouldOpenCircuit,transient:transientFailure,elapsedMs:Date.now()-neuralStartedAt,voice:String(voice)});
       circuitOpen=shouldOpenCircuit;audibleVerified=false;if(circuitOpen)phase='error';else if(service)phase='ready';
       try{service?.stop?.()}catch{}
-      return fallbackOrThrow(error);
+      throw error;
     }
     circuitOpen=false;audibleVerified=true;lastError='';lastFallbackReason='';phase='ready';
     diag({phase:'speak_neural_success',provider:String(result?.provider||'neural'),voice:String(result?.voice||voice||''),requestId:String(result?.requestId||''),elapsedMs:Date.now()-neuralStartedAt});
@@ -506,18 +506,17 @@
       return false;
     }
   }
-  // Berhenti harus mencapai TIGA lapisan: permintaan mesin yang sedang jalan, potongan yang
-  // SUDAH dijadwalkan di garis waktu Web Audio (murid tidak boleh mendengar sisa kalimat
-  // sesudah pindah layar), dan TTS peramban sebagai cadangan.
-  function stop(){try{service?.stop?.()}catch{}try{playerRef?.cancel?.()}catch{}try{root.speechSynthesis?.cancel?.()}catch{}}
+  // Berhenti harus mencapai DUA lapisan: permintaan mesin yang sedang jalan, dan potongan
+  // yang SUDAH dijadwalkan di garis waktu Web Audio (murid tidak boleh mendengar sisa kalimat
+  // sesudah pindah layar). m025-231: lapisan ketiga - TTS peramban - sudah tidak ada, jadi
+  // tidak ada lagi antrean bicara peramban yang perlu dibatalkan di sini.
+  function stop(){try{service?.stop?.()}catch{}try{playerRef?.cancel?.()}catch{}}
   // T-023 lifecycle: bebaskan sesi neural + WebAudio saat tab tidak terlihat agar
   // tab tidak dipaksa mati oleh browser (WASM 92MB+21MB + AudioContext tetap hidup
   // saat hidden). ADDITIVE — kontrak publik tidak berubah; init ulang on-demand
   // terjadi otomatis lewat speak()/ensureReady() berikutnya.
   function release(){
     try{service?.stop?.()}catch{}
-    try{root.speechSynthesis?.cancel?.()}catch{}
-    speechActive=false;
     try{root.FiezelWebAudioPlayer?.createPlayer?.(root)?.close?.()}catch{}
     playerRef=null;service=null;adapter=null;
     phase='idle';lastError='';lastFallbackReason='';circuitOpen=false;audibleVerified=false;
@@ -526,7 +525,9 @@
     return status();
   }
 
-  diag({phase:'bootstrap_loaded',crossOriginIsolated:!!root.crossOriginIsolated,speechSynthesis:!!(root.speechSynthesis&&root.SpeechSynthesisUtterance),cacheAvailable:('caches'in root)});
+  // m025-231: dipatok false demi alasan yang sama dengan status() - bidangnya tetap ada agar
+  // dump diagnostik lama tidak berubah bentuk, nilainya jujur karena L4 sudah tidak ada.
+  diag({phase:'bootstrap_loaded',crossOriginIsolated:!!root.crossOriginIsolated,speechSynthesis:false,cacheAvailable:('caches'in root)});
   if(typeof Promise!=='undefined'&&root.caches)refreshPreparedFlag().then(prepared=>{
     if(prepared){phase='cached';diag({phase:'prepared_idle'});}
   }).catch(()=>{});
