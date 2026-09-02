@@ -76,6 +76,7 @@ import { registerLearningRoutes } from './learning/route-learning-events.js';
 // (EVIDENCE_DB), kill switch lain (EVIDENCE_ENABLED).
 import { registerEvidenceRoutes } from './evidence/route-evidence.js';
 import { purgeEvidence } from './evidence/evidence-store-d1.js';
+import { purgeLearnerEvidence } from './evidence/learner-evidence-store-d1.js';
 import { jsonResponse, jsonError, unauthenticated, ERR } from './errors.js';
 // A3: pencatat hasil cron. Satu-satunya alasan berkas ini diubah paket kerja A3.
 import { withCronRun, CRON_JOBS } from './cron-status.js';
@@ -737,13 +738,29 @@ export async function runEvidencePurge(env, now) {
  * (keduanya idempoten) daripada tidak jalan karena ekspresi cron diubah di
  * `wrangler.toml` tanpa mengubah berkas ini.
  */
+/**
+ * Purge lane bukti PER-MURID (SLOT 9). Database BERBEDA dari purge di atas —
+ * `fiezel-core`, bukan `fiezel-evidence` — jadi ia job sendiri, bukan cabang di
+ * dalam `runEvidencePurge`. TTL default 180 hari (LEARNER_EVIDENCE_LIMITS
+ * .RETENTION_DAYS); menaikkannya berarti mengubah konstanta itu DAN
+ * docs/D1-RETENTION.md §2.7, bukan menambah data diam-diam.
+ *
+ * Tanpa binding = `skipped`, bukan galat: lane ini boleh belum dipasang.
+ */
+export async function runLearnerEvidencePurge(env, now) {
+  const db = quotaDb(env);
+  if (!db) return { skipped: 'no_binding' };
+  const today = new Date(Number.isFinite(now) ? now : Date.now()).toISOString().slice(0, 10);
+  return purgeLearnerEvidence(db, today);
+}
+
 export const CRON_QUOTA_SWEEP = '*/5 * * * *';
 export const CRON_ANALYTICS_ROLLUP = '5 17 * * *';
 
 export async function runScheduled(event, env, executionCtx, now) {
   const cron = String((event && event.cron) || '');
   const at = Number.isFinite(now) ? now : Number((event && event.scheduledTime)) || Date.now();
-  const out = { cron, quotaSweep: null, analyticsRollup: null, evidencePurge: null };
+  const out = { cron, quotaSweep: null, analyticsRollup: null, evidencePurge: null, learnerEvidencePurge: null };
 
   const wantSweep = cron === CRON_QUOTA_SWEEP || cron !== CRON_ANALYTICS_ROLLUP;
   const wantRollup = cron === CRON_ANALYTICS_ROLLUP || cron !== CRON_QUOTA_SWEEP;
@@ -770,6 +787,12 @@ export async function runScheduled(event, env, executionCtx, now) {
     try {
       out.evidencePurge = await runEvidencePurge(env, at);
     } catch (e) { out.evidencePurge = { error: e && e.name }; }
+    // Purge lane per-murid: database lain, retensi lain (180 hari), kegagalan lain.
+    // Berdiri sendiri untuk alasan yang sama dengan purge di atas — bukti yang tidak
+    // pernah dipurge adalah arsip, dan arsip yang gagal diam-diam adalah arsip permanen.
+    try {
+      out.learnerEvidencePurge = await runLearnerEvidencePurge(env, at);
+    } catch (e) { out.learnerEvidencePurge = { error: e && e.name }; }
   }
   return out;
 }
