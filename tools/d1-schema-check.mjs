@@ -120,17 +120,25 @@ export function filesByDbFromDoc(dir) {
  *  tidak boleh memuat tabel identitas/kuota/analytics. Pemisahan tiga domain
  *  (identitas · kehadiran perangkat · hasil kebijakan Brain) hanya bermakna
  *  kalau ketiga arahnya dijaga, bukan dua. */
+/* [INFRA-0009-20260901] Lane bukti PER-MURID (`learner_evidence*`) hidup di
+ * `core` bersama identitas. Ketiga tabelnya karena itu DILARANG muncul di
+ * stats/learning/evidence: tabel yang memuat `sub` DAN dimensi belajar adalah
+ * persis benda yang membuat tiga database lain berhenti anonim kalau ia nyasar
+ * ke sana. Arah sebaliknya sudah dijaga baris `core` di bawah. */
 const FORBIDDEN_BY_DB = {
   core: ['metrics_daily', 'usage_daily', 'retention_daily', 'dau_dedup', 'pepper_state',
     'learning_daily', 'learning_dedup', 'evidence_daily', 'evidence_dedup', 'evidence_learner_day'],
   stats: ['identity', 'session', 'anon_issue', 'quota_daily', 'quota_reservation',
-    'learning_daily', 'learning_dedup', 'evidence_daily', 'evidence_dedup', 'evidence_learner_day'],
+    'learning_daily', 'learning_dedup', 'evidence_daily', 'evidence_dedup', 'evidence_learner_day',
+    'learner_evidence', 'learner_evidence_state', 'learner_evidence_consent'],
   learning: ['identity', 'session', 'anon_issue', 'quota_daily', 'quota_reservation',
     'metrics_daily', 'usage_daily', 'retention_daily', 'dau_dedup', 'pepper_state', 'batch_dedup',
-    'evidence_daily', 'evidence_dedup', 'evidence_learner_day'],
+    'evidence_daily', 'evidence_dedup', 'evidence_learner_day',
+    'learner_evidence', 'learner_evidence_state', 'learner_evidence_consent'],
   evidence: ['identity', 'session', 'anon_issue', 'quota_daily', 'quota_reservation',
     'metrics_daily', 'usage_daily', 'retention_daily', 'dau_dedup', 'pepper_state', 'batch_dedup',
-    'learning_daily', 'learning_dedup']
+    'learning_daily', 'learning_dedup',
+    'learner_evidence', 'learner_evidence_state', 'learner_evidence_consent']
 };
 
 /** Kolom penghubung yang tidak boleh muncul di database analytics. */
