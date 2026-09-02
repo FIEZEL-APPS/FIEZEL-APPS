@@ -100,14 +100,59 @@ Kunci yang tidak boleh meleset satu byte:
 listening rusak pra-perbaikan (3.227 string Thai) — bukan ditebak:
 
 - **`residuIndonesia`** — leksikon dari korpus repo sendiri, bukan daftar kata fungsi.
-  Menangkap 1.266 string. Percobaan daftar-kata-fungsi buta pada frasa pendek yang justru
+  Menangkap 1.335 string. Percobaan daftar-kata-fungsi buta pada frasa pendek yang justru
   mendominasi bank (`"Tangannya kedinginan"`, `"Sebuah kuas"`): 580 dari 1.600 opsi A1/A2
   lolos secara keliru.
 - **`thaiKataPerKata`** — jejak penerjemah token (rentetan Thai bersepasi). Menangkap 320,
-  di antaranya **77 yang tidak tertangkap pemeriksaan lain** — itulah nilai marginalnya.
+  di antaranya **51 yang tidak tertangkap pemeriksaan lain** — itulah nilai marginalnya.
 
-Total 1.343 tangkapan, dan angka itu **tidak berubah** melewati seluruh perbaikan presisi
-di bawah. Kalau Anda menyentuh detektor, ukur ulang angka ini sebelum dan sesudah.
+Total **1.386** tangkapan (1.343 sebelum kontrak korpus diperbaiki). Kalau Anda menyentuh detektor, ukur ulang angka ini sebelum dan sesudah.
+
+### JEBAKAN PALING BERBAHAYA: pencemaran korpus Inggris
+
+Leksikon dibangun dari **selisih ID − EN**. Konsekuensinya tajam dan tidak intuitif: setiap
+kata Indonesia yang keliru masuk sisi **EN** akan **terhapus dari leksikon**, dan detektor
+menjadi buta terhadap kata itu **di seluruh permukaan** — bukan hanya di berkas yang salah
+label.
+
+Ini sudah terjadi, dan akibatnya gerbang melaporkan **20/20 sementara 75 kebocoran nyata
+masih duduk di sidecar th**, termasuk 15 di bank listening yang sudah dinyatakan bersih
+(`"มีแนวโน้มว่า จะ dilakukan Bayu?"`). Tiga sumbernya:
+
+1. **`reading-exam-v1.json` `stem` + `options` dilabeli Inggris, padahal Indonesia**
+   (`"Paragraf mana yang memuat perbandingan..."`). Satu salah label ini sendirian
+   menyuntikkan delapan kata Indonesia **paling umum** — `dan`, `yang`, `adalah`, `untuk`,
+   `tidak`, `dulu`, `jalan`, `kembali` — ke korpus Inggris.
+2. **Prosa Inggris yang MENGUTIP bahasa Indonesia** di dalam tanda kutip:
+   `"mirroring the Indonesian order 'minum selalu'"`. Ada di `grammar-templates.json`, kunci
+   `grammar-misconception-id.json`, dan `misconception` distraktor cloze. Ditangani helper
+   `addENKutip` yang membuang isi `'...'` sebelum menambahkan ke korpus Inggris.
+3. **Pertanyaan listening mode `dictation`** adalah instruksi antarmuka berbahasa Indonesia
+   (`"Ketik kalimat yang kamu dengar..."`), bukan soal Inggris — 134 butir di B1+.
+
+**Kalau Anda menambah sumber ke `buildLexicon`, verifikasi labelnya dengan membaca isinya,
+jangan menebak dari nama berkasnya.** Cara cepat memeriksa kesehatan leksikon:
+
+```js
+const {buildLexicon} = require('./th-purity-lexicon.js');
+const L = buildLexicon(__dirname);
+['dan','yang','adalah','untuk','tidak','dulu','kembali','minum','mau'].forEach(w =>
+  console.log(w, L.has(w) ? 'ok' : '*** BUTA — korpus EN tercemar ***'));
+```
+
+Semua kata itu **wajib** ada di leksikon. Kalau salah satu hilang, ada sumber EN yang
+tercemar dan seluruh gerbang tidak bisa dipercaya sampai itu diperbaiki.
+
+### Pemindai kedua: `tools/scan-th-bank-leak.js`
+
+Pemindai berbasis daftar kata (dari jalur PR ini) punya titik buta yang **berbeda** dari
+leksikon korpus, dan justru itulah gunanya: ia yang menemukan delapan kebocoran yang gerbang
+korpus lewatkan. Jalankan **keduanya**; keduanya harus bersih.
+
+```
+node th-bank-purity-test.js      # 20/20 PASS
+node tools/scan-th-bank-leak.js  # 0 temuan
+```
 
 ### Ambang kata-per-kata sengaja tidak dilonggarkan
 
@@ -153,11 +198,19 @@ menggolongkannya.
 5. **Ritual bump versi** — `core-config.js` `FIEZEL_PAGE_BUILD`, `fiezel-diag-panel.js`
    `DIAG_BUILD`, `sw.js` `SW_REV` dinaikkan bertiga ke `m025-230`.
 
+## Penjelasan L1: adaptasi, jangan terjemahkan
+
+Sembilan penjelasan di `grammar-explanations-th.json` dulu mengajari murid Thai soal
+interferensi bahasa **Indonesia** (`"mau"`, `"minum selalu"`, `"yang"`) — hasil terjemahan
+literal dari versi id. Itu tidak mengajari murid Thai apa pun. Kini diadaptasi ke padanan L1
+Thai yang benar: `"อยาก"`, `"ดื่มชาเสมอ"`, `"ที่/ซึ่ง"`. **Contoh interferensi bahasa ibu harus
+diadaptasi ke bahasa ibu pembacanya, bukan diterjemahkan.**
+
 ## Kalau menambah konten Thai baru
 
 1. Tambahkan pasangan **kalimat utuh** ke berkas peta di `tools/th-strings/`.
 2. Jalankan generatornya (ia gagal keras dan mencetak yang belum terpeta).
-3. `node th-bank-purity-test.js` harus tetap 20/20.
+3. `node th-bank-purity-test.js` harus tetap 20/20 **dan** `node tools/scan-th-bank-leak.js` 0 temuan.
 4. Jalankan daftar tes di `.github/workflows/quality.yml`. Kegagalan lama yang tidak
    berhubungan (tes hash-lock `vendor/kokoro-js/kokoro.web.js`, merah bahkan di `main` bersih
    pada lingkungan ini) tidak memblokir — pastikan dulu lewat `git diff main -- <path>` bahwa
