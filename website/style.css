@@ -419,3 +419,200 @@ ul,ol{margin:0;padding:0;list-style:none}
   .foot-notes{justify-items:end;text-align:right}
   .sec-head{margin-bottom:34px}
 }
+
+/* ============================================================
+   HAWAIIAN HULA PAW MASCOT MOTION (3s DYNAMIC CHOREOGRAPHY)
+   ============================================================ */
+.hula-paw {
+  filter: drop-shadow(0 8px 24px rgba(140, 34, 51, 0.12));
+}
+
+.anim .hula-paw.hula-playing .fz-hula-all {
+  animation: hula-all-sway 2.4s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  transform-origin: 160px 280px;
+}
+@keyframes hula-all-sway {
+  0%, 100% { transform: rotate(0deg) translateX(0px); }
+  25% { transform: rotate(-3.5deg) translateX(-8px) translateY(-3px); }
+  50% { transform: rotate(0deg) translateX(0px) translateY(1px); }
+  75% { transform: rotate(3.5deg) translateX(8px) translateY(-3px); }
+}
+
+.anim .hula-paw.hula-playing .fz-hula-torso {
+  animation: hula-hip-roll 2.4s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  transform-origin: 160px 240px;
+}
+@keyframes hula-hip-roll {
+  0%, 100% { transform: rotate(0deg) translateX(0px); }
+  25% { transform: rotate(4deg) translateX(-6px) scaleY(0.98); }
+  50% { transform: rotate(0deg) translateX(0px) scaleY(1); }
+  75% { transform: rotate(-4deg) translateX(6px) scaleY(0.98); }
+}
+
+.anim .hula-paw.hula-playing .fz-skirt-layer-front {
+  animation: skirt-sway-front 2.4s cubic-bezier(0.35, 0.1, 0.25, 1) infinite;
+  transform-origin: 160px 222px;
+}
+@keyframes skirt-sway-front {
+  0%, 100% { transform: skewX(0deg) scaleX(1); }
+  25% { transform: skewX(-14deg) scaleX(1.08) translateX(-5px); }
+  50% { transform: skewX(0deg) scaleX(1); }
+  75% { transform: skewX(14deg) scaleX(1.08) translateX(5px); }
+}
+
+.anim .hula-paw.hula-playing .fz-skirt-blade-left {
+  animation: skirt-blade-l 2.4s ease-in-out infinite;
+  transform-origin: 110px 224px;
+}
+@keyframes skirt-blade-l {
+  0%, 100% { transform: rotate(0deg); }
+  22% { transform: rotate(-18deg) scaleY(1.08); }
+  72% { transform: rotate(10deg) scaleY(0.96); }
+}
+
+.anim .hula-paw.hula-playing .fz-skirt-blade-right {
+  animation: skirt-blade-r 2.4s ease-in-out infinite;
+  transform-origin: 210px 224px;
+}
+@keyframes skirt-blade-r {
+  0%, 100% { transform: rotate(0deg); }
+  28% { transform: rotate(-10deg) scaleY(0.96); }
+  78% { transform: rotate(18deg) scaleY(1.08); }
+}
+
+.anim .hula-paw.hula-playing .fz-skirt-blade-center {
+  animation: skirt-blade-c 2.4s ease-in-out infinite;
+  transform-origin: 160px 224px;
+}
+@keyframes skirt-blade-c {
+  0%, 100% { transform: rotate(0deg) scaleX(1); }
+  25% { transform: rotate(-12deg) scaleX(1.1); }
+  75% { transform: rotate(12deg) scaleX(1.1); }
+}
+
+.anim .hula-paw.hula-playing .fz-hula-head {
+  animation: hula-head-tilt 2.4s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  transform-origin: 160px 140px;
+}
+@keyframes hula-head-tilt {
+  0%, 50%, 100% { transform: rotate(0deg) translateY(0px); }
+  25% { transform: rotate(4.5deg) translateY(-2px); }
+  75% { transform: rotate(-4.5deg) translateY(-2px); }
+}
+
+.anim .hula-paw.hula-playing .fz-haku-lei {
+  animation: haku-lei-bounce 2.4s ease-in-out infinite;
+  transform-origin: 160px 50px;
+}
+@keyframes haku-lei-bounce {
+  0%, 50%, 100% { transform: rotate(0deg) translateY(0px); }
+  25% { transform: rotate(-2.5deg) translateY(-2px); }
+  75% { transform: rotate(2.5deg) translateY(-2px); }
+}
+
+.anim .hula-paw.hula-playing .fz-tail-hula {
+  animation: tail-hula 2.4s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  transform-origin: 212px 244px;
+}
+@keyframes tail-hula {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(16deg) translateY(4px); }
+  75% { transform: rotate(-16deg) translateY(-4px); }
+}
+
+/* Routine 1: Ocean Waves */
+.anim .hula-paw.routine-1 .fz-arm-l {
+  animation: r1-arm-l 2.4s ease-in-out infinite;
+  transform-origin: 106px 186px;
+}
+@keyframes r1-arm-l {
+  0%, 100% { transform: rotate(-8deg) translateY(0); }
+  20% { transform: rotate(-28deg) translateY(-14px) scaleY(1.04); }
+  40% { transform: rotate(-18deg) translateY(-8px); }
+  65% { transform: rotate(12deg) translateY(6px); }
+  85% { transform: rotate(2deg) translateY(2px); }
+}
+.anim .hula-paw.routine-1 .fz-arm-r {
+  animation: r1-arm-r 2.4s ease-in-out infinite;
+  transform-origin: 214px 186px;
+}
+@keyframes r1-arm-r {
+  0%, 100% { transform: rotate(8deg) translateY(0); }
+  20% { transform: rotate(-10deg) translateY(4px); }
+  45% { transform: rotate(4deg) translateY(2px); }
+  70% { transform: rotate(28deg) translateY(-14px) scaleY(1.04); }
+  90% { transform: rotate(18deg) translateY(-6px); }
+}
+
+/* Routine 2: Tropical Sun */
+.anim .hula-paw.routine-2 .fz-arm-l {
+  animation: r2-arm-l 2.2s ease-in-out infinite;
+  transform-origin: 106px 186px;
+}
+@keyframes r2-arm-l {
+  0%, 100% { transform: rotate(-35deg) translateY(-20px); }
+  30% { transform: rotate(-50deg) translateY(-26px) scaleY(1.06); }
+  70% { transform: rotate(-20deg) translateY(-10px); }
+}
+.anim .hula-paw.routine-2 .fz-arm-r {
+  animation: r2-arm-r 2.2s ease-in-out infinite;
+  transform-origin: 214px 186px;
+}
+@keyframes r2-arm-r {
+  0%, 100% { transform: rotate(35deg) translateY(-20px); }
+  30% { transform: rotate(20deg) translateY(-10px); }
+  70% { transform: rotate(50deg) translateY(-26px) scaleY(1.06); }
+}
+
+/* Routine 3: Island Breeze */
+.anim .hula-paw.routine-3 .fz-arm-l {
+  animation: r3-arm-l 2.4s ease-in-out infinite;
+  transform-origin: 106px 186px;
+}
+@keyframes r3-arm-l {
+  0%, 100% { transform: rotate(18deg) translateX(12px) translateY(8px); }
+  50% { transform: rotate(10deg) translateX(8px) translateY(4px); }
+}
+.anim .hula-paw.routine-3 .fz-arm-r {
+  animation: r3-arm-r 2.4s ease-in-out infinite;
+  transform-origin: 214px 186px;
+}
+@keyframes r3-arm-r {
+  0%, 100% { transform: rotate(36deg) translateY(-18px) scaleX(1.06); }
+  50% { transform: rotate(48deg) translateY(-26px) scaleX(1.08); }
+}
+
+/* Routine 4: Aloha Celebration */
+.anim .hula-paw.routine-4 .fz-arm-l {
+  animation: r4-arm-l 2.0s cubic-bezier(0.34, 1.4, 0.64, 1) infinite;
+  transform-origin: 106px 186px;
+}
+@keyframes r4-arm-l {
+  0%, 100% { transform: rotate(-22deg) translateY(-10px); }
+  50% { transform: rotate(-44deg) translateY(-22px) scaleY(1.08); }
+}
+.anim .hula-paw.routine-4 .fz-arm-r {
+  animation: r4-arm-r 2.0s cubic-bezier(0.34, 1.4, 0.64, 1) infinite;
+  transform-origin: 214px 186px;
+}
+@keyframes r4-arm-r {
+  0%, 100% { transform: rotate(22deg) translateY(-10px); }
+  50% { transform: rotate(44deg) translateY(-22px) scaleY(1.08); }
+}
+.anim .hula-paw.routine-4 .fz-ear-l {
+  animation: ear-wiggle-l 1.0s ease-in-out infinite;
+  transform-origin: 108px 52px;
+}
+@keyframes ear-wiggle-l {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-10deg); }
+}
+.anim .hula-paw.routine-4 .fz-ear-r {
+  animation: ear-wiggle-r 1.0s ease-in-out infinite;
+  transform-origin: 212px 52px;
+}
+@keyframes ear-wiggle-r {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(10deg); }
+}
+
