@@ -764,6 +764,13 @@ function sanitizeLearnerRow(raw) {
   if (!sub) return null;
   return {
     sub,
+    // `name` = nama yang sudah DIPILIH server (perkenalan > profil sosial).
+    // `nameSource` ikut supaya panel bisa membedakan "belum punya nama di
+    // server" dari "namanya kebetulan sama dengan handle" — dua keadaan yang
+    // terlihat identik kalau yang datang hanya string.
+    name: safeName(raw.name, 64),
+    nameSource: /^(onboarding|social_display|social_handle|none)$/.test(String(raw.nameSource || ''))
+      ? String(raw.nameSource) : 'none',
     displayName: safeName(raw.displayName, 64),
     handle: safeName(raw.handle, 64),
     firstDay: safeDay(raw.firstDay),
@@ -1087,6 +1094,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}
 th,td{text-align:right;padding:5px 4px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
 th:first-child,td:first-child{text-align:left}
 tr.sel td{background:#FFF3CE}
+.muted-mark{color:var(--muted);font-size:11px}
 h4{margin:12px 0 4px;font-size:13px;letter-spacing:.02em;text-transform:uppercase;color:var(--muted)}
 svg{display:block;width:100%;height:52px;margin:6px 0 2px}
 footer{padding:0 16px 34px;color:var(--muted);font-size:12px}
@@ -1320,9 +1328,17 @@ function renderEvidenceSection(m) {
  */
 function learnerLabel(row) {
   if (!row) return 'murid tanpa nama';
+  // `name` sudah dipilih server dengan urutan perkenalan > display_name > handle.
+  // Panel tidak mengulang logika itu: dua tempat yang memilih nama adalah dua
+  // urutan yang pelan-pelan menyimpang.
+  if (row.name) return row.nameSource === 'social_handle' ? '@' + row.name : row.name;
   if (row.displayName) return row.displayName;
   if (row.handle) return '@' + row.handle;
-  // Delapan hex pertama `sub`. Cukup untuk membedakan baris di layar, dan memang bukan nama.
+  // Delapan hex pertama `sub`. Sejak nama WAJIB diisi di perkenalan, baris seperti
+  // ini adalah keadaan LEGACY/GALAT — murid yang mendaftar sebelum `learner_name`
+  // ada, atau yang namanya gagal sampai ke server — bukan perilaku normal untuk
+  // murid baru. Ia tetap dicetak apa adanya: menyembunyikannya akan membuat owner
+  // mengira murid itu tidak ada.
   return 'murid ' + String(row.sub || '').slice(0, 8);
 }
 
@@ -1351,8 +1367,11 @@ function renderLearnerDirectory(m) {
   const rows = d.learners.map((x) => {
     const selected = m.learnerSub === x.sub;
     const href = `/?period=${esc(m.period)}&amp;learner=${esc(x.sub)}`;
+    // Nama yang BUKAN dari perkenalan ditandai, bukan disamarkan: owner berhak tahu
+    // bahwa yang ia baca adalah handle sosial atau tidak ada nama sama sekali.
+    const mark = x.nameSource === 'onboarding' ? '' : ' <span class="muted-mark">(bukan nama perkenalan)</span>';
     return `<tr${selected ? ' class="sel"' : ''}>
-      <td><a href="${href}">${esc(learnerLabel(x))}</a></td>
+      <td><a href="${href}">${esc(learnerLabel(x))}</a>${mark}</td>
       <td>${esc(x.lastDay || '—')}</td>
       <td>${esc(fmtInt(x.evidenceCount))}</td>
       <td>${esc(fmtInt(x.decisionCount))}</td>
@@ -1363,9 +1382,11 @@ function renderLearnerDirectory(m) {
   }).join('');
   return `<table><tr><th>murid</th><th>aktivitas terakhir</th><th>bukti</th><th>keputusan</th>
     <th>level</th><th>mastery</th><th>tren</th></tr>${rows}</table>
-    <div class="note">Nama diambil dari profil sosial murid (<code>social_profile</code>) lewat
-      <code>sub</code>. Murid yang belum membuat profil muncul sebagai "murid &lt;8 hex sub&gt;" —
-      itu identitas internalnya, bukan nama yang pernah ia ketik.</div>`;
+    <div class="note">Nama diambil dari yang DIKETIK murid di langkah pertama perkenalan
+      (<code>learner_name</code>, wajib diisi, terikat <code>identity.sub</code>). Profil sosial
+      (<code>social_profile</code>) hanya cadangan untuk murid lama. Baris "murid &lt;8 hex sub&gt;"
+      berarti murid itu mendaftar sebelum nama disimpan di server, atau namanya belum sampai —
+      bukan perilaku normal untuk murid baru.</div>`;
 }
 
 function renderLearnerDetail(m) {

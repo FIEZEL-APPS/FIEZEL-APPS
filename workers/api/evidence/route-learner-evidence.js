@@ -57,6 +57,8 @@ import {
   LEARNER_DIRECTORY_SCHEMA,
   LEARNER_EVIDENCE_EVENT_TYPES,
   isValidSub,
+  normalizeLearnerName,
+  LEARNER_NAME_MAX,
   normalizeLearnerEvidenceEnvelope,
   summarizeLearnerRows
 } from './learner-evidence-core.js';
@@ -66,6 +68,8 @@ import {
   grantConsent,
   revokeConsent,
   writeLearnerEvidence,
+  writeLearnerName,
+  readLearnerName,
   readLearnerDirectory,
   readLearnerProfile,
   readLearnerState,
@@ -74,6 +78,7 @@ import {
 
 export const LEARNER_EVIDENCE_PATH = '/api/braincore/learner-evidence';
 export const LEARNER_CONSENT_PATH = '/api/braincore/learner-evidence/consent';
+export const LEARNER_NAME_PATH = '/api/learner/name';
 export const OWNER_LEARNERS_PATH = '/api/owner/learners';
 export const OWNER_LEARNER_EVIDENCE_PATH = '/api/owner/learner-evidence';
 
@@ -215,6 +220,74 @@ export async function routeLearnerConsent(ctx) {
   }
 }
 
+/* ========================================================== NAMA LEARNER ==== */
+
+/**
+ * Skema body: HANYA `name`. Tidak ada `sub`, tidak ada `userId` — validator
+ * deny-by-default menolak keduanya 400, jadi murid A secara struktur tidak punya
+ * field untuk menimpa nama murid B. Pemiliknya adalah `gate.sub` dari cookie.
+ */
+const SCHEMA_LEARNER_NAME = {
+  allow: { name: { type: 'string', max: 200, required: true } }
+};
+
+/**
+ * POST /api/learner/name — simpan/ganti nama panggilan milik PEMANGGIL.
+ *
+ * SENGAJA TIDAK MENUNTUT PERSETUJUAN BUKTI. Nama adalah identitas tampilan yang
+ * murid isi sendiri di langkah pertama perkenalan (wajib, tidak bisa dilewati),
+ * dan naskah di layar itu yang memberitahunya ke mana namanya pergi. Persetujuan
+ * di `learner_evidence_consent` mengatur hal yang berbeda: apakah KEADAAN
+ * BELAJARNYA boleh disimpan per-orang. Menggabungkan keduanya akan membuat murid
+ * yang menolak analitik kehilangan namanya juga — dan owner melihat daftar tanpa
+ * nama untuk murid yang sebenarnya sudah memberikannya.
+ *
+ * `max: 200` di skema, `LEARNER_NAME_MAX` (24) sesudah normalisasi: batas skema
+ * ada untuk menolak payload konyol lebih awal; batas nama ada untuk memotong.
+ * Nama yang lebih panjang DIPOTONG, bukan ditolak — aturan yang sama dengan
+ * klien, karena menolak masukan yang wajar di langkah WAJIB berarti mengurung
+ * murid di layar perkenalan.
+ */
+export async function routeLearnerName(ctx) {
+  const gate = await learnerGate(ctx);
+  if (gate.deny) return gate.deny;
+  if (!checkSubRateLimit(gate.sub, ctx.now)) {
+    return jsonError(429, ERR.RATE_LIMITED, {}, gate.opt);
+  }
+  const body = await readJsonFromCtx(ctx, gate.opt);
+  if (!body.ok) return body.response;
+  const shape = validateShape(body.value, SCHEMA_LEARNER_NAME);
+  if (!shape.ok) return jsonError(400, ERR.SCHEMA_INVALID, {}, gate.opt);
+
+  const name = normalizeLearnerName(body.value.name);
+  // Kosong SESUDAH normalisasi (spasi saja, kurung sudut saja) = 400. Nama
+  // kosong di server berarti dashboard owner menampilkan baris tanpa nama untuk
+  // murid yang mengira sudah memberikannya.
+  if (!name) return jsonError(400, ERR.SCHEMA_INVALID, { reason: 'empty_name' }, gate.opt);
+
+  try {
+    await writeLearnerName(gate.db, gate.sub, name, gate.day, ctx.now);
+  } catch {
+    return jsonError(503, ERR.UNAVAILABLE, {}, gate.opt);
+  }
+  // `name` dipantulkan kembali supaya klien tahu bentuk TERNORMALISASI yang
+  // benar-benar tersimpan (mis. "  Andi   " -> "Andi"), bukan menebaknya.
+  return jsonResponse({ ok: true, name, maxLength: LEARNER_NAME_MAX }, gate.opt);
+}
+
+/**
+ * GET /api/learner/name — nama milik PEMANGGIL SENDIRI, bukan milik orang lain.
+ * Tidak menerima `?sub=`: satu-satunya nama yang bisa dibaca rute ini adalah
+ * nama pemilik cookie yang menyertainya.
+ */
+export async function routeLearnerNameRead(ctx) {
+  const gate = await learnerGate(ctx);
+  if (gate.deny) return gate.deny;
+  let row = null;
+  try { row = await readLearnerName(gate.db, gate.sub); } catch { row = null; }
+  return jsonResponse({ ok: true, name: (row && row.name) || null, maxLength: LEARNER_NAME_MAX }, gate.opt);
+}
+
 /* ============================================================ BACA OWNER === */
 
 function ownerDeny() {
@@ -229,12 +302,22 @@ function ownerDays(url) {
   return Math.min(LIMITS.OWNER_MAX_DAYS, Math.trunc(days));
 }
 
-/** Nama yang boleh dilihat owner. SATU sumber: `social_profile`. */
-function displayFrom(row) {
-  return {
-    displayName: (row && row.display_name) || null,
-    handle: (row && row.handle) || null
-  };
+/**
+ * Nama yang dilihat owner, dan DARI MANA ia datang.
+ *
+ * Urutan (keputusan OWNER 2 Sep 2026): nama perkenalan lebih dulu, profil sosial
+ * hanya cadangan untuk murid lama. `nameSource` ikut dikembalikan supaya owner
+ * (dan gerbang) bisa membedakan "murid ini memang belum punya nama di server"
+ * dari "namanya kebetulan sama dengan handle-nya" — dua keadaan yang terlihat
+ * identik kalau yang dikirim hanya string.
+ */
+function displayFrom(nameRow, profileRow) {
+  const learnerName = (nameRow && nameRow.name) || null;
+  const displayName = (profileRow && profileRow.display_name) || null;
+  const handle = (profileRow && profileRow.handle) || null;
+  const name = learnerName || displayName || handle || null;
+  const nameSource = learnerName ? 'onboarding' : displayName ? 'social_display' : handle ? 'social_handle' : 'none';
+  return { name, nameSource, displayName, handle };
 }
 
 /**
@@ -274,7 +357,7 @@ export async function handleOwnerLearners(ctx) {
     range: { from, to },
     learners: rows.map((r) => ({
       sub: r.sub,
-      ...displayFrom(r),
+      ...displayFrom({ name: r.learner_name }, r),
       firstDay: r.first_day || null,
       lastDay: r.last_day || null,
       evidenceCount: Number(r.evidence_n) || 0,
@@ -321,9 +404,13 @@ export async function handleOwnerLearnerEvidence(ctx) {
   let rows = [];
   let profile = null;
   let state = null;
+  let nameRow = null;
   try {
     rows = await readLearnerEvidenceRows(db, sub, from, to, LIMITS.MAX_ROWS_PER_READ);
-    profile = await readLearnerProfile(db, sub);
+    nameRow = await readLearnerName(db, sub);
+    // Profil sosial hanya CADANGAN nama; kegagalannya (lane sosial belum ada)
+    // tidak boleh menjatuhkan halaman murid yang namanya sudah ada di server.
+    try { profile = await readLearnerProfile(db, sub); } catch { profile = null; }
     state = await readLearnerState(db, sub);
   } catch {
     return jsonResponse({ ok: true, migrated: false, schema: LEARNER_EVIDENCE_SUMMARY_SCHEMA, range: { from, to }, learner: null, summary: null });
@@ -336,7 +423,7 @@ export async function handleOwnerLearnerEvidence(ctx) {
     range: { from, to },
     learner: {
       sub,
-      ...displayFrom(profile),
+      ...displayFrom(nameRow, profile),
       firstDay: (state && state.first_day) || null,
       lastDay: (state && state.last_day) || null,
       evidenceCountAllTime: (state && Number(state.evidence_n)) || 0,
@@ -351,6 +438,8 @@ export async function handleOwnerLearnerEvidence(ctx) {
 export const ROUTES = Object.freeze([
   ['POST', LEARNER_EVIDENCE_PATH, routeLearnerEvidence],
   ['POST', LEARNER_CONSENT_PATH, routeLearnerConsent],
+  ['POST', LEARNER_NAME_PATH, routeLearnerName],
+  ['GET', LEARNER_NAME_PATH, routeLearnerNameRead],
   ['GET', OWNER_LEARNERS_PATH, handleOwnerLearners],
   ['GET', OWNER_LEARNER_EVIDENCE_PATH, handleOwnerLearnerEvidence]
 ]);

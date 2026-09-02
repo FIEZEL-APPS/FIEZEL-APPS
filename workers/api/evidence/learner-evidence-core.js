@@ -111,6 +111,37 @@ function dayDrift(day, nowMs) {
   return Math.abs(Math.round((t - today) / 86400000));
 }
 
+/* ==========================================================================
+ * NAMA LEARNER — normalisasi yang SAMA dengan sisi klien
+ * ==========================================================================
+ * Aturan ini adalah salinan sadar dari `normalizeName()` di
+ * features/onboarding/fiezel-onboarding.js, dan gerbang
+ * braincore-learner-identity-test.js mengadu keduanya. Alasannya bukan
+ * kerapian: kalau server menormalkan berbeda dari klien, nama yang tampil di HP
+ * murid dan nama yang dilihat owner pelan-pelan menyimpang — dan yang pertama
+ * menyadarinya adalah murid yang merasa namanya salah tulis.
+ *
+ * Yang dibuang bukan "karakter yang tidak disukai" melainkan hal-hal yang
+ * merusak tampilan: karakter kendali, kurung sudut (nama masuk ke HTML
+ * dashboard lewat esc(), tetapi juga ke tempat lain), dan spasi berlebih. Huruf
+ * beraksen, tanda kutip pada nama seperti O'Neil, dan tanda hubung sengaja
+ * DIBIARKAN — itu nama orang.
+ */
+export const LEARNER_NAME_MAX = 24;
+
+export function normalizeLearnerName(value) {
+  const raw = String(value == null ? '' : value);
+  let clean = '';
+  for (let i = 0; i < raw.length; i += 1) {
+    const code = raw.charCodeAt(i);
+    const ch = raw.charAt(i);
+    if (code < 32 || code === 127) { clean += ' '; continue; }
+    if (ch === '<' || ch === '>') continue;
+    clean += ch;
+  }
+  return clean.replace(/\s+/g, ' ').trim().slice(0, LEARNER_NAME_MAX).trim();
+}
+
 export function isValidSub(value) {
   return typeof value === 'string' && SUB_PATTERN.test(value);
 }
@@ -387,6 +418,8 @@ export default {
   LEARNER_EVIDENCE_EVENT_TYPES,
   SUB_PATTERN,
   isValidSub,
+  LEARNER_NAME_MAX,
+  normalizeLearnerName,
   normalizeLearnerEvidenceEvent,
   normalizeLearnerEvidenceEnvelope,
   parseStoredDims,
