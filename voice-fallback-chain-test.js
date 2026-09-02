@@ -1,22 +1,37 @@
 #!/usr/bin/env node
 /**
- * m026-BUG gerbang TANGGA SUARA — tiga bug produksi yang membuat murid DIAM.
+ * m026-BUG gerbang TANGGA SUARA — dan, sejak m025-231, penjaga PENGHAPUSAN TTS peramban.
  *
- * KENAPA BERKAS INI ADA. Ketiga bug yang dijaga di sini punya bentuk yang sama, dan itulah
- * yang membuat mereka hidup berbulan-bulan: kodenya MENYEBUT cadangan, komentarnya
- * menjanjikan cadangan, tetapi cadangannya tidak pernah tercapai. Mencocokkan kata kunci
- * tidak akan pernah menangkap kelas bug itu — satu-satunya cara adalah MENJALANKAN jalur
+ * KENAPA BERKAS INI ADA. Bug-bug yang dijaga di sini punya bentuk yang sama, dan itulah yang
+ * membuat mereka hidup berbulan-bulan: kodenya MENYEBUT satu lapisan, komentarnya menjanjikan
+ * lapisan itu, tetapi yang benar-benar menyahut saat gagal adalah hal lain. Mencocokkan kata
+ * kunci tidak akan pernah menangkap kelas bug itu — satu-satunya cara adalah MENJALANKAN jalur
  * gagalnya dan melihat siapa yang menyahut. Karena itu gerbang ini memuat blok sumber yang
  * asli ke dalam vm dan memaksa setiap lapisan gagal satu per satu.
+ *
+ * m025-231 — KEPUTUSAN OWNER, DIMINTA DUA KALI. L4 `speechSynthesis` DIHAPUS dari tangga.
+ * Tangganya kini: C0 cache klien → L1 aset R2/ElevenLabs → C1 POST /api/tts/render → L2 Puter →
+ * L3 mesin neural di perangkat (HANYA bila aset `prepared`) → L5 TEKS TANPA SUARA. Tidak ada
+ * lapisan bersuara di bawah L3. Gerbang ini karena itu berbalik arah: yang dulu membuktikan
+ * "cadangan peramban TERCAPAI" sekarang membuktikan "tangga berhenti di L3, dan di bawahnya
+ * jawabannya `false` yang tenang plus teks yang tetap terbaca".
+ *
+ * PERANGKAP, BUKAN KEKOSONGAN. `speechSynthesis` dan `SpeechSynthesisUtterance` tetap dipasang
+ * di sandbox justru supaya "tidak dipakai" bisa dibuktikan, bukan sekadar dimungkinkan. Kalau
+ * lapisan itu kembali suatu hari — lewat tambalan kebisuan yang kelihatan masuk akal, seperti
+ * pertama kali dulu — ia akan menemukan pintu yang terbuka dan gerbang inilah yang berteriak.
  *
  * Empat janji:
  *   (a) `fiezel-speaking-listening-addon.js` MENGEMBALIKAN replay di catch dan tidak
  *       mengunci item listening. Dua kegagalan TTS berturut-turut dulu berarti item itu
  *       mati permanen (CF-MIGRATION §Ringkasan, cf-b4 §5.2).
- *   (b) `fiezel-voice-say.js` punya cabang speechSynthesis yang TERCAPAI ketika
- *       prepared=false — kasus murid baru, yang aset neuralnya belum diunduh (cf-c1 K10).
- *   (c) `app.js` AudioService menjatuhkan diri ke cadangan karena say() GAGAL, bukan karena
- *       modulnya absen; dan bila semua gagal ia berbicara jujur SEKALI (cf-c1 K11).
+ *   (b) `fiezel-voice-say.js` BERAKHIR di L3. Saat aset neural belum `prepared` — kasus murid
+ *       baru — say() menjawab `false` dengan tenang, pita subtitle DITUTUP, giliran dilaporkan
+ *       sebagai diam di lapisan 5, dan tidak satu pun utterance peramban dinyalakan.
+ *       `browserFallbackReady` dipaku false, breaker L4 tidak ada lagi.
+ *   (c) `app.js` AudioService menjawab `null` untuk SETIAP kegagalan pintu suara — tanpa suara
+ *       kedua — dan berbicara jujur SEKALI per sesi (cf-c1 K11). Stopwatch 9 detiknya menjawab
+ *       PENDING, dan PENDING BUKAN kebisuan: ia lewat tanpa toast dan tanpa suara.
  *   (d) tidak ada kelonggaran pada penjaga unduhan 152 MB. Memperbaiki kebisuan dengan
  *       menyalakan mesin neural di tengah pelajaran adalah obat yang lebih buruk dari
  *       penyakitnya (cf-a5 §4).
@@ -61,6 +76,46 @@ function sourceBlock(name, source) {
   if (start < 0) return '';
   const next = source.slice(start + 10).search(/\n(?:async\s+)?function\s+[A-Za-z_$][\w$]*\s*\(/);
   return source.slice(start, next < 0 ? source.length : start + 10 + next);
+}
+
+/**
+ * Sumber TANPA komentar, dipakai oleh penjaga statis "lapisan ini tidak boleh kembali".
+ *
+ * Membedakan kode dari komentar bukan kerewelan: blok kepala `fiezel-voice-say.js` dan blok
+ * `play()` di app.js memang MENYEBUT speechSynthesis - itu catatan penghapusannya, tulisan yang
+ * paling berguna di kedua berkas itu. Gerbang yang mencocokkan kata mentah akan menghukum
+ * dokumentasi yang benar dan mendorong orang berikutnya menghapus penjelasannya, lalu
+ * penghapusan L4 kehilangan satu-satunya jejak alasannya.
+ *
+ * Pemindai ini melacak kutip (termasuk template dan escape), jadi 'https://...' tidak salah
+ * dibaca sebagai komentar. Ia hanya MEMBUANG di dalam komentar - di luar itu setiap karakter
+ * diteruskan apa adanya - sehingga kesalahan terburuknya adalah gerbang yang terlalu galak,
+ * bukan gerbang yang lulus karena kodenya ikut termakan. Penjaga anti-vakum di bawah tetap
+ * memastikan hasil potongannya masih berisi kode sungguhan.
+ */
+function codeOnly(source) {
+  const text = String(source == null ? '' : source);
+  let out = '';
+  let inBlock = false;
+  let inLine = false;
+  let quote = '';
+  for (let i = 0; i < text.length; i += 1) {
+    const ch = text[i];
+    const next = text[i + 1];
+    if (inBlock) { if (ch === '*' && next === '/') { inBlock = false; i += 1; } continue; }
+    if (inLine) { if (ch === '\n') { inLine = false; out += ch; } continue; }
+    if (quote) {
+      out += ch;
+      if (ch === '\\') { out += next === undefined ? '' : next; i += 1; continue; }
+      if (ch === quote) quote = '';
+      continue;
+    }
+    if (ch === '/' && next === '*') { inBlock = true; i += 1; continue; }
+    if (ch === '/' && next === '/') { inLine = true; i += 1; continue; }
+    if (ch === '"' || ch === "'" || ch === '`') { quote = ch; }
+    out += ch;
+  }
+  return out;
 }
 
 // ===========================================================================================
@@ -275,17 +330,39 @@ function failingController(reason) {
 })();
 
 // ===========================================================================================
-// (b) VOICE SAY — L4 speechSynthesis tercapai justru ketika prepared=false
+// (b) VOICE SAY — tangga BERHENTI di L3; di bawahnya diam yang jujur (L4 dihapus, m025-231)
 // ===========================================================================================
 
+/**
+ * Sandbox berisi PERANGKAP, bukan kekosongan.
+ *
+ * `speechSynthesis` dan `SpeechSynthesisUtterance` sengaja TETAP dipasang di sini walau
+ * lapisannya sudah dihapus dari produksi. Hanya dengan pintu yang terbuka lebar, "tangga tidak
+ * memakainya" bisa DIBUKTIKAN: kalau stubnya dibuang, setiap `synth === 0` di bawah akan lulus
+ * karena kesempatannya tidak ada, bukan karena keputusan OWNER dihormati - dan lapisan yang
+ * diam-diam kembali suatu hari tidak akan menabrak apa pun. Peranti murid pun punya
+ * speechSynthesis; menghapus stubnya berarti menguji dunia yang tidak ada.
+ */
 function sayHarness(options) {
   const opts = options || {};
-  const calls = { puter: 0, runtime: 0, prepare: 0, ensureReady: 0, synth: 0, spoken: [] };
+  const calls = {
+    puter: 0, runtime: 0, prepare: 0, ensureReady: 0,
+    synth: 0, synthCancel: 0, utterances: 0,
+    bandBegin: 0, bandEnd: 0, spoken: [], speech: []
+  };
   const timers = new Set();
   const sandbox = {
     console,
     setTimeout: (fn, ms) => { const t = setTimeout(fn, ms); timers.add(t); return t; },
     clearTimeout: (t) => { timers.delete(t); return clearTimeout(t); },
+    /* Pita subtitle yang MENCATAT. Janji L5 bukan cuma "false", melainkan "false dengan teks
+       yang tetap terbaca dan pita giliran yang DITUTUP" - dulu penutupan itu tugas closeBand()
+       milik L4, dan menghapus L4 tanpa memindahkannya akan meninggalkan baris terjemahan
+       menggantung di layar untuk giliran yang sudah selesai. Tanpa stub ini, janji itu tidak
+       bisa dibuktikan sama sekali. */
+    FiezelSubtitle: {
+      create() { return { begin() { calls.bandBegin++; }, end() { calls.bandEnd++; } }; }
+    },
     FiezelPuterVoice: opts.noPuter ? undefined : {
       // Dua bentuk kegagalan Puter yang sama-sama nyata: MELEMPAR (jaringan mati) dan
       // RESOLVE false (kehabisan waktu di dalam SDK-nya). Keduanya wajib turun ke lapisan
@@ -302,95 +379,126 @@ function sayHarness(options) {
       stop() {}
     }
   };
-  if (!opts.noSpeechSynthesis) {
-    sandbox.speechSynthesis = {
-      speak(utterance) {
-        calls.synth++;
-        calls.spoken.push('speechSynthesis:' + utterance.text);
-        if (opts.synthNeverStarts) return; // kegagalan khas iOS: diterima, tidak pernah berbunyi
-        setTimeout(() => { utterance.onstart && utterance.onstart(); utterance.onend && utterance.onend(); }, 0);
-      },
-      cancel() {}
-    };
-    sandbox.SpeechSynthesisUtterance = function (text) { this.text = text; this.lang = ''; this.rate = 1; };
-  }
+  /* Siaran 'fiezel-speech' adalah satu-satunya cara membaca DARI LUAR bahwa giliran ini
+     berakhir diam di lapisan 5. Tanpa dua stub ini emitSpeech() gagal di dalam try-nya sendiri
+     dan gerbang hanya bisa melihat boolean-nya. */
+  sandbox.CustomEvent = function (type, init) { this.type = String(type); this.detail = init && init.detail; };
+  sandbox.document = {
+    dispatchEvent(event) {
+      const detail = (event && event.detail) || {};
+      calls.speech.push(String(detail.phase) + ':' + String(detail.layer));
+      return true;
+    }
+  };
+  // PERANGKAP L4 - lihat blok komentar di atas. Setiap sentuhan dicatat; tidak satu pun boleh.
+  sandbox.speechSynthesis = {
+    speak(utterance) { calls.synth++; calls.spoken.push('speechSynthesis:' + (utterance && utterance.text)); },
+    cancel() { calls.synthCancel++; }
+  };
+  sandbox.SpeechSynthesisUtterance = function (text) { calls.utterances++; this.text = text; this.lang = ''; this.rate = 1; };
   vm.createContext(sandbox);
   vm.runInContext(SAY, sandbox, { timeout: 5000, filename: SAY_PATH });
   return { api: sandbox.FiezelVoiceSay, calls, sandbox, done: () => timers.forEach(clearTimeout) };
 }
 
 (async function voiceSayLadder() {
-  // Murid BARU: aset neural belum diunduh (prepared=false), Puter gagal (luring).
+  // Murid BARU: aset neural belum diunduh (prepared=false), Puter gagal (luring). Kasus INI
+  // dulu satu-satunya alasan L4 dipertahankan; sekarang jawabannya jujur - diam, teks terbaca.
   const fresh = sayHarness({ prepared: false });
   const spoke = await fresh.api.say('Good morning.', { locale: 'en-US', speed: 1 });
-  check('voice-say: prepared=false tetap berbunyi lewat speechSynthesis (murid baru tidak lagi senyap)',
-    spoke === true && fresh.calls.synth === 1,
-    `say()=${spoke} speechSynthesis.speak=${fresh.calls.synth}`);
+  check('voice-say: prepared=false berakhir di L5 — false yang tenang, BUKAN suara peramban',
+    spoke === false && fresh.calls.synth === 0 && fresh.calls.utterances === 0,
+    `say()=${spoke} speechSynthesis.speak=${fresh.calls.synth} utterance=${fresh.calls.utterances}`);
   check('voice-say: mesin neural TIDAK disentuh saat asetnya belum siap',
     fresh.calls.runtime === 0 && fresh.calls.prepare === 0 && fresh.calls.ensureReady === 0,
     `runtime.speak=${fresh.calls.runtime} prepare=${fresh.calls.prepare} ensureReady=${fresh.calls.ensureReady}`);
-  check('voice-say: urutannya tetap Puter dulu, cadangan peramban sesudahnya',
-    fresh.calls.puter === 1 && fresh.calls.spoken[0].startsWith('speechSynthesis:'),
+  check('voice-say: urutannya tetap Puter dulu, dan SESUDAH Puter tidak ada lagi yang bersuara',
+    fresh.calls.puter === 1 && fresh.calls.spoken.length === 0,
     `puter.speak=${fresh.calls.puter} jejak=${JSON.stringify(fresh.calls.spoken)}`);
-  check('voice-say: status() melaporkan lapisan peramban, jadi kebisuan bisa didiagnosis',
-    fresh.api.status().browserFallbackReady === true,
-    JSON.stringify(fresh.api.status()));
+  check('voice-say: L5 menutup pita subtitle dan melaporkan diam di lapisan 5 (teks tidak menggantung)',
+    fresh.calls.bandEnd >= 1 && fresh.calls.speech[fresh.calls.speech.length - 1] === 'silent:5',
+    `band.end=${fresh.calls.bandEnd} siaran=${JSON.stringify(fresh.calls.speech)}`);
+  const freshStatus = fresh.api.status();
+  check('voice-say: status() memaku browserFallbackReady=false MESKI peramban punya speechSynthesis',
+    'browserFallbackReady' in freshStatus && freshStatus.browserFallbackReady === false
+      && !('browserBreakerOpen' in freshStatus) && !('browserBreakerCooldownMs' in freshStatus),
+    JSON.stringify(freshStatus));
   fresh.done();
 
-  // Aset SUDAH siap: L3 dicoba lebih dulu, dan L4 tetap ada di bawahnya.
-  // Puter yang RESOLVE false (bukan melempar) juga harus turun, bukan diam.
-  const softFail = sayHarness({ prepared: false, puterResolvesFalse: true });
+  // Puter yang RESOLVE false (bukan melempar) harus tetap TURUN. Yang menerimanya sekarang
+  // adalah L3 dan hanya L3 - karena itu harness ini prepared:true, supaya turunnya terlihat.
+  const softFail = sayHarness({ prepared: true, puterResolvesFalse: true });
   const softSpoke = await softFail.api.say('Good morning.', { locale: 'en-US', speed: 1 });
-  check('voice-say: Puter yang menjawab false (bukan melempar) tetap turun ke lapisan bawah',
-    softSpoke === true && softFail.calls.synth === 1,
-    `say()=${softSpoke} speechSynthesis.speak=${softFail.calls.synth}`);
+  check('voice-say: Puter yang menjawab false (bukan melempar) tetap turun — ke L3, lalu berhenti di sana',
+    softSpoke === false && softFail.calls.puter === 1 && softFail.calls.runtime === 1 && softFail.calls.synth === 0,
+    `say()=${softSpoke} puter=${softFail.calls.puter} runtime=${softFail.calls.runtime} synth=${softFail.calls.synth}`);
   softFail.done();
 
   const prepared = sayHarness({ prepared: true });
   const spoke2 = await prepared.api.say('Good evening.', {});
-  check('voice-say: aset siap → mesin neural dicoba dulu, lalu turun ke peramban bila ia gagal',
-    prepared.calls.runtime === 1 && prepared.calls.synth === 1 && spoke2 === true,
-    `runtime.speak=${prepared.calls.runtime} speechSynthesis.speak=${prepared.calls.synth}`);
+  check('voice-say: aset siap → L3 dicoba; L3 yang GAGAL berakhir diam, bukan suara kedua',
+    prepared.calls.runtime === 1 && prepared.calls.synth === 0 && spoke2 === false,
+    `runtime.speak=${prepared.calls.runtime} speechSynthesis.speak=${prepared.calls.synth} say()=${spoke2}`);
   prepared.done();
 
   const preparedOk = sayHarness({ prepared: true, localSucceeds: true });
-  await preparedOk.api.say('Neural wins.', {});
-  check('voice-say: mesin neural yang BERHASIL tidak diikuti suara peramban dua kali',
-    preparedOk.calls.runtime === 1 && preparedOk.calls.synth === 0,
-    `runtime.speak=${preparedOk.calls.runtime} speechSynthesis.speak=${preparedOk.calls.synth}`);
+  const spokeOk = await preparedOk.api.say('Neural wins.', {});
+  check('voice-say: mesin neural yang BERHASIL tidak diikuti suara kedua — satu kalimat, satu suara',
+    spokeOk === true && preparedOk.calls.runtime === 1 && preparedOk.calls.synth === 0 && preparedOk.calls.spoken.length === 1,
+    `runtime.speak=${preparedOk.calls.runtime} speechSynthesis.speak=${preparedOk.calls.synth} jejak=${JSON.stringify(preparedOk.calls.spoken)}`);
   preparedOk.done();
 
-  // Tanpa runtime sama sekali (modul bootstrap belum termuat) L4 masih harus tercapai.
-  const noRuntime = sayHarness({ noRuntime: true, noPuter: true });
-  const spoke3 = await noRuntime.api.say('No engine at all.', {});
-  check('voice-say: tanpa mesin apa pun, peramban masih menjadi lapisan terakhir yang bersuara',
-    spoke3 === true && noRuntime.calls.synth === 1,
-    `say()=${spoke3} speechSynthesis.speak=${noRuntime.calls.synth}`);
-  noRuntime.done();
+  // Tanpa mesin apa pun (modul bootstrap belum termuat), jawabannya harus TENANG. Melempar di
+  // sini akan mengubah kebisuan menjadi galat tak tertangkap di pemanggil, dan layar murid ikut
+  // mati bersamanya - kegagalan yang jauh lebih besar daripada satu kalimat yang tidak berbunyi.
+  const noEngine = sayHarness({ noRuntime: true, noPuter: true });
+  let threw = '';
+  const spoke3 = await noEngine.api.say('No engine at all.', {}).catch((error) => { threw = String(error && error.message); return 'MELEMPAR'; });
+  check('voice-say: tanpa mesin apa pun, say() menjawab false dengan TENANG (tidak melempar)',
+    spoke3 === false && threw === '' && noEngine.calls.synth === 0,
+    `say()=${spoke3} lempar=${threw} speechSynthesis.speak=${noEngine.calls.synth}`);
+  noEngine.done();
 
-  // L5: benar-benar tidak ada suara di perangkat → false, tenang, tanpa dialog.
-  const silent = sayHarness({ prepared: false, noSpeechSynthesis: true });
+  // L5 sebagai keadaan BAWAAN. Opsi harness `noSpeechSynthesis` sudah tidak punya arti dan
+  // karena itu dihapus: tidak ada lagi lapisan peramban untuk dimatikan, jadi "perangkat tanpa
+  // suara sama sekali" adalah harness biasa tanpa satu pun bendera.
+  const silent = sayHarness({ prepared: false });
   const spoke4 = await silent.api.say('Nothing can speak.', {});
   check('voice-say: perangkat tanpa suara sama sekali menjawab false, bukan melempar',
     spoke4 === false,
     `say()=${spoke4}`);
   silent.done();
 
-  // Breaker 10 s untuk speak() yang diterima tanpa pernah berbunyi (khas iOS).
-  const stuck = sayHarness({ prepared: false, synthNeverStarts: true });
-  const breakerMs = Number((/BROWSER_BREAKER_MS\s*=\s*(\d+)/.exec(SAY) || [])[1]);
-  check('voice-say: cabang peramban punya breaker sendiri, dan ambangnya bisa dibaca',
-    Number.isFinite(breakerMs) && breakerMs > 0 && breakerMs <= 10000,
-    `BROWSER_BREAKER_MS=${breakerMs}`);
-  check('voice-say: breaker MENDINGIN, tidak melatch seumur sesi (satu macet tidak mendiamkan murid selamanya)',
-    /BROWSER_COOLDOWN_MS/.test(SAY) && /browserBreakerUntil = Date\.now\(\) \+ BROWSER_COOLDOWN_MS/.test(SAY) &&
-      !/browserBreakerOpen = true/.test(SAY),
-    'breaker L4 harus punya masa dingin, bukan bendera permanen');
+  /* PENGGANTI tiga gerbang breaker L4 (BROWSER_BREAKER_MS, BROWSER_COOLDOWN_MS, dan bentuk
+     `utterance.onstart`). Yang dijaga sekarang bukan lagi CARA lapisan itu menyerah, melainkan
+     bahwa ia TIDAK ADA - dan inilah gerbang paling berharga di berkas ini, karena OWNER sudah
+     meminta penghapusan yang sama DUA KALI.
+     Sebutan di dalam komentar justru DIIZINKAN: catatan yang menjelaskan kenapa lapisan itu
+     pergi adalah dokumentasi yang benar, dan gerbang yang menghukumnya hanya akan mendorong
+     orang berikutnya menghapus penjelasannya. Karena itu yang dibaca adalah KODE-nya. */
+  const SAY_CODE = codeOnly(SAY);
+  check('voice-say: pemotong komentar menyisakan KODE yang utuh (anti-vakum untuk dua penjaga di bawah)',
+    SAY_CODE.includes('function speakWithLocal') && SAY_CODE.includes('FiezelVoiceSay')
+      && SAY_CODE.includes('localEngine') && SAY_CODE.length > SAY.length * 0.4,
+    `${SAY_CODE.length} char kode dari ${SAY.length} char berkas`);
+  check('voice-say: NOL sebutan speechSynthesis/SpeechSynthesisUtterance/speakWithBrowser di KODE',
+    !/speechSynthesis|SpeechSynthesisUtterance|speakWithBrowser|FiezelBrowserSpeak/.test(SAY_CODE),
+    'L4 dihapus m025-231: komentar boleh menyebutnya, kode tidak boleh memanggilnya lagi');
+  check('voice-say: tidak ada sisa BENTUK pemanggilan L4 (new Utterance, breaker peramban)',
+    !/new\s+(?:root\.)?SpeechSynthesisUtterance/.test(SAY_CODE)
+      && !/BROWSER_BREAKER_MS|BROWSER_COOLDOWN_MS|browserBreaker/.test(SAY_CODE),
+    'breaker hanya masuk akal untuk lapisan yang ada; sisanya berarti lapisannya sudah kembali');
 
-  check('voice-say: breaker hanya mengukur waktu SEBELUM onstart, bukan panjang kalimatnya',
-    /utterance\.onstart\s*=\s*function\s*\(\)\s*\{\s*started\s*=\s*true;\s*if\s*\(timer\)/.test(SAY),
-    'memutus setelah 10 s berbunyi akan memotong paragraf bacaan yang wajar');
-  stuck.done();
+  // Pasangan RUNTIME dari dua penjaga statis di atas: pintunya terbuka, dan tangga tetap tidak
+  // melewatinya - termasuk stop(), yang dulu memanggil speechSynthesis.cancel() milik antrean
+  // GLOBAL peramban. Antrean itulah yang membuat "dua suara" dulu tidak bisa dihentikan.
+  const trap = sayHarness({ prepared: false });
+  await trap.api.say('Trap sentence.', { locale: 'en-US' });
+  trap.api.stop();
+  check('voice-say: PERANGKAP — peramban PUNYA speechSynthesis, dan tangga tidak menyentuhnya sekali pun',
+    trap.calls.synth === 0 && trap.calls.utterances === 0 && trap.calls.synthCancel === 0,
+    `speak=${trap.calls.synth} utterance=${trap.calls.utterances} cancel=${trap.calls.synthCancel}`);
+  trap.done();
 })().catch((error) => { check('voice-say: harness berjalan tanpa galat', false, error.stack || String(error)); });
 
 // ===========================================================================================
