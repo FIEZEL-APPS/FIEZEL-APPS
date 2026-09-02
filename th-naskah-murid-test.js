@@ -72,6 +72,7 @@ const BERKAS_DIKECUALIKAN = {
      TIDAK melemahkan gerbang, karena diganti pemeriksa yang lebih ketat di bawah:
      tiap bidang COPY wajib punya kunci di KEDUA locale. */
   'features/quota/quota-copy.js': 'peta COPY adalah cadangan terakhir; cakupan naskah aktifnya dijaga pemeriksa khusus di bawah',
+  'fiezel-cf-voice-notice.js': 'sama seperti quota-copy: peta COPY adalah cadangan terakhir, cakupannya dijaga pemeriksa di bawah',
 };
 
 function dikecualikan(berkas) {
@@ -146,6 +147,29 @@ function bersihkan(sumber) {
      DITEMPELKAN di ekor teks Thai. Jadi pemakaian literalnya dijaga di sini. */
   check('naskah kuota: penanda waktu reset tidak lagi literal di kode',
     !/\/sesudah tengah malam\/\.test/.test(qc), 'regex literal masih ada di quota-copy.js');
+}
+
+/* --- cakupan naskah pemberitahuan suara ------------------------------------------- */
+{
+  const vn = fs.readFileSync(path.join(root, 'features/neural-voice/fiezel-cf-voice-notice.js'), 'utf8');
+  const i = vn.indexOf('var COPY = Object.freeze({');
+  const j = vn.indexOf('\n  });', i);
+  const blok = i < 0 ? '' : vn.slice(i, j);
+  const butuh = [];
+  for (const m of blok.matchAll(/[\x27"]([a-z][\w.]*)[\x27"]:\s*Object\.freeze\(\{([\s\S]*?)\}\)/g)) {
+    for (const f of m[2].matchAll(/\b(title|spoken|silent)\s*:/g)) butuh.push('voicenotice.' + m[1] + '.' + f[1]);
+  }
+  butuh.push('voicenotice.reassurance.text', 'voicenotice.reset.next');
+  function kunciDi(berkas) {
+    const t = fs.readFileSync(path.join(root, berkas), 'utf8');
+    return new Set([...t.matchAll(/[\x27"]([a-z][\w.]*)[\x27"]\s*:/g)].map((m) => m[1]));
+  }
+  const kId = kunciDi('features/i18n/copy-id-quota.js');
+  const kTh = kunciDi('features/i18n/copy-th-quota.js');
+  check('naskah pemberitahuan suara: seluruh bidang punya kunci id (' + butuh.length + ' bidang)',
+    butuh.every((k) => kId.has(k)), butuh.filter((k) => !kId.has(k)).slice(0, 6).join(', '));
+  check('naskah pemberitahuan suara: seluruh bidang punya kunci th',
+    butuh.every((k) => kTh.has(k)), butuh.filter((k) => !kTh.has(k)).slice(0, 6).join(', '));
 }
 
 const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');

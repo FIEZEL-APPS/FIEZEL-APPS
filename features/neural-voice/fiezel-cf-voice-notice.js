@@ -97,6 +97,36 @@
   /** Nada yang sama dengan `noteNoAudio()`: sebut penyebabnya, jangan tuduh murid. */
   var REASSURANCE = 'Item ini tidak dinilai dan tidak dikunci.';
 
+  /* m025-236: naskah berkas ini tidak pernah lewat lapisan i18n, jadi murid Thai membaca
+     22 kalimat Indonesia setiap kali suaranya bermasalah - justru saat ia paling butuh
+     mengerti apa yang terjadi. Peta COPY tetap jadi cadangan terakhir supaya berkas ini
+     tetap bisa dipakai tanpa i18n (boot paling awal, harness), dan jalur id byte-identik. */
+  function naskah(kunci, bidang, cadangan) {
+    try {
+      var i18n = (typeof self !== 'undefined' && self.FiezelI18n) || null;
+      if (i18n && typeof i18n.t === 'function') {
+        var penuh = 'voicenotice.' + kunci + '.' + bidang;
+        var nilai = i18n.t(penuh);
+        if (nilai && nilai !== penuh) return String(nilai);
+      }
+    } catch (_) {}
+    return cadangan;
+  }
+
+  /* Kalimat penenang memakai kunci quota.* yang sudah patuh kanon id ("nggak", bukan
+     "tidak"), bukan duplikat voicenotice.*. Maknanya identik, dan menyatukannya membawa
+     berkas ini ke kanon yang memang selalu berlaku untuknya. */
+  function naskahPenuh(kunciPenuh, cadangan) {
+    try {
+      var i18n = (typeof self !== 'undefined' && self.FiezelI18n) || null;
+      if (i18n && typeof i18n.t === 'function') {
+        var nilai = i18n.t(kunciPenuh);
+        if (nilai && nilai !== kunciPenuh) return String(nilai);
+      }
+    } catch (_) {}
+    return cadangan;
+  }
+
   function entry(copyKey) {
     var key = String(copyKey || '').trim();
     return COPY[key] || COPY['service.unknown'];
@@ -126,9 +156,10 @@
     var e = entry(copyKey);
     var spoken = opts.spoken === true;
     var reset = jakartaResetLabel(opts.resetAt);
-    var body = spoken ? e.spoken : e.silent;
+    var kunci = COPY[String(copyKey || '').trim()] ? String(copyKey).trim() : 'service.unknown';
+    var body = naskah(kunci, spoken ? 'spoken' : 'silent', spoken ? e.spoken : e.silent);
     if (!spoken && reset && e.tone === 'quota') {
-      body = body + ' Jatah berikutnya mulai jam ' + reset + ' WIB.';
+      body = body + ' ' + naskah('reset', 'next', 'Jatah berikutnya mulai jam {jam} WIB.').replace('{jam}', reset);
     }
     return Object.freeze({
       schema: SCHEMA,
@@ -143,9 +174,9 @@
       // membiarkannya berdiri di daftar membuat pembaca diagnostik berikutnya percaya
       // masih ada cadangan peramban di bawah L3 — padahal di bawah L3 tinggal teks senyap.
       layer: String(opts.layer || ''),
-      title: e.title,
+      title: naskah(kunci, 'title', e.title),
       body: body,
-      reassurance: REASSURANCE,
+      reassurance: naskahPenuh('quota.reassurance.text', REASSURANCE),
       // Selalu ada, dan selalu 'advisory'. Ia menandai bahwa pemberitahuan ini TIDAK BOLEH
       // mengubah state pelajaran: tidak mengunci item, tidak menghitung replay.
       severity: 'advisory',

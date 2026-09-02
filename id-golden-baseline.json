@@ -1,6 +1,6 @@
 {
   "schema": "id-golden-baseline/1",
-  "generatedAt": "2026-09-02T11:23:55.281Z",
+  "generatedAt": "2026-09-02T15:06:48.249Z",
   "root": "/home/user/FIEZEL-APPS",
   "files": {
     "grammar-explanations-id.json": "4ce816145b77a86ed6d9ec9b366f70c1bbf1859283f667207eada762fccccb17",
@@ -11,15 +11,15 @@
     "misconception-taxonomy-v1.json": "20b59c5723b3febd03dcd4f2efe4bad2351a275f57c486b48ce9c68aba931bb8",
     "manifest.json": "9409e0897d5f4cb1d13227cfb725c1dee54ad0e3ee838c9070fe436b6f7bda75",
     "404.html": "d6f620cd736b4f2b8f82bffa5b3c6440b82e0e00d0b179c5d95bceff3a5227aa",
-    "features/quota/quota-copy.js": "7d269eb75346639d50541bd95f8b865efae52be067e11fe2bbcce24d3607cfe2",
+    "features/quota/quota-copy.js": "01b486ddb4032a29f9268786524699f7b1aaebcaccda424d79bab06df14c8ba2",
     "features/speaking-listening/gems-core.js": "5e30ae80b4234083f3b7a3bbb3b2e78f072835f124d298f21727a4e8e43890d6",
     "features/prasasti/fiezel-prasasti-core.js": "81b9b9fdcd5dec2f6f21582837709a9c4a7fa1624d8c1a9110a0abc2ca993ad7",
     "workers/api/tts/tts-key.js": "eaf1960ce71feebbc8aa6ea3d5c7784b3afe2a9ee9b94a79f45c5eb392230771",
     "features/audio-assets/fiezel-audio-key.js": "11624e303917fe0df881ac3f410911587766fd6f4d2491ca6687ec42de8d457d"
   },
   "literals": {
-    "count": 2142,
-    "sha256": "1d93ce95dd0c20a8c5566eb106dd0e9a7236f33c0ef6ff7778bc664f9e71a752",
+    "count": 2143,
+    "sha256": "d1d88a79bced4ecbfd30095e514abe750d9b0743cabf6225e04adf6028f786e2",
     "list": [
       "\n      SETELAH beat concern ≤1000ms selesai (13 §2.2), bukan menimpanya. Tanpa bunyi:\n      SFX hint sudah dipensiunkan (20 §4); cooldown 8 detiknya dijaga komponen. */\n   setTimeout(()=>{try{pawReact(",
       "\n      case 'silent':                        // L5: kalau mulut sempat mulai (taksiran L3 kandas), tutup SEKARANG\n        degradedLatch = false;\n        closeTurn(false);\n        break;\n      case 'interrupt':                     // stop(): snap tutup\n        degradedLatch = false;\n        closeTurn(true);\n        break;\n      default:\n        break;                              // fase asing dari versi fasad lebih baru: diabaikan tanpa suara\n    }\n  }\n\n  try { doc.addEventListener('fiezel-speech', onSpeech); } catch (_) {}\n\n  /* Suara terdegradasi (audibility-fix): mulut mati SEKETIKA dan tidak boleh\n     hidup lagi untuk sisa giliran — apa pun yang masih dikirim lapisan bawah. */\n  try {\n    root.addEventListener('fiezel-neural-voice-degraded', function () {\n      if (turn) closeTurn(true);\n      degradedLatch = true;                 // dilepas oleh end/silent/interrupt fasad berikutnya\n    });\n  } catch (_) {}\n\n  /* Permukaan kecil untuk Diagnostics/tes — bukan API pemanggil biasa:\n     satu-satunya pintu bicara tetap FiezelVoiceSay.say(). */\n  root.FiezelSpeechBridge = Object.freeze({\n    SCHEMA: SCHEMA,\n    speaking: function () { return !!turn; },\n    degraded: function () { return !!degradedLatch; },\n    motionAllowed: motionAllowed\n  });\n})(typeof self !== 'undefined' ? self : (typeof window !== 'undefined' ? window : this));\n",
@@ -43,7 +43,6 @@
       " Aku kerjakan satu yang mirip dulu ya, biar kelihatan langkahnya.",
       " DIHAPUS.\n    //\n    // Ia menawarkan paket yang sudah tidak ada sejak m025-95, dan yang lebih buruk: sejak\n    // m025-100 prepareLearningBundle() hanya mengembalikan status tanpa menyiapkan apa pun.\n    // Jadi menekannya menampilkan ",
       " Gem Terjemahan buat kamu — simpan atau langsung pakai, bebas.",
-      " Jatah berikutnya mulai jam ",
       " Kamu sedang offline: tampilan baru akan lengkap setelah tersambung internet.",
       " Oke, aku buka sekarang.",
       " Pembaruan service worker belum bisa diperiksa sekarang.",
@@ -991,6 +990,7 @@
       "Jangan mengulang kalimat pembuka yang sama setiap jawaban.",
       "Jangan menolak pertanyaan hanya karena berada di luar materi, dan jangan mengalihkan balik ke materi kecuali memang diminta.",
       "Jaringan Kekeliruan Kosakata",
+      "Jatah berikutnya mulai jam {jam} WIB.",
       "Jatah hari ini masih ada",
       "Jatah hari ini sudah habis",
       "Jatah putar audionya sudah habis. Jawab dari ingatanmu — dan catatanmu kalau tadi sempat mencatat.",
@@ -1128,6 +1128,7 @@
       "Kalimat sebelumnya",
       "Kalimat yang diucapkan di audio persis: “",
       "Kalimat yang rapi bikin orang fokus ke isi omongan lu, bukan ke cara lu ngomongnya.",
+      "Kalimatnya kepanjangan untuk sekali dibunyikan, jadi belum ada suaranya. Teksnya tetap bisa kamu baca \\\\u2014 potong jadi dua bagian lalu coba lagi.",
       "Kalimatnya kepanjangan untuk sekali dibunyikan, jadi belum ada suaranya. Teksnya tetap bisa kamu baca \\u2014 potong jadi dua bagian lalu coba lagi.",
       "Kamar kecil yang ia sewa di kota",
       "Kami coba sambungkan lagi otomatis sebentar lagi, jadi kamu nggak perlu menekan apa pun.",
