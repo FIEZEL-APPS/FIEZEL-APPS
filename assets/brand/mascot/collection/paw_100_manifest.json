@@ -1,0 +1,859 @@
+[
+  {
+    "id": 1,
+    "slug": "001-reading-book",
+    "title": "PAW Sedang Membaca Buku Bahasa Inggris",
+    "category": "DAILY LIFE",
+    "expression": "happy",
+    "foreProps": "\n      <g transform=\"translate(160, 235)\">\n        <rect x=\"-35\" y=\"-20\" width=\"70\" height=\"42\" rx=\"4\" fill=\"#8C2233\"/>\n        <path d=\"M -30 -16 L -2 -16 L -2 16 L -30 16 Z\" fill=\"#FFF8E7\"/>\n        <path d=\"M 2 -16 L 30 -16 L 30 16 L 2 16 Z\" fill=\"#FFF8E7\"/>\n        <text x=\"-16\" y=\"2\" font-size=\"10\" font-weight=\"bold\" fill=\"#8C2233\">A B</text>\n        <text x=\"16\" y=\"2\" font-size=\"10\" font-weight=\"bold\" fill=\"#8C2233\">C D</text>\n      </g>\n    ",
+    "leftArm": "<ellipse cx=\"120\" cy=\"225\" rx=\"14\" ry=\"24\" transform=\"rotate(25 120 225)\" fill=\"#FFD94F\"/>",
+    "rightArm": "<ellipse cx=\"200\" cy=\"225\" rx=\"14\" ry=\"24\" transform=\"rotate(-25 200 225)\" fill=\"#FFD94F\"/>"
+  },
+  {
+    "id": 2,
+    "slug": "002-writing-notebook",
+    "title": "PAW Sedang Menulis di Notebook",
+    "category": "DAILY LIFE",
+    "expression": "focus",
+    "foreProps": "\n      <rect x=\"125\" y=\"215\" width=\"45\" height=\"55\" rx=\"4\" fill=\"#3B82F6\" transform=\"rotate(-10 125 215)\"/>\n      <rect x=\"130\" y=\"220\" width=\"35\" height=\"45\" rx=\"2\" fill=\"#FFFFFF\" transform=\"rotate(-10 125 215)\"/>\n      <rect x=\"180\" y=\"200\" width=\"6\" height=\"30\" rx=\"3\" fill=\"#F59E0B\" transform=\"rotate(35 180 200)\"/>\n    ",
+    "leftArm": "<ellipse cx=\"118\" cy=\"225\" rx=\"14\" ry=\"26\" transform=\"rotate(15 118 225)\" fill=\"#FFD94F\"/>",
+    "rightArm": "<ellipse cx=\"195\" cy=\"210\" rx=\"14\" ry=\"26\" transform=\"rotate(-30 195 210)\" fill=\"#FFD94F\"/>"
+  },
+  {
+    "id": 3,
+    "slug": "003-laptop-study",
+    "title": "PAW Sedang Belajar Menggunakan Laptop",
+    "category": "DAILY LIFE",
+    "expression": "happy",
+    "foreProps": "\n      <g transform=\"translate(160, 250)\">\n        <polygon points=\"-40,15 40,15 35,28 -35,28\" fill=\"#94A3B8\"/>\n        <rect x=\"-35\" y=\"-18\" width=\"70\" height=\"35\" rx=\"4\" fill=\"#1E293B\"/>\n        <rect x=\"-31\" y=\"-14\" width=\"62\" height=\"27\" rx=\"2\" fill=\"#38BDF8\"/>\n        <circle cx=\"0\" cy=\"0\" r=\"4\" fill=\"#FFF\"/>\n      </g>\n    ",
+    "leftArm": "<ellipse cx=\"118\" cy=\"235\" rx=\"14\" ry=\"24\" transform=\"rotate(30 118 235)\" fill=\"#FFD94F\"/>",
+    "rightArm": "<ellipse cx=\"202\" cy=\"235\" rx=\"14\" ry=\"24\" transform=\"rotate(-30 202 235)\" fill=\"#FFD94F\"/>"
+  },
+  {
+    "id": 4,
+    "slug": "004-listening-music",
+    "title": "PAW Mendengarkan Musik dengan Headphone Besar",
+    "category": "DAILY LIFE",
+    "expression": "excited",
+    "headwear": "\n      <g transform=\"translate(160, 106)\">\n        <path d=\"M -86 0 C -86 -85 86 -85 86 0\" stroke=\"#8C2233\" stroke-width=\"12\" fill=\"none\"/>\n        <rect x=\"-95\" y=\"-16\" width=\"18\" height=\"36\" rx=\"9\" fill=\"#8C2233\"/>\n        <rect x=\"-92\" y=\"-12\" width=\"12\" height=\"28\" rx=\"6\" fill=\"#FFF4DA\"/>\n        <rect x=\"77\" y=\"-16\" width=\"18\" height=\"36\" rx=\"9\" fill=\"#8C2233\"/>\n        <rect x=\"80\" y=\"-12\" width=\"12\" height=\"28\" rx=\"6\" fill=\"#FFF4DA\"/>\n      </g>\n    ",
+    "leftArm": "<ellipse cx=\"106\" cy=\"190\" rx=\"14\" ry=\"28\" transform=\"rotate(-35 106 190)\" fill=\"#FFD94F\"/>",
+    "rightArm": "<ellipse cx=\"214\" cy=\"190\" rx=\"14\" ry=\"28\" transform=\"rotate(35 214 190)\" fill=\"#FFD94F\"/>"
+  },
+  {
+    "id": 5,
+    "slug": "005-drinking-coconut",
+    "title": "PAW Sedang Minum Air Kelapa Segar",
+    "category": "DAILY LIFE",
+    "expression": "happy",
+    "foreProps": "\n      <g transform=\"translate(160, 235)\">\n        <ellipse cx=\"0\" cy=\"0\" rx=\"24\" ry=\"20\" fill=\"#65A30D\"/>\n        <ellipse cx=\"0\" cy=\"-6\" rx=\"16\" ry=\"10\" fill=\"#FFF\"/>\n        <rect x=\"-4\" y=\"-28\" width=\"6\" height=\"24\" rx=\"3\" fill=\"#F43F5E\" transform=\"rotate(-15)\"/>\n        <circle cx=\"8\" cy=\"-8\" r=\"6\" fill=\"#F43F5E\"/>\n      </g>\n    ",
+    "leftArm": "<ellipse cx=\"125\" cy=\"225\" rx=\"14\" ry=\"24\" transform=\"rotate(20 125 225)\" fill=\"#FFD94F\"/>",
+    "rightArm": "<ellipse cx=\"195\" cy=\"225\" rx=\"14\" ry=\"24\" transform=\"rotate(-20 195 225)\" fill=\"#FFD94F\"/>"
+  },
+  {
+    "id": 6,
+    "slug": "006-drinking-boba",
+    "title": "PAW Sedang Minum Bubble Tea",
+    "category": "DAILY LIFE",
+    "expression": "love",
+    "foreProps": "\n      <g transform=\"translate(175, 220)\">\n        <polygon points=\"-12,-15 12,-15 9,20 -9,20\" fill=\"#FDE047\" opacity=\"0.85\"/>\n        <ellipse cx=\"0\" cy=\"-15\" rx=\"12\" ry=\"5\" fill=\"#9333EA\"/>\n        <rect x=\"-2\" y=\"-30\" width=\"4\" height=\"22\" rx=\"2\" fill=\"#9333EA\"/>\n        <circle cx=\"-4\" cy=\"12\" r=\"3\" fill=\"#1E293B\"/>\n        <circle cx=\"3\" cy=\"14\" r=\"3\" fill=\"#1E293B\"/>\n        <circle cx=\"0\" cy=\"6\" r=\"3\" fill=\"#1E293B\"/>\n      </g>\n    ",
+    "rightArm": "<ellipse cx=\"185\" cy=\"210\" rx=\"14\" ry=\"26\" transform=\"rotate(-25 185 210)\" fill=\"#FFD94F\"/>"
+  },
+  {
+    "id": 7,
+    "slug": "007-eating-ice-cream",
+    "title": "PAW Makan Es Krim Bahagia",
+    "category": "DAILY LIFE",
+    "expression": "excited",
+    "foreProps": "\n      <g transform=\"translate(180, 205)\">\n        <polygon points=\"0,5 -10,32 10,32\" fill=\"#D97706\" transform=\"rotate(180 0 18)\"/>\n        <circle cx=\"0\" cy=\"-4\" r=\"14\" fill=\"#EC4899\"/>\n        <circle cx=\"0\" cy=\"-14\" r=\"10\" fill=\"#38BDF8\"/>\n        <circle cx=\"0\" cy=\"-22\" r=\"4\" fill=\"#EF4444\"/>\n      </g>\n    ",
+    "rightArm": "<ellipse cx=\"185\" cy=\"195\" rx=\"14\" ry=\"26\" transform=\"rotate(-35 185 195)\" fill=\"#FFD94F\"/>"
+  },
+  {
+    "id": 8,
+    "slug": "008-school-backpack",
+    "title": "PAW Membawa Tas Sekolah Berjalan",
+    "category": "DAILY LIFE",
+    "expression": "happy",
+    "backProps": "\n      <rect x=\"75\" y=\"170\" width=\"38\" height=\"55\" rx=\"12\" fill=\"#0284C7\"/>\n      <ellipse cx=\"94\" cy=\"185\" rx=\"12\" ry=\"6\" fill=\"#38BDF8\"/>\n    ",
+    "leftArm": "<ellipse cx=\"100\" cy=\"190\" rx=\"14\" ry=\"26\" transform=\"rotate(-30 100 190)\" fill=\"#FFD94F\"/>",
+    "rightArm": "<ellipse cx=\"205\" cy=\"215\" rx=\"14\" ry=\"26\" transform=\"rotate(20 205 215)\" fill=\"#FFD94F\"/>"
+  },
+  {
+    "id": 9,
+    "slug": "009-cleaning-desk",
+    "title": "PAW Sedang Merapikan Meja Belajar",
+    "category": "DAILY LIFE",
+    "expression": "happy",
+    "foreProps": "\n      <rect x=\"110\" y=\"245\" width=\"100\" height=\"15\" rx=\"4\" fill=\"#B45309\"/>\n      <rect x=\"120\" y=\"228\" width=\"14\" height=\"18\" rx=\"2\" fill=\"#E11D48\"/>\n      <rect x=\"138\" y=\"232\" width=\"12\" height=\"14\" rx=\"2\" fill=\"#2563EB\"/>\n      <rect x=\"175\" y=\"222\" width=\"22\" height=\"24\" rx=\"3\" fill=\"#10B981\"/>\n    ",
+    "leftArm": "<ellipse cx=\"130\" cy=\"225\" rx=\"14\" ry=\"24\" transform=\"rotate(25 130 225)\" fill=\"#FFD94F\"/>",
+    "rightArm": "<ellipse cx=\"190\" cy=\"225\" rx=\"14\" ry=\"24\" transform=\"rotate(-25 190 225)\" fill=\"#FFD94F\"/>"
+  },
+  {
+    "id": 10,
+    "slug": "010-mopping-floor",
+    "title": "PAW Sedang Mengepel Lantai",
+    "category": "DAILY LIFE",
+    "expression": "focus",
+    "foreProps": "\n      <line x1=\"190\" y1=\"160\" x2=\"225\" y2=\"285\" stroke=\"#94A3B8\" stroke-width=\"8\" stroke-linecap=\"round\"/>\n      <rect x=\"205\" y=\"275\" width=\"40\" height=\"18\" rx=\"4\" fill=\"#0284C7\"/>\n      <circle cx=\"245\" cy=\"285\" r=\"4\" fill=\"#38BDF8\" opacity=\"0.6\"/>\n    ",
+    "leftArm": "<ellipse cx=\"130\" cy=\"215\" rx=\"14\" ry=\"26\" transform=\"rotate(25 130 215)\" fill=\"#FFD94F\"/>",
+    "rightArm": "<ellipse cx=\"190\" cy=\"195\" rx=\"14\" ry=\"26\" transform=\"rotate(-40 190 195)\" fill=\"#FFD94F\"/>"
+  },
+  {
+    "id": 11,
+    "slug": "011-vespa-scooter",
+    "title": "PAW Naik Vespa Klasik Memakai Helm",
+    "cat": "TRAVEL & CULTURE",
+    "exp": "excited",
+    "hw": "<circle cx=\"160\" cy=\"70\" r=\"50\" fill=\"#EF4444\"/><rect x=\"140\" y=\"90\" width=\"40\" height=\"8\" rx=\"4\" fill=\"#1E293B\"/>",
+    "fp": "<path d=\"M100 270 Q160 250 220 270 L210 290 L110 290 Z\" fill=\"#059669\"/><circle cx=\"120\" cy=\"285\" r=\"14\" fill=\"#1E293B\"/><circle cx=\"200\" cy=\"285\" r=\"14\" fill=\"#1E293B\"/>"
+  },
+  {
+    "id": 12,
+    "slug": "012-riding-bicycle",
+    "title": "PAW Mengendarai Sepeda",
+    "cat": "TRAVEL & CULTURE",
+    "exp": "happy",
+    "fp": "<circle cx=\"115\" cy=\"275\" r=\"18\" stroke=\"#0284C7\" stroke-width=\"4\" fill=\"none\"/><circle cx=\"205\" cy=\"275\" r=\"18\" stroke=\"#0284C7\" stroke-width=\"4\" fill=\"none\"/><line x1=\"115\" y1=\"275\" x2=\"160\" y2=\"255\" stroke=\"#0284C7\" stroke-width=\"4\"/>"
+  },
+  {
+    "id": 13,
+    "slug": "013-skateboarding",
+    "title": "PAW Naik Skateboard Keren",
+    "cat": "TRAVEL & CULTURE",
+    "exp": "wink",
+    "fp": "<rect x=\"90\" y=\"275\" width=\"140\" height=\"10\" rx=\"5\" fill=\"#DC2626\"/><circle cx=\"115\" cy=\"288\" r=\"6\" fill=\"#F59E0B\"/><circle cx=\"205\" cy=\"288\" r=\"6\" fill=\"#F59E0B\"/>"
+  },
+  {
+    "id": 14,
+    "slug": "014-airport-luggage",
+    "title": "PAW Membawa Koper di Bandara",
+    "cat": "TRAVEL & CULTURE",
+    "exp": "happy",
+    "fp": "<rect x=\"210\" y=\"210\" width=\"45\" height=\"65\" rx=\"8\" fill=\"#F59E0B\"/><rect x=\"225\" y=\"195\" width=\"15\" height=\"16\" rx=\"3\" fill=\"#475569\"/><circle cx=\"220\" cy=\"278\" r=\"4\" fill=\"#1E293B\"/><circle cx=\"245\" cy=\"278\" r=\"4\" fill=\"#1E293B\"/>"
+  },
+  {
+    "id": 15,
+    "slug": "015-batik-shirt",
+    "title": "PAW Memakai Kemeja Batik Nusantara",
+    "cat": "TRAVEL & CULTURE",
+    "exp": "happy",
+    "ob": "<rect x=\"102\" y=\"164\" width=\"116\" height=\"85\" rx=\"20\" fill=\"url(#batikGrad)\"/><circle cx=\"140\" cy=\"190\" r=\"4\" fill=\"#FDE047\"/><circle cx=\"180\" cy=\"190\" r=\"4\" fill=\"#FDE047\"/><circle cx=\"160\" cy=\"220\" r=\"6\" fill=\"#FDE047\"/>"
+  },
+  {
+    "id": 16,
+    "slug": "016-bali-traditional",
+    "title": "PAW Pakaian Adat Bali (Udeng & Kemben)",
+    "cat": "TRAVEL & CULTURE",
+    "exp": "happy",
+    "hw": "<path d=\"M120 40 L160 20 L200 40 L160 50 Z\" fill=\"#F59E0B\"/><circle cx=\"160\" cy=\"35\" r=\"6\" fill=\"#DC2626\"/>",
+    "ob": "<rect x=\"105\" y=\"200\" width=\"110\" height=\"50\" rx=\"10\" fill=\"#DC2626\"/><rect x=\"100\" y=\"220\" width=\"120\" height=\"8\" fill=\"#FDE047\"/>"
+  },
+  {
+    "id": 17,
+    "slug": "017-jawa-beskap",
+    "title": "PAW Pakaian Tradisional Jawa (Blangkon & Beskap)",
+    "cat": "TRAVEL & CULTURE",
+    "exp": "happy",
+    "hw": "<ellipse cx=\"160\" cy=\"40\" rx=\"45\" ry=\"18\" fill=\"#78350F\"/><circle cx=\"205\" cy=\"45\" r=\"10\" fill=\"#78350F\"/>",
+    "ob": "<rect x=\"102\" y=\"164\" width=\"116\" height=\"80\" rx=\"20\" fill=\"#1E293B\"/><line x1=\"160\" y1=\"164\" x2=\"160\" y2=\"244\" stroke=\"#FDE047\" stroke-width=\"4\"/>"
+  },
+  {
+    "id": 18,
+    "slug": "018-sumatra-adat",
+    "title": "PAW Pakaian Tradisional Sumatra (Suntiang Emas)",
+    "cat": "TRAVEL & CULTURE",
+    "exp": "happy",
+    "hw": "<polygon points=\"120,45 160,10 200,45 160,35\" fill=\"#EAB308\"/><circle cx=\"160\" cy=\"22\" r=\"5\" fill=\"#DC2626\"/>",
+    "ob": "<rect x=\"102\" y=\"180\" width=\"116\" height=\"65\" rx=\"15\" fill=\"#B91C1C\"/><rect x=\"110\" y=\"205\" width=\"100\" height=\"12\" fill=\"#FDE047\"/>"
+  },
+  {
+    "id": 19,
+    "slug": "019-kalimantan-adat",
+    "title": "PAW Pakaian Tradisional Kalimantan (Bulu Enggang)",
+    "cat": "TRAVEL & CULTURE",
+    "exp": "happy",
+    "hw": "<rect x=\"125\" y=\"35\" width=\"70\" height=\"12\" rx=\"4\" fill=\"#B45309\"/><path d=\"M160 35 Q170 0 175 -15 Q155 5 160 35\" fill=\"#FFF\" stroke=\"#1E293B\" stroke-width=\"2\"/>",
+    "ob": "<rect x=\"105\" y=\"175\" width=\"110\" height=\"70\" rx=\"15\" fill=\"#1E293B\"/><polygon points=\"130,200 160,180 190,200 160,220\" fill=\"#EAB308\"/>"
+  },
+  {
+    "id": 20,
+    "slug": "020-sulawesi-adat",
+    "title": "PAW Pakaian Tradisional Sulawesi (Baju Bodo)",
+    "cat": "TRAVEL & CULTURE",
+    "exp": "happy",
+    "hw": "<circle cx=\"160\" cy=\"35\" r=\"12\" fill=\"#EAB308\"/>",
+    "ob": "<rect x=\"95\" y=\"164\" width=\"130\" height=\"85\" rx=\"25\" fill=\"#EA580C\"/>"
+  },
+  {
+    "id": 21,
+    "slug": "021-hawaiian-shirt-shades",
+    "title": "PAW Kemeja Hawaii & Kacamata Pantai",
+    "cat": "BEACH / HAWAIIAN",
+    "exp": "happy",
+    "fp": "<rect x=\"108\" y=\"83\" width=\"38\" height=\"28\" rx=\"9\" fill=\"url(#shadesGrad)\"/><rect x=\"174\" y=\"83\" width=\"38\" height=\"28\" rx=\"9\" fill=\"url(#shadesGrad)\"/><rect x=\"146\" y=\"94\" width=\"28\" height=\"6\" rx=\"3\" fill=\"#8C2233\"/>",
+    "ob": "<rect x=\"102\" y=\"164\" width=\"116\" height=\"80\" rx=\"20\" fill=\"#0284C7\"/><circle cx=\"130\" cy=\"190\" r=\"8\" fill=\"#FDE047\"/><circle cx=\"180\" cy=\"210\" r=\"8\" fill=\"#F43F5E\"/>"
+  },
+  {
+    "id": 22,
+    "slug": "022-grass-skirt-hula",
+    "title": "PAW Rok Rumput Hula & Flower Lei",
+    "cat": "BEACH / HAWAIIAN",
+    "exp": "excited",
+    "hw": "<g transform=\"translate(160,40)\"><circle cx=\"-30\" cy=\"0\" r=\"8\" fill=\"#FF5252\"/><circle cx=\"0\" cy=\"-6\" r=\"9\" fill=\"#FDD835\"/><circle cx=\"30\" cy=\"0\" r=\"8\" fill=\"#FF5252\"/></g>",
+    "ob": "<path d=\"M100 226 Q160 236 220 226 L226 274 Q160 286 94 274 Z\" fill=\"#1B5E20\"/>"
+  },
+  {
+    "id": 23,
+    "slug": "023-surfing-wave",
+    "title": "PAW Berselancar di Ombak",
+    "cat": "BEACH / HAWAIIAN",
+    "exp": "excited",
+    "fp": "<ellipse cx=\"160\" cy=\"275\" rx=\"75\" ry=\"14\" fill=\"#F59E0B\" transform=\"rotate(-10 160 275)\"/><path d=\"M60 290 Q160 270 260 290\" stroke=\"#38BDF8\" stroke-width=\"12\" fill=\"none\"/>"
+  },
+  {
+    "id": 24,
+    "slug": "024-beach-volleyball",
+    "title": "PAW Bermain Voli Pantai",
+    "cat": "BEACH / HAWAIIAN",
+    "exp": "happy",
+    "fp": "<circle cx=\"215\" cy=\"150\" r=\"22\" fill=\"#FFF\" stroke=\"#EAB308\" stroke-width=\"4\"/><path d=\"M200 140 Q215 150 230 140\" stroke=\"#0284C7\" stroke-width=\"3\" fill=\"none\"/>"
+  },
+  {
+    "id": 25,
+    "slug": "025-carrying-surfboard",
+    "title": "PAW Membawa Papan Selancar",
+    "cat": "BEACH / HAWAIIAN",
+    "exp": "happy",
+    "fp": "<ellipse cx=\"230\" cy=\"210\" rx=\"18\" ry=\"75\" fill=\"#EC4899\" transform=\"rotate(15 230 210)\"/><line x1=\"230\" y1=\"140\" x2=\"230\" y2=\"280\" stroke=\"#FDE047\" stroke-width=\"4\"/>"
+  },
+  {
+    "id": 26,
+    "slug": "026-beach-umbrella-relax",
+    "title": "PAW Santai di Bawah Payung Pantai",
+    "cat": "BEACH / HAWAIIAN",
+    "exp": "happy",
+    "bp": "<path d=\"M60 60 Q160 -10 260 60 Z\" fill=\"#F43F5E\"/><line x1=\"160\" y1=\"50\" x2=\"160\" y2=\"280\" stroke=\"#94A3B8\" stroke-width=\"8\"/>"
+  },
+  {
+    "id": 27,
+    "slug": "027-sandcastle-builder",
+    "title": "PAW Membangun Istana Pasir",
+    "cat": "BEACH / HAWAIIAN",
+    "exp": "happy",
+    "fp": "<polygon points=\"135,275 160,240 185,275\" fill=\"#D97706\"/><rect x=\"140\" y=\"260\" width=\"40\" height=\"25\" fill=\"#D97706\"/><circle cx=\"160\" cy=\"235\" r=\"4\" fill=\"#EF4444\"/>"
+  },
+  {
+    "id": 28,
+    "slug": "028-snorkeling-gear",
+    "title": "PAW Memakai Kacamata Snorkeling & Fin",
+    "cat": "BEACH / HAWAIIAN",
+    "exp": "happy",
+    "fp": "<rect x=\"110\" y=\"85\" width=\"100\" height=\"30\" rx=\"10\" fill=\"#06B6D4\" opacity=\"0.75\" stroke=\"#0891B2\" stroke-width=\"4\"/><line x1=\"210\" y1=\"95\" x2=\"230\" y2=\"50\" stroke=\"#EAB308\" stroke-width=\"6\" stroke-linecap=\"round\"/>"
+  },
+  {
+    "id": 29,
+    "slug": "029-beach-walking-sandals",
+    "title": "PAW Berjalan di Pantai Menenteng Sandal",
+    "cat": "BEACH / HAWAIIAN",
+    "exp": "happy",
+    "fp": "<rect x=\"215\" y=\"210\" width=\"12\" height=\"24\" rx=\"6\" fill=\"#F43F5E\" transform=\"rotate(20 215 210)\"/>"
+  },
+  {
+    "id": 30,
+    "slug": "030-tropical-dancer",
+    "title": "PAW Menari Tarian Tropis Ceria",
+    "cat": "BEACH / HAWAIIAN",
+    "exp": "excited",
+    "hw": "<g transform=\"translate(160,35)\"><circle cx=\"-15\" cy=\"0\" r=\"10\" fill=\"#F43F5E\"/><circle cx=\"15\" cy=\"0\" r=\"10\" fill=\"#F59E0B\"/></g>",
+    "leftArm": "<ellipse cx=\"100\" cy=\"180\" rx=\"14\" ry=\"30\" transform=\"rotate(-45 100 180)\" fill=\"#FFD94F\"/>",
+    "rightArm": "<ellipse cx=\"220\" cy=\"180\" rx=\"14\" ry=\"30\" transform=\"rotate(45 220 180)\" fill=\"#FFD94F\"/>"
+  },
+  {
+    "id": 31,
+    "slug": "031-running-sportswear",
+    "title": "PAW Berlari Memakai Sportswear",
+    "cat": "SPORTS",
+    "exp": "excited",
+    "hw": "<rect x=\"120\" y=\"45\" width=\"80\" height=\"12\" rx=\"6\" fill=\"#EF4444\"/>",
+    "ob": "<rect x=\"105\" y=\"175\" width=\"110\" height=\"65\" rx=\"15\" fill=\"#3B82F6\"/>"
+  },
+  {
+    "id": 32,
+    "slug": "032-smartwatch-jogging",
+    "title": "PAW Jogging Memakai Smartwatch",
+    "cat": "SPORTS",
+    "exp": "happy",
+    "fp": "<rect x=\"105\" y=\"215\" width=\"10\" height=\"12\" rx=\"3\" fill=\"#1E293B\"/><circle cx=\"110\" cy=\"221\" r=\"3\" fill=\"#22C55E\"/>"
+  },
+  {
+    "id": 33,
+    "slug": "033-soccer-player",
+    "title": "PAW Bermain Sepak Bola",
+    "cat": "SPORTS",
+    "exp": "excited",
+    "fp": "<circle cx=\"215\" cy=\"265\" r=\"20\" fill=\"#FFF\" stroke=\"#1E293B\" stroke-width=\"4\"/><polygon points=\"215,255 225,263 221,273 209,273 205,263\" fill=\"#1E293B\"/>"
+  },
+  {
+    "id": 34,
+    "slug": "034-basketball-star",
+    "title": "PAW Bermain Bola Basket",
+    "cat": "SPORTS",
+    "exp": "excited",
+    "fp": "<circle cx=\"215\" cy=\"170\" r=\"22\" fill=\"#EA580C\"/><path d=\"M195 170 L235 170 M215 150 L215 190\" stroke=\"#1E293B\" stroke-width=\"3\"/>"
+  },
+  {
+    "id": 35,
+    "slug": "035-badminton-player",
+    "title": "PAW Bermain Bulu Tangkis",
+    "cat": "SPORTS",
+    "exp": "happy",
+    "fp": "<circle cx=\"230\" cy=\"160\" r=\"16\" stroke=\"#EF4444\" stroke-width=\"4\" fill=\"none\"/><line x1=\"220\" y1=\"172\" x2=\"200\" y2=\"200\" stroke=\"#475569\" stroke-width=\"4\"/><circle cx=\"115\" cy=\"140\" r=\"6\" fill=\"#FFF\"/>"
+  },
+  {
+    "id": 36,
+    "slug": "036-tennis-ace",
+    "title": "PAW Bermain Tenis",
+    "cat": "SPORTS",
+    "exp": "happy",
+    "fp": "<circle cx=\"230\" cy=\"160\" r=\"18\" stroke=\"#10B981\" stroke-width=\"4\" fill=\"none\"/><circle cx=\"115\" cy=\"140\" r=\"8\" fill=\"#84CC16\"/>"
+  },
+  {
+    "id": 37,
+    "slug": "037-table-tennis",
+    "title": "PAW Bermain Tenis Meja",
+    "cat": "SPORTS",
+    "exp": "focus",
+    "fp": "<circle cx=\"195\" cy=\"200\" r=\"14\" fill=\"#DC2626\"/><rect x=\"190\" y=\"210\" width=\"8\" height=\"16\" fill=\"#B45309\"/><circle cx=\"130\" cy=\"190\" r=\"6\" fill=\"#F59E0B\"/>"
+  },
+  {
+    "id": 38,
+    "slug": "038-mountain-biking",
+    "title": "PAW Bersepeda Gunung",
+    "cat": "SPORTS",
+    "exp": "excited",
+    "hw": "<ellipse cx=\"160\" cy=\"50\" rx=\"45\" ry=\"16\" fill=\"#0284C7\"/><polygon points=\"120,50 160,25 200,50\" fill=\"#0284C7\"/>"
+  },
+  {
+    "id": 39,
+    "slug": "039-stretching-yoga",
+    "title": "PAW Melakukan Stretching Yoga",
+    "cat": "SPORTS",
+    "exp": "happy",
+    "leftArm": "<ellipse cx=\"90\" cy=\"160\" rx=\"14\" ry=\"32\" transform=\"rotate(-60 90 160)\" fill=\"#FFD94F\"/>",
+    "rightArm": "<ellipse cx=\"230\" cy=\"160\" rx=\"14\" ry=\"32\" transform=\"rotate(60 230 160)\" fill=\"#FFD94F\"/>"
+  },
+  {
+    "id": 40,
+    "slug": "040-gold-medal-winner",
+    "title": "PAW Mengangkat Medali Kemenangan Emas",
+    "cat": "SPORTS",
+    "exp": "laugh",
+    "fp": "<path d=\"M140 180 L160 215 L180 180\" stroke=\"#3B82F6\" stroke-width=\"6\" fill=\"none\"/><circle cx=\"160\" cy=\"225\" r=\"14\" fill=\"#EAB308\"/><text x=\"156\" y=\"230\" font-size=\"12\" font-weight=\"bold\" fill=\"#78350F\">1</text>"
+  },
+  {
+    "id": 41,
+    "slug": "041-teacher-pointer",
+    "title": "PAW Guru Membawa Pointer & Buku",
+    "cat": "PROFESSIONS",
+    "exp": "happy",
+    "fp": "<rect x=\"110\" y=\"210\" width=\"30\" height=\"40\" rx=\"4\" fill=\"#1D4ED8\"/><line x1=\"195\" y1=\"190\" x2=\"245\" y2=\"130\" stroke=\"#B45309\" stroke-width=\"5\" stroke-linecap=\"round\"/>"
+  },
+  {
+    "id": 42,
+    "slug": "042-doctor-stethoscope",
+    "title": "PAW Dokter Memakai Jas & Stetoskop",
+    "cat": "PROFESSIONS",
+    "exp": "happy",
+    "ob": "<rect x=\"102\" y=\"164\" width=\"116\" height=\"85\" rx=\"20\" fill=\"#FFFFFF\"/><path d=\"M135 180 C135 220 185 220 185 180\" stroke=\"#0284C7\" stroke-width=\"4\" fill=\"none\"/><circle cx=\"160\" cy=\"220\" r=\"7\" fill=\"#64748B\"/>"
+  },
+  {
+    "id": 43,
+    "slug": "043-chef-spatula",
+    "title": "PAW Chef Memakai Topi Koki & Spatula",
+    "cat": "PROFESSIONS",
+    "exp": "excited",
+    "hw": "<rect x=\"130\" y=\"15\" width=\"60\" height=\"25\" rx=\"4\" fill=\"#FFF\"/><ellipse cx=\"160\" cy=\"15\" rx=\"35\" ry=\"18\" fill=\"#FFF\"/>",
+    "fp": "<rect x=\"205\" y=\"180\" width=\"12\" height=\"35\" rx=\"2\" fill=\"#475569\"/><rect x=\"200\" y=\"165\" width=\"22\" height=\"20\" rx=\"4\" fill=\"#94A3B8\"/>"
+  },
+  {
+    "id": 44,
+    "slug": "044-barista-coffee",
+    "title": "PAW Barista Membuat Kopi Latte Art",
+    "cat": "PROFESSIONS",
+    "exp": "happy",
+    "ob": "<rect x=\"108\" y=\"185\" width=\"104\" height=\"65\" rx=\"10\" fill=\"#78350F\"/>",
+    "fp": "<rect x=\"150\" y=\"225\" width=\"22\" height=\"20\" rx=\"4\" fill=\"#FFF\"/><ellipse cx=\"161\" cy=\"225\" rx=\"11\" ry=\"4\" fill=\"#92400E\"/>"
+  },
+  {
+    "id": 45,
+    "slug": "045-pilot-uniform",
+    "title": "PAW Pilot Seragam Lengkap",
+    "cat": "PROFESSIONS",
+    "exp": "happy",
+    "hw": "<ellipse cx=\"160\" cy=\"40\" rx=\"45\" ry=\"14\" fill=\"#1E293B\"/><polygon points=\"150,30 160,20 170,30\" fill=\"#EAB308\"/>",
+    "ob": "<rect x=\"102\" y=\"164\" width=\"116\" height=\"85\" rx=\"20\" fill=\"#1E293B\"/><polygon points=\"152,164 160,180 168,164\" fill=\"#FDE047\"/>"
+  },
+  {
+    "id": 46,
+    "slug": "046-flight-attendant",
+    "title": "PAW Pramugara Membawa Trolley",
+    "cat": "PROFESSIONS",
+    "exp": "happy",
+    "hw": "<ellipse cx=\"140\" cy=\"40\" rx=\"20\" ry=\"10\" fill=\"#B91C1C\" transform=\"rotate(-15 140 40)\"/>",
+    "fp": "<rect x=\"215\" y=\"210\" width=\"30\" height=\"65\" rx=\"4\" fill=\"#94A3B8\"/>"
+  },
+  {
+    "id": 47,
+    "slug": "047-police-officer",
+    "title": "PAW Polisi Berseragam Gagah",
+    "cat": "PROFESSIONS",
+    "exp": "happy",
+    "hw": "<ellipse cx=\"160\" cy=\"38\" rx=\"48\" ry=\"15\" fill=\"#1E3A8A\"/><circle cx=\"160\" cy=\"30\" r=\"6\" fill=\"#EAB308\"/>",
+    "ob": "<rect x=\"102\" y=\"164\" width=\"116\" height=\"85\" rx=\"20\" fill=\"#1E3A8A\"/>"
+  },
+  {
+    "id": 48,
+    "slug": "048-firefighter-hero",
+    "title": "PAW Pemadam Kebakaran Membawa Selang",
+    "cat": "PROFESSIONS",
+    "exp": "focus",
+    "hw": "<path d=\"M120 45 Q160 10 200 45 L205 50 L115 50 Z\" fill=\"#DC2626\"/><polygon points=\"155,30 160,20 165,30\" fill=\"#FDE047\"/>",
+    "fp": "<line x1=\"180\" y1=\"210\" x2=\"245\" y2=\"240\" stroke=\"#F59E0B\" stroke-width=\"12\" stroke-linecap=\"round\"/>"
+  },
+  {
+    "id": 49,
+    "slug": "049-farmer-harvest",
+    "title": "PAW Petani Membawa Keranjang Panen",
+    "cat": "PROFESSIONS",
+    "exp": "happy",
+    "hw": "<ellipse cx=\"160\" cy=\"45\" rx=\"60\" ry=\"18\" fill=\"#FDE047\"/><circle cx=\"160\" cy=\"35\" r=\"25\" fill=\"#EAB308\"/>",
+    "fp": "<ellipse cx=\"215\" cy=\"235\" rx=\"24\" ry=\"18\" fill=\"#B45309\"/><circle cx=\"210\" cy=\"225\" r=\"6\" fill=\"#EF4444\"/><circle cx=\"225\" cy=\"225\" r=\"6\" fill=\"#F59E0B\"/>"
+  },
+  {
+    "id": 50,
+    "slug": "050-astronaut-spacesuit",
+    "title": "PAW Astronaut Menjelajah Luar Angkasa",
+    "cat": "PROFESSIONS",
+    "exp": "excited",
+    "hw": "<circle cx=\"160\" cy=\"106\" r=\"75\" stroke=\"#E2E8F0\" stroke-width=\"12\" fill=\"none\"/><ellipse cx=\"160\" cy=\"100\" rx=\"55\" ry=\"35\" fill=\"#0284C7\" opacity=\"0.3\"/>",
+    "ob": "<rect x=\"95\" y=\"164\" width=\"130\" height=\"95\" rx=\"25\" fill=\"#F1F5F9\"/><rect x=\"140\" y=\"195\" width=\"40\" height=\"30\" rx=\"6\" fill=\"#0284C7\"/>"
+  },
+  {
+    "id": 51,
+    "slug": "051-painter-artist",
+    "title": "PAW Pelukis Memegang Kuas & Palet",
+    "cat": "CREATIVE",
+    "exp": "happy",
+    "hw": "<ellipse cx=\"140\" cy=\"35\" rx=\"30\" ry=\"14\" fill=\"#DC2626\" transform=\"rotate(-15 140 35)\"/>",
+    "fp": "<ellipse cx=\"120\" cy=\"230\" rx=\"20\" ry=\"14\" fill=\"#D97706\"/><circle cx=\"112\" cy=\"226\" r=\"3\" fill=\"#DC2626\"/><circle cx=\"125\" cy=\"226\" r=\"3\" fill=\"#2563EB\"/><rect x=\"195\" y=\"180\" width=\"6\" height=\"30\" rx=\"3\" fill=\"#B45309\" transform=\"rotate(25 195 180)\"/>"
+  },
+  {
+    "id": 52,
+    "slug": "052-photographer",
+    "title": "PAW Fotografer Membawa Kamera DSLR",
+    "cat": "CREATIVE",
+    "exp": "happy",
+    "fp": "<rect x=\"135\" y=\"195\" width=\"50\" height=\"35\" rx=\"6\" fill=\"#1E293B\"/><circle cx=\"160\" cy=\"212\" r=\"12\" fill=\"#475569\"/><circle cx=\"160\" cy=\"212\" r=\"8\" fill=\"#38BDF8\"/>"
+  },
+  {
+    "id": 53,
+    "slug": "053-guitar-musician",
+    "title": "PAW Musisi Memainkan Gitar Akustik",
+    "cat": "CREATIVE",
+    "exp": "happy",
+    "fp": "<g transform=\"translate(160, 225) rotate(-25)\"><ellipse cx=\"0\" cy=\"0\" rx=\"25\" ry=\"32\" fill=\"#B45309\"/><circle cx=\"0\" cy=\"0\" r=\"10\" fill=\"#1E293B\"/><rect x=\"-5\" y=\"-55\" width=\"10\" height=\"55\" fill=\"#D97706\"/></g>"
+  },
+  {
+    "id": 54,
+    "slug": "054-drummer-beat",
+    "title": "PAW Drummer Memegang Stick Drum",
+    "cat": "CREATIVE",
+    "exp": "excited",
+    "hw": "<rect x=\"120\" y=\"45\" width=\"80\" height=\"10\" rx=\"5\" fill=\"#1E293B\"/>",
+    "fp": "<ellipse cx=\"160\" cy=\"265\" rx=\"35\" ry=\"14\" fill=\"#EF4444\"/><rect x=\"130\" y=\"265\" width=\"60\" height=\"25\" fill=\"#EF4444\"/><line x1=\"120\" y1=\"190\" x2=\"145\" y2=\"250\" stroke=\"#D97706\" stroke-width=\"4\"/><line x1=\"200\" y1=\"190\" x2=\"175\" y2=\"250\" stroke=\"#D97706\" stroke-width=\"4\"/>"
+  },
+  {
+    "id": 55,
+    "slug": "055-dj-turntable",
+    "title": "PAW DJ di DJ Booth",
+    "cat": "CREATIVE",
+    "exp": "excited",
+    "hw": "<path d=\"M -86 0 C -86 -85 86 -85 86 0\" transform=\"translate(160, 106)\" stroke=\"#9333EA\" stroke-width=\"12\" fill=\"none\"/>",
+    "fp": "<rect x=\"100\" y=\"245\" width=\"120\" height=\"25\" rx=\"6\" fill=\"#1E293B\"/><circle cx=\"130\" cy=\"257\" r=\"10\" fill=\"#475569\"/><circle cx=\"190\" cy=\"257\" r=\"10\" fill=\"#475569\"/>"
+  },
+  {
+    "id": 56,
+    "slug": "056-singer-vocalist",
+    "title": "PAW Penyanyi Memegang Mic",
+    "cat": "CREATIVE",
+    "exp": "laugh",
+    "fp": "<circle cx=\"185\" cy=\"180\" r=\"10\" fill=\"#94A3B8\"/><rect x=\"181\" y=\"188\" width=\"8\" height=\"25\" rx=\"3\" fill=\"#1E293B\"/>"
+  },
+  {
+    "id": 57,
+    "slug": "057-writer-typewriter",
+    "title": "PAW Penulis Mengetik di Mesin Tik",
+    "cat": "CREATIVE",
+    "exp": "focus",
+    "fp": "<rect x=\"120\" y=\"235\" width=\"80\" height=\"30\" rx=\"4\" fill=\"#334155\"/><rect x=\"135\" y=\"215\" width=\"50\" height=\"25\" fill=\"#FFF\"/>"
+  },
+  {
+    "id": 58,
+    "slug": "058-digital-designer",
+    "title": "PAW Desainer Grafis Menggambar di Tablet",
+    "cat": "CREATIVE",
+    "exp": "happy",
+    "fp": "<rect x=\"125\" y=\"205\" width=\"60\" height=\"45\" rx=\"4\" fill=\"#0F172A\"/><rect x=\"130\" y=\"210\" width=\"50\" height=\"35\" rx=\"2\" fill=\"#06B6D4\"/><line x1=\"190\" y1=\"205\" x2=\"180\" y2=\"225\" stroke=\"#FFF\" stroke-width=\"3\"/>"
+  },
+  {
+    "id": 59,
+    "slug": "059-filmmaker-director",
+    "title": "PAW Sutradara Membawa Kamera Video",
+    "cat": "CREATIVE",
+    "exp": "focus",
+    "hw": "<ellipse cx=\"140\" cy=\"35\" rx=\"28\" ry=\"12\" fill=\"#1E293B\" transform=\"rotate(-15 140 35)\"/>",
+    "fp": "<rect x=\"190\" y=\"185\" width=\"35\" height=\"25\" rx=\"4\" fill=\"#1E293B\"/><circle cx=\"215\" cy=\"180\" r=\"8\" fill=\"#475569\"/>"
+  },
+  {
+    "id": 60,
+    "slug": "060-mural-street-artist",
+    "title": "PAW Seniman Mural Memegang Cat Semprot",
+    "cat": "CREATIVE",
+    "exp": "wink",
+    "hw": "<ellipse cx=\"170\" cy=\"40\" rx=\"35\" ry=\"12\" fill=\"#F59E0B\" transform=\"rotate(20 170 40)\"/>",
+    "fp": "<rect x=\"195\" y=\"195\" width=\"14\" height=\"28\" rx=\"4\" fill=\"#06B6D4\"/><circle cx=\"202\" cy=\"190\" r=\"3\" fill=\"#EF4444\"/>"
+  },
+  {
+    "id": 61,
+    "slug": "061-explorer-backpack",
+    "title": "PAW Penjelajah Alam Membawa Backpack",
+    "cat": "ADVENTURE",
+    "exp": "happy",
+    "hw": "<ellipse cx=\"160\" cy=\"42\" rx=\"48\" ry=\"16\" fill=\"#A16207\"/><circle cx=\"160\" cy=\"32\" r=\"22\" fill=\"#CA8A04\"/>",
+    "bp": "<rect x=\"80\" y=\"170\" width=\"30\" height=\"55\" rx=\"10\" fill=\"#15803D\"/>"
+  },
+  {
+    "id": 62,
+    "slug": "062-mountain-climber",
+    "title": "PAW Mendaki Gunung Membawa Tongkat",
+    "cat": "ADVENTURE",
+    "exp": "excited",
+    "hw": "<circle cx=\"160\" cy=\"45\" r=\"38\" fill=\"#EA580C\"/>",
+    "fp": "<line x1=\"215\" y1=\"180\" x2=\"235\" y2=\"285\" stroke=\"#94A3B8\" stroke-width=\"6\" stroke-linecap=\"round\"/>"
+  },
+  {
+    "id": 63,
+    "slug": "063-camping-bonfire",
+    "title": "PAW Berkemah di Dekat Api Unggun",
+    "cat": "ADVENTURE",
+    "exp": "happy",
+    "fp": "<polygon points=\"150,285 160,255 170,285\" fill=\"#EF4444\"/><polygon points=\"155,285 160,265 165,285\" fill=\"#F59E0B\"/>"
+  },
+  {
+    "id": 64,
+    "slug": "064-campfire-cooking",
+    "title": "PAW Memasak Marshmallow di Campfire",
+    "cat": "ADVENTURE",
+    "exp": "love",
+    "fp": "<line x1=\"185\" y1=\"210\" x2=\"145\" y2=\"245\" stroke=\"#B45309\" stroke-width=\"4\"/><ellipse cx=\"145\" cy=\"245\" rx=\"6\" ry=\"8\" fill=\"#FFF\"/>"
+  },
+  {
+    "id": 65,
+    "slug": "065-compass-map",
+    "title": "PAW Memegang Kompas & Peta Harta Karun",
+    "cat": "ADVENTURE",
+    "exp": "focus",
+    "fp": "<rect x=\"110\" y=\"215\" width=\"40\" height=\"30\" rx=\"3\" fill=\"#FDE68A\" transform=\"rotate(15 110 215)\"/><circle cx=\"195\" cy=\"225\" r=\"14\" fill=\"#EAB308\"/><polygon points=\"195,215 198,225 195,235 192,225\" fill=\"#DC2626\"/>"
+  },
+  {
+    "id": 66,
+    "slug": "066-binoculars-scout",
+    "title": "PAW Menggunakan Teropong Binokular",
+    "cat": "ADVENTURE",
+    "exp": "happy",
+    "fp": "<rect x=\"110\" y=\"88\" width=\"35\" height=\"25\" rx=\"8\" fill=\"#1E293B\"/><rect x=\"175\" y=\"88\" width=\"35\" height=\"25\" rx=\"8\" fill=\"#1E293B\"/><rect x=\"145\" y=\"96\" width=\"30\" height=\"8\" rx=\"4\" fill=\"#475569\"/>"
+  },
+  {
+    "id": 67,
+    "slug": "067-fishing-rod",
+    "title": "PAW Sedang Memancing Ikan",
+    "cat": "ADVENTURE",
+    "exp": "excited",
+    "fp": "<line x1=\"190\" y1=\"200\" x2=\"260\" y2=\"80\" stroke=\"#94A3B8\" stroke-width=\"4\"/><circle cx=\"250\" cy=\"230\" r=\"8\" fill=\"#0284C7\"/>"
+  },
+  {
+    "id": 68,
+    "slug": "068-rowing-boat",
+    "title": "PAW Naik Perahu Kecil Mendayung",
+    "cat": "ADVENTURE",
+    "exp": "happy",
+    "fp": "<path d=\"M80 270 Q160 250 240 270 L230 295 L90 295 Z\" fill=\"#B45309\"/><line x1=\"190\" y1=\"200\" x2=\"245\" y2=\"285\" stroke=\"#78350F\" stroke-width=\"6\"/>"
+  },
+  {
+    "id": 69,
+    "slug": "069-pirate-captain",
+    "title": "PAW Kapten Bajak Laut (Topi Pirate)",
+    "cat": "ADVENTURE",
+    "exp": "wink",
+    "hw": "<path d=\"M100 45 Q160 10 220 45 L210 55 L110 55 Z\" fill=\"#1E293B\"/><circle cx=\"160\" cy=\"35\" r=\"8\" fill=\"#FFF\"/>"
+  },
+  {
+    "id": 70,
+    "slug": "070-adventurer-lantern",
+    "title": "PAW Petualang Membawa Lentera Menyala",
+    "cat": "ADVENTURE",
+    "exp": "happy",
+    "fp": "<rect x=\"210\" y=\"190\" width=\"22\" height=\"35\" rx=\"6\" fill=\"#B45309\"/><circle cx=\"221\" cy=\"207\" r=\"10\" fill=\"#FDE047\" opacity=\"0.8\"/>"
+  },
+  {
+    "id": 71,
+    "slug": "071-futuristic-headset",
+    "title": "PAW Tech Expert Memakai Headset Futuristik",
+    "cat": "TECHNOLOGY / FUTURE",
+    "exp": "happy",
+    "hw": "<path d=\"M120 45 C120 20 200 20 200 45\" stroke=\"#00E5FF\" stroke-width=\"8\" fill=\"none\"/><circle cx=\"120\" cy=\"45\" r=\"8\" fill=\"#00E5FF\"/><circle cx=\"200\" cy=\"45\" r=\"8\" fill=\"#00E5FF\"/>"
+  },
+  {
+    "id": 72,
+    "slug": "072-coding-developer",
+    "title": "PAW Sedang Coding Software di Laptop",
+    "cat": "TECHNOLOGY / FUTURE",
+    "exp": "focus",
+    "fp": "<rect x=\"125\" y=\"235\" width=\"70\" height=\"35\" rx=\"4\" fill=\"#0F172A\"/><text x=\"135\" y=\"255\" font-size=\"10\" fill=\"#22C55E\" font-family=\"monospace\">&lt;/&gt;</text>"
+  },
+  {
+    "id": 73,
+    "slug": "073-tablet-touch",
+    "title": "PAW Sedang Mengoperasikan Smart Tablet",
+    "cat": "TECHNOLOGY / FUTURE",
+    "exp": "happy",
+    "fp": "<rect x=\"130\" y=\"210\" width=\"60\" height=\"42\" rx=\"4\" fill=\"#1E293B\"/><rect x=\"134\" y=\"214\" width=\"52\" height=\"34\" rx=\"2\" fill=\"#3B82F6\"/>"
+  },
+  {
+    "id": 74,
+    "slug": "074-vr-headset-gamer",
+    "title": "PAW Memakai VR Headset Metaverse",
+    "cat": "TECHNOLOGY / FUTURE",
+    "exp": "excited",
+    "fp": "<rect x=\"105\" y=\"80\" width=\"110\" height=\"40\" rx=\"14\" fill=\"url(#vrGrad)\"/><circle cx=\"130\" cy=\"100\" r=\"8\" fill=\"#FFF\" opacity=\"0.6\"/><circle cx=\"190\" cy=\"100\" r=\"8\" fill=\"#FFF\" opacity=\"0.6\"/>"
+  },
+  {
+    "id": 75,
+    "slug": "075-robotics-engineer",
+    "title": "PAW Memegang Robot Mini Sahabat",
+    "cat": "TECHNOLOGY / FUTURE",
+    "exp": "happy",
+    "fp": "<rect x=\"185\" y=\"200\" width=\"30\" height=\"35\" rx=\"6\" fill=\"#94A3B8\"/><circle cx=\"193\" cy=\"210\" r=\"4\" fill=\"#06B6D4\"/><circle cx=\"207\" cy=\"210\" r=\"4\" fill=\"#06B6D4\"/>"
+  },
+  {
+    "id": 76,
+    "slug": "076-space-explorer-cyber",
+    "title": "PAW Futuristic Space Cyber Explorer",
+    "cat": "TECHNOLOGY / FUTURE",
+    "exp": "excited",
+    "ob": "<rect x=\"102\" y=\"164\" width=\"116\" height=\"85\" rx=\"20\" fill=\"#0F172A\"/><circle cx=\"160\" cy=\"205\" r=\"14\" fill=\"#00E5FF\" opacity=\"0.8\"/>"
+  },
+  {
+    "id": 77,
+    "slug": "077-hover-scooter",
+    "title": "PAW Mengendarai Hover Scooter Futuristik",
+    "cat": "TECHNOLOGY / FUTURE",
+    "exp": "excited",
+    "fp": "<ellipse cx=\"160\" cy=\"280\" rx=\"75\" ry=\"14\" fill=\"#00E5FF\" opacity=\"0.85\"/>"
+  },
+  {
+    "id": 78,
+    "slug": "078-smart-glasses",
+    "title": "PAW Memakai Kacamata AR Pintar",
+    "cat": "TECHNOLOGY / FUTURE",
+    "exp": "wink",
+    "fp": "<rect x=\"108\" y=\"88\" width=\"38\" height=\"22\" rx=\"6\" stroke=\"#00E5FF\" stroke-width=\"3\" fill=\"none\"/><rect x=\"174\" y=\"88\" width=\"38\" height=\"22\" rx=\"6\" stroke=\"#00E5FF\" stroke-width=\"3\" fill=\"none\"/>"
+  },
+  {
+    "id": 79,
+    "slug": "079-hologram-interface",
+    "title": "PAW Mengoperasikan Hologram Melayang",
+    "cat": "TECHNOLOGY / FUTURE",
+    "exp": "focus",
+    "fp": "<circle cx=\"160\" cy=\"215\" r=\"28\" stroke=\"#00E5FF\" stroke-dasharray=\"6,4\" stroke-width=\"3\" fill=\"none\" opacity=\"0.75\"/>"
+  },
+  {
+    "id": 80,
+    "slug": "080-ai-researcher-lab",
+    "title": "PAW Peneliti AI di Lab Canggih",
+    "cat": "TECHNOLOGY / FUTURE",
+    "exp": "happy",
+    "ob": "<rect x=\"102\" y=\"164\" width=\"116\" height=\"85\" rx=\"20\" fill=\"#1E293B\"/><polygon points=\"150,190 160,175 170,190\" fill=\"#00E5FF\"/>"
+  },
+  {
+    "id": 81,
+    "slug": "081-pajamas-pillow",
+    "title": "PAW Memakai Piyama Membawa Bantal",
+    "cat": "FUN / COMEDY",
+    "exp": "sleepy",
+    "ob": "<rect x=\"102\" y=\"164\" width=\"116\" height=\"85\" rx=\"20\" fill=\"#93C5FD\"/><circle cx=\"130\" cy=\"190\" r=\"4\" fill=\"#FFF\"/><circle cx=\"180\" cy=\"210\" r=\"4\" fill=\"#FFF\"/>",
+    "fp": "<rect x=\"185\" y=\"195\" width=\"45\" height=\"35\" rx=\"8\" fill=\"#FEF08A\"/>"
+  },
+  {
+    "id": 82,
+    "slug": "082-morning-bedhead",
+    "title": "PAW Baru Bangun Tidur Menguap Lucu",
+    "cat": "FUN / COMEDY",
+    "exp": "sleepy",
+    "hw": "<path d=\"M150 20 Q160 0 170 20\" stroke=\"#FFD94F\" stroke-width=\"8\" fill=\"none\"/>"
+  },
+  {
+    "id": 83,
+    "slug": "083-raincoat-boots",
+    "title": "PAW Memakai Raincoat & Sepatu Boots",
+    "cat": "FUN / COMEDY",
+    "exp": "happy",
+    "hw": "<circle cx=\"160\" cy=\"50\" r=\"45\" fill=\"#FACC15\"/>",
+    "ob": "<rect x=\"102\" y=\"164\" width=\"116\" height=\"85\" rx=\"20\" fill=\"#FACC15\"/>"
+  },
+  {
+    "id": 84,
+    "slug": "084-umbrella-rain",
+    "title": "PAW Membawa Payung di Tengah Hujan",
+    "cat": "FUN / COMEDY",
+    "exp": "happy",
+    "bp": "<path d=\"M80 60 Q160 -10 240 60 Z\" fill=\"#3B82F6\"/><line x1=\"160\" y1=\"50\" x2=\"160\" y2=\"200\" stroke=\"#64748B\" stroke-width=\"6\"/>"
+  },
+  {
+    "id": 85,
+    "slug": "085-kite-flying",
+    "title": "PAW Mengejar Layang-Layang Melayang",
+    "cat": "FUN / COMEDY",
+    "exp": "excited",
+    "fp": "<polygon points=\"240,40 255,55 240,70 225,55\" fill=\"#EF4444\"/><line x1=\"195\" y1=\"180\" x2=\"240\" y2=\"70\" stroke=\"#CBD5E1\" stroke-width=\"2\"/>"
+  },
+  {
+    "id": 86,
+    "slug": "086-soap-bubbles",
+    "title": "PAW Meniup Gelembung Sabun Berkilau",
+    "cat": "FUN / COMEDY",
+    "exp": "love",
+    "fp": "<circle cx=\"130\" cy=\"150\" r=\"14\" fill=\"#38BDF8\" opacity=\"0.6\"/><circle cx=\"190\" cy=\"130\" r=\"18\" fill=\"#F472B6\" opacity=\"0.6\"/><circle cx=\"220\" cy=\"160\" r=\"10\" fill=\"#FDE047\" opacity=\"0.6\"/>"
+  },
+  {
+    "id": 87,
+    "slug": "087-birthday-party-cake",
+    "title": "PAW Topi Ulang Tahun Membawa Kue",
+    "cat": "FUN / COMEDY",
+    "exp": "excited",
+    "hw": "<polygon points=\"140,45 160,5 180,45\" fill=\"#EC4899\"/><circle cx=\"160\" cy=\"5\" r=\"5\" fill=\"#FDE047\"/>",
+    "fp": "<rect x=\"135\" y=\"225\" width=\"50\" height=\"25\" rx=\"4\" fill=\"#F472B6\"/><circle cx=\"160\" cy=\"215\" r=\"4\" fill=\"#F59E0B\"/>"
+  },
+  {
+    "id": 88,
+    "slug": "088-gift-wrapping",
+    "title": "PAW Membungkus Kado Pita Merah",
+    "cat": "FUN / COMEDY",
+    "exp": "happy",
+    "fp": "<rect x=\"135\" y=\"215\" width=\"50\" height=\"45\" rx=\"6\" fill=\"#10B981\"/><rect x=\"156\" y=\"215\" width=\"8\" height=\"45\" fill=\"#EF4444\"/><rect x=\"135\" y=\"233\" width=\"50\" height=\"8\" fill=\"#EF4444\"/>"
+  },
+  {
+    "id": 89,
+    "slug": "089-nerd-big-glasses",
+    "title": "PAW Kutu Buku Kacamata Besar & Sweater",
+    "cat": "FUN / COMEDY",
+    "exp": "happy",
+    "fp": "<circle cx=\"126\" cy=\"98\" r=\"22\" stroke=\"#1E293B\" stroke-width=\"4\" fill=\"none\"/><circle cx=\"194\" cy=\"98\" r=\"22\" stroke=\"#1E293B\" stroke-width=\"4\" fill=\"none\"/>",
+    "ob": "<rect x=\"102\" y=\"164\" width=\"116\" height=\"85\" rx=\"20\" fill=\"#047857\"/>"
+  },
+  {
+    "id": 90,
+    "slug": "090-instant-camera-selfie",
+    "title": "PAW Foto Selfie dengan Kamera Instan",
+    "cat": "FUN / COMEDY",
+    "exp": "wink",
+    "fp": "<rect x=\"135\" y=\"195\" width=\"50\" height=\"40\" rx=\"8\" fill=\"#06B6D4\"/><circle cx=\"160\" cy=\"215\" r=\"10\" fill=\"#FFF\"/>"
+  },
+  {
+    "id": 91,
+    "slug": "091-black-tuxedo",
+    "title": "PAW Memakai Tuxedo Hitam Premium Mewah",
+    "cat": "PREMIUM / SPECIAL",
+    "exp": "happy",
+    "ob": "<rect x=\"102\" y=\"164\" width=\"116\" height=\"85\" rx=\"20\" fill=\"#0F172A\"/><polygon points=\"145,164 160,195 175,164\" fill=\"#FFF\"/><polygon points=\"152,180 160,185 168,180 160,175\" fill=\"#DC2626\"/>"
+  },
+  {
+    "id": 92,
+    "slug": "092-executive-briefcase",
+    "title": "PAW Eksekutif Modern Membawa Briefcase",
+    "cat": "PREMIUM / SPECIAL",
+    "exp": "confident",
+    "ob": "<rect x=\"102\" y=\"164\" width=\"116\" height=\"85\" rx=\"20\" fill=\"#1E3A8A\"/><polygon points=\"156,164 160,205 164,164\" fill=\"#DC2626\"/>",
+    "fp": "<rect x=\"210\" y=\"215\" width=\"40\" height=\"30\" rx=\"4\" fill=\"#78350F\"/>"
+  },
+  {
+    "id": 93,
+    "slug": "093-premium-yellow-coat",
+    "title": "PAW Jas Hujan Kuning Emas Signature",
+    "cat": "PREMIUM / SPECIAL",
+    "exp": "happy",
+    "ob": "<rect x=\"98\" y=\"164\" width=\"124\" height=\"90\" rx=\"22\" fill=\"#EAB308\"/><circle cx=\"160\" cy=\"190\" r=\"4\" fill=\"#78350F\"/><circle cx=\"160\" cy=\"220\" r=\"4\" fill=\"#78350F\"/>"
+  },
+  {
+    "id": 94,
+    "slug": "094-detective-trenchcoat",
+    "title": "PAW Detektif Kaca Pembesar & Topi Sherlock",
+    "cat": "PREMIUM / SPECIAL",
+    "exp": "focus",
+    "hw": "<ellipse cx=\"160\" cy=\"40\" rx=\"50\" ry=\"15\" fill=\"#78350F\"/>",
+    "ob": "<rect x=\"102\" y=\"164\" width=\"116\" height=\"85\" rx=\"20\" fill=\"#A16207\"/>",
+    "fp": "<circle cx=\"210\" cy=\"190\" r=\"14\" stroke=\"#475569\" stroke-width=\"4\" fill=\"#E0F2FE\" opacity=\"0.6\"/>"
+  },
+  {
+    "id": 95,
+    "slug": "095-royal-explorer-crown",
+    "title": "PAW Penjelajah Kerajaan Memakai Mahkota Emas",
+    "cat": "PREMIUM / SPECIAL",
+    "exp": "happy",
+    "hw": "<polygon points=\"135,45 145,15 160,30 175,15 185,45\" fill=\"#EAB308\"/><circle cx=\"160\" cy=\"22\" r=\"4\" fill=\"#DC2626\"/>",
+    "ob": "<rect x=\"102\" y=\"164\" width=\"116\" height=\"85\" rx=\"20\" fill=\"#581C87\"/>"
+  },
+  {
+    "id": 96,
+    "slug": "096-samurai-warrior",
+    "title": "PAW Samurai Warrior Berbaju Zirah Tradisional",
+    "cat": "PREMIUM / SPECIAL",
+    "exp": "focus",
+    "hw": "<polygon points=\"120,40 160,15 200,40\" fill=\"#1E293B\"/><circle cx=\"160\" cy=\"28\" r=\"8\" fill=\"#EAB308\"/>",
+    "ob": "<rect x=\"102\" y=\"164\" width=\"116\" height=\"85\" rx=\"20\" fill=\"#991B1B\"/>"
+  },
+  {
+    "id": 97,
+    "slug": "097-indonesian-traditional-dancer",
+    "title": "PAW Penari Tradisional Nusantara Bermahkota",
+    "cat": "PREMIUM / SPECIAL",
+    "exp": "excited",
+    "hw": "<path d=\"M125 45 Q160 5 195 45\" fill=\"#EAB308\"/><circle cx=\"140\" cy=\"30\" r=\"5\" fill=\"#DC2626\"/><circle cx=\"180\" cy=\"30\" r=\"5\" fill=\"#DC2626\"/>",
+    "ob": "<rect x=\"102\" y=\"180\" width=\"116\" height=\"65\" rx=\"15\" fill=\"#DC2626\"/>"
+  },
+  {
+    "id": 98,
+    "slug": "098-festival-carnival",
+    "title": "PAW Festival Penuh Dekorasi & Confetti Bunga",
+    "cat": "PREMIUM / SPECIAL",
+    "exp": "laugh",
+    "hw": "<g transform=\"translate(160,35)\"><circle cx=\"-25\" cy=\"0\" r=\"8\" fill=\"#EC4899\"/><circle cx=\"0\" cy=\"-8\" r=\"10\" fill=\"#EAB308\"/><circle cx=\"25\" cy=\"0\" r=\"8\" fill=\"#06B6D4\"/></g>"
+  },
+  {
+    "id": 99,
+    "slug": "099-language-ambassador",
+    "title": "PAW Duta Bahasa FIEZEL Membawa Globe & Buku",
+    "cat": "PREMIUM / SPECIAL",
+    "exp": "happy",
+    "fp": "<circle cx=\"215\" cy=\"225\" r=\"18\" fill=\"#0284C7\"/><path d=\"M205 220 Q215 230 225 220\" fill=\"#22C55E\"/><rect x=\"105\" y=\"215\" width=\"28\" height=\"36\" rx=\"4\" fill=\"#8C2233\"/>"
+  },
+  {
+    "id": 100,
+    "slug": "100-hero-mascot-signature",
+    "title": "PAW HERO CHARACTER — Maskot Utama FIEZEL",
+    "cat": "PREMIUM / SPECIAL",
+    "exp": "excited",
+    "hw": "<polygon points=\"145,25 160,8 175,25\" fill=\"#EAB308\"/><circle cx=\"160\" cy=\"16\" r=\"4\" fill=\"#8C2233\"/>",
+    "ob": "<rect x=\"100\" y=\"164\" width=\"120\" height=\"88\" rx=\"24\" fill=\"#8C2233\"/>",
+    "fp": "<rect x=\"120\" y=\"220\" width=\"80\" height=\"45\" rx=\"6\" fill=\"#FFF4DA\"/><text x=\"135\" y=\"248\" font-size=\"14\" font-weight=\"900\" fill=\"#8C2233\">FIEZEL</text>"
+  }
+]
