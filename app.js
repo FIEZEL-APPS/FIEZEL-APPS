@@ -6109,7 +6109,16 @@ function exitStage(){if(!leaveStage())return false;uiSfx('nav');drawTopScreen();
  * sama seperti di atas. Entri yang ditinggalkan menjadi entri mati, dan modul back-nav
  * sudah tahu cara melewatinya tanpa memakan tekanan kembali murid.
  */
-function dropStages(){if(!stageStack.length)return false;runStageLeave(stageStack.splice(0).reverse());syncLessonMode();return true}
+/* m025-237: dropStages() membuang pembukuan stage DAN entri lapisannya di modul back-nav.
+   Sampai rilis ini ia sengaja TIDAK menyentuh back-nav, karena dismiss() dulu membuang
+   entri dengan history.go() yang asinkron dan menjalankannya tepat sebelum pushState
+   entri view baru adalah cara tercepat membuat riwayat dan tumpukan tidak sejajar.
+   dismiss() sekarang murni bedah tumpukan - nol History API, nol penelusuran - jadi
+   alasan itu hilang, dan yang tersisa adalah kerugiannya: keluar dari sesi lewat
+   navigasi bawah meninggalkan entri lapisan MATI yang harus dilewati satu per satu
+   oleh tekanan kembali berikutnya. Sekarang entri paling bawah yang dibuang diserahkan
+   ke dismiss(), yang ikut membawa semua yang menumpuk di atasnya. */
+function dropStages(){if(!stageStack.length)return false;const first=stageStack[0];runStageLeave(stageStack.splice(0).reverse());syncLessonMode();try{self.FiezelBackNav?.dismiss?.(first.id)}catch{}return true}
 function stageDepth(){return stageStack.length}
 self.FiezelStage={enter:enterStage,leave:leaveStage,leaveAll:leaveAllStages,depth:stageDepth,lessonMode:()=>document.body?.classList?.contains?.('fz-lesson-mode')===true};
 window.exitStage=exitStage;
@@ -11035,7 +11044,13 @@ function installBackNav(){
           if(document.body?.classList?.contains?.('daily-locked'))return true;
           return !!document.querySelector?.('.fiezel-splash,.fiezel-ob');
         }catch{return false}
-      }
+      },
+      // m025-237: tekanan kembali yang menghabiskan tumpukan tidak langsung menutup PWA -
+      // ia melepas entri penanda dan menyerahkan keputusan ke tekanan BERIKUTNYA. Tanpa
+      // sepatah kata pun, jeda itu terbaca sebagai tekanan yang tidak melakukan apa-apa;
+      // dengan kalimat ini ia terbaca sebagai jaring pengaman, dan gestur tepi yang meleset
+      // di beranda tidak lagi bisa membuang sesi belajar murid.
+      onExit:()=>{try{showToast(FiezelI18n.t('nav.tekan-lagi-untuk-keluar'))}catch(_){}}
     })||null
   }catch{return null}
 }

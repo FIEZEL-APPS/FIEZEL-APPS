@@ -1,6 +1,6 @@
 {
   "schema": "id-golden-baseline/1",
-  "generatedAt": "2026-09-02T17:18:40.400Z",
+  "generatedAt": "2026-09-02T20:18:53.375Z",
   "root": "/home/user/FIEZEL-APPS",
   "files": {
     "grammar-explanations-id.json": "4ce816145b77a86ed6d9ec9b366f70c1bbf1859283f667207eada762fccccb17",
@@ -18,8 +18,8 @@
     "features/audio-assets/fiezel-audio-key.js": "11624e303917fe0df881ac3f410911587766fd6f4d2491ca6687ec42de8d457d"
   },
   "literals": {
-    "count": 2142,
-    "sha256": "2a49d04e15cd8b2fd992a2f87b85304188d0ccb5c0c758e53c6df00925754704",
+    "count": 2144,
+    "sha256": "4c80d92bfecf86b8e4b0ffa08ce2d65eefd1bd8b8c346742216a1a81d602b785",
     "list": [
       "\n      SETELAH beat concern ≤1000ms selesai (13 §2.2), bukan menimpanya. Tanpa bunyi:\n      SFX hint sudah dipensiunkan (20 §4); cooldown 8 detiknya dijaga komponen. */\n   setTimeout(()=>{try{pawReact(",
       "\n      case 'silent':                        // L5: kalau mulut sempat mulai (taksiran L3 kandas), tutup SEKARANG\n        degradedLatch = false;\n        closeTurn(false);\n        break;\n      case 'interrupt':                     // stop(): snap tutup\n        degradedLatch = false;\n        closeTurn(true);\n        break;\n      default:\n        break;                              // fase asing dari versi fasad lebih baru: diabaikan tanpa suara\n    }\n  }\n\n  try { doc.addEventListener('fiezel-speech', onSpeech); } catch (_) {}\n\n  /* Suara terdegradasi (audibility-fix): mulut mati SEKETIKA dan tidak boleh\n     hidup lagi untuk sisa giliran — apa pun yang masih dikirim lapisan bawah. */\n  try {\n    root.addEventListener('fiezel-neural-voice-degraded', function () {\n      if (turn) closeTurn(true);\n      degradedLatch = true;                 // dilepas oleh end/silent/interrupt fasad berikutnya\n    });\n  } catch (_) {}\n\n  /* Permukaan kecil untuk Diagnostics/tes — bukan API pemanggil biasa:\n     satu-satunya pintu bicara tetap FiezelVoiceSay.say(). */\n  root.FiezelSpeechBridge = Object.freeze({\n    SCHEMA: SCHEMA,\n    speaking: function () { return !!turn; },\n    degraded: function () { return !!degradedLatch; },\n    motionAllowed: motionAllowed\n  });\n})(typeof self !== 'undefined' ? self : (typeof window !== 'undefined' ? window : this));\n",
@@ -1849,6 +1849,7 @@
       "Target luar negeri masih sama kan? Yaudah, comeback hari ini biar jalurnya nggak makin jauh.",
       "Tas belanja yang ia bawa ke rumahnya sendiri",
       "Tas yang ia beli di pantai",
+      "Tekan kembali sekali lagi untuk keluar dari FIEZEL.",
       "Teks tidak menyebut hal ini. Kalimat terdekat cuma membahas: “{evidence}” — itu bukan bukti untuk klaim tadi.",
       "Teksnya jalan bareng audionya, kalimat demi kalimat. Sambil dengar sambil baca \\u2014 telinga dan mata belajar bareng.",
       "Telur yang ia jual di warung kecil",
@@ -2044,6 +2045,7 @@
       "menempatkan kata dalam urutan yang tidak sesuai dengan pola kalimat ini.",
       "menurutku ini salah",
       "model berjalan di Worker; kokoro menjalankan WASM panjang di main thread dan membunuh content process iOS",
+      "nav.tekan-lagi-untuk-keluar",
       "nggak",
       "nggak paham",
       "otomatis di start(), maksimal sekali per hari",

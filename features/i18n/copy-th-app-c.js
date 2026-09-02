@@ -100,6 +100,7 @@
     'masukan.terkirim': 'ส่งแล้ว ขอบคุณ!',
     'masukan.tulis-dulu': 'เขียนข้อความก่อนนะ',
     'nav.halaman-tak-tersedia': 'หน้าที่ต้องการยังไม่พร้อมใช้งาน',
+    'nav.tekan-lagi-untuk-keluar': 'กดย้อนกลับอีกครั้งเพื่อออกจาก FIEZEL',
     'prasasti.aria-baru': 'จารึกใหม่ถูกสลักแล้ว',
     'prasasti.aria-belum': 'ยังไม่ถูกสลัก {hint}',
     'prasasti.aria-terukir': 'สลักเมื่อ {kapan}',
