@@ -52,6 +52,7 @@ di level mana pun adalah bahasa Indonesia.
 ```
 node th-bank-purity-test.js      # 26/26 PASS
 node th-exam-overlay-test.js     # 13/13 PASS
+node th-content-overlay-test.js  # 15/15 PASS
 node tools/scan-th-bank-leak.js  # 0 temuan
 ```
 
@@ -76,7 +77,7 @@ B1+ **sengaja tidak** punya sidecar: mulai B1 pertanyaan dan pilihannya memang b
 Inggris — imersi yang disengaja dan sama untuk murid id maupun th. Yang tidak pernah sah di
 level mana pun adalah bahasa Indonesia.
 
-### JEBAKAN KEDUA: gerbang memeriksa ISI, bukan SAMPAI-nya
+### JEBAKAN KEDUA: gerbang memeriksa ISI, bukan SAMPAI-nya (SUDAH TIGA KALI)
 
 Ditemukan m025-232, setelah owner melapor sesi listening Thai masih bercampur padahal
 kedua pemindai hijau. Keduanya benar — dan keduanya buta pada hal yang sama.
@@ -113,6 +114,50 @@ selamanya pada bank yang overlay-nya salah sasaran.
 kutipan itu bukti jawabannya. Menerjemahkannya berarti murid membaca kalimat yang tidak
 pernah terdengar di audio, dan soalnya jadi tidak bisa dijawab dari rekaman. Gerbang pasal 8
 memeriksa kontrak ini terpisah, jadi kutipan yang diam-diam diterjemahkan tetap ketahuan.
+
+#### Kemunculan ketiga (m025-234): terjemahan terkirim lalu menganggur
+
+Owner melapor lagi bahwa masih banyak bahasa Indonesia tercampur, padahal kedua pemindai
+hijau DAN th-exam-overlay-test hijau. Laporannya benar untuk ketiga kalinya, dan kali ini
+sebabnya paling halus: terjemahannya **sudah ada, sudah dikirim ke perangkat murid, lalu
+menganggur**. `applyContentLocale()` menyalin sebagian bidang saja.
+
+| Sidecar | Overlay menyalin | Yang menganggur |
+|---|---|---|
+| `writing-prompts-th.json` | `honesty`, `rubric.criteria` | 45 prompt (`hint` + `focus`) + 5 catatan tugas ujian |
+| `reading-exam-th.json` | `honesty`, `formats` | 8 set / 96 soal (`why` + `whyOthersFail`) |
+
+Jadi seluruh layar Writing dan seluruh umpan balik soal reading-exam berbahasa Indonesia
+untuk murid Thai — sekitar 287 bidang yang padanan Thainya sudah ikut terunduh.
+
+Satu jebakan nama bidang yang mudah terulang: penyaji membaca `prompt.id_hint`, sedangkan
+sidecar menyediakan `hint`. Overlay WAJIB menulis ke slot `id_hint`; menamai ulang bidang
+sumber akan memutus jalur `id` yang byte-identik dan memerahkan baseline emas.
+
+**Penjaganya** — `th-content-overlay-test.js`, saudara kandung `th-exam-overlay-test.js`
+untuk bank konten di `app.js`. Ia menjalankan `applyContentLocale()` yang ASLI lewat `vm`
+atas fixture berawalan `TH-`. Dua mutasi (cabut overlay writing, cabut overlay reading-exam)
+keduanya tertangkap.
+
+**Cara memakainya waktu menambah sidecar berikutnya.** Sebelum menyatakan sidecar baru
+selesai, jawab dua pertanyaan yang TERPISAH:
+
+1. Isinya bersih? → `th-bank-purity-test.js` + `tools/scan-th-bank-leak.js`
+2. Isinya sampai ke layar? → tambahkan pemeriksa di `th-content-overlay-test.js`
+   (bank di `app.js`) atau `th-exam-overlay-test.js` (bank di addon)
+
+Gerbang yang hanya menjawab (1) akan hijau selamanya sambil murid membaca bahasa Indonesia.
+Itu sudah terjadi tiga kali; anggap ia mode kegagalan default, bukan kebetulan.
+
+**Cara cepat menemukan bidang yang menganggur:** untuk tiap sidecar, bandingkan kunci
+tingkat-atas yang ia sediakan dengan yang benar-benar disebut di `applyContentLocale()`.
+Selisihnya adalah terjemahan yang tidak pernah dipakai. JANGAN mengandalkan pencarian nama
+bidang di seluruh berkas — nama seperti `focus` atau `hint` muncul juga di jalur sumber,
+jadi pencarian itu memberi rasa aman palsu (saya sempat tertipu olehnya).
+
+**Yang sudah diperiksa dan BERSIH** (jangan cari ulang di sini):
+cakupan kunci i18n 2518 kunci `id` semuanya ada di `th` (nol hilang), dan 180 kunci
+`grammar.title.*` menutup seluruh judul di `grammar-labels-id.js`.
 
 ## Generator — jangan sunting sidecar dengan tangan
 
