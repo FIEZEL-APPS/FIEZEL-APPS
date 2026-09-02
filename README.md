@@ -17,9 +17,9 @@ Handoff berikutnya memakai master prompt v2.0 dan roadmap berbasis gerbang bukti
 ## Baseline content
 
 - Vocabulary: 2.440 entri (+605 wave-2, +70 C1 kurasi gen2 non-duplikat).
-- Grammar: 248 template / 179 lesson unik (gen2 +26 subskill baru; wave-2 +69 varian latihan) × 25 mode.
+- Grammar: 249 template / 180 lesson unik (gen2 +26 subskill baru; wave-2 +69 varian latihan) × 25 mode.
 - Reading: 312 passages / 1.560 questions.
-- Cloze: 209 item (gen2 +25, wave-2 +61) + alternates (cloze-alternates-v1.json).
+- Cloze: 210 item (gen2 +25, wave-2 +61) + alternates (cloze-alternates-v1.json).
 - Listening: 1.407 item bank + 36 latihan Skills Lab.
 - Speaking: 36 item.
 - Grammar schema: `2.0.0`.

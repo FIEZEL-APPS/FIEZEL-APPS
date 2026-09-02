@@ -247,6 +247,9 @@ ul,ol{margin:0;padding:0;list-style:none}
 .card{background:var(--cream-warm);border:1px solid var(--line);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm)}
 .anim .card{transition:transform var(--fz-base) var(--fz-out),box-shadow var(--fz-base) var(--fz-out),border-color var(--fz-base)}
 
+/* lede tingkat seksi: paragraf pengantar sebelum grid kartu (dipakai #untuk-guru) */
+.sec-lede{font-size:1.04rem;color:var(--body);max-width:62ch;margin-bottom:24px}
+
 .feat-grid{display:grid;gap:16px}
 .feat{padding:24px 22px 26px;position:relative}
 .feat h3{font-size:1.08rem;margin:14px 0 9px;letter-spacing:-.015em}
