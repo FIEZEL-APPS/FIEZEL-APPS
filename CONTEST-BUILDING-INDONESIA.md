@@ -7,10 +7,11 @@ Hadiah: 100 pemenang berbagi Rp800 juta.
 
 Dokumen ini berisi empat hal, berurutan sesuai cara memakainya:
 
-1. **Gerbang 0** — satu hal yang harus Owner cek sendiri sebelum apa pun dikerjakan.
+1. **Gerbang 0** — syarat platform yang sudah dikonfirmasi Owner, dan apa yang harus
+   dibangun untuk memenuhinya.
 2. **Positioning** — kenapa yang disubmit adalah *FIEZEL untuk Sekolah*, bukan FIEZEL utuh.
 3. **Naskah submission** — siap tempel, bahasa Indonesia dan Inggris.
-4. **Rencana B** — spesifikasi versi ramping kalau ternyata wajib dibangun di Emergent.
+4. **Rencana B** — spesifikasi komponen kecil yang dibangun langsung di Emergent.
 
 Semua angka di dokumen ini diambil dari berkas data repo pada commit ini, bukan dari
 ingatan atau dari README (lihat §8 Lampiran angka). Kalau ada klaim yang tidak bisa
@@ -18,25 +19,35 @@ ditunjuk ke berkasnya, klaim itu dicoret, bukan dipoles.
 
 ---
 
-## 1. Gerbang 0 — yang harus dicek Owner lebih dulu
+## 1. Gerbang 0 — dikonfirmasi: 15% harus dibangun di Emergent
 
-**Pertanyaan: apakah submission WAJIB berupa aplikasi yang dibangun di app.emergent.sh?**
+**Temuan Owner (2 September 2026):** syaratnya bukan "seluruh aplikasi wajib dibangun
+di app.emergent.sh", dan bukan pula "boleh 100% submit produk lama tanpa sentuhan
+Emergent". Titik tengahnya: **minimal 15% dari submission harus benar-benar dibangun
+di Emergent.**
 
-Kontesnya dipromosikan sebagai "selesaikan masalah bisnis nyata dengan AI builder
-Emergent, tanpa perlu koding". Kalau kalimat itu adalah *syarat*, bukan sekadar ajakan,
-maka FIEZEL apa adanya **tidak bisa disubmit** — ia vanilla JS, PWA, service worker,
-dan neural voice lokal, dibangun di luar Emergent.
+Ini mengubah keputusan di §7 dari pilihan biner (rebuild total vs. tidak sama sekali)
+menjadi **model hybrid**: FIEZEL yang sudah ada dan sudah teruji tetap jadi produk inti
+dan tetap yang didemokan di §4, tapi ditambah satu komponen nyata yang dibangun di
+Emergent — bukan sekadar disebut di naskah, karena penjurian kemungkinan memeriksa
+riwayat build di platform mereka, bukan cuma percaya klaim.
 
-Konsekuensinya bercabang, dan cabangnya menentukan seluruh sisa pekerjaan:
+| Bagian | Porsi | Dibangun di mana |
+|---|---|---|
+| Aplikasi belajar murid (grammar, reading, listening, speaking) | ~70% | FIEZEL yang sudah ada, tidak disentuh |
+| Dashboard/bukti belajar guru | ~15% | FIEZEL yang sudah ada, tidak disentuh |
+| **Laporan orang tua otomatis** | **~15%** | **Dibangun baru, di Emergent** |
 
-| Temuan di halaman resmi | Yang dikerjakan |
-|---|---|
-| Boleh submit produk yang sudah ada | Pakai §3 (naskah) + §4 (demo) apa adanya. Selesai. |
-| Wajib dibangun di Emergent | Pakai §7 (Rencana B): rebuild irisan tipis di Emergent, naskah §3 tetap dipakai. |
+Spesifikasi komponen yang dibangun di Emergent ada di §7. Ini bukan komponen tempelan:
+ia menjawab bagian paling lemah dari cerita FIEZEL saat ini — *bukti belajar sampai ke
+guru, tapi belum ada apa pun yang sampai ke orang tua dalam bentuk siap kirim.* Jadi
+syarat platform kontes justru menutup lubang nyata di produk, bukan menambah pekerjaan
+yang tidak berarti.
 
-Cek ini butuh lima menit dan menghemat delapan hari. **Jangan lewati.**
-Sesi Claude tidak bisa membuka emergent.sh (diblokir egress proxy), jadi ini hanya bisa
-dilakukan Owner.
+Yang perlu Owner lakukan: mendaftar/login di app.emergent.sh dan membangun komponen
+§7 di sana langsung (builder no-code mereka), karena sesi Claude tidak bisa membuka
+emergent.sh (diblokir egress proxy). Spesifikasinya sudah dirinci supaya tinggal diikuti
+tanpa keputusan desain lagi di tempat.
 
 ---
 
@@ -179,16 +190,18 @@ Tiga hal, dan ketiganya keputusan teknis yang sudah dikunci gerbang test — buk
 
 ## 4. Naskah demo 60 detik
 
-Urutannya sengaja dibalik dari kebiasaan: **guru dulu, murid belakangan.** Yang dijual
-ke juri adalah nilai bisnisnya, bukan tur fitur.
+Urutannya sengaja dibalik dari kebiasaan: **guru dulu, murid belakangan, laporan
+orang tua di penutup.** Yang dijual ke juri adalah nilai bisnisnya, bukan tur fitur —
+dan babak terakhir sekaligus menunjukkan komponen Emergent (§7) sebagai bagian yang
+hidup dari alur, bukan tempelan terpisah.
 
 | Detik | Yang terlihat | Yang dikatakan |
 |---|---|---|
 | 0–10 | Dashboard guru, satu kelas | "Ini kelas 20 murid. Guru belum mengoreksi apa pun minggu ini." |
 | 10–25 | Sorot satu murid mandek | "Rina berhenti tiga hari, dan mandek di conditional. Guru tahu ini hari Selasa, bukan pas rapor." |
 | 25–40 | Pindah ke sisi murid, kerjakan 2 soal | "Dari sisi Rina cuma latihan biasa. Ini yang jadi datanya." |
-| 40–50 | Kembali ke dashboard, angka berubah | "Tanpa guru menyentuh apa pun." |
-| 50–60 | Layar penutup, satu kalimat | "Lembaga kursus akhirnya punya bukti, bukan kesan." |
+| 40–50 | Kembali ke dashboard, lalu buka Laporan Orang Tua (dibangun di Emergent) | "Satu tombol, jadi paragraf siap kirim ke orang tua Rina." |
+| 50–60 | Layar penutup, satu kalimat | "Lembaga kursus akhirnya punya bukti, bukan kesan — dan orang tua ikut melihatnya." |
 
 **Aturan keras demo:**
 
@@ -222,42 +235,73 @@ Hanya 200 teratas yang masuk penjurian, jadi ini bukan pelengkap — ini separuh
 
 | Risiko | Berat | Sikap |
 |---|---|---|
-| Submission wajib dibangun di Emergent | **Tinggi** | Gerbang 0 (§1). Kalau iya, jalankan §7. |
+| Komponen Emergent tidak jadi/telat | **Tinggi** | Kecil dan sempit by design (§7): satu alur tiga langkah, tanpa integrasi API. Kerjakan di hari 1–2, bukan hari terakhir. |
+| Penjuri memeriksa apakah 15%-nya sungguhan dibangun di Emergent, bukan cuma diklaim | Sedang | Komponen §7 harus benar-benar dipublish di app.emergent.sh dan link-nya disertakan (§7.4) — bukan mockup atau tangkapan layar. |
 | Naskah "personal" tidak cocok syarat "bisnis" | Sedang | Sudah dijawab: submit sebagai FIEZEL untuk Sekolah, dan bagian guru ditambahkan ke landing page pada commit ini. |
 | Murid tidak punya sakelar menolak sinkronisasi bukti | Sedang | Keputusan Owner di `m025-236`, tercatat apa adanya. **Sebut sendiri di submission** sebelum orang lain menemukannya: yang tersimpan hanya nama + ringkasan berbucket, guru memberitahu murid di kelas. Menyembunyikannya jauh lebih mahal daripada menyebutkannya. |
 | Suara neural belum terverifikasi di perangkat | Rendah untuk kontes | Jangan didemokan. Sudah tertulis di §4. |
-| Delapan hari, satu orang | Sedang | Jangan tambah fitur. Naskah, demo, dan halaman guru sudah cukup. |
+| Delapan hari, satu orang | Sedang | Jangan tambah fitur di sisi FIEZEL. Komponen Emergent sengaja dibuat kecil supaya tidak menyita waktu itu. |
 
 ---
 
-## 7. Rencana B — spesifikasi ramping untuk dibangun ulang di Emergent
+## 7. Komponen Emergent — Laporan Orang Tua Otomatis
 
-Dipakai **hanya kalau** Gerbang 0 menyatakan submission wajib dibangun di platform mereka.
-Prinsipnya: bangun **irisan tertipis yang masih menceritakan keseluruhan cerita**, bukan
-FIEZEL mini.
+Ini bagian yang **wajib dibangun langsung di app.emergent.sh**, bukan opsional dan
+bukan disimulasikan. Dipilih karena tiga alasan sekaligus: cukup kecil untuk selesai
+dalam 1–2 hari lewat builder no-code, cukup nyata untuk memenuhi porsi 15%, dan
+menjawab lubang asli di produk (lihat §1) — bukan fitur tempelan yang dibuat cuma
+untuk kontes.
 
-**Yang dibangun (empat layar, tidak lebih):**
+### 7.1 Masalah spesifik yang dijawab komponen ini
 
-1. **Dashboard guru.** Daftar murid satu kelas, tiap baris: nama, level sekarang,
-   latihan terakhir, satu penanda status (naik / jalan / mandek / berhenti).
-2. **Halaman satu murid.** Peta skill sederhana, riwayat singkat, dan satu kalimat
-   rekomendasi tindakan untuk guru.
-3. **Layar latihan murid.** Satu jenis soal saja — grammar pilihan ganda sudah cukup.
-   Benar/salah langsung, dan skornya masuk ke dashboard.
-4. **Laporan orang tua.** Satu halaman ringkas yang bisa dikirim ke orang tua.
+Dashboard guru FIEZEL (`workers/owner/index.js`) menampilkan bukti belajar ke guru,
+tapi berhenti di situ. Guru masih harus **menceritakan ulang** angka itu ke orang tua
+secara manual — lewat WhatsApp, lewat rapat, lewat obrolan singkat saat jemput. Itu
+pekerjaan tambahan yang tidak dibayar, persis masalah yang sama yang membuat lembaga
+kursus tidak punya bukti sejak awal.
 
-**Yang TIDAK dibangun ulang:** neural voice, offline/PWA, maskot beranimasi, ujian
-IELTS/TOEFL, adaptivitas penuh, multi-bahasa. Semuanya kekuatan FIEZEL, dan semuanya
-tidak menambah nilai dalam demo 60 detik.
+### 7.2 Yang dibangun di Emergent
 
-**Data seed:** ambil dari repo ini supaya isinya nyata sejak menit pertama —
-`grammar-curriculum-v1.json` (180 lesson) dan `reading-bank.json` (312 bacaan) sudah
-berformat rapi. Cukup 20–30 butir untuk demo; sisanya diceritakan sebagai kapasitas
-yang sudah ada, dengan link ke aplikasi asli sebagai bukti.
+Satu alur pendek, tiga langkah:
 
-**Anggaran waktu (8 hari):** 2 hari empat layar, 1 hari data seed, 1 hari naskah dan
-gambar, 1 hari rekam demo, submit di hari ke-6. Dua hari sisanya untuk upvote —
-bukan untuk menambah fitur.
+1. **Input.** Guru memasukkan (atau menempel) ringkasan bukti belajar satu murid:
+   nama, level CEFR sekarang, jumlah latihan minggu ini, satu topik yang sudah
+   dikuasai, satu topik yang masih perlu latihan. Ini cocok dengan bentuk data yang
+   memang sudah ada di sisi FIEZEL — bukan struktur baru yang diarang.
+2. **Generate.** AI builder Emergent menyusun satu paragraf laporan berbahasa
+   Indonesia yang siap dikirim ke orang tua: nada positif tapi jujur, tidak
+   mengarang skor atau prediksi (aturan yang sama dengan §3.5 poin 1 — tidak
+   menebak apa yang belum terukur).
+3. **Output.** Teks siap salin-tempel ke WhatsApp, atau diunduh sebagai satu
+   halaman PDF/gambar sederhana.
+
+Tidak perlu login murid, tidak perlu autentikasi rumit, tidak perlu integrasi API
+ke FIEZEL — ini alat berdiri sendiri yang **melengkapi** alur FIEZEL, dipakai guru
+di antara buka dashboard dan mengirim pesan ke orang tua.
+
+### 7.3 Yang sengaja TIDAK dibangun di sini
+
+Tidak ada latihan murid, tidak ada bank soal, tidak ada dashboard kelas — itu semua
+sudah ada dan sudah teruji di FIEZEL (§8). Membangunnya ulang di Emergent hanya
+mengulang pekerjaan tanpa menambah cerita. Komponen ini murni mengisi satu langkah
+yang hilang: dari "guru tahu" ke "orang tua tahu".
+
+### 7.4 Bagaimana ini muncul di naskah submission
+
+Tambahkan satu kalimat di §3.4 (Solusi) atau sebagai poin keempat di §3.5:
+
+> **4. Laporan orang tua, bukan cuma dashboard guru.** Bukti belajar tidak berhenti
+> di layar guru. Satu langkah tambahan — dibangun di Emergent — mengubahnya jadi
+> paragraf siap kirim ke WhatsApp orang tua, tanpa guru mengetik ulang dari nol.
+
+Sertakan link ke aplikasi Emergent yang sudah dipublish sebagai bukti, persis
+seperti link ke FIEZEL yang sudah ada untuk sisa produk.
+
+**Anggaran waktu (8 hari):** 1–2 hari membangun komponen ini di Emergent, 1 hari
+data seed dari `grammar-curriculum-v1.json`/`reading-bank.json` untuk demo yang
+konsisten dengan sisi FIEZEL, 1 hari naskah dan gambar, 1 hari rekam demo (kini
+tiga babak: dashboard guru → laporan orang tua ter-generate → sisi murid), submit
+di hari ke-7. Sisa waktu untuk upvote.
 
 ---
 
@@ -286,7 +330,10 @@ tertinggal satu gelombang konten; dikoreksi pada commit ini.
 
 ## 9. Urutan kerja
 
-1. **Owner:** jalankan Gerbang 0 (§1). Lima menit.
-2. Kalau produk yang ada boleh disubmit → tempel §3, rekam §4, submit, jalankan §5.
-3. Kalau wajib Emergent → jalankan §7 dengan naskah §3 yang sama.
-4. Submit paling lambat **8 September**, bukan 10 — sisakan ruang untuk upvote.
+1. **Owner:** bangun komponen Laporan Orang Tua di app.emergent.sh mengikuti §7.
+   Ini satu-satunya bagian yang harus dikerjakan langsung di platform mereka.
+2. Rekam demo tiga babak (§4) yang menyambungkan FIEZEL asli dengan komponen
+   Emergent tadi.
+3. Tempel naskah §3, tambahkan poin §7.4, submit.
+4. Jalankan §5 (rencana upvote).
+5. Submit paling lambat **8 September**, bukan 10 — sisakan ruang untuk upvote.
