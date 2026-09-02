@@ -318,8 +318,13 @@
   function capabilities(){
     const Recognition=global.SpeechRecognition||global.webkitSpeechRecognition;
     return Object.freeze({
-      // m025-28: audio capability means the neural runtime is usable. Browser
-      // SpeechSynthesis presence is irrelevant: it is never used for listening.
+      // m025-28: kemampuan audio berarti PINTU BICARA BERSAMA bisa dipakai, bukan
+      // "perangkat ini punya mesin suara". Yang diperiksa memang FiezelVoiceSay.say,
+      // karena hanya dia yang tahu lapisan mana yang sanggup berbunyi hari ini.
+      // m025-232: dulu di sini ada catatan bahwa keberadaan suara peramban tidak
+      // relevan; sekarang lapisan itu sudah dihapus dari aplikasi, jadi tidak ada
+      // lagi kemampuan kedua yang bisa keliru dihitung — di bawah pintu ini tinggal
+      // R2/ElevenLabs, Cloudflare, Puter, neural di perangkat, lalu teks senyap.
       tts:!!(global.FiezelVoiceSay&&typeof global.FiezelVoiceSay.say==='function'),
       neuralVoice:global.FiezelPuterVoice?.status?.().ready===true,
       speechRecognition:typeof Recognition==='function',
@@ -470,13 +475,24 @@
 
   class TTSService{
     constructor(config){this.config=config}
-    stop(){try{global.FiezelVoiceSay?.stop?.()}catch{}try{global.speechSynthesis?.cancel()}catch{}}
-    // m025-28: listening used to call SpeechSynthesisUtterance directly, so it never
-    // touched the neural engine at all -- every listening item was browser TTS by
-    // construction. That is also why longer scripts failed: B2 scripts run ~155 chars
-    // against A1's ~40, and iOS SpeechSynthesis routinely stalls on the longer ones,
-    // tripping the internal timeout and locking the item. Route listening through the
-    // same neural runtime as the rest of the app, and never substitute browser TTS.
+    // m025-232: baris ini dulu memanggil `speechSynthesis.cancel()` sesudah stop()
+    // pintu bicara, karena pernah ada lapisan suara peramban dengan antrean sendiri
+    // DI LUAR pintu itu — satu-satunya bunyi yang tidak bisa dihentikan FiezelVoiceSay.
+    // Lapisan itu dihapus, jadi pembatal keduanya ikut dibuang: menyisakannya berarti
+    // memelihara kepercayaan bahwa masih ada jalur bunyi kedua yang perlu diredam.
+    // Satu pintu untuk berbunyi = satu pintu untuk berhenti.
+    stop(){try{global.FiezelVoiceSay?.stop?.()}catch{}}
+    // m025-28: listening dulu memanggil mesin suara peramban langsung, jadi ia tidak
+    // pernah menyentuh runtime neural sama sekali - setiap item listening dibacakan
+    // suara peramban karena bentuk kodenya memang begitu. Itu pula sebab naskah
+    // panjang gagal: naskah B2 ~155 karakter melawan A1 ~40, dan jalur peramban di
+    // iOS rutin macet pada yang panjang, memicu timeout internal lalu MENGUNCI item.
+    // PELAJARANNYA tetap berlaku dan justru makin keras: listening wajib lewat pintu
+    // bicara bersama, tidak pernah lewat jalur bunyi sendiri.
+    // m025-232: jalur peramban itu sendiri sudah dihapus dari seluruh aplikasi, jadi
+    // "jangan diganti TTS peramban" bukan lagi godaan yang tersedia - kalau pintu
+    // bersama diam, yang benar adalah diam plus teks yang tetap terbaca, bukan
+    // mencari sumber bunyi lain di belakang pintu.
     // m025-100: jalur ini ikut pintu bicara bersama. Sebelumnya ia memanggil mesin
     // lokal langsung dan MENOLAK berbunyi bila modelnya belum diunduh - pemeriksaan
     // yang benar ketika suara memang harus diunduh, dan penghalang murni sesudah
