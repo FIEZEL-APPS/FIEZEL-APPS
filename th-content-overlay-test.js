@@ -28,18 +28,49 @@ const check = (name, ok, details) => {
 };
 
 const src = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
+/* Dipotong tepat di kurung tutup fungsinya, BUKAN di "function" berikutnya: di antara
+   dua fungsi ada deklarasi tingkat-atas (mis. let CLOZE_BANK_BASE=null) yang kalau ikut
+   terbawa akan me-null-kan bank fixture sebelum overlay sempat menyentuhnya - dan tesnya
+   lalu merah karena alasan yang salah. */
 function ambilFungsi(nama) {
   const i = src.indexOf('function ' + nama + '(');
   if (i < 0) return '';
-  const j = src.indexOf('\nfunction ', i + 10);
-  return src.slice(i, j < 0 ? undefined : j);
+  const akhir = src.indexOf('\n}', i);
+  return akhir < 0 ? src.slice(i) : src.slice(i, akhir + 2);
 }
 
-const kode = [ambilFungsi('grammarItemForTh'), ambilFungsi('vocabForLocale'), ambilFungsi('applyContentLocale')].join('\n');
+const kode = [ambilFungsi('grammarItemForTh'), ambilFungsi('vocabForLocale'), ambilFungsi('applyContentLocale'), ambilFungsi('applyClozeLocale')].join('\n');
 check('applyContentLocale bisa diekstrak dari app.js', kode.includes('function applyContentLocale('), kode.length + ' karakter');
 
 const writingSrc = JSON.parse(fs.readFileSync(path.join(root, 'writing-prompts-v1.json'), 'utf8'));
 const readingSrc = JSON.parse(fs.readFileSync(path.join(root, 'reading-exam-v1.json'), 'utf8'));
+
+/* Lima permukaan sisanya tidak punya berkas sumber terpisah yang enak dipakai sebagai
+   fixture, jadi sumbernya dibuat minimal DI SINI - bentuknya mengikuti kontrak yang
+   dibaca applyContentLocale, dan itulah yang sedang diuji. Nilai sumber sengaja diberi
+   awalan ID- supaya kalau overlay tidak jalan, yang tertangkap adalah nilai ID- itu. */
+const grammarTemplateId = 'tpl-uji-th';
+const grammarOptA = 'goes';
+const grammarOptB = 'go';
+// Item grammar adalah LARIK berindeks: [0]=stem [1]=options [2]=answerIndex [4]=alasan
+// per-pilihan [8]=id template [12]=meta penjelasan [16]=meta belajar [17]=distraktor.
+function itemGrammarSumber() {
+  const it = [];
+  it[0] = 'She ___ to school.';
+  it[1] = [grammarOptA, grammarOptB];
+  it[2] = 0;
+  it[4] = ['ID-BENAR', 'ID-SALAH'];
+  it[8] = grammarTemplateId;
+  it[12] = { ruleId: 'ID-ATURAN' };
+  it[16] = { objectiveId: 'ID-TUJUAN', misconceptionId: 'ID-MISKONSEPSI', reasoningId: 'ID-NALAR' };
+  it[17] = [{ option: grammarOptB, whyFails: 'ID-KENAPA-GAGAL' }];
+  return it;
+}
+const vocabId = 'v-uji-th';
+const bacaanId = 'r-uji-th';
+const clozeId = 'c-uji-th';
+const clozeDistraktor = 'ID-PILIHAN-SALAH';
+const misconKey = 'subject verb agreement slip';
 
 const promptId = (writingSrc.prompts || [])[0]?.id;
 const examTaskKey = Object.keys(writingSrc.examTasks || {})[0];
@@ -51,19 +82,33 @@ function buatSandbox(localeTh) {
   const sandbox = {
     console,
     JSON, Object, Array, String, Number, Boolean, Math,
-    CONTENT_BASE: { items: [], g: {}, v: [], r: [] },
+    CONTENT_BASE: {
+      items: [{ skill: 'grammar', item: itemGrammarSumber() }],
+      g: {},
+      v: [{ id: vocabId, meaning: 'ID-ARTI', example: 'She goes to school.' }],
+      r: [{ id: bacaanId, qs: [['ID-STEM', ['ID-OPSI-1', 'ID-OPSI-2'], 0, {}]] }],
+    },
     GRAMMAR_ITEMS: [], G: {}, V: [], R: [],
     placementListeningBank: null,
-    CLOZE_BANK_BASE: null,
+    CLOZE_BANK_BASE: [{ id: clozeId, explain: { why: 'ID-KENAPA' }, distractors: [{ text: clozeDistraktor, reason: 'ID-ALASAN' }] }],
+    CLOZE_BANK: null,
     GRAMMAR_MISCONCEPTION_ID: null,
-    GRAMMAR_MISCONCEPTION_BASE: null,
-    applyClozeLocale() {},
+    GRAMMAR_MISCONCEPTION_BASE: { [misconKey]: 'ID-DIAGNOSIS' },
     __fzSyncShellElements() {},
     WRITING_BANK: JSON.parse(JSON.stringify(writingSrc)),
     READING_EXAM: JSON.parse(JSON.stringify(readingSrc)),
     self: {
       FiezelI18n: { getLocale: () => (localeTh ? 'th' : 'id') },
       FiezelThData: {
+        grammar: { templates: { [grammarTemplateId]: {
+          rule: 'TH-ATURAN', whyCorrect: 'TH-BENAR', whyOthersFail: 'TH-SALAH',
+          objective: 'TH-TUJUAN', misconception: 'TH-MISKONSEPSI', reasoning: 'TH-NALAR',
+          distractors: { [grammarOptB]: { whyFails: 'TH-KENAPA-GAGAL' } },
+        } } },
+        vocab: { entries: { [vocabId]: { meaning: 'TH-ARTI', example: 'TH-CONTOH' } } },
+        readingBank: { [bacaanId]: { qs: [{ stem: 'TH-STEM', options: ['TH-OPSI-1', 'TH-OPSI-2'] }] } },
+        cloze: { [clozeId]: { explain: { why: 'TH-KENAPA' }, distractors: { [clozeDistraktor]: { reason: 'TH-ALASAN' } } } },
+        misconception: { diagnoses: { [misconKey]: 'TH-DIAGNOSIS' } },
         writing: {
           prompts: { [promptId]: { hint: 'TH-HINT', focus: 'TH-FOCUS' } },
           examTasks: { [examTaskKey]: { note: 'TH-EXAM-NOTE' } },
@@ -121,6 +166,61 @@ if (th) {
     !!q && q.explain && q.explain.evidence === qSrc.explain.evidence, '-');
 }
 
+if (th) {
+  /* --- lima permukaan yang overlay-nya SUDAH ada tapi belum pernah diuji pengirimannya.
+     Kelas bug ini tiga kali lolos justru pada permukaan yang kodenya 'sudah ada'. --- */
+
+  const gi = (th.GRAMMAR_ITEMS || [])[0] && th.GRAMMAR_ITEMS[0].item;
+  check('grammar: aturan dan alasan jawaban memakai teks Thai',
+    !!gi && gi[12] && gi[12].ruleId === 'TH-ATURAN' && gi[4] && gi[4][0] === 'TH-BENAR',
+    gi ? JSON.stringify([gi[12] && gi[12].ruleId, gi[4] && gi[4][0]]).slice(0, 70) : 'item tidak ada');
+  check('grammar: alasan tiap pengecoh memakai teks Thai',
+    !!gi && Array.isArray(gi[17]) && gi[17][0] && gi[17][0].whyFails === 'TH-KENAPA-GAGAL',
+    gi ? JSON.stringify(gi[17]).slice(0, 70) : '-');
+  check('grammar: meta belajar (tujuan/miskonsepsi/nalar) memakai teks Thai',
+    !!gi && gi[16] && gi[16].objectiveId === 'TH-TUJUAN' && gi[16].misconceptionId === 'TH-MISKONSEPSI'
+      && gi[16].reasoningId === 'TH-NALAR', gi ? JSON.stringify(gi[16]).slice(0, 70) : '-');
+  check('grammar: kalimat soal dan pilihan Inggris TIDAK disentuh',
+    !!gi && gi[0] === 'She ___ to school.' && JSON.stringify(gi[1]) === JSON.stringify([grammarOptA, grammarOptB])
+      && gi[2] === 0, gi ? JSON.stringify([gi[0], gi[1], gi[2]]).slice(0, 70) : '-');
+
+  const vv = (th.V || [])[0];
+  check('vocab: arti kata memakai teks Thai',
+    !!vv && vv.meaning === 'TH-ARTI', vv ? JSON.stringify(vv.meaning) : 'entri tidak ada');
+  check('vocab: terjemahan kalimat contoh mendarat di exampleTranslation',
+    !!vv && vv.exampleTranslation === 'TH-CONTOH', vv ? JSON.stringify(vv.exampleTranslation) : '-');
+  check('vocab: kalimat contoh Inggris TIDAK disentuh',
+    !!vv && vv.example === 'She goes to school.', vv ? JSON.stringify(vv.example) : '-');
+
+  const rq = (th.R || [])[0] && th.R[0].qs && th.R[0].qs[0];
+  check('reading A1/A2: pertanyaan memakai teks Thai',
+    !!rq && rq[0] === 'TH-STEM', rq ? JSON.stringify(rq[0]) : 'bacaan tidak ada');
+  check('reading A1/A2: pilihan jawaban memakai teks Thai',
+    !!rq && JSON.stringify(rq[1]) === JSON.stringify(['TH-OPSI-1', 'TH-OPSI-2']), rq ? JSON.stringify(rq[1]) : '-');
+  /* Indeks jawaban benar HARUS ikut posisi sumber. Overlay yang menggeser satu pilihan
+     menilai murid SALAH atas jawaban yang BENAR, dan tidak ada yang melihatnya. */
+  check('reading A1/A2: indeks kunci jawaban tetap dari sumber',
+    !!rq && rq[2] === 0, rq ? String(rq[2]) : '-');
+
+  const cz = (th.CLOZE_BANK || [])[0];
+  check('cloze: penjelasan memakai teks Thai',
+    !!cz && cz.explain && cz.explain.why === 'TH-KENAPA', cz ? JSON.stringify(cz.explain) : 'butir tidak ada');
+  /* Kunci distraktor = TEKS PILIHAN persis, karena urutan pilihan diacak saat disajikan.
+     Meleset satu byte = murid melihat kalimat umum, bukan koreksi atas kekeliruannya. */
+  check('cloze: umpan balik per-pengecoh dijodohkan lewat teks pilihan dan memakai Thai',
+    !!cz && Array.isArray(cz.distractors) && cz.distractors[0] && cz.distractors[0].reason === 'TH-ALASAN',
+    cz ? JSON.stringify(cz.distractors).slice(0, 70) : '-');
+
+  const mis = th.GRAMMAR_MISCONCEPTION_ID || {};
+  check('misconception: isi diagnosis memakai teks Thai',
+    mis[misconKey] === 'TH-DIAGNOSIS', JSON.stringify(mis[misconKey]));
+  /* Kunci diagnosis adalah nama miskonsepsi berbahasa INGGRIS yang dipakai bank untuk
+     menjodohkan. Menerjemahkan KUNCInya memutus penjodohan: diagnosisnya jadi tidak
+     pernah ketemu, dan murid kehilangan koreksinya sama sekali. */
+  check('misconception: kunci penjodohan Inggris TIDAK ikut diterjemahkan',
+    Object.keys(mis).length === 1 && Object.keys(mis)[0] === misconKey, Object.keys(mis).join(', '));
+}
+
 // Arah sebaliknya, dan ini yang menjaga murid Indonesia: locale id TIDAK BOLEH kebocoran Thai.
 let id;
 try { id = buatSandbox(false); } catch (e) {
@@ -136,6 +236,21 @@ if (id) {
   const q = ps && (ps.questions || []).find((x) => x && x.id === questionId);
   check('locale id: penjelasan reading-exam tetap teks sumber',
     !!q && q.explain && q.explain.why === readingSrc.passages[0].questions[0].explain.why, '-');
+
+  const gi = (id.GRAMMAR_ITEMS || [])[0] && id.GRAMMAR_ITEMS[0].item;
+  check('locale id: aturan grammar tetap teks sumber',
+    !!gi && gi[12] && gi[12].ruleId === 'ID-ATURAN', gi ? JSON.stringify(gi[12]) : '-');
+  const vv = (id.V || [])[0];
+  check('locale id: arti kosakata tetap teks sumber',
+    !!vv && vv.meaning === 'ID-ARTI' && vv.exampleTranslation === undefined, vv ? JSON.stringify(vv.meaning) : '-');
+  const rq = (id.R || [])[0] && id.R[0].qs && id.R[0].qs[0];
+  check('locale id: pertanyaan reading tetap teks sumber',
+    !!rq && rq[0] === 'ID-STEM', rq ? JSON.stringify(rq[0]) : '-');
+  const cz = (id.CLOZE_BANK || [])[0];
+  check('locale id: penjelasan cloze tetap teks sumber',
+    !!cz && cz.explain && cz.explain.why === 'ID-KENAPA', cz ? JSON.stringify(cz.explain) : '-');
+  check('locale id: diagnosis miskonsepsi tetap teks sumber',
+    (id.GRAMMAR_MISCONCEPTION_ID || {})[misconKey] === 'ID-DIAGNOSIS', '-');
 }
 
 // Sidecar belum terunduh (offline parsial) tidak boleh melempar: aturan fail-soft yang sama
@@ -143,10 +258,16 @@ if (id) {
 try {
   const kosong = {
     console, JSON, Object, Array, String, Number, Boolean, Math,
-    CONTENT_BASE: { items: [], g: {}, v: [], r: [] },
+    CONTENT_BASE: {
+      items: [{ skill: 'grammar', item: itemGrammarSumber() }],
+      g: {},
+      v: [{ id: vocabId, meaning: 'ID-ARTI', example: 'She goes to school.' }],
+      r: [{ id: bacaanId, qs: [['ID-STEM', ['ID-OPSI-1', 'ID-OPSI-2'], 0, {}]] }],
+    },
     GRAMMAR_ITEMS: [], G: {}, V: [], R: [],
-    placementListeningBank: null, CLOZE_BANK_BASE: null, GRAMMAR_MISCONCEPTION_ID: null, GRAMMAR_MISCONCEPTION_BASE: null,
-    applyClozeLocale() {},
+    placementListeningBank: null, CLOZE_BANK: null,
+    CLOZE_BANK_BASE: [{ id: clozeId, explain: { why: 'ID-KENAPA' }, distractors: [{ text: clozeDistraktor, reason: 'ID-ALASAN' }] }],
+    GRAMMAR_MISCONCEPTION_ID: null, GRAMMAR_MISCONCEPTION_BASE: { [misconKey]: 'ID-DIAGNOSIS' },
     __fzSyncShellElements() {},
     WRITING_BANK: JSON.parse(JSON.stringify(writingSrc)),
     READING_EXAM: JSON.parse(JSON.stringify(readingSrc)),

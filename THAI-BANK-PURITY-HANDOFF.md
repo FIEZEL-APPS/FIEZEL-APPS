@@ -51,8 +51,8 @@ di level mana pun adalah bahasa Indonesia.
 
 ```
 node th-bank-purity-test.js      # 26/26 PASS
-node th-exam-overlay-test.js     # 13/13 PASS
-node th-content-overlay-test.js  # 15/15 PASS
+node th-exam-overlay-test.js     # 21/21 PASS
+node th-content-overlay-test.js  # 34/34 PASS
 node tools/scan-th-bank-leak.js  # 0 temuan
 ```
 
@@ -145,6 +145,14 @@ selesai, jawab dua pertanyaan yang TERPISAH:
 1. Isinya bersih? → `th-bank-purity-test.js` + `tools/scan-th-bank-leak.js`
 2. Isinya sampai ke layar? → tambahkan pemeriksa di `th-content-overlay-test.js`
    (bank di `app.js`) atau `th-exam-overlay-test.js` (bank di addon)
+
+**Status cakupan pertanyaan (2) per m025-235: SEBELAS dari sebelas permukaan.**
+`th-content-overlay-test.js` (34/34) menutup grammar, vocab, reading A1/A2, cloze,
+misconception, writing, dan reading-exam; `th-exam-overlay-test.js` (21/21) menutup
+listening harian, speaking harian, listening exam, dan speaking exam. Tiap permukaan
+diuji-mutasi: overlay dicabut satu per satu, dan tiap kali pemeriksa yang tepat merah.
+Sebelum ini hanya EMPAT permukaan yang terbukti, dan tiga kebocoran yang dilaporkan
+owner semuanya jatuh di permukaan yang belum terbukti itu.
 
 Gerbang yang hanya menjawab (1) akan hijau selamanya sambil murid membaca bahasa Indonesia.
 Itu sudah terjadi tiga kali; anggap ia mode kegagalan default, bukan kebetulan.
