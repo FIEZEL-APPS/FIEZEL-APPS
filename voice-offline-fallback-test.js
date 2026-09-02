@@ -93,12 +93,43 @@ test('cadangan menolak menyala bila asetnya belum lengkap', () => {
   }
 });
 
-test('unduhan menyala hanya setelah login terdeteksi', () => {
+/* m025-235: gerbang ini DIBALIK, bukan dihapus.
+ *
+ * Sampai m025-232 ia menuntut kebalikannya - `if(!puterSignedIn())return false;` wajib ada,
+ * karena saat itu OWNER menetapkan login Puter sebagai pemicu unduhan. Keputusan itu masuk
+ * akal selama TTS peramban masih menampung murid yang belum login. Lapisan itu dihapus, dan
+ * OWNER mencabut gerbangnya: mesin neural kini lapisan terakhir yang bersuara, jadi murid
+ * yang tidak pernah login Puter justru yang paling butuh unduhan ini.
+ *
+ * Yang dijaga sekarang adalah arah sebaliknya, dan itu yang berharga: gerbang login tidak
+ * boleh MERAYAP KEMBALI. Menghapus uji ini akan membuat penambahan `if(!puterSignedIn())`
+ * lolos tanpa seorang pun melihatnya. */
+test('unduhan menyala untuk SEMUA murid, tanpa menunggu login', () => {
   if (!/function armOfflineVoiceAutoload\(\)/.test(APP)) throw new Error('tidak ada penyala unduhan di app.js');
-  if (!/armOfflineVoiceAutoload\(\)\{\s*\n?\s*if\(!puterSignedIn\(\)\)return false;/.test(APP)) {
-    throw new Error('unduhan bisa menyala tanpa login; OWNER menetapkan login sebagai pemicunya');
+  const fn = /function armOfflineVoiceAutoload\(\)\{[\s\S]*?\n\}/.exec(APP);
+  if (!fn) throw new Error('badan armOfflineVoiceAutoload tidak terbaca');
+  if (/puterSignedIn\(\)/.test(fn[0])) {
+    throw new Error('gerbang login kembali: sejak m025-235 unduhan menyala untuk semua murid, bukan hanya yang login Puter');
   }
   if (!APP.includes('noteSignedIn')) throw new Error('penyala tidak pernah memberi tahu pengunduhnya');
+});
+
+/* Serah terima Background Fetch: satu-satunya cara unduhan lanjut setelah aplikasi ditutup.
+ * Hanya ada di Chromium - di iOS Safari cabang ini selalu gagal dan jalur potongan yang
+ * bekerja. Yang dijaga di sini: jalur potongan TIDAK ikut berjalan saat Background Fetch
+ * mengambil alih, karena dua pengunduh atas berkas yang sama membayar kuota murid dua kali. */
+test('Background Fetch mengambil alih, dan jalur potongan berhenti saat itu', () => {
+  const SRC = require('fs').readFileSync(require('path').join(__dirname, 'features/neural-voice/fiezel-voice-offline-autoload.js'), 'utf8');
+  if (!/handOffToBackgroundFetch/.test(SRC)) throw new Error('tidak ada serah terima Background Fetch');
+  if (!/if \(await handOffToBackgroundFetch\(rt, cache, items\)\) return;/.test(SRC)) {
+    throw new Error('jalur potongan tidak berhenti saat Background Fetch mengambil alih: kuota murid terbayar dua kali');
+  }
+  if (!/'fiezel-neural-voice::' \+ String\(rt\.cacheName/.test(SRC)) {
+    throw new Error('id registrasi tidak membawa nama cache; service worker tidak akan tahu ke mana hasilnya disimpan');
+  }
+  if (!/backgroundFetch\.get/.test(SRC)) {
+    throw new Error('pendaftaran yang masih hidup tidak diperiksa; mendaftar ulang membatalkan kemajuan sesi sebelumnya');
+  }
 });
 
 test('"Ganti akun" keluar dulu, baru masuk', () => {

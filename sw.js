@@ -414,3 +414,106 @@ self.addEventListener('push',event=>{
   const options={body:String(payload.body||'').slice(0,280),tag:String(payload.tag||'fiezel-remote').slice(0,64),renotify:false,icon:'./apple-touch-icon.png',badge:'./favicon-64.png',data:{url:payload.url||'./'}};
   event.waitUntil(self.registration.showNotification(String(payload.title||'FIEZEL').slice(0,80),options));
 });
+
+/* ===== m025-235: UNDUHAN SUARA NEURAL YANG TIDAK IKUT MATI SAAT APLIKASI DITUTUP =====
+   OWNER meminta suara neural terunduh di latar dan TETAP LANJUT walau murid menutup FIEZEL.
+   Satu-satunya API web yang benar-benar bisa itu adalah Background Fetch: peramban sendiri
+   yang memegang unduhannya, jadi ia berjalan tanpa satu pun dokumen hidup. Pengunduh potongan
+   20 MB di features/neural-voice/fiezel-voice-offline-autoload.js tidak bisa - ia kode
+   halaman, jadi ia berhenti begitu halaman ditutup dan baru melanjutkan dari potongan
+   terakhir pada sesi berikutnya.
+
+   Background Fetch HANYA ada di Chromium (Android + Chrome/Edge desktop). WebKit/iOS tidak
+   memilikinya, dan murid FIEZEL banyak memakai iPhone, jadi jalur potongan 20 MB TIDAK
+   digantikan apa pun di sini - di sana ia tetap satu-satunya jalur. Blok ini murni tambahan
+   untuk mesin yang punya API-nya, dan seluruh pendaftarannya berpagar deteksi kemampuan
+   supaya Safari tidak pernah menyentuh satu baris pun.
+
+   TIDAK ADA SATU BARIS fetch/install/activate YANG BERUBAH karenanya. Blok ini hanya menulis
+   ke cache runtime neural, dan hanya pada satu kejadian: unduhan latar yang SELESAI UTUH.
+
+   KENAPA NAMA CACHE DIBACA DARI id PENDAFTARAN. Ketika 'backgroundfetchsuccess' tiba,
+   aplikasinya boleh jadi sudah lama ditutup: tidak ada halaman yang bisa ditanyai, dan modul
+   yang memiliki nama cache itu (fiezel-neural-voice-bootstrap.js) adalah kode halaman yang
+   tidak bisa - dan tidak boleh - diimpor ke worker. Karena itu halaman menitipkan tujuannya
+   pada id pendaftaran, dengan bentuk yang disepakati:
+
+       fiezel-neural-voice::<namaCacheRuntimeNeural>
+
+   MENEBAK nama cache adalah satu-satunya alternatif, dan ia lebih buruk daripada tidak
+   melakukan apa-apa: tebakan yang meleset menaruh ratusan MB bita model di cache yang salah -
+   kuota murid habis DAN lapisan neural tetap melihat cache-nya kosong. Jadi id yang tidak
+   sesuai bentuk diabaikan dengan tenang, tanpa menulis apa pun.
+
+   Bentuk nama yang diterima sengaja satu pola saja: cache runtime neural (fiezel-v...,
+   dirakit lapisan neural dari version.js - cache yang sama dengan CACHE di kepala berkas
+   ini). Dipakai POLA, bukan perbandingan langsung dengan CACHE, karena unduhan latar bisa
+   dimulai di generasi version.js sebelumnya dan bita itu tetap milik lapisan neural (activate
+   di atas juga sudah mempertahankan cache basi yang menyimpan bita model). Yang dijaga keras
+   oleh pola ini: cangkang (fiezel-shell-...) dan cache locale (fiezel-locale-th-...) tidak
+   mungkin cocok, jadi tidak ada id yang bisa membujuk jalur ini menulis ke sana. */
+const BGF_NEURAL_PREFIX='fiezel-neural-voice::';
+const namaCacheNeuralDariId=id=>{
+  const teks=String(id||'');
+  if(!teks.startsWith(BGF_NEURAL_PREFIX))return '';
+  const nama=teks.slice(BGF_NEURAL_PREFIX.length);
+  return /^fiezel-v[0-9][A-Za-z0-9._-]*$/.test(nama)?nama:'';
+};
+/* SEMUA respons dikumpulkan dulu, baru ditulis. Kalau ada satu saja rekaman yang responsnya
+   tidak bisa dibaca atau tidak 'ok', TIDAK ADA yang ditulis sama sekali - alasannya sama
+   dengan cabang gagal/batal di bawah: lapisan neural membaca kehadiran entri cache sebagai
+   "aset ini sudah siap", jadi salinan separuh berbohong kepadanya. Mengumpulkan responsReady
+   lebih dulu tidak menahan bita di memori: yang siap di situ kepalanya, badannya tetap
+   mengalir ke cache saat put(). */
+async function salinUnduhanLatarKeCacheNeural(pendaftaran,namaCache){
+  const rekaman=await pendaftaran.matchAll();
+  if(!rekaman.length)return;
+  const siap=await Promise.all(rekaman.map(async r=>({request:r.request,response:await r.responseReady})));
+  if(siap.some(x=>!x.response||!x.response.ok))return;
+  const cache=await caches.open(namaCache);
+  for(const {request,response} of siap)await cache.put(request,response);
+}
+/* Deteksi kemampuan, bukan asumsi. self.registration bisa tidak ada sama sekali di harness
+   uji yang menjalankan berkas ini di sandbox, dan di WebKit BackgroundFetchManager memang
+   tidak pernah ada - keduanya harus berakhir sama: pendengar tidak didaftarkan, dan tidak ada
+   yang dilempar saat worker dievaluasi. */
+const adaBackgroundFetch=(()=>{
+  try{
+    if(typeof self.BackgroundFetchManager!=='undefined')return true;
+    return !!(self.registration&&'backgroundFetch' in self.registration);
+  }catch{return false}
+})();
+if(adaBackgroundFetch){
+  try{
+    self.addEventListener('backgroundfetchsuccess',event=>{
+      const namaCache=namaCacheNeuralDariId(event.registration?.id);
+      if(!namaCache)return;
+      event.waitUntil(salinUnduhanLatarKeCacheNeural(event.registration,namaCache).catch(()=>{}));
+    });
+    /* Gagal dan batal SENGAJA tidak menulis apa pun - itu seluruh isi kedua pendengar ini,
+       dan mereka ada supaya keputusannya terbaca di tempat orang berikutnya akan mencarinya.
+       Unduhan separuh lebih berbahaya daripada tidak ada unduhan: entri cache yang ada dibaca
+       lapisan neural sebagai aset siap pakai, dan kebohongan itu baru ketahuan jauh kemudian,
+       persis ketika murid menekan tombol bicara. Rekaman unduhan yang gagal dibuang peramban
+       sendiri, dan tidak ada satu bita pun yang pernah masuk cache dari jalur ini, jadi tidak
+       ada juga yang perlu dibersihkan.
+
+       Tidak ada pencatatan di sini karena sw.js memang tidak punya kanal log: seluruh
+       diagnostik suara hidup di localStorage halaman (FiezelVoiceDiagnostics), yang tidak bisa
+       disentuh worker, dan kejadian ini justru tiba ketika halamannya tidak ada. Diam di sini
+       jujur - ia bukan galat yang ditelan, karena tidak ada keadaan apa pun yang berubah. */
+    self.addEventListener('backgroundfetchfail',()=>{});
+    self.addEventListener('backgroundfetchabort',()=>{});
+    /* Chromium menampilkan notifikasi kemajuan bawaan sistem untuk setiap unduhan latar, dan
+       notifikasi itu bisa ditekan. Tanpa pendengar ini, tekanan murid tidak menghasilkan apa
+       pun - aplikasi yang punya ikon di layar kunci tetapi tidak bisa dibuka dari situ terasa
+       rusak. Bentuknya mengikuti notificationclick di atas: jendela yang sudah ada difokuskan
+       lebih dulu, jendela baru hanya kalau memang tidak ada satu pun. */
+    self.addEventListener('backgroundfetchclick',event=>{
+      event.waitUntil(clients.matchAll({type:'window',includeUncontrolled:true}).then(list=>{
+        for(const client of list)if('focus' in client)return client.focus();
+        return clients.openWindow?clients.openWindow('./'):undefined;
+      }).catch(()=>{}));
+    });
+  }catch(_){}
+}

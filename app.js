@@ -5487,7 +5487,7 @@ function armPuterAuthGate(){
   return false
 }
 /**
- * m025-121: menyalakan unduhan suara cadangan begitu murid terlihat sudah login.
+ * m025-121: menyalakan unduhan suara neural di latar belakang.
  *
  * Tidak ada apa pun yang muncul di layar - itu memang permintaannya. Dua hal yang
  * membuatnya tidak boleh dipanggil sembarangan dari tempat lain:
@@ -5498,9 +5498,21 @@ function armPuterAuthGate(){
  *   - Ia menyalakan jam hanya SEKALI; panggilan berikutnya melanjutkan, bukan mengulang.
  *     Jadi memanggilnya di setiap boot justru yang diinginkan: sesi berikutnya meneruskan
  *     dari potongan terakhir.
+ *
+ * m025-235 (keputusan OWNER): GERBANG LOGIN PUTER DICABUT. Dulu baris pertama fungsi ini
+ * adalah `if(!puterSignedIn())return false;` - suara neural baru mulai diunduh sesudah
+ * murid login Puter, karena saat itu perannya memang cuma cadangan untuk hari jatah Puter
+ * habis. Sejak L4 (TTS peramban) dihapus di m025-232, perannya berubah total: mesin neural
+ * kini lapisan TERAKHIR yang bersuara. Murid yang tidak pernah login Puter dulu masih
+ * ditolong suara bawaan peramban; sekarang ia mendapat SENYAP. Menyalakan unduhan hanya
+ * bagi yang login berarti menjamin suara justru bagi yang paling kecil kemungkinannya
+ * membutuhkannya.
+ *
+ * Jadi unduhan kini menyala di boot PERTAMA, untuk semua murid, tanpa menunggu login dan
+ * tanpa bertanya. OWNER menerima ongkos datanya secara sadar (152 MB), dan itu memang
+ * ongkos yang nyata - lihat catatan kuota di kepala fiezel-voice-offline-autoload.js.
  */
 function armOfflineVoiceAutoload(){
-  if(!puterSignedIn())return false;
   const go=()=>{try{return(self.FiezelVoiceOfflineAutoload?.arm?.()??self.FiezelVoiceOfflineAutoload?.noteSignedIn?.())===true}catch{return false}};
   if(go())return true;
   ensureVoiceRuntime().then(go).catch(()=>{});
