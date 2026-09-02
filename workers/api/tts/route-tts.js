@@ -136,14 +136,21 @@
     invalid_input: 'Teks yang mau dibacakan belum lengkap.',
     key_mismatch: 'Aku belum paham kirimanmu. Muat ulang halaman lalu coba lagi, ya.',
     too_long: 'Kalimatnya kepanjangan untuk sekali dibacakan.',
-    quota_exceeded: 'Jatah suara hari ini sudah habis. Suara perangkatmu tetap bisa dipakai, dan jatahnya kembali sesudah tengah malam.',
+    quota_exceeded: 'Jatah suara hari ini sudah habis, jadi kalimat ini belum bisa dibunyikan. Teksnya tetap bisa kamu baca, dan jatahnya kembali sesudah tengah malam.',
     // A8 TEMUAN BOHONG (§4 reports/add-a8-a11y.md): sebelum commit ini, penghitung jatah
     // yang MATI dilaporkan ke murid sebagai "jatah suara hari ini sudah habis".
-    quota_unavailable: 'Aku belum bisa membaca sisa jatahmu, jadi jatahmu kemungkinan besar masih utuh. Suara perangkatmu tetap bisa dipakai — coba lagi sebentar lagi, ya.',
+    quota_unavailable: 'Aku belum bisa membaca sisa jatahmu, jadi jatahmu kemungkinan besar masih utuh. Suaranya belum bisa dibunyikan sekarang — teksnya tetap bisa kamu baca, dan kamu boleh coba lagi sebentar lagi, ya.',
     breaker_open: 'Suara dari perangkatmu dulu — layanan suara sedang istirahat sebentar. Ini bukan kesalahanmu.',
     unavailable: 'Suara dari perangkatmu dulu — audio belum tersedia untuk kalimat ini.',
-    // S2 - jatah neuron AKUN (bukan jatah murid) penuh: suara perangkat tetap jalan dan
-    // jatah murid TIDAK dipotong, jadi kalimatnya harus mengatakan dua hal itu.
+    // S2 - jatah neuron AKUN (bukan jatah murid) penuh. Yang WAJIB dikatakan kalimatnya:
+    // jatah murid TIDAK dipotong sedikit pun, karena tidak ada satu byte audio yang
+    // diproduksi. m025-231: dulu ia wajib mengatakan satu hal lagi - "suara perangkat
+    // tetap jalan". Lapisan speechSynthesis peramban sudah DIHAPUS dari aplikasi, jadi
+    // janji itu keluar dari kontrak naskah ini; di bawah L3 tidak ada apa pun yang
+    // berbunyi. Pembukaan "Suara dari perangkatmu dulu" yang masih berdiri di beberapa
+    // kalimat tetangga adalah sisa lapisan itu dan menunggu sapuan naskah tersendiri
+    // (tts_disabled bahkan dikunci tts-provider-contract-test S3-a5) - JANGAN disalin
+    // ke kalimat baru.
     account_budget: 'Suara dari perangkatmu dulu — pembuatan suara sedang penuh untuk hari ini, bukan karena jatahmu. Jatahmu nggak berkurang.',
     // S2 - pagar neuron akun BELUM TERPASANG (dep tidak disuntikkan / tanda terima tidak
     // sah). Salah pasang, bukan jatah penuh, dan bukan salah murid.
@@ -385,9 +392,15 @@
    *
    * 503, bukan 429: 429 adalah bahasa "jatah MURID", dan ini bukan jatah murid. Yang
    * tidak boleh berubah di cabang mana pun: `quotaCharged:false` - jatah suara murid
-   * tidak dipotong sedikit pun, karena tidak ada satu byte audio yang diproduksi. Murid
-   * tetap punya jalan keluar yang nyata: suara perangkat (`speechSynthesis`), yang sudah
-   * menjadi jalur cadangan sah di aplikasi ini.
+   * tidak dipotong sedikit pun, karena tidak ada satu byte audio yang diproduksi.
+   *
+   * m025-231: paragraf ini dulu ditutup dengan "murid tetap punya jalan keluar yang nyata:
+   * suara perangkat (`speechSynthesis`)". Jalan keluar itu SUDAH TIDAK ADA - lapisan
+   * peramban dihapus dari seluruh aplikasi dan di bawah L3 (neural di perangkat) tidak ada
+   * lagi apa pun yang berbunyi. Justru karena itu `quotaCharged:false` makin tidak boleh
+   * dilonggarkan: penolakan di sini sekarang berarti murid benar-benar tidak mendengar
+   * kalimatnya, jadi yang tersisa untuknya harus utuh - jatahnya penuh, teks dan
+   * subtitle-nya tetap terbaca, dan ia boleh mencoba lagi ketika layanan pulih.
    */
   function accountDenied(identity, objectName, chars, phase, reason, started, now, ledger) {
     var capReached = String(reason) === 'ai_account_cap';
