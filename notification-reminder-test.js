@@ -13,7 +13,15 @@ const root=__dirname,app=fs.readFileSync(path.join(root,'app.js'),'utf8');
 const expectedVersion=JSON.parse(fs.readFileSync(path.join(root,'VERSION.json'),'utf8')).version;
 const failures=[];const assert=(c,m)=>{if(!c)failures.push(m)};
 function classList(){const s=new Set();return{add(...xs){xs.forEach(x=>s.add(x))},remove(...xs){xs.forEach(x=>s.delete(x))},toggle(x,v){if(v===undefined?v:!s.has(x))s.add(x);else s.delete(x)},contains(x){return s.has(x)},values:s}}
-const elements={};function element(id){return elements[id]||=( {id,innerHTML:'',textContent:'',disabled:false,onclick:null,className:'',classList:classList(),setAttribute(){},addEventListener(){},focus(){}} )}
+/* `querySelector`/`querySelectorAll` ADA di elemen palsu ini sejak m025-236. Alasannya bukan
+   kelengkapan demi kelengkapan: sejak naskah gerbang notifikasi pindah ke copy-map,
+   setNotificationGateState() menyisir anak-anak panel (`.welcome-mark`,
+   `.notification-requirement span`) untuk menerjemahkannya. Elemen palsu tanpa dua metode itu
+   membuat harness meledak dengan `gate.querySelector is not a function` — kegagalan HARNESS
+   yang menyamar sebagai kegagalan produk, sebab di peramban `$('welcome')` adalah elemen
+   sungguhan yang punya keduanya. Kembalian `null`/`[]` sudah cukup: kode produksi menjaga
+   setiap hasilnya dengan `if(...)`, dan itu justru yang ikut terjaga di sini. */
+const elements={};function element(id){return elements[id]||=( {id,innerHTML:'',textContent:'',disabled:false,onclick:null,className:'',classList:classList(),setAttribute(){},addEventListener(){},focus(){},querySelector(){return null},querySelectorAll(){return[]}} )}
 const bodyClasses=classList();
 const document={baseURI:'http://localhost/',body:{classList:bodyClasses},visibilityState:'visible',getElementById:element,querySelector(){return null},querySelectorAll(){return[]},createElement(){return{className:'',textContent:'',disabled:false,onclick:null,classList:classList(),append(){},addEventListener(){}}},addEventListener(){}};
 const store={};const localStorage={getItem:k=>Object.prototype.hasOwnProperty.call(store,k)?store[k]:null,setItem:(k,v)=>store[k]=String(v),removeItem:k=>delete store[k]};
