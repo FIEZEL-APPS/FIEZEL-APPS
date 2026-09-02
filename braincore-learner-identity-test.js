@@ -711,8 +711,19 @@ async function babDashboard() {
   const src = read('workers/owner/index.js');
   check('(E) panel murid ditempel ke dashboard yang SUDAH ADA (renderDashboard)',
     /\$\{renderEvidenceSection\(m\)\}\s*\n\s*\$\{renderLearnerSection\(m\)\}/.test(src));
-  check('(E) NOL rute owner baru: OWNER_ROUTES tidak bertambah',
-    /const OWNER_ROUTES = \['\/', '\/api\/summary', '\/api\/series', '\/api\/retention', '\/api\/cost', '\/logout'\];/.test(src));
+  /* Versi pertama membekukan literal SATU BARIS `const OWNER_ROUTES = [...];`. Itu memerah
+   * bukan karena lane per-murid menambah rute, melainkan karena m025-229 (ekspor CSV owner)
+   * memperpanjang inventarisnya dan memecahnya ke beberapa baris — gerbang yang membekukan
+   * BENTUK, bukan klaimnya. Klaimnya cuma satu: lane per-murid tidak menambah SATU pun rute
+   * owner (pemilihan murid numpang `?learner=` pada `/`). Jadi yang diperiksa sekarang: enam
+   * rute dasar masih ada, dan TIDAK ADA satu pun entri rute yang menyebut learner. */
+  const ownerRoutesSrc = (src.match(/const OWNER_ROUTES = \[[\s\S]*?\];/) || [''])[0];
+  const ownerRoutes = (ownerRoutesSrc.match(/'[^']*'/g) || []).map((x) => x.slice(1, -1));
+  const rutaDasar = ['/', '/api/summary', '/api/series', '/api/retention', '/api/cost', '/logout'];
+  check('(E) NOL rute owner baru: tidak ada rute ber-learner di OWNER_ROUTES',
+    ownerRoutes.length > 0 &&
+    rutaDasar.every((r) => ownerRoutes.includes(r)) &&
+    !ownerRoutes.some((r) => /learner/i.test(r)), ownerRoutes.join(' '));
   check('(E) pemilihan murid lewat parameter kueri `?learner=` pada rute `/`',
     /url\.searchParams\.get\('learner'\)/.test(src));
   check('(E) Worker owner tetap membaca lewat subrequest, TANPA binding D1 kedua',

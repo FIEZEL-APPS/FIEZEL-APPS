@@ -193,7 +193,14 @@ menemukan tiga hal yang gerbang terpilih belum melihatnya:
    antrean dari sebelum reset akan mendarat di Owner Dashboard sesudahnya sebagai bukti
    murid yang sama. Keduanya sekarang dihapus, antrean lane D ikut di-`purge()` seperti
    lane C, dan keduanya masuk daftar kontrak gerbang supaya tidak bisa hilang lagi.
-3. **`coordination/BUILD-VERSION.json` tertinggal di m025-229** sementara tiga penanda
+3. **Gerbang OWNER_ROUTES membekukan BENTUK, bukan klaimnya.** `(E) NOL rute owner baru`
+   meng-assert literal satu baris `const OWNER_ROUTES = [...];`. Ia hijau lokal dan MERAH di
+   CI — bukan karena lane per-murid menambah rute, melainkan karena ekspor CSV owner
+   (m025-229, sudah di `main`) memperpanjang inventaris itu dan memecahnya ke beberapa baris.
+   Gerbangnya sekarang memeriksa klaimnya: enam rute dasar masih ada dan TIDAK ADA satu pun
+   entri rute yang menyebut `learner`. `main` ikut di-merge ke cabang ini supaya yang
+   dijalankan lokal sama dengan yang dijalankan CI (CI menguji hasil merge, bukan HEAD PR).
+4. **`coordination/BUILD-VERSION.json` tertinggal di m025-229** sementara tiga penanda
    build sudah m025-230 (`coordination-guard-test.js` merah). Sumber tunggal nomor build
    disamakan; tiga penanda tidak diutak-atik.
 
