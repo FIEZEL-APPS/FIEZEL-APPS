@@ -192,20 +192,31 @@ diperbarui bersama kodenya adalah kebohongan yang ditandatangani murid.
 alasan yang berbeda (rincian dan SQL penghapusan atas permintaan: `docs/D1-RETENTION.md`
 §2.8 dan §4).
 
-**Persetujuan.** Lane ini menulis HANYA bila ada baris aktif di
-`learner_evidence_consent` untuk `sub` itu, dengan `policy` = versi teks persetujuan yang
-sedang berlaku (`learner-evidence-consent-v1`). Tanpa itu: **403 `consent_required`, nol
-baris**. Memasang aplikasi bukan persetujuan; sakelarnya ada di Pengaturan
-(`preferences.learnerEvidenceConsent`, bawaan `false`, fail-closed di dua tempat).
-Menaikkan versi `policy` membuat persetujuan lama berhenti berlaku.
+**Persetujuan: DIHAPUS m025-236, atas keputusan OWNER.** Sampai m025-234 lane ini menulis
+hanya bila ada baris aktif di `learner_evidence_consent`, dan memasang aplikasi bukan
+persetujuan. Owner menghapus syarat itu dengan alasan yang dicatat apa adanya di sini:
+FIEZEL adalah aplikasi kelas, guru memberitahu muridnya sebelum mereka memasang, dan bukti
+belajar ini memang data guru. **Sejak m025-236, murid yang memasang FIEZEL langsung
+tersinkron** — termasuk murid yang sudah memasang lebih dulu, begitu shell m025-236 sampai
+ke perangkatnya. Tidak ada sakelar di Pengaturan, dan dokumen ini tidak berpura-pura ada.
+
+Yang **tidak** ikut dilonggarkan bersama sakelarnya, dan itu yang membuat lane ini tetap
+bisa dipertanggungjawabkan: yang meninggalkan perangkat tetap bucket berenum tertutup (bukan
+jawaban, bukan teks soal, bukan riwayat), identitas tetap diturunkan server dari cookie
+ber-HMAC (perangkat tidak pernah mengirim `sub`), tiga sakelar server tetap harus sepakat
+dan tetap fail-closed, retensi tetap 180 hari, dan penghapusan atas permintaan tetap ada
+(paragraf **Penghapusan** di bawah).
 
 **Retensi 180 hari** (`LEARNER_EVIDENCE_LIMITS.RETENTION_DAYS`), bukan 14 hari seperti lane
 agregat dan bukan tak terbatas. Perintah purge dan alasannya di
 [docs/D1-RETENTION.md](docs/D1-RETENTION.md) §2.7.
 
-**Penghapusan.** Mencabut persetujuan (`POST /api/braincore/learner-evidence/consent`
-dengan `{"granted":false}`) **menghapus** baris bukti murid itu seketika (`revokeConsent`),
-bukan menandainya, dan barisnya hilang dari direktori owner.
+**Penghapusan.** `POST /api/braincore/learner-evidence/consent` dengan `{"granted":false}`
+**menghapus** baris bukti murid itu seketika (`revokeConsent`), bukan menandainya, dan
+barisnya hilang dari direktori owner. Sesudah sakelar persetujuan dihapus, INI satu-satunya
+penghapusan atas permintaan yang tersisa selain menunggu purge 180 hari — karena itu rutenya
+dipertahankan, bukan ikut dibuang. Ia bersifat **sekali jalan**: tulisan berikutnya dari
+murid yang sama diterima lagi, sebab tidak ada lagi gerbang yang menahannya.
 
 **Siapa yang bisa membaca.** Hanya Owner Dashboard yang sudah ada, lewat dua rute
 owner-gated di Worker `fiezel-api` (`GET /api/owner/learners`,

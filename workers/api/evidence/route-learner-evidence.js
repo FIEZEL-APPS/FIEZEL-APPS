@@ -29,13 +29,19 @@
  * ada rute mana pun yang menerima `sub` dari pemanggil BUKAN-owner.
  *
  * ==========================================================================
- * PERSETUJUAN ADALAH SYARAT, BUKAN CATATAN KAKI
+ * PERSETUJUAN: DIHAPUS m025-235 ATAS KEPUTUSAN OWNER
  * ==========================================================================
- * Tanpa baris aktif di `learner_evidence_consent`, POST bukti dijawab 403
- * `consent_required` dan NOL baris ditulis. "Murid memasang aplikasinya"
- * bukan persetujuan untuk analitik tingkat-perorangan; itu keputusan terpisah
- * yang punya sakelarnya sendiri di Pengaturan, dan pencabutannya MENGHAPUS
- * bukti yang sudah terkumpul (revokeConsent di learner-evidence-store-d1.js).
+ * Sampai m025-234, POST bukti menuntut baris aktif di `learner_evidence_consent`
+ * dan menjawab 403 `consent_required` tanpanya. Owner menghapus syarat itu:
+ * FIEZEL adalah aplikasi kelas, guru memberitahu muridnya sebelum mereka
+ * memasang, dan bukti belajar ini memang data guru. Murid yang memasang
+ * aplikasinya langsung tersinkron — termasuk yang sudah memasang lebih dulu,
+ * begitu shell m025-235 sampai ke perangkatnya.
+ *
+ * TABELNYA TETAP ADA, dengan tugas yang lebih sempit: POST .../consent
+ * {granted:false} MENGHAPUS bukti murid itu (revokeConsent). Sesudah sakelarnya
+ * hilang, itu satu-satunya penghapusan atas permintaan yang tersisa selain
+ * menunggu purge 180 hari — jadi ia dipertahankan, bukan ikut dibuang.
  *
  * PEMASANGAN: keempat rute lewat `route-slots.js` (array ROUTES). Lane ini
  * TIDAK lewat `route-wiring.js`: ia tidak memanggil provider berbayar, tidak
@@ -64,7 +70,6 @@ import {
 } from './learner-evidence-core.js';
 import {
   ensureLearnerEvidenceSchema,
-  readConsent,
   grantConsent,
   revokeConsent,
   writeLearnerEvidence,
@@ -126,10 +131,14 @@ export function checkSubRateLimit(sub, now = Date.now()) {
 /**
  * Urutan penolakan selaras `socialGate` (route-social.js):
  *   identitas (401) -> flag fitur (403, fail-closed) -> DB (503) -> skema.
- * `requireConsent` dipisah karena rute persetujuan sendiri jelas tidak boleh
- * menuntut persetujuan yang belum ada.
+ * m025-235: gerbang PERSETUJUAN dihapus atas keputusan OWNER. FIEZEL adalah aplikasi kelas —
+ * guru memberitahu muridnya sebelum mereka memasang, dan bukti belajar ini memang data guru.
+ * Yang TIDAK ikut dilonggarkan: identitas tetap dari cookie ber-HMAC (bukan dari body), tiga
+ * sakelar server tetap harus sepakat dan tetap fail-closed, retensi tetap 180 hari, dan
+ * `learner_evidence_consent` tetap ada sebagai jalur HAPUS (POST .../consent {granted:false}
+ * menghapus bukti murid itu) — satu-satunya penghapusan atas permintaan yang tersisa.
  */
-async function learnerGate(ctx, options = {}) {
+async function learnerGate(ctx) {
   const opt = corsOpt(ctx);
   if (!ctx.identity || !ctx.identity.verified || !ctx.identity.sub) {
     return { deny: unauthenticated(opt) };
@@ -148,21 +157,13 @@ async function learnerGate(ctx, options = {}) {
   } catch {
     return { deny: jsonError(503, ERR.UNAVAILABLE, {}, opt) };
   }
-  if (options.requireConsent) {
-    let consent = { granted: false, policy: null };
-    try { consent = await readConsent(db, sub); } catch { consent = { granted: false, policy: null }; }
-    // Persetujuan versi LAMA bukan persetujuan untuk maksud versi baru.
-    if (!consent.granted || consent.policy !== LEARNER_EVIDENCE_CONSENT_POLICY) {
-      return { deny: jsonError(403, ERR.CONSENT_REQUIRED, {}, opt) };
-    }
-  }
   return { db, sub, day: studyDayWib(ctx.now), opt };
 }
 
 /* ================================================================ TULIS ==== */
 
 export async function routeLearnerEvidence(ctx) {
-  const gate = await learnerGate(ctx, { requireConsent: true });
+  const gate = await learnerGate(ctx);
   if (gate.deny) return gate.deny;
   if (!checkSubRateLimit(gate.sub, ctx.now)) {
     return jsonError(429, ERR.RATE_LIMITED, {}, gate.opt);
