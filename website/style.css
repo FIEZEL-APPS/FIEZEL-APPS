@@ -515,14 +515,16 @@ ul,ol{margin:0;padding:0;list-style:none}
   75% { transform: rotate(2.5deg) translateY(-2px); }
 }
 
-/* Tail Joint Wag (Anchored securely to base, only joint wags naturally) */
-.hula-paw.hula-playing .fz-tail-tip {
-  animation: hula-tail-wag 2.4s ease-in-out infinite;
-  transform-origin: 296px 200px;
+/* Continuous Tail Gentle Natural Sway */
+.hula-paw.hula-playing .fz-tail {
+  animation: hula-tail-sway 2.4s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  transform-origin: 212px 244px;
 }
-@keyframes hula-tail-wag {
-  0%, 100% { transform: rotate(4deg); }
-  50% { transform: rotate(-14deg); }
+@keyframes hula-tail-sway {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(5deg) translateY(-1px); }
+  50% { transform: rotate(0deg); }
+  75% { transform: rotate(-5deg) translateY(1px); }
 }
 
 /* Routine 1: Ocean Waves */
