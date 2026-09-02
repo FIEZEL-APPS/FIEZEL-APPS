@@ -132,14 +132,18 @@ ke server** dan disimpan di `learner_name(sub, name, name_day, updated_at)`
 
 ## 4. Persetujuan & retensi
 
-- Tanpa baris aktif di `learner_evidence_consent` (dengan `policy` =
-  `learner-evidence-consent-v1`): **403 `consent_required`, NOL baris**.
-- Sakelarnya di Pengaturan (`preferences.learnerEvidenceConsent`), bawaan `false`,
-  fail-closed di klien **dan** server. Panel-nya tidak dirender sama sekali selama
-  `identityEvidence.mode === 'off'`: menawarkan persetujuan untuk sesuatu yang tidak bisa
-  menyala hanya melatih orang menyetujui hal yang tidak ia pahami.
-- **Mencabut = menghapus.** `revokeConsent()` menghapus baris bukti murid itu, bukan
-  menandainya, dan barisnya hilang dari direktori Owner.
+> **DIGANTIKAN m025-235.** Dua butir pertama di bawah ini **sudah tidak berlaku**: gerbang
+> persetujuan dihapus atas keputusan OWNER, dan murid yang memasang FIEZEL langsung
+> tersinkron. Alasan, konsekuensi, dan pagar yang tetap berdiri ada di
+> `FIEZEL-M025235-LEARNER-EVIDENCE-OTOMATIS-HANDOFF.md`. Butir retensi di bawah tetap benar.
+
+- ~~Tanpa baris aktif di `learner_evidence_consent` (dengan `policy` =
+  `learner-evidence-consent-v1`): **403 `consent_required`, NOL baris**.~~
+- ~~Sakelarnya di Pengaturan (`preferences.learnerEvidenceConsent`), bawaan `false`,
+  fail-closed di klien **dan** server.~~
+- **Penghapusan atas permintaan tetap ada.** `revokeConsent()` menghapus baris bukti murid
+  itu, bukan menandainya, dan barisnya hilang dari direktori Owner — sekarang lewat
+  `window.forgetLearnerEvidence()`, bukan sakelar.
 - **Retensi 180 hari** (`LEARNER_EVIDENCE_LIMITS.RETENTION_DAYS`) — bukan 14 hari seperti
   lane agregat, bukan pula tak terbatas. Purge **sudah terpasang** di cron 00:05 WIB lewat
   `runLearnerEvidencePurge()` (`route-wiring.js`), berdiri di luar `withCronRun` rollup

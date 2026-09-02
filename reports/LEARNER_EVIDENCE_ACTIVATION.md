@@ -231,14 +231,18 @@ mendarat sebelum §1–§3:
 Persetujuan yang tampak diterima padahal tidak adalah janji yang tidak ditepati.
 Itu sebabnya urutannya mengikat.
 
-## 7. Murid menyalakan persetujuannya sendiri
+## 7. Murid tidak melakukan apa pun (sejak m025-235)
 
-Sakelar server **bukan** persetujuan. Selama murid belum menyalakan
-**Pengaturan → Bukti belajar per murid**, kiriman dijawab 403
-`consent_required` dan **nol baris** ditulis untuk murid itu.
+Gerbang persetujuan **dihapus** atas keputusan OWNER: FIEZEL aplikasi kelas, guru
+memberitahu muridnya sebelum memasang, dan bukti belajar ini memang data guru.
+Murid yang memasang FIEZEL langsung tersinkron — termasuk yang sudah memasang
+lebih dulu, begitu shell baru sampai ke perangkatnya.
 
 Kadens kirim maksimal sekali sehari per perangkat: angka pertama muncul dalam
 hitungan jam, bukan menit.
+
+Penghapusan bukti satu murid tetap mungkin: jalankan `forgetLearnerEvidence()`
+dari konsol di perangkat murid itu (lihat handoff m025-235 §3).
 
 ---
 

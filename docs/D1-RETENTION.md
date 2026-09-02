@@ -199,8 +199,11 @@ default yang lahir diam-diam:
 
 - **180 hari**, bukan 14 hari seperti lane agregat. Alasan 14 hari di lane
   agregat adalah `cohort` yang tidak dipurge berubah menjadi identitas seumur
-  hidup dengan nama lain; di lane ini identitasnya memang sudah ada **atas
-  persetujuan murid**, jadi argumen itu tidak berlaku.
+  hidup dengan nama lain; di lane ini identitasnya memang sudah ada sejak awal,
+  jadi argumen itu tidak berlaku. **m025-235: gerbang persetujuan dihapus**
+  (keputusan OWNER — aplikasi kelas, guru memberitahu muridnya sebelum memasang),
+  sehingga retensi 180 hari ini menjadi satu-satunya batas otomatis yang tersisa.
+  Justru karena itu ia tidak boleh dinaikkan diam-diam.
 - **180 hari, bukan selamanya.** Dua semester sekolah cukup untuk melihat
   perkembangan satu tahun ajaran, dan tetap punya ujung. Angkanya hidup di
   `LEARNER_EVIDENCE_LIMITS.RETENTION_DAYS`
@@ -217,10 +220,13 @@ Dua jalur penghapusan, dan keduanya harus ada:
    rollup gagal, dan sebaliknya. Batas kejujuran yang sama dengan `runEvidencePurge`
    berlaku — hasilnya hanya muncul di nilai balik `runScheduled`, jadi purge yang
    gagal TIDAK terlihat di `/api/owner/cron-status`.
-2. **Pencabutan persetujuan** — `POST /api/braincore/learner-evidence/consent`
+2. **Penghapusan atas permintaan** — `POST /api/braincore/learner-evidence/consent`
    dengan `{"granted":false}` menjalankan `revokeConsent()`, yang **menghapus**
-   baris bukti murid itu, bukan sekadar menandainya. "Boleh berhenti
-   dikumpulkan tetapi yang lama tetap disimpan" bukan pencabutan.
+   baris bukti murid itu, bukan sekadar menandainya. Sejak m025-235 (gerbang
+   persetujuan dihapus) rute ini bukan lagi pencabutan izin melainkan tombol
+   hapus, dan ia **sekali jalan**: tulisan berikutnya dari murid yang sama
+   diterima lagi. Di klien ia dipapar sebagai `window.forgetLearnerEvidence()`,
+   tanpa UI — dijalankan owner dari konsol di perangkat murid yang bersangkutan.
 
 ```sql
 -- Retensi 180 hari. Pola rowid+LIMIT yang sama dengan §2.1: D1 tidak mendukung
@@ -276,13 +282,12 @@ DELETE FROM learner_name WHERE rowid IN (
   SELECT rowid FROM learner_name WHERE name_day < :batas LIMIT 500);
 ```
 
-**Yang TIDAK dilakukan pencabutan persetujuan bukti.** `revokeConsent()`
-menghapus bukti belajar murid itu, **bukan** namanya — keduanya data yang
-berbeda dengan alasan yang berbeda. Nama adalah identitas tampilan yang murid
-berikan sendiri di perkenalan; persetujuan mengatur apakah KEADAAN BELAJARNYA
-boleh disimpan per-orang. Menggabungkan keduanya berarti murid yang menolak
-analitik kehilangan namanya juga, lalu klien mengirimnya lagi besok pagi lewat
-penyegaran harian — data yang "dihapus" lalu hidup kembali adalah janji
+**Yang TIDAK dilakukan penghapusan bukti.** `revokeConsent()` menghapus bukti
+belajar murid itu, **bukan** namanya — keduanya data yang berbeda dengan alasan
+yang berbeda. Nama adalah identitas tampilan yang murid berikan sendiri di
+perkenalan; bukti adalah keadaan belajarnya. Menggabungkan keduanya berarti
+sekali hapus bukti, namanya ikut hilang, lalu klien mengirimnya lagi besok pagi
+lewat penyegaran harian — data yang "dihapus" lalu hidup kembali adalah janji
 penghapusan yang tidak ditepati. Penghapusan nama atas permintaan ada di §4.
 
 ---
