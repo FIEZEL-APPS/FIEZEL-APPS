@@ -114,6 +114,38 @@ kutipan itu bukti jawabannya. Menerjemahkannya berarti murid membaca kalimat yan
 pernah terdengar di audio, dan soalnya jadi tidak bisa dijawab dari rekaman. Gerbang pasal 8
 memeriksa kontrak ini terpisah, jadi kutipan yang diam-diam diterjemahkan tetap ketahuan.
 
+### JEBAKAN KETIGA: naskah murid DI LUAR bank soal
+
+Ditemukan m025-235, saat owner bertanya apakah i18n Thai sudah 100%. Jawaban jujurnya
+tidak, dan pembuktiannya langsung menemukan celah yang lebih luas dari dua jebakan di atas.
+
+Keempat gerbang th yang ada semuanya bertanya tentang **bank soal**. Naskah murid yang
+bukan bank soal karena itu tidak diperiksa SIAPA PUN. Contoh yang memicu:
+`features/quota/quota-copy.js` memuat 45 kalimat murid, tidak memanggil lapisan i18n sama
+sekali, dan `copy-th-quota.js` punya NOL kunci `quota.*` — jadi setiap pemberitahuan kuota
+suara tampil berbahasa Indonesia untuk murid Thai. Gerbang mana pun tidak bisa melihatnya.
+
+**Penjaganya** — `th-naskah-murid-test.js`, dan cakupannya dibalik dari ketiga gerbang lain:
+ia memindai SELURUH berkas runtime `index.html`, bukan bank soal. Tiap temuan wajib salah
+satu dari dua: dipindah ke copy map lalu dipanggil lewat `t()`, atau didaftarkan di
+`BERKAS_DIKECUALIKAN`/`KALIMAT_DITINJAU` **dengan alasan tertulis**.
+
+Untuk berkas yang menyimpan peta naskah sendiri (kuota, pemberitahuan suara), ia tidak
+sekadar memindai string melainkan menuntut **pasangan kunci di dua locale** — lebih ketat
+daripada ketiadaan kalimat Indonesia.
+
+**Belum selesai.** Per m025-235 gerbang ini masih melaporkan ~208 kalimat di 18 berkas
+(`app.js`, coach bubble, tutor, prasasti, choreography). Karena itu ia **sengaja belum
+didaftarkan di `quality.yml`**: mendaftarkannya sekarang memerahkan CI untuk setiap PR yang
+tidak berhubungan. Daftarkan pada PR yang menutup temuan terakhir. Sampai saat itu jalankan
+manual — ia daftar-kerja yang bisa dieksekusi, bukan gerbang.
+
+**Dua kanon repo yang mudah dilanggar waktu mengerjakan ini**, keduanya ditegakkan
+`quota-notice-a11y-test.js`:
+1. Kanon th melarang jargon mesin, dan `โควตา` termasuk. Ganti dengan penulisan ulang dari
+   sudut pandang murid ("apa yang masih bisa ia lakukan hari ini"), bukan sinonim yang lebih sopan.
+2. Kanon id mewajibkan `nggak`, bukan `tidak`.
+
 ## Generator — jangan sunting sidecar dengan tangan
 
 Setiap sidecar dirakit ulang dari peta terjemahan **kalimat utuh** di `tools/th-strings/`:
