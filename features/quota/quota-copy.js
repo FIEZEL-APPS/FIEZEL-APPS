@@ -33,8 +33,11 @@
  *     yang nggak ada dan tetap mengajari murid bahwa ada pintu berbayar.
  *
  * DUA VARIAN UNTUK SETIAP KEADAAN — dan ini inti kejujurannya:
- *   spoken:true  → murid MASIH mendengar sesuatu (suara perangkat menyahut). Naskahnya
- *                  menyebut bunyinya berubah, bukan gagal.
+ *   spoken:true  → murid MASIH mendengar sesuatu. m025-232: dulu itu berarti "suara
+ *                  perangkat menyahut" - suara bawaan sistem, lapisan L4 yang kini DIHAPUS.
+ *                  Sekarang yang menyahut hanya suara FIEZEL sendiri (mesin awan atau mesin
+ *                  neural di perangkat), jadi naskahnya menyebut "suara cadanganku", bukan
+ *                  "suara perangkatmu". Bunyinya berubah, bukan gagal.
  *   spoken:false → BENAR-BENAR TANPA SUARA. Naskahnya mengaku audionya nggak keluar,
  *                  menunjuk teks yang tetap bisa dibaca, dan menyebut kapan bisa dicoba
  *                  lagi. Menampilkan "sedang menyiapkan suara" pada keadaan tanpa suara
@@ -69,20 +72,20 @@
     }),
     'quota.low': Object.freeze({
       title: 'Jatah suara hari ini hampir habis',
-      spoken: 'Masih berbunyi seperti biasa. Kalau nanti habis, aku pindah ke suara perangkatmu.',
+      spoken: 'Masih berbunyi seperti biasa. Kalau nanti habis, aku pindah ke suara cadanganku.',
       silent: 'Kalimat ini belum berbunyi di perangkatmu. Teksnya tetap bisa kamu baca, dan kamu boleh menekan Dengarkan lagi.',
       urgency: 'advisory', surface: 'inline'
     }),
     'quota.exhausted': Object.freeze({
       title: 'Jatah hari ini sudah habis',
-      spoken: 'Aku pakai suara perangkatmu dulu. Pelajarannya nggak berhenti.',
+      spoken: 'Aku pakai suara cadanganku dulu. Pelajarannya nggak berhenti.',
       silent: 'Suaranya nggak bisa dibunyikan sekarang. Teksnya tetap ada, dan jatahnya kembali sesudah tengah malam.',
       urgency: 'advisory', surface: 'panel'
     }),
     'quota.tts.exhausted': Object.freeze({
       title: 'Jatah suara hari ini sudah habis',
-      spoken: 'Aku pakai suara perangkatmu dulu untuk sisa sesi ini. Bunyinya beda, pelajarannya tetap jalan.',
-      silent: 'Perangkat ini belum punya suara cadangan, jadi kalimat ini nggak bisa dibunyikan. Teksnya tetap bisa kamu baca, dan jatahnya kembali sesudah tengah malam.',
+      spoken: 'Aku pakai suara cadanganku dulu untuk sisa sesi ini. Bunyinya beda, pelajarannya tetap jalan.',
+      silent: 'Suara cadanganku juga belum siap, jadi kalimat ini nggak bisa dibunyikan. Teksnya tetap bisa kamu baca, dan jatahnya kembali sesudah tengah malam.',
       urgency: 'advisory', surface: 'panel'
     }),
     'quota.ai.exhausted': Object.freeze({
@@ -99,7 +102,7 @@
     }),
     'quota.rate.slowdown': Object.freeze({
       title: 'Kecepatan menekannya perlu diberi jeda',
-      spoken: 'Aku pakai suara perangkatmu untuk kalimat ini. Tunggu sebentar sebelum menekan lagi.',
+      spoken: 'Aku pakai suara cadanganku untuk kalimat ini. Tunggu sebentar sebelum menekan lagi.',
       silent: 'Kalimat ini belum bisa dibunyikan. Tunggu beberapa detik lalu coba lagi — teksnya tetap ada.',
       urgency: 'advisory', surface: 'inline'
     }),
@@ -117,19 +120,19 @@
     }),
     'service.degraded': Object.freeze({
       title: 'Layanan suara sedang istirahat sebentar',
-      spoken: 'Suara dari perangkatmu dulu, ya. Ini bukan kesalahanmu dan nggak ada yang hilang.',
+      spoken: 'Suara cadanganku dulu, ya. Ini bukan kesalahanmu dan nggak ada yang hilang.',
       silent: 'Aku belum berhasil membunyikan kalimat ini. Bukan kamu yang salah — teksnya tetap bisa dibaca, dan suaranya biasanya kembali beberapa menit lagi.',
       urgency: 'advisory', surface: 'panel'
     }),
     'service.providerError': Object.freeze({
       title: 'Suara gagal disiapkan',
-      spoken: 'Aku pakai suara perangkatmu untuk kalimat ini.',
+      spoken: 'Aku pakai suara cadanganku untuk kalimat ini.',
       silent: 'Aku belum berhasil membunyikan kalimat ini. Teksnya tetap bisa kamu baca, dan kamu boleh mencoba lagi sekarang.',
       urgency: 'advisory', surface: 'panel'
     }),
     'service.unknown': Object.freeze({
       title: 'Suara belum tersedia untuk kalimat ini',
-      spoken: 'Aku pakai suara perangkatmu dulu.',
+      spoken: 'Aku pakai suara cadanganku dulu.',
       silent: 'Aku belum berhasil membunyikan kalimat ini. Teksnya tetap bisa kamu baca, dan kamu boleh menekan Dengarkan lagi.',
       urgency: 'advisory', surface: 'panel'
     }),
@@ -137,7 +140,7 @@
        murid yang belum memakai apa pun nggak boleh dituduh sudah menghabiskan jatahnya. */
     'quota.unavailable': Object.freeze({
       title: 'Aku belum bisa membaca sisa jatahmu',
-      spoken: 'Jatahmu kemungkinan besar masih utuh — yang bermasalah catatannya, bukan kamu. Aku pakai suara perangkatmu sementara ini.',
+      spoken: 'Jatahmu kemungkinan besar masih utuh — yang bermasalah catatannya, bukan kamu. Aku pakai suara cadanganku sementara ini.',
       silent: 'Jatahmu kemungkinan besar masih utuh — yang bermasalah catatannya, bukan kamu. Kalimat ini belum bisa dibunyikan; teksnya tetap ada, dan coba lagi sebentar lagi.',
       urgency: 'advisory', surface: 'panel'
     }),

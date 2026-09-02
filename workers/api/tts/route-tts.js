@@ -136,22 +136,33 @@
     invalid_input: 'Teks yang mau dibacakan belum lengkap.',
     key_mismatch: 'Aku belum paham kirimanmu. Muat ulang halaman lalu coba lagi, ya.',
     too_long: 'Kalimatnya kepanjangan untuk sekali dibacakan.',
-    quota_exceeded: 'Jatah suara hari ini sudah habis. Suara perangkatmu tetap bisa dipakai, dan jatahnya kembali sesudah tengah malam.',
+    quota_exceeded: 'Jatah suara hari ini sudah habis, jadi kalimat ini belum bisa dibunyikan. Teksnya tetap bisa kamu baca, dan jatahnya kembali sesudah tengah malam.',
     // A8 TEMUAN BOHONG (§4 reports/add-a8-a11y.md): sebelum commit ini, penghitung jatah
     // yang MATI dilaporkan ke murid sebagai "jatah suara hari ini sudah habis".
-    quota_unavailable: 'Aku belum bisa membaca sisa jatahmu, jadi jatahmu kemungkinan besar masih utuh. Suara perangkatmu tetap bisa dipakai — coba lagi sebentar lagi, ya.',
-    breaker_open: 'Suara dari perangkatmu dulu — layanan suara sedang istirahat sebentar. Ini bukan kesalahanmu.',
-    unavailable: 'Suara dari perangkatmu dulu — audio belum tersedia untuk kalimat ini.',
-    // S2 - jatah neuron AKUN (bukan jatah murid) penuh: suara perangkat tetap jalan dan
-    // jatah murid TIDAK dipotong, jadi kalimatnya harus mengatakan dua hal itu.
-    account_budget: 'Suara dari perangkatmu dulu — pembuatan suara sedang penuh untuk hari ini, bukan karena jatahmu. Jatahmu nggak berkurang.',
+    quota_unavailable: 'Aku belum bisa membaca sisa jatahmu, jadi jatahmu kemungkinan besar masih utuh. Suaranya belum bisa dibunyikan sekarang — teksnya tetap bisa kamu baca, dan kamu boleh coba lagi sebentar lagi, ya.',
+    breaker_open: 'Layanan suara sedang istirahat sebentar, jadi kalimat ini belum berbunyi. Teksnya tetap bisa kamu baca. Ini bukan kesalahanmu.',
+    unavailable: 'Audio belum tersedia untuk kalimat ini. Teksnya tetap bisa kamu baca.',
+    // S2 - jatah neuron AKUN (bukan jatah murid) penuh. Yang WAJIB dikatakan kalimatnya:
+    // jatah murid TIDAK dipotong sedikit pun, karena tidak ada satu byte audio yang
+    // diproduksi.
+    //
+    // m025-232: dulu setiap kalimat di peta ini dibuka dengan "Suara dari perangkatmu
+    // dulu". Lapisan speechSynthesis peramban sudah DIHAPUS, jadi kalimat itu menjanjikan
+    // sesuatu yang tidak bisa terjadi - di bawah L3 tidak ada apa pun yang berbunyi.
+    // Pembukaan itu dicabut dari KELIMA kalimat sekaligus, bukan satu per satu, supaya
+    // tidak ada satu pun yang tertinggal menjanjikan suara hantu.
+    //
+    // Penggantinya menjawab pertanyaan murid yang sebenarnya - "lalu aku harus apa?" -
+    // dengan hal yang MASIH benar: teksnya tetap bisa dibaca. Gerbang S3-a5 di
+    // tts-provider-contract-test.js ikut dipindah ke janji baru itu.
+    account_budget: 'Pembuatan suara sedang penuh untuk hari ini, bukan karena jatahmu. Jatahmu nggak berkurang, dan teksnya tetap bisa kamu baca.',
     // S2 - pagar neuron akun BELUM TERPASANG (dep tidak disuntikkan / tanda terima tidak
     // sah). Salah pasang, bukan jatah penuh, dan bukan salah murid.
-    account_missing: 'Suara dari perangkatmu dulu — pembuatan suara belum bisa dipakai karena penyiapan di sisi kami belum lengkap. Jatahmu utuh.',
+    account_missing: 'Pembuatan suara belum bisa dipakai karena penyiapan di sisi kami belum lengkap. Jatahmu utuh, dan teksnya tetap bisa kamu baca.',
     // S3 - FLAG TTS MATI. Bukan jatah murid, bukan jatah akun, bukan kesalahan murid, dan
     // bukan soal waktu: pemilik aplikasi belum menyalakan suara premium. Kalimatnya tidak
     // boleh menjanjikan "coba lagi nanti", karena menunggu tidak mengubah apa pun.
-    tts_disabled: 'Suara dari perangkatmu dulu — suara premium sedang kami matikan sementara, bukan karena jatahmu. Jatahmu utuh.',
+    tts_disabled: 'Suara premium sedang kami matikan sementara, bukan karena jatahmu. Jatahmu utuh, dan teksnya tetap bisa kamu baca.',
     body_too_big: 'Kirimanmu kebesaran untuk sekali kirim.'
   });
 
@@ -385,9 +396,15 @@
    *
    * 503, bukan 429: 429 adalah bahasa "jatah MURID", dan ini bukan jatah murid. Yang
    * tidak boleh berubah di cabang mana pun: `quotaCharged:false` - jatah suara murid
-   * tidak dipotong sedikit pun, karena tidak ada satu byte audio yang diproduksi. Murid
-   * tetap punya jalan keluar yang nyata: suara perangkat (`speechSynthesis`), yang sudah
-   * menjadi jalur cadangan sah di aplikasi ini.
+   * tidak dipotong sedikit pun, karena tidak ada satu byte audio yang diproduksi.
+   *
+   * m025-232: paragraf ini dulu ditutup dengan "murid tetap punya jalan keluar yang nyata:
+   * suara perangkat (`speechSynthesis`)". Jalan keluar itu SUDAH TIDAK ADA - lapisan
+   * peramban dihapus dari seluruh aplikasi dan di bawah L3 (neural di perangkat) tidak ada
+   * lagi apa pun yang berbunyi. Justru karena itu `quotaCharged:false` makin tidak boleh
+   * dilonggarkan: penolakan di sini sekarang berarti murid benar-benar tidak mendengar
+   * kalimatnya, jadi yang tersisa untuknya harus utuh - jatahnya penuh, teks dan
+   * subtitle-nya tetap terbaca, dan ia boleh mencoba lagi ketika layanan pulih.
    */
   function accountDenied(identity, objectName, chars, phase, reason, started, now, ledger) {
     var capReached = String(reason) === 'ai_account_cap';
