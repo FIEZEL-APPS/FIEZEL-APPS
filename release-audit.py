@@ -172,7 +172,16 @@ check('Speaking and Listening privacy boundary','fiezel-sl-v1-state' in (ROOT/'f
 # all. The check is repointed, not relaxed: it still demands the throw, and additionally demands
 # that browserSpeak/allowFallback cannot come back.
 _nv_bootstrap=(ROOT/'features/neural-voice/fiezel-neural-voice-bootstrap.js').read_text(encoding='utf-8',errors='ignore')
-check('Neural voice explicit opt-in','prepareNeuralVoice' in app and "if(!readStatus().prepared&&!preparedFlag)throw new Error('Neural voice assets are not prepared')" in _nv_bootstrap and 'browserSpeak' not in _nv_bootstrap and 'SpeechSynthesisUtterance' not in _nv_bootstrap and '!isNeuralAsset(e.request)' in feature_sw,'large local model cache is user-triggered; every not-prepared call fails closed with no browser-TTS escape hatch, and heavy assets remain excluded from implicit service-worker caching')
+# m025-235: the name and the first clause of the detail string were about to become a lie.
+# The owner removed the Puter-login gate, so the ~152 MB model download now starts on first
+# launch for EVERY student, without asking -- it is no longer "user-triggered" in any sense.
+# Saying otherwise in the release report would misdescribe a real data cost to real students.
+#
+# What this check actually protects is unchanged and still worth enforcing: a not-prepared
+# neural engine fails closed instead of half-playing, no browser-TTS escape hatch can return,
+# and the shell never precaches the heavy assets implicitly (they stay owned by the prepare
+# and autoload layers). The assertions are identical; only the description is corrected.
+check('Neural voice fail-closed and shell-excluded','prepareNeuralVoice' in app and "if(!readStatus().prepared&&!preparedFlag)throw new Error('Neural voice assets are not prepared')" in _nv_bootstrap and 'browserSpeak' not in _nv_bootstrap and 'SpeechSynthesisUtterance' not in _nv_bootstrap and '!isNeuralAsset(e.request)' in feature_sw,'every not-prepared call fails closed with no browser-TTS escape hatch, and heavy assets remain excluded from implicit service-worker caching; since m025-235 the download itself is automatic on first launch for all students, by explicit owner decision')
 voice_inventory_path=ROOT/'VENDOR-VOICE-INVENTORY.json'
 try: voice_inventory=json.load(open(voice_inventory_path,encoding='utf-8'))
 except Exception: voice_inventory={}

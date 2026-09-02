@@ -1,19 +1,36 @@
 /**
- * m025-121 pengunduh suara cadangan yang tidak pernah menampakkan diri.
+ * m025-121 pengunduh suara neural yang tidak pernah menampakkan diri.
  *
- * APA YANG DIMINTA OWNER. Saat murid sudah login akun Puter dan memakai suara neural
- * Puter, lalu jatahnya habis, ia harus TETAP bisa mendengar suara neural - tanpa upgrade
- * Puter, tanpa sadar pernah mengunduh apa pun. Unduhannya mulai sendiri di latar begitu
- * sistem mendeteksi login pertama, dan tidak boleh ada satu pun pemberitahuan.
+ * APA YANG DIMINTA OWNER (m025-235, memperbarui m025-121). Suara neural FIEZEL harus
+ * tertanam di sistem: terunduh sendiri di latar, untuk SEMUA murid, sejak peluncuran
+ * PERTAMA - tanpa menunggu login Puter dan tanpa satu pun pemberitahuan.
  *
- * SATU BAGIAN PERMINTAAN YANG TIDAK BISA DIPENUHI, dan lebih baik ditulis di sini
- * daripada dijanjikan diam-diam: unduhan TIDAK bisa terus berjalan setelah FIEZEL ditutup
- * penuh. Satu-satunya API web yang bisa melakukannya adalah Background Fetch, dan
- * WebKit/iOS tidak memilikinya - murid FIEZEL memakai iPhone dengan PWA dari Safari. Yang
- * bisa dilakukan, dan yang dilakukan berkas ini, adalah membuat penutupan aplikasi TIDAK
- * PERNAH memakan biaya: kemajuan disimpan per POTONGAN 20 MB, bukan per berkas, sehingga
- * sesi berikutnya melanjutkan dari potongan terakhir dan tidak pernah mengulang dari nol.
- * Tanpa itu, satu aset 78 MB yang putus di menit terakhir berarti 78 MB terbuang.
+ * KENAPA GERBANG LOGIN DICABUT. Versi m025-121 baru menyalakan unduhan sesudah login
+ * Puter terdeteksi, karena saat itu mesin neural hanya cadangan untuk hari jatah Puter
+ * habis - di bawahnya masih ada TTS peramban yang menampung semua orang. Lapisan itu
+ * dihapus total di m025-232, jadi mesin neural kini lapisan TERAKHIR yang bersuara.
+ * Mempertahankan gerbang login berarti menjamin suara justru bagi murid yang paling kecil
+ * kemungkinannya membutuhkannya, dan menyisakan SENYAP bagi yang tidak pernah login.
+ *
+ * ONGKOSNYA NYATA DAN DITERIMA SADAR. Unduhan ini ~152 MB dan kini berjalan untuk murid
+ * yang mungkin tidak pernah memerlukannya. OWNER memilih itu secara eksplisit. Penjaga
+ * kuota di blockedReason() tetap dipasang, TETAPI lihat catatan Safari di sana sebelum
+ * mengandalkannya.
+ *
+ * DUA MEKANISME, SATU PERILAKU (m025-235). "Tetap mengunduh walau aplikasi ditutup" hanya
+ * mungkin lewat Background Fetch, dan Background Fetch hanya ada di Chromium:
+ *
+ *   - Chromium (Android, Chrome/Edge desktop): unduhan diserahkan ke Background Fetch dan
+ *     BENAR-BENAR lanjut sesudah aplikasi ditutup. Service worker yang memindahkan
+ *     hasilnya ke cache - lihat penangan backgroundfetchsuccess di sw.js.
+ *   - WebKit/iOS Safari - perangkat sasaran FIEZEL: TIDAK ADA API-nya, dan tidak ada
+ *     akal-akalan yang menggantikannya. Di sana berlaku jalur potongan di bawah, yang
+ *     membuat penutupan aplikasi tidak pernah memakan biaya: kemajuan disimpan per
+ *     POTONGAN 20 MB, sehingga sesi berikutnya melanjutkan dari potongan terakhir dan
+ *     tidak pernah mengulang dari nol. Satu aset 78 MB yang putus di menit terakhir
+ *     berarti 78 MB terbuang tanpa itu.
+ *
+ * Jangan menulis di mana pun bahwa iOS melanjutkan unduhan saat tertutup. Ia tidak.
  *
  * KENAPA POTONGAN, BUKAN SATU fetch PANJANG. warmAssets() di bootstrap mengunduh tiap
  * aset dalam satu tarikan. Itu benar untuk tombol "Simpan untuk offline" yang ditekan
@@ -104,6 +121,13 @@
     if (root.navigator && root.navigator.onLine === false) return 'offline';
     // Hemat kuota data murid. Kalau ia menyalakan Mode Hemat Data, unduhan 152 MB adalah
     // hal terakhir yang ia inginkan berjalan tanpa diminta.
+    //
+    // m025-235, DAN INI PENTING SEBELUM ADA YANG MENGANDALKANNYA: Network Information API
+    // (navigator.connection) TIDAK ADA di Safari, jadi di iPhone - perangkat sasaran
+    // FIEZEL - kedua penjaga di bawah selalu undefined dan tidak pernah menahan apa pun.
+    // Keduanya dipertahankan karena benar-benar bekerja di Chromium, bukan karena mereka
+    // melindungi murid iPhone. Di iOS satu-satunya rem yang nyata adalah murid menutup
+    // aplikasi, dan itulah sebabnya jalur potongan 20 MB harus tetap murah untuk diputus.
     try {
       var c = root.navigator && root.navigator.connection;
       if (c && c.saveData === true) return 'save_data';
@@ -168,6 +192,71 @@
     }));
   }
 
+  /**
+   * m025-235 — SERAH TERIMA KE BACKGROUND FETCH (hanya Chromium).
+   *
+   * Ini satu-satunya jalan agar unduhan benar-benar lanjut sesudah murid menutup FIEZEL.
+   * Sistem operasi yang memegang unduhannya, bukan halaman; hasilnya dipindahkan ke cache
+   * oleh service worker lewat penangan `backgroundfetchsuccess` di sw.js.
+   *
+   * Mengembalikan true bila Background Fetch MENGAMBIL ALIH - pemanggil harus berhenti dan
+   * TIDAK menjalankan jalur potongan. Dua pengunduh yang berjalan bersamaan atas berkas
+   * yang sama berarti membayar kuota murid dua kali.
+   *
+   * Mengembalikan false berarti "tidak tersedia / gagal didaftarkan": jalur potongan 20 MB
+   * lanjut seperti biasa. Itulah yang terjadi di iOS Safari, selalu.
+   */
+  async function handOffToBackgroundFetch(rt, cache, items) {
+    var reg = null;
+    try {
+      var sw = root.navigator && root.navigator.serviceWorker;
+      if (!sw || typeof sw.ready !== 'object' && typeof sw.ready !== 'function') return false;
+      reg = await sw.ready;
+    } catch (_) { return false; }
+    if (!reg || !reg.backgroundFetch || typeof reg.backgroundFetch.fetch !== 'function') return false;
+
+    // Kontrak id dengan sw.js: prefix tetap + nama cache tujuan, supaya service worker tahu
+    // ke mana hasilnya disimpan tanpa perlu memuat modul halaman mana pun.
+    var id = 'fiezel-neural-voice::' + String(rt.cacheName || '');
+
+    try {
+      // Sudah ada yang berjalan dari sesi sebelumnya - mungkin sesi yang sudah ditutup.
+      // Membiarkannya adalah intinya; mendaftar ulang justru membatalkan kemajuannya.
+      if (typeof reg.backgroundFetch.get === 'function') {
+        var live = await reg.backgroundFetch.get(id);
+        if (live) { log({ phase: 'autoload_bgfetch_live' }); return true; }
+      }
+    } catch (_) { /* get() yang gagal bukan alasan menolak mendaftar */ }
+
+    // Hanya aset yang BELUM utuh di cache. Yang sudah ada - dari sesi lalu atau dari tombol
+    // "Simpan untuk offline" - tidak boleh diunduh ulang.
+    var urls = [], bytes = 0;
+    for (var i = 0; i < items.length; i++) {
+      var url = rt.assetUrl(items[i].path);
+      try { if (await cache.match(url)) continue; } catch (_) {}
+      urls.push(url);
+      bytes += Number(items[i].bytes || 0);
+    }
+    if (!urls.length) return false; // tidak ada sisa: biarkan jalur biasa menutup state
+
+    try {
+      await reg.backgroundFetch.fetch(id, urls, {
+        // Naskah ini muncul di notifikasi kemajuan milik SISTEM, bukan di layar FIEZEL.
+        // Ia satu-satunya tempat unduhan ini terlihat oleh murid, jadi ia harus jujur dan
+        // tidak menakutkan - bukan nama mesin, bukan angka byte.
+        title: 'Menyiapkan suara FIEZEL',
+        downloadTotal: bytes
+      });
+      log({ phase: 'autoload_bgfetch_start', assets: urls.length, bytes: bytes });
+      return true;
+    } catch (error) {
+      // Kuota ditolak, pengguna menolak, atau Background Fetch dimatikan kebijakan. Semua
+      // berakhir sama: jalur potongan yang menangani.
+      log({ phase: 'autoload_bgfetch_unavailable' });
+      return false;
+    }
+  }
+
   async function pump() {
     if (running) return;
     var rt = runtime();
@@ -182,6 +271,11 @@
       var cache = await root.caches.open(rt.cacheName);
       var items = rt.assets();
       var failures = 0;
+
+      // m025-235: Chromium menyerahkan unduhan ke sistem supaya ia lanjut walau aplikasi
+      // ditutup. Bila serah terima berhasil, jalur potongan di bawah TIDAK dijalankan.
+      // Di iOS Safari ini selalu false dan jalur potongan yang bekerja, seperti sebelumnya.
+      if (await handOffToBackgroundFetch(rt, cache, items)) return;
 
       for (var a = 0; a < items.length; a++) {
         var item = items[a];
@@ -243,8 +337,14 @@
   }
 
   /**
-   * Dipanggil begitu sistem melihat murid sudah login Puter. Aman dipanggil berkali-kali:
-   * hanya panggilan PERTAMA yang menyalakan jam, sisanya melanjutkan.
+   * Menyalakan pengunduh. Aman dipanggil berkali-kali: hanya panggilan PERTAMA yang
+   * menyalakan jam, sisanya melanjutkan.
+   *
+   * m025-235: dulu bernama "dipanggil begitu murid login Puter" - sekarang dipanggil di
+   * setiap boot, untuk semua murid. Nama field simpanan `signedInAt` SENGAJA tidak diubah
+   * walau maknanya kini "kapan pengunduh dinyalakan": mengganti namanya akan membuat state
+   * murid yang sedang setengah jalan tidak terbaca, dan unduhan 152 MB-nya mengulang dari
+   * nol. Nama lama yang jujur dijelaskan lebih murah daripada kuota yang terbuang.
    */
   function noteSignedIn() {
     var state = readState();
