@@ -350,10 +350,15 @@ let SETTLE = null;
   check('S3-a4. penolakan flag TIDAK menjanjikan retryAfter (menunggu tidak mengubah flag)',
     !('retryAfter' in flagOff.res.json) && !flagOff.res.headers.get('retry-after'),
     JSON.stringify(flagOff.res.json.retryAfter) + ' hdr=' + flagOff.res.headers.get('retry-after'));
-  check('S3-a5. naskahnya JUJUR: bukan bahasa jatah, dan menawarkan suara perangkat',
+  // m025-232: gerbang ini dulu menuntut kata 'perangkat' - stand-in untuk "naskahnya
+  // menawarkan sesuatu yang masih bekerja", yang saat itu berarti suara bawaan perangkat.
+  // Lapisan itu dihapus, jadi menuntut katanya berarti menuntut janji palsu. Invariannya
+  // TIDAK dilonggarkan, hanya dipindah ke hal yang masih benar: teksnya tetap terbaca.
+  check('S3-a5. naskahnya JUJUR: bukan bahasa jatah, dan menawarkan jalan yang masih ada',
     flagOff.res.json.message === RouteTts.POLITE.tts_disabled
     && !/jatahmu (habis|penuh)/i.test(flagOff.res.json.message)
-    && /perangkat/i.test(flagOff.res.json.message),
+    && /teksnya tetap bisa kamu baca/i.test(flagOff.res.json.message)
+    && !/perangkat/i.test(flagOff.res.json.message),
     JSON.stringify(flagOff.res.json.message));
 
   // FEATURE_TTS var mati, dan KV yang TIDAK TERBACA: dua-duanya harus fail-CLOSED.

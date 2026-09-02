@@ -54,9 +54,13 @@ const check = (name, ok, details) => {
  * Blok sumber sebuah fungsi puncak — pola yang sama dengan voice-fallback-chain-test.js:
  * potong dari deklarasinya sampai deklarasi fungsi berikutnya. Bedanya satu: fungsi di
  * fiezel-voice-say.js hidup di dalam pembungkus UMD, jadi deklarasinya MENJOROK dua spasi
- * dan pemotong yang menuntut kolom nol akan menelan seluruh sisa berkas — termasuk stop(),
- * yang memang menyebut speechSynthesis. Penjaga statis di bawah akan lulus untuk alasan
- * yang salah kalau batasnya keliru.
+ * dan pemotong yang menuntut kolom nol akan menelan seluruh sisa berkas.
+ *
+ * m025-232: sentinel lama untuk kekeliruan itu adalah kata `speechSynthesis` di stop(). Kata
+ * itu SUDAH TIDAK ADA di mana pun (L4 dihapus), jadi penjaga yang memakainya kini lulus
+ * secara hampa - ia tidak lagi bisa membedakan potongan yang benar dari potongan yang
+ * menelan seluruh berkas. Sentinelnya diganti di bawah dengan sesuatu yang MASIH hidup di
+ * luar blok prefetch: `emitSpeech(` milik jalur say().
  */
 function sourceBlock(name, source) {
   const start = source.search(new RegExp(`(?:function|async function)\\s+${name}\\s*\\(`));
@@ -427,9 +431,12 @@ function runtimeHarness() {
     /localEngine\(\)/.test(sourceBlock('prefetchWithLocal', SAY)) &&
       !/FiezelVoiceRuntime/.test(live),
     'pintu bersama itulah yang membaca status().prepared || ready');
-  check('penjaga statis: jalur prefetch tidak menyentuh L4 speechSynthesis maupun subtitle',
+  check('penjaga statis: pemotong blok masih memotong, bukan menelan seluruh berkas',
+    live.length > 0 && !/emitSpeech\(/.test(live) && !/function stop\(/.test(live),
+    'sentinel pengganti speechSynthesis (m025-232): emitSpeech() hidup di jalur say(), bukan prefetch');
+  check('penjaga statis: jalur prefetch tidak membunyikan apa pun dan tidak menyentuh subtitle',
     !/speechSynthesis/.test(live) && !/subtitles\(\)/.test(live) && !/prepareSubtitle/.test(live),
-    'menghangatkan suara peramban berarti membunyikannya lebih awal');
+    'prefetch menghangatkan, tidak memutar - dan tidak boleh membakar jatah terjemahan');
   check('penjaga statis: localEngine() tetap membaca prepared || ready (pagar tidak dilonggarkan)',
     /st\.prepared \|\| st\.ready/.test(SAY),
     'ini pagar yang sama yang dijaga voice-fallback-chain-test.js');
