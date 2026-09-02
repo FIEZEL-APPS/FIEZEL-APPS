@@ -75,23 +75,44 @@ npx wrangler@3 whoami
 Database `fiezel-core` **sudah ada** (di sanalah `identity` dan `social_profile`
 tinggal), jadi tidak ada `d1 create` di sini. Yang ditambahkan hanya tabel baru.
 
+**JANGAN jalankan dari folder `workers/api`.** `workers/api/wrangler.toml` di repo
+ini adalah **template**: `database_id`-nya sengaja berisi teks
+`<isi setelah: wrangler d1 create fiezel-core>`, dan CI yang mengisinya dengan UUID
+asli saat deploy. Kalau perintah dijalankan dari folder itu, wrangler membaca
+placeholder itu sebagai id database dan gagal:
+
 ```
-cd workers/api
-npx wrangler@3 d1 execute fiezel-core --remote --file=migrations/0009_learner_evidence.sql
-npx wrangler@3 d1 execute fiezel-core --remote --file=migrations/0010_learner_name.sql
+X [ERROR] ... Invalid property: databaseId => Invalid uuid [code: 7400]
+```
+
+Itu bukan tanda token/akun bermasalah — itu tanda perintahnya membaca berkas
+template. Jalankan dari **akar repo** dan sebut database-nya dengan **UUID asli**:
+
+**1a. Ambil UUID `fiezel-core`** (dari akar repo, folder `FIEZEL-APPS`):
+```
+npx wrangler@3 d1 list
+```
+Catat nilai `uuid` pada baris `fiezel-core` — 36 karakter, bentuknya
+`xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`.
+
+**1b. Jalankan kedua migrasi** (ganti `UUID_FIEZEL_CORE` dengan nilai tadi):
+```
+npx wrangler@3 d1 execute UUID_FIEZEL_CORE --remote --file=workers/api/migrations/0009_learner_evidence.sql
+npx wrangler@3 d1 execute UUID_FIEZEL_CORE --remote --file=workers/api/migrations/0010_learner_name.sql
 ```
 
 `--remote` **wajib** ada di kedua baris. Tanpa itu wrangler menulis ke salinan
 lokal di laptop Anda, semuanya terlihat sukses, dan produksi tidak berubah sama
-sekali — kesalahan paling sering di langkah ini.
+sekali.
 
 Kedua migrasi memakai `CREATE TABLE IF NOT EXISTS`, jadi menjalankannya dua kali
-tidak merusak apa pun.
+tidak merusak apa pun — termasuk kalau percobaan pertama gagal di tengah.
 
 ## 2. Buktikan tabelnya benar-benar ada
 
+Masih dari akar repo, dengan UUID yang sama:
 ```
-npx wrangler@3 d1 execute fiezel-core --remote --command="SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 'learner%' ORDER BY name"
+npx wrangler@3 d1 execute UUID_FIEZEL_CORE --remote --command="SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 'learner%' ORDER BY name"
 ```
 
 Harus muncul **empat** baris:
