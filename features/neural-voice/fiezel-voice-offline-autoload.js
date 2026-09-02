@@ -32,6 +32,17 @@
  *
  * Jangan menulis di mana pun bahwa iOS melanjutkan unduhan saat tertutup. Ia tidak.
  *
+ * SATU JANJI LAMA YANG GUGUR SEBAGIAN, dan lebih baik dicatat daripada dibiarkan menyesatkan:
+ * m025-121 berjanji "tidak boleh ada satu pun pemberitahuan". Di iOS janji itu masih utuh -
+ * jalur potongan benar-benar tidak terlihat. Di Chromium TIDAK: Background Fetch selalu
+ * menampilkan notifikasi kemajuan milik SISTEM, dan itu tidak bisa dimatikan aplikasi. Itulah
+ * harga yang dibayar untuk unduhan yang lanjut setelah aplikasi ditutup, dan harga itu diterima
+ * sadar - tanpa notifikasi sistem, tidak ada unduhan latar sama sekali di sana.
+ *
+ * Karena notifikasi itu pasti terlihat, judulnya diperlakukan sebagai naskah murid sungguhan:
+ * lihat `title` di handOffToBackgroundFetch(). Ia tunduk pada kanon yang sama dengan naskah
+ * lain - tidak menyebut nama mesin, tidak menyebut angka byte, tidak menakutkan.
+ *
  * KENAPA POTONGAN, BUKAN SATU fetch PANJANG. warmAssets() di bootstrap mengunduh tiap
  * aset dalam satu tarikan. Itu benar untuk tombol "Simpan untuk offline" yang ditekan
  * murid sambil menunggu. Untuk unduhan latar di jaringan ponsel, satu tarikan 78 MB
