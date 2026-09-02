@@ -12,7 +12,7 @@
  *
  * Tujuh janji:
  *   (a) flag 'off' = NOL permintaan ke Cloudflare dan tangga hari ini utuh (aset → Puter →
- *       neural bila prepared → speechSynthesis);
+ *       neural bila prepared → DIAM, teks tetap terbaca; L4 peramban dihapus m025-231);
  *   (b) flag 'on' = urutannya benar dan `POST /api/tts/render` berada TEPAT di antara aset R2
  *       dan Puter — bukan sebelum aset (yang sudah dibayar, gratis), bukan sesudah Puter;
  *   (c) klien tidak pernah mengirim kunci cache. Kuncinya dihitung ULANG di server
@@ -88,6 +88,8 @@ const check = (name, ok, details) => {
  *   warmClientCache   true untuk mengisi cache klien lebih dulu (C0 hit)
  *   prepared          status mesin neural di perangkat
  *   noResolver        true bila modul resolver belum termuat
+ *   localSpeaks       true bila mesin neural di perangkat benar-benar berbunyi (L3 menyahut);
+ *                     tanpa ini L3 menolak, dan tangga berakhir DIAM - tidak ada lapisan lain
  */
 function harness(options) {
   const opts = options || {};
@@ -182,7 +184,7 @@ function harness(options) {
     },
     FiezelVoiceRuntime: {
       status() { return { prepared: !!opts.prepared, ready: !!opts.prepared }; },
-      speak() { calls.runtime++; trace.push('runtime.speak'); return Promise.reject(new Error('neural_failed')); },
+      speak() { calls.runtime++; trace.push('runtime.speak'); return opts.localSpeaks ? Promise.resolve(true) : Promise.reject(new Error('neural_failed')); },
       prefetch() { calls.runtime++; trace.push('runtime.prefetch'); return Promise.resolve(false); },
       // Dipanggilnya SATU KALI saja sudah cukup untuk menggagalkan gerbang: itu artinya jalur
       // spekulatif bisa memulai unduhan model 152 MB tanpa persetujuan murid.
@@ -190,6 +192,12 @@ function harness(options) {
       ensureReady() { calls.ensureReady++; return Promise.reject(new Error('ensureReady_must_never_be_called')); },
       stop() {}
     },
+    /* PERANGKAP L4. Lapisan `speechSynthesis` sudah DIHAPUS dari tangga (m025-231, keputusan
+       OWNER), tetapi stubnya sengaja tetap berdiri di sini: pintu yang terbuka lebar adalah
+       satu-satunya cara membuktikan bahwa tangga tidak melewatinya. Kalau stubnya dibuang,
+       setiap gerbang "tidak berbunyi lewat peramban" akan lulus karena kesempatannya tidak ada
+       - bukan karena keputusannya dihormati - dan lapisan yang diam-diam kembali suatu hari
+       tidak akan menabrak apa pun. Setiap sentuhan dicatat di trace DAN di calls.synth. */
     speechSynthesis: {
       speak(utterance) {
         calls.synth++;
@@ -243,17 +251,28 @@ const idx = (trace, needle) => trace.findIndex((entry) => entry.indexOf(needle) 
     JSON.stringify({ enabled: offHit.api.status().cfVoiceEnabled, mode: offHit.api.status().cfVoiceMode }));
   offHit.done();
 
-  // Aset TIDAK ada, Puter gagal, mesin neural belum prepared: tangga hari ini harus berakhir
-  // di speechSynthesis, urutannya persis seperti sebelum S6.
-  const offMiss = harness({ flag: 'off', prepared: false });
+  /* Aset TIDAK ada dan Puter gagal. Sejak m025-231 tangga hari ini BERHENTI di L3: tidak ada
+     lagi anak tangga bersuara di bawahnya. Harness ini prepared:true supaya anak tangga
+     terakhir itu benar-benar terlihat di jejaknya; varian prepared:false tepat di bawahnya
+     menguji apa yang terjadi ketika L3 pun belum ada - kasus murid baru. */
+  const offMiss = harness({ flag: 'off', prepared: true });
   const offMissSpoke = await offMiss.api.say('Good morning.', { locale: 'en-US' });
-  check('(a) flag off: tangga hari ini utuh — aset → Puter → speechSynthesis, tanpa sisipan',
-    offMissSpoke === true && offMiss.cfFetches().length === 0
+  check('(a) flag off: tangga hari ini utuh — aset → Puter → neural L3, tanpa sisipan dan tanpa anak tangga di bawahnya',
+    offMissSpoke === false && offMiss.cfFetches().length === 0
     && idx(offMiss.trace, 'resolver.resolve') === 0
     && idx(offMiss.trace, 'puter.speak') === 1
-    && idx(offMiss.trace, 'speechSynthesis.speak') === 2
+    && idx(offMiss.trace, 'runtime.speak') === 2
+    && idx(offMiss.trace, 'speechSynthesis.speak') === -1
     && offMiss.calls.prepare === 0 && offMiss.calls.ensureReady === 0,
     JSON.stringify(offMiss.trace));
+  const offBare = harness({ flag: 'off', prepared: false });
+  const offBareSpoke = await offBare.api.say('Good morning.', { locale: 'en-US' });
+  check('(a) flag off tanpa L3: jawabannya false yang tenang, dan suara peramban tidak pernah disentuh',
+    offBareSpoke === false && offBare.cfFetches().length === 0
+    && offBare.calls.runtime === 0 && offBare.calls.synth === 0
+    && offBare.calls.prepare === 0 && offBare.calls.ensureReady === 0,
+    `say()=${offBareSpoke} runtime=${offBare.calls.runtime} synth=${offBare.calls.synth} jejak=${JSON.stringify(offBare.trace)}`);
+  offBare.done();
   check('(a) flag off: prefetch juga tidak menyentuh Cloudflare',
     (await offMiss.api.prefetch('Next sentence.', { locale: 'en-US' }), offMiss.cfFetches().length === 0),
     `fetchCF=${JSON.stringify(offMiss.cfFetches())}`);
@@ -261,15 +280,16 @@ const idx = (trace, needle) => trace.findIndex((entry) => entry.indexOf(needle) 
 
   /* ---------------------------------------------------------------- (b) urutan ----------- */
 
-  const on = harness({ flag: 'on', prepared: false, renderStatus: 500, renderPayload: { error: 'provider_error' } });
+  const on = harness({ flag: 'on', prepared: true, renderStatus: 500, renderPayload: { error: 'provider_error' } });
   const onSpoke = await on.api.say('Good morning.', { locale: 'en-US' });
   const iCache = idx(on.trace, 'cache-open');
   const iAsset = idx(on.trace, 'resolver.resolve');
   const iRender = idx(on.trace, 'fetch-mock:');
   const iPuter = idx(on.trace, 'puter.speak');
-  const iSynth = idx(on.trace, 'speechSynthesis.speak');
-  check('(b) flag on: urutan tangga = cache klien → aset R2 → /api/tts/render → Puter → speechSynthesis',
-    onSpoke === true && iCache === 0 && iAsset > iCache && iRender > iAsset && iPuter > iRender && iSynth > iPuter,
+  const iLocal = idx(on.trace, 'runtime.speak');
+  check('(b) flag on: urutan tangga = cache klien → aset R2 → /api/tts/render → Puter → neural L3',
+    onSpoke === false && iCache === 0 && iAsset > iCache && iRender > iAsset && iPuter > iRender
+    && iLocal > iPuter && idx(on.trace, 'speechSynthesis.speak') === -1,
     JSON.stringify(on.trace));
   check('(b) flag on: sisipan tepat di /api/tts/render pada basis CF, satu permintaan saja',
     on.cfFetches().length === 1 && on.cfFetches()[0] === RENDER_URL,
@@ -323,12 +343,17 @@ const idx = (trace, needle) => trace.findIndex((entry) => entry.indexOf(needle) 
     JSON.stringify(hit.calls.played));
   hit.done();
 
-  const bridge = harness({ flag: 'on', prepared: false, renderPayload: { url: BRIDGE_URL, source: 'cache' } });
+  /* Jembatan PHP ditolak, lalu tangga TURUN. Harness ini memakai L3 yang benar-benar berbunyi
+     supaya yang diuji tetap "turun ke lapisan berikutnya" dan bukan "menyerah": tanpa itu,
+     produksi yang salah - yang menolak URL jembatan lalu diam saja - akan lolos hanya karena
+     hasil akhirnya kebetulan sama-sama false. */
+  const bridge = harness({ flag: 'on', prepared: true, localSpeaks: true, renderPayload: { url: BRIDGE_URL, source: 'cache' } });
   const bridgeSpoke = await bridge.api.say('Good morning.', { locale: 'en-US' });
   check('(e) URL jembatan/origin DITOLAK, dan tangga turun alih-alih memutarnya',
     bridge.calls.played.every((u) => u.indexOf('.php') === -1 && u.indexOf('/api/') === -1)
-    && bridgeSpoke === true && bridge.calls.puter === 1,
-    `diputar=${JSON.stringify(bridge.calls.played)} say()=${bridgeSpoke}`);
+    && bridgeSpoke === true && bridge.calls.puter === 1 && bridge.calls.runtime === 1
+    && bridge.calls.synth === 0,
+    `diputar=${JSON.stringify(bridge.calls.played)} say()=${bridgeSpoke} jejak=${JSON.stringify(bridge.trace)}`);
   bridge.done();
 
   // C0: alamat yang sudah diingat berarti nol permintaan render sama sekali.
@@ -342,14 +367,18 @@ const idx = (trace, needle) => trace.findIndex((entry) => entry.indexOf(needle) 
 
   /* ---------------------------------------------------------------- (f) kuota 429 --------- */
 
+  /* 429 harus TURUN, dan turunnya kini berhenti di L3. Harness ini memberi L3 yang benar-benar
+     berbunyi: janji "murid TETAP mendengar sesuatu bila mungkin" masih hidup sesudah m025-231,
+     hanya saja yang menyahut paling bawah adalah mesin di perangkat - bukan suara peramban,
+     yang punya antrean global dan karena itu bisa berbunyi menimpa pemutar kita. */
   const quota = harness({
-    flag: 'on', prepared: false, renderStatus: 429,
+    flag: 'on', prepared: true, localSpeaks: true, renderStatus: 429,
     renderPayload: { error: 'quota_exceeded', copyKey: 'quota.tts.exhausted', retryAfter: 3600, resetAt: Date.now() + 3600000 }
   });
   const quotaSpoke = await quota.api.say('Good morning.', { locale: 'en-US' });
-  check('(f) 429 jatuh ke lapisan berikutnya — murid TETAP mendengar sesuatu',
-    quotaSpoke === true && quota.calls.puter === 1 && quota.calls.synth === 1,
-    `say()=${quotaSpoke} puter=${quota.calls.puter} synth=${quota.calls.synth} jejak=${JSON.stringify(quota.trace)}`);
+  check('(f) 429 jatuh ke lapisan berikutnya — Puter lalu L3 — dan murid TETAP mendengar sesuatu',
+    quotaSpoke === true && quota.calls.puter === 1 && quota.calls.runtime === 1 && quota.calls.synth === 0,
+    `say()=${quotaSpoke} puter=${quota.calls.puter} runtime=${quota.calls.runtime} synth=${quota.calls.synth} jejak=${JSON.stringify(quota.trace)}`);
   const shown = quota.calls.notices[0] || {};
   check('(f) 429 memunculkan naskah kuota, dan naskahnya TIDAK mengunci item / tidak menghitung replay',
     shown.resolvedKey === 'quota.tts.exhausted' && shown.locksItem === false
@@ -361,14 +390,20 @@ const idx = (trace, needle) => trace.findIndex((entry) => entry.indexOf(needle) 
     `fetchCF=${quota.cfFetches().length} outOfQuota=${quota.transport.status().outOfQuota}`);
   quota.done();
 
-  // Varian JUJUR: tidak ada satu pun lapisan yang bersuara.
+  /* Varian JUJUR: tidak ada satu pun lapisan yang bersuara. Keadaan ini dulu disimulasikan
+     dengan `delete sandbox.speechSynthesis` - dunia dihapus supaya hasilnya diam. Sejak
+     m025-231 tidak ada yang perlu dihapus: perangkat yang aset neuralnya belum diunduh memang
+     SUDAH tidak punya lapisan bersuara di bawah Puter, dan itulah keadaan murid baru yang
+     sebenarnya. Perangkap `speechSynthesis` justru dibiarkan terpasang, supaya diam di sini
+     terbukti sebagai KEPUTUSAN, bukan sebagai kekurangan alat.
+     Inti gerbangnya tidak bergeser sedikit pun: naskah yang dibaca murid harus tetap jujur -
+     kata-kata untuk "berbunyi" dan untuk "diam" wajib berbeda. */
   const mute = harness({ flag: 'on', prepared: false, renderStatus: 429, renderPayload: { copyKey: 'quota.tts.exhausted', resetAt: Date.now() } });
-  delete mute.sandbox.speechSynthesis;
-  delete mute.sandbox.SpeechSynthesisUtterance;
   const muteSpoke = await mute.api.say('Good morning.', { locale: 'en-US' });
   const honest = mute.calls.notices[0] || {};
   check('(f) tanpa suara sama sekali: naskahnya JUJUR (bukan "pakai suara perangkat") dan tetap tidak mengunci',
     muteSpoke === false && honest.spoken === false && honest.locksItem === false
+    && mute.calls.synth === 0
     && /belum bisa dibunyikan|belum punya suara cadangan/.test(String(honest.body))
     && String(honest.body) !== String(notice.build('quota.tts.exhausted', { spoken: true }).body),
     JSON.stringify(honest));
@@ -384,7 +419,7 @@ const idx = (trace, needle) => trace.findIndex((entry) => entry.indexOf(needle) 
   check('(g) prefetch TIDAK memanggil prepare()/ensureReady() — pagar 152 MB utuh',
     pre.calls.prepare === 0 && pre.calls.ensureReady === 0,
     `prepare=${pre.calls.prepare} ensureReady=${pre.calls.ensureReady}`);
-  check('(g) prefetch tidak membunyikan apa pun (tanpa pemutaran, tanpa speechSynthesis, tanpa toast)',
+  check('(g) prefetch tidak membunyikan apa pun (tanpa pemutaran, tanpa suara peramban, tanpa naskah)',
     pre.calls.played.length === 0 && pre.calls.synth === 0 && pre.calls.notices.length === 0,
     `diputar=${JSON.stringify(pre.calls.played)} synth=${pre.calls.synth} notice=${pre.calls.notices.length}`);
   const preBody = pre.calls.bodies[0] || {};
@@ -432,6 +467,16 @@ const idx = (trace, needle) => trace.findIndex((entry) => entry.indexOf(needle) 
   check('penjaga: pintu bicara tidak pernah menyusun sendiri badan permintaan CF',
     !/(^|[^A-Za-z_.$])fetch\s*\(/.test(SAY),
     'seluruh pengetahuan jaringan tinggal di fiezel-cf-tts-transport.js');
+
+  /* m025-231. Lapisan suara peramban DIHAPUS dari tangga atas keputusan OWNER; jalur CF tidak
+     boleh menjadi pintu belakangnya. Yang dihitung adalah KODE, bukan berkas: komentar tangga
+     di kepala kedua berkas ini memang masih menyebut L4 sebagai sejarah, dan di sanalah memang
+     tempatnya - gerbang yang menghukum penjelasan hanya akan membuat penjelasannya dihapus. */
+  const codeLines = (source) => source.split('\n').filter((line) => !/^\s*(\/\/|\*|\/\*)/.test(line)).join('\n');
+  check('penjaga: tidak ada pemanggilan suara peramban di lapisan CF maupun di pintu bicara',
+    !/speechSynthesis|SpeechSynthesisUtterance|speakWithBrowser/.test(codeLines(TRANSPORT))
+      && !/speechSynthesis|SpeechSynthesisUtterance|speakWithBrowser/.test(codeLines(SAY)),
+    'kalau L4 kembali suatu hari, ia akan kembali lewat salah satu dari dua berkas ini');
   check('penjaga: modul baru ikut dimuat malas di grup voice DAN ikut di-precache service worker',
     HTML.includes('src="./features/neural-voice/fiezel-cf-tts-transport.js"')
     && HTML.includes('src="./features/neural-voice/fiezel-cf-voice-notice.js"')
