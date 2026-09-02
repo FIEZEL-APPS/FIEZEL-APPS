@@ -195,8 +195,19 @@ menggolongkannya.
    sekalian menutup celah **yang sudah ada sebelumnya**: empat sidecar bank yang terdaftar di
    manifest sejak W3 (speaking, listening, writing, reading-exam) tidak pernah tercakup
    matcher, jadi murid th offline kehilangan bank soalnya tanpa suara. Kini 29 aset tercakup.
-5. **Ritual bump versi** — `core-config.js` `FIEZEL_PAGE_BUILD`, `fiezel-diag-panel.js`
-   `DIAG_BUILD`, `sw.js` `SW_REV` dinaikkan bertiga ke `m025-230`.
+5. **Ritual bump versi** — dinaikkan ke `m025-230`. **Tempatnya EMPAT, bukan tiga**, dan
+   nomornya tidak boleh diketik dengan tangan:
+
+   ```
+   node tools/bump-build.mjs "<alasan singkat>"
+   ```
+
+   Ia mengambil versi dari `origin/main`, menaikkan satu, lalu menulis `sw.js`,
+   `core-config.js`, `fiezel-diag-panel.js` **dan** `coordination/BUILD-VERSION.json`
+   sekaligus. Berkas keempat itu sumber tunggalnya; `coordination-guard-test.js` merah kalau
+   ketiga penanda tidak sama dengannya. Menaikkan tiga berkas dengan tangan lolos A7 di CI
+   (A7 hanya memeriksa +1) tetapi tetap merah di gerbang koordinasi — persis yang terjadi di
+   PR ini.
 
 ## Penjelasan L1: adaptasi, jangan terjemahkan
 
@@ -215,4 +226,5 @@ diadaptasi ke bahasa ibu pembacanya, bukan diterjemahkan.**
    berhubungan (tes hash-lock `vendor/kokoro-js/kokoro.web.js`, merah bahkan di `main` bersih
    pada lingkungan ini) tidak memblokir — pastikan dulu lewat `git diff main -- <path>` bahwa
    berkasnya memang tidak tersentuh.
-5. Naikkan trio build bertiga, +1 dari `m025-N` saat ini.
+5. Naikkan build lewat `node tools/bump-build.mjs "<alasan>"` — jangan mengetik nomornya
+   dengan tangan, dan jangan lupa berkas keempat (`coordination/BUILD-VERSION.json`).
