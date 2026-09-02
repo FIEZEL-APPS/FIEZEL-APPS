@@ -52,6 +52,8 @@
   var VOCAB_TH = './vocabulary-th.json';
   var SPEAKING_TH = './features/i18n/speaking-bank-th.json';
   var LISTENING_TH = './features/i18n/listening-bank-th.json';
+  var LISTENING_EXAM_TH = './features/i18n/listening-exam-th.json';
+  var SPEAKING_EXAM_TH = './features/i18n/speaking-exam-th.json';
   var WRITING_TH = './features/i18n/writing-prompts-th.json';
   var READING_TH = './features/i18n/reading-exam-th.json';
   var MISCONCEPTION_TH = './features/i18n/misconception-th.json';
@@ -88,6 +90,8 @@
       fetch(VOCAB_TH, { credentials: 'same-origin' }).then(function (r) { if (!r.ok) throw Error(VOCAB_TH + ': ' + r.status); return r.json(); }).then(function (j) { d.vocab = j; }),
       fetch(SPEAKING_TH, { credentials: 'same-origin' }).then(function (r) { if (!r.ok) throw Error(SPEAKING_TH + ': ' + r.status); return r.json(); }).then(function (j) { d.speaking = j.items || j; }),
       fetch(LISTENING_TH, { credentials: 'same-origin' }).then(function (r) { if (!r.ok) throw Error(LISTENING_TH + ': ' + r.status); return r.json(); }).then(function (j) { d.listening = j.items || j; }),
+      fetch(LISTENING_EXAM_TH, { credentials: 'same-origin' }).then(function (r) { if (!r.ok) throw Error(LISTENING_EXAM_TH + ': ' + r.status); return r.json(); }).then(function (j) { d.listeningExam = j; }),
+      fetch(SPEAKING_EXAM_TH, { credentials: 'same-origin' }).then(function (r) { if (!r.ok) throw Error(SPEAKING_EXAM_TH + ': ' + r.status); return r.json(); }).then(function (j) { d.speakingExam = j; }),
       fetch(WRITING_TH, { credentials: 'same-origin' }).then(function (r) { if (!r.ok) throw Error(WRITING_TH + ': ' + r.status); return r.json(); }).then(function (j) { d.writing = j; }),
       fetch(READING_TH, { credentials: 'same-origin' }).then(function (r) { if (!r.ok) throw Error(READING_TH + ': ' + r.status); return r.json(); }).then(function (j) { d.reading = j; }),
       fetch(MISCONCEPTION_TH, { credentials: 'same-origin' }).then(function (r) { if (!r.ok) throw Error(MISCONCEPTION_TH + ': ' + r.status); return r.json(); }).then(function (j) { d.misconception = j; }),
@@ -124,7 +128,7 @@
     if (activated) return;
     activated = true;
     // Baru di titik ini window.FiezelThData lahir — murid id tidak pernah sampai sini.
-    root.FiezelThData = { grammar: null, vocab: null, speaking: null, listening: null, writing: null, reading: null, misconception: null, cloze: null, readingBank: null, ready: false };
+    root.FiezelThData = { grammar: null, vocab: null, speaking: null, listening: null, listeningExam: null, speakingExam: null, writing: null, reading: null, misconception: null, cloze: null, readingBank: null, ready: false };
     injectScripts();
     fetchDatasets();
     fillLocaleCache();
@@ -134,7 +138,8 @@
     try { if (root.FiezelI18n && root.FiezelI18n.getLocale() === 'th') activate(); } catch (_) {}
   }
 
-  root.FiezelThLoader = { maybeActivate: maybeActivate };
+  function isThActive() { return activated; }
+  root.FiezelThLoader = { maybeActivate: maybeActivate, isThActive: isThActive };
   // Boot: skrip ini dieksekusi SETELAH fiezel-i18n.js (urutan blok FIEZEL_I18N) tapi SEBELUM
   // app.js menarik learnerLocale dari state — jadi jalur nyata aktivasi boot adalah listener
   // onChange di bawah. Pemeriksaan langsung tetap ada untuk harness/VM yang memuat terbalik.

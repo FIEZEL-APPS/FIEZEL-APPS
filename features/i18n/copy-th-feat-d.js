@@ -35,6 +35,8 @@
     'fsl.exit-btn': 'ออก',
     'fsl.dictation-placeholder': 'พิมพ์สิ่งที่คุณได้ยิน…',
     'fsl.submit-btn': 'ตรวจคำตอบ',
+    'fsl.level-follows-main': ' · ตามระดับหลักที่เลือกไว้',
+    'fsl.script-label': 'บทพูด:',
     'fsl.replays-count': 'เล่น {count} ครั้ง',
     'fsl.replay-status': 'เสียงพร้อม · เล่นซ้ำ {current}/{limit}',
     'fsl.translation-label': 'คำแปล:',
