@@ -59,6 +59,13 @@
     navigator.serviceWorker.addEventListener('controllerchange', reloadIfApproved);
   }
 
+  function t(k, params) {
+    try {
+      if (self.FiezelI18n && typeof self.FiezelI18n.t === 'function') return self.FiezelI18n.t(k, params);
+    } catch (_) {}
+    return k;
+  }
+
   function hide() {
     var node = el();
     if (!node) return;
@@ -70,7 +77,11 @@
   function apply() {
     bindReload();
     var node = el(), btn = node && node.querySelector('#updateBannerApply');
-    if (btn) { btn.disabled = true; btn.textContent = 'Memperbarui...'; }
+    if (btn) {
+      btn.disabled = true;
+      var apText = t('update.applying-text');
+      btn.textContent = (apText && apText !== 'update.applying-text') ? apText : 'Memperbarui...';
+    }
     setSess('fiezel-apply-update', '1');
     if (pendingWorker && typeof pendingWorker.postMessage === 'function') {
       try { pendingWorker.postMessage({ type: 'FIEZEL_SKIP_WAITING' }); } catch (_) {}
@@ -91,11 +102,26 @@
     var node = el();
     if (!node) return false;
     shown = true;
+    try {
+      node.querySelectorAll('[data-i18n]').forEach(function (el) {
+        var k = el.getAttribute('data-i18n');
+        if (k) { var val = t(k); if (val && val !== k) el.textContent = val; }
+      });
+      node.querySelectorAll('[data-i18n-html]').forEach(function (el) {
+        var k = el.getAttribute('data-i18n-html');
+        if (k) { var val = t(k); if (val && val !== k) el.innerHTML = val; }
+      });
+    } catch (_) {}
     var line = node.querySelector('#updateBannerVersion');
     if (line) {
-      line.textContent = remoteVersion && remoteVersion !== APP_VERSION
-        ? 'Versi ' + remoteVersion + (APP_VERSION ? ' · kamu sekarang memakai ' + APP_VERSION : '')
-        : '';
+      if (remoteVersion && remoteVersion !== APP_VERSION) {
+        var vText = t('update.version-text', { newVersion: remoteVersion, curVersion: APP_VERSION || '' });
+        line.textContent = (vText && vText !== 'update.version-text')
+          ? vText
+          : ('Versi ' + remoteVersion + (APP_VERSION ? ' · kamu sekarang memakai ' + APP_VERSION : ''));
+      } else {
+        line.textContent = '';
+      }
     }
     var applyBtn = node.querySelector('#updateBannerApply');
     var laterBtn = node.querySelector('#updateBannerLater');
