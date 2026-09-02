@@ -19,6 +19,8 @@
  *  I. NOL KUNCI BERSAMA— `toIdentityEvent` membuang cohort dan mengganti eventId,
  *                        sehingga dua lane tidak bisa disambungkan lewat kunci apa pun.
  *  J. MURNI            — validator/agregator lane ini diuji langsung tanpa Worker.
+ *  K. NAMA LEARNER     — nama WAJIB di perkenalan, dikirim ke server, terikat
+ *                        identity.sub, dan mengganti nama TIDAK memutus bukti.
  *
  * Worker dibangkitkan lengkap (D1 palsu) lewat tools/cf-worker-boot.js: gerbang yang
  * hanya menguji fungsi murni tidak akan pernah membuktikan bahwa cookie -> sub -> baris
@@ -116,6 +118,7 @@ async function bootLane(options = {}) {
   await boot.prepareDb(app);
   await boot.applyMigration(app.core, 'migrations/0006_social.sql');
   await boot.applyMigration(app.core, 'migrations/0009_learner_evidence.sql');
+  await boot.applyMigration(app.core, 'migrations/0010_learner_name.sql');
   return app;
 }
 
@@ -400,6 +403,157 @@ async function babWorker() {
 }
 
 /* ==========================================================================
+ * K. NAMA LEARNER — dari perkenalan, ke server, terikat identity.sub
+ * ========================================================================== */
+async function babK() {
+  const app = await bootLane();
+  const cookieA = await app.issueIdentity();
+  const cookieB = await app.issueIdentity();
+
+  // --- tanpa identitas: tidak ada nama yang bisa disimpan --------------------
+  const anon = await app.call('POST', '/api/learner/name', { body: { name: 'Andi' } });
+  check('(K) POST nama tanpa cookie -> 401', anon.status === 401, String(anon.status));
+
+  // --- jalur normal ---------------------------------------------------------
+  const putA = await app.call('POST', '/api/learner/name', { cookie: cookieA, body: { name: '  Budi   Santoso ' } });
+  check('(K) nama tersimpan dan dipantulkan dalam bentuk TERNORMALISASI',
+    putA.status === 200 && putA.json.ok === true && putA.json.name === 'Budi Santoso', JSON.stringify(putA.json));
+  const putB = await app.call('POST', '/api/learner/name', { cookie: cookieB, body: { name: 'Siti' } });
+  check('(K) murid kedua menyimpan namanya sendiri', putB.status === 200 && putB.json.name === 'Siti');
+
+  const getA = await app.call('GET', '/api/learner/name', { cookie: cookieA });
+  const getB = await app.call('GET', '/api/learner/name', { cookie: cookieB });
+  check('(K) tiap murid membaca namanya SENDIRI, bukan nama orang lain',
+    getA.json.name === 'Budi Santoso' && getB.json.name === 'Siti',
+    JSON.stringify({ a: getA.json, b: getB.json }));
+
+  // --- spoofing -------------------------------------------------------------
+  const spoof = await app.call('POST', '/api/learner/name', { cookie: cookieA, body: { name: 'Andi', sub: '11111111-1111-4111-8111-111111111111' } });
+  check('(K) body nama yang menitipkan `sub` ditolak 400',
+    spoof.status === 400 && spoof.json.error === 'schema_invalid', JSON.stringify(spoof.json));
+  const spoofUser = await app.call('POST', '/api/learner/name', { cookie: cookieA, body: { name: 'Andi', userId: 'x' } });
+  check('(K) body nama yang menitipkan `userId` ditolak 400', spoofUser.status === 400);
+  check('(K) nama murid B TIDAK berubah oleh percobaan spoof murid A',
+    (await app.call('GET', '/api/learner/name', { cookie: cookieB })).json.name === 'Siti');
+
+  // --- normalisasi + penolakan ---------------------------------------------
+  const empty = await app.call('POST', '/api/learner/name', { cookie: cookieA, body: { name: '   ' } });
+  check('(K) nama kosong sesudah normalisasi -> 400 empty_name',
+    empty.status === 400 && empty.json.reason === 'empty_name', JSON.stringify(empty.json));
+  const angled = await app.call('POST', '/api/learner/name', { cookie: cookieA, body: { name: '<b>Andi</b>' } });
+  check('(K) kurung sudut dibuang, bukan ditolak', angled.status === 200 && angled.json.name === 'bAndi/b', JSON.stringify(angled.json));
+  const longName = await app.call('POST', '/api/learner/name', { cookie: cookieA, body: { name: 'A'.repeat(60) } });
+  check('(K) nama kepanjangan DIPOTONG ke 24, bukan ditolak',
+    longName.status === 200 && longName.json.name.length === 24, String(longName.json && longName.json.name && longName.json.name.length));
+
+  // --- nama muncul di Owner Dashboard TANPA social_profile ------------------
+  await app.call('POST', '/api/braincore/learner-evidence/consent', { cookie: cookieA, body: { granted: true } });
+  await app.call('POST', '/api/braincore/learner-evidence/consent', { cookie: cookieB, body: { granted: true } });
+  await app.call('POST', '/api/learner/name', { cookie: cookieA, body: { name: 'Budi' } });
+  await app.call('POST', '/api/braincore/learner-evidence', { cookie: cookieA, body: envelope([evEvent(), decEvent()]) });
+  await app.call('POST', '/api/braincore/learner-evidence', { cookie: cookieB, body: envelope([evEvent()]) });
+
+  const dir = await app.call('GET', '/api/owner/learners?days=30', { headers: ownerHeaders });
+  const budi = dir.json.learners.find((x) => x.name === 'Budi');
+  const siti = dir.json.learners.find((x) => x.name === 'Siti');
+  check('(K) owner melihat NAMA murid, bukan 8 hex sub — tanpa social_profile sama sekali',
+    !!budi && !!siti && budi.sub !== siti.sub, JSON.stringify(dir.json.learners));
+  check('(K) asal nama dilaporkan sebagai `onboarding`',
+    budi.nameSource === 'onboarding' && siti.nameSource === 'onboarding',
+    JSON.stringify([budi.nameSource, siti.nameSource]));
+  check('(K) murid TANPA profil sosial tetap punya nama (tidak lagi bergantung social_profile)',
+    budi.displayName === null && budi.handle === null && budi.name === 'Budi');
+
+  const detail = await app.call('GET', `/api/owner/learner-evidence?sub=${budi.sub}`, { headers: ownerHeaders });
+  check('(K) halaman satu murid juga memakai nama perkenalan',
+    detail.json.learner.name === 'Budi' && detail.json.learner.nameSource === 'onboarding',
+    JSON.stringify(detail.json.learner));
+
+  // --- GANTI NAMA: bukti tetap melekat pada sub yang sama --------------------
+  {
+    const before = detail.json.summary.decisionCount;
+    const renamed = await app.call('POST', '/api/learner/name', { cookie: cookieA, body: { name: 'Budiman' } });
+    check('(K) murid mengganti namanya', renamed.status === 200 && renamed.json.name === 'Budiman');
+    const after = await app.call('GET', `/api/owner/learner-evidence?sub=${budi.sub}`, { headers: ownerHeaders });
+    check('(K) GANTI NAMA TIDAK memutus bukti: sub sama, hitungan sama, nama baru',
+      after.json.learner.sub === budi.sub &&
+      after.json.learner.name === 'Budiman' &&
+      after.json.summary.decisionCount === before,
+      JSON.stringify({ sub: after.json.learner.sub, name: after.json.learner.name, before, after: after.json.summary.decisionCount }));
+    const dir2 = await app.call('GET', '/api/owner/learners?days=30', { headers: ownerHeaders });
+    check('(K) direktori TIDAK memunculkan murid kedua akibat ganti nama',
+      dir2.json.learners.length === 2 && dir2.json.learners.some((x) => x.name === 'Budiman'),
+      JSON.stringify(dir2.json.learners.map((x) => x.name)));
+  }
+
+  // --- profil sosial hanya CADANGAN ----------------------------------------
+  {
+    const app2 = await bootLane();
+    const cookieC = await app2.issueIdentity();
+    await app2.call('POST', '/api/braincore/learner-evidence/consent', { cookie: cookieC, body: { granted: true } });
+    await app2.call('POST', '/api/braincore/learner-evidence', { cookie: cookieC, body: envelope([evEvent()]) });
+    await app2.call('POST', '/api/social/profile/create', { cookie: cookieC, body: { handle: 'citra_x', displayName: 'Citra' } });
+    const d1 = await app2.call('GET', '/api/owner/learners?days=30', { headers: ownerHeaders });
+    check('(K) murid LAMA tanpa learner_name jatuh ke display_name sosial (cadangan)',
+      d1.json.learners[0].name === 'Citra' && d1.json.learners[0].nameSource === 'social_display',
+      JSON.stringify(d1.json.learners[0]));
+    await app2.call('POST', '/api/learner/name', { cookie: cookieC, body: { name: 'Citra Dewi' } });
+    const d2 = await app2.call('GET', '/api/owner/learners?days=30', { headers: ownerHeaders });
+    check('(K) begitu nama perkenalan ada, IA yang menang atas profil sosial',
+      d2.json.learners[0].name === 'Citra Dewi' && d2.json.learners[0].nameSource === 'onboarding',
+      JSON.stringify(d2.json.learners[0]));
+  }
+}
+
+/* ==========================================================================
+ * K2. NAMA — sumber klien: WAJIB, dinormalkan sama, dikirim ke server
+ * ========================================================================== */
+async function babK2() {
+  const onboarding = read('features/onboarding/fiezel-onboarding.js');
+  // Langkah nama tidak boleh punya jalan keluar. Tiga pagar, ketiganya diperiksa.
+  check('(K) langkah nama TANPA tombol "Lewati" dan tanpa "Kembali" (topbar(false, false))',
+    /function nameMarkup\(env, typed\)[\s\S]{0,200}topbar\(false, false\)/.test(onboarding));
+  check('(K) tombol lanjut MATI selama nama kosong',
+    /btn\(T\('onboarding\.next'\), 'data-ob-advance' \+ \(clean \? '' : ' disabled'\)\)/.test(onboarding));
+  check('(K) jalur Enter pada papan ketik juga dijaga (tidak melewati tombol)',
+    /if \(step === NAME_STEP\)[\s\S]{0,300}if \(!typedName\) return;/.test(onboarding));
+
+  // Normalisasi klien dan server WAJIB satu aturan.
+  const core = await boot.importApiModule('evidence/learner-evidence-core.js');
+  const M = require('./features/onboarding/fiezel-onboarding.js');
+  const clientNormalize = M && typeof M.normalizeName === 'function' ? M.normalizeName : null;
+  check('(K) modul perkenalan memaparkan normalizeName untuk diadu', typeof clientNormalize === 'function');
+  if (clientNormalize) {
+    const kasus = ['  Andi   Pratama  ', "O'Neil-Ré", '<b>Budi</b>', 'A'.repeat(60), '   ', 'Siti\tNur'];
+    const beda = kasus.filter((k) => clientNormalize(k) !== core.normalizeLearnerName(k));
+    check('(K) normalisasi nama KLIEN == SERVER (nama tidak menyimpang antar dua layar)',
+      beda.length === 0, JSON.stringify(beda.map((k) => ({ k, klien: clientNormalize(k), server: core.normalizeLearnerName(k) }))));
+    check('(K) batas panjang nama sama di kedua sisi (24)', core.LEARNER_NAME_MAX === 24);
+  }
+
+  const app = read('app.js');
+  check('(K) klien mengirim nama ke server saat nama DISET (force, tidak menunggu besok)',
+    /learnerNameSyncToServer\(name,\{force:true\}\)/.test(app));
+  check('(K) klien menyegarkan nama maksimum SEKALI SEHARI (rem tulis)',
+    /LEARNER_NAME_SYNC_KEY/.test(app) && /last\.day===day&&last\.name===clean/.test(app));
+  check('(K) penanda kirim ditulis HANYA sesudah server mengonfirmasi',
+    /if\(!r\|\|!r\.ok\)return false;[\s\S]{0,240}setItem\(LEARNER_NAME_SYNC_KEY/.test(app));
+  check('(K) klien TIDAK PERNAH mengirim sub bersama nama (hanya {name})',
+    /body:JSON\.stringify\(\{name:clean\}\)/.test(app));
+  check('(K) nama tidak meninggalkan perangkat selama lane per-murid mati',
+    /function learnerNameSyncToServer[\s\S]{0,200}identityEvidenceMode\(\)==='off'\)return Promise\.resolve\(false\)/.test(app));
+  check('(K) penyegaran harian dipanggil dari jalur boot SESUDAH perkenalan',
+    /askLearnerNameIfMissing\(at\)\)return null;[\s\S]{0,400}maybeSyncLearnerName\(at\)/.test(app));
+
+  // Naskah privasi WAJIB benar apa adanya.
+  const copyId = read('features/i18n/copy-id-feat-b.js');
+  check('(K) naskah perkenalan TIDAK lagi menjanjikan "nggak dibagi ke siapa pun"',
+    !/Nggak dibagi ke siapa pun/.test(copyId));
+  check('(K) naskah perkenalan menyebut nama ikut ke akun FIEZEL dan bisa diganti',
+    /akun FIEZEL/.test(copyId) && /(ganti|Pengaturan)/.test(copyId));
+}
+
+/* ==========================================================================
  * G. FAIL-CLOSED — tiga sakelar AND
  * ========================================================================== */
 async function babG() {
@@ -409,6 +563,9 @@ async function babG() {
     const res = await app.call('POST', '/api/braincore/learner-evidence/consent', { cookie, body: { granted: true } });
     check('(G) FEATURE_LEARNER_EVIDENCE="off" -> 403 learner_evidence_disabled',
       res.status === 403 && res.json.error === 'learner_evidence_disabled', JSON.stringify(res.json));
+    const nameOff = await app.call('POST', '/api/learner/name', { cookie, body: { name: 'Andi' } });
+    check('(G) nama pun TIDAK tersimpan selama lane mati -> 403',
+      nameOff.status === 403, String(nameOff.status));
   }
   {
     const app = await bootLane({ kvEntries: {} });
@@ -460,6 +617,19 @@ function babH() {
   // Komentar BOLEH menyebut binding lain (larangannya justru ditulis di sana); yang
   // dilarang adalah KODE yang menyentuhnya. Karena itu komentar dibuang dulu.
   const stripComments = (src) => src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
+  const mig10 = read('workers/api/migrations/0010_learner_name.sql');
+  const ddl10 = mig10.replace(/--[^\n]*/g, '');
+  check('(K) 0010 menyimpan nama di TABEL SENDIRI, bukan kolom di `identity`',
+    /CREATE TABLE IF NOT EXISTS learner_name/.test(ddl10) && !/ALTER TABLE identity/i.test(ddl10));
+  check('(K) `sub` tetap primary key; nama BUKAN kunci dan BUKAN unik',
+    /sub\s+TEXT\s+NOT NULL\s+PRIMARY KEY/.test(ddl10) && !/UNIQUE[\s\S]{0,40}name/i.test(ddl10));
+  for (const forbidden of ['email', 'phone', 'school', 'birth', 'ip_address', 'user_agent', 'password', 'answer']) {
+    check(`(K) 0010 tidak memuat kolom terlarang "${forbidden}"`,
+      !new RegExp('\\b' + forbidden + '\\b', 'i').test(ddl10));
+  }
+  check('(K) tidak ada indeks atas kolom `name` (mencari murid by nama tidak dimurahkan)',
+    !/CREATE INDEX[^\n]*learner_name\(name\)/i.test(mig10));
+
   const store = stripComments(read('workers/api/evidence/learner-evidence-store-d1.js'));
   check('(H) store lane per-murid TIDAK PERNAH menyebut EVIDENCE_DB/LEARNING_DB/STATS_DB',
     !/EVIDENCE_DB|LEARNING_DB|STATS_DB|ANALYTICS/.test(store), store.match(/EVIDENCE_DB|LEARNING_DB|STATS_DB|ANALYTICS/g));
@@ -551,13 +721,13 @@ async function babDashboard() {
     learners: {
       state: 'measured',
       learners: [
-        { sub: '11111111-1111-4111-8111-111111111111', displayName: 'Andi', handle: 'andi_belajar', firstDay: '2026-08-01', lastDay: '2026-09-01', evidenceCount: 4, decisionCount: 42, lastLevel: 'A2', lastMastery: 'm60-80', lastTrend: 'up', lastOutcome: 'positive' },
-        { sub: '22222222-2222-4222-8222-222222222222', displayName: null, handle: null, firstDay: '2026-08-20', lastDay: '2026-08-30', evidenceCount: 1, decisionCount: 0, lastLevel: null, lastMastery: null, lastTrend: null, lastOutcome: null },
+        { sub: '11111111-1111-4111-8111-111111111111', name: 'Andi', nameSource: 'onboarding', displayName: 'Andi', handle: 'andi_belajar', firstDay: '2026-08-01', lastDay: '2026-09-01', evidenceCount: 4, decisionCount: 42, lastLevel: 'A2', lastMastery: 'm60-80', lastTrend: 'up', lastOutcome: 'positive' },
+        { sub: '22222222-2222-4222-8222-222222222222', name: null, nameSource: 'none', displayName: null, handle: null, firstDay: '2026-08-20', lastDay: '2026-08-30', evidenceCount: 1, decisionCount: 0, lastLevel: null, lastMastery: null, lastTrend: null, lastOutcome: null },
       ],
     },
     learnerDetail: {
       state: 'measured',
-      learner: { sub: '11111111-1111-4111-8111-111111111111', displayName: 'Andi', handle: 'andi_belajar' },
+      learner: { sub: '11111111-1111-4111-8111-111111111111', name: 'Andi', nameSource: 'onboarding', displayName: 'Andi', handle: 'andi_belajar' },
       summary: {
         measured: true, evidenceCount: 4, decisionCount: 42, activeDays: 12,
         firstDay: '2026-08-01', lastDay: '2026-09-01',
@@ -574,6 +744,15 @@ async function babDashboard() {
   };
   const html = mod.renderLearnerSection(model);
   check('(E) HTML dashboard memuat nama murid', /Andi/.test(html));
+  check('(K) label memakai `name` dari server, bukan mengulang urutan pemilihan',
+    mod.learnerLabel({ sub: '1', name: 'Budi', nameSource: 'onboarding', displayName: 'X', handle: 'y' }) === 'Budi');
+  check('(K) handle sosial ditandai @, nama perkenalan tidak',
+    mod.learnerLabel({ sub: '1', name: 'citra_x', nameSource: 'social_handle' }) === '@citra_x' &&
+    mod.learnerLabel({ sub: '1', name: 'Citra', nameSource: 'onboarding' }) === 'Citra');
+  check('(K) tanpa nama sama sekali -> "murid <8 hex>" (legacy/galat, bukan normal)',
+    mod.learnerLabel({ sub: 'a83f21c4-0000-4000-8000-000000000000', name: null, nameSource: 'none' }) === 'murid a83f21c4');
+  check('(K) nameSource asing dari API dinormalkan ke "none"',
+    mod.sanitizeLearnerRow({ sub: '11111111-1111-4111-8111-111111111111', name: 'X', nameSource: 'karangan' }).nameSource === 'none');
   check('(E) HTML dashboard memuat tautan pilih-murid ber-sub', /learner=11111111-1111-4111-8111-111111111111/.test(html));
   check('(E) HTML dashboard memuat angka keputusan Braincore murid itu', /42/.test(html));
   check('(E) HTML dashboard memuat kalibrasi 84%', /84%/.test(html));
@@ -614,9 +793,15 @@ function babDokumen() {
   const migDoc = read('workers/api/migrations/MIGRATIONS.md');
   check('(H) 0009 terdaftar di MIGRATIONS.md sebagai migrasi fiezel-core',
     /d1 execute fiezel-core --remote --file=migrations\/0009_learner_evidence\.sql/.test(migDoc));
+  check('(K) 0010 terdaftar di MIGRATIONS.md sebagai migrasi fiezel-core',
+    /d1 execute fiezel-core --remote --file=migrations\/0010_learner_name\.sql/.test(migDoc));
+  check('(K) retensi nama learner tertulis di docs/D1-RETENTION.md',
+    /learner_name/.test(retention));
   const privacy = read('BRAIN-DATA-PRIVACY.md');
   check('(F) BRAIN-DATA-PRIVACY.md mendokumentasikan lane per-murid',
     /learner_evidence/.test(privacy) && /180/.test(privacy));
+  check('(K) BRAIN-DATA-PRIVACY.md mendokumentasikan nama learner di server',
+    /learner_name/.test(privacy));
   const workflow = read('.github/workflows/quality.yml');
   check('gerbang ini dipanggil quality.yml',
     /node braincore-learner-identity-test\.js/.test(workflow));
@@ -627,6 +812,8 @@ function babDokumen() {
   await babJ();
   babI();
   await babWorker();
+  await babK();
+  await babK2();
   await babG();
   babH();
   babKlien();

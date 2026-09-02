@@ -89,6 +89,8 @@ wrangler d1 execute fiezel-evidence --remote --file=migrations/0008_evidence.sql
 wrangler d1 execute fiezel-core --remote --file=migrations/0006_social.sql
 # --- fiezel-core: lane bukti belajar PER-MURID (SLOT 9) ---
 wrangler d1 execute fiezel-core --remote --file=migrations/0009_learner_evidence.sql
+# --- fiezel-core: nama learner dari perkenalan (SLOT 9) ---
+wrangler d1 execute fiezel-core --remote --file=migrations/0010_learner_name.sql
 ```
 
 `0009_learner_evidence.sql` masuk `fiezel-core` dan **bukan** `fiezel-evidence`,
@@ -101,6 +103,14 @@ membatalkan seluruh jaminannya. `fiezel-core` sebaliknya sudah memegang
 `identity` dan `social_profile`, jadi lane beridentitas memang tempatnya di sana,
 dan LEFT JOIN ke `social_profile` untuk nama tampilan menjadi mungkin tanpa
 menyalin nama ke tabel kedua.
+
+`0010_learner_name.sql` menyimpan nama panggilan yang WAJIB diisi murid di
+langkah pertama perkenalan, dalam tabel SENDIRI dan bukan sebagai kolom di
+`identity`. Alasannya ada di kepala berkasnya: `0001_identity.sql` memuat daftar
+keras yang melarang nama masuk ke tabel itu, dan larangan itu punya alasan
+operasional yang masih berlaku (tabel jalur-panas, jarang berubah). Nama boleh
+berubah kapan saja; `sub` tidak. Memisahkan keduanya juga yang membuat penggantian
+nama TIDAK memutus bukti belajar yang sudah terkumpul.
 
 Retensi lane ini **180 hari** (`LEARNER_EVIDENCE_LIMITS.RETENTION_DAYS`), bukan
 14 hari seperti lane agregat, dan bukan pula tak terbatas. Alasan dan perintah

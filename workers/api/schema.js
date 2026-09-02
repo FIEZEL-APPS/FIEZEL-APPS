@@ -81,7 +81,11 @@ export const BYTE_LIMITS = Object.freeze({
   '/api/braincore/learner-evidence': 8192,
   '/api/braincore/learner-evidence/consent': 512,
   '/api/owner/learners': 512,          // GET, tanpa body
-  '/api/owner/learner-evidence': 512   // GET, tanpa body
+  '/api/owner/learner-evidence': 512,  // GET, tanpa body
+  // Nama panggilan murid (maks 24 char sesudah normalisasi) + amplop JSON.
+  // Kecil dengan sengaja: payload kecil = CPU kecil, dan rute ini dipanggil
+  // setiap murid maksimum sekali sehari.
+  '/api/learner/name': 512
 });
 
 /** Cap terakhir untuk path yang tidak terdaftar: kecil, sengaja. */

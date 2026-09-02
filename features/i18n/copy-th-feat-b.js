@@ -313,7 +313,7 @@
     'onboarding.isinya-item-listening-grammar-and': '<p class="fiezel-note">ข้างในมี 25 ข้อ listening, grammar และ vocabulary - ไม่มีบทอ่าน - และหยุดเมื่อไหร่ก็ได้ ผลลัพธ์จะกลายเป็นระดับที่แท้จริงของคุณใน FIEZEL แทนการประเมินเริ่มต้นเมื่อกี้</p>',
     'onboarding.kerjakan-santai-aja-ini-bukan': '<p class="fiezel-body">ทำแบบสบาย ๆ ได้เลย นี่ไม่ใช่การสอบ — แค่ให้เรารู้จักความสามารถของคุณ</p>',
     'onboarding.me-pakai-namamu-buat-nyapa': '<p class="fiezel-body">เราใช้ชื่อของคุณไว้ทักทายทุกวัน การเรียนจะได้รู้สึกเป็นของคุณเอง</p>',
-    'onboarding.nama-this-disimpan-at-hp': '<p class="fiezel-note">ชื่อนี้ถูกเก็บไว้ในมือถือของคุณ และไปกับบัญชี FIEZEL ของคุณเองเท่านั้น เพื่อให้ตัวเตือนการเรียนทักทายคุณได้ ไม่ถูกแชร์ให้ใครทั้งนั้น</p>',
+    'onboarding.nama-this-disimpan-at-hp': '<p class="fiezel-note">ชื่อนี้ถูกเก็บไว้ในมือถือและในบัญชี FIEZEL ของคุณ เพื่อให้ตัวเตือนทักทายคุณได้ และผู้สอน FIEZEL รู้ว่าความก้าวหน้านี้เป็นของใคร สิ่งที่ส่งไปมีแค่ชื่อเล่น ไม่ใช่คำตอบหรือประวัติข้อสอบ เปลี่ยนได้ทุกเมื่อในการตั้งค่า</p>',
     'onboarding.next': 'ต่อไป',
     'onboarding.next-l523': 'ต่อไป',
     'onboarding.next-l554': 'ต่อไป',

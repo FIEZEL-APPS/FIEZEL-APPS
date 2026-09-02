@@ -55,6 +55,10 @@ function setLearnerName(value){
   if(!name)return false;
   if(name===state.userName)return true;
   state.userName=name;save();
+  // Nama BARU didorong ke server segera (force), bukan menunggu rem harian: owner yang
+  // melihat nama lama untuk murid yang sudah menggantinya adalah cara termudah membuat
+  // dashboard terasa berbohong. Senyap dan tidak pernah menahan perkenalan.
+  try{const p=learnerNameSyncToServer(name,{force:true});if(p&&typeof p.catch==='function')p.catch(()=>{})}catch{}
   return true
 }
 window.setLearnerName=setLearnerName;
@@ -1964,6 +1968,68 @@ function identityEvidenceFlush(nowMs=Date.now()){
     return res;
   }).catch(()=>null);
 }
+/* ---- Nama learner ke server: identitas TAMPILAN, terikat identity.sub ------------------
+ *
+ * KEPUTUSAN OWNER 2 Sep 2026. Sampai rilis ini, nama yang diketik murid di langkah pertama
+ * perkenalan hanya hidup di localStorage perangkat, jadi Owner Dashboard tidak punya cara
+ * menyebut murid selain 8 hex pertama `sub`-nya. Sekarang nama itu dikirim ke server dan
+ * disimpan di `learner_name(sub, name)`.
+ *
+ * TIGA HAL YANG TIDAK BERUBAH, dan ketiganya penting:
+ *   1. `sub` TETAP kunci tekniknya. Nama tidak pernah menjadi kunci, tidak unik, dan tidak
+ *      dipakai mencocokkan apa pun — mengganti nama TIDAK memutus bukti belajar yang sudah
+ *      terkumpul, karena yang mengikatnya adalah `sub` yang tidak ikut berubah.
+ *   2. Perangkat TIDAK PERNAH mengirim `sub`. Ia hanya menyertakan cookie fz_id
+ *      (HttpOnly — kode ini secara harfiah tidak bisa membacanya) dan server menurunkan
+ *      identitasnya sendiri. Body yang menitipkan `sub` ditolak 400 di sana.
+ *   3. Selama lane per-murid 'off', nama TIDAK PERNAH meninggalkan perangkat. Sakelarnya
+ *      satu dengan lane itu, jadi tidak ada keadaan "nama terkirim tapi buktinya tidak".
+ *
+ * REM TULIS: maksimum SEKALI SEHARI per perangkat (pola `last_seen_day` di mw-identity).
+ * Penyegaran harian itu juga yang menjadi penanda "masih dipakai" untuk retensi 180 hari di
+ * server — nama yang ditinggalkan hilang sendiri tanpa ada yang perlu mengingat menghapusnya.
+ */
+const LEARNER_NAME_SYNC_KEY='fiezel-lname-sync-v1';
+function identityEvidenceNameEndpoint(){
+  try{return String(identityEvidenceCfg()?.nameEndpoint||'')}catch{return ''}
+}
+/**
+ * Kirim satu nama ke server. `force` melewati rem harian — dipakai saat murid benar-benar
+ * MENGUBAH namanya, karena menunda perubahan nama sampai besok berarti owner melihat nama
+ * lama untuk murid yang sudah menggantinya.
+ */
+function learnerNameSyncToServer(name,{force=false,nowMs=Date.now()}={}){
+  if(identityEvidenceMode()==='off')return Promise.resolve(false);
+  const url=identityEvidenceNameEndpoint();
+  const clean=String(name??'').trim();
+  if(!url||!clean)return Promise.resolve(false);
+  const day=braincoreEvidenceDay(nowMs);
+  let last=null;
+  try{last=JSON.parse(localStorage.getItem(LEARNER_NAME_SYNC_KEY)||'null')}catch{last=null}
+  // Rem: hari yang sama DAN nama yang sama = tidak ada yang perlu diberitahukan.
+  if(!force&&last&&last.day===day&&last.name===clean)return Promise.resolve(false);
+  return identityEvidenceEnsureAnon().then(ok=>{
+    if(!ok)return false;
+    return fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:clean}),credentials:'include',mode:'cors',cache:'no-store'})
+      .then(r=>{
+        if(!r||!r.ok)return false;
+        // Penanda ditulis HANYA sesudah server mengonfirmasi. Menandainya lebih awal berarti
+        // satu kegagalan jaringan membuat nama itu tidak pernah dicoba lagi hari itu.
+        try{localStorage.setItem(LEARNER_NAME_SYNC_KEY,JSON.stringify({day,name:clean}))}catch{}
+        return true;
+      });
+  }).catch(()=>false);
+}
+/** Penyegaran harian dari jalur boot. Senyap, dan tidak pernah menahan apa pun. */
+function maybeSyncLearnerName(nowMs=Date.now()){
+  if(identityEvidenceMode()==='off')return null;
+  if(learnerNameMissing())return null;
+  const p=learnerNameSyncToServer(learnerName(),{nowMs});
+  if(p&&typeof p.catch==='function')p.catch(()=>{});
+  return p;
+}
+window.learnerNameSyncToServer=learnerNameSyncToServer;
+
 /**
  * Satu pintu untuk sakelar Pengaturan. Menyalakan = daftarkan persetujuan. Mematikan =
  * cabut, yang di server MENGHAPUS bukti murid itu (revokeConsent), lalu kosongkan antrean
@@ -5477,6 +5543,11 @@ function startWelcomeExperience(){
     // itulah yang tampil - dan alur berikutnya (tawaran notifikasi) menunggu di ujungnya,
     // sama seperti perkenalan penuh, supaya tidak ada dua lapisan bertumpuk di layar.
     if(askLearnerNameIfMissing(at))return null;
+    // Sampai di sini murid PASTI punya nama (perkenalan mewajibkannya, dan langkah susulan
+    // di atas menutup celah murid lama). Penyegaran harian dikirim dari sini, sesudah alur
+    // perkenalan selesai — bukan di tengahnya, supaya satu permintaan jaringan tidak pernah
+    // berdiri di antara murid dan layar pertamanya.
+    maybeSyncLearnerName(at);
     return startNotificationInvitation()
   })
 }
@@ -10825,7 +10896,7 @@ window.queueSocialEvidence=queueSocialEvidence;window.socialSummaryCardMarkup=so
 // karena murid menutup aplikasi saat offline berangkat di sini.
 setTimeout(()=>{try{socialCore()?.flushOutbox()}catch(_){}},4500);
 /* ============================== akhir blok SOSIAL (SLOT 7) ========================== */
-window.istilahMurid=istilahMurid;/* dipapar untuk gerbang QA: penerjemah enum harus bisa disapu penuh */window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,/* m025-201: dipapar untuk core-policy-parity-test.js - gerbang paritas tidak bisa membandingkan apa yang tidak bisa ia panggil */capRationaleCodes,policyEffectiveness,sanitizePolicyEffectiveness,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,coreBrainMemory,tutorSession,tutorObserve,misconceptionLedgerRead,misconceptionLedgerActive,coreBrainAttempts,quizPredictedSuccess,evidenceKappa,bktRead,bktRecord,bktShadowMarkup,brainManifestMarkup,learningTelemetryMode,learningTelemetryEmitAnswer,learningTelemetryStudyDay,braincoreEvidenceMode,braincoreEvidenceCohort,braincoreEvidenceCohortForBuild,braincoreEvidenceDay,braincoreEvidenceEmitSnapshot,braincoreEvidenceEmitDecision,braincoreEvidenceFlush,braincoreEvidenceObserveSession,braincoreDecisionReason,braincoreEvidenceAnyLaneActive,identityEvidenceMode,identityEvidenceConsented,identityEvidenceActive,identityEvidenceMirror,identityEvidenceFlush,identityEvidenceSyncConsent,setLearnerEvidenceConsent,confusionMatrixRead,confusionMatrixRecord,affectObserve,affectSessionSync,affectTargetSuccess,listeningAdaptivePolicy,olmPanelMarkup,coreBrainPanelMarkup,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession,/* Fase 3 (C5): kalibrasi item, cloze, OLM negotiated, SRL, speaking adaptif, step tutor */itemCalibrationRead,itemCalibrationObserve,itemCalibrationEffective,calibrationItemId,ensureClozeBank,makeClozeQuestion,clozeAdaptivePicks,clozeSkillReady,clozeProductionRecord,olmSummarizeInput,olmDispute,olmProbeNextSkill,olmProbeConsume,olmNegotiationRead,srlSessionPlan,srlPredictPrompt,srlCaptureConfidence,srlReflect,srlSessionSync,speakingCoverageRows,speakingAdaptiveEvidence,speakingAdaptivePolicy,stepTutorGuidance,stepTutorGuidanceMarkup,record,quizLoop,startAdaptive};
+window.istilahMurid=istilahMurid;/* dipapar untuk gerbang QA: penerjemah enum harus bisa disapu penuh */window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,/* m025-201: dipapar untuk core-policy-parity-test.js - gerbang paritas tidak bisa membandingkan apa yang tidak bisa ia panggil */capRationaleCodes,policyEffectiveness,sanitizePolicyEffectiveness,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,coreBrainMemory,tutorSession,tutorObserve,misconceptionLedgerRead,misconceptionLedgerActive,coreBrainAttempts,quizPredictedSuccess,evidenceKappa,bktRead,bktRecord,bktShadowMarkup,brainManifestMarkup,learningTelemetryMode,learningTelemetryEmitAnswer,learningTelemetryStudyDay,braincoreEvidenceMode,braincoreEvidenceCohort,braincoreEvidenceCohortForBuild,braincoreEvidenceDay,braincoreEvidenceEmitSnapshot,braincoreEvidenceEmitDecision,braincoreEvidenceFlush,braincoreEvidenceObserveSession,braincoreDecisionReason,braincoreEvidenceAnyLaneActive,identityEvidenceMode,learnerNameSyncToServer,maybeSyncLearnerName,identityEvidenceConsented,identityEvidenceActive,identityEvidenceMirror,identityEvidenceFlush,identityEvidenceSyncConsent,setLearnerEvidenceConsent,confusionMatrixRead,confusionMatrixRecord,affectObserve,affectSessionSync,affectTargetSuccess,listeningAdaptivePolicy,olmPanelMarkup,coreBrainPanelMarkup,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession,/* Fase 3 (C5): kalibrasi item, cloze, OLM negotiated, SRL, speaking adaptif, step tutor */itemCalibrationRead,itemCalibrationObserve,itemCalibrationEffective,calibrationItemId,ensureClozeBank,makeClozeQuestion,clozeAdaptivePicks,clozeSkillReady,clozeProductionRecord,olmSummarizeInput,olmDispute,olmProbeNextSkill,olmProbeConsume,olmNegotiationRead,srlSessionPlan,srlPredictPrompt,srlCaptureConfidence,srlReflect,srlSessionSync,speakingCoverageRows,speakingAdaptiveEvidence,speakingAdaptivePolicy,stepTutorGuidance,stepTutorGuidanceMarkup,record,quizLoop,startAdaptive};
 window.startVocabQuiz=startVocabQuiz;window.buildAdaptivePool=buildAdaptivePool;window.buildGrammarLessonQuestions=buildGrammarLessonQuestions;window.getScenePalette=getScenePalette;window.getCelestialState=getCelestialState;window.playFeedbackSound=playFeedbackSound;window.updateMastery=updateMastery;window.markMastered=markMastered;window.__getFiezelState=()=>state;window.__fiezelValidViews=()=>[...VALID_VIEWS];window.__fiezelDueReviews=()=>dueItems().length;window.buildAdaptivePolicy=buildAdaptivePolicy;window.studyDayKey=studyDayKey;window.startAdaptive=startAdaptive;window.showToast=showToast;window.answerFeedbackSignal=answerFeedbackSignal;window.practiceSkill=practiceSkill;window.openReadingLevel=openReadingLevel;window.startReadingRandom=startReadingRandom;window.startReadingAdaptive=startReadingAdaptive;window.startPlacement=startPlacement;window.startLevelPractice=startLevelPractice;window.startAdaptive=startAdaptive;window.resetProgress=resetProgress;window.closeModal=closeModal;window.openSettings=openSettings;window.openReportPreview=openReportPreview;window.sendCreatorReport=sendCreatorReport;window.askCoachAI=askCoachAI;window.dismissWelcome=dismissWelcome;window.requestStudyNotificationPermission=requestStudyNotificationPermission;window.declineStudyNotifications=declineStudyNotifications;window.skipPuterSignIn=skipPuterSignIn;window.shouldPresentPuterPopup=shouldPresentPuterPopup;window.notifyAppUpdateIfNew=notifyAppUpdateIfNew;window.setConfidence=setConfidence;window.explainWithAI=explainWithAI;window.explainWordWithAI=explainWordWithAI;window.olmDispute=olmDispute;/* Fase 3 (C5 butir 3): handler tombol sanggah di panel OLM */
 // m025-84: dipasang di ujung berkas, saat go()/state/VALID_VIEWS sudah ada, dan SEBELUM
 // load() supaya navigasi pertama pun sudah terekam di riwayat.

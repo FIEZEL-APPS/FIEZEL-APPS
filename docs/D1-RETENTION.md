@@ -63,6 +63,7 @@ lewat `EXPLAIN QUERY PLAN` — bukti per kueri ada di
 | `learner_evidence` | `fiezel-core` | **180 hari** (`day < hari_ini − 180`) | `runLearnerEvidencePurge()` — cron `5 17 * * *` | **YA** (lihat §2.7) |
 | `learner_evidence_state` | `fiezel-core` | **180 hari** (`last_day < hari_ini − 180`) | `runLearnerEvidencePurge()` — cron `5 17 * * *` | **YA** (lihat §2.7) |
 | `learner_evidence_consent` | `fiezel-core` | selama akun ada; dicabut = baris bukti DIHAPUS seketika | `revokeConsent()` di jalur permintaan | **YA** |
+| `learner_name` | `fiezel-core` | **180 hari** tanpa penulisan (`name_day < hari_ini − 180`) | `runLearnerEvidencePurge()` — cron `5 17 * * *` | **YA** (lihat §2.8) |
 
 **Tidak ada trigger cron baru yang dibutuhkan.** Kedua ekspresi cron di
 `workers/api/wrangler.toml` sudah ada (`*/5 * * * *` dan `5 17 * * *`).
@@ -239,12 +240,50 @@ DELETE FROM learner_evidence WHERE rowid IN (
 DELETE FROM learner_evidence_state WHERE rowid IN (
   SELECT rowid FROM learner_evidence_state WHERE sub = :sub LIMIT 1);
 UPDATE learner_evidence_consent SET revoked_at = :now WHERE sub = :sub;
+-- Nama TIDAK ikut terhapus oleh pencabutan persetujuan (lihat §2.8), jadi
+-- permintaan "hapus data saya" yang sungguhan harus menyebutnya sendiri.
+DELETE FROM learner_name WHERE rowid IN (
+  SELECT rowid FROM learner_name WHERE sub = :sub LIMIT 1);
 ```
 
 Baris `learner_evidence_consent` sengaja **tidak** ikut dihapus: catatan bahwa
 seseorang pernah memberi lalu mencabut izin adalah satu-satunya hal yang
 mencegah lane menulis lagi diam-diam, dan isinya hanyalah `sub` + dua stempel
 waktu + versi teks persetujuan — nol dimensi belajar.
+
+### 2.8 `learner_name` — 180 hari tanpa penulisan
+
+Nama panggilan yang **wajib** diisi murid di langkah pertama perkenalan, disimpan
+di server dan terikat `identity.sub` (keputusan OWNER 2 Sep 2026,
+`0010_learner_name.sql`). Ia yang membuat Owner Dashboard bisa menyebut murid
+dengan namanya alih-alih delapan hex `sub`-nya.
+
+Retensinya **180 hari dihitung dari penulisan terakhir**, bukan dari pembuatan:
+klien menyegarkan `name_day` maksimum **sekali sehari** (`LEARNER_NAME_SYNC_KEY`
+di `app.js`), jadi
+
+- murid yang masih memakai FIEZEL → namanya tidak pernah kedaluwarsa;
+- murid yang berhenti memakai FIEZEL → namanya hilang sendiri 180 hari kemudian,
+  tanpa ada yang perlu mengingat untuk menghapusnya.
+
+Angkanya sengaja SAMA dengan retensi bukti per-murid: nama yang bertahan lebih
+lama daripada buktinya adalah daftar nama tanpa guna, dan nama yang hilang lebih
+cepat daripada buktinya adalah dashboard yang tiba-tiba berisi murid tanpa nama.
+
+```sql
+-- Retensi 180 hari. Pola rowid+LIMIT yang sama dengan §2.1.
+DELETE FROM learner_name WHERE rowid IN (
+  SELECT rowid FROM learner_name WHERE name_day < :batas LIMIT 500);
+```
+
+**Yang TIDAK dilakukan pencabutan persetujuan bukti.** `revokeConsent()`
+menghapus bukti belajar murid itu, **bukan** namanya — keduanya data yang
+berbeda dengan alasan yang berbeda. Nama adalah identitas tampilan yang murid
+berikan sendiri di perkenalan; persetujuan mengatur apakah KEADAAN BELAJARNYA
+boleh disimpan per-orang. Menggabungkan keduanya berarti murid yang menolak
+analitik kehilangan namanya juga, lalu klien mengirimnya lagi besok pagi lewat
+penyegaran harian — data yang "dihapus" lalu hidup kembali adalah janji
+penghapusan yang tidak ditepati. Penghapusan nama atas permintaan ada di §4.
 
 ---
 

@@ -21,7 +21,7 @@ import {
 } from './learner-evidence-core.js';
 
 export const LEARNER_EVIDENCE_TABLES = Object.freeze([
-  'learner_evidence', 'learner_evidence_state', 'learner_evidence_consent'
+  'learner_evidence', 'learner_evidence_state', 'learner_evidence_consent', 'learner_name'
 ]);
 
 /**
@@ -47,6 +47,22 @@ export const SQL = Object.freeze({
     'CREATE INDEX IF NOT EXISTS idx_learner_evidence_state_last_day ON learner_evidence_state(last_day)',
   ensureConsentTable:
     'CREATE TABLE IF NOT EXISTS learner_evidence_consent (sub TEXT PRIMARY KEY, granted_at INTEGER NOT NULL, revoked_at INTEGER, policy TEXT NOT NULL)',
+  ensureNameTable:
+    'CREATE TABLE IF NOT EXISTS learner_name (sub TEXT NOT NULL PRIMARY KEY, name TEXT NOT NULL, name_day TEXT NOT NULL, updated_at INTEGER NOT NULL)',
+  ensureNameDayIndex:
+    'CREATE INDEX IF NOT EXISTS idx_learner_name_day ON learner_name(name_day)',
+
+  // --- nama learner --------------------------------------------------------
+  // Upsert, bukan INSERT: murid boleh mengganti namanya kapan saja dan `sub`-nya
+  // tidak ikut berubah — itulah gunanya nama dan kunci teknis dipisah.
+  upsertLearnerName:
+    'INSERT INTO learner_name (sub, name, name_day, updated_at) VALUES (?1, ?2, ?3, ?4) ON CONFLICT(sub) DO UPDATE SET name = excluded.name, name_day = excluded.name_day, updated_at = excluded.updated_at',
+  selectLearnerName:
+    'SELECT sub, name, name_day FROM learner_name WHERE sub = ?1',
+  deleteLearnerName:
+    'DELETE FROM learner_name WHERE sub = ?1',
+  purgeLearnerNames:
+    'DELETE FROM learner_name WHERE name_day < ?1',
 
   // --- persetujuan ---------------------------------------------------------
   selectConsent:
@@ -112,7 +128,9 @@ export async function ensureLearnerEvidenceSchema(db) {
     SQL.ensureEvidenceDayIndex,
     SQL.ensureStateTable,
     SQL.ensureStateLastDayIndex,
-    SQL.ensureConsentTable
+    SQL.ensureConsentTable,
+    SQL.ensureNameTable,
+    SQL.ensureNameDayIndex
   ];
   for (const statement of ddl) await db.prepare(statement).run();
   ENSURED.set(db, true);
@@ -147,6 +165,48 @@ export async function revokeConsent(db, sub, nowMs) {
   const a = await db.prepare(SQL.deleteEvidenceForSub).bind(sub).run();
   await db.prepare(SQL.deleteStateForSub).bind(sub).run();
   return { deleted: (a && a.meta && a.meta.changes) || 0 };
+}
+
+/** Placeholder ?N berurutan (pola `placeholders()` di route-social.js). */
+function placeholders(count, start) {
+  const out = [];
+  for (let i = 0; i < count; i += 1) out.push('?' + (start + i));
+  return out.join(', ');
+}
+
+/* ============================================================ nama learner == */
+
+/**
+ * Simpan/ganti nama panggilan milik `sub`. `sub` adalah ARGUMEN FUNGSI yang
+ * sudah diautentikasi pemanggil, bukan field payload — tidak ada jalan bagi body
+ * klien untuk mencapainya, dan karena itu murid A tidak punya cara menimpa nama
+ * murid B.
+ *
+ * `name` WAJIB sudah dinormalkan pemanggil (normalizeLearnerName di
+ * learner-evidence-core.js). Lapisan ini tidak menormalkan ulang: dua tempat
+ * yang menormalkan satu nilai adalah dua aturan yang pelan-pelan menyimpang.
+ */
+export async function writeLearnerName(db, sub, name, day, nowMs) {
+  await db.prepare(SQL.upsertLearnerName).bind(sub, name, day, Number(nowMs) || 0).run();
+  return true;
+}
+
+export async function readLearnerName(db, sub) {
+  return db.prepare(SQL.selectLearnerName).bind(sub).first();
+}
+
+/**
+ * Baca nama untuk sekumpulan `sub` sekaligus (satu kueri, bukan N). Kegagalan
+ * ditelan pemanggil: direktori tanpa nama tetap berguna, direktori yang hilang tidak.
+ */
+export async function readLearnerNames(db, subs) {
+  const list = Array.isArray(subs) ? subs.filter(Boolean) : [];
+  if (!list.length) return new Map();
+  const sql = 'SELECT sub, name FROM learner_name WHERE sub IN (' + placeholders(list.length, 1) + ')';
+  const res = await db.prepare(sql).bind(...list).all();
+  const out = new Map();
+  for (const r of (res && res.results) || []) out.set(r.sub, r.name);
+  return out;
 }
 
 /* ================================================================= tulis === */
@@ -191,34 +251,45 @@ export async function writeLearnerEvidence(db, sub, day, events, nowMs) {
 
 /* ============================================================== baca owner = */
 
-/** Placeholder ?N berurutan (pola `placeholders()` di route-social.js). */
-function placeholders(count, start) {
-  const out = [];
-  for (let i = 0; i < count; i += 1) out.push('?' + (start + i));
-  return out.join(', ');
-}
-
 /**
- * Direktori murid + nama tampilannya. Nama dibaca dari `social_profile` dalam
- * SATU kueri tambahan (bukan N kueri, dan bukan JOIN — lihat SQL di atas).
- * Kegagalan pembacaan nama SENGAJA ditelan: direktori tanpa nama tetap berguna,
- * direktori yang hilang tidak.
+ * Direktori murid + nama tampilannya.
+ *
+ * URUTAN SUMBER NAMA, dan alasannya (keputusan OWNER 2 Sep 2026):
+ *   1. `learner_name.name` — nama yang DIKETIK murid di perkenalan. Ia WAJIB
+ *      diisi dan tidak bisa dilewati, jadi inilah nama yang dipunyai setiap
+ *      murid baru. Ia yang menang.
+ *   2. `social_profile.display_name` lalu `.handle` — cadangan untuk murid lama
+ *      yang sudah punya profil sosial sebelum tabel `learner_name` ada.
+ *   3. tidak ada nama — HANYA keadaan legacy/galat, bukan perilaku normal.
+ *
+ * Dua kueri tambahan, bukan JOIN: lane sosial yang mati (atau `learner_name`
+ * yang belum dimigrasi) berakhir sebagai "nama dari sumber yang lain", bukan
+ * sebagai direktori yang gagal total.
  */
 export async function readLearnerDirectory(db, sinceDay, limit) {
   const cap = Math.min(LEARNER_EVIDENCE_LIMITS.DIRECTORY_MAX, Math.max(1, Math.trunc(Number(limit) || 0) || LEARNER_EVIDENCE_LIMITS.DIRECTORY_MAX));
   const res = await db.prepare(SQL.readLearnerDirectory).bind(sinceDay, cap).all();
   const rows = (res && res.results) || [];
   if (!rows.length) return rows;
-  const names = new Map();
+  const subs = rows.map((r) => r.sub);
+
+  let names = new Map();
+  try { names = await readLearnerNames(db, subs); } catch { names = new Map(); }
+
+  const profiles = new Map();
   try {
-    const subs = rows.map((r) => r.sub);
     const sql = 'SELECT sub, handle, display_name FROM social_profile WHERE sub IN (' + placeholders(subs.length, 1) + ')';
     const got = await db.prepare(sql).bind(...subs).all();
-    for (const p of (got && got.results) || []) names.set(p.sub, p);
-  } catch { /* lane sosial belum ada = murid tanpa nama, bukan direktori gagal */ }
+    for (const p of (got && got.results) || []) profiles.set(p.sub, p);
+  } catch { /* lane sosial belum ada = cadangan tidak tersedia, bukan direktori gagal */ }
+
   return rows.map((r) => {
-    const p = names.get(r.sub);
-    return Object.assign({}, r, { handle: (p && p.handle) || null, display_name: (p && p.display_name) || null });
+    const p = profiles.get(r.sub);
+    return Object.assign({}, r, {
+      learner_name: names.get(r.sub) || null,
+      handle: (p && p.handle) || null,
+      display_name: (p && p.display_name) || null
+    });
   });
 }
 
@@ -268,12 +339,18 @@ function cutoff(today, ttlDays) {
  */
 export async function purgeLearnerEvidence(db, today, ttlDays = LEARNER_EVIDENCE_LIMITS.RETENTION_DAYS) {
   const before = cutoff(today, ttlDays);
-  if (!before) return { rows: 0, state: 0 };
+  if (!before) return { rows: 0, state: 0, names: 0 };
   const a = await db.prepare(SQL.purgeLearnerEvidence).bind(before).run();
   const b = await db.prepare(SQL.purgeLearnerEvidenceState).bind(before).run();
+  // Nama ikut retensi yang SAMA, dihitung dari penulisan terakhirnya. Klien
+  // menyegarkannya maksimum sekali sehari, jadi nama murid yang masih memakai
+  // FIEZEL tidak pernah kedaluwarsa — dan nama yang ditinggalkan hilang sendiri
+  // tanpa ada yang perlu mengingat untuk menghapusnya.
+  const c = await db.prepare(SQL.purgeLearnerNames).bind(before).run();
   return {
     rows: (a && a.meta && a.meta.changes) || 0,
-    state: (b && b.meta && b.meta.changes) || 0
+    state: (b && b.meta && b.meta.changes) || 0,
+    names: (c && c.meta && c.meta.changes) || 0
   };
 }
 
@@ -286,6 +363,9 @@ export default {
   grantConsent,
   revokeConsent,
   writeLearnerEvidence,
+  writeLearnerName,
+  readLearnerName,
+  readLearnerNames,
   readLearnerDirectory,
   readLearnerProfile,
   readLearnerState,

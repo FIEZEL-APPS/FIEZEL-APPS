@@ -160,12 +160,37 @@ murid, teks soal, riwayat, transkrip AI, isi localStorage, timestamp presisi sel
 `received_at`. Validator `learner-evidence-core.js` menolak field asing dengan **400
 `foreign_field`** — bukan mengabaikannya.
 
-**Nama murid untuk dashboard** dibaca dari `social_profile.display_name` / `.handle`
-(lane sosial, database yang sama, dibaca lewat `sub`). Ia **tidak disalin** ke lane ini:
-satu sumber nama, dan mencabut/mengganti profil sosial langsung terlihat di dashboard.
-Nama yang diketik murid saat perkenalan tinggal di `localStorage` perangkat dan **tidak
-pernah** sampai ke server — murid tanpa profil sosial muncul di dashboard tanpa nama, dan
-itu dicetak apa adanya alih-alih dikarang.
+### Nama murid — `learner_name` (keputusan OWNER 2 Sep 2026)
+
+Nama panggilan yang **wajib** diisi murid di langkah pertama perkenalan (tanpa tombol
+"Lewati", tombol lanjut mati sampai diisi, jalur Enter ikut dijaga) dikirim ke server dan
+disimpan di `learner_name(sub, name, name_day, updated_at)` — **tabel sendiri**, bukan
+kolom di `identity`, karena `0001_identity.sql` melarang nama masuk ke tabel jalur-panas
+itu dan larangan tersebut tidak dilemahkan.
+
+| | |
+|---|---|
+| Yang disimpan | HANYA nama panggilan, maks 24 karakter, karakter kendali dan `< >` dibuang |
+| Kunci | `sub`. Nama **bukan** kunci, **tidak** unik, **tidak** dipakai mencocokkan apa pun |
+| Ganti nama | `sub` tidak ikut berubah, jadi seluruh bukti dan riwayat tetap melekat |
+| Retensi | 180 hari sejak penulisan terakhir; klien menyegarkan maks 1×/hari |
+| Siapa yang bisa membaca | murid itu sendiri (`GET /api/learner/name`, hanya miliknya) + Owner Dashboard |
+| Yang DILARANG ditambahkan | nama lengkap, email, telepon, sekolah, kelas, umur, tanggal lahir, foto |
+
+Urutan nama yang dilihat owner: `learner_name.name` → `social_profile.display_name` →
+`.handle` → tidak ada. Tiga terakhir adalah **cadangan untuk murid lama**; sejak nama wajib
+diisi, baris tanpa nama adalah keadaan legacy/galat, bukan perilaku normal. Panel owner
+menandai nama yang bukan berasal dari perkenalan alih-alih menyamarkannya.
+
+**Naskah perkenalan diperbarui bersama perubahan ini.** Sebelumnya ia berjanji "Nggak
+dibagi ke siapa pun" — janji yang menjadi tidak benar begitu nama sampai ke server dan
+terlihat owner. Naskah baru menyebutkan ke mana namanya pergi, apa yang **tidak** ikut
+(jawaban, riwayat soal), dan bahwa ia bisa diganti kapan saja. Janji privasi yang tidak
+diperbarui bersama kodenya adalah kebohongan yang ditandatangani murid.
+
+**Pencabutan persetujuan bukti TIDAK menghapus nama** — keduanya data yang berbeda dengan
+alasan yang berbeda (rincian dan SQL penghapusan atas permintaan: `docs/D1-RETENTION.md`
+§2.8 dan §4).
 
 **Persetujuan.** Lane ini menulis HANYA bila ada baris aktif di
 `learner_evidence_consent` untuk `sub` itu, dengan `policy` = versi teks persetujuan yang

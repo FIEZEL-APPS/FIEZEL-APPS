@@ -74,6 +74,12 @@
       endpoint: 'https://api.fiezel.my.id/api/braincore/learner-evidence',
       consentEndpoint: 'https://api.fiezel.my.id/api/braincore/learner-evidence/consent',
       anonEndpoint: 'https://api.fiezel.my.id/api/auth/anon',
+      // Nama panggilan dari perkenalan. Endpoint-nya hidup di blok yang SAMA
+      // dengan lane ini, dan itu disengaja: nama adalah identitas TAMPILAN yang
+      // membuat lane ini berguna bagi owner, jadi keduanya menyala dan mati
+      // bersama. Sebelum lane ini 'on', nama murid tidak pernah meninggalkan
+      // perangkat sama sekali.
+      nameEndpoint: 'https://api.fiezel.my.id/api/learner/name',
       // Sama dengan lane agregat: sekali sehari sudah memuat seluruh informasi
       // yang bucket sekasar ini bisa bawa.
       minIntervalMs: 86400000
