@@ -248,10 +248,15 @@ async function babWorker() {
   const cookieB = await app.issueIdentity();
   check('(A) dua identitas berbeda diterbitkan server', cookieA !== cookieB);
 
-  // --- F. tanpa persetujuan: tolak, dan NOL baris ------------------------------
-  const noConsent = await app.call('POST', '/api/braincore/learner-evidence', { cookie: cookieA, body: envelope([evEvent()]) });
-  check('(F) tanpa persetujuan -> 403 consent_required',
-    noConsent.status === 403 && noConsent.json && noConsent.json.error === 'consent_required', JSON.stringify(noConsent.json));
+  /* --- F. m025-235: TANPA persetujuan pun bukti tercatat ------------------------
+   * Sampai m025-234 baris ini menuntut 403 `consent_required`. Owner menghapus gerbang
+   * itu: FIEZEL aplikasi kelas, guru memberitahu muridnya sebelum memasang, dan bukti
+   * belajar ini memang data guru. Assert-nya DIBALIK, bukan dihapus — perubahan sebesar
+   * "murid tidak lagi punya sakelar" harus terbaca di gerbang, bukan hanya di komentar. */
+  const tanpaPersetujuan = await app.call('POST', '/api/braincore/learner-evidence', { cookie: cookieA, body: envelope([evEvent()]) });
+  check('(F) tanpa persetujuan pun bukti TETAP tercatat (sakelar dihapus m025-235)',
+    tanpaPersetujuan.status === 202 && tanpaPersetujuan.json && tanpaPersetujuan.json.accepted === 1,
+    JSON.stringify(tanpaPersetujuan.json));
 
   // --- G. tanpa identitas sama sekali ------------------------------------------
   const anon = await app.call('POST', '/api/braincore/learner-evidence', { body: envelope([evEvent()]) });
@@ -279,14 +284,15 @@ async function babWorker() {
   check('(E) owner mendapat direktori 2 murid',
     dirRes.status === 200 && dirRes.json.migrated === true && dirRes.json.learners.length === 2,
     JSON.stringify(dirRes.json));
-  const subA = dirRes.json.learners.find((x) => x.evidenceCount === 1 && x.decisionCount === 1);
+  // Murid A: satu event dari tulisan tanpa-persetujuan di atas + satu bukti + satu keputusan.
+  const subA = dirRes.json.learners.find((x) => x.evidenceCount === 2 && x.decisionCount === 1);
   const subB = dirRes.json.learners.find((x) => x.evidenceCount === 1 && x.decisionCount === 0);
   check('(B) direktori memisahkan penghitung per murid', !!subA && !!subB && subA.sub !== subB.sub,
     JSON.stringify(dirRes.json.learners));
 
   const rowsA = await rowsFor(app, subA.sub);
   const rowsB = await rowsFor(app, subB.sub);
-  check('(B) baris D1 murid A = 2, murid B = 1', rowsA.length === 2 && rowsB.length === 1,
+  check('(B) baris D1 murid A = 3, murid B = 1', rowsA.length === 3 && rowsB.length === 1,
     `${rowsA.length}/${rowsB.length}`);
 
   // --- idempotensi ------------------------------------------------------------
@@ -396,9 +402,13 @@ async function babWorker() {
       dir3.json.learners.every((x) => x.sub !== subB.sub), JSON.stringify(dir3.json.learners.map((x) => x.sub)));
     check('(F) murid A TIDAK ikut terhapus oleh pencabutan murid B',
       (await rowsFor(app, subA.sub)).length > 0);
+    /* m025-235: penghapusan adalah SATU KALI, bukan gerbang permanen. Sesudah sakelar
+     * persetujuan dihapus, tulisan berikutnya dari murid yang sama diterima lagi — dan itu
+     * harus tertulis di gerbang, supaya tidak ada yang menyangka POST {granted:false}
+     * mematikan lane untuk murid itu selamanya. Yang ia lakukan: menghapus yang sudah ada. */
     const afterRevoke = await app.call('POST', '/api/braincore/learner-evidence', { cookie: cookieB, body: envelope([evEvent()]) });
-    check('(F) sesudah dicabut, tulisan berikutnya ditolak 403',
-      afterRevoke.status === 403 && afterRevoke.json.error === 'consent_required');
+    check('(F) sesudah dihapus, tulisan berikutnya DITERIMA lagi (hapus = sekali, bukan gerbang)',
+      afterRevoke.status === 202 && afterRevoke.json.accepted === 1, JSON.stringify(afterRevoke.json));
   }
 }
 
@@ -657,11 +667,17 @@ function babH() {
  * ========================================================================== */
 function babKlien() {
   const app = read('app.js');
-  check('(F) klien: lane per-murid hanya aktif bila mode != off DAN murid menyetujui',
-    /function identityEvidenceActive\(\)\{\s*return identityEvidenceMode\(\)!=='off'&&identityEvidenceConsented\(\);?\s*\}/.test(app.replace(/\n\s*/g, '\n')) ||
-    /identityEvidenceMode\(\)!=='off'&&identityEvidenceConsented\(\)/.test(app));
-  check('(F) klien: persetujuan fail-closed (=== true persis)',
-    /learnerEvidenceConsent===true/.test(app));
+  /* m025-235: sakelar persetujuan di aplikasi dihapus (keputusan OWNER). Assert lama
+   * menuntut `identityEvidenceActive()` menggabungkan mode DAN persetujuan; sekarang ia
+   * menuntut yang sebaliknya secara eksplisit — mode saja, dan NOL sisa sakelar di app.js.
+   * Ditulis sebagai dua assert, bukan satu yang dilonggarkan: yang kedua yang menjaga
+   * supaya sakelarnya tidak diam-diam kembali setengah (fungsi ada, panggilan hilang). */
+  check('(F) klien: lane per-murid aktif dari MODE saja (tanpa sakelar persetujuan)',
+    /function identityEvidenceActive\(\)\{\s*return identityEvidenceMode\(\)!=='off';\s*\}/.test(app.replace(/\n\s*/g, '\n')));
+  check('(F) klien: NOL sisa sakelar persetujuan di app.js',
+    !/identityEvidenceConsented|setLearnerEvidenceConsent|learnerEvidenceConsent/.test(app));
+  check('(F) klien: jalur HAPUS bukti per murid tetap ada (granted:false)',
+    /function forgetLearnerEvidence\(\)[\s\S]{0,600}granted:false/.test(app));
   /* Versi pertama gerbang ini meng-assert `q.clear` — dan LULUS, padahal makeQueue()
    * tidak pernah punya metode bernama itu: `q.clear&&q.clear()` di app.js diam-diam
    * tidak melakukan apa pun, jadi antrean lane D SELAMAT dari pencabutan persetujuan.
@@ -672,8 +688,8 @@ function babKlien() {
   const queueApi = (queueSrc.match(/return \{\s*put: put[^}]*\}/) || [''])[0];
   check('(F) modul antrean memang mengekspor purge() dan TIDAK mengekspor clear()',
     /\bpurge: purge\b/.test(queueApi) && !/\bclear\s*:/.test(queueApi), queueApi.slice(0, 160));
-  check('(F) klien: mencabut persetujuan mengosongkan antrean lokal (purge, metode yang ada)',
-    /setLearnerEvidenceConsent[\s\S]{0,900}q\.purge\(\)/.test(app));
+  check('(F) klien: jalur hapus mengosongkan antrean lokal (purge, metode yang ada)',
+    /function forgetLearnerEvidence\(\)[\s\S]{0,300}q\.purge\(\)/.test(app));
   check('(F) klien: reset progres ikut mengosongkan antrean lane per-murid',
     /function resetProgress\(\)[\s\S]{0,4000}identityEvidenceQueue\(\)[\s\S]{0,200}q\.purge\(\)/.test(app));
   check('(F) klien: reset progres menghapus penanda lane per-murid dari localStorage',
