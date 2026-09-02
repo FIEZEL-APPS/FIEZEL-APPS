@@ -45,7 +45,7 @@ const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
 // TIDAK ikut ASSETS - ia hidup di cache locale terpisah (LOCALE_TH_CACHE di bawah) yang
 // diisi halaman on-demand, meniru pola neural-prepare, sehingga murid Indonesia tidak
 // pernah membayar byte Thai.
-const SW_REV='m025-229-braincore-learner-evidence-20260901';
+const SW_REV='m025-230-th-bank-purity-20260901';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 // m025-61: health check menanyakan revisi shell langsung ke worker yang sedang aktif.
 // Menebaknya dari nama cache tidak cukup: cache lama bisa tertinggal, sedangkan jawaban ini
@@ -174,7 +174,15 @@ const isLocaleThAsset=request=>{
     // (tabel naskah Thai modul brain, W3-BRAIN-TH) juga belum cocok pola mana pun, jadi
     // ditambah pencocok prefix naskah-th- — pola prefix, bukan nama literal, mengikuti
     // konvensi copy-th- di atasnya agar berkas naskah th berikutnya otomatis tercakup.
-    return p.includes('/features/i18n/copy-th-')
+    // m025-230: sidecar BANK SOAL th (speaking/listening/writing/reading-exam/misconception/
+    // cloze/reading-bank) tidak pernah cocok pola mana pun di atas — pola dataset menuntut
+    // nama diawali grammar|vocabulary. Empat di antaranya SUDAH terdaftar di manifest sejak
+    // W3 tetapi tidak pernah tercakup matcher, jadi murid th offline kehilangan seluruh bank
+    // soalnya diam-diam. Ditutup dengan pola direktori + sufiks (bukan daftar literal),
+    // mengikuti konvensi copy-th-/naskah-th- di atas supaya sidecar bank berikutnya otomatis
+    // ikut tercakup.
+    return /\/features\/i18n\/[a-z0-9-]+-th\.json$/.test(p)
+      ||p.includes('/features/i18n/copy-th-')
       ||p.includes('/features/i18n/naskah-th-')
       ||/\/(?:grammar|vocabulary)(?:-[a-z0-9]+)*?-th\.(?:js|json)$/.test(p)
       ||p.includes('/assets/fonts/NotoSansThaiLooped');

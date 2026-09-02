@@ -30,6 +30,24 @@
 <link rel="stylesheet" href="style.css?v=m02806">
 <link rel="stylesheet" href="assets/mascot/fiezel-motion.css?v=m02806">
 <script>if(!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches))document.documentElement.className+=' anim';</script>
+<!-- m026 GEO: pengunjung dari Thailand yang BELUM memilih bahasa manual diarahkan otomatis ke /th/.
+     Pilihan manual (localStorage fiezel-site-locale) SELALU menang. Gagal/timeout/offline = tetap
+     di halaman Indonesia (fail-soft, tidak memblokir). 'th' tersimpan -> alihkan instan tanpa fetch. -->
+<script>(function(){try{
+  var KEY='fiezel-site-locale',saved=null;
+  try{saved=localStorage.getItem(KEY)}catch(_){}
+  if(saved==='id')return;
+  if(saved==='th'){location.replace('th/');return;}
+  if(typeof fetch!=='function')return;
+  var ctrl=('AbortController' in window)?new AbortController():null;
+  var timer=setTimeout(function(){try{ctrl&&ctrl.abort()}catch(_){}}, 2000);
+  fetch('https://ipwho.is/?fields=success,country_code', ctrl?{signal:ctrl.signal}:{})
+    .then(function(r){return (r&&r.ok)?r.json():null})
+    .then(function(d){clearTimeout(timer);
+      if(d&&d.success!==false&&d.country_code==='TH'){try{localStorage.setItem(KEY,'th')}catch(_){}location.replace('th/');}
+    })
+    .catch(function(){try{clearTimeout(timer)}catch(_){}});
+}catch(_){}})();</script>
 </head>
 <body>
 <a class="skip" href="#main">Lewati ke konten utama</a>
@@ -52,6 +70,7 @@
     </a>
     <nav class="topnav" aria-label="Navigasi utama">
       <a href="install/">Cara Install</a>
+      <a class="lang-switch" href="th/" hreflang="th" lang="th" aria-label="เปลี่ยนเป็นภาษาไทย" onclick="try{localStorage.setItem('fiezel-site-locale','th')}catch(e){}">ไทย</a>
       <a class="btn btn-sm btn-primary" href="app/">Mulai Belajar</a>
     </nav>
   </div>
