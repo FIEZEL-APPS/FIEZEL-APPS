@@ -123,7 +123,7 @@
    * Kalau salah satu tidak terpenuhi, jawabannya null dan tangga berjalan seperti hari ini.
    * Modul yang absen HARUS berarti aman, bukan berarti galat: berkas ini dimuat malas lewat
    * `FiezelLazy`, dan satu berkas yang gagal diunduh di jaringan buruk tidak boleh
-   * mendiamkan murid yang jalur L1/L2/L4-nya sehat.
+   * mendiamkan murid yang jalur L1/L2/L3-nya sehat.
    */
   function cfTransport() {
     var mod = root.FiezelCfTtsTransport;
@@ -385,7 +385,7 @@
    *
    * TIGA HASIL, dan semuanya berujung pada murid mendengar sesuatu bila mungkin:
    *   - ok + URL → diputar langsung dari R2, lalu alamatnya diingat untuk C0;
-   *   - 429 kuota habis → TURUN ke L2/L3/L4 dan naskah kuota ditampilkan, dengan varian jujur
+   *   - 429 kuota habis → TURUN ke L2/L3 dan naskah kuota ditampilkan, dengan varian jujur
    *     bila ternyata tidak ada lapisan yang bersuara. Tidak mengunci, tidak menghitung replay;
    *   - degradasi/galat/timeout → turun seperti kegagalan render lain.
    */
@@ -587,7 +587,7 @@
    * membaca status() dan menjawab null selama aset belum prepared/ready, dan null di sini
    * berarti Promise.resolve(false) - BUKAN unduhan 152 MB di latar belakang. Siapa pun yang
    * kelak ingin "memperbaiki" prefetch yang selalu false pada murid baru: itu bukan bug,
-   * itulah pagarnya. Murid baru mendapat suara dari L1/L2/L4, bukan dari unduhan diam-diam.
+   * itulah pagarnya. Murid baru mendapat suara dari L1/L2, bukan dari unduhan diam-diam.
    */
   function prefetchWithLocal(english, opts) {
     var local = localEngine();
