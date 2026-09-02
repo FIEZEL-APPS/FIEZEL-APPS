@@ -148,7 +148,7 @@ Cari baris yang `title`-nya memuat **CFG** (mis. `fiezel-api-CFG`), catat `id`-n
 
 **3a-ii. Ambil nilai yang sekarang** (ganti `ID_CFG` dengan id tadi):
 ```
-npx wrangler@3 kv key get --namespace-id=ID_CFG "cfg:flags" --remote
+npx wrangler@3 kv key get --namespace-id=ID_CFG "cfg:flags" --text
 ```
 Salin seluruh keluarannya ke editor teks (Notepad/TextEdit).
 
@@ -166,8 +166,13 @@ kunci lain di akun Anda mungkin berbeda):
 
 **3c. Tulis balik utuh:**
 ```
-npx wrangler@3 kv key put --namespace-id=ID_CFG "cfg:flags" 'TEMPEL_JSON_UTUH_DI_SINI' --remote
+npx wrangler@3 kv key put --namespace-id=ID_CFG "cfg:flags" 'TEMPEL_JSON_UTUH_DI_SINI'
 ```
+**Perhatikan: perintah `kv` TIDAK memakai `--remote`** (beda dengan `d1 execute`).
+Di wrangler v3, KV jarak jauh adalah bawaannya; `--local` justru yang harus
+ditambahkan kalau mau menyentuh salinan lokal. Menambahkan `--remote` di sini
+menghasilkan `Unknown argument: remote`.
+
 Di PowerShell, JSON-nya dibungkus **kutip tunggal**; kalau ada kutip tunggal di
 dalam JSON-nya (harusnya tidak ada), simpan ke berkas lalu pakai `--path`.
 
@@ -278,7 +283,7 @@ gerbang ke publik), jadi urutan eliminasi di atas memang cara memeriksanya.
 Balik ke keadaan mati tanpa menghapus data:
 
 ```
-npx wrangler@3 kv key put --namespace-id=ID_CFG "cfg:flags" 'JSON_UTUH_DENGAN_KEDUA_FLAG_false' --remote
+npx wrangler@3 kv key put --namespace-id=ID_CFG "cfg:flags" 'JSON_UTUH_DENGAN_KEDUA_FLAG_false'
 ```
 
 Dalam ≤60 detik lane berhenti menerima kiriman (fail-closed). Data yang sudah
