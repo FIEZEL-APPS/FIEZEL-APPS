@@ -64,6 +64,12 @@ ul,ol{margin:0;padding:0;list-style:none}
 .topnav>a:first-child{display:none;font-weight:700;color:var(--maroon-deep);font-size:.92rem;
   letter-spacing:.02em;border-bottom:1px solid transparent}
 .topnav>a:first-child:hover{text-decoration:none;border-color:var(--maroon-line-strong)}
+/* m026 GEO: saklar bahasa manual (id<->th) — pilihan selalu menang atas deteksi IP */
+.lang-switch{font-weight:700;color:var(--maroon-deep);font-size:.88rem;line-height:1;
+  border:1px solid var(--maroon-line-strong);border-radius:999px;padding:7px 15px;white-space:nowrap}
+.lang-switch:hover{text-decoration:none;border-color:var(--maroon-deep);background:rgba(140,34,51,.06)}
+.anim .lang-switch{transition:border-color var(--fz-base) var(--fz-out),background var(--fz-base) var(--fz-out),transform var(--fz-fast) var(--fz-spring)}
+.anim .lang-switch:hover{transform:translateY(-2px)}
 
 /* ---------- masthead: WORDMARK RESMI (assets/brand/fiezel-wordmark.svg) ---------- */
 .masthead{padding:20px 0 4px;text-align:center}
