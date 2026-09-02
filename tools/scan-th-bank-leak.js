@@ -12,6 +12,11 @@ const FILES = [
   'features/i18n/listening-bank-th.json',
   'features/i18n/reading-exam-th.json',
   'features/i18n/writing-prompts-th.json',
+  'features/i18n/listening-exam-th.json',
+  'features/i18n/speaking-exam-th.json',
+  'features/i18n/misconception-th.json',
+  'features/i18n/cloze-bank-th.json',
+  'features/i18n/reading-bank-th.json',
 ];
 const SKIP_KEYS = new Set(['schema', 'status', 'catatan', 'version', 'count', 'generatedFrom', 'id']);
 

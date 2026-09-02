@@ -47,11 +47,16 @@ memang Inggris — itu imersi yang disengaja, sama untuk murid id maupun th, jad
 Mode `paraphrase` juga dikecualikan: pilihan Inggris memang objek ujinya. Yang tidak pernah sah
 di level mana pun adalah bahasa Indonesia.
 
-## Status: SELESAI — gerbang 20/20 PASS
+## Status: SELESAI — gerbang 26/26 PASS
 
 ```
-node th-bank-purity-test.js      # 20/20 PASS
+node th-bank-purity-test.js      # 26/26 PASS
+node th-exam-overlay-test.js     # 13/13 PASS
+node tools/scan-th-bank-leak.js  # 0 temuan
 ```
+
+OWNER memegang keputusan rilis; MASTER/A14 hanya mereviu. Gerbang di atas wajib hijau
+sebelum konten Thai apa pun dianggap selesai.
 
 Keenam bank soal yang dibaca murid Thai kini bersih, dan ketiganya yang baru sudah
 tersambung ke runtime. Rincian per bank:
@@ -64,10 +69,50 @@ tersambung ke runtime. Rincian per bank:
 | misconception | `features/i18n/misconception-th.json` | 644 diagnosis + 49 kode taksonomi |
 | reading-exam | `features/i18n/reading-exam-th.json` | format + penjelasan tiap soal, 196 bidang |
 | writing | `features/i18n/writing-prompts-th.json` | prompt + examTask + rubrik, 131 bidang |
+| listening-exam | `features/i18n/listening-exam-th.json` | 8 set, 57 penjelasan, 6 catatan format, honesty + audioSource |
+| speaking-exam | `features/i18n/speaking-exam-th.json` | 7 catatan format, honesty, rubrik 4 kriteria |
 
 B1+ **sengaja tidak** punya sidecar: mulai B1 pertanyaan dan pilihannya memang berbahasa
 Inggris — imersi yang disengaja dan sama untuk murid id maupun th. Yang tidak pernah sah di
 level mana pun adalah bahasa Indonesia.
+
+### JEBAKAN KEDUA: gerbang memeriksa ISI, bukan SAMPAI-nya
+
+Ditemukan m025-232, setelah owner melapor sesi listening Thai masih bercampur padahal
+kedua pemindai hijau. Keduanya benar — dan keduanya buta pada hal yang sama.
+
+Bank ujian Listening (8 set, 57 soal) **tidak punya sidecar th sama sekali**. Overlay-nya
+ada sejak lama, tapi mencocokkan id set `lx-ielts-s1` ke `listening-bank-th.json` yang
+seluruh 1.407 kuncinya berbentuk `listen_sc_*`. Pencocokan itu tidak pernah kena sasaran
+satu kali pun. Setiap gerbang purity memeriksa ISI sidecar; bank tanpa sidecar tidak punya
+isi untuk diperiksa, jadi ia lolos **dengan diam** — mode kegagalan yang sama persis dengan
+pencemaran korpus di atas: gerbang hijau, murid tetap membaca bahasa Indonesia.
+
+Bersamaan itu, sebelas kalimat di jalur render `fiezel-speaking-listening-addon.js` tidak
+pernah memanggil `T()` sama sekali, dan **sepuluh di antaranya sudah punya terjemahan Thai
+yang menganggur** di `copy-th-feat-d.js`. Kuncinya diekstrak, tempat pemanggilannya tidak
+ikut dipindah. Yang paling sering terlihat: chip pemutar menulis ulang dirinya jadi
+`Diputar 1x` setiap kali audio diputar.
+
+**Penjaganya sekarang** — `th-exam-overlay-test.js`, dan ia sengaja memeriksa hal yang
+berbeda dari kedua pemindai: bukan datanya, melainkan JALUR BACANYA. Fixture sintetis
+berawalan `TH-` ditanam ke `FiezelThData`, lalu diperiksa bahwa nilai itu benar-benar
+keluar dari `listeningExamFor` / `listeningFormat` / `listeningHonestyText`. Kalau
+pencocokan id meleset, nilai `TH-` tidak akan pernah muncul dan tesnya merah.
+
+Ia juga menjaga dua arah lain yang mudah rusak diam-diam: murid Indonesia tidak boleh
+kebocoran teks Thai lewat jalur baca yang sama, dan sidecar yang belum terunduh
+(offline parsial) harus gagal-lunak, bukan melempar.
+
+**Aturan turunannya, dan ini yang penting untuk pekerjaan berikutnya:** setiap kali ada
+sidecar th BARU, tanyakan dua hal terpisah — (1) isinya bersih? (pemindai), dan
+(2) isinya sampai ke layar? (tes overlay). Gerbang yang hanya menjawab (1) akan hijau
+selamanya pada bank yang overlay-nya salah sasaran.
+
+**Kutipan skrip audio TETAP Inggris.** Penjelasan soal ujian mengutip rekamannya verbatim;
+kutipan itu bukti jawabannya. Menerjemahkannya berarti murid membaca kalimat yang tidak
+pernah terdengar di audio, dan soalnya jadi tidak bisa dijawab dari rekaman. Gerbang pasal 8
+memeriksa kontrak ini terpisah, jadi kutipan yang diam-diam diterjemahkan tetap ketahuan.
 
 ## Generator — jangan sunting sidecar dengan tangan
 
@@ -221,7 +266,8 @@ diadaptasi ke bahasa ibu pembacanya, bukan diterjemahkan.**
 
 1. Tambahkan pasangan **kalimat utuh** ke berkas peta di `tools/th-strings/`.
 2. Jalankan generatornya (ia gagal keras dan mencetak yang belum terpeta).
-3. `node th-bank-purity-test.js` harus tetap 20/20 **dan** `node tools/scan-th-bank-leak.js` 0 temuan.
+3. `node th-bank-purity-test.js` harus tetap 26/26, `node th-exam-overlay-test.js` 13/13,
+   **dan** `node tools/scan-th-bank-leak.js` 0 temuan.
 4. Jalankan daftar tes di `.github/workflows/quality.yml`. Kegagalan lama yang tidak
    berhubungan (tes hash-lock `vendor/kokoro-js/kokoro.web.js`, merah bahkan di `main` bersih
    pada lingkungan ini) tidak memblokir — pastikan dulu lewat `git diff main -- <path>` bahwa
