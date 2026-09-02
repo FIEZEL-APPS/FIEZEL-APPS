@@ -41,6 +41,11 @@ if (Repo) {
   repo.listeningFormats = srcListening.examFormats || {};
   repo.listeningHonesty = String(srcListening.honesty || '');
   repo.speakingExam = srcSpeaking.items;
+  /* Bank harian: satu butir sintetis per domain, cukup untuk membuktikan jalur bacanya.
+     for() memakai peta thData.listening / thData.speaking - peta yang BERBEDA dari
+     thData.listeningExam, dan pernah tertukar persis di bug m025-231. */
+  repo.listening = [{ id: 'ls-uji-th', level: 'A1', mode: 'gist', question: 'ID-PERTANYAAN', options: ['ID-A', 'ID-B'], answerIndex: 0, explain: 'ID-PENJELASAN', script: 'She goes to school.' }];
+  repo.speaking = [{ id: 'sp-uji-th', level: 'A1', mode: 'repeat', instruction: 'ID-INSTRUKSI', targetText: 'She goes to school.' }];
   repo.examFormats = srcSpeaking.examFormats || {};
   repo.examHonesty = String(srcSpeaking.honesty || '');
 
@@ -58,6 +63,8 @@ if (Repo) {
       examFormats: { [fmtKey]: { note: 'TH-CATATAN' } },
       honesty: 'TH-HONESTY',
     },
+    listening: { 'ls-uji-th': { question: 'TH-PERTANYAAN', options: ['TH-A', 'TH-B'], explain: 'TH-PENJELASAN' } },
+    speaking: { 'sp-uji-th': { instruction: 'TH-INSTRUKSI' } },
     speakingExam: {
       examFormats: spk0.exam ? { [spk0.exam]: { note: 'TH-CATATAN-SPEAKING' } } : {},
       honesty: 'TH-HONESTY-SPEAKING',
@@ -101,6 +108,27 @@ if (Repo) {
       !!sfmt && sfmt.note === 'TH-CATATAN-SPEAKING', sfmt ? JSON.stringify(sfmt.note) : 'format null');
   }
 
+  /* --- BANK HARIAN: jalur yang dipakai murid tiap hari, dan sampai sekarang belum
+     pernah punya uji pengiriman sendiri. --- */
+  const harian = repo.for('listening', 'A1').find(x => x && x.id === 'ls-uji-th');
+  check('listening harian: pertanyaan memakai teks Thai',
+    !!harian && harian.question === 'TH-PERTANYAAN', harian ? JSON.stringify(harian.question) : 'butir tidak ada');
+  check('listening harian: pilihan jawaban memakai teks Thai',
+    !!harian && JSON.stringify(harian.options) === JSON.stringify(['TH-A', 'TH-B']), harian ? JSON.stringify(harian.options) : '-');
+  check('listening harian: penjelasan memakai teks Thai',
+    !!harian && harian.explain === 'TH-PENJELASAN', harian ? JSON.stringify(harian.explain) : '-');
+  /* Skrip audio dan kunci jawaban milik SUMBER: skripnya bahasa Inggris yang benar-benar
+     terdengar, dan indeks yang bergeser menilai murid salah atas jawaban yang benar. */
+  check('listening harian: skrip audio Inggris dan kunci jawaban tetap dari sumber',
+    !!harian && harian.script === 'She goes to school.' && harian.answerIndex === 0,
+    harian ? JSON.stringify([harian.script, harian.answerIndex]) : '-');
+
+  const spk = repo.for('speaking', 'A1').find(x => x && x.id === 'sp-uji-th');
+  check('speaking harian: instruksi memakai teks Thai',
+    !!spk && spk.instruction === 'TH-INSTRUKSI', spk ? JSON.stringify(spk.instruction) : 'butir tidak ada');
+  check('speaking harian: kalimat target Inggris TIDAK disentuh',
+    !!spk && spk.targetText === 'She goes to school.', spk ? JSON.stringify(spk.targetText) : '-');
+
   // Sisi sebaliknya, dan ini yang menjaga murid Indonesia: begitu locale bukan th,
   // TIDAK BOLEH ada satu pun teks Thai yang bocor ke jalur baca yang sama.
   global.FiezelThLoader = { isThActive: () => false };
@@ -110,6 +138,12 @@ if (Repo) {
     !!gotId && gotId.title === set0.title, gotId ? JSON.stringify(gotId.title).slice(0, 50) : '-');
   check('locale id: honesty kembali ke teks sumber',
     repo.listeningHonestyText() === repo.listeningHonesty, '-');
+  const harianId = repo.for('listening', 'A1').find(x => x && x.id === 'ls-uji-th');
+  check('locale id: pertanyaan listening harian kembali ke teks sumber',
+    !!harianId && harianId.question === 'ID-PERTANYAAN', harianId ? JSON.stringify(harianId.question) : '-');
+  const spkId = repo.for('speaking', 'A1').find(x => x && x.id === 'sp-uji-th');
+  check('locale id: instruksi speaking harian kembali ke teks sumber',
+    !!spkId && spkId.instruction === 'ID-INSTRUKSI', spkId ? JSON.stringify(spkId.instruction) : '-');
   check('locale id: catatan format kembali ke teks sumber',
     (repo.listeningFormat(set0) || {}).note === (srcListening.examFormats[fmtKey] || {}).note, '-');
 
@@ -123,6 +157,8 @@ if (Repo) {
     repo.listeningFormat(set0);
     repo.listeningHonestyText();
     repo.examHonestyText();
+    repo.for('listening', 'A1');
+    repo.for('speaking', 'A1');
   } catch (e) { aman = false; }
   check('sidecar absen: jalur baca tidak melempar (fail-soft)', aman, '-');
 }

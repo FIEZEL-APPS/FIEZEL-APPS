@@ -975,9 +975,31 @@ function applyContentLocale(){
         return thC ? Object.assign({}, c, thC) : c;
       });
     }
+    /* m025-234: prompts dan examTasks sudah ADA di writing-prompts-th.json sejak sidecar
+       itu dibuat, tetapi overlay hanya pernah menyalin honesty + rubric. Akibatnya layar
+       Writing menampilkan petunjuk, fokus, dan catatan ujian dalam bahasa Indonesia untuk
+       murid Thai - 95 bidang terjemahan yang menganggur di berkas yang sudah dikirim.
+       Penyaji membaca prompt.id_hint (nama bidang warisan), jadi hint th ditulis ke SANA;
+       menamainya ulang akan memutus jalur id yang byte-identik. */
+    if(thReady.writing.prompts && Array.isArray(WRITING_BANK._orig?.prompts)){
+      WRITING_BANK.prompts = WRITING_BANK._orig.prompts.map(pr=>{
+        const t = thReady.writing.prompts[String(pr?.id||'')];
+        if(!t) return pr;
+        return Object.assign({}, pr, t.hint?{id_hint:t.hint}:{}, t.focus?{focus:t.focus}:{});
+      });
+    }
+    if(thReady.writing.examTasks && WRITING_BANK._orig?.examTasks){
+      WRITING_BANK.examTasks = {};
+      for(const [k,v] of Object.entries(WRITING_BANK._orig.examTasks)){
+        const t = thReady.writing.examTasks[k];
+        WRITING_BANK.examTasks[k] = t ? Object.assign({}, v, t) : v;
+      }
+    }
   } else if(WRITING_BANK?._orig) {
     WRITING_BANK.honesty = WRITING_BANK._orig.honesty;
     if(WRITING_BANK.rubric) WRITING_BANK.rubric.criteria = WRITING_BANK._orig.rubric.criteria;
+    if(WRITING_BANK._orig.prompts) WRITING_BANK.prompts = WRITING_BANK._orig.prompts;
+    if(WRITING_BANK._orig.examTasks) WRITING_BANK.examTasks = JSON.parse(JSON.stringify(WRITING_BANK._orig.examTasks));
   }
   if(thReady?.reading && READING_EXAM){
     if(!READING_EXAM._orig) READING_EXAM._orig = JSON.parse(JSON.stringify(READING_EXAM));
@@ -987,9 +1009,28 @@ function applyContentLocale(){
         if(READING_EXAM.examFormats[k]) Object.assign(READING_EXAM.examFormats[k], thReady.reading.formats[k]);
       }
     }
+    /* m025-234: passages juga sudah lama ada di reading-exam-th.json (8 set, 96 soal
+       dengan why + whyOthersFail Thai) dan tidak pernah dipakai. startReadingExam()
+       menyalin explain.why -> why dan explain.whyOthersFail -> distractor, lalu
+       renderFeedback menampilkannya; tanpa overlay ini keduanya berbahasa Indonesia.
+       Stem, options, dan answerIndex TIDAK disentuh: teks Inggrisnya adalah objek uji,
+       dan menggeser satu pilihan akan mengubah kunci jawaban tanpa jejak. */
+    if(thReady.reading.passages && Array.isArray(READING_EXAM._orig?.passages)){
+      READING_EXAM.passages = READING_EXAM._orig.passages.map(ps=>{
+        const t = thReady.reading.passages[String(ps?.id||'')];
+        if(!t?.questions || !Array.isArray(ps.questions)) return ps;
+        return Object.assign({}, ps, {questions: ps.questions.map(q=>{
+          const tq = t.questions[String(q?.id||'')];
+          if(!tq) return q;
+          return Object.assign({}, q, {explain: Object.assign({}, q.explain,
+            tq.why?{why:tq.why}:{}, tq.whyOthersFail?{whyOthersFail:tq.whyOthersFail}:{})});
+        })});
+      });
+    }
   } else if(READING_EXAM?._orig) {
     READING_EXAM.honesty = READING_EXAM._orig.honesty;
     if(READING_EXAM.examFormats) READING_EXAM.examFormats = JSON.parse(JSON.stringify(READING_EXAM._orig.examFormats));
+    if(READING_EXAM._orig.passages) READING_EXAM.passages = READING_EXAM._orig.passages;
   }
   // --- BANK SOAL: reading A1/A2, cloze, diagnosis miskonsepsi (m025-230) ---------------
   // Tiga sidecar ini menutup jalur yang dulu TIDAK PERNAH punya overlay: murid Thai membaca
