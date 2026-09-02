@@ -5916,11 +5916,19 @@ function pawFaceMarkup(){try{if(self.FiezelPaw?.ready?.())
 // menyala di waktu yang salah. Ambangnya <=1 supaya hanya kejatuhan sungguhan
 // (rantai hilang) yang memicunya, bukan koreksi angka biasa.
 // [ADAPTASI] 14 §3.1 aturan 2: SFX karakter tidak boleh menimpa suara tutor yang sedang
-// bicara. FiezelVoiceSay tidak mengekspor isSpeaking — yang jujur adalah status().speaking
-// milik FiezelPuterVoice dan speechSynthesis.speaking milik cadangan browser.
+// bicara. FiezelVoiceSay tidak mengekspor isSpeaking, jadi sinyalnya dirakit dari dua
+// pengamat.
+//
+// m025-232: dulu baris keduanya membaca `speechSynthesis.speaking` milik cadangan peramban.
+// Cadangan itu sudah dihapus, dan menggantinya dengan FiezelSpeechBridge.speaking() BUKAN
+// sekadar tambal: jembatan itu mengikuti aliran event 'fiezel-speech' dari fasad, jadi ia
+// menjawab benar untuk SEMUA lapisan yang tersisa - aset R2/ElevenLabs (L1), Cloudflare (C1),
+// Puter (L2), dan neural di perangkat (L3). `speechSynthesis.speaking` dulu hanya tahu satu
+// lapisan, yang paling bawah, sehingga SFX maskot tetap boleh menimpa suara L1 yang sedang
+// berbunyi. Sinyal barunya lebih luas, bukan lebih sempit.
 function voiceIsSpeaking(){
+  try{if(self.FiezelSpeechBridge?.speaking?.())return true}catch(_){}
   try{if(self.FiezelPuterVoice?.status?.().speaking)return true}catch(_){}
-  try{if(self.speechSynthesis?.speaking)return true}catch(_){}
   return false
 }
 let pawLastSeenStreak=null;
@@ -7840,34 +7848,27 @@ function vocab(){const level=getActiveLevel(),active=V.filter(v=>v.level===level
 // Indonesia. Bacaan tidak punya pasangan terjemahan di banknya, jadi barisnya datang
 // dari penerjemah - itulah satu-satunya jalur yang memakai jatah AI.
 //
-// Cadangan speechSynthesis DIPERTAHANKAN, dan bukan karena lupa dibersihkan: mesin
-// Puter butuh jaringan, dan tanpa cadangan ini sebuah bacaan yang dibuka saat sinyal
-// hilang akan diam sepenuhnya. Suara bawaan perangkat memang kalah jauh, tetapi diam
-// total lebih buruk daripada suara seadanya.
+// m025-232 (laporan OWNER: dua suara sekaligus di sesi listening tes kemampuan).
+// Cadangan speechSynthesis peramban DIHAPUS TOTAL dari pintu ini.
+//
+// AKARNYA ada di play(): `viaDoor` adalah Promise.race antara pintu suara dan timeout 9 detik.
+// Satu paragraf bacaan atau satu skrip listening WAJAR berbunyi lebih dari 9 detik, jadi
+// timeout itu menang secara rutin SELAGI audio ElevenLabs masih berbunyi - dan hasil `false`
+// dari timeout dulu dibaca sebagai "pintu bisu", lalu browserPlay() menyalakan utterance
+// peramban DI ATAS audio yang sedang jalan. Itulah dua suara yang didengar OWNER: bukan dua
+// lapisan yang berebut, melainkan satu stopwatch yang menyimpulkan kebisuan terlalu cepat.
+//
+// stop() pun tidak bisa menolongnya: `speechSynthesis` punya antrean GLOBAL milik peramban
+// yang hidup di luar pemutar kita, jadi setiap perbaikan overlap harus mengurus dua dunia.
+// Menghapus lapisannya menghapus dunia keduanya, dan itu satu-satunya perbaikan yang tidak
+// bisa bocor lagi nanti.
+//
+// Gantinya BUKAN suara lain: pintu ini berhenti di L5 - teks tetap terbaca, tanpa suara.
 function AudioService(){
- const browserSupported='speechSynthesis'in window&&typeof SpeechSynthesisUtterance==='function';
  // m026-BUG3: pesan jujur DIUCAPKAN SEKALI per sesi. Reading, Vocabulary, dan Grammar
  // memanggil audio.play() berkali-kali dalam satu layar; memberi tahu murid setiap kali
  // akan mengubah satu kegagalan menjadi banjir toast di atas materinya.
  let silenceNoticed=false;
- const rateFor=options=>Number(options.speed??selectedNeuralRate())||1;
- // Cadangan peramban, dipanggil sebagai FUNGSI - bukan sebagai cabang if yang hanya
- // hidup ketika modulnya absen. Ia resolve false bila peramban tidak punya suara sama
- // sekali, supaya pemanggil di bawah bisa membedakan "berbunyi" dari "tidak ada apa-apa".
- const browserPlay=(text,options)=>{
-  if(!browserSupported)return Promise.resolve(false);
-  try{
-   const u=new SpeechSynthesisUtterance(text);u.lang=options.locale||'en-US';
-   // m028 fase4 AKAR: cadangan ini dulu memakai .88 tetap, jadi murid yang menggeser
-   // "Kecepatan bicara" ke 1.25x tetap mendengar suara pelan begitu jalur neural gagal -
-   // satu preferensi dengan dua kecepatan berbeda tergantung mesin mana yang menyahut.
-   // OBAT: baca preferensi yang sama seperti jalur neural. Clamp 0.75-1.25 dijamin
-   // selectedNeuralRate().
-   u.rate=rateFor(options);
-   speechSynthesis.speak(u);
-   return Promise.resolve({provider:'browser-speech-synthesis'});
-  }catch(_){return Promise.resolve(false)}
- };
  const noteSilence=()=>{
   if(silenceNoticed)return false;
   silenceNoticed=true;
@@ -7875,8 +7876,8 @@ function AudioService(){
   return true;
  };
  return{
-  isSupported:()=>!!self.FiezelVoiceSay||browserSupported,
-  stop(){cancelVoicePrefetch();self.FiezelVoiceSay?.stop?.();if(browserSupported)speechSynthesis.cancel()},
+  isSupported:()=>!!self.FiezelVoiceSay,
+  stop(){cancelVoicePrefetch();self.FiezelVoiceSay?.stop?.()},
   /**
    * V6: pintu hangat untuk Reading/Vocabulary/Grammar. Ia TIDAK menebak apa kalimat
    * berikutnya - pemanggilnya yang tahu (flashcards tahu kartu sesudahnya, kuis tahu
@@ -7885,12 +7886,9 @@ function AudioService(){
    */
   prefetch(next,options={}){return prefetchNextVoice(next,{speed:options.speed??selectedNeuralRate(),contentType:options.contentType,locale:options.locale})},
   /**
-   * m026-BUG3 (cf-c1 K11). Sebelum perbaikan ini cabang SpeechSynthesisUtterance hanya
-   * dipakai bila modul FiezelVoiceSay TIDAK ADA - dan sw.js mem-precache modul itu, jadi
-   * cabangnya mati secara struktural. Akibatnya say() yang mengembalikan false (atau
-   * menolak) berarti Reading/Vocabulary/Grammar BISU, tanpa cadangan dan tanpa pesan.
-   *
-   * Yang memicu cadangan sekarang adalah HASIL pemutaran, bukan ada-tidaknya modul.
+   * Satu pintu untuk Reading/Vocabulary/Grammar. Sejak m025-232 ia TIDAK punya cadangan
+   * bersuara: hasil selain "berbunyi" berarti teks tanpa suara, dan sekali per sesi murid
+   * diberi tahu lewat noteSilence().
    */
   play(text,options={}){
    if(!text)return Promise.resolve(null);
@@ -7915,7 +7913,18 @@ function AudioService(){
     * FiezelSubtitleTranslate yang mengikuti locale murid, jadi jalur Thai mati di titik yang
     * sama persis. */
    const noSubtitles=options.suppressSubtitles===true||options.contentType==='listening';
-   const timeoutPromise=typeof setTimeout==='function'?new Promise(r=>setTimeout(()=>r(false),9000)):new Promise(()=>{});
+   /* m025-232. Timeout ini dulu resolve `false` - nilai yang SAMA dengan "pintu suara tidak
+    * berbunyi" - dan di ujung play() `false` berarti "nyalakan cadangan peramban". Karena satu
+    * paragraf bacaan wajar berbunyi lebih dari 9 detik, stopwatch ini menang secara rutin
+    * SELAGI audio ElevenLabs masih berjalan, lalu utterance peramban berbunyi menimpanya.
+    *
+    * Sekarang ia resolve SENTINEL yang berbeda. Timeout tidak lagi bisa disalahartikan sebagai
+    * kebisuan: ia hanya berarti "pintu belum menjawab", jawaban yang benar untuk itu adalah
+    * TIDAK MELAKUKAN APA-APA - tidak ada suara kedua, dan tidak ada toast "suara bermasalah"
+    * di atas audio yang sebenarnya terdengar baik-baik saja. Pintu suara tetap memiliki
+    * gilirannya sampai ia selesai atau sampai stop() berikutnya membatalkannya. */
+   const PENDING=Symbol('voice-pending');
+   const timeoutPromise=typeof setTimeout==='function'?new Promise(r=>setTimeout(()=>r(PENDING),9000)):new Promise(()=>{});
    /* m025-201 (REGRESI PRODUKSI). `say` di baris berikutnya adalah identifier BEBAS - tidak
     * pernah dideklarasikan di AudioService(). `typeof` pada identifier tak dideklarasikan
     * TIDAK melempar, ia mengembalikan 'undefined' dengan tenang, jadi viaDoor selalu false
@@ -7940,12 +7949,10 @@ function AudioService(){
    // stop() di atas sudah membatalkan generation sebelumnya, jadi pengajuan ini yang berlaku.
    if(options.next)this.prefetch(options.next,{speed:options.speed,contentType:options.nextContentType||options.contentType,locale:options.locale});
    return viaDoor.then(result=>{
+    if(result===PENDING)return null; // masih berbunyi di bawah sana - lihat catatan PENDING di atas
     if(result!==false&&result!==null&&result!==undefined)return result===true?{provider:'fiezel-voice-say'}:result;
-    return Promise.resolve(browserPlay(text,options)).then(fallback=>{
-     if(fallback)return fallback;
-     noteSilence();
-     return null;
-    });
+    noteSilence();
+    return null;
    });
   }
  }

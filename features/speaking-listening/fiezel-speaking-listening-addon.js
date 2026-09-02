@@ -318,8 +318,13 @@
   function capabilities(){
     const Recognition=global.SpeechRecognition||global.webkitSpeechRecognition;
     return Object.freeze({
-      // m025-28: audio capability means the neural runtime is usable. Browser
-      // SpeechSynthesis presence is irrelevant: it is never used for listening.
+      // m025-28: kemampuan audio berarti PINTU BICARA BERSAMA bisa dipakai, bukan
+      // "perangkat ini punya mesin suara". Yang diperiksa memang FiezelVoiceSay.say,
+      // karena hanya dia yang tahu lapisan mana yang sanggup berbunyi hari ini.
+      // m025-232: dulu di sini ada catatan bahwa keberadaan suara peramban tidak
+      // relevan; sekarang lapisan itu sudah dihapus dari aplikasi, jadi tidak ada
+      // lagi kemampuan kedua yang bisa keliru dihitung — di bawah pintu ini tinggal
+      // R2/ElevenLabs, Cloudflare, Puter, neural di perangkat, lalu teks senyap.
       tts:!!(global.FiezelVoiceSay&&typeof global.FiezelVoiceSay.say==='function'),
       neuralVoice:global.FiezelPuterVoice?.status?.().ready===true,
       speechRecognition:typeof Recognition==='function',
@@ -413,23 +418,81 @@
         return true;
       }catch(_){return false}
     }
-    listeningFormat(set){const key=String(set&&set.exam||'');const meta=key?this.listeningFormats[key]:null;return meta?{id:key,...meta}:null}
+    /* m025-231: sidecar th untuk bank ujian Listening. Overlay set-id yang lama TIDAK
+       pernah kena sasaran - id set adalah lx-* sementara listening-bank-th.json hanya
+       berisi kunci listen_sc_*, jadi seluruh sesi ujian (judul, penjelasan tiap soal,
+       catatan format, dan paragraf honesty) selalu jatuh ke teks Indonesia untuk murid th.
+       Tiga permukaan itu butuh kait sendiri: judul+soal lewat listeningExamFor, catatan
+       format lewat listeningFormat, dan honesty lewat listeningHonestyText. */
+    thExam(){
+      const isTh=(I18N&&I18N.getLocale()==='th')||(global.FiezelThLoader&&global.FiezelThLoader.isThActive&&global.FiezelThLoader.isThActive());
+      if(!isTh)return null;
+      const d=global.FiezelThData;
+      return d&&d.listeningExam?d.listeningExam:null;
+    }
+    listeningFormat(set){
+      const key=String(set&&set.exam||'');
+      const meta=key?this.listeningFormats[key]:null;
+      if(!meta)return null;
+      const th=this.thExam();
+      const thMeta=th&&th.examFormats?th.examFormats[key]:null;
+      return thMeta?{id:key,...meta,...thMeta}:{id:key,...meta};
+    }
+    listeningHonestyText(){
+      const th=this.thExam();
+      return String((th&&th.honesty)||this.listeningHonesty||'');
+    }
     listeningExamLevels(){return [...new Set(this.listeningExam.map(x=>x.level))].filter(Boolean).sort()}
     listeningExamFor(level){
       const target=normalizeLevel(level);
-      const rows=this.listeningExam.filter(x=>x.level===target);
+      let rows=this.listeningExam.filter(x=>x.level===target);
       const thData=global.FiezelThData;
       const isTh=(I18N&&I18N.getLocale()==='th')||(global.FiezelThLoader&&global.FiezelThLoader.isThActive&&global.FiezelThLoader.isThActive());
       if(isTh&&thData?.listening){
-        return rows.map(set=>{
+        rows=rows.map(set=>{
           const thSet=thData.listening[set.id];
           return thSet?{...set,...thSet}:set;
+        });
+      }
+      const thEx=this.thExam();
+      if(thEx&&thEx.sets){
+        rows=rows.map(set=>{
+          const thSet=thEx.sets[set.id];
+          if(!thSet)return set;
+          const merged={...set,...thSet};
+          /* questions adalah LARIK di sumber tapi PETA-per-id di sidecar: gabung per id,
+             jangan menyalin petanya mentah-mentah. Urutan dan answerIndex milik sumber
+             harus utuh - satu soal yang bergeser diam-diam mengubah kunci jawaban. */
+          if(Array.isArray(set.questions)){
+            merged.questions=set.questions.map(q=>{
+              const thQ=thSet.questions&&thSet.questions[q.id];
+              return thQ?{...q,...thQ}:q;
+            });
+          }
+          return merged;
         });
       }
       return rows;
     }
 
-    examFormat(item){const key=String(item&&item.exam||'');const meta=key?this.examFormats[key]:null;return meta?{id:key,...meta}:null}
+    thSpeakingExam(){
+      const isTh=(I18N&&I18N.getLocale()==='th')||(global.FiezelThLoader&&global.FiezelThLoader.isThActive&&global.FiezelThLoader.isThActive());
+      if(!isTh)return null;
+      const d=global.FiezelThData;
+      return d&&d.speakingExam?d.speakingExam:null;
+    }
+    examFormat(item){
+      const key=String(item&&item.exam||'');
+      const meta=key?this.examFormats[key]:null;
+      if(!meta)return null;
+      const th=this.thSpeakingExam();
+      const thMeta=th&&th.examFormats?th.examFormats[key]:null;
+      return thMeta?{id:key,...meta,...thMeta}:{id:key,...meta};
+    }
+    examHonestyText(){
+      const th=this.thSpeakingExam();
+      return String((th&&th.honesty)||this.examHonesty||'');
+    }
     examLevels(){return [...new Set(this.speakingExam.map(x=>x.level))].filter(Boolean).sort()}
     examFor(level){
       const target=normalizeLevel(level);
@@ -470,13 +533,24 @@
 
   class TTSService{
     constructor(config){this.config=config}
-    stop(){try{global.FiezelVoiceSay?.stop?.()}catch{}try{global.speechSynthesis?.cancel()}catch{}}
-    // m025-28: listening used to call SpeechSynthesisUtterance directly, so it never
-    // touched the neural engine at all -- every listening item was browser TTS by
-    // construction. That is also why longer scripts failed: B2 scripts run ~155 chars
-    // against A1's ~40, and iOS SpeechSynthesis routinely stalls on the longer ones,
-    // tripping the internal timeout and locking the item. Route listening through the
-    // same neural runtime as the rest of the app, and never substitute browser TTS.
+    // m025-232: baris ini dulu memanggil `speechSynthesis.cancel()` sesudah stop()
+    // pintu bicara, karena pernah ada lapisan suara peramban dengan antrean sendiri
+    // DI LUAR pintu itu — satu-satunya bunyi yang tidak bisa dihentikan FiezelVoiceSay.
+    // Lapisan itu dihapus, jadi pembatal keduanya ikut dibuang: menyisakannya berarti
+    // memelihara kepercayaan bahwa masih ada jalur bunyi kedua yang perlu diredam.
+    // Satu pintu untuk berbunyi = satu pintu untuk berhenti.
+    stop(){try{global.FiezelVoiceSay?.stop?.()}catch{}}
+    // m025-28: listening dulu memanggil mesin suara peramban langsung, jadi ia tidak
+    // pernah menyentuh runtime neural sama sekali - setiap item listening dibacakan
+    // suara peramban karena bentuk kodenya memang begitu. Itu pula sebab naskah
+    // panjang gagal: naskah B2 ~155 karakter melawan A1 ~40, dan jalur peramban di
+    // iOS rutin macet pada yang panjang, memicu timeout internal lalu MENGUNCI item.
+    // PELAJARANNYA tetap berlaku dan justru makin keras: listening wajib lewat pintu
+    // bicara bersama, tidak pernah lewat jalur bunyi sendiri.
+    // m025-232: jalur peramban itu sendiri sudah dihapus dari seluruh aplikasi, jadi
+    // "jangan diganti TTS peramban" bukan lagi godaan yang tersedia - kalau pintu
+    // bersama diam, yang benar adalah diam plus teks yang tetap terbaca, bukan
+    // mencari sumber bunyi lain di belakang pintu.
     // m025-100: jalur ini ikut pintu bicara bersama. Sebelumnya ia memanggil mesin
     // lokal langsung dan MENOLAK berbunyi bila modelnya belum diunduh - pemeriksaan
     // yang benar ketika suara memang harus diunduh, dan penghalang murni sesudah
@@ -587,7 +661,7 @@
     }
     exit(){this.cancelPrefetch();this.setSessionStage(false);this.tts.stop();this.recognition.stop();this.recorder.destroy();this.ephemeralTranscript='';this.notifySessionEnd('exit');if(typeof this.options.onExit==='function')this.options.onExit();else this.renderHub()}
     emitEvidence(){const evidence=this.store.evidence();if(typeof this.options.onAggregateEvidence==='function')this.options.onAggregateEvidence(evidence);return evidence}
-    renderHub(){this.setSessionStage(false);if(!this.root)return;const c=capabilities(),ev=this.store.evidence(),active=this.readActiveLevel();this.root.innerHTML=`<section class="fsl-shell"><div class="fsl-head"><div><span class="fsl-kicker">FIEZEL SKILLS LAB</span><h1>Speaking + Listening</h1><p>${T('fsl.privacy-intro', 'Latihan suara dengan data terisolasi. Speaking mengukur target-language coverage, bukan pronunciation.')}</p><p class="fsl-level-state">${T('fsl.active-level', 'Level aktif: {level}', {level: esc(active)})}${this.levelContract.external?' · mengikuti pilihan level utama':''}</p></div></div><div class="fsl-grid"><article class="fsl-card"><span class="fsl-kicker">Listening</span><h2>${T('fsl.listening-title', 'Dengar lalu pahami')}</h2><p>${T('fsl.listening-desc', 'Gist, detail, dan dictation. Jawaban baru aktif setelah audio berhasil diputar dan raw dictation tidak disimpan.')}</p><div class="fsl-actions"><button class="fsl-primary" data-open="listening">${T('fsl.listening-start-btn', 'Mulai Listening')}</button></div></article>${this.repo.listeningExamFor(active).length?`<article class="fsl-card"><span class="fsl-kicker">${T('fsl.listening-exam-kicker', 'Listening berformat ujian')}</span><h2>IELTS &amp; TOEFL Listening</h2><p>${T('fsl.listening-exam-desc', '{count} set untuk level {level}. Audio diputar SEKALI, persis seperti ujiannya.', {count: this.repo.listeningExamFor(active).length, level: esc(active)})}</p><p class="fsl-privacy">${esc(this.repo.listeningHonesty)}</p><div class="fsl-actions"><button class="fsl-primary" data-open="listening_exam">${T('fsl.listening-exam-start-btn', 'Mulai latihan ujian')}</button></div></article>`:`<article class="fsl-card"><span class="fsl-kicker">${T('fsl.listening-exam-kicker', 'Listening berformat ujian')}</span><h2>IELTS &amp; TOEFL Listening</h2><p>${T('fsl.listening-exam-empty', 'Belum ada set untuk level {level}. Yang sudah tersedia: {available}.', {level: esc(active), available: esc(this.repo.listeningExamLevels().join(', ')||'-')})}</p></article>`}<article class="fsl-card"><span class="fsl-kicker">Speaking</span><h2>${T('fsl.speaking-title', 'Ucapkan dan respons')}</h2><p>${c.speechRecognition?T('fsl.speaking-sr-available', 'Speech recognition tersedia untuk target-language coverage.'):T('fsl.speaking-sr-unavailable', 'Speech recognition tidak tersedia; mode rekam-dengar mandiri tetap dapat dipakai jika microphone recording tersedia.')}</p><div class="fsl-actions"><button class="fsl-primary" data-open="speaking">${T('fsl.speaking-start-btn', 'Mulai Speaking')}</button></div></article>${this.repo.examFor(active).length?`<article class="fsl-card"><span class="fsl-kicker">${T('fsl.speaking-exam-kicker', 'Latihan berformat ujian')}</span><h2>IELTS &amp; TOEFL Speaking</h2><p>${T('fsl.speaking-exam-desc', '{count} set untuk level {level}, lengkap dengan waktu menyiapkan dan waktu bicara seperti ujian aslinya.', {count: this.repo.examFor(active).length, level: esc(active)})}</p><p class="fsl-privacy">${esc(this.repo.examHonesty)}</p><div class="fsl-actions"><button class="fsl-primary" data-open="speaking_exam">${T('fsl.speaking-exam-start-btn', 'Mulai latihan ujian')}</button></div></article>`:`<article class="fsl-card"><span class="fsl-kicker">${T('fsl.speaking-exam-kicker', 'Latihan berformat ujian')}</span><h2>IELTS &amp; TOEFL Speaking</h2><p>${T('fsl.speaking-exam-empty', 'Belum ada set untuk level {level}.', {level: esc(active)})}</p></article>`}</div><article class="fsl-card"><span class="fsl-kicker">Capability gate</span><div class="fsl-status">Audio output: <b>${c.neuralVoice?T('fsl.audio-neural-ready', 'neural ready'):T('fsl.audio-neural-pending', 'neural belum diunduh')}</b> · Speech recognition: <b>${c.speechRecognition?'ready':'unavailable'}</b> · Recorder: <b>${c.mediaRecorder?'ready':'unavailable'}</b> · Secure context: <b>${c.secureContext?'yes':'no'}</b></div><p class="fsl-privacy">${T('fsl.browser-privacy', 'Browser speech recognition dapat melibatkan layanan pengenal milik browser. FIEZEL tidak menyimpan raw audio, transcript, atau jawaban dictation.')}</p></article><article class="fsl-card"><span class="fsl-kicker">Evidence lokal</span><p>Listening: <b>${ev.domains.listening.attempts}</b> attempt · average ${ev.domains.listening.averageScore??'-'}%. Speaking: <b>${ev.domains.speaking.attempts}</b> attempt · average ${ev.domains.speaking.averageScore??'-'}%.</p></article></section>`;
+    renderHub(){this.setSessionStage(false);if(!this.root)return;const c=capabilities(),ev=this.store.evidence(),active=this.readActiveLevel();this.root.innerHTML=`<section class="fsl-shell"><div class="fsl-head"><div><span class="fsl-kicker">FIEZEL SKILLS LAB</span><h1>Speaking + Listening</h1><p>${T('fsl.privacy-intro', 'Latihan suara dengan data terisolasi. Speaking mengukur target-language coverage, bukan pronunciation.')}</p><p class="fsl-level-state">${T('fsl.active-level', 'Level aktif: {level}', {level: esc(active)})}${this.levelContract.external?esc(T('fsl.level-follows-main')):''}</p></div></div><div class="fsl-grid"><article class="fsl-card"><span class="fsl-kicker">Listening</span><h2>${T('fsl.listening-title', 'Dengar lalu pahami')}</h2><p>${T('fsl.listening-desc', 'Gist, detail, dan dictation. Jawaban baru aktif setelah audio berhasil diputar dan raw dictation tidak disimpan.')}</p><div class="fsl-actions"><button class="fsl-primary" data-open="listening">${T('fsl.listening-start-btn', 'Mulai Listening')}</button></div></article>${this.repo.listeningExamFor(active).length?`<article class="fsl-card"><span class="fsl-kicker">${T('fsl.listening-exam-kicker', 'Listening berformat ujian')}</span><h2>IELTS &amp; TOEFL Listening</h2><p>${T('fsl.listening-exam-desc', '{count} set untuk level {level}. Audio diputar SEKALI, persis seperti ujiannya.', {count: this.repo.listeningExamFor(active).length, level: esc(active)})}</p><p class="fsl-privacy">${esc(this.repo.listeningHonestyText())}</p><div class="fsl-actions"><button class="fsl-primary" data-open="listening_exam">${T('fsl.listening-exam-start-btn', 'Mulai latihan ujian')}</button></div></article>`:`<article class="fsl-card"><span class="fsl-kicker">${T('fsl.listening-exam-kicker', 'Listening berformat ujian')}</span><h2>IELTS &amp; TOEFL Listening</h2><p>${T('fsl.listening-exam-empty', 'Belum ada set untuk level {level}. Yang sudah tersedia: {available}.', {level: esc(active), available: esc(this.repo.listeningExamLevels().join(', ')||'-')})}</p></article>`}<article class="fsl-card"><span class="fsl-kicker">Speaking</span><h2>${T('fsl.speaking-title', 'Ucapkan dan respons')}</h2><p>${c.speechRecognition?T('fsl.speaking-sr-available', 'Speech recognition tersedia untuk target-language coverage.'):T('fsl.speaking-sr-unavailable', 'Speech recognition tidak tersedia; mode rekam-dengar mandiri tetap dapat dipakai jika microphone recording tersedia.')}</p><div class="fsl-actions"><button class="fsl-primary" data-open="speaking">${T('fsl.speaking-start-btn', 'Mulai Speaking')}</button></div></article>${this.repo.examFor(active).length?`<article class="fsl-card"><span class="fsl-kicker">${T('fsl.speaking-exam-kicker', 'Latihan berformat ujian')}</span><h2>IELTS &amp; TOEFL Speaking</h2><p>${T('fsl.speaking-exam-desc', '{count} set untuk level {level}, lengkap dengan waktu menyiapkan dan waktu bicara seperti ujian aslinya.', {count: this.repo.examFor(active).length, level: esc(active)})}</p><p class="fsl-privacy">${esc(this.repo.examHonestyText())}</p><div class="fsl-actions"><button class="fsl-primary" data-open="speaking_exam">${T('fsl.speaking-exam-start-btn', 'Mulai latihan ujian')}</button></div></article>`:`<article class="fsl-card"><span class="fsl-kicker">${T('fsl.speaking-exam-kicker', 'Latihan berformat ujian')}</span><h2>IELTS &amp; TOEFL Speaking</h2><p>${T('fsl.speaking-exam-empty', 'Belum ada set untuk level {level}.', {level: esc(active)})}</p></article>`}</div><article class="fsl-card"><span class="fsl-kicker">Capability gate</span><div class="fsl-status">Audio output: <b>${c.neuralVoice?T('fsl.audio-neural-ready', 'neural ready'):T('fsl.audio-neural-pending', 'neural belum diunduh')}</b> · Speech recognition: <b>${c.speechRecognition?'ready':'unavailable'}</b> · Recorder: <b>${c.mediaRecorder?'ready':'unavailable'}</b> · Secure context: <b>${c.secureContext?'yes':'no'}</b></div><p class="fsl-privacy">${T('fsl.browser-privacy', 'Browser speech recognition dapat melibatkan layanan pengenal milik browser. FIEZEL tidak menyimpan raw audio, transcript, atau jawaban dictation.')}</p></article><article class="fsl-card"><span class="fsl-kicker">Evidence lokal</span><p>Listening: <b>${ev.domains.listening.attempts}</b> attempt · average ${ev.domains.listening.averageScore??'-'}%. Speaking: <b>${ev.domains.speaking.attempts}</b> attempt · average ${ev.domains.speaking.averageScore??'-'}%.</p></article></section>`;
       this.root.querySelectorAll?.('[data-open]').forEach(b=>b.addEventListener('click',()=>this.levelContract.external?this.open(b.getAttribute('data-open')):this.renderLevelPicker(b.getAttribute('data-open'))))
     }
     renderLevelPicker(domain){if(this.levelContract.external){return this.open(domain)}if(!this.root)return;this.root.innerHTML=`<section class="fsl-shell"><article class="fsl-card"><span class="fsl-kicker">${esc(domain)}</span><h2>${T('fsl.level-select-title', 'Pilih level')}</h2><div class="fsl-levels">${LEVELS.map(l=>`<button data-level="${l}" aria-pressed="${String(l===this.level)}">${l}</button>`).join('')}</div><div class="fsl-actions"><button data-back>${T('skillslab.btn-back')}</button></div></article></section>`;this.root.querySelectorAll?.('[data-level]').forEach(b=>b.addEventListener('click',()=>this.open(domain,b.getAttribute('data-level'))));this.root.querySelector?.('[data-back]')?.addEventListener('click',()=>this.renderHub())}
@@ -630,8 +704,8 @@
           this.noAudio=false;
           this.root.querySelector('[data-work]').disabled=false;
           this.store.noteCapability('tts',String(result?.provider||'ok'));
-          const chip=this.root.querySelector('[data-replays]');if(chip)chip.textContent=`Diputar ${this.replays}\u00d7`;
-          this.setFeedback(`Audio siap \u00b7 replay ${this.replays}/${limit}.`);
+          const chip=this.root.querySelector('[data-replays]');if(chip)chip.textContent=T('fsl.replays-count',{count:this.replays});
+          this.setFeedback(T('fsl.replay-status',{current:this.replays,limit:limit}));
         }catch(_){
           /* m026-BUG1 (cf-b4 §5.2, CF-MIGRATION §Ringkasan). Kegagalan pemutaran BUKAN
              pemakaian replay. Sebelum baris ini, this.replays++ dijalankan di luar try dan
@@ -737,9 +811,9 @@
       const scriptLine=lines[0]||raw.trim();
       const optionLines=options.length&&lines.length===options.length+1?lines.slice(1):[];
       host.hidden=false;
-      host.innerHTML=`<div class="fsl-translation" data-translation-body><p><b>Terjemahan:</b> ${esc(scriptLine)}</p>`
+      host.innerHTML=`<div class="fsl-translation" data-translation-body><p><b>${esc(T('fsl.translation-label'))}</b> ${esc(scriptLine)}</p>`
         +(optionLines.length?`<ul class="fsl-translation-options">${optionLines.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:'')
-        +`<small class="fsl-privacy">${esc(copy.autoNote)} · butuh jaringan, hasilnya belum dikurasi</small></div>`;
+        +`<small class="fsl-privacy">${esc(copy.autoNote)}${esc(T('fsl.translation-disclaimer'))}</small></div>`;
       this.syncGemBar();
       return true;
     }
@@ -763,10 +837,10 @@
       const questionMarkup=questions.map((question,index)=>{
         const body=question.answerType==='choice'
           ? `<div class="fsl-options">${(question.options||[]).map((option,choice)=>`<button type="button" class="fsl-option" data-q="${index}" data-choice="${choice}">${esc(option)}</button>`).join('')}</div>`
-          : `<input class="fsl-input" data-q="${index}" autocomplete="off" spellcheck="false" placeholder="Tulis jawabanmu…">`;
+          : `<input class="fsl-input" data-q="${index}" autocomplete="off" spellcheck="false" placeholder="${esc(T('fsl.freeform-placeholder'))}">`;
         return `<li class="fsl-exam-q" data-question="${index}"><p><b>${index+1}.</b> ${esc(question.prompt)}</p>${body}<div class="fsl-q-feedback" data-q-feedback="${index}"></div></li>`;
       }).join('');
-      this.root.innerHTML=`${T('skillslab.practice-ujian-audio-diputar-saja',{progress:progress,level:esc(set.level),slMascotStripMarkup:slMascotStripMarkup(),label:esc(format.label||''),allowedReplays:allowedReplays,length:questions.length,note:esc(format.note||''),title:esc(set.title||''),listeningHonesty:esc(this.repo.listeningHonesty||''),label2:visibleDuringAudio?'':'<label class="fsl-notes-label">Catatanmu (tidak disimpan)<textarea class="fsl-notes" data-notes rows="5" placeholder="Catat sambil mendengar…"></textarea></label>',hidden:visibleDuringAudio?'':' hidden',questionMarkup:questionMarkup})}`;
+      this.root.innerHTML=`${T('skillslab.practice-ujian-audio-diputar-saja',{progress:progress,level:esc(set.level),slMascotStripMarkup:slMascotStripMarkup(),label:esc(format.label||''),allowedReplays:allowedReplays,length:questions.length,note:esc(format.note||''),title:esc(set.title||''),listeningHonesty:esc(this.repo.listeningHonestyText()),label2:visibleDuringAudio?'':'<label class="fsl-notes-label">'+esc(T('fsl.notes-label'))+'<textarea class="fsl-notes" data-notes rows="5" placeholder="'+esc(T('fsl.notes-placeholder'))+'"></textarea></label>',hidden:visibleDuringAudio?'':' hidden',questionMarkup:questionMarkup})}`;
 
       const responses=new Array(questions.length).fill(undefined);
       const work=this.root.querySelector('[data-work]');
@@ -787,7 +861,7 @@
         const button=event.currentTarget;
         if(this.replays>=allowedReplays){status.textContent=T('skillslab.exam-audio-once');return}
         button.disabled=true;this.replays++;
-        status.textContent='Memutar…';
+        status.textContent=T('fsl.playing-status');
         try{
           /* Sama seperti jalur harian: false berarti tidak ada suara, dan di ujian itu lebih
              berbahaya lagi - soal terbuka tanpa pernah berbunyi dan nilainya dianggap sah. */
@@ -814,7 +888,7 @@
           if(!host)return;
           const key=question.answerType==='choice'?String(question.options?.[question.answerIndex]??''):(question.accept||[])[0]||'';
           host.className=`fsl-q-feedback is-${row.correct?'ok':'wrong'}`;
-          host.innerHTML=`<span>${row.correct?'Benar':`Jawaban: ${esc(key)}`}</span><small>${esc(question.explain||'')}</small>`;
+          host.innerHTML=`<span>${row.correct?esc(T('fsl.answer-correct')):esc(T('fsl.answer-key-prefix'))+esc(key)}</span><small>${esc(question.explain||'')}</small>`;
         });
         this.root.querySelector('[data-work]').disabled=true;
         this.finishItem(set,result,`${detail}<details class="fsl-script"><summary>${T('fsl.show-script', 'Lihat skrip audio')}</summary><pre>${esc(set.script)}</pre></details>`);
@@ -876,7 +950,7 @@
     setFeedback(text){const el=this.root?.querySelector?.('[data-feedback]');if(el)el.innerHTML=`<div class="fsl-feedback">${esc(text)}</div>`}
     finishItem(item,result,prefix=''){
       const ms=now()-this.startedAt;this.store.record(this.domain,item,result,ms,this.replays);this.emitEvidence();const label=result.passed?T('skillslab.target-pass'):T('skillslab.target-fail');const note=this.domain==='speaking'?(T('fsl.score-result', {score: result.score, metric: result.metric.replace(/_/g,' ')}) || ('Skor ' + result.score + '% hanya mengukur ' + result.metric.replace(/_/g,' ') + '; bukan pronunciation.')):(I18N && I18N.getLocale() === 'th' ? ('คะแนน ' + result.score + '%.') : ('Skor ' + result.score + '%.'));
-      const fb=this.root.querySelector('[data-feedback]');if(fb)fb.innerHTML=`${prefix}<div class="fsl-feedback"><strong>${label}</strong><span>${esc(note)}</span>${this.domain==='listening'?`<p><b>Script:</b> ${esc(item.script)}</p><div data-translation hidden></div>`:`<p><b>${T('fsl.sample-response', 'Contoh respons:')}</b> ${esc(item.sampleAnswer||item.targetText||'')}</p>`}<div class="fsl-actions"><button class="fsl-primary" data-next>${T('fsl.next-btn', 'Lanjut')}</button></div></div>`;
+      const fb=this.root.querySelector('[data-feedback]');if(fb)fb.innerHTML=`${prefix}<div class="fsl-feedback"><strong>${label}</strong><span>${esc(note)}</span>${this.domain==='listening'?`<p><b>${esc(T('fsl.script-label'))}</b> ${esc(item.script)}</p><div data-translation hidden></div>`:`<p><b>${T('fsl.sample-response', 'Contoh respons:')}</b> ${esc(item.sampleAnswer||item.targetText||'')}</p>`}<div class="fsl-actions"><button class="fsl-primary" data-next>${T('fsl.next-btn', 'Lanjut')}</button></div></div>`;
       /* R2-4: kabar benar/salah untuk maskot dikirim lewat kait host, BUKAN langsung ke
          FiezelPaw - host yang memegang gerbang reduced-motion/preferensi animasi
          (pawReact), dan addon tidak boleh punya gerbang kedua yang bisa menyimpang.

@@ -76,12 +76,12 @@
       streamSentences: true,
       streamMaxWords: 26,
       silenceScale: 0.4
-    }),
-
-    fallback: Object.freeze({
-      browserSpeechSynthesis: true,
-      reason: 'Cadangan terakhir bila render server dan mesin perangkat sama-sama tidak tersedia.'
     })
+
+    // Di sini dulu ada `fallback.browserSpeechSynthesis`. m025-232 MENGHAPUS lapisan TTS
+    // peramban seluruhnya (keputusan OWNER: suara sistem bukan suara FIEZEL dan pelafalannya
+    // mengajarkan bunyi yang salah), jadi bendera ini tidak punya pembaca lagi - jangan
+    // dihidupkan kembali. Di bawah L3 mesin perangkat yang tersisa hanya L5 teks senyap.
   });
 
   return config;

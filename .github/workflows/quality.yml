@@ -138,6 +138,12 @@ jobs:
           # kebocoran yang gerbang korpus lewatkan ketika korpus Inggrisnya tercemar.
           # Keduanya wajib bersih; jangan menghapus salah satunya.
           node tools/scan-th-bank-leak.js
+          # Kedua pemindai di atas memeriksa ISI sidecar, dan tidak satu pun memeriksa
+          # bahwa sidecar itu SAMPAI ke murid. Bank ujian Listening lolos keduanya selama
+          # berbulan-bulan justru karena itu: overlay-nya mencocokkan id lx-* ke peta yang
+          # hanya berisi kunci listen_sc_*, jadi tidak pernah kena sasaran sekali pun.
+          # th-exam-overlay-test.js memeriksa jalur bacanya, bukan datanya.
+          node th-exam-overlay-test.js
           node boot-order-test.js
           node splash-first-paint-test.js
           # m025-199: m025-84 memindahkan markup splash ke frame pertama, tetapi peramban

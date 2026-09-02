@@ -47,12 +47,17 @@ if (mulai !== -1 && tutup > mulai) {
   const kode = src.slice(mulai, tutup + 1);
 
   /* Semua yang dipakai AudioService di luar dirinya sendiri distub. Yang PENTING adalah
-   * FiezelVoiceSay.say tiruan: ia mencatat options apa adanya, lalu menjawab true supaya
-   * jalur cadangan peramban tidak ikut jalan dan mengaburkan pengukuran. */
+   * FiezelVoiceSay.say tiruan: ia mencatat options apa adanya, lalu menjawab true - satu
+   * pemutaran yang BERHASIL, supaya yang diukur di sini murni soal subtitle.
+   *
+   * m025-232: alasan lama untuk `window: {}` adalah "tanpa speechSynthesis -> browserSupported
+   * =false", yakni mematikan cadangan peramban supaya ia tidak mengaburkan pengukuran.
+   * Cadangan itu sudah dihapus dan `browserSupported` tidak ada lagi, jadi window kosong kini
+   * hanya membuktikan hal yang tetap berharga: AudioService bisa dikonstruksi di luar peramban. */
   const dicatat = [];
   const prefetched = [];
   const sandbox = {
-    window: {},                    // tanpa speechSynthesis -> browserSupported=false
+    window: {},                    // AudioService tidak boleh butuh apa pun dari window saat dikonstruksi
     self: { FiezelVoiceSay: { say: (text, options) => { dicatat.push({ text, options }); return true; } } },
     selectedNeuralRate: () => 1,
     prefetchNextVoice: (teks, opsi) => { prefetched.push({ teks, opsi }); return Promise.resolve(false); },

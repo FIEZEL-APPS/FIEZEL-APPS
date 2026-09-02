@@ -90,9 +90,19 @@ async function testVoiceSayOwnershipAndStop() {
     const currentEnd = events.filter((ev) => ev.phase === 'end' && ev.generation === 2);
     assert.strictEqual(currentEnd.length, 1, 'current turn must retain normal completion semantics');
 
+    /* m025-232: say() kini MENDAHULUI dirinya sendiri - ia membungkam semua pemutar sebelum
+       membuka giliran baru, supaya pemanggil yang lupa stop() (adaptor Skills Lab memanggil
+       say() langsung) tidak bisa menumpuk dua suara. Konsekuensinya say() ikut memanggil
+       FiezelVoiceRuntime.stop(), jadi menghitung TOTAL panggilan tidak lagi mengukur apa pun.
+       Yang diuji tetap sama - stop() bersama meneruskan ke L3 - hanya diukur sebagai DELTA. */
+    const stopsBeforeSay = localStops;
     const stoppedTurn = voice.say('stopped turn');
+    assert.strictEqual(localStops - stopsBeforeSay, 1,
+      'say() must preempt L3 so a forgetful caller cannot stack two voices');
+    const stopsBeforeStop = localStops;
     assert.strictEqual(voice.stop(), true);
-    assert.strictEqual(localStops, 1, 'shared stop() must forward to FiezelVoiceRuntime.stop()');
+    assert.strictEqual(localStops - stopsBeforeStop, 1,
+      'shared stop() must forward to FiezelVoiceRuntime.stop()');
     translations.get('stopped turn').resolve('subtitle terlambat');
     await Promise.resolve();
     assert.deepStrictEqual(begun, ['subtitle baru'], 'translation settling after stop must stay inert');

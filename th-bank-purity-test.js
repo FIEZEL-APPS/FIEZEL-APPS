@@ -259,6 +259,60 @@ function periksaPermukaan(nama, entri) {
   periksaPermukaan('speaking', entri);
 }
 
+/* ==================== 8 · LISTENING EXAM (listening-exam-th.json) ======================== */
+/* Bank ujian Listening sempat SELURUHNYA lolos audit: overlay lama memakai id set lx-*
+   terhadap peta listen_sc_* di listening-bank-th.json, jadi tidak pernah kena sasaran dan
+   tidak ada satu pun gerbang yang melihat permukaan ini. Empat permukaan diperiksa di sini
+   karena keempatnya benar-benar sampai ke layar murid: judul set, penjelasan tiap soal,
+   label/catatan format ujian, dan paragraf honesty + audioSource.
+   prompt dan options TIDAK diperiksa: keduanya bahasa Inggris by design (B1+ imersi). */
+{
+  const src = readJson('features/speaking-listening/listening-exam-v1.json');
+  const th = readJson('features/i18n/listening-exam-th.json');
+  const thSets = th.sets || {};
+  const entri = [];
+  const hilang = [];
+  const soalHilang = [];
+  const kutipan = [];
+  for (const set of src.sets || []) {
+    const e = thSets[set.id];
+    if (!e) { hilang.push(set.id); continue; }
+    entri.push([set.id + '.title', e.title]);
+    for (const q of set.questions || []) {
+      const thQ = (e.questions || {})[q.id];
+      if (!thQ) { soalHilang.push(q.id); continue; }
+      const luarKutip = String(thQ.explain == null ? '' : thQ.explain).replace(/"[^"]*"/g, ' ');
+      entri.push([q.id + '.explain', luarKutip]);
+      kutipan.push([q.id, String(thQ.explain == null ? '' : thQ.explain)]);
+    }
+  }
+  for (const [k, v] of Object.entries(th.examFormats || {})) {
+    entri.push([k + '.label', v && v.label]);
+    entri.push([k + '.note', v && v.note]);
+  }
+  entri.push(['honesty', th.honesty]);
+  for (const [k, v] of Object.entries(th.audioSource || {})) entri.push(['audioSource.' + k, v]);
+
+  check('listening-exam: seluruh set punya sidecar th (' + (src.sets || []).length + ' set)',
+    hilang.length === 0, hilang.length + ' tanpa sidecar: ' + hilang.slice(0, 8).join(', '));
+  check('listening-exam: seluruh soal punya penjelasan th',
+    soalHilang.length === 0, soalHilang.length + ' tanpa penjelasan: ' + soalHilang.slice(0, 8).join(', '));
+  /* Kontrak format: setiap format yang dipakai set mana pun WAJIB punya padanan th, kalau
+     tidak catatan formatnya jatuh ke teks Indonesia di dalam cangkang Thai. */
+  const formatDipakai = [...new Set((src.sets || []).map((x) => x.exam).filter(Boolean))];
+  const formatHilang = formatDipakai.filter((k) => !(th.examFormats || {})[k]);
+  check('listening-exam: seluruh format ujian punya padanan th (' + formatDipakai.length + ' format)',
+    formatHilang.length === 0, 'tanpa padanan: ' + formatHilang.join(', '));
+  /* Kutipan skrip WAJIB tetap Inggris. Kalau ada aksara Thai di dalam tanda kutip,
+     penerjemah menyentuh bukti jawabannya - murid membaca kutipan yang tidak pernah
+     terdengar di audio, dan soalnya jadi tidak bisa dijawab dari rekaman. */
+  const kutipanTersentuh = kutipan.filter(([, v]) => (v.match(/"[^"]*"/g) || []).some((k) => /[\u0E00-\u0E7F]/.test(k)));
+  check('listening-exam: kutipan skrip audio tetap bahasa Inggris',
+    kutipanTersentuh.length === 0,
+    kutipanTersentuh.length + ' tersentuh: ' + kutipanTersentuh.slice(0, 4).map(([k]) => k).join(', '));
+  periksaPermukaan('listening-exam', entri);
+}
+
 /* ======================================== Laporan ======================================== */
 
 let pass = 0;

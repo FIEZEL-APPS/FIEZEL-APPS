@@ -145,7 +145,16 @@ const ANCHORS = [
   // 'id' byte-identik). Validasi sisi server: workers/api/ai/ai-tasks.js + locale-enum-test.
   { name: "locale AI request dari FiezelI18n.getLocale() (app.js)", file: 'app.js', re: /locale:FiezelI18n\.getLocale\(\)/ },
   { name: 'GUARD berbahasa Indonesia (ai-tasks.js)', file: 'workers/api/ai/ai-tasks.js', re: /Jawab dalam bahasa Indonesia/ },
-  { name: 'utterance.lang default en-US (voice-say)', file: 'features/neural-voice/fiezel-voice-say.js', re: /utterance\.lang\s*=\s*opts\.locale\s*\|\|\s*'en-US'/ },
+  // m025-232: jangkar utterance.lang DIBUKA secara SENGAJA, pola yang sama dengan m025-182 di
+  // atas. Ia dulu memaku `utterance.lang = opts.locale || 'en-US'` di dalam speakWithBrowser() -
+  // cadangan TTS peramban, yang kini dihapus total atas keputusan OWNER. Jangkar yang memaku
+  // baris di berkas yang sudah tidak punya baris itu tidak bisa hijau lagi selamanya.
+  //
+  // Penggantinya menegaskan invarian yang SAMA di boundary yang MASIH hidup: permintaan aset
+  // audio tetap default 'en-US', jadi locale murid ('id'/'th') tidak bisa bocor menjadi
+  // identitas suara. Itu isi sebenarnya dari AI-17 F05, dan sekarang ia dijaga di lapisan yang
+  // benar-benar dipakai (L1), bukan di lapisan yang sudah tiada.
+  { name: "locale aset audio default en-US (voice-say)", file: 'features/neural-voice/fiezel-voice-say.js', re: /locale:\s*opts\.locale\s*\|\|\s*'en-US'/ },
   { name: 'nama manifest tetap', file: 'manifest.json', re: /"FIEZEL Personal English OS"/ }
 ];
 

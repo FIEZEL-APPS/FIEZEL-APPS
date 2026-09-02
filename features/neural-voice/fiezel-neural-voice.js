@@ -275,34 +275,24 @@
     }));
   }
 
-  function canUseSpeechSynthesis(env) {
-    return Boolean(env && env.speechSynthesis && env.SpeechSynthesisUtterance);
-  }
-
-  function createBrowserFallback(env) {
-    const BROWSER_FALLBACK_TIMEOUT_MS=12000;
-    return {
-      async speak(text, options) {
-        if (!canUseSpeechSynthesis(env)) throw new Error('Browser TTS unavailable');
-        return new Promise((resolve, reject) => {
-          let done = false;
-          let started = false;
-          const settle = (fn, value) => { if (done) return; done = true; fn(value); };
-          const u = new env.SpeechSynthesisUtterance(text);
-          u.lang = options && options.lang ? options.lang : 'en-US';
-          u.rate = options && typeof options.rate === 'number' ? options.rate : 1;
-          u.onstart = () => { started = true; };
-          u.onend = () => settle(resolve, { provider: 'browser-speech-synthesis', started: true });
-          u.onerror = (event) => settle(reject, new Error('browser_tts_' + String(event && event.error ? event.error : 'error')));
-          setTimeout(() => settle(reject, new Error(started ? 'browser_tts_timeout' : 'browser_tts_not_started')), BROWSER_FALLBACK_TIMEOUT_MS);
-          setTimeout(() => { if (done) return; try { env.speechSynthesis.speak(u); } catch (error) { settle(reject, error); } }, 60);
-        });
-      },
-      stop() {
-        if (canUseSpeechSynthesis(env)) env.speechSynthesis.cancel();
-      }
-    };
-  }
+  /**
+   * m025-232: lapisan TTS peramban DIHAPUS dari berkas ini, bukan sekadar dimatikan.
+   *
+   * Dulu di sini berdiri `createBrowserFallback(env)` yang membacakan teks lewat
+   * `speechSynthesis` / `SpeechSynthesisUtterance` sebagai cadangan paling bawah. Ia dibuang
+   * atas keputusan OWNER: suara sistem peramban bukan suara FIEZEL, berbeda-beda di tiap
+   * peranti dan peramban, dan pelafalannya justru mengajarkan bunyi yang salah kepada murid
+   * yang sedang belajar mendengar bahasa Inggris. Lebih baik senyap daripada salah ajar.
+   *
+   * Tangga suara sesudah m025-232: L1 ElevenLabs/R2 -> C1 Cloudflare -> L2 Puter ->
+   * L3 mesin di perangkat -> L5 TEKS SENYAP. Tidak ada lapisan berbunyi di bawah L3.
+   *
+   * Konsekuensinya untuk berkas ini: setiap jalur gagal WAJIB menolak (reject). Pemanggil
+   * (`fiezel-voice-say.js`) membaca resolve yang truthy sebagai "audio sudah berbunyi" lalu
+   * melewatkan teks senyap L5 - murid berakhir tanpa suara SEKALIGUS tanpa teks. Jangan
+   * menghidupkan kembali cadangan peramban di sini, dan jangan mengubah satu pun `throw`
+   * di bawah menjadi `return`.
+   */
 
   function createVoiceService(options) {
     options = options || {};
@@ -310,7 +300,6 @@
     const adapter = options.adapter || null;
     const env = options.env || (typeof globalThis !== 'undefined' ? globalThis : {});
     const playAudio = options.playAudio;
-    const fallback = createBrowserFallback(env);
     const maxChars = config.limits && config.limits.maxInputChars || 3600;
     const targetWords = config.limits && config.limits.targetChunkWords || 140;
     const hardWords = config.limits && config.limits.hardChunkWords || 190;
@@ -453,7 +442,6 @@
         try { activeStop(); } catch (_) {}
       }
       activeStop = null;
-      fallback.stop();
     }
 
     // m025-45 cross-call warm cache. One entry is enough: the Library warms exactly the
@@ -543,8 +531,8 @@
     }
 
     async function speak(input, speakOptions) {
-      // speak('halo') with no options is a supported call - the fallback path and several
-      // callers rely on it, so the default must be restored before anything reads it.
+      // speak('halo') tanpa options adalah panggilan yang didukung dan beberapa pemanggil
+      // memakainya apa adanya, jadi default harus dipulihkan sebelum ada yang membacanya.
       speakOptions = speakOptions || {};
       const text = normalizeText(input, maxChars);
       const callGeneration = ++generation;
@@ -567,10 +555,9 @@
       });
 
       if (!adapter) {
-        if (config.fallback && config.fallback.browserSpeechSynthesis) {
-          const fallbackResult = await fallback.speak(text, { lang: speakOptions.lang || 'en-US', rate: speakOptions.speed || 1 });
-          return { ...fallbackResult, provider: 'browser-speech-synthesis', voice, chunks: 1, outputs: [] };
-        }
+        // m025-232: tidak ada lagi cadangan peramban di bawah titik ini. Menolak adalah cara
+        // tangga turun ke L5 teks senyap; mengembalikan objek apa pun justru akan membungkam
+        // teks itu juga.
         throw new Error('Neural voice adapter unavailable');
       }
 
@@ -772,11 +759,12 @@
         return { provider: adapter.kind || 'neural-local', voice, chunks: chunks.length, outputs, requestId };
       } catch (error) {
         diag({ phase: 'voice_service_error', requestId, voice, error: String(error && (error.message || error.name) || error) });
+        // Penjaga supersede sengaja DIPERTAHANKAN walau kini kedua cabang sama-sama melempar.
+        // Sampai m025-232 justru di sinilah bedanya terasa: permintaan yang sudah digantikan
+        // tidak boleh membajak pemutaran dengan membacakan ulang teksnya lewat TTS peramban.
+        // Cadangan itu hilang, jadi yang tersisa hanya satu aturan - m025-232: gagal berarti
+        // gagal, semua jalur melempar supaya tangga turun ke L5 teks senyap.
         if (callGeneration !== generation) throw error;
-        if (speakOptions.allowFallback !== false && config.fallback && config.fallback.browserSpeechSynthesis) {
-          const fallbackResult = await fallback.speak(text, { lang: speakOptions.lang || 'en-US', rate: speakOptions.speed || 1 });
-          return { ...fallbackResult, provider: 'browser-speech-synthesis', voice, chunks: chunks.length, outputs, requestId };
-        }
         throw error;
       }
     }
