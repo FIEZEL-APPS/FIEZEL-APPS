@@ -471,16 +471,19 @@ function grammarClue(base){const text=String(base||'');const hit=text.match(/\b(
  * diagnosisnya turun ke pencocokan pola lama lalu ke kalimat umum - kuisnya tetap jalan.
  * Berkas data yang hilang tidak boleh pernah mematikan sesi belajar.
  */
-let GRAMMAR_MISCONCEPTION_ID=Object.create(null),GRAMMAR_MISCONCEPTION_BASE=null;
+let GRAMMAR_MISCONCEPTION_ID=Object.create(null);
+// GRAMMAR_MISCONCEPTION_BASE menyimpan rujukan sumber apa adanya: overlay th menulis SALINAN,
+// jadi berpindah balik ke id harus bisa memulihkan byte aslinya tanpa fetch ulang. Ditaruh di
+// LUAR badan loadMisconceptionDiagnoses dengan sengaja — misconception-diagnosis-test.js
+// memeriksa try/catch pemuat itu dalam jendela 500 aksara dari nama fungsinya, dan komentar di
+// dalam badannya mendorong catch{} keluar jendela sehingga penjaga fail-soft terbaca hilang.
+let GRAMMAR_MISCONCEPTION_BASE=null;
 async function loadMisconceptionDiagnoses(root){
   try{
     const response=await fetch(new URL('grammar-misconception-id.json',root),{credentials:'same-origin'});
     if(!response.ok)return;
     const data=await response.json();
-    if(data&&typeof data.diagnoses==='object'&&data.diagnoses){GRAMMAR_MISCONCEPTION_ID=data.diagnoses;
-      // Simpan rujukan sumber: overlay th menulis SALINAN, jadi berpindah balik ke id
-      // harus bisa memulihkan byte aslinya tanpa fetch ulang.
-      GRAMMAR_MISCONCEPTION_BASE=data.diagnoses;}
+    if(data&&typeof data.diagnoses==='object'&&data.diagnoses)GRAMMAR_MISCONCEPTION_BASE=GRAMMAR_MISCONCEPTION_ID=data.diagnoses;
   }catch{}
 }
 /**
