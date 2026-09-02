@@ -200,7 +200,7 @@ default yang lahir diam-diam:
 - **180 hari**, bukan 14 hari seperti lane agregat. Alasan 14 hari di lane
   agregat adalah `cohort` yang tidak dipurge berubah menjadi identitas seumur
   hidup dengan nama lain; di lane ini identitasnya memang sudah ada sejak awal,
-  jadi argumen itu tidak berlaku. **m025-235: gerbang persetujuan dihapus**
+  jadi argumen itu tidak berlaku. **m025-236: gerbang persetujuan dihapus**
   (keputusan OWNER — aplikasi kelas, guru memberitahu muridnya sebelum memasang),
   sehingga retensi 180 hari ini menjadi satu-satunya batas otomatis yang tersisa.
   Justru karena itu ia tidak boleh dinaikkan diam-diam.
@@ -222,7 +222,7 @@ Dua jalur penghapusan, dan keduanya harus ada:
    gagal TIDAK terlihat di `/api/owner/cron-status`.
 2. **Penghapusan atas permintaan** — `POST /api/braincore/learner-evidence/consent`
    dengan `{"granted":false}` menjalankan `revokeConsent()`, yang **menghapus**
-   baris bukti murid itu, bukan sekadar menandainya. Sejak m025-235 (gerbang
+   baris bukti murid itu, bukan sekadar menandainya. Sejak m025-236 (gerbang
    persetujuan dihapus) rute ini bukan lagi pencabutan izin melainkan tombol
    hapus, dan ia **sekali jalan**: tulisan berikutnya dari murid yang sama
    diterima lagi. Di klien ia dipapar sebagai `window.forgetLearnerEvidence()`,

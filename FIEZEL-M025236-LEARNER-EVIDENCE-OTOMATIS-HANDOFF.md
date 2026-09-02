@@ -1,4 +1,4 @@
-# Handoff m025-235 — Bukti belajar per-murid TERSINKRON OTOMATIS (gerbang persetujuan dihapus)
+# Handoff m025-236 — Bukti belajar per-murid TERSINKRON OTOMATIS (gerbang persetujuan dihapus)
 
 **Kewenangan: OWNER.** Keputusan diambil 2 Sep 2026, beberapa jam sesudah lane per-murid
 menyala di produksi (m025-234). Dokumen ini menggantikan §4 handoff m025-230 pada bagian
@@ -35,7 +35,7 @@ guru di kelas, di luar aplikasi.
 | `features/i18n/copy-{id,th}-app-d.js` | lima naskah sakelar persetujuan dihapus (id + th, tetap sepadan) |
 | `BRAIN-DATA-PRIVACY.md`, `docs/D1-RETENTION.md` | naskah privasi & retensi ditulis ulang mengikuti keadaan baru |
 | `braincore-learner-identity-test.js` | assert persetujuan DIBALIK, bukan dihapus (§4) |
-| build | m025-234 → **m025-235** lewat `tools/bump-build.mjs` |
+| build | m025-234 → **m025-236** lewat `tools/bump-build.mjs` |
 
 ## 3. Yang TIDAK ikut dilonggarkan
 
@@ -84,7 +84,7 @@ proxy sandbox menjawab 403) dan `analytics-client-test.js` (flaky, merah juga di
 
 1. Merge PR ini.
 2. Jalankan `deploy-api-worker.yml` (server berhenti menuntut persetujuan).
-3. Jalankan `deploy-site.yml` (shell m025-235).
+3. Jalankan `deploy-site.yml` (shell m025-236).
 4. Murid yang **sudah** memasang PWA: tidak perlu melakukan apa pun. Begitu shell baru
    sampai (kartu pembaruan / buka-tutup aplikasi), perangkatnya mulai mengirim sendiri —
    maksimum sekali sehari per perangkat, jadi angka pertama muncul dalam hitungan jam.

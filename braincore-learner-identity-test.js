@@ -248,13 +248,13 @@ async function babWorker() {
   const cookieB = await app.issueIdentity();
   check('(A) dua identitas berbeda diterbitkan server', cookieA !== cookieB);
 
-  /* --- F. m025-235: TANPA persetujuan pun bukti tercatat ------------------------
+  /* --- F. m025-236: TANPA persetujuan pun bukti tercatat ------------------------
    * Sampai m025-234 baris ini menuntut 403 `consent_required`. Owner menghapus gerbang
    * itu: FIEZEL aplikasi kelas, guru memberitahu muridnya sebelum memasang, dan bukti
    * belajar ini memang data guru. Assert-nya DIBALIK, bukan dihapus — perubahan sebesar
    * "murid tidak lagi punya sakelar" harus terbaca di gerbang, bukan hanya di komentar. */
   const tanpaPersetujuan = await app.call('POST', '/api/braincore/learner-evidence', { cookie: cookieA, body: envelope([evEvent()]) });
-  check('(F) tanpa persetujuan pun bukti TETAP tercatat (sakelar dihapus m025-235)',
+  check('(F) tanpa persetujuan pun bukti TETAP tercatat (sakelar dihapus m025-236)',
     tanpaPersetujuan.status === 202 && tanpaPersetujuan.json && tanpaPersetujuan.json.accepted === 1,
     JSON.stringify(tanpaPersetujuan.json));
 
@@ -402,7 +402,7 @@ async function babWorker() {
       dir3.json.learners.every((x) => x.sub !== subB.sub), JSON.stringify(dir3.json.learners.map((x) => x.sub)));
     check('(F) murid A TIDAK ikut terhapus oleh pencabutan murid B',
       (await rowsFor(app, subA.sub)).length > 0);
-    /* m025-235: penghapusan adalah SATU KALI, bukan gerbang permanen. Sesudah sakelar
+    /* m025-236: penghapusan adalah SATU KALI, bukan gerbang permanen. Sesudah sakelar
      * persetujuan dihapus, tulisan berikutnya dari murid yang sama diterima lagi — dan itu
      * harus tertulis di gerbang, supaya tidak ada yang menyangka POST {granted:false}
      * mematikan lane untuk murid itu selamanya. Yang ia lakukan: menghapus yang sudah ada. */
@@ -667,7 +667,7 @@ function babH() {
  * ========================================================================== */
 function babKlien() {
   const app = read('app.js');
-  /* m025-235: sakelar persetujuan di aplikasi dihapus (keputusan OWNER). Assert lama
+  /* m025-236: sakelar persetujuan di aplikasi dihapus (keputusan OWNER). Assert lama
    * menuntut `identityEvidenceActive()` menggabungkan mode DAN persetujuan; sekarang ia
    * menuntut yang sebaliknya secara eksplisit — mode saja, dan NOL sisa sakelar di app.js.
    * Ditulis sebagai dua assert, bukan satu yang dilonggarkan: yang kedua yang menjaga
