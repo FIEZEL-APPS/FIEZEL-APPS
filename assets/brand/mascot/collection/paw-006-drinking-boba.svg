@@ -1,0 +1,133 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" width="100%" height="100%" role="img" aria-label="PAW #6 — PAW Sedang Minum Bubble Tea">
+  
+  <defs>
+    <clipPath id="fzcEyeL"><circle cx="126" cy="98" r="16"/></clipPath>
+    <clipPath id="fzcEyeR"><circle cx="194" cy="98" r="16"/></clipPath>
+    <linearGradient id="pawGradGold" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFE57F"/>
+      <stop offset="100%" stop-color="#FFD94F"/>
+    </linearGradient>
+    <linearGradient id="pawGradAmber" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#F5C442"/>
+      <stop offset="100%" stop-color="#EDB93A"/>
+    </linearGradient>
+    <linearGradient id="pawGradMaroon" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#A83246"/>
+      <stop offset="100%" stop-color="#8C2233"/>
+    </linearGradient>
+    <linearGradient id="leafGrad1" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#4CAF50"/><stop offset="100%" stop-color="#1B5E20"/>
+    </linearGradient>
+    <linearGradient id="leafGrad2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#81C784"/><stop offset="100%" stop-color="#2E7D32"/>
+    </linearGradient>
+    <linearGradient id="flowerPlumeria" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/><stop offset="60%" stop-color="#FFF9C4"/><stop offset="100%" stop-color="#FBC02D"/>
+    </linearGradient>
+    <linearGradient id="flowerHibiscus" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF5252"/><stop offset="100%" stop-color="#C2185B"/>
+    </linearGradient>
+    <linearGradient id="shadesGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2D3748"/><stop offset="100%" stop-color="#1A202C"/>
+    </linearGradient>
+    <linearGradient id="vrGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00E5FF"/><stop offset="100%" stop-color="#7C4DFF"/>
+    </linearGradient>
+    <linearGradient id="batikGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6D4C41"/><stop offset="50%" stop-color="#8D6E63"/><stop offset="100%" stop-color="#4E342E"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Ground Shadow -->
+  <ellipse class="fz-shadow" cx="160" cy="296" rx="88" ry="11" fill="#33201F" opacity="0.12"/>
+  
+  <g class="fz-all">
+    <!-- Back Props -->
+    
+
+    <!-- Tail -->
+    <g class="fz-tail">
+      <path d="M 212 244 C 266 258 298 238 296 200 C 294 178 282 163 268 158" stroke="#EDB93A" stroke-width="25" stroke-linecap="round" fill="none"/>
+      <path d="M 284 172 C 276 163 270 159 268 158" stroke="#8C2233" stroke-width="25" stroke-linecap="round" fill="none"/>
+    </g>
+
+    <!-- Torso -->
+    <g class="fz-body">
+      <g class="fz-torso">
+        <rect x="102" y="164" width="116" height="96" rx="42" fill="#FFD94F"/>
+        
+  <g class="fz-chest">
+    <ellipse cx="160" cy="226" rx="36" ry="28" fill="#FFF4DA"/>
+    <g class="fz-emblem" transform="translate(160,225) scale(1.75) translate(-12.6,-12.45)" fill="#8C2233">
+      <rect x="4.6" y="7.5" width="3.1" height="4.6" rx="1.55"/>
+      <rect x="8.9" y="5.1" width="3.1" height="7" rx="1.55"/>
+      <rect x="13.2" y="3.4" width="3.1" height="8.7" rx="1.55"/>
+      <rect x="17.5" y="6.2" width="3.1" height="5.9" rx="1.55"/>
+      <path d="M12.6 14c3.5 0 5.9 1.9 5.9 4.1 0 2-2 3.4-5.9 3.4s-5.9-1.4-5.9-3.4c0-2.2 2.4-4.1 5.9-4.1Z"/>
+    </g>
+  </g>
+
+        
+        <g class="fz-legs">
+    <rect class="fz-foot fz-foot-l" x="108" y="246" width="48" height="22" rx="11" fill="#EDB93A"/>
+    <rect class="fz-foot fz-foot-r" x="164" y="246" width="48" height="22" rx="11" fill="#EDB93A"/>
+  </g>
+      </g>
+
+      <!-- Head & Expression -->
+      
+    <g class="fz-head">
+      <!-- Ears -->
+      <g class="fz-ear fz-ear-l">
+        <path d="M76 66 L95 0 L140 34 Q104 66 76 66 Z" fill="#FFD94F"/>
+        <path d="M90 52 L 101 17 L 125 35 Z" fill="#8C2233"/>
+      </g>
+      <g class="fz-ear fz-ear-r">
+        <path d="M244 66 L225 0 L180 34 Q216 66 244 66 Z" fill="#FFD94F"/>
+        <path d="M230 52 L 219 17 L 195 35 Z" fill="#8C2233"/>
+      </g>
+
+      <!-- Head Circle -->
+      <circle cx="160" cy="106" r="88" fill="#FFD94F"/>
+
+      <!-- Face -->
+      <g class="fz-face">
+        <ellipse cx="160" cy="140" rx="36" ry="25" fill="#FFF4DA"/>
+        <path d="M153 126 L 167 126 L 160 136 Z" fill="#8C2233"/>
+        <circle class="fz-blush" cx="102" cy="126" r="11" fill="#F0A0AC"/>
+        <circle class="fz-blush" cx="218" cy="126" r="11" fill="#F0A0AC"/>
+        <g class="fz-eyes">
+      <g transform="translate(126,98) scale(0.95)" fill="#8C2233">
+        <path d="M0 11 C -7 4 -12 1 -12 -4.5 C -12 -9 -8 -12 -4.5 -12 C -2.5 -12 -0.8 -10.5 0 -8 C 0.8 -10.5 2.5 -12 4.5 -12 C 8 -12 12 -9 12 -4.5 C 12 1 7 4 0 11 Z"/>
+        <circle cx="-3.5" cy="-6" r="2" fill="#fff" opacity=".9"/>
+      </g>
+      <g transform="translate(194,98) scale(0.95)" fill="#8C2233">
+        <path d="M0 11 C -7 4 -12 1 -12 -4.5 C -12 -9 -8 -12 -4.5 -12 C -2.5 -12 -0.8 -10.5 0 -8 C 0.8 -10.5 2.5 -12 4.5 -12 C 8 -12 12 -9 12 -4.5 C 12 1 7 4 0 11 Z"/>
+        <circle cx="-3.5" cy="-6" r="2" fill="#fff" opacity=".9"/>
+      </g>
+    </g>
+        <g class="fz-mouth">
+      <path d="M146 145 C 146 160 174 160 174 145 Z" fill="#8C2233" stroke="#33201F" stroke-width="3"/>
+    </g>
+        
+      </g>
+      
+    </g>
+  
+
+      <!-- Arms & Fore Props -->
+      <g class="fz-arm-left"><ellipse cx="115" cy="211" rx="14" ry="30" fill="#FFD94F"/></g>
+      <g class="fz-arm-right"><ellipse cx="185" cy="210" rx="14" ry="26" transform="rotate(-25 185 210)" fill="#FFD94F"/></g>
+      
+      <g transform="translate(175, 220)">
+        <polygon points="-12,-15 12,-15 9,20 -9,20" fill="#FDE047" opacity="0.85"/>
+        <ellipse cx="0" cy="-15" rx="12" ry="5" fill="#9333EA"/>
+        <rect x="-2" y="-30" width="4" height="22" rx="2" fill="#9333EA"/>
+        <circle cx="-4" cy="12" r="3" fill="#1E293B"/>
+        <circle cx="3" cy="14" r="3" fill="#1E293B"/>
+        <circle cx="0" cy="6" r="3" fill="#1E293B"/>
+      </g>
+    
+    </g>
+  </g>
+</svg>
