@@ -10616,7 +10616,7 @@ function resetProgress(){openModal(`<div class="modal-mark">FIEZEL</div><h2>${Fi
      reset di penghitung server. Antrean IndexedDB-nya ikut dikosongkan tepat di bawah -
      menghapus kuncinya saja tidak cukup, karena event yang masih menunggu upload membawa
      cohort lama di dalam dirinya. */
-  /* Lane D (bukti per-murid, m025-230): IDENTITY_EVIDENCE_ATTEMPT_KEY dan
+  /* Lane D (bukti per-murid, m025-231): IDENTITY_EVIDENCE_ATTEMPT_KEY dan
      LEARNER_NAME_SYNC_KEY ikut dihapus, dan antrean IndexedDB lane D ikut
      dikosongkan di bawah. Alasannya seperti lane C, hanya lebih tajam: event lane D
      terikat sub, dan sub TIDAK ikut berubah saat reset. Tanpa pengosongan ini,
