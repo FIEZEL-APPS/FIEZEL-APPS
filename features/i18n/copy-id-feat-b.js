@@ -354,7 +354,7 @@
     // features/onboarding/fiezel-onboarding.js:481
     'onboarding.me-pakai-namamu-buat-nyapa': '<p class="fiezel-body">Aku pakai namamu buat nyapa kamu tiap hari, jadi belajarnya berasa punya kamu sendiri.</p>',
     // features/onboarding/fiezel-onboarding.js:490
-    'onboarding.nama-this-disimpan-at-hp': '<p class="fiezel-note">Nama ini disimpan di HP kamu, dan cuma ikut ke akun FIEZEL kamu sendiri supaya pengingat belajar bisa nyapa kamu. Nggak dibagi ke siapa pun.</p>',
+    'onboarding.nama-this-disimpan-at-hp': '<p class="fiezel-note">Nama ini disimpan di HP kamu dan di akun FIEZEL kamu, jadi pengingat belajar bisa nyapa kamu dan pengajar FIEZEL tahu kemajuanmu itu punya siapa. Yang ikut cuma nama panggilannya — bukan jawabanmu, bukan riwayat soalmu. Bisa kamu ganti kapan aja di Pengaturan.</p>',
     // features/onboarding/fiezel-onboarding.js:491
     'onboarding.next': 'Lanjut',
     // features/onboarding/fiezel-onboarding.js:523

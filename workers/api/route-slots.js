@@ -82,6 +82,21 @@ import { ROUTES as SOCIAL_ROUTES } from './route-social.js';
  * owner-gated, yang tidak butuh jembatan kuota maupun identitas murid - pola
  * yang sama dengan SLOT 6. */
 import { ROUTES as EVIDENCE_OWNER_ROUTES } from './evidence/route-evidence.js';
+/* --- SLOT 9: BUKTI BRAINCORE PER-MURID (evidence/route-learner-evidence.js)  [TERPASANG]
+ *             POST /api/braincore/learner-evidence
+ *             POST /api/braincore/learner-evidence/consent
+ *             GET  /api/owner/learners
+ *             GET  /api/owner/learner-evidence
+ * KEEMPATNYA di sini, bukan di route-wiring.js, dan itu keputusan yang sama
+ * dengan SLOT 7: lane ini tidak memanggil provider berbayar (nol jembatan
+ * kuota/neuron) dan — yang menentukan — ia memakai CORE_DB, bukan EVIDENCE_DB.
+ * route-wiring.js ada untuk MENYEMPITKAN env ke binding lane agregat; melewatkan
+ * lane beridentitas ke sana akan menaruh handler ini di jalur yang memegang
+ * database yang seluruh kontraknya menjanjikan anonimitas.
+ *
+ * Rute TULIS-nya menuntut identitas (kebalikan SLOT 8), jadi ia WAJIB lewat
+ * jalur yang sudah dilewati [M1] mw-identity — yaitu jalur ini. */
+import { ROUTES as LEARNER_EVIDENCE_ROUTES } from './evidence/route-learner-evidence.js';
 
 export const EXTRA_ROUTES = [
   ...buildExtraRoutes(),  /* SLOT 1-4 */
@@ -89,4 +104,5 @@ export const EXTRA_ROUTES = [
   ...CRON_STATUS_ROUTES,  /* SLOT 6 */
   ...SOCIAL_ROUTES,       /* SLOT 7 */
   ...EVIDENCE_OWNER_ROUTES, /* SLOT 8 */
+  ...LEARNER_EVIDENCE_ROUTES, /* SLOT 9 */
 ];

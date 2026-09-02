@@ -276,7 +276,11 @@ test('C7c · ketiga titik produksi mengambil kuncinya dari sideStateKey(SL_STATE
   // Dan ia ikut migrasi + reset, seperti delapan kunci lain.
   assert.ok(/sideStateBaseKeys\(\)\s*\{[\s\S]*?SL_STATE_KEY[\s\S]*?\}/.test(appSource),
     'SL_STATE_KEY tidak ikut daftar migrasi — bukti murid lama tertinggal di kunci datar saat login');
-  assert.ok(/RETENTION_PROBE_KEY,\s*SL_STATE_KEY\]/.test(appSource),
+  // `[,\]]` di ujung, bukan `\]`: daftar reset boleh bertambah panjang (lane D m025-230
+  // menambahkan dua kunci sesudah SL_STATE_KEY). Yang dijaga gerbang ini tetap sama —
+  // SL_STATE_KEY ADA di daftar itu, tepat sesudah RETENTION_PROBE_KEY — dan mengeluarkannya
+  // tetap membuat gerbang merah.
+  assert.ok(/RETENTION_PROBE_KEY,\s*SL_STATE_KEY[,\]]/.test(appSource),
     'SL_STATE_KEY tidak ikut daftar reset — reset progres yang meninggalkan bukti speaking adalah reset yang bohong');
 });
 
