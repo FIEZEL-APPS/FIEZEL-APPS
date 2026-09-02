@@ -4,12 +4,9 @@
   const runtime=root.FiezelVoiceRuntime;
   if(!runtime||runtime.__audibilityPatched)return;
 
-  const BROWSER_TTS_TIMEOUT_MS=Number(root.FIEZEL_BROWSER_TTS_TIMEOUT_MS)||12000;
   const DIAG_LIMIT=200;
   const READINESS_PATCH='m025-13-readiness-v1';
   const UX_PATCH='m025-18-persisted-ready-ux-v1';
-  let browserActive=false;
-  let activeUtterance=null;
   let backgroundReadyPromise=null;
   let automaticReadyAttempted=false;
   let uxObserver=null;
@@ -65,62 +62,12 @@
     }
   }
 
-  function pickVoice(lang){
-    try{
-      const voices=root.speechSynthesis?.getVoices?.()||[];
-      const wanted=String(lang||'en-US').toLowerCase();
-      return voices.find(v=>String(v.lang||'').toLowerCase()===wanted)
-        ||voices.find(v=>String(v.lang||'').toLowerCase().startsWith(wanted.split('-')[0]))
-        ||null;
-    }catch{return null}
-  }
-
-  function browserSpeakImmediate(text,options={}){
-    if(!root.speechSynthesis||!root.SpeechSynthesisUtterance){
-      diag({phase:'browser_unavailable'});
-      return Promise.reject(new Error('Browser TTS unavailable'));
-    }
-    warmWebAudio();
-    return new Promise((resolve,reject)=>{
-      let done=false,started=false,timer=null;
-      const finish=(ok,value)=>{
-        if(done)return;
-        done=true;
-        if(timer)clearTimeout(timer);
-        browserActive=false;
-        activeUtterance=null;
-        try{root.__fiezelActiveUtterance=null}catch{}
-        if(ok)resolve(value);else reject(value);
-      };
-      let utterance;
-      try{utterance=new root.SpeechSynthesisUtterance(String(text||''))}catch(error){finish(false,error);return}
-      activeUtterance=utterance;
-      root.__fiezelActiveUtterance=utterance;
-      browserActive=true;
-      utterance.lang=options.lang||'en-US';
-      utterance.rate=Number(options.speed||options.rate||.88);
-      const voice=pickVoice(utterance.lang);
-      if(voice)utterance.voice=voice;
-      utterance.onstart=()=>{started=true;diag({phase:'browser_start',lang:utterance.lang})};
-      utterance.onend=()=>{diag({phase:'browser_end'});finish(true,{provider:'browser-speech-synthesis',started:true})};
-      utterance.onerror=event=>{
-        const reason=String(event?.error||'error');
-        diag({phase:'browser_error',reason});
-        finish(false,new Error(`browser_tts_${reason}`));
-      };
-      timer=setTimeout(()=>{
-        const reason=started?'browser_tts_timeout':'browser_tts_not_started';
-        diag({phase:'browser_timeout',reason});
-        try{root.speechSynthesis.cancel()}catch{}
-        finish(false,new Error(reason));
-      },BROWSER_TTS_TIMEOUT_MS);
-      try{
-        if(root.speechSynthesis.paused&&typeof root.speechSynthesis.resume==='function')root.speechSynthesis.resume();
-        root.speechSynthesis.speak(utterance);
-        diag({phase:'browser_enqueued',lang:utterance.lang});
-      }catch(error){finish(false,error)}
-    });
-  }
+  // m025-231: pickVoice() dan browserSpeakImmediate() DIHAPUS. Keduanya adalah keseluruhan
+  // jembatan TTS peramban di berkas ini - pemilih suara perangkat, utterance, penjaga waktu
+  // 12 detik, dan cancel-nya. Lapisan itu (L4) tidak ada lagi: di bawah L3 neural hanya ada
+  // L5 teks senyap. Yang TIDAK ikut dihapus adalah showFallbackNotice() di bawah - lihat
+  // catatannya di sana; ia sekarang menandai "giliran ini tidak bersuara", bukan "giliran ini
+  // pindah ke suara perangkat".
 
   function currentRenderKey(node){
     if(!node)return'';
@@ -140,13 +87,21 @@
   }
   function setText(node,value){if(node&&String(node.textContent||'')!==value)node.textContent=value}
   function setDisabled(node,value){if(node&&node.disabled!==!!value)node.disabled=!!value}
+  // m025-231: fungsi ini DIPERTAHANKAN, dan event 'fiezel-neural-voice-degraded' yang ia
+  // kirim justru menjadi lebih penting sesudah L4 hilang. fiezel-speech-bridge.js mendengarkan
+  // event itu untuk MEMATIKAN animasi mulut maskot; tanpa event ini mulut Pau akan terus
+  // bergerak di atas keheningan L5 - persis kesan "aplikasinya menggantung" yang mahal.
+  // Yang berubah hanya isi pesannya: `provider` dulu berbunyi 'browser-speech-synthesis' dan
+  // itu sekarang bohong, dan salinan untuk murid dulu menjanjikan "audio sementara memakai
+  // suara perangkat" - juga bohong. Kebenarannya: giliran ini tidak bersuara, teksnya tetap
+  // terbaca.
   function showFallbackNotice(reason){
     const detail=String(reason||'neural_unavailable');
     diag({phase:'fallback_notice',reason:detail});
     try{
       const hint=root.document?.getElementById?.('neuralVoiceProgress');
-      if(hint)setText(hint,'Suara neural sedang bermasalah. Audio sementara memakai suara perangkat; coba lagi setelah mesin neural siap.');
-      root.dispatchEvent?.(new CustomEvent('fiezel-neural-voice-degraded',{detail:{reason:detail,provider:'browser-speech-synthesis'}}));
+      if(hint)setText(hint,'Suara neural sedang bermasalah. Bagian ini tampil sebagai teks tanpa suara; coba lagi setelah mesin neural siap.');
+      root.dispatchEvent?.(new CustomEvent('fiezel-neural-voice-degraded',{detail:{reason:detail,provider:'silent-text',audible:false}}));
     }catch{}
   }
 
@@ -178,7 +133,7 @@
         setDisabled(prepareButton,true);
         setHtml(prepareButton,'warming','<i data-lucide="loader-circle"></i> Mengaktifkan neural…');
         setDisabled(testButton,true);
-        if(hint&&/Model tersimpan|Aset suara offline|Mengaktifkan mesin neural|Mengunduh aset suara|Menyiapkan mesin suara/i.test(String(hint.textContent||'')))setText(hint,'Aset suara offline sudah tersimpan. Mesin neural sedang diaktifkan di latar; latihan Listening tetap dapat langsung bersuara selama pemanasan.');
+        if(hint&&/Model tersimpan|Aset suara offline|Mengaktifkan mesin neural|Mengunduh aset suara|Menyiapkan mesin suara/i.test(String(hint.textContent||'')))setText(hint,'Aset suara offline sudah tersimpan. Mesin neural sedang diaktifkan di latar; selama pemanasan latihan Listening tampil sebagai teks tanpa suara.');
       }else{
         setDisabled(prepareButton,false);
         setHtml(prepareButton,'cached-cold','<i data-lucide="zap"></i> Aktifkan suara neural');
@@ -208,8 +163,10 @@
       backgroundReadyPromise=null;
       syncPersistedReadyUi();
     });
-    // A background warm must never become an unhandled rejection when ordinary
-    // audio already completed through the bounded browser bridge.
+    // m025-231: pemanasan latar tetap tidak boleh menjadi unhandled rejection. Dulu alasannya
+    // "audio biasa sudah selesai lewat jembatan peramban"; jembatan itu sudah dihapus, tapi
+    // alasannya masih berlaku dalam bentuk lain - primeBackgroundReady() dipanggil juga dari
+    // MutationObserver dan dari klik tombol yang penolakannya sudah ditangani di tempat lain.
     backgroundReadyPromise.catch(()=>{});
     return backgroundReadyPromise;
   }
@@ -256,16 +213,21 @@
     else refresh();
   }
 
+  // m025-231: kelima cabang yang dulu berakhir di browserSpeakImmediate() kini berakhir sama:
+  // neural berbunyi, atau penolakan naik ke pemanggil. Perbedaan `neuralOnly` (allowFallback
+  // === false) ikut hilang karena ia hanya pernah berarti "jangan pakai TTS peramban" - sesuatu
+  // yang sekarang berlaku untuk SEMUA pemanggil, jadi menyimpannya berarti menyimpan dua nama
+  // untuk satu perilaku. allowFallback:false tetap diteruskan ke runtime supaya kontraknya
+  // tersurat di titik panggil.
   async function speak(text,options={}){
     warmWebAudio();
     const state=runtime.status?.()||{};
-    const neuralOnly=options.allowFallback===false;
     if(state.circuitOpen){
       const reason=String(state.lastFallbackReason||state.error||'previous_failure');
       diag({phase:'circuit_open',reason});
-      if(neuralOnly)return runtime.speak(text,{...options,allowFallback:false});
-      showFallbackNotice(reason);
-      return browserSpeakImmediate(text,options);
+      // runtime.speak() sendiri yang melempar `neural_circuit_open:...` berikut sebabnya;
+      // meneruskan lemparan itu apa adanya lebih berguna daripada galat baru buatan sini.
+      return runtime.speak(text,{...options,allowFallback:false});
     }
     if(!state.ready){
       diag({phase:'audibility_first',prepared:!!state.prepared});
@@ -273,54 +235,52 @@
         // A user-requested utterance is explicit intent and may retry even when the
         // background automatic attempt for this prepared+cold epoch already failed.
         const warming=primeBackgroundReady({automatic:false});
-        if(!neuralOnly){
-          // m025-17+ UX: do not make the first Listening audio wait tens of seconds
-          // for a cold in-memory Kokoro service after a reload. The cached model is
-          // activated in parallel; the bridge is used only until neural is ready.
-          diag({patch:UX_PATCH,phase:'cold_bridge_browser',prepared:true});
-          return browserSpeakImmediate(text,options);
-        }
+        // m025-231 TITIK PALING RAWAN DI BERKAS INI. Dulu cabang ini menjawab SEKETIKA dengan
+        // TTS peramban sementara mesin neural memanas di latar - murid mendapat bunyi tanpa
+        // menunggu. Sesudah L4 dihapus tidak ada lagi yang bisa mengisi jeda itu, jadi satu-
+        // satunya jawaban jujur adalah MENUNGGU pemanasan lalu bicara neural, atau melempar.
+        // Yang dilarang keras di sini: resolve true tanpa audio. Pemanggil akan menganggap
+        // giliran ini berbunyi, subtitle L5 tidak pernah muncul, dan mulut maskot bergerak di
+        // atas keheningan.
+        diag({patch:UX_PATCH,phase:'cold_wait_neural',prepared:true});
         try{
           await warming;
-          const warmed=runtime.status?.()||{};
-          if(warmed.ready){
-            try{return await runtime.speak(text,{...options,allowFallback:false})}
-            catch(error){
-              const reason=String(error?.message||error);
-              diag({phase:'neural_throw_fallback',error:reason});
-              if(neuralOnly)throw error;
-              showFallbackNotice(reason);
-              return browserSpeakImmediate(text,options);
-            }
-          }
         }catch(error){
           const reason=String(error?.message||error);
           diag({phase:'neural_resume_error',error:reason});
-          if(neuralOnly)throw error;
           showFallbackNotice(reason);
+          throw error;
+        }
+        const warmed=runtime.status?.()||{};
+        if(warmed.ready){
+          try{return await runtime.speak(text,{...options,allowFallback:false})}
+          catch(error){
+            const reason=String(error?.message||error);
+            diag({phase:'neural_throw_fallback',error:reason});
+            showFallbackNotice(reason);
+            throw error;
+          }
         }
       }
-      if(neuralOnly)return runtime.speak(text,{...options,allowFallback:false});
-      return browserSpeakImmediate(text,options);
+      // Pemanasan selesai tanpa membuat mesin siap, atau aset memang belum prepared: runtime
+      // yang memutuskan galatnya (`assets are not prepared`, `cache verification failed`, ...)
+      // supaya pemanggil dan diagnostik melihat sebab yang sama.
+      return runtime.speak(text,{...options,allowFallback:false});
     }
     try{return await runtime.speak(text,{...options,allowFallback:false})}
     catch(error){
       const reason=String(error?.message||error);
       diag({phase:'neural_throw_fallback',error:reason});
-      if(neuralOnly)throw error;
       showFallbackNotice(reason);
-      return browserSpeakImmediate(text,options);
+      throw error;
     }
   }
 
+  // m025-231: yang perlu dihentikan tinggal mesin neural. Blok pembatalan antrean bicara
+  // peramban di sini menjadi kode mati begitu browserSpeakImmediate() dihapus - tidak ada lagi
+  // yang pernah menyalakan penandanya.
   function stop(){
     const state=runtime.status?.()||{};
-    if(browserActive){
-      try{root.speechSynthesis?.cancel?.()}catch{}
-      browserActive=false;
-      activeUtterance=null;
-      try{root.__fiezelActiveUtterance=null}catch{}
-    }
     if(state.ready){try{runtime.stop?.()}catch{}}
   }
 
@@ -330,9 +290,10 @@
     return Object.freeze({...base,wasmPolicy,audibilityPatch:'v1',persistedReadyUxPatch:'m025-18'});
   }
 
-  // Prevent the bootstrap's zero-volume speech warmup from occupying Safari's speech queue.
-  root.__fiezelTtsUnlocked=true;
-  root.FiezelVoiceRuntime=Object.freeze({...runtime,status,ensureReady,speak,stop,browserSpeakImmediate,__audibilityPatched:true});
+  // m025-231: penanda __fiezelTtsUnlocked ikut hilang bersama pemanasan volume-0 di bootstrap
+  // yang dulu ia tahan, dan browserSpeakImmediate tidak lagi diekspor - permukaan publik berkas
+  // ini sekarang murni neural.
+  root.FiezelVoiceRuntime=Object.freeze({...runtime,status,ensureReady,speak,stop,__audibilityPatched:true});
   installPersistedReadyUx();
   diag({phase:'audibility_patch_loaded'});
 })(typeof globalThis!=='undefined'?globalThis:this);

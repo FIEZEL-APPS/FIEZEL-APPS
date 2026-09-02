@@ -16,17 +16,26 @@
  * Salah satunya absen → jembatan diam tanpa suara galat; suara & subtitle
  * jalan terus (14 §0: suara tidak pernah bergantung pada wajah).
  *
- * TIGA TINGKAT KEBENARAN WAKTU (14 §1.3):
+ * DUA TINGKAT KEBENARAN WAKTU (14 §1.3; dulu tiga — lihat catatan m025-231):
  *   L1/L2  'progress' ~4 Hz  → siklus flap DIGERBANG jam audio (macet 900ms /
  *                              dua callback maju <60ms → mulut tutup, buka lagi
  *                              saat callback maju berikutnya).
  *   L3     'start'+durasi    → siklus taksiran; tutup paksa min(est×1.5, 20s);
  *                              resolusi janji fasad SELALU menang.
- *   L4     'start' onstart   → siklus lebih kalem (140–200ms, bobot open 5%),
- *                              mulai HANYA sejak onstart, pagar 45s.
  *   L5     'silent'          → mulut TIDAK PERNAH dianimasikan.
  * Arah gagal yang dipilih spec: mulut BERHENTI LEBIH AWAL, tidak pernah
  * mengepak di atas keheningan.
+ *
+ * m025-231 (keputusan OWNER): lapisan L4 speechSynthesis peramban DIHAPUS dari
+ * seluruh aplikasi, jadi tidak ada satu pun pengirim `layer:4` yang tersisa di
+ * kabel 'fiezel-speech'. Karena itu SELURUH mesin L4 di berkas ini ikut dibuang —
+ * mode 'l4', irama kalemnya (140–200ms, bobot open 5%), dan pagar 45 detik untuk
+ * giliran tanpa jam audio. Mode yang tidak bisa dimasuki lagi bukan "cadangan
+ * murah": ia kode mati yang cepat atau lambat dihidupkan kembali oleh tebakan.
+ * Akibatnya fase 'start' kini SELALU berarti L3, satu cabang tanpa syarat.
+ * Tangga suara hari ini: L1 ElevenLabs/R2 → C1 Cloudflare → L2 Puter → L3 neural
+ * di perangkat → L5 teks senyap. Di bawah L3 tidak ada bunyi sama sekali, dan
+ * jembatan ini memang tidak punya apa pun untuk dianimasikan di sana.
  *
  * SATU OTAK WAKTU. Koreografi batas kalimat TIDAK menghitung ulang indeks cue:
  * jembatan mengamati DOM #fiezelSubtitle (yang ditulis band subtitle dari
@@ -57,13 +66,11 @@
 
   /* ---------- konstanta irama (14 §1.1–1.3) ---------- */
   var BEAT_MIN = 110, BEAT_MAX = 160;         // L1/L2/L3: beat ber-jitter (--fz-beat 140 ±20-an)
-  var BEAT_MIN_L4 = 140, BEAT_MAX_L4 = 200;   // L4: lebih kalem
   var STALL_MS = 900;                         // tanpa callback 900ms → gerbang macet menutup mulut
   var STALL_DELTA_S = 0.06;                   // dua callback beruntun maju <60ms → macet (buffering)
   var OPEN_COOLDOWN_MS = 600;                 // 'open' tidak boleh dua kali dalam 600ms
   var SMALL_PX = 42;                          // di bawah ini siklus runtuh jadi soft↔open
   var L3_FORCE_MAX_MS = 20000;                // pagar mutlak mode taksiran
-  var L4_FAILSAFE_MS = 45000;                 // L4 tanpa jam: pagar "berhenti lebih awal"
   var ACCENT_MS = 140;                        // beat aksen tanda baca ('?'→o, '!'→open)
   var EST_GAP_EVERY_MS = 3800;                // mode taksiran tanpa cue: jeda kalimat periodik
   var SACCADE_MIN_MS = 2500, SACCADE_MAX_MS = 4000; // micro-saccade pupil (14 §1.5)
@@ -212,7 +219,7 @@
     var now = perfNow();
     turn = {
       layer: layer,
-      mode: mode,                           // 'clock' (L1/L2) | 'est' (L3) | 'l4'
+      mode: mode,                           // 'clock' (L1/L2) | 'est' (L3) — tidak ada mode ketiga lagi (m025-231)
       startedAt: now,
       lastT: 0, lastAt: now,                // jam audio terakhir (mode clock)
       slowHits: 0, stalled: false,
@@ -222,7 +229,7 @@
       lastShape: '', lastOpenAt: 0,
       forceCloseAt: mode === 'est'
         ? now + Math.min(((opt && opt.duration > 0 ? Number(opt.duration) : 8) * 1500), L3_FORCE_MAX_MS)
-        : mode === 'l4' ? now + L4_FAILSAFE_MS : 0,
+        : 0,
       small: isSmall()
     };
     react('speak-start');                   // komponen: setState('speaking') + simpan state pra-bicara
@@ -272,13 +279,14 @@
     turn.lastShape = 'soft';
   }
 
-  /* Satu beat mulut: bobot 14 §1.1 (sp1 55 / sp2 30 / open 15; L4: open 5),
-     tidak pernah bentuk sama dua kali beruntun, 'open' ber-cooldown 600ms. */
+  /* Satu beat mulut: bobot 14 §1.1 (sp1 55 / sp2 30 / open 15), tidak pernah
+     bentuk sama dua kali beruntun, 'open' ber-cooldown 600ms. Bobot alternatif
+     yang dulu dipakai giliran L4 hilang bersama lapisannya (m025-231): satu
+     lapisan bersuara yang tersisa di sisi taksiran = satu tabel bobot. */
   function pickShape(now) {
     if (turn.small) return turn.lastShape === 'open' ? 'soft' : 'open';
-    var r = Math.random(), s;
-    if (turn.mode === 'l4') s = r < 0.60 ? 'sp1' : r < 0.95 ? 'sp2' : 'open';
-    else s = r < 0.55 ? 'sp1' : r < 0.85 ? 'sp2' : 'open';
+    var r = Math.random();
+    var s = r < 0.55 ? 'sp1' : r < 0.85 ? 'sp2' : 'open';
     if (s === 'open' && now - turn.lastOpenAt < OPEN_COOLDOWN_MS) s = 'sp2';
     if (s === turn.lastShape) s = s === 'sp1' ? 'sp2' : 'sp1';
     return s;
@@ -288,9 +296,7 @@
     setViseme(s);
     turn.lastShape = s;
     if (s === 'open') turn.lastOpenAt = now;
-    var lo = turn.mode === 'l4' ? BEAT_MIN_L4 : BEAT_MIN;
-    var hi = turn.mode === 'l4' ? BEAT_MAX_L4 : BEAT_MAX;
-    turn.nextBeatAt = now + lo + Math.random() * (hi - lo);
+    turn.nextBeatAt = now + BEAT_MIN + Math.random() * (BEAT_MAX - BEAT_MIN);
   }
 
   /* Loop rAF — akumulasi waktu, BUKAN setInterval (14 §1.1): tab di belakang
@@ -301,7 +307,7 @@
     if (!motionAllowed()) { closeTurn(true); return; } // gerak dimatikan di tengah giliran
     var now = perfNow();
 
-    // pagar tutup paksa (L3 est×1.5 max 20s; L4 45s) — arah gagal: berhenti lebih awal
+    // pagar tutup paksa (L3 est×1.5, maksimum 20s) — arah gagal: berhenti lebih awal
     if (turn.forceCloseAt && now >= turn.forceCloseAt) { closeTurn(false); return; }
 
     // gerbang macet mode jam: tidak ada callback 900ms → mulut tutup sampai jam maju lagi
@@ -341,9 +347,12 @@
       case 'progress':                      // L1/L2: jam audio adalah kebenaran
         feedClock(Number(d.layer) === 2 ? 2 : 1, Number(d.currentTime) || 0);
         break;
-      case 'start':                         // L3 (durasi taksiran) / L4 (onstart)
-        if (Number(d.layer) === 4) beginTurn(4, 'l4');
-        else beginTurn(3, 'est', d);
+      case 'start':                         // L3: yang ada hanyalah durasi taksiran
+        // m025-231: dulu baris ini bercabang ke giliran 'l4' saat d.layer === 4.
+        // Lapisan peramban itu dihapus dan tidak ada lagi yang mengirim layer 4,
+        // jadi cabangnya dibuang, bukan disisakan "untuk jaga-jaga": cabang mati
+        // membuat pembaca berikutnya percaya masih ada lapisan di bawah L3.
+        beginTurn(3, 'est', d);
         break;
       case 'end':                           // resolusi janji fasad: otoritas "giliran usai"
       case 'silent':                        // L5: kalau mulut sempat mulai (taksiran L3 kandas), tutup SEKARANG

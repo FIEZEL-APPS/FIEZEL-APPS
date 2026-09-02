@@ -24,8 +24,19 @@
  *   L1 aset R2/ElevenLabs .......... say() -> assets().resolve/playUrl
  *   L2 mesin Puter ................. speakWithEngine()
  *   L3 mesin neural di perangkat ... speakWithLocal(), HANYA bila aset sudah prepared
- *   L4 speechSynthesis peramban .... speakWithBrowser()   <- lapisan terakhir yang bersuara
+ *                                    <- lapisan TERAKHIR yang bersuara
  *   L5 teks tanpa suara ............ resolve(false), pemanggil menampilkan teksnya
+ *
+ * L4 speechSynthesis peramban DIHAPUS (m025-231, keputusan OWNER). Ia dulu duduk di antara
+ * L3 dan L5, dan itulah sumber "dua suara sekaligus" yang dilaporkan pada tes kemampuan:
+ * pemutar L1/L2/L3 punya jam sendiri, sedangkan `speechSynthesis` punya antrean GLOBAL milik
+ * peramban yang TIDAK ikut berhenti saat pemutar kita berhenti. Begitu satu lapisan atas
+ * dinilai "gagal" padahal audionya sudah/masih berjalan, utterance peramban ikut berbunyi di
+ * atasnya. Suara bawaan perangkat juga bukan suara FIEZEL: aksen, kecepatan, dan nama voice
+ * berbeda-beda per perangkat, jadi ia melanggar janji "satu suara" produk ini.
+ *
+ * Yang menggantikannya adalah L5 apa adanya: DIAM, teks tetap terbaca. Tidak ada lapisan
+ * suara baru yang boleh disisipkan di bawah L3 - lihat speakWithLocal().
  *
  * S6 — LAPISAN CLOUDFLARE, DUA SISIPAN DAN TIDAK LEBIH. Saat
  * `FIEZEL_CF_CONFIG.endpoints.tts === 'on'` (dan `enabled:true` + `base` terisi), tangga di
@@ -34,7 +45,7 @@
  *   C0 cache Cache API klien ....... cfCachedFirst()      <- alamat R2 yang pernah berhasil
  *   L1 aset R2/ElevenLabs .......... speakFromAssets()     (tidak diubah)
  *   C1 POST /api/tts/render ........ speakWithCloudflare() <- sisipan kedua
- *   L2 -> L3 -> L4 -> L5 ........... tidak diubah, satu baris pun
+ *   L2 -> L3 -> L5 ................. tidak diubah, satu baris pun
  *
  * SAAT FLAG BUKAN 'on', `cfEnabled()` menjawab false dan tangga ini SAMA PERSIS dengan hari
  * ini: `afterAssets()` memanggil `speakWithEngine()` langsung, tidak ada satu pun permintaan
@@ -48,13 +59,10 @@
  * hanya tahu URUTAN. Itu sengaja: urutan tangga adalah satu-satunya hal yang pernah salah
  * berulang kali di sini.
  *
- * Sampai perbaikan ini L4 tidak pernah tercapai justru pada kasus yang paling penting:
- * murid BARU, yang aset neuralnya belum diunduh, mendapat senyap total karena L3
- * mengembalikan false alih-alih meneruskan ke bawah. Penjaga unduhan 152 MB di L3 tidak
- * disentuh - lihat localEngine() dan speakWithBrowser().
+ * Penjaga unduhan 152 MB di L3 tidak disentuh - lihat localEngine() dan speakWithLocal().
  *
  * PREFETCH MENGIKUTI TANGGA YANG SAMA (v5). prefetch() menghangatkan kalimat BERIKUTNYA
- * lewat L1 -> L2 -> L3, tanpa L4 dan tanpa subtitle. Ia tidak boleh memicu unduhan model:
+ * lewat L1 -> L2 -> L3, tanpa subtitle. Ia tidak boleh memicu unduhan model:
  * lihat blok komentar di atas prefetch() untuk pagar 152 MB, batas konkurensi, dan
  * deduplikasi teks kanonik.
  *
@@ -73,11 +81,6 @@
   var SCHEMA = 'fiezel-voice-say-v1';
   var band = null;
   var turnGeneration = 0; // NV-08: satu ownership token untuk subtitle + event visual async.
-  // m026-BUG2: breaker L4. Ia MENDINGIN, tidak melatch seumur sesi - lihat speakWithBrowser().
-  var BROWSER_BREAKER_MS = 10000;
-  var BROWSER_COOLDOWN_MS = 60000;
-  var browserBreakerUntil = 0;
-  function browserBreakerIsOpen() { return browserBreakerUntil > Date.now(); }
 
   function nextTurnGeneration() {
     turnGeneration += 1;
@@ -464,86 +467,35 @@
   }
 
   /**
-   * Mesin perangkat - satu-satunya saat ia terdengar. Kalau ia juga tidak ada atau ikut
-   * gagal, hasilnya sama seperti sebelum m025-121: false, dan pemanggil menampilkan
-   * subtitle tanpa suara. Tidak ada modal, tidak ada dialog, tidak ada tuntutan upgrade.
+   * L3 - mesin neural di perangkat. Lapisan TERAKHIR yang bersuara sejak L4 dihapus.
+   *
+   * Kalau ia tidak ada atau ikut gagal, jawabannya false: pemanggil menampilkan teks tanpa
+   * suara (L5). Itu memang lebih sunyi daripada sebelumnya, dan itu disengaja - lihat blok
+   * L4 di kepala berkas. Menambahkan lapisan bersuara apa pun di bawah sini mengembalikan
+   * persis tabrakan suara yang baru saja dihapus, karena setiap pemutar tambahan membawa
+   * jam dan antreannya sendiri yang tidak ikut berhenti saat stop() dipanggil.
    */
   function speakWithLocal(english, opts, band_) {
+    // L5: satu-satunya jalan keluar tanpa suara. Pita subtitle DITUTUP di sini - dulu itu
+    // tugas closeBand() milik L4, dan menghapusnya begitu saja akan meninggalkan baris
+    // terjemahan menggantung di layar untuk giliran yang sudah selesai.
+    var silent = function () {
+      if (band_ && opts._turnGeneration === turnGeneration) { try { band_.end(); } catch (_) {} }
+      return Promise.resolve(false);
+    };
     var local = localEngine();
-    // m026-BUG2. Penjaga 152 MB TIDAK dilonggarkan: localEngine() tetap mengembalikan null
-    // selama aset belum prepared, jadi mesin neural tetap tidak bisa dinyalakan dari jalur
-    // gagal. Yang berubah hanya apa yang terjadi SESUDAH null - dulu jalurnya berhenti di
-    // sini dengan false, dan itulah kenapa murid baru mendapat SENYAP TOTAL (cf-c1 K10).
-    if (!local) return speakWithBrowser(english, opts, band_);
+    // Penjaga 152 MB TIDAK dilonggarkan: localEngine() tetap mengembalikan null selama aset
+    // belum prepared, jadi mesin neural tetap tidak bisa dinyalakan dari jalur gagal.
+    if (!local) return silent();
     emitSpeech('start', 3, { duration: english.length / (14.5 * (Number(opts.speed) > 0 ? Number(opts.speed) : 1)), generation: opts._turnGeneration }); // FASE 11: L3 tanpa onProgress — durasi taksiran 14 §1.3
     return local.speak(english, {
       speed: opts.speed,
       voice: opts.voice
     }).then(function (done) {
-      if (done === false) return speakWithBrowser(english, opts, band_);
+      if (done === false) return silent();
       if (band_ && opts._turnGeneration === turnGeneration) band_.end();
       return true;
-    }).catch(function () {
-      return speakWithBrowser(english, opts, band_);
-    });
-  }
-
-  /**
-   * L4 - suara bawaan peramban. Lapisan TERAKHIR yang masih bersuara.
-   *
-   * Ia berdiri sendiri di sini, tidak lewat FiezelVoiceRuntime, justru supaya penjaga
-   * unduhan tidak perlu dilonggarkan sedikit pun: berkas ini tidak menyentuh satu pun
-   * aset neural, tidak memanggil prepare(), dan tidak bisa memicu unduhan 152 MB
-   * betapapun sering ia dipakai. Kalau nanti browserSpeak dipisah menjadi modul sendiri
-   * (cf-b4 §5.1 butir 1), modul itu dipakai lebih dulu lewat FiezelBrowserSpeak.
-   *
-   * BREAKER. cf-b4 §5.4 meminta breaker 10 s untuk kegagalan khas iOS, di mana speak()
-   * diterima tanpa pernah berbunyi. Yang diukur di sini adalah 10 s SEBELUM onstart, bukan
-   * 10 s sampai selesai: satu paragraf bacaan memang wajar berbunyi lebih dari 10 s, dan
-   * memutusnya di tengah akan mengubah pagar keselamatan menjadi bug baru.
-   */
-  function speakWithBrowser(english, opts, band_) {
-    var closeBand = function () { if (band_ && opts._turnGeneration === turnGeneration) { try { band_.end(); } catch (_) {} } };
-    // Breaker yang melatch seumur sesi akan mendiamkan murid untuk selamanya setelah SATU
-    // kemacetan - dan kemacetan itu sering hanya soal daftar voice yang belum selesai dimuat
-    // atau iOS yang menunggu gesture. Karena itu ia mendingin: klik berikutnya sesudah
-    // BROWSER_COOLDOWN_MS benar-benar mencoba lagi, bukan langsung menjawab false.
-    if (browserBreakerIsOpen()) { closeBand(); return Promise.resolve(false); }
-
-    var mod = root.FiezelBrowserSpeak;
-    if (mod && typeof mod.speak === 'function') {
-      return mod.speak(english, { lang: opts.locale || 'en-US', locale: opts.locale || 'en-US', speed: opts.speed, voice: opts.voice })
-        .then(function (done) { closeBand(); return done !== false; })
-        .catch(function () { browserBreakerUntil = Date.now() + BROWSER_COOLDOWN_MS; closeBand(); return false; });
-    }
-
-    var synth = root.speechSynthesis;
-    var Utterance = root.SpeechSynthesisUtterance;
-    if (!synth || typeof Utterance !== 'function') { closeBand(); return Promise.resolve(false); }
-
-    return new Promise(function (resolve) {
-      var settled = false, started = false, timer = null;
-      var settle = function (ok) {
-        if (settled) return;
-        settled = true;
-        if (timer) { clearTimeout(timer); timer = null; }
-        if (!ok && !started) browserBreakerUntil = Date.now() + BROWSER_COOLDOWN_MS;
-        closeBand();
-        resolve(ok);
-      };
-      var utterance;
-      try { utterance = new Utterance(String(english || '')); } catch (_) { return settle(false); }
-      utterance.lang = opts.locale || 'en-US';
-      var rate = Number(opts.speed);
-      utterance.rate = rate > 0 ? rate : 1;
-      if (opts.voice && typeof opts.voice === 'object') { try { utterance.voice = opts.voice; } catch (_) {} }
-      utterance.onstart = function () { started = true; if (timer) { clearTimeout(timer); timer = null; } emitSpeech('start', 4, { generation: opts._turnGeneration }); }; // FASE 11: L4 bicara HANYA sejak onstart (14 §1.3)
-      utterance.onend = function () { settle(true); };
-      utterance.onerror = function () { settle(false); };
-      timer = setTimeout(function () { settle(false); }, BROWSER_BREAKER_MS);
-      try { synth.cancel(); } catch (_) {}
-      try { synth.speak(utterance); } catch (_) { settle(false); }
-    });
+    }).catch(silent);
   }
 
   // =========================================================================================
@@ -566,10 +518,8 @@
   //      senyap terhadap murid (tidak ada toast, tidak ada subtitle, tidak ada breaker).
   //   3. TIDAK MENULIS APA PUN. Prefetch tidak menyentuh pita subtitle (jadi penerjemah
   //      tidak dipanggil dan jatah AI tidak terpakai), tidak menyentuh pemutar, dan tidak
-  //      pernah menyalakan L4 speechSynthesis - suara peramban tidak punya cache, jadi
-  //      menghangatkannya berarti membunyikannya lebih awal. Kredit ElevenLabs juga aman:
-  //      L1 hanya mengambil berkas yang SUDAH ada di manifest, dan tak satu pun mesin di
-  //      bawahnya memanggil ElevenLabs.
+  //      Kredit ElevenLabs juga aman: L1 hanya mengambil berkas yang SUDAH ada di manifest,
+  //      dan tak satu pun mesin di bawahnya memanggil ElevenLabs.
   //
   // URUTAN LAPISANNYA SAMA DENGAN say(): aset R2 -> Puter -> neural lokal. Menembak neural
   // langsung akan menghangatkan mesin yang tidak akan dipakai untuk kalimat yang sudah punya
@@ -762,9 +712,6 @@
     // model dan tidak menyentuh status()/prepare(); runtime yang absen cukup diabaikan.
     var local = root.FiezelVoiceRuntime;
     if (local && typeof local.stop === 'function') { try { local.stop(); } catch (_) {} }
-    // L4 punya pemutar sendiri; tanpa baris ini "Keluar" meninggalkan kalimat yang masih
-    // berbunyi di layar berikutnya.
-    if (root.speechSynthesis && typeof root.speechSynthesis.cancel === 'function') { try { root.speechSynthesis.cancel(); } catch (_) {} }
     if (band) { try { band.end(); } catch (_) {} }
     return true;
   }
@@ -778,9 +725,10 @@
       assetCount: store && store.status && store.status().manifest ? store.status().manifest.assetCount : 0,
       voiceReady: !!(voice && voice.status && voice.status().ready),
       localFallbackReady: !!localEngine(),
-      browserFallbackReady: !!(root.speechSynthesis && typeof root.SpeechSynthesisUtterance === 'function') && !browserBreakerIsOpen(),
-      browserBreakerOpen: browserBreakerIsOpen(),
-      browserBreakerCooldownMs: BROWSER_COOLDOWN_MS,
+      // m025-231: L4 dihapus. Kuncinya DIPERTAHANKAN dan dipaku false supaya panel
+      // Diagnostics lama dan gerbang yang membacanya tidak perlu menebak - "tidak ada
+      // cadangan peramban" adalah jawaban yang jujur, bukan field yang hilang.
+      browserFallbackReady: false,
       subtitleReady: !!subtitles(),
       translatorReady: !!translator(),
       // S6 — dilaporkan supaya panel Diagnostics bisa menjawab "jalur mana yang dipakai"
