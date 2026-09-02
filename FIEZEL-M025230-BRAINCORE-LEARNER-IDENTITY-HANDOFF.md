@@ -8,13 +8,18 @@ diverifikasi, dan langkah berikutnya — supaya sesi berikutnya tidak menebak.
 
 ## Status
 
-**KODE SELESAI, LANE MASIH MATI, PRODUKSI BELUM DIVERIFIKASI.**
+**KODE SELESAI. DUA SAKELAR SUDAH DINYALAKAN DI KODE (m025-234), DUA LANGKAH INFRASTRUKTUR
+MASIH MENUNGGU OWNER. PRODUKSI BELUM DIVERIFIKASI.**
 
 - Rantai penuh (murid → identitas → Braincore → bukti → D1 → API owner → Owner Dashboard)
-  terpasang dan terbukti lewat gerbang `braincore-learner-identity-test.js` (175 assert,
+  terpasang dan terbukti lewat gerbang `braincore-learner-identity-test.js` (177 assert,
   Worker penuh + D1 palsu), termasuk nama murid dari perkenalan (§3).
-- Lane **lahir mati**: `FEATURE_LEARNER_EVIDENCE="off"`, KV belum ditulis, klien
-  `identityEvidence.mode:'off'`, dan tiap murid tetap harus memberi persetujuannya sendiri.
+- **m025-234 menyalakan langkah 2 dan 4** dari §7: `FEATURE_LEARNER_EVIDENCE="on"` dan klien
+  `identityEvidence.mode:'on'`. **Rilis ini TIDAK boleh mendarat sebelum langkah 1 dan 3
+  dijalankan** — lihat peringatan urutan di §7.
+- Lane tetap menulis **nol baris** sampai langkah 1 dan 3 selesai: tanpa migrasi 0009/0010
+  tabelnya tidak ada, dan tanpa KV `cfg:flags` gerbangnya fail-closed menolak. Di atas itu
+  semua, tiap murid tetap harus memberi persetujuannya sendiri (langkah 5).
 - **NOT VERIFIED di produksi.** Migrasi `0009_learner_evidence.sql` dan
   `0010_learner_name.sql` belum dijalankan
   (token CI tidak bisa `wrangler d1 execute --remote`), jadi belum ada satu baris pun yang
@@ -159,7 +164,7 @@ dengan panel agregat.
 
 ## 6. Gerbang
 
-`braincore-learner-identity-test.js` — **175/175**, terdaftar di `quality.yml`. Ia
+`braincore-learner-identity-test.js` — **177/177**, terdaftar di `quality.yml`. Ia
 membangkitkan Worker penuh dengan D1 palsu dan membuktikan dua murid nyata: kepemilikan
 terpisah, isolasi lintas-murid (cookie murid → 403 di rute owner, dengan atau tanpa `?sub=`
 orang lain), spoofing `sub` → 400 tanpa satu baris pun tertulis untuk korban, idempotensi
@@ -232,11 +237,19 @@ Dua gerbang yang **diubah dengan sadar**, dan alasannya ditulis di tempatnya:
 
 1. `wrangler d1 execute fiezel-core --remote --file=migrations/0009_learner_evidence.sql`
    **dan** `wrangler d1 execute fiezel-core --remote --file=migrations/0010_learner_name.sql`
-2. `FEATURE_LEARNER_EVIDENCE = "on"` di `workers/api/wrangler.toml`, lalu deploy Worker api.
+2. ~~`FEATURE_LEARNER_EVIDENCE = "on"` di `workers/api/wrangler.toml`~~ **SUDAH di kode
+   (m025-234)** — tinggal deploy Worker api sesudah langkah 1.
 3. KV `cfg:flags`: `enabled.learnerEvidence = true` **dan**
    `flags.cfLearnerEvidenceEnabled = true`.
-4. `identityEvidence.mode = 'on'` di `features/telemetry/fiezel-telemetry-config.js`, lalu
-   bump build (m025-231 → m025-232) dan rilis.
+4. ~~`identityEvidence.mode = 'on'` di `features/telemetry/fiezel-telemetry-config.js` + bump
+   build~~ **SUDAH di kode (m025-233 → m025-234)** — tinggal rilis sesudah langkah 1 dan 3.
+
+**URUTAN ITU BUKAN FORMALITAS.** Kalau rilis m025-234 mendarat sebelum langkah 1/3: setiap
+perangkat murid memanggil endpoint yang menjawab 403 `learner_evidence_disabled` (fail-closed,
+jadi tidak ada data yang bocor dan tidak ada pelajaran yang terganggu), TETAPI sakelar
+persetujuan sudah muncul di Pengaturan. Murid yang menyalakannya akan melihat sakelarnya
+menyala di perangkatnya sementara server menolak mencatatnya — persetujuan yang tampak
+diterima padahal tidak. Itu sebabnya langkah 1 dan 3 dulu, rilis belakangan.
 5. Murid menyalakan persetujuan di Pengaturan → Bukti belajar per murid.
 
 Selama satu langkah pun belum dilakukan, lane ini menulis **nol baris**. Verifikasi produksi

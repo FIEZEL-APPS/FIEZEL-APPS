@@ -70,7 +70,7 @@
      * lane dinyalakan, karena tanpa mode 'on' tidak ada yang pernah memanggilnya. */
     identityEvidence: Object.freeze({
       schema: 'fiezel-braincore-learner-evidence-v1',
-      mode: 'off',
+      mode: 'on',
       endpoint: 'https://api.fiezel.my.id/api/braincore/learner-evidence',
       consentEndpoint: 'https://api.fiezel.my.id/api/braincore/learner-evidence/consent',
       anonEndpoint: 'https://api.fiezel.my.id/api/auth/anon',
