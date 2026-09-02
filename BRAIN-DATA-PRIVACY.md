@@ -192,12 +192,12 @@ diperbarui bersama kodenya adalah kebohongan yang ditandatangani murid.
 alasan yang berbeda (rincian dan SQL penghapusan atas permintaan: `docs/D1-RETENTION.md`
 §2.8 dan §4).
 
-**Persetujuan: DIHAPUS m025-235, atas keputusan OWNER.** Sampai m025-234 lane ini menulis
+**Persetujuan: DIHAPUS m025-236, atas keputusan OWNER.** Sampai m025-234 lane ini menulis
 hanya bila ada baris aktif di `learner_evidence_consent`, dan memasang aplikasi bukan
 persetujuan. Owner menghapus syarat itu dengan alasan yang dicatat apa adanya di sini:
 FIEZEL adalah aplikasi kelas, guru memberitahu muridnya sebelum mereka memasang, dan bukti
-belajar ini memang data guru. **Sejak m025-235, murid yang memasang FIEZEL langsung
-tersinkron** — termasuk murid yang sudah memasang lebih dulu, begitu shell m025-235 sampai
+belajar ini memang data guru. **Sejak m025-236, murid yang memasang FIEZEL langsung
+tersinkron** — termasuk murid yang sudah memasang lebih dulu, begitu shell m025-236 sampai
 ke perangkatnya. Tidak ada sakelar di Pengaturan, dan dokumen ini tidak berpura-pura ada.
 
 Yang **tidak** ikut dilonggarkan bersama sakelarnya, dan itu yang membuat lane ini tetap

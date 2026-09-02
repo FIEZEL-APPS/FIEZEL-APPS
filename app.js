@@ -1875,7 +1875,7 @@ function braincoreEvidenceObserveSession(outcome,nowMs=Date.now()){
  * pengetatan diam-diam, jadi ia dibayar dengan tiga pagar yang lane C tidak punya:
  *
  *   1. GERBANG SERVER BERLAPIS TIGA. FEATURE_LEARNER_EVIDENCE + dua flag KV harus sepakat,
- *      dan flag tak terbaca = tolak. Sakelar persetujuan di aplikasi DIHAPUS m025-235
+ *      dan flag tak terbaca = tolak. Sakelar persetujuan di aplikasi DIHAPUS m025-236
  *      (keputusan OWNER): guru memberitahu muridnya sebelum memasang, dan bukti belajar ini
  *      memang data guru.
  *   2. IDENTITAS DITENTUKAN SERVER. Perangkat TIDAK PERNAH mengirim `sub`/`userId`. Ia
@@ -2092,7 +2092,7 @@ window.learnerNameSyncToServer=learnerNameSyncToServer;
 /**
  * Hapus bukti belajar murid INI dari server, lalu kosongkan antrean lokalnya.
  *
- * Sisa dari sakelar persetujuan yang dihapus m025-235, dan sengaja disisakan: sesudah
+ * Sisa dari sakelar persetujuan yang dihapus m025-236, dan sengaja disisakan: sesudah
  * sakelarnya hilang, INI satu-satunya jalur penghapusan atas permintaan yang tersisa selain
  * menunggu purge 180 hari. Ia tidak dipanggil UI mana pun — dipapar ke `window` supaya owner
  * bisa menjalankannya dari konsol di perangkat murid yang bersangkutan.
@@ -4027,7 +4027,7 @@ function localCoachSignal(){const p=buildAdaptivePolicy();if(p.mode==='diagnosti
 // tempat yang memang bertugas menyapa.
 function todayLabel(){try{return uiFormatter(FiezelI18n.getBcp47(),{weekday:'long',day:'numeric',month:'long'},'tanggal').format(new Date())}catch{return dayKey(Date.now())}}
 /**
- * m025-235: sakelar PERSETUJUAN lane bukti per-murid DIHAPUS atas keputusan OWNER. Alasannya
+ * m025-236: sakelar PERSETUJUAN lane bukti per-murid DIHAPUS atas keputusan OWNER. Alasannya
  * ditulis di identityEvidenceActive(). Yang tersisa di sini hanya catatan ini, supaya sesi
  * berikutnya tidak mengira panel itu hilang karena kecelakaan refactor.
  */
@@ -5483,7 +5483,7 @@ function armPuterAuthGate(){
  *     Jadi memanggilnya di setiap boot justru yang diinginkan: sesi berikutnya meneruskan
  *     dari potongan terakhir.
  *
- * m025-235 (keputusan OWNER): GERBANG LOGIN PUTER DICABUT. Dulu baris pertama fungsi ini
+ * m025-236 (keputusan OWNER): GERBANG LOGIN PUTER DICABUT. Dulu baris pertama fungsi ini
  * adalah `if(!puterSignedIn())return false;` - suara neural baru mulai diunduh sesudah
  * murid login Puter, karena saat itu perannya memang cuma cadangan untuk hari jatah Puter
  * habis. Sejak L4 (TTS peramban) dihapus di m025-232, perannya berubah total: mesin neural

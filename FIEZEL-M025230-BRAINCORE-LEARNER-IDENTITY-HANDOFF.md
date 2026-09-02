@@ -132,10 +132,10 @@ ke server** dan disimpan di `learner_name(sub, name, name_day, updated_at)`
 
 ## 4. Persetujuan & retensi
 
-> **DIGANTIKAN m025-235.** Dua butir pertama di bawah ini **sudah tidak berlaku**: gerbang
+> **DIGANTIKAN m025-236.** Dua butir pertama di bawah ini **sudah tidak berlaku**: gerbang
 > persetujuan dihapus atas keputusan OWNER, dan murid yang memasang FIEZEL langsung
 > tersinkron. Alasan, konsekuensi, dan pagar yang tetap berdiri ada di
-> `FIEZEL-M025235-LEARNER-EVIDENCE-OTOMATIS-HANDOFF.md`. Butir retensi di bawah tetap benar.
+> `FIEZEL-M025236-LEARNER-EVIDENCE-OTOMATIS-HANDOFF.md`. Butir retensi di bawah tetap benar.
 
 - ~~Tanpa baris aktif di `learner_evidence_consent` (dengan `policy` =
   `learner-evidence-consent-v1`): **403 `consent_required`, NOL baris**.~~
