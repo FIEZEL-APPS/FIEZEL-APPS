@@ -163,7 +163,16 @@ feature_html=(ROOT/'index.html').read_text(encoding='utf-8',errors='ignore')
 feature_sw=(ROOT/'sw.js').read_text(encoding='utf-8',errors='ignore')
 check('Speaking and Listening route','FiezelSLAddon.create' in app and "go('skills')" in app and './features/speaking-listening/fiezel-speaking-listening-addon.js' in feature_html,'72 A1-C2 Speaking/Listening items are exposed through the isolated Skills Lab route')
 check('Speaking and Listening privacy boundary','fiezel-sl-v1-state' in (ROOT/'features/speaking-listening/speaking-listening-config.js').read_text(encoding='utf-8',errors='ignore') and 'persistRawAudio:false' in (ROOT/'features/speaking-listening/fiezel-speaking-listening-addon.js').read_text(encoding='utf-8',errors='ignore') and 'persistRawTranscript:false' in (ROOT/'features/speaking-listening/fiezel-speaking-listening-addon.js').read_text(encoding='utf-8',errors='ignore'),'sidecar uses isolated state and forbids raw audio/transcript persistence')
-check('Neural voice explicit opt-in','prepareNeuralVoice' in app and 'if(!readStatus().prepared&&!preparedFlag&&allowFallback)return browserSpeak' in (ROOT/'features/neural-voice/fiezel-neural-voice-bootstrap.js').read_text(encoding='utf-8',errors='ignore') and "if(!readStatus().prepared&&!preparedFlag)throw new Error('Neural voice assets are not prepared')" in (ROOT/'features/neural-voice/fiezel-neural-voice-bootstrap.js').read_text(encoding='utf-8',errors='ignore') and '!isNeuralAsset(e.request)' in feature_sw,'large local model cache is user-triggered; ordinary calls may fallback while neural-only calls fail closed, and heavy assets remain excluded from implicit service-worker caching')
+# m025-232: the browser-TTS layer (L4) was removed, so the old second clause of this check --
+# 'if(!readStatus().prepared&&!preparedFlag&&allowFallback)return browserSpeak' -- asserts a
+# branch that no longer exists. The invariant it guarded is UNCHANGED and now strictly stronger:
+# an un-prepared neural engine must fail closed rather than silently starting the 152 MB model
+# download. It used to hold in two different ways (ordinary calls escaped to browser TTS,
+# neural-only calls threw); now every not-prepared path throws, so there is no escape hatch at
+# all. The check is repointed, not relaxed: it still demands the throw, and additionally demands
+# that browserSpeak/allowFallback cannot come back.
+_nv_bootstrap=(ROOT/'features/neural-voice/fiezel-neural-voice-bootstrap.js').read_text(encoding='utf-8',errors='ignore')
+check('Neural voice explicit opt-in','prepareNeuralVoice' in app and "if(!readStatus().prepared&&!preparedFlag)throw new Error('Neural voice assets are not prepared')" in _nv_bootstrap and 'browserSpeak' not in _nv_bootstrap and 'SpeechSynthesisUtterance' not in _nv_bootstrap and '!isNeuralAsset(e.request)' in feature_sw,'large local model cache is user-triggered; every not-prepared call fails closed with no browser-TTS escape hatch, and heavy assets remain excluded from implicit service-worker caching')
 voice_inventory_path=ROOT/'VENDOR-VOICE-INVENTORY.json'
 try: voice_inventory=json.load(open(voice_inventory_path,encoding='utf-8'))
 except Exception: voice_inventory={}
