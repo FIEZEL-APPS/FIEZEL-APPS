@@ -78,7 +78,7 @@
       silenceScale: 0.4
     })
 
-    // Di sini dulu ada `fallback.browserSpeechSynthesis`. m025-231 MENGHAPUS lapisan TTS
+    // Di sini dulu ada `fallback.browserSpeechSynthesis`. m025-232 MENGHAPUS lapisan TTS
     // peramban seluruhnya (keputusan OWNER: suara sistem bukan suara FIEZEL dan pelafalannya
     // mengajarkan bunyi yang salah), jadi bendera ini tidak punya pembaca lagi - jangan
     // dihidupkan kembali. Di bawah L3 mesin perangkat yang tersisa hanya L5 teks senyap.

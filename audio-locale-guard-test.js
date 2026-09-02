@@ -42,7 +42,7 @@ const collect = (dir) => {
 };
 ['features/neural-voice', 'features/audio', 'features/audio-assets', 'workers/api/tts'].forEach(collect);
 
-// 1. m025-231: BOUNDARY-NYA SENDIRI YANG DIHAPUS, dan gerbangnya ikut naik kelas.
+// 1. m025-232: BOUNDARY-NYA SENDIRI YANG DIHAPUS, dan gerbangnya ikut naik kelas.
 //
 // AI-17 F05 dulu dijaga dengan memastikan `utterance.lang` punya default 'en-US' yang benar:
 // selama defaultnya betul, locale murid 'th-TH' tidak akan bocor dan membuat suara sistem Thai
@@ -63,11 +63,11 @@ const SPEECH_API = /\b(speechSynthesis|SpeechSynthesisUtterance)\b/;
 for (const zone of AUDIO_ZONES) {
   check('zona audio bebas speechSynthesis: ' + zone,
     !SPEECH_API.test(stripComments(read(zone))),
-    'L4 dihapus m025-231 — cadangan suara peramban tidak boleh kembali lewat pintu mana pun');
+    'L4 dihapus m025-232 — cadangan suara peramban tidak boleh kembali lewat pintu mana pun');
 }
 check('app.js bebas speechSynthesis',
   !SPEECH_API.test(stripComments(read('app.js'))),
-  'AudioService tidak boleh punya cadangan peramban lagi (m025-231)');
+  'AudioService tidak boleh punya cadangan peramban lagi (m025-232)');
 
 // 2. Tidak ada satu pun berkas zona audio yang menyentuh i18n/locale murid.
 //    Regex sengaja kasar: menyebut nama-nama ini di zona audio adalah bau desain yang salah,

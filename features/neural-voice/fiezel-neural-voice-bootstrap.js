@@ -23,7 +23,7 @@
   // 49-char chunk). The sherpa VITS worker engine removes that failure mode at the source,
   // so neural dispatch is live again everywhere.
   //
-  // m025-231: lapisan TTS peramban (L4) DIHAPUS TOTAL atas keputusan OWNER. Tangga suara
+  // m025-232: lapisan TTS peramban (L4) DIHAPUS TOTAL atas keputusan OWNER. Tangga suara
   // sekarang berhenti di L3 - aset ElevenLabs/R2 (L1), Cloudflare (C1), Puter (L2), lalu
   // mesin neural di perangkat ini (L3); di bawah L3 hanya ada L5 TEKS SENYAP, tidak ada satu
   // pun lapisan yang berbunyi. Konsekuensinya untuk berkas ini cuma satu kalimat, tapi
@@ -88,7 +88,7 @@
   installBootstrapLifecycleDiagnostics();
   const VENDOR_STAGE_PHASES=new Set(['espeak_module_loaded','espeak_worker_promise_create','espeak_runtime_already_ready','espeak_runtime_wait','espeak_runtime_ready','espeak_worker_construct_enter','espeak_worker_construct_ready','espeak_initcache_enter','espeak_list_voices_enter','espeak_list_voices_return','espeak_initcache_ready','espeak_phonemize_enter','espeak_worker_await_ready','espeak_initcache_await_ready','espeak_set_voice_enter','espeak_set_voice_return','espeak_synthesize_enter','espeak_synthesize_return','espeak_synthesize_error']);
   root.__fiezelNeuralVendorStage=entry=>{try{const vendorPhase=String(entry?.phase||'');if(VENDOR_STAGE_PHASES.has(vendorPhase))diag({phase:vendorPhase})}catch{}};
-  // m025-231: yang dibuka kuncinya di dalam gestur tinggal SATU, dan memang hanya itu yang
+  // m025-232: yang dibuka kuncinya di dalam gestur tinggal SATU, dan memang hanya itu yang
   // pernah dipakai lagi - AudioContext milik pemutar neural. Blok kedua yang dulu ada di sini
   // mengantrekan utterance volume-0 supaya TTS peramban ikut terbuka; setelah L4 dihapus blok
   // itu bukan cuma mubazir, ia merugikan, karena menduduki antrean bicara Safari untuk
@@ -421,7 +421,7 @@
     await initialize();
     return status();
   }
-  // m025-231: KONTRAK BARU. speak() hanya punya dua akhir - berbunyi lewat neural, atau
+  // m025-232: KONTRAK BARU. speak() hanya punya dua akhir - berbunyi lewat neural, atau
   // MENOLAK. Tidak ada lagi `allowFallback`/`fallbackOrThrow` yang menukar galat dengan suara
   // peramban, karena tidak ada lagi suara peramban. Setiap jalur gagal di bawah ini melempar
   // galat ASLINYA supaya dua hal tetap utuh: pembukuan circuitOpen/lastFallbackReason yang
@@ -467,7 +467,7 @@
       // circuit for the page lifetime. Every later request then failed closed, which is
       // exactly the "A1 works, A2 goes back to the fallback, fixed only after several
       // reloads" report.
-      // m025-231: akibat salah-klasifikasi itu sekarang LEBIH BERAT, bukan lebih ringan.
+      // m025-232: akibat salah-klasifikasi itu sekarang LEBIH BERAT, bukan lebih ringan.
       // Dulu sirkuit yang terlanjur terkunci masih menjatuhkan aplikasi ke TTS peramban -
       // tetap ada bunyi. Sesudah L4 dihapus, di bawah L3 hanya ada L5 teks senyap, jadi
       // menandai kegagalan transien (superseded/stop/busy/timeout) sebagai kegagalan keras
@@ -509,7 +509,7 @@
   }
   // Berhenti harus mencapai DUA lapisan: permintaan mesin yang sedang jalan, dan potongan
   // yang SUDAH dijadwalkan di garis waktu Web Audio (murid tidak boleh mendengar sisa kalimat
-  // sesudah pindah layar). m025-231: lapisan ketiga - TTS peramban - sudah tidak ada, jadi
+  // sesudah pindah layar). m025-232: lapisan ketiga - TTS peramban - sudah tidak ada, jadi
   // tidak ada lagi antrean bicara peramban yang perlu dibatalkan di sini.
   function stop(){try{service?.stop?.()}catch{}try{playerRef?.cancel?.()}catch{}}
   // T-023 lifecycle: bebaskan sesi neural + WebAudio saat tab tidak terlihat agar
@@ -526,7 +526,7 @@
     return status();
   }
 
-  // m025-231: dipatok false demi alasan yang sama dengan status() - bidangnya tetap ada agar
+  // m025-232: dipatok false demi alasan yang sama dengan status() - bidangnya tetap ada agar
   // dump diagnostik lama tidak berubah bentuk, nilainya jujur karena L4 sudah tidak ada.
   diag({phase:'bootstrap_loaded',crossOriginIsolated:!!root.crossOriginIsolated,browserFallbackWired:false,cacheAvailable:('caches'in root)});
   if(typeof Promise!=='undefined'&&root.caches)refreshPreparedFlag().then(prepared=>{

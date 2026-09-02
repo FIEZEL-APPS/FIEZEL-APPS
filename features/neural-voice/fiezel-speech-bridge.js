@@ -16,7 +16,7 @@
  * Salah satunya absen → jembatan diam tanpa suara galat; suara & subtitle
  * jalan terus (14 §0: suara tidak pernah bergantung pada wajah).
  *
- * DUA TINGKAT KEBENARAN WAKTU (14 §1.3; dulu tiga — lihat catatan m025-231):
+ * DUA TINGKAT KEBENARAN WAKTU (14 §1.3; dulu tiga — lihat catatan m025-232):
  *   L1/L2  'progress' ~4 Hz  → siklus flap DIGERBANG jam audio (macet 900ms /
  *                              dua callback maju <60ms → mulut tutup, buka lagi
  *                              saat callback maju berikutnya).
@@ -26,7 +26,7 @@
  * Arah gagal yang dipilih spec: mulut BERHENTI LEBIH AWAL, tidak pernah
  * mengepak di atas keheningan.
  *
- * m025-231 (keputusan OWNER): lapisan L4 speechSynthesis peramban DIHAPUS dari
+ * m025-232 (keputusan OWNER): lapisan L4 speechSynthesis peramban DIHAPUS dari
  * seluruh aplikasi, jadi tidak ada satu pun pengirim `layer:4` yang tersisa di
  * kabel 'fiezel-speech'. Karena itu SELURUH mesin L4 di berkas ini ikut dibuang —
  * mode 'l4', irama kalemnya (140–200ms, bobot open 5%), dan pagar 45 detik untuk
@@ -219,7 +219,7 @@
     var now = perfNow();
     turn = {
       layer: layer,
-      mode: mode,                           // 'clock' (L1/L2) | 'est' (L3) — tidak ada mode ketiga lagi (m025-231)
+      mode: mode,                           // 'clock' (L1/L2) | 'est' (L3) — tidak ada mode ketiga lagi (m025-232)
       startedAt: now,
       lastT: 0, lastAt: now,                // jam audio terakhir (mode clock)
       slowHits: 0, stalled: false,
@@ -281,7 +281,7 @@
 
   /* Satu beat mulut: bobot 14 §1.1 (sp1 55 / sp2 30 / open 15), tidak pernah
      bentuk sama dua kali beruntun, 'open' ber-cooldown 600ms. Bobot alternatif
-     yang dulu dipakai giliran L4 hilang bersama lapisannya (m025-231): satu
+     yang dulu dipakai giliran L4 hilang bersama lapisannya (m025-232): satu
      lapisan bersuara yang tersisa di sisi taksiran = satu tabel bobot. */
   function pickShape(now) {
     if (turn.small) return turn.lastShape === 'open' ? 'soft' : 'open';
@@ -348,7 +348,7 @@
         feedClock(Number(d.layer) === 2 ? 2 : 1, Number(d.currentTime) || 0);
         break;
       case 'start':                         // L3: yang ada hanyalah durasi taksiran
-        // m025-231: dulu baris ini bercabang ke giliran 'l4' saat d.layer === 4.
+        // m025-232: dulu baris ini bercabang ke giliran 'l4' saat d.layer === 4.
         // Lapisan peramban itu dihapus dan tidak ada lagi yang mengirim layer 4,
         // jadi cabangnya dibuang, bukan disisakan "untuk jaga-jaga": cabang mati
         // membuat pembaca berikutnya percaya masih ada lapisan di bawah L3.

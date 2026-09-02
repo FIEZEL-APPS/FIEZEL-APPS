@@ -19,7 +19,7 @@
  *   L5 teks saja, TANPA bunyi ...... (tidak diubah)
  *
  * Anak tangga L4 speechSynthesis peramban yang dulu berdiri di antara L3 dan L5 sudah
- * DIHAPUS seluruhnya (m025-231, keputusan OWNER). Yang berubah untuk berkas ini bukan
+ * DIHAPUS seluruhnya (m025-232, keputusan OWNER). Yang berubah untuk berkas ini bukan
  * kodenya melainkan TARUHANNYA: dulu C1 yang gagal masih jatuh ke suara peramban, jadi
  * murid tetap mendengar sesuatu; sekarang di bawah L3 tidak ada apa pun yang berbunyi,
  * dan kegagalan render berujung pada L5 — teks yang tetap terbaca, tanpa suara.

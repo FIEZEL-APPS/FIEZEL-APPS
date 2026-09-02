@@ -27,7 +27,7 @@
  *                                    <- lapisan TERAKHIR yang bersuara
  *   L5 teks tanpa suara ............ resolve(false), pemanggil menampilkan teksnya
  *
- * L4 speechSynthesis peramban DIHAPUS (m025-231, keputusan OWNER). Ia dulu duduk di antara
+ * L4 speechSynthesis peramban DIHAPUS (m025-232, keputusan OWNER). Ia dulu duduk di antara
  * L3 dan L5, dan itulah sumber "dua suara sekaligus" yang dilaporkan pada tes kemampuan:
  * pemutar L1/L2/L3 punya jam sendiri, sedangkan `speechSynthesis` punya antrean GLOBAL milik
  * peramban yang TIDAK ikut berhenti saat pemutar kita berhenti. Begitu satu lapisan atas
@@ -254,6 +254,23 @@
     if (!english) return Promise.resolve(false);
 
     var generation = nextTurnGeneration();
+    /* m025-232 — PREEMPTION. Menaikkan generation hanya membuat giliran lama INERT: subtitle
+     * dan event-nya berhenti dihiraukan, tetapi audionya TETAP BERBUNYI. Yang benar-benar
+     * membungkam adalah stop() milik tiap lapisan, dan sampai sekarang itu tugas PEMANGGIL.
+     *
+     * app.js AudioService.play() memang memanggil this.stop() lebih dulu, tetapi ia bukan
+     * satu-satunya pintu: adaptor Skills Lab (app.js, tts.play) memanggil say() LANGSUNG,
+     * dan itu justru jalur yang dipakai sesi listening - tempat OWNER melaporkan suara
+     * bertabrakan. Pemanggil yang lupa stop() dulu tertolong tanpa sengaja oleh L4, yang
+     * memanggil synth.cancel() di jalur bicaranya; antrean global peramban itu ikut
+     * membatalkan sisa lapisan lain. Lapisan itu sudah dihapus, jadi tolong-menolong tidak
+     * disengaja itu ikut hilang.
+     *
+     * Karena itu say() kini mendahului dirinya sendiri: satu giliran bicara, satu suara,
+     * apa pun yang dilakukan pemanggil. Ini TIDAK memancarkan 'interrupt' - giliran baru
+     * mengirim 'start'-nya sendiri beberapa baris lagi, dan memancarkan interupsi di sini
+     * akan membuat mulut maskot berkedip tutup-buka di setiap kalimat. */
+    silenceLayers();
     var opts = turnOptions(options, generation);
     var band_ = subtitles();
 
@@ -704,17 +721,33 @@
     return run;
   }
 
-  function stop() {
-    var generation = nextTurnGeneration(); // NV-08: semua completion/subtitle turn lama menjadi inert.
-    emitSpeech('interrupt', 0, { generation: generation }); // FASE 11: stop() = interupsi giliran — mulut snap tutup (14 §1.4)
+  /**
+   * Bungkam SEMUA pemutar, tanpa menyentuh generation dan tanpa memancarkan event.
+   *
+   * Dipisah dari stop() karena say() juga membutuhkannya - lihat catatan preemption di say().
+   * Ia sengaja TIDAK menutup pita subtitle: say() memanggilnya tepat sebelum menyiapkan pita
+   * untuk giliran BARU, dan menutup pita di sini akan menghapus baris yang belum sempat
+   * tampil. stop() tetap menutup pitanya sendiri sesudah memanggil helper ini.
+   *
+   * Setiap lapisan punya token sendiri (Puter token/current, callGeneration mesin neural,
+   * pipelineGeneration pemutar), dan stop() masing-masing lapisanlah yang membumikannya.
+   * Runtime yang absen cukup diabaikan; memanggil stop() tidak pernah menyiapkan model dan
+   * tidak menyentuh status()/prepare(), jadi pagar unduhan 152 MB tidak tersentuh.
+   */
+  function silenceLayers() {
     var store = assets();
     if (store && typeof store.stop === 'function') { try { store.stop(); } catch (_) {} }
     var voice = engine();
     if (voice && typeof voice.stop === 'function') { try { voice.stop(); } catch (_) {} }
-    // NV-09: shared façade harus menghentikan L3 juga. Memanggil stop() tidak menyiapkan
-    // model dan tidak menyentuh status()/prepare(); runtime yang absen cukup diabaikan.
+    // NV-09: shared façade harus menghentikan L3 juga.
     var local = root.FiezelVoiceRuntime;
     if (local && typeof local.stop === 'function') { try { local.stop(); } catch (_) {} }
+  }
+
+  function stop() {
+    var generation = nextTurnGeneration(); // NV-08: semua completion/subtitle turn lama menjadi inert.
+    emitSpeech('interrupt', 0, { generation: generation }); // FASE 11: stop() = interupsi giliran — mulut snap tutup (14 §1.4)
+    silenceLayers();
     if (band) { try { band.end(); } catch (_) {} }
     return true;
   }
@@ -728,7 +761,7 @@
       assetCount: store && store.status && store.status().manifest ? store.status().manifest.assetCount : 0,
       voiceReady: !!(voice && voice.status && voice.status().ready),
       localFallbackReady: !!localEngine(),
-      // m025-231: L4 dihapus. Kuncinya DIPERTAHANKAN dan dipaku false supaya panel
+      // m025-232: L4 dihapus. Kuncinya DIPERTAHANKAN dan dipaku false supaya panel
       // Diagnostics lama dan gerbang yang membacanya tidak perlu menebak - "tidak ada
       // cadangan peramban" adalah jawaban yang jujur, bukan field yang hilang.
       browserFallbackReady: false,
