@@ -144,6 +144,12 @@ jobs:
           # hanya berisi kunci listen_sc_*, jadi tidak pernah kena sasaran sekali pun.
           # th-exam-overlay-test.js memeriksa jalur bacanya, bukan datanya.
           node th-exam-overlay-test.js
+          # Saudara kandungnya untuk bank konten di app.js. Kelas bug yang sama sudah muncul
+          # TIGA kali: sidecar th berisi terjemahan yang benar, gerbang purity hijau, tetapi
+          # applyContentLocale() tidak pernah menyalinnya ke bank runtime - jadi terjemahannya
+          # terkirim ke perangkat murid lalu menganggur. Berkas ini menjalankan overlay ASLI
+          # atas fixture dan memeriksa nilainya benar-benar mendarat.
+          node th-content-overlay-test.js
           node boot-order-test.js
           node splash-first-paint-test.js
           # m025-199: m025-84 memindahkan markup splash ke frame pertama, tetapi peramban
