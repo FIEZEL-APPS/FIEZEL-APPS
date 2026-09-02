@@ -24,7 +24,9 @@ Urutan aktivasi ada di §7 dan wajib dijalankan berurutan.
 
 ## Sentuhan pada `features/neural-voice/`
 
-**Hanya nomor build** (`DIAG_BUILD` m025-229 → m025-230). **Nol baris logika suara neural
+**Hanya nomor build** (`DIAG_BUILD` m025-229 → **m025-231**; angka 230 diambil `main`
+untuk sapu bersih bank soal Thai (#307) di menit yang sama, jadi cabang ini menaikkannya lagi
+lewat `tools/bump-build.mjs` — persis prosedur yang dijanjikan `coordination/BUILD-VERSION.json`). **Nol baris logika suara neural
 berubah.** Bump-nya wajib, bukan kosmetik: `app.js`, `core-config.js`, dan tiga berkas
 `features/telemetry/` ikut ter-precache shell service worker. Tanpa `SW_REV` naik, PWA yang
 sudah terpasang tetap menyajikan Lane D versi lama — dan sakelar persetujuan di Pengaturan
@@ -193,14 +195,20 @@ menemukan tiga hal yang gerbang terpilih belum melihatnya:
    antrean dari sebelum reset akan mendarat di Owner Dashboard sesudahnya sebagai bukti
    murid yang sama. Keduanya sekarang dihapus, antrean lane D ikut di-`purge()` seperti
    lane C, dan keduanya masuk daftar kontrak gerbang supaya tidak bisa hilang lagi.
-3. **Gerbang OWNER_ROUTES membekukan BENTUK, bukan klaimnya.** `(E) NOL rute owner baru`
+3. **Tabrakan nomor build dengan `main`.** Sesudah perbaikan di butir 4, `main` memakai
+   m025-230 untuk #307. Cabang ini karena itu naik lagi ke **m025-231** lewat
+   `tools/bump-build.mjs` (keempat tempat sekaligus), dan `defaultPreferences` digabung
+   dua sisi: `learnerLocaleExplicit`/`localeAutoDetected` (GEO-IP dari main) DAN
+   `learnerEvidenceConsent` (SLOT 9). Memilih salah satu sisi akan menghapus bawaan milik
+   sisi lain tanpa satu gerbang pun merah.
+4. **Gerbang OWNER_ROUTES membekukan BENTUK, bukan klaimnya.** `(E) NOL rute owner baru`
    meng-assert literal satu baris `const OWNER_ROUTES = [...];`. Ia hijau lokal dan MERAH di
    CI — bukan karena lane per-murid menambah rute, melainkan karena ekspor CSV owner
    (m025-229, sudah di `main`) memperpanjang inventaris itu dan memecahnya ke beberapa baris.
    Gerbangnya sekarang memeriksa klaimnya: enam rute dasar masih ada dan TIDAK ADA satu pun
    entri rute yang menyebut `learner`. `main` ikut di-merge ke cabang ini supaya yang
    dijalankan lokal sama dengan yang dijalankan CI (CI menguji hasil merge, bukan HEAD PR).
-4. **`coordination/BUILD-VERSION.json` tertinggal di m025-229** sementara tiga penanda
+5. **`coordination/BUILD-VERSION.json` tertinggal di m025-229** sementara tiga penanda
    build sudah m025-230 (`coordination-guard-test.js` merah). Sumber tunggal nomor build
    disamakan; tiga penanda tidak diutak-atik.
 
@@ -228,7 +236,7 @@ Dua gerbang yang **diubah dengan sadar**, dan alasannya ditulis di tempatnya:
 3. KV `cfg:flags`: `enabled.learnerEvidence = true` **dan**
    `flags.cfLearnerEvidenceEnabled = true`.
 4. `identityEvidence.mode = 'on'` di `features/telemetry/fiezel-telemetry-config.js`, lalu
-   bump build (m025-230 → m025-231) dan rilis.
+   bump build (m025-231 → m025-232) dan rilis.
 5. Murid menyalakan persetujuan di Pengaturan → Bukti belajar per murid.
 
 Selama satu langkah pun belum dilakukan, lane ini menulis **nol baris**. Verifikasi produksi
