@@ -236,7 +236,8 @@ Hanya 200 teratas yang masuk penjurian, jadi ini bukan pelengkap — ini separuh
 | Risiko | Berat | Sikap |
 |---|---|---|
 | Komponen Emergent tidak jadi/telat | **Tinggi** | Kecil dan sempit by design (§7): satu alur tiga langkah, tanpa integrasi API. Kerjakan di hari 1–2, bukan hari terakhir. |
-| Penjuri memeriksa apakah 15%-nya sungguhan dibangun di Emergent, bukan cuma diklaim | Sedang | Komponen §7 harus benar-benar dipublish di app.emergent.sh dan link-nya disertakan (§7.4) — bukan mockup atau tangkapan layar. |
+| Dropdown "Select an app" di Emergent hanya berisi app yang dibangun di sana — FIEZEL tidak bisa dipilih sama sekali | **Tinggi, dikonfirmasi** | Bukan risiko lagi, sudah jadi rancangan sejak awal (§7.4): app Laporan Orang Tua ITU SENDIRI yang disubmit lewat dropdown itu, FIEZEL disebut lewat judul app + Description (178 karakter), bukan lewat link terpisah. |
+| Description dibatasi 180 karakter — naskah §3 tidak muat | Sedang | Draf 178 karakter sudah disiapkan di §7.4, dipakai apa adanya. |
 | Naskah "personal" tidak cocok syarat "bisnis" | Sedang | Sudah dijawab: submit sebagai FIEZEL untuk Sekolah, dan bagian guru ditambahkan ke landing page pada commit ini. |
 | Murid tidak punya sakelar menolak sinkronisasi bukti | Sedang | Keputusan Owner di `m025-236`, tercatat apa adanya. **Sebut sendiri di submission** sebelum orang lain menemukannya: yang tersimpan hanya nama + ringkasan berbucket, guru memberitahu murid di kelas. Menyembunyikannya jauh lebih mahal daripada menyebutkannya. |
 | Suara neural belum terverifikasi di perangkat | Rendah untuk kontes | Jangan didemokan. Sudah tertulis di §4. |
@@ -286,16 +287,32 @@ sudah ada dan sudah teruji di FIEZEL (§8). Membangunnya ulang di Emergent hanya
 mengulang pekerjaan tanpa menambah cerita. Komponen ini murni mengisi satu langkah
 yang hilang: dari "guru tahu" ke "orang tua tahu".
 
-### 7.4 Bagaimana ini muncul di naskah submission
+### 7.4 Cara submission-nya bekerja di Emergent (dikonfirmasi dari layar app.emergent.sh)
 
-Tambahkan satu kalimat di §3.4 (Solusi) atau sebagai poin keempat di §3.5:
+Ini bukan detail kecil: layar "Build it. Publish it. Submit it." di Emergent punya
+kolom **"Select an app"** berupa dropdown, dan dropdown itu hanya berisi app yang
+sudah dibangun di akun Emergent-mu sendiri. Artinya **FIEZEL tidak bisa dipilih di
+sana sama sekali** — yang dipilih dan disubmit langsung adalah app Laporan Orang
+Tua ini. FIEZEL tidak "ditempelkan" ke submission; ia hanya disebut lewat naskah
+dan judul app, bukan lewat link terpisah.
 
-> **4. Laporan orang tua, bukan cuma dashboard guru.** Bukti belajar tidak berhenti
-> di layar guru. Satu langkah tambahan — dibangun di Emergent — mengubahnya jadi
-> paragraf siap kirim ke WhatsApp orang tua, tanpa guru mengetik ulang dari nol.
+Konsekuensinya: **judul app di Emergent adalah satu-satunya tempat yang menyambungkan
+submission ke FIEZEL**, jadi wajib diawali "FIEZEL —", dan halaman app itu sendiri
+(lihat §7.2, teks pembuka "Bagian dari FIEZEL untuk Sekolah...") yang menanggung
+penjelasan bahwa ini bagian dari produk yang lebih besar, bukan app berdiri sendiri.
 
-Sertakan link ke aplikasi Emergent yang sudah dipublish sebagai bukti, persis
-seperti link ke FIEZEL yang sudah ada untuk sisa produk.
+Kolom **Description** di layar itu dibatasi **180 karakter** — terlalu pendek untuk
+naskah panjang §3. Draf yang muat pas:
+
+> Ubah bukti belajar bahasa Inggris murid jadi laporan siap kirim WhatsApp untuk
+> orang tua. Bagian dari FIEZEL untuk Sekolah — bukti belajar per-murid, gratis
+> untuk lembaga kursus. (178/180 karakter)
+
+Kalau setelah menekan "Publish & Submit" muncul halaman showcase dengan kolom
+tambahan (judul, gambar, naskah panjang) — yang umum di platform kontes semacam
+ini — barulah naskah lengkap §3 dipakai di sana. Kalau ternyata tidak ada kolom
+tambahan, satu-satunya cerita yang sampai ke juri adalah judul app + 178 karakter
+di atas, jadi keduanya harus benar-benar menyebut "FIEZEL" secara eksplisit.
 
 **Anggaran waktu (8 hari):** 1–2 hari membangun komponen ini di Emergent, 1 hari
 data seed dari `grammar-curriculum-v1.json`/`reading-bank.json` untuk demo yang
