@@ -166,6 +166,25 @@
   /** Nada yang sama dengan `noteNoAudio()`: sebut penyebabnya, jangan tuduh murid. */
   var REASSURANCE = 'Item ini nggak dinilai dan nggak dikunci.';
 
+  /* m025-236: naskah kuota dulu HANYA ada di berkas ini dan tidak pernah lewat lapisan
+     i18n, jadi murid Thai membaca 45 kalimat berbahasa Indonesia setiap kali kuota
+     suaranya menipis. COPY di atas tetap menjadi sumber kebenaran nada DAN cadangan
+     terakhir: naskah(key,bidang) mencoba kunci i18n lebih dulu, lalu jatuh ke COPY.
+     Dengan begitu jalur id byte-identik seperti sebelumnya, dan berkas ini tetap bisa
+     dipakai tanpa lapisan i18n sama sekali (harness, uji unit, boot paling awal). */
+  function naskah(kunci, bidang, cadangan) {
+    try {
+      var i18n = (typeof self !== 'undefined' && self.FiezelI18n) || null;
+      if (i18n && typeof i18n.t === 'function') {
+        var penuh = kunci + '.' + bidang;
+        var nilai = i18n.t(penuh);
+        // t() mengembalikan KUNCInya sendiri kalau tidak ketemu - itu bukan naskah.
+        if (nilai && nilai !== penuh) return String(nilai);
+      }
+    } catch (_) {}
+    return cadangan;
+  }
+
   var FALLBACK_KEY = 'service.unknown';
 
   /* ============================================ 2 · KEJUJURAN KEADAAN ================== */
@@ -291,25 +310,32 @@
     var key = resolveKey(f);
     var e = COPY[key];
     var spoken = f.spoken === true;
-    var body = spoken ? e.spoken : e.silent;
+    var body = naskah(key, spoken ? 'spoken' : 'silent', spoken ? e.spoken : e.silent);
     var reset = jakartaResetLabel(f.resetAt);
     if (!spoken && reset && key.indexOf('quota.') === 0 && key !== 'quota.unavailable') {
       // Kalau naskahnya sudah menyebut waktu kembalinya secara kasar ("sesudah tengah
       // malam"), jam pastinya MENGGANTI frasa itu, bukan menempel sesudahnya. Menempel
       // menghasilkan dua kalimat waktu berturut-turut, dan murid membaca yang kedua sebagai
       // aturan lain.
-      body = /sesudah tengah malam/.test(body)
-        ? body.replace('sesudah tengah malam', 'jam ' + reset + ' WIB')
-        : body + ' Jatah berikutnya mulai jam ' + reset + ' WIB.';
+      /* Penanda DAN penggantinya ikut ber-locale. Kalau penandanya dibiarkan literal
+         Indonesia, badan naskah Thai tidak akan pernah cocok - dan cabang else-nya
+         MENEMPELKAN kalimat Indonesia baru di ekor teks Thai. Persis kebocoran yang
+         sedang ditutup, dilahirkan ulang oleh perbaikannya sendiri. */
+      var penanda = naskah('quota.reset', 'marker', 'sesudah tengah malam');
+      var jamnya = naskah('quota.reset', 'at', 'jam {jam} WIB').replace('{jam}', reset);
+      var lanjutan = naskah('quota.reset', 'next', 'Jatah berikutnya mulai jam {jam} WIB.').replace('{jam}', reset);
+      body = body.indexOf(penanda) !== -1
+        ? body.replace(penanda, jamnya)
+        : body + ' ' + lanjutan;
     }
     var a11y = announcement(key, { listeningActive: f.listeningActive === true });
     return Object.freeze({
       schema: SCHEMA,
       key: key,
       requestedCopyKey: String(f.copyKey || ''),
-      title: e.title,
+      title: naskah(key, 'title', e.title),
       body: body,
-      reassurance: REASSURANCE,
+      reassurance: naskah('quota.reassurance', 'text', REASSURANCE),
       spoken: spoken,
       urgency: e.urgency,
       surface: e.surface,
