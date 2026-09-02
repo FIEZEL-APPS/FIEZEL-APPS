@@ -82,11 +82,16 @@ const killSwitchKeys = readFrozenKeys(schema, 'KILL_SWITCH_DEFAULTS');
 // (CLIENT_FLAG_DEFAULTS) dan `social` (KILL_SWITCH_DEFAULTS) — keduanya default false,
 // fail-closed di route-social.js. Sesuai komentar di atas: daftar berubah, angka di sini
 // ikut berubah SADAR, bukan otomatis.
+//
+// 8 & 6 sejak SLOT 9 (1 Sep 2026): lane bukti belajar PER-MURID menambah
+// `cfLearnerEvidenceEnabled` dan `learnerEvidence`, keduanya default false dan fail-closed
+// di route-learner-evidence.js. Angka di bawah dinaikkan SADAR bersama commit itu —
+// gerbang ini memang dirancang supaya penambahan flag tidak bisa lewat tanpa dilihat orang.
 check('CLIENT_FLAG_DEFAULTS terbaca dari workers/api/schema.js',
-  Array.isArray(clientFlagKeys) && clientFlagKeys.length === 7,
+  Array.isArray(clientFlagKeys) && clientFlagKeys.length === 8,
   clientFlagKeys ? clientFlagKeys.join(',') : 'TIDAK TERBACA');
 check('KILL_SWITCH_DEFAULTS terbaca dari workers/api/schema.js',
-  Array.isArray(killSwitchKeys) && killSwitchKeys.length === 5,
+  Array.isArray(killSwitchKeys) && killSwitchKeys.length === 6,
   killSwitchKeys ? killSwitchKeys.join(',') : 'TIDAK TERBACA');
 
 const FLAG_KEYS = new Set(clientFlagKeys || []);

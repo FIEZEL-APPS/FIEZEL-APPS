@@ -87,7 +87,34 @@ wrangler d1 execute fiezel-learning --remote --file=migrations/0007_learning.sql
 wrangler d1 execute fiezel-evidence --remote --file=migrations/0008_evidence.sql
 # --- fiezel-core: lapisan sosial (SLOT 7) ---
 wrangler d1 execute fiezel-core --remote --file=migrations/0006_social.sql
+# --- fiezel-core: lane bukti belajar PER-MURID (SLOT 9) ---
+wrangler d1 execute fiezel-core --remote --file=migrations/0009_learner_evidence.sql
+# --- fiezel-core: nama learner dari perkenalan (SLOT 9) ---
+wrangler d1 execute fiezel-core --remote --file=migrations/0010_learner_name.sql
 ```
+
+`0009_learner_evidence.sql` masuk `fiezel-core` dan **bukan** `fiezel-evidence`,
+dan itu keputusan privasi, bukan kenyamanan. `fiezel-evidence` memegang lane
+AGREGAT yang seluruh kontraknya (0008_evidence.sql, blok "KONTRAK PRIVASI")
+menjanjikan bahwa satu-satunya pengenal di sana adalah `cohort` acak berotasi 14
+hari. Menaruh tabel ber-`sub` di database itu akan mendudukkan identitas akun di
+sebelah cohort, dan sejak detik itu lane agregat berhenti anonim — satu migrasi
+membatalkan seluruh jaminannya. `fiezel-core` sebaliknya sudah memegang
+`identity` dan `social_profile`, jadi lane beridentitas memang tempatnya di sana,
+dan LEFT JOIN ke `social_profile` untuk nama tampilan menjadi mungkin tanpa
+menyalin nama ke tabel kedua.
+
+`0010_learner_name.sql` menyimpan nama panggilan yang WAJIB diisi murid di
+langkah pertama perkenalan, dalam tabel SENDIRI dan bukan sebagai kolom di
+`identity`. Alasannya ada di kepala berkasnya: `0001_identity.sql` memuat daftar
+keras yang melarang nama masuk ke tabel itu, dan larangan itu punya alasan
+operasional yang masih berlaku (tabel jalur-panas, jarang berubah). Nama boleh
+berubah kapan saja; `sub` tidak. Memisahkan keduanya juga yang membuat penggantian
+nama TIDAK memutus bukti belajar yang sudah terkumpul.
+
+Retensi lane ini **180 hari** (`LEARNER_EVIDENCE_LIMITS.RETENTION_DAYS`), bukan
+14 hari seperti lane agregat, dan bukan pula tak terbatas. Alasan dan perintah
+purge-nya ada di `docs/D1-RETENTION.md`.
 
 `0007_learning.sql` masuk database KETIGA (`fiezel-learning`), bukan
 `fiezel-stats`, karena dua alasan yang sama kerasnya dengan penempatan

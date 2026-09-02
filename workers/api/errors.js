@@ -36,7 +36,13 @@ export const ERR = {
   PROFILE_REQUIRED: 'profile_required', // rute sosial butuh profil (belum dibuat)
   HANDLE_TAKEN: 'handle_taken',         // handle sudah diklaim (unik case-insensitive)
   CODE_INVALID: 'code_invalid',         // SATU galat untuk SEMUA sebab kode undangan (anti-oracle)
-  LIMIT_REACHED: 'limit_reached'        // batas struktural (3 kode aktif / 50 teman)
+  LIMIT_REACHED: 'limit_reached',       // batas struktural (3 kode aktif / 50 teman)
+  // --- SLOT 9: lane bukti belajar per-murid (evidence/route-learner-evidence.js) ---
+  LEARNER_EVIDENCE_DISABLED: 'learner_evidence_disabled', // gerbang flag menolak (fail-closed)
+  // Persetujuan murid belum ada, sudah dicabut, atau versinya bukan versi yang
+  // berlaku. SATU kode untuk ketiganya: membedakannya memberi tahu pemanggil
+  // keadaan persetujuan orang lain kalau cookie-nya pernah bocor.
+  CONSENT_REQUIRED: 'consent_required'
 };
 
 /**
