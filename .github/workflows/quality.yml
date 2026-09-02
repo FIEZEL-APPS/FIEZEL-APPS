@@ -131,6 +131,12 @@ jobs:
           # BANK SOAL punya jalur hidrasi sendiri yang tidak pernah lewat copy-map.
           # th-bank-purity-test.js menutup celah itu (lihat THAI-BANK-PURITY-HANDOFF.md).
           node th-bank-purity-test.js
+          # Pemindai KEDUA, sengaja memakai metode lain: th-bank-purity-test.js memakai
+          # leksikon selisih korpus, scan-th-bank-leak.js memakai daftar kata. Titik
+          # butanya BERBEDA — pemindai daftar kata inilah yang menemukan delapan
+          # kebocoran yang gerbang korpus lewatkan ketika korpus Inggrisnya tercemar.
+          # Keduanya wajib bersih; jangan menghapus salah satunya.
+          node tools/scan-th-bank-leak.js
           node boot-order-test.js
           node splash-first-paint-test.js
           # m025-199: m025-84 memindahkan markup splash ke frame pertama, tetapi peramban
