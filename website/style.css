@@ -427,7 +427,12 @@ ul,ol{margin:0;padding:0;list-style:none}
   filter: drop-shadow(0 8px 24px rgba(140, 34, 51, 0.12));
 }
 
-.anim .hula-paw.hula-playing .fz-hula-all {
+.hula-paw,
+.hula-paw * {
+  transform-box: view-box;
+}
+
+.hula-paw.hula-playing .fz-hula-all {
   animation: hula-all-sway 2.4s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
   transform-origin: 160px 280px;
 }
@@ -438,7 +443,7 @@ ul,ol{margin:0;padding:0;list-style:none}
   75% { transform: rotate(3.5deg) translateX(8px) translateY(-3px); }
 }
 
-.anim .hula-paw.hula-playing .fz-hula-torso {
+.hula-paw.hula-playing .fz-hula-torso {
   animation: hula-hip-roll 2.4s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
   transform-origin: 160px 240px;
 }
@@ -449,7 +454,7 @@ ul,ol{margin:0;padding:0;list-style:none}
   75% { transform: rotate(-4deg) translateX(6px) scaleY(0.98); }
 }
 
-.anim .hula-paw.hula-playing .fz-skirt-layer-front {
+.hula-paw.hula-playing .fz-skirt-layer-front {
   animation: skirt-sway-front 2.4s cubic-bezier(0.35, 0.1, 0.25, 1) infinite;
   transform-origin: 160px 222px;
 }
@@ -460,7 +465,7 @@ ul,ol{margin:0;padding:0;list-style:none}
   75% { transform: skewX(14deg) scaleX(1.08) translateX(5px); }
 }
 
-.anim .hula-paw.hula-playing .fz-skirt-blade-left {
+.hula-paw.hula-playing .fz-skirt-blade-left {
   animation: skirt-blade-l 2.4s ease-in-out infinite;
   transform-origin: 110px 224px;
 }
@@ -470,7 +475,7 @@ ul,ol{margin:0;padding:0;list-style:none}
   72% { transform: rotate(10deg) scaleY(0.96); }
 }
 
-.anim .hula-paw.hula-playing .fz-skirt-blade-right {
+.hula-paw.hula-playing .fz-skirt-blade-right {
   animation: skirt-blade-r 2.4s ease-in-out infinite;
   transform-origin: 210px 224px;
 }
@@ -480,7 +485,7 @@ ul,ol{margin:0;padding:0;list-style:none}
   78% { transform: rotate(18deg) scaleY(1.08); }
 }
 
-.anim .hula-paw.hula-playing .fz-skirt-blade-center {
+.hula-paw.hula-playing .fz-skirt-blade-center {
   animation: skirt-blade-c 2.4s ease-in-out infinite;
   transform-origin: 160px 224px;
 }
@@ -490,7 +495,7 @@ ul,ol{margin:0;padding:0;list-style:none}
   75% { transform: rotate(12deg) scaleX(1.1); }
 }
 
-.anim .hula-paw.hula-playing .fz-hula-head {
+.hula-paw.hula-playing .fz-hula-head {
   animation: hula-head-tilt 2.4s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
   transform-origin: 160px 140px;
 }
@@ -500,7 +505,7 @@ ul,ol{margin:0;padding:0;list-style:none}
   75% { transform: rotate(-4.5deg) translateY(-2px); }
 }
 
-.anim .hula-paw.hula-playing .fz-haku-lei {
+.hula-paw.hula-playing .fz-haku-lei {
   animation: haku-lei-bounce 2.4s ease-in-out infinite;
   transform-origin: 160px 50px;
 }
@@ -510,20 +515,20 @@ ul,ol{margin:0;padding:0;list-style:none}
   75% { transform: rotate(2.5deg) translateY(-2px); }
 }
 
-.anim .hula-paw.hula-playing .fz-tail-hula {
-  animation: tail-hula 2.4s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
-  transform-origin: 212px 244px;
+/* Tail Joint Wag (Anchored securely to base, only joint wags naturally) */
+.hula-paw.hula-playing .fz-tail-tip {
+  animation: hula-tail-wag 2.4s ease-in-out infinite;
+  transform-origin: 296px 200px;
 }
-@keyframes tail-hula {
-  0%, 100% { transform: rotate(0deg); }
-  25% { transform: rotate(16deg) translateY(4px); }
-  75% { transform: rotate(-16deg) translateY(-4px); }
+@keyframes hula-tail-wag {
+  0%, 100% { transform: rotate(4deg); }
+  50% { transform: rotate(-14deg); }
 }
 
 /* Routine 1: Ocean Waves */
-.anim .hula-paw.routine-1 .fz-arm-l {
+.hula-paw.routine-1 .fz-arm-l {
   animation: r1-arm-l 2.4s ease-in-out infinite;
-  transform-origin: 106px 186px;
+  transform-origin: 115px 185px;
 }
 @keyframes r1-arm-l {
   0%, 100% { transform: rotate(-8deg) translateY(0); }
@@ -532,9 +537,9 @@ ul,ol{margin:0;padding:0;list-style:none}
   65% { transform: rotate(12deg) translateY(6px); }
   85% { transform: rotate(2deg) translateY(2px); }
 }
-.anim .hula-paw.routine-1 .fz-arm-r {
+.hula-paw.routine-1 .fz-arm-r {
   animation: r1-arm-r 2.4s ease-in-out infinite;
-  transform-origin: 214px 186px;
+  transform-origin: 198px 182px;
 }
 @keyframes r1-arm-r {
   0%, 100% { transform: rotate(8deg) translateY(0); }
@@ -545,18 +550,18 @@ ul,ol{margin:0;padding:0;list-style:none}
 }
 
 /* Routine 2: Tropical Sun */
-.anim .hula-paw.routine-2 .fz-arm-l {
+.hula-paw.routine-2 .fz-arm-l {
   animation: r2-arm-l 2.2s ease-in-out infinite;
-  transform-origin: 106px 186px;
+  transform-origin: 115px 185px;
 }
 @keyframes r2-arm-l {
   0%, 100% { transform: rotate(-35deg) translateY(-20px); }
   30% { transform: rotate(-50deg) translateY(-26px) scaleY(1.06); }
   70% { transform: rotate(-20deg) translateY(-10px); }
 }
-.anim .hula-paw.routine-2 .fz-arm-r {
+.hula-paw.routine-2 .fz-arm-r {
   animation: r2-arm-r 2.2s ease-in-out infinite;
-  transform-origin: 214px 186px;
+  transform-origin: 198px 182px;
 }
 @keyframes r2-arm-r {
   0%, 100% { transform: rotate(35deg) translateY(-20px); }
@@ -565,17 +570,17 @@ ul,ol{margin:0;padding:0;list-style:none}
 }
 
 /* Routine 3: Island Breeze */
-.anim .hula-paw.routine-3 .fz-arm-l {
+.hula-paw.routine-3 .fz-arm-l {
   animation: r3-arm-l 2.4s ease-in-out infinite;
-  transform-origin: 106px 186px;
+  transform-origin: 115px 185px;
 }
 @keyframes r3-arm-l {
   0%, 100% { transform: rotate(18deg) translateX(12px) translateY(8px); }
   50% { transform: rotate(10deg) translateX(8px) translateY(4px); }
 }
-.anim .hula-paw.routine-3 .fz-arm-r {
+.hula-paw.routine-3 .fz-arm-r {
   animation: r3-arm-r 2.4s ease-in-out infinite;
-  transform-origin: 214px 186px;
+  transform-origin: 198px 182px;
 }
 @keyframes r3-arm-r {
   0%, 100% { transform: rotate(36deg) translateY(-18px) scaleX(1.06); }
@@ -583,23 +588,23 @@ ul,ol{margin:0;padding:0;list-style:none}
 }
 
 /* Routine 4: Aloha Celebration */
-.anim .hula-paw.routine-4 .fz-arm-l {
+.hula-paw.routine-4 .fz-arm-l {
   animation: r4-arm-l 2.0s cubic-bezier(0.34, 1.4, 0.64, 1) infinite;
-  transform-origin: 106px 186px;
+  transform-origin: 115px 185px;
 }
 @keyframes r4-arm-l {
   0%, 100% { transform: rotate(-22deg) translateY(-10px); }
   50% { transform: rotate(-44deg) translateY(-22px) scaleY(1.08); }
 }
-.anim .hula-paw.routine-4 .fz-arm-r {
+.hula-paw.routine-4 .fz-arm-r {
   animation: r4-arm-r 2.0s cubic-bezier(0.34, 1.4, 0.64, 1) infinite;
-  transform-origin: 214px 186px;
+  transform-origin: 198px 182px;
 }
 @keyframes r4-arm-r {
   0%, 100% { transform: rotate(22deg) translateY(-10px); }
   50% { transform: rotate(44deg) translateY(-22px) scaleY(1.08); }
 }
-.anim .hula-paw.routine-4 .fz-ear-l {
+.hula-paw.routine-4 .fz-ear-l {
   animation: ear-wiggle-l 1.0s ease-in-out infinite;
   transform-origin: 108px 52px;
 }
@@ -607,7 +612,7 @@ ul,ol{margin:0;padding:0;list-style:none}
   0%, 100% { transform: rotate(0deg); }
   50% { transform: rotate(-10deg); }
 }
-.anim .hula-paw.routine-4 .fz-ear-r {
+.hula-paw.routine-4 .fz-ear-r {
   animation: ear-wiggle-r 1.0s ease-in-out infinite;
   transform-origin: 212px 52px;
 }
@@ -615,4 +620,5 @@ ul,ol{margin:0;padding:0;list-style:none}
   0%, 100% { transform: rotate(0deg); }
   50% { transform: rotate(10deg); }
 }
+
 
