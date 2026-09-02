@@ -122,14 +122,15 @@
     }catch{}
     preparedFlag=false;return false;
   }
-  // m025-231: kunci `speechSynthesis` SENGAJA dipertahankan dan dipatok false, bukan dihapus.
+  // m025-232: kunci lama `speechSynthesis` DIGANTI NAMA menjadi `browserFallbackWired` dan
+  // dipatok false, bukan sekadar dihapus.
   // Panel diagnostik membuang objek status apa adanya, jadi menghilangkan kuncinya membuat
   // baris itu lenyap tanpa keterangan dan orang yang membaca dump lama mengira datanya rusak.
   // False adalah jawaban yang JUJUR sekarang: tidak ada cadangan peramban lagi, sehingga
   // ada-tidaknya speechSynthesis di perangkat tidak lagi mengubah apa pun di jalur suara.
   function status(){
     const stored=readStatus();
-    return Object.freeze({schema:STATUS_SCHEMA,version,phase,prepared:stored.prepared||preparedFlag,assetsCached:stored.prepared||preparedFlag,initialized:!!service,ready:!!service&&!circuitOpen,audibleVerified,circuitOpen,error:lastError,storage:preparedStorage(),totalBytes,assetCount:assets.length,zeroPaidRuntime:true,crossOriginInference:false,crossOriginIsolated:!!root.crossOriginIsolated,speechSynthesis:false,storageEstimate:lastStorageEstimate,timeoutMs:neuralGenerationTimeoutMs(),generationTimeoutMs:neuralGenerationTimeoutMs(),initializeTimeoutMs:INITIALIZE_TIMEOUT_MS,lastFallbackReason,wasmPolicy,engine:NEURAL_ENGINE_ID,engineModel:root.FiezelSherpaVitsAdapter?.MODEL_ID||''});
+    return Object.freeze({schema:STATUS_SCHEMA,version,phase,prepared:stored.prepared||preparedFlag,assetsCached:stored.prepared||preparedFlag,initialized:!!service,ready:!!service&&!circuitOpen,audibleVerified,circuitOpen,error:lastError,storage:preparedStorage(),totalBytes,assetCount:assets.length,zeroPaidRuntime:true,crossOriginInference:false,crossOriginIsolated:!!root.crossOriginIsolated,browserFallbackWired:false,storageEstimate:lastStorageEstimate,timeoutMs:neuralGenerationTimeoutMs(),generationTimeoutMs:neuralGenerationTimeoutMs(),initializeTimeoutMs:INITIALIZE_TIMEOUT_MS,lastFallbackReason,wasmPolicy,engine:NEURAL_ENGINE_ID,engineModel:root.FiezelSherpaVitsAdapter?.MODEL_ID||''});
   }
   function emit(progress,callback){
     const payload=Object.freeze({...progress,totalBytes,assetCount:assets.length,phase});
@@ -527,7 +528,7 @@
 
   // m025-231: dipatok false demi alasan yang sama dengan status() - bidangnya tetap ada agar
   // dump diagnostik lama tidak berubah bentuk, nilainya jujur karena L4 sudah tidak ada.
-  diag({phase:'bootstrap_loaded',crossOriginIsolated:!!root.crossOriginIsolated,speechSynthesis:false,cacheAvailable:('caches'in root)});
+  diag({phase:'bootstrap_loaded',crossOriginIsolated:!!root.crossOriginIsolated,browserFallbackWired:false,cacheAvailable:('caches'in root)});
   if(typeof Promise!=='undefined'&&root.caches)refreshPreparedFlag().then(prepared=>{
     if(prepared){phase='cached';diag({phase:'prepared_idle'});}
   }).catch(()=>{});
