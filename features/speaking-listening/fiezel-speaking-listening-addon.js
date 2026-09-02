@@ -321,7 +321,7 @@
       // m025-28: kemampuan audio berarti PINTU BICARA BERSAMA bisa dipakai, bukan
       // "perangkat ini punya mesin suara". Yang diperiksa memang FiezelVoiceSay.say,
       // karena hanya dia yang tahu lapisan mana yang sanggup berbunyi hari ini.
-      // m025-231: dulu di sini ada catatan bahwa keberadaan suara peramban tidak
+      // m025-232: dulu di sini ada catatan bahwa keberadaan suara peramban tidak
       // relevan; sekarang lapisan itu sudah dihapus dari aplikasi, jadi tidak ada
       // lagi kemampuan kedua yang bisa keliru dihitung — di bawah pintu ini tinggal
       // R2/ElevenLabs, Cloudflare, Puter, neural di perangkat, lalu teks senyap.
@@ -475,7 +475,7 @@
 
   class TTSService{
     constructor(config){this.config=config}
-    // m025-231: baris ini dulu memanggil `speechSynthesis.cancel()` sesudah stop()
+    // m025-232: baris ini dulu memanggil `speechSynthesis.cancel()` sesudah stop()
     // pintu bicara, karena pernah ada lapisan suara peramban dengan antrean sendiri
     // DI LUAR pintu itu — satu-satunya bunyi yang tidak bisa dihentikan FiezelVoiceSay.
     // Lapisan itu dihapus, jadi pembatal keduanya ikut dibuang: menyisakannya berarti
@@ -489,7 +489,7 @@
     // iOS rutin macet pada yang panjang, memicu timeout internal lalu MENGUNCI item.
     // PELAJARANNYA tetap berlaku dan justru makin keras: listening wajib lewat pintu
     // bicara bersama, tidak pernah lewat jalur bunyi sendiri.
-    // m025-231: jalur peramban itu sendiri sudah dihapus dari seluruh aplikasi, jadi
+    // m025-232: jalur peramban itu sendiri sudah dihapus dari seluruh aplikasi, jadi
     // "jangan diganti TTS peramban" bukan lagi godaan yang tersedia - kalau pintu
     // bersama diam, yang benar adalah diam plus teks yang tetap terbaca, bukan
     // mencari sumber bunyi lain di belakang pintu.

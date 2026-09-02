@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * m026-BUG gerbang TANGGA SUARA — dan, sejak m025-231, penjaga PENGHAPUSAN TTS peramban.
+ * m026-BUG gerbang TANGGA SUARA — dan, sejak m025-232, penjaga PENGHAPUSAN TTS peramban.
  *
  * KENAPA BERKAS INI ADA. Bug-bug yang dijaga di sini punya bentuk yang sama, dan itulah yang
  * membuat mereka hidup berbulan-bulan: kodenya MENYEBUT satu lapisan, komentarnya menjanjikan
@@ -9,7 +9,7 @@
  * gagalnya dan melihat siapa yang menyahut. Karena itu gerbang ini memuat blok sumber yang
  * asli ke dalam vm dan memaksa setiap lapisan gagal satu per satu.
  *
- * m025-231 — KEPUTUSAN OWNER, DIMINTA DUA KALI. L4 `speechSynthesis` DIHAPUS dari tangga.
+ * m025-232 — KEPUTUSAN OWNER, DIMINTA DUA KALI. L4 `speechSynthesis` DIHAPUS dari tangga.
  * Tangganya kini: C0 cache klien → L1 aset R2/ElevenLabs → C1 POST /api/tts/render → L2 Puter →
  * L3 mesin neural di perangkat (HANYA bila aset `prepared`) → L5 TEKS TANPA SUARA. Tidak ada
  * lapisan bersuara di bawah L3. Gerbang ini karena itu berbalik arah: yang dulu membuktikan
@@ -330,7 +330,7 @@ function failingController(reason) {
 })();
 
 // ===========================================================================================
-// (b) VOICE SAY — tangga BERHENTI di L3; di bawahnya diam yang jujur (L4 dihapus, m025-231)
+// (b) VOICE SAY — tangga BERHENTI di L3; di bawahnya diam yang jujur (L4 dihapus, m025-232)
 // ===========================================================================================
 
 /**
@@ -483,7 +483,7 @@ function sayHarness(options) {
     `${SAY_CODE.length} char kode dari ${SAY.length} char berkas`);
   check('voice-say: NOL sebutan speechSynthesis/SpeechSynthesisUtterance/speakWithBrowser di KODE',
     !/speechSynthesis|SpeechSynthesisUtterance|speakWithBrowser|FiezelBrowserSpeak/.test(SAY_CODE),
-    'L4 dihapus m025-231: komentar boleh menyebutnya, kode tidak boleh memanggilnya lagi');
+    'L4 dihapus m025-232: komentar boleh menyebutnya, kode tidak boleh memanggilnya lagi');
   check('voice-say: tidak ada sisa BENTUK pemanggilan L4 (new Utterance, breaker peramban)',
     !/new\s+(?:root\.)?SpeechSynthesisUtterance/.test(SAY_CODE)
       && !/BROWSER_BREAKER_MS|BROWSER_COOLDOWN_MS|browserBreaker/.test(SAY_CODE),
@@ -512,7 +512,7 @@ check('app.js: AudioService bisa diambil sebagai blok sumber utuh',
 check('app.js: cadangan TIDAK lagi bersyarat "modul FiezelVoiceSay absen"',
   !/if\(self\.FiezelVoiceSay\?\.say\)return self\.FiezelVoiceSay\.say\(/.test(APP),
   'cabang lama itu mati secara struktural karena sw.js mem-precache modulnya (cf-c1 K11)');
-/* m025-231, kebalikan dari gerbang di atasnya. Dulu yang dijaga adalah "cadangannya benar-benar
+/* m025-232, kebalikan dari gerbang di atasnya. Dulu yang dijaga adalah "cadangannya benar-benar
    DIPANGGIL"; sekarang yang dijaga adalah tidak ada cadangan bersuara sama sekali di dalam
    AudioService. Komentar sejarah di play() memang masih menyebut speechSynthesis - itulah
    sebabnya yang diperiksa KODE-nya, bukan berkasnya. */
@@ -562,7 +562,7 @@ function audioHarness(options) {
         if (opts.sayRejects) return Promise.reject(new Error('voice_playback_failed'));
         if (opts.sayThrows) throw new Error('voice_door_exploded');
         // Paragraf bacaan yang MASIH berbunyi ketika stopwatch 9 detik habis - bentuk persis
-        // dari bug dua-suara m025-231.
+        // dari bug dua-suara m025-232.
         if (opts.sayHangs) return new Promise(() => {});
         return Promise.resolve(opts.sayResult === undefined ? false : opts.sayResult);
       },
@@ -586,7 +586,7 @@ function audioHarness(options) {
   check('app.js: tidak satu pun SpeechSynthesisUtterance dibangun — cadangannya tidak dicoba, bukan gagal',
     falsey.calls.utterances.length === 0,
     `utterance=${falsey.calls.utterances.length}`);
-  /* INVERSI m025-231. Gerbang ini dulu berbunyi "satu kegagalan yang TERTOLONG cadangan tidak
+  /* INVERSI m025-232. Gerbang ini dulu berbunyi "satu kegagalan yang TERTOLONG cadangan tidak
      mengganggu murid dengan pesan": diam adalah hal yang benar karena murid tetap mendengar
      sesuatu. Sekarang tidak ada yang menolong, jadi diam berarti membohongi murid yang sedang
      menunggu suara. Toast-nya WAJIB muncul - sekali, apa adanya. */
@@ -606,7 +606,7 @@ function audioHarness(options) {
     thrownResult === null && thrown.calls.synth === 0,
     `hasil=${JSON.stringify(thrownResult)} speak=${thrown.calls.synth}`);
 
-  /* AKAR m025-231, dan satu-satunya gerbang di berkas ini yang menguji SEBABNYA, bukan
+  /* AKAR m025-232, dan satu-satunya gerbang di berkas ini yang menguji SEBABNYA, bukan
      akibatnya. Satu paragraf bacaan WAJAR berbunyi lebih dari 9 detik, jadi stopwatch di
      play() menang secara rutin SELAGI audionya masih berjalan. Dulu ia resolve `false` -
      nilai yang sama persis dengan "pintu suara bisu" - dan cadangan peramban lalu berbunyi

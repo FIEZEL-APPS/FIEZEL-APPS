@@ -62,7 +62,7 @@
     }
   }
 
-  // m025-231: pickVoice() dan browserSpeakImmediate() DIHAPUS. Keduanya adalah keseluruhan
+  // m025-232: pickVoice() dan browserSpeakImmediate() DIHAPUS. Keduanya adalah keseluruhan
   // jembatan TTS peramban di berkas ini - pemilih suara perangkat, utterance, penjaga waktu
   // 12 detik, dan cancel-nya. Lapisan itu (L4) tidak ada lagi: di bawah L3 neural hanya ada
   // L5 teks senyap. Yang TIDAK ikut dihapus adalah showFallbackNotice() di bawah - lihat
@@ -87,7 +87,7 @@
   }
   function setText(node,value){if(node&&String(node.textContent||'')!==value)node.textContent=value}
   function setDisabled(node,value){if(node&&node.disabled!==!!value)node.disabled=!!value}
-  // m025-231: fungsi ini DIPERTAHANKAN, dan event 'fiezel-neural-voice-degraded' yang ia
+  // m025-232: fungsi ini DIPERTAHANKAN, dan event 'fiezel-neural-voice-degraded' yang ia
   // kirim justru menjadi lebih penting sesudah L4 hilang. fiezel-speech-bridge.js mendengarkan
   // event itu untuk MEMATIKAN animasi mulut maskot; tanpa event ini mulut Pau akan terus
   // bergerak di atas keheningan L5 - persis kesan "aplikasinya menggantung" yang mahal.
@@ -163,7 +163,7 @@
       backgroundReadyPromise=null;
       syncPersistedReadyUi();
     });
-    // m025-231: pemanasan latar tetap tidak boleh menjadi unhandled rejection. Dulu alasannya
+    // m025-232: pemanasan latar tetap tidak boleh menjadi unhandled rejection. Dulu alasannya
     // "audio biasa sudah selesai lewat jembatan peramban"; jembatan itu sudah dihapus, tapi
     // alasannya masih berlaku dalam bentuk lain - primeBackgroundReady() dipanggil juga dari
     // MutationObserver dan dari klik tombol yang penolakannya sudah ditangani di tempat lain.
@@ -213,7 +213,7 @@
     else refresh();
   }
 
-  // m025-231: kelima cabang yang dulu berakhir di browserSpeakImmediate() kini berakhir sama:
+  // m025-232: kelima cabang yang dulu berakhir di browserSpeakImmediate() kini berakhir sama:
   // neural berbunyi, atau penolakan naik ke pemanggil. Perbedaan `neuralOnly` (allowFallback
   // === false) ikut hilang karena ia hanya pernah berarti "jangan pakai TTS peramban" - sesuatu
   // yang sekarang berlaku untuk SEMUA pemanggil, jadi menyimpannya berarti menyimpan dua nama
@@ -235,7 +235,7 @@
         // A user-requested utterance is explicit intent and may retry even when the
         // background automatic attempt for this prepared+cold epoch already failed.
         const warming=primeBackgroundReady({automatic:false});
-        // m025-231 TITIK PALING RAWAN DI BERKAS INI. Dulu cabang ini menjawab SEKETIKA dengan
+        // m025-232 TITIK PALING RAWAN DI BERKAS INI. Dulu cabang ini menjawab SEKETIKA dengan
         // TTS peramban sementara mesin neural memanas di latar - murid mendapat bunyi tanpa
         // menunggu. Sesudah L4 dihapus tidak ada lagi yang bisa mengisi jeda itu, jadi satu-
         // satunya jawaban jujur adalah MENUNGGU pemanasan lalu bicara neural, atau melempar.
@@ -276,7 +276,7 @@
     }
   }
 
-  // m025-231: yang perlu dihentikan tinggal mesin neural. Blok pembatalan antrean bicara
+  // m025-232: yang perlu dihentikan tinggal mesin neural. Blok pembatalan antrean bicara
   // peramban di sini menjadi kode mati begitu browserSpeakImmediate() dihapus - tidak ada lagi
   // yang pernah menyalakan penandanya.
   function stop(){
@@ -290,7 +290,7 @@
     return Object.freeze({...base,wasmPolicy,audibilityPatch:'v1',persistedReadyUxPatch:'m025-18'});
   }
 
-  // m025-231: penanda __fiezelTtsUnlocked ikut hilang bersama pemanasan volume-0 di bootstrap
+  // m025-232: penanda __fiezelTtsUnlocked ikut hilang bersama pemanasan volume-0 di bootstrap
   // yang dulu ia tahan, dan browserSpeakImmediate tidak lagi diekspor - permukaan publik berkas
   // ini sekarang murni neural.
   root.FiezelVoiceRuntime=Object.freeze({...runtime,status,ensureReady,speak,stop,__audibilityPatched:true});

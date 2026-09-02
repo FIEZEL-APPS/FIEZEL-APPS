@@ -276,7 +276,7 @@
   }
 
   /**
-   * m025-231: lapisan TTS peramban DIHAPUS dari berkas ini, bukan sekadar dimatikan.
+   * m025-232: lapisan TTS peramban DIHAPUS dari berkas ini, bukan sekadar dimatikan.
    *
    * Dulu di sini berdiri `createBrowserFallback(env)` yang membacakan teks lewat
    * `speechSynthesis` / `SpeechSynthesisUtterance` sebagai cadangan paling bawah. Ia dibuang
@@ -284,7 +284,7 @@
    * peranti dan peramban, dan pelafalannya justru mengajarkan bunyi yang salah kepada murid
    * yang sedang belajar mendengar bahasa Inggris. Lebih baik senyap daripada salah ajar.
    *
-   * Tangga suara sesudah m025-231: L1 ElevenLabs/R2 -> C1 Cloudflare -> L2 Puter ->
+   * Tangga suara sesudah m025-232: L1 ElevenLabs/R2 -> C1 Cloudflare -> L2 Puter ->
    * L3 mesin di perangkat -> L5 TEKS SENYAP. Tidak ada lapisan berbunyi di bawah L3.
    *
    * Konsekuensinya untuk berkas ini: setiap jalur gagal WAJIB menolak (reject). Pemanggil
@@ -555,7 +555,7 @@
       });
 
       if (!adapter) {
-        // m025-231: tidak ada lagi cadangan peramban di bawah titik ini. Menolak adalah cara
+        // m025-232: tidak ada lagi cadangan peramban di bawah titik ini. Menolak adalah cara
         // tangga turun ke L5 teks senyap; mengembalikan objek apa pun justru akan membungkam
         // teks itu juga.
         throw new Error('Neural voice adapter unavailable');
@@ -760,9 +760,9 @@
       } catch (error) {
         diag({ phase: 'voice_service_error', requestId, voice, error: String(error && (error.message || error.name) || error) });
         // Penjaga supersede sengaja DIPERTAHANKAN walau kini kedua cabang sama-sama melempar.
-        // Sampai m025-231 justru di sinilah bedanya terasa: permintaan yang sudah digantikan
+        // Sampai m025-232 justru di sinilah bedanya terasa: permintaan yang sudah digantikan
         // tidak boleh membajak pemutaran dengan membacakan ulang teksnya lewat TTS peramban.
-        // Cadangan itu hilang, jadi yang tersisa hanya satu aturan - m025-231: gagal berarti
+        // Cadangan itu hilang, jadi yang tersisa hanya satu aturan - m025-232: gagal berarti
         // gagal, semua jalur melempar supaya tangga turun ke L5 teks senyap.
         if (callGeneration !== generation) throw error;
         throw error;

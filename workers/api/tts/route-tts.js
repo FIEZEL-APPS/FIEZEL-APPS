@@ -398,7 +398,7 @@
    * tidak boleh berubah di cabang mana pun: `quotaCharged:false` - jatah suara murid
    * tidak dipotong sedikit pun, karena tidak ada satu byte audio yang diproduksi.
    *
-   * m025-231: paragraf ini dulu ditutup dengan "murid tetap punya jalan keluar yang nyata:
+   * m025-232: paragraf ini dulu ditutup dengan "murid tetap punya jalan keluar yang nyata:
    * suara perangkat (`speechSynthesis`)". Jalan keluar itu SUDAH TIDAK ADA - lapisan
    * peramban dihapus dari seluruh aplikasi dan di bawah L3 (neural di perangkat) tidak ada
    * lagi apa pun yang berbunyi. Justru karena itu `quotaCharged:false` makin tidak boleh

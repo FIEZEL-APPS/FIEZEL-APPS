@@ -12,7 +12,7 @@
  *
  * Tujuh janji:
  *   (a) flag 'off' = NOL permintaan ke Cloudflare dan tangga hari ini utuh (aset → Puter →
- *       neural bila prepared → DIAM, teks tetap terbaca; L4 peramban dihapus m025-231);
+ *       neural bila prepared → DIAM, teks tetap terbaca; L4 peramban dihapus m025-232);
  *   (b) flag 'on' = urutannya benar dan `POST /api/tts/render` berada TEPAT di antara aset R2
  *       dan Puter — bukan sebelum aset (yang sudah dibayar, gratis), bukan sesudah Puter;
  *   (c) klien tidak pernah mengirim kunci cache. Kuncinya dihitung ULANG di server
@@ -192,7 +192,7 @@ function harness(options) {
       ensureReady() { calls.ensureReady++; return Promise.reject(new Error('ensureReady_must_never_be_called')); },
       stop() {}
     },
-    /* PERANGKAP L4. Lapisan `speechSynthesis` sudah DIHAPUS dari tangga (m025-231, keputusan
+    /* PERANGKAP L4. Lapisan `speechSynthesis` sudah DIHAPUS dari tangga (m025-232, keputusan
        OWNER), tetapi stubnya sengaja tetap berdiri di sini: pintu yang terbuka lebar adalah
        satu-satunya cara membuktikan bahwa tangga tidak melewatinya. Kalau stubnya dibuang,
        setiap gerbang "tidak berbunyi lewat peramban" akan lulus karena kesempatannya tidak ada
@@ -251,7 +251,7 @@ const idx = (trace, needle) => trace.findIndex((entry) => entry.indexOf(needle) 
     JSON.stringify({ enabled: offHit.api.status().cfVoiceEnabled, mode: offHit.api.status().cfVoiceMode }));
   offHit.done();
 
-  /* Aset TIDAK ada dan Puter gagal. Sejak m025-231 tangga hari ini BERHENTI di L3: tidak ada
+  /* Aset TIDAK ada dan Puter gagal. Sejak m025-232 tangga hari ini BERHENTI di L3: tidak ada
      lagi anak tangga bersuara di bawahnya. Harness ini prepared:true supaya anak tangga
      terakhir itu benar-benar terlihat di jejaknya; varian prepared:false tepat di bawahnya
      menguji apa yang terjadi ketika L3 pun belum ada - kasus murid baru. */
@@ -368,7 +368,7 @@ const idx = (trace, needle) => trace.findIndex((entry) => entry.indexOf(needle) 
   /* ---------------------------------------------------------------- (f) kuota 429 --------- */
 
   /* 429 harus TURUN, dan turunnya kini berhenti di L3. Harness ini memberi L3 yang benar-benar
-     berbunyi: janji "murid TETAP mendengar sesuatu bila mungkin" masih hidup sesudah m025-231,
+     berbunyi: janji "murid TETAP mendengar sesuatu bila mungkin" masih hidup sesudah m025-232,
      hanya saja yang menyahut paling bawah adalah mesin di perangkat - bukan suara peramban,
      yang punya antrean global dan karena itu bisa berbunyi menimpa pemutar kita. */
   const quota = harness({
@@ -392,7 +392,7 @@ const idx = (trace, needle) => trace.findIndex((entry) => entry.indexOf(needle) 
 
   /* Varian JUJUR: tidak ada satu pun lapisan yang bersuara. Keadaan ini dulu disimulasikan
      dengan `delete sandbox.speechSynthesis` - dunia dihapus supaya hasilnya diam. Sejak
-     m025-231 tidak ada yang perlu dihapus: perangkat yang aset neuralnya belum diunduh memang
+     m025-232 tidak ada yang perlu dihapus: perangkat yang aset neuralnya belum diunduh memang
      SUDAH tidak punya lapisan bersuara di bawah Puter, dan itulah keadaan murid baru yang
      sebenarnya. Perangkap `speechSynthesis` justru dibiarkan terpasang, supaya diam di sini
      terbukti sebagai KEPUTUSAN, bukan sebagai kekurangan alat.
@@ -468,7 +468,7 @@ const idx = (trace, needle) => trace.findIndex((entry) => entry.indexOf(needle) 
     !/(^|[^A-Za-z_.$])fetch\s*\(/.test(SAY),
     'seluruh pengetahuan jaringan tinggal di fiezel-cf-tts-transport.js');
 
-  /* m025-231. Lapisan suara peramban DIHAPUS dari tangga atas keputusan OWNER; jalur CF tidak
+  /* m025-232. Lapisan suara peramban DIHAPUS dari tangga atas keputusan OWNER; jalur CF tidak
      boleh menjadi pintu belakangnya. Yang dihitung adalah KODE, bukan berkas: komentar tangga
      di kepala kedua berkas ini memang masih menyebut L4 sebagai sejarah, dan di sanalah memang
      tempatnya - gerbang yang menghukum penjelasan hanya akan membuat penjelasannya dihapus. */

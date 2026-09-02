@@ -5623,7 +5623,7 @@ function pawFaceMarkup(){try{if(self.FiezelPaw?.ready?.())
 // bicara. FiezelVoiceSay tidak mengekspor isSpeaking, jadi sinyalnya dirakit dari dua
 // pengamat.
 //
-// m025-231: dulu baris keduanya membaca `speechSynthesis.speaking` milik cadangan peramban.
+// m025-232: dulu baris keduanya membaca `speechSynthesis.speaking` milik cadangan peramban.
 // Cadangan itu sudah dihapus, dan menggantinya dengan FiezelSpeechBridge.speaking() BUKAN
 // sekadar tambal: jembatan itu mengikuti aliran event 'fiezel-speech' dari fasad, jadi ia
 // menjawab benar untuk SEMUA lapisan yang tersisa - aset R2/ElevenLabs (L1), Cloudflare (C1),
@@ -7552,7 +7552,7 @@ function vocab(){const level=getActiveLevel(),active=V.filter(v=>v.level===level
 // Indonesia. Bacaan tidak punya pasangan terjemahan di banknya, jadi barisnya datang
 // dari penerjemah - itulah satu-satunya jalur yang memakai jatah AI.
 //
-// m025-231 (laporan OWNER: dua suara sekaligus di sesi listening tes kemampuan).
+// m025-232 (laporan OWNER: dua suara sekaligus di sesi listening tes kemampuan).
 // Cadangan speechSynthesis peramban DIHAPUS TOTAL dari pintu ini.
 //
 // AKARNYA ada di play(): `viaDoor` adalah Promise.race antara pintu suara dan timeout 9 detik.
@@ -7590,7 +7590,7 @@ function AudioService(){
    */
   prefetch(next,options={}){return prefetchNextVoice(next,{speed:options.speed??selectedNeuralRate(),contentType:options.contentType,locale:options.locale})},
   /**
-   * Satu pintu untuk Reading/Vocabulary/Grammar. Sejak m025-231 ia TIDAK punya cadangan
+   * Satu pintu untuk Reading/Vocabulary/Grammar. Sejak m025-232 ia TIDAK punya cadangan
    * bersuara: hasil selain "berbunyi" berarti teks tanpa suara, dan sekali per sesi murid
    * diberi tahu lewat noteSilence().
    */
@@ -7617,7 +7617,7 @@ function AudioService(){
     * FiezelSubtitleTranslate yang mengikuti locale murid, jadi jalur Thai mati di titik yang
     * sama persis. */
    const noSubtitles=options.suppressSubtitles===true||options.contentType==='listening';
-   /* m025-231. Timeout ini dulu resolve `false` - nilai yang SAMA dengan "pintu suara tidak
+   /* m025-232. Timeout ini dulu resolve `false` - nilai yang SAMA dengan "pintu suara tidak
     * berbunyi" - dan di ujung play() `false` berarti "nyalakan cadangan peramban". Karena satu
     * paragraf bacaan wajar berbunyi lebih dari 9 detik, stopwatch ini menang secara rutin
     * SELAGI audio ElevenLabs masih berjalan, lalu utterance peramban berbunyi menimpanya.

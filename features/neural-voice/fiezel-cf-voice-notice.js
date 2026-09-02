@@ -23,7 +23,7 @@
  *
  * DUA VARIAN UNTUK SETIAP KEADAAN, dan itu inti berkas ini:
  *   spoken:true  → murid TETAP mendengar sesuatu (Puter atau neural di perangkat yang
- *                  menyahut; m025-231 menghapus cadangan peramban, jadi ia bukan lagi
+ *                  menyahut; m025-232 menghapus cadangan peramban, jadi ia bukan lagi
  *                  salah satu penyahut). Naskahnya menyebut penurunan mutu, bukan kegagalan.
  *   spoken:false → tidak ada suara sama sekali. Naskahnya JUJUR: mengatakan audionya tidak
  *                  ada, mengatakan teksnya tetap bisa dibaca, dan mengatakan kapan ia
@@ -138,7 +138,7 @@
       spoken: spoken,
       // Lapisan yang akhirnya bersuara, untuk diagnostik: '' berarti tidak ada bunyi sama
       // sekali, selain itu nama lapisan yang dikirim pemanggil ('puter' | 'neural' |
-      // 'fallback'). m025-231: nilai 'browser' DICORET dari kosakata ini bersama lapisan
+      // 'fallback'). m025-232: nilai 'browser' DICORET dari kosakata ini bersama lapisan
       // speechSynthesis-nya. Tidak ada satu pun kode yang bisa memproduksinya lagi, dan
       // membiarkannya berdiri di daftar membuat pembaca diagnostik berikutnya percaya
       // masih ada cadangan peramban di bawah L3 — padahal di bawah L3 tinggal teks senyap.
