@@ -191,7 +191,7 @@ periksa akun (`whoami`) dan `--remote`.
 ## 4. Merge PR aktivasi (sakelar server + klien)
 
 PR **[#312](https://github.com/FIEZEL-APPS/FIEZEL-APPS/pull/312)** berisi dua
-sakelar terakhir dan bump build m025-232:
+sakelar terakhir dan bump build m025-234:
 
 - `workers/api/wrangler.toml`: `FEATURE_LEARNER_EVIDENCE = "on"`
 - `features/telemetry/fiezel-telemetry-config.js`: `identityEvidence.mode = 'on'`
@@ -215,7 +215,7 @@ Bukti sudah kena: buka `owner.fiezel.my.id`, panel **"🧑‍🎓 Murid per oran
 pada periode ini"* — bukan *"belum dikonfigurasi"*, bukan *"pengukuran tidak
 tersedia"*. Arti ketiganya ada di tabel §7.
 
-## 6. Rilis aplikasi (m025-232)
+## 6. Rilis aplikasi (m025-234)
 
 Jalankan `deploy-site.yml` dari halaman Actions yang sama.
 

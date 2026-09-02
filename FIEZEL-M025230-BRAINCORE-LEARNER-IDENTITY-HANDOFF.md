@@ -8,13 +8,13 @@ diverifikasi, dan langkah berikutnya — supaya sesi berikutnya tidak menebak.
 
 ## Status
 
-**KODE SELESAI. DUA SAKELAR SUDAH DINYALAKAN DI KODE (m025-232), DUA LANGKAH INFRASTRUKTUR
+**KODE SELESAI. DUA SAKELAR SUDAH DINYALAKAN DI KODE (m025-234), DUA LANGKAH INFRASTRUKTUR
 MASIH MENUNGGU OWNER. PRODUKSI BELUM DIVERIFIKASI.**
 
 - Rantai penuh (murid → identitas → Braincore → bukti → D1 → API owner → Owner Dashboard)
   terpasang dan terbukti lewat gerbang `braincore-learner-identity-test.js` (177 assert,
   Worker penuh + D1 palsu), termasuk nama murid dari perkenalan (§3).
-- **m025-232 menyalakan langkah 2 dan 4** dari §7: `FEATURE_LEARNER_EVIDENCE="on"` dan klien
+- **m025-234 menyalakan langkah 2 dan 4** dari §7: `FEATURE_LEARNER_EVIDENCE="on"` dan klien
   `identityEvidence.mode:'on'`. **Rilis ini TIDAK boleh mendarat sebelum langkah 1 dan 3
   dijalankan** — lihat peringatan urutan di §7.
 - Lane tetap menulis **nol baris** sampai langkah 1 dan 3 selesai: tanpa migrasi 0009/0010
@@ -238,13 +238,13 @@ Dua gerbang yang **diubah dengan sadar**, dan alasannya ditulis di tempatnya:
 1. `wrangler d1 execute fiezel-core --remote --file=migrations/0009_learner_evidence.sql`
    **dan** `wrangler d1 execute fiezel-core --remote --file=migrations/0010_learner_name.sql`
 2. ~~`FEATURE_LEARNER_EVIDENCE = "on"` di `workers/api/wrangler.toml`~~ **SUDAH di kode
-   (m025-232)** — tinggal deploy Worker api sesudah langkah 1.
+   (m025-234)** — tinggal deploy Worker api sesudah langkah 1.
 3. KV `cfg:flags`: `enabled.learnerEvidence = true` **dan**
    `flags.cfLearnerEvidenceEnabled = true`.
 4. ~~`identityEvidence.mode = 'on'` di `features/telemetry/fiezel-telemetry-config.js` + bump
-   build~~ **SUDAH di kode (m025-231 → m025-232)** — tinggal rilis sesudah langkah 1 dan 3.
+   build~~ **SUDAH di kode (m025-233 → m025-234)** — tinggal rilis sesudah langkah 1 dan 3.
 
-**URUTAN ITU BUKAN FORMALITAS.** Kalau rilis m025-232 mendarat sebelum langkah 1/3: setiap
+**URUTAN ITU BUKAN FORMALITAS.** Kalau rilis m025-234 mendarat sebelum langkah 1/3: setiap
 perangkat murid memanggil endpoint yang menjawab 403 `learner_evidence_disabled` (fail-closed,
 jadi tidak ada data yang bocor dan tidak ada pelajaran yang terganggu), TETAPI sakelar
 persetujuan sudah muncul di Pengaturan. Murid yang menyalakannya akan melihat sakelarnya
