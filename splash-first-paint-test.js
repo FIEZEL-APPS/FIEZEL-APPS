@@ -241,7 +241,15 @@ test('jaring pengaman: splash tidak bisa mengurung murid kalau boot gagal', () =
     'index.html harus menyediakan jalan keluar mandiri untuk splash frame-pertama');
   assert.ok(/setTimeout\(function \(\) \{[\s\S]{0,200}?dismiss\(\);\s*\}, 15000\)/.test(html),
     'harus ada pewaktu jaring pengaman yang membuang splash bila tak pernah diadopsi');
-  assert.ok(/load\(\)\.catch\(e=>\{dismissBootSplash\(\);/.test(appSource),
+  // Diperiksa pada RANTAI bootFiezel, bukan pada urutan byte "load().catch(" — m026 GEO-IP
+  // membungkus load() di belakang maybeAutoDetectLocale(), jadi pola lama berhenti cocok
+  // padahal jaminannya utuh: .catch tetap menangkap penolakan dari SELURUH rantai, termasuk
+  // load(). Yang dijaga tetap sama persis: rantai boot memanggil load(), dan penangkap
+  // galatnya membuang splash SEBELUM menulis pesan galat.
+  const rantaiBoot = appSource.slice(appSource.indexOf('function bootFiezel('), appSource.indexOf('function bootFiezel(') + 900);
+  assert.ok(/\bload\(\)/.test(rantaiBoot),
+    'rantai bootFiezel harus benar-benar memanggil load()');
+  assert.ok(/\.catch\(e=>\{dismissBootSplash\(\);/.test(rantaiBoot),
     'boot yang gagal harus membuang splash sebelum menulis pesan galat di baliknya');
   assert.ok(/if\(!splash\|\|typeof splash\.show!=='function'\)\{dismissBootSplash\(\);/.test(appSource),
     'modul splash yang hilang tidak boleh meninggalkan lapisan penuh layar');
