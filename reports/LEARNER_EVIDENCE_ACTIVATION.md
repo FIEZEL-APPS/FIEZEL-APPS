@@ -23,11 +23,38 @@ node -v
 Harus mencetak `v20` atau lebih baru. Kalau tidak dikenali, pasang dari
 https://nodejs.org (tombol LTS), tutup-buka Terminal, ulangi.
 
+**Klon ke folder BARU `PRODING/FIEZEL-APPS`**, bukan ke folder lama yang mungkin
+sudah berisi perubahan setengah jadi. Folder baru = titik awal yang bersih, dan
+kalau ada yang kacau tinggal hapus foldernya tanpa kehilangan apa pun.
+
+**Windows (PowerShell):**
 ```
+mkdir $HOME\PRODING
+cd $HOME\PRODING
 git clone https://github.com/FIEZEL-APPS/FIEZEL-APPS.git
 cd FIEZEL-APPS
 ```
-(kalau foldernya sudah ada, cukup `cd` ke sana lalu `git pull`)
+
+**Mac / Linux (Terminal):**
+```
+mkdir -p ~/PRODING
+cd ~/PRODING
+git clone https://github.com/FIEZEL-APPS/FIEZEL-APPS.git
+cd FIEZEL-APPS
+```
+
+Hasilnya: `PRODING/FIEZEL-APPS`. Kalau mau di tempat lain (misalnya `D:\PRODING`),
+ganti dua baris pertama saja — sisa panduan ini tidak berubah.
+
+Kalau `mkdir` mengeluh foldernya sudah ada, itu bukan masalah: lanjut `cd` saja.
+Kalau `git clone` mengeluh `FIEZEL-APPS` sudah ada di dalam `PRODING`, berarti
+klonnya pernah dibuat — `cd FIEZEL-APPS` lalu `git pull` sudah cukup.
+
+Bukti Anda berada di folder yang benar sebelum lanjut:
+```
+git remote -v
+```
+Harus menyebut `FIEZEL-APPS/FIEZEL-APPS`.
 
 ```
 npx wrangler@3 login
