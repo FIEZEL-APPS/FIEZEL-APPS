@@ -50,7 +50,11 @@ const ALLOWLIST = new Set([
   // mana pun, sehingga selisih korpus salah menggolongkannya Indonesia-saja. Penjelasan tata
   // bahasa Thai mengutip kata yang sama persis, jadi tanpa ini kalimat Thai yang benar
   // dituduh berbahasa Indonesia.
-  'farther', 'further', 'republic'
+  'farther', 'further', 'republic',
+  // NAMA KOTA. 'Malang' juga kata sifat Indonesia ('sial'), jadi selisih korpus
+  // menggolongkannya Indonesia-saja; sebagai nama tempat ia memang tidak diterjemahkan
+  // ke locale mana pun dan muncul apa adanya di pilihan jawaban Thai.
+  'malang'
 ]);
 
 function buildLexicon(ROOT) {
@@ -200,6 +204,17 @@ const KATA_PER_KATA_DITINJAU = new Set([
   "“Mustn't” = ห้าม อย่าทำ ส่วน “Needn't” / “don't have to” = ไม่จำเป็น เลือกได้ตามใจ รูปปฏิเสธพลิกความหมาย เพราะ “must” กับ “have to” คล้ายกัน แต่ “mustn't” กับ “needn't” ต่างกันมาก",
   "ภาพวาด หนังสือ ความคิด ใช้ “some of WHICH” ส่วนอาสาสมัคร นักเรียน ใช้ “many of WHOM”",
   "“Because” ใช้บอกเหตุผล ส่วน “so” ใช้บอกผล คือ เหตุผล + “so” + ผล หรือ ผล + “because” + เหตุผล ให้ใช้อย่างใดอย่างหนึ่งต่อหนึ่งประโยคเท่านั้น",
+  "ผลไม้ ขนม และชา",
+  "ขนมปัง นม และข้าว",
+  "ข้าว ไข่ และซุป",
+  "ปลา น้ำ และขนม",
+  "ขนมปัง ข้าวสาร และชา",
+  "ไข่ น้ำตาล และนม",
+  "ขนมปัง น้ำตาล และนม",
+  "ผลไม้ ขนมปัง และน้ำ",
+  "นม น้ำแข็ง และส้มหนึ่งลูก",
+  "ตามเนื้อเรื่อง ชั้น ม.3 ทาสีอะไรบนผนัง?",
+  "ตามเนื้อเรื่อง ชั้น ม.1 ปลูกอะไรในกระบะ?",
 ]);
 
 function thaiKataPerKata(value) {
