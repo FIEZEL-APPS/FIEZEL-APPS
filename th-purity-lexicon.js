@@ -54,7 +54,11 @@ const ALLOWLIST = new Set([
   // NAMA KOTA. 'Malang' juga kata sifat Indonesia ('sial'), jadi selisih korpus
   // menggolongkannya Indonesia-saja; sebagai nama tempat ia memang tidak diterjemahkan
   // ke locale mana pun dan muncul apa adanya di pilihan jawaban Thai.
-  'malang'
+  'malang',
+  // MORFEM Inggris yang dikutip telanjang di penjelasan tata bahasa: '-est' hanya pernah
+  // muncul MENEMPEL pada kata di korpus Inggris ('largest'), tidak pernah sebagai token
+  // sendiri, jadi kutipan telanjangnya jatuh ke selisih Indonesia-saja.
+  'est'
 ]);
 
 function buildLexicon(ROOT) {
@@ -63,6 +67,14 @@ function buildLexicon(ROOT) {
   const EN = new Set();
   const addID = (s) => tokens(s).forEach((w) => ID.add(w.toLowerCase()));
   const addEN = (s) => tokens(s).forEach((w) => EN.add(w.toLowerCase()));
+
+  // Prosa Inggris yang MENGUTIP bahasa Indonesia di dalam tanda kutip — pola yang dipakai
+  // konsisten di bank grammar dan kunci miskonsepsi: "mirroring the Indonesian order 'minum
+  // selalu'", "transferring Indonesian 'untuk'". Kutipannya WAJIB dibuang sebelum masuk korpus
+  // Inggris. Tanpa ini kata Indonesia yang dikutip terhapus dari selisih ID−EN, dan detektor
+  // jadi buta terhadap kata itu DI SELURUH permukaan — persis cara 'yang' dan 'minum' hilang.
+  const addENKutip = (v) => addEN(String(v == null ? '' : v).replace(/'[^']*'/g, ' '));
+
 
   for (const p of J('reading-bank.json')) {
     addEN(p.text); addEN(p.title);
@@ -76,7 +88,7 @@ function buildLexicon(ROOT) {
   for (const it of J('cloze-bank-v1.json').items) {
     addEN(it.sentence); addEN(it.blank && it.blank.answer);
     ((it.blank && it.blank.alternates) || []).forEach(addEN);
-    for (const d of it.distractors || []) { addEN(d.text); addEN(d.misconception); addID(d.whyFailsId); addID(d.misconceptionId); }
+    for (const d of it.distractors || []) { addEN(d.text); addENKutip(d.misconception); addID(d.whyFailsId); addID(d.misconceptionId); }
     for (const k of ['why', 'rule', 'memory', 'avoid']) addID(it.explain && it.explain[k]);
   }
   // vocabulary-master.json: 2.440 entri kosakata INGGRIS (kata, sinonim, antonim, kolokasi,
@@ -99,10 +111,10 @@ function buildLexicon(ROOT) {
   // kedua di repo setelah reading-bank. Tanpa ia, istilah tata bahasa yang hanya muncul di
   // sini — 'phrasal', 'particle' — dihitung Indonesia-saja oleh selisih korpus.
   for (const t of J('grammar-templates.json').templates || []) {
-    addEN(t.stem); addEN(t.pedagogicalObjective); addEN(t.misconceptionTargeted);
-    addEN(t.reasoningOperation); addEN(t.explanation); addEN(t.subskill); addEN(t.family);
+    addEN(t.stem); addEN(t.pedagogicalObjective); addENKutip(t.misconceptionTargeted);
+    addEN(t.reasoningOperation); addENKutip(t.explanation); addEN(t.subskill); addEN(t.family);
     (t.options || []).forEach(addEN);
-    for (const d of t.distractors || []) { addEN(d.option); addEN(d.misconception); addEN(d.whyFails); }
+    for (const d of t.distractors || []) { addEN(d.option); addENKutip(d.misconception); addENKutip(d.whyFails); }
   }
   for (const t of Object.values(J('grammar-explanations-id.json').templates || {})) {
     for (const k of ['objective', 'misconception', 'reasoning', 'rule', 'whyCorrect', 'whyOthersFail', 'howToAvoid', 'memoryCue']) addID(t[k]);
@@ -119,7 +131,13 @@ function buildLexicon(ROOT) {
     for (const p of r.passages || []) {
       addEN(p.text); addEN(p.title);
       for (const q of p.questions || []) {
-        addEN(q.stem); (q.options || []).forEach(addEN);
+        // KOREKSI KONTRAK: stem dan pilihan ujian ini BERBAHASA INDONESIA ("Paragraf mana yang
+        // memuat..."), bukan Inggris. Salah label di sini menyuntikkan delapan kata Indonesia
+        // paling umum — dan, yang, adalah, untuk, tidak, dulu, jalan, kembali — ke korpus
+        // Inggris, dan selisih ID−EN menghapus semuanya dari leksikon. Akibatnya detektor buta
+        // pada kata-kata itu di SELURUH bank, dan gerbang sempat melaporkan 20/20 sementara
+        // kalimat Indonesia utuh masih duduk di sidecar th.
+        addID(q.stem); (q.options || []).forEach(addID);
         if (q.explain) { addEN(q.explain.evidence); addID(q.explain.why); addID(q.explain.whyOthersFail); }
       }
     }
@@ -128,9 +146,9 @@ function buildLexicon(ROOT) {
   // menjodohkan); hanya NILAINYA yang Indonesia. Tanpa memasukkan kuncinya ke korpus Inggris,
   // istilah tata bahasa yang memang tidak diterjemahkan — 'phrasal', 'deny', 'gerund' — jatuh
   // ke himpunan Indonesia-saja dan penerjemahnya dituduh menyelundupkan bahasa Indonesia.
-  for (const [k, v] of Object.entries(J('grammar-misconception-id.json').diagnoses)) { addEN(k); addID(v); }
+  for (const [k, v] of Object.entries(J('grammar-misconception-id.json').diagnoses)) { addENKutip(k); addID(v); }
   for (const [k, c] of Object.entries(J('misconception-taxonomy-v1.json').codes)) {
-    addEN(k); addEN(c.familyHint); addID(c.label); addID(c.description_id);
+    addEN(k); addENKutip(c.familyHint); addID(c.label); addID(c.description_id);
   }
   for (const it of J('features/speaking-listening/listening-bank-v1.json').items || []) {
     addEN(it.script); addEN(it.answerText);
@@ -140,7 +158,11 @@ function buildLexicon(ROOT) {
       addID(it.question); addID(it.explain);
       (it.options || []).forEach(it.mode === 'paraphrase' ? addEN : addID);
     } else {
-      addEN(it.question); (it.options || []).forEach(addEN); addID(it.explain);
+      // Mode dictation: pertanyaannya BUKAN soal Inggris melainkan instruksi antarmuka
+      // berbahasa Indonesia ("Ketik kalimat yang kamu dengar..."), 134 butir di B1+. Tanpa
+      // pengecualian ini 'yang' dan 'tidak' ikut masuk korpus Inggris dan hilang dari leksikon.
+      if (it.mode === 'dictation') addID(it.question); else addEN(it.question);
+      (it.options || []).forEach(addEN); addID(it.explain);
     }
   }
   // copy-id-*.js: seluruh teks antarmuka Indonesia. Literal string diambil kasar dengan regex —

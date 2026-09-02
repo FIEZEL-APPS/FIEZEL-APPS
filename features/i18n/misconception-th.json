@@ -667,7 +667,7 @@
       "description": "ใช้ present perfect หรือ past perfect กับเหตุการณ์ในอดีตทุกแบบ หรือกลับละไว้ทั้งที่ต้องระบุลำดับของเหตุการณ์อดีตสองเหตุการณ์"
     },
     "tense_aspect.timeline_mismatch": {
-      "label": "Tense tidak cocok dengan garis waktu kalimat",
+      "label": "รูปกาลของกริยาไม่สอดคล้องกับเส้นเวลาของประโยค",
       "description": "รูป tense ขัดกับคำบอกเวลา เช่นใช้ present ในเรื่องเล่าอดีต ใช้ past กับข้อเท็จจริงปัจจุบัน และการเลื่อนเส้นเวลาแบบอื่น"
     },
     "tense_aspect.future_form_confusion": {

@@ -982,7 +982,7 @@
       "explain": {
         "why": "“Books” มีจำนวนหลายเล่ม ส่วน “over there” บอกว่าของอยู่ไกล “Those” จึงเหมาะกับทั้งสองเงื่อนไข",
         "rule": "this ใช้กับของหนึ่งสิ่งที่อยู่ใกล้ that ใช้กับของหนึ่งสิ่งที่อยู่ไกล these ใช้กับของหลายสิ่งที่อยู่ใกล้ those ใช้กับของหลายสิ่งที่อยู่ไกล",
-        "memory": "Banyak dan jauh: “those books over there”.",
+        "memory": "หลายสิ่งและอยู่ไกล ใช้ “those books over there”",
         "avoid": "ให้เขียนรูปเต็ม อย่าเขียนเพียงคำกริยารูปพื้นฐาน"
       },
       "distractors": {
@@ -2038,7 +2038,7 @@
       "explain": {
         "why": "“They” เป็นพหูพจน์ รูปของ be สำหรับพหูพจน์คือ “are”",
         "rule": "รูป be ในปัจจุบัน I ใช้ am / he, she, it ใช้ is / you, we, they ใช้ are",
-        "memory": "“They” selalu sama “are”: “they are at home”.",
+        "memory": "“They” คู่กับ “are” เสมอ เช่น “they are at home”",
         "avoid": "ให้เขียนรูปเต็ม อย่าเขียนเพียงคำกริยารูปพื้นฐาน"
       },
       "distractors": {
@@ -2060,7 +2060,7 @@
       "explain": {
         "why": "สิ่งของคือ “two books” ซึ่งมีมากกว่าหนึ่ง จึงต้องใช้ “are”",
         "rule": "there are ใช้กับคำนามพหูพจน์ ส่วน there is ใช้กับคำนามเอกพจน์",
-        "memory": "Banyak: “there are”. Satu: “there is”.",
+        "memory": "หลายสิ่งใช้ “there are” สิ่งเดียวใช้ “there is”",
         "avoid": "ให้เขียนรูปเต็ม อย่าเขียนเพียงคำกริยารูปพื้นฐาน"
       },
       "distractors": {
@@ -2808,7 +2808,7 @@
       "explain": {
         "why": "ประธานคือ “you” จึงใช้ “have” และเมื่อจะถาม ให้ย้าย “have” ไปไว้ข้างหน้า คือ “Have you got ...?”",
         "rule": "คำถามที่ใช้ have got ให้ย้าย have หรือ has ไปไว้หน้าประธาน ส่วน got คงอยู่ข้างหลัง อย่าเติม do",
-        "memory": "“Have you got ...?” — nggak perlu “do”.",
+        "memory": "“Have you got ...?” ไม่ต้องใช้ “do”",
         "avoid": "ถ้ามี “got” อย่าใช้ “do” ให้ย้าย “have” หรือ “has” ไปไว้หน้าประธานแทน"
       },
       "distractors": {
@@ -4304,7 +4304,7 @@
       "explain": {
         "why": "ตารางเวลาบอกอย่างหนึ่ง ความเป็นจริงบอกอีกอย่างหนึ่ง และความคาดหวังที่คลาดเคลื่อนแบบนี้เองคือหน้าที่ของ “be supposed to” เช่น “The ferry is supposed to leave in ten minutes”",
         "rule": "“Be supposed to + กริยารูปฐาน” รายงานสิ่งที่กฎ ตารางเวลา หรือข้อตกลงคาดหวังไว้ ซึ่งอาจไม่เกิดขึ้นจริงก็ได้ ส่วนกริยาช่วย “be” เป็นสิ่งจำเป็นเพราะ “supposed” เป็น participle",
-        "memory": "Nggak ada “be”, nggak ada “supposed to”: selalu “is/was supposed to”.",
+        "memory": "ถ้าไม่มี “be” ก็ไม่มี “supposed to” ต้องเป็น “is/was supposed to” เสมอ",
         "avoid": "อย่าปล่อยให้ “supposed to” ยืนเป็นคำกริยาของประโยคตามลำพัง ให้เชื่อมรูป “be” ไว้ข้างหน้าเสมอ"
       },
       "distractors": {
