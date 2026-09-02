@@ -52,43 +52,43 @@
   var COPY = Object.freeze({
     'quota.tts.exhausted': Object.freeze({
       title: 'Jatah suara hari ini sudah habis',
-      spoken: 'Aku pakai suara perangkat dulu untuk sisa sesi ini. Bunyinya beda, pelajarannya tetap jalan.',
+      spoken: 'Aku pakai suara cadanganku dulu untuk sisa sesi ini. Bunyinya beda, pelajarannya tetap jalan.',
       silent: 'Perangkat ini juga belum punya suara cadangan, jadi kalimat ini belum bisa dibunyikan. Teksnya tetap bisa kamu baca, dan jatahnya kembali setelah tengah malam.',
       tone: 'quota'
     }),
     'quota.exhausted': Object.freeze({
       title: 'Jatah hari ini sudah habis',
-      spoken: 'Aku pakai suara perangkat dulu. Pelajarannya tidak berhenti.',
+      spoken: 'Aku pakai suara cadanganku dulu. Pelajarannya tetap jalan.',
       silent: 'Suaranya belum bisa dibunyikan sekarang. Teksnya tetap ada, dan jatahnya kembali setelah tengah malam.',
       tone: 'quota'
     }),
     'quota.low': Object.freeze({
       title: 'Jatah suara hari ini hampir habis',
-      spoken: 'Masih berbunyi seperti biasa. Kalau nanti habis, aku pindah ke suara perangkat.',
+      spoken: 'Masih berbunyi seperti biasa. Kalau nanti habis, aku pindah ke suara cadanganku.',
       silent: 'Suaranya belum berbunyi untuk kalimat ini. Teksnya tetap bisa kamu baca.',
       tone: 'quota'
     }),
     'quota.rate.slowdown': Object.freeze({
       title: 'Terlalu cepat berurutan',
-      spoken: 'Aku pakai suara perangkat untuk kalimat ini. Tunggu sebentar sebelum menekan lagi.',
+      spoken: 'Aku pakai suara cadanganku untuk kalimat ini. Tunggu sebentar sebelum menekan lagi.',
       silent: 'Kalimat ini belum bisa dibunyikan. Tunggu beberapa detik lalu coba lagi — teksnya tetap ada.',
       tone: 'rate'
     }),
     'service.degraded': Object.freeze({
       title: 'Layanan suara sedang istirahat sebentar',
-      spoken: 'Suara dari perangkat dulu, ya. Ini bukan kesalahanmu dan tidak ada yang hilang.',
+      spoken: 'Suara cadanganku dulu, ya. Ini bukan kesalahanmu dan nggak ada yang hilang.',
       silent: 'Aku belum berhasil membunyikan kalimat ini. Bukan kamu yang salah — teksnya tetap bisa dibaca, dan suaranya biasanya kembali dalam beberapa menit.',
       tone: 'service'
     }),
     'service.providerError': Object.freeze({
       title: 'Suara gagal disiapkan',
-      spoken: 'Aku pakai suara perangkat untuk kalimat ini.',
+      spoken: 'Aku pakai suara cadanganku untuk kalimat ini.',
       silent: 'Aku belum berhasil membunyikan kalimat ini. Teksnya tetap bisa kamu baca, dan kamu boleh mencoba lagi sekarang.',
       tone: 'service'
     }),
     'service.unknown': Object.freeze({
       title: 'Suara belum tersedia untuk kalimat ini',
-      spoken: 'Aku pakai suara perangkat dulu.',
+      spoken: 'Aku pakai suara cadanganku dulu.',
       silent: 'Aku belum berhasil membunyikan kalimat ini. Teksnya tetap bisa kamu baca, dan kamu boleh menekan Dengarkan lagi.',
       tone: 'service'
     })

@@ -140,25 +140,29 @@
     // A8 TEMUAN BOHONG (§4 reports/add-a8-a11y.md): sebelum commit ini, penghitung jatah
     // yang MATI dilaporkan ke murid sebagai "jatah suara hari ini sudah habis".
     quota_unavailable: 'Aku belum bisa membaca sisa jatahmu, jadi jatahmu kemungkinan besar masih utuh. Suaranya belum bisa dibunyikan sekarang — teksnya tetap bisa kamu baca, dan kamu boleh coba lagi sebentar lagi, ya.',
-    breaker_open: 'Suara dari perangkatmu dulu — layanan suara sedang istirahat sebentar. Ini bukan kesalahanmu.',
-    unavailable: 'Suara dari perangkatmu dulu — audio belum tersedia untuk kalimat ini.',
+    breaker_open: 'Layanan suara sedang istirahat sebentar, jadi kalimat ini belum berbunyi. Teksnya tetap bisa kamu baca. Ini bukan kesalahanmu.',
+    unavailable: 'Audio belum tersedia untuk kalimat ini. Teksnya tetap bisa kamu baca.',
     // S2 - jatah neuron AKUN (bukan jatah murid) penuh. Yang WAJIB dikatakan kalimatnya:
     // jatah murid TIDAK dipotong sedikit pun, karena tidak ada satu byte audio yang
-    // diproduksi. m025-231: dulu ia wajib mengatakan satu hal lagi - "suara perangkat
-    // tetap jalan". Lapisan speechSynthesis peramban sudah DIHAPUS dari aplikasi, jadi
-    // janji itu keluar dari kontrak naskah ini; di bawah L3 tidak ada apa pun yang
-    // berbunyi. Pembukaan "Suara dari perangkatmu dulu" yang masih berdiri di beberapa
-    // kalimat tetangga adalah sisa lapisan itu dan menunggu sapuan naskah tersendiri
-    // (tts_disabled bahkan dikunci tts-provider-contract-test S3-a5) - JANGAN disalin
-    // ke kalimat baru.
-    account_budget: 'Suara dari perangkatmu dulu — pembuatan suara sedang penuh untuk hari ini, bukan karena jatahmu. Jatahmu nggak berkurang.',
+    // diproduksi.
+    //
+    // m025-232: dulu setiap kalimat di peta ini dibuka dengan "Suara dari perangkatmu
+    // dulu". Lapisan speechSynthesis peramban sudah DIHAPUS, jadi kalimat itu menjanjikan
+    // sesuatu yang tidak bisa terjadi - di bawah L3 tidak ada apa pun yang berbunyi.
+    // Pembukaan itu dicabut dari KELIMA kalimat sekaligus, bukan satu per satu, supaya
+    // tidak ada satu pun yang tertinggal menjanjikan suara hantu.
+    //
+    // Penggantinya menjawab pertanyaan murid yang sebenarnya - "lalu aku harus apa?" -
+    // dengan hal yang MASIH benar: teksnya tetap bisa dibaca. Gerbang S3-a5 di
+    // tts-provider-contract-test.js ikut dipindah ke janji baru itu.
+    account_budget: 'Pembuatan suara sedang penuh untuk hari ini, bukan karena jatahmu. Jatahmu nggak berkurang, dan teksnya tetap bisa kamu baca.',
     // S2 - pagar neuron akun BELUM TERPASANG (dep tidak disuntikkan / tanda terima tidak
     // sah). Salah pasang, bukan jatah penuh, dan bukan salah murid.
-    account_missing: 'Suara dari perangkatmu dulu — pembuatan suara belum bisa dipakai karena penyiapan di sisi kami belum lengkap. Jatahmu utuh.',
+    account_missing: 'Pembuatan suara belum bisa dipakai karena penyiapan di sisi kami belum lengkap. Jatahmu utuh, dan teksnya tetap bisa kamu baca.',
     // S3 - FLAG TTS MATI. Bukan jatah murid, bukan jatah akun, bukan kesalahan murid, dan
     // bukan soal waktu: pemilik aplikasi belum menyalakan suara premium. Kalimatnya tidak
     // boleh menjanjikan "coba lagi nanti", karena menunggu tidak mengubah apa pun.
-    tts_disabled: 'Suara dari perangkatmu dulu — suara premium sedang kami matikan sementara, bukan karena jatahmu. Jatahmu utuh.',
+    tts_disabled: 'Suara premium sedang kami matikan sementara, bukan karena jatahmu. Jatahmu utuh, dan teksnya tetap bisa kamu baca.',
     body_too_big: 'Kirimanmu kebesaran untuk sekali kirim.'
   });
 
