@@ -181,6 +181,51 @@
     // app.js:2905 — tombol modal fallback jatah
     'quota.fallback-tombol': 'Oke, lanjut belajar',
     // app.js:2435 — status laporan: default
-    'settings.laporan-siap': 'Siap mengirim otomatis'
+    'settings.laporan-siap': 'Siap mengirim otomatis',
+
+    // ---------- Auth Gate, Notification Gate, Update Prompt, Recovery, Shell, Toasts ----------
+    'auth.gate-title': 'Masuk ke FIEZEL',
+    'auth.gate-body': 'Akunmu menyimpan progres belajar, streak, dan AI tutor supaya tetap sama di setiap perangkat.',
+    'auth.status-check': 'Memeriksa status akun…',
+    'auth.skip-btn': 'Lanjut tanpa akun',
+    'auth.skip-help': 'Semua materi dan latihan tetap jalan tanpa akun — tutor AI dan suara neural baru bisa dipakai kalau kamu masuk akun Puter dan ada jaringan.',
+    'auth.puter-help': 'Jendela login Puter terbuka sebentar di atas FIEZEL, lalu tertutup sendiri begitu selesai - kamu tidak akan dipindahkan ke browser lain.',
+    'auth.legal-note': 'Dengan melanjutkan, kamu menyetujui progres belajarmu disimpan di akun Puter milikmu sendiri.',
+
+    'notif.gate-badge': 'FIEZEL REMINDER',
+    'notif.gate-title': 'Mau diingatkan?',
+    'notif.gate-desc': 'FIEZEL bisa mengetuk pelan saat target harian belum selesai, atau saat ada kata dan pola yang menurut jadwal pengulangan sudah waktunya diulang sebelum sempat lupa.',
+    'notif.gate-terms': 'Paling banyak satu pengingat sehari dan tidak pernah di jam tidur. Bisa dinyalakan atau dimatikan kapan saja lewat Pengaturan.',
+    'notif.skip-link': 'Nanti saja',
+    'notif.help-init': 'Pilih "Nanti saja" dan FIEZEL langsung terbuka. Pengingatnya menunggu di Pengaturan kalau suatu saat dibutuhkan.',
+
+    'update.banner-title': 'Versi baru FIEZEL tersedia',
+    'update.banner-desc': 'Materi dan perbaikan terbaru sudah selesai diunduh. Tekan <b>Perbarui sekarang</b> — aplikasi akan menutup sebentar lalu terbuka lagi sendiri. Progres belajarmu tidak hilang.',
+    'update.apply-btn': 'Perbarui sekarang',
+    'update.later-btn': 'Nanti saja',
+    'update.applying-text': 'Memperbarui...',
+    'update.version-text': 'Versi {newVersion} · kamu sekarang memakai {curVersion}',
+
+    'boot.recovery-title': 'FIEZEL belum siap',
+    'boot.recovery-desc': 'Koneksi atau data belum selesai dimuat.',
+    'boot.recovery-retry': 'Muat ulang',
+
+    'nav.back-home-aria': 'Kembali ke Home',
+    'nav.open-settings-aria': 'Buka pengaturan',
+    'nav.main-aria': 'Navigasi utama',
+    'nav.home-aria': 'Beranda',
+    'nav.vocab-aria': 'Vocabulary',
+    'nav.grammar-aria': 'Grammar',
+    'nav.reading-aria': 'Reading',
+    'nav.map-aria': 'Peta belajar',
+    'dialog.fiezel-aria': 'Dialog FIEZEL',
+    'topbar.ask-aria': 'Tanya FIEZEL',
+
+    'adaptif.toast-not-ready': 'Latihan terbuka setelah tes awal selesai.',
+    'adaptif.toast-server-slow': 'Servernya lambat merespons — sesi ini pakai profil lokalmu dulu.',
+    'adaptif.toast-pool-empty': 'Profil adaptif belum memiliki area yang cukup terukur. Lanjutkan latihan level terlebih dahulu.',
+    'suara.toast-device-issue': 'Suara sedang bermasalah di perangkatmu. Teksnya tetap bisa kamu baca, dan kamu boleh mencoba lagi nanti.',
+    'settings.toast-report-sent': 'Laporan agregat terkirim ke Creator Hub',
+    'settings.toast-report-queued': 'Laporan disimpan di antrean dan akan dicoba lagi'
   });
 }());

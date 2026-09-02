@@ -257,15 +257,21 @@ html.fz-booting body{overflow:hidden}
           recovery.style.cssText = 'position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;padding:24px;background:#1B1418;color:#FFF4DA;text-align:center;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif';
           var card = doc.createElement('div');
           card.style.cssText = 'width:min(320px,100%);padding:24px 20px;border:1px solid rgba(255,244,218,.22);border-radius:20px;background:#2A2126';
+          var isTh = false;
+          try {
+            var st = localStorage.getItem('fiezel-state') || localStorage.getItem('fiezel-state-v1');
+            if (st && st.indexOf('"learnerLocale":"th"') >= 0) isTh = true;
+            if (!isTh && (typeof FiezelI18n !== 'undefined' && FiezelI18n && FiezelI18n.getLocale && FiezelI18n.getLocale() === 'th')) isTh = true;
+          } catch (e) {}
           var title = doc.createElement('strong');
-          title.textContent = 'FIEZEL belum siap';
+          title.textContent = isTh ? 'FIEZEL ยังไม่พร้อม' : 'FIEZEL belum siap';
           title.style.cssText = 'display:block;font-size:20px;line-height:1.25;margin-bottom:10px';
           var message = doc.createElement('p');
-          message.textContent = 'Koneksi atau data belum selesai dimuat.';
+          message.textContent = isTh ? 'การเชื่อมต่อหรือข้อมูลยังโหลดไม่เสร็จ' : 'Koneksi atau data belum selesai dimuat.';
           message.style.cssText = 'margin:0;color:#E8D9C5;font-size:15px;line-height:1.5';
           var retry = doc.createElement('button');
           retry.type = 'button';
-          retry.textContent = 'Muat ulang';
+          retry.textContent = isTh ? 'โหลดใหม่อีกครั้ง' : 'Muat ulang';
           retry.style.cssText = 'margin-top:18px;min-height:48px;padding:0 20px;border:0;border-radius:12px;background:#FFC700;color:#241A11;font:700 16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif';
           retry.addEventListener('click', function () {
             try { window.location.reload(); } catch (e) { window.location.href = window.location.href; }
@@ -289,7 +295,7 @@ html.fz-booting body{overflow:hidden}
       <!-- m025-127: gradien wordmark topbar memakai token, bukan hex mati. Hanya SALINAN INI
            yang bertema - salinan di splash sengaja tetap gading/emas karena panggungnya
            memang selalu gelap, dan menyeretnya ikut bertema akan membuatnya hilang di sana. -->
-      <button type="button" class="brand-button" onclick="go('home')" aria-label="Kembali ke Home">
+      <button type="button" class="brand-button" onclick="go('home')" aria-label="Kembali ke Home" data-i18n-aria-label="nav.back-home-aria">
         <span class="brand"><svg class="fiezel-wordmark" id="fzTopMark" viewBox="0 0 1000 260" role="img" aria-label="FIEZEL"><g class="fzw-sparks" aria-hidden="true"><circle class="fzw-spark" cx="51" cy="51" r="15" style="--sx:-70px;--sy:-85px;--sd:0s"/><circle class="fzw-spark" cx="51" cy="205" r="15" style="--sx:-78px;--sy:80px;--sd:.03s"/><circle class="fzw-spark" cx="102" cy="51" r="15" style="--sx:-52px;--sy:-96px;--sd:.06s"/><circle class="fzw-spark" cx="88" cy="130" r="15" style="--sx:-92px;--sy:0px;--sd:.09s"/><circle class="fzw-spark" cx="205" cy="60" r="15" style="--sx:-30px;--sy:-92px;--sd:.12s"/><circle class="fzw-spark" cx="253" cy="168" r="15" style="--sx:-22px;--sy:78px;--sd:.15s"/><circle class="fzw-spark" cx="321" cy="51" r="15" style="--sx:-40px;--sy:-90px;--sd:.18s"/><circle class="fzw-spark" cx="350" cy="130" r="15" style="--sx:-60px;--sy:-6px;--sd:.21s"/><circle class="fzw-spark" cx="365" cy="209" r="15" style="--sx:-44px;--sy:86px;--sd:.24s"/><circle class="fzw-spark" cx="553" cy="51" r="15" style="--sx:6px;--sy:-98px;--sd:.27s"/><circle class="fzw-spark" cx="553" cy="209" r="15" style="--sx:6px;--sy:92px;--sd:.3s"/><circle class="fzw-spark" cx="683" cy="130" r="15" style="--sx:30px;--sy:-4px;--sd:.33s"/><circle class="fzw-spark" cx="734" cy="51" r="15" style="--sx:44px;--sy:-88px;--sd:.36s"/><circle class="fzw-spark" cx="727" cy="209" r="15" style="--sx:40px;--sy:90px;--sd:.39s"/><circle class="fzw-spark" cx="861" cy="130" r="15" style="--sx:86px;--sy:-8px;--sd:.42s"/><circle class="fzw-spark" cx="905" cy="209" r="15" style="--sx:96px;--sy:84px;--sd:.45s"/></g><defs><linearGradient id="fztIv" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--wordmark-ink-hi)"/><stop offset="100%" stop-color="var(--wordmark-ink-lo)"/></linearGradient><linearGradient id="fztGo" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--wordmark-accent-hi)"/><stop offset="100%" stop-color="var(--wordmark-accent-lo)"/></linearGradient></defs><g class="fzw-mark"><g fill="url(#fztIv)"><rect x="30" y="30" width="42" height="200" rx="21"/><rect x="30" y="30" width="144" height="42" rx="21"/><rect x="30" y="109" width="116" height="42" rx="21"/><rect x="300" y="30" width="42" height="200" rx="21"/><rect x="300" y="30" width="144" height="42" rx="21"/><rect x="300" y="109" width="100" height="42" rx="21"/><rect x="300" y="188" width="130" height="42" rx="21"/><rect x="478" y="30" width="150" height="42" rx="21"/><rect x="478" y="188" width="150" height="42" rx="21"/><rect x="607" y="30" width="191.38" height="42" rx="21" transform="rotate(124.354 607 51)"/><rect x="662" y="30" width="42" height="200" rx="21"/><rect x="662" y="30" width="144" height="42" rx="21"/><rect x="662" y="109" width="100" height="42" rx="21"/><rect x="662" y="188" width="130" height="42" rx="21"/><rect x="840" y="30" width="42" height="200" rx="21"/><rect x="840" y="188" width="130" height="42" rx="21"/></g><g fill="url(#fztGo)"><rect x="192" y="30" width="26" height="200" rx="13"/><rect x="240" y="106" width="26" height="124" rx="13"/></g></g></svg></span>
       </button>
       <div class="topbar-actions">
@@ -304,8 +310,8 @@ html.fz-booting body{overflow:hidden}
              TANPA data-view, dengan sengaja. renderInner() menambahkan kelas active ke
              elemen ber-data-view tetapi hanya membersihkannya dari .nav, jadi atribut itu
              akan membuat ikon ini tersangkut menyala selamanya setelah sekali dibuka. -->
-        <button type="button" class="icon-button ask-button" onclick="go('ask')" aria-label="Tanya FIEZEL"><svg class="fiezel-ask-mark" viewBox="0 0 74 200" aria-hidden="true"><defs><linearGradient id="fztAsk" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFDE59"/><stop offset="45%" stop-color="#FFC700"/><stop offset="100%" stop-color="#E6A800"/></linearGradient></defs><g fill="url(#fztAsk)"><rect x="0" y="0" width="26" height="200" rx="13"/><rect x="48" y="76" width="26" height="124" rx="13"/></g></svg><span class="ask-label" data-i18n="topbar.ask">Tanya FIEZEL?</span></button>
-        <button type="button" class="icon-button" onclick="openSettings()" aria-label="Buka pengaturan"><i data-lucide="sliders-horizontal"></i></button>
+        <button type="button" class="icon-button ask-button" onclick="go('ask')" aria-label="Tanya FIEZEL" data-i18n-aria-label="topbar.ask-aria"><svg class="fiezel-ask-mark" viewBox="0 0 74 200" aria-hidden="true"><defs><linearGradient id="fztAsk" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFDE59"/><stop offset="45%" stop-color="#FFC700"/><stop offset="100%" stop-color="#E6A800"/></linearGradient></defs><g fill="url(#fztAsk)"><rect x="0" y="0" width="26" height="200" rx="13"/><rect x="48" y="76" width="26" height="124" rx="13"/></g></svg><span class="ask-label" data-i18n="topbar.ask">Tanya FIEZEL?</span></button>
+        <button type="button" class="icon-button" onclick="openSettings()" aria-label="Buka pengaturan" data-i18n-aria-label="nav.open-settings-aria"><i data-lucide="sliders-horizontal"></i></button>
         <div class="version" id="version"></div>
       </div>
     </header>
@@ -336,14 +342,14 @@ html.fz-booting body{overflow:hidden}
   <div id="welcome" class="welcome notification-gate hidden" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle" aria-describedby="notificationGateBody">
     <div class="welcome-panel notification-panel">
       <div class="welcome-icon"><i data-lucide="bell-ring"></i></div>
-      <div class="welcome-mark">FIEZEL REMINDER</div>
-      <h2 id="welcomeTitle">Mau diingatkan?</h2>
-      <p id="notificationGateBody">FIEZEL bisa mengetuk pelan saat target harian belum selesai, atau saat ada kata dan pola yang menurut jadwal pengulangan sudah waktunya diulang sebelum sempat lupa.</p>
-      <div class="notification-requirement"><i data-lucide="shield-check"></i><span>Paling banyak satu pengingat sehari dan tidak pernah di jam tidur. Bisa dinyalakan atau dimatikan kapan saja lewat Pengaturan.</span></div>
-      <p id="notificationGateStatus" class="notification-status" role="status">Belajar tetap bisa dimulai tanpa ini.</p>
-      <button id="notificationGateButton" type="button" class="primary wide" onclick="requestStudyNotificationPermission()">Ingatkan saya <i data-lucide="bell-ring"></i></button>
-      <button id="notificationGateSkip" type="button" class="text-button wide" onclick="declineStudyNotifications()">Nanti saja</button>
-      <p id="notificationGateHelp" class="notification-help">Pilih "Nanti saja" dan FIEZEL langsung terbuka. Pengingatnya menunggu di Pengaturan kalau suatu saat dibutuhkan.</p>
+      <div class="welcome-mark" data-i18n="notif.gate-badge">FIEZEL REMINDER</div>
+      <h2 id="welcomeTitle" data-i18n="notif.gate-title">Mau diingatkan?</h2>
+      <p id="notificationGateBody" data-i18n="notif.gate-desc">FIEZEL bisa mengetuk pelan saat target harian belum selesai, atau saat ada kata dan pola yang menurut jadwal pengulangan sudah waktunya diulang sebelum sempat lupa.</p>
+      <div class="notification-requirement"><i data-lucide="shield-check"></i><span data-i18n="notif.gate-terms">Paling banyak satu pengingat sehari dan tidak pernah di jam tidur. Bisa dinyalakan atau dimatikan kapan saja lewat Pengaturan.</span></div>
+      <p id="notificationGateStatus" class="notification-status" role="status" data-i18n="notif.status-default">Belajar tetap bisa dimulai tanpa ini.</p>
+      <button id="notificationGateButton" type="button" class="primary wide" onclick="requestStudyNotificationPermission()"><span data-i18n="notif.tombol-ingatkan">Ingatkan saya</span> <i data-lucide="bell-ring"></i></button>
+      <button id="notificationGateSkip" type="button" class="text-button wide" onclick="declineStudyNotifications()" data-i18n="notif.skip-link">Nanti saja</button>
+      <p id="notificationGateHelp" class="notification-help" data-i18n="notif.help-init">Pilih "Nanti saja" dan FIEZEL langsung terbuka. Pengingatnya menunggu di Pengaturan kalau suatu saat dibutuhkan.</p>
     </div>
   </div>
 
@@ -353,23 +359,23 @@ html.fz-booting body{overflow:hidden}
   <div id="authGate" class="welcome auth-gate hidden" role="dialog" aria-modal="true" aria-labelledby="authGateTitle" aria-describedby="authGateBody">
     <div class="welcome-panel auth-panel">
       <img class="auth-mark" src="./assets/brand/fiezel-icon-192.png" alt="" width="72" height="72" decoding="async">
-      <h2 id="authGateTitle">Masuk ke FIEZEL</h2>
-      <p id="authGateBody">Akunmu menyimpan progres belajar, streak, dan AI tutor supaya tetap sama di setiap perangkat.</p>
-      <p id="authGateStatus" class="auth-status" role="status">Memeriksa status akun…</p>
-      <button id="authGateButton" type="button" class="auth-primary" onclick="attemptPuterSignIn()"><i data-lucide="user-round"></i><span>Lanjutkan dengan Puter</span></button>
+      <h2 id="authGateTitle" data-i18n="auth.gate-title">Masuk ke FIEZEL</h2>
+      <p id="authGateBody" data-i18n="auth.gate-body">Akunmu menyimpan progres belajar, streak, dan AI tutor supaya tetap sama di setiap perangkat.</p>
+      <p id="authGateStatus" class="auth-status" role="status" data-i18n="auth.status-check">Memeriksa status akun…</p>
+      <button id="authGateButton" type="button" class="auth-primary" onclick="attemptPuterSignIn()"><i data-lucide="user-round"></i><span data-i18n="auth.tombol-lanjutkan">Lanjutkan dengan Puter</span></button>
       <!-- m026-02: jalan keluar yang selalu ada, meniru notificationGateSkip "Nanti saja"
            persis satu-banding-satu. Tanpa tombol ini, murid yang tidak mau (atau tidak
            bisa) login terkurung di balik .auth-locked - dark-pattern yang sama yang sudah
            dibongkar OWNER di gerbang notifikasi. Pengaturan > Akun Puter adalah jalan
            masuknya kembali. -->
-      <button id="authGateSkip" type="button" class="text-button wide" onclick="skipPuterSignIn()">Lanjut tanpa akun</button>
-      <p id="authGateSkipHelp" class="auth-help">Semua materi dan latihan tetap jalan tanpa akun — tutor AI dan suara neural baru bisa dipakai kalau kamu masuk akun Puter dan ada jaringan.</p>
-      <p id="authGateHelp" class="auth-help">Jendela login Puter terbuka sebentar di atas FIEZEL, lalu tertutup sendiri begitu selesai - kamu tidak akan dipindahkan ke browser lain.</p>
-      <p class="auth-legal">Dengan melanjutkan, kamu menyetujui progres belajarmu disimpan di akun Puter milikmu sendiri.</p>
+      <button id="authGateSkip" type="button" class="text-button wide" onclick="skipPuterSignIn()" data-i18n="auth.skip-btn">Lanjut tanpa akun</button>
+      <p id="authGateSkipHelp" class="auth-help" data-i18n="auth.skip-help">Semua materi dan latihan tetap jalan tanpa akun — tutor AI dan suara neural baru bisa dipakai kalau kamu masuk akun Puter dan ada jaringan.</p>
+      <p id="authGateHelp" class="auth-help" data-i18n="auth.puter-help">Jendela login Puter terbuka sebentar di atas FIEZEL, lalu tertutup sendiri begitu selesai - kamu tidak akan dipindahkan ke browser lain.</p>
+      <p class="auth-legal" data-i18n="auth.legal-note">Dengan melanjutkan, kamu menyetujui progres belajarmu disimpan di akun Puter milikmu sendiri.</p>
     </div>
   </div>
 
-  <div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Dialog FIEZEL">
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Dialog FIEZEL" data-i18n-aria-label="dialog.fiezel-aria">
     <div class="modal-panel" id="modalPanel"></div>
   </div>
 
@@ -387,13 +393,13 @@ html.fz-booting body{overflow:hidden}
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3.2-6.9"/><path d="M21 3v6h-6"/></svg>
       </div>
       <div class="update-banner-text">
-        <p id="updateBannerTitle" class="update-banner-title">Versi baru FIEZEL tersedia</p>
-        <p id="updateBannerBody" class="update-banner-body">Materi dan perbaikan terbaru sudah selesai diunduh. Tekan <b>Perbarui sekarang</b> — aplikasi akan menutup sebentar lalu terbuka lagi sendiri. Progres belajarmu tidak hilang.</p>
+        <p id="updateBannerTitle" class="update-banner-title" data-i18n="update.banner-title">Versi baru FIEZEL tersedia</p>
+        <p id="updateBannerBody" class="update-banner-body" data-i18n-html="update.banner-desc">Materi dan perbaikan terbaru sudah selesai diunduh. Tekan <b>Perbarui sekarang</b> — aplikasi akan menutup sebentar lalu terbuka lagi sendiri. Progres belajarmu tidak hilang.</p>
         <p id="updateBannerVersion" class="update-banner-version"></p>
       </div>
       <div class="update-banner-actions">
-        <button type="button" id="updateBannerApply" class="update-banner-apply">Perbarui sekarang</button>
-        <button type="button" id="updateBannerLater" class="update-banner-later">Nanti saja</button>
+        <button type="button" id="updateBannerApply" class="update-banner-apply" data-i18n="update.apply-btn">Perbarui sekarang</button>
+        <button type="button" id="updateBannerLater" class="update-banner-later" data-i18n="update.later-btn">Nanti saja</button>
       </div>
     </div>
   </div>
@@ -402,15 +408,15 @@ html.fz-booting body{overflow:hidden}
        angka yang terbaca samar di balik pill saat bergulir - lihat .nav-scrim di style.css
        untuk pengukuran yang mendasarinya. Dekoratif murni, karena itu aria-hidden. -->
   <div class="nav-scrim" aria-hidden="true"></div>
-  <nav class="bottomnav" aria-label="Navigasi utama">
-    <button type="button" class="nav active" data-view="home" onclick="go('home')" aria-label="Beranda"><i class="fz-i" data-fz-icon="home" aria-hidden="true"></i><span data-i18n="nav.home">Home</span></button>
-    <button type="button" class="nav" data-view="vocab" onclick="go('vocab')" aria-label="Vocabulary"><i class="fz-i" data-fz-icon="vocab" aria-hidden="true"></i><span data-i18n="nav.vocab">Vocab</span></button>
-    <button type="button" class="nav" data-view="grammar" onclick="go('grammar')" aria-label="Grammar"><i class="fz-i" data-fz-icon="grammar" aria-hidden="true"></i><span data-i18n="nav.grammar">Grammar</span></button>
-    <button type="button" class="nav" data-view="reading" onclick="go('reading')" aria-label="Reading"><i class="fz-i" data-fz-icon="reading" aria-hidden="true"></i><span data-i18n="nav.reading">Reading</span></button>
+  <nav class="bottomnav" aria-label="Navigasi utama" data-i18n-aria-label="nav.main-aria">
+    <button type="button" class="nav active" data-view="home" onclick="go('home')" aria-label="Beranda" data-i18n-aria-label="nav.home-aria"><i class="fz-i" data-fz-icon="home" aria-hidden="true"></i><span data-i18n="nav.home">Home</span></button>
+    <button type="button" class="nav" data-view="vocab" onclick="go('vocab')" aria-label="Vocabulary" data-i18n-aria-label="nav.vocab-aria"><i class="fz-i" data-fz-icon="vocab" aria-hidden="true"></i><span data-i18n="nav.vocab">Vocab</span></button>
+    <button type="button" class="nav" data-view="grammar" onclick="go('grammar')" aria-label="Grammar" data-i18n-aria-label="nav.grammar-aria"><i class="fz-i" data-fz-icon="grammar" aria-hidden="true"></i><span data-i18n="nav.grammar">Grammar</span></button>
+    <button type="button" class="nav" data-view="reading" onclick="go('reading')" aria-label="Reading" data-i18n-aria-label="nav.reading-aria"><i class="fz-i" data-fz-icon="reading" aria-hidden="true"></i><span data-i18n="nav.reading">Reading</span></button>
     <!-- Audit UX Bagian 4: ikon lama (grafik batang) membaca sebagai "statistik", bukan
          "jalur belajar". Ikon route adalah jalur berkelok dengan simpul - persis makna
          yang harus dibawa tab ini, sejajar dengan Path/Jalur Belajar di Duolingo. -->
-    <button type="button" class="nav" data-view="progress" onclick="go('progress')" aria-label="Peta belajar"><i class="fz-i" data-fz-icon="map" aria-hidden="true"></i><span data-i18n="nav.peta">Peta</span></button>
+    <button type="button" class="nav" data-view="progress" onclick="go('progress')" aria-label="Peta belajar" data-i18n-aria-label="nav.map-aria"><i class="fz-i" data-fz-icon="map" aria-hidden="true"></i><span data-i18n="nav.peta">Peta</span></button>
   </nav>
 
   <!-- OWNER: "Terlalu banyak script terpisah (30+ file JS) dimuat sinkron di <head>/<body>
