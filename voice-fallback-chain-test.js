@@ -527,6 +527,8 @@ function audioHarness(options) {
     console,
     selectedNeuralRate: () => 1,
     showToast: (message) => { calls.toast.push(String(message)); },
+    /* `self` DIBUTUHKAN i18n asli yang dimuat di bawah (lihat catatan di sana). */
+    self: null,
     /* Stopwatch 9 detik milik play() DIPENDEKKAN, bukan dimatikan. Yang diuji adalah ARTI
        kemenangannya, dan menunggu sembilan detik sungguhan di dalam gerbang tidak menambah
        satu pun kebenaran. Angka yang DIMINTA tetap dicatat, supaya "9 detik" tidak diam-diam
@@ -570,6 +572,22 @@ function audioHarness(options) {
     };
   }
   vm.createContext(sandbox);
+  /* i18n ASLI dimuat ke sandbox sejak m025-236, meniru urutan <script> index.html
+     (fiezel-i18n.js lalu copy-id-*.js pada baris 458-471, app.js pada 670 — semuanya
+     `defer`, jadi di peramban FiezelI18n SELALU siap sebelum app.js jalan). Sejak naskah
+     noteSilence() pindah ke copy-map, blok AudioService memanggil FiezelI18n.t() dan sandbox
+     tanpa ini meledak `FiezelI18n is not defined` — kegagalan HARNESS yang menyamar sebagai
+     kegagalan produk. Yang dimuat adalah berkas naskah SUNGGUHAN, bukan stub yang
+     mengembalikan kuncinya: dua assert di bawah menilai kalimat yang dibaca murid
+     ("bermasalah", "kamu"), dan stub palsu akan membuat keduanya lulus/gagal karena alasan
+     yang salah. Pola dan sebabnya sama dengan harness i18n di notification-reminder-test.js. */
+  const i18nDir = path.join(__dirname, 'features', 'i18n');
+  if (fs.existsSync(path.join(i18nDir, 'fiezel-i18n.js'))) {
+    vm.runInContext(fs.readFileSync(path.join(i18nDir, 'fiezel-i18n.js'), 'utf8'), sandbox, { filename: 'fiezel-i18n.js' });
+    for (const f of fs.readdirSync(i18nDir).filter((n) => /^copy-id-.*\.js$/.test(n)).sort()) {
+      vm.runInContext(fs.readFileSync(path.join(i18nDir, f), 'utf8'), sandbox, { filename: f });
+    }
+  }
   // `const audio=AudioService()` adalah pengikatan leksikal, jadi ia tidak muncul sebagai
   // properti global sandbox. Satu baris tambahan menyerahkannya - blok produksinya sendiri
   // tidak diubah sebaris pun.
