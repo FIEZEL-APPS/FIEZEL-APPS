@@ -394,7 +394,7 @@ function sayHarness(options) {
 })().catch((error) => { check('voice-say: harness berjalan tanpa galat', false, error.stack || String(error)); });
 
 // ===========================================================================================
-// (c) APP.JS — cadangan dipicu oleh KEGAGALAN say(), bukan oleh modul yang hilang
+// (c) APP.JS — setiap kegagalan pintu suara menjawab null, dan PENDING BUKAN kebisuan
 // ===========================================================================================
 
 const audioBlock = sourceBlock('AudioService', APP);
@@ -404,14 +404,29 @@ check('app.js: AudioService bisa diambil sebagai blok sumber utuh',
 check('app.js: cadangan TIDAK lagi bersyarat "modul FiezelVoiceSay absen"',
   !/if\(self\.FiezelVoiceSay\?\.say\)return self\.FiezelVoiceSay\.say\(/.test(APP),
   'cabang lama itu mati secara struktural karena sw.js mem-precache modulnya (cf-c1 K11)');
+/* m025-231, kebalikan dari gerbang di atasnya. Dulu yang dijaga adalah "cadangannya benar-benar
+   DIPANGGIL"; sekarang yang dijaga adalah tidak ada cadangan bersuara sama sekali di dalam
+   AudioService. Komentar sejarah di play() memang masih menyebut speechSynthesis - itulah
+   sebabnya yang diperiksa KODE-nya, bukan berkasnya. */
+check('app.js: AudioService tidak menyimpan satu pun sebutan suara peramban di KODE-nya',
+  !/speechSynthesis|SpeechSynthesisUtterance|browserPlay|browserSupported/.test(codeOnly(audioBlock)),
+  'browserPlay()/browserSupported dihapus bersama L4; menyisakannya berarti lapisan itu bisa hidup lagi');
 
 function audioHarness(options) {
   const opts = options || {};
-  const calls = { say: 0, synth: 0, toast: [], utterances: [], cancelPrefetch: 0, prefetch: 0 };
+  const calls = { say: 0, synth: 0, synthCancel: 0, toast: [], utterances: [], cancelPrefetch: 0, prefetch: 0, timers: [] };
   const sandbox = {
     console,
     selectedNeuralRate: () => 1,
     showToast: (message) => { calls.toast.push(String(message)); },
+    /* Stopwatch 9 detik milik play() DIPENDEKKAN, bukan dimatikan. Yang diuji adalah ARTI
+       kemenangannya, dan menunggu sembilan detik sungguhan di dalam gerbang tidak menambah
+       satu pun kebenaran. Angka yang DIMINTA tetap dicatat, supaya "9 detik" tidak diam-diam
+       berubah menjadi nol dan membuat gerbang PENDING di bawah lulus untuk alasan salah.
+       Timer adalah makrotask, jadi say() yang menjawab lewat rantai mikrotask tetap menang
+       lebih dulu - urutan yang sama persis dengan di peramban. */
+    setTimeout: (fn, ms) => { calls.timers.push(ms); return setTimeout(fn, 0); },
+    clearTimeout: (t) => clearTimeout(t),
     // V6: AudioService sekarang membatalkan/mengajukan prefetch lewat dua pintu di app.js
     // (cancelVoicePrefetch/prefetchNextVoice). Keduanya di luar blok sumber yang dijalankan
     // gerbang ini, jadi mereka distub di sini - sama seperti selectedNeuralRate dan
@@ -423,19 +438,24 @@ function audioHarness(options) {
   };
   sandbox.window = sandbox;
   sandbox.self = sandbox;
-  if (!opts.noBrowser) {
-    sandbox.speechSynthesis = {
-      speak(utterance) { calls.synth++; calls.utterances.push(utterance); },
-      cancel() {}
-    };
-    sandbox.SpeechSynthesisUtterance = function (text) { this.text = text; this.lang = ''; this.rate = 1; };
-  }
+  /* PERANGKAP L4, sama seperti di sayHarness. Bendera `noBrowser` dihapus: pintunya sekarang
+     SELALU terbuka, supaya setiap `synth === 0` di bawah berarti "tidak dipakai" dan bukan
+     "tidak mungkin dipakai". Peranti murid pun punya speechSynthesis - menghapus stubnya akan
+     menguji dunia yang tidak ada. */
+  sandbox.speechSynthesis = {
+    speak(utterance) { calls.synth++; calls.utterances.push(utterance); },
+    cancel() { calls.synthCancel++; }
+  };
+  sandbox.SpeechSynthesisUtterance = function (text) { this.text = text; this.lang = ''; this.rate = 1; };
   if (!opts.noModule) {
     sandbox.FiezelVoiceSay = {
       say(text) {
         calls.say++;
         if (opts.sayRejects) return Promise.reject(new Error('voice_playback_failed'));
         if (opts.sayThrows) throw new Error('voice_door_exploded');
+        // Paragraf bacaan yang MASIH berbunyi ketika stopwatch 9 detik habis - bentuk persis
+        // dari bug dua-suara m025-231.
+        if (opts.sayHangs) return new Promise(() => {});
         return Promise.resolve(opts.sayResult === undefined ? false : opts.sayResult);
       },
       stop() {}
@@ -452,27 +472,47 @@ function audioHarness(options) {
 (async function appFallback() {
   const falsey = audioHarness({ sayResult: false });
   const result = await falsey.audio.play('Reading passage.', {});
-  check('app.js: say() yang mengembalikan false MEMICU cadangan speechSynthesis',
-    falsey.calls.say === 1 && falsey.calls.synth === 1 && result && result.provider === 'browser-speech-synthesis',
+  check('app.js: say() yang mengembalikan false menjawab null — TANPA suara peramban di belakangnya',
+    falsey.calls.say === 1 && falsey.calls.synth === 0 && result === null,
     `say=${falsey.calls.say} speak=${falsey.calls.synth} hasil=${JSON.stringify(result)}`);
-  check('app.js: cadangan tidak mengabaikan preferensi kecepatan bicara',
-    falsey.calls.utterances[0].rate === 1 && falsey.calls.utterances[0].lang === 'en-US',
-    `rate=${falsey.calls.utterances[0].rate} lang=${falsey.calls.utterances[0].lang}`);
-  check('app.js: satu kegagalan yang tertolong cadangan tidak mengganggu murid dengan pesan',
-    falsey.calls.toast.length === 0,
+  check('app.js: tidak satu pun SpeechSynthesisUtterance dibangun — cadangannya tidak dicoba, bukan gagal',
+    falsey.calls.utterances.length === 0,
+    `utterance=${falsey.calls.utterances.length}`);
+  /* INVERSI m025-231. Gerbang ini dulu berbunyi "satu kegagalan yang TERTOLONG cadangan tidak
+     mengganggu murid dengan pesan": diam adalah hal yang benar karena murid tetap mendengar
+     sesuatu. Sekarang tidak ada yang menolong, jadi diam berarti membohongi murid yang sedang
+     menunggu suara. Toast-nya WAJIB muncul - sekali, apa adanya. */
+  check('app.js: kegagalan yang tidak lagi punya cadangan DIKATAKAN kepada murid, sekali',
+    falsey.calls.toast.length === 1 && /bermasalah/i.test(falsey.calls.toast[0]) && /\bkamu\b/.test(falsey.calls.toast[0]),
     JSON.stringify(falsey.calls.toast));
 
   const rejected = audioHarness({ sayRejects: true });
-  await rejected.audio.play('Vocabulary example.', {});
-  check('app.js: say() yang MENOLAK juga jatuh ke cadangan, bukan menjadi galat tak tertangkap',
-    rejected.calls.synth === 1,
-    `speak=${rejected.calls.synth}`);
+  const rejectedResult = await rejected.audio.play('Vocabulary example.', {});
+  check('app.js: say() yang MENOLAK menjawab null dengan tenang, bukan galat dan bukan suara kedua',
+    rejectedResult === null && rejected.calls.synth === 0,
+    `hasil=${JSON.stringify(rejectedResult)} speak=${rejected.calls.synth}`);
 
   const thrown = audioHarness({ sayThrows: true });
-  await thrown.audio.play('Grammar example.', {});
-  check('app.js: say() yang melempar seketika pun tidak membuat layar bisu',
-    thrown.calls.synth === 1,
-    `speak=${thrown.calls.synth}`);
+  const thrownResult = await thrown.audio.play('Grammar example.', {});
+  check('app.js: say() yang melempar seketika pun tidak menyalakan suara peramban',
+    thrownResult === null && thrown.calls.synth === 0,
+    `hasil=${JSON.stringify(thrownResult)} speak=${thrown.calls.synth}`);
+
+  /* AKAR m025-231, dan satu-satunya gerbang di berkas ini yang menguji SEBABNYA, bukan
+     akibatnya. Satu paragraf bacaan WAJAR berbunyi lebih dari 9 detik, jadi stopwatch di
+     play() menang secara rutin SELAGI audionya masih berjalan. Dulu ia resolve `false` -
+     nilai yang sama persis dengan "pintu suara bisu" - dan cadangan peramban lalu berbunyi
+     DI ATAS audio yang sedang jalan. Itulah dua suara yang dilaporkan OWNER. Sekarang ia
+     resolve sentinel PENDING, dan PENDING berarti "belum menjawab": null, tanpa toast,
+     tanpa suara kedua. */
+  const pending = audioHarness({ sayHangs: true });
+  const pendingResult = await pending.audio.play('A reading paragraph that outlives nine seconds.', {});
+  check('app.js: stopwatch 9 detik BUKAN kebisuan — null, tanpa toast dan tanpa suara kedua',
+    pendingResult === null && pending.calls.toast.length === 0 && pending.calls.synth === 0,
+    `hasil=${JSON.stringify(pendingResult)} toast=${JSON.stringify(pending.calls.toast)} speak=${pending.calls.synth}`);
+  check('app.js: ambang stopwatch itu tetap 9 detik, bukan diam-diam menjadi nol',
+    pending.calls.timers.indexOf(9000) !== -1,
+    `timer=${JSON.stringify(pending.calls.timers)}`);
 
   const ok = audioHarness({ sayResult: true });
   const okResult = await ok.audio.play('Neural is fine.', {});
@@ -483,7 +523,9 @@ function audioHarness(options) {
     ok.calls.toast.length === 0,
     JSON.stringify(ok.calls.toast));
 
-  const mute = audioHarness({ sayResult: false, noBrowser: true });
+  // "Semua gagal" kini adalah keadaan BAWAAN harness. Bendera `noBrowser` dihapus karena tidak
+  // ada lagi lapisan peramban untuk dimatikan - kegagalan pintu suara SUDAH berarti kebisuan.
+  const mute = audioHarness({ sayResult: false });
   const first = await mute.audio.play('Nothing works.', {});
   await mute.audio.play('Nothing works twice.', {});
   await mute.audio.play('Nothing works three times.', {});
@@ -493,6 +535,23 @@ function audioHarness(options) {
   check('app.js: kegagalan total menjawab dengan null, bukan melempar ke pemanggil',
     first === null,
     `hasil=${JSON.stringify(first)}`);
+  check('app.js: tiga kegagalan berturut-turut tetap NOL utterance peramban',
+    mute.calls.synth === 0 && mute.calls.utterances.length === 0,
+    `speak=${mute.calls.synth} utterance=${mute.calls.utterances.length}`);
+
+  /* Dua pintu samping yang dulu dipakai L4, ditutup dan dijaga terbalik. stop() dulu
+     memanggil speechSynthesis.cancel() (antrean GLOBAL peramban), dan isSupported() dulu
+     menjawab true hanya karena peranti punya speechSynthesis - jawaban yang membuat pemanggil
+     mengira ada suara padahal pintu suaranya belum termuat sama sekali. */
+  mute.audio.stop();
+  check('app.js: stop() tidak lagi menyentuh antrean speechSynthesis global peramban',
+    mute.calls.synthCancel === 0 && mute.calls.cancelPrefetch >= 1,
+    `cancel=${mute.calls.synthCancel} cancelPrefetch=${mute.calls.cancelPrefetch}`);
+  const noModule = audioHarness({ noModule: true });
+  check('app.js: isSupported() tidak lagi mengaku didukung hanya karena peramban punya speechSynthesis',
+    noModule.audio.isSupported() === false && mute.audio.isSupported() === true,
+    `tanpaModul=${noModule.audio.isSupported()} denganModul=${mute.audio.isSupported()}`);
+
   check('app.js: pemanggil listening membaca hasil pemutaran sebelum berkata "putar ulang"',
     /const played=await audio\.play\(q\.script/.test(APP) && (/played\?'Putar ulang bila perlu\.'/.test(APP) || (/played\?FiezelI18n\.t\('quiz\.putar-ulang-bila-perlu'\)/.test(APP) && ID_COPY_CORPUS.includes('Putar ulang bila perlu.'))),
     'catatan "Putar ulang bila perlu" untuk rekaman yang tidak berbunyi adalah pesan yang bohong');
@@ -506,10 +565,14 @@ check('penjaga: localEngine() tetap menolak mesin neural yang asetnya belum leng
   /st\.prepared \|\| st\.ready/.test(SAY),
   'tanpa pemeriksaan ini satu kalimat gagal memicu inisialisasi 152 MB di tengah pelajaran');
 
-const browserBlock = (/function speakWithBrowser\([\s\S]*?\r?\n  \}\r?\n/.exec(SAY) || [''])[0];
-check('penjaga: cabang peramban tidak menyentuh aset neural sama sekali',
-  Boolean(browserBlock) && !/prepare\(|ensureReady\(|warmAssets|FiezelVoiceRuntime|vendor\//.test(browserBlock),
-  browserBlock ? 'speakWithBrowser() berdiri sendiri' : 'speakWithBrowser() tidak ditemukan');
+/* Pengganti gerbang lama "cabang peramban tidak menyentuh aset neural": cabang itu sudah
+   tidak ada. Yang berdiri di DASAR tangga sekarang adalah speakWithLocal(), dan justru di
+   sanalah godaan 152 MB paling besar - "murid diam, nyalakan saja mesinnya" adalah obat yang
+   lebih buruk daripada penyakitnya. */
+const localBlock = (/function speakWithLocal\([\s\S]*?\r?\n  \}\r?\n/.exec(SAY) || [''])[0];
+check('penjaga: dasar tangga (L3 lalu L5) tidak pernah memicu unduhan model dari jalur gagal',
+  Boolean(localBlock) && !/prepare\(|ensureReady\(|warmAssets/.test(localBlock),
+  localBlock ? 'speakWithLocal() hanya memakai mesin yang SUDAH prepared' : 'speakWithLocal() tidak ditemukan');
 
 const forbiddenPrecache = ['vendor/supertonic', 'vendor/kokoro', '.onnx', 'model.int8', 'text_encoder'];
 const swAssets = (/const ASSETS=(\[[^;]+\]);/s.exec(SW) || [])[1] || '';

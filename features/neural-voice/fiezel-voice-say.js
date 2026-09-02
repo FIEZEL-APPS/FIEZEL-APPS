@@ -401,10 +401,13 @@
    * Turun satu lapisan, lalu bicara jujur tentang apa yang terjadi.
    *
    * Naskahnya dipilih SESUDAH tahu hasilnya, bukan sebelum: hanya di titik ini kita tahu
-   * apakah murid akhirnya mendengar sesuatu (`spoken:true`, naskah "pakai suara perangkat
+   * apakah murid akhirnya mendengar sesuatu (`spoken:true`, naskah "pakai suara cadanganku
    * dulu") atau tidak sama sekali (`spoken:false`, naskah jujur yang menyebut audionya tidak
    * ada dan teksnya tetap bisa dibaca). Memutuskan naskah lebih awal adalah cara termudah
-   * menampilkan "pakai suara perangkat" pada murid yang sedang tidak mendengar apa pun.
+   * menampilkan "pakai suara cadanganku" pada murid yang sedang tidak mendengar apa pun.
+   *
+   * m025-232: sejak L4 dihapus, `spoken:true` hanya bisa berarti L2 (mesin awan) atau L3
+   * (neural di perangkat) - tidak pernah lagi suara bawaan sistem.
    */
   function descend(res, english, opts, band_) {
     var out = res || {};
