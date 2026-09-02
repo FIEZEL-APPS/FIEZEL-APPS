@@ -11,7 +11,7 @@ diverifikasi, dan langkah berikutnya — supaya sesi berikutnya tidak menebak.
 **KODE SELESAI, LANE MASIH MATI, PRODUKSI BELUM DIVERIFIKASI.**
 
 - Rantai penuh (murid → identitas → Braincore → bukti → D1 → API owner → Owner Dashboard)
-  terpasang dan terbukti lewat gerbang `braincore-learner-identity-test.js` (172 assert,
+  terpasang dan terbukti lewat gerbang `braincore-learner-identity-test.js` (175 assert,
   Worker penuh + D1 palsu), termasuk nama murid dari perkenalan (§3).
 - Lane **lahir mati**: `FEATURE_LEARNER_EVIDENCE="off"`, KV belum ditulis, klien
   `identityEvidence.mode:'off'`, dan tiap murid tetap harus memberi persetujuannya sendiri.
@@ -157,7 +157,7 @@ dengan panel agregat.
 
 ## 6. Gerbang
 
-`braincore-learner-identity-test.js` — **172/172**, terdaftar di `quality.yml`. Ia
+`braincore-learner-identity-test.js` — **175/175**, terdaftar di `quality.yml`. Ia
 membangkitkan Worker penuh dengan D1 palsu dan membuktikan dua murid nyata: kepemilikan
 terpisah, isolasi lintas-murid (cookie murid → 403 di rute owner, dengan atau tanpa `?sub=`
 orang lain), spoofing `sub` → 400 tanpa satu baris pun tertulis untuk korban, idempotensi
@@ -172,6 +172,37 @@ Regresi yang ikut diperiksa dan hijau: `braincore-evidence`, `d1-schema-contract
 `brain-sync-failclosed`, `install-health`, `pwa-release-coherence`,
 `build-number-uniqueness`, `cf-config-killswitch`, `analytics-privacy`,
 `analytics-server-only`, `learning-lane`, `braincore-purity`.
+
+### Tiga cacat yang ditemukan gerbang penuh sesudah dorongan pertama
+
+Suite lengkap (229 gerbang `quality.yml`) dijalankan sesudah dorongan pertama dan
+menemukan tiga hal yang gerbang terpilih belum melihatnya:
+
+1. **`q.clear` tidak pernah ada.** `setLearnerEvidenceConsent()` memanggil
+   `q.clear&&q.clear()` untuk mengosongkan antrean saat persetujuan dicabut — tetapi
+   `makeQueue()` (`features/telemetry/fiezel-learning-queue.js`) mengembalikan
+   `{put, peekBatch, ack, purge, stats, limits}`. Tidak ada `clear`. Panggilannya diam-diam
+   tidak melakukan apa pun, jadi janji "cabut = tidak ada sisa yang terkirim" hanya benar
+   di komentar: event yang sudah antre tetap terkirim begitu murid menyalakan
+   persetujuannya lagi. Sekarang `purge()`. Gerbangnya ikut diperbaiki: versi pertamanya
+   meng-assert TEKS `q.clear` dan karena itu LULUS pada kode yang tidak bekerja — sekarang
+   nama metodenya diadu langsung ke daftar yang benar-benar dikembalikan `makeQueue()`.
+2. **Reset progres melewatkan dua kunci lane D** (`reset-side-state-test.js` merah).
+   `IDENTITY_EVIDENCE_ATTEMPT_KEY` dan `LEARNER_NAME_SYNC_KEY` ditulis app.js tetapi tidak
+   ikut dihapus. Karena event lane D terikat `sub` yang TIDAK berubah saat reset, sisa
+   antrean dari sebelum reset akan mendarat di Owner Dashboard sesudahnya sebagai bukti
+   murid yang sama. Keduanya sekarang dihapus, antrean lane D ikut di-`purge()` seperti
+   lane C, dan keduanya masuk daftar kontrak gerbang supaya tidak bisa hilang lagi.
+3. **`coordination/BUILD-VERSION.json` tertinggal di m025-229** sementara tiga penanda
+   build sudah m025-230 (`coordination-guard-test.js` merah). Sumber tunggal nomor build
+   disamakan; tiga penanda tidak diutak-atik.
+
+`id-golden-baseline.json` di-regenerate di commit yang sama, dan itu WAJIB dibaca sebagai
+bagian dari cacat #2: lexer `id-golden-snapshot-test.js` membaca blok komentar di sekitar
+`resetProgress()` sebagai satu literal panjang, jadi menambah dua nama kunci ke daftar
+`removeItem` mengubah satu "literal" itu. Delta baselinenya persis satu entri, isinya
+komentar + daftar kunci — **nol kata yang dibaca murid berubah**, dan jumlah literal tetap
+2.146.
 
 Dua gerbang yang **diubah dengan sadar**, dan alasannya ditulis di tempatnya:
 

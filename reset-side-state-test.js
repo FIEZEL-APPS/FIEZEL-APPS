@@ -56,7 +56,13 @@ const DIHAPUS_SAAT_RESET = [
   'CONFUSION_MATRIX_KEY',
   'OLM_NEGOTIATION_KEY',
   'SRL_KEY',
-  'RETENTION_PROBE_KEY'
+  'RETENTION_PROBE_KEY',
+  // Lane D (bukti per-murid, m025-230). Keduanya sudah dihapus app.js; dikontrakkan DI SINI
+  // supaya penghapusannya tidak bisa hilang lagi dalam refactor berikutnya. Event lane D
+  // terikat `sub` yang TIDAK berubah saat reset, jadi sisa antrean/penanda dari sebelum reset
+  // akan muncul sebagai bukti murid yang sama sesudahnya.
+  'IDENTITY_EVIDENCE_ATTEMPT_KEY',
+  'LEARNER_NAME_SYNC_KEY'
 ];
 
 /**

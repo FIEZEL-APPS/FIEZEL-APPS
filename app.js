@@ -2039,7 +2039,12 @@ function setLearnerEvidenceConsent(granted){
   const want=granted===true;
   state.preferences={...state.preferences,learnerEvidenceConsent:want};save();
   if(!want){
-    try{const q=identityEvidenceQueue();const p=q&&q.clear&&q.clear();if(p&&typeof p.catch==='function')p.catch(()=>{})}catch{}
+    /* purge(), BUKAN clear(): makeQueue() (features/telemetry/fiezel-learning-queue.js)
+       mengembalikan {put,peekBatch,ack,purge,stats,limits} - tidak ada `clear`. Panggilan
+       lama `q.clear&&q.clear()` karena itu diam-diam tidak melakukan apa pun, jadi janji
+       cabut-sama-dengan-tidak-ada-sisa hanya benar di komentar: event yang sudah
+       antre tetap terkirim begitu murid menyalakan persetujuannya lagi. */
+    try{const q=identityEvidenceQueue();if(q&&typeof q.purge==='function'){const p=q.purge();if(p&&typeof p.catch==='function')p.catch(()=>{})}}catch{}
   }
   const p=identityEvidenceSyncConsent(want);
   if(p&&typeof p.catch==='function')p.catch(()=>{});
@@ -10548,11 +10553,21 @@ function resetProgress(){openModal(`<div class="modal-mark">FIEZEL</div><h2>${Fi
      reset di penghitung server. Antrean IndexedDB-nya ikut dikosongkan tepat di bawah -
      menghapus kuncinya saja tidak cukup, karena event yang masih menunggu upload membawa
      cohort lama di dalam dirinya. */
-  for(const k of [BKT_KEY,MISCONCEPTION_LEDGER_KEY,ITEM_CALIBRATION_KEY,CONFUSION_MATRIX_KEY,OLM_NEGOTIATION_KEY,SRL_KEY,EVIDENCE_COHORT_KEY,EVIDENCE_LAST_KEY,EVIDENCE_ATTEMPT_KEY,RETENTION_PROBE_KEY,SL_STATE_KEY]){
+  /* Lane D (bukti per-murid, m025-230): IDENTITY_EVIDENCE_ATTEMPT_KEY dan
+     LEARNER_NAME_SYNC_KEY ikut dihapus, dan antrean IndexedDB lane D ikut
+     dikosongkan di bawah. Alasannya seperti lane C, hanya lebih tajam: event lane D
+     terikat sub, dan sub TIDAK ikut berubah saat reset. Tanpa pengosongan ini,
+     event yang masih menunggu upload mendarat di Owner Dashboard SESUDAH reset,
+     sebagai bukti murid yang sama - persis progres yang katanya sudah dihapus.
+     Penanda rem tulis nama ikut dihapus karena ia menyimpan nama yang diketik
+     murid; membiarkannya berarti hapus-permanen menyisakan satu salinan nama,
+     dan harganya cuma satu POST nama tambahan sesudah reset. */
+  for(const k of [BKT_KEY,MISCONCEPTION_LEDGER_KEY,ITEM_CALIBRATION_KEY,CONFUSION_MATRIX_KEY,OLM_NEGOTIATION_KEY,SRL_KEY,EVIDENCE_COHORT_KEY,EVIDENCE_LAST_KEY,EVIDENCE_ATTEMPT_KEY,RETENTION_PROBE_KEY,SL_STATE_KEY,IDENTITY_EVIDENCE_ATTEMPT_KEY,LEARNER_NAME_SYNC_KEY]){
     try{localStorage.removeItem(sideStateKey(k))}catch{}
     try{localStorage.removeItem(k)}catch{}
   }
   try{const q=braincoreEvidenceQueue();if(q&&typeof q.purge==='function'){const p=q.purge();if(p&&typeof p.catch==='function')p.catch(()=>{})}}catch{}
+  try{const q=identityEvidenceQueue();if(q&&typeof q.purge==='function'){const p=q.purge();if(p&&typeof p.catch==='function')p.catch(()=>{})}}catch{}
   state=loadState();if(activeAccountUuid)state.ownerUuid=activeAccountUuid;coreBrainCache=null;save();closeModal();go('home');showToast(FiezelI18n.t('settings.progres-akun-berhasil-direset'))}}
 document.addEventListener?.('keydown',e=>{if(e.key==='Escape'&&!$('modal')?.classList.contains('hidden'))closeModal()});
 /* q17-S1 2026-08-29: trap Tab di dalam dialog \u2014 latar tidak boleh bisa dijelajah selama modal terbuka (aria-modal jujur). Siklus manual first<->last, tanpa inert supaya kompatibel luas. */
