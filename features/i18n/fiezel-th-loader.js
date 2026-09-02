@@ -54,6 +54,9 @@
   var LISTENING_TH = './features/i18n/listening-bank-th.json';
   var WRITING_TH = './features/i18n/writing-prompts-th.json';
   var READING_TH = './features/i18n/reading-exam-th.json';
+  var MISCONCEPTION_TH = './features/i18n/misconception-th.json';
+  var CLOZE_TH = './features/i18n/cloze-bank-th.json';
+  var READING_BANK_TH = './features/i18n/reading-bank-th.json';
   var MANIFEST = './features/i18n/locale-assets-th.json';
 
   var activated = false;
@@ -86,7 +89,10 @@
       fetch(SPEAKING_TH, { credentials: 'same-origin' }).then(function (r) { if (!r.ok) throw Error(SPEAKING_TH + ': ' + r.status); return r.json(); }).then(function (j) { d.speaking = j.items || j; }),
       fetch(LISTENING_TH, { credentials: 'same-origin' }).then(function (r) { if (!r.ok) throw Error(LISTENING_TH + ': ' + r.status); return r.json(); }).then(function (j) { d.listening = j.items || j; }),
       fetch(WRITING_TH, { credentials: 'same-origin' }).then(function (r) { if (!r.ok) throw Error(WRITING_TH + ': ' + r.status); return r.json(); }).then(function (j) { d.writing = j; }),
-      fetch(READING_TH, { credentials: 'same-origin' }).then(function (r) { if (!r.ok) throw Error(READING_TH + ': ' + r.status); return r.json(); }).then(function (j) { d.reading = j; })
+      fetch(READING_TH, { credentials: 'same-origin' }).then(function (r) { if (!r.ok) throw Error(READING_TH + ': ' + r.status); return r.json(); }).then(function (j) { d.reading = j; }),
+      fetch(MISCONCEPTION_TH, { credentials: 'same-origin' }).then(function (r) { if (!r.ok) throw Error(MISCONCEPTION_TH + ': ' + r.status); return r.json(); }).then(function (j) { d.misconception = j; }),
+      fetch(CLOZE_TH, { credentials: 'same-origin' }).then(function (r) { if (!r.ok) throw Error(CLOZE_TH + ': ' + r.status); return r.json(); }).then(function (j) { d.cloze = j.items || j; }),
+      fetch(READING_BANK_TH, { credentials: 'same-origin' }).then(function (r) { if (!r.ok) throw Error(READING_BANK_TH + ': ' + r.status); return r.json(); }).then(function (j) { d.readingBank = j.items || j; })
     ];
     // allSettled, bukan all: satu dataset gagal (offline parsial) tidak boleh menahan yang
     // lain — overlay per-dataset di app.js sudah fail-soft (null = tampilan id bertahan).
@@ -118,7 +124,7 @@
     if (activated) return;
     activated = true;
     // Baru di titik ini window.FiezelThData lahir — murid id tidak pernah sampai sini.
-    root.FiezelThData = { grammar: null, vocab: null, speaking: null, listening: null, writing: null, reading: null, ready: false };
+    root.FiezelThData = { grammar: null, vocab: null, speaking: null, listening: null, writing: null, reading: null, misconception: null, cloze: null, readingBank: null, ready: false };
     injectScripts();
     fetchDatasets();
     fillLocaleCache();
