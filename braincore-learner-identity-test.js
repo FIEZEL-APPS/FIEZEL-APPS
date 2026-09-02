@@ -662,8 +662,22 @@ function babKlien() {
     /identityEvidenceMode\(\)!=='off'&&identityEvidenceConsented\(\)/.test(app));
   check('(F) klien: persetujuan fail-closed (=== true persis)',
     /learnerEvidenceConsent===true/.test(app));
-  check('(F) klien: mencabut persetujuan mengosongkan antrean lokal',
-    /setLearnerEvidenceConsent[\s\S]{0,400}q\.clear/.test(app));
+  /* Versi pertama gerbang ini meng-assert `q.clear` — dan LULUS, padahal makeQueue()
+   * tidak pernah punya metode bernama itu: `q.clear&&q.clear()` di app.js diam-diam
+   * tidak melakukan apa pun, jadi antrean lane D SELAMAT dari pencabutan persetujuan.
+   * Itu bentuk vakum yang paling mahal: gerbang yang mencocokkan TEKS, bukan metode
+   * yang benar-benar ada. Karena itu nama metodenya sekarang diadu langsung ke daftar
+   * yang dikembalikan makeQueue(). */
+  const queueSrc = read('features/telemetry/fiezel-learning-queue.js');
+  const queueApi = (queueSrc.match(/return \{\s*put: put[^}]*\}/) || [''])[0];
+  check('(F) modul antrean memang mengekspor purge() dan TIDAK mengekspor clear()',
+    /\bpurge: purge\b/.test(queueApi) && !/\bclear\s*:/.test(queueApi), queueApi.slice(0, 160));
+  check('(F) klien: mencabut persetujuan mengosongkan antrean lokal (purge, metode yang ada)',
+    /setLearnerEvidenceConsent[\s\S]{0,900}q\.purge\(\)/.test(app));
+  check('(F) klien: reset progres ikut mengosongkan antrean lane per-murid',
+    /function resetProgress\(\)[\s\S]{0,4000}identityEvidenceQueue\(\)[\s\S]{0,200}q\.purge\(\)/.test(app));
+  check('(F) klien: reset progres menghapus penanda lane per-murid dari localStorage',
+    /resetProgress\(\)[\s\S]{0,4000}IDENTITY_EVIDENCE_ATTEMPT_KEY,LEARNER_NAME_SYNC_KEY\]/.test(app));
   check('(B) klien: antrean IndexedDB lane per-murid TERPISAH dari lane agregat',
     /IDENTITY_EVIDENCE_DB_NAME='fiezel-braincore-learner-evidence-v1'/.test(app) &&
     /EVIDENCE_DB_NAME='fiezel-braincore-evidence-v1'/.test(app));

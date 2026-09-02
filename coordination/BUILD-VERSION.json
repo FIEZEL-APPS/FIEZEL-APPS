@@ -1,7 +1,7 @@
 {
-  "version": "m025-229",
-  "claimedBy": "perplexity-computer (multilingual i18n wave, direbase atas m025-185)",
-  "claimedAt": "2026-09-01T21:14:41.563Z",
-  "reason": "aktivasi lane bukti belajar Braincore (fiezel-evidence): EVIDENCE_ENABLED on + emitter klien",
+  "version": "m025-230",
+  "claimedBy": "claude-code (SLOT 9 — lane bukti belajar Braincore per-murid, PR #308)",
+  "claimedAt": "2026-09-02T00:40:00.000Z",
+  "reason": "lane bukti belajar Braincore PER-MURID (identity.sub) + nama learner ke server: app.js, core-config.js, dan tiga berkas features/telemetry/ ikut precache shell, jadi SW_REV wajib naik",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
