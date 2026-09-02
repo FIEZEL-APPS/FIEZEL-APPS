@@ -74,7 +74,7 @@ FEATURE_SOCIAL    = "on"
 # TIGA sakelar AND (var ini "on" + KV cfg:flags enabled.learnerEvidence=true +
 # flags.cfLearnerEvidenceEnabled=true) DAN persetujuan per-murid di
 # `learner_evidence_consent`. Tanpa persetujuan itu, lane yang menyala pun menulis NOL baris.
-FEATURE_LEARNER_EVIDENCE = "off"
+FEATURE_LEARNER_EVIDENCE = "on"
 # Angka limit hanya untuk NASKAH UX (bab 12); penegakan tetap di server.
 #
 # 🔄 TEMUAN LAPANGAN 28 Agu 2026 — DUA ANGKA UNTUK HAL YANG SAMA, SUDAH DISELARASKAN.
