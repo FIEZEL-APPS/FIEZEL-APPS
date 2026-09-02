@@ -1,0 +1,209 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" width="100%" height="100%" role="img" aria-label="PAW Maskot Resmi FIEZEL — Pose Halo Semangat">
+  <defs>
+    <!-- Gradients for subtle premium depth -->
+    <linearGradient id="pawBodyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFE066" />
+      <stop offset="100%" stop-color="#FFD94F" />
+    </linearGradient>
+    
+    <linearGradient id="pawShadeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#F5C442" />
+      <stop offset="100%" stop-color="#EDB93A" />
+    </linearGradient>
+
+    <linearGradient id="pawBellyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#FFF4DA" />
+    </linearGradient>
+
+    <linearGradient id="pawTerracottaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#A83246" />
+      <stop offset="100%" stop-color="#8C2233" />
+    </linearGradient>
+
+    <!-- Clip path for sparkling eyes -->
+    <clipPath id="pawEyeLeftClip">
+      <ellipse cx="400" cy="380" rx="46" ry="52" />
+    </clipPath>
+    <clipPath id="pawEyeRightClip">
+      <ellipse cx="600" cy="380" rx="46" ry="52" />
+    </clipPath>
+
+    <!-- Drop shadow filter -->
+    <filter id="pawSoftShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="16" stdDeviation="20" flood-color="#8C2233" flood-opacity="0.12" />
+    </filter>
+  </defs>
+
+  <!-- GROUND CONTACT SHADOW -->
+  <ellipse cx="500" cy="920" rx="280" ry="32" fill="#000000" opacity="0.1" />
+
+  <!-- MAIN CHARACTER GROUP -->
+  <g id="pawCharacter" filter="url(#pawSoftShadow)">
+
+    <!-- 1. FLUFFY INTACT CONNECTED TAIL (Zero Anomaly, Perfectly Attached) -->
+    <g id="pawTail">
+      <!-- Outer Tail Path -->
+      <path d="M 640 730 
+               C 780 770 910 680 900 540 
+               C 890 420 780 390 730 450 
+               C 680 510 730 610 810 580 
+               C 830 570 820 630 760 670 
+               C 700 710 630 680 610 660 Z" 
+            fill="url(#pawShadeGrad)" />
+      
+      <!-- Tail Tip Ring (Burgundy / Terracotta Accent) -->
+      <path d="M 875 480 
+               C 890 420 780 390 730 450 
+               C 700 486 715 530 750 540 
+               C 760 480 820 450 875 480 Z" 
+               fill="url(#pawTerracottaGrad)" />
+      
+      <!-- Tail Fluff Highlight -->
+      <path d="M 740 455 C 760 420 810 420 840 445 C 820 440 780 435 755 465 Z" fill="#FFF4DA" opacity="0.8" />
+    </g>
+
+    <!-- 2. BODY & FEET -->
+    <g id="pawBody">
+      <!-- Back / Torso Base -->
+      <rect x="330" y="550" width="340" height="280" rx="140" fill="url(#pawBodyGrad)" />
+      
+      <!-- Left Foot -->
+      <rect x="330" y="790" width="140" height="75" rx="37.5" fill="url(#pawShadeGrad)" />
+      <ellipse cx="380" cy="805" rx="16" ry="10" fill="#FFF4DA" opacity="0.6" />
+      <ellipse cx="420" cy="805" rx="16" ry="10" fill="#FFF4DA" opacity="0.6" />
+
+      <!-- Right Foot -->
+      <rect x="530" y="790" width="140" height="75" rx="37.5" fill="url(#pawShadeGrad)" />
+      <ellipse cx="580" cy="805" rx="16" ry="10" fill="#FFF4DA" opacity="0.6" />
+      <ellipse cx="620" cy="805" rx="16" ry="10" fill="#FFF4DA" opacity="0.6" />
+
+      <!-- Fluffy Cream Belly / Chest Patch -->
+      <ellipse cx="500" cy="690" rx="125" ry="105" fill="url(#pawBellyGrad)" />
+
+      <!-- FIEZEL Pawprint Chest Emblem (Burgundy Terracotta) -->
+      <g id="pawprintEmblem" transform="translate(500, 680) scale(3.2) translate(-12.6, -12.5)" fill="url(#pawTerracottaGrad)">
+        <!-- 4 Toe Beans -->
+        <rect x="4.6" y="7.5" width="3.1" height="4.6" rx="1.55"/>
+        <rect x="8.9" y="5.1" width="3.1" height="7.0" rx="1.55"/>
+        <rect x="13.2" y="3.4" width="3.1" height="8.7" rx="1.55"/>
+        <rect x="17.5" y="6.2" width="3.1" height="5.9" rx="1.55"/>
+        <!-- Main Heart Pad -->
+        <path d="M12.6 14.0 C 16.1 14.0 18.5 15.9 18.5 18.1 C 18.5 20.1 16.5 21.5 12.6 21.5 C 8.7 21.5 6.7 20.1 6.7 18.1 C 6.7 15.9 9.1 14.0 12.6 14.0 Z"/>
+      </g>
+    </g>
+
+    <!-- 3. HEAD & EARS -->
+    <g id="pawHeadGroup">
+      <!-- Left Ear (Behind Head) -->
+      <g id="pawEarLeft">
+        <path d="M 270 280 L 320 90 L 460 190 Q 355 285 270 280 Z" fill="url(#pawBodyGrad)" />
+        <!-- Inner Ear Terracotta -->
+        <path d="M 310 240 L 340 140 L 415 195 Z" fill="url(#pawTerracottaGrad)" />
+      </g>
+
+      <!-- Right Ear (Behind Head) -->
+      <g id="pawEarRight">
+        <path d="M 730 280 L 680 90 L 540 190 Q 645 285 730 280 Z" fill="url(#pawBodyGrad)" />
+        <!-- Inner Ear Terracotta -->
+        <path d="M 690 240 L 660 140 L 585 195 Z" fill="url(#pawTerracottaGrad)" />
+      </g>
+
+      <!-- Main Round Head -->
+      <circle cx="500" cy="400" r="255" fill="url(#pawBodyGrad)" />
+
+      <!-- Head Top Tuft / Cute Hair Detail -->
+      <path d="M 470 150 Q 500 110 530 150 Q 515 130 470 150 Z" fill="#FFEAA0" />
+
+      <!-- Muzzle / Face Patch (Cream Vanilla) -->
+      <ellipse cx="500" cy="495" rx="115" ry="85" fill="url(#pawBellyGrad)" />
+
+      <!-- Boop Nose (Cute Soft Triangle) -->
+      <path d="M 475 450 L 525 450 L 500 480 Z" fill="url(#pawTerracottaGrad)" />
+      <!-- Nose Highlight -->
+      <ellipse cx="490" cy="456" rx="6" ry="3" fill="#FFFFFF" opacity="0.6" />
+
+      <!-- Blushing Cheeks (Warm Pink Peach) -->
+      <circle cx="340" cy="460" r="32" fill="#F0A0AC" opacity="0.75" />
+      <circle cx="660" cy="460" r="32" fill="#F0A0AC" opacity="0.75" />
+      <!-- Blushing Sparkle Lines -->
+      <line x1="325" y1="455" x2="355" y2="455" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity="0.5" />
+      <line x1="645" y1="455" x2="675" y2="455" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity="0.5" />
+
+      <!-- Big Sparkling Eyes (Espresso with Dual Highlights) -->
+      <!-- Left Eye -->
+      <g id="eyeLeft">
+        <ellipse cx="400" cy="380" rx="46" ry="52" fill="#33201F" />
+        <g clip-path="url(#pawEyeLeftClip)">
+          <!-- Primary Top-Right Highlight -->
+          <circle cx="414" cy="362" r="16" fill="#FFFFFF" />
+          <!-- Secondary Bottom-Left Highlight -->
+          <circle cx="388" cy="398" r="8" fill="#FFFFFF" opacity="0.8" />
+          <!-- Cute Star Sparkle -->
+          <circle cx="420" cy="395" r="4" fill="#FFEAA0" />
+        </g>
+      </g>
+
+      <!-- Right Eye -->
+      <g id="eyeRight">
+        <ellipse cx="600" cy="380" rx="46" ry="52" fill="#33201F" />
+        <g clip-path="url(#pawEyeRightClip)">
+          <!-- Primary Top-Right Highlight -->
+          <circle cx="614" cy="362" r="16" fill="#FFFFFF" />
+          <!-- Secondary Bottom-Left Highlight -->
+          <circle cx="588" cy="398" r="8" fill="#FFFFFF" opacity="0.8" />
+          <!-- Cute Star Sparkle -->
+          <circle cx="620" cy="395" r="4" fill="#FFEAA0" />
+        </g>
+      </g>
+
+      <!-- Cheerful Smile & Open Mouth with Tongue -->
+      <g id="pawSmile">
+        <!-- Open Cheerful Mouth -->
+        <path d="M 450 495 
+                 C 450 560 550 560 550 495 
+                 C 530 498 470 498 450 495 Z" 
+              fill="#8C2233" />
+        <!-- Tongue -->
+        <path d="M 470 525 
+                 C 485 555 515 555 530 525 
+                 C 515 515 485 515 470 525 Z" 
+              fill="#F0A0AC" />
+        <!-- Mouth Outline Stroke -->
+        <path d="M 445 492 C 470 508 500 508 500 482 C 500 508 530 508 555 492" 
+              stroke="#33201F" stroke-width="12" stroke-linecap="round" fill="none" />
+      </g>
+    </g>
+
+    <!-- 4. ARMS & INTERACTIVE PROPS (Waving Hello & Mini Smart Book) -->
+    <!-- Right Arm: Waving Friendly Hello (Up in the Air) -->
+    <g id="pawArmWaving" transform="translate(710, 480) rotate(-35)">
+      <!-- Arm Limb -->
+      <rect x="-30" y="-80" width="60" height="150" rx="30" fill="url(#pawBodyGrad)" />
+      <!-- Paw Pad Highlight -->
+      <ellipse cx="0" cy="-60" rx="18" ry="14" fill="#FFF4DA" opacity="0.9" />
+      <circle cx="-10" cy="-78" r="5" fill="#FFF4DA" opacity="0.9" />
+      <circle cx="0" cy="-82" r="5" fill="#FFF4DA" opacity="0.9" />
+      <circle cx="10" cy="-78" r="5" fill="#FFF4DA" opacity="0.9" />
+    </g>
+
+    <!-- Left Arm: Holding Cute FIEZEL Study Tablet/Book -->
+    <g id="pawArmHolding" transform="translate(290, 640)">
+      <!-- Arm Limb -->
+      <ellipse cx="30" cy="0" rx="42" ry="70" fill="url(#pawBodyGrad)" transform="rotate(25)" />
+      
+      <!-- FIEZEL Study Tablet / Notebook -->
+      <g transform="translate(-50, -40) rotate(-12)">
+        <rect x="0" y="0" width="110" height="140" rx="14" fill="#8C2233" />
+        <rect x="8" y="8" width="94" height="124" rx="8" fill="#FFF7D6" />
+        <!-- F Logo on Book -->
+        <path d="M 38 45 L 72 45 L 72 58 L 54 58 L 54 68 L 68 68 L 68 80 L 54 80 L 54 100 L 38 100 Z" fill="#8C2233" />
+        <circle cx="55" cy="115" r="4" fill="#F0C241" />
+      </g>
+
+      <!-- Paw Fingers Over the Book -->
+      <ellipse cx="35" cy="20" rx="20" ry="16" fill="url(#pawBodyGrad)" />
+    </g>
+
+  </g>
+</svg>
