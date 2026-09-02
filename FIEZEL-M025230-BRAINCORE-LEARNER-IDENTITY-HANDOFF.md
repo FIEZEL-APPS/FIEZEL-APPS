@@ -11,11 +11,12 @@ diverifikasi, dan langkah berikutnya — supaya sesi berikutnya tidak menebak.
 **KODE SELESAI, LANE MASIH MATI, PRODUKSI BELUM DIVERIFIKASI.**
 
 - Rantai penuh (murid → identitas → Braincore → bukti → D1 → API owner → Owner Dashboard)
-  terpasang dan terbukti lewat gerbang `braincore-learner-identity-test.js` (120 assert,
-  Worker penuh + D1 palsu).
+  terpasang dan terbukti lewat gerbang `braincore-learner-identity-test.js` (172 assert,
+  Worker penuh + D1 palsu), termasuk nama murid dari perkenalan (§3).
 - Lane **lahir mati**: `FEATURE_LEARNER_EVIDENCE="off"`, KV belum ditulis, klien
   `identityEvidence.mode:'off'`, dan tiap murid tetap harus memberi persetujuannya sendiri.
-- **NOT VERIFIED di produksi.** Migrasi `0009_learner_evidence.sql` belum dijalankan
+- **NOT VERIFIED di produksi.** Migrasi `0009_learner_evidence.sql` dan
+  `0010_learner_name.sql` belum dijalankan
   (token CI tidak bisa `wrangler d1 execute --remote`), jadi belum ada satu baris pun yang
   benar-benar ditulis atau dibaca di Cloudflare. Semua klaim di bawah **SOURCE VERIFIED**.
 
@@ -90,21 +91,37 @@ server: sub = ctx.identity.sub          ← BUKAN dari body
 `sub`/`userId`/`cohort` ditolak **400 `foreign_field`** — bukan diabaikan. Perbedaan itu
 penting: field yang diabaikan hari ini adalah field yang dibaca kode baru besok.
 
-## 3. Nama murid — batas yang harus diketahui sesi berikutnya
+## 3. Nama murid — nama perkenalan, dikirim ke server
 
-Nama untuk dashboard dibaca dari **`social_profile.display_name` / `.handle`** lewat `sub`,
-dan **tidak disalin** ke lane ini. Satu sumber nama.
+**Diputuskan OWNER 2 Sep 2026, sesudah versi pertama handoff ini.** Versi pertama melaporkan
+bahwa nama hanya bisa datang dari `social_profile`, dan bahwa sebagian besar murid akan
+muncul tanpa nama. Owner menolak konsekuensi itu, jadi jalurnya diubah:
 
-**`state.userName` (nama perkenalan) TIDAK dipakai, dan itu keputusan, bukan kelalaian.**
-Nama itu hidup di `localStorage` perangkat (`app.js` `setLearnerName`) dan tidak pernah
-sampai ke server sama sekali — memperlakukannya sebagai otoritatif berarti mengarang. Murid
-tanpa profil sosial karena itu tampil sebagai `murid <8 hex sub>` di dashboard, bukan
-disembunyikan: menyembunyikan yang tak bernama akan membuat Owner mengira murid itu tidak ada.
+Nama panggilan yang **wajib** diisi murid di langkah pertama perkenalan sekarang **dikirim
+ke server** dan disimpan di `learner_name(sub, name, name_day, updated_at)`
+(`0010_learner_name.sql`).
 
-Konsekuensi praktis yang perlu diputuskan Owner: **selama lapisan sosial belum dipakai luas,
-sebagian besar murid akan muncul tanpa nama.** Kalau itu tidak bisa diterima, jalur yang
-paling kecil adalah membuat pembuatan profil sosial menjadi bagian dari perkenalan — bukan
-menambah tabel nama kedua di lane ini.
+- Langkah nama di perkenalan **sudah** wajib sebelum perubahan ini — `topbar(false, false)`
+  (tanpa Kembali, tanpa Lewati), tombol lanjut mati sampai nama diisi, dan jalur Enter pada
+  papan ketik ikut dijaga. **Tidak ada alur baru yang dibuat**; yang ditambahkan hanya
+  pengiriman ke server.
+- **Tabel sendiri, bukan kolom di `identity`.** `0001_identity.sql` melarang nama masuk ke
+  sana, dan larangan itu punya alasan operasional yang masih berlaku (tabel jalur-panas,
+  jarang berubah). Nama boleh berubah kapan saja; `sub` tidak.
+- **Mengganti nama tidak memutus bukti** — yang mengikat bukti adalah `sub`, dan `sub` tidak
+  ikut berubah. Gerbang membuktikannya: hitungan bukti sama, direktori tidak memunculkan
+  murid kedua.
+- **Urutan nama di dashboard:** `learner_name` → `social_profile.display_name` → `.handle` →
+  tidak ada. Tiga terakhir cadangan untuk murid lama. Baris `murid <8 hex sub>` sekarang
+  adalah keadaan **legacy/galat**, bukan perilaku normal untuk murid baru.
+- **Naskah privasi langkah nama diperbarui (id + th).** Naskah lama berjanji "Nggak dibagi ke
+  siapa pun" — janji yang menjadi tidak benar begitu nama sampai ke server dan terlihat
+  Owner. Ini bukan detail kosmetik: janji privasi yang tidak diperbarui bersama kodenya
+  adalah kebohongan yang ditandatangani murid.
+- **Rem tulis:** klien menyegarkan nama maksimum sekali sehari; perubahan nama didorong
+  segera (`force`). Penyegaran itu juga penanda "masih dipakai" untuk retensi 180 hari.
+- **Pencabutan persetujuan bukti tidak menghapus nama** (dua data, dua alasan). Penghapusan
+  atas permintaan ada di `docs/D1-RETENTION.md` §4.
 
 ## 4. Persetujuan & retensi
 
@@ -140,12 +157,14 @@ dengan panel agregat.
 
 ## 6. Gerbang
 
-`braincore-learner-identity-test.js` — **120/120**, terdaftar di `quality.yml`. Ia
+`braincore-learner-identity-test.js` — **172/172**, terdaftar di `quality.yml`. Ia
 membangkitkan Worker penuh dengan D1 palsu dan membuktikan dua murid nyata: kepemilikan
 terpisah, isolasi lintas-murid (cookie murid → 403 di rute owner, dengan atau tanpa `?sub=`
 orang lain), spoofing `sub` → 400 tanpa satu baris pun tertulis untuk korban, idempotensi
 replay, direktori + pilih murid, nama dari `social_profile`, pencabutan menghapus,
-fail-closed tiga sakelar, lane agregat utuh, dan render HTML dashboard.
+fail-closed tiga sakelar, lane agregat utuh, render HTML dashboard, dan seluruh rantai nama
+(§3): nama wajib di perkenalan, normalisasi klien == server yang diadu langsung, spoof nama
+orang lain ditolak, ganti nama tidak memutus bukti, dan naskah privasi yang sudah benar.
 
 Regresi yang ikut diperiksa dan hijau: `braincore-evidence`, `d1-schema-contract` (41/41),
 `cf-wiring`, `cf-api-contract`, `config-consistency`, `owner-dashboard`, `owner-edge-guard`
@@ -166,6 +185,7 @@ Dua gerbang yang **diubah dengan sadar**, dan alasannya ditulis di tempatnya:
 ## 7. Langkah berikut (urutan wajib, dijalankan OWNER)
 
 1. `wrangler d1 execute fiezel-core --remote --file=migrations/0009_learner_evidence.sql`
+   **dan** `wrangler d1 execute fiezel-core --remote --file=migrations/0010_learner_name.sql`
 2. `FEATURE_LEARNER_EVIDENCE = "on"` di `workers/api/wrangler.toml`, lalu deploy Worker api.
 3. KV `cfg:flags`: `enabled.learnerEvidence = true` **dan**
    `flags.cfLearnerEvidenceEnabled = true`.
@@ -181,8 +201,10 @@ Selama satu langkah pun belum dilakukan, lane ini menulis **nol baris**. Verifik
 - **Kegagalan `runLearnerEvidencePurge` tidak muncul di `/api/owner/cron-status`** — batas
   yang persis sama dengan `runEvidencePurge` yang sudah ada, dan diwarisi dengan sadar,
   bukan ditemukan belakangan.
-- **Nama murid hanya ada untuk yang punya `social_profile`** (lihat §3). Keputusan produk,
-  bukan bug.
+- **Murid yang mendaftar SEBELUM aktivasi tidak punya baris `learner_name`** sampai mereka
+  membuka aplikasi lagi (penyegaran harian mengirimkannya). Sampai saat itu mereka jatuh ke
+  nama profil sosial, atau ke `murid <8 hex>`. Ini keadaan transisi yang hilang sendiri,
+  bukan keadaan tetap.
 - **Direktori dibatasi 200 murid per halaman** (`DIRECTORY_MAX`) tanpa paginasi. Cukup untuk
   populasi hari ini; menambah paginasi adalah pekerjaan berikutnya kalau angkanya terlampaui,
   bukan sekarang.
