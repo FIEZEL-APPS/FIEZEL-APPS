@@ -134,11 +134,30 @@ Untuk berkas yang menyimpan peta naskah sendiri (kuota, pemberitahuan suara), ia
 sekadar memindai string melainkan menuntut **pasangan kunci di dua locale** — lebih ketat
 daripada ketiadaan kalimat Indonesia.
 
-**Belum selesai.** Per m025-235 gerbang ini masih melaporkan ~208 kalimat di 18 berkas
-(`app.js`, coach bubble, tutor, prasasti, choreography). Karena itu ia **sengaja belum
-didaftarkan di `quality.yml`**: mendaftarkannya sekarang memerahkan CI untuk setiap PR yang
-tidak berhubungan. Daftarkan pada PR yang menutup temuan terakhir. Sampai saat itu jalankan
-manual — ia daftar-kerja yang bisa dieksekusi, bukan gerbang.
+**Belum selesai.** Per m025-235 gerbang ini masih melaporkan 208 kalimat di 18 berkas
+(`app.js` 112, coach bubble 16, tutor 25, prasasti 12, choreography 10, sisanya kecil-kecil).
+Daftar lengkapnya:
+
+```
+TH_GERBANG_RINCI=1 node th-naskah-murid-test.js
+```
+
+Karena utang itu sudah diketahui, gerbangnya **belum didaftarkan di `quality.yml`** —
+mendaftarkannya sekarang memerahkan CI untuk utang lama, bukan untuk regresi baru. Tapi
+"belum didaftarkan" bukan berarti tidak tercatat: repo ini punya gerbang-meta
+(`gate-registry-test.js`) yang MELARANG gerbang tak terdaftar, jadi ia masuk `EXCLUSIONS`
+di sana dengan kelas `gerbang-pra-rilis-fitur` dan alasan tertulis. **PR yang menutup temuan
+terakhir wajib menghapus entri itu dan mendaftarkan gerbangnya di `quality.yml`** — pola yang
+sama persis dengan entri `th-coverage` di m025-192, yang dihapus begitu lubangnya tertutup.
+
+Yang perlu diketahui siapa pun yang mengerjakan sisanya: **tidak semua 208 temuan adalah
+naskah murid.** Tiga kelompok yang HARUS dikecualikan dengan alasan, bukan diterjemahkan:
+*pencocok masukan* (`fiezel-prosody.js` mencocokkan penanda wacana Indonesia; menerjemahkannya
+mematikan fiturnya), *catatan storyboard* (`fiezel-choreography.js`), dan *nama aturan audit
+internal* (`app.js` sekitar baris 811-866). Sebaliknya ada satu kelompok yang **lebih parah
+dari sekadar label**: prompt sistem LLM di `fiezel-tutor-dialog.js` (~:282-292) dan `app.js`
+(~:5716) menyuruh model menjawab dalam bahasa Indonesia — jadi murid Thai menerima jawaban
+tutor berbahasa Indonesia meskipun setiap label di layar sudah Thai.
 
 **Dua kanon repo yang mudah dilanggar waktu mengerjakan ini**, keduanya ditegakkan
 `quota-notice-a11y-test.js`:

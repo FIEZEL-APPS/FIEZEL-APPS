@@ -114,6 +114,21 @@ const EXCLUSIONS = new Map([
       '(terdaftar). Cara menjalankan alat ini: `node audit/bank-audit.js` (lihat ' +
       'FIEZEL-M025125-SIDAK-BANK-SOAL-HANDOFF.md).'
   }],
+  ['th-naskah-murid-test.js', {
+    class: 'gerbang-pra-rilis-fitur',
+    reason:
+      'Gerbang PENUH (exit 1 bila ada temuan), tapi kontraknya mengikat rilis fitur yang ' +
+      'belum tuntas: "murid Thai tidak membaca satu kalimat Indonesia pun di seluruh naskah ' +
+      'runtime, bukan hanya di bank soal". Bagian bank soal sudah nol; bagian NASKAH DI LUAR ' +
+      'bank soal masih 208 kalimat di 18 berkas (jalankan TH_GERBANG_RINCI=1 node ' +
+      'th-naskah-murid-test.js untuk daftar lengkapnya). Mendaftarkannya sekarang membuat CI ' +
+      'merah untuk utang yang memang sudah diketahui dan sedang dikerjakan, bukan untuk ' +
+      'regresi baru. Pemeriksa cakupan kuota + pemberitahuan suara di dalamnya SUDAH ' +
+      'mengikat hari ini lewat quota-notice-a11y-test.js. HAPUS ENTRI INI dan daftarkan ' +
+      'gerbangnya di quality.yml pada PR yang membersihkan temuan terakhir - persis seperti ' +
+      'yang dilakukan entri th-coverage di m025-192 (lihat catatan di atas). Rinciannya di ' +
+      'THAI-BANK-PURITY-HANDOFF.md.'
+  }],
   ['adaptivity-simulation.js', {
     class: 'alat-pelaporan',
     reason:

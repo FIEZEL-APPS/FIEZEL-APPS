@@ -159,7 +159,15 @@ function bersihkan(sumber) {
   for (const m of blok.matchAll(/[\x27"]([a-z][\w.]*)[\x27"]:\s*Object\.freeze\(\{([\s\S]*?)\}\)/g)) {
     for (const f of m[2].matchAll(/\b(title|spoken|silent)\s*:/g)) butuh.push('voicenotice.' + m[1] + '.' + f[1]);
   }
-  butuh.push('voicenotice.reassurance.text', 'voicenotice.reset.next');
+  /* Kalimat penenangnya SENGAJA memakai kunci kuota, bukan kunci voicenotice sendiri:
+     naskah id-nya identik makna dengan quota.reassurance.text, dan kanon id mewajibkan
+     'nggak' - dua salinan berarti dua peluang salah satunya melenceng dari kanon. Kunci
+     yang dituntut di sini DIBACA dari kodenya, supaya pemeriksa ini ikut pindah kalau
+     suatu hari kuncinya diganti, alih-alih menuntut kunci yang sudah tidak dipakai. */
+  const mRe = vn.match(/reassurance:\s*naskahPenuh\(\s*[\x27"]([\w.]+)[\x27"]/);
+  check('naskah pemberitahuan suara: kalimat penenang dipanggil lewat kunci i18n',
+    !!mRe, 'reassurance: masih literal di fiezel-cf-voice-notice.js');
+  butuh.push(mRe ? mRe[1] : 'voicenotice.reassurance.text', 'voicenotice.reset.next');
   function kunciDi(berkas) {
     const t = fs.readFileSync(path.join(root, berkas), 'utf8');
     return new Set([...t.matchAll(/[\x27"]([a-z][\w.]*)[\x27"]\s*:/g)].map((m) => m[1]));
@@ -225,10 +233,13 @@ check('nol naskah murid berbahasa Indonesia di luar lapisan i18n',
   temuan.length + ' kalimat di ' + Object.keys(perBerkas).length + ' berkas: ' + ringkas);
 
 if (temuan.length) {
-  console.log('\n--- rincian temuan (maks 3 per berkas) ---');
+  /* Ringkas secara bawaan supaya log CI tetap terbaca; TH_GERBANG_RINCI=1 mencetak
+     SEMUA temuan, yang dibutuhkan siapa pun yang sedang mengerjakan sisa daftarnya. */
+  const rinci = process.env.TH_GERBANG_RINCI === '1';
+  console.log('\n--- rincian temuan (' + (rinci ? 'lengkap' : 'maks 3 per berkas; TH_GERBANG_RINCI=1 untuk semua') + ') ---');
   for (const [f, v] of Object.entries(perBerkas)) {
     console.log('  ' + f);
-    v.slice(0, 3).forEach((t) => console.log('    :' + t.baris + '  ' + t.isi));
+    (rinci ? v : v.slice(0, 3)).forEach((t) => console.log('    :' + t.baris + '  ' + t.isi));
   }
   console.log('\nTiap temuan wajib salah satu dari:');
   console.log('  (a) dipindah ke features/i18n/copy-id-*.js + copy-th-*.js lalu dipanggil lewat t()');
