@@ -35,6 +35,8 @@
     'fsl.exit-btn': 'Keluar',
     'fsl.dictation-placeholder': 'Ketik yang kamu dengar…',
     'fsl.submit-btn': 'Nilai jawaban',
+    'fsl.level-follows-main': ' · mengikuti pilihan level utama',
+    'fsl.script-label': 'Script:',
     'fsl.replays-count': 'Diputar {count}×',
     'fsl.replay-status': 'Audio siap · replay {current}/{limit}.',
     'fsl.translation-label': 'Terjemahan:',
