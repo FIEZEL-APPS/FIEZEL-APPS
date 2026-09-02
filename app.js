@@ -471,13 +471,16 @@ function grammarClue(base){const text=String(base||'');const hit=text.match(/\b(
  * diagnosisnya turun ke pencocokan pola lama lalu ke kalimat umum - kuisnya tetap jalan.
  * Berkas data yang hilang tidak boleh pernah mematikan sesi belajar.
  */
-let GRAMMAR_MISCONCEPTION_ID=Object.create(null);
+let GRAMMAR_MISCONCEPTION_ID=Object.create(null),GRAMMAR_MISCONCEPTION_BASE=null;
 async function loadMisconceptionDiagnoses(root){
   try{
     const response=await fetch(new URL('grammar-misconception-id.json',root),{credentials:'same-origin'});
     if(!response.ok)return;
     const data=await response.json();
-    if(data&&typeof data.diagnoses==='object'&&data.diagnoses)GRAMMAR_MISCONCEPTION_ID=data.diagnoses;
+    if(data&&typeof data.diagnoses==='object'&&data.diagnoses){GRAMMAR_MISCONCEPTION_ID=data.diagnoses;
+      // Simpan rujukan sumber: overlay th menulis SALINAN, jadi berpindah balik ke id
+      // harus bisa memulihkan byte aslinya tanpa fetch ulang.
+      GRAMMAR_MISCONCEPTION_BASE=data.diagnoses;}
   }catch{}
 }
 /**
@@ -981,7 +984,64 @@ function applyContentLocale(){
     READING_EXAM.honesty = READING_EXAM._orig.honesty;
     if(READING_EXAM.examFormats) READING_EXAM.examFormats = JSON.parse(JSON.stringify(READING_EXAM._orig.examFormats));
   }
+  // --- BANK SOAL: reading A1/A2, cloze, diagnosis miskonsepsi (m025-230) ---------------
+  // Tiga sidecar ini menutup jalur yang dulu TIDAK PERNAH punya overlay: murid Thai membaca
+  // pertanyaan, pilihan, dan umpan balik berbahasa Indonesia sepanjang sesi. Polanya sama
+  // dengan writing/reading-exam di atas: simpan sumber pristine sekali, tulis SALINAN
+  // ber-Thai, dan pulihkan sumbernya saat locale kembali ke id.
+  //
+  // reading: HANYA A1/A2 yang punya sidecar — mulai B1 pertanyaannya memang berbahasa
+  // Inggris (imersi yang disengaja, sama untuk id maupun th). Panjang options WAJIB sama
+  // dengan sumber: satu pilihan hilang menggeser indeks jawaban dan murid dinilai salah
+  // atas jawaban yang benar, jadi overlay per-soal dibatalkan kalau panjangnya berbeda.
+  if(thReady?.readingBank && Array.isArray(CONTENT_BASE.r)){
+    const rTh=thReady.readingBank;
+    R=CONTENT_BASE.r.map(p=>{
+      const e=rTh[String(p?.id||'')];
+      if(!e||!Array.isArray(e.qs)||!Array.isArray(p.qs)||e.qs.length!==p.qs.length)return p;
+      return Object.assign({},p,{qs:p.qs.map((q,i)=>{
+        const t=e.qs[i];
+        if(!t||!Array.isArray(q))return q;
+        const opts=Array.isArray(t.options)&&Array.isArray(q[1])&&t.options.length===q[1].length?t.options:q[1];
+        const out=q.slice();
+        if(t.stem)out[0]=t.stem;
+        out[1]=opts;
+        return out;
+      })});
+    });
+  } else if(Array.isArray(CONTENT_BASE.r)) R=CONTENT_BASE.r;
+  applyClozeLocale();
+  if(thReady?.misconception?.diagnoses && GRAMMAR_MISCONCEPTION_BASE){
+    const src=GRAMMAR_MISCONCEPTION_BASE,thD=thReady.misconception.diagnoses,out=Object.create(null);
+    // Kunci diagnosis berbahasa INGGRIS (nama miskonsepsi yang dipakai bank untuk menjodohkan);
+    // yang diterjemahkan hanya NILAInya. Kunci disalin apa adanya supaya penjodohan tetap kena.
+    for(const k of Object.keys(src))out[k]=thD[k]||src[k];
+    GRAMMAR_MISCONCEPTION_ID=out;
+  } else if(GRAMMAR_MISCONCEPTION_BASE) GRAMMAR_MISCONCEPTION_ID=GRAMMAR_MISCONCEPTION_BASE;
   __fzSyncShellElements();
+}
+// Overlay cloze dipisah karena banknya dimuat MALAS (fetch pertama saat sesi cloze dibuka),
+// jadi ia bisa mendarat jauh sesudah applyContentLocale() terakhir. Dipanggil dari dua sisi:
+// applyContentLocale (locale/berkas th berubah) dan loader cloze (bank baru mendarat).
+let CLOZE_BANK_BASE=null;
+function applyClozeLocale(){
+  if(!Array.isArray(CLOZE_BANK_BASE))return;
+  const thReady=self.FiezelI18n?.getLocale?.()==='th'?self.FiezelThData:null;
+  const thC=thReady?.cloze;
+  if(!thC){CLOZE_BANK=CLOZE_BANK_BASE;return}
+  CLOZE_BANK=CLOZE_BANK_BASE.map(it=>{
+    const e=thC[String(it?.id||'')];
+    if(!e)return it;
+    const out=Object.assign({},it);
+    if(e.explain&&it.explain)out.explain=Object.assign({},it.explain,e.explain);
+    if(e.distractors&&Array.isArray(it.distractors)){
+      // Kunci distraktor = TEKS PILIHAN persis (urutan pilihan diacak saat disajikan, jadi
+      // indeks tidak stabil). Meleset satu byte = umpan balik tak ditemukan dan murid melihat
+      // kalimat umum, bukan koreksi atas kekeliruannya.
+      out.distractors=it.distractors.map(d=>{const x=e.distractors[String(d?.text||'')];return x?Object.assign({},d,x):d});
+    }
+    return out;
+  });
 }
 function placementLevel(sourceState=state){const raw=Math.max(1,Math.min(6,Math.floor(Number(sourceState?.level)||1)));return LEVELS[raw-1]||'A1'}
 function getActiveLevel(sourceState=state){const prefs=sourceState?.preferences||{};if(LEVELS.includes(String(prefs.activeLevel||'')))return String(prefs.activeLevel);if(!sourceState?.placementDone&&LEVELS.includes(String(prefs.selfAssessedLevel||'')))return String(prefs.selfAssessedLevel);return sourceState?.placementDone?placementLevel(sourceState):'A1'}
@@ -3067,8 +3127,8 @@ function ensureClozeBank(){
   if(CLOZE_BANK)return Promise.resolve(CLOZE_BANK);
   if(!CLOZE_BANK_LOADING)CLOZE_BANK_LOADING=fetch(new URL('cloze-bank-v1.json',document.baseURI))
     .then(r=>r.ok?r.json():null)
-    .then(j=>{CLOZE_BANK=(j&&j.schema==='fiezel-cloze-bank-v1'&&Array.isArray(j.items))?j.items:[];return CLOZE_BANK})
-    .catch(()=>{CLOZE_BANK=[];return CLOZE_BANK});
+    .then(j=>{CLOZE_BANK_BASE=(j&&j.schema==='fiezel-cloze-bank-v1'&&Array.isArray(j.items))?j.items:[];CLOZE_BANK=CLOZE_BANK_BASE;try{applyClozeLocale()}catch(_){}return CLOZE_BANK})
+    .catch(()=>{CLOZE_BANK_BASE=[];CLOZE_BANK=[];return CLOZE_BANK});
   return CLOZE_BANK_LOADING;
 }
 /** Soal cloze runtime dari satu item bank. difficulty: prior mode produksi (lebih berat
@@ -3790,7 +3850,7 @@ async function load(){const root=document.baseURI;/* W1 P0-1 (16-001): fetch ban
   }
   V=V.map(v=>{const rawTranslation=v.exampleTranslation||v.examples?.[0]?.translation||v.examples?.[0]?.id||'';const exampleTranslation=/^[a-z]\d?[a-z]?_\d+$/i.test(rawTranslation)?'':rawTranslation;return{id:v.id,word:v.word,phonetic:v.phonetic||'',partOfSpeech:v.partOfSpeech||'',level:v.level||v.cefr||'',meaning:v.meaning||v.meanings?.[0]?.meaning||'',example:v.example||v.examples?.[0]?.en||'',exampleTranslation,topic:v.topic||'general',difficulty:v.difficulty||({A1:1,A2:2,B1:3,B2:4,C1:5,C2:6}[v.level]||3),synonyms:v.synonyms||[],antonyms:v.antonyms||[],collocations:v.collocations||[],commonMistakes:v.commonMistakes||[],relatedWords:v.relatedWords||[],usageNotes:v.usageNotes||'',status:v.status||'needs_review',canary:v.__fiezelCanary||null}}).filter(v=>v.status==='complete'&&LEVELS.includes(v.level)&&v.word&&v.meaning);
   // W4-MERGE: simpan hasil hidrasi id lalu terapkan locale aktif (id = no-op referensial).
-  CONTENT_BASE={g:G,items:GRAMMAR_ITEMS,v:V};applyContentLocale();
+  CONTENT_BASE={g:G,items:GRAMMAR_ITEMS,v:V,r:R};applyContentLocale();
   backfillPolicyOutcomes();$('version').textContent=`v${APP_VERSION}`;startCelestialClock();startWelcomeExperience();startUpdateWatcher()}
 // m025-115: dua sistem ikon hidup berdampingan dengan sengaja. Set duotone FIEZEL
 // (features/ui/fiezel-icons.js) memegang kroma yang dilihat murid tiap hari - tab bar,
