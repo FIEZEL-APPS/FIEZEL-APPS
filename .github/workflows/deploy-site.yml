@@ -61,6 +61,10 @@ jobs:
       ( github.event_name == 'workflow_dispatch' ||
         (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') )
     runs-on: ubuntu-latest
+    # Batas keras: tanpa ini GitHub memakai 360 menit, dan satu langkah
+    # yang menggantung membakar enam jam dalam diam (lihat
+    # workflow-timeout-gate-test.js).
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
         with:

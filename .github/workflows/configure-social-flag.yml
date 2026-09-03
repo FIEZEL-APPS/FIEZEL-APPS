@@ -29,6 +29,10 @@ jobs:
   flag:
     if: github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'
     runs-on: ubuntu-latest
+    # Batas keras: tanpa ini GitHub memakai 360 menit, dan satu langkah
+    # yang menggantung membakar enam jam dalam diam (lihat
+    # workflow-timeout-gate-test.js).
+    timeout-minutes: 15
     steps:
       - uses: actions/setup-node@v4
         with:
