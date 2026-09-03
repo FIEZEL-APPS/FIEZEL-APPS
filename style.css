@@ -1019,6 +1019,14 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
    duduk selebar seperempat di grid empat kolom. Kartunya juga lebih pendek dari launcher
    belajar — ini pintu sekunder, bukan salah satu dari empat tujuan utama. */
 .social-home-launcher{grid-template-columns:1fr}
+/* Kartu Home saat ada undangan teman yang belum dijawab. Pembeda visualnya SATU: garis
+   emas yang sama dengan .social-code, supaya "ada sesuatu yang menunggumu" terbaca tanpa
+   warna baru, tanpa animasi, dan tanpa kosakata bentuk baru di Home. */
+.social-launch-invite,.social-launch-news{border-color:var(--gold);box-shadow:inset 0 0 0 1px rgba(201,162,75,.35)}
+/* Lencana jumlah kabar belum terbaca. Ditumpangkan pada .launch-icon yang sudah ada, jadi
+   ia tidak menambah kolom dan tidak menggeser tata letak kartu di 390px. */
+.social-launch .launch-icon{position:relative}
+.social-badge{position:absolute;top:-4px;right:-6px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--gold);color:var(--text);font-size:.68rem;font-weight:700;line-height:18px;text-align:center;box-shadow:0 0 0 2px var(--panel)}
 .social-home-launcher .launch-card{min-height:132px}
 @media (max-width:900px){.social-home-launcher{grid-template-columns:1fr}}
 @media (max-width:560px){.social-home-launcher{grid-template-columns:1fr}.social-home-launcher .launch-card{min-height:108px}}
@@ -4624,6 +4632,10 @@ body.fz-stage-grammar-lesson .section-head h1{font-family:var(--fz-heading);font
 .social-handle-status{min-height:1.2em;margin:4px 0 8px;font-size:.82rem}
 .social-handle-status.social-ok{color:#2c7a3f;font-weight:600}
 .social-code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:1.7rem;font-weight:700;letter-spacing:.35em;text-align:center;padding:14px 8px;margin:10px 0;border-radius:14px;border:1.5px dashed var(--gold);background:rgba(201,162,75,.08);color:var(--ink);user-select:all}
+/* Ajakan pasang ke Home Screen sesudah undangan diterima di tab peramban (bukan aplikasi
+   terpasang). Garis pemisah tipis di atasnya supaya tidak menyatu dengan tombol Duel di
+   atasnya — ini langkah opsional berikutnya, bukan bagian dari keberhasilan menerima teman. */
+.social-install-nudge{margin-top:14px;padding-top:14px;border-top:1px solid var(--line-soft)}
 .social-chip{display:inline-block;padding:2px 9px;border-radius:999px;font-size:.72rem;font-weight:600;border:1px solid var(--gold);color:var(--ink);background:rgba(201,162,75,.12)}
 .social-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
 .social-friend{display:flex;align-items:center;gap:11px;padding:10px 0;border-bottom:1px solid rgba(36,26,17,.08)}

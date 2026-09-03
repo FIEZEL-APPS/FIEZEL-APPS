@@ -5454,6 +5454,11 @@ function openApp(){
   document.body?.classList?.remove?.('notification-locked');notifyAppUpdateIfNew();render();
   // Tautan undangan Duel Belajar (?duel=KODE): langsung buka alur belajar tab Duel.
   try{if(new URL(location.href).searchParams.get('duel')&&state.view!=='learn')go('learn')}catch{}
+  // Undangan teman (?invite=KODE, share sheet, atau sisa boot sebelumnya). Ditangkap SEKARANG
+  // supaya alamatnya bersih dan lencana Home benar sejak cat pertama; lembar undangannya
+  // sendiri menunggu alur sambutan selesai — lihat armSocialInviteSheet() di bawah.
+  try{socialInviteBoot()}catch(_){}
+  armSocialInviteSheet();
   // Layar utama sudah tergambar - INI momen yang benar untuk mengambil tumpukan berat.
   // Mengambilnya lebih awal (mis. begitu DOM siap) justru merebut pita dari app.js dan
   // ~2,7 MB JSON kontennya di jaringan seluler, sehingga penghematannya hilang seluruhnya.
@@ -10910,22 +10915,50 @@ function socialCopyInvite(){
 window.socialCopyInvite=socialCopyInvite;
 function socialShareInvite(){
   const code=socialInviteLast?.code;if(!code)return;
-  // Tautan dibangun dari lokasi app yang sedang berjalan — bukan hardcode — supaya benar
-  // di fiezel.my.id/app/, mirror Pages, maupun preview (gate ai-transport-switch (h)).
-  const inviteUrl=(()=>{try{return location.origin+location.pathname}catch(_){return './'}})();
-  const text=FiezelI18n.t('social.share-text',{url:inviteUrl+'?invite='+code});
+  // KENAPA `url` DIKIRIM TERPISAH, bukan diselipkan ke dalam `text`: WhatsApp/Telegram hanya
+  // membuat pratinjau yang bisa diketuk untuk field `url` share sheet. Sebelum ini seluruh
+  // undangan adalah satu kalimat, jadi di sebagian klien tautannya mendarat sebagai teks
+  // mati — murid melihat alamat, bukan tombol.
+  //
+  // Kodenya TETAP ikut di dalam teks. Kalau tautannya mati di peramban dalam-aplikasi, kode
+  // telanjang itulah yang masih bisa ditempel, dan FiezelInviteLink.extract() di sisi
+  // penerima memang dibuat untuk menemukannya di tengah kalimat.
+  const link=inviteLink();
+  const payload=link
+    ?link.sharePayload(code,{text:FiezelI18n.t('social.share-body')})
+    :{title:'FIEZEL',text:FiezelI18n.t('social.share-text',{url:(()=>{try{return location.origin+location.pathname}catch(_){return './'}})()+'?invite='+code}),url:'',code};
   try{
-    if(typeof navigator!=='undefined'&&typeof navigator.share==='function'){navigator.share({title:'FIEZEL',text}).catch(()=>{});return}
+    if(typeof navigator!=='undefined'&&typeof navigator.share==='function'){
+      const data=payload.url?{title:payload.title,text:payload.text,url:payload.url}:{title:payload.title,text:payload.text};
+      navigator.share(data).catch(()=>{});return;
+    }
   }catch(_){}
-  socialCopyInvite();
+  // Tanpa share sheet (desktop, peramban lama): SELURUH pesan disalin — tautan + kode —
+  // bukan cuma delapan karakter yang tidak menjelaskan apa-apa saat ditempel ke chat.
+  const full=payload.url?payload.text+'\n'+payload.url:payload.text;
+  try{navigator.clipboard?.writeText?.(full).then(()=>showToast(FiezelI18n.t('social.share-copied-toast'))).catch(()=>socialCopyInvite())}catch(_){socialCopyInvite()}
 }
 window.socialShareInvite=socialShareInvite;
 async function socialRedeem(){
   const core=socialCore();if(!core)return;
-  const code=String($('socialRedeemInput')?.value||'').trim();
-  if(!code)return showToast(FiezelI18n.t('social.redeem-empty-toast'));
+  const raw=String($('socialRedeemInput')?.value||'').trim();
+  if(!raw)return showToast(FiezelI18n.t('social.redeem-empty-toast'));
+  // Murid menempel APA YANG DIA PUNYA: kadang kode, sering seluruh pesan WhatsApp, kadang
+  // tautannya saja. Sebelum ini string mentah itu dikirim apa adanya dan server menolaknya
+  // sebagai kode tidak berlaku — kegagalan yang terlihat seperti kode temannya yang rusak.
+  const link=inviteLink();
+  let code=raw;
+  if(link){
+    const hit=link.extract(raw);
+    code=hit&&hit.kind===link.KIND_FRIEND?hit.code:link.normalizeCode(raw);
+    if(!link.isServerShaped(code))return showToast(FiezelI18n.t('social.redeem-not-found-toast'));
+  }
   const res=await core.api.redeem(code);
-  if(res.ok&&res.data?.friend){showToast(FiezelI18n.t('social.redeem-success-toast',{handle:res.data.friend.handle}));socialMicroMoment('friend');render();return}
+  if(res.ok&&res.data?.friend){
+    try{link?.markHandled(code)}catch(_){}
+    socialNotifyResync();socialSummaryAt=0;
+    showToast(FiezelI18n.t('social.redeem-success-toast',{handle:res.data.friend.handle}));socialMicroMoment('friend');render();return;
+  }
   showToast(res.message);
 }
 window.socialRedeem=socialRedeem;
@@ -11035,14 +11068,389 @@ function socialHomeMarkup(){
 function socialHomeBody(){
   const c=socialSummaryCache;
   if(!c||c.kind==='off'||c.kind==='offline')return '';
-  const sub=c.kind==='profile'
-    ?FiezelI18n.t('social.home-sub-profile',{handle:esc(c.handle||''),pb:c.pb==null?'—':c.pb})
-    :FiezelI18n.t('social.home-sub-cta');
+  // Undangan yang belum dijawab MENANG atas kartu biasa. Ini keadaan yang dicatat handoff
+  // m025-240 §8 sebagai yang paling layak dikerjakan berikutnya: sebelum ini kartu Home
+  // hanya membedakan sudah/belum punya profil, jadi undangan yang tiba lewat tautan tidak
+  // meninggalkan satu pun jejak yang bisa dilihat murid dari layar yang ia lewati tiap hari.
+  const pendingInvite=socialPendingInvite();
+  if(pendingInvite&&pendingInvite.kind==='friend'){
+    return `<div class="home-section-head"><div><h2>${FiezelI18n.t('social.summary-title')}</h2></div></div>
+<div class="learning-launcher social-home-launcher">
+  <button class="launch-card social-launch social-launch-invite" onclick="socialHomeOpenInvite()" data-testid="home-social-invite"><span class="launch-icon"><i data-lucide="mail-open" aria-hidden="true"></i></span><span><small>${FiezelI18n.t('social.home-pending-sub')}</small><b>${FiezelI18n.t('social.home-pending-open')}</b></span><i data-lucide="arrow-up-right"></i></button>
+</div>`;
+  }
+  const unread=socialUnreadCount();
+  const sub=unread>0
+    ?FiezelI18n.t('social.home-sub-unread',{count:unread})
+    :c.kind==='profile'
+      ?FiezelI18n.t('social.home-sub-profile',{handle:esc(c.handle||''),pb:c.pb==null?'—':c.pb})
+      :FiezelI18n.t('social.home-sub-cta');
+  const badge=unread>0?`<span class="social-badge" aria-hidden="true">${unread>9?'9+':unread}</span>`:'';
   return `<div class="home-section-head"><div><h2>${FiezelI18n.t('social.summary-title')}</h2></div></div>
 <div class="learning-launcher social-home-launcher">
-  <button class="launch-card social-launch" onclick="go('online')" data-testid="home-online-teman"><span class="launch-icon"><i data-lucide="users" aria-hidden="true"></i></span><span><small>${sub}</small><b>${FiezelI18n.t('social.home-open')}</b></span><i data-lucide="arrow-up-right"></i></button>
+  <button class="launch-card social-launch${unread>0?' social-launch-news':''}" onclick="socialHomeOpenOnline()" data-testid="home-online-teman"><span class="launch-icon"><i data-lucide="users" aria-hidden="true"></i>${badge}</span><span><small>${sub}</small><b>${FiezelI18n.t('social.home-open')}</b></span><i data-lucide="arrow-up-right"></i></button>
 </div>`;
 }
+/** Ketukan pada kartu undangan = membuka lembar yang sama, bukan melempar ke layar lain. */
+function socialHomeOpenInvite(){
+  const link=inviteLink();const entry=link?link.pending():null;
+  if(!entry)return socialHomeOpenOnline();
+  openSocialInviteSheet(entry);
+  return true;
+}
+window.socialHomeOpenInvite=socialHomeOpenInvite;
+/** Membuka Online menandai kabar sudah terbaca — lencana tidak boleh menetap selamanya. */
+function socialHomeOpenOnline(){
+  try{socialNotifyCore()?.markAllRead()}catch(_){}
+  go('online');
+  return true;
+}
+window.socialHomeOpenOnline=socialHomeOpenOnline;
+/* ---------------------------------------------------------------- JEMBATAN UNDANGAN (deep link) */
+/* AKAR MASALAH yang ditutup blok ini — empat lapis, semuanya nyata sebelum rilis ini:
+ *
+ *   1. Undangan dikirim sebagai KALIMAT berisi tautan. `?invite=KODE` hanya MENGISI kolom
+ *      teks di Online → tab Teman; ia tidak menukarkan apa pun. Murid yang mengetuk tautan
+ *      harus menemukan sendiri layar itu — tiga ketukan buta sesudah tautannya terbuka.
+ *   2. Tautan mendarat di PERAMBAN, bukan PWA terpasang. Itu batas platform (lihat catatan
+ *      panjang di features/social/fiezel-invite-link.js), jadi jawabannya BUKAN memaksa
+ *      tautan membuka PWA — melainkan menyimpan kodenya di origin yang sama supaya PWA
+ *      MENEMUKANNYA sendiri, dan menyediakan share_target sebagai jalan masuk yang benar.
+ *   3. NOL notifikasi di kedua sisi. Pengundang tidak pernah tahu undangannya diterima.
+ *   4. Sesudah berteman pun tidak ada apa-apa untuk dimasuki bersama.
+ *
+ * Lembar di bawah ini menjawab (1) dan (4); socialNotifyPoll() menjawab (3); modul jembatan
+ * + manifest menjawab sebanyak yang bisa dijawab dari (2).
+ */
+let socialInviteSheetOpen=false,socialInviteBusy=false,socialInviteBooted=false;
+function inviteLink(){try{return self.FiezelInviteLink||null}catch(_){return null}}
+function socialNotifyCore(){try{return self.FiezelSocialNotify||null}catch(_){return null}}
+
+/* ---------------------------------------------------------------- ajakan pasang ke Home Screen */
+/* Tautan undangan yang dibuka dari WhatsApp SELALU mendarat di tab peramban, bukan aplikasi
+ * terpasang (batas platform, lihat catatan panjang di fiezel-invite-link.js). Sesudah undangan
+ * DITERIMA di tab itu — momen paling wajar untuk mengajak murid memasang aplikasinya, supaya
+ * besok cukup ketuk icon. Chrome/Android punya `beforeinstallprompt` yang bisa dipicu dari
+ * kode; Safari/iOS TIDAK PUNYA API itu sama sekali, jadi satu-satunya jalan di sana adalah
+ * instruksi manual (Bagikan → Tambah ke Layar Utama). Dua platform, dua markup, nol janji
+ * yang tidak bisa ditepati salah satunya. */
+let deferredInstallPrompt=null;
+try{
+  self.addEventListener?.('beforeinstallprompt',e=>{
+    e.preventDefault();               // tahan banner bawaan Chrome — kita tawarkan di momen kita sendiri
+    deferredInstallPrompt=e;
+  });
+  self.addEventListener?.('appinstalled',()=>{deferredInstallPrompt=null});
+}catch(_){}
+function isStandaloneApp(){try{return self.FiezelBackNav?.standalone?.(self)===true}catch(_){return false}}
+function isIosPlatform(){try{return /iP(hone|ad|od)/.test(navigator.userAgent||'')}catch(_){return false}}
+/** Nudge hanya relevan di tab peramban biasa: aplikasi terpasang tidak perlu mengajak dirinya sendiri. */
+function socialShouldOfferInstall(){return !isStandaloneApp()&&(!!deferredInstallPrompt||isIosPlatform())}
+function socialInstallNudgeMarkup(){
+  if(!socialShouldOfferInstall())return '';
+  if(deferredInstallPrompt){
+    return `<div class="social-install-nudge"><p class="muted">${FiezelI18n.t('social.install-body')}</p><div class="modal-actions"><button onclick="socialPromptInstall()"><i data-lucide="download"></i> ${FiezelI18n.t('social.install-btn')}</button></div></div>`;
+  }
+  if(isIosPlatform())return `<div class="social-install-nudge"><p class="muted">${FiezelI18n.t('social.install-ios-body')}</p></div>`;
+  return '';
+}
+async function socialPromptInstall(){
+  if(!deferredInstallPrompt)return false;
+  const evt=deferredInstallPrompt;deferredInstallPrompt=null;
+  try{
+    evt.prompt();
+    const choice=await evt.userChoice;
+    if(choice?.outcome==='accepted')showToast(FiezelI18n.t('social.install-done-toast'));
+  }catch(_){/* dialog sistem dibatalkan/gagal — tidak fatal, murid masih di tab yang jalan */}
+  // Nudge sudah tidak relevan lagi (diterima atau ditolak) — cat ulang supaya tombolnya hilang.
+  try{const host=document.querySelector('.social-install-nudge');if(host)host.remove()}catch(_){}
+  return true;
+}
+window.socialPromptInstall=socialPromptInstall;
+
+/**
+ * Satu-satunya pintu masuk undangan. Dipanggil SESUDAH alur sambutan selesai supaya lembar
+ * ini tidak pernah bertumpuk di atas perkenalan/izin notifikasi, dan lagi setiap kali tab
+ * kembali terlihat (share sheet Android mendaratkan alamat baru di dokumen yang sama).
+ */
+function socialInviteBoot(){
+  const link=inviteLink();if(!link)return null;
+  let entry=null;
+  try{entry=link.capture({})}catch(_){entry=null}
+  if(!socialInviteBooted){
+    socialInviteBooted=true;
+    try{
+      document.addEventListener?.('visibilitychange',()=>{
+        if(document.visibilityState!=='visible')return;
+        try{link.capture({})}catch(_){}
+        maybeOpenSocialInviteSheet();
+        socialNotifyPoll();
+      });
+      // launch_handler:focus-existing memakai ulang jendela PWA yang sudah terbuka; alamat
+      // barunya sampai lewat navigasi, jadi popstate adalah tanda "ada alamat baru" juga.
+      window.addEventListener?.('popstate',()=>{try{link.capture({})}catch(_){}maybeOpenSocialInviteSheet()});
+    }catch(_){}
+  }
+  maybeOpenSocialInviteSheet();
+  return entry;
+}
+/**
+ * Buka lembar HANYA kalau: ada undangan tertunda, layar sedang tidak dipakai hal lain, dan
+ * jalur online memang HIDUP. Fail-closed sama seperti seluruh lane ini — memunculkan lembar
+ * undangan yang ujungnya "fitur belum aktif" adalah pintu buntu yang dibuka sendiri.
+ * Kodenya tidak hilang: ia tetap tertunda dan lembar ini lahir sendiri begitu flag hidup.
+ */
+function maybeOpenSocialInviteSheet(){
+  try{
+    const link=inviteLink(),core=socialCore();
+    if(!link||!core)return false;
+    const entry=link.pending();if(!entry||entry.kind!==link.KIND_FRIEND)return false;
+    // Lembar bisa ditutup lewat jalan yang tidak melewati socialInviteLater(): tombol Kembali
+    // perangkat, latar modal, atau Esc. Tanpa baris ini penanda tetap 'terbuka' seumur sesi
+    // dan undangannya tidak akan pernah muncul lagi sampai aplikasi dimuat ulang.
+    if(socialInviteSheetOpen&&!modalOpen)socialInviteSheetOpen=false;
+    if(socialInviteSheetOpen||modalOpen)return false;
+    const flag=core.socialFlag();
+    if(flag==='off'||flag==='offline')return false;
+    // 'unknown' = /api/config belum pernah dijawab. Bertanya sekali, lalu coba lagi — bukan
+    // membuka lembar di atas ketidaktahuan.
+    if(flag!=='on'){core.probeFlag().then(f=>{if(f==='on')maybeOpenSocialInviteSheet()}).catch(()=>{});return false}
+    openSocialInviteSheet(entry);
+    return true;
+  }catch(_){return false}
+}
+function socialInviteSheetShell(inner){
+  return `<div class="modal-mark">${FiezelI18n.t('social.deeplink-mark')}</div><div id="socialInviteSheet">${inner}</div>`;
+}
+function socialInvitePaint(inner){
+  const host=$('socialInviteSheet');
+  if(host){host.innerHTML=inner;enhanceUI();return true}
+  openModal(socialInviteSheetShell(inner));socialInviteSheetOpen=true;return true;
+}
+function openSocialInviteSheet(entry){
+  socialInviteSheetOpen=true;
+  const code=String(entry?.code||'');
+  openModal(socialInviteSheetShell(
+    `<h2>${FiezelI18n.t('social.deeplink-title')}</h2>
+     <p>${FiezelI18n.t('social.deeplink-body')}</p>
+     <div class="social-code">${esc(code)}</div>
+     <div class="modal-actions"><button onclick="socialInviteLater()">${FiezelI18n.t('social.deeplink-later')}</button><button class="primary" id="socialInviteAcceptBtn" onclick="socialInviteAccept()"><i data-lucide="handshake"></i> ${FiezelI18n.t('social.deeplink-accept')}</button></div>`
+  ));
+  try{socialMicroMoment('friend')}catch(_){}
+}
+/** "Nanti saja" TIDAK membuang kodenya: ia tetap tertunda dan bisa dibuka lagi dari Home. */
+function socialInviteLater(){
+  socialInviteSheetOpen=false;closeModal();
+  showToast(FiezelI18n.t('social.deeplink-saved-toast'));
+  try{render()}catch(_){}
+  return true;
+}
+window.socialInviteLater=socialInviteLater;
+/**
+ * Terima undangan. Seluruh rantai — sesi anon, profil, tukar kode — dikerjakan DI DALAM
+ * lembar ini. Murid tidak pernah dilempar ke layar lain untuk menyelesaikan satu undangan.
+ */
+async function socialInviteAccept(){
+  if(socialInviteBusy)return false;
+  const link=inviteLink(),core=socialCore();
+  if(!link||!core)return false;
+  const entry=link.pending();if(!entry)return socialInviteLater();
+  socialInviteBusy=true;
+  const btn=$('socialInviteAcceptBtn');if(btn){btn.disabled=true;btn.textContent=FiezelI18n.t('social.deeplink-working')}
+  try{
+    if(typeof navigator!=='undefined'&&navigator.onLine===false){socialInvitePaint(socialInviteNoticeMarkup(FiezelI18n.t('social.deeplink-offline')));return false}
+    let flag='off';try{flag=await core.probeFlag()}catch(_){flag='off'}
+    if(flag!=='on'){socialInvitePaint(socialInviteNoticeMarkup(FiezelI18n.t('social.deeplink-flag-off')));return false}
+    try{await core.ensureAnon()}catch(_){}
+    const me=await core.api.profileMe();
+    if(me.error==='profile_required')return socialInviteAskHandle();
+    if(!me.ok&&me.error!=='profile_required'){socialInvitePaint(socialInviteNoticeMarkup(me.message));return false}
+    socialProfileCache=me.data?.profile||socialProfileCache;
+    return await socialInviteRedeem(entry.code);
+  }finally{socialInviteBusy=false}
+}
+window.socialInviteAccept=socialInviteAccept;
+function socialInviteNoticeMarkup(message){
+  return `<h2>${FiezelI18n.t('social.deeplink-title')}</h2><p>${esc(String(message||''))}</p>
+    <div class="modal-actions"><button class="primary" onclick="socialInviteLater()">${FiezelI18n.t('social.deeplink-later')}</button></div>`;
+}
+/** Belum punya profil: kolom nama samaran muncul DI LEMBAR YANG SAMA, bukan di layar lain. */
+function socialInviteAskHandle(){
+  socialInvitePaint(`<h2>${FiezelI18n.t('social.deeplink-title')}</h2>
+    <p>${FiezelI18n.t('social.deeplink-need-handle')}</p>
+    <label class="endpoint-label">${FiezelI18n.t('social.handle-label')}<input id="socialInviteHandle" type="text" maxlength="20" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="mis. belajar_terus"></label>
+    <p class="social-handle-status muted" id="socialInviteHandleStatus">${FiezelI18n.t('social.handle-rules')}</p>
+    <div class="modal-actions"><button onclick="socialInviteLater()">${FiezelI18n.t('social.deeplink-later')}</button><button class="primary" id="socialInviteAcceptBtn" onclick="socialInviteCreateThenAccept()"><i data-lucide="user-plus"></i> ${FiezelI18n.t('social.deeplink-create-accept')}</button></div>`);
+  return false;
+}
+async function socialInviteCreateThenAccept(){
+  if(socialInviteBusy)return false;
+  const link=inviteLink(),core=socialCore();if(!link||!core)return false;
+  const entry=link.pending();if(!entry)return socialInviteLater();
+  const v=core.validateHandle($('socialInviteHandle')?.value);
+  const status=$('socialInviteHandleStatus');
+  if(!v.ok){if(status)status.textContent=v.reason;return false}
+  socialInviteBusy=true;
+  const btn=$('socialInviteAcceptBtn');if(btn){btn.disabled=true;btn.textContent=FiezelI18n.t('social.deeplink-working')}
+  try{
+    // Kesepakatan privasi bawaan lembar undangan = yang paling tertutup yang tetap membuat
+    // fitur teman bermakna: progres terlihat oleh TEMAN, liga TIDAK diikuti. Keduanya bisa
+    // diubah kapan pun di Pengaturan; menyalakan liga diam-diam bukan hak lembar ini.
+    const res=await core.api.profileCreate({handle:v.handle,friendsVisible:true,leagueOptIn:false});
+    if(!res.ok&&res.error!=='profile_exists'){
+      if(status)status.textContent=res.message;
+      if(btn){btn.disabled=false;btn.innerHTML=`<i data-lucide="user-plus"></i> ${FiezelI18n.t('social.deeplink-create-accept')}`;enhanceUI()}
+      return false;
+    }
+    socialProfileCache=res.data?.profile||null;socialSummaryAt=0;
+    try{queueSocialEvidence()}catch(_){}
+    return await socialInviteRedeem(entry.code);
+  }finally{socialInviteBusy=false}
+}
+window.socialInviteCreateThenAccept=socialInviteCreateThenAccept;
+async function socialInviteRedeem(code){
+  const link=inviteLink(),core=socialCore();if(!link||!core)return false;
+  const res=await core.api.redeem(code);
+  if(res.ok&&res.data?.friend){
+    const handle=String(res.data.friend.handle||'');
+    // Kode selesai: ditandai supaya lembar ini tidak lahir lagi di boot berikutnya.
+    try{link.markHandled(code)}catch(_){}
+    socialSummaryAt=0;
+    // Potret disegarkan DIAM-DIAM: teman yang baru saja KITA tambahkan sendiri bukan kabar,
+    // dan membiarkannya masuk selisih akan melahirkan notifikasi "undanganmu diterima" palsu.
+    socialNotifyResync();
+    socialInvitePaint(`<h2>${FiezelI18n.t('social.deeplink-success-title')}</h2>
+      <p>${FiezelI18n.t('social.deeplink-success-body',{handle:esc(handle)})}</p>
+      <div class="modal-actions"><button onclick="socialInviteOpenFriends()"><i data-lucide="users"></i> ${FiezelI18n.t('social.deeplink-open-btn')}</button><button class="primary" onclick="socialInviteOpenDuel()"><i data-lucide="swords"></i> ${FiezelI18n.t('social.deeplink-duel-btn')}</button></div>
+      ${socialInstallNudgeMarkup()}`);
+    socialMicroMoment('friend');
+    return true;
+  }
+  // code_invalid = kadaluwarsa / sudah dipakai / kode sendiri. Server sengaja tidak
+  // membedakannya (anti-oracle), jadi klien pun tidak boleh menebak — tetapi kode itu
+  // TIDAK akan pernah berhasil, jadi menahannya di antrean hanya melahirkan lembar berulang.
+  if(res.error==='code_invalid'||res.error==='schema_invalid'){try{link.markHandled(code)}catch(_){}}
+  socialInvitePaint(socialInviteNoticeMarkup(res.message));
+  return false;
+}
+function socialInviteOpenFriends(){socialInviteSheetOpen=false;closeModal();onlineTab='teman';go('online');return true}
+window.socialInviteOpenFriends=socialInviteOpenFriends;
+/** Langsung masuk permainan — inilah "teman langsung bisa main" yang selama ini hilang. */
+function socialInviteOpenDuel(){
+  socialInviteSheetOpen=false;closeModal();go('learn');
+  setTimeout(()=>{try{const M=self.FiezelLearnerFlow,st=M?._state?.();if(st&&M?.render){st.tab='duel';M.render()}}catch(_){}},140);
+  return true;
+}
+window.socialInviteOpenDuel=socialInviteOpenDuel;
+/* ---------------------------------------------------------------- kabar dari teman (notifikasi) */
+let socialNotifyAt=0,socialNotifyBusy=false;
+const SOCIAL_NOTIFY_MIN_GAP_MS=90000;   // satu tanya per satu setengah menit, bukan per render
+/**
+ * Bandingkan daftar teman hari ini dengan potret terakhir. Teman baru = undanganmu DITERIMA.
+ * Sorakan bertambah = temanmu menyoraki belajarmu. Dua kabar yang sebelumnya HILANG total.
+ *
+ * Batas jujur jalur ini: ia berjalan saat aplikasi dibuka atau kembali terlihat, BUKAN saat
+ * layar terkunci — push server belum ada (lihat features/social/fiezel-social-notify.js).
+ * Karena itu tidak ada satu pun naskah di bawah yang menjanjikan notifikasi seketika.
+ */
+async function socialNotifyPoll(force){
+  const core=socialCore(),notify=socialNotifyCore();
+  if(!core||!notify)return null;
+  if(socialNotifyBusy)return null;
+  if(!force&&Date.now()-socialNotifyAt<SOCIAL_NOTIFY_MIN_GAP_MS)return null;
+  if(typeof navigator!=='undefined'&&navigator.onLine===false)return null;
+  socialNotifyBusy=true;
+  try{
+    let flag='off';try{flag=await core.probeFlag()}catch(_){flag='off'}
+    if(flag!=='on')return null;
+    const fr=await core.api.friends();
+    if(!fr.ok||!fr.data)return null;
+    socialNotifyAt=Date.now();
+    const next=notify.snapshotOf(fr.data);
+    const prev=notify.readSnapshot();
+    const events=notify.diff(prev,next);
+    notify.writeSnapshot(next);
+    if(!events.length)return [];
+    const added=notify.push(events);
+    socialNotifyAnnounce(notify.notifiable(added));
+    try{if(state.view==='home')render()}catch(_){}
+    return added;
+  }catch(_){return null}
+  finally{socialNotifyBusy=false}
+}
+/** Potret ulang tanpa melahirkan kabar — dipakai sesudah kita sendiri yang menambah teman. */
+function socialNotifyResync(){
+  const core=socialCore(),notify=socialNotifyCore();
+  if(!core||!notify)return false;
+  (async()=>{try{const fr=await core.api.friends();if(fr.ok&&fr.data)notify.writeSnapshot(notify.snapshotOf(fr.data))}catch(_){}})();
+  return true;
+}
+/**
+ * Angkat kabar ke permukaan. Aplikasi TERLIHAT → toast (notifikasi sistem di atas aplikasi
+ * yang sedang dipandang adalah gangguan, bukan kabar). Aplikasi di latar → notifikasi sistem
+ * lewat service worker, memakai izin yang SUDAH diberikan murid; tidak pernah meminta izin
+ * baru dari sini.
+ */
+function socialNotifyAnnounce(events){
+  const list=Array.isArray(events)?events:[];
+  if(!list.length)return false;
+  const visible=(()=>{try{return document.visibilityState==='visible'}catch(_){return true}})();
+  for(const e of list){
+    const text=socialNotifyText(e);
+    if(!text)continue;
+    if(visible){showToast(text);try{socialMicroMoment(e.kind==='cheer_received'?'cheer':'friend')}catch(_){}}
+    else socialNotifySystem(text,e);
+  }
+  return true;
+}
+function socialNotifyText(e){
+  if(!e)return '';
+  if(e.kind==='friend_accepted')return FiezelI18n.t('social.notify-friend-accepted',{handle:String(e.handle||'')});
+  if(e.kind==='cheer_received')return FiezelI18n.t('social.notify-cheer',{handle:String(e.handle||''),count:Math.max(1,Number(e.count)||1)});
+  if(e.kind==='friend_milestone')return FiezelI18n.t('social.notify-milestone',{handle:String(e.handle||'')});
+  return '';
+}
+async function socialNotifySystem(body,event){
+  try{
+    if(notificationPermission()!=='granted')return false;
+    if(!navigator?.serviceWorker?.ready)return false;
+    const reg=await navigator.serviceWorker.ready;
+    // tag per-jenis: sepuluh sorakan menjadi SATU baris yang diperbarui, bukan sepuluh baris.
+    await reg.showNotification(FiezelI18n.t('social.notify-title'),{
+      body:String(body||'').slice(0,180),
+      tag:`fiezel-social-${String(event?.kind||'news')}`,
+      renotify:false,icon:'./apple-touch-icon.png',badge:'./favicon-64.png',
+      data:{url:'./'}
+    });
+    return true;
+  }catch(_){return false}
+}
+/**
+ * Lembar undangan TIDAK BOLEH bertumpuk di atas perkenalan, permintaan nama, atau tawaran
+ * notifikasi — tiga panel yang memang mengantre di boot pertama. Alur itu tidak memancarkan
+ * satu peristiwa "selesai" yang bisa didengar dari sini (tiap cabangnya `return null` sendiri),
+ * jadi yang dipakai adalah syarat yang benar-benar bisa dibaca: tidak ada modal terbuka.
+ * Sepuluh percobaan × 1,6 detik ≈ 16 detik — cukup untuk perkenalan terpanjang, dan sesudah
+ * itu diam. Undangannya tidak hilang: lencana Home tetap ada, dan lembar ini lahir lagi
+ * saat tab kembali terlihat.
+ */
+function armSocialInviteSheet(tries){
+  let left=Number.isFinite(tries)?tries:10;
+  const tick=()=>{
+    if(maybeOpenSocialInviteSheet())return;
+    if(--left<=0)return;
+    const t=setTimeout(tick,1600);t?.unref?.();
+  };
+  const first=setTimeout(tick,1600);first?.unref?.();
+  // Kabar dari teman ditanyakan sekali sesudah boot tenang — sesudah konten dan suara
+  // selesai berebut pita, bukan di tengahnya.
+  const poll=setTimeout(()=>{socialNotifyPoll(true)},6500);poll?.unref?.();
+  return true;
+}
+/** Jumlah kabar belum terbaca — dipakai lencana kartu Home. */
+function socialUnreadCount(){try{return socialNotifyCore()?.unreadCount()||0}catch(_){return 0}}
+function socialPendingInvite(){try{return inviteLink()?.pending()||null}catch(_){return null}}
+window.socialNotifyPoll=socialNotifyPoll;
 /* ---------------------------------------------------------------- kait bukti (evidence ingest) */
 // Ledger lesson yang SUDAH dilaporkan lesson_mastered — di localStorage terpisah, bukan di
 // state belajar (sanitizeState tidak perlu tahu; hilang ledger = paling buruk event ganda,
