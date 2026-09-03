@@ -180,10 +180,18 @@
   }
 
   /** Kode hasil untuk tutor: hanya nama depan + akurasi per skill, tanpa jawaban mentah. */
+  function classCode() { try { var r = JSON.parse(localStorage.getItem('fiezel-onboarding-v1') || '{}'); return String(r.classCode || ''); } catch (_) { return ''; } }
+  // Di perangkat yang sama (kelas demo/uji), hasil diagnostic langsung masuk ke kelas berkode.
+  function pushToClass() {
+    var T = root.FiezelTutorActionCenter; if (!T || !classCode()) return false;
+    try { return T.ingestLearnerResult(JSON.parse(decodeURIComponent(escape(atob(tutorCode(st, env.learnerName ? env.learnerName() : '')))))); } catch (_) { return false; }
+  }
   function tutorCode(st, name) {
     var B = bank(), skills = {};
     B.SKILL_ORDER.forEach(function (id) { var s = st.skills[id]; if (s) skills[id] = { c: s.correct, t: s.total }; });
-    var payload = { v: 1, name: String(name || 'Murid').split(' ')[0], at: Date.now(), goal: st.goal, skills: skills, lessons: st.lessons.length };
+    var nm = String(name || '').trim();
+    if (!nm || /^(sobat|murid|teman)$/i.test(nm)) { try { nm = String(JSON.parse(localStorage.getItem('fiezel-onboarding-v1') || '{}').name || nm || 'Murid'); } catch (_) { nm = nm || 'Murid'; } }
+    var payload = { v: 1, name: nm.split(' ')[0], at: Date.now(), goal: st.goal, skills: skills, lessons: st.lessons.length, cls: classCode() || undefined };
     try { return btoa(unescape(encodeURIComponent(JSON.stringify(payload)))); } catch (_) { return ''; }
   }
 
@@ -341,7 +349,7 @@
       '<p class="lf-muted">Istilah yang dipakai: practice completed, target coverage, review needed, confidence belum cukup, session completed. Menyelesaikan soal bukan berarti "menguasai" skill.</p>' +
       '<div class="lf-actions"><button type="button" class="lf-primary" data-lf="copy-summary" data-testid="lf-copy-summary">Salin ringkasan</button>' +
       (typeof navigator !== 'undefined' && navigator.share ? '<button type="button" class="lf-ghost" data-lf="share-summary" data-testid="lf-share-summary">Bagikan</button>' : '') + '</div></div>' +
-      '<div class="lf-card"><h3>Kode hasil untuk tutor</h3><p class="lf-muted">Berisi nama depan dan akurasi per skill saja — tanpa jawaban mentah atau audio. Tempel di Tutor Action Center → Tambah murid dari kode.</p>' +
+      '<div class="lf-card"><h3>Kode hasil untuk tutor</h3>' + (classCode() ? '<p class="lf-chip" data-testid="lf-class-code">Kelas ' + esc(classCode()) + '</p>' : '') + '<p class="lf-muted">Berisi nama depan dan akurasi per skill saja — tanpa jawaban mentah atau audio. Tempel di Tutor Action Center → Tambah murid dari kode.</p>' +
       '<textarea class="lf-code" readonly rows="3" data-testid="lf-tutor-code">' + esc(tutorCode(st, name)) + '</textarea>' +
       '<div class="lf-actions"><button type="button" class="lf-ghost" data-lf="copy-code" data-testid="lf-copy-code">Salin kode</button></div></div>';
   }
@@ -415,7 +423,7 @@
       }
       case 'diag-next': {
         var r2 = ensureDiagRun(); r2.index += 1; r2.feedback = null; r2.transcript = false;
-        if (r2.index >= r2.itemIds.length) { st.diagnostic = { at: Date.now(), answers: r2.answers }; st.diagRuns = (st.diagRuns || 0) + 1; st.diagRun = null; st.plan = null; st.step = 'skillmap'; }
+        if (r2.index >= r2.itemIds.length) { st.diagnostic = { at: Date.now(), answers: r2.answers }; st.diagRuns = (st.diagRuns || 0) + 1; st.diagRun = null; st.plan = null; st.step = 'skillmap'; if (pushToClass()) toast('Hasil diagnostic terkirim ke kelas ' + classCode() + '.'); }
         break;
       }
       case 'redo-diagnostic': st.skills = {}; st.diagnostic = null; st.diagRun = null; st.plan = null; st.lastNext = null; st.step = 'diagnostic'; break;
