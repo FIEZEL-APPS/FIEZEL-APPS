@@ -14,10 +14,12 @@
  *
  * Konsekuensi yang diterima dengan sadar dan WAJIB dibaca sebelum menurunkan
  * angka: PBKDF2 lemah terhadap penyerang ber-GPU dibanding Argon2id. Karena itu
- * iterasinya TINGGI (210.000, angka rekomendasi OWASP 2023 untuk PBKDF2-SHA256)
- * dan itu adalah anggaran CPU nyata di plan gratis: ±80-120 ms per login. Itu
- * SENGAJA — login bukan jalur panas, dan rate limit per identitas menahan
- * penyerang dari membelanjakan CPU kita.
+ * iterasinya disetel SETINGGI YANG RUNTIME IZINKAN — 100.000, batas keras
+ * WebCrypto Workers (rinciannya di blok PBKDF2 di bawah; OWASP 2023 menganjurkan
+ * 210.000, tetapi angka itu MELEMPAR di produksi, jadi tidak tersedia). Ini
+ * anggaran CPU nyata di plan gratis: ±40-60 ms per login. Itu SENGAJA — login
+ * bukan jalur panas, dan rate limit per identitas menahan penyerang dari
+ * membelanjakan CPU kita.
  *
  * KENAPA BUKAN "hash di klien": hash klien MENJADI kata sandi. Bocornya tabel
  * berarti login langsung, dan itu justru yang mau dicegah. Turunan kunci HARUS
@@ -38,10 +40,39 @@
  * itu disengaja.
  */
 
-/** Parameter aktif. Menaikkan ITERATIONS aman: `needsRehash` menangani migrasi. */
+/**
+ * Parameter aktif. Menaikkan ITERATIONS aman DARI SISI MIGRASI (`needsRehash`
+ * menangani hash lama), tetapi TIDAK BOLEH melewati `PBKDF2_MAX_ITERATIONS`.
+ *
+ * ==========================================================================
+ * KENAPA 100.000 DAN BUKAN 210.000 — TEMUAN PRODUKSI 3 Sep 2026
+ * ==========================================================================
+ * Nilai sebelumnya 210.000 (rekomendasi OWASP 2023) dan lolos semua tes lokal,
+ * karena Node menjalankan PBKDF2 tanpa batas iterasi. Di PRODUKSI, setiap
+ * `POST /api/account/register` menjawab 500 dengan pengecualian dari runtime:
+ *
+ *     NotSupportedError: Pbkdf2 failed: iteration counts above 100000 are not
+ *     supported (requested 210000).
+ *
+ * Ini BATAS KERAS WebCrypto di Cloudflare Workers, bukan batas CPU dan bukan
+ * sesuatu yang bisa dinaikkan lewat konfigurasi, plan, atau flag. Jadi angka
+ * di sini bukan pilihan keamanan yang bisa ditawar ke atas: 100.000 adalah
+ * langit-langit platform, dan hash apa pun di atasnya TIDAK PERNAH berhasil
+ * dibuat — bukan "lebih lambat", melainkan 500 di setiap pendaftaran.
+ *
+ * Konsekuensi yang harus diketahui pembaca berikutnya:
+ *   - `needsRehash()` membandingkan `iterations < PBKDF2.ITERATIONS`. Menurunkan
+ *     angka ini membuat hash 210.000 lama TIDAK ditandai perlu rehash — dan itu
+ *     benar, karena hash begitu memang tidak pernah bisa ada di produksi
+ *     (penerbitannya selalu gagal sebelum tersimpan);
+ *   - kalau suatu hari Workers menaikkan batasnya, naikkan `PBKDF2_MAX_ITERATIONS`
+ *     LEBIH DULU, baru `ITERATIONS`. Tes `auth-role-test.js` menjaga urutan itu.
+ */
+export const PBKDF2_MAX_ITERATIONS = 100000;
+
 export const PBKDF2 = Object.freeze({
   ALGO: 'pbkdf2',
-  ITERATIONS: 210000,
+  ITERATIONS: 100000,
   SALT_BYTES: 16,
   DERIVED_BYTES: 32,
   HASH: 'SHA-256'
@@ -175,7 +206,10 @@ async function derive(password, salt, iterations) {
 export async function hashPassword(raw, opts = {}) {
   const problem = checkPasswordPolicy(raw);
   if (problem) throw Object.assign(new Error('password_policy'), problem);
-  const iterations = Number(opts.iterations) > 0 ? Number(opts.iterations) : PBKDF2.ITERATIONS;
+  // Dijepit ke langit-langit platform (lihat PBKDF2_MAX_ITERATIONS): pemanggil
+  // yang meminta lebih tinggi mendapat hash yang BISA dibuat, bukan 500.
+  const asked = Number(opts.iterations) > 0 ? Number(opts.iterations) : PBKDF2.ITERATIONS;
+  const iterations = Math.min(asked, PBKDF2_MAX_ITERATIONS);
   const salt = opts.salt instanceof Uint8Array
     ? opts.salt
     : subtleOf().getRandomValues(new Uint8Array(PBKDF2.SALT_BYTES));
