@@ -258,7 +258,45 @@ export default {
       // provider bisa memuat kunci, prompt, atau nama model. Detail masuk log
       // Worker (observability), respons tetap generik + header CORS supaya
       // frontend bisa menampilkan naskah FIEZEL, bukan "network error".
-      console.error('fiezel-api unhandled', err && err.name);
+      //
+      // ======================================================================
+      // KENAPA `message` DAN `stack` IKUT — DIBAYAR SATU SIKLUS DEPLOY
+      // ======================================================================
+      // Versi sebelumnya mencatat `err.name` SAJA, dan itu tidak menepati
+      // kalimat "Detail masuk log Worker" di atas: yang sampai ke `wrangler
+      // tail` cuma nama kelas DOMException. Ongkosnya terukur pada insiden
+      // 3 Sep 2026 — setiap `POST /api/account/register` menjawab 500 dan log
+      // produksi hanya berbunyi:
+      //
+      //     fiezel-api unhandled NotSupportedError
+      //
+      // Dari baris itu penyebabnya TIDAK dapat disimpulkan. Perbaikan pertama
+      // yang diusulkan (PR #331) menebak bentuk parameter `hash` WebCrypto dan
+      // keliru. Baru setelah `message` + `stack` ikut tercatat, penyebabnya
+      // terbaca sekali lihat dan tanpa tebakan:
+      //
+      //     Pbkdf2 failed: iteration counts above 100000 are not supported
+      //     (requested 210000).   at derive -> hashPassword -> routeAccountRegister
+      //
+      // Jadi satu siklus deploy terbuang untuk memulihkan informasi yang
+      // seharusnya sudah ada di log sejak awal. Itu harga yang tidak perlu
+      // dibayar dua kali.
+      //
+      // BATAS YANG TETAP BERLAKU, dan kenapa ini bukan pelonggaran keamanan:
+      //   - yang berubah HANYA sisi log Worker, yang cuma bisa dibaca pemilik
+      //     akun Cloudflare lewat `wrangler tail`/observability;
+      //   - RESPONS ke murid tidak berubah sedikit pun — tetap `jsonError(500,
+      //     ERR.INTERNAL, {})`, nol detail, sama seperti sebelumnya. Itulah
+      //     invarian yang benar-benar menjaga kunci hulu, dan ia utuh;
+      //   - peringatan "pesan provider bisa memuat kunci" tetap relevan untuk
+      //     log: jangan pernah menyalin-tempel keluaran `tail` ke tempat publik
+      //     (issue, PR, chat pihak ketiga) tanpa membacanya lebih dulu.
+      console.error(
+        'fiezel-api unhandled',
+        err && err.name,
+        err && err.message,
+        err && err.stack
+      );
       const cors = corsHeaders(env, request.headers.get('origin'));
       return jsonError(500, ERR.INTERNAL, {}, { headers: cors });
     }
