@@ -53,6 +53,33 @@ export const BYTE_LIMITS = Object.freeze({
   '/api/usage/events': 16384,   // batch event klien; sama dengan /api/usage/event (tunggal) yang digantikannya
   '/api/usage/retention': 2048, // {cohort_day, day_index} + amplop
   '/api/usage/pepper': 512,     // GET, tanpa body
+  // --- SLOT 10: akun/peran/konten guru. Cap kecil di mana-mana KECUALI dua jalur
+  //     CSV: payload kecil = CPU kecil, dan CPU adalah anggaran paling langka.
+  '/api/account/register': 1024,
+  '/api/account/login': 1024,
+  '/api/account/logout': 512,
+  '/api/account/me': 512,
+  '/api/account/teacher-activate': 1536,   // kode 32 char + handle + kata sandi
+  '/api/owner/teacher-invite': 1024,
+  '/api/owner/teacher-invite/revoke': 512,
+  '/api/owner/teachers': 512,              // GET, tanpa body
+  '/api/teacher/tree': 512,                // GET
+  '/api/teacher/node/save': 16384,         // deskripsi + tujuan + daftar kosakata
+  '/api/teacher/node/publish': 512,
+  '/api/teacher/node/archive': 512,
+  '/api/teacher/question/list': 512,       // GET
+  '/api/teacher/question/save': 16384,     // batang soal + opsi + penjelasan + contoh
+  // Dua ini SENGAJA jauh lebih besar: mereka menerima BERKAS. Angkanya = 2 MiB,
+  // sama persis dengan CSV_LIMITS.MAX_BYTES di teacher/csv-core.js — dua tempat
+  // yang WAJIB sama, dan `teacher-csv-test.js` mengunci kesamaannya. Kalau cap
+  // di sini lebih kecil, guru mendapat 413 tanpa penjelasan alih-alih laporan
+  // "berkas kebesaran" yang bisa ia tindaklanjuti.
+  '/api/teacher/csv/preview': 2097152,
+  '/api/teacher/csv/commit': 2097152,
+  '/api/teacher/csv/template': 512,        // GET
+  '/api/teacher/csv/export': 512,          // GET
+  '/api/teacher/assign': 32768,            // sampai 500 sub murid
+  '/api/teacher/progress': 512,            // GET
   // --- SLOT 7: lapisan sosial (route-social.js). Payload kecil = CPU kecil;
   // satu-satunya yang besar adalah evidence batch (maks 20 event, pola LIMITS
   // analytics 8KB — spec sosial §4.4.2).
