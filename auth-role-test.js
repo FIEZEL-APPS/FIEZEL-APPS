@@ -72,7 +72,22 @@ function mod(rel) {
   assert(pw.needsRehash(stored) === true, 'hash beriterasi rendah ditandai perlu di-hash ulang');
   assert(pw.needsRehash(await pw.hashPassword(secret, { iterations: pw.PBKDF2.ITERATIONS })) === false,
     'hash beriterasi terkini tidak perlu di-hash ulang');
-  assert(pw.PBKDF2.ITERATIONS >= 210000, 'iterasi produksi >= rekomendasi OWASP 2023');
+  // Batas keras WebCrypto Cloudflare Workers: iterasi di atas 100.000 melempar
+  // NotSupportedError di produksi (terukur 3 Sep 2026, setiap register -> 500).
+  // Jadi yang dijaga bukan "setinggi mungkin", melainkan "setinggi yang bisa
+  // dijalankan runtime" — dan bukti bahwa itu memang bisa dijalankan.
+  assert(pw.PBKDF2_MAX_ITERATIONS === 100000, 'langit-langit PBKDF2 Workers terdokumentasi');
+  assert(pw.PBKDF2.ITERATIONS <= pw.PBKDF2_MAX_ITERATIONS,
+    'iterasi produksi tidak melewati batas runtime Workers');
+  assert(pw.PBKDF2.ITERATIONS === pw.PBKDF2_MAX_ITERATIONS,
+    'iterasi produksi dipakukan ke batas tertinggi yang didukung');
+  {
+    const clamped = await pw.hashPassword(secret, { iterations: 210000 });
+    assert(pw.parseStored(clamped).iterations === pw.PBKDF2_MAX_ITERATIONS,
+      'permintaan iterasi di atas batas dijepit, bukan melempar');
+    assert((await pw.verifyPassword(secret, clamped)) === true,
+      'hash hasil jepitan tetap bisa diverifikasi');
+  }
 
   assert(pw.constantTimeEqual('abc', 'abc') === true, 'banding waktu-tetap: sama = true');
   assert(pw.constantTimeEqual('abc', 'abd') === false, 'banding waktu-tetap: beda = false');
