@@ -105,6 +105,39 @@ permissions:
 jobs:
   quality:
     runs-on: ubuntu-latest
+
+    # ======================================================================
+    # KENAPA ADA BATAS WAKTU — DAN KENAPA ANGKANYA 45
+    # ======================================================================
+    # Tanpa `timeout-minutes`, GitHub memakai batas bawaan 6 JAM. Itu bukan
+    # angka teoretis: pada 3 Sep 2026 satu gerbang di `Core validation`
+    # menggantung TIGA KALI berturut-turut di PR #333 (job 100652521266,
+    # 100703901200, 100721759384). Setiap kali step-nya tidak pernah selesai,
+    # run harus dibatalkan manual, dan — ini bagian yang mahal — GitHub TIDAK
+    # PERNAH MENGUNGGAH LOG job yang dibatalkan di tengah step. Ketiga job itu
+    # menjawab HTTP 404 saat lognya diminta.
+    #
+    # Akibatnya nama gerbang yang menggantung TIDAK DAPAT DIKETAHUI sama
+    # sekali. Gerbang mutu yang tidak bisa melaporkan di mana ia berhenti
+    # adalah gerbang yang buta persis pada saat ia paling dibutuhkan, dan
+    # satu-satunya jalan keluar yang tersisa adalah menebak.
+    #
+    # `timeout-minutes` menutup itu, dan bukan dengan mempercepat apa pun:
+    # job yang MELEWATI BATAS diperlakukan sebagai KEGAGALAN BIASA, bukan
+    # pembatalan — jadi lognya DIUNGGAH seperti run gagal lainnya, dan baris
+    # terakhir sebelum senyap menyebutkan gerbang yang menggantung. Wedge yang
+    # tak terdiagnosis berubah menjadi kegagalan bernama.
+    #
+    # Angka 45 diambil dari ukuran, bukan selera: enam merge berurutan di
+    # `main` (#329, #330, #332, #334, #335, dan 809d8156) semuanya selesai
+    # 23m49s-24m11s. 45 menit memberi hampir 2x kelonggaran terhadap run
+    # tersehat, jadi ia tidak akan menyentuh run yang wajar sekalipun runner
+    # sedang lambat — tetapi memotong wedge berjam-jam pada percobaan pertama.
+    # Kalau suatu hari daftar gerbang tumbuh sampai run sehat melewati ~35
+    # menit, naikkan angka ini SESUDAH mengukur ulang, jangan sesudah satu
+    # run merah.
+    timeout-minutes: 45
+
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
