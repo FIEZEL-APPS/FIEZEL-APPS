@@ -313,12 +313,13 @@
       case 'new-class': st.creating = true; break;
       case 'cancel-create': st.creating = false; break;
       case 'seed-demo': { var k = seedClass(); st.classes.push(k); st.activeClassId = k.id; st.creating = false; st.tab = 'map'; toast('Kelas demo dimuat: 18 murid.'); break; }
-      case 'quick-session': st.picked = btn.getAttribute('data-skills').split(','); st.session = B.buildSession({ skills: st.picked, count: st.picked.length > 1 ? 10 : 5, seed: Date.now() % 997 }); st.tab = 'session'; break;
-      case 'build-session': st.session = B.buildSession({ skills: st.picked, seed: Date.now() % 997 }); break;
+      case 'quick-session': st.picked = btn.getAttribute('data-skills').split(','); st.session = B.buildSession({ skills: st.picked, count: st.picked.length > 1 ? 10 : 5, avoid: (c && c.sentItemIds) || [], seed: Date.now() % 997 }); st.tab = 'session'; break;
+      case 'build-session': st.session = B.buildSession({ skills: st.picked, avoid: (c && c.sentItemIds) || [], seed: Date.now() % 997 }); break;
       case 'send-session': {
         if (!c || !st.session) return;
         var sent = Object.assign({}, st.session, { sentAt: Date.now() });
         c.sessions.push(sent);
+        c.sentItemIds = ((c.sentItemIds || []).concat(sent.itemIds)).slice(-80);
         try { var a = JSON.parse(localStorage.getItem(ASSIGN_KEY)) || []; a.push({ id: sent.id + '-' + sent.sentAt, title: sent.title, skills: sent.skills, itemIds: sent.itemIds, minutes: sent.minutes, from: c.name, at: sent.sentAt }); localStorage.setItem(ASSIGN_KEY, JSON.stringify(a.slice(-5))); } catch (_) {}
         toast('Latihan dikirim ke ' + c.name + '. Muncul di Today Plan murid.');
         st.session = null; st.picked = [];

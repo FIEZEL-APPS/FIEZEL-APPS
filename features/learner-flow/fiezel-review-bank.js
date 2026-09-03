@@ -91,7 +91,19 @@
   ITEMS.forEach(function (it) { BY_ID[it.id] = it; });
 
   function itemsFor(skill) { return ITEMS.filter(function (it) { return it.skill === skill; }); }
-  function byId(id) { return BY_ID[id] || null; }
+  // Rekonstruksi soal statis, hasil-generate ('gpt:'/'gpq:'), dan hasil-acak ('base~oXXXX').
+  function byId(id) {
+    id = String(id || '');
+    var vi = id.indexOf('~o');
+    if (vi > -1) {
+      var base = byId(id.slice(0, vi)), order = id.slice(vi + 2).split('').map(Number);
+      return base ? applyOrder(base, order, id) : null;
+    }
+    if (BY_ID[id]) return BY_ID[id];
+    var m = id.match(/^g(pt|pq):(\d+):(\d+):(\d+)$/);
+    if (m) return (m[1] === 'pq' ? pastQItem : pastTenseItem)(+m[2], +m[3], +m[4]);
+    return null;
+  }
 
   function seededShuffle(list, seed) {
     var arr = list.slice(), s = (Number(seed) || 1) >>> 0;
@@ -106,9 +118,106 @@
     return seededShuffle(itemsFor(skill), seed || 7).slice(0, Math.max(0, n | 0));
   }
 
-  /** Lima soal diagnostic: satu per skill, urutan tetap supaya hasil antar-murid sebanding. */
-  function diagnosticSet(seed) {
-    return SKILL_ORDER.map(function (skill) { return pick(skill, 1, seed || 11)[0]; });
+  // ---- Mesin variasi + anti-pengulangan -------------------------------------------------
+  // Agar murid tidak bosan: soal yang sudah diuji dihindari, dan bila stok pola habis, soal
+  // grammar dibuat baru dari template (subjek × kata kerja × penanda waktu). Untuk bank
+  // terbatas (vocab/listening/reading) urutan pilihan diacak ulang supaya terasa segar.
+
+  var GEN_VERBS = [
+    { b: 'go', p: 'went', s: 'goes', ing: 'going', obj: 'to the market' },
+    { b: 'watch', p: 'watched', s: 'watches', ing: 'watching', obj: 'a movie' },
+    { b: 'finish', p: 'finished', s: 'finishes', ing: 'finishing', obj: 'the homework' },
+    { b: 'play', p: 'played', s: 'plays', ing: 'playing', obj: 'football' },
+    { b: 'visit', p: 'visited', s: 'visits', ing: 'visiting', obj: 'their grandmother' },
+    { b: 'clean', p: 'cleaned', s: 'cleans', ing: 'cleaning', obj: 'the kitchen' },
+    { b: 'call', p: 'called', s: 'calls', ing: 'calling', obj: 'a friend' },
+    { b: 'study', p: 'studied', s: 'studies', ing: 'studying', obj: 'English' },
+    { b: 'cook', p: 'cooked', s: 'cooks', ing: 'cooking', obj: 'dinner' },
+    { b: 'eat', p: 'ate', s: 'eats', ing: 'eating', obj: 'breakfast' },
+    { b: 'buy', p: 'bought', s: 'buys', ing: 'buying', obj: 'a new phone' },
+    { b: 'see', p: 'saw', s: 'sees', ing: 'seeing', obj: 'an old friend' },
+    { b: 'write', p: 'wrote', s: 'writes', ing: 'writing', obj: 'a letter' },
+    { b: 'take', p: 'took', s: 'takes', ing: 'taking', obj: 'the bus' },
+    { b: 'give', p: 'gave', s: 'gives', ing: 'giving', obj: 'a present' },
+    { b: 'meet', p: 'met', s: 'meets', ing: 'meeting', obj: 'her cousin' },
+    { b: 'lose', p: 'lost', s: 'loses', ing: 'losing', obj: 'his keys' },
+    { b: 'find', p: 'found', s: 'finds', ing: 'finding', obj: 'the answer' },
+    { b: 'travel', p: 'travelled', s: 'travels', ing: 'travelling', obj: 'to Bali' },
+    { b: 'speak', p: 'spoke', s: 'speaks', ing: 'speaking', obj: 'to the teacher' }
+  ];
+  var GEN_SUBJ = [
+    { s: 'I', low: 'I' }, { s: 'We', low: 'we' }, { s: 'They', low: 'they' }, { s: 'She', low: 'she' },
+    { s: 'He', low: 'he' }, { s: 'My father', low: 'my father' }, { s: 'The students', low: 'the students' }, { s: 'My friends', low: 'my friends' }
+  ];
+  var GEN_TIME = ['yesterday', 'last week', 'last night', 'two days ago', 'last month', 'this morning'];
+
+  function pastTenseItem(vi, si, ti) {
+    var v = GEN_VERBS[vi % GEN_VERBS.length], su = GEN_SUBJ[si % GEN_SUBJ.length], tm = GEN_TIME[ti % GEN_TIME.length];
+    return {
+      id: 'gpt:' + (vi % GEN_VERBS.length) + ':' + (si % GEN_SUBJ.length) + ':' + (ti % GEN_TIME.length), skill: 'past_tense',
+      prompt: su.s + ' ___ ' + v.obj + ' ' + tm + '.', options: [v.b, v.p, v.s, v.ing], answer: 1, marker: tm,
+      why: { 0: '“' + v.b + '” ' + V1, 2: '“' + v.s + '” ' + S3, 3: '“' + v.ing + '” ' + ING },
+      note: 'Penanda waktu “' + tm + '” meminta bentuk lampau (verb 2).'
+    };
+  }
+  function pastQItem(vi, si, ti) {
+    var v = GEN_VERBS[vi % GEN_VERBS.length], su = GEN_SUBJ[si % GEN_SUBJ.length], tm = GEN_TIME[ti % GEN_TIME.length];
+    return {
+      id: 'gpq:' + (vi % GEN_VERBS.length) + ':' + (si % GEN_SUBJ.length) + ':' + (ti % GEN_TIME.length), skill: 'past_questions',
+      prompt: 'Did ' + su.low + ' ___ ' + v.obj + ' ' + tm + '?', options: [v.b, v.p, v.s, v.ing], answer: 0, marker: 'did',
+      why: { 1: '“' + v.p + '” menandai lampau dua kali. ' + AFTER_DID, 2: '“' + v.s + '” ' + S3, 3: '“' + v.ing + '” ' + ING },
+      note: 'Pertanyaan lampau: did + subject + verb 1.'
+    };
+  }
+  function generated(skill, seed) {
+    var s = (Number(seed) || 1) >>> 0;
+    var vi = s % GEN_VERBS.length, si = (Math.floor(s / 7)) % GEN_SUBJ.length, ti = (Math.floor(s / 53)) % GEN_TIME.length;
+    return skill === 'past_questions' ? pastQItem(vi, si, ti) : pastTenseItem(vi, si, ti);
+  }
+
+  /** Klon soal dengan urutan pilihan diacak; id meng-encode urutan agar bisa direkonstruksi. */
+  function variant(item, seed) {
+    var order = seededShuffle(item.options.map(function (_, i) { return i; }), seed || 3);
+    return applyOrder(item, order, item.id + '~o' + order.join(''));
+  }
+  function applyOrder(item, order, id) {
+    var opts = order.map(function (i) { return item.options[i]; });
+    var why = {};
+    if (item.why) order.forEach(function (old, ni) { if (item.why[old] != null) why[ni] = item.why[old]; });
+    return Object.assign({}, item, { id: id, options: opts, answer: order.indexOf(item.answer), why: why });
+  }
+
+  /**
+   * Ambil n soal SEGAR untuk sebuah skill: hindari id yang sudah pernah diuji (opts.avoid);
+   * bila stok grammar habis, buat soal baru dari template; bila bank terbatas habis, acak
+   * ulang pilihan soal lama supaya tidak terasa sama.
+   */
+  function pickFresh(skill, n, opts) {
+    opts = opts || {}; n = Math.max(0, n | 0);
+    var avoid = {}; (opts.avoid || []).forEach(function (id) { avoid[id] = true; });
+    var seed = Number(opts.seed) || 7;
+    var out = seededShuffle(itemsFor(skill).filter(function (it) { return !avoid[it.id]; }), seed).slice(0, n);
+    var have = {}; out.forEach(function (it) { have[it.id] = true; });
+    if (out.length < n && (skill === 'past_tense' || skill === 'past_questions')) {
+      var guard = 0;
+      while (out.length < n && guard < 400) {
+        var g = generated(skill, seed + guard * 101 + 13); guard++;
+        if (!avoid[g.id] && !have[g.id]) { out.push(g); have[g.id] = true; }
+      }
+    }
+    if (out.length < n) {
+      var base = seededShuffle(itemsFor(skill), seed + 1), j = 0;
+      while (out.length < n && base.length) { out.push(variant(base[j % base.length], seed + out.length + 1)); j++; if (j > base.length * 4) break; }
+    }
+    return out;
+  }
+
+  /** Lima soal diagnostic: satu per skill, hindari yang sudah diuji, urutan skill tetap. */
+  function diagnosticSet(opts) {
+    if (typeof opts === 'number') opts = { seed: opts };
+    opts = opts || {};
+    var avoid = opts.avoid || [], seed = Number(opts.seed) || 11;
+    return SKILL_ORDER.map(function (skill, i) { return pickFresh(skill, 1, { avoid: avoid, seed: seed + i * 17 })[0]; });
   }
 
   function optionText(item, index) {
@@ -149,8 +258,12 @@
     if (!skills.length) skills = ['past_tense'];
     var total = Math.min(10, Math.max(5, Number(o.count) || (skills.length >= 3 ? 10 : skills.length * 5)));
     var seed = Number(o.seed) || 21;
-    var per = Math.ceil(total / skills.length), items = [];
-    skills.forEach(function (skill, i) { items = items.concat(pick(skill, per, seed + i)); });
+    var per = Math.ceil(total / skills.length), items = [], avoid = (o.avoid || []).slice();
+    skills.forEach(function (skill, i) {
+      var got = pickFresh(skill, per, { avoid: avoid, seed: seed + i });
+      got.forEach(function (it) { avoid.push(it.id); });
+      items = items.concat(got);
+    });
     items = items.slice(0, total);
     var minutes = Math.max(3, Math.round(items.reduce(function (m, it) { return m + SKILLS[it.skill].minutesPer; }, 0) + 2));
     var order = skills.map(function (skill, i) {
@@ -182,6 +295,7 @@
 
   return {
     AREAS: AREAS, SKILLS: SKILLS, SKILL_ORDER: SKILL_ORDER, ITEMS: ITEMS,
-    itemsFor: itemsFor, byId: byId, pick: pick, diagnosticSet: diagnosticSet, explain: explain, buildSession: buildSession, afterSessionNote: afterSessionNote
+    itemsFor: itemsFor, byId: byId, pick: pick, pickFresh: pickFresh, variant: variant, generated: generated,
+    diagnosticSet: diagnosticSet, explain: explain, buildSession: buildSession, afterSessionNote: afterSessionNote
   };
 });

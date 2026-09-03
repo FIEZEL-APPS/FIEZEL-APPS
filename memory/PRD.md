@@ -28,6 +28,14 @@ PDF/CSV/anonim). Wajib: buat branch/PR baru sebelum mulai.
 - ui-render-audit: SKIP (playwright tak terpasang di env — bukan gagal).
 
 ## Backlog / Next
-- P1: Suara neural untuk listening di alur learner (kini SpeechSynthesis fallback).
+- P1: Suara neural untuk listening di alur learner (kini SpeechSynthesis fallback + FiezelVoiceSay bila aktif). ✅ tersambung.
 - P2: Grafik tren mingguan kelas; filter murid per status di Tutor.
 - P2: Jalankan full CI suite (~240 gate) sebelum merge PR.
+
+## Anti-pengulangan & variasi (2026-09-03)
+Agar murid tidak bosan: `fiezel-review-bank.js` kini punya mesin variasi.
+- `pickFresh(skill,n,{avoid,seed})` menghindari id soal yang sudah diuji.
+- Bila stok pola grammar habis → generate soal baru dari template (20 verb × 8 subjek × 6 penanda waktu) via `generated()`; distraktor memakai bentuk present `-s` sehingga TIDAK pernah ada pilihan duplikat (verba dengan past==participle sekalipun).
+- Bank terbatas (vocab/listening/reading) → `variant()` mengacak urutan pilihan (jawaban & penjelasan dipetakan ulang; urutan di-encode di id → `byId()` bisa rekonstruksi).
+- Learner menyimpan ledger `seen` per skill (cap 40) → diagnostic (rotasi seed per run), lesson, dan review selalu ambil soal segar. Tutor menyimpan `sentItemIds` per kelas → "Buat sesi review" tidak mengirim soal yang sama dua kali.
+Terverifikasi: 30 tarikan unik, ~6000 soal generate tanpa opsi duplikat, roundtrip `byId` untuk generated & variant, lesson e2e jalan.
