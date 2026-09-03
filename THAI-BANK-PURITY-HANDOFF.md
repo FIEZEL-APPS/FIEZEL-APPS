@@ -114,6 +114,59 @@ kutipan itu bukti jawabannya. Menerjemahkannya berarti murid membaca kalimat yan
 pernah terdengar di audio, dan soalnya jadi tidak bisa dijawab dari rekaman. Gerbang pasal 8
 memeriksa kontrak ini terpisah, jadi kutipan yang diam-diam diterjemahkan tetap ketahuan.
 
+### JEBAKAN KETIGA: naskah murid DI LUAR bank soal
+
+Ditemukan m025-235, saat owner bertanya apakah i18n Thai sudah 100%. Jawaban jujurnya
+tidak, dan pembuktiannya langsung menemukan celah yang lebih luas dari dua jebakan di atas.
+
+Keempat gerbang th yang ada semuanya bertanya tentang **bank soal**. Naskah murid yang
+bukan bank soal karena itu tidak diperiksa SIAPA PUN. Contoh yang memicu:
+`features/quota/quota-copy.js` memuat 45 kalimat murid, tidak memanggil lapisan i18n sama
+sekali, dan `copy-th-quota.js` punya NOL kunci `quota.*` — jadi setiap pemberitahuan kuota
+suara tampil berbahasa Indonesia untuk murid Thai. Gerbang mana pun tidak bisa melihatnya.
+
+**Penjaganya** — `th-naskah-murid-test.js`, dan cakupannya dibalik dari ketiga gerbang lain:
+ia memindai SELURUH berkas runtime `index.html`, bukan bank soal. Tiap temuan wajib salah
+satu dari dua: dipindah ke copy map lalu dipanggil lewat `t()`, atau didaftarkan di
+`BERKAS_DIKECUALIKAN`/`KALIMAT_DITINJAU` **dengan alasan tertulis**.
+
+Untuk berkas yang menyimpan peta naskah sendiri (kuota, pemberitahuan suara), ia tidak
+sekadar memindai string melainkan menuntut **pasangan kunci di dua locale** — lebih ketat
+daripada ketiadaan kalimat Indonesia.
+
+**Belum selesai.** Per m025-243, setelah branch disinkronkan dengan `main`, gerbang ini
+melaporkan 610 kalimat di 23 berkas (`fiezel-review-bank.js` 196, `app.js` 120,
+`fiezel-learner-flow.js` 84, `fiezel-tutor-action-center.js` 82, `fiezel-duel.js` 23,
+coach bubble 16, dan sisanya lebih kecil).
+Daftar lengkapnya:
+
+```
+TH_GERBANG_RINCI=1 node th-naskah-murid-test.js
+```
+
+Karena utang itu sudah diketahui, gerbangnya **belum didaftarkan di `quality.yml`** —
+mendaftarkannya sekarang memerahkan CI untuk utang lama, bukan untuk regresi baru. Tapi
+"belum didaftarkan" bukan berarti tidak tercatat: repo ini punya gerbang-meta
+(`gate-registry-test.js`) yang MELARANG gerbang tak terdaftar, jadi ia masuk `EXCLUSIONS`
+di sana dengan kelas `gerbang-pra-rilis-fitur` dan alasan tertulis. **PR yang menutup temuan
+terakhir wajib menghapus entri itu dan mendaftarkan gerbangnya di `quality.yml`** — pola yang
+sama persis dengan entri `th-coverage` di m025-192, yang dihapus begitu lubangnya tertutup.
+
+Yang perlu diketahui siapa pun yang mengerjakan sisanya: **tidak semua 610 temuan adalah
+naskah murid.** Tiga kelompok yang HARUS dikecualikan dengan alasan, bukan diterjemahkan:
+*pencocok masukan* (`fiezel-prosody.js` mencocokkan penanda wacana Indonesia; menerjemahkannya
+mematikan fiturnya), *catatan storyboard* (`fiezel-choreography.js`), dan *nama aturan audit
+internal* (`app.js` sekitar baris 811-866). Sebaliknya ada satu kelompok yang **lebih parah
+dari sekadar label**: prompt sistem LLM di `fiezel-tutor-dialog.js` (~:282-292) dan `app.js`
+(~:5716) menyuruh model menjawab dalam bahasa Indonesia — jadi murid Thai menerima jawaban
+tutor berbahasa Indonesia meskipun setiap label di layar sudah Thai.
+
+**Dua kanon repo yang mudah dilanggar waktu mengerjakan ini**, keduanya ditegakkan
+`quota-notice-a11y-test.js`:
+1. Kanon th melarang jargon mesin, dan `โควตา` termasuk. Ganti dengan penulisan ulang dari
+   sudut pandang murid ("apa yang masih bisa ia lakukan hari ini"), bukan sinonim yang lebih sopan.
+2. Kanon id mewajibkan `nggak`, bukan `tidak`.
+
 ## Generator — jangan sunting sidecar dengan tangan
 
 Setiap sidecar dirakit ulang dari peta terjemahan **kalimat utuh** di `tools/th-strings/`:
