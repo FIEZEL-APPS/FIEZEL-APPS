@@ -116,6 +116,14 @@ jobs:
           node fiezel-stat-gate-test.js
           node learning-lane-test.js
           node braincore-evidence-test.js
+          # --- SLOT 10: akun, peran, konten guru, CSV, Braincore, sosial -------
+          node auth-schema-contract-test.js
+          node auth-role-test.js
+          node role-security-test.js
+          node teacher-content-test.js
+          node teacher-csv-test.js
+          node teacher-braincore-test.js
+          node social-notify-test.js
           node braincore-learner-identity-test.js
           node learning-metrics-test.js
           node learning-telemetry-test.js

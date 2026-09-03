@@ -134,8 +134,10 @@ Untuk berkas yang menyimpan peta naskah sendiri (kuota, pemberitahuan suara), ia
 sekadar memindai string melainkan menuntut **pasangan kunci di dua locale** — lebih ketat
 daripada ketiadaan kalimat Indonesia.
 
-**Belum selesai.** Per m025-235 gerbang ini masih melaporkan 208 kalimat di 18 berkas
-(`app.js` 112, coach bubble 16, tutor 25, prasasti 12, choreography 10, sisanya kecil-kecil).
+**Belum selesai.** Per m025-243, setelah branch disinkronkan dengan `main`, gerbang ini
+melaporkan 610 kalimat di 23 berkas (`fiezel-review-bank.js` 196, `app.js` 120,
+`fiezel-learner-flow.js` 84, `fiezel-tutor-action-center.js` 82, `fiezel-duel.js` 23,
+coach bubble 16, dan sisanya lebih kecil).
 Daftar lengkapnya:
 
 ```
@@ -150,7 +152,7 @@ di sana dengan kelas `gerbang-pra-rilis-fitur` dan alasan tertulis. **PR yang me
 terakhir wajib menghapus entri itu dan mendaftarkan gerbangnya di `quality.yml`** — pola yang
 sama persis dengan entri `th-coverage` di m025-192, yang dihapus begitu lubangnya tertutup.
 
-Yang perlu diketahui siapa pun yang mengerjakan sisanya: **tidak semua 208 temuan adalah
+Yang perlu diketahui siapa pun yang mengerjakan sisanya: **tidak semua 610 temuan adalah
 naskah murid.** Tiga kelompok yang HARUS dikecualikan dengan alasan, bukan diterjemahkan:
 *pencocok masukan* (`fiezel-prosody.js` mencocokkan penanda wacana Indonesia; menerjemahkannya
 mematikan fiturnya), *catatan storyboard* (`fiezel-choreography.js`), dan *nama aturan audit

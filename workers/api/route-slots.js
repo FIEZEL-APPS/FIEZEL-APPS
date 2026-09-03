@@ -97,6 +97,27 @@ import { ROUTES as EVIDENCE_OWNER_ROUTES } from './evidence/route-evidence.js';
  * Rute TULIS-nya menuntut identitas (kebalikan SLOT 8), jadi ia WAJIB lewat
  * jalur yang sudah dilewati [M1] mw-identity — yaitu jalur ini. */
 import { ROUTES as LEARNER_EVIDENCE_ROUTES } from './evidence/route-learner-evidence.js';
+/* --- SLOT 10: AKUN, PERAN, KONTEN GURU                               [TERPASANG]
+ *             route-account.js         — /api/account/*, aktivasi guru
+ *             route-owner-teachers.js  — /api/owner/teacher-invite*, /api/owner/teachers
+ *             route-teacher.js         — /api/teacher/*
+ * Dipasang sebagai array `ROUTES` sungguhan (jalur yang dirancang berkas ini),
+ * BUKAN lewat route-wiring.js, dengan alasan yang SAMA dengan SLOT 7 dan SLOT 9:
+ * tidak satu pun rute di sini memanggil provider berbayar, jadi tidak ada
+ * jembatan kuota/neuron yang perlu disuntikkan — dan yang menentukan, lane ini
+ * memakai CORE_DB. route-wiring.js ada untuk MENYEMPITKAN env ke binding lane
+ * agregat; melewatkan lane beridentitas ke sana akan menaruh handler ini di
+ * jalur yang memegang database yang seluruh kontraknya menjanjikan anonimitas.
+ *
+ * Gerbangnya hidup di dalam modulnya: identitas (mw-identity) -> `roleGate`
+ * (peran otoritatif dari baris auth_account, DIBACA SETIAP PERMINTAAN) ->
+ * penyaringan per-baris `teacher_sub` di dalam handler. Rute owner yang MENULIS
+ * (cetak/cabut undangan) menambah gerbang KEDUA: secret `OWNER_TOKEN_HASH`,
+ * karena satu baris D1 yang keliru tidak boleh cukup untuk mencetak akun berizin.
+ * Cap byte per path terdaftar di schema.js BYTE_LIMITS seperti slot lain. */
+import { ROUTES as ACCOUNT_ROUTES } from './route-account.js';
+import { ROUTES as OWNER_TEACHER_ROUTES } from './route-owner-teachers.js';
+import { ROUTES as TEACHER_ROUTES } from './route-teacher.js';
 
 export const EXTRA_ROUTES = [
   ...buildExtraRoutes(),  /* SLOT 1-4 */
@@ -105,4 +126,7 @@ export const EXTRA_ROUTES = [
   ...SOCIAL_ROUTES,       /* SLOT 7 */
   ...EVIDENCE_OWNER_ROUTES, /* SLOT 8 */
   ...LEARNER_EVIDENCE_ROUTES, /* SLOT 9 */
+  ...ACCOUNT_ROUTES,          /* SLOT 10 */
+  ...OWNER_TEACHER_ROUTES,    /* SLOT 10 */
+  ...TEACHER_ROUTES,          /* SLOT 10 */
 ];

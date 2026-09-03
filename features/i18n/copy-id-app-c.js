@@ -185,6 +185,7 @@
     'masukan.tulis-dulu': 'Tulis dulu pesannya.',
     // app.js:4195 — go(): toast view tidak dikenal (AI-14-F01)
     'nav.halaman-tak-tersedia': 'Halaman tujuan tidak tersedia.',
+    'nav.tekan-lagi-untuk-keluar': 'Tekan kembali sekali lagi untuk keluar dari FIEZEL.',
     // app.js:5755 — showPrasastiMoment: aria-label
     'prasasti.aria-baru': 'Prasasti baru terukir',
     // app.js:5788 — aria-label badge prasasti belum terukir

@@ -120,7 +120,8 @@ const EXCLUSIONS = new Map([
       'Gerbang PENUH (exit 1 bila ada temuan), tapi kontraknya mengikat rilis fitur yang ' +
       'belum tuntas: "murid Thai tidak membaca satu kalimat Indonesia pun di seluruh naskah ' +
       'runtime, bukan hanya di bank soal". Bagian bank soal sudah nol; bagian NASKAH DI LUAR ' +
-      'bank soal masih 208 kalimat di 18 berkas (jalankan TH_GERBANG_RINCI=1 node ' +
+      'bank soal masih 610 kalimat di 23 berkas setelah sinkronisasi m025-243 dengan main ' +
+      '(jalankan TH_GERBANG_RINCI=1 node ' +
       'th-naskah-murid-test.js untuk daftar lengkapnya). Mendaftarkannya sekarang membuat CI ' +
       'merah untuk utang yang memang sudah diketahui dan sedang dikerjakan, bukan untuk ' +
       'regresi baru. Pemeriksa cakupan kuota + pemberitahuan suara di dalamnya SUDAH ' +

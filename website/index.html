@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="id" data-music="assets/music/ambient.mp3">
+<html lang="id" data-music="assets/music/ambient.mp3?v=20260903-joyclean02">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>FIEZEL — Ruang Belajar Bahasa Inggris Personal, Gratis</title>
-<meta name="description" content="139 grammar lesson, 1.765 kosakata, 300 bacaan berjenjang, dan latihan speaking–listening. Dipetakan ke tingkat CEFR A1–C2. Gratis, tanpa langganan.">
+<meta name="description" content="180 grammar lesson, 2.440 kosakata, 312 bacaan berjenjang, dan latihan speaking–listening. Dipetakan ke tingkat CEFR A1–C2. Gratis, tanpa langganan.">
 <meta name="theme-color" content="#FFF9EE">
 <link rel="icon" href="assets/brand/fiezel-icon.svg" type="image/svg+xml">
 <link rel="icon" href="assets/brand/fiezel-icon-192.png" type="image/png">
@@ -26,9 +26,9 @@
 <meta name="twitter:image" content="https://fiezel.my.id/assets/shots/home-desktop.png">
 <link rel="preload" href="assets/fonts/PlusJakartaSans-700.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/PlusJakartaSans-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="tokens.css?v=m02806">
-<link rel="stylesheet" href="style.css?v=m02806">
-<link rel="stylesheet" href="assets/mascot/fiezel-motion.css?v=m02806">
+<link rel="stylesheet" href="tokens.css?v=20260903-hula02">
+<link rel="stylesheet" href="style.css?v=20260903-hula02">
+<link rel="stylesheet" href="assets/mascot/fiezel-motion.css?v=20260903-hula02">
 <script>if(!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches))document.documentElement.className+=' anim';</script>
 <!-- m026 GEO: pengunjung dari Thailand yang BELUM memilih bahasa manual diarahkan otomatis ke /th/.
      Pilihan manual (localStorage fiezel-site-locale) SELALU menang. Gagal/timeout/offline = tetap
@@ -92,11 +92,30 @@
         <!-- wordmark RESMI repo: assets/brand/fiezel-wordmark.svg (inline, tint maroon) -->
         <svg class="mast-word" viewBox="0 0 1000 260" role="img" aria-label="FIEZEL"><defs><linearGradient id="fzwMaroon-mast" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8C2233"/><stop offset="100%" stop-color="#6D1926"/></linearGradient><linearGradient id="fzwGold-mast" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFDE59"/><stop offset="45%" stop-color="#FFC700"/><stop offset="100%" stop-color="#E6A800"/></linearGradient></defs><g fill="url(#fzwMaroon-mast)"><rect x="30" y="30" width="42" height="200" rx="21"/><rect x="30" y="30" width="144" height="42" rx="21"/><rect x="30" y="109" width="116" height="42" rx="21"/><rect x="300" y="30" width="42" height="200" rx="21"/><rect x="300" y="30" width="144" height="42" rx="21"/><rect x="300" y="109" width="100" height="42" rx="21"/><rect x="300" y="188" width="130" height="42" rx="21"/><rect x="478" y="30" width="150" height="42" rx="21"/><rect x="478" y="188" width="150" height="42" rx="21"/><rect x="607" y="30" width="191.38" height="42" rx="21" transform="rotate(124.354 607 51)"/><rect x="662" y="30" width="42" height="200" rx="21"/><rect x="662" y="30" width="144" height="42" rx="21"/><rect x="662" y="109" width="100" height="42" rx="21"/><rect x="662" y="188" width="130" height="42" rx="21"/><rect x="840" y="30" width="42" height="200" rx="21"/><rect x="840" y="188" width="130" height="42" rx="21"/></g><g fill="url(#fzwGold-mast)"><rect x="192" y="30" width="26" height="200" rx="13"/><rect x="240" y="106" width="26" height="124" rx="13"/></g></svg>
       </div>
-      <p class="mast-sub seq seq-2">Not just learning with you. Learning about you.</p>
+      <p class="mast-sub seq seq-1">Not just learning with you. Learning about you.</p>
+
+      <!-- m029 FOCUS: layar pertama harus menjawab TIGA pertanyaan dalam 5 detik —
+           untuk siapa, masalah apa yang diselesaikan, dan apa yang harus diklik.
+           Sampai commit ini teks TERBESAR di atas lipatan adalah tagline Inggris 12px,
+           dan <h1> satu-satunya terkubur di seksi berikutnya (#ringkasan), jadi pengunjung
+           Indonesia menatap wordmark + panggung animasi tanpa satu kalimat pun yang
+           menyebut masalahnya. Judul dipindah NAIK ke sini, dan CTA ganda (yang membelah
+           perhatian tepat di detik pengunjung paling siap mengklik) menjadi satu jalur. -->
+      <h1 class="mast-h1 seq seq-2">Belajar bahasa Inggris dari kesalahanmu sendiri</h1>
+      <p class="mast-lede seq seq-2">FIEZEL membaca pola jawabanmu, lalu menyusun rencana belajar yang menyesuaikan kemampuanmu — bukan sekadar menandai benar atau salah.</p>
+
+      <!-- CTA tunggal & KONKRET. Angkanya jujur: tes penempatan FIEZEL memang 25 soal
+           (app.js PLACEMENT_SIZE=25) — bukan "3 menit" yang enak dibaca tapi tidak benar. -->
       <div class="cta-row cta-center mast-cta seq seq-3">
-        <a class="btn btn-primary" href="app/">Mulai Belajar</a>
-        <a class="btn btn-ghost" href="install/">Cara Install</a>
+        <a class="btn btn-primary btn-hero" href="app/">
+          <span class="btn-hero-main">Mulai tes penempatan</span>
+          <span class="btn-hero-sub">25 soal · tanpa akun · hasilnya jadi rencana belajarmu</span>
+        </a>
       </div>
+      <p class="mast-trust seq seq-3">
+        Gratis, tanpa langganan · Progres tersimpan di perangkatmu sendiri · Bisa dipakai offline
+        <a class="mast-trust-link" href="install/">Cara pasang ke layar utama</a>
+      </p>
     </div>
 
     <div class="wrap">
@@ -135,8 +154,246 @@
           </svg>
         </div>
 
-        <!-- maskot resmi: custom element features/mascot/fiezel-mascot.js (arahan owner #3) -->
-        <fiezel-mascot class="hero-paw" role="img" aria-label="PAW, maskot FIEZEL, melambai menyambutmu"></fiezel-mascot>
+        <!-- Maskot PAW: Hawaiian Hula Dance (3s Dynamic Auto-Cycle) -->
+        <svg class="hero-paw hula-paw hula-playing routine-1" viewBox="0 0 320 310" role="img" aria-label="PAW — maskot FIEZEL menari Hula Hawaii">
+          <defs>
+            <clipPath id="hula-eyeL-hero"><circle cx="126" cy="98" r="16"/></clipPath>
+            <clipPath id="hula-eyeR-hero"><circle cx="194" cy="98" r="16"/></clipPath>
+            <mask id="hula-tailTip-hero" maskUnits="userSpaceOnUse" x="230" y="120" width="110" height="120">
+              <path d="M296 200 C 295 180 284 164 268 158" stroke="#fff" stroke-width="25" fill="none" stroke-linecap="round"/>
+            </mask>
+            <linearGradient id="leafGrad1-hero" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#4CAF50"/>
+              <stop offset="100%" stop-color="#1B5E20"/>
+            </linearGradient>
+            <linearGradient id="leafGrad2-hero" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#81C784"/>
+              <stop offset="100%" stop-color="#2E7D32"/>
+            </linearGradient>
+            <linearGradient id="flowerPlumeria-hero" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#FFFFFF"/>
+              <stop offset="60%" stop-color="#FFF9C4"/>
+              <stop offset="100%" stop-color="#FBC02D"/>
+            </linearGradient>
+            <linearGradient id="flowerHibiscus-hero" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#FF5252"/>
+              <stop offset="100%" stop-color="#C2185B"/>
+            </linearGradient>
+          </defs>
+
+          <!-- Shadow -->
+          <ellipse class="fz-shadow" cx="160" cy="292" rx="88" ry="11" fill="#33201F" opacity="0.12"/>
+
+          <!-- Root Hula Structure -->
+          <g class="fz-hula-all">
+            
+            <!-- BODY & TORSO -->
+            <g class="fz-body">
+              <g class="fz-hula-torso">
+                
+                <!-- TAIL (Inside torso transform, 100% permanently anchored to body) -->
+                <g class="fz-tail">
+                  <path d="M 212 244 C 266 258 298 238 296 200 C 294 178 282 163 268 158" stroke="#EDB93A" stroke-width="25" stroke-linecap="round" fill="none"/>
+                  <path d="M 278 162 C 274 160 270 159 268 158" stroke="#8C2233" stroke-width="25" stroke-linecap="round" fill="none"/>
+                </g>
+
+                <rect x="102" y="164" width="116" height="96" rx="42" fill="#FFD94F"/>
+                
+                <!-- Chest & Pawprint Emblem -->
+                <g class="fz-chest">
+                  <ellipse cx="160" cy="226" rx="36" ry="28" fill="#FFF4DA"/>
+                  <g class="fz-emblem" transform="translate(160,225) scale(1.75) translate(-12.6,-12.45)">
+                    <g fill="#8C2233">
+                      <rect x="4.6" y="7.5" width="3.1" height="4.6" rx="1.55"/>
+                      <rect x="8.9" y="5.1" width="3.1" height="7" rx="1.55"/>
+                      <rect x="13.2" y="3.4" width="3.1" height="8.7" rx="1.55"/>
+                      <rect x="17.5" y="6.2" width="3.1" height="5.9" rx="1.55"/>
+                      <path d="M12.6 14c3.5 0 5.9 1.9 5.9 4.1 0 2-2 3.4-5.9 3.4s-5.9-1.4-5.9-3.4c0-2.2 2.4-4.1 5.9-4.1Z"/>
+                    </g>
+                  </g>
+                </g>
+
+                <!-- PĀʻŪ (GRASS SKIRT) -->
+                <g class="fz-hula-skirt">
+                  <path d="M100 226 Q160 236 220 226 L226 274 Q160 286 94 274 Z" fill="#1B5E20" opacity="0.75"/>
+                  <g class="fz-skirt-blade-left">
+                    <path d="M102 224 Q88 248 92 278 Q106 254 114 226 Z" fill="url(#leafGrad1-hero)"/>
+                    <path d="M110 224 Q98 252 104 282 Q118 254 122 226 Z" fill="url(#leafGrad2-hero)"/>
+                    <path d="M118 225 Q108 255 116 284 Q128 256 130 226 Z" fill="url(#leafGrad1-hero)"/>
+                  </g>
+                  <g class="fz-skirt-blade-center">
+                    <path d="M126 226 Q122 258 128 285 Q138 258 138 227 Z" fill="url(#leafGrad2-hero)"/>
+                    <path d="M136 227 Q134 260 142 287 Q150 260 148 227 Z" fill="url(#leafGrad1-hero)"/>
+                    <path d="M146 227 Q148 262 154 288 Q162 262 158 227 Z" fill="url(#leafGrad2-hero)"/>
+                    <path d="M156 227 Q162 262 168 288 Q174 262 168 227 Z" fill="url(#leafGrad1-hero)"/>
+                    <path d="M166 227 Q174 260 180 287 Q188 260 178 227 Z" fill="url(#leafGrad2-hero)"/>
+                    <path d="M176 226 Q186 258 194 285 Q200 258 188 227 Z" fill="url(#leafGrad1-hero)"/>
+                  </g>
+                  <g class="fz-skirt-blade-right">
+                    <path d="M186 225 Q200 255 206 284 Q214 256 198 226 Z" fill="url(#leafGrad2-hero)"/>
+                    <path d="M196 224 Q212 252 218 282 Q224 254 208 226 Z" fill="url(#leafGrad1-hero)"/>
+                    <path d="M206 224 Q226 248 230 278 Q234 254 218 226 Z" fill="url(#leafGrad2-hero)"/>
+                  </g>
+                  <g class="fz-skirt-layer-front">
+                    <path d="M102 224 C138 236 182 236 218 224 C214 254 186 284 160 288 C134 284 106 254 102 224 Z" fill="#4CAF50" opacity="0.35"/>
+                    <path d="M98 223 Q160 236 222 223 Q222 229 220 231 Q160 242 100 231 Z" fill="#FDD835"/>
+                    <circle cx="160" cy="232" r="5.5" fill="#FF5252"/>
+                    <circle cx="160" cy="232" r="2.5" fill="#FFF59D"/>
+                  </g>
+                </g>
+
+                <!-- Feet -->
+                <g class="fz-legs">
+                  <rect class="fz-foot fz-foot-l" x="108" y="246" width="48" height="22" rx="11" fill="#EDB93A"/>
+                  <rect class="fz-foot fz-foot-r" x="164" y="246" width="48" height="22" rx="11" fill="#EDB93A"/>
+                </g>
+              </g>
+
+              <!-- HEAD & HAKU LEI -->
+              <g class="fz-head fz-hula-head">
+                <!-- Ears -->
+                <g class="fz-ear fz-ear-l">
+                  <path d="M76 66 L95 0 L140 34 Q104 66 76 66 Z" fill="#FFD94F"/>
+                  <path d="M90 52 L 101 17 L 125 35 Z" fill="#8C2233"/>
+                </g>
+                <g class="fz-ear fz-ear-r">
+                  <path d="M244 66 L225 0 L180 34 Q216 66 244 66 Z" fill="#FFD94F"/>
+                  <path d="M230 52 L 219 17 L 195 35 Z" fill="#8C2233"/>
+                </g>
+
+                <!-- Head Base -->
+                <circle cx="160" cy="106" r="88" fill="#FFD94F"/>
+
+                <!-- Dynamic Expressions Rig -->
+                <g class="fz-face">
+                  <ellipse cx="160" cy="140" rx="36" ry="25" fill="#FFF4DA"/>
+                  <path d="M153 126 L 167 126 L 160 136 Z" fill="#8C2233"/>
+                  <circle class="fz-blush" cx="102" cy="126" r="11" fill="#F0A0AC"/>
+                  <circle class="fz-blush" cx="218" cy="126" r="11" fill="#F0A0AC"/>
+                  
+                  <!-- EXPRESSION 1: OPEN HAPPY EYES -->
+                  <g id="hulaEyesOpen">
+                    <g class="fz-eye fz-eye-l">
+                      <circle cx="126" cy="98" r="16" fill="#33201F"/>
+                      <g class="fz-pupil" clip-path="url(#hula-eyeL-hero)">
+                        <circle cx="130.5" cy="92.5" r="5.5" fill="#fff"/>
+                        <circle cx="121.5" cy="104" r="2.8" fill="#fff" opacity=".7"/>
+                      </g>
+                    </g>
+                    <g class="fz-eye fz-eye-r">
+                      <circle cx="194" cy="98" r="16" fill="#33201F"/>
+                      <g class="fz-pupil" clip-path="url(#hula-eyeR-hero)">
+                        <circle cx="198.5" cy="92.5" r="5.5" fill="#fff"/>
+                        <circle cx="189.5" cy="104" r="2.8" fill="#fff" opacity=".7"/>
+                      </g>
+                    </g>
+                  </g>
+
+                  <!-- EXPRESSION 2: JOYFUL ARCH EYES -->
+                  <g id="hulaEyesJoy" style="display:none;">
+                    <path d="M112 101 C 119 88 133 88 140 101" stroke="#33201F" stroke-width="6.5" stroke-linecap="round" fill="none"/>
+                    <path d="M180 101 C 187 88 201 88 208 101" stroke="#33201F" stroke-width="6.5" stroke-linecap="round" fill="none"/>
+                  </g>
+
+                  <!-- EXPRESSION 3: WINK -->
+                  <g id="hulaEyesWink" style="display:none;">
+                    <g class="fz-eye fz-eye-l">
+                      <circle cx="126" cy="98" r="16" fill="#33201F"/>
+                      <g class="fz-pupil" clip-path="url(#hula-eyeL-hero)">
+                        <circle cx="130.5" cy="92.5" r="5.5" fill="#fff"/>
+                        <circle cx="121.5" cy="104" r="2.8" fill="#fff" opacity=".7"/>
+                      </g>
+                    </g>
+                    <path d="M180 100 C 187 90 201 90 208 100" stroke="#33201F" stroke-width="6.5" stroke-linecap="round" fill="none"/>
+                  </g>
+
+                  <!-- EXPRESSION 4: STAR/HEART JOY -->
+                  <g id="hulaEyesLove" style="display:none;" fill="#8C2233">
+                    <g transform="translate(126,98) scale(0.95)">
+                      <path d="M0 11 C -7 4 -12 1 -12 -4.5 C -12 -9 -8 -12 -4.5 -12 C -2.5 -12 -0.8 -10.5 0 -8 C 0.8 -10.5 2.5 -12 4.5 -12 C 8 -12 12 -9 12 -4.5 C 12 1 7 4 0 11 Z"/>
+                      <circle cx="-3.5" cy="-6" r="2" fill="#fff" opacity=".9"/>
+                    </g>
+                    <g transform="translate(194,98) scale(0.95)">
+                      <path d="M0 11 C -7 4 -12 1 -12 -4.5 C -12 -9 -8 -12 -4.5 -12 C -2.5 -12 -0.8 -10.5 0 -8 C 0.8 -10.5 2.5 -12 4.5 -12 C 8 -12 12 -9 12 -4.5 C 12 1 7 4 0 11 Z"/>
+                      <circle cx="-3.5" cy="-6" r="2" fill="#fff" opacity=".9"/>
+                    </g>
+                  </g>
+
+                  <!-- DYNAMIC MOUTH -->
+                  <g class="fz-mouth">
+                    <path id="hulaMouthSmile" class="fz-m fz-m-smile" d="M148 148 C 154 155 166 155 172 148" stroke="#33201F" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+                    <path id="hulaMouthOpen" style="display:none;" d="M146 146 C 148 158 172 158 174 146 Z" fill="#8C2233" stroke="#33201F" stroke-width="3"/>
+                  </g>
+                </g>
+
+                <!-- HAKU LEI CROWN -->
+                <g class="fz-haku-lei">
+                  <g class="fz-lei-leaves" fill="#2E7D32">
+                    <path d="M96 52 C84 40 102 30 114 44 Z"/>
+                    <path d="M116 42 C108 26 128 22 136 36 Z"/>
+                    <path d="M142 34 C148 16 166 16 168 32 Z" fill="#388E3C"/>
+                    <path d="M178 36 C186 20 206 24 200 40 Z"/>
+                    <path d="M202 44 C216 32 232 44 220 54 Z"/>
+                  </g>
+
+                  <!-- Flower 1 -->
+                  <g transform="translate(108, 48) scale(0.95)">
+                    <g fill="url(#flowerHibiscus-hero)">
+                      <circle cx="0" cy="-7" r="6"/><circle cx="7" cy="-2" r="6"/><circle cx="4" cy="6" r="6"/><circle cx="-4" cy="6" r="6"/><circle cx="-7" cy="-2" r="6"/>
+                    </g>
+                    <circle cx="0" cy="0" r="3.5" fill="#FFD54F"/><circle cx="0" cy="0" r="1.5" fill="#E65100"/>
+                  </g>
+                  <!-- Flower 2 -->
+                  <g transform="translate(138, 40) scale(1.05)">
+                    <g fill="url(#flowerPlumeria-hero)">
+                      <path d="M0 0 C-6 -10 2 -16 6 -8 Z"/><path d="M0 0 C6 -10 14 -4 8 4 Z"/><path d="M0 0 C10 0 12 10 2 8 Z"/><path d="M0 0 C2 10 -8 10 -6 2 Z"/><path d="M0 0 C-10 4 -12 -6 -2 -6 Z"/>
+                    </g>
+                    <circle cx="1" cy="0" r="3" fill="#FBC02D"/>
+                  </g>
+                  <!-- Flower 3 -->
+                  <g transform="translate(164, 38) scale(1.15)">
+                    <g fill="url(#flowerHibiscus-hero)">
+                      <circle cx="0" cy="-7.5" r="6.5"/><circle cx="7.5" cy="-2.5" r="6.5"/><circle cx="4.5" cy="6.5" r="6.5"/><circle cx="-4.5" cy="6.5" r="6.5"/><circle cx="-7.5" cy="-2.5" r="6.5"/>
+                    </g>
+                    <circle cx="0" cy="0" r="4" fill="#FFF59D"/><circle cx="0" cy="0" r="2" fill="#E91E63"/>
+                  </g>
+                  <!-- Flower 4 -->
+                  <g transform="translate(190, 42) scale(1.02)">
+                    <g fill="url(#flowerPlumeria-hero)">
+                      <path d="M0 0 C-6 -10 2 -16 6 -8 Z"/><path d="M0 0 C6 -10 14 -4 8 4 Z"/><path d="M0 0 C10 0 12 10 2 8 Z"/><path d="M0 0 C2 10 -8 10 -6 2 Z"/><path d="M0 0 C-10 4 -12 -6 -2 -6 Z"/>
+                    </g>
+                    <circle cx="0" cy="0" r="2.8" fill="#FBC02D"/>
+                  </g>
+                  <!-- Flower 5 -->
+                  <g transform="translate(216, 50) scale(0.92)">
+                    <g fill="#FF4081">
+                      <circle cx="0" cy="-6.5" r="5.5"/><circle cx="6.5" cy="-2" r="5.5"/><circle cx="4" cy="5.5" r="5.5"/><circle cx="-4" cy="5.5" r="5.5"/><circle cx="-6.5" cy="-2" r="5.5"/>
+                    </g>
+                    <circle cx="0" cy="0" r="3" fill="#FFEB3B"/>
+                  </g>
+                </g>
+              </g>
+
+              <!-- ARMS WITH KUPEʻE -->
+              <g class="fz-arm fz-arm-l">
+                <ellipse cx="115" cy="208" rx="14" ry="30" fill="#FFD94F"/>
+                <g class="fz-kupee-l" transform="translate(114, 226)">
+                  <rect x="-12" y="-4" width="24" height="8" rx="4" fill="#2E7D32"/>
+                  <circle cx="-6" cy="0" r="3.5" fill="#FF5252"/><circle cx="0" cy="0" r="4" fill="#FFF59D"/><circle cx="6" cy="0" r="3.5" fill="#FF80AB"/>
+                </g>
+              </g>
+
+              <g class="fz-arm fz-arm-r">
+                <ellipse cx="198" cy="204" rx="14" ry="30" fill="#FFD94F"/>
+                <g class="fz-kupee-r" transform="translate(199, 222)">
+                  <rect x="-12" y="-4" width="24" height="8" rx="4" fill="#2E7D32"/>
+                  <circle cx="-6" cy="0" r="3.5" fill="#FF80AB"/><circle cx="0" cy="0" r="4" fill="#FFF59D"/><circle cx="6" cy="0" r="3.5" fill="#FF5252"/>
+                </g>
+              </g>
+
+            </g>
+          </g>
+        </svg>
 
         <ul class="cefr-cycle" aria-hidden="true">
           <li>A1</li><li>A2</li><li>B1</li><li>B2</li><li>C1</li><li>C2</li>
@@ -145,15 +402,68 @@
     </div>
   </section>
 
+  <!-- ============ ADAPTIF DALAM TIGA LANGKAH ============
+       m029 FOCUS: "adaptif" adalah klaim pembeda FIEZEL, tetapi sampai commit ini ia hanya
+       DIKATAKAN ("menyesuaikan soal dengan jawabanmu") dan tidak pernah DITUNJUKKAN — dari
+       luar tidak ada bedanya dengan aplikasi kuis biasa. Strip ini memperlihatkan satu putaran
+       nyata: jawaban salah -> pola dibaca -> sesi berikutnya berubah.
+
+       Naskah langkah 2 BUKAN karangan halaman ini: ia disalin apa adanya dari entri TA-002 di
+       grammar-explanations-id.json (field `misconception` dan `rule`) — yaitu penjelasan yang
+       benar-benar dibaca murid di dalam aplikasi. Kalau bank soal berubah, perbarui di sini. -->
+  <section class="sec sec-loop" id="adaptif">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="sec-num" aria-hidden="true">01 — Adaptif</span>
+        <h2 class="sec-title">Apa yang terjadi saat kamu salah</h2>
+        <p class="sec-dek">Kebanyakan orang berhenti belajar bukan karena kurang materi, tapi karena tidak tahu harus mulai dari mana. Ini satu putaran nyata di dalam FIEZEL — bukan ilustrasi.</p>
+        <hr class="rule" aria-hidden="true">
+      </div>
+
+      <ol class="loop">
+        <li class="card loop-step reveal">
+          <p class="loop-n"><span aria-hidden="true">1</span>Kamu menjawab</p>
+          <p class="loop-q">I <s>have finished</s> it <b>yesterday</b>.</p>
+          <p class="loop-verdict loop-verdict-bad">Belum tepat</p>
+          <dl class="loop-ans">
+            <dt>Pilihanmu</dt><dd>have finished</dd>
+            <dt>Seharusnya</dt><dd>finished</dd>
+          </dl>
+          <p class="loop-note">FIEZEL berhenti di sini kalau ia aplikasi kuis biasa.</p>
+        </li>
+
+        <li class="card loop-step reveal">
+          <p class="loop-n"><span aria-hidden="true">2</span>FIEZEL menjelaskan polanya</p>
+          <p class="loop-exp">Kamu ngira present perfect selalu berarti masih jalan sekarang. Padahal maknanya lampau tanpa waktu pasti yang masih nyambung ke sekarang.</p>
+          <p class="loop-rule"><b>Aturannya:</b> present perfect nggak bisa jalan bareng keterangan waktu lampau yang pasti — “yesterday”, “in 2019”, “last week”.</p>
+          <p class="loop-note">Bukan cuma “salah”, tapi <b>kenapa</b> salah.</p>
+        </li>
+
+        <li class="card loop-step reveal">
+          <p class="loop-n"><span aria-hidden="true">3</span>Sesi berikutnya berubah</p>
+          <ul class="loop-plan">
+            <li><span class="loop-plan-k">Ditambahkan</span> Review past simple vs present perfect</li>
+            <li><span class="loop-plan-k">Alasan</span> Pola ini tertukar di latihan terakhirmu</li>
+            <li><span class="loop-plan-k">Muncul lagi</span> Di target harianmu besok</li>
+          </ul>
+          <p class="loop-note">Rencana besok disusun dari kesalahan hari ini.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
   <!-- ============ RINGKASAN (teks panjang: turun setelah panggung visual) ============ -->
   <section class="sec sec-intro" id="ringkasan">
     <div class="wrap intro-grid">
       <div class="intro-copy reveal">
         <p class="eyebrow">Gratis, tanpa langganan</p>
-        <h1>Ruang belajar bahasa Inggris personal milikmu</h1>
+        <!-- m029 FOCUS: turun dari <h1> ke <h2>. Judul halaman sekarang ada di hero
+             (.mast-h1); dua <h1> dalam satu dokumen membuat urutan heading pembaca
+             layar bercabang dan tidak ada yang tahu mana judul halaman sebenarnya. -->
+        <h2>Ruang belajar bahasa Inggris personal milikmu</h2>
         <p class="lede">FIEZEL menyatukan grammar, kosakata, reading, speaking, dan listening dalam satu aplikasi yang menyesuaikan soal dengan jawabanmu. Semuanya dipetakan ke tingkat CEFR A1–C2 dan bisa kamu pakai tanpa biaya.</p>
         <div class="cta-row">
-          <a class="btn btn-primary" href="app/">Mulai Belajar</a>
+          <a class="btn btn-primary" href="app/">Mulai tes penempatan</a>
           <a class="btn btn-ghost" href="install/">Cara Install</a>
         </div>
         <p class="fineprint">Tanpa akun. Progres belajarmu tersimpan di perangkatmu sendiri.</p>
@@ -167,9 +477,9 @@
 
     <div class="wrap">
       <ul class="stats">
-        <li class="reveal"><b>139</b><span>grammar lesson</span></li>
-        <li class="reveal"><b>1.765</b><span>kosakata</span></li>
-        <li class="reveal"><b>300</b><span>bacaan berjenjang</span></li>
+        <li class="reveal"><b>180</b><span>grammar lesson</span></li>
+        <li class="reveal"><b>2.440</b><span>kosakata</span></li>
+        <li class="reveal"><b>312</b><span>bacaan berjenjang</span></li>
         <li class="reveal"><b>A1–C2</b><span>tingkat CEFR</span></li>
       </ul>
     </div>
@@ -177,8 +487,8 @@
     <!-- marquee statistik: dekoratif, mengulang fakta yang sama (disembunyikan dari pembaca layar) -->
     <div class="ticker" aria-hidden="true">
       <ul class="ticker-track">
-        <li>139 grammar lesson</li><li>1.765 kosakata</li><li>300 bacaan berjenjang</li><li>1.500 soal membaca</li><li>36 sesi speaking</li><li>25 soal per lesson</li><li>CEFR A1–C2</li><li>Gratis, tanpa langganan</li>
-        <li>139 grammar lesson</li><li>1.765 kosakata</li><li>300 bacaan berjenjang</li><li>1.500 soal membaca</li><li>36 sesi speaking</li><li>25 soal per lesson</li><li>CEFR A1–C2</li><li>Gratis, tanpa langganan</li>
+        <li>180 grammar lesson</li><li>2.440 kosakata</li><li>312 bacaan berjenjang</li><li>1.560 soal membaca</li><li>36 sesi speaking</li><li>25 soal per lesson</li><li>CEFR A1–C2</li><li>Gratis, tanpa langganan</li>
+        <li>180 grammar lesson</li><li>2.440 kosakata</li><li>312 bacaan berjenjang</li><li>1.560 soal membaca</li><li>36 sesi speaking</li><li>25 soal per lesson</li><li>CEFR A1–C2</li><li>Gratis, tanpa langganan</li>
       </ul>
     </div>
   </section>
@@ -188,10 +498,10 @@
     <div class="wrap about-grid">
       <div class="reveal">
         <div class="sec-head">
-          <span class="sec-num" aria-hidden="true">01 — Tentang</span>
+          <span class="sec-num" aria-hidden="true">02 — Tentang</span>
           <h2 class="sec-title">Apa itu FIEZEL</h2>
         </div>
-        <p class="body-lg">FIEZEL adalah ruang belajar bahasa Inggris personal: satu aplikasi berisi 139 grammar lesson, 1.765 kosakata, 300 bacaan berjenjang dengan 1.500 soal membaca, 36 sesi speaking, dan latihan listening. Materinya dipetakan ke tingkat CEFR A1–C2, jadi kamu bisa mulai dari level yang benar-benar sesuai.</p>
+        <p class="body-lg">FIEZEL adalah ruang belajar bahasa Inggris personal: satu aplikasi berisi 180 grammar lesson, 2.440 kosakata, 312 bacaan berjenjang dengan 1.560 soal membaca, 36 sesi speaking, dan 1.400+ latihan listening. Materinya dipetakan ke tingkat CEFR A1–C2, jadi kamu bisa mulai dari level yang benar-benar sesuai.</p>
         <p class="body-lg">Cocok untuk pelajar, mahasiswa, dan siapa pun yang ingin belajar rutin tanpa kelas dan tanpa biaya: gratis, tanpa langganan, tanpa akun. Aplikasinya bisa dipasang ke layar utama seperti aplikasi biasa, dan menyesuaikan soal berikutnya dari jawabanmu.</p>
       </div>
       <div class="shot-pair reveal">
@@ -213,7 +523,7 @@
   <section class="sec" id="fitur">
     <div class="wrap">
       <div class="sec-head reveal">
-        <span class="sec-num" aria-hidden="true">02 — Isi aplikasi</span>
+        <span class="sec-num" aria-hidden="true">03 — Isi aplikasi</span>
         <h2 class="sec-title">Yang kamu dapat di dalam</h2>
         <hr class="rule" aria-hidden="true">
       </div>
@@ -221,28 +531,28 @@
         <article class="card feat feat-wide tint-sun reveal">
           <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19V6a2 2 0 0 1 2-2h9l5 5v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"/><path d="M14 4v5h5"/><path d="M8 13h7M8 16.5h4"/></svg>
           <h3>Grammar Hub berjenjang</h3>
-          <p>139 lesson dari A1 sampai C2, tiap lesson 25 soal latihan terfokus, terbuka bertahap lewat prasyarat.</p>
+          <p>180 lesson dari A1 sampai C2, tiap lesson 25 soal latihan terfokus, terbuka bertahap lewat prasyarat.</p>
           <ul class="chiplist">
-            <li>A1 17</li><li>A2 17</li><li>B1 47</li><li>B2 32</li><li>C1 19</li><li>C2 7</li>
+            <li>A1 17</li><li>A2 29</li><li>B1 52</li><li>B2 39</li><li>C1 24</li><li>C2 19</li>
           </ul>
         </article>
 
         <article class="card feat tint-paper reveal">
           <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5.5A2.5 2.5 0 0 1 5.5 3H11v18H5.5A2.5 2.5 0 0 1 3 18.5Z"/><path d="M21 5.5A2.5 2.5 0 0 0 18.5 3H13v18h5.5A2.5 2.5 0 0 0 21 18.5Z"/></svg>
           <h3>Reading A1–C2</h3>
-          <p>300 bacaan berjenjang dengan 1.500 soal membaca, dari teks pendek pemula sampai bacaan panjang tingkat lanjut.</p>
+          <p>312 bacaan berjenjang dengan 1.560 soal membaca, dari teks pendek pemula sampai bacaan panjang tingkat lanjut.</p>
         </article>
 
         <article class="card feat tint-sun reveal">
           <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3Z"/><path d="M5 17h14"/><path d="M9 8h6M9 11.5h4"/></svg>
-          <h3>1.765 kosakata</h3>
+          <h3>2.440 kosakata</h3>
           <p>Bank kosakata bertingkat untuk dilatih berulang, tersusun mengikuti tingkat CEFR yang sedang kamu kerjakan.</p>
         </article>
 
         <article class="card feat tint-paper reveal">
           <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5V21M9 21h6"/></svg>
           <h3>Speaking dan Listening</h3>
-          <p>36 sesi speaking plus latihan listening dengan bank soal dan enam format ujian bergaya IELTS dan TOEFL. Audionya TTS dari skrip orisinal, bukan rekaman ujian asli.</p>
+          <p>36 sesi speaking plus 1.400+ latihan listening dengan bank soal dan enam format ujian bergaya IELTS dan TOEFL. Audionya TTS dari skrip orisinal, bukan rekaman ujian asli.</p>
         </article>
 
         <article class="card feat tint-blush reveal">
@@ -277,17 +587,21 @@
   <section class="sec sec-steps" id="cara-pakai">
     <div class="wrap">
       <div class="sec-head reveal">
-        <span class="sec-num" aria-hidden="true">03 — Alur</span>
+        <span class="sec-num" aria-hidden="true">04 — Alur</span>
         <h2 class="sec-title">Cara pakai</h2>
         <hr class="rule" aria-hidden="true">
       </div>
+      <!-- m029 FOCUS: urutan disamakan dengan alur aplikasi yang SUNGGUHAN
+           (tes penempatan -> level -> target harian -> review), bukan "pilih level sendiri".
+           Yang menentukan level adalah tes penempatan; state.level tidak pernah diisi
+           dari tebakan murid (app.js ~7074). -->
       <ol class="steps">
-        <li class="card step reveal"><span class="step-n">1</span><p>Buka aplikasi FIEZEL langsung dari browser, tanpa daftar akun.</p></li>
-        <li class="card step reveal"><span class="step-n">2</span><p>Pilih tingkat CEFR yang paling dekat dengan kemampuanmu sekarang.</p></li>
-        <li class="card step reveal"><span class="step-n">3</span><p>Kerjakan lesson beserta 25 soal latihannya sampai tuntas.</p></li>
-        <li class="card step reveal"><span class="step-n">4</span><p>Progres tersimpan otomatis di perangkatmu, siap dilanjutkan besok.</p></li>
+        <li class="card step reveal"><span class="step-n">1</span><p>Buka FIEZEL langsung dari browser. Tanpa daftar akun, tanpa unduhan.</p></li>
+        <li class="card step reveal"><span class="step-n">2</span><p>Kerjakan tes penempatan 25 soal. FIEZEL memetakan levelmu di CEFR A1–C2.</p></li>
+        <li class="card step reveal"><span class="step-n">3</span><p>Dapatkan target harian yang disusun dari jawabanmu sendiri, bukan angka tetap.</p></li>
+        <li class="card step reveal"><span class="step-n">4</span><p>Setiap kesalahan kembali sebagai review. Progres tersimpan di perangkatmu.</p></li>
       </ol>
-      <div class="steps-cta reveal"><a class="btn btn-primary" href="app/">Mulai Belajar</a></div>
+      <div class="steps-cta reveal"><a class="btn btn-primary" href="app/">Mulai tes penempatan</a></div>
     </div>
   </section>
 
@@ -296,7 +610,7 @@
     <div class="wrap">
       <div class="card install-card reveal">
         <div class="install-copy">
-          <span class="sec-num" aria-hidden="true">04 — Pemasangan</span>
+          <span class="sec-num" aria-hidden="true">05 — Pemasangan</span>
           <h2 class="sec-title">Pasang di ponselmu</h2>
           <p class="body-lg">FIEZEL bisa dipasang ke layar utama lewat menu browser, tanpa toko aplikasi. Materi dan latihan bisa dibuka tanpa internet. Suara neural dan tutor AI butuh jaringan.</p>
           <ul class="howlist">
@@ -319,14 +633,14 @@
   <section class="sec sec-faq" id="faq">
     <div class="wrap wrap-narrow">
       <div class="sec-head reveal">
-        <span class="sec-num" aria-hidden="true">05 — Tanya jawab</span>
+        <span class="sec-num" aria-hidden="true">06 — Tanya jawab</span>
         <h2 class="sec-title">Pertanyaan yang sering muncul</h2>
         <hr class="rule" aria-hidden="true">
       </div>
       <div class="faq reveal">
         <details>
           <summary>Apakah FIEZEL gratis?<span class="chev" aria-hidden="true"></span></summary>
-          <div class="faq-body"><p>Ya. Gratis, tanpa langganan. Tidak ada paket premium, tidak ada fitur yang dikunci di balik pembayaran. Seluruh 139 grammar lesson, 1.765 kosakata, dan 300 bacaan bisa kamu buka sejak hari pertama.</p></div>
+          <div class="faq-body"><p>Ya. Gratis, tanpa langganan. Tidak ada paket premium, tidak ada fitur yang dikunci di balik pembayaran. Seluruh 180 grammar lesson, 2.440 kosakata, dan 312 bacaan bisa kamu buka sejak hari pertama.</p></div>
         </details>
         <details>
           <summary>Perlu bikin akun?<span class="chev" aria-hidden="true"></span></summary>
@@ -354,7 +668,7 @@
         </details>
         <details>
           <summary>Berapa banyak soal yang tersedia?<span class="chev" aria-hidden="true"></span></summary>
-          <div class="faq-body"><p>Setiap grammar lesson punya 25 soal latihan terfokus, dari total 139 lesson (A1 17 · A2 17 · B1 47 · B2 32 · C1 19 · C2 7). Reading menambah 1.500 soal membaca di 300 bacaan berjenjang.</p></div>
+          <div class="faq-body"><p>Setiap grammar lesson punya 25 soal latihan terfokus, dari total 180 lesson (A1 17 · A2 29 · B1 52 · B2 39 · C1 24 · C2 19). Reading menambah 1.560 soal membaca di 312 bacaan berjenjang.</p></div>
         </details>
       </div>
     </div>
@@ -401,7 +715,7 @@
   <div class="wrap foot-copy"><p>© 2026 FIEZEL</p></div>
 </footer>
 
-<script src="assets/mascot/fiezel-mascot.js?v=m02806" defer></script>
-<script src="site.js?v=m02806" defer></script>
+<script src="assets/mascot/fiezel-mascot.js?v=20260903-hula02" defer></script>
+<script src="site.js?v=20260903-hula02" defer></script>
 </body>
 </html>

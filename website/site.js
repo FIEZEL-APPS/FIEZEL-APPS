@@ -49,25 +49,61 @@
     }
   }
 
-  /* ---------- 3. maskot PAW interaktif (komponen features/mascot/fiezel-mascot.js) ----------
-     Saat masuk: MELAMBAI (state "greeting"). Lalu bersiklus ekspresi tiap ~6 detik:
-     curious -> love -> encouraging -> idle (breathing) -> ulangi.
-     Reduced-motion: pose greeting statis, tanpa siklus. */
-  var paw = document.querySelector('fiezel-mascot');
-  if (paw && window.customElements && customElements.whenDefined) {
-    customElements.whenDefined('fiezel-mascot').then(function () {
-      if (typeof paw.setState !== 'function') return;
-      var CYCLE = ['curious', 'love', 'encouraging', 'idle'];
-      var step = 0;
-      window.__fzPawState = function () { return paw.state; }; /* pengait QA */
-      if (reduce) { paw.setState('greeting', { hold: 0 }); return; }
-      paw.setState('greeting', { hold: 2600, then: 'idle' });
+  /* ---------- 3. maskot PAW interaktif: Hawaiian Hula Dance (3s dynamic cycle) ---------- */
+  function initHulaPaw() {
+    var hulaPaw = document.querySelector('.hula-paw');
+    if (hulaPaw && !reduce) {
+      var routines = ['routine-1', 'routine-2', 'routine-3', 'routine-4'];
+      var currentRoutine = 0;
+      var expEyesOpen = hulaPaw.querySelector('#hulaEyesOpen');
+      var expEyesJoy = hulaPaw.querySelector('#hulaEyesJoy');
+      var expEyesWink = hulaPaw.querySelector('#hulaEyesWink');
+      var expEyesLove = hulaPaw.querySelector('#hulaEyesLove');
+      var expMouthSmile = hulaPaw.querySelector('#hulaMouthSmile');
+      var expMouthOpen = hulaPaw.querySelector('#hulaMouthOpen');
+
+      function applyHulaRoutine(idx) {
+        currentRoutine = idx;
+        hulaPaw.classList.remove('routine-1', 'routine-2', 'routine-3', 'routine-4');
+        hulaPaw.classList.add(routines[idx]);
+
+        if (expEyesOpen) expEyesOpen.style.display = (idx === 0) ? '' : 'none';
+        if (expEyesJoy) expEyesJoy.style.display = (idx === 1) ? '' : 'none';
+        if (expEyesWink) expEyesWink.style.display = (idx === 2) ? '' : 'none';
+        if (expEyesLove) expEyesLove.style.display = (idx === 3) ? '' : 'none';
+
+        if (expMouthSmile) expMouthSmile.style.display = (idx === 0 || idx === 2) ? '' : 'none';
+        if (expMouthOpen) expMouthOpen.style.display = (idx === 1 || idx === 3) ? '' : 'none';
+      }
+
+      applyHulaRoutine(0);
       setInterval(function () {
-        var next = CYCLE[step % CYCLE.length];
-        step++;
-        paw.setState(next, next === 'idle' ? { hold: 0 } : { hold: 2600, then: 'idle' });
-      }, 6000);
-    }).catch(function () {});
+        applyHulaRoutine((currentRoutine + 1) % routines.length);
+      }, 3000);
+    } else {
+      var paw = document.querySelector('fiezel-mascot');
+      if (paw && window.customElements && customElements.whenDefined) {
+        customElements.whenDefined('fiezel-mascot').then(function () {
+          if (typeof paw.setState !== 'function') return;
+          var CYCLE = ['curious', 'love', 'encouraging', 'idle'];
+          var step = 0;
+          window.__fzPawState = function () { return paw.state; }; /* pengait QA */
+          if (reduce) { paw.setState('greeting', { hold: 0 }); return; }
+          paw.setState('greeting', { hold: 2600, then: 'idle' });
+          setInterval(function () {
+            var next = CYCLE[step % CYCLE.length];
+            step++;
+            paw.setState(next, next === 'idle' ? { hold: 0 } : { hold: 2600, then: 'idle' });
+          }, 6000);
+        }).catch(function () {});
+      }
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initHulaPaw);
+  } else {
+    initHulaPaw();
   }
 
   /* ---------- 4. musik latar: OTOMATIS, loop, volume .35, TANPA UI ----------

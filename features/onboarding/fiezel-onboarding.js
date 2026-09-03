@@ -184,6 +184,23 @@
     } catch (_) { return false; }
   }
 
+  // Peran pengguna: 'murid' (bawaan) atau 'guru'. Guru melompati langkah tujuan/penempatan/
+  // jadwal (itu langkah belajar) dan mendarat di Tutor Action Center.
+  var ROLES = ['murid', 'guru'];
+  function normalizeRole(v) { v = String(v || '').toLowerCase(); return ROLES.indexOf(v) === -1 ? 'murid' : v; }
+  function storedRole(env) { var r = readRecord(env); return normalizeRole(r && r.role); }
+  function roleMarkup(selected) {
+    var cards = [
+      ['murid', T('onboarding.role-murid'), T('onboarding.role-murid-desc')],
+      ['guru', T('onboarding.role-guru'), T('onboarding.role-guru-desc')]
+    ];
+    return '<div class="fiezel-role-grid" role="radiogroup" aria-label="' + T('onboarding.role-aria') + '">'
+      + cards.map(function (c) {
+        var on = c[0] === selected;
+        return '<button type="button" role="radio" aria-checked="' + (on ? 'true' : 'false') + '" class="fiezel-goal-card fiezel-role-card' + (on ? ' is-selected' : '') + '" data-ob-role="' + c[0] + '" data-testid="ob-role-' + c[0] + '">'
+          + '<strong>' + c[1] + '</strong><span>' + c[2] + '</span></button>';
+      }).join('') + '</div>';
+  }
   function readRecord(env) {
     try {
       var store = env && env.localStorage;
@@ -257,7 +274,9 @@
         locale: normalizeLocale((detail && detail.locale) || previous.locale),
         name: name,
         goal: String((detail && detail.goal) || ''),
-        level: String((detail && detail.level) || '')
+        level: String((detail && detail.level) || ''),
+        role: normalizeRole((detail && detail.role) || previous.role),
+        classCode: String((detail && detail.classCode) || previous.classCode || '')
       }));
     } catch (_) { /* penyimpanan penuh tidak boleh mengurung murid di onboarding */ }
   }
@@ -556,7 +575,7 @@
   // kepala berkas. Tombol Lanjut dinonaktifkan sampai ada nama yang benar-benar bisa dipakai
   // (normalizeName mengembalikan sesuatu), sehingga spasi saja tidak lolos.
   // ---------------------------------------------------------------------------------------
-  function nameMarkup(env, typed) {
+  function nameMarkup(env, typed, role) {
     var clean = normalizeName(typed);
     return reveal(env)
       + topbar(false, false)
@@ -566,16 +585,17 @@
       + greet(env, 'greeting', T('onboarding.senang-ketemu-you-kita-start'))
       + '<div class="fiezel-sheet" data-ob-step="name">'
       + T('onboarding.halo-me-fiezel-nama-you')
-      + T('onboarding.me-pakai-namamu-buat-nyapa')
       + '<label class="fiezel-field"><span>' + T('onboarding.name-field-label') + '</span>'
       + '<input type="text" data-ob-name value="' + escapeHtml(typed || '') + '" maxlength="' + NAME_MAX + '"'
       + ' placeholder="' + T('onboarding.name-placeholder') + '" autocomplete="given-name" autocapitalize="words"'
       + ' spellcheck="false" enterkeyhint="go" aria-label="' + T('onboarding.name-aria') + '"></label>'
-      // Janji privasi harus benar apa adanya. Nama ini memang tinggal di perangkat, TETAPI
-      // ia ikut ke Core Brain di akun FIEZEL murid sendiri supaya pengingat push bisa
-      // menyapa namanya. Menuliskan "nggak dikirim ke mana-mana" akan menjadi janji yang
-      // dilanggar oleh kode di app.js (remoteActivitySnapshot).
-      + T('onboarding.nama-this-disimpan-at-hp')
+      // m025-242: kalimat panjang soal penyimpanan nama dilepas dari layar - ia benar, tapi
+      // ia juga yang membuat langkah pertama harus digulir. Janji yang sama tetap ada di
+      // Pengaturan, tempat nama itu bisa diganti.
+      + '<p class="fiezel-role-label">' + T('onboarding.role-question') + '</p>'
+      + roleMarkup(normalizeRole(role))
+      + '<label class="fiezel-field fiezel-classcode-field" data-ob-classcode-wrap' + (normalizeRole(role) === 'guru' ? ' hidden' : '') + '><span>' + T('onboarding.classcode-label') + '</span>'
+      + '<input type="text" data-ob-classcode maxlength="9" placeholder="FZ-XXXXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" data-testid="ob-class-code"></label>'
       + btn(T('onboarding.next'), 'data-ob-advance' + (clean ? '' : ' disabled'))
       + '</div>';
   }
@@ -620,7 +640,7 @@
     var cards = goals.map(function (g) {
       var selected = g.id === selectedGoal;
       return '<button type="button" class="fiezel-goal-card' + (selected ? ' is-selected' : '') + '" data-ob-goal="' + escapeHtml(g.id) + '">'
-        + '<b>' + escapeHtml(g.label) + '</b><span>' + escapeHtml(g.description) + '</span></button>';
+        + '<b>' + escapeHtml(g.label) + '</b></button>';
     }).join('');
     var levelRow = selectedGoal ? '<div class="fiezel-level-row">' + CEFR_LEVELS.map(function (lv) {
       var selected = lv === selectedLevel;
@@ -637,8 +657,8 @@
       + '<div class="fiezel-sheet" data-ob-step="3">'
       + T('onboarding.apa-tujuan-you-study')
       + '<div class="fiezel-goal-grid">' + cards + '</div>'
-      + (selectedGoal ? T('onboarding.berapa-perkiraan-level-lang-inggrismu') + levelRow
-        + T('onboarding.ini-cuma-perkiraan-awal-darimu') : '')
+      + (selectedGoal ? T('onboarding.apa-level-lang-you-inline') + levelRow
+        + T('onboarding.level-perkiraan-singkat') : '')
       + btn(T('onboarding.next-l554'), 'data-ob-advance' + (selectedGoal ? '' : ' disabled'))
       + btn(T('onboarding.btn-skip-step'), 'data-ob-step-skip', 'ghost')
       + '</div>';
@@ -654,7 +674,6 @@
       + greet(env, 'encouraging', T('onboarding.santai-this-bukan-ujian-can'))
       + '<div class="fiezel-sheet" data-ob-step="4">'
       + T('onboarding.apa-level-lang-you')
-      + T('onboarding.kerjakan-santai-aja-ini-bukan')
       + T('onboarding.isinya-item-listening-grammar-and')
       + btn(T('onboarding.btn-placement'), 'data-ob-primary')
       + btn(T('onboarding.btn-skip-step'), 'data-ob-step-skip', 'ghost')
@@ -674,7 +693,6 @@
       + greet(env, 'calm', T('onboarding.greet-schedule'))
       + '<div class="fiezel-sheet" data-ob-step="5">'
       + '<h2 class="fiezel-title">' + T('onboarding.schedule-title') + '</h2>'
-      + '<p class="fiezel-body">' + T('onboarding.schedule-body') + '</p>'
       + '<p class="fiezel-note">' + T('onboarding.schedule-note') + '</p>'
       + btn(T('onboarding.next-l591'), 'data-ob-advance')
       + '</div>';
@@ -758,6 +776,8 @@
     var localeToken = 0;
     var localeWaitT = null;
     var typedName = storedName(target);
+    var selectedRole = storedRole(target);
+    var typedClassCode = '';
     var selectedGoal = '';
     var selectedLevel = '';
     var closed = false;
@@ -1036,7 +1056,7 @@
     function paint() {
       var html;
       if (step === LANGUAGE_STEP) html = languageMarkup(target, selectedLocale, localeBusy);
-      else if (step === 1) html = nameMarkup(target, typedName);
+      else if (step === 1) html = nameMarkup(target, typedName, selectedRole);
       else if (step === 2) html = carouselMarkup(target, slide);
       else if (step === 3) html = goalMarkup(target, selectedGoal, selectedLevel);
       else if (step === 4) html = placementMarkup(target);
@@ -1136,7 +1156,7 @@
       if (closed) return;
       closed = true;
       clearMascotTimers();
-      markCompleted(target, { at: now, via: via, locale: selectedLocale, name: typedName, goal: selectedGoal, level: selectedLevel });
+      markCompleted(target, { at: now, via: via, locale: selectedLocale, name: typedName, goal: selectedGoal, level: selectedLevel, role: selectedRole, classCode: typedClassCode });
       // Serah terima hanya pada penyelesaian sungguhan; skip/placement keluar lewat fade
       // lama (§2.3: dilewati pada kurangi-gerak dan pada jalur tes penempatan).
       var handedOff = via === 'finish' ? beginHandoff() : false;
@@ -1150,7 +1170,7 @@
       // semua jalan keluar lain berarti "lanjutkan alur pembukaan seperti biasa".
       var handler = via === 'placement' ? opts.onPlacement : opts.onFinish;
       if (typeof handler === 'function') {
-        try { handler({ name: typedName, goal: selectedGoal, level: selectedLevel, via: via }); } catch (_) {}
+        try { handler({ name: typedName, goal: selectedGoal, level: selectedLevel, via: via, role: selectedRole, classCode: typedClassCode }); } catch (_) {}
       }
     }
     function remove() {
@@ -1221,6 +1241,7 @@
         if (!typedName) return;
         commitName();
         if (nameOnly) { finish('name'); return; }
+        if (selectedRole === 'guru') { finish('finish'); return; }
         goStep(step + 1);
         return;
       }
@@ -1280,6 +1301,24 @@
           });
           nameInput.addEventListener('focus', function () { nameReacted = false; });
           nameInput.addEventListener('change', sync);
+          host.querySelectorAll('[data-ob-role]').forEach(function (b) {
+            b.addEventListener('click', function () {
+              selectedRole = normalizeRole(b.getAttribute('data-ob-role'));
+              host.querySelectorAll('[data-ob-role]').forEach(function (x) {
+                var on = x === b; x.classList.toggle('is-selected', on); x.setAttribute('aria-checked', on ? 'true' : 'false');
+              });
+              var next = host.querySelector('[data-ob-advance]');
+              if (next) next.textContent = selectedRole === 'guru' ? T('onboarding.role-guru-cta') : T('onboarding.next');
+              var wrap = host.querySelector('[data-ob-classcode-wrap]');
+              if (wrap) { if (selectedRole === 'guru') wrap.setAttribute('hidden', ''); else wrap.removeAttribute('hidden'); }
+            });
+          });
+          var codeInput = host.querySelector('[data-ob-classcode]');
+          if (codeInput) codeInput.addEventListener('input', function () {
+            var v = String(codeInput.value || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+            if (v.indexOf('FZ') === 0) v = v.slice(2);
+            typedClassCode = v.length === 6 ? 'FZ-' + v : '';
+          });
           nameInput.addEventListener('keydown', function (event) {
             if (event && (event.key === 'Enter' || event.keyCode === 13)) {
               if (typeof event.preventDefault === 'function') event.preventDefault();
@@ -1405,6 +1444,9 @@
     summaryMarkup: summaryMarkup,
     completed: completed,
     storedName: storedName,
+    storedRole: storedRole,
+    normalizeRole: normalizeRole,
+    roleMarkup: roleMarkup,
     storedLocale: storedLocale,
     needsName: needsName,
     show: show

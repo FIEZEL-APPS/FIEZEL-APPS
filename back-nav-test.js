@@ -63,6 +63,8 @@ function makeApp(over) {
     go(n) { app.traversals.push(n); if (app.autoPop) app.ctrl.handlePop(); },
     back() { history.go(-1); }
   };
+  // m025-237: `pushes` sekarang menghitung entri PENANDA, bukan entri per layar. Riwayat
+  // sungguhan tidak lagi menyimpan kedalaman, jadi yang diuji adalah kedalamannya KONSTAN.
 
   app.history = history;
   app.ctrl = backNav.createStack({
@@ -98,7 +100,11 @@ test('menekan tab yang sedang aktif tidak mendorong entri', () => {
   assert.strictEqual(a.pushes, 0);
 });
 
-test('popstate memulihkan view asal dan TIDAK mendorong entri baru', () => {
+test('popstate memulihkan view asal dan memasang ulang penanda, tanpa menelusuri riwayat', () => {
+  // m025-237: jalur kembali SEKARANG mendorong entri, dan itu justru yang menahan murid di
+  // dalam dokumen. Gelung "back memicu push memicu back" butuh DUA bahan - mendorong DAN
+  // menelusuri; mendorong saja tidak bisa memicu popstate berikutnya. Yang dijaga di sini
+  // adalah bahan keduanya: jalur kembali tidak boleh menelusuri riwayat sama sekali.
   const a = makeApp();
   a.navigate('library');
   const before = a.pushes;
@@ -106,8 +112,45 @@ test('popstate memulihkan view asal dan TIDAK mendorong entri baru', () => {
   assert.strictEqual(result.action, 'view');
   assert.strictEqual(result.view, 'home');
   assert.deepStrictEqual(a.applied, ['home']);
-  assert.strictEqual(a.pushes, before, 'jalur kembali yang mendorong entri = gelung tak berujung');
+  assert.strictEqual(a.pushes, before + 1, 'penanda harus dipasang ulang, kalau tidak tekanan berikutnya keluar dokumen');
+  assert.deepStrictEqual(a.traversals, [], 'menelusuri riwayat dari dalam popstate = gelung tak berujung');
   assert.strictEqual(a.ctrl.depth(), 0);
+});
+
+test('kedalaman riwayat KONSTAN berapa pun dalamnya layar', () => {
+  // Inti perbaikan boot-loop m025-237. Sepuluh layar bersarang tetap SATU entri penanda,
+  // jadi tumpukan tidak punya apa pun untuk didesinkronisasi dengan riwayat - dan batas
+  // pushState Safari (100 panggilan / 30 detik) tidak pernah tersentuh oleh sesi belajar.
+  const a = makeApp();
+  a.navigate('library');
+  assert.strictEqual(a.pushes, 1, 'entri penanda pertama');
+  for (let i = 0; i < 10; i++) a.ctrl.pushLayer({ id: 'lapis-' + i, close: () => true });
+  a.navigate('vocab');
+  assert.strictEqual(a.ctrl.depth(), 12);
+  assert.strictEqual(a.pushes, 1, 'kedalaman layar tidak boleh menambah kedalaman riwayat');
+  assert.strictEqual(a.ctrl.holdsMarker(), true);
+});
+
+test('tekanan kembali tidak pernah melepas penanda selama masih ada layar', () => {
+  // Kalau satu saja cabang lupa memasangnya ulang, tekanan kembali berikutnya mendarat di
+  // entri dokumen dan tekanan sesudahnya meng-unload halaman: about:blank, lalu splash.
+  const a = makeApp();
+  a.navigate('library');
+  a.navigate('vocab');
+  a.ctrl.pushLayer({ id: 'modal', close: () => true });
+  for (const expected of ['close', 'view', 'view']) {
+    assert.strictEqual(a.ctrl.handlePop().action, expected);
+    assert.strictEqual(a.ctrl.holdsMarker(), true, 'penanda lepas di tengah jalan = boot loop');
+  }
+  assert.strictEqual(a.ctrl.handlePop().action, 'exit');
+  assert.strictEqual(a.ctrl.holdsMarker(), false, 'baru di sini murid memang boleh keluar');
+});
+
+test('gerbang wajib juga memasang ulang penanda, bukan hanya menahan view', () => {
+  const a = makeApp({ locked: true });
+  a.ctrl.handlePop();
+  assert.strictEqual(a.ctrl.holdsMarker(), true);
+  assert.deepStrictEqual(a.traversals, []);
 });
 
 test('kembali menuruni riwayat satu langkah tiap tekanan, bukan langsung ke akar', () => {
@@ -128,6 +171,20 @@ test('tumpukan kosong berarti keluar aplikasi, bukan murid terkurung', () => {
   assert.strictEqual(result.action, 'exit');
   assert.strictEqual(a.applied.length, 0);
   assert.strictEqual(a.pushes, 0, 'menahan popstate di akar akan mengurung murid di dalam PWA');
+  assert.strictEqual(a.ctrl.holdsMarker(), false, 'penanda harus dilepas, kalau tidak PWA tidak bisa ditutup');
+});
+
+test('aplikasi diberi tahu saat tekanan berikutnya benar-benar akan keluar', () => {
+  // Tanpa sepatah kata pun, jeda satu tekanan itu terbaca sebagai tombol kembali yang
+  // rusak. app.js menyambungkannya ke showToast("Tekan kembali sekali lagi...").
+  let hints = 0;
+  const a = makeApp();
+  a.ctrl = backNav.createStack({
+    history: a.history, currentView: () => a.view, knownView: v => a.views.has(v),
+    homeView: 'home', applyView: () => true, locked: () => false, onExit: () => { hints++; }
+  });
+  assert.strictEqual(a.ctrl.handlePop().action, 'exit');
+  assert.strictEqual(hints, 1);
 });
 
 test('back() terprogram diam saja saat tidak ada tujuan', () => {
@@ -175,7 +232,9 @@ test('pembaca perpustakaan kembali ke rak buku, bukan keluar dari perpustakaan',
 
 test('lapisan yang layarnya sudah ditinggalkan tidak memakan tekanan kembali', () => {
   // Pembaca ditinggalkan lewat navigasi bawah, bukan lewat tombol kembali: entrinya jadi
-  // entri mati. Tanpa penerusan berantai, satu tekanan kembali akan hilang tanpa jejak.
+  // entri mati. m025-237: penelusurannya sekarang gelung biasa DI DALAM satu handler, jadi
+  // satu tekanan kembali langsung mendarat di layar yang benar. Dulu tiap entri mati
+  // membutuhkan satu history.back() lagi - satu tekanan, beberapa penelusuran asinkron.
   const a = makeApp({ autoPop: true });
   a.navigate('library');
   a.ctrl.pushLayer({ id: 'library-reader', close: () => false });
@@ -183,9 +242,11 @@ test('lapisan yang layarnya sudah ditinggalkan tidak memakan tekanan kembali', (
 
   assert.strictEqual(a.ctrl.handlePop().view, 'library');
   const dead = a.ctrl.handlePop();
-  assert.strictEqual(dead.action, 'chained');
+  assert.strictEqual(dead.action, 'view', 'entri mati dilewati dalam tekanan yang sama');
+  assert.strictEqual(dead.view, 'home');
   assert.deepStrictEqual(a.applied, ['library', 'home'], 'entri mati dilewati, bukan diam saja');
   assert.strictEqual(a.ctrl.depth(), 0);
+  assert.deepStrictEqual(a.traversals, [], 'melewati entri mati tidak boleh menyentuh riwayat');
 });
 
 test('penerusan berantai tidak pernah menguras riwayat sampai keluar aplikasi', () => {
@@ -197,17 +258,26 @@ test('penerusan berantai tidak pernah menguras riwayat sampai keluar aplikasi', 
   assert.deepStrictEqual(a.applied, [], 'tidak ada view yang berpindah diam-diam');
 });
 
-test('dismiss() membuang entri lapisan dan menelan popstate gemanya', () => {
-  // Tombol "Batal"/"Tutup" menutup layarnya seketika; yang tersisa hanya membereskan riwayat.
+test('dismiss() TIDAK BOLEH menyentuh History API sama sekali', () => {
+  // m025-237, dan ini gerbang paling penting di berkas ini. Versi lama membuang entri
+  // dengan history.go(-n) yang ASINKRON, sementara pemanggilnya hampir selalu melakukan
+  // sesuatu yang SINKRON sesudahnya - closeModal() lalu go(), closeModal() lalu
+  // enterStage(), leaveStage() lalu enterStage(). pushState sinkron itu memotong cabang
+  // riwayat di depan penunjuk, penelusuran yang tertunda mendarat di entri yang bukan
+  // hitungan tumpukan, dan sejak saat itu tumpukan lebih dalam daripada riwayat. Tekanan
+  // kembali berikutnya jatuh KELUAR DARI DOKUMEN: about:blank, PWA diluncurkan ulang,
+  // murid mendarat di splash. Itulah boot loop yang dilaporkan owner - diverifikasi di
+  // Chromium sungguhan, jejaknya ada di kepala features/ui/fiezel-back-nav.js.
   const a = makeApp();
   a.navigate('library');
   a.ctrl.pushLayer({ id: 'modal', close: () => true });
+  const before = a.pushes;
   assert.strictEqual(a.ctrl.dismiss('modal'), true);
   assert.strictEqual(a.ctrl.depth(), 1);
-  assert.deepStrictEqual(a.traversals, [-1]);
-  const echo = a.ctrl.handlePop();
-  assert.strictEqual(echo.action, 'skipped', 'gema dari history.go() sendiri tidak boleh diproses dua kali');
-  assert.strictEqual(a.ctrl.depth(), 1, 'tumpukan tetap sejajar dengan riwayat');
+  assert.deepStrictEqual(a.traversals, [], 'penelusuran asinkron di sini = boot loop ke splash');
+  assert.strictEqual(a.pushes, before, 'dan tidak ada entri baru yang didorong sebagai gantinya');
+  // Tekanan kembali sesudahnya tetap mendarat di layar yang benar, sekali jalan.
+  assert.strictEqual(a.ctrl.handlePop().view, 'home');
 });
 
 test('dismiss() ikut membuang lapisan yang menumpuk di atasnya', () => {
@@ -216,7 +286,24 @@ test('dismiss() ikut membuang lapisan yang menumpuk di atasnya', () => {
   a.ctrl.pushLayer({ id: 'sheet', close: () => true });
   assert.strictEqual(a.ctrl.dismiss('modal'), true);
   assert.strictEqual(a.ctrl.depth(), 0);
-  assert.deepStrictEqual(a.traversals, [-2], 'dua entri dibuang, dua entri ditelusuri');
+  assert.deepStrictEqual(a.traversals, [], 'dua entri dibuang dari tumpukan, riwayat tidak disentuh');
+});
+
+test('tutup-lalu-langsung-buka: pola yang dulu menjatuhkan murid keluar dokumen', () => {
+  // Urutan persis dari sesi Chromium: masuk Perpustakaan, masuk rak buku, tekan
+  // "<- Rak buku" (dismiss), lalu LANGSUNG membuka pembaca. Yang dijaga: tidak ada satu pun
+  // penelusuran riwayat di sepanjang urutan itu, dan kedalaman riwayat tidak berubah.
+  const a = makeApp();
+  a.navigate('library');
+  a.ctrl.pushLayer({ id: 'shelf', close: () => true });
+  const marker = a.pushes;
+  a.ctrl.dismiss('shelf');
+  a.ctrl.pushLayer({ id: 'reader', close: () => true });
+  assert.deepStrictEqual(a.traversals, []);
+  assert.strictEqual(a.pushes, marker, 'penanda sudah terpasang, tidak ada entri kedua');
+  assert.strictEqual(a.ctrl.depth(), 2);
+  assert.strictEqual(a.ctrl.handlePop().id, 'reader', 'kembali menutup pembaca, bukan keluar aplikasi');
+  assert.strictEqual(a.ctrl.holdsMarker(), true);
 });
 
 test('dismiss() pada lapisan yang tidak ada tidak menyentuh riwayat', () => {
@@ -227,13 +314,16 @@ test('dismiss() pada lapisan yang tidak ada tidak menyentuh riwayat', () => {
   assert.strictEqual(a.ctrl.depth(), 1);
 });
 
-test('penelan popstate kedaluwarsa, tidak menelan tekanan kembali yang sah', () => {
+test('tidak ada lagi penelan popstate yang bisa menelan tekanan kembali yang sah', () => {
+  // Penelan itu ada karena dismiss() dulu memicu popstate-nya sendiri. Sekarang dismiss()
+  // tidak memicu apa pun, jadi setiap popstate yang tiba PASTI berasal dari murid dan harus
+  // dijawab dengan sebuah tindakan - tidak ada lagi jalur 'skipped'.
   const a = makeApp();
   a.navigate('library');
   a.ctrl.pushLayer({ id: 'modal', close: () => true });
   a.ctrl.dismiss('modal');
-  a.now += backNav.SKIP_WINDOW_MS + 1;
-  assert.strictEqual(a.ctrl.handlePop().action, 'view', 'penanda yang basi harus dibuang, bukan menumpuk');
+  assert.strictEqual(a.ctrl.handlePop().action, 'view');
+  assert.strictEqual(backNav.SKIP_WINDOW_MS, undefined, 'jendela penelan tidak boleh hidup kembali');
 });
 
 // ---- gerbang wajib dan layar kosong -------------------------------------------------
@@ -292,6 +382,56 @@ test('tarikan mendatar dari tepi kiri memicu kembali', () => {
   assert.strictEqual(g.hasFired(), true);
 });
 
+/* m025-238 - OWNER: "ketika user melakukan swipe back, sekarang ada jeda sekitar 10 detik,
+   itu sangat mengganggu, tapi kalau user berpindah halaman dengan menekan taskbar navigasi,
+   itu lancar dan mulus".
+   Perangkatnya iOS, dan bentuk jedanya "diam, lalu tiba-tiba pindah". Itu bukan lambat -
+   itu tarikan yang DITELAN. Di iOS mode standalone gestur swipe-back Safari tidak ada, jadi
+   yang dipakai adalah gestur tepi milik modul ini, dan ambangnya menuntut tarikan yang nyaris
+   lurus dari 24px pertama layar. Tiga tarikan yang benar-benar dilakukan ibu jari gagal
+   memenuhinya. Gerbang di bawah menahan ketiganya - semuanya terbukti MERAH pada ambang lama. */
+function tarik(points) {
+  const g = backNav.createEdgeSwipe();
+  if (g.start(points[0]) !== true) return false;
+  let fired = false;
+  for (let i = 1; i < points.length; i++) if (g.move(points[i])) fired = true;
+  return fired;
+}
+const titik = (x, y) => ({ x, y, target: plainNode });
+
+test('busur ibu jari dari tepi kiri TETAP dibaca sebagai kembali', () => {
+  // Ibu jari berputar pada pangkalnya: di awal tarikan ia sudah naik ~30px sementara dx baru
+  // ~14px. Aturan lama (|dy| >= |dx|) menyerahkan gestur ke penggulung PADA GERAKAN PERTAMA,
+  // dan penyerahannya permanen - sisa tarikan 200px ke kanan tidak berarti apa-apa. Dari sisi
+  // murid gesturnya benar tetapi layarnya diam, dan ia menarik berulang kali sampai kebetulan
+  // ada satu yang cukup lurus untuk lolos.
+  assert.strictEqual(tarik([titik(6, 400), titik(20, 370), titik(90, 368), titik(206, 360)]), true,
+    'tarikan melengkung adalah tarikan NORMAL, bukan gulir');
+});
+
+test('tarikan yang dimulai 26-30px dari tepi tetap dibaca sebagai kembali', () => {
+  // Titik sentuh ibu jari di iPhone gampang mendarat 26-30px dari tepi walau murid merasa
+  // menarik "dari pinggir". Pada 24px tarikan itu ditolak MENTAH di sentuhan pertama.
+  assert.strictEqual(tarik([titik(26, 400), titik(120, 402), titik(240, 404)]), true);
+  assert.strictEqual(tarik([titik(30, 400), titik(120, 402), titik(240, 404)]), true);
+});
+
+test('gulir vertikal sungguhan TETAP bukan gestur kembali', () => {
+  // Pagar dua arah: melonggarkan busur tidak boleh membuat gulir halaman terbajak. Gulir
+  // sungguhan punya dx nyaris nol - didominasi vertikal jauh di atas ambang 2,5x.
+  assert.strictEqual(tarik([titik(6, 400), titik(20, 300), titik(30, 200)]), false);
+  assert.ok(backNav.VERTICAL_DOMINANCE >= 2, 'ambang dominasi vertikal tidak boleh dilucuti');
+});
+
+test('jeda antar-gestur tidak boleh menelan tarikan kedua yang disengaja', () => {
+  // 450ms lebih panjang daripada waktu murid menarik lagi ketika layar sebelumnya belum
+  // selesai digambar, jadi tarikan yang DISENGAJA ikut tertelan. Perlindungan sesungguhnya
+  // terhadap satu tarikan yang terbaca dua kali ada di createEdgeSwipe (sekali `fired`,
+  // tracking mati sampai sentuhan berikutnya), bukan di jeda ini.
+  assert.ok(backNav.GESTURE_COOLDOWN_MS <= 300,
+    'jeda yang lebih panjang dari ini menelan tarikan yang disengaja');
+});
+
 test('gestur yang dimulai jauh dari tepi diabaikan', () => {
   const g = backNav.createEdgeSwipe();
   assert.strictEqual(g.start({ x: backNav.EDGE_PX + 1, y: 300, target: plainNode }), false);
@@ -309,8 +449,8 @@ test('gulir vertikal di dekat tepi kiri bukan gestur kembali', () => {
 test('tarikan miring yang tidak cukup mendatar ditolak', () => {
   const g = backNav.createEdgeSwipe();
   g.start({ x: 6, y: 400, target: plainNode });
-  // dx 80, dy 70: sudah cukup jauh, tetapi rasionya di bawah ambang mendatar.
-  assert.strictEqual(g.move({ x: 86, y: 470 }), false);
+  // dx 80, dy 100: sudah cukup jauh, tetapi rasionya masih di bawah ambang mendatar (1.2).
+  assert.strictEqual(g.move({ x: 86, y: 500 }), false);
 });
 
 test('menarik ke kiri dari tepi kiri bukan kembali', () => {
@@ -561,12 +701,25 @@ test('stage menyimpan cara menggambar DIRINYA, bukan cara kembali ke induk', () 
   assert.ok(/runStageLeave\(stageStack\.splice\(i\)\.reverse\(\)\);\r?\n  drawTopScreen\(\);/.test(app));
 });
 
-test('perpindahan view membuang pembukuan stage, tanpa memutar riwayat mundur', () => {
-  // history.go() bersifat asinkron; menjalankannya tepat sebelum pushState entri view baru
-  // adalah cara tercepat membuat riwayat dan tumpukan kembali tidak sejajar.
+test('perpindahan view membuang pembukuan stage BESERTA entri lapisannya', () => {
+  // Sampai m025-237 dropStages() sengaja tidak menyentuh modul kembali, karena dismiss()
+  // dulu memutar riwayat mundur dengan history.go() yang asinkron dan menjalankannya tepat
+  // sebelum pushState entri view baru adalah cara tercepat membuat riwayat dan tumpukan
+  // tidak sejajar. dismiss() sekarang murni bedah tumpukan, jadi alasan itu hilang - dan
+  // yang tersisa hanyalah kerugiannya: keluar dari sesi lewat navigasi bawah meninggalkan
+  // entri lapisan MATI yang harus dilewati satu per satu oleh tekanan kembali berikutnya.
   assert.ok(/uiSfx\('nav'\);dropStages\(\);if\(opts\?\.viaHistory!==true\)pushBackNavView\(v\)/.test(app));
-  assert.ok(/function dropStages\(\)\{if\(!stageStack\.length\)return false;runStageLeave/.test(app));
-  assert.ok(!/function dropStages\(\)[^}]*dismiss/.test(app), 'dropStages tidak boleh menyentuh riwayat');
+  assert.ok(/function dropStages\(\)\{if\(!stageStack\.length\)return false;const first=stageStack\[0\];runStageLeave/.test(app));
+  assert.ok(/function dropStages\(\)[^\n]*FiezelBackNav\?\.dismiss\?\.\(first\.id\)/.test(app),
+    'entri lapisan yang layarnya sudah dibuang harus ikut dibuang');
+});
+
+test('dismiss() di app.js dan modulnya tidak boleh memutar riwayat mundur', () => {
+  // Gerbang lintas-berkas untuk penyebab boot loop: tidak boleh ada history.go()/back() di
+  // jalur "aplikasi menutup layarnya sendiri", di berkas mana pun yang memegang stage.
+  assert.ok(!/history\.go\(-/.test(moduleCode), 'modul kembali tidak boleh menelusuri riwayat mundur lagi');
+  const goBackCalls = moduleCode.match(/api\.back\(\)/g) || [];
+  assert.strictEqual(goBackCalls.length, 1, 'satu-satunya penelusuran yang sah adalah back() untuk gestur tepi');
 });
 
 test('Classroom tutor ikut mendaftarkan foldernya, lewat pengait opsional', () => {

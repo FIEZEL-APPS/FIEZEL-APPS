@@ -21,11 +21,58 @@
  * view (modal, pembaca perpustakaan), sehingga "kembali" menutup lapisan teratas dulu dan
  * baru sesudahnya berpindah view.
  *
+ * m025-237 - BENTUK RIWAYATNYA BERUBAH TOTAL, dan inilah inti perbaikan boot-loop.
+ *
+ * OWNER: "saat user masuk ke menu, atau panel, setting, sesi soal listening, audio book,
+ * dan lain lain, saat melakukan swipe back, selalu melakukan force boot loop ke splash,
+ * dan sering berkedip blackscreen."
+ *
+ * Penyebabnya ditemukan dengan menjalankan modul ini di Chromium sungguhan sambil mencatat
+ * setiap pushState/go/popstate. Sampai rilis sebelumnya dismiss() - tombol "Batal" milik
+ * modal, tombol "<- Rak buku" milik pembaca, leaveStage() milik sub-layar - membuang entri
+ * riwayat dengan MENELUSURI riwayat mundur: history.go(-n). Penelusuran riwayat bersifat
+ * ASINKRON. Setiap pushState yang berjalan SINKRON sebelum penelusuran itu sempat diproses
+ * akan memotong cabang riwayat di depan penunjuk, dan penelusuran yang tertunda kemudian
+ * mendarat di entri yang SAMA SEKALI BUKAN entri yang diperhitungkan tumpukan. Jejak
+ * sungguhannya, dari sesi Chromium:
+ *
+ *     PUSH #1            (masuk Perpustakaan)
+ *     PUSH #2            (masuk rak buku)
+ *     GO -1              (tombol "<- Rak buku": dismiss, ASINKRON, belum diproses)
+ *     PUSH #3            (langsung membuka pembaca - SINKRON, memotong cabang)
+ *     popstate -> mendarat di state #1     <-- tumpukan mengira masih ada 2 entri
+ *
+ * Sejak baris terakhir itu tumpukan SATU LANGKAH LEBIH DALAM daripada riwayat sungguhan.
+ * Tekanan kembali berikutnya mendarat di entri dokumen itu sendiri, dan tekanan sesudahnya
+ * JATUH KELUAR DARI DOKUMEN: url menjadi about:blank (itulah "kedipan blackscreen"-nya),
+ * PWA diluncurkan ulang, dan murid mendarat kembali di splash. Persis laporan owner. Pola
+ * "tutup lalu langsung buka sesuatu yang lain" ada di mana-mana di aplikasi ini - tutup
+ * modal lalu pindah view, tutup modal lalu mulai kuis, keluar satu sub-layar lalu masuk
+ * sub-layar lain - jadi bug ini bisa dipicu dari hampir setiap layar.
+ *
+ * Karena itu modul ini TIDAK LAGI MEMAKAI RIWAYAT SEBAGAI TEMPAT PENYIMPANAN. Kedalaman
+ * layar hanya hidup di tumpukan JavaScript di bawah ini, dan riwayat sungguhan dipakai
+ * hanya sebagai SATU ENTRI PENANDA ("sentinel") yang selalu duduk tepat satu langkah di
+ * atas entri dokumen:
+ *
+ *     [entri dokumen] [penanda]   <- penunjuk selalu di sini selama masih ada layar
+ *
+ * Navigasi maju menambah entri di tumpukan; penanda sudah ada, jadi TIDAK ada pushState
+ * kedua. Tekanan kembali menjatuhkan penunjuk ke entri dokumen, modul mengerjakan tepat
+ * satu tindakan, lalu MEMASANG ULANG penanda. Akibatnya:
+ *
+ *   - kedalaman riwayat KONSTAN, jadi tumpukan tidak punya apa pun untuk didesinkronisasi;
+ *   - dismiss() sekarang murni bedah tumpukan - nol sentuhan History API, nol penelusuran
+ *     asinkron, jadi balapan yang menyebabkan boot loop TIDAK BISA DIWAKILI LAGI;
+ *   - selama masih ada satu layar pun di tumpukan, tekanan kembali MUSTAHIL menjatuhkan
+ *     murid keluar dari dokumen.
+ *
  * Empat batas yang dijaga di sini, semuanya karena produk ini sudah pernah membayarnya:
  *
- * 1. TIDAK ADA GELUNG TAK BERUJUNG. Jalur popstate TIDAK PERNAH memanggil pushState untuk
- *    navigasi normal. Kesalahan klasik "back memicu push memicu back" tidak mungkin terjadi
- *    karena mendorong entri hanya dilakukan oleh jalur maju.
+ * 1. TIDAK ADA GELUNG TAK BERUJUNG. Jalur popstate memang memasang ulang penanda, tetapi ia
+ *    TIDAK PERNAH menelusuri riwayat (tidak ada history.back()/go() dari dalam handler).
+ *    Gelung "back memicu push memicu back" butuh KEDUANYA; mendorong saja tidak bisa
+ *    memicu popstate berikutnya, jadi setiap tekanan kembali tetap tepat satu tindakan.
  * 2. GERBANG WAJIB TIDAK BISA DITEROBOS. Gerbang notifikasi dan gerbang akun Puter adalah
  *    syarat masuk FIEZEL. Selama salah satunya menutupi layar, popstate dikembalikan apa
  *    adanya (entrinya didorong ulang) dan tidak ada view yang berubah.
@@ -53,30 +100,53 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
 
-  // Tepi kiri iOS sendiri kira-kira selebar ini. Lebih lebar dari ini dan tarikan mendatar
-  // biasa di tengah konten akan ikut tertangkap.
-  var EDGE_PX = 24;
+  // m025-238: 24px terlalu sempit untuk ibu jari sungguhan. Titik sentuh ibu jari di iPhone
+  // gampang mendarat 26-30px dari tepi walau si murid merasa menarik "dari pinggir", dan
+  // tarikan seperti itu ditolak MENTAH-MENTAH di sentuhan pertama - tidak ada apa pun di
+  // layar yang menjelaskan kenapa. Zona sendiri milik iOS lebih lebar dari 24pt; 32px masih
+  // jauh dari tengah konten, jadi tarikan mendatar biasa tetap tidak tertangkap.
+  var EDGE_PX = 32;
   // Jarak minimum sebelum tarikan dianggap sungguh-sungguh, bukan sentuhan yang meleset.
   var MIN_DISTANCE_PX = 64;
-  // dx harus sekian kali lebih besar dari dy; tanpa ini gulir vertikal yang sedikit miring
-  // di dekat tepi kiri akan terbaca sebagai "kembali".
-  var HORIZONTAL_RATIO = 1.6;
-  // Setelah bergerak sejauh ini secara vertikal, gestur milik penggulung halaman.
+  // dx harus sekian kali lebih besar dari dy. m025-238: 1.6 menuntut tarikan yang hampir
+  // datar; ibu jari berputar pada pangkalnya, jadi tarikan "mendatar" yang sesungguhnya
+  // selalu melengkung. 1.2 masih menolak gulir miring, tetapi tidak lagi menuntut penggaris.
+  var HORIZONTAL_RATIO = 1.2;
+  // Setelah bergerak sejauh ini secara vertikal, gestur BOLEH dianggap milik penggulung -
+  // tetapi hanya kalau ia memang DIDOMINASI gerakan vertikal; lihat VERTICAL_DOMINANCE.
   var VERTICAL_SLOP_PX = 24;
+  // m025-238 - INI PENYEBAB "swipe back diam lalu tiba-tiba pindah" DI iOS.
+  //
+  // Aturan lama menyerahkan gestur ke penggulung begitu |dy| > 24 DAN |dy| >= dx. Ibu jari
+  // yang menarik dari tepi kiri bergerak pada busur: di awal tarikan ia sudah naik ~30px
+  // sementara dx baru ~14px, jadi syarat itu terpenuhi PADA GERAKAN PERTAMA - dan karena
+  // penyerahannya permanen (tracking=false, tidak bisa dijemput lagi), sisa tarikan sejauh
+  // 200px ke kanan tidak berarti apa-apa. Dari sisi murid: gesturnya benar, layarnya diam.
+  // Ia menarik lagi, diam lagi, sampai kebetulan ada satu tarikan yang cukup lurus untuk
+  // lolos - lalu layar tiba-tiba pindah. Itulah "jeda sekitar 10 detik" yang dilaporkan.
+  //
+  // Sekarang penyerahan hanya terjadi kalau gerakannya benar-benar DIDOMINASI vertikal:
+  // |dy| lebih dari 2,5x dx. Gulir halaman sungguhan (dx nyaris nol) tetap diserahkan, busur
+  // ibu jari tidak.
+  var VERTICAL_DOMINANCE = 2.5;
   // Selisih kurang dari ini bukan gulungan sungguhan, hanya pembulatan tata letak.
   var SCROLL_SLOP_PX = 2;
   // Batas penelusuran ke atas; pohon DOM yang dalam tidak boleh membuat satu sentuhan
   // berjalan sepanjang dokumen.
   var MAX_ANCESTORS = 24;
-  // Jendela untuk mengabaikan popstate hasil dari history.go() yang KITA panggil sendiri.
-  var SKIP_WINDOW_MS = 1200;
-  // Entri mati (lapisan yang layarnya sudah ditinggalkan lewat jalan lain) boleh dilewati
-  // berantai, tetapi harus ada batasnya supaya satu tekanan kembali tidak pernah bisa
-  // menguras seluruh riwayat.
+  // Entri mati (lapisan yang layarnya sudah ditinggalkan lewat jalan lain) dilewati dalam
+  // SATU tekanan kembali, tetapi harus ada batasnya supaya satu tekanan tidak pernah bisa
+  // menguras seluruh tumpukan sekaligus. m025-237: penelusuran ini sekarang gelung biasa di
+  // dalam satu handler - dulu ia memanggil history.back() berulang kali, yaitu satu-satunya
+  // tempat modul ini pernah menelusuri riwayat dari dalam jalur popstate.
   var MAX_CHAIN = 3;
-  // Jeda antar-pemicu gestur tepi. Lebih pendek dari ini dan satu tarikan jari yang terbaca
-  // dua kali akan memundurkan dua layar sekaligus.
-  var GESTURE_COOLDOWN_MS = 450;
+  // Jeda antar-pemicu gestur tepi. m025-238: 450ms diturunkan ke 250ms. Perlindungan yang
+  // SEBENARNYA terhadap satu tarikan yang terbaca dua kali ada di createEdgeSwipe sendiri -
+  // sekali `fired`, tracking mati sampai sentuhan berikutnya, jadi satu tarikan mustahil
+  // memicu dua kali. Jeda ini hanya menjaring gema peristiwa. 450ms cukup panjang untuk
+  // MENELAN tarikan kedua yang disengaja murid ketika layar sebelumnya belum selesai
+  // digambar - dan menelan tarikan yang disengaja persis seperti tidak berfungsi.
+  var GESTURE_COOLDOWN_MS = 250;
 
   function str(value) { return value == null ? '' : String(value); }
 
@@ -93,19 +163,18 @@
    *   homeView     string                   - tujuan darurat bila view tidak dikenal
    *   applyView    (v)       -> boolean     - pindah view TANPA mendorong entri baru
    *   locked       ()        -> boolean     - benar bila gerbang wajib menutupi layar
-   *   now          ()        -> number
+   *   onExit       ()        -> void         - dipanggil saat tekanan kembali berikutnya
+   *                                            benar-benar akan meninggalkan aplikasi
    */
   function createStack(hooks) {
     var h = hooks || {};
     var stack = [];
-    var skips = 0;
-    var skipsAt = 0;
-    var chained = 0;
+    // m025-237: benar bila kita SEDANG memegang entri penanda satu langkah di atas entri
+    // dokumen. Ini satu-satunya pembukuan riwayat yang tersisa di modul ini - tidak ada
+    // lagi hitungan entri, tidak ada lagi jendela penelan popstate, karena tidak ada lagi
+    // penelusuran riwayat yang kita mulai sendiri untuk dicocokkan.
+    var holding = false;
 
-    function now() {
-      try { return typeof h.now === 'function' ? Number(h.now()) : Date.now(); }
-      catch (_) { return Date.now(); }
-    }
     function history() { return h.history || null; }
     function currentView() {
       try { return typeof h.currentView === 'function' ? str(h.currentView()) : ''; }
@@ -131,20 +200,28 @@
       try { return h.applyView(view) !== false; }
       catch (_) { return false; }
     }
-    function pushHistory() {
+    /**
+     * Memasang entri penanda bila belum terpasang. Dipanggil oleh SETIAP jalur maju dan di
+     * ujung SETIAP popstate yang tidak berakhir keluar aplikasi.
+     *
+     * Yang penting di sini adalah kata "bila belum": kedalaman riwayat tidak boleh tumbuh
+     * mengikuti kedalaman layar. Sepuluh sub-layar bersarang tetap satu entri penanda, jadi
+     * riwayat tidak pernah bisa lebih dangkal maupun lebih dalam daripada yang dikira modul
+     * ini - tidak ada lagi yang bisa desinkron. Ini juga menjauhkan aplikasi dari batas
+     * pushState Safari (100 panggilan / 30 detik): satu sesi belajar penuh hanya mendorong
+     * satu entri per tekanan kembali, bukan satu per layar.
+     */
+    function holdMarker() {
+      if (holding) return true;
       var api = history();
       if (!api || typeof api.pushState !== 'function') return false;
-      try { api.pushState({ fiezelBackNav: stack.length }, ''); return true; }
+      try { api.pushState({ fiezelBackNav: 1 }, ''); holding = true; return true; }
       catch (_) { return false; }
     }
-    function noteSkip(at) {
-      skips = (at - skipsAt > SKIP_WINDOW_MS ? 0 : skips) + 1;
-      skipsAt = at;
-    }
-    function consumeSkip(at) {
-      if (skips > 0 && at - skipsAt <= SKIP_WINDOW_MS) { skips--; return true; }
-      skips = 0;
-      return false;
+    /** Dipanggil saat kita SENGAJA melepas penanda, yaitu ketika murid memang akan keluar. */
+    function notifyExit() {
+      if (typeof h.onExit !== 'function') return;
+      try { h.onExit(); } catch (_) {}
     }
 
     /**
@@ -161,7 +238,7 @@
       // Selama gerbang wajib menutupi layar, tidak ada perpindahan yang boleh terekam.
       if (locked()) return false;
       stack.push({ kind: 'view', id: 'view:' + wanted, view: wanted, fromView: from, close: null });
-      pushHistory();
+      holdMarker();
       return true;
     }
 
@@ -180,7 +257,7 @@
         kind: 'layer', id: id, view: view, fromView: view,
         close: typeof spec.close === 'function' ? spec.close : null
       });
-      pushHistory();
+      holdMarker();
       return true;
     }
 
@@ -193,69 +270,81 @@
     /**
      * Satu popstate = satu entri = satu tindakan. Nilai kembaliannya adalah tindakan yang
      * diambil, supaya pengujian menilai perilaku, bukan efek samping.
+     *
+     * m025-237: begitu handler ini berjalan, penunjuk riwayat SUDAH turun ke entri dokumen -
+     * penanda kita habis. Setiap cabang yang tidak berakhir "keluar aplikasi" karena itu
+     * WAJIB memasangnya kembali di ujung; itulah yang membuat murid tidak pernah bisa
+     * terjatuh keluar dari dokumen selama masih ada satu layar pun di tumpukan.
      */
     function handlePop() {
-      var at = now();
-      // popstate ini adalah gema dari history.go() yang kita panggil sendiri di dismiss():
-      // layarnya sudah ditutup, jadi tidak ada yang tersisa untuk dikerjakan.
-      if (consumeSkip(at)) return { action: 'skipped', depth: stack.length };
+      holding = false;
       // Gerbang wajib diperiksa SEBELUM tumpukan kosong. m025-117: urutan lama memeriksa
       // tumpukan lebih dulu, jadi gerbang yang menyala di layar pertama - kunci target
       // harian, gerbang akun, undangan notifikasi - bisa ditembus oleh satu tekanan kembali
-      // hanya karena belum ada navigasi apa pun yang terekam. Entrinya didorong ulang supaya
-      // kedalaman riwayat tetap sama dan tekanan berikutnya tetap tertahan di sini.
+      // hanya karena belum ada navigasi apa pun yang terekam. Penandanya dipasang ulang
+      // supaya tekanan berikutnya tetap tertahan di sini.
       if (locked()) {
-        pushHistory();
+        holdMarker();
         return { action: 'blocked', depth: stack.length };
       }
       // Tumpukan kosong berarti murid memang sedang meninggalkan aplikasi. Menahan mereka
-      // di sini akan mengurung mereka di dalam PWA tanpa jalan keluar.
-      if (!stack.length) return { action: 'exit', depth: 0 };
+      // di sini akan mengurung mereka di dalam PWA tanpa jalan keluar, jadi penanda TIDAK
+      // dipasang ulang: penunjuk dibiarkan beristirahat di entri dokumen, dan tekanan
+      // kembali berikutnya benar-benar keluar. Satu tekanan jeda itu disengaja - ia
+      // mengubah "swipe tak sengaja langsung membunuh aplikasi" menjadi pola tekan-lagi
+      // yang sudah dikenal murid Android, dan onExit() memberi aplikasi kesempatan
+      // mengatakannya dengan kata-kata.
+      if (!stack.length) { notifyExit(); return { action: 'exit', depth: 0 }; }
 
-      var entry = stack.pop();
       var view = currentView();
+      var skipped = 0;
+      // Entri mati - lapisan yang layarnya sudah ditinggalkan lewat jalan lain, misalnya
+      // pembaca buku yang ditutup lewat navigasi bawah - tidak boleh memakan tekanan
+      // kembali. Dulu penelusurannya dilakukan dengan memanggil history.back() lagi dari
+      // dalam handler ini, satu entri riwayat per entri mati. Sekarang kedalaman layar tidak
+      // lagi tersimpan di riwayat, jadi penelusuran itu cukup gelung biasa: nol penelusuran
+      // riwayat, nol balapan, dan tekanan kembali selesai dalam satu tindakan yang sama.
+      while (stack.length) {
+        var entry = stack.pop();
 
-      // Lapisan teratas ditutup lebih dulu, dan hanya kalau layarnya memang masih layar yang
-      // sama - lapisan yang view-nya sudah ditinggalkan lewat jalan lain bukan lagi lapisan.
-      if (entry.kind === 'layer' && entry.view === view && closeEntry(entry)) {
-        chained = 0;
-        return { action: 'close', id: entry.id, depth: stack.length };
+        // Lapisan teratas ditutup lebih dulu, dan hanya kalau layarnya memang masih layar
+        // yang sama - lapisan yang view-nya sudah ditinggalkan bukan lagi lapisan.
+        if (entry.kind === 'layer' && entry.view === view && closeEntry(entry)) {
+          holdMarker();
+          return { action: 'close', id: entry.id, depth: stack.length };
+        }
+
+        var target = safeView(entry.fromView);
+        if (target && target !== view) {
+          applyView(target);
+          holdMarker();
+          return { action: 'view', view: target, depth: stack.length };
+        }
+
+        // Batasnya tetap ada: satu tekanan kembali tidak boleh menelan tumpukan sedalam apa
+        // pun sekaligus. Sisa entri matinya diteruskan ke tekanan berikutnya - murid tetap
+        // maju, hanya lebih pelan, dan tidak ada layar terjangkau yang dibuang diam-diam.
+        if (++skipped >= MAX_CHAIN && stack.length) {
+          holdMarker();
+          return { action: 'chained', depth: stack.length };
+        }
       }
 
-      var target = safeView(entry.fromView);
-      if (target && target !== view) {
-        chained = 0;
-        applyView(target);
-        return { action: 'view', view: target, depth: stack.length };
+      // Jalan buntu yang sesungguhnya: tumpukan HABIS, tidak ada lapisan yang tertutup, dan
+      // view-nya sudah benar. m025-117: dulu baris ini berbunyi `return {action:'noop'}`
+      // begitu saja - satu tekanan kembali yang tidak mengubah apa pun di layar, yang dari
+      // sisi murid tidak terbaca sebagai "tidak ada tujuan" melainkan sebagai aplikasi yang
+      // macet. Beranda adalah jawaban yang jujur; dari beranda sendiri, diam memang benar.
+      var home = str(h.homeView) || 'home';
+      if (view !== home && applyView(home)) {
+        holdMarker();
+        return { action: 'fallback', view: home, depth: 0 };
       }
-
-      // Entri mati: tidak ada yang ditutup dan view-nya sudah benar. Contohnya pembaca buku
-      // yang ditinggalkan lewat navigasi bawah, bukan lewat tombol kembali. Satu tekanan
-      // kembali tidak boleh terbuang di situ, jadi entri berikutnya diambil juga - dengan
-      // batas, dan tidak pernah sampai mengosongkan tumpukan (yang berarti keluar aplikasi).
-      if (stack.length > 0 && chained < MAX_CHAIN) {
-        chained++;
-        var api = history();
-        if (api && typeof api.back === 'function') { try { api.back(); } catch (_) {} }
-        return { action: 'chained', depth: stack.length };
-      }
-      chained = 0;
-      // m025-117: jalan buntu yang sesungguhnya - tumpukan HABIS, tidak ada lapisan yang
-      // tertutup, dan view-nya sudah benar. Sampai rilis ini baris di bawah berbunyi
-      // `return {action:'noop'}` begitu saja: satu tekanan kembali yang menghabiskan entri
-      // riwayat dan TIDAK mengubah apa pun di layar. Dari sisi murid itu tidak terbaca
-      // sebagai "tidak ada tujuan" melainkan sebagai aplikasi yang macet - gesturnya jelas
-      // jalan, layarnya diam. Contoh nyatanya: modal yang ditutup lewat jalan lain
-      // meninggalkan satu entri mati di dasar tumpukan.
-      //
-      // Batas chained di atas TIDAK ikut jatuh ke sini, dan itu disengaja: di sana masih ada
-      // entri tersisa dan `chained` sudah dinolkan, jadi tekanan berikutnya melanjutkan
-      // penelusuran - murid tetap maju, hanya lebih pelan. Melompat ke beranda di situ
-      // berarti membuang layar yang masih bisa dicapai satu per satu.
-      if (!stack.length) {
-        var home = str(h.homeView) || 'home';
-        if (view !== home && applyView(home)) return { action: 'fallback', view: home, depth: 0 };
-      }
+      // Penanda tetap dipasang ulang: tumpukan memang habis, tetapi tekanan INI sudah
+      // terpakai untuk menjawab. Keluar aplikasi diputuskan oleh tekanan BERIKUTNYA, lewat
+      // cabang 'exit' di atas, supaya jalan buntu tidak pernah langsung berubah menjadi
+      // aplikasi tertutup.
+      holdMarker();
       return { action: 'noop', depth: stack.length };
     }
 
@@ -288,17 +377,28 @@
 
     /**
      * Lapisan ditutup oleh aplikasi sendiri (tombol "Batal", "← Rak buku", tombol Escape).
-     * Layarnya sudah berubah seketika; yang tersisa hanyalah membuang entri riwayatnya,
-     * supaya tekanan kembali berikutnya tidak jatuh pada layar yang sudah tidak ada.
+     * Layarnya sudah berubah seketika; yang tersisa hanyalah membuang pembukuannya, supaya
+     * tekanan kembali berikutnya tidak jatuh pada layar yang sudah tidak ada.
+     *
+     * m025-237 - INI FUNGSI YANG DULU MENYEBABKAN BOOT LOOP, dan sekarang ia tidak menyentuh
+     * History API sama sekali. Versi lama membuang entri riwayatnya dengan history.go(-n).
+     * Penelusuran riwayat bersifat asinkron, sementara pemanggilnya hampir selalu langsung
+     * melakukan sesuatu yang SINKRON sesudahnya - closeModal() lalu go(), closeModal() lalu
+     * enterStage(), leaveStage() lalu enterStage(). pushState yang sinkron itu memotong
+     * cabang riwayat di depan penunjuk, dan penelusuran yang tertunda kemudian mendarat di
+     * entri yang bukan entri yang dihitung tumpukan. Sejak saat itu tumpukan lebih dalam
+     * daripada riwayat, dan tekanan kembali berikutnya jatuh keluar dari dokumen: about:blank,
+     * lalu splash. Lihat jejak Chromium di kepala berkas.
+     *
+     * Karena kedalaman layar tidak lagi disimpan di riwayat, membuang lapisan cukup dengan
+     * memotong tumpukan. Penanda tetap di tempatnya, kedalaman riwayat tidak berubah, dan
+     * tidak ada satu pun operasi asinkron yang bisa dibalap.
      */
     function dismiss(id) {
       var wanted = str(id);
       for (var i = stack.length - 1; i >= 0; i--) {
         if (stack[i].kind === 'layer' && stack[i].id === wanted) {
-          var removed = stack.splice(i);
-          noteSkip(now());
-          var api = history();
-          if (api && typeof api.go === 'function') { try { api.go(-removed.length); } catch (_) {} }
+          stack.splice(i);
           return true;
         }
       }
@@ -311,6 +411,9 @@
      * ke halaman apa pun yang kebetulan ada sebelumnya.
      */
     function back() {
+      // m025-237: tanpa layar tersisa, penanda adalah satu-satunya hal di atas entri
+      // dokumen; menelusurinya di sini berarti gestur tepi bisa menutup PWA tanpa satu pun
+      // tekanan kembali yang terlihat mengerjakan sesuatu.
       if (!stack.length) return false;
       var api = history();
       if (!api || typeof api.back !== 'function') return false;
@@ -324,7 +427,7 @@
         return { kind: entry.kind, id: entry.id, view: entry.view, fromView: entry.fromView };
       });
     }
-    function reset() { stack.length = 0; skips = 0; skipsAt = 0; chained = 0; }
+    function reset() { stack.length = 0; holding = false; }
 
     return {
       pushView: pushView,
@@ -333,8 +436,13 @@
       handlePop: handlePop,
       dismiss: dismiss,
       back: back,
+      /** Memasang entri penanda bila belum ada. Dipanggil sekali saat pemasangan. */
+      hold: holdMarker,
       depth: depth,
       snapshot: snapshot,
+      /** Benar bila entri penanda sedang terpasang. Dipakai gerbang untuk membuktikan
+       *  bahwa kedalaman riwayat tetap konstan berapa pun dalamnya layar. */
+      holdsMarker: function () { return holding; },
       reset: reset
     };
   }
@@ -407,8 +515,10 @@
       if (!isFinite(dx) || !isFinite(dy)) { tracking = false; return false; }
       // Menarik ke kiri dari tepi kiri bukan "kembali".
       if (dx < 0) { tracking = false; return false; }
-      // Sudah cukup jauh ke atas/bawah: ini gulir halaman, dan gestur diserahkan seluruhnya.
-      if (Math.abs(dy) > VERTICAL_SLOP_PX && Math.abs(dy) >= Math.abs(dx)) { tracking = false; return false; }
+      // Gulir halaman: gerakannya DIDOMINASI vertikal, bukan sekadar tidak lurus. Busur ibu
+      // jari (dy 30 / dx 14) tidak lagi jatuh ke sini; gulir sungguhan (dy 100 / dx 14)
+      // tetap jatuh ke sini dan gestur diserahkan seluruhnya.
+      if (Math.abs(dy) > VERTICAL_SLOP_PX && Math.abs(dy) > Math.abs(dx) * VERTICAL_DOMINANCE) { tracking = false; return false; }
       if (dx < distancePx) return false;
       if (dx < Math.abs(dy) * ratio) return false;
       fired = true;
@@ -548,8 +658,13 @@
       homeView: config.homeView,
       applyView: config.applyView,
       locked: config.locked,
-      now: config.now
+      onExit: config.onExit
     });
+
+    // m025-237: penanda dipasang SEKARANG, sebelum navigasi apa pun. Tanpa ini, tekanan
+    // kembali pertama di beranda mendarat langsung di entri dokumen dan menutup PWA - satu
+    // gestur tepi yang meleset, dan murid sudah keluar dari aplikasi.
+    controller.hold();
 
     if (typeof target.addEventListener === 'function') {
       target.addEventListener('popstate', function () { controller.handlePop(); });
@@ -573,7 +688,7 @@
     MIN_DISTANCE_PX: MIN_DISTANCE_PX,
     HORIZONTAL_RATIO: HORIZONTAL_RATIO,
     VERTICAL_SLOP_PX: VERTICAL_SLOP_PX,
-    SKIP_WINDOW_MS: SKIP_WINDOW_MS,
+    VERTICAL_DOMINANCE: VERTICAL_DOMINANCE,
     MAX_CHAIN: MAX_CHAIN,
     GESTURE_COOLDOWN_MS: GESTURE_COOLDOWN_MS,
     createStack: createStack,
@@ -589,6 +704,7 @@
     replaceTopLayer: forward('replaceTopLayer'),
     dismiss: forward('dismiss'),
     back: function () { return controller ? controller.back() : false; },
-    depth: function () { return controller ? controller.depth() : 0; }
+    depth: function () { return controller ? controller.depth() : 0; },
+    holdsMarker: function () { return controller ? controller.holdsMarker() : false; }
   };
 });
