@@ -31,7 +31,7 @@
   function today(now) { return new Date(now || Date.now()).toISOString().slice(0, 10); }
 
   function defaults() {
-    return { schema: KEY, goal: null, step: 'goal', tab: 'flow', diagnostic: null, diagRun: null, skills: {}, plan: null, activeLesson: null, lessons: [], lastNext: null };
+    return { schema: KEY, goal: null, step: 'goal', tab: 'flow', diagnostic: null, diagRun: null, skills: {}, seen: {}, diagRuns: 0, plan: null, activeLesson: null, lessons: [], lastNext: null };
   }
   function load() {
     try { var raw = JSON.parse(localStorage.getItem(KEY)); if (raw && raw.schema === KEY) return Object.assign(defaults(), raw); } catch (_) {}
@@ -41,6 +41,16 @@
   function loadAssignments() { try { var a = JSON.parse(localStorage.getItem(ASSIGN_KEY)); return Array.isArray(a) ? a : []; } catch (_) { return []; } }
 
   // ---- model -----------------------------------------------------------------------------
+  // Ledger anti-pengulangan: id soal yang sudah diuji per skill (dibatasi agar akhirnya
+  // berputar kembali setelah semua variasi habis, bukan tumbuh tanpa batas).
+  var SEEN_CAP = 40;
+  function seenFor(sk) { return (st.seen && st.seen[sk]) || []; }
+  function markSeen(sk, id) {
+    if (!st.seen) st.seen = {};
+    var list = (st.seen[sk] || []).filter(function (x) { return x !== id; });
+    list.push(id); st.seen[sk] = list.slice(-SEEN_CAP);
+  }
+  function allSeen() { var out = []; Object.keys(st.seen || {}).forEach(function (k) { out = out.concat(st.seen[k]); }); return out; }
   function record(st, skill, correct) {
     var s = st.skills[skill] || { correct: 0, total: 0, lastAt: 0 };
     s.total += 1; if (correct) s.correct += 1; s.lastAt = Date.now();
@@ -96,7 +106,8 @@
 
   function startLesson(st, block) {
     var B = bank();
-    var ids = block.itemIds || B.pick(block.skill, block.count, Date.now() % 1000 + 3).map(function (it) { return it.id; });
+    var ids = block.itemIds || B.pickFresh(block.skill, block.count, { avoid: seenFor(block.skill), seed: (Date.now() % 9000) + 3 }).map(function (it) { return it.id; });
+    ids.forEach(function (id) { markSeen(block.skill, id); });
     st.activeLesson = { blockId: block.id, skill: block.skill, title: block.title, kind: block.kind, minutes: block.minutes, itemIds: ids, index: 0, attempt: 0, results: [], feedback: null, revealed: false, startedAt: Date.now() };
     st.step = 'lesson';
   }
@@ -226,7 +237,10 @@
   }
 
   function ensureDiagRun() {
-    if (!st.diagRun) st.diagRun = { itemIds: bank().diagnosticSet(11).map(function (it) { return it.id; }), index: 0, answers: [], feedback: null };
+    if (!st.diagRun) {
+      var ids = bank().diagnosticSet({ avoid: allSeen(), seed: 11 + (st.diagRuns || 0) * 29 }).map(function (it) { return it.id; });
+      st.diagRun = { itemIds: ids, index: 0, answers: [], feedback: null };
+    }
     return st.diagRun;
   }
 
@@ -389,12 +403,13 @@
         var run = ensureDiagRun(), item = B.byId(run.itemIds[run.index]), chosen = Number(btn.getAttribute('data-choice'));
         var fb = B.explain(item, chosen); run.feedback = fb;
         run.answers.push({ itemId: item.id, skill: item.skill, chosen: chosen, correct: fb.correct });
+        markSeen(item.skill, item.id);
         record(st, item.skill, fb.correct);
         break;
       }
       case 'diag-next': {
         var r2 = ensureDiagRun(); r2.index += 1; r2.feedback = null; r2.transcript = false;
-        if (r2.index >= r2.itemIds.length) { st.diagnostic = { at: Date.now(), answers: r2.answers }; st.diagRun = null; st.plan = null; st.step = 'skillmap'; }
+        if (r2.index >= r2.itemIds.length) { st.diagnostic = { at: Date.now(), answers: r2.answers }; st.diagRuns = (st.diagRuns || 0) + 1; st.diagRun = null; st.plan = null; st.step = 'skillmap'; }
         break;
       }
       case 'redo-diagnostic': st.skills = {}; st.diagnostic = null; st.diagRun = null; st.plan = null; st.lastNext = null; st.step = 'diagnostic'; break;
