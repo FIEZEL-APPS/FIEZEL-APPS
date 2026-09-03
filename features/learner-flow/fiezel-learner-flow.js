@@ -357,9 +357,20 @@
     else { fallbackCopy(text); done(); }
   }
   function fallbackCopy(text) { try { var ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); } catch (_) {} }
-  function speak(text) {
-    try { if (root.speechSynthesis && root.SpeechSynthesisUtterance) { var u = new SpeechSynthesisUtterance(text.replace(/^[AB]:\s*/gm, '')); u.lang = 'en-US'; u.rate = 0.92; root.speechSynthesis.cancel(); root.speechSynthesis.speak(u); return true; } } catch (_) {}
+  function browserSpeak(text) {
+    try { if (root.speechSynthesis && root.SpeechSynthesisUtterance) { var u = new SpeechSynthesisUtterance(text); u.lang = 'en-US'; u.rate = 0.92; root.speechSynthesis.cancel(); root.speechSynthesis.speak(u); return true; } } catch (_) {}
     return false;
+  }
+  // Prefer suara FIEZEL (FiezelVoiceSay.say → aset/Puter/neural lokal) bila pintu bicara sudah
+  // hidup; jatuh ke SpeechSynthesis browser supaya soal listening tetap bisa didengar offline
+  // sebelum suara neural diunduh.
+  function speak(text) {
+    var clean = String(text || '').replace(/^[AB]:\s*/gm, '');
+    var vs = root.FiezelVoiceSay;
+    if (vs && typeof vs.say === 'function') {
+      try { var p = vs.say(clean, { contentType: 'sentence' }); if (p && typeof p.catch === 'function') p.catch(function () { browserSpeak(clean); }); return true; } catch (_) {}
+    }
+    return browserSpeak(clean);
   }
   function download(name, text) {
     var blob = new Blob([text], { type: 'application/json' }), url = URL.createObjectURL(blob), a = document.createElement('a');
