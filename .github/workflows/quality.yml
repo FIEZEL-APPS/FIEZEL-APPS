@@ -1,6 +1,53 @@
 name: FIEZEL Quality Gate
+
+# ==========================================================================
+# KENAPA `push` DIBATASI KE `main`, DAN KENAPA ADA `concurrency`
+# ==========================================================================
+# Sebelum ini triggernya `push:` (semua branch) + `pull_request:` tanpa filter
+# dan tanpa concurrency group. Akibatnya SETIAP push ke branch ber-PR memicu
+# gerbang ~25 menit ini DUA KALI, paralel, atas commit yang sama persis — satu
+# dari `push`, satu dari `pull_request`. Itu bukan dugaan: pada PR #333 head
+# d15cb71e tercatat dua job `quality` hidup bersamaan (run 33771881451 dan
+# 33771878031).
+#
+# APA YANG DIPERBAIKI INI, DAN APA YANG TIDAK — dipisah tegas, karena versi
+# pertama komentar ini mengklaim sebab yang TIDAK lolos data. Klaim itu berbunyi
+# "dua salinan berebut runner membuat keduanya melambat". Diuji terhadap riwayat
+# run yang sesungguhnya, klaim itu GUGUR:
+#
+#   11 pasang run duplikat (5 branch berbeda) : 17,9 - 24,3 menit
+#   run tunggal di `main` (nol duplikasi)     : 23,8 - 24,2 menit
+#
+# Kedua rentang TUMPANG TINDIH PENUH. Runner hosted GitHub dialokasikan per-run
+# dari pool bersama, jadi dua run tidak saling memperlambat — dan macet 2 jam di
+# head sebelumnya terjadi pada 1 dari 11 pasang duplikat itu; sepuluh sisanya,
+# dengan kondisi duplikasi yang persis sama, selesai normal. Duplikasi karena itu
+# TIDAK BISA menjadi sebab macetnya, dan perubahan ini BUKAN perbaikan macet.
+# Akar macetnya masih belum diketahui; `timeout-minutes` (PR #336) yang membuatnya
+# berhenti diam-diam, bukan blok ini.
+#
+# Yang benar-benar dibeli perubahan ini, dan sudah cukup membenarkannya:
+#   - separuh konsumsi menit CI hilang (satu suite ~25 menit per commit, bukan dua);
+#   - check `cancelled` dari run yang kalah tidak lagi lahir — merah palsu yang
+#     menghabiskan waktu review untuk menelusuri kegagalan yang tidak pernah ada.
+#
+# Perbaikannya dua lapis, dan keduanya perlu:
+#
+#   1. `push: branches: [main]` — di branch fitur, `pull_request` sudah
+#      meliput setiap commit. Membiarkan `push` ikut jalan di sana tidak
+#      menambah satu pun pemeriksaan, hanya menggandakannya. Push ke `main`
+#      TETAP diperiksa: itu satu-satunya tempat commit bisa mendarat tanpa
+#      melewati PR (merge commit, dan perbaikan langsung kalau sampai terjadi).
+#
+#   2. `concurrency` per branch — push beruntun ke PR yang sama tidak lagi
+#      menumpuk. Run lama dibatalkan oleh yang lebih baru, karena hanya commit
+#      terakhir yang akan di-merge. `cancel-in-progress` sengaja MATI di `main`:
+#      di sana setiap commit adalah sejarah yang sudah mendarat, dan
+#      membatalkannya berarti ada commit di `main` yang tidak pernah diperiksa
+#      penuh — persis keadaan yang gerbang ini ada untuk mencegahnya.
 on:
   push:
+    branches: [main]
   pull_request:
   # F5: satu-satunya cara SENGAJA menjalankan gerbang live dari CI.
   #
@@ -45,15 +92,64 @@ on:
           Kosongkan untuk tetap SKIP.
         required: false
         default: ''
+concurrency:
+  # Dikunci ke NAMA BRANCH, bukan ke nomor PR atau `github.ref`: pada peristiwa
+  # `pull_request` nilai `github.ref_name` berbentuk `333/merge`, sedangkan pada
+  # `push` ia berbentuk `main`. Memakai nama branch kepala membuat kedua jalur
+  # jatuh ke group yang sama, sehingga dedupe-nya benar-benar terjadi.
+  group: ${{ github.workflow }}-${{ github.event.pull_request.head.ref || github.ref_name }}
+  cancel-in-progress: ${{ github.ref_name != 'main' }}
+
 permissions:
   contents: read
 jobs:
   quality:
     runs-on: ubuntu-latest
-    # Batas keras: tanpa ini GitHub memakai 360 menit, dan satu langkah
-    # yang menggantung membakar enam jam dalam diam (lihat
-    # workflow-timeout-gate-test.js).
+
+    # ======================================================================
+    # KENAPA ADA BATAS WAKTU — DAN KENAPA ANGKANYA 45
+    # ======================================================================
+    # Tanpa `timeout-minutes`, GitHub memakai batas bawaan 6 JAM. Itu bukan
+    # angka teoretis: pada 3 Sep 2026 satu gerbang di `Core validation`
+    # menggantung TIGA KALI berturut-turut di PR #333 (job 100652521266,
+    # 100703901200, 100721759384). Setiap kali step-nya tidak pernah selesai,
+    # run harus dibatalkan manual, dan — ini bagian yang mahal — GitHub TIDAK
+    # PERNAH MENGUNGGAH LOG job yang dibatalkan di tengah step. Ketiga job itu
+    # menjawab HTTP 404 saat lognya diminta.
+    #
+    # Akibatnya nama gerbang yang menggantung TIDAK DAPAT DIKETAHUI sama
+    # sekali. Gerbang mutu yang tidak bisa melaporkan di mana ia berhenti
+    # adalah gerbang yang buta persis pada saat ia paling dibutuhkan.
+    #
+    # BATAS YANG DIAKUI JUJUR, karena versi pertama komentar ini menjanjikan
+    # lebih dari yang bisa ditepati: dikatakan bahwa job yang MELEWATI BATAS
+    # menjadi "kegagalan bernama" yang lognya diunggah, sehingga wedge selalu
+    # bisa didiagnosis. Itu TIDAK terjadi pada wedge yang sesungguhnya. Job
+    # 100741519242 berjalan 51m44s — enam menit LEWAT dari batas 45 menit —
+    # tanpa pernah dipotong, dan berhenti hanya karena dibatalkan manual.
+    # Sebabnya masuk akal sesudah akar masalahnya ketahuan: wedge-nya adalah
+    # BANJIR LOG (satu gerbang memuntahkan 22 MB; lihat `compactStack` di
+    # workers/api/index.js), dan runner yang tenggelam oleh backpressure
+    # unggahan log ikut melumpuhkan penegak timeout-nya sendiri.
+    #
+    # Jadi batas ini adalah higiene yang benar — ia memotong wedge yang runner-
+    # nya masih hidup, dan menghapus bawaan 6 jam yang tak seorang pun pilih —
+    # tetapi ia BUKAN jaring pengaman untuk kelas macet yang melumpuhkan
+    # runner. Jangan mengandalkannya untuk mendapatkan log; untuk kelas itu,
+    # obatnya menghentikan banjirnya di sumber.
+    #
+    # Angka 45 diambil dari ukuran, bukan selera: enam merge berurutan di
+    # `main` (#329, #330, #332, #334, #335, dan 809d8156) semuanya selesai
+    # 23m49s-24m11s. 45 menit memberi hampir 2x kelonggaran terhadap run
+    # tersehat, jadi ia tidak akan menyentuh run yang wajar sekalipun runner
+    # sedang lambat. Kalau suatu hari daftar gerbang tumbuh sampai run sehat
+    # melewati ~35 menit, naikkan angka ini SESUDAH mengukur ulang, jangan
+    # sesudah satu run merah.
+    #
+    # Yang MENEGAKKAN keberadaan batas ini di seluruh workflow:
+    # `workflow-timeout-gate-test.js`.
     timeout-minutes: 45
+
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -276,27 +372,11 @@ jobs:
           node fiezel-meta-learning-test.js
           node fiezel-evolution-ledger-test.js
           node fiezel-self-refine-test.js
-          # Gerbang brain-learning-infra (PR #226) + gerbang i18n yang belum terdaftar
-          # (dituntut gate-registry-test: terdaftar atau dikecualikan beralasan).
-          node fiezel-stat-gate-test.js
-          node brain-manifest-test.js
-          node brain-config-test.js
-          node learning-metrics-test.js
-          node metrics-digest-test.js
-          node learning-telemetry-test.js
-          node learning-lane-test.js
-          node braincore-evidence-test.js
-          node braincore-learner-identity-test.js
-          node app-telemetry-wiring-test.js
-          node analytics-dedup-test.js
-          node analytics-stable-id-guard-test.js
-          node adaptivity-simulation-v3-hardened-test.js
-          node audio-locale-guard-test.js
-          node id-golden-snapshot-test.js
-          node locale-enum-test.js
-          node social-api-contract-test.js
-          node social-frontend-test.js
-          node social-schema-contract-test.js
+          # Gerbang brain-learning-infra (PR #226) yang belum terdaftar (dituntut
+          # gate-registry-test: terdaftar atau dikecualikan beralasan). Gerbang i18n yang
+          # semula juga terdaftar di sini sudah punya registrasi asli di SLOT 10 di atas;
+          # duplikatnya dibuang (temuan PR #336: 19 gerbang terdaftar berulang, ±2m24s
+          # terbuang tiap run) — nol gerbang dihapus, hanya salinannya.
           node fiezel-evolution-loop-test.js
           node core-worker-contract-test.js
           # m025-201: dua gerbang penutup lima celah Core Brain (audit m025-201).
@@ -596,30 +676,12 @@ jobs:
           # kuota, endpoint hidup tanpa kill switch yang terbaca) dan bersih pada keadaan repo
           # hari ini. Nol jaringan; fixture ditulis ke direktori temporer OS.
           node rollout-plan-test.js
-          # m025-190: 15 gerbang tertinggal belum terdaftar (temuan gate-registry saat CI
-          # main merah berlapis). 13 lulus langsung dan didaftarkan di sini; id-golden-
-          # snapshot & th-coverage didaftarkan setelah baseline diregenerasi + pendamping
-          # Thai gen2 dilengkapi dalam commit yang sama.
-          node adaptivity-simulation-v3-hardened-test.js
-          # (termasuk 3 gerbang sosial SLOT 7 yang juga belum terdaftar; ketiganya lulus)
-          node social-api-contract-test.js
-          node social-frontend-test.js
-          node social-schema-contract-test.js
-          node analytics-dedup-test.js
-          node analytics-stable-id-guard-test.js
-          node app-telemetry-wiring-test.js
-          node audio-locale-guard-test.js
-          node brain-config-test.js
-          node brain-manifest-test.js
-          node fiezel-stat-gate-test.js
-          node learning-lane-test.js
-          node braincore-evidence-test.js
-          node braincore-learner-identity-test.js
-          node learning-metrics-test.js
-          node learning-telemetry-test.js
-          node locale-enum-test.js
-          node metrics-digest-test.js
-          node id-golden-snapshot-test.js
+          # m025-190 dulu mendaftarkan ulang 19 gerbang (adaptivity-simulation-v3-hardened,
+          # tiga gerbang sosial, dan 15 gerbang analytics/brain/learning/locale) yang saat
+          # itu dikira belum terdaftar. Semuanya sudah punya registrasi asli di SLOT 10 di
+          # atas; duplikatnya dibuang (temuan PR #336, ±2m24s terbuang tiap run). Nol
+          # gerbang dihapus, hanya salinannya — gate-registry-test.js tetap menuntut satu
+          # registrasi per berkas uji, bukan nol.
           node workflow-actor-gate-test.js
           # Sepupu workflow-actor-gate-test.js dari sisi WAKTU, bukan aktor. Pada 3 Sep
           # 2026 dua run untuk commit yang sama macet di step ini selama 1 jam 59 menit
@@ -628,6 +690,9 @@ jobs:
           # adalah bawaan GitHub — 360 menit diam. Gerbang ini menuntut setiap job punya
           # batas yang berhingga DAN mengikat, supaya macet berikutnya merah sendiri
           # alih-alih menunggu ada manusia yang kebetulan menonton tab Actions.
+          # BATASNYA: batas waktu hanya menggigit selama runner-nya masih hidup. Pada
+          # wedge banjir-log ia terbukti TIDAK menggigit (job 100741519242, 51m44s) —
+          # alasannya ditulis lengkap di komentar `timeout-minutes` pada job di atas.
           node workflow-timeout-gate-test.js
           # Pasangan workflow-actor-gate-test.js dari sisi isi, bukan aktor: ia
           # MENJALANKAN skrip substitusi binding yang tertanam di
@@ -865,31 +930,12 @@ jobs:
         # verdict-nya merah karena TEMUAN brain (v2 tersensor 88% vs v1 50.4%,
         # CI [0.334, 0.42]) — kandidat wave berikut, bukan alasan memblokir PR lain.
         run: node adaptivity-simulation-v3-extended-selftest.js
-      - name: 'Gerbang warisan merge main 28 Agu yang belum terdaftar (temuan E5, wave E)'
-        # Ditemukan gate-registry-test.js saat pengerjaan E5 (29 Agu 2026): lima belas berkas
-        # uji dari merge main (analytics, telemetry, brain manifest, locale, baseline emas,
-        # cakupan Thai, dst.) tidak pernah dipanggil CI. Semuanya dijalankan lokal lebih dulu
-        # dan lima belas-nya exit 0 — yang kurang pendaftarannya, bukan mutunya.
-        run: |
-          node analytics-dedup-test.js
-          node analytics-stable-id-guard-test.js
-          node app-telemetry-wiring-test.js
-          node audio-locale-guard-test.js
-          node brain-config-test.js
-          node brain-manifest-test.js
-          node fiezel-stat-gate-test.js
-          node id-golden-snapshot-test.js
-          node learning-lane-test.js
-          node braincore-evidence-test.js
-          node braincore-learner-identity-test.js
-          node learning-metrics-test.js
-          node learning-telemetry-test.js
-          node locale-enum-test.js
-          node metrics-digest-test.js
-          # (union merge 29 Agu) tiga gerbang Thai m025-186 dari sisi main — id-golden-snapshot,
-          # locale-enum, audio-locale-guard — sudah tercakup daftar di atas; th-coverage-test.js
-          # dikecualikan registry (kelas gerbang-pra-rilis-fitur, keputusan MASTER 9bf2e13):
-          # kontraknya mengikat rilis th, bukan rilis id — didaftarkan ulang sebelum saklar th.
+      # 'Gerbang warisan merge main 28 Agu yang belum terdaftar (temuan E5, wave E)' pernah
+      # berdiri di sini sebagai step sendiri, mendaftarkan ulang 15 gerbang yang saat itu
+      # dikira belum terdaftar. Semuanya sudah punya registrasi asli di SLOT 10 dalam step
+      # Core validation di atas; step ini dihapus seluruhnya karena isinya 100% duplikat
+      # (temuan PR #336, ±2m24s terbuang tiap run). Th-coverage-test.js tetap dikecualikan
+      # registry seperti sebelumnya (kelas gerbang-pra-rilis-fitur, keputusan MASTER 9bf2e13).
       - name: 'Wave F2: gate anti-drift konten (explanations-id ↔ templates, inventori, count vocab-th)'
         # Menutup pola kerusakan 3 wave berturut: sumber terjemahan tertinggal dari
         # bank yang di-QA (b0d983c → c3e02f3, 5643a32, f87a39a) dan inventori
