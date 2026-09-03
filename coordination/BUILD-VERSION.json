@@ -1,7 +1,7 @@
 {
-  "version": "m025-239",
-  "claimedBy": "sesi-claude-pr323 (learner flow + tutor action center, branch conflict_030926_0820)",
-  "claimedAt": "2026-09-03T02:13:21.805Z",
-  "reason": "alur belajar murid (learner flow, bank soal tak-terbatas, duel) plus pusat aksi tutor",
+  "version": "m025-240",
+  "claimedBy": "sesi-claude-online-teman (pintu masuk Online & Teman di Home, branch claude/online-teman-home-entry)",
+  "claimedAt": "2026-09-03T03:27:56.785Z",
+  "reason": "pintu masuk Online & Teman di Home, fail-closed saat flag server mati",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
