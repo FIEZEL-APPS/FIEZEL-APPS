@@ -3,8 +3,13 @@
  *
  * Node murni, nol dependency, nol jaringan. Yang dijaga:
  *   1. Kebijakan kata sandi menolak yang lemah dan menerima yang wajar.
- *   2. hash/verify BENAR-BENAR bekerja (WebCrypto yang sama dengan produksi),
- *      salt acak, dan kata sandi mentah tidak pernah muncul di bentuk tersimpan.
+ *   2. hash/verify BENAR-BENAR bekerja lewat WebCrypto, salt acak, dan kata
+ *      sandi mentah tidak pernah muncul di bentuk tersimpan. CATATAN JUJUR:
+ *      ini menguji WebCrypto NODE, bukan `workerd` — keduanya bukan
+ *      implementasi yang sama (insiden produksi m025 membuktikannya: bentuk
+ *      parameter yang lolos di Node melempar NotSupportedError di workerd).
+ *      Butir 2b di bawah menutup celah itu dengan mengunci BENTUK PARAMETER
+ *      yang dipakai kode, bukan hanya perilakunya di Node.
  *   3. Matriks peran: learner tidak punya satu pun kapabilitas teacher/owner,
  *      teacher tidak punya owner, dan rute tak terdaftar DITOLAK (fail-closed).
  *   4. Cangkang benar-benar TERPISAH — bukan satu cangkang bermenu tersembunyi.
@@ -45,7 +50,26 @@ function mod(rel) {
     'kata sandi sangat panjang DITOLAK (cap CPU, bukan cap keamanan)');
   assert(pw.checkPasswordPolicy('kucing-oranye-9') === null, 'frasa sandi wajar DITERIMA');
 
-  /* ---------- 2. Turunan kunci ----------------------------------------------- */
+  /* ---------- 2. Turunan kunci ------------------------------------------------ */
+  // REGRESI PRODUKSI: `deriveBits({ hash: 'SHA-256' })` — hash sebagai STRING
+  // TELANJANG — lolos mulus di Node tapi melempar `NotSupportedError` di
+  // `workerd` (runtime asli Cloudflare Workers) saat /api/account/register
+  // dipanggil sungguhan. Gerbang Node yang lolos TIDAK membuktikan lolos di
+  // workerd, jadi assert ini tidak menutup kelas bug itu — ia hanya mengunci
+  // bahwa BENTUK PARAMETER yang dipakai sekarang adalah objek `{name:'...'}`
+  // (pola yang sudah terbukti jalan di util-hmac.js), supaya siapa pun yang
+  // menulis ulang derive() dan mengembalikannya ke string telanjang tertangkap
+  // di sini SEBELUM sampai produksi.
+  const deriveSrc = require('fs').readFileSync(
+    path.join(__dirname, 'workers/api/auth/password-core.js'), 'utf8'
+  );
+  const deriveBody = deriveSrc.slice(deriveSrc.indexOf('async function derive('));
+  assert(/hash:\s*\{\s*name:/.test(deriveBody),
+    'parameter `hash` PBKDF2 bentuk OBJEK {name:...} — string telanjang melempar '
+    + 'NotSupportedError di workerd (insiden produksi, bukan hipotetis)');
+  assert(/importKey\(\s*'raw',[^,]+,\s*\{\s*name:\s*'PBKDF2'\s*\}/.test(deriveBody.replace(/\s+/g, ' ')),
+    'algoritma importKey PBKDF2 juga bentuk OBJEK, konsisten dengan hash di atas');
+
   const secret = 'kucing-oranye-9';
   // Iterasi rendah HANYA untuk gerbang: 210.000 x banyak assert = menit CI.
   const stored = await pw.hashPassword(secret, { iterations: 5000 });

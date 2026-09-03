@@ -9,8 +9,22 @@
  * dependency runtime (alasan lengkap di kepala `workers/api/index.js`). Argon2id
  * dan bcrypt keduanya butuh WASM/native yang harus di-`npm install` ke jalur
  * produksi — jalur yang dilarang. Yang TERSEDIA di WebCrypto Workers, dan juga
- * di Node 22 (`globalThis.crypto.subtle`, jadi gerbang menguji fungsi YANG SAMA
- * yang dipakai produksi, bukan tiruan), hanya PBKDF2.
+ * di Node 22 (`globalThis.crypto.subtle`), hanya PBKDF2.
+ *
+ * PERINGATAN YANG TERBUKTI BERGUNA (bukan hipotetis — insiden produksi
+ * menegakkannya): "tersedia di kedua runtime" TIDAK berarti "berperilaku identik
+ * bentuk parameternya". `deriveBits({ hash: 'SHA-256' })` — `hash` sebagai
+ * STRING TELANJANG — lolos mulus di Node 22 tetapi melempar `NotSupportedError`
+ * di `workerd` (runtime asli Cloudflare Workers, BUKAN Node) saat sungguh
+ * dipanggil `/api/account/register` di produksi. Gerbang Node yang lolos
+ * TIDAK membuktikan kode akan lolos di `workerd` — keduanya WebCrypto, tetapi
+ * bukan implementasi yang sama, dan penyimpangan pada bentuk `AlgorithmIdentifier`
+ * bersarang (`hash` di dalam `PBKDF2Params`) adalah salah satu titik yang nyata
+ * berbeda. Karena itu `derive()` di bawah memakai bentuk OBJEK `{name:'...'}`
+ * di SETIAP identifier algoritma, bukan string telanjang — bentuk yang lebih
+ * ketat dan terbukti diterima kedua runtime. Kalau menambah operasi WebCrypto
+ * baru di paket ini, uji ke `workerd` sungguhan (`wrangler dev`) sebelum
+ * mempercayai gerbang Node saja.
  *
  * Konsekuensi yang diterima dengan sadar dan WAJIB dibaca sebelum menurunkan
  * angka: PBKDF2 lemah terhadap penyerang ber-GPU dibanding Argon2id. Karena itu
@@ -155,13 +169,26 @@ function subtleOf() {
   return webcrypto;
 }
 
+/**
+ * PERBAIKAN PRODUKSI (dipicu galat nyata di `fiezel-api`, bukan spekulasi):
+ * `deriveBits({ ..., hash: 'SHA-256' })` — `hash` sebagai STRING TELANJANG —
+ * melempar `NotSupportedError` di runtime `workerd` (Cloudflare Workers),
+ * meski keduanya (string dan objek `{name:...}`) sah menurut spesifikasi
+ * WebCrypto dan Node 22 menerima keduanya tanpa keluhan. Itulah celah dalam
+ * klaim lama "WebCrypto identik di Workers dan Node" — Node lebih longgar
+ * pada bentuk `AlgorithmIdentifier` bersarang daripada `workerd`.
+ *
+ * Karena itu SELURUH identifier algoritma di sini SEKARANG bentuk OBJEK
+ * `{ name: '...' }` — bentuk yang lebih ketat dan diterima di KEDUA runtime —
+ * bukan hanya `hash`. Konsisten lebih aman daripada menambal satu titik saja.
+ */
 async function derive(password, salt, iterations) {
   const webcrypto = subtleOf();
   const key = await webcrypto.subtle.importKey(
-    'raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveBits']
+    'raw', new TextEncoder().encode(password), { name: 'PBKDF2' }, false, ['deriveBits']
   );
   const bits = await webcrypto.subtle.deriveBits(
-    { name: 'PBKDF2', salt, iterations, hash: PBKDF2.HASH },
+    { name: 'PBKDF2', salt, iterations, hash: { name: PBKDF2.HASH } },
     key,
     PBKDF2.DERIVED_BYTES * 8
   );
