@@ -28,6 +28,13 @@
     "push:secrets": "node generate-push-secrets.mjs",
     "core:preflight": "node core-deploy-preflight.mjs",
     "core:smoke": "node core-live-smoke.mjs",
-    "core:activate": "node core-activate.mjs"
+    "core:activate": "node core-activate.mjs",
+    "test:auth-schema": "node auth-schema-contract-test.js",
+    "test:auth-role": "node auth-role-test.js",
+    "test:role-security": "node role-security-test.js",
+    "test:teacher-content": "node teacher-content-test.js",
+    "test:teacher-csv": "node teacher-csv-test.js",
+    "test:teacher-braincore": "node teacher-braincore-test.js",
+    "test:social-notify": "node social-notify-test.js"
   }
 }
