@@ -82,7 +82,23 @@ function refHulu() {
 function riwayatPenuh() {
   const dangkal = () => (coba('git rev-parse --is-shallow-repository').out || '').trim() === 'true';
   if (!dangkal()) return true;
-  coba('git fetch --unshallow --quiet') || coba('git fetch --deepen=500 --quiet');
+  /* Cadangan `--deepen=500` di baris ini pernah MATI TOTAL. Bentuk lamanya adalah
+   *
+   *     coba('git fetch --unshallow --quiet') || coba('git fetch --deepen=500 --quiet');
+   *
+   * dan `coba()` mengembalikan OBJEK `{ ok, out }` pada kedua cabangnya — termasuk saat
+   * gagal. Objek selalu truthy, jadi `||` selalu memutus dan cabang kanan tidak pernah
+   * sekali pun dieksekusi sejak gerbang ini ditulis. Yang tersisa hanyalah `--unshallow`:
+   * satu-satunya jalan, tanpa jaring pengaman, mengunduh SELURUH riwayat (pack repo ini
+   * 497 MiB) tepat di gerbang TERAKHIR `Core validation`. Persis kelas cacat yang sudah
+   * dicatat di kepala berkas ini sendiri — perintah yang rusak menghasilkan hijau palsu —
+   * hanya saja kali ini korbannya bukan hasil, melainkan cadangan yang disangka ada.
+   *
+   * Yang diperbaiki hanya itu: cadangannya dibuat bisa dijangkau. Urutannya sengaja TIDAK
+   * dibalik. `--deepen` tidak pernah melepas status dangkal, jadi mendahulukannya akan
+   * membuat `riwayatPenuh()` selalu mengembalikan false dan gerbang selamanya menahan
+   * vonis ancestry-nya — menukar operasi yang mahal dengan gerbang yang tidak menjaga. */
+  if (!coba('git fetch --unshallow --quiet').ok) coba('git fetch --deepen=500 --quiet');
   return !dangkal();
 }
 

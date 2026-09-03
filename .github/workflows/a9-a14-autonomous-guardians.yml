@@ -17,6 +17,10 @@ jobs:
   a9-security-sentinel:
     name: A9 Security Sentinel
     runs-on: ubuntu-latest
+    # Batas keras: tanpa ini GitHub memakai 360 menit, dan satu langkah
+    # yang menggantung membakar enam jam dalam diam (lihat
+    # workflow-timeout-gate-test.js).
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
@@ -40,6 +44,10 @@ jobs:
   a10-regression-watcher:
     name: A10 Regression Watcher
     runs-on: ubuntu-latest
+    # Batas keras: tanpa ini GitHub memakai 360 menit, dan satu langkah
+    # yang menggantung membakar enam jam dalam diam (lihat
+    # workflow-timeout-gate-test.js).
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
@@ -61,6 +69,10 @@ jobs:
   a11-release-readiness-auditor:
     name: A11 Release Readiness Auditor
     runs-on: ubuntu-latest
+    # Batas keras: tanpa ini GitHub memakai 360 menit, dan satu langkah
+    # yang menggantung membakar enam jam dalam diam (lihat
+    # workflow-timeout-gate-test.js).
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
@@ -77,6 +89,10 @@ jobs:
   a13-handoff-keeper:
     name: A13 Handoff Keeper
     runs-on: ubuntu-latest
+    # Batas keras: tanpa ini GitHub memakai 360 menit, dan satu langkah
+    # yang menggantung membakar enam jam dalam diam (lihat
+    # workflow-timeout-gate-test.js).
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
@@ -99,6 +115,10 @@ jobs:
       - a11-release-readiness-auditor
       - a13-handoff-keeper
     runs-on: ubuntu-latest
+    # Batas keras: tanpa ini GitHub memakai 360 menit, dan satu langkah
+    # yang menggantung membakar enam jam dalam diam (lihat
+    # workflow-timeout-gate-test.js).
+    timeout-minutes: 20
     permissions:
       contents: read
       pull-requests: write
