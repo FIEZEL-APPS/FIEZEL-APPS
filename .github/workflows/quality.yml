@@ -8,11 +8,28 @@ name: FIEZEL Quality Gate
 # gerbang ~25 menit ini DUA KALI, paralel, atas commit yang sama persis — satu
 # dari `push`, satu dari `pull_request`. Itu bukan dugaan: pada PR #333 head
 # d15cb71e tercatat dua job `quality` hidup bersamaan (run 33771881451 dan
-# 33771878031), dan pada head sebelumnya satu job berjalan 12:41 -> 14:48
-# (2 jam 7 menit) sebelum dibatalkan, padahal run sehat selesai 22-24 menit.
-# Dua salinan suite yang sama berebut runner membuat keduanya melambat, dan
-# yang kalah berakhir sebagai check `cancelled` — merah palsu yang menghabiskan
-# waktu review untuk menelusuri kegagalan yang tidak pernah ada.
+# 33771878031).
+#
+# APA YANG DIPERBAIKI INI, DAN APA YANG TIDAK — dipisah tegas, karena versi
+# pertama komentar ini mengklaim sebab yang TIDAK lolos data. Klaim itu berbunyi
+# "dua salinan berebut runner membuat keduanya melambat". Diuji terhadap riwayat
+# run yang sesungguhnya, klaim itu GUGUR:
+#
+#   11 pasang run duplikat (5 branch berbeda) : 17,9 - 24,3 menit
+#   run tunggal di `main` (nol duplikasi)     : 23,8 - 24,2 menit
+#
+# Kedua rentang TUMPANG TINDIH PENUH. Runner hosted GitHub dialokasikan per-run
+# dari pool bersama, jadi dua run tidak saling memperlambat — dan macet 2 jam di
+# head sebelumnya terjadi pada 1 dari 11 pasang duplikat itu; sepuluh sisanya,
+# dengan kondisi duplikasi yang persis sama, selesai normal. Duplikasi karena itu
+# TIDAK BISA menjadi sebab macetnya, dan perubahan ini BUKAN perbaikan macet.
+# Akar macetnya masih belum diketahui; `timeout-minutes` (PR #336) yang membuatnya
+# berhenti diam-diam, bukan blok ini.
+#
+# Yang benar-benar dibeli perubahan ini, dan sudah cukup membenarkannya:
+#   - separuh konsumsi menit CI hilang (satu suite ~25 menit per commit, bukan dua);
+#   - check `cancelled` dari run yang kalah tidak lagi lahir — merah palsu yang
+#     menghabiskan waktu review untuk menelusuri kegagalan yang tidak pernah ada.
 #
 # Perbaikannya dua lapis, dan keduanya perlu:
 #
