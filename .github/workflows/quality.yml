@@ -119,23 +119,35 @@ jobs:
     #
     # Akibatnya nama gerbang yang menggantung TIDAK DAPAT DIKETAHUI sama
     # sekali. Gerbang mutu yang tidak bisa melaporkan di mana ia berhenti
-    # adalah gerbang yang buta persis pada saat ia paling dibutuhkan, dan
-    # satu-satunya jalan keluar yang tersisa adalah menebak.
+    # adalah gerbang yang buta persis pada saat ia paling dibutuhkan.
     #
-    # `timeout-minutes` menutup itu, dan bukan dengan mempercepat apa pun:
-    # job yang MELEWATI BATAS diperlakukan sebagai KEGAGALAN BIASA, bukan
-    # pembatalan — jadi lognya DIUNGGAH seperti run gagal lainnya, dan baris
-    # terakhir sebelum senyap menyebutkan gerbang yang menggantung. Wedge yang
-    # tak terdiagnosis berubah menjadi kegagalan bernama.
+    # BATAS YANG DIAKUI JUJUR, karena versi pertama komentar ini menjanjikan
+    # lebih dari yang bisa ditepati: dikatakan bahwa job yang MELEWATI BATAS
+    # menjadi "kegagalan bernama" yang lognya diunggah, sehingga wedge selalu
+    # bisa didiagnosis. Itu TIDAK terjadi pada wedge yang sesungguhnya. Job
+    # 100741519242 berjalan 51m44s — enam menit LEWAT dari batas 45 menit —
+    # tanpa pernah dipotong, dan berhenti hanya karena dibatalkan manual.
+    # Sebabnya masuk akal sesudah akar masalahnya ketahuan: wedge-nya adalah
+    # BANJIR LOG (satu gerbang memuntahkan 22 MB; lihat `compactStack` di
+    # workers/api/index.js), dan runner yang tenggelam oleh backpressure
+    # unggahan log ikut melumpuhkan penegak timeout-nya sendiri.
+    #
+    # Jadi batas ini adalah higiene yang benar — ia memotong wedge yang runner-
+    # nya masih hidup, dan menghapus bawaan 6 jam yang tak seorang pun pilih —
+    # tetapi ia BUKAN jaring pengaman untuk kelas macet yang melumpuhkan
+    # runner. Jangan mengandalkannya untuk mendapatkan log; untuk kelas itu,
+    # obatnya menghentikan banjirnya di sumber.
     #
     # Angka 45 diambil dari ukuran, bukan selera: enam merge berurutan di
     # `main` (#329, #330, #332, #334, #335, dan 809d8156) semuanya selesai
     # 23m49s-24m11s. 45 menit memberi hampir 2x kelonggaran terhadap run
     # tersehat, jadi ia tidak akan menyentuh run yang wajar sekalipun runner
-    # sedang lambat — tetapi memotong wedge berjam-jam pada percobaan pertama.
-    # Kalau suatu hari daftar gerbang tumbuh sampai run sehat melewati ~35
-    # menit, naikkan angka ini SESUDAH mengukur ulang, jangan sesudah satu
-    # run merah.
+    # sedang lambat. Kalau suatu hari daftar gerbang tumbuh sampai run sehat
+    # melewati ~35 menit, naikkan angka ini SESUDAH mengukur ulang, jangan
+    # sesudah satu run merah.
+    #
+    # Yang MENEGAKKAN keberadaan batas ini di seluruh workflow:
+    # `workflow-timeout-gate-test.js`.
     timeout-minutes: 45
 
     steps:
@@ -671,6 +683,17 @@ jobs:
           # gerbang dihapus, hanya salinannya — gate-registry-test.js tetap menuntut satu
           # registrasi per berkas uji, bukan nol.
           node workflow-actor-gate-test.js
+          # Sepupu workflow-actor-gate-test.js dari sisi WAKTU, bukan aktor. Pada 3 Sep
+          # 2026 dua run untuk commit yang sama macet di step ini selama 1 jam 59 menit
+          # dan baru berhenti karena Owner menekan Cancel: tidak ada satu pun
+          # `timeout-minutes` di seluruh .github/workflows/, jadi batas yang berlaku
+          # adalah bawaan GitHub — 360 menit diam. Gerbang ini menuntut setiap job punya
+          # batas yang berhingga DAN mengikat, supaya macet berikutnya merah sendiri
+          # alih-alih menunggu ada manusia yang kebetulan menonton tab Actions.
+          # BATASNYA: batas waktu hanya menggigit selama runner-nya masih hidup. Pada
+          # wedge banjir-log ia terbukti TIDAK menggigit (job 100741519242, 51m44s) —
+          # alasannya ditulis lengkap di komentar `timeout-minutes` pada job di atas.
+          node workflow-timeout-gate-test.js
           # Pasangan workflow-actor-gate-test.js dari sisi isi, bukan aktor: ia
           # MENJALANKAN skrip substitusi binding yang tertanam di
           # deploy-api-worker.yml (diekstrak dari heredoc, bukan disalin) terhadap

@@ -20,6 +20,10 @@ jobs:
   build-candidate:
     name: Build m025-5 vendor candidate (read-only)
     runs-on: ubuntu-latest
+    # Batas keras: tanpa ini GitHub memakai 360 menit, dan satu langkah
+    # yang menggantung membakar enam jam dalam diam (lihat
+    # workflow-timeout-gate-test.js).
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -125,6 +129,10 @@ jobs:
     name: Simulate atomic m025-5 promotion (read-only)
     needs: build-candidate
     runs-on: ubuntu-latest
+    # Batas keras: tanpa ini GitHub memakai 360 menit, dan satu langkah
+    # yang menggantung membakar enam jam dalam diam (lihat
+    # workflow-timeout-gate-test.js).
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
         with:

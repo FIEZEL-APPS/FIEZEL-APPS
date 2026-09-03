@@ -17,6 +17,10 @@ jobs:
   a6-automated-verification:
     name: A6 Automated Verification
     runs-on: ubuntu-latest
+    # Batas keras: tanpa ini GitHub memakai 360 menit, dan satu langkah
+    # yang menggantung membakar enam jam dalam diam (lihat
+    # workflow-timeout-gate-test.js).
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
@@ -83,6 +87,10 @@ jobs:
     name: A7 Automated Release Safety
     needs: a6-automated-verification
     runs-on: ubuntu-latest
+    # Batas keras: tanpa ini GitHub memakai 360 menit, dan satu langkah
+    # yang menggantung membakar enam jam dalam diam (lihat
+    # workflow-timeout-gate-test.js).
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
