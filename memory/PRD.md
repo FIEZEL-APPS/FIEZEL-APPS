@@ -31,6 +31,12 @@ PDF/CSV/anonim). Wajib: buat branch/PR baru sebelum mulai.
 - `canonicalFor()/generated()` kini mencakup vocab (16 frame), listening (10 dialog), reading (10 passage) — jawaban di posisi tetap lalu diacak `variant()`; id `gvc:/gld:/gri:` (+`~oXXXX`) direkonstruksi `byId()`. `pickFresh` dedupe per frame dalam satu batch. Terverifikasi 25 tarikan unik per skill, 0 opsi duplikat, roundtrip OK.
 - Tutor tab **Tren kelas**: sparkline SVG 4 minggu per skill + delta & label (membaik/stabil/perlu perhatian). Snapshot coverage per ISO-minggu disimpan otomatis (`cls.weeklyCoverage`, maks 8) → setelah ≥2 minggu memakai riwayat nyata; sebelumnya ditandai jelas sebagai estimasi.
 
+## Soal bergambar + Filter murid + Duel Belajar (2026-09-03)
+- **Soal bergambar**: 20 pictogram SVG garis (offline) di `PIC` → `picItem(w,d1,d2,d3)` (id `gpi:…`), diselang-seling dengan soal kalimat untuk vocab_a2 dan dicampur ke pool awal `pickFresh` (4 gambar) agar muncul sejak soal pertama. Render `.lf-picture` di learner & duel.
+- **Filter murid** (Tutor → Per murid): chip Semua / belum stabil / perlu bantuan ringan / belum kembali belajar / sedang berkembang / stabil, dengan hitungan; `st.studentFilter`.
+- **Duel Belajar** (`features/learner-flow/fiezel-duel.js`, tab "Duel" di alur belajar): 8 soal × 15 detik, poin 100 + bonus cepat (≤50) + bonus beruntun (+20); salah tetap dijelaskan polanya. Tanpa server: tantangan = kode/link `?duel=KODE` (seed sama → soal identik); teman buka link → Duel tab auto-terbuka → main → head-to-head → kode balasan → papan skor di pembuat. Mode "Main berdua di satu HP" (hot-seat bergantian). Deep-link: `app.js` auto `go('learn')` + kartu "Terima Duel Belajar" di Home.
+- Terverifikasi e2e: solo → link → teman gabung (Rina 720 vs Dimas 469) → kode balasan; hot-seat dengan soal bergambar; filter murid; semua gate hijau.
+
 ## Backlog / Next
 - P1: Suara neural untuk listening di alur learner (kini SpeechSynthesis fallback + FiezelVoiceSay bila aktif). ✅ tersambung.
 - P2: Grafik tren mingguan kelas; filter murid per status di Tutor.

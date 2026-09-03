@@ -104,6 +104,8 @@
     if (m) return (m[1] === 'pq' ? pastQItem : pastTenseItem)(+m[2], +m[3], +m[4]);
     var f = id.match(/^g(vc|ld|ri):(\d+)$/);
     if (f) return (f[1] === 'vc' ? vfItem : f[1] === 'ld' ? ldItem : riItem)(+f[2]);
+    var p = id.match(/^gpi:(\d+):(\d+):(\d+):(\d+)$/);
+    if (p) return picItem(+p[1], +p[2], +p[3], +p[4]);
     return null;
   }
 
@@ -219,10 +221,48 @@
   function vfItem(i) { var f = VF[i % VF.length]; return { id: 'gvc:' + (i % VF.length), skill: 'vocab_a2', prompt: f[0], options: [f[1]].concat(f[2]), answer: 0, marker: f[3], why: { 1: f[4][0], 2: f[4][1], 3: f[4][2] }, note: 'Petunjuk konteksnya: “' + f[3] + '”.' }; }
   function ldItem(i) { var f = LF[i % LF.length]; return { id: 'gld:' + (i % LF.length), skill: 'listening_detail', context: f[0], contextKind: 'dialogue', prompt: f[1], options: [f[2]].concat(f[3]), answer: 0, marker: f[4], why: { 1: f[5][0], 2: f[5][1], 3: f[5][2] }, note: 'Kata kuncinya: “' + f[4] + '”.' }; }
   function riItem(i) { var f = RF[i % RF.length]; return { id: 'gri:' + (i % RF.length), skill: 'reading_inference', context: f[0], contextKind: 'passage', prompt: f[1], options: [f[2]].concat(f[3]), answer: 0, marker: f[4], why: { 1: f[5][0], 2: f[5][1], 3: f[5][2] }, note: 'Kesimpulannya datang dari petunjuk “' + f[4] + '”, bukan kalimat yang tertulis langsung.' }; }
+
+  // Soal bergambar: pictogram SVG garis (24×24, offline, tanpa aset eksternal). [kata, arti, svg]
+  var S = 'fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"';
+  var PIC = [
+    ['apple', 'apel', '<path d="M12 7c-3-2-7 0-7 5 0 4 2.5 8 5 8 1 0 1.5-.5 2-.5s1 .5 2 .5c2.5 0 5-4 5-8 0-5-4-7-7-5z"/><path d="M12 7V4"/><path d="M12 5c1.5-2 3.5-2 4.5-1.5C15.5 5 13.5 5.5 12 5z"/>'],
+    ['umbrella', 'payung', '<path d="M3 12a9 9 0 0 1 18 0H3z"/><path d="M12 12v7a2 2 0 0 0 4 0"/><path d="M12 3v1"/>'],
+    ['bus', 'bus', '<rect x="4" y="4" width="16" height="14" rx="2"/><path d="M4 11h16"/><path d="M8 4v7M16 4v7"/><circle cx="8" cy="19" r="1.5"/><circle cx="16" cy="19" r="1.5"/>'],
+    ['key', 'kunci', '<circle cx="8" cy="15" r="4"/><path d="M11 12l9-9"/><path d="M17 6l2 2M15 8l2 2"/>'],
+    ['book', 'buku', '<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19a2 2 0 0 1 2-2h13"/><path d="M9 7h6"/>'],
+    ['cup', 'cangkir', '<path d="M5 9h11v7a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z"/><path d="M16 11h1a2.5 2.5 0 0 1 0 5h-1"/><path d="M8 3c0 1.5 1 1.5 1 3M12 3c0 1.5 1 1.5 1 3"/>'],
+    ['chair', 'kursi', '<path d="M7 3h10v9H7z"/><path d="M5 12h14v4H5z"/><path d="M6 16v5M18 16v5"/>'],
+    ['clock', 'jam', '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'],
+    ['sun', 'matahari', '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>'],
+    ['cloud', 'awan', '<path d="M7 18a4 4 0 0 1-.5-8A6 6 0 0 1 18 9a4.5 4.5 0 0 1 0 9z"/>'],
+    ['bicycle', 'sepeda', '<circle cx="6" cy="16" r="4"/><circle cx="18" cy="16" r="4"/><path d="M6 16l4-8h4l4 8"/><path d="M10 8h-2M14 8l-3 8"/>'],
+    ['house', 'rumah', '<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>'],
+    ['phone', 'telepon', '<rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/>'],
+    ['fish', 'ikan', '<path d="M3 12s4-6 10-6 8 6 8 6-2 6-8 6-10-6-10-6z"/><path d="M3 12l-1-4M3 12l-1 4"/><circle cx="16" cy="11" r="1"/>'],
+    ['tree', 'pohon', '<path d="M12 3l6 8h-3l4 5H5l4-5H6z"/><path d="M12 16v5"/>'],
+    ['star', 'bintang', '<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>'],
+    ['car', 'mobil', '<path d="M4 15l2-6h12l2 6"/><rect x="3" y="15" width="18" height="4" rx="1"/><circle cx="7" cy="19" r="1.5"/><circle cx="17" cy="19" r="1.5"/><path d="M8 9V7h8v2"/>'],
+    ['bed', 'tempat tidur', '<path d="M3 18V8"/><path d="M3 12h18v6"/><path d="M5 12V9h6v3"/><path d="M3 18h18"/>'],
+    ['glasses', 'kacamata', '<circle cx="7" cy="14" r="3.5"/><circle cx="17" cy="14" r="3.5"/><path d="M10.5 14h3"/><path d="M3.5 14L5 8M20.5 14L19 8"/>'],
+    ['bag', 'tas', '<path d="M5 9h14l-1 12H6z"/><path d="M9 9V7a3 3 0 0 1 6 0v2"/>']
+  ];
+  function picItem(w, d1, d2, d3) {
+    var n = PIC.length; w %= n; d1 %= n; d2 %= n; d3 %= n;
+    var pick3 = [d1, d2, d3], seen = { }; seen[w] = true;
+    var ds = [];
+    pick3.forEach(function (d) { var k = d; while (seen[k]) k = (k + 1) % n; seen[k] = true; ds.push(k); });
+    var why = {};
+    ds.forEach(function (k, i) { why[i + 1] = '“' + PIC[k][0] + '” berarti ' + PIC[k][1] + ' — bukan benda di gambar.'; });
+    return { id: 'gpi:' + w + ':' + ds.join(':'), skill: 'vocab_a2', contextKind: 'picture', picture: PIC[w][2], pictureAlt: PIC[w][1], prompt: 'Kata Inggris apa yang cocok untuk gambar ini?', options: [PIC[w][0]].concat(ds.map(function (k) { return PIC[k][0]; })), answer: 0, marker: PIC[w][1], why: why, note: 'Gambar menunjukkan ' + PIC[w][1] + '.' };
+  }
   // Soal kanonik dari seed (jawaban di posisi tetap); generated() mengacak urutannya.
   function canonicalFor(skill, seed) {
     var s = (Number(seed) || 1) >>> 0;
-    if (skill === 'vocab_a2') return vfItem(s % VF.length);
+    if (skill === 'vocab_a2') {
+      // Selang-seling: soal kalimat dan soal bergambar agar latihan kosakata terasa hidup.
+      if (s % 2 === 1) return picItem(Math.floor(s / 2), Math.floor(s / 3) + 1, Math.floor(s / 5) + 2, Math.floor(s / 11) + 3);
+      return vfItem(Math.floor(s / 2) % VF.length);
+    }
     if (skill === 'listening_detail') return ldItem(s % LF.length);
     if (skill === 'reading_inference') return riItem(s % RF.length);
     var vi = s % GEN_VERBS.length, si = (Math.floor(s / 7)) % GEN_SUBJ.length, ti = (Math.floor(s / 53)) % GEN_TIME.length;
@@ -252,7 +292,10 @@
     opts = opts || {}; n = Math.max(0, n | 0);
     var avoid = {}; (opts.avoid || []).forEach(function (id) { avoid[id] = true; });
     var seed = Number(opts.seed) || 7;
-    var out = seededShuffle(itemsFor(skill).filter(function (it) { return !avoid[it.id]; }), seed).slice(0, n);
+    var pool = itemsFor(skill);
+    // Vocabulary: campurkan beberapa soal bergambar ke pool awal agar latihan kosakata hidup sejak soal pertama.
+    if (skill === 'vocab_a2') for (var k = 0; k < 4; k++) pool = pool.concat([picItem(seed * 3 + k * 5, seed + k + 1, seed + k * 2 + 2, seed + k * 3 + 3)]);
+    var out = seededShuffle(pool.filter(function (it) { return !avoid[it.id]; }), seed).slice(0, n);
     var have = {}, usedBase = {};
     out.forEach(function (it) { have[it.id] = true; usedBase[baseId(it.id)] = true; });
     // Stok statis habis → buat soal baru dari template (semua skill), hindari frame/pola yang
@@ -294,7 +337,7 @@
     if (item.skill === 'past_tense' || item.skill === 'past_questions') {
       body = 'Dalam kalimat ini diperlukan “' + right + '” karena ' + (item.marker === 'did' ? 'sudah ada “did” di depannya.' : 'terdapat penanda “' + item.marker + '”.');
     } else if (item.skill === 'vocab_a2') {
-      body = 'Petunjuk konteksnya “' + item.marker + '” menunjuk ke “' + right + '”.';
+      body = item.contextKind === 'picture' ? 'Gambar menunjukkan ' + item.marker + ', jadi kata yang tepat adalah “' + right + '”.' : 'Petunjuk konteksnya “' + item.marker + '” menunjuk ke “' + right + '”.';
     } else if (item.skill === 'listening_detail') {
       body = 'Jawabannya “' + right + '” — dengarkan kata kunci “' + item.marker + '”.';
     } else {
@@ -353,7 +396,7 @@
 
   return {
     AREAS: AREAS, SKILLS: SKILLS, SKILL_ORDER: SKILL_ORDER, ITEMS: ITEMS,
-    itemsFor: itemsFor, byId: byId, pick: pick, pickFresh: pickFresh, variant: variant, generated: generated,
+    itemsFor: itemsFor, byId: byId, pick: pick, pickFresh: pickFresh, variant: variant, generated: generated, picItem: picItem, PIC: PIC,
     diagnosticSet: diagnosticSet, explain: explain, buildSession: buildSession, afterSessionNote: afterSessionNote
   };
 });
