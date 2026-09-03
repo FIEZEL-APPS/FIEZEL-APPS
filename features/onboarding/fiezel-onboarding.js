@@ -566,16 +566,13 @@
       + greet(env, 'greeting', T('onboarding.senang-ketemu-you-kita-start'))
       + '<div class="fiezel-sheet" data-ob-step="name">'
       + T('onboarding.halo-me-fiezel-nama-you')
-      + T('onboarding.me-pakai-namamu-buat-nyapa')
       + '<label class="fiezel-field"><span>' + T('onboarding.name-field-label') + '</span>'
       + '<input type="text" data-ob-name value="' + escapeHtml(typed || '') + '" maxlength="' + NAME_MAX + '"'
       + ' placeholder="' + T('onboarding.name-placeholder') + '" autocomplete="given-name" autocapitalize="words"'
       + ' spellcheck="false" enterkeyhint="go" aria-label="' + T('onboarding.name-aria') + '"></label>'
-      // Janji privasi harus benar apa adanya. Nama ini memang tinggal di perangkat, TETAPI
-      // ia ikut ke Core Brain di akun FIEZEL murid sendiri supaya pengingat push bisa
-      // menyapa namanya. Menuliskan "nggak dikirim ke mana-mana" akan menjadi janji yang
-      // dilanggar oleh kode di app.js (remoteActivitySnapshot).
-      + T('onboarding.nama-this-disimpan-at-hp')
+      // m025-241: kalimat panjang soal penyimpanan nama dilepas dari layar - ia benar, tapi
+      // ia juga yang membuat langkah pertama harus digulir. Janji yang sama tetap ada di
+      // Pengaturan, tempat nama itu bisa diganti.
       + btn(T('onboarding.next'), 'data-ob-advance' + (clean ? '' : ' disabled'))
       + '</div>';
   }
@@ -620,7 +617,7 @@
     var cards = goals.map(function (g) {
       var selected = g.id === selectedGoal;
       return '<button type="button" class="fiezel-goal-card' + (selected ? ' is-selected' : '') + '" data-ob-goal="' + escapeHtml(g.id) + '">'
-        + '<b>' + escapeHtml(g.label) + '</b><span>' + escapeHtml(g.description) + '</span></button>';
+        + '<b>' + escapeHtml(g.label) + '</b></button>';
     }).join('');
     var levelRow = selectedGoal ? '<div class="fiezel-level-row">' + CEFR_LEVELS.map(function (lv) {
       var selected = lv === selectedLevel;
@@ -637,8 +634,8 @@
       + '<div class="fiezel-sheet" data-ob-step="3">'
       + T('onboarding.apa-tujuan-you-study')
       + '<div class="fiezel-goal-grid">' + cards + '</div>'
-      + (selectedGoal ? T('onboarding.berapa-perkiraan-level-lang-inggrismu') + levelRow
-        + T('onboarding.ini-cuma-perkiraan-awal-darimu') : '')
+      + (selectedGoal ? T('onboarding.apa-level-lang-you-inline') + levelRow
+        + T('onboarding.level-perkiraan-singkat') : '')
       + btn(T('onboarding.next-l554'), 'data-ob-advance' + (selectedGoal ? '' : ' disabled'))
       + btn(T('onboarding.btn-skip-step'), 'data-ob-step-skip', 'ghost')
       + '</div>';
@@ -654,7 +651,6 @@
       + greet(env, 'encouraging', T('onboarding.santai-this-bukan-ujian-can'))
       + '<div class="fiezel-sheet" data-ob-step="4">'
       + T('onboarding.apa-level-lang-you')
-      + T('onboarding.kerjakan-santai-aja-ini-bukan')
       + T('onboarding.isinya-item-listening-grammar-and')
       + btn(T('onboarding.btn-placement'), 'data-ob-primary')
       + btn(T('onboarding.btn-skip-step'), 'data-ob-step-skip', 'ghost')
@@ -674,7 +670,6 @@
       + greet(env, 'calm', T('onboarding.greet-schedule'))
       + '<div class="fiezel-sheet" data-ob-step="5">'
       + '<h2 class="fiezel-title">' + T('onboarding.schedule-title') + '</h2>'
-      + '<p class="fiezel-body">' + T('onboarding.schedule-body') + '</p>'
       + '<p class="fiezel-note">' + T('onboarding.schedule-note') + '</p>'
       + btn(T('onboarding.next-l591'), 'data-ob-advance')
       + '</div>';
