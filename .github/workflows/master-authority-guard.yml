@@ -15,6 +15,10 @@ jobs:
   authority:
     name: MASTER-only authority
     runs-on: ubuntu-latest
+    # Batas keras: tanpa ini GitHub memakai 360 menit, dan satu langkah
+    # yang menggantung membakar enam jam dalam diam (lihat
+    # workflow-timeout-gate-test.js).
+    timeout-minutes: 10
     steps:
       - name: Enforce sole execution identity
         shell: bash

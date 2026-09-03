@@ -50,6 +50,10 @@ permissions:
 jobs:
   quality:
     runs-on: ubuntu-latest
+    # Batas keras: tanpa ini GitHub memakai 360 menit, dan satu langkah
+    # yang menggantung membakar enam jam dalam diam (lihat
+    # workflow-timeout-gate-test.js).
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -617,6 +621,14 @@ jobs:
           node metrics-digest-test.js
           node id-golden-snapshot-test.js
           node workflow-actor-gate-test.js
+          # Sepupu workflow-actor-gate-test.js dari sisi WAKTU, bukan aktor. Pada 3 Sep
+          # 2026 dua run untuk commit yang sama macet di step ini selama 1 jam 59 menit
+          # dan baru berhenti karena Owner menekan Cancel: tidak ada satu pun
+          # `timeout-minutes` di seluruh .github/workflows/, jadi batas yang berlaku
+          # adalah bawaan GitHub — 360 menit diam. Gerbang ini menuntut setiap job punya
+          # batas yang berhingga DAN mengikat, supaya macet berikutnya merah sendiri
+          # alih-alih menunggu ada manusia yang kebetulan menonton tab Actions.
+          node workflow-timeout-gate-test.js
           # Pasangan workflow-actor-gate-test.js dari sisi isi, bukan aktor: ia
           # MENJALANKAN skrip substitusi binding yang tertanam di
           # deploy-api-worker.yml (diekstrak dari heredoc, bukan disalin) terhadap

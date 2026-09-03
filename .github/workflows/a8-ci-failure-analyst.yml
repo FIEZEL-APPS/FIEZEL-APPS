@@ -26,6 +26,10 @@ jobs:
     name: A8 CI Failure Analyst
     if: github.event.workflow_run.conclusion == 'failure'
     runs-on: ubuntu-latest
+    # Batas keras: tanpa ini GitHub memakai 360 menit, dan satu langkah
+    # yang menggantung membakar enam jam dalam diam (lihat
+    # workflow-timeout-gate-test.js).
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
