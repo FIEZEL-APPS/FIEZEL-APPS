@@ -592,6 +592,12 @@ html.fz-booting body{overflow:hidden}
        Dimuat sebelum app.js supaya kait bukti finishQuiz menemukannya sejak sesi pertama;
        kalau gagal dimuat, seluruh pengaitnya di app.js guarded dan fitur online diam. -->
   <script defer src="./features/social/fiezel-social.js"></script>
+  <!-- JEMBATAN UNDANGAN + KOTAK MASUK SOSIAL. Keduanya inti murni (pola gems-core) dan
+       harus sudah ada sebelum app.js: lembar undangan dibuka dari alur boot, dan kotak
+       masuk dibaca saat Home digambar pertama kali. Kalau salah satu gagal dimuat,
+       seluruh pemanggilnya di app.js guarded dan fitur teman kembali ke jalur manual. -->
+  <script defer src="./features/social/fiezel-invite-link.js"></script>
+  <script defer src="./features/social/fiezel-social-notify.js"></script>
   <script defer src="./features/speaking-listening/fiezel-speaking-listening-addon.js"></script>
   <script defer src="./fiezel-lazy-loader.js"></script>
 
