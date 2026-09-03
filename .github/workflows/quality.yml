@@ -1,6 +1,36 @@
 name: FIEZEL Quality Gate
+
+# ==========================================================================
+# KENAPA `push` DIBATASI KE `main`, DAN KENAPA ADA `concurrency`
+# ==========================================================================
+# Sebelum ini triggernya `push:` (semua branch) + `pull_request:` tanpa filter
+# dan tanpa concurrency group. Akibatnya SETIAP push ke branch ber-PR memicu
+# gerbang ~25 menit ini DUA KALI, paralel, atas commit yang sama persis — satu
+# dari `push`, satu dari `pull_request`. Itu bukan dugaan: pada PR #333 head
+# d15cb71e tercatat dua job `quality` hidup bersamaan (run 33771881451 dan
+# 33771878031), dan pada head sebelumnya satu job berjalan 12:41 -> 14:48
+# (2 jam 7 menit) sebelum dibatalkan, padahal run sehat selesai 22-24 menit.
+# Dua salinan suite yang sama berebut runner membuat keduanya melambat, dan
+# yang kalah berakhir sebagai check `cancelled` — merah palsu yang menghabiskan
+# waktu review untuk menelusuri kegagalan yang tidak pernah ada.
+#
+# Perbaikannya dua lapis, dan keduanya perlu:
+#
+#   1. `push: branches: [main]` — di branch fitur, `pull_request` sudah
+#      meliput setiap commit. Membiarkan `push` ikut jalan di sana tidak
+#      menambah satu pun pemeriksaan, hanya menggandakannya. Push ke `main`
+#      TETAP diperiksa: itu satu-satunya tempat commit bisa mendarat tanpa
+#      melewati PR (merge commit, dan perbaikan langsung kalau sampai terjadi).
+#
+#   2. `concurrency` per branch — push beruntun ke PR yang sama tidak lagi
+#      menumpuk. Run lama dibatalkan oleh yang lebih baru, karena hanya commit
+#      terakhir yang akan di-merge. `cancel-in-progress` sengaja MATI di `main`:
+#      di sana setiap commit adalah sejarah yang sudah mendarat, dan
+#      membatalkannya berarti ada commit di `main` yang tidak pernah diperiksa
+#      penuh — persis keadaan yang gerbang ini ada untuk mencegahnya.
 on:
   push:
+    branches: [main]
   pull_request:
   # F5: satu-satunya cara SENGAJA menjalankan gerbang live dari CI.
   #
@@ -45,6 +75,14 @@ on:
           Kosongkan untuk tetap SKIP.
         required: false
         default: ''
+concurrency:
+  # Dikunci ke NAMA BRANCH, bukan ke nomor PR atau `github.ref`: pada peristiwa
+  # `pull_request` nilai `github.ref_name` berbentuk `333/merge`, sedangkan pada
+  # `push` ia berbentuk `main`. Memakai nama branch kepala membuat kedua jalur
+  # jatuh ke group yang sama, sehingga dedupe-nya benar-benar terjadi.
+  group: ${{ github.workflow }}-${{ github.event.pull_request.head.ref || github.ref_name }}
+  cancel-in-progress: ${{ github.ref_name != 'main' }}
+
 permissions:
   contents: read
 jobs:
