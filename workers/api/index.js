@@ -238,6 +238,41 @@ function needsCorsHeaders(response, ctx) {
   return !response.headers.has('access-control-allow-origin');
 }
 
+/**
+ * Pangkas stack SEBELUM dicetak. Wajib, dan angkanya bukan teoretis.
+ *
+ * Harness uji memuat modul Worker sebagai `data:text/javascript;base64,...`,
+ * jadi SETIAP frame stack membawa satu modul UTUH ter-base64. Begitu `err.stack`
+ * ikut dicetak mentah, satu galat saja bisa memuntahkan puluhan megabita.
+ * Terukur pada `edge-guard-test.js` (gerbang yang memang sengaja menggiring
+ * banyak jalur galat), mesin sama, gerbang sama, hanya baris log yang beda:
+ *
+ *     tanpa err.stack :             64 bita
+ *     dengan err.stack : 22.135.831 bita   (345.872x)
+ *
+ * Volume itulah yang menyumbat aliran log runner GitHub sampai step `Core
+ * validation` tampak menggantung berjam-jam — dan karena job yang dibatalkan
+ * di tengah step tidak pernah mengunggah lognya, penyebabnya tidak terbaca
+ * sama sekali selama tiga run berturut-turut.
+ *
+ * Yang dibuang HANYA muatan base64-nya. Nama fungsi dan urutan pemanggilan —
+ * satu-satunya bagian yang benar-benar menolong diagnosis, dan seluruh alasan
+ * `err.stack` ditambahkan — tetap utuh:
+ *
+ *     at ensureIdentityRow (<modul>)
+ *     at issueAnonIdentity (<modul>)
+ *     at async routeAuthAnonInner (<modul>)
+ *
+ * Cap 4.000 karakter dipasang sebagai sabuk kedua: stack rekursif dalam bisa
+ * panjang walau tanpa data-URI, dan log yang tidak terbatas adalah cacat yang
+ * sama dalam bentuk lain. Di produksi modulnya berkas biasa, jadi pemangkasan
+ * ini nyaris tidak pernah menggigit di sana.
+ */
+function compactStack(raw) {
+  if (typeof raw !== 'string') return raw;
+  return raw.replace(/data:[^,\s)]*,[A-Za-z0-9+/=_-]*/g, '<modul>').slice(0, 4000);
+}
+
 export default {
   /**
    * Cron. Galat SATU job tidak boleh membatalkan job lain (`runScheduled`
@@ -295,7 +330,7 @@ export default {
         'fiezel-api unhandled',
         err && err.name,
         err && err.message,
-        err && err.stack
+        compactStack(err && err.stack)
       );
       const cors = corsHeaders(env, request.headers.get('origin'));
       return jsonError(500, ERR.INTERNAL, {}, { headers: cors });
