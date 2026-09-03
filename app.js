@@ -5617,6 +5617,9 @@ function startNotificationInvitation(){
 let pendingAfterGate=null;let pendingAfterGateFn=null;/* v06 2026-08-29: penundaan generik \u2014 kuis apa pun yang diminta saat gerbang akun menutup layar dijalankan ulang setelah gerbang selesai/dilewati. */
 function afterOnboardingExit(action){
   if(action==='placement')pendingAfterGate='placement';
+  // Peran dari perkenalan (sudah tersimpan oleh onboarding sebelum handler ini): guru
+  // mendarat langsung di Tutor Action Center, murid mengikuti alur Home seperti biasa.
+  if(action==='home'){try{const role=self.FiezelOnboarding?.storedRole?.(self)||'murid';if(state.preferences?.role!==role){state.preferences={...state.preferences,role};save()}if(role==='guru')setTimeout(()=>{try{go('tutor')}catch{}},420)}catch{}}
   if(appOpened){if(action==='placement'){/* q19-P2a 2026-08-29: kalau gerbang akun sedang menutup layar, penempatan menunggu lewat pendingAfterGate (jalur 'placement' setelah gate selesai) \u2014 memulai kuis di balik gerbang membuat pushLayer ditolak dan mode lesson tidak pernah menyala. */if(document.body?.classList?.contains?.('auth-locked')){pendingAfterGateFn=()=>startPlacement();/* v38 2026-08-29: cabang defensif ini dulu memarkir niat di pendingAfterGate yang tak pernah dikonsumsi setelah gerbang turun — sekarang lewat jalur generik runPendingAfterGateFn. */return}pendingAfterGate=null;startPlacement()}else go('home');return}
   startNotificationInvitation()
 }
@@ -6619,8 +6622,8 @@ function home(){pawStreakWatch();/* m028-06: kabar demosi yang tertahan selama k
      keping ber-cincin di hero-stats (satu-satunya tempatnya sekarang), statistik Level/Runtun
      juga sudah di keping hero, dan rencana mingguan pindah ke Peta Belajar → Ringkasan —
      tempat ia dibaca saat dicari, bukan dilewati setiap hari. -->
-${skillHubMarkup()}
 ${learnerFlowHomeMarkup()}
+${skillHubMarkup()}
 ${socialHomeMarkup()}
 <div class="home-section-head"><div><h2>${FiezelI18n.t('home.pilih-fokus')}</h2></div><button class="text-button" onclick="go('progress')">${FiezelI18n.t('home.lihat-peta')} <i data-lucide="arrow-right"></i></button></div>
 <div class="learning-launcher">
@@ -9923,11 +9926,12 @@ function learnerFlowHomeMarkup(){
   try{lf=mod?mod.load():null;plan=lf&&lf.plan&&lf.plan.date===new Date().toISOString().slice(0,10)?lf.plan:null}catch(_){}
   try{const code=new URL(location.href).searchParams.get('duel');invite=code&&self.FiezelDuel?self.FiezelDuel.decode(code):null}catch(_){}
   const sub=plan?`Rencana hari ini — ${plan.minutes} menit · ${plan.done.length}/${plan.blocks.length} sesi selesai`:lf&&lf.diagnostic?'Rencana hari ini siap disusun dari skill map kamu':'Pilih tujuan → 5 soal singkat → rencana hari ini';
+  const isGuru=(state.preferences?.role||self.FiezelOnboarding?.storedRole?.(self))==='guru';
   const inviteCard=invite?`<button class="launch-card duel-invite-card" onclick="go('learn')" data-testid="home-duel-invite"><span class="launch-icon"><i class="fz-i" data-fz-icon="speaking" aria-hidden="true"></i></span><span><small>${esc(invite.from||'Teman')} menantangmu · ${invite.score} poin</small><b>Terima Duel Belajar</b></span><i data-lucide="arrow-up-right"></i></button>`:'';
-  return `<div class="home-section-head"><div><h2>Alur belajar</h2></div></div>
-<div class="learning-launcher learner-flow-launcher">${inviteCard}
-  <button class="launch-card learn-launch" onclick="go('learn')" data-testid="home-learn-flow"><span class="launch-icon"><i class="fz-i" data-fz-icon="grammar" aria-hidden="true"></i></span><span><small>${esc(sub)}</small><b>Today Plan</b></span><i data-lucide="arrow-up-right"></i></button>
-  <button class="launch-card tutor-launch" onclick="go('tutor')" data-testid="home-tutor-center"><span class="launch-icon"><i class="fz-i" data-fz-icon="map" aria-hidden="true"></i></span><span><small>Dari pola kesalahan ke rencana mengajar</small><b>Tutor Action Center</b></span><i data-lucide="arrow-up-right"></i></button>
+  const learnCard=`<button class="launch-card learn-launch" onclick="go('learn')" data-testid="home-learn-flow"><span class="launch-icon"><i class="fz-i" data-fz-icon="grammar" aria-hidden="true"></i></span><span><small>${esc(sub)}</small><b>Today Plan</b></span><i data-lucide="arrow-up-right"></i></button>`;
+  const tutorCard=`<button class="launch-card tutor-launch" onclick="go('tutor')" data-testid="home-tutor-center"><span class="launch-icon"><i class="fz-i" data-fz-icon="map" aria-hidden="true"></i></span><span><small>${isGuru?'Peranmu: Guru · kelas, pola kesalahan, sesi review':'Dari pola kesalahan ke rencana mengajar'}</small><b>Tutor Action Center</b></span><i data-lucide="arrow-up-right"></i></button>`;
+  return `<div class="home-section-head"><div><h2>${isGuru?'Ruang guru':'Alur belajar'}</h2></div></div>
+<div class="learning-launcher learner-flow-launcher">${inviteCard}${isGuru?tutorCard+learnCard:learnCard+tutorCard}
 </div>`;
 }
 function progress(){

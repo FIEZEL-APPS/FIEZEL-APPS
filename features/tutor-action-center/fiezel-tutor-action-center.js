@@ -24,6 +24,19 @@
   function bank() { return root.FiezelReviewBank; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (m) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[m]; }); }
   function uid(p) { return p + '-' + Math.random().toString(36).slice(2, 8); }
+  // Kode kelas 6 karakter (tanpa 0/O/1/I) yang murid ketik saat onboarding, mis. FZ-K7M3QX.
+  function makeClassCode() { var A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', out = ''; for (var i = 0; i < 6; i++) out += A[Math.floor(Math.random() * A.length)]; return 'FZ-' + out; }
+  function normalizeClassCode(v) { v = String(v || '').toUpperCase().replace(/[^A-Z0-9]/g, ''); if (v.indexOf('FZ') === 0) v = v.slice(2); return v.length === 6 ? 'FZ-' + v : ''; }
+  function ensureClassCode(c) { if (c && !c.code) c.code = makeClassCode(); return c ? c.code : ''; }
+  /** Simpan hasil learner ke kelas berkode (dipanggil learner-flow di perangkat yang sama). */
+  function ingestLearnerResult(payload) {
+    var st0 = load(), code = normalizeClassCode(payload && payload.cls); if (!code) return false;
+    var c = st0.classes.filter(function (k) { return k.code === code; })[0]; if (!c) return false;
+    var s = parseLearnerCode(btoa(unescape(encodeURIComponent(JSON.stringify(payload))))); if (!s) return false;
+    var idx = -1; c.students.forEach(function (x, i) { if (x.name === s.name) idx = i; });
+    if (idx > -1) { s.id = c.students[idx].id; s.joinedAt = c.students[idx].joinedAt; c.students[idx] = s; } else c.students.push(s);
+    save(st0); if (st) st = st0; return true;
+  }
   function pct(n) { return n == null ? '—' : Math.round(n * 100) + '%'; }
 
   function defaults() { return { schema: KEY, classes: [], activeClassId: null, tab: 'map', picked: [], session: null, preview: null }; }
@@ -51,7 +64,7 @@
         results: [mk('past_tense', r[0], 5), mk('past_questions', r[1], 5), mk('vocab_a2', r[2], 10), mk('listening_detail', r[3], 5), mk('reading_inference', r[4], 5), mk('speaking', r[5], 5)]
       };
     });
-    return { id: uid('cls'), name: 'English A2', level: 'A2', createdAt: t - 14 * DAY, week: 2, students: students, sessions: [], demo: true };
+    return { id: uid('cls'), code: makeClassCode(), name: 'English A2', level: 'A2', createdAt: t - 14 * DAY, week: 2, students: students, sessions: [], demo: true };
   }
 
   // ---- analisis --------------------------------------------------------------------------
@@ -202,7 +215,7 @@
       var payload = JSON.parse(decodeURIComponent(escape(atob(String(code || '').trim()))));
       if (!payload || payload.v !== 1 || !payload.skills) return null;
       var results = Object.keys(payload.skills).map(function (k) { return { skill: k, correct: Number(payload.skills[k].c) || 0, total: Number(payload.skills[k].t) || 0 }; });
-      return { id: uid('s'), name: String(payload.name || 'Murid').slice(0, 24), joinedAt: Date.now(), lastActiveAt: Number(payload.at) || Date.now(), targetDone: (payload.lessons || 0) >= 3, listening: { opened: 0, completed: 0 }, results: results, goal: payload.goal || null };
+      return { id: uid('s'), name: String(payload.name || 'Murid').slice(0, 24), joinedAt: Date.now(), lastActiveAt: Number(payload.at) || Date.now(), targetDone: (payload.lessons || 0) >= 3, listening: { opened: 0, completed: 0 }, results: results, goal: payload.goal || null, cls: normalizeClassCode(payload.cls) || null };
     } catch (_) { return null; }
   }
 
@@ -230,6 +243,7 @@
     return '<header class="tac-head"><div><p class="tac-kicker">Tutor Action Center</p><h1>Dari pola kesalahan ke rencana mengajar</h1><p class="tac-muted">Data jawaban murid dibaca otomatis menjadi tindakan yang jelas — bukan sekadar grafik.</p></div>' +
       '<div class="tac-class-picker">' + (st.classes.length ? '<select data-tac-select="class" data-testid="tac-class-select">' + st.classes.map(function (k) { return '<option value="' + k.id + '"' + (c && k.id === c.id ? ' selected' : '') + '>' + esc(k.name) + ' · ' + k.students.length + ' murid</option>'; }).join('') + '</select>' : '') +
       '<button type="button" class="tac-ghost" data-tac="new-class" data-testid="tac-new-class">+ Kelas baru</button></div></header>' +
+      (c ? '<div class="tac-classcode" data-testid="tac-class-code"><div><small>Kode kelas — murid ketik saat onboarding</small><b>' + esc(ensureClassCode(c)) + '</b></div><button type="button" class="tac-mini" data-tac="copy-code" data-testid="tac-copy-class-code">Salin kode</button><p class="tac-muted">Hasil diagnostic murid yang memakai kode ini otomatis masuk ke kelas ini.</p></div>' : '') +
       (st.creating || !st.classes.length ? createClassForm() : '');
   }
   function createClassForm() {
@@ -374,6 +388,7 @@
     switch (act) {
       case 'tab': st.tab = btn.getAttribute('data-tab'); st.preview = null; break;
       case 'filter': st.studentFilter = btn.getAttribute('data-filter'); break;
+      case 'copy-code': if (c) copy(ensureClassCode(c), 'Kode kelas ' + c.code + ' tersalin.'); return;
       case 'new-class': st.creating = true; break;
       case 'cancel-create': st.creating = false; break;
       case 'seed-demo': { var k = seedClass(); st.classes.push(k); st.activeClassId = k.id; st.creating = false; st.tab = 'map'; toast('Kelas demo dimuat: 18 murid.'); break; }
@@ -414,12 +429,13 @@
     e.preventDefault();
     var kind = form.getAttribute('data-tac-form'), fd = new FormData(form);
     if (kind === 'create-class') {
-      var k = { id: uid('cls'), name: String(fd.get('name') || 'Kelas baru').trim().slice(0, 40), level: String(fd.get('level') || 'A2'), createdAt: Date.now(), week: 1, students: [], sessions: [] };
+      var k = { id: uid('cls'), code: makeClassCode(), name: String(fd.get('name') || 'Kelas baru').trim().slice(0, 40), level: String(fd.get('level') || 'A2'), createdAt: Date.now(), week: 1, students: [], sessions: [] };
       st.classes.push(k); st.activeClassId = k.id; st.creating = false; st.tab = 'students'; toast('Kelas dibuat. Tambahkan murid dari kode hasil.');
     } else if (kind === 'add-student') {
       var c = cls(), s = parseLearnerCode(fd.get('code')); if (!c) return;
       if (!s) { toast('Kode hasil tidak valid.'); return; }
-      c.students.push(s); toast(s.name + ' ditambahkan ke ' + c.name + '.');
+      var byCode = s.cls ? st.classes.filter(function (k) { return k.code === s.cls; })[0] : null;
+      var target = byCode || c; target.students.push(s); toast(s.name + ' ditambahkan ke ' + target.name + (byCode ? ' (lewat kode kelas).' : '.'));
     }
     save(st); render();
   }
@@ -430,5 +446,5 @@
     if (pick) { var id = pick.getAttribute('data-tac-pick'); st.picked = pick.checked ? st.picked.concat([id]) : st.picked.filter(function (x) { return x !== id; }); save(st); render(); }
   }
 
-  return { KEY: KEY, mount: mount, render: render, load: load, seedClass: seedClass, classSkillMap: classSkillMap, classWeeklyTrend: classWeeklyTrend, interventionQueue: interventionQueue, studentRecommendation: studentRecommendation, weeklyReport: weeklyReport, reportText: reportText, csvText: csvText, parseLearnerCode: parseLearnerCode, _state: function () { return st; } };
+  return { KEY: KEY, mount: mount, render: render, load: load, seedClass: seedClass, classSkillMap: classSkillMap, classWeeklyTrend: classWeeklyTrend, interventionQueue: interventionQueue, studentRecommendation: studentRecommendation, weeklyReport: weeklyReport, reportText: reportText, csvText: csvText, parseLearnerCode: parseLearnerCode, ingestLearnerResult: ingestLearnerResult, normalizeClassCode: normalizeClassCode, makeClassCode: makeClassCode, _state: function () { return st; } };
 });
