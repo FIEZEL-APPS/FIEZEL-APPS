@@ -134,6 +134,24 @@
     return { strengths: strengths, review: review, growing: growing, suggestion: parts.join(' + '), status: status, statusLabel: STATUS[status], inactiveDays: Math.floor(((now || Date.now()) - s.lastActiveAt) / DAY) };
   }
 
+  // Tren 4 minggu per skill. Bila kelas menyimpan snapshot mingguan (cls.weeklyCoverage),
+  // pakai data nyata; kalau belum ada (mis. kelas demo), susun estimasi deterministik yang
+  // berakhir di coverage saat ini — ditandai jelas sebagai estimasi, bukan riwayat palsu.
+  function classWeeklyTrend(cls) {
+    var map = classSkillMap(cls), real = Array.isArray(cls.weeklyCoverage) && cls.weeklyCoverage.length >= 2;
+    return map.map(function (m, idx) {
+      var cur = m.acc == null ? 0 : m.acc, points;
+      if (real) {
+        points = cls.weeklyCoverage.slice(-4).map(function (w) { return Math.round(((w[m.area] == null ? cur : w[m.area])) * 100); });
+      } else {
+        var jitter = ((m.label.charCodeAt(0) + idx * 7) % 5) / 100;
+        points = [cur - 0.14 + jitter, cur - 0.09, cur - 0.04 - jitter, cur].map(function (v) { return Math.max(5, Math.min(100, Math.round(v * 100))); });
+      }
+      var delta = points[points.length - 1] - points[0];
+      return { area: m.area, label: m.label, points: points, delta: delta, current: points[points.length - 1], estimate: !real };
+    });
+  }
+
   function weeklyReport(cls, now) {
     var t = now || Date.now(), B = bank(), active = activeStudents(cls, t), done = cls.students.filter(function (s) { return s.targetDone; });
     var prio = priorityAreas(cls), pt = weakStudents(cls, 'past_tense'), away = inactiveStudents(cls, t);
@@ -222,10 +240,49 @@
   }
   function emptyState() { return ''; }
 
+  function isoWeek(now) {
+    var d = new Date(now || Date.now()); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() + 3 - ((d.getDay() + 6) % 7));
+    var w1 = new Date(d.getFullYear(), 0, 4);
+    return d.getFullYear() + '-W' + (1 + Math.round(((d - w1) / DAY - 3 + ((w1.getDay() + 6) % 7)) / 7));
+  }
+  // Snapshot coverage per minggu (sekali per ISO-minggu) → tren kelas menjadi riwayat nyata.
+  function snapshotWeek(c) {
+    if (!c || !c.students.length) return false;
+    var wk = isoWeek(), list = Array.isArray(c.weeklyCoverage) ? c.weeklyCoverage : (c.weeklyCoverage = []);
+    var row = { week: wk };
+    classSkillMap(c).forEach(function (m) { if (m.acc != null) row[m.area] = Math.round(m.acc * 1000) / 1000; });
+    var last = list[list.length - 1];
+    if (last && last.week === wk) { Object.assign(last, row); return false; }
+    list.push(row); if (list.length > 8) list.splice(0, list.length - 8);
+    return true;
+  }
+
   function body(c) {
-    var tabs = [['map', 'Peta kelas'], ['queue', 'Antrian intervensi'], ['session', 'Buat sesi review'], ['students', 'Per murid'], ['report', 'Laporan mingguan']];
+    if (snapshotWeek(c)) save(st);
+    var tabs = [['map', 'Peta kelas'], ['trend', 'Tren kelas'], ['queue', 'Antrian intervensi'], ['session', 'Buat sesi review'], ['students', 'Per murid'], ['report', 'Laporan mingguan']];
     return headline(c) + '<nav class="tac-tabs" role="tablist">' + tabs.map(function (t) { return '<button type="button" role="tab" class="tac-tab' + (st.tab === t[0] ? ' is-active' : '') + '" data-tac="tab" data-tab="' + t[0] + '" data-testid="tac-tab-' + t[0] + '">' + t[1] + '</button>'; }).join('') + '</nav>' +
-      ({ map: mapView, queue: queueView, session: sessionView, students: studentsView, report: reportView })[st.tab](c);
+      ({ map: mapView, trend: trendView, queue: queueView, session: sessionView, students: studentsView, report: reportView })[st.tab](c);
+  }
+
+  function sparkline(points) {
+    var w = 220, h = 56, pad = 6, max = 100, n = points.length;
+    var xy = points.map(function (v, i) { return [pad + i * ((w - 2 * pad) / (n - 1)), h - pad - (v / max) * (h - 2 * pad)]; });
+    var line = xy.map(function (p, i) { return (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1); }).join(' ');
+    var area = 'M' + xy[0][0].toFixed(1) + ' ' + (h - pad) + ' ' + xy.map(function (p) { return 'L' + p[0].toFixed(1) + ' ' + p[1].toFixed(1); }).join(' ') + ' L' + xy[n - 1][0].toFixed(1) + ' ' + (h - pad) + ' Z';
+    var dots = xy.map(function (p, i) { return '<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="' + (i === n - 1 ? 3.5 : 2) + '"/>'; }).join('');
+    return '<svg class="tac-spark" viewBox="0 0 ' + w + ' ' + h + '" width="100%" height="' + h + '" preserveAspectRatio="none" aria-hidden="true"><path class="tac-spark-area" d="' + area + '"/><path class="tac-spark-line" d="' + line + '"/>' + dots + '</svg>';
+  }
+  function trendView(c) {
+    if (!c.students.length) return '<div class="tac-card"><h2>Tren kelas</h2><p class="tac-muted">Belum ada murid — tambahkan hasil diagnostic dulu.</p></div>';
+    var rows = classWeeklyTrend(c), est = rows.some(function (r) { return r.estimate; });
+    return '<div class="tac-card" data-testid="tac-trend"><h2>Tren kelas — 4 minggu terakhir</h2>' +
+      '<p class="tac-muted">Arah coverage tiap skill dari minggu ke minggu. ' + (est ? 'Angka ini <b>estimasi</b> dari coverage kelas saat ini (kelas demo belum punya riwayat mingguan nyata).' : 'Berdasarkan snapshot mingguan kelas.') + '</p>' +
+      '<div class="tac-trend-grid">' + rows.map(function (r) {
+        var dir = r.delta > 1 ? 'up' : r.delta < -1 ? 'down' : 'flat', arrow = dir === 'up' ? '▲' : dir === 'down' ? '▼' : '▬';
+        return '<div class="tac-trend-card is-' + dir + '" data-testid="tac-trend-' + r.area + '"><div class="tac-trend-head"><b>' + esc(r.label) + '</b><span class="tac-trend-delta">' + arrow + ' ' + (r.delta >= 0 ? '+' : '') + r.delta + '%</span></div>' +
+          sparkline(r.points) + '<div class="tac-trend-foot"><small>M1 ' + r.points[0] + '% → M' + r.points.length + ' ' + r.current + '%</small><em>' + (dir === 'up' ? 'membaik' : dir === 'down' ? 'perlu perhatian' : 'stabil') + '</em></div></div>';
+      }).join('') + '</div>' +
+      '<p class="tac-muted">Skill dengan panah turun adalah prioritas: buat sesi review dari tab “Buat sesi review”.</p></div>';
   }
 
   function headline(c) {
@@ -366,5 +423,5 @@
     if (pick) { var id = pick.getAttribute('data-tac-pick'); st.picked = pick.checked ? st.picked.concat([id]) : st.picked.filter(function (x) { return x !== id; }); save(st); render(); }
   }
 
-  return { KEY: KEY, mount: mount, render: render, load: load, seedClass: seedClass, classSkillMap: classSkillMap, interventionQueue: interventionQueue, studentRecommendation: studentRecommendation, weeklyReport: weeklyReport, reportText: reportText, csvText: csvText, parseLearnerCode: parseLearnerCode, _state: function () { return st; } };
+  return { KEY: KEY, mount: mount, render: render, load: load, seedClass: seedClass, classSkillMap: classSkillMap, classWeeklyTrend: classWeeklyTrend, interventionQueue: interventionQueue, studentRecommendation: studentRecommendation, weeklyReport: weeklyReport, reportText: reportText, csvText: csvText, parseLearnerCode: parseLearnerCode, _state: function () { return st; } };
 });
