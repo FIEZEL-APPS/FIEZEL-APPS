@@ -116,8 +116,8 @@ export async function routeAccountRegister(ctx) {
   }
 
   await db.batch([
-    db.prepare('INSERT INTO auth_account (sub, role, login_handle, status, created_at) '
-      + 'VALUES (?1, ?2, ?3, ?4, ?5)')
+    db.prepare('INSERT INTO auth_account (sub, role, login_handle, status, created_at) ' +
+      'VALUES (?1, ?2, ?3, ?4, ?5)')
       .bind(ctx.identity.sub, ROLE.LEARNER, handle, 'active', now),
     db.prepare('INSERT INTO auth_credential (sub, pass_hash, updated_at, failed_count) VALUES (?1, ?2, ?3, 0)')
       .bind(ctx.identity.sub, passHash, now)
@@ -147,8 +147,8 @@ export async function routeAccountLogin(ctx) {
   const invalid = () => jsonError(401, 'invalid_credentials', {}, opt);
 
   const account = HANDLE_RE.test(handle)
-    ? await db.prepare('SELECT sub, role, login_handle, status, institution_id FROM auth_account '
-      + 'WHERE login_handle = ?1').bind(handle).first()
+    ? await db.prepare('SELECT sub, role, login_handle, status, institution_id FROM auth_account ' +
+      'WHERE login_handle = ?1').bind(handle).first()
     : null;
 
   if (!account) {
@@ -261,8 +261,8 @@ export async function routeTeacherActivate(ctx) {
 
   const codeHash = await hashCode(code);
   const invite = await db.prepare(
-    'SELECT code_hash, teacher_name, institution, institution_type, expires_at, used_at, revoked_at '
-    + 'FROM teacher_invite WHERE code_hash = ?1'
+    'SELECT code_hash, teacher_name, institution, institution_type, expires_at, used_at, revoked_at ' +
+    'FROM teacher_invite WHERE code_hash = ?1'
   ).bind(codeHash).first();
 
   const verdict = checkRedeemable(invite, ctx.now, codeHash);
@@ -274,8 +274,8 @@ export async function routeTeacherActivate(ctx) {
   if (already) return jsonError(409, 'account_exists', {}, opt);
 
   const claimed = await db.prepare(
-    'UPDATE teacher_invite SET used_at = ?2, used_by = ?3 WHERE code_hash = ?1 AND used_at IS NULL '
-    + 'AND revoked_at IS NULL AND expires_at > ?2'
+    'UPDATE teacher_invite SET used_at = ?2, used_by = ?3 WHERE code_hash = ?1 AND used_at IS NULL ' +
+    'AND revoked_at IS NULL AND expires_at > ?2'
   ).bind(codeHash, ctx.now, ctx.identity.sub).run();
 
   // `meta.changes === 0` berarti token dipakai orang lain di antara baca dan
@@ -304,13 +304,13 @@ export async function routeTeacherActivate(ctx) {
   const passHash = await hashPassword(body.value.password);
 
   await db.batch([
-    db.prepare('INSERT INTO auth_account (sub, role, login_handle, status, created_at, institution_id) '
-      + 'VALUES (?1, ?2, ?3, ?4, ?5, ?6)')
+    db.prepare('INSERT INTO auth_account (sub, role, login_handle, status, created_at, institution_id) ' +
+      'VALUES (?1, ?2, ?3, ?4, ?5, ?6)')
       .bind(ctx.identity.sub, ROLE.TEACHER, handle, 'active', ctx.now, institutionId),
     db.prepare('INSERT INTO auth_credential (sub, pass_hash, updated_at, failed_count) VALUES (?1, ?2, ?3, 0)')
       .bind(ctx.identity.sub, passHash, ctx.now),
-    db.prepare('INSERT INTO teacher_profile (sub, teacher_name, institution, institution_type, '
-      + 'institution_id, activated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6)')
+    db.prepare('INSERT INTO teacher_profile (sub, teacher_name, institution, institution_type, ' +
+      'institution_id, activated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6)')
       .bind(ctx.identity.sub, invite.teacher_name, invite.institution, invite.institution_type,
         institutionId, ctx.now)
   ]);

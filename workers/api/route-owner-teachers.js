@@ -42,8 +42,8 @@ export async function routeTeacherInviteCreate(ctx) {
   const minted = await mintInvite({ ...body.value, ownerSub: gate.sub }, ctx.now);
   const r = minted.record;
   await gate.db.prepare(
-    'INSERT INTO teacher_invite (code_hash, teacher_name, institution, institution_type, '
-    + 'created_at, expires_at, created_by) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)'
+    'INSERT INTO teacher_invite (code_hash, teacher_name, institution, institution_type, ' +
+    'created_at, expires_at, created_by) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)'
   ).bind(r.code_hash, r.teacher_name, r.institution, r.institution_type,
     r.created_at, r.expires_at, r.created_by).run();
 
@@ -102,13 +102,13 @@ export async function routeOwnerTeachers(ctx) {
   if (!gate.ok) return gate.response;
 
   const invites = await gate.db.prepare(
-    'SELECT code_hash, teacher_name, institution, institution_type, created_at, expires_at, '
-    + 'used_at, revoked_at FROM teacher_invite ORDER BY created_at DESC LIMIT 200'
+    'SELECT code_hash, teacher_name, institution, institution_type, created_at, expires_at, ' +
+    'used_at, revoked_at FROM teacher_invite ORDER BY created_at DESC LIMIT 200'
   ).all();
 
   const teachers = await gate.db.prepare(
-    'SELECT p.teacher_name, p.institution, p.institution_type, p.activated_at, a.login_handle, a.status '
-    + 'FROM teacher_profile p JOIN auth_account a ON a.sub = p.sub ORDER BY p.activated_at DESC LIMIT 200'
+    'SELECT p.teacher_name, p.institution, p.institution_type, p.activated_at, a.login_handle, a.status ' +
+    'FROM teacher_profile p JOIN auth_account a ON a.sub = p.sub ORDER BY p.activated_at DESC LIMIT 200'
   ).all();
 
   return jsonResponse({
