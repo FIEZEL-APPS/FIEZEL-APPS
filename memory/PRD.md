@@ -41,6 +41,10 @@ PDF/CSV/anonim). Wajib: buat branch/PR baru sebelum mulai.
 - Langkah nama menampilkan pilihan peran (radio-card `data-ob-role`, i18n id+th). Guru → CTA "Masuk ke Tutor Action Center", melompati tujuan/penempatan/jadwal, `role` tersimpan di record onboarding; `afterOnboardingExit('home')` membaca `FiezelOnboarding.storedRole` → `state.preferences.role` + `go('tutor')`. Home: seksi "Ruang guru" dengan kartu Tutor di depan untuk guru.
 - Catatan: ini pemilihan PERAN, bukan autentikasi; login akun tetap lewat gerbang Puter yang sudah ada.
 
+## Kode Kelas + Home/taskbar polish (2026-09-03)
+- **Kode kelas** `FZ-XXXXXX` (tanpa 0/O/1/I): dibuat otomatis per kelas (`makeClassCode`), tampil + "Salin kode" di header Tutor. Murid mengetiknya di langkah nama onboarding (field opsional, tersembunyi untuk Guru) → tersimpan `classCode` di record onboarding. Saat diagnostic selesai: `pushToClass()` → `FiezelTutorActionCenter.ingestLearnerResult` (perangkat sama; upsert per nama) + toast; kode hasil learner menyertakan `cls` sehingga saat guru menempel kode hasil, murid otomatis masuk ke kelas berkode (lintas perangkat).
+- **Home**: panel "Alur belajar" (Today Plan + Tutor + undangan duel) dipindah ke atas skill hub sebagai etalase; `features/learner-flow/home-polish.css` (dimuat terakhir, `#app`-scoped): kartu gradien kuning/gelap dengan orb, hover lift; taskbar jadi pil kaca (blur 18px) dengan item aktif gelap + penanda kuning meluncur; reduced-motion aman.
+
 ## Backlog / Next
 - P1: Suara neural untuk listening di alur learner (kini SpeechSynthesis fallback + FiezelVoiceSay bila aktif). ✅ tersambung.
 - P2: Grafik tren mingguan kelas; filter murid per status di Tutor.

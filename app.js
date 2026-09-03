@@ -6601,8 +6601,8 @@ function home(){pawStreakWatch();/* m028-06: kabar demosi yang tertahan selama k
      keping ber-cincin di hero-stats (satu-satunya tempatnya sekarang), statistik Level/Runtun
      juga sudah di keping hero, dan rencana mingguan pindah ke Peta Belajar → Ringkasan —
      tempat ia dibaca saat dicari, bukan dilewati setiap hari. -->
-${skillHubMarkup()}
 ${learnerFlowHomeMarkup()}
+${skillHubMarkup()}
 <div class="home-section-head"><div><h2>${FiezelI18n.t('home.pilih-fokus')}</h2></div><button class="text-button" onclick="go('progress')">${FiezelI18n.t('home.lihat-peta')} <i data-lucide="arrow-right"></i></button></div>
 <div class="learning-launcher">
   <button class="launch-card vocab-launch" onclick="go('vocab')"><span class="launch-icon"><i class="fz-i" data-fz-icon="vocab" aria-hidden="true"></i></span><span><small>${FiezelI18n.t('home.kartu-vocab',{jumlah:activeV.length.toLocaleString(),level:esc(activeLevel)})}</small><b>Vocabulary</b></span><i data-lucide="arrow-up-right"></i></button>
