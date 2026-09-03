@@ -131,6 +131,7 @@ jobs:
           node social-api-contract-test.js
           node social-frontend-test.js
           node social-schema-contract-test.js
+          node social-invite-link-test.js
           node audio-locale-guard-test.js
           node id-golden-snapshot-test.js
           node locale-enum-test.js
