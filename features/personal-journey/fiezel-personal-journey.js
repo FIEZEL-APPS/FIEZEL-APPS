@@ -61,6 +61,10 @@
       id: 'it', label: 'journey.goal-it-label',
       prerequisites: ['journey.goal-it-p1', 'journey.goal-it-p2', 'journey.goal-it-p3']
     },
+    campus: {
+      id: 'campus', label: 'journey.goal-campus-label',
+      prerequisites: ['journey.goal-campus-p1', 'journey.goal-campus-p2', 'journey.goal-campus-p3']
+    },
     scholarship: {
       id: 'scholarship', label: 'journey.goal-scholarship-label',
       prerequisites: ['journey.goal-scholarship-p1', 'journey.goal-scholarship-p2', 'journey.goal-scholarship-p3']
@@ -70,6 +74,10 @@
       // Roadmap melarang prediksi skor. Yang boleh disebut hanya prasyarat.
       prerequisites: ['journey.goal-exam-p1', 'journey.goal-exam-p2', 'journey.goal-exam-p3'],
       note: 'journey.goal-exam-note'
+    },
+    everyday: {
+      id: 'everyday', label: 'journey.goal-everyday-label',
+      prerequisites: ['journey.goal-everyday-p1', 'journey.goal-everyday-p2', 'journey.goal-everyday-p3']
     }
   };
   var DEFAULT_GOAL = 'school';
