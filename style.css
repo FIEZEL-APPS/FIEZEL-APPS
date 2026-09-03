@@ -1804,6 +1804,12 @@ body.daily-locked{overflow:hidden}
 
 /* ---------- Goal Selection (Step 2) ---------- */
 .fiezel-goal-grid{display:flex;flex-direction:column;gap:8px;width:100%}
+/* Pilihan peran (Murid / Guru) di langkah nama onboarding. */
+.fiezel-role-label{margin:14px 0 8px;font-size:.82rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--fz-ink-muted,var(--muted))}
+.fiezel-role-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;margin-bottom:12px}
+.fiezel-role-card{min-height:96px}
+.fiezel-role-card span{font-size:.8rem;line-height:1.4}
+@media (max-width:420px){.fiezel-role-grid{grid-template-columns:1fr}}
 /* Card Selection (bagian 14): border->gold, bg->soft, scale 1->1.035->1, 300-400ms. */
 /* align-items dipaksa flex-start: aturan dasar `button{display:inline-flex;align-items:center}`
    di kepala berkas ini menang atas text-align, jadi tanpa baris ini judul dan penjelasan

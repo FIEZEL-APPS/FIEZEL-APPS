@@ -37,6 +37,10 @@ PDF/CSV/anonim). Wajib: buat branch/PR baru sebelum mulai.
 - **Duel Belajar** (`features/learner-flow/fiezel-duel.js`, tab "Duel" di alur belajar): 8 soal × 15 detik, poin 100 + bonus cepat (≤50) + bonus beruntun (+20); salah tetap dijelaskan polanya. Tanpa server: tantangan = kode/link `?duel=KODE` (seed sama → soal identik); teman buka link → Duel tab auto-terbuka → main → head-to-head → kode balasan → papan skor di pembuat. Mode "Main berdua di satu HP" (hot-seat bergantian). Deep-link: `app.js` auto `go('learn')` + kartu "Terima Duel Belajar" di Home.
 - Terverifikasi e2e: solo → link → teman gabung (Rina 720 vs Dimas 469) → kode balasan; hot-seat dengan soal bergambar; filter murid; semua gate hijau.
 
+## Peran Murid / Guru di onboarding (2026-09-03)
+- Langkah nama menampilkan pilihan peran (radio-card `data-ob-role`, i18n id+th). Guru → CTA "Masuk ke Tutor Action Center", melompati tujuan/penempatan/jadwal, `role` tersimpan di record onboarding; `afterOnboardingExit('home')` membaca `FiezelOnboarding.storedRole` → `state.preferences.role` + `go('tutor')`. Home: seksi "Ruang guru" dengan kartu Tutor di depan untuk guru.
+- Catatan: ini pemilihan PERAN, bukan autentikasi; login akun tetap lewat gerbang Puter yang sudah ada.
+
 ## Backlog / Next
 - P1: Suara neural untuk listening di alur learner (kini SpeechSynthesis fallback + FiezelVoiceSay bila aktif). ✅ tersambung.
 - P2: Grafik tren mingguan kelas; filter murid per status di Tutor.
