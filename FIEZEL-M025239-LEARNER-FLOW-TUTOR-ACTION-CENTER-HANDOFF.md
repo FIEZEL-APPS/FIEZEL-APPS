@@ -1,8 +1,8 @@
-# m025-238 — Alur belajar murid (Learner Flow) + Tutor Action Center
+# m025-239 — Alur belajar murid (Learner Flow) + Tutor Action Center
 
 Dokumen serah-terima untuk PR #323 (branch `conflict_030926_0820`). Rilis ini menambah dua
 layar baru (`learn` dan `tutor`) beserta modul pendukungnya, dan menaikkan nomor build ke
-**m025-238** lewat arbiter.
+**m025-239** lewat arbiter (lihat bagian 4: nomornya sempat m025-238 sampai PR #324 mengklaimnya lebih dulu di `main`).
 
 Kewenangan rilis tetap di **OWNER**. Dokumen ini ditulis dari sisi yang mengerjakan patch,
 jadi ia mencatat apa yang sudah terbukti oleh gerbang dan — sama pentingnya — apa yang
@@ -118,13 +118,13 @@ tambahan liar.
 | `features/i18n/copy-id-feat-b.js`, `copy-th-feat-b.js` | kunci `campus`/`everyday`; label exam diperketat |
 | `id-golden-baseline.json` | baseline emas Indonesia ditulis ulang untuk naskah di atas |
 | `memory/PRD.md` | PRD menyusul dua layar baru |
-| `sw.js`, `core-config.js`, `features/neural-voice/fiezel-diag-panel.js`, `coordination/BUILD-VERSION.json` | m025-237 → **m025-238** lewat `node tools/bump-build.mjs` |
+| `sw.js`, `core-config.js`, `features/neural-voice/fiezel-diag-panel.js`, `coordination/BUILD-VERSION.json` | m025-237 → m025-238 → **m025-239** lewat `node tools/bump-build.mjs` |
 | `.gitignore` | pola rahasia (`*.env`, `*.pem`, `*.key`, `credentials.json`, `.credentials`) |
 | `.gitconfig`, `.emergent/emergent.yml`, `.emergent/cron/webhook-crons` | artefak lingkungan agen, bukan kode produk |
 
 ---
 
-## 4. Nomor build — m025-238, lewat arbiter
+## 4. Nomor build — m025-239, lewat arbiter
 
 Nomor build **tidak** diketik tangan. `node tools/bump-build.mjs "<alasan>"` yang menulis
 keempat tempat, sesuai `protocol` di `coordination/BUILD-VERSION.json`.
@@ -135,27 +135,36 @@ tunggalnya di m025-237, sehingga assert A `coordination-guard-test.js` merah (23
 pesan `sumber=m025-237 terpasang={...m025-238}`. Repo ini punya **empat** tempat nomor build,
 bukan tiga — dan satu-satunya cara menjaganya koheren adalah lewat arbiter.
 
-Arbiter mengambil dasar dari `origin/main` (m025-237), menaikkan satu, dan memeriksa riwayat
-`origin/main` apakah nomor itu pernah diklaim jalur lain. **m025-238 belum pernah diklaim**,
-jadi tidak ada yang dilompati dan hasilnya tetap m025-238 — sama dengan yang sudah terpasang
-di tiga penanda. Yang berubah karena itu hanya berkas sumbernya:
+### Kenapa akhirnya 239, bukan 238
+
+Perbaikan pertama menyelaraskan keempat tempat di **m025-238**: saat itu dasar dari
+`origin/main` adalah m025-237, naik satu jadi 238, dan 238 belum pernah diklaim di hulu.
+
+Lalu **PR #324 lebih dulu merge ke `main` dan memakai m025-238** untuk rilis gestur swipe
+back iOS (`FIEZEL-M025238-SWIPE-BACK-GESTUR-IOS-HANDOFF.md`). Sejak detik itu 238 bukan lagi
+milik PR ini — dan membiarkannya berarti **satu SW_REV memayungi dua isi berbeda**, persis
+kegagalan lapangan yang melahirkan arbiter ini (lihat komentar kepala `tools/bump-build.mjs`).
+
+Jadi `main` di-merge masuk dan arbiter dijalankan lagi. Ia mengambil dasar dari hulu yang
+sudah bergerak (m025-238), menaikkan satu, dan mendarat di **m025-239**. Tidak ada nomor yang
+diketik tangan di sepanjang jalan itu.
+
+Ini bukan kecelakaan yang lolos — ini alat yang bekerja sebagaimana dirancang. Tabrakannya
+jatuh di berkas JSON delapan baris, bukan di `sw.js`/`style.css`, dan biayanya satu merge
+plus satu perintah.
 
 ```
-sw.js: m025-238 -> m025-238
-core-config.js: m025-238 -> m025-238
-features/neural-voice/fiezel-diag-panel.js: m025-238 -> m025-238
-coordination/BUILD-VERSION.json: m025-238
+coordination/BUILD-VERSION.json: m025-239
 Selaras. Commit keempat berkas bersama-sama.
 ```
 
-Nol penanda build berubah nilainya, jadi **nol murid mengunduh ulang shell cache** karena
-perbaikan ini. `claimedBy` diperbarui manual ke sesi ini (arbiter tidak menulis field itu;
-sebelumnya masih tertinggal atas nama jalur i18n `perplexity-computer`), dan `reason` diisi
-alasan nyata rilis ini — `coordination-guard-test.js` menuntut panjangnya ≥ 30 karakter.
+`claimedBy` diperbarui manual ke sesi ini (arbiter tidak menulis field itu; sebelumnya masih
+tertinggal atas nama jalur i18n `perplexity-computer`), dan `reason` diisi alasan nyata rilis
+ini — `coordination-guard-test.js` menuntut panjangnya ≥ 30 karakter.
 
-m025-238 juga angka yang **wajib**, bukan sekadar boleh: `A11 Release Readiness Auditor`
-menuntut `DIAG_BUILD` head tepat +1 dari base (`m025-237`). Menaikkannya lebih tinggi untuk
-"aman" justru memerahkan A11.
+m025-239 juga angka yang **wajib**, bukan sekadar boleh: `A11 Release Readiness Auditor`
+menuntut `DIAG_BUILD` head tepat +1 dari base. Base kini `main` yang membawa m025-238, jadi
+head harus 239 — bertahan di 238 (atau melompat lebih tinggi) sama-sama memerahkan A11.
 
 ---
 
