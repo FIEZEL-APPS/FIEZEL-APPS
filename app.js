@@ -5452,6 +5452,8 @@ function openApp(){
   // sebelum rilis ini). Dibersihkan sekali di sini supaya .app/.bottomnav tidak tetap
   // tersembunyi oleh aturan CSS yang sekarang tidak pernah dipasang lagi.
   document.body?.classList?.remove?.('notification-locked');notifyAppUpdateIfNew();render();
+  // Tautan undangan Duel Belajar (?duel=KODE): langsung buka alur belajar tab Duel.
+  try{if(new URL(location.href).searchParams.get('duel')&&state.view!=='learn')go('learn')}catch{}
   // Layar utama sudah tergambar - INI momen yang benar untuk mengambil tumpukan berat.
   // Mengambilnya lebih awal (mis. begitu DOM siap) justru merebut pita dari app.js dan
   // ~2,7 MB JSON kontennya di jaringan seluler, sehingga penghematannya hilang seluruhnya.
@@ -9895,11 +9897,13 @@ function nextSessionPanelMarkup(){
 function learnerFlowView(){setApp('<div id="fzLearnerFlow" class="learner-flow-shell"></div>');const mod=self.FiezelLearnerFlow;if(!mod){$('fzLearnerFlow').innerHTML='<p class="muted">Modul alur belajar belum termuat.</p>';return}mod.mount($('fzLearnerFlow'),{toast:showToast,appVersion:APP_VERSION,learnerName,afterRender:enhanceUI})}
 function tutorCenterView(){setApp('<div id="fzTutorCenter" class="tutor-center-shell"></div>');const mod=self.FiezelTutorActionCenter;if(!mod){$('fzTutorCenter').innerHTML='<p class="muted">Modul Tutor Action Center belum termuat.</p>';return}mod.mount($('fzTutorCenter'),{toast:showToast,afterRender:enhanceUI})}
 function learnerFlowHomeMarkup(){
-  const mod=self.FiezelLearnerFlow;let plan=null,lf=null;
+  const mod=self.FiezelLearnerFlow;let plan=null,lf=null,invite=null;
   try{lf=mod?mod.load():null;plan=lf&&lf.plan&&lf.plan.date===new Date().toISOString().slice(0,10)?lf.plan:null}catch(_){}
+  try{const code=new URL(location.href).searchParams.get('duel');invite=code&&self.FiezelDuel?self.FiezelDuel.decode(code):null}catch(_){}
   const sub=plan?`Rencana hari ini — ${plan.minutes} menit · ${plan.done.length}/${plan.blocks.length} sesi selesai`:lf&&lf.diagnostic?'Rencana hari ini siap disusun dari skill map kamu':'Pilih tujuan → 5 soal singkat → rencana hari ini';
+  const inviteCard=invite?`<button class="launch-card duel-invite-card" onclick="go('learn')" data-testid="home-duel-invite"><span class="launch-icon"><i class="fz-i" data-fz-icon="speaking" aria-hidden="true"></i></span><span><small>${esc(invite.from||'Teman')} menantangmu · ${invite.score} poin</small><b>Terima Duel Belajar</b></span><i data-lucide="arrow-up-right"></i></button>`:'';
   return `<div class="home-section-head"><div><h2>Alur belajar</h2></div></div>
-<div class="learning-launcher learner-flow-launcher">
+<div class="learning-launcher learner-flow-launcher">${inviteCard}
   <button class="launch-card learn-launch" onclick="go('learn')" data-testid="home-learn-flow"><span class="launch-icon"><i class="fz-i" data-fz-icon="grammar" aria-hidden="true"></i></span><span><small>${esc(sub)}</small><b>Today Plan</b></span><i data-lucide="arrow-up-right"></i></button>
   <button class="launch-card tutor-launch" onclick="go('tutor')" data-testid="home-tutor-center"><span class="launch-icon"><i class="fz-i" data-fz-icon="map" aria-hidden="true"></i></span><span><small>Dari pola kesalahan ke rencana mengajar</small><b>Tutor Action Center</b></span><i data-lucide="arrow-up-right"></i></button>
 </div>`;

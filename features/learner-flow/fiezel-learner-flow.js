@@ -193,6 +193,7 @@
   function mount(el, options) {
     mountEl = el; env = options || {}; st = load();
     if (st.goal && st.step === 'goal') st.step = st.diagnostic ? 'plan' : 'diagnostic';
+    try { if (new URL(location.href).searchParams.get('duel')) st.tab = 'duel'; } catch (_) {}
     el.addEventListener('click', onClick);
     el.addEventListener('change', onChange);
     render();
@@ -200,12 +201,14 @@
 
   function render() {
     if (!mountEl) return;
-    var tabs = [['flow', 'Alur belajar'], ['summary', 'Ringkasan'], ['backup', 'Progres & backup']];
+    var tabs = [['flow', 'Alur belajar'], ['duel', 'Duel'], ['summary', 'Ringkasan'], ['backup', 'Progres & backup']];
     var html = '<section class="lf" data-testid="learner-flow">' +
       '<header class="lf-head"><div><p class="lf-kicker">Practice pathway</p><h1>Belajar hari ini</h1></div>' +
       '<nav class="lf-tabs" role="tablist">' + tabs.map(function (t) { return '<button type="button" role="tab" class="lf-tab' + (st.tab === t[0] ? ' is-active' : '') + '" data-lf="tab" data-tab="' + t[0] + '" data-testid="lf-tab-' + t[0] + '">' + t[1] + '</button>'; }).join('') + '</nav></header>' +
-      (st.tab === 'summary' ? summaryView() : st.tab === 'backup' ? backupView() : flowView()) + '</section>';
+      (st.tab === 'summary' ? summaryView() : st.tab === 'backup' ? backupView() : st.tab === 'duel' ? '<div id="lfDuelHost" data-testid="lf-duel-host"></div>' : flowView()) + '</section>';
     mountEl.innerHTML = html;
+    if (st.tab === 'duel') { var D = root.FiezelDuel, host = mountEl.querySelector('#lfDuelHost'); if (D && host) D.mount(host, env); else if (host) host.innerHTML = '<p class="lf-muted">Modul Duel belum termuat.</p>'; }
+    else if (root.FiezelDuel && root.FiezelDuel.unmount) root.FiezelDuel.unmount();
     if (env.afterRender) try { env.afterRender(); } catch (_) {}
   }
 
@@ -245,6 +248,9 @@
   }
 
   function contextBlock(item, showTranscript) {
+    if (item.contextKind === 'picture' && item.picture) {
+      return '<div class="lf-picture" role="img" aria-label="Gambar: ' + esc(item.pictureAlt || '') + '" data-testid="lf-picture"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + item.picture + '</svg></div>';
+    }
     if (!item.context) return '';
     if (item.contextKind === 'dialogue') {
       return '<div class="lf-context lf-dialogue"><div class="lf-context-head"><span>Dialog pendek</span>' +

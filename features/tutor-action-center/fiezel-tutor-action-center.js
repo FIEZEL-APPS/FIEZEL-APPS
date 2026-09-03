@@ -335,13 +335,19 @@
   }
 
   function studentsView(c) {
+    var recs = c.students.map(function (s) { return { s: s, r: studentRecommendation(s) }; });
+    var counts = {}; recs.forEach(function (x) { counts[x.r.status] = (counts[x.r.status] || 0) + 1; });
+    var filter = st.studentFilter || 'all';
+    var chips = [['all', 'Semua', recs.length]].concat(['unstable', 'light', 'away', 'growing', 'stable'].map(function (k) { return [k, STATUS[k], counts[k] || 0]; }));
+    var shown = recs.filter(function (x) { return filter === 'all' || x.r.status === filter; });
     return '<div class="tac-card" data-testid="tac-students"><h2>Rekomendasi per murid</h2><p class="tac-muted">Bahasa suportif: “perlu review”, “belum stabil”, “sedang berkembang” — bukan label murid lemah/gagal.</p>' +
-      '<ul class="tac-students">' + c.students.map(function (s) {
-        var r = studentRecommendation(s);
+      '<div class="tac-filters" role="tablist" data-testid="tac-student-filters">' + chips.map(function (ch) { return '<button type="button" class="tac-filter' + (filter === ch[0] ? ' is-on' : '') + '" data-tac="filter" data-filter="' + ch[0] + '" data-testid="tac-filter-' + ch[0] + '"' + (ch[2] === 0 && ch[0] !== 'all' ? ' disabled' : '') + '>' + esc(ch[1]) + ' <em>' + ch[2] + '</em></button>'; }).join('') + '</div>' +
+      (shown.length ? '<ul class="tac-students">' + shown.map(function (x) {
+        var s = x.s, r = x.r;
         return '<li class="is-' + r.status + '" data-testid="tac-student-' + s.id + '"><div class="tac-student-head"><b>' + esc(s.name) + '</b><span class="tac-status">' + esc(r.statusLabel) + '</span></div>' +
           '<p><b>Kekuatan:</b> ' + esc(r.strengths.join(', ') || 'belum ada bukti') + ' · <b>Perlu review:</b> ' + esc(r.review.join(', ') || '—') + '</p>' +
           '<p><b>Saran:</b> ' + esc(r.suggestion) + (r.status === 'away' ? ' · terakhir aktif ' + r.inactiveDays + ' hari lalu' : '') + '</p></li>';
-      }).join('') + '</ul></div>' +
+      }).join('') + '</ul>' : '<p class="tac-muted" data-testid="tac-students-empty">Tidak ada murid dengan status ini.</p>') + '</div>' +
       '<form class="tac-card tac-form" data-tac-form="add-student" data-testid="tac-add-student-form"><h3>Tambah murid dari kode hasil</h3><p class="tac-muted">Murid menyalin kode dari Belajar hari ini → Ringkasan. Kode hanya berisi nama depan + akurasi per skill.</p>' +
       '<textarea name="code" rows="2" placeholder="Tempel kode hasil di sini" data-testid="tac-student-code"></textarea>' +
       '<div class="tac-actions"><button type="submit" class="tac-primary" data-testid="tac-add-student-submit">Tambah murid</button></div></form>';
@@ -367,6 +373,7 @@
     var act = btn.getAttribute('data-tac'), c = cls(), B = bank();
     switch (act) {
       case 'tab': st.tab = btn.getAttribute('data-tab'); st.preview = null; break;
+      case 'filter': st.studentFilter = btn.getAttribute('data-filter'); break;
       case 'new-class': st.creating = true; break;
       case 'cancel-create': st.creating = false; break;
       case 'seed-demo': { var k = seedClass(); st.classes.push(k); st.activeClassId = k.id; st.creating = false; st.tab = 'map'; toast('Kelas demo dimuat: 18 murid.'); break; }
