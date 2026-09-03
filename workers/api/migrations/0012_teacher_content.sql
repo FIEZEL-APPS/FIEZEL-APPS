@@ -1,6 +1,9 @@
 -- 0012_teacher_content.sql — hierarki konten guru (subject/course/topic/lesson),
--- bank soal, dan penugasan. Database tujuan: fiezel-core (binding CORE_DB).
--- Penerapan runtime + gerbang kesetaraan: sama dengan 0011_auth_roles.sql.
+-- bank soal, penugasan, dan bukti belajar per-lesson. Database tujuan:
+-- fiezel-core (binding CORE_DB).
+--
+-- DITURUNKAN OTOMATIS dari workers/api/auth-schema.js oleh
+-- `node tools/gen-auth-migrations.mjs`. JANGAN sunting berkas ini langsung.
 --
 -- ==========================================================================
 -- SATU TABEL UNTUK EMPAT TINGKAT HIERARKI
@@ -25,8 +28,8 @@
 -- lesson+tipe+batang soal ternormalisasi (csv-core.dedupKey). Keunikannya
 -- ber-`teacher_sub` dan bukan global: dua guru berhak menulis soal yang sama.
 --
--- `content_source` ada di kedua tabel dan nilainya SELALU 'TEACHER' di sini.
--- Kolomnya tetap eksplisit karena Braincore membacanya untuk memisahkan
+-- `content_source` ada di kedua tabel konten dan nilainya SELALU 'TEACHER' di
+-- sini. Kolomnya tetap eksplisit karena Braincore membacanya untuk memisahkan
 -- kalibrasi item guru dari prior bank inti (§17) — satu soal guru yang menjebak
 -- tidak boleh menggeser prior yang dipakai seluruh pengguna FIEZEL.
 --
@@ -35,6 +38,11 @@
 -- kode: konten impor yang belum tervalidasi TIDAK BOLEH sampai ke murid (§13),
 -- dan default database adalah pertahanan terakhir kalau ada jalur tulis yang
 -- lupa menyetelnya.
+--
+-- `tc_lesson_evidence` memuat BENAR/SALAH per soal per murid — TANPA teks
+-- jawaban, TANPA transkrip (larangan bab 29 berlaku penuh). Ia WITHOUT ROWID
+-- dengan PRIMARY KEY berawalan `lesson_id`, jadi pembacaan laporan kelas sudah
+-- dilayani PK-nya sendiri dan TIDAK butuh indeks tambahan.
 
 CREATE TABLE IF NOT EXISTS tc_node (
   id TEXT PRIMARY KEY,
@@ -61,9 +69,10 @@ CREATE TABLE IF NOT EXISTS tc_node (
   updated_by TEXT NOT NULL
 );
 
+-- DIPAKAI: pohon konten guru — perjalanan terpanas dasbor guru.
+-- workers/api/route-teacher.js (routeTeacherTree)
+-- 'SELECT * FROM tc_node WHERE teacher_sub = ?1 ORDER BY kind, title LIMIT 2000'
 CREATE INDEX IF NOT EXISTS ix_tc_node_owner ON tc_node(teacher_sub, kind);
-
-CREATE INDEX IF NOT EXISTS ix_tc_node_parent ON tc_node(parent_id);
 
 CREATE TABLE IF NOT EXISTS tc_question (
   id TEXT PRIMARY KEY,
@@ -89,8 +98,14 @@ CREATE TABLE IF NOT EXISTS tc_question (
   updated_by TEXT NOT NULL
 );
 
+-- DIPAKAI: soal satu lesson saat pratinjau, penerbitan, dan ekspor.
+-- workers/api/route-teacher.js (routeQuestionList, routeCsvExport)
+-- 'SELECT * FROM tc_question WHERE teacher_sub = ?1 AND lesson_id = ?2 LIMIT 1000'
 CREATE INDEX IF NOT EXISTS ix_tc_question_lesson ON tc_question(lesson_id, status);
 
+-- DIPAKAI: PENEGAK §12 — impor CSV yang sama dua kali tidak boleh menghasilkan duplikat; sekaligus melayani pembacaan konteks impor.
+-- workers/api/route-teacher.js (importContext)
+-- 'SELECT id, lesson_id, type, stem FROM tc_question WHERE teacher_sub = ?1'
 CREATE UNIQUE INDEX IF NOT EXISTS ux_tc_question_dedup ON tc_question(teacher_sub, dedup_key);
 
 CREATE TABLE IF NOT EXISTS tc_assignment (
@@ -104,6 +119,9 @@ CREATE TABLE IF NOT EXISTS tc_assignment (
   updated_at INTEGER NOT NULL
 );
 
+-- DIPAKAI: laporan kelas menelusuri penugasan milik guru pemanggil.
+-- workers/api/route-teacher.js (routeTeacherProgress)
+-- 'SELECT t.learner_sub FROM tc_assignment_target t JOIN tc_assignment a ON a.id = t.assignment_id WHERE a.lesson_id = ?1 AND a.teacher_sub = ?2'
 CREATE INDEX IF NOT EXISTS ix_tc_assignment_owner ON tc_assignment(teacher_sub, status);
 
 CREATE TABLE IF NOT EXISTS tc_assignment_target (
@@ -112,8 +130,6 @@ CREATE TABLE IF NOT EXISTS tc_assignment_target (
   assigned_at INTEGER NOT NULL,
   PRIMARY KEY (assignment_id, learner_sub)
 ) WITHOUT ROWID;
-
-CREATE INDEX IF NOT EXISTS ix_tc_target_learner ON tc_assignment_target(learner_sub);
 
 CREATE TABLE IF NOT EXISTS tc_lesson_evidence (
   lesson_id TEXT NOT NULL,
@@ -125,5 +141,3 @@ CREATE TABLE IF NOT EXISTS tc_lesson_evidence (
   day TEXT NOT NULL,
   PRIMARY KEY (lesson_id, learner_sub, question_id)
 ) WITHOUT ROWID;
-
-CREATE INDEX IF NOT EXISTS ix_tc_evidence_lesson ON tc_lesson_evidence(lesson_id);

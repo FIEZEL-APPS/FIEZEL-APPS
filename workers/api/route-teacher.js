@@ -109,16 +109,16 @@ export async function routeNodeSave(ctx) {
   const scope = body.value.scope === 'institution' ? 'institution' : 'private';
 
   await gate.db.prepare(
-    'INSERT INTO tc_node (id, kind, parent_id, teacher_sub, institution_id, scope, title, description, '
-    + 'objective, skill, level, difficulty, duration_min, tags, vocabulary, status, content_source, version, '
-    + 'created_at, created_by, updated_at, updated_by) '
-    + 'VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12,?13,?14,?15,?16,?17,?18,?19,?20,?21,?22) '
+    'INSERT INTO tc_node (id, kind, parent_id, teacher_sub, institution_id, scope, title, description, ' +
+    'objective, skill, level, difficulty, duration_min, tags, vocabulary, status, content_source, version, ' +
+    'created_at, created_by, updated_at, updated_by) ' +
+    'VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12,?13,?14,?15,?16,?17,?18,?19,?20,?21,?22) '
     // Sunting mempertahankan `status`: penyimpanan isi TIDAK boleh diam-diam
     // menurunkan konten terbit menjadi draf (murid akan kehilangan tugasnya di
     // tengah jalan), dan tidak boleh menaikkan draf menjadi terbit tanpa lewat
     // /publish yang menjalankan checkPublishReady.
-    + 'ON CONFLICT(id) DO UPDATE SET title=?7, description=?8, objective=?9, skill=?10, level=?11, '
-    + 'difficulty=?12, duration_min=?13, tags=?14, vocabulary=?15, scope=?6, version=?18, updated_at=?21, updated_by=?22'
+    + 'ON CONFLICT(id) DO UPDATE SET title=?7, description=?8, objective=?9, skill=?10, level=?11, ' +
+    'difficulty=?12, duration_min=?13, tags=?14, vocabulary=?15, scope=?6, version=?18, updated_at=?21, updated_by=?22'
   ).bind(
     id, n.kind, parent ? parent.id : null, gate.sub, gate.institutionId, scope, n.title, n.description,
     n.objective, n.skill, n.level, n.difficulty, n.duration_min, jsonCol(n.tags), jsonCol(n.vocabulary),
@@ -250,11 +250,11 @@ export async function routeQuestionSave(ctx) {
 
   try {
     await gate.db.prepare(
-      'INSERT INTO tc_question (id, lesson_id, teacher_sub, type, stem, options, answer, explanation, example, '
-      + 'skill, level, difficulty, tags, status, content_source, version, dedup_key, created_at, created_by, '
-      + 'updated_at, updated_by) VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12,?13,?14,?15,?16,?17,?18,?19,?20,?21) '
-      + 'ON CONFLICT(id) DO UPDATE SET type=?4, stem=?5, options=?6, answer=?7, explanation=?8, example=?9, '
-      + 'skill=?10, level=?11, difficulty=?12, tags=?13, version=?16, dedup_key=?17, updated_at=?20, updated_by=?21'
+      'INSERT INTO tc_question (id, lesson_id, teacher_sub, type, stem, options, answer, explanation, example, ' +
+      'skill, level, difficulty, tags, status, content_source, version, dedup_key, created_at, created_by, ' +
+      'updated_at, updated_by) VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12,?13,?14,?15,?16,?17,?18,?19,?20,?21) ' +
+      'ON CONFLICT(id) DO UPDATE SET type=?4, stem=?5, options=?6, answer=?7, explanation=?8, example=?9, ' +
+      'skill=?10, level=?11, difficulty=?12, tags=?13, version=?16, dedup_key=?17, updated_at=?20, updated_by=?21'
     ).bind(
       id, q.lesson_id, gate.sub, q.type, q.stem, jsonCol(q.options), q.answer, q.explanation, q.example,
       q.skill, q.level, q.difficulty, jsonCol(q.tags), existing ? existing.status : CONTENT_STATUS.DRAFT,
@@ -340,17 +340,17 @@ export async function routeCsvCommit(ctx) {
     const stamp = versionStamp({ actorSub: gate.sub, nowMs: ctx.now, isCreate: entry.operation === 'create' });
     if (entry.operation === 'update') {
       writes.push(gate.db.prepare(
-        'UPDATE tc_question SET type=?3, stem=?4, options=?5, answer=?6, explanation=?7, example=?8, '
-        + 'skill=?9, level=?10, difficulty=?11, tags=?12, dedup_key=?13, version = version + 1, '
-        + 'updated_at=?14, updated_by=?15 WHERE id = ?1 AND teacher_sub = ?2'
+        'UPDATE tc_question SET type=?3, stem=?4, options=?5, answer=?6, explanation=?7, example=?8, ' +
+        'skill=?9, level=?10, difficulty=?11, tags=?12, dedup_key=?13, version = version + 1, ' +
+        'updated_at=?14, updated_by=?15 WHERE id = ?1 AND teacher_sub = ?2'
       ).bind(entry.contentId, gate.sub, q.type, q.stem, jsonCol(q.options), q.answer, q.explanation,
         q.example, q.skill, q.level, q.difficulty, jsonCol(q.tags), dedupKey(q), ctx.now, gate.sub));
     } else {
       writes.push(gate.db.prepare(
-        'INSERT INTO tc_question (id, lesson_id, teacher_sub, type, stem, options, answer, explanation, '
-        + 'example, skill, level, difficulty, tags, status, content_source, version, dedup_key, created_at, '
-        + 'created_by, updated_at, updated_by) '
-        + 'VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12,?13,?14,?15,?16,?17,?18,?19,?20,?21)'
+        'INSERT INTO tc_question (id, lesson_id, teacher_sub, type, stem, options, answer, explanation, ' +
+        'example, skill, level, difficulty, tags, status, content_source, version, dedup_key, created_at, ' +
+        'created_by, updated_at, updated_by) ' +
+        'VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12,?13,?14,?15,?16,?17,?18,?19,?20,?21)'
       ).bind(newId('Q'), q.lesson_id, gate.sub, q.type, q.stem, jsonCol(q.options), q.answer, q.explanation,
         q.example, q.skill, q.level, q.difficulty, jsonCol(q.tags), CONTENT_STATUS.DRAFT, 'TEACHER',
         stamp.version, dedupKey(q), ctx.now, gate.sub, ctx.now, gate.sub));
@@ -428,8 +428,8 @@ export async function routeAssign(ctx) {
 
   const assignmentId = newId('ASG');
   const writes = [gate.db.prepare(
-    'INSERT INTO tc_assignment (id, lesson_id, teacher_sub, class_code, due_day, status, created_at, updated_at) '
-    + 'VALUES (?1,?2,?3,?4,?5,?6,?7,?7)'
+    'INSERT INTO tc_assignment (id, lesson_id, teacher_sub, class_code, due_day, status, created_at, updated_at) ' +
+    'VALUES (?1,?2,?3,?4,?5,?6,?7,?7)'
   ).bind(assignmentId, lesson.id, gate.sub, body.value.classCode || null, body.value.dueDay || null,
     CONTENT_STATUS.PUBLISHED, ctx.now)];
 
@@ -457,8 +457,8 @@ export async function routeTeacherProgress(ctx) {
   if (!lesson) return jsonError(404, CONTENT_PROBLEM.NOT_FOUND, {}, gate.opt);
 
   const targets = await gate.db.prepare(
-    'SELECT t.learner_sub FROM tc_assignment_target t JOIN tc_assignment a ON a.id = t.assignment_id '
-    + 'WHERE a.lesson_id = ?1 AND a.teacher_sub = ?2'
+    'SELECT t.learner_sub FROM tc_assignment_target t JOIN tc_assignment a ON a.id = t.assignment_id ' +
+    'WHERE a.lesson_id = ?1 AND a.teacher_sub = ?2'
   ).bind(lessonId, gate.sub).all();
   const learners = ((targets && targets.results) || []).map((r) => r.learner_sub);
 
@@ -467,8 +467,8 @@ export async function routeTeacherProgress(ctx) {
   // apa pun menghasilkan array kosong, dan `classProgress` melaporkannya sebagai
   // nol yang jujur — bukan angka karangan.
   const rows = await gate.db.prepare(
-    'SELECT learner_sub AS learnerRef, lesson_id AS lessonId, skill, correct FROM tc_lesson_evidence '
-    + 'WHERE lesson_id = ?1 LIMIT 5000'
+    'SELECT learner_sub AS learnerRef, lesson_id AS lessonId, skill, correct FROM tc_lesson_evidence ' +
+    'WHERE lesson_id = ?1 LIMIT 5000'
   ).bind(lessonId).all();
   const evidence = ((rows && rows.results) || []).map((r) => ({ ...r, correct: Number(r.correct) === 1 }));
 

@@ -4,11 +4,14 @@
 -- CI tidak punya izin `wrangler d1 create`, jadi tabel per-pengguna hidup di
 -- fiezel-core bersama identitas & kuota — dan TETAP HARAM di fiezel-stats.
 --
+-- DITURUNKAN OTOMATIS dari workers/api/auth-schema.js oleh
+-- `node tools/gen-auth-migrations.mjs`. JANGAN sunting berkas ini langsung:
+-- ubah DDL di auth-schema.js lalu jalankan ulang generatornya.
+--
 -- PENERAPAN: token CI juga tidak bisa `wrangler d1 execute --remote`. Runtime
--- punya `ensureAuthSchema()` (workers/api/auth-schema.js) yang menerapkan DDL
--- YANG SAMA secara idempoten. Berkas ini TETAP SUMBER RESMI; gerbang
--- `auth-schema-contract-test.js` menegakkan keduanya setara pernyataan-per-
--- pernyataan (ternormalisasi).
+-- punya `ensureAuthSchema()` yang menerapkan DDL YANG SAMA secara idempoten.
+-- Berkas ini TETAP SUMBER RESMI; gerbang `auth-schema-contract-test.js`
+-- menegakkan keduanya setara pernyataan-per-pernyataan (ternormalisasi).
 --
 -- ==========================================================================
 -- KATA SANDI, DAN KENAPA IA TIDAK MELANGGAR DAFTAR KERAS BAB 29
@@ -45,6 +48,12 @@
 -- D1 tidak boleh cukup untuk memakainya. Statusnya (ACTIVE/USED/EXPIRED/REVOKED)
 -- DITURUNKAN dari kolom waktu, bukan disimpan: status tersimpan yang butuh cron
 -- untuk jadi benar akan berbohong setiap kali cron telat.
+--
+-- INDEKS: hanya SATU (`ux_auth_account_handle`), dan ia UNIQUE karena login
+-- menukar handle->akun. `friend_request`, `notification`, dan
+-- `push_subscription` SENGAJA tanpa indeks: rute yang membacanya belum ditulis,
+-- jadi indeksnya hari ini murni biaya tulis tanpa pembacaan yang dipercepat.
+-- Ia ditambahkan bersama rutenya.
 
 CREATE TABLE IF NOT EXISTS auth_account (
   sub TEXT PRIMARY KEY,
@@ -56,6 +65,9 @@ CREATE TABLE IF NOT EXISTS auth_account (
   institution_id TEXT
 );
 
+-- DIPAKAI: login menukar handle -> akun, satu-satunya jalur masuk kata sandi.
+-- workers/api/route-account.js (routeAccountLogin)
+-- 'SELECT sub, role, login_handle, status, institution_id FROM auth_account WHERE login_handle = ?1'
 CREATE UNIQUE INDEX IF NOT EXISTS ux_auth_account_handle ON auth_account(login_handle);
 
 CREATE TABLE IF NOT EXISTS auth_login_handle (
@@ -102,8 +114,6 @@ CREATE TABLE IF NOT EXISTS friend_request (
   PRIMARY KEY (from_sub, to_sub)
 ) WITHOUT ROWID;
 
-CREATE INDEX IF NOT EXISTS ix_friend_request_to ON friend_request(to_sub, status);
-
 CREATE TABLE IF NOT EXISTS notification (
   id TEXT PRIMARY KEY,
   sub TEXT NOT NULL,
@@ -115,8 +125,6 @@ CREATE TABLE IF NOT EXISTS notification (
   read_at INTEGER
 );
 
-CREATE INDEX IF NOT EXISTS ix_notification_sub ON notification(sub, created_at);
-
 CREATE TABLE IF NOT EXISTS push_subscription (
   endpoint_hash TEXT PRIMARY KEY,
   sub TEXT NOT NULL,
@@ -126,5 +134,3 @@ CREATE TABLE IF NOT EXISTS push_subscription (
   created_at INTEGER NOT NULL,
   failed_count INTEGER NOT NULL DEFAULT 0
 );
-
-CREATE INDEX IF NOT EXISTS ix_push_subscription_sub ON push_subscription(sub);

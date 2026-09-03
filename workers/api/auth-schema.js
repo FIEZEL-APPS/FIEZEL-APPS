@@ -101,7 +101,6 @@ export const AUTH_DDL = Object.freeze([
     ' resolved_day TEXT,' +
     ' PRIMARY KEY (from_sub, to_sub)' +
     ' ) WITHOUT ROWID',
-  'CREATE INDEX IF NOT EXISTS ix_friend_request_to ON friend_request(to_sub, status)',
   'CREATE TABLE IF NOT EXISTS notification (' +
     ' id TEXT PRIMARY KEY,' +
     ' sub TEXT NOT NULL,' +
@@ -112,7 +111,6 @@ export const AUTH_DDL = Object.freeze([
     ' created_at INTEGER NOT NULL,' +
     ' read_at INTEGER' +
     ' )',
-  'CREATE INDEX IF NOT EXISTS ix_notification_sub ON notification(sub, created_at)',
   'CREATE TABLE IF NOT EXISTS push_subscription (' +
     ' endpoint_hash TEXT PRIMARY KEY,' +
     ' sub TEXT NOT NULL,' +
@@ -122,7 +120,6 @@ export const AUTH_DDL = Object.freeze([
     ' created_at INTEGER NOT NULL,' +
     ' failed_count INTEGER NOT NULL DEFAULT 0' +
     ' )',
-  'CREATE INDEX IF NOT EXISTS ix_push_subscription_sub ON push_subscription(sub)'
 ]);
 
 export const TEACHER_DDL = Object.freeze([
@@ -151,7 +148,6 @@ export const TEACHER_DDL = Object.freeze([
     ' updated_by TEXT NOT NULL' +
     ' )',
   'CREATE INDEX IF NOT EXISTS ix_tc_node_owner ON tc_node(teacher_sub, kind)',
-  'CREATE INDEX IF NOT EXISTS ix_tc_node_parent ON tc_node(parent_id)',
   'CREATE TABLE IF NOT EXISTS tc_question (' +
     ' id TEXT PRIMARY KEY,' +
     ' lesson_id TEXT NOT NULL,' +
@@ -194,7 +190,6 @@ export const TEACHER_DDL = Object.freeze([
     ' assigned_at INTEGER NOT NULL,' +
     ' PRIMARY KEY (assignment_id, learner_sub)' +
     ' ) WITHOUT ROWID',
-  'CREATE INDEX IF NOT EXISTS ix_tc_target_learner ON tc_assignment_target(learner_sub)',
   'CREATE TABLE IF NOT EXISTS tc_lesson_evidence (' +
     ' lesson_id TEXT NOT NULL,' +
     ' learner_sub TEXT NOT NULL,' +
@@ -205,7 +200,6 @@ export const TEACHER_DDL = Object.freeze([
     ' day TEXT NOT NULL,' +
     ' PRIMARY KEY (lesson_id, learner_sub, question_id)' +
     ' ) WITHOUT ROWID',
-  'CREATE INDEX IF NOT EXISTS ix_tc_evidence_lesson ON tc_lesson_evidence(lesson_id)'
 ]);
 
 /** Seluruh DDL paket ini, urut terapan. */
