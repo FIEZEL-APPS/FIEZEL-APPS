@@ -170,6 +170,7 @@
     'onboarding.btn-skip-all': 'ข้าม',
     'onboarding.btn-skip-step': 'ข้ามขั้นตอนนี้',
     'onboarding.btn-placement': 'เริ่มแบบทดสอบวัดระดับ',
+    'onboarding.classcode-label': 'รหัสชั้นเรียนจากครู (ไม่บังคับ)',
     'onboarding.role-question': 'คุณเข้าใช้ในฐานะใคร?',
     'onboarding.role-aria': 'เลือกบทบาท: นักเรียนหรือครู',
     'onboarding.role-murid': 'นักเรียน',

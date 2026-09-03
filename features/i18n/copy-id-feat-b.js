@@ -173,6 +173,7 @@
     'onboarding.btn-skip-all': 'Lewati',
     'onboarding.btn-skip-step': 'Lewati langkah ini',
     'onboarding.btn-placement': 'Mulai tes penempatan',
+    'onboarding.classcode-label': 'Kode kelas dari guru (opsional)',
     'onboarding.role-question': 'Kamu masuk sebagai siapa?',
     'onboarding.role-aria': 'Pilih peran: murid atau guru',
     'onboarding.role-murid': 'Murid',

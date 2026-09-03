@@ -275,7 +275,8 @@
         name: name,
         goal: String((detail && detail.goal) || ''),
         level: String((detail && detail.level) || ''),
-        role: normalizeRole((detail && detail.role) || previous.role)
+        role: normalizeRole((detail && detail.role) || previous.role),
+        classCode: String((detail && detail.classCode) || previous.classCode || '')
       }));
     } catch (_) { /* penyimpanan penuh tidak boleh mengurung murid di onboarding */ }
   }
@@ -596,6 +597,8 @@
       + T('onboarding.nama-this-disimpan-at-hp')
       + '<p class="fiezel-role-label">' + T('onboarding.role-question') + '</p>'
       + roleMarkup(normalizeRole(role))
+      + '<label class="fiezel-field fiezel-classcode-field" data-ob-classcode-wrap' + (normalizeRole(role) === 'guru' ? ' hidden' : '') + '><span>' + T('onboarding.classcode-label') + '</span>'
+      + '<input type="text" data-ob-classcode maxlength="9" placeholder="FZ-XXXXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" data-testid="ob-class-code"></label>'
       + btn(T('onboarding.next'), 'data-ob-advance' + (clean ? '' : ' disabled'))
       + '</div>';
   }
@@ -779,6 +782,7 @@
     var localeWaitT = null;
     var typedName = storedName(target);
     var selectedRole = storedRole(target);
+    var typedClassCode = '';
     var selectedGoal = '';
     var selectedLevel = '';
     var closed = false;
@@ -1157,7 +1161,7 @@
       if (closed) return;
       closed = true;
       clearMascotTimers();
-      markCompleted(target, { at: now, via: via, locale: selectedLocale, name: typedName, goal: selectedGoal, level: selectedLevel, role: selectedRole });
+      markCompleted(target, { at: now, via: via, locale: selectedLocale, name: typedName, goal: selectedGoal, level: selectedLevel, role: selectedRole, classCode: typedClassCode });
       // Serah terima hanya pada penyelesaian sungguhan; skip/placement keluar lewat fade
       // lama (§2.3: dilewati pada kurangi-gerak dan pada jalur tes penempatan).
       var handedOff = via === 'finish' ? beginHandoff() : false;
@@ -1171,7 +1175,7 @@
       // semua jalan keluar lain berarti "lanjutkan alur pembukaan seperti biasa".
       var handler = via === 'placement' ? opts.onPlacement : opts.onFinish;
       if (typeof handler === 'function') {
-        try { handler({ name: typedName, goal: selectedGoal, level: selectedLevel, via: via, role: selectedRole }); } catch (_) {}
+        try { handler({ name: typedName, goal: selectedGoal, level: selectedLevel, via: via, role: selectedRole, classCode: typedClassCode }); } catch (_) {}
       }
     }
     function remove() {
@@ -1310,7 +1314,15 @@
               });
               var next = host.querySelector('[data-ob-advance]');
               if (next) next.textContent = selectedRole === 'guru' ? T('onboarding.role-guru-cta') : T('onboarding.next');
+              var wrap = host.querySelector('[data-ob-classcode-wrap]');
+              if (wrap) { if (selectedRole === 'guru') wrap.setAttribute('hidden', ''); else wrap.removeAttribute('hidden'); }
             });
+          });
+          var codeInput = host.querySelector('[data-ob-classcode]');
+          if (codeInput) codeInput.addEventListener('input', function () {
+            var v = String(codeInput.value || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+            if (v.indexOf('FZ') === 0) v = v.slice(2);
+            typedClassCode = v.length === 6 ? 'FZ-' + v : '';
           });
           nameInput.addEventListener('keydown', function (event) {
             if (event && (event.key === 'Enter' || event.keyCode === 13)) {
