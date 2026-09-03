@@ -5987,7 +5987,28 @@ function pawStreakWatch(){const now=Number(state.streak)||0;
 // fungsi yang sama dengan {viaHistory:true}: transisi, uiSfx('nav'), preferensi motion, dan
 // prefers-reduced-motion di bawah ini berlaku persis sama, tetapi TIDAK ada entri kedua
 // yang didorong - itulah yang mencegah gelung back->push->back.
-function go(v,opts){if(!VALID_VIEWS.has(v)){showToast(FiezelI18n.t('nav.halaman-tak-tersedia'));return false}uiSfx('nav');dropStages();if(opts?.viaHistory!==true)pushBackNavView(v);const swap=()=>{state.view=v;save();render()};if(document.startViewTransition&&state.preferences?.motion!==false&&!prefersReducedMotion())document.startViewTransition(swap);else swap();return true} window.go=go;
+/* m025-238: state.view dipindah KELUAR dari callback transisi.
+   Sampai rilis ini satu-satunya tempat state.view berubah adalah swap(), dan swap()
+   dijalankan oleh document.startViewTransition() - yaitu ASINKRON, satu frame atau lebih
+   sesudah go() kembali. Sepanjang jendela itu state.view masih menunjuk layar LAMA
+   padahal aplikasi sudah berpindah.
+
+   Jalur maju tidak peduli: ia hanya MENULIS state.view. Jalur kembali MEMBACANYA untuk
+   mengambil keputusan - features/ui/fiezel-back-nav.js membandingkan entry.view dengan
+   view sekarang untuk memutuskan apakah sebuah lapisan masih hidup, dan membandingkan
+   tujuan dengan view sekarang untuk memutuskan apakah perlu berpindah. Dengan state.view
+   yang tertinggal, lapisan yang MASIH di layar terbaca mati dan entri yang tujuannya
+   BEDA terbaca sama - dua-duanya berakhir sebagai tekanan kembali yang tidak mengubah
+   apa pun. Terukur di Chromium: sesudah satu tekanan kembali mendarat di beranda,
+   currentView() masih menjawab 'vocab'. Di perangkat murid yang render-nya jauh lebih
+   lambat, jendela itu jauh lebih lebar, dan beberapa tekanan berturut-turut bisa habis
+   tanpa satu pun perubahan di layar - persis rasa 'swipe back macet lalu tiba-tiba jalan'.
+
+   Menaikkan state.view ke sini aman: yang menggambar ulang DOM hanya render(), dan
+   render() tetap di dalam callback. Cuplikan layar LAMA yang diambil startViewTransition
+   karena itu tetap utuh - yang berubah hanya kapan sumber kebenaran ikut maju.
+   pushBackNavView() tetap dipanggil SEBELUMNYA, sebab yang ia rekam adalah view ASAL. */
+function go(v,opts){if(!VALID_VIEWS.has(v)){showToast(FiezelI18n.t('nav.halaman-tak-tersedia'));return false}uiSfx('nav');dropStages();if(opts?.viaHistory!==true)pushBackNavView(v);state.view=v;const swap=()=>{save();render()};if(document.startViewTransition&&state.preferences?.motion!==false&&!prefersReducedMotion())document.startViewTransition(swap);else swap();return true} window.go=go;
 function pushBackNavView(v){try{return self.FiezelBackNav?.pushView?.(v)===true}catch{return false}}
 /* ---- m025-117 lapisan layar-di-dalam-view (stage) ---------------------------------
  * OWNER: "misalnya sudah masuk ke dalam folder, dan ingin kembali, ketika swipe back malah
