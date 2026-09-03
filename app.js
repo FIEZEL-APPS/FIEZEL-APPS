@@ -6621,6 +6621,7 @@ function home(){pawStreakWatch();/* m028-06: kabar demosi yang tertahan selama k
      tempat ia dibaca saat dicari, bukan dilewati setiap hari. -->
 ${skillHubMarkup()}
 ${learnerFlowHomeMarkup()}
+${socialHomeMarkup()}
 <div class="home-section-head"><div><h2>${FiezelI18n.t('home.pilih-fokus')}</h2></div><button class="text-button" onclick="go('progress')">${FiezelI18n.t('home.lihat-peta')} <i data-lucide="arrow-right"></i></button></div>
 <div class="learning-launcher">
   <button class="launch-card vocab-launch" onclick="go('vocab')"><span class="launch-icon"><i class="fz-i" data-fz-icon="vocab" aria-hidden="true"></i></span><span><small>${FiezelI18n.t('home.kartu-vocab',{jumlah:activeV.length.toLocaleString(),level:esc(activeLevel)})}</small><b>Vocabulary</b></span><i data-lucide="arrow-up-right"></i></button>
@@ -11011,7 +11012,33 @@ async function refreshSocialSummaryCard(){
   socialSummaryAt=Date.now();
   socialSummaryPaint();
 }
-function socialSummaryPaint(){const el=$('socialSummaryCard');if(el&&state.view==='progress'){el.innerHTML=socialSummaryBody();enhanceUI()}}
+function socialSummaryPaint(){const el=$('socialSummaryCard');if(el&&state.view==='progress'){el.innerHTML=socialSummaryBody();enhanceUI()}const home=$('socialHomeSlot');if(home&&state.view==='home'){home.innerHTML=socialHomeBody();enhanceUI()}}
+/* ---------------------------------------------------------------- pintu masuk Online & Teman di Home */
+// Kenapa Home, bukan slot nav keenam: bottom nav lima slot itu hasil penataan yang disengaja
+// (m029 FOCUS), dan di 390px slot keenam memampatkan labelnya. Kartu ini memakai pola launcher
+// yang sama dengan learnerFlowHomeMarkup, jadi tidak ada bahasa tata letak baru.
+//
+// Bedanya dengan kartu ringkas di Peta Belajar: DI HOME kartu ini MENYEMBUNYIKAN DIRI saat
+// jalur online mati (flag server off, atau perangkat offline). Peta Belajar boleh menjelaskan
+// keadaan karena murid ke sana untuk memeriksa; Home dilewati setiap hari, dan pintu yang
+// selalu buntu di sana melatih murid mengabaikan Home. Fail-closed: cache kosong = belum ada
+// jawaban = belum ada pintu.
+function socialHomeMarkup(){
+  if(!socialCore())return '';
+  setTimeout(refreshSocialSummaryCard,0);
+  return `<div id="socialHomeSlot">${socialHomeBody()}</div>`;
+}
+function socialHomeBody(){
+  const c=socialSummaryCache;
+  if(!c||c.kind==='off'||c.kind==='offline')return '';
+  const sub=c.kind==='profile'
+    ?FiezelI18n.t('social.home-sub-profile',{handle:esc(c.handle||''),pb:c.pb==null?'—':c.pb})
+    :FiezelI18n.t('social.home-sub-cta');
+  return `<div class="home-section-head"><div><h2>${FiezelI18n.t('social.summary-title')}</h2></div></div>
+<div class="learning-launcher social-home-launcher">
+  <button class="launch-card social-launch" onclick="go('online')" data-testid="home-online-teman"><span class="launch-icon"><i data-lucide="users" aria-hidden="true"></i></span><span><small>${sub}</small><b>${FiezelI18n.t('social.home-open')}</b></span><i data-lucide="arrow-up-right"></i></button>
+</div>`;
+}
 /* ---------------------------------------------------------------- kait bukti (evidence ingest) */
 // Ledger lesson yang SUDAH dilaporkan lesson_mastered — di localStorage terpisah, bukan di
 // state belajar (sanitizeState tidak perlu tahu; hilang ledger = paling buruk event ganda,
