@@ -272,27 +272,11 @@ jobs:
           node fiezel-meta-learning-test.js
           node fiezel-evolution-ledger-test.js
           node fiezel-self-refine-test.js
-          # Gerbang brain-learning-infra (PR #226) + gerbang i18n yang belum terdaftar
-          # (dituntut gate-registry-test: terdaftar atau dikecualikan beralasan).
-          node fiezel-stat-gate-test.js
-          node brain-manifest-test.js
-          node brain-config-test.js
-          node learning-metrics-test.js
-          node metrics-digest-test.js
-          node learning-telemetry-test.js
-          node learning-lane-test.js
-          node braincore-evidence-test.js
-          node braincore-learner-identity-test.js
-          node app-telemetry-wiring-test.js
-          node analytics-dedup-test.js
-          node analytics-stable-id-guard-test.js
-          node adaptivity-simulation-v3-hardened-test.js
-          node audio-locale-guard-test.js
-          node id-golden-snapshot-test.js
-          node locale-enum-test.js
-          node social-api-contract-test.js
-          node social-frontend-test.js
-          node social-schema-contract-test.js
+          # Gerbang brain-learning-infra (PR #226) yang belum terdaftar (dituntut
+          # gate-registry-test: terdaftar atau dikecualikan beralasan). Gerbang i18n yang
+          # semula juga terdaftar di sini sudah punya registrasi asli di SLOT 10 di atas;
+          # duplikatnya dibuang (temuan PR #336: 19 gerbang terdaftar berulang, ±2m24s
+          # terbuang tiap run) — nol gerbang dihapus, hanya salinannya.
           node fiezel-evolution-loop-test.js
           node core-worker-contract-test.js
           # m025-201: dua gerbang penutup lima celah Core Brain (audit m025-201).
@@ -592,30 +576,12 @@ jobs:
           # kuota, endpoint hidup tanpa kill switch yang terbaca) dan bersih pada keadaan repo
           # hari ini. Nol jaringan; fixture ditulis ke direktori temporer OS.
           node rollout-plan-test.js
-          # m025-190: 15 gerbang tertinggal belum terdaftar (temuan gate-registry saat CI
-          # main merah berlapis). 13 lulus langsung dan didaftarkan di sini; id-golden-
-          # snapshot & th-coverage didaftarkan setelah baseline diregenerasi + pendamping
-          # Thai gen2 dilengkapi dalam commit yang sama.
-          node adaptivity-simulation-v3-hardened-test.js
-          # (termasuk 3 gerbang sosial SLOT 7 yang juga belum terdaftar; ketiganya lulus)
-          node social-api-contract-test.js
-          node social-frontend-test.js
-          node social-schema-contract-test.js
-          node analytics-dedup-test.js
-          node analytics-stable-id-guard-test.js
-          node app-telemetry-wiring-test.js
-          node audio-locale-guard-test.js
-          node brain-config-test.js
-          node brain-manifest-test.js
-          node fiezel-stat-gate-test.js
-          node learning-lane-test.js
-          node braincore-evidence-test.js
-          node braincore-learner-identity-test.js
-          node learning-metrics-test.js
-          node learning-telemetry-test.js
-          node locale-enum-test.js
-          node metrics-digest-test.js
-          node id-golden-snapshot-test.js
+          # m025-190 dulu mendaftarkan ulang 19 gerbang (adaptivity-simulation-v3-hardened,
+          # tiga gerbang sosial, dan 15 gerbang analytics/brain/learning/locale) yang saat
+          # itu dikira belum terdaftar. Semuanya sudah punya registrasi asli di SLOT 10 di
+          # atas; duplikatnya dibuang (temuan PR #336, ±2m24s terbuang tiap run). Nol
+          # gerbang dihapus, hanya salinannya — gate-registry-test.js tetap menuntut satu
+          # registrasi per berkas uji, bukan nol.
           node workflow-actor-gate-test.js
           # Pasangan workflow-actor-gate-test.js dari sisi isi, bukan aktor: ia
           # MENJALANKAN skrip substitusi binding yang tertanam di
@@ -853,31 +819,12 @@ jobs:
         # verdict-nya merah karena TEMUAN brain (v2 tersensor 88% vs v1 50.4%,
         # CI [0.334, 0.42]) — kandidat wave berikut, bukan alasan memblokir PR lain.
         run: node adaptivity-simulation-v3-extended-selftest.js
-      - name: 'Gerbang warisan merge main 28 Agu yang belum terdaftar (temuan E5, wave E)'
-        # Ditemukan gate-registry-test.js saat pengerjaan E5 (29 Agu 2026): lima belas berkas
-        # uji dari merge main (analytics, telemetry, brain manifest, locale, baseline emas,
-        # cakupan Thai, dst.) tidak pernah dipanggil CI. Semuanya dijalankan lokal lebih dulu
-        # dan lima belas-nya exit 0 — yang kurang pendaftarannya, bukan mutunya.
-        run: |
-          node analytics-dedup-test.js
-          node analytics-stable-id-guard-test.js
-          node app-telemetry-wiring-test.js
-          node audio-locale-guard-test.js
-          node brain-config-test.js
-          node brain-manifest-test.js
-          node fiezel-stat-gate-test.js
-          node id-golden-snapshot-test.js
-          node learning-lane-test.js
-          node braincore-evidence-test.js
-          node braincore-learner-identity-test.js
-          node learning-metrics-test.js
-          node learning-telemetry-test.js
-          node locale-enum-test.js
-          node metrics-digest-test.js
-          # (union merge 29 Agu) tiga gerbang Thai m025-186 dari sisi main — id-golden-snapshot,
-          # locale-enum, audio-locale-guard — sudah tercakup daftar di atas; th-coverage-test.js
-          # dikecualikan registry (kelas gerbang-pra-rilis-fitur, keputusan MASTER 9bf2e13):
-          # kontraknya mengikat rilis th, bukan rilis id — didaftarkan ulang sebelum saklar th.
+      # 'Gerbang warisan merge main 28 Agu yang belum terdaftar (temuan E5, wave E)' pernah
+      # berdiri di sini sebagai step sendiri, mendaftarkan ulang 15 gerbang yang saat itu
+      # dikira belum terdaftar. Semuanya sudah punya registrasi asli di SLOT 10 dalam step
+      # Core validation di atas; step ini dihapus seluruhnya karena isinya 100% duplikat
+      # (temuan PR #336, ±2m24s terbuang tiap run). Th-coverage-test.js tetap dikecualikan
+      # registry seperti sebelumnya (kelas gerbang-pra-rilis-fitur, keputusan MASTER 9bf2e13).
       - name: 'Wave F2: gate anti-drift konten (explanations-id ↔ templates, inventori, count vocab-th)'
         # Menutup pola kerusakan 3 wave berturut: sumber terjemahan tertinggal dari
         # bank yang di-QA (b0d983c → c3e02f3, 5643a32, f87a39a) dan inventori
