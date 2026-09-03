@@ -187,7 +187,7 @@
     'onboarding.greet-schedule': 'Soal pengingat: aku yang cari waktunya, kamu tinggal belajar.',
     'onboarding.schedule-title': 'Kapan kamu ingin belajar?',
     'onboarding.schedule-body': 'Aku ingetin kamu belajar ya, biar streak-nya nggak putus.',
-    'onboarding.schedule-note': 'Notifikasi belajar: Aktif. Waktunya aku yang pilih otomatis dari kebiasaan belajarmu sendiri, bukan jadwal tetap yang kamu atur manual - jadi pengingatnya selalu pas dengan caramu belajar, bukan jam yang dipilih sekali lalu dilupakan.',
+    'onboarding.schedule-note': 'Waktunya dipilih otomatis dari kebiasaan belajarmu.',
     'onboarding.summary-bubble': 'Sudah beres semua. Ini rangkumannya.',
     'onboarding.summary-ready-named': '{name}, siap belajar bersama FIEZEL!',
     'onboarding.summary-ready': 'Siap belajar bersama FIEZEL!',
@@ -354,6 +354,8 @@
     // features/ui/fiezel-coach-bubble.js:154
     'coach.yg-merah-bukan-aib-that': 'Yang merah bukan aib, itu yang bakal kita kerjain.',
     // features/onboarding/fiezel-onboarding.js:568
+    'onboarding.apa-level-lang-you-inline': '<h2 class="fiezel-title">Apa level bahasa kamu?</h2>',
+    'onboarding.level-perkiraan-singkat': '<p class="fiezel-note">Perkiraan aja, bukan hasil tes.</p>',
     'onboarding.apa-level-lang-you': '<h2 class="fiezel-title">Apa level bahasa kamu?</h2>',
     // features/onboarding/fiezel-onboarding.js:550
     'onboarding.apa-tujuan-you-study': '<h2 class="fiezel-title">Apa tujuan kamu belajar?</h2>',
@@ -364,7 +366,7 @@
     // features/onboarding/fiezel-onboarding.js:553
     'onboarding.ini-cuma-perkiraan-awal-darimu': '<p class="fiezel-note">Ini cuma perkiraan awal darimu sendiri, akan disesuaikan otomatis setelah kamu mengerjakan latihan - bukan hasil tes.</p>',
     // features/onboarding/fiezel-onboarding.js:570
-    'onboarding.isinya-item-listening-grammar-and': '<p class="fiezel-note">Isinya 25 soal listening, grammar, dan vocabulary - tanpa teks bacaan - dan bisa kamu hentikan kapan saja. Hasilnya menjadi levelmu yang sesungguhnya di FIEZEL, menggantikan perkiraan awal tadi.</p>',
+    'onboarding.isinya-item-listening-grammar-and': '<p class="fiezel-note">25 soal listening, grammar, dan vocabulary. Bisa dihentikan kapan saja.</p>',
     // features/onboarding/fiezel-onboarding.js:569
     'onboarding.kerjakan-santai-aja-ini-bukan': '<p class="fiezel-body">Kerjakan santai aja, ini bukan ujian — cuma buat aku kenal kemampuanmu.</p>',
     // features/onboarding/fiezel-onboarding.js:481

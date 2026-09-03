@@ -1550,15 +1550,15 @@ body.daily-locked{overflow:hidden}
 .fiezel-skip{text-decoration:underline;margin-left:auto}
 
 .fiezel-stage{flex:0 0 auto;display:flex;flex-direction:column;align-items:stretch;
-  min-height:0;padding:12px 16px 0;text-align:left}
+  min-height:0;padding:6px 16px 0;text-align:left}
 /* m028-maskot: wajah 64px di SAMPING gelembung diganti maskot besar DI ATAS gelembung.
    Susunan kolom dipilih karena aritmetikanya: pada 390px lebar isi hanya 358px, dan
    maskot 132px + gelembung 270px tidak muat berdampingan tanpa memaksa gelembungnya
    menyusut jadi dua kata per baris. Menumpuknya juga yang menjaga aturan DIRECTION -
    maskot tidak pernah berada di atas kolom nama atau tombol, ia berada DI ATASNYA dalam
    aliran normal, tanpa position:absolute sama sekali. */
-.fiezel-stage-art{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
-  gap:8px;min-height:64px;width:100%}
+.fiezel-stage-art{display:flex;flex-direction:row;align-items:center;justify-content:center;
+  gap:6px;min-height:0;width:100%}
 .fiezel-stage-art img{max-height:38vh;width:auto}
 
 /* ---------- m028-maskot: MASKOT PAW di kepala tiap panel perkenalan ----------
@@ -1575,8 +1575,10 @@ body.daily-locked{overflow:hidden}
   /* Nilai bawaan bila JS tidak mengirimnya. Angka dari JS menjadi BATAS ATAS, bukan ukuran
      mati: pada 390px yang menang tetap 34vw (=132px), jadi satu angka tidak bisa membuat
      layar kecil kebanjiran maskot. */
-  --fz-ob-paw:148px;
-  width:clamp(120px,34vw,var(--fz-ob-paw));
+  /* m025-241: perkenalan dibuat muat satu layar tanpa gulir. Maskot turun dari 132-148px
+     ke ukuran kepala yang cukup untuk membawa gelembung sapaan di sampingnya. */
+  --fz-ob-paw:104px;
+  width:clamp(78px,23vw,var(--fz-ob-paw));
   aspect-ratio:320/300;
   flex:0 0 auto;
   display:grid;place-items:center;
@@ -1637,9 +1639,10 @@ body.daily-locked{overflow:hidden}
   border-radius:var(--radius-md);
   /* Sudut yang "dipotong" pindah ke ATAS: gelembung sekarang duduk di bawah maskot, jadi
      ekornya harus menunjuk ke atas - ke wajah yang sedang bicara. */
-  border-top-left-radius:4px;
-  padding:10px 14px;box-shadow:var(--shadow-sm);
-  font-size:14px;font-weight:500;line-height:1.45;color:var(--fz-ink);max-width:320px;
+  /* Gelembung sekarang duduk DI SAMPING kepala maskot, jadi ekornya menunjuk ke kiri. */
+  border-bottom-left-radius:4px;
+  padding:7px 10px;box-shadow:var(--shadow-sm);
+  font-size:12.5px;font-weight:500;line-height:1.35;color:var(--fz-ink);max-width:190px;
   /* Gelembung ikut di tengah bersama maskot: pada layar lebar gelembung yang menempel ke
      tepi kiri sementara maskotnya di tengah terbaca seperti dua elemen yang tidak saling
      bicara. Teksnya tetap rata kiri karena ini kalimat, bukan judul. */
@@ -1655,9 +1658,9 @@ body.daily-locked{overflow:hidden}
   border-radius:var(--radius-lg);
   border:1px solid var(--fz-line);
   box-shadow:var(--shadow-md);
-  margin:14px 16px max(16px,env(safe-area-inset-bottom));
-  padding:22px 20px 20px;
-  display:flex;flex-direction:column;align-items:stretch;gap:10px;text-align:left}
+  margin:10px 16px max(14px,env(safe-area-inset-bottom));
+  padding:16px 18px 16px;
+  display:flex;flex-direction:column;align-items:stretch;gap:8px;text-align:left}
 
 .fiezel-badge{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;
   background:var(--fz-sun);color:var(--fz-ink);font-family:var(--fz-heading);font-weight:700;font-size:13px}
@@ -1810,11 +1813,13 @@ body.daily-locked{overflow:hidden}
 .fiezel-carousel-arrow[disabled]{background:var(--fz-bg);color:#75654C;opacity:1}
 
 /* ---------- Goal Selection (Step 2) ---------- */
-.fiezel-goal-grid{display:flex;flex-direction:column;gap:8px;width:100%}
+/* m025-242: dua kolom - enam tujuan dalam satu kolom adalah alasan utama langkah ini
+   harus digulir. Kartunya kini hanya membawa labelnya. */
+.fiezel-goal-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:100%}
 /* Pilihan peran (Murid / Guru) di langkah nama onboarding. */
-.fiezel-role-label{margin:14px 0 8px;font-size:.82rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--fz-ink-muted,var(--muted))}
-.fiezel-role-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;margin-bottom:12px}
-.fiezel-role-card{min-height:96px}
+.fiezel-role-label{margin:10px 0 6px;font-size:.82rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--fz-ink-muted,var(--muted))}
+.fiezel-role-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;margin-bottom:8px}
+.fiezel-role-card{min-height:64px}
 .fiezel-classcode-field input{letter-spacing:.18em;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;text-transform:uppercase}
 .fiezel-classcode-field[hidden]{display:none}
 .fiezel-role-card span{font-size:.8rem;line-height:1.4}
@@ -1824,8 +1829,8 @@ body.daily-locked{overflow:hidden}
    di kepala berkas ini menang atas text-align, jadi tanpa baris ini judul dan penjelasan
    kartu tujuan tetap rata tengah walau kartunya jelas-jelas daftar pilihan. */
 .fiezel-goal-card{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;
-  gap:3px;text-align:left;width:100%;
-  border:1.5px solid var(--fz-line);border-radius:var(--radius-sm);padding:12px 14px;background:var(--fz-paper);
+  gap:3px;text-align:left;width:100%;min-height:48px;justify-content:center;
+  border:1.5px solid var(--fz-line);border-radius:var(--radius-sm);padding:10px 12px;background:var(--fz-paper);
   transition:transform .32s cubic-bezier(.34,1.56,.64,1),border-color .3s,background .3s}
 .fiezel-goal-card b{font-family:var(--fz-heading);font-weight:700;font-size:14px;color:var(--fz-ink)}
 .fiezel-goal-card span{font-size:13px;color:var(--fz-ink-muted);line-height:1.45}
