@@ -1,7 +1,7 @@
 {
-  "version": "m025-238",
-  "claimedBy": "perplexity-computer (multilingual i18n wave, direbase atas m025-185)",
-  "claimedAt": "2026-09-03T00:54:35.325Z",
-  "reason": "swipe back iOS: gestur tepi berhenti menelan busur ibu jari; state.view sinkron",
+  "version": "m025-239",
+  "claimedBy": "sesi-claude-pr323 (learner flow + tutor action center, branch conflict_030926_0820)",
+  "claimedAt": "2026-09-03T02:13:21.805Z",
+  "reason": "alur belajar murid (learner flow, bank soal tak-terbatas, duel) plus pusat aksi tutor",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
