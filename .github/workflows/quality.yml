@@ -1,6 +1,53 @@
 name: FIEZEL Quality Gate
+
+# ==========================================================================
+# KENAPA `push` DIBATASI KE `main`, DAN KENAPA ADA `concurrency`
+# ==========================================================================
+# Sebelum ini triggernya `push:` (semua branch) + `pull_request:` tanpa filter
+# dan tanpa concurrency group. Akibatnya SETIAP push ke branch ber-PR memicu
+# gerbang ~25 menit ini DUA KALI, paralel, atas commit yang sama persis — satu
+# dari `push`, satu dari `pull_request`. Itu bukan dugaan: pada PR #333 head
+# d15cb71e tercatat dua job `quality` hidup bersamaan (run 33771881451 dan
+# 33771878031).
+#
+# APA YANG DIPERBAIKI INI, DAN APA YANG TIDAK — dipisah tegas, karena versi
+# pertama komentar ini mengklaim sebab yang TIDAK lolos data. Klaim itu berbunyi
+# "dua salinan berebut runner membuat keduanya melambat". Diuji terhadap riwayat
+# run yang sesungguhnya, klaim itu GUGUR:
+#
+#   11 pasang run duplikat (5 branch berbeda) : 17,9 - 24,3 menit
+#   run tunggal di `main` (nol duplikasi)     : 23,8 - 24,2 menit
+#
+# Kedua rentang TUMPANG TINDIH PENUH. Runner hosted GitHub dialokasikan per-run
+# dari pool bersama, jadi dua run tidak saling memperlambat — dan macet 2 jam di
+# head sebelumnya terjadi pada 1 dari 11 pasang duplikat itu; sepuluh sisanya,
+# dengan kondisi duplikasi yang persis sama, selesai normal. Duplikasi karena itu
+# TIDAK BISA menjadi sebab macetnya, dan perubahan ini BUKAN perbaikan macet.
+# Akar macetnya masih belum diketahui; `timeout-minutes` (PR #336) yang membuatnya
+# berhenti diam-diam, bukan blok ini.
+#
+# Yang benar-benar dibeli perubahan ini, dan sudah cukup membenarkannya:
+#   - separuh konsumsi menit CI hilang (satu suite ~25 menit per commit, bukan dua);
+#   - check `cancelled` dari run yang kalah tidak lagi lahir — merah palsu yang
+#     menghabiskan waktu review untuk menelusuri kegagalan yang tidak pernah ada.
+#
+# Perbaikannya dua lapis, dan keduanya perlu:
+#
+#   1. `push: branches: [main]` — di branch fitur, `pull_request` sudah
+#      meliput setiap commit. Membiarkan `push` ikut jalan di sana tidak
+#      menambah satu pun pemeriksaan, hanya menggandakannya. Push ke `main`
+#      TETAP diperiksa: itu satu-satunya tempat commit bisa mendarat tanpa
+#      melewati PR (merge commit, dan perbaikan langsung kalau sampai terjadi).
+#
+#   2. `concurrency` per branch — push beruntun ke PR yang sama tidak lagi
+#      menumpuk. Run lama dibatalkan oleh yang lebih baru, karena hanya commit
+#      terakhir yang akan di-merge. `cancel-in-progress` sengaja MATI di `main`:
+#      di sana setiap commit adalah sejarah yang sudah mendarat, dan
+#      membatalkannya berarti ada commit di `main` yang tidak pernah diperiksa
+#      penuh — persis keadaan yang gerbang ini ada untuk mencegahnya.
 on:
   push:
+    branches: [main]
   pull_request:
   # F5: satu-satunya cara SENGAJA menjalankan gerbang live dari CI.
   #
@@ -45,11 +92,52 @@ on:
           Kosongkan untuk tetap SKIP.
         required: false
         default: ''
+concurrency:
+  # Dikunci ke NAMA BRANCH, bukan ke nomor PR atau `github.ref`: pada peristiwa
+  # `pull_request` nilai `github.ref_name` berbentuk `333/merge`, sedangkan pada
+  # `push` ia berbentuk `main`. Memakai nama branch kepala membuat kedua jalur
+  # jatuh ke group yang sama, sehingga dedupe-nya benar-benar terjadi.
+  group: ${{ github.workflow }}-${{ github.event.pull_request.head.ref || github.ref_name }}
+  cancel-in-progress: ${{ github.ref_name != 'main' }}
+
 permissions:
   contents: read
 jobs:
   quality:
     runs-on: ubuntu-latest
+
+    # ======================================================================
+    # KENAPA ADA BATAS WAKTU — DAN KENAPA ANGKANYA 45
+    # ======================================================================
+    # Tanpa `timeout-minutes`, GitHub memakai batas bawaan 6 JAM. Itu bukan
+    # angka teoretis: pada 3 Sep 2026 satu gerbang di `Core validation`
+    # menggantung TIGA KALI berturut-turut di PR #333 (job 100652521266,
+    # 100703901200, 100721759384). Setiap kali step-nya tidak pernah selesai,
+    # run harus dibatalkan manual, dan — ini bagian yang mahal — GitHub TIDAK
+    # PERNAH MENGUNGGAH LOG job yang dibatalkan di tengah step. Ketiga job itu
+    # menjawab HTTP 404 saat lognya diminta.
+    #
+    # Akibatnya nama gerbang yang menggantung TIDAK DAPAT DIKETAHUI sama
+    # sekali. Gerbang mutu yang tidak bisa melaporkan di mana ia berhenti
+    # adalah gerbang yang buta persis pada saat ia paling dibutuhkan, dan
+    # satu-satunya jalan keluar yang tersisa adalah menebak.
+    #
+    # `timeout-minutes` menutup itu, dan bukan dengan mempercepat apa pun:
+    # job yang MELEWATI BATAS diperlakukan sebagai KEGAGALAN BIASA, bukan
+    # pembatalan — jadi lognya DIUNGGAH seperti run gagal lainnya, dan baris
+    # terakhir sebelum senyap menyebutkan gerbang yang menggantung. Wedge yang
+    # tak terdiagnosis berubah menjadi kegagalan bernama.
+    #
+    # Angka 45 diambil dari ukuran, bukan selera: enam merge berurutan di
+    # `main` (#329, #330, #332, #334, #335, dan 809d8156) semuanya selesai
+    # 23m49s-24m11s. 45 menit memberi hampir 2x kelonggaran terhadap run
+    # tersehat, jadi ia tidak akan menyentuh run yang wajar sekalipun runner
+    # sedang lambat — tetapi memotong wedge berjam-jam pada percobaan pertama.
+    # Kalau suatu hari daftar gerbang tumbuh sampai run sehat melewati ~35
+    # menit, naikkan angka ini SESUDAH mengukur ulang, jangan sesudah satu
+    # run merah.
+    timeout-minutes: 45
+
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
