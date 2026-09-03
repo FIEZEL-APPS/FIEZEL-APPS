@@ -100,16 +100,35 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
 
-  // Tepi kiri iOS sendiri kira-kira selebar ini. Lebih lebar dari ini dan tarikan mendatar
-  // biasa di tengah konten akan ikut tertangkap.
-  var EDGE_PX = 24;
+  // m025-238: 24px terlalu sempit untuk ibu jari sungguhan. Titik sentuh ibu jari di iPhone
+  // gampang mendarat 26-30px dari tepi walau si murid merasa menarik "dari pinggir", dan
+  // tarikan seperti itu ditolak MENTAH-MENTAH di sentuhan pertama - tidak ada apa pun di
+  // layar yang menjelaskan kenapa. Zona sendiri milik iOS lebih lebar dari 24pt; 32px masih
+  // jauh dari tengah konten, jadi tarikan mendatar biasa tetap tidak tertangkap.
+  var EDGE_PX = 32;
   // Jarak minimum sebelum tarikan dianggap sungguh-sungguh, bukan sentuhan yang meleset.
   var MIN_DISTANCE_PX = 64;
-  // dx harus sekian kali lebih besar dari dy; tanpa ini gulir vertikal yang sedikit miring
-  // di dekat tepi kiri akan terbaca sebagai "kembali".
-  var HORIZONTAL_RATIO = 1.6;
-  // Setelah bergerak sejauh ini secara vertikal, gestur milik penggulung halaman.
+  // dx harus sekian kali lebih besar dari dy. m025-238: 1.6 menuntut tarikan yang hampir
+  // datar; ibu jari berputar pada pangkalnya, jadi tarikan "mendatar" yang sesungguhnya
+  // selalu melengkung. 1.2 masih menolak gulir miring, tetapi tidak lagi menuntut penggaris.
+  var HORIZONTAL_RATIO = 1.2;
+  // Setelah bergerak sejauh ini secara vertikal, gestur BOLEH dianggap milik penggulung -
+  // tetapi hanya kalau ia memang DIDOMINASI gerakan vertikal; lihat VERTICAL_DOMINANCE.
   var VERTICAL_SLOP_PX = 24;
+  // m025-238 - INI PENYEBAB "swipe back diam lalu tiba-tiba pindah" DI iOS.
+  //
+  // Aturan lama menyerahkan gestur ke penggulung begitu |dy| > 24 DAN |dy| >= dx. Ibu jari
+  // yang menarik dari tepi kiri bergerak pada busur: di awal tarikan ia sudah naik ~30px
+  // sementara dx baru ~14px, jadi syarat itu terpenuhi PADA GERAKAN PERTAMA - dan karena
+  // penyerahannya permanen (tracking=false, tidak bisa dijemput lagi), sisa tarikan sejauh
+  // 200px ke kanan tidak berarti apa-apa. Dari sisi murid: gesturnya benar, layarnya diam.
+  // Ia menarik lagi, diam lagi, sampai kebetulan ada satu tarikan yang cukup lurus untuk
+  // lolos - lalu layar tiba-tiba pindah. Itulah "jeda sekitar 10 detik" yang dilaporkan.
+  //
+  // Sekarang penyerahan hanya terjadi kalau gerakannya benar-benar DIDOMINASI vertikal:
+  // |dy| lebih dari 2,5x dx. Gulir halaman sungguhan (dx nyaris nol) tetap diserahkan, busur
+  // ibu jari tidak.
+  var VERTICAL_DOMINANCE = 2.5;
   // Selisih kurang dari ini bukan gulungan sungguhan, hanya pembulatan tata letak.
   var SCROLL_SLOP_PX = 2;
   // Batas penelusuran ke atas; pohon DOM yang dalam tidak boleh membuat satu sentuhan
@@ -121,9 +140,13 @@
   // dalam satu handler - dulu ia memanggil history.back() berulang kali, yaitu satu-satunya
   // tempat modul ini pernah menelusuri riwayat dari dalam jalur popstate.
   var MAX_CHAIN = 3;
-  // Jeda antar-pemicu gestur tepi. Lebih pendek dari ini dan satu tarikan jari yang terbaca
-  // dua kali akan memundurkan dua layar sekaligus.
-  var GESTURE_COOLDOWN_MS = 450;
+  // Jeda antar-pemicu gestur tepi. m025-238: 450ms diturunkan ke 250ms. Perlindungan yang
+  // SEBENARNYA terhadap satu tarikan yang terbaca dua kali ada di createEdgeSwipe sendiri -
+  // sekali `fired`, tracking mati sampai sentuhan berikutnya, jadi satu tarikan mustahil
+  // memicu dua kali. Jeda ini hanya menjaring gema peristiwa. 450ms cukup panjang untuk
+  // MENELAN tarikan kedua yang disengaja murid ketika layar sebelumnya belum selesai
+  // digambar - dan menelan tarikan yang disengaja persis seperti tidak berfungsi.
+  var GESTURE_COOLDOWN_MS = 250;
 
   function str(value) { return value == null ? '' : String(value); }
 
@@ -492,8 +515,10 @@
       if (!isFinite(dx) || !isFinite(dy)) { tracking = false; return false; }
       // Menarik ke kiri dari tepi kiri bukan "kembali".
       if (dx < 0) { tracking = false; return false; }
-      // Sudah cukup jauh ke atas/bawah: ini gulir halaman, dan gestur diserahkan seluruhnya.
-      if (Math.abs(dy) > VERTICAL_SLOP_PX && Math.abs(dy) >= Math.abs(dx)) { tracking = false; return false; }
+      // Gulir halaman: gerakannya DIDOMINASI vertikal, bukan sekadar tidak lurus. Busur ibu
+      // jari (dy 30 / dx 14) tidak lagi jatuh ke sini; gulir sungguhan (dy 100 / dx 14)
+      // tetap jatuh ke sini dan gestur diserahkan seluruhnya.
+      if (Math.abs(dy) > VERTICAL_SLOP_PX && Math.abs(dy) > Math.abs(dx) * VERTICAL_DOMINANCE) { tracking = false; return false; }
       if (dx < distancePx) return false;
       if (dx < Math.abs(dy) * ratio) return false;
       fired = true;
@@ -663,6 +688,7 @@
     MIN_DISTANCE_PX: MIN_DISTANCE_PX,
     HORIZONTAL_RATIO: HORIZONTAL_RATIO,
     VERTICAL_SLOP_PX: VERTICAL_SLOP_PX,
+    VERTICAL_DOMINANCE: VERTICAL_DOMINANCE,
     MAX_CHAIN: MAX_CHAIN,
     GESTURE_COOLDOWN_MS: GESTURE_COOLDOWN_MS,
     createStack: createStack,
