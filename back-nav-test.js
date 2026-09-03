@@ -382,6 +382,56 @@ test('tarikan mendatar dari tepi kiri memicu kembali', () => {
   assert.strictEqual(g.hasFired(), true);
 });
 
+/* m025-238 - OWNER: "ketika user melakukan swipe back, sekarang ada jeda sekitar 10 detik,
+   itu sangat mengganggu, tapi kalau user berpindah halaman dengan menekan taskbar navigasi,
+   itu lancar dan mulus".
+   Perangkatnya iOS, dan bentuk jedanya "diam, lalu tiba-tiba pindah". Itu bukan lambat -
+   itu tarikan yang DITELAN. Di iOS mode standalone gestur swipe-back Safari tidak ada, jadi
+   yang dipakai adalah gestur tepi milik modul ini, dan ambangnya menuntut tarikan yang nyaris
+   lurus dari 24px pertama layar. Tiga tarikan yang benar-benar dilakukan ibu jari gagal
+   memenuhinya. Gerbang di bawah menahan ketiganya - semuanya terbukti MERAH pada ambang lama. */
+function tarik(points) {
+  const g = backNav.createEdgeSwipe();
+  if (g.start(points[0]) !== true) return false;
+  let fired = false;
+  for (let i = 1; i < points.length; i++) if (g.move(points[i])) fired = true;
+  return fired;
+}
+const titik = (x, y) => ({ x, y, target: plainNode });
+
+test('busur ibu jari dari tepi kiri TETAP dibaca sebagai kembali', () => {
+  // Ibu jari berputar pada pangkalnya: di awal tarikan ia sudah naik ~30px sementara dx baru
+  // ~14px. Aturan lama (|dy| >= |dx|) menyerahkan gestur ke penggulung PADA GERAKAN PERTAMA,
+  // dan penyerahannya permanen - sisa tarikan 200px ke kanan tidak berarti apa-apa. Dari sisi
+  // murid gesturnya benar tetapi layarnya diam, dan ia menarik berulang kali sampai kebetulan
+  // ada satu yang cukup lurus untuk lolos.
+  assert.strictEqual(tarik([titik(6, 400), titik(20, 370), titik(90, 368), titik(206, 360)]), true,
+    'tarikan melengkung adalah tarikan NORMAL, bukan gulir');
+});
+
+test('tarikan yang dimulai 26-30px dari tepi tetap dibaca sebagai kembali', () => {
+  // Titik sentuh ibu jari di iPhone gampang mendarat 26-30px dari tepi walau murid merasa
+  // menarik "dari pinggir". Pada 24px tarikan itu ditolak MENTAH di sentuhan pertama.
+  assert.strictEqual(tarik([titik(26, 400), titik(120, 402), titik(240, 404)]), true);
+  assert.strictEqual(tarik([titik(30, 400), titik(120, 402), titik(240, 404)]), true);
+});
+
+test('gulir vertikal sungguhan TETAP bukan gestur kembali', () => {
+  // Pagar dua arah: melonggarkan busur tidak boleh membuat gulir halaman terbajak. Gulir
+  // sungguhan punya dx nyaris nol - didominasi vertikal jauh di atas ambang 2,5x.
+  assert.strictEqual(tarik([titik(6, 400), titik(20, 300), titik(30, 200)]), false);
+  assert.ok(backNav.VERTICAL_DOMINANCE >= 2, 'ambang dominasi vertikal tidak boleh dilucuti');
+});
+
+test('jeda antar-gestur tidak boleh menelan tarikan kedua yang disengaja', () => {
+  // 450ms lebih panjang daripada waktu murid menarik lagi ketika layar sebelumnya belum
+  // selesai digambar, jadi tarikan yang DISENGAJA ikut tertelan. Perlindungan sesungguhnya
+  // terhadap satu tarikan yang terbaca dua kali ada di createEdgeSwipe (sekali `fired`,
+  // tracking mati sampai sentuhan berikutnya), bukan di jeda ini.
+  assert.ok(backNav.GESTURE_COOLDOWN_MS <= 300,
+    'jeda yang lebih panjang dari ini menelan tarikan yang disengaja');
+});
+
 test('gestur yang dimulai jauh dari tepi diabaikan', () => {
   const g = backNav.createEdgeSwipe();
   assert.strictEqual(g.start({ x: backNav.EDGE_PX + 1, y: 300, target: plainNode }), false);
@@ -399,8 +449,8 @@ test('gulir vertikal di dekat tepi kiri bukan gestur kembali', () => {
 test('tarikan miring yang tidak cukup mendatar ditolak', () => {
   const g = backNav.createEdgeSwipe();
   g.start({ x: 6, y: 400, target: plainNode });
-  // dx 80, dy 70: sudah cukup jauh, tetapi rasionya di bawah ambang mendatar.
-  assert.strictEqual(g.move({ x: 86, y: 470 }), false);
+  // dx 80, dy 100: sudah cukup jauh, tetapi rasionya masih di bawah ambang mendatar (1.2).
+  assert.strictEqual(g.move({ x: 86, y: 500 }), false);
 });
 
 test('menarik ke kiri dari tepi kiri bukan kembali', () => {
