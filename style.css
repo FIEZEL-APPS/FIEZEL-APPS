@@ -1019,6 +1019,14 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
    duduk selebar seperempat di grid empat kolom. Kartunya juga lebih pendek dari launcher
    belajar — ini pintu sekunder, bukan salah satu dari empat tujuan utama. */
 .social-home-launcher{grid-template-columns:1fr}
+/* Kartu Home saat ada undangan teman yang belum dijawab. Pembeda visualnya SATU: garis
+   emas yang sama dengan .social-code, supaya "ada sesuatu yang menunggumu" terbaca tanpa
+   warna baru, tanpa animasi, dan tanpa kosakata bentuk baru di Home. */
+.social-launch-invite,.social-launch-news{border-color:var(--gold);box-shadow:inset 0 0 0 1px rgba(201,162,75,.35)}
+/* Lencana jumlah kabar belum terbaca. Ditumpangkan pada .launch-icon yang sudah ada, jadi
+   ia tidak menambah kolom dan tidak menggeser tata letak kartu di 390px. */
+.social-launch .launch-icon{position:relative}
+.social-badge{position:absolute;top:-4px;right:-6px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--gold);color:var(--text);font-size:.68rem;font-weight:700;line-height:18px;text-align:center;box-shadow:0 0 0 2px var(--panel)}
 .social-home-launcher .launch-card{min-height:132px}
 @media (max-width:900px){.social-home-launcher{grid-template-columns:1fr}}
 @media (max-width:560px){.social-home-launcher{grid-template-columns:1fr}.social-home-launcher .launch-card{min-height:108px}}
