@@ -19,6 +19,8 @@ sini yang menjadi urutan resmi.
 | `0007_learning.sql` | `fiezel-learning` (binding `LEARNING_DB`) | `learning_daily`, `learning_dedup` |
 | `0008_evidence.sql` | `fiezel-evidence` (binding `EVIDENCE_DB`) | `evidence_daily`, `evidence_dedup`, `evidence_learner_day` |
 | `0006_social.sql` | `fiezel-core` (binding `CORE_DB`) | `social_profile`, `social_handle`, `social_invite`, `social_friend`, `social_counter`, `rank_week`, `social_cohort`, `milestone_feed`, `cheer_feed`, `rank_jti` |
+| `0011_auth_roles.sql` | `fiezel-core` (binding `CORE_DB`) | `auth_account`, `auth_login_handle`, `auth_credential`, `teacher_invite`, `teacher_profile`, `friend_request`, `notification`, `push_subscription` |
+| `0012_teacher_content.sql` | `fiezel-core` (binding `CORE_DB`) | `tc_node`, `tc_question`, `tc_assignment`, `tc_assignment_target`, `tc_lesson_evidence` |
 
 Tabel di atas adalah **satu-satunya** daftar berkas→database yang ditulis manusia.
 `tools/d1-schema-check.mjs` dan `d1-schema-contract-test.js` **menurunkan** peta itu
@@ -91,6 +93,10 @@ wrangler d1 execute fiezel-core --remote --file=migrations/0006_social.sql
 wrangler d1 execute fiezel-core --remote --file=migrations/0009_learner_evidence.sql
 # --- fiezel-core: nama learner dari perkenalan (SLOT 9) ---
 wrangler d1 execute fiezel-core --remote --file=migrations/0010_learner_name.sql
+# --- fiezel-core: akun berperan + undangan guru + notifikasi (SLOT 10) ---
+wrangler d1 execute fiezel-core --remote --file=migrations/0011_auth_roles.sql
+# --- fiezel-core: hierarki konten guru + bank soal + penugasan (SLOT 10) ---
+wrangler d1 execute fiezel-core --remote --file=migrations/0012_teacher_content.sql
 ```
 
 `0009_learner_evidence.sql` masuk `fiezel-core` dan **bukan** `fiezel-evidence`,
