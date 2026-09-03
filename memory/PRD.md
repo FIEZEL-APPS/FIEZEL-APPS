@@ -27,6 +27,10 @@ PDF/CSV/anonim). Wajib: buat branch/PR baru sebelum mulai.
 - Gates hijau: install-health, pwa-cache, config-consistency, http-smoke, global-name-collision, gate-registry, no-network, id-golden-snapshot (baseline diperbarui), back-nav, onboarding, continuity, backup-ui, lesson-experience, experience-integration, content-integrity-audit.
 - ui-render-audit: SKIP (playwright tak terpasang di env — bukan gagal).
 
+## Bank soal tak-terbatas semua skill + Tren Kelas (2026-09-03)
+- `canonicalFor()/generated()` kini mencakup vocab (16 frame), listening (10 dialog), reading (10 passage) — jawaban di posisi tetap lalu diacak `variant()`; id `gvc:/gld:/gri:` (+`~oXXXX`) direkonstruksi `byId()`. `pickFresh` dedupe per frame dalam satu batch. Terverifikasi 25 tarikan unik per skill, 0 opsi duplikat, roundtrip OK.
+- Tutor tab **Tren kelas**: sparkline SVG 4 minggu per skill + delta & label (membaik/stabil/perlu perhatian). Snapshot coverage per ISO-minggu disimpan otomatis (`cls.weeklyCoverage`, maks 8) → setelah ≥2 minggu memakai riwayat nyata; sebelumnya ditandai jelas sebagai estimasi.
+
 ## Backlog / Next
 - P1: Suara neural untuk listening di alur learner (kini SpeechSynthesis fallback + FiezelVoiceSay bila aktif). ✅ tersambung.
 - P2: Grafik tren mingguan kelas; filter murid per status di Tutor.

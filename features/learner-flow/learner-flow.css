@@ -128,4 +128,21 @@
 .tac-privacy ul{margin:4px 0 0;padding-left:18px;font-size:.88rem;line-height:1.55}
 .tac-preview{margin-top:14px;padding:16px;border-radius:var(--radius-md);border:1.5px solid var(--yellow-deep);background:var(--yellow-soft)}
 .tac-list li{padding:10px 12px;border-radius:var(--radius-sm);background:var(--panel-soft)}.tac-list b{display:block}.tac-list small{color:var(--muted)}
+/* Tren kelas */
+.tac-trend-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin-top:12px}
+.tac-trend-card{padding:14px;border-radius:var(--radius-md);background:var(--panel-soft);border-top:4px solid var(--line);animation:lfIn var(--dur-m) var(--ease) both}
+.tac-trend-card.is-up{border-top-color:var(--good)}.tac-trend-card.is-down{border-top-color:var(--bad)}.tac-trend-card.is-flat{border-top-color:var(--yellow-deep)}
+.tac-trend-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:6px}
+.tac-trend-delta{font-size:.8rem;font-weight:800;padding:3px 9px;border-radius:var(--radius-pill);background:var(--panel)}
+.is-up .tac-trend-delta{color:var(--good)}.is-down .tac-trend-delta{color:var(--bad)}.is-flat .tac-trend-delta{color:var(--muted)}
+.tac-spark{display:block;overflow:visible}
+.tac-spark-line{fill:none;stroke:var(--ink);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:600;stroke-dashoffset:600;animation:tacDraw 1.1s var(--ease) forwards}
+.tac-spark-area{fill:var(--yellow-soft)}
+.tac-spark circle{fill:var(--ink)}
+.is-up .tac-spark-line,.is-up .tac-spark circle{stroke:var(--good);fill:var(--good)}.is-up .tac-spark-line{fill:none}.is-up .tac-spark-area{fill:var(--good-soft)}
+.is-down .tac-spark-line,.is-down .tac-spark circle{stroke:var(--bad);fill:var(--bad)}.is-down .tac-spark-line{fill:none}.is-down .tac-spark-area{fill:var(--bad-soft)}
+@keyframes tacDraw{to{stroke-dashoffset:0}}
+.tac-trend-foot{display:flex;justify-content:space-between;align-items:baseline;margin-top:6px}
+.tac-trend-foot small{color:var(--muted)}.tac-trend-foot em{font-style:normal;font-size:.78rem;font-weight:700}
+@media (prefers-reduced-motion:reduce){.tac-spark-line{animation:none;stroke-dashoffset:0}}
 @media (max-width:560px){.lf-skill{grid-template-columns:1fr 80px 40px}.tac-table th:nth-child(3),.tac-table td:nth-child(3){display:none}.lf-card,.tac-card{padding:16px}}

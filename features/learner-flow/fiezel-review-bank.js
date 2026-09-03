@@ -102,6 +102,8 @@
     if (BY_ID[id]) return BY_ID[id];
     var m = id.match(/^g(pt|pq):(\d+):(\d+):(\d+)$/);
     if (m) return (m[1] === 'pq' ? pastQItem : pastTenseItem)(+m[2], +m[3], +m[4]);
+    var f = id.match(/^g(vc|ld|ri):(\d+)$/);
+    if (f) return (f[1] === 'vc' ? vfItem : f[1] === 'ld' ? ldItem : riItem)(+f[2]);
     return null;
   }
 
@@ -169,11 +171,65 @@
       note: 'Pertanyaan lampau: did + subject + verb 1.'
     };
   }
-  function generated(skill, seed) {
+  // Template data untuk vocab/listening/reading (tak-terbatas seperti grammar: dipilih per
+  // seed lalu urutan pilihan diacak variant()). Bentuk: [prompt/dialog/passage, jawaban,
+  // [3 distraktor], kata kunci, [3 alasan distraktor]].
+  var VF = [
+    ['She was very ___ after she won the prize.', 'happy', ['sad', 'angry', 'tired'], 'won the prize', ['“sad” (sedih) bertentangan dengan menang.', '“angry” (marah) bertentangan dengan menang.', '“tired” (lelah) tidak dijelaskan konteks.']],
+    ['I need an ___ because it is raining.', 'umbrella', ['apple', 'onion', 'engine'], 'it is raining', ['“apple” tidak melindungi dari hujan.', '“onion” tidak berhubungan.', '“engine” tidak berhubungan.']],
+    ['The soup is too ___; I added more water.', 'salty', ['sweet', 'empty', 'quiet'], 'added more water', ['“sweet” tidak diperbaiki dengan air.', '“empty” bukan sifat rasa.', '“quiet” bukan sifat rasa.']],
+    ['He is ___ because he did not sleep last night.', 'sleepy', ['excited', 'hungry', 'proud'], 'did not sleep', ['“excited” tidak cocok dengan kurang tidur.', '“hungry” soal lapar, bukan tidur.', '“proud” tidak berhubungan.']],
+    ['Please ___ the door; it is cold outside.', 'close', ['open', 'break', 'paint'], 'it is cold outside', ['“open” justru menambah dingin.', '“break” berarti merusak.', '“paint” berarti mengecat.']],
+    ['We arrived ___ so we missed the first bus.', 'late', ['early', 'quickly', 'safely'], 'missed the first bus', ['“early” bertentangan dengan ketinggalan bus.', '“quickly” tidak menjelaskan sebab.', '“safely” tidak menjelaskan sebab.']],
+    ['This box is very ___; I cannot lift it.', 'heavy', ['light', 'cheap', 'clean'], 'cannot lift it', ['“light” bertentangan dengan tak terangkat.', '“cheap” soal harga.', '“clean” soal kebersihan.']],
+    ['She ___ money every month to buy a laptop.', 'saves', ['spends', 'loses', 'throws'], 'to buy a laptop', ['“spends” justru menghabiskan.', '“loses” berarti kehilangan.', '“throws” berarti membuang.']],
+    ['The museum is ___ on Mondays, so come on Tuesday.', 'closed', ['open', 'free', 'busy'], 'come on Tuesday', ['“open” bertentangan dengan datang hari lain.', '“free” soal biaya.', '“busy” tidak menjelaskan.']],
+    ['My grandmother is very ___; she helps everyone.', 'kind', ['rude', 'lazy', 'noisy'], 'helps everyone', ['“rude” bertentangan dengan menolong.', '“lazy” bertentangan dengan menolong.', '“noisy” tidak berhubungan.']],
+    ['Turn ___ the lights when you leave the room.', 'off', ['on', 'up', 'in'], 'when you leave', ['“on” justru menyalakan.', '“up” tidak dipakai untuk lampu di sini.', '“in” tidak cocok.']],
+    ['The test was ___, so most students passed.', 'easy', ['difficult', 'expensive', 'loud'], 'most students passed', ['“difficult” bertentangan dengan banyak lulus.', '“expensive” soal harga.', '“loud” soal suara.']],
+    ['I am ___; can we stop for lunch?', 'hungry', ['full', 'sleepy', 'angry'], 'stop for lunch', ['“full” bertentangan dengan minta makan.', '“sleepy” soal kantuk.', '“angry” soal marah.']],
+    ['He speaks English ___; everyone understands him.', 'clearly', ['badly', 'slowly', 'rarely'], 'everyone understands', ['“badly” bertentangan dengan mudah dimengerti.', '“slowly” belum tentu jelas.', '“rarely” soal frekuensi.']],
+    ['We ___ a table before going to the restaurant.', 'booked', ['cooked', 'cleaned', 'sold'], 'before going to the restaurant', ['“cooked” bukan yang dilakukan tamu.', '“cleaned” tidak cocok.', '“sold” berarti menjual.']],
+    ['The road is ___, so drive carefully.', 'wet', ['dry', 'wide', 'new'], 'drive carefully', ['“dry” tidak menuntut hati-hati.', '“wide” soal lebar.', '“new” soal usia jalan.']]
+  ];
+  var LF = [
+    ['A: What time is the meeting?\nB: At three, but please come at ten to three.', 'When should they arrive?', '2:50', ['3:00', '3:10', '2:30'], 'ten to three', ['3:00 adalah jam mulai, bukan jam datang.', '3:10 tidak disebut.', '2:30 tidak disebut.']],
+    ['A: Would you like tea or juice?\nB: Juice, please, but without ice.', 'What does B want?', 'Juice without ice', ['Tea with ice', 'Juice with ice', 'Tea without ice'], 'without ice', ['B memilih jus, bukan teh.', 'B menolak es.', 'B memilih jus.']],
+    ['A: How many people are coming?\nB: Ten adults and five children.', 'How many children are coming?', 'Five', ['Ten', 'Fifteen', 'Two'], 'five children', ['Sepuluh adalah jumlah dewasa.', 'Lima belas adalah total.', 'Dua tidak disebut.']],
+    ['A: Where did you leave the umbrella?\nB: By the door, not in the car.', 'Where is the umbrella?', 'By the door', ['In the car', 'On the chair', 'At school'], 'not in the car', ['B menegaskan bukan di mobil.', 'Kursi tidak disebut.', 'Sekolah tidak disebut.']],
+    ['A: Is the shop open now?\nB: Yes, until nine, but closed tomorrow.', 'When is the shop closed?', 'Tomorrow', ['Now', 'At nine tonight', 'On weekends'], 'closed tomorrow', ['Sekarang buka.', 'Jam sembilan tutup harian, bukan hari libur.', 'Akhir pekan tidak disebut.']],
+    ['A: Shall we meet Monday?\nB: Monday is hard. Thursday is better for me.', 'When will they likely meet?', 'Thursday', ['Monday', 'Tuesday', 'Friday'], 'Thursday is better', ['B bilang Senin sulit.', 'Selasa tidak disebut.', 'Jumat tidak disebut.']],
+    ['A: How much is the notebook?\nB: Three dollars each, or five for two.', 'How much for two notebooks?', 'Five dollars', ['Three dollars', 'Six dollars', 'Ten dollars'], 'five for two', ['Tiga dolar untuk satu.', 'Enam adalah 3×2 tanpa diskon.', 'Sepuluh tidak disebut.']],
+    ['A: Did the train arrive?\nB: Not yet. It is twenty minutes late.', 'What happened to the train?', 'It is late', ['It arrived early', 'It was cancelled', 'It is on time'], 'twenty minutes late', ['Justru terlambat, bukan lebih awal.', 'Tidak dibatalkan.', 'Tidak tepat waktu.']],
+    ['A: Which bag is yours?\nB: The small black one, not the big brown one.', 'Which bag is B\u2019s?', 'Small black', ['Big brown', 'Small brown', 'Big black'], 'small black one', ['B menolak yang cokelat besar.', 'Warna salah.', 'Ukuran salah.']],
+    ['A: What is the homework?\nB: Read page ten, and answer only question two.', 'Which question must be answered?', 'Question two', ['Question ten', 'All questions', 'No questions'], 'only question two', ['Sepuluh adalah nomor halaman.', 'Hanya satu soal.', 'Ada satu soal yang dikerjakan.']]
+  ];
+  var RF = [
+    ['Rudi packed sunscreen, a hat, and his swimming shorts.', 'Where is Rudi probably going?', 'To the beach', ['To school', 'To a meeting', 'To bed'], 'sunscreen, hat, swimming shorts', ['Sekolah tidak butuh baju renang.', 'Rapat tidak butuh baju renang.', 'Tidur tidak butuh itu.']],
+    ['The streets were empty and all the shops had their lights off.', 'What can we infer?', 'It is very late at night', ['It is a busy morning', 'It is a holiday sale', 'It is raining hard'], 'empty + lights off', ['Pagi sibuk tidak sepi.', 'Obral membuat toko menyala.', 'Hujan tidak dijelaskan.']],
+    ['Dina kept yawning and rubbing her eyes during the film.', 'How does Dina feel?', 'Sleepy', ['Excited', 'Angry', 'Hungry'], 'yawning + rubbing her eyes', ['Antusias tidak menguap terus.', 'Marah tidak dijelaskan.', 'Lapar tidak dijelaskan.']],
+    ['Everyone clapped and the singer smiled and bowed.', 'What just happened?', 'A performance ended', ['A test started', 'A fight began', 'A meal was served'], 'clapped + bowed', ['Ujian tidak bertepuk tangan.', 'Tidak ada tanda pertengkaran.', 'Tidak ada makanan.']],
+    ['Andi checked the map twice and asked a stranger for directions.', 'What can we infer about Andi?', 'He is lost', ['He is a tour guide', 'He is very tired', 'He is late for work'], 'checked map + asked directions', ['Pemandu tidak perlu bertanya arah.', 'Lelah tidak dijelaskan.', 'Terlambat tidak dijelaskan.']],
+    ['The plants were brown and the soil was dry and cracked.', 'What can we infer?', 'They have not been watered', ['It rained a lot', 'It is winter', 'They are plastic'], 'brown + dry cracked soil', ['Hujan banyak membuat tanah basah.', 'Musim dingin tidak dijelaskan.', 'Tidak ada tanda plastik.']],
+    ['Sari put on a thick coat, gloves, and a woollen hat.', 'What is the weather like?', 'Very cold', ['Very hot', 'Rainy', 'Windy only'], 'coat, gloves, woollen hat', ['Panas tidak butuh mantel tebal.', 'Tidak ada payung/jas hujan.', 'Ketiganya khas dingin, bukan hanya angin.']],
+    ['The baby stopped crying as soon as her mother held her.', 'Why did the baby stop crying?', 'She felt safe with her mother', ['She was hungry', 'The room was dark', 'She saw a toy'], 'as soon as her mother held her', ['Lapar tidak dijelaskan sebagai sebab berhenti.', 'Kegelapan tidak disebut.', 'Mainan tidak disebut.']],
+    ['Tono studied all week and smiled when he saw his grade.', 'What can we infer about the grade?', 'It was good', ['It was bad', 'It was missing', 'It was late'], 'studied all week + smiled', ['Senyum tidak cocok dengan nilai buruk.', 'Nilai tidak hilang.', 'Tidak ada soal keterlambatan.']],
+    ['The waiter brought menus and filled the glasses with water.', 'Where are they?', 'At a restaurant', ['At a library', 'At a hospital', 'At a bus stop'], 'waiter + menus', ['Perpustakaan tidak ada pelayan/menu.', 'Rumah sakit tidak begitu.', 'Halte bus tidak begitu.']]
+  ];
+  function vfItem(i) { var f = VF[i % VF.length]; return { id: 'gvc:' + (i % VF.length), skill: 'vocab_a2', prompt: f[0], options: [f[1]].concat(f[2]), answer: 0, marker: f[3], why: { 1: f[4][0], 2: f[4][1], 3: f[4][2] }, note: 'Petunjuk konteksnya: “' + f[3] + '”.' }; }
+  function ldItem(i) { var f = LF[i % LF.length]; return { id: 'gld:' + (i % LF.length), skill: 'listening_detail', context: f[0], contextKind: 'dialogue', prompt: f[1], options: [f[2]].concat(f[3]), answer: 0, marker: f[4], why: { 1: f[5][0], 2: f[5][1], 3: f[5][2] }, note: 'Kata kuncinya: “' + f[4] + '”.' }; }
+  function riItem(i) { var f = RF[i % RF.length]; return { id: 'gri:' + (i % RF.length), skill: 'reading_inference', context: f[0], contextKind: 'passage', prompt: f[1], options: [f[2]].concat(f[3]), answer: 0, marker: f[4], why: { 1: f[5][0], 2: f[5][1], 3: f[5][2] }, note: 'Kesimpulannya datang dari petunjuk “' + f[4] + '”, bukan kalimat yang tertulis langsung.' }; }
+  // Soal kanonik dari seed (jawaban di posisi tetap); generated() mengacak urutannya.
+  function canonicalFor(skill, seed) {
     var s = (Number(seed) || 1) >>> 0;
+    if (skill === 'vocab_a2') return vfItem(s % VF.length);
+    if (skill === 'listening_detail') return ldItem(s % LF.length);
+    if (skill === 'reading_inference') return riItem(s % RF.length);
     var vi = s % GEN_VERBS.length, si = (Math.floor(s / 7)) % GEN_SUBJ.length, ti = (Math.floor(s / 53)) % GEN_TIME.length;
     return skill === 'past_questions' ? pastQItem(vi, si, ti) : pastTenseItem(vi, si, ti);
   }
+  function generated(skill, seed) { return variant(canonicalFor(skill, seed), seed); }
+  function baseId(id) { var i = String(id).indexOf('~o'); return i > -1 ? String(id).slice(0, i) : String(id); }
 
   /** Klon soal dengan urutan pilihan diacak; id meng-encode urutan agar bisa direkonstruksi. */
   function variant(item, seed) {
@@ -197,13 +253,15 @@
     var avoid = {}; (opts.avoid || []).forEach(function (id) { avoid[id] = true; });
     var seed = Number(opts.seed) || 7;
     var out = seededShuffle(itemsFor(skill).filter(function (it) { return !avoid[it.id]; }), seed).slice(0, n);
-    var have = {}; out.forEach(function (it) { have[it.id] = true; });
-    if (out.length < n && (skill === 'past_tense' || skill === 'past_questions')) {
-      var guard = 0;
-      while (out.length < n && guard < 400) {
-        var g = generated(skill, seed + guard * 101 + 13); guard++;
-        if (!avoid[g.id] && !have[g.id]) { out.push(g); have[g.id] = true; }
-      }
+    var have = {}, usedBase = {};
+    out.forEach(function (it) { have[it.id] = true; usedBase[baseId(it.id)] = true; });
+    // Stok statis habis → buat soal baru dari template (semua skill), hindari frame/pola yang
+    // sudah dipakai di batch ini dan id yang sudah pernah diuji.
+    var guard = 0;
+    while (out.length < n && guard < 600) {
+      var g = generated(skill, seed + guard * 101 + 13); guard++;
+      var b = baseId(g.id);
+      if (!avoid[g.id] && !avoid[b] && !have[g.id] && !usedBase[b]) { out.push(g); have[g.id] = true; usedBase[b] = true; }
     }
     if (out.length < n) {
       var base = seededShuffle(itemsFor(skill), seed + 1), j = 0;
