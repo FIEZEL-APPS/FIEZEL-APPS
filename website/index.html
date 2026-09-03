@@ -92,11 +92,30 @@
         <!-- wordmark RESMI repo: assets/brand/fiezel-wordmark.svg (inline, tint maroon) -->
         <svg class="mast-word" viewBox="0 0 1000 260" role="img" aria-label="FIEZEL"><defs><linearGradient id="fzwMaroon-mast" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8C2233"/><stop offset="100%" stop-color="#6D1926"/></linearGradient><linearGradient id="fzwGold-mast" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFDE59"/><stop offset="45%" stop-color="#FFC700"/><stop offset="100%" stop-color="#E6A800"/></linearGradient></defs><g fill="url(#fzwMaroon-mast)"><rect x="30" y="30" width="42" height="200" rx="21"/><rect x="30" y="30" width="144" height="42" rx="21"/><rect x="30" y="109" width="116" height="42" rx="21"/><rect x="300" y="30" width="42" height="200" rx="21"/><rect x="300" y="30" width="144" height="42" rx="21"/><rect x="300" y="109" width="100" height="42" rx="21"/><rect x="300" y="188" width="130" height="42" rx="21"/><rect x="478" y="30" width="150" height="42" rx="21"/><rect x="478" y="188" width="150" height="42" rx="21"/><rect x="607" y="30" width="191.38" height="42" rx="21" transform="rotate(124.354 607 51)"/><rect x="662" y="30" width="42" height="200" rx="21"/><rect x="662" y="30" width="144" height="42" rx="21"/><rect x="662" y="109" width="100" height="42" rx="21"/><rect x="662" y="188" width="130" height="42" rx="21"/><rect x="840" y="30" width="42" height="200" rx="21"/><rect x="840" y="188" width="130" height="42" rx="21"/></g><g fill="url(#fzwGold-mast)"><rect x="192" y="30" width="26" height="200" rx="13"/><rect x="240" y="106" width="26" height="124" rx="13"/></g></svg>
       </div>
-      <p class="mast-sub seq seq-2">Not just learning with you. Learning about you.</p>
+      <p class="mast-sub seq seq-1">Not just learning with you. Learning about you.</p>
+
+      <!-- m029 FOCUS: layar pertama harus menjawab TIGA pertanyaan dalam 5 detik —
+           untuk siapa, masalah apa yang diselesaikan, dan apa yang harus diklik.
+           Sampai commit ini teks TERBESAR di atas lipatan adalah tagline Inggris 12px,
+           dan <h1> satu-satunya terkubur di seksi berikutnya (#ringkasan), jadi pengunjung
+           Indonesia menatap wordmark + panggung animasi tanpa satu kalimat pun yang
+           menyebut masalahnya. Judul dipindah NAIK ke sini, dan CTA ganda (yang membelah
+           perhatian tepat di detik pengunjung paling siap mengklik) menjadi satu jalur. -->
+      <h1 class="mast-h1 seq seq-2">Belajar bahasa Inggris dari kesalahanmu sendiri</h1>
+      <p class="mast-lede seq seq-2">FIEZEL membaca pola jawabanmu, lalu menyusun rencana belajar yang menyesuaikan kemampuanmu — bukan sekadar menandai benar atau salah.</p>
+
+      <!-- CTA tunggal & KONKRET. Angkanya jujur: tes penempatan FIEZEL memang 25 soal
+           (app.js PLACEMENT_SIZE=25) — bukan "3 menit" yang enak dibaca tapi tidak benar. -->
       <div class="cta-row cta-center mast-cta seq seq-3">
-        <a class="btn btn-primary" href="app/">Mulai Belajar</a>
-        <a class="btn btn-ghost" href="install/">Cara Install</a>
+        <a class="btn btn-primary btn-hero" href="app/">
+          <span class="btn-hero-main">Mulai tes penempatan</span>
+          <span class="btn-hero-sub">25 soal · tanpa akun · hasilnya jadi rencana belajarmu</span>
+        </a>
       </div>
+      <p class="mast-trust seq seq-3">
+        Gratis, tanpa langganan · Progres tersimpan di perangkatmu sendiri · Bisa dipakai offline
+        <a class="mast-trust-link" href="install/">Cara pasang ke layar utama</a>
+      </p>
     </div>
 
     <div class="wrap">
@@ -383,15 +402,68 @@
     </div>
   </section>
 
+  <!-- ============ ADAPTIF DALAM TIGA LANGKAH ============
+       m029 FOCUS: "adaptif" adalah klaim pembeda FIEZEL, tetapi sampai commit ini ia hanya
+       DIKATAKAN ("menyesuaikan soal dengan jawabanmu") dan tidak pernah DITUNJUKKAN — dari
+       luar tidak ada bedanya dengan aplikasi kuis biasa. Strip ini memperlihatkan satu putaran
+       nyata: jawaban salah -> pola dibaca -> sesi berikutnya berubah.
+
+       Naskah langkah 2 BUKAN karangan halaman ini: ia disalin apa adanya dari entri TA-002 di
+       grammar-explanations-id.json (field `misconception` dan `rule`) — yaitu penjelasan yang
+       benar-benar dibaca murid di dalam aplikasi. Kalau bank soal berubah, perbarui di sini. -->
+  <section class="sec sec-loop" id="adaptif">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="sec-num" aria-hidden="true">01 — Adaptif</span>
+        <h2 class="sec-title">Apa yang terjadi saat kamu salah</h2>
+        <p class="sec-dek">Kebanyakan orang berhenti belajar bukan karena kurang materi, tapi karena tidak tahu harus mulai dari mana. Ini satu putaran nyata di dalam FIEZEL — bukan ilustrasi.</p>
+        <hr class="rule" aria-hidden="true">
+      </div>
+
+      <ol class="loop">
+        <li class="card loop-step reveal">
+          <p class="loop-n"><span aria-hidden="true">1</span>Kamu menjawab</p>
+          <p class="loop-q">I <s>have finished</s> it <b>yesterday</b>.</p>
+          <p class="loop-verdict loop-verdict-bad">Belum tepat</p>
+          <dl class="loop-ans">
+            <dt>Pilihanmu</dt><dd>have finished</dd>
+            <dt>Seharusnya</dt><dd>finished</dd>
+          </dl>
+          <p class="loop-note">FIEZEL berhenti di sini kalau ia aplikasi kuis biasa.</p>
+        </li>
+
+        <li class="card loop-step reveal">
+          <p class="loop-n"><span aria-hidden="true">2</span>FIEZEL menjelaskan polanya</p>
+          <p class="loop-exp">Kamu ngira present perfect selalu berarti masih jalan sekarang. Padahal maknanya lampau tanpa waktu pasti yang masih nyambung ke sekarang.</p>
+          <p class="loop-rule"><b>Aturannya:</b> present perfect nggak bisa jalan bareng keterangan waktu lampau yang pasti — “yesterday”, “in 2019”, “last week”.</p>
+          <p class="loop-note">Bukan cuma “salah”, tapi <b>kenapa</b> salah.</p>
+        </li>
+
+        <li class="card loop-step reveal">
+          <p class="loop-n"><span aria-hidden="true">3</span>Sesi berikutnya berubah</p>
+          <ul class="loop-plan">
+            <li><span class="loop-plan-k">Ditambahkan</span> Review past simple vs present perfect</li>
+            <li><span class="loop-plan-k">Alasan</span> Pola ini tertukar di latihan terakhirmu</li>
+            <li><span class="loop-plan-k">Muncul lagi</span> Di target harianmu besok</li>
+          </ul>
+          <p class="loop-note">Rencana besok disusun dari kesalahan hari ini.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
   <!-- ============ RINGKASAN (teks panjang: turun setelah panggung visual) ============ -->
   <section class="sec sec-intro" id="ringkasan">
     <div class="wrap intro-grid">
       <div class="intro-copy reveal">
         <p class="eyebrow">Gratis, tanpa langganan</p>
-        <h1>Ruang belajar bahasa Inggris personal milikmu</h1>
+        <!-- m029 FOCUS: turun dari <h1> ke <h2>. Judul halaman sekarang ada di hero
+             (.mast-h1); dua <h1> dalam satu dokumen membuat urutan heading pembaca
+             layar bercabang dan tidak ada yang tahu mana judul halaman sebenarnya. -->
+        <h2>Ruang belajar bahasa Inggris personal milikmu</h2>
         <p class="lede">FIEZEL menyatukan grammar, kosakata, reading, speaking, dan listening dalam satu aplikasi yang menyesuaikan soal dengan jawabanmu. Semuanya dipetakan ke tingkat CEFR A1–C2 dan bisa kamu pakai tanpa biaya.</p>
         <div class="cta-row">
-          <a class="btn btn-primary" href="app/">Mulai Belajar</a>
+          <a class="btn btn-primary" href="app/">Mulai tes penempatan</a>
           <a class="btn btn-ghost" href="install/">Cara Install</a>
         </div>
         <p class="fineprint">Tanpa akun. Progres belajarmu tersimpan di perangkatmu sendiri.</p>
@@ -426,7 +498,7 @@
     <div class="wrap about-grid">
       <div class="reveal">
         <div class="sec-head">
-          <span class="sec-num" aria-hidden="true">01 — Tentang</span>
+          <span class="sec-num" aria-hidden="true">02 — Tentang</span>
           <h2 class="sec-title">Apa itu FIEZEL</h2>
         </div>
         <p class="body-lg">FIEZEL adalah ruang belajar bahasa Inggris personal: satu aplikasi berisi 180 grammar lesson, 2.440 kosakata, 312 bacaan berjenjang dengan 1.560 soal membaca, 36 sesi speaking, dan 1.400+ latihan listening. Materinya dipetakan ke tingkat CEFR A1–C2, jadi kamu bisa mulai dari level yang benar-benar sesuai.</p>
@@ -451,7 +523,7 @@
   <section class="sec" id="fitur">
     <div class="wrap">
       <div class="sec-head reveal">
-        <span class="sec-num" aria-hidden="true">02 — Isi aplikasi</span>
+        <span class="sec-num" aria-hidden="true">03 — Isi aplikasi</span>
         <h2 class="sec-title">Yang kamu dapat di dalam</h2>
         <hr class="rule" aria-hidden="true">
       </div>
@@ -515,17 +587,21 @@
   <section class="sec sec-steps" id="cara-pakai">
     <div class="wrap">
       <div class="sec-head reveal">
-        <span class="sec-num" aria-hidden="true">03 — Alur</span>
+        <span class="sec-num" aria-hidden="true">04 — Alur</span>
         <h2 class="sec-title">Cara pakai</h2>
         <hr class="rule" aria-hidden="true">
       </div>
+      <!-- m029 FOCUS: urutan disamakan dengan alur aplikasi yang SUNGGUHAN
+           (tes penempatan -> level -> target harian -> review), bukan "pilih level sendiri".
+           Yang menentukan level adalah tes penempatan; state.level tidak pernah diisi
+           dari tebakan murid (app.js ~7074). -->
       <ol class="steps">
-        <li class="card step reveal"><span class="step-n">1</span><p>Buka aplikasi FIEZEL langsung dari browser, tanpa daftar akun.</p></li>
-        <li class="card step reveal"><span class="step-n">2</span><p>Pilih tingkat CEFR yang paling dekat dengan kemampuanmu sekarang.</p></li>
-        <li class="card step reveal"><span class="step-n">3</span><p>Kerjakan lesson beserta 25 soal latihannya sampai tuntas.</p></li>
-        <li class="card step reveal"><span class="step-n">4</span><p>Progres tersimpan otomatis di perangkatmu, siap dilanjutkan besok.</p></li>
+        <li class="card step reveal"><span class="step-n">1</span><p>Buka FIEZEL langsung dari browser. Tanpa daftar akun, tanpa unduhan.</p></li>
+        <li class="card step reveal"><span class="step-n">2</span><p>Kerjakan tes penempatan 25 soal. FIEZEL memetakan levelmu di CEFR A1–C2.</p></li>
+        <li class="card step reveal"><span class="step-n">3</span><p>Dapatkan target harian yang disusun dari jawabanmu sendiri, bukan angka tetap.</p></li>
+        <li class="card step reveal"><span class="step-n">4</span><p>Setiap kesalahan kembali sebagai review. Progres tersimpan di perangkatmu.</p></li>
       </ol>
-      <div class="steps-cta reveal"><a class="btn btn-primary" href="app/">Mulai Belajar</a></div>
+      <div class="steps-cta reveal"><a class="btn btn-primary" href="app/">Mulai tes penempatan</a></div>
     </div>
   </section>
 
@@ -534,7 +610,7 @@
     <div class="wrap">
       <div class="card install-card reveal">
         <div class="install-copy">
-          <span class="sec-num" aria-hidden="true">04 — Pemasangan</span>
+          <span class="sec-num" aria-hidden="true">05 — Pemasangan</span>
           <h2 class="sec-title">Pasang di ponselmu</h2>
           <p class="body-lg">FIEZEL bisa dipasang ke layar utama lewat menu browser, tanpa toko aplikasi. Materi dan latihan bisa dibuka tanpa internet. Suara neural dan tutor AI butuh jaringan.</p>
           <ul class="howlist">
@@ -557,7 +633,7 @@
   <section class="sec sec-faq" id="faq">
     <div class="wrap wrap-narrow">
       <div class="sec-head reveal">
-        <span class="sec-num" aria-hidden="true">05 — Tanya jawab</span>
+        <span class="sec-num" aria-hidden="true">06 — Tanya jawab</span>
         <h2 class="sec-title">Pertanyaan yang sering muncul</h2>
         <hr class="rule" aria-hidden="true">
       </div>
