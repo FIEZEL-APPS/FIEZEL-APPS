@@ -238,6 +238,41 @@ function needsCorsHeaders(response, ctx) {
   return !response.headers.has('access-control-allow-origin');
 }
 
+/**
+ * Pangkas stack SEBELUM dicetak. Wajib, dan angkanya bukan teoretis.
+ *
+ * Harness uji memuat modul Worker sebagai `data:text/javascript;base64,...`,
+ * jadi SETIAP frame stack membawa satu modul UTUH ter-base64. Begitu `err.stack`
+ * ikut dicetak mentah, satu galat saja bisa memuntahkan puluhan megabita.
+ * Terukur pada `edge-guard-test.js` (gerbang yang memang sengaja menggiring
+ * banyak jalur galat), mesin sama, gerbang sama, hanya baris log yang beda:
+ *
+ *     tanpa err.stack :             64 bita
+ *     dengan err.stack : 22.135.831 bita   (345.872x)
+ *
+ * Volume itulah yang menyumbat aliran log runner GitHub sampai step `Core
+ * validation` tampak menggantung berjam-jam — dan karena job yang dibatalkan
+ * di tengah step tidak pernah mengunggah lognya, penyebabnya tidak terbaca
+ * sama sekali selama tiga run berturut-turut.
+ *
+ * Yang dibuang HANYA muatan base64-nya. Nama fungsi dan urutan pemanggilan —
+ * satu-satunya bagian yang benar-benar menolong diagnosis, dan seluruh alasan
+ * `err.stack` ditambahkan — tetap utuh:
+ *
+ *     at ensureIdentityRow (<modul>)
+ *     at issueAnonIdentity (<modul>)
+ *     at async routeAuthAnonInner (<modul>)
+ *
+ * Cap 4.000 karakter dipasang sebagai sabuk kedua: stack rekursif dalam bisa
+ * panjang walau tanpa data-URI, dan log yang tidak terbatas adalah cacat yang
+ * sama dalam bentuk lain. Di produksi modulnya berkas biasa, jadi pemangkasan
+ * ini nyaris tidak pernah menggigit di sana.
+ */
+function compactStack(raw) {
+  if (typeof raw !== 'string') return raw;
+  return raw.replace(/data:[^,\s)]*,[A-Za-z0-9+/=_-]*/g, '<modul>').slice(0, 4000);
+}
+
 export default {
   /**
    * Cron. Galat SATU job tidak boleh membatalkan job lain (`runScheduled`
@@ -258,7 +293,45 @@ export default {
       // provider bisa memuat kunci, prompt, atau nama model. Detail masuk log
       // Worker (observability), respons tetap generik + header CORS supaya
       // frontend bisa menampilkan naskah FIEZEL, bukan "network error".
-      console.error('fiezel-api unhandled', err && err.name);
+      //
+      // ======================================================================
+      // KENAPA `message` DAN `stack` IKUT — DIBAYAR SATU SIKLUS DEPLOY
+      // ======================================================================
+      // Versi sebelumnya mencatat `err.name` SAJA, dan itu tidak menepati
+      // kalimat "Detail masuk log Worker" di atas: yang sampai ke `wrangler
+      // tail` cuma nama kelas DOMException. Ongkosnya terukur pada insiden
+      // 3 Sep 2026 — setiap `POST /api/account/register` menjawab 500 dan log
+      // produksi hanya berbunyi:
+      //
+      //     fiezel-api unhandled NotSupportedError
+      //
+      // Dari baris itu penyebabnya TIDAK dapat disimpulkan. Perbaikan pertama
+      // yang diusulkan (PR #331) menebak bentuk parameter `hash` WebCrypto dan
+      // keliru. Baru setelah `message` + `stack` ikut tercatat, penyebabnya
+      // terbaca sekali lihat dan tanpa tebakan:
+      //
+      //     Pbkdf2 failed: iteration counts above 100000 are not supported
+      //     (requested 210000).   at derive -> hashPassword -> routeAccountRegister
+      //
+      // Jadi satu siklus deploy terbuang untuk memulihkan informasi yang
+      // seharusnya sudah ada di log sejak awal. Itu harga yang tidak perlu
+      // dibayar dua kali.
+      //
+      // BATAS YANG TETAP BERLAKU, dan kenapa ini bukan pelonggaran keamanan:
+      //   - yang berubah HANYA sisi log Worker, yang cuma bisa dibaca pemilik
+      //     akun Cloudflare lewat `wrangler tail`/observability;
+      //   - RESPONS ke murid tidak berubah sedikit pun — tetap `jsonError(500,
+      //     ERR.INTERNAL, {})`, nol detail, sama seperti sebelumnya. Itulah
+      //     invarian yang benar-benar menjaga kunci hulu, dan ia utuh;
+      //   - peringatan "pesan provider bisa memuat kunci" tetap relevan untuk
+      //     log: jangan pernah menyalin-tempel keluaran `tail` ke tempat publik
+      //     (issue, PR, chat pihak ketiga) tanpa membacanya lebih dulu.
+      console.error(
+        'fiezel-api unhandled',
+        err && err.name,
+        err && err.message,
+        compactStack(err && err.stack)
+      );
       const cors = corsHeaders(env, request.headers.get('origin'));
       return jsonError(500, ERR.INTERNAL, {}, { headers: cors });
     }
