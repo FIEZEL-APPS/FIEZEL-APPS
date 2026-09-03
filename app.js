@@ -11126,6 +11126,48 @@ let socialInviteSheetOpen=false,socialInviteBusy=false,socialInviteBooted=false;
 function inviteLink(){try{return self.FiezelInviteLink||null}catch(_){return null}}
 function socialNotifyCore(){try{return self.FiezelSocialNotify||null}catch(_){return null}}
 
+/* ---------------------------------------------------------------- ajakan pasang ke Home Screen */
+/* Tautan undangan yang dibuka dari WhatsApp SELALU mendarat di tab peramban, bukan aplikasi
+ * terpasang (batas platform, lihat catatan panjang di fiezel-invite-link.js). Sesudah undangan
+ * DITERIMA di tab itu — momen paling wajar untuk mengajak murid memasang aplikasinya, supaya
+ * besok cukup ketuk icon. Chrome/Android punya `beforeinstallprompt` yang bisa dipicu dari
+ * kode; Safari/iOS TIDAK PUNYA API itu sama sekali, jadi satu-satunya jalan di sana adalah
+ * instruksi manual (Bagikan → Tambah ke Layar Utama). Dua platform, dua markup, nol janji
+ * yang tidak bisa ditepati salah satunya. */
+let deferredInstallPrompt=null;
+try{
+  self.addEventListener?.('beforeinstallprompt',e=>{
+    e.preventDefault();               // tahan banner bawaan Chrome — kita tawarkan di momen kita sendiri
+    deferredInstallPrompt=e;
+  });
+  self.addEventListener?.('appinstalled',()=>{deferredInstallPrompt=null});
+}catch(_){}
+function isStandaloneApp(){try{return self.FiezelBackNav?.standalone?.(self)===true}catch(_){return false}}
+function isIosPlatform(){try{return /iP(hone|ad|od)/.test(navigator.userAgent||'')}catch(_){return false}}
+/** Nudge hanya relevan di tab peramban biasa: aplikasi terpasang tidak perlu mengajak dirinya sendiri. */
+function socialShouldOfferInstall(){return !isStandaloneApp()&&(!!deferredInstallPrompt||isIosPlatform())}
+function socialInstallNudgeMarkup(){
+  if(!socialShouldOfferInstall())return '';
+  if(deferredInstallPrompt){
+    return `<div class="social-install-nudge"><p class="muted">${FiezelI18n.t('social.install-body')}</p><div class="modal-actions"><button onclick="socialPromptInstall()"><i data-lucide="download"></i> ${FiezelI18n.t('social.install-btn')}</button></div></div>`;
+  }
+  if(isIosPlatform())return `<div class="social-install-nudge"><p class="muted">${FiezelI18n.t('social.install-ios-body')}</p></div>`;
+  return '';
+}
+async function socialPromptInstall(){
+  if(!deferredInstallPrompt)return false;
+  const evt=deferredInstallPrompt;deferredInstallPrompt=null;
+  try{
+    evt.prompt();
+    const choice=await evt.userChoice;
+    if(choice?.outcome==='accepted')showToast(FiezelI18n.t('social.install-done-toast'));
+  }catch(_){/* dialog sistem dibatalkan/gagal — tidak fatal, murid masih di tab yang jalan */}
+  // Nudge sudah tidak relevan lagi (diterima atau ditolak) — cat ulang supaya tombolnya hilang.
+  try{const host=document.querySelector('.social-install-nudge');if(host)host.remove()}catch(_){}
+  return true;
+}
+window.socialPromptInstall=socialPromptInstall;
+
 /**
  * Satu-satunya pintu masuk undangan. Dipanggil SESUDAH alur sambutan selesai supaya lembar
  * ini tidak pernah bertumpuk di atas perkenalan/izin notifikasi, dan lagi setiap kali tab
@@ -11279,7 +11321,8 @@ async function socialInviteRedeem(code){
     socialNotifyResync();
     socialInvitePaint(`<h2>${FiezelI18n.t('social.deeplink-success-title')}</h2>
       <p>${FiezelI18n.t('social.deeplink-success-body',{handle:esc(handle)})}</p>
-      <div class="modal-actions"><button onclick="socialInviteOpenFriends()"><i data-lucide="users"></i> ${FiezelI18n.t('social.deeplink-open-btn')}</button><button class="primary" onclick="socialInviteOpenDuel()"><i data-lucide="swords"></i> ${FiezelI18n.t('social.deeplink-duel-btn')}</button></div>`);
+      <div class="modal-actions"><button onclick="socialInviteOpenFriends()"><i data-lucide="users"></i> ${FiezelI18n.t('social.deeplink-open-btn')}</button><button class="primary" onclick="socialInviteOpenDuel()"><i data-lucide="swords"></i> ${FiezelI18n.t('social.deeplink-duel-btn')}</button></div>
+      ${socialInstallNudgeMarkup()}`);
     socialMicroMoment('friend');
     return true;
   }
