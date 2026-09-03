@@ -232,6 +232,31 @@ assert(html.indexOf('features/social/fiezel-invite-link.js') < html.indexOf('src
 assert(app.includes('socialInviteBoot()'), 'app.js memanggil socialInviteBoot()');
 assert(app.includes('armSocialInviteSheet()'), 'app.js menjadwalkan lembar undangan sesudah alur sambutan');
 assert(app.includes('socialNotifyPoll'), 'app.js memanggil jalur kabar teman');
+
+/* ================================================================ 6. ajakan pasang Home Screen */
+/* Undangan yang dibuka dari WhatsApp selalu mendarat di tab peramban (batas platform §2). Sesudah
+ * DITERIMA di sana adalah momen paling wajar untuk mengajak murid memasang aplikasinya — yang
+ * dikunci di sini adalah bahwa ajakan itu memang terpasang di titik yang benar, dan TIDAK
+ * PERNAH menjanjikan sesuatu yang tidak bisa ditepati platformnya (Safari/iOS tidak punya
+ * `beforeinstallprompt` sama sekali — Apple belum pernah mengekspos API itu). */
+assert(/addEventListener\?\.\('beforeinstallprompt'/.test(app),
+  'app.js menangkap beforeinstallprompt (satu-satunya API pemicu install terprogram, Chrome/Android)');
+assert(/beforeinstallprompt'[\s\S]{0,80}e\.preventDefault\(\)/.test(app),
+  'banner install BAWAAN Chrome ditahan (preventDefault) — ajakan ditawarkan di momen kita sendiri, bukan menumpuk dua banner');
+assert(app.includes("addEventListener?.('appinstalled'"),
+  'deferredInstallPrompt dibersihkan sesudah terpasang — tidak menawarkan install yang sudah selesai');
+assert(app.includes('function socialShouldOfferInstall()') && /!isStandaloneApp\(\)/.test(app),
+  'ajakan HANYA muncul di tab peramban — aplikasi terpasang tidak perlu mengajak dirinya sendiri');
+assert(app.includes("if(isIosPlatform())return"),
+  'iOS/Safari dapat CABANG TERPISAH (instruksi manual) — nol pura-pura punya tombol install terprogram yang platformnya tidak sediakan');
+assert(app.includes('social.install-btn') && app.includes('social.install-ios-body'),
+  'dua kunci naskah terpisah untuk dua cabang platform — Android dan iOS tidak berbagi satu kalimat yang salah untuk salah satunya');
+assert(app.includes("${socialInstallNudgeMarkup()}"),
+  'ajakan install benar-benar DIPASANG di layar sukses undangan diterima, bukan cuma didefinisikan tanpa dipanggil');
+assert(/async function socialPromptInstall\(\)\{[\s\S]{0,400}evt\.prompt\(\)/.test(app),
+  'socialPromptInstall memicu prompt native yang SAMA yang ditangkap beforeinstallprompt, bukan dialog buatan sendiri');
+assert(app.includes('window.socialPromptInstall=socialPromptInstall'),
+  'socialPromptInstall terpasang ke window — dipanggil dari onclick markup yang dirender lewat innerHTML');
 assert(/self\.FiezelInviteLink/.test(app) && /self\.FiezelSocialNotify/.test(app),
   'app.js membaca kedua modul lewat self.* di belakang penjaga (pola fail-silent lane sosial)');
 
