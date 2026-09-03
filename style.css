@@ -1813,9 +1813,17 @@ body.daily-locked{overflow:hidden}
 .fiezel-carousel-arrow[disabled]{background:var(--fz-bg);color:#75654C;opacity:1}
 
 /* ---------- Goal Selection (Step 2) ---------- */
-/* m025-241: dua kolom - enam tujuan dalam satu kolom adalah alasan utama langkah ini
+/* m025-242: dua kolom - enam tujuan dalam satu kolom adalah alasan utama langkah ini
    harus digulir. Kartunya kini hanya membawa labelnya. */
 .fiezel-goal-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:100%}
+/* Pilihan peran (Murid / Guru) di langkah nama onboarding. */
+.fiezel-role-label{margin:10px 0 6px;font-size:.82rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--fz-ink-muted,var(--muted))}
+.fiezel-role-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;margin-bottom:8px}
+.fiezel-role-card{min-height:64px}
+.fiezel-classcode-field input{letter-spacing:.18em;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;text-transform:uppercase}
+.fiezel-classcode-field[hidden]{display:none}
+.fiezel-role-card span{font-size:.8rem;line-height:1.4}
+@media (max-width:420px){.fiezel-role-grid{grid-template-columns:1fr}}
 /* Card Selection (bagian 14): border->gold, bg->soft, scale 1->1.035->1, 300-400ms. */
 /* align-items dipaksa flex-start: aturan dasar `button{display:inline-flex;align-items:center}`
    di kepala berkas ini menang atas text-align, jadi tanpa baris ini judul dan penjelasan

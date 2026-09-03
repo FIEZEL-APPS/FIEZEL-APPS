@@ -521,8 +521,12 @@ async function babK() {
 async function babK2() {
   const onboarding = read('features/onboarding/fiezel-onboarding.js');
   // Langkah nama tidak boleh punya jalan keluar. Tiga pagar, ketiganya diperiksa.
+  // m025-241: tanda tangan nameMarkup menerima parameter ketiga (`role`) sejak pilihan
+  // peran murid/guru masuk ke langkah nama. Pola tanda tangan dilonggarkan supaya parameter
+  // tambahan tidak memerahkan gerbang, TETAPI tuntutannya tidak dikurangi sedikit pun:
+  // topbar(false, false) tetap WAJIB muncul dalam 200 karakter pertama fungsi itu.
   check('(K) langkah nama TANPA tombol "Lewati" dan tanpa "Kembali" (topbar(false, false))',
-    /function nameMarkup\(env, typed\)[\s\S]{0,200}topbar\(false, false\)/.test(onboarding));
+    /function nameMarkup\(env, typed[^)]*\)[\s\S]{0,200}topbar\(false, false\)/.test(onboarding));
   check('(K) tombol lanjut MATI selama nama kosong',
     /btn\(T\('onboarding\.next'\), 'data-ob-advance' \+ \(clean \? '' : ' disabled'\)\)/.test(onboarding));
   check('(K) jalur Enter pada papan ketik juga dijaga (tidak melewati tombol)',

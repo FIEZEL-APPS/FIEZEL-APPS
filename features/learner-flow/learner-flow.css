@@ -192,3 +192,8 @@
 .duel-board ol li.is-me{font-weight:700}
 .duel-result h2{font-size:1.5rem}
 @media (max-width:560px){.duel-versus{grid-template-columns:1fr}}
+
+.tac-classcode{display:grid;grid-template-columns:1fr auto;gap:6px 14px;align-items:center;padding:14px 18px;border-radius:var(--radius-md);background:var(--yellow-soft);border:1.5px dashed var(--yellow-deep)}
+.tac-classcode small{display:block;font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.tac-classcode b{font-size:1.5rem;letter-spacing:.14em;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.tac-classcode p{grid-column:1/-1;margin:0}
