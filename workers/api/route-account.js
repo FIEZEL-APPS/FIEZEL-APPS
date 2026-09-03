@@ -42,7 +42,7 @@ import { codeWellFormed, hashCode, checkRedeemable, INVITE_PROBLEM } from './aut
  * hash sah atas kata sandi acak yang tidak pernah dipakai siapa pun; ia hanya
  * perlu MEMBUAT PBKDF2 berjalan, bukan menjadi rahasia.
  */
-const DUMMY_HASH = 'pbkdf2$210000$AAAAAAAAAAAAAAAAAAAAAA$AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+const DUMMY_HASH = 'pbkdf2$100000$AAAAAAAAAAAAAAAAAAAAAA$AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 
 /** Aturan handle: sama dengan `social_handle` supaya satu orang punya satu nama. */
 const HANDLE_RE = /^[a-z0-9_]{3,20}$/;
