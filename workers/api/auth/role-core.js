@@ -113,6 +113,9 @@ export const ROUTE_CAPABILITY = Object.freeze({
   '/api/teacher/csv/export': CAP.TEACHER_CSV_EXPORT,
   '/api/teacher/assign': CAP.TEACHER_CLASS,
   '/api/teacher/progress': CAP.TEACHER_PROGRESS,
+  '/api/teacher/class/claim': CAP.TEACHER_CLASS,
+  '/api/teacher/class/list': CAP.TEACHER_CLASS,
+  '/api/teacher/class/reports': CAP.TEACHER_PROGRESS,
   '/api/owner/teacher-invite': CAP.OWNER_INVITE,
   '/api/owner/teacher-invite/revoke': CAP.OWNER_INVITE,
   '/api/owner/teachers': CAP.OWNER_TEACHERS
