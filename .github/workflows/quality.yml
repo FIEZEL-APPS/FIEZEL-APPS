@@ -241,6 +241,10 @@ jobs:
           # server (nol field identitas, credentials:include, peran hanya dari server,
           # sandi tidak pernah tersimpan), bukan ejaan kodenya.
           node account-auth-client-test.js
+          # m025-250: auth-account-test.js ADA di repo sejak gelombang akun murid tapi tidak
+          # pernah didaftarkan, jadi CI tidak pernah menjalankannya - gate-registry-test.js
+          # memerahkan tepat keadaan itu. Ia hijau; yang hilang hanya barisnya.
+          node auth-account-test.js
           node audio-locale-guard-test.js
           node id-golden-snapshot-test.js
           node locale-enum-test.js

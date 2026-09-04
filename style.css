@@ -1068,6 +1068,38 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
     --shadow-lg:0 24px 60px rgba(0,0,0,.6);
 }
 
+/* Fase langit dipasang sebagai KELAS di <body> (`.scene-day` dst, style.css:148), dan tiap
+   kelas itu MENDEFINISIKAN ULANG --sky-* pada elemen body sendiri. Karena itu ia menang atas
+   dua hal sekaligus: nilai malam di :root (spesifisitas ada di elemen yang lebih dekat) DAN
+   nilai inline yang dipasang updateCelestialClock() di <html>. Akibatnya nyata dan terukur:
+   dengan Tema Malam menyala, judul halaman berwarna --ambient-text terang (#FDFAF3) tergambar
+   di atas body #FFF9EE — 1,12:1, praktis tidak terbaca (temuan ui-render-audit-test T3,
+   dark/vocab dan dark/reading).
+
+   Perbaikannya `inherit`, bukan nilai gelap yang dipaku. `inherit` membuat body memakai nilai
+   milik <html> apa adanya — yaitu palet malam dari :root, ATAU nilai inline dari
+   updateCelestialClock() yang memang sudah sadar-tema (getScenePalette memulangkan
+   SCENE_NIGHT_PALETTE saat activeThemeMode()==='dark'). Jadi animasi fase tetap hidup kalau
+   bendera scenePhases dinyalakan lagi; yang dicabut hanya kemampuan kelas fase MEMAKSA langit
+   terang di tema gelap.
+
+   Dua pintu, sama seperti palet malam di atas — dan sengaja DI LUAR kedua blok itu, karena
+   night-theme-test.js T1 membandingkan isi keduanya token demi token. */
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]) body.scene-day,
+  :root:not([data-theme="light"]) body.scene-dawn,
+  :root:not([data-theme="light"]) body.scene-dusk,
+  :root:not([data-theme="light"]) body.scene-night{
+    --sky-top:inherit;--sky-bottom:inherit;--scene-light:inherit;
+  }
+}
+:root[data-theme="dark"] body.scene-day,
+:root[data-theme="dark"] body.scene-dawn,
+:root[data-theme="dark"] body.scene-dusk,
+:root[data-theme="dark"] body.scene-night{
+  --sky-top:inherit;--sky-bottom:inherit;--scene-light:inherit;
+}
+
 /* Font merek berlaku di SELURUH aplikasi, termasuk gerbang izin, gerbang akun, modal,
    dan toast - bukan hanya di splash/onboarding seperti sebelumnya (Audit Roadmap #4). */
 body{background:var(--sky-bottom);font-family:var(--fz-body)}
@@ -4933,7 +4965,12 @@ html[data-fz-input="touch"] :focus{outline-color:transparent!important}
 .auth-form{display:flex;flex-direction:column;gap:12px;margin-top:8px}
 .auth-field-label{display:flex;flex-direction:column;gap:4px;font-size:.85rem;font-weight:600;color:var(--text);text-align:left}
 .auth-field-label input{padding:10px 12px;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--panel-soft);color:var(--text);font-size:.95rem}
-.auth-field-label input:focus{outline:2px solid var(--sun-deep);background:var(--panel)}
+/* m025-250: `:focus-visible`, bukan `:focus` telanjang (kebijakan app-interaction-policy-test E:
+   penanda fokus yang terlihat tidak boleh menyala pada klik tetikus). Untuk kolom teks ini
+   BUKAN perubahan perilaku: peramban memperlakukan input teks sebagai selalu focus-visible,
+   termasuk saat diklik - jadi cincinnya tetap muncul persis seperti sebelumnya, dan yang
+   hilang hanya pengecualian diam-diam terhadap kebijakan itu. */
+.auth-field-label input:focus-visible{outline:2px solid var(--sun-deep);background:var(--panel)}
 .auth-error-box{padding:10px 12px;background:var(--accent-soft);border:1px solid var(--accent);border-radius:var(--radius-sm);color:var(--accent-strong);font-size:.85rem;line-height:1.4;text-align:left}
 .badge-success{background:#dcfce7;color:#166534;padding:2px 8px;border-radius:var(--radius-pill);font-size:.8rem}
 .badge-neutral{background:var(--panel-soft);color:var(--muted);padding:2px 8px;border-radius:var(--radius-pill);font-size:.8rem}

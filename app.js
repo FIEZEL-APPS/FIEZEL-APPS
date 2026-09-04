@@ -11760,7 +11760,15 @@ function resetProgress(){openModal(`<div class="modal-mark">FIEZEL</div><h2>${Fi
      Penanda rem tulis nama ikut dihapus karena ia menyimpan nama yang diketik
      murid; membiarkannya berarti hapus-permanen menyisakan satu salinan nama,
      dan harganya cuma satu POST nama tambahan sesudah reset. */
-  for(const k of [BKT_KEY,MISCONCEPTION_LEDGER_KEY,ITEM_CALIBRATION_KEY,CONFUSION_MATRIX_KEY,OLM_NEGOTIATION_KEY,SRL_KEY,EVIDENCE_COHORT_KEY,EVIDENCE_LAST_KEY,EVIDENCE_ATTEMPT_KEY,RETENTION_PROBE_KEY,SL_STATE_KEY,IDENTITY_EVIDENCE_ATTEMPT_KEY,LEARNER_NAME_SYNC_KEY]){
+  /* m025-246: ACCOUNT_NUDGE_KEY (dorongan buat akun sesudah model suara selesai
+     diunduh) ikut DIHAPUS, bukan dikecualikan. Reset berarti murid ini mulai dari nol
+     lagi, dan sesudahnya ia memang tidak punya akun - jadi dorongan itu kembali
+     berguna. Meninggalkannya berarti murid yang baru saja mereset progresnya justru
+     kehilangan satu-satunya ajakan mencadangkan progres barunya.
+     Komentar ini sengaja DI LUAR literal array: reset-side-state-test.js mengurai
+     daftar itu dengan split(','), jadi satu koma di dalam komentar membuat gerbangnya
+     membaca kunci yang salah. */
+  for(const k of [BKT_KEY,MISCONCEPTION_LEDGER_KEY,ITEM_CALIBRATION_KEY,CONFUSION_MATRIX_KEY,OLM_NEGOTIATION_KEY,SRL_KEY,EVIDENCE_COHORT_KEY,EVIDENCE_LAST_KEY,EVIDENCE_ATTEMPT_KEY,RETENTION_PROBE_KEY,SL_STATE_KEY,IDENTITY_EVIDENCE_ATTEMPT_KEY,LEARNER_NAME_SYNC_KEY,ACCOUNT_NUDGE_KEY]){
     try{localStorage.removeItem(sideStateKey(k))}catch{}
     try{localStorage.removeItem(k)}catch{}
   }

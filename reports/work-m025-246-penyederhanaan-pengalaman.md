@@ -285,6 +285,58 @@ gelombang berikutnya tidak mengulanginya:
 
 ---
 
+## 6b. Ronde kedua: menjalankan SELURUH suite dalam urutan CI
+
+Gelombang ini sempat dinyatakan hijau atas dasar gerbang-gerbang yang RELEVAN saja.
+Menjalankan keseluruhannya (256 gerbang) dalam urutan `quality.yml` menemukan sebelas merah.
+Tiga di antaranya artefak harness (suite berjalan saat pohon kerja masih memuat penanda
+konflik merge; hijau begitu diulang). Delapan sisanya nyata, dan pembagiannya penting:
+
+**Milik gelombang ini (empat):**
+
+1. **`voice-fallback-chain-test.js`** — naskah gagal-audio yang saya tulis ulang menghapus dua
+   janji yang dijaga gerbang: "tidak dinilai" dan "tidak dikunci". Kalimatnya benar secara
+   aritmetika (soal yang dilewati memang keluar dari penyebut) tetapi murid tidak membaca
+   aritmetika; ia membaca kalimat. Dikembalikan: *"Soal yang dilewati karena audio gagal tidak
+   dinilai, dan sesimu tidak dikunci."*
+2. **`ui-render-audit-test.js` T3** — judul halaman 1,12:1 di Tema Malam pada `vocab` dan
+   `reading`. Sebabnya bukan token: `--ambient-text`, `--sky-*`, dan palet malam semuanya
+   BENAR. Kelas fase langit (`.scene-day` dst) dipasang di `<body>` dan MENDEFINISIKAN ULANG
+   `--sky-*` di elemen itu, jadi ia menang atas nilai malam di `:root` maupun nilai inline
+   sadar-tema dari `updateCelestialClock()` di `<html>`. Body tergambar `#FFF9EE` di bawah
+   judul `#FDFAF3`. Diperbaiki dengan `--sky-*:inherit` di bawah kedua pintu tema gelap —
+   bukan nilai gelap yang dipaku, supaya animasi fase tetap hidup kalau `scenePhases`
+   dinyalakan lagi.
+3. **`reset-side-state-test.js`** — `ACCOUNT_NUDGE_KEY` lolos reset tanpa keputusan. Dimasukkan
+   ke daftar hapus, bukan dikecualikan: sesudah reset murid memang tidak punya akun lagi, jadi
+   dorongan mencadangkan progres justru kembali berguna.
+4. **`r2-ux-overhaul-smoke-test.js` + `experience-integration-test.js`** — dua asersi memaku
+   BENTUK tata letak lama (kelas `coach-strip-go`, keberadaan kartu Classroom di Home,
+   keberdampingan `nextSessionPanelMarkup()}${journeyMarkup()`, dan lima nama pertama
+   `VALID_VIEWS` berikut urutannya). Semuanya dibalik ke janjinya: Home punya TEPAT satu tombol
+   primer (lebih ketat dari pola lama — dua tombol kini merah), Classroom tidak bisa diketuk
+   dari Home, `journeyMarkup()` ada di template Ringkasan, dan kelima rute wajib ada di
+   `VALID_VIEWS` di mana pun letaknya.
+
+**Milik `main`, bukan gelombang ini (empat).** Semuanya diverifikasi di worktree bersih
+`origin/main` (e3afd0d8) lebih dulu, bukan disimpulkan:
+
+| Gerbang | Sebab di `main` | Yang diporting ke sini |
+|---|---|---|
+| `id-golden-snapshot-test.js` | 95 literal Ruang Guru tanpa regenerasi baseline | baseline diregenerasi (memuat naskah kedua belah pihak) |
+| `social-frontend-test.js` | `contains(` bukan `contains?.(` di `renderInner()` | `main` memperbaikinya sendiri (e3afd0d8) beberapa menit setelah cabang ini |
+| `gate-registry-test.js` | `auth-account-test.js` ada di repo tapi tidak pernah didaftarkan | didaftarkan di `quality.yml` (gerbangnya hijau; yang hilang cuma barisnya) |
+| `app-interaction-policy-test.js` | `.auth-field-label input:focus` — `:focus` telanjang | jadi `:focus-visible` (nol perubahan perilaku untuk kolom teks) |
+| `secret-scan-test.js` | fixture `password: 'wrongpass123'` di `auth-account-test.js` | entri allowlist beralasan, nilainya TIDAK diobfuskasi |
+
+Kenapa empat kegagalan `main` baru terlihat sekarang: CI `main` berhenti di
+`id-golden-snapshot-test.js` (baris 244 `quality.yml`) dan tidak pernah sampai ke gerbang
+sesudahnya. Begitu baseline diperbaiki di cabang ini, sisanya ikut terlihat satu per satu.
+Semuanya diporting karena tanpa itu PR ini tidak bisa hijau; tiap perbaikan akan no-op begitu
+`main` memperbaiki miliknya sendiri.
+
+---
+
 ## 7. Yang TIDAK dikerjakan
 
 - **Peran tutor Fase 4** — brief menandainya kondisional; hanya benderanya yang didaftarkan.

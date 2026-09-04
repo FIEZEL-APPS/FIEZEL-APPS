@@ -372,6 +372,19 @@ const HEURISTIC_PATH_ALLOWLIST = [
  */
 const TOKEN_ALLOWLIST = [
   {
+    /* Ditambahkan 4 Sep 2026 (m025-250): fixture kata sandi yang SENGAJA SALAH di
+     * auth-account-test.js. Ia dipakai untuk membuktikan login GAGAL mengembalikan
+     * `invalid_credentials` — jadi nilainya bermakna justru karena ia BUKAN kredensial
+     * siapa pun, dan tidak pernah cocok dengan apa pun di server. Tertangkap pemindai
+     * karena berbentuk kata+angka 12 karakter di sebelah kata `password`, yaitu heuristik
+     * yang memang benar untuk kasus lain; di sini yang salah adalah kesimpulannya, bukan
+     * pemindainya. Nilainya sengaja tidak diobfuskasi: menyamarkan literal supaya lolos
+     * pemindai adalah kebiasaan yang jauh lebih berbahaya daripada satu entri beralasan. */
+    digest: '49ea0f8ce0190fbe31b5b82e269e2855d50469d9e6f2090beacfe2e50829ce50',
+    file: 'auth-account-test.js',
+    reason: 'fixture kata sandi yang sengaja SALAH untuk membuktikan login gagal mengembalikan invalid_credentials - bukan kredensial siapa pun, tidak pernah cocok di server'
+  },
+  {
     /* Ditambahkan 29 Agu 2026: BUKAN token — nama kunci metrik riset simulator
      * (gabungan kata: multiseed + residual + nama metrik osilasi, 45 huruf
      * camelCase+underscore; sengaja TIDAK ditulis utuh di sini supaya berkas gerbang

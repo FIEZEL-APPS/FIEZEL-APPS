@@ -71,16 +71,38 @@ setTimeout(()=>{
   assert(/Sesi berikutnya · dipilih Paw/.test(appCopyUnion),'label hero "Sesi berikutnya · dipilih Paw" tidak ada di coach-strip');
   ctx.go('home');
   const homeMarkup=elements.app.innerHTML;
-  assert(/coach-strip-go/.test(homeMarkup),'CTA utama hero tidak ada');
+  /* m025-246: pola lama memaku KELAS tombolnya (`coach-strip-go`) - nama milik hero Home
+     lama. Janji yang dijaga baris ini adalah "Home punya SATU tombol primer, tidak pernah
+     dua"; itu janji yang sama persis yang diminta brief penyederhanaan ("satu kartu, satu
+     CTA"), dan kartu "Hari ini" memenuhinya dengan kelas `today-cta`. Jadi yang diuji
+     sekarang jumlahnya, bukan ejaannya - dan versinya jadi LEBIH ketat: dua tombol primer
+     kini merah, padahal pola lama akan meloloskannya. */
+  const primerHome=(homeMarkup.match(/class="primary luxe/g)||[]).length;
+  assert(primerHome===1,`Home harus punya TEPAT satu tombol primer, ditemukan ${primerHome}`);
   assert(!/mission-panel/.test(homeMarkup),'blok "Selesaikan ritme hari ini" masih di Home');
   // Diperiksa lewat kelas panelnya (judul "Rencana kamu" ikut tersebut di komentar markup).
   assert(!/journey-panel/.test(homeMarkup),'blok "Rencana kamu" masih di Home');
   // ---- R2-3: Classroom terkunci ----
-  assert(/classroom-launch is-coming-soon/.test(homeMarkup),'kartu Classroom tidak terkunci Coming Soon');
+  /* m025-246: janjinya "Classroom tidak bisa dimasuki dari Home", bukan "kartu Classroom
+     wajib ada di Home". Kartu "Hari ini" tidak merender kartu itu sama sekali - itu
+     memenuhi janjinya lebih kuat, bukan lebih lemah. Jadi: kalau kartunya ADA, ia wajib
+     terkunci; kalau tidak ada, tidak ada yang bisa diketuk. Asersi berikutnya
+     (tidak ada onclick go('classroom')) tetap berlaku untuk kedua tata letak. */
+  assert(!/classroom-launch/.test(homeMarkup)||/classroom-launch is-coming-soon/.test(homeMarkup),
+    'kartu Classroom ada di Home tapi tidak terkunci Coming Soon');
   assert(!/onclick="go\('classroom'\)"/.test(homeMarkup),'kartu Classroom masih bernavigasi');
   // Rencana + cincin misi pindah ke Peta Belajar (dijaga di level sumber karena modul
   // personal-journey tidak dimuat di harness ini).
-  assert(/nextSessionPanelMarkup\(\)\}\$\{journeyMarkup\(\)/.test(app),'journeyMarkup tidak dirender di Peta Belajar → Ringkasan');
+  /* m025-246: pola lama memaku KEBERDAMPINGAN dua pemanggilan di dalam satu template
+     (`nextSessionPanelMarkup()}${journeyMarkup()`), jadi menyisipkan gerbang bendera di
+     antaranya memerahkannya tanpa satu janji pun yang dilanggar. Janji R2 adalah "Rencana
+     PINDAH dari Home ke Ringkasan Peta Belajar" - dan itu tetap benar: kedua pemanggilan
+     ada di template Ringkasan yang sama, kini di belakang bendera personalJourneyTab
+     (OWNER: "Personal Journey + dashboard skill - satu tab 'Progres'"). Yang diuji sekarang
+     KEHADIRAN keduanya di baris template itu, bukan jarak antar-karakternya. */
+  const overviewTpl=(app.match(/overview:`[^`]*`/)||[''])[0];
+  assert(/nextSessionPanelMarkup\(\)/.test(overviewTpl)&&/journeyMarkup\(\)/.test(overviewTpl),
+    'journeyMarkup tidak dirender di Peta Belajar → Ringkasan');
   assert(/journey-ring-row/.test(app)&&/mission-ring/.test(app),'cincin misi harian hilang sama sekali');
 
   // ---- R2-1: chip ujian di puncak Grammar Hub ----
