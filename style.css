@@ -911,9 +911,8 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
      kartu di ukuran menengah, dan serif kontras-tinggi kehilangan keterbacaan di sana
      (alasan yang sama yang sudah tertulis di --fz-display tepat di atas). Berkas
      Fredoka-var.woff2 ikut dicabut dari @font-face, preload index.html, dan precache
-     sw.js - membiarkan 
-     berkasnya terunduh untuk font yang tidak pernah dipakai adalah 
-     ongkos jaringan tanpa satu piksel pun imbalan. */
+     sw.js - membiarkan berkasnya terunduh untuk font yang tidak pernah dipakai
+     adalah ongkos jaringan tanpa satu piksel pun imbalan. */
   --fz-display-round:'FZ Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   --fz-heading:'FZ Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   --fz-body:'FZ Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
