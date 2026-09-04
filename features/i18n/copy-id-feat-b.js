@@ -115,7 +115,7 @@
     // demi karakter dengan nilai runtime langkah tur.
     'tour.menu-home-title': 'Mulai dari Home',
     'tour.menu-home-body': 'Ini beranda kamu: progres harian, streak, dan saran latihan dari PAW. Semua perjalananmu berangkat dari sini.',
-    'tour.menu-vocab-title': 'Tab Latihan',
+    'tour.menu-vocab-title': 'Tab Vocab, Grammar, Reading',
     'tour.menu-vocab-body': 'Semua latihan mandiri ada di sini: Vocabulary, Grammar, Reading, bicara \u0026 dengar, nulis, sama perpustakaan. Buka kalau kamu pengin ngelatih satu hal tertentu.',
     'tour.menu-reading-title': 'Tab Progres',
     'tour.menu-reading-body': 'Di sini kamu lihat jalur belajarmu dari A1 sampai C2, materi yang udah kuat, dan pola kesalahan yang masih sering muncul \u2014 biar arahmu jelas.',

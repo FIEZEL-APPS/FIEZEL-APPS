@@ -81,9 +81,9 @@
      bisa dikembalikan ke perilaku lama tanpa revert kode. */
   var SHOWN = {
     /* "Home 'Hari ini': satu kartu, satu CTA 'Mulai 10 menit'." */
-    todayHome: true,
+    todayHome: false,
     /* "Navigasi: maks 4 tab — Hari ini · Latihan · Progres · Pengaturan." */
-    fourTabNav: true,
+    fourTabNav: false,
     /* "perkenalan <=3 layar" + "Splash (cold saja)". */
     leanIntro: true,
     /* "placement-lite 8-12 soal" yang mengisi model murid. */
