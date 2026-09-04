@@ -126,7 +126,11 @@ for (const name of Object.keys(REQUIRED)) {
     ['scenePhases', APP],
     ['skillExams', APP + fs.readFileSync(path.join(__dirname, 'features/speaking-listening/fiezel-speaking-listening-addon.js'), 'utf8')],
     ['personalJourneyTab', APP],
-    ['voicePackGate', APP],
+    /* voicePackGate SENGAJA TIDAK ada di daftar pembaca. OWNER 4 Sep 2026 membatalkan
+       sakelar opt-in-nya: unduhan latar 152 MB kembali menyala sendiri di boot dan tidak
+       melihat bendera apa pun. Yang tersisa untuk dikendalikan bendera ini adalah GERBANG
+       unduhan yang memang sudah tidak ada di kode. Menuntutnya punya titik baca berarti
+       memaksa seseorang menambahkan percabangan palsu hanya supaya gerbang ini hijau. */
     ['todayHome', APP],
     ['placementLite', APP],
     ['sessionSummary', APP],
@@ -135,6 +139,16 @@ for (const name of Object.keys(REQUIRED)) {
   for (const [name, source] of readers) {
     check(source.indexOf("'" + name + "'") !== -1,
       'T6 bendera ' + name + ' benar-benar dibaca kode yang dikirim');
+  }
+  /* Pasangan asersi untuk pengecualian di atas: unduhan latar harus TETAP tidak
+     berpagar. Kalau suatu hari seseorang memasang gerbang di depannya lagi, gerbang ini
+     merah dan koreksi owner terbaca sebelum rilis, bukan sesudah. */
+  {
+    const at = APP.indexOf('function armOfflineVoiceAutoload()');
+    const body = at === -1 ? '' : APP.slice(at, APP.indexOf('\n}', at));
+    check(at !== -1 && !/uxOn\(|uxOff\(|voicePackOptIn/.test(body),
+      'T6b unduhan suara latar tidak berpagar bendera maupun opt-in (koreksi OWNER 4 Sep 2026)',
+      body.slice(0, 200));
   }
 }
 

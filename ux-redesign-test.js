@@ -176,10 +176,9 @@ function check(ok, name, detail) {
      murid dengan layar buntu yang lama, jadi keduanya diperiksa. */
   for (const [label, src] of [['kuis', APP], ['sesi bicara & dengar', ADDON]]) {
     check(/listening\.gagal-coba-lagi/.test(src), 'G1 [' + label + '] opsi "coba lagi" ada');
-    check(/listening\.gagal-peramban/.test(src), 'G2 [' + label + '] opsi "suara peramban" ada');
-    check(/listening\.gagal-lewati/.test(src), 'G3 [' + label + '] opsi "lewati" ada');
+    check(/listening\.gagal-lewati/.test(src), 'G2 [' + label + '] opsi "lewati" ada');
     check(/listening\.gagal-tanpa-penalti/.test(src),
-      'G4 [' + label + '] janji "tanpa penalti" dikatakan kepada murid');
+      'G3 [' + label + '] janji "tanpa penalti" dikatakan kepada murid');
   }
   /* "Tanpa penalti" harus benar di ARITMETIKANYA, bukan hanya di kalimatnya: akurasi =
      score/asked, jadi soal yang dilewati harus keluar dari penyebut. */
@@ -187,14 +186,17 @@ function check(ok, name, detail) {
     'G5 soal yang dilewati karena audio gagal dihitung');
   check(/-\(Number\(cfg\.__noAudioSkips\)\|\|0\)/.test(APP),
     'G6 dan benar-benar dikeluarkan dari penyebut akurasi');
-  /* Suara peramban hanya boleh berjalan dari gestur murid - tidak pernah otomatis. */
-  const browserVoiceCalls = (APP.match(/speakWithBrowserVoice\(/g) || []).length
-    + (ADDON.match(/playWithBrowserVoice\(/g) || []).length;
-  check(browserVoiceCalls >= 4,
-    'G7 jatuh-balik suara peramban terpasang di kedua mesin',
-    'titik pakai: ' + browserVoiceCalls);
-  check(!/setTimeout\([^)]*speakWithBrowserVoice/.test(APP),
-    'G8 suara peramban tidak pernah dijadwalkan sendiri (kontrak: tombol Putar adalah gestur)');
+  /* TIDAK ADA opsi suara peramban, di mana pun. OWNER 4 Sep 2026: "aku ga mau lagi ada
+     tts browser, tts browser harus mati total." Larangan strukturalnya ditegakkan
+     audio-locale-guard-test.js atas zona audio + app.js; asersi di bawah menutup dua
+     berkas yang berada DI LUAR zona itu (addon dan naskah), supaya opsinya tidak bisa
+     kembali lewat pintu samping. */
+  check(!/speechSynthesis|SpeechSynthesisUtterance/.test(
+        ADDON.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[^:])\/\/[^\n]*/g, '$1')),
+    'G7 addon bicara & dengar bebas speechSynthesis');
+  const copyText = COPY.map(f => f.text).join('\n');
+  check(!/gagal-peramban/.test(copyText),
+    'G8 tidak ada naskah tombol "suara peramban" yang tertinggal di copy-map');
 }
 
 /* ================================ H · SKOR SPEAKING ================================ */

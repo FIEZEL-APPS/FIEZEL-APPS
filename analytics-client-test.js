@@ -241,8 +241,17 @@ const PENANDA = ['Jahran', 'jahran@example.com', '0f8fad5b', 'u_123', '203.0.113
     `klien=${serverOnlyClient.join('|')} worker=${serverOnlyWorker.join('|')}`);
 
   const clientAllowed = FiezelAnalytics.CLIENT_EVENTS.slice().sort();
-  const clientExpected = ['app_open', 'day_active', 'lesson_completed', 'lesson_started', 'question_answered', 'retention_ping', 'session_ended', 'session_started'];
-  check('Tepat delapan event yang boleh dari klien',
+  /* m025-246: delapan jadi SEPULUH. Dua event baru diminta owner secara eksplisit -
+     "Instrumentasi funnel (opt-in, agregat, tanpa PII): launch->soal pertama, selesai
+     sesi, kembali D1/D7, skip rate". Tiga dari empat sudah tertutup event yang ada;
+     `first_question` dan `question_skipped` menutup dua sisanya.
+
+     Daftar ini sengaja tetap ditulis TANGAN, bukan diturunkan dari CLIENT_EVENT_SPEC:
+     gunanya justru memaksa setiap event baru melewati review manusia. Event yang
+     ditambahkan diam-diam ke permukaan telemetri adalah persis hal yang tidak boleh
+     lolos tanpa ada yang membacanya. */
+  const clientExpected = ['app_open', 'day_active', 'first_question', 'lesson_completed', 'lesson_started', 'question_answered', 'question_skipped', 'retention_ping', 'session_ended', 'session_started'];
+  check('Tepat sepuluh event yang boleh dari klien',
     JSON.stringify(clientAllowed) === JSON.stringify(clientExpected), clientAllowed.join(','));
   check('Daftar klien = event `origin:client` di sisi Worker',
     JSON.stringify(clientAllowed) === JSON.stringify(core.CLIENT_EVENTS.slice().sort()), core.CLIENT_EVENTS.join(','));

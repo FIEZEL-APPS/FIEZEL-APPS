@@ -55,9 +55,19 @@
     personalJourneyTab: false,
 
     /* "Gerbang paket suara 119 MB — pindah ke Pengaturan + prompt kontekstual saat
-       latihan pertama." Yang mati: gerbang unduhan di jalur masuk. Yang hidup:
-       tombol unduh di Pengaturan, plus satu tawaran kontekstual saat murid pertama
-       kali menyentuh latihan yang berbunyi. */
+       latihan pertama."
+
+       YANG MATI: GERBANGNYA — layar yang menahan murid sampai ia mengunduh. Itu saja.
+
+       YANG TIDAK DISENTUH, atas koreksi OWNER 4 Sep 2026 ("unduhan suaranya biarkan
+       diunduh secara diam-diam di background, jangan kamu sentuh"): unduhan LATAR
+       m025-236, yang menyala di boot pertama untuk semua murid tanpa bertanya. Sempat
+       diubah jadi opt-in di gelombang ini, lalu dikembalikan.
+
+       Akibatnya bendera ini TIDAK mengendalikan unduhannya — armOfflineVoiceAutoload()
+       berjalan tanpa melihatnya sama sekali. Ia tetap didaftarkan (bukan dihapus) supaya
+       gerbang unduhan yang dulu ada punya sakelarnya sendiri kalau suatu hari kembali,
+       dan supaya keputusan ini punya tempat tertulis alih-alih jadi cerita lisan. */
     voicePackGate: false,
 
     /* "Peran tutor (minimal): kode kelas + progres murid read-only (Fase 4,

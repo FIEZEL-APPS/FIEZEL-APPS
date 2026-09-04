@@ -85,16 +85,13 @@
     'listening.gagal-judul': 'Audio belum bisa diputar',
     'listening.gagal-body': 'Bisa jadi jaringannya sedang berat. Pilih salah satu:',
     'listening.gagal-coba-lagi': 'Coba lagi',
-    'listening.gagal-peramban': 'Pakai suara peramban',
     'listening.gagal-lewati': 'Lewati soal ini',
     'listening.gagal-tanpa-penalti': 'Soal yang dilewati karena audio gagal tidak memengaruhi nilaimu.',
     'listening.gagal-dilewati': 'Soal dilewati. Nilaimu tidak terpengaruh.',
 
-    /* ── Tawaran paket suara (kontekstual, bukan gerbang) ───────────────────── */
-    'suara.tawaran-judul': 'Mau suaranya jalan tanpa sinyal?',
-    'suara.tawaran-body': 'Ada paket suara yang bisa diunduh sekali dan dipakai offline. Tidak wajib — tanpa itu suara tetap berbunyi selama ada jaringan.',
-    'suara.tawaran-unduh': 'Unduh di Pengaturan',
-    'suara.tawaran-nanti': 'Nanti saja',
+    /* 'suara.tawaran-*' DICABUT bersama sakelar paket suaranya (OWNER 4 Sep 2026:
+       "unduhan suaranya biarkan diunduh secara diam-diam di background, jangan kamu
+       sentuh"). Unduhan latar memang tidak punya naskah — itu intinya. */
 
     /* ── Edge case iOS: penyimpanan bisa hilang setelah 7 hari ──────────────── */
     'settings.cadangan-judul': 'Progres belum dicadangkan',
