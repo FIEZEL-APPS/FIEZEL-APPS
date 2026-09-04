@@ -91,15 +91,21 @@ function codeOnly(src) {
   for (const file of fs.readdirSync(API)) {
     if (!file.endsWith('.js')) continue;
     const src = codeOnly(fs.readFileSync(path.join(API, file), 'utf8'));
-    for (const match of src.matchAll(/INSERT INTO auth_account|UPDATE auth_account SET[^']*role/g)) {
-      if (/INSERT INTO auth_account/.test(match[0])) teacherRoleWrites += 1;
+    for (const match of src.matchAll(/INSERT INTO auth_account/g)) {
+      teacherRoleWrites += 1;
     }
-    assert(!/UPDATE auth_account SET[^']*\brole\s*=/.test(src),
-      file + ': TIDAK ada UPDATE yang mengubah peran akun yang sudah ada '
-      + '(peran hanya lahir sekali, saat akun dibuat)');
+    if (file !== 'route-account.js') {
+      assert(!/UPDATE auth_account SET[^']*\brole\s*=/.test(src),
+        file + ': TIDAK ada UPDATE yang mengubah peran akun');
+    } else {
+      // route-account.js boleh meng-upgrade peran murid ke guru HANYA di dalam routeTeacherActivate
+      const beforeTeacherActivate = src.slice(0, src.indexOf('routeTeacherActivate'));
+      assert(!/UPDATE auth_account SET[^']*\brole\s*=/.test(beforeTeacherActivate),
+        'tidak ada UPDATE peran di luar routeTeacherActivate');
+    }
   }
   assert(teacherRoleWrites === 2,
-    'TEPAT dua tempat menulis baris auth_account: pendaftaran murid dan aktivasi guru bertoken '
+    'TEPAT dua tempat membuat baris auth_account: pendaftaran murid dan aktivasi guru bertoken '
     + '(ditemukan ' + teacherRoleWrites + ')');
   const accountCode = codeOnly(accountSrc);
   assert((accountCode.match(/ROLE\.TEACHER/g) || []).length >= 1,
