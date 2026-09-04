@@ -961,24 +961,21 @@
          layar yang baru saja di-scrollIntoView menjauh darinya. Jadi satu-satunya
          jalan keluar yang benar-benar terlihat adalah menyerah.
 
-         Sekarang ketiganya berdiri berdampingan di tempat kegagalannya terjadi:
-           coba lagi        -> menekan ulang [data-play] yang sudah ada. Tetap satu
-                               gestur murid, jadi kebijakan autoplay tidak dilanggar
-                               (tidak ada satu pun jalur di berkas ini yang memutar
-                               audio tanpa klik).
-           suara peramban   -> speechSynthesis bawaan perangkat. Ia tidak butuh
-                               jaringan dan tidak butuh model 152 MB, jadi ia justru
-                               jalan keluar yang paling mungkin berhasil ketika mesin
-                               neural-lah yang gagal. Hanya ditawarkan bila API-nya
-                               benar-benar ada.
-           lewati           -> skipNoAudio(), yang sengaja BUKAN finishItem(): tidak
-                               ada store.record(), jadi tidak ada skor yang tersimpan
-                               untuk soal yang audionya tidak pernah berbunyi. Itulah
-                               arti "tanpa penalti", dan sekarang kalimatnya dikatakan
-                               kepada murid, bukan hanya benar di dalam kode. */
-      var punyaSuaraPeramban=false;
-      try{punyaSuaraPeramban=typeof global!=='undefined'&&!!global.speechSynthesis&&typeof global.SpeechSynthesisUtterance==='function'}catch(_){punyaSuaraPeramban=false}
-      if(host)host.innerHTML=`<div class="fsl-feedback" data-no-audio role="status"><strong>${T('fsl.audio-error-title', 'Suaranya sedang bermasalah, bukan kamu.')}</strong><span>${T('listening.gagal-body')}</span><span class="fsl-privacy">${T('fsl.audio-error-script-note', 'Skripnya tetap aku tutup: membacanya akan mengubah latihan dengar menjadi latihan baca.')}</span><div class="fsl-actions"><button class="fsl-primary" data-retry-audio>${T('listening.gagal-coba-lagi')}</button>${punyaSuaraPeramban?`<button data-browser-voice>${T('listening.gagal-peramban')}</button>`:''}<button data-skip-no-audio>${T('listening.gagal-lewati')}</button></div><span class="fsl-privacy">${T('listening.gagal-tanpa-penalti')}</span></div>`;
+         Sekarang keduanya berdiri berdampingan di tempat kegagalannya terjadi:
+           coba lagi -> menekan ulang [data-play] yang sudah ada. Tetap satu gestur
+                        murid, jadi kebijakan autoplay tidak dilanggar (tidak ada satu
+                        pun jalur di berkas ini yang memutar audio tanpa klik).
+           lewati    -> skipNoAudio(), yang sengaja BUKAN finishItem(): tidak ada
+                        store.record(), jadi tidak ada skor yang tersimpan untuk soal
+                        yang audionya tidak pernah berbunyi. Itulah arti "tanpa
+                        penalti", dan sekarang kalimatnya dikatakan kepada murid,
+                        bukan hanya benar di dalam kode.
+
+         TIDAK ADA opsi "suara peramban". OWNER, 4 Sep 2026: "aku ga mau lagi ada tts
+         browser, tts browser harus mati total." Ini menutup kembali lubang yang sama
+         yang dicabut m025-232 (antrean speechSynthesis global yang tidak ikut berhenti
+         saat pemutar kita berhenti). Jangan tambahkan kembali. */
+      if(host)host.innerHTML=`<div class="fsl-feedback" data-no-audio role="status"><strong>${T('fsl.audio-error-title', 'Suaranya sedang bermasalah, bukan kamu.')}</strong><span>${T('listening.gagal-body')}</span><span class="fsl-privacy">${T('fsl.audio-error-script-note', 'Skripnya tetap aku tutup: membacanya akan mengubah latihan dengar menjadi latihan baca.')}</span><div class="fsl-actions"><button class="fsl-primary" data-retry-audio>${T('listening.gagal-coba-lagi')}</button><button data-skip-no-audio>${T('listening.gagal-lewati')}</button></div><span class="fsl-privacy">${T('listening.gagal-tanpa-penalti')}</span></div>`;
       this.root?.querySelector?.('[data-skip-no-audio]')?.addEventListener('click',()=>this.skipNoAudio());
       /* "Coba lagi" meneruskan klik ke tombol Dengarkan yang sudah ada, alih-alih
          menyalin logika pemutarannya. Menyalinnya berarti dua tempat yang harus
@@ -990,47 +987,13 @@
         try{play.disabled=false}catch(_){}
         play.click();
       });
-      this.root?.querySelector?.('[data-browser-voice]')?.addEventListener('click',()=>this.playWithBrowserVoice(item));
+
       /* Di 390 px, blok ini lahir DI BAWAH lipatan: yang terlihat hanya tombol hitamnya di
          dekat dok, dan murid diminta memutuskan sesuatu tanpa membaca alasannya. Pesan jujur
          yang tidak terbaca sama saja dengan tidak ada. Gagalnya diam - lingkungan tanpa
          layout (gerbang node) tidak punya scrollIntoView dan itu bukan kesalahan. */
       try{host?.querySelector?.('[data-no-audio]')?.scrollIntoView?.({block:'center',behavior:'smooth'})}catch(_){}
       return {state:'no_audio',itemId:id,scored:false,locked:false};
-    }
-    /* m025-246 — JATUH-BALIK SUARA PERAMBAN.
-       speechSynthesis adalah mesin bawaan perangkat: nol byte unduhan, nol jaringan,
-       dan ia hidup justru pada perangkat kelas bawah tempat mesin neural paling
-       sering gagal. Karena itu ia jalan keluar, bukan hiasan.
-
-       DUA HAL YANG SENGAJA TIDAK DILAKUKAN DI SINI:
-       (1) Tidak pernah dipanggil sendiri. Ia hanya berjalan dari klik murid pada
-           tombolnya - kontrak "tombol Putar adalah gestur, tidak pernah autoplay".
-       (2) Tidak menaikkan this.replays. Batas replay adalah aturan latihan dengar
-           (dengar sekali, seperti ujian); kegagalan mesin bukan pemakaian jatah
-           murid, dan alasan yang sama sudah tertulis di handler [data-play]. */
-    playWithBrowserVoice(item){
-      var api=null,Utter=null;
-      try{api=global.speechSynthesis;Utter=global.SpeechSynthesisUtterance}catch(_){api=null}
-      if(!api||typeof Utter!=='function')return false;
-      try{
-        this.tts.stop();
-        api.cancel();
-        var u=new Utter(String(item&&item.script||''));
-        u.lang='en-US';
-        u.rate=Number(this.config.ttsRate)||1;
-        /* Kerja dibuka BEGITU ucapan benar-benar mulai, bukan saat perintah dikirim:
-           `speak()` yang gagal senyap (suara sistem belum termuat) tidak boleh membuka
-           kolom jawaban untuk audio yang tidak pernah berbunyi. */
-        u.onstart=()=>{
-          this.noAudio=false;
-          var work=this.root&&this.root.querySelector&&this.root.querySelector('[data-work]');
-          if(work)work.disabled=false;
-          try{this.store.noteCapability('tts','browser-speech-synthesis')}catch(_){}
-        };
-        api.speak(u);
-        return true;
-      }catch(_){return false}
     }
     /* Jalan keluar untuk keadaan no_audio: maju satu item TANPA menilai dan TANPA menulis
        evidence. Sengaja bukan finishItem(), karena finishItem() selalu memanggil

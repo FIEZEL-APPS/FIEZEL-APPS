@@ -264,7 +264,7 @@ function validTimeZone(value){
 // sanitizeState (AI-11 F04 pola #3): blob lama tanpa field ini ter-merge mulus ke 'id',
 // tanpa kunci baru, tanpa bump schema. Nilainya enum tertutup FiezelI18n.SUPPORTED ('id'|'th');
 // JANGAN pernah meneruskannya ke opsi audio/voice (audio-locale-guard-test, AI-17 F02).
-const defaultPreferences={haptics:true,feedbackSounds:true,motion:true,neuralVoice:'auto',reminders:null,reportConsent:false,reportEndpoint:DEFAULT_REPORT_ENDPOINT,selfAssessedLevel:'',activeLevel:'',levelMode:'placement',goalProfile:'general',timeZone:detectedTimeZone(),learnerLocale:'id',/* m026 GEO-IP: penanda pilihan bahasa MANUAL murid. Sekali true (murid memilih di onboarding/Pengaturan), deteksi IP tidak pernah menimpanya lagi. localeAutoDetected: sudah pernah dicek lokasi sekali per perangkat supaya tidak fetch tiap buka. */learnerLocaleExplicit:false,localeAutoDetected:false,/* S5b: sinkron otak antar-perangkat. BAWAAN false dan sengaja begitu — bukti belajar tidak boleh mulai meninggalkan perangkat karena sebuah pembaruan mendarat, hanya karena murid memilihnya. */brainSync:false,/* m025-246: paket suara offline 152 MB. BAWAAN false, dan itu keputusan, bukan kelalaian: unduhan sebesar itu di kuota seluler tidak boleh dimulai atas nama murid tanpa ia mengiyakan. voicePackAsked mencatat bahwa tawaran kontekstualnya sudah pernah muncul, supaya ia tidak bertanya dua kali. */voicePackOptIn:false,voicePackAsked:false,};
+const defaultPreferences={haptics:true,feedbackSounds:true,motion:true,neuralVoice:'auto',reminders:null,reportConsent:false,reportEndpoint:DEFAULT_REPORT_ENDPOINT,selfAssessedLevel:'',activeLevel:'',levelMode:'placement',goalProfile:'general',timeZone:detectedTimeZone(),learnerLocale:'id',/* m026 GEO-IP: penanda pilihan bahasa MANUAL murid. Sekali true (murid memilih di onboarding/Pengaturan), deteksi IP tidak pernah menimpanya lagi. localeAutoDetected: sudah pernah dicek lokasi sekali per perangkat supaya tidak fetch tiap buka. */learnerLocaleExplicit:false,localeAutoDetected:false,/* S5b: sinkron otak antar-perangkat. BAWAAN false dan sengaja begitu — bukti belajar tidak boleh mulai meninggalkan perangkat karena sebuah pembaruan mendarat, hanya karena murid memilihnya. */brainSync:false,};
 const defaultReportMeta={lastSentAnswered:0,lastSentAt:0,lastStatus:'not_configured',lastReceipt:'',lastAccessReportDay:'',queue:[]};
 const LOGIN_MESSAGES=__fzI18nTable([],()=>([
   {headline:FiezelI18n.t('login.pesan-01-headline'),lead:FiezelI18n.t('login.pesan-01-lead')},
@@ -1320,7 +1320,7 @@ function sanitizeToursSeen(raw){
 }
 function sanitizeState(raw){
   const rawPreferences=raw?.preferences||{},activeLevel=LEVELS.includes(String(rawPreferences.activeLevel||''))?String(rawPreferences.activeLevel):'';
-  const next={...defaultState,...raw,view:'home',ownerUuid:String(raw?.ownerUuid||'').replace(/[^A-Za-z0-9_-]/g,'').slice(0,128),vocab:raw?.vocab||{},grammar:raw?.grammar||{},reading:raw?.reading||{},history:Array.isArray(raw?.history)?raw.history.filter(h=>h&&typeof h==='object'):[],wrongAnswers:pruneCorruptedReviewEntries(raw?.wrongAnswers),confidenceHistory:Array.isArray(raw?.confidenceHistory)?raw.confidenceHistory:[],sessionHistory:Array.isArray(raw?.sessionHistory)?raw.sessionHistory:[],learningDays:Array.isArray(raw?.learningDays)?raw.learningDays:[],daily:raw?.daily&&typeof raw.daily==='object'?raw.daily:{date:'',count:0,attempts:0,meaningful:false},preferences:{...defaultPreferences,...rawPreferences,activeLevel,levelMode:activeLevel?'manual':'placement',selfAssessedLevel:LEVELS.includes(String(rawPreferences.selfAssessedLevel||''))?String(rawPreferences.selfAssessedLevel):'',timeZone:validTimeZone(rawPreferences.timeZone||defaultPreferences.timeZone),goalProfile:String(rawPreferences.goalProfile||defaultPreferences.goalProfile).slice(0,30),reportEndpoint:String(rawPreferences.reportEndpoint||DEFAULT_REPORT_ENDPOINT).trim(),/* m025-182 W2-STATE: enum tertutup — nilai korup/asing jatuh ke default 'id', bukan lolos mentah */learnerLocale:(self.FiezelI18n?.SUPPORTED||['id','th']).includes(rawPreferences.learnerLocale)?rawPreferences.learnerLocale:defaultPreferences.learnerLocale,/* fail-closed: apa pun selain true persis -> false. State korup tidak boleh bisa menyalakan pengiriman data. */brainSync:rawPreferences.brainSync===true,/* fail-closed, alasan yang sama dengan brainSync: state korup tidak boleh bisa memulai unduhan 152 MB. */voicePackOptIn:rawPreferences.voicePackOptIn===true,voicePackAsked:rawPreferences.voicePackAsked===true},reportMeta:{...defaultReportMeta,...(raw?.reportMeta||{}),queue:Array.isArray(raw?.reportMeta?.queue)?raw.reportMeta.queue.slice(-8):[]},reminderMeta:{lastNotificationAt:0,lastNotificationDay:'',lastNotificationKind:'',lastMessageIndex:-1,lastPositiveDay:'',evidenceLog:[],...(raw?.reminderMeta||{}),evidenceLog:Array.isArray(raw?.reminderMeta?.evidenceLog)?raw.reminderMeta.evidenceLog.slice(-ALRS_EVIDENCE_LOG_LIMIT):[]},activeSession:raw?.activeSession&&typeof raw.activeSession==='object'?raw.activeSession:null,adaptivePolicyMeta:{lastPolicy:null,lastSource:'',lastAt:0,history:[],...(raw?.adaptivePolicyMeta||{}),history:Array.isArray(raw?.adaptivePolicyMeta?.history)?raw.adaptivePolicyMeta.history.slice(-30):[]},policyOutcomeMeta:{last:null,history:[],queue:[],...(raw?.policyOutcomeMeta||{}),history:Array.isArray(raw?.policyOutcomeMeta?.history)?raw.policyOutcomeMeta.history.slice(-POLICY_OUTCOME_LOG_LIMIT):[],queue:Array.isArray(raw?.policyOutcomeMeta?.queue)?raw.policyOutcomeMeta.queue.slice(-10):[]},contentCanaryMeta:CONTENT_CANARY?CONTENT_CANARY.sanitizeEvidence(raw?.contentCanaryMeta,CONTENT_CANARY_CONFIG?.canaryId||raw?.contentCanaryMeta?.canaryId||''):{...defaultState.contentCanaryMeta},coachCache:raw?.coachCache&&typeof raw.coachCache==='object'?raw.coachCache:null,levelTrust:sanitizeLevelTrust(raw?.levelTrust),gems:sanitizeGemsState(raw?.gems),toursSeen:sanitizeToursSeen(raw?.toursSeen)};
+  const next={...defaultState,...raw,view:'home',ownerUuid:String(raw?.ownerUuid||'').replace(/[^A-Za-z0-9_-]/g,'').slice(0,128),vocab:raw?.vocab||{},grammar:raw?.grammar||{},reading:raw?.reading||{},history:Array.isArray(raw?.history)?raw.history.filter(h=>h&&typeof h==='object'):[],wrongAnswers:pruneCorruptedReviewEntries(raw?.wrongAnswers),confidenceHistory:Array.isArray(raw?.confidenceHistory)?raw.confidenceHistory:[],sessionHistory:Array.isArray(raw?.sessionHistory)?raw.sessionHistory:[],learningDays:Array.isArray(raw?.learningDays)?raw.learningDays:[],daily:raw?.daily&&typeof raw.daily==='object'?raw.daily:{date:'',count:0,attempts:0,meaningful:false},preferences:{...defaultPreferences,...rawPreferences,activeLevel,levelMode:activeLevel?'manual':'placement',selfAssessedLevel:LEVELS.includes(String(rawPreferences.selfAssessedLevel||''))?String(rawPreferences.selfAssessedLevel):'',timeZone:validTimeZone(rawPreferences.timeZone||defaultPreferences.timeZone),goalProfile:String(rawPreferences.goalProfile||defaultPreferences.goalProfile).slice(0,30),reportEndpoint:String(rawPreferences.reportEndpoint||DEFAULT_REPORT_ENDPOINT).trim(),/* m025-182 W2-STATE: enum tertutup — nilai korup/asing jatuh ke default 'id', bukan lolos mentah */learnerLocale:(self.FiezelI18n?.SUPPORTED||['id','th']).includes(rawPreferences.learnerLocale)?rawPreferences.learnerLocale:defaultPreferences.learnerLocale,/* fail-closed: apa pun selain true persis -> false. State korup tidak boleh bisa menyalakan pengiriman data. */brainSync:rawPreferences.brainSync===true},reportMeta:{...defaultReportMeta,...(raw?.reportMeta||{}),queue:Array.isArray(raw?.reportMeta?.queue)?raw.reportMeta.queue.slice(-8):[]},reminderMeta:{lastNotificationAt:0,lastNotificationDay:'',lastNotificationKind:'',lastMessageIndex:-1,lastPositiveDay:'',evidenceLog:[],...(raw?.reminderMeta||{}),evidenceLog:Array.isArray(raw?.reminderMeta?.evidenceLog)?raw.reminderMeta.evidenceLog.slice(-ALRS_EVIDENCE_LOG_LIMIT):[]},activeSession:raw?.activeSession&&typeof raw.activeSession==='object'?raw.activeSession:null,adaptivePolicyMeta:{lastPolicy:null,lastSource:'',lastAt:0,history:[],...(raw?.adaptivePolicyMeta||{}),history:Array.isArray(raw?.adaptivePolicyMeta?.history)?raw.adaptivePolicyMeta.history.slice(-30):[]},policyOutcomeMeta:{last:null,history:[],queue:[],...(raw?.policyOutcomeMeta||{}),history:Array.isArray(raw?.policyOutcomeMeta?.history)?raw.policyOutcomeMeta.history.slice(-POLICY_OUTCOME_LOG_LIMIT):[],queue:Array.isArray(raw?.policyOutcomeMeta?.queue)?raw.policyOutcomeMeta.queue.slice(-10):[]},contentCanaryMeta:CONTENT_CANARY?CONTENT_CANARY.sanitizeEvidence(raw?.contentCanaryMeta,CONTENT_CANARY_CONFIG?.canaryId||raw?.contentCanaryMeta?.canaryId||''):{...defaultState.contentCanaryMeta},coachCache:raw?.coachCache&&typeof raw.coachCache==='object'?raw.coachCache:null,levelTrust:sanitizeLevelTrust(raw?.levelTrust),gems:sanitizeGemsState(raw?.gems),toursSeen:sanitizeToursSeen(raw?.toursSeen)};
   /* R6 perbaikan-15/16: penghitung yang rusak TIDAK boleh menghapus bukti belajar.
      (1) Baris history yang korup (null/bukan objek) dibuang SATU-SATU di atas - dulu satu
      baris null membuat hs.map(h=>h.skill) melempar, loadState menangkapnya, dan SELURUH
@@ -5692,57 +5692,35 @@ function armPuterAuthGate(){
  * tanpa bertanya. OWNER menerima ongkos datanya secara sadar (152 MB), dan itu memang
  * ongkos yang nyata - lihat catatan kuota di kepala fiezel-voice-offline-autoload.js.
  */
-/* m025-246 — 152 MB BERHENTI MENGALIR TANPA DITANYA.
- * OWNER: "Gerbang paket suara 119 MB - pindah ke Pengaturan + prompt kontekstual saat
- * latihan pertama."
+/* m025-236 (keputusan OWNER, DIPERTAHANKAN): unduhan suara neural menyala di boot
+ * PERTAMA untuk SEMUA murid, tanpa bertanya dan tanpa satu pun layar menyebutnya.
  *
- * Yang ada sebelum baris ini bukan gerbang, melainkan kebalikannya: sejak m025-236
- * unduhan 152 MB menyala di boot PERTAMA untuk SEMUA murid, tanpa satu pun layar
- * menyebutnya. Untuk murid di kuota seluler Indonesia itu keputusan besar yang dibuat
- * atas namanya. Owner meminta keduanya diperbaiki sekaligus - gerbangnya hilang DAN
- * unduhannya berhenti diam-diam - dan tempatnya menjadi dua: sakelar di Pengaturan,
- * plus satu tawaran kontekstual saat murid pertama kali menyentuh latihan yang berbunyi.
+ * m025-246 sempat mengubahnya menjadi opt-in atas dasar baris brief "gerbang paket suara
+ * 119 MB - pindah ke Pengaturan". OWNER MEMBATALKAN perubahan itu pada hari yang sama:
+ * "unduhan suaranya biarkan diunduh secara diam-diam di background, jangan kamu sentuh."
+ * Jadi baris brief itu hanya berlaku untuk GERBANG-nya (layar yang menahan murid sampai
+ * ia mengunduh) - bukan untuk unduhan latarnya, yang memang disengaja.
  *
- * YANG TIDAK RUSAK KARENA INI: suara tetap berbunyi tanpa paket ini selama ada jaringan
- * (mesin server), dan kalau mesin itu gagal ada jatuh-balik suara peramban di layar
- * dengar (playWithBrowserVoice di addon). Paket lokal adalah tambahan untuk belajar
- * tanpa sinyal - persis peran yang sudah tertulis di kepala kartu Pengaturan.
+ * Ongkos datanya (152 MB) tetap ongkos yang nyata dan tetap diterima owner secara sadar;
+ * catatan kuotanya ada di kepala fiezel-voice-offline-autoload.js.
  */
-function voicePackOptedIn(){return state?.preferences?.voicePackOptIn===true}
-function armOfflineVoiceAutoload(){
-  /* Bendera ON = perilaku lama (unduh di boot, tanpa bertanya). Bendera OFF = hanya
-     jalan setelah murid mengiyakan. Dua-duanya lewat satu pintu supaya tidak ada
-     jalur kedua yang bisa menyalakan unduhan tanpa melewati keputusan ini. */
-  if(uxOff('voicePackGate')&&!voicePackOptedIn())return false;
-  const go=()=>{try{return(self.FiezelVoiceOfflineAutoload?.arm?.()??self.FiezelVoiceOfflineAutoload?.noteSignedIn?.())===true}catch{return false}};
-  if(go())return true;
-  ensureVoiceRuntime().then(go).catch(()=>{});
-  return false
-}
-/* Sakelar murid. Satu-satunya penulis voicePackOptIn, dan ia langsung menyalakan
-   unduhannya - "menyimpan preferensi lalu tidak melakukan apa-apa sampai boot
-   berikutnya" adalah tombol yang terasa rusak. */
-function setVoicePackOptIn(on){
-  state.preferences={...state.preferences,voicePackOptIn:on===true,voicePackAsked:true};save();
-  if(on===true){armOfflineVoiceAutoload();armAccountNudgeAfterModel()}
-  return on===true;
-}
 /* m025-246 — DORONGAN AKUN SESUDAH UNDUHAN MODEL.
-   OWNER (edge case wajib): "akun didorong setelah unduh model".
-
-   Alasannya bukan "supaya lebih banyak yang mendaftar": murid yang baru saja
-   menghabiskan 152 MB kuota untuk paket suara adalah murid yang paling banyak rugi
-   kalau ITP menghapus penyimpanannya tujuh hari kemudian. Titik itulah momen yang
-   jujur untuk menawarkan akun - biayanya sudah dikeluarkan, dan tawarannya berbunyi
-   "amankan yang sudah kamu bayar", bukan "daftar dulu baru boleh belajar".
-
-   SEKALI, dan hanya kalau perlu: sudah punya akun -> diam; sudah pernah ditawari ->
-   diam; unduhan belum selesai -> menunggu, tidak memaksa.
-
-   Jamnya berhenti sendiri: `armed` menjaga hanya ada satu pemeriksa hidup, dan
-   pemeriksanya membatalkan diri setelah tawaran keluar atau setelah batas percobaan
-   habis - jam yang berdetak selamanya di perangkat murid adalah baterai yang habis
-   tanpa satu piksel pun imbalan. */
+ * OWNER (edge case wajib): "akun didorong setelah unduh model".
+ *
+ * Alasannya bukan "supaya lebih banyak yang mendaftar": murid yang perangkatnya baru saja
+ * menghabiskan 152 MB untuk paket suara adalah murid yang paling banyak rugi kalau ITP
+ * menghapus penyimpanannya tujuh hari kemudian. Titik itulah momen yang jujur untuk
+ * menawarkan akun - biayanya sudah dikeluarkan, dan tawarannya berbunyi "amankan yang sudah
+ * kamu bayar", bukan "daftar dulu baru boleh belajar".
+ *
+ * SEKALI, dan hanya kalau perlu: sudah punya akun -> diam; sudah pernah ditawari -> diam;
+ * unduhan belum selesai -> menunggu, tidak memaksa.
+ *
+ * Jamnya berhenti sendiri. `accountNudgeArmed` menjaga hanya ada satu pemeriksa hidup, dan
+ * pemeriksanya membatalkan diri setelah tawaran keluar atau setelah batas percobaan habis -
+ * jam yang berdetak selamanya di perangkat murid adalah baterai yang habis tanpa satu piksel
+ * pun imbalan.
+ */
 const ACCOUNT_NUDGE_KEY='fiezel-account-nudge-after-model';
 let accountNudgeArmed=false;
 function accountNudgeDone(){try{return localStorage.getItem(ACCOUNT_NUDGE_KEY)==='1'}catch(_){return false}}
@@ -5753,9 +5731,9 @@ function armAccountNudgeAfterModel(){
   let ticks=0;
   const timer=setInterval(()=>{
     ticks++;
-    /* 120 detak x 30 detik = satu jam. Unduhan yang belum selesai dalam satu jam
-       sedang tidak berjalan; tawarannya akan datang lagi di boot berikutnya lewat
-       jalur yang sama, bukan dari jam yang tidak pernah mati. */
+    /* 120 detak x 30 detik = satu jam. Unduhan yang belum selesai dalam satu jam sedang
+       tidak berjalan; tawarannya akan datang lagi di boot berikutnya lewat jalur yang
+       sama, bukan dari jam yang tidak pernah mati. */
     if(ticks>120){clearInterval(timer);accountNudgeArmed=false;return}
     let done=false;
     try{done=self.FiezelVoiceOfflineAutoload?.status?.().done===true}catch(_){done=false}
@@ -5766,7 +5744,7 @@ function armAccountNudgeAfterModel(){
     try{
       if(self.FiezelStage?.lessonMode?.())return;
       if(topDialogLayer())return;
-      openModal(`<h2>${FiezelI18n.t('settings.cadangan-judul')}</h2><p>${FiezelI18n.t('settings.cadangan-body')}</p><div class="modal-actions"><button class="primary" id="nudgeAccountYes">${FiezelI18n.t('settings.cadangan-aksi')}</button><button id="nudgeAccountNo">${FiezelI18n.t('suara.tawaran-nanti')}</button></div>`);
+      openModal(`<h2>${FiezelI18n.t('settings.cadangan-judul')}</h2><p>${FiezelI18n.t('settings.cadangan-body')}</p><div class="modal-actions"><button class="primary" id="nudgeAccountYes">${FiezelI18n.t('settings.cadangan-aksi')}</button><button id="nudgeAccountNo">${FiezelI18n.t('umum.nanti-dulu')}</button></div>`);
       $('nudgeAccountYes')?.addEventListener('click',()=>{closeModal();openAccountSheet('login')});
       $('nudgeAccountNo')?.addEventListener('click',()=>closeModal());
     }catch(_){}
@@ -5774,22 +5752,16 @@ function armAccountNudgeAfterModel(){
   timer?.unref?.();
   return true;
 }
-window.setVoicePackOptIn=setVoicePackOptIn;
-/* Tawaran kontekstual: SEKALI seumur pemasangan, dan hanya di titik latihan berbunyi -
-   bukan di boot, bukan di perkenalan. Ditolak = tidak pernah ditanya lagi; pintunya
-   tetap ada di Pengaturan. */
-function maybeOfferVoicePack(){
-  if(uxOn('voicePackGate'))return false;
-  if(state?.preferences?.voicePackAsked===true||voicePackOptedIn())return false;
-  if(typeof document==='undefined'||typeof openModal!=='function')return false;
-  /* Tidak menumpuk di atas dialog lain: aturan lapisan yang sama dengan ritual harian
-     dan undangan notifikasi (DIALOG_LAYER_IDS). */
-  try{if(topDialogLayer())return false}catch(_){}
-  state.preferences={...state.preferences,voicePackAsked:true};save();
-  openModal(`<h2>${FiezelI18n.t('suara.tawaran-judul')}</h2><p>${FiezelI18n.t('suara.tawaran-body')}</p><div class="modal-actions"><button class="primary" id="voicePackYes">${FiezelI18n.t('suara.tawaran-unduh')}</button><button id="voicePackNo">${FiezelI18n.t('suara.tawaran-nanti')}</button></div>`);
-  $('voicePackYes')?.addEventListener('click',()=>{setVoicePackOptIn(true);closeModal();showToast(FiezelI18n.t('suara.menyiapkan'))});
-  $('voicePackNo')?.addEventListener('click',()=>{closeModal()});
-  return true;
+function armOfflineVoiceAutoload(){
+  const go=()=>{try{return(self.FiezelVoiceOfflineAutoload?.arm?.()??self.FiezelVoiceOfflineAutoload?.noteSignedIn?.())===true}catch{return false}};
+  /* Dorongan akun dipasang bersamaan, bukan sesudah sebuah sakelar: murid yang perangkatnya
+     baru saja menghabiskan 152 MB adalah murid yang paling banyak rugi kalau ITP menghapus
+     penyimpanannya tujuh hari kemudian (edge case wajib: "akun didorong setelah unduh
+     model"). Ia sendiri yang menunggu sampai unduhannya benar-benar selesai. */
+  try{armAccountNudgeAfterModel()}catch(_){}
+  if(go())return true;
+  ensureVoiceRuntime().then(go).catch(()=>{});
+  return false
 }
 // Menampilkan undangan notifikasi. Mengembalikan true HANYA kalau panelnya benar-benar
 // muncul, supaya pemanggil tahu apakah ia perlu melanjutkan alur sendiri.
@@ -7749,12 +7721,7 @@ function neuralVoiceStatusMarkup(){const say=self.FiezelPuterVoice,online=say?.s
   // m025-100. Cadangan perangkat menyiapkan dirinya sendiri di latar; yang ditampilkan di
   // sini hanyalah kenyataan sesudahnya, satu baris, tanpa tombol dan tanpa angka megabita.
   const backupLine=offline.done?FiezelI18n.t('suara.cadangan'):'';
-  /* m025-246: sakelar paket suara offline. Inilah "pindah ke Pengaturan" dari brief -
-     satu-satunya tempat murid bisa MEMULAI unduhan 152 MB dengan sadar. Disembunyikan
-     kalau bendera `voicePackGate` dinyalakan lagi, karena di mode itu unduhannya
-     menyala sendiri di boot dan sakelar yang tidak mengubah apa pun hanya membingungkan. */
-  const packRow=uxOff('voicePackGate')?`<label class="setting-row"><span class="setting-icon"><i data-lucide="hard-drive-download"></i></span><span><b>${FiezelI18n.t('suara.tawaran-judul')}</b><small>${FiezelI18n.t('suara.tawaran-body')}</small></span><input id="settingVoicePack" type="checkbox" ${voicePackOptedIn()?'checked':''} aria-label="${FiezelI18n.t('suara.tawaran-judul')}"></label>`:'';
-  return `<article class="voice-setup-card"><div class="voice-setup-copy"><h2>${esc(label)}</h2><p id="neuralVoiceProgress">${FiezelI18n.t('suara.ket-subtitle')}</p>${online.error?`<p class="muted">${FiezelI18n.t('suara.status-error',{galat:esc(online.error)})}</p>`:''}<label class="neural-voice-choice" for="neuralRateInput"><span>${FiezelI18n.t('suara.kecepatan-bicara')}</span><input id="neuralRateInput" type="range" min="${NEURAL_RATE_MIN}" max="${NEURAL_RATE_MAX}" step="${NEURAL_RATE_STEP}" value="${selectedNeuralRate()}"><small id="neuralRateValue">${esc(neuralRateLabel(selectedNeuralRate()))}</small></label>${backupLine?`<p class="muted">${esc(backupLine)}</p>`:''}${packRow}</div><div class="voice-setup-actions"><button id="testNeuralVoice" type="button"><i data-lucide="volume-2"></i> ${FiezelI18n.t('suara.tes')}</button></div></article>`}
+  return `<article class="voice-setup-card"><div class="voice-setup-copy"><h2>${esc(label)}</h2><p id="neuralVoiceProgress">${FiezelI18n.t('suara.ket-subtitle')}</p>${online.error?`<p class="muted">${FiezelI18n.t('suara.status-error',{galat:esc(online.error)})}</p>`:''}<label class="neural-voice-choice" for="neuralRateInput"><span>${FiezelI18n.t('suara.kecepatan-bicara')}</span><input id="neuralRateInput" type="range" min="${NEURAL_RATE_MIN}" max="${NEURAL_RATE_MAX}" step="${NEURAL_RATE_STEP}" value="${selectedNeuralRate()}"><small id="neuralRateValue">${esc(neuralRateLabel(selectedNeuralRate()))}</small></label>${backupLine?`<p class="muted">${esc(backupLine)}</p>`:''}</div><div class="voice-setup-actions"><button id="testNeuralVoice" type="button"><i data-lucide="volume-2"></i> ${FiezelI18n.t('suara.tes')}</button></div></article>`}
 // m025-96: menguji mesin yang benar-benar dipakai murid. Menguji mesin lokal di sini
 // akan melaporkan 'suara siap' padahal jalur yang dipakai pelajaran adalah yang lain.
 async function testNeuralVoice(){const button=$('testNeuralVoice'),say=self.FiezelVoiceSay;if(!button||!say?.say)return;button.disabled=true;const hint=$('neuralVoiceProgress');try{const ok=await say.say(`Hello ${learnerName()}. This is your FIEZEL voice.`,{speed:selectedNeuralRate()});if(hint)hint.textContent=ok?FiezelI18n.t('suara.tes-selesai'):FiezelI18n.t('suara.tak-berbunyi');showToast(ok?FiezelI18n.t('suara.terdengar'):FiezelI18n.t('suara.belum-berbunyi'))}catch(error){if(hint)hint.textContent=FiezelI18n.t('suara.tes-gagal-detail',{galat:String(error?.message||error)});showToast(FiezelI18n.t('suara.tes-gagal'))}finally{button.disabled=false;enhanceUI()}}
@@ -8005,7 +7972,7 @@ function gemsHook(){
     }
   };
 }
-async function skillsLab(domain){const token=speakingListeningMountToken;const copy=SKILL_PAGE_COPY[domain];const head=copy?`<div class="skill-page-topbar"><button type="button" class="skill-help-dot" onclick="openSkillHelp('${esc(domain)}')" aria-label="${esc(FiezelI18n.t('skills.bantuan'))}" title="${esc(FiezelI18n.t('skills.bantuan'))}"><span aria-hidden="true">?</span></button></div>`:`<div class="section-head"><div><h1>${esc(FiezelI18n.t('latihan.bicara-dengar'))}</h1><p>${FiezelI18n.t('skills.lead-hub')}</p></div>${levelControlMarkup()}</div>`;setApp(`<section class="fade skills-page">${head}<div id="speakingListeningRoot"><div class="card skills-loading">${FiezelI18n.t('skills.memuat')}</div></div></section>`);enhanceUI();await ensureVoiceRuntime();try{if(!self.FiezelSLAddon)throw new Error(FiezelI18n.t('skills.runtime-hilang'));const tts={play:(text,options={})=>self.FiezelVoiceSay?.say?.(text,{speed:options.speed??selectedNeuralRate(),suppressSubtitles:!!options.suppressSubtitles})||Promise.reject(new Error('tts_unavailable')),/* V6: adaptor ini hanya meneruskan (voice-v5-prefetch.md §3 baris 10); keputusan APA yang dihangatkan - dan larangan menghangatkan item ujian - tetap milik addon. */prefetch:(text,options={})=>prefetchNextVoice(text,{speed:options.speed??selectedNeuralRate()}),stop:()=>{cancelVoicePrefetch();self.FiezelVoiceSay?.stop?.()}};const controller=await self.FiezelSLAddon.create({root:$('speakingListeningRoot'),baseUrl:'./features/speaking-listening/',/* S1b: satu-satunya PENULIS sidecar Speaking/Listening. Kuncinya di-override di sini, di titik mount, supaya penulis dan kedua pembacanya selalu menunjuk ruang akun yang sama. */config:{...self.FIEZEL_SPEAKING_LISTENING_CONFIG,storageKey:sideStateKey(SL_STATE_KEY)},getActiveLevel,activeLevel:getActiveLevel(),tts,/* m026-02: satu-satunya titik pemberitahuan Puter boleh muncul - sesi dengar sudah bubar (renderComplete/exit di addon). */onSessionEnd:()=>{try{maybePresentPuterCreditNotice()}catch{}},/* m025-246: kait skip rate. Addon melaporkan; app.js yang memutuskan boleh-tidaknya mengirim (satu gerbang persetujuan, bukan dua). */onSkip:info=>{try{anQuestionSkipped(info?.domain,info?.level,info?.reason)}catch(_){}},/* R2-4: ekspresi maskot dalam sesi Skills Lab — lewat pawReact host supaya gerbang reduced-motion/preferensi animasinya SATU. */onAnswerFeedback:ok=>{try{pawReact(ok?'correct':'wrong')}catch(_){}},/* Fase 3 (C5 butir 5): kait kebijakan speaking adaptif untuk addon - addon yang memutuskan kapan memakainya; kunci asing diabaikan addon lama, jadi ini aman untuk versi mana pun. */speakingAdaptive:speakingAdaptiveAvailable()?{evidence:speakingAdaptiveEvidence,policy:speakingAdaptivePolicy}:null,gems:gemsHook()});if(token!==speakingListeningMountToken||!SKILLS_LAB_VIEWS.has(state.view)){controller.destroy();return}speakingListeningController=controller;/* m026-03: kait tur listening. Addon-nya TIDAK diubah - renderListening dibungkus dari luar, pola yang sama dengan hook lain milik host. Tur diberi tahu setelah kartu soal tercat. */try{const baseRenderListening=controller.renderListening?.bind(controller);if(baseRenderListening)controller.renderListening=(...args)=>{const out=baseRenderListening(...args);notifyFeatureTour('listening');return out}}catch(_){}controller.mount($('speakingListeningRoot'));if(SKILL_PAGE_COPY[domain]){try{controller.open(domain)}catch(_){}}/* m026-01: hanya Listening yang memicu state dengar; Speaking dan lainnya cukup penasaran. */pawReact(domain==='listening'?'listening-start':'question-shown');enhanceUI();/* m025-246: TITIK KONTEKSTUAL tawaran paket suara - sesudah layar berbunyi benar-benar tercat, bukan di boot dan bukan di perkenalan. Ditunda satu jeda supaya ia tidak menumpuk di atas animasi masuk kartunya. */setTimeout(()=>{try{maybeOfferVoicePack()}catch(_){}},900)}catch(error){const root=$('speakingListeningRoot');if(root)root.innerHTML=`<div class="card"><b>${FiezelI18n.t('skills.gagal-muat')}</b><p class="muted">${esc(error?.message||error)}</p></div>`;/* [ADAPTASI] OA-7 §4: error_system hanya untuk kegagalan sistem, bukan jawaban salah. */uiSfx('error_system')}}// m025-115 - Writing: satu-satunya dari empat skill inti tes yang belum punya mesin sama
+async function skillsLab(domain){const token=speakingListeningMountToken;const copy=SKILL_PAGE_COPY[domain];const head=copy?`<div class="skill-page-topbar"><button type="button" class="skill-help-dot" onclick="openSkillHelp('${esc(domain)}')" aria-label="${esc(FiezelI18n.t('skills.bantuan'))}" title="${esc(FiezelI18n.t('skills.bantuan'))}"><span aria-hidden="true">?</span></button></div>`:`<div class="section-head"><div><h1>${esc(FiezelI18n.t('latihan.bicara-dengar'))}</h1><p>${FiezelI18n.t('skills.lead-hub')}</p></div>${levelControlMarkup()}</div>`;setApp(`<section class="fade skills-page">${head}<div id="speakingListeningRoot"><div class="card skills-loading">${FiezelI18n.t('skills.memuat')}</div></div></section>`);enhanceUI();await ensureVoiceRuntime();try{if(!self.FiezelSLAddon)throw new Error(FiezelI18n.t('skills.runtime-hilang'));const tts={play:(text,options={})=>self.FiezelVoiceSay?.say?.(text,{speed:options.speed??selectedNeuralRate(),suppressSubtitles:!!options.suppressSubtitles})||Promise.reject(new Error('tts_unavailable')),/* V6: adaptor ini hanya meneruskan (voice-v5-prefetch.md §3 baris 10); keputusan APA yang dihangatkan - dan larangan menghangatkan item ujian - tetap milik addon. */prefetch:(text,options={})=>prefetchNextVoice(text,{speed:options.speed??selectedNeuralRate()}),stop:()=>{cancelVoicePrefetch();self.FiezelVoiceSay?.stop?.()}};const controller=await self.FiezelSLAddon.create({root:$('speakingListeningRoot'),baseUrl:'./features/speaking-listening/',/* S1b: satu-satunya PENULIS sidecar Speaking/Listening. Kuncinya di-override di sini, di titik mount, supaya penulis dan kedua pembacanya selalu menunjuk ruang akun yang sama. */config:{...self.FIEZEL_SPEAKING_LISTENING_CONFIG,storageKey:sideStateKey(SL_STATE_KEY)},getActiveLevel,activeLevel:getActiveLevel(),tts,/* m026-02: satu-satunya titik pemberitahuan Puter boleh muncul - sesi dengar sudah bubar (renderComplete/exit di addon). */onSessionEnd:()=>{try{maybePresentPuterCreditNotice()}catch{}},/* m025-246: kait skip rate. Addon melaporkan; app.js yang memutuskan boleh-tidaknya mengirim (satu gerbang persetujuan, bukan dua). */onSkip:info=>{try{anQuestionSkipped(info?.domain,info?.level,info?.reason)}catch(_){}},/* R2-4: ekspresi maskot dalam sesi Skills Lab — lewat pawReact host supaya gerbang reduced-motion/preferensi animasinya SATU. */onAnswerFeedback:ok=>{try{pawReact(ok?'correct':'wrong')}catch(_){}},/* Fase 3 (C5 butir 5): kait kebijakan speaking adaptif untuk addon - addon yang memutuskan kapan memakainya; kunci asing diabaikan addon lama, jadi ini aman untuk versi mana pun. */speakingAdaptive:speakingAdaptiveAvailable()?{evidence:speakingAdaptiveEvidence,policy:speakingAdaptivePolicy}:null,gems:gemsHook()});if(token!==speakingListeningMountToken||!SKILLS_LAB_VIEWS.has(state.view)){controller.destroy();return}speakingListeningController=controller;/* m026-03: kait tur listening. Addon-nya TIDAK diubah - renderListening dibungkus dari luar, pola yang sama dengan hook lain milik host. Tur diberi tahu setelah kartu soal tercat. */try{const baseRenderListening=controller.renderListening?.bind(controller);if(baseRenderListening)controller.renderListening=(...args)=>{const out=baseRenderListening(...args);notifyFeatureTour('listening');return out}}catch(_){}controller.mount($('speakingListeningRoot'));if(SKILL_PAGE_COPY[domain]){try{controller.open(domain)}catch(_){}}/* m026-01: hanya Listening yang memicu state dengar; Speaking dan lainnya cukup penasaran. */pawReact(domain==='listening'?'listening-start':'question-shown');enhanceUI()}catch(error){const root=$('speakingListeningRoot');if(root)root.innerHTML=`<div class="card"><b>${FiezelI18n.t('skills.gagal-muat')}</b><p class="muted">${esc(error?.message||error)}</p></div>`;/* [ADAPTASI] OA-7 §4: error_system hanya untuk kegagalan sistem, bukan jawaban salah. */uiSfx('error_system')}}// m025-115 - Writing: satu-satunya dari empat skill inti tes yang belum punya mesin sama
 // sekali. Yang dibangun di sini sengaja yang paling kecil tapi utuh: satu topik sesuai
 // level, satu kotak tulis, satu masukan yang bisa dipakai. Bukan editor esai.
 //
@@ -8527,43 +8494,28 @@ function AudioService(){
    tetapi menebak bukan jalan keluar - ia hanya bukti palsu yang masuk ke model
    kemampuan murid.
 
-   TIGA JALAN KELUAR, dan yang ketiga yang paling penting:
-     coba lagi      - menekan ulang tombol Dengarkan yang sudah ada.
-     suara peramban - speechSynthesis bawaan perangkat: nol unduhan, nol jaringan,
-                      dan justru hidup di perangkat kelas bawah tempat mesin neural
-                      paling sering gagal. Hanya ditawarkan bila API-nya ada.
-     lewati         - maju ke soal berikutnya TANPA menilai. Itu arti "tanpa
-                      penalti", dan di sini ia harus dikatakan kepada murid, bukan
-                      sekadar benar di dalam kode. */
-function browserSpeechAvailable(){
-  try{return !!self.speechSynthesis&&typeof self.SpeechSynthesisUtterance==='function'}catch(_){return false}
-}
-/* Jatuh-balik suara peramban. TIDAK PERNAH dipanggil sendiri - hanya dari klik murid
-   pada tombolnya, kontrak "tombol Putar adalah gestur, tidak pernah autoplay". */
-function speakWithBrowserVoice(text,rate){
-  if(!browserSpeechAvailable())return false;
-  try{
-    audio.stop();
-    self.speechSynthesis.cancel();
-    const u=new self.SpeechSynthesisUtterance(String(text||''));
-    u.lang='en-US';u.rate=Number(rate)||1;
-    self.speechSynthesis.speak(u);
-    return true;
-  }catch(_){return false}
-}
+   DUA JALAN KELUAR:
+     coba lagi - menekan ulang tombol Dengarkan yang sudah ada.
+     lewati    - maju ke soal berikutnya TANPA menilai. Itu arti "tanpa penalti",
+                 dan di sini ia harus dikatakan kepada murid, bukan sekadar benar
+                 di dalam kode.
+
+   TIDAK ADA opsi "suara peramban", dan itu keputusan OWNER yang tegas (4 Sep 2026:
+   "aku ga mau lagi ada tts browser, tts browser harus mati total"). Larangannya
+   ditegakkan gerbang: audio-locale-guard-test.js menolak SETIAP sebutan
+   speechSynthesis di app.js dan di seluruh zona audio. Jangan tambahkan kembali. */
 function showListeningFailureActions(q,cfg){
   const note=$('quizListenNote');if(!note||!note.parentNode)return false;
   if(document.getElementById('quizAudioFallback'))return false;
   const row=document.createElement('div');
   row.id='quizAudioFallback';row.className='quiz-audio-fallback';
   row.setAttribute('role','status');
-  row.innerHTML=`<div class="quiz-audio-fallback-actions"><button type="button" id="quizAudioRetry">${esc(FiezelI18n.t('listening.gagal-coba-lagi'))}</button>${browserSpeechAvailable()?`<button type="button" id="quizAudioBrowser">${esc(FiezelI18n.t('listening.gagal-peramban'))}</button>`:''}<button type="button" id="quizAudioSkip">${esc(FiezelI18n.t('listening.gagal-lewati'))}</button></div><small class="muted">${esc(FiezelI18n.t('listening.gagal-tanpa-penalti'))}</small>`;
+  row.innerHTML=`<div class="quiz-audio-fallback-actions"><button type="button" id="quizAudioRetry">${esc(FiezelI18n.t('listening.gagal-coba-lagi'))}</button><button type="button" id="quizAudioSkip">${esc(FiezelI18n.t('listening.gagal-lewati'))}</button></div><small class="muted">${esc(FiezelI18n.t('listening.gagal-tanpa-penalti'))}</small>`;
   note.parentNode.appendChild(row);
   /* Coba lagi meneruskan klik ke tombol yang sudah ada alih-alih menyalin logikanya:
      dua salinan berarti dua tempat yang harus sepakat soal penghitungan replay dan
      penanda memutar, dan dua tempat seperti itu selalu berakhir tidak sepakat. */
   $('quizAudioRetry')?.addEventListener('click',()=>{try{row.remove()}catch(_){}const b=$('quizListen');if(b){b.disabled=false;b.click()}});
-  $('quizAudioBrowser')?.addEventListener('click',()=>{speakWithBrowserVoice(q&&q.script,selectedNeuralRate())});
   /* Lewati = maju TANPA record(). Ia menandai soal supaya tidak ikut dinilai, lalu
      menekan tombol Lanjut yang sudah ada - jalur maju yang sama dengan jawaban biasa,
      tanpa jawaban. */
@@ -10901,7 +10853,7 @@ async function toggleStudyReminders(input){
 // updateNeuralVoiceProgress() dihapus, bukan disembunyikan. Cadangan perangkat kini
 // menyiapkan dirinya sendiri di latar; sebuah tombol yang menawarkan pekerjaan yang
 // sudah berjalan sendiri hanya akan membuat murid mengira ada yang harus ia lakukan.
-function bindVoiceSettingControls(){$('testNeuralVoice')?.addEventListener('click',testNeuralVoice);$('neuralRateInput')?.addEventListener('input',event=>setNeuralRatePreference(event.currentTarget.value));$('settingVoicePack')?.addEventListener('change',event=>setVoicePackOptIn(event.currentTarget.checked===true))}
+function bindVoiceSettingControls(){$('testNeuralVoice')?.addEventListener('click',testNeuralVoice);$('neuralRateInput')?.addEventListener('input',event=>setNeuralRatePreference(event.currentTarget.value))}
 function saveSettings(){const endpoint=$('reportEndpoint').value.trim(),consent=$('reportConsent').checked;if(endpoint&&!validReportEndpoint(endpoint)){showToast(FiezelI18n.t('settings.gunakan-url-https-dengan-domain'));answerFeedbackSignal(false);return}
   // m025-117: nama boleh diganti kapan saja, tetapi tidak boleh DIHAPUS dari sini - kolom
   // yang dikosongkan lalu disimpan akan mengembalikan aplikasi ke keadaan tanpa nama yang

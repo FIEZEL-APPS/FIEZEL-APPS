@@ -350,9 +350,16 @@
 
          Yang dilakukan di sini adalah MENOLAK dengan jujur, bukan mencoba lalu berharap:
          inisialisasi berhenti, `phase` jatuh ke gagal seperti kegagalan init lain, dan
-         tangga suara (fiezel-voice-say.js) melanjutkan ke lapisan berikutnya. Murid tidak
-         terjebak dalam senyap: keadaan gagal audio di kedua mesin soal dengar menawarkan
-         tombol "Pakai suara peramban" yang tidak butuh WASM sama sekali.
+         tangga suara (fiezel-voice-say.js) melanjutkan ke lapisan berikutnya. Menolak
+         BUKAN berarti murid kehilangan suara: L1 (aset R2/ElevenLabs) dan L2 (mesin Puter)
+         berada DI ATAS lapisan ini, jadi selama ada jaringan suara tetap berbunyi persis
+         seperti biasa. Yang hilang hanya sintesis lokal - dan justru sintesis lokal itulah
+         yang mematikan tab di perangkat ini.
+
+         Kalau seluruh tangga gagal, jawabannya DIAM plus teks (L5), bukan suara peramban:
+         OWNER 4 Sep 2026, "aku ga mau lagi ada tts browser, tts browser harus mati total".
+         Di layar soal dengar murid tetap punya dua jalan keluar yang tidak butuh suara
+         sama sekali - coba lagi, atau lewati tanpa penalti.
 
          AMBANGNYA konservatif dan hanya dari sinyal yang MEMANG ADA. `deviceMemory` dan
          `hardwareConcurrency` boleh tidak ada (Safari tidak memberi deviceMemory); yang

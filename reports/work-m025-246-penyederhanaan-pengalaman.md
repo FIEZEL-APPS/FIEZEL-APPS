@@ -62,10 +62,18 @@ murid benar-benar akan mengerjakannya. Tiga tab yang tersisa **tidak** dilipat j
 gulungan: m025-85 sudah pernah punya layar itu (17 kartu tanpa struktur) dan tab inilah
 perbaikannya.
 
-**Gerbang paket suara.** Yang ada sebelum ini bukan gerbang melainkan kebalikannya: sejak
-m025-236 unduhan **152 MB** menyala di boot pertama untuk semua murid, tanpa satu layar pun
-menyebutnya. Sekarang: `voicePackOptIn` bawaannya `false`, ada sakelar di Pengaturan, dan satu
-tawaran kontekstual saat murid pertama kali membuka latihan yang berbunyi.
+**Gerbang paket suara.** Yang mati adalah **gerbangnya** — layar yang menahan murid sampai ia
+mengunduh. Itu saja.
+
+Gelombang ini sempat melangkah lebih jauh: unduhan latar 152 MB (m025-236, menyala di boot
+pertama untuk semua murid tanpa bertanya) diubah jadi opt-in dengan sakelar di Pengaturan.
+**OWNER membatalkannya pada hari yang sama**: "unduhan suaranya biarkan diunduh secara
+diam-diam di background, jangan kamu sentuh." Perubahan itu direvert seluruhnya —
+`armOfflineVoiceAutoload()` kembali berjalan tanpa melihat bendera atau preferensi apa pun,
+dan `voicePackOptIn`/`voicePackAsked` dihapus dari `defaultPreferences` dan sanitizer.
+
+Bendera `voicePackGate` tetap didaftarkan (bukan dihapus) sebagai tempat tertulis keputusan
+itu, dan `ux-flags-test.js` T6b menjaga agar unduhannya tidak berpagar lagi.
 
 ---
 
@@ -102,11 +110,17 @@ kalimat di sebelahnya menyangkalnya. Sekarang: label "Cakupan kata" + hitungan y
 benar-benar diukur mesinnya ("3 dari 5 kata terdengar") + satu kalimat penjelasan.
 `result.score` tetap disimpan dan tetap memberi makan bukti adaptif.
 
-**Listening gagal audio.** Tiga jalan keluar di **kedua** mesin soal dengar (kuis harian dan
+**Listening gagal audio.** **Dua** jalan keluar di **kedua** mesin soal dengar (kuis harian dan
 sesi bicara & dengar — satu perbaikan di salah satunya meninggalkan separuh murid dengan layar
-buntu yang lama): coba lagi, suara peramban, lewati. "Tanpa penalti" dibuat benar di
-aritmetikanya, bukan hanya di kalimatnya: soal yang dilewati dikeluarkan dari **penyebut**
-akurasi (`cfg.__noAudioSkips`).
+buntu yang lama): coba lagi, dan lewati. "Tanpa penalti" dibuat benar di aritmetikanya, bukan
+hanya di kalimatnya: soal yang dilewati dikeluarkan dari **penyebut** akurasi
+(`cfg.__noAudioSkips`).
+
+Opsi ketiga — "suara peramban" — sempat dipasang atas baris brief 3 Sep, lalu **dicabut atas
+perintah OWNER 4 Sep**: "aku ga mau lagi ada tts browser, tts browser harus mati total."
+Seluruh jalurnya dihapus dari `app.js` dan dari addon, naskahnya dicabut dari copy-map, dan
+`audio-locale-guard-test.js` dikembalikan ke larangan total m025-232 (setiap sebutan
+`speechSynthesis` di zona audio maupun `app.js` memerahkan gerbang).
 
 **Prompt "Versi baru".** Ditunda selama `FiezelStage.lessonMode()` aktif, dilepas
 `FiezelUpdatePrompt.flush()` di layar hasil. Ditunda, bukan dibuang: permintaannya diparkir,
@@ -172,7 +186,11 @@ dari 25 dan memulai semuanya di A1.
 Naskah layar penempatan dibuat mengikuti jumlah soal yang benar-benar disajikan — menjanjikan
 25 lalu menyajikan 12 adalah kebohongan kecil di layar paling mahal.
 
-**Instrumentasi funnel.** Dua event baru di `CLIENT_EVENT_SPEC`: `first_question`
+**Instrumentasi funnel.** Dua event baru, didaftarkan di **kedua** sisi — klien
+(`CLIENT_EVENT_SPEC`) dan Worker (`workers/api/analytics/analytics-core.js`, `origin:'client'`
+dengan enum byte-identik). Tanpa entri sisi Worker, keduanya ditolak 400 dan instrumentasinya
+tidak akan pernah menghasilkan satu baris pun — kegagalan yang hanya terlihat sebagai
+"angkanya nol". Yang ditambahkan: `first_question`
 (`elapsed_bucket` dengan tepi tepat di **60 detik**, plus `cold`) dan `question_skipped`
 (`reason` enum tertutup — kolom teks bebas adalah tempat PII bocor). Dua yang lain sudah ada:
 `session_ended` dan `retention_ping` (D1/D7). Opt-in **tidak** diulang sebagai gerbang ketiga:
@@ -194,16 +212,16 @@ guru/murid yang baru mendarat (#336, #338) tidak disentuh.
 | Akun didorong setelah unduh model | `armAccountNudgeAfterModel()` — sekali, saat unduhan 152 MB selesai. Jamnya berhenti sendiri setelah satu jam; jam yang berdetak selamanya adalah baterai yang habis tanpa imbalan. |
 | Offline saat gerbang akun | `OFFLINE_AUTH_ESCAPE_MS = 3000`, memanggil `skipPuterSignIn()` yang sudah ada — kunci dilepas **dan** kuis yang tertunda ikut jalan, satu perilaku bukan dua. |
 | Autoplay | Tidak ada jalur yang memutar audio tanpa klik. Jatuh-balik suara peramban hanya berjalan dari tombolnya. |
-| Android low-end (Kokoro WASM) | Mesin utama (supertonic/sherpa) sudah berjalan di Worker. Cabang Kokoro lama — yang menjalankan WASM di jalur yang bisa membuat proses konten dihentikan OS — kini **menolak** di perangkat `deviceMemory ≤ 2` atau `hardwareConcurrency ≤ 2`, dan jatuh ke tombol suara peramban yang tidak butuh WASM sama sekali. |
+| Android low-end (Kokoro WASM) | Mesin utama (supertonic/sherpa) sudah berjalan di Worker. Cabang Kokoro lama — yang menjalankan WASM di jalur yang bisa membuat proses konten dihentikan OS — kini **menolak** di perangkat `deviceMemory ≤ 2` atau `hardwareConcurrency ≤ 2`. Menolak bukan berarti kehilangan suara: L1 (aset R2) dan L2 (Puter) ada di atas lapisan itu. Kalau seluruh tangga gagal, jawabannya DIAM + teks (L5) — **bukan** suara peramban. |
 | Kurangi-gerak: fallback statis maskot | `STATIC_FACE_FOR_STATE` memetakan **19** state ke 14 ekspresi statis; `setState()` memanggil `applyFace()` di bawah gerbang `_reducedMotion()`. Diverifikasi `mascot-reduced-motion-test.js`. |
 | Kompatibilitas state lama | `VALID_VIEWS` tidak dikurangi; `sanitizeState` menerima preferensi baru dengan pola fail-closed yang sama dengan `brainSync`; `progressTabSafe()` menjaga tab tersimpan yang sudah tidak ada agar tidak mengecat layar kosong. |
 
-**Kenapa suara peramban BUKAN dikembalikan sebagai lapisan L4.** L4 dicabut di m025-232 karena
-`speechSynthesis` punya antrean **global** milik peramban yang tidak ikut berhenti saat pemutar
-kita berhenti — itulah sumber "dua suara sekaligus". Penyebab itu belum berubah. Jadi suara
-peramban hidup sebagai **tombol**: hanya berjalan sesudah tangga menyerah, hanya dari klik
-murid, dan selalu memanggil `stop()` lebih dulu. Ketiganya hilang begitu ia jadi lapisan
-otomatis lagi.
+**Suara peramban: MATI TOTAL.** L4 dicabut di m025-232 karena `speechSynthesis` punya antrean
+**global** milik peramban yang tidak ikut berhenti saat pemutar kita berhenti — sumber "dua
+suara sekaligus". Brief 3 Sep sempat memintanya kembali sebagai jalan keluar; **OWNER
+membatalkannya 4 Sep**: "tts browser harus mati total." Tidak ada suara peramban di mana pun —
+bukan lapisan, bukan tombol, bukan jalan keluar darurat. Ditegakkan
+`audio-locale-guard-test.js`.
 
 ---
 
@@ -227,7 +245,10 @@ Gerbang yang **diperbarui** karena kontraknya memang berubah:
 `ui-structure-test.js` (lima tab → empat, dan angkanya kini plafon yang diminta owner),
 `a11y-test.js` (pola lama `class="nav"` melewatkan tab aktif — pola baru menangkap keduanya),
 `classroom-test.js` (hitungan tab), `onboarding-test.js` (stub bendera + lima asersi alur
-ringkas; ~35 asersi lama tetap menguji alur lengkap dengan bendera dimatikan).
+ringkas; ~35 asersi lama tetap menguji alur lengkap dengan bendera dimatikan),
+`analytics-client-test.js` dan `analytics-server-only-test.js` (delapan event klien jadi
+sepuluh, delapan belas event terdaftar jadi dua puluh — angkanya sengaja tetap dipaku tangan
+supaya setiap event telemetri baru melewati review manusia).
 
 Baseline emas `id-golden-baseline.json` diregenerasi — perubahan naskah di gelombang ini
 disengaja (nama internal, jumlah soal penempatan, kalimat baru di `copy-id-redesign.js`).
