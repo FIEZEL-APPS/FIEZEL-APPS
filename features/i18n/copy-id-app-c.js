@@ -237,7 +237,7 @@
     // app.js:4865 — READINESS_STATUS_LABELS.met (getter lazy; identifier tetap, kontrak W2-TEST-A)
     'siap.terpenuhi': 'Sudah terpenuhi',
     // app.js:5460 — skillsLab: kartu gagal
-    'skills.gagal-muat': 'Skills Lab belum dapat dimuat.',
+    'skills.gagal-muat': 'Latihan bicara & dengar belum dapat dimuat.',
     // app.js:5420 — SKILL_PAGE_COPY.listening.lead (getter lazy; title Inggris tetap di kode)
     'skills.lead-listening': 'Dengar dulu, baru jawab. Kalau belum nangkep, ulang - itu bagian dari latihannya.',
     // app.js:5421 — SKILL_PAGE_COPY.speaking.lead (getter lazy)

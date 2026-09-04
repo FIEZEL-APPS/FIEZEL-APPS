@@ -20,7 +20,18 @@ check(/function playFeedbackSound/.test(app)&&/function answerFeedbackSignal/.te
 check(/id="answerBurst"/.test(html)&&/\.answer-burst/.test(css)&&/circle-check-big/.test(app)&&/circle-x/.test(app),'Animated answer popup missing');
 check(/document\.startViewTransition/.test(app)&&/\.reduce-motion \*/.test(css),'Motion system or reduced-motion control missing');
 check(/launcher-shell/.test(app)&&/launcher-shell/.test(css)&&/coach-preview/.test(css),'Premium launcher surface missing');
-check(/VALID_VIEWS=new Set\(\['home','vocab','grammar','reading','skills'/.test(app)&&/FiezelSLAddon\.create/.test(app)&&/speakingListeningController\.destroy/.test(app),'Skills Lab route or lifecycle cleanup missing');
+/* m025-246: pola lama memaku LIMA nama pertama VALID_VIEWS berikut URUTANNYA sebagai
+   satu literal. Yang dijanjikan pemeriksaan ini bukan urutan itu - ia "rute Skills Lab
+   ada, dan pengendalinya dibersihkan". Menyisipkan satu tujuan baru di awal himpunan
+   (tab 'latihan') memerahkannya tanpa satu pun janji yang benar-benar dilanggar. Kini
+   yang diuji KEANGGOTAAN: kelima rute wajib itu harus ada, di mana pun letaknya. */
+{
+  const set=/VALID_VIEWS=new Set\(\[([^\]]*)\]/.exec(app);
+  const views=set?set[1].split(',').map(x=>x.trim().replace(/^'|'$/g,'')):[];
+  const wajib=['home','vocab','grammar','reading','skills'];
+  check(!!set&&wajib.every(v=>views.includes(v))&&/FiezelSLAddon\.create/.test(app)&&/speakingListeningController\.destroy/.test(app),
+    'Skills Lab route or lifecycle cleanup missing'+(set?' (rute hilang: '+wajib.filter(v=>!views.includes(v)).join(', ')+')':' (VALID_VIEWS tidak terbaca)'));
+}
 check(/FiezelVoiceSay/.test(app)&&/Simpan untuk offline/.test(idCorpus)&&/Tidak ada yang perlu diunduh/.test(idCorpus),'m025-96: suara harus lewat pintu bersama, dan unduhan lokal hanya tambahan opsional');
 check(html.includes('./features/speaking-listening/speaking-listening-addon.css')&&html.includes('./features/neural-voice/fiezel-voice-say.js'),'Feature assets are not wired into the document');
 check(/LOGIN_MESSAGES=(?:\[|__fzI18nTable\(\[\])/.test(app)&&/* v49-F1 2026-08-29: wrapper i18n-refresh *//selectLoginMessage/.test(app)&&/fiezel-last-login-message/.test(app)&&/LEARNER_STAGE/.test(app),'Rotating learner-stage login reminders missing');

@@ -92,8 +92,12 @@ test('perubahan yang tidak terlihat tetap diumumkan ke pembaca layar', () => {
 test('tombol yang hanya berisi ikon punya nama yang bisa dibacakan', () => {
   // Navigasi utama adalah ikon + label pendek; tanpa aria-label, pembaca layar hanya
   // mendengar nama ikonnya atau tidak sama sekali.
-  const nav = html.match(/<button[^>]*class="nav"[^>]*>/g) || [];
-  assert.ok(nav.length >= 4, 'navigasi utama harus ada');
+  // m025-246: pola lama `class="nav"` MELEWATKAN tab yang sedang aktif (`class="nav active"`),
+  // jadi selama ini justru satu tombol navigasi yang tidak pernah diperiksa aria-label-nya.
+  // Pola di bawah menangkap keduanya. Ambangnya 4 karena tab bar sekarang berisi empat
+  // tujuan (Hari ini / Latihan / Progres / Pengaturan).
+  const nav = html.match(/<button[^>]*class="nav(?: active)?"[^>]*>/g) || [];
+  assert.ok(nav.length >= 4, 'navigasi utama harus ada (ditemukan ' + nav.length + ')');
   for (const tag of nav) assert.ok(/aria-label="/.test(tag), `tombol navigasi tanpa aria-label: ${tag.slice(0, 80)}`);
   const kunci = html.match(/<input[^>]*type="checkbox"[^>]*disabled[^>]*>/g) || [];
   for (const tag of kunci) assert.ok(/aria-label="/.test(tag), `kotak centang terkunci tanpa nama: ${tag.slice(0, 80)}`);

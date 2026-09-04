@@ -82,7 +82,28 @@ setTimeout(()=>{try{
   assert(sunset.body==='sun'&&sunset.x>90&&sunset.y>70,'sunset position is incorrect');
   assert(moonrise.body==='moon'&&moonrise.x<10&&moonrise.y>70,'moonrise position is incorrect');
   assert(midnight.body==='moon'&&Math.abs(midnight.x-50)<1&&midnight.y<20,'midnight moon position is incorrect');
-  assert(noon.palette.top!==midnight.palette.top&&noon.palette.bottom!==midnight.palette.bottom,'screen palette does not change from day to night');
+  /* m025-246 — ASERSI INI DIBALIK, dan pembalikannya adalah inti permintaan owner:
+     "4 FASE SUASANA DAY/DAWN/DUSK/NIGHT ... INI MENGGANDAKAN QA 4X, MEMBINGUNGKAN MURID."
+
+     Sampai gelombang ini, baris ini menuntut palet layar BERUBAH dari siang ke malam -
+     tepat perilaku yang membuat setiap layar harus di-QA empat kali. Sekarang ia menuntut
+     kebalikannya: satu panggung, satu palet, berapa pun jamnya.
+
+     Yang TIDAK ikut dibalik adalah lima asersi posisi di atas: jam celestial tetap
+     bergerak (murid memakainya untuk tahu jam), dan matahari/bulan tetap berganti. Yang
+     berhenti berubah hanya WARNA PANGGUNGNYA - dan hanya itulah yang menggandakan QA. */
+  assert(noon.palette.top===midnight.palette.top&&noon.palette.bottom===midnight.palette.bottom,
+    'palet layar masih berubah siang->malam; empat fase seharusnya sudah dilipat jadi satu');
+  /* Mesin interpolasinya sendiri TIDAK dihapus dan harus tetap benar, supaya bendera
+     `scenePhases` bisa dinyalakan lagi tanpa menemukan kode yang sudah lapuk. Ia diuji
+     langsung di sini, satu lapis di bawah gerbang benderanya. */
+  const bekasUX=context.FiezelUX;
+  try{
+    context.FiezelUX={on:(f)=>f==='scenePhases',off:(f)=>f!=='scenePhases'};
+    const siang=context.getScenePalette(720),tengahMalam=context.getScenePalette(0);
+    assert(siang.top!==tengahMalam.top,
+      'interpolasi palet 9-perhentian rusak - ia harus tetap benar walau tidak lagi dipanggil');
+  } finally { context.FiezelUX=bekasUX; }
   assert(/^rgba\(/.test(noon.light)&&/^rgba\(/.test(midnight.light),'sun/moon light color is missing');
 
   assert(context.playFeedbackSound('success')===true,'correct-answer sound did not start');

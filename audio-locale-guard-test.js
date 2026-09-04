@@ -65,9 +65,22 @@ for (const zone of AUDIO_ZONES) {
     !SPEECH_API.test(stripComments(read(zone))),
     'L4 dihapus m025-232 — cadangan suara peramban tidak boleh kembali lewat pintu mana pun');
 }
+// 1b. m025-246: larangan total di app.js DIPERTAHANKAN, dan sekarang punya dua keputusan
+//     owner di belakangnya, bukan satu.
+//
+//     Brief 3 Sep 2026 sempat meminta "suara peramban" sebagai salah satu jalan keluar saat
+//     audio soal dengar gagal, dan gerbang ini sempat dilonggarkan untuk mengizinkannya.
+//     OWNER MEMBATALKANNYA sehari kemudian, tanpa ruang tafsir: "aku ga mau lagi ada tts
+//     browser, tts browser harus mati total."
+//
+//     Jadi invariannya kembali ke bentuk m025-232 yang paling kuat: TIDAK ADA satu pun
+//     berkas zona audio MAUPUN app.js yang boleh menyentuh API speechSynthesis. Kedua kelas
+//     bug yang pernah lahir dari sana - kebocoran locale (AI-17 F05) dan dua suara sekaligus
+//     (antrean speechSynthesis global yang tidak ikut berhenti saat pemutar kita berhenti) -
+//     mustahil secara STRUKTUR, bukan karena nilainya kebetulan benar.
 check('app.js bebas speechSynthesis',
   !SPEECH_API.test(stripComments(read('app.js'))),
-  'AudioService tidak boleh punya cadangan peramban lagi (m025-232)');
+  'AudioService tidak boleh punya cadangan peramban lagi (m025-232, ditegaskan ulang m025-246)');
 
 // 2. Tidak ada satu pun berkas zona audio yang menyentuh i18n/locale murid.
 //    Regex sengaja kasar: menyebut nama-nama ini di zona audio adalah bau desain yang salah,

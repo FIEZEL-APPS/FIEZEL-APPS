@@ -294,7 +294,18 @@ test('wajah bulat dirujuk, dibatasi ke display, dan menjauhi wordmark', () => {
     assert.ok(fs.statSync(file).size < 60 * 1024,
       'Fredoka harus tetap ter-subset; di atas 60 KB berarti berkas penuh ikut masuk');
   } else {
-    assert.ok(!/Fredoka/.test(css), 'style.css merujuk Fredoka tapi berkasnya tidak ada');
+    /* m025-246: OWNER "Tipografi: 3 -> 2 keluarga font (buang Fredoka)". Cabang ini
+       sekarang benar-benar terpakai, dan larangannya dipersempit ke KODE.
+       `!/Fredoka/.test(css)` yang lama juga memerahkan KOMENTAR yang menjelaskan
+       pencabutannya - artinya satu-satunya cara menjadi hijau adalah menghapus
+       jejak keputusannya, dan pembaca berikutnya menemukan --fz-display-round
+       menunjuk Jakarta tanpa satu kalimat pun yang menerangkan kenapa. Yang
+       berbahaya adalah @font-face/url() yang menunjuk berkas yang sudah tidak
+       ada (font gagal muat, teks memakai fallback diam-diam), bukan namanya di
+       dalam /* ... *\/. */
+    const code = css.replace(/\/\*[\s\S]*?\*\//g, '');
+    assert.ok(!/Fredoka/.test(code), 'style.css masih MEMAKAI Fredoka tapi berkasnya tidak ada');
+    assert.ok(!/Fredoka-var\.woff2/.test(code), 'masih ada url() ke berkas Fredoka yang sudah dihapus');
   }
   // Wordmark + judul dialog tetap serif. Aturan display yang dipaku di bawah
   // tidak boleh berpindah keluarga.

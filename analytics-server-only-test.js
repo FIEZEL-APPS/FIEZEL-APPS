@@ -46,6 +46,13 @@ const CONTOH = {
   session_ended: { mode: 'adaptive', level: 'B1', completed: true, answered: 12, duration_bucket: '2-10m' },
   lesson_started: { domain: 'grammar', level: 'B1' },
   lesson_completed: { domain: 'grammar', level: 'B1' },
+  /* m025-246: dua event funnel masuk (OWNER: "Instrumentasi funnel ... launch->soal
+     pertama, ... skip rate"). Contoh di bawah harus LOLOS validasi Worker - itulah yang
+     membuktikan enum di kedua sisi sepakat; nilai yang tidak ada di enum akan membuat
+     event yang dikirim klien ditolak 400 di server, dan kegagalan itu hanya terlihat
+     sebagai "angkanya nol", bukan sebagai galat. */
+  first_question: { elapsed_bucket: '30-60s', cold: true },
+  question_skipped: { domain: 'listening', level: 'B1', reason: 'audio_failed' },
   question_answered: { domain: 'grammar', level: 'B1', ok: true },
   retention_ping: { cohort_day: '2026-08-01', day_index: 7 },
   user_created: { kind: 'anon_learner', platform: 'android' },
@@ -96,8 +103,12 @@ const ENV_ON = { ANALYTICS_ENABLED: 'on', RATE_SALT: 'salt-uji' };
     .map(([n]) => n);
   check('Penandaan origin di EVENT_SPEC konsisten dengan SERVER_ONLY_EVENTS', specMismatch.length === 0, specMismatch.join(','));
 
-  check('Semua 18 event terdaftar (15 nama bab 19 + app_open + day_active + retention_ping)',
-    core.KNOWN_EVENTS.length === 18, `${core.KNOWN_EVENTS.length}: ${core.KNOWN_EVENTS.join(',')}`);
+  /* m025-246: 18 jadi 20 — first_question dan question_skipped. Angkanya sengaja tetap
+     dipaku, bukan diturunkan dari KNOWN_EVENTS: gunanya justru memaksa setiap event baru
+     di permukaan telemetri melewati review manusia. Event yang bertambah diam-diam adalah
+     persis hal yang tidak boleh lolos tanpa ada yang membacanya. */
+  check('Semua 20 event terdaftar (15 nama bab 19 + app_open + day_active + retention_ping + 2 funnel m025-246)',
+    core.KNOWN_EVENTS.length === 20, `${core.KNOWN_EVENTS.length}: ${core.KNOWN_EVENTS.join(',')}`);
 
   const bab19 = ['user_created', 'session_started', 'session_ended', 'lesson_started', 'lesson_completed',
     'question_answered', 'ai_request', 'ai_success', 'ai_failure', 'tts_request', 'tts_success',

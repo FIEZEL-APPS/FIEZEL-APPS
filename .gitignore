@@ -10,6 +10,14 @@ Thumbs.db
 *.orig
 *.rej
 node_modules/
+# package-lock.json SENGAJA tidak dilacak, dan itu bukan kelalaian: quality.yml menjalankan
+# `npm install --ignore-scripts` TANPA lockfile, jadi menambahkan satu ke repo akan mengubah
+# versi yang benar-benar dipasang CI hari ini. Repo ini punya satu dependensi runtime
+# (web-push), dan keputusan mengunci atau tidak menguncinya adalah keputusan rilis
+# tersendiri - bukan efek samping dari `npm install` yang kebetulan dijalankan seseorang di
+# mesinnya. Barisnya ada di sini supaya berkas itu berhenti muncul sebagai perubahan yang
+# belum di-commit setiap kali ada yang memasang dependensi.
+package-lock.json
 __pycache__/
 *.pyc
 FINAL-AUDIT-REPORT.json

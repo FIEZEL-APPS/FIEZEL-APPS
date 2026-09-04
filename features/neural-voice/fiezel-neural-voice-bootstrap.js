@@ -337,6 +337,48 @@
         diag({phase:'init_ready',engine:'supertonic-3',elapsedMs:Date.now()-initStartedAt});
         return service;
       }
+      /* m025-246 - JALUR KOKORO DITOLAK DI PERANGKAT KELAS BAWAH.
+         OWNER (edge case wajib): "Android low-end: Kokoro WASM bisa mematikan tab -
+         sintesis tidak boleh memblokir, fallback suara peramban."
+
+         Mesin UTAMA (supertonic/sherpa, cabang di atas) menjalankan seluruh model di
+         dalam Worker khusus, jadi thread utama tidak pernah memegang panggilan WASM
+         panjang - itu alasan struktural kenapa ia tidak mematikan tab. Cabang Kokoro di
+         bawah ini adalah jalur LAMA yang hanya terpakai kalau adapter sherpa tidak ada,
+         dan ia mengompilasi serta menjalankan WASM di jalur yang bisa membuat proses
+         konten dihentikan OS pada perangkat ber-RAM kecil. Persis yang dilaporkan owner.
+
+         Yang dilakukan di sini adalah MENOLAK dengan jujur, bukan mencoba lalu berharap:
+         inisialisasi berhenti, `phase` jatuh ke gagal seperti kegagalan init lain, dan
+         tangga suara (fiezel-voice-say.js) melanjutkan ke lapisan berikutnya. Menolak
+         BUKAN berarti murid kehilangan suara: L1 (aset R2/ElevenLabs) dan L2 (mesin Puter)
+         berada DI ATAS lapisan ini, jadi selama ada jaringan suara tetap berbunyi persis
+         seperti biasa. Yang hilang hanya sintesis lokal - dan justru sintesis lokal itulah
+         yang mematikan tab di perangkat ini.
+
+         Kalau seluruh tangga gagal, jawabannya DIAM plus teks (L5), bukan suara peramban:
+         OWNER 4 Sep 2026, "aku ga mau lagi ada tts browser, tts browser harus mati total".
+         Di layar soal dengar murid tetap punya dua jalan keluar yang tidak butuh suara
+         sama sekali - coba lagi, atau lewati tanpa penalti.
+
+         AMBANGNYA konservatif dan hanya dari sinyal yang MEMANG ADA. `deviceMemory` dan
+         `hardwareConcurrency` boleh tidak ada (Safari tidak memberi deviceMemory); yang
+         tidak diketahui TIDAK dihitung sebagai kelas bawah - menolak mesin suara karena
+         satu API yang absen akan membisukan perangkat yang sebenarnya sanggup. */
+      var lowEndDevice=(function(){
+        try{
+          var nav=root.navigator;if(!nav)return false;
+          var mem=Number(nav.deviceMemory);
+          if(Number.isFinite(mem)&&mem>0&&mem<=2)return true;
+          var cores=Number(nav.hardwareConcurrency);
+          if(Number.isFinite(cores)&&cores>0&&cores<=2)return true;
+          return false;
+        }catch(_){return false}
+      })();
+      if(lowEndDevice){
+        diag({phase:'init_refused',engine:'kokoro',reason:'low_end_device'});
+        throw new Error('Kokoro main-thread synthesis refused on a low-end device');
+      }
       if(!root.FiezelKokoroAdapter)throw new Error('Neural voice runtime modules are missing');
       const dynamicImport=typeof root.__fiezelDynamicImport==='function'?root.__fiezelDynamicImport:(url)=>import(url);
       const kokoro=await dynamicImport(absolute('vendor/kokoro-js/kokoro.web.js?nv=m025-22'));
