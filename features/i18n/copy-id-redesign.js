@@ -86,7 +86,7 @@
     'listening.gagal-body': 'Bisa jadi jaringannya sedang berat. Pilih salah satu:',
     'listening.gagal-coba-lagi': 'Coba lagi',
     'listening.gagal-lewati': 'Lewati soal ini',
-    'listening.gagal-tanpa-penalti': 'Soal yang dilewati karena audio gagal tidak memengaruhi nilaimu.',
+    'listening.gagal-tanpa-penalti': 'Soal yang dilewati karena audio gagal tidak dinilai, dan sesimu tidak dikunci.',
     'listening.gagal-dilewati': 'Soal dilewati. Nilaimu tidak terpengaruh.',
 
     /* 'suara.tawaran-*' DICABUT bersama sakelar paket suaranya (OWNER 4 Sep 2026:
