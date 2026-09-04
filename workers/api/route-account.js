@@ -270,8 +270,45 @@ export async function routeTeacherActivate(ctx) {
   // membedakannya memberi tahu penyerang bahwa tebakannya "hampir benar".
   if (verdict) return jsonError(403, 'invite_unusable', {}, opt);
 
-  const already = await db.prepare('SELECT sub FROM auth_account WHERE sub = ?1').bind(ctx.identity.sub).first();
-  if (already) return jsonError(409, 'account_exists', {}, opt);
+  const institutionId = codeHash.slice(0, 16);
+  const existingAccount = await db.prepare(
+    'SELECT sub, role, login_handle, status, institution_id FROM auth_account WHERE sub = ?1'
+  ).bind(ctx.identity.sub).first();
+
+  if (existingAccount) {
+    if (existingAccount.role === ROLE.TEACHER) {
+      return jsonError(409, 'already_teacher', {}, opt);
+    }
+    // Murid aktif mengaktifkan token guru: pemakaian token atomik, peran di-upgrade.
+    const claimed = await db.prepare(
+      'UPDATE teacher_invite SET used_at = ?2, used_by = ?3 WHERE code_hash = ?1 AND used_at IS NULL ' +
+      'AND revoked_at IS NULL AND expires_at > ?2'
+    ).bind(codeHash, ctx.now, ctx.identity.sub).run();
+
+    if (!claimed || !claimed.meta || claimed.meta.changes !== 1) {
+      return jsonError(403, 'invite_unusable', {}, opt);
+    }
+
+    await db.batch([
+      db.prepare('UPDATE auth_account SET role = ?2, institution_id = ?3 WHERE sub = ?1 AND role = ?4')
+        .bind(ctx.identity.sub, ROLE.TEACHER, institutionId, ROLE.LEARNER),
+      db.prepare('INSERT INTO teacher_profile (sub, teacher_name, institution, institution_type, ' +
+        'institution_id, activated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6)')
+        .bind(ctx.identity.sub, invite.teacher_name, invite.institution, invite.institution_type,
+          institutionId, ctx.now)
+    ]);
+
+    return jsonResponse({
+      ok: true,
+      account: accountView({ login_handle: existingAccount.login_handle, institution_id: institutionId }, ROLE.TEACHER)
+    }, { headers: ctx.corsHeaders });
+  }
+
+  // Belum punya akun: wajib menyertakan handle dan kata sandi baru.
+  const handle = normalizeHandle(body.value.handle);
+  if (!HANDLE_RE.test(handle)) return jsonError(400, 'handle_invalid', {}, opt);
+  const problem = checkPasswordPolicy(body.value.password);
+  if (problem) return jsonError(400, problem.problem, {}, opt);
 
   const claimed = await db.prepare(
     'UPDATE teacher_invite SET used_at = ?2, used_by = ?3 WHERE code_hash = ?1 AND used_at IS NULL ' +
@@ -297,10 +334,6 @@ export async function routeTeacherActivate(ctx) {
     return jsonError(409, 'handle_taken', {}, opt);
   }
 
-  // `institution_id` diturunkan dari hash token, bukan diketik guru: institusi
-  // yang bisa diketik sendiri berarti guru bisa memasukkan dirinya ke lingkup
-  // berbagi institusi milik orang lain (§18).
-  const institutionId = codeHash.slice(0, 16);
   const passHash = await hashPassword(body.value.password);
 
   await db.batch([
