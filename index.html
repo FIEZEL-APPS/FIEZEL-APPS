@@ -141,6 +141,7 @@ html.fz-booting body{overflow:hidden}
        dan bukan :root. Urutan terakhir memastikan aturan penempatan maskotnya menang
        atas ukuran wajah pembimbing lama tanpa perlu !important. -->
   <link rel="stylesheet" href="./features/mascot/fiezel-motion.css">
+  <link rel="stylesheet" href="./features/ui/fiezel-lux.css">
 </head>
 <body class="scene-day">
   <!-- Splash frame-pertama. Isinya WAJIB sama persis dengan FiezelSplash.markup(); modul
@@ -372,7 +373,7 @@ html.fz-booting body{overflow:hidden}
            bisa) login terkurung di balik .auth-locked - dark-pattern yang sama yang sudah
            dibongkar OWNER di gerbang notifikasi. Pengaturan > Akun Puter adalah jalan
            masuknya kembali. -->
-      <button id="authGateSkip" type="button" class="text-button wide" onclick="skipPuterSignIn()" data-i18n="auth.skip-btn">Lanjut tanpa akun</button>
+      <button id="authGateSkip" data-testid="auth-gate-skip" type="button" class="text-button wide" onclick="skipPuterSignIn()" data-i18n="auth.skip-btn">Lanjut tanpa akun</button>
       <p id="authGateSkipHelp" class="auth-help" data-i18n="auth.skip-help">Semua materi dan latihan tetap jalan tanpa akun — tutor AI dan suara neural baru bisa dipakai kalau kamu masuk akun Puter dan ada jaringan.</p>
       <p id="authGateHelp" class="auth-help" data-i18n="auth.puter-help">Jendela login Puter terbuka sebentar di atas FIEZEL, lalu tertutup sendiri begitu selesai - kamu tidak akan dipindahkan ke browser lain.</p>
       <p class="auth-legal" data-i18n="auth.legal-note">Dengan melanjutkan, kamu menyetujui progres belajarmu disimpan di akun Puter milikmu sendiri.</p>
@@ -414,13 +415,13 @@ html.fz-booting body{overflow:hidden}
   <div class="nav-scrim" aria-hidden="true"></div>
   <nav class="bottomnav" aria-label="Navigasi utama" data-i18n-aria-label="nav.main-aria">
     <button type="button" class="nav active" data-view="home" onclick="go('home')" aria-label="Beranda" data-i18n-aria-label="nav.home-aria"><i class="fz-i" data-fz-icon="home" aria-hidden="true"></i><span data-i18n="nav.home">Home</span></button>
-    <button type="button" class="nav" data-view="vocab" onclick="go('vocab')" aria-label="Vocabulary" data-i18n-aria-label="nav.vocab-aria"><i class="fz-i" data-fz-icon="vocab" aria-hidden="true"></i><span data-i18n="nav.vocab">Vocab</span></button>
-    <button type="button" class="nav" data-view="grammar" onclick="go('grammar')" aria-label="Grammar" data-i18n-aria-label="nav.grammar-aria"><i class="fz-i" data-fz-icon="grammar" aria-hidden="true"></i><span data-i18n="nav.grammar">Grammar</span></button>
-    <button type="button" class="nav" data-view="reading" onclick="go('reading')" aria-label="Reading" data-i18n-aria-label="nav.reading-aria"><i class="fz-i" data-fz-icon="reading" aria-hidden="true"></i><span data-i18n="nav.reading">Reading</span></button>
+    <button type="button" class="nav" data-view="vocab" data-testid="nav-vocab" onclick="go('vocab')" aria-label="Vocabulary" data-i18n-aria-label="nav.vocab-aria"><i class="fz-i" data-fz-icon="vocab" aria-hidden="true"></i><span data-i18n="nav.vocab">Vocab</span></button>
+    <button type="button" class="nav" data-view="grammar" data-testid="nav-grammar" onclick="go('grammar')" aria-label="Grammar" data-i18n-aria-label="nav.grammar-aria"><i class="fz-i" data-fz-icon="grammar" aria-hidden="true"></i><span data-i18n="nav.grammar">Grammar</span></button>
+    <button type="button" class="nav" data-view="reading" data-testid="nav-reading" onclick="go('reading')" aria-label="Reading" data-i18n-aria-label="nav.reading-aria"><i class="fz-i" data-fz-icon="reading" aria-hidden="true"></i><span data-i18n="nav.reading">Reading</span></button>
     <!-- Audit UX Bagian 4: ikon lama (grafik batang) membaca sebagai "statistik", bukan
          "jalur belajar". Ikon route adalah jalur berkelok dengan simpul - persis makna
          yang harus dibawa tab ini, sejajar dengan Path/Jalur Belajar di Duolingo. -->
-    <button type="button" class="nav" data-view="progress" onclick="go('progress')" aria-label="Peta belajar" data-i18n-aria-label="nav.map-aria"><i class="fz-i" data-fz-icon="map" aria-hidden="true"></i><span data-i18n="nav.peta">Peta</span></button>
+    <button type="button" class="nav" data-view="progress" data-testid="nav-progress" onclick="go('progress')" aria-label="Peta belajar" data-i18n-aria-label="nav.map-aria"><i class="fz-i" data-fz-icon="map" aria-hidden="true"></i><span data-i18n="nav.peta">Peta</span></button>
   </nav>
 
   <!-- OWNER: "Terlalu banyak script terpisah (30+ file JS) dimuat sinkron di <head>/<body>
@@ -481,6 +482,7 @@ html.fz-booting body{overflow:hidden}
   <script defer src="./features/i18n/copy-id-quota.js"></script>
   <script defer src="./features/i18n/copy-id-settings-locale.js"></script>
   <script defer src="./features/i18n/copy-id-grammar-labels.js"></script>
+  <script defer src="./features/i18n/copy-id-student.js"></script>
   <!-- W4-MERGE: aset th TIDAK dimuat statis (copy-th-*, naskah-th-brain, dua dataset th) —
        semuanya disuntik/difetch DINAMIS oleh pemuat kecil di bawah HANYA saat locale th
        (AI-13 F02/F05: murid Indonesia nol byte th). Pemuat wajib SETELAH fiezel-i18n.js
@@ -704,6 +706,7 @@ html.fz-booting body{overflow:hidden}
   <script defer src="./features/health/fiezel-install-health.js"></script>
   <script defer src="./features/ui/fiezel-report-gesture-isolation.js"></script>
   <script defer src="./features/ui/fiezel-ui-manager.js"></script>
+  <script defer src="./features/ui/fiezel-student-mode.js"></script>
   <!-- T-031: berkas ini memasang `window.FiezelABAnalytics` (pipa eksperimen UI). Ia TIDAK
        BOLEH menyentuh `window.FiezelAnalytics` — nama itu milik modul analytics
        privasi-maksimal yang disuntik app.js di idle, dan `<script defer>` di sini selalu
