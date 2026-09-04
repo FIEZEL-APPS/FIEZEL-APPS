@@ -30,3 +30,33 @@ Cek repo FIEZEL-APPS terbaru (github.com/FIEZEL-APPS/FIEZEL-APPS). Dashboard gur
 - P1: Import CSV siswa lengkap (kolom HP ortu), riwayat kehadiran bulanan + ekspor, notifikasi tenggat, mode papan interaktif (kuis live).
 - P1: Sisi murid — tampilkan badge "Tugas dari Guru" di Home & kirim kode hasil otomatis setelah tugas selesai.
 - P2: AI opsional (ringkasan kelas, generator soal esai), multi-guru per kelas, template pesan kustom.
+
+
+---
+
+# FIEZEL — Redesign Sisi Murid (PRD tambahan, 2026-09-04)
+
+## Problem statement (asli)
+"Cek repo https://github.com/FIEZEL-APPS/FIEZEL-APPS.git ... redesign menyeluruh seluruh aplikasi agar lebih mudah diakses murid dan mudah dipahami; hapus/ganti semua bahasa yang susah dimengerti; panel tidak penting hilangkan/sembunyikan; seluruh UI/UX harus terlihat seperti aplikasi mahal dan eksklusif."
+Pilihan user: gaya visual diserahkan; target SMP + SMA/SMK; panel jarang dipakai murid disembunyikan; i18n Indonesia + Thai; **palet warna resmi tetap** (kuning #FFC700/#E6A800, tinta #241A11, krem #FFF9EE); **Ruang Guru jangan disentuh**.
+
+## Arsitektur perubahan (non-destruktif, lapisan di atas app.js)
+- `features/ui/fiezel-lux.css` — tema premium; semua selector berprefiks `body.fz-lux` (tidak aktif di `body.fz-teacher-mode`). Kartu hitam (tinta) untuk hero, kuning hanya aksi/sorotan, garis tipis, bayangan lembut, judul serif (Instrument Serif), tab bar pil kaca mengambang, rel kiri di desktop ≥1000px. Termasuk aturan sembunyikan panel (tab Analisis / Cara soal dipilih, kartu Classroom coming-soon, kartu kreator).
+- `features/ui/fiezel-student-mode.js` — memasang `body.fz-lux`, menyembunyikan kartu berjudul Laporan Diagnostik / Lab Kesalahan / BKT / panel sosial belum aktif (text-match via kunci i18n), membungkus `enhanceUI`/`render`.
+- `features/i18n/fiezel-i18n.js` — fungsi baru `overrideCopy(locale, map)`.
+- `features/i18n/copy-id-student.js` + `copy-th-student.js` — ~200 kalimat murid disederhanakan (mastery→dikuasai, Skip Level→Naik Level, Peta Belajar & Lab→Kemajuan Belajar, Review Due→Ulang, dst) + kunci baru `student.*`, `fsl.*`.
+- `app.js` — edit kecil: hero greeting pakai `studentGreeting()` (bukan pesan login slang), literal Inggris (Vocabulary Hub/Grammar Hub/Today Plan/CONTROL ROOM/LEVEL CONTROL/Reading adaptif) → i18n, kartu Laporan Diagnostik dihapus dari ringkasan, label jalur grammar bisa diklik, hitungan materi di Home = jumlah lesson (konsisten dengan halaman Grammar), data-testid nav & lesson.
+- `lucide.min.js` — subset ditambah 24 ikon yang sebelumnya kosong (user, user-x, languages, award, list, users, log-in, …).
+- `features/speaking-listening/fiezel-speaking-listening-addon.js` — `T(key, fallback, params)` diperbaiki (placeholder {level} tidak terselesaikan).
+- Build marker naik ke m025-250 (sw.js, core-config.js, diag panel, coordination/BUILD-VERSION.json). Baseline `id-golden-baseline.json` diregenerasi; 6 tes literal diperbarui.
+
+## Status (2026-09-04)
+- Suite repo: 224/230 lulus (6 gagal sudah gagal sebelum perubahan: app-interaction-policy, content-adoption, e2e-level-grammar, fiezel-evolution-loop, gate-registry, release-audit-gate, secret-scan).
+- Testing agent iterasi 1: 14/14 skenario terverifikasi; temuan sudah diperbaiki (label lesson klik, ikon kosong, literal Vocabulary, duplikasi judul Skills/Kemajuan, kontras chip ujian, desktop kolom, Thai leaks).
+
+## Backlog
+- P1: Onboarding & layar pilih bahasa belum disesuaikan gaya lux (masih CSS onboarding lama).
+- P1: Konsistensi kata ganti Thai (คุณ vs เธอ) di copy-th lama.
+- P2: 'Keluar' dari kuis kosakata kembali ke Home (bukan Kosakata).
+- P2: Sisa copy teknis di domain progress/analisis (disembunyikan, belum ditulis ulang).
+- P2: Sembunyikan panel via data-attribute stabil (bukan text-match).

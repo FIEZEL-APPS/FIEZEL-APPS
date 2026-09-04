@@ -140,7 +140,7 @@ setTimeout(async()=>{
   const st=ctx.__getFiezelState();
   assert(st.totalAnswered===0&&!st.adaptiveReady,'new user is not cleanly initialized');
   assert(Object.keys(st.vocab).length===0,'new user has seeded vocabulary mastery/review');
-  ctx.go('vocab'); assert(/Review Due \(0\)/.test(elements.app.innerHTML),'new user should have zero Review Due');
+  ctx.go('vocab'); assert(/(Review Due|Ulang) \(0\)/.test(elements.app.innerHTML),'new user should have zero Review Due');
 
   const v=V.find(x=>x.level==='A1'&&x.status==='complete')||V.find(x=>x.status==='complete');
   st.vocab[v.id]={correct:0,total:0,streak:0,mastery:0,nextReview:0};

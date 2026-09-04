@@ -74,7 +74,7 @@ setTimeout(() => {
     // m025-131: judulnya "Rencana kamu", bukan "Perjalanan belajar minggu ini". OWNER
     // meminta bahasa yang lebih pendek dan langsung untuk murid kelas 1 SMA; yang dijaga
     // pemeriksaan ini tetap sama - panelnya benar-benar dirender.
-    assert.ok(/Rencana kamu/.test(markup));
+    assert.ok(/Rencana kamu|Rencana minggu ini/.test(markup));
     assert.ok(/journey-panel/.test(markup) && /journey-today/.test(markup));
     assert.ok(/2026-08-17/.test(markup) && /2026-08-23/.test(markup), 'rentang minggu WIB tampil');
   });

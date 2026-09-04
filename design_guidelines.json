@@ -1,0 +1,258 @@
+{
+  "project_summary": {
+    "app_name": "FIEZEL",
+    "target_audience": "Indonesian (ID) & Thai (TH) Middle and High School Students (SMP & SMA/SMK)",
+    "app_type": "Mobile Web App PWA (Primary viewport: 390px - 430px, Desktop centered container max-width: 720px)",
+    "redesign_goal": "Transform FIEZEL from a jargon-heavy diagnostic app into an exclusive, high-end, luxury-editorial learning experience for students. Simplify all complex wording into student-friendly terms, remove student-irrelevant teacher/diagnostic panels, and deliver an expensive, highly polished UI while preserving core brand identity assets (Wordmark, Brand Yellow, Dark Ink, Cream Base, Paw Mascot).",
+    "locale_support": ["id", "th"],
+    "non_negotiables": "DO NOT touch teacher panel (Ruang Guru). Preserve vanilla JS compatibility and CSS theme architecture. Maintain 100% WCAG AA contrast compliance."
+  },
+  "persona_and_archetype": {
+    "design_archetype": "Luxury Editorial x Premium Fintech for Youth",
+    "vibe": "Exclusive, tactile, inspiring, frictionless, and high-status. Feels like a world-class magazine combined with a modern sleek learning pass.",
+    "mascot_role": "Paw the Yellow Cat acts as a subtle, encouraging learning companion (used for micro-cheers, streaks, and quiz feedback—never cluttering structural screens)."
+  },
+  "typography": {
+    "fonts": {
+      "display_serif": "Instrument Serif, serif",
+      "display_friendly": "Fredoka, sans-serif",
+      "body": "Plus Jakarta Sans, -apple-system, BlinkMacSystemFont, sans-serif",
+      "thai_fallback": "Noto Sans Thai, sans-serif"
+    },
+    "scale": {
+      "h1_hero": "text-3xl sm:text-4xl font-serif tracking-tight leading-tight",
+      "h2_section": "text-xl sm:text-2xl font-bold tracking-tight text-[#241A11]",
+      "h3_card": "text-lg font-semibold tracking-tight text-[#241A11]",
+      "body_lg": "text-base font-medium leading-relaxed text-[#241A11]/90",
+      "body_base": "text-sm font-normal leading-normal text-[#241A11]/80",
+      "caption_sm": "text-xs font-medium tracking-wide text-[#241A11]/60 uppercase"
+    },
+    "rules": [
+      "Use Instrument Serif for expressive main headings and luxury editorial accent statements.",
+      "Use Plus Jakarta Sans for all UI labels, body paragraphs, buttons, options, and readable text.",
+      "Use Fredoka sparingly for mascot callouts, streak chips, and playful motivational badges.",
+      "Ensure Noto Sans Thai is specified in font stacks for flawless rendering of Thai characters.",
+      "Headings over 24px must use tracking-tight."
+    ]
+  },
+  "colors": {
+    "brand": {
+      "yellow_primary": "#FFC700",
+      "yellow_hover": "#E6A800",
+      "yellow_light": "#FFF3C4",
+      "dark_ink": "#241A11",
+      "dark_ink_hover": "#16100B",
+      "cream_base": "#FFF9EE",
+      "cream_surface": "#FFFFFF",
+      "cream_card": "#FFFDF7"
+    },
+    "accents_and_semantics": {
+      "success_green": "#10B981",
+      "success_surface": "#ECFDF5",
+      "success_border": "#A7F3D0",
+      "error_red": "#EF4444",
+      "error_surface": "#FEF2F2",
+      "error_border": "#FECACA",
+      "info_blue": "#3B82F6",
+      "purple_gem": "#8B5CF6",
+      "neutral_border": "rgba(36, 26, 17, 0.12)",
+      "neutral_subtle_border": "rgba(36, 26, 17, 0.06)",
+      "glass_bg": "rgba(255, 255, 255, 0.82)"
+    },
+    "elevation_and_shadows": {
+      "card_shadow": "0 4px 20px -2px rgba(36, 26, 17, 0.05), 0 2px 6px -1px rgba(36, 26, 17, 0.03)",
+      "active_elevated": "0 12px 28px -4px rgba(36, 26, 17, 0.12), 0 4px 12px -2px rgba(36, 26, 17, 0.06)",
+      "gold_glow": "0 8px 24px -2px rgba(255, 199, 0, 0.35)",
+      "floating_bar": "0 -4px 20px rgba(36, 26, 17, 0.06)"
+    },
+    "rules": [
+      "Never use pure black (#000000). Always use Dark Ink (#241A11).",
+      "Background is warm cream (#FFF9EE) with crisp white (#FFFFFF) card surfaces.",
+      "Use 1px borders with dark_ink/12 opacity for sharp, luxury editorial framing.",
+      "Ensure minimum 4.5:1 text contrast for all body copy and interactive labels."
+    ]
+  },
+  "layout_and_spacing": {
+    "viewport_constraints": {
+      "container_class": "max-w-[720px] mx-auto min-h-screen bg-[#FFF9EE] text-[#241A11] pb-24 relative overflow-x-hidden shadow-2xl md:my-4 md:rounded-3xl md:border md:border-[#241A11]/10",
+      "content_padding": "px-5 py-4 sm:px-6"
+    },
+    "spacing_scale": {
+      "card_padding": "p-5 sm:p-6",
+      "grid_gap": "gap-4 sm:gap-5",
+      "section_spacing": "mb-8"
+    }
+  },
+  "hidden_panels_and_simplification": {
+    "panels_to_hide_from_students": [
+      {
+        "panel_id": "diagnostic_raw_scans",
+        "reason": "Technical diagnostic scans (BKT mastery scores, log-odds, misinterpretation vectors) cause anxiety and confusion for SMP/SMA students."
+      },
+      {
+        "panel_id": "cara_soal_dipilih",
+        "reason": "Algorithmic decision tree details belong in internal logs or teacher views."
+      },
+      {
+        "panel_id": "raw_telemetry_and_neural_cache",
+        "reason": "Internal developer metrics cluttering UI."
+      },
+      {
+        "panel_id": "teacher_csv_exports",
+        "reason": "Only relevant inside Ruang Guru (Teacher Panel)."
+      }
+    ],
+    "simplified_replacement_panels": [
+      {
+        "original": "Analisis Miskonsepsi & BKT Mastery %",
+        "simplified_name_id": "Kemajuan Belajar",
+        "simplified_name_th": "ความก้าวหน้าในการเรียน",
+        "student_view_format": "Visual mastery bar, accuracy percentage (e.g., 85% Tepat), and streak counter."
+      },
+      {
+        "original": "Cara Soal Dipilih & Adaptive Verdict",
+        "simplified_name_id": "Tingkat Kesulitan Otomatis",
+        "simplified_name_th": "ระดับความยากอัตโนมัติ",
+        "student_view_format": "Simple badge indicating current level status (e.g., 'Disesuaikan dengan kemampuanmu')."
+      }
+    ]
+  },
+  "language_and_copywriting_guide": {
+    "tone": "Warm, encouraging, direct, high-end, student-friendly.",
+    "id_copy_dictionary": {
+      "home_greeting": "Halo, {name}! Ready for today?",
+      "main_cta": "Mulai Belajar Hari Ini",
+      "daily_goal": "Target Harian",
+      "streak_label": "Hari Beruntun",
+      "gems_label": "Permata",
+      "skill_listening": "Mendengar",
+      "skill_speaking": "Berbicara",
+      "skill_reading": "Membaca",
+      "skill_writing": "Menulis",
+      "vocab_hub": "Kosakata",
+      "grammar_hub": "Tata Bahasa",
+      "library_hub": "Perpustakaan",
+      "progress_map": "Peta Kemajuan",
+      "settings": "Pengaturan",
+      "level_beginner": "Pemula (SMP)",
+      "level_intermediate": "Menengah (SMA/SMK)",
+      "level_advanced": "Mahir",
+      "quiz_correct": "Luar biasa! Jawabanmu tepat.",
+      "quiz_wrong": "Hampir tepat! Coba pelajari lagi ya.",
+      "quiz_continue": "Lanjut",
+      "quiz_check": "Periksa Jawaban"
+    },
+    "th_copy_dictionary": {
+      "home_greeting": "สวัสดี, {name}! พร้อมเรียนหรือยัง?",
+      "main_cta": "เริ่มเรียนวันนี้",
+      "daily_goal": "เป้าหมายประจำวัน",
+      "streak_label": "วันต่อเนื่อง",
+      "gems_label": "อัญมณี",
+      "skill_listening": "การฟัง",
+      "skill_speaking": "การพูด",
+      "skill_reading": "การอ่าน",
+      "skill_writing": "การเขียน",
+      "vocab_hub": "คลังคำศัพท์",
+      "grammar_hub": "ไวยากรณ์",
+      "library_hub": "ห้องสมุด",
+      "progress_map": "แผนที่ความก้าวหน้า",
+      "settings": "การตั้งค่า",
+      "level_beginner": "เริ่มต้น (ม.ต้น)",
+      "level_intermediate": "ปานกลาง (ม.ปลาย/อาชีวะ)",
+      "level_advanced": "ขั้นสูง",
+      "quiz_correct": "ยอดเยี่ยมมาก! คำตอบถูกต้อง",
+      "quiz_wrong": "เกือบถูกแล้ว! ลองทบทวนดูนะ",
+      "quiz_continue": "ถัดไป",
+      "quiz_check": "ตรวจสอบคำตอบ"
+    }
+  },
+  "component_specifications": {
+    "top_bar": {
+      "bg": "bg-[#FFF9EE]/90 backdrop-blur-md sticky top-0 z-40 border-b border-[#241A11]/10 px-5 py-3 flex items-center justify-between",
+      "logo": "FIEZEL in Instrument Serif, font-bold text-2xl tracking-tight text-[#241A11]",
+      "widgets": "Displays Streak badge (flame icon + count) and Gems badge (gem icon + count)"
+    },
+    "bottom_tab_bar": {
+      "bg": "fixed bottom-0 left-0 right-0 max-w-[720px] mx-auto bg-white/95 backdrop-blur-xl border-t border-[#241A11]/10 px-6 py-2.5 z-40 flex justify-around items-center shadow-lg",
+      "tabs": [
+        {"id": "home", "label_id": "Beranda", "label_th": "หน้าแรก", "icon": "home"},
+        {"id": "vocab", "label_id": "Kosakata", "label_th": "คำศัพท์", "icon": "book-open"},
+        {"id": "grammar", "label_id": "Tata Bahasa", "label_th": "ไวยากรณ์", "icon": "sparkles"},
+        {"id": "reading", "label_id": "Membaca", "label_th": "การอ่าน", "icon": "compass"},
+        {"id": "progress", "label_id": "Kemajuan", "label_th": "ความก้าวหน้า", "icon": "award"}
+      ],
+      "active_state": "text-[#241A11] font-bold bg-[#FFC700]/20 px-3 py-1.5 rounded-full transition-all duration-200"
+    },
+    "hero_card": {
+      "bg": "bg-gradient-to-br from-[#FFC700] via-[#FFD700] to-[#E6A800] text-[#241A11] rounded-3xl p-6 shadow-xl border border-[#241A11]/15 relative overflow-hidden",
+      "content": "Personalized Greeting, Level Chip, Daily Progress Bar, and glowing 'Mulai Belajar Hari Ini' button with press effect."
+    },
+    "skill_cards": {
+      "layout": "grid grid-cols-2 gap-4",
+      "card_style": "bg-white rounded-2xl p-4 border border-[#241A11]/10 shadow-sm hover:border-[#FFC700] hover:shadow-md transition-all cursor-pointer flex flex-col justify-between h-32"
+    },
+    "lesson_path": {
+      "node_completed": "w-14 h-14 rounded-full bg-[#10B981] text-white flex items-center justify-center shadow-md border-2 border-white",
+      "node_current": "w-16 h-16 rounded-full bg-[#FFC700] text-[#241A11] flex items-center justify-center shadow-lg border-4 border-white animate-pulse",
+      "node_locked": "w-14 h-14 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center border-2 border-gray-300 opacity-75"
+    }
+  },
+  "quiz_ui_and_feedback_system": {
+    "header": "Progress bar line at top, question card with clean Instrument Serif typography.",
+    "option_states": {
+      "default": "bg-white border border-[#241A11]/15 rounded-xl p-4 text-[#241A11] font-medium hover:border-[#FFC700] cursor-pointer transition-all",
+      "selected": "bg-[#FFC700]/15 border-2 border-[#FFC700] rounded-xl p-4 text-[#241A11] font-bold shadow-sm",
+      "correct": "bg-[#ECFDF5] border-2 border-[#10B981] rounded-xl p-4 text-[#065F46] font-bold shadow-sm animate-bounce-short",
+      "wrong": "bg-[#FEF2F2] border-2 border-[#EF4444] rounded-xl p-4 text-[#991B1B] font-bold shadow-sm animate-shake"
+    },
+    "feedback_drawer": {
+      "correct_bg": "bg-[#ECFDF5] border-t border-[#A7F3D0] p-5 text-[#065F46]",
+      "wrong_bg": "bg-[#FEF2F2] border-t border-[#FECACA] p-5 text-[#991B1B]"
+    }
+  },
+  "motion_and_interactions": {
+    "button_press": "active:scale-[0.98] transition-transform duration-100 ease-out",
+    "card_hover": "hover:-translate-y-1 transition-all duration-200 ease-out",
+    "tab_switch": "transition-opacity duration-150 ease-in-out",
+    "modal_backdrop": "backdrop-blur-sm bg-[#241A11]/40 transition-opacity"
+  },
+  "accessibility_and_contrast": {
+    "apca_target": "LC 75+ for body text, LC 90+ for headings",
+    "touch_targets": "Minimum 48px x 48px for all tap items",
+    "focus_states": "focus-visible:ring-2 focus-visible:ring-[#FFC700] focus-visible:ring-offset-2 outline-none"
+  },
+  "testing_and_data_testids": {
+    "required_testids": [
+      "topbar-brand-logo",
+      "streak-counter-badge",
+      "gems-counter-badge",
+      "home-hero-start-cta",
+      "skill-card-listening",
+      "skill-card-speaking",
+      "skill-card-reading",
+      "skill-card-writing",
+      "bottom-nav-home",
+      "bottom-nav-vocab",
+      "bottom-nav-grammar",
+      "bottom-nav-reading",
+      "bottom-nav-progress",
+      "language-switch-toggle",
+      "quiz-option-item",
+      "quiz-submit-btn",
+      "quiz-feedback-drawer"
+    ]
+  },
+  "instructions_to_main_agent": [
+    "Apply this design system in the frontend code base.",
+    "Ensure all user-facing Indonesian and Thai copies replace raw diagnostic jargon.",
+    "Hide or eliminate raw algorithm score displays from student-facing components.",
+    "Do NOT touch or break teacher panel functionality (Ruang Guru).",
+    "Ensure data-testid attributes are preserved or added for automated test stability."
+  ],
+  "UNIVERSAL GUIDELINES FOR MAIN AGENT": [
+    "Avoid AI slop, default generic blue cards, or low contrast gray text.",
+    "Never use pure black #000000; use #241A11.",
+    "Maintain smooth micro-interactions on all clickable surfaces.",
+    "Keep mobile PWA primary view constraint centered for larger screens."
+  ]
+}
