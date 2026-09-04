@@ -409,6 +409,7 @@
     validatePassword: validatePassword,
     validateCode: validateCode,
     ensureAnon: ensureAnon,
+    api: call,
     refresh: refresh,
     getMe: refresh,
     register: register,

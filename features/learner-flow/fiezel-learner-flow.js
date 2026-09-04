@@ -133,9 +133,10 @@
     var L = st.activeLesson, B = bank(), correct = L.results.filter(function (r) { return r.correct; }).length;
     st.lessons.push({ at: Date.now(), skill: L.skill, area: B.SKILLS[L.skill].area, kind: L.kind, title: L.title, correct: correct, total: L.results.length, minutes: L.minutes });
     if (st.plan && st.plan.done.indexOf(L.blockId) === -1) st.plan.done.push(L.blockId);
-    if (L.blockId.indexOf('assign-') === 0) { try { localStorage.setItem(ASSIGN_KEY, JSON.stringify(loadAssignments().filter(function (a) { return 'assign-' + a.id !== L.blockId; }))); } catch (_) {} }
+    if (L.blockId.indexOf('assign-') === 0) { st.doneAssign = (st.doneAssign || []).concat([{ id: L.blockId.slice(7), at: Date.now(), c: correct, t: L.results.length }]).slice(-6); try { localStorage.setItem(ASSIGN_KEY, JSON.stringify(loadAssignments().filter(function (a) { return 'assign-' + a.id !== L.blockId; }))); } catch (_) {} }
     st.lastNext = buildNext(st, L, correct);
     st.activeLesson = null;
+    pushToClass();
     st.step = 'next';
   }
   function buildNext(st, L, correct) {
@@ -144,7 +145,7 @@
     var reason;
     if (remaining.length) {
       var nb = remaining[0];
-      reason = wrong >= 2
+      reason = wrong > 1
         ? 'Kamu masih tertukar pada ' + wrong + ' dari ' + L.results.length + ' soal ' + skillName + ', jadi pola ini akan diulang lagi besok. Sekarang kita lanjut ke ' + nb.title + ' agar sesi hari ini tetap seimbang.'
         : wrong === 1
           ? 'Hanya satu soal ' + skillName + ' yang tertukar — confidence-nya belum cukup untuk disebut stabil, tapi cukup untuk lanjut ke ' + nb.title + '.'
@@ -166,7 +167,7 @@
     var vocabItems = rows.filter(function (l) { return l.area === 'vocabulary'; }).reduce(function (m, l) { return m + l.total; }, 0);
     var ranked = rankedSkills(st);
     var reviewNeeded = ranked.filter(function (r) { return r.status.id === 'review'; }).map(function (r) { return B.SKILLS[r.id].short; });
-    var lowConf = ranked.filter(function (r) { return r.status.id === 'growing' || (r.status.id === 'strong' && r.total < 3); }).map(function (r) { return B.SKILLS[r.id].short; });
+    var lowConf = ranked.filter(function (r) { return r.status.id === 'unmeasured' || r.status.id === 'growing'; }).map(function (r) { return B.SKILLS[r.id].short; });
     var measured = ranked.filter(function (r) { return r.acc != null; }).length;
     var lines = [
       'Saya menyelesaikan: ' + count('grammar') + ' lesson grammar · ' + vocabItems + ' vocabulary · ' + count('listening') + ' sesi listening · ' + count('reading') + ' sesi reading',
@@ -183,15 +184,21 @@
   function classCode() { try { var r = JSON.parse(localStorage.getItem('fiezel-onboarding-v1') || '{}'); return String(r.classCode || ''); } catch (_) { return ''; } }
   // Di perangkat yang sama (kelas demo/uji), hasil diagnostic langsung masuk ke kelas berkode.
   function pushToClass() {
-    var T = root.FiezelTutorActionCenter; if (!T || !classCode()) return false;
-    try { return T.ingestLearnerResult(JSON.parse(decodeURIComponent(escape(atob(tutorCode(st, env.learnerName ? env.learnerName() : '')))))); } catch (_) { return false; }
+    if (!classCode()) return false;
+    var payload = null;
+    try { payload = JSON.parse(decodeURIComponent(escape(atob(tutorCode(st, env.learnerName ? env.learnerName() : ''))))); } catch (_) { return false; }
+    // Sinkron server: laporan agregat ke kelas yang kodenya diklaim guru (tanpa tempel kode). Gagal diam-diam bila offline.
+    var TS = root.FiezelTeacherStore;
+    if (TS && TS.reportToClass) { try { TS.reportToClass(payload).then(function (r) { st.classReport = { at: Date.now(), ok: !!r.ok, error: r.error || '' }; save(st); }); } catch (_) {} }
+    var T = root.FiezelTutorActionCenter; if (!T) return true;
+    try { return T.ingestLearnerResult(payload) || true; } catch (_) { return true; }
   }
   function tutorCode(st, name) {
     var B = bank(), skills = {};
     B.SKILL_ORDER.forEach(function (id) { var s = st.skills[id]; if (s) skills[id] = { c: s.correct, t: s.total }; });
     var nm = String(name || '').trim();
     if (!nm || /^(sobat|murid|teman)$/i.test(nm)) { try { nm = String(JSON.parse(localStorage.getItem('fiezel-onboarding-v1') || '{}').name || nm || 'Murid'); } catch (_) { nm = nm || 'Murid'; } }
-    var payload = { v: 1, name: nm.split(' ')[0], at: Date.now(), goal: st.goal, skills: skills, lessons: st.lessons.length, cls: classCode() || undefined };
+    var payload = { v: 1, name: nm.split(' ')[0], at: Date.now(), goal: st.goal, skills: skills, lessons: st.lessons.length, cls: classCode() || undefined, assign: (st.doneAssign || []).length ? st.doneAssign : undefined };
     try { return btoa(unescape(encodeURIComponent(JSON.stringify(payload)))); } catch (_) { return ''; }
   }
 
@@ -319,6 +326,7 @@
           (done ? '<span class="lf-done">Selesai</span>' : '<button type="button" class="lf-mini lf-start" data-lf="start-lesson" data-block="' + b.id + '" data-testid="lf-start-' + b.id + '">Mulai</button>') + '</li>';
       }).join('') + '</ol>' +
       '<p class="lf-reason" data-testid="lf-plan-reason"><b>Alasan sesi ini:</b> ' + esc(plan.reason) + '</p>' +
+      '<div class="lf-assign-code" data-testid="lf-assign-code"><label class="lf-muted" for="lfAssignCode">Punya kode tugas dari guru?</label><div class="lf-actions"><input id="lfAssignCode" class="lf-code lf-code-input" placeholder="Tempel kode tugas di sini" autocomplete="off" data-testid="lf-assign-code-input"><button type="button" class="lf-mini" data-lf="accept-assign" data-testid="lf-accept-assign">Tambahkan ke rencana</button></div></div>' +
       '<div class="lf-actions">' + (doneCount < plan.blocks.length ? '<button type="button" class="lf-primary" data-lf="start-first" data-testid="lf-start-first">Mulai sesi berikutnya</button>' : '<span class="lf-done">Rencana hari ini selesai</span>') +
       '<button type="button" class="lf-ghost" data-lf="to-skillmap" data-testid="lf-back-skillmap">Lihat skill map</button></div></div>';
   }
@@ -349,7 +357,7 @@
       '<p class="lf-muted">Istilah yang dipakai: practice completed, target coverage, review needed, confidence belum cukup, session completed. Menyelesaikan soal bukan berarti "menguasai" skill.</p>' +
       '<div class="lf-actions"><button type="button" class="lf-primary" data-lf="copy-summary" data-testid="lf-copy-summary">Salin ringkasan</button>' +
       (typeof navigator !== 'undefined' && navigator.share ? '<button type="button" class="lf-ghost" data-lf="share-summary" data-testid="lf-share-summary">Bagikan</button>' : '') + '</div></div>' +
-      '<div class="lf-card"><h3>Kode hasil untuk tutor</h3>' + (classCode() ? '<p class="lf-chip" data-testid="lf-class-code">Kelas ' + esc(classCode()) + '</p>' : '') + '<p class="lf-muted">Berisi nama depan dan akurasi per skill saja — tanpa jawaban mentah atau audio. Tempel di Tutor Action Center → Tambah murid dari kode.</p>' +
+      '<div class="lf-card"><h3>Kode hasil untuk tutor</h3>' + (classCode() ? '<p class="lf-chip" data-testid="lf-class-code">Kelas ' + esc(classCode()) + (st.classReport && st.classReport.ok ? ' · terkirim otomatis' : '') + '</p>' : '') + '<p class="lf-muted">Berisi nama depan dan akurasi per skill saja — tanpa jawaban mentah atau audio. ' + (classCode() ? (st.classReport && st.classReport.ok ? 'Hasilmu sudah dikirim ke guru lewat kode kelas; kode di bawah hanya cadangan.' : 'Saat online, hasil dikirim otomatis ke guru lewat kode kelas. Kode di bawah untuk cadangan bila offline.') : 'Tempel di Ruang Guru → Tempel kode hasil murid.') + '</p>' +
       '<textarea class="lf-code" readonly rows="3" data-testid="lf-tutor-code">' + esc(tutorCode(st, name)) + '</textarea>' +
       '<div class="lf-actions"><button type="button" class="lf-ghost" data-lf="copy-code" data-testid="lf-copy-code">Salin kode</button></div></div>';
   }
@@ -457,6 +465,11 @@
       case 'copy-summary': copy(weeklySummary(st).text, 'Ringkasan tersalin.'); return;
       case 'share-summary': try { navigator.share({ title: 'Ringkasan belajar FIEZEL', text: weeklySummary(st).text }); } catch (_) {} return;
       case 'copy-code': copy(tutorCode(st, env.learnerName ? env.learnerName() : ''), 'Kode hasil tersalin.'); return;
+      case 'accept-assign': {
+        var inp = mountEl.querySelector('#lfAssignCode'), T2 = root.FiezelTeacherStore, acc = inp && T2 ? T2.acceptAssignmentCode(inp.value) : null;
+        if (!acc) { toast('Kode tugas tidak dikenali. Minta guru menyalin ulang kodenya.'); return; }
+        st.plan = null; toast('Tugas “' + acc.title + '” dari ' + acc.from + ' masuk ke rencana hari ini.'); break;
+      }
       case 'export': {
         var P = backup(), payload = P.collect(localStorage, { appVersion: env.appVersion });
         download(P.filename(), JSON.stringify(payload, null, 2)); toast('Backup diunduh: ' + P.filename()); return;
