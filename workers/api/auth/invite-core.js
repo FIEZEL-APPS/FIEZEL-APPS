@@ -165,7 +165,10 @@ export async function mintInvite(input, nowMs, deps = {}) {
   if (problem) throw Object.assign(new Error('invite_input'), problem);
   const code = typeof deps.code === 'string' ? deps.code : generateCode(deps.randomBytes);
   const codeHash = await hashCode(code);
-  const ttlMs = INVITE.TTL_DAYS * 24 * 60 * 60 * 1000;
+  const days = Number(input && (input.days || input.ttlDays)) > 0
+    ? Math.min(3650, Math.trunc(Number(input.days || input.ttlDays)))
+    : INVITE.TTL_DAYS;
+  const ttlMs = days * 24 * 60 * 60 * 1000;
   return {
     code,
     record: {

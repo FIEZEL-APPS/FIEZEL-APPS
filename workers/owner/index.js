@@ -718,24 +718,69 @@ function sanitizeEvidenceSummary(raw) {
  * `OWNER_TOKEN_HASH`). Nol Secret baru, nol binding baru, nol dashboard kedua — hanya dua
  * bacaan tambahan pada dashboard yang sudah ada.
  */
-async function ownerApiFetch(env, pathAndQuery, fetchImpl) {
-  const base = env && typeof env.EVIDENCE_API_BASE === 'string' ? env.EVIDENCE_API_BASE.trim().replace(/\/+$/, '') : '';
-  const rawKey = env ? env.EVIDENCE_API_TOKEN : null;
+async function ownerApiFetch(env, pathAndQuery, fetchImpl, options = {}) {
+  const base = (env && typeof env.EVIDENCE_API_BASE === 'string' && env.EVIDENCE_API_BASE.trim().replace(/\/+$/, '')) || 'https://api.fiezel.my.id';
+  const rawKey = env ? (env.EVIDENCE_API_TOKEN || env.OWNER_TOKEN || env.OWNER_TOKEN_HASH) : null;
   const apiKey = typeof rawKey === 'string' ? rawKey.trim() : '';
   if (!base || !apiKey) return { state: 'unconfigured', body: null };
   if (!/^https:\/\//.test(base)) return { state: 'unconfigured', body: null };
-  const doFetch = typeof fetchImpl === 'function' ? fetchImpl : (typeof fetch === 'function' ? fetch : null);
+  const doFetch = typeof fetchImpl === 'function' ? fetchImpl : (typeof fetch === 'function' ? fetch : (typeof globalThis !== 'undefined' && globalThis.fetch ? globalThis.fetch : null));
   if (!doFetch) return { state: 'unavailable', body: null };
   try {
-    const res = await doFetch(base + pathAndQuery, {
-      method: 'GET',
-      headers: { 'x-fiezel-owner-token': apiKey, 'cache-control': 'no-store' },
-    });
-    if (!res || !res.ok) return { state: 'unavailable', body: null, status: (res && res.status) || 0 };
+    const fetchOpt = {
+      method: options.method || 'GET',
+      headers: Object.assign({
+        'x-fiezel-owner-token': apiKey,
+        'cache-control': 'no-store'
+      }, options.headers || {})
+    };
+    if (options.body) {
+      fetchOpt.body = typeof options.body === 'string' ? options.body : JSON.stringify(options.body);
+      fetchOpt.headers['content-type'] = 'application/json';
+    }
+    const res = await doFetch(base + pathAndQuery, fetchOpt);
+    if (!res || !res.ok) {
+      let errBody = null;
+      try { errBody = await res.json(); } catch (_) {}
+      return { state: 'unavailable', body: errBody, status: (res && res.status) || 0 };
+    }
     return { state: 'ok', body: await res.json() };
   } catch {
     return { state: 'unavailable', body: null };
   }
+}
+
+async function readTeachers(env, fetchImpl) {
+  const res = await ownerApiFetch(env, '/api/owner/teachers', fetchImpl);
+  if (res.state !== 'ok') return { state: res.state, status: res.status, invites: [], teachers: [] };
+  const body = res.body || {};
+  return {
+    state: 'ok',
+    invites: Array.isArray(body.invites) ? body.invites : [],
+    teachers: Array.isArray(body.teachers) ? body.teachers : [],
+  };
+}
+
+async function mintTeacherInvite(env, input, fetchImpl) {
+  return await ownerApiFetch(env, '/api/owner/teacher-invite', fetchImpl, {
+    method: 'POST',
+    body: {
+      teacherName: input.teacherName,
+      institution: input.institution,
+      institutionType: input.institutionType,
+      days: input.days,
+    }
+  });
+}
+
+async function revokeTeacherInvite(env, input, fetchImpl) {
+  return await ownerApiFetch(env, '/api/owner/teacher-invite/revoke', fetchImpl, {
+    method: 'POST',
+    body: {
+      code: input.code || undefined,
+      codeHash: input.codeHash || undefined,
+    }
+  });
 }
 
 /** `sub` yang sah = UUID. Dipakai DUA arah: sebelum dikirim ke API, dan sebelum dirender. */
@@ -871,7 +916,7 @@ async function readLearnerDetail(env, period, sub, fetchImpl) {
   };
 }
 
-async function readModel(env, period, nowMs, learnerSub) {
+async function readModel(env, period, nowMs, learnerSub, fetchImpl) {
   const db = env && env.ANALYTICS;
   // Kegagalan baca dicatat per-query dan TIDAK diubah menjadi nol. "Tidak tahu" adalah jawaban
   // yang sah; "nol" adalah klaim, dan klaim itu butuh pengukuran.
@@ -1054,12 +1099,14 @@ async function readModel(env, period, nowMs, learnerSub) {
     collection: start || {},
     // Bukti belajar Braincore: satu subrequest, tidak pernah melempar, tidak pernah
     // menjatuhkan panel lain (lihat readEvidence).
-    evidence: await readEvidence(env, period),
+    evidence: await readEvidence(env, period, fetchImpl),
     // Murid per orang. Dua subrequest, keduanya fail-soft persis seperti `evidence`:
     // kegagalan baca dicetak sebagai "tidak tersedia", TIDAK PERNAH sebagai "nol murid".
-    learners: await readLearners(env, period),
+    learners: await readLearners(env, period, fetchImpl),
     learnerSub: SUB_RE.test(String(learnerSub || '')) ? String(learnerSub) : null,
-    learnerDetail: SUB_RE.test(String(learnerSub || '')) ? await readLearnerDetail(env, period, learnerSub) : null,
+    learnerDetail: SUB_RE.test(String(learnerSub || '')) ? await readLearnerDetail(env, period, learnerSub, fetchImpl) : null,
+    // Undangan & token guru. Satu subrequest owner-gated ke Worker api, fail-soft.
+    teachers: await readTeachers(env, fetchImpl),
     // Batas pengukuran ikut ke model — jadi HTML dan JSON menceritakan batas yang SAMA.
     unmeasurable: UNMEASURABLE,
     generatedAtIso: new Date(Number(nowMs)).toISOString(),
@@ -1465,6 +1512,224 @@ function renderLearnerSection(m) {
   </section>`;
 }
 
+function renderTeacherSection(m) {
+  const tData = m.teachers || { state: 'ok', invites: [], teachers: [] };
+  const action = m.teacherAction;
+
+  let alertBanner = '';
+  if (action) {
+    if (action.action === 'mint' && action.ok) {
+      const inv = action.invite || {};
+      const expDate = inv.expiresAt ? wibDay(inv.expiresAt) : '—';
+      alertBanner = `
+        <div style="background:#fff;border:2px solid var(--ink);border-radius:12px;padding:20px;margin-bottom:20px;box-shadow:0 4px 12px rgba(0,0,0,0.05);">
+          <div style="font-size:18px;font-weight:bold;color:var(--ink);margin-bottom:8px;">🎉 Token Guru Berhasil Dibuat!</div>
+          <div style="font-size:13px;color:var(--muted);margin-bottom:12px;">Salin token ini sekarang dan serahkan kepada guru untuk diaktifkan di menu Pengaturan aplikasi.</div>
+          <div style="margin:12px 0;text-align:center;">
+            <code style="font-size:1.6rem;font-weight:bold;letter-spacing:2px;color:var(--ink);background:var(--cream);padding:10px 20px;border-radius:8px;border:2px dashed var(--line);user-select:all;display:inline-block;">${esc(action.code)}</code>
+            <div style="font-size:11px;color:var(--muted);margin-top:6px;">(Klik/blok teks token di atas untuk menyalin langsung)</div>
+          </div>
+          <div style="font-size:13px;line-height:1.6;margin-top:12px;border-top:1px solid var(--line);padding-top:10px;">
+            <div>Nama Guru: <b>${esc(inv.teacherName || '—')}</b></div>
+            <div>Sekolah/Instansi: <b>${esc(inv.institution || '—')}</b> (${esc(inv.institutionType || '—')})</div>
+            <div>Masa Berlaku: <b>s.d. ${esc(expDate)} (WIB)</b></div>
+          </div>
+          <div class="warn" style="margin-top:14px;font-size:12px;"><b>⚠️ PERHATIAN PENTING:</b> Kode token ini <b>HANYA DITAMPILKAN SEKALI INI SAJA</b> demi keamanan kriptografis. Sistem tidak menyimpan token mentah di basis data. Pastikan Anda telah menyalinnya sebelum berpindah halaman.</div>
+        </div>
+      `;
+    } else if (action.action === 'revoke' && action.ok) {
+      alertBanner = `
+        <div class="note" style="border-left-color:#2e7d32;color:#1b5e20;background:#e8f5e9;padding:12px 16px;margin-bottom:16px;">
+          <b>✅ Berhasil:</b> ${esc(action.message)}
+        </div>
+      `;
+    } else if (!action.ok) {
+      alertBanner = `
+        <div class="warn" style="padding:12px 16px;margin-bottom:16px;">
+          <b>❌ Gagal:</b> ${esc(action.message)}${action.error ? ` (kode: ${esc(action.error)})` : ''}
+        </div>
+      `;
+    }
+  }
+
+  // Formulir pembuatan token
+  const formMint = `
+    <div style="background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:20px;">
+      <h3 style="margin-top:0;margin-bottom:8px;color:var(--ink);">+ Buat Undangan &amp; Token Guru Baru</h3>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:16px;">
+        Owner dapat mencetak token untuk guru. Guru kemudian memasukkan kode token ini di aplikasi FIEZEL untuk membuka portal guru dan mengelola materi kelas.
+      </div>
+      <form method="GET" action="/" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:12px;align-items:end;">
+        <input type="hidden" name="action" value="mint_teacher">
+        <div>
+          <label for="f_teacherName" style="display:block;font-size:12px;font-weight:bold;margin-bottom:4px;color:var(--ink);">Nama Guru</label>
+          <input id="f_teacherName" name="teacherName" type="text" placeholder="Contoh: Mardhiana Hamzah" maxlength="60" required style="width:100%;box-sizing:border-box;">
+        </div>
+        <div>
+          <label for="f_institution" style="display:block;font-size:12px;font-weight:bold;margin-bottom:4px;color:var(--ink);">Nama Sekolah / Instansi</label>
+          <input id="f_institution" name="institution" type="text" placeholder="Contoh: MTsN 5 ACEH BESAR" maxlength="80" required style="width:100%;box-sizing:border-box;">
+        </div>
+        <div>
+          <label for="f_institutionType" style="display:block;font-size:12px;font-weight:bold;margin-bottom:4px;color:var(--ink);">Jenis Instansi</label>
+          <select id="f_institutionType" name="institutionType" style="width:100%;box-sizing:border-box;">
+            <option value="school" selected>Sekolah (school)</option>
+            <option value="tutoring">Bimbel (tutoring)</option>
+            <option value="course">Kursus (course)</option>
+            <option value="other">Lainnya (other)</option>
+          </select>
+        </div>
+        <div>
+          <label for="f_days" style="display:block;font-size:12px;font-weight:bold;margin-bottom:4px;color:var(--ink);">Masa Aktif Token</label>
+          <select id="f_days" name="days" style="width:100%;box-sizing:border-box;">
+            <option value="14">14 Hari</option>
+            <option value="30">30 Hari (1 Bulan)</option>
+            <option value="90" selected>90 Hari (3 Bulan)</option>
+            <option value="180">180 Hari (6 Bulan)</option>
+            <option value="365">365 Hari (1 Tahun)</option>
+          </select>
+        </div>
+        <div style="grid-column:1/-1;text-align:right;margin-top:6px;">
+          <button type="submit" style="background:var(--ink);color:#fff;padding:10px 20px;border:none;border-radius:6px;font-weight:bold;cursor:pointer;">+ Buat Token Guru</button>
+        </div>
+      </form>
+    </div>
+  `;
+
+  // Formulir cabut manual
+  const formRevokeManual = `
+    <div style="background:#fff;border:1px dashed var(--line);border-radius:10px;padding:14px;margin-bottom:20px;">
+      <form method="GET" action="/" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <input type="hidden" name="action" value="revoke_invite">
+        <label for="f_revoke_code" style="font-size:12px;font-weight:bold;color:var(--muted);white-space:nowrap;">Cabut Token Manual:</label>
+        <input id="f_revoke_code" name="code" type="text" placeholder="Ketik atau tempel 32 karakter kode token Crockford" maxlength="32" required style="flex:1;min-width:260px;box-sizing:border-box;">
+        <button type="submit" style="background:#c62828;color:#fff;padding:8px 16px;border:none;border-radius:6px;font-weight:bold;cursor:pointer;">Cabut Token</button>
+      </form>
+    </div>
+  `;
+
+  // Tabel daftar token
+  const invites = tData.invites || [];
+  let inviteTable = '';
+  if (!invites.length) {
+    inviteTable = `<div class="note">Belum ada token undangan yang dicetak.</div>`;
+  } else {
+    const rows = invites.map((inv) => {
+      let statusBadge = '';
+      if (inv.status === 'ACTIVE') {
+        statusBadge = `<span style="background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:10px;font-weight:bold;font-size:11px;">AKTIF</span>`;
+      } else if (inv.status === 'USED') {
+        statusBadge = `<span style="background:#f5f5f5;color:#616161;padding:2px 8px;border-radius:10px;font-size:11px;">TERPAKAI</span>`;
+      } else if (inv.status === 'EXPIRED') {
+        statusBadge = `<span style="background:#fff3e0;color:#e65100;padding:2px 8px;border-radius:10px;font-size:11px;">KEDALUWARSA</span>`;
+      } else if (inv.status === 'REVOKED') {
+        statusBadge = `<span style="background:#ffebee;color:#c62828;padding:2px 8px;border-radius:10px;font-size:11px;text-decoration:line-through;">DICABUT</span>`;
+      } else {
+        statusBadge = `<span style="background:#f5f5f5;color:#616161;padding:2px 8px;border-radius:10px;font-size:11px;">${esc(inv.status || '—')}</span>`;
+      }
+
+      let actionCell = '—';
+      if (inv.status === 'ACTIVE' && inv.codeHash) {
+        actionCell = `
+          <form method="GET" action="/" style="display:inline;margin:0;">
+            <input type="hidden" name="action" value="revoke_invite">
+            <input type="hidden" name="codeHash" value="${esc(inv.codeHash)}">
+            <button type="submit" style="background:#c62828;color:#fff;border:none;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;">Cabut</button>
+          </form>
+        `;
+      }
+
+      const createdStr = inv.createdAt ? wibDay(inv.createdAt) : '—';
+      const expiresStr = inv.expiresAt ? wibDay(inv.expiresAt) : '—';
+
+      return `<tr>
+        <td><b>${esc(inv.teacherName || '—')}</b></td>
+        <td>${esc(inv.institution || '—')}</td>
+        <td>${esc(inv.institutionType || '—')}</td>
+        <td>${statusBadge}</td>
+        <td>${esc(createdStr)}</td>
+        <td>${esc(expiresStr)}</td>
+        <td style="text-align:center;">${actionCell}</td>
+      </tr>`;
+    }).join('');
+
+    inviteTable = `
+      <div style="overflow-x:auto;margin-bottom:24px;">
+        <table>
+          <thead>
+            <tr>
+              <th>Guru</th>
+              <th>Sekolah / Instansi</th>
+              <th>Jenis</th>
+              <th>Status</th>
+              <th>Dibuat (WIB)</th>
+              <th>Berlaku Hingga</th>
+              <th style="text-align:center;">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  // Tabel daftar guru aktif
+  const teachers = tData.teachers || [];
+  let teacherTable = '';
+  if (!teachers.length) {
+    teacherTable = `<div class="note">Belum ada akun guru yang menyelesaikan aktivasi token.</div>`;
+  } else {
+    const tRows = teachers.map((tc) => {
+      const actDate = tc.activatedAt ? wibDay(tc.activatedAt) : '—';
+      return `<tr>
+        <td><code>${esc(tc.handle || '—')}</code></td>
+        <td><b>${esc(tc.teacherName || '—')}</b></td>
+        <td>${esc(tc.institution || '—')}</td>
+        <td>${esc(tc.institutionType || '—')}</td>
+        <td><span style="background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:10px;font-weight:bold;font-size:11px;">${esc(tc.status || 'active')}</span></td>
+        <td>${esc(actDate)}</td>
+      </tr>`;
+    }).join('');
+
+    teacherTable = `
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Handle Akun</th>
+              <th>Nama Guru</th>
+              <th>Sekolah / Instansi</th>
+              <th>Jenis</th>
+              <th>Status</th>
+              <th>Aktivasi (WIB)</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${tRows}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  return `
+    <section>
+      <h2>🎓 Kelola Token &amp; Undangan Guru</h2>
+      ${alertBanner}
+      ${formMint}
+      ${formRevokeManual}
+      <h3 style="color:var(--ink);margin-top:20px;margin-bottom:8px;">Riwayat Undangan &amp; Token Guru</h3>
+      ${inviteTable}
+      <h3 style="color:var(--ink);margin-top:20px;margin-bottom:8px;">Daftar Guru Terdaftar &amp; Aktif</h3>
+      ${teacherTable}
+      <div class="note" style="margin-top:16px;">
+        Undangan guru bersifat sekali pakai. Masa aktif default adalah 90 hari. Begitu guru mengaktifkan token di aplikasi, peran akunnya langsung dipromosikan ke <code>teacher</code> dan profil sekolahnya tersimpan aman di basis data server.
+      </div>
+    </section>
+  `;
+}
+
 function renderDashboard(m) {
   const t = m.totals || {}, l = m.latest || {}, c = m.cost || {}, a = (c.assumptions || {});
   const periodLabel = { today: 'Hari ini', '7d': '7 hari', '30d': '30 hari', '90d': '90 hari' }[m.period] || m.period;
@@ -1682,6 +1947,7 @@ ${emptyBanner}${staleBanner}
 
   ${renderEvidenceSection(m)}
   ${renderLearnerSection(m)}
+  ${renderTeacherSection(m)}
 
 </main>
 <footer>Sumber: TIGA tabel agregat saja — metrik harian (bentuk panjang: hari × nama metrik × nilai), dimensi pemakaian berenum tertutup, dan retensi kohor. Tabel token perangkat dan bahan rahasia rotasi ADA di database yang sama tetapi TIDAK PERNAH dibaca halaman ini. Dashboard ini tidak punya jalan untuk membaca baris per-orang, dan tidak menampilkan identitas, surel, isi jawaban, maupun percakapan AI.
@@ -2271,11 +2537,60 @@ async function handle(request, env, ctx, nowMs) {
   const refreshed = sessionCookieHeader(await issueSession(env, now), Math.floor(SESSION_TTL_MS / 1000));
 
   if (path === '/') {
+    const fetchImpl = (ctx && ctx.fetch) || (typeof fetch === 'function' ? fetch : null);
+    const action = url.searchParams.get('action');
+    let teacherAction = null;
+    if (action === 'mint_teacher') {
+      const teacherName = url.searchParams.get('teacherName') || '';
+      const institution = url.searchParams.get('institution') || '';
+      const institutionType = url.searchParams.get('institutionType') || 'school';
+      const days = url.searchParams.get('days') || '90';
+      const mintRes = await mintTeacherInvite(env, { teacherName, institution, institutionType, days }, fetchImpl);
+      if (mintRes.state === 'ok' && mintRes.body && mintRes.body.code) {
+        teacherAction = {
+          ok: true,
+          action: 'mint',
+          code: mintRes.body.code,
+          invite: mintRes.body.invite,
+          message: 'Token guru berhasil dibuat! Simpan/salin sekarang karena token hanya ditampilkan satu kali.'
+        };
+      } else {
+        teacherAction = {
+          ok: false,
+          action: 'mint',
+          error: (mintRes.body && mintRes.body.error) || mintRes.state,
+          message: 'Gagal membuat token guru. Periksa kembali nama guru, instansi, dan jenis instansi.'
+        };
+      }
+    } else if (action === 'revoke_invite') {
+      const code = url.searchParams.get('code') || '';
+      const codeHash = url.searchParams.get('codeHash') || '';
+      const revokeRes = await revokeTeacherInvite(env, { code, codeHash }, fetchImpl);
+      if (revokeRes.state === 'ok' && revokeRes.body && revokeRes.body.ok) {
+        teacherAction = {
+          ok: true,
+          action: 'revoke',
+          revoked: revokeRes.body.revoked,
+          message: revokeRes.body.revoked ? 'Token guru berhasil dicabut.' : 'Token tidak ditemukan atau sudah dicabut sebelumnya.'
+        };
+      } else {
+        teacherAction = {
+          ok: false,
+          action: 'revoke',
+          error: (revokeRes.body && revokeRes.body.error) || revokeRes.state,
+          message: 'Gagal mencabut token guru. Periksa format kode token.'
+        };
+      }
+    }
+
     // Murid terpilih adalah PARAMETER KUERI pada rute yang sudah ada, bukan rute baru.
     // Konsekuensinya disengaja: OWNER_ROUTES tidak berubah, allowlist proxy
     // `deploy/edge/owner-index.php` tidak berubah, dan tidak ada satu pun permukaan owner
     // baru yang harus dipagari ulang. Validasi bentuk `sub` terjadi di readModel.
-    const model = await readModel(env, period, now, url.searchParams.get('learner'));
+    const model = await readModel(env, period, now, url.searchParams.get('learner'), fetchImpl);
+    if (teacherAction) {
+      model.teacherAction = teacherAction;
+    }
     return html(renderDashboard(model), 200, { 'set-cookie': refreshed });
   }
   if (path === '/api/summary') {
@@ -2459,6 +2774,7 @@ export {
   readEvidence, sanitizeEvidenceSummary, renderEvidenceSection, EVIDENCE_PERIOD_DAYS,
   readLearners, readLearnerDetail, sanitizeLearnerRow, sanitizeLearnerSummary,
   renderLearnerSection, renderLearnerDirectory, renderLearnerDetail, learnerLabel, SUB_RE,
+  readTeachers, mintTeacherInvite, revokeTeacherInvite, renderTeacherSection,
   // Rem penebakan halaman masuk: diekspor supaya gerbang bisa memodelkan ISOLATE BARU per
   // permintaan (cacat yang tidak pernah diuji) dan mengassert angka jendelanya sebagai kontrak.
   LOGIN_MAX, LOGIN_MAX_SHARED, LOGIN_BUCKET_MS, LOGIN_WINDOW_BUCKETS, LOGIN_WINDOW_MS,

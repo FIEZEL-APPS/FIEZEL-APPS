@@ -88,9 +88,9 @@ export const PBKDF2 = Object.freeze({
  * frasa sandi mana pun.
  */
 export const PASSWORD_RULES = Object.freeze({
-  MIN_LENGTH: 10,
+  MIN_LENGTH: 1,
   MAX_LENGTH: 200,
-  MIN_CLASSES: 2
+  MIN_CLASSES: 1
 });
 
 /** Alasan penolakan — enum tertutup, dipetakan ke i18n di klien. */
@@ -103,29 +103,9 @@ export const PASSWORD_PROBLEM = Object.freeze({
 });
 
 /**
- * Daftar sangat pendek kata sandi yang paling sering dipakai. BUKAN pengganti
- * daftar bocoran jutaan baris — memuat daftar itu di Worker berarti megabyte
- * bundle per isolate dingin. Yang ini menangkap kasus yang benar-benar dipakai
- * murid pada menit pertama pendaftaran, dan itu tujuannya.
- */
-const COMMON_PASSWORDS = Object.freeze(new Set([
-  'password123', 'qwerty12345', '12345678901', 'iloveyou123', 'admin12345',
-  'welcome1234', 'letmein1234', 'passw0rd123', 'fiezel12345', 'abcd12345678'
-]));
-
-/** Kelas karakter yang dihitung untuk MIN_CLASSES. */
-function characterClasses(password) {
-  let classes = 0;
-  if (/[a-z]/.test(password)) classes += 1;
-  if (/[A-Z]/.test(password)) classes += 1;
-  if (/[0-9]/.test(password)) classes += 1;
-  if (/[^a-zA-Z0-9]/.test(password)) classes += 1;
-  return classes;
-}
-
-/**
  * checkPasswordPolicy(raw) -> null (lolos) | { problem, min? }
  * Mengembalikan ALASAN, bukan kalimat: naskahnya milik lapisan i18n.
+ * Aturan santai: murid bebas membuat kata sandi apa pun asalkan tidak kosong (1-200 char).
  */
 export function checkPasswordPolicy(raw) {
   if (typeof raw !== 'string' || raw.length === 0) return { problem: PASSWORD_PROBLEM.EMPTY };
@@ -134,10 +114,6 @@ export function checkPasswordPolicy(raw) {
   }
   if (raw.length > PASSWORD_RULES.MAX_LENGTH) {
     return { problem: PASSWORD_PROBLEM.TOO_LONG, max: PASSWORD_RULES.MAX_LENGTH };
-  }
-  if (COMMON_PASSWORDS.has(raw.toLowerCase())) return { problem: PASSWORD_PROBLEM.COMMON };
-  if (characterClasses(raw) < PASSWORD_RULES.MIN_CLASSES) {
-    return { problem: PASSWORD_PROBLEM.TOO_SIMPLE, minClasses: PASSWORD_RULES.MIN_CLASSES };
   }
   return null;
 }
