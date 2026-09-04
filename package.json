@@ -35,6 +35,8 @@
     "test:teacher-content": "node teacher-content-test.js",
     "test:teacher-csv": "node teacher-csv-test.js",
     "test:teacher-braincore": "node teacher-braincore-test.js",
-    "test:social-notify": "node social-notify-test.js"
+    "test:social-notify": "node social-notify-test.js",
+    "test:auth-account": "node auth-account-test.js",
+    "invite:teacher": "node tools/mint-teacher-invite.mjs"
   }
 }
