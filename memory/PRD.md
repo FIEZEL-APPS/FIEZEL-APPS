@@ -1,59 +1,32 @@
-# FIEZEL — PRD (Rencana Pengembangan)
+# FIEZEL — Ruang Guru (PRD)
 
-## Problem statement (verbatim ringkas)
-Tambah fitur sisi Learner (alur diagnostic → rencana → lesson → feedback, Today Plan, feedback
-yang menjelaskan pola bahasa, export/import progres, tujuan belajar spesifik, ringkasan hasil
-yang bisa dibagikan, bukti offline) dan Tutor Action Center (peta kemampuan kelas, antrian
-intervensi, "Buat sesi review", rekomendasi per murid, laporan mingguan otomatis, export
-PDF/CSV/anonim). Wajib: buat branch/PR baru sebelum mulai.
+## Problem statement (asli)
+Cek repo FIEZEL-APPS terbaru (github.com/FIEZEL-APPS/FIEZEL-APPS). Dashboard guru sudah ada, tapi UI/UX guru dan murid harus berbeda, dan tambahkan banyak fitur guru agar guru/tutor lebih mudah mengatur & mengelola siswa. Pikirkan ide kreatif yang menyelesaikan problem guru yang selama ini belum ada solusinya.
+
+## Pilihan user
+- Clone dari GitHub (branch main). Tanpa AI dulu. Prioritas: manajemen kelas & siswa, tugas & ujian, analitik & deteksi dini, komunikasi. Visual: bebas.
 
 ## Arsitektur
-- PWA statis (vanilla JS, tanpa build) di root `/app`, dilayani `frontend/server.js` (preview) → port 3000.
-- Fitur modular di `features/**`, dimuat via `<script defer>` di `index.html`; app inti `app.js`.
-- State lokal (localStorage), tanpa network I/O untuk fitur baru → offline-friendly & privasi.
-- Build ritual: `FIEZEL_PAGE_BUILD` (core-config.js) = `DIAG_BUILD` (fiezel-diag-panel.js) = prefix `SW_REV` (sw.js). Naik +1 bersama. Saat ini **m025-238** (dari m025-237).
+- Repo = PWA vanilla JS (index.html + app.js 12k baris + features/*), backend Cloudflare Workers/D1 (tidak bisa dijalankan di pratinjau).
+- Pratinjau lokal: `tools/preview-server.mjs` (dipanggil oleh supervisor `frontend` via /app/frontend/package.json) melayani /app statis di :3000.
+- Modul baru `features/teacher/`:
+  - `fiezel-teacher-store.js` — data lokal (localStorage `fiezel-teacher-v1`) + analitik murni (risk score, heatmap, kelompok belajar, miskonsepsi, naskah pesan/laporan, kode tukar tugas/hasil).
+  - `fiezel-teacher-shell.js` — cangkang UI guru terpisah (sidebar gelap + kertas hangat, Fraunces/IBM Plex), body.fz-teacher-mode menyembunyikan chrome murid.
+  - `fiezel-teacher-icons.js` — ikon inline (lucide subset repo tidak memuat ikon yang dibutuhkan).
+  - `teacher-shell.css`.
+- Integrasi: `app.js` tutorCenterView() memasang shell (fallback ke Tutor Action Center lama), renderInner() melepas shell saat pindah view, isVerifiedTeacher() menerima pratinjau dev (`?teacher=preview`, host non-produksi saja). `sw.js` ASSETS diperbarui. Learner flow: input "Punya kode tugas dari guru?" + payload kode hasil membawa `assign[]` untuk penilaian presisi.
 
-## Yang sudah diimplementasikan (2026-09-03)
-- Branch `feature/learner-flow-tutor-action-center` (dari `origin/main`). PUSH via "Save to GitHub" (pending user).
-- `features/learner-flow/fiezel-review-bank.js` — bank soal deterministik (past tense, past questions, vocab A2, listening detail, reading inference) + generator umpan balik pola bahasa + `buildSession` (5–10 soal, tujuan, durasi, urutan, penjelasan pasca-sesi).
-- `features/learner-flow/fiezel-progress-backup.js` — export/import JSON tanpa sandi, `preview` restore, penjelasan data per kelompok, `wipeAll` (hapus semua data).
-- `features/learner-flow/fiezel-learner-flow.js` — view `learn`: pilih tujuan (school/campus/IT/scholarship/foundation IELTS-TOEFL/everyday) → 5 diagnostic → skill map → Today Plan (target/durasi/skill/review/mulai/alasan) → lesson (feedback menjelaskan pola) → alasan rekomendasi berikutnya; tab Ringkasan + kode hasil untuk tutor; tab Progres & backup.
-- `features/tutor-action-center/fiezel-tutor-action-center.js` — view `tutor`: buat kelas / seed demo (English A2, 18 murid), peta kemampuan (angka+arti+tindakan+prioritas), antrian intervensi, "Buat sesi review" + kirim ke Today Plan murid, rekomendasi per murid (bahasa suportif), laporan mingguan otomatis, export PDF/CSV/anonim + pratinjau, impor murid dari kode hasil.
-- `features/learner-flow/learner-flow.css` — styling pastel (.lf-* & .tac-*).
-- Integrasi: `index.html`, `sw.js` (ASSETS + SW_REV), `app.js` (VALID_VIEWS, router, kartu Home), goals baru (campus/everyday) di personal-journey + i18n id/th, baseline emas Indonesia di-regenerate.
+## Fitur selesai (2026-06)
+- Briefing: KPI, "Siapa yang perlu disapa hari ini" (skor risiko + alasan + tindakan), agenda tenggat, miskonsepsi kelas, aksi cepat.
+- Kelas & Siswa: multi-kelas, kode kelas, tambah siswa massal (tempel daftar absen), pencarian, tabel status/risiko, drawer siswa (skill, kehadiran, tugas, kontak ortu, catatan), absensi cepat (H/I/S/A), ekspor CSV, hapus.
+- Tugas & Ujian: builder dari bank soal FIEZEL (skill, jumlah, tenggat, mode latihan/ujian acak+timer, target siswa), kode tugas + pesan WA, status siapa belum, penilaian otomatis via kode hasil murid, tandai selesai manual, pengingat.
+- Analitik: tile skill, heatmap siswa×skill, kelompok belajar otomatis (mentor), 3 miskonsepsi + remedial 1 klik.
+- Komunikasi: pengumuman (salin/WA), Kartu Sapa personal 1 ketuk, Rapor naratif orang tua (wa.me ke nomor ortu), laporan kelas mingguan (salin/cetak), salin semua laporan.
+- Jurnal Guru (refleksi 60 detik, tag siswa → muncul di drawer), Mode Papan (proyektor, anonim), profil guru, ekspor/pulihkan cadangan, "Waktu terhemat".
+- Testing: iteration_1 lulus (frontend). Gate repo: boot-order, pwa-cache, role-security, account-auth-client, splash lulus.
 
-## Verifikasi
-- E2E browser: alur learner lengkap OK; tutor (seed→map→queue→build→send→report/CSV/anon) OK.
-- Gates hijau: install-health, pwa-cache, config-consistency, http-smoke, global-name-collision, gate-registry, no-network, id-golden-snapshot (baseline diperbarui), back-nav, onboarding, continuity, backup-ui, lesson-experience, experience-integration, content-integrity-audit.
-- ui-render-audit: SKIP (playwright tak terpasang di env — bukan gagal).
-
-## Bank soal tak-terbatas semua skill + Tren Kelas (2026-09-03)
-- `canonicalFor()/generated()` kini mencakup vocab (16 frame), listening (10 dialog), reading (10 passage) — jawaban di posisi tetap lalu diacak `variant()`; id `gvc:/gld:/gri:` (+`~oXXXX`) direkonstruksi `byId()`. `pickFresh` dedupe per frame dalam satu batch. Terverifikasi 25 tarikan unik per skill, 0 opsi duplikat, roundtrip OK.
-- Tutor tab **Tren kelas**: sparkline SVG 4 minggu per skill + delta & label (membaik/stabil/perlu perhatian). Snapshot coverage per ISO-minggu disimpan otomatis (`cls.weeklyCoverage`, maks 8) → setelah ≥2 minggu memakai riwayat nyata; sebelumnya ditandai jelas sebagai estimasi.
-
-## Soal bergambar + Filter murid + Duel Belajar (2026-09-03)
-- **Soal bergambar**: 20 pictogram SVG garis (offline) di `PIC` → `picItem(w,d1,d2,d3)` (id `gpi:…`), diselang-seling dengan soal kalimat untuk vocab_a2 dan dicampur ke pool awal `pickFresh` (4 gambar) agar muncul sejak soal pertama. Render `.lf-picture` di learner & duel.
-- **Filter murid** (Tutor → Per murid): chip Semua / belum stabil / perlu bantuan ringan / belum kembali belajar / sedang berkembang / stabil, dengan hitungan; `st.studentFilter`.
-- **Duel Belajar** (`features/learner-flow/fiezel-duel.js`, tab "Duel" di alur belajar): 8 soal × 15 detik, poin 100 + bonus cepat (≤50) + bonus beruntun (+20); salah tetap dijelaskan polanya. Tanpa server: tantangan = kode/link `?duel=KODE` (seed sama → soal identik); teman buka link → Duel tab auto-terbuka → main → head-to-head → kode balasan → papan skor di pembuat. Mode "Main berdua di satu HP" (hot-seat bergantian). Deep-link: `app.js` auto `go('learn')` + kartu "Terima Duel Belajar" di Home.
-- Terverifikasi e2e: solo → link → teman gabung (Rina 720 vs Dimas 469) → kode balasan; hot-seat dengan soal bergambar; filter murid; semua gate hijau.
-
-## Peran Murid / Guru di onboarding (2026-09-03)
-- Langkah nama menampilkan pilihan peran (radio-card `data-ob-role`, i18n id+th). Guru → CTA "Masuk ke Tutor Action Center", melompati tujuan/penempatan/jadwal, `role` tersimpan di record onboarding; `afterOnboardingExit('home')` membaca `FiezelOnboarding.storedRole` → `state.preferences.role` + `go('tutor')`. Home: seksi "Ruang guru" dengan kartu Tutor di depan untuk guru.
-- Catatan: ini pemilihan PERAN, bukan autentikasi; login akun tetap lewat gerbang Puter yang sudah ada.
-
-## Kode Kelas + Home/taskbar polish (2026-09-03)
-- **Kode kelas** `FZ-XXXXXX` (tanpa 0/O/1/I): dibuat otomatis per kelas (`makeClassCode`), tampil + "Salin kode" di header Tutor. Murid mengetiknya di langkah nama onboarding (field opsional, tersembunyi untuk Guru) → tersimpan `classCode` di record onboarding. Saat diagnostic selesai: `pushToClass()` → `FiezelTutorActionCenter.ingestLearnerResult` (perangkat sama; upsert per nama) + toast; kode hasil learner menyertakan `cls` sehingga saat guru menempel kode hasil, murid otomatis masuk ke kelas berkode (lintas perangkat).
-- **Home**: panel "Alur belajar" (Today Plan + Tutor + undangan duel) dipindah ke atas skill hub sebagai etalase; `features/learner-flow/home-polish.css` (dimuat terakhir, `#app`-scoped): kartu gradien kuning/gelap dengan orb, hover lift; taskbar jadi pil kaca (blur 18px) dengan item aktif gelap + penanda kuning meluncur; reduced-motion aman.
-
-## Backlog / Next
-- P1: Suara neural untuk listening di alur learner (kini SpeechSynthesis fallback + FiezelVoiceSay bila aktif). ✅ tersambung.
-- P2: Grafik tren mingguan kelas; filter murid per status di Tutor.
-- P2: Jalankan full CI suite (~240 gate) sebelum merge PR.
-
-## Anti-pengulangan & variasi (2026-09-03)
-Agar murid tidak bosan: `fiezel-review-bank.js` kini punya mesin variasi.
-- `pickFresh(skill,n,{avoid,seed})` menghindari id soal yang sudah diuji.
-- Bila stok pola grammar habis → generate soal baru dari template (20 verb × 8 subjek × 6 penanda waktu) via `generated()`; distraktor memakai bentuk present `-s` sehingga TIDAK pernah ada pilihan duplikat (verba dengan past==participle sekalipun).
-- Bank terbatas (vocab/listening/reading) → `variant()` mengacak urutan pilihan (jawaban & penjelasan dipetakan ulang; urutan di-encode di id → `byId()` bisa rekonstruksi).
-- Learner menyimpan ledger `seen` per skill (cap 40) → diagnostic (rotasi seed per run), lesson, dan review selalu ambil soal segar. Tutor menyimpan `sentItemIds` per kelas → "Buat sesi review" tidak mengirim soal yang sama dua kali.
-Terverifikasi: 30 tarikan unik, ~6000 soal generate tanpa opsi duplikat, roundtrip `byId` untuk generated & variant, lesson e2e jalan.
+## Backlog
+- P0: Sinkron server (route-teacher.js D1) agar hasil murid masuk otomatis lewat kode kelas tanpa tempel kode; login guru nyata di pratinjau.
+- P1: Import CSV siswa lengkap (kolom HP ortu), riwayat kehadiran bulanan + ekspor, notifikasi tenggat, mode papan interaktif (kuis live).
+- P1: Sisi murid — tampilkan badge "Tugas dari Guru" di Home & kirim kode hasil otomatis setelah tugas selesai.
+- P2: AI opsional (ringkasan kelas, generator soal esai), multi-guru per kelas, template pesan kustom.
