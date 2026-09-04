@@ -318,6 +318,14 @@ konflik merge; hijau begitu diulang). Delapan sisanya nyata, dan pembagiannya pe
    dari Home, `journeyMarkup()` ada di template Ringkasan, dan kelima rute wajib ada di
    `VALID_VIEWS` di mana pun letaknya.
 
+5. **`braincore-learner-identity-test.js`** — akibat langsung dari perbaikan (3) di atas.
+   Gerbang itu memaku dua penanda lane per-murid sebagai DUA ANGGOTA TERAKHIR daftar reset
+   (`...ATTEMPT_KEY,LEARNER_NAME_SYNC_KEY]`), jadi menambahkan `ACCOUNT_NUDGE_KEY` sesudahnya
+   memerahkannya tanpa satu janji pun yang dilanggar. Dibalik ke keanggotaan: kedua kunci wajib
+   ada di dalam daftar `for(const k of [...])` milik `resetProgress()`, di posisi mana pun —
+   dan daftarnya diurai dari fungsi itu, bukan dicocokkan sebagai teks bebas di app.js, supaya
+   gerbangnya tidak bisa lulus karena nama yang kebetulan muncul di tempat lain.
+
 **Milik `main`, bukan gelombang ini (empat).** Semuanya diverifikasi di worktree bersih
 `origin/main` (e3afd0d8) lebih dulu, bukan disimpulkan:
 
