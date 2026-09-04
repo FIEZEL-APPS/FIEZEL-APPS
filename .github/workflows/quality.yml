@@ -223,6 +223,7 @@ jobs:
           node teacher-content-test.js
           node teacher-csv-test.js
           node teacher-braincore-test.js
+          node class-sync-test.js
           node social-notify-test.js
           node braincore-learner-identity-test.js
           node learning-metrics-test.js

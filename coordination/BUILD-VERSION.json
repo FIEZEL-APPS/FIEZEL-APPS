@@ -1,7 +1,7 @@
 {
-  "version": "m025-249",
-  "claimedBy": "branch claude/language-app-redesign-fm9g2f (penyederhanaan pengalaman m025-246)",
-  "claimedAt": "2026-09-04T17:34:33.708Z",
+  "version": "m025-250",
+  "claimedBy": "branch claude/language-app-redesign-fm9g2f",
+  "claimedAt": "2026-09-04T18:09:45.249Z",
   "reason": "penyederhanaan pengalaman: nav 4 tab, Home Hari ini, tema malam, placement-lite",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
