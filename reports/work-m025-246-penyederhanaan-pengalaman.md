@@ -128,11 +128,24 @@ dan kalau `flush()` tidak pernah dipanggil, pengecekan berkala berikutnya tetap 
 `show()` — kegagalan terburuknya kartu yang datang terlambat, bukan kartu yang hilang.
 
 **Tipografi.** Tiga keluarga → dua. `@font-face 'FZ Fredoka'` dicabut, preload dicabut dari
-`index.html`, `Fredoka-var.woff2` dicabut dari precache `sw.js`. Token `--fz-display-round`
-**dipertahankan** (menunjuk Jakarta 700) alih-alih dicari-ganti di ~40 titik pakai: satu nilai
-yang berubah lebih mudah diaudit daripada empat puluh selektor. `Noto Sans Thai Looped` tetap
-di-self-host dan sengaja tidak dihitung sebagai wajah ketiga — ia dukungan **aksara**, bukan
-keluarga dalam sistem tipografi.
+`index.html`, `Fredoka-var.woff2` dicabut dari precache `sw.js`, dan **berkasnya sendiri
+dihapus** dari `assets/fonts/`. Penghapusan berkas itu bukan kerapian: `splash-choreography-test.js`
+menjaga kontrak "tidak boleh ada font yatim" — berkas yang tergeletak di `assets/fonts` tanpa
+satu pun aturan CSS merujuknya adalah persis alasan Fredoka dulu dilepas di m028 fase 1, karena
+ia ikut ter-precache dan dibayar setiap murid tanpa pernah tergambar. Mencabut rujukannya tapi
+meninggalkan berkasnya akan menciptakan ulang bug yang sama.
+
+Cabang `else` gerbang itu — yang selama ini tidak pernah dijalankan siapa pun — berbunyi
+`!/Fredoka/.test(css)`, artinya ia ikut memerahkan **komentar** yang menerangkan pencabutannya.
+Larangannya dipersempit ke KODE (komentar CSS dilucuti dulu), ditambah satu asersi baru yang
+menjaga bahaya yang sebenarnya: tidak boleh ada `url()` menunjuk berkas yang sudah tidak ada.
+Pola yang sama dipakai `audio-locale-guard-test.js` — yang dilarang pemakaiannya, bukan
+penyebutan namanya di catatan sejarah.
+
+Token `--fz-display-round` **dipertahankan** (menunjuk Jakarta 700) alih-alih dicari-ganti di
+~40 titik pakai: satu nilai yang berubah lebih mudah diaudit daripada empat puluh selektor.
+`Noto Sans Thai Looped` tetap di-self-host dan sengaja tidak dihitung sebagai wajah ketiga — ia
+dukungan **aksara**, bukan keluarga dalam sistem tipografi.
 
 **Tema Malam.** Ini pembalikan m025-134 ("hapus mode gelap"). Yang rusak pada percobaan
 pertama bisa disebut persis: puluhan permukaan memaku warnanya sendiri (`#fff`, `#f6f4ed`)
@@ -250,8 +263,25 @@ ringkas; ~35 asersi lama tetap menguji alur lengkap dengan bendera dimatikan),
 sepuluh, delapan belas event terdaftar jadi dua puluh — angkanya sengaja tetap dipaku tangan
 supaya setiap event telemetri baru melewati review manusia).
 
+`splash-choreography-test.js` — cabang `else` Fredoka dipersempit ke kode (lihat §3
+Tipografi); asersi wajah-bulat/serif/precache lainnya tidak disentuh.
+
 Baseline emas `id-golden-baseline.json` diregenerasi — perubahan naskah di gelombang ini
 disengaja (nama internal, jumlah soal penempatan, kalimat baru di `copy-id-redesign.js`).
+
+Dua jebakan di regenerasi itu, keduanya sempat memerahkan CI dan layak dicatat supaya
+gelombang berikutnya tidak mengulanginya:
+
+1. **Urutan gerbang.** `grammar-quality-audit.js` menulis ulang stempel tanggal di
+   `grammar-templates.json`, dan baseline mengunci **hash** berkas itu. Regenerasi setelah
+   gerbang itu berjalan akan mengunci hash yang termutasi — hijau di mesin lokal yang
+   menjalankan tes berurutan abjad, merah di CI yang menjalankan id-golden (baris 244)
+   **sebelum** mutatornya (baris 340). Regenerasi harus dari pohon kerja yang bersih.
+2. **Pohon yang tertinggal.** Regenerasi dari checkout `main` yang sudah basi akan
+   mengembalikan naskah agen lain yang sudah merge (di sini: aturan handle/kata sandi di
+   `auth-form`). Baseline diregenerasi ulang dari pohon kerja cabang ini setelah
+   `git fetch origin main`, jadi 2410 literalnya adalah gabungan naskah main terbaru +
+   naskah gelombang ini, bukan salah satunya saja.
 
 ---
 
