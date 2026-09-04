@@ -601,6 +601,7 @@ jobs:
           # aura-2-en, daftar frasa berisiko "On balance", override model per-item).
           node prerender-plan-test.js
           node owner-dashboard-test.js
+          node owner-teacher-panel-test.js
           # Ekspor CSV dashboard owner. Gerbang TERPISAH dari owner-dashboard-test.js karena
           # yang dijaga beda: berkas CSV BEREDAR LEPAS dari dashboard, jadi konteks kejujuran
           # (measurement_state, notice, batas UNMEASURABLE) wajib ikut TERTULIS DI DALAM

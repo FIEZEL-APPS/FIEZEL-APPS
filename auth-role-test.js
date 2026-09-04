@@ -198,6 +198,8 @@ function mod(rel) {
     'teks token TIDAK muncul di nilai kolom mana pun');
   assert(minted.record.code_hash.length === 64, 'yang disimpan adalah sha256 hex');
   assert(minted.record.expires_at === NOW + iv.INVITE.TTL_DAYS * DAY, 'TTL 14 hari');
+  const minted90 = await iv.mintInvite({ ...good, days: 90 }, NOW);
+  assert(minted90.record.expires_at === NOW + 90 * DAY, 'TTL kustom 90 hari');
 
   const hash = await iv.hashCode(minted.code);
   assert(iv.inviteStatus(minted.record, NOW) === 'ACTIVE', 'undangan baru = ACTIVE');
