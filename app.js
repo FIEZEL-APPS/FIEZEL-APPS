@@ -7429,7 +7429,7 @@ function openFiezelAuthModal(initialTab){
     if(currentTab==='login'){
       tabContent=`<div class="auth-form">
         <label class="auth-field-label">Handle Akun
-          <input id="authLoginHandle" type="text" placeholder="contoh: budi_123" maxlength="20" autocomplete="username">
+          <input id="authLoginHandle" type="text" placeholder="Username / nama akun" maxlength="50" autocomplete="username">
         </label>
         <label class="auth-field-label">Kata Sandi
           <input id="authLoginPassword" type="password" placeholder="Masukkan kata sandi" autocomplete="current-password">
@@ -7442,10 +7442,10 @@ function openFiezelAuthModal(initialTab){
     } else if(currentTab==='register'){
       tabContent=`<div class="auth-form">
         <label class="auth-field-label">Handle Akun
-          <input id="authRegHandle" type="text" placeholder="3–20 karakter (huruf, angka, _)" maxlength="20" autocomplete="username">
+          <input id="authRegHandle" type="text" placeholder="Username bebas (1–50 karakter)" maxlength="50" autocomplete="username">
         </label>
         <label class="auth-field-label">Kata Sandi
-          <input id="authRegPassword" type="password" placeholder="Minimal 10 karakter" autocomplete="new-password">
+          <input id="authRegPassword" type="password" placeholder="Kata sandi bebas" autocomplete="new-password">
         </label>
         <label class="auth-field-label">Konfirmasi Kata Sandi
           <input id="authRegConfirm" type="password" placeholder="Ulangi kata sandi" autocomplete="new-password">
@@ -7459,10 +7459,10 @@ function openFiezelAuthModal(initialTab){
       const needCredentials=!acc;
       const extraFields=needCredentials
         ?`<label class="auth-field-label">Handle Pengajar Baru
-            <input id="authTeacherHandle" type="text" placeholder="3–20 karakter (huruf, angka, _)" maxlength="20" autocomplete="username">
+            <input id="authTeacherHandle" type="text" placeholder="Username pengajar bebas" maxlength="50" autocomplete="username">
           </label>
           <label class="auth-field-label">Kata Sandi Baru
-            <input id="authTeacherPassword" type="password" placeholder="Minimal 10 karakter" autocomplete="new-password">
+            <input id="authTeacherPassword" type="password" placeholder="Kata sandi bebas" autocomplete="new-password">
           </label>`
         :`<p class="muted" style="font-size:0.85rem">Anda sedang masuk sebagai <b>@${esc(acc.handle)}</b>. Masukkan kode undangan guru untuk mengaktifkan akun ini.</p>`;
 
@@ -7519,7 +7519,8 @@ function openFiezelAuthModal(initialTab){
             const password=$('authLoginPassword')?.value;
             const res=await self.FiezelAccount?.login?.({handle,password});
             if(res?.ok){
-              showToast(`Berhasil masuk sebagai @${res.account.handle}`);
+              const h=res.account?.handle||self.FiezelAccount?.getAccount?.()?.handle||handle;
+              showToast(`Berhasil masuk sebagai @${h}`);
               closeModal();
               setTimeout(openSettings,100);
               return;
@@ -7534,7 +7535,8 @@ function openFiezelAuthModal(initialTab){
             const confirmPassword=$('authRegConfirm')?.value;
             const res=await self.FiezelAccount?.register?.({handle,password,confirmPassword});
             if(res?.ok){
-              showToast(`Akun @${res.account.handle} berhasil dibuat!`);
+              const h=res.account?.handle||self.FiezelAccount?.getAccount?.()?.handle||handle;
+              showToast(`Akun @${h} berhasil dibuat!`);
               closeModal();
               setTimeout(openSettings,100);
               return;
