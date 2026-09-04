@@ -304,6 +304,12 @@
       case 'logout':
         persist();
         if (confirm('Keluar dari akun guru?')) {
+          try { localStorage.removeItem('fz_teacher_mode'); } catch(_) {}
+          if (root.state && root.state.preferences) {
+            root.state.preferences.role = 'murid';
+            root.state.view = 'home';
+            try { root.save?.(); } catch(_) {}
+          }
           if (root.FiezelAccount && root.FiezelAccount.logout) {
             root.FiezelAccount.logout().then(function () {
               location.reload();

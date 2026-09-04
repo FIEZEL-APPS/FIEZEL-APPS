@@ -4175,7 +4175,7 @@ async function load(){const root=document.baseURI;/* W1 P0-1 (16-001): fetch ban
   V=V.map(v=>{const rawTranslation=v.exampleTranslation||v.examples?.[0]?.translation||v.examples?.[0]?.id||'';const exampleTranslation=/^[a-z]\d?[a-z]?_\d+$/i.test(rawTranslation)?'':rawTranslation;return{id:v.id,word:v.word,phonetic:v.phonetic||'',partOfSpeech:v.partOfSpeech||'',level:v.level||v.cefr||'',meaning:v.meaning||v.meanings?.[0]?.meaning||'',example:v.example||v.examples?.[0]?.en||'',exampleTranslation,topic:v.topic||'general',difficulty:v.difficulty||({A1:1,A2:2,B1:3,B2:4,C1:5,C2:6}[v.level]||3),synonyms:v.synonyms||[],antonyms:v.antonyms||[],collocations:v.collocations||[],commonMistakes:v.commonMistakes||[],relatedWords:v.relatedWords||[],usageNotes:v.usageNotes||'',status:v.status||'needs_review',canary:v.__fiezelCanary||null}}).filter(v=>v.status==='complete'&&LEVELS.includes(v.level)&&v.word&&v.meaning);
   // W4-MERGE: simpan hasil hidrasi id lalu terapkan locale aktif (id = no-op referensial).
   CONTENT_BASE={g:G,items:GRAMMAR_ITEMS,v:V,r:R};applyContentLocale();
-  backfillPolicyOutcomes();$('version').textContent=`v${APP_VERSION}`;startCelestialClock();startWelcomeExperience();startUpdateWatcher()}
+  backfillPolicyOutcomes();$('version').textContent=`v${APP_VERSION}`;startCelestialClock();startRoleResolution();startWelcomeExperience();startUpdateWatcher()}
 // m025-115: dua sistem ikon hidup berdampingan dengan sengaja. Set duotone FIEZEL
 // (features/ui/fiezel-icons.js) memegang kroma yang dilihat murid tiap hari - tab bar,
 // kartu modul, kartu skill, wajah pembimbing - karena di situlah kesan "template" dibuat
@@ -5605,9 +5605,9 @@ async function checkUrlTeacherToken(){
   try{
     const url=new URL(location.href);
     const token=url.searchParams.get('token')||url.searchParams.get('teacher_token')||url.searchParams.get('guru_token')||url.searchParams.get('invite_teacher');
-    if(!token)return;
+    if(!token)return null;
     const core=accountCore();
-    if(!core||!core.activateTeacher)return;
+    if(!core||!core.activateTeacher)return null;
     url.searchParams.delete('token');
     url.searchParams.delete('teacher_token');
     url.searchParams.delete('guru_token');
@@ -5616,6 +5616,7 @@ async function checkUrlTeacherToken(){
     showToast('Mengaktifkan akses Ruang Guru...');
     const res=await core.activateTeacher({code:token});
     if(res&&res.ok){
+      try{localStorage.setItem('fz_teacher_mode','1')}catch(_){}
       const tName=res.account?.teacherName||'Guru';
       showToast(`Selamat datang, ${tName}! Ruang Guru aktif.`);
       try{
@@ -5624,15 +5625,60 @@ async function checkUrlTeacherToken(){
         }
       }catch(_){}
       state.preferences={...state.preferences,role:'guru'};
+      state.view='tutor';
       try{save()}catch(_){}
-      go('tutor');
+      if(appOpened&&state.view!=='tutor')go('tutor');
+      return res;
     }else{
       showToast(res?.message||'Token guru tidak valid atau telah kadaluwarsa.');
+      return res;
     }
-  }catch(_){}
+  }catch(_){return null}
+}
+let roleResolutionPromise=null;
+function startRoleResolution(){
+  if(roleResolutionPromise)return roleResolutionPromise;
+  roleResolutionPromise=(async()=>{
+    try{
+      const tokRes=await checkUrlTeacherToken();
+      if(tokRes?.ok)return 'teacher';
+    }catch(_){}
+    if(isVerifiedTeacher()){
+      state.view='tutor';
+    }
+    try{
+      const core=accountCore();
+      if(core?.refresh){
+        const r=await core.refresh();
+        if(r?.ok){
+          if(core.role()==='teacher'){
+            try{localStorage.setItem('fz_teacher_mode','1')}catch(_){}
+            state.preferences={...state.preferences,role:'guru'};
+            state.view='tutor';
+            try{save()}catch(_){}
+            return 'teacher';
+          }else if(core.role()==='learner'){
+            if(!self.FiezelTeacherShell?.previewAllowed?.()){
+              try{localStorage.removeItem('fz_teacher_mode')}catch(_){}
+              if(state.preferences?.role==='guru'){
+                state.preferences={...state.preferences,role:'murid'};
+                try{save()}catch(_){}
+              }
+            }
+          }
+        }
+      }
+    }catch(_){}
+    return isVerifiedTeacher()?'teacher':'learner';
+  })();
+  return roleResolutionPromise;
 }
 function openApp(){
   if(appOpened)return true;appOpened=true;
+  if(isVerifiedTeacher()){
+    state.view='tutor';
+    document.body?.classList?.add?.('fz-teacher-mode');
+  }
   // Sesi lama bisa saja masih memegang kelas kunci m025-34 di <body> (mis. tab yang dibuka
   // sebelum rilis ini). Dibersihkan sekali di sini supaya .app/.bottomnav tidak tetap
   // tersembunyi oleh aturan CSS yang sekarang tidak pernah dipasang lagi.
@@ -5893,30 +5939,29 @@ function afterOnboardingExit(action){
 // penyebab utama kesan "app abal-abal". Sekarang splash tampil lebih dulu untuk SEMUA
 // murid, dan tawarannya menyusul di ujung: splash -> (perkenalan bila belum) -> tawaran.
 function startWelcomeExperience(){
+  startRoleResolution();
   if(isVerifiedTeacher()){
-    if(state.view!=='tutor')go('tutor');
-    return null;
+    state.view='tutor';
   }
   let onboardingDone=true;
   try{onboardingDone=self.FiezelOnboarding?.completed?.(self)!==false}catch{}
   return showBrandSplash(Date.now(),at=>{
-    // Perkenalan berakhir di afterOnboardingExit() -> startNotificationInvitation().
-    // Modulnya mengembalikan {shown:boolean}; hanya kalau ia benar-benar TAMPIL tawaran
-    // ditahan, sebab jalur keluarnya sendiri yang akan memanggilnya nanti. Kalau ia menolak
-    // tampil (sudah pernah selesai, maskot belum siap, dst) tawaran dipanggil langsung dari
-    // sini supaya alurnya tidak berhenti di tengah jalan.
-    if(!onboardingDone&&showOnboarding(at)?.shown===true)return null;
-    // m025-117: perkenalan yang sudah pernah selesai tidak lagi menghadang, tetapi murid
-    // yang menyelesaikannya sebelum rilis ini belum pernah ditanya namanya. Satu langkah
-    // itulah yang tampil - dan alur berikutnya (tawaran notifikasi) menunggu di ujungnya,
-    // sama seperti perkenalan penuh, supaya tidak ada dua lapisan bertumpuk di layar.
-    if(askLearnerNameIfMissing(at))return null;
-    // Sampai di sini murid PASTI punya nama (perkenalan mewajibkannya, dan langkah susulan
-    // di atas menutup celah murid lama). Penyegaran harian dikirim dari sini, sesudah alur
-    // perkenalan selesai — bukan di tengahnya, supaya satu permintaan jaringan tidak pernah
-    // berdiri di antara murid dan layar pertamanya.
-    maybeSyncLearnerName(at);
-    return startNotificationInvitation()
+    const proceed=()=>{
+      if(isVerifiedTeacher()){
+        state.view='tutor';
+        dismissBootSplash();
+        return openApp();
+      }
+      if(!onboardingDone&&showOnboarding(at)?.shown===true)return null;
+      if(askLearnerNameIfMissing(at))return null;
+      maybeSyncLearnerName(at);
+      return startNotificationInvitation()
+    };
+    if(roleResolutionPromise){
+      Promise.race([roleResolutionPromise,new Promise(r=>setTimeout(r,1200))]).then(proceed).catch(proceed);
+      return null;
+    }
+    return proceed();
   })
 }
 function dismissWelcome(){return declineStudyNotifications()}
@@ -7843,6 +7888,12 @@ function bindFiezelAccountControls(){
   $('btnFiezelLogout')?.addEventListener('click',async()=>{
     const btn=$('btnFiezelLogout');
     if(btn)btn.disabled=true;
+    try{localStorage.removeItem('fz_teacher_mode')}catch(_){}
+    if(state.preferences?.role==='guru'){
+      state.preferences={...state.preferences,role:'murid'};
+      state.view='home';
+      try{save()}catch(_){}
+    }
     try{
       await self.FiezelAccount?.logout?.();
       showToast('Berhasil keluar dari akun.');
@@ -7867,9 +7918,11 @@ function bindFiezelAccountControls(){
     if(errDiv)errDiv.style.display='none';
     const res=await self.FiezelAccount?.activateTeacher?.({code});
     if(res?.ok){
+      try{localStorage.setItem('fz_teacher_mode','1')}catch(_){}
       const tName=res.account?.teacherName||'Guru';
       showToast(`Akun Guru aktif! Selamat datang, ${tName}.`);
       state.preferences={...state.preferences,role:'guru'};
+      state.view='tutor';
       try{save()}catch(_){}
       closeModal();
       go('tutor');
@@ -10946,6 +10999,12 @@ function nextSessionPanelMarkup(){
 function learnerFlowView(){setApp('<div id="fzLearnerFlow" class="learner-flow-shell"></div>');const mod=self.FiezelLearnerFlow;if(!mod){$('fzLearnerFlow').innerHTML='<p class="muted">Modul alur belajar belum termuat.</p>';return}mod.mount($('fzLearnerFlow'),{toast:showToast,appVersion:APP_VERSION,learnerName,afterRender:enhanceUI})}
 function isVerifiedTeacher(){
   if((self.FiezelAccount?.role?.() === 'teacher') || (self.FiezelAccount?.state?.()?.role === 'teacher'))return true;
+  try{
+    if(localStorage.getItem('fz_teacher_mode')==='1')return true;
+  }catch(_){}
+  try{
+    if(state.preferences?.role==='guru')return true;
+  }catch(_){}
   // Pratinjau lokal (host pengembangan saja, bukan fiezel.my.id): hanya membuka cangkang UI; rute data server tetap menuntut peran guru.
   try{return !!self.FiezelTeacherShell?.previewAllowed?.()}catch{return false}
 }
@@ -12643,9 +12702,11 @@ async function accountSubmit(){
     closeModal();
     const st=core.state();
     if(accountSheetMode==='teacher'||core.role()==='teacher'){
+      try{localStorage.setItem('fz_teacher_mode','1')}catch(_){}
       const tName=res.account?.teacherName||'Guru';
       showToast(`Akun Guru aktif! Selamat datang, ${tName}.`);
       state.preferences={...state.preferences,role:'guru'};
+      state.view='tutor';
       try{save()}catch(_){}
       go('tutor');
       return true;
@@ -12660,6 +12721,10 @@ async function accountSubmit(){
 /** Keluar akun. Cookie identitas TIDAK disentuh: ia pembawa progres anonim, bukan sesi akun. */
 async function fiezelAccountLogout(){
   const core=accountCore();if(!core)return false;
+  try{localStorage.removeItem('fz_teacher_mode')}catch(_){}
+  state.preferences={...state.preferences,role:'murid'};
+  state.view='home';
+  try{save()}catch(_){}
   await core.logout();
   showToast(FiezelI18n.t('account.logout-done'));
   try{render()}catch(_){}
@@ -12680,6 +12745,7 @@ function accountBootRefresh(){
     core.refresh().then(r=>{
       if(r&&r.ok){
         if(isVerifiedTeacher()){
+          try{localStorage.setItem('fz_teacher_mode','1')}catch(_){}
           state.preferences={...state.preferences,role:'guru'};
           try{save()}catch(_){}
           if(state.view!=='tutor')go('tutor');
