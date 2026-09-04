@@ -502,18 +502,62 @@ const idx = (trace, needle) => trace.findIndex((entry) => entry.indexOf(needle) 
       .every((global) => TRANSPORT.indexOf(global) === -1 && read(NOTICE_PATH).indexOf(global) === -1),
     'kontrak ketiga berkas itu tetap di luar jangkauan lapisan transport');
   // Diperiksa terhadap HEAD, bukan terhadap cabang jauh: gerbang harus tetap bisa dijalankan
-  // di klon dangkal (CI) tanpa origin/main. Bila git tidak tersedia, penjaga ini TIDAK
-  // berpura-pura lulus dengan alasan yang salah - ia lulus dengan alasan yang disebutkan.
-  let dirtyLocked = '';
-  let gitAvailable = true;
-  try {
-    dirtyLocked = require('child_process').execSync(
-      'git diff --name-only HEAD -- features/neural-voice/fiezel-web-audio-player.js features/neural-voice/fiezel-prosody.js features/neural-voice/fiezel-neural-voice.js',
-      { cwd: root, stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim();
-  } catch (_) { gitAvailable = false; }
-  check('penjaga: berkas player/prosody/mesin neural tidak berubah di pohon kerja ini',
-    dirtyLocked === '',
-    gitAvailable ? dirtyLocked : 'git tidak tersedia; pemeriksaan pohon kerja dilewati');
+  // di klon dangkal (CI) tanpa origin/main.
+  //
+  // KENAPA INI TIDAK LAGI "LEWAT DIAM-DIAM". Versi pertama penjaga ini menangkap SEMUA
+  // kegagalan `execSync` dan lulus dengan pesan "git tidak tersedia; pemeriksaan dilewati".
+  // Pola itu baru saja terbukti berbahaya di gerbang keunikan nomor build: perintah git-nya
+  // rusak diam-diam di Windows (cmd.exe tidak mengenal kutip tunggal), pencarian selalu
+  // mengembalikan nol hasil, dan gerbangnya hijau selama berhari-hari sambil tidak menjaga
+  // apa pun. Gerbang yang hijau karena perintahnya gagal lebih berbahaya daripada tidak ada
+  // gerbang.
+  //
+  // Dua perubahan menutupnya:
+  //   1. Kondisi lulus di sini adalah KELUARAN KOSONG — persis keluaran yang juga dihasilkan
+  //      git yang rusak tapi keluar dengan kode 0. Jadi keluaran kosong tidak dipercaya
+  //      sebelum satu perintah PEMBUKTI berhasil: `git ls-files` atas ketiga jalur yang sama
+  //      harus mengembalikan ketiganya. Kalau pathspec-nya tidak menemukan apa pun, yang
+  //      sedang kita baca bukan "pohon kerja bersih", melainkan perintah yang tidak bekerja.
+  //   2. Kalau dasar itu tidak terverifikasi, hasilnya bergantung pada mode: lokal → lulus
+  //      dengan PERINGATAN yang menyebut alasannya; `--strict` (dipakai CI) → MERAH.
+  const STRICT = process.argv.includes('--strict');
+  const LOCKED_PATHS = [
+    'features/neural-voice/fiezel-web-audio-player.js',
+    'features/neural-voice/fiezel-prosody.js',
+    'features/neural-voice/fiezel-neural-voice.js'
+  ];
+  const git = (cmd) => {
+    try {
+      return { ok: true, out: require('child_process').execSync(cmd, {
+        cwd: root, encoding: 'utf8', timeout: 60000, stdio: ['ignore', 'pipe', 'ignore']
+      }).trim() };
+    } catch (error) { return { ok: false, out: '', error: String(error && error.message) }; }
+  };
+
+  const tracked = git('git ls-files -- ' + LOCKED_PATHS.join(' '));
+  const baseOk = tracked.ok
+    && LOCKED_PATHS.every((file) => tracked.out.split(/\r?\n/).map((line) => line.trim()).includes(file));
+  const diff = baseOk ? git('git diff --name-only HEAD -- ' + LOCKED_PATHS.join(' ')) : null;
+
+  if (!baseOk) {
+    const alasan = 'git tidak bisa membuktikan ketiga berkas terlacak (' + LOCKED_PATHS.length
+      + ' diminta, terbaca: ' + JSON.stringify(tracked.out) + '), jadi "pohon kerja bersih" '
+      + 'TIDAK TERVERIFIKASI — keluaran kosong di sini tidak bisa dibedakan dari perintah yang rusak.';
+    if (STRICT) {
+      check('penjaga: berkas player/prosody/mesin neural tidak berubah di pohon kerja ini',
+        false, alasan + ' Mode --strict: ini MERAH.');
+    } else {
+      check('penjaga: dasar pemeriksaan pohon kerja terbukti (git terbaca, ketiga berkas terlacak)',
+        true, 'PERINGATAN — ' + alasan + ' Jalankan dengan --strict di CI; lokal ini lulus dengan peringatan.');
+      console.warn('PERINGATAN - ' + alasan);
+    }
+  } else {
+    check('penjaga: dasar pemeriksaan pohon kerja terbukti (git terbaca, ketiga berkas terlacak)',
+      true, LOCKED_PATHS.join(', '));
+    check('penjaga: berkas player/prosody/mesin neural tidak berubah di pohon kerja ini',
+      diff.ok && diff.out === '',
+      diff.ok ? diff.out : ('git diff gagal: ' + diff.error));
+  }
 
   process.on('exit', () => {
     const report = {

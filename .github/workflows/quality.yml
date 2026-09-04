@@ -321,7 +321,9 @@ jobs:
           node voice-pipeline-gap-test.js
           node voice-prefetch-neural-test.js
           node voice-callsite-prefetch-test.js
-          node tts-transport-switch-test.js
+          # --strict: kalau git tidak bisa membuktikan dasar pemeriksaan pohon kerja,
+          # gerbang ini MERAH di CI alih-alih lulus diam-diam.
+          node tts-transport-switch-test.js --strict
           node audio-asset-pipeline-test.js
           node product-audit.js
           node runtime-stage8-test.js
