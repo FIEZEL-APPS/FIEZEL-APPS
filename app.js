@@ -1,5 +1,30 @@
 /* FIEZEL — local-first adaptive English engine */
 const APP_VERSION=self.FIEZEL_VERSION||'5.19.0';
+/* m025-246 — PINTU app.js KE SAKELAR PENYEDERHANAAN PENGALAMAN.
+   ============================================================================
+   Sumber kebenarannya fiezel-ux-flags.js (dimuat index.html sebelum berkas ini).
+   Yang ada di sini hanya pintunya, plus SATU salinan nilai bawaan — dan salinan
+   itu perlu penjelasan, karena duplikasi konfigurasi biasanya cacat.
+
+   Kenapa salinannya ada: ~40 gerbang tes menjalankan app.js di dalam konteks `vm`
+   yang dibangun tangan (lihat adaptive-policy-test.js) dan konteks itu TIDAK
+   memuat fiezel-ux-flags.js. Tanpa nilai bawaan lokal, `uxOn()` di sana menjawab
+   undefined untuk SEMUA bendera, jadi setiap gerbang render akan menguji jalur
+   "semua fitur mati" — termasuk yang seharusnya hidup — dan hijau-nya tidak lagi
+   berarti apa-apa.
+
+   Kenapa duplikasinya aman: ux-flags-test.js membandingkan tabel di bawah dengan
+   FIEZEL_UX_FLAGS milik berkas benderanya, kunci demi kunci, dan MERAH kalau
+   keduanya menyimpang satu nilai pun. Jadi ini duplikasi berpagar, bukan dua
+   sumber kebenaran yang saling bersaing. */
+const UX_FALLBACK_FLAGS={scenePhases:false,skillExams:false,skillsLabDestination:false,personalJourneyTab:false,voicePackGate:false,tutorRole:false,todayHome:true,fourTabNav:true,leanIntro:true,placementLite:true,sessionSummary:true,funnelTelemetry:true};
+/* Nama tak dikenal -> false di KEDUA jalur: salah ketik mematikan fitur (aman),
+   bukan menyalakannya diam-diam. */
+function uxOn(flag){
+  try{const api=self.FiezelUX;if(api&&typeof api.on==='function')return api.on(flag)===true}catch(_){}
+  return UX_FALLBACK_FLAGS[flag]===true;
+}
+function uxOff(flag){return !uxOn(flag)}
 // m025-80 AUDIT (Bagian 6): nama murid tidak boleh dipaku di kode.
 //
 // m025-117 menyelesaikan pekerjaan itu. Sampai rilis ini konstanta di bawah masih berisi
@@ -239,7 +264,7 @@ function validTimeZone(value){
 // sanitizeState (AI-11 F04 pola #3): blob lama tanpa field ini ter-merge mulus ke 'id',
 // tanpa kunci baru, tanpa bump schema. Nilainya enum tertutup FiezelI18n.SUPPORTED ('id'|'th');
 // JANGAN pernah meneruskannya ke opsi audio/voice (audio-locale-guard-test, AI-17 F02).
-const defaultPreferences={haptics:true,feedbackSounds:true,motion:true,neuralVoice:'auto',reminders:null,reportConsent:false,reportEndpoint:DEFAULT_REPORT_ENDPOINT,selfAssessedLevel:'',activeLevel:'',levelMode:'placement',goalProfile:'general',timeZone:detectedTimeZone(),learnerLocale:'id',/* m026 GEO-IP: penanda pilihan bahasa MANUAL murid. Sekali true (murid memilih di onboarding/Pengaturan), deteksi IP tidak pernah menimpanya lagi. localeAutoDetected: sudah pernah dicek lokasi sekali per perangkat supaya tidak fetch tiap buka. */learnerLocaleExplicit:false,localeAutoDetected:false,/* S5b: sinkron otak antar-perangkat. BAWAAN false dan sengaja begitu — bukti belajar tidak boleh mulai meninggalkan perangkat karena sebuah pembaruan mendarat, hanya karena murid memilihnya. */brainSync:false,};
+const defaultPreferences={haptics:true,feedbackSounds:true,motion:true,neuralVoice:'auto',reminders:null,reportConsent:false,reportEndpoint:DEFAULT_REPORT_ENDPOINT,selfAssessedLevel:'',activeLevel:'',levelMode:'placement',goalProfile:'general',timeZone:detectedTimeZone(),learnerLocale:'id',/* m026 GEO-IP: penanda pilihan bahasa MANUAL murid. Sekali true (murid memilih di onboarding/Pengaturan), deteksi IP tidak pernah menimpanya lagi. localeAutoDetected: sudah pernah dicek lokasi sekali per perangkat supaya tidak fetch tiap buka. */learnerLocaleExplicit:false,localeAutoDetected:false,/* S5b: sinkron otak antar-perangkat. BAWAAN false dan sengaja begitu — bukti belajar tidak boleh mulai meninggalkan perangkat karena sebuah pembaruan mendarat, hanya karena murid memilihnya. */brainSync:false,/* m025-246: paket suara offline 152 MB. BAWAAN false, dan itu keputusan, bukan kelalaian: unduhan sebesar itu di kuota seluler tidak boleh dimulai atas nama murid tanpa ia mengiyakan. voicePackAsked mencatat bahwa tawaran kontekstualnya sudah pernah muncul, supaya ia tidak bertanya dua kali. */voicePackOptIn:false,voicePackAsked:false,};
 const defaultReportMeta={lastSentAnswered:0,lastSentAt:0,lastStatus:'not_configured',lastReceipt:'',lastAccessReportDay:'',queue:[]};
 const LOGIN_MESSAGES=__fzI18nTable([],()=>([
   {headline:FiezelI18n.t('login.pesan-01-headline'),lead:FiezelI18n.t('login.pesan-01-lead')},
@@ -1295,7 +1320,7 @@ function sanitizeToursSeen(raw){
 }
 function sanitizeState(raw){
   const rawPreferences=raw?.preferences||{},activeLevel=LEVELS.includes(String(rawPreferences.activeLevel||''))?String(rawPreferences.activeLevel):'';
-  const next={...defaultState,...raw,view:'home',ownerUuid:String(raw?.ownerUuid||'').replace(/[^A-Za-z0-9_-]/g,'').slice(0,128),vocab:raw?.vocab||{},grammar:raw?.grammar||{},reading:raw?.reading||{},history:Array.isArray(raw?.history)?raw.history.filter(h=>h&&typeof h==='object'):[],wrongAnswers:pruneCorruptedReviewEntries(raw?.wrongAnswers),confidenceHistory:Array.isArray(raw?.confidenceHistory)?raw.confidenceHistory:[],sessionHistory:Array.isArray(raw?.sessionHistory)?raw.sessionHistory:[],learningDays:Array.isArray(raw?.learningDays)?raw.learningDays:[],daily:raw?.daily&&typeof raw.daily==='object'?raw.daily:{date:'',count:0,attempts:0,meaningful:false},preferences:{...defaultPreferences,...rawPreferences,activeLevel,levelMode:activeLevel?'manual':'placement',selfAssessedLevel:LEVELS.includes(String(rawPreferences.selfAssessedLevel||''))?String(rawPreferences.selfAssessedLevel):'',timeZone:validTimeZone(rawPreferences.timeZone||defaultPreferences.timeZone),goalProfile:String(rawPreferences.goalProfile||defaultPreferences.goalProfile).slice(0,30),reportEndpoint:String(rawPreferences.reportEndpoint||DEFAULT_REPORT_ENDPOINT).trim(),/* m025-182 W2-STATE: enum tertutup — nilai korup/asing jatuh ke default 'id', bukan lolos mentah */learnerLocale:(self.FiezelI18n?.SUPPORTED||['id','th']).includes(rawPreferences.learnerLocale)?rawPreferences.learnerLocale:defaultPreferences.learnerLocale,/* fail-closed: apa pun selain true persis -> false. State korup tidak boleh bisa menyalakan pengiriman data. */brainSync:rawPreferences.brainSync===true},reportMeta:{...defaultReportMeta,...(raw?.reportMeta||{}),queue:Array.isArray(raw?.reportMeta?.queue)?raw.reportMeta.queue.slice(-8):[]},reminderMeta:{lastNotificationAt:0,lastNotificationDay:'',lastNotificationKind:'',lastMessageIndex:-1,lastPositiveDay:'',evidenceLog:[],...(raw?.reminderMeta||{}),evidenceLog:Array.isArray(raw?.reminderMeta?.evidenceLog)?raw.reminderMeta.evidenceLog.slice(-ALRS_EVIDENCE_LOG_LIMIT):[]},activeSession:raw?.activeSession&&typeof raw.activeSession==='object'?raw.activeSession:null,adaptivePolicyMeta:{lastPolicy:null,lastSource:'',lastAt:0,history:[],...(raw?.adaptivePolicyMeta||{}),history:Array.isArray(raw?.adaptivePolicyMeta?.history)?raw.adaptivePolicyMeta.history.slice(-30):[]},policyOutcomeMeta:{last:null,history:[],queue:[],...(raw?.policyOutcomeMeta||{}),history:Array.isArray(raw?.policyOutcomeMeta?.history)?raw.policyOutcomeMeta.history.slice(-POLICY_OUTCOME_LOG_LIMIT):[],queue:Array.isArray(raw?.policyOutcomeMeta?.queue)?raw.policyOutcomeMeta.queue.slice(-10):[]},contentCanaryMeta:CONTENT_CANARY?CONTENT_CANARY.sanitizeEvidence(raw?.contentCanaryMeta,CONTENT_CANARY_CONFIG?.canaryId||raw?.contentCanaryMeta?.canaryId||''):{...defaultState.contentCanaryMeta},coachCache:raw?.coachCache&&typeof raw.coachCache==='object'?raw.coachCache:null,levelTrust:sanitizeLevelTrust(raw?.levelTrust),gems:sanitizeGemsState(raw?.gems),toursSeen:sanitizeToursSeen(raw?.toursSeen)};
+  const next={...defaultState,...raw,view:'home',ownerUuid:String(raw?.ownerUuid||'').replace(/[^A-Za-z0-9_-]/g,'').slice(0,128),vocab:raw?.vocab||{},grammar:raw?.grammar||{},reading:raw?.reading||{},history:Array.isArray(raw?.history)?raw.history.filter(h=>h&&typeof h==='object'):[],wrongAnswers:pruneCorruptedReviewEntries(raw?.wrongAnswers),confidenceHistory:Array.isArray(raw?.confidenceHistory)?raw.confidenceHistory:[],sessionHistory:Array.isArray(raw?.sessionHistory)?raw.sessionHistory:[],learningDays:Array.isArray(raw?.learningDays)?raw.learningDays:[],daily:raw?.daily&&typeof raw.daily==='object'?raw.daily:{date:'',count:0,attempts:0,meaningful:false},preferences:{...defaultPreferences,...rawPreferences,activeLevel,levelMode:activeLevel?'manual':'placement',selfAssessedLevel:LEVELS.includes(String(rawPreferences.selfAssessedLevel||''))?String(rawPreferences.selfAssessedLevel):'',timeZone:validTimeZone(rawPreferences.timeZone||defaultPreferences.timeZone),goalProfile:String(rawPreferences.goalProfile||defaultPreferences.goalProfile).slice(0,30),reportEndpoint:String(rawPreferences.reportEndpoint||DEFAULT_REPORT_ENDPOINT).trim(),/* m025-182 W2-STATE: enum tertutup — nilai korup/asing jatuh ke default 'id', bukan lolos mentah */learnerLocale:(self.FiezelI18n?.SUPPORTED||['id','th']).includes(rawPreferences.learnerLocale)?rawPreferences.learnerLocale:defaultPreferences.learnerLocale,/* fail-closed: apa pun selain true persis -> false. State korup tidak boleh bisa menyalakan pengiriman data. */brainSync:rawPreferences.brainSync===true,/* fail-closed, alasan yang sama dengan brainSync: state korup tidak boleh bisa memulai unduhan 152 MB. */voicePackOptIn:rawPreferences.voicePackOptIn===true,voicePackAsked:rawPreferences.voicePackAsked===true},reportMeta:{...defaultReportMeta,...(raw?.reportMeta||{}),queue:Array.isArray(raw?.reportMeta?.queue)?raw.reportMeta.queue.slice(-8):[]},reminderMeta:{lastNotificationAt:0,lastNotificationDay:'',lastNotificationKind:'',lastMessageIndex:-1,lastPositiveDay:'',evidenceLog:[],...(raw?.reminderMeta||{}),evidenceLog:Array.isArray(raw?.reminderMeta?.evidenceLog)?raw.reminderMeta.evidenceLog.slice(-ALRS_EVIDENCE_LOG_LIMIT):[]},activeSession:raw?.activeSession&&typeof raw.activeSession==='object'?raw.activeSession:null,adaptivePolicyMeta:{lastPolicy:null,lastSource:'',lastAt:0,history:[],...(raw?.adaptivePolicyMeta||{}),history:Array.isArray(raw?.adaptivePolicyMeta?.history)?raw.adaptivePolicyMeta.history.slice(-30):[]},policyOutcomeMeta:{last:null,history:[],queue:[],...(raw?.policyOutcomeMeta||{}),history:Array.isArray(raw?.policyOutcomeMeta?.history)?raw.policyOutcomeMeta.history.slice(-POLICY_OUTCOME_LOG_LIMIT):[],queue:Array.isArray(raw?.policyOutcomeMeta?.queue)?raw.policyOutcomeMeta.queue.slice(-10):[]},contentCanaryMeta:CONTENT_CANARY?CONTENT_CANARY.sanitizeEvidence(raw?.contentCanaryMeta,CONTENT_CANARY_CONFIG?.canaryId||raw?.contentCanaryMeta?.canaryId||''):{...defaultState.contentCanaryMeta},coachCache:raw?.coachCache&&typeof raw.coachCache==='object'?raw.coachCache:null,levelTrust:sanitizeLevelTrust(raw?.levelTrust),gems:sanitizeGemsState(raw?.gems),toursSeen:sanitizeToursSeen(raw?.toursSeen)};
   /* R6 perbaikan-15/16: penghitung yang rusak TIDAK boleh menghapus bukti belajar.
      (1) Baris history yang korup (null/bukan objek) dibuang SATU-SATU di atas - dulu satu
      baris null membuat hs.map(h=>h.skill) melempar, loadState menangkapnya, dan SELURUH
@@ -4162,17 +4187,48 @@ function refreshIcons(){
 }
 function hexRgb(value){const hex=String(value).replace('#','');return{r:parseInt(hex.slice(0,2),16),g:parseInt(hex.slice(2,4),16),b:parseInt(hex.slice(4,6),16)}}
 function mixHex(a,b,ratio){const x=hexRgb(a),y=hexRgb(b),t=Math.max(0,Math.min(1,ratio)),channel=k=>Math.round(x[k]+(y[k]-x[k])*t).toString(16).padStart(2,'0');return`#${channel('r')}${channel('g')}${channel('b')}`}
-function getScenePalette(minutes){const value=((Number(minutes)||0)%1440+1440)%1440;let left=SCENE_STOPS[0],right=SCENE_STOPS[SCENE_STOPS.length-1];for(let i=0;i<SCENE_STOPS.length-1;i++){if(value>=SCENE_STOPS[i].minute&&value<=SCENE_STOPS[i+1].minute){left=SCENE_STOPS[i];right=SCENE_STOPS[i+1];break}}const ratio=(value-left.minute)/Math.max(1,right.minute-left.minute);return{top:mixHex(left.top,right.top,ratio),bottom:mixHex(left.bottom,right.bottom,ratio)}}
+/* m025-246 — SATU PANGGUNG, BUKAN EMPAT.
+   OWNER: "4 FASE SUASANA DAY/DAWN/DUSK/NIGHT ... INI MENGGANDAKAN QA 4X,
+   MEMBINGUNGKAN MURID". Dengan bendera `scenePhases` mati, palet langit berhenti
+   bergerak sepanjang hari dan mengunci ke satu nilai — nilai yang SAMA PERSIS
+   dengan aturan `.scene-day` di style.css:148, supaya kaskade CSS dan gaya inline
+   yang dipasang updateCelestialClock() tidak pernah menyebut dua warna berbeda.
+   Interpolasi 9 perhentian di bawah tetap utuh dan tetap diuji; ia hanya tidak
+   lagi dipanggil dari jalur murid. */
+const SCENE_STATIC_PALETTE=Object.freeze({top:'#FFE9B8',bottom:'#FFF9EE'});
+/* Kembaran malamnya. Nilainya = --n-panel-soft / --n-bg di style.css, dan --n-bg
+   sendiri = --core. Ia HARUS ada di sini, bukan hanya di CSS: updateCelestialClock()
+   memasang --sky-top/--sky-bottom sebagai gaya INLINE di <html>, dan gaya inline
+   menang atas aturan tema mana pun. Tanpa kembaran ini, murid bertema malam mendapat
+   langit cream yang dipaksakan JavaScript di atas seluruh palet gelap yang benar. */
+const SCENE_NIGHT_PALETTE=Object.freeze({top:'#221A1F',bottom:'#1B1418'});
+const SCENE_STATIC_PHASE='day';
+/* Tema yang BENAR-BENAR tampil. Urutannya sama dengan kontrak tiga keadaan di
+   fiezel-ui-manager.js: atribut eksplisit menang, kalau tidak ada barulah perangkat
+   yang memutuskan. Gagal ke 'light' - harness tes tidak punya matchMedia, dan terang
+   adalah tampilan yang sudah dijaga puluhan gerbang kontras. */
+function activeThemeMode(){
+  try{
+    const attr=document.documentElement?.getAttribute?.('data-theme');
+    if(attr==='dark'||attr==='light')return attr;
+    if(self.matchMedia&&self.matchMedia('(prefers-color-scheme: dark)').matches)return 'dark';
+  }catch(_){}
+  return 'light';
+}
+function getScenePalette(minutes){if(uxOff('scenePhases')){const p=activeThemeMode()==='dark'?SCENE_NIGHT_PALETTE:SCENE_STATIC_PALETTE;return{top:p.top,bottom:p.bottom}}const value=((Number(minutes)||0)%1440+1440)%1440;let left=SCENE_STOPS[0],right=SCENE_STOPS[SCENE_STOPS.length-1];for(let i=0;i<SCENE_STOPS.length-1;i++){if(value>=SCENE_STOPS[i].minute&&value<=SCENE_STOPS[i+1].minute){left=SCENE_STOPS[i];right=SCENE_STOPS[i+1];break}}const ratio=(value-left.minute)/Math.max(1,right.minute-left.minute);return{top:mixHex(left.top,right.top,ratio),bottom:mixHex(left.bottom,right.bottom,ratio)}}
 function getCelestialState(input=new Date()){
   const date=input instanceof Date?input:new Date(input);const minutes=date.getHours()*60+date.getMinutes()+date.getSeconds()/60;
   const isDay=minutes>=SUNRISE_MINUTE&&minutes<SUNSET_MINUTE;
   const elapsed=isDay?minutes-SUNRISE_MINUTE:(minutes>=SUNSET_MINUTE?minutes-SUNSET_MINUTE:minutes+24*60-SUNSET_MINUTE);
   const progress=Math.max(0,Math.min(1,elapsed/(12*60)));const x=3+94*progress;const y=88-Math.sin(Math.PI*progress)*78;
-  const phase=minutes>=5*60&&minutes<8*60?'dawn':minutes>=8*60&&minutes<16*60?'day':minutes>=16*60&&minutes<19*60?'dusk':'night';
+  const phase=uxOff('scenePhases')?SCENE_STATIC_PHASE:(minutes>=5*60&&minutes<8*60?'dawn':minutes>=8*60&&minutes<16*60?'day':minutes>=16*60&&minutes<19*60?'dusk':'night');
   const time=uiFormatter(FiezelI18n.getBcp47(),{hour:'2-digit',minute:'2-digit'},'jam').format(date);const body=isDay?'sun':'moon';
   const position=progress<.18?FiezelI18n.t('home.celestial-posisi-terbit'):progress<.42?FiezelI18n.t('home.celestial-posisi-naik'):progress<.58?FiezelI18n.t('home.celestial-posisi-puncak'):progress<.82?FiezelI18n.t('home.celestial-posisi-turun'):FiezelI18n.t('home.celestial-posisi-tenggelam');
   const palette=getScenePalette(minutes),intensity=isDay ? .56+Math.sin(Math.PI*progress)*.44 : .28+Math.sin(Math.PI*progress)*.2;
-  const light=isDay?`rgba(255,214,132,${(.2+intensity*.38).toFixed(3)})`:`rgba(190,211,255,${(.14+intensity*.28).toFixed(3)})`;
+  /* Halo di sekeliling matahari/bulan ikut dibekukan bersama paletnya: sebuah halo yang
+     tetap bergerak di atas langit yang diam terbaca sebagai kedip, bukan sebagai waktu.
+     Nilainya sama dengan --scene-light milik `.scene-day` (style.css:148). */
+  const light=uxOff('scenePhases')?(activeThemeMode()==='dark'?'rgba(255,224,126,0.120)':'rgba(255,224,126,0.420)'):(isDay?`rgba(255,214,132,${(.2+intensity*.38).toFixed(3)})`:`rgba(190,211,255,${(.14+intensity*.28).toFixed(3)})`);
   return{body,phase,progress:Number(progress.toFixed(4)),x:Number(x.toFixed(2)),y:Number(y.toFixed(2)),time,position,palette,light,label:isDay?FiezelI18n.t('home.celestial-label-matahari'):FiezelI18n.t('home.celestial-label-bulan'),detail:FiezelI18n.t('home.celestial-detail',{benda:FiezelI18n.t(isDay?'home.celestial-matahari':'home.celestial-bulan'),posisi:position,pukul:time})}
 }
 function celestialStatusMarkup(){const c=getCelestialState();return`<span class="celestial-status" id="celestialStatus" title="${esc(c.detail)}"><i data-lucide="clock-3"></i><b id="celestialTime">${esc(c.time)}</b><span id="celestialDetail">${esc(FiezelI18n.t('home.celestial-status',{benda:FiezelI18n.t(c.body==='sun'?'home.celestial-matahari':'home.celestial-bulan'),posisi:c.position}))}</span></span>`}
@@ -4185,8 +4241,27 @@ function updateCelestialClock(input=new Date()){
   document.querySelector?.('meta[name="theme-color"]')?.setAttribute?.('content',c.palette.top);
   if($('celestialTime'))$('celestialTime').textContent=c.time;if($('celestialDetail'))$('celestialDetail').textContent=FiezelI18n.t('home.celestial-status',{benda:FiezelI18n.t(c.body==='sun'?'home.celestial-matahari':'home.celestial-bulan'),posisi:c.position});if($('celestialStatus'))$('celestialStatus').title=c.detail;refreshIcons();return c
 }
-let celestialTimer=null;
-function startCelestialClock(){updateCelestialClock();if(typeof setInterval!=='function')return;if(celestialTimer&&typeof clearInterval==='function')clearInterval(celestialTimer);celestialTimer=setInterval(updateCelestialClock,30000);celestialTimer.unref?.()}
+let celestialTimer=null,themeWatchBound=false;
+/* m025-246: perangkat bisa berganti skema warna SELAGI aplikasi terbuka - iOS dan
+   Android menjadwalkannya otomatis saat matahari terbenam. Token CSS ikut berganti
+   sendiri lewat @media, TETAPI --sky-top/--sky-bottom dipasang sebagai gaya inline
+   oleh updateCelestialClock() dan gaya inline tidak mendengarkan @media. Tanpa
+   pengait di bawah, murid yang ponselnya berganti ke gelap pukul 18.00 mendapat
+   seluruh aplikasi gelap dengan satu langit cream yang tertinggal di belakangnya.
+   Hanya dipasang sekali (themeWatchBound) - startCelestialClock dipanggil ulang
+   setiap kali konten dihidrasi. */
+function watchThemeChanges(){
+  if(themeWatchBound)return;
+  try{
+    const mq=self.matchMedia?.('(prefers-color-scheme: dark)');
+    if(!mq)return;
+    const onChange=()=>{try{updateCelestialClock()}catch(_){}};
+    if(typeof mq.addEventListener==='function')mq.addEventListener('change',onChange);
+    else if(typeof mq.addListener==='function')mq.addListener(onChange);
+    themeWatchBound=true;
+  }catch(_){}
+}
+function startCelestialClock(){updateCelestialClock();watchThemeChanges();if(typeof setInterval!=='function')return;if(celestialTimer&&typeof clearInterval==='function')clearInterval(celestialTimer);celestialTimer=setInterval(updateCelestialClock,30000);celestialTimer.unref?.()}
 function enhanceUI(){document.body?.classList?.toggle('reduce-motion',state.preferences?.motion===false);updateCelestialClock();try{document.getElementById('fiezelDiagOpen')?.setAttribute('tabindex','-1')}catch(_){}/* v31-1 2026-08-29: tombol diagnostik 1x1 tak terlihat ikut urutan Tab di semua layar \u2014 gestur rahasianya pakai click(), bukan fokus keyboard; file panelnya diklaim tim neural-voice jadi perbaikannya dari sisi app. */(window.requestAnimationFrame||setTimeout)(refreshIcons)}
 // m028 fase3 (PATCH-PLAN §8/§9.3): setApp adalah corong tunggal SEMUA layar, jadi
 // di sinilah panggung dicatat. Layar kuis digambar langsung dari quizLoop tanpa
@@ -4523,7 +4598,47 @@ function presentPuterAuthGateIfNeeded(){
   markPuterPopupShown(at);
   document.body?.classList?.add?.('auth-locked');setAuthGateState('idle');
   if(!authRetryBound){authRetryBound=true;document.addEventListener?.('visibilitychange',()=>{if(document.visibilityState==='visible'&&document.body?.classList?.contains('auth-locked')&&puterSignedIn())completeAuthGate()})}
+  armOfflineAuthGateEscape();
   return true
+}
+/* m025-246 — GERBANG AKUN TIDAK BOLEH MENGURUNG MURID YANG SEDANG OFFLINE.
+   OWNER (edge case wajib): "Offline saat gerbang akun: timeout <=3 detik ke 'Lanjut
+   tanpa akun' otomatis."
+
+   Gerbang ini memasang `.auth-locked` di <body>, dan kelas itu benar-benar mengunci
+   layar (style.css:438). Satu-satunya tombol yang membukanya - "Lanjutkan dengan
+   Puter" - butuh jaringan. Murid yang membuka FIEZEL di angkot tanpa sinyal karena
+   itu menatap gerbang yang tidak punya jalan keluar sampai sinyalnya kembali.
+
+   TIGA DETIK, dan bukan lebih: itu batas yang diminta owner, dan ia juga batas yang
+   masuk akal - login Puter yang sehat menyelesaikan handshake jauh di bawah itu.
+
+   YANG DILAKUKANNYA sengaja BUKAN sekadar menyembunyikan gerbang: ia memanggil
+   skipPuterSignIn(), jalur "Lanjut tanpa akun" yang sudah ada. Jadi kunci dilepas,
+   kuis yang tertunda ikut jalan (runPendingAfterGateFn), dan penandanya tercatat -
+   satu perilaku, bukan dua yang harus terus disepakatkan.
+
+   TIDAK menutup gerbang yang sedang bekerja: kalau murid sudah menekan tombol
+   (status 'pending') atau sudah masuk, jam ini mundur dan tidak melakukan apa pun. */
+const OFFLINE_AUTH_ESCAPE_MS=3000;
+let offlineAuthEscapeTimer=null;
+function offlineNow(){try{return typeof navigator!=='undefined'&&navigator.onLine===false}catch(_){return false}}
+function armOfflineAuthGateEscape(){
+  if(!offlineNow())return false;
+  if(offlineAuthEscapeTimer)return false;
+  if(typeof setTimeout!=='function')return false;
+  const note=$('authGateStatus');
+  if(note){try{note.textContent=FiezelI18n.t('account.offline-catatan')}catch(_){}}
+  offlineAuthEscapeTimer=setTimeout(()=>{
+    offlineAuthEscapeTimer=null;
+    try{
+      if(!document.body?.classList?.contains?.('auth-locked'))return;
+      if(puterSignedIn())return;
+      skipPuterSignIn();
+    }catch(_){}
+  },OFFLINE_AUTH_ESCAPE_MS);
+  offlineAuthEscapeTimer?.unref?.();
+  return true;
 }
 /**
  * m026-02 pemberitahuan kredit habis - MILIK FIEZEL, bukan dialog SDK.
@@ -5033,6 +5148,44 @@ function anSessionEnded(session){
     });
   }catch{return false}
 }
+/* m025-246 — DUA PEMANCAR FUNNEL MASUK.
+   OWNER: "Instrumentasi funnel (opt-in, agregat, tanpa PII): launch->soal pertama,
+   selesai sesi, kembali D1/D7, skip rate."
+
+   OPT-IN sudah dijamin di lapisan bawah dan TIDAK diulang di sini: anGateOpen()
+   menuntut cfStaticMode('usage')==='on' DAN modul analytics menuntut persetujuannya
+   sendiri sebelum membuat installId, menulis antrean, atau mengirim apa pun. Dua
+   fungsi di bawah karena itu tidak boleh punya gerbang ketiga - gerbang ketiga adalah
+   tempat kebijakan privasi mulai menyimpang dari dirinya sendiri.
+
+   TANPA PII, secara struktur: keduanya hanya mengirim ember dan enum tertutup yang
+   sudah didefinisikan CLIENT_EVENT_SPEC, dan payload apa pun tetap dipindai ulang
+   pola PII sebelum dikirim (scanForPii di modul analytics). */
+const AN_FIRST_QUESTION_EDGES=[[30000,'<30s'],[60000,'30-60s'],[180000,'60-180s']];
+let anFirstQuestionSent=false;
+function anFirstQuestionBucket(ms){
+  for(const [limit,label] of AN_FIRST_QUESTION_EDGES)if(ms<limit)return label;
+  return '180s+';
+}
+/* Sekali per pemuatan halaman. Diukur dari saat dokumen mulai dimuat sampai soal
+   PERTAMA benar-benar tercat - bukan sampai tombol ditekan, karena yang dijanjikan
+   owner adalah "soal pertama <60 detik", dan soal yang sudah diminta tapi belum
+   tergambar belum menepati janji itu. */
+function anFirstQuestion(){
+  if(anFirstQuestionSent)return false;
+  anFirstQuestionSent=true;
+  try{
+    let ms=0;
+    try{ms=Math.max(0,Math.round(performance.now()))}catch(_){ms=0}
+    const cold=isColdLaunch();
+    return anEmit(c=>{anSwallow(c.track('first_question',anFields('first_question',{elapsed_bucket:anFirstQuestionBucket(ms),cold})))});
+  }catch{return false}
+}
+/* Skip rate. `reason` dibatasi tiga nilai tertutup di CLIENT_EVENT_SPEC; nilai lain
+   dibuang oleh validator modul analytics, bukan diteruskan mentah. */
+function anQuestionSkipped(domain,level,reason){
+  try{return anEmit(c=>{anSwallow(c.track('question_skipped',anFields('question_skipped',{domain:String(domain||''),level:anLevel(level),reason:String(reason||'learner_choice')})))})}catch{return false}
+}
 /* app_open + retention_ping + pelampung pagehide, sekali per pemuatan halaman. */
 function anBoot(){
   if(anStarted)return false;
@@ -5052,6 +5205,8 @@ self.FiezelAnalyticsEmitter=Object.freeze({
   boot:anBoot,
   sessionStarted:anSessionStarted,
   sessionEnded:anSessionEnded,
+  firstQuestion:anFirstQuestion,
+  questionSkipped:anQuestionSkipped,
   markActive:anMarkActive,
   gateOpen:anGateOpen,
   fields:anFields,
@@ -5537,11 +5692,104 @@ function armPuterAuthGate(){
  * tanpa bertanya. OWNER menerima ongkos datanya secara sadar (152 MB), dan itu memang
  * ongkos yang nyata - lihat catatan kuota di kepala fiezel-voice-offline-autoload.js.
  */
+/* m025-246 — 152 MB BERHENTI MENGALIR TANPA DITANYA.
+ * OWNER: "Gerbang paket suara 119 MB - pindah ke Pengaturan + prompt kontekstual saat
+ * latihan pertama."
+ *
+ * Yang ada sebelum baris ini bukan gerbang, melainkan kebalikannya: sejak m025-236
+ * unduhan 152 MB menyala di boot PERTAMA untuk SEMUA murid, tanpa satu pun layar
+ * menyebutnya. Untuk murid di kuota seluler Indonesia itu keputusan besar yang dibuat
+ * atas namanya. Owner meminta keduanya diperbaiki sekaligus - gerbangnya hilang DAN
+ * unduhannya berhenti diam-diam - dan tempatnya menjadi dua: sakelar di Pengaturan,
+ * plus satu tawaran kontekstual saat murid pertama kali menyentuh latihan yang berbunyi.
+ *
+ * YANG TIDAK RUSAK KARENA INI: suara tetap berbunyi tanpa paket ini selama ada jaringan
+ * (mesin server), dan kalau mesin itu gagal ada jatuh-balik suara peramban di layar
+ * dengar (playWithBrowserVoice di addon). Paket lokal adalah tambahan untuk belajar
+ * tanpa sinyal - persis peran yang sudah tertulis di kepala kartu Pengaturan.
+ */
+function voicePackOptedIn(){return state?.preferences?.voicePackOptIn===true}
 function armOfflineVoiceAutoload(){
+  /* Bendera ON = perilaku lama (unduh di boot, tanpa bertanya). Bendera OFF = hanya
+     jalan setelah murid mengiyakan. Dua-duanya lewat satu pintu supaya tidak ada
+     jalur kedua yang bisa menyalakan unduhan tanpa melewati keputusan ini. */
+  if(uxOff('voicePackGate')&&!voicePackOptedIn())return false;
   const go=()=>{try{return(self.FiezelVoiceOfflineAutoload?.arm?.()??self.FiezelVoiceOfflineAutoload?.noteSignedIn?.())===true}catch{return false}};
   if(go())return true;
   ensureVoiceRuntime().then(go).catch(()=>{});
   return false
+}
+/* Sakelar murid. Satu-satunya penulis voicePackOptIn, dan ia langsung menyalakan
+   unduhannya - "menyimpan preferensi lalu tidak melakukan apa-apa sampai boot
+   berikutnya" adalah tombol yang terasa rusak. */
+function setVoicePackOptIn(on){
+  state.preferences={...state.preferences,voicePackOptIn:on===true,voicePackAsked:true};save();
+  if(on===true){armOfflineVoiceAutoload();armAccountNudgeAfterModel()}
+  return on===true;
+}
+/* m025-246 — DORONGAN AKUN SESUDAH UNDUHAN MODEL.
+   OWNER (edge case wajib): "akun didorong setelah unduh model".
+
+   Alasannya bukan "supaya lebih banyak yang mendaftar": murid yang baru saja
+   menghabiskan 152 MB kuota untuk paket suara adalah murid yang paling banyak rugi
+   kalau ITP menghapus penyimpanannya tujuh hari kemudian. Titik itulah momen yang
+   jujur untuk menawarkan akun - biayanya sudah dikeluarkan, dan tawarannya berbunyi
+   "amankan yang sudah kamu bayar", bukan "daftar dulu baru boleh belajar".
+
+   SEKALI, dan hanya kalau perlu: sudah punya akun -> diam; sudah pernah ditawari ->
+   diam; unduhan belum selesai -> menunggu, tidak memaksa.
+
+   Jamnya berhenti sendiri: `armed` menjaga hanya ada satu pemeriksa hidup, dan
+   pemeriksanya membatalkan diri setelah tawaran keluar atau setelah batas percobaan
+   habis - jam yang berdetak selamanya di perangkat murid adalah baterai yang habis
+   tanpa satu piksel pun imbalan. */
+const ACCOUNT_NUDGE_KEY='fiezel-account-nudge-after-model';
+let accountNudgeArmed=false;
+function accountNudgeDone(){try{return localStorage.getItem(ACCOUNT_NUDGE_KEY)==='1'}catch(_){return false}}
+function armAccountNudgeAfterModel(){
+  if(accountNudgeArmed||accountNudgeDone())return false;
+  if(typeof setInterval!=='function')return false;
+  accountNudgeArmed=true;
+  let ticks=0;
+  const timer=setInterval(()=>{
+    ticks++;
+    /* 120 detak x 30 detik = satu jam. Unduhan yang belum selesai dalam satu jam
+       sedang tidak berjalan; tawarannya akan datang lagi di boot berikutnya lewat
+       jalur yang sama, bukan dari jam yang tidak pernah mati. */
+    if(ticks>120){clearInterval(timer);accountNudgeArmed=false;return}
+    let done=false;
+    try{done=self.FiezelVoiceOfflineAutoload?.status?.().done===true}catch(_){done=false}
+    if(!done)return;
+    clearInterval(timer);accountNudgeArmed=false;
+    if(progressBackedUp())return;
+    try{localStorage.setItem(ACCOUNT_NUDGE_KEY,'1')}catch(_){}
+    try{
+      if(self.FiezelStage?.lessonMode?.())return;
+      if(topDialogLayer())return;
+      openModal(`<h2>${FiezelI18n.t('settings.cadangan-judul')}</h2><p>${FiezelI18n.t('settings.cadangan-body')}</p><div class="modal-actions"><button class="primary" id="nudgeAccountYes">${FiezelI18n.t('settings.cadangan-aksi')}</button><button id="nudgeAccountNo">${FiezelI18n.t('suara.tawaran-nanti')}</button></div>`);
+      $('nudgeAccountYes')?.addEventListener('click',()=>{closeModal();openAccountSheet('login')});
+      $('nudgeAccountNo')?.addEventListener('click',()=>closeModal());
+    }catch(_){}
+  },30000);
+  timer?.unref?.();
+  return true;
+}
+window.setVoicePackOptIn=setVoicePackOptIn;
+/* Tawaran kontekstual: SEKALI seumur pemasangan, dan hanya di titik latihan berbunyi -
+   bukan di boot, bukan di perkenalan. Ditolak = tidak pernah ditanya lagi; pintunya
+   tetap ada di Pengaturan. */
+function maybeOfferVoicePack(){
+  if(uxOn('voicePackGate'))return false;
+  if(state?.preferences?.voicePackAsked===true||voicePackOptedIn())return false;
+  if(typeof document==='undefined'||typeof openModal!=='function')return false;
+  /* Tidak menumpuk di atas dialog lain: aturan lapisan yang sama dengan ritual harian
+     dan undangan notifikasi (DIALOG_LAYER_IDS). */
+  try{if(topDialogLayer())return false}catch(_){}
+  state.preferences={...state.preferences,voicePackAsked:true};save();
+  openModal(`<h2>${FiezelI18n.t('suara.tawaran-judul')}</h2><p>${FiezelI18n.t('suara.tawaran-body')}</p><div class="modal-actions"><button class="primary" id="voicePackYes">${FiezelI18n.t('suara.tawaran-unduh')}</button><button id="voicePackNo">${FiezelI18n.t('suara.tawaran-nanti')}</button></div>`);
+  $('voicePackYes')?.addEventListener('click',()=>{setVoicePackOptIn(true);closeModal();showToast(FiezelI18n.t('suara.menyiapkan'))});
+  $('voicePackNo')?.addEventListener('click',()=>{closeModal()});
+  return true;
 }
 // Menampilkan undangan notifikasi. Mengembalikan true HANYA kalau panelnya benar-benar
 // muncul, supaya pemanggil tahu apakah ia perlu melanjutkan alur sendiri.
@@ -5801,7 +6049,7 @@ function openFeedback(prefill){
 function render(){const __renderStartedAt=Date.now();try{return renderInner()}finally{window.__fiezelLastRenderMs=Date.now()-__renderStartedAt;/* [FASE-4] pasang ulang timer kantuk 90 dtk tiap layar dicat (mati sendiri di luar layar santai). */try{pawIdleArm()}catch(_){}/* [OUTFIT G5'] konteks layar untuk resolver outfit (19 §6.1) */try{self.FiezelPawOutfit?.screen?.(state.view)}catch(_){}}}
 // m025-41: render duration is recorded so the diagnostic scanner can see a slow screen,
 // which is how OWNER experienced the Classroom regression before any error was logged.
-function renderInner(){speakingListeningMountToken++;if(speakingListeningController){speakingListeningController.destroy();speakingListeningController=null;/* m026-01: satu-satunya tempat sesi dengar benar-benar bubar. Di dalam if, bukan di luar - kalau tidak, tiap navigasi biasa akan memaksa maskot kembali idle dan memotong selebrasi yang sedang jalan. */pawReact('listening-stop')}document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));setApp('');if(state.view==='home')home();if(state.view==='vocab')vocab();if(state.view==='grammar')grammar();if(state.view==='reading')reading();if(state.view==='skills')skillsLab();if(state.view==='listening')skillsLab('listening');if(state.view==='speaking')skillsLab('speaking');if(state.view==='writing')writing();if(state.view==='classroom')classroom();if(state.view==='library')library();if(state.view==='ask'||state.view==='search')askView();if(state.view==='test')placement();if(state.view==='progress')progress();if(state.view==='online')onlineView();if(state.view==='learn')learnerFlowView();if(state.view==='tutor')tutorCenterView();/* merge SLOT 7 sosial 2026-08-29 */document.querySelector(`[data-view="${state.view}"]`)?.classList.add('active');/* m028 fase3: bendera panggung Skills Lab. Addon listening memaku blok tombolnya ke dasar layar (speaking-listening-addon.css), jadi ia panggung kedua yang bisa ditutupi gelembung. */document.body?.classList?.toggle?.('fz-stage-sl',['skills','listening','speaking'].includes(state.view));/* m028 fase3 (QA §9): Peta Belajar ikut jadi panggung ber-kontrol sejak panel NEXT SESSION punya tombol "Mulai sesi" di dekat dasar layar - screenshot QA menunjukkan gelembung PAW menutupinya utuh. Aturannya sama dengan kuis: peek dilarang, dok mengecil, layar diberi ruang bawah. */document.body?.classList?.toggle?.('fz-stage-map',state.view==='progress');/* 2026-08-29 overhaul I12 (O6 #10): bendera panggung Home. Wajah coach-strip adalah SATU-SATUNYA Pau di Home; gelembung FAB pengambang (Pau kedua, terukur menimpa lipatan hero/skill-hub di 390px) disembunyikan lewat CSS body.fz-stage-home — pola yang sama dengan fz-stage-sl/fz-stage-map, modul gelembung tidak disentuh. */document.body?.classList?.toggle?.('fz-stage-home',state.view==='home');/* q16-P2-2 2026-08-29: hub juga panggung ber-CTA-dekat-dasar (Review Due, Buka flashcards, Mulai 25 soal) \u2014 peek dilarang, dok mengecil, pola sama dengan sl/map. */document.body?.classList?.toggle?.('fz-stage-hub',['vocab','grammar','reading','library','test'].includes(state.view));document.body?.classList?.toggle?.('fz-stage-writing',state.view==='writing');/* v24-F2 2026-08-29: Writing = layar mengarang; FAB disembunyikan via CSS (pola fz-stage-home), modul gelembung tidak disentuh. */enhanceUI();syncCoachBubble();window.scrollTo(0,0)}
+function renderInner(){speakingListeningMountToken++;if(speakingListeningController){speakingListeningController.destroy();speakingListeningController=null;/* m026-01: satu-satunya tempat sesi dengar benar-benar bubar. Di dalam if, bukan di luar - kalau tidak, tiap navigasi biasa akan memaksa maskot kembali idle dan memotong selebrasi yang sedang jalan. */pawReact('listening-stop')}document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));setApp('');if(state.view==='home')home();if(state.view==='latihan')latihan();if(state.view==='vocab')vocab();if(state.view==='grammar')grammar();if(state.view==='reading')reading();if(state.view==='skills')skillsLab();if(state.view==='listening')skillsLab('listening');if(state.view==='speaking')skillsLab('speaking');if(state.view==='writing')writing();if(state.view==='classroom')classroom();if(state.view==='library')library();if(state.view==='ask'||state.view==='search')askView();if(state.view==='test')placement();if(state.view==='progress')progress();if(state.view==='online')onlineView();if(state.view==='learn')learnerFlowView();if(state.view==='tutor')tutorCenterView();/* merge SLOT 7 sosial 2026-08-29 */document.querySelector(`[data-view="${state.view}"]`)?.classList.add('active');/* m028 fase3: bendera panggung Skills Lab. Addon listening memaku blok tombolnya ke dasar layar (speaking-listening-addon.css), jadi ia panggung kedua yang bisa ditutupi gelembung. */document.body?.classList?.toggle?.('fz-stage-sl',['skills','listening','speaking'].includes(state.view));/* m028 fase3 (QA §9): Peta Belajar ikut jadi panggung ber-kontrol sejak panel NEXT SESSION punya tombol "Mulai sesi" di dekat dasar layar - screenshot QA menunjukkan gelembung PAW menutupinya utuh. Aturannya sama dengan kuis: peek dilarang, dok mengecil, layar diberi ruang bawah. */document.body?.classList?.toggle?.('fz-stage-map',state.view==='progress');/* 2026-08-29 overhaul I12 (O6 #10): bendera panggung Home. Wajah coach-strip adalah SATU-SATUNYA Pau di Home; gelembung FAB pengambang (Pau kedua, terukur menimpa lipatan hero/skill-hub di 390px) disembunyikan lewat CSS body.fz-stage-home — pola yang sama dengan fz-stage-sl/fz-stage-map, modul gelembung tidak disentuh. */document.body?.classList?.toggle?.('fz-stage-home',state.view==='home');/* q16-P2-2 2026-08-29: hub juga panggung ber-CTA-dekat-dasar (Review Due, Buka flashcards, Mulai 25 soal) \u2014 peek dilarang, dok mengecil, pola sama dengan sl/map. */document.body?.classList?.toggle?.('fz-stage-hub',['vocab','grammar','reading','library','test'].includes(state.view));document.body?.classList?.toggle?.('fz-stage-writing',state.view==='writing');/* v24-F2 2026-08-29: Writing = layar mengarang; FAB disembunyikan via CSS (pola fz-stage-home), modul gelembung tidak disentuh. */enhanceUI();syncCoachBubble();window.scrollTo(0,0)}
 // m025-115 - pembimbing yang ikut ke mana pun murid pergi (brief bagian 7).
 //
 // Gelembungnya dipasang SEKALI ke <body> dan tidak pernah ikut dicat ulang; yang dikirim
@@ -5844,7 +6092,12 @@ function syncCoachBubble(){
 // m025-115: tiga tujuan baru untuk tiga skill inti tes yang belum punya halamannya
 // sendiri. Tidak ada tujuan lama yang dihapus - brief bagian 2 menyebutnya sebagai
 // batasan pertama: "Nol fitur dihapus."
-const VALID_VIEWS=new Set(['home','vocab','grammar','reading','skills','listening','speaking','writing','test','progress','classroom','library','ask','search','online','learn','tutor']);
+/* m025-246: 'latihan' ditambahkan, TIDAK ADA yang dibuang. Tab bar sekarang hanya
+   menampilkan empat dari daftar ini, tetapi rute lama tetap sah - back-nav murid lama,
+   tautan dalam layar, dan tur semuanya membawa nama view yang sudah ada, dan menghapus
+   satu nama dari himpunan ini akan membuat go() menampilkan toast "halaman tak tersedia"
+   pada perjalanan yang benar-benar valid. */
+const VALID_VIEWS=new Set(['home','latihan','vocab','grammar','reading','skills','listening','speaking','writing','test','progress','classroom','library','ask','search','online','learn','tutor']);
 function prefersReducedMotion(){try{return !!(self.matchMedia&&self.matchMedia('(prefers-reduced-motion: reduce)').matches)}catch(_){return false}}
 // m026-01 - maskot PAW. Tiga pembungkus di bawah ini adalah SATU-SATUNYA cara app.js
 // berbicara dengan <fiezel-mascot>. Alasannya:
@@ -6539,6 +6792,50 @@ function skillHubModel(){
     {id:'writing',view:'writing',label:'Writing',icon:'writing',note:FiezelI18n.t('home.skill-writing',{done:written,goal:WRITING_WEEKLY_TARGET}),ring:written?Math.round(Math.min(1,written/WRITING_WEEKLY_TARGET)*100):null}
   ];
 }
+/* m025-246 — TAB LATIHAN: SATU TUJUAN UNTUK SEMUA LATIHAN MANDIRI.
+   ============================================================================
+   OWNER meminta dua hal yang bertemu di layar ini:
+     "Navigasi: maks 4 tab", dan
+     "Skills Lab sebagai tujuan terpisah - Listening/Speaking dilebur ke sesi harian."
+
+   Yang dilebur ke sesi harian adalah PORSI HARIANNYA (perencana sesi memilih blok
+   dengar/bicara sendiri, murid tidak perlu pergi ke mana pun untuk mendapatkannya).
+   Yang tetap ada di sini adalah LATIHAN MANDIRI - murid yang hari ini memang ingin
+   melatih satu hal tertentu. Menghapus pintunya sama sekali bukan penyederhanaan,
+   itu penghapusan fitur; yang diminta adalah pintunya berhenti menjadi tujuan
+   sejajar di tab bar.
+
+   NAMA INTERNAL TIDAK MUNCUL DI SINI. "Skills Lab" tidak ditulis di satu tempat pun
+   pada layar murid - kartunya berbunyi "Latihan bicara & dengar", persis kalimat
+   yang diminta owner. Rutenya tetap `skills` supaya riwayat back-nav, tautan lama,
+   dan tur listening tidak ada yang patah. */
+function latihanCards(){
+  const cards=[
+    {view:'vocab',icon:'vocab',label:'Vocabulary',note:FiezelI18n.t('latihan.vocab-note')},
+    {view:'grammar',icon:'grammar',label:'Grammar',note:FiezelI18n.t('latihan.grammar-note')},
+    {view:'reading',icon:'reading',label:'Reading',note:FiezelI18n.t('latihan.reading-note')}
+  ];
+  /* Kartu bicara & dengar TETAP ADA di sini, dan itu bukan kelalaian terhadap
+     "Skills Lab sebagai tujuan terpisah - HAPUS". Yang dihapus adalah statusnya
+     sebagai TUJUAN SEJAJAR: ia tidak lagi punya tab sendiri dan tidak lagi punya
+     hub sendiri di beranda. Owner sendiri yang menunjukkan bahwa permukaannya
+     bertahan, di baris PERBAIKI pada brief yang sama: "'Skills Lab' -> 'Latihan
+     bicara & dengar'" - sebuah nama baru hanya berguna untuk sesuatu yang masih
+     dilihat murid. Porsi HARIANNYA sudah dilebur: todayPlanBlocks() menaruh blok
+     dengar/bicara di dalam kartu Hari ini, jadi murid yang hanya mengikuti sesi
+     harian tetap mendapatkannya tanpa pernah membuka kartu ini. */
+  cards.push({view:'skills',icon:'skills',label:FiezelI18n.t('latihan.bicara-dengar'),note:FiezelI18n.t('latihan.bicara-dengar-note')});
+  cards.push({view:'writing',icon:'writing',label:'Writing',note:FiezelI18n.t('latihan.writing-note')});
+  cards.push({view:'library',icon:'library',label:FiezelI18n.t('home.library-card'),note:FiezelI18n.t('latihan.library-note')});
+  return cards.map(c=>`<button class="launch-card" onclick="go('${esc(c.view)}')" aria-label="${esc(c.label)}"><span class="launch-icon"><i class="fz-i" data-fz-icon="${esc(c.icon)}" aria-hidden="true"></i></span><span><small>${esc(c.note)}</small><b>${esc(c.label)}</b></span><i data-lucide="arrow-up-right"></i></button>`).join('');
+}
+function latihan(){
+  /* levelControlMarkup() sudah dipasang shell() di kanan judul, jadi level aktif tetap
+     terbaca DAN tetap bisa diganti dari layar ini - tanpa keping level kedua yang
+     mengulang angka yang sama beberapa piksel di sebelahnya. */
+  shell(FiezelI18n.t('latihan.judul'),FiezelI18n.t('latihan.lead'),
+    `<div class="learning-launcher">${latihanCards()}</div>`);
+}
 function skillHubMarkup(){
   const cards=skillHubModel().map(s=>{
     const measured=s.ring!=null;
@@ -6591,10 +6888,116 @@ function homeStatStripMarkup(level,streak,attempts,review){
   ].filter(Boolean).join('');
   return `<div class="hero-stats">${chips}</div>`
 }
+/* m025-246 — HOME "HARI INI": SATU KARTU, SATU TOMBOL.
+   ============================================================================
+   OWNER: "Home 'Hari ini': satu kartu, satu CTA 'Mulai 10 menit', isi sesi
+   terlihat, streak sekunder."
+
+   YANG DIGANTIKAN, dihitung dari layar lama pada 390px: pita meta + empat keping
+   statistik + baris trust level + kalimat sapaan + strip Coach dengan DUA tombol +
+   blok learner-flow + hub empat skill + blok sosial + judul seksi + grid enam
+   kartu peluncur. Sebelas blok, dan sedikitnya lima di antaranya membawa ajakan
+   aksinya sendiri. Murid yang membuka aplikasi untuk belajar sepuluh menit harus
+   memilih di antara lima pintu sebelum menjawab satu soal pun.
+
+   EMPAT ATURAN LAYAR INI, dan semuanya bisa diperiksa oleh gerbang:
+     1. SATU tombol primer (.primary) di seluruh layar. today-home-test.js
+        menghitungnya dan merah kalau ada dua.
+     2. Isi sesi TERLIHAT sebelum ditekan - murid tahu apa yang akan ia kerjakan,
+        bukan menekan tombol berlabel harapan.
+     3. Runtun SEKUNDER: satu baris kecil di bawah tombol, bukan keping berukuran
+        sama dengan ajakan utamanya. Runtun nol tidak ditampilkan sama sekali -
+        keping "0 hari" hanya mengajarkan bahwa layar ini tempat kegagalan
+        diumumkan (alasan yang sama sudah tertulis di homeStatStripMarkup).
+     4. Blok dengar/bicara ikut di dalam isi sesi. Itu bagian "Listening/Speaking
+        dilebur ke sesi harian" dari brief yang sama: murid mendapatkannya tanpa
+        pergi ke tujuan mana pun.
+
+   Layar lama TIDAK DIHAPUS - ia hidup di homeClassic() di bawah dan kembali utuh
+   begitu bendera `todayHome` dimatikan. */
+function todayPlanBlocks(now=Date.now()){
+  const out=[];
+  try{
+    const built=buildPersonalJourney(now);
+    for(const b of (built?.plan?.blocks||[]).slice(0,3)){
+      out.push({label:`${b.questions} ${JOURNEY_BLOCK_LABELS[b.kind]||b.kind}`,why:String(b.why||'')});
+    }
+  }catch(_){}
+  /* Blok dengar/bicara ditambahkan HANYA kalau perencana belum menyebutnya, dan hanya
+     kalau addon-nya memang ada di build ini - menjanjikan latihan menyimak lalu
+     mendaratkan murid di kartu "gagal dimuat" lebih buruk daripada tidak menjanjikan. */
+  const punyaSuara=!!self.FiezelSLAddon||!!self.FIEZEL_SPEAKING_LISTENING_CONFIG;
+  const sudahAda=out.some(x=>/dengar|bicara|simak/i.test(x.label+' '+x.why));
+  if(punyaSuara&&!sudahAda&&out.length)out.push({label:FiezelI18n.t('latihan.bicara-dengar'),why:FiezelI18n.t('latihan.bicara-dengar-note')});
+  return out;
+}
+/* Ringkasan angka untuk baris "{soal} soal . sekitar {menit} menit". Diambil dari
+   policy adaptif yang SAMA dengan yang dipakai panel di Progres, jadi dua layar tidak
+   pernah menjanjikan panjang sesi yang berbeda. */
+function todaySessionShape(){
+  try{const p=buildAdaptivePolicy();if(p)return{soal:p.sessionSize,menit:p.estimatedMinutes}}catch(_){}
+  return{soal:10,menit:10};
+}
+function todayHomeMarkup(){
+  const trust=levelTrustState(state),locked=trust.locked===true;
+  const examLevel=nextVerifiableLevel(state)||verifiedLevel(state);
+  const streak=Number(state.streak)||0;
+  /* Modul target harian dimuat malas dan bisa belum ada saat cat pertama; opsional-
+     berantai + `===true` membuat "belum tahu" dibaca sebagai BELUM selesai, yang
+     adalah arah aman: kartu yang menawarkan sesi lebih baik daripada kartu yang
+     mengumumkan selesai kepada murid yang belum mengerjakan apa pun hari ini. */
+  let selesai=false;try{selesai=!state.activeSession&&self.FiezelDailyTarget?.status?.().met===true}catch(_){}
+  const shape=todaySessionShape();
+  const blocks=todayPlanBlocks();
+  /* SATU aksi, dipilih di satu tempat. Urutannya adalah urutan kepentingan, dan
+     tiap cabang sudah ada di aplikasi sebelum layar ini - tidak ada jalur baru yang
+     diciptakan di sini, hanya satu tombol yang memilih di antaranya.
+       terkunci        -> ujian level (gerbang kepercayaan level, m025-166)
+       sesi tertunda   -> lanjutkan, bukan mulai dari nol
+       belum tes       -> placement dulu; tanpa itu soal pertama A1 untuk semua
+       sudah siap      -> sesi adaptif
+       pasca-placement -> latihan level (startAdaptive menolak sebelum bukti cukup) */
+  let aksi,label;
+  if(locked){aksi=`openActiveLevelExamPanel('${esc(examLevel)}')`;label=FiezelI18n.t('home.entry-exam-cta',{exam:esc(LEVEL_GUARD_COPY.entryExam),level:esc(examLevel)});}
+  else if(state.activeSession){aksi='startAdaptive()';label=FiezelI18n.t('today.cta-lanjut');}
+  else if(!state.placementDone){aksi="go('test')";label=FiezelI18n.t('today.cta-kenalan');}
+  else if(state.adaptiveReady){aksi='startAdaptive()';label=FiezelI18n.t('today.cta');}
+  else{aksi=`startLevelPractice('${esc(getActiveLevel())}')`;label=FiezelI18n.t('today.cta');}
+
+  const isi=blocks.length
+    ? `<ul class="today-blocks">${blocks.map((b,i)=>`<li style="--ti:${i}"><b>${esc(b.label)}</b>${b.why?`<span>${esc(b.why)}</span>`:''}</li>`).join('')}</ul>`
+    : `<p class="today-empty">${esc(state.placementDone?FiezelI18n.t('today.blok-kosong'):FiezelI18n.t('today.belum-kenal'))}</p>`;
+
+  /* Sesi hari ini sudah tuntas: kartunya berganti isi, TIDAK berganti jumlah tombol.
+     Tombol tambahannya sengaja bukan .primary - target harian sudah tercapai, dan
+     mendorong sesi kedua dengan tombol sekuat tombol utama adalah pola yang membuat
+     aplikasi belajar terasa menagih. */
+  const badan=selesai
+    ? `<h2 class="today-title">${FiezelI18n.t('today.selesai-judul')}</h2>
+       <p class="today-lead">${FiezelI18n.t('today.selesai-body')}</p>
+       <button type="button" class="today-cta-soft" onclick="${aksi}">${esc(FiezelI18n.t('today.selesai-cta'))} <i data-lucide="arrow-up-right"></i></button>`
+    : `<h2 class="today-title">${esc(FiezelI18n.t('today.judul-sapaan',{nama:learnerName()}))}</h2>
+       <p class="today-lead">${esc(FiezelI18n.t('today.ringkas',{soal:shape.soal,menit:shape.menit}))}</p>
+       <h3 class="today-isi-head">${FiezelI18n.t('today.isi-judul')}</h3>
+       ${isi}
+       <button class="primary luxe today-cta" onclick="${aksi}">${esc(label)} <i data-lucide="arrow-right"></i></button>`;
+
+  return `<section class="today-card" aria-label="${esc(FiezelI18n.t('today.aria-kartu'))}">
+  <div class="today-head"><span class="today-eyebrow">${FiezelI18n.t('today.eyebrow')}</span>${pawFaceMarkup()}</div>
+  ${badan}
+  ${streak>0?`<p class="today-streak"><i class="fz-i" data-fz-icon="flame" aria-hidden="true"></i> ${esc(FiezelI18n.t('today.streak',{days:streak}))}</p>`:''}
+  ${activeLevelTrustLineMarkup()}
+</section>`;
+}
 function home(){pawStreakWatch();/* m028-06: kabar demosi yang tertahan selama kuis dibuka di sini, bukan di tengah soal. */if(!state.activeSession&&levelTrustState(state).pendingNotice)setTimeout(()=>{try{flushLevelGuardNotice()}catch(_){}},280);/* W1 P1-2: kabar percobaan-terputus dari boot (sanitizeState) diumumkan SEKALI di beranda. */if(state.pendingInterruptNotice){const iNotice=state.pendingInterruptNotice;state.pendingInterruptNotice='';save();setTimeout(()=>{try{showToast(iNotice)}catch(_){}},900)}/* m025-166: gerbang level yang dipasang di perkenalan muncul di sini - saat murid sudah
    benar-benar berada di dalam aplikasi, bukan di atas layar perkenalan. */if(!state.activeSession&&levelEntryGatePending)setTimeout(()=>{try{maybeShowLevelEntryGate()}catch(_){}},360);const activeLevel=getActiveLevel(),activeV=V.filter(v=>v.level===activeLevel),activeR=R.filter(r=>r.level===activeLevel),activeGrammar=grammarItemsForLevel(activeLevel),snapshot=buildLearningSnapshot(),policy=buildAdaptivePolicy(),signal=localCoachSignal(),loginMessage=selectLoginMessage(),review=snapshot.dueReviews,level=activeLevel;/* 2026-08-29 overhaul I12 (O6 #5, O1-005): saat level TERKUNCI, CTA hero-lah yang berganti
    menjadi aksi ujian (banner trust 200px dengan tombol primernya sendiri diciutkan ke satu
-   baris trust-line). Satu layar, satu tombol primer — tidak pernah dua. */const homeTrust=levelTrustState(state),homeLocked=homeTrust.locked===true,homeExamLevel=nextVerifiableLevel(state)||verifiedLevel(state),primaryAction=homeLocked?`openActiveLevelExamPanel('${esc(homeExamLevel)}')`:state.adaptiveReady?'startAdaptive()':state.placementDone?`startLevelPractice('${esc(getActiveLevel())}')`:"go('test')";/* q19-P2c + v06-F1 2026-08-29: pasca-placement (belum adaptiveReady) CTA memulai sesi LEVEL nyata di level hasil tes \u2014 startAdaptive() menolak sebelum bukti cukup (guard app.js startAdaptive), jadi rutenya latihan level yang sekaligus menabung bukti menuju adaptif. */setApp(`<section class="fade home-page">
+   baris trust-line). Satu layar, satu tombol primer — tidak pernah dua. */const homeTrust=levelTrustState(state),homeLocked=homeTrust.locked===true,homeExamLevel=nextVerifiableLevel(state)||verifiedLevel(state),primaryAction=homeLocked?`openActiveLevelExamPanel('${esc(homeExamLevel)}')`:state.adaptiveReady?'startAdaptive()':state.placementDone?`startLevelPractice('${esc(getActiveLevel())}')`:"go('test')";/* q19-P2c + v06-F1 2026-08-29: pasca-placement (belum adaptiveReady) CTA memulai sesi LEVEL nyata di level hasil tes \u2014 startAdaptive() menolak sebelum bukti cukup (guard app.js startAdaptive), jadi rutenya latihan level yang sekaligus menabung bukti menuju adaptif. *//* m025-246: satu preamble, dua tata letak. Preamble di atas (kabar demosi, kabar
+     percobaan-terputus, gerbang level, hidrasi konstanta) berlaku untuk KEDUANYA -
+     memindahkannya ke dalam salah satu cabang adalah cara paling mudah membuat satu
+     tata letak diam-diam kehilangan kabar yang harus ia sampaikan. */
+  if(uxOn('todayHome'))setApp(`<section class="fade home-page home-today">${todayHomeMarkup()}</section>`);
+  else setApp(`<section class="fade home-page">
 <div class="launcher-shell">
   <div class="launcher-copy">
   <!-- 2026-08-29 overhaul I12 (O6 #3): chip "A2 · semua materi · ganti" pindah ke keping LEVEL
@@ -6898,9 +7301,46 @@ function applyRestore(payload){
   return{ok:true,before,after:{answered:state.totalAnswered,history:(state.history||[]).length}};
 }
 window.__fiezelBackup={buildBackupFile,previewRestoreForState,applyRestore};
+/* m025-246 — PERINGATAN PENYIMPANAN iOS.
+   OWNER (edge case wajib): "iOS Safari: storage hilang setelah 7 hari - akun didorong
+   setelah unduh model, Pengaturan tampilkan 'Progres belum dicadangkan'."
+
+   FAKTANYA, dan kenapa ini bukan peringatan yang berlebihan: ITP di WebKit menghapus
+   seluruh penyimpanan skrip - localStorage, IndexedDB, CacheStorage - untuk situs yang
+   TIDAK dibuka selama tujuh hari. Seluruh progres FIEZEL hidup di localStorage. Jadi
+   murid iPhone yang libur seminggu bisa kembali ke aplikasi kosong tanpa pernah
+   diberi tahu bahwa itu mungkin terjadi.
+
+   HANYA WebKit, dan hanya kalau BELUM ada akun. Menampilkannya di Android atau kepada
+   murid yang sudah masuk akun berarti mengubah peringatan menjadi kebisingan, dan
+   peringatan yang jadi kebisingan berhenti dibaca justru saat ia penting.
+
+   DETEKSINYA konservatif dengan sengaja: iPhone/iPad/iPod di userAgent, plus iPadOS
+   modern yang menyamar sebagai Macintosh (ia mengaku 'Macintosh' tetapi punya layar
+   sentuh). Salah-negatif di sini berarti satu murid tidak melihat peringatan; salah-
+   positif berarti semua murid Android membacanya. Yang pertama lebih murah. */
+function appleWebkitDevice(){
+  try{
+    const nav=self.navigator;if(!nav)return false;
+    const ua=String(nav.userAgent||'');
+    if(/iPhone|iPad|iPod/i.test(ua))return true;
+    return /Macintosh/i.test(ua)&&Number(nav.maxTouchPoints)>1;
+  }catch(_){return false}
+}
+/** Sudah ada akun tempat progres bisa dipulihkan? */
+function progressBackedUp(){
+  try{const st=accountCore()?.state?.();if(st&&st.handle)return true}catch(_){}
+  try{if(puterSignedIn())return true}catch(_){}
+  return false;
+}
+function storageEvictionWarningMarkup(){
+  if(!appleWebkitDevice())return '';
+  if(progressBackedUp())return `<p class="report-state">${FiezelI18n.t('settings.cadangan-aman')}</p>`;
+  return `<div class="card storage-warning" role="status"><h3><i data-lucide="triangle-alert"></i> ${FiezelI18n.t('settings.cadangan-judul')}</h3><p class="muted">${FiezelI18n.t('settings.cadangan-body')}</p><button type="button" onclick="closeModal();openAccountSheet('login')">${FiezelI18n.t('settings.cadangan-aksi')} <i data-lucide="arrow-right"></i></button></div>`;
+}
 function continuitySettingsMarkup(){
   if(!continuityModule())return '';
-  return `<div class="report-settings backup-settings"><div class="row"><div><b>${FiezelI18n.t('backup.judul')}</b><p class="muted">${FiezelI18n.t('backup.keterangan')}</p></div></div>`+
+  return storageEvictionWarningMarkup()+`<div class="report-settings backup-settings"><div class="row"><div><b>${FiezelI18n.t('backup.judul')}</b><p class="muted">${FiezelI18n.t('backup.keterangan')}</p></div></div>`+
     `<label class="endpoint-label">${FiezelI18n.t('backup.label-sandi')}<input id="backupPassphrase" type="password" autocomplete="new-password" placeholder="${FiezelI18n.t('backup.placeholder-sandi')}"></label>`+
     `<p class="muted">${FiezelI18n.t('backup.peringatan-sandi')}</p>`+
     `<div class="modal-actions backup-actions"><button id="backupExport" type="button">${FiezelI18n.t('backup.buat')}</button><button id="backupPick" type="button">${FiezelI18n.t('backup.pilih')}</button></div>`+
@@ -7055,6 +7495,27 @@ function dismissBootSplash(){
   }catch(_){return false}
 }
 window.dismissBootSplash=dismissBootSplash;
+/* Peluncuran DINGIN vs hangat.
+   sessionStorage adalah penanda yang tepat di sini, dan bukan localStorage: ia hidup
+   selama SESI PERAMBAN (bertahan melewati muat ulang di tab yang sama, hilang ketika
+   aplikasi benar-benar ditutup). Persis pembedaan yang diminta.
+
+   Gagal ke DINGIN, bukan ke hangat: mode privat dan peramban yang memblokir penyimpanan
+   melempar di sini, dan murid yang kehilangan splash-nya selamanya adalah kegagalan yang
+   lebih buruk daripada murid yang melihatnya sekali lebih banyak. */
+const COLD_LAUNCH_KEY='fiezel-launch-session-v1';
+let coldLaunchAnswer=null;
+function isColdLaunch(){
+  if(coldLaunchAnswer!==null)return coldLaunchAnswer;
+  try{
+    const store=self.sessionStorage;
+    if(!store){coldLaunchAnswer=true;return true}
+    const warm=store.getItem(COLD_LAUNCH_KEY)==='1';
+    store.setItem(COLD_LAUNCH_KEY,'1');
+    coldLaunchAnswer=!warm;
+  }catch(_){coldLaunchAnswer=true}
+  return coldLaunchAnswer;
+}
 function showBrandSplash(now=Date.now(),afterSplash=null){
   const done=typeof afterSplash==='function'?afterSplash:(at=>{showOnboarding(at)});
   const splash=self.FiezelSplash;
@@ -7065,7 +7526,21 @@ function showBrandSplash(now=Date.now(),afterSplash=null){
     // memaksanya tampil di SETIAP peluncuran. Panggilan lain (sapaan harian di ekor
     // openApp) tetap tidak memaksa, jadi tidak pernah ada dua splash
     // dalam satu peluncuran.
-    const shown=splash.show(self,{now,force:typeof afterSplash==='function',onClose:()=>done(Date.now())});
+    /* m025-246 — SPLASH HANYA DI PELUNCURAN DINGIN.
+       OWNER: "Alur masuk: Splash (cold saja) -> ...".
+
+       m025-80 memasang `force:true` di sini atas permintaan owner waktu itu ("yang aku
+       harapkan setiap kali buka apps itu adalah splash"), dan itu berarti koreografi
+       1,9 detik diputar ulang pada SETIAP muat dokumen. Di PWA iOS, kembali dari app
+       switcher sering berarti muat ulang penuh - jadi murid yang bolak-balik ke
+       aplikasi lain di tengah belajar membayar splash itu berkali-kali dalam satu jam.
+
+       `isColdLaunch()` memisahkan keduanya. Yang tetap dapat splash penuh: peluncuran
+       pertama sebuah sesi peramban. Yang tidak: muat ulang dan kebangkitan di dalam
+       sesi yang sama. Ketika ia bukan peluncuran dingin, `force` mati dan gerbang
+       seenToday() milik modul splash yang memutuskan - jadi tidak ada jalur baru yang
+       diciptakan, hanya satu paksaan yang dilepas. */
+    const shown=splash.show(self,{now,force:typeof afterSplash==='function'&&isColdLaunch(),onClose:()=>done(Date.now())});
     // Splash yang tidak jadi tampil (sudah disapa hari ini) tidak boleh menelan perkenalan
     // bersamanya - murid baru yang membuka aplikasi untuk kedua kalinya tetap perlu dituntun.
     if(!shown||shown.shown!==true){dismissBootSplash();done(now)}
@@ -7273,7 +7748,13 @@ function neuralVoiceStatusMarkup(){const say=self.FiezelPuterVoice,online=say?.s
   // m025-121: kartu ini TIDAK menjual unduhan apa pun, dan itu keputusan yang sama dengan
   // m025-100. Cadangan perangkat menyiapkan dirinya sendiri di latar; yang ditampilkan di
   // sini hanyalah kenyataan sesudahnya, satu baris, tanpa tombol dan tanpa angka megabita.
-  const backupLine=offline.done?FiezelI18n.t('suara.cadangan'):'';return `<article class="voice-setup-card"><div class="voice-setup-copy"><h2>${esc(label)}</h2><p id="neuralVoiceProgress">${FiezelI18n.t('suara.ket-subtitle')}</p>${online.error?`<p class="muted">${FiezelI18n.t('suara.status-error',{galat:esc(online.error)})}</p>`:''}<label class="neural-voice-choice" for="neuralRateInput"><span>${FiezelI18n.t('suara.kecepatan-bicara')}</span><input id="neuralRateInput" type="range" min="${NEURAL_RATE_MIN}" max="${NEURAL_RATE_MAX}" step="${NEURAL_RATE_STEP}" value="${selectedNeuralRate()}"><small id="neuralRateValue">${esc(neuralRateLabel(selectedNeuralRate()))}</small></label>${backupLine?`<p class="muted">${esc(backupLine)}</p>`:''}</div><div class="voice-setup-actions"><button id="testNeuralVoice" type="button"><i data-lucide="volume-2"></i> ${FiezelI18n.t('suara.tes')}</button></div></article>`}
+  const backupLine=offline.done?FiezelI18n.t('suara.cadangan'):'';
+  /* m025-246: sakelar paket suara offline. Inilah "pindah ke Pengaturan" dari brief -
+     satu-satunya tempat murid bisa MEMULAI unduhan 152 MB dengan sadar. Disembunyikan
+     kalau bendera `voicePackGate` dinyalakan lagi, karena di mode itu unduhannya
+     menyala sendiri di boot dan sakelar yang tidak mengubah apa pun hanya membingungkan. */
+  const packRow=uxOff('voicePackGate')?`<label class="setting-row"><span class="setting-icon"><i data-lucide="hard-drive-download"></i></span><span><b>${FiezelI18n.t('suara.tawaran-judul')}</b><small>${FiezelI18n.t('suara.tawaran-body')}</small></span><input id="settingVoicePack" type="checkbox" ${voicePackOptedIn()?'checked':''} aria-label="${FiezelI18n.t('suara.tawaran-judul')}"></label>`:'';
+  return `<article class="voice-setup-card"><div class="voice-setup-copy"><h2>${esc(label)}</h2><p id="neuralVoiceProgress">${FiezelI18n.t('suara.ket-subtitle')}</p>${online.error?`<p class="muted">${FiezelI18n.t('suara.status-error',{galat:esc(online.error)})}</p>`:''}<label class="neural-voice-choice" for="neuralRateInput"><span>${FiezelI18n.t('suara.kecepatan-bicara')}</span><input id="neuralRateInput" type="range" min="${NEURAL_RATE_MIN}" max="${NEURAL_RATE_MAX}" step="${NEURAL_RATE_STEP}" value="${selectedNeuralRate()}"><small id="neuralRateValue">${esc(neuralRateLabel(selectedNeuralRate()))}</small></label>${backupLine?`<p class="muted">${esc(backupLine)}</p>`:''}${packRow}</div><div class="voice-setup-actions"><button id="testNeuralVoice" type="button"><i data-lucide="volume-2"></i> ${FiezelI18n.t('suara.tes')}</button></div></article>`}
 // m025-96: menguji mesin yang benar-benar dipakai murid. Menguji mesin lokal di sini
 // akan melaporkan 'suara siap' padahal jalur yang dipakai pelajaran adalah yang lain.
 async function testNeuralVoice(){const button=$('testNeuralVoice'),say=self.FiezelVoiceSay;if(!button||!say?.say)return;button.disabled=true;const hint=$('neuralVoiceProgress');try{const ok=await say.say(`Hello ${learnerName()}. This is your FIEZEL voice.`,{speed:selectedNeuralRate()});if(hint)hint.textContent=ok?FiezelI18n.t('suara.tes-selesai'):FiezelI18n.t('suara.tak-berbunyi');showToast(ok?FiezelI18n.t('suara.terdengar'):FiezelI18n.t('suara.belum-berbunyi'))}catch(error){if(hint)hint.textContent=FiezelI18n.t('suara.tes-gagal-detail',{galat:String(error?.message||error)});showToast(FiezelI18n.t('suara.tes-gagal'))}finally{button.disabled=false;enhanceUI()}}
@@ -7524,7 +8005,7 @@ function gemsHook(){
     }
   };
 }
-async function skillsLab(domain){const token=speakingListeningMountToken;const copy=SKILL_PAGE_COPY[domain];const head=copy?`<div class="skill-page-topbar"><button type="button" class="skill-help-dot" onclick="openSkillHelp('${esc(domain)}')" aria-label="${esc(FiezelI18n.t('skills.bantuan'))}" title="${esc(FiezelI18n.t('skills.bantuan'))}"><span aria-hidden="true">?</span></button></div>`:`<div class="section-head"><div><h1>Skills Lab</h1><p>${FiezelI18n.t('skills.lead-hub')}</p></div>${levelControlMarkup()}</div>`;setApp(`<section class="fade skills-page">${head}<div id="speakingListeningRoot"><div class="card skills-loading">${FiezelI18n.t('skills.memuat')}</div></div></section>`);enhanceUI();await ensureVoiceRuntime();try{if(!self.FiezelSLAddon)throw new Error(FiezelI18n.t('skills.runtime-hilang'));const tts={play:(text,options={})=>self.FiezelVoiceSay?.say?.(text,{speed:options.speed??selectedNeuralRate(),suppressSubtitles:!!options.suppressSubtitles})||Promise.reject(new Error('tts_unavailable')),/* V6: adaptor ini hanya meneruskan (voice-v5-prefetch.md §3 baris 10); keputusan APA yang dihangatkan - dan larangan menghangatkan item ujian - tetap milik addon. */prefetch:(text,options={})=>prefetchNextVoice(text,{speed:options.speed??selectedNeuralRate()}),stop:()=>{cancelVoicePrefetch();self.FiezelVoiceSay?.stop?.()}};const controller=await self.FiezelSLAddon.create({root:$('speakingListeningRoot'),baseUrl:'./features/speaking-listening/',/* S1b: satu-satunya PENULIS sidecar Speaking/Listening. Kuncinya di-override di sini, di titik mount, supaya penulis dan kedua pembacanya selalu menunjuk ruang akun yang sama. */config:{...self.FIEZEL_SPEAKING_LISTENING_CONFIG,storageKey:sideStateKey(SL_STATE_KEY)},getActiveLevel,activeLevel:getActiveLevel(),tts,/* m026-02: satu-satunya titik pemberitahuan Puter boleh muncul - sesi dengar sudah bubar (renderComplete/exit di addon). */onSessionEnd:()=>{try{maybePresentPuterCreditNotice()}catch{}},/* R2-4: ekspresi maskot dalam sesi Skills Lab — lewat pawReact host supaya gerbang reduced-motion/preferensi animasinya SATU. */onAnswerFeedback:ok=>{try{pawReact(ok?'correct':'wrong')}catch(_){}},/* Fase 3 (C5 butir 5): kait kebijakan speaking adaptif untuk addon - addon yang memutuskan kapan memakainya; kunci asing diabaikan addon lama, jadi ini aman untuk versi mana pun. */speakingAdaptive:speakingAdaptiveAvailable()?{evidence:speakingAdaptiveEvidence,policy:speakingAdaptivePolicy}:null,gems:gemsHook()});if(token!==speakingListeningMountToken||!SKILLS_LAB_VIEWS.has(state.view)){controller.destroy();return}speakingListeningController=controller;/* m026-03: kait tur listening. Addon-nya TIDAK diubah - renderListening dibungkus dari luar, pola yang sama dengan hook lain milik host. Tur diberi tahu setelah kartu soal tercat. */try{const baseRenderListening=controller.renderListening?.bind(controller);if(baseRenderListening)controller.renderListening=(...args)=>{const out=baseRenderListening(...args);notifyFeatureTour('listening');return out}}catch(_){}controller.mount($('speakingListeningRoot'));if(SKILL_PAGE_COPY[domain]){try{controller.open(domain)}catch(_){}}/* m026-01: hanya Listening yang memicu state dengar; Speaking dan lainnya cukup penasaran. */pawReact(domain==='listening'?'listening-start':'question-shown');enhanceUI()}catch(error){const root=$('speakingListeningRoot');if(root)root.innerHTML=`<div class="card"><b>${FiezelI18n.t('skills.gagal-muat')}</b><p class="muted">${esc(error?.message||error)}</p></div>`;/* [ADAPTASI] OA-7 §4: error_system hanya untuk kegagalan sistem, bukan jawaban salah. */uiSfx('error_system')}}// m025-115 - Writing: satu-satunya dari empat skill inti tes yang belum punya mesin sama
+async function skillsLab(domain){const token=speakingListeningMountToken;const copy=SKILL_PAGE_COPY[domain];const head=copy?`<div class="skill-page-topbar"><button type="button" class="skill-help-dot" onclick="openSkillHelp('${esc(domain)}')" aria-label="${esc(FiezelI18n.t('skills.bantuan'))}" title="${esc(FiezelI18n.t('skills.bantuan'))}"><span aria-hidden="true">?</span></button></div>`:`<div class="section-head"><div><h1>${esc(FiezelI18n.t('latihan.bicara-dengar'))}</h1><p>${FiezelI18n.t('skills.lead-hub')}</p></div>${levelControlMarkup()}</div>`;setApp(`<section class="fade skills-page">${head}<div id="speakingListeningRoot"><div class="card skills-loading">${FiezelI18n.t('skills.memuat')}</div></div></section>`);enhanceUI();await ensureVoiceRuntime();try{if(!self.FiezelSLAddon)throw new Error(FiezelI18n.t('skills.runtime-hilang'));const tts={play:(text,options={})=>self.FiezelVoiceSay?.say?.(text,{speed:options.speed??selectedNeuralRate(),suppressSubtitles:!!options.suppressSubtitles})||Promise.reject(new Error('tts_unavailable')),/* V6: adaptor ini hanya meneruskan (voice-v5-prefetch.md §3 baris 10); keputusan APA yang dihangatkan - dan larangan menghangatkan item ujian - tetap milik addon. */prefetch:(text,options={})=>prefetchNextVoice(text,{speed:options.speed??selectedNeuralRate()}),stop:()=>{cancelVoicePrefetch();self.FiezelVoiceSay?.stop?.()}};const controller=await self.FiezelSLAddon.create({root:$('speakingListeningRoot'),baseUrl:'./features/speaking-listening/',/* S1b: satu-satunya PENULIS sidecar Speaking/Listening. Kuncinya di-override di sini, di titik mount, supaya penulis dan kedua pembacanya selalu menunjuk ruang akun yang sama. */config:{...self.FIEZEL_SPEAKING_LISTENING_CONFIG,storageKey:sideStateKey(SL_STATE_KEY)},getActiveLevel,activeLevel:getActiveLevel(),tts,/* m026-02: satu-satunya titik pemberitahuan Puter boleh muncul - sesi dengar sudah bubar (renderComplete/exit di addon). */onSessionEnd:()=>{try{maybePresentPuterCreditNotice()}catch{}},/* m025-246: kait skip rate. Addon melaporkan; app.js yang memutuskan boleh-tidaknya mengirim (satu gerbang persetujuan, bukan dua). */onSkip:info=>{try{anQuestionSkipped(info?.domain,info?.level,info?.reason)}catch(_){}},/* R2-4: ekspresi maskot dalam sesi Skills Lab — lewat pawReact host supaya gerbang reduced-motion/preferensi animasinya SATU. */onAnswerFeedback:ok=>{try{pawReact(ok?'correct':'wrong')}catch(_){}},/* Fase 3 (C5 butir 5): kait kebijakan speaking adaptif untuk addon - addon yang memutuskan kapan memakainya; kunci asing diabaikan addon lama, jadi ini aman untuk versi mana pun. */speakingAdaptive:speakingAdaptiveAvailable()?{evidence:speakingAdaptiveEvidence,policy:speakingAdaptivePolicy}:null,gems:gemsHook()});if(token!==speakingListeningMountToken||!SKILLS_LAB_VIEWS.has(state.view)){controller.destroy();return}speakingListeningController=controller;/* m026-03: kait tur listening. Addon-nya TIDAK diubah - renderListening dibungkus dari luar, pola yang sama dengan hook lain milik host. Tur diberi tahu setelah kartu soal tercat. */try{const baseRenderListening=controller.renderListening?.bind(controller);if(baseRenderListening)controller.renderListening=(...args)=>{const out=baseRenderListening(...args);notifyFeatureTour('listening');return out}}catch(_){}controller.mount($('speakingListeningRoot'));if(SKILL_PAGE_COPY[domain]){try{controller.open(domain)}catch(_){}}/* m026-01: hanya Listening yang memicu state dengar; Speaking dan lainnya cukup penasaran. */pawReact(domain==='listening'?'listening-start':'question-shown');enhanceUI();/* m025-246: TITIK KONTEKSTUAL tawaran paket suara - sesudah layar berbunyi benar-benar tercat, bukan di boot dan bukan di perkenalan. Ditunda satu jeda supaya ia tidak menumpuk di atas animasi masuk kartunya. */setTimeout(()=>{try{maybeOfferVoicePack()}catch(_){}},900)}catch(error){const root=$('speakingListeningRoot');if(root)root.innerHTML=`<div class="card"><b>${FiezelI18n.t('skills.gagal-muat')}</b><p class="muted">${esc(error?.message||error)}</p></div>`;/* [ADAPTASI] OA-7 §4: error_system hanya untuk kegagalan sistem, bukan jawaban salah. */uiSfx('error_system')}}// m025-115 - Writing: satu-satunya dari empat skill inti tes yang belum punya mesin sama
 // sekali. Yang dibangun di sini sengaja yang paling kecil tapi utuh: satu topik sesuai
 // level, satu kotak tulis, satu masukan yang bisa dipakai. Bukan editor esai.
 //
@@ -8029,6 +8510,79 @@ function AudioService(){
   }
  }
 }const audio=AudioService();
+/* m025-246 — KEADAAN GAGAL AUDIO DI SOAL DENGAR KUIS.
+   ============================================================================
+   OWNER: "Listening gagal audio: tampilkan state gagal dengan opsi coba lagi /
+   suara peramban / lewati tanpa penalti."
+
+   Jalur ini adalah kembaran dari yang sudah dipasang di sesi bicara & dengar
+   (noteNoAudio di fiezel-speaking-listening-addon.js); keduanya perlu ada karena
+   soal dengar hidup di DUA mesin - sesi latihan bicara & dengar punya mesinnya
+   sendiri, dan kuis harian punya mesinnya sendiri. Satu perbaikan di salah satunya
+   akan meninggalkan setengah murid dengan layar buntu yang lama.
+
+   Sebelum ini yang terjadi di kuis: catatan kecil berbunyi "suaranya belum
+   berbunyi", pilihan jawaban dibuka, dan murid dibiarkan menebak soal dengar tanpa
+   pernah mendengar apa pun. Membuka kunci memang benar (mengurungnya lebih buruk),
+   tetapi menebak bukan jalan keluar - ia hanya bukti palsu yang masuk ke model
+   kemampuan murid.
+
+   TIGA JALAN KELUAR, dan yang ketiga yang paling penting:
+     coba lagi      - menekan ulang tombol Dengarkan yang sudah ada.
+     suara peramban - speechSynthesis bawaan perangkat: nol unduhan, nol jaringan,
+                      dan justru hidup di perangkat kelas bawah tempat mesin neural
+                      paling sering gagal. Hanya ditawarkan bila API-nya ada.
+     lewati         - maju ke soal berikutnya TANPA menilai. Itu arti "tanpa
+                      penalti", dan di sini ia harus dikatakan kepada murid, bukan
+                      sekadar benar di dalam kode. */
+function browserSpeechAvailable(){
+  try{return !!self.speechSynthesis&&typeof self.SpeechSynthesisUtterance==='function'}catch(_){return false}
+}
+/* Jatuh-balik suara peramban. TIDAK PERNAH dipanggil sendiri - hanya dari klik murid
+   pada tombolnya, kontrak "tombol Putar adalah gestur, tidak pernah autoplay". */
+function speakWithBrowserVoice(text,rate){
+  if(!browserSpeechAvailable())return false;
+  try{
+    audio.stop();
+    self.speechSynthesis.cancel();
+    const u=new self.SpeechSynthesisUtterance(String(text||''));
+    u.lang='en-US';u.rate=Number(rate)||1;
+    self.speechSynthesis.speak(u);
+    return true;
+  }catch(_){return false}
+}
+function showListeningFailureActions(q,cfg){
+  const note=$('quizListenNote');if(!note||!note.parentNode)return false;
+  if(document.getElementById('quizAudioFallback'))return false;
+  const row=document.createElement('div');
+  row.id='quizAudioFallback';row.className='quiz-audio-fallback';
+  row.setAttribute('role','status');
+  row.innerHTML=`<div class="quiz-audio-fallback-actions"><button type="button" id="quizAudioRetry">${esc(FiezelI18n.t('listening.gagal-coba-lagi'))}</button>${browserSpeechAvailable()?`<button type="button" id="quizAudioBrowser">${esc(FiezelI18n.t('listening.gagal-peramban'))}</button>`:''}<button type="button" id="quizAudioSkip">${esc(FiezelI18n.t('listening.gagal-lewati'))}</button></div><small class="muted">${esc(FiezelI18n.t('listening.gagal-tanpa-penalti'))}</small>`;
+  note.parentNode.appendChild(row);
+  /* Coba lagi meneruskan klik ke tombol yang sudah ada alih-alih menyalin logikanya:
+     dua salinan berarti dua tempat yang harus sepakat soal penghitungan replay dan
+     penanda memutar, dan dua tempat seperti itu selalu berakhir tidak sepakat. */
+  $('quizAudioRetry')?.addEventListener('click',()=>{try{row.remove()}catch(_){}const b=$('quizListen');if(b){b.disabled=false;b.click()}});
+  $('quizAudioBrowser')?.addEventListener('click',()=>{speakWithBrowserVoice(q&&q.script,selectedNeuralRate())});
+  /* Lewati = maju TANPA record(). Ia menandai soal supaya tidak ikut dinilai, lalu
+     menekan tombol Lanjut yang sudah ada - jalur maju yang sama dengan jawaban biasa,
+     tanpa jawaban. */
+  $('quizAudioSkip')?.addEventListener('click',()=>{
+    /* "Tanpa penalti" harus benar di ARITMETIKANYA, bukan hanya di kalimatnya.
+       finishQuiz menghitung akurasi sebagai score/asked, dan soal yang dilewati ikut
+       naik ke `asked` - jadi tanpa hitungan ini, soal yang audionya tidak pernah
+       berbunyi akan dihitung sebagai jawaban SALAH. Penghitungnya di cfg (bukan
+       variabel modul) supaya dua sesi yang tumpang tindih tidak saling menimpa. */
+    try{if(cfg)cfg.__noAudioSkips=(Number(cfg.__noAudioSkips)||0)+1}catch(_){}
+    try{if(q)q.__skippedNoAudio=true}catch(_){}
+    try{anQuestionSkipped('listening',q&&q.level,'audio_failed')}catch(_){}
+    showToast(FiezelI18n.t('listening.gagal-dilewati'));
+    const next=$('quizNext');
+    if(next){next.disabled=false;answer.locked=true;next.click()}
+  });
+  enhanceUI();
+  return true;
+}
 function bindSwipe(el,onLeft,onRight){let sx=0,sy=0;el.addEventListener('touchstart',e=>{const t=e.changedTouches[0];sx=t.clientX;sy=t.clientY},{passive:true});el.addEventListener('touchend',e=>{const t=e.changedTouches[0],dx=t.clientX-sx,dy=t.clientY-sy;if(Math.abs(dx)>55&&Math.abs(dx)>Math.abs(dy)*1.25){haptic('navigate');if(dx<0)onLeft();else onRight()}},{passive:true})}
 function flashcards(level){
   const active=getActiveLevel();
@@ -8454,7 +9008,11 @@ function makeGrammarQuestion(skill,item,variant=0,lessonSkill=skill){const exerc
 
 function reading(){const level=getActiveLevel(),active=R.filter(r=>r.level===level),total=active.reduce((n,r)=>n+(r.qs?.length||0),0);
   const examSets=readingExamSetsForLevel(level),examLevels=readingExamLevels();
-  const examMarkup=readingExamSets().length?`<div class="card reading-exam"><div class="row"><b>${FiezelI18n.t('reading.practice-berformat-ujian')}</b><span>${FiezelI18n.t('reading.set-untuk',{length:examSets.length,level:esc(level)})}</span></div>${examSets.length?examSets.map(set=>{const f=readingExamFormat(set);return `<div class="reading-exam-set"><b>${esc(set.title)}</b><span>${FiezelI18n.t('reading.kata-item-menit',{label:esc(f?.label||''),wordCount:set.wordCount,jumlahSoal:set.questions.length,minutesPerPassage:f?.minutesPerPassage||'-'})}</span><small>${esc(f?.note||'')}</small><button onclick="startReadingExam('${esc(set.id)}')">${FiezelI18n.t('reading.mulai-set')} <i data-lucide="arrow-right"></i></button></div>`}).join(''):`<p class="muted">${FiezelI18n.t('reading.belum-ada-set-berformat-ujian',{level:esc(level),join:esc(examLevels.join(', ')||'-')})}</p>`}<p class="muted">${esc(READING_EXAM?.honesty||'')}</p></div>`:'';shell(FiezelI18n.t('reading.ruang-reading'),FiezelI18n.t('reading.bacaan-item-for-level',{length:active.length,total:total,level:level}),`<div class="level-scope-note"><b>${esc(level)}</b> · ${esc(levelDescriptor(level))}<span>${FiezelI18n.t('reading.bacaan-level-lain-tersimpan-tetapi')}</span></div>${examMarkup}<div class="toolbar"><button class="${state.adaptiveReady?'':'primary'}" onclick="startReadingRandom()"><i data-lucide="shuffle"></i> ${FiezelI18n.t('reading.bacaan-acak',{level:esc(level)})}</button><button class="${state.adaptiveReady?'primary':''}" onclick="startReadingAdaptive()"${state.adaptiveReady?'':' title="'+FiezelI18n.t('reading.terbuka-setelah-tes-awal-selesai')+'"'}><i data-lucide="zap"></i> Reading adaptif</button></div><div class="grid"><div class="card"><div class="row"><b>${FiezelI18n.t('grammar.jalur',{level:esc(level)})}</b><span>${FiezelI18n.t('reading.bacaan',{length:active.length})}</span></div><p class="muted">${active.length?FiezelI18n.t('reading.hub-instruction'):FiezelI18n.t('reading.hub-empty')}</p>${active.length?`<button onclick="openReadingLevel('${level}')">${FiezelI18n.t('reading.buka-bacaan')} <i data-lucide="arrow-right"></i></button>`:''}</div></div>`)}
+  /* m025-246: blok "Latihan berformat ujian" di layar Reading disembunyikan bersama
+ pintu ujian per skill lainnya (OWNER: "Ujian per skill ... SEMBUNYIKAN"). Bank
+ soalnya (reading-exam-v1.json), startReadingExam(), dan seluruh mesin penilaiannya
+ tetap utuh dan tetap dijaga reading-exam-test.js - yang mati hanya pintunya. */
+ const examMarkup=(uxOn('skillExams')&&readingExamSets().length)?`<div class="card reading-exam"><div class="row"><b>${FiezelI18n.t('reading.practice-berformat-ujian')}</b><span>${FiezelI18n.t('reading.set-untuk',{length:examSets.length,level:esc(level)})}</span></div>${examSets.length?examSets.map(set=>{const f=readingExamFormat(set);return `<div class="reading-exam-set"><b>${esc(set.title)}</b><span>${FiezelI18n.t('reading.kata-item-menit',{label:esc(f?.label||''),wordCount:set.wordCount,jumlahSoal:set.questions.length,minutesPerPassage:f?.minutesPerPassage||'-'})}</span><small>${esc(f?.note||'')}</small><button onclick="startReadingExam('${esc(set.id)}')">${FiezelI18n.t('reading.mulai-set')} <i data-lucide="arrow-right"></i></button></div>`}).join(''):`<p class="muted">${FiezelI18n.t('reading.belum-ada-set-berformat-ujian',{level:esc(level),join:esc(examLevels.join(', ')||'-')})}</p>`}<p class="muted">${esc(READING_EXAM?.honesty||'')}</p></div>`:'';shell(FiezelI18n.t('reading.ruang-reading'),FiezelI18n.t('reading.bacaan-item-for-level',{length:active.length,total:total,level:level}),`<div class="level-scope-note"><b>${esc(level)}</b> · ${esc(levelDescriptor(level))}<span>${FiezelI18n.t('reading.bacaan-level-lain-tersimpan-tetapi')}</span></div>${examMarkup}<div class="toolbar"><button class="${state.adaptiveReady?'':'primary'}" onclick="startReadingRandom()"><i data-lucide="shuffle"></i> ${FiezelI18n.t('reading.bacaan-acak',{level:esc(level)})}</button><button class="${state.adaptiveReady?'primary':''}" onclick="startReadingAdaptive()"${state.adaptiveReady?'':' title="'+FiezelI18n.t('reading.terbuka-setelah-tes-awal-selesai')+'"'}><i data-lucide="zap"></i> Reading adaptif</button></div><div class="grid"><div class="card"><div class="row"><b>${FiezelI18n.t('grammar.jalur',{level:esc(level)})}</b><span>${FiezelI18n.t('reading.bacaan',{length:active.length})}</span></div><p class="muted">${active.length?FiezelI18n.t('reading.hub-instruction'):FiezelI18n.t('reading.hub-empty')}</p>${active.length?`<button onclick="openReadingLevel('${level}')">${FiezelI18n.t('reading.buka-bacaan')} <i data-lucide="arrow-right"></i></button>`:''}</div></div>`)}
 function openReadingLevel(l){const active=getActiveLevel();if(String(l||'')!==active)return showToast(FiezelI18n.t('reading.reading-dikunci-level',{active:active}));const r=pick(R.filter(x=>x.level===active));if(r)readingSession(r);else showToast(FiezelI18n.t('reading.reading-belum-tersedia',{active:active}))}
 function startReadingRandom(){const active=getActiveLevel(),pool=R.filter(r=>r.level===active);if(pool.length)readingSession(pick(pool));else showToast(FiezelI18n.t('reading.reading-belum-tersedia',{active:active}))}
 function startReadingAdaptive(){if(!state.adaptiveReady){showToast(FiezelI18n.t('reading.reading-terbuka-setelah-tes-awal'));return}const now=Date.now(),level=getActiveLevel(),ids=new Set(Object.entries(state.reading).filter(([,x])=>x.total&&(x.mastery<80||(x.nextReview&&x.nextReview<=now))).map(([id])=>id)),pool=R.filter(x=>x.level===level),r=pick(pool.filter(x=>ids.has(x.id)))||pick(pool);if(r)readingSession(r);else showToast(FiezelI18n.t('reading.belum-ada-area-reading-perlu',{level:level}))}
@@ -8578,7 +9136,14 @@ function startReadingExam(id){
   quizLoop({type:'reading',count:qs.length,pool:qs,factory:x=>x,context:set,preserveOrder:true});
 }
 function readingSession(r){const qs=(r.qs||[]).map((q,i)=>makeReadingQuestion(r,q,i));quizLoop({type:'reading',count:Math.min(8,qs.length),pool:qs,factory:x=>x,context:r,preserveOrder:true})}
-function placement(){shell(FiezelI18n.t('placement.tes-kemampuan-dasar'),FiezelI18n.t('placement.item-for-memetakan-kemampuan-sampai'),`<div class="card hero"><div class="eyebrow">${FiezelI18n.t('placement.pemetaan-level')}</div><h2>${FiezelI18n.t('placement.item-sekitar-sepuluh-menit')}</h2><p>${FiezelI18n.t('placement.isinya-listening-grammar-vocabulary-tanpa')}</p><button class="primary" onclick="startPlacement()">${FiezelI18n.t('placement.start-item')} <i data-lucide="arrow-right"></i></button></div><div class="level-grid">${LEVELS.map((l,i)=>card(`<button class="level-card" onclick="startLevelPractice('${l}')"><span class="level-number">${i+1}</span><div><b>${l}</b><p>${FiezelI18n.t('placement.masuk-practice-level',{l:l})}</p></div><i data-lucide="arrow-right"></i></button>`)).join('')}</div>`)}
+/* m025-246: naskah layar penempatan mengikuti JUMLAH SOAL yang benar-benar akan
+   disajikan. Empat kalimat lamanya memaku angka 25; dengan placement-lite yang 12,
+   layar itu akan menjanjikan 25 lalu menyajikan 12 - kebohongan kecil di tempat
+   paling mahal, yaitu layar pertama sebelum murid punya alasan mempercayai apa pun.
+   Menit dihitung, bukan dipaku: ~25 detik per soal (angka yang sama yang membuat 25
+   soal disebut "sekitar sepuluh menit"), dibulatkan ke menit terdekat. */
+function placementMinutes(count){return Math.max(3,Math.round(Number(count||0)*25/60))}
+function placement(){const jumlah=placementSize(),menit=placementMinutes(jumlah);shell(FiezelI18n.t('placement.tes-kemampuan-dasar'),FiezelI18n.t('placement.lite-lead',{jumlah}),`<div class="card hero"><div class="eyebrow">${FiezelI18n.t('placement.pemetaan-level')}</div><h2>${FiezelI18n.t('placement.lite-hero',{jumlah,menit})}</h2><p>${FiezelI18n.t(uxOn('placementLite')?'placement.lite-isi':'placement.isinya-listening-grammar-vocabulary-tanpa')}</p><button class="primary" onclick="startPlacement()">${FiezelI18n.t('placement.lite-mulai',{jumlah})} <i data-lucide="arrow-right"></i></button></div><div class="level-grid">${LEVELS.map((l,i)=>card(`<button class="level-card" onclick="startLevelPractice('${l}')"><span class="level-number">${i+1}</span><div><b>${l}</b><p>${FiezelI18n.t('placement.masuk-practice-level',{l:l})}</p></div><i data-lucide="arrow-right"></i></button>`)).join('')}</div>`)}
 function grammarItemsForLevel(level=getActiveLevel()){
   const target=LEVELS.includes(String(level||''))?String(level):'A1';const bySequence=(a,b)=>Number(a.sequence||Number.MAX_SAFE_INTEGER)-Number(b.sequence||Number.MAX_SAFE_INTEGER)||a.skill.localeCompare(b.skill);return GRAMMAR_ITEMS.filter(entry=>entry.level===target).sort(bySequence);
 }
@@ -8636,6 +9201,42 @@ function makeLevelSource(level){
 // sesi Skills Lab, jadi tidak ada urutan yang bisa dihafal.
 const PLACEMENT_SIZE=25;
 const PLACEMENT_BLUEPRINT={A1:{vocab:3,grammar:2,listening:1},A2:{vocab:2,grammar:2,listening:1},B1:{vocab:2,grammar:1,listening:1},B2:{vocab:2,grammar:1,listening:1},C1:{vocab:1,grammar:1,listening:1},C2:{vocab:1,grammar:1,listening:1}};
+/* ==========================================================================
+   PLACEMENT-LITE (m025-246)
+   ==========================================================================
+   OWNER: "placement-lite 8-12 soal", dan alasannya: "Placement-lite: mengisi
+   Core Brain agar soal pertama tidak A1 untuk semua."
+
+   DUA BELAS, DAN ANGKANYA BUKAN SELERA. Tangga band di bawah menuntut
+   PLACEMENT_BAND_MIN_EVIDENCE = 2 bukti di dalam SATU band sebelum band itu
+   boleh dinaiki; band dengan bukti kurang dari itu tidak pernah bisa lewat.
+   Enam band CEFR x 2 bukti = 12 - batas ATAS rentang yang diminta owner, dan
+   satu-satunya angka di dalam rentang itu yang membuat keenam band tetap bisa
+   dicapai. Sepuluh soal akan menutup dua band secara permanen untuk alasan
+   aritmetika, bukan alasan kemampuan.
+
+   TANPA LISTENING, dan itu keputusan. Blueprint penuh menaruh satu soal dengar
+   per band; soal dengar butuh jaringan, butuh mesin suara, dan bisa gagal
+   berbunyi. Menaruhnya di jalur "soal pertama <60 detik" berarti mempertaruhkan
+   janji itu pada bagian aplikasi yang paling mungkin lambat. Kemampuan dengar
+   tetap terukur - di sesi harian, tempat kegagalan audio punya tiga jalan keluar
+   dan tidak menahan siapa pun di layar pembuka.
+
+   ONGKOS YANG DITERIMA, ditulis di sini supaya tidak ditemukan sebagai kejutan:
+   dua bukti per band berarti ambang 0,625 menuntut 2/2 benar untuk naik, jadi
+   satu keteledoran di band bawah menurunkan hasilnya satu tingkat. Tes ini
+   memang kurang presisi daripada yang 25 soal - itu arti kata "lite". Yang
+   ditukar dengan presisi itu adalah murid yang benar-benar SAMPAI ke soal
+   pertamanya, dan hasilnya bukan vonis: mesin adaptif terus mengoreksi level
+   dari bukti sesi berikutnya, dan tes 25 soal tetap satu ketukan dari layar
+   penempatan. Yang digantikannya adalah keadaan lama, yaitu murid yang menyerah
+   di soal ke-9 dari 25 dan memulai semuanya di A1. */
+const PLACEMENT_LITE_SIZE=12;
+const PLACEMENT_LITE_BLUEPRINT={A1:{vocab:1,grammar:1,listening:0},A2:{vocab:1,grammar:1,listening:0},B1:{vocab:1,grammar:1,listening:0},B2:{vocab:1,grammar:1,listening:0},C1:{vocab:1,grammar:1,listening:0},C2:{vocab:1,grammar:1,listening:0}};
+/** Cetak biru yang berlaku. Satu pintu, supaya pembangun soal dan penjaga jumlah
+ *  minimum di startPlacement() tidak pernah membaca dua rencana berbeda. */
+function placementBlueprint(){return uxOn('placementLite')?PLACEMENT_LITE_BLUEPRINT:PLACEMENT_BLUEPRINT}
+function placementSize(){return uxOn('placementLite')?PLACEMENT_LITE_SIZE:PLACEMENT_SIZE}
 // Hanya dua mode listening yang dipakai. Sisanya menguji inferensi dan sikap pembicara,
 // yang bukan kemampuan dasar dan membuat murid A1 gagal karena alasan yang salah.
 const PLACEMENT_LISTENING_MODES=['gist','detail'];
@@ -8788,7 +9389,7 @@ async function buildPlacement(){
   const all=[],seen=new Set();
   const listeningItems=await loadPlacementListening();
   for(const level of LEVELS){
-    const plan=PLACEMENT_BLUEPRINT[level];
+    const plan=placementBlueprint()[level];
     // F1 placement: di sini letak freeze 4 detik. `.map()` dulu EAGER - seluruh kata di level
     // itu dijadikan objek soal lebih dulu (1.765 panggilan makeVocabQuestion lintas 6 level)
     // padahal blueprint hanya memakai 11, dan loop di bawah sudah `break` setelah kuotanya
@@ -8839,9 +9440,9 @@ async function startPlacement(){
   // Enam dari 25 soal berasal dari bank listening yang diambil lewat jaringan. Kalau bank
   // itu tidak termuat, sembilan belas soal grammar dan vocabulary masih cukup untuk membaca
   // level; di bawah itu angkanya tidak lagi berarti dan tes ditahan.
-  const floor=PLACEMENT_SIZE-Object.values(PLACEMENT_BLUEPRINT).reduce((n,plan)=>n+plan.listening,0);
+  const floor=placementSize()-Object.values(placementBlueprint()).reduce((n,plan)=>n+plan.listening,0);
   if(qs.length<floor)return showToast(FiezelI18n.t('placement.validator-hanya-menemukan-item-unik',{length:qs.length}));
-  quizLoop({type:'placement',count:PLACEMENT_SIZE,pool:qs,factory:x=>x,placement:true});
+  quizLoop({type:'placement',count:placementSize(),pool:qs,factory:x=>x,placement:true});
 }
 function startLevelPractice(level){
   const items=shuffle(makeLevelSource(level)).map(x=>x.q);
@@ -8867,7 +9468,12 @@ function startLevelPractice(level){
  *    daripada yang sebenarnya, dan seluruh model kemampuan di atasnya ikut keliru.
  */
 function quizLoop(cfg){
- if(document.body?.classList?.contains?.('auth-locked')){pendingAfterGateFn=()=>quizLoop(cfg);return}/* v06 2026-08-29: gerbang akun menutup layar \u2014 pushLayer pasti ditolak dan mode lesson tak menyala; kuis ditunda sampai gerbang selesai/dilewati (runPendingAfterGateFn). */
+ if(document.body?.classList?.contains?.('auth-locked')){pendingAfterGateFn=()=>quizLoop(cfg);return}
+ /* m025-246: potret mastery SEBELUM satu jawaban pun masuk. Diambil di sini dan bukan di
+    finishQuiz karena di sana angkanya sudah berubah - ringkasan "apa yang naik" butuh dua
+    titik waktu, dan ini titik pertamanya. Disimpan di cfg (bukan variabel modul) supaya
+    dua sesi yang tumpang tindih tidak pernah saling menimpa potretnya. */
+ try{if(cfg&&!cfg.__masteryBefore)cfg.__masteryBefore=masterySnapshotNow()}catch(_){}/* v06 2026-08-29: gerbang akun menutup layar \u2014 pushLayer pasti ditolak dan mode lesson tak menyala; kuis ditunda sampai gerbang selesai/dilewati (runPendingAfterGateFn). */
  /* W1 P1-1 (09-001, 10-005, 09-010): mode UKUR. Ujian Skip Level, gerbang lewati materi,
     dan tes penempatan adalah alat ukur \u2014 vonis benar/salah, kunci jawaban, pembahasan,
     popup keyakinan, dan teater analyzing per-soal MEMBOCORKAN kunci ke percobaan berikutnya
@@ -8948,7 +9554,11 @@ function quizLoop(cfg){
  };
 
  const draw=()=>{
-  if(asked>=planned||!remaining.length){finishQuiz(cfg,score,asked||planned,tutorSummary(tutor));return}
+  /* m025-246: soal yang dilewati karena audio gagal dikeluarkan dari PENYEBUT. Ia
+     bukan jawaban salah - ia bukan jawaban sama sekali. Math.max(1,...) menjaga
+     pembagian tetap sah pada kasus ekstrem "seluruh sesi audionya gagal"; hasilnya 0%
+     di sana memang jujur, karena tidak ada satu pun bukti yang terkumpul. */
+  if(asked>=planned||!remaining.length){finishQuiz(cfg,score,Math.max(1,(asked||planned)-(Number(cfg.__noAudioSkips)||0)),tutorSummary(tutor));return}
   if(pendingCard){const c=pendingCard;teach(c);return}
   // Placement mengambil soal berikutnya dari urutan berjenjang di atas, bukan dari tutorPick:
   // pemilihan adaptif targetSuccess 0,8 adalah alat MENGAJAR, dan di dalam alat UKUR ia
@@ -9005,6 +9615,11 @@ function quizLoop(cfg){
   setApp(`<section class="fade quiz-shell${pawSlot?pawSlot.shellClass:''}"><div class="quiz-topbar"><button id="quizExit" class="quiz-exit" aria-label="${FiezelI18n.t('quiz.exit-aria')}"><i data-lucide="x"></i><span class="quiz-exit-label">${FiezelI18n.t('quiz.exit-label')}</span></button><div class="quiz-progress" role="progressbar" aria-valuemin="0" aria-valuemax="${planned}" aria-valuenow="${asked+1}" aria-label="${FiezelI18n.t('quiz.progress-aria',{asked:asked+1,planned})}"><span>${asked+1}</span><em>/ ${planned}</em><i class="quiz-progress-bar" aria-hidden="true" style="--p:${(asked/Math.max(1,planned)).toFixed(3)}"><b></b></i></div><button id="quizNext" class="quiz-next" disabled>${FiezelI18n.t('quiz.next-btn')} <i data-lucide="arrow-right"></i></button></div>${pawSlot?'':`<div class="quiz-mascot" aria-hidden="true">${pawFaceMarkup()}</div>`}${q.passage?card(`<div class="passage passage-reading"><div class="eyebrow">${FiezelI18n.t('quiz.reading-eyebrow')}</div><h3>${esc(q.passage.title)}</h3><p>${esc(q.passage.text)}</p></div>`,'card-reading'):(cfg.context?card(`<div class="passage"><b>${esc(cfg.context.title)}</b><p>${esc(cfg.context.text)}</p></div>`):'')}${card(`${pawSlot?pawSlot.peek:''}${pawSlot&&pawSlot.above?`<div class="quiz-stage">${pawSlot.above}<div class="quiz-bubble"><h2 class="question" id="quizStem">${esc(q.question)}</h2></div></div>`:''}${q.focus?`<div class="vocab-focus"><span class="vocab-focus-word">${esc(q.focus.word)}</span>${q.focus.phonetic?`<span class="phonetic">${esc(q.focus.phonetic)}</span>`:''}</div>`:''}${q.type==='listening'?`<div class="quiz-listen quiz-listen-hero"><button id="quizListen" class="quiz-listen-btn quiz-listen-btn-hero"><i data-lucide="volume-2"></i> ${FiezelI18n.t('quiz.listen-btn')}</button><span id="quizListenNote" class="muted">${FiezelI18n.t('quiz.listen-note')}</span></div>`:''}${pawSlot&&pawSlot.above?'':`<h2 class="question" id="quizStem">${esc(q.question)}</h2>`}<div id="options" class="options"></div><div id="feedback" class="feedback hidden"></div><div id="tutorTurn" class="tutor-turn hidden"></div>`,pawSlot?pawSlot.cardClass:'')}${pawSlot?pawSlot.side:''} </section>`);
   $('quizExit').onclick=()=>confirmQuizExit();/* W1 P1-2: keluar lewat konfirmasi, bukan seketika. */
   $('options').append(...opts.map((o,j)=>{const b=document.createElement('button');b.className='option';b.textContent=o;b.onclick=()=>answer(q,j,b);return b}));
+  /* m025-246: soal PERTAMA sesi ini benar-benar tercat. Ini titik ukur funnel
+     "launch -> soal pertama"; ia diletakkan sesudah opsi terpasang, bukan sesudah
+     setApp, karena soal tanpa pilihan jawaban belum bisa dikerjakan siapa pun.
+     Fungsinya sendiri hanya menembak sekali per pemuatan halaman. */
+  try{anFirstQuestion()}catch(_){}
   /* [FASE 7] m-audit-03 Tugas D: tiga event pelajaran yang didukung maskot tapi tak pernah
      dipanggil (question-shown / hover-answer / answer-picked). Pengawinannya milik modul slot;
      emit = pawReact supaya gerbang kurangi-gerak & preferensi animasi tetap SATU pintu, dan
@@ -9053,8 +9668,9 @@ function quizLoop(cfg){
      // evidenceKappa (diskon jawaban benar berbekal banyak replay) dan riwayat listening.
      if(played){q.__plays=(q.__plays||0)+1;q.__replayCount=Math.max(0,q.__plays-1)}
      note.textContent=played?FiezelI18n.t('quiz.putar-ulang-bila-perlu'):FiezelI18n.t('quiz.suaranya-belum-berbunyi-perangkat-pilihan');
+     if(!played)showListeningFailureActions(q,cfg);
      unlock()}
-    catch(error){note.textContent=FiezelI18n.t('quiz.suara-tidak-berbunyi-pilihan-tetap',{error:String(error?.message||error)});unlock()}
+    catch(error){note.textContent=FiezelI18n.t('quiz.suara-tidak-berbunyi-pilihan-tetap',{error:String(error?.message||error)});showListeningFailureActions(q,cfg);unlock()}
     finally{listen.disabled=false;pawReact('listening-stop');enhanceUI()}
    };
   }
@@ -9389,6 +10005,74 @@ function quizLoop(cfg){
  enterStage('quiz',{draw:()=>draw(),leave:()=>{if(!cfg.__finished)abandonActiveSession('quiz_exit')}});
  draw();
 }
+/* ==========================================================================
+   RINGKASAN AKHIR SESI (m025-246)
+   ==========================================================================
+   OWNER: "Ringkasan akhir sesi: apa yang naik, apa yang jatuh tempo besok -
+   penggerak retensi."
+
+   Layar hasil sebelum ini menjawab satu pertanyaan: "berapa nilaiku?". Itu
+   angka masa lalu, dan angka masa lalu tidak memanggil siapa pun kembali besok.
+   Dua blok di bawah menjawab dua pertanyaan lain, dan keduanya menghadap ke
+   depan: apa yang BERGERAK karena sesi ini, dan apa yang MENUNGGU besok.
+
+   SUMBERNYA BUKAN ANGKA BARU. "Yang naik" dibaca dari selisih mastery yang
+   sudah dicatat updateMastery() untuk tiap materi; "jatuh tempo besok" dibaca
+   dari nextReview yang sudah dijadwalkan penjadwal ingatan yang sama. Tidak ada
+   metrik yang dikarang di layar ini - kalau angkanya salah, yang salah adalah
+   mesinnya, dan itu memang tempat yang benar untuk memperbaikinya. */
+const SESSION_SUMMARY_MIN_DELTA=3;
+const SESSION_SUMMARY_MAX_ROWS=3;
+/** Potret mastery per materi SEBELUM sesi. Dipanggil di awal quizLoop. */
+function masterySnapshotNow(){
+  const out={};
+  for(const bucket of ['vocab','grammar','reading']){
+    const store=state?.[bucket];if(!store)continue;
+    for(const key of Object.keys(store))out[bucket+':'+key]=Number(store[key]?.mastery)||0;
+  }
+  return out;
+}
+/** Selisih mastery terbesar sejak potret. Hanya kenaikan; penurunan bukan urusan layar ini. */
+function sessionMasteryGains(before){
+  if(!before||typeof before!=='object')return [];
+  const rows=[];
+  for(const bucket of ['vocab','grammar','reading']){
+    const store=state?.[bucket];if(!store)continue;
+    for(const key of Object.keys(store)){
+      const now=Number(store[key]?.mastery)||0,was=Number(before[bucket+':'+key])||0;
+      const delta=Math.round(now-was);
+      if(delta>=SESSION_SUMMARY_MIN_DELTA)rows.push({key,delta});
+    }
+  }
+  return rows.sort((a,b)=>b.delta-a.delta).slice(0,SESSION_SUMMARY_MAX_ROWS);
+}
+/** Berapa materi yang jatuh tempo diulang dalam 24 jam ke depan. */
+function dueTomorrowCount(now=Date.now()){
+  const end=now+86400000;let n=0;
+  for(const bucket of ['vocab','grammar','reading']){
+    const store=state?.[bucket];if(!store)continue;
+    for(const key of Object.keys(store)){
+      const at=Number(store[key]?.nextReview)||0;
+      if(at>0&&at<=end)n++;
+    }
+  }
+  return n;
+}
+function sessionSummaryMarkup(before,now=Date.now()){
+  if(uxOff('sessionSummary'))return '';
+  const gains=sessionMasteryGains(before),due=dueTomorrowCount(now);
+  const naik=gains.length
+    ? `<ul class="summary-list">${gains.map(g=>`<li>${esc(FiezelI18n.t('ringkas.baris-naik',{skill:friendlySkillName(g.key),delta:g.delta}))}</li>`).join('')}</ul>`
+    : `<p class="muted">${FiezelI18n.t('ringkas.naik-kosong')}</p>`;
+  const besok=due>0
+    ? `<p class="summary-due">${esc(FiezelI18n.t('ringkas.besok-item',{jumlah:due}))}</p>`
+    : `<p class="muted">${FiezelI18n.t('ringkas.besok-kosong')}</p>`;
+  return `<section class="session-summary" aria-label="${esc(FiezelI18n.t('ringkas.aria'))}">
+  <h3>${FiezelI18n.t('ringkas.judul')}</h3>
+  <div class="summary-block"><b>${FiezelI18n.t('ringkas.naik')}</b>${naik}</div>
+  <div class="summary-block"><b>${FiezelI18n.t('ringkas.besok')}</b>${besok}</div>
+</section>`;
+}
 function finishQuiz(cfg,score,total,tutorReport){
   // Menandai sesi selesai supaya pemulih stage kuis tidak lagi menutupnya sebagai
   // "ditinggalkan" ketika murid menekan kembali dari layar hasil.
@@ -9525,10 +10209,15 @@ function finishQuiz(cfg,score,total,tutorReport){
      konfeti quizMajorCelebrate di atas (accuracy>=70). Literal vonis & CTA (r2 smoke:
      'Tes level selesai', 'Gerbang lewati materi selesai', 'ditandai selesai') tetap. */
   const resultProud=accuracy>=70;
-  setApp(`<section class="fade center result-stage">${card(`<div class="result-icon"><i data-lucide="${resultProud?'trophy':'book-open'}"></i></div><div class="modal-mark">${resultProud?FiezelI18n.t('quiz.result-proud-mark'):FiezelI18n.t('quiz.result-review-mark')}</div><h2>${cfg.placement?FiezelI18n.t('quiz.result-placement-done'):cfg.type==='level-exam'?FiezelI18n.t('quiz.result-exam-done',{title:esc(LEVEL_GUARD_COPY.examTitle),scope:esc(cfg.levelScope||'')}):cfg.type==='grammar-skip'?FiezelI18n.t('quiz.result-skip-done'):FiezelI18n.t('quiz.result-practice-done')}</h2><div class="ring-row"><div class="score" role="img" aria-label="${accuracy}%"><span id="quizScoreCount" aria-hidden="true">${accuracy}%</span></div>${pawFaceMarkup()}</div><p>${FiezelI18n.t('quiz.result-score',{score,total})}</p>${placementLevelBlock}${tutorLine}${examVerdict?`<p class=\"level-exam-verdict ${examVerdict.passed?'is-pass':'is-fail'}\">${esc(examVerdict.message)}</p>`:''}${skipVerdict?`<p class=\"level-exam-verdict ${skipVerdict.passed?'is-pass':'is-fail'}\">${esc(skipVerdict.message)}</p>`:''}${measureReviewBlock}${outcomeLine}${srlLine}${placementAdoptButton?`<div class="result-actions">${placementAdoptButton}<button class="ghost" onclick="go('home')">${FiezelI18n.t('quiz.result-home-btn')}</button></div>`:nextDomain?`<div class="result-actions"><button class="primary" onclick="go('${nextDomain}')">${FiezelI18n.t('quiz.result-next-btn')} <i data-lucide="arrow-right"></i></button><button class="ghost" onclick="go('home')">${FiezelI18n.t('quiz.result-home-btn')}</button></div>`:`<button class="primary" onclick="go('home')">${FiezelI18n.t('quiz.result-home-btn')} <i data-lucide="arrow-right"></i></button>`}`,'hero result-card')}</section>`);
+  setApp(`<section class="fade center result-stage">${card(`<div class="result-icon"><i data-lucide="${resultProud?'trophy':'book-open'}"></i></div><div class="modal-mark">${resultProud?FiezelI18n.t('quiz.result-proud-mark'):FiezelI18n.t('quiz.result-review-mark')}</div><h2>${cfg.placement?FiezelI18n.t('quiz.result-placement-done'):cfg.type==='level-exam'?FiezelI18n.t('quiz.result-exam-done',{title:esc(LEVEL_GUARD_COPY.examTitle),scope:esc(cfg.levelScope||'')}):cfg.type==='grammar-skip'?FiezelI18n.t('quiz.result-skip-done'):FiezelI18n.t('quiz.result-practice-done')}</h2><div class="ring-row"><div class="score" role="img" aria-label="${accuracy}%"><span id="quizScoreCount" aria-hidden="true">${accuracy}%</span></div>${pawFaceMarkup()}</div><p>${FiezelI18n.t('quiz.result-score',{score,total})}</p>${placementLevelBlock}${tutorLine}${examVerdict?`<p class=\"level-exam-verdict ${examVerdict.passed?'is-pass':'is-fail'}\">${esc(examVerdict.message)}</p>`:''}${skipVerdict?`<p class=\"level-exam-verdict ${skipVerdict.passed?'is-pass':'is-fail'}\">${esc(skipVerdict.message)}</p>`:''}${measureReviewBlock}${outcomeLine}${srlLine}${sessionSummaryMarkup(cfg&&cfg.__masteryBefore)}${placementAdoptButton?`<div class="result-actions">${placementAdoptButton}<button class="ghost" onclick="go('home')">${FiezelI18n.t('quiz.result-home-btn')}</button></div>`:nextDomain?`<div class="result-actions"><button class="primary" onclick="go('${nextDomain}')">${FiezelI18n.t('quiz.result-next-btn')} <i data-lucide="arrow-right"></i></button><button class="ghost" onclick="go('home')">${FiezelI18n.t('quiz.result-home-btn')}</button></div>`:`<button class="primary" onclick="go('home')">${FiezelI18n.t('quiz.result-home-btn')} <i data-lucide="arrow-right"></i></button>`}`,'hero result-card')}</section>`);
   // P0-1: skor count-up 0→n% (audit §5: angka tidak pernah melompat). Markup sudah memuat
   // nilai final, jadi lingkungan tanpa animasi tetap benar tanpa satu frame pun berjalan.
   try{countUpScore($('quizScoreCount'),accuracy)}catch(_){}
+  /* m025-246: INI akhir sesi. Kartu "Versi baru" yang ditahan selama pelajaran dilepas di
+     sini - layar hasil adalah satu-satunya titik di mana memuat ulang halaman tidak
+     membuang jawaban siapa pun. Ditunda satu jeda supaya ia tidak berebut perhatian dengan
+     animasi skor yang baru saja dimulai di baris atas. */
+  setTimeout(()=>{try{self.FiezelUpdatePrompt?.flush?.()}catch(_){}},1400);
   // [FASE-9 permukaan] Wajah di cincin skor: pawReact('level-up'/'lesson-complete') di atas
   // berjalan SEBELUM setApp menggambar maskot layar hasil, jadi instans baru itu lahir idle
   // padahal copy-nya menjanjikan perayaan (LEVEL_GUARD_COPY.examPass: "PAW sampai
@@ -9893,8 +10582,30 @@ function istilahMurid(prefix,nilai){
   if(!teks||teks===kunci)return '';
   return teks;
 }
-const PROGRESS_TABS=__fzI18nTable([],()=>([['overview',FiezelI18n.t('progress.ringkasan')],['analysis',FiezelI18n.t('progress.analisis')],['adaptive',FiezelI18n.t('progress.tab-cara-soal-dipilih')],['readiness',FiezelI18n.t('progress.kesiapan-skills')]]));
+/* m025-246 — EMPAT TAB DALAM PROGRES JADI TIGA.
+   OWNER: "Personal Journey + dashboard skill - satu tab 'Progres'."
+
+   Tab "Kesiapan & skill" adalah dashboard skill yang berdiri sendiri itu; isinya
+   (academicReadinessMarkup + unifiedSkillsMarkup) TIDAK dibuang, ia dilipat ke dalam
+   Ringkasan. Kartu "Rencana kamu" (journeyMarkup) juga dilipat keluar dari layar ini
+   dengan bendera `personalJourneyTab` - rencananya sendiri tetap dihitung
+   buildPersonalJourney() dan sekarang terbaca di tempat yang lebih tepat: sebagai isi
+   sesi di kartu Hari ini, tempat murid benar-benar akan mengerjakannya.
+
+   Tiga tab yang tersisa TIDAK dilipat jadi satu gulungan. m025-85 sudah pernah punya
+   layar itu - 17 kartu dalam satu gulungan tanpa struktur - dan tab inilah perbaikannya;
+   mengembalikannya berarti mengulang keluhan yang sudah pernah diselesaikan. Yang
+   diminta owner adalah satu TUJUAN bernama Progres, bukan satu gulungan tanpa dasar. */
+const PROGRESS_TABS=__fzI18nTable([],()=>{
+  const tabs=[['overview',FiezelI18n.t('progress.ringkasan')],['analysis',FiezelI18n.t('progress.analisis')],['adaptive',FiezelI18n.t('progress.tab-cara-soal-dipilih')]];
+  if(uxOn('personalJourneyTab'))tabs.push(['readiness',FiezelI18n.t('progress.kesiapan-skills')]);
+  return tabs;
+});
 let progressTab='overview';
+/* Bendera bisa berganti antar rilis dan `progressTab` hidup di memori modul, jadi nilai
+   'readiness' bisa bertahan melewati satu navigasi setelah tabnya menghilang. Tanpa
+   penjaga ini tabContent[progressTab] menjawab undefined dan layar Progres tercat kosong. */
+function progressTabSafe(){return PROGRESS_TABS.some(([id])=>id===progressTab)?progressTab:'overview'}
 function switchProgressTab(tab){if(!PROGRESS_TABS.some(([id])=>id===tab)||progressTab===tab)return;progressTab=tab;progress()}
 /**
  * m028 fase3 (PATCH-PLAN §5): panel "NEXT SESSION · dipilih PAW".
@@ -9962,7 +10673,8 @@ function progress(){
  // out entirely - it is app/install health, not learning progress, and now lives
  // in Settings (see openSettings()).
  const tabContent={
-  overview:`<div class="grid">${nextSessionPanelMarkup()}${journeyMarkup()}${socialSummaryCardMarkup()}<div><h3>${FiezelI18n.t('progress.peta-study')}</h3>${mapCards}</div>
+  overview:`<div class="grid">${nextSessionPanelMarkup()}${uxOn('personalJourneyTab')?journeyMarkup():''}${socialSummaryCardMarkup()}<div><h3>${FiezelI18n.t('progress.peta-study')}</h3>${mapCards}</div>
+   ${uxOn('personalJourneyTab')?'':card(`<h3>${FiezelI18n.t('progress.readiness-heading')}</h3>${academicReadinessMarkup()}`)+card(`<h3>${FiezelI18n.t('progress.skills-heading')}</h3>${unifiedSkillsMarkup()}`)}
    ${card(`<h3>${FiezelI18n.t('progress.ulangan-pintar')}</h3>${due.length?due.map(([k,x])=>`<div class="row"><span>${esc(friendlySkillName(k))}</span><span>${FiezelI18n.t('progress.dikuasai-risiko-lupa',{mastery:x.mastery||0,x:Math.round(forgettingProbability(x)*100)})}</span></div>`).join('<hr>')+`<div style="margin-top:12px"><button class="primary" onclick="reviewVocab()"><i data-lucide="history"></i> ${FiezelI18n.t('progress.mulai-review-btn',{jumlah:due.length})}</button></div>`:'<p class="muted">'+FiezelI18n.t('progress.belum-ada-materi-perlu-diulang')+'</p>'}`)}
    ${card(`<h3>${FiezelI18n.t('progress.laporan-diagnostik')}</h3>${diagHtml}`)}
    ${card(`<h3>${FiezelI18n.t('progress.prasasti-judul')}</h3><p class="muted">${FiezelI18n.t('progress.lencana-bukti-study-redup-menunjukkan')}</p>${prasastiGalleryMarkup()}`,'prasasti-gallery-card')}
@@ -9988,8 +10700,8 @@ function progress(){
  };
  shell(FiezelI18n.t('progress.peta-study-lab'),FiezelI18n.t('progress.lihat-bagian-sudah-kuat-pola'),`
  ${card(`<div class="stats"><div>${stat(FiezelI18n.t('progress.stat-accuracy'),acc+'%')}</div><div>${stat(FiezelI18n.t('progress.stat-streak'),FiezelI18n.t('progress.stat-streak-days',{days:state.streak}))}</div><div>${stat(FiezelI18n.t('progress.stat-today'),FiezelI18n.t('progress.stat-today-value',{count:state.daily.attempts}))}</div><div>${stat(FiezelI18n.t('progress.stat-review'),due.length)}</div><div>${stat(FiezelI18n.t('progress.stat-gem'),gemsBalance())}</div></div>`)}
- <div class="progress-tabs" role="tablist">${PROGRESS_TABS.map(([id,label])=>`<button type="button" class="progress-tab${progressTab===id?' active':''}" role="tab" aria-selected="${progressTab===id}" onclick="switchProgressTab('${id}')">${esc(label)}</button>`).join('')}</div>
- ${tabContent[progressTab]}
+ <div class="progress-tabs" role="tablist">${PROGRESS_TABS.map(([id,label])=>`<button type="button" class="progress-tab${progressTabSafe()===id?' active':''}" role="tab" aria-selected="${progressTabSafe()===id}" onclick="switchProgressTab('${id}')">${esc(label)}</button>`).join('')}</div>
+ ${tabContent[progressTabSafe()]}
  ${card(`<div class="row"><b><!-- Dibuat oleh Fitrarustqi -->${FiezelI18n.t('footer.dibuat-oleh',{nama:'Fitrarustqi'})}</b><a href="https://instagram.com/fitrarustqi" target="_blank" rel="noopener noreferrer" class="creator-link"><img src="./instagram.svg" alt="Instagram" width="22" height="22"> @fitrarustqi</a></div>`)}
  <button class="danger" onclick="resetProgress()">${FiezelI18n.t('progress.reset-progres')}</button>`)
 }
@@ -10057,11 +10769,37 @@ function setLearnerLocalePreference(next){
   return true;
 }
 window.setLearnerLocalePreference=setLearnerLocalePreference;
+/* m025-246 — BARIS PEMILIH TAMPILAN (Tema Malam).
+   Tiga pilihan, sama persis dengan kontrak di features/ui/fiezel-ui-manager.js:
+   'system' (bawaan, atribut data-theme dihapus supaya @media yang memutuskan),
+   'light', dan 'dark'. Diterapkan SEKETIKA seperti pemilih bahasa, bukan menunggu
+   tombol Simpan: murid yang membuka Pengaturan di ruangan gelap sedang mencari
+   kelegaan mata, dan menyuruhnya menggulir ke dasar panel untuk mendapatkannya
+   adalah kegagalan yang sama dengan sakelar yang tidak melakukan apa-apa. */
+function themeChoiceRowMarkup(){
+  const ui=self.FiezelUI;
+  const active=(ui&&typeof ui.storedTheme==='function')?ui.storedTheme():'system';
+  const options=[['system',FiezelI18n.t('settings.tema-opsi-system')],['light',FiezelI18n.t('settings.tema-opsi-light')],['dark',FiezelI18n.t('settings.tema-opsi-dark')]]
+    .map(([value,label])=>`<option value="${value}"${value===active?' selected':''}>${esc(label)}</option>`).join('');
+  return `<label class="setting-row"><span class="setting-icon"><i data-lucide="moon-star"></i></span><span><b>${FiezelI18n.t('settings.tema-judul')}</b><small>${FiezelI18n.t('settings.tema-catatan')}</small></span><select id="settingTheme" aria-label="${FiezelI18n.t('settings.tema-judul')}">${options}</select></label>`;
+}
+function setThemePreference(next){
+  const ui=self.FiezelUI;
+  if(!ui||typeof ui.applyTheme!=='function')return false;
+  ui.applyTheme(next);
+  /* Langit dipasang sebagai gaya INLINE oleh updateCelestialClock (lihat
+     SCENE_NIGHT_PALETTE), jadi berganti tema tanpa memanggilnya meninggalkan satu
+     langit dari tema lama di belakang seluruh palet yang sudah benar. */
+  try{updateCelestialClock()}catch(_){}
+  haptic('confirm');showToast(FiezelI18n.t('settings.tema-toast'));
+  return true;
+}
+window.setThemePreference=setThemePreference;
 function openSettings(){const p=state.preferences||defaultPreferences,endpoint=p.reportEndpoint||'';
   // Kartu Akun Puter dibungkus lipatan bersarang, BUKAN dipindah atau dihapus: elemennya
   // tetap di DOM (bindAccountSettingControls dan refreshPuterAccountCard tetap menemukannya),
   // tetapi 330 px penjelasan akun tidak lagi ikut terbuka saat panel baru dibuka.
-  const grupProfil=`<label class="endpoint-label">${FiezelI18n.t('onboarding.name-field-label')}<input id="settingLearnerName" type="text" value="${esc(state.userName||'')}" maxlength="24" placeholder="${FiezelI18n.t('settings.nama-you')}" autocomplete="given-name"></label>${learnerLocaleRowMarkup()}`+settingsFold(FiezelI18n.t('settings.akun-puter'),accountSettingsMarkup(),false,'settings-subfold');
+  const grupProfil=`<label class="endpoint-label">${FiezelI18n.t('onboarding.name-field-label')}<input id="settingLearnerName" type="text" value="${esc(state.userName||'')}" maxlength="24" placeholder="${FiezelI18n.t('settings.nama-you')}" autocomplete="given-name"></label>${learnerLocaleRowMarkup()}${themeChoiceRowMarkup()}`+settingsFold(FiezelI18n.t('settings.akun-puter'),accountSettingsMarkup(),false,'settings-subfold');
   const grupBelajar=`<div class="settings-list"><button type="button" class="setting-row setting-row-action" onclick="replayTour()"><span class="setting-icon"><i data-lucide="rotate-ccw"></i></span><span><b>${FiezelI18n.t('settings.redo-kenalan-cepat')}</b><small>${FiezelI18n.t('settings.menjalankan-ulang-tur-menu-awal')}</small></span><i data-lucide="chevron-right"></i></button><label class="setting-row"><span class="setting-icon"><i data-lucide="wand-sparkles"></i></span><span><b>${FiezelI18n.t('settings.animation-label')}</b><small>${FiezelI18n.t('settings.transisi-halaman-kartu-popup-feedback')}</small></span><input id="settingMotion" type="checkbox" ${p.motion?'checked':''}></label><label class="setting-row"><span class="setting-icon"><i data-lucide="vibrate"></i></span><span><b>${FiezelI18n.t('settings.vibration-label')}</b><small>${typeof navigator!=='undefined'&&typeof navigator.vibrate==='function'?FiezelI18n.t('settings.vibration-supported'):FiezelI18n.t('settings.vibration-fallback')}</small></span><input id="settingHaptics" type="checkbox" ${p.haptics?'checked':''}></label>${gemsSettingsRowMarkup()}</div>`;  const grupSuara=`<div class="settings-list"><label class="setting-row"><span class="setting-icon"><i data-lucide="bell-check"></i></span><span><b>${FiezelI18n.t('settings.pengingat-study')}</b><small>${esc(reminderSettingHint())}</small></span><input id="settingReminders" type="checkbox" ${remindersActive()?'checked':''} ${notificationPermission()==='denied'||notificationPermission()==='unsupported'?'disabled':''} aria-label="${FiezelI18n.t('settings.reminder-aria')}"></label><label class="setting-row"><span class="setting-icon"><i data-lucide="badge-check"></i></span><span><b>${FiezelI18n.t('settings.suara-answer')}</b><small>${FiezelI18n.t('settings.bunyi-naik-when-right-bunyi')}</small></span><input id="settingFeedbackSounds" type="checkbox" ${p.feedbackSounds!==false?'checked':''}></label><div class="setting-row" id="audioDiagRow"><span class="setting-icon"><i data-lucide="smartphone"></i></span><span><b>${FiezelI18n.t('settings.status-bunyi-perangkat')}</b><small id="audioDiagText">${FiezelI18n.t('settings.audio-checking')}</small></span></div></div><div id="voiceSettingsCard">${neuralVoiceStatusMarkup()}</div>`;
   // Tombol bersihkan-cache duduk di antara Backup dan Kesehatan Instalasi: kartu diagnosis
   // itulah yang melaporkan shell usang, jadi tombol perbaikannya berdampingan dengannya.
@@ -10079,7 +10817,7 @@ function openSettings(){const p=state.preferences||defaultPreferences,endpoint=p
     +settingsFold(FiezelI18n.t('settings.data-amp-penyimpanan'),grupData,false)
     +settingsFold(FiezelI18n.t('settings.lanjutan'),grupLanjutan,false)
     +`<div class="modal-actions settings-actions"><button id="settingsCancel">${FiezelI18n.t('settings.cancel-btn')}</button><button class="primary" id="settingsSave">${FiezelI18n.t('settings.simpan-prefs')}</button></div>`);
-  $('settingsCancel').onclick=closeModal;setTimeout(refreshInstallHealth,0);setTimeout(refreshAudioDiagnostics,0);$('backupExport')?.addEventListener('click',runBackupExport);$('backupPick')?.addEventListener('click',()=>$('backupFile')?.click());$('backupFile')?.addEventListener('change',event=>runBackupImport(event.currentTarget.files?.[0]));$('openFeedback')?.addEventListener('click',()=>{closeModal();openFeedback('')});$('reportPreview').onclick=openReportPreview;$('settingsSave').onclick=saveSettings;$('settingClearCache')?.addEventListener('click',()=>{confirmClearAppCache()});bindVoiceSettingControls();bindAccountSettingControls();$('settingReminders')?.addEventListener('change',event=>toggleStudyReminders(event.currentTarget));$('settingLearnerLocale')?.addEventListener('change',event=>setLearnerLocalePreference(event.currentTarget.value));$('settingBoardHidden')?.addEventListener('change',event=>socialToggleHidden(event.currentTarget));
+  $('settingsCancel').onclick=closeModal;setTimeout(refreshInstallHealth,0);setTimeout(refreshAudioDiagnostics,0);$('backupExport')?.addEventListener('click',runBackupExport);$('backupPick')?.addEventListener('click',()=>$('backupFile')?.click());$('backupFile')?.addEventListener('change',event=>runBackupImport(event.currentTarget.files?.[0]));$('openFeedback')?.addEventListener('click',()=>{closeModal();openFeedback('')});$('reportPreview').onclick=openReportPreview;$('settingsSave').onclick=saveSettings;$('settingClearCache')?.addEventListener('click',()=>{confirmClearAppCache()});bindVoiceSettingControls();bindAccountSettingControls();$('settingReminders')?.addEventListener('change',event=>toggleStudyReminders(event.currentTarget));$('settingLearnerLocale')?.addEventListener('change',event=>setLearnerLocalePreference(event.currentTarget.value));$('settingTheme')?.addEventListener('change',event=>setThemePreference(event.currentTarget.value));$('settingBoardHidden')?.addEventListener('change',event=>socialToggleHidden(event.currentTarget));
 // Runtime suara dimuat malas (lihat ./fiezel-lazy-loader.js). Kalau murid membuka
 // Pengaturan sebelum gelombang idle selesai, kartunya akan berbunyi "tidak tersedia"
 // padahal berkasnya sedang dalam perjalanan - jadi kartunya digambar ulang begitu tiba.
@@ -10163,7 +10901,7 @@ async function toggleStudyReminders(input){
 // updateNeuralVoiceProgress() dihapus, bukan disembunyikan. Cadangan perangkat kini
 // menyiapkan dirinya sendiri di latar; sebuah tombol yang menawarkan pekerjaan yang
 // sudah berjalan sendiri hanya akan membuat murid mengira ada yang harus ia lakukan.
-function bindVoiceSettingControls(){$('testNeuralVoice')?.addEventListener('click',testNeuralVoice);$('neuralRateInput')?.addEventListener('input',event=>setNeuralRatePreference(event.currentTarget.value))}
+function bindVoiceSettingControls(){$('testNeuralVoice')?.addEventListener('click',testNeuralVoice);$('neuralRateInput')?.addEventListener('input',event=>setNeuralRatePreference(event.currentTarget.value));$('settingVoicePack')?.addEventListener('change',event=>setVoicePackOptIn(event.currentTarget.checked===true))}
 function saveSettings(){const endpoint=$('reportEndpoint').value.trim(),consent=$('reportConsent').checked;if(endpoint&&!validReportEndpoint(endpoint)){showToast(FiezelI18n.t('settings.gunakan-url-https-dengan-domain'));answerFeedbackSignal(false);return}
   // m025-117: nama boleh diganti kapan saja, tetapi tidak boleh DIHAPUS dari sini - kolom
   // yang dikosongkan lalu disimpan akan mengembalikan aplikasi ke keadaan tanpa nama yang

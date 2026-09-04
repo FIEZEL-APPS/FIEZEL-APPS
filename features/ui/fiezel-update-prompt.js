@@ -95,10 +95,47 @@
     }
   }
 
+  /* m025-246 — KARTU "VERSI BARU" TIDAK PERNAH MEMOTONG SOAL.
+     OWNER: "Prompt 'Versi baru': tunda ke akhir sesi, tidak muncul di tengah soal."
+
+     Sebelum ini kartunya muncul begitu service worker punya kandidat baru, dan waktunya
+     ditentukan oleh jaringan - artinya ia bisa (dan akan) mendarat di atas soal yang
+     sedang dikerjakan. Kartu itu punya tombol "Perbarui sekarang" yang MEMUAT ULANG
+     halaman; ditekan di tengah sesi, ia membuang jawaban yang sedang berjalan.
+
+     Sumber kebenaran "sedang ada pelajaran" adalah FiezelStage.lessonMode() - kontrak
+     yang sama yang sudah dipakai tur (fiezel-tour.js:183) dan toast infrastruktur
+     (app.js), jadi tidak ada gerbang kedua yang bisa menyimpang.
+
+     Ditunda, BUKAN dibuang: permintaannya diparkir dan dilepas oleh flush(), yang
+     dipanggil app.js di akhir sesi. Kalau app.js tidak pernah memanggilnya (build lama,
+     jalur keluar yang tidak terduga), pengecekan berkala berikutnya tetap akan
+     memanggil show() lagi - jadi kegagalan terburuknya adalah kartu yang datang
+     terlambat, bukan kartu yang hilang. */
+  var deferred = null;
+  function lessonActive() {
+    try {
+      var stage = (typeof globalThis !== 'undefined' && globalThis.FiezelStage) || null;
+      return !!(stage && typeof stage.lessonMode === 'function' && stage.lessonMode() === true);
+    } catch (_) { return false; }
+  }
+  /** Dipanggil di akhir sesi. Mengembalikan true kalau ada kartu tertunda yang jadi tampil. */
+  function flush() {
+    if (!deferred) return false;
+    var pending = deferred;
+    deferred = null;
+    return show(pending.worker, pending.remoteVersion);
+  }
   function show(worker, remoteVersion) {
     if (worker) pendingWorker = worker;
     if (shown) return false;
     if (sess('fiezel-update-later') === '1') return false;
+    if (lessonActive()) {
+      /* Versi terbaru yang menang: kalau dua kandidat mendarat selama satu sesi, yang
+         dilepas di akhir adalah yang paling akhir diketahui. */
+      deferred = { worker: worker || pendingWorker, remoteVersion: remoteVersion };
+      return false;
+    }
     var node = el();
     if (!node) return false;
     shown = true;
@@ -201,7 +238,7 @@
     }
   }
 
-  self.FiezelUpdatePrompt = { start: start, check: check, show: show, dismiss: later, apply: apply };
+  self.FiezelUpdatePrompt = { start: start, check: check, show: show, flush: flush, dismiss: later, apply: apply };
 
   // Berjalan sendiri. app.js baru juga memanggil start(), tetapi app.js LAMA tidak tahu
   // berkas ini ada - dan justru instalasi lama itulah yang paling butuh kartunya.

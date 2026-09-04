@@ -323,6 +323,50 @@
                   "celebrating","confused","hinting","completion",
                   "proud","sleepy","sad","love",
                   "speaking","welcome-back","lesson-start","level-up","milestone"];
+  /* m025-246 — SETIAP STATE PUNYA BINGKAI STATIS.
+     ========================================================================
+     OWNER (edge case wajib): "Kurangi-gerak: 14 state maskot harus punya
+     fallback statis - verifikasi dengan test."
+
+     APA YANG SEBENARNYA RUSAK SEBELUM INI, dan kenapa ia tidak terlihat sebagai
+     bug: blok prefers-reduced-motion di fiezel-motion.css memampatkan SEMUA
+     animasi maskot ke 0,01 ms. Itu benar sebagai peredam gerak - tetapi animasi
+     yang tidak memakai `forwards` lalu runtuh kembali ke pose DASAR. Akibatnya
+     murid yang menyalakan kurangi-gerak melihat wajah yang sama persis untuk
+     "benar", "salah", "berpikir", dan "mengantuk": maskotnya berhenti
+     berkomunikasi, dan yang hilang bukan hiasan melainkan umpan balik.
+
+     Perbaikannya memakai barang yang SUDAH ADA di berkas ini: pustaka 14 ekspresi
+     (EXPRESSIONS) plus applyFace(), yang memang dibuat untuk "frame statis di atas
+     rig" - nol animasi, murni atribut dan gaya inline. Peta di bawah menyambungkan
+     setiap state ke satu ekspresi, sehingga di bawah kurangi-gerak tiap state
+     mendarat pada wajah yang berbeda tanpa satu keyframe pun berjalan.
+
+     Peta ini WAJIB menutup seluruh STATES. mascot-reduced-motion-test.js
+     membandingkan kedua daftar dan merah kalau ada state yang tidak punya
+     bingkai statis - termasuk state yang ditambahkan besok. */
+  const STATIC_FACE_FOR_STATE = {
+    "idle": "neutral",
+    "greeting": "welcoming",
+    "curious": "curious",
+    "thinking": "thinking",
+    "listening": "calm",
+    "encouraging": "encouraging",
+    "celebrating": "celebrating",
+    "confused": "confused",
+    "hinting": "curious",
+    "completion": "proud",
+    "proud": "proud",
+    "sleepy": "sleepy",
+    "sad": "concern",
+    "love": "happy",
+    "speaking": "happy",
+    "welcome-back": "welcoming",
+    "lesson-start": "excited",
+    "level-up": "surprised",
+    "milestone": "proud"
+  };
+
   /* Durasi transien state baru mengikat 17 R-2: welcome-back 2200 (R-2b),
      lesson-start 1600 (R-2c), level-up 2800 (09 §2.13), milestone 3400
      (09 §2.15 / 13 §4.3). speaking SENGAJA tidak transien (persisten). */
@@ -537,6 +581,10 @@
     /* [P1-2] getter publik — konsumen tidak perlu baca this._state */
     get state() { return this._state; }
     static get states() { return STATES.slice(); }
+    /** Untuk gerbang kurangi-gerak: peta state -> ekspresi statis. Salinan, bukan rujukan. */
+    static get staticFaces() { return Object.assign({}, STATIC_FACE_FOR_STATE); }
+    /** Untuk gerbang: nama ekspresi yang benar-benar ada di pustaka. */
+    static get expressions() { return Object.keys(EXPRESSIONS); }
     /* [FASE-2/3] daftar nama pustaka — additive, tidak menyentuh states */
     static get expressions() { return Object.keys(EXPRESSIONS); }
     static get poses() { return Object.keys(POSES); }
@@ -586,6 +634,14 @@
       // pergantian state lain sudah otomatis restart lewat perubahan class.
       if (reenter) this._restartAnimations();
       this._mouth(name);
+      /* Bingkai statis dipasang SEBELUM _choreo: dua state yang punya koreografi JS
+         (level-up, milestone) memanggil applyFace sendiri di sana, dan koreografi
+         itu yang harus menang kalau ia memang berjalan. Untuk 17 state lainnya,
+         inilah satu-satunya hal yang terjadi di bawah kurangi-gerak. */
+      if (this._reducedMotion()) {
+        const face = STATIC_FACE_FOR_STATE[name];
+        if (face) this.applyFace(face);
+      }
       if (name === "celebrating" || name === "completion")
         this._confetti(conf ?? (name === "completion" ? 46 : 18 + 10 * (level || 1)));
       this._choreo(name, gen);                    // [FASE-4] koreografi JS state baru
@@ -856,6 +912,22 @@
      * sebagai frame statis di atas rig. Tidak mengubah state/kelas st-*;
      * kedip & lookAt tetap hidup. return true/false.
      */
+    /** Kurangi-gerak aktif? Dua sumber, sama dengan yang dibaca fiezel-motion.css:
+     *  preferensi SISTEM (media query) dan sakelar DI DALAM aplikasi
+     *  (body.reduce-motion, dipasang enhanceUI di app.js). Keduanya harus dibaca -
+     *  murid yang mematikan gerak di Pengaturan tidak selalu mematikannya di
+     *  perangkat, dan sebaliknya. Gagal ke false: lingkungan tanpa matchMedia
+     *  (harness tes) tidak boleh diam-diam berjalan di jalur statis. */
+    _reducedMotion() {
+      try {
+        if (typeof matchMedia === "function"
+            && matchMedia("(prefers-reduced-motion: reduce)").matches) return true;
+      } catch (_) {}
+      try {
+        return !!(document.body && document.body.classList.contains("reduce-motion"));
+      } catch (_) { return false; }
+    }
+
     applyFace(name) {
       if (!this._init) return false;
       const t = EXPRESSIONS[name];

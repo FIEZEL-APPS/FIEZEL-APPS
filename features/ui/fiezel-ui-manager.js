@@ -1,4 +1,4 @@
-/* FIEZEL UI: A/B Testing + Skeleton/Empty-state utilities (tema tunggal: terang) */
+/* FIEZEL UI: A/B Testing + Skeleton/Empty-state utilities + pemilih tema (terang / malam / ikut perangkat) */
 
 /* AI-02 F01: naskah murid tidak lagi literal di titik pakai - diambil dari FiezelI18n
    (copy-id-feat-b.js), dimuat lebih dulu lewat <script defer> di index.html. Guard typeof
@@ -7,25 +7,83 @@ const FZ_UI_T = (key) => (typeof FiezelI18n !== 'undefined' && FiezelI18n && Fie
 
 class FiezelUIManager {
   constructor() {
-    /* Kunci lama dari era mode gelap; dipertahankan hanya untuk dibersihkan di initTheme. */
+    /* Pilihan tema murid: 'system' (bawaan, atribut dihapus), 'light', atau 'dark'. */
     this.STORAGE_KEY_THEME = 'fiezel_theme_preference';
     this.STORAGE_KEY_VARIANT = 'fiezel_ab_variant';
     this.init();
   }
 
-  /* ===== TEMA ===== */
-  /* m025-134: mode gelap dihapus atas permintaan OWNER. Dasar cream adalah keputusan
-     produk dan kini satu-satunya tampilan: tidak ada sakelar, tidak ada preferensi
-     tersimpan, dan preferensi sistem tidak lagi punya suara. Atribut data-theme="light"
-     tetap DINYATAKAN (bukan dihapus) supaya stylesheet atau ekstensi pihak ketiga yang
-     masih mengenal konvensi itu membaca terang secara eksplisit. */
-  initTheme() {
-    document.documentElement.setAttribute('data-theme', 'light');
-    try { localStorage.removeItem(this.STORAGE_KEY_THEME); } catch (e) {}
+  /* ===== TEMA =====
+     RIWAYAT, karena keputusan di sini sudah dibalik dua kali dan orang berikutnya
+     berhak tahu urutannya sebelum membaliknya untuk ketiga kali:
+
+       m025-120  OWNER: "MODE GELAP ATAU TIDAK GELAP TIDAK BERFUNGSI DI APLIKASI,
+                 INTINYA AKU TETAP MAU DASAR CREAM."
+       m025-134  Mode gelap DIHAPUS seluruhnya. data-theme dipaku 'light', preferensi
+                 sistem dicabut suaranya, dan pastel-field-contrast-test.js dipasang
+                 untuk menjaga keadaan itu.
+       m025-246  OWNER MEMBALIKNYA, dan kali ini dengan syarat teknis yang eksplisit:
+                 "Tema Malam: pakai token --core* yang sudah ada, hormati
+                 prefers-color-scheme."
+
+     Yang membuat pembalikan ini BUKAN pengulangan kesalahan m025-120: keluhan waktu itu
+     adalah mode gelap yang "tidak berfungsi" - separuh permukaan memaku warnanya sendiri
+     (#fff, #f6f4ed) sementara teks memakai var(--text), jadi gelap berarti tinta terang
+     di atas bidang putih, 1,08:1. Sejak m025-85 permukaan-permukaan itu sudah dipindah ke
+     token, dan keluarga --core* (--core / --core-soft / --core-line / --on-core) sudah
+     hidup dan sudah diuji sebagai panggung gelap splash dan toast. Jadi malam sekarang
+     memakai keluarga yang SUDAH ADA, bukan palet gelap kedua yang dikarang di sini.
+
+     TIGA KEADAAN, dan hanya tiga:
+       'light' - murid memilih terang. data-theme="light" menang atas preferensi sistem.
+       'dark'  - murid memilih malam. data-theme="dark" menang atas preferensi sistem.
+       'system'- bawaan. ATRIBUT DIHAPUS supaya @media (prefers-color-scheme) yang
+                 memutuskan, tanpa satu baris JavaScript pun ikut campur. */
+  THEME_CHOICES() { return ['system', 'light', 'dark']; }
+
+  /** Pilihan murid apa adanya ('system' bila belum pernah memilih atau nilainya rusak). */
+  storedTheme() {
+    try {
+      const raw = localStorage.getItem(this.STORAGE_KEY_THEME);
+      return this.THEME_CHOICES().indexOf(raw) === -1 ? 'system' : raw;
+    } catch (e) { return 'system'; }
   }
 
+  initTheme() {
+    this.applyTheme(this.storedTheme(), { persist: false });
+  }
+
+  /**
+   * Menerapkan pilihan tema ke <html>.
+   * @param {'system'|'light'|'dark'} choice
+   * @param {{persist?:boolean}} [options] persist:false dipakai initTheme - membaca lalu
+   *        menulis balik nilai yang sama hanya menambah tulisan localStorage per boot.
+   */
+  applyTheme(choice, options) {
+    const want = this.THEME_CHOICES().indexOf(choice) === -1 ? 'system' : choice;
+    const root = document.documentElement;
+    /* 'system' MENGHAPUS atribut. Menuliskan data-theme="system" akan membuat kedua
+       selektor tema di style.css meleset (keduanya menyebut nilai konkret), dan hasilnya
+       murid tersangkut di palet terang apa pun setelan perangkatnya - persis kegagalan
+       diam-diam yang membuat mode gelap lama disebut "tidak berfungsi". */
+    if (want === 'system') root.removeAttribute('data-theme');
+    else root.setAttribute('data-theme', want);
+    if (!options || options.persist !== false) {
+      try {
+        if (want === 'system') localStorage.removeItem(this.STORAGE_KEY_THEME);
+        else localStorage.setItem(this.STORAGE_KEY_THEME, want);
+      } catch (e) {}
+    }
+    return want;
+  }
+
+  /** Tema yang BENAR-BENAR tampil sekarang - pilihan murid diselesaikan ke terang/malam. */
   getCurrentTheme() {
-    return 'light';
+    const choice = this.storedTheme();
+    if (choice !== 'system') return choice;
+    try {
+      return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+    } catch (e) { return 'light'; }
   }
 
   /* ===== A/B TESTING ===== */

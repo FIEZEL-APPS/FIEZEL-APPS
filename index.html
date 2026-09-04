@@ -1,5 +1,10 @@
 <!DOCTYPE html>
-<html lang="id" class="fz-booting" data-theme="light">
+<!-- m025-246: data-theme SENGAJA TIDAK dipaku di sini. Nilai statis "light" akan
+     menang atas @media (prefers-color-scheme) selamanya, jadi Tema Malam tidak akan
+     pernah menyala untuk siapa pun - sakelar yang tidak melakukan apa-apa, persis
+     keluhan m025-120. FiezelUIManager.initTheme() memasang atributnya hanya bila murid
+     PERNAH memilih; sampai saat itu perangkatlah yang memutuskan. -->
+<html lang="id" class="fz-booting">
 <head>
   <meta charset="utf-8">
   <!-- m025-186 — KEPUTUSAN OWNER, DIAMBIL SADAR, DAN INI CATATAN BIAYANYA.
@@ -29,9 +34,13 @@
        WebAssembly.instantiate - model 152 MB yang sudah diunduh jadi tidak terpakai. -->
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://js.puter.com; connect-src 'self' https: wss:; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; media-src 'self' blob: data:; worker-src 'self' blob:">
   <meta name="theme-color" content="#FFF9EE">
-  <!-- m025-134: mode gelap dihapus. color-scheme:light membuat kontrol bawaan peramban
-       (scrollbar, input, tombol form) ikut terang di ponsel yang disetel gelap. -->
-  <meta name="color-scheme" content="light">
+  <!-- m025-246: mode gelap KEMBALI sebagai "Tema Malam" (OWNER membalik m025-134;
+       riwayat lengkapnya di blok TEMA MALAM style.css). `light dark` memberi tahu
+       peramban bahwa KEDUA skema didukung, sehingga scrollbar, input, dan tombol
+       bawaan ikut skema yang sedang berlaku alih-alih terkunci terang di atas
+       permukaan gelap. Skema yang berlaku sendiri diputuskan oleh CSS
+       (prefers-color-scheme) dan atribut data-theme, bukan oleh baris ini. -->
+  <meta name="color-scheme" content="light dark">
   <meta name="description" content="FIEZEL adalah aplikasi belajar bahasa Inggris adaptif untuk vocabulary, grammar, reading, speaking, listening, dan tes diagnostik CEFR.">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -53,9 +62,8 @@
        bergeser sendiri. -->
   <link rel="preload" as="font" type="font/woff2" href="./assets/fonts/InstrumentSerif-400.woff2" crossorigin>
   <link rel="preload" as="font" type="font/woff2" href="./assets/fonts/PlusJakartaSans-400.woff2" crossorigin>
-  <!-- Fredoka dipakai pada judul hero beranda, yaitu teks besar PERTAMA yang
-       terlihat setelah splash. Tanpa preload ia swap di depan mata pembaca. -->
-  <link rel="preload" as="font" type="font/woff2" href="./assets/fonts/Fredoka-var.woff2" crossorigin>
+  <!-- m025-246: preload Fredoka DICABUT bersama keluarga fontnya. Judul hero beranda
+       sekarang memakai Plus Jakarta Sans, yang sudah di-preload satu baris di atas. -->
   <style id="fiezelBootCritical">
 html.fz-booting,html.fz-booting body{background:#1B1418}
 html.fz-booting body{overflow:hidden}
@@ -410,15 +418,35 @@ html.fz-booting body{overflow:hidden}
        angka yang terbaca samar di balik pill saat bergulir - lihat .nav-scrim di style.css
        untuk pengukuran yang mendasarinya. Dekoratif murni, karena itu aria-hidden. -->
   <div class="nav-scrim" aria-hidden="true"></div>
+  <!-- m025-246 — EMPAT TAB, TIDAK LEBIH.
+       OWNER: "Navigasi: maks 4 tab - Hari ini . Latihan . Progres . Pengaturan."
+
+       YANG HILANG DAN KE MANA PERGINYA, supaya tidak ada tujuan yang menguap:
+         Vocab, Grammar, Reading  -> di dalam tab Latihan (view `latihan`), bersama
+                                      Menulis, Perpustakaan, dan "Latihan bicara &
+                                      dengar" yang dulu berdiri sendiri sebagai
+                                      Skills Lab. Rute lamanya TETAP HIDUP
+                                      (VALID_VIEWS di app.js tidak dikurangi), jadi
+                                      tautan lama, tombol dalam layar, dan riwayat
+                                      back-nav murid lama tidak ada yang patah.
+         Peta                     -> berganti nama jadi Progres, view yang sama.
+
+       Tab Pengaturan membuka modal, bukan view. Ia SENGAJA tidak membawa data-view:
+       renderInner() memasang kelas active ke elemen ber-data-view dan hanya
+       membersihkannya dari .nav yang lain, jadi atribut itu akan membuat tab ini
+       tersangkut menyala setelah sekali dibuka (kesalahan yang sama sudah tertulis
+       di tombol Tanya FIEZEL di topbar).
+
+       Tombol gigi di topbar TETAP ADA dan itu bukan pintu kembar yang terlewat:
+       selama pelajaran berlangsung, tab bar disembunyikan seluruhnya
+       (body.daily-locked .bottomnav), jadi gigi topbar adalah SATU-SATUNYA pintu ke
+       Pengaturan di dalam sesi - dan tiga tur (menu, library, listening) menunjuk
+       tepat ke sana untuk menjelaskan pengatur kecepatan suara. -->
   <nav class="bottomnav" aria-label="Navigasi utama" data-i18n-aria-label="nav.main-aria">
-    <button type="button" class="nav active" data-view="home" onclick="go('home')" aria-label="Beranda" data-i18n-aria-label="nav.home-aria"><i class="fz-i" data-fz-icon="home" aria-hidden="true"></i><span data-i18n="nav.home">Home</span></button>
-    <button type="button" class="nav" data-view="vocab" onclick="go('vocab')" aria-label="Vocabulary" data-i18n-aria-label="nav.vocab-aria"><i class="fz-i" data-fz-icon="vocab" aria-hidden="true"></i><span data-i18n="nav.vocab">Vocab</span></button>
-    <button type="button" class="nav" data-view="grammar" onclick="go('grammar')" aria-label="Grammar" data-i18n-aria-label="nav.grammar-aria"><i class="fz-i" data-fz-icon="grammar" aria-hidden="true"></i><span data-i18n="nav.grammar">Grammar</span></button>
-    <button type="button" class="nav" data-view="reading" onclick="go('reading')" aria-label="Reading" data-i18n-aria-label="nav.reading-aria"><i class="fz-i" data-fz-icon="reading" aria-hidden="true"></i><span data-i18n="nav.reading">Reading</span></button>
-    <!-- Audit UX Bagian 4: ikon lama (grafik batang) membaca sebagai "statistik", bukan
-         "jalur belajar". Ikon route adalah jalur berkelok dengan simpul - persis makna
-         yang harus dibawa tab ini, sejajar dengan Path/Jalur Belajar di Duolingo. -->
-    <button type="button" class="nav" data-view="progress" onclick="go('progress')" aria-label="Peta belajar" data-i18n-aria-label="nav.map-aria"><i class="fz-i" data-fz-icon="map" aria-hidden="true"></i><span data-i18n="nav.peta">Peta</span></button>
+    <button type="button" class="nav active" data-view="home" onclick="go('home')" aria-label="Hari ini" data-i18n-aria-label="nav.hari-ini-aria"><i class="fz-i" data-fz-icon="home" aria-hidden="true"></i><span data-i18n="nav.hari-ini">Hari ini</span></button>
+    <button type="button" class="nav" data-view="latihan" onclick="go('latihan')" aria-label="Latihan" data-i18n-aria-label="nav.latihan-aria"><i class="fz-i" data-fz-icon="skills" aria-hidden="true"></i><span data-i18n="nav.latihan">Latihan</span></button>
+    <button type="button" class="nav" data-view="progress" onclick="go('progress')" aria-label="Progres" data-i18n-aria-label="nav.progres-aria"><i class="fz-i" data-fz-icon="map" aria-hidden="true"></i><span data-i18n="nav.progres">Progres</span></button>
+    <button type="button" class="nav" onclick="openSettings()" aria-label="Buka pengaturan" data-i18n-aria-label="nav.pengaturan-aria"><i class="fz-i" data-fz-icon="settings" aria-hidden="true"></i><span data-i18n="nav.pengaturan">Pengaturan</span></button>
   </nav>
 
   <!-- OWNER: "Terlalu banyak script terpisah (30+ file JS) dimuat sinkron di <head>/<body>
@@ -447,6 +475,10 @@ html.fz-booting body{overflow:hidden}
   <script defer src="./version.js"></script>
   <script defer src="./report-config.js"></script>
   <script defer src="./core-config.js"></script>
+  <!-- m025-246: sakelar penyederhanaan pengalaman. WAJIB sebelum app.js dan sebelum
+       modul features/* mana pun yang bertanya FiezelUX.on() saat definisi tabel - sama
+       persis dengan alasan urutan blok i18n di bawah. Berkas murni data, nol jaringan. -->
+  <script defer src="./fiezel-ux-flags.js"></script>
   <script defer src="./content-canary.js"></script>
   <script defer src="./content-promotion.js"></script>
   <script defer src="./content-canary-config.js"></script>
@@ -478,6 +510,11 @@ html.fz-booting body{overflow:hidden}
   <script defer src="./features/i18n/copy-id-gems.js"></script>
   <script defer src="./features/i18n/copy-id-quota.js"></script>
   <script defer src="./features/i18n/copy-id-settings-locale.js"></script>
+  <!-- m025-246: naskah BARU gelombang penyederhanaan pengalaman (navigasi 4 tab, Home
+       "Hari ini", ringkasan sesi, tema malam, keadaan gagal audio). Berkas terpisah dengan
+       alasan yang sama dengan copy-id-settings-locale.js di atas: kalimatnya baru, bukan
+       pindahan, jadi regenerasi baseline emasnya bisa dibaca sebagai satu blok. -->
+  <script defer src="./features/i18n/copy-id-redesign.js"></script>
   <script defer src="./features/i18n/copy-id-grammar-labels.js"></script>
   <!-- W4-MERGE: aset th TIDAK dimuat statis (copy-th-*, naskah-th-brain, dua dataset th) —
        semuanya disuntik/difetch DINAMIS oleh pemuat kecil di bawah HANYA saat locale th

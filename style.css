@@ -898,13 +898,23 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
      besar - wordmark, judul layar, judul dialog. Di ukuran kecil serif kontras-tinggi
      kehilangan keterbacaan di layar ponsel, jadi judul kecil tetap memakai sans. */
   --fz-display:'FZ Instrument Serif',Georgia,'Times New Roman',serif;
-  /* m028 fase2: wajah display BULAT. DIRECTION menetapkan Fredoka untuk display &
-     judul LAYAR; judul dialog/onboarding dan wordmark splash TETAP --fz-display serif
-     karena koreografi pembukaan dipaku pada wajah itu (splash-choreography-test).
-     Judul kartu/UI tetap Jakarta 700 - Fredoka hanya di ukuran besar, tempat
-     kebulatannya terbaca sebagai kehangatan, bukan sebagai ketidakjelasan.
-     Fallback menaruh Jakarta sebelum sistem supaya metriknya tetap dekat saat swap. */
-  --fz-display-round:'FZ Fredoka','FZ Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  /* m025-246 — TIGA KELUARGA FONT JADI DUA. OWNER: "Tipografi: 3 -> 2 keluarga font
+     (buang Fredoka)."
+
+     Yang tersisa: Instrument Serif (--fz-display, ukuran besar saja) dan Plus Jakarta
+     Sans (--fz-heading/--fz-body). Fredoka dulu memegang --fz-display-round, dan
+     tokennya SENGAJA dipertahankan alih-alih dicari-ganti di ~40 titik pakai: satu
+     nilai yang berubah lebih mudah diaudit daripada empat puluh selektor yang berubah,
+     dan kalau owner memintanya kembali, yang perlu diubah tetap satu baris.
+
+     Ia menunjuk ke Jakarta 700, bukan ke serif: titik pakainya adalah judul LAYAR dan
+     kartu di ukuran menengah, dan serif kontras-tinggi kehilangan keterbacaan di sana
+     (alasan yang sama yang sudah tertulis di --fz-display tepat di atas). Berkas
+     Fredoka-var.woff2 ikut dicabut dari @font-face, preload index.html, dan precache
+     sw.js - membiarkan 
+     berkasnya terunduh untuk font yang tidak pernah dipakai adalah 
+     ongkos jaringan tanpa satu piksel pun imbalan. */
+  --fz-display-round:'FZ Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   --fz-heading:'FZ Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   --fz-body:'FZ Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   /* ===== v6.1 CALM delta (O4 2026-08) — spacing, type scale, lift, micro-durations.
@@ -922,6 +932,141 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
   --lift-edge:0 3px 0 var(--surface-edge);
   --lift-edge-press:0 1px 0 var(--surface-edge);
   --dur-xs:.12s; --dur-xl:.6s;
+}
+
+/* ==========================================================================
+   TEMA MALAM (m025-246)
+   ==========================================================================
+   OWNER: "Tema Malam: pakai token --core* yang sudah ada, hormati
+   prefers-color-scheme."
+
+   RIWAYAT SINGKAT, karena ini pembalikan. m025-120: "MODE GELAP ... TIDAK
+   BERFUNGSI DI APLIKASI, INTINYA AKU TETAP MAU DASAR CREAM". m025-134 lalu
+   MENCABUT mode gelap seluruhnya. Yang rusak waktu itu bisa disebut persis:
+   puluhan permukaan memaku warnanya sendiri (#fff, #f6f4ed, rgba(255,254,250,.9))
+   sementara teks di atasnya memakai var(--text), jadi "gelap" berarti tinta
+   terang di atas bidang putih - 1,08:1. Sejak m025-85 permukaan-permukaan itu
+   sudah pindah ke token, jadi penyebabnya sudah tidak ada lagi.
+
+   DUA ATURAN YANG MEMBUAT BLOK INI TIDAK MENGULANG KEGAGALAN ITU:
+
+   1. TIDAK ADA PALET GELAP BARU. Setiap nilai di bawah adalah keluarga --core*
+      yang SUDAH hidup dan sudah diuji sebagai panggung gelap splash, panel core,
+      dan toast (--core / --core-soft / --core-line / --on-core / --on-core-muted),
+      atau turunan langsung dari keluarga itu. Yang ditambahkan hanyalah tinta
+      TERANG untuk peran semantik yang versi terangnya sengaja pekat (--info,
+      --good, --bad, --accent): #7A5F1B di atas #1B1418 hanya 2,4:1, jadi memakai
+      ulang nilai terang di sini justru akan menciptakan kembali bug 2026.
+
+   2. SATU DAFTAR, DUA PINTU, DIJAGA GERBANG. Aktivasi ditulis dua kali - sekali
+      untuk preferensi perangkat, sekali untuk pilihan eksplisit murid - karena CSS
+      tidak punya cara menggabungkan @media dan selektor atribut dalam satu aturan.
+      Kedua salinan WAJIB identik, dan night-theme-test.js membandingkannya baris
+      demi baris; menyunting salah satu saja memerahkan gerbang.
+
+   TIGA KEADAAN (kontrak yang sama dengan features/ui/fiezel-ui-manager.js):
+     data-theme="light"  murid memilih terang -> preferensi perangkat DIABAIKAN.
+     data-theme="dark"   murid memilih malam  -> preferensi perangkat DIABAIKAN.
+     atribut tidak ada   bawaan               -> @media di bawah yang memutuskan.
+   Karena itu selektor @media memakai :not([data-theme="light"]) dan bukan :root
+   telanjang: tanpa :not itu, murid yang MEMILIH terang di ponsel bertema gelap
+   tetap mendapat malam, dan pilihannya jadi tombol yang tidak melakukan apa-apa. */
+:root{
+  /* Palet malam disiapkan di sini sebagai token --n-*, lalu dua pintu di bawah
+     hanya memetakannya. Bentuk ini yang membuat kedua pintu itu pendek dan
+     identik - dan karena ia hanya definisi, ia tidak mengubah satu piksel pun
+     selama tidak ada pintu yang aktif. */
+  --n-bg:#1B1418;              /* = --core */
+  --n-panel:#2A2126;           /* = --core-soft */
+  --n-panel-soft:#221A1F;
+  --n-line:#3A3038;            /* = --core-line */
+  --n-line-soft:#2F262C;
+  --n-text:#FDFAF3;            /* = --on-core, 17,4:1 di atas --core */
+  --n-muted:rgba(253,250,243,.72);
+  --n-surface:#2A2126;
+  --n-surface-tint:#241C21;
+  --n-surface-warm:#2F252A;
+  --n-surface-cool:#262029;
+  --n-surface-edge:#3A3038;
+  --n-surface-mute:#322830;
+  --n-surface-edge-strong:#4A3F48;
+  /* Tinta semantik versi malam. Rasio diukur terhadap --n-bg #1B1418:
+     kuning #FFDE59 14,0:1 | hijau #6FD3A8 9,9:1 | merah #FF9075 7,6:1.
+     Bidang -soft-nya sengaja sangat pekat: ia latar chip, bukan tinta. */
+  --n-info:#FFDE59;
+  --n-info-soft:#3A2E10;
+  --n-good:#6FD3A8;
+  --n-good-soft:#14332A;
+  --n-bad:#FF9075;
+  --n-bad-soft:#3A1A14;
+  --n-scrim:rgba(10,7,9,.66);
+  --n-scrim-soft:rgba(10,7,9,.42);
+}
+
+/* PINTU 1 - preferensi perangkat. Berlaku hanya bila murid BELUM memilih terang. */
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:var(--n-bg);--panel:var(--n-panel);--panel-soft:var(--n-panel-soft);
+    --line:var(--n-line);--line-soft:var(--n-line-soft);
+    --text:var(--n-text);--muted:var(--n-muted);--muted-soft:var(--n-muted);
+    --ambient-text:var(--n-text);--ambient-muted:var(--n-muted);
+    --glass-text:var(--n-text);--glass-muted:var(--n-muted);--glass-line:rgba(253,250,243,.14);
+    --surface-solid:var(--n-surface);--surface-tint:var(--n-surface-tint);
+    --surface-warm:var(--n-surface-warm);--surface-cool:var(--n-surface-cool);
+    --surface-edge:var(--n-surface-edge);--surface-mute:var(--n-surface-mute);
+    --surface-edge-strong:var(--n-surface-edge-strong);
+    --surface-rgb:42,33,38;--surface-pure-rgb:42,33,38;--bg-rgb:27,20,24;
+    --sky-top:var(--n-panel-soft);--sky-bottom:var(--n-bg);--scene-light:rgba(255,224,126,.12);
+    --info:var(--n-info);--info-soft:var(--n-info-soft);
+    --good:var(--n-good);--good-bright:var(--n-good);--good-soft:var(--n-good-soft);
+    --bad:var(--n-bad);--bad-bright:var(--n-bad);--bad-soft:var(--n-bad-soft);
+    --green:var(--n-good);--green-soft:var(--n-good-soft);
+    --red:var(--n-bad);--red-soft:var(--n-bad-soft);
+    --accent:var(--n-bad);--accent-strong:var(--n-bad);--accent-soft:var(--n-bad-soft);
+    --ink-soft:var(--n-muted);--ink-danger:var(--n-bad);
+    --ink-hover:var(--n-text);--ink-press:var(--n-text);
+    --text-disabled:rgba(253,250,243,.46);
+    --wordmark-ink-hi:var(--n-text);--wordmark-ink-lo:#D9D2C6;
+    --wordmark-accent-hi:#FFDE59;--wordmark-accent-lo:#E6A800;
+    --focus-ring:var(--focus-ring-on-core);
+    --scrim:var(--n-scrim);--scrim-soft:var(--n-scrim-soft);
+    --shadow-sm:0 2px 10px rgba(0,0,0,.42);
+    --shadow-md:0 10px 30px rgba(0,0,0,.5);
+    --shadow-lg:0 24px 60px rgba(0,0,0,.6);
+  }
+}
+/* PINTU 2 - pilihan eksplisit murid. Isinya WAJIB identik dengan pintu 1
+   (dijaga night-theme-test.js). */
+:root[data-theme="dark"]{
+    color-scheme:dark;
+    --bg:var(--n-bg);--panel:var(--n-panel);--panel-soft:var(--n-panel-soft);
+    --line:var(--n-line);--line-soft:var(--n-line-soft);
+    --text:var(--n-text);--muted:var(--n-muted);--muted-soft:var(--n-muted);
+    --ambient-text:var(--n-text);--ambient-muted:var(--n-muted);
+    --glass-text:var(--n-text);--glass-muted:var(--n-muted);--glass-line:rgba(253,250,243,.14);
+    --surface-solid:var(--n-surface);--surface-tint:var(--n-surface-tint);
+    --surface-warm:var(--n-surface-warm);--surface-cool:var(--n-surface-cool);
+    --surface-edge:var(--n-surface-edge);--surface-mute:var(--n-surface-mute);
+    --surface-edge-strong:var(--n-surface-edge-strong);
+    --surface-rgb:42,33,38;--surface-pure-rgb:42,33,38;--bg-rgb:27,20,24;
+    --sky-top:var(--n-panel-soft);--sky-bottom:var(--n-bg);--scene-light:rgba(255,224,126,.12);
+    --info:var(--n-info);--info-soft:var(--n-info-soft);
+    --good:var(--n-good);--good-bright:var(--n-good);--good-soft:var(--n-good-soft);
+    --bad:var(--n-bad);--bad-bright:var(--n-bad);--bad-soft:var(--n-bad-soft);
+    --green:var(--n-good);--green-soft:var(--n-good-soft);
+    --red:var(--n-bad);--red-soft:var(--n-bad-soft);
+    --accent:var(--n-bad);--accent-strong:var(--n-bad);--accent-soft:var(--n-bad-soft);
+    --ink-soft:var(--n-muted);--ink-danger:var(--n-bad);
+    --ink-hover:var(--n-text);--ink-press:var(--n-text);
+    --text-disabled:rgba(253,250,243,.46);
+    --wordmark-ink-hi:var(--n-text);--wordmark-ink-lo:#D9D2C6;
+    --wordmark-accent-hi:#FFDE59;--wordmark-accent-lo:#E6A800;
+    --focus-ring:var(--focus-ring-on-core);
+    --scrim:var(--n-scrim);--scrim-soft:var(--n-scrim-soft);
+    --shadow-sm:0 2px 10px rgba(0,0,0,.42);
+    --shadow-md:0 10px 30px rgba(0,0,0,.5);
+    --shadow-lg:0 24px 60px rgba(0,0,0,.6);
 }
 
 /* Font merek berlaku di SELURUH aplikasi, termasuk gerbang izin, gerbang akun, modal,
@@ -1014,6 +1159,95 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 .home-stats>div{padding:22px 16px;border-right:1px solid var(--glass-line)}.home-stats>div:last-child{border:0}.home-stats small{display:block;color:var(--glass-muted);font-size:var(--fs-caption);text-transform:uppercase;letter-spacing:.1em}.home-stats strong{display:block;font-size:1.15rem;margin-top:8px}
 
 .home-section-head{display:flex;align-items:end;justify-content:space-between;gap:20px;margin-top:14px}.home-section-head h2{font-size:var(--fs-h1);margin:0;letter-spacing:-.035em}.text-button{border:0;background:transparent;padding:6px;color:var(--accent-strong);box-shadow:none}.text-button:hover{box-shadow:none;border-color:transparent;transform:translateX(2px)}
+/* ==========================================================================
+   HOME "HARI INI" (m025-246)
+   ==========================================================================
+   Satu kartu, satu tombol. Semua warna lewat token, tanpa satu literal pun -
+   itulah syarat kartu ini ikut berbalik sendiri di Tema Malam tanpa aturan
+   kedua (pelajaran dari m025-85: permukaan yang memaku warnanya sendiri adalah
+   satu-satunya sebab mode gelap lama tidak terbaca). */
+/* Keadaan gagal audio di soal dengar kuis (m025-246). Tiga jalan keluar berdiri
+   berdampingan di tempat kegagalannya terjadi - bukan di atas lipatan, tempat
+   murid yang baru saja membaca "suaranya belum berbunyi" tidak akan melihatnya. */
+.quiz-audio-fallback{
+  margin-top:var(--sp-3);padding:var(--sp-3);
+  border:1px solid var(--line);border-radius:var(--radius-sm);
+  background:var(--surface-tint);
+  display:flex;flex-direction:column;gap:var(--sp-2)}
+.quiz-audio-fallback-actions{display:flex;flex-wrap:wrap;gap:var(--sp-2)}
+.quiz-audio-fallback-actions button{flex:1 1 auto;min-height:44px}
+.quiz-audio-fallback small{font-size:var(--fs-caption);line-height:var(--lh-body)}
+
+/* Peringatan penyimpanan iOS (m025-246). Nada peringatan, bukan nada galat: ia
+   memberi tahu sesuatu yang BISA terjadi dan menawarkan jalan keluarnya, jadi
+   warnanya keluarga --info (kuning), bukan --bad (merah). */
+.storage-warning{border:1px solid var(--info);background:var(--info-soft)}
+.storage-warning h3{display:flex;align-items:center;gap:8px;margin:0 0 6px;color:var(--text)}
+.storage-warning h3 svg{width:18px;height:18px;color:var(--info)}
+.storage-warning button{margin-top:var(--sp-3)}
+
+/* Ringkasan akhir sesi (m025-246). Ditempel di layar hasil, di bawah skor:
+   skor menjawab "berapa nilaiku", dua blok ini menjawab "apa yang bergerak" dan
+   "apa yang menunggu besok". Semua warna lewat token, jadi ia ikut Tema Malam
+   tanpa aturan kedua. */
+.session-summary{
+  text-align:left;margin-top:var(--sp-5);padding-top:var(--sp-4);
+  border-top:1px solid var(--line)}
+.session-summary h3{
+  margin:0 0 var(--sp-3);font-size:var(--fs-caption);letter-spacing:.1em;
+  text-transform:uppercase;color:var(--muted);font-weight:700}
+.summary-block{margin-bottom:var(--sp-3)}
+.summary-block>b{display:block;font-size:var(--fs-small);color:var(--text);margin-bottom:4px}
+.summary-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.summary-list li{
+  font-size:var(--fs-small);color:var(--text);
+  padding:8px 10px;border-radius:var(--radius-xs);background:var(--good-soft)}
+.summary-due{margin:0;font-size:var(--fs-small);color:var(--text)}
+
+.today-card{
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-lg);
+  padding:var(--sp-6);box-shadow:var(--shadow-md);
+  display:flex;flex-direction:column;gap:var(--sp-3);
+  max-width:640px;margin:0 auto}
+.today-head{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3)}
+.today-eyebrow{
+  font-size:var(--fs-caption);letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);font-weight:700}
+.today-title{
+  font-family:var(--fz-display);font-weight:400;letter-spacing:-.015em;
+  font-size:var(--fs-display);line-height:var(--lh-tight);margin:0;color:var(--text)}
+.today-lead{margin:0;color:var(--muted);font-size:var(--fs-small);line-height:var(--lh-body)}
+.today-isi-head{
+  margin:var(--sp-2) 0 0;font-size:var(--fs-caption);letter-spacing:.1em;
+  text-transform:uppercase;color:var(--muted);font-weight:700}
+/* Isi sesi terbaca sebagai DAFTAR, bukan sebagai paragraf: murid harus bisa
+   menghitung apa yang akan ia kerjakan dengan sekali lihat. */
+.today-blocks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:var(--sp-2)}
+.today-blocks li{
+  display:flex;flex-direction:column;gap:2px;
+  background:var(--surface-tint);border:1px solid var(--line-soft);
+  border-radius:var(--radius-sm);padding:var(--sp-3)}
+.today-blocks li b{font-size:var(--fs-body);color:var(--text)}
+.today-blocks li span{font-size:var(--fs-small);color:var(--muted);line-height:var(--lh-body)}
+.today-empty{margin:0;color:var(--muted);font-size:var(--fs-small);line-height:var(--lh-body)}
+.today-cta{width:100%;margin-top:var(--sp-2);min-height:52px;font-size:var(--fs-body)}
+/* Tombol "latihan tambahan" setelah target tercapai. SENGAJA bukan .primary:
+   satu layar, satu tombol primer - dan menagih sesi kedua sekuat sesi pertama
+   adalah persis yang membuat aplikasi belajar terasa menuntut. */
+.today-cta-soft{
+  width:100%;margin-top:var(--sp-2);background:var(--surface-tint);
+  border:1px solid var(--line);color:var(--text)}
+/* Runtun SEKUNDER: satu baris kecil, bukan keping sebesar ajakan utamanya. */
+.today-streak{
+  margin:0;display:flex;align-items:center;gap:6px;
+  font-size:var(--fs-small);color:var(--muted)}
+.today-streak .fz-i{width:18px;height:18px}
+.home-today .trust-line,.home-today .home-level-context{margin-top:var(--sp-2)}
+@media (prefers-reduced-motion:no-preference){
+  .today-blocks li{animation:today-block-in .32s var(--ease,ease) both;animation-delay:calc(var(--ti,0)*60ms)}
+}
+@keyframes today-block-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
 .learning-launcher{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
 /* Pintu Online & Teman di Home: satu kartu, jadi ia mengisi barisnya sendiri alih-alih
    duduk selebar seperempat di grid empat kolom. Kartunya juga lebih pendek dari launcher
@@ -1456,12 +1690,12 @@ body.daily-locked{overflow:hidden}
   src:url('./assets/fonts/PlusJakartaSans-600.woff2') format('woff2')}
 @font-face{font-family:'FZ Plus Jakarta Sans';font-style:normal;font-weight:700;font-display:swap;
   src:url('./assets/fonts/PlusJakartaSans-700.woff2') format('woff2')}
-/* FZ Fredoka - wajah display bulat brand, di-self-host (29 KB, sudah ter-subset:
-   217 codepoint, latin dasar lengkap). Ia VARIABLE font dengan axis wght 300-700,
-   jadi satu deklarasi sudah menutup seluruh rentang beratnya - tidak seperti
-   PlusJakartaSans yang butuh empat berkas statis. */
-@font-face{font-family:'FZ Fredoka';font-style:normal;font-weight:300 700;font-display:swap;
-  src:url('./assets/fonts/Fredoka-var.woff2') format('woff2')}
+/* m025-246: @font-face 'FZ Fredoka' DICABUT bersama keluarga fontnya (OWNER:
+   "Tipografi: 3 -> 2 keluarga font (buang Fredoka)"). Tidak ada satu pun selektor yang
+   masih menyebut nama keluarga itu - satu-satunya pemakainya adalah --fz-display-round,
+   dan token itu sekarang menunjuk Jakarta. Deklarasi yang ditinggalkan di sini akan
+   membuat peramban menyiapkan wajah yang tidak pernah dilukis; berkas woff2-nya ikut
+   dicabut dari preload index.html dan dari precache sw.js. */
 
 .fiezel-splash,.fiezel-ob{
   /* m028 "Warm Paper, Bright Mind". Peran token TIDAK berubah - hanya nilainya, plus
@@ -4584,7 +4818,7 @@ body.fz-stage-grammar-lesson .section-head h1{font-family:var(--fz-heading);font
    (AI-04 F10) tetap utuh dan memang tidak memuat konten Thai. */
 :root:lang(th){
   --fz-display:'Noto Sans Thai Looped','FZ Instrument Serif',Georgia,'Times New Roman',serif;
-  --fz-display-round:'Noto Sans Thai Looped','FZ Fredoka','FZ Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --fz-display-round:'Noto Sans Thai Looped','FZ Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   --fz-heading:'Noto Sans Thai Looped','FZ Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   --fz-body:'Noto Sans Thai Looped','FZ Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
 }
