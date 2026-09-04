@@ -1,6 +1,6 @@
 /**
  * FIEZEL · features/i18n/copy-id-feat-a.js — COPY-MAP INDONESIA, domain features A–M
- * (splash, daily-target, install-health, academic-readiness, diagnostics, brain A–M).
+ * (splash, install-health, academic-readiness, diagnostics, brain A–M).
  * W2-FEAT-A, dasar: impl/plans/W1-FEAT-A-plan.json.
  *
  * ATURAN (penjelasan penuh: copy-id-core.js):
@@ -29,17 +29,6 @@
   I18N.registerCopy('id', {
     // ---------- splash.* ----------
     'splash.welcome-aria': 'Selamat datang di FIEZEL',
-
-    // ---------- daily.* ----------
-    'daily.lock-mark': '<div class="daily-lock-mark">TARGET HARIAN FIEZEL · WAJIB</div>',
-    'daily.lock-title': '<h2>Target hari ini belum selesai</h2>',
-    'daily.lock-body': '<p>FIEZEL menilai kamu perlu <b>' + '{total}' + ' soal</b> hari ini. Sisa <b>' + '{remaining}' + '</b> lagi. Aplikasi terbuka penuh setelah target beres.</p>',
-    'daily.lock-count': '<p class="daily-lock-count">' + '{done}' + ' / ' + '{total}' + ' soal</p>',
-    'daily.lock-start-btn': '<button type="button" class="primary wide" id="dailyLockStart">Kerjakan sekarang</button>',
-    'daily.lock-note': '<p class="daily-lock-note">Keluar dari aplikasi tidak menghapus target. Saat kembali, target ini masih menunggu.</p>',
-    'daily.lock-aria': 'Target harian FIEZEL',
-    'daily.done-toast': 'Target harian selesai. Aplikasi terbuka penuh.',
-    'daily.finish-first-toast': 'Selesaikan target harian dulu.',
 
     // ---------- health.* ----------
     'health.build-unreadable-title': 'Penanda build tidak terbaca',

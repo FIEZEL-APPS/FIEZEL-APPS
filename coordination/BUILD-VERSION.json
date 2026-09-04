@@ -1,7 +1,7 @@
 {
-  "version": "m025-253",
-  "claimedBy": "branch main",
-  "claimedAt": "2026-09-04T20:09:31.020Z",
-  "reason": "resolusi peran guru paralel saat splash dan transisi instan ke ruang guru",
+  "version": "m025-254",
+  "claimedBy": "branch claude/hapus-popup-target-harian-b96rws",
+  "claimedAt": "2026-09-04T23:10:33.348Z",
+  "reason": "hapus kunci target harian wajib",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

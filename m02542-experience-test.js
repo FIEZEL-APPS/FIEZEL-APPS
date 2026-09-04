@@ -1,7 +1,8 @@
 'use strict';
 // m025-42 OWNER experience batch:
 //   1. Classroom press-to-talk with varied, lesson-aware answers
-//   2. a mandatory daily target that locks every in-app exit
+//   2. a mandatory daily target that locks every in-app exit — DIHAPUS di m025-254
+//      (OWNER: "annoying banget"); bagian 2 kini gerbang penghapusannya
 //   3. zoom disabled everywhere, by tag AND by gesture
 //   4. one batch download for both neural voices, offered once and never again
 const assert = require('assert');
@@ -9,7 +10,8 @@ const fs = require('fs');
 
 const zoom = require('./features/ui/fiezel-zoom-lock.js');
 // m025-96: gerbang unduhan dipensiunkan seluruhnya - berkasnya tidak ada lagi.
-const daily = require('./features/daily-target/fiezel-daily-target.js');
+// m025-254: kunci target harian menyusul; berkasnya juga tidak ada lagi, jadi tidak ada
+// yang bisa (atau boleh) di-require di sini - lihat bagian 2 di bawah.
 // W4-QA — harness i18n, teknik union W2 (pola regression-test/tours-test W2-INT §1):
 // naskah tutor-dialog PINDAH byte-identik ke copy-id-feat-b.js (AI-02 F01, W2-FEAT-B).
 // require modul di ATAS ini sudah menyeret runtime FiezelI18n ke globalThis TANPA copy-map
@@ -26,7 +28,6 @@ const index = fs.readFileSync('index.html', 'utf8');
 const css = fs.readFileSync('style.css', 'utf8');
 const sw = fs.readFileSync('sw.js', 'utf8');
 const app = fs.readFileSync('app.js', 'utf8');
-const dailySrc = fs.readFileSync('features/daily-target/fiezel-daily-target.js', 'utf8');
 const chatSrc = fs.readFileSync('features/tutor-classroom/fiezel-tutor-voice-chat.js', 'utf8');
 const tutorSrc = fs.readFileSync('features/tutor-classroom/fiezel-tutor-v3.js', 'utf8');
 const tutorCss = fs.readFileSync('features/tutor-classroom/tutor-v3.css', 'utf8');
@@ -117,48 +118,53 @@ test('m025-96: gerbang unduhan digantikan pintu bicara bersama', () => {
   assert.ok(!/FiezelVoiceBundleGate/.test(app), 'app.js tidak boleh memicu gerbang yang sudah dihapus');
 });
 
-// ---- 2. mandatory daily target -----------------------------------------------------
+// ---- 2. m025-254: kunci "target harian WAJIB" DIHAPUS -------------------------------
+//
+// OWNER, 4 Sep 2026: "HAPUSKAN SISTEM POPUP TARGET HARIAN FIEZEL YANG WAJIB ITU, KARENA
+// ITU ANNOYING BANGET." Yang dihapus adalah SELURUH lapisannya: modulnya, lembar
+// #dailyLock, pembungkus window.go yang menolak perpindahan, kelas body.daily-locked,
+// naskah daily.* di kedua copy-map, dan aturan CSS-nya. Asersi di bawah dibalik secara
+// terbuka - persis cara m025-96 memensiunkan gerbang unduhan suara di atas - supaya
+// pembaca berikutnya tahu ini keputusan produk, bukan gerbang yang diam-diam hilang.
+//
+// Bentuk lamanya, dicatat agar tidak lahir kembali dengan nama lain: modul itu memasang
+// dirinya sendiri 1,2 detik setelah boot, membuka lembar penuh layar begitu murid
+// memenuhi syarat (notifikasi + sudah tes), lalu MENOLAK setiap panggilan go() sampai
+// jumlah soal hari itu tercapai. Meninggalkan aplikasi tidak menghapusnya; ia kembali
+// pada kunjungan berikutnya.
 
-test('the target is derived from the learner, inside sane bounds', () => {
-  assert.strictEqual(daily.targetFor({ sessionSize: 12, dueReviews: 0 }), 12);
-  assert.strictEqual(daily.targetFor({ sessionSize: 12, dueReviews: 5 }), 17);
-  assert.strictEqual(daily.targetFor({ sessionSize: 12, dueReviews: 99 }), daily.MAX_TARGET, 'a huge backlog cannot make the day impossible');
-  assert.strictEqual(daily.targetFor({ sessionSize: 2, dueReviews: 0 }), daily.MIN_TARGET, 'a tiny session still means a real day');
-  assert.strictEqual(daily.targetFor({}), 12, 'missing evidence falls back to the standard session');
+test('m025-254: tidak ada lagi kunci target harian di mana pun', () => {
+  assert.ok(!fs.existsSync('features/daily-target/fiezel-daily-target.js'), 'modulnya harus terhapus');
+  assert.ok(!fs.existsSync('features/daily-target'), 'foldernya ikut terhapus, bukan disisakan kosong');
+  assert.ok(!index.includes('fiezel-daily-target.js'), 'index tidak boleh memuatnya');
+  assert.ok(!sw.includes('fiezel-daily-target.js'), 'service worker tidak boleh menyimpannya');
+  assert.ok(!/FiezelDailyTarget/.test(app), 'app.js tidak boleh menanyakan modul yang sudah tidak ada');
+  assert.ok(!/daily-lock/.test(css), 'lembar dan panel kuncinya tidak boleh punya gaya lagi');
+  assert.ok(!/daily-locked/.test(css), 'kelas pengunci navigasi ikut hilang');
+  // app.js masih MENYEBUT kelas itu di catatan sejarah m025-254 - itu memang gunanya
+  // catatan. Yang dilarang adalah KODE yang menanyakannya kepada <body>.
+  assert.ok(!/contains\?\.\('daily-locked'\)/.test(app), 'hook locked back-nav tidak boleh menunggu kelas yang tak pernah dipasang');
+  assert.ok(!/dailyLock/.test(index), 'tidak ada sisa markup lembar kunci di dokumen');
 });
 
-test('the lock only engages for a learner who meets all three conditions', () => {
-  const base = { sessionSize: 12, dueReviews: 0, todayAttempts: 0 };
-  assert.strictEqual(daily.evaluate({ ...base, notificationsGranted: false, placementDone: true }).locked, false,
-    'no notifications, no lock');
-  assert.strictEqual(daily.evaluate({ ...base, notificationsGranted: true, placementDone: false }).locked, false,
-    'not assessed yet, no lock');
-  const locked = daily.evaluate({ ...base, notificationsGranted: true, placementDone: true });
-  assert.strictEqual(locked.locked, true, 'assessed learner with an unfinished target is locked');
-  assert.strictEqual(locked.remaining, 12);
-  const met = daily.evaluate({ ...base, notificationsGranted: true, placementDone: true, todayAttempts: 12 });
-  assert.strictEqual(met.locked, false, 'finishing the target unlocks the app');
-  assert.strictEqual(met.met, true);
-  assert.strictEqual(met.done, 12, 'overshooting is capped at the target for display');
+test('m025-254: naskah kuncinya ikut hilang dari kedua copy-map', () => {
+  const idCopy = fs.readFileSync('features/i18n/copy-id-feat-a.js', 'utf8');
+  const thCopy = fs.readFileSync('features/i18n/copy-th-feat-a.js', 'utf8');
+  // Naskah yatim = godaan untuk menghidupkan kembali fiturnya "karena kalimatnya sudah ada".
+  assert.ok(!/'daily\./.test(idCopy), 'kunci daily.* tidak boleh tersisa di copy-map Indonesia');
+  assert.ok(!/'daily\./.test(thCopy), 'kunci daily.* tidak boleh tersisa di copy-map Thai');
+  assert.ok(!idCopy.includes('TARGET HARIAN FIEZEL'), 'judul lembar kuncinya benar-benar hilang');
 });
 
-test('every in-app exit is blocked while the lock is armed', () => {
-  assert.match(dailySrc, /guarded\.__dailyTargetGuarded/, 'go() is wrapped so navigation is refused');
-  assert.match(dailySrc, /popstate/, 'the in-app back gesture is swallowed');
-  assert.match(dailySrc, /visibilitychange/, 'returning to the app re-evaluates the lock');
-  assert.match(css, /body\.daily-locked \.bottomnav/, 'the bottom navigation is inert while locked');
-  // Honesty requirement: the module must not pretend it can hold the OS gesture.
-  assert.match(dailySrc, /CANNOT: stop the iOS home-screen swipe/,
-    'the OS-level limit must be documented where the next maintainer will read it');
-  assert.ok(index.includes('./features/daily-target/fiezel-daily-target.js'), 'loaded by the document');
-  assert.ok(sw.includes('./features/daily-target/fiezel-daily-target.js'), 'precached');
-  // Wave D (D6 §5): nudge start() dari app.js DIHAPUS — tiap panggilan menumpuk listener
-  // visibilitychange tanpa guard. Modulnya self-arm (DOMContentLoaded/setTimeout 1200 ms,
-  // lihat komentar m025-43 di modul), jadi yang di-assert kini self-arm itu sendiri dan
-  // ketiadaan nudge ganda di app.js.
-  assert.match(dailySrc, /setTimeout\(start, 1200\)/, 'the module arms itself once the page settles');
-  assert.ok(!/FiezelDailyTarget\?\.start\(\)/.test(app), 'app.js must not stack a second arm (leaky listener)');
-  assert.match(app, /window\.__fiezelDueReviews=/, 'the module reads real review evidence, not a guess');
+test('m025-254: hari yang tuntas tetap dikenali, tanpa mengunci apa pun', () => {
+  // Yang dihapus adalah KUNCINYA, bukan kemampuan aplikasi mengenali hari yang beres:
+  // kartu Home masih berganti isi dan bukti sosial daily_target masih berangkat. Keduanya
+  // kini bertanya ke satu fungsi biasa di app.js yang tidak menyentuh navigasi sama sekali.
+  assert.match(app, /function dailySessionDone\(target\)\{/, 'penggantinya sebuah pertanyaan, bukan gerbang');
+  assert.match(app, /selesai=!state\.activeSession&&dailySessionDone\(shape\.soal\)/, 'kartu Home memakainya');
+  assert.match(app, /if\(dailySessionDone\(\)\)events\.push\(\{kind:'daily_target'\}\)/, 'bukti sosial memakainya');
+  // Gerbang anti-kambuh: tidak ada pembungkus go() yang menolak perpindahan atas nama target.
+  assert.ok(!/__dailyTargetGuarded/.test(app), 'go() tidak boleh dibungkus penolak navigasi');
 });
 
 // ---- 1. press-to-talk --------------------------------------------------------------
@@ -247,14 +253,13 @@ test('the round button exists, answers by voice, and never falls back to browser
 
 // ---- m025-43 OWNER repair batch ----------------------------------------------------
 
-test('daily target tetap menyalakan dirinya sendiri', () => {
-  // The original call sat inside unlockAppAfterNotification, which executes while app.js
-  // is still parsing - every <script> after it was undefined, so the optional call was a
-  // silent no-op. That is why OWNER saw no popup at all.
-  assert.match(dailySrc, /DOMContentLoaded/, 'the daily target arms itself');
-  // m025-96: gerbang suara sudah dihapus, jadi tinggal daily target yang menyalakan diri.
-  // Two blocking sheets must never stack.
-  assert.match(dailySrc, /voiceBundleSheet/, 'the target sheet waits for the mandatory download');
+test('tidak ada lagi lembar pemblokir yang menyalakan dirinya sendiri saat boot', () => {
+  // Dulu: kunci target harian memasang dirinya 1,2 dtk setelah boot (m025-43), dan harus
+  // mengintip #voiceBundleSheet supaya dua lembar pemblokir tidak bertumpuk. Kedua lembar
+  // itu sekarang sudah dihapus (m025-96 dan m025-254), jadi yang dijaga tinggal
+  // ketiadaannya - boot tidak boleh lagi melahirkan lapisan yang menahan murid.
+  assert.ok(!/voiceBundleSheet/.test(app), 'lembar unduhan suara tidak boleh disebut lagi');
+  assert.ok(!/dailyLock/.test(app), 'lembar target harian tidak boleh disebut lagi');
 });
 
 test('long press can no longer select or copy the interface', () => {
