@@ -51,6 +51,26 @@ function versiSumber() {
   return JSON.parse(fs.readFileSync(SUMBER, 'utf8')).version;
 }
 
+/* SIAPA yang memegang nomor ini. Sebelum m025-249 alat ini menulis version/claimedAt/reason
+ * tapi TIDAK PERNAH menulis claimedBy, jadi field itu membawa nama pengklaim LAMA selamanya:
+ * m025-249 tercatat atas nama sesi yang sebenarnya mengklaim m025-248. coordination-guard-test
+ * hanya memeriksa field itu ADA, bukan benar - jadi kebohongannya hijau, dan sesi berikutnya
+ * yang mencari "siapa yang sedang memegang nomor ini" diarahkan ke branch yang salah.
+ *
+ * Namanya diambil dari cabang git karena itu satu-satunya identitas yang benar-benar dimiliki
+ * pemanggilnya tanpa harus diketik (dan diketik berarti kadang tidak diketik). FIEZEL_BUILD_CLAIMER
+ * menimpanya untuk pemanggil yang punya nama lebih berarti daripada nama cabang. */
+function pengklaim() {
+  if (process.env.FIEZEL_BUILD_CLAIMER) return String(process.env.FIEZEL_BUILD_CLAIMER).trim();
+  try {
+    const cabang = execSync('git rev-parse --abbrev-ref HEAD', {
+      cwd: ROOT, encoding: 'utf8', timeout: 15000, stdio: ['ignore', 'pipe', 'ignore']
+    }).trim();
+    if (cabang && cabang !== 'HEAD') return 'branch ' + cabang;
+  } catch { /* di luar git: jatuh ke bawah */ }
+  return 'tidak tercatat (jalankan ulang di dalam git, atau set FIEZEL_BUILD_CLAIMER)';
+}
+
 /* Versi di origin/main. Kalau git tidak bisa dihubungi (mode luring, sandbox tanpa remote),
  * JANGAN diam-diam memakai versi lokal sebagai dasar: itu justru cara tabrakan lahir.
  * Kembalikan null dan katakan terus terang bahwa dasarnya tidak terverifikasi. */
@@ -128,6 +148,7 @@ if (argv[0] === '--adopt') {
   j.version = v[0];
   j.claimedAt = new Date().toISOString();
   j.reason = alasanAdopt;
+  j.claimedBy = pengklaim();
   fs.writeFileSync(SUMBER, JSON.stringify(j, null, 2) + '\n');
   console.log('Diadopsi: ' + sumberLama + ' -> ' + v[0] + ' (' + alasanAdopt + ')');
   console.log('Tidak ada penanda build yang diubah, jadi nol murid mengunduh ulang shell cache.');
@@ -215,6 +236,7 @@ const sumber = JSON.parse(fs.readFileSync(SUMBER, 'utf8'));
 sumber.version = versiBaru;
 sumber.claimedAt = new Date().toISOString();
 sumber.reason = alasan;
+sumber.claimedBy = pengklaim();
 fs.writeFileSync(SUMBER, JSON.stringify(sumber, null, 2) + '\n');
 console.log('coordination/BUILD-VERSION.json: ' + versiBaru + ' (' + alasan + ')');
 
