@@ -1,0 +1,192 @@
+name: m025-47 Neural Library Safari gate
+
+on:
+  pull_request:
+    paths:
+      - 'features/neural-voice/**'
+      - 'features/library/**'
+      - 'neural-voice-m02547-latency-integrity-test.js'
+      - '.github/workflows/m02547-neural-library-safari.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audiobook-safari:
+    runs-on: macos-26
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Record Safari substrate
+        shell: bash
+        run: |
+          set -euo pipefail
+          sw_vers
+          /usr/bin/safaridriver --version
+          test "$(/usr/bin/arch)" = arm64
+
+      - name: Verify shipped Supertonic substrate
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd vendor/supertonic-3
+          shasum -a 256 sherpa-onnx-wasm-main-tts.wasm sherpa-onnx-wasm-main-tts.js \
+            sherpa-onnx-tts.js sherpa-onnx-tts.worker.js \
+            vector_estimator.int8.onnx vocoder.int8.onnx | tee ../../m02547-runtime-sha256.txt
+          grep -q '325adfe564122ca2766fe0902b22c780f61a362f5d36b0c364b1c3e34db932fe' ../../m02547-runtime-sha256.txt
+          grep -q '6ded938a274ad01f2d786ceda2dfcac49dd5e3ffffe1dc81fed9e3a13b70eaa3' ../../m02547-runtime-sha256.txt
+          grep -q '20cd86fa5c6effedfda0e7cffe5b0569ca401c440a0c3a1d72bf39286c0db3fd' ../../m02547-runtime-sha256.txt
+          grep -q 'e923d60f53f95eb1ce235f1dc33ec56d9c057823c96fa6f8acf98f32b0da6152' ../../m02547-runtime-sha256.txt
+
+      - name: Create real product audiobook probe
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > m02547-probe.html <<'HTML'
+          <!doctype html><meta charset="utf-8"><title>m025-47 neural library Safari gate</title>
+          <script>window.FIEZEL_VERSION='5.19.0';</script>
+          <script src="./features/neural-voice/fiezel-voice-diagnostics.js"></script>
+          <script src="./features/neural-voice/fiezel-neural-voice-config.js"></script>
+          <script src="./features/neural-voice/fiezel-kokoro-adapter.js"></script>
+          <script src="./features/neural-voice/fiezel-prosody.js"></script>
+          <script src="./features/neural-voice/fiezel-voice-persona.js"></script>
+          <script src="./features/neural-voice/fiezel-sherpa-vits-adapter.js"></script>
+          <script src="./features/neural-voice/fiezel-neural-voice.js"></script>
+          <script src="./features/neural-voice/fiezel-web-audio-player.js"></script>
+          <script src="./features/neural-voice/fiezel-neural-voice-bootstrap.js"></script>
+          <script src="./features/neural-voice/fiezel-neural-voice-audibility-fix.js"></script>
+          <script>
+          (()=>{
+            const r={phase:'boot',errors:[],usedBrowserTts:false};
+            window.__probeStatus='boot';window.__probeResult=null;
+            try{
+              const realSpeak=speechSynthesis.speak.bind(speechSynthesis);
+              speechSynthesis.speak=u=>{
+                if(String(u&&u.text||'').trim())r.usedBrowserTts=true;
+                return realSpeak(u);
+              };
+            }catch(_){}
+            let last=performance.now(),maxDrift=0,ticks=0;
+            const timer=setInterval(()=>{const n=performance.now();maxDrift=Math.max(maxDrift,n-last-100);last=n;ticks++},100);
+            const finish=(ok,e)=>{
+              clearInterval(timer);
+              r.success=ok;
+              r.eventLoop={maxTickDriftMs:Math.round(Math.max(0,maxDrift)),tickCount:ticks};
+              if(e)r.errors.push(String(e&&e.message||e));
+              window.__probeStatus=ok?'done':'error';window.__probeResult=r;
+            };
+            const timeout=(p,ms,label)=>Promise.race([p,new Promise((_,reject)=>setTimeout(()=>reject(new Error(label+' timeout '+ms)),ms))]);
+            const line1='The little mouse looked at the lion and promised to remember his kindness.';
+            const line2='A few days later, the lion became trapped in a hunter’s strong net.';
+            (async()=>{
+              const rt=window.FiezelVoiceRuntime;
+              if(!rt)throw new Error('FiezelVoiceRuntime missing');
+              await timeout(rt.prepare(),900000,'prepare');
+              const state=rt.status();
+              r.engine=state.engine;r.prepared=state.prepared;r.ready=state.ready;
+
+              // Stabilize one ordinary utterance so the measured pair represents the
+              // Library's ongoing audiobook path rather than first-ever model warm-up.
+              const smoke=await timeout(rt.speak('Neural audiobook warmup.',{lang:'en-US',speed:1,allowFallback:false}),300000,'smoke');
+              r.smokeProvider=String(smoke&&smoke.provider||'');
+
+              // Exact product pattern: requested sentence first, speculative next sentence
+              // immediately after in the SAME JavaScript turn. This is the race m025-45's
+              // source-order test did not reproduce.
+              const pairStart=performance.now();
+              const firstPromise=rt.speak(line1,{lang:'en-US',speed:1,allowFallback:false});
+              const warmPromise=rt.prefetch(line2,{lang:'en-US',speed:1,allowFallback:false});
+              const first=await timeout(firstPromise,300000,'first audiobook sentence');
+              const warmReady=await timeout(warmPromise,300000,'next sentence prefetch');
+              const firstDone=performance.now();
+              const second=await timeout(rt.speak(line2,{lang:'en-US',speed:1,allowFallback:false}),300000,'second audiobook sentence');
+              const pairDone=performance.now();
+
+              const logs=rt.diagnostics();
+              const firstId=String(first&&first.requestId||'');
+              const secondId=String(second&&second.requestId||'');
+              const firstPlaybackDone=logs.filter(x=>x.phase==='playback_done'&&x.requestId===firstId).pop();
+              const secondPlaybackStart=logs.filter(x=>x.phase==='playback_start'&&x.requestId===secondId).pop();
+              const secondGenerate=logs.filter(x=>x.phase==='generate_start'&&x.requestId===secondId);
+              const secondWarmHit=logs.some(x=>x.phase==='prefetch_hit'&&x.requestId===secondId);
+
+              r.first={requestId:firstId,provider:String(first&&first.provider||'')};
+              r.second={requestId:secondId,provider:String(second&&second.provider||'')};
+              r.warmReady=warmReady===true;
+              r.secondWarmHit=secondWarmHit;
+              r.secondGenerateCount=secondGenerate.length;
+              r.transitionMs=(firstPlaybackDone&&secondPlaybackStart)
+                ? Math.max(0,Number(secondPlaybackStart.t)-Number(firstPlaybackDone.t)) : null;
+              r.firstWallMs=Math.round(firstDone-pairStart);
+              r.pairWallMs=Math.round(pairDone-pairStart);
+              const after=rt.status();
+              r.circuitOpen=!!after.circuitOpen;
+              r.lastFallbackReason=String(after.lastFallbackReason||'');
+              finish(true);
+            })().catch(e=>finish(false,e));
+          })();
+          </script>
+          HTML
+
+      - name: Start server and SafariDriver
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m http.server 8000 >/tmp/m02547-http.log 2>&1 &
+          for i in $(seq 1 40); do curl -fsS http://127.0.0.1:8000/m02547-probe.html >/dev/null 2>&1 && break; sleep 1; done
+          sudo /usr/bin/safaridriver --enable || true
+          /usr/bin/safaridriver -p 4444 >/tmp/m02547-safaridriver.log 2>&1 &
+          for i in $(seq 1 40); do curl -fsS http://127.0.0.1:4444/status >/dev/null 2>&1 && break; sleep 1; done
+
+      - name: Run audiobook transition proof
+        shell: bash
+        run: |
+          set -euo pipefail
+          sj="$(curl -fsS -H 'Content-Type: application/json' -d '{"capabilities":{"alwaysMatch":{"browserName":"safari"}}}' http://127.0.0.1:4444/session)"
+          sid="$(echo "$sj" | jq -r '.value.sessionId // .sessionId // empty')"; test -n "$sid"
+          curl -fsS -H 'Content-Type: application/json' -d '{"url":"http://127.0.0.1:8000/m02547-probe.html"}' "http://127.0.0.1:4444/session/$sid/url" >/dev/null
+          found=0
+          for i in $(seq 1 1200); do
+            resp="$(curl -fsS -H 'Content-Type: application/json' -d '{"script":"return {status:window.__probeStatus||null,result:window.__probeResult||null};","args":[]}' "http://127.0.0.1:4444/session/$sid/execute/sync" 2>/dev/null || true)"
+            status="$(echo "$resp" | jq -r '.value.status // empty' 2>/dev/null || true)"
+            if [[ "$status" == done || "$status" == error ]]; then
+              echo "$resp" | jq -c '.value.result' > m02547-result.json
+              found=1; break
+            fi
+            sleep 1
+          done
+          curl -fsS -X DELETE "http://127.0.0.1:4444/session/$sid" >/dev/null || true
+          test "$found" = 1
+          jq . m02547-result.json
+
+      - name: Assert release acceptance gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -e '.success==true' m02547-result.json >/dev/null
+          jq -e '.engine=="supertonic-3" and .prepared==true and .ready==true' m02547-result.json >/dev/null
+          jq -e '.usedBrowserTts==false' m02547-result.json >/dev/null
+          jq -e '.first.provider!="browser-speech-synthesis" and .second.provider!="browser-speech-synthesis"' m02547-result.json >/dev/null
+          jq -e '.warmReady==true and .secondWarmHit==true and .secondGenerateCount==0' m02547-result.json >/dev/null
+          # With PCM already warm, there is no legitimate multi-second silence between
+          # first playback completion and second playback start. One second leaves ample
+          # runner/diagnostic scheduling headroom while still rejecting the reported 10-15s.
+          jq -e '.transitionMs!=null and .transitionMs < 1000' m02547-result.json >/dev/null
+          jq -e '.circuitOpen==false and .lastFallbackReason==""' m02547-result.json >/dev/null
+          jq -e '.eventLoop.maxTickDriftMs < 1500' m02547-result.json >/dev/null
+          echo 'm025-47 SAFARI AUDIOBOOK GATE GREEN'
+
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m02547-neural-library-${{ github.sha }}
+          path: |
+            m02547-result.json
+            m02547-runtime-sha256.txt
+            /tmp/m02547-http.log
+            /tmp/m02547-safaridriver.log
+          if-no-files-found: warn
+          retention-days: 30

@@ -1,0 +1,380 @@
+name: FIEZEL Nightwatch
+# Nightwatch (D19, wave D): patroli malam yang menjalankan suite gate inti setiap
+# 01:00 WIB, terlepas dari ada/tidaknya push. Motivasi: repo bergerak ~74 commit/hari
+# (peta D10) dan drift lintas-branch bisa mematahkan gate tanpa push pemicunya sendiri
+# (contoh nyata: needle release-audit basi setelah refactor app.js — temuan D1).
+#
+# KEAMANAN: workflow ini SENGAJA hanya membaca repo dan menulis issue.
+# JANGAN pernah menambahkan permission contents:write / pull-requests:write di sini —
+# nightwatch tidak boleh bisa push/merge apa pun.
+on:
+  schedule:
+    - cron: '0 18 * * *' # 18:00 UTC = 01:00 WIB
+  workflow_dispatch:
+permissions:
+  contents: read
+  issues: write
+jobs:
+  nightwatch:
+    runs-on: ubuntu-latest
+    # Batas keras: tanpa ini GitHub memakai 360 menit, dan satu langkah
+    # yang menggantung membakar enam jam dalam diam (lihat
+    # workflow-timeout-gate-test.js).
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install pinned push dependency
+        run: npm install --ignore-scripts
+      - name: Siapkan direktori log
+        run: mkdir -p .nightwatch/logs
+      - name: 'Gate: regression-test.js'
+        id: gate_regression_test
+        continue-on-error: true
+        shell: bash
+        run: |
+          rc=0
+          node regression-test.js 2>&1 | tee '.nightwatch/logs/regression-test.js.log' || rc=$?
+          printf '%s\t%s\n' 'regression-test.js' "$rc" >> .nightwatch/status.tsv
+          exit "$rc"
+      - name: 'Gate: validator.js'
+        id: gate_validator
+        continue-on-error: true
+        shell: bash
+        run: |
+          rc=0
+          node validator.js 2>&1 | tee '.nightwatch/logs/validator.js.log' || rc=$?
+          printf '%s\t%s\n' 'validator.js' "$rc" >> .nightwatch/status.tsv
+          exit "$rc"
+      - name: 'Gate: core-brain-v2-test.js'
+        id: gate_core_brain_v2_test
+        continue-on-error: true
+        shell: bash
+        run: |
+          rc=0
+          node core-brain-v2-test.js 2>&1 | tee '.nightwatch/logs/core-brain-v2-test.js.log' || rc=$?
+          printf '%s\t%s\n' 'core-brain-v2-test.js' "$rc" >> .nightwatch/status.tsv
+          exit "$rc"
+      - name: 'Gate: core-brain-v3-upgrade-test.js'
+        id: gate_core_brain_v3_upgrade_test
+        continue-on-error: true
+        shell: bash
+        run: |
+          rc=0
+          node core-brain-v3-upgrade-test.js 2>&1 | tee '.nightwatch/logs/core-brain-v3-upgrade-test.js.log' || rc=$?
+          printf '%s\t%s\n' 'core-brain-v3-upgrade-test.js' "$rc" >> .nightwatch/status.tsv
+          exit "$rc"
+      - name: 'Gate: tutor-brain-v3-test.js'
+        id: gate_tutor_brain_v3_test
+        continue-on-error: true
+        shell: bash
+        run: |
+          rc=0
+          node tutor-brain-v3-test.js 2>&1 | tee '.nightwatch/logs/tutor-brain-v3-test.js.log' || rc=$?
+          printf '%s\t%s\n' 'tutor-brain-v3-test.js' "$rc" >> .nightwatch/status.tsv
+          exit "$rc"
+      - name: 'Gate: affect-test.js'
+        id: gate_affect_test
+        continue-on-error: true
+        shell: bash
+        run: |
+          rc=0
+          node affect-test.js 2>&1 | tee '.nightwatch/logs/affect-test.js.log' || rc=$?
+          printf '%s\t%s\n' 'affect-test.js' "$rc" >> .nightwatch/status.tsv
+          exit "$rc"
+      - name: 'Gate: confusion-matrix-test.js'
+        id: gate_confusion_matrix_test
+        continue-on-error: true
+        shell: bash
+        run: |
+          rc=0
+          node confusion-matrix-test.js 2>&1 | tee '.nightwatch/logs/confusion-matrix-test.js.log' || rc=$?
+          printf '%s\t%s\n' 'confusion-matrix-test.js' "$rc" >> .nightwatch/status.tsv
+          exit "$rc"
+      - name: 'Gate: core-brain-test.js'
+        id: gate_core_brain_test
+        continue-on-error: true
+        shell: bash
+        run: |
+          rc=0
+          node core-brain-test.js 2>&1 | tee '.nightwatch/logs/core-brain-test.js.log' || rc=$?
+          printf '%s\t%s\n' 'core-brain-test.js' "$rc" >> .nightwatch/status.tsv
+          exit "$rc"
+      - name: 'Gate: evidence-credibility-test.js'
+        id: gate_evidence_credibility_test
+        continue-on-error: true
+        shell: bash
+        run: |
+          rc=0
+          node evidence-credibility-test.js 2>&1 | tee '.nightwatch/logs/evidence-credibility-test.js.log' || rc=$?
+          printf '%s\t%s\n' 'evidence-credibility-test.js' "$rc" >> .nightwatch/status.tsv
+          exit "$rc"
+      - name: 'Gate: item-calibration-test.js'
+        id: gate_item_calibration_test
+        continue-on-error: true
+        shell: bash
+        run: |
+          rc=0
+          node item-calibration-test.js 2>&1 | tee '.nightwatch/logs/item-calibration-test.js.log' || rc=$?
+          printf '%s\t%s\n' 'item-calibration-test.js' "$rc" >> .nightwatch/status.tsv
+          exit "$rc"
+      - name: 'Gate: item-prior-test.js'
+        id: gate_item_prior_test
+        continue-on-error: true
+        shell: bash
+        run: |
+          rc=0
+          node item-prior-test.js 2>&1 | tee '.nightwatch/logs/item-prior-test.js.log' || rc=$?
+          printf '%s\t%s\n' 'item-prior-test.js' "$rc" >> .nightwatch/status.tsv
+          exit "$rc"
+      - name: 'Gate: listening-adaptive-test.js'
+        id: gate_listening_adaptive_test
+        continue-on-error: true
+        shell: bash
+        run: |
+          rc=0
+          node listening-adaptive-test.js 2>&1 | tee '.nightwatch/logs/listening-adaptive-test.js.log' || rc=$?
+          printf '%s\t%s\n' 'listening-adaptive-test.js' "$rc" >> .nightwatch/status.tsv
+          exit "$rc"
+      - name: 'Gate: mastery-bkt-test.js'
+        id: gate_mastery_bkt_test
+        continue-on-error: true
+        shell: bash
+        run: |
+          rc=0
+          node mastery-bkt-test.js 2>&1 | tee '.nightwatch/logs/mastery-bkt-test.js.log' || rc=$?
+          printf '%s\t%s\n' 'mastery-bkt-test.js' "$rc" >> .nightwatch/status.tsv
+          exit "$rc"
+      - name: 'Gate: misconception-ledger-test.js'
+        id: gate_misconception_ledger_test
+        continue-on-error: true
+        shell: bash
+        run: |
+          rc=0
+          node misconception-ledger-test.js 2>&1 | tee '.nightwatch/logs/misconception-ledger-test.js.log' || rc=$?
+          printf '%s\t%s\n' 'misconception-ledger-test.js' "$rc" >> .nightwatch/status.tsv
+          exit "$rc"
+      - name: 'Gate: olm-test.js'
+        id: gate_olm_test
+        continue-on-error: true
+        shell: bash
+        run: |
+          rc=0
+          node olm-test.js 2>&1 | tee '.nightwatch/logs/olm-test.js.log' || rc=$?
+          printf '%s\t%s\n' 'olm-test.js' "$rc" >> .nightwatch/status.tsv
+          exit "$rc"
+      - name: 'Gate: production-grader-test.js'
+        id: gate_production_grader_test
+        continue-on-error: true
+        shell: bash
+        run: |
+          rc=0
+          node production-grader-test.js 2>&1 | tee '.nightwatch/logs/production-grader-test.js.log' || rc=$?
+          printf '%s\t%s\n' 'production-grader-test.js' "$rc" >> .nightwatch/status.tsv
+          exit "$rc"
+      - name: 'Gate: speaking-adaptive-test.js'
+        id: gate_speaking_adaptive_test
+        continue-on-error: true
+        shell: bash
+        run: |
+          rc=0
+          node speaking-adaptive-test.js 2>&1 | tee '.nightwatch/logs/speaking-adaptive-test.js.log' || rc=$?
+          printf '%s\t%s\n' 'speaking-adaptive-test.js' "$rc" >> .nightwatch/status.tsv
+          exit "$rc"
+      - name: 'Gate: srl-coach-test.js'
+        id: gate_srl_coach_test
+        continue-on-error: true
+        shell: bash
+        run: |
+          rc=0
+          node srl-coach-test.js 2>&1 | tee '.nightwatch/logs/srl-coach-test.js.log' || rc=$?
+          printf '%s\t%s\n' 'srl-coach-test.js' "$rc" >> .nightwatch/status.tsv
+          exit "$rc"
+      - name: 'Gate: step-tutor-test.js'
+        id: gate_step_tutor_test
+        continue-on-error: true
+        shell: bash
+        run: |
+          rc=0
+          node step-tutor-test.js 2>&1 | tee '.nightwatch/logs/step-tutor-test.js.log' || rc=$?
+          printf '%s\t%s\n' 'step-tutor-test.js' "$rc" >> .nightwatch/status.tsv
+          exit "$rc"
+      - name: 'Gate: content-audit.js'
+        id: gate_content_audit
+        continue-on-error: true
+        shell: bash
+        run: |
+          rc=0
+          node content-audit.js 2>&1 | tee '.nightwatch/logs/content-audit.js.log' || rc=$?
+          printf '%s\t%s\n' 'content-audit.js' "$rc" >> .nightwatch/status.tsv
+          exit "$rc"
+      - name: 'Gate: grammar-quality-audit.js'
+        id: gate_grammar_quality_audit
+        continue-on-error: true
+        shell: bash
+        run: |
+          rc=0
+          node grammar-quality-audit.js 2>&1 | tee '.nightwatch/logs/grammar-quality-audit.js.log' || rc=$?
+          printf '%s\t%s\n' 'grammar-quality-audit.js' "$rc" >> .nightwatch/status.tsv
+          exit "$rc"
+      - name: 'Gate: pwa-cache-test.js'
+        id: gate_pwa_cache_test
+        continue-on-error: true
+        shell: bash
+        run: |
+          rc=0
+          node pwa-cache-test.js 2>&1 | tee '.nightwatch/logs/pwa-cache-test.js.log' || rc=$?
+          printf '%s\t%s\n' 'pwa-cache-test.js' "$rc" >> .nightwatch/status.tsv
+          exit "$rc"
+      - name: 'Gate: level-grammar-contract-test.js'
+        id: gate_level_grammar_contract_test
+        continue-on-error: true
+        shell: bash
+        run: |
+          rc=0
+          node level-grammar-contract-test.js 2>&1 | tee '.nightwatch/logs/level-grammar-contract-test.js.log' || rc=$?
+          printf '%s\t%s\n' 'level-grammar-contract-test.js' "$rc" >> .nightwatch/status.tsv
+          exit "$rc"
+      - name: 'Gate: level-guard-test.js'
+        id: gate_level_guard_test
+        continue-on-error: true
+        shell: bash
+        run: |
+          rc=0
+          node level-guard-test.js 2>&1 | tee '.nightwatch/logs/level-guard-test.js.log' || rc=$?
+          printf '%s\t%s\n' 'level-guard-test.js' "$rc" >> .nightwatch/status.tsv
+          exit "$rc"
+      - name: 'Gate: level-evidence-test.js'
+        id: gate_level_evidence_test
+        continue-on-error: true
+        shell: bash
+        run: |
+          rc=0
+          node level-evidence-test.js 2>&1 | tee '.nightwatch/logs/level-evidence-test.js.log' || rc=$?
+          printf '%s\t%s\n' 'level-evidence-test.js' "$rc" >> .nightwatch/status.tsv
+          exit "$rc"
+      - name: 'Gate: adaptivity-simulation-v3.js'
+        id: gate_adaptivity_simulation_v3
+        continue-on-error: true
+        shell: bash
+        run: |
+          rc=0
+          node adaptivity-simulation-v3.js 2>&1 | tee '.nightwatch/logs/adaptivity-simulation-v3.js.log' || rc=$?
+          printf '%s\t%s\n' 'adaptivity-simulation-v3.js' "$rc" >> .nightwatch/status.tsv
+          exit "$rc"
+      - name: Rekap
+        # Langkah ini yang membuat run MERAH bila ada gate gagal (setiap gate di atas
+        # memakai continue-on-error supaya seluruh suite tetap berjalan sampai habis).
+        if: always()
+        shell: bash
+        run: |
+          total=0; merah=0
+          {
+            echo '## Nightwatch — rekap gate'
+            echo ''
+            echo '| Gate | Status | Exit |'
+            echo '|---|---|---|'
+          } >> "$GITHUB_STEP_SUMMARY"
+          while IFS=$'\t' read -r gate rc; do
+            total=$((total+1))
+            if [ "$rc" = "0" ]; then
+              status='PASS'
+            else
+              status='**FAIL**'; merah=$((merah+1))
+            fi
+            echo "| \`$gate\` | $status | $rc |" >> "$GITHUB_STEP_SUMMARY"
+          done < .nightwatch/status.tsv
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          echo "Total: $total gate, merah: $merah" >> "$GITHUB_STEP_SUMMARY"
+          echo "Nightwatch: $merah dari $total gate merah"
+          [ "$merah" -eq 0 ]
+      - name: Buat/update/tutup issue Nightwatch
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const TITLE_PREFIX = 'Nightwatch: gate merah';
+            const statusPath = '.nightwatch/status.tsv';
+            const rows = fs.existsSync(statusPath)
+              ? fs.readFileSync(statusPath, 'utf8').split('\n').filter(Boolean).map((line) => {
+                  const [gate, rc] = line.split('\t');
+                  return { gate, rc: Number(rc) };
+                })
+              : [];
+            const failures = rows.filter((r) => r.rc !== 0);
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const tanggal = new Intl.DateTimeFormat('id-ID', {
+              timeZone: 'Asia/Jakarta', day: 'numeric', month: 'long', year: 'numeric',
+            }).format(new Date());
+            // Guard anti-duplikat: cari SEMUA issue nightwatch yang masih terbuka.
+            const open = await github.paginate(github.rest.issues.listForRepo, {
+              owner: context.repo.owner, repo: context.repo.repo, state: 'open', per_page: 100,
+            });
+            const existing = open.filter((i) => !i.pull_request && i.title.startsWith(TITLE_PREFIX));
+            if (rows.length === 0) {
+              // Suite tidak sempat lari sama sekali (mis. npm install gagal) — jangan
+              // menutup issue lama berdasarkan ketiadaan bukti.
+              core.warning('Tidak ada status gate yang tercatat; issue nightwatch dibiarkan apa adanya.');
+              return;
+            }
+            if (failures.length > 0) {
+              const sections = failures.map((f) => {
+                const logFile = `.nightwatch/logs/${f.gate}.log`;
+                let tail = '(log tidak ditemukan)';
+                if (fs.existsSync(logFile)) {
+                  const lines = fs.readFileSync(logFile, 'utf8').split('\n');
+                  while (lines.length && lines[lines.length - 1] === '') lines.pop();
+                  tail = lines.slice(-20).join('\n');
+                }
+                return `### \`${f.gate}\` (exit ${f.rc})\n\n20 baris log terakhir:\n\n\u0060\u0060\u0060\u0060\n${tail}\n\u0060\u0060\u0060\u0060`;
+              });
+              const body = [
+                `Nightwatch ${tanggal} (01:00 WIB): **${failures.length} dari ${rows.length} gate merah**.`,
+                '',
+                `Run: ${runUrl}`,
+                '',
+                `Gate gagal: ${failures.map((f) => `\`${f.gate}\``).join(', ')}`,
+                '',
+                ...sections,
+                '',
+                '_Issue ini dikelola otomatis oleh workflow nightwatch.yml; ia di-update (bukan diduplikasi) selama masih terbuka, dan ditutup otomatis saat semua gate hijau._',
+              ].join('\n');
+              const title = `${TITLE_PREFIX} ${tanggal}`;
+              if (existing.length > 0) {
+                // Update issue yang ada, jangan buat duplikat.
+                const issue = existing[0];
+                await github.rest.issues.update({
+                  owner: context.repo.owner, repo: context.repo.repo,
+                  issue_number: issue.number, title, body,
+                });
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner, repo: context.repo.repo,
+                  issue_number: issue.number,
+                  body: `Nightwatch ${tanggal}: masih merah (${failures.length} gate). Detail diperbarui di deskripsi issue. Run: ${runUrl}`,
+                });
+                core.info(`Issue #${issue.number} di-update (${failures.length} gate merah).`);
+              } else {
+                const created = await github.rest.issues.create({
+                  owner: context.repo.owner, repo: context.repo.repo, title, body,
+                });
+                core.info(`Issue #${created.data.number} dibuat (${failures.length} gate merah).`);
+              }
+            } else {
+              // Semua hijau: tutup issue nightwatch yang masih terbuka dengan komentar.
+              for (const issue of existing) {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner, repo: context.repo.repo,
+                  issue_number: issue.number,
+                  body: `Nightwatch ${tanggal}: semua ${rows.length} gate hijau — issue ditutup otomatis. Run: ${runUrl}`,
+                });
+                await github.rest.issues.update({
+                  owner: context.repo.owner, repo: context.repo.repo,
+                  issue_number: issue.number, state: 'closed', state_reason: 'completed',
+                });
+                core.info(`Issue #${issue.number} ditutup (semua gate hijau).`);
+              }
+              if (existing.length === 0) core.info('Semua gate hijau; tidak ada issue nightwatch terbuka.');
+            }

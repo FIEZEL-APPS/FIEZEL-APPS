@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=390, initial-scale=1">
+<title>FIEZEL — Quiz — Benar</title>
+<link rel="stylesheet" href="fz.css">
+</head>
+<body>
+<div class="phone">
+<header class="topbar">
+  <div class="wordmark" role="img" aria-label="FIEZEL">F<span class="wm-i"><i></i><i></i></span>EZEL</div>
+  <div class="top-actions">
+    <button class="ask-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3Z"/><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9L19 15Z"/></svg> Tanya FIEZEL?</button>
+    <button class="icon-btn" aria-label="Pengaturan"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M2 14h4M10 8h4M18 16h4"/></svg></button>
+  </div>
+</header>
+<div class="quizbar">
+  <button class="exit-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg> Keluar</button>
+  <div class="counter" aria-label="Soal 1 dari 25">1<small> / 25</small></div>
+  <button class="next-btn is-on">Lanjut <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+</div>
+<div class="progress" role="progressbar" aria-valuenow="1" aria-valuemin="0" aria-valuemax="25"><i style="width:4%"></i></div>
+<main class="content">
+<div class="toast" role="status"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> Progres tersimpan · Streak 1/5 hari ini</div>
+<div class="fb-banner good">
+  <span class="fb-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
+  <div>
+    <div class="fb-title">Benar, mantap!</div>
+    <p class="fb-sub">Jawabanmu <b>Her</b> — jawaban yang paling tepat.</p>
+  </div>
+</div>
+<div class="options" role="group" aria-label="Review jawaban">
+<button class="option is-good"><span class="key">B</span>Her<span class="mark"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><span class="tag good">BENAR</span></button>
+<div class="others" aria-label="Pilihan lain">
+  <span class="mini"><small>A</small> She</span>
+  <span class="mini"><small>C</small> Me</span>
+  <span class="mini"><small>D</small> Hers</span>
+</div>
+</div>
+<section class="why-card">
+  <div class="eyebrow">Kenapa ini benar</div>
+  <p class="why-body">Sesudah bagian kosong ada kata benda <b>“name”</b> — posisi itu butuh <b>bentuk kepemilikan</b>. Jadi pakai <b>Her</b>.</p>
+  <div class="why-rule"><span class="chip">Her</span> + name <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg> kepemilikan sebelum kata benda</div>
+  <button class="acc-head" aria-expanded="false" aria-controls="accOthers">Bandingkan pilihan lain <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+  <div class="acc-list" id="accOthers" hidden>
+    <div class="acc-item"><b>She</b><span>kata ganti subjek sebelum kata benda — posisi ini butuh bentuk kepemilikan.</span></div>
+    <div class="acc-item"><b>Me</b><span>kata ganti objek di posisi yang butuh penanda kepemilikan.</span></div>
+    <div class="acc-item"><b>Hers</b><span>bentuk milik yang berdiri sendiri — nggak dipakai tepat sebelum kata benda.</span></div>
+  </div>
+</section>
+<div class="tip"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.6.6 1 1.5 1 2.5h6c0-1 .4-1.9 1-2.5A6 6 0 0 0 12 3Z"/></svg><span><b>Inget:</b> fokus kata ganti subjek, objek, dan bentuk kepemilikan, ya. Cek kenapa tiap jebakan beda dari jawaban benar.</span></div>
+<button class="ai-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3Z"/><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9L19 15Z"/></svg> Jelaskan dengan cara yang lebih sederhana</button>
+</main>
+<aside class="dock">
+  <div class="coach-bubble" role="status"><p>Yes! Kamu nangkep polanya.</p><button class="coach-close" aria-label="Tutup pesan"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+  <div class="mascot"><svg viewBox="56 -14 208 224" role="img" aria-label="PAW merayakan jawaban benar"><path d="M250 26l3 7 7 3-7 3-3 7-3-7-7-3 7-3 3-7Z" fill="#E6A800"/><path d="M70 8l2.4 5.6L78 16l-5.6 2.4L70 24l-2.4-5.6L62 16l5.6-2.4L70 8Z" fill="#E6A800" opacity=".85"/><path d="M76 66 L 95 0 L 140 34 Z" fill="#FFD94F"/><path d="M90 52 L 101 17 L 125 35 Z" fill="#8C2233"/><path d="M244 66 L 225 0 L 180 34 Z" fill="#FFD94F"/><path d="M230 52 L 219 17 L 195 35 Z" fill="#8C2233"/><circle cx="160" cy="106" r="88" fill="#FFD94F"/><ellipse cx="160" cy="140" rx="36" ry="25" fill="#FFF4DA"/><path d="M153 126 L 167 126 L 160 136 Z" fill="#8C2233"/><circle cx="102" cy="126" r="11" fill="#F0A0AC"/><circle cx="218" cy="126" r="11" fill="#F0A0AC"/><path d="M112 100 C 118 88 134 88 140 100" stroke="#33201F" stroke-width="7" stroke-linecap="round" fill="none"/><path d="M180 100 C 186 88 202 88 208 100" stroke="#33201F" stroke-width="7" stroke-linecap="round" fill="none"/><path d="M144 144 C 152 158 168 158 176 144" stroke="#33201F" stroke-width="5.5" stroke-linecap="round" fill="none"/></svg></div>
+</aside>
+<nav class="nav" aria-label="Navigasi utama"><a href="#" class=""><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg></span>Home</a><a href="#" class=""><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M9 16l3-8 3 8M10.2 13.5h3.6"/></svg></span>Vocab</a><a href="#" class="active" aria-current="page"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-8 8H4l2-3a8 8 0 1 1 15-5Z"/></svg></span>Grammar</a><a href="#" class=""><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6c-2-1.5-4.5-2-8-2v14c3.5 0 6 .5 8 2 2-1.5 4.5-2 8-2V4c-3.5 0-6 .5-8 2Z"/><path d="M12 6v14"/></svg></span>Reading</a><a href="#" class=""><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2Z"/><path d="M9 4v14M15 6v14"/></svg></span>Peta</a></nav>
+</div>
+</body>
+</html>

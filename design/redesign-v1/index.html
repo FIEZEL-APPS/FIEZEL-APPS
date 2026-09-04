@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FIEZEL Rebrand — Warm Paper, Bright Mind</title>
+<style>
+:root{--bg:#FFF9EE;--panel:#fff;--text:#241A11;--muted:#6E5E47;--sun:#FFC700;--sun-deep:#E6A800;--core:#1B1418;--on-core:#FDFAF3;--line:#F0E4CF;--r:16px;--sh:0 10px 30px rgba(36,26,17,.09)}
+*{box-sizing:border-box;margin:0}
+body{font:15px/1.6 system-ui,'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);padding:0 0 80px}
+header{background:var(--core);color:var(--on-core);padding:56px 24px 48px;text-align:center}
+header h1{font-size:30px;letter-spacing:.5px}
+header .tag{color:var(--sun);font-weight:700;font-size:13px;letter-spacing:2px;text-transform:uppercase}
+header p{color:rgba(253,250,243,.7);max-width:640px;margin:10px auto 0}
+main{max-width:1080px;margin:0 auto;padding:32px 24px}
+h2{font-size:19px;margin:36px 0 14px;border-left:4px solid var(--sun);padding-left:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+a.card{display:block;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:18px;text-decoration:none;color:var(--text);box-shadow:var(--sh);transition:transform .16s}
+a.card:hover{transform:translateY(-2px)}
+a.card b{display:block;margin-bottom:4px}
+a.card span{color:var(--muted);font-size:13px}
+.shots{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+.shots figure{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px}
+.shots img{width:100%;border-radius:8px;display:block}
+.shots figcaption{font-size:12px;color:var(--muted);padding:6px 2px 0;text-align:center}
+.pill{display:inline-block;background:var(--sun);color:var(--text);font-weight:700;font-size:12px;border-radius:99px;padding:3px 12px;margin-top:14px}
+</style>
+</head>
+<body>
+<header>
+  <div class="tag">FIEZEL VISUAL REBRAND / REDESIGN</div>
+  <h1>Warm Paper, Bright Mind</h1>
+  <p>Fondasi krem hangat untuk belajar, panel gelap berenergi kuning solar untuk momen kecerdasan AI — satu sistem yang menyambungkan aplikasi dengan kampanye V3.</p>
+  <div class="pill">AUDIT → DIRECTION → TOKENS → KOMPONEN → LAYAR → MOTION → MIGRASI</div>
+</header>
+<main>
+  <h2>Fondasi</h2>
+  <div class="grid">
+    <a class="card" href="tokens/brand-board.png"><b>Brand Direction Board</b><span>Konsep, palet + rasio kontras, tipografi, do/don't</span></a>
+    <a class="card" href="DIRECTION.md"><b>DIRECTION.md</b><span>Kontrak arah brand untuk semua pekerjaan</span></a>
+    <a class="card" href="tokens/tokens.css"><b>tokens.css</b><span>Design tokens final + state</span></a>
+    <a class="card" href="tokens/WCAG.md"><b>Matriks WCAG</b><span>39/39 pasangan lulus AA</span></a>
+    <a class="card" href="audit/AUDIT.md"><b>Audit UI Live</b><span>31 layar, temuan kontras & usability, PRESERVE/REFINE/REPLACE</span></a>
+  </div>
+  <h2>Sistem</h2>
+  <div class="grid">
+    <a class="card" href="components/index.html"><b>Component Library</b><span>17 keluarga komponen, semua state, 22/22 kontras AA</span></a>
+    <a class="card" href="motion/MOTION.md"><b>Motion Language</b><span>Observe→Analyze→Adapt→Teach→Improve, 14 primitive</span></a>
+    <a class="card" href="motion/motion-demo.html"><b>Motion Demo</b><span>5 primitive kunci dengan token baru</span></a>
+    <a class="card" href="prototype/index.html"><b>Prototype Flow Interaktif</b><span>Home → Quiz → Hint → Listening → Completion (klik-able)</span></a>
+  </div>
+  <h2>Layar Hi-Fi (390×844)</h2>
+  <div class="shots">
+    <figure><img src="screens/a/onboarding.png" loading="lazy"><figcaption>Onboarding</figcaption></figure>
+    <figure><img src="screens/a/home.png" loading="lazy"><figcaption>Home / Dashboard</figcaption></figure>
+    <figure><img src="screens/a/library.png" loading="lazy"><figcaption>Lesson Selection</figcaption></figure>
+    <figure><img src="screens/b/png/quiz.png" loading="lazy"><figcaption>Quiz</figcaption></figure>
+    <figure><img src="screens/b/png/quiz-analyzing.png" loading="lazy"><figcaption>Analyzing (AI)</figcaption></figure>
+    <figure><img src="screens/b/png/quiz-correct.png" loading="lazy"><figcaption>Feedback Benar + Why</figcaption></figure>
+    <figure><img src="screens/b/png/quiz-wrong.png" loading="lazy"><figcaption>Feedback Salah + Diagnosis</figcaption></figure>
+    <figure><img src="screens/b/png/quiz-hint.png" loading="lazy"><figcaption>Hint Bertahap</figcaption></figure>
+    <figure><img src="screens/c/listening.png" loading="lazy"><figcaption>Listening</figcaption></figure>
+    <figure><img src="screens/c/listening-dictation.png" loading="lazy"><figcaption>Dikte</figcaption></figure>
+    <figure><img src="screens/c/listening-feedback.png" loading="lazy"><figcaption>Hasil Listening</figcaption></figure>
+    <figure><img src="screens/c/vocab.png" loading="lazy"><figcaption>Vocabulary</figcaption></figure>
+    <figure><img src="screens/d/progress.png" loading="lazy"><figcaption>Progress / Analytics</figcaption></figure>
+    <figure><img src="screens/d/completion.png" loading="lazy"><figcaption>Completion</figcaption></figure>
+    <figure><img src="screens/d/settings.png" loading="lazy"><figcaption>Profile / Settings</figcaption></figure>
+  </div>
+  <h2>Implementasi</h2>
+  <div class="grid">
+    <a class="card" href="spec/SPEC.md"><b>Developer Spec</b><span>Pemetaan token lama→baru per kemunculan nyata</span></a>
+    <a class="card" href="spec/MIGRATION.md"><b>Migration Plan</b><span>4 fase aman + rollback + 91 test wajib hijau</span></a>
+  </div>
+</main>
+</body>
+</html>

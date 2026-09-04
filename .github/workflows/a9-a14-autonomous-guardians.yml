@@ -1,0 +1,198 @@
+name: FIEZEL A9 A14 Autonomous Guardians
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review, edited]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: a9-a14-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  a9-security-sentinel:
+    name: A9 Security Sentinel
+    runs-on: ubuntu-latest
+    # Batas keras: tanpa ini GitHub memakai 360 menit, dan satu langkah
+    # yang menggantung membakar enam jam dalam diam (lihat
+    # workflow-timeout-gate-test.js).
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Guardian engine self-test
+        run: node tools/fiezel-guardians.mjs self-test
+      - name: Security and secret-boundary audit
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_DRAFT: ${{ github.event.pull_request.draft }}
+        run: node tools/fiezel-guardians.mjs a9
+      - name: Existing auth and response-policy regressions
+        run: |
+          node puter-auth-coop-test.js
+          node sw-corp-test.js
+
+  a10-regression-watcher:
+    name: A10 Regression Watcher
+    runs-on: ubuntu-latest
+    # Batas keras: tanpa ini GitHub memakai 360 menit, dan satu langkah
+    # yang menggantung membakar enam jam dalam diam (lihat
+    # workflow-timeout-gate-test.js).
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Diff and assertion-surface audit
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: node tools/fiezel-guardians.mjs a10
+      - name: High-value cross-cutting regressions
+        run: |
+          node diag-search-test.js
+          node pwa-cache-test.js
+          node pwa-release-coherence-test.js
+
+  a11-release-readiness-auditor:
+    name: A11 Release Readiness Auditor
+    runs-on: ubuntu-latest
+    # Batas keras: tanpa ini GitHub memakai 360 menit, dan satu langkah
+    # yang menggantung membakar enam jam dalam diam (lihat
+    # workflow-timeout-gate-test.js).
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Freshness, merge-tree, and release-boundary audit
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: node tools/fiezel-guardians.mjs a11
+
+  a13-handoff-keeper:
+    name: A13 Handoff Keeper
+    runs-on: ubuntu-latest
+    # Batas keras: tanpa ini GitHub memakai 360 menit, dan satu langkah
+    # yang menggantung membakar enam jam dalam diam (lihat
+    # workflow-timeout-gate-test.js).
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Handoff continuity audit
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: node tools/fiezel-guardians.mjs a13
+
+  a14-autonomous-review:
+    name: A14 Autonomous Review
+    if: always()
+    needs:
+      - a9-security-sentinel
+      - a10-regression-watcher
+      - a11-release-readiness-auditor
+      - a13-handoff-keeper
+    runs-on: ubuntu-latest
+    # Batas keras: tanpa ini GitHub memakai 360 menit, dan satu langkah
+    # yang menggantung membakar enam jam dalam diam (lihat
+    # workflow-timeout-gate-test.js).
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+    steps:
+      - name: Build consolidated guardian verdict
+        id: verdict
+        env:
+          A9: ${{ needs.a9-security-sentinel.result }}
+          A10: ${{ needs.a10-regression-watcher.result }}
+          A11: ${{ needs.a11-release-readiness-auditor.result }}
+          A13: ${{ needs.a13-handoff-keeper.result }}
+          PR_DRAFT: ${{ github.event.pull_request.draft }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          blocked=false
+          for result in "$A9" "$A10" "$A11" "$A13"; do
+            if [[ "$result" != success ]]; then blocked=true; fi
+          done
+          if [[ "$blocked" == true ]]; then
+            verdict="BLOCKED"
+          elif [[ "$PR_DRAFT" == true ]]; then
+            verdict="MACHINE-GREEN / DRAFT-HOLD"
+          else
+            verdict="READY FOR MASTER REVIEW"
+          fi
+          echo "verdict=$verdict" >> "$GITHUB_OUTPUT"
+          {
+            echo '<!-- FIEZEL_A14_AUTONOMOUS_REVIEW -->'
+            echo '## A14 Autonomous Review'
+            echo
+            echo "**Verdict: $verdict**"
+            echo
+            echo '| Guardian | Result |'
+            echo '|---|---|'
+            echo "| A9 Security Sentinel | $A9 |"
+            echo "| A10 Regression Watcher | $A10 |"
+            echo "| A11 Release Readiness Auditor | $A11 |"
+            echo "| A13 Handoff Keeper | $A13 |"
+            echo
+            echo 'A14 is an autonomous deterministic reviewer. It may block or recommend MASTER review, but it never grants merge/deploy authority and never substitutes for required physical evidence.'
+          } > /tmp/a14-review.md
+          cat /tmp/a14-review.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upsert consolidated PR review comment
+        if: github.event.pull_request.head.repo.full_name == github.repository
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const marker = '<!-- FIEZEL_A14_AUTONOMOUS_REVIEW -->';
+            const body = fs.readFileSync('/tmp/a14-review.md', 'utf8');
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner, repo, issue_number, per_page: 100
+            });
+            const previous = comments.find(c => c.user?.type === 'Bot' && c.body?.includes(marker));
+            if (previous) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: previous.id, body });
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number, body });
+            }
+
+      - name: Enforce consolidated blocking result
+        env:
+          A9: ${{ needs.a9-security-sentinel.result }}
+          A10: ${{ needs.a10-regression-watcher.result }}
+          A11: ${{ needs.a11-release-readiness-auditor.result }}
+          A13: ${{ needs.a13-handoff-keeper.result }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          for result in "$A9" "$A10" "$A11" "$A13"; do
+            test "$result" = success
+          done

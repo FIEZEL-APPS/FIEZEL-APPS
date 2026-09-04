@@ -1,0 +1,452 @@
+{
+  "schema": "fiezel-d3-owner-guard-red-proof-v1",
+  "generatedAt": "2026-08-28T12:49:49.038Z",
+  "gate": "owner-edge-guard-test.js",
+  "mutations": [
+    {
+      "id": "M1-jalur-hostname-dimatikan",
+      "kenapaIniLubang": "kalau jalur hostname hilang, owner.fiezel.my.id kembali 403 di semua rute (bug aslinya)",
+      "berkas": "workers/owner/index.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(g-a)",
+        "(g-d)",
+        "(g-e)"
+      ],
+      "butirDiharapkanJatuh": [
+        "(g-a)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(g-a)"
+      ],
+      "contohAssertMerah": [
+        "(g-a) GET /login di hostname kanonik TANPA header edge → 200, dapat 403",
+        "(g-a) jalur yang dilaporkan untuk hostname kanonik adalah custom-domain, dapat denied",
+        "(g-a) POST /login token benar di hostname kanonik → 303, dapat 403"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M2-workers-dev-diloloskan-tanpa-header",
+      "kenapaIniLubang": "pintu kedua yang TIDAK dilewati Cloudflare Access",
+      "berkas": "workers/owner/index.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(?)",
+        "(a)",
+        "(g-b)"
+      ],
+      "butirDiharapkanJatuh": [
+        "(g-b)",
+        "(a)",
+        "(b)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(g-b)",
+        "(a)"
+      ],
+      "contohAssertMerah": [
+        "(a) / [sesi owner sah tanpa header edge] → 200, seharusnya 403",
+        "(a) / [sesi owner sah tanpa header edge] menyentuh D1 sebelum penjaga edge lulus",
+        "(a) / [sesi owner sah tanpa header edge] tidak boleh menerbitkan cookie apa pun"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M3-workers-dev-masuk-daftar-tepercaya",
+      "kenapaIniLubang": "daftar tepercaya menyimpang dari route custom_domain di wrangler.toml",
+      "berkas": "workers/owner/index.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(g-a)"
+      ],
+      "butirDiharapkanJatuh": [
+        "(g-a)",
+        "(g-b)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(g-a)"
+      ],
+      "contohAssertMerah": [
+        "(g-a) TRUSTED_EDGE_HOSTS identik dengan route custom_domain di wrangler.toml, dapat [\"owner.fiezel.my.id\",\"fiezel-owner.fitrajft.workers.dev\"]"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M4-pencocokan-hostname-jadi-akhiran",
+      "kenapaIniLubang": "owner.fiezel.my.id.penyerang.com akan lolos kalau pencocokan bukan PERSIS",
+      "berkas": "workers/owner/index.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(g-c)"
+      ],
+      "butirDiharapkanJatuh": [
+        "(g-c)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(g-c)"
+      ],
+      "contohAssertMerah": [
+        "(g-c) owner.fiezel.my.id.penyerang.com bukan hostname tepercaya",
+        "(g-c) owner.fiezel.my.id.penyerang.com/ [header edge benar + sesi sah] → 200, seharusnya 403 (default-deny hostname)",
+        "(g-c) penolakan hostname asing tidak menyentuh D1"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M5-default-allow-hostname-asing",
+      "kenapaIniLubang": "hostname karangan apa pun menjadi pintu ke dashboard",
+      "berkas": "workers/owner/index.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(g-c)"
+      ],
+      "butirDiharapkanJatuh": [
+        "(g-c)",
+        "(a)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(g-c)"
+      ],
+      "contohAssertMerah": [
+        "(g-c) owner.fiezel.my.id.penyerang.com/ [header edge benar + sesi sah] → 200, seharusnya 403 (default-deny hostname)",
+        "(g-c) penolakan hostname asing tidak menyentuh D1",
+        "(g-c) penyerang.com/ [header edge benar + sesi sah] → 200, seharusnya 403 (default-deny hostname)"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M6-hostname-dibaca-dari-header-yang-bisa-dipalsukan",
+      "kenapaIniLubang": "sinyal hostname menjadi masukan klien sepenuhnya (X-Forwarded-Host)",
+      "berkas": "workers/owner/index.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(g-a)"
+      ],
+      "butirDiharapkanJatuh": [
+        "(g-a)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(g-a)"
+      ],
+      "contohAssertMerah": [
+        "(g-a) penjaga TIDAK PERNAH membaca X-Forwarded-Host / X-Host / Forwarded"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M7-hostname-dibaca-dari-header-host-mentah",
+      "kenapaIniLubang": "header Host mentah tidak dinormalkan dan bisa dikirim ganda",
+      "berkas": "workers/owner/index.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(?)",
+        "(b)",
+        "(c)",
+        "(g-a)",
+        "(g-b)",
+        "(g-d)",
+        "(g-e)"
+      ],
+      "butirDiharapkanJatuh": [
+        "(g-a)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(g-a)"
+      ],
+      "contohAssertMerah": [
+        "nama header edge tidak peka huruf besar/kecil, dapat 403",
+        "(b) header edge + sesi owner sah → 200, dapat 403",
+        "(b) permintaan yang lolos DUA lapis benar-benar membaca D1 agregat"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M8-header-edge-menaikkan-hak-di-hostname-kanonik",
+      "kenapaIniLubang": "header palsu tidak boleh mengubah apa pun di hostname kanonik",
+      "berkas": "workers/owner/index.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(b)",
+        "(g-d)",
+        "(g-f)"
+      ],
+      "butirDiharapkanJatuh": [
+        "(g-d)",
+        "(b)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(g-d)",
+        "(b)"
+      ],
+      "contohAssertMerah": [
+        "(b) / [tanpa cookie] dengan header edge BENAR → 200, seharusnya 403",
+        "(b) / [tanpa cookie] menyentuh D1 tanpa sesi owner",
+        "(b) / [cookie sampah] dengan header edge BENAR → 200, seharusnya 403"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M9-pembuka-darurat-menerima-TRUE",
+      "kenapaIniLubang": "janji \"string persis 'true'\" tidak ditegakkan; nilai tersalin membuka *.workers.dev",
+      "berkas": "workers/owner/index.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(g-e)"
+      ],
+      "butirDiharapkanJatuh": [
+        "(g-e)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(g-e)"
+      ],
+      "contohAssertMerah": [
+        "(g-e) ALLOW_NO_EDGE_SECRET=\"TRUE\" TIDAK membuka gerbang",
+        "(g-e) workers.dev tetap 403 dengan ALLOW_NO_EDGE_SECRET=\"TRUE\", dapat 200",
+        "(g-e) ALLOW_NO_EDGE_SECRET=\"True\" TIDAK membuka gerbang"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M10-pembuka-darurat-jadi-truthy",
+      "kenapaIniLubang": "salah ketik apa pun akan membuka gerbang",
+      "berkas": "workers/owner/index.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(?)",
+        "(g-e)"
+      ],
+      "butirDiharapkanJatuh": [
+        "(g-e)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(g-e)"
+      ],
+      "contohAssertMerah": [
+        "ALLOW_NO_EDGE_SECRET='1' TIDAK membuka gerbang (hanya string 'true'), dapat 200",
+        "(g-e) ALLOW_NO_EDGE_SECRET=\"1\" TIDAK membuka gerbang",
+        "(g-e) workers.dev tetap 403 dengan ALLOW_NO_EDGE_SECRET=\"1\", dapat 200"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M11-fail-closed-Secret-owner-dilemahkan",
+      "kenapaIniLubang": "tanpa OWNER_SESSION_KEY, sesi tidak bisa diverifikasi; rute tidak boleh terbuka",
+      "berkas": "workers/owner/index.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(g-f)"
+      ],
+      "butirDiharapkanJatuh": [
+        "(g-f)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(g-f)"
+      ],
+      "contohAssertMerah": [
+        "(g-f) owner.fiezel.my.id/ [tanpa OWNER_TOKEN_HASH] → 200, seharusnya 403 (fail-closed Secret)",
+        "(g-f) fail-closed Secret tidak menyentuh D1",
+        "(g-f) fiezel-owner.fitrajft.workers.dev/ [tanpa OWNER_TOKEN_HASH] → 200, seharusnya 403 (fail-closed Secret)"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M12-binding-fiezel-core-diselundupkan",
+      "kenapaIniLubang": "INSIDEN privasi: identity/session/quota_daily per-orang menjadi terjangkau Worker owner",
+      "berkas": "workers/owner/wrangler.toml",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(g-g)"
+      ],
+      "butirDiharapkanJatuh": [
+        "(g-g)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(g-g)"
+      ],
+      "contohAssertMerah": [
+        "(g-g) TEPAT satu binding D1 di workers/owner/wrangler.toml, dapat 2",
+        "(g-g) satu-satunya database D1 adalah fiezel-stats, dapat fiezel-stats,fiezel-core",
+        "(g-g) database_id-nya fiezel-stats yang benar, dapat c712000c-aab9-4a1d-b43d-e6d4c9b36ee8,7bc356dc-8aff-41e1-b682-ae2039c58c55"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M13-binding-KV-diselundupkan",
+      "kenapaIniLubang": "jenis binding lain juga harus nol, bukan hanya D1 core",
+      "berkas": "workers/owner/wrangler.toml",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(g-g)"
+      ],
+      "butirDiharapkanJatuh": [
+        "(g-g)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(g-g)"
+      ],
+      "contohAssertMerah": [
+        "(g-g) NOL binding kv_namespaces di Worker owner (radius ledakan tetap satu database agregat)"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M14-workers-dev-dinyalakan-lagi",
+      "kenapaIniLubang": "alamat workers.dev hidup = pintu yang tidak dilewati Cloudflare Access",
+      "berkas": "workers/owner/wrangler.toml",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(g-g)"
+      ],
+      "butirDiharapkanJatuh": [
+        "(g-g)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(g-g)"
+      ],
+      "contohAssertMerah": [
+        "(g-g) workers_dev = false tetap terpasang (satu pintu, satu tempat memasang Access)"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M15-route-custom-domain-menyimpang",
+      "kenapaIniLubang": "kode dan wrangler.toml harus menyebut hostname yang SAMA",
+      "berkas": "workers/owner/wrangler.toml",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(g-a)"
+      ],
+      "butirDiharapkanJatuh": [
+        "(g-a)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(g-a)"
+      ],
+      "contohAssertMerah": [
+        "(g-a) wrangler.toml owner punya TEPAT satu route custom_domain owner.fiezel.my.id, dapat [\"owner2.fiezel.my.id\"]",
+        "(g-a) TRUSTED_EDGE_HOSTS identik dengan route custom_domain di wrangler.toml, dapat [\"owner.fiezel.my.id\"]"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M16-DEPLOY.md-tidak-lagi-menyebut-insiden",
+      "kenapaIniLubang": "invarian privasi tanpa alasan tertulis akan dilanggar \"sebentar saja\"",
+      "berkas": "workers/owner/DEPLOY.md",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(g-g)"
+      ],
+      "butirDiharapkanJatuh": [
+        "(g-g)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(g-g)"
+      ],
+      "contohAssertMerah": [
+        "(g-g) DEPLOY.md tetap menyebut kemunculan binding core sebagai INSIDEN"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M17-DEPLOY.md-menyuruh-membuka-gerbang",
+      "kenapaIniLubang": "dokumen yang menyuruh ALLOW_NO_EDGE_SECRET mengembalikan lubangnya lewat prosedur",
+      "berkas": "workers/owner/DEPLOY.md",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(g-e)"
+      ],
+      "butirDiharapkanJatuh": [
+        "(g-e)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(g-e)"
+      ],
+      "contohAssertMerah": [
+        "(g-e) DEPLOY.md tidak lagi memuat perintah deploy yang membuka gerbang"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M18-alasan-jalur-cadangan-dihapus",
+      "kenapaIniLubang": "jalur cadangan tanpa alasan tertulis akan dihapus orang berikutnya, atau dibiarkan tanpa tahu kenapa",
+      "berkas": "workers/owner/index.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(g-*)"
+      ],
+      "butirDiharapkanJatuh": [
+        "(g-*)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(g-*)"
+      ],
+      "contohAssertMerah": [
+        "(g-*) alasan mempertahankan jalur cadangan tertulis di kode (bukan diwariskan lisan)"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M19-risiko-sisa-disembunyikan",
+      "kenapaIniLubang": "jalur hostname hanya sah bersama workers_dev=false + Access; itu wajib tertulis",
+      "berkas": "workers/owner/index.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(g-*)"
+      ],
+      "butirDiharapkanJatuh": [
+        "(g-*)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(g-*)"
+      ],
+      "contohAssertMerah": [
+        "(g-*) risiko sisa jalur hostname ditulis apa adanya, bukan dihilangkan"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M20-jalur-tidak-dilaporkan",
+      "kenapaIniLubang": "tanpa edgeGuardPath, \"lolos karena hostname\" tidak bisa dibedakan dari \"lolos karena header\"",
+      "berkas": "workers/owner/index.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(g-b)"
+      ],
+      "butirDiharapkanJatuh": [
+        "(g-b)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(g-b)"
+      ],
+      "contohAssertMerah": [
+        "(g-b) jalur yang dilaporkan untuk fiezel-owner.fitrajft.workers.dev adalah denied",
+        "(g-b) jalur yang dilaporkan untuk 9ad13540-fiezel-owner.fitrajft.workers.dev adalah denied",
+        "(g-b) jalur yang dilaporkan untuk FIEZEL-OWNER.FITRAJFT.WORKERS.DEV adalah denied"
+      ],
+      "ok": true
+    }
+  ],
+  "pulihSesudahSemuaMutasi": 0,
+  "pass": true
+}

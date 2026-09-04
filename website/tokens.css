@@ -1,0 +1,167 @@
+/* FIEZEL website — token desain bersama (SATU sumber, dipakai landing + install).
+   m028-05 "CREAM · SOLAR · MAROON" — arahan owner yang mengikat:
+
+   TIDAK ADA LATAR GELAP. Sama sekali. Palet hanya tiga keluarga:
+   1. KREM  — #FFF9EE dasar, #FFF3DC bidang lembut, #FFFDF8 kertas kartu. Semua permukaan.
+   2. SOLAR — #FFC700 / #FFDE59→#FFA500 / #FFF3C4. Energi: bidang tombol, sorotan, hairline emas.
+   3. MAROON — #8C2233 (keluarga) dan #6D1926 (tinta kuat). Maroon mengambil peran yang dulu
+      dipegang permukaan gelap --core: teks display, tombol utama (tinta + garis), garis aksen,
+      nomor section, ornamen. Maroon dipakai sebagai TINTA dan GARIS, bukan bidang besar.
+
+   Kontras nyata (dihitung, WCAG 2.1 relative luminance):
+     #6D1926 di #FFF9EE = 11,03:1   |  #6D1926 di #FFFDF8 = 11,37:1
+     #8C2233 di #FFF9EE =  8,38:1   |  #8C2233 di #FFF3C4 =  7,89:1
+     #7E3742 di #FFF9EE =  7,98:1   |  #7E3742 di #FBEDEF =  7,35:1
+     #8A4550 di #FFF9EE =  6,57:1   |  #6D1926 di #FFC700 =  7,39:1
+     #FFF9EE di #8C2233 =  8,38:1   (hanya untuk elemen kecil: badge nomor, tombol musik)
+   Semua ≥ 4,5:1 → AA untuk teks normal, AAA untuk sebagian besar.
+
+   Aturan keras yang diwarisi dari app:
+   - Kuning adalah warna BIDANG, bukan warna teks (kuning di krem hanya 1,4:1).
+   - LANTAI FONT 12px (.75rem).
+   - Animasi hanya transform + opacity; prefers-reduced-motion mematikan semuanya.
+   - Focus ring 2px --focus-ring offset 2px. */
+@font-face{font-family:'Plus Jakarta Sans';src:url('assets/fonts/PlusJakartaSans-400.woff2') format('woff2');font-weight:400;font-display:swap}
+@font-face{font-family:'Plus Jakarta Sans';src:url('assets/fonts/PlusJakartaSans-600.woff2') format('woff2');font-weight:600;font-display:swap}
+@font-face{font-family:'Plus Jakarta Sans';src:url('assets/fonts/PlusJakartaSans-700.woff2') format('woff2');font-weight:700 800;font-display:swap}
+:root{
+  /* --- surface: KREM saja --- */
+  --bg:#FFF9EE;
+  --cream:#FFF9EE;
+  --cream-deep:#FFF3DC;
+  --cream-warm:#FFFDF8;
+  --panel:#FFFDF8;
+  --panel-soft:#FFF3DC;
+  --blush:#FBEDEF;          /* krem bernuansa maroon paling tipis, lum .87 */
+  --line:#EFE0C6;
+  --line-soft:#F7EFDF;
+
+  /* --- MAROON: tinta, garis, aksen (pengganti peran core) --- */
+  --maroon:#8C2233;
+  --maroon-deep:#6D1926;
+  --maroon-mid:#7E3742;
+  --maroon-soft:#8A4550;
+  --maroon-line:rgba(140,34,51,.20);
+  --maroon-line-strong:rgba(140,34,51,.42);
+  --maroon-wash:rgba(140,34,51,.05);
+
+  /* --- ink --- */
+  --text:#6D1926;           /* display + judul + teks kuat */
+  --ink:#6D1926;
+  --body:#7E3742;           /* paragraf */
+  --muted:#7E3742;
+  --muted-soft:#8A4550;     /* hanya untuk teks >=14px */
+
+  /* --- SOLAR --- */
+  --sun:#FFC700;
+  --sun-deep:#E6A800;
+  --sun-press:#CC9600;
+  --sun-soft:#FFF3C4;
+  --sun-mid:#FFDE59;
+  --sun-grad:linear-gradient(180deg,#FFDE59,#FFA500);
+  --gold-line:rgba(198,150,20,.38);
+  --gold-line-soft:rgba(198,150,20,.20);
+  --yellow:#FFC700;
+  --yellow-deep:#E6A800;
+  --yellow-soft:#FFF3C4;
+
+  /* --- semantik --- */
+  --accent:#8C2233;
+  --accent-strong:#6D1926;
+  --accent-soft:#FBEDEF;
+  --good:#1F6B4E; --good-soft:#E9F7F0;
+  --bad:#8C2233;  --bad-soft:#FBEDEF;
+  --info:#7A5F1B; --info-soft:#FFF3C4;
+  --focus-ring:#8C2233;
+
+  /* --- tipografi --- */
+  --font:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --fs-micro:.75rem;   /* 12px - LANTAI */
+  --fs-label:.8125rem; /* 13px */
+  --fs-body:1rem;
+  --track-wide:.22em;  /* eyebrow boutique */
+
+  /* --- bentuk --- */
+  --radius-lg:22px;
+  --radius-md:16px;
+  --radius-sm:12px;
+  --radius-pill:999px;
+  --radius:22px;
+
+  /* --- bayangan lembut berlapis (krem, bukan hitam pekat) --- */
+  --shadow-sm:0 1px 2px rgba(109,25,38,.05),0 3px 10px rgba(109,25,38,.05);
+  --shadow-md:0 1px 2px rgba(109,25,38,.05),0 6px 18px rgba(109,25,38,.07),0 18px 40px rgba(109,25,38,.05);
+  --shadow-lg:0 2px 4px rgba(109,25,38,.05),0 12px 32px rgba(109,25,38,.09),0 34px 70px rgba(109,25,38,.08);
+  --shadow-card:var(--shadow-md);
+  --shadow-btn:0 3px 0 var(--sun-deep);
+
+  /* --- gerak --- */
+  --ease:cubic-bezier(.22,.8,.28,1);
+  --ease-spring:cubic-bezier(.34,1.4,.4,1);
+  --dur-s:.18s; --dur-m:.32s; --dur-l:.5s;
+  --fz-out:cubic-bezier(.22,.8,.28,1);
+  --fz-spring:cubic-bezier(.34,1.4,.4,1);
+  --fz-fast:180ms; --fz-base:320ms; --fz-slow:560ms;
+
+  --maxw:1120px;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--body);font-family:var(--font);font-weight:400;line-height:1.65;-webkit-font-smoothing:antialiased}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px;border-radius:6px}
+
+/* ---------- STAGE: pengganti panel core. Kartu krem hangat, hairline maroon,
+     sorotan Solar tipis di sudut. Tidak ada bidang gelap. ---------- */
+.stage{position:relative;overflow:hidden;background:linear-gradient(168deg,#FFFDF8 0%,#FFF6E4 62%,#FFF1D2 100%);
+  color:var(--text);border:1px solid var(--maroon-line);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg)}
+.stage::before{
+  content:"";position:absolute;inset:-40% -25% auto -25%;height:130%;
+  background:radial-gradient(52% 48% at 78% 6%,rgba(255,199,0,.34) 0%,rgba(255,222,89,.16) 44%,transparent 74%);
+  pointer-events:none;
+}
+.stage::after{
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:.55;
+  background-image:linear-gradient(90deg,var(--maroon-line) 1px,transparent 1px),linear-gradient(180deg,var(--gold-line-soft) 1px,transparent 1px);
+  background-size:38px 38px;
+  mask-image:radial-gradient(72% 62% at 74% 8%,#000 0%,transparent 78%);
+  -webkit-mask-image:radial-gradient(72% 62% at 74% 8%,#000 0%,transparent 78%);
+}
+.stage>*{position:relative;z-index:1}
+
+/* eyebrow boutique: huruf kecil, tracking lebar, tinta maroon + hairline */
+.eyebrow-line{display:inline-flex;align-items:center;gap:10px;font-size:var(--fs-micro);font-weight:700;
+  letter-spacing:var(--track-wide);text-transform:uppercase;color:var(--maroon)}
+.eyebrow-line::before{content:"";width:34px;height:1px;background:var(--maroon-line-strong)}
+
+/* tagline kampanye V3 - "NOT JUST LEARNING WITH YOU. LEARNING ABOUT YOU." */
+.tagline{margin:0;font-weight:800;letter-spacing:.01em;line-height:1.35;text-transform:uppercase}
+.tagline .t-1{color:var(--maroon-soft)}
+.tagline .t-2{color:var(--maroon-deep)}
+
+/* credit strip - baris kredit paling atas topbar (konten m028-03 tidak berubah) */
+.credit-strip{background:var(--cream-deep);color:var(--maroon-mid);border-bottom:1px solid var(--gold-line-soft)}
+.credit-in{display:flex;align-items:center;justify-content:center;gap:8px;min-height:32px;font-size:var(--fs-micro);
+  letter-spacing:.12em;text-transform:uppercase;flex-wrap:nowrap;white-space:nowrap}
+/* satu anchor membungkus ikon Instagram DAN teks @fitrarustqi (arahan owner m028-06) */
+.credit-ig{display:inline-flex;align-items:center;gap:7px;padding:2px 8px;border-radius:var(--radius-pill);
+  color:var(--maroon);text-decoration:none;
+  transition:transform var(--fz-fast) var(--fz-spring),color var(--fz-fast),background-color var(--fz-fast)}
+.credit-ig svg{width:15px;height:15px;flex:0 0 auto}
+.credit-ig strong{font-weight:700;color:var(--maroon-deep);letter-spacing:.12em}
+.credit-ig:hover,.credit-ig:focus-visible{text-decoration:none;transform:scale(1.05);
+  color:var(--maroon-deep);background:var(--blush)}
+.credit-ig:hover strong,.credit-ig:focus-visible strong{color:var(--maroon-deep);text-decoration:underline;
+  text-decoration-color:var(--maroon-line-strong);text-underline-offset:3px}
+
+/* ---------- ornamen garis: hairline emas/maroon ---------- */
+.rule{height:1px;border:0;margin:0;background:linear-gradient(90deg,var(--maroon-line-strong),var(--gold-line) 42%,transparent)}
+.rule-center{background:linear-gradient(90deg,transparent,var(--gold-line) 30%,var(--maroon-line-strong) 50%,var(--gold-line) 70%,transparent)}
+
+/* ---------- musik latar: TANPA elemen UI sama sekali (arahan owner m028-06) ----------
+   Landing memutar assets/music/ambient.mp3 otomatis lewat site.js: percobaan play() saat
+   load, lalu fallback ke gestur pertama (pointerdown/keydown/touchstart/scroll). Tidak ada
+   tombol, banner, atau indikator apa pun — jadi tidak ada gaya yang perlu didefinisikan. */

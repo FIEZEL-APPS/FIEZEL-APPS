@@ -1,447 +1,535 @@
 {
-    "protocol_version":  "v1",
-    "updated":  "2026-08-15T22:45:00+07:00",
-    "agents":  [
-                   {
-                       "id":  "coordinator-1",
-                       "session":  "ses_0034e69d3ffes3kjiFLNDzYXUZ",
-                       "role":  "coordinator/observer",
-                       "directory":  "Temp\\opencode\\FIEZEL-APPS-clone"
-                   },
-                   {
-                       "id":  "executor-1",
-                       "session":  "ses_0027db319ffeiu7OrUF1qbWBH8",
-                       "role":  "implementer (fix live)",
-                       "directory":  "Temp\\opencode\\FIEZEL-APPS"
-                   },
-                   {
-                       "id":  "agent-1",
-                       "session":  "ses_000325795ffePUB0VTxSfBE64V",
-                       "role":  "squad (verifikasi produksi)",
-                       "directory":  "Temp\\opencode\\FIEZEL-APPS-clone",
-                        "model":  "opencode-go/kimi-k3"
-                   },
-                   {
-                       "id":  "agent-2",
-                       "session":  "ses_000323295ffeEWAlY1ruQ0zNRr",
-                       "role":  "squad (desain IndexedDB)",
-                       "directory":  "Temp\\opencode\\FIEZEL-APPS-clone",
-                        "model":  "opencode-go/kimi-k3"
-                   },
-                   {
-                       "id":  "agent-3",
-                       "session":  "ses_000321c1cffengK0Als7R81yNI",
-                       "role":  "squad (audit T-005/T-006)",
-                       "directory":  "Temp\\opencode\\FIEZEL-APPS-clone",
-                        "model":  "opencode-go/kimi-k3"
-                   },
-                   {
-                       "id":  "agent-4",
-                       "session":  "ses_000320968ffe6hUykdumYrGPiS",
-                       "role":  "squad (rekonsiliasi ledger)",
-                       "directory":  "Temp\\opencode\\FIEZEL-APPS-clone",
-                        "model":  "opencode-go/kimi-k3"
-                   },
-                   {
-                       "id":  "agent-5",
-                       "session":  "ses_00031f177ffen91yZn7TRaD6Gf",
-                       "role":  "Main Coordinator / worker pool lead",
-                       "directory":  "Temp\\opencode\\FIEZEL-APPS-clone",
-                        "model":  "opencode-go/kimi-k3"
-                   },
-                   {
-                       "id":  "agent-6",
-                       "session":  "tbd",
-                       "role":  "worker",
-                       "directory":  "Temp\\opencode\\FIEZEL-APPS-clone",
-                        "model":  "opencode-go/kimi-k3"
-                   },
-                   {
-                       "id":  "agent-7",
-                       "session":  "tbd",
-                       "role":  "worker",
-                       "directory":  "Temp\\opencode\\FIEZEL-APPS-clone",
-                        "model":  "opencode-go/kimi-k3"
-                   },
-                   {
-                       "id":  "agent-8",
-                       "session":  "tbd",
-                       "role":  "worker",
-                       "directory":  "Temp\\opencode\\FIEZEL-APPS-clone",
-                        "model":  "opencode-go/kimi-k3"
-                   },
-                   {
-                       "id":  "agent-9",
-                       "session":  "tbd",
-                       "role":  "worker",
-                       "directory":  "Temp\\opencode\\FIEZEL-APPS-clone",
-                        "model":  "opencode-go/kimi-k3"
-                   },
-                   {
-                       "id":  "agent-10",
-                       "session":  "tbd",
-                       "role":  "worker",
-                       "directory":  "Temp\\opencode\\FIEZEL-APPS-clone",
-                        "model":  "opencode-go/kimi-k3"
-                   },
-                   {
-                       "id":  "agent-11",
-                       "session":  "tbd",
-                       "role":  "worker",
-                       "directory":  "Temp\\opencode\\FIEZEL-APPS-clone",
-                        "model":  "opencode-go/kimi-k3"
-                   },
-                   {
-                       "id":  "agent-12",
-                       "session":  "tbd",
-                       "role":  "worker",
-                       "directory":  "Temp\\opencode\\FIEZEL-APPS-clone",
-                        "model":  "opencode-go/kimi-k3"
-                   },
-                   {
-                       "id":  "agent-13",
-                       "session":  "tbd",
-                       "role":  "worker",
-                       "directory":  "Temp\\opencode\\FIEZEL-APPS-clone",
-                        "model":  "opencode-go/kimi-k3"
-                   },
-                   {
-                       "id":  "agent-14",
-                       "session":  "tbd",
-                       "role":  "worker",
-                       "directory":  "Temp\\opencode\\FIEZEL-APPS-clone",
-                        "model":  "opencode-go/kimi-k3"
-                   },
-                   {
-                       "id":  "agent-15",
-                       "session":  "tbd",
-                       "role":  "worker",
-                       "directory":  "Temp\\opencode\\FIEZEL-APPS-clone",
-                        "model":  "opencode-go/kimi-k3"
-                   }
-               ],
-    "tasks":  [
-                  {
-                      "id":  "T-001",
-                      "title":  "COI (COOP/COEP) via SW",
-                      "status":  "done",
-                      "owner":  "executor-1",
-                      "evidence":  "main 5ca5592 + 42b4ebb, Quality Gate SUCCESS (31784357531), Pages deployed",
-                      "note":  "crossOriginIsolated=true di device; ort multi-thread aktif"
-                  },
-                  {
-                      "id":  "T-002",
-                      "title":  "Audibility-first browser TTS",
-                      "status":  "done",
-                      "owner":  "executor-1",
-                      "evidence":  "main 78f0c18; user mengkonfirmasi suara browser TTS pulih",
-                      "note":  "Terbukti di device (konfirmasi user)"
-                  },
-                  {
-                      "id":  "T-003",
-                      "title":  "iOS CacheStorage compatibility layer",
-                      "status":  "done",
-                      "owner":  "executor-1",
-                      "evidence":  "main 25a0abd..fbc99c5, CI SUCCESS",
-                      "note":  "Masih menulis ke CacheStorage (quota iOS ~50MB) - diduga blocker neural. Belum diverifikasi device."
-                  },
-                  {
-                      "id":  "T-004",
-                      "title":  "Voice UX feedback + prewarm",
-                      "status":  "done",
-                      "owner":  "executor-1",
-                      "evidence":  "main 9871687 + merge 42b4ebb, CI SUCCESS 31784357531",
-                      "note":  "Belum diverifikasi device"
-                  },
-                  {
-                      "id":  "T-005",
-                      "title":  "Neural voice audible di device (goal utama)",
-                      "status":  "blocked",
-                      "owner":  "owner",
-                      "evidence":  "TIDAK ADA bukti device; user belum mengirim diagnostics localStorage fiezel-neural-voice-diagnostics-v1",
-                      "note":  "Hipotesis utama (analisis coordinator): aset 113MB \u003e quota CacheStorage iOS (~50MB) + fetch no-store + init timeout 20s. Butuh: 1) diagnostics device, 2) jika terkonfirmasi quota: migrasi ke IndexedDB. UPDATE M-016 (scan GitHub 2026-08-14): hipotesis DIKONFIRMASI dengan koreksi — timeout 20s hanya membungkus adapter.initialize, bukan fase download (blocker kuota muncul via storagePreflight storage_insufficient atau cache.put storage_quota); COI via SW hanya efektif setelah SW aktif (load ke-2) karena main belum punya client refresh; semua aset produksi utuh == HEAD; branch kandidat fix (A) sudah di main, (B) tidak menyentuh blocker quota."
-                  },
-                  {
-                      "id":  "T-006",
-                      "title":  "Baca diagnostics dari device (bukti emas)",
-                      "status":  "blocked",
-                      "owner":  "owner",
-                      "evidence":  "",
-                      "note":  "localStorage key: fiezel-neural-voice-diagnostics-v1. Instruksi ekstraksi sudah diberikan ke owner. Tanpa ini, T-007 TIDAK boleh dikerjakan. UPDATE M-016: kode diagnostics tetap aktif di HEAD (3 penulis: bootstrap/ios-cache/audibility); scan GitHub tidak bisa menggantikan bukti device ini."
-                  },
-                  {
-                      "id":  "T-007",
-                      "title":  "Migrasi aset neural ke IndexedDB jika T-003/T-005 terkonfirmasi",
-                      "status":  "pending",
-                      "owner":  "unassigned",
-                      "evidence":  "",
-                      "note":  "Solusi paling mungkin untuk blocker 113MB. Jangan dikerjakan sebelum T-006 bukti masuk. UPDATE M-016: desain T-010/baa804e tetap satu-satunya jalur yang menyentuh root cause (quota); branch A/B yang belum merge TIDAK menyentuh quota."
-                  },
-                  {
-                      "id":  "T-008",
-                      "title":  "Nonaktifkan gate notifikasi wajib saat masuk (Safari/PWA issue)",
-                      "status":  "done",
-                      "owner":  "coordinator-1",
-                      "evidence":  "main 14b1100 + 1f19930; 14b1100 QG FAIL (94724561223/31786847825, TypeError body.classList.toggle) -\u003e diperbaiki 1f19930 QG SUCCESS 31787384948; Pages deployed. TERVERIFIKASI LIVE di produksi (M-009/agent-1): https://fitrajft-ux.github.io/FIEZEL-APPS/ app.js 178839B sha256 79F7F2C0..C4B2 IDENTIK dgn HEAD, notificationsRequired() hanya true jika flag===true, lockAppForNotifications langsung unlock saat default; SW_REV=neural-voice-ux-fix-20260814-1.",
-                      "note":  "Flag dinamis globalThis.FIEZEL_REQUIRE_NOTIFICATIONS (default off). Re-enable: set true (index.html/console) tanpa ubah kode. Next: retest owner di iPhone (lihat analysis/device-retest-checklist.md) â€” app harus terbuka langsung tanpa gate notifikasi."
-                  },
-                  {
-                      "id":  "T-009",
-                      "title":  "Verifikasi T-008 di produksi (Pages live)",
-                      "status":  "done",
-                      "owner":  "agent-1",
-                      "evidence":  "M-009: Pages live HTTP 200; prod app.js == HEAD hash (sha256 79F7F2C035990EAEBA2D6D695225EA749B295FB13719BE715C37D1456A93C4B2); kutipan kode notificationsRequired()/lockAppForNotifications; prod-sw.js SW_REV=neural-voice-ux-fix-20260814-1"
-                  },
-                  {
-                      "id":  "T-010",
-                      "title":  "Desain migrasi IndexedDB (prep T-007)",
-                      "status":  "done",
-                      "owner":  "agent-2",
-                      "evidence":  "M-010: commit baa804e analysis/idb-migration-design.md (303 baris, 4 fase: additive-\u003ewrite-\u003eread-\u003ecleanup; StorageBackend di atas IDB fiezel-assets/neural-assets + fallback CacheStorage; kontrak FiezelVoiceRuntime tidak berubah; gerbang device: prepared=true, storage=idb, init\u003c20s)"
-                  },
-                  {
-                      "id":  "T-011",
-                      "title":  "Audit kesiapan T-006 + re-verifikasi hipotesis T-005 di HEAD",
-                      "status":  "done",
-                      "owner":  "agent-3",
-                      "evidence":  "M-011 di HEAD 6fa2d82: no-store bootstrap:175; INITIALIZE_TIMEOUT_MS 20s bootstrap:15/242-243; aset model 92.361.116 + wasm 21.596.019 (total 119.274.361B); 100% CacheStorage (IDB hanya vendor kokoro); SW_REV sw.js:3; diagnostics aktif 3 penulis (bootstrap 20/ios-cache 40/audibility 30 entri, key fiezel-neural-voice-diagnostics-v1); fallback bytes ios-cache-fix:23 tidak sinkron (+522240B)"
-                  },
-                  {
-                      "id":  "T-012",
-                      "title":  "Rekonsiliasi ledger vs git/CI realita",
-                      "status":  "done",
-                      "owner":  "agent-4",
-                      "evidence":  "M-012: 11 hash semua ancestor main; QG 31784357531 SUCCESS (42b4ebb), 31787384948 SUCCESS (1f19930), 14b1100 QG FAIL 94724561223; Pages builds SUCCESS; temuan: T-008 evidence wording menyesatkan (sudah dikoreksi di ledger ini), T-001 note crossOriginIsolated tanpa bukti device, 94 commit vs 83 main (11 dari branch agent)"
-                  },
-                  {
-                      "id":  "T-013",
-                      "title":  "Checklist retest owner di iPhone",
-                      "status":  "done",
-                      "owner":  "agent-5",
-                      "evidence":  "M-013: commit 09518cd analysis/device-retest-checklist.md (247 baris): retest T-008, uji neural voice, ekstraksi diagnostics (Web Inspector via Mac + catatan jujur tanpa Mac), template laporan ke coordinator. QG SUCCESS 31793320647"
-                  },
-                  {
-                      "id":  "T-014",
-                      "title":  "Reconfigurasi orchestration: Agent 5 = Main Coordinator (satu sistem, tanpa duplikasi)",
-                      "status":  "done",
-                      "owner":  "agent-5",
-                      "evidence":  "M-014: global opencode.jsonc (agent-5 Main Coordinator + agent-1..4 worker pool), agent/verifier.md + agent/squad-member.md, command/squad.md (agent build-\u003eagent-5), fiezel-analysis/opencode.json (default_agent=agent-5, subagent_depth=1), .opencode/agents vestigial dipindah ke Temp\\opencode\\FIEZEL-ORCH-BACKUP-20260814; AGENTS-COORDINATION.md v1.1; TEST 3 worker + TEST 4 verifier + TEST 5 failure-loop dijalankan via Task tool",
-                      "note":  "Hanya konfigurasi orchestration yang diubah; tidak ada file source FIEZEL yang disentuh; backup lengkap sebelum perubahan"
-                  },
-                  {
-                      "id":  "T-015",
-                      "title":  "Integrasi FIEZEL-Orkestrasi-Protokol-Pelengkap (scope-lock, context-injection, checklist verifier 6 poin, kriteria selesai)",
-                      "status":  "done",
-                      "owner":  "agent-5",
-                      "evidence":  "M-015: FIEZEL-Orkestrasi-Protokol-Pelengkap.md (267 baris, verbatim dari owner) di root repo; AGENTS-COORDINATION.md v1.2; verifier.md runtime = checklist 6 poin wajib; prompt agent-5 + agent-1..4 + squad-member = enforcement scope-lock/context-injection; TEST A verifier checklist (VERIFIED, format Â§3) + TEST B worker scope-lock (done, patuh files_allowed) via Task tool",
-                      "note":  "Dokumen owner disalin verbatim; tidak ada perubahan source FIEZEL; verifier menemukan \u0026 dikoreksi inkonsistensi header (v1 -\u003e v1.2)"
-                  },
-                  {
-                      "id":  "T-016",
-                      "title":  "coordinator-1 jadi task-giver pool (instruksi owner 20:34)",
-                      "status":  "done",
-                      "owner":  "owner",
-                      "evidence":  "Instruksi verbal owner: \u0027aku ingin kamu yang memberi tugas kepada mereka, berupa fix dan lain lain\u0027 setelah scan \u0027Reconfigurasi Orchestration FIEZEL\u0027 selesai. coordinator-1 (sesi ses_0034e69d) berwenang menugaskan agent-1..15 dengan format scope-lock (protokol v1.2).",
-                      "note":  "coordinator-1 juga memverifikasi pertanyaan terbuka scan (lihat Temp\\opencode\\coordinator-1-findings.md): (1) fix 0094db0 = 7cbf183 + 2417549; (2) fa2ecbc == 4685d94 (diff kosong, cherry-pick CONFIRMED); (3) branch berbahaya jika di-merge: neural-voice-coi-repair-20260814, ios-neural-voice-5.19.1, derive-adoption-target-version (index.html kehilangan ios-cache-fix.js + audibility-fix.js)."
-                  },
-                  {
-                      "id":  "T-017",
-                      "title":  "Scan GitHub menyeluruh: masalah neural voice belum berfungsi",
-                      "status":  "done",
-                      "owner":  "agent-5",
-                      "evidence":  "M-016: 4 worker paralel (SCAN-NV-01..04) + verifier VERIFY-SCAN-001 (STATUS VERIFIED, checklist 6 poin, 5 gate neural lokal PASS, regresi PASS). Temuan: (1) prod == HEAD utk SEMUA file neural (sha256 penuh, model fbae9257.., wasm c46655e8..); (2) branch agent/ios-neural-voice-5.19.1 SUDAH penuh di main (git diff fa2ecbc..branch kosong) - JANGAN merge; (3) branch neural-voice-coi-repair-20260814: COI sudah ada di main (9045b34 + CORP wrapper js.puter.com), branch tanpa CORP + tanpa 2 script fix - JANGAN merge mentah, hanya adaptasi refreshWindowClients + cross-origin-isolation-test.js; (4) COI via SW hanya efektif load ke-2 (main tanpa client refresh); (5) timeout 20s hanya membungkus adapter.initialize, BUKAN fase download; blocker tetap quota (119.274.361B \u003e CacheStorage iOS ~50MB) + no-store fetch; (6) quality.yml HEAD 35 script, 5 gate neural, 0 gate COI khusus",
-                      "note":  "Tidak ada perubahan source; temuan selaras dgn verifikasi coordinator-1 (T-016). Path penyelesaian: T-006 diagnostics device (masih blocked) -\u003e T-007 migrasi IndexedDB (desain siap T-010/baa804e)."
-                  },
-                  {
-                      "id":  "T-018",
-                      "title":  "Night-watch coordinator-1 atas sesi Reconfigurasi (M-016) + konfirmasi final",
-                      "status":  "done",
-                      "owner":  "coordinator-1",
-                      "evidence":  "coordinator-1 memantau ses_fffbfda0 (agent-5) 20:37-21:00 via nightwatch.py (polling DB): parent mengeluarkan FINAL REPORT M-016/T-017 (teks penuh 4684 char, 20:46) + verifier VERIFY-SCAN-001 retry VERIFIED 5/5 klaim; commit a7afce3 ter-push (log terverifikasi); git diff fa2ecbc..origin/agent/ios-neural-voice-5.19.1 = kosong (branch A sudah di main, DIKONFIRMASI ulang); branch --contains fa2ecbc menampilkan main. Ledger T-017/M-016 konsisten, clone bersih.",
-                      "note":  "Sesi Reconfigurasi SELESAI tuntas malam ini. Tidak ada regresi baru dari scan (read-only)."
-                  },
-                  {
-                      "id":  "T-019",
-                      "title":  "Sinkronisasi dokumentasi: PRIME_TIMEOUT_MS 45s vs \u002725 detik\u0027 + PRIME_TOTAL_BYTES + dead code storage===\u0027memory\u0027",
-                      "status":  "done",
-                      "owner":  "agent-1 (via coordinator-1 M-017)",
-                      "evidence":  "M-017: 3/3 inkonsistensi DIIVERIFIKASI BENAR di HEAD ace434f. (1) Protokol Pelengkap:121 \u002725 detik\u0027 -\u003e dikoreksi \u002745 detik (45.000 ms)\u0027 selaras ios-cache-fix.js:21 PRIME_TIMEOUT_MS=45000. (2) PRIME_TOTAL_BYTES fallback 119.796.601 vs manifest 13 aset 119.274.361 B (selisih +522.240 B = 1 voice, kosmetik progress bar; runtime.totalBytes benar) -\u003e komentar [DOC-SYNC-M017-20260814]. (3) dead code storage===\u0027memory\u0027 app.js:585 (bootstrap hanya tulis \u0027cache\u0027, baca bootstrap.js:53/58/207) -\u003e komentar [DEAD-CODE-20260814] tanpa hapus (fallback safety). node --check app.js + ios-cache-fix.js PASS. Commit ter-push ke main (git diff --stat 3 file, tanpa sentuh source runtime).",
-                      "note":  "Dari temuan M-016 \u0027BELUM SELESAI\u0027 (inkonsistensi kecil): ios-cache-fix.js:21 PRIME_TIMEOUT_MS=45.000ms vs \u002725 detik\u0027 di Protokol Pelengkap; PRIME_TOTAL_BYTES +/-522.240B vs total manifest; dead code branch storage===\u0027memory\u0027 app.js:585. LOW-RISK: dokumentasi/komentar saja, TIDAK mengubah perilaku runtime. Scope-lock protokol v1.2. HASIL: semua inkonsistensi benar \u0026 disinkronkan (hanya dokumen/komentar)."
-                  },
-                  {
-                      "id":  "T-020",
-                      "title":  "Adopsi client-refresh COI + gate COI (adaptasi dari branch neural-voice-coi-repair) - branch baru, tanpa merge",
-                      "status":  "done",
-                      "owner":  "agent-2 (via coordinator-1 M-018)",
-                      "evidence":  "M-018: branch agent/coi-client-refresh-20260814 (dari origin/main ace434f) ter-push (commit fa3da4c, head branch e45f111 = koreksi hash). Gate lokal: cross-origin-isolation-test.js PASS + 5 gate neural PASS + regression PASS. index.html TIDAK diubah (ios-cache-fix.js + audibility-fix.js terverifikasi masih ada). CORP wrapper fetchCrossOriginWithCorp + COOP_COEP_HEADERS di sw.js utuh.",
-                      "note":  "STATUS: changed-not-tested (perilaku device belum diuji; butuh retest iPhone + keputusan owner). JANGAN merge ke main. Adaptasi: refreshWindowClients() + client.navigate(client.url) di activate (sw.js), gate COI di quality.yml (36 script: 35 lama + cross-origin-isolation-test.js). SW_REV bump ke neural-voice-coi-client-refresh-20260814-1. NILAI DI-PORT dari branch agent-2 (commit e45f111/fa3da4c) agar M-018 tetap utuh di main -- bukan merge branch."
-                  },
-                  {
-                      "id":  "T-021",
-                      "title":  "M-019: deploy diag-panel build (panel Diagnostics read-only)",
-                      "status":  "changed-not-tested",
-                      "owner":  "agent-1 (via gelombang pagi 2026-08-15)",
-                      "evidence":  "branch origin/m019-diag-panel @ 6a6d37b (2026-08-15 08:18:43, 12 file +611/-81): fiezel-diag-panel.js (baru 287 baris), diag-panel-test.js (baru 203 baris), sw.js +11, index.html +4, quality.yml +1, bootstrap/ios-cache/audibility sinkronisasi kecil, AGENTS-COORDINATION.md +48, device-retest-checklist.md +124/-...; sesi kerja: LEDGER-DRAFT T-021 (@agent-7 08:10), CLAIMS-AUDIT (@agent-2 08:11), REG-DIFF (@agent-4 08:18), DEPLOY-PREP (@agent-1 08:20), GATE-DRY-RUN full suite lokal (@agent-6 09:33-09:39, semua gate PASS)",
-                      "note":  "BELUM di-merge ke main (main masih 588320f). TIDAK ada entri ini di ledger main sebelumnya - ditambahkan agent-5 (T-022) berdasarkan bukti git. Keputusan merge menunggu GATE-DRY-RUN tuntas + retest device."
-                  },
-                  {
-                      "id":  "T-022",
-                      "title":  "Update repo dengan handoff neural voice (instruksi owner 2026-08-15 pagi)",
-                      "status":  "done",
-                      "owner":  "agent-5",
-                      "evidence":  "commit [5.19.0] T-022: FIEZEL-5.19.0-NEURAL-VOICE-HANDOFF.md (baru, handoff v1.0: status T-001..T-007, root cause CONFIRMED quota 119.274.361B \u003e ~50MB, status branch m019-diag-panel + fix-coi-opaque-response, langkah berikut, catatan sesi) + TASKS-LEDGER.json (T-021/M-019 + T-022); verifier VERIFY-HANDOFF-001 (checklist 6 poin)",
-                      "note":  "Permintaan owner sama sudah dicoba sesi lain 08:06 (ses_ffd109383ffeglFg0r5xbt, 13 pesan) tanpa commit - difinalisasi agent-5. AGENTS-COORDINATION.md uncommitted (v1.3) di working tree koordinator TIDAK ikut di-commit (di luar scope)."
-                  },
-                  {
-                      "id":  "T-023",
-                      "owner":  "agent-5",
-                      "note":  "Root cause dari pembacaan kode HEAD a9b5bbb: (1) fiezel-web-audio-player.js simpan AudioContext di env.__fiezelWebAudioContext tanpa pernah close; (2) fiezel-neural-voice-bootstrap.js tidak punya release/dispose path -- WASM model 92MB+21MB tetap di memori setelah init; (3) app.js:817 visibilitychange hanya suspend musik/fx, tidak stop neural voice / close player context; (4) timer berat jalan saat hidden (celestial 30s, soundtrack 5.8s); (5) SW cache-first 119MB memperlambat restore tab. Fix ADDITIVE: tambah release()/close()/stopAll() + lifecycle handler. Kontrak publik FiezelVoiceRuntime hanya bertambah, tidak berubah.",
-                      "evidence":  "agent-5 (takeover OWNER 2026-08-15, MASTER/squad tidak aktif): (1) fiezel-web-audio-player.js +close() (stop source + close shared AudioContext + env.__fiezelWebAudioContext=null), API Object.freeze({play,stop,warm,close}) ADDITIVE; (2) fiezel-neural-voice-bootstrap.js +release() (service.stop + speechSynthesis.cancel + FiezelWebAudioPlayer.createPlayer(root).close() + playerRef/service/adapter=null + phase=idle + diag released, re-init on-demand via speak/ensureReady), diekspos di FiezelVoiceRuntime (speak,stop,release) ADDITIVE; (3) app.js visibilitychange handler: hidden -> tambah FiezelVoiceRuntime.release() (masih suspend musicCtx/fxCtx), visible -> resume normal; (4) neural-voice-fix-test.js section 6 (13 check T-023, total 42/42 PASS); node --check PASS (97 file); neural-voice-test.js PASS 39/0; Quality Gate penuh lokal 46/46 script PASS (termasuk remote-push-test.js 16/16 dgn rfc8030TopicSanitized, regression-test.js hang di node v24/Windows = isu lingkungan, PASS di CI node 22); verifier VERIFY-TAKEOVER-001: diff/evidence/regression/forbidden PASS, objective+CI FAIL hanya karena kode belum di-commit; DIPERBAIKI: commit 7 file + CI QG hijau untuk kode T-023 + push fix (lihat evidence verifikasi ulang). KONTRAK PUBLIK TIDAK BERUBAH (hanya bertambah).",
-                      "title":  "Fix tab lifecycle: tab FIEZEL stuck/force-close saat pindah tab (release neural voice + AudioContext saat hidden)",
-                      "status":  "done"
-                  },
-                   {
-                       "id":  "T-024",
-                       "title":  "A3 Apple standalone direct single-thread WASM + prompt-safe adapter stage diagnostics",
-                       "status":  "done",
-                       "owner":  "agent-1",
-                       "evidence":  "PR #23 merged as b0ab5ff; source candidate commit 97cd608; main then refreshed by PR #26 merge bde96b9. CI QG 31890896563/31891031289 and A6/A7 31890896589/31891013016/31892730568 SUCCESS; Pages 31892856756 SUCCESS. Local focused neural/regression gates PASS per agent-1/agent-3 evidence.",
-                       "note":  "Automated code/gate objective done: Apple standalone uses numThreads=1 + proxy=false and bounded prompt-safe stages. Physical Apple audibility is NOT claimed: T-005/T-006 remain blocked pending fiezel-neural-voice-diagnostics-v1 from the owner device; release readiness is therefore separate and not yet passed."
-                   },
-                   {
-                       "id":  "T-024-A2",
-                       "title":  "Independent audit of PR #23 direct-WASM neural candidate",
-                       "status":  "done",
-                       "owner":  "agent-2",
-                       "evidence":  "analysis/neural-voice-a3-audit.md; worker commit 48c359e (integrated as 37dbdce); CI 31892599225 SUCCESS. Diff audit found exactly the three PR source files, privacy-safe bounded diagnostics, and additive contract behavior.",
-                       "note":  "Recommendation SAFE CANDIDATE for controlled diagnostic deployment, not proof of physical Apple standalone audibility."
-                   },
-                   {
-                       "id":  "T-024-A3",
-                       "title":  "Independent neural gate and release-readiness audit",
-                       "status":  "done",
-                       "owner":  "agent-3",
-                       "evidence":  "analysis/neural-voice-a3-gate-audit.md; worker commit 1c15af0. Eighteen relevant local gates PASS; main bde96b9 QG/Pages and PR #26 A6/A7 checks SUCCESS; regression-test.js Windows/node24 hang is documented and CI node22 passed.",
-                       "note":  "Release gate remains NOT READY because physical device diagnostics/audibility evidence is missing; no new regression was found."
-                   },
-                   {
-                       "id":  "T-024-A4",
-                      "title":  "Audit config aktif OpenCode: migrasi provider/model ke opencode-go/kimi-k3 + normalisasi field model ledger",
-                      "status":  "done",
-                      "owner":  "agent-4",
-                      "evidence":  "analysis/agent-model-config-audit.md (baru) + TASKS-LEDGER.json (metadata). Bukti config aktif: opencode.jsonc top-level model+small_model=enabled_providers=['opencode-go']+15/15 agent model='opencode-go/kimi-k3'; agent/verifier.md + agent/squad-member.md model='opencode-go/kimi-k3'; command/squad.md agent=agent-5. Validasi nyata (node v24.19.0): STRICT-JSON OK opencode.jsonc (tanpa komentar/trailing comma) + TASKS-LEDGER.json agents=17 tasks=23 missions=12. Model slug diverifikasi di models.dev: provider opencode-go (env OPENCODE_API_KEY, api opencode.ai/zen/go/v1) memuat model kimi-k3. Ledger: 15 field model agen dinormalisasi zen-agent-N/deepseek-v4-flash-free -> opencode-go/kimi-k3; coordinator-1/executor-1 tetap tanpa field model. PRASYARAT JUJUR: OPENCODE_API_KEY ABSENT di shell audit; perubahan config butuh RESTART proses OpenCode yang sudah berjalan (tidak diklaim sudah aktif).",
-                      "note":  "Scope-lock T-024-A4: hanya analysis/agent-model-config-audit.md + TASKS-LEDGER.json yang diubah; tidak menyentuh config global, agent markdown, source/neural voice/SW/app/CI/vendor. Riwayat task/mission/last_report lama tidak ditulis ulang."
-                  },
-                  {
-                      "id":  "T-025",
-                      "title":  "Migrasi config aktif OpenCode ke OpenCode Go Kimi K3 (opencode-go/kimi-k3) — dicatat di ledger",
-                      "status":  "done",
-                      "owner":  "agent-5",
-                      "evidence":  "Config aktif C:\\Users\\WINDOWS\\.config\\opencode\\opencode.jsonc telah dimigrasi & divalidasi Agent 5 di luar repo (root_cause_context CONFIRMED): model+small_model='opencode-go/kimi-k3', enabled_providers=['opencode-go'], 15 agen (agent-1..15) semuanya 'opencode-go/kimi-k3'. Catatan ledger: T-024-A4 memverifikasi selector, jumlah agen (15), dan file aktif; slug kimi-k3 tervalidasi via models.dev (provider opencode-go). PRASYARAT: env OPENCODE_API_KEY belum terlihat di shell audit; sesi OpenCode yang sedang berjalan belum otomatis berpindah model (butuh restart).",
-                      "note":  "Entri pencatatan migrasi di ledger (bukan perubahan config; config global di luar scope repo). Entri lama di T-014/T-015 yang menyebut zen/deepseek adalah riwayat sesi lama dan TIDAK ditulis ulang."
-                  }
-              ],
-    "last_report":  {
-                        "by":  "agent-5 coordinator - T-024/T-025 latest GitHub audit and model migration",
-                        "time":  "2026-08-15T22:45:00+07:00",
-                        "summary":  "Latest main is bde96b9 (PR #23 direct-WASM neural candidate merged as b0ab5ff, PR #26 shell refresh merged after it); automated Quality Gate, A6/A7, and Pages deployment checks are green. T-024 code and independent A2/A3 audits are complete with no automated regression. T-025 active OpenCode config is set to opencode-go/kimi-k3 for all 15 configured agents plus worker/verifier definitions, but restart and OpenCode Go auth are prerequisites. RELEASE HOLD: physical Apple device audibility and fiezel-neural-voice-diagnostics-v1 are still missing (T-005/T-006 blocked), so no unsupported production release claim is made."
-                     },
-    "missions":  [
-                     {
-                         "id":  "M-009",
-                         "task_ref":  "T-009",
-                         "agent":  "agent-1",
-                         "status":  "done",
-                         "title":  "Verifikasi T-008 di produksi (Pages live)",
-                         "note":  "TERBUKTI LIVE: app.js produksi identik hash dengan HEAD; flag default off ada"
-                     },
-                     {
-                         "id":  "M-010",
-                         "task_ref":  "T-010",
-                         "agent":  "agent-2",
-                         "status":  "done",
-                         "title":  "Desain migrasi IndexedDB (prep T-007)",
-                         "note":  "baa804e: analysis/idb-migration-design.md, 4 fase, StorageBackend IDB + fallback CacheStorage"
-                     },
-                     {
-                         "id":  "M-011",
-                         "task_ref":  "T-011",
-                         "agent":  "agent-3",
-                         "status":  "done",
-                         "title":  "Audit kesiapan T-006 + re-verifikasi hipotesis T-005 di HEAD",
-                         "note":  "Hipotesis konfirm; instruksi ekstraksi via Mac Web Inspector + bookmarklet tanpa Mac; bukti Website Data"
-                     },
-                     {
-                         "id":  "M-012",
-                         "task_ref":  "T-012",
-                         "agent":  "agent-4",
-                         "status":  "done",
-                         "title":  "Rekonsiliasi ledger vs git/CI realita",
-                         "note":  "11 hash OK; koreksi evidence T-008 diterapkan; CI run terverifikasi via GitHub API"
-                     },
-                     {
-                         "id":  "M-013",
-                         "task_ref":  "T-013",
-                         "agent":  "agent-5",
-                         "status":  "done",
-                         "title":  "Checklist retest owner di iPhone",
-                         "note":  "09518cd: analysis/device-retest-checklist.md; QG SUCCESS 31793320647"
-                     },
-                     {
-                         "id":  "M-014",
-                         "task_ref":  "T-014",
-                         "agent":  "agent-5",
-                         "status":  "done",
-                         "title":  "Reconfigurasi orchestration: Agent 5 = Main Coordinator",
-                         "note":  "Satu sistem orchestration bersih: worker pool agent-1..4 + verifier read-only di bawah Agent 5; sistem duplikat .opencode/agents dipindah ke backup; default_agent=agent-5; /squad -\u003e agent-5; protokol v1.1"
-                     },
-                     {
-                         "id":  "M-015",
-                         "task_ref":  "T-015",
-                         "agent":  "agent-5",
-                         "status":  "done",
-                         "title":  "Integrasi Protokol Pelengkap ke sistem orchestration",
-                         "note":  "Scope-lock + context-injection + checklist verifier 6 poin + kriteria selesai kini wajib di runtime (prompt agent-5/agent-1..4, verifier.md, squad-member.md); tervalidasi via Task tool (TEST A + TEST B)"
-                     },
-                     {
-                         "id":  "M-016",
-                         "task_ref":  "T-017",
-                         "agent":  "agent-5",
-                         "status":  "done",
-                         "title":  "Scan GitHub menyeluruh masalah neural voice (4 worker paralel + verifier)",
-                         "note":  "SCAN-NV-01 agent-1 (branch/CI/workflow), SCAN-NV-02 agent-2 (audit kode HEAD), SCAN-NV-03 agent-3 (deep-dive 2 branch belum-merge), SCAN-NV-04 agent-4 (audit produksi Pages + MIME + hash); verifier VERIFY-SCAN-001 VERIFIED 5/5 klaim (gate neural lokal PASS, regresi PASS, CI SUCCESS). Kesimpulan: blocker = quota CacheStorage iOS ~50MB vs 119.274.361B + no-store; COI hanya efektif load ke-2; branch A sudah di main, branch B butuh adaptasi; solusi tetap T-007 IndexedDB setelah T-006 diagnostics device."
-                     },
-                     {
-                         "id":  "M-017",
-                         "task_ref":  "T-019",
-                         "agent":  "agent-1",
-                         "status":  "done",
-                         "title":  "Sinkronisasi dokumentasi inkonsistensi kecil (dari temuan M-016)",
-                         "note":  "DONE: 3/3 inkonsistensi benar \u0026 disinkronkan di main (3 file: Protokol Pekengkap 45s, komentar [DOC-SYNC-M017-20260814] ios-cache-fix, [DEAD-CODE-20260814] app.js). Hanya dokumentasi/komentar, TIDAK mengubah perilaku runtime; node --check PASS; diff stat 3 file. Awalnya BLOCKED (konflik working-dir agent-2), difinalisasi setelah agent-2 selesai."
-                     },
-                     {
-                         "id":  "M-018",
-                         "task_ref":  "T-020",
-                         "agent":  "agent-2",
-                         "status":  "done",
-                         "title":  "Adopsi client-refresh COI + gate COI di branch baru (tanpa merge)",
-                         "note":  "Branch agent/coi-client-refresh-20260814 (commit fa3da4c, dari ace434f) ter-push, CI hijau. sw.js: +refreshWindowClients + activate .then(refreshWindowClients) + SW_REV bump; CORP wrapper \u0026 COI injection utuh. File baru cross-origin-isolation-test.js (gate CI). quality.yml: +gate COI (36 script). index.html TANPA perubahan (2 script fix terverifikasi ada). STATUS: changed-not-tested - butuh retest device + keputusan owner; JANGAN merge. NILAI DI-PORT dari branch agent-2 (commit e45f111) agar M-018 tetap utuh di main -- bukan merge branch."
-                     },
-                     {
-                         "id":  "M-019",
-                         "task_ref":  "T-021",
-                         "agent":  "agent-1 (gelombang pagi 2026-08-15)",
-                         "status":  "changed-not-tested",
-                         "title":  "Deploy diag-panel build (panel Diagnostics read-only)",
-                         "note":  "origin/m019-diag-panel @ 6a6d37b (08:18:43). Panel Diagnostics read-only (fiezel-diag-panel.js 287 baris + diag-panel-test.js 203 baris), SW_REV bump, riwayat diag 200, versi 5.19.0, gate notifikasi tersembunyi. BELUM di-merge ke main. GATE-DRY-RUN lokal (@agent-6) semua PASS 09:33-09:37."
-                     },
-                     {
-                         "id":  "M-020",
-                         "task_ref":  "T-022",
-                         "agent":  "agent-5",
-                         "status":  "done",
-                         "title":  "Handoff neural voice 5.19.0 + rekonsiliasi ledger (T-021/M-019 dari branch)",
-                         "note":  "FIEZEL-5.19.0-NEURAL-VOICE-HANDOFF.md v1.0 di-commit ke main + ledger T-021/M-019 (yang hanya ada di branch) dicatat + T-022. Verifier VERIFY-HANDOFF-001. Permintaan owner yang sama (08:06) tidak selesai di sesi lain - difinalisasi di sini."
-                     }
-                 ]
+  "protocol_version": "v1.2",
+  "updated": "2026-08-29T01:24:07.128986+00:00",
+  "agents": [
+    {
+      "id": "coordinator-1",
+      "session": "ses_0034e69d3ffes3kjiFLNDzYXUZ",
+      "role": "coordinator/observer",
+      "directory": "Temp\\opencode\\FIEZEL-APPS-clone"
+    },
+    {
+      "id": "executor-1",
+      "session": "ses_0027db319ffeiu7OrUF1qbWBH8",
+      "role": "implementer (fix live)",
+      "directory": "Temp\\opencode\\FIEZEL-APPS"
+    },
+    {
+      "id": "agent-1",
+      "session": "ses_000325795ffePUB0VTxSfBE64V",
+      "role": "squad (verifikasi produksi)",
+      "directory": "Temp\\opencode\\FIEZEL-APPS-clone",
+      "model": "zen-agent-1/deepseek-v4-flash-free"
+    },
+    {
+      "id": "agent-2",
+      "session": "ses_000323295ffeEWAlY1ruQ0zNRr",
+      "role": "squad (desain IndexedDB)",
+      "directory": "Temp\\opencode\\FIEZEL-APPS-clone",
+      "model": "zen-agent-2/deepseek-v4-flash-free"
+    },
+    {
+      "id": "agent-3",
+      "session": "ses_000321c1cffengK0Als7R81yNI",
+      "role": "squad (audit T-005/T-006)",
+      "directory": "Temp\\opencode\\FIEZEL-APPS-clone",
+      "model": "zen-agent-3/deepseek-v4-flash-free"
+    },
+    {
+      "id": "agent-4",
+      "session": "ses_000320968ffe6hUykdumYrGPiS",
+      "role": "squad (rekonsiliasi ledger)",
+      "directory": "Temp\\opencode\\FIEZEL-APPS-clone",
+      "model": "zen-agent-4/deepseek-v4-flash-free"
+    },
+    {
+      "id": "agent-5",
+      "session": "ses_00031f177ffen91yZn7TRaD6Gf",
+      "role": "Main Coordinator / worker pool lead",
+      "directory": "Temp\\opencode\\FIEZEL-APPS-clone",
+      "model": "zen-agent-5/deepseek-v4-flash-free"
+    },
+    {
+      "id": "agent-6",
+      "session": "tbd",
+      "role": "worker",
+      "directory": "Temp\\opencode\\FIEZEL-APPS-clone",
+      "model": "zen-agent-1/deepseek-v4-flash-free"
+    },
+    {
+      "id": "agent-7",
+      "session": "tbd",
+      "role": "worker",
+      "directory": "Temp\\opencode\\FIEZEL-APPS-clone",
+      "model": "zen-agent-2/deepseek-v4-flash-free"
+    },
+    {
+      "id": "agent-8",
+      "session": "tbd",
+      "role": "worker",
+      "directory": "Temp\\opencode\\FIEZEL-APPS-clone",
+      "model": "zen-agent-3/deepseek-v4-flash-free"
+    },
+    {
+      "id": "agent-9",
+      "session": "tbd",
+      "role": "worker",
+      "directory": "Temp\\opencode\\FIEZEL-APPS-clone",
+      "model": "zen-agent-4/deepseek-v4-flash-free"
+    },
+    {
+      "id": "agent-10",
+      "session": "tbd",
+      "role": "worker",
+      "directory": "Temp\\opencode\\FIEZEL-APPS-clone",
+      "model": "zen-agent-5/deepseek-v4-flash-free"
+    },
+    {
+      "id": "agent-11",
+      "session": "tbd",
+      "role": "worker",
+      "directory": "Temp\\opencode\\FIEZEL-APPS-clone",
+      "model": "zen-agent-1/deepseek-v4-flash-free"
+    },
+    {
+      "id": "agent-12",
+      "session": "tbd",
+      "role": "worker",
+      "directory": "Temp\\opencode\\FIEZEL-APPS-clone",
+      "model": "zen-agent-2/deepseek-v4-flash-free"
+    },
+    {
+      "id": "agent-13",
+      "session": "tbd",
+      "role": "worker",
+      "directory": "Temp\\opencode\\FIEZEL-APPS-clone",
+      "model": "zen-agent-3/deepseek-v4-flash-free"
+    },
+    {
+      "id": "agent-14",
+      "session": "tbd",
+      "role": "worker",
+      "directory": "Temp\\opencode\\FIEZEL-APPS-clone",
+      "model": "zen-agent-4/deepseek-v4-flash-free"
+    },
+    {
+      "id": "agent-15",
+      "session": "tbd",
+      "role": "worker",
+      "directory": "Temp\\opencode\\FIEZEL-APPS-clone",
+      "model": "zen-agent-5/deepseek-v4-flash-free"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "T-001",
+      "title": "COI (COOP/COEP) via SW",
+      "status": "done",
+      "owner": "executor-1",
+      "evidence": "main 5ca5592 + 42b4ebb, Quality Gate SUCCESS (31784357531), Pages deployed",
+      "note": "crossOriginIsolated=true di device; ort multi-thread aktif"
+    },
+    {
+      "id": "T-002",
+      "title": "Audibility-first browser TTS",
+      "status": "done",
+      "owner": "executor-1",
+      "evidence": "main 78f0c18; user mengkonfirmasi suara browser TTS pulih",
+      "note": "Terbukti di device (konfirmasi user)"
+    },
+    {
+      "id": "T-003",
+      "title": "iOS CacheStorage compatibility layer",
+      "status": "done",
+      "owner": "executor-1",
+      "evidence": "main 25a0abd..fbc99c5, CI SUCCESS",
+      "note": "Masih menulis ke CacheStorage (quota iOS ~50MB) - diduga blocker neural. Belum diverifikasi device."
+    },
+    {
+      "id": "T-004",
+      "title": "Voice UX feedback + prewarm",
+      "status": "done",
+      "owner": "executor-1",
+      "evidence": "main 9871687 + merge 42b4ebb, CI SUCCESS 31784357531",
+      "note": "Belum diverifikasi device"
+    },
+    {
+      "id": "T-005",
+      "title": "Neural voice audible di device (goal utama)",
+      "status": "blocked",
+      "owner": "owner",
+      "evidence": "TIDAK ADA bukti device; user belum mengirim diagnostics localStorage fiezel-neural-voice-diagnostics-v1",
+      "note": "Hipotesis utama (analisis coordinator): aset 113MB > quota CacheStorage iOS (~50MB) + fetch no-store + init timeout 20s. Butuh: 1) diagnostics device, 2) jika terkonfirmasi quota: migrasi ke IndexedDB. UPDATE M-016 (scan GitHub 2026-08-14): hipotesis DIKONFIRMASI dengan koreksi — timeout 20s hanya membungkus adapter.initialize, bukan fase download (blocker kuota muncul via storagePreflight storage_insufficient atau cache.put storage_quota); COI via SW hanya efektif setelah SW aktif (load ke-2) karena main belum punya client refresh; semua aset produksi utuh == HEAD; branch kandidat fix (A) sudah di main, (B) tidak menyentuh blocker quota."
+    },
+    {
+      "id": "T-006",
+      "title": "Baca diagnostics dari device (bukti emas)",
+      "status": "blocked",
+      "owner": "owner",
+      "evidence": "",
+      "note": "localStorage key: fiezel-neural-voice-diagnostics-v1. Instruksi ekstraksi sudah diberikan ke owner. Tanpa ini, T-007 TIDAK boleh dikerjakan. UPDATE M-016: kode diagnostics tetap aktif di HEAD (3 penulis: bootstrap/ios-cache/audibility); scan GitHub tidak bisa menggantikan bukti device ini."
+    },
+    {
+      "id": "T-007",
+      "title": "Migrasi aset neural ke IndexedDB jika T-003/T-005 terkonfirmasi",
+      "status": "pending",
+      "owner": "unassigned",
+      "evidence": "",
+      "note": "Solusi paling mungkin untuk blocker 113MB. Jangan dikerjakan sebelum T-006 bukti masuk. UPDATE M-016: desain T-010/baa804e tetap satu-satunya jalur yang menyentuh root cause (quota); branch A/B yang belum merge TIDAK menyentuh quota."
+    },
+    {
+      "id": "T-008",
+      "title": "Nonaktifkan gate notifikasi wajib saat masuk (Safari/PWA issue)",
+      "status": "done",
+      "owner": "coordinator-1",
+      "evidence": "main 14b1100 + 1f19930; 14b1100 QG FAIL (94724561223/31786847825, TypeError body.classList.toggle) -> diperbaiki 1f19930 QG SUCCESS 31787384948; Pages deployed. TERVERIFIKASI LIVE di produksi (M-009/agent-1): https://fitrajft-ux.github.io/FIEZEL-APPS/ app.js 178839B sha256 79F7F2C0..C4B2 IDENTIK dgn HEAD, notificationsRequired() hanya true jika flag===true, lockAppForNotifications langsung unlock saat default; SW_REV=neural-voice-ux-fix-20260814-1.",
+      "note": "Flag dinamis globalThis.FIEZEL_REQUIRE_NOTIFICATIONS (default off). Re-enable: set true (index.html/console) tanpa ubah kode. Next: retest owner di iPhone (lihat analysis/device-retest-checklist.md) â€” app harus terbuka langsung tanpa gate notifikasi."
+    },
+    {
+      "id": "T-009",
+      "title": "Verifikasi T-008 di produksi (Pages live)",
+      "status": "done",
+      "owner": "agent-1",
+      "evidence": "M-009: Pages live HTTP 200; prod app.js == HEAD hash (sha256 79F7F2C035990EAEBA2D6D695225EA749B295FB13719BE715C37D1456A93C4B2); kutipan kode notificationsRequired()/lockAppForNotifications; prod-sw.js SW_REV=neural-voice-ux-fix-20260814-1"
+    },
+    {
+      "id": "T-010",
+      "title": "Desain migrasi IndexedDB (prep T-007)",
+      "status": "done",
+      "owner": "agent-2",
+      "evidence": "M-010: commit baa804e analysis/idb-migration-design.md (303 baris, 4 fase: additive->write->read->cleanup; StorageBackend di atas IDB fiezel-assets/neural-assets + fallback CacheStorage; kontrak FiezelVoiceRuntime tidak berubah; gerbang device: prepared=true, storage=idb, init<20s)"
+    },
+    {
+      "id": "T-011",
+      "title": "Audit kesiapan T-006 + re-verifikasi hipotesis T-005 di HEAD",
+      "status": "done",
+      "owner": "agent-3",
+      "evidence": "M-011 di HEAD 6fa2d82: no-store bootstrap:175; INITIALIZE_TIMEOUT_MS 20s bootstrap:15/242-243; aset model 92.361.116 + wasm 21.596.019 (total 119.274.361B); 100% CacheStorage (IDB hanya vendor kokoro); SW_REV sw.js:3; diagnostics aktif 3 penulis (bootstrap 20/ios-cache 40/audibility 30 entri, key fiezel-neural-voice-diagnostics-v1); fallback bytes ios-cache-fix:23 tidak sinkron (+522240B)"
+    },
+    {
+      "id": "T-012",
+      "title": "Rekonsiliasi ledger vs git/CI realita",
+      "status": "done",
+      "owner": "agent-4",
+      "evidence": "M-012: 11 hash semua ancestor main; QG 31784357531 SUCCESS (42b4ebb), 31787384948 SUCCESS (1f19930), 14b1100 QG FAIL 94724561223; Pages builds SUCCESS; temuan: T-008 evidence wording menyesatkan (sudah dikoreksi di ledger ini), T-001 note crossOriginIsolated tanpa bukti device, 94 commit vs 83 main (11 dari branch agent)"
+    },
+    {
+      "id": "T-013",
+      "title": "Checklist retest owner di iPhone",
+      "status": "done",
+      "owner": "agent-5",
+      "evidence": "M-013: commit 09518cd analysis/device-retest-checklist.md (247 baris): retest T-008, uji neural voice, ekstraksi diagnostics (Web Inspector via Mac + catatan jujur tanpa Mac), template laporan ke coordinator. QG SUCCESS 31793320647"
+    },
+    {
+      "id": "T-014",
+      "title": "Reconfigurasi orchestration: Agent 5 = Main Coordinator (satu sistem, tanpa duplikasi)",
+      "status": "done",
+      "owner": "agent-5",
+      "evidence": "M-014: global opencode.jsonc (agent-5 Main Coordinator + agent-1..4 worker pool), agent/verifier.md + agent/squad-member.md, command/squad.md (agent build->agent-5), fiezel-analysis/opencode.json (default_agent=agent-5, subagent_depth=1), .opencode/agents vestigial dipindah ke Temp\\opencode\\FIEZEL-ORCH-BACKUP-20260814; AGENTS-COORDINATION.md v1.1; TEST 3 worker + TEST 4 verifier + TEST 5 failure-loop dijalankan via Task tool",
+      "note": "Hanya konfigurasi orchestration yang diubah; tidak ada file source FIEZEL yang disentuh; backup lengkap sebelum perubahan"
+    },
+    {
+      "id": "T-015",
+      "title": "Integrasi FIEZEL-Orkestrasi-Protokol-Pelengkap (scope-lock, context-injection, checklist verifier 6 poin, kriteria selesai)",
+      "status": "done",
+      "owner": "agent-5",
+      "evidence": "M-015: FIEZEL-Orkestrasi-Protokol-Pelengkap.md (267 baris, verbatim dari owner) di root repo; AGENTS-COORDINATION.md v1.2; verifier.md runtime = checklist 6 poin wajib; prompt agent-5 + agent-1..4 + squad-member = enforcement scope-lock/context-injection; TEST A verifier checklist (VERIFIED, format Â§3) + TEST B worker scope-lock (done, patuh files_allowed) via Task tool",
+      "note": "Dokumen owner disalin verbatim; tidak ada perubahan source FIEZEL; verifier menemukan & dikoreksi inkonsistensi header (v1 -> v1.2)"
+    },
+    {
+      "id": "T-016",
+      "title": "coordinator-1 jadi task-giver pool (instruksi owner 20:34)",
+      "status": "done",
+      "owner": "owner",
+      "evidence": "Instruksi verbal owner: 'aku ingin kamu yang memberi tugas kepada mereka, berupa fix dan lain lain' setelah scan 'Reconfigurasi Orchestration FIEZEL' selesai. coordinator-1 (sesi ses_0034e69d) berwenang menugaskan agent-1..15 dengan format scope-lock (protokol v1.2).",
+      "note": "coordinator-1 juga memverifikasi pertanyaan terbuka scan (lihat Temp\\opencode\\coordinator-1-findings.md): (1) fix 0094db0 = 7cbf183 + 2417549; (2) fa2ecbc == 4685d94 (diff kosong, cherry-pick CONFIRMED); (3) branch berbahaya jika di-merge: neural-voice-coi-repair-20260814, ios-neural-voice-5.19.1, derive-adoption-target-version (index.html kehilangan ios-cache-fix.js + audibility-fix.js)."
+    },
+    {
+      "id": "T-017",
+      "title": "Scan GitHub menyeluruh: masalah neural voice belum berfungsi",
+      "status": "done",
+      "owner": "agent-5",
+      "evidence": "M-016: 4 worker paralel (SCAN-NV-01..04) + verifier VERIFY-SCAN-001 (STATUS VERIFIED, checklist 6 poin, 5 gate neural lokal PASS, regresi PASS). Temuan: (1) prod == HEAD utk SEMUA file neural (sha256 penuh, model fbae9257.., wasm c46655e8..); (2) branch agent/ios-neural-voice-5.19.1 SUDAH penuh di main (git diff fa2ecbc..branch kosong) - JANGAN merge; (3) branch neural-voice-coi-repair-20260814: COI sudah ada di main (9045b34 + CORP wrapper js.puter.com), branch tanpa CORP + tanpa 2 script fix - JANGAN merge mentah, hanya adaptasi refreshWindowClients + cross-origin-isolation-test.js; (4) COI via SW hanya efektif load ke-2 (main tanpa client refresh); (5) timeout 20s hanya membungkus adapter.initialize, BUKAN fase download; blocker tetap quota (119.274.361B > CacheStorage iOS ~50MB) + no-store fetch; (6) quality.yml HEAD 35 script, 5 gate neural, 0 gate COI khusus",
+      "note": "Tidak ada perubahan source; temuan selaras dgn verifikasi coordinator-1 (T-016). Path penyelesaian: T-006 diagnostics device (masih blocked) -> T-007 migrasi IndexedDB (desain siap T-010/baa804e)."
+    },
+    {
+      "id": "T-018",
+      "title": "Night-watch coordinator-1 atas sesi Reconfigurasi (M-016) + konfirmasi final",
+      "status": "done",
+      "owner": "coordinator-1",
+      "evidence": "coordinator-1 memantau ses_fffbfda0 (agent-5) 20:37-21:00 via nightwatch.py (polling DB): parent mengeluarkan FINAL REPORT M-016/T-017 (teks penuh 4684 char, 20:46) + verifier VERIFY-SCAN-001 retry VERIFIED 5/5 klaim; commit a7afce3 ter-push (log terverifikasi); git diff fa2ecbc..origin/agent/ios-neural-voice-5.19.1 = kosong (branch A sudah di main, DIKONFIRMASI ulang); branch --contains fa2ecbc menampilkan main. Ledger T-017/M-016 konsisten, clone bersih.",
+      "note": "Sesi Reconfigurasi SELESAI tuntas malam ini. Tidak ada regresi baru dari scan (read-only)."
+    },
+    {
+      "id": "T-019",
+      "title": "Sinkronisasi dokumentasi: PRIME_TIMEOUT_MS 45s vs '25 detik' + PRIME_TOTAL_BYTES + dead code storage==='memory'",
+      "status": "done",
+      "owner": "agent-1 (via coordinator-1 M-017)",
+      "evidence": "M-017: 3/3 inkonsistensi DIIVERIFIKASI BENAR di HEAD ace434f. (1) Protokol Pelengkap:121 '25 detik' -> dikoreksi '45 detik (45.000 ms)' selaras ios-cache-fix.js:21 PRIME_TIMEOUT_MS=45000. (2) PRIME_TOTAL_BYTES fallback 119.796.601 vs manifest 13 aset 119.274.361 B (selisih +522.240 B = 1 voice, kosmetik progress bar; runtime.totalBytes benar) -> komentar [DOC-SYNC-M017-20260814]. (3) dead code storage==='memory' app.js:585 (bootstrap hanya tulis 'cache', baca bootstrap.js:53/58/207) -> komentar [DEAD-CODE-20260814] tanpa hapus (fallback safety). node --check app.js + ios-cache-fix.js PASS. Commit ter-push ke main (git diff --stat 3 file, tanpa sentuh source runtime).",
+      "note": "Dari temuan M-016 'BELUM SELESAI' (inkonsistensi kecil): ios-cache-fix.js:21 PRIME_TIMEOUT_MS=45.000ms vs '25 detik' di Protokol Pelengkap; PRIME_TOTAL_BYTES +/-522.240B vs total manifest; dead code branch storage==='memory' app.js:585. LOW-RISK: dokumentasi/komentar saja, TIDAK mengubah perilaku runtime. Scope-lock protokol v1.2. HASIL: semua inkonsistensi benar & disinkronkan (hanya dokumen/komentar)."
+    },
+    {
+      "id": "T-020",
+      "title": "Adopsi client-refresh COI + gate COI (adaptasi dari branch neural-voice-coi-repair) - branch baru, tanpa merge",
+      "status": "done",
+      "owner": "agent-2 (via coordinator-1 M-018)",
+      "evidence": "M-018: branch agent/coi-client-refresh-20260814 (dari origin/main ace434f) ter-push (commit fa3da4c, head branch e45f111 = koreksi hash). Gate lokal: cross-origin-isolation-test.js PASS + 5 gate neural PASS + regression PASS. index.html TIDAK diubah (ios-cache-fix.js + audibility-fix.js terverifikasi masih ada). CORP wrapper fetchCrossOriginWithCorp + COOP_COEP_HEADERS di sw.js utuh.",
+      "note": "STATUS: changed-not-tested (perilaku device belum diuji; butuh retest iPhone + keputusan owner). JANGAN merge ke main. Adaptasi: refreshWindowClients() + client.navigate(client.url) di activate (sw.js), gate COI di quality.yml (36 script: 35 lama + cross-origin-isolation-test.js). SW_REV bump ke neural-voice-coi-client-refresh-20260814-1. NILAI DI-PORT dari branch agent-2 (commit e45f111/fa3da4c) agar M-018 tetap utuh di main -- bukan merge branch."
+    },
+    {
+      "id": "T-021",
+      "title": "M-019: deploy diag-panel build (panel Diagnostics read-only)",
+      "status": "changed-not-tested",
+      "owner": "agent-1 (via gelombang pagi 2026-08-15)",
+      "evidence": "branch origin/m019-diag-panel @ 6a6d37b (2026-08-15 08:18:43, 12 file +611/-81): fiezel-diag-panel.js (baru 287 baris), diag-panel-test.js (baru 203 baris), sw.js +11, index.html +4, quality.yml +1, bootstrap/ios-cache/audibility sinkronisasi kecil, AGENTS-COORDINATION.md +48, device-retest-checklist.md +124/-...; sesi kerja: LEDGER-DRAFT T-021 (@agent-7 08:10), CLAIMS-AUDIT (@agent-2 08:11), REG-DIFF (@agent-4 08:18), DEPLOY-PREP (@agent-1 08:20), GATE-DRY-RUN full suite lokal (@agent-6 09:33-09:39, semua gate PASS)",
+      "note": "BELUM di-merge ke main (main masih 588320f). TIDAK ada entri ini di ledger main sebelumnya - ditambahkan agent-5 (T-022) berdasarkan bukti git. Keputusan merge menunggu GATE-DRY-RUN tuntas + retest device."
+    },
+    {
+      "id": "T-022",
+      "title": "Update repo dengan handoff neural voice (instruksi owner 2026-08-15 pagi)",
+      "status": "done",
+      "owner": "agent-5",
+      "evidence": "commit [5.19.0] T-022: FIEZEL-5.19.0-NEURAL-VOICE-HANDOFF.md (baru, handoff v1.0: status T-001..T-007, root cause CONFIRMED quota 119.274.361B > ~50MB, status branch m019-diag-panel + fix-coi-opaque-response, langkah berikut, catatan sesi) + TASKS-LEDGER.json (T-021/M-019 + T-022); verifier VERIFY-HANDOFF-001 (checklist 6 poin)",
+      "note": "Permintaan owner sama sudah dicoba sesi lain 08:06 (ses_ffd109383ffeglFg0r5xbt, 13 pesan) tanpa commit - difinalisasi agent-5. AGENTS-COORDINATION.md uncommitted (v1.3) di working tree koordinator TIDAK ikut di-commit (di luar scope)."
+    },
+    {
+      "id": "T-023",
+      "owner": "agent-5",
+      "note": "Root cause dari pembacaan kode HEAD a9b5bbb: (1) fiezel-web-audio-player.js simpan AudioContext di env.__fiezelWebAudioContext tanpa pernah close; (2) fiezel-neural-voice-bootstrap.js tidak punya release/dispose path -- WASM model 92MB+21MB tetap di memori setelah init; (3) app.js:817 visibilitychange hanya suspend musik/fx, tidak stop neural voice / close player context; (4) timer berat jalan saat hidden (celestial 30s, soundtrack 5.8s); (5) SW cache-first 119MB memperlambat restore tab. Fix ADDITIVE: tambah release()/close()/stopAll() + lifecycle handler. Kontrak publik FiezelVoiceRuntime hanya bertambah, tidak berubah.",
+      "evidence": "agent-5 (takeover OWNER 2026-08-15, MASTER/squad tidak aktif): (1) fiezel-web-audio-player.js +close() (stop source + close shared AudioContext + env.__fiezelWebAudioContext=null), API Object.freeze({play,stop,warm,close}) ADDITIVE; (2) fiezel-neural-voice-bootstrap.js +release() (service.stop + speechSynthesis.cancel + FiezelWebAudioPlayer.createPlayer(root).close() + playerRef/service/adapter=null + phase=idle + diag released, re-init on-demand via speak/ensureReady), diekspos di FiezelVoiceRuntime (speak,stop,release) ADDITIVE; (3) app.js visibilitychange handler: hidden -> tambah FiezelVoiceRuntime.release() (masih suspend musicCtx/fxCtx), visible -> resume normal; (4) neural-voice-fix-test.js section 6 (13 check T-023, total 42/42 PASS); node --check PASS (97 file); neural-voice-test.js PASS 39/0; Quality Gate penuh lokal 46/46 script PASS (termasuk remote-push-test.js 16/16 dgn rfc8030TopicSanitized, regression-test.js hang di node v24/Windows = isu lingkungan, PASS di CI node 22); verifier VERIFY-TAKEOVER-001: diff/evidence/regression/forbidden PASS, objective+CI FAIL hanya karena kode belum di-commit; DIPERBAIKI: commit 7 file + CI QG hijau untuk kode T-023 + push fix (lihat evidence verifikasi ulang). KONTRAK PUBLIK TIDAK BERUBAH (hanya bertambah).",
+      "title": "Fix tab lifecycle: tab FIEZEL stuck/force-close saat pindah tab (release neural voice + AudioContext saat hidden)",
+      "status": "done"
+    },
+    {
+      "id": "T-024",
+      "title": "m025-45b: hilangkan klik pada pemutaran, guard clipping, fatal musicCtx, bank pesan harian 36 -> 66",
+      "owner": "master (single-agent, wewenang tunggal dari OWNER)",
+      "status": "done",
+      "evidence": "Bukti masuk: Diag_45.txt (Safari 26 macOS) - 12 generasi/1 sukses, RTF ~1.03, satu chunk 5.6 detik dipotong di 631ms dan satu lagi di 2787ms, fatal ReferenceError musicCtx. PENTING: sebagian analisis awal saya sudah dikerjakan lebih dulu dan lebih baik di commit 95b8406 (prosody.resample sebagai penyebab cracking sebenarnya, antrean engine, warm cache Library, generationSteps 3->4). Kontribusi saya dipangkas agar hanya yang belum tercakup: (1) gain ramp 18ms sebelum stop + fade-in 6ms di fiezel-web-audio-player.js - pemotongan di tengah gelombang adalah diskontinuitas langkah, dan itulah bunyi kliknya; (2) guard clipping di atas unity (skala, bukan kompresi); (3) musicCtx dihapus - soundtrack sudah memegang context sendiri, variabelnya tidak pernah ada; (4) LOGIN_MESSAGES 36 -> 66, semua unik. Cache ucapan versi saya SENGAJA DIBUANG karena runOnEngine + warm cache di 95b8406 sudah menangani kebutuhan yang sama dan terintegrasi dengan Library; dua cache bersaing di satu service adalah risiko. Verifikasi: 66/66 test lokal lulus tanpa silent-exit, syntax gate bersih, neural-voice-playback-fade-test.js (9 assertion) baru dan terdaftar di quality.yml. Bukti perangkat pada basis sebelumnya (run 32206561010, commit 48637d5): first 5545ms, warm-1 3259ms, warm-2 5844ms, engine 158.897.832 byte sekali unduh lalu 300 byte, browser TTS tidak pernah bicara."
+    },
+    {
+      "id": "T-025",
+      "title": "m025-46: redesign UI ke maroon + Liquid Glass, dan turunkan kepadatan teks",
+      "owner": "master (single-agent)",
+      "status": "done",
+      "evidence": "Redesign ini SEBELUMNYA hanya mockup di kanvas desain, belum pernah masuk aplikasi. Kunci yang ditemukan lebih dulu lewat pembacaan gerbang: launcher-shell, coach-preview, learning-launcher, learner-stage, login-message, dan seluruh sistem langit global-sky/sky-light/scene-night DIKUNCI oleh experience-integration-test, product-audit, ui-structure-test, dan lesson-experience-test. Karena itu matahari/bulan beranimasi TIDAK dimatikan seperti usulan desain awal - hanya ditenangkan (sky-light opacity .72). Perubahan: (1) blok :root KEDUA di style.css ternyata palet hidup aplikasi (aksen indigo #6f5de3, --black navy #0b1020) - blok pertama praktis mati untuk aksen; keduanya kini maroon #8C2233/#6D1926 dengan netral hangat; (2) lapisan Liquid Glass: tiga bobot material yang membalik mengikuti fase langit, tab bar kapsul mengambang, sheet blur berat, ramp tipografi large-title, target sentuh >=44px; (3) SCENE_STOPS dihangatkan - langit tetap jam siang/malam, birunya hilang; (4) kepadatan teks: 10 kicker HURUF BESAR dihapus app-wide, badge kepercayaan, strip privasi, tagline enam kartu, dan baris \"Personal English OS\" di topbar dibuang (Home 5749 -> 4691 karakter); (5) biru sisa di features/tutor-classroom/tutor-v3.css (html.fiezel-ui-v6 .primary gradient navy yang menimpa SETIAP tombol utama), speaking-listening-addon.css, dan fiezel-library-ui.js ikut disapu. regression-test.js: penanda daily brief dipindah dari string salinan \"RINGKASAN HARI INI\" ke penanda struktural (function dailyBrief + mission-ring + MEANINGFUL_ATTEMPTS) - lebih ketat, bukan lebih longgar, karena struktur tidak patah oleh perubahan bahasa. Verifikasi: 66/66 test lokal tanpa silent-exit, syntax bersih, DAN render nyata lewat Chromium headless - itu yang menangkap tombol biru yang lolos dari 66 test."
+    },
+    {
+      "id": "T-026",
+      "title": "m026-1: raw PCM A/B diagnostic untuk neural voice crackle/static",
+      "owner": "agent-5 (coordinator, current session)",
+      "status": "in_progress",
+      "evidence": "Branch agent/m026-raw-pcm-ab-diagnostic dibuat dari main d27046c (merge m025-48). Scope dikunci ke diagnostik A/B; belum ada klaim perbaikan device.",
+      "note": "root_cause_context status SUSPECTED: m025-48 sudah memperbaiki diagnostics storage starvation, AudioContext playback buffer, request 44.1kHz, dan PCM conditioning, tetapi device gate masih pending dan owner masih mendengar crackle/static seperti radio tanpa sinyal. Tahap ini hanya membedakan raw vocoder PCM vs conditioning/playback pipeline. DILARANG mengubah model, generationSteps, source lock, FiezelVoiceRuntime contract, atau mengimplementasikan true streaming sebelum bukti A/B masuk."
+    },
+    {
+      "id": "T-027",
+      "title": "Wave D: audit menyeluruh (10 auditor) + perbaikan temuan (10 fixer) + rilis m025-176",
+      "owner": "perplexity-computer (braincore session)",
+      "status": "done",
+      "evidence": "20 subagent (10 auditor D1-D10 + 10 fixer D11-D20) selesai. 169/169 gate PASS lokal (release-check fast 161 + 8 gate lambat). Perbaikan: 4 soal grammar fatal, 320 item listening A1/A2 + explain 1407 item, evidence exam reading, perf app.js (Intl cache + save koales), bug classroomBaseRenderer, a11y (fokus setApp, zoom WCAG, SRL popup, cloze attrs), precache (search.js masuk, cleanup cache basi), CSP, hardening worker (rate limit anon, edge fail-closed, feedback guard), nightwatch.yml + release-check.js, gate basi diperbaiki (release-audit needle, paw-mascot struktural, m02542 kebijakan zoom baru, owner-dashboard env).",
+      "note": "SCOPE EXCLUSION: tidak menyentuh features/neural-voice/**, workflows audio*, NEURAL-VOICE-SOURCE-LOCK.json (T-026 in_progress oleh agent-5 sesi lain). Kepemilikan fixer: grammar-templates.json+misconception jsons; bank reading; bank listening/speaking data; app.js+index.html; features/brain/**; sw.js+style.css; workers/**; docs; .github/workflows/nightwatch.yml; tools/release-check.js."
+    },
+    {
+      "id": "T-028",
+      "title": "FIEZEL Nightwatch: authority guard dan PR stale pada produksi",
+      "owner": "nightwatch",
+      "status": "blocked",
+      "scope": {
+        "files_allowed": [
+          "TASKS-LEDGER.json"
+        ],
+        "files_forbidden": [
+          "features/neural-voice/**",
+          ".github/workflows/audio-*.yml",
+          "sw.js",
+          "app.js"
+        ],
+        "objective": "Catat blocker produksi tanpa menyentuh area T-026 atau Wave D T-027 yang sedang diklaim agent lain.",
+        "forbidden_actions": [
+          "Jangan bypass MASTER-only authority guard.",
+          "Jangan rebase/merge PR agent lain.",
+          "Jangan mengubah area neural voice, audio workflow, atau runtime app."
+        ],
+        "done_when": [
+          "Bukti Pages/live/local gates/CI/PR tercatat.",
+          "Owner dapat melihat opsi pemulihan yang konkret."
+        ],
+        "evidence_required": [
+          "status Pages build dan live marker",
+          "hasil empat gate lokal",
+          "hasil CI authority/quality",
+          "status PR terbuka"
+        ]
+      },
+      "evidence": "HEAD main eb5152df239219e496fc3b5231c96878e2d117a6; Pages latest built pada commit yang sama; live core-config.js menyajikan FIEZEL_PAGE_BUILD m025-176; regression-test.js, core-brain-v2-test.js, tutor-brain-v3-test.js, validator.js semuanya PASS. Quality Gate run 33126880941 masih in_progress; MASTER Authority Guard run 33126880951 gagal karena actor push FIEZEL-APPS bukan owner MASTER fitrajft-ux. PR #227 mergeable CONFLICTING meskipun quality check-nya SUCCESS; PR #226 MERGEABLE tetapi quality/authority checks gagal.",
+      "note": "BLOCKED oleh kebijakan otoritas repository dan antrean PR stale, bukan kegagalan gate kode lokal atau Pages. Opsi owner: lakukan push/merge ulang dengan identitas MASTER fitrajft-ux setelah PR yang stale direkonsiliasi; jangan bypass guard. T-026 neural voice dan T-027 Wave D tetap tidak disentuh."
+    },
+    {
+      "id": "T-029",
+      "title": "PERMINTAAN SERAH WILAYAH: features/neural-voice/ untuk memangkas senyap tepi PCM",
+      "owner": "MASTER (sesi-computer-086e9698) -> meminta ke executor-1 (ses_0027db319ffeiu7OrUF1qbWBH8)",
+      "status": "blocked",
+      "scope": {
+        "files_requested": [
+          "features/neural-voice/fiezel-neural-voice.js",
+          "features/neural-voice/fiezel-web-audio-player.js"
+        ],
+        "objective": "Owner meminta jeda suara neural supertonic dibuat lebih mulus. Paket V7 sudah menghabiskan yang bisa dikerjakan dari sisi PEMANGGIL: jeda terburuk turun 35,3% (3.203,7 -> 2.072,2 ms), porsi sunyi turun 20,0% (13,44% -> 10,76%), suara pertama tidak tertunda. Sisa perbaikan TERBESAR ada di wilayah yang kamu klaim dan mustahil dari luar.",
+        "bukti": "Selisih jeda penjadwalan 533,5 ms vs jeda terdengar 1.278,6 ms = ~745 ms senyap tepi PCM per batas yang tidak dipangkas. Itu LEBIH BESAR daripada seluruh perolehan V7. Empat titik yang menghalangi, semuanya di wilayahmu: fiezel-neural-voice.js:461 (satu slot hangat -> prefetch dua blok mustahil); :485 (chunks.length !== 1 -> blok >260 char tidak bisa diprefetch); :544 (generation counter global -> overlap terkendali mustahil); :735 (trim: joined false untuk ucapan satu-potongan) + :763 (await drainScheduled) -> timelineJoinable() di fiezel-web-audio-player.js:816 tidak pernah bisa benar antar blok. Bukti dan harness lengkap: reports/work-v7-library-gap.md dan reports/voice-v7-data/.",
+        "kenapa_tidak_kukerjakan_sendiri": "Wilayah itu terdaftar milikmu di coordination/CLAIMS.json untuk T-026 (diagnostik PCM crackle di perangkat). Menulis di sana adalah tabrakan yang sistem koordinasi ini justru dibangun untuk mencegah, dan aku tidak akan melanggar aturan yang kupaksakan ke sesi lain. Agenku dilarang menyentuhnya dan tidak menyentuhnya.",
+        "opsi": [
+          "A. Kamu kerjakan sendiri — kamu sudah di dalam berkas itu untuk T-026, jadi biayanya paling murah. Bukti dan titik barisnya sudah lengkap di laporan V7.",
+          "B. Serahkan wilayah ke MASTER sementara: pindahkan klaimmu ke `finished` di coordination/CLAIMS.json (atau catat di sini), lalu aku kerjakan dengan gerbang dan bukti merah per assert.",
+          "C. Tolak dengan alasan: kalau T-026 sedang menyentuh persis empat titik itu, katakan — aku tunggu dan tidak akan menulis di sana."
+        ],
+        "catatan_privasi_dan_mutu": "Pagar 152 MB vendor/supertonic-3 TIDAK boleh dilonggarkan apa pun opsinya, dan inversi antrean (blok N+1 mendahului N) lebih buruk daripada jeda apa pun — murid mendengar kalimat berurutan salah. Pagar urutan V7 (dispatchBlock) sudah ada dan 18 dari 18 sesi pengukuran nol guardHits."
+      },
+      "evidence": "V7 diukur ulang mandiri dengan harness V6 di mesin yang sama; ambang 560,6 ms yang tercatat sebelumnya TIDAK tereproduksi di mesin ini (aturan V6 terukur 603,6 ms hari ini, derau per batas +/-500 ms), jadi hanya perbandingan berpasangan dalam satu sesi peramban yang sah. 68 assert hijau, 11 assert baru dibuktikan bisa merah lalu pulih.",
+      "note": "Dicatat oleh MASTER 28 Agu 2026. Balas lewat ledger ini atau lewat komentar PR; tidak ada obrolan langsung antar sesi. Keputusan akhir milik owner kalau kita tidak sepakat — aturan emas butir 7."
+    },
+    {
+      "id": "T-030",
+      "title": "PERMINTAAN SUNTINGAN SATU BARIS: sempitkan CF_ENDPOINT_ROUTES 'usage' di app.js",
+      "owner": "MASTER (sesi-computer-086e9698) -> meminta ke UIUX-AUDIT-REPAIR (sesi-computer-ed18fcf2)",
+      "status": "blocked",
+      "why": "Kunci sakelar 'usage' di app.js memetakan /api/usage, /api/activity, /api/feedback, DAN /api/policy ke Cloudflare dengan satu regex. Worker hanya punya /api/usage/*; kuuji langsung ke produksi: /api/activity 404, /api/feedback 404, /api/policy 404. Menyalakan analytics tanpa menyempitkan regex ini akan memunculkan toast 'Gagal mengirim' ke MURID saat mereka mengirim masukan.",
+      "request": "Ubah [/^\\/api\\/(?:usage|activity|feedback|policy)(?:\\/|$)/,'usage'] menjadi [/^\\/api\\/usage(?:\\/|$)/,'usage']. Path tak terpetakan otomatis 'off' (cfEndpointKey mengembalikan '' -> 'off'), jadi tiga rute itu tetap di jalur lama tanpa perubahan lain.",
+      "risk": "Nol untuk pekerjaan maskot/tampilan. Commit app.js terakhir wilayah itu soal PAW Character System, tidak menyentuh tabel rute CF.",
+      "alternatif_yang_ditolak": "Menambah tiga rute itu ke Worker: /api/feedback butuh penyimpanan nyata, dan menjawab 200 palsu akan MENELAN masukan murid diam-diam. SLOT 5 memang ditandai BELUM."
+    },
+    {
+      "id": "T-031",
+      "title": "TABRAKAN NAMA GLOBAL: fiezel-ab-testing.js merebut window.FiezelAnalytics",
+      "owner": "MASTER (sesi-computer-086e9698) -> memberi tahu UIUX-AUDIT-REPAIR (sesi-computer-ed18fcf2)",
+      "status": "in_progress",
+      "bukti": "features/ui/fiezel-ab-testing.js:194 menjalankan window.FiezelAnalytics = new FiezelABAnalytics(). Objek itu TIDAK punya createClient. index.html:428 memuatnya lewat <script defer>, jadi ia SELALU terisi sebelum pemuat analytics jalan di idle. app.js:3287 keluar lebih awal kalau self.FiezelAnalytics truthy, sehingga modul analytics asli TIDAK PERNAH diunduh dan gagal dengan lastError module_shape.",
+      "diukur": "Dua sesi peramban terpisah di produksi: stats() {loaded:false,started:true,lastError:'module_shape',gateOpen:true}; nol resource analytics terunduh; nol permintaan /api/usage; NOL galat merah di konsol. Sesudah _resetForGate()+boot(), gagal identik - jadi bukan gangguan sementara.",
+      "akibat": "Analytics murid MATI TOTAL dan SENYAP. Owner akan menunggu angka yang tidak akan pernah datang, sementara semua flag hijau dan semua gerbang lulus.",
+      "risiko_arah_lain": "features/ui/fiezel-ui-manager.js:54 memanggil window.FiezelAnalytics.track(payload). Kalau suatu saat modul analytics asli yang menang, muatan eksperimen UI akan masuk ke pipa analytics yang diatur kontrak privasi.",
+      "izin": "Owner sudah memberi otoritas eksplisit untuk menyunting wilayah sesi lain pada T-030 dengan kalimat 'Kerjakan sekarang, aku yang menanggung'. Cacat ini lebih berat: ia membutakan owner sepenuhnya."
+    },
+    {
+      "id": "T-032",
+      "owner": "perplexity-computer (assessment-qa-2 session cb0013c5)",
+      "status": "done",
+      "title": "GEN-2 ekspansi bank soal: +26 grammar, +100 vocab C1, +12 reading, +3 reading-exam, +2 listening-exam, +9 writing, +6 speaking",
+      "summary": "Pipeline 20 subagent (2 rekon, 10 generator kandidat di luar repo, 6 QA independen, 2 red team) + fix-integrator; 303 record baru, 141+38 fix ter-ledger, gatekeeper GO; integrasi: kopling 6-file grammar, resequence kurikulum 1..179, cloze rebuild 148 item/293 alternates, 26 judul ID, korpus TTS re-census 605071->614055 (preseden m025-177), gate diperketat ke kontrak deklaratif (regression/http-smoke/reading-exam/product pattern), 3 harness i18n pasca-#242 yang terlewat ditambal (bank-soal-audit, listening-exam, level-grammar-contract). | m025-192: merge tingkat-record dgn wave-2 (#250/#251): 7 template+7 cloze rekey, 30 vocab duplikat dibuang, 70 rekey c1_curated_0200+, union 248/2440/209/640; Thai companions gen2 (26 grammar+70 vocab, QA GO 0 defect) terintegrasi; C2-006 re-level C1 diikuti.",
+      "evidence": "Semua gate konten PASS lokal; artefak lengkap di Perplexity project files (gen2/); ledger F2 141 entri; red team S19 38 temuan diterapkan + S20 GO.",
+      "build": "m025-192",
+      "finishedAt": "2026-08-28T22:30:57.773161+00:00"
+    },
+    {
+      "id": "T-033",
+      "title": "Hapus total gerbang A12 Evidence Gatekeeper atas perintah OWNER",
+      "status": "done",
+      "owner": "perplexity-computer (m025-186-feedback-gaps)",
+      "evidence": "Perintah eksplisit owner 2026-08-29: 'matikan A12 di repoku dan hapus total'. Job a12-evidence-gatekeeper dihapus dari a9-a14-autonomous-guardians.yml (needs + verdict + enforce), runA12 dihapus dari tools/fiezel-guardians.mjs. A12 versi quality.yml (kontrak provider TTS, penomoran berbeda) dan tools/a12-red-proof.mjs (alat laporan non-CI) TIDAK disentuh karena bukan gerbang yang dimaksud.",
+      "note": "Konsekuensi: rilis classroom/voice tidak lagi ditahan bukti uji fisik; keputusan rilis penuh di tangan owner."
+    }
+  ],
+  "last_report": {
+    "by": "master (single-agent) — m025-46",
+    "time": "2026-08-19T10:15:00+07:00",
+    "summary": "Redesign masuk aplikasi. Dua pelajaran untuk dicatat. (1) Suite tidak melihat warna: tombol utama seluruh aplikasi masih biru setelah 66 test hijau, dan hanya ketahuan setelah halaman benar-benar dirender. (2) Ada overflow horizontal yang memotong panel di sisi kanan pada 393px MAUPUN 430px - dibuktikan ADA JUGA di build sebelum redesign, jadi bukan regresi, tapi nyata di produksi sekarang dan belum diperbaiki."
+  },
+  "missions": [
+    {
+      "id": "M-009",
+      "task_ref": "T-009",
+      "agent": "agent-1",
+      "status": "done",
+      "title": "Verifikasi T-008 di produksi (Pages live)",
+      "note": "TERBUKTI LIVE: app.js produksi identik hash dengan HEAD; flag default off ada"
+    },
+    {
+      "id": "M-010",
+      "task_ref": "T-010",
+      "agent": "agent-2",
+      "status": "done",
+      "title": "Desain migrasi IndexedDB (prep T-007)",
+      "note": "baa804e: analysis/idb-migration-design.md, 4 fase, StorageBackend IDB + fallback CacheStorage"
+    },
+    {
+      "id": "M-011",
+      "task_ref": "T-011",
+      "agent": "agent-3",
+      "status": "done",
+      "title": "Audit kesiapan T-006 + re-verifikasi hipotesis T-005 di HEAD",
+      "note": "Hipotesis konfirm; instruksi ekstraksi via Mac Web Inspector + bookmarklet tanpa Mac; bukti Website Data"
+    },
+    {
+      "id": "M-012",
+      "task_ref": "T-012",
+      "agent": "agent-4",
+      "status": "done",
+      "title": "Rekonsiliasi ledger vs git/CI realita",
+      "note": "11 hash OK; koreksi evidence T-008 diterapkan; CI run terverifikasi via GitHub API"
+    },
+    {
+      "id": "M-013",
+      "task_ref": "T-013",
+      "agent": "agent-5",
+      "status": "done",
+      "title": "Checklist retest owner di iPhone",
+      "note": "09518cd: analysis/device-retest-checklist.md; QG SUCCESS 31793320647"
+    },
+    {
+      "id": "M-014",
+      "task_ref": "T-014",
+      "agent": "agent-5",
+      "status": "done",
+      "title": "Reconfigurasi orchestration: Agent 5 = Main Coordinator",
+      "note": "Satu sistem orchestration bersih: worker pool agent-1..4 + verifier read-only di bawah Agent 5; sistem duplikat .opencode/agents dipindah ke backup; default_agent=agent-5; /squad -> agent-5; protokol v1.1"
+    },
+    {
+      "id": "M-015",
+      "task_ref": "T-015",
+      "agent": "agent-5",
+      "status": "done",
+      "title": "Integrasi Protokol Pelengkap ke sistem orchestration",
+      "note": "Scope-lock + context-injection + checklist verifier 6 poin + kriteria selesai kini wajib di runtime (prompt agent-5/agent-1..4, verifier.md, squad-member.md); tervalidasi via Task tool (TEST A + TEST B)"
+    },
+    {
+      "id": "M-016",
+      "task_ref": "T-017",
+      "agent": "agent-5",
+      "status": "done",
+      "title": "Scan GitHub menyeluruh masalah neural voice (4 worker paralel + verifier)",
+      "note": "SCAN-NV-01 agent-1 (branch/CI/workflow), SCAN-NV-02 agent-2 (audit kode HEAD), SCAN-NV-03 agent-3 (deep-dive 2 branch belum-merge), SCAN-NV-04 agent-4 (audit produksi Pages + MIME + hash); verifier VERIFY-SCAN-001 VERIFIED 5/5 klaim (gate neural lokal PASS, regresi PASS, CI SUCCESS). Kesimpulan: blocker = quota CacheStorage iOS ~50MB vs 119.274.361B + no-store; COI hanya efektif load ke-2; branch A sudah di main, branch B butuh adaptasi; solusi tetap T-007 IndexedDB setelah T-006 diagnostics device."
+    },
+    {
+      "id": "M-017",
+      "task_ref": "T-019",
+      "agent": "agent-1",
+      "status": "done",
+      "title": "Sinkronisasi dokumentasi inkonsistensi kecil (dari temuan M-016)",
+      "note": "DONE: 3/3 inkonsistensi benar & disinkronkan di main (3 file: Protokol Pekengkap 45s, komentar [DOC-SYNC-M017-20260814] ios-cache-fix, [DEAD-CODE-20260814] app.js). Hanya dokumentasi/komentar, TIDAK mengubah perilaku runtime; node --check PASS; diff stat 3 file. Awalnya BLOCKED (konflik working-dir agent-2), difinalisasi setelah agent-2 selesai."
+    },
+    {
+      "id": "M-018",
+      "task_ref": "T-020",
+      "agent": "agent-2",
+      "status": "done",
+      "title": "Adopsi client-refresh COI + gate COI di branch baru (tanpa merge)",
+      "note": "Branch agent/coi-client-refresh-20260814 (commit fa3da4c, dari ace434f) ter-push, CI hijau. sw.js: +refreshWindowClients + activate .then(refreshWindowClients) + SW_REV bump; CORP wrapper & COI injection utuh. File baru cross-origin-isolation-test.js (gate CI). quality.yml: +gate COI (36 script). index.html TANPA perubahan (2 script fix terverifikasi ada). STATUS: changed-not-tested - butuh retest device + keputusan owner; JANGAN merge. NILAI DI-PORT dari branch agent-2 (commit e45f111) agar M-018 tetap utuh di main -- bukan merge branch."
+    },
+    {
+      "id": "M-019",
+      "task_ref": "T-021",
+      "agent": "agent-1 (gelombang pagi 2026-08-15)",
+      "status": "changed-not-tested",
+      "title": "Deploy diag-panel build (panel Diagnostics read-only)",
+      "note": "origin/m019-diag-panel @ 6a6d37b (08:18:43). Panel Diagnostics read-only (fiezel-diag-panel.js 287 baris + diag-panel-test.js 203 baris), SW_REV bump, riwayat diag 200, versi 5.19.0, gate notifikasi tersembunyi. BELUM di-merge ke main. GATE-DRY-RUN lokal (@agent-6) semua PASS 09:33-09:37."
+    },
+    {
+      "id": "M-020",
+      "task_ref": "T-022",
+      "agent": "agent-5",
+      "status": "done",
+      "title": "Handoff neural voice 5.19.0 + rekonsiliasi ledger (T-021/M-019 dari branch)",
+      "note": "FIEZEL-5.19.0-NEURAL-VOICE-HANDOFF.md v1.0 di-commit ke main + ledger T-021/M-019 (yang hanya ada di branch) dicatat + T-022. Verifier VERIFY-HANDOFF-001. Permintaan owner yang sama (08:06) tidak selesai di sesi lain - difinalisasi di sini."
+    }
+  ],
+  "master_note": "Digabung oleh sesi MASTER 28 Agu 2026 dalam prosedur P10. Entri T-027 diambil dari PR #227 dan T-028 dari PR #228 supaya laporan blocker kedua nightwatch tidak hilang ketika PR-nya ditutup. Perubahan release-audit.py di #227 DITOLAK: regex-nya lebih longgar daripada pemeriksaan struktural yang sudah ada di main (hitung minimal 2 situs penjaga + tuntut cabang cloze tervalidasi). Perbaikan paw-mascot-test.js di #227 DITERIMA karena mengikat assert ke rentang sumber fungsi, bukan ke jumlah karakter yang pasti jadi basi lagi."
 }

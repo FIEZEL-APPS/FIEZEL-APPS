@@ -1,0 +1,4602 @@
+[
+ {
+  "id": "r0051",
+  "level": "A2",
+  "title": "Two Nights Near Mount Bromo",
+  "text": "We left Malang at midnight because the jeep driver wanted to reach the viewpoint before sunrise. The road was cold and dark, and I slept badly, but the first orange light over the crater made me forget everything. After breakfast we walked across the sand sea, and my shoes filled with grey dust. In the afternoon I bought hot corn from a small stall near the parking area. Next month I will come back with my sister, and this time we will stay three nights.",
+  "qs": [
+   [
+    "Bacaan ini terutama menceritakan tentang...",
+    [
+     "A driving lesson on a dark mountain road",
+     "A short mountain trip and what the writer did there",
+     "A shop that sells shoes near a volcano",
+     "A school project about volcanoes in Java"
+    ],
+    1,
+    {
+     "type": "main_idea",
+     "evidence": "the first orange light over the crater made me forget everything",
+     "answer": "A short mountain trip and what the writer did there",
+     "patternId": "a2-051-main-idea"
+    }
+   ],
+   [
+    "Mengapa rombongan berangkat dari Malang tengah malam?",
+    [
+     "Because the hotel closed at midnight",
+     "Because the road was closed in the morning",
+     "Because the driver wanted to arrive before sunrise",
+     "Because the tickets were cheaper at night"
+    ],
+    2,
+    {
+     "type": "cause_effect",
+     "evidence": "because the jeep driver wanted to reach the viewpoint before sunrise",
+     "answer": "Because the driver wanted to arrive before sunrise",
+     "patternId": "a2-051-cause-effect"
+    }
+   ],
+   [
+    "Apa yang dilakukan penulis setelah sarapan?",
+    [
+     "He slept in the jeep",
+     "He bought a new pair of shoes",
+     "He drove back to Malang",
+     "He walked across the sand sea"
+    ],
+    3,
+    {
+     "type": "sequence",
+     "evidence": "After breakfast we walked across the sand sea",
+     "answer": "He walked across the sand sea",
+     "patternId": "a2-051-sequence"
+    }
+   ],
+   [
+    "Apa yang dibeli penulis pada sore hari?",
+    [
+     "Hot corn",
+     "A warm jacket",
+     "A cup of coffee",
+     "A postcard"
+    ],
+    0,
+    {
+     "type": "supporting_detail",
+     "evidence": "I bought hot corn from a small stall",
+     "answer": "Hot corn",
+     "patternId": "a2-051-supporting-detail"
+    }
+   ],
+   [
+    "Bulan depan penulis kemungkinan besar akan...",
+    [
+     "sell his old shoes",
+     "move to Malang for work",
+     "stop travelling for a year",
+     "travel to the mountain again"
+    ],
+    3,
+    {
+     "type": "likely",
+     "evidence": "Next month I will come back with my sister",
+     "answer": "travel to the mountain again",
+     "patternId": "a2-051-likely"
+    }
+   ]
+  ],
+  "topic": "perjalanan gunung",
+  "author": "Rina Salsabila",
+  "setting": "Bromo, Jawa Timur",
+  "focus": "past simple dan rencana sederhana"
+ },
+ {
+  "id": "r0052",
+  "level": "A2",
+  "title": "Email About the Water Plant Trip",
+  "text": "Dear Mr. Hartono, I am writing about the field trip to the water treatment plant on Friday. My class finished the safety form yesterday, but two students still need a signature from their parents. Could we bring the missing forms on Friday morning? We also want to ask about lunch, because the canteen at the plant is closed for repairs. If it is closed, we will bring food from home. Thank you for your help. Best wishes, Andi Prasetyo, class 8B.",
+  "qs": [
+   [
+    "Tujuan utama email ini adalah...",
+    [
+     "to invite the teacher to a party",
+     "to ask about forms and lunch for the trip",
+     "to complain about a broken machine",
+     "to cancel the visit to the plant"
+    ],
+    1,
+    {
+     "type": "purpose",
+     "evidence": "I am writing about the field trip to the water treatment plant",
+     "answer": "to ask about forms and lunch for the trip",
+     "patternId": "a2-052-purpose"
+    }
+   ],
+   [
+    "Berapa murid yang belum melengkapi tanda tangan?",
+    [
+     "Two",
+     "None",
+     "Eight",
+     "Twelve"
+    ],
+    0,
+    {
+     "type": "detail",
+     "evidence": "two students still need a signature from their parents",
+     "answer": "Two",
+     "patternId": "a2-052-detail"
+    }
+   ],
+   [
+    "Kata 'it' dalam kalimat 'If it is closed' merujuk pada...",
+    [
+     "the school office",
+     "the canteen at the plant",
+     "the water plant gate",
+     "the safety form"
+    ],
+    1,
+    {
+     "type": "reference",
+     "evidence": "because the canteen at the plant is closed for repairs",
+     "answer": "the canteen at the plant",
+     "patternId": "a2-052-reference"
+    }
+   ],
+   [
+    "Mengapa kelas itu mungkin membawa makanan dari rumah?",
+    [
+     "Because the food at the plant is expensive",
+     "Because the trip starts very early",
+     "Because the teacher asked for a picnic",
+     "Because the canteen is under repair"
+    ],
+    3,
+    {
+     "type": "why",
+     "evidence": "the canteen at the plant is closed for repairs",
+     "answer": "Because the canteen is under repair",
+     "patternId": "a2-052-why"
+    }
+   ],
+   [
+    "Dari email ini kita dapat menyimpulkan bahwa kelas 8B...",
+    [
+     "has already cancelled the visit",
+     "will visit the plant next year",
+     "has never met Mr. Hartono",
+     "is preparing carefully for the visit"
+    ],
+    3,
+    {
+     "type": "conclusion",
+     "evidence": "My class finished the safety form yesterday",
+     "answer": "is preparing carefully for the visit",
+     "patternId": "a2-052-conclusion"
+    }
+   ]
+  ],
+  "topic": "surat sekolah",
+  "author": "Andi Prasetyo",
+  "setting": "sekolah dan instalasi air",
+  "focus": "email formal sederhana"
+ },
+ {
+  "id": "r0053",
+  "level": "A2",
+  "title": "A Noodle Stall Behind the Station",
+  "text": "I tried the new noodle stall behind the station last Saturday. The soup arrived fast, and the broth tasted fresh, but the chilli was much too strong for me. The owner noticed my face and brought a glass of cold tea without charging me. Prices are low: one bowl costs less than a bus ticket. The stall has only six chairs, so you may wait outside during lunch hour. I will go again on a quiet evening, and next time I will ask for less chilli.",
+  "qs": [
+   [
+    "Bagaimana nada ulasan ini secara keseluruhan?",
+    [
+     "Angry and rude",
+     "Completely uninterested",
+     "Sad and hopeless",
+     "Friendly but honest"
+    ],
+    3,
+    {
+     "type": "tone",
+     "evidence": "I will go again on a quiet evening",
+     "answer": "Friendly but honest",
+     "patternId": "a2-053-tone"
+    }
+   ],
+   [
+    "Apa yang dilakukan pemilik warung ketika melihat wajah penulis?",
+    [
+     "He asked the writer to leave",
+     "He changed the whole order",
+     "He gave free cold tea",
+     "He added more chilli"
+    ],
+    2,
+    {
+     "type": "detail",
+     "evidence": "brought a glass of cold tea without charging me",
+     "answer": "He gave free cold tea",
+     "patternId": "a2-053-detail"
+    }
+   ],
+   [
+    "Menurut penulis, harga satu mangkuk dibandingkan dengan tiket bus adalah...",
+    [
+     "much higher",
+     "exactly the same",
+     "impossible to know",
+     "lower"
+    ],
+    3,
+    {
+     "type": "comparison",
+     "evidence": "one bowl costs less than a bus ticket",
+     "answer": "lower",
+     "patternId": "a2-053-comparison"
+    }
+   ],
+   [
+    "Mengapa pengunjung mungkin harus menunggu di luar saat jam makan siang?",
+    [
+     "The kitchen closes at noon",
+     "The stall has very few chairs",
+     "The owner opens late",
+     "The street is often flooded"
+    ],
+    1,
+    {
+     "type": "inference",
+     "evidence": "The stall has only six chairs",
+     "answer": "The stall has very few chairs",
+     "patternId": "a2-053-inference"
+    }
+   ],
+   [
+    "Kalimat mana yang menunjukkan bahwa makanannya disajikan cepat?",
+    [
+     "Prices are low",
+     "The soup arrived fast",
+     "The stall has only six chairs",
+     "I tried the new noodle stall"
+    ],
+    1,
+    {
+     "type": "evidence",
+     "evidence": "The soup arrived fast",
+     "answer": "The soup arrived fast",
+     "patternId": "a2-053-evidence"
+    }
+   ]
+  ],
+  "topic": "ulasan makanan",
+  "author": "Dwi Lestari",
+  "setting": "warung dekat stasiun",
+  "focus": "ulasan pendek"
+ },
+ {
+  "id": "r0054",
+  "level": "A2",
+  "title": "Karimunjawa Boat Trip",
+  "text": "Karimunjawa Boat Trip: three islands in one day. Our wooden boat leaves the harbour at seven and returns before dark. You will snorkel above a shallow reef, eat grilled fish on a white beach, and walk through a small mangrove forest with a guide. The price includes a mask, a life jacket, and lunch. Bring sunscreen and a hat, because there is little shade on the boat. Children under seven travel free. Book two days early, because seats fill quickly in the dry season.",
+  "qs": [
+   [
+    "Mengapa teks ini ditulis?",
+    [
+     "to teach readers how to build a boat",
+     "to persuade readers to join a day trip",
+     "to warn readers about dangerous water",
+     "to report an accident at sea"
+    ],
+    1,
+    {
+     "type": "author_purpose",
+     "evidence": "Karimunjawa Boat Trip: three islands in one day",
+     "answer": "to persuade readers to join a day trip",
+     "patternId": "a2-054-author-purpose"
+    }
+   ],
+   [
+    "Apa saja yang sudah termasuk dalam harga?",
+    [
+     "A hotel room and dinner",
+     "A mask, a life jacket, and lunch",
+     "A flight ticket and a guidebook",
+     "A camera and a towel"
+    ],
+    1,
+    {
+     "type": "detail",
+     "evidence": "The price includes a mask, a life jacket, and lunch",
+     "answer": "A mask, a life jacket, and lunch",
+     "patternId": "a2-054-detail"
+    }
+   ],
+   [
+    "Bagaimana peserta melihat terumbu karang?",
+    [
+     "By diving with heavy tanks",
+     "By walking on the reef",
+     "By watching a video on the boat",
+     "By snorkelling above it"
+    ],
+    3,
+    {
+     "type": "how",
+     "evidence": "You will snorkel above a shallow reef",
+     "answer": "By snorkelling above it",
+     "patternId": "a2-054-how"
+    }
+   ],
+   [
+    "Mengapa peserta diminta membawa topi?",
+    [
+     "Because the guide asks for a uniform",
+     "Because the wind is very cold",
+     "Because the boat gives little shade",
+     "Because the sun sets early"
+    ],
+    2,
+    {
+     "type": "cause_effect",
+     "evidence": "because there is little shade on the boat",
+     "answer": "Because the boat gives little shade",
+     "patternId": "a2-054-cause-effect"
+    }
+   ],
+   [
+    "Manakah pernyataan yang TIDAK disebutkan dalam brosur?",
+    [
+     "The boat is made of wood",
+     "The trip visits three islands",
+     "The boat has a small library",
+     "Lunch is grilled fish"
+    ],
+    2,
+    {
+     "type": "true_false_not_stated",
+     "evidence": "Our wooden boat leaves the harbour at seven",
+     "answer": "The boat has a small library",
+     "patternId": "a2-054-tf-not-stated"
+    }
+   ]
+  ],
+  "topic": "brosur wisata",
+  "author": "Tim Wisata Jepara",
+  "setting": "Karimunjawa",
+  "focus": "brosur dan future sederhana"
+ },
+ {
+  "id": "r0055",
+  "level": "A2",
+  "title": "Green Art Contest Announcement",
+  "text": "Announcement for all students: the Green Art Contest will open on 12 September. Each team of three must build one object from waste that families throw away every week, such as bottles, cans, or old paper. Teams will present their work for four minutes in the school hall, and the judges will ask two questions. The first prize is a set of art books for the class library. Register with Ms. Ratna before 5 September, because the hall holds only twelve teams.",
+  "qs": [
+   [
+    "Pengumuman ini terutama memberi tahu murid tentang...",
+    [
+     "an art contest that uses waste",
+     "a new library building",
+     "a holiday in September",
+     "a change in the school uniform"
+    ],
+    0,
+    {
+     "type": "main_idea",
+     "evidence": "the Green Art Contest will open on 12 September",
+     "answer": "an art contest that uses waste",
+     "patternId": "a2-055-main-idea"
+    }
+   ],
+   [
+    "Berapa lama setiap tim menyampaikan karyanya?",
+    [
+     "Two minutes",
+     "Ten minutes",
+     "Four minutes",
+     "Half an hour"
+    ],
+    2,
+    {
+     "type": "supporting_detail",
+     "evidence": "present their work for four minutes in the school hall",
+     "answer": "Four minutes",
+     "patternId": "a2-055-supporting-detail"
+    }
+   ],
+   [
+    "Mengapa pendaftaran ditutup lebih awal?",
+    [
+     "Because the judges leave the city",
+     "Because the prize is small",
+     "Because September is a holiday month",
+     "Because the hall fits only twelve teams"
+    ],
+    3,
+    {
+     "type": "why",
+     "evidence": "because the hall holds only twelve teams",
+     "answer": "Because the hall fits only twelve teams",
+     "patternId": "a2-055-why"
+    }
+   ],
+   [
+    "Bahan seperti apa yang harus dipakai tim?",
+    [
+     "New paint from the shop",
+     "Wood from the school garden",
+     "Cloth from a factory",
+     "Waste that families throw away"
+    ],
+    3,
+    {
+     "type": "detail",
+     "evidence": "one object from waste that families throw away every week",
+     "answer": "Waste that families throw away",
+     "patternId": "a2-055-detail"
+    }
+   ],
+   [
+    "Kata 'judges' dalam teks paling dekat artinya dengan...",
+    [
+     "students who join the contest",
+     "people who decide the winner",
+     "teachers who clean the hall",
+     "parents who watch the show"
+    ],
+    1,
+    {
+     "type": "vocabulary_context",
+     "evidence": "the judges will ask two questions",
+     "answer": "people who decide the winner",
+     "patternId": "a2-055-vocabulary"
+    }
+   ]
+  ],
+  "topic": "lomba sekolah",
+  "author": "Panitia OSIS",
+  "setting": "aula sekolah",
+  "focus": "pengumuman"
+ },
+ {
+  "id": "r0056",
+  "level": "A2",
+  "title": "How to Take Your First City Bus",
+  "text": "Taking a city bus is easy if you prepare. First, buy a card at the small counter near the gate and put some money on it. Next, check the number and the last stop on the front window, because two buses often use the same lane. Tap your card when you enter, and keep it in your pocket, not in your bag. Stand behind the yellow line while the bus moves. Press the red button one stop before you arrive.",
+  "qs": [
+   [
+    "Apa langkah pertama menurut panduan ini?",
+    [
+     "Press the red button",
+     "Buy a card and add money",
+     "Stand behind the yellow line",
+     "Ask the driver for a ticket"
+    ],
+    1,
+    {
+     "type": "sequence",
+     "evidence": "First, buy a card at the small counter near the gate",
+     "answer": "Buy a card and add money",
+     "patternId": "a2-056-sequence"
+    }
+   ],
+   [
+    "Bagaimana cara membayar perjalanan?",
+    [
+     "By tapping a card at the entrance",
+     "By showing a paper letter",
+     "By giving coins to the driver",
+     "By paying at the last stop"
+    ],
+    0,
+    {
+     "type": "how",
+     "evidence": "Tap your card when you enter",
+     "answer": "By tapping a card at the entrance",
+     "patternId": "a2-056-how"
+    }
+   ],
+   [
+    "Mengapa penumpang harus memeriksa nomor bus dengan teliti?",
+    [
+     "Because the card only works once",
+     "Because the driver often forgets the route",
+     "Because two buses share the same lane",
+     "Because the gate closes at noon"
+    ],
+    2,
+    {
+     "type": "cause_effect",
+     "evidence": "because two buses often use the same lane",
+     "answer": "Because two buses share the same lane",
+     "patternId": "a2-056-bus-cause"
+    }
+   ],
+   [
+    "Kata 'it' dalam 'put some money on it' menunjuk pada...",
+    [
+     "the gate",
+     "the bus",
+     "the card",
+     "the counter"
+    ],
+    2,
+    {
+     "type": "reference",
+     "evidence": "buy a card at the small counter near the gate and put some money on it",
+     "answer": "the card",
+     "patternId": "a2-056-reference"
+    }
+   ],
+   [
+    "Teks ini ditulis untuk...",
+    [
+     "give simple steps to new passengers",
+     "describe the history of city buses",
+     "sell tickets to tourists",
+     "complain about slow traffic"
+    ],
+    0,
+    {
+     "type": "author_purpose",
+     "evidence": "Taking a city bus is easy if you prepare",
+     "answer": "give simple steps to new passengers",
+     "patternId": "a2-056-author-purpose"
+    }
+   ]
+  ],
+  "topic": "panduan transportasi",
+  "author": "Redaksi FIEZEL",
+  "setting": "halte kota",
+  "focus": "instruksi berurutan"
+ },
+ {
+  "id": "r0057",
+  "level": "A2",
+  "title": "Interview With a Morning Nurse",
+  "text": "Reporter: You start work at five in the morning. Is that hard? Nurse Yuni: It was hard in my first year, but my body learned the rhythm. I sleep early and I never drink coffee after four. Reporter: What do patients ask you most? Nurse Yuni: They ask about pain, and they ask when they can go home. I always answer slowly, because a worried person forgets fast. Reporter: Any advice for students? Nurse Yuni: Practise listening. Machines are useful, but ears are more useful.",
+  "qs": [
+   [
+    "Apa yang dilakukan Yuni agar bisa bangun pagi?",
+    [
+     "She sleeps early and avoids late coffee",
+     "She drinks strong coffee at night",
+     "She works only three days a week",
+     "She sleeps in the hospital"
+    ],
+    0,
+    {
+     "type": "detail",
+     "evidence": "I sleep early and I never drink coffee after four",
+     "answer": "She sleeps early and avoids late coffee",
+     "patternId": "a2-057-detail"
+    }
+   ],
+   [
+    "Mengapa Yuni menjawab pertanyaan pasien dengan pelan?",
+    [
+     "Because worried people forget quickly",
+     "Because she speaks a different language",
+     "Because the room is very noisy",
+     "Because the doctor asked her to wait"
+    ],
+    0,
+    {
+     "type": "why",
+     "evidence": "because a worried person forgets fast",
+     "answer": "Because worried people forget quickly",
+     "patternId": "a2-057-why"
+    }
+   ],
+   [
+    "Menurut Yuni, mesin dibandingkan dengan kemampuan mendengar adalah...",
+    [
+     "more important than ears",
+     "never used in hospitals",
+     "less useful than ears",
+     "only useful at night"
+    ],
+    2,
+    {
+     "type": "comparison",
+     "evidence": "Machines are useful, but ears are more useful",
+     "answer": "less useful than ears",
+     "patternId": "a2-057-comparison"
+    }
+   ],
+   [
+    "Dari jawaban Yuni kita tahu bahwa tahun pertamanya...",
+    [
+     "was easy and quiet",
+     "was difficult for her",
+     "happened in another country",
+     "was spent in a school"
+    ],
+    1,
+    {
+     "type": "inference",
+     "evidence": "It was hard in my first year",
+     "answer": "was difficult for her",
+     "patternId": "a2-057-inference"
+    }
+   ],
+   [
+    "Sikap Yuni terhadap pekerjaannya terdengar...",
+    [
+     "bored and tired of it",
+     "angry with patients",
+     "calm and caring",
+     "afraid of the hospital"
+    ],
+    2,
+    {
+     "type": "tone",
+     "evidence": "I always answer slowly",
+     "answer": "calm and caring",
+     "patternId": "a2-057-tone"
+    }
+   ]
+  ],
+  "topic": "wawancara kesehatan",
+  "author": "Majalah Sekolah Nusantara",
+  "setting": "rumah sakit daerah",
+  "focus": "dialog wawancara"
+ },
+ {
+  "id": "r0058",
+  "level": "A2",
+  "title": "Coastal Clean-Up Report",
+  "text": "Report of the Coastal Clean-Up, 8 August. Thirty-two students and four teachers joined the activity at Sepanjang Beach. We started at half past six and finished at ten. Our group collected eleven sacks of rubbish, and most of it was plastic from food packets. A fisherman told us that the rubbish arrives with the tide from the river, not from the beach itself. We weighed every sack and wrote the numbers in a table. Next term we will study the river and talk to the villages beside it.",
+  "qs": [
+   [
+    "Berapa banyak karung sampah yang dikumpulkan kelompok itu?",
+    [
+     "Four",
+     "Eight",
+     "Thirty-two",
+     "Eleven"
+    ],
+    3,
+    {
+     "type": "detail",
+     "evidence": "Our group collected eleven sacks of rubbish",
+     "answer": "Eleven",
+     "patternId": "a2-058-detail"
+    }
+   ],
+   [
+    "Kalimat mana yang menjelaskan asal sampah tersebut?",
+    [
+     "the rubbish arrives with the tide from the river",
+     "We started at half past six and finished at ten",
+     "We weighed every sack and wrote the numbers in a table",
+     "Thirty-two students and four teachers joined the activity"
+    ],
+    0,
+    {
+     "type": "evidence",
+     "evidence": "the rubbish arrives with the tide from the river",
+     "answer": "the rubbish arrives with the tide from the river",
+     "patternId": "a2-058-evidence"
+    }
+   ],
+   [
+    "Apa hubungan antara sungai dan pantai dalam laporan ini?",
+    [
+     "The beach sends rubbish into the river",
+     "The river carries rubbish to the beach",
+     "The river and the beach are far apart",
+     "The beach cleans the river every week"
+    ],
+    1,
+    {
+     "type": "relationship",
+     "evidence": "the rubbish arrives with the tide from the river, not from the beach itself",
+     "answer": "The river carries rubbish to the beach",
+     "patternId": "a2-058-relationship"
+    }
+   ],
+   [
+    "Apa yang dilakukan murid setelah mengumpulkan sampah?",
+    [
+     "They swam in the sea",
+     "They weighed the sacks and recorded the numbers",
+     "They went home immediately",
+     "They sold the plastic at the market"
+    ],
+    1,
+    {
+     "type": "sequence",
+     "evidence": "We weighed every sack and wrote the numbers in a table",
+     "answer": "They weighed the sacks and recorded the numbers",
+     "patternId": "a2-058-sequence"
+    }
+   ],
+   [
+    "Kesimpulan yang paling tepat dari laporan ini adalah...",
+    [
+     "Cleaning the beach alone will not solve the problem",
+     "The beach is already clean and needs no work",
+     "Plastic packets are useful for the villages",
+     "The students will stop the project this year"
+    ],
+    0,
+    {
+     "type": "conclusion",
+     "evidence": "Next term we will study the river and talk to the villages beside it",
+     "answer": "Cleaning the beach alone will not solve the problem",
+     "patternId": "a2-058-conclusion"
+    }
+   ]
+  ],
+  "topic": "laporan lingkungan",
+  "author": "Kelompok Pecinta Alam SMP 3",
+  "setting": "Pantai Sepanjang",
+  "focus": "laporan kegiatan"
+ },
+ {
+  "id": "r0059",
+  "level": "A2",
+  "title": "The Mouse Deer and the Crocodiles",
+  "text": "Long ago a small mouse deer wanted to cross a wide river, but crocodiles waited under the brown water. The mouse deer sat on the bank and said loudly, 'The king wants me to count you.' The crocodiles were proud, so they made a line from one bank to the other. The mouse deer stepped on every back and counted aloud. When he reached the last crocodile, he jumped to the grass and laughed. The crocodiles were angry, but the clever animal was already gone.",
+  "qs": [
+   [
+    "Apa masalah utama si kancil di awal cerita?",
+    [
+     "He was hungry and had no food",
+     "He wanted to become a king",
+     "He lost his family in the forest",
+     "He could not cross the river safely"
+    ],
+    3,
+    {
+     "type": "main_idea",
+     "evidence": "wanted to cross a wide river, but crocodiles waited under the brown water",
+     "answer": "He could not cross the river safely",
+     "patternId": "a2-059-main-idea"
+    }
+   ],
+   [
+    "Bagaimana kancil menyeberangi sungai?",
+    [
+     "He swam very quickly",
+     "He used a wooden boat",
+     "He walked on the backs of the crocodiles",
+     "He waited for the water to dry"
+    ],
+    2,
+    {
+     "type": "how",
+     "evidence": "The mouse deer stepped on every back and counted aloud",
+     "answer": "He walked on the backs of the crocodiles",
+     "patternId": "a2-059-how"
+    }
+   ],
+   [
+    "Mengapa buaya mau berbaris?",
+    [
+     "Because they were proud and wanted to be counted",
+     "Because they were afraid of the king",
+     "Because the water was too cold",
+     "Because they wanted to sleep on the bank"
+    ],
+    0,
+    {
+     "type": "cause_effect",
+     "evidence": "The crocodiles were proud, so they made a line",
+     "answer": "Because they were proud and wanted to be counted",
+     "patternId": "a2-059-cause-effect"
+    }
+   ],
+   [
+    "Kata 'clever' dalam cerita ini paling dekat artinya dengan...",
+    [
+     "smart",
+     "strong",
+     "slow",
+     "kind"
+    ],
+    0,
+    {
+     "type": "vocabulary_context",
+     "evidence": "but the clever animal was already gone",
+     "answer": "smart",
+     "patternId": "a2-059-vocabulary"
+    }
+   ],
+   [
+    "Cerita ini mengajarkan bahwa...",
+    [
+     "big animals always win",
+     "a good plan can beat strength",
+     "rivers are never dangerous",
+     "kings should count animals"
+    ],
+    1,
+    {
+     "type": "inference",
+     "evidence": "he jumped to the grass and laughed",
+     "answer": "a good plan can beat strength",
+     "patternId": "a2-059-inference"
+    }
+   ]
+  ],
+  "topic": "cerita rakyat",
+  "author": "Diceritakan ulang oleh Sari Wulandari",
+  "setting": "sungai di hutan",
+  "focus": "narasi past simple"
+ },
+ {
+  "id": "r0060",
+  "level": "A2",
+  "title": "Phones, Pillows and Sleepy Mornings",
+  "text": "Do you check your phone in bed? A school in Semarang asked two hundred teenagers about their nights. Students who kept a phone beside the pillow slept about fifty minutes less than students who left it in another room. Tired students were also more likely to skip breakfast. The writers of the study do not tell teenagers to throw their phones away. They suggest one small change: charge the phone in the kitchen. Three weeks later, most students in the test said mornings felt easier.",
+  "qs": [
+   [
+    "Perbedaan tidur antara dua kelompok murid adalah sekitar...",
+    [
+     "five minutes",
+     "fifty minutes",
+     "fifteen minutes",
+     "two hours"
+    ],
+    1,
+    {
+     "type": "comparison",
+     "evidence": "slept about fifty minutes less than students who left it in another room",
+     "answer": "fifty minutes",
+     "patternId": "a2-060-comparison"
+    }
+   ],
+   [
+    "Saran penulis penelitian dapat dinyatakan ulang sebagai...",
+    [
+     "Teenagers should sell their phones",
+     "Teenagers should stop eating breakfast",
+     "Teenagers should sleep in the kitchen",
+     "Teenagers should charge phones outside the bedroom"
+    ],
+    3,
+    {
+     "type": "paraphrase",
+     "evidence": "charge the phone in the kitchen",
+     "answer": "Teenagers should charge phones outside the bedroom",
+     "patternId": "a2-060-paraphrase"
+    }
+   ],
+   [
+    "Apa akibat yang disebutkan bagi murid yang kurang tidur?",
+    [
+     "They walked to school more often",
+     "They got better marks in tests",
+     "They were more likely to skip breakfast",
+     "They slept during every lesson"
+    ],
+    2,
+    {
+     "type": "cause_effect",
+     "evidence": "Tired students were also more likely to skip breakfast",
+     "answer": "They were more likely to skip breakfast",
+     "patternId": "a2-060-cause-effect"
+    }
+   ],
+   [
+    "Manakah informasi yang TIDAK ada dalam artikel?",
+    [
+     "The study asked two hundred teenagers",
+     "The school is in Semarang",
+     "The study lasted about three weeks",
+     "The teenagers paid for the study"
+    ],
+    3,
+    {
+     "type": "true_false_not_stated",
+     "evidence": "A school in Semarang asked two hundred teenagers about their nights",
+     "answer": "The teenagers paid for the study",
+     "patternId": "a2-060-tf-not-stated"
+    }
+   ],
+   [
+    "Penulis artikel ini terutama ingin...",
+    [
+     "sell a new brand of phone",
+     "prove that phones are useless",
+     "share a simple habit that helps sleep",
+     "describe a hospital in Semarang"
+    ],
+    2,
+    {
+     "type": "author_purpose",
+     "evidence": "They suggest one small change",
+     "answer": "share a simple habit that helps sleep",
+     "patternId": "a2-060-author-purpose"
+    }
+   ]
+  ],
+  "topic": "artikel remaja",
+  "author": "Redaksi Remaja Sehat",
+  "setting": "sekolah di Semarang",
+  "focus": "perbandingan dan saran"
+ },
+ {
+  "id": "r0061",
+  "level": "A2",
+  "title": "Sirih Light Rain Jacket",
+  "text": "The Sirih rain jacket weighs only three hundred grams, so it fits inside a school bag. The outer cloth keeps water out during heavy afternoon rain, and small holes under the arms let warm air escape. Two deep pockets close with zips, and the hood rolls into the collar when the sky is clear. Wash it by hand in cool water; hot water damages the coating. The jacket comes in four colours and one free size for teenagers. Our shop repairs torn seams for one year.",
+  "qs": [
+   [
+    "Keterangan produk ini terutama menjelaskan...",
+    [
+     "the price of school bags",
+     "how factories make cloth",
+     "what the jacket can do for the wearer",
+     "the weather in the mountains"
+    ],
+    2,
+    {
+     "type": "main_idea",
+     "evidence": "The outer cloth keeps water out during heavy afternoon rain",
+     "answer": "what the jacket can do for the wearer",
+     "patternId": "a2-061-main-idea"
+    }
+   ],
+   [
+    "Berapa berat jaket tersebut?",
+    [
+     "Three hundred grams",
+     "One kilogram",
+     "Three kilograms",
+     "Thirty grams"
+    ],
+    0,
+    {
+     "type": "detail",
+     "evidence": "weighs only three hundred grams",
+     "answer": "Three hundred grams",
+     "patternId": "a2-061-detail"
+    }
+   ],
+   [
+    "Bagaimana cara mencuci jaket ini dengan benar?",
+    [
+     "In a machine with hot water",
+     "By hand in cool water",
+     "With soap and boiling water",
+     "Only at a special shop"
+    ],
+    1,
+    {
+     "type": "how",
+     "evidence": "Wash it by hand in cool water",
+     "answer": "By hand in cool water",
+     "patternId": "a2-061-how"
+    }
+   ],
+   [
+    "Mengapa ada lubang kecil di bawah lengan?",
+    [
+     "To make the jacket lighter",
+     "To let warm air escape",
+     "To hold a small bottle",
+     "To show the brand name"
+    ],
+    1,
+    {
+     "type": "why",
+     "evidence": "small holes under the arms let warm air escape",
+     "answer": "To let warm air escape",
+     "patternId": "a2-061-why"
+    }
+   ],
+   [
+    "Jaket ini paling cocok untuk pembeli yang...",
+    [
+     "ride a boat every night",
+     "work in a hot kitchen",
+     "climb snowy mountains",
+     "walk to school in the rainy season"
+    ],
+    3,
+    {
+     "type": "likely",
+     "evidence": "one free size for teenagers",
+     "answer": "walk to school in the rainy season",
+     "patternId": "a2-061-likely"
+    }
+   ]
+  ],
+  "topic": "keterangan produk",
+  "author": "Toko Sirih Outdoor",
+  "setting": "toko perlengkapan",
+  "focus": "deskripsi produk"
+ },
+ {
+  "id": "r0062",
+  "level": "A2",
+  "title": "My First Morning at the Bakery",
+  "text": "On my first day at the bakery, I arrived at four and the street was still empty. Pak Budi showed me how to shape the dough, and my first ten breads looked like small stones. He did not laugh; he simply made one again in front of me, slowly. By seven the shelves were full and customers came in with sleepy faces. My arms hurt, but the smell of hot bread made me happy. After two weeks I will learn the big oven.",
+  "qs": [
+   [
+    "Apa yang terjadi pada roti pertama yang dibuat penulis?",
+    [
+     "They burned in the oven",
+     "They looked like small stones",
+     "They were sold immediately",
+     "They were the best in the shop"
+    ],
+    1,
+    {
+     "type": "detail",
+     "evidence": "my first ten breads looked like small stones",
+     "answer": "They looked like small stones",
+     "patternId": "a2-062-detail"
+    }
+   ],
+   [
+    "Bagaimana sikap Pak Budi terhadap kesalahan penulis?",
+    [
+     "He was patient and showed the way again",
+     "He shouted at the new worker",
+     "He sent the writer home",
+     "He asked for money"
+    ],
+    0,
+    {
+     "type": "inference",
+     "evidence": "He did not laugh; he simply made one again in front of me",
+     "answer": "He was patient and showed the way again",
+     "patternId": "a2-062-inference"
+    }
+   ],
+   [
+    "Urutan kejadian di pagi itu adalah...",
+    [
+     "The writer shaped dough, then the shelves were full",
+     "Customers came, then the writer arrived",
+     "The oven lesson came before the dough lesson",
+     "The bakery closed before seven"
+    ],
+    0,
+    {
+     "type": "sequence",
+     "evidence": "By seven the shelves were full",
+     "answer": "The writer shaped dough, then the shelves were full",
+     "patternId": "a2-062-sequence"
+    }
+   ],
+   [
+    "Perasaan penulis pada akhir hari itu adalah...",
+    [
+     "sorry about the job",
+     "bored and angry",
+     "frightened of the oven",
+     "tired but glad"
+    ],
+    3,
+    {
+     "type": "tone",
+     "evidence": "My arms hurt, but the smell of hot bread made me happy",
+     "answer": "tired but glad",
+     "patternId": "a2-062-tone"
+    }
+   ],
+   [
+    "Apa yang akan dipelajari penulis setelah dua minggu?",
+    [
+     "How to sell bread outside",
+     "How to drive a delivery bike",
+     "How to use the big oven",
+     "How to open a new shop"
+    ],
+    2,
+    {
+     "type": "likely",
+     "evidence": "After two weeks I will learn the big oven",
+     "answer": "How to use the big oven",
+     "patternId": "a2-062-work-detail"
+    }
+   ]
+  ],
+  "topic": "pekerjaan sehari-hari",
+  "author": "Fajar Nugroho",
+  "setting": "toko roti kecil",
+  "focus": "cerita pengalaman"
+ },
+ {
+  "id": "r0063",
+  "level": "A2",
+  "title": "Night Train to Yogyakarta",
+  "text": "The train left Jakarta at nine in the evening, and the lights inside soon turned blue. I could not sleep, so I watched dark rice fields slide past the window. A woman beside me shared boiled peanuts and told me about her daughter in Solo. At four the sky turned grey, and vendors walked through the carriage with hot tea. We arrived in Yogyakarta before six, and the air smelled of wet earth. I took a becak to my aunt's house and slept until noon.",
+  "qs": [
+   [
+    "Apa yang dilakukan penulis karena tidak bisa tidur?",
+    [
+     "He read a long novel",
+     "He walked to the last carriage",
+     "He watched the fields from the window",
+     "He called his aunt"
+    ],
+    2,
+    {
+     "type": "cause_effect",
+     "evidence": "I could not sleep, so I watched dark rice fields slide past the window",
+     "answer": "He watched the fields from the window",
+     "patternId": "a2-063-cause-effect"
+    }
+   ],
+   [
+    "Apa yang diberikan penumpang di sebelah penulis?",
+    [
+     "A blanket",
+     "Boiled peanuts",
+     "A train ticket",
+     "A cup of coffee"
+    ],
+    1,
+    {
+     "type": "supporting_detail",
+     "evidence": "shared boiled peanuts",
+     "answer": "Boiled peanuts",
+     "patternId": "a2-063-supporting-detail"
+    }
+   ],
+   [
+    "Kata 'vendors' dalam teks ini berarti...",
+    [
+     "people who sell things",
+     "people who drive the train",
+     "people who clean the seats",
+     "people who check tickets"
+    ],
+    0,
+    {
+     "type": "vocabulary_context",
+     "evidence": "vendors walked through the carriage with hot tea",
+     "answer": "people who sell things",
+     "patternId": "a2-063-vocabulary"
+    }
+   ],
+   [
+    "Apa yang terjadi tepat sesudah penulis tiba?",
+    [
+     "He bought a new ticket",
+     "He returned to Jakarta",
+     "He took a becak to his aunt's house",
+     "He waited at the station until noon"
+    ],
+    2,
+    {
+     "type": "sequence",
+     "evidence": "I took a becak to my aunt's house",
+     "answer": "He took a becak to his aunt's house",
+     "patternId": "a2-063-sequence"
+    }
+   ],
+   [
+    "Dari cerita ini dapat disimpulkan bahwa perjalanan malam itu...",
+    [
+     "was long but pleasant enough",
+     "was lonely and unpleasant",
+     "ended with a delay of many hours",
+     "was the writer's first journey ever"
+    ],
+    0,
+    {
+     "type": "conclusion",
+     "evidence": "the air smelled of wet earth",
+     "answer": "was long but pleasant enough",
+     "patternId": "a2-063-conclusion"
+    }
+   ]
+  ],
+  "topic": "blog perjalanan",
+  "author": "Bagas Ramadhan",
+  "setting": "kereta malam Jawa",
+  "focus": "narasi perjalanan"
+ },
+ {
+  "id": "r0064",
+  "level": "A2",
+  "title": "Message to the Homestay Owner",
+  "text": "Hello Mrs. Ningsih, my name is Karin and I booked a room for two nights next week. Our bus will arrive very late, at about eleven at night, so I want to ask if someone can open the gate for us. We do not need dinner, but a hot shower would be wonderful after nine hours on the road. My friend cannot eat eggs; is that a problem for breakfast? Please send me a short reply. Thank you very much, Karin.",
+  "qs": [
+   [
+    "Mengapa Karin menulis pesan ini?",
+    [
+     "to cancel her booking",
+     "to sell bus tickets",
+     "to complain about the room price",
+     "to ask about a late arrival and breakfast"
+    ],
+    3,
+    {
+     "type": "purpose",
+     "evidence": "I want to ask if someone can open the gate for us",
+     "answer": "to ask about a late arrival and breakfast",
+     "patternId": "a2-064-purpose"
+    }
+   ],
+   [
+    "Kapan bus mereka akan tiba?",
+    [
+     "At about eleven at night",
+     "At six in the morning",
+     "At nine in the morning",
+     "At two in the afternoon"
+    ],
+    0,
+    {
+     "type": "detail",
+     "evidence": "at about eleven at night",
+     "answer": "At about eleven at night",
+     "patternId": "a2-064-detail"
+    }
+   ],
+   [
+    "Apa yang paling diinginkan Karin setelah perjalanan panjang?",
+    [
+     "A new room key",
+     "A long walk",
+     "A big dinner",
+     "A hot shower"
+    ],
+    3,
+    {
+     "type": "inference",
+     "evidence": "a hot shower would be wonderful after nine hours on the road",
+     "answer": "A hot shower",
+     "patternId": "a2-064-inference"
+    }
+   ],
+   [
+    "Kalimat mana yang menunjukkan kebutuhan khusus temannya?",
+    [
+     "We do not need dinner",
+     "My friend cannot eat eggs",
+     "Please send me a short reply",
+     "I booked a room for two nights"
+    ],
+    1,
+    {
+     "type": "evidence",
+     "evidence": "My friend cannot eat eggs",
+     "answer": "My friend cannot eat eggs",
+     "patternId": "a2-064-evidence"
+    }
+   ],
+   [
+    "Manakah yang TIDAK disebutkan dalam pesan?",
+    [
+     "The number of nights",
+     "The time of arrival",
+     "The price of the room",
+     "The problem with eggs"
+    ],
+    2,
+    {
+     "type": "true_false_not_stated",
+     "evidence": "I booked a room for two nights next week",
+     "answer": "The price of the room",
+     "patternId": "a2-064-tf-not-stated"
+    }
+   ]
+  ],
+  "topic": "pesan penginapan",
+  "author": "Karin Maheswari",
+  "setting": "homestay desa",
+  "focus": "permintaan sopan"
+ },
+ {
+  "id": "r0065",
+  "level": "A2",
+  "title": "Speech Contest for Class Nine",
+  "text": "Class nine students, the English Speech Contest returns this October. This year the theme is water in our town, and every speech must last between three and five minutes. You may use one small card with notes, but slides are not allowed, because the judges want to hear your voice, not read a screen. Practice rooms open every Wednesday after school. The winner will represent our school in the district contest in November. Give your name to Mr. Fikri by the last day of September.",
+  "qs": [
+   [
+    "Apa tema lomba tahun ini?",
+    [
+     "Sport in our town",
+     "Food in our town",
+     "Water in our town",
+     "Traffic in our town"
+    ],
+    2,
+    {
+     "type": "detail",
+     "evidence": "the theme is water in our town",
+     "answer": "Water in our town",
+     "patternId": "a2-065-detail"
+    }
+   ],
+   [
+    "Mengapa slide tidak diperbolehkan?",
+    [
+     "Because the hall has no electricity",
+     "Because slides cost too much money",
+     "Because the judges want to hear the speaker",
+     "Because students prepare them too slowly"
+    ],
+    2,
+    {
+     "type": "cause_effect",
+     "evidence": "because the judges want to hear your voice, not read a screen",
+     "answer": "Because the judges want to hear the speaker",
+     "patternId": "a2-065-cause-effect"
+    }
+   ],
+   [
+    "Apa yang akan terjadi pada pemenang?",
+    [
+     "He or she will teach English lessons",
+     "He or she will lead the practice rooms",
+     "He or she will get a free trip abroad",
+     "He or she will join a district contest"
+    ],
+    3,
+    {
+     "type": "likely",
+     "evidence": "The winner will represent our school in the district contest in November",
+     "answer": "He or she will join a district contest",
+     "patternId": "a2-065-likely"
+    }
+   ],
+   [
+    "Frasa 'represent our school' paling dekat artinya dengan...",
+    [
+     "speak for the school",
+     "clean the school hall",
+     "pay for the school trip",
+     "draw the school badge"
+    ],
+    0,
+    {
+     "type": "vocabulary_context",
+     "evidence": "will represent our school in the district contest",
+     "answer": "speak for the school",
+     "patternId": "a2-065-vocabulary"
+    }
+   ],
+   [
+    "Pengumuman ini dibuat untuk...",
+    [
+     "ask parents to send money",
+     "report the result of last year's contest",
+     "describe the history of public speaking",
+     "invite students to join and explain the rules"
+    ],
+    3,
+    {
+     "type": "author_purpose",
+     "evidence": "Give your name to Mr. Fikri by the last day of September",
+     "answer": "invite students to join and explain the rules",
+     "patternId": "a2-065-author-purpose"
+    }
+   ]
+  ],
+  "topic": "pengumuman lomba",
+  "author": "Klub Bahasa Inggris",
+  "setting": "sekolah menengah",
+  "focus": "aturan lomba"
+ },
+ {
+  "id": "r0066",
+  "level": "A2",
+  "title": "Build a Small First-Aid Box",
+  "text": "Every family can build a first-aid box at home. Choose a plastic box with a lid, because paper boxes become soft when the air is wet. Put clean bandages, small scissors, and a thermometer inside. Add a card with two phone numbers: the nearest clinic and a neighbour. Keep the box in the kitchen, not in the bathroom, since steam spoils medicine. Check the box every three months and throw away old items. A child can help, and then the child knows where the box lives.",
+  "qs": [
+   [
+    "Kotak seperti apa yang sebaiknya dipilih?",
+    [
+     "A paper box with a handle",
+     "A cloth bag",
+     "A metal box without a lid",
+     "A plastic box with a lid"
+    ],
+    3,
+    {
+     "type": "detail",
+     "evidence": "Choose a plastic box with a lid",
+     "answer": "A plastic box with a lid",
+     "patternId": "a2-066-detail"
+    }
+   ],
+   [
+    "Mengapa kotak sebaiknya tidak disimpan di kamar mandi?",
+    [
+     "Because children play there",
+     "Because the room is too small",
+     "Because steam spoils medicine",
+     "Because the door is often locked"
+    ],
+    2,
+    {
+     "type": "why",
+     "evidence": "since steam spoils medicine",
+     "answer": "Because steam spoils medicine",
+     "patternId": "a2-066-why"
+    }
+   ],
+   [
+    "Setiap berapa lama isi kotak harus diperiksa?",
+    [
+     "Every three months",
+     "Every month",
+     "Every week",
+     "Every five years"
+    ],
+    0,
+    {
+     "type": "sequence",
+     "evidence": "Check the box every three months",
+     "answer": "Every three months",
+     "patternId": "a2-066-sequence"
+    }
+   ],
+   [
+    "Mengapa anak sebaiknya ikut membantu?",
+    [
+     "So the child knows where the box is",
+     "So the child can sell the medicine",
+     "So the parents can rest",
+     "So the box looks nicer"
+    ],
+    0,
+    {
+     "type": "inference",
+     "evidence": "then the child knows where the box lives",
+     "answer": "So the child knows where the box is",
+     "patternId": "a2-066-inference"
+    }
+   ],
+   [
+    "Nomor telepon apa yang ditulis pada kartu?",
+    [
+     "A hospital in another city",
+     "The school and a shop",
+     "The clinic and a neighbour",
+     "A taxi and a friend"
+    ],
+    2,
+    {
+     "type": "supporting_detail",
+     "evidence": "the nearest clinic and a neighbour",
+     "answer": "The clinic and a neighbour",
+     "patternId": "a2-066-supporting-detail"
+    }
+   ]
+  ],
+  "topic": "panduan kesehatan",
+  "author": "Puskesmas Melati",
+  "setting": "rumah keluarga",
+  "focus": "instruksi praktis"
+ },
+ {
+  "id": "r0067",
+  "level": "A2",
+  "title": "A Young Farmer Answers Questions",
+  "text": "Interviewer: Why did you come back to the village after university? Rahmat: My father was ill, and the rice fields needed hands. I planned to stay one season, but I found the work interesting. Interviewer: What did you change? Rahmat: I began to write everything in a notebook: rain, seeds, and prices. Now I know which month gives the best harvest. Interviewer: Do young people join you? Rahmat: Two friends came last year. They said farming was boring, but numbers changed their minds.",
+  "qs": [
+   [
+    "Mengapa Rahmat pulang ke desa?",
+    [
+     "His father was ill and the fields needed help",
+     "He wanted a holiday",
+     "He failed his university exams",
+     "The city was too expensive"
+    ],
+    0,
+    {
+     "type": "cause_effect",
+     "evidence": "My father was ill, and the rice fields needed hands",
+     "answer": "His father was ill and the fields needed help",
+     "patternId": "a2-067-cause-effect"
+    }
+   ],
+   [
+    "Apa perubahan yang dibawa Rahmat ke sawah?",
+    [
+     "He wrote records in a notebook",
+     "He bought a large machine",
+     "He moved the fields to a hill",
+     "He hired twenty workers"
+    ],
+    0,
+    {
+     "type": "detail",
+     "evidence": "I began to write everything in a notebook",
+     "answer": "He wrote records in a notebook",
+     "patternId": "a2-067-detail"
+    }
+   ],
+   [
+    "Rencana awal Rahmat berbeda dengan kenyataannya karena...",
+    [
+     "he never worked in the fields",
+     "he left the village after one week",
+     "he stayed longer than one season",
+     "he sold his father's land"
+    ],
+    2,
+    {
+     "type": "comparison",
+     "evidence": "I planned to stay one season, but I found the work interesting",
+     "answer": "he stayed longer than one season",
+     "patternId": "a2-067-comparison"
+    }
+   ],
+   [
+    "Apa yang mengubah pikiran kedua temannya?",
+    [
+     "The weather",
+     "A television programme",
+     "The numbers in the records",
+     "A gift of money"
+    ],
+    2,
+    {
+     "type": "relationship",
+     "evidence": "They said farming was boring, but numbers changed their minds",
+     "answer": "The numbers in the records",
+     "patternId": "a2-067-relationship"
+    }
+   ],
+   [
+    "Kata 'harvest' dalam wawancara ini berarti...",
+    [
+     "a village festival",
+     "the time when crops are collected",
+     "a kind of seed",
+     "a machine for water"
+    ],
+    1,
+    {
+     "type": "vocabulary_context",
+     "evidence": "which month gives the best harvest",
+     "answer": "the time when crops are collected",
+     "patternId": "a2-067-vocabulary"
+    }
+   ]
+  ],
+  "topic": "wawancara pekerjaan",
+  "author": "Radio Desa Sukamaju",
+  "setting": "desa pertanian",
+  "focus": "tanya jawab"
+ },
+ {
+  "id": "r0068",
+  "level": "A2",
+  "title": "Dental Check Report, Grade Seven",
+  "text": "Last Tuesday a dentist and two students from the health club visited every grade seven class. They looked at the teeth of one hundred and twelve students in three hours. Forty-one students had a small hole in at least one tooth, and most of them said they brushed only in the morning. The dentist gave a short talk about brushing at night. Our club will put a poster near the canteen, and we will ask the shop to sell fewer sweet drinks.",
+  "qs": [
+   [
+    "Berapa murid yang diperiksa giginya?",
+    [
+     "Forty-one",
+     "Seven",
+     "Three",
+     "One hundred and twelve"
+    ],
+    3,
+    {
+     "type": "detail",
+     "evidence": "one hundred and twelve students in three hours",
+     "answer": "One hundred and twelve",
+     "patternId": "a2-068-detail"
+    }
+   ],
+   [
+    "Kebiasaan apa yang dilaporkan oleh sebagian besar murid berlubang giginya?",
+    [
+     "They brushed only in the morning",
+     "They never drank water",
+     "They ate no breakfast",
+     "They brushed three times a day"
+    ],
+    0,
+    {
+     "type": "supporting_detail",
+     "evidence": "most of them said they brushed only in the morning",
+     "answer": "They brushed only in the morning",
+     "patternId": "a2-068-supporting-detail"
+    }
+   ],
+   [
+    "Apa hubungan antara temuan pemeriksaan dan ceramah dokter gigi?",
+    [
+     "The talk happened before the check",
+     "The talk answered the problem the check found",
+     "The talk was about food prices",
+     "The talk had no link to the check"
+    ],
+    1,
+    {
+     "type": "relationship",
+     "evidence": "The dentist gave a short talk about brushing at night",
+     "answer": "The talk answered the problem the check found",
+     "patternId": "a2-068-relationship"
+    }
+   ],
+   [
+    "Apa rencana klub kesehatan selanjutnya?",
+    [
+     "To buy new toothbrushes for teachers",
+     "To put up a poster and talk to the shop",
+     "To close the canteen for a month",
+     "To visit a hospital in another town"
+    ],
+    1,
+    {
+     "type": "conclusion",
+     "evidence": "we will ask the shop to sell fewer sweet drinks",
+     "answer": "To put up a poster and talk to the shop",
+     "patternId": "a2-068-conclusion"
+    }
+   ],
+   [
+    "Manakah yang TIDAK tertulis dalam laporan?",
+    [
+     "The day of the visit",
+     "The number of students with a hole",
+     "The length of the check",
+     "The name of the dentist"
+    ],
+    3,
+    {
+     "type": "true_false_not_stated",
+     "evidence": "Last Tuesday a dentist and two students from the health club visited",
+     "answer": "The name of the dentist",
+     "patternId": "a2-068-tf-not-stated"
+    }
+   ]
+  ],
+  "topic": "laporan kesehatan",
+  "author": "Klub Kesehatan Sekolah",
+  "setting": "kelas tujuh",
+  "focus": "laporan angka"
+ },
+ {
+  "id": "r0069",
+  "level": "A2",
+  "title": "The Girl Who Grew From a Cucumber",
+  "text": "A poor woman wanted a child, so a giant gave her a magic seed. From the seed grew a golden cucumber, and inside it slept a baby girl. The woman called her Timun Mas and loved her very much. Years later the giant returned and asked for the girl. The mother gave her daughter four small gifts and told her to run. Timun Mas threw the gifts behind her one by one, and each gift became a field, a forest, a lake, and finally hot mud.",
+  "qs": [
+   [
+    "Bagaimana ibu itu mendapatkan seorang anak?",
+    [
+     "A giant gave her a magic seed",
+     "She found a baby by the river",
+     "She bought a cucumber at the market",
+     "A neighbour brought her a child"
+    ],
+    0,
+    {
+     "type": "how",
+     "evidence": "a giant gave her a magic seed",
+     "answer": "A giant gave her a magic seed",
+     "patternId": "a2-069-how"
+    }
+   ],
+   [
+    "Apa yang terjadi ketika raksasa itu kembali?",
+    [
+     "He planted a new seed",
+     "He gave more gifts",
+     "He asked for the girl",
+     "He built a house"
+    ],
+    2,
+    {
+     "type": "sequence",
+     "evidence": "Years later the giant returned and asked for the girl",
+     "answer": "He asked for the girl",
+     "patternId": "a2-069-sequence"
+    }
+   ],
+   [
+    "Untuk apa keempat pemberian ibu itu?",
+    [
+     "To sell them in the market",
+     "To decorate the house",
+     "To feed the girl on the road",
+     "To slow down the giant"
+    ],
+    3,
+    {
+     "type": "purpose",
+     "evidence": "Timun Mas threw the gifts behind her one by one",
+     "answer": "To slow down the giant",
+     "patternId": "a2-069-purpose"
+    }
+   ],
+   [
+    "Kata 'it' dalam 'inside it slept a baby girl' merujuk pada...",
+    [
+     "the golden cucumber",
+     "the house",
+     "the giant",
+     "the seed bag"
+    ],
+    0,
+    {
+     "type": "reference",
+     "evidence": "From the seed grew a golden cucumber, and inside it slept a baby girl",
+     "answer": "the golden cucumber",
+     "patternId": "a2-069-reference"
+    }
+   ],
+   [
+    "Cerita ini terutama tentang...",
+    [
+     "children who like to swim in a lake",
+     "a farmer who grows big vegetables",
+     "a giant who becomes a good friend",
+     "a mother who protects her child with clever gifts"
+    ],
+    3,
+    {
+     "type": "main_idea",
+     "evidence": "The mother gave her daughter four small gifts and told her to run",
+     "answer": "a mother who protects her child with clever gifts",
+     "patternId": "a2-069-main-idea"
+    }
+   ]
+  ],
+  "topic": "cerita rakyat",
+  "author": "Diceritakan ulang oleh Nadia Kusuma",
+  "setting": "desa di kaki bukit",
+  "focus": "alur cerita"
+ },
+ {
+  "id": "r0070",
+  "level": "A2",
+  "title": "Twenty Minutes on Foot",
+  "text": "Many students in our town ride a motorbike for a journey of one kilometre. A teacher in Malang asked her class to walk for four weeks instead. At first the students complained about the heat, but they soon found new things: a small bridge, a bird market, and a friend from another class. Their teacher measured simple numbers. Students who walked arrived calmer and remembered more in the first lesson. The class will keep walking, and two families sold their second motorbike.",
+  "qs": [
+   [
+    "Ide utama artikel ini adalah...",
+    [
+     "motorbikes are cheaper than bicycles",
+     "walking short distances brought unexpected benefits",
+     "teachers should measure the weather",
+     "students prefer riding to school"
+    ],
+    1,
+    {
+     "type": "main_idea",
+     "evidence": "Students who walked arrived calmer and remembered more in the first lesson",
+     "answer": "walking short distances brought unexpected benefits",
+     "patternId": "a2-070-main-idea"
+    }
+   ],
+   [
+    "Bagaimana reaksi murid pada awalnya?",
+    [
+     "They were excited",
+     "They complained about the heat",
+     "They refused to come to school",
+     "They asked for longer routes"
+    ],
+    1,
+    {
+     "type": "detail",
+     "evidence": "At first the students complained about the heat",
+     "answer": "They complained about the heat",
+     "patternId": "a2-070-detail"
+    }
+   ],
+   [
+    "Manakah bukti bahwa perubahan itu berlanjut setelah percobaan?",
+    [
+     "The students found a bird market",
+     "The teacher measured simple numbers",
+     "The journey was one kilometre",
+     "Two families sold their second motorbike"
+    ],
+    3,
+    {
+     "type": "evidence",
+     "evidence": "two families sold their second motorbike",
+     "answer": "Two families sold their second motorbike",
+     "patternId": "a2-070-evidence"
+    }
+   ],
+   [
+    "Kalimat 'they soon found new things' dapat dinyatakan ulang sebagai...",
+    [
+     "they noticed places they had never seen",
+     "they bought many new items",
+     "they lost their old bags",
+     "they built a new bridge"
+    ],
+    0,
+    {
+     "type": "paraphrase",
+     "evidence": "but they soon found new things",
+     "answer": "they noticed places they had never seen",
+     "patternId": "a2-070-paraphrase"
+    }
+   ],
+   [
+    "Nada penulis terhadap percobaan berjalan kaki ini adalah...",
+    [
+     "doubtful",
+     "annoyed",
+     "positive",
+     "frightened"
+    ],
+    2,
+    {
+     "type": "tone",
+     "evidence": "The class will keep walking",
+     "answer": "positive",
+     "patternId": "a2-070-tone"
+    }
+   ]
+  ],
+  "topic": "artikel remaja",
+  "author": "Redaksi Remaja Sehat",
+  "setting": "kota Malang",
+  "focus": "laporan percobaan kelas"
+ },
+ {
+  "id": "r0071",
+  "level": "A2",
+  "title": "The Bicycle Repair Shop on Jalan Kenari",
+  "text": "My back wheel broke on Monday, so I pushed the bicycle to a small shop on Jalan Kenari. The mechanic listened to my story, turned the wheel once, and found the problem in a minute. He fixed it while I drank water in the shade. The price was fair, and he showed me how to tighten the chain myself. The shop looks untidy and there is no waiting room, but the work is careful. I will send my brother there next week.",
+  "qs": [
+   [
+    "Apa yang penulis sukai dari bengkel ini?",
+    [
+     "The careful and quick work",
+     "The clean waiting room",
+     "The free bicycle parts",
+     "The large building"
+    ],
+    0,
+    {
+     "type": "main_idea",
+     "evidence": "but the work is careful",
+     "answer": "The careful and quick work",
+     "patternId": "a2-071-main-idea"
+    }
+   ],
+   [
+    "Apa yang dilakukan mekanik sebelum memperbaiki sepeda?",
+    [
+     "He turned the wheel and found the problem",
+     "He asked for money",
+     "He called another shop",
+     "He cleaned the whole street"
+    ],
+    0,
+    {
+     "type": "sequence",
+     "evidence": "turned the wheel once, and found the problem in a minute",
+     "answer": "He turned the wheel and found the problem",
+     "patternId": "a2-071-sequence"
+    }
+   ],
+   [
+    "Apa kekurangan bengkel tersebut menurut ulasan ini?",
+    [
+     "The prices are very high",
+     "The mechanic works slowly",
+     "The shop opens only on Monday",
+     "The place looks untidy"
+    ],
+    3,
+    {
+     "type": "supporting_detail",
+     "evidence": "The shop looks untidy and there is no waiting room",
+     "answer": "The place looks untidy",
+     "patternId": "a2-071-supporting-detail"
+    }
+   ],
+   [
+    "Mengapa penulis akan mengirim adiknya ke sana?",
+    [
+     "Because the shop is the only one in town",
+     "Because his brother works there",
+     "Because the shop sells new bicycles",
+     "Because the writer trusts the mechanic"
+    ],
+    3,
+    {
+     "type": "inference",
+     "evidence": "I will send my brother there next week",
+     "answer": "Because the writer trusts the mechanic",
+     "patternId": "a2-071-inference"
+    }
+   ],
+   [
+    "Frasa 'the price was fair' berarti harganya...",
+    [
+     "too high for most people",
+     "reasonable for the work",
+     "free for students",
+     "fixed by the government"
+    ],
+    1,
+    {
+     "type": "vocabulary_context",
+     "evidence": "The price was fair",
+     "answer": "reasonable for the work",
+     "patternId": "a2-071-vocabulary"
+    }
+   ]
+  ],
+  "topic": "ulasan jasa",
+  "author": "Yoga Pratama",
+  "setting": "bengkel sepeda",
+  "focus": "ulasan pengalaman"
+ },
+ {
+  "id": "r0072",
+  "level": "A2",
+  "title": "Morning at the Malabar Tea Garden",
+  "text": "Come to the Malabar Tea Garden, one hour south of Bandung. A guide will meet you at the gate at half past six, when mist still covers the hills. You can pick young leaves with the workers, carry a basket, and learn why only two leaves and a bud are taken. After the walk, taste four kinds of tea in the old wooden house. Wear closed shoes, because the paths are wet and steep. Groups of ten pay less, and the last tour starts at three.",
+  "qs": [
+   [
+    "Kapan pemandu menemui pengunjung?",
+    [
+     "At noon",
+     "At six thirty in the morning",
+     "At three in the afternoon",
+     "At nine at night"
+    ],
+    1,
+    {
+     "type": "detail",
+     "evidence": "at the gate at half past six",
+     "answer": "At six thirty in the morning",
+     "patternId": "a2-072-detail"
+    }
+   ],
+   [
+    "Mengapa pengunjung harus memakai sepatu tertutup?",
+    [
+     "Because the paths are wet and steep",
+     "Because the garden is cold at night",
+     "Because insects live in the house",
+     "Because the guide asks for a uniform"
+    ],
+    0,
+    {
+     "type": "cause_effect",
+     "evidence": "because the paths are wet and steep",
+     "answer": "Because the paths are wet and steep",
+     "patternId": "a2-072-cause-effect"
+    }
+   ],
+   [
+    "Apa yang dilakukan pengunjung setelah berjalan di kebun?",
+    [
+     "They ride a bus to Bandung",
+     "They plant new tea trees",
+     "They taste four kinds of tea",
+     "They wash the baskets"
+    ],
+    2,
+    {
+     "type": "sequence",
+     "evidence": "After the walk, taste four kinds of tea in the old wooden house",
+     "answer": "They taste four kinds of tea",
+     "patternId": "a2-072-sequence"
+    }
+   ],
+   [
+    "Brosur ini paling menarik bagi orang yang...",
+    [
+     "need a fast city holiday",
+     "want a quiet morning outdoors",
+     "look for a night market",
+     "study machines in factories"
+    ],
+    1,
+    {
+     "type": "likely",
+     "evidence": "when mist still covers the hills",
+     "answer": "want a quiet morning outdoors",
+     "patternId": "a2-072-likely"
+    }
+   ],
+   [
+    "Apa keuntungan bagi rombongan sepuluh orang?",
+    [
+     "They start the tour earlier",
+     "They stay in the wooden house",
+     "They pay a lower price",
+     "They receive free shoes"
+    ],
+    2,
+    {
+     "type": "supporting_detail",
+     "evidence": "Groups of ten pay less",
+     "answer": "They pay a lower price",
+     "patternId": "a2-072-supporting-detail"
+    }
+   ]
+  ],
+  "topic": "brosur wisata",
+  "author": "Wisata Kebun Malabar",
+  "setting": "perkebunan teh",
+  "focus": "ajakan dan syarat"
+ },
+ {
+  "id": "r0073",
+  "level": "A2",
+  "title": "Saturday at the Village Clinic",
+  "text": "For three Saturdays I helped at the village clinic near my grandmother's house. My job was simple: I wrote names in a book and showed people where to sit. One old man walked eight kilometres because the bus does not come on Saturday. The nurse weighed babies while their mothers talked about food prices. I understood little about medicine, but I understood the waiting. At the end of the day my hand was tired from writing, and my head was full of stories.",
+  "qs": [
+   [
+    "Apa tugas penulis di klinik?",
+    [
+     "He gave medicine to patients",
+     "He drove the clinic car",
+     "He wrote names and guided people",
+     "He cooked food for the nurses"
+    ],
+    2,
+    {
+     "type": "detail",
+     "evidence": "I wrote names in a book and showed people where to sit",
+     "answer": "He wrote names and guided people",
+     "patternId": "a2-073-detail"
+    }
+   ],
+   [
+    "Mengapa lelaki tua itu berjalan delapan kilometer?",
+    [
+     "Because he wanted exercise",
+     "Because his family lived nearby",
+     "Because the clinic was closed",
+     "Because no bus runs on Saturday"
+    ],
+    3,
+    {
+     "type": "why",
+     "evidence": "because the bus does not come on Saturday",
+     "answer": "Because no bus runs on Saturday",
+     "patternId": "a2-073-why"
+    }
+   ],
+   [
+    "Kalimat 'my head was full of stories' menunjukkan bahwa penulis...",
+    [
+     "learned a lot about people",
+     "forgot everything quickly",
+     "wrote a book that evening",
+     "felt ill after work"
+    ],
+    0,
+    {
+     "type": "inference",
+     "evidence": "my head was full of stories",
+     "answer": "learned a lot about people",
+     "patternId": "a2-073-inference"
+    }
+   ],
+   [
+    "Perawat di klinik itu sedang...",
+    [
+     "painting the wall",
+     "weighing babies",
+     "selling tickets",
+     "teaching English"
+    ],
+    1,
+    {
+     "type": "supporting_detail",
+     "evidence": "The nurse weighed babies",
+     "answer": "weighing babies",
+     "patternId": "a2-073-supporting-detail"
+    }
+   ],
+   [
+    "Nada cerita ini paling tepat digambarkan sebagai...",
+    [
+     "angry",
+     "thoughtful",
+     "funny",
+     "frightening"
+    ],
+    1,
+    {
+     "type": "tone",
+     "evidence": "I understood little about medicine, but I understood the waiting",
+     "answer": "thoughtful",
+     "patternId": "a2-073-tone"
+    }
+   ]
+  ],
+  "topic": "pengalaman relawan",
+  "author": "Intan Permata",
+  "setting": "klinik desa",
+  "focus": "cerita reflektif"
+ },
+ {
+  "id": "r0074",
+  "level": "A2",
+  "title": "Asking About the River Volunteer Programme",
+  "text": "Dear Kak Danu, I read about your river volunteer programme on a poster at the library. I am sixteen and I have joined two clean-ups at school, so I know how to use gloves and sacks safely. Does the programme accept students under eighteen? I can come on Saturdays, but I have extra lessons on Sunday morning. I also want to know if volunteers need their own boots. Please tell me the next meeting date. Warm regards, Sinta Rahayu.",
+  "qs": [
+   [
+    "Apa tujuan Sinta menulis surat ini?",
+    [
+     "to report a dirty river",
+     "to invite the club to her school",
+     "to offer a job to Kak Danu",
+     "to ask questions about joining the programme"
+    ],
+    3,
+    {
+     "type": "purpose",
+     "evidence": "Does the programme accept students under eighteen?",
+     "answer": "to ask questions about joining the programme",
+     "patternId": "a2-074-purpose"
+    }
+   ],
+   [
+    "Di mana Sinta melihat informasi tentang program itu?",
+    [
+     "On television",
+     "In a school magazine",
+     "On a poster at the library",
+     "From her teacher"
+    ],
+    2,
+    {
+     "type": "detail",
+     "evidence": "on a poster at the library",
+     "answer": "On a poster at the library",
+     "patternId": "a2-074-detail"
+    }
+   ],
+   [
+    "Mengapa Sinta hanya bisa datang pada hari Sabtu?",
+    [
+     "Because she works on Friday",
+     "Because her family travels on Monday",
+     "Because the river is closed on Sunday",
+     "Because she has lessons on Sunday morning"
+    ],
+    3,
+    {
+     "type": "cause_effect",
+     "evidence": "but I have extra lessons on Sunday morning",
+     "answer": "Because she has lessons on Sunday morning",
+     "patternId": "a2-074-cause-effect"
+    }
+   ],
+   [
+    "Pengalaman apa yang sudah dimiliki Sinta?",
+    [
+     "She joined two school clean-ups",
+     "She led a large river project",
+     "She sold gloves and sacks",
+     "She studied biology at university"
+    ],
+    0,
+    {
+     "type": "supporting_detail",
+     "evidence": "I have joined two clean-ups at school",
+     "answer": "She joined two school clean-ups",
+     "patternId": "a2-074-supporting-detail"
+    }
+   ],
+   [
+    "Manakah yang TIDAK ditanyakan Sinta dalam surat?",
+    [
+     "The next meeting date",
+     "The cost of transport",
+     "The need for boots",
+     "The rule about age"
+    ],
+    1,
+    {
+     "type": "true_false_not_stated",
+     "evidence": "Please tell me the next meeting date",
+     "answer": "The cost of transport",
+     "patternId": "a2-074-tf-not-stated"
+    }
+   ]
+  ],
+  "topic": "surat relawan",
+  "author": "Sinta Rahayu",
+  "setting": "program sungai bersih",
+  "focus": "pertanyaan terstruktur"
+ },
+ {
+  "id": "r0075",
+  "level": "A2",
+  "title": "Photo Contest: One Street, One Problem",
+  "text": "Send us one photograph of an environmental problem on your own street. Do not travel far; the contest is about the place where you live. Each photo needs a title and two sentences that explain what you saw. We will show thirty photos at the town library in October, and visitors will vote for their favourite. The best three photographers will join a workshop with a newspaper photographer. Send your file before 30 September to the address on this poster. Photos with people need permission.",
+  "qs": [
+   [
+    "Foto seperti apa yang diminta panitia?",
+    [
+     "A photo of a famous mountain",
+     "A photo of a school building",
+     "A photo of a problem on the writer's own street",
+     "A photo taken in another country"
+    ],
+    2,
+    {
+     "type": "detail",
+     "evidence": "one photograph of an environmental problem on your own street",
+     "answer": "A photo of a problem on the writer's own street",
+     "patternId": "a2-075-detail"
+    }
+   ],
+   [
+    "Mengapa peserta diminta tidak pergi jauh?",
+    [
+     "Because travelling is expensive",
+     "Because the contest is about their own place",
+     "Because the roads are closed",
+     "Because the judges live nearby"
+    ],
+    1,
+    {
+     "type": "why",
+     "evidence": "the contest is about the place where you live",
+     "answer": "Because the contest is about their own place",
+     "patternId": "a2-075-why"
+    }
+   ],
+   [
+    "Bagaimana pemenang favorit pengunjung ditentukan?",
+    [
+     "The newspaper chooses it",
+     "A computer counts the colours",
+     "Visitors vote at the library",
+     "The photographers choose together"
+    ],
+    2,
+    {
+     "type": "how",
+     "evidence": "visitors will vote for their favourite",
+     "answer": "Visitors vote at the library",
+     "patternId": "a2-075-how"
+    }
+   ],
+   [
+    "Apa hadiah untuk tiga fotografer terbaik?",
+    [
+     "A new camera each",
+     "Money for their school",
+     "A trip to the capital city",
+     "A workshop with a newspaper photographer"
+    ],
+    3,
+    {
+     "type": "supporting_detail",
+     "evidence": "will join a workshop with a newspaper photographer",
+     "answer": "A workshop with a newspaper photographer",
+     "patternId": "a2-075-supporting-detail"
+    }
+   ],
+   [
+    "Pengumuman ini ditulis terutama untuk...",
+    [
+     "invite young people to take part",
+     "teach readers to repair cameras",
+     "report the winners of last year",
+     "describe the town library"
+    ],
+    0,
+    {
+     "type": "author_purpose",
+     "evidence": "Send us one photograph",
+     "answer": "invite young people to take part",
+     "patternId": "a2-075-author-purpose"
+    }
+   ]
+  ],
+  "topic": "lomba foto",
+  "author": "Panitia Lomba Lingkungan",
+  "setting": "perpustakaan kota",
+  "focus": "syarat lomba"
+ },
+ {
+  "id": "r0076",
+  "level": "A2",
+  "title": "Six Buckets a Day",
+  "text": "A family of four often uses more water than it needs. Start with the tap: a slow drip fills a bucket in one night, so change the rubber ring. Collect the cold water from the shower in a bucket while you wait for warm water, and use it for the toilet. Water the garden after sunset, because the sun steals half of it at noon. Wash vegetables in a bowl, not under a running tap, and then pour that water on the plants.",
+  "qs": [
+   [
+    "Ide utama panduan ini adalah...",
+    [
+     "small habits at home can save water",
+     "gardens should be bigger",
+     "families should buy new taps",
+     "water is free for everyone"
+    ],
+    0,
+    {
+     "type": "main_idea",
+     "evidence": "A family of four often uses more water than it needs",
+     "answer": "small habits at home can save water",
+     "patternId": "a2-076-main-idea"
+    }
+   ],
+   [
+    "Apa yang sebaiknya dilakukan dengan air dingin dari pancuran?",
+    [
+     "Collect it for the toilet",
+     "Throw it away",
+     "Boil it for drinking",
+     "Pour it in the street"
+    ],
+    0,
+    {
+     "type": "detail",
+     "evidence": "Collect the cold water from the shower in a bucket",
+     "answer": "Collect it for the toilet",
+     "patternId": "a2-076-detail"
+    }
+   ],
+   [
+    "Mengapa taman sebaiknya disiram setelah matahari terbenam?",
+    [
+     "Because plants sleep at night",
+     "Because the midday sun takes half the water",
+     "Because water is cheaper in the evening",
+     "Because the soil is harder at noon"
+    ],
+    1,
+    {
+     "type": "cause_effect",
+     "evidence": "because the sun steals half of it at noon",
+     "answer": "Because the midday sun takes half the water",
+     "patternId": "a2-076-cause-effect"
+    }
+   ],
+   [
+    "Kata 'it' dalam 'the sun steals half of it' menunjuk pada...",
+    [
+     "the garden",
+     "the bucket",
+     "the evening",
+     "the water"
+    ],
+    3,
+    {
+     "type": "reference",
+     "evidence": "Water the garden after sunset, because the sun steals half of it at noon",
+     "answer": "the water",
+     "patternId": "a2-076-reference"
+    }
+   ],
+   [
+    "Mencuci sayur di dalam baskom dibandingkan di bawah keran adalah...",
+    [
+     "slower but noisier",
+     "cleaner but more expensive",
+     "better because the water can be used again",
+     "worse because it needs more soap"
+    ],
+    2,
+    {
+     "type": "comparison",
+     "evidence": "Wash vegetables in a bowl, not under a running tap",
+     "answer": "better because the water can be used again",
+     "patternId": "a2-076-comparison"
+    }
+   ]
+  ],
+  "topic": "panduan lingkungan",
+  "author": "Komunitas Air Bersih",
+  "setting": "rumah tangga",
+  "focus": "tips hemat air"
+ },
+ {
+  "id": "r0077",
+  "level": "A2",
+  "title": "Thirty Years Behind the Wheel",
+  "text": "Q: You have driven the same route for thirty years. Is it boring? A: The road is the same, but the passengers are never the same. I know which grandmother needs an extra minute at the step. Q: What is the hardest part? A: Rain at five in the afternoon. Everybody is tired, the windows fog, and children run between cars. Q: Will you stop soon? A: My daughter says yes. I say two more years, because I still enjoy the first trip of the morning.",
+  "qs": [
+   [
+    "Menurut sopir itu, apa yang membuat pekerjaannya tidak membosankan?",
+    [
+     "The short route",
+     "The new bus engine",
+     "The higher salary",
+     "The changing passengers"
+    ],
+    3,
+    {
+     "type": "main_idea",
+     "evidence": "The road is the same, but the passengers are never the same",
+     "answer": "The changing passengers",
+     "patternId": "a2-077-main-idea"
+    }
+   ],
+   [
+    "Kapan situasi paling sulit menurut sopir?",
+    [
+     "Early in the morning",
+     "At midnight",
+     "On dry Sunday mornings",
+     "During rain in the late afternoon"
+    ],
+    3,
+    {
+     "type": "supporting_detail",
+     "evidence": "Rain at five in the afternoon",
+     "answer": "During rain in the late afternoon",
+     "patternId": "a2-077-supporting-detail"
+    }
+   ],
+   [
+    "Pendapat sopir dan pendapat putrinya tentang pensiun...",
+    [
+     "are different",
+     "are exactly the same",
+     "are both unknown",
+     "were never discussed"
+    ],
+    0,
+    {
+     "type": "comparison",
+     "evidence": "My daughter says yes. I say two more years",
+     "answer": "are different",
+     "patternId": "a2-077-comparison"
+    }
+   ],
+   [
+    "Kalimat mana yang menunjukkan bahwa sopir memperhatikan penumpangnya?",
+    [
+     "I know which grandmother needs an extra minute at the step",
+     "The road is the same",
+     "Everybody is tired, the windows fog",
+     "I say two more years"
+    ],
+    0,
+    {
+     "type": "evidence",
+     "evidence": "I know which grandmother needs an extra minute at the step",
+     "answer": "I know which grandmother needs an extra minute at the step",
+     "patternId": "a2-077-evidence"
+    }
+   ],
+   [
+    "Mengapa sopir belum ingin berhenti bekerja?",
+    [
+     "Because he needs more money",
+     "Because he still enjoys the morning trip",
+     "Because nobody can drive the bus",
+     "Because his daughter asked him to stay"
+    ],
+    1,
+    {
+     "type": "why",
+     "evidence": "because I still enjoy the first trip of the morning",
+     "answer": "Because he still enjoys the morning trip",
+     "patternId": "a2-077-why"
+    }
+   ]
+  ],
+  "topic": "wawancara pekerjaan",
+  "author": "Buletin Terminal Kota",
+  "setting": "terminal bus",
+  "focus": "wawancara singkat"
+ },
+ {
+  "id": "r0078",
+  "level": "A2",
+  "title": "Report: Trees for the School Yard",
+  "text": "On 14 March our class planted twenty-four young trees along the west fence. The gardener chose trembesi, because their wide branches make shade for the parking area. Each pair of students dug one hole, added compost from the canteen waste, and poured five litres of water. We wrote the name of every pair on a small wooden sign. Two trees died in April, and we replaced them in May. Today nineteen trees are taller than a student, and the yard feels cooler at noon.",
+  "qs": [
+   [
+    "Mengapa jenis trembesi dipilih?",
+    [
+     "Because the seeds are free",
+     "Because wide branches give shade",
+     "Because they grow near rivers",
+     "Because their wood is expensive"
+    ],
+    1,
+    {
+     "type": "cause_effect",
+     "evidence": "because their wide branches make shade for the parking area",
+     "answer": "Because wide branches give shade",
+     "patternId": "a2-078-cause-effect"
+    }
+   ],
+   [
+    "Apa yang dilakukan setiap pasangan murid?",
+    [
+     "They painted the fence",
+     "They wrote a long report",
+     "They counted cars in the parking area",
+     "They dug a hole and watered the tree"
+    ],
+    3,
+    {
+     "type": "detail",
+     "evidence": "Each pair of students dug one hole",
+     "answer": "They dug a hole and watered the tree",
+     "patternId": "a2-078-detail"
+    }
+   ],
+   [
+    "Kapan pohon pengganti ditanam?",
+    [
+     "In March",
+     "In April",
+     "In June",
+     "In May"
+    ],
+    3,
+    {
+     "type": "sequence",
+     "evidence": "we replaced them in May",
+     "answer": "In May",
+     "patternId": "a2-078-sequence"
+    }
+   ],
+   [
+    "Hasil dari kegiatan ini adalah...",
+    [
+     "all trees died in the dry season",
+     "most trees are growing and the yard is cooler",
+     "the parking area became larger",
+     "the canteen waste increased"
+    ],
+    1,
+    {
+     "type": "conclusion",
+     "evidence": "the yard feels cooler at noon",
+     "answer": "most trees are growing and the yard is cooler",
+     "patternId": "a2-078-conclusion"
+    }
+   ],
+   [
+    "Apa hubungan antara sampah kantin dan penanaman ini?",
+    [
+     "The waste became compost for the holes",
+     "The waste was buried under the fence",
+     "The waste paid for the trees",
+     "The waste had no use in the project"
+    ],
+    0,
+    {
+     "type": "relationship",
+     "evidence": "added compost from the canteen waste",
+     "answer": "The waste became compost for the holes",
+     "patternId": "a2-078-relationship"
+    }
+   ]
+  ],
+  "topic": "laporan kegiatan",
+  "author": "Kelas 8A SMP Harapan",
+  "setting": "halaman sekolah",
+  "focus": "laporan hasil"
+ },
+ {
+  "id": "r0079",
+  "level": "A2",
+  "title": "The Boat That Became a Mountain",
+  "text": "Sangkuriang loved a woman who was, in truth, his own mother. She did not want the marriage, so she asked for an impossible gift: a lake and a large boat before the first light. The young man worked all night with the help of spirits, and the boat was almost ready. Then the mother lit fires in the east, and the birds began to sing. The spirits ran away. Sangkuriang was furious and kicked the boat, and today that boat lies upside down as a mountain.",
+  "qs": [
+   [
+    "Mengapa sang ibu meminta hadiah yang mustahil?",
+    [
+     "Because she wanted a new boat",
+     "Because she wanted to stop the marriage",
+     "Because she liked lakes",
+     "Because the spirits asked her"
+    ],
+    1,
+    {
+     "type": "why",
+     "evidence": "She did not want the marriage, so she asked for an impossible gift",
+     "answer": "Because she wanted to stop the marriage",
+     "patternId": "a2-079-why"
+    }
+   ],
+   [
+    "Apa yang dilakukan ibu untuk menghentikan pekerjaan itu?",
+    [
+     "She woke the villagers",
+     "She lit fires in the east",
+     "She hid the boat",
+     "She called the birds by name"
+    ],
+    1,
+    {
+     "type": "how",
+     "evidence": "the mother lit fires in the east",
+     "answer": "She lit fires in the east",
+     "patternId": "a2-079-how"
+    }
+   ],
+   [
+    "Apa akibat dari cahaya dan suara burung itu?",
+    [
+     "The mother disappeared",
+     "The lake became deeper",
+     "The boat sailed to the sea",
+     "The spirits ran away"
+    ],
+    3,
+    {
+     "type": "cause_effect",
+     "evidence": "the birds began to sing. The spirits ran away",
+     "answer": "The spirits ran away",
+     "patternId": "a2-079-cause-effect"
+    }
+   ],
+   [
+    "Kata 'furious' dalam cerita ini berarti...",
+    [
+     "very proud",
+     "very tired",
+     "very angry",
+     "very quiet"
+    ],
+    2,
+    {
+     "type": "vocabulary_context",
+     "evidence": "Sangkuriang was furious and kicked the boat",
+     "answer": "very angry",
+     "patternId": "a2-079-vocabulary"
+    }
+   ],
+   [
+    "Cerita ini menjelaskan asal usul...",
+    [
+     "a kind of bird",
+     "a river",
+     "a village market",
+     "a mountain"
+    ],
+    3,
+    {
+     "type": "conclusion",
+     "evidence": "today that boat lies upside down as a mountain",
+     "answer": "a mountain",
+     "patternId": "a2-079-conclusion"
+    }
+   ]
+  ],
+  "topic": "cerita rakyat",
+  "author": "Diceritakan ulang oleh Rangga Wijaya",
+  "setting": "dataran tinggi Sunda",
+  "focus": "legenda asal usul"
+ },
+ {
+  "id": "r0080",
+  "level": "A2",
+  "title": "Weekend Work, Real Lessons",
+  "text": "Should teenagers work at the weekend? Three students in Surabaya tried it for one term. Nabila sold drinks at her uncle's stall, Reza helped in a phone repair shop, and Tiara taught two children to read. All three said the money was small. All three also said something else: they learned to speak to strangers without fear. Their marks did not fall, but Reza slept less and stopped his football club. Work can teach a lot, yet it takes hours that a young body still needs.",
+  "qs": [
+   [
+    "Apa yang sama dari ketiga murid tersebut?",
+    [
+     "They all taught reading",
+     "They worked in the same shop",
+     "They all stopped studying",
+     "They earned little money"
+    ],
+    3,
+    {
+     "type": "comparison",
+     "evidence": "All three said the money was small",
+     "answer": "They earned little money",
+     "patternId": "a2-080-comparison"
+    }
+   ],
+   [
+    "Apa keterampilan yang mereka pelajari?",
+    [
+     "Speaking to strangers with confidence",
+     "Repairing engines",
+     "Writing long reports",
+     "Cooking for large groups"
+    ],
+    0,
+    {
+     "type": "paraphrase",
+     "evidence": "they learned to speak to strangers without fear",
+     "answer": "Speaking to strangers with confidence",
+     "patternId": "a2-080-paraphrase"
+    }
+   ],
+   [
+    "Apa kerugian yang dialami Reza?",
+    [
+     "He lost his job",
+     "He moved to another city",
+     "His marks fell sharply",
+     "He slept less and left his football club"
+    ],
+    3,
+    {
+     "type": "detail",
+     "evidence": "but Reza slept less and stopped his football club",
+     "answer": "He slept less and left his football club",
+     "patternId": "a2-080-detail"
+    }
+   ],
+   [
+    "Sikap penulis terhadap kerja akhir pekan bagi remaja adalah...",
+    [
+     "completely against it",
+     "balanced, seeing gains and costs",
+     "only interested in the money",
+     "sure that marks will fall"
+    ],
+    1,
+    {
+     "type": "tone",
+     "evidence": "Work can teach a lot, yet it takes hours that a young body still needs",
+     "answer": "balanced, seeing gains and costs",
+     "patternId": "a2-080-tone"
+    }
+   ],
+   [
+    "Melalui artikel ini, redaksi ingin...",
+    [
+     "sell drinks at a stall",
+     "help readers think about a choice",
+     "prove that school is useless",
+     "describe football training"
+    ],
+    1,
+    {
+     "type": "author_purpose",
+     "evidence": "Should teenagers work at the weekend?",
+     "answer": "help readers think about a choice",
+     "patternId": "a2-080-author-purpose"
+    }
+   ]
+  ],
+  "topic": "artikel remaja",
+  "author": "Redaksi Ruang Muda",
+  "setting": "Surabaya",
+  "focus": "argumen seimbang"
+ },
+ {
+  "id": "r0081",
+  "level": "A2",
+  "title": "Crossing to Madura by Ferry",
+  "text": "We reached the port at noon, and the ferry smelled of diesel and salt. Cars waited in four long lines under a white sun. On the upper deck a man played a small guitar for coins, and a mother pointed at the bridge in the distance for her son. The crossing took only forty minutes, yet it felt like a short holiday. When we drove off the ramp, the wind was hot and dry. My cousin was waiting with a bag of salted fish.",
+  "qs": [
+   [
+    "Bagaimana suasana di kapal feri itu?",
+    [
+     "Busy and full of small scenes",
+     "Quiet and empty",
+     "Cold and dark",
+     "Dangerous and frightening"
+    ],
+    0,
+    {
+     "type": "main_idea",
+     "evidence": "a man played a small guitar for coins",
+     "answer": "Busy and full of small scenes",
+     "patternId": "a2-081-main-idea"
+    }
+   ],
+   [
+    "Berapa lama penyeberangan tersebut?",
+    [
+     "Twenty minutes",
+     "Two hours",
+     "Forty minutes",
+     "Half a day"
+    ],
+    2,
+    {
+     "type": "supporting_detail",
+     "evidence": "The crossing took only forty minutes",
+     "answer": "Forty minutes",
+     "patternId": "a2-081-supporting-detail"
+    }
+   ],
+   [
+    "Kalimat 'it felt like a short holiday' menunjukkan bahwa penulis...",
+    [
+     "was bored by the trip",
+     "missed his home",
+     "was afraid of the sea",
+     "enjoyed the crossing"
+    ],
+    3,
+    {
+     "type": "inference",
+     "evidence": "yet it felt like a short holiday",
+     "answer": "enjoyed the crossing",
+     "patternId": "a2-081-inference"
+    }
+   ],
+   [
+    "Apa yang terjadi sesudah mobil turun dari kapal?",
+    [
+     "They waited in four lines",
+     "They met a cousin with salted fish",
+     "They went back to the port",
+     "They climbed the upper deck"
+    ],
+    1,
+    {
+     "type": "sequence",
+     "evidence": "My cousin was waiting with a bag of salted fish",
+     "answer": "They met a cousin with salted fish",
+     "patternId": "a2-081-sequence"
+    }
+   ],
+   [
+    "Kata 'ramp' dalam teks ini paling dekat maknanya dengan...",
+    [
+     "a sloping way off the ship",
+     "a small shop on the deck",
+     "a heavy rope",
+     "a ticket window"
+    ],
+    0,
+    {
+     "type": "vocabulary_context",
+     "evidence": "When we drove off the ramp",
+     "answer": "a sloping way off the ship",
+     "patternId": "a2-081-vocabulary"
+    }
+   ]
+  ],
+  "topic": "blog perjalanan",
+  "author": "Hafiz Alamsyah",
+  "setting": "pelabuhan dan selat",
+  "focus": "deskripsi suasana"
+ },
+ {
+  "id": "r0082",
+  "level": "A2",
+  "title": "Cahaya Solar Study Lamp",
+  "text": "The Cahaya lamp charges in the sun and gives eight hours of light. Put the small panel on a roof or a window before ten in the morning, and the battery will be full by afternoon. The lamp has three levels: low for a corridor, medium for reading, and high for a work table. A red light warns you when the battery falls under one hour. The lamp also charges a phone through a short cable. It survives rain, but it must not stay in water.",
+  "qs": [
+   [
+    "Bagaimana lampu ini mendapatkan tenaga?",
+    [
+     "From a wall socket",
+     "From two large batteries",
+     "From sunlight on a panel",
+     "From a small engine"
+    ],
+    2,
+    {
+     "type": "how",
+     "evidence": "The Cahaya lamp charges in the sun",
+     "answer": "From sunlight on a panel",
+     "patternId": "a2-082-how"
+    }
+   ],
+   [
+    "Berapa lama lampu ini menyala?",
+    [
+     "Two hours",
+     "Four hours",
+     "Twenty hours",
+     "Eight hours"
+    ],
+    3,
+    {
+     "type": "detail",
+     "evidence": "gives eight hours of light",
+     "answer": "Eight hours",
+     "patternId": "a2-082-detail"
+    }
+   ],
+   [
+    "Apa arti lampu merah pada alat ini?",
+    [
+     "The panel is broken",
+     "The light is on high level",
+     "The lamp is charging a phone",
+     "The battery is almost empty"
+    ],
+    3,
+    {
+     "type": "purpose",
+     "evidence": "A red light warns you when the battery falls under one hour",
+     "answer": "The battery is almost empty",
+     "patternId": "a2-082-purpose"
+    }
+   ],
+   [
+    "Tingkat cahaya mana yang cocok untuk membaca?",
+    [
+     "Low",
+     "Medium",
+     "High",
+     "None of the levels"
+    ],
+    1,
+    {
+     "type": "supporting_detail",
+     "evidence": "medium for reading",
+     "answer": "Medium",
+     "patternId": "a2-082-supporting-detail"
+    }
+   ],
+   [
+    "Manakah pernyataan yang benar tentang air?",
+    [
+     "The lamp can stand rain but not water",
+     "The lamp works under water",
+     "The lamp must never get wet",
+     "The lamp cleans water"
+    ],
+    0,
+    {
+     "type": "true_false_not_stated",
+     "evidence": "It survives rain, but it must not stay in water",
+     "answer": "The lamp can stand rain but not water",
+     "patternId": "a2-082-tf-not-stated"
+    }
+   ]
+  ],
+  "topic": "keterangan produk",
+  "author": "Koperasi Cahaya Desa",
+  "setting": "rumah tanpa listrik tetap",
+  "focus": "fitur dan aturan pakai"
+ },
+ {
+  "id": "r0083",
+  "level": "A2",
+  "title": "The Wallet on Bus 14",
+  "text": "I found a brown wallet on the seat of bus 14 last Thursday. Inside there was a school card, some money, and a photograph of a small dog. I gave the wallet to the driver, but he asked me to take it to the office at the terminal, because he could not leave his seat. The office was closed for lunch, so I waited half an hour. Two days later a girl sent me a message. She had lost her card before an exam, and she was very relieved.",
+  "qs": [
+   [
+    "Mengapa sopir tidak mengambil dompet itu?",
+    [
+     "Because he did not believe the writer",
+     "Because the office was closed",
+     "Because the wallet was empty",
+     "Because he could not leave his seat"
+    ],
+    3,
+    {
+     "type": "why",
+     "evidence": "because he could not leave his seat",
+     "answer": "Because he could not leave his seat",
+     "patternId": "a2-083-why"
+    }
+   ],
+   [
+    "Apa yang ada di dalam dompet?",
+    [
+     "A phone and keys",
+     "A school card, money, and a photo",
+     "Only coins",
+     "A letter and a pen"
+    ],
+    1,
+    {
+     "type": "supporting_detail",
+     "evidence": "there was a school card, some money, and a photograph of a small dog",
+     "answer": "A school card, money, and a photo",
+     "patternId": "a2-083-supporting-detail"
+    }
+   ],
+   [
+    "Mengapa penulis menunggu setengah jam?",
+    [
+     "The office was closed for lunch",
+     "The bus was late",
+     "The girl asked him to wait",
+     "The driver went home"
+    ],
+    0,
+    {
+     "type": "cause_effect",
+     "evidence": "The office was closed for lunch, so I waited half an hour",
+     "answer": "The office was closed for lunch",
+     "patternId": "a2-083-cause-effect"
+    }
+   ],
+   [
+    "Kata 'relieved' pada akhir cerita berarti...",
+    [
+     "worried again",
+     "no longer worried",
+     "angry with the writer",
+     "surprised by the dog"
+    ],
+    1,
+    {
+     "type": "vocabulary_context",
+     "evidence": "she was very relieved",
+     "answer": "no longer worried",
+     "patternId": "a2-083-vocabulary"
+    }
+   ],
+   [
+    "Apa yang mungkin terjadi jika dompet itu tidak ditemukan?",
+    [
+     "The office would open earlier",
+     "The bus would stop running",
+     "The driver would lose his job",
+     "The girl would sit her exam without her card"
+    ],
+    3,
+    {
+     "type": "likely",
+     "evidence": "She had lost her card before an exam",
+     "answer": "The girl would sit her exam without her card",
+     "patternId": "a2-083-likely"
+    }
+   ]
+  ],
+  "topic": "cerita pengalaman",
+  "author": "Rizky Maulana",
+  "setting": "bus kota",
+  "focus": "kejadian sehari-hari"
+ },
+ {
+  "id": "r0084",
+  "level": "A2",
+  "title": "Thank You From a Work Experience Student",
+  "text": "Dear Bu Melati and the whole team, thank you for five days in your printing workshop. On Monday I was afraid of the big machine, and on Friday I could load paper alone. I am sorry about the ink on the floor on Wednesday; Pak Slamet showed me the correct way to hold the tray. I learned that a small mistake in the first minute becomes a large mistake in the last one. If you need help during the school holiday, please write to me. Sincerely, Galih.",
+  "qs": [
+   [
+    "Mengapa Galih menulis surat ini?",
+    [
+     "to ask for money",
+     "to complain about a machine",
+     "to thank the workshop team",
+     "to order printed books"
+    ],
+    2,
+    {
+     "type": "purpose",
+     "evidence": "thank you for five days in your printing workshop",
+     "answer": "to thank the workshop team",
+     "patternId": "a2-084-purpose"
+    }
+   ],
+   [
+    "Bagaimana perubahan kemampuan Galih dari Senin ke Jumat?",
+    [
+     "He became slower",
+     "He moved from fear to skill",
+     "He stopped using machines",
+     "He worked fewer hours"
+    ],
+    1,
+    {
+     "type": "comparison",
+     "evidence": "On Monday I was afraid of the big machine, and on Friday I could load paper alone",
+     "answer": "He moved from fear to skill",
+     "patternId": "a2-084-comparison"
+    }
+   ],
+   [
+    "Apa yang terjadi pada hari Rabu?",
+    [
+     "He printed a book alone",
+     "He spilled ink on the floor",
+     "He arrived late",
+     "He met the school principal"
+    ],
+    1,
+    {
+     "type": "sequence",
+     "evidence": "I am sorry about the ink on the floor on Wednesday",
+     "answer": "He spilled ink on the floor",
+     "patternId": "a2-084-sequence"
+    }
+   ],
+   [
+    "Pelajaran apa yang paling diingat Galih?",
+    [
+     "Early mistakes grow larger later",
+     "Big machines are always dangerous",
+     "Printing is an easy job",
+     "Teams should work in silence"
+    ],
+    0,
+    {
+     "type": "paraphrase",
+     "evidence": "a small mistake in the first minute becomes a large mistake in the last one",
+     "answer": "Early mistakes grow larger later",
+     "patternId": "a2-084-paraphrase"
+    }
+   ],
+   [
+    "Dari surat ini kita dapat menyimpulkan bahwa Galih...",
+    [
+     "did not enjoy the week",
+     "broke the printing machine",
+     "wants to change schools",
+     "is willing to return and help"
+    ],
+    3,
+    {
+     "type": "conclusion",
+     "evidence": "If you need help during the school holiday, please write to me",
+     "answer": "is willing to return and help",
+     "patternId": "a2-084-conclusion"
+    }
+   ]
+  ],
+  "topic": "surat terima kasih",
+  "author": "Galih Saputra",
+  "setting": "bengkel percetakan",
+  "focus": "refleksi kerja"
+ },
+ {
+  "id": "r0085",
+  "level": "A2",
+  "title": "Electronic Waste Collection Day",
+  "text": "Neighbours of Blok C, bring your broken electronics to the community hall on Sunday, 21 June, between seven and eleven. We accept old phones, chargers, small fans, and batteries. Please do not bring lamps with broken glass, because our volunteers have no safety gloves for them. A technician from the city will separate the parts, and a truck will carry the rest to a licensed centre. Remove your photographs and messages from any phone first. Children may join the sorting table with an adult.",
+  "qs": [
+   [
+    "Barang apa yang tidak boleh dibawa?",
+    [
+     "Old phones",
+     "Small fans",
+     "Batteries",
+     "Lamps with broken glass"
+    ],
+    3,
+    {
+     "type": "detail",
+     "evidence": "do not bring lamps with broken glass",
+     "answer": "Lamps with broken glass",
+     "patternId": "a2-085-detail"
+    }
+   ],
+   [
+    "Mengapa lampu pecah tidak diterima?",
+    [
+     "Because they are too heavy",
+     "Because the truck is small",
+     "Because volunteers lack safety gloves",
+     "Because glass has no value"
+    ],
+    2,
+    {
+     "type": "cause_effect",
+     "evidence": "because our volunteers have no safety gloves for them",
+     "answer": "Because volunteers lack safety gloves",
+     "patternId": "a2-085-cause-effect"
+    }
+   ],
+   [
+    "Mengapa warga diminta menghapus foto dari ponsel lama?",
+    [
+     "To make the phone lighter",
+     "To save the battery",
+     "To protect their private information",
+     "To help the truck driver"
+    ],
+    2,
+    {
+     "type": "inference",
+     "evidence": "Remove your photographs and messages from any phone first",
+     "answer": "To protect their private information",
+     "patternId": "a2-085-inference"
+    }
+   ],
+   [
+    "Ke mana sisa barang akan dibawa?",
+    [
+     "To a licensed centre",
+     "To the community hall store",
+     "To a school laboratory",
+     "To the river bank"
+    ],
+    0,
+    {
+     "type": "supporting_detail",
+     "evidence": "a truck will carry the rest to a licensed centre",
+     "answer": "To a licensed centre",
+     "patternId": "a2-085-supporting-detail"
+    }
+   ],
+   [
+    "Manakah yang TIDAK disebutkan dalam pengumuman?",
+    [
+     "The date of the event",
+     "The price of collection",
+     "The opening hours",
+     "The role of the technician"
+    ],
+    1,
+    {
+     "type": "true_false_not_stated",
+     "evidence": "on Sunday, 21 June, between seven and eleven",
+     "answer": "The price of collection",
+     "patternId": "a2-085-tf-not-stated"
+    }
+   ]
+  ],
+  "topic": "pengumuman warga",
+  "author": "Pengurus RW 04",
+  "setting": "balai warga",
+  "focus": "aturan pengumpulan"
+ },
+ {
+  "id": "r0086",
+  "level": "A2",
+  "title": "Before You See the Doctor",
+  "text": "Ten minutes of preparation makes a short visit useful. Write down when your problem started and what makes it worse; memory becomes weak in a small white room. Bring every medicine box, even vitamins, since some pills do not work together. Wear clothes that open easily if the doctor must listen to your chest. Ask one question at the end: what should happen next? If you do not understand a word, say so, because a doctor cannot hear a silent question.",
+  "qs": [
+   [
+    "Apa yang sebaiknya ditulis sebelum ke dokter?",
+    [
+     "The price of medicine",
+     "The name of the nurse",
+     "When the problem began and what makes it worse",
+     "A list of favourite foods"
+    ],
+    2,
+    {
+     "type": "detail",
+     "evidence": "Write down when your problem started and what makes it worse",
+     "answer": "When the problem began and what makes it worse",
+     "patternId": "a2-086-detail"
+    }
+   ],
+   [
+    "Mengapa semua kotak obat perlu dibawa?",
+    [
+     "Because the clinic sells them",
+     "Because the boxes are needed for rubbish",
+     "Because some pills do not work together",
+     "Because the doctor collects them"
+    ],
+    2,
+    {
+     "type": "why",
+     "evidence": "since some pills do not work together",
+     "answer": "Because some pills do not work together",
+     "patternId": "a2-086-why"
+    }
+   ],
+   [
+    "Kalimat terakhir menyarankan pasien untuk...",
+    [
+     "stay quiet during the visit",
+     "bring a friend to the room",
+     "write a letter to the doctor",
+     "speak when something is unclear"
+    ],
+    3,
+    {
+     "type": "paraphrase",
+     "evidence": "because a doctor cannot hear a silent question",
+     "answer": "speak when something is unclear",
+     "patternId": "a2-086-paraphrase"
+    }
+   ],
+   [
+    "Mengapa pakaian yang mudah dibuka disarankan?",
+    [
+     "Because the room is hot",
+     "Because the visit is long",
+     "Because clothes must be washed",
+     "Because the doctor may need to listen to the chest"
+    ],
+    3,
+    {
+     "type": "cause_effect",
+     "evidence": "Wear clothes that open easily if the doctor must listen to your chest",
+     "answer": "Because the doctor may need to listen to the chest",
+     "patternId": "a2-086-cause-effect"
+    }
+   ],
+   [
+    "Penulis panduan ini ingin pembaca...",
+    [
+     "use their short visit well",
+     "avoid doctors completely",
+     "buy more vitamins",
+     "become nurses"
+    ],
+    0,
+    {
+     "type": "author_purpose",
+     "evidence": "Ten minutes of preparation makes a short visit useful",
+     "answer": "use their short visit well",
+     "patternId": "a2-086-author-purpose"
+    }
+   ]
+  ],
+  "topic": "panduan kesehatan",
+  "author": "Klinik Sehat Bersama",
+  "setting": "ruang praktik dokter",
+  "focus": "persiapan pasien"
+ },
+ {
+  "id": "r0087",
+  "level": "A2",
+  "title": "Wax, Cloth and Patience",
+  "text": "Reporter: How long does one piece of batik take? Bu Warsini: My smallest cloth takes eleven days. People see the pattern; they do not see the waiting between colours. Reporter: Do you use machines? Bu Warsini: No. My tool is a canting, and my hand is the machine. A printed cloth costs less, but it has no small mistakes, and mistakes are where the maker lives. Reporter: Who will continue your work? Bu Warsini: My niece started last year. She is quick, and quickness is the enemy of wax.",
+  "qs": [
+   [
+    "Berapa lama kain terkecil dikerjakan?",
+    [
+     "Two days",
+     "Eleven days",
+     "One month",
+     "Half a year"
+    ],
+    1,
+    {
+     "type": "detail",
+     "evidence": "My smallest cloth takes eleven days",
+     "answer": "Eleven days",
+     "patternId": "a2-087-detail"
+    }
+   ],
+   [
+    "Kain cetak dibandingkan kain batik tulis menurut Bu Warsini adalah...",
+    [
+     "made with a canting too",
+     "more expensive and slower",
+     "cheaper but without small mistakes",
+     "stronger and softer"
+    ],
+    2,
+    {
+     "type": "comparison",
+     "evidence": "A printed cloth costs less, but it has no small mistakes",
+     "answer": "cheaper but without small mistakes",
+     "patternId": "a2-087-comparison"
+    }
+   ],
+   [
+    "Apa maksud kalimat tentang keponakannya?",
+    [
+     "She teaches at a school",
+     "She refuses to learn batik",
+     "She sells cloth in the city",
+     "She works too fast for this craft"
+    ],
+    3,
+    {
+     "type": "inference",
+     "evidence": "She is quick, and quickness is the enemy of wax",
+     "answer": "She works too fast for this craft",
+     "patternId": "a2-087-inference"
+    }
+   ],
+   [
+    "Kata 'canting' dalam wawancara ini adalah...",
+    [
+     "a kind of colour",
+     "a large printing machine",
+     "a hand tool for drawing with wax",
+     "a room in the workshop"
+    ],
+    2,
+    {
+     "type": "vocabulary_context",
+     "evidence": "My tool is a canting",
+     "answer": "a hand tool for drawing with wax",
+     "patternId": "a2-087-vocabulary"
+    }
+   ],
+   [
+    "Nada Bu Warsini ketika berbicara tentang pekerjaannya adalah...",
+    [
+     "bored and tired",
+     "proud and serious",
+     "joking and light",
+     "angry and rude"
+    ],
+    1,
+    {
+     "type": "tone",
+     "evidence": "mistakes are where the maker lives",
+     "answer": "proud and serious",
+     "patternId": "a2-087-tone"
+    }
+   ]
+  ],
+  "topic": "wawancara kerajinan",
+  "author": "Majalah Warisan",
+  "setting": "rumah pembatik",
+  "focus": "pekerjaan tangan"
+ },
+ {
+  "id": "r0088",
+  "level": "A2",
+  "title": "Library Week: What the Numbers Say",
+  "text": "During Library Week our team counted every borrowed book. Students took four hundred and six books in five days, and comics were the most popular. Only nine science books left the shelves, although the school bought forty new ones in January. We asked thirty readers why. Most answered that the science shelf stands behind the door, and nobody sees it. Next month we will move that shelf near the window, and we will count again in October.",
+  "qs": [
+   [
+    "Berapa buku yang dipinjam selama pekan itu?",
+    [
+     "Four hundred and six",
+     "Thirty",
+     "Forty",
+     "Nine"
+    ],
+    0,
+    {
+     "type": "detail",
+     "evidence": "Students took four hundred and six books in five days",
+     "answer": "Four hundred and six",
+     "patternId": "a2-088-detail"
+    }
+   ],
+   [
+    "Mengapa buku sains jarang dipinjam?",
+    [
+     "The books are too difficult",
+     "The school has no science books",
+     "The shelf is hidden behind the door",
+     "The library closes early"
+    ],
+    2,
+    {
+     "type": "cause_effect",
+     "evidence": "the science shelf stands behind the door, and nobody sees it",
+     "answer": "The shelf is hidden behind the door",
+     "patternId": "a2-088-cause-effect"
+    }
+   ],
+   [
+    "Bagaimana tim mengetahui alasan tersebut?",
+    [
+     "They read old records",
+     "They asked thirty readers",
+     "They counted the shelves",
+     "They wrote to the publisher"
+    ],
+    1,
+    {
+     "type": "how",
+     "evidence": "We asked thirty readers why",
+     "answer": "They asked thirty readers",
+     "patternId": "a2-088-how"
+    }
+   ],
+   [
+    "Apa hubungan antara temuan dan rencana tim?",
+    [
+     "The plan answers the reason readers gave",
+     "The plan ignores the survey",
+     "The plan is about buying comics",
+     "The plan closes the library"
+    ],
+    0,
+    {
+     "type": "relationship",
+     "evidence": "we will move that shelf near the window",
+     "answer": "The plan answers the reason readers gave",
+     "patternId": "a2-088-relationship"
+    }
+   ],
+   [
+    "Mengapa tim akan menghitung lagi pada bulan Oktober?",
+    [
+     "To sell the old books",
+     "To find new readers",
+     "To check if the change works",
+     "To close the project"
+    ],
+    2,
+    {
+     "type": "purpose",
+     "evidence": "we will count again in October",
+     "answer": "To check if the change works",
+     "patternId": "a2-088-purpose"
+    }
+   ]
+  ],
+  "topic": "laporan perpustakaan",
+  "author": "Tim Perpustakaan Siswa",
+  "setting": "perpustakaan sekolah",
+  "focus": "data dan tindak lanjut"
+ },
+ {
+  "id": "r0089",
+  "level": "A2",
+  "title": "Two Sisters and the Old Woman",
+  "text": "Bawang Putih worked all day while her stepsister rested. One morning her washing basket fell into the river, and she followed the water until she reached a small house. An old woman gave her food and asked for help with the cleaning. After three days the woman offered two pumpkins, one large and one small. The girl chose the small one, and at home it was full of gold. Her stepsister ran to the river and chose the large pumpkin, but snakes came out of it.",
+  "qs": [
+   [
+    "Mengapa Bawang Putih pergi menyusuri sungai?",
+    [
+     "She wanted to visit a friend",
+     "She was looking for gold",
+     "Her basket fell into the water",
+     "The old woman called her"
+    ],
+    2,
+    {
+     "type": "why",
+     "evidence": "her washing basket fell into the river",
+     "answer": "Her basket fell into the water",
+     "patternId": "a2-089-why"
+    }
+   ],
+   [
+    "Apa yang diminta perempuan tua itu?",
+    [
+     "Money for food",
+     "A new basket",
+     "Help with the cleaning",
+     "A song"
+    ],
+    2,
+    {
+     "type": "supporting_detail",
+     "evidence": "asked for help with the cleaning",
+     "answer": "Help with the cleaning",
+     "patternId": "a2-089-supporting-detail"
+    }
+   ],
+   [
+    "Urutan kejadian yang benar adalah...",
+    [
+     "The girl chose a pumpkin, then she lost her basket",
+     "The girl helped for three days, then she received a choice",
+     "Snakes came before the gold",
+     "The stepsister went to the river first"
+    ],
+    1,
+    {
+     "type": "sequence",
+     "evidence": "After three days the woman offered two pumpkins",
+     "answer": "The girl helped for three days, then she received a choice",
+     "patternId": "a2-089-sequence"
+    }
+   ],
+   [
+    "Perbedaan hasil kedua saudari itu terjadi karena...",
+    [
+     "their different behaviour and choices",
+     "the size of the river",
+     "the weather that week",
+     "the price of pumpkins"
+    ],
+    0,
+    {
+     "type": "cause_effect",
+     "evidence": "but snakes came out of it",
+     "answer": "their different behaviour and choices",
+     "patternId": "a2-089-cause-effect"
+    }
+   ],
+   [
+    "Pesan cerita ini adalah...",
+    [
+     "old women live alone",
+     "large gifts are always better",
+     "rivers carry treasure",
+     "hard work and modesty bring reward"
+    ],
+    3,
+    {
+     "type": "main_idea",
+     "evidence": "The girl chose the small one, and at home it was full of gold",
+     "answer": "hard work and modesty bring reward",
+     "patternId": "a2-089-main-idea"
+    }
+   ]
+  ],
+  "topic": "cerita rakyat",
+  "author": "Diceritakan ulang oleh Ayu Lestari",
+  "setting": "desa di tepi sungai",
+  "focus": "pesan moral"
+ },
+ {
+  "id": "r0090",
+  "level": "A2",
+  "title": "An Afternoon at the Salt Museum",
+  "text": "The salt museum in our town is small, but I stayed two hours. The first room shows old wooden tools, and a video explains how families made salt before machines arrived. Labels are only in Indonesian, so my friend from Manila understood little. The guide, however, answered every question in simple English. There is no cafe and no water tap, so bring a bottle. Entry costs less than a bowl of noodles, and students pay half. Go on a weekday, because Sunday is noisy.",
+  "qs": [
+   [
+    "Apa kelemahan museum ini menurut penulis?",
+    [
+     "The tools are broken",
+     "Labels are only in one language",
+     "The guide is unfriendly",
+     "The rooms are dark"
+    ],
+    1,
+    {
+     "type": "supporting_detail",
+     "evidence": "Labels are only in Indonesian",
+     "answer": "Labels are only in one language",
+     "patternId": "a2-090-supporting-detail"
+    }
+   ],
+   [
+    "Kalimat mana yang menunjukkan bahwa pemandu membantu pengunjung asing?",
+    [
+     "Entry costs less than a bowl of noodles",
+     "The first room shows old wooden tools",
+     "The guide, however, answered every question in simple English",
+     "Go on a weekday, because Sunday is noisy"
+    ],
+    2,
+    {
+     "type": "evidence",
+     "evidence": "The guide, however, answered every question in simple English",
+     "answer": "The guide, however, answered every question in simple English",
+     "patternId": "a2-090-evidence"
+    }
+   ],
+   [
+    "Mengapa pengunjung disarankan membawa botol air?",
+    [
+     "Because the visit lasts all day",
+     "Because the weather is very hot",
+     "Because drinks are expensive",
+     "Because the museum has no water tap"
+    ],
+    3,
+    {
+     "type": "cause_effect",
+     "evidence": "There is no cafe and no water tap, so bring a bottle",
+     "answer": "Because the museum has no water tap",
+     "patternId": "a2-090-cause-effect"
+    }
+   ],
+   [
+    "Kapan sebaiknya orang berkunjung?",
+    [
+     "On Sunday morning",
+     "On a weekday",
+     "On a public holiday",
+     "At night"
+    ],
+    1,
+    {
+     "type": "likely",
+     "evidence": "Go on a weekday, because Sunday is noisy",
+     "answer": "On a weekday",
+     "patternId": "a2-090-likely"
+    }
+   ],
+   [
+    "Kesan penulis tentang museum ini secara keseluruhan adalah...",
+    [
+     "small but worth a visit",
+     "large and expensive",
+     "boring and empty",
+     "modern and crowded"
+    ],
+    0,
+    {
+     "type": "conclusion",
+     "evidence": "The salt museum in our town is small, but I stayed two hours",
+     "answer": "small but worth a visit",
+     "patternId": "a2-090-conclusion"
+    }
+   ]
+  ],
+  "topic": "ulasan museum",
+  "author": "Melinda Sari",
+  "setting": "museum garam",
+  "focus": "ulasan kunjungan"
+ },
+ {
+  "id": "r0091",
+  "level": "A2",
+  "title": "Homestay Nights in Raja Ampat",
+  "text": "Sleep above the water in a village homestay. Each wooden room holds two beds, a lamp, and a wide window with no glass. Your host cooks fish and cassava, and the price of the room includes three meals. Electricity runs from six in the evening until midnight, so charge your camera early. Boats to the reef leave when the sea is calm, usually after breakfast. Bring cash, because there is no bank on the island. Half of every payment stays with the village.",
+  "qs": [
+   [
+    "Apa yang termasuk dalam harga kamar?",
+    [
+     "Boat tickets to the city",
+     "A guide for one week",
+     "Three meals a day",
+     "Electricity all night"
+    ],
+    2,
+    {
+     "type": "detail",
+     "evidence": "the price of the room includes three meals",
+     "answer": "Three meals a day",
+     "patternId": "a2-091-detail"
+    }
+   ],
+   [
+    "Mengapa tamu harus mengisi daya kamera lebih awal?",
+    [
+     "Because the sun is too strong",
+     "Because the rooms have no plugs",
+     "Because the boat leaves at dawn",
+     "Because electricity stops at midnight"
+    ],
+    3,
+    {
+     "type": "cause_effect",
+     "evidence": "Electricity runs from six in the evening until midnight",
+     "answer": "Because electricity stops at midnight",
+     "patternId": "a2-091-cause-effect"
+    }
+   ],
+   [
+    "Mengapa pengunjung diminta membawa uang tunai?",
+    [
+     "The host does not trust cards",
+     "The island has no bank",
+     "Prices change every day",
+     "The boats are expensive"
+    ],
+    1,
+    {
+     "type": "why",
+     "evidence": "because there is no bank on the island",
+     "answer": "The island has no bank",
+     "patternId": "a2-091-why"
+    }
+   ],
+   [
+    "Kalimat terakhir menunjukkan bahwa program ini...",
+    [
+     "sends profit to a large company",
+     "gives money back to local people",
+     "is free for all visitors",
+     "pays the government only"
+    ],
+    1,
+    {
+     "type": "conclusion",
+     "evidence": "Half of every payment stays with the village",
+     "answer": "gives money back to local people",
+     "patternId": "a2-091-conclusion"
+    }
+   ],
+   [
+    "Kapan perahu biasanya berangkat ke terumbu karang?",
+    [
+     "Before sunrise",
+     "On Sunday only",
+     "At midnight",
+     "After breakfast"
+    ],
+    3,
+    {
+     "type": "supporting_detail",
+     "evidence": "usually after breakfast",
+     "answer": "After breakfast",
+     "patternId": "a2-091-supporting-detail"
+    }
+   ]
+  ],
+  "topic": "brosur penginapan",
+  "author": "Jaringan Homestay Papua",
+  "setting": "pulau kecil",
+  "focus": "fasilitas dan aturan"
+ },
+ {
+  "id": "r0092",
+  "level": "A2",
+  "title": "My First Flight",
+  "text": "I was twenty when I first sat in an aeroplane. My hands were cold, and I held the arm of the seat during take-off. A flight attendant noticed and said the noise was normal. Twenty minutes later I looked down and saw my whole province: rivers like silver threads, and clouds below me, not above me. I forgot my fear and forgot my lunch. When we landed in Makassar, my legs felt strange, but I wanted to fly again the same evening.",
+  "qs": [
+   [
+    "Bagaimana perasaan penulis saat lepas landas?",
+    [
+     "Excited and calm",
+     "Sleepy and bored",
+     "Nervous and tense",
+     "Angry with the crew"
+    ],
+    2,
+    {
+     "type": "tone",
+     "evidence": "My hands were cold, and I held the arm of the seat during take-off",
+     "answer": "Nervous and tense",
+     "patternId": "a2-092-tone"
+    }
+   ],
+   [
+    "Apa yang mengubah perasaan penulis?",
+    [
+     "The view from the window",
+     "A drink from the trolley",
+     "A film on a screen",
+     "A friend beside him"
+    ],
+    0,
+    {
+     "type": "cause_effect",
+     "evidence": "I looked down and saw my whole province",
+     "answer": "The view from the window",
+     "patternId": "a2-092-cause-effect"
+    }
+   ],
+   [
+    "Kata 'threads' dalam 'rivers like silver threads' membantu pembaca membayangkan...",
+    [
+     "thin lines seen from far above",
+     "heavy metal bridges",
+     "fast boats on the water",
+     "tall trees near the river"
+    ],
+    0,
+    {
+     "type": "vocabulary_context",
+     "evidence": "rivers like silver threads",
+     "answer": "thin lines seen from far above",
+     "patternId": "a2-092-vocabulary"
+    }
+   ],
+   [
+    "Apa yang terjadi setelah pesawat mendarat?",
+    [
+     "He lost his bag",
+     "His legs felt strange",
+     "He met the flight attendant again",
+     "He slept in the airport"
+    ],
+    1,
+    {
+     "type": "sequence",
+     "evidence": "my legs felt strange",
+     "answer": "His legs felt strange",
+     "patternId": "a2-092-sequence"
+    }
+   ],
+   [
+    "Kalimat akhir menunjukkan bahwa penulis...",
+    [
+     "will never fly again",
+     "was ill after the flight",
+     "enjoyed the experience",
+     "disliked Makassar"
+    ],
+    2,
+    {
+     "type": "inference",
+     "evidence": "I wanted to fly again the same evening",
+     "answer": "enjoyed the experience",
+     "patternId": "a2-092-inference"
+    }
+   ]
+  ],
+  "topic": "cerita pengalaman",
+  "author": "Teguh Firmansyah",
+  "setting": "pesawat menuju Makassar",
+  "focus": "perubahan perasaan"
+ },
+ {
+  "id": "r0093",
+  "level": "A2",
+  "title": "Complaint About Broken Headphones",
+  "text": "To the service team of Toko Audio Jaya: I bought a pair of headphones in your shop on 3 May, and the right side stopped working after nine days. I did not drop them, and I always keep them in the box. I still have the receipt and the warranty card. Your website promises a free repair within thirty days, so I would like a repair or a new pair. I can come to the shop on Saturday morning. Please confirm before Friday. Regards, Nurul Aini.",
+  "qs": [
+   [
+    "Apa masalah yang dilaporkan pembeli?",
+    [
+     "The right side stopped working",
+     "The box was missing",
+     "The colour was wrong",
+     "The price was too high"
+    ],
+    0,
+    {
+     "type": "detail",
+     "evidence": "the right side stopped working after nine days",
+     "answer": "The right side stopped working",
+     "patternId": "a2-093-detail"
+    }
+   ],
+   [
+    "Apa yang diminta Nurul dari toko?",
+    [
+     "A free carrying case",
+     "A repair or a replacement",
+     "An apology letter",
+     "A discount on a new model"
+    ],
+    1,
+    {
+     "type": "purpose",
+     "evidence": "I would like a repair or a new pair",
+     "answer": "A repair or a replacement",
+     "patternId": "a2-093-purpose"
+    }
+   ],
+   [
+    "Kalimat mana yang menjadi dasar tuntutan Nurul?",
+    [
+     "I can come to the shop on Saturday morning",
+     "Your website promises a free repair within thirty days",
+     "I did not drop them",
+     "Please confirm before Friday"
+    ],
+    1,
+    {
+     "type": "evidence",
+     "evidence": "Your website promises a free repair within thirty days",
+     "answer": "Your website promises a free repair within thirty days",
+     "patternId": "a2-093-evidence"
+    }
+   ],
+   [
+    "Mengapa Nurul menyebutkan bahwa ia tidak pernah menjatuhkan alat itu?",
+    [
+     "To praise the shop",
+     "To ask for a bigger box",
+     "To show the damage was not her fault",
+     "To explain a late payment"
+    ],
+    2,
+    {
+     "type": "inference",
+     "evidence": "I did not drop them",
+     "answer": "To show the damage was not her fault",
+     "patternId": "a2-093-inference"
+    }
+   ],
+   [
+    "Kata 'them' dalam 'I always keep them in the box' merujuk pada...",
+    [
+     "the headphones",
+     "the receipts",
+     "the shop workers",
+     "the warranty cards"
+    ],
+    0,
+    {
+     "type": "reference",
+     "evidence": "I did not drop them, and I always keep them in the box",
+     "answer": "the headphones",
+     "patternId": "a2-093-reference"
+    }
+   ]
+  ],
+  "topic": "surat keluhan",
+  "author": "Nurul Aini",
+  "setting": "toko elektronik",
+  "focus": "surat resmi singkat"
+ },
+ {
+  "id": "r0094",
+  "level": "A2",
+  "title": "Run for Clean Water",
+  "text": "The town will hold a five-kilometre fun run on Sunday, 4 October. Runners start at the sports field at six and finish under the old banyan tree. There is no prize for the fastest runner, because this event is not a race. Every ticket pays for one water filter in a school without clean taps. Wear the yellow shirt from the organisers, and please bring your own bottle: we will not hand out plastic cups. Families with small children can walk the short route.",
+  "qs": [
+   [
+    "Mengapa acara ini tidak memberikan hadiah untuk pelari tercepat?",
+    [
+     "Because the route is too short",
+     "Because the town has no money",
+     "Because the money went to shirts",
+     "Because the event is not a race"
+    ],
+    3,
+    {
+     "type": "cause_effect",
+     "evidence": "because this event is not a race",
+     "answer": "Because the event is not a race",
+     "patternId": "a2-094-cause-effect"
+    }
+   ],
+   [
+    "Untuk apa uang tiket digunakan?",
+    [
+     "To pay the runners",
+     "To repair the sports field",
+     "To buy water filters for schools",
+     "To plant banyan trees"
+    ],
+    2,
+    {
+     "type": "purpose",
+     "evidence": "Every ticket pays for one water filter",
+     "answer": "To buy water filters for schools",
+     "patternId": "a2-094-purpose"
+    }
+   ],
+   [
+    "Mengapa peserta harus membawa botol sendiri?",
+    [
+     "Because organisers give no plastic cups",
+     "Because the water is far away",
+     "Because bottles are part of the prize",
+     "Because the route has no shade"
+    ],
+    0,
+    {
+     "type": "why",
+     "evidence": "we will not hand out plastic cups",
+     "answer": "Because organisers give no plastic cups",
+     "patternId": "a2-094-why"
+    }
+   ],
+   [
+    "Di mana acara ini berakhir?",
+    [
+     "At the sports field",
+     "At the town hall",
+     "Under the old banyan tree",
+     "Beside the river"
+    ],
+    2,
+    {
+     "type": "supporting_detail",
+     "evidence": "finish under the old banyan tree",
+     "answer": "Under the old banyan tree",
+     "patternId": "a2-094-supporting-detail"
+    }
+   ],
+   [
+    "Pengumuman ini menunjukkan bahwa panitia peduli pada...",
+    [
+     "speed and competition",
+     "the history of the town",
+     "new sports clothes",
+     "the environment and school needs"
+    ],
+    3,
+    {
+     "type": "author_purpose",
+     "evidence": "Every ticket pays for one water filter in a school without clean taps",
+     "answer": "the environment and school needs",
+     "patternId": "a2-094-author-purpose"
+    }
+   ]
+  ],
+  "topic": "pengumuman acara",
+  "author": "Panitia Lari Sehat",
+  "setting": "lapangan olahraga",
+  "focus": "acara amal"
+ },
+ {
+  "id": "r0095",
+  "level": "A2",
+  "title": "Three Bins, One Habit",
+  "text": "Sorting rubbish is not difficult; the difficulty is starting. Put three containers in the kitchen: one for wet kitchen waste, one for paper and plastic, and one for glass and metal. Rinse a milk carton before you drop it in, because dirty paper cannot be recycled. Keep batteries in a separate jar on a high shelf, away from children. On collection day, take out the dry containers first, as the truck arrives early. After one month the family will not think about it any more.",
+  "qs": [
+   [
+    "Berapa wadah utama yang disarankan di dapur?",
+    [
+     "One",
+     "Two",
+     "Three",
+     "Five"
+    ],
+    2,
+    {
+     "type": "detail",
+     "evidence": "Put three containers in the kitchen",
+     "answer": "Three",
+     "patternId": "a2-095-detail"
+    }
+   ],
+   [
+    "Mengapa karton susu harus dibilas?",
+    [
+     "Because dirty paper cannot be recycled",
+     "Because the smell attracts cats",
+     "Because the truck refuses cartons",
+     "Because water makes it lighter"
+    ],
+    0,
+    {
+     "type": "cause_effect",
+     "evidence": "because dirty paper cannot be recycled",
+     "answer": "Because dirty paper cannot be recycled",
+     "patternId": "a2-095-cause-effect"
+    }
+   ],
+   [
+    "Di mana baterai bekas disimpan?",
+    [
+     "In the wet waste container",
+     "With paper and plastic",
+     "In a jar on a high shelf",
+     "Outside the house"
+    ],
+    2,
+    {
+     "type": "supporting_detail",
+     "evidence": "Keep batteries in a separate jar on a high shelf",
+     "answer": "In a jar on a high shelf",
+     "patternId": "a2-095-supporting-detail"
+    }
+   ],
+   [
+    "Apa yang dilakukan lebih dulu pada hari pengangkutan?",
+    [
+     "Move the bins to the garden",
+     "Wash all the glass",
+     "Call the truck driver",
+     "Take out the dry containers"
+    ],
+    3,
+    {
+     "type": "sequence",
+     "evidence": "take out the dry containers first",
+     "answer": "Take out the dry containers",
+     "patternId": "a2-095-sequence"
+    }
+   ],
+   [
+    "Kalimat terakhir bermakna bahwa memilah sampah akan...",
+    [
+     "need a new machine",
+     "become harder each month",
+     "stop after one month",
+     "become an automatic habit"
+    ],
+    3,
+    {
+     "type": "paraphrase",
+     "evidence": "the family will not think about it any more",
+     "answer": "become an automatic habit",
+     "patternId": "a2-095-paraphrase"
+    }
+   ]
+  ],
+  "topic": "panduan rumah tangga",
+  "author": "Bank Sampah Melati",
+  "setting": "dapur keluarga",
+  "focus": "kebiasaan baru"
+ },
+ {
+  "id": "r0096",
+  "level": "A2",
+  "title": "A Volunteer in the Flood Week",
+  "text": "Q: What did you do during the flood in January? A: I am a nurse, but that week I mostly carried boxes and listened. People needed dry clothes and a person who could hear them. Q: What surprised you? A: Children recovered faster than adults, because they played again quickly. Q: What did you learn? A: Send help early, and ask the village first. In one street we brought rice, but they already had rice; they needed clean water and a working toilet.",
+  "qs": [
+   [
+    "Apa pekerjaan utama narasumber?",
+    [
+     "A teacher",
+     "A nurse",
+     "A driver",
+     "A shopkeeper"
+    ],
+    1,
+    {
+     "type": "detail",
+     "evidence": "I am a nurse",
+     "answer": "A nurse",
+     "patternId": "a2-096-detail"
+    }
+   ],
+   [
+    "Apa yang mengejutkan narasumber?",
+    [
+     "Children recovered faster",
+     "Adults recovered faster",
+     "Nobody needed clothes",
+     "The flood lasted one day"
+    ],
+    0,
+    {
+     "type": "comparison",
+     "evidence": "Children recovered faster than adults",
+     "answer": "Children recovered faster",
+     "patternId": "a2-096-comparison"
+    }
+   ],
+   [
+    "Mengapa beras yang dibawa kurang berguna di satu jalan?",
+    [
+     "The road was closed",
+     "The rice was wet",
+     "The people already had rice",
+     "Nobody could cook"
+    ],
+    2,
+    {
+     "type": "why",
+     "evidence": "but they already had rice",
+     "answer": "The people already had rice",
+     "patternId": "a2-096-why"
+    }
+   ],
+   [
+    "Pelajaran utama dari pengalaman ini adalah...",
+    [
+     "wait until the water goes down",
+     "send only food to floods",
+     "ask the village what it really needs",
+     "let nurses stay in hospitals"
+    ],
+    2,
+    {
+     "type": "main_idea",
+     "evidence": "Send help early, and ask the village first",
+     "answer": "ask the village what it really needs",
+     "patternId": "a2-096-main-idea"
+    }
+   ],
+   [
+    "Sikap narasumber terhadap warga terdengar...",
+    [
+     "respectful",
+     "impatient",
+     "amused",
+     "doubtful"
+    ],
+    0,
+    {
+     "type": "tone",
+     "evidence": "People needed dry clothes and a person who could hear them",
+     "answer": "respectful",
+     "patternId": "a2-096-tone"
+    }
+   ]
+  ],
+  "topic": "wawancara bencana",
+  "author": "Warta Relawan",
+  "setting": "desa terdampak banjir",
+  "focus": "pengalaman relawan"
+ },
+ {
+  "id": "r0097",
+  "level": "A2",
+  "title": "What Grade Eight Eats at Seven",
+  "text": "Our class asked eighty-six students one question: did you eat breakfast today? Fifty-two said yes, nineteen said no, and fifteen ate only a snack on the way to school. Students who skipped breakfast often live far from school and leave before six. Half of them said they felt hungry before the second lesson. We showed the numbers to the canteen manager. From next Monday the canteen will open at six thirty, and simple rice packets will cost two thousand rupiah.",
+  "qs": [
+   [
+    "Berapa murid yang sarapan pada hari itu?",
+    [
+     "Nineteen",
+     "Fifteen",
+     "Fifty-two",
+     "Eighty-six"
+    ],
+    2,
+    {
+     "type": "detail",
+     "evidence": "Fifty-two said yes",
+     "answer": "Fifty-two",
+     "patternId": "a2-097-detail"
+    }
+   ],
+   [
+    "Mengapa sebagian murid melewatkan sarapan?",
+    [
+     "They dislike rice",
+     "Their parents asked them to wait",
+     "The canteen was closed all year",
+     "They live far and leave very early"
+    ],
+    3,
+    {
+     "type": "cause_effect",
+     "evidence": "often live far from school and leave before six",
+     "answer": "They live far and leave very early",
+     "patternId": "a2-097-cause-effect"
+    }
+   ],
+   [
+    "Apa hubungan antara hasil survei dan keputusan kantin?",
+    [
+     "The canteen changed its hours because of the results",
+     "The canteen ignored the survey",
+     "The survey came after the change",
+     "The canteen closed because of the survey"
+    ],
+    0,
+    {
+     "type": "relationship",
+     "evidence": "the canteen will open at six thirty",
+     "answer": "The canteen changed its hours because of the results",
+     "patternId": "a2-097-relationship"
+    }
+   ],
+   [
+    "Frasa 'ate only a snack' berarti mereka makan...",
+    [
+     "a full meal at home",
+     "lunch before school",
+     "nothing at all",
+     "a small amount of food"
+    ],
+    3,
+    {
+     "type": "vocabulary_context",
+     "evidence": "fifteen ate only a snack on the way to school",
+     "answer": "a small amount of food",
+     "patternId": "a2-097-vocabulary"
+    }
+   ],
+   [
+    "Kemungkinan hasil dari perubahan jam kantin adalah...",
+    [
+     "fewer hungry students in the morning",
+     "more students staying at home",
+     "a higher price for rice packets",
+     "a shorter school day"
+    ],
+    0,
+    {
+     "type": "likely",
+     "evidence": "From next Monday the canteen will open at six thirty",
+     "answer": "fewer hungry students in the morning",
+     "patternId": "a2-097-likely"
+    }
+   ]
+  ],
+  "topic": "laporan survei",
+  "author": "Kelas 8C SMP Tunas",
+  "setting": "kantin sekolah",
+  "focus": "data dan perubahan"
+ },
+ {
+  "id": "r0098",
+  "level": "A2",
+  "title": "The Son Who Forgot the Shore",
+  "text": "A poor mother raised her son alone beside a grey beach. The boy sailed away on a merchant ship and became rich in another land. Years later his fine ship returned, and the whole village ran to the water. His mother came too, in an old dress, and called his name. He looked at her, then at his young wife, and said he did not know the woman. The sky turned black, the sea rose, and a storm carried his ship onto the rocks.",
+  "qs": [
+   [
+    "Bagaimana anak itu menjadi kaya?",
+    [
+     "He found gold on the beach",
+     "He sailed away and traded in another land",
+     "He married a rich woman first",
+     "He worked for the village head"
+    ],
+    1,
+    {
+     "type": "how",
+     "evidence": "The boy sailed away on a merchant ship and became rich",
+     "answer": "He sailed away and traded in another land",
+     "patternId": "a2-098-how"
+    }
+   ],
+   [
+    "Apa yang dilakukan anak itu ketika bertemu ibunya?",
+    [
+     "He gave her money",
+     "He said he did not know her",
+     "He took her to the ship",
+     "He asked her to wait"
+    ],
+    1,
+    {
+     "type": "detail",
+     "evidence": "said he did not know the woman",
+     "answer": "He said he did not know her",
+     "patternId": "a2-098-detail"
+    }
+   ],
+   [
+    "Apa yang terjadi setelah anak itu menolak ibunya?",
+    [
+     "A storm destroyed his ship",
+     "The village gave him a feast",
+     "His wife left the ship",
+     "The sea became calm"
+    ],
+    0,
+    {
+     "type": "cause_effect",
+     "evidence": "a storm carried his ship onto the rocks",
+     "answer": "A storm destroyed his ship",
+     "patternId": "a2-098-cause-effect"
+    }
+   ],
+   [
+    "Kata 'merchant' dalam cerita ini berhubungan dengan...",
+    [
+     "trade and selling goods",
+     "fishing at night",
+     "war between villages",
+     "building houses"
+    ],
+    0,
+    {
+     "type": "vocabulary_context",
+     "evidence": "The boy sailed away on a merchant ship",
+     "answer": "trade and selling goods",
+     "patternId": "a2-098-vocabulary"
+    }
+   ],
+   [
+    "Cerita ini terutama memperingatkan pembaca tentang...",
+    [
+     "the danger of the sea",
+     "travelling to other lands",
+     "forgetting your own family",
+     "marrying too young"
+    ],
+    2,
+    {
+     "type": "author_purpose",
+     "evidence": "His mother came too, in an old dress, and called his name",
+     "answer": "forgetting your own family",
+     "patternId": "a2-098-author-purpose"
+    }
+   ]
+  ],
+  "topic": "cerita rakyat",
+  "author": "Diceritakan ulang oleh Fauzan Hakim",
+  "setting": "pantai barat Sumatra",
+  "focus": "peringatan moral"
+ },
+ {
+  "id": "r0099",
+  "level": "A2",
+  "title": "Your Eyes Need a Window",
+  "text": "Screens do not damage eyes for ever, but tired eyes make bad afternoons. Doctors suggest a simple rule for study time: after twenty minutes, look at something far away for twenty seconds. A window is enough; a wall is not. Blinking matters too, because we blink less than half as often in front of a bright screen. Dry eyes feel like sand. Put the screen a little below eye level and keep a lamp behind you, not in front of the glass.",
+  "qs": [
+   [
+    "Aturan sederhana yang disarankan dokter adalah...",
+    [
+     "stop studying after one hour",
+     "look far away after twenty minutes",
+     "close the eyes every minute",
+     "use a bigger screen"
+    ],
+    1,
+    {
+     "type": "main_idea",
+     "evidence": "after twenty minutes, look at something far away for twenty seconds",
+     "answer": "look far away after twenty minutes",
+     "patternId": "a2-099-main-idea"
+    }
+   ],
+   [
+    "Mengapa mata menjadi kering di depan layar?",
+    [
+     "Because rooms are always cold",
+     "Because we blink much less",
+     "Because screens produce dust",
+     "Because we sit too far away"
+    ],
+    1,
+    {
+     "type": "cause_effect",
+     "evidence": "we blink less than half as often in front of a bright screen",
+     "answer": "Because we blink much less",
+     "patternId": "a2-099-cause-effect"
+    }
+   ],
+   [
+    "Menurut teks, jendela dibandingkan dengan dinding adalah...",
+    [
+     "equally useful for resting eyes",
+     "worse, because of the light",
+     "better, because the view is far",
+     "dangerous for young readers"
+    ],
+    2,
+    {
+     "type": "comparison",
+     "evidence": "A window is enough; a wall is not",
+     "answer": "better, because the view is far",
+     "patternId": "a2-099-comparison"
+    }
+   ],
+   [
+    "Di mana lampu sebaiknya diletakkan?",
+    [
+     "Outside the room",
+     "In front of the screen",
+     "On the screen itself",
+     "Behind the reader"
+    ],
+    3,
+    {
+     "type": "supporting_detail",
+     "evidence": "keep a lamp behind you",
+     "answer": "Behind the reader",
+     "patternId": "a2-099-supporting-detail"
+    }
+   ],
+   [
+    "Manakah pernyataan yang sesuai dengan teks?",
+    [
+     "Screens cause permanent blindness",
+     "Screens are safe only at night",
+     "Screens should never be used",
+     "Screens can make eyes tired"
+    ],
+    3,
+    {
+     "type": "true_false_not_stated",
+     "evidence": "Screens do not damage eyes for ever, but tired eyes make bad afternoons",
+     "answer": "Screens can make eyes tired",
+     "patternId": "a2-099-tf-not-stated"
+    }
+   ]
+  ],
+  "topic": "artikel kesehatan",
+  "author": "Redaksi Remaja Sehat",
+  "setting": "meja belajar",
+  "focus": "kebiasaan belajar"
+ },
+ {
+  "id": "r0100",
+  "level": "A2",
+  "title": "Two Wheels Around Yogyakarta",
+  "text": "I rented an old bicycle for fifteen thousand rupiah a day and cycled from Kotagede to the palace. Traffic looked frightening at first, but drivers here expect bicycles and leave space. I stopped at a silver workshop, watched a man beat a thin sheet for a ring, and drank iced tea in the shade. In the afternoon I lost my way near the river, and a boy on a bicycle led me back without asking for anything. Tomorrow I will ride south to the coast.",
+  "qs": [
+   [
+    "Bagaimana perasaan penulis tentang lalu lintas di sana?",
+    [
+     "It was worse than expected",
+     "It was completely empty",
+     "It looked scary but felt safe",
+     "It stopped him from cycling"
+    ],
+    2,
+    {
+     "type": "inference",
+     "evidence": "Traffic looked frightening at first, but drivers here expect bicycles and leave space",
+     "answer": "It looked scary but felt safe",
+     "patternId": "a2-100-inference"
+    }
+   ],
+   [
+    "Apa yang dilihat penulis di bengkel perak?",
+    [
+     "A man shaping metal for a ring",
+     "A machine making bicycles",
+     "A shop selling iced tea",
+     "A class for tourists"
+    ],
+    0,
+    {
+     "type": "supporting_detail",
+     "evidence": "watched a man beat a thin sheet for a ring",
+     "answer": "A man shaping metal for a ring",
+     "patternId": "a2-100-supporting-detail"
+    }
+   ],
+   [
+    "Apa yang terjadi ketika penulis tersesat?",
+    [
+     "He called a taxi",
+     "He returned to the palace",
+     "A boy guided him back",
+     "He waited until evening"
+    ],
+    2,
+    {
+     "type": "sequence",
+     "evidence": "a boy on a bicycle led me back without asking for anything",
+     "answer": "A boy guided him back",
+     "patternId": "a2-100-sequence"
+    }
+   ],
+   [
+    "Sikap anak yang menolongnya menunjukkan bahwa...",
+    [
+     "tourists must pay for help",
+     "local people can be generous",
+     "the city is dangerous",
+     "bicycles are rare there"
+    ],
+    1,
+    {
+     "type": "conclusion",
+     "evidence": "without asking for anything",
+     "answer": "local people can be generous",
+     "patternId": "a2-100-conclusion"
+    }
+   ],
+   [
+    "Apa rencana penulis besok?",
+    [
+     "To cycle south to the coast",
+     "To return the bicycle early",
+     "To visit the silver workshop again",
+     "To take a bus to Kotagede"
+    ],
+    0,
+    {
+     "type": "likely",
+     "evidence": "Tomorrow I will ride south to the coast",
+     "answer": "To cycle south to the coast",
+     "patternId": "a2-100-likely"
+    }
+   ]
+  ],
+  "topic": "blog perjalanan",
+  "author": "Laras Ayuningtyas",
+  "setting": "Yogyakarta",
+  "focus": "perjalanan sepeda"
+ }
+]

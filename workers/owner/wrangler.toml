@@ -1,0 +1,126 @@
+# FIEZEL — Worker dashboard owner (E6). Worker TERPISAH, bukan tambahan pada worker api.
+#
+# JANGAN pindahkan konfigurasi ini ke workers/wrangler.toml: berkas itu milik Worker aset audio
+# dan gerbang audio-asset-pipeline-test.js melarang string tertentu di sana (EXEC-BRIEF-CF.md
+# "ATURAN TEKNIS FASE INI"). Owner dashboard punya wrangler-nya sendiri, seperti workers/api.
+#
+# ============================================================================================
+# KEPUTUSAN ROUTE: hostname owner.fiezel.my.id, BUKAN path /owner di worker api.
+# ============================================================================================
+# cf-b5-analytics.md §5.1 memilih "HTML dari Worker di GET /owner" — yang menang di situ adalah
+# "HTML dirender Worker, bukan berkas di repo", dan itu tetap dipatuhi 100% di sini. Yang saya
+# pilih beda hanya SIAPA Worker-nya, dan alasannya empat, bukan selera:
+#
+# 1. Radius ledakan. Kalau /owner hidup di worker api, satu-satunya Worker yang dipakai MURID
+#    juga memegang binding D1 analytics dan seluruh kode gate owner. Bug router apa pun di jalur
+#    belajar berjemaah dengan kode yang boleh membaca angka bisnis. Worker terpisah = binding
+#    analytics tidak pernah ada di isolate yang melayani murid.
+# 2. Kadens deploy. Dashboard owner akan sering diubah (panel, label kejujuran). Tiap perubahan
+#    tidak boleh memaksa deploy ulang Worker yang sedang melayani murid; main auto-deploy tiap
+#    5 menit (EXEC-BRIEF-CF.md #5) sehingga risiko itu nyata, bukan teoretis.
+# 3. Lapis kedua gratis. Cloudflare Access dipasang per hostname. Dengan owner.fiezel.my.id,
+#    MFA bisa ditaruh di DEPAN seluruh dashboard tanpa satu baris kode auth baru, dan tanpa
+#    menyentuh hostname yang dipakai murid. Dengan path /owner, aturan Access harus mencocokkan
+#    path pada hostname murid — lebih mudah salah, dan sekali salah ia memblokir murid.
+# 4. Kejelasan gerbang. "Semua rute Worker ini adalah rute owner" bisa diassert habis (default
+#    deny untuk rute yang belum ada sekalipun). Pada worker api, assert itu berubah menjadi
+#    "semua rute berprefiks /owner", yaitu invarian yang bisa bocor lewat prefiks baru.
+#
+# Harga pilihan ini (jujur): satu Worker lagi untuk dideploy dan satu record DNS lagi
+# (CNAME/AAAA proxied untuk owner.fiezel.my.id). Keduanya nol biaya di plan GRATIS.
+#
+# ============================================================================================
+# FREE-TIER-SAFE (EXEC-BRIEF-CF.md #2)
+# ============================================================================================
+# · Workers Free: 100.000 permintaan/hari, CPU 10 ms/permintaan. Dashboard owner dipakai satu
+#   orang; volumenya puluhan permintaan/hari. CPU: satu render = ~10 SELECT agregat (I/O, bukan
+#   CPU) + penyusunan string HTML. Tidak ada HMAC per-event, tidak ada loop atas baris per-orang.
+# · Nol tulis D1: Worker ini hanya SELECT terhadap `fiezel-stats`. Sesi owner ditandatangani
+#   HMAC (stateless), jadi sesi tidak pernah disimpan di mana pun.
+# · KOREKSI 28 Agu 2026 (D4): klaim "nol tulis KV" DULU tertulis di sini dan sekarang TIDAK
+#   BENAR lagi — rem penebakan halaman masuk menulis penghitung ke KV `fiezel-CFG` (lihat
+#   binding di bawah). Yang menulis HANYA percobaan token yang GAGAL: login berhasil nol tulis,
+#   percobaan yang sudah ditolak 429 nol tulis. Batas atas dari satu sumber yang menyerang
+#   tanpa henti = 5 tulis/10 menit = 720/hari dari kuota 1.000/hari plan gratis. Angka dan
+#   alasannya lengkap di bab "PENYIMPANAN YANG DIPILIH" di `index.js`.
+# · Analytics Engine dipakai HANYA untuk menulis jejak audit akses owner (cf-b5 §5.2 aturan 6);
+#   kuota AE Free 100.000 datapoint/hari, akses owner ≈ puluhan. Membaca AE butuh SQL API +
+#   token akun (bukan binding) → panel SYSTEM/AE sengaja TIDAK dibangun di fase ini, dan
+#   ketiadaannya ditulis di README sebagai batas, bukan disembunyikan.
+
+name = "fiezel-owner"
+main = "index.js"
+compatibility_date = "2025-06-01"
+# *.workers.dev DIMATIKAN. Alasannya bukan kerapian: Cloudflare Access dipasang PER HOSTNAME,
+# jadi selama fiezel-owner.<akun>.workers.dev hidup, ia adalah pintu kedua ke dashboard yang
+# TIDAK dilewati Access sama sekali. Sejak zona fiezel.my.id aktif, custom domain di bawah
+# sudah cukup; satu pintu, satu tempat memasang MFA. Lihat DEPLOY.md langkah 4.
+workers_dev = false
+
+# Hostname khusus owner. Zona fiezel.my.id sudah di Cloudflare (plan GRATIS).
+# custom_domain = true → Cloudflare yang mengurus record + sertifikatnya.
+[[routes]]
+pattern = "owner.fiezel.my.id"
+custom_domain = true
+
+# D1 analytics — DIBACA SAJA oleh Worker ini.
+# Kejujuran teknis: D1 hari ini TIDAK punya binding read-only. Jadi "read-only" ditegakkan di
+# dua tempat lain: (a) queries.js hanya memuat SELECT dan menolak muat bila ada kata tulis,
+# (b) owner-dashboard-test.js gagal bila ada pernyataan tulis muncul. Klaim di dokumentasi
+# tidak boleh melebihi apa yang benar-benar dipaksakan — lihat README §Batas.
+# Database ini TERPISAH dari database kuota (cf-a11 risiko 5: D1 single-threaded per database)
+# dan tabel kuota DILARANG di-join dengan tabel analytics (KONTRAK ANALYTICS).
+# PENTING (diperbaiki 28 Agu 2026): nama database sebelumnya tertulis "fiezel-analytics" dan
+# database_id-nya tidak ada. Database itu TIDAK PERNAH ADA. Yang ada di akun adalah
+# `fiezel-stats` (binding STATS_DB di workers/api/wrangler.toml), tempat 0002_analytics.sql
+# sudah dijalankan. Nama yang salah = deploy yang gagal atau, lebih buruk, database baru kosong
+# yang dibuat tanpa sengaja lalu dianggap "belum ada data".
+[[d1_databases]]
+binding = "ANALYTICS"
+database_name = "fiezel-stats"
+database_id = "c712000c-aab9-4a1d-b43d-e6d4c9b36ee8"
+
+# KV `fiezel-CFG` — SATU-SATUNYA penyimpanan yang ditulis Worker ini, dan hanya oleh rem
+# penebakan halaman masuk (`index.js`, bab "PENYIMPANAN YANG DIPILIH").
+#
+# KENAPA KV DAN BUKAN D1 `fiezel-stats` yang sudah terikat di atas: `fiezel-stats` adalah
+# database ANALYTICS. `analytics-privacy-test.js` menguncinya pada LIMA tabel agregat, dan
+# DEPLOY.md melarang mencampur data auth ke sana. Worker ini juga HANYA-BACA terhadap database
+# itu — sifat yang ditegakkan gerbang (`queries.js` menolak kata tulis). Menaruh penghitung auth
+# di sana akan menghapus dua invarian sekaligus untuk satu penghitung, dan tulis rem akan
+# berebut dengan rollup analytics (D1 single-threaded per database, cf-a11 risiko 5).
+#
+# KENAPA INI TIDAK MELEBARKAN RADIUS LEDAKAN: `fiezel-CFG` memuat flag/config dan penanda
+# anti-replay ber-TTL — NOL data per-orang. Yang tetap DILARANG, dan tetap diassert butir (g-g)
+# `owner-edge-guard-test.js`: binding apa pun ke D1 `fiezel-core` (identity/session/quota_daily).
+[[kv_namespaces]]
+binding = "CFG"
+id      = "6386fc9752e14afd8a8f76a8d45e47d1"
+
+# Jejak audit akses owner (tanpa IP, tanpa identitas). Opsional: bila binding tidak ada,
+# index.js tetap jalan — audit hanya dilewati.
+[[analytics_engine_datasets]]
+binding = "AE"
+dataset = "fiezel_ops"
+
+[observability]
+enabled = true
+
+# ============================================================================================
+# TIDAK ADA NILAI RAHASIA DI BERKAS INI. Hanya nama binding (pola workers/wrangler.toml:15-20).
+# Secret dipasang owner dengan `wrangler secret put`, lihat README:
+#   OWNER_TOKEN_HASH   — sha256 HEX dari token owner. HASH, bukan token. Repo tidak pernah
+#                        memuat token maupun hash-nya.
+#   OWNER_SESSION_KEY  — kunci HMAC untuk menandatangani cookie sesi owner.
+#   RATE_SALT          — garam HMAC kunci ember rem laju (nama yang SAMA dengan rem laju di
+#                        workers/api). Belum dipasang = rem tetap jalan memakai OWNER_SESSION_KEY
+#                        sebagai garam; IP tetap tidak pernah tersimpan mentah. Pasang saja:
+#                        openssl rand -hex 32
+#   EDGE_SHARED_SECRET — WAJIB sejak audit D3 HIGH-3: penjaga edge kini FAIL-CLOSED. Tanpa
+#                        secret ini, SEMUA permintaan ditolak (bukan lagi "terbuka selama
+#                        transisi"). Pasang nilai yang SAMA di jembatan PHP owner. Pembuka
+#                        darurat: var ALLOW_NO_EDGE_SECRET = "true" (string persis) — sengaja
+#                        TIDAK ditaruh di blok vars supaya membukanya butuh tindakan sadar.
+# Bila salah satu belum dipasang, Worker FAIL-CLOSED: semua rute 403, termasuk halaman masuk.
+# Itu sekaligus perwujudan "fitur baru wajib di belakang flag OFF": tanpa Secret, dashboard mati.
+# ============================================================================================

@@ -1,0 +1,284 @@
+{
+  "schema": "fiezel-ai-account-cap-gate-v1",
+  "pass": true,
+  "counts": {
+    "pass": 53,
+    "fail": 0
+  },
+  "discoveredRoutes": [
+    "POST /api/ai/task <- ai/route-ai.js",
+    "POST /api/tts/render <- tts/route-tts.js",
+    "GET /api/tts/manifest <- tts/route-tts.js"
+  ],
+  "modelCapableModules": [
+    "ai/route-ai.js",
+    "tts/route-tts.js"
+  ],
+  "checks": [
+    {
+      "name": "berkas wajib ada: ai/model-call-gate.js",
+      "status": "PASS",
+      "details": "ai/model-call-gate.js"
+    },
+    {
+      "name": "berkas wajib ada: ai/ai-account-budget.js",
+      "status": "PASS",
+      "details": "ai/ai-account-budget.js"
+    },
+    {
+      "name": "berkas wajib ada: ai/route-ai.js",
+      "status": "PASS",
+      "details": "ai/route-ai.js"
+    },
+    {
+      "name": "berkas wajib ada: tts/route-tts.js",
+      "status": "PASS",
+      "details": "tts/route-tts.js"
+    },
+    {
+      "name": "berkas wajib ada: route-wiring.js",
+      "status": "PASS",
+      "details": "route-wiring.js"
+    },
+    {
+      "name": "berkas wajib ada: index.js",
+      "status": "PASS",
+      "details": "index.js"
+    },
+    {
+      "name": "berkas wajib ada: migrations/0005_ai_account_budget.sql",
+      "status": "PASS",
+      "details": "migrations/0005_ai_account_budget.sql"
+    },
+    {
+      "name": "berkas wajib ada: quota/quota-config.js",
+      "status": "PASS",
+      "details": "quota/quota-config.js"
+    },
+    {
+      "name": "berkas wajib ada: wrangler.toml",
+      "status": "PASS",
+      "details": "wrangler.toml"
+    },
+    {
+      "name": "A1. Binding Workers AI dieja HANYA di ai/model-call-gate.js (dipindai dari sumber)",
+      "status": "PASS",
+      "details": "ai/model-call-gate.js"
+    },
+    {
+      "name": "A2. route-ai.js dan tts/route-tts.js TIDAK lagi menyentuh binding sendiri",
+      "status": "PASS",
+      "details": "ai/model-call-gate.js"
+    },
+    {
+      "name": "B1. runReservedModel MENOLAK setiap tanda terima tidak sah",
+      "status": "PASS",
+      "details": "tanpa tanda terima (null)=model_call_unreserved | objek permisif karangan=model_call_unreserved | merek salah=model_call_unreserved | neuron < 1=model_call_unreserved | tanpa release()=model_call_unreserved"
+    },
+    {
+      "name": "B2. Penolakan terjadi SEBELUM binding disentuh (nol panggilan model)",
+      "status": "PASS",
+      "details": "0"
+    },
+    {
+      "name": "B3. Tanda terima yang sah DILEWATKAN ke binding",
+      "status": "PASS",
+      "details": "1"
+    },
+    {
+      "name": "B4. makeReservation menolak dibuat tanpa release() (pelepasan tidak boleh opsional)",
+      "status": "PASS",
+      "details": "reservation_needs_release"
+    },
+    {
+      "name": "C1. Penemuan modul model-capable berjalan dan tidak kosong",
+      "status": "PASS",
+      "details": "pendaftar=ai/route-ai.js,analytics/route-events.js,evidence/route-evidence.js,learning/route-learning-events.js,quota/route-quota.js,tts/route-tts.js | model-capable=ai/route-ai.js,tts/route-tts.js"
+    },
+    {
+      "name": "C2. Kedua jalur berbayar ikut ditemukan (AI DAN TTS)",
+      "status": "PASS",
+      "details": "ai/route-ai.js,tts/route-tts.js"
+    },
+    {
+      "name": "C3[ai/route-ai.js] pendaftar rute bisa dipanggil",
+      "status": "PASS",
+      "details": "registerAiRoutes"
+    },
+    {
+      "name": "C3[tts/route-tts.js] pendaftar rute bisa dipanggil",
+      "status": "PASS",
+      "details": "registerTtsRoutes"
+    },
+    {
+      "name": "C4. Setiap rute dari modul model-capable punya fixture di gerbang ini",
+      "status": "PASS",
+      "details": "POST /api/ai/task, POST /api/tts/render, GET /api/tts/manifest"
+    },
+    {
+      "name": "C5[POST /api/ai/task] perilaku model cocok dengan deklarasi fixture",
+      "status": "PASS",
+      "details": "expectModel=true ranModel=true status=200"
+    },
+    {
+      "name": "C6[POST /api/ai/task] reservasi neuron akun terjadi SEBELUM panggilan model",
+      "status": "PASS",
+      "details": "reserve@1 ai@2 status=200"
+    },
+    {
+      "name": "C7[POST /api/ai/task] penghitung ai_account_day benar-benar bergerak",
+      "status": "PASS",
+      "details": "[{\"day\":\"2026-09-04\",\"neurons\":60,\"requests\":1,\"touched_at\":1788557481658}]"
+    },
+    {
+      "name": "C5[POST /api/tts/render] perilaku model cocok dengan deklarasi fixture",
+      "status": "PASS",
+      "details": "expectModel=true ranModel=true status=200"
+    },
+    {
+      "name": "C6[POST /api/tts/render] reservasi neuron akun terjadi SEBELUM panggilan model",
+      "status": "PASS",
+      "details": "reserve@1 ai@2 status=200"
+    },
+    {
+      "name": "C7[POST /api/tts/render] penghitung ai_account_day benar-benar bergerak",
+      "status": "PASS",
+      "details": "[{\"day\":\"2026-09-04\",\"neurons\":33,\"requests\":1,\"touched_at\":1788557481668}]"
+    },
+    {
+      "name": "C5[GET /api/tts/manifest] perilaku model cocok dengan deklarasi fixture",
+      "status": "PASS",
+      "details": "expectModel=false ranModel=false status=200"
+    },
+    {
+      "name": "C6[GET /api/tts/manifest] rute non-model TIDAK menyentuh binding AI",
+      "status": "PASS",
+      "details": "ai@-1"
+    },
+    {
+      "name": "D1. /api/ai/task TANPA deps.accountBudget = 503, BUKAN dilayani",
+      "status": "PASS",
+      "details": "503 ai_budget_dep_missing"
+    },
+    {
+      "name": "D2. Penolakan itu tidak menagih jatah murid (quotaChecked:false, quotaCharged:false)",
+      "status": "PASS",
+      "details": "{\"quotaChecked\":false,\"quotaCharged\":false}"
+    },
+    {
+      "name": "D3. Nol panggilan model saat dep hilang",
+      "status": "PASS",
+      "details": "0"
+    },
+    {
+      "name": "D4. Murid tetap mendapat teks materi, dan pesannya JUJUR (bukan \"jatah penuh\")",
+      "status": "PASS",
+      "details": "\"Bantuan AI belum bisa dipakai karena penyiapan di sisi kami belum lengkap. Ini bukan salah kamu, jatahmu utuh, dan penjelasan dari materi tetap muncul.\""
+    },
+    {
+      "name": "D5. Izin tanpa tanda terima sah = 503 ai_budget_receipt_invalid",
+      "status": "PASS",
+      "details": "503 ai_budget_receipt_invalid run=0"
+    },
+    {
+      "name": "D6. /api/tts/render TANPA deps.accountBudget = 503 + quotaCharged:false",
+      "status": "PASS",
+      "details": "503 ai_budget_dep_missing"
+    },
+    {
+      "name": "D7. Nol panggilan mesin TTS saat dep hilang",
+      "status": "PASS",
+      "details": "0"
+    },
+    {
+      "name": "E1. GLOBAL_NEURON_CAP dipakai apa adanya saat <= jatah gratis akun",
+      "status": "PASS",
+      "details": "8000"
+    },
+    {
+      "name": "E2. Nilai di atas jatah gratis DIPOTONG ke ACCOUNT_DAILY_NEURON_BUDGET",
+      "status": "PASS",
+      "details": "10000"
+    },
+    {
+      "name": "E3. Tanpa var, plafonnya TETAP ADA (fail-closed ke jatah gratis, bukan tak terbatas)",
+      "status": "PASS",
+      "details": "10000"
+    },
+    {
+      "name": "E4. Angkanya datang dari QUOTA_CONFIG, bukan dari konstanta yang dikarang di modul",
+      "status": "PASS",
+      "details": "referensi QUOTA_CONFIG"
+    },
+    {
+      "name": "E5. wrangler.toml benar-benar menyetel GLOBAL_NEURON_CAP",
+      "status": "PASS",
+      "details": "8000"
+    },
+    {
+      "name": "E6. Plafon ditegakkan DI DALAM WHERE (atomik), bukan dibandingkan setelah dibaca",
+      "status": "PASS",
+      "details": "UPDATE ai_account_day SET neurons = neurons + ?2, requests = requests + 1, touched_at = ?3 WHERE day = ?1 AND neurons + ?2 <= ?4 RETURNING neurons"
+    },
+    {
+      "name": "F1. Dua reservasi bersamaan di ambang: TEPAT SATU lolos",
+      "status": "PASS",
+      "details": "[{\"allowed\":true,\"reason\":\"\",\"usedBefore\":8,\"cap\":10},{\"allowed\":false,\"reason\":\"ai_account_cap\",\"usedBefore\":10,\"cap\":10}]"
+    },
+    {
+      "name": "F2. Penghitung tidak pernah melampaui plafon",
+      "status": "PASS",
+      "details": "{\"day\":\"2026-08-27\",\"neurons\":10,\"requests\":2,\"touched_at\":1787799600000}"
+    },
+    {
+      "name": "F3. Yang ditolak memberi alasan plafon (bukan galat generik)",
+      "status": "PASS",
+      "details": "[\"\",\"ai_account_cap\"]"
+    },
+    {
+      "name": "G1. Tanpa binding D1: DITOLAK (ai_budget_store_missing)",
+      "status": "PASS",
+      "details": "{\"allowed\":false,\"reason\":\"ai_budget_store_missing\",\"usedBefore\":0,\"cap\":10000}"
+    },
+    {
+      "name": "G2. D1 melempar: DITOLAK (ai_budget_unreadable), bukan diizinkan",
+      "status": "PASS",
+      "details": "{\"allowed\":false,\"reason\":\"ai_budget_unreadable\",\"usedBefore\":0,\"cap\":10000}"
+    },
+    {
+      "name": "G3. D1 mati di jalur permintaan: 503 dan NOL panggilan model",
+      "status": "PASS",
+      "details": "503 reason=ai_budget_unreadable ai=false"
+    },
+    {
+      "name": "G4. Penolakan D1-mati tidak menagih jatah murid",
+      "status": "PASS",
+      "details": "{\"c\":false,\"ch\":false}"
+    },
+    {
+      "name": "H1. Panggilan model yang GAGAL melepas reservasinya kembali",
+      "status": "PASS",
+      "details": "releaseSql=true row={\"day\":\"2026-09-04\",\"neurons\":0,\"requests\":0,\"touched_at\":1788557481730}"
+    },
+    {
+      "name": "H2. Amplopnya melaporkan pelepasan itu, dan murid tetap dilayani 200",
+      "status": "PASS",
+      "details": "200 true"
+    },
+    {
+      "name": "H3. TIMEOUT tidak melepas neuron (model sudah bekerja, biayanya nyata)",
+      "status": "PASS",
+      "details": "released=false row={\"day\":\"2026-09-04\",\"neurons\":60,\"requests\":1,\"touched_at\":1788557481734}"
+    },
+    {
+      "name": "H4. Keputusan boleh-dilepas tinggal di SATU tempat (releasableFailure)",
+      "status": "PASS",
+      "details": "klasifikasi tunggal"
+    },
+    {
+      "name": "I1. Gerbang terdaftar di .github/workflows/quality.yml",
+      "status": "PASS",
+      "details": "terdaftar"
+    }
+  ]
+}

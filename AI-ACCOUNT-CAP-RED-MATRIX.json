@@ -1,0 +1,193 @@
+{
+  "schema": "fiezel-account-cap-red-matrix-v1",
+  "pass": true,
+  "baselineGreen": true,
+  "restoredGreen": true,
+  "counts": {
+    "mutations": 15,
+    "red": 15,
+    "holes": 0
+  },
+  "rows": [
+    {
+      "mutation": "M1 aiDeps kehilangan accountBudget",
+      "why": "perakit lupa menyuntikkan dep ke jalur AI (bentuk asli celah S1)",
+      "target": "workers/api/route-wiring.js",
+      "gate": "MERAH",
+      "exit": 1,
+      "failedChecks": [
+        "C5[POST /api/ai/task] perilaku model cocok dengan deklarasi fixture",
+        "C6[POST /api/ai/task] reservasi neuron akun terjadi SEBELUM panggilan model",
+        "C7[POST /api/ai/task] penghitung ai_account_day benar-benar bergerak",
+        "H1. Panggilan model yang GAGAL melepas reservasinya kembali",
+        "H2. Amplopnya melaporkan pelepasan itu, dan murid tetap dilayani 200",
+        "H3. TIMEOUT tidak melepas neuron (model sudah bekerja, biayanya nyata)"
+      ]
+    },
+    {
+      "mutation": "M2 ttsDeps kehilangan accountBudget",
+      "why": "cacat ASLI P3: dep disuntik ke AI, lupa ke TTS - dan TTS memakai binding yang sama",
+      "target": "workers/api/route-wiring.js",
+      "gate": "MERAH",
+      "exit": 1,
+      "failedChecks": [
+        "C5[POST /api/tts/render] perilaku model cocok dengan deklarasi fixture",
+        "C6[POST /api/tts/render] reservasi neuron akun terjadi SEBELUM panggilan model",
+        "C7[POST /api/tts/render] penghitung ai_account_day benar-benar bergerak"
+      ]
+    },
+    {
+      "mutation": "M3 dep dibuat opsional kembali",
+      "why": "kembali ke bentuk S1: pemanggil yang lupa dilayani tanpa galat",
+      "target": "workers/api/ai/route-ai.js",
+      "gate": "MERAH",
+      "exit": 1,
+      "failedChecks": [
+        "D1. /api/ai/task TANPA deps.accountBudget = 503, BUKAN dilayani"
+      ]
+    },
+    {
+      "mutation": "M4 route-tts memanggil binding langsung",
+      "why": "chokepoint dilangkahi: satu baris `env.AI.run` di rute baru mengembalikan lubangnya",
+      "target": "workers/api/tts/route-tts.js",
+      "gate": "MERAH",
+      "exit": 1,
+      "failedChecks": [
+        "A1. Binding Workers AI dieja HANYA di ai/model-call-gate.js (dipindai dari sumber)",
+        "A2. route-ai.js dan tts/route-tts.js TIDAK lagi menyentuh binding sendiri"
+      ]
+    },
+    {
+      "mutation": "M5 chokepoint menerima tanda terima apa pun",
+      "why": "assertReservation dilemahkan jadi no-op",
+      "target": "workers/api/ai/model-call-gate.js",
+      "gate": "MERAH",
+      "exit": 1,
+      "failedChecks": [
+        "B1. runReservedModel MENOLAK setiap tanda terima tidak sah",
+        "B2. Penolakan terjadi SEBELUM binding disentuh (nol panggilan model)",
+        "B3. Tanda terima yang sah DILEWATKAN ke binding"
+      ]
+    },
+    {
+      "mutation": "M6 reservasi TIDAK memesan apa pun (hanya menerbitkan tanda terima)",
+      "why": "tersambung tapi tidak mengikat: tanda terima ada, D1 tidak pernah dinaikkan",
+      "target": "workers/api/route-wiring.js",
+      "gate": "MERAH",
+      "exit": 1,
+      "failedChecks": [
+        "C6[POST /api/ai/task] reservasi neuron akun terjadi SEBELUM panggilan model",
+        "C7[POST /api/ai/task] penghitung ai_account_day benar-benar bergerak",
+        "C6[POST /api/tts/render] reservasi neuron akun terjadi SEBELUM panggilan model",
+        "C7[POST /api/tts/render] penghitung ai_account_day benar-benar bergerak",
+        "G3. D1 mati di jalur permintaan: 503 dan NOL panggilan model",
+        "G4. Penolakan D1-mati tidak menagih jatah murid",
+        "H1. Panggilan model yang GAGAL melepas reservasinya kembali",
+        "H3. TIMEOUT tidak melepas neuron (model sudah bekerja, biayanya nyata)"
+      ]
+    },
+    {
+      "mutation": "M7 plafon dibandingkan SESUDAH dibaca (WHERE kehilangan syarat plafon)",
+      "why": "reservasi berhenti atomik: dua permintaan bersamaan bisa dua-duanya lolos",
+      "target": "workers/api/ai/ai-account-budget.js",
+      "gate": "MERAH",
+      "exit": 1,
+      "failedChecks": [
+        "C6[POST /api/ai/task] reservasi neuron akun terjadi SEBELUM panggilan model",
+        "C6[POST /api/tts/render] reservasi neuron akun terjadi SEBELUM panggilan model",
+        "E6. Plafon ditegakkan DI DALAM WHERE (atomik), bukan dibandingkan setelah dibaca",
+        "F1. Dua reservasi bersamaan di ambang: TEPAT SATU lolos",
+        "F2. Penghitung tidak pernah melampaui plafon",
+        "F3. Yang ditolak memberi alasan plafon (bukan galat generik)"
+      ]
+    },
+    {
+      "mutation": "M8 D1 hilang = fail-OPEN",
+      "why": "tanpa binding D1 permintaan diizinkan, biaya berjalan tanpa penghitung",
+      "target": "workers/api/ai/ai-account-budget.js",
+      "gate": "MERAH",
+      "exit": 1,
+      "failedChecks": [
+        "G1. Tanpa binding D1: DITOLAK (ai_budget_store_missing)"
+      ]
+    },
+    {
+      "mutation": "M9 D1 galat = fail-OPEN",
+      "why": "D1 batuk lalu plafon membuka sendiri - keadaan paling mahal dan paling senyap",
+      "target": "workers/api/ai/ai-account-budget.js",
+      "gate": "MERAH",
+      "exit": 1,
+      "failedChecks": [
+        "G2. D1 melempar: DITOLAK (ai_budget_unreadable), bukan diizinkan",
+        "G3. D1 mati di jalur permintaan: 503 dan NOL panggilan model",
+        "G4. Penolakan D1-mati tidak menagih jatah murid"
+      ]
+    },
+    {
+      "mutation": "M10 reservasi tidak dilepas saat panggilan model gagal",
+      "why": "plafon 8.000 habis oleh permintaan nol biaya, AI mati tanpa satu neuron terpakai",
+      "target": "workers/api/ai/route-ai.js",
+      "gate": "MERAH",
+      "exit": 1,
+      "failedChecks": [
+        "H1. Panggilan model yang GAGAL melepas reservasinya kembali",
+        "H2. Amplopnya melaporkan pelepasan itu, dan murid tetap dilayani 200"
+      ]
+    },
+    {
+      "mutation": "M11 timeout ikut dilepas",
+      "why": "model sudah bekerja, neuronnya sudah terbelanja: melepasnya = penghitung yang bohong",
+      "target": "workers/api/ai/route-ai.js",
+      "gate": "MERAH",
+      "exit": 1,
+      "failedChecks": [
+        "H3. TIMEOUT tidak melepas neuron (model sudah bekerja, biayanya nyata)"
+      ]
+    },
+    {
+      "mutation": "M12 penolakan salah pasang memakai kalimat \"jatah penuh\"",
+      "why": "pesan tidak jujur: menuduh jatah murid habis padahal server yang salah dipasang",
+      "target": "workers/api/ai/route-ai.js",
+      "gate": "MERAH",
+      "exit": 1,
+      "failedChecks": [
+        "D4. Murid tetap mendapat teks materi, dan pesannya JUJUR (bukan \"jatah penuh\")"
+      ]
+    },
+    {
+      "mutation": "M13 penolakan plafon menagih kuota murid",
+      "why": "murid dihukum untuk urusan dompet owner",
+      "target": "workers/api/ai/route-ai.js",
+      "gate": "MERAH",
+      "exit": 1,
+      "failedChecks": [
+        "D2. Penolakan itu tidak menagih jatah murid (quotaChecked:false, quotaCharged:false)",
+        "G4. Penolakan D1-mati tidak menagih jatah murid"
+      ]
+    },
+    {
+      "mutation": "M14 plafon dijadikan tak terbatas",
+      "why": "angka plafonnya berhenti nyata",
+      "target": "workers/api/ai/ai-account-budget.js",
+      "gate": "MERAH",
+      "exit": 1,
+      "failedChecks": [
+        "E1. GLOBAL_NEURON_CAP dipakai apa adanya saat <= jatah gratis akun",
+        "E2. Nilai di atas jatah gratis DIPOTONG ke ACCOUNT_DAILY_NEURON_BUDGET",
+        "F1. Dua reservasi bersamaan di ambang: TEPAT SATU lolos",
+        "F2. Penghitung tidak pernah melampaui plafon",
+        "F3. Yang ditolak memberi alasan plafon (bukan galat generik)"
+      ]
+    },
+    {
+      "mutation": "M15 rute model BARU lahir tanpa fixture",
+      "why": "inti paket: penemuan harus PROGRAMATIK, jadi rute baru yang bisa memanggil model tidak boleh lolos hanya karena gerbang ini belum menyebut namanya",
+      "target": "workers/api/ai/route-shadow.js",
+      "gate": "MERAH",
+      "exit": 1,
+      "failedChecks": [
+        "C4. Setiap rute dari modul model-capable punya fixture di gerbang ini"
+      ]
+    }
+  ]
+}

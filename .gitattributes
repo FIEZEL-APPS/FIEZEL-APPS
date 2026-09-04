@@ -1,0 +1,27 @@
+# SEMUA berkas teks di-checkout dengan LF, di platform mana pun.
+#
+# (Aturan checkout, bukan rilis: berkas ini tidak menyentuh SW_REV, FIEZEL_PAGE_BUILD, maupun
+# DIAG_BUILD, jadi ia sengaja TIDAK menaikkan nomor build.)
+#
+# Ini bukan selera gaya. Sejumlah gerbang di repo ini adalah kontrak BYTE, bukan kontrak isi:
+# e5-checksum-gate mencocokkan sha256 tiap ekspor maskot dengan assets/brand/mascot-checksums.json,
+# dan lapis "kembar byte"-nya menuntut salinan website identik byte demi byte dengan sumbernya.
+# Blob di Git sudah LF - terbukti: `git cat-file -p HEAD:assets/brand/fiezel-paw.svg | sha256sum`
+# mengembalikan persis nilai yang diminta manifest. Yang menyimpang hanyalah SALINAN KERJA di
+# Windows, karena core.autocrlf menulis ulang LF menjadi CRLF saat checkout.
+#
+# Akibatnya sebelum aturan ini ada: gerbang byte MUSTAHIL hijau di Windows walau kodenya identik
+# dengan yang hijau di CI Linux - 11 berkas maskot merah karena akhiran baris, bukan karena ada
+# yang rusak. Dan arah sebaliknya lebih berbahaya: kontributor Windows yang menyunting salah satu
+# ekspor bisa meng-commit bita CRLF, lalu kontrak byte itu pecah untuk SEMUA ORANG, termasuk CI.
+#
+# Aturan ini ditaruh PALING ATAS supaya pengecualian di bawahnya tetap menang.
+* text=auto eol=lf
+
+# Vendored neural runtimes are byte-exact, source-locked artifacts. Checksums are
+# asserted in CI, so no platform may rewrite their line endings on checkout.
+vendor/** -text
+*.wasm binary
+*.data binary
+*.onnx binary
+*.bin binary

@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=390, initial-scale=1">
+<title>FIEZEL — Peta Belajar & Lab (redesign D)</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="d.css">
+<style>
+  .content{gap:7px;padding:8px 16px 10px}
+  .map-rows{gap:6px}
+  .h1{font-size:24px}
+  .head-row{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+  .level-pill{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 14px;border-radius:var(--radius-pill);background:var(--text);color:var(--bg);font-size:13px;font-weight:700}
+  .level-pill span{font-weight:500;color:rgba(253,250,243,.72)}
+  .card{padding:11px 14px}
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <!-- topbar -->
+  <header class="topbar">
+    <span class="wordmark" aria-label="FIEZEL">F<span class="wm-i" aria-hidden="true"><i></i><i></i></span>EZEL</span>
+    <div class="top-actions">
+      <button class="ask-btn">
+        <svg class="ic s16" viewBox="0 0 24 24"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3Z"/></svg>
+        Tanya FIEZEL
+      </button>
+      <button class="icon-btn" aria-label="Pengaturan">
+        <svg class="ic" viewBox="0 0 24 24"><line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="content">
+
+    <!-- header -->
+    <div class="head-row">
+      <div>
+        <p class="eyebrow">Peta Belajar &amp; Lab</p>
+        <h1 class="h1" style="margin-top:3px">Peta belajarmu</h1>
+      </div>
+      <button class="level-pill">A2 <span>· Ganti</span></button>
+    </div>
+
+    <!-- filter chips + affordance overflow (perbaikan audit 3b) -->
+    <div class="chips-wrap">
+      <div class="chips" role="tablist" aria-label="Filter peta">
+        <button class="chip is-on" role="tab" aria-selected="true">Ringkasan</button>
+        <button class="chip" role="tab">Analisis</button>
+        <button class="chip" role="tab">Adaptive Engine</button>
+        <button class="chip" role="tab">Kebiasaan</button>
+      </div>
+      <div class="chips-fade" aria-hidden="true">
+        <svg class="ic s16" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+      </div>
+    </div>
+
+    <!-- PERSONAL LEARNING MAP -->
+    <section class="card" aria-label="Personal learning map">
+      <div class="map-head">
+        <p class="eyebrow">Personal Learning Map</p>
+        <p class="sub num" style="font-size:12px"><b style="color:var(--text)">68%</b> akurasi · Jalur A2</p>
+      </div>
+      <div class="map-rows">
+        <div class="map-row">
+          <span class="mi"><svg class="ic s16" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="m9 16 3-8 3 8"/><path d="M10 13.5h4"/></svg></span>
+          <span class="mn">Kosakata</span>
+          <span class="bar"><i style="width:72%"></i></span>
+          <span class="mv">72%</span>
+        </div>
+        <div class="map-row">
+          <span class="mi"><svg class="ic s16" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+          <span class="mn">Grammar</span>
+          <span class="bar"><i style="width:58%"></i></span>
+          <span class="mv">58%</span>
+        </div>
+        <div class="map-row">
+          <span class="mi"><svg class="ic s16" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span>
+          <span class="mn">Reading</span>
+          <span class="bar"><i style="width:41%"></i></span>
+          <span class="mv">41%</span>
+        </div>
+        <div class="map-row">
+          <span class="mi"><svg class="ic s16" viewBox="0 0 24 24"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-9a9 9 0 0 1 18 0v9a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></svg></span>
+          <span class="mn">Listening</span>
+          <span class="bar"><i style="width:35%"></i></span>
+          <span class="mv">35%</span>
+        </div>
+        <div class="map-row">
+          <span class="mi"><svg class="ic s16" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg></span>
+          <span class="mn">Speaking</span>
+          <span class="bar"><i style="width:22%"></i></span>
+          <span class="mv">22%</span>
+        </div>
+        <div class="map-row">
+          <span class="mi"><svg class="ic s16" viewBox="0 0 24 24"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg></span>
+          <span class="mn">Writing</span>
+          <span class="bar"><i style="width:18%"></i></span>
+          <span class="mv">18%</span>
+        </div>
+      </div>
+      <!-- maskot inline slot: tidak menutupi konten (perbaikan audit 3c) -->
+      <div class="map-note">
+        <img class="paw" src="assets/mascot/paw-mascot-head.svg" alt="" width="24" height="24">
+        <span>Ini peta kemampuanmu — bukan rapor. Bukti terkuat: <b style="color:var(--text)">Kosakata</b>.</span>
+      </div>
+    </section>
+
+    <!-- BRIGHT MIND: rekomendasi adaptif -->
+    <section class="core-panel on-core" aria-label="Rekomendasi sesi berikutnya">
+      <svg class="neural" viewBox="0 0 358 170" aria-hidden="true" preserveAspectRatio="xMidYMid slice">
+        <path d="M-10 128 C 70 96 118 148 190 112 S 320 60 372 84" stroke="#FFC700" stroke-width="1" fill="none" opacity=".16"/>
+        <path d="M-10 44 C 60 74 150 18 224 44 S 330 96 372 66" stroke="#FFC700" stroke-width="1" fill="none" opacity=".10"/>
+        <circle cx="224" cy="44" r="2.5" fill="#FFC700" opacity=".45"/>
+        <circle cx="190" cy="112" r="2.5" fill="#FFC700" opacity=".35"/>
+        <circle cx="318" cy="74" r="2" fill="#FFC700" opacity=".3"/>
+      </svg>
+      <div class="ci">
+        <p class="core-eyebrow">
+          <svg class="ic s16" viewBox="0 0 24 24"><path d="M12 18V5"/><path d="M15 13a4.17 4.17 0 0 1-3-4 4.17 4.17 0 0 1-3 4"/><path d="M17.598 6.5A3 3 0 1 0 12 5a3 3 0 1 0-5.598 1.5"/><path d="M17.997 5.125a4 4 0 0 1 2.526 5.77"/><path d="M18 18a4 4 0 0 0 2-7.464"/><path d="M19.967 17.483A4 4 0 1 1 12 18a4 4 0 1 1-7.967-.517"/><path d="M6 18a4 4 0 0 1-2-7.464"/><path d="M6.003 5.125a4 4 0 0 0-2.526 5.77"/></svg>
+          Next Session · dipilih PAW
+        </p>
+        <h2 class="core-title">Grammar · Past Simple</h2>
+        <p class="core-sub">Pola salah yang sama muncul <b>3×</b> kemarin — 10 menit fokus diprediksi menaikkan akurasi <b>+9%</b>.</p>
+        <div class="core-actions">
+          <button class="core-cta">Mulai sesi 10 mnt
+            <svg class="ic s16" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </button>
+          <button class="core-ghost">Ubah fokus</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- streak kalender -->
+    <section class="card" aria-label="Runtun belajar">
+      <div class="streak-head">
+        <p class="h2" style="font-size:16px">Runtun belajar</p>
+        <span class="flame-chip">
+          <svg class="ic s16" viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+          6 hari
+        </span>
+      </div>
+      <div class="week">
+        <div class="day done"><span>Sen</span><span class="dot"><svg class="ic" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span></div>
+        <div class="day done"><span>Sel</span><span class="dot"><svg class="ic" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span></div>
+        <div class="day done"><span>Rab</span><span class="dot"><svg class="ic" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span></div>
+        <div class="day done"><span>Kam</span><span class="dot"><svg class="ic" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span></div>
+        <div class="day done"><span>Jum</span><span class="dot"><svg class="ic" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span></div>
+        <div class="day today"><span>Sab</span><span class="dot num">6</span></div>
+        <div class="day next"><span>Min</span><span class="dot">·</span></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- bottom nav -->
+  <nav class="bottom-nav" aria-label="Navigasi utama">
+    <button class="nav-item"><svg viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>Home</button>
+    <button class="nav-item"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="m9 16 3-8 3 8"/><path d="M10 13.5h4"/></svg>Vocab</button>
+    <button class="nav-item"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Grammar</button>
+    <button class="nav-item"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>Reading</button>
+    <button class="nav-item is-on" aria-current="page"><svg viewBox="0 0 24 24"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/></svg>Peta</button>
+  </nav>
+
+</div>
+</body>
+</html>

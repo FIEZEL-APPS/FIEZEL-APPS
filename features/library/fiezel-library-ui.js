@@ -1,0 +1,914 @@
+/**
+ * m025-44 Library screen: shelf, reader, audiobook, instant translation, Ask Fiezel.
+ *
+ * The reader renders one <button> per sentence rather than a block of text. That single
+ * decision is what makes the rest work:
+ *
+ *   - tapping a sentence is a normal button press, so the translation appears instantly
+ *     and no text-selection UI is involved (selection is disabled app-wide anyway);
+ *   - the audiobook can highlight exactly what it is reading, because the narrator and
+ *     the DOM share one sentence index;
+ *   - "Tanya Fiezel" always has a precise subject: the sentence the learner tapped.
+ *
+ * Narration is the neural English voice already shipped with the app. There is no audio
+ * file to license, ship or cache, and it keeps working offline once the voice bundle is
+ * downloaded - which is now mandatory at install.
+ */
+(function (root) {
+  'use strict';
+
+  // i18n (W2-REGEN, pola AI-02 F01): naskah murid modul ini pindah ke
+  // features/i18n/copy-id-feat-a.js; di Node copy-map di-require agar nilai 'id'
+  // tetap SATU sumber byte-identik dengan naskah beku gerbang emas.
+  var I18N = (typeof FiezelI18n !== 'undefined') ? FiezelI18n
+    : ((typeof module === 'object' && module.exports) ? require('../i18n/copy-id-feat-a.js') : null);
+  function t(key, params) { return I18N ? I18N.t(key, params) : String(key); }
+  if (!root || !root.document || root.__fiezelLibraryUiInstalled) return;
+  root.__fiezelLibraryUiInstalled = true;
+
+  var doc = root.document;
+  var PROGRESS_KEY = 'fiezel-library-progress-v1';
+  // m025-84: pembaca buku persis layar yang disebut owner - "dari menu terus menuju ke fitur
+  // audiobook, ketika ingin kembali dan swipe back, itu tidak berfungsi". Ia bukan view
+  // tersendiri di app.js (state.view tetap 'library'), jadi tanpa entri riwayatnya sendiri ia
+  // tidak akan pernah terlihat oleh gestur kembali. Nama lapisan ini yang dipegang riwayat.
+  var READER_LAYER = 'library-reader';
+  var pack = null;
+  var packPromise = null;
+  var session = null;
+  var narrating = false;
+  var narrationToken = 0;
+  /* =========================== V6 audiobook: TEKS UTUH ==============================
+     Sampai V6 narasi mengirim SATU KALIMAT per say() lalu menunggu bunyinya habis. Itu
+     yang mematikan seluruh mesin gapless di bawahnya: chunks.length === 1 membuat `joined`
+     false, penjadwalan berkelanjutan dan pemangkasan senyap tidak menyala
+     (reports/voice-v3-chunk.md §1-§3, reports/voice-v2-player.md §1), dan setiap titik
+     membayar satu batas generasi penuh (~4,5 detik, reports/voice-v1-audit.md §1).
+
+     Sekarang narasi mengirim BLOK: kalimat-kalimat berurutan di dalam SATU bab, digabung
+     sampai anggaran karakter, satu say() untuk seluruh blok. Pemecahan sesungguhnya
+     dikerjakan lapisan bawah lewat planUtterance (180-260 char per potongan), yang memang
+     kontrak V3.
+
+     900 char: kira-kira 4-5 potongan anggaran. Cukup panjang untuk membuat pipelining
+     bermakna, cukup pendek supaya jeda dan pindah kalimat manual tetap terasa responsif.
+
+     TAPI blok besar TIDAK boleh dipakai untuk blok PERTAMA, dan ini bukan tebakan - ia
+     terukur di reports/voice-v6-data/caller-measurements.json: mengirim teks 248 char
+     sebagai potongan pertama membuat suara pertama datang 12.395 ms setelah murid menekan
+     putar, sementara satu kalimat 60 char datang 3.407 ms. Tidak ada satu pun jeda
+     antar-kalimat yang layak dibayar dengan 12 detik dead air di awal.
+
+     Karena itu anggarannya TUMBUH, dan angka pertumbuhannya diturunkan dari pengukuran,
+     bukan dari selera. Mesin berjalan pada RTF ~0,865 dan ~15,4 char/detik
+     (reports/voice-v6-data/): menghangatkan potongan pertama blok berikutnya memakan
+     ~0,056 detik/char, sedangkan blok yang sedang berbunyi memberi ~0,065 detik/char
+     penutup. Jadi blok N menutupi generasi potongan pembuka blok N+1 selama
+
+         panjang(potongan pembuka N+1) <= 1,15 x panjang(blok N)
+
+     Tangga tetap yang terlalu berani membuktikan pentingnya batas itu: dengan 80 -> 200
+     char, batas pertama diukur 7.351 ms - karena blok 60 char hanya memberi 3,2 detik
+     penutup untuk generasi 9,7 detik. Tangga di bawah karena itu proporsional terhadap blok
+     SEBELUMNYA, dan langsung melompat ke ukuran penuh begitu blok terakhir >= 224 char,
+     yaitu titik di mana potongan mana pun (dibatasi 260 char oleh planUtterance) sudah
+     tertutup.
+
+     Konsekuensi yang harus dikatakan terang: untuk beberapa kalimat pertama sebuah buku,
+     narasi V6 berperilaku seperti V5 - satu blok satu kalimat, jeda ~1,1 detik - dan baru
+     menyatu mendekati 0,22 detik ketika bloknya sudah tumbuh. Itu memang harga yang dipilih:
+     suara pertama 3,4 detik lebih penting daripada batas kalimat kedua.
+
+     KOREKSI V7 ATAS PARAGRAF DI ATAS: kalimat "baru menyatu ketika bloknya sudah tumbuh"
+     TIDAK TERBUKTI pada buku nyata. Bloknya tidak pernah tumbuh; lihat alasannya di komentar
+     nextBlockBudget() di bawah. Rumus 1,15 x panjang(blok N) tetap benar sebagai batas fisika
+     tutupan - yang keliru adalah cara V6 memakainya bersama lantai 80 char.
+
+     SOROTAN TETAP PER KALIMAT. Ia tidak dibuang - ia digerakkan penanda batas dari
+     planUtterance, lihat scheduleBlockHighlight(). */
+  var BLOCK_MAX_CHARS = 900;
+  var LEAD_BLOCK_CHARS = 80;
+
+  /* V7: ANGGARAN BLOK DARI DUA LAJU TERUKUR, BUKAN DARI SATU PENGALI TETAP.
+
+     Yang salah pada tangga V6 (Math.max(80, prev * 1,15)) bukan pengalinya, tapi LANTAI 80
+     char-nya. Anggaran dihitung dari panjang blok yang BENAR-BENAR TERCAPAI, dan panjang itu
+     selalu <= anggaran karena blok hanya boleh pecah di batas kalimat. Akibatnya tangga V6
+     punya titik tetap di sekitar 80 char: pada buku nyata (features/library/library-books-v1.json,
+     "The Three Little Pigs") ia menghasilkan 47, 71, 57, 64, 67, 52, 35, 78, 75, 80, 60, 65...
+     dan TIDAK PERNAH mencapai 224 apalagi 900. Narasi Library berperilaku seperti V5
+     sepanjang buku, bukan hanya di beberapa kalimat pertama seperti yang ditulis di atas.
+
+     Lebih buruk: lantai 80 itulah yang membuat dua batas termahal. Sesudah blok 47 char,
+     tutupan jujurnya 54 char, tapi lantai memaksa 80 -> jeda penjadwalan terukur 1.437,5 ms.
+     Sesudah blok 35 char, tutupan jujurnya 40 char, lantai memaksa 80 -> 2.453,2 ms. Batas
+     yang tutupannya terpenuhi hanya membayar 3-25 ms. Jadi jedanya bukan sifat mesin, tapi
+     akibat anggaran yang berjanji lebih besar daripada yang bisa ditutupi audio blok
+     sebelumnya.
+
+     Aturan V7 memakai dua laju yang diukur di reports/voice-v6-data/block-measurements.json:
+       GEN   = 36.494 ms generasi / 626 char = 0,0583 s per char
+       SPEAK = 41,86 s PCM       / 626 char = 0,0669 s per char (sudah termasuk senyap tepi)
+     Blok berikutnya boleh sepanjang apa pun yang generasinya masih selesai selama audio blok
+     sekarang diputar:  anggaran = (prev * SPEAK + KELONGGARAN) / GEN.
+
+     BOUNDARY_SLACK_S = 0,80 s adalah kelonggaran yang DISENGAJA, dan harganya diukur bukan
+     dikarang: menambah satu batas blok pada bacaan yang sama memasukkan ~530 ms senyap
+     penjadwalan (rata-rata jeda penjadwalan di rezim tertutup, reports/voice-v7-data/) DITAMBAH
+     senyap kepala+ekor PCM satu render lagi (~250-535 ms per sisi, lihat headSilenceMs/
+     tailSilenceMs di block-measurements.json). Jadi membayar sampai 0,80 s generasi yang tak
+     tertutup demi MENGHILANGKAN satu batas masih untung; di atas itu tidak lagi.
+
+     TIDAK ADA LANTAI MINIMUM. Lantai adalah justru sumber cacat V6, dan lantai versi lebih
+     rendah pun tetap cacat: dengan lantai 70 char, sesudah blok 31 char anggaran menjanjikan
+     generasi 1.774 ms di luar tutupan - lubang yang sama kelasnya, cuma lebih kecil. Satu
+     kelonggaran yang diberi alasan lebih jujur daripada lantai yang kelihatan aman.
+
+     Ketiga varian ini benar-benar diukur di harness yang sama (18 kalimat, 2-5 ulangan,
+     reports/voice-v7-data/block-measurements-v7.json dan -v7b.json):
+       aturan V6 terkirim   10 blok  jeda penjadwalan 614,4 ms  porsi sunyi 13,64%
+       lantai 70 + 0,30 s   10 blok  jeda penjadwalan 526,8 ms  porsi sunyi 11,92%
+       tanpa lantai, 0,80 s  9 blok  jeda penjadwalan 533,2 ms  porsi sunyi 10,66%  <- terkirim
+     Yang dipilih BUKAN yang rata-rata jedanya paling kecil, karena rata-rata jeda bisa
+     diperbaiki cuma dengan menambah batas: v7_pure_cover (tanpa lantai, 0,30 s) mencapai
+     rata-rata 497,4 ms dengan 18 blok, tapi porsi sunyi yang DIDENGAR murid justru melonjak
+     ke 20,3%. Yang dipilih adalah yang total senyapnya paling kecil.
+
+     RAMP_SETTLED_CHARS = 226 = 260/1,15: panjang blok terkecil yang tutupannya sudah melebihi
+     potongan terpanjang yang mungkin (CHUNK_CHARS.max di fiezel-prosody.js), jadi di atas itu
+     anggaran boleh langsung penuh. */
+  var GEN_S_PER_CHAR = 0.0583;
+  var SPEAK_S_PER_CHAR = 0.0669;
+  var BOUNDARY_SLACK_S = 0.80;
+  var RAMP_SETTLED_CHARS = 226;
+  function nextBlockBudget(previousChars) {
+    var prev = Math.max(0, Number(previousChars) || 0);
+    var coverSeconds = prev * SPEAK_S_PER_CHAR + BOUNDARY_SLACK_S;
+    var budget = Math.round(coverSeconds / GEN_S_PER_CHAR);
+    if (budget >= RAMP_SETTLED_CHARS) return BLOCK_MAX_CHARS;
+    return Math.min(BLOCK_MAX_CHARS, budget);
+  }
+  /** Tutupan yang benar-benar tersedia di satu batas, dalam ms. Dipakai uji, bukan produksi. */
+  function blockCoverMs(previousChars) {
+    return Math.max(0, Number(previousChars) || 0) * SPEAK_S_PER_CHAR * 1000;
+  }
+  /* Laju bicara terukur, bukan angka karangan: 384 karakter teks uji menghasilkan 24,90 s
+     audio bersih pada speed 1 (reports/voice-v5-data/, dipakai juga di
+     reports/voice-v1-audit.md) = 15,4 char/detik. Ia dipakai HANYA untuk menjadwalkan
+     sorotan, tidak pernah untuk menjadwalkan suara. */
+  var NARRATION_CHARS_PER_SECOND = 15.4;
+  /* Jeda prosodi milik pemutar (PROSODY_GAP di fiezel-web-audio-player.js /
+     fiezel-prosody.js). Disalin sebagai detik supaya sorotan ikut memperhitungkan seam yang
+     memang disengaja, bukan menganggap bicara berjalan tanpa henti. */
+  var BOUNDARY_GAP_S = { none: 0, comma: 0.09, clause: 0.09, sentence: 0.22, paragraph: 0.45 };
+  var highlightTimers = [];
+
+  function mount() { return doc.getElementById('app'); }
+  function esc(value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function readProgress() {
+    try { return JSON.parse(root.localStorage.getItem(PROGRESS_KEY) || 'null'); } catch (_) { return null; }
+  }
+  function saveProgress() {
+    if (!session) return;
+    try { root.localStorage.setItem(PROGRESS_KEY, JSON.stringify(session.exportProgress())); } catch (_) {}
+  }
+
+  async function ensurePack() {
+    if (pack) return pack;
+    if (packPromise) return packPromise;
+    packPromise = (async function () {
+      var response = await root.fetch('./features/library/library-books-v1.json', { credentials: 'same-origin' });
+      if (!response || !response.ok) throw new Error('library_pack_unavailable');
+      var loaded = await response.json();
+      if (!root.FiezelLibrary) throw new Error('library_runtime_missing');
+      var loadedSession = root.FiezelLibrary.createSession(loaded, readProgress());
+      pack = loaded;
+      session = loadedSession;
+      return pack;
+    })();
+    try { return await packPromise; }
+    finally { packPromise = null; }
+  }
+
+  // ---- narration ----------------------------------------------------------------
+
+  function narrationOptions() {
+    return { speed: currentRate() };
+  }
+
+  // ---- kecepatan narasi ----------------------------------------------------------
+  //
+  // m028 fase4: kecepatan bicara sudah punya satu sumber kebenaran di app.js
+  // (state.preferences.neuralRate, dibaca selectedNeuralRate, ditulis
+  // setNeuralRatePreference). Yang belum ada adalah pintunya DI SINI - murid yang sedang
+  // mendengarkan buku harus keluar ke Pengaturan hanya untuk memperlambat satu kalimat,
+  // dan pada saat ia kembali narasinya sudah lewat.
+  //
+  // Tombol ini TIDAK menyimpan angkanya sendiri. Ia membaca dan menulis preferensi yang
+  // sama seperti slider Settings, jadi keduanya tidak bisa berselisih; peristiwa
+  // 'fiezel-neural-rate' yang disiarkan setNeuralRatePreference membuat labelnya ikut
+  // berubah walau yang digeser adalah slider di Settings.
+  //
+  // narrationOptions() dibaca ulang tiap kalimat, jadi perubahan terasa di kalimat
+  // berikutnya tanpa memutus narasi yang sedang berjalan.
+  var SPEED_STEPS = [0.75, 1, 1.25];
+
+  function currentRate() {
+    try {
+      if (typeof root.selectedNeuralRate === 'function') return Number(root.selectedNeuralRate()) || 1;
+    } catch (_) {}
+    return 1;
+  }
+
+  function speedLabel(rate) {
+    var text = Number(rate) === 1 ? '1x' : String(Number(rate)) + 'x';
+    return text;
+  }
+
+  function nextSpeed(rate) {
+    var current = Number(rate) || 1;
+    // Preset terdekat dulu, supaya nilai dari slider (misal 1.05) tetap masuk siklus
+    // di tempat yang masuk akal, bukan melompat ke awal.
+    var nearest = 0;
+    for (var i = 1; i < SPEED_STEPS.length; i++) {
+      if (Math.abs(SPEED_STEPS[i] - current) < Math.abs(SPEED_STEPS[nearest] - current)) nearest = i;
+    }
+    if (Math.abs(SPEED_STEPS[nearest] - current) > 0.001) return SPEED_STEPS[nearest];
+    return SPEED_STEPS[(nearest + 1) % SPEED_STEPS.length];
+  }
+
+  function renderSpeedButton() {
+    var button = doc.getElementById('librarySpeed');
+    if (!button) return;
+    var rate = currentRate();
+    button.textContent = speedLabel(rate);
+    button.setAttribute('aria-label', 'Kecepatan suara ' + speedLabel(rate) + t('pustaka.tap-for-mengganti'));
+    button.dataset.rate = String(rate);
+  }
+
+  function cycleSpeed() {
+    var wanted = nextSpeed(currentRate());
+    if (typeof root.setNeuralRatePreference === 'function') {
+      try { root.setNeuralRatePreference(wanted); } catch (_) {}
+    }
+    renderSpeedButton();
+    setStatus('Kecepatan suara ' + speedLabel(currentRate()) + t('pustaka.berlaku-from-kalimat-upcoming'));
+  }
+
+  // Slider Settings memakai fungsi tulis yang sama, jadi satu pendengar cukup untuk
+  // menjaga label dok tetap sejajar tanpa polling.
+  try { doc.addEventListener('fiezel-neural-rate', renderSpeedButton); } catch (_) {}
+
+  /**
+   * m025-100: narasi buku ikut pintu bicara bersama.
+   *
+   * Sebelumnya jalur ini memanggil FiezelVoiceRuntime langsung, dan itu terlewat saat
+   * m025-95 mengalihkan Library - yang dialihkan hanya tombol tanya, karena narasi
+   * memakai fungsi yang berbeda. Akibatnya menekan "Dengar" masih menuntut unduhan
+   * model, tepat seperti yang OWNER laporkan.
+   *
+   * Buku di library-books-v1.json sudah berpasangan {en, id} per kalimat, jadi subtitle
+   * Indonesianya diambil langsung dari sana. Ini penting bukan sekadar rapi: satu buku
+   * berisi ratusan kalimat, dan menerjemahkannya satu per satu akan menghabiskan jatah
+   * 40 permintaan AI per jam sebelum bab pertama selesai.
+   */
+  function speak(sentence) {
+    var say = root.FiezelVoiceSay;
+    if (!say || typeof say.say !== 'function') return Promise.reject(new Error('voice_door_missing'));
+    if (typeof sentence === 'string') return say.say(sentence, narrationOptions());
+    return say.say({ en: sentence && sentence.en, id: sentence && sentence.id }, narrationOptions());
+  }
+
+  /**
+   * V6: satu blok narasi = kalimat berurutan DI DALAM SATU BAB sampai anggaran karakter.
+   *
+   * Batas bab tidak pernah dilewati: judul bab adalah pindah konteks, dan menggabungkannya
+   * ke dalam satu ucapan akan membuat bab berikutnya berbunyi sebelum kepalanya terlihat.
+   * Terjemahan Indonesia ikut digabung dari pasangan {en,id} yang SUDAH ada di
+   * library-books-v1.json - jadi pita subtitle tetap tidak perlu memanggil penerjemah dan
+   * jatah permintaan AI tetap utuh.
+   */
+  function blockAt(startIndex, budget) {
+    if (!session) return null;
+    var list = session.sentences();
+    var first = list[Math.max(0, Number(startIndex) || 0)];
+    if (!first) return null;
+    var cap = Math.min(BLOCK_MAX_CHARS, Number(budget) || BLOCK_MAX_CHARS);
+    var picked = [first];
+    var chars = String(first.en || '').length;
+    for (var i = first.index + 1; i < list.length; i++) {
+      var s = list[i];
+      if (!s || s.chapterIndex !== first.chapterIndex) break;
+      var len = String(s.en || '').length;
+      if (chars + 1 + len > cap) break;
+      picked.push(s);
+      chars += 1 + len;
+    }
+    return {
+      sentences: picked,
+      from: picked[0].index,
+      to: picked[picked.length - 1].index,
+      text: picked.map(function (s) { return String(s.en || '').trim(); }).join(' '),
+      translation: picked.map(function (s) { return String(s.id || '').trim(); }).filter(Boolean).join(' ')
+    };
+  }
+
+  /** Rencana potongan bertanda batas untuk TEKS UTUH satu blok. Murni; tidak memutar apa pun. */
+  function planBlock(text) {
+    var prosody = root.FiezelProsody;
+    if (!prosody || typeof prosody.planUtterance !== 'function') return null;
+    try { return prosody.planUtterance(text); } catch (_) { return null; }
+  }
+
+  function clearHighlightTimers() {
+    while (highlightTimers.length) {
+      try { root.clearTimeout(highlightTimers.pop()); } catch (_) {}
+    }
+  }
+
+  /**
+   * V6: sorotan per kalimat TANPA satu panggilan suara per kalimat.
+   *
+   * Kalimat pertama disorot langsung; sisanya dijadwalkan dari posisi karakternya di dalam
+   * teks blok dibagi laju bicara terukur, DITAMBAH jeda prosodi setiap seam potongan yang
+   * sudah dilewati - dan seam itu adalah penanda batas dari planUtterance (chunk.boundary).
+   *
+   * BATAS KEJUJURAN, ditulis di sini supaya tidak ada yang menjualnya lebih tinggi: ini
+   * ESTIMASI, bukan pengukuran. Pintu suara bersama tidak memberi pemanggil kait kemajuan
+   * per potongan, jadi sorotan bisa bergeser bila laju model berbeda dari 15,4 char/detik.
+   * Yang tidak boleh terjadi - dan tidak terjadi - adalah sorotan berjalan sesudah murid
+   * menekan jeda: setiap timer memeriksa token narasi lebih dulu dan stopNarration()
+   * membatalkan semuanya.
+   */
+  function scheduleBlockHighlight(block, plan, token) {
+    clearHighlightTimers();
+    if (!block || !block.sentences || !block.sentences.length) return 0;
+    highlight(block.from, true);
+    var rate = Number(currentRate()) || 1;
+    var cps = NARRATION_CHARS_PER_SECOND * rate;
+    var seams = [];
+    if (plan && plan.chunks) {
+      var at = 0;
+      plan.chunks.forEach(function (chunk) {
+        at += Number(chunk.chars || String(chunk.text || '').length);
+        seams.push({ at: at, boundary: chunk.boundary });
+      });
+    }
+    var offset = String(block.sentences[0].en || '').trim().length + 1;
+    var scheduled = 0;
+    for (var i = 1; i < block.sentences.length; i++) {
+      var gap = 0;
+      for (var s = 0; s < seams.length; s++) if (seams[s].at <= offset) gap += BOUNDARY_GAP_S[seams[s].boundary] || 0;
+      var delay = Math.max(0, (offset / cps + gap) * 1000);
+      highlightTimers.push(root.setTimeout((function (index) {
+        return function () {
+          if (!narrating || token !== narrationToken) return;
+          highlight(index, true);
+        };
+      }(block.sentences[i].index)), delay));
+      scheduled++;
+      offset += String(block.sentences[i].en || '').trim().length + 1;
+    }
+    return scheduled;
+  }
+
+  /* ---- PAGAR URUTAN (V7) ---------------------------------------------------------
+
+     Aturan anggaran V7 membuat blok lebih panjang dan prefetch lebih sering benar-benar
+     terpakai, jadi risiko yang harus dijaga bukan lagi jedanya tapi URUTANNYA. Inversi
+     antrean pernah terjadi di repo ini (m025-47): blok N+1 memesan mesin satu giliran lebih
+     dulu daripada N, dan murid mendengar kalimat dengan urutan salah. Itu jauh lebih buruk
+     daripada jeda.
+
+     Pagarnya satu pintu: TIDAK ADA teks yang boleh sampai ke say() selain lewat
+     dispatchBlock(). Pintu itu menolak tiga hal, dan setiap penolakan dihitung supaya uji
+     bisa melihatnya:
+       1. narasi sudah dihentikan atau tokennya kedaluwarsa (murid menekan jeda / pindah
+          halaman) -> 'stopped';
+       2. blok yang tidak persis menyambung dari yang terakhir dikirim -> 'order';
+       3. blok yang awalnya sudah pernah dikirim -> 'replay'.
+     dispatchedThrough menyimpan indeks kalimat terakhir yang SUDAH dikirim ke suara, bukan
+     yang sudah didengar; ia satu-satunya sumber kebenaran urutan. */
+  var dispatchedThrough = -1;
+  var dispatchRejects = { stopped: 0, order: 0, replay: 0, prefetchLate: 0 };
+
+  function resetDispatchCursor(startIndex) {
+    var at = Number(startIndex);
+    dispatchedThrough = startIndex == null || !isFinite(at) ? -1 : at - 1;
+  }
+
+  function dispatchBlock(block, token) {
+    if (!narrating || token !== narrationToken) { dispatchRejects.stopped++; return null; }
+    if (!block || !block.text) { dispatchRejects.order++; return null; }
+    if (block.from <= dispatchedThrough) { dispatchRejects.replay++; return null; }
+    if (block.from !== dispatchedThrough + 1) { dispatchRejects.order++; return null; }
+    dispatchedThrough = block.to;
+    return speak({ en: block.text, id: block.translation });
+  }
+
+  /**
+   * m025-47: prefetch is intentionally deferred by one task. The public runtime has
+   * readiness/audibility wrappers around the core service; issuing N+1 in the same JS
+   * turn as speak(N) allowed N+1 to reserve the single-flight engine before N reached it.
+   * That is the exact queue inversion behind the 10-15 second sentence gap.
+   */
+  function warmNext(token, index, budget) {
+    setTimeout(function () {
+      if (!narrating || token !== narrationToken || !session) return;
+      // Prefetch tidak boleh berbunyi belakangan: kalau blok yang akan dihangatkan sudah
+      // berada DI BELAKANG kursor kirim, ia bukan blok berikutnya lagi - menghangatkannya
+      // hanya mengisi satu-satunya slot hangat mesin dengan teks yang salah.
+      if (index != null && Number(index) <= dispatchedThrough) { dispatchRejects.prefetchLate++; return; }
+      var say = root.FiezelVoiceSay;
+      if (!say || typeof say.prefetch !== 'function') return;
+      // V6: yang dihangatkan adalah BLOK berikutnya, bukan kalimat berikutnya. Bentuknya
+      // harus sama persis dengan yang nanti dikirim ke say(), kalau tidak kunci dedup/cache
+      // di pintu suara tidak akan cocok dan pekerjaannya terbuang.
+      var upcoming = blockAt(index == null ? session.snapshot().sentenceIndex + 1 : index, budget);
+      if (!upcoming || !upcoming.text) return;
+      try { say.prefetch(upcoming.text, narrationOptions()); } catch (_) {}
+    }, 0);
+  }
+
+  function stopNarration() {
+    narrationToken++;
+    narrating = false;
+    resetDispatchCursor(null);
+    clearHighlightTimers();
+    if (session) session.pause();
+    try { root.FiezelVoiceSay && root.FiezelVoiceSay.stop && root.FiezelVoiceSay.stop(); } catch (_) {}
+    updatePlayButton();
+  }
+
+  /**
+   * V6: membacakan BLOK per blok, bukan kalimat per kalimat.
+   *
+   * Yang berubah cuma satu hal, tapi hal itu menentukan semuanya: `speak()` menerima teks
+   * utuh satu blok, jadi planUtterance di bawahnya punya bahan untuk memotong di batas
+   * alami, pemutar menyambung potongan tanpa senyap, dan hanya batas antar-BLOK yang
+   * membayar generasi - dan batas itu pun sudah dihangatkan lebih dulu oleh warmNext().
+   *
+   * Yang TIDAK berubah: setiap langkah tetap memeriksa tokennya, jadi menekan jeda atau
+   * meninggalkan layar menghentikan buku, bukan membiarkan blok yang sudah diantre berbunyi
+   * belakangan. Sorotan per kalimat juga tidak berubah dari sisi murid.
+   */
+  async function narrate() {
+    var token = ++narrationToken;
+    narrating = true;
+    resetDispatchCursor(session.snapshot().sentenceIndex);
+    session.play();
+    updatePlayButton();
+    // Anggaran dihitung dari blok SEBELUMNYA, bukan dari posisi di buku: yang mahal adalah
+    // blok PERTAMA sesudah murid menekan putar, dan itu terjadi juga ketika ia melompat ke
+    // tengah buku lalu memutar lagi.
+    var budget = LEAD_BLOCK_CHARS;
+    while (narrating && token === narrationToken) {
+      var snap = session.snapshot();
+      var block = blockAt(snap.sentenceIndex, budget);
+      if (!block || !block.text) break;
+      var plan = planBlock(block.text);
+      scheduleBlockHighlight(block, plan, token);
+      var speaking = dispatchBlock(block, token);
+      if (!speaking) { clearHighlightTimers(); return; }
+      // Anggaran yang dioper ke warmNext HARUS anggaran yang nanti benar-benar dipakai,
+      // kalau tidak teks yang dihangatkan berbeda dari teks yang dikirim dan kunci dedup
+      // di pintu suara tidak cocok.
+      var upcomingBudget = nextBlockBudget(block.text.length);
+      warmNext(token, block.to + 1, upcomingBudget);
+      budget = upcomingBudget;
+      try {
+        await speaking;
+      } catch (error) {
+        clearHighlightTimers();
+        narrating = false;
+        session.pause();
+        setStatus(t('pustaka.suara-tidak-bisa-dimuat'));
+        updatePlayButton();
+        return;
+      }
+      clearHighlightTimers();
+      if (!narrating || token !== narrationToken) return;
+      // Blok selesai berarti kalimat terakhirnya sudah dibacakan: sorotan dan kursor
+      // dipindahkan ke sana sebelum menghitung blok berikutnya, supaya progres yang
+      // disimpan tidak pernah lebih maju daripada yang benar-benar terdengar.
+      var total = session.sentences().length;
+      if (block.to >= total - 1) {
+        session.goTo(total - 1);
+        saveProgress();
+        highlight(total - 1, true);
+        narrating = false;
+        setStatus(t('pustaka.finish-buku-this-done'));
+        updatePlayButton();
+        return;
+      }
+      session.goTo(block.to + 1);
+      saveProgress();
+      renderProgress();
+    }
+  }
+
+  // ---- rendering ------------------------------------------------------------------
+
+  function shelfMarkup() {
+    var cards = session.books().map(function (b) {
+      var progress = session.progressFor(b.id);
+      var accent = esc((b.cover && b.cover.accent) || '#8C2233');
+      var metaStr = t('library.book-meta', esc(b.level) + ' · ' + esc(b.minutes) + ' menit · ' + esc(b.sentences) + ' kalimat', {level: esc(b.level), minutes: esc(b.minutes), sentences: esc(b.sentences)});
+      return '<button type="button" class="library-card" data-book="' + esc(b.id) + '" style="--book-accent:' + accent + '">' +
+        '<span class="library-cover">' + esc((b.cover && b.cover.emoji) || '📖') + '</span>' +
+        '<span class="library-meta"><b>' + esc(b.title) + '</b>' +
+        '<small>' + metaStr + '</small>' +
+        '<em>' + esc(b.about.id) + '</em>' +
+        (b.original ? '' : '<span class="library-badge">' + t('library.fiezel-summary-badge', 'Ringkasan FIEZEL') + '</span>') +
+        (progress.percent ? '<span class="library-progress"><span style="width:' + progress.percent + '%"></span></span>' : '') +
+        '</span></button>';
+    }).join('');
+    return '<section class="fade library-page"><div class="section-head"><div>' +
+      '<span class="section-kicker">FIEZEL LIBRARY</span><h1>' + t('library.title', 'Perpustakaan') + '</h1>' +
+      t('pustaka.dongeng-dan-novel-pendek') +
+      '</div></div><div class="library-grid">' + cards + '</div></section>';
+  }
+
+  function readerMarkup() {
+    var snap = session.snapshot();
+    var summary = session.books().filter(function (b) { return b.id === snap.bookId; })[0] || {};
+    var chapters = {};
+    var body = session.sentences().map(function (s) {
+      var head = '';
+      if (chapters[s.chapterIndex] !== true) {
+        chapters[s.chapterIndex] = true;
+        head = '<h2 class="library-chapter">' + esc(s.chapterTitle) + '</h2>';
+      }
+      return head + '<button type="button" class="library-sentence" data-sentence="' + s.index + '"' +
+        (s.index === snap.sentenceIndex ? ' data-active="1"' : '') + '>' + esc(s.en) + '</button>';
+    }).join('');
+    return '<section class="fade library-page library-reader">' +
+      '<div class="library-reader-head"><button type="button" class="library-back" data-shelf="1">← ' + t('library.back-to-shelf', 'Rak buku') + '</button>' +
+      '<div><span class="section-kicker">' + esc(summary.level || '') + ' · ' + esc(snap.chapterTitle || '') + '</span>' +
+      '<h1>' + esc(snap.title || '') + '</h1></div></div>' +
+      (summary.original ? '' : '<p class="library-note">' + esc(summary.source) + '</p>') +
+      '<div class="library-text" id="libraryText">' + body + '</div>' +
+      '<div class="library-dock">' +
+      '<div class="library-progress-line"><span id="libraryBar" style="width:' + snap.percent + '%"></span></div>' +
+      '<div class="library-dock-line">' +
+      '<button type="button" class="library-speed" id="librarySpeed" aria-label="' + t('library.speed-label', 'Kecepatan suara') + ' ' + esc(speedLabel(currentRate())) + t('pustaka.tap-for-mengganti-data') + esc(currentRate()) + '">' + esc(speedLabel(currentRate())) + '</button>' +
+      t('pustaka.tap-kalimat-for-arti') +
+      '</div>' +
+      '<div class="library-controls">' +
+      '<button type="button" id="libraryPrev" data-step="-1" aria-label="' + t('library.prev-sentence-aria', 'Kalimat sebelumnya') + '"><i data-lucide="chevron-left"></i></button>' +
+      '<button type="button" class="primary" id="libraryPlay"><i data-lucide="play"></i> Audiobook</button>' +
+      '<button type="button" id="libraryNext" data-step="1" aria-label="' + t('library.next-sentence-aria', 'Kalimat berikutnya') + '"><i data-lucide="chevron-right"></i></button>' +
+      '<button type="button" id="libraryAsk"><i data-lucide="message-circle-question"></i> ' + t('ask.judul') + '</button>' +
+      '</div></div></section>';
+  }
+
+  function renderShelf() {
+    stopNarration();
+    closeTranslation();
+    session.close();
+    var node = mount();
+    if (!node) return;
+    node.innerHTML = shelfMarkup();
+    node.querySelectorAll('[data-book]').forEach(function (button) {
+      button.addEventListener('click', function () { openBook(button.dataset.book); });
+    });
+    icons();
+  }
+
+  function renderReader() {
+    var node = mount();
+    if (!node) return;
+    node.innerHTML = readerMarkup();
+    node.querySelectorAll('[data-sentence]').forEach(function (button) {
+      button.addEventListener('click', function () { onSentence(Number(button.dataset.sentence)); });
+    });
+    node.querySelectorAll('[data-shelf]').forEach(function (button) {
+      button.addEventListener('click', backToShelf);
+    });
+    node.querySelectorAll('[data-step]').forEach(function (button) {
+      button.addEventListener('click', function () { step(Number(button.dataset.step)); });
+    });
+    var play = doc.getElementById('libraryPlay');
+    if (play) play.addEventListener('click', togglePlay);
+    var ask = doc.getElementById('libraryAsk');
+    if (ask) ask.addEventListener('click', openAsk);
+    var speed = doc.getElementById('librarySpeed');
+    if (speed) speed.addEventListener('click', cycleSpeed);
+    renderSpeedButton();
+    icons();
+  }
+
+  function icons() {
+    try { if (root.lucide && root.lucide.createIcons) root.lucide.createIcons(); } catch (_) {}
+  }
+
+  function setStatus(text) {
+    var node = doc.getElementById('libraryStatus');
+    if (node) node.textContent = text;
+  }
+
+  function renderProgress() {
+    var snap = session.snapshot();
+    var bar = doc.getElementById('libraryBar');
+    if (bar && bar.style) bar.style.width = snap.percent + '%';
+    highlight(snap.sentenceIndex, true);
+  }
+
+  // m025-47: only touch the old active line and the new one. The previous implementation
+  // scanned every sentence button on every narration tick and then started a smooth-scroll
+  // animation. Long books paid that DOM cost hundreds of times while the audio worker was
+  // also busy. A direct numeric selector makes the work O(1) and auto-scroll does not keep
+  // an animation alive between consecutive sentences.
+  function highlight(index, scroll) {
+    var wanted = Number(index);
+    var active = doc.querySelector('[data-sentence][data-active="1"]');
+    if (active && Number(active.dataset.sentence) !== wanted) active.removeAttribute('data-active');
+    var node = doc.querySelector('[data-sentence="' + wanted + '"]');
+    if (!node) return;
+    node.setAttribute('data-active', '1');
+    if (scroll && node.scrollIntoView) {
+      try { node.scrollIntoView({ block: 'center', behavior: 'auto' }); } catch (_) {}
+    }
+  }
+
+  function updatePlayButton() {
+    var button = doc.getElementById('libraryPlay');
+    if (!button) return;
+    button.innerHTML = narrating
+      ? '<i data-lucide="pause"></i> ' + t('library.pause-label', 'Jeda')
+      : '<i data-lucide="play"></i> Audiobook';
+    icons();
+  }
+
+  // ---- interaction ----------------------------------------------------------------
+
+  /**
+   * Dipanggil oleh riwayat saat tekanan kembali sampai di lapisan pembaca. Menutup saja -
+   * TIDAK menyentuh riwayat lagi, karena entrinya sudah diambil oleh jalur itu. False berarti
+   * pembacanya memang sudah tidak di layar, sehingga tekanan kembali tidak terbuang di sini.
+   */
+  function closeReaderLayer() {
+    if (!doc.querySelector('.library-reader')) return false;
+    renderShelf();
+    return true;
+  }
+
+  /** Tombol "← Rak buku": tutup seketika, lalu buang entri riwayatnya supaya tetap sejajar. */
+  function backToShelf() {
+    var nav = root.FiezelBackNav;
+    if (nav && typeof nav.dismiss === 'function') { try { nav.dismiss(READER_LAYER); } catch (_) {} }
+    renderShelf();
+  }
+
+  function openBook(bookId) {
+    try { session.open(bookId); } catch (_) { return; }
+    renderReader();
+    var nav = root.FiezelBackNav;
+    if (nav && typeof nav.pushLayer === 'function') {
+      try { nav.pushLayer({ id: READER_LAYER, close: closeReaderLayer }); } catch (_) {}
+    }
+    var progress = session.progressFor(bookId);
+    if (progress.percent) setStatus(t('pustaka.next-from-kalimat') + (session.snapshot().sentenceIndex + 1) + '.');
+    // m026-03: tur kontekstual pembaca, sekali saja per murid. Modul ini tidak tahu apa pun
+    // tentang bendera tur, state, atau save() - ia hanya memberi tahu host bahwa pembaca baru
+    // tergambar, dan host yang memutuskan. Gagalnya diam: tur adalah lapisan paling boleh
+    // gagal di aplikasi ini, dan buku harus tetap terbuka kalau ia tidak ada.
+    try { if (typeof root.notifyFeatureTour === 'function') root.notifyFeatureTour('library'); } catch (_) {}
+  }
+
+  /** Tap a sentence: translate instantly, and make it the narration position too. */
+  function onSentence(index) {
+    session.goTo(index);
+    var picked = session.select(index);
+    saveProgress();
+    highlight(index, false);
+    showTranslation(picked);
+    renderProgress();
+  }
+
+  function closeTranslation() {
+    var existing = doc.getElementById('libraryTranslation');
+    if (existing && existing.remove) existing.remove();
+  }
+
+  /**
+   * m025-45 OWNER: the translation must float in the middle of the screen, not sit in a
+   * strip next to the play button. It is a light overlay rather than a modal: the book
+   * stays visible behind it, and tapping anywhere outside dismisses it.
+   */
+  function showTranslation(picked) {
+    closeTranslation();
+    if (!picked) return;
+    var layer = doc.createElement('div');
+    layer.id = 'libraryTranslation';
+    layer.className = 'library-translation-layer';
+    layer.setAttribute('role', 'dialog');
+    layer.setAttribute('aria-label', t('pustaka.translate-kalimat'));
+    layer.innerHTML = '<div class="library-translation-card">' +
+      t('pustaka.translate') +
+      '<p class="library-translation-en">' + esc(picked.en) + '</p>' +
+      '<p class="library-translation-id">' + esc(picked.id) + '</p>' +
+      '<div class="library-translation-actions">' +
+      '<button type="button" id="librarySpeakOne"><i data-lucide="volume-2"></i> ' + t('quiz.tombol-dengar') + '</button>' +
+      '<button type="button" id="libraryAskOne"><i data-lucide="message-circle-question"></i> ' + t('ask.judul') + '</button>' +
+      '<button type="button" id="libraryCloseOne" aria-label="' + t('modal.tutup') + '"><i data-lucide="x"></i></button>' +
+      '</div></div>';
+    doc.body.appendChild(layer);
+    layer.addEventListener('click', function (event) {
+      if (event.target === layer) closeTranslation();
+    });
+    var listen = doc.getElementById('librarySpeakOne');
+    if (listen) listen.addEventListener('click', function () { stopNarration(); speak(picked).catch(function () {}); });
+    var ask = doc.getElementById('libraryAskOne');
+    if (ask) ask.addEventListener('click', openAsk);
+    var close = doc.getElementById('libraryCloseOne');
+    if (close) close.addEventListener('click', closeTranslation);
+    icons();
+  }
+
+  function step(direction) {
+    stopNarration();
+    if (direction > 0) session.next(); else session.previous();
+    saveProgress();
+    renderProgress();
+  }
+
+  function togglePlay() {
+    closeTranslation();
+    if (narrating) { stopNarration(); setStatus(t('library.status-paused', 'Dijeda.')); return; }
+    setStatus(t('library.status-reading', 'Membacakan…'));
+    narrate();
+  }
+
+  // ---- Ask Fiezel about this book -------------------------------------------------
+
+  function askContext() {
+    var snap = session.snapshot();
+    var picked = snap.selected || session.current();
+    return {
+      lesson: {
+        topic: snap.title || t('library.ask-default-topic', 'bacaan ini'),
+        level: 'A2',
+        board: { title: snap.title || '', formula: picked ? picked.en : '', examples: picked ? [picked.en] : [] }
+      },
+      beat: picked ? { en: picked.en, idText: picked.id } : null
+    };
+  }
+
+  function openAsk() {
+    stopNarration();
+    var picked = session.snapshot().selected || session.current();
+    var existing = doc.getElementById('libraryAskSheet');
+    if (existing && existing.remove) existing.remove();
+    var sheet = doc.createElement('div');
+    sheet.id = 'libraryAskSheet';
+    sheet.className = 'library-ask-sheet';
+    sheet.innerHTML = '<form class="library-ask-panel"><span class="library-ask-mark">' + t('tutor.ask-kicker') + '</span>' +
+      '<h2>' + t('ask.tanya-tentang-bacaan') + '</h2>' +
+      (picked ? '<p class="library-ask-quote">“' + esc(picked.en) + '”</p>' : '') +
+      '<textarea name="question" rows="3" maxlength="240" placeholder="' + t('ask.placeholder-contoh-kenapa') + '" required></textarea>' +
+      '<div class="library-ask-actions"><button type="button" data-cancel>' + t('modal.tutup') + '</button>' +
+      '<button type="submit" class="primary">' + t('ask.tombol-tanya') + '</button></div>' +
+      '<p class="library-ask-answer" id="libraryAskAnswer"></p></form>';
+    doc.body.appendChild(sheet);
+    sheet.querySelector('[data-cancel]').addEventListener('click', function () { sheet.remove(); });
+    sheet.querySelector('form').addEventListener('submit', function (event) {
+      event.preventDefault();
+      var field = sheet.querySelector('textarea');
+      var question = String((field && field.value) || '').trim();
+      if (!question) return;
+      answerQuestion(question);
+    });
+    var area = sheet.querySelector('textarea');
+    if (area && area.focus) area.focus();
+    icons();
+  }
+
+
+  /**
+   * m025-100: teks model ditulis dalam Markdown. Sampai rilis ini ia dipasang lewat
+   * textContent, jadi murid membaca "**tebal**" apa adanya - bug Bab 2 brief redesign, dan
+   * di sini justru pada permukaan AI yang paling sering dibaca.
+   *
+   * Beralih ke innerHTML membuka permukaan injeksi, jadi syaratnya keras: HANYA lewat
+   * renderMarkdown() milik app.js, yang meng-esc setiap baris SEBELUM mengubah penanda
+   * menjadi tag. Kalau penerjemah itu tidak ada - app.js gagal dimuat, atau modul ini
+   * dipakai di luar aplikasi - kita kembali ke textContent, bukan menulis teks mentah ke
+   * innerHTML. Lebih baik terlihat jelek daripada tidak aman.
+   */
+  function paintModelText(node, text) {
+    if (!node) return false;
+    var md = root && root.renderMarkdown;
+    if (typeof md === 'function') {
+      try { node.innerHTML = md(text); return true; } catch (_) {}
+    }
+    node.textContent = String(text || '');
+    return false;
+  }
+
+  function showAskAnswer(text) {
+    paintModelText(doc.getElementById('libraryAskAnswer'), text);
+  }
+
+  /**
+   * Same contract as the Classroom talk button: the Core AI model first, the local
+   * engine when it is unreachable, and the reply is spoken, never silently printed.
+   */
+  function answerQuestion(question) {
+    showAskAnswer(t('library.ask-thinking', 'Fiezel sedang menjawab…'));
+    var dialog = root.FiezelTutorDialog;
+    var context = askContext();
+    var ai = (typeof root.askFiezelAI === 'function' && dialog)
+      ? Promise.resolve().then(function () { return root.askFiezelAI(dialog.aiPrompt(question, context)); }).catch(function () { return null; })
+      : Promise.resolve(null);
+    ai.then(function (text) {
+      var answer = String(text || '').trim();
+      if (!answer && dialog) answer = dialog.respond(question, context, memory()).id;
+      if (!answer) answer = t('pustaka.fiezel-pending-can-menjawab');
+      showAskAnswer(answer);
+      return speakAnswer(answer);
+    }).catch(function () { showAskAnswer(t('pustaka.fiezel-pending-can-menjawab')); });
+  }
+
+  var askMemory = null;
+  function memory() {
+    if (!askMemory && root.FiezelTutorDialog) askMemory = root.FiezelTutorDialog.createMemory();
+    return askMemory || { lastVariant: {}, turns: 0 };
+  }
+
+  /**
+   * m025-95: jawaban Library dibacakan dalam INGGRIS dengan subtitle Indonesia.
+   * Teksnya tidak punya pasangan terjemahan, jadi penerjemah yang menyediakannya.
+   */
+  function speakAnswer(text) {
+    var say = root.FiezelVoiceSay;
+    if (!say || typeof say.say !== 'function') return Promise.resolve(false);
+    return say.say(String(text || ''));
+  }
+
+
+  // ---- entry point -----------------------------------------------------------------
+
+  async function library() {
+    var node = mount();
+    if (!node) return;
+    node.innerHTML = '<section class="fade library-page"><div class="card">' + t('library.loading', 'Memuat perpustakaan…') + '</div></section>';
+    try {
+      await ensurePack();
+      renderShelf();
+    } catch (error) {
+      node.innerHTML = t('pustaka.perpustakaan-pending-can-dimuat') +
+        '<p class="muted">' + esc((error && error.message) || error) + '</p></div></section>';
+    }
+  }
+
+  // Load the small authored book index while the launcher is idle. It remains a normal
+  // fetch backed by the service-worker cache; this only moves JSON parse/session setup
+  // away from the user's navigation tap. A single shared promise prevents duplicate work.
+  function schedulePackWarm() {
+    var run = function () { ensurePack().catch(function () {}); };
+    try {
+      if (typeof root.requestIdleCallback === 'function') {
+        root.requestIdleCallback(run, { timeout: 1800 });
+      } else {
+        setTimeout(run, 900);
+      }
+    } catch (_) { setTimeout(run, 900); }
+  }
+
+  root.library = library;
+  // Leaving the screen must silence the narrator; nothing is worse than a book that keeps
+  // reading over the next screen.
+  if (root.MutationObserver) {
+    var app = mount();
+    if (app) {
+      new root.MutationObserver(function () {
+        if (narrating && !doc.querySelector('.library-reader')) stopNarration();
+      }).observe(app, { childList: true, subtree: true });
+    }
+  }
+
+  root.FiezelLibraryUi = Object.freeze({
+    schema: 'fiezel-library-ui-v1',
+    open: library,
+    stop: stopNarration,
+    isNarrating: function () { return narrating; },
+    /* Dibuka untuk uji dan diagnostik saja: tidak ada jalur produksi yang membacanya.
+       orderViolations menjumlahkan penolakan yang benar-benar berarti urutan salah
+       (bukan penolakan karena murid menekan jeda). */
+    narrationDiagnostics: function () {
+      return {
+        dispatchedThrough: dispatchedThrough,
+        rejects: { stopped: dispatchRejects.stopped, order: dispatchRejects.order,
+          replay: dispatchRejects.replay, prefetchLate: dispatchRejects.prefetchLate },
+        orderViolations: dispatchRejects.order + dispatchRejects.replay
+      };
+    }
+  });
+  schedulePackWarm();
+}(typeof globalThis !== 'undefined' ? globalThis : this));

@@ -1,0 +1,1083 @@
+#!/usr/bin/env node
+'use strict';
+/**
+ * d1-schema-contract-test.js — gerbang KONTRAK SKEMA D1 (node murni, nol dependensi,
+ * nol jaringan).
+ *
+ * Yang dijaga gerbang ini:
+ *   1. Setiap tabel yang DIPAKAI KODE ada di berkas migrasi (dan yang tidak ada
+ *      di migrasi harus terdaftar sebagai DORMAN + terbukti tidak tersambung).
+ *   2. TIDAK ADA kolom penghubung antara tabel kuota/identitas dan tabel
+ *      analytics (pindai DDL kedua database, bukan hanya baca janji di dokumen).
+ *   3. Setiap indeks BARU (migrasi >= 0003) punya kueri nyata yang memakainya.
+ *   4. `tools/d1-schema-check.mjs` benar-benar MENDETEKSI tabel hilang, kolom
+ *      hilang, indeks hilang, dan pelanggaran privasi (diuji dengan fixture,
+ *      termasuk fixture yang sengaja rusak — gerbang yang hanya bisa hijau tidak
+ *      membuktikan apa pun).
+ *   5. Tidak ada `DELETE`/`DROP` tanpa `WHERE`/`LIMIT` di migrasi baru maupun di
+ *      blok SQL `docs/D1-RETENTION.md`.
+ *
+ * Parser DDL di berkas ini SENGAJA ditulis ulang, terpisah dari parser di
+ * `tools/d1-schema-check.mjs`. Kalau keduanya memakai kode yang sama, bug parser
+ * akan lolos di kedua sisi sekaligus.
+ */
+
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
+const { execFileSync } = require('child_process');
+
+const REPO = __dirname;
+const MIG_DIR = path.join(REPO, 'workers', 'api', 'migrations');
+const API_DIR = path.join(REPO, 'workers', 'api');
+const CHECKER = path.join(REPO, 'tools', 'd1-schema-check.mjs');
+
+const MIG_DOC = path.join(MIG_DIR, 'MIGRATIONS.md');
+
+/**
+ * Daftar berkas migrasi per database TIDAK BOLEH ditulis tangan di sini.
+ *
+ * Versi sebelumnya memakai literal `{ core: ['0001_identity.sql', '0001_quota.sql',
+ * '0004_indexes.sql'], stats: ['0002_analytics.sql'] }`. Ketika A3 mendaratkan
+ * `0003_cron.sql`, daftar itu tidak ikut berubah, jadi gerbang ini membangun
+ * "skema harapan" TANPA tabel `cron_run` dan lalu menuduh `cron-status.js`
+ * memakai tabel yang tidak punya migrasi — padahal migrasinya ada di direktori
+ * yang sama. Kegagalan seperti itu diam-diam ke arah sebaliknya juga: berkas
+ * migrasi baru yang lupa didaftarkan tidak akan pernah diperiksa sama sekali.
+ *
+ * Sekarang pemetaan DITURUNKAN dari perintah penerapan resmi di
+ * `migrations/MIGRATIONS.md` (`wrangler d1 execute <db> ... --file=migrations/X.sql`),
+ * dan pemeriksaan `semua_berkas_migrasi_terbaca` di bawah MEMERAH kalau ada satu
+ * saja berkas `.sql` di direktori yang tidak terpetakan. Efek sampingnya
+ * disengaja: menambah migrasi tanpa mendokumentasikan cara menerapkannya =
+ * gerbang MERAH.
+ */
+function filesByDbFromDoc() {
+  // [INFRA-0007-20260829] `learning` masuk peta bersama migrasi 0007_learning.sql
+  // (database ketiga `fiezel-learning`, binding LEARNING_DB). Tanpa entri ini,
+  // 0007 menjadi berkas "tidak terpetakan" dan `semua_berkas_migrasi_terbaca`
+  // merah — arah gagal yang benar; ini perluasan jujurnya.
+  // [INFRA-0008-20260901] `evidence` = database keempat (fiezel-evidence, 0008_evidence.sql).
+  const byDb = { core: [], stats: [], learning: [], evidence: [] };
+  const alias = { 'fiezel-core': 'core', 'fiezel-stats': 'stats', 'fiezel-learning': 'learning', 'fiezel-evidence': 'evidence' };
+  const text = fs.existsSync(MIG_DOC) ? fs.readFileSync(MIG_DOC, 'utf8') : '';
+  const re = /d1\s+execute\s+([A-Za-z0-9_-]+)[^\n]*?--file=migrations\/([A-Za-z0-9_.-]+\.sql)/gi;
+  let m;
+  while ((m = re.exec(text))) {
+    const db = alias[m[1].toLowerCase()];
+    if (!db) continue;
+    if (!byDb[db].includes(m[2])) byDb[db].push(m[2]);
+  }
+  byDb.core.sort();
+  byDb.stats.sort();
+  byDb.learning.sort();
+  byDb.evidence.sort();
+  return byDb;
+}
+
+const FILES_BY_DB = filesByDbFromDoc();
+const SQL_IN_DIR = fs.existsSync(MIG_DIR)
+  ? fs.readdirSync(MIG_DIR).filter((f) => f.endsWith('.sql')).sort()
+  : [];
+
+/** Tabel yang dirujuk kode tetapi SENGAJA tidak punya migrasi. Setiap entri wajib
+ *  dibuktikan dorman oleh pemeriksaan terpisah di bawah. */
+const DORMANT_TABLES = {
+  breaker_events: {
+    berkas: 'workers/api/breaker/breaker.js',
+    alasan:
+      'INSERT hanya berjalan bila createStore() menerima handle D1; tidak ada satu pun ' +
+      'pemanggil yang memberikannya, dan pemanggilannya dibungkus if(d1) + try/catch. ' +
+      'Membuat tabelnya berarti membayar baris tertulis untuk fitur yang belum hidup.'
+  }
+};
+
+/** Kolom yang tidak boleh muncul di DDL analytics. */
+const LINKING_COLUMNS = ['user_id', 'sub', 'install_id', 'account_id', 'legacy_ref_hmac', 'sid'];
+/** Kolom analytics yang tidak boleh muncul di DDL kuota/identitas. */
+const ANALYTICS_COLUMNS = ['token', 'pepper'];
+
+const checks = [];
+function check(name, ok, details) {
+  checks.push({ name, ok: Boolean(ok), details: details === undefined ? null : details });
+}
+
+/* ------------------------------------------------------------ utilitas kecil */
+
+/** Gabungkan literal string yang DISAMBUNG dengan `+` menjadi satu literal.
+ *  `'SELECT a FROM t ' + 'WHERE day >= ?1'` di kode adalah SATU kueri; kalau
+ *  pemindai membacanya sebagai dua potongan, klaim pemakaian indeks yang
+ *  menyebut kueri utuh tidak akan pernah cocok dengan kode nyata dan gerbang
+ *  akan menuduh indeks yang benar-benar dipakai sebagai indeks mati. */
+function joinConcatenatedLiterals(src) {
+  let out = String(src);
+  for (let i = 0; i < 12; i += 1) {
+    const next = out.replace(/(['"`])[ \t]*\+[ \t]*(?:\r?\n[ \t]*)?\1/g, '');
+    if (next === out) break;
+    out = next;
+  }
+  return out;
+}
+
+function stripComments(sql) {
+  return String(sql).replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/--[^\n]*/g, ' ');
+}
+function statements(sql) {
+  return stripComments(sql)
+    .split(';')
+    .map((s) => s.replace(/\s+/g, ' ').trim())
+    .filter(Boolean);
+}
+function splitTop(body) {
+  const out = [];
+  let depth = 0;
+  let cur = '';
+  for (const ch of body) {
+    if (ch === '(') depth += 1;
+    if (ch === ')') depth -= 1;
+    if (ch === ',' && depth === 0) { out.push(cur); cur = ''; continue; }
+    cur += ch;
+  }
+  if (cur.trim()) out.push(cur);
+  return out.map((s) => s.trim()).filter(Boolean);
+}
+function closingParen(text, open) {
+  let depth = 0;
+  for (let i = open; i < text.length; i += 1) {
+    if (text[i] === '(') depth += 1;
+    else if (text[i] === ')') { depth -= 1; if (depth === 0) return i; }
+  }
+  return -1;
+}
+function listFiles(dir, ext, acc) {
+  const out = acc || [];
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      if (entry.name === 'node_modules' || entry.name.startsWith('.')) continue;
+      listFiles(full, ext, out);
+    } else if (entry.name.endsWith(ext)) out.push(full);
+  }
+  return out;
+}
+function norm(s) { return String(s).replace(/\s+/g, ' ').trim(); }
+
+/* ------------------------------------------------------- skema dari migrasi */
+
+/** Statistik per berkas migrasi yang benar-benar DIBACA parser di berkas ini.
+ *  Dipakai pemeriksaan `semua_berkas_migrasi_terbaca` supaya berkas yang ada di
+ *  direktori tetapi tidak pernah terparsir (atau terparsir nol pernyataan)
+ *  tidak bisa lewat diam-diam. */
+const PARSED = new Map();
+
+/** Buang kutip identifier SQLite ("x", `x`, [x]) supaya pola `CREATE TABLE`
+ *  dengan gaya kutip apa pun tetap dikenali. Literal nilai memakai kutip
+ *  tunggal, jadi ia TIDAK tersentuh. */
+function unquoteIdents(stmt) {
+  return String(stmt).replace(/[`"[\]]/g, '');
+}
+
+function schemaFromMigrations(files) {
+  const tables = new Map();
+  const indexes = new Map();
+  for (const file of files) {
+    const full = path.join(MIG_DIR, file);
+    if (!fs.existsSync(full)) { PARSED.set(file, { ada: false, dikenali: 0, tak_dikenali: [] }); continue; }
+    const raw = fs.readFileSync(full, 'utf8');
+    const stat = { ada: true, dikenali: 0, tak_dikenali: [] };
+    PARSED.set(file, stat);
+    for (const stmtRaw of statements(raw)) {
+      const stmt = unquoteIdents(stmtRaw);
+      let m = /^CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?([A-Za-z_]\w*)\s*\(/i.exec(stmt);
+      if (m) {
+        const open = stmt.indexOf('(', m[0].length - 1);
+        const close = closingParen(stmt, open);
+        const cols = [];
+        for (const part of splitTop(stmt.slice(open + 1, close))) {
+          if (/^(primary\s+key|unique|check|foreign\s+key|constraint)\b/i.test(part)) continue;
+          const c = /^([A-Za-z_]\w*)/.exec(part);
+          if (c) cols.push(c[1].toLowerCase());
+        }
+        tables.set(m[1].toLowerCase(), { name: m[1].toLowerCase(), columns: cols, file, ddl: stmt });
+        stat.dikenali += 1;
+        continue;
+      }
+      m = /^CREATE\s+(UNIQUE\s+)?INDEX\s+(?:IF\s+NOT\s+EXISTS\s+)?([A-Za-z_]\w*)\s+ON\s+([A-Za-z_]\w*)\s*\(/i.exec(stmt);
+      if (m) {
+        const open = stmt.indexOf('(', m[0].length - 1);
+        const close = closingParen(stmt, open);
+        const tail = stmt.slice(close + 1);
+        const w = /\bWHERE\b(.*)$/i.exec(tail);
+        indexes.set(m[2].toLowerCase(), {
+          name: m[2].toLowerCase(),
+          table: m[3].toLowerCase(),
+          unique: Boolean(m[1]),
+          columns: splitTop(stmt.slice(open + 1, close)).map((c) =>
+            c.replace(/\s+(asc|desc)$/i, '').trim().toLowerCase()),
+          where: w ? norm(w[1]).toLowerCase() : null,
+          file
+        });
+        stat.dikenali += 1;
+        continue;
+      }
+      m = /^DROP\s+INDEX\s+(?:IF\s+EXISTS\s+)?([A-Za-z_]\w*)/i.exec(stmt);
+      if (m) { indexes.delete(m[1].toLowerCase()); stat.dikenali += 1; continue; }
+      m = /^DROP\s+TABLE\s+(?:IF\s+EXISTS\s+)?([A-Za-z_]\w*)/i.exec(stmt);
+      if (m) { tables.delete(m[1].toLowerCase()); stat.dikenali += 1; continue; }
+      stat.tak_dikenali.push(stmt.slice(0, 120));
+    }
+  }
+  return { tables, indexes };
+}
+
+/* ------------------------------------------- SQL yang benar-benar ada di kode */
+
+function sqlLiteralsFromCode() {
+  const out = [];
+  for (const file of listFiles(API_DIR, '.js')) {
+    const src = joinConcatenatedLiterals(fs.readFileSync(file, 'utf8'));
+    const re = /(`(?:[^`\\]|\\.)*`|'(?:[^'\\\n]|\\.)*'|"(?:[^"\\\n]|\\.)*")/g;
+    let m;
+    while ((m = re.exec(src))) {
+      const body = m[1].slice(1, -1);
+      if (/\b(SELECT|INSERT\s+INTO|INSERT\s+OR|UPDATE|DELETE\s+FROM|CREATE\s+TABLE|CREATE\s+INDEX)\b/i.test(body)) {
+        out.push({ file: path.relative(REPO, file), sql: norm(body) });
+      }
+    }
+  }
+  return out;
+}
+
+function tablesFromSql(sqlList) {
+  const found = new Map();
+  const re = /\b(?:FROM|INTO|UPDATE|JOIN)\s+([A-Za-z_]\w*)/gi;
+  for (const item of sqlList) {
+    let m;
+    while ((m = re.exec(item.sql))) {
+      const t = m[1].toLowerCase();
+      if (['select', 'values', 'set', 'sqlite_master'].includes(t)) continue;
+      if (!found.has(t)) found.set(t, item.file);
+    }
+  }
+  return found;
+}
+
+/* ------------------------------------------------------- pemeriksaan 1 & 1b */
+
+const coreSchema = schemaFromMigrations(FILES_BY_DB.core);
+const statsSchema = schemaFromMigrations(FILES_BY_DB.stats);
+// [INFRA-0007-20260829] skema harapan database ketiga (fiezel-learning).
+const learningSchema = schemaFromMigrations(FILES_BY_DB.learning);
+// [INFRA-0008-20260901] skema harapan database keempat (fiezel-evidence).
+const evidenceSchema = schemaFromMigrations(FILES_BY_DB.evidence);
+const allMigrationTables = new Set([
+  ...coreSchema.tables.keys(), ...statsSchema.tables.keys(), ...learningSchema.tables.keys(),
+  ...evidenceSchema.tables.keys()
+]);
+const codeSql = sqlLiteralsFromCode();
+const codeTables = tablesFromSql(codeSql);
+
+// Pemeriksaan yang HARUS ada sebelum semua pemeriksaan skema lain: kalau parser
+// tidak membaca seluruh migrasi, setiap kesimpulan di bawahnya dibangun dari
+// skema yang tidak lengkap (inilah cacat yang membuat `cron_run` "hilang").
+{
+  const mapped = [...FILES_BY_DB.core, ...FILES_BY_DB.stats, ...FILES_BY_DB.learning, ...FILES_BY_DB.evidence].sort();
+  const dupes = mapped.filter((f, i) => mapped.indexOf(f) !== i);
+  const tidak_terpetakan = SQL_IN_DIR.filter((f) => !mapped.includes(f));
+  const dipetakan_tapi_tidak_ada = mapped.filter((f) => !SQL_IN_DIR.includes(f));
+  const nol_pernyataan = [...PARSED.entries()]
+    .filter(([, s]) => s.ada && s.dikenali === 0)
+    .map(([f]) => f);
+  const tak_dikenali = [...PARSED.entries()]
+    .filter(([, s]) => s.tak_dikenali.length)
+    .map(([f, s]) => ({ berkas: f, pernyataan: s.tak_dikenali }));
+  const ok = SQL_IN_DIR.length > 0 &&
+    mapped.length === SQL_IN_DIR.length &&
+    dupes.length === 0 &&
+    tidak_terpetakan.length === 0 &&
+    dipetakan_tapi_tidak_ada.length === 0 &&
+    nol_pernyataan.length === 0 &&
+    tak_dikenali.length === 0;
+  check('semua_berkas_migrasi_terbaca', ok, {
+    berkas_sql_di_direktori: SQL_IN_DIR,
+    jumlah_di_direktori: SQL_IN_DIR.length,
+    berkas_terpetakan: mapped,
+    jumlah_terbaca: mapped.length,
+    peta_dari_MIGRATIONS_md: FILES_BY_DB,
+    tidak_terpetakan,
+    dipetakan_tapi_tidak_ada,
+    terpetakan_ganda: dupes,
+    berkas_nol_pernyataan_dikenali: nol_pernyataan,
+    pernyataan_tak_dikenali: tak_dikenali,
+    catatan: 'Peta berkas->database diturunkan dari perintah `wrangler d1 execute` di ' +
+      'workers/api/migrations/MIGRATIONS.md. Migrasi baru WAJIB muncul di sana, ' +
+      'kalau tidak gerbang ini MERAH dan bukan diam-diam mengabaikan berkasnya.'
+  });
+}
+
+check('kode_punya_sql_yang_terbaca', codeSql.length >= 20 && codeTables.size >= 8, {
+  literal_sql: codeSql.length,
+  tabel_dirujuk: [...codeTables.keys()].sort()
+});
+
+{
+  const missing = [];
+  for (const [t, file] of codeTables) {
+    if (allMigrationTables.has(t)) continue;
+    if (DORMANT_TABLES[t]) continue;
+    missing.push({ tabel: t, dirujuk_di: file });
+  }
+  check('setiap_tabel_yang_dipakai_kode_ada_di_migrasi', missing.length === 0, {
+    tabel_migrasi: [...allMigrationTables].sort(),
+    tanpa_migrasi: missing,
+    dorman_diizinkan: Object.keys(DORMANT_TABLES)
+  });
+}
+
+// Tabel dorman WAJIB tetap dorman: begitu ada pemanggil yang mengoper handle D1,
+// tabelnya harus dibuatkan migrasi dan gerbang ini harus MERAH.
+{
+  const problems = [];
+  for (const [table, meta] of Object.entries(DORMANT_TABLES)) {
+    if (allMigrationTables.has(table)) continue; // sudah dibuatkan migrasi: lolos
+    const src = fs.readFileSync(path.join(REPO, meta.berkas), 'utf8');
+    const exported = /function\s+createStore\s*\(/.test(src);
+    if (!exported) { problems.push({ tabel: table, sebab: 'createStore() tidak lagi ada di ' + meta.berkas }); continue; }
+    const wiredCalls = [];
+    for (const file of listFiles(API_DIR, '.js')) {
+      if (path.resolve(file) === path.resolve(REPO, meta.berkas)) continue;
+      const s = fs.readFileSync(file, 'utf8');
+      const re = /createStore\s*\(([^)]*)\)/g;
+      let m;
+      while ((m = re.exec(s))) {
+        if (/\bd1\b/.test(m[1])) wiredCalls.push({ berkas: path.relative(REPO, file), argumen: norm(m[1]).slice(0, 80) });
+      }
+    }
+    if (wiredCalls.length) problems.push({ tabel: table, sebab: 'createStore() sudah menerima handle D1 tanpa migrasi', pemanggil: wiredCalls });
+  }
+  check('tabel_dorman_terbukti_belum_tersambung', problems.length === 0, {
+    masalah: problems,
+    catatan: DORMANT_TABLES
+  });
+}
+
+// Tabel yang ada di migrasi tapi belum dipakai kode: bukan kegagalan, tapi wajib terlihat.
+check('inventaris_tabel_belum_dipakai_kode', true, {
+  belum_dipakai: [...allMigrationTables].filter((t) => !codeTables.has(t)).sort(),
+  catatan: 'session dan anon_issue sudah ada DDL-nya tetapi belum ada kode yang menulisnya; ' +
+    'retensi untuk keduanya tetap wajib ditulis karena DDL-nya sudah dijalankan di produksi.'
+});
+
+/* -------------------------------------------- pemeriksaan 2: kontrak privasi */
+
+{
+  const coreTableNames = new Set(coreSchema.tables.keys());
+  const statsTableNames = new Set(statsSchema.tables.keys());
+  const learningTableNames = new Set(learningSchema.tables.keys());
+  // [INFRA-0007-20260829] tumpang tindih kini diperiksa untuk KETIGA pasangan
+  // database — nama tabel bersama adalah pintu masuk paling murah untuk
+  // menyalin data lintas domain "karena skemanya toh sama".
+  const overlap = [
+    ...[...coreTableNames].filter((t) => statsTableNames.has(t)),
+    ...[...coreTableNames].filter((t) => learningTableNames.has(t)),
+    ...[...statsTableNames].filter((t) => learningTableNames.has(t))
+  ];
+  check('dua_database_tidak_punya_tabel_bersama', overlap.length === 0, {
+    core: [...coreTableNames].sort(), stats: [...statsTableNames].sort(),
+    learning: [...learningTableNames].sort(), tumpang_tindih: overlap
+  });
+
+  const leaksInStats = [];
+  for (const [name, t] of statsSchema.tables) {
+    for (const c of t.columns) if (LINKING_COLUMNS.includes(c)) leaksInStats.push({ tabel: name, kolom: c });
+  }
+  check('ddl_analytics_tanpa_kolom_penghubung', leaksInStats.length === 0, {
+    dipindai: [...statsSchema.tables.keys()].sort(), kolom_terlarang: LINKING_COLUMNS, temuan: leaksInStats
+  });
+
+  // [INFRA-0007-20260829] database learning memikul kontrak kolom yang sama
+  // dengan analytics: agregat + dedup UUID acak, nol kolom penghubung.
+  const leaksInLearning = [];
+  for (const [name, t] of learningSchema.tables) {
+    for (const c of t.columns) if (LINKING_COLUMNS.includes(c)) leaksInLearning.push({ tabel: name, kolom: c });
+  }
+  check('ddl_learning_tanpa_kolom_penghubung', leaksInLearning.length === 0, {
+    dipindai: [...learningSchema.tables.keys()].sort(), kolom_terlarang: LINKING_COLUMNS, temuan: leaksInLearning
+  });
+
+  const leaksInCore = [];
+  for (const [name, t] of coreSchema.tables) {
+    for (const c of t.columns) if (ANALYTICS_COLUMNS.includes(c)) leaksInCore.push({ tabel: name, kolom: c });
+  }
+  check('ddl_kuota_tanpa_kolom_analytics', leaksInCore.length === 0, {
+    dipindai: [...coreSchema.tables.keys()].sort(), kolom_terlarang: ANALYTICS_COLUMNS, temuan: leaksInCore
+  });
+
+  // Tidak boleh ada REFERENCES lintas domain, dan tidak boleh ada ATTACH sama sekali.
+  const crossRefs = [];
+  // [INFRA-0007-20260829] `foreign` = gabungan tabel DUA database lain, supaya
+  // REFERENCES lintas domain tertangkap di ketiga arah.
+  const SCHEMAS_BY_DB = { core: coreSchema, stats: statsSchema, learning: learningSchema, evidence: evidenceSchema };
+  for (const [db, schema] of Object.entries(SCHEMAS_BY_DB)) {
+    const foreign = new Set();
+    for (const [otherDb, otherSchema] of Object.entries(SCHEMAS_BY_DB)) {
+      if (otherDb === db) continue;
+      for (const t of otherSchema.tables.keys()) foreign.add(t);
+    }
+    for (const [name, t] of schema.tables) {
+      const refs = t.ddl.match(/REFERENCES\s+([A-Za-z_]\w*)/gi) || [];
+      for (const r of refs) {
+        const target = norm(r).split(/\s+/)[1].toLowerCase();
+        if (foreign.has(target)) crossRefs.push({ database: db, tabel: name, referensi: target });
+      }
+    }
+  }
+  const attachHits = [];
+  for (const file of [...listFiles(MIG_DIR, '.sql'), ...listFiles(API_DIR, '.js')]) {
+    const s = fs.readFileSync(file, 'utf8');
+    if (/\bATTACH\s+DATABASE\b/i.test(stripComments(s))) attachHits.push(path.relative(REPO, file));
+  }
+  check('tidak_ada_foreign_key_atau_attach_lintas_database', crossRefs.length === 0 && attachHits.length === 0, {
+    referensi_lintas: crossRefs, attach: attachHits
+  });
+}
+
+/* ------------------------- pemeriksaan 3: indeks baru harus dipakai kueri */
+
+const NEW_MIGRATIONS = listFiles(MIG_DIR, '.sql')
+  .map((f) => path.basename(f))
+  .filter((f) => /^(\d{4})_/.test(f) && Number(f.slice(0, 4)) >= 3)
+  .sort();
+
+check('ada_migrasi_baru_untuk_diperiksa', NEW_MIGRATIONS.length >= 1, { migrasi_baru: NEW_MIGRATIONS });
+
+{
+  const retentionDoc = path.join(REPO, 'docs', 'D1-RETENTION.md');
+  const docSql = fs.existsSync(retentionDoc) ? norm(fs.readFileSync(retentionDoc, 'utf8')) : '';
+  const haystack = codeSql.map((c) => c.sql.toLowerCase());
+  const unused = [];
+  const evidence = [];
+
+  for (const file of NEW_MIGRATIONS) {
+    const raw = fs.readFileSync(path.join(MIG_DIR, file), 'utf8');
+    const lines = raw.split('\n');
+    for (let i = 0; i < lines.length; i += 1) {
+      const m = /^\s*CREATE\s+(UNIQUE\s+)?INDEX\s+(?:IF\s+NOT\s+EXISTS\s+)?([A-Za-z_]\w*)\s+ON\s+([A-Za-z_]\w*)\s*\(([^)]*)\)/i.exec(lines[i]);
+      if (!m) continue;
+      const name = m[2].toLowerCase();
+      const table = m[3].toLowerCase();
+      const cols = m[4].split(',').map((c) => c.replace(/\s+(asc|desc)$/i, '').trim().toLowerCase());
+
+      // Klaim pemakaian: blok komentar 'DIPAKAI ...' persis di atas CREATE INDEX.
+      const claims = [];
+      for (let j = i - 1; j >= 0; j -= 1) {
+        const line = lines[j];
+        if (!/^\s*--/.test(line)) break;
+        claims.unshift(line.replace(/^\s*--\s?/, ''));
+        if (/DIPAKAI/i.test(line) && j > 0 && !/^\s*--/.test(lines[j - 1])) break;
+      }
+      const claimText = claims.join(' ');
+      const quoted = (claimText.match(/'[^']+'/g) || []).map((q) => norm(q.slice(1, -1)).toLowerCase());
+
+      // Bukti nyata: kueri yang disebut harus benar-benar ada di kode ATAU di
+      // dokumen retensi, harus menyentuh tabel indeks ini, dan harus menyaring/
+      // mengurutkan dengan kolom pertama indeks.
+      //
+      // Komentar TIDAK PERNAH menjadi bukti dengan sendirinya. Yang dinilai:
+      //   (a) string kueri yang dikutip klaim harus BENAR-BENAR ada sebagai SQL
+      //       di kode Worker (atau di blok SQL dokumen retensi);
+      //   (b) kueri itu harus menyentuh TABEL indeks ini lewat FROM/INTO/UPDATE/
+      //       JOIN — bukan cuma menyebut namanya di teks bebas;
+      //   (c) kolom PERTAMA indeks harus muncul di bagian PENYARING kueri
+      //       (setelah WHERE/ORDER BY/GROUP BY) — bukan cuma di daftar SELECT,
+      //       karena kolom yang hanya dibaca tidak membuat indeks terpakai.
+      const proofs = [];
+      const rejected = [];
+      for (const q of quoted) {
+        const inCode = haystack.some((h) => h.includes(q));
+        const inDoc = docSql.toLowerCase().includes(q);
+        const touchesTable = new RegExp('\\b(?:from|into|update|join)\\s+' + table + '\\b', 'i').test(q);
+        const filterPart = (/\b(where|order\s+by|group\s+by)\b([\s\S]*)$/i.exec(q) || [])[0] || '';
+        const usesLeading = Boolean(filterPart) && new RegExp('\\b' + cols[0] + '\\b', 'i').test(filterPart);
+        if ((inCode || inDoc) && touchesTable && usesLeading) {
+          proofs.push({ kueri: q, sumber: inCode ? 'kode' : 'docs/D1-RETENTION.md' });
+        } else {
+          rejected.push({
+            kueri: q,
+            ada_di_kode: inCode,
+            ada_di_dokumen_retensi: inDoc,
+            menyentuh_tabel: touchesTable,
+            memakai_kolom_pertama_sebagai_penyaring: usesLeading
+          });
+        }
+      }
+      evidence.push({
+        migrasi: file, indeks: name, tabel: table, kolom: cols,
+        klaim: quoted.length, bukti: proofs, klaim_ditolak: rejected
+      });
+      if (!proofs.length) {
+        unused.push({
+          migrasi: file, indeks: name, tabel: table, kolom: cols,
+          klaim_di_komentar: quoted, klaim_ditolak: rejected
+        });
+      }
+    }
+  }
+  check('setiap_indeks_baru_punya_kueri_yang_memakainya', unused.length === 0, {
+    tanpa_bukti: unused, bukti: evidence
+  });
+}
+
+/* --------------- pemeriksaan 4: DELETE/DROP liar di migrasi baru & dokumen */
+
+function scanDangerousSql(label, sqlText, opts) {
+  const problems = [];
+  for (const stmt of statements(sqlText)) {
+    if (/^TRUNCATE\b/i.test(stmt)) problems.push({ berkas: label, pernyataan: stmt.slice(0, 140), sebab: 'TRUNCATE dilarang' });
+    if (/^DROP\s+TABLE\b/i.test(stmt)) problems.push({ berkas: label, pernyataan: stmt.slice(0, 140), sebab: 'DROP TABLE dilarang di migrasi baru' });
+    if (/^DELETE\s+FROM\b/i.test(stmt)) {
+      const hasWhere = /\bWHERE\b/i.test(stmt);
+      const hasLimit = /\bLIMIT\s+\d+/i.test(stmt);
+      if (!hasWhere || !hasLimit) {
+        problems.push({ berkas: label, pernyataan: stmt.slice(0, 160), sebab: (!hasWhere ? 'tanpa WHERE' : '') + (!hasWhere && !hasLimit ? ' dan ' : '') + (!hasLimit ? 'tanpa LIMIT' : '') });
+      }
+    }
+    if (/^UPDATE\b/i.test(stmt) && !/\bWHERE\b/i.test(stmt)) {
+      problems.push({ berkas: label, pernyataan: stmt.slice(0, 140), sebab: 'UPDATE tanpa WHERE' });
+    }
+  }
+  if (opts && opts.checkDropIndex) problems.push(...scanDropIndex(label, sqlText));
+  return problems;
+}
+
+/** `DROP INDEX` hanya boleh kalau baris di atasnya menyatakan indeks pengganti
+ *  yang dibuat di berkas yang sama, di tabel yang sama, dan kolomnya SUPERSET. */
+function scanDropIndex(label, raw) {
+  const problems = [];
+  const created = new Map();
+  const lines = raw.split('\n');
+  for (const line of lines) {
+    const m = /^\s*CREATE\s+(?:UNIQUE\s+)?INDEX\s+(?:IF\s+NOT\s+EXISTS\s+)?([A-Za-z_]\w*)\s+ON\s+([A-Za-z_]\w*)\s*\(([^)]*)\)/i.exec(line);
+    if (m) {
+      created.set(m[1].toLowerCase(), {
+        table: m[2].toLowerCase(),
+        columns: m[3].split(',').map((c) => c.trim().toLowerCase())
+      });
+    }
+  }
+  // Indeks lama (dari migrasi 0001/0002) untuk mengetahui kolom yang dibuang.
+  const legacy = new Map();
+  for (const f of listFiles(MIG_DIR, '.sql')) {
+    for (const line of fs.readFileSync(f, 'utf8').split('\n')) {
+      const m = /^\s*CREATE\s+(?:UNIQUE\s+)?INDEX\s+(?:IF\s+NOT\s+EXISTS\s+)?([A-Za-z_]\w*)\s+ON\s+([A-Za-z_]\w*)\s*\(([^)]*)\)/i.exec(line);
+      if (m) legacy.set(m[1].toLowerCase(), { table: m[2].toLowerCase(), columns: m[3].split(',').map((c) => c.trim().toLowerCase()) });
+    }
+  }
+  for (let i = 0; i < lines.length; i += 1) {
+    const m = /^\s*DROP\s+INDEX\s+(?:IF\s+EXISTS\s+)?([A-Za-z_]\w*)/i.exec(lines[i]);
+    if (!m) continue;
+    const dropped = m[1].toLowerCase();
+    const prev = (lines[i - 1] || '').trim();
+    const rm = /^--\s*REDUNDANT-BY:\s*([A-Za-z_]\w*)/i.exec(prev);
+    if (!rm) {
+      problems.push({ berkas: label, pernyataan: norm(lines[i]), sebab: 'DROP INDEX tanpa baris "-- REDUNDANT-BY: <indeks pengganti>" di atasnya' });
+      continue;
+    }
+    const replacement = created.get(rm[1].toLowerCase());
+    const old = legacy.get(dropped);
+    if (!replacement) {
+      problems.push({ berkas: label, pernyataan: norm(lines[i]), sebab: 'indeks pengganti "' + rm[1] + '" tidak dibuat di berkas yang sama' });
+      continue;
+    }
+    if (old && old.table !== replacement.table) {
+      problems.push({ berkas: label, pernyataan: norm(lines[i]), sebab: 'indeks pengganti ada di tabel lain (' + replacement.table + ' vs ' + old.table + ')' });
+      continue;
+    }
+    if (old && !old.columns.every((c) => replacement.columns.includes(c))) {
+      problems.push({
+        berkas: label, pernyataan: norm(lines[i]),
+        sebab: 'kolom indeks lama [' + old.columns.join(',') + '] bukan subset pengganti [' + replacement.columns.join(',') + ']'
+      });
+    }
+  }
+  return problems;
+}
+
+{
+  const problems = [];
+  for (const file of NEW_MIGRATIONS) {
+    const raw = fs.readFileSync(path.join(MIG_DIR, file), 'utf8');
+    problems.push(...scanDangerousSql('workers/api/migrations/' + file, raw, { checkDropIndex: true }));
+  }
+  check('migrasi_baru_tanpa_delete_drop_liar', problems.length === 0, { diperiksa: NEW_MIGRATIONS, masalah: problems });
+}
+
+{
+  const doc = path.join(REPO, 'docs', 'D1-RETENTION.md');
+  const ok = fs.existsSync(doc);
+  let problems = [];
+  let blocks = 0;
+  if (ok) {
+    const text = fs.readFileSync(doc, 'utf8');
+    const re = /```sql\r?\n([\s\S]*?)```/g;
+    let m;
+    while ((m = re.exec(text))) {
+      blocks += 1;
+      problems.push(...scanDangerousSql('docs/D1-RETENTION.md#blok' + blocks, m[1], null));
+    }
+  }
+  check('sql_retensi_selalu_ber_where_dan_ber_limit', ok && blocks >= 1 && problems.length === 0, {
+    dokumen_ada: ok, blok_sql: blocks, masalah: problems
+  });
+}
+
+/* ------------- pemeriksaan 5: pembanding skema benar-benar bisa MERAH */
+
+function renderRows(schema) {
+  const rows = [];
+  for (const [name, t] of schema.tables) {
+    rows.push({ type: 'table', name, tbl_name: name, sql: 'CREATE TABLE ' + name + ' (' + t.columns.map((c) => c + ' TEXT').join(', ') + ')' });
+  }
+  for (const [name, ix] of schema.indexes) {
+    rows.push({
+      type: 'index', name, tbl_name: ix.table,
+      sql: 'CREATE ' + (ix.unique ? 'UNIQUE ' : '') + 'INDEX ' + name + ' ON ' + ix.table +
+        '(' + ix.columns.join(', ') + ')' + (ix.where ? ' WHERE ' + ix.where : '')
+    });
+  }
+  return rows;
+}
+function wranglerEnvelope(rows) {
+  return JSON.stringify([{ results: rows, success: true, meta: { duration: 1 } }]);
+}
+/** Ambil daftar `beda`/`kind` dari laporan pembanding TANPA meledak kalau
+ *  pembanding keluar 2 (masukan/berkas migrasi tidak bisa dipercaya, laporannya
+ *  memuat `galat` bukan `beda`). Gerbang yang MELEDAK tetap merah, tetapi merah
+ *  yang tidak bisa dibaca menyembunyikan sebab aslinya. */
+function bedaOf(r) {
+  return r && r.report && Array.isArray(r.report.beda) ? r.report.beda : [];
+}
+function kindsOf(r) {
+  return bedaOf(r).map((d) => d.kind);
+}
+
+function runChecker(db, stdinText) {
+  try {
+    const out = execFileSync(process.execPath, [CHECKER, '--db', db, '--json'], { input: stdinText, encoding: 'utf8' });
+    return { code: 0, report: JSON.parse(out) };
+  } catch (e) {
+    let report = null;
+    try { report = JSON.parse(String(e.stdout || '')); } catch (_) { /* biarkan null */ }
+    return { code: e.status === undefined ? -1 : e.status, report, stderr: String(e.stderr || '') };
+  }
+}
+
+check('pembanding_skema_ada_dan_nol_jaringan', (() => {
+  if (!fs.existsSync(CHECKER)) return false;
+  const src = fs.readFileSync(CHECKER, 'utf8');
+  return !/\bfetch\s*\(|node:https?|require\(['"](https?|net|dgram|tls)['"]\)|from\s+['"]node:(net|http|https|tls|dgram)['"]/.test(src);
+})(), { berkas: 'tools/d1-schema-check.mjs' });
+
+const coreRows = renderRows(coreSchema);
+const statsRows = renderRows(statsSchema);
+
+{
+  const r = runChecker('core', wranglerEnvelope(coreRows));
+  check('pembanding_hijau_untuk_skema_yang_benar_core', r.code === 0 && r.report && r.report.cocok === true, {
+    exit: r.code, beda: r.report ? r.report.beda : null, ringkasan: r.report ? r.report.ringkasan : null
+  });
+}
+{
+  const r = runChecker('stats', wranglerEnvelope(statsRows));
+  check('pembanding_hijau_untuk_skema_yang_benar_stats', r.code === 0 && r.report && r.report.cocok === true, {
+    exit: r.code, beda: r.report ? r.report.beda : null
+  });
+}
+// [INFRA-0007-20260829] database ketiga ikut dibuktikan dua arah: skema benar
+// harus hijau, dan tabel kuota yang nyasar ke database learning harus merah.
+{
+  const learningRows = renderRows(learningSchema);
+  const r = runChecker('learning', wranglerEnvelope(learningRows));
+  check('pembanding_hijau_untuk_skema_yang_benar_learning', r.code === 0 && r.report && r.report.cocok === true, {
+    exit: r.code, beda: r.report ? r.report.beda : null
+  });
+  const rows = renderRows(learningSchema).concat([{
+    type: 'table', name: 'quota_daily', tbl_name: 'quota_daily',
+    sql: 'CREATE TABLE quota_daily (user_id TEXT, day TEXT, used INTEGER)'
+  }]);
+  const r2 = runChecker('learning', wranglerEnvelope(rows));
+  const kinds = kindsOf(r2);
+  check('pembanding_mendeteksi_tabel_kuota_di_database_learning',
+    r2.code === 1 && kinds.includes('pelanggaran_privasi_tabel'), { exit: r2.code, kinds });
+}
+{ // TABEL HILANG
+  const rows = coreRows.filter((r) => r.name !== 'quota_reservation');
+  const r = runChecker('core', wranglerEnvelope(rows));
+  const kinds = kindsOf(r);
+  check('pembanding_mendeteksi_tabel_hilang', r.code === 1 && kinds.includes('tabel_hilang'), { exit: r.code, kinds });
+}
+{ // KOLOM HILANG
+  const rows = coreRows.map((r) => (r.name === 'quota_daily'
+    ? { ...r, sql: r.sql.replace(/ai_held TEXT, /, '') } : r));
+  const r = runChecker('core', wranglerEnvelope(rows));
+  const kinds = kindsOf(r);
+  check('pembanding_mendeteksi_kolom_hilang', r.code === 1 && kinds.includes('kolom_hilang'), {
+    exit: r.code, kinds, beda: bedaOf(r).filter((d) => d.kind === 'kolom_hilang')
+  });
+}
+{ // INDEKS HILANG
+  const rows = coreRows.filter((r) => r.name !== 'idx_quota_reservation_expires');
+  const r = runChecker('core', wranglerEnvelope(rows));
+  const kinds = kindsOf(r);
+  check('pembanding_mendeteksi_indeks_hilang', r.code === 1 && kinds.includes('indeks_hilang'), { exit: r.code, kinds });
+}
+{ // INDEKS SALAH KOLOM (mis. rollback diam-diam di produksi)
+  const rows = coreRows.map((r) => (r.name === 'idx_quota_reservation_day_user'
+    ? { ...r, sql: 'CREATE INDEX idx_quota_reservation_day_user ON quota_reservation(day)' } : r));
+  const r = runChecker('core', wranglerEnvelope(rows));
+  const kinds = kindsOf(r);
+  check('pembanding_mendeteksi_kolom_indeks_berbeda', r.code === 1 && kinds.includes('indeks_kolom_beda'), { exit: r.code, kinds });
+}
+{ // INDEKS BERLEBIH (indeks lama yang seharusnya sudah di-DROP masih hidup)
+  const rows = coreRows.concat([{ type: 'index', name: 'idx_quota_daily_day', tbl_name: 'quota_daily', sql: 'CREATE INDEX idx_quota_daily_day ON quota_daily(day)' }]);
+  const r = runChecker('core', wranglerEnvelope(rows));
+  const kinds = kindsOf(r);
+  check('pembanding_mendeteksi_indeks_berlebih', r.code === 1 && kinds.includes('indeks_berlebih'), { exit: r.code, kinds });
+}
+{ // PELANGGARAN PRIVASI: tabel analytics muncul di database kuota
+  const rows = coreRows.concat([{ type: 'table', name: 'dau_dedup', tbl_name: 'dau_dedup', sql: 'CREATE TABLE dau_dedup (day TEXT, token TEXT)' }]);
+  const r = runChecker('core', wranglerEnvelope(rows));
+  const kinds = kindsOf(r);
+  check('pembanding_mendeteksi_tabel_analytics_di_database_kuota', r.code === 1 && kinds.includes('pelanggaran_privasi_tabel'), { exit: r.code, kinds });
+}
+{ // PELANGGARAN PRIVASI: kolom penghubung muncul di database analytics
+  const rows = statsRows.map((r) => (r.name === 'metrics_daily'
+    ? { ...r, sql: r.sql.replace(/\)$/, ', user_id TEXT)') } : r));
+  const r = runChecker('stats', wranglerEnvelope(rows));
+  const kinds = kindsOf(r);
+  check('pembanding_mendeteksi_kolom_penghubung_di_database_analytics', r.code === 1 && kinds.includes('pelanggaran_privasi_kolom'), { exit: r.code, kinds });
+}
+{ // Masukan rusak harus keluar 2, bukan 0 (jangan pernah "hijau karena diam")
+  const r = runChecker('core', 'ini bukan json');
+  check('pembanding_menolak_masukan_rusak', r.code === 2, { exit: r.code });
+}
+{ // Bentuk keluaran wrangler alternatif harus tetap dipahami
+  const r = runChecker('core', JSON.stringify({ result: [{ results: coreRows, success: true }] }));
+  check('pembanding_menerima_bentuk_json_alternatif', r.code === 0 && r.report && r.report.cocok === true, { exit: r.code });
+}
+
+/* -------------------------- pemeriksaan 6: dokumen wajib & pernyataan wajib */
+
+{
+  const need = [
+    ['docs/D1-BACKUP-RESTORE.md', [/localStorage/, /wrangler d1 export/, /fiezel-core/, /fiezel-stats/, /d1-schema-check\.mjs/]],
+    ['docs/D1-RETENTION.md', [/quota_daily/, /session/, /anon_issue/, /dau_dedup/, /quota_reservation/]],
+    ['docs/D1-CAPACITY.md', [/100\.000/, /developers\.cloudflare\.com\/d1\/platform\/(pricing|limits)/, /500 MB/]]
+  ];
+  const problems = [];
+  for (const [rel, patterns] of need) {
+    const full = path.join(REPO, rel);
+    if (!fs.existsSync(full)) { problems.push({ berkas: rel, sebab: 'tidak ada' }); continue; }
+    const text = fs.readFileSync(full, 'utf8');
+    for (const p of patterns) if (!p.test(text)) problems.push({ berkas: rel, sebab: 'tidak memuat ' + String(p) });
+  }
+  check('dokumen_d1_wajib_lengkap', problems.length === 0, { masalah: problems });
+}
+
+{
+  // Pernyataan yang tidak boleh hilang dari dokumen backup, karena itu inti
+  // kejujuran ke murid: progres TIDAK ada di D1.
+  const full = path.join(REPO, 'docs', 'D1-BACKUP-RESTORE.md');
+  const text = fs.existsSync(full) ? fs.readFileSync(full, 'utf8') : '';
+  const ok = /PROGRES BELAJAR MURID \*\*TIDAK ADA DI D1\*\*/.test(text) &&
+    /BUKAN kehilangan progres/.test(text);
+  check('dokumen_backup_menyatakan_progres_bukan_di_d1', ok, {
+    berkas: 'docs/D1-BACKUP-RESTORE.md'
+  });
+}
+
+{
+  // Urutan pemulihan wajib eksplisit: core sebelum stats.
+  const text = fs.existsSync(path.join(REPO, 'docs', 'D1-BACKUP-RESTORE.md'))
+    ? fs.readFileSync(path.join(REPO, 'docs', 'D1-BACKUP-RESTORE.md'), 'utf8') : '';
+  const iCore = text.indexOf('pulihkan `fiezel-core` LEBIH DULU');
+  const iStats = text.indexOf('`fiezel-stats` (SESUDAH core sehat)');
+  check('dokumen_backup_menyatakan_urutan_pemulihan', iCore > 0 && iStats > iCore, { posisi_core: iCore, posisi_stats: iStats });
+}
+
+/* ================================================================================================
+   BAGIAN D2q: kontrak DASHBOARD OWNER (workers/owner/queries.js) vs DDL migrasi
+
+   Mengapa bagian ini ada DI SINI dan bukan gerbang baru:
+   berkas ini SUDAH memiliki parser DDL independen (schemaFromMigrations/statements/splitTop) dan
+   sudah memegang tanggung jawab "SQL di kode vs DDL migrasi" untuk workers/api/. Yang hilang
+   hanyalah CAKUPANNYA: pemindaiannya berhenti di API_DIR, sehingga workers/owner/ bisa memuat
+   kueri untuk skema yang tidak pernah ada dan seluruh gerbang tetap hijau. Itulah yang terjadi.
+   Menaruh pemeriksaan ini di owner-dashboard-test.js akan memaksa parser DDL KEDUA di repo yang
+   sama, dan dua parser yang boleh berbeda pendapat tentang bentuk tabel adalah cara paling rapi
+   untuk kehilangan kepercayaan pada keduanya. Cakupan pemindaian API_DIR yang lama TIDAK diubah;
+   bagian ini murni tambahan.
+
+   Tanpa jaringan: DDL dibaca dari berkas migrasi, kueri dibaca dari berkas sumber.
+   ============================================================================================== */
+
+const OWNER_QUERIES = path.join(REPO, 'workers', 'owner', 'queries.js');
+
+// Lima tabel yang benar-benar ada di fiezel-stats. Dikunci di sini SEBAGAI ANGKA, bukan sebagai
+// daftar yang diambil dari kode owner, supaya menambah tabel tidak bisa lolos hanya karena kode
+// owner ikut diubah. `analytics-privacy-test.js` mengunci sisi database; ini mengunci sisi kueri.
+// [INFRA-0006-20260828] batch_dedup masuk daftar: tabel dedup idempoten batch (0006,
+// PR brain-learning-infra) — dua kolom (batch_id acak, day), TTL 48 jam, BUKAN bacaan
+// owner (dilarang seperti dau_dedup/pepper_state), tidak bisa di-join ke identitas.
+const STATS_TABLES_EXPECTED = ['batch_dedup', 'dau_dedup', 'metrics_daily', 'pepper_state', 'retention_daily', 'usage_daily'];
+
+// Tabel yang boleh DIBACA dashboard owner: hanya yang agregat. `dau_dedup` (token per-perangkat)
+// dan `pepper_state` (bahan rahasia HMAC) ada di database yang sama dan justru karena itu harus
+// dilarang eksplisit.
+const OWNER_READABLE = ['metrics_daily', 'usage_daily', 'retention_daily'];
+
+// Kata kunci SQL + nama fungsi. Token di luar daftar ini WAJIB berupa nama tabel, alias, atau
+// kolom yang benar-benar ada di DDL.
+const SQL_WORDS = new Set(('select from where group by order asc desc limit offset as and or not in '
+  + 'between is null on distinct count sum max min avg coalesce cast integer text real case when '
+  + 'then else end having union all left join inner outer nullif abs round').split(' '));
+
+// Komentar JS WAJIB dibuang lebih dulu: komentar di queries.js memuat backtick (mis. nama tabel
+// dalam kutipan miring), dan backtick itu berpasangan dengan backtick kode sehingga ekstraksi
+// literal ikut bergeser dan sebagian kueri lolos dari pemindaian tanpa ada yang sadar.
+function stripJsComments(src) {
+  return src.replace(/^[ \t]*\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '');
+}
+
+function ownerQuerySql() {
+  if (!fs.existsSync(OWNER_QUERIES)) return null;
+  // joinConcatenatedLiterals() TIDAK dipakai di sini: ia menyambung pasangan kutip yang
+  // bersebelahan, dan pada berkas ini efeknya menelan tiga kueri utuh (10 → 7). Gantinya,
+  // penyambungan string dilarang eksplisit oleh pemeriksaan `owner_queries_tanpa_sambung_string`
+  // di bawah, sehingga tidak ada SQL yang bisa disembunyikan lewat konkatenasi.
+  const src = stripJsComments(fs.readFileSync(OWNER_QUERIES, 'utf8'));
+  const out = [];
+  const re = /(`(?:[^`\\]|\\.)*`|'(?:[^'\\\n]|\\.)*'|"(?:[^"\\\n]|\\.)*")/g;
+  let m;
+  while ((m = re.exec(src))) {
+    const body = m[1].slice(1, -1);
+    if (/\bSELECT\b/i.test(body) && /\bFROM\b/i.test(body)) out.push(norm(body));
+  }
+  return out;
+}
+
+{
+  const sqls = ownerQuerySql();
+  check('owner_queries_terbaca', Array.isArray(sqls) && sqls.length >= 10, {
+    berkas: 'workers/owner/queries.js', jumlah_kueri: sqls ? sqls.length : 0,
+    catatan: 'Nol kueri terbaca berarti pemindai ini buta, bukan berarti kuerinya benar.'
+  });
+
+  // SQL wajib berupa satu literal utuh. Kalau dirakit dari potongan string, pemindai token di
+  // bawah hanya melihat pecahannya dan bisa mengaku hijau atas kueri yang tidak pernah ia baca.
+  {
+    const raw = fs.existsSync(OWNER_QUERIES) ? stripJsComments(fs.readFileSync(OWNER_QUERIES, 'utf8')) : '';
+    // Hanya literal yang BERISI SQL yang dilarang disambung. Kalimat penjelasan panjang di
+    // katalog UNMEASURABLE memang disambung antar baris dan itu tidak mengganggu pemindai SQL.
+    const sambung = [...raw.matchAll(/(['"`])([^'"`\n]*)\1\s*\+\s*(['"`])/g)]
+      .filter((m) => /\b(SELECT|FROM|WHERE|GROUP\s+BY|ORDER\s+BY)\b/i.test(m[2]))
+      .map((m) => m[0].slice(0, 80));
+    check('owner_queries_tanpa_sambung_string', sambung.length === 0, {
+      temuan: sambung,
+      alasan: 'SQL yang dirakit dari potongan string tidak bisa diverifikasi utuh oleh pemindai '
+        + 'ini; satu literal per kueri adalah prasyarat agar gerbang ini bermakna.'
+    });
+  }
+
+  // Kunci #0: parser DDL benar-benar melihat lima tabel stats. Kalau tidak, semua kesimpulan di
+  // bawah dibangun di atas skema yang tidak lengkap.
+  const statsFound = [...statsSchema.tables.keys()].sort();
+  check('skema_stats_tepat_lima_tabel',
+    statsFound.join(',') === STATS_TABLES_EXPECTED.join(','), {
+      diharapkan: STATS_TABLES_EXPECTED, ditemukan: statsFound,
+      otoritas: 'workers/api/migrations/0002_analytics.sql'
+    });
+
+  const bentuk = {};
+  for (const t of STATS_TABLES_EXPECTED) {
+    const def = statsSchema.tables.get(t);
+    bentuk[t] = def ? def.columns : null;
+  }
+
+  if (sqls && sqls.length) {
+    // Kunci #1: NOL rujukan tabel di luar tiga tabel agregat.
+    const refTables = new Map();
+    for (const sql of sqls) {
+      const re = /\b(?:FROM|JOIN|INTO|UPDATE)\s+([A-Za-z_]\w*)/gi;
+      let m;
+      while ((m = re.exec(sql))) {
+        const t = m[1].toLowerCase();
+        if (!refTables.has(t)) refTables.set(t, sql.slice(0, 90));
+      }
+    }
+    const luar = [...refTables.keys()].filter((t) => !OWNER_READABLE.includes(t));
+    check('owner_queries_nol_tabel_di_luar_tiga_agregat', luar.length === 0, {
+      boleh_dibaca: OWNER_READABLE, dirujuk: [...refTables.keys()].sort(),
+      pelanggaran: luar.map((t) => ({ tabel: t, kueri: refTables.get(t) })),
+      alasan: 'Tabel di luar daftar ini tidak ada di migrasi, atau ada tetapi memuat token '
+        + 'per-perangkat / bahan rahasia yang tidak boleh dibaca dashboard.'
+    });
+
+    // Kunci #2: setiap tabel yang dirujuk BENAR-BENAR ada di DDL stats.
+    const tabelHantu = [...refTables.keys()].filter((t) => !statsSchema.tables.has(t));
+    check('owner_queries_tabel_ada_di_ddl', tabelHantu.length === 0, {
+      tabel_tidak_ada: tabelHantu.map((t) => ({ tabel: t, kueri: refTables.get(t) })),
+      catatan: 'Inilah cacat yang paket D2q perbaiki: queries.js versi sebelumnya merujuk '
+        + '`retention_cohort` dan `cost_daily`, dua tabel yang tidak pernah dibuat.'
+    });
+
+    // Kunci #3: setiap KOLOM yang dirujuk ada di salah satu tabel yang dirujuk kueri itu.
+    // Alias (`AS x`) dikecualikan karena ia nama keluaran, bukan kolom masukan.
+    const kolomHantu = [];
+    for (const sql of sqls) {
+      const tables = [];
+      const tre = /\b(?:FROM|JOIN)\s+([A-Za-z_]\w*)/gi;
+      let tm;
+      while ((tm = tre.exec(sql))) tables.push(tm[1].toLowerCase());
+      const known = new Set();
+      for (const t of tables) {
+        const def = statsSchema.tables.get(t);
+        if (def) for (const c of def.columns) known.add(c);
+      }
+      const aliases = new Set();
+      const are = /\bAS\s+([A-Za-z_]\w*)/gi;
+      let am;
+      while ((am = are.exec(sql))) aliases.add(am[1].toLowerCase());
+      // Literal string bukan pengenal, dan `${...}` adalah interpolasi JS (daftar IN yang dirakit
+      // dari konstanta beku) — bukan kolom. Keduanya dibuang sebelum token dipindai.
+      const bare = sql.replace(/\$\{[^}]*\}/g, '?').replace(/'[^']*'/g, "''");
+      const tre2 = /\b[A-Za-z_]\w*\b/g;
+      let m;
+      while ((m = tre2.exec(bare))) {
+        const tok = m[0].toLowerCase();
+        if (SQL_WORDS.has(tok) || aliases.has(tok) || tables.includes(tok)) continue;
+        if (known.has(tok)) continue;
+        kolomHantu.push({ token: tok, tabel_dirujuk: tables, kueri: sql.slice(0, 120) });
+      }
+    }
+    check('owner_queries_kolom_ada_di_ddl', kolomHantu.length === 0, {
+      bentuk_tabel_menurut_ddl: bentuk,
+      kolom_tidak_ada: kolomHantu.slice(0, 20),
+      jumlah: kolomHantu.length,
+      alasan: 'Kolom yang tidak ada di DDL akan membuat D1 melempar begitu tabelnya berisi data. '
+        + 'Selama semua tabel kosong, cacat ini tidak terlihat sama sekali.'
+    });
+  }
+
+  // Kunci #4: nama metrik yang dipakai dashboard harus BENAR-BENAR DITULIS oleh jalur server.
+  // Metrik yang tidak pernah ditulis siapa pun = panel yang selamanya kosong, dan tidak ada
+  // pemeriksaan skema yang bisa menangkapnya karena bentuk PANJANG menerima string apa pun.
+  {
+    const writerFiles = [
+      path.join(API_DIR, 'analytics', 'analytics-core.js'),
+      path.join(API_DIR, 'analytics', 'rollup.js'),
+    ].filter((f) => fs.existsSync(f));
+    const writerSrc = writerFiles.map((f) => fs.readFileSync(f, 'utf8')).join('\n');
+    const src = fs.existsSync(OWNER_QUERIES) ? stripJsComments(fs.readFileSync(OWNER_QUERIES, 'utf8')) : '';
+
+    // Ambil daftar metrik & bucket dari queries.js secara tekstual (tanpa mengeksekusi modul ESM
+    // di dalam gerbang CommonJS ini).
+    const grabArray = (name) => {
+      const i = src.indexOf('const ' + name);
+      if (i < 0) return null;
+      const open = src.indexOf('[', i);
+      const close = closingBracket(src, open);
+      if (open < 0 || close < 0) return null;
+      return [...src.slice(open + 1, close).matchAll(/'([^']+)'/g)].map((m) => m[1]);
+    };
+    const grabKeys = (name) => {
+      const i = src.indexOf('const ' + name);
+      if (i < 0) return null;
+      const open = src.indexOf('{', i);
+      const close = closingParenGeneric(src, open, '{', '}');
+      if (open < 0 || close < 0) return null;
+      return [...src.slice(open + 1, close).matchAll(/'([^']+)'\s*:/g)].map((m) => m[1]);
+    };
+    const metrics = [
+      ...(grabArray('FLOW_METRICS') || []),
+      ...(grabArray('DAILY_STATE_METRICS') || []),
+      ...(grabArray('SERIES_METRICS') || []),
+    ];
+    const buckets = grabKeys('USAGE_BUCKETS') || [];
+
+    check('daftar_metrik_owner_terbaca', metrics.length >= 15 && buckets.length >= 5,
+      { jumlah_metrik: metrics.length, jumlah_bucket: buckets.length, penulis: writerFiles.map((f) => path.relative(REPO, f)) });
+
+    const metrikTanpaPenulis = [...new Set(metrics)].filter((m) => !writerSrc.includes("'" + m + "'"));
+    check('setiap_metrik_owner_ditulis_jalur_server', metrikTanpaPenulis.length === 0, {
+      metrik_tanpa_penulis: metrikTanpaPenulis,
+      dipindai: writerFiles.map((f) => path.relative(REPO, f)),
+      alasan: 'Bentuk PANJANG metrics_daily(day, metric, value) menerima nama metrik APA PUN, '
+        + 'jadi salah nama tidak pernah menghasilkan galat SQL — hanya panel yang kosong '
+        + 'selamanya. Hanya pemeriksaan ini yang bisa menangkapnya tanpa jaringan.'
+    });
+
+    const bucketTanpaPenulis = [...new Set(buckets)]
+      .map((b) => b.split(':')[0])
+      .filter((dim, i, a) => a.indexOf(dim) === i)
+      // Penulisnya memakai template literal (`ai_err:${e.code}`), bukan kutipan tunggal, jadi
+      // pencocokan harus atas AWALAN dimensinya, bukan atas string berkutip lengkap.
+      .filter((dim) => !new RegExp('[\'"`]' + dim + ':').test(writerSrc));
+    check('setiap_dimensi_bucket_owner_ditulis_jalur_server', bucketTanpaPenulis.length === 0, {
+      dimensi_tanpa_penulis: bucketTanpaPenulis,
+      catatan: 'usage_daily.bucket adalah enum tertutup "dimensi:nilai"; dimensi yang tidak '
+        + 'pernah ditulis berarti panel pecahannya kosong permanen.'
+    });
+  }
+
+  // Kunci #5: prasyarat indeks dinyatakan JUJUR. Indeks yang dipakai kueri owner harus sudah ada
+  // di migrasi yang SUDAH jalan di produksi (0002), bukan di 0004 yang belum diterapkan.
+  {
+    const idx = [...statsSchema.indexes.values()].map((i) => ({ nama: i.name, tabel: i.table, kolom: i.columns, berkas: i.file }));
+    const fileIdx = [...new Set(idx.map((i) => i.berkas))];
+    // [INFRA-0006-20260828] 0006 diizinkan di sini dengan syarat sempit: satu-satunya
+    // indeksnya (idx_batch_dedup_day) dipakai purge rollup — BUKAN kueri owner — dan
+    // rollup fail-soft (try/catch) di DB yang belum bermigrasi, jadi tidak ada kueri
+    // owner yang bergantung pada migrasi yang belum diterapkan.
+    check('indeks_stats_berasal_dari_migrasi_yang_sudah_jalan',
+      fileIdx.every((f) => /000[126]_/.test(f)), {
+        indeks: idx, berkas: fileIdx,
+        catatan: '0004_indexes.sql adalah migrasi fiezel-core dan BELUM diterapkan; kueri owner '
+          + 'tidak boleh bergantung padanya. 0006 hanya menyumbang indeks purge rollup '
+          + '(fail-soft), bukan prasyarat kueri owner. Nol prasyarat indeks baru.'
+      });
+  }
+}
+
+function closingBracket(text, open) { return closingParenGeneric(text, open, '[', ']'); }
+function closingParenGeneric(text, open, o, c) {
+  if (open < 0) return -1;
+  let depth = 0;
+  for (let i = open; i < text.length; i++) {
+    if (text[i] === o) depth++;
+    else if (text[i] === c) { depth--; if (depth === 0) return i; }
+  }
+  return -1;
+}
+
+/* -------------------------------------------------------------------- laporan */
+
+const failed = checks.filter((c) => !c.ok);
+const report = {
+  schema: 'fiezel-d1-schema-contract-v1',
+  generated_at: new Date().toISOString(),
+  total: checks.length,
+  lulus: checks.length - failed.length,
+  gagal: failed.length,
+  status: failed.length === 0 ? 'PASS' : 'FAIL',
+  checks
+};
+fs.writeFileSync(path.join(REPO, 'D1-SCHEMA-CONTRACT-REPORT.json'), JSON.stringify(report, null, 2) + '\n');
+console.log(JSON.stringify(report, null, 2));
+if (failed.length) {
+  console.error('\nd1-schema-contract-test: GAGAL ' + failed.length + '/' + checks.length);
+  for (const f of failed) console.error('  - ' + f.name);
+  process.exitCode = 1;
+} else {
+  console.error('\nd1-schema-contract-test: LULUS ' + checks.length + '/' + checks.length);
+}

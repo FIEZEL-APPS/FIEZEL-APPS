@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=390, initial-scale=1">
+<title>FIEZEL — Control Room / Pengaturan (redesign D)</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="d.css">
+<style>
+  .content{gap:7px;padding:14px 16px 12px}
+  .card{padding:12px 14px}
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <main class="content">
+
+    <!-- header sheet -->
+    <div class="sheet-head">
+      <div>
+        <p class="eyebrow">FIEZEL Control Room</p>
+        <h1 class="h1" style="margin-top:4px">Pengalaman Rara</h1>
+        <p class="sub" style="margin-top:4px">Atur respons perangkat, suara, dan gerakan.</p>
+      </div>
+      <button class="icon-btn" aria-label="Tutup pengaturan">
+        <svg class="ic" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>
+
+    <!-- profil -->
+    <section class="card" aria-label="Profil">
+      <div class="profile">
+        <span class="avatar"><img src="assets/mascot/paw-mascot-head.svg" alt="Avatar PAW" width="38" height="38"></span>
+        <div class="pn">
+          <b>Rara</b>
+          <span>Level A2 · Jalur sekolah</span>
+        </div>
+        <span class="flame-chip">
+          <svg class="ic s16" viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+          6 hari
+        </span>
+      </div>
+      <div class="field">
+        <label for="nickname">Nama panggilan</label>
+        <div class="fi">
+          <input id="nickname" type="text" value="Rara">
+          <button class="fedit" aria-label="Ubah nama panggilan">
+            <svg class="ic s16" viewBox="0 0 24 24"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- sesi & pengingat -->
+    <p class="sec-label">Sesi &amp; pengingat</p>
+    <section class="list" aria-label="Sesi dan pengingat">
+      <button class="row">
+        <span class="ri"><svg class="ic" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></span>
+        <span class="rt"><b>Ulangi kenalan cepat</b><span>Tur singkat yang nunjukin tombol mana buat apa</span></span>
+        <svg class="ic chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+      <!-- disabled state baru: teks tetap terbaca + ikon gembok (perbaikan audit #4) -->
+      <div class="row is-disabled" aria-disabled="true">
+        <span class="ri"><svg class="ic" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></span>
+        <span class="rt"><b>Pengingat belajar</b><span>Izin notifikasi ditolak di browser — ubah lewat ikon gembok</span></span>
+        <span class="lock"><svg class="ic" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+      </div>
+    </section>
+
+    <!-- suara & respons -->
+    <p class="sec-label">Suara &amp; respons</p>
+    <section class="list" aria-label="Suara dan respons">
+      <div class="row">
+        <span class="ri"><svg class="ic" viewBox="0 0 24 24"><path d="m2 8 2 2-2 2 2 2-2 2"/><path d="m22 8-2 2 2 2-2 2 2 2"/><rect width="8" height="14" x="8" y="5" rx="1"/></svg></span>
+        <span class="rt"><b>Getaran sentuh</b><span>Perangkat ini mendukung getaran</span></span>
+        <button class="toggle" role="switch" aria-checked="true" aria-label="Getaran sentuh">
+          <span class="tr"></span><span class="kn"><svg class="ic" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+        </button>
+      </div>
+      <div class="row">
+        <span class="ri"><svg class="ic" viewBox="0 0 24 24"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg></span>
+        <span class="rt"><b>Suara jawaban</b><span>Bunyi naik saat benar, bunyi lembut saat perlu coba lagi</span></span>
+        <button class="toggle" role="switch" aria-checked="true" aria-label="Suara jawaban">
+          <span class="tr"></span><span class="kn"><svg class="ic" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+        </button>
+      </div>
+      <div class="row">
+        <span class="ri"><svg class="ic" viewBox="0 0 24 24"><rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 18h.01"/></svg></span>
+        <span class="rt"><b>Status bunyi di perangkat ini</b><span>Kalau tetap sunyi, periksa saklar senyap &amp; volume media</span></span>
+        <span class="badge-good">
+          <svg class="ic s16" viewBox="0 0 24 24" style="stroke-width:2.2"><path d="M20 6 9 17l-5-5"/></svg>
+          Aktif
+        </span>
+      </div>
+      <div class="row">
+        <span class="ri"><svg class="ic" viewBox="0 0 24 24"><path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72"/><path d="m14 7 3 3"/><path d="M5 6v4"/><path d="M19 14v4"/><path d="M10 2v2"/><path d="M7 8H3"/><path d="M21 16h-4"/></svg></span>
+        <span class="rt"><b>Animasi antarmuka</b><span>Transisi halaman, kartu, popup, dan feedback jawaban</span></span>
+        <button class="toggle" role="switch" aria-checked="true" aria-label="Animasi antarmuka">
+          <span class="tr"></span><span class="kn"><svg class="ic" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+        </button>
+      </div>
+    </section>
+
+    <!-- reset + versi app -->
+    <button class="danger-btn">
+      <svg class="ic s16" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+      Reset progres belajar
+    </button>
+    <div class="version">
+      <b>FIEZEL v3.2.0 · Build 184</b>
+      <span>Warm Paper, Bright Mind — sistem desain v1.0</span>
+    </div>
+
+  </main>
+
+</div>
+</body>
+</html>

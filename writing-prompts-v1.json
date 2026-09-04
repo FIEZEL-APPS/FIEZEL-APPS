@@ -1,0 +1,615 @@
+{
+  "schema": "fiezel-writing-prompts-v1",
+  "schemaVersion": "1.0.0",
+  "version": "1.0.0",
+  "promptCount": 45,
+  "minPromptsPerLevel": 6,
+  "honesty": "FIEZEL tidak memprediksi skor IELTS atau TOEFL. Rubrik ini alat latihan dan umpan balik; band resmi hanya keluar dari ujian resmi.",
+  "rubric": {
+    "id": "fiezel-writing-rubric-v1",
+    "scale": {
+      "min": 0,
+      "max": 4
+    },
+    "note": "Lima kriteria, masing-masing 0-4. Empat kriteria pertama mengikuti keluarga kriteria IELTS Writing; yang kelima memisahkan nada dan kerapian supaya bisa dilatih sendiri.",
+    "criteria": [
+      {
+        "id": "task_response",
+        "label": "Penuntasan tugas",
+        "labelEn": "Task achievement / response",
+        "asks": "Apakah semua yang diminta soal benar-benar dijawab, dan posisinya jelas?",
+        "levels": [
+          "Belum menjawab tugasnya, atau menulis topik yang berbeda.",
+          "Menyentuh topik tetapi sebagian besar permintaan soal terlewat; posisi tidak terbaca.",
+          "Menjawab sebagian besar permintaan; posisinya ada tetapi berpindah-pindah atau kurang berkembang.",
+          "Menjawab seluruh permintaan dengan posisi jelas; sebagian gagasan masih tipis dukungannya.",
+          "Menjawab seluruh permintaan dengan posisi jelas dan konsisten; tiap gagasan utama dikembangkan dengan alasan atau contoh yang relevan."
+        ]
+      },
+      {
+        "id": "coherence_cohesion",
+        "label": "Keruntutan dan keterkaitan",
+        "labelEn": "Coherence and cohesion",
+        "asks": "Apakah alurnya bisa diikuti tanpa membaca ulang?",
+        "levels": [
+          "Tidak ada alur yang bisa diikuti.",
+          "Gagasan berloncatan; hampir tanpa paragraf atau penanda hubungan.",
+          "Ada paragraf, tetapi sebagian gagasan tidak pada tempatnya atau penandanya diulang-ulang.",
+          "Paragraf logis dengan penanda yang tepat; sesekali hubungan antarkalimat terasa longgar.",
+          "Setiap paragraf punya satu gagasan pusat, urutannya beralasan, dan rujukan antarkalimat mengalir tanpa mengulang penanda."
+        ]
+      },
+      {
+        "id": "lexical_resource",
+        "label": "Kekayaan kosakata",
+        "labelEn": "Lexical resource",
+        "asks": "Apakah katanya cukup tepat dan bervariasi untuk topiknya?",
+        "levels": [
+          "Kosakata terlalu sedikit untuk menyampaikan maksud.",
+          "Hanya kata paling dasar; pengulangan berat dan sering salah pilih kata.",
+          "Cukup untuk topik sehari-hari; kata yang kurang umum sering meleset maknanya.",
+          "Bervariasi dan umumnya tepat, termasuk beberapa kata topikal; kesalahan sesekali tidak mengganggu.",
+          "Luwes dan tepat, termasuk kolokasi dan ungkapan yang wajar; salah pilih kata sangat jarang."
+        ]
+      },
+      {
+        "id": "grammatical_range_accuracy",
+        "label": "Ragam dan ketepatan tata bahasa",
+        "labelEn": "Grammatical range and accuracy",
+        "asks": "Apakah struktur kalimatnya bervariasi dan benar?",
+        "levels": [
+          "Struktur belum terbentuk sebagai kalimat.",
+          "Hampir seluruhnya kalimat pendek sejenis; kesalahan menghambat pemahaman.",
+          "Campuran kalimat sederhana dan majemuk; kesalahan sering tetapi maksud masih tertangkap.",
+          "Beragam struktur termasuk klausa kompleks; sebagian besar kalimat bebas kesalahan.",
+          "Ragam struktur luas dan terkendali; kesalahan hanya sesekali dan tidak mengganggu."
+        ]
+      },
+      {
+        "id": "register_mechanics",
+        "label": "Nada dan kerapian",
+        "labelEn": "Register and mechanics",
+        "asks": "Apakah nadanya cocok dengan pembacanya, dan tanda bacanya rapi?",
+        "levels": [
+          "Nada dan kerapian belum bisa dinilai.",
+          "Nada tidak cocok dengan tugasnya; ejaan dan tanda baca banyak menyimpang.",
+          "Nada berpindah-pindah antara formal dan santai; kesalahan ejaan atau tanda baca cukup terlihat.",
+          "Nada sesuai tugasnya; kesalahan ejaan dan tanda baca sedikit.",
+          "Nada konsisten dan pas untuk pembacanya; ejaan, tanda baca, dan pemenggalan paragraf rapi."
+        ]
+      }
+    ]
+  },
+  "examTasks": {
+    "ielts_task2": {
+      "label": "IELTS Writing Task 2",
+      "minWords": 250,
+      "minutes": 40,
+      "note": "Esai. Di ujian aslinya, tulisan di bawah 250 kata dikenai penalti pada penuntasan tugas."
+    },
+    "ielts_task1_letter": {
+      "label": "IELTS General Training Writing Task 1",
+      "minWords": 150,
+      "minutes": 20,
+      "note": "Surat. Ketiga poin dalam soal wajib dijawab; melewatkan satu poin menurunkan penuntasan tugas."
+    },
+    "ielts_task1_report": {
+      "label": "IELTS Academic Writing Task 1",
+      "minWords": 150,
+      "minutes": 20,
+      "note": "Laporan data. Ringkas ciri utamanya dan bandingkan - jangan memberi opini atau menebak sebabnya."
+    },
+    "toefl_discussion": {
+      "label": "TOEFL iBT Writing for an Academic Discussion",
+      "minWords": 100,
+      "minutes": 10,
+      "note": "Tanggapan diskusi kelas. Nyatakan posisimu sendiri DAN tanggapi tulisan teman sekelas."
+    },
+    "toefl_integrated_adapted": {
+      "label": "TOEFL iBT Integrated Writing (adaptasi teks)",
+      "minWords": 150,
+      "minutes": 20,
+      "note": "Ringkas bagaimana bantahan menantang tiap poin sumber. ADAPTASI: TOEFL asli memakai kuliah audio; di sini bantahannya disajikan tertulis, jadi latihan ini melatih sintesisnya, bukan menyimaknya."
+    }
+  },
+  "prompts": [
+    {
+      "id": "w-a1-1",
+      "level": "A1",
+      "genre": "descriptive",
+      "examTask": null,
+      "minutes": 10,
+      "target": 40,
+      "en": "Describe your day today in five simple sentences.",
+      "id_hint": "Ceritakan harimu hari ini dalam lima kalimat sederhana.",
+      "focus": "present simple dan urutan waktu"
+    },
+    {
+      "id": "w-a1-2",
+      "level": "A1",
+      "genre": "descriptive",
+      "examTask": null,
+      "minutes": 10,
+      "target": 40,
+      "en": "Write about your favourite food and why you like it.",
+      "id_hint": "Tulis tentang makanan favoritmu dan kenapa kamu suka.",
+      "focus": "menyatakan alasan dengan because"
+    },
+    {
+      "id": "w-a1-3",
+      "level": "A1",
+      "genre": "descriptive",
+      "examTask": null,
+      "minutes": 10,
+      "target": 40,
+      "en": "Describe your bedroom. Where are your things?",
+      "id_hint": "Ceritakan kamarmu. Barang-barangmu ada di mana saja?",
+      "focus": "there is/are dan preposisi tempat"
+    },
+    {
+      "id": "w-a1-4",
+      "level": "A1",
+      "genre": "personal",
+      "examTask": null,
+      "minutes": 10,
+      "target": 40,
+      "en": "Introduce one person in your family. What do they do every day?",
+      "id_hint": "Perkenalkan satu anggota keluargamu. Apa kegiatannya setiap hari?",
+      "focus": "present simple orang ketiga tunggal"
+    },
+    {
+      "id": "w-a1-5",
+      "level": "A1",
+      "genre": "narrative",
+      "examTask": null,
+      "minutes": 10,
+      "target": 45,
+      "en": "What did you do last weekend? Write four sentences.",
+      "id_hint": "Apa yang kamu lakukan akhir pekan lalu? Tulis empat kalimat.",
+      "focus": "past simple bentuk dasar"
+    },
+    {
+      "id": "w-a1-6",
+      "level": "A1",
+      "genre": "transactional",
+      "examTask": null,
+      "minutes": 10,
+      "target": 40,
+      "en": "Write a short message to invite a friend to your house.",
+      "id_hint": "Tulis pesan singkat untuk mengajak teman ke rumahmu.",
+      "focus": "ajakan sederhana dan keterangan waktu"
+    },
+    {
+      "id": "w-a2-1",
+      "level": "A2",
+      "genre": "transactional",
+      "examTask": null,
+      "minutes": 15,
+      "target": 70,
+      "en": "Write a short message to a friend who missed school today. Tell them what happened.",
+      "id_hint": "Tulis pesan singkat untuk teman yang hari ini tidak masuk sekolah. Ceritakan apa yang terjadi.",
+      "focus": "past simple dan urutan kejadian"
+    },
+    {
+      "id": "w-a2-2",
+      "level": "A2",
+      "genre": "descriptive",
+      "examTask": null,
+      "minutes": 15,
+      "target": 70,
+      "en": "Describe a place you go to when you want to feel calm.",
+      "id_hint": "Ceritakan tempat yang kamu datangi kalau ingin tenang.",
+      "focus": "kata sifat dan penjelasan alasan"
+    },
+    {
+      "id": "w-a2-3",
+      "level": "A2",
+      "genre": "narrative",
+      "examTask": null,
+      "minutes": 15,
+      "target": 80,
+      "en": "Write about a day that did not go as planned. What happened, and how did you feel?",
+      "id_hint": "Tulis tentang hari yang tidak berjalan sesuai rencana. Apa yang terjadi, dan bagaimana perasaanmu?",
+      "focus": "past simple dan past continuous"
+    },
+    {
+      "id": "w-a2-4",
+      "level": "A2",
+      "genre": "opinion",
+      "examTask": null,
+      "minutes": 15,
+      "target": 80,
+      "en": "Is it better to study alone or with friends? Give your opinion and two reasons.",
+      "id_hint": "Lebih baik belajar sendiri atau bersama teman? Beri pendapatmu dan dua alasan.",
+      "focus": "menyusun pendapat dengan dua alasan"
+    },
+    {
+      "id": "w-a2-5",
+      "level": "A2",
+      "genre": "transactional",
+      "examTask": null,
+      "minutes": 15,
+      "target": 80,
+      "en": "Write an email to your teacher to ask for extra time on an assignment.",
+      "id_hint": "Tulis email ke gurumu untuk meminta tambahan waktu mengerjakan tugas.",
+      "focus": "permintaan sopan dan alasan"
+    },
+    {
+      "id": "w-a2-6",
+      "level": "A2",
+      "genre": "descriptive",
+      "examTask": null,
+      "minutes": 15,
+      "target": 80,
+      "en": "Describe your daily routine on a school day and on a holiday. How are they different?",
+      "id_hint": "Ceritakan rutinitas harianmu saat sekolah dan saat libur. Apa bedanya?",
+      "focus": "perbandingan sederhana"
+    },
+    {
+      "id": "w-b1-1",
+      "level": "B1",
+      "genre": "opinion",
+      "examTask": "ielts_task2",
+      "minutes": 40,
+      "target": 250,
+      "en": "Some students study better at night than in the morning. To what extent do you agree or disagree? Give reasons and include relevant examples from your own experience.",
+      "id_hint": "Sebagian murid lebih fokus belajar malam hari daripada pagi. Sejauh mana kamu setuju? Beri alasan dan contoh dari pengalamanmu.",
+      "focus": "esai opini: posisi jelas, dua alasan dikembangkan"
+    },
+    {
+      "id": "w-b1-2",
+      "level": "B1",
+      "genre": "planning",
+      "examTask": null,
+      "minutes": 20,
+      "target": 150,
+      "en": "Describe a skill you want to learn this year and explain your plan to get it.",
+      "id_hint": "Ceritakan satu keahlian yang ingin kamu kuasai tahun ini dan jelaskan rencanamu.",
+      "focus": "future forms dan urutan langkah"
+    },
+    {
+      "id": "w-b1-3",
+      "level": "B1",
+      "genre": "letter",
+      "examTask": "ielts_task1_letter",
+      "minutes": 20,
+      "target": 150,
+      "en": "You borrowed a book from a classmate and damaged it. Write a letter to your classmate. In your letter: apologise and explain what happened, say what you have done about it, and offer to put things right.",
+      "id_hint": "Kamu meminjam buku teman sekelas dan merusaknya. Tulis surat untuknya: minta maaf dan jelaskan kejadiannya, ceritakan apa yang sudah kamu lakukan, dan tawarkan cara menggantinya.",
+      "focus": "surat semi-formal, tiga bullet wajib dijawab"
+    },
+    {
+      "id": "w-b1-4",
+      "level": "B1",
+      "genre": "letter",
+      "examTask": "ielts_task1_letter",
+      "minutes": 20,
+      "target": 150,
+      "en": "Your school is planning to change the start time of classes. Write a letter to the head teacher. In your letter: say how you feel about the change, explain how it would affect your day, and suggest one alternative.",
+      "id_hint": "Sekolahmu berencana mengubah jam masuk. Tulis surat ke kepala sekolah: sampaikan perasaanmu, jelaskan dampaknya pada harimu, dan usulkan satu alternatif.",
+      "focus": "surat formal dan usulan"
+    },
+    {
+      "id": "w-b1-5",
+      "level": "B1",
+      "genre": "discussion",
+      "examTask": "ielts_task2",
+      "minutes": 40,
+      "target": 250,
+      "en": "Some people think homework helps students learn. Others believe it takes away time for rest and family. Discuss both views and give your own opinion.",
+      "id_hint": "Sebagian orang menganggap PR membantu belajar. Sebagian lain menilai PR merampas waktu istirahat dan keluarga. Bahas kedua pandangan dan beri pendapatmu.",
+      "focus": "esai dua sisi: seimbang, lalu posisi sendiri"
+    },
+    {
+      "id": "w-b1-6",
+      "level": "B1",
+      "genre": "discussion",
+      "examTask": "toefl_discussion",
+      "minutes": 10,
+      "target": 110,
+      "en": "Your teacher is discussing transport. Professor: \"Cities are trying to reduce traffic. Some invest in public transport, others limit private cars.\" Another student wrote that cheap buses work best. Write a post that states your own view and responds to your classmate, adding one reason they did not mention.",
+      "id_hint": "Gurumu membahas transportasi. Dosen: \"Kota berusaha mengurangi kemacetan. Ada yang membangun transportasi umum, ada yang membatasi mobil pribadi.\" Seorang murid menulis bahwa bus murah paling efektif. Tulis tanggapan berisi pendapatmu sendiri sekaligus balasan untuk temanmu, dengan satu alasan yang belum ia sebut.",
+      "focus": "TOEFL academic discussion: pendek, padat, menanggapi orang lain"
+    },
+    {
+      "id": "w-b2-1",
+      "level": "B2",
+      "genre": "discussion",
+      "examTask": "ielts_task2",
+      "minutes": 40,
+      "target": 250,
+      "en": "Social media helps students learn, but it also distracts them. Discuss both sides and give your own opinion.",
+      "id_hint": "Media sosial membantu belajar tetapi juga mengganggu. Bahas kedua sisi dan beri pendapatmu.",
+      "focus": "esai dua sisi dengan contoh spesifik"
+    },
+    {
+      "id": "w-b2-2",
+      "level": "B2",
+      "genre": "problem_solution",
+      "examTask": "ielts_task2",
+      "minutes": 40,
+      "target": 250,
+      "en": "Many young people in developing countries move to large cities for work. What problems does this cause, and what measures could reduce them?",
+      "id_hint": "Banyak anak muda di negara berkembang pindah ke kota besar untuk bekerja. Masalah apa yang timbul, dan langkah apa yang bisa menguranginya?",
+      "focus": "esai masalah-solusi: sebab, akibat, tindakan"
+    },
+    {
+      "id": "w-b2-3",
+      "level": "B2",
+      "genre": "advantages",
+      "examTask": "ielts_task2",
+      "minutes": 40,
+      "target": 250,
+      "en": "More universities now offer degrees that are taught entirely online. Do the advantages of this development outweigh the disadvantages?",
+      "id_hint": "Makin banyak universitas menawarkan gelar yang seluruhnya diajarkan daring. Apakah keuntungannya melebihi kerugiannya?",
+      "focus": "esai untung-rugi dengan penilaian akhir"
+    },
+    {
+      "id": "w-b2-4",
+      "level": "B2",
+      "genre": "report",
+      "examTask": "ielts_task1_report",
+      "minutes": 20,
+      "target": 150,
+      "en": "The table below shows how students at one school spent their study time in 2020 and 2025. Hours per week — Reading: 6 then 4; Watching video lessons: 2 then 7; Practising exercises: 5 then 5; Group study: 3 then 2. Summarise the information by selecting and reporting the main features, and make comparisons where relevant.",
+      "id_hint": "Tabel berikut menunjukkan cara murid satu sekolah memakai waktu belajarnya pada 2020 dan 2025. Jam per minggu — Membaca: 6 lalu 4; Menonton video pelajaran: 2 lalu 7; Latihan soal: 5 lalu 5; Belajar kelompok: 3 lalu 2. Ringkas informasinya dengan memilih dan melaporkan ciri utamanya, serta bandingkan bila relevan.",
+      "focus": "IELTS Task 1: tren utama, perbandingan, tanpa opini"
+    },
+    {
+      "id": "w-b2-5",
+      "level": "B2",
+      "genre": "discussion",
+      "examTask": "toefl_discussion",
+      "minutes": 10,
+      "target": 110,
+      "en": "Professor: \"Some argue that companies should be required to let employees work from home when the job allows it. Others say attendance builds teams.\" A classmate wrote that remote work harms new employees most. Write a post giving your own position and responding directly to that claim.",
+      "id_hint": "Dosen: \"Sebagian berpendapat perusahaan wajib mengizinkan kerja dari rumah bila pekerjaannya memungkinkan. Sebagian lain menilai kehadiran membangun tim.\" Seorang teman menulis bahwa kerja jarak jauh paling merugikan karyawan baru. Tulis tanggapan berisi posisimu sendiri dan balasan langsung atas klaim itu.",
+      "focus": "TOEFL academic discussion: posisi + sanggahan"
+    },
+    {
+      "id": "w-b2-6",
+      "level": "B2",
+      "genre": "opinion",
+      "examTask": "ielts_task2",
+      "minutes": 40,
+      "target": 250,
+      "en": "Some people believe that schools should teach students how to manage money before they teach advanced mathematics. To what extent do you agree or disagree?",
+      "id_hint": "Sebagian orang menilai sekolah seharusnya mengajarkan pengelolaan uang sebelum matematika lanjut. Sejauh mana kamu setuju?",
+      "focus": "esai opini dengan batasan klaim"
+    },
+    {
+      "id": "w-c1-1",
+      "level": "C1",
+      "genre": "opinion",
+      "examTask": "ielts_task2",
+      "minutes": 40,
+      "target": 250,
+      "en": "To what extent should schools measure students by exam results alone?",
+      "id_hint": "Sejauh mana sekolah boleh menilai murid hanya dari hasil ujian?",
+      "focus": "esai opini dengan kualifikasi dan konsesi"
+    },
+    {
+      "id": "w-c1-2",
+      "level": "C1",
+      "genre": "two_part",
+      "examTask": "ielts_task2",
+      "minutes": 40,
+      "target": 250,
+      "en": "In many countries the gap between the richest and poorest regions is widening. Why is this happening, and what can governments do to make development more even?",
+      "id_hint": "Di banyak negara jurang antara wilayah terkaya dan termiskin makin lebar. Mengapa ini terjadi, dan apa yang bisa dilakukan pemerintah agar pembangunan lebih merata?",
+      "focus": "esai dua pertanyaan: keduanya wajib dijawab penuh"
+    },
+    {
+      "id": "w-c1-3",
+      "level": "C1",
+      "genre": "summary",
+      "examTask": "toefl_integrated_adapted",
+      "minutes": 20,
+      "target": 200,
+      "en": "Reading: Supporters of a four-day school week argue three things. First, students concentrate better in fewer, longer sessions. Second, schools cut electricity and transport costs. Third, teachers gain a full day to prepare lessons. Now consider the counter-argument that a shorter week pushes the same workload into less time, that savings are offset by paying for childcare, and that preparation days are often filled with meetings. Write a response that explains how the counter-argument challenges each of the three points in the reading.",
+      "id_hint": "Bacaan: Pendukung sekolah empat hari mengajukan tiga hal. Pertama, murid lebih fokus dalam sesi yang lebih sedikit tetapi lebih panjang. Kedua, sekolah menghemat biaya listrik dan transportasi. Ketiga, guru mendapat satu hari penuh untuk menyiapkan pelajaran. Sekarang pertimbangkan bantahan bahwa pekan yang lebih pendek memampatkan beban kerja yang sama ke waktu yang lebih sempit, bahwa penghematan tergerus biaya penitipan anak, dan bahwa hari persiapan sering habis untuk rapat. Tulis tanggapan yang menjelaskan bagaimana bantahan itu menantang setiap poin dalam bacaan.",
+      "focus": "TOEFL integrated (adaptasi teks): memasangkan bantahan ke tiap poin sumber",
+      "sourceNote": "Adaptasi berbasis teks. TOEFL asli memakai kuliah audio; di sini bantahannya disajikan tertulis."
+    },
+    {
+      "id": "w-c1-4",
+      "level": "C1",
+      "genre": "report",
+      "examTask": "ielts_task1_report",
+      "minutes": 20,
+      "target": 150,
+      "en": "The chart below shows the percentage of households with home internet access in four countries in 2005, 2015, and 2025. Country A: 30, 70, 92. Country B: 12, 55, 88. Country C: 55, 80, 95. Country D: 4, 22, 61. Summarise the information by selecting and reporting the main features, and make comparisons where relevant.",
+      "id_hint": "Grafik berikut menunjukkan persentase rumah tangga dengan akses internet di empat negara pada 2005, 2015, dan 2025. Negara A: 30, 70, 92. Negara B: 12, 55, 88. Negara C: 55, 80, 95. Negara D: 4, 22, 61. Ringkas informasinya dengan memilih dan melaporkan ciri utamanya, serta bandingkan bila relevan.",
+      "focus": "IELTS Task 1: overview, pengelompokan, bahasa perubahan"
+    },
+    {
+      "id": "w-c1-5",
+      "level": "C1",
+      "genre": "discussion",
+      "examTask": "ielts_task2",
+      "minutes": 40,
+      "target": 250,
+      "en": "Some argue that scientific research should be funded mainly by governments; others believe private companies should carry the cost. Discuss both views and give your own opinion.",
+      "id_hint": "Sebagian berpendapat riset ilmiah sebaiknya dibiayai terutama oleh pemerintah; sebagian lain menilai perusahaan swasta yang harus menanggungnya. Bahas kedua pandangan dan beri pendapatmu.",
+      "focus": "esai dua sisi tingkat lanjut dengan bahasa hedging"
+    },
+    {
+      "id": "w-c1-6",
+      "level": "C1",
+      "genre": "discussion",
+      "examTask": "toefl_discussion",
+      "minutes": 10,
+      "target": 110,
+      "en": "Professor: \"Should universities require students to study a subject far outside their major?\" One classmate argued it wastes time that specialists need. Write a post that takes a clear position, engages that argument, and adds evidence or an example it overlooks.",
+      "id_hint": "Dosen: \"Haruskah universitas mewajibkan mahasiswa mempelajari bidang yang jauh dari jurusannya?\" Seorang teman berargumen itu membuang waktu yang dibutuhkan spesialis. Tulis tanggapan dengan posisi jelas, tanggapi argumen itu, dan tambahkan bukti atau contoh yang ia lewatkan.",
+      "focus": "TOEFL academic discussion: keterlibatan akademik yang padat"
+    },
+    {
+      "id": "w-c2-1",
+      "level": "C2",
+      "genre": "evaluation",
+      "examTask": "ielts_task2",
+      "minutes": 40,
+      "target": 250,
+      "en": "Evaluate whether artificial intelligence will strengthen or weaken independent learning in the long term.",
+      "id_hint": "Evaluasi apakah kecerdasan buatan akan memperkuat atau melemahkan belajar mandiri dalam jangka panjang.",
+      "focus": "evaluasi dengan kriteria eksplisit"
+    },
+    {
+      "id": "w-c2-2",
+      "level": "C2",
+      "genre": "evaluation",
+      "examTask": "ielts_task2",
+      "minutes": 40,
+      "target": 250,
+      "en": "Some claim that global problems such as climate change can only be solved by international agreement, while national action is largely symbolic. How far do you accept this claim?",
+      "id_hint": "Sebagian mengklaim masalah global seperti perubahan iklim hanya bisa diselesaikan lewat kesepakatan internasional, sementara aksi nasional sebagian besar simbolis. Sejauh mana kamu menerima klaim itu?",
+      "focus": "menguji klaim, bukan sekadar setuju atau menolak"
+    },
+    {
+      "id": "w-c2-3",
+      "level": "C2",
+      "genre": "two_part",
+      "examTask": "ielts_task2",
+      "minutes": 40,
+      "target": 250,
+      "en": "Cultural traditions are increasingly shaped by global media rather than local communities. Is this a positive or negative development, and what might be lost or gained?",
+      "id_hint": "Tradisi budaya makin dibentuk oleh media global alih-alih komunitas lokal. Apakah ini perkembangan positif atau negatif, dan apa yang mungkin hilang atau didapat?",
+      "focus": "menimbang nilai, bukan hanya sebab-akibat"
+    },
+    {
+      "id": "w-c2-4",
+      "level": "C2",
+      "genre": "summary",
+      "examTask": "toefl_integrated_adapted",
+      "minutes": 20,
+      "target": 200,
+      "en": "Reading: Advocates of replacing final exams with continuous assessment give three reasons. It reduces the effect of a single bad day; it measures skills that exams cannot, such as sustained research; and it lowers student anxiety. Now consider the counter-argument that continuous assessment rewards students with more time and support at home, that it is far harder to standardise between teachers, and that anxiety is spread across the year rather than removed. Write a response explaining how the counter-argument challenges each reason.",
+      "id_hint": "Bacaan: Pendukung penggantian ujian akhir dengan penilaian berkelanjutan mengajukan tiga alasan. Ia mengurangi dampak satu hari buruk; ia mengukur kemampuan yang tak terjangkau ujian, seperti riset panjang; dan ia menurunkan kecemasan murid. Sekarang pertimbangkan bantahan bahwa penilaian berkelanjutan menguntungkan murid yang punya lebih banyak waktu dan dukungan di rumah, bahwa ia jauh lebih sulit diseragamkan antarguru, dan bahwa kecemasannya hanya disebar sepanjang tahun, bukan dihilangkan. Tulis tanggapan yang menjelaskan bagaimana bantahan itu menantang tiap alasan.",
+      "focus": "TOEFL integrated (adaptasi teks): sintesis tiga pasangan argumen",
+      "sourceNote": "Adaptasi berbasis teks. TOEFL asli memakai kuliah audio; di sini bantahannya disajikan tertulis."
+    },
+    {
+      "id": "w-c2-5",
+      "level": "C2",
+      "genre": "opinion",
+      "examTask": "ielts_task2",
+      "minutes": 40,
+      "target": 250,
+      "en": "It is sometimes argued that the freedom to say anything publicly matters more than protecting people from harmful speech. To what extent do you agree?",
+      "id_hint": "Kadang diperdebatkan bahwa kebebasan menyampaikan apa pun di ruang publik lebih penting daripada melindungi orang dari ujaran yang merugikan. Sejauh mana kamu setuju?",
+      "focus": "menangani nilai yang bertabrakan dengan nuansa"
+    },
+    {
+      "id": "w-c2-6",
+      "level": "C2",
+      "genre": "discussion",
+      "examTask": "toefl_discussion",
+      "minutes": 10,
+      "target": 110,
+      "en": "Professor: \"Does economic growth remain a useful measure of a country’s progress?\" A classmate argued that growth still lifts people out of poverty faster than any alternative. Write a post that engages this argument on its own terms before setting out your own position.",
+      "id_hint": "Dosen: \"Apakah pertumbuhan ekonomi masih ukuran yang berguna untuk kemajuan sebuah negara?\" Seorang teman berargumen pertumbuhan tetap mengangkat orang dari kemiskinan lebih cepat daripada alternatif mana pun. Tulis tanggapan yang menanggapi argumen itu dengan seriusnya sendiri sebelum menyampaikan posisimu.",
+      "focus": "TOEFL academic discussion: konsesi sebelum posisi"
+    },
+    {
+      "id": "w-a2-7",
+      "level": "A2",
+      "genre": "letter",
+      "examTask": null,
+      "minutes": 15,
+      "target": 80,
+      "en": "Your friend Rara helped you study for last week's English test, and you passed. Write a short email to thank her. In your email: say thank you and tell her how you feel, tell her your test result, and offer to help her with something too.",
+      "id_hint": "Temanmu Rara membantumu belajar untuk ulangan bahasa Inggris minggu lalu, dan kamu lulus. Tulis email singkat untuk berterima kasih padanya: ucapkan terima kasih dan ceritakan perasaanmu, beri tahu hasil ulanganmu, dan tawarkan bantuanmu untuk sesuatu juga.",
+      "focus": "email informal ucapan terima kasih: tiga poin wajib, sapaan dan penutup"
+    },
+    {
+      "id": "w-b1-7",
+      "level": "B1",
+      "genre": "narrative",
+      "examTask": null,
+      "minutes": 25,
+      "target": 150,
+      "en": "Write a story that begins with this sentence: \"When Dina opened her bag, her phone was not there.\" In your story: describe what Dina did next, explain how the phone was lost or found, and end with how she felt. Give your story a clear beginning, middle, and ending.",
+      "id_hint": "Tulis cerita yang diawali kalimat ini: \"When Dina opened her bag, her phone was not there.\" Ceritakan apa yang Dina lakukan setelah itu, bagaimana ponselnya hilang atau ditemukan, dan tutup dengan perasaannya. Pastikan ceritamu punya awal, tengah, dan akhir yang jelas.",
+      "focus": "narasi dari kalimat pembuka: past simple, past continuous, urutan kejadian"
+    },
+    {
+      "id": "w-b1-8",
+      "level": "B1",
+      "genre": "report",
+      "examTask": null,
+      "minutes": 25,
+      "target": 150,
+      "en": "You asked 24 classmates about lunch at the school canteen. Results — usually buy fried snacks: 10; buy rice meals: 8; bring food from home: 6. The change most students want: more fruit on the menu. Write a short report for the student council. In your report: describe the main results, compare the groups, and recommend one change with a reason.",
+      "id_hint": "Kamu menanyai 24 teman sekelas tentang makan siang di kantin sekolah. Hasilnya — biasa membeli gorengan: 10; membeli nasi dan lauk: 8; membawa bekal dari rumah: 6. Perubahan yang paling diinginkan murid: lebih banyak buah di menu. Tulis laporan singkat untuk OSIS: jelaskan hasil utamanya, bandingkan kelompoknya, dan rekomendasikan satu perubahan beserta alasannya.",
+      "focus": "laporan survei sederhana: melaporkan angka, membandingkan, satu rekomendasi"
+    },
+    {
+      "id": "w-b2-7",
+      "level": "B2",
+      "genre": "letter",
+      "examTask": "ielts_task1_letter",
+      "minutes": 20,
+      "target": 150,
+      "en": "You bought a backpack from an online shop, but when it arrived the zip was broken, and the seller has not replied to your messages. Write a letter to the customer service manager. In your letter: describe what you ordered and the problem, explain what you have already done to solve it, and say what you want the company to do now.",
+      "id_hint": "Kamu membeli tas ransel dari toko daring, tetapi saat tiba resletingnya rusak, dan penjualnya tidak membalas pesanmu. Tulis surat ke manajer layanan pelanggan: jelaskan apa yang kamu pesan dan masalahnya, ceritakan apa yang sudah kamu lakukan untuk menyelesaikannya, dan sampaikan apa yang kamu minta dari perusahaan sekarang.",
+      "focus": "surat komplain formal: nada tegas tetapi sopan, tiga bullet wajib dijawab"
+    },
+    {
+      "id": "w-b2-8",
+      "level": "B2",
+      "genre": "summary",
+      "examTask": "toefl_integrated_adapted",
+      "minutes": 20,
+      "target": 200,
+      "en": "Reading: Supporters of replacing printed textbooks with e-books argue three things. First, e-books cost schools less over time. Second, their content can be updated instantly. Third, students stop carrying heavy bags. Now consider the counter-argument that devices are costly to buy and repair, that constant updates leave classes unsure which version to follow, and that screens add distraction and eye strain of their own. Write a response explaining how the counter-argument challenges each point.",
+      "id_hint": "Bacaan: Pendukung penggantian buku cetak dengan buku digital mengajukan tiga hal. Pertama, buku digital lebih hemat untuk sekolah dalam jangka panjang. Kedua, isinya bisa diperbarui seketika. Ketiga, murid tidak lagi membawa tas berat. Sekarang pertimbangkan bantahan bahwa perangkatnya mahal dibeli dan diperbaiki, bahwa pembaruan terus-menerus membuat kelas bingung memakai versi yang mana, dan bahwa layar justru menambah distraksi serta mata lelah. Tulis tanggapan yang menjelaskan bagaimana bantahan itu menantang tiap poin dalam bacaan.",
+      "focus": "TOEFL integrated (adaptasi teks): memasangkan bantahan ke tiap poin sumber",
+      "sourceNote": "Adaptasi berbasis teks. TOEFL asli memakai kuliah audio; di sini bantahannya disajikan tertulis."
+    },
+    {
+      "id": "w-c1-7",
+      "level": "C1",
+      "genre": "problem_solution",
+      "examTask": "ielts_task2",
+      "minutes": 40,
+      "target": 250,
+      "en": "In many large cities, young workers can no longer afford to live near their jobs. What problems does this situation create for individuals and for the city as a whole, and what measures could governments and employers take to address them?",
+      "id_hint": "Di banyak kota besar, pekerja muda tidak lagi mampu tinggal dekat tempat kerjanya. Masalah apa yang ditimbulkan situasi ini bagi individu dan bagi kotanya secara keseluruhan, dan langkah apa yang bisa diambil pemerintah serta pemberi kerja untuk mengatasinya?",
+      "focus": "esai masalah-solusi C1: dampak dua tingkat, solusi multi-aktor"
+    },
+    {
+      "id": "w-c1-8",
+      "level": "C1",
+      "genre": "letter",
+      "examTask": "ielts_task1_letter",
+      "minutes": 20,
+      "target": 150,
+      "en": "An empty plot of land in your neighbourhood has been unused for years and is now attracting rubbish. Write a letter to the local council. In your letter: describe the current state of the land and its effect on residents, propose what the space could become, and explain how residents would help maintain it.",
+      "id_hint": "Sebidang tanah kosong di lingkunganmu terbengkalai bertahun-tahun dan kini jadi tempat orang membuang sampah. Tulis surat ke pemerintah daerah: gambarkan kondisi lahan itu dan dampaknya bagi warga, usulkan lahan itu dijadikan apa, dan jelaskan bagaimana warga akan ikut merawatnya.",
+      "focus": "surat usulan formal ke institusi: tiga bullet wajib, register formal konsisten"
+    },
+    {
+      "id": "w-c2-7",
+      "level": "C2",
+      "genre": "report",
+      "examTask": "ielts_task1_report",
+      "minutes": 20,
+      "target": 150,
+      "en": "The table below shows how one country generated its electricity in 2010 and 2025, with average household electricity prices for the same years. Share of generation — Coal: 58% then 34%; Natural gas: 24% then 28%; Renewables: 11% then 33%; Other: 7% then 5%. Average household price per kWh (index, 2010 = 100): 100 then 128. Summarise the information by selecting and reporting the main features, and make comparisons where relevant.",
+      "id_hint": "Tabel berikut menunjukkan cara satu negara membangkitkan listriknya pada 2010 dan 2025, beserta harga listrik rumah tangga rata-rata pada tahun yang sama. Porsi pembangkitan — Batu bara: 58% lalu 34%; Gas alam: 24% lalu 28%; Energi terbarukan: 11% lalu 33%; Lainnya: 7% lalu 5%. Harga rumah tangga per kWh (indeks, 2010 = 100): 100 lalu 128. Ringkas informasinya dengan memilih dan melaporkan ciri utamanya, serta bandingkan bila relevan.",
+      "focus": "IELTS Task 1 dua sumber data: sintesis lintas ukuran, tanpa opini atau menebak sebab"
+    },
+    {
+      "id": "w-c2-8",
+      "level": "C2",
+      "genre": "problem_solution",
+      "examTask": "ielts_task2",
+      "minutes": 40,
+      "target": 250,
+      "en": "In many countries, people are living longer while birth rates fall, so a shrinking working population must support a growing number of retirees. What problems does this shift create, and what policies could governments adopt to manage them?",
+      "id_hint": "Di banyak negara, orang hidup makin lama sementara angka kelahiran turun, sehingga penduduk usia kerja yang menyusut harus menopang makin banyak pensiunan. Masalah apa yang ditimbulkan pergeseran ini, dan kebijakan apa yang bisa diambil pemerintah untuk mengelolanya?",
+      "focus": "esai masalah-solusi kebijakan abstrak: presisi, menimbang trade-off antarkebijakan"
+    }
+  ]
+}

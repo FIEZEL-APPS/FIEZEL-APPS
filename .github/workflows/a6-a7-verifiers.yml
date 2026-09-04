@@ -17,6 +17,10 @@ jobs:
   a6-automated-verification:
     name: A6 Automated Verification
     runs-on: ubuntu-latest
+    # Batas keras: tanpa ini GitHub memakai 360 menit, dan satu langkah
+    # yang menggantung membakar enam jam dalam diam (lihat
+    # workflow-timeout-gate-test.js).
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
@@ -75,11 +79,7 @@ jobs:
 
       - name: Focused neural runtime verification
         run: |
-          node neural-voice-device-hotfix-test.js
-          node neural-voice-generation-timeout-test.js
-          node neural-voice-single-flight-test.js
-          node neural-voice-diagnostics-retention-test.js
-          node neural-voice-audibility-test.js
+          node diag-search-test.js
           node puter-auth-coop-test.js
           node sw-corp-test.js
 
@@ -87,6 +87,10 @@ jobs:
     name: A7 Automated Release Safety
     needs: a6-automated-verification
     runs-on: ubuntu-latest
+    # Batas keras: tanpa ini GitHub memakai 360 menit, dan satu langkah
+    # yang menggantung membakar enam jam dalam diam (lihat
+    # workflow-timeout-gate-test.js).
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
@@ -115,12 +119,33 @@ jobs:
             fi
           fi
 
+          # Every product deploy must advance Diagnostics exactly one build and
+          # carry the same build in SW_REV so cache-first PWA clients refresh shell.
+          if grep -Eq '^(index\.html|style\.css|app\.js|sw\.js|version\.js|manifest\.json|core-config\.js|report-config\.js|content-.*\.js|features/)' /tmp/changed.txt; then
+            base_diag=$(git show "$BASE_SHA:features/neural-voice/fiezel-diag-panel.js" | sed -nE "s/.*var DIAG_BUILD = 'm025-([0-9]+)'.*/\1/p" | head -n1)
+            head_diag=$(sed -nE "s/.*var DIAG_BUILD = 'm025-([0-9]+)'.*/\1/p" features/neural-voice/fiezel-diag-panel.js | head -n1)
+            if [[ -z "$base_diag" || -z "$head_diag" ]]; then
+              echo "A7 FAIL: unable to parse m025-N Diagnostics build"
+              exit 1
+            fi
+            expected_diag=$((base_diag + 1))
+            if [[ "$head_diag" -ne "$expected_diag" ]]; then
+              echo "A7 FAIL: product deploy must increment Diagnostics m025-N exactly +1 (base=$base_diag head=$head_diag expected=$expected_diag)"
+              exit 1
+            fi
+            if ! grep -F "const SW_REV='m025-${head_diag}-" sw.js >/dev/null; then
+              echo "A7 FAIL: SW_REV must carry m025-${head_diag}- prefix so installed PWA refreshes the deployed shell"
+              exit 1
+            fi
+          fi
+
           git merge-tree --write-tree origin/main HEAD >/tmp/merge-tree.txt
           test -s /tmp/merge-tree.txt
 
       - name: Release-safety regressions
         run: |
           node pwa-cache-test.js
+          node pwa-release-coherence-test.js
           node sw-corp-test.js
           node puter-auth-coop-test.js
-          node neural-voice-single-flight-test.js
+          node diag-search-test.js

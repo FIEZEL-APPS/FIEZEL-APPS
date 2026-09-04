@@ -1,6 +1,6 @@
-# FIEZEL 5.18.0
+# FIEZEL 5.19.0
 
-FIEZEL adalah Personal English OS untuk Jahran. Build 5.18.0 mengintegrasikan **Speaking + Listening Skills Lab** dan jalur **local neural voice** yang tetap menjaga privasi, biaya runtime nol, serta kompatibilitas state lama.
+FIEZEL adalah Personal English OS. Build 5.19.0 mengintegrasikan **Speaking + Listening Skills Lab**, **Core Brain adaptif**, dan jalur **local neural voice** yang tetap menjaga privasi, biaya runtime nol, serta kompatibilitas state lama.
 
 Handoff berikutnya memakai master prompt v2.0 dan roadmap berbasis gerbang bukti. Baca `FIEZEL-5.18.0-NEXT-HANDOFF-MASTER-PROMPT.md` bersama `FIEZEL-PRODUCT-ROADMAP-2026-2027.md`. GitHub dan archive wajib direkonsiliasi sebelum promosi bila version surfaces berbeda.
 
@@ -16,10 +16,11 @@ Handoff berikutnya memakai master prompt v2.0 dan roadmap berbasis gerbang bukti
 
 ## Baseline content
 
-- Vocabulary: 1.765 entri.
-- Grammar: 129 lesson × 25 mode = 3.225 runtime questions.
-- Reading: 300 passages / 1.500 questions.
-- Listening: 36 item.
+- Vocabulary: 2.440 entri (+605 wave-2, +70 C1 kurasi gen2 non-duplikat).
+- Grammar: 248 template / 179 lesson unik (gen2 +26 subskill baru; wave-2 +69 varian latihan) × 25 mode.
+- Reading: 312 passages / 1.560 questions.
+- Cloze: 209 item (gen2 +25, wave-2 +61) + alternates (cloze-alternates-v1.json).
+- Listening: 1.407 item bank + 36 latihan Skills Lab.
 - Speaking: 36 item.
 - Grammar schema: `2.0.0`.
 - Practice blueprint: `focused-25-v1`.

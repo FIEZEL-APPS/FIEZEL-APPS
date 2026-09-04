@@ -1,0 +1,121 @@
+# m025-176 deploy gateway `fiezel-api` (workers/api) ke Cloudflare.
+#
+# Kenapa berkas ini ada: sebelum ini fiezel-api adalah SATU-SATUNYA Worker tanpa jalur
+# deploy di CI — audio dan core punya workflow-nya sendiri, gateway murid justru manual.
+# Akibat nyatanya terasa saat migrasi identitas m025-176: `ALLOWED_ORIGINS` di
+# `workers/api/wrangler.toml` sudah menunjuk origin Pages baru (fiezel-apps.github.io),
+# tetapi Worker yang berjalan masih memegang nilai lama sampai seseorang deploy ulang
+# dari laptop. Workflow ini menutup celah itu.
+#
+# Dijalankan manual dan idempoten: kode + vars selalu di-deploy ulang dari sumber repo.
+# Rahasia TIDAK disentuh (semua lewat `wrangler secret put`, lihat catatan di
+# workers/api/wrangler.toml). Migrasi D1 juga TIDAK dijalankan di sini — kontraknya
+# eksplisit per berkas per database (lihat quality.yml gerbang d1-schema-contract).
+name: FIEZEL API Worker Deploy
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fiezel-api-worker-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    # Gate aktor: pola yang sama dengan deploy-core-worker.yml, audio-deploy-worker.yml,
+    # configure-core.yml — satu bentuk, satu login owner (FIEZEL-APPS, pasca-rename
+    # m025-176). Pemeriksaan event_name ikut serta supaya penambahan pemicu otomatis di
+    # masa depan gagal tertutup, bukan lolos diam-diam.
+    if: github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'
+    runs-on: ubuntu-latest
+    # Batas keras: tanpa ini GitHub memakai 360 menit, dan satu langkah
+    # yang menggantung membakar enam jam dalam diam (lihat
+    # workflow-timeout-gate-test.js).
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Deploy Worker fiezel-api
+        working-directory: workers/api
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          node --check index.js
+          # wrangler.toml di repo SENGAJA template: database_id/namespace id asli tidak
+          # dicatat di repo. Token CI hanya berizin Workers (bukan D1 list), jadi sumber
+          # ID-nya adalah worker fiezel-api yang SEDANG live: endpoint settings script
+          # mengembalikan binding produksi hari ini (CORE_DB, STATS_DB, CFG). Deploy ulang
+          # dengan ID yang sama persis = perilaku data tidak berubah, hanya kode+vars.
+          curl -sf -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/scripts/fiezel-api/settings" > /tmp/settings.json
+          node <<'JS'
+          const fs = require('fs');
+          const bindings = JSON.parse(fs.readFileSync('/tmp/settings.json','utf8')).result.bindings;
+          const find = n => bindings.find(b => b.name === n);
+          const id = b => b && (b.id || b.database_id || b.namespace_id);
+          let toml = fs.readFileSync('wrangler.toml','utf8');
+          // Tiga binding WAJIB: kalau tidak ada di worker live, deploy harus gagal keras.
+          for (const [name, ph] of [
+            ['CORE_DB',  '<isi setelah: wrangler d1 create fiezel-core>'],
+            ['STATS_DB', '<isi setelah: wrangler d1 create fiezel-stats>'],
+            ['CFG',      '<isi setelah: wrangler kv namespace create CFG>'],
+          ]) {
+            const v = id(find(name));
+            if (!v) { console.error(`binding wajib ${name} tidak ada di worker live`); process.exit(1); }
+            toml = toml.replace(ph, v);
+          }
+          // LEARNING_DB OPSIONAL: modul learning membaca env.LEARNING_DB dan fail-closed
+          // saat null (route-wiring.js:learningEnv). Kalau database belum pernah dibuat di
+          // akun, lepas bloknya supaya deploy tidak gagal; endpoint learning tetap mati
+          // sampai owner membuat fiezel-learning lalu deploy ulang.
+          const lv = id(find('LEARNING_DB'));
+          if (lv) {
+            toml = toml.replace('<isi setelah: wrangler d1 create fiezel-learning>', lv);
+          } else {
+            const blok = /\[\[d1_databases\]\]\s*\nbinding\s*=\s*"LEARNING_DB"[\s\S]*?<isi setelah: wrangler d1 create fiezel-learning>"\s*\n/;
+            if (!blok.test(toml)) { console.error('blok LEARNING_DB tidak ditemukan untuk dilepas'); process.exit(1); }
+            toml = toml.replace(blok, '# (blok LEARNING_DB dilepas saat deploy: database fiezel-learning belum ada di akun)\n');
+            console.log('LEARNING_DB tidak ada di worker live: blok dilepas, modul learning tetap mati (fail-closed).');
+          }
+          // EVIDENCE_DB OPSIONAL, aturan PERSIS sama dengan LEARNING_DB di atas dan
+          // alasannya lebih keras lagi: database `fiezel-evidence` adalah satu-satunya
+          // yang menyimpan pengenal per-perangkat (cohort), jadi ia baru boleh ada setelah
+          // owner sengaja membuatnya. Selama belum ada di worker live, bloknya DILEPAS —
+          // `route-evidence.js` membaca `env.EVIDENCE_DB` tanpa fallback dan menjawab 202
+          // `{disabled:true}` saat null, jadi lane bukti tetap mati dengan tenang.
+          //
+          // Tanpa cabang ini, penjaga placeholder di bawah akan MENJATUHKAN seluruh deploy
+          // fiezel-api — gateway yang dipakai murid — hanya karena satu lane opsional yang
+          // memang belum disiapkan. Itu kegagalan yang salah sasaran.
+          const ev = id(find('EVIDENCE_DB'));
+          if (ev) {
+            toml = toml.replace('<isi setelah: wrangler d1 create fiezel-evidence>', ev);
+          } else {
+            const eblok = /\[\[d1_databases\]\]\s*\nbinding\s*=\s*"EVIDENCE_DB"[\s\S]*?<isi setelah: wrangler d1 create fiezel-evidence>"\s*\n/;
+            if (!eblok.test(toml)) { console.error('blok EVIDENCE_DB tidak ditemukan untuk dilepas'); process.exit(1); }
+            toml = toml.replace(eblok, '# (blok EVIDENCE_DB dilepas saat deploy: database fiezel-evidence belum ada di akun)\n');
+            console.log('EVIDENCE_DB tidak ada di worker live: blok dilepas, lane bukti tetap mati (fail-closed).');
+          }
+          // ROUTES: custom domain api.fiezel.my.id SUDAH menempel pada worker live dan
+          // lampiran itu bertahan lintas deploy. Token CI tidak berizin Zone->Workers
+          // Routes (error 10000), jadi blok routes dilepas saat deploy: kode+vars tetap
+          // terkirim, alamat publik tidak berubah. Mengubah route tetap urusan owner.
+          const rblok = /routes\s*=\s*\[[\s\S]*?\]\s*\n/;
+          if (!rblok.test(toml)) { console.error('blok routes tidak ditemukan untuk dilepas'); process.exit(1); }
+          toml = toml.replace(rblok, '# (blok routes dilepas saat deploy: token CI tanpa izin zona; custom domain live tetap menempel)\n');
+          if (toml.includes('<isi setelah')) { console.error('masih ada placeholder yang tidak tertangani'); process.exit(1); }
+          fs.writeFileSync('wrangler.toml', toml);
+          JS
+          npx --yes wrangler@3 deploy
+
+      - name: Ringkasan
+        run: |
+          echo "fiezel-api di-deploy ulang dari commit ${GITHUB_SHA}." >> "$GITHUB_STEP_SUMMARY"
+          echo "Vars (termasuk ALLOWED_ORIGINS) kini mengikuti workers/api/wrangler.toml di main." >> "$GITHUB_STEP_SUMMARY"

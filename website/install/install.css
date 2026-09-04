@@ -1,0 +1,234 @@
+/* FIEZEL — halaman /install/. Semua token berasal dari ../tokens.css (jangan definisikan palet baru di sini).
+   m028-05 "CREAM · SOLAR · MAROON": bahasa visual disamakan dengan landing — tanpa satu pun bidang gelap,
+   maroon jadi tinta/garis/aksen. Alur PWA tetap sama (tab per platform + fallback tanpa JS). */
+
+.wrap{width:100%;max-width:var(--maxw);margin:0 auto;padding:0 22px}
+
+.skip{position:absolute;left:-9999px;top:0}
+.skip:focus{left:12px;top:12px;z-index:70;background:var(--cream-warm);color:var(--maroon-deep);
+  border:1px solid var(--maroon);padding:10px 14px;border-radius:var(--radius-sm);box-shadow:var(--shadow-md);font-weight:700}
+
+/* ---------- header ---------- */
+.top{border-bottom:1px solid var(--gold-line-soft);background:var(--cream)}
+.top-in{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:66px;padding-right:52px}
+.brand{display:inline-flex;align-items:center;gap:11px;color:var(--maroon-deep);text-decoration:none}
+.brand-icon{width:30px;height:30px;color:var(--maroon);flex:0 0 auto}
+.wordmark{width:112px;height:auto;display:block;color:var(--maroon-deep)}
+.wordmark rect{fill:currentColor}
+.back{color:var(--maroon-deep);text-decoration:none;font-size:.9rem;font-weight:700;padding:9px 14px;
+  border-radius:var(--radius-pill);border:1px solid var(--maroon-line-strong);background:var(--cream-warm);white-space:nowrap;
+  transition:transform var(--fz-fast) var(--fz-out),box-shadow var(--fz-base) var(--fz-out)}
+.back:hover{transform:translateY(-2px);box-shadow:var(--shadow-sm)}
+
+/* ---------- masthead: wordmark besar + ikon logo, paling atas ---------- */
+.masthead{padding:30px 22px 4px;text-align:center}
+.mast-lock{display:inline-flex;align-items:center;justify-content:center;gap:15px}
+.mast-icon{width:40px;height:40px;color:var(--maroon);flex:0 0 auto}
+/* wordmark RESMI (assets/brand/fiezel-wordmark.svg) — gradient internalnya dipakai apa
+   adanya, jadi TIDAK ada override fill di sini. */
+.mast-word{width:min(66vw,280px);height:auto}
+.mast-sub{margin:12px 0 0;font-size:var(--fs-micro);font-weight:700;letter-spacing:var(--track-wide);
+  text-transform:uppercase;color:var(--maroon-soft)}
+.mast-rule{margin:20px auto 0;max-width:260px;height:1px;border:0;
+  background:linear-gradient(90deg,transparent,var(--gold-line) 30%,var(--maroon-line-strong) 50%,var(--gold-line) 70%,transparent)}
+
+/* ---------- intro ---------- */
+.intro{padding:28px 22px 8px}
+.intro>*{max-width:760px}
+h1{font-size:clamp(1.7rem,6.2vw,2.5rem);line-height:1.14;font-weight:800;letter-spacing:-.032em;
+  margin:0 0 16px;color:var(--text);text-wrap:balance}
+.lead{color:var(--body);font-size:1.03rem;margin:0 0 24px}
+
+/* panggung terang: maskot + tagline kampanye, sekeluarga dengan hero landing */
+.intro-stage{display:flex;align-items:center;gap:16px;padding:18px 20px;margin:0 0 24px}
+.intro-stage .mascot{display:block;width:64px;height:auto;margin:0;flex:0 0 auto}
+.intro-stage .eyebrow-line{margin:0 0 8px}
+.intro-stage .tagline{font-size:var(--fs-label);letter-spacing:.1em;margin:0}
+.paw-idle{transform-origin:50% 84%}
+.anim .paw-idle{animation:pawBreath 5.2s ease-in-out infinite}
+@keyframes pawBreath{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-4px) scale(1.028)}}
+
+.note{background:var(--sun-soft);border:1px solid var(--gold-line);border-radius:var(--radius-lg);padding:17px 19px}
+.note-h{margin:0 0 7px;font-size:var(--fs-micro);font-weight:800;letter-spacing:var(--track-wide);
+  text-transform:uppercase;color:var(--maroon-deep)}
+.note p{margin:0;color:var(--maroon-mid);font-size:.95rem}
+
+.cta-row{display:flex;flex-wrap:wrap;gap:13px;margin:24px 0 0}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:50px;padding:13px 26px;
+  border-radius:var(--radius-pill);font-weight:700;font-size:1rem;text-decoration:none;
+  color:var(--maroon-deep);border:2px solid var(--maroon);
+  transition:transform var(--fz-fast) var(--fz-spring),box-shadow var(--fz-base) var(--fz-out)}
+.btn-primary{background:var(--sun-grad);box-shadow:0 3px 0 var(--maroon),var(--shadow-sm)}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 6px 0 var(--maroon),var(--shadow-md)}
+.btn-ghost{background:var(--cream-warm);box-shadow:0 3px 0 var(--maroon-line-strong)}
+.btn-ghost:hover{transform:translateY(-3px);box-shadow:0 6px 0 var(--maroon-line-strong),var(--shadow-md)}
+.btn:active{transform:translateY(2px) scale(.985)}
+
+/* ---------- section heading ---------- */
+.sec-h{font-size:1.3rem;font-weight:800;letter-spacing:-.02em;margin:0 0 14px;color:var(--text)}
+.sec-num{display:block;font-size:var(--fs-micro);font-weight:700;letter-spacing:var(--track-wide);
+  text-transform:uppercase;color:var(--maroon-soft);margin:0 0 9px}
+
+/* ---------- tabs ---------- */
+.platforms{padding:34px 22px 8px}
+.tabs{display:flex;gap:8px;background:var(--panel-soft);border:1px solid var(--gold-line-soft);
+  border-radius:var(--radius-pill);padding:6px;margin:0 0 18px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs[hidden]{display:none}
+.tab{flex:1 1 auto;min-height:44px;white-space:nowrap;border:0;background:transparent;color:var(--maroon-soft);
+  font-family:var(--font);font-size:.95rem;font-weight:700;border-radius:var(--radius-pill);padding:8px 14px;cursor:pointer;
+  transition:transform var(--fz-fast) var(--fz-out),background-color var(--fz-fast) var(--fz-out),color var(--fz-fast) var(--fz-out)}
+.tab:hover{color:var(--maroon-deep)}
+.tab[aria-selected="true"]{background:var(--sun);color:var(--maroon-deep);box-shadow:0 2px 0 var(--maroon)}
+.tab:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
+
+/* progressive enhancement:
+   tanpa JS -> semua panel tampil berurutan; dengan JS -> hanya panel terpilih */
+.panel{background:var(--cream-warm);border:1px solid var(--line);border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-sm);padding:22px 20px;margin:0 0 18px}
+html.js .panel{display:none}
+html.js .panel.is-open{display:block;animation:fzIn var(--fz-base) var(--fz-out) both}
+@keyframes fzIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.panel[hidden]{display:none}
+
+.panel-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 18px;
+  padding-bottom:14px;border-bottom:1px solid var(--gold-line-soft)}
+.panel-head h3{margin:0;font-size:1.12rem;font-weight:800;letter-spacing:-.02em;color:var(--text)}
+.chip{display:inline-block;background:var(--sun-soft);border:1px solid var(--gold-line);color:var(--maroon-deep);
+  font-size:var(--fs-micro);font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:5px 11px;border-radius:var(--radius-pill)}
+/* chip iOS dibedakan lewat bidang blush + garis maroon (7,4:1), bukan bidang gelap */
+.chip-maroon{background:var(--blush);border-color:var(--maroon-line-strong);color:var(--maroon-deep)}
+
+/* ---------- langkah bernomor ---------- */
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:16px}
+.steps li{display:flex;gap:15px;align-items:flex-start}
+.num{flex:0 0 auto;width:38px;height:38px;border-radius:50%;background:var(--maroon);border:0;color:var(--cream);
+  font-weight:800;font-size:1.05rem;display:flex;align-items:center;justify-content:center;
+  font-variant-numeric:tabular-nums;box-shadow:0 0 0 4px rgba(140,34,51,.10)}
+.step-body{min-width:0}
+.step-body p{margin:0;font-size:1rem;overflow-wrap:break-word;color:var(--body)}
+.step-body p b{color:var(--maroon-deep)}
+.step-body .hint{margin:9px 0 0;color:var(--muted-soft);font-size:.87rem;display:flex;align-items:center;gap:9px}
+
+.ico{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;flex:0 0 auto;
+  border-radius:9px;background:var(--panel-soft);border:1px solid var(--gold-line-soft);color:var(--maroon-deep);vertical-align:-9px}
+.ico svg{width:19px;height:19px;fill:currentColor}
+.ico-sm{width:24px;height:24px;vertical-align:-7px}
+.ico-sm svg{width:15px;height:15px}
+
+.callout{margin:20px 0 0;padding:15px 17px;background:var(--sun-soft);border:1px solid var(--gold-line);
+  border-radius:var(--radius-sm);font-size:.92rem;color:var(--maroon-mid)}
+.callout-blush{background:var(--blush);border-color:var(--maroon-line-strong);color:var(--maroon-mid)}
+.callout strong{font-weight:800;color:var(--maroon-deep)}
+
+/* ---------- setelah terpasang ---------- */
+.after{padding:28px 22px}
+.after-card{background:var(--cream-warm);border:1px solid var(--line);border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-sm);padding:24px 20px;display:flex;flex-direction:column;gap:22px}
+.after-text p{margin:0 0 10px;color:var(--body);font-size:.98rem}
+.after-text p:last-child{margin-bottom:0}
+.must{font-weight:700;color:var(--maroon-deep)!important;font-size:1.02rem!important;
+  border-left:3px solid var(--maroon);padding-left:14px}
+.shot{margin:0;text-align:center}
+.shot img{width:100%;max-width:210px;height:auto;border-radius:16px;border:1px solid var(--maroon-line-strong);box-shadow:var(--shadow-md)}
+.shot figcaption{margin-top:10px;font-size:.82rem;color:var(--muted-soft)}
+
+/* ---------- troubleshooting ---------- */
+.trouble{padding:8px 22px 28px}
+.acc{background:var(--cream-warm);border:1px solid var(--line);border-radius:var(--radius-sm);margin:0 0 10px;overflow:hidden}
+.acc summary{cursor:pointer;list-style:none;padding:16px 46px 16px 17px;font-weight:700;position:relative;
+  font-size:.98rem;color:var(--maroon-deep)}
+.acc summary::-webkit-details-marker{display:none}
+.acc summary::after{content:"";position:absolute;right:17px;top:50%;width:10px;height:10px;margin-top:-6px;
+  border-right:2.5px solid var(--maroon);border-bottom:2.5px solid var(--maroon);transform:rotate(45deg);
+  transition:transform var(--fz-fast) var(--fz-out)}
+.acc[open] summary::after{transform:rotate(225deg);margin-top:-2px}
+.acc p{margin:0;padding:0 17px 17px;color:var(--body);font-size:.94rem}
+
+/* ---------- CTA akhir ---------- */
+.end{padding:6px 22px 36px}
+.end-card{padding:28px 22px;text-align:center}
+.end-card h2{margin:0 0 10px;font-size:clamp(1.3rem,4.8vw,1.8rem);font-weight:800;letter-spacing:-.025em;color:var(--maroon-deep)}
+.end-card p{margin:0;color:var(--body)}
+.end-card .tagline{font-size:var(--fs-label);letter-spacing:.12em;margin:0 0 14px}
+.end .cta-row{justify-content:center;margin-top:22px}
+.end-rule{margin:22px auto 0;max-width:200px;height:1px;border:0;
+  background:linear-gradient(90deg,transparent,var(--gold-line) 30%,var(--maroon-line-strong) 50%,var(--gold-line) 70%,transparent)}
+
+/* ---------- footer ---------- */
+.foot{border-top:1px solid var(--gold-line);background:var(--cream-deep);padding:30px 0 36px}
+.foot-in{text-align:center}
+.wordmark-foot{width:120px;margin:0 auto 12px;color:var(--maroon-deep)}
+.foot-tag{margin:0 0 16px;color:var(--muted);font-size:.92rem}
+.foot-nav{display:flex;gap:11px;justify-content:center;align-items:center;flex-wrap:wrap;
+  color:var(--maroon-soft);font-size:.92rem;margin-bottom:16px}
+.foot-nav a{color:var(--maroon-deep);font-weight:700;text-decoration:none;border-bottom:1px solid var(--maroon-line-strong);padding-bottom:1px}
+.foot-nav a:hover{border-color:var(--maroon)}
+.foot-note{margin:0 auto 6px;max-width:52ch;color:var(--muted);font-size:.84rem}
+.foot-copy{margin:16px 0 0;color:var(--muted-soft);font-size:.82rem;letter-spacing:.08em;text-transform:uppercase}
+
+/* ---------- reveal on-scroll ---------- */
+.anim .reveal{opacity:0;transform:translate3d(0,20px,0);
+  transition:opacity var(--fz-slow) var(--fz-out),transform var(--fz-slow) var(--fz-out);
+  transition-delay:calc(var(--i,0) * 70ms)}
+.anim .reveal.is-in{opacity:1;transform:none}
+.anim .seq{opacity:0;transform:translate3d(0,14px,0);animation:seqIn .7s var(--fz-out) both}
+.anim .seq-1{animation-delay:.06s}
+.anim .seq-2{animation-delay:.22s}
+.anim .seq-3{animation-delay:.38s}
+@keyframes seqIn{from{opacity:0;transform:translate3d(0,14px,0)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){
+  .reveal,.seq{opacity:1!important;transform:none!important}
+}
+
+/* ---------- <= 359px: jaga tiga tab tetap satu baris ---------- */
+@media (max-width:359px){
+  .tabs{gap:4px}
+  .tab{padding:8px 8px;font-size:.88rem}
+  .intro-stage{gap:12px;padding:16px}
+  .intro-stage .mascot{width:52px}
+  .mast-icon{width:32px;height:32px}
+}
+
+/* ---------- >= 720px ---------- */
+@media (min-width:720px){
+  .masthead{padding:44px 22px 6px}
+  .mast-word{width:340px}
+  .mast-icon{width:50px;height:50px}
+  .mast-rule{max-width:400px}
+  .intro{padding:40px 22px 8px}
+  .lead{font-size:1.1rem}
+  .intro-stage{padding:24px 28px;gap:22px}
+  .intro-stage .mascot{width:80px}
+  .intro-stage .tagline{font-size:1.02rem;letter-spacing:.06em}
+  .platforms{padding:52px 22px 8px}
+  .tabs{display:inline-flex;gap:6px}
+  .tab{flex:0 0 auto;padding:8px 20px}
+  .panel{padding:30px 32px}
+  .num{width:44px;height:44px;font-size:1.2rem}
+  .steps{gap:22px}
+  .after-card{flex-direction:row;align-items:center;gap:36px;padding:32px}
+  .after-text{flex:1 1 auto}
+  .shot{flex:0 0 200px}
+  .end-card{padding:44px}
+  .acc summary{font-size:1rem}
+}
+
+/* ---------- >= 1024px ---------- */
+@media (min-width:1024px){
+  .wordmark{width:124px}
+  h1{font-size:2.7rem}
+  .sec-h{font-size:1.5rem}
+  .panel-head h3{font-size:1.28rem}
+  .step-body p{font-size:1.03rem}
+  .shot{flex:0 0 220px}
+  .shot img{max-width:220px}
+}
+
+/* ---------- <= 559px: label kembali dipendekkan supaya tidak melewati tepi layar ---------- */
+@media (max-width:559px){
+  .back-long{display:none}
+  .back{font-size:.86rem;padding:9px 12px}
+  .wordmark{width:96px}
+  .brand-icon{width:26px;height:26px}
+}

@@ -22,13 +22,13 @@ function load(userAgent){
   const listeners={};
   const cached=new ResponseMock('cached',{'headers':{'content-type':'text/html'}});
   const sandbox={console,URL,Promise,Symbol,setTimeout,clearTimeout,Headers:HeadersMock,Response:ResponseMock,Request:function(){},navigator:{userAgent},fetch:async()=>new ResponseMock('network'),caches:{match:async()=>cached,open:async()=>({addAll:async()=>{},put:async()=>{}}),keys:async()=>[],delete:async()=>true},clients:{matchAll:async()=>[]},importScripts:()=>{sandbox.self.FIEZEL_VERSION='5.19.0'},self:null};
-  sandbox.self=sandbox;sandbox.globalThis=sandbox;sandbox.location={origin:'https://fitrajft-ux.github.io'};sandbox.registration={showNotification:()=>{},update:async()=>{}};sandbox.skipWaiting=async()=>{};sandbox.addEventListener=(name,fn)=>(listeners[name]=listeners[name]||[]).push(fn);
+  sandbox.self=sandbox;sandbox.globalThis=sandbox;sandbox.location={origin:'https://fiezel-apps.github.io'};sandbox.registration={showNotification:()=>{},update:async()=>{}};sandbox.skipWaiting=async()=>{};sandbox.addEventListener=(name,fn)=>(listeners[name]=listeners[name]||[]).push(fn);
   vm.createContext(sandbox);vm.runInContext(src,sandbox,{filename:'sw.js'});
   return{listeners};
 }
 async function navigationHeaders(userAgent){
   const t=load(userAgent);let promise=null;
-  const request={url:'https://fitrajft-ux.github.io/FIEZEL-APPS/',method:'GET',mode:'navigate'};
+  const request={url:'https://fiezel-apps.github.io/FIEZEL-APPS/',method:'GET',mode:'navigate'};
   for(const fn of t.listeners.fetch||[])fn({request,respondWith:value=>{promise=value}});
   assert.ok(promise,'same-origin navigation must be handled by the service worker');
   return(await promise).headers;
@@ -41,7 +41,11 @@ async function navigationHeaders(userAgent){
   assert.equal(safariHeaders.get('Cross-Origin-Opener-Policy'),'same-origin-allow-popups','WebKit navigation must preserve the Puter popup opener channel');
   assert.equal(safariHeaders.get('Cross-Origin-Embedder-Policy'),'credentialless');
   const chromeHeaders=await navigationHeaders(chrome);
-  assert.equal(chromeHeaders.get('Cross-Origin-Opener-Policy'),'same-origin','Chromium must retain the isolation-capable opener policy');
+  // m025-83: strict COOP:same-origin on Chromium severed window.opener for the Puter
+  // sign-in popup and sent the majority of installs through a full-page escape instead of
+  // completing inline - see the OWNER note above openerPolicyFor() in sw.js. Chromium now
+  // gets the same opener-preserving policy as WebKit; there is no engine split left to test.
+  assert.equal(chromeHeaders.get('Cross-Origin-Opener-Policy'),'same-origin-allow-popups','Chromium navigation must also preserve the Puter popup opener channel');
 
   const t=load(safari);let intercepted=false;
   const puterRequest={url:'https://js.puter.com/v2/',method:'GET',mode:'no-cors'};

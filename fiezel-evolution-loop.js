@@ -15,13 +15,37 @@
   'use strict';
   const LOOP_SCHEMA='fiezel-evolution-loop-v1';
   const text=v=>String(v??'').trim();
+  /**
+   * Menyeragamkan bentuk insight dari dua sumber yang berbeda bahasa.
+   *
+   * Meta-learning menghasilkan insight `weak_skill` yang menyebut SUBSKILL (mis.
+   * present_perfect), sedangkan self-refine bekerja pada SATU ITEM konkret. Jembatannya
+   * adalah `opts.skillTargets`, peta subskill -> item.
+   *
+   * Yang TIDAK boleh terjadi: insight tanpa peta itu hilang diam-diam. Justru
+   * `weak_skill` adalah temuan utama meta-learning, dan membuangnya tanpa suara membuat
+   * insightCount menyusut tanpa satu pun galat - kegagalan yang tidak akan pernah
+   * dilaporkan siapa pun. Karena itu insight yang belum punya sasaran item tetap
+   * dikembalikan, ditandai `incomplete`, dan dicatat runLoop sebagai `hold` beralasan.
+   */
+  function normalizeInsight(raw,opts){
+    const x=raw&&typeof raw==='object'?raw:{},target=opts?.skillTargets?.[x.subskill]||opts?.skillTargets?.[x.id]||{};
+    const id=text(x.id||x.insightId),itemId=text(x.itemId||target.itemId),domain=text(x.domain||target.domain),category=text(x.category||x.evidence?.category||target.category||'difficulty_mismatch');
+    if(!id||!domain)return null;
+    const templateId=text(x.templateId||target.templateId||(category==='repetition'?'rewrite_repetition':'fix_weak_skill'));
+    const finding=text(x.finding||target.finding||(x.type==='weak_skill'?`Weak skill ${x.subskill}: accuracy ${x.evidence?.accuracy}% after ${x.evidence?.attempts} attempts.`:`QA review: ${category}`));
+    const out={...x,id,insightId:id,itemId,domain,category,templateId,finding};
+    if(!itemId)out.incomplete='missing_item_target';
+    return out;
+  }
   function discoverInsights(memory,opts){
     const raw=opts?.leaderboard||opts?.metaInput||null;
     if(raw&&d.meta){
-      const m=d.meta.run(raw);
-      if(m.ok)return m.insights;
+      const analyze=d.meta.analyze||d.meta.run;
+      const m=typeof analyze==='function'?analyze(raw,opts?.reviewQueue||[]):null;
+      if(m&&(m.ok===true||m.status==='PASS'))return (m.insights||[]).map(x=>normalizeInsight(x,opts)).filter(Boolean);
     }
-    return memory||[];
+    return (memory||[]).map(x=>normalizeInsight(x,opts)).filter(Boolean);
   }
   function runLoop(opts){
     const errors=[];
@@ -34,6 +58,12 @@
     let ledger=Array.isArray(opts.ledgerState)?opts.ledgerState:[];
     if(!ledger.length)ledger=[d.ledger.genesis()];
     for(const insight of (insights||[]).slice(0,8)){
+      // Insight tanpa sasaran item tidak bisa digerbangi, tetapi ia tetap dihitung dan
+      // dilaporkan - "tidak tahu item mana" adalah temuan, bukan alasan untuk diam.
+      if(insight.incomplete){
+        results.push({insightId:text(insight.id,80),patchId:'',stage:'insight',decision:'hold',promotionStatus:'hold',adoptionReady:false,gateOk:false,errors:[insight.incomplete]});
+        continue;
+      }
       const r=d.refine.run({config:cfgRaw,patchGate:opts.patchGate||d.patchGate,library:opts.library||d.library,promotion:opts.promotion||d.promotion,insight,aiOutput:opts.aiOutputs?.[insight.id],aiGenerate:opts.aiGenerate,evidence:opts.evidence?.[insight.id],promptVars:opts.promptVars?.[insight.id]});
       const appended=d.ledger.append(ledger,{event:'gate_result',patchId:r.patchId||'',insightId:text(insight.id,80),target:text(insight.itemId,160),decision:r.decision||'hold',metrics:{gatePassed:r.gate?.ok===true?1:0,promotionStatus:r.promotionStatus||'hold'},timestamp:opts.timestamp||undefined},{maxEntries:opts.maxLedgerEntries||5000});
       ledger=appended.ok?appended.entries:ledger;
@@ -42,5 +72,5 @@
     const chainOk=d.ledger.verifyChain(ledger).ok;
     return{ok:true,schema:LOOP_SCHEMA,autonomyLevel:cfg.autonomyLevel,insightCount:results.length,adoptionReadyCount:results.filter(x=>x.adoptionReady).length,chainIntegrity:chainOk,results,ledgerTail:ledger.slice(-3).map(e=>({seq:e.seq,event:e.event,patchId:e.patchId,decision:e.decision,entryHash:e.entryHash}))};
   }
-  return{LOOP_SCHEMA,discoverInsights,runLoop};
+  return{LOOP_SCHEMA,normalizeInsight,discoverInsights,runLoop};
 });

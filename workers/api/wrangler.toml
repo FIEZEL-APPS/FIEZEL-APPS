@@ -1,0 +1,342 @@
+# ============================================================================
+# FIEZEL API gateway (`fiezel-api`) — konfigurasi PLAN GRATIS-SAFE.
+#
+# BERKAS INI TERPISAH TOTAL dari `workers/wrangler.toml` (Worker audio).
+# `workers/wrangler.toml` dan `workers/fiezel-audio-worker.js` TIDAK BOLEH
+# disentuh: gerbang `audio-asset-pipeline-test.js` melarang string tertentu di
+# sana dan memverifikasi Worker audio tetap hanya-baca. Satu berkas wrangler =
+# satu Worker; menambahkan blok kedua ke berkas itu adalah kesalahan.
+#
+# TIDAK ADA SATU PUN NILAI RAHASIA DI BERKAS INI. Semua rahasia lewat
+# `wrangler secret put` (daftar nama di bagian paling bawah).
+# ============================================================================
+name = "fiezel-api"
+main = "index.js"
+compatibility_date = "2026-06-01"
+workers_dev = false
+
+# `nodejs_compat` SENGAJA TIDAK DIPASANG: seluruh Worker ini hanya memakai API
+# web standar (WebCrypto, Request/Response, btoa/atob). Flag kompatibilitas yang
+# tidak dipakai memperbesar permukaan perubahan perilaku runtime tanpa manfaat.
+
+# --- ROUTE ------------------------------------------------------------------
+# Custom domain sejak hari pertama. Alasannya bukan estetika: CORS untuk API
+# berkredensial tidak boleh "*" (Worker audio memakai "*" dan itu BENAR untuk
+# aset publik, SALAH untuk API), dan `api.fiezel.my.id` satu registrable domain
+# dengan `fiezel.my.id` sehingga cookie `SameSite=Lax` ikut terkirim.
+#
+# PRASYARAT OWNER (P0, blocking): zona `fiezel.my.id` harus sudah ada di
+# Cloudflare. Tanpa itu, deploy dengan blok ini akan GAGAL — dan itu lebih baik
+# daripada diam-diam jatuh ke `workers.dev` yang tidak bisa dikunci CORS.
+routes = [
+  { pattern = "api.fiezel.my.id", custom_domain = true }
+]
+
+# --- VARS (BUKAN rahasia; boleh terlihat di dashboard dan di repo) -----------
+[vars]
+PROTOCOL_VERSION  = "1.7"          # dibaca /health; frontend MENOLAK selain ini
+SERVICE_NAME      = "fiezel-api"
+API_VERSION       = "cf-api-1"
+AI_GATEWAY_MODE   = "core-only"    # cermin core-config.js aiGateway
+# Allowlist CORS eksplisit. BUKAN pantulan Origin, BUKAN "*".
+# Catatan jujur: `fiezel-apps.github.io` ada di public suffix list => cross-site,
+# jadi cookie identitas TIDAK akan terkirim dari sana. Cermin GitHub Pages tetap
+# bisa belajar penuh (semua pelajaran lokal), tanpa AI/TTS. Keputusan owner.
+ALLOWED_ORIGINS   = "https://fiezel.my.id,https://www.fiezel.my.id,https://fiezel-apps.github.io"
+COOKIE_DOMAIN     = "fiezel.my.id" # cookie ikut terkirim ke api.fiezel.my.id
+# Entitlement fase ini: AI HIDUP, TTS dan COACH masih mati. Aturannya tetap: fitur baru
+# wajib di belakang flag OFF sampai jalurnya terbukti hidup ujung-ke-ujung.
+#
+# KOREKSI GANDA (audit rilis m025-179, 28 Agu 2026).
+#
+# (a) Baris ini dulu berbunyi "SEMUA MATI" — sudah tidak benar sejak FEATURE_AI dinyalakan.
+#
+# (b) Baris ini juga menjadikan "main auto-deploy ke produksi tiap 5 menit" DASAR aturan
+#     flag-OFF. Audit menyisir seluruh `.github/workflows/` dan menemukan NOL mekanisme yang
+#     menerbitkan aplikasi ke `fiezel.my.id/app/` — nol scp, nol rsync, nol FTP, nol
+#     deploy-pages; yang ada hanya deploy Worker Cloudflare. Premisnya tidak bisa
+#     ditunjukkan, dan aturan yang menumpu pada mekanisme yang tidak ada bukan aturan.
+#
+# Sejak audit itu mekanismenya BENAR-BENAR ADA: `.github/workflows/deploy-site.yml` (dipicu
+# HANYA sesudah Quality Gate hijau) dan `.cpanel.yml` untuk jalur cPanel Git. Keduanya
+# mengunggah aset lebih dulu dan `sw.js` paling akhir, lalu MEMBUKTIKAN penandanya lewat
+# `tools/deploy-site-verify.mjs`. Aturan flag-OFF kini punya alasan yang bisa diperiksa.
+FEATURE_AI        = "on"
+FEATURE_TTS       = "off"
+FEATURE_COACH     = "off"
+# SLOT 7 lapisan sosial (route-social.js): LAHIR MATI sesuai aturan produksi.
+# Menyalakannya butuh TIGA sakelar AND: var ini "on" + KV cfg:flags
+# enabled.social=true + flags.cfSocialEnabled=true. Fail-closed bila KV tak terbaca.
+FEATURE_SOCIAL    = "on"
+# SLOT 9 lane bukti belajar PER-MURID (evidence/route-learner-evidence.js): LAHIR MATI.
+# Ini satu-satunya lane FIEZEL yang menyimpan bukti belajar terikat `identity.sub`, jadi
+# "lahir mati" di sini bukan formalitas rilis melainkan pagar privasi: menyalakannya butuh
+# TIGA sakelar AND (var ini "on" + KV cfg:flags enabled.learnerEvidence=true +
+# flags.cfLearnerEvidenceEnabled=true) DAN persetujuan per-murid di
+# `learner_evidence_consent`. Tanpa persetujuan itu, lane yang menyala pun menulis NOL baris.
+FEATURE_LEARNER_EVIDENCE = "on"
+# Angka limit hanya untuk NASKAH UX (bab 12); penegakan tetap di server.
+#
+# 🔄 TEMUAN LAPANGAN 28 Agu 2026 — DUA ANGKA UNTUK HAL YANG SAMA, SUDAH DISELARASKAN.
+# Sampai commit ini nilainya AI_LIMIT_PER_DAY="20" dan TTS_CHARS_PER_DAY="6000", sedangkan
+# yang BENAR-BENAR ditegakkan adalah FREE_AI_DAILY_LIMIT=25 dan FREE_TTS_DAILY_CHARS=12000
+# (`quota/quota-config.js`). Angka di berkas inilah yang dikirim ke murid lewat
+# `GET /api/config` dan `GET /api/user/me` (`limits.aiPerDay`, `limits.ttsCharsPerDay`;
+# route-config.js:69-70, route-user.js:53-55) — jadi naskah kuota MEMBOHONGI murid: murid
+# diberi tahu jatahnya 20 padahal server memberi 25, dan 6.000 char padahal server memberi
+# 12.000. Murid berhenti sebelum jatahnya habis, dan pesan "sisa" tidak pernah cocok dengan
+# 429 yang sesungguhnya.
+#
+# ARAH PENYELARASAN, disengaja: NASKAH mengikuti PENEGAKAN, bukan sebaliknya.
+# `quota/quota-config.js` satu-satunya sumber kebenaran (bab 10) dan nilainya TIDAK
+# diturunkan — menurunkannya berarti memotong jatah murid demi merapikan dokumen.
+# Pasangan wajib-cocok ini ditegakkan gerbang `config-consistency-test.js`:
+#   AI_LIMIT_PER_DAY  <-> FREE_AI_DAILY_LIMIT   (quota-config.js:32)
+#   TTS_CHARS_PER_DAY <-> FREE_TTS_DAILY_CHARS  (quota-config.js:48)
+# Mengubah salah satu sisi sepihak = gerbang MERAH.
+AI_LIMIT_PER_DAY  = "25"           # == FREE_AI_DAILY_LIMIT (nilai yang ditegakkan)
+# AI_LIMIT_PER_HOUR TIDAK punya pasangan penegakan, dan itu dicatat, bukan didiamkan:
+# tidak ada batas AI per-JAM di quota-config.js. Yang ada hanya laju
+# FREE_AI_RATE_PER_MINUTE=8 (= 480/jam) dan batas HARIAN 25, dan 25/hari sudah mengikat jauh
+# lebih dulu daripada 40/jam — jadi angka 40 ini tidak pernah menjadi batas yang menolak
+# permintaan siapa pun. Var ini TETAP dikirim ke klien sebagai `limits.aiPerHour`
+# (route-user.js:54; `GET /api/config` tidak membawanya), jadi ia naskah murni tanpa
+# penegakan. Dibiarkan APA ADANYA di paket ini: menghapus var yang mungkin masih dibaca
+# konfigurasi produksi, atau menambah penegakan per-jam yang belum pernah diputuskan,
+# dua-duanya bukan keputusan sepihak. Terdaftar sebagai pengecualian BERALASAN di
+# config-consistency-test.js supaya tidak pernah lolos senyap.
+AI_LIMIT_PER_HOUR = "40"
+TTS_CHARS_PER_DAY = "12000"        # == FREE_TTS_DAILY_CHARS (nilai yang ditegakkan)
+GLOBAL_NEURON_CAP = "8000"         # < 10.000/hari alokasi gratis akun
+MAX_USERS         = "250"          # cermin fiezel-core-worker.js:5
+AUDIO_PUBLIC_BASE = "https://audio.fiezel.my.id"
+# Kill switch analytics. "off" = `/api/usage/*` tetap TERDAFTAR (menjawab 202
+# `{disabled:true}`, bukan 404 — klien lama yang melihat 404 akan mengulang
+# tanpa henti) tetapi tidak satu baris pun ditulis, dan cron rollup keluar
+# lewat `{skipped:'flag_off'}`. Owner menyalakannya dengan:
+#   wrangler deploy   (setelah mengubah nilai ini)  ATAU  var override di dashboard.
+ANALYTICS_ENABLED = "on"
+# Kill switch lane telemetri BELAJAR (fiezel-learning-event-v1). Default "off"
+# DENGAN SENGAJA: kontrak BRAIN-TELEMETRY-SCHEMA.md §5 mensyaratkan dedup
+# idempoten sebelum emitter pertama, jadi lane ini baru boleh menyala setelah
+# migrasi 0007_learning.sql diterapkan dan database_id LEARNING_DB terisi.
+# "off" = `POST /api/learning/events` tetap TERDAFTAR (menjawab 202
+# `{disabled:true}`, bukan 404) tetapi tidak satu baris pun ditulis.
+LEARNING_ENABLED = "off"
+# Kill switch lane BUKTI BELAJAR Braincore (fiezel-braincore-evidence-v1).
+# Default "off" DENGAN SENGAJA, dan alasannya sama kerasnya dengan lane
+# learning: lane ini adalah SATU-SATUNYA yang membawa pengenal murid (cohort
+# acak berotasi 14 hari), jadi ia baru boleh menyala setelah migrasi
+# 0008_evidence.sql diterapkan, database_id EVIDENCE_DB terisi, dan purge TTL
+# cohort terbukti jalan. "off" = `POST /api/braincore/evidence` tetap TERDAFTAR
+# (menjawab 202 `{disabled:true}`, bukan 404) tetapi tidak satu baris pun
+# ditulis.
+EVIDENCE_ENABLED = "on"
+# CATATAN: TIDAK ADA `TEST_CLOCK_MS` di sini, dan tidak boleh pernah ada.
+# Var itu hanya untuk harness gerbang; gerbang cf-api-contract-test.js
+# meng-assert ketiadaannya di berkas ini.
+
+# --- D1: identitas, sesi, entitlement ---------------------------------------
+# Kenapa D1 dan bukan KV: KV eventually consistent ("may take up to 60 seconds
+# or more") dan hanya 1 tulis/detik/kunci. D1 single-threaded per database
+# sehingga `UPDATE ... WHERE ... RETURNING` bersyarat bersifat atomik — dan itu
+# pengganti Durable Object yang bisa dipakai di PLAN GRATIS.
+[[d1_databases]]
+binding        = "CORE_DB"
+database_name  = "fiezel-core"
+database_id    = "<isi setelah: wrangler d1 create fiezel-core>"
+
+# D1 kedua untuk statistik/agregat. Dipisah supaya analytics tidak
+# menyerialisasi jalur panas identitas (D1 single-threaded per database).
+# Tabelnya HANYA agregat — kontrak analytics privasi-maksimal melarang baris
+# per-orang untuk analytics, dan melarang join ke tabel kuota.
+# CATATAN PENTING soal migrasi: `migrations_dir` di atas SENGAJA DIHAPUS setelah
+# migrasi analytics masuk ke `migrations/`. `wrangler d1 migrations apply` hanya
+# mengenal SATU database per direktori, sehingga membiarkannya berarti
+# `0002_analytics.sql` akan dijalankan di `fiezel-core` — tabel agregat analytics
+# berakhir satu database dengan `quota_daily`, dan JOIN yang dilarang kontrak
+# privasi mendadak menjadi mungkin. Cara menerapkan migrasi ada di
+# `migrations/MIGRATIONS.md` (per berkas, per database, eksplisit).
+
+[[d1_databases]]
+binding       = "STATS_DB"
+database_name = "fiezel-stats"
+database_id   = "<isi setelah: wrangler d1 create fiezel-stats>"
+# Modul analytics (`analytics/route-events.js`, `analytics/rollup.js`) membaca
+# `env.ANALYTICS_DB`. Aliasnya dibuat di kode (`route-wiring.js:analyticsEnv`),
+# BUKAN dengan binding kedua ke database yang sama: dua binding ke satu database
+# membuat pembaca berikutnya mengira ada dua database, dan itu justru kebalikan
+# dari yang mau dijamin (pemisahan fisik kuota vs analytics).
+
+# D1 KETIGA untuk lane telemetri belajar (BRAIN-TELEMETRY-SCHEMA.md). Terpisah
+# dari fiezel-core (identitas) DAN fiezel-stats (kehadiran perangkat) dengan
+# alasan yang sama kerasnya: D1 tidak bisa JOIN lintas database, jadi "hasil
+# kebijakan Brain tidak bisa digabungkan dengan identitas atau token kehadiran"
+# menjadi sifat struktur, bukan disiplin orang. Tabelnya HANYA agregat harian
+# (learning_daily) + dedup UUID sekali-pakai ber-TTL (learning_dedup) — migrasi
+# 0007_learning.sql. Modul learning membaca `env.LEARNING_DB` TANPA fallback ke
+# binding lain (route-wiring.js:learningEnv).
+[[d1_databases]]
+binding       = "LEARNING_DB"
+database_name = "fiezel-learning"
+database_id   = "<isi setelah: wrangler d1 create fiezel-learning>"
+
+# D1 KEEMPAT untuk lane BUKTI BELAJAR Braincore. Alasan pemisahannya satu
+# tingkat lebih keras daripada tiga database di atas: inilah satu-satunya
+# database yang menyimpan pengenal per-perangkat (`evidence_learner_day.cohort`,
+# 16 hex acak, TTL 14 hari). Selama ia hidup di database sendiri, "cohort tidak
+# bisa disambungkan ke identitas, kuota, kehadiran, atau jawaban" adalah sifat
+# yang tidak bisa ditulis dalam SQL — D1 tidak bisa JOIN lintas database.
+# Tabel: evidence_daily (agregat), evidence_dedup (UUID sekali pakai),
+# evidence_learner_day (hari+cohort) — migrasi 0008_evidence.sql. Modul bukti
+# membaca `env.EVIDENCE_DB` TANPA fallback (route-wiring.js:evidenceEnv).
+[[d1_databases]]
+binding       = "EVIDENCE_DB"
+database_name = "fiezel-evidence"
+database_id   = "<isi setelah: wrangler d1 create fiezel-evidence>"
+
+# --- KV: HANYA config/flag/state breaker + penanda anti-replay ber-TTL -------
+# PLAN GRATIS: 1.000 TULIS/HARI. Karena itu jalur panas DILARANG menulis ke KV.
+# Yang boleh menulis: `PUT /api/owner/flags` (jarang) dan penanda anti-replay
+# tiket klaim (`claim:jti:*`, TTL 300 s, hanya saat murid login Puter).
+# Baca memakai `cacheTtl` 60 s supaya baca berulang tidak jadi operasi baru.
+[[kv_namespaces]]
+binding = "CFG"
+id      = "<isi setelah: wrangler kv namespace create CFG>"
+
+# --- R2: BACA aset audio yang SUDAH ADA -------------------------------------
+# Bucket yang sama dengan Worker audio. Worker ini hanya perlu `head`/`get` untuk
+# memeriksa apakah aset TTS/pelajaran sudah ada (cache-hit dijawab dengan URL
+# publik `audio.fiezel.my.id`, BUKAN dengan mem-proxy byte: nol CPU, nol
+# subrequest, egress gratis).
+# 1.170 objek `a/<sha256>.mp3` milik pipeline ElevenLabs TIDAK PERNAH ditulis
+# dari Worker ini; prefiks tulis (kalau nanti ada) dipisah di `tts/v1/**`.
+[[r2_buckets]]
+binding     = "AUDIO"
+bucket_name = "fiezel-audio"
+
+# --- Workers AI: binding, bukan REST ----------------------------------------
+# Binding berarti TIDAK ADA token API di dalam Worker => nol permukaan kebocoran
+# kunci (repo ini pernah punya insiden secret). Penggunaan AI di fase ini NOL;
+# binding sudah disiapkan supaya paket kerja AI/TTS tidak perlu mengubah berkas
+# konfigurasi ini lagi.
+[ai]
+binding = "AI"
+
+# --- Analytics Engine: DIHAPUS (m025-176) -------------------------------------
+# Binding `AE` (dataset fiezel_events) dulu dideklarasikan di sini untuk event
+# operasional, tetapi TIDAK ADA satu baris kode pun di workers/api yang memakai
+# `env.AE`/`writeDataPoint` — deklarasi mati. Efek nyatanya: `wrangler deploy`
+# gagal keras (code 10089) di akun yang belum mengaktifkan Analytics Engine.
+# Kalau suatu saat event operasional benar-benar ditulis, kembalikan blok
+# `[[analytics_engine_datasets]]` BERSAMA kodenya, dan pertahankan kontrak
+# privasi: tanpa `index1 = user_id`, pengenal harian ber-pepper rotasi 24 jam.
+
+# --- CRON -------------------------------------------------------------------
+# DUA trigger, dan keduanya wajib. Handler-nya `scheduled()` di `index.js`,
+# pemetaan ekspresi -> job di `route-wiring.js` (CRON_QUOTA_SWEEP,
+# CRON_ANALYTICS_ROLLUP).
+#
+#   "*/5 * * * *"  (a) sweep reservasi kuota kedaluwarsa + rekonsiliasi `held`.
+#                      TTL reservasi 30 s (quota-config RESERVATION_TTL_MS), jadi
+#                      5 menit jauh lebih cepat dari yang dibutuhkan sementara
+#                      tetap murah: 288 eksekusi/hari dari 100.000 request/hari
+#                      plan gratis = 0,3%. Tanpa job ini, slot yang ditahan
+#                      permintaan yang mati hilang dari jatah murid sampai
+#                      tengah malam.
+#   "5 17 * * *"   (b) rollup analytics harian + rotasi pepper, 00:05 WIB
+#                      (UTC+7). Menit ke-5, bukan ke-0: memberi ruang bagi event
+#                      terakhir hari itu tiba. Tanpa job ini kontrak privasi
+#                      BOHONG — token harian tidak pernah dihapus dan pepper
+#                      tidak pernah dirotasi.
+#
+# Cron cadangan TIDAK dipasang: kalau satu eksekusi gagal, yang berikutnya
+# mengerjakan hal yang sama (kedua job idempoten).
+[triggers]
+crons = ["*/5 * * * *", "5 17 * * *"]
+
+# ============================================================================
+# YANG SENGAJA TIDAK ADA DI SINI, DAN ALASANNYA
+# ============================================================================
+# 1. DURABLE OBJECTS — TIDAK DIPASANG.
+#    Durable Objects membutuhkan Workers PAID. Keputusan owner 27 Agu 2026:
+#    PLAN GRATIS dulu. Konsekuensi teknis yang harus dilaporkan apa adanya:
+#    kuota memakai D1 `UPDATE ... WHERE used < limit RETURNING` (atomik per
+#    pernyataan, TANPA lease), jadi dua request yang datang persis bersamaan
+#    tetap terhitung benar, TETAPI tidak ada penguncian lintas-pernyataan
+#    (mis. "cadangkan lalu refund" tidak bisa dibungkus satu transaksi lintas
+#    request). KALAU pemantauan menunjukkan kuota terlampaui atau butuh
+#    atomisitas lebih ketat: Durable Object adalah UPGRADE BERBAYAR, dan itu
+#    WAJIB DILAPORKAN KE OWNER dengan angka (berapa kali terlampaui, berapa
+#    biaya kelebihannya) — bukan dinyalakan diam-diam di berkas ini.
+# 2. `migrations_dir` — lihat catatan di blok D1 di atas: dihapus karena satu
+#    direktori migrasi hanya bisa menunjuk satu database, dan repo ini punya dua.
+# 3. `[triggers] crons` — SUDAH TERPASANG (lihat blok CRON di atas) oleh paket
+#    kerja integrasi rute, karena dua paket kerja berbeda (kuota + analytics)
+#    masing-masing butuh satu trigger dan hanya boleh ada satu blok
+#    `[triggers]` per Worker.
+# 3b. `[[unsafe.bindings]]` rate limiting TETAP tidak dipasang: penegakan
+#    per-menit hari ini memakai tabel kuota D1 yang sama (satu sumber angka),
+#    dan binding rate-limit Cloudflare masih ditandai unsafe/beta. Menambahkannya
+#    berarti dua sumber kebenaran untuk satu batas.
+# 3c. Bucket R2 tulis untuk TTS (`tts/v1/**`) memakai binding `AUDIO` yang sudah
+#    ada; prefiksnya yang dipisah, bukan bucket-nya.
+# 4. Bucket R2 kedua (`USERDATA`, backup progres murid) — TIDAK DIPASANG.
+#    Backup progres ke server default MATI (bab 1 melarang server jadi sumber
+#    kebenaran progres). Binding yang tidak ada = fitur yang secara struktural
+#    tidak bisa bocor.
+# 5. `[observability] enabled = true` — TIDAK DIPASANG di plan gratis: retensi
+#    log dan biayanya berbeda antar plan. Pakai `wrangler tail` saat perlu.
+
+# ============================================================================
+# SECRET YANG HARUS DIPASANG OWNER (NAMA SAJA — jangan pernah menulis nilainya)
+#
+#   wrangler secret put SESSION_HMAC_KEY_CURRENT     # penanda cookie fz_id (kid=2)
+#   wrangler secret put SESSION_HMAC_KEY_PREVIOUS    # kid=1; rotasi tanpa logout massal
+#   wrangler secret put PUTER_CLAIM_SECRET_CURRENT   # verifikasi tiket klaim dari Worker Puter
+#   wrangler secret put PUTER_CLAIM_SECRET_PREVIOUS  # rotasi tiket klaim
+#   wrangler secret put IDENTITY_PEPPER              # HMAC pengenal turunan (ip_hmac, ref)
+#   wrangler secret put OWNER_SUBJECT                # identitas owner untuk Worker owner
+#   wrangler secret put OWNER_TOKEN_HASH             # sha256 HEX token owner; gerbang rute
+#                                                    # /api/owner/* (cron-status + bukti
+#                                                    # Braincore). NILAI YANG SAMA dengan
+#                                                    # OWNER_TOKEN_HASH di Worker owner -
+#                                                    # satu token untuk dua Worker. Tanpa ini
+#                                                    # kedua rute owner 403 SELALU
+#                                                    # (fail-closed), dan gejalanya identik
+#                                                    # dengan "token saya salah".
+#   wrangler secret put CRON_TOKEN                   # pengganti FIEZEL_REMINDER_CRON_TOKEN
+#   wrangler secret put EDGE_SHARED_SECRET           # header X-Fiezel-Edge dari proxy jembatan
+#
+# Tanpa `SESSION_HMAC_KEY_CURRENT`, `/api/auth/anon` akan 500 (tidak bisa
+# menandatangani cookie) — itu kegagalan yang benar: lebih baik gagal jelas
+# daripada menerbitkan identitas yang tidak bisa diverifikasi.
+# Tanpa `PUTER_CLAIM_SECRET_CURRENT`, `/api/auth/claim` selalu 401 — juga benar:
+# fitur tanpa penerbit tiket tidak boleh mengikat identitas.
+#
+# `EDGE_SHARED_SECRET` kini WAJIB SEBELUM deploy pertama (m0261-d17, audit D3
+# HIGH-3): tanpa dia gerbang edge FAIL-CLOSED — semua rute kecuali `/healthz`
+# menjawab 403. Itu default aman yang disengaja: deploy yang lupa memasang
+# secret menghasilkan API yang diam, bukan alamat `*.workers.dev` yang terbuka
+# untuk menerbitkan identitas anonim tanpa batas (tulis D1 + kuras jatah
+# gratis). Nilainya harus IDENTIK dengan yang disuntik ke
+# `deploy/edge/api-index.php` di origin.
+# Pengecualian eksplisit untuk dev/masa transisi SAJA: var (bukan secret)
+# `ALLOW_NO_EDGE_SECRET = "true"` membuka mode `off` lama — Worker jalan tanpa
+# gerbang dan `/health` melaporkan `edgeGuard:"off"`. Var itu SENGAJA tidak
+# ditulis di [vars] berkas ini; kalau dibutuhkan, pasang sadar-sadar dan hapus
+# lagi. Lihat `workers/api/mw-edge.js` dan `deploy/edge/README.md`.
+#
+# VAR OPSIONAL pembatas penerbitan identitas (m0261-d17 audit D3 HIGH-2, direvisi
+# paket S1 28 Agu 2026 — lihat `workers/api/rate-anon.js`; default dipakai bila
+# tidak disetel). Cabang tarif dipilih dari `ctx.edgePath` (jalur yang BENAR-BENAR
+# dipakai permintaan), bukan dari ada/tidaknya `EDGE_SHARED_SECRET`:
+#   ANON_ISSUE_LIMIT_PER_HOUR          = "15"  # per IP, JENDELA BERGULIR 1 jam (jalur langsung)
+#   ANON_ISSUE_LIMIT_BRIDGE_PER_HOUR   = "30"  # TOTAL/jam, HANYA saat edgePath="header" (proxy PHP: satu IP bersama)
+#   ANON_ISSUE_LIMIT_DEGRADED_PER_HOUR = "5"   # saat D1 tak terbaca; otomatis dijepit <= batas normal
+#   ANON_JITTER_MAX_MS                 = "150" # jitter respons /api/auth/anon; "0" mematikan
+# Satu kelas (30-40 murid) yang onboarding serentak di SATU wifi sekolah akan kena
+# 429 mulai murid ke-16. Untuk sesi kelas terjadwal, setel sementara
+# ANON_ISSUE_LIMIT_PER_HOUR = "60" lalu hapus lagi; penutup permanennya Turnstile
+# atau WAF rate-rule per ASN (lihat reports/work-s1-auth-anon.md).
+# ============================================================================

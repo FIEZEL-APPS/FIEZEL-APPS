@@ -1,19 +1,20 @@
 name: Configure FIEZEL Core Worker
 
-# Resume trigger: verified deployment continuation; targeted transport recovery; deploy-authorized run 2026-08-13.
+# MASTER-ONLY: configuration is never triggered by a repository push.
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/configure-core.yml'
+
+permissions:
+  contents: read
 
 jobs:
   configure:
-    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[configure-core]')
+    if: github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
+    # Batas keras: tanpa ini GitHub memakai 360 menit, dan satu langkah
+    # yang menggantung membakar enam jam dalam diam (lihat
+    # workflow-timeout-gate-test.js).
+    timeout-minutes: 15
     env:
       FIEZEL_CORE_WORKER_URL: https://fiezel-core.puter.work
     steps:

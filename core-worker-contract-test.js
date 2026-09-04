@@ -8,7 +8,7 @@ const kv={
   list:async({pattern='',returnValues=false}={})=>{const prefix=pattern.replace('*','');return[...store.entries()].filter(([k])=>k.startsWith(prefix)).map(([key,value])=>returnValues?{key,value}:{key})}
 };
 const me={puter:{kv,auth:{getUser:async()=>({uuid:'owner-uuid',username:'owner'})}}};
-const context={router,me,Response,Intl,Date,Math,console,crypto:require('crypto').webcrypto,TextEncoder,TextDecoder};
+const context={router,me,Response,Intl,Date,Math,console,crypto:require('crypto').webcrypto,TextEncoder,TextDecoder,URL};
 vm.createContext(context);vm.runInContext(source,context,{filename:'fiezel-core-worker.js'});
 const assert=(v,m)=>{if(!v)throw new Error(m)};
 const req=(body={},headers={})=>({json:async()=>body,headers:{get:k=>headers[k.toLowerCase()]||headers[k]||''}});
@@ -21,8 +21,8 @@ const req=(body={},headers={})=>({json:async()=>body,headers:{get:k=>headers[k.t
 
   let modelSeen='';
   const user={puter:{auth:{getUser:async()=>({uuid:'jahran-uuid',username:'Jahran'})},ai:{chat:async(msgs,opt)=>{modelSeen=opt.model;return{message:{content:'aman'}}}}}};
-  const ai=await routes.POST.get('/api/ai/chat')({request:req({prompt:'jelaskan present perfect',model:'untrusted-model'}),user});
-  assert(ai.text==='aman'&&modelSeen==='gpt-5.4-nano'&&ai.model==='gpt-5.4-nano'&&ai.protocol==='1.7','server-side AI model ownership failed');
+  const ai=await routes.POST.get('/api/ai/chat')({request:req({task:'quiz_explanation',profile:{goalProfile:'scholarship',estimatedLevel:'B1',timeZone:'America/New_York'},prompt:'jelaskan present perfect',model:'untrusted-model'}),user});
+  assert(ai.text==='aman'&&ai.schema==='fiezel-ai-response-v1'&&ai.task==='quiz_explanation'&&modelSeen==='gpt-5.4-nano'&&ai.model==='gpt-5.4-nano'&&ai.protocol==='1.7','server-side AI model ownership/schema failed');
   const coach=await routes.POST.get('/api/coach/context')({request:req({snapshot:{adaptiveReady:true,totalAttempts:80,estimatedLevel:'B1',domains:{grammar:{attempts:30,accuracy:45}}},evidence:{behavior:{consistency14d:60},memory:{},skills:{weakest:[{skill:'present_perfect',type:'grammar',attempts:10,accuracy:40,errorRate:60,recurringErrors:3}]}},outcomes:[]}),user});
   assert(coach.text==='aman'&&coach.protocol==='1.7'&&coach.via==='fiezel-core-worker-context-coach','context-aware coach endpoint failed');
   let ownerPromptSeen='';
@@ -128,11 +128,17 @@ const req=(body={},headers={})=>({json:async()=>body,headers:{get:k=>headers[k.t
   assert(saved.activity.evidence.privacy.rawAnswersIncluded===false&&saved.activity.evidence.privacy.rawHistoryIncluded===false&&!JSON.stringify(saved.activity.evidence).includes('SHOULD_NOT_SURVIVE'),'raw/private learner evidence leaked to backend');
 
 
-  const rawOutcome={schema:'fiezel-policy-outcome-v1',outcomeId:'out-1',policyId:'p-1',evaluatedAt:new Date().toISOString(),policyMode:'repair',targetSkill:'present_perfect',primaryDomain:'grammar',completed:true,abandoned:false,planned:6,answered:6,completionRate:100,accuracy:40,targetAttempts:6,targetAccuracy:40,targetAdherence:100,score:35,status:'negative',recommendation:'reduce_load',privacy:{rawAnswersIncluded:true},selectedAnswer:'SHOULD_NOT_SURVIVE'};
+  const rawOutcome={schema:'fiezel-policy-outcome-v1',outcomeId:'out-1',sessionId:'session-1',policyId:'p-1',evaluatedAt:new Date().toISOString(),policyMode:'repair',targetSkill:'present_perfect',primaryDomain:'grammar',completed:true,abandoned:false,planned:6,answered:6,completionRate:100,accuracy:40,targetAttempts:6,targetAccuracy:40,targetAdherence:100,score:35,status:'negative',recommendation:'reduce_load',privacy:{rawAnswersIncluded:true},selectedAnswer:'SHOULD_NOT_SURVIVE'};
   const outcomeStored=await routes.POST.get('/api/policy/outcome')({request:req({outcome:rawOutcome}),user});
   assert(outcomeStored.stored===true&&outcomeStored.protocol==='1.7'&&outcomeStored.outcomeSchema==='fiezel-policy-outcome-v1','policy outcome store failed');
   const storedOutcome=store.get('fiezel_push_v1_outcomes_jahran-uuid');
   assert(storedOutcome.history.length===1&&!JSON.stringify(storedOutcome).includes('SHOULD_NOT_SURVIVE')&&storedOutcome.history[0].privacy.rawAnswersIncluded===false,'policy outcome privacy/bounding failed');
+  // Kiriman ulang untuk SESI yang sama: tidak menggandakan, dan tidak menimpa penilaian
+  // yang sudah tercatat - tulisan pertama yang menang.
+  const duplicateOutcome={...rawOutcome,outcomeId:'out-2',score:30};
+  const duplicateStored=await routes.POST.get('/api/policy/outcome')({request:req({outcome:duplicateOutcome}),user});
+  const afterDuplicate=store.get('fiezel_push_v1_outcomes_jahran-uuid');
+  assert(duplicateStored.idempotent===true&&duplicateStored.duplicate===true&&afterDuplicate.history.length===1&&afterDuplicate.history[0].score===35,'policy outcome session idempotency failed');
 
   const policyRes=await routes.POST.get('/api/policy/next')({request:req({snapshot:{adaptiveReady:true,totalAttempts:80,estimatedLevel:'B1',dueReviews:4,domains:{grammar:{attempts:30,accuracy:45,recentAccuracy:40},vocabulary:{attempts:20,accuracy:75},reading:{attempts:20,accuracy:70}}},evidence:{behavior:{consistency14d:50,abandonmentRate:10,medianResponseMs:6000},confidence:{evidence:20,gap:10},memory:{dueReviews:4,maxForgettingRisk:82,highRiskCount:3},skills:{measured:5,recurringErrorSkills:1,weakest:[{skill:'present_perfect',type:'grammar',attempts:10,accuracy:40,errorRate:60,recurringErrors:3}]}}}),user});
   assert(policyRes.protocol==='1.7'&&policyRes.policy?.schema==='fiezel-adaptive-policy-v1'&&policyRes.policy.mode==='review'&&policyRes.policy.primaryDomain==='grammar'&&policyRes.policy.targetSkill==='present_perfect'&&policyRes.policy.rationaleCodes.includes('recent_policy_outcome_negative'),'adaptive policy endpoint failed');
@@ -150,6 +156,55 @@ const req=(body={},headers={})=>({json:async()=>body,headers:{get:k=>headers[k.t
   const quiet=Date.parse('2026-08-11T19:00:00Z');
   assert(context.reminderFor({activity:{totalAnswered:50,lastStudyAt:quiet-8*86400000,evidence:context.boundedEvidence({generatedAt:new Date(quiet).toISOString()})}},quiet)===null,'remote ALRS quiet hours failed');
 
+
+  /* ---- S5: aliran percobaan per murid ---------------------------------------------------
+   * Dua hal yang diuji di sini dan tidak bisa diuji di tempat lain: (1) worker memvalidasi
+   * ULANG catatan, karena klien adalah masukan tidak tepercaya dan proyeksi di perangkat
+   * hanya menjaga murid dari kebocoran yang tak disengaja; (2) allowlist worker identik
+   * dengan modul — dua daftar yang menyimpang berarti ada field yang lolos di satu sisi. */
+  const AR=require('./features/brain/fiezel-attempt-record.js');
+  assert(health.capabilities.includes('brain-attempts-v1'),'kapabilitas brain-attempts-v1 tidak diumumkan');
+  assert(JSON.stringify(context.attemptAllowedFields().sort())===JSON.stringify([...AR.ALLOWED].sort()),
+    'allowlist worker menyimpang dari fiezel-attempt-record.js — satu sisi akan meloloskan field yang ditolak sisi lain');
+
+  const attemptUser={puter:{auth:{getUser:async()=>({uuid:'murid-1'})}}};
+  assert((await routes.POST.get('/api/brain/attempts')({request:req({attempts:[]}),user:null})).status===401,'aliran percobaan tanpa autentikasi tidak ditolak');
+  assert((await routes.GET.get('/api/brain/attempts')({request:{url:'https://x/api/brain/attempts'},user:null})).status===401,'pembacaan aliran tanpa autentikasi tidak ditolak');
+
+  const rec=(id,at,over={})=>Object.assign({schema:'fiezel-attempt-record-v1',attemptId:id,at,ok:true,type:'grammar',skill:'present_perfect',lesson:'present_perfect',kappa:0.7},over);
+  // Sengaja tidak urut waktu: urutan simpan harus ditentukan `at`, bukan urutan batch.
+  const simpan1=await routes.POST.get('/api/brain/attempts')({request:req({attempts:[rec('a3',3000),rec('a1',1000),rec('a2',2000)]}),user:attemptUser});
+  assert(simpan1.accepted===3&&simpan1.count===3,'batch pertama tidak tersimpan utuh: '+JSON.stringify(simpan1));
+  const baca1=await routes.GET.get('/api/brain/attempts')({request:{url:'https://x/api/brain/attempts'},user:attemptUser});
+  assert(baca1.attempts.map(x=>x.attemptId).join(',')==='a1,a2,a3','aliran tidak diurutkan menurut waktu: '+JSON.stringify(baca1.attempts.map(x=>x.attemptId)));
+
+  // Idempotensi: kirim ulang batch yang sama (retry jaringan) tidak boleh menggandakan bukti.
+  const simpan2=await routes.POST.get('/api/brain/attempts')({request:req({attempts:[rec('a1',1000),rec('a2',2000)]}),user:attemptUser});
+  assert(simpan2.accepted===0&&simpan2.duplicate===2&&simpan2.count===3,'pengiriman ulang menggandakan bukti: '+JSON.stringify(simpan2));
+
+  // Field asing DITOLAK seluruh catatannya, bukan dibuang diam-diam.
+  const kotor=await routes.POST.get('/api/brain/attempts')({request:req({attempts:[Object.assign(rec('a4',4000),{selectedAnswer:'she have gone'})]}),user:attemptUser});
+  assert(kotor instanceof Response&&kotor.status===400,'catatan dengan field asing diterima worker');
+
+  // Kalimat tidak bisa menyamar jadi pengenal: field-nya gugur, catatannya tetap sah.
+  await routes.POST.get('/api/brain/attempts')({request:req({attempts:[rec('a5',5000,{skill:'ini kalimat soal yang panjang'})]}),user:attemptUser});
+  const baca2=await routes.GET.get('/api/brain/attempts')({request:{url:'https://x/api/brain/attempts'},user:attemptUser});
+  assert(JSON.stringify(baca2.attempts).indexOf('kalimat soal')<0,'kalimat lolos ke penyimpanan lewat field pengenal');
+  const a5=baca2.attempts.find(x=>x.attemptId==='a5');
+  assert(a5&&a5.skill===undefined,'field pengenal cacat tidak digugurkan');
+
+  // Aliran murid lain tidak pernah tercampur.
+  const lain={puter:{auth:{getUser:async()=>({uuid:'murid-2'})}}};
+  const bacaLain=await routes.GET.get('/api/brain/attempts')({request:{url:'https://x/api/brain/attempts'},user:lain});
+  assert(bacaLain.count===0,'aliran murid lain bocor ke akun berbeda');
+
+  const sejak=await routes.GET.get('/api/brain/attempts')({request:{url:'https://x/api/brain/attempts?since=3000'},user:attemptUser});
+  // a4 memang DITOLAK (field asing), jadi yang tersimpan a1,a2,a3,a5 — since=3000 menyisakan dua.
+  assert(sejak.attempts.every(x=>x.at>=3000)&&sejak.attempts.length===2,'filter since tidak bekerja: '+JSON.stringify(sejak.attempts.map(x=>x.at)));
+
+  const kosong=await routes.POST.get('/api/brain/attempts')({request:req({attempts:[{schema:'lain',attemptId:'z',at:1,ok:true}]}),user:attemptUser});
+  assert(kosong instanceof Response&&kosong.status===400,'batch tanpa catatan sah tidak ditolak');
+
   console.log('FIEZEL core worker contract: PASS');
-  console.log(JSON.stringify({protocol:'1.7',coreOnlyAI:true,serverModel:'gpt-5.4-nano',rateLimit:40,unauthRejected:true,learnerEvidenceBounded:true,adaptivePolicy:true,policyOutcome:true,contextCoach:true,contentQa:true,guardedContentPatch:true,remoteALRS:true,legacyDueReviewCompatible:true}));
+  console.log(JSON.stringify({protocol:'1.7',coreOnlyAI:true,serverModel:'gpt-5.4-nano',rateLimit:40,unauthRejected:true,learnerEvidenceBounded:true,adaptivePolicy:true,policyOutcome:true,contextCoach:true,contentQa:true,guardedContentPatch:true,brainAttempts:true,remoteALRS:true,legacyDueReviewCompatible:true}));
 })().catch(e=>{console.error('FIEZEL core worker contract: FAIL\n'+e.stack);process.exit(1)});
