@@ -20,7 +20,7 @@ sini yang menjadi urutan resmi.
 | `0008_evidence.sql` | `fiezel-evidence` (binding `EVIDENCE_DB`) | `evidence_daily`, `evidence_dedup`, `evidence_learner_day` |
 | `0006_social.sql` | `fiezel-core` (binding `CORE_DB`) | `social_profile`, `social_handle`, `social_invite`, `social_friend`, `social_counter`, `rank_week`, `social_cohort`, `milestone_feed`, `cheer_feed`, `rank_jti` |
 | `0011_auth_roles.sql` | `fiezel-core` (binding `CORE_DB`) | `auth_account`, `auth_login_handle`, `auth_credential`, `teacher_invite`, `teacher_profile`, `friend_request`, `notification`, `push_subscription` |
-| `0012_teacher_content.sql` | `fiezel-core` (binding `CORE_DB`) | `tc_node`, `tc_question`, `tc_assignment`, `tc_assignment_target`, `tc_lesson_evidence` |
+| `0012_teacher_content.sql` | `fiezel-core` (binding `CORE_DB`) | `tc_node`, `tc_question`, `tc_assignment`, `tc_assignment_target`, `tc_lesson_evidence`, `tc_class`, `tc_class_report` |
 
 Tabel di atas adalah **satu-satunya** daftar berkas→database yang ditulis manusia.
 `tools/d1-schema-check.mjs` dan `d1-schema-contract-test.js` **menurunkan** peta itu
