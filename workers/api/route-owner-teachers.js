@@ -92,11 +92,18 @@ export async function routeTeacherInviteRevoke(ctx) {
   const body = await readJsonFromCtx(ctx, opt);
   if (!body.ok) return body.response;
 
-  // Owner mencabut dengan MENGETIK ULANG token dari catatannya, karena itulah
-  // satu-satunya pengenal yang ia punya (kita tidak menyimpan teksnya). Alternatif
-  // "cabut berdasarkan nama guru" akan salah sasaran saat satu nama punya dua token.
-  if (!codeWellFormed(body.value.code)) return jsonError(400, 'invite_code_malformed', {}, opt);
-  const codeHash = await hashCode(body.value.code);
+  // Owner mencabut dengan MENGETIK ULANG token atau memilih tombol Cabut dari daftar.
+  const rawCode = body.value && body.value.code;
+  const rawHash = body.value && body.value.codeHash;
+  let codeHash = null;
+
+  if (typeof rawHash === 'string' && /^[a-f0-9]{64}$/i.test(rawHash.trim())) {
+    codeHash = rawHash.trim().toLowerCase();
+  } else if (typeof rawCode === 'string' && codeWellFormed(rawCode)) {
+    codeHash = await hashCode(rawCode);
+  } else {
+    return jsonError(400, 'invite_code_malformed', {}, opt);
+  }
 
   const result = await db.prepare(
     'UPDATE teacher_invite SET revoked_at = ?2 WHERE code_hash = ?1 AND revoked_at IS NULL'
@@ -114,10 +121,7 @@ export async function routeTeacherInviteRevoke(ctx) {
 /* ========================================================================== */
 
 /**
- * Daftar guru + undangan. Yang TIDAK keluar: `code_hash` (bahan uji tebakan
- * offline) dan seluruh konten milik guru. Owner mengelola GURU, bukan membaca
- * bank soal mereka — itulah sebabnya peran owner tidak memegang kapabilitas
- * `teacher:*` (lihat "kenapa tidak ada hierarki" di auth/role-core.js).
+ * Daftar guru + undangan. Owner mengelola GURU, bukan membaca bank soal mereka.
  */
 export async function routeOwnerTeachers(ctx) {
   const secretGate = await ownerGate(ctx);
@@ -144,7 +148,10 @@ export async function routeOwnerTeachers(ctx) {
   ).all();
 
   return jsonResponse({
-    invites: ((invites && invites.results) || []).map((row) => publicInviteView(row, ctx.now)),
+    invites: ((invites && invites.results) || []).map((row) => ({
+      ...publicInviteView(row, ctx.now),
+      codeHash: row.code_hash
+    })),
     teachers: ((teachers && teachers.results) || []).map((row) => ({
       handle: row.login_handle,
       teacherName: row.teacher_name,
