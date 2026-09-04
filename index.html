@@ -1,10 +1,6 @@
 <!DOCTYPE html>
-<!-- m025-246: data-theme SENGAJA TIDAK dipaku di sini. Nilai statis "light" akan
-     menang atas @media (prefers-color-scheme) selamanya, jadi Tema Malam tidak akan
-     pernah menyala untuk siapa pun - sakelar yang tidak melakukan apa-apa, persis
-     keluhan m025-120. FiezelUIManager.initTheme() memasang atributnya hanya bila murid
-     PERNAH memilih; sampai saat itu perangkatlah yang memutuskan. -->
-<html lang="id" class="fz-booting">
+<!-- Mode gelap dihapus sesuai permintaan OWNER: aplikasi memiliki satu tampilan dasar cream. -->
+<html lang="id" class="fz-booting" data-theme="light">
 <head>
   <meta charset="utf-8">
   <!-- m025-186 — KEPUTUSAN OWNER, DIAMBIL SADAR, DAN INI CATATAN BIAYANYA.
@@ -34,13 +30,8 @@
        WebAssembly.instantiate - model 152 MB yang sudah diunduh jadi tidak terpakai. -->
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://js.puter.com; connect-src 'self' https: wss:; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; media-src 'self' blob: data:; worker-src 'self' blob:">
   <meta name="theme-color" content="#FFF9EE">
-  <!-- m025-246: mode gelap KEMBALI sebagai "Tema Malam" (OWNER membalik m025-134;
-       riwayat lengkapnya di blok TEMA MALAM style.css). `light dark` memberi tahu
-       peramban bahwa KEDUA skema didukung, sehingga scrollbar, input, dan tombol
-       bawaan ikut skema yang sedang berlaku alih-alih terkunci terang di atas
-       permukaan gelap. Skema yang berlaku sendiri diputuskan oleh CSS
-       (prefers-color-scheme) dan atribut data-theme, bukan oleh baris ini. -->
-  <meta name="color-scheme" content="light dark">
+  <!-- Mode gelap dihapus: color-scheme dipaku light agar kontrol form/scrollbar selalu terang. -->
+  <meta name="color-scheme" content="light">
   <meta name="description" content="FIEZEL adalah aplikasi belajar bahasa Inggris adaptif untuk vocabulary, grammar, reading, speaking, listening, dan tes diagnostik CEFR.">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
