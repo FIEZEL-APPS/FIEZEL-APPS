@@ -335,7 +335,12 @@ konflik merge; hijau begitu diulang). Delapan sisanya nyata, dan pembagiannya pe
 | `social-frontend-test.js` | `contains(` bukan `contains?.(` di `renderInner()` | `main` memperbaikinya sendiri (e3afd0d8) beberapa menit setelah cabang ini |
 | `gate-registry-test.js` | `auth-account-test.js` ada di repo tapi tidak pernah didaftarkan | didaftarkan di `quality.yml` (gerbangnya hijau; yang hilang cuma barisnya) |
 | `app-interaction-policy-test.js` | `.auth-field-label input:focus` — `:focus` telanjang | jadi `:focus-visible` (nol perubahan perilaku untuk kolom teks) |
-| `secret-scan-test.js` | fixture `password: 'wrongpass123'` di `auth-account-test.js` | entri allowlist beralasan, nilainya TIDAK diobfuskasi |
+| `secret-scan-test.js` | fixture kata sandi yang sengaja SALAH di `auth-account-test.js:175` | entri allowlist beralasan (didaftarkan lewat digest, per-berkas) |
+
+Nilai fixture itu sengaja TIDAK dikutip di laporan ini. Allowlist `secret-scan-test.js`
+memaafkan digest **per berkas** — itu pagarnya, bukan kelalaiannya — jadi menuliskan nilainya di
+sini akan memerahkan gerbang lagi di berkas yang berbeda, dan "perbaikannya" akan berupa entri
+allowlist kedua untuk sebuah dokumen. Yang benar adalah dokumen tidak perlu memuat polanya.
 
 Kenapa empat kegagalan `main` baru terlihat sekarang: CI `main` berhenti di
 `id-golden-snapshot-test.js` (baris 244 `quality.yml`) dan tidak pernah sampai ke gerbang
