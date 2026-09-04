@@ -118,6 +118,9 @@ import { ROUTES as LEARNER_EVIDENCE_ROUTES } from './evidence/route-learner-evid
 import { ROUTES as ACCOUNT_ROUTES } from './route-account.js';
 import { ROUTES as OWNER_TEACHER_ROUTES } from './route-owner-teachers.js';
 import { ROUTES as TEACHER_ROUTES } from './route-teacher.js';
+/* --- SLOT 11: SINKRON RUANG GURU (route-class-sync.js) — /api/learner/class-report,
+   /api/teacher/class/claim|list|reports. Kode kelas diklaim guru, murid melapor agregat. [TERPASANG] */
+import { ROUTES as CLASS_SYNC_ROUTES } from './route-class-sync.js';
 
 export const EXTRA_ROUTES = [
   ...buildExtraRoutes(),  /* SLOT 1-4 */
@@ -129,4 +132,5 @@ export const EXTRA_ROUTES = [
   ...ACCOUNT_ROUTES,          /* SLOT 10 */
   ...OWNER_TEACHER_ROUTES,    /* SLOT 10 */
   ...TEACHER_ROUTES,          /* SLOT 10 */
+  ...CLASS_SYNC_ROUTES,       /* SLOT 11 */
 ];

@@ -37,6 +37,8 @@
     "test:teacher-braincore": "node teacher-braincore-test.js",
     "test:social-notify": "node social-notify-test.js",
     "test:auth-account": "node auth-account-test.js",
+    "test:class-sync": "node class-sync-test.js",
+    "test:owner-teacher-panel": "node owner-teacher-panel-test.js",
     "invite:teacher": "node tools/mint-teacher-invite.mjs"
   }
 }
