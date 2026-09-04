@@ -1,7 +1,7 @@
 {
-  "version": "m025-245",
+  "version": "m025-246",
   "claimedBy": "sesi-claude-online-teman (pintu masuk Online & Teman di Home, branch claude/online-teman-home-entry)",
-  "claimedAt": "2026-09-04T00:39:04.614Z",
-  "reason": "lapis akun: masuk, daftar, aktivasi guru",
+  "claimedAt": "2026-09-04T13:16:21.987Z",
+  "reason": "proteksi akses guru hanya untuk role server terverifikasi",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
