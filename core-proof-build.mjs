@@ -1,0 +1,10 @@
+import fs from 'node:fs';
+const base=fs.readFileSync('fiezel-core-worker.js','utf8');
+const proof=fs.readFileSync('fiezel-core-worker-proof-route.js','utf8').trim();
+const marker="router.post('/api/reminders/due'";
+if(!base.includes(marker))throw new Error('Core reminder route insertion marker missing');
+if(!proof.includes("router.post('/api/reminders/proof'"))throw new Error('Proof route source missing expected route');
+const next=base.replace(marker,`${proof}\n${marker}`);
+if(!next.includes("router.post('/api/reminders/proof'"))throw new Error('Proof route insertion failed');
+fs.writeFileSync('fiezel-core-worker-deploy.js',next);
+console.log(JSON.stringify({proofRouteInserted:true,markerPreserved:next.includes(marker)}));

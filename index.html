@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="id" class="fz-booting" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <!-- m025-186 — KEPUTUSAN OWNER, DIAMBIL SADAR, DAN INI CATATAN BIAYANYA.
+       D16 (D5 T1) dulu MENCABUT kunci zoom demi WCAG 1.4.4/1.4.10. Pada 29 Agu 2026 OWNER
+       membalikkannya setelah biayanya disampaikan: FIEZEL harus terasa aplikasi, bukan
+       dokumen, dan pinch/zoom halaman dinilai merusak pengalaman belajar.
+
+       BIAYA YANG DITERIMA, ditulis di sini supaya tidak ada yang menemukannya sebagai
+       kejutan: murid low-vision TIDAK lagi bisa memperbesar halaman. Ini penyimpangan dari
+       WCAG 1.4.4 (Resize Text) dan 1.4.10 (Reflow).
+
+       JANGAN membalik baris ini tanpa OWNER. Ia bukan kelalaian dan bukan sisa eksperimen;
+       ia keputusan produk. Gerbang `app-interaction-policy-test.js` dan
+       `m02542-experience-test.js` menegakkan keadaan TERKUNCI ini, jadi mengembalikannya
+       diam-diam akan memerahkan CI.
+
+       MITIGASI YANG DISARANKAN (belum ada, dan ini utang yang jujur): pengatur ukuran teks
+       DI DALAM aplikasi. Itu mengembalikan kemampuan membaca tanpa mengembalikan zoom
+       halaman - satu-satunya jalan menutup biaya di atas tanpa membatalkan keputusan ini. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <!-- D16 (D3 HIGH-1): CSP mode longgar via meta - GitHub Pages tidak bisa set header.
+       'unsafe-inline' dipertahankan karena skrip boot splash inline + handler onclick
+       memang masih dipakai; pagar utamanya adalah script-src yang membatasi skrip eksternal
+       ke js.puter.com saja dan default-src 'self'. frame-ancestors tidak bisa via meta.
+       'wasm-unsafe-eval' WAJIB ada: mesin suara neural mengompilasi sherpa-onnx .wasm
+       (vendor/supertonic-3, 13 MB) di klien, dan tanpa token itu Chromium menolak
+       WebAssembly.instantiate - model 152 MB yang sudah diunduh jadi tidak terpakai. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://js.puter.com; connect-src 'self' https: wss:; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; media-src 'self' blob: data:; worker-src 'self' blob:">
+  <meta name="theme-color" content="#FFF9EE">
+  <!-- m025-134: mode gelap dihapus. color-scheme:light membuat kontrol bawaan peramban
+       (scrollbar, input, tombol form) ikut terang di ponsel yang disetel gelap. -->
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="FIEZEL adalah aplikasi belajar bahasa Inggris adaptif untuk vocabulary, grammar, reading, speaking, listening, dan tes diagnostik CEFR.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./favicon-64.png">
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+  <title>FIEZEL | Adaptive English</title>
+  <!-- m025-84 OWNER: "sebelum muncul splash ada jeda sekitar kurang lebih 3 detik dan
+       muncul layar putih seluruh layar". Layar putih itu adalah body kosong: `body{background:
+       var(--sky-bottom)}` = #fdf6f5, ditahan selama ~50 berkas skrip (termasuk js.puter.com dari
+       jaringan) dieksekusi DAN ~2,7 MB JSON konten diunduh app.js, sebab showBrandSplash()
+       dipanggil di UJUNG load(). Splash tidak dipercepat - ia dipindah ke frame pertama:
+       markupnya statis di bawah, di ATAS seluruh berkas skrip, dan CSS kritisnya di sini supaya
+       cat pertama browser sudah berupa splash, bukan putih.
+
+       Aturan splash di bawah disalin APA ADANYA dari style.css (selector dan nilai identik),
+       jadi begitu style.css tiba tidak ada satu piksel pun yang berubah di layar.
+       splash-first-paint-test.js membandingkan keduanya dan gagal kalau salah satunya
+       bergeser sendiri. -->
+  <link rel="preload" as="font" type="font/woff2" href="./assets/fonts/InstrumentSerif-400.woff2" crossorigin>
+  <link rel="preload" as="font" type="font/woff2" href="./assets/fonts/PlusJakartaSans-400.woff2" crossorigin>
+  <!-- Fredoka dipakai pada judul hero beranda, yaitu teks besar PERTAMA yang
+       terlihat setelah splash. Tanpa preload ia swap di depan mata pembaca. -->
+  <link rel="preload" as="font" type="font/woff2" href="./assets/fonts/Fredoka-var.woff2" crossorigin>
+  <style id="fiezelBootCritical">
+html.fz-booting,html.fz-booting body{background:#1B1418}
+html.fz-booting body{overflow:hidden}
+#fiezelBootSplash:not(.is-leaving){animation:none}
+/* Ketukan koreografi v4. Nilai ini WAJIB sama dengan tabel di
+   features/brand/fiezel-choreography.js; splash-choreography-test.js gagal kalau
+   keduanya menyimpang. Ada di sini karena jalur kurangi-gerak splash frame-pertama
+   memudar pada ketukan ini sebelum satu baris JavaScript pun sempat berjalan. */
+#fiezelBootSplash{--fz-b1:0ms;--fz-b2:240ms;--fz-b3:470ms;--fz-b4:690ms;--fz-b5:870ms;--fz-b6:1060ms;--fz-b7:1150ms;--fz-b8:1400ms;--fz-b9:1520ms;--fz-b10:1655ms;--fz-b11:1780ms;--fz-b12:1900ms}
+/* Salinan APA ADANYA dari style.css (diperiksa splash-first-paint-test.js). */
+.fiezel-wordmark{display:block;width:100%;height:auto}
+.fiezel-splash,.fiezel-ob{--fz-bg:#FFF9EE;--fz-paper:#FFFFFF;--fz-ink:#241A11;--fz-ink-muted:#6E5E47;--fz-accent:#241A11;--fz-accent-deep:#120C07;--fz-gold:#E6A800;--fz-soft:#FFF3C4;--fz-line:#F0E4CF;--fz-sun:#FFC700;--fz-sun-soft:#FFF3C4;--fz-sun-press:#CC9600;--fz-sun-grad:linear-gradient(180deg,#FFDE59,#FFA500);--fz-info:#7A5F1B;--fz-core:#1B1418;--fz-core-soft:#2A2126;--fz-on-core:#FDFAF3;--fz-display:'FZ Instrument Serif',Georgia,'Times New Roman',serif;--fz-heading:'FZ Plus Jakarta Sans',-apple-system,'Segoe UI',sans-serif;--fz-body:'FZ Plus Jakarta Sans',-apple-system,'Segoe UI',sans-serif}
+.fiezel-splash,.fiezel-ob{position:fixed;inset:0;z-index:2147482000;display:flex;flex-direction:column;background:var(--fz-bg);font-family:var(--fz-body);color:var(--fz-ink);padding-top:max(18px,env(safe-area-inset-top));animation:fzm-page-in .4s cubic-bezier(.22,.61,.36,1) both}
+.fiezel-splash[hidden]{display:none}
+.fiezel-splash.is-leaving,.fiezel-ob.is-leaving{animation:fzm-page-out .3s ease-in both}
+@keyframes fzm-page-in{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
+@keyframes fzm-page-out{from{opacity:1;transform:none}to{opacity:0;transform:translateX(-16px)}}
+.fiezel-splash-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center}
+.fiezel-splash-word{font-family:var(--fz-heading);font-weight:700;font-size:2.6rem;letter-spacing:.01em;color:var(--fz-accent);margin:0;display:flex;align-items:center;gap:8px}
+.fiezel-splash-tag{font-family:var(--fz-body);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--fz-ink-muted);margin:0}
+.fiezel-splash-dark{background:#1B1418;padding-top:0}
+.fiezel-splash-brand{background:radial-gradient(circle at 30% 18%,#2A2126 0%,#1B1418 55%,#120C0F 100%);position:relative;overflow:hidden;display:grid;grid-template-rows:1fr auto auto;justify-items:center;align-items:center;gap:0;padding:24px 24px 17vh}
+.fz-splash-canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.fiezel-logo{width:62vmin;height:auto;display:block;overflow:visible;transform:translateX(-0.5859375%)}
+.fz-fgroup,.fz-barsgroup{opacity:0;will-change:opacity}
+.fiezel-logo .fz-f,.fiezel-logo .fz-bar{transform-box:fill-box}
+.fiezel-splash-brand .fiezel-splash-word{position:absolute;display:block;left:0;right:0;margin:0 auto;bottom:calc(7vh + env(safe-area-inset-bottom,0px));width:min(52vw,238px);text-align:center;opacity:0;transform:translateY(14px);will-change:transform,opacity;pointer-events:none}
+.fiezel-splash-brand .fiezel-wordmark{display:block;width:min(30vw,132px);height:auto;margin:0 auto}
+.fiezel-splash-brand .fiezel-splash-tag{font-family:var(--fz-body);font-size:12px;letter-spacing:.30em;text-transform:uppercase;color:#FFC700;margin:14px 0 0;white-space:nowrap}
+@keyframes fz-fade-in{from{opacity:0}to{opacity:1}}
+.fiezel-splash-still .fz-splash-canvas{display:none}
+.fiezel-splash-still .fz-fgroup,.fiezel-splash-still .fz-barsgroup{opacity:1}
+.fiezel-splash-still .fiezel-logo .fz-f{transform:none!important;animation:fz-fade-in .95s ease var(--fz-b1,0ms) both}
+.fiezel-splash-still .fiezel-logo .fz-bar{transform:none!important;animation:fz-fade-in .3s ease var(--fz-b6,1060ms) both}
+.fiezel-splash-still .fiezel-splash-word{transform:none!important;animation:fz-fade-in .3s ease var(--fz-b7,1150ms) both}
+.fiezel-splash-still .fiezel-splash-tag{transform:none!important;animation:fz-fade-in .24s ease var(--fz-b12,1900ms) both;opacity:0}
+  </style>
+  <!-- ============================================================================
+       m025-199 (laporan OWNER: "saat boot memasukin splash sangat lama sekali").
+       DIUKUR sebelum disentuh, Slow 4G + CPU 4x, median dari 3 kali jalan:
+
+         apa adanya .................................. FCP 2304 ms
+         tiga CSS fitur di bawah dibuat non-blokir ... FCP 2668 ms  (nol perbaikan)
+         style.css juga non-blokir ................... FCP  272 ms
+
+       Jadi yang menahan cat pertama BUKAN jumlah stylesheet-nya, melainkan style.css
+       SENDIRIAN: 286 KB yang wajib tiba, terurai, dan berlaku sebelum peramban boleh
+       mencat satu piksel pun. Selama itu murid menatap layar kosong - persis jeda yang
+       dilaporkan pemilik. Tiga stylesheet lain tetap blokir karena membuangnya tidak
+       membeli apa pun, dan aturan urutan token di komentar bawah tetap berlaku.
+
+       KENAPA INI TIDAK MENGHASILKAN KILATAN HTML TELANJANG. Tirai splash sudah dicat
+       dari CSS kritis yang di-INLINE di atas (blok <style> tepat di atas baris ini), dan
+       ia menutupi seluruh layar sepanjang boot. Yang berhak membubarkan tirai hanya
+       dismissBootSplash() di app.js, dan ia MENUNGGU __fzShellCss selesai lebih dulu.
+       Penantian itu berpagar 4 detik supaya lembar yang gagal tidak pernah mengunci murid
+       di balik tirai - aturan yang sama yang sudah ditulis di kepala fungsi itu.
+
+       `rel=preload as=style` lalu ditukar ke stylesheet saat onload: bentuk ini yang
+       membuat unduhannya tetap prioritas tinggi TANPA memblokir cat. <noscript> menjaga
+       peramban tanpa JS tetap mendapat lembar penuh, dan onerror menandai kegagalan
+       supaya penantian di atas tidak menunggu sesuatu yang tidak akan pernah datang.
+
+       NOL SKRIP DI SINI, dan itu bukan gaya melainkan aturan: splash-first-paint-test
+       menuntut markup splash berada di atas SETIAP elemen skrip, karena satu saja di
+       hadapannya mengembalikan urutan yang dulu membuat layar putih 3 detik. Penanda
+       kesiapan karena itu dibaca dari DOM (`link.rel` yang sudah bertukar), bukan dari
+       variabel yang butuh skrip untuk disiapkan.
+       ============================================================================ -->
+  <link rel="preload" as="style" href="./style.css"
+        onload="this.onload=null;this.rel='stylesheet';window.__fzShellCss='ready'"
+        onerror="window.__fzShellCss='error'">
+  <noscript><link rel="stylesheet" href="./style.css"></noscript>
+  <link rel="stylesheet" href="./features/speaking-listening/speaking-listening-addon.css">
+  <link rel="stylesheet" href="./features/tutor-classroom/tutor-v3.css">
+  <link rel="stylesheet" href="./features/learner-flow/learner-flow.css">
+  <link rel="stylesheet" href="./features/learner-flow/home-polish.css">
+  <!-- Ruang Guru: tema terpisah untuk cangkang guru (features/teacher). Hanya aktif saat body.fz-teacher-mode. -->
+  <link rel="stylesheet" href="./features/teacher/teacher-shell.css">
+  <!-- m026-01: motion system maskot PAW. Sengaja PALING AKHIR di antara stylesheet:
+       berkasnya memakai nama token yang bertabrakan dengan style.css (--fz-gold,
+       --fz-ink, --fz-line), jadi di sana token dipasang pada kelas .fz-mascot/.fz-motion
+       dan bukan :root. Urutan terakhir memastikan aturan penempatan maskotnya menang
+       atas ukuran wajah pembimbing lama tanpa perlu !important. -->
+  <link rel="stylesheet" href="./features/mascot/fiezel-motion.css">
+</head>
+<body class="scene-day">
+  <!-- Splash frame-pertama. Isinya WAJIB sama persis dengan FiezelSplash.markup(); modul
+       features/brand/fiezel-splash.js mengadopsi elemen ini lewat [data-fiezel-boot-splash]
+       alih-alih membuat lapisan kedua, jadi animasi yang sudah berjalan diteruskan, bukan
+       diulang dari awal setelah boot selesai. -->
+  <div id="fiezelBootSplash" class="fiezel-splash fiezel-splash-dark" data-fiezel-boot-splash role="dialog" aria-label="Selamat datang di FIEZEL"><div class="fiezel-splash-body fiezel-splash-brand"><canvas class="fz-splash-canvas" aria-hidden="true"></canvas><svg class="fiezel-logo" viewBox="0 0 512 512" role="img" aria-label="FIEZEL"><defs><linearGradient id="fzsGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFD94F"/><stop offset="100%" stop-color="#F0C241"/></linearGradient></defs><g class="fz-fgroup" fill="#FFF4DA"><rect class="fz-f fz-f1" x="136" y="148" width="42"  height="216" rx="20"/><rect class="fz-f fz-f2" x="136" y="148" width="128" height="42"  rx="20"/><rect class="fz-f fz-f3" x="136" y="230" width="102" height="40"  rx="19"/></g><g class="fz-barsgroup" fill="url(#fzsGold)"><rect class="fz-bar fz-bar1" x="298" y="200" width="34" height="112" rx="17"/><rect class="fz-bar fz-bar2" x="348" y="166" width="34" height="180" rx="17"/></g></svg><div class="fiezel-splash-word"><svg class="fiezel-wordmark" viewBox="0 0 1000 260" role="img" aria-label="FIEZEL"><defs><linearGradient id="fzsIv" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFFBF3"/><stop offset="100%" stop-color="#EBDBC0"/></linearGradient><linearGradient id="fzsGo" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFDE59"/><stop offset="45%" stop-color="#FFC700"/><stop offset="100%" stop-color="#E6A800"/></linearGradient></defs><g fill="url(#fzsIv)"><rect x="30" y="30" width="42" height="200" rx="21"/><rect x="30" y="30" width="144" height="42" rx="21"/><rect x="30" y="109" width="116" height="42" rx="21"/><rect x="300" y="30" width="42" height="200" rx="21"/><rect x="300" y="30" width="144" height="42" rx="21"/><rect x="300" y="109" width="100" height="42" rx="21"/><rect x="300" y="188" width="130" height="42" rx="21"/><rect x="478" y="30" width="150" height="42" rx="21"/><rect x="478" y="188" width="150" height="42" rx="21"/><rect x="607" y="30" width="191.38" height="42" rx="21" transform="rotate(124.354 607 51)"/><rect x="662" y="30" width="42" height="200" rx="21"/><rect x="662" y="30" width="144" height="42" rx="21"/><rect x="662" y="109" width="100" height="42" rx="21"/><rect x="662" y="188" width="130" height="42" rx="21"/><rect x="840" y="30" width="42" height="200" rx="21"/><rect x="840" y="188" width="130" height="42" rx="21"/></g><g fill="url(#fzsGo)"><rect x="192" y="30" width="26" height="200" rx="13"/><rect x="240" y="106" width="26" height="124" rx="13"/></g></svg><p class="fiezel-splash-tag">ADAPTIVE ENGLISH</p></div></div></div>
+  <script>
+
+    /* Jaring pengaman storage: di iframe preview yang di-sandbox tanpa allow-same-origin,
+       SEMUA akses window.localStorage/sessionStorage melempar SecurityError dan aplikasi
+       gagal boot. Shim ini mendeteksi kondisi itu dan memasang penyimpanan memori
+       (non-persisten) supaya aplikasi tetap bisa dimuat dan dicoba. Di browser normal,
+       probe berhasil dan shim TIDAK dipasang - localStorage asli tetap dipakai. */
+    (function(){
+      function usable(kind){try{var s=window[kind];var k='__fz_probe__';s.setItem(k,'1');s.removeItem(k);return true}catch(e){return false}}
+      function memStore(){var m=new Map();return{get length(){return m.size},key:function(i){var ks=Array.from(m.keys());return i>=0&&i<ks.length?ks[i]:null},getItem:function(k){k=String(k);return m.has(k)?m.get(k):null},setItem:function(k,v){m.set(String(k),String(v))},removeItem:function(k){m.delete(String(k))},clear:function(){m.clear()}}}
+      ['localStorage','sessionStorage'].forEach(function(kind){
+        if(!usable(kind)){try{Object.defineProperty(window,kind,{value:memStore(),configurable:true})}catch(e){}}
+      });
+    })();
+    /* Stempel waktu cat pertama + jaring pengaman. Stempelnya dipakai fiezel-splash.js untuk
+       menghitung SISA waktu tayang: tanpa itu splash akan tampil selama boot DITAMBAH 2,6
+       detik penuh. Jaring pengamannya menutup satu-satunya cara layar ini bisa mengurung
+       murid: kalau app.js gagal dimuat atau melempar sebelum sempat mengadopsi splash, tidak
+       ada lagi yang akan menutupnya. */
+    (function () {
+      var doc = document, el = doc.getElementById('fiezelBootSplash');
+      /* Boot JSON must not be allowed to wait forever on a mobile radio. This wrapper
+         covers both the response headers and the body consumed by response.json(). */
+      try {
+        if (!window.__fiezelBootFetchGuard && typeof window.fetch === 'function') {
+          var nativeFetch = window.fetch.bind(window);
+          var bootFetchTimeoutMs = 12000;
+          var settleBootFetch = function (promise, controller) {
+            var timeout = 0;
+            var guard = new Promise(function (_, reject) {
+              timeout = setTimeout(function () {
+                try { if (controller) controller.abort(); } catch (e) {}
+                reject(new Error());
+              }, bootFetchTimeoutMs);
+            });
+            return Promise.race([promise, guard]).then(function (value) {
+              if (timeout) clearTimeout(timeout);
+              return value;
+            }, function (error) {
+              if (timeout) clearTimeout(timeout);
+              throw error;
+            });
+          };
+          window.fetch = function (input, init) {
+            var raw = '';
+            try { raw = String((input && input.url) || input || ''); } catch (e) {}
+            if (!/\.json(?:[?#]|$)/i.test(raw)) return nativeFetch(input, init);
+            var controller = null;
+            try { if (typeof AbortController === 'function') controller = new AbortController(); } catch (e) {}
+            var options = init;
+            if (controller) {
+              options = {};
+              if (init) for (var key in init) options[key] = init[key];
+              options.signal = controller.signal;
+              var sourceSignal = (init && init.signal) || (input && input.signal);
+              try {
+                if (sourceSignal) {
+                  if (sourceSignal.aborted) controller.abort();
+                  else sourceSignal.addEventListener('abort', function () {
+                    try { controller.abort(); } catch (e) {}
+                  }, { once: true });
+                }
+              } catch (e) {}
+            }
+            var responsePromise = settleBootFetch(nativeFetch(input, options), controller);
+            return responsePromise.then(function (response) {
+              if (!response || typeof response.json !== 'function') return response;
+              var originalJson = response.json.bind(response);
+              var guardedJson = function () { return settleBootFetch(originalJson(), controller); };
+              try {
+                Object.defineProperty(response, 'json', { configurable: true, value: guardedJson });
+              } catch (e) {
+                try { response.json = guardedJson; } catch (ignore) {}
+              }
+              return response;
+            });
+          };
+          window.__fiezelBootFetchGuard = true;
+        }
+      } catch (e) {}
+      if (!el) return;
+      try { if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) el.className += ' fiezel-splash-still'; } catch (e) {}
+      var startedAt = 0;
+      try { startedAt = (window.performance && typeof performance.now === 'function') ? performance.now() : 0; } catch (e) {}
+      window.__fiezelBootSplashAt = startedAt;
+      var timer = 0;
+      function dismiss() {
+        if (timer) { clearTimeout(timer); timer = 0; }
+        try { doc.documentElement.classList.remove('fz-booting'); } catch (e) {}
+        try { el.setAttribute('data-fiezel-boot-claimed', 'disposed'); } catch (e) {}
+        try { if (el.parentNode) el.parentNode.removeChild(el); } catch (e) {}
+      }
+      timer = setTimeout(function () {
+        try { if (!el.parentNode) return; } catch (e) {}
+        showRecovery();
+        dismiss();
+      }, 15000);
+      var recoveryId = 'fiezelBootRecovery';
+      function clearRecovery() {
+        try {
+          var recovery = doc.getElementById(recoveryId);
+          if (recovery && recovery.parentNode) recovery.parentNode.removeChild(recovery);
+        } catch (e) {}
+      }
+      function showRecovery() {
+        try {
+          if (doc.getElementById(recoveryId)) return;
+          var recovery = doc.createElement('div');
+          recovery.id = recoveryId;
+          recovery.setAttribute('role', 'alert');
+          recovery.style.cssText = 'position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;padding:24px;background:#1B1418;color:#FFF4DA;text-align:center;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif';
+          var card = doc.createElement('div');
+          card.style.cssText = 'width:min(320px,100%);padding:24px 20px;border:1px solid rgba(255,244,218,.22);border-radius:20px;background:#2A2126';
+          var isTh = false;
+          try {
+            var st = localStorage.getItem('fiezel-state') || localStorage.getItem('fiezel-state-v1');
+            if (st && st.indexOf('"learnerLocale":"th"') >= 0) isTh = true;
+            if (!isTh && (typeof FiezelI18n !== 'undefined' && FiezelI18n && FiezelI18n.getLocale && FiezelI18n.getLocale() === 'th')) isTh = true;
+          } catch (e) {}
+          var title = doc.createElement('strong');
+          title.textContent = isTh ? 'FIEZEL ยังไม่พร้อม' : 'FIEZEL belum siap';
+          title.style.cssText = 'display:block;font-size:20px;line-height:1.25;margin-bottom:10px';
+          var message = doc.createElement('p');
+          message.textContent = isTh ? 'การเชื่อมต่อหรือข้อมูลยังโหลดไม่เสร็จ' : 'Koneksi atau data belum selesai dimuat.';
+          message.style.cssText = 'margin:0;color:#E8D9C5;font-size:15px;line-height:1.5';
+          var retry = doc.createElement('button');
+          retry.type = 'button';
+          retry.textContent = isTh ? 'โหลดใหม่อีกครั้ง' : 'Muat ulang';
+          retry.style.cssText = 'margin-top:18px;min-height:48px;padding:0 20px;border:0;border-radius:12px;background:#FFC700;color:#241A11;font:700 16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif';
+          retry.addEventListener('click', function () {
+            try { window.location.reload(); } catch (e) { window.location.href = window.location.href; }
+          });
+          card.appendChild(title);
+          card.appendChild(message);
+          card.appendChild(retry);
+          recovery.appendChild(card);
+          (doc.body || doc.documentElement).appendChild(recovery);
+        } catch (e) {}
+      }
+      window.__fiezelBootSplash = { at: startedAt, dismiss: dismiss, clearRecovery: clearRecovery };
+    })();
+  </script>
+  <div id="globalSky" class="global-sky phase-day" aria-hidden="true">
+    <div class="sky-light"></div>
+    <span id="globalCelestial" class="global-celestial sun" data-kind="sun"><i data-lucide="sun"></i></span>
+  </div>
+  <main class="app">
+    <header class="topbar">
+      <!-- m025-127: gradien wordmark topbar memakai token, bukan hex mati. Hanya SALINAN INI
+           yang bertema - salinan di splash sengaja tetap gading/emas karena panggungnya
+           memang selalu gelap, dan menyeretnya ikut bertema akan membuatnya hilang di sana. -->
+      <button type="button" class="brand-button" onclick="go('home')" aria-label="Kembali ke Home" data-i18n-aria-label="nav.back-home-aria">
+        <span class="brand"><svg class="fiezel-wordmark" id="fzTopMark" viewBox="0 0 1000 260" role="img" aria-label="FIEZEL"><g class="fzw-sparks" aria-hidden="true"><circle class="fzw-spark" cx="51" cy="51" r="15" style="--sx:-70px;--sy:-85px;--sd:0s"/><circle class="fzw-spark" cx="51" cy="205" r="15" style="--sx:-78px;--sy:80px;--sd:.03s"/><circle class="fzw-spark" cx="102" cy="51" r="15" style="--sx:-52px;--sy:-96px;--sd:.06s"/><circle class="fzw-spark" cx="88" cy="130" r="15" style="--sx:-92px;--sy:0px;--sd:.09s"/><circle class="fzw-spark" cx="205" cy="60" r="15" style="--sx:-30px;--sy:-92px;--sd:.12s"/><circle class="fzw-spark" cx="253" cy="168" r="15" style="--sx:-22px;--sy:78px;--sd:.15s"/><circle class="fzw-spark" cx="321" cy="51" r="15" style="--sx:-40px;--sy:-90px;--sd:.18s"/><circle class="fzw-spark" cx="350" cy="130" r="15" style="--sx:-60px;--sy:-6px;--sd:.21s"/><circle class="fzw-spark" cx="365" cy="209" r="15" style="--sx:-44px;--sy:86px;--sd:.24s"/><circle class="fzw-spark" cx="553" cy="51" r="15" style="--sx:6px;--sy:-98px;--sd:.27s"/><circle class="fzw-spark" cx="553" cy="209" r="15" style="--sx:6px;--sy:92px;--sd:.3s"/><circle class="fzw-spark" cx="683" cy="130" r="15" style="--sx:30px;--sy:-4px;--sd:.33s"/><circle class="fzw-spark" cx="734" cy="51" r="15" style="--sx:44px;--sy:-88px;--sd:.36s"/><circle class="fzw-spark" cx="727" cy="209" r="15" style="--sx:40px;--sy:90px;--sd:.39s"/><circle class="fzw-spark" cx="861" cy="130" r="15" style="--sx:86px;--sy:-8px;--sd:.42s"/><circle class="fzw-spark" cx="905" cy="209" r="15" style="--sx:96px;--sy:84px;--sd:.45s"/></g><defs><linearGradient id="fztIv" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--wordmark-ink-hi)"/><stop offset="100%" stop-color="var(--wordmark-ink-lo)"/></linearGradient><linearGradient id="fztGo" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--wordmark-accent-hi)"/><stop offset="100%" stop-color="var(--wordmark-accent-lo)"/></linearGradient></defs><g class="fzw-mark"><g fill="url(#fztIv)"><rect x="30" y="30" width="42" height="200" rx="21"/><rect x="30" y="30" width="144" height="42" rx="21"/><rect x="30" y="109" width="116" height="42" rx="21"/><rect x="300" y="30" width="42" height="200" rx="21"/><rect x="300" y="30" width="144" height="42" rx="21"/><rect x="300" y="109" width="100" height="42" rx="21"/><rect x="300" y="188" width="130" height="42" rx="21"/><rect x="478" y="30" width="150" height="42" rx="21"/><rect x="478" y="188" width="150" height="42" rx="21"/><rect x="607" y="30" width="191.38" height="42" rx="21" transform="rotate(124.354 607 51)"/><rect x="662" y="30" width="42" height="200" rx="21"/><rect x="662" y="30" width="144" height="42" rx="21"/><rect x="662" y="109" width="100" height="42" rx="21"/><rect x="662" y="188" width="130" height="42" rx="21"/><rect x="840" y="30" width="42" height="200" rx="21"/><rect x="840" y="188" width="130" height="42" rx="21"/></g><g fill="url(#fztGo)"><rect x="192" y="30" width="26" height="200" rx="13"/><rect x="240" y="106" width="26" height="124" rx="13"/></g></g></svg></span>
+      </button>
+      <div class="topbar-actions">
+        <!-- m025-105: pintu ke Tanya FIEZEL. Ikonnya dua balok emas dari wordmark FIEZEL
+             sendiri, bukan ikon pustaka - inilah satu-satunya tempat di aplikasi yang
+             berbicara sebagai FIEZEL, jadi tandanya pun miliknya sendiri.
+
+             Digambar inline, bukan <img>: ikon topbar harus ikut warna dan ukuran
+             tombolnya, dan berkas terpisah akan berkedip datang belakangan pada muat
+             pertama. Sumbernya tetap ada di assets/brand/fiezel-ask.svg.
+
+             TANPA data-view, dengan sengaja. renderInner() menambahkan kelas active ke
+             elemen ber-data-view tetapi hanya membersihkannya dari .nav, jadi atribut itu
+             akan membuat ikon ini tersangkut menyala selamanya setelah sekali dibuka. -->
+        <button type="button" class="icon-button ask-button" onclick="go('ask')" aria-label="Tanya FIEZEL" data-i18n-aria-label="topbar.ask-aria"><svg class="fiezel-ask-mark" viewBox="0 0 74 200" aria-hidden="true"><defs><linearGradient id="fztAsk" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFDE59"/><stop offset="45%" stop-color="#FFC700"/><stop offset="100%" stop-color="#E6A800"/></linearGradient></defs><g fill="url(#fztAsk)"><rect x="0" y="0" width="26" height="200" rx="13"/><rect x="48" y="76" width="26" height="124" rx="13"/></g></svg><span class="ask-label" data-i18n="topbar.ask">Tanya FIEZEL?</span></button>
+        <button type="button" class="icon-button" onclick="openSettings()" aria-label="Buka pengaturan" data-i18n-aria-label="nav.open-settings-aria"><i data-lucide="sliders-horizontal"></i></button>
+        <div class="version" id="version"></div>
+      </div>
+    </header>
+    <!-- D16 (D5 T3): aria-live dicabut dari #app - live region seluruh layar membuat pembaca
+         layar mencoba mengumumkan SETIAP render penuh. Pengumuman status pindah ke #liveStatus
+         di bawah; app.js menyusul mengisinya di wave berikutnya (D14 memegang app.js). -->
+    <div id="app"></div>
+    <!-- Live region kecil khusus status. Gaya sr-only ditulis inline karena style.css milik
+         pemilik lain di wave ini; kelasnya tetap dipasang untuk dipindahkan ke CSS nanti. -->
+    <div id="liveStatus" aria-live="polite" class="sr-only" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0"></div>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <div id="answerBurst" class="answer-burst hidden" role="status" aria-live="assertive" aria-atomic="true"></div>
+
+  <!-- Undangan notifikasi - BUKAN gerbang lagi.
+
+       m025-34 memasang gerbang wajib di sini: kalau izin ditolak, layar ini berbunyi
+       "FIEZEL belum bisa dibuka" dan seluruh aplikasi tetap terkunci. OWNER membatalkan
+       keputusan itu: "Ini pola dark-pattern yang justru bikin app terasa murahan, bukan
+       premium - Duolingo/Spotify minta izin notifikasi setelah onboarding, dengan alasan
+       kontekstual, dan tetap bisa dipakai kalau ditolak."
+
+       Yang tersisa adalah undangan: ia tetap muncul di UJUNG perkenalan, menjelaskan apa
+       yang sebenarnya dikerjakan pengingatnya (target harian + jadwal pengulangan), dan
+       menutup diri tanpa menahan apa pun kalau ditolak atau dilewati. Tombol "Nanti saja"
+       adalah jalan keluar yang selalu ada; Pengaturan adalah jalan masuknya kembali. -->
+  <div id="welcome" class="welcome notification-gate hidden" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle" aria-describedby="notificationGateBody">
+    <div class="welcome-panel notification-panel">
+      <div class="welcome-icon"><i data-lucide="bell-ring"></i></div>
+      <div class="welcome-mark" data-i18n="notif.gate-badge">FIEZEL REMINDER</div>
+      <h2 id="welcomeTitle" data-i18n="notif.gate-title">Mau diingatkan?</h2>
+      <p id="notificationGateBody" data-i18n="notif.gate-desc">FIEZEL bisa mengetuk pelan saat target harian belum selesai, atau saat ada kata dan pola yang menurut jadwal pengulangan sudah waktunya diulang sebelum sempat lupa.</p>
+      <div class="notification-requirement"><i data-lucide="shield-check"></i><span data-i18n="notif.gate-terms">Paling banyak satu pengingat sehari dan tidak pernah di jam tidur. Bisa dinyalakan atau dimatikan kapan saja lewat Pengaturan.</span></div>
+      <p id="notificationGateStatus" class="notification-status" role="status" data-i18n="notif.status-default">Belajar tetap bisa dimulai tanpa ini.</p>
+      <button id="notificationGateButton" type="button" class="primary wide" onclick="requestStudyNotificationPermission()"><span data-i18n="notif.tombol-ingatkan">Ingatkan saya</span> <i data-lucide="bell-ring"></i></button>
+      <button id="notificationGateSkip" type="button" class="text-button wide" onclick="declineStudyNotifications()" data-i18n="notif.skip-link">Nanti saja</button>
+      <p id="notificationGateHelp" class="notification-help" data-i18n="notif.help-init">Pilih "Nanti saja" dan FIEZEL langsung terbuka. Pengingatnya menunggu di Pengaturan kalau suatu saat dibutuhkan.</p>
+    </div>
+  </div>
+
+  <!-- Audit UX Bagian 3: layar masuk bergaya Apple Sign-In - satu lambang merek di atas,
+       judul besar, satu tombol utama penuh lebar, sisanya lapang. Tidak ada elemen bawaan
+       browser yang terlihat dan tidak ada nama murid di layar sistem. -->
+  <div id="authGate" class="welcome auth-gate hidden" role="dialog" aria-modal="true" aria-labelledby="authGateTitle" aria-describedby="authGateBody">
+    <div class="welcome-panel auth-panel">
+      <img class="auth-mark" src="./assets/brand/fiezel-icon-192.png" alt="" width="72" height="72" decoding="async">
+      <h2 id="authGateTitle" data-i18n="auth.gate-title">Masuk ke FIEZEL</h2>
+      <p id="authGateBody" data-i18n="auth.gate-body">Akunmu menyimpan progres belajar, streak, dan AI tutor supaya tetap sama di setiap perangkat.</p>
+      <p id="authGateStatus" class="auth-status" role="status" data-i18n="auth.status-check">Memeriksa status akun…</p>
+      <button id="authGateButton" type="button" class="auth-primary" onclick="attemptPuterSignIn()"><i data-lucide="user-round"></i><span data-i18n="auth.tombol-lanjutkan">Lanjutkan dengan Puter</span></button>
+      <!-- m026-02: jalan keluar yang selalu ada, meniru notificationGateSkip "Nanti saja"
+           persis satu-banding-satu. Tanpa tombol ini, murid yang tidak mau (atau tidak
+           bisa) login terkurung di balik .auth-locked - dark-pattern yang sama yang sudah
+           dibongkar OWNER di gerbang notifikasi. Pengaturan > Akun Puter adalah jalan
+           masuknya kembali. -->
+      <button id="authGateSkip" type="button" class="text-button wide" onclick="skipPuterSignIn()" data-i18n="auth.skip-btn">Lanjut tanpa akun</button>
+      <p id="authGateSkipHelp" class="auth-help" data-i18n="auth.skip-help">Semua materi dan latihan tetap jalan tanpa akun — tutor AI dan suara neural baru bisa dipakai kalau kamu masuk akun Puter dan ada jaringan.</p>
+      <p id="authGateHelp" class="auth-help" data-i18n="auth.puter-help">Jendela login Puter terbuka sebentar di atas FIEZEL, lalu tertutup sendiri begitu selesai - kamu tidak akan dipindahkan ke browser lain.</p>
+      <p class="auth-legal" data-i18n="auth.legal-note">Dengan melanjutkan, kamu menyetujui progres belajarmu disimpan di akun Puter milikmu sendiri.</p>
+    </div>
+  </div>
+
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Dialog FIEZEL" data-i18n-aria-label="dialog.fiezel-aria">
+    <div class="modal-panel" id="modalPanel"></div>
+  </div>
+
+  <!-- m025-212: KABAR PEMBARUAN YANG TERLIHAT.
+       Sebelum ini pembaruan PWA dipasang diam-diam lalu halaman dimuat ulang sendiri.
+       Di perangkat murid itu terbaca sebagai aplikasi yang "berkedip" tanpa sebab, dan
+       kalau muat ulang tidak sempat terjadi, murid memegang versi lama tanpa pernah tahu.
+       Sekarang versi baru mengumumkan dirinya di layar, lengkap dengan instruksinya, dan
+       murid yang memutuskan kapan ia dipasang. Markupnya statis di sini (bukan disuntik
+       JS) supaya kartu ini tetap ada meski app.js gagal dimuat sebagian. -->
+  <div id="updateBanner" class="update-banner hidden" role="alertdialog" aria-live="polite"
+       aria-labelledby="updateBannerTitle" aria-describedby="updateBannerBody">
+    <div class="update-banner-card">
+      <div class="update-banner-icon" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3.2-6.9"/><path d="M21 3v6h-6"/></svg>
+      </div>
+      <div class="update-banner-text">
+        <p id="updateBannerTitle" class="update-banner-title" data-i18n="update.banner-title">Versi baru FIEZEL tersedia</p>
+        <p id="updateBannerBody" class="update-banner-body" data-i18n-html="update.banner-desc">Materi dan perbaikan terbaru sudah selesai diunduh. Tekan <b>Perbarui sekarang</b> — aplikasi akan menutup sebentar lalu terbuka lagi sendiri. Progres belajarmu tidak hilang.</p>
+        <p id="updateBannerVersion" class="update-banner-version"></p>
+      </div>
+      <div class="update-banner-actions">
+        <button type="button" id="updateBannerApply" class="update-banner-apply" data-i18n="update.apply-btn">Perbarui sekarang</button>
+        <button type="button" id="updateBannerLater" class="update-banner-later" data-i18n="update.later-btn">Nanti saja</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Peredup di dasar layar. Konten memudar SEBELUM sampai ke tab bar, jadi tidak ada lagi
+       angka yang terbaca samar di balik pill saat bergulir - lihat .nav-scrim di style.css
+       untuk pengukuran yang mendasarinya. Dekoratif murni, karena itu aria-hidden. -->
+  <div class="nav-scrim" aria-hidden="true"></div>
+  <nav class="bottomnav" aria-label="Navigasi utama" data-i18n-aria-label="nav.main-aria">
+    <button type="button" class="nav active" data-view="home" onclick="go('home')" aria-label="Beranda" data-i18n-aria-label="nav.home-aria"><i class="fz-i" data-fz-icon="home" aria-hidden="true"></i><span data-i18n="nav.home">Home</span></button>
+    <button type="button" class="nav" data-view="vocab" onclick="go('vocab')" aria-label="Vocabulary" data-i18n-aria-label="nav.vocab-aria"><i class="fz-i" data-fz-icon="vocab" aria-hidden="true"></i><span data-i18n="nav.vocab">Vocab</span></button>
+    <button type="button" class="nav" data-view="grammar" onclick="go('grammar')" aria-label="Grammar" data-i18n-aria-label="nav.grammar-aria"><i class="fz-i" data-fz-icon="grammar" aria-hidden="true"></i><span data-i18n="nav.grammar">Grammar</span></button>
+    <button type="button" class="nav" data-view="reading" onclick="go('reading')" aria-label="Reading" data-i18n-aria-label="nav.reading-aria"><i class="fz-i" data-fz-icon="reading" aria-hidden="true"></i><span data-i18n="nav.reading">Reading</span></button>
+    <!-- Audit UX Bagian 4: ikon lama (grafik batang) membaca sebagai "statistik", bukan
+         "jalur belajar". Ikon route adalah jalur berkelok dengan simpul - persis makna
+         yang harus dibawa tab ini, sejajar dengan Path/Jalur Belajar di Duolingo. -->
+    <button type="button" class="nav" data-view="progress" onclick="go('progress')" aria-label="Peta belajar" data-i18n-aria-label="nav.map-aria"><i class="fz-i" data-fz-icon="map" aria-hidden="true"></i><span data-i18n="nav.peta">Peta</span></button>
+  </nav>
+
+  <!-- OWNER: "Terlalu banyak script terpisah (30+ file JS) dimuat sinkron di <head>/<body>
+       tanpa bundling/lazy-load" dan "kalau Puter down/lambat, splash/loading ikut ketahan".
+       Keduanya benar dan keduanya berasal dari daftar di bawah ini, yang dulu seluruhnya
+       parser-blocking dengan js.puter.com di baris pertama.
+
+       Tiga aturan sekarang berlaku di sini, dan boot-order-test.js menggagalkan build kalau
+       salah satunya dilanggar:
+
+       1. js.puter.com `async` - permintaan pihak ketiga tidak boleh berada di jalur kritis
+          sama sekali. Konsekuensinya `puter` bisa datang kapan saja, jadi setiap pemakainya
+          menunggu lewat FiezelPuterReady (./fiezel-puter-ready.js), bukan menebak.
+       2. Semua skrip lokal `defer` - berhenti menahan pengurai, urutan eksekusi tetap sama
+          persis dengan urutan tulisnya. TIDAK BOLEH ada blok <script> inline di bawah sini:
+          blok inline TIDAK ikut ditunda dan akan berjalan sebelum app.js, membaca fungsi
+          yang belum ada. Dua blok inline yang dulu ada di sini karena itu dipindah menjadi
+          ./features/ui/fiezel-report-gesture-isolation.js dan ./features/ui/fiezel-boot-tail.js.
+       3. Tumpukan berat (suara neural 265 KB, tutor/Classroom 81 KB) memakai
+          type="fiezel/lazy" - browser tidak mengambilnya saat mengurai, dan
+          ./fiezel-lazy-loader.js mengangkatnya jadi <script> sungguhan setelah layar
+          pertama tercat, atau lebih awal kalau murid membukanya duluan. -->
+  <script async id="fiezelPuterSdk" src="https://js.puter.com/v2/"></script>
+  <script defer src="./fiezel-puter-ready.js"></script>
+  <script defer src="./lucide.min.js"></script>
+  <script defer src="./version.js"></script>
+  <script defer src="./report-config.js"></script>
+  <script defer src="./core-config.js"></script>
+  <script defer src="./content-canary.js"></script>
+  <script defer src="./content-promotion.js"></script>
+  <script defer src="./content-canary-config.js"></script>
+  <!-- FIEZEL_I18N_BEGIN — runtime i18n + copy-map per domain (audit v2: AI-02 F01).
+       Urutan di blok ini adalah kontrak: fiezel-i18n.js lebih dulu (mendefinisikan
+       FiezelI18n.t), lalu SEMUA copy-id-<domain>.js, lalu copy-th-<domain>.js — semuanya
+       SEBELUM modul features/* mana pun yang memanggil t() dan SEBELUM app.js. Karena
+       `defer` mempertahankan urutan tulis, cukup tambahkan baris <script defer> berkas
+       copy domain baru DI DALAM blok ini (id dulu, th di bawahnya), lalu minta W1-SW
+       menambahkannya ke precache sw.js. -->
+  <script defer src="./features/i18n/fiezel-i18n.js"></script>
+  <script defer src="./features/i18n/copy-id-core.js"></script>
+  <!-- W2-INT: SEMUA copy-map id Gelombang 2 dimuat di sini — SESUDAH copy-id-core.js,
+       SEBELUM modul features/* dan app.js (kontrak handoff W2-APP-A..D, W2-FEAT-A/B,
+       W2-STATE; modul features non-pure memanggil t() saat definisi tabel, jadi copy
+       yang telat = kunci mentah tampil ke murid). Urutan register antar copy-id bebas
+       (fiezel-i18n.js menolak kunci ganda), tapi urutan tulis ini dipertahankan sama
+       dengan harness tes W2-TEST-A: core → app-a..d → feat-a/b → quota → settings-locale. -->
+  <script defer src="./features/i18n/copy-id-app-a.js"></script>
+  <script defer src="./features/i18n/copy-id-app-b.js"></script>
+  <script defer src="./features/i18n/copy-id-app-c.js"></script>
+  <script defer src="./features/i18n/copy-id-app-d.js"></script>
+  <script defer src="./features/i18n/copy-id-app-e.js"></script>
+  <script defer src="./features/i18n/copy-id-app-f.js"></script>
+  <script defer src="./features/i18n/copy-id-feat-a.js"></script>
+  <script defer src="./features/i18n/copy-id-feat-b.js"></script>
+  <script defer src="./features/i18n/copy-id-feat-c.js"></script>
+  <script defer src="./features/i18n/copy-id-feat-d.js"></script>
+  <script defer src="./features/i18n/copy-id-gems.js"></script>
+  <script defer src="./features/i18n/copy-id-quota.js"></script>
+  <script defer src="./features/i18n/copy-id-settings-locale.js"></script>
+  <script defer src="./features/i18n/copy-id-grammar-labels.js"></script>
+  <!-- W4-MERGE: aset th TIDAK dimuat statis (copy-th-*, naskah-th-brain, dua dataset th) —
+       semuanya disuntik/difetch DINAMIS oleh pemuat kecil di bawah HANYA saat locale th
+       (AI-13 F02/F05: murid Indonesia nol byte th). Pemuat wajib SETELAH fiezel-i18n.js
+       (butuh getLocale/onChange) dan SEBELUM app.js (app.js memasang FiezelOnThDataReady). -->
+  <script defer src="./features/i18n/fiezel-th-loader.js"></script>
+  <!-- FIEZEL_I18N_END -->
+  <script defer src="./features/diagnostics/fiezel-diagnostic-targets.js"></script>
+  <script defer src="./features/diagnostics/fiezel-diagnostic-bus.js"></script>
+  <script defer src="./features/diagnostics/fiezel-module-selftests.js"></script>
+  <script defer src="./features/diagnostics/fiezel-diagnostic-register.js"></script>
+  <!-- Sengaja dimuat sebelum app.js: kalau app.js throw, tombol Diagnostics tetap ada.
+       Karena itu Diagnostics TIDAK ikut dimuat malas bersama tumpukan suara lainnya -
+       nilainya justru terletak pada tersedia lebih dulu daripada yang ia periksa. -->
+  <script defer src="./features/neural-voice/fiezel-diag-panel.js"></script>
+  <script defer src="./features/ui/fiezel-zoom-lock.js"></script>
+  <script defer src="./features/ui/fiezel-back-nav.js"></script>
+  <!-- m025-115: set ikon duotone FIEZEL dan pembimbing mengambang. Keduanya dideklarasikan
+       SEBELUM app.js karena app.js memanggil keduanya pada cat pertama (refreshIcons dan
+       syncCoachBubble). Keduanya ringan dan tidak menyentuh jaringan sama sekali. -->
+  <script defer src="./features/ui/fiezel-icons.js"></script>
+  <!-- m026-01: <fiezel-mascot> WAJIB terdaftar sebelum dua berkas di bawahnya.
+       fiezel-coach-bubble.js memutuskan bentuk wajah gelembung saat install(), dan
+       app.js memutuskan wajah panel "Kata FIEZEL" saat cat pertama; keduanya membaca
+       customElements.get('fiezel-mascot'). Kalau berkas ini datang belakangan, kedua
+       tempat itu jatuh ke ikon paw cadangan dan tidak pernah naik lagi. -->
+  <script defer src="./features/mascot/fiezel-mascot.js"></script>
+  <!-- [FASE 7] Lapisan slot PAW panel (12-lesson-layer.md). Dimuat SETELAH
+       fiezel-mascot.js (ia bertanya FiezelPaw.ready() sebelum memesan ruang) dan
+       SEBELUM app.js (render kuis membaca self.FiezelPawSlot pra-cat). Tanpa berkas
+       ini app.js jatuh mulus ke wajah quiz-mascot lama - tidak ada yang patah. -->
+  <script defer src="./features/mascot/fiezel-paw-slot.js"></script>
+  <!-- Lapisan outfit kontekstual PAW (G5' — registry terkurasi, 19-outfit-system).
+       Menyuntik item ke jangkar fz-outfit-* DARI LUAR komponen; deterministik,
+       bukan ekonomi hadiah; kill switch localStorage fzPawOutfits. Tanpa berkas
+       ini PAW tampil polos - tidak ada yang patah. -->
+  <script defer src="./features/mascot/fiezel-paw-outfit.js"></script>
+  <script defer src="./features/ui/fiezel-coach-bubble.js"></script>
+  <!-- m025-117 Core Brain v2. Dimuat SEBELUM app.js dan tidak ikut dimuat malas: kebijakan
+       sesi pertama sudah membutuhkannya, dan tanpa itu murid akan mendapat satu sesi dengan
+       kebijakan lama sebelum lapisan penalarannya tiba. Berkasnya ~14 KB, murni fungsi. -->
+  <script defer src="./features/brain/fiezel-core-brain.js"></script>
+  <!-- m025-118 Tutor Brain v3. Dimuat bersama Core Brain dan tidak malas: ia bekerja pada
+       jawaban PERTAMA murid, jadi menunggunya tiba berarti soal pertama setiap sesi
+       berjalan tanpa tutor. Berkasnya ~11 KB, murni fungsi, tanpa jaringan. -->
+  <script defer src="./features/brain/fiezel-tutor-brain.js"></script>
+  <!-- Braincore v3. Sembilan modul penalaran baru, pola muat sama dengan Core Brain: defer,
+       tidak malas, murni fungsi tanpa jaringan. Seluruh pengaitnya di app.js dijaga
+       availability-check + try/catch - berkas yang belum tiba (atau gagal dimuat) berarti
+       aplikasi berjalan persis seperti hari ini, bukan aplikasi yang mati. -->
+  <script defer src="./features/brain/fiezel-misconception-ledger.js"></script>
+  <script defer src="./features/brain/fiezel-item-prior.js"></script>
+  <script defer src="./features/brain/fiezel-evidence-credibility.js"></script>
+  <script defer src="./features/brain/fiezel-mastery-bkt.js"></script>
+  <script defer src="./features/brain/fiezel-olm.js"></script>
+  <script defer src="./features/brain/fiezel-affect.js"></script>
+  <script defer src="./features/brain/fiezel-confusion-matrix.js"></script>
+  <script defer src="./features/brain/fiezel-step-tutor.js"></script>
+  <script defer src="./features/brain/fiezel-production-grader.js"></script>
+  <!-- Fase 2 (B3 butir 8): modul listening adaptif (B6). Pola muat sama dengan modul brain
+       lain: defer, murni fungsi. Pengaitnya di app.js guarded - berkas belum tiba/gagal
+       dimuat berarti listening berjalan persis seperti hari ini. -->
+  <script defer src="./features/brain/fiezel-listening-adaptive.js"></script>
+  <!-- Fase 3 (Wiring C5): tiga modul gelombang C - kalibrasi kesulitan item (C1), speaking
+       adaptif dari agregat coverage (C2), dan coach regulasi belajar/SRL (C4). Pola muat
+       identik dengan modul brain lain: defer, murni fungsi, tanpa jaringan. SEMUA pengait
+       di app.js dijaga availability-check + try/catch - berkas yang belum tiba atau gagal
+       dimuat berarti aplikasi berjalan persis seperti sebelum Fase 3. -->
+  <script defer src="./features/brain/fiezel-item-calibration.js"></script>
+  <script defer src="./features/brain/fiezel-speaking-adaptive.js"></script>
+  <script defer src="./features/brain/fiezel-srl-coach.js"></script>
+  <!-- brain-learning-infra: lima modul infrastruktur belajar (stat-gate, manifest, config,
+       metrik belajar, digest metrik). Pola muat identik dengan modul brain lain: defer,
+       murni fungsi, tanpa jaringan. stat-gate dimuat PERTAMA karena manifest/config/metrik
+       membacanya saat evaluasi; semua pengait di app.js dijaga availability-check +
+       try/catch - berkas yang belum tiba berarti aplikasi berjalan persis seperti hari ini. -->
+  <script defer src="./features/brain/fiezel-stat-gate.js"></script>
+  <script defer src="./features/brain/fiezel-brain-manifest.js"></script>
+  <script defer src="./features/brain/fiezel-brain-config.js"></script>
+  <script defer src="./features/brain/fiezel-learning-metrics.js"></script>
+  <script defer src="./features/brain/fiezel-metrics-digest.js"></script>
+  <!-- Langkah 1 roadmap otonomi: probe retensi tertunda. Dimuat SETELAH mastery-bkt
+       karena penjadwalnya membaca gerbang mastery; modul murni, tanpa jaringan. -->
+  <script defer src="./features/brain/fiezel-retention-probe.js"></script>
+  <!-- S5b: pemangkas bukti untuk sinkron antar-perangkat. Tanpa modul ini sinkron mati
+       total, karena satu-satunya yang bisa dikirim tinggal baris riwayat mentah. -->
+  <script defer src="./features/brain/fiezel-attempt-record.js"></script>
+  <!-- Langkah 2: pemutus nasib kebijakan dari INTERVAL, bukan ambang. Dimuat setelah
+       stat-gate karena ia adapter di atasnya. -->
+  <script defer src="./features/brain/fiezel-policy-verdict.js"></script>
+  <!-- brain-learning-infra: lane telemetri belajar (config → events → queue → transport).
+       Urutan penting: transport membaca queue, queue membaca events, semuanya membaca
+       config, jadi config dimuat paling awal. Dimuat SEBELUM app.js dengan pola defer
+       yang sama; pengaitnya di app.js guarded - tanpa berkas ini telemetri diam,
+       aplikasi tidak berubah perilaku. -->
+  <script defer src="./features/telemetry/fiezel-telemetry-config.js"></script>
+  <script defer src="./features/telemetry/fiezel-learning-events.js"></script>
+  <script defer src="./features/telemetry/fiezel-learning-queue.js"></script>
+  <script defer src="./features/telemetry/fiezel-learning-transport.js"></script>
+  <script defer src="./features/telemetry/fiezel-braincore-evidence.js"></script>
+  <script defer src="./features/brand/fiezel-choreography.js"></script>
+  <script defer src="./features/audio/fiezel-ui-sfx.js"></script>
+  <script defer src="./features/library/fiezel-library.js"></script>
+  <script defer src="./features/speaking-listening/speaking-listening-config.js"></script>
+  <!-- Gem Terjemahan. Dimuat SEBELUM addon dan app.js, dan tidak malas: defaultState app.js
+       memanggil freshGems() saat berkas itu dieksekusi, jadi modulnya harus sudah ada.
+       Isinya fungsi murni ~4 KB tanpa DOM dan tanpa jaringan. -->
+  <script defer src="./features/speaking-listening/gems-core.js"></script>
+  <!-- P1 Prasasti: inti murni lencana bukti (pola gems-core) - dideklarasikan sebelum app.js. -->
+  <script defer src="./features/prasasti/fiezel-prasasti-core.js"></script>
+  <!-- SOSIAL (SLOT 7): inti online/teman/papan (pola gems-core: mandiri, tanpa import).
+       Dimuat sebelum app.js supaya kait bukti finishQuiz menemukannya sejak sesi pertama;
+       kalau gagal dimuat, seluruh pengaitnya di app.js guarded dan fitur online diam. -->
+  <script defer src="./features/social/fiezel-social.js"></script>
+  <!-- JEMBATAN UNDANGAN + KOTAK MASUK SOSIAL. Keduanya inti murni (pola gems-core) dan
+       harus sudah ada sebelum app.js: lembar undangan dibuka dari alur boot, dan kotak
+       masuk dibaca saat Home digambar pertama kali. Kalau salah satu gagal dimuat,
+       seluruh pemanggilnya di app.js guarded dan fitur teman kembali ke jalur manual. -->
+  <script defer src="./features/social/fiezel-invite-link.js"></script>
+  <script defer src="./features/social/fiezel-social-notify.js"></script>
+  <!-- LAPIS AKUN (masuk / daftar / aktivasi guru). Inti murni tanpa DOM, seperti
+       gems-core: seluruh UI-nya hidup di app.js. Dimuat SEBELUM app.js karena alur
+       boot menanyakan sesi (`FiezelAccount.refresh()`) sebelum Home digambar, jadi
+       cangkang yang benar dipilih sekali — bukan digambar sebagai murid lalu
+       melompat ke cangkang guru sesudahnya. Kalau berkas ini gagal dimuat, seluruh
+       pemanggilnya di app.js guarded dan aplikasi tetap jalan sebagai anonim. -->
+  <script defer src="./features/auth/fiezel-account.js"></script>
+  <script defer src="./features/speaking-listening/fiezel-speaking-listening-addon.js"></script>
+  <script defer src="./fiezel-lazy-loader.js"></script>
+
+  <!-- FIEZEL_LAZY_START — runtime suara neural. Urutan di bawah ini adalah kontrak, bukan
+       selera: dua berkas m0281 di dalamnya adalah tambalan yang membungkus tetangganya -
+       satu menambal SEBELUM bootstrap, satu merekam runtime SESUDAH semua tambalan
+       terpasang. Pemuat menjalankannya dengan async=false sehingga urutan tulis di bawah
+       ini tetap menjadi urutan eksekusi.
+
+       (Nama berkasnya sengaja tidak ditulis di komentar ini: beberapa tes menghitung
+       urutan lewat index.html indexOf pada nama berkas, dan penyebutan di komentar akan
+       terbaca sebagai posisi pemuatan yang lebih awal daripada tag-nya sendiri.) -->
+  <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/audio-assets/fiezel-audio-key.js"></script>
+  <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/audio-assets/fiezel-audio-manifest.js"></script>
+  <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/audio-assets/fiezel-audio-resolver.js"></script>
+  <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-neural-voice-config.js"></script>
+  <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-prosody.js"></script>
+  <script defer src="./features/search/fiezel-search.js"></script>
+  <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-puter-voice.js"></script>
+  <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-subtitle.js"></script>
+  <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-subtitle-translate.js"></script>
+  <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-cf-tts-transport.js"></script>
+  <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-cf-voice-notice.js"></script>
+  <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-voice-say.js"></script>
+  <!-- FASE 11: jembatan bicara→maskot. Menumpang grup malas suara karena ia hanya
+       berguna ketika pintu bicara hidup; ia mendengar CustomEvent, jadi urutannya di
+       dalam grup tidak sensitif — diletakkan tepat sesudah pintu bicara supaya event
+       pertama pun sudah ada pendengarnya. -->
+  <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-speech-bridge.js"></script>
+  <!-- m025-121 mesin cadangan di perangkat. Urutannya penting dan bukan selera:
+       persona -> adapter -> mesin -> pemutar -> hotfix -> bootstrap -> tambalan cache,
+       persis urutan yang berlaku sebelum m025-100 menghapusnya. Semuanya MALAS dan
+       berada SESUDAH pintu bicara: tidak satu pun dari berkas ini boleh menunda kalimat
+       pertama yang dibacakan Puter. Pengunduh latarnya menyusul paling akhir karena ia
+       membaca daftar aset dari bootstrap. -->
+  <script type="fiezel/lazy" data-fiezel-lazy="voice" data-fiezel-lazy-when="idle" src="./features/neural-voice/fiezel-voice-diagnostics.js"></script>
+  <script type="fiezel/lazy" data-fiezel-lazy="voice" data-fiezel-lazy-when="idle" src="./features/neural-voice/fiezel-voice-persona.js"></script>
+  <script type="fiezel/lazy" data-fiezel-lazy="voice" data-fiezel-lazy-when="idle" src="./features/neural-voice/fiezel-sherpa-vits-adapter.js"></script>
+  <script type="fiezel/lazy" data-fiezel-lazy="voice" data-fiezel-lazy-when="idle" src="./features/neural-voice/fiezel-neural-voice.js"></script>
+  <script type="fiezel/lazy" data-fiezel-lazy="voice" data-fiezel-lazy-when="idle" src="./features/neural-voice/fiezel-web-audio-player.js"></script>
+  <script type="fiezel/lazy" data-fiezel-lazy="voice" data-fiezel-lazy-when="idle" src="./features/neural-voice/fiezel-m0281-prebootstrap-hotfix.js"></script>
+  <script type="fiezel/lazy" data-fiezel-lazy="voice" data-fiezel-lazy-when="idle" src="./features/neural-voice/fiezel-neural-voice-bootstrap.js"></script>
+  <script type="fiezel/lazy" data-fiezel-lazy="voice" data-fiezel-lazy-when="idle" src="./features/neural-voice/fiezel-neural-voice-ios-cache-fix.js"></script>
+  <script type="fiezel/lazy" data-fiezel-lazy="voice" data-fiezel-lazy-when="idle" src="./features/neural-voice/fiezel-neural-voice-cache-integrity-repair.js"></script>
+  <script type="fiezel/lazy" data-fiezel-lazy="voice" data-fiezel-lazy-when="idle" src="./features/neural-voice/fiezel-neural-voice-audibility-fix.js"></script>
+  <script type="fiezel/lazy" data-fiezel-lazy="voice" data-fiezel-lazy-when="idle" src="./features/neural-voice/fiezel-voice-offline-autoload.js"></script>
+  <!-- Tumpukan tutor/Classroom. data-fiezel-lazy-needs="voice" bukan hiasan: tutor v3
+       menimpa runtime suara, jadi grup suara HARUS selesai lebih dulu walaupun murid
+       membuka Classroom sebelum gelombang idle sempat jalan. -->
+  <script type="fiezel/lazy" data-fiezel-lazy="classroom" data-fiezel-lazy-when="idle" data-fiezel-lazy-needs="voice" src="./features/classroom/fiezel-classroom.js"></script>
+  <script type="fiezel/lazy" data-fiezel-lazy="classroom" src="./features/tutor-classroom/fiezel-tutor-v3.js"></script>
+  <script type="fiezel/lazy" data-fiezel-lazy="classroom" src="./features/tutor-classroom/fiezel-tutor-dialog.js"></script>
+  <script type="fiezel/lazy" data-fiezel-lazy="classroom" src="./features/tutor-classroom/fiezel-tutor-voice-chat.js"></script>
+  <!-- m025-224 (P1 performa, keputusan OWNER: perluas mekanisme lazy yang sudah ada).
+       fiezel-library-ui.js (43 KB) tidak dibutuhkan untuk mencetak layar pertama: nol
+       pemanggil di luar dirinya sendiri, dan ia memasang dirinya ke DOM layar Perpustakaan
+       yang butuh beberapa ketukan untuk dicapai - sementara gelombang malas berangkat saat
+       idle tepat sesudah cat pertama. Pola dan alasannya sama persis dengan grup classroom.
+       Tetap ada di ASSETS sw.js, jadi peluncuran offline tidak kehilangan apa pun. -->
+  <script type="fiezel/lazy" data-fiezel-lazy="library" data-fiezel-lazy-when="idle" src="./features/library/fiezel-library-ui.js"></script>
+  <!-- FIEZEL_LAZY_END -->
+
+  <!-- m025-125: judul lesson grammar Bahasa Indonesia. Wajib sebelum app.js karena
+       friendlySkillName() membacanya sejak render Grammar Hub yang pertama. -->
+  <script defer src="./grammar-labels-id.js"></script>
+  <!-- A8: naskah murid + aturan aksesibilitas untuk pemberitahuan jatah/suara. Wajib SEBELUM
+       app.js karena presentQuotaNotice() memakainya, dan kalau ia belum ada app.js akan
+       terpaksa memakai naskah cadangan yang lebih miskin. -->
+  <script defer src="./features/quota/quota-copy.js"></script>
+  <!-- Splash v4 (OA-6): partikel + equalizer + cap PAW dimuat sebelum orkestratornya. -->
+  <script defer src="./features/brand/fiezel-splash-particles.js"></script>
+  <script defer src="./features/brand/fiezel-splash-equalizer.js"></script>
+  <script defer src="./features/brand/fiezel-splash-pawstamp.js"></script>
+  <script defer src="./features/brand/fiezel-splash.js"></script>
+  <script defer src="./features/onboarding/fiezel-onboarding.js"></script>
+  <script defer src="./features/onboarding/fiezel-tour.js"></script>
+  <script defer src="./features/personal-journey/fiezel-personal-journey.js"></script>
+  <!-- Alur learner (diagnostic → rencana → lesson) + backup progres + Tutor Action Center.
+       Wajib SEBELUM app.js karena home() membaca FiezelLearnerFlow.load() saat render pertama. -->
+  <script defer src="./features/learner-flow/fiezel-review-bank.js"></script>
+  <script defer src="./features/learner-flow/fiezel-progress-backup.js"></script>
+  <script defer src="./features/learner-flow/fiezel-duel.js"></script>
+  <script defer src="./features/learner-flow/fiezel-learner-flow.js"></script>
+  <script defer src="./features/tutor-action-center/fiezel-tutor-action-center.js"></script>
+  <!-- Ruang Guru (cangkang guru terpisah). Wajib SEBELUM app.js: tutorCenterView() memasangnya,
+       dan isVerifiedTeacher() menanyakan previewAllowed() saat Home digambar pertama kali. -->
+  <script defer src="./features/teacher/fiezel-teacher-icons.js"></script>
+  <script defer src="./features/teacher/fiezel-teacher-store.js"></script>
+  <script defer src="./features/teacher/fiezel-teacher-shell.js"></script>
+  <script defer src="./app.js"></script>
+  <script defer src="./features/daily-target/fiezel-daily-target.js"></script>
+  <script defer src="./features/skills-evidence/fiezel-skills-evidence.js"></script>
+  <script defer src="./features/academic-readiness/fiezel-academic-readiness.js"></script>
+  <script defer src="./features/continuity/fiezel-continuity.js"></script>
+  <script defer src="./features/health/fiezel-install-health.js"></script>
+  <script defer src="./features/ui/fiezel-report-gesture-isolation.js"></script>
+  <script defer src="./features/ui/fiezel-ui-manager.js"></script>
+  <!-- T-031: berkas ini memasang `window.FiezelABAnalytics` (pipa eksperimen UI). Ia TIDAK
+       BOLEH menyentuh `window.FiezelAnalytics` — nama itu milik modul analytics
+       privasi-maksimal yang disuntik app.js di idle, dan `<script defer>` di sini selalu
+       menang balapan terhadap idle. Dijaga `global-name-collision-test.js`. -->
+  <script defer src="./features/ui/fiezel-ab-testing.js"></script>
+  <script defer src="./features/ui/skeleton-helpers.js"></script>
+  <script defer src="./features/ui/fiezel-boot-tail.js"></script>
+  <script defer src="./features/ui/fiezel-update-prompt.js"></script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+{
+  "summary": "Frontend-only Playwright testing of the new Ruang Guru (teacher dashboard) in the vanilla-JS PWA via ?teacher=preview. Verified the full teacher flow end-to-end: welcome + demo class load, briefing KPIs/greet/misconception/quick actions, class creation & code chip, add-students with dedup/first-name, student search, student drawer + phone/note forms, attendance modal with mark-all, assignments create with exam mode + share-code modal + copy, learner import code grading (drawer opens, toast), invalid code error, analytics tiles + heatmap + groups switching per skill, communications (announcements, parent report modal with WhatsApp link, greet modal with mark-sent), weekly report modal, teacher journal with student tagging, mode papan (board) with Escape close, settings profile save + persistence after reload, exit-to-student flow, mobile responsive at 390px, and regression that the app requires an invitation code (lock gate) when NOT in preview mode. Overall the shell is functional and stable. Reporting a few testability gaps and one potentially inconclusive grading-progress observation.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "Assignment create modal", "issue": "Assignment share code modal appears only when at least 1 skill checkbox is checked (a top-misconception skill is pre-checked). Automated single-click on the same testid toggled it off and submit failed with 'Pilih minimal satu skill'. Not a functional bug for users, but the pre-checked chip is not visually indicated as strongly as it could be.", "selector": "[data-testid=tg-assign-skill-*]", "priority": "LOW"},
+      {"component": "Teacher settings / sidebar", "issue": "After saving profile (tg-teacher-name='Bu Sari'), state and localStorage update correctly but the sidebar profile row still renders 'Guru FIEZEL' at desktop width until navigating away and back. Body text elsewhere does include the new name so the save works — this looks like a stale sidebar render.", "selector": ".tg-sidebar profile row", "priority": "MEDIUM"},
+      {"component": "Assignment progress after learner import", "issue": "Pasted a valid base64 learner code for an existing demo assignment (Ujian mini Listening detail) and Rina — drawer opened + toast 'Rina masuk' shown, but the card's '9/18 selesai · rata-rata 56%' text was unchanged. This may be because Rina was already among the completed 9 in demo data. Please verify progress increments for a genuinely un-completed student.", "selector": "[data-testid^=tg-assign-as-]", "priority": "MEDIUM"}
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Briefing / Mobile", "issues": ["Confirmed no horizontal overflow at 390px width; .tg-mnav has 6 items; sidebar hidden. All good."]}
+    ],
+    "testability_gaps": [
+      {"missing_testid": "tg-phone-save", "location": "Student drawer 'Simpan' button after tg-phone-input"},
+      {"missing_testid": "tg-note-add", "location": "Student drawer 'Tambah' button after tg-note-input"},
+      {"missing_testid": "tg-journal-item-*", "location": "Journal Riwayat list entries"},
+      {"note": "Spec called out data-testid=tg-error for invalid import code, but the DOM uses class 'tg-error' on a <p>. Consider adding data-testid=tg-error for stable selection."},
+      {"note": "tg-parent- prefix collides with tg-parent-section wrapper; prefix-based selectors match one extra element. Consider renaming section to tg-parent-report-section."}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Investigate why sidebar profile row does not immediately reflect saved teacher name at desktop width (verify tg-render/re-mount on settings save).",
+    "Verify assignment progress increments for an un-completed student when a learner import code is grade-imported (rule out demo-data false negative).",
+    "Add missing data-testid attributes: tg-phone-save, tg-note-add, tg-journal-item-<id>, tg-error (on <p class=tg-error>).",
+    "Rename or namespace tg-parent-section to avoid data-testid prefix collision with tg-parent-<sid>."
+  ],
+  "critical_code_review_comments": [
+    "fiezel-teacher-shell.js grew large; consider splitting views (briefing/classes/assignments/insights/comms/journal/settings) into separate modules for maintainability.",
+    "Preview flag (`fz-teacher-preview` in sessionStorage) is set by ?teacher=preview but did not appear in sessionStorage in fresh contexts — access still worked through previewAllowed(); verify the mechanism (URL param vs sessionStorage) so it can't be bypassed in production."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (skipped)", "frontend": "~92% of listed scenarios verified"},
+  "test_credentials": "No credentials required. Access via <PREVIEW_URL>/?teacher=preview then window.go('tutor'). Demo class via [data-testid=tg-welcome-demo].",
+  "seed_data_creation": "Used built-in demo class (18 students, 2 assignments, 14 days data) via tg-welcome-demo button. All teacher data persisted in localStorage key fiezel-teacher-v1.",
+  "retest_needed": true,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Splash/onboarding overlay appears on first load — must click 'Bahasa Indonesia' before invoking window.go('tutor'). CORS errors to api.fiezel.my.id are expected in preview and NOT bugs. Class codes and student ids differ per fresh context (localStorage). Skill-chip testids target <input type=checkbox>; use element.checked=true + dispatch('change') to programmatically select. Invalid import code shows <p class='tg-error'> not [data-testid=tg-error]. Parent report modal opens via [data-testid=tg-parent-<sid>] (student-specific), not the prefix (which also matches tg-parent-section)."
+}

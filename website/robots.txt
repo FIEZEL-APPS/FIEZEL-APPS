@@ -1,0 +1,13 @@
+# robots.txt untuk root fiezel.my.id (AI-15-F02, W3-WEB).
+# MENGIZINKAN crawl seluruh situs marketing (id + th) dan menunjuk sitemap.
+# PENTING: file ini BUKAN robots.txt di root repo (yang full-block "Disallow: /");
+# file repo-root itu inert (tak pernah terlayani di root domain) dan SENGAJA tidak
+# disentuh/dipindah — memindahkannya ke root domain akan men-deindeks seluruh situs.
+# Deploy: upload manual file ini ke ~/public_html/robots.txt di ArenHost cPanel.
+# Keputusan crawl /app/ (index vs noindex) adalah keputusan produk terbuka (AI-15-F05);
+# di sini /app/ dibiarkan boleh di-crawl (tidak ada Disallow).
+
+User-agent: *
+Allow: /
+
+Sitemap: https://fiezel.my.id/sitemap.xml

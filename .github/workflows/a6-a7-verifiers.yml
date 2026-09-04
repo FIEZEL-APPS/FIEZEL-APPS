@@ -1,0 +1,151 @@
+name: FIEZEL A6 A7 Automated Verifiers
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: a6-a7-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  a6-automated-verification:
+    name: A6 Automated Verification
+    runs-on: ubuntu-latest
+    # Batas keras: tanpa ini GitHub memakai 360 menit, dan satu langkah
+    # yang menggantung membakar enam jam dalam diam (lihat
+    # workflow-timeout-gate-test.js).
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install pinned push dependency
+        run: npm install --ignore-scripts
+
+      - name: Verify A3 scope and invariants
+        shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          set -euo pipefail
+          git diff --name-only "$BASE_SHA...HEAD" | sort > /tmp/changed.txt
+          cat /tmp/changed.txt
+
+          if [[ "$HEAD_REF" == agent/a3-* ]]; then
+            cat > /tmp/expected.txt <<'EOF'
+          features/neural-voice/fiezel-kokoro-adapter.js
+          features/neural-voice/fiezel-neural-voice-bootstrap.js
+          neural-voice-device-hotfix-test.js
+          EOF
+            sort -o /tmp/expected.txt /tmp/expected.txt
+            diff -u /tmp/expected.txt /tmp/changed.txt
+
+            if git diff -U0 "$BASE_SHA...HEAD" -- features/neural-voice/fiezel-neural-voice-bootstrap.js \
+              | grep -E '^[+-].*(NEURAL_GENERATION_TIMEOUT_MS|FIEZEL_GENERATION_TIMEOUT_MS|FIEZEL_TTS_TIMEOUT_MS)'; then
+              echo "A6 FAIL: neural timeout contract changed"
+              exit 1
+            fi
+
+            grep -F "wasmEnv.numThreads=1" features/neural-voice/fiezel-neural-voice-bootstrap.js
+            grep -F "wasmEnv.proxy=false" features/neural-voice/fiezel-neural-voice-bootstrap.js
+            grep -F "apple-standalone-single-thread-direct" features/neural-voice/fiezel-neural-voice-bootstrap.js
+            grep -F "onStage:entry=>diag(entry)" features/neural-voice/fiezel-neural-voice-bootstrap.js
+
+            grep -F "adapter_generate_dispatched" features/neural-voice/fiezel-kokoro-adapter.js
+            grep -F "adapter_generate_resolved" features/neural-voice/fiezel-kokoro-adapter.js
+            grep -F "adapter_generate_error" features/neural-voice/fiezel-kokoro-adapter.js
+
+            if grep -F ".message" features/neural-voice/fiezel-kokoro-adapter.js; then
+              echo "A6 FAIL: external error.message may enter adapter diagnostics"
+              exit 1
+            fi
+          fi
+
+      - name: Focused neural runtime verification
+        run: |
+          node diag-search-test.js
+          node puter-auth-coop-test.js
+          node sw-corp-test.js
+
+  a7-automated-release-safety:
+    name: A7 Automated Release Safety
+    needs: a6-automated-verification
+    runs-on: ubuntu-latest
+    # Batas keras: tanpa ini GitHub memakai 360 menit, dan satu langkah
+    # yang menggantung membakar enam jam dalam diam (lihat
+    # workflow-timeout-gate-test.js).
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify branch freshness and release boundary
+        shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          set -euo pipefail
+          git diff --name-only "$BASE_SHA...HEAD" | sort > /tmp/changed.txt
+          cat /tmp/changed.txt
+
+          git fetch origin main --no-tags
+          if ! git merge-base --is-ancestor origin/main HEAD; then
+            echo "A7 FAIL: candidate head does not contain current main"
+            exit 1
+          fi
+
+          if [[ "$HEAD_REF" == agent/a3-* ]]; then
+            if grep -E '^(sw\.js|vendor/|\.github/workflows/|features/puter/|.*puter.*)' /tmp/changed.txt; then
+              echo "A7 FAIL: A3 candidate crossed SW/Puter/vendor/workflow release boundary"
+              exit 1
+            fi
+          fi
+
+          # Every product deploy must advance Diagnostics exactly one build and
+          # carry the same build in SW_REV so cache-first PWA clients refresh shell.
+          if grep -Eq '^(index\.html|style\.css|app\.js|sw\.js|version\.js|manifest\.json|core-config\.js|report-config\.js|content-.*\.js|features/)' /tmp/changed.txt; then
+            base_diag=$(git show "$BASE_SHA:features/neural-voice/fiezel-diag-panel.js" | sed -nE "s/.*var DIAG_BUILD = 'm025-([0-9]+)'.*/\1/p" | head -n1)
+            head_diag=$(sed -nE "s/.*var DIAG_BUILD = 'm025-([0-9]+)'.*/\1/p" features/neural-voice/fiezel-diag-panel.js | head -n1)
+            if [[ -z "$base_diag" || -z "$head_diag" ]]; then
+              echo "A7 FAIL: unable to parse m025-N Diagnostics build"
+              exit 1
+            fi
+            expected_diag=$((base_diag + 1))
+            if [[ "$head_diag" -ne "$expected_diag" ]]; then
+              echo "A7 FAIL: product deploy must increment Diagnostics m025-N exactly +1 (base=$base_diag head=$head_diag expected=$expected_diag)"
+              exit 1
+            fi
+            if ! grep -F "const SW_REV='m025-${head_diag}-" sw.js >/dev/null; then
+              echo "A7 FAIL: SW_REV must carry m025-${head_diag}- prefix so installed PWA refreshes the deployed shell"
+              exit 1
+            fi
+          fi
+
+          git merge-tree --write-tree origin/main HEAD >/tmp/merge-tree.txt
+          test -s /tmp/merge-tree.txt
+
+      - name: Release-safety regressions
+        run: |
+          node pwa-cache-test.js
+          node pwa-release-coherence-test.js
+          node sw-corp-test.js
+          node puter-auth-coop-test.js
+          node diag-search-test.js

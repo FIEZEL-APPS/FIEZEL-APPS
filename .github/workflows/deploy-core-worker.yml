@@ -1,0 +1,57 @@
+name: Deploy FIEZEL Core Worker
+
+# MASTER-ONLY: deployment is manual-only and owner-actor gated.
+on:
+  workflow_dispatch:
+    inputs:
+      worker_name:
+        description: Puter Worker name
+        required: true
+        default: fiezel-core
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    if: github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'
+    runs-on: ubuntu-latest
+    # Batas keras: tanpa ini GitHub memakai 360 menit, dan satu langkah
+    # yang menggantung membakar enam jam dalam diam (lihat
+    # workflow-timeout-gate-test.js).
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install -g @heyputer/cli@0.1.2
+      - name: Prepare guarded deploy source
+        shell: bash
+        run: |
+          cp fiezel-core-worker.js fiezel-core-worker-deploy.js
+          mkdir -p .deploy-core
+          cp fiezel-core-worker-deploy.js .deploy-core/fiezel-core-worker.js
+          node --check .deploy-core/fiezel-core-worker.js
+      - name: Core deployment preflight
+        env:
+          PUTER_AUTH_TOKEN: ${{ secrets.PUTER_AUTH_TOKEN }}
+        run: node core-deploy-preflight.mjs
+      - name: Resolve Worker name
+        id: worker
+        shell: bash
+        run: echo "name=${{ inputs.worker_name }}" >> "$GITHUB_OUTPUT"
+      - name: Deploy Core Worker with official Puter action
+        id: puter_worker
+        uses: HeyPuter/puter-worker-deploy-action@3ea96548afcf0815fd2338f58ebc2032050bfd9d # v1.0.1
+        with:
+          worker_name: ${{ steps.worker.outputs.name }}
+          # Existing fiezel-core is permanently bound to ~/Workers/fiezel-core/fiezel-core-worker.js.
+          # Keep this basename stable so the official action overwrites the bound source file in-place.
+          source_path: .deploy-core/fiezel-core-worker.js
+          puter_path: ~/Workers/${{ steps.worker.outputs.name }}
+          puter_token: ${{ secrets.PUTER_AUTH_TOKEN }}
+      - name: Confirm deployed Worker URL
+        run: |
+          test -n "${{ steps.puter_worker.outputs.worker_url }}"
+          echo "Core Worker deployed successfully. URL: ${{ steps.puter_worker.outputs.worker_url }}"

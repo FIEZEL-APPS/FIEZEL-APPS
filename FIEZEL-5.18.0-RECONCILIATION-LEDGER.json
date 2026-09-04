@@ -1,0 +1,89 @@
+{
+  "schema": "fiezel-repository-reconciliation-ledger-v1",
+  "version": "5.18.0",
+  "generatedAt": "2026-08-14T00:00:00Z",
+  "baseline": {
+    "repo": "https://github.com/fitrajft-ux/FIEZEL-APPS",
+    "mainHead": "e0d8d83b056f3b0834ac01cad64ffa8f75a5a968",
+    "mainHeadMessage": "[closed-app-proof] Send iPhone proof after live route verification",
+    "mainVersion": "5.17.0",
+    "branches": ["main"],
+    "cloneDepth": "full history fetched"
+  },
+  "candidate": {
+    "source": "FIEZEL-5.18.0-FULL-MASTER-PROMPT-v2.zip",
+    "tree": "FIEZEL-5.18.0-FULL",
+    "version": "5.18.0",
+    "files": 145,
+    "totalBytes": 123050589,
+    "checksumManifest": "FIEZEL-5.18.0-BASELINE-CHECKSUM.json"
+  },
+  "comparison": {
+    "sharedFilesBetweenRepoMainAndLocalFULL": 87,
+    "identical": 5,
+    "different": 82,
+    "repoMainOnlyFiles": 0,
+    "localFULLOnlyStructuredFiles": 32,
+    "workspaceFlattenMissingStructuredPaths": 32,
+    "identicalCanonicalContent": [
+      "vocabulary-master.json",
+      "reading-bank.json",
+      "apple-touch-icon.png",
+      "favicon-64.png",
+      "instagram.svg"
+    ]
+  },
+  "lineageVerdict": {
+    "status": "PASS",
+    "conclusion": "FIEZEL 5.18.0 FULL is a direct descendant of GitHub main 5.17.0: canonical learner content (vocabulary-master.json sha256 2482dab7..., reading-bank.json sha256 f399c98a...) is byte-identical to the 5.17.0 baseline. grammar-templates.json differs only by version bump to 5.18.0 with schema 2.0.0 and blueprint focused-25-v1 unchanged.",
+    "grammarTemplatesRepoSha256": "CF94002371A0DA5A43225B66213C55FFF39971C7B462698BE8D15563D8C193B5",
+    "grammarTemplatesLocalSha256": "AC17FF65254765EC1A3FC955E470891F0F3E12F646B470E7A526EAEBEDDA3B0C"
+  },
+  "versionSurfaceMatrix": {
+    "repoMain": {
+      "VERSION.json": "5.17.0",
+      "version.js": "5.17.0",
+      "package.json": "5.17.0"
+    },
+    "localFULL": {
+      "VERSION.json": "5.18.0",
+      "version.js": "5.18.0",
+      "package.json": "5.18.0",
+      "grammarSchema": "2.0.0",
+      "practiceBlueprint": "focused-25-v1",
+      "coreProtocol": "1.7"
+    }
+  },
+  "featureDelta": {
+    "addedIn518": [
+      "36 Listening + 36 Speaking items (A1-C2)",
+      "isolated Skills Lab runtime (features/speaking-listening)",
+      "local Kokoro neural voice (features/neural-voice, vendor/kokoro-js, vendor/kokoro-model)",
+      "NEURAL-VOICE-SOURCE-LOCK.json",
+      "speaking-listening-test.js, neural-voice-test.js, neural-voice-http-test.js",
+      "rebuild-speaking-listening-data.js, rebuild-grammar-data.js",
+      "release-audit.py, quality.yml, configure-core.yml, deploy-core-worker.yml",
+      "third-party license closure (Apache-2.0/MIT)"
+    ]
+  },
+  "gateEvidence": {
+    "suite": "FIEZEL-5.18.0-SUITE-RERUN-EVIDENCE.json",
+    "commands": 32,
+    "passed": 32,
+    "failed": 0,
+    "sourceRootUsed": "extracted FULL ZIP tree (not flattened workspace)"
+  },
+  "decision": {
+    "sourceOfTruth": "FIEZEL-5.18.0 FULL ZIP tree",
+    "repoMainRemains": "5.17.0 at e0d8d83b056f3b0834ac01cad64ffa8f75a5a968 (unchanged, no push performed)",
+    "rollbackSource": "e0d8d83b056f3b0834ac01cad64ffa8f75a5a968",
+    "rollbackCanonicalSha256": {
+      "grammar": "e6af40a2ed9beea4bfeedd1b18c8460b9ea4429120e50861b9f49c11823580bc",
+      "vocabulary": "2482dab7460c8092bb31d52bdfaee05b6cba0d8a46c294bbb9d25245a8798ef0",
+      "reading": "f399c98a975807f1e4509af976409f0dc502256f36b47cd9fceb871dee0de25b"
+    },
+    "releaseDecision": "NOT_READY_REAL_DEVICE_GATE_PENDING",
+    "externalAction": "NONE",
+    "claim": "No push, deploy, scheduler activation, or live claim for 5.18.0 was made."
+  }
+}

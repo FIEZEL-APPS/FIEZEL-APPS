@@ -1,0 +1,42 @@
+=== jatah suara habis · benar-benar tanpa suara
+kunci        : quota.tts.exhausted
+role/aria    : role="status" aria-live="polite" announce=true tunda=false
+fokus/umur   : stealsFocus=false autoHideMs=0 persist=true
+markup       : <section class="fz-notice fz-notice-advisory" data-fz-notice="quota.tts.exhausted" role="status" aria-live="polite" aria-atomic="true"><h2 class="fz-notice-title">Jatah suara hari ini sudah habis</h2><p class="fz-notice-body">Perangkat ini belum punya suara cadangan, jadi kalimat ini nggak bisa dibunyikan. Teksnya tetap bisa kamu baca, dan jatahnya kembali jam 00.00 WIB.</p><p class="fz-notice-note">Item ini nggak dinilai dan nggak dikunci.</p><div class="fz-notice-actions"><button type="button" class="fz-notice-btn" data-fz-notice-dismiss>Oke, lanjut belajar</button></div></section>
+
+=== jatah suara habis · masih ada suara perangkat
+kunci        : quota.tts.exhausted
+role/aria    : role="status" aria-live="polite" announce=true tunda=false
+fokus/umur   : stealsFocus=false autoHideMs=0 persist=true
+markup       : <section class="fz-notice fz-notice-advisory" data-fz-notice="quota.tts.exhausted" role="status" aria-live="polite" aria-atomic="true"><h2 class="fz-notice-title">Jatah suara hari ini sudah habis</h2><p class="fz-notice-body">Aku pakai suara perangkatmu dulu untuk sisa sesi ini. Bunyinya beda, pelajarannya tetap jalan.</p><p class="fz-notice-note">Item ini nggak dinilai dan nggak dikunci.</p><div class="fz-notice-actions"><button type="button" class="fz-notice-btn" data-fz-notice-dismiss>Oke, lanjut belajar</button></div></section>
+
+=== perangkat lepas dari internet
+kunci        : network.offline  (diminta: quota.ai.exhausted)
+role/aria    : role="status" aria-live="polite" announce=true tunda=false
+fokus/umur   : stealsFocus=false autoHideMs=0 persist=true
+markup       : <section class="fz-notice fz-notice-advisory" data-fz-notice="network.offline" role="status" aria-live="polite" aria-atomic="true"><h2 class="fz-notice-title">Perangkatmu sedang lepas dari internet</h2><p class="fz-notice-body">Kalimat ini butuh internet supaya bisa dibunyikan, jadi sekarang belum ada suaranya. Teksnya tetap bisa kamu baca, dan jatahmu nggak terpakai sama sekali.</p><p class="fz-notice-note">Item ini nggak dinilai dan nggak dikunci.</p><div class="fz-notice-actions"><button type="button" class="fz-notice-btn" data-fz-notice-dismiss>Oke, lanjut belajar</button></div></section>
+
+=== penghitung jatah rusak (temuan bohong)
+kunci        : quota.unavailable
+role/aria    : role="status" aria-live="polite" announce=true tunda=false
+fokus/umur   : stealsFocus=false autoHideMs=0 persist=true
+markup       : <section class="fz-notice fz-notice-advisory" data-fz-notice="quota.unavailable" role="status" aria-live="polite" aria-atomic="true"><h2 class="fz-notice-title">Aku belum bisa membaca sisa jatahmu</h2><p class="fz-notice-body">Jatahmu kemungkinan besar masih utuh — yang bermasalah catatannya, bukan kamu. Kalimat ini belum bisa dibunyikan; teksnya tetap ada, dan coba lagi sebentar lagi.</p><p class="fz-notice-note">Item ini nggak dinilai dan nggak dikunci.</p><div class="fz-notice-actions"><button type="button" class="fz-notice-btn" data-fz-notice-dismiss>Oke, lanjut belajar</button></div></section>
+
+=== sesi kedaluwarsa (satu-satunya role=alert)
+kunci        : session.expired
+role/aria    : role="alert" aria-live="assertive" announce=true tunda=false
+fokus/umur   : stealsFocus=false autoHideMs=0 persist=true
+markup       : <section class="fz-notice fz-notice-urgent" data-fz-notice="session.expired" role="alert" aria-live="assertive" aria-atomic="true"><h2 class="fz-notice-title">Kamu perlu masuk lagi supaya hasilmu tercatat</h2><p class="fz-notice-body">Masuk lagi sebentar, ya. Yang sudah selesai tetap aman, dan latihan berikutnya baru tercatat sesudah kamu masuk.</p><p class="fz-notice-note">Item ini nggak dinilai dan nggak dikunci.</p><div class="fz-notice-actions"><button type="button" class="fz-notice-btn" data-fz-notice-dismiss>Oke, lanjut belajar</button></div></section>
+
+=== jatah suara habis SAAT sesi listening jalan
+kunci        : quota.tts.exhausted
+role/aria    : role="" aria-live="off" announce=false tunda=true
+fokus/umur   : stealsFocus=false autoHideMs=0 persist=true
+markup       : <section class="fz-notice fz-notice-advisory" data-fz-notice="quota.tts.exhausted" aria-live="off" aria-atomic="true"><h2 class="fz-notice-title">Jatah suara hari ini sudah habis</h2><p class="fz-notice-body">Perangkat ini belum punya suara cadangan, jadi kalimat ini nggak bisa dibunyikan. Teksnya tetap bisa kamu baca, dan jatahnya kembali sesudah tengah malam.</p><p class="fz-notice-note">Item ini nggak dinilai dan nggak dikunci.</p><div class="fz-notice-actions"><button type="button" class="fz-notice-btn" data-fz-notice-dismiss>Oke, lanjut belajar</button></div></section>
+
+=== panel jatah (paymentEnabled=false)
+elemen <a>   : 0
+elemen <btn> : 0
+markup       : <section class="fz-plan" data-fz-plan aria-labelledby="fzPlanTitle"><h2 class="fz-plan-title" id="fzPlanTitle">Jatah belajarmu hari ini</h2><p class="fz-plan-line">Terpakai 12 dari 30.</p><p class="fz-plan-line">FIEZEL gratis dan nggak dijual. Jatah ini cuma penjaga supaya semua murid kebagian, dan ia mulai lagi sendiri jam 00.00 WIB.</p><p class="fz-plan-line">Kalau jatahnya habis, latihan, materi, dan progresmu tetap jalan seperti biasa.</p></section>
+
+paymentEnabled=true → melempar: quota-copy: paymentEnabled=true belum punya naskah yang disetujui

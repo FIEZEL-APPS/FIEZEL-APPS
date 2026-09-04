@@ -1,0 +1,23 @@
+{
+  "schema": "fiezel-security-scan-v1",
+  "version": "5.18.0",
+  "status": "PASS",
+  "findings": {
+    "hardCodedVendorApiKeys": 0,
+    "hardCodedBearerTokens": 0,
+    "bundledPrivateKeys": 0,
+    "directVendorAiRuntimeCalls": 0,
+    "remoteNeuralInferenceAllowed": false,
+    "rawAudioPersistenceAllowed": false,
+    "rawTranscriptPersistenceAllowed": false
+  },
+  "controls": {
+    "coreOnlyAiGateway": true,
+    "localNeuralModelRouting": true,
+    "explicitLargeAssetWarmup": true,
+    "stalePreparedStateFailsClosed": true,
+    "binaryFailureNeverFallsBackToHtml": true,
+    "thirdPartyLicenseClosure": true
+  },
+  "source": "release-audit.py plus neural-voice-test.js and speaking-listening-test.js"
+}

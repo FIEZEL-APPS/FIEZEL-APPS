@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<!--
+  A8 · Harness bukti 390px. TIDAK dipakai runtime, TIDAK di-precache, TIDAK ditautkan dari
+  index.html. Ia memuat berkas asli style.css dan features/quota/quota-copy.js dari repo
+  (bukan salinan), lalu mencetak markup yang persis dipakai app.js lewat panelMarkup() dan
+  planPanelMarkup(). Presedennya audit-harness.html.
+-->
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FIEZEL A8 · bukti pemberitahuan 390px</title>
+<link rel="stylesheet" href="../../style.css">
+<style>
+  body{margin:0;padding:16px;background:#FFFDF7;font-family:system-ui,-apple-system,sans-serif}
+  .shot-label{font:600 12px/1.4 system-ui;color:#6E5E47;margin:18px 0 6px;text-transform:uppercase;letter-spacing:.06em}
+  .shot-label:first-child{margin-top:0}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="../../features/quota/quota-copy.js"></script>
+<script>
+(function(){
+  var copy = window.FiezelQuotaCopy;
+  var root = document.getElementById('root');
+  var shots = [
+    ['1 · jatah suara habis, benar-benar tanpa suara', copy.panelMarkup(copy.build({
+      copyKey:'quota.tts.exhausted', spoken:false, online:true,
+      resetAt: Date.UTC(2026,7,28,17,0,0)
+    }))],
+    ['2 · perangkat lepas dari internet', copy.panelMarkup(copy.build({
+      copyKey:'quota.ai.exhausted', online:false, spoken:false
+    }))],
+    ['3 · penghitung jatah rusak (temuan bohong yang diperbaiki)', copy.panelMarkup(copy.build({
+      reason:'quota_unavailable', online:true, spoken:false
+    }))],
+    ['4 · panel jatah tanpa satu pun elemen bayar', copy.planPanelMarkup({
+      used:12, limit:30, paymentEnabled:false, resetAt: Date.UTC(2026,7,28,17,0,0)
+    })]
+  ];
+  root.innerHTML = shots.map(function(s){
+    return '<p class="shot-label">'+s[0]+'</p>'+s[1];
+  }).join('');
+  document.body.setAttribute('data-ready','1');
+})();
+</script>
+</body>
+</html>

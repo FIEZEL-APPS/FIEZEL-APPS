@@ -1,0 +1,980 @@
+name: FIEZEL Quality Gate
+
+# ==========================================================================
+# KENAPA `push` DIBATASI KE `main`, DAN KENAPA ADA `concurrency`
+# ==========================================================================
+# Sebelum ini triggernya `push:` (semua branch) + `pull_request:` tanpa filter
+# dan tanpa concurrency group. Akibatnya SETIAP push ke branch ber-PR memicu
+# gerbang ~25 menit ini DUA KALI, paralel, atas commit yang sama persis — satu
+# dari `push`, satu dari `pull_request`. Itu bukan dugaan: pada PR #333 head
+# d15cb71e tercatat dua job `quality` hidup bersamaan (run 33771881451 dan
+# 33771878031).
+#
+# APA YANG DIPERBAIKI INI, DAN APA YANG TIDAK — dipisah tegas, karena versi
+# pertama komentar ini mengklaim sebab yang TIDAK lolos data. Klaim itu berbunyi
+# "dua salinan berebut runner membuat keduanya melambat". Diuji terhadap riwayat
+# run yang sesungguhnya, klaim itu GUGUR:
+#
+#   11 pasang run duplikat (5 branch berbeda) : 17,9 - 24,3 menit
+#   run tunggal di `main` (nol duplikasi)     : 23,8 - 24,2 menit
+#
+# Kedua rentang TUMPANG TINDIH PENUH. Runner hosted GitHub dialokasikan per-run
+# dari pool bersama, jadi dua run tidak saling memperlambat — dan macet 2 jam di
+# head sebelumnya terjadi pada 1 dari 11 pasang duplikat itu; sepuluh sisanya,
+# dengan kondisi duplikasi yang persis sama, selesai normal. Duplikasi karena itu
+# TIDAK BISA menjadi sebab macetnya, dan perubahan ini BUKAN perbaikan macet.
+# Akar macetnya masih belum diketahui; `timeout-minutes` (PR #336) yang membuatnya
+# berhenti diam-diam, bukan blok ini.
+#
+# Yang benar-benar dibeli perubahan ini, dan sudah cukup membenarkannya:
+#   - separuh konsumsi menit CI hilang (satu suite ~25 menit per commit, bukan dua);
+#   - check `cancelled` dari run yang kalah tidak lagi lahir — merah palsu yang
+#     menghabiskan waktu review untuk menelusuri kegagalan yang tidak pernah ada.
+#
+# Perbaikannya dua lapis, dan keduanya perlu:
+#
+#   1. `push: branches: [main]` — di branch fitur, `pull_request` sudah
+#      meliput setiap commit. Membiarkan `push` ikut jalan di sana tidak
+#      menambah satu pun pemeriksaan, hanya menggandakannya. Push ke `main`
+#      TETAP diperiksa: itu satu-satunya tempat commit bisa mendarat tanpa
+#      melewati PR (merge commit, dan perbaikan langsung kalau sampai terjadi).
+#
+#   2. `concurrency` per branch — push beruntun ke PR yang sama tidak lagi
+#      menumpuk. Run lama dibatalkan oleh yang lebih baru, karena hanya commit
+#      terakhir yang akan di-merge. `cancel-in-progress` sengaja MATI di `main`:
+#      di sana setiap commit adalah sejarah yang sudah mendarat, dan
+#      membatalkannya berarti ada commit di `main` yang tidak pernah diperiksa
+#      penuh — persis keadaan yang gerbang ini ada untuk mencegahnya.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  # F5: satu-satunya cara SENGAJA menjalankan gerbang live dari CI.
+  #
+  # Sebelum ini `quality.yml` memanggil `cf-live-contract-test.js` dan
+  # `staging-live-test.js` tanpa meneruskan env apa pun, jadi keduanya SELALU
+  # SKIP dan angka "semua gerbang hijau" mengandung dua langkah yang tidak
+  # menguji satu byte pun runtime Cloudflare (temuan reports/add-a10-kepatuhan.md
+  # §5.1). Jawabannya BUKAN menyalakannya pada setiap push: CI publik yang
+  # menembak produksi setiap kali seseorang commit adalah beban yang kita
+  # timpakan ke murid, bukan pengujian — dan `health-probe-test.js` memang
+  # meng-assert larangan itu.
+  #
+  # Karena itu jalurnya dibuat MANUAL dan ber-input: owner menekan "Run
+  # workflow", mengisi base URL, dan hanya pada jalan itu gerbang live berjalan
+  # sungguhan (dan MERAH kalau kontraknya patah). Dikosongkan = SKIP eksplisit,
+  # sama seperti push biasa.
+  workflow_dispatch:
+    inputs:
+      cf_live_base:
+        description: >-
+          Base URL Worker fiezel-api untuk cf-live-contract-test.js
+          (mis. https://api.fiezel.my.id). Kosongkan untuk tetap SKIP.
+          Gerbang ini hanya MEMBACA (GET/OPTIONS + sesi anon), tidak menulis
+          state murid.
+        required: false
+        default: ''
+      staging_base:
+        description: >-
+          Base URL lingkungan STAGING untuk staging-live-test.js. Gerbang ini
+          MENULIS state (kuota harian, objek audio, baris analytics) dan menolak
+          berjalan kalau /health tidak mengaku staging — JANGAN isi dengan
+          produksi. Butuh secret FIEZEL_STAGING_EDGE terpasang di repo.
+          Kosongkan untuk tetap SKIP.
+        required: false
+        default: ''
+      ai_live_base:
+        description: >-
+          Base URL Worker fiezel-api untuk tools/ai-live-verify.mjs (mis.
+          https://api.fiezel.my.id). BERBAYAR: satu panggilan model SUNGGUHAN per
+          tipe task (hari ini 5 = ±US$0.002, ±244 neuron dari 10.000/hari jatah
+          AKUN) dan MENGHABISKAN 1-5 kuota AI harian sebuah identitas anon.
+          Kosongkan untuk tetap SKIP.
+        required: false
+        default: ''
+concurrency:
+  # Dikunci ke NAMA BRANCH, bukan ke nomor PR atau `github.ref`: pada peristiwa
+  # `pull_request` nilai `github.ref_name` berbentuk `333/merge`, sedangkan pada
+  # `push` ia berbentuk `main`. Memakai nama branch kepala membuat kedua jalur
+  # jatuh ke group yang sama, sehingga dedupe-nya benar-benar terjadi.
+  group: ${{ github.workflow }}-${{ github.event.pull_request.head.ref || github.ref_name }}
+  cancel-in-progress: ${{ github.ref_name != 'main' }}
+
+permissions:
+  contents: read
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+
+    # ======================================================================
+    # KENAPA ADA BATAS WAKTU — DAN KENAPA ANGKANYA 45
+    # ======================================================================
+    # Tanpa `timeout-minutes`, GitHub memakai batas bawaan 6 JAM. Itu bukan
+    # angka teoretis: pada 3 Sep 2026 satu gerbang di `Core validation`
+    # menggantung TIGA KALI berturut-turut di PR #333 (job 100652521266,
+    # 100703901200, 100721759384). Setiap kali step-nya tidak pernah selesai,
+    # run harus dibatalkan manual, dan — ini bagian yang mahal — GitHub TIDAK
+    # PERNAH MENGUNGGAH LOG job yang dibatalkan di tengah step. Ketiga job itu
+    # menjawab HTTP 404 saat lognya diminta.
+    #
+    # Akibatnya nama gerbang yang menggantung TIDAK DAPAT DIKETAHUI sama
+    # sekali. Gerbang mutu yang tidak bisa melaporkan di mana ia berhenti
+    # adalah gerbang yang buta persis pada saat ia paling dibutuhkan.
+    #
+    # BATAS YANG DIAKUI JUJUR, karena versi pertama komentar ini menjanjikan
+    # lebih dari yang bisa ditepati: dikatakan bahwa job yang MELEWATI BATAS
+    # menjadi "kegagalan bernama" yang lognya diunggah, sehingga wedge selalu
+    # bisa didiagnosis. Itu TIDAK terjadi pada wedge yang sesungguhnya. Job
+    # 100741519242 berjalan 51m44s — enam menit LEWAT dari batas 45 menit —
+    # tanpa pernah dipotong, dan berhenti hanya karena dibatalkan manual.
+    # Sebabnya masuk akal sesudah akar masalahnya ketahuan: wedge-nya adalah
+    # BANJIR LOG (satu gerbang memuntahkan 22 MB; lihat `compactStack` di
+    # workers/api/index.js), dan runner yang tenggelam oleh backpressure
+    # unggahan log ikut melumpuhkan penegak timeout-nya sendiri.
+    #
+    # Jadi batas ini adalah higiene yang benar — ia memotong wedge yang runner-
+    # nya masih hidup, dan menghapus bawaan 6 jam yang tak seorang pun pilih —
+    # tetapi ia BUKAN jaring pengaman untuk kelas macet yang melumpuhkan
+    # runner. Jangan mengandalkannya untuk mendapatkan log; untuk kelas itu,
+    # obatnya menghentikan banjirnya di sumber.
+    #
+    # Angka 45 diambil dari ukuran, bukan selera: enam merge berurutan di
+    # `main` (#329, #330, #332, #334, #335, dan 809d8156) semuanya selesai
+    # 23m49s-24m11s. 45 menit memberi hampir 2x kelonggaran terhadap run
+    # tersehat, jadi ia tidak akan menyentuh run yang wajar sekalipun runner
+    # sedang lambat. Kalau suatu hari daftar gerbang tumbuh sampai run sehat
+    # melewati ~35 menit, naikkan angka ini SESUDAH mengukur ulang, jangan
+    # sesudah satu run merah.
+    #
+    # Yang MENEGAKKAN keberadaan batas ini di seluruh workflow:
+    # `workflow-timeout-gate-test.js`.
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned push dependency
+        run: npm install --ignore-scripts
+      - name: Syntax
+        shell: bash
+        run: |
+          while IFS= read -r -d '' file; do
+            node --check "$file"
+          done < <(find . -type f \( -name '*.js' -o -name '*.mjs' \) \
+            -not -path './node_modules/*' \
+            -not -path './vendor/*' \
+            -print0)
+      # Bab 32 mewajibkan audit rilis lulus sebelum rilis, tetapi sampai commit ini tidak ada
+      # satu pun workflow yang menjalankannya (temuan K13, reports/cf-c1-konsistensi.md) — satu
+      # setup-python terpasang di atas tanpa ada yang memakai Python. Step ini dibuat berdiri
+      # sendiri, bukan disisipkan ke blok `Core validation`, karena tiga alasan: ia bukan node
+      # dan butuh toolchain berbeda, ia berjalan menit (bukan detik) sehingga durasinya perlu
+      # terlihat sendiri di UI Actions, dan kegagalannya harus punya lampu merah sendiri alih-alih
+      # tenggelam di antara ~100 baris `node ...`. Ia sengaja diletakkan SEBELUM Core validation
+      # agar gagal cepat, dan agar `release-audit-gate-test.js` di bawah bisa memakai ulang
+      # FINAL-AUDIT-REPORT.json yang baru saja ditulisnya.
+      - name: Release audit (Python)
+        run: python3 release-audit.py
+      - name: Core validation
+        env:
+          # Memberi izin kepada release-audit-gate-test.js untuk memakai ulang laporan dari step
+          # di atas alih-alih menjalankan audit menit-menitan dua kali. Gerbang itu TIDAK percaya
+          # pada flag ini sendirian: ia memverifikasi sha256 app.js + version di dalam laporan
+          # cocok dengan berkas kerja saat ini, dan menjalankan auditnya sendiri kalau tidak.
+          FIEZEL_RELEASE_AUDIT_REPORT_FRESH: '1'
+        run: |
+          node validator.js
+          node regression-test.js
+          node content-audit.js
+          node content-qa-agent.js
+          node content-qa-agent-test.js
+          node content-patch-gate-test.js
+          node content-canary-test.js
+          node content-promotion-test.js
+          node content-adoption-evidence-test.js
+          node content-evidence-origin-test.js
+          node content-adoption-rehearsal-test.js
+          node content-adoption-test.js
+          node content-adoption-receipt-test.js
+          node continuity-test.js
+          node backup-ui-test.js
+          node install-health-test.js
+          node onboarding-test.js
+          node tour-test.js
+          node tours-test.js
+          node adaptivity-simulation-v3-hardened-test.js
+          node analytics-dedup-test.js
+          node analytics-stable-id-guard-test.js
+          node app-telemetry-wiring-test.js
+          node brain-config-test.js
+          node brain-manifest-test.js
+          node fiezel-stat-gate-test.js
+          node learning-lane-test.js
+          node braincore-evidence-test.js
+          # --- SLOT 10: akun, peran, konten guru, CSV, Braincore, sosial -------
+          node auth-schema-contract-test.js
+          node auth-role-test.js
+          node role-security-test.js
+          node teacher-content-test.js
+          node teacher-csv-test.js
+          node teacher-braincore-test.js
+          node social-notify-test.js
+          node braincore-learner-identity-test.js
+          node learning-metrics-test.js
+          node learning-telemetry-test.js
+          node metrics-digest-test.js
+          node social-api-contract-test.js
+          node social-frontend-test.js
+          node social-schema-contract-test.js
+          node social-invite-link-test.js
+          # Lapis AKUN sisi murid (masuk/daftar/aktivasi guru). Ditempatkan tepat sesudah
+          # gerbang sosial karena keduanya memakai lane transport yang sama (panggilan
+          # langsung ke Worker dengan cookie fz_id), dan cacat di lane itu akan memerahkan
+          # keduanya berdampingan alih-alih terpisah 100 baris. Ia MENJALANKAN modulnya di
+          # vm dengan fetch tiruan: yang dijaga adalah apa yang benar-benar berangkat ke
+          # server (nol field identitas, credentials:include, peran hanya dari server,
+          # sandi tidak pernah tersimpan), bukan ejaan kodenya.
+          node account-auth-client-test.js
+          node audio-locale-guard-test.js
+          node id-golden-snapshot-test.js
+          node locale-enum-test.js
+          node th-coverage-test.js
+          # th-coverage-test.js menghitung copy-map/naskah/grammar/vocabulary; ia hijau
+          # 143/143 sementara murid Thai membaca bahasa Indonesia sepanjang sesi, karena
+          # BANK SOAL punya jalur hidrasi sendiri yang tidak pernah lewat copy-map.
+          # th-bank-purity-test.js menutup celah itu (lihat THAI-BANK-PURITY-HANDOFF.md).
+          node th-bank-purity-test.js
+          # Pemindai KEDUA, sengaja memakai metode lain: th-bank-purity-test.js memakai
+          # leksikon selisih korpus, scan-th-bank-leak.js memakai daftar kata. Titik
+          # butanya BERBEDA — pemindai daftar kata inilah yang menemukan delapan
+          # kebocoran yang gerbang korpus lewatkan ketika korpus Inggrisnya tercemar.
+          # Keduanya wajib bersih; jangan menghapus salah satunya.
+          node tools/scan-th-bank-leak.js
+          # Kedua pemindai di atas memeriksa ISI sidecar, dan tidak satu pun memeriksa
+          # bahwa sidecar itu SAMPAI ke murid. Bank ujian Listening lolos keduanya selama
+          # berbulan-bulan justru karena itu: overlay-nya mencocokkan id lx-* ke peta yang
+          # hanya berisi kunci listen_sc_*, jadi tidak pernah kena sasaran sekali pun.
+          # th-exam-overlay-test.js memeriksa jalur bacanya, bukan datanya.
+          node th-exam-overlay-test.js
+          node boot-order-test.js
+          node splash-first-paint-test.js
+          # m025-199: m025-84 memindahkan markup splash ke frame pertama, tetapi peramban
+          # tetap menahan cat sampai style.css (286 KB) berlaku - separuh cacat yang sama
+          # bertahan sampai pemilik melaporkannya lagi. Gerbang ini menjaga separuh kedua,
+          # berikut jaminan tirai tidak terangkat sebelum lembarnya berlaku.
+          node boot-first-paint-nonblocking-test.js
+          node splash-choreography-test.js
+          node observability-privacy-test.js
+          node analytics-privacy-test.js
+          node analytics-aggregate-test.js
+          node analytics-server-only-test.js
+          # A2: sisi KLIEN dari kontrak analytics. Tiga gerbang di atas menjaga Worker; yang ini
+          # menjaga tempat jaminannya sebenarnya dieksekusi — perangkat murid. Ia menjalankan
+          # `features/analytics/fiezel-analytics-client.js` di dalam `vm` (tanpa jaringan, tanpa
+          # localStorage/navigator nyata) lalu menuntut: installId tidak pernah masuk payload,
+          # sepuluh event server-only ditolak klien, field asing dibuang, flag `usage` bukan 'on'
+          # = nol permintaan DAN nol akses penyimpanan, antrean offline punya cap yang membuang
+          # yang tertua, token berubah saat pepper berubah, dan nol pola PII di seluruh payload.
+          # Diletakkan tepat sesudah gerbang server-only supaya kedua sisi kontrak yang sama
+          # gagal bersebelahan di UI Actions, bukan terpisah 60 baris.
+          node analytics-client-test.js
+          # T-031: gerbang NAMA GLOBAL. Ia memindai SUMBER seluruh repo (bukan daftar tangan)
+          # dan menuntut satu pemilik per nama global: `FiezelAnalytics` hanya boleh ditugaskan
+          # modul analytics, `FiezelABAnalytics` hanya oleh modul A/B. Cacat yang melahirkannya:
+          # modul A/B merebut `window.FiezelAnalytics` lewat <script defer>, jadi pemuat analytics
+          # di idle menerima objek asing dan modul asli tidak pernah diunduh — analytics murid
+          # mati total tanpa satu pun galat konsol. Diletakkan bersebelahan dengan gerbang klien
+          # analytics supaya kedua sisi cacat yang sama gagal berdampingan.
+          node global-name-collision-test.js
+          node a11y-test.js
+          node contrast-test.js
+          # Gerbang di atas dan di bawah baris ini semuanya membaca TEKS SUMBER dengan regex.
+          # Itu sengaja - mereka murah dan berjalan di mana saja - tetapi ada satu kelas cacat
+          # yang secara struktural TIDAK BISA mereka lihat, karena cacatnya baru lahir setelah
+          # kaskade CSS dihitung dan DOM disusun. Contoh yang benar-benar lolos ke murid:
+          # contrast-test.js SUDAH menguji `.section-head h1`, tetapi memodelkan warnanya sebagai
+          # var(--ambient-text); warna sungguhannya ditimpa #f8faff dari tutor-v3.css, dan judul
+          # tiap layar hilang setiap senja pada 1,18:1 dengan gerbang tetap hijau.
+          # ui-render-audit-test.js menutup celah itu dengan MENJALANKAN aplikasinya di Chromium.
+          # Ia SKIP (keluar 0) kalau Playwright/Chromium tidak ada, jadi CI publik tidak berubah;
+          # ia merah hanya kalau browsernya ada DAN invariannya benar-benar patah.
+          node ui-render-audit-test.js
+          node pastel-field-contrast-test.js
+          node topbar-logo-contrast-test.js
+          node paw-mascot-test.js
+          # Lima gerbang redesign maskot PAW (spec §35 "New regression nets" + A-10).
+          # Ditaruh tepat sesudah paw-mascot-test.js karena kelimanya memperluas kontrak
+          # yang gerbang itu mulai jaga: satu sumber bentuk (geometri + checksum ekspor),
+          # palet karakter tertutup G1, tubuh bebas rotasi, dan kosakata event react().
+          node e5-checksum-gate-test.js
+          node pawprint-geometry-gate-test.js
+          node palette-gate-test.js
+          node keyframe-rotation-gate-test.js
+          node event-vocabulary-gate-test.js
+          node voice-offline-fallback-test.js
+          node voice-fallback-chain-test.js
+          node voice-pipeline-gap-test.js
+          node voice-prefetch-neural-test.js
+          node voice-callsite-prefetch-test.js
+          node tts-transport-switch-test.js
+          node audio-asset-pipeline-test.js
+          node product-audit.js
+          node runtime-stage8-test.js
+          node ai-integration-test.js
+          node experience-integration-test.js
+          node lesson-experience-test.js
+          node ui-structure-test.js
+          node settings-cache-test.js
+          node gems-test.js
+          node back-nav-test.js
+          node grammar-quality-audit.js
+          node content-integrity-audit.js
+          node content-integrity-gate-test.js
+          # F5: ADA di repo sejak m025-124 dan LULUS, tetapi tidak pernah dipanggil satu pun
+          # workflow (temuan reports/add-a10-kepatuhan.md §5.3). Didaftarkan di sini, bersebelahan
+          # dengan dua gerbang integritas konten di atas, karena ia menjaga permukaan yang sama
+          # dari sisi BAHASA: nol judul skill berupa kunci mentah, grammar-labels-id.js dimuat
+          # sebelum app.js dan ikut di-precache SW, dan setiap penjelasan/alasan distraktor punya
+          # versi Bahasa Indonesia yang menunjuk template yang benar-benar ada. Kelas gerbang yang
+          # paling langsung menjaga "murid tidak belajar sesuatu yang salah" adalah kelas yang
+          # paling tidak boleh berada di luar CI.
+          node bank-soal-audit-test.js
+          node grammar-memory-scope-test.js
+          node grammar-curriculum-test.js
+          node level-grammar-contract-test.js
+          node grammar-unlock-test.js
+          node placement-accuracy-test.js
+          node level-guard-test.js
+          node writing-rubric-test.js
+          node reading-exam-test.js
+          node level-evidence-test.js
+          node neural-cache-isolation-test.js
+          node prerequisite-graph-test.js
+          node speaking-exam-test.js
+          node listening-exam-test.js
+          # m025-198: terjemahan bocor ke soal listening tes penempatan - murid MEMBACA
+          # jawabannya. Gerbang ini menjalankan AudioService asli dari app.js dengan
+          # FiezelVoiceSay tiruan, jadi yang diuji perilaku pintunya, bukan pola teks.
+          node listening-subtitle-suppression-test.js
+          node e2e-level-grammar-test.js
+          node notification-reminder-test.js
+          node remote-push-test.js
+          # F5: gerbang kedua yang ada tapi tidak terdaftar (reports/add-a10-kepatuhan.md §5.3).
+          # Diletakkan tepat sesudah dua gerbang pemberitahuan/push karena ia menjaga jalur yang
+          # sama dari sisi PERSETUJUAN: gestur tangkap laporan tetap terisolasi, laporan otomatis
+          # tidak pernah interaktif, laporan sesi/harian tetap tertunda (bukan hilang) tanpa auth,
+          # dan persetujuan eksplisit tidak pernah dilangkahi.
+          node app-report-control-path-test.js
+          node core-brain-test.js
+          node core-brain-v2-test.js
+          node tutor-brain-v3-test.js
+          node misconception-diagnosis-test.js
+          node tutor-reteach-card-test.js
+          node fiezel-autonomy-config-test.js
+          node fiezel-prompt-library-test.js
+          node fiezel-meta-learning-test.js
+          node fiezel-evolution-ledger-test.js
+          node fiezel-self-refine-test.js
+          # Gerbang brain-learning-infra (PR #226) yang belum terdaftar (dituntut
+          # gate-registry-test: terdaftar atau dikecualikan beralasan). Gerbang i18n yang
+          # semula juga terdaftar di sini sudah punya registrasi asli di SLOT 10 di atas;
+          # duplikatnya dibuang (temuan PR #336: 19 gerbang terdaftar berulang, ±2m24s
+          # terbuang tiap run) — nol gerbang dihapus, hanya salinannya.
+          node fiezel-evolution-loop-test.js
+          node core-worker-contract-test.js
+          # m025-201: dua gerbang penutup lima celah Core Brain (audit m025-201).
+          # core-policy-parity-test.js mengadu kebijakan app.js dengan kebijakan Worker atas
+          # matriks skenario yang sama - dua salinan yang seharusnya identik dan selama ini
+          # tidak pernah dibandingkan, sehingga setiap perbaikan yang mendarat di satu sisi
+          # saja lolos tanpa terlihat. Ia juga menuntut tidak ada rute Worker yang memakai
+          # kebijakan MENTAH (celah pelatih AI), bahwa highRiskCount/todayAttempts benar-benar
+          # mengubah keluaran, bahwa pemotong kode rasional berprioritas (alasan otak berhenti
+          # dibuang sebelum sampai ke layar), dan bahwa tren efektivitas dihitung atas sepuluh
+          # hasil - masing-masing dengan bukti-bisa-merah terhadap sumber yang sengaja dirusak.
+          # Diletakkan tepat sesudah core-worker-contract-test.js karena keduanya memuat Worker
+          # yang sama di dalam vm: yang di atas menjaga KONTRAK rutenya, yang ini menjaga
+          # KEBIJAKAN yang mengalir lewat rute itu.
+          node core-policy-parity-test.js
+          # brain-page-wiring-test.js menutup lubang yang brain-manifest-test.js tidak jangkau:
+          # manifest mengadu dirinya dengan isi direktori, tetapi NOL gerbang mengadunya dengan
+          # index.html/sw.js. Modul yang dinyatakan berwenang tetapi tidak pernah dimuat halaman
+          # adalah kelas cacat yang membunuh analytics murid secara senyap di T-031.
+          node brain-page-wiring-test.js
+          node reset-side-state-test.js
+          node side-state-scope-test.js
+          node attempt-identity-test.js
+          node brain-replay-equivalence-test.js
+          node attempt-record-test.js
+          node brain-sync-failclosed-test.js
+          node brain-sync-rebuild-test.js
+          node policy-verdict-test.js
+          node nof1-test.js
+          node param-ledger-test.js
+          node self-tune-test.js
+          node content-chain-test.js
+          node content-chain-report-test.js
+          node learner-evidence-test.js
+          node alrs-behavior-test.js
+          node adaptive-policy-test.js
+          node policy-outcome-test.js
+          node personal-journey-test.js
+          node personal-journey-ui-test.js
+          node skills-evidence-test.js
+          node skills-dashboard-test.js
+          node academic-readiness-test.js
+          node library-integrity-test.js
+          node pwa-cache-test.js
+          # m025-201: navigasi network-first tanpa batas waktu membuat PWA terpasang
+          # tersandera jaringan yang MENGGANTUNG (Wi-Fi berhalaman-login, sinyal satu
+          # batang) walau cangkangnya sudah ada di perangkat. Gerbang ini menjalankan
+          # pendengar fetch sungguhan dari sw.js, bukan mencocokkan pola teks.
+          node sw-nav-shell-first-test.js
+          node pwa-release-coherence-test.js
+          # m025-212: kabar pembaruan wajib TERLIHAT murid - kartu di layar, tombolnya
+          # yang memicu perpindahan generasi controller, bukan muat ulang diam-diam.
+          node update-prompt-test.js
+          # pwa-release-coherence memeriksa keempat penanda SELARAS satu sama lain; ia tidak
+          # bisa tahu nomornya sudah dipakai jalur lain. Itu celah yang meloloskan tabrakan
+          # m025-196..199 (BUILD-NUMBER-COLLISION-2026-08-30.md). --strict: di CI, dasar yang
+          # tak terverifikasi = merah, karena gerbang yang diam saat tidak bisa memeriksa
+          # tidak menjaga apa pun.
+          node build-number-uniqueness-test.js --strict
+          node pwa-startup-white-screen-recovery-test.js
+          node http-smoke-test.js
+          node speaking-listening-test.js
+          node check-listening-similarity.js
+          node search-feedback-test.js
+          node diag-panel-test.js
+          node diag-search-test.js
+          node sw-corp-test.js
+          node classroom-test.js
+          node diagnostic-scanner-test.js
+          node reminder-struggle-test.js
+          node prosody-test.js
+          node voice-chunker-test.js
+          node tutor-classroom-regression-test.js
+          node m02542-experience-test.js
+          node neural-voice-m02592-puter-subtitle-test.js
+          node neural-voice-m02593-subtitle-translate-test.js
+          node puter-auth-coop-test.js
+          node puter-auth-diagnostics-test.js
+          node puter-popup-once-test.js
+          node cf-api-contract-test.js
+          node cf-wiring-test.js
+          # A6/D1: kontrak SKEMA D1. Dijalankan tepat sesudah `cf-wiring-test.js` karena
+          # keduanya membaca berkas yang sama (`workers/api/migrations/*.sql`) dari dua sisi:
+          # yang di atas menjaga PENYAMBUNGAN (binding, salinan byte-identik, nama tabel tidak
+          # bertabrakan), yang ini menjaga ISI SKEMA — setiap tabel yang dipakai kode ada
+          # migrasinya, tidak ada kolom penghubung antara tabel kuota dan tabel analytics,
+          # setiap indeks baru punya kueri yang benar-benar memakainya, tidak ada DELETE/DROP
+          # tanpa WHERE+LIMIT di migrasi baru, dan `tools/d1-schema-check.mjs` terbukti bisa
+          # MERAH (diuji dengan fixture rusak, bukan hanya fixture benar).
+          node d1-schema-contract-test.js
+          # E9: penjaga jembatan edge. Dijalankan tepat sesudah dua gerbang kontrak Worker
+          # karena ia menguji berkas yang sama (`workers/api/index.js`, `route-health.js`) dari
+          # sisi ketiga: siapa yang BOLEH memanggil Worker sama sekali. Selama zona
+          # `fiezel.my.id` belum di Cloudflare, `api.fiezel.my.id` adalah proxy PHP di origin
+          # dan alamat `*.workers.dev` tetap publik — gerbang ini yang menjaga header bersama
+          # `X-Fiezel-Edge` benar-benar ditegakkan (waktu-konstan), bahwa `/healthz` tidak
+          # membocorkan `capabilities`, dan bahwa `deploy/edge/api-index.php` tidak pernah
+          # memuat nilai secret sungguhan.
+          node edge-guard-test.js
+          # S1: pembatas laju PENERBITAN identitas anonim (`POST /api/auth/anon`).
+          # Dijalankan tepat sesudah `edge-guard-test.js` karena keduanya membaca sinyal yang
+          # SAMA dari dua sisi: gerbang di atas menulis `ctx.edgePath` (jalur mana yang dipakai
+          # permintaan), gerbang ini menuntut tarif pembatas dipilih dari sinyal itu dan BUKAN
+          # dari header klien atau dari ada/tidaknya `EDGE_SHARED_SECRET` — bug lapangan 28 Agu
+          # 2026 (52 tembakan dari satu IP, 28 lolos: tarif jembatan 30/jam terpakai di jalur
+          # langsung). Ia juga menjaga jendela BERGULIR (tidak reset di menit ke-0), amplop 429
+          # yang tidak membocorkan riwayat IP, jitter anti-oracle, perilaku saat D1 galat, dan
+          # nol IP mentah di bind D1 / log.
+          node rate-anon-test.js
+          # S2: PLAFON NEURON TINGKAT AKUN ITU WAJIB. Dijalankan tepat sesudah
+          # `rate-anon-test.js` karena keduanya menjaga dua sisi dari ancaman yang sama:
+          # gerbang di atas membatasi PENERBITAN identitas per IP, gerbang ini menjaga satu-
+          # satunya hal yang masih menahan penyerang dari BANYAK IP - plafon biaya akun. Yang
+          # di-assert: `env.AI.run` hanya dieja di satu chokepoint yang menolak jalan tanpa
+          # tanda terima reservasi; setiap rute yang bisa memanggil model ditemukan PROGRAMATIK
+          # dari graf impor (bukan dari daftar tangan, karena daftar tangan basi begitu rute
+          # baru lahir - itu persis cara celah ini muncul) dan wajib memesan neuron SEBELUM
+          # memanggil model; dep `accountBudget` tidak lagi opsional (hilang = 503 dengan
+          # `quotaCharged:false`); reservasi atomik; D1 galat = fail-closed; dan reservasi
+          # dilepas kembali kalau panggilan model gagal sebelum model bekerja.
+          node ai-account-cap-gate-test.js
+          # S7: pemantauan produksi. DUA langkah, dan pembagiannya sengaja:
+          # `health-probe-test.js` adalah gerbangnya (ia yang membuktikan probe menilai
+          # `workers.dev` 200 sebagai KRITIS — bukan OK — dan bahwa exit code hanya merah
+          # untuk kegagalan kritis), sedangkan baris di bawahnya menjalankan self-test probe
+          # itu sendiri terhadap server loopback. TIDAK ADA pemanggilan probe tanpa
+          # `--selftest` di CI: mode produksi menembak api.fiezel.my.id sungguhan, dan
+          # CI publik yang menembak produksi pada setiap push adalah beban yang kita
+          # timpakan ke murid, bukan pengujian. Gerbangnya meng-assert larangan itu.
+          node health-probe-test.js
+          node tools/fiezel-health-probe.mjs --selftest
+          # A3: kontrak Cron Trigger. Dijalankan tepat sesudah gerbang wiring/edge
+          # karena ia mengeksekusi Worker yang sama lewat jalur `scheduled()` dan
+          # bukan `fetch()` — sisi yang tidak pernah disentuh gerbang lain. Ia
+          # membuktikan: satu ekspresi cron = satu job, rollup dua kali tidak
+          # menurunkan angka, pepper lama benar-benar dihapus, `cron_run` mencatat
+          # sukses DAN gagal tanpa pesan galat mentah, `dau_dedup` kosong +
+          # `usage_daily` terisi = `collection_ok=0`, dan `/api/owner/cron-status`
+          # 403 tanpa kredensial owner. Butuh tools/cf-test-harness.js.
+          node cron-contract-test.js
+          # A7: kontrak proxy PHP jembatan. Dijalankan TEPAT SESUDAH edge-guard-test.js
+          # karena keduanya menjaga jembatan yang sama dari dua sisi: yang di atas menjaga
+          # sisi WORKER (siapa yang boleh memanggil, /healthz minimal, nol nilai secret di
+          # artefak), yang ini menjaga sisi PROXY (allowlist 13 jalur tetap default-tolak,
+          # X-Fiezel-Edge tetap dikirim, nol cache pada jalur identitas/kuota/Set-Cookie,
+          # IP mentah tidak diteruskan, galat curl mentah tidak pernah sampai ke murid,
+          # FOLLOWLOCATION tetap false, dan setiap sakelar transport baru punya komentar
+          # alasan). Ia memindai berkas PHP sebagai TEKS — tidak ada PHP di runner ini, dan
+          # memasangnya demi satu berkas bukan pertukaran yang sehat; batas itu ditulis di
+          # kepala gerbangnya, bukan disembunyikan.
+          node edge-proxy-contract-test.js
+          # F4: gerbang cacat "permintaan ke-3 menggantung". Dijalankan TEPAT SESUDAH
+          # edge-proxy-contract-test.js karena ia menjaga berkas PHP yang sama dari sudut
+          # yang berbeda: yang di atas menjaga KEBIJAKAN (siapa boleh lewat, apa yang
+          # di-cache), yang ini menjaga TRANSPORT — header hop-by-hop dibuang DUA ARAH,
+          # batas cURL lebih pendek dari batas 8 s yang membuat browser
+          # menyerah (angkanya dibaca dari tools/fiezel-e2e-bridge.mjs, bukan ditulis dua
+          # kali), nol session_start() tanpa session_write_close(), Content-Length tidak
+          # diteruskan mentah, badan ditulis sekali lalu di-flush, dan placeholder secret
+          # tetap placeholder. Ia memuat KEDUA proxy (api + owner) sebagai TEKS dan
+          # membuktikan setiap detektornya bisa MERAH lewat matriks racun di memori.
+          # Batasnya ditulis di kepala gerbangnya: ia mencegah kelas cacat ini KEMBALI, ia
+          # TIDAK membuktikan cacat F4 tertutup — itu hanya terbukti sesudah gerbang E2E
+          # browser dijalankan ulang terhadap jembatan yang sudah diunggah (deploy/edge/
+          # README.md §5e.4).
+          node edge-proxy-hopbyhop-test.js
+          # A4: pemindai rahasia SELURUH repo. Dijalankan tepat sesudah edge-guard karena
+          # keduanya menjaga permukaan yang sama dari dua jangkauan berbeda: edge-guard
+          # menjaga SATU berkas (`deploy/edge/api-index.php`) secara mendalam, gerbang ini
+          # menjaga SEMUA berkas yang dilacak git — kunci ber-prefiks (sk-/pk_/ghp_/cfut_/
+          # AIza), JWT, blok PEM, hash bcrypt, token base64url berentropi tinggi, dan
+          # `password=`/`secret=`/`token=` bernilai literal. Ia juga menegakkan higiene git:
+          # `.gitignore` memuat berkas laporan bergantung-lingkungan, tidak ada `.env` atau
+          # `*.bak`/`*.orig`/`*.rej` yang terlacak, dan `deploy/edge/*.php` tetap placeholder.
+          # BATAS yang dilaporkan apa adanya: ia memindai working tree, BUKAN riwayat commit
+          # (perintah manual untuk owner ada di reports/add-a4-secret-scan.md).
+          node secret-scan-test.js
+          node quota-core-test.js
+          node quota-manipulation-test.js
+          node quota-reset-test.js
+          # A8: naskah murid + aksesibilitas pemberitahuan jatah/suara. Diletakkan tepat
+          # sesudah tiga gerbang jatah karena ia menguji sisi yang mereka nggak sentuh sama
+          # sekali: bukan angkanya, tetapi KALIMAT yang dibaca murid ketika angkanya habis —
+          # istilah teknis, "nggak" vs "tidak", ketiadaan permukaan bayar, role="alert" yang
+          # terdaftar, larangan jalur toast 2.600 ms, varian jujur untuk keadaan tanpa suara,
+          # dan aturan senyap selama sesi listening berjalan.
+          node quota-notice-a11y-test.js
+          node tts-key-test.js
+          # A12: gerbang kontrak provider TTS. Wajib tepat sesudah tts-key-test.js karena keduanya
+          # menjaga sisi berlawanan dari SATU invarian biaya: yang di atas menjaga bagaimana voiceId
+          # masuk kunci cache, yang ini menjaga bahwa voiceId yang SAMA benar-benar berangkat ke
+          # provider. Cacat produksi yang melahirkannya (route-tts memanggil {text} saja, pra-render
+          # memanggil {text,speaker}) hijau di kedua gerbang lama: 100% render menjawab
+          # source:"unavailable", bytes:0, dan tidak ada gerbang yang memeriksa isi permintaan.
+          node tts-provider-contract-test.js
+          node ai-task-contract-test.js
+          # V4: gerbang bentuk jawaban Workers AI + kontrak mutu keluaran. Dijalankan tepat
+          # sesudah gerbang kontrak task karena keduanya menguji berkas yang sama dari dua sisi:
+          # yang di atas menjaga bentuk PERMINTAAN (klien tidak mengirim prompt), yang ini menjaga
+          # bentuk JAWABAN (dua bentuk terbaca, kosong = gagal, reasoning tidak pernah tampil,
+          # batas kalimat dan kanon kata ditegakkan). Ia butuh tools/cf-test-harness.js yang sudah
+          # dijalankan sebagai self-test di bawah.
+          # A12 memperluasnya dengan dua hal yang tidak bisa dilihat dari bentuk jawaban saja:
+          # `quotaCharged` wajib ada dan bertipe boolean di SETIAP jalur route-ai.js, dan keluaran
+          # kosong ("{}" dari jsonMode, whitespace, JSON kosong) tidak pernah dinyatakan sukses
+          # sekaligus kuotanya DIKEMBALIKAN.
+          node ai-response-shape-test.js
+          node breaker-test.js
+          node prerender-dryrun-test.js
+          # A1: gerbang aritmetika pra-render. Dijalankan tepat sesudah gerbang dry-run karena
+          # keduanya menguji tools/prerender-tts.mjs dari dua sisi: yang di atas menjaga BENTUK
+          # (dry-run kering, workflow bergate, manifest terpisah), yang ini menjaga ANGKA (korpus
+          # 604.962 karakter, 5.657 objek/286.851 karakter sesudah dedup, harga aura-1 vs
+          # aura-2-en, daftar frasa berisiko "On balance", override model per-item).
+          node prerender-plan-test.js
+          node owner-dashboard-test.js
+          # Ekspor CSV dashboard owner. Gerbang TERPISAH dari owner-dashboard-test.js karena
+          # yang dijaga beda: berkas CSV BEREDAR LEPAS dari dashboard, jadi konteks kejujuran
+          # (measurement_state, notice, batas UNMEASURABLE) wajib ikut TERTULIS DI DALAM
+          # berkasnya — kalau tidak, 'belum diukur' terbaca sebagai 'nol' begitu berkas itu
+          # sampai ke tangan calon pembeli. Ia juga mengunci escaping RFC 4180 (alasan
+          # UNMEASURABLE penuh koma) dan paritas angka CSV vs /api/summary.
+          node owner-export-csv-test.js
+          # S4: gerbang jembatan `owner.fiezel.my.id`. Ditempatkan TEPAT sesudah
+          # `owner-dashboard-test.js` karena keduanya menguji `workers/owner/index.js`, tetapi
+          # dari dua sisi berbeda: yang di atas menjaga siapa yang boleh MELIHAT angka (sesi
+          # owner), yang ini menjaga siapa yang boleh MEMANGGIL Worker sama sekali (header
+          # jembatan `X-Fiezel-Edge`) — dan bahwa dua lapis itu tidak saling menggantikan.
+          # Ia juga membuktikan header keamanan HTML (CSP ketat, noindex) tidak hilang di
+          # perjalanan lewat daftar pass-through `deploy/edge/owner-index.php`, dan bahwa
+          # berkas PHP itu tidak pernah memuat nilai secret sungguhan.
+          node owner-edge-guard-test.js
+          node tools/cf-test-harness.js
+          node no-network-test.js
+          # `cf-live-selftest.js` membuktikan gerbang live di bawah ini bisa MERAH:
+          # ia menjalankannya terhadap server HTTP loopback yang meniru jawaban
+          # benar dan 20 variasi jawaban salah. Loopback murni (127.0.0.1, port 0),
+          # tanpa DNS, tanpa keluar mesin — karena itu ia terdaftar di
+          # SOCKET_ALLOWLIST `no-network-test.js` dan dijalankan SESUDAHNYA.
+          node cf-live-selftest.js
+          # F5: DUA gerbang live (`cf-live-contract-test.js`, `staging-live-test.js`)
+          # DIPINDAH KELUAR dari blok ini, menjadi step bernama sendiri di bawah.
+          # Alasannya bukan kosmetik. Selama keduanya berada di tengah ~150 baris
+          # `node …`, kondisi SKIP-nya tidak terlihat siapa pun: langkah "Core
+          # validation" berwarna hijau, dan pembaca menyimpulkan runtime Cloudflare
+          # sudah terbukti padahal nol byte pernah menyentuhnya. Sebagai step
+          # sendiri, SKIP-nya punya nama, alasan, dan ringkasan di UI Actions.
+          # `gate-registry-test.js` meng-assert bahwa keduanya TIDAK dihitung
+          # sebagai bukti selama env-nya kosong.
+          # `e2e-bridge-selftest.js` membuktikan gerbang E2E BROWSER
+          # (`tools/fiezel-e2e-bridge.mjs`) bisa MERAH: ia menjalankannya terhadap
+          # aplikasi tiruan + jembatan HTTPS loopback dalam 21 skenario (satu benar,
+          # 20 salah), dan menuntut kegagalannya jatuh pada id assert yang tepat.
+          # Loopback murni: semua nama host uji dipetakan ke 127.0.0.1 lewat
+          # --host-resolver-rules, jadi tanpa DNS dan tanpa keluar mesin. Karena itu
+          # namanya ada di SOCKET_ALLOWLIST `no-network-test.js` dan langkah ini
+          # dijalankan SESUDAHNYA. Kalau playwright/Chromium tidak terpasang di
+          # runner, ia mencetak SKIP dan exit 0 — ketiadaan browser di runner bukan
+          # cacat produk.
+          #
+          # `tools/fiezel-e2e-bridge.mjs` sendiri SENGAJA TIDAK didaftarkan di CI.
+          # Ia menembak jembatan HIDUP (api.fiezel.my.id) dengan browser sungguhan:
+          # mendaftarkannya berarti setiap push memaksa produksi melayani sesi anon
+          # baru dan membuat CI merah karena jaringan, bukan karena kode. Cara
+          # menjalankannya ada di reports/add-a5-e2e.md dan tools/cf-live-runner.md.
+          node e2e-bridge-selftest.js
+          node release-audit-gate-test.js
+          node cf-transport-test.js
+          node cf-shadow-mode-test.js
+          # Kill switch server (`GET /api/config`): penggabungan AND (server hanya bisa
+          # mematikan), protokol 1.7 wajib cocok, cermin maks 5 menit di sessionStorage,
+          # dan boot tidak diblokir. Dijalankan sesudah dua gerbang di atas karena ia
+          # menjalankan blok kill switch DAN blok transport bersama-sama.
+          node cf-config-killswitch-test.js
+          # Batas waktu klien di jalur CF (paket F6): setiap batas punya nilai eksplisit,
+          # nilainya >= p95 terukur + margin yang ditulis di komentar sumber, jalur config
+          # tidak pernah menahan render, dan kegagalan config jatuh ke semua-off. Berjalan
+          # sesudah gerbang kill switch karena ia memakai blok app.js yang sama.
+          node cf-client-timeout-test.js
+          # Konsistensi konfigurasi lintas berkas: bentuk KV di runbook (§4.5-4.7) harus
+          # benar-benar bisa dibaca route-config.js, dan angka batas di wrangler [vars]
+          # (yang dikirim ke NASKAH murid) harus sama dengan angka yang DITEGAKKAN di
+          # quota/quota-config.js. Ditempatkan tepat sesudah gerbang kill switch karena
+          # keduanya menjaga sakelar yang sama dari dua sisi: perilaku kode vs perintah
+          # yang benar-benar diketik owner saat insiden.
+          node config-consistency-test.js
+          node cf-shadow-ledger-test.js
+          node ai-transport-switch-test.js
+          # A9: gerbang rencana rollout. Diletakkan tepat sesudah dua gerbang sakelar transport
+          # karena ia menguji sisi KETIGA dari sakelar yang sama: bukan bentuknya
+          # (`cf-transport-test.js`) dan bukan perilakunya (`cf-shadow-mode-test.js`), tetapi
+          # apakah URUTAN PENYALAANNYA bisa dieksekusi tanpa menebak — ambang batal berupa angka
+          # per langkah, prosedur pembatalan < 60 detik, dan daftar prasyarat yang BELUM
+          # terpenuhi yang masih terverifikasi benar terhadap repo. Ia juga menjalankan
+          # `tools/flag-plan-check.mjs` terhadap fixture untuk membuktikan kalkulator keadaan
+          # efektif itu benar-benar menangkap kombinasi berbahaya (ai on tanpa auth, ai on tanpa
+          # kuota, endpoint hidup tanpa kill switch yang terbaca) dan bersih pada keadaan repo
+          # hari ini. Nol jaringan; fixture ditulis ke direktori temporer OS.
+          node rollout-plan-test.js
+          # m025-190 dulu mendaftarkan ulang 19 gerbang (adaptivity-simulation-v3-hardened,
+          # tiga gerbang sosial, dan 15 gerbang analytics/brain/learning/locale) yang saat
+          # itu dikira belum terdaftar. Semuanya sudah punya registrasi asli di SLOT 10 di
+          # atas; duplikatnya dibuang (temuan PR #336, ±2m24s terbuang tiap run). Nol
+          # gerbang dihapus, hanya salinannya — gate-registry-test.js tetap menuntut satu
+          # registrasi per berkas uji, bukan nol.
+          node workflow-actor-gate-test.js
+          # Sepupu workflow-actor-gate-test.js dari sisi WAKTU, bukan aktor. Pada 3 Sep
+          # 2026 dua run untuk commit yang sama macet di step ini selama 1 jam 59 menit
+          # dan baru berhenti karena Owner menekan Cancel: tidak ada satu pun
+          # `timeout-minutes` di seluruh .github/workflows/, jadi batas yang berlaku
+          # adalah bawaan GitHub — 360 menit diam. Gerbang ini menuntut setiap job punya
+          # batas yang berhingga DAN mengikat, supaya macet berikutnya merah sendiri
+          # alih-alih menunggu ada manusia yang kebetulan menonton tab Actions.
+          # BATASNYA: batas waktu hanya menggigit selama runner-nya masih hidup. Pada
+          # wedge banjir-log ia terbukti TIDAK menggigit (job 100741519242, 51m44s) —
+          # alasannya ditulis lengkap di komentar `timeout-minutes` pada job di atas.
+          node workflow-timeout-gate-test.js
+          # Pasangan workflow-actor-gate-test.js dari sisi isi, bukan aktor: ia
+          # MENJALANKAN skrip substitusi binding yang tertanam di
+          # deploy-api-worker.yml (diekstrak dari heredoc, bukan disalin) terhadap
+          # workers/api/wrangler.toml yang asli. Tanpa gerbang ini, penjaga
+          # placeholder di dalam workflow hanya berbunyi SAAT DEPLOY — dan
+          # korbannya adalah gateway yang dipakai murid. Blok binding opsional baru
+          # yang ditambahkan ke wrangler.toml tanpa cabang pelepasannya kini
+          # memerah di sini, bukan di tengah deploy (cacat EVIDENCE_DB, PR #304).
+          node deploy-api-binding-guard-test.js
+          # Pasangan gerbang di atas dari sisi PENEMPELAN MANUAL PERTAMA (bukan CI):
+          # workers/api/tools/attach-live-bindings.mjs adalah skrip yang Owner
+          # jalankan sekali dari laptop untuk menempel ID D1/KV live ke wrangler.toml
+          # sebelum `wrangler deploy` pertama kali (mis. sesudah database baru
+          # dibuat). Logikanya (workers/api/tools/attach-live-bindings-core.mjs)
+          # memakai pencocokan nama EKSAK, bukan substring — tanpa itu
+          # "fiezel-core-staging" bisa lolos ke binding CORE_DB dan gateway murid
+          # menulis identitas ke database staging tanpa satu pun error. Gerbang ini
+          # membuktikan pencocokan itu berpegang pada nama persis dengan data akun
+          # tiruan yang sengaja memuat pasangan staging/produksi berdampingan.
+          node attach-live-bindings-test.js
+          # F5: gerbang meta pendaftaran. Diletakkan PALING AKHIR dengan sengaja — ia
+          # membaca berkas workflow ini sendiri dan membandingkannya dengan seluruh
+          # berkas uji yang dilacak git, jadi ia hanya berarti setelah semua entri di
+          # atas ada. Ia membuat kelas cacat "gerbang ada di repo tapi tidak pernah
+          # dijalankan CI" (§5.3 add-a10) mustahil terulang tanpa terlihat: setiap
+          # berkas uji WAJIB terdaftar di sini ATAU punya entri pengecualian dengan
+          # ALASAN TERTULIS di dalam gerbang itu. Ia juga meng-assert bahwa dua gerbang
+          # live tidak boleh dihitung sebagai bukti.
+          node gate-registry-test.js
+          # Audit rilis m025-179: repo tidak punya SATU PUN penerbit aplikasi ke
+          # `fiezel.my.id/app/` — permukaan yang benar-benar dipakai murid — sehingga
+          # setiap nomor build adalah janji, bukan fakta, dan paritas produksi tidak
+          # pernah bisa dibuktikan. `deploy-site.yml` menutupnya; gerbang ini menjaga
+          # penutupnya: urutan unggah (sw.js WAJIB terakhir, kalau tidak service worker
+          # baru mem-precache bita lama di bawah revisi baru), daftar kecualian yang
+          # tidak boleh memakan satu pun entri ASSETS sw.js, syarat Quality Gate hijau
+          # sebelum terbit, dan SKIP yang bersuara saat secret hosting belum ada.
+          # m025-186: kebijakan interaksi app-like. Dijalankan bersebelahan dengan gerbang
+          # a11y/kontras karena ia menjaga permukaan yang sama dari sisi berlawanan:
+          # yang di atas menjaga agar murid BISA melihat dan memakai, yang ini menjaga
+          # agar peramban tidak menyodorkan perilaku dokumen (seleksi teks, menu konteks,
+          # zoom-otomatis saat fokus) di atas UI aplikasi. Ia juga MEMERAH kalau ada yang
+          # 'memperbaiki' zoom dengan user-scalable=no — regresi WCAG 1.4.4/1.4.10 yang
+          # sudah pernah dicabut audit D16.
+          node app-interaction-policy-test.js
+          node deploy-site-gate-test.js
+          node coordination-guard-test.js
+
+      # =================================================================================
+      # F5 — GERBANG LIVE: SKIP YANG TERLIHAT, DAN CARA MENJALANKANNYA DENGAN SENGAJA
+      # =================================================================================
+      # Kedua step di bawah ini SENGAJA berdiri sendiri. Pada push/PR biasa keduanya
+      # SKIP dan mengatakannya dengan lantang (nama step + alasan + baris ringkasan di
+      # $GITHUB_STEP_SUMMARY), sehingga tidak ada lagi "hijau" yang diam-diam berisi
+      # gerbang yang tidak menguji apa pun. Pada `workflow_dispatch` dengan input terisi,
+      # keduanya berjalan sungguhan dan MERAH kalau kontraknya patah — gerbangnya sendiri
+      # yang menegakkan itu (`cf-live-contract-test.js` exit 1 pada assert gagal;
+      # `staging-live-test.js` exit 1 bahkan bila base URL diisi tapi tidak sah).
+      - name: 'CF live contract gate (SKIP kecuali workflow_dispatch dengan cf_live_base)'
+        # Penjaga aktor per-LANGKAH, bukan per-workflow. `quality.yml` harus tetap
+        # berjalan untuk setiap push dan setiap PR dari siapa pun - itu justru gunanya.
+        # Yang perlu dijaga hanya DUA langkah yang bisa menembak sistem hidup dan
+        # membaca secret jembatan. Menggerbangi seluruh workflow ke satu aktor akan
+        # mematikan 150+ gerbang untuk kontributor lain: obatnya lebih buruk dari
+        # penyakitnya. (Temuan workflow-actor-gate-test.js, 28 Agu 2026.)
+        if: github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'
+        env:
+          # Pada push/PR `inputs` tidak ada, jadi nilainya string kosong = SKIP.
+          # TIDAK ADA nilai bawaan berupa URL di sini, dan itu diperiksa oleh
+          # `no-network-test.js`: satu `|| 'https://…'` akan mengubah CI publik menjadi
+          # penembak produksi pada setiap push.
+          FIEZEL_CF_LIVE_BASE: ${{ github.event.inputs.cf_live_base }}
+          # Laporan diarahkan keluar dari working tree (gerbang lain memeriksa pohon tetap
+          # bersih) dan ke tempat yang bisa diunggah sebagai artefak.
+          FIEZEL_CF_LIVE_REPORT: ${{ runner.temp }}/CF-LIVE-REPORT.json
+        run: |
+          if [ -z "${FIEZEL_CF_LIVE_BASE}" ]; then
+            echo '::notice title=cf-live-contract-test.js SKIP::FIEZEL_CF_LIVE_BASE kosong — gerbang ini TIDAK menguji runtime Cloudflare pada jalan ini dan TIDAK boleh dikutip sebagai bukti runtime.'
+            {
+              echo '### cf-live-contract-test.js — **SKIP** (bukan PASS)'
+              echo ''
+              echo 'Alasan: `FIEZEL_CF_LIVE_BASE` tidak diset, jadi tidak ada Worker hidup untuk diuji.'
+              echo 'Yang BELUM terbukti pada jalan ini: rute terpasang di edge, `Set-Cookie fz_id` lolos utuh'
+              echo 'melewati Cloudflare, `ALLOWED_ORIGINS`/`COOKIE_DOMAIN` benar-benar ter-deploy, cap byte'
+              echo 'ditegakkan sebelum body dibaca. Semua itu saat ini hanya diuji di atas stub.'
+              echo ''
+              echo 'Cara menjalankannya: Actions → FIEZEL Quality Gate → Run workflow → isi `cf_live_base`.'
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Menjalankan gerbang live SUNGGUHAN terhadap ${FIEZEL_CF_LIVE_BASE} (dipilih manual lewat workflow_dispatch)."
+            echo "### cf-live-contract-test.js — dijalankan terhadap \`${FIEZEL_CF_LIVE_BASE}\`" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          node cf-live-contract-test.js --report
+      - name: 'Staging live gate (SKIP kecuali workflow_dispatch dengan staging_base)'
+        # Penjaga aktor per-LANGKAH, bukan per-workflow. `quality.yml` harus tetap
+        # berjalan untuk setiap push dan setiap PR dari siapa pun - itu justru gunanya.
+        # Yang perlu dijaga hanya DUA langkah yang bisa menembak sistem hidup dan
+        # membaca secret jembatan. Menggerbangi seluruh workflow ke satu aktor akan
+        # mematikan 150+ gerbang untuk kontributor lain: obatnya lebih buruk dari
+        # penyakitnya. (Temuan workflow-actor-gate-test.js, 28 Agu 2026.)
+        if: github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'
+        env:
+          FIEZEL_STAGING_BASE: ${{ github.event.inputs.staging_base }}
+          # Rahasia header jembatan HANYA boleh datang dari repository secret, tidak
+          # pernah dari berkas di repo dan tidak pernah dari input yang terlihat di UI.
+          # Kalau secret-nya belum dipasang, nilainya kosong dan gerbangnya SKIP.
+          FIEZEL_STAGING_EDGE: ${{ secrets.FIEZEL_STAGING_EDGE }}
+        run: |
+          if [ -z "${FIEZEL_STAGING_BASE}" ] || [ -z "${FIEZEL_STAGING_EDGE}" ]; then
+            echo '::notice title=staging-live-test.js SKIP::FIEZEL_STAGING_BASE dan/atau secret FIEZEL_STAGING_EDGE kosong — gerbang ini TIDAK menguji runtime Cloudflare pada jalan ini.'
+            {
+              echo '### staging-live-test.js — **SKIP** (bukan PASS)'
+              echo ''
+              echo 'Alasan: `FIEZEL_STAGING_BASE` dan/atau secret `FIEZEL_STAGING_EDGE` tidak terisi.'
+              echo 'Gerbang ini MENULIS state (kuota harian, objek audio, baris analytics), jadi ia hanya boleh'
+              echo 'menembak lingkungan staging yang terpisah dari data murid — dan ia menolak berjalan kalau'
+              echo '`/health` tidak mengaku staging.'
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Menjalankan gerbang staging SUNGGUHAN terhadap ${FIEZEL_STAGING_BASE} (dipilih manual lewat workflow_dispatch)."
+            echo "### staging-live-test.js — dijalankan terhadap \`${FIEZEL_STAGING_BASE}\`" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          node staging-live-test.js
+      - name: 'AI live verify (SKIP kecuali workflow_dispatch dengan ai_live_base)'
+        # Penjaga aktor per-LANGKAH, alasannya sama dengan dua langkah live di atas —
+        # dengan satu tambahan yang khas langkah ini: ia MEMBELANJAKAN UANG. Setiap
+        # tipe task adalah satu panggilan Workers AI sungguhan, dan jatah neuron itu
+        # milik AKUN, bukan per-pemicu. Kalau langkah ini pernah jalan tiap push, satu
+        # PR ramai bisa menghabiskan jatah harian akun dan mematikan AI untuk murid.
+        # `no-network-test.js` blok 2d memeriksa dari sisi lain bahwa langkah ini hanya
+        # ada dalam bentuk bergerbang aktor + workflow_dispatch.
+        if: github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'
+        env:
+          # Pada push/PR `inputs` tidak ada, jadi nilainya string kosong = SKIP.
+          FIEZEL_AI_LIVE_BASE: ${{ github.event.inputs.ai_live_base }}
+          FIEZEL_AI_LIVE_REPORT: ${{ runner.temp }}/AI-LIVE-REPORT.json
+        run: |
+          if [ -z "${FIEZEL_AI_LIVE_BASE}" ]; then
+            echo '::notice title=ai-live-verify SKIP::FIEZEL_AI_LIVE_BASE kosong — kontrak AI Cloudflare TIDAK diuji terhadap model sungguhan pada jalan ini dan TIDAK boleh dikutip sebagai bukti runtime.'
+            {
+              echo '### tools/ai-live-verify.mjs — **SKIP** (bukan PASS)'
+              echo ''
+              echo 'Alasan: `FIEZEL_AI_LIVE_BASE` tidak diset. Langkah ini berbayar, jadi ia mati secara bawaan.'
+              echo 'Yang BELUM terbukti pada jalan ini: model Workers AI sungguhan menjawab, jawabannya LOLOS'
+              echo 'kontrak mutu kami dan sampai ke murid (bukan diganti fallback), kedua bentuk jawaban provider'
+              echo 'terbaca di runtime nyata, dan `quotaCharged` benar sebagai FAKTA — jatah di `/api/quota` naik'
+              echo 'tepat sebanyak jawaban provider yang sukses. Semua itu saat ini hanya diuji di atas stub.'
+              echo ''
+              echo 'Cara menjalankannya: Actions → FIEZEL Quality Gate → Run workflow → isi `ai_live_base`.'
+              echo 'Biaya sekali jalan: ±US$0.002 dan ±244 neuron; batasi dengan `FIEZEL_AI_LIVE_TASKS`.'
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Menjalankan pembukti AI live SUNGGUHAN terhadap ${FIEZEL_AI_LIVE_BASE} (dipilih manual lewat workflow_dispatch)."
+            echo "### tools/ai-live-verify.mjs — dijalankan terhadap \`${FIEZEL_AI_LIVE_BASE}\` (BERBAYAR)" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          node tools/ai-live-verify.mjs --report
+      - name: 'Bukti gerbang live (artefak — supaya hasilnya bisa DIBACA, bukan hanya hijau)'
+        # Kenapa langkah ini ada: kedua gerbang live di atas menghasilkan bukti terkaya di
+        # seluruh workflow ini — assert per assert terhadap sistem yang sungguhan hidup —
+        # lalu bukti itu tenggelam di tengah log job yang panjang, di belakang keluaran
+        # simulasi adaptivitas yang berukuran puluhan ribu baris. Centang hijau BUKAN bukti:
+        # ia tidak memberi tahu assert mana yang lulus, berapa panggilan model yang terjadi,
+        # atau berapa kuota yang terpakai. Audit rilis 30 Agu 2026 tersandung persis di situ.
+        # `if: always()` disengaja: jalan yang MERAH justru yang paling perlu dibaca.
+        if: always() && github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'
+        uses: actions/upload-artifact@v4
+        with:
+          name: fiezel-bukti-live
+          path: |
+            ${{ runner.temp }}/CF-LIVE-REPORT.json
+            ${{ runner.temp }}/AI-LIVE-REPORT.json
+          if-no-files-found: ignore
+          retention-days: 30
+      - name: 'Gerbang hulu yang sempat tidak terdaftar (braincore fase 2 + lapisan game/UX)'
+        # Ditemukan gate-registry-test.js saat merge 28 Agu 2026: lima belas berkas uji
+        # mendarat bersama braincore fase 2 dan lapisan game/UX tanpa pernah dipanggil CI.
+        # Semuanya dijalankan satu per satu lebih dulu dan lima belas-nya exit 0, jadi yang
+        # kurang cuma pendaftaran - bukan mutunya. Didaftarkan di satu langkah agar urutan
+        # aslinya terbaca; gate-registry-test.js yang menjaga supaya ini tidak terulang.
+        run: |
+          node affect-test.js
+          node cloze-bank-test.js
+          node confusion-matrix-test.js
+          node core-brain-v3-upgrade-test.js
+          node evidence-credibility-test.js
+          node item-prior-test.js
+          node level-source-difficulty-variance-test.js
+          node listening-adaptive-test.js
+          node mastery-bkt-test.js
+          node misconception-ledger-test.js
+          node misconception-taxonomy-test.js
+          node olm-test.js
+          node p1-game-layer-smoke-test.js
+          node prasasti-test.js
+          node production-grader-test.js
+          node r2-ux-overhaul-smoke-test.js
+          node step-tutor-test.js
+          node item-calibration-test.js
+          node speaking-adaptive-test.js
+          node srl-coach-test.js
+          node cors-envelope-test.js
+      - name: 'Braincore v3: jalur save() diukur (regresi performa D4)'
+        # Perbaikan D4 (#1 formatter Intl per baris, #2 tiga save() per jawaban) sampai kini
+        # hanya dijaga tiga blok komentar. Regresi performa adalah regresi paling sunyi:
+        # tidak ada yang merah, aplikasinya cuma pelan — dan pelan di HP murid berarti sesi
+        # yang ditinggalkan. Gerbang ini menjalankan app.js di vm dengan Intl.DateTimeFormat
+        # dan localStorage.setItem yang DIHITUNG, jadi kode boleh ditulis ulang sesuka hati
+        # selama angkanya tetap. Terbukti bisa merah: bentuk pra-perbaikan = 3.006 konstruksi.
+        run: node save-path-perf-test.js
+      - name: 'Braincore v3: kemurnian modul brain (lint kustom)'
+        # Definition of Done Braincore v3: NOL Math.random / Date.now / DOM / storage /
+        # jaringan di features/brain/**. Sampai gerbang ini ada, kemurnian itu hanya
+        # dijanjikan di header tiap modul — dan janji di komentar tidak menghentikan
+        # commit siapa pun. Ia memakai lexer yang membuang komentar & string lebih dulu,
+        # supaya kalimat dokumentasi ("tidak pernah memanggil Date.now()") tidak dihukum
+        # sebagai pelanggaran; gerbang yang merah karena alasan salah akan dimatikan orang.
+        # Berdiri di step sendiri agar kegagalannya punya lampu merah sendiri.
+        run: node braincore-purity-test.js
+      - name: 'Wave E4: post-test tertunda / probe retensi (fiezel-post-test)'
+        # Modul murni baru features/brain/fiezel-retention-probe.js: penjadwal probe retensi
+        # deterministik (offset 3/7/21 hari, jitter seeded per lessonId+userSeed) +
+        # evaluator kalibrasi retensi (Brier, flag mastery rapuh, rekomendasi half-life
+        # ADVISORY — penulisan memori tetap milik single-writer FSRS). Gate memeriksa
+        # oracle manual, determinisme byte-identik, ketahanan input korup, dan properti
+        # "probe tidak pernah dijadwalkan untuk lesson tanpa mastery".
+        run: node fiezel-post-test-test.js
+      - name: 'Wave E2: selftest simulator extended (mekanisme gate jujur — arah pesan, CI bootstrap, censoring)'
+        # Menjaga MEKANISME adaptivity-simulation-v3-extended.js (tulis-ulang jujur
+        # pengerasan PR #226 yang dicabut di fe62a95): arah perbandingan verdict,
+        # pesan yang tidak berbohong tentang arah (bug forensik E2: "itemBiasRMSE
+        # TIDAK turun (0.2694 → 0.2622)" padahal turun), bootstrap deterministik,
+        # aturan mutlak censoring hanya untuk varian kebijakan populasi, dan CLI
+        # byte-identik. Simulator extended-nya SENGAJA tidak dijadikan gate CI:
+        # verdict-nya merah karena TEMUAN brain (v2 tersensor 88% vs v1 50.4%,
+        # CI [0.334, 0.42]) — kandidat wave berikut, bukan alasan memblokir PR lain.
+        run: node adaptivity-simulation-v3-extended-selftest.js
+      # 'Gerbang warisan merge main 28 Agu yang belum terdaftar (temuan E5, wave E)' pernah
+      # berdiri di sini sebagai step sendiri, mendaftarkan ulang 15 gerbang yang saat itu
+      # dikira belum terdaftar. Semuanya sudah punya registrasi asli di SLOT 10 dalam step
+      # Core validation di atas; step ini dihapus seluruhnya karena isinya 100% duplikat
+      # (temuan PR #336, ±2m24s terbuang tiap run). Th-coverage-test.js tetap dikecualikan
+      # registry seperti sebelumnya (kelas gerbang-pra-rilis-fitur, keputusan MASTER 9bf2e13).
+      - name: 'Wave F2: gate anti-drift konten (explanations-id ↔ templates, inventori, count vocab-th)'
+        # Menutup pola kerusakan 3 wave berturut: sumber terjemahan tertinggal dari
+        # bank yang di-QA (b0d983c → c3e02f3, 5643a32, f87a39a) dan inventori
+        # indonesianCoverage basi (222/222 vs 249) yang lolos semua gerbang lama.
+        # Perbaikan bila merah: node tools/sync-grammar-explanations-id.js --write
+        # && node audit/merge-grammar-id.js. Detail: header content-drift-test.js.
+        run: node content-drift-test.js
+      - name: 'Wave F1: gerbang overperformance berkelanjutan (regresi censoring mastery)'
+        # Mengawal perbaikan F1 di fiezel-core-brain.js: residualPositiveShare (momentum
+        # basis residual) + cabang 'sustained_overperformance' planSession. Tanpa gate ini
+        # cabang tersebut bisa dicabut diam-diam dan jebakan jangkar censoring (mastery v2
+        # ~13% vs v1 ~44% dalam 35 hari, research_hold simulasi v3) kembali tanpa alarm.
+        run: node wave-f1-censoring-test.js
+      - name: 'Gerbang simulasi adaptivitas v3 (gate yatim CI — temuan D1, wave D)'
+        # adaptivity-simulation-v3.js adalah gate sungguhan (exit code dari main();
+        # gate residual + gate kalibrasi bisa merah), tetapi namanya lolos dari pola
+        # GATE_NAME_RE gate-registry-test.js (*-test/-audit/-selftest) sehingga tidak
+        # pernah dipanggil CI (temuan D1 gate-sweep, 28 Agu 2026). Didaftarkan di sini
+        # secara ADDITIVE per peta koordinasi D10 (quality.yml disentuh 5 PR terbuka).
+        run: node adaptivity-simulation-v3.js
+      - name: 'Cetak ulang bukti live di AKHIR log (bukan hanya di artefak)'
+        # Artefak `fiezel-bukti-live` sudah menyimpan kedua laporan, tetapi mengunduh artefak
+        # butuh perkakas; membaca log tidak. Dan letaknya menentukan: keluaran asli kedua
+        # gerbang live terkubur di TENGAH log, di belakang simulasi adaptivitas yang puluhan
+        # ribu baris, jadi pembaca yang membuka log dari bawah tidak akan pernah sampai ke
+        # sana. Dicetak ulang di paling akhir, laporan itu jadi hal pertama yang terlihat.
+        #
+        # Skripnya berkas repo, BUKAN skrip sebaris: runner menggemakan badan setiap `run:`
+        # ke log, jadi skrip sebaris 40 baris justru mendorong bukti yang mau diselamatkan
+        # keluar dari jendela ekor log. Obatnya jangan jadi penyakitnya.
+        #
+        # `if: always()` disengaja: jalan yang MERAH justru yang paling perlu dibaca.
+        if: always() && github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'
+        run: node tools/print-live-evidence.mjs "$RUNNER_TEMP/CF-LIVE-REPORT.json" "$RUNNER_TEMP/AI-LIVE-REPORT.json"

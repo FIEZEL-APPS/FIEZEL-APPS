@@ -1,0 +1,34 @@
+name: FIEZEL Remote Push Reminders
+
+on:
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dispatch:
+    # Scheduled product delivery may continue within its bounded runtime contract.
+    # Manual execution is MASTER-only. Repository pushes never dispatch reminders.
+    if: (github.event_name == 'schedule' && vars.FIEZEL_REMOTE_PUSH_ENABLED == 'true') || (github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS')
+    runs-on: ubuntu-latest
+    # Batas keras: tanpa ini GitHub memakai 360 menit, dan satu langkah
+    # yang menggantung membakar enam jam dalam diam (lihat
+    # workflow-timeout-gate-test.js).
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --ignore-scripts --no-audit --no-fund
+      - name: Dispatch bounded remote reminders
+        run: node push-dispatcher.mjs
+        env:
+          FIEZEL_CORE_WORKER_URL: ${{ secrets.FIEZEL_CORE_WORKER_URL }}
+          FIEZEL_REMINDER_CRON_TOKEN: ${{ secrets.FIEZEL_REMINDER_CRON_TOKEN }}
+          VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          VAPID_SUBJECT: ${{ secrets.VAPID_SUBJECT }}

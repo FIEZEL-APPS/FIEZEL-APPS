@@ -1,0 +1,6 @@
+{
+  "name": "fiezel-api-analytics",
+  "private": true,
+  "type": "module",
+  "description": "Modul analytics privasi-maksimal untuk Worker fiezel-api. TANPA DEPENDENSI: tidak ada node_modules yang boleh muncul di sini (lihat cf-b1-arch-worker.md B1-R5). Berkas ini hanya menyatakan ESM supaya Node bisa memuatnya langsung di gerbang."
+}

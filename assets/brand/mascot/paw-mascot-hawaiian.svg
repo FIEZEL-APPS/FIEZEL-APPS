@@ -1,0 +1,234 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" width="100%" height="100%" role="img" aria-label="PAW Maskot Resmi FIEZEL — Kostum Hawai Hula">
+  <defs>
+    <clipPath id="fzcEyeL-hawaii">
+      <circle cx="126" cy="98" r="16"/>
+    </clipPath>
+    <clipPath id="fzcEyeR-hawaii">
+      <circle cx="194" cy="98" r="16"/>
+    </clipPath>
+    <linearGradient id="leafGrad1" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#4CAF50"/>
+      <stop offset="100%" stop-color="#1B5E20"/>
+    </linearGradient>
+    <linearGradient id="leafGrad2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#81C784"/>
+      <stop offset="100%" stop-color="#2E7D32"/>
+    </linearGradient>
+    <linearGradient id="flowerPlumeria" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="60%" stop-color="#FFF9C4"/>
+      <stop offset="100%" stop-color="#FBC02D"/>
+    </linearGradient>
+    <linearGradient id="flowerHibiscus" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF5252"/>
+      <stop offset="100%" stop-color="#C2185B"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Ground Shadow -->
+  <ellipse class="fz-shadow" cx="160" cy="296" rx="90" ry="11" fill="#33201F" opacity="0.12"/>
+
+  <!-- ROOT CHARACTER GROUP -->
+  <g class="fz-all">
+    
+    <!-- 1. TAIL (100% Exact Landing Page Anatomy & Continuous Stroke) -->
+    <g class="fz-tail">
+      <path d="M 212 244 C 266 258 298 238 296 200 C 294 178 282 163 268 158" stroke="#EDB93A" stroke-width="25" stroke-linecap="round" fill="none"/>
+      <path d="M 284 172 C 276 163 270 159 268 158" stroke="#8C2233" stroke-width="25" stroke-linecap="round" fill="none"/>
+    </g>
+
+    <!-- 2. BODY & TORSO (100% Canonical Landing Page Spec) -->
+    <g class="fz-body">
+      <g class="fz-torso">
+        <!-- Main Torso Box -->
+        <rect x="102" y="164" width="116" height="96" rx="42" fill="#FFD94F"/>
+        
+        <!-- Chest Patch & FIEZEL Pawprint Emblem -->
+        <g class="fz-chest">
+          <ellipse cx="160" cy="226" rx="36" ry="28" fill="#FFF4DA"/>
+          <g class="fz-emblem" transform="translate(160,225) scale(1.75) translate(-12.6,-12.45)">
+            <g id="fz-pawprint-hawaii" fill="#8C2233">
+              <rect x="4.6" y="7.5" width="3.1" height="4.6" rx="1.55"/>
+              <rect x="8.9" y="5.1" width="3.1" height="7" rx="1.55"/>
+              <rect x="13.2" y="3.4" width="3.1" height="8.7" rx="1.55"/>
+              <rect x="17.5" y="6.2" width="3.1" height="5.9" rx="1.55"/>
+              <path d="M12.6 14c3.5 0 5.9 1.9 5.9 4.1 0 2-2 3.4-5.9 3.4s-5.9-1.4-5.9-3.4c0-2.2 2.4-4.1 5.9-4.1Z"/>
+            </g>
+          </g>
+        </g>
+
+        <!-- PĀʻŪ (HAWAIIAN HULA GRASS SKIRT) -->
+        <g class="fz-hula-skirt">
+          <!-- Shadow Base of Skirt -->
+          <path d="M100 226 Q160 236 220 226 L226 274 Q160 286 94 274 Z" fill="#1B5E20" opacity="0.75"/>
+          
+          <!-- Left Grass Blades -->
+          <g class="fz-skirt-blade-left">
+            <path d="M102 224 Q88 248 92 278 Q106 254 114 226 Z" fill="url(#leafGrad1)"/>
+            <path d="M110 224 Q98 252 104 282 Q118 254 122 226 Z" fill="url(#leafGrad2)"/>
+            <path d="M118 225 Q108 255 116 284 Q128 256 130 226 Z" fill="url(#leafGrad1)"/>
+          </g>
+          
+          <!-- Center Grass Blades -->
+          <g class="fz-skirt-blade-center">
+            <path d="M126 226 Q122 258 128 285 Q138 258 138 227 Z" fill="url(#leafGrad2)"/>
+            <path d="M136 227 Q134 260 142 287 Q150 260 148 227 Z" fill="url(#leafGrad1)"/>
+            <path d="M146 227 Q148 262 154 288 Q162 262 158 227 Z" fill="url(#leafGrad2)"/>
+            <path d="M156 227 Q162 262 168 288 Q174 262 168 227 Z" fill="url(#leafGrad1)"/>
+            <path d="M166 227 Q174 260 180 287 Q188 260 178 227 Z" fill="url(#leafGrad2)"/>
+            <path d="M176 226 Q186 258 194 285 Q200 258 188 227 Z" fill="url(#leafGrad1)"/>
+          </g>
+          
+          <!-- Right Grass Blades -->
+          <g class="fz-skirt-blade-right">
+            <path d="M186 225 Q200 255 206 284 Q214 256 198 226 Z" fill="url(#leafGrad2)"/>
+            <path d="M196 224 Q212 252 218 282 Q224 254 208 226 Z" fill="url(#leafGrad1)"/>
+            <path d="M206 224 Q226 248 230 278 Q234 254 218 226 Z" fill="url(#leafGrad2)"/>
+          </g>
+          
+          <!-- Skirt Front Layer & Golden Band with Hibiscus Belt Brooch -->
+          <g class="fz-skirt-layer-front">
+            <path d="M102 224 C138 236 182 236 218 224 C214 254 186 284 160 288 C134 284 106 254 102 224 Z" fill="#4CAF50" opacity="0.35"/>
+            <path d="M98 223 Q160 236 222 223 Q222 229 220 231 Q160 242 100 231 Z" fill="#FDD835"/>
+            <circle cx="160" cy="232" r="5.5" fill="#FF5252"/>
+            <circle cx="160" cy="232" r="2.5" fill="#FFF59D"/>
+          </g>
+        </g>
+
+        <!-- Feet (100% Landing Page Pill Shape) -->
+        <g class="fz-legs">
+          <rect class="fz-foot fz-foot-l" x="108" y="252" width="48" height="22" rx="11" fill="#EDB93A"/>
+          <rect class="fz-foot fz-foot-r" x="164" y="252" width="48" height="22" rx="11" fill="#EDB93A"/>
+        </g>
+      </g>
+
+      <!-- 3. HEAD & HAKU LEI TROPICAL FLOWER CROWN -->
+      <g class="fz-head">
+        <!-- Left Ear -->
+        <g class="fz-ear fz-ear-l">
+          <path d="M76 66 L95 0 L140 34 Q104 66 76 66 Z" fill="#FFD94F"/>
+          <path d="M90 52 L 101 17 L 125 35 Z" fill="#8C2233"/>
+        </g>
+        
+        <!-- Right Ear -->
+        <g class="fz-ear fz-ear-r">
+          <path d="M244 66 L225 0 L180 34 Q216 66 244 66 Z" fill="#FFD94F"/>
+          <path d="M230 52 L 219 17 L 195 35 Z" fill="#8C2233"/>
+        </g>
+
+        <!-- Head Base Sphere -->
+        <circle cx="160" cy="106" r="88" fill="#FFD94F"/>
+
+        <!-- Face Details -->
+        <g class="fz-face">
+          <!-- Muzzle Patch -->
+          <ellipse cx="160" cy="140" rx="36" ry="25" fill="#FFF4DA"/>
+          <!-- Nose -->
+          <path d="M153 126 L 167 126 L 160 136 Z" fill="#8C2233"/>
+          <!-- Blushing Cheeks -->
+          <circle class="fz-blush" cx="102" cy="126" r="11" fill="#F0A0AC"/>
+          <circle class="fz-blush" cx="218" cy="126" r="11" fill="#F0A0AC"/>
+          
+          <!-- Eyes with Sparkling Highlights -->
+          <g class="fz-eyes">
+            <g class="fz-eye fz-eye-l">
+              <circle cx="126" cy="98" r="16" fill="#33201F"/>
+              <g class="fz-pupil" clip-path="url(#fzcEyeL-hawaii)">
+                <circle cx="130.5" cy="92.5" r="5.5" fill="#fff"/>
+                <circle cx="121.5" cy="104" r="2.8" fill="#fff" opacity=".7"/>
+              </g>
+            </g>
+            <g class="fz-eye fz-eye-r">
+              <circle cx="194" cy="98" r="16" fill="#33201F"/>
+              <g class="fz-pupil" clip-path="url(#fzcEyeR-hawaii)">
+                <circle cx="198.5" cy="92.5" r="5.5" fill="#fff"/>
+                <circle cx="189.5" cy="104" r="2.8" fill="#fff" opacity=".7"/>
+              </g>
+            </g>
+          </g>
+
+          <!-- Cheerful Smile -->
+          <g class="fz-mouth">
+            <path class="fz-m fz-m-smile" d="M148 148 C 154 155 166 155 172 148" stroke="#33201F" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+          </g>
+        </g>
+
+        <!-- HAKU LEI (TROPICAL HAWAIIAN FLOWER CROWN ON HEAD) -->
+        <g class="fz-haku-lei">
+          <!-- Tropical Green Leaves Crown -->
+          <g class="fz-lei-leaves" fill="#2E7D32">
+            <path d="M96 52 C84 40 102 30 114 44 Z"/>
+            <path d="M116 42 C108 26 128 22 136 36 Z"/>
+            <path d="M142 34 C148 16 166 16 168 32 Z" fill="#388E3C"/>
+            <path d="M178 36 C186 20 206 24 200 40 Z"/>
+            <path d="M202 44 C216 32 232 44 220 54 Z"/>
+          </g>
+
+          <!-- Flower 1: Pink Hibiscus -->
+          <g transform="translate(108, 48) scale(0.95)">
+            <g fill="url(#flowerHibiscus)">
+              <circle cx="0" cy="-7" r="6"/><circle cx="7" cy="-2" r="6"/><circle cx="4" cy="6" r="6"/><circle cx="-4" cy="6" r="6"/><circle cx="-7" cy="-2" r="6"/>
+            </g>
+            <circle cx="0" cy="0" r="3.5" fill="#FFD54F"/><circle cx="0" cy="0" r="1.5" fill="#E65100"/>
+          </g>
+          
+          <!-- Flower 2: White-Yellow Plumeria -->
+          <g transform="translate(138, 40) scale(1.05)">
+            <g fill="url(#flowerPlumeria)">
+              <path d="M0 0 C-6 -10 2 -16 6 -8 Z"/><path d="M0 0 C6 -10 14 -4 8 4 Z"/><path d="M0 0 C10 0 12 10 2 8 Z"/><path d="M0 0 C2 10 -8 10 -6 2 Z"/><path d="M0 0 C-10 4 -12 -6 -2 -6 Z"/>
+            </g>
+            <circle cx="1" cy="0" r="3" fill="#FBC02D"/>
+          </g>
+          
+          <!-- Flower 3: Red Grand Hibiscus (Center) -->
+          <g transform="translate(164, 38) scale(1.15)">
+            <g fill="url(#flowerHibiscus)">
+              <circle cx="0" cy="-7.5" r="6.5"/><circle cx="7.5" cy="-2.5" r="6.5"/><circle cx="4.5" cy="6.5" r="6.5"/><circle cx="-4.5" cy="6.5" r="6.5"/><circle cx="-7.5" cy="-2.5" r="6.5"/>
+            </g>
+            <circle cx="0" cy="0" r="4" fill="#FFF59D"/><circle cx="0" cy="0" r="2" fill="#E91E63"/>
+          </g>
+          
+          <!-- Flower 4: White Plumeria -->
+          <g transform="translate(190, 42) scale(1.02)">
+            <g fill="url(#flowerPlumeria)">
+              <path d="M0 0 C-6 -10 2 -16 6 -8 Z"/><path d="M0 0 C6 -10 14 -4 8 4 Z"/><path d="M0 0 C10 0 12 10 2 8 Z"/><path d="M0 0 C2 10 -8 10 -6 2 Z"/><path d="M0 0 C-10 4 -12 -6 -2 -6 Z"/>
+            </g>
+            <circle cx="0" cy="0" r="2.8" fill="#FBC02D"/>
+          </g>
+          
+          <!-- Flower 5: Pink Blossom -->
+          <g transform="translate(216, 50) scale(0.92)">
+            <g fill="#FF4081">
+              <circle cx="0" cy="-6.5" r="5.5"/><circle cx="6.5" cy="-2" r="5.5"/><circle cx="4" cy="5.5" r="5.5"/><circle cx="-4" cy="5.5" r="5.5"/><circle cx="-6.5" cy="-2" r="5.5"/>
+            </g>
+            <circle cx="0" cy="0" r="3" fill="#FFEB3B"/>
+          </g>
+        </g>
+      </g>
+
+      <!-- 4. ARMS WITH KŪPEʻE (WRIST FLOWER LEI) -->
+      <!-- Left Arm & Wrist Flower -->
+      <g class="fz-arm fz-arm-l">
+        <ellipse cx="115" cy="208" rx="14" ry="30" fill="#FFD94F"/>
+        <g class="fz-kupee-l" transform="translate(114, 226)">
+          <rect x="-12" y="-4" width="24" height="8" rx="4" fill="#2E7D32"/>
+          <circle cx="-6" cy="0" r="3.5" fill="#FF5252"/>
+          <circle cx="0" cy="0" r="4" fill="#FFF59D"/>
+          <circle cx="6" cy="0" r="3.5" fill="#FF80AB"/>
+        </g>
+      </g>
+
+      <!-- Right Arm & Wrist Flower -->
+      <g class="fz-arm fz-arm-r">
+        <ellipse cx="198" cy="204" rx="14" ry="30" fill="#FFD94F"/>
+        <g class="fz-kupee-r" transform="translate(199, 222)">
+          <rect x="-12" y="-4" width="24" height="8" rx="4" fill="#2E7D32"/>
+          <circle cx="-6" cy="0" r="3.5" fill="#FF80AB"/>
+          <circle cx="0" cy="0" r="4" fill="#FFF59D"/>
+          <circle cx="6" cy="0" r="3.5" fill="#FF5252"/>
+        </g>
+      </g>
+
+    </g>
+  </g>
+</svg>

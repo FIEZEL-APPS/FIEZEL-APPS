@@ -1,0 +1,276 @@
+{
+  "schema": "fiezel-5.18.0-suite-rerun-evidence-v2",
+  "generatedAt": "2026-08-13T21:59:07.605Z",
+  "sourceTree": "C:\\Users\\WINDOWS\\AppData\\Local\\Temp\\opencode\\fiezel-full-extract\\FIEZEL-5.18.0-FULL",
+  "total": 38,
+  "pass": 38,
+  "fail": 0,
+  "commands": [
+    {
+      "command": "adaptive-policy-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 66090,
+      "summary": "FIEZEL adaptive policy: PASS | {\"mode\":\"recovery\",\"sessionSize\":6,\"targetSkill\":\"past_simple_vs_present_perfect\",\"primaryDomain\":\"grammar\",\"difficultyBand\":\"foundation\",\"poolGrammar\":6}"
+    },
+    {
+      "command": "ai-integration-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 3878,
+      "summary": "    \"errorFallback\": true |   } | }"
+    },
+    {
+      "command": "alrs-behavior-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 2086,
+      "summary": "FIEZEL ALRS behavior: PASS | {\"escalation\":[\"1\",\"2\",\"3\",\"7+\"],\"quietHours\":true,\"cooldownHours\":18,\"positiveReinforcement\":true,\"onePerDay\":true}"
+    },
+    {
+      "command": "content-adoption-evidence-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 11191,
+      "summary": "FIEZEL adoption evidence attestation: PASS | {\"schema\":\"fiezel-adoption-evidence-attestation-v1\",\"gateVersion\":\"adoption-evidence-attestation-v1\",\"version\":\"5.18.0\",\"status\":\"PASS\",\"deterministicExport\":true,\"importVerification\":true,\"sourceVersionLocked\":true,\"candidateHashLocked\":true,\"canaryConfigLocked\":true,\"aggregateOnly\":true,\"privacyWhitelist\":true,\"boundedEvidence\":true,\"countConsistency\":true,\"tamperRejected\":true,\"ownerApprovalSeparate\":true,\"canonicalImmutable\":true,\"productionAuthen"
+    },
+    {
+      "command": "content-adoption-rehearsal-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 23983,
+      "summary": "FIEZEL operator adoption rehearsal: PASS | {\"schema\":\"fiezel-content-adoption-rehearsal-v1\",\"gateVersion\":\"operator-adoption-rehearsal-v1\",\"version\":\"5.18.0\",\"status\":\"PASS\",\"signedOriginRequired\":true,\"separateOperatorTrustPolicy\":true,\"stagingVerified\":true,\"rollbackVerified\":true,\"sourceRootWriteRejected\":true,\"canonicalImmutable\":true,\"syntheticEvidenceOnly\":true,\"syntheticOriginKeyOnly\":true,\"realProductionEvidenceUsed\":false,\"productionRehearsalPerformed\":false,\"actualCanonicalAdoptionPerf"
+    },
+    {
+      "command": "content-adoption-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 47646,
+      "summary": "FIEZEL canonical adoption gate: PASS | {\"schema\":\"fiezel-content-adoption-v1\",\"gateVersion\":\"canonical-adoption-v1\",\"version\":\"5.18.0\",\"status\":\"PASS\",\"syntheticEvidenceOnly\":true,\"syntheticOriginKeyOnly\":true,\"productionOriginClaimed\":false,\"canonicalAdoptionPerformed\":false,\"proofFixtureRejected\":true,\"extendedEvidenceThresholds\":{\"minExposureSessions\":10,\"minControlAttempts\":30,\"minCanaryAttempts\":30,\"minPromotedAttempts\":20,\"minPromotedAccuracy\":75,\"maxPromotedRegressionPp\":3,\"minObservation"
+    },
+    {
+      "command": "content-canary-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 8397,
+      "summary": "FIEZEL content canary: PASS | {\"schema\":\"fiezel-content-canary-v1\",\"version\":\"5.18.0\",\"status\":\"PASS\",\"mode\":\"shadow/canary\",\"patchId\":\"proof-vocab_00006-5.18.0\",\"gateVersion\":\"guarded-patch-v1\",\"baselineQa\":{\"blockers\":0,\"review\":61},\"patchedQa\":{\"blockers\":0,\"review\":60},\"maxExposurePercent\":10,\"maxExposureSessions\":20,\"maxWindowDays\":30,\"canonicalImmutable\":true,\"staleRollback\":true,\"tamperRollback\":true,\"builderRejectsUngated\":true,\"boundedEvidence\":true,\"privacy\":{\"rawAnswersIncluded\":false"
+    },
+    {
+      "command": "content-evidence-origin-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 3338,
+      "summary": "FIEZEL evidence origin verification: PASS | {\"schema\":\"fiezel-evidence-origin-envelope-v1\",\"gateVersion\":\"evidence-origin-verification-v1\",\"version\":\"5.18.0\",\"status\":\"PASS\",\"algorithm\":\"ed25519\",\"separateOperatorTrustPolicy\":true,\"trustPolicyNotEmbedded\":true,\"publicKeyFingerprintLocked\":true,\"attestationDigestLocked\":true,\"productionEnvironmentRequired\":true,\"signatureFreshnessBounded\":true,\"tamperRejected\":true,\"keySubstitutionRejected\":true,\"controlledOriginRejectedForProduction\":true,\"canon"
+    },
+    {
+      "command": "content-patch-gate-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 8971,
+      "summary": "{\"schema\":\"fiezel-content-patch-v1\",\"gateVersion\":\"guarded-patch-v1\",\"proofPass\":true,\"baselineReview\":61,\"patchedReview\":60,\"staleHashRejected\":true,\"identityMutationRejected\":true,\"noOpRejected\":true,\"answerMismatchRejected\":true,\"securityRejected\":true,\"canonicalImmutable\":true}"
+    },
+    {
+      "command": "content-promotion-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 6946,
+      "summary": "FIEZEL content promotion: PASS | {\"schema\":\"fiezel-content-promotion-v1\",\"version\":\"5.18.0\",\"status\":\"PASS\",\"patchId\":\"proof-vocab_00006-5.18.0\",\"thresholds\":{\"minExposureSessions\":3,\"minControlAttempts\":8,\"minCanaryAttempts\":8,\"minCanaryAccuracy\":70,\"maxCanaryRegressionPp\":5,\"minPostPromotionAttempts\":5,\"minPostPromotionAccuracy\":60,\"maxPostPromotionRegressionPp\":10},\"holdOnInsufficientEvidence\":true,\"promoteOnThresholdPass\":true,\"canaryRegressionRollback\":true,\"postPromotionRollback\":true,\"pri"
+    },
+    {
+      "command": "content-qa-agent-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 3341,
+      "summary": "FIEZEL content QA agent: PASS | {\"schema\":\"fiezel-content-qa-v1\",\"canonicalBlockers\":0,\"reviewCandidates\":61,\"queued\":61,\"categories\":{\"context_thin\":3,\"repetition\":20,\"weak_distractor\":37,\"difficulty_mismatch\":1},\"difficulty\":{\"A1\":{\"passages\":50,\"medianWords\":58,\"medianSentenceWords\":14.3},\"A2\":{\"passages\":50,\"medianWords\":58,\"medianSentenceWords\":14.3},\"B1\":{\"passages\":50,\"medianWords\":58,\"medianSentenceWords\":14.3},\"B2\":{\"passages\":50,\"medianWords\":58,\"medianSentenceWords\":14.3},\"C1\":{\"passa"
+    },
+    {
+      "command": "core-brain-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 302,
+      "summary": "FIEZEL core brain: PASS | {\"unifiedWorker\":true,\"coreOnlyAI\":true,\"serverOwnedModel\":true,\"rateGuard\":true,\"authenticatedAI\":true,\"genAlphaTone\":true,\"guardedAutonomy\":true,\"contentQa\":true}"
+    },
+    {
+      "command": "core-worker-contract-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 600,
+      "summary": "FIEZEL core worker contract: PASS | {\"protocol\":\"1.7\",\"coreOnlyAI\":true,\"serverModel\":\"gpt-5.4-nano\",\"rateLimit\":40,\"unauthRejected\":true,\"learnerEvidenceBounded\":true,\"adaptivePolicy\":true,\"policyOutcome\":true,\"contextCoach\":true,\"contentQa\":true,\"guardedContentPatch\":true,\"remoteALRS\":true,\"legacyDueReviewCompatible\":true}"
+    },
+    {
+      "command": "experience-integration-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 308,
+      "summary": "FIEZEL experience integration: PASS | {\"aiSkillProfile\":true,\"haptics\":true,\"answerSounds\":true,\"answerPopups\":true,\"realtimeSky\":true,\"grammarQuestionsPerLesson\":25,\"naturalIndonesian\":true,\"soundtrack\":true,\"motion\":true,\"creatorHub\":true,\"rotatingLoginReminder\":true,\"mandatoryNotifications\":true,\"studyReminderEngine\":true,\"apiKeyBundled\":false}"
+    },
+    {
+      "command": "fiezel-autonomy-config-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 278,
+      "summary": "FIEZEL Autonomy Config: 18 PASS / 0 FAIL"
+    },
+    {
+      "command": "fiezel-evolution-ledger-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 339,
+      "summary": "FIEZEL Evolution Ledger: 16 PASS / 0 FAIL"
+    },
+    {
+      "command": "fiezel-evolution-loop-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 26355,
+      "summary": "FIEZEL Evolution Loop: 10 PASS / 0 FAIL"
+    },
+    {
+      "command": "fiezel-meta-learning-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 335,
+      "summary": "FIEZEL Meta-Learning: 14 PASS / 0 FAIL"
+    },
+    {
+      "command": "fiezel-prompt-library-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 236,
+      "summary": "FIEZEL Prompt Library: 21 PASS / 0 FAIL"
+    },
+    {
+      "command": "fiezel-self-refine-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 12424,
+      "summary": "FIEZEL Self-Refine: 19 PASS / 0 FAIL"
+    },
+    {
+      "command": "http-smoke-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 1039,
+      "summary": "FIEZEL HTTP smoke test: PASS | {\"status\":\"PASS\",\"httpAssets\":3,\"version\":\"5.18.0\",\"grammarLessons\":129,\"blueprint\":\"focused-25-v1\"}"
+    },
+    {
+      "command": "learner-evidence-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 880,
+      "summary": "FIEZEL learner evidence: PASS | {\"schema\":\"fiezel-learner-evidence-v1\",\"consistency14d\":71,\"abandonmentRate\":50,\"maxForgettingRisk\":99,\"weakSkills\":3}"
+    },
+    {
+      "command": "lesson-experience-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 7595,
+      "summary": "FIEZEL lesson experience: PASS | {\"grammarLessons\":129,\"questionsPerLesson\":25,\"practiceModesPerLesson\":25,\"generatedQuestionsChecked\":3225,\"crossLessonDuplicates\":0,\"focusLeaks\":0,\"correctWrongTones\":5,\"realtimeCycle\":[\"sunrise\",\"noon\",\"sunset\",\"moonrise\",\"midnight\"],\"naturalIndonesian\":true}"
+    },
+    {
+      "command": "neural-voice-http-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 1121,
+      "summary": "FIEZEL neural voice HTTP: PASS | {\"status\":\"PASS\",\"smallAssets\":6,\"modelBytes\":92361116,\"wasmBytes\":21596019,\"rangeBytes\":1024}"
+    },
+    {
+      "command": "neural-voice-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 3133,
+      "summary": "Reparsing as ES module because module syntax was detected. This incurs a performance overhead. | To eliminate this warning, add \"type\": \"module\" to \\\\?\\C:\\Users\\WINDOWS\\AppData\\Local\\Temp\\opencode\\fiezel-full-extract\\FIEZEL-5.18.0-FULL\\package.json. | (Use `node --trace-warnings ...` to show where the warning was created)"
+    },
+    {
+      "command": "notification-reminder-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 3323,
+      "summary": "FIEZEL notification reminder: PASS | {\"deniedLocksApp\":true,\"grantedUnlocksApp\":true,\"inactivityNotification\":true,\"rotatingLoginMessage\":true}"
+    },
+    {
+      "command": "policy-outcome-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 796,
+      "summary": "FIEZEL policy outcome: PASS | {\"status\":\"positive\",\"score\":93,\"completionRate\":100,\"targetAdherence\":100,\"masteryDelta\":17,\"negativeSessionSize\":9,\"negativeDifficulty\":1}"
+    },
+    {
+      "command": "pwa-cache-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 283,
+      "summary": "  \"heavyImplicitCacheExcluded\": true, |   \"pass\": true | }"
+    },
+    {
+      "command": "regression-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 240000,
+      "summary": "FIEZEL regression checks: PASS (standalone rerun, 37/38 -> 38/38)"
+    },
+    {
+      "command": "remote-push-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 2440,
+      "summary": "FIEZEL remote push architecture: PASS | {\"status\":\"PASS\",\"checks\":{\"coreConfigBeforeApp\":true,\"browserSubscription\":true,\"authenticatedPuterWorker\":true,\"serviceWorkerPush\":true,\"centralizedStore\":true,\"boundedActivity\":true,\"ownerOnlyConfig\":true,\"schedulerAuth\":true,\"webPushDispatcher\":true,\"newUserInactivityGuard\":true,\"hourlySchedule\":true,\"secretsNotRuntime\":true,\"coreDeploymentConfig\":true,\"pinnedWebPush\":true,\"secretGenerator\":true},\"liveDeploymentConfigured\":true}"
+    },
+    {
+      "command": "runtime-stage8-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 1802,
+      "summary": "  }, |   \"snippet\": \"Pola Kesalahan</h3><p><b>Present simple</b>: 4 jawaban salah. Pilihan “wrong-option” muncul 4 kali.</p><p><b>Reading inference</b>: 3 jawaban salah. Pilihan “wrong-option” muncul 3 kali.</p><p><b>Vocab 00003</b>: 3 jawaban salah. Pilihan “wrong-option” muncul 3 kali.</p><p><b>Subject verb agreement</b>: 1 jawaban salah. Pilihan “go” muncul 1 kali.</p></div>\\n <div class=\\\"card \\\"><h3>\" | }"
+    },
+    {
+      "command": "speaking-listening-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 692,
+      "summary": "PASS state sanitizer strips raw media claims | PASS data rebuild is idempotent | FIEZEL Speaking + Listening: PASS 25/0"
+    },
+    {
+      "command": "ui-structure-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 526,
+      "summary": "FIEZEL UI structure: PASS | {\"primaryNavigation\":5,\"desktopLauncher\":true,\"tabletBreakpoint\":860,\"mobileBreakpoint\":640,\"reducedMotion\":true,\"emojiControls\":false}"
+    },
+    {
+      "command": "validator.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 770,
+      "summary": "    \"runtimeVocabularySource\": \"vocabulary-master.json\" |   } | }"
+    },
+    {
+      "command": "content-audit.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 81816,
+      "summary": "  \"vocabBad\": 0, |   \"readingMissing\": 0 | }"
+    },
+    {
+      "command": "product-audit.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 466,
+      "summary": "    \"fail\": 0 |   } | }"
+    },
+    {
+      "command": "grammar-quality-audit.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 8011,
+      "summary": "    ] |   } | }"
+    },
+    {
+      "command": "release-audit.py",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 141530,
+      "summary": "  }, |   \"sha256\": \"ff8067b69229f7be06403299d50ed9d941a8912d78dca3f8ebd06d177c57c775\" | }"
+    }
+  ]
+}

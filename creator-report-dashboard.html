@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f3f1eb">
+  <title>FIEZEL Creator Report</title>
+  <style>
+    :root{--bg:#f3f1eb;--paper:#fffefa;--ink:#11172a;--muted:#6a6e7d;--line:#dfddd6;--accent:#6f5de3;--green:#278268}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 92% 0,rgba(216,179,107,.16),transparent 26rem),var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    main{max-width:1080px;margin:auto;padding:28px 22px 70px}.top{display:flex;justify-content:space-between;align-items:center;gap:16px}.brand{font-size:1.15rem;font-weight:900;letter-spacing:-.05em}.brand span{color:var(--accent)}.secure{color:var(--muted);font-size:.72rem}
+    .hero{margin-top:28px;padding:clamp(28px,5vw,52px);border-radius:28px;background:linear-gradient(135deg,#0b1020,#202047);color:#f8f8fb;box-shadow:0 28px 80px rgba(10,14,31,.18)}.hero small{color:#b6b8c8;font-size:.66rem;letter-spacing:.15em}.hero h1{font-size:clamp(2.2rem,6vw,4.6rem);letter-spacing:-.06em;line-height:.98;margin:12px 0}.hero p{max-width:640px;color:#bfc2d0;line-height:1.65}
+    .connect{display:grid;grid-template-columns:1fr auto auto;gap:9px;margin:20px 0}.connect input{min-width:0;padding:14px 15px;border:1px solid var(--line);border-radius:13px;background:var(--paper);font:inherit;color:var(--ink)}button{padding:13px 18px;border:1px solid #11172a;border-radius:13px;background:#11172a;color:white;font:inherit;font-weight:700;cursor:pointer}button.secondary{background:var(--paper);color:var(--ink);border-color:var(--line)}button:disabled{opacity:.45;cursor:not-allowed}
+    .status{min-height:23px;color:var(--muted);font-size:.77rem}.status.error{color:#a54457}
+    .summary{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:20px 0}.metric{padding:19px;border:1px solid var(--line);border-radius:17px;background:rgba(255,254,250,.92)}.metric small{display:block;color:var(--muted);font-size:.63rem;letter-spacing:.1em;text-transform:uppercase}.metric strong{display:block;margin-top:8px;font-size:1.45rem;letter-spacing:-.03em}
+    .content{display:grid;grid-template-columns:.9fr 1.1fr;gap:12px}.panel{padding:22px;border:1px solid var(--line);border-radius:20px;background:rgba(255,254,250,.94)}.panel h2{font-size:1.05rem;margin:0 0 16px}.domains{display:grid;gap:18px}.domain-head{display:flex;justify-content:space-between;font-size:.78rem}.bar{height:8px;margin-top:7px;border-radius:999px;background:#e8e5ee;overflow:hidden}.bar i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#9e91ef,var(--accent))}
+    .weak{display:grid;gap:8px;margin-top:22px}.weak-row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid var(--line);font-size:.75rem}.weak-row span:last-child{color:var(--muted)}
+    .report-list{display:grid;gap:8px;max-height:560px;overflow:auto}.report{display:grid;grid-template-columns:1fr auto;gap:6px;padding:14px 0;border-bottom:1px solid var(--line)}.report b{font-size:.82rem}.report time,.report span{color:var(--muted);font-size:.7rem}.report strong{grid-row:1/3;grid-column:2;align-self:center;color:var(--green);font-size:1.05rem}
+    .empty{padding:28px;text-align:center;color:var(--muted);font-size:.82rem}.foot{margin-top:20px;color:var(--muted);font-size:.7rem;line-height:1.6}
+    @media(max-width:820px){.summary{grid-template-columns:repeat(2,1fr)}.metric:last-child{grid-column:1/-1}.content{grid-template-columns:1fr}}@media(max-width:600px){main{padding:18px 13px 60px}.connect{grid-template-columns:1fr}.connect button{width:100%}.hero{border-radius:22px}.top{align-items:flex-start;flex-direction:column}}
+  </style>
+</head>
+<body>
+  <main>
+    <div class="top"><div class="brand">FIE<span>ZEL</span> · Creator Report</div><div class="secure">Owner-only Puter Worker view</div></div>
+    <section class="hero"><small>FIEZEL LEARNING INTELLIGENCE</small><h1>Progress yang bisa ditindaklanjuti.</h1><p>Ringkasan akses dan sesi belajar masuk otomatis setelah consent aktif. Dashboard tidak menerima password, API key, isi jawaban mentah, atau riwayat browser.</p></section>
+    <div class="connect">
+      <input id="endpoint" type="url" aria-label="Endpoint Puter Worker" placeholder="https://fiezel-creator-hub.puter.work">
+      <button type="button" id="load">Muat laporan</button>
+      <button type="button" id="csv" class="secondary" disabled>Unduh CSV</button>
+    </div>
+    <div id="status" class="status" role="status" aria-live="polite">Masukkan endpoint Creator Hub atau jalankan setup satu klik.</div>
+    <section class="summary">
+      <div class="metric"><small>Level</small><strong id="level">—</strong></div>
+      <div class="metric"><small>Akurasi</small><strong id="accuracy">—</strong></div>
+      <div class="metric"><small>Total attempts</small><strong id="attempts">—</strong></div>
+      <div class="metric"><small>Streak</small><strong id="streak">—</strong></div>
+      <div class="metric"><small>Laporan</small><strong id="count">0</strong></div>
+    </section>
+    <section class="content">
+      <article class="panel"><h2>Skill profile terbaru</h2><div id="domains" class="domains"><div class="empty">Belum ada data.</div></div><div id="weak" class="weak"></div></article>
+      <article class="panel"><h2>Aktivitas terkini</h2><div id="reports" class="report-list"><div class="empty">Belum ada laporan.</div></div></article>
+      <article class="panel"><h2>Masukan pengguna</h2><div id="feedbackTop" class="weak"></div><div id="feedbackList" class="report-list"><div class="empty">Belum ada masukan.</div></div></article>
+    </section>
+    <p class="foot">Creator Hub terikat ke akun learner pertama yang mengirim laporan. Dashboard hanya dapat dibuka oleh akun Puter yang memiliki Worker tersebut.</p>
+  </main>
+  <script src="https://js.puter.com/v2/"></script>
+  <script>
+    (function(){
+      var reports=[];
+      var endpointInput=document.getElementById('endpoint');
+      var status=document.getElementById('status');
+      var loadButton=document.getElementById('load');
+      var csvButton=document.getElementById('csv');
+      var stored=localStorage.getItem('fiezel-creator-endpoint')||'';
+      try{
+        var appState=JSON.parse(localStorage.getItem('fiezel-v4-state')||'{}');
+        stored=stored||(appState.preferences&&appState.preferences.reportEndpoint)||'';
+      }catch{}
+      endpointInput.value=stored;
+      function validEndpoint(value){return /^https:\/\/[^/]+\.puter\.work\/?$/i.test(String(value||'').trim())}
+      function setText(id,value){document.getElementById(id).textContent=value}
+      function reportDate(value){try{return new Intl.DateTimeFormat('id-ID',{dateStyle:'medium',timeStyle:'short'}).format(new Date(value))}catch{return String(value||'')}}
+      function render(data){
+        reports=Array.isArray(data.reports)?data.reports:[];
+        var latest=reports[0]||null;
+        var summary=latest&&latest.summary||{};
+        setText('level',summary.estimatedLevel||'—');
+        setText('accuracy',summary.totalAccuracy==null?'—':summary.totalAccuracy+'%');
+        setText('attempts',summary.totalAttempts==null?'—':String(summary.totalAttempts));
+        setText('streak',summary.streakDays==null?'—':summary.streakDays+' hari');
+        setText('count',String(data.total==null?reports.length:data.total));
+        csvButton.disabled=!reports.length;
+
+        var domains=document.getElementById('domains');domains.replaceChildren();
+        var labels={vocabulary:'Vocabulary',grammar:'Grammar',reading:'Reading'};
+        Object.keys(labels).forEach(function(key){
+          var row=summary.domains&&summary.domains[key]||{};
+          var accuracy=row.recentAccuracy==null?row.accuracy:row.recentAccuracy;
+          var box=document.createElement('div');
+          var head=document.createElement('div');head.className='domain-head';
+          var name=document.createElement('span');name.textContent=labels[key];
+          var value=document.createElement('b');value.textContent=accuracy==null?'Belum terukur':accuracy+'%';
+          head.append(name,value);
+          var bar=document.createElement('div');bar.className='bar';
+          var fill=document.createElement('i');fill.style.width=Math.max(0,Math.min(100,Number(accuracy)||0))+'%';bar.append(fill);
+          box.append(head,bar);domains.append(box);
+        });
+        var weak=document.getElementById('weak');weak.replaceChildren();
+        (summary.weakSkills||[]).slice(0,5).forEach(function(item){
+          var row=document.createElement('div');row.className='weak-row';
+          var name=document.createElement('span');name.textContent=String(item.skill||'').replace(/_/g,' ');
+          var value=document.createElement('span');value.textContent='Prioritas '+String(item.priority||0)+' · '+String(item.errors||0)+' error';
+          row.append(name,value);weak.append(row);
+        });
+        var list=document.getElementById('reports');list.replaceChildren();
+        if(!reports.length){var empty=document.createElement('div');empty.className='empty';empty.textContent='Belum ada laporan.';list.append(empty)}
+        reports.slice(0,80).forEach(function(item){
+          var row=document.createElement('div');row.className='report';
+          var title=document.createElement('b');title.textContent=item.reason==='daily_access'?'Akses harian':'Sesi '+String(item.latestSession&&item.latestSession.type||'belajar');
+          var time=document.createElement('time');time.textContent=reportDate(item.receivedAt||item.createdAt);
+          var score=document.createElement('strong');score.textContent=item.latestSession?String(item.latestSession.accuracy)+'%':String(item.summary&&item.summary.totalAccuracy==null?'—':item.summary.totalAccuracy+'%');
+          row.append(title,time,score);list.append(row);
+        });
+      }
+      async function loadReports(){
+        var endpoint=endpointInput.value.trim().replace(/\/+$/,'');
+        if(!validEndpoint(endpoint)){status.className='status error';status.textContent='Endpoint harus berupa URL HTTPS dengan domain .puter.work.';return}
+        loadButton.disabled=true;status.className='status';status.textContent='Mengautentikasi akun creator dan memuat laporan…';
+        try{
+          var response=await puter.workers.exec(endpoint+'/api/reports',{method:'GET'});
+          var data=await response.json();
+          if(!response.ok||data.ok===false)throw new Error(data.error||'Creator Hub merespons '+response.status);
+          localStorage.setItem('fiezel-creator-endpoint',endpoint);
+          render(data);loadFeedback(endpoint);status.className='status';status.textContent='Sinkron terakhir '+reportDate(new Date().toISOString())+'. Auto-refresh aktif setiap 60 detik.';
+        }catch(error){
+          status.className='status error';status.textContent='Laporan tidak dapat dimuat: '+String(error&&error.message||error);
+        }finally{loadButton.disabled=false}
+      }
+      /**
+       * m025-102 masukan pengguna.
+       *
+       * OWNER memilih kiriman TERBUKA tanpa login, jadi teks di panel ini datang dari
+       * orang yang tidak dikenali. Karena itu setiap nilainya ditulis lewat textContent
+       * dan tidak pernah lewat innerHTML: masukan tidak tepercaya yang dirender sebagai
+       * markup adalah jalan masuk serangan ke halaman OWNER sendiri. Worker sudah
+       * membuang penanda sudut, tetapi itu jaring kedua - yang menentukan ada di sini.
+       *
+       * Pencarian nihil diringkas jadi baris berhitung lebih dulu, karena "dua belas
+       * orang mencari did" adalah prioritas konten, sedangkan dua belas baris identik
+       * hanyalah kebisingan.
+       */
+      function renderFeedback(data){
+        var top=document.getElementById('feedbackTop');
+        var list=document.getElementById('feedbackList');
+        top.textContent='';list.textContent='';
+        var queries=(data&&data.topQueries)||[];
+        queries.forEach(function(q){
+          var row=document.createElement('div');row.className='weak-row';
+          var name=document.createElement('span');name.textContent=String(q.query||'');
+          var value=document.createElement('span');value.textContent='dicari '+String(q.count||0)+'x, materi belum ada';
+          row.append(name,value);top.append(row);
+        });
+        var items=(data&&data.items)||[];
+        if(!items.length){var empty=document.createElement('div');empty.className='empty';empty.textContent='Belum ada masukan.';list.append(empty);return}
+        items.slice(0,40).forEach(function(item){
+          var row=document.createElement('div');row.className='report-row';
+          var title=document.createElement('span');
+          title.textContent=item.kind==='missing_material'?('Materi diminta: '+String(item.query||'')):String(item.message||'');
+          var time=document.createElement('time');time.textContent=reportDate(item.at);
+          var kind=document.createElement('strong');kind.textContent=item.kind==='missing_material'?'materi':'catatan';
+          row.append(title,time,kind);list.append(row);
+        });
+      }
+      async function loadFeedback(endpoint){
+        try{
+          var response=await puter.workers.exec(endpoint+'/api/feedback/list',{method:'GET'});
+          var data=await response.json();
+          if(!response.ok)return;   // bukan OWNER, atau belum ada apa-apa: diam saja
+          renderFeedback(data);
+        }catch(error){/* panel masukan tidak boleh menjatuhkan laporan utama */}
+      }
+      loadButton.addEventListener('click',loadReports);
+      csvButton.addEventListener('click',function(){
+        if(!reports.length)return;
+        var cells=[['received_at','reason','level','total_attempts','total_accuracy','streak_days','session_type','session_accuracy']];
+        reports.forEach(function(r){var s=r.summary||{},x=r.latestSession||{};cells.push([r.receivedAt||r.createdAt||'',r.reason||'',s.estimatedLevel||'',s.totalAttempts==null?'':s.totalAttempts,s.totalAccuracy==null?'':s.totalAccuracy,s.streakDays==null?'':s.streakDays,x.type||'',x.accuracy==null?'':x.accuracy])});
+        var csv=cells.map(function(row){return row.map(function(v){return '"'+String(v).replace(/"/g,'""')+'"'}).join(',')}).join('\n');
+        var url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));var a=document.createElement('a');a.href=url;a.download='fiezel-learning-report.csv';a.click();setTimeout(function(){URL.revokeObjectURL(url)},1000);
+      });
+      if(stored&&validEndpoint(stored))setTimeout(loadReports,400);
+      setInterval(function(){if(endpointInput.value&&document.visibilityState!=='hidden')loadReports()},60000);
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,279 @@
+{
+  "schema": "fiezel-5.18.0-suite-final-evidence-v1",
+  "version": "5.18.0",
+  "generatedAt": "2026-08-14T02:29:43.744Z",
+  "tree": "FIEZEL-5.18.0-FULL-RUN (run tree; worker sync after Autonomous Brain integration)",
+  "total": 38,
+  "pass": 38,
+  "fail": 0,
+  "status": "PASS",
+  "coreLiveSmokeExcluded": "core-live-smoke.mjs memerlukan live worker URL; tidak termasuk suite lokal (sama seperti suite sebelumnya)",
+  "commands": [
+    {
+      "command": "adaptive-policy-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 28291,
+      "summary": "{\"mode\":\"recovery\",\"sessionSize\":6,\"targetSkill\":\"past_simple_vs_present_perfect\",\"primaryDomain\":\"grammar\",\"difficultyBand\":\"foundation\",\"poolGrammar\":6}"
+    },
+    {
+      "command": "ai-integration-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 3168,
+      "summary": "}"
+    },
+    {
+      "command": "alrs-behavior-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 704,
+      "summary": "{\"escalation\":[\"1\",\"2\",\"3\",\"7+\"],\"quietHours\":true,\"cooldownHours\":18,\"positiveReinforcement\":true,\"onePerDay\":true}"
+    },
+    {
+      "command": "content-adoption-evidence-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 3189,
+      "summary": "{\"schema\":\"fiezel-adoption-evidence-attestation-v1\",\"gateVersion\":\"adoption-evidence-attestation-v1\",\"version\":\"5.18.0\",\"status\":\"PASS\",\"deterministicExport\":true,\"importVerification\":true,\"sourceVersionLocked\":true,\"candidateHashLocked\":true,\"canaryConfigLocked\":true,\"aggregateOnly\":true,\"privacyWhitelist\":true,\"boundedEvidence\":true,\"countConsistency\":true,\"tamperRejected\":true,\"ownerApprovalSeparate\":true,\"canonicalImmutable\":true,\"productionAuthenticityClaimed\":false}"
+    },
+    {
+      "command": "content-adoption-rehearsal-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 11343,
+      "summary": "{\"schema\":\"fiezel-content-adoption-rehearsal-v1\",\"gateVersion\":\"operator-adoption-rehearsal-v1\",\"version\":\"5.18.0\",\"status\":\"PASS\",\"signedOriginRequired\":true,\"separateOperatorTrustPolicy\":true,\"stagingVerified\":true,\"rollbackVerified\":true,\"sourceRootWriteRejected\":true,\"canonicalImmutable\":true,\"syntheticEvidenceOnly\":true,\"syntheticOriginKeyOnly\":true,\"realProductionEvidenceUsed\":false,\"productionRehearsalPerformed\":false,\"actualCanonicalAdoptionPerformed\":false}"
+    },
+    {
+      "command": "content-adoption-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 42582,
+      "summary": "{\"schema\":\"fiezel-content-adoption-v1\",\"gateVersion\":\"canonical-adoption-v1\",\"version\":\"5.18.0\",\"status\":\"PASS\",\"syntheticEvidenceOnly\":true,\"syntheticOriginKeyOnly\":true,\"productionOriginClaimed\":false,\"canonicalAdoptionPerformed\":false,\"proofFixtureRejected\":true,\"extendedEvidenceThresholds\":{\"minExposureSessions\":10,\"minControlAttempts\":30,\"minCanaryAttempts\":30,\"minPromotedAttempts\":20,\"minPromotedAccuracy\":75,\"maxPromotedRegressionPp\":3,\"minObservationDays\":7,\"minReleaseAuditPass\":111,\"minProductAuditPass\":44},\"ownerReleaseBoundary\":true,\"releaseAuditBoundary\":true,\"canaryGateDigestLocked"
+    },
+    {
+      "command": "content-canary-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 8546,
+      "summary": "{\"schema\":\"fiezel-content-canary-v1\",\"version\":\"5.18.0\",\"status\":\"PASS\",\"mode\":\"shadow/canary\",\"patchId\":\"proof-vocab_00006-5.18.0\",\"gateVersion\":\"guarded-patch-v1\",\"baselineQa\":{\"blockers\":0,\"review\":61},\"patchedQa\":{\"blockers\":0,\"review\":60},\"maxExposurePercent\":10,\"maxExposureSessions\":20,\"maxWindowDays\":30,\"canonicalImmutable\":true,\"staleRollback\":true,\"tamperRollback\":true,\"builderRejectsUngated\":true,\"boundedEvidence\":true,\"privacy\":{\"rawAnswersIncluded\":false,\"rawHistoryIncluded\":false}}"
+    },
+    {
+      "command": "content-evidence-origin-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 4476,
+      "summary": "{\"schema\":\"fiezel-evidence-origin-envelope-v1\",\"gateVersion\":\"evidence-origin-verification-v1\",\"version\":\"5.18.0\",\"status\":\"PASS\",\"algorithm\":\"ed25519\",\"separateOperatorTrustPolicy\":true,\"trustPolicyNotEmbedded\":true,\"publicKeyFingerprintLocked\":true,\"attestationDigestLocked\":true,\"productionEnvironmentRequired\":true,\"signatureFreshnessBounded\":true,\"tamperRejected\":true,\"keySubstitutionRejected\":true,\"controlledOriginRejectedForProduction\":true,\"canonicalImmutable\":true,\"syntheticOriginKeyOnly\":true,\"productionOriginClaimed\":false,\"privateKeyStoredInSource\":false}"
+    },
+    {
+      "command": "content-patch-gate-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 10281,
+      "summary": "{\"schema\":\"fiezel-content-patch-v1\",\"gateVersion\":\"guarded-patch-v1\",\"proofPass\":true,\"baselineReview\":61,\"patchedReview\":60,\"staleHashRejected\":true,\"identityMutationRejected\":true,\"noOpRejected\":true,\"answerMismatchRejected\":true,\"securityRejected\":true,\"canonicalImmutable\":true}"
+    },
+    {
+      "command": "content-promotion-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 21301,
+      "summary": "{\"schema\":\"fiezel-content-promotion-v1\",\"version\":\"5.18.0\",\"status\":\"PASS\",\"patchId\":\"proof-vocab_00006-5.18.0\",\"thresholds\":{\"minExposureSessions\":3,\"minControlAttempts\":8,\"minCanaryAttempts\":8,\"minCanaryAccuracy\":70,\"maxCanaryRegressionPp\":5,\"minPostPromotionAttempts\":5,\"minPostPromotionAccuracy\":60,\"maxPostPromotionRegressionPp\":10},\"holdOnInsufficientEvidence\":true,\"promoteOnThresholdPass\":true,\"canaryRegressionRollback\":true,\"postPromotionRollback\":true,\"priorRuntimeRollbackBlocksPromotion\":true,\"privacyFailClosed\":true,\"auditableBoundedLedger\":true,\"canonicalImmutable\":true,\"activeOverla"
+    },
+    {
+      "command": "content-qa-agent-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 4434,
+      "summary": "{\"schema\":\"fiezel-content-qa-v1\",\"canonicalBlockers\":0,\"reviewCandidates\":61,\"queued\":61,\"categories\":{\"context_thin\":3,\"repetition\":20,\"weak_distractor\":37,\"difficulty_mismatch\":1},\"difficulty\":{\"A1\":{\"passages\":50,\"medianWords\":58,\"medianSentenceWords\":14.3},\"A2\":{\"passages\":50,\"medianWords\":58,\"medianSentenceWords\":14.3},\"B1\":{\"passages\":50,\"medianWords\":58,\"medianSentenceWords\":14.3},\"B2\":{\"passages\":50,\"medianWords\":58,\"medianSentenceWords\":14.3},\"C1\":{\"passages\":50,\"medianWords\":58,\"medianSentenceWords\":14.3},\"C2\":{\"passages\":50,\"medianWords\":61,\"medianSentenceWords\":15}},\"readOnly\":true"
+    },
+    {
+      "command": "core-brain-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 347,
+      "summary": "{\"unifiedWorker\":true,\"coreOnlyAI\":true,\"serverOwnedModel\":true,\"rateGuard\":true,\"authenticatedAI\":true,\"genAlphaTone\":true,\"guardedAutonomy\":true,\"contentQa\":true}"
+    },
+    {
+      "command": "core-worker-contract-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 863,
+      "summary": "{\"protocol\":\"1.7\",\"coreOnlyAI\":true,\"serverModel\":\"gpt-5.4-nano\",\"rateLimit\":40,\"unauthRejected\":true,\"learnerEvidenceBounded\":true,\"adaptivePolicy\":true,\"policyOutcome\":true,\"contextCoach\":true,\"contentQa\":true,\"guardedContentPatch\":true,\"remoteALRS\":true,\"legacyDueReviewCompatible\":true}"
+    },
+    {
+      "command": "experience-integration-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 357,
+      "summary": "{\"aiSkillProfile\":true,\"haptics\":true,\"answerSounds\":true,\"answerPopups\":true,\"realtimeSky\":true,\"grammarQuestionsPerLesson\":25,\"naturalIndonesian\":true,\"soundtrack\":true,\"motion\":true,\"creatorHub\":true,\"rotatingLoginReminder\":true,\"mandatoryNotifications\":true,\"studyReminderEngine\":true,\"apiKeyBundled\":false}"
+    },
+    {
+      "command": "fiezel-autonomy-config-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 327,
+      "summary": "FIEZEL Autonomy Config: 18 PASS / 0 FAIL"
+    },
+    {
+      "command": "fiezel-evolution-ledger-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 414,
+      "summary": "FIEZEL Evolution Ledger: 16 PASS / 0 FAIL"
+    },
+    {
+      "command": "fiezel-evolution-loop-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 124276,
+      "summary": "FIEZEL Evolution Loop: 10 PASS / 0 FAIL"
+    },
+    {
+      "command": "fiezel-meta-learning-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 2123,
+      "summary": "FIEZEL Meta-Learning: 14 PASS / 0 FAIL"
+    },
+    {
+      "command": "fiezel-prompt-library-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 883,
+      "summary": "FIEZEL Prompt Library: 21 PASS / 0 FAIL"
+    },
+    {
+      "command": "fiezel-self-refine-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 47178,
+      "summary": "FIEZEL Self-Refine: 19 PASS / 0 FAIL"
+    },
+    {
+      "command": "http-smoke-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 11935,
+      "summary": "{\"status\":\"PASS\",\"httpAssets\":3,\"version\":\"5.18.0\",\"grammarLessons\":129,\"blueprint\":\"focused-25-v1\"}"
+    },
+    {
+      "command": "learner-evidence-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 3540,
+      "summary": "{\"schema\":\"fiezel-learner-evidence-v1\",\"consistency14d\":71,\"abandonmentRate\":50,\"maxForgettingRisk\":99,\"weakSkills\":3}"
+    },
+    {
+      "command": "lesson-experience-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 34485,
+      "summary": "{\"grammarLessons\":129,\"questionsPerLesson\":25,\"practiceModesPerLesson\":25,\"generatedQuestionsChecked\":3225,\"crossLessonDuplicates\":0,\"focusLeaks\":0,\"correctWrongTones\":5,\"realtimeCycle\":[\"sunrise\",\"noon\",\"sunset\",\"moonrise\",\"midnight\"],\"naturalIndonesian\":true}"
+    },
+    {
+      "command": "neural-voice-http-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 9017,
+      "summary": "{\"status\":\"PASS\",\"smallAssets\":6,\"modelBytes\":92361116,\"wasmBytes\":21596019,\"rangeBytes\":1024}"
+    },
+    {
+      "command": "neural-voice-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 18359,
+      "summary": "FIEZEL Neural Voice: PASS 28/0"
+    },
+    {
+      "command": "notification-reminder-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 5872,
+      "summary": "{\"deniedLocksApp\":true,\"grantedUnlocksApp\":true,\"inactivityNotification\":true,\"rotatingLoginMessage\":true,\"updateNotification\":true,\"updateNoRepeat\":true}"
+    },
+    {
+      "command": "policy-outcome-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 2881,
+      "summary": "{\"status\":\"positive\",\"score\":93,\"completionRate\":100,\"targetAdherence\":100,\"masteryDelta\":17,\"negativeSessionSize\":9,\"negativeDifficulty\":1}"
+    },
+    {
+      "command": "pwa-cache-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 810,
+      "summary": "}"
+    },
+    {
+      "command": "regression-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 549298,
+      "summary": "{\"adaptive\":12,\"placement\":150,\"placementDifficulty\":{\"1\":25,\"2\":25,\"3\":25,\"4\":25,\"5\":25,\"6\":25},\"levelSourceCounts\":{\"A1\":474,\"A2\":577,\"B1\":816,\"B2\":858,\"C1\":311,\"C2\":358},\"newUserReviewDue\":0,\"adaptiveLockedBeforeDiagnosis\":true,\"readingPassageAttached\":true}"
+    },
+    {
+      "command": "remote-push-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 1786,
+      "summary": "{\"status\":\"PASS\",\"checks\":{\"coreConfigBeforeApp\":true,\"browserSubscription\":true,\"authenticatedPuterWorker\":true,\"serviceWorkerPush\":true,\"centralizedStore\":true,\"boundedActivity\":true,\"ownerOnlyConfig\":true,\"schedulerAuth\":true,\"webPushDispatcher\":true,\"newUserInactivityGuard\":true,\"hourlySchedule\":true,\"secretsNotRuntime\":true,\"coreDeploymentConfig\":true,\"pinnedWebPush\":true,\"secretGenerator\":true},\"liveDeploymentConfigured\":true}"
+    },
+    {
+      "command": "runtime-stage8-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 2024,
+      "summary": "}"
+    },
+    {
+      "command": "speaking-listening-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 951,
+      "summary": "FIEZEL Speaking + Listening: PASS 25/0"
+    },
+    {
+      "command": "ui-structure-test.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 528,
+      "summary": "{\"primaryNavigation\":5,\"desktopLauncher\":true,\"tabletBreakpoint\":860,\"mobileBreakpoint\":640,\"reducedMotion\":true,\"emojiControls\":false}"
+    },
+    {
+      "command": "validator.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 1015,
+      "summary": "}"
+    },
+    {
+      "command": "content-audit.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 233606,
+      "summary": "}"
+    },
+    {
+      "command": "product-audit.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 587,
+      "summary": "}"
+    },
+    {
+      "command": "grammar-quality-audit.js",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 9690,
+      "summary": "}"
+    },
+    {
+      "command": "release-audit.py",
+      "status": "PASS",
+      "exit": 0,
+      "durationMs": 207739,
+      "summary": "}"
+    }
+  ]
+}
