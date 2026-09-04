@@ -939,7 +939,6 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
    Aplikasi memiliki satu tampilan dasar: palet cream/terang yang konsisten.
    Seluruh jalur tema gelap dan selektor terkait telah dicabut seluruhnya. */
 
-
 /* Font merek berlaku di SELURUH aplikasi, termasuk gerbang izin, gerbang akun, modal,
    dan toast - bukan hanya di splash/onboarding seperti sebelumnya (Audit Roadmap #4). */
 body{background:var(--sky-bottom);font-family:var(--fz-body)}
@@ -4814,4 +4813,97 @@ html[data-fz-input="touch"] :focus{outline-color:transparent!important}
 .auth-error-box{padding:10px 12px;background:var(--accent-soft);border:1px solid var(--accent);border-radius:var(--radius-sm);color:var(--accent-strong);font-size:.85rem;line-height:1.4;text-align:left}
 .badge-success{background:#dcfce7;color:#166534;padding:2px 8px;border-radius:var(--radius-pill);font-size:.8rem}
 .badge-neutral{background:var(--panel-soft);color:var(--muted);padding:2px 8px;border-radius:var(--radius-pill);font-size:.8rem}
+
+
+/* ---- Lonceng notifikasi topbar + lembar notifikasi (tugas guru, teman, undangan) ---- */
+.notif-button{position:relative;overflow:visible}
+.notif-button.has-new i,.notif-button.has-new svg{animation:notif-ring 1.4s ease-in-out 1}
+@keyframes notif-ring{0%,100%{transform:rotate(0)}15%{transform:rotate(14deg)}30%{transform:rotate(-12deg)}45%{transform:rotate(8deg)}60%{transform:rotate(-4deg)}}
+.notif-badge{position:absolute;top:-3px;right:-3px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--red,#C94F3D);color:#fff;font-size:.68rem;font-weight:700;line-height:18px;text-align:center;box-shadow:0 0 0 2px var(--panel,#fff)}
+.notif-badge.hidden{display:none}
+.notif-sheet{text-align:left}
+.notif-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:4px 0 12px}
+.notif-head h2{margin:0;font-size:1.35rem}
+.notif-readall{font-size:.8rem;padding:6px 10px}
+.notif-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;max-height:min(56vh,520px);overflow:auto;padding-right:2px}
+.notif-section{font-size:.7rem;text-transform:uppercase;letter-spacing:.12em;font-weight:700;color:var(--muted);padding:8px 4px 0}
+.notif-item{display:grid;grid-template-columns:40px 1fr;gap:10px 12px;align-items:start;padding:12px 14px;border-radius:var(--radius-lg,18px);background:var(--panel-soft,rgba(255,255,255,.6));border:1px solid var(--line-soft,var(--line));transition:background-color .2s,transform .2s}
+.notif-item.is-unread{background:var(--accent-soft);border-color:var(--accent-soft)}
+.notif-item .notif-icon{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--panel,#fff);color:var(--accent-strong);box-shadow:var(--shadow-sm)}
+.notif-item.is-teacher .notif-icon{background:var(--gold);color:var(--text)}
+.notif-body{display:flex;flex-direction:column;gap:2px;min-width:0}
+.notif-body b{font-weight:600;line-height:1.35;font-size:.95rem}
+.notif-body small{color:var(--muted);font-size:.78rem}
+.notif-cta{grid-column:2;justify-self:start;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;border:0;background:var(--accent-strong);color:#fff;font:inherit;font-size:.85rem;font-weight:600;cursor:pointer;transition:transform .15s,background-color .2s}
+.notif-cta:hover{transform:translateY(-1px)}
+.notif-cta.is-ghost{background:transparent;color:var(--accent-strong);border:1px solid var(--line)}
+.notif-cta i,.notif-cta svg{width:1em;height:1em}
+.notif-empty{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;color:var(--muted);padding:26px 12px;font-size:.92rem}
+.notif-empty i,.notif-empty svg{width:32px;height:32px;opacity:.6}
+
+/* =====================================================================================
+   PALET CERIA PASTEL (permintaan owner 2026-09-04): Home klasik kembali (todayHome off,
+   nav 5 tab) + warna pastel yang lebih hidup: kuning, merah muda, mint, lilac bergilir di
+   kartu, chip, dan ikon. Tinta tetap coklat gelap supaya kontras aman.
+   ===================================================================================== */
+:root{
+  --pz-yellow:#FBF1C2;--pz-yellow-line:#F1DF95;--pz-yellow-ink:#8A6400;
+  --pz-pink:#FBE3E1;--pz-pink-line:#F2C8C4;--pz-pink-ink:#A6473A;
+  --pz-mint:#E0F2EB;--pz-mint-line:#BFE2D3;--pz-mint-ink:#1F6F57;
+  --pz-lilac:#ECE6F8;--pz-lilac-line:#D6CBEE;--pz-lilac-ink:#5B4694;
+  --pz-sky:#E2EFF9;--pz-sky-line:#C3DAEE;--pz-sky-ink:#2A5C86;
+  --pz-peach:#FDE8D3;--pz-peach-line:#F4CFAA;--pz-peach-ink:#8F4E14;
+  --bg:#F9F3E6;--sky-bottom:#F9F3E6;
+  --panel-soft:#FBF6EA;--line:#EADFC8;
+}
+body{background:var(--bg)}
+/* Judul seksi serif ramah */
+.home-section-head h2,.today-title,.lf h1,.lf-card h2,.launcher-copy h1{font-family:var(--fz-display)}
+/* Kartu peluncur bergilir pastel (spesifisitas di atas html.fiezel-ui-v6 .launch-card) */
+html body #app .launch-card{background:var(--pz-yellow);border-color:var(--pz-yellow-line);transition:transform .2s,box-shadow .2s,background-color .2s}
+html body #app .launch-card:nth-child(4n+2){background:var(--pz-pink);border-color:var(--pz-pink-line)}
+html body #app .launch-card:nth-child(4n+3){background:var(--pz-mint);border-color:var(--pz-mint-line)}
+html body #app .launch-card:nth-child(4n+4){background:var(--pz-lilac);border-color:var(--pz-lilac-line)}
+html body #app .learner-flow-launcher .learn-launch{background:linear-gradient(135deg,var(--pz-yellow) 0%,#FFE9B3 55%,#FFD97A 100%)}
+html body #app .launch-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
+html body #app .launch-card .launch-icon{background:rgba(255,255,255,.8);border-color:transparent;color:var(--pz-yellow-ink);box-shadow:var(--shadow-sm)}
+html body #app .launch-card:nth-child(4n+2) .launch-icon{color:var(--pz-pink-ink)}
+html body #app .launch-card:nth-child(4n+3) .launch-icon{color:var(--pz-mint-ink)}
+html body #app .launch-card:nth-child(4n+4) .launch-icon{color:var(--pz-lilac-ink)}
+html body #app .launch-card small{color:var(--muted)}
+/* Empat skill inti: pastel lebih jenuh + ring berwarna */
+.skill-listening{--skill-bg:var(--pz-yellow);--skill-line:var(--pz-yellow-line);--skill-ink:#F2B705}
+.skill-speaking{--skill-bg:var(--pz-pink);--skill-line:var(--pz-pink-line);--skill-ink:#E0705F}
+.skill-reading{--skill-bg:var(--pz-mint);--skill-line:var(--pz-mint-line);--skill-ink:#2E8B69}
+.skill-writing{--skill-bg:var(--pz-lilac);--skill-line:var(--pz-lilac-line);--skill-ink:#7A62C4}
+.skill-card{box-shadow:0 8px 24px -14px rgba(36,26,17,.35);transition:transform .2s,box-shadow .2s}
+.skill-card:hover{transform:translateY(-2px)}
+/* Chip statistik hero */
+.hero-stats>*:nth-child(1){background:var(--pz-yellow)!important;border-color:var(--pz-yellow-line)!important}
+.hero-stats>*:nth-child(2){background:var(--pz-mint)!important;border-color:var(--pz-mint-line)!important}
+.hero-stats>*:nth-child(3){background:var(--pz-pink)!important;border-color:var(--pz-pink-line)!important}
+.hero-stats>*:nth-child(4){background:var(--pz-lilac)!important;border-color:var(--pz-lilac-line)!important}
+/* Kartu Today Plan / alur belajar */
+.today-card,.lf-card{background:#fff;border:1.5px solid var(--line)}
+.lf-plan-list li:nth-child(4n+1){background:var(--pz-yellow)}
+.lf-plan-list li:nth-child(4n+2){background:var(--pz-pink)}
+.lf-plan-list li:nth-child(4n+3){background:var(--pz-mint)}
+.lf-plan-list li:nth-child(4n+4){background:var(--pz-lilac)}
+.lf-plan-list li{border-radius:var(--radius-md);padding:12px 14px;margin:8px 0}
+.lf-skill.is-strong{background:var(--pz-mint)}.lf-skill.is-growing{background:var(--pz-yellow)}.lf-skill.is-review{background:var(--pz-pink)}
+.lf-goal{background:var(--pz-yellow);border-color:var(--pz-yellow-line)}.lf-goal:nth-child(2){background:var(--pz-mint);border-color:var(--pz-mint-line)}.lf-goal:nth-child(3){background:var(--pz-pink);border-color:var(--pz-pink-line)}.lf-goal:nth-child(4){background:var(--pz-lilac);border-color:var(--pz-lilac-line)}
+/* Kartu sosial & notifikasi */
+html body #app .social-home-launcher .launch-card{background:var(--pz-sky);border-color:var(--pz-sky-line)}
+.social-home-launcher .launch-icon{color:var(--pz-sky-ink)}
+.notif-item.is-teacher{background:var(--pz-yellow);border-color:var(--pz-yellow-line)}
+.notif-item.is-social{background:var(--pz-mint);border-color:var(--pz-mint-line)}
+.notif-item.is-invite{background:var(--pz-pink);border-color:var(--pz-pink-line)}
+/* Nav bawah: pil putih, tab aktif tinta gelap dengan ikon emas */
+.bottomnav{background:rgba(255,255,255,.92);border-color:#E6DCC8;box-shadow:0 14px 40px -18px rgba(36,26,17,.35)}
+.bottomnav .nav.active .fz-i{color:var(--yellow)}
+/* Topbar: lonceng & pengaturan sebagai chip pastel */
+.topbar .icon-button{background:#fff;border:1px solid var(--line)}
+.notif-button.has-new{background:var(--pz-yellow)}
+/* Tombol utama tetap kuning ceria */
+.primary{background:var(--yellow);color:var(--ink)}
 

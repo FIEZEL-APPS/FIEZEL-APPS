@@ -83,8 +83,8 @@
 
   function buildPlan(st, now) {
     var B = bank(), ranked = rankedSkills(st), blocks = [], used = {};
-    loadAssignments().slice(0, 1).forEach(function (a) {
-      blocks.push({ id: 'assign-' + a.id, kind: 'Latihan dari tutor', skill: a.skills[0], title: a.title, minutes: a.minutes, itemIds: a.itemIds, from: a.from });
+    loadAssignments().slice(-3).reverse().forEach(function (a) {
+      blocks.push({ id: 'assign-' + a.id, kind: a.mode === 'ujian' ? 'Ujian dari guru' : 'Tugas dari guru', skill: a.skills[0], title: a.title, minutes: a.minutes, itemIds: a.itemIds, from: a.from });
       a.skills.forEach(function (s) { used[s] = true; });
     });
     var first = ranked[0], second = ranked[1];
@@ -203,7 +203,28 @@
   }
 
   // ---- render ----------------------------------------------------------------------------
-  var mountEl = null, env = {}, st = null, pendingRestore = null;
+  var mountEl = null, env = {}, st = null, pendingRestore = null, pendingAssignment = null;
+
+  /**
+   * Buka tugas guru langsung dari notifikasi: sisipkan ke rencana hari ini bila belum ada,
+   * lalu mulai sesinya. Bila modul belum terpasang (navigasi masih berjalan), ditunda ke mount().
+   */
+  function openAssignment(id) {
+    if (!id) return false;
+    if (!mountEl || !st) { pendingAssignment = id; return true; }
+    var a = loadAssignments().filter(function (x) { return x.id === id; })[0];
+    if (!a) { if (env.toast) env.toast('Tugas ini sudah selesai atau tidak ditemukan.'); return false; }
+    if (!st.goal) st.goal = GOALS[0].id;
+    if (!st.diagnostic) st.diagnostic = { at: Date.now(), answers: [], skipped: true };
+    var plan = ensurePlan(st), bid = 'assign-' + a.id;
+    var block = plan.blocks.filter(function (b) { return b.id === bid; })[0];
+    if (!block) { block = { id: bid, kind: a.mode === 'ujian' ? 'Ujian dari guru' : 'Tugas dari guru', skill: a.skills[0], title: a.title, minutes: a.minutes, itemIds: a.itemIds, from: a.from }; plan.blocks.unshift(block); plan.minutes += block.minutes; }
+    if (plan.done.indexOf(bid) !== -1) { if (env.toast) env.toast('Tugas ini sudah kamu selesaikan.'); st.tab = 'flow'; st.step = 'plan'; save(st); render(); return true; }
+    st.tab = 'flow';
+    startLesson(st, block);
+    save(st); render();
+    return true;
+  }
 
   function mount(el, options) {
     mountEl = el; env = options || {}; st = load();
@@ -211,6 +232,7 @@
     try { if (new URL(location.href).searchParams.get('duel')) st.tab = 'duel'; } catch (_) {}
     el.addEventListener('click', onClick);
     el.addEventListener('change', onChange);
+    if (pendingAssignment) { var pid = pendingAssignment; pendingAssignment = null; if (openAssignment(pid)) return; }
     render();
   }
 
@@ -504,5 +526,5 @@
     });
   }
 
-  return { KEY: KEY, ASSIGN_KEY: ASSIGN_KEY, GOALS: GOALS, mount: mount, render: render, load: load, buildPlan: buildPlan, skillSummary: skillSummary, weeklySummary: weeklySummary, tutorCode: tutorCode, rankedSkills: rankedSkills, statusOf: statusOf, _state: function () { return st; } };
+  return { KEY: KEY, ASSIGN_KEY: ASSIGN_KEY, GOALS: GOALS, mount: mount, render: render, load: load, buildPlan: buildPlan, skillSummary: skillSummary, weeklySummary: weeklySummary, tutorCode: tutorCode, rankedSkills: rankedSkills, statusOf: statusOf, openAssignment: openAssignment, _state: function () { return st; } };
 });
