@@ -1,7 +1,7 @@
 {
-  "version": "m025-251",
+  "version": "m025-253",
   "claimedBy": "branch main",
-  "claimedAt": "2026-09-04T19:41:24.913Z",
-  "reason": "aktivasi guru instan tanpa password dan dedicated mode",
+  "claimedAt": "2026-09-04T20:09:31.020Z",
+  "reason": "resolusi peran guru paralel saat splash dan transisi instan ke ruang guru",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
