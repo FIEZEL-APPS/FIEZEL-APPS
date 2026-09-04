@@ -44,11 +44,11 @@ import { codeWellFormed, hashCode, checkRedeemable, INVITE_PROBLEM } from './aut
  */
 const DUMMY_HASH = 'pbkdf2$100000$AAAAAAAAAAAAAAAAAAAAAA$AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 
-/** Aturan handle: sama dengan `social_handle` supaya satu orang punya satu nama. */
-const HANDLE_RE = /^[a-z0-9_]{3,20}$/;
+/** Aturan handle: bebas huruf, angka, underscore, titik, spasi, hubung (1-50 karakter). */
+const HANDLE_RE = /^[a-z0-9_.\s-]{1,50}$/;
 
 function normalizeHandle(raw) {
-  return typeof raw === 'string' ? raw.trim().toLowerCase() : '';
+  return typeof raw === 'string' ? raw.trim().replace(/\s+/g, ' ').toLowerCase() : '';
 }
 
 /**
@@ -253,11 +253,6 @@ export async function routeTeacherActivate(ctx) {
   // Bentuk diperiksa SEBELUM menyentuh D1: token asal-asalan tidak boleh
   // membelanjakan satu baca pun dari anggaran plan gratis.
   if (!codeWellFormed(code)) return jsonError(400, INVITE_PROBLEM.CODE_MALFORMED, {}, opt);
-
-  const handle = normalizeHandle(body.value.handle);
-  if (!HANDLE_RE.test(handle)) return jsonError(400, 'handle_invalid', {}, opt);
-  const problem = checkPasswordPolicy(body.value.password);
-  if (problem) return jsonError(400, problem.problem, {}, opt);
 
   const codeHash = await hashCode(code);
   const invite = await db.prepare(

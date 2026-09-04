@@ -61,21 +61,21 @@ function fail(msg) {
 
 if (!existsSync(TOML_PATH)) fail(`wrangler.toml tidak ditemukan di ${TOML_PATH} — jalankan dari folder workers/api`);
 
-console.log('Membaca daftar database D1 dari akun Cloudflare Anda (npx wrangler@3 d1 list)...');
+console.log('Membaca daftar database D1 dari akun Cloudflare Anda (npx wrangler d1 list)...');
 let d1List;
 try {
-  d1List = JSON.parse(run('npx', ['wrangler@3', 'd1', 'list', '--json']));
+  d1List = JSON.parse(run('npx', ['wrangler', 'd1', 'list', '--json']));
 } catch (e) {
   fail(
-    "gagal menjalankan 'wrangler d1 list'. Kemungkinan belum login: jalankan dulu 'npx wrangler@3 login'.\n" +
+    "gagal menjalankan 'wrangler d1 list'. Kemungkinan belum login: jalankan dulu 'npx wrangler login'.\n" +
     `Detail: ${e.message}`
   );
 }
 
-console.log('Membaca daftar KV namespace dari akun Cloudflare Anda (npx wrangler@3 kv namespace list)...');
+console.log('Membaca daftar KV namespace dari akun Cloudflare Anda (npx wrangler kv namespace list)...');
 let kvList;
 try {
-  kvList = JSON.parse(run('npx', ['wrangler@3', 'kv', 'namespace', 'list']));
+  kvList = JSON.parse(run('npx', ['wrangler', 'kv', 'namespace', 'list']));
 } catch (e) {
   fail(`gagal menjalankan 'wrangler kv namespace list'. Detail: ${e.message}`);
 }
