@@ -5601,12 +5601,44 @@ function replayTour(){try{
   const start=setTimeout(maybeStartTour,360);start?.unref?.();
   return true}catch{return false}}
 window.replayTour=replayTour;
+async function checkUrlTeacherToken(){
+  try{
+    const url=new URL(location.href);
+    const token=url.searchParams.get('token')||url.searchParams.get('teacher_token')||url.searchParams.get('guru_token')||url.searchParams.get('invite_teacher');
+    if(!token)return;
+    const core=accountCore();
+    if(!core||!core.activateTeacher)return;
+    url.searchParams.delete('token');
+    url.searchParams.delete('teacher_token');
+    url.searchParams.delete('guru_token');
+    url.searchParams.delete('invite_teacher');
+    window.history.replaceState({},document.title,url.pathname+(url.search?url.search:'')+url.hash);
+    showToast('Mengaktifkan akses Ruang Guru...');
+    const res=await core.activateTeacher({code:token});
+    if(res&&res.ok){
+      const tName=res.account?.teacherName||'Guru';
+      showToast(`Selamat datang, ${tName}! Ruang Guru aktif.`);
+      try{
+        if(self.FiezelOnboarding?.markCompleted){
+          self.FiezelOnboarding.markCompleted(self,{at:Date.now(),via:'token_url',name:tName,role:'guru'});
+        }
+      }catch(_){}
+      state.preferences={...state.preferences,role:'guru'};
+      try{save()}catch(_){}
+      go('tutor');
+    }else{
+      showToast(res?.message||'Token guru tidak valid atau telah kadaluwarsa.');
+    }
+  }catch(_){}
+}
 function openApp(){
   if(appOpened)return true;appOpened=true;
   // Sesi lama bisa saja masih memegang kelas kunci m025-34 di <body> (mis. tab yang dibuka
   // sebelum rilis ini). Dibersihkan sekali di sini supaya .app/.bottomnav tidak tetap
   // tersembunyi oleh aturan CSS yang sekarang tidak pernah dipasang lagi.
   document.body?.classList?.remove?.('notification-locked');notifyAppUpdateIfNew();render();
+  // Deteksi token undangan guru di URL (?token=...): langsung aktivasi & buka Ruang Guru
+  try{checkUrlTeacherToken()}catch(_){}
   // Tautan undangan Duel Belajar (?duel=KODE): langsung buka alur belajar tab Duel.
   try{if(new URL(location.href).searchParams.get('duel')&&state.view!=='learn')go('learn')}catch{}
   // Undangan teman (?invite=KODE, share sheet, atau sisa boot sebelumnya). Ditangkap SEKARANG
@@ -5844,6 +5876,10 @@ function startNotificationInvitation(){
 // modulnya masing-masing.
 let pendingAfterGate=null;let pendingAfterGateFn=null;/* v06 2026-08-29: penundaan generik \u2014 kuis apa pun yang diminta saat gerbang akun menutup layar dijalankan ulang setelah gerbang selesai/dilewati. */
 function afterOnboardingExit(action){
+  if(isVerifiedTeacher()){
+    if(state.view!=='tutor')go('tutor');
+    return;
+  }
   if(action==='placement')pendingAfterGate='placement';
   // Peran dari perkenalan: hanya guru terverifikasi yang mendarat di Tutor Action Center.
   // Pengguna tanpa kode undangan diarahkan ke modal aktivasi guru.
@@ -5857,6 +5893,10 @@ function afterOnboardingExit(action){
 // penyebab utama kesan "app abal-abal". Sekarang splash tampil lebih dulu untuk SEMUA
 // murid, dan tawarannya menyusul di ujung: splash -> (perkenalan bila belum) -> tawaran.
 function startWelcomeExperience(){
+  if(isVerifiedTeacher()){
+    if(state.view!=='tutor')go('tutor');
+    return null;
+  }
   let onboardingDone=true;
   try{onboardingDone=self.FiezelOnboarding?.completed?.(self)!==false}catch{}
   return showBrandSplash(Date.now(),at=>{
@@ -6021,12 +6061,7 @@ function openFeedback(prefill){
 function render(){const __renderStartedAt=Date.now();try{return renderInner()}finally{window.__fiezelLastRenderMs=Date.now()-__renderStartedAt;/* [FASE-4] pasang ulang timer kantuk 90 dtk tiap layar dicat (mati sendiri di luar layar santai). */try{pawIdleArm()}catch(_){}/* [OUTFIT G5'] konteks layar untuk resolver outfit (19 §6.1) */try{self.FiezelPawOutfit?.screen?.(state.view)}catch(_){}}}
 // m025-41: render duration is recorded so the diagnostic scanner can see a slow screen,
 // which is how OWNER experienced the Classroom regression before any error was logged.
-function renderInner(){/* m025-250: `contains?.(` - panggilan OPSIONAL, bukan sekadar `?.` di rantai propertinya.
-   `?.` hanya menjaga null/undefined; ia TIDAK menjaga classList palsu yang tidak punya
-   metode itu, dan puluhan harness di repo ini memasang classList tiruan seadanya. Baris
-   ini berjalan di SETIAP render, jadi satu metode yang absen menjatuhkan seluruh boot
-   dengan TypeError - persis yang terjadi di social-frontend-test. Tiga tetangganya di
-   fungsi yang sama sudah memakai `toggle?.(` untuk alasan yang sama; ini menyelaraskannya. */if(document.body?.classList?.contains?.('fz-teacher-mode')&&state.view!=='tutor'){try{self.FiezelTeacherShell?.unmount?.()}catch(_){}}speakingListeningMountToken++;if(speakingListeningController){speakingListeningController.destroy();speakingListeningController=null;/* m026-01: satu-satunya tempat sesi dengar benar-benar bubar. Di dalam if, bukan di luar - kalau tidak, tiap navigasi biasa akan memaksa maskot kembali idle dan memotong selebrasi yang sedang jalan. */pawReact('listening-stop')}document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));setApp('');if(state.view==='home')home();if(state.view==='latihan')latihan();if(state.view==='vocab')vocab();if(state.view==='grammar')grammar();if(state.view==='reading')reading();if(state.view==='skills')skillsLab();if(state.view==='listening')skillsLab('listening');if(state.view==='speaking')skillsLab('speaking');if(state.view==='writing')writing();if(state.view==='classroom')classroom();if(state.view==='library')library();if(state.view==='ask'||state.view==='search')askView();if(state.view==='test')placement();if(state.view==='progress')progress();if(state.view==='online')onlineView();if(state.view==='learn')learnerFlowView();if(state.view==='tutor')tutorCenterView();/* merge SLOT 7 sosial 2026-08-29 */document.querySelector(`[data-view="${state.view}"]`)?.classList.add('active');/* m028 fase3: bendera panggung Skills Lab. Addon listening memaku blok tombolnya ke dasar layar (speaking-listening-addon.css), jadi ia panggung kedua yang bisa ditutupi gelembung. */document.body?.classList?.toggle?.('fz-stage-sl',['skills','listening','speaking'].includes(state.view));/* m028 fase3 (QA §9): Peta Belajar ikut jadi panggung ber-kontrol sejak panel NEXT SESSION punya tombol "Mulai sesi" di dekat dasar layar - screenshot QA menunjukkan gelembung PAW menutupinya utuh. Aturannya sama dengan kuis: peek dilarang, dok mengecil, layar diberi ruang bawah. */document.body?.classList?.toggle?.('fz-stage-map',state.view==='progress');/* 2026-08-29 overhaul I12 (O6 #10): bendera panggung Home. Wajah coach-strip adalah SATU-SATUNYA Pau di Home; gelembung FAB pengambang (Pau kedua, terukur menimpa lipatan hero/skill-hub di 390px) disembunyikan lewat CSS body.fz-stage-home — pola yang sama dengan fz-stage-sl/fz-stage-map, modul gelembung tidak disentuh. */document.body?.classList?.toggle?.('fz-stage-home',state.view==='home');/* q16-P2-2 2026-08-29: hub juga panggung ber-CTA-dekat-dasar (Review Due, Buka flashcards, Mulai 25 soal) \u2014 peek dilarang, dok mengecil, pola sama dengan sl/map. */document.body?.classList?.toggle?.('fz-stage-hub',['vocab','grammar','reading','library','test'].includes(state.view));document.body?.classList?.toggle?.('fz-stage-writing',state.view==='writing');/* v24-F2 2026-08-29: Writing = layar mengarang; FAB disembunyikan via CSS (pola fz-stage-home), modul gelembung tidak disentuh. */enhanceUI();syncCoachBubble();window.scrollTo(0,0)}
+function renderInner(){if(isVerifiedTeacher()&&state.view!=='tutor'){state.view='tutor'}if(document.body?.classList?.contains?.('fz-teacher-mode')&&state.view!=='tutor'){try{self.FiezelTeacherShell?.unmount?.()}catch(_){}}speakingListeningMountToken++;if(speakingListeningController){speakingListeningController.destroy();speakingListeningController=null;/* m026-01: satu-satunya tempat sesi dengar benar-benar bubar. Di dalam if, bukan di luar - kalau tidak, tiap navigasi biasa akan memaksa maskot kembali idle dan memotong selebrasi yang sedang jalan. */pawReact('listening-stop')}document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));setApp('');if(state.view==='home')home();if(state.view==='latihan')latihan();if(state.view==='vocab')vocab();if(state.view==='grammar')grammar();if(state.view==='reading')reading();if(state.view==='skills')skillsLab();if(state.view==='listening')skillsLab('listening');if(state.view==='speaking')skillsLab('speaking');if(state.view==='writing')writing();if(state.view==='classroom')classroom();if(state.view==='library')library();if(state.view==='ask'||state.view==='search')askView();if(state.view==='test')placement();if(state.view==='progress')progress();if(state.view==='online')onlineView();if(state.view==='learn')learnerFlowView();if(state.view==='tutor')tutorCenterView();/* merge SLOT 7 sosial 2026-08-29 */document.querySelector(`[data-view="${state.view}"]`)?.classList.add('active');/* m028 fase3: bendera panggung Skills Lab. Addon listening memaku blok tombolnya ke dasar layar (speaking-listening-addon.css), jadi ia panggung kedua yang bisa ditutupi gelembung. */document.body?.classList?.toggle?.('fz-stage-sl',['skills','listening','speaking'].includes(state.view));/* m028 fase3 (QA §9): Peta Belajar ikut jadi panggung ber-kontrol sejak panel NEXT SESSION punya tombol "Mulai sesi" di dekat dasar layar - screenshot QA menunjukkan gelembung PAW menutupinya utuh. Aturannya sama dengan kuis: peek dilarang, dok mengecil, layar diberi ruang bawah. */document.body?.classList?.toggle?.('fz-stage-map',state.view==='progress');/* 2026-08-29 overhaul I12 (O6 #10): bendera panggung Home. Wajah coach-strip adalah SATU-SATUNYA Pau di Home; gelembung FAB pengambang (Pau kedua, terukur menimpa lipatan hero/skill-hub di 390px) disembunyikan lewat CSS body.fz-stage-home — pola yang sama dengan fz-stage-sl/fz-stage-map, modul gelembung tidak disentuh. */document.body?.classList?.toggle?.('fz-stage-home',state.view==='home');/* q16-P2-2 2026-08-29: hub juga panggung ber-CTA-dekat-dasar (Review Due, Buka flashcards, Mulai 25 soal) \u2014 peek dilarang, dok mengecil, pola sama dengan sl/map. */document.body?.classList?.toggle?.('fz-stage-hub',['vocab','grammar','reading','library','test'].includes(state.view));document.body?.classList?.toggle?.('fz-stage-writing',state.view==='writing');/* v24-F2 2026-08-29: Writing = layar mengarang; FAB disembunyikan via CSS (pola fz-stage-home), modul gelembung tidak disentuh. */enhanceUI();syncCoachBubble();window.scrollTo(0,0)}
 // m025-115 - pembimbing yang ikut ke mana pun murid pergi (brief bagian 7).
 //
 // Gelembungnya dipasang SEKALI ke <body> dan tidak pernah ikut dicat ulang; yang dikirim
@@ -6249,7 +6284,7 @@ function pawStreakWatch(){const now=Number(state.streak)||0;
    render() tetap di dalam callback. Cuplikan layar LAMA yang diambil startViewTransition
    karena itu tetap utuh - yang berubah hanya kapan sumber kebenaran ikut maju.
    pushBackNavView() tetap dipanggil SEBELUMNYA, sebab yang ia rekam adalah view ASAL. */
-function go(v,opts){if(!VALID_VIEWS.has(v)){showToast(FiezelI18n.t('nav.halaman-tak-tersedia'));return false}uiSfx('nav');dropStages();if(opts?.viaHistory!==true)pushBackNavView(v);state.view=v;const swap=()=>{save();render()};if(document.startViewTransition&&state.preferences?.motion!==false&&!prefersReducedMotion())document.startViewTransition(swap);else swap();return true} window.go=go;
+function go(v,opts){if(isVerifiedTeacher()&&v!=='tutor'){v='tutor'}if(!VALID_VIEWS.has(v)){showToast(FiezelI18n.t('nav.halaman-tak-tersedia'));return false}uiSfx('nav');dropStages();if(opts?.viaHistory!==true)pushBackNavView(v);state.view=v;const swap=()=>{save();render()};if(document.startViewTransition&&state.preferences?.motion!==false&&!prefersReducedMotion())document.startViewTransition(swap);else swap();return true} window.go=go;
 function pushBackNavView(v){try{return self.FiezelBackNav?.pushView?.(v)===true}catch{return false}}
 /* ---- m025-117 lapisan layar-di-dalam-view (stage) ---------------------------------
  * OWNER: "misalnya sudah masuk ke dalam folder, dan ingin kembali, ketika swipe back malah
@@ -7832,9 +7867,12 @@ function bindFiezelAccountControls(){
     if(errDiv)errDiv.style.display='none';
     const res=await self.FiezelAccount?.activateTeacher?.({code});
     if(res?.ok){
-      showToast('Akun Anda berhasil diaktifkan sebagai Guru!');
+      const tName=res.account?.teacherName||'Guru';
+      showToast(`Akun Guru aktif! Selamat datang, ${tName}.`);
+      state.preferences={...state.preferences,role:'guru'};
+      try{save()}catch(_){}
       closeModal();
-      setTimeout(openSettings,100);
+      go('tutor');
     } else {
       btn.disabled=false;
       if(errDiv){
@@ -7908,24 +7946,14 @@ function openFiezelAuthModal(initialTab){
         </button>
       </div>`;
     } else if(currentTab==='teacher'){
-      const needCredentials=!acc;
-      const extraFields=needCredentials
-        ?`<label class="auth-field-label">Handle Pengajar Baru
-            <input id="authTeacherHandle" type="text" placeholder="Username pengajar bebas" maxlength="50" autocomplete="username">
-          </label>
-          <label class="auth-field-label">Kata Sandi Baru
-            <input id="authTeacherPassword" type="password" placeholder="Kata sandi bebas" autocomplete="new-password">
-          </label>`
-        :`<p class="muted" style="font-size:0.85rem">Anda sedang masuk sebagai <b>@${esc(acc.handle)}</b>. Masukkan kode undangan guru untuk mengaktifkan akun ini.</p>`;
-
       tabContent=`<div class="auth-form">
         <label class="auth-field-label">Kode Undangan Guru
           <input id="authTeacherCode" type="text" placeholder="Kode 32 karakter (Crockford)" maxlength="32" style="text-transform:uppercase" autocomplete="off">
         </label>
-        ${extraFields}
+        <p class="muted" style="font-size:0.85rem;margin-top:-2px">Nama & profil lembaga akan terisi otomatis dari token undangan resmi.</p>
         <div id="authModalError" class="auth-error-box" style="display:none"></div>
         <button type="button" id="btnAuthAction" class="primary" style="margin-top:6px">
-          <i data-lucide="award"></i> Aktifkan Akun Guru
+          <i data-lucide="award"></i> Aktifkan & Buka Ruang Guru
         </button>
       </div>`;
     }
@@ -7999,13 +8027,19 @@ function openFiezelAuthModal(initialTab){
             }
           } else if(currentTab==='teacher'){
             const code=$('authTeacherCode')?.value;
-            const handle=$('authTeacherHandle')?.value;
-            const password=$('authTeacherPassword')?.value;
-            const res=await self.FiezelAccount?.activateTeacher?.({code,handle,password});
+            const res=await self.FiezelAccount?.activateTeacher?.({code});
             if(res?.ok){
-              showToast('Akun Guru berhasil diaktifkan!');
+              const tName=res.account?.teacherName||'Guru';
+              showToast(`Akun Guru aktif! Selamat datang, ${tName}.`);
+              try{
+                if(self.FiezelOnboarding?.markCompleted){
+                  self.FiezelOnboarding.markCompleted(self,{at:Date.now(),via:'token',name:tName,role:'guru'});
+                }
+              }catch(_){}
+              state.preferences={...state.preferences,role:'guru'};
+              try{save()}catch(_){}
               closeModal();
-              setTimeout(openSettings,100);
+              go('tutor');
               return;
             }
             if(errBox){
@@ -12539,7 +12573,8 @@ function accountSheetMarkup(mode,message){
   const m=ACCOUNT_MODES[mode]||ACCOUNT_MODES.login;
   const codeField=mode==='teacher'
     ? `<div class="field"><label for="accountCode">${FiezelI18n.t('account.label-code')}</label>
-       <input id="accountCode" type="text" autocomplete="one-time-code" inputmode="text" spellcheck="false"></div>`
+       <input id="accountCode" type="text" autocomplete="one-time-code" inputmode="text" spellcheck="false" placeholder="Kode 32 karakter">
+       <small class="field-msg">Nama dan lembaga terisi otomatis dari token.</small></div>`
     : '';
   // Petunjuk sandi hanya ditampilkan di jalur yang MEMBUAT sandi. Menampilkannya saat masuk
   // memberi tahu penebak bentuk sandi yang sah, dan tidak menolong siapa pun yang sudah punya.
@@ -12548,17 +12583,19 @@ function accountSheetMarkup(mode,message){
     ? `<button type="button" class="setup-link" onclick="accountSetMode('register')">${FiezelI18n.t('account.to-register')}</button>
        <button type="button" class="setup-link" onclick="accountSetMode('teacher')">${FiezelI18n.t('account.to-teacher')}</button>`
     : `<button type="button" class="setup-link" onclick="accountSetMode('login')">${FiezelI18n.t('account.to-login')}</button>`;
+  const handlePassFields=mode==='teacher'?'':`
+    <div class="field"><label for="accountHandle">${FiezelI18n.t('account.label-handle')}</label>
+    <input id="accountHandle" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" inputmode="text"></div>
+    <div class="field"><label for="accountPassword">${FiezelI18n.t('account.label-password')}</label>
+    <input id="accountPassword" type="password" autocomplete="${mode==='login'?'current-password':'new-password'}">
+    ${passHint}</div>`;
   // Pesan galat memakai `.field.is-error` yang SUDAH ada (warna var(--bad), lolos kontras)
   // alih-alih kelas baru: satu palet, satu resep fokus, nol warna tambahan untuk diaudit.
   const msg=message?`<div class="field is-error"><p id="accountMsg" class="field-msg" role="alert">${esc(String(message))}</p></div>`:'';
   return `<h2>${FiezelI18n.t(m.title)}</h2>
     <p>${FiezelI18n.t(m.body)}</p>
     ${codeField}
-    <div class="field"><label for="accountHandle">${FiezelI18n.t('account.label-handle')}</label>
-    <input id="accountHandle" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" inputmode="text"></div>
-    <div class="field"><label for="accountPassword">${FiezelI18n.t('account.label-password')}</label>
-    <input id="accountPassword" type="password" autocomplete="${mode==='login'?'current-password':'new-password'}">
-    ${passHint}</div>
+    ${handlePassFields}
     ${msg}
     <div class="modal-actions">
       <button type="button" onclick="closeModal()">${FiezelI18n.t('account.btn-cancel')}</button>
@@ -12599,12 +12636,20 @@ async function accountSubmit(){
   const btn=$('accountSubmitBtn');
   if(btn){btn.disabled=true;btn.textContent=FiezelI18n.t('account.busy')}
   const res=accountSheetMode==='register'?await core.register(handle,password)
-    :accountSheetMode==='teacher'?await core.activateTeacher(code,handle,password)
+    :accountSheetMode==='teacher'?await core.activateTeacher({code})
       :await core.login(handle,password);
   accountSheetBusy=false;
   if(res&&res.ok){
     closeModal();
     const st=core.state();
+    if(accountSheetMode==='teacher'||core.role()==='teacher'){
+      const tName=res.account?.teacherName||'Guru';
+      showToast(`Akun Guru aktif! Selamat datang, ${tName}.`);
+      state.preferences={...state.preferences,role:'guru'};
+      try{save()}catch(_){}
+      go('tutor');
+      return true;
+    }
     showToast(FiezelI18n.t('account.signed-in',{handle:st?.handle||handle}));
     try{render()}catch(_){}
     return true;
@@ -12631,7 +12676,19 @@ function accountStatusLine(){
  */
 function accountBootRefresh(){
   const core=accountCore();if(!core)return false;
-  const t=setTimeout(()=>{core.refresh().then(r=>{if(r&&r.ok){try{render()}catch(_){}}}).catch(()=>{})},2200);
+  const t=setTimeout(()=>{
+    core.refresh().then(r=>{
+      if(r&&r.ok){
+        if(isVerifiedTeacher()){
+          state.preferences={...state.preferences,role:'guru'};
+          try{save()}catch(_){}
+          if(state.view!=='tutor')go('tutor');
+        }else{
+          try{render()}catch(_){}
+        }
+      }
+    }).catch(()=>{})
+  },100);
   t?.unref?.();
   return true;
 }

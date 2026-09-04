@@ -261,8 +261,29 @@
       role: String(acc.role || ''),
       shell: acc.shell || null,
       navigation: acc.navigation || null,
-      institutionId: acc.institutionId || null
+      institutionId: acc.institutionId || null,
+      teacherName: acc.teacherName ? String(acc.teacherName) : '',
+      institution: acc.institution ? String(acc.institution) : '',
+      institutionType: acc.institutionType ? String(acc.institutionType) : ''
     });
+    if (typeof FiezelTeacherStore !== 'undefined' && session.role === 'teacher') {
+      try {
+        var profile = FiezelTeacherStore.load();
+        if (!profile.teacher) profile.teacher = { name: '', school: '' };
+        var modified = false;
+        if (session.teacherName && profile.teacher.name !== session.teacherName) {
+          profile.teacher.name = session.teacherName;
+          modified = true;
+        }
+        if (session.institution && profile.teacher.school !== session.institution) {
+          profile.teacher.school = session.institution;
+          modified = true;
+        }
+        if (modified) {
+          FiezelTeacherStore.save(profile);
+        }
+      } catch (_) {}
+    }
     return session;
   }
 
