@@ -4197,26 +4197,10 @@ function mixHex(a,b,ratio){const x=hexRgb(a),y=hexRgb(b),t=Math.max(0,Math.min(1
    Interpolasi 9 perhentian di bawah tetap utuh dan tetap diuji; ia hanya tidak
    lagi dipanggil dari jalur murid. */
 const SCENE_STATIC_PALETTE=Object.freeze({top:'#FFE9B8',bottom:'#FFF9EE'});
-/* Kembaran malamnya. Nilainya = --n-panel-soft / --n-bg di style.css, dan --n-bg
-   sendiri = --core. Ia HARUS ada di sini, bukan hanya di CSS: updateCelestialClock()
-   memasang --sky-top/--sky-bottom sebagai gaya INLINE di <html>, dan gaya inline
-   menang atas aturan tema mana pun. Tanpa kembaran ini, murid bertema malam mendapat
-   langit cream yang dipaksakan JavaScript di atas seluruh palet gelap yang benar. */
-const SCENE_NIGHT_PALETTE=Object.freeze({top:'#221A1F',bottom:'#1B1418'});
 const SCENE_STATIC_PHASE='day';
-/* Tema yang BENAR-BENAR tampil. Urutannya sama dengan kontrak tiga keadaan di
-   fiezel-ui-manager.js: atribut eksplisit menang, kalau tidak ada barulah perangkat
-   yang memutuskan. Gagal ke 'light' - harness tes tidak punya matchMedia, dan terang
-   adalah tampilan yang sudah dijaga puluhan gerbang kontras. */
-function activeThemeMode(){
-  try{
-    const attr=document.documentElement?.getAttribute?.('data-theme');
-    if(attr==='dark'||attr==='light')return attr;
-    if(self.matchMedia&&self.matchMedia('(prefers-color-scheme: dark)').matches)return 'dark';
-  }catch(_){}
-  return 'light';
-}
-function getScenePalette(minutes){if(uxOff('scenePhases')){const p=activeThemeMode()==='dark'?SCENE_NIGHT_PALETTE:SCENE_STATIC_PALETTE;return{top:p.top,bottom:p.bottom}}const value=((Number(minutes)||0)%1440+1440)%1440;let left=SCENE_STOPS[0],right=SCENE_STOPS[SCENE_STOPS.length-1];for(let i=0;i<SCENE_STOPS.length-1;i++){if(value>=SCENE_STOPS[i].minute&&value<=SCENE_STOPS[i+1].minute){left=SCENE_STOPS[i];right=SCENE_STOPS[i+1];break}}const ratio=(value-left.minute)/Math.max(1,right.minute-left.minute);return{top:mixHex(left.top,right.top,ratio),bottom:mixHex(left.bottom,right.bottom,ratio)}}
+/* Mode gelap dihapus sesuai permintaan OWNER: aplikasi terkunci ke tampilan terang cream. */
+function activeThemeMode(){ return 'light'; }
+function getScenePalette(minutes){if(uxOff('scenePhases')){return{top:SCENE_STATIC_PALETTE.top,bottom:SCENE_STATIC_PALETTE.bottom}}const value=((Number(minutes)||0)%1440+1440)%1440;let left=SCENE_STOPS[0],right=SCENE_STOPS[SCENE_STOPS.length-1];for(let i=0;i<SCENE_STOPS.length-1;i++){if(value>=SCENE_STOPS[i].minute&&value<=SCENE_STOPS[i+1].minute){left=SCENE_STOPS[i];right=SCENE_STOPS[i+1];break}}const ratio=(value-left.minute)/Math.max(1,right.minute-left.minute);return{top:mixHex(left.top,right.top,ratio),bottom:mixHex(left.bottom,right.bottom,ratio)}}
 function getCelestialState(input=new Date()){
   const date=input instanceof Date?input:new Date(input);const minutes=date.getHours()*60+date.getMinutes()+date.getSeconds()/60;
   const isDay=minutes>=SUNRISE_MINUTE&&minutes<SUNSET_MINUTE;
@@ -4226,10 +4210,7 @@ function getCelestialState(input=new Date()){
   const time=uiFormatter(FiezelI18n.getBcp47(),{hour:'2-digit',minute:'2-digit'},'jam').format(date);const body=isDay?'sun':'moon';
   const position=progress<.18?FiezelI18n.t('home.celestial-posisi-terbit'):progress<.42?FiezelI18n.t('home.celestial-posisi-naik'):progress<.58?FiezelI18n.t('home.celestial-posisi-puncak'):progress<.82?FiezelI18n.t('home.celestial-posisi-turun'):FiezelI18n.t('home.celestial-posisi-tenggelam');
   const palette=getScenePalette(minutes),intensity=isDay ? .56+Math.sin(Math.PI*progress)*.44 : .28+Math.sin(Math.PI*progress)*.2;
-  /* Halo di sekeliling matahari/bulan ikut dibekukan bersama paletnya: sebuah halo yang
-     tetap bergerak di atas langit yang diam terbaca sebagai kedip, bukan sebagai waktu.
-     Nilainya sama dengan --scene-light milik `.scene-day` (style.css:148). */
-  const light=uxOff('scenePhases')?(activeThemeMode()==='dark'?'rgba(255,224,126,0.120)':'rgba(255,224,126,0.420)'):(isDay?`rgba(255,214,132,${(.2+intensity*.38).toFixed(3)})`:`rgba(190,211,255,${(.14+intensity*.28).toFixed(3)})`);
+  const light=uxOff('scenePhases')?'rgba(255,224,126,0.420)':(isDay?`rgba(255,214,132,${(.2+intensity*.38).toFixed(3)})`:`rgba(190,211,255,${(.14+intensity*.28).toFixed(3)})`);
   return{body,phase,progress:Number(progress.toFixed(4)),x:Number(x.toFixed(2)),y:Number(y.toFixed(2)),time,position,palette,light,label:isDay?FiezelI18n.t('home.celestial-label-matahari'):FiezelI18n.t('home.celestial-label-bulan'),detail:FiezelI18n.t('home.celestial-detail',{benda:FiezelI18n.t(isDay?'home.celestial-matahari':'home.celestial-bulan'),posisi:position,pukul:time})}
 }
 function celestialStatusMarkup(){const c=getCelestialState();return`<span class="celestial-status" id="celestialStatus" title="${esc(c.detail)}"><i data-lucide="clock-3"></i><b id="celestialTime">${esc(c.time)}</b><span id="celestialDetail">${esc(FiezelI18n.t('home.celestial-status',{benda:FiezelI18n.t(c.body==='sun'?'home.celestial-matahari':'home.celestial-bulan'),posisi:c.position}))}</span></span>`}
@@ -4242,26 +4223,8 @@ function updateCelestialClock(input=new Date()){
   document.querySelector?.('meta[name="theme-color"]')?.setAttribute?.('content',c.palette.top);
   if($('celestialTime'))$('celestialTime').textContent=c.time;if($('celestialDetail'))$('celestialDetail').textContent=FiezelI18n.t('home.celestial-status',{benda:FiezelI18n.t(c.body==='sun'?'home.celestial-matahari':'home.celestial-bulan'),posisi:c.position});if($('celestialStatus'))$('celestialStatus').title=c.detail;refreshIcons();return c
 }
-let celestialTimer=null,themeWatchBound=false;
-/* m025-246: perangkat bisa berganti skema warna SELAGI aplikasi terbuka - iOS dan
-   Android menjadwalkannya otomatis saat matahari terbenam. Token CSS ikut berganti
-   sendiri lewat @media, TETAPI --sky-top/--sky-bottom dipasang sebagai gaya inline
-   oleh updateCelestialClock() dan gaya inline tidak mendengarkan @media. Tanpa
-   pengait di bawah, murid yang ponselnya berganti ke gelap pukul 18.00 mendapat
-   seluruh aplikasi gelap dengan satu langit cream yang tertinggal di belakangnya.
-   Hanya dipasang sekali (themeWatchBound) - startCelestialClock dipanggil ulang
-   setiap kali konten dihidrasi. */
-function watchThemeChanges(){
-  if(themeWatchBound)return;
-  try{
-    const mq=self.matchMedia?.('(prefers-color-scheme: dark)');
-    if(!mq)return;
-    const onChange=()=>{try{updateCelestialClock()}catch(_){}};
-    if(typeof mq.addEventListener==='function')mq.addEventListener('change',onChange);
-    else if(typeof mq.addListener==='function')mq.addListener(onChange);
-    themeWatchBound=true;
-  }catch(_){}
-}
+let celestialTimer=null;
+function watchThemeChanges(){}
 function startCelestialClock(){updateCelestialClock();watchThemeChanges();if(typeof setInterval!=='function')return;if(celestialTimer&&typeof clearInterval==='function')clearInterval(celestialTimer);celestialTimer=setInterval(updateCelestialClock,30000);celestialTimer.unref?.()}
 function enhanceUI(){document.body?.classList?.toggle('reduce-motion',state.preferences?.motion===false);updateCelestialClock();try{document.getElementById('fiezelDiagOpen')?.setAttribute('tabindex','-1')}catch(_){}/* v31-1 2026-08-29: tombol diagnostik 1x1 tak terlihat ikut urutan Tab di semua layar \u2014 gestur rahasianya pakai click(), bukan fokus keyboard; file panelnya diklaim tim neural-voice jadi perbaikannya dari sisi app. */(window.requestAnimationFrame||setTimeout)(refreshIcons)}
 // m028 fase3 (PATCH-PLAN §8/§9.3): setApp adalah corong tunggal SEMUA layar, jadi
@@ -11172,37 +11135,19 @@ function setLearnerLocalePreference(next){
   return true;
 }
 window.setLearnerLocalePreference=setLearnerLocalePreference;
-/* m025-246 — BARIS PEMILIH TAMPILAN (Tema Malam).
-   Tiga pilihan, sama persis dengan kontrak di features/ui/fiezel-ui-manager.js:
-   'system' (bawaan, atribut data-theme dihapus supaya @media yang memutuskan),
-   'light', dan 'dark'. Diterapkan SEKETIKA seperti pemilih bahasa, bukan menunggu
-   tombol Simpan: murid yang membuka Pengaturan di ruangan gelap sedang mencari
-   kelegaan mata, dan menyuruhnya menggulir ke dasar panel untuk mendapatkannya
-   adalah kegagalan yang sama dengan sakelar yang tidak melakukan apa-apa. */
+/* Mode gelap dihapus — baris pemilih tema tidak lagi ditampilkan. */
 function themeChoiceRowMarkup(){
-  const ui=self.FiezelUI;
-  const active=(ui&&typeof ui.storedTheme==='function')?ui.storedTheme():'system';
-  const options=[['system',FiezelI18n.t('settings.tema-opsi-system')],['light',FiezelI18n.t('settings.tema-opsi-light')],['dark',FiezelI18n.t('settings.tema-opsi-dark')]]
-    .map(([value,label])=>`<option value="${value}"${value===active?' selected':''}>${esc(label)}</option>`).join('');
-  return `<label class="setting-row"><span class="setting-icon"><i data-lucide="moon-star"></i></span><span><b>${FiezelI18n.t('settings.tema-judul')}</b><small>${FiezelI18n.t('settings.tema-catatan')}</small></span><select id="settingTheme" aria-label="${FiezelI18n.t('settings.tema-judul')}">${options}</select></label>`;
+  return '';
 }
-function setThemePreference(next){
-  const ui=self.FiezelUI;
-  if(!ui||typeof ui.applyTheme!=='function')return false;
-  ui.applyTheme(next);
-  /* Langit dipasang sebagai gaya INLINE oleh updateCelestialClock (lihat
-     SCENE_NIGHT_PALETTE), jadi berganti tema tanpa memanggilnya meninggalkan satu
-     langit dari tema lama di belakang seluruh palet yang sudah benar. */
-  try{updateCelestialClock()}catch(_){}
-  haptic('confirm');showToast(FiezelI18n.t('settings.tema-toast'));
-  return true;
+function setThemePreference(){
+  return false;
 }
 window.setThemePreference=setThemePreference;
 function openSettings(){const p=state.preferences||defaultPreferences,endpoint=p.reportEndpoint||'';
   // Kartu Akun Puter dibungkus lipatan bersarang, BUKAN dipindah atau dihapus: elemennya
   // tetap di DOM (bindAccountSettingControls dan refreshPuterAccountCard tetap menemukannya),
   // tetapi 330 px penjelasan akun tidak lagi ikut terbuka saat panel baru dibuka.
-  const grupProfil=`<label class="endpoint-label">${FiezelI18n.t('onboarding.name-field-label')}<input id="settingLearnerName" type="text" value="${esc(state.userName||'')}" maxlength="24" placeholder="${FiezelI18n.t('settings.nama-you')}" autocomplete="given-name"></label>${learnerLocaleRowMarkup()}${themeChoiceRowMarkup()}`+settingsFold(FiezelI18n.t('settings.akun-puter'),accountSettingsMarkup(),false,'settings-subfold');
+  const grupProfil=`<label class="endpoint-label">${FiezelI18n.t('onboarding.name-field-label')}<input id="settingLearnerName" type="text" value="${esc(state.userName||'')}" maxlength="24" placeholder="${FiezelI18n.t('settings.nama-you')}" autocomplete="given-name"></label>${learnerLocaleRowMarkup()}`+settingsFold(FiezelI18n.t('settings.akun-puter'),accountSettingsMarkup(),false,'settings-subfold');
   const grupBelajar=`<div class="settings-list"><button type="button" class="setting-row setting-row-action" onclick="replayTour()"><span class="setting-icon"><i data-lucide="rotate-ccw"></i></span><span><b>${FiezelI18n.t('settings.redo-kenalan-cepat')}</b><small>${FiezelI18n.t('settings.menjalankan-ulang-tur-menu-awal')}</small></span><i data-lucide="chevron-right"></i></button><label class="setting-row"><span class="setting-icon"><i data-lucide="wand-sparkles"></i></span><span><b>${FiezelI18n.t('settings.animation-label')}</b><small>${FiezelI18n.t('settings.transisi-halaman-kartu-popup-feedback')}</small></span><input id="settingMotion" type="checkbox" ${p.motion?'checked':''}></label><label class="setting-row"><span class="setting-icon"><i data-lucide="vibrate"></i></span><span><b>${FiezelI18n.t('settings.vibration-label')}</b><small>${typeof navigator!=='undefined'&&typeof navigator.vibrate==='function'?FiezelI18n.t('settings.vibration-supported'):FiezelI18n.t('settings.vibration-fallback')}</small></span><input id="settingHaptics" type="checkbox" ${p.haptics?'checked':''}></label>${gemsSettingsRowMarkup()}</div>`;  const grupSuara=`<div class="settings-list"><label class="setting-row"><span class="setting-icon"><i data-lucide="bell-check"></i></span><span><b>${FiezelI18n.t('settings.pengingat-study')}</b><small>${esc(reminderSettingHint())}</small></span><input id="settingReminders" type="checkbox" ${remindersActive()?'checked':''} ${notificationPermission()==='denied'||notificationPermission()==='unsupported'?'disabled':''} aria-label="${FiezelI18n.t('settings.reminder-aria')}"></label><label class="setting-row"><span class="setting-icon"><i data-lucide="badge-check"></i></span><span><b>${FiezelI18n.t('settings.suara-answer')}</b><small>${FiezelI18n.t('settings.bunyi-naik-when-right-bunyi')}</small></span><input id="settingFeedbackSounds" type="checkbox" ${p.feedbackSounds!==false?'checked':''}></label><div class="setting-row" id="audioDiagRow"><span class="setting-icon"><i data-lucide="smartphone"></i></span><span><b>${FiezelI18n.t('settings.status-bunyi-perangkat')}</b><small id="audioDiagText">${FiezelI18n.t('settings.audio-checking')}</small></span></div></div><div id="voiceSettingsCard">${neuralVoiceStatusMarkup()}</div>`;
   // Tombol bersihkan-cache duduk di antara Backup dan Kesehatan Instalasi: kartu diagnosis
   // itulah yang melaporkan shell usang, jadi tombol perbaikannya berdampingan dengannya.
@@ -11221,7 +11166,7 @@ function openSettings(){const p=state.preferences||defaultPreferences,endpoint=p
     +settingsFold(FiezelI18n.t('settings.data-amp-penyimpanan'),grupData,false)
     +settingsFold(FiezelI18n.t('settings.lanjutan'),grupLanjutan,false)
     +`<div class="modal-actions settings-actions"><button id="settingsCancel">${FiezelI18n.t('settings.cancel-btn')}</button><button class="primary" id="settingsSave">${FiezelI18n.t('settings.simpan-prefs')}</button></div>`);
-  $('settingsCancel').onclick=closeModal;setTimeout(refreshInstallHealth,0);setTimeout(refreshAudioDiagnostics,0);$('backupExport')?.addEventListener('click',runBackupExport);$('backupPick')?.addEventListener('click',()=>$('backupFile')?.click());$('backupFile')?.addEventListener('change',event=>runBackupImport(event.currentTarget.files?.[0]));$('openFeedback')?.addEventListener('click',()=>{closeModal();openFeedback('')});$('reportPreview').onclick=openReportPreview;$('settingsSave').onclick=saveSettings;$('settingClearCache')?.addEventListener('click',()=>{confirmClearAppCache()});bindVoiceSettingControls();bindAccountSettingControls();bindFiezelAccountControls();$('settingReminders')?.addEventListener('change',event=>toggleStudyReminders(event.currentTarget));$('settingLearnerLocale')?.addEventListener('change',event=>setLearnerLocalePreference(event.currentTarget.value));$('settingTheme')?.addEventListener('change',event=>setThemePreference(event.currentTarget.value));$('settingBoardHidden')?.addEventListener('change',event=>socialToggleHidden(event.currentTarget));
+  $('settingsCancel').onclick=closeModal;setTimeout(refreshInstallHealth,0);setTimeout(refreshAudioDiagnostics,0);$('backupExport')?.addEventListener('click',runBackupExport);$('backupPick')?.addEventListener('click',()=>$('backupFile')?.click());$('backupFile')?.addEventListener('change',event=>runBackupImport(event.currentTarget.files?.[0]));$('openFeedback')?.addEventListener('click',()=>{closeModal();openFeedback('')});$('reportPreview').onclick=openReportPreview;$('settingsSave').onclick=saveSettings;$('settingClearCache')?.addEventListener('click',()=>{confirmClearAppCache()});bindVoiceSettingControls();bindAccountSettingControls();bindFiezelAccountControls();$('settingReminders')?.addEventListener('change',event=>toggleStudyReminders(event.currentTarget));$('settingLearnerLocale')?.addEventListener('change',event=>setLearnerLocalePreference(event.currentTarget.value));$('settingBoardHidden')?.addEventListener('change',event=>socialToggleHidden(event.currentTarget));
 // Pengaturan sebelum gelombang idle selesai, kartunya akan berbunyi "tidak tersedia"
 // padahal berkasnya sedang dalam perjalanan - jadi kartunya digambar ulang begitu tiba.
 if(!self.FiezelVoiceRuntime)ensureVoiceRuntime().then(()=>{const holder=$('voiceSettingsCard');if(!holder)return;holder.innerHTML=neuralVoiceStatusMarkup();bindVoiceSettingControls();enhanceUI()});
