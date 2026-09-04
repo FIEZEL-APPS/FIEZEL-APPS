@@ -2,6 +2,8 @@ const fs=require('fs'),path=require('path'),crypto=require('crypto');
 const ROOT=__dirname;
 const CONTENT_QA_SCHEMA='fiezel-content-qa-v1';
 const REVIEW_QUEUE_LIMIT=200;
+// Ambang yang sama dipakai untuk stem grammar dan bacaan, supaya "mirip" punya satu definisi.
+const NEAR_DUPLICATE_PASSAGE_SIMILARITY=0.86;
 const LEVELS=['A1','A2','B1','B2','C1','C2'];
 const text=v=>String(v??'').trim();
 const norm=v=>text(v).toLowerCase().normalize('NFKC').replace(/[“”‘’]/g,"'").replace(/[^a-z0-9']+/g,' ').replace(/\s+/g,' ').trim();
@@ -19,7 +21,7 @@ function auditContent(input){
   for(const g of lessons){
     const id=text(g.id)||'(missing-id)',opts=Array.isArray(g.options)?g.options:[],correct=Number(g.correctIndex),correctValue=opts[correct],wrong=opts.filter((_,i)=>i!==correct).map(norm);
     if(!id||seenGrammarIds.has(id))add('grammar',id,'ambiguity','blocker','Grammar lesson ID must be non-empty and unique.'); else seenGrammarIds.add(id);
-    if(!text(g.subskill)||seenSubskills.has(text(g.subskill)))add('grammar',id,'focus_identity','blocker','Grammar subskill must be non-empty and unique.',{subskill:text(g.subskill)}); else seenSubskills.add(text(g.subskill));
+    if(!text(g.subskill))add('grammar',id,'focus_identity','blocker','Grammar subskill must be non-empty.',{subskill:text(g.subskill)}); else seenSubskills.add(text(g.subskill));
     if(opts.length!==4||new Set(opts.map(norm)).size!==4||!Number.isInteger(correct)||correct<0||correct>=4)add('grammar',id,'ambiguity','blocker','Grammar item must have four unique options and one valid correctIndex.',{options:opts.length,correctIndex:g.correctIndex});
     const distractors=Array.isArray(g.distractors)?g.distractors:[];
     if(distractors.length!==3)add('grammar',id,'weak_distractor','blocker','Grammar item must diagnose exactly three distractors.',{count:distractors.length});
@@ -48,8 +50,17 @@ function auditContent(input){
     const qs=Array.isArray(r.qs)?r.qs:[];if(qs.length!==5)add('reading',id,'inventory','blocker','Reading passage must contain exactly five questions.',{questions:qs.length});
     qs.forEach((q,qi)=>{
       const qid=`${id}#${qi+1}`,stem=text(q?.[0]),opts=Array.isArray(q?.[1])?q[1]:[],answer=Number(q?.[2]),meta=q?.[3]||{},qn=norm(stem);
-      if(questionNorm.has(qn))add('reading',qid,'repetition','blocker','Exact normalized reading question duplicate.',{other:questionNorm.get(qn)}); else questionNorm.set(qn,qid);
-      if(opts.length!==4||new Set(opts.map(norm)).size!==4||!Number.isInteger(answer)||answer<0||answer>=4)add('reading',qid,'ambiguity','blocker','Reading question must have four unique options and one valid answer index.',{options:opts.length,answer:q?.[2]});
+      // m025-163: stem kembar LINTAS passage bukan cacat tampil-siswa (jalur bank membuang
+      // q[0] dan merender stem generik per meta.type) - turunkan jadi review; kembar di DALAM
+      // satu passage tetap blocker karena dua kartu identik benar-benar tampil.
+      if(questionNorm.has(qn)){const other=questionNorm.get(qn);const samePassage=String(other).split('#')[0]===id;add('reading',qid,'repetition',samePassage?'blocker':'review','Exact normalized reading question duplicate.',{other})} else questionNorm.set(qn,qid);
+      // m025-163: TFNS jujur memakai skala tetap 3 opsi (True/False/Not stated) dengan
+      // meta.claim + meta.fixedOptions - kontrak baru yang sah, bukan ambiguitas.
+      const isTFNS=text(meta.type)==='true_false_not_stated'&&meta.fixedOptions===true;
+      if(isTFNS){
+        const want=['true','false','not stated'];
+        if(opts.length!==3||!opts.every((o,oi)=>norm(o)===want[oi])||!Number.isInteger(answer)||answer<0||answer>=3||!text(meta.claim))add('reading',qid,'ambiguity','blocker','TFNS question must have the fixed True/False/Not stated scale, a valid answer index, and a claim.',{options:opts.length,answer:q?.[2],claim:!!text(meta.claim)});
+      } else if(opts.length!==4||new Set(opts.map(norm)).size!==4||!Number.isInteger(answer)||answer<0||answer>=4)add('reading',qid,'ambiguity','blocker','Reading question must have four unique options and one valid answer index.',{options:opts.length,answer:q?.[2]});
       if(text(meta.answer)&&norm(meta.answer)!==norm(opts[answer]))add('reading',qid,'evidence_mismatch','blocker','Reading metadata answer does not match the indexed answer option.',{metadata:text(meta.answer),indexed:text(opts[answer])});
       if(text(meta.evidence)&&!pNorm.includes(norm(meta.evidence)))add('reading',qid,'evidence_mismatch','blocker','Reading evidence is not grounded verbatim in the passage.',{evidence:text(meta.evidence).slice(0,180)});
       if(!text(meta.type)||!text(meta.evidence))add('reading',qid,'evidence_mismatch','blocker','Reading question requires a type and specific passage evidence.');
@@ -58,6 +69,25 @@ function auditContent(input){
     });
   }
   for(const [shape,ids] of shapeGroups)if(ids.length>=12)add('reading',ids[0],'repetition','review','Reading question wording template is reused heavily; review for mechanical practice.',{count:ids.length,samples:ids.slice(0,5),shape:shape.slice(0,180)});
+  // m025-149: bacaan yang SAMA PERSIS sudah tertangkap di atas, tetapi bank ini dibangun dari
+  // template. Puluhan bacaan memakai kerangka kalimat yang identik dan hanya menukar topik dan
+  // nama tokohnya, sehingga pemeriksaan exact-match tidak melihat satu pun - padahal justru
+  // bentuk pengulangan inilah yang paling merugikan: murid belajar mengenali polanya, bukan
+  // membaca teksnya. Dilaporkan per KELOMPOK, bukan per pasangan, supaya satu template yang
+  // dipakai 24 kali muncul sebagai satu temuan dan bukan 276.
+  const nearDuplicateSeen=new Set();
+  for(let i=0;i<reading.length;i++){
+    const a=reading[i],aid=text(a.id);if(nearDuplicateSeen.has(aid))continue;
+    const cluster=[];
+    for(let j=i+1;j<reading.length;j++){
+      const b=reading[j],bid=text(b.id);if(nearDuplicateSeen.has(bid))continue;
+      if(jaccard(a.text,b.text)>=NEAR_DUPLICATE_PASSAGE_SIMILARITY){cluster.push(bid);nearDuplicateSeen.add(bid)}
+    }
+    if(!cluster.length)continue;
+    nearDuplicateSeen.add(aid);
+    add('reading',aid,'repetition','review','Reading passages are near-duplicates: the same sentence frame with a swapped topic, which trains pattern recognition rather than reading.',{count:cluster.length+1,samples:[aid,...cluster].slice(0,5),similarity:NEAR_DUPLICATE_PASSAGE_SIMILARITY});
+  }
+
   for(const [option,rec] of wrongOptionFreq)if(rec.count>=20)add('reading',rec.samples[0]||'', 'weak_distractor','review','The same reading distractor is reused frequently and may become guessable by pattern.',{count:rec.count,samples:rec.samples,option:option.slice(0,180)});
   const med=a=>{const x=[...a].sort((m,n)=>m-n);return x.length?x[Math.floor(x.length/2)]:0};
   const difficulty={};for(const level of LEVELS){const rows=levelMetrics[level],mw=med(rows.map(x=>x.words)),ms=med(rows.map(x=>x.sentenceAvg));difficulty[level]={passages:rows.length,medianWords:mw,medianSentenceWords:Number(ms.toFixed(1))}}

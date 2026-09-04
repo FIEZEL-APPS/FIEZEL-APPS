@@ -3,7 +3,21 @@ Thumbs.db
 *.log
 *.tmp
 *.bak
+# Artefak merge/patch. Bukan sekadar sampah: `*.orig`/`*.rej` adalah SALINAN UTUH
+# versi lain sebuah berkas, jadi berkas yang placeholder-nya sudah dibersihkan bisa
+# tetap memuat nilai sungguhan di dalam salinan ini. `secret-scan-test.js` meng-assert
+# ketiganya diabaikan DAN tidak ada satu pun yang terlacak git.
+*.orig
+*.rej
 node_modules/
+# package-lock.json SENGAJA tidak dilacak, dan itu bukan kelalaian: quality.yml menjalankan
+# `npm install --ignore-scripts` TANPA lockfile, jadi menambahkan satu ke repo akan mengubah
+# versi yang benar-benar dipasang CI hari ini. Repo ini punya satu dependensi runtime
+# (web-push), dan keputusan mengunci atau tidak menguncinya adalah keputusan rilis
+# tersendiri - bukan efek samping dari `npm install` yang kebetulan dijalankan seseorang di
+# mesinnya. Barisnya ada di sini supaya berkas itu berhenti muncul sebagai perubahan yang
+# belum di-commit setiap kali ada yang memasang dependensi.
+package-lock.json
 __pycache__/
 *.pyc
 FINAL-AUDIT-REPORT.json
@@ -25,3 +39,50 @@ CONTENT-ADOPTION-PROOF.json
 push-secrets*.json
 push-secrets*.txt
 fiezel-autonomy-config.json
+
+# Worktree sementara milik agent. Pernah ikut ter-commit sebagai gitlink (mode 160000)
+# pada merge m025-85, yang membuat kloning baru melihat submodule rusak.
+.claude/worktrees/
+
+# Preview-server config lokal per sesi (port bisa beda-beda antar sesi/agent).
+.claude/launch.json
+.reading-new/parts/
+RELEASE-AUDIT-GATE-REPORT.json
+
+# Laporan cf-live-contract-test.js (`--report`). Isinya BERGANTUNG LINGKUNGAN:
+# base URL Worker, status per assert, dan daftar permintaan yang benar-benar
+# ditembakkan. Dua orang yang menjalankannya terhadap dua deployment berbeda akan
+# menghasilkan isi berbeda tanpa satu pun perubahan kode, jadi men-commit-nya
+# hanya menghasilkan konflik dan bukti yang menyesatkan ("hijau di repo" padahal
+# hijaunya milik lingkungan orang lain). Buktinya hidup di CI/terminal, bukan di git.
+CF-LIVE-REPORT.json
+CF-SHADOW-MODE-REPORT.json
+
+# Laporan staging-live-test.js (`--report`). Alasan yang sama seperti di atas, plus
+# satu yang lebih keras: isinya merekam percakapan HTTP nyata ke Worker staging
+# (jalur, status, waktu). Ia TIDAK memuat nilai rahasia edge — gerbang itu memindai
+# laporannya sendiri sebelum menulis dan menolak menulis kalau rahasianya muncul —
+# tapi jejak lingkungan seperti ini tetap tidak punya urusan di dalam git.
+STAGING-LIVE-REPORT.json
+CF-CONFIG-KILLSWITCH-REPORT.json
+CF-SHADOW-LEDGER-REPORT.json
+NO-NETWORK-REPORT.json
+SECRET-SCAN-REPORT.json
+
+# Artefak gerbang: DIHASILKAN ULANG setiap gerbang jalan, nol gerbang membacanya sebagai
+# masukan (diverifikasi 28 Agu 2026: 50 berkas menulis, 0 membaca). Melacaknya di git hanya
+# menambah permukaan konflik - malam ini satu di antaranya bahkan ter-commit BERISI penanda
+# konflik merge. Buktinya ada di keluaran gerbang, bukan di berkas yang tertinggal di worktree.
+*-REPORT.json
+# P10: artefak report generated tidak dilacak
+ANALYTICS-DEDUP-REPORT.json
+ANALYTICS-STABLE-ID-GUARD-REPORT.json
+LISTENING-SUBTITLE-SUPPRESSION-REPORT.json
+BOOT-FIRST-PAINT-REPORT.json
+SW-NAV-SHELL-FIRST-REPORT.json
+*.env
+credentials.json
+*.pem
+*.key
+.credentials
+.wrangler/

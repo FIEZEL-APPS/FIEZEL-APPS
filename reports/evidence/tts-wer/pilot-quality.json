@@ -1,0 +1,122 @@
+[
+ {
+  "text": "a1",
+  "model": "aura-1",
+  "http": "200",
+  "ms": 441,
+  "bytes": 25704,
+  "sec": 4.28,
+  "wer": 0.0,
+  "tx": "Maya has a small garden behind her house. She grows tomatoes and green plants there."
+ },
+ {
+  "text": "a1",
+  "model": "aura-2-en",
+  "http": "200",
+  "ms": 2293,
+  "bytes": 31248,
+  "sec": 5.21,
+  "wer": 0.0,
+  "tx": "Maya has a small garden behind her house. She grows tomatoes and green plants there."
+ },
+ {
+  "text": "a1",
+  "model": "melotts",
+  "http": "500",
+  "ms": 642,
+  "bytes": 0,
+  "sec": 0,
+  "wer": null,
+  "tx": ""
+ },
+ {
+  "text": "a2",
+  "model": "aura-1",
+  "http": "200",
+  "ms": 368,
+  "bytes": 23667,
+  "sec": 3.94,
+  "wer": 0.0,
+  "tx": "Every morning she gives water to them. Her little brother helps her on Sunday."
+ },
+ {
+  "text": "a2",
+  "model": "aura-2-en",
+  "http": "200",
+  "ms": 2141,
+  "bytes": 26496,
+  "sec": 4.42,
+  "wer": 0.0,
+  "tx": "Every morning she gives water to them. Her little brother helps her on Sunday."
+ },
+ {
+  "text": "a2",
+  "model": "melotts",
+  "http": "500",
+  "ms": 824,
+  "bytes": 0,
+  "sec": 0,
+  "wer": null,
+  "tx": ""
+ },
+ {
+  "text": "b1",
+  "model": "aura-1",
+  "http": "200",
+  "ms": 598,
+  "bytes": 27899,
+  "sec": 4.65,
+  "wer": 0.0,
+  "tx": "The council approved the plan after three long meetings, though several members remained doubtful."
+ },
+ {
+  "text": "b1",
+  "model": "aura-2-en",
+  "http": "200",
+  "ms": 2124,
+  "bytes": 29664,
+  "sec": 4.94,
+  "wer": 0.071,
+  "tx": "The Council approved the plan after three long meetings, though several members remain doubtful."
+ },
+ {
+  "text": "b1",
+  "model": "melotts",
+  "http": "500",
+  "ms": 717,
+  "bytes": 0,
+  "sec": 0,
+  "wer": null,
+  "tx": ""
+ },
+ {
+  "text": "c1",
+  "model": "aura-1",
+  "http": "200",
+  "ms": 933,
+  "bytes": 29466,
+  "sec": 4.91,
+  "wer": 0.154,
+  "tx": "Unbalanced, the evidence suggests that the intervention succeeded, albeit within narrow limits."
+ },
+ {
+  "text": "c1",
+  "model": "aura-2-en",
+  "http": "200",
+  "ms": 3077,
+  "bytes": 36576,
+  "sec": 6.1,
+  "wer": 0.0,
+  "tx": "On balance, the evidence suggests that the intervention succeeded, albeit within narrow limits."
+ },
+ {
+  "text": "c1",
+  "model": "melotts",
+  "http": "200",
+  "ms": 781,
+  "bytes": 44764,
+  "sec": 5.52,
+  "wer": 0.0,
+  "tx": "On balance, the evidence suggests that the intervention succeeded, albeit within narrow limits."
+ }
+]

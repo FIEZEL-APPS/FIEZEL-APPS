@@ -1,0 +1,122 @@
+{
+ "audit_version": "v1.0",
+ "timestamp": "2026-08-28T13:33:05.442146",
+ "app": "FIEZEL (fiezel.my.id) @ m025-182, PR #237",
+ "screens_routes_components": "14 views / 3 stages / shared quizLoop for 8 quiz flows (see uiux-audit-01-architecture.md)",
+ "viewport_results": "320-1440px + landscape: zero horizontal overflow post-fix (agent04, agent20 re-verified)",
+ "severity_totals": {
+  "P2": 37,
+  "P3": 68,
+  "P4": 28,
+  "P1": 12
+ },
+ "issue_count": 145,
+ "critical_issues": [],
+ "high_issues": [
+  {
+   "id": "03-001",
+   "issue": "DESIGN-SYSTEM.md is stale in nearly every section and actively misleads the concurrent AI agents told to treat it as canonical. Stale statements verified one by one: (1) Palette table §1: --accent claimed #8C2233 maroon / dark #e0708a — actual is #C2402C terracotta (style.css:660) and live computed --accent = #C2402C; every other light value in the table is also wrong: --bg #faf7f6 vs actual #FFF9EE (style.css:653), --panel #fffdfc vs #FFFFFF (654), --panel-soft #f6eef0 vs #FFF3DC (655), --line #e9dfe1 vs #F0E4CF (656), --text #1d1114 vs #241A11 (658), --muted #6b5a60 vs #6E5E47 (659), --gold #d8b36b vs #C9A24B (665), --green #278268 vs #2E8B69 (679), --red #bd4f63 vs #B8432D (681). (2) The doc never mentions the --sun/--core/--good/--bad/--info/--focus-ring families the product actually runs on: the primary CTA renders --sun #FFC700 (style.css:698, 813 '.primary{background:var(--sun)}', live computed .primary background rgb(255,199,0)), matching the yellow/gold branding in shots/baseline-home-390.png and manifest.json:8 theme_color #FFC700. (3) Dark mode §1: doc documents @media(prefers-color-scheme:dark)+:root[data-theme=dark] and features/ui/fiezel-dark-mode.js — NONE exist: zero matches for prefers-color-scheme or data-theme=\"dark\" in style.css; features/ui/ contains no fiezel-dark-mode.js; index.html:18-20 comment 'm025-134: mode gelap dihapus' + <meta name=color-scheme content=light>; features/ui/fiezel-ui-manager.js:18 force-pins data-theme='light'; live dataTheme='light', window.fiezelDarkMode undefined. The entire dark column of the token table and the '--black dark = #8C2233' trap note are dead. (4) Typography §2: doc claims --fz-heading = FZ Fredoka — actual --fz-heading = 'FZ Plus Jakarta Sans' (style.css:776); Fredoka is --fz-display-round (775); the doc never mentions FZ Instrument Serif (--fz-display, style.css:771) even though it is the rendered h1/section-title face (style.css:786-787; live h1 computed font = 'FZ Instrument Serif'; index.html:40 preloads InstrumentSerif-400.woff2). (5) Shape §3: --radius-lg claimed 22px vs actual 24px (style.css:683); shadow values claimed 0 8px 24px / 0 20px 50px / 0 34px 90px vs actual 0 2px 10px / 0 10px 30px / 0 24px 60px (style.css:687-689). (6) Brand §8: manifest background_color claimed #120C0F vs actual #FFF9EE (manifest.json:7). (7) Mascot note §8 says character was deleted at m025-80 and no new illustration style may be introduced — features/mascot/fiezel-mascot.js + fiezel-motion.css + micro-ui.css implement the live 'Pau' mascot visible in baseline-home-390.png. (8) §1 says the SECOND :root block is the single source of truth and block 1 is merely 'overridden' — in reality 31 live tokens (--ease, --ease-spring, --dur-*, all --glass-*, --ambient-*, --chrome-bg, --sky-*, --launcher-*, --cream*, --yellow*, --accent-on-glass) are defined ONLY in block 1 (style.css:6-89) and a THIRD :root block exists at style.css:3210.",
+   "severity": "P1"
+  },
+  {
+   "id": "06-001",
+   "issue": "History/stack desync: starting the exam from its modal runs closeModal() (which calls FiezelBackNav.dismiss -> asynchronous history.go(-1)) and then immediately quizLoop() -> enterStage -> pushState. The async rewind lands AFTER the push, so the back-nav stack reports depth=1 (quiz layer) while the real history pointer sits on the base entry with no in-app entry beneath. Instrumented live: at '2-EXAM' snapshot stack=['stage:quiz:1'] depth=1, but ONE browser/Android back press mid-exam unloaded the app document entirely (URL -> about:blank) instead of closing the quiz. In the installed PWA this closes/exits the app mid-assessment. Because the document unloads, the quiz stage 'leave' hook never runs: abandonActiveSession/recordSkipExamFail never fire, so on relaunch levelTrust.exams={} — no failed attempt, no 24h cooldown. The back button is therefore also a free exam re-roll that bypasses the m025-177 anti-reroll rule, while the learner's in-exam progress silently vanishes. Same closeModal()->quiz pattern exists at app.js:4052 (levelEntryExam) and app.js:5735 (lessonSkipStart->startLessonSkipGate). app.js's own comment (app.js:3946-3951) names running dismiss() right before pushing a new entry as 'persis cara membuat riwayat dan tumpukan tidak sejajar' — startLevelExam does exactly that.",
+   "severity": "P1"
+  },
+  {
+   "id": "09-001",
+   "issue": "CRITICAL CHECK FAILED: assessments reveal correctness AND the correct answer after every question, mid-test, including exam mode. On tap, answer() adds classList 'correct'/'wrong' to the chosen option in ALL modes (app.js:6441 button.classList.add(ok?'correct':'wrong')) and fires answerFeedbackSignal (haptic+sound+'Benar!/Belum tepat' burst, app.js:2542-2546). The confidence popup then announces the verdict (app.js:1279). reveal() then highlights the correct option (app.js:6392 querySelectorAll('.option')[q.answerIndex].classList.add('correct')) and prints 'Jawaban yang paling tepat adalah <correct>' with full explanation, per-distractor breakdown and an AI-explain button (app.js:6395-6396). cfg.noHints only disables retry/hints (app.js:6486-6493), NOT the reveal. Verified live in exam mode: tap classes ['option correct','option','option','option'], feedback 'Jawaban yang paling tepat adalah students who collect plastic on a beach'. Because the exam draws from a finite per-level bank ('Soal diacak dari bank level A2 setiap percobaan') and retry costs only 24h (app.js:100-103,991), an examinee can farm the answer key across attempts — undermining the stated contract 'Jawab benar minimal 80% tanpa petunjuk' (app.js:126) and the verified-level trust chain. Same channel applies to placement (retake after 24h, app.js:6178).",
+   "severity": "P1"
+  },
+  {
+   "id": "09-002",
+   "issue": "Exiting an exam mid-test silently burns the attempt: 'Keluar' (and back gesture / bottom nav) triggers abandonActiveSession which records a FAIL (score 0/25, accuracy 0) plus 24h cooldown with weakSkill 'ujian ditinggalkan sebelum selesai' (app.js:1161, recordSkipExamFail app.js:987-993) — with NO confirmation dialog and NO message at exit time (quizExit handler just go('home'), app.js:6313; enterStage leave app.js:6559; no confirm() anywhere). Verified live: after tapping Keluar with 1 answer, state.levelTrust.exams.A2={attempts:1,passed:false,cooldownUntil:+24h} and the screen showed only the home view. The instructions modal never warns that exiting counts as a failed attempt — the user discovers the penalty only when reopening the panel ('Percobaan terakhir: 0/25 (0%) · yang menjatuhkan: ujian ditinggalkan sebelum selesai' + disabled 'Bisa diulang 24 jam lagi').",
+   "severity": "P1"
+  },
+  {
+   "id": "10-001",
+   "issue": "Tapping 'Keluar' mid-exam exits instantly with NO confirmation dialog and NO post-exit notice, yet silently burns the attempt: recordSkipExamFail is called (attempt logged as 0/25, weakSkill 'ujian ditinggalkan sebelum selesai') and a 24h cooldown starts. Same for the skip gate (skipGateCooldownUntil set silently). The user lands on Home with zero communication; the penalty is only discoverable later when re-opening the exam/gate ('Bisa diulang 23 jam lagi' / cooldown toast). Destructive action without confirmation + hidden consequence.",
+   "severity": "P1"
+  },
+  {
+   "id": "10-002",
+   "issue": "Reloading the page (or killing the PWA) mid-exam fully bypasses the attempt-burn penalty that 'Keluar' enforces. The interrupted activeSession is logged as abandoned/'interrupted' WITHOUT calling recordSkipExamFail or setting skipGateCooldownUntil, and there is no beforeunload handler. Empirically: B1 exam with 2 answers -> reload -> examB1 back to {attempts:0, cooldownUntil:0}; skip gate with 1 answer -> reload -> skipGateCooldownUntil:0. This is a free-reroll exploit (see a bad question bank, refresh, get a new draw) and makes enforcement dishonest: the honest user who taps Keluar is punished, the user who refreshes is not — contradicting the gate modal's own claim 'keluar di tengah jalan = percobaannya terpakai'.",
+   "severity": "P1"
+  },
+  {
+   "id": "11-001",
+   "issue": "The full explanation panel renders entirely below the fold with no auto-scroll and no visual cue that it exists. Measured across 10 real questions: #feedback top 923–1159px vs viewport height 844px, scrollY 0, visible pixels 0 on every correct-first-try reveal. The user sees only the verdict burst/badges on the options; 'Lanjut' in the fixed topbar is already enabled, so the whole explanation (Intinya, distractor notes, memory tip, AI-explain button) can be skipped without ever being seen. reveal() has no scrollIntoView, while the retry tutor turn does (app.js:~6386), so the inconsistency is one-line fixable.",
+   "severity": "P1"
+  },
+  {
+   "id": "16-001",
+   "issue": "load() awaits the three required bank fetches with NO timeout (app.js:2410). If a response stalls, the fetch never rejects, so the load().catch error path (app.js:7656) never fires. The static splash's 15s watchdog (index.html:125-134) then removes the splash, leaving a permanently BLANK main area: header and bottom nav render and look alive, but #app stays empty forever — no loading indicator, no error, no retry. Tapping nav during this state renders misleading fake-empty hubs: Vocabulary Hub claims '0 kata level A1' because V is still empty, presenting missing data as a content-less level.",
+   "severity": "P1"
+  },
+  {
+   "id": "17-001",
+   "issue": "Cold boot transfers 8.61 MB over 91 requests before the app settles (localhost). 6.03 MB of that is content JSON fetched EAGERLY at boot: reading-bank.json 1,896,680 B + listening-bank-v1.json 1,894,903 B (idle prefetch for placement) + vocabulary-master.json 1,157,695 B + grammar-templates.json 570,593 B + library-books-v1.json 331,753 B + 5 more banks — far more than the ~2.7 MB assumed. Under Slow 4G + 4x CPU: FCP 32.4 s, splash removed at 48.4 s, and at 52.8 s the home content area was STILL EMPTY (only header + bottom nav painted, #app children = 0). 64 separate script files (2.08 MB) load at boot.",
+   "severity": "P1"
+  },
+  {
+   "id": "17-002",
+   "issue": "After the splash leaves on a slow connection, the user faces a fully blank content stage — header and bottom nav only, no skeleton, no spinner, no progress message — for tens of seconds while the 6 MB content banks finish downloading (screenshot at T+52.8 s shows empty #app). features/ui/skeleton-helpers.js exists but nothing fills the home stage in this state. Blank-after-splash is the single strongest 'app feels broken/slow' signal.",
+   "severity": "P1"
+  },
+  {
+   "id": "20-001",
+   "issue": "Tapping the main CTA gives ZERO feedback on the page (no spinner, no disabled state, no aria-busy, no toast) while it silently opens a puter.com sign-in popup and awaits it with NO timeout. If the popup stays open unattended (or opens behind the window), the app hangs indefinitely looking dead: 0 options after 66s of polling; a direct await of resolveAdaptivePolicy() never resolved (killed at 630s). The button stays enabled — 5 rapid clicks queue silently with no feedback. Recovery only happens if the learner interacts with the popup (question appeared ~3s after manually closing it) or if a popup blocker nulls window.open (question in 3.2s). Learner test fails hard: 'I pressed start and nothing happened.'",
+   "severity": "P1"
+  },
+  {
+   "id": "20-002",
+   "issue": "Flame icon renders at 300x300px because no CSS width rule exists for .fz-i inside .fz-ritual-streak. Card balloons to 580px tall, streak text 'Runtun 2 hari — jaga nyalanya.' is clipped off the right edge, giant flame covers the plan. Same defect class as the previously-fixed 'Peta icons 300px' bug noted in a style.css comment.",
+   "severity": "P1"
+  }
+ ],
+ "statuses": {
+  "visual_design": "PASS (post-fix)",
+  "design_system": "CONDITIONAL (doc rewritten; token fragmentation P3 open)",
+  "navigation": "PASS (post-fix: 06-001 fixed, exit confirm added)",
+  "onboarding": "CONDITIONAL (07-001 reload persistence, 07-002/18-P1 placement handoff open)",
+  "learning": "CONDITIONAL (08-001 listening watchdog open; exit confirm + scroll fixed)",
+  "assessment": "PASS (post-fix: measure mode, symmetric abandon, reload loophole closed)",
+  "skip_level": "PASS (post-fix)",
+  "skip_material": "PASS (post-fix)",
+  "feedback": "PASS (post-fix: 11-001 auto-scroll; 11-002 AI modal timeout open P2)",
+  "responsive": "PASS (post-fix)",
+  "mobile": "PASS",
+  "pwa": "CONDITIONAL (05-002 update flow, 05-003 resume open)",
+  "accessibility": "CONDITIONAL (modal inert P2 open; contrast fixed)",
+  "microcopy": "CONDITIONAL (register/terminology sweep open)",
+  "animation": "CONDITIONAL (12-001 returning-user black boot, 12-003 dead pageIn open)",
+  "audio": "PASS",
+  "loading_states": "CONDITIONAL (skeleton system still unwired 16-004)",
+  "error_states": "PASS (post-fix: timeout + branched error card + retry)",
+  "empty_states": "PASS",
+  "performance": "CONDITIONAL (17-001 6MB eager boot payload open P1)",
+  "cross_session_consistency": "CONDITIONAL (01-001 state fragmentation, 20-005 two-tab race open)",
+  "regression": "PASS (173/173 local gates pre-merge; post-merge criticals green; 5 upstream content-gate failures pre-exist on main)",
+  "red_team": "PASS (both P1 breaks fixed and verified)",
+  "night_watch": "ACTIVE (daily UI/UX watch + repo nightwatch.yml)"
+ },
+ "implemented_repairs": [
+  "16-001/16-002 bank timeout + retry card",
+  "20-001 CTA busy + 4s race fallback",
+  "09-001 measure mode (no mid-test reveal)",
+  "09-002/10-001/10-003 exit confirm + modal disclosure",
+  "10-002 inflightAttempt reload penalty",
+  "06-001 replaceTopLayer history fix",
+  "11-001/08-003/02-002 reveal auto-scroll + stage scroll reset",
+  "20-002/20-003 flame icon + .fz-i guard",
+  "04-001 settings 320px",
+  "02-003 chip contrast 5.17:1",
+  "14-002 Tanya FIEZEL 6.07:1",
+  "04-003/04-004/04-005 tap targets + connector pointer-events",
+  "03-001 DESIGN-SYSTEM.md rewrite"
+ ],
+ "regressions_found": "none (verifier 11/11 VERIFIED, 0 refuted; practice flows re-proven)",
+ "concurrent_agent_changes": "PAW Character System m025-181 merged in-branch; neural-voice T-026 untouched; upstream main quality CI red on content gates (http-smoke schema, mastery-bkt 153!=139, lesson-experience, quota-notice-a11y, product-audit) — pre-existing, outside claim, reported",
+ "night_watch_status": "activated (daily)",
+ "production_ready": "CONDITIONAL GO — P1 blockers fixed & independently verified; pending owner A12 decision + merge; top open items: 17-001 boot payload diet, 18-002 review loop, 12-001 returning-user boot"
+}

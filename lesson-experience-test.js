@@ -1,6 +1,14 @@
 const fs=require('fs'),path=require('path'),vm=require('vm');
 const root=__dirname;
 const app=fs.readFileSync(path.join(root,'app.js'),'utf8');
+// AI-20 F06 (kategori 2a, UNION-CORPUS): kontrak naskah alami ('Hindari gaya buku teks',
+// 'Gunakan Bahasa Indonesia yang jernih') boleh PINDAH byte-identik ke copy-map
+// features/i18n/copy-id-*.js (dijaga id-golden-snapshot-test.js), jadi literalnya dicari
+// di gabungan app.js + copy-map id. Sinkron dengan release-audit.py check
+// 'Natural Indonesian explanations' yang memakai corpus gabungan yang sama.
+const i18nDir=path.join(root,'features','i18n');
+const copyIdCorpus=fs.existsSync(i18nDir)?fs.readdirSync(i18nDir).filter(n=>/^copy-id-.*\.js$/.test(n)).sort().map(n=>fs.readFileSync(path.join(i18nDir,n),'utf8')).join('\n'):'';
+const idCorpus=app+'\n'+copyIdCorpus;
 const css=fs.readFileSync(path.join(root,'style.css'),'utf8');
 const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
 const grammar=JSON.parse(fs.readFileSync(path.join(root,'grammar-templates.json'),'utf8'));
@@ -10,38 +18,62 @@ function classList(){const values=new Set();return{add(...xs){xs.forEach(x=>valu
 function element(id){return elements[id]||=( {id,innerHTML:'',textContent:'',className:'',dataset:{},style:{setProperty(){}},classList:classList(),setAttribute(){},addEventListener(){},append(){},focus(){},onclick:null,disabled:false} )}
 const document={baseURI:'http://localhost/',body:{classList:classList()},visibilityState:'visible',getElementById:element,querySelector(){return null},querySelectorAll(){return[]},createElement(){return{className:'',textContent:'',disabled:false,onclick:null,classList:classList(),append(){},addEventListener(){}}},addEventListener(){}};
 const localStorage={getItem:k=>store[k]||null,setItem:(k,v)=>store[k]=String(v),removeItem:k=>delete store[k]};const Notification=function(title,options){this.title=title;this.options=options;this.close=()=>{};};Notification.permission='granted';Notification.requestPermission=async()=>Notification.permission;
-const fetch=async url=>{const file=String(url).split('/').pop();return{ok:true,json:async()=>JSON.parse(fs.readFileSync(path.join(root,file),'utf8'))}};
-let oscillatorStarts=0;
-class FakeAudioContext{constructor(){this.currentTime=0;this.state='running';this.destination={}}createGain(){return{gain:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){}},connect(){}}}createOscillator(){return{type:'sine',frequency:{value:0,setValueAtTime(){}},connect(){},start(){oscillatorStarts++},stop(){}}}resume(){this.state='running'}suspend(){this.state='suspended'}close(){this.state='closed'}}
+// m029 (OA-7): SFX kini sampel OGG lewat fetch+decodeAudioData, bukan osilator. Mock fetch
+// mencatat OGG mana yang diminta (sfxRequests) dan mengembalikan buffer palsu untuk didekode.
+const sfxRequests=[];
+const fetch=async url=>{const file=String(url).split('/').pop();if(file.endsWith('.ogg')){sfxRequests.push(file);return{ok:true,arrayBuffer:async()=>new ArrayBuffer(16)}}return{ok:true,json:async()=>JSON.parse(fs.readFileSync(path.join(root,file),'utf8'))}};
+let oscillatorStarts=0,bufferSourceStarts=0;
+class FakeAudioContext{constructor(){this.currentTime=0;this.state='running';this.destination={}}createGain(){return{gain:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){}},connect(){}}}createOscillator(){return{type:'sine',frequency:{value:0,setValueAtTime(){}},connect(){},start(){oscillatorStarts++},stop(){}}}createBufferSource(){return{buffer:null,playbackRate:{value:1},connect(){},start(){bufferSourceStarts++},stop(){}}}decodeAudioData(raw,ok){const buf={duration:.2,numberOfChannels:1};if(typeof ok==='function'){ok(buf);return null}return Promise.resolve(buf)}resume(){this.state='running'}suspend(){this.state='suspended'}close(){this.state='closed'}}
 const context={console,Notification,document,localStorage,fetch,window:null,self:null,navigator:{vibrate(){return true}},Date,Intl,Math,URL,Error,Promise,setTimeout,clearTimeout,setInterval:()=>({unref(){}}),clearInterval(){},SpeechSynthesisUtterance:function(){},speechSynthesis:{cancel(){},speak(){}},AudioContext:FakeAudioContext};
 context.window=context;context.self=context;context.FIEZEL_VERSION=JSON.parse(fs.readFileSync(path.join(root,'VERSION.json'),'utf8')).version;context.window.scrollTo=()=>{};context.window.requestAnimationFrame=fn=>fn();
-vm.createContext(context);vm.runInContext(app,context,{filename:'app.js'});
+vm.createContext(context);
+/* Harness i18n (pola W1-TESTPLAN 2b, hotfix CI pasca-#242): muat runtime i18n + copy-id sebelum kode app dievaluasi. existsSync = hijau dua arah. */
+const __i18nRt=path.join(root,'features','i18n','fiezel-i18n.js');
+if(fs.existsSync(__i18nRt)){vm.runInContext(fs.readFileSync(__i18nRt,'utf8'),context,{filename:'fiezel-i18n.js'});
+for(const __n of fs.readdirSync(path.join(root,'features','i18n')).filter(n=>/^copy-id-.*\.js$/.test(n)).sort()){
+vm.runInContext(fs.readFileSync(path.join(root,'features','i18n',__n),'utf8'),context,{filename:__n});}}
+
+// m029: mesin SFX dimuat lebih dulu, persis urutan <script defer> di index.html - app.js
+// mendelegasikan playFeedbackSound ke FiezelUiSfx, jadi tanpa modul ini tesnya menguji udara.
+vm.runInContext(fs.readFileSync(path.join(root,'features/audio/fiezel-ui-sfx.js'),'utf8'),context,{filename:'features/audio/fiezel-ui-sfx.js'});
+/* m025-186 merge-fix: kontrak index.html FIEZEL_I18N_BEGIN — fiezel-i18n.js lalu SEMUA
+   copy-id-*.js dimuat SEBELUM app.js; tanpa ini app.js:16 (FiezelI18n.t) melempar. */
+for (const __f of ['features/i18n/fiezel-i18n.js'].concat(fs.readdirSync(path.join(root,'features/i18n')).filter(n=>/^copy-id-.*\.js$/.test(n)).sort().map(n=>'features/i18n/'+n))) {
+  vm.runInContext(fs.readFileSync(path.join(root, __f), 'utf8'), context, { filename: __f });
+}
+vm.runInContext(app,context,{filename:'app.js'});
 const signature=q=>String(q.question).toLowerCase().replace(/\s+/g,' ').trim()+'||'+q.options.map(x=>String(x).toLowerCase()).sort().join('|');
 
 setTimeout(()=>{try{
   const skills=grammar.templates.map(x=>x.subskill);
-  assert(new Set(skills).size===129,'grammar skill fixture changed unexpectedly');
+  assert(grammar.templates.length===grammar.count&&new Set(grammar.templates.map(x=>x.id)).size===grammar.count,'grammar skill fixture contains duplicate or undeclared lessons');
+  const runtimeState=context.__getFiezelState();
+  const previousActiveLevel=runtimeState.preferences.activeLevel||'';
+  const previousLevelMode=runtimeState.preferences.levelMode||'placement';
   const expectedModes=['apply_form','complete_sentence','justify_correct','recognize_rule','recognize_objective','sequence_reasoning','identify_misconception','recall_memory_cue','choose_avoidance','diagnose_distractor_1','diagnose_distractor_2','diagnose_distractor_3','label_misconception_1','label_misconception_2','label_misconception_3','repair_distractor_1','repair_distractor_2','repair_distractor_3','contrast_distractor_1','contrast_distractor_2','contrast_distractor_3','classify_family','locate_decision_cue','teach_back','mastery_check'];
   const globalSignatures=new Map(),sourceOwners=new Map();
   let generated=0;
   for(const template of grammar.templates){
     const skill=template.subskill;
+    runtimeState.preferences={...runtimeState.preferences,activeLevel:template.cefr,levelMode:'manual'};
     const questions=context.buildGrammarLessonQuestions(skill,25);
     assert(questions.length===25,`${skill} generated ${questions.length}/25 questions`);
     assert(new Set(questions.map(signature)).size===25,`${skill} contains duplicate runtime questions`);
     assert(new Set(questions.map(q=>q.question)).size===25,`${skill} repeats question wording across practice modes`);
     assert(questions.every(q=>context.__fiezelAudit.validateQuestion(q).ok),`${skill} contains an invalid question`);
     assert(questions.every(q=>q.lessonSkill===skill),`${skill} lost its lesson identity`);
-    assert(questions.every(q=>q.skill===skill&&q.sourceId===template.id&&q.conceptId===template.id),`${skill} leaks a peer concept into the lesson`);
+    const lessonIds=new Set(grammar.templates.filter(t=>t.subskill===skill).map(t=>t.id));
+    assert(questions.every(q=>q.skill===skill&&lessonIds.has(q.sourceId)&&lessonIds.has(q.conceptId)),`${skill} leaks a peer concept into the lesson`);
     assert(new Set(questions.map(q=>q.practiceMode)).size===25&&expectedModes.every(mode=>questions.some(q=>q.practiceMode===mode)),`${skill} does not cover all 25 pedagogical modes`);
     for(const q of questions){
-      const sig=signature(q);assert(!globalSignatures.has(sig),`${skill} repeats a runtime question from ${globalSignatures.get(sig)}`);globalSignatures.set(sig,skill);
+      const sig=signature(q);const prevOwner=globalSignatures.get(sig);assert(!prevOwner||prevOwner===skill,`${skill} repeats a runtime question from ${prevOwner}`);globalSignatures.set(sig,skill);
       const owner=sourceOwners.get(q.sourceId);assert(!owner||owner===skill,`${skill} reuses source concept ${q.sourceId} from ${owner}`);sourceOwners.set(q.sourceId,skill);
     }
     const explanation=questions.map(q=>JSON.stringify(q.explain)).join(' ');
     assert(!/Correct:|This form matches|does not satisfy|Evidence from the passage|Reading focus:/i.test(explanation),`${skill} still exposes raw English explanation text`);
     generated+=questions.length;
   }
+  runtimeState.preferences={...runtimeState.preferences,activeLevel:previousActiveLevel,levelMode:previousLevelMode};
 
   const at=(hour,minute=0)=>context.getCelestialState(new Date(2026,7,12,hour,minute,0));
   const sunrise=at(6),noon=at(12),sunset=at(17,59),moonrise=at(18),midnight=at(0);
@@ -50,16 +82,47 @@ setTimeout(()=>{try{
   assert(sunset.body==='sun'&&sunset.x>90&&sunset.y>70,'sunset position is incorrect');
   assert(moonrise.body==='moon'&&moonrise.x<10&&moonrise.y>70,'moonrise position is incorrect');
   assert(midnight.body==='moon'&&Math.abs(midnight.x-50)<1&&midnight.y<20,'midnight moon position is incorrect');
-  assert(noon.palette.top!==midnight.palette.top&&noon.palette.bottom!==midnight.palette.bottom,'screen palette does not change from day to night');
+  /* m025-246 — ASERSI INI DIBALIK, dan pembalikannya adalah inti permintaan owner:
+     "4 FASE SUASANA DAY/DAWN/DUSK/NIGHT ... INI MENGGANDAKAN QA 4X, MEMBINGUNGKAN MURID."
+
+     Sampai gelombang ini, baris ini menuntut palet layar BERUBAH dari siang ke malam -
+     tepat perilaku yang membuat setiap layar harus di-QA empat kali. Sekarang ia menuntut
+     kebalikannya: satu panggung, satu palet, berapa pun jamnya.
+
+     Yang TIDAK ikut dibalik adalah lima asersi posisi di atas: jam celestial tetap
+     bergerak (murid memakainya untuk tahu jam), dan matahari/bulan tetap berganti. Yang
+     berhenti berubah hanya WARNA PANGGUNGNYA - dan hanya itulah yang menggandakan QA. */
+  assert(noon.palette.top===midnight.palette.top&&noon.palette.bottom===midnight.palette.bottom,
+    'palet layar masih berubah siang->malam; empat fase seharusnya sudah dilipat jadi satu');
+  /* Mesin interpolasinya sendiri TIDAK dihapus dan harus tetap benar, supaya bendera
+     `scenePhases` bisa dinyalakan lagi tanpa menemukan kode yang sudah lapuk. Ia diuji
+     langsung di sini, satu lapis di bawah gerbang benderanya. */
+  const bekasUX=context.FiezelUX;
+  try{
+    context.FiezelUX={on:(f)=>f==='scenePhases',off:(f)=>f!=='scenePhases'};
+    const siang=context.getScenePalette(720),tengahMalam=context.getScenePalette(0);
+    assert(siang.top!==tengahMalam.top,
+      'interpolasi palet 9-perhentian rusak - ia harus tetap benar walau tidak lagi dipanggil');
+  } finally { context.FiezelUX=bekasUX; }
   assert(/^rgba\(/.test(noon.light)&&/^rgba\(/.test(midnight.light),'sun/moon light color is missing');
 
   assert(context.playFeedbackSound('success')===true,'correct-answer sound did not start');
   assert(context.playFeedbackSound('error')===true,'wrong-answer sound did not start');
-  assert(oscillatorStarts===5,`feedback sound produced ${oscillatorStarts}/5 expected tones`);
+  // m029 (OA-7): umpan balik jawaban kini sampel produksi answer_correct/answer_wrong.
+  // Yang bisa diperiksa sinkron: kedua berkas benar-benar DIMINTA (bukan sekadar return
+  // true dari fungsi yang diamputasi). Osilator lama harus nol - sintesisnya sudah tiada.
+  assert(sfxRequests.includes('answer_correct.ogg'),'answer_correct.ogg was never fetched');
+  assert(sfxRequests.includes('answer_wrong.ogg'),'answer_wrong.ogg was never fetched');
+  assert(oscillatorStarts===0,`old oscillator synthesis still running (${oscillatorStarts} starts)`);
   assert(html.includes('id="answerBurst"')&&css.includes('.answer-burst.show'),'answer popup surface is missing');
   assert(html.includes('id="globalSky"')&&html.includes('id="globalCelestial"'),'full-screen celestial layer is missing');
   assert(css.includes('.global-sky')&&css.includes('.sky-light')&&css.includes('.scene-night'),'day/night full-screen visual phases are incomplete');
-  assert(app.includes('Hindari gaya buku teks')&&app.includes('Gunakan Bahasa Indonesia yang jernih'),'AI natural-language contract is missing');
-  console.log('FIEZEL lesson experience: PASS');
-  console.log(JSON.stringify({grammarLessons:skills.length,questionsPerLesson:25,practiceModesPerLesson:25,generatedQuestionsChecked:generated,crossLessonDuplicates:0,focusLeaks:0,correctWrongTones:oscillatorStarts,realtimeCycle:['sunrise','noon','sunset','moonrise','midnight'],naturalIndonesian:true}));
+  assert(idCorpus.includes('Hindari gaya buku teks')&&idCorpus.includes('Gunakan Bahasa Indonesia yang jernih'),'AI natural-language contract is missing');
+  // Unduh+dekode sampel berjalan asinkron; beri satu putaran event loop sebelum menagih
+  // bunyinya benar-benar DIBUNYIKAN (AudioBufferSourceNode.start), bukan hanya diminta.
+  setTimeout(()=>{try{
+    assert(bufferSourceStarts>=2,`feedback samples fetched but never started (${bufferSourceStarts} starts)`);
+    console.log('FIEZEL lesson experience: PASS');
+    console.log(JSON.stringify({grammarLessons:skills.length,questionsPerLesson:25,practiceModesPerLesson:25,generatedQuestionsChecked:generated,crossLessonDuplicates:0,focusLeaks:0,correctWrongSamples:bufferSourceStarts,sfxFilesFetched:[...new Set(sfxRequests)].length,realtimeCycle:['sunrise','noon','sunset','moonrise','midnight'],naturalIndonesian:true}));
+  }catch(error){console.error('FIEZEL lesson experience: FAIL\n'+error.stack);process.exitCode=1}},120);
 }catch(error){console.error('FIEZEL lesson experience: FAIL\n'+error.stack);process.exitCode=1}},260);

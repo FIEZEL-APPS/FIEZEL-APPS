@@ -1,0 +1,3682 @@
+[
+ {
+  "id": "r0101",
+  "level": "B1",
+  "title": "The Library Stays Open",
+  "text": "Since March, the school library in Bandung has stayed open until seven in the evening, and the change has surprised almost everyone. The head librarian expected a quiet room with three or four students. Instead, more than sixty come each night. Many of them live in small houses where younger brothers and sisters are noisy, so the long tables have become their only calm workspace. The school pays for the extra electricity from money it once spent on printed newsletters. If the numbers stay high until December, the committee will ask the city for a small grant. One student named Dimas says his marks in mathematics have improved, because he can finally finish a whole exercise without stopping.",
+  "qs": [
+   [
+    "Apa gagasan utama laporan tentang perpustakaan di Bandung ini?",
+    [
+     "The library's longer hours have attracted far more students than anyone expected",
+     "The library has replaced its printed newsletters with a digital version",
+     "The city has already given the school a grant for new lighting",
+     "Students in Bandung prefer to study at home with their families"
+    ],
+    0,
+    {
+     "type": "main_idea",
+     "evidence": "the school library in Bandung has stayed open until seven in the evening, and the change has surprised almost everyone",
+     "answer": "The library's longer hours have attracted far more students than anyone expected",
+     "patternId": "b1-101-main_idea"
+    }
+   ],
+   [
+    "Berapa banyak murid yang datang ke perpustakaan setiap malam?",
+    [
+     "Three or four",
+     "Fewer than thirty",
+     "More than sixty",
+     "About sixty each week"
+    ],
+    2,
+    {
+     "type": "detail",
+     "evidence": "Instead, more than sixty come each night.",
+     "answer": "More than sixty",
+     "patternId": "b1-101-detail"
+    }
+   ],
+   [
+    "Mengapa meja panjang perpustakaan menjadi penting bagi banyak murid?",
+    [
+     "Their homes are noisy, so the library is their only calm workspace",
+     "The library gives them a free dinner every evening",
+     "Their teachers require them to sign in there every night",
+     "The city pays students a small amount to study after school"
+    ],
+    0,
+    {
+     "type": "cause_effect",
+     "evidence": "so the long tables have become their only calm workspace",
+     "answer": "Their homes are noisy, so the library is their only calm workspace",
+     "patternId": "b1-101-cause_effect"
+    }
+   ],
+   [
+    "Apa yang dapat disimpulkan tentang cara sekolah membiayai jam tambahan itu?",
+    [
+     "The school borrowed money from the city in March",
+     "The school charges each evening student a small fee",
+     "The school has no plan to continue after December",
+     "The school found the extra cost inside its own budget"
+    ],
+    3,
+    {
+     "type": "inference",
+     "evidence": "The school pays for the extra electricity from money it once spent on printed newsletters.",
+     "answer": "The school found the extra cost inside its own budget",
+     "patternId": "b1-101-inference"
+    }
+   ],
+   [
+    "Apa yang mungkin dilakukan panitia jika jumlah pengunjung tetap tinggi sampai Desember?",
+    [
+     "The library will close at weekends",
+     "The committee will request a small grant from the city",
+     "The head librarian will leave her post",
+     "The school will start printing newsletters again"
+    ],
+    1,
+    {
+     "type": "likely",
+     "evidence": "If the numbers stay high until December, the committee will ask the city for a small grant.",
+     "answer": "The committee will request a small grant from the city",
+     "patternId": "b1-101-likely"
+    }
+   ]
+  ],
+  "topic": "perpustakaan-sekolah",
+  "author": "Rani Puspitasari",
+  "setting": "sekolah menengah di Bandung",
+  "focus": "membaca-berita"
+ },
+ {
+  "id": "r0102",
+  "level": "B1",
+  "title": "Lock the Phones Away?",
+  "text": "Our school is thinking about buying lockers for phones, and I believe the plan deserves a chance. People who oppose it say that students must learn self-control, not obey a metal box. That argument sounds strong until you sit in a classroom at eleven o'clock. I have watched clever friends miss an entire explanation because a notification arrived at the wrong second. A locker teaches nothing, of course; it simply removes one battle from a tired brain. If the school tries the system for a single term, we will have real evidence instead of loud opinions. My one condition is that teachers lock their phones away too. Rules that apply to one group and not the other never survive for long.",
+  "qs": [
+   [
+    "Apa tujuan penulis kolom tentang loker telepon ini?",
+    [
+     "To describe how the phone lockers were built",
+     "To persuade readers that the locker plan is worth testing",
+     "To announce that the school has already banned phones",
+     "To complain about teachers who answer calls in class"
+    ],
+    1,
+    {
+     "type": "author_purpose",
+     "evidence": "I believe the plan deserves a chance",
+     "answer": "To persuade readers that the locker plan is worth testing",
+     "patternId": "b1-102-author_purpose"
+    }
+   ],
+   [
+    "Bagaimana nada penulis terhadap orang yang menolak rencana tersebut?",
+    [
+     "Fair towards them, but finally unconvinced",
+     "Angry and insulting",
+     "Completely neutral and undecided",
+     "Frightened of disagreeing with them"
+    ],
+    0,
+    {
+     "type": "tone",
+     "evidence": "That argument sounds strong until you sit in a classroom at eleven o'clock.",
+     "answer": "Fair towards them, but finally unconvinced",
+     "patternId": "b1-102-tone"
+    }
+   ],
+   [
+    "Pernyataan mana yang paling dekat maknanya dengan pandangan penulis tentang loker?",
+    [
+     "The locker slowly teaches students to control themselves",
+     "The locker is more useful for teachers than for students",
+     "The locker teaches nothing but takes away one difficulty",
+     "The locker replaces the authority of the teacher"
+    ],
+    2,
+    {
+     "type": "paraphrase",
+     "evidence": "it simply removes one battle from a tired brain",
+     "answer": "The locker teaches nothing but takes away one difficulty",
+     "patternId": "b1-102-paraphrase"
+    }
+   ],
+   [
+    "Kata 'battle' dalam teks paling dekat maknanya dengan ...",
+    [
+     "a fight between two students",
+     "a struggle inside a tired mind",
+     "a school sports competition",
+     "a military exercise"
+    ],
+    1,
+    {
+     "type": "vocabulary_context",
+     "evidence": "removes one battle from a tired brain",
+     "answer": "a struggle inside a tired mind",
+     "patternId": "b1-102-vocabulary_context"
+    }
+   ],
+   [
+    "Kesimpulan apa yang ditarik penulis pada akhir kolomnya?",
+    [
+     "Teachers should be allowed to keep their phones",
+     "Students will never accept any new rule",
+     "The school should decide the matter without discussion",
+     "A rule must include teachers, or it will not last"
+    ],
+    3,
+    {
+     "type": "conclusion",
+     "evidence": "Rules that apply to one group and not the other never survive for long.",
+     "answer": "A rule must include teachers, or it will not last",
+     "patternId": "b1-102-conclusion"
+    }
+   ]
+  ],
+  "topic": "telepon-di-sekolah",
+  "author": "Bagas Wirawan",
+  "setting": "kolom opini majalah sekolah",
+  "focus": "argumen-dan-nada"
+ },
+ {
+  "id": "r0103",
+  "level": "B1",
+  "title": "The Boy Who Fixes Kettles",
+  "text": "Every second Saturday, Arif Maulana carries a green toolbox into a community hall in Semarang and waits for broken things. He is nineteen, studies electrical engineering, and has repaired more than four hundred kettles, fans and radios since he joined the repair cafe two years ago. Customers pay nothing. In return, they must stand beside him and hold the screwdriver at least once. 'People throw away a machine because one cheap part has died,' he says. 'If they watch me for ten minutes, they stop being afraid of the inside.' His grandmother taught him this patience; she used to mend fishing nets on the veranda and never let a single knot defeat her. Arif hopes to open a workshop that trains other students.",
+  "qs": [
+   [
+    "Apa gambaran utama tentang Arif Maulana dalam profil ini?",
+    [
+     "He repairs household machines free of charge and teaches their owners to help",
+     "He sells second-hand kettles and fans at a community hall",
+     "He studies engineering but dislikes any practical work",
+     "He collects broken radios in order to build a museum"
+    ],
+    0,
+    {
+     "type": "main_idea",
+     "evidence": "has repaired more than four hundred kettles, fans and radios since he joined the repair cafe two years ago",
+     "answer": "He repairs household machines free of charge and teaches their owners to help",
+     "patternId": "b1-103-main_idea"
+    }
+   ],
+   [
+    "Menurut teks, apa yang Arif lakukan setelah membawa kotak perkakasnya masuk?",
+    [
+     "He begins a lesson about electricity",
+     "He repaints the walls of the community hall",
+     "He waits for broken things to arrive",
+     "He sells his old tools to the visitors"
+    ],
+    2,
+    {
+     "type": "sequence",
+     "evidence": "carries a green toolbox into a community hall in Semarang and waits for broken things",
+     "answer": "He waits for broken things to arrive",
+     "patternId": "b1-103-sequence"
+    }
+   ],
+   [
+    "Syarat apa yang harus dipenuhi pelanggan yang datang kepada Arif?",
+    [
+     "They must pay a small fee for the spare parts",
+     "They must hold the screwdriver at least once",
+     "They must bring a toolbox of their own",
+     "They must arrive before nine in the morning"
+    ],
+    1,
+    {
+     "type": "detail",
+     "evidence": "they must stand beside him and hold the screwdriver at least once",
+     "answer": "They must hold the screwdriver at least once",
+     "patternId": "b1-103-detail"
+    }
+   ],
+   [
+    "Mengapa Arif ingin pemilik barang menontonnya selama sepuluh menit?",
+    [
+     "So that he can charge them for a short lesson",
+     "So that they film the repair for social media",
+     "So that he does not have to work alone on Saturdays",
+     "So that they stop being afraid of the inside of a machine"
+    ],
+    3,
+    {
+     "type": "why",
+     "evidence": "If they watch me for ten minutes, they stop being afraid of the inside.",
+     "answer": "So that they stop being afraid of the inside of a machine",
+     "patternId": "b1-103-why"
+    }
+   ],
+   [
+    "Apa persamaan antara Arif dan neneknya?",
+    [
+     "Both refuse to give up on something that looks ruined",
+     "Both repair electrical machines for money",
+     "Both teach classes at the same community hall",
+     "Both go fishing in the harbour every Saturday"
+    ],
+    0,
+    {
+     "type": "comparison",
+     "evidence": "she used to mend fishing nets on the veranda and never let a single knot defeat her",
+     "answer": "Both refuse to give up on something that looks ruined",
+     "patternId": "b1-103-comparison"
+    }
+   ]
+  ],
+  "topic": "perbaikan-barang",
+  "author": "Sinta Halim",
+  "setting": "balai warga di Semarang",
+  "focus": "profil-tokoh"
+ },
+ {
+  "id": "r0104",
+  "level": "B1",
+  "title": "One Extra Hour of Sleep",
+  "text": "A small study at a senior high school in Malang has tested a simple idea: can students improve their results by going to bed earlier? Sixty volunteers agreed to sleep one extra hour on school nights for six weeks, while sixty others kept their normal habits. Both groups took the same vocabulary test at the start and at the end. The early sleepers gained an average of nine points; the second group gained three. The teachers who ran the study are careful. They admit that the volunteers may have been more motivated from the beginning, which would explain part of the difference. Even so, the school has decided to move its evening tutoring class from nine o'clock to seven.",
+  "qs": [
+   [
+    "Apa tujuan penelitian kecil di Malang tersebut?",
+    [
+     "To find out whether an earlier bedtime improves student results",
+     "To compare two different vocabulary textbooks",
+     "To measure how long students sleep at the weekend",
+     "To test a new medicine for tired students"
+    ],
+    0,
+    {
+     "type": "purpose",
+     "evidence": "can students improve their results by going to bed earlier",
+     "answer": "To find out whether an earlier bedtime improves student results",
+     "patternId": "b1-104-purpose"
+    }
+   ],
+   [
+    "Kalimat mana yang menjadi bukti bahwa hasil penelitian ini belum pasti?",
+    [
+     "The early sleepers gained an average of nine points.",
+     "Sixty volunteers agreed to sleep one extra hour on school nights.",
+     "They admit that the volunteers may have been more motivated from the beginning.",
+     "Both groups took the same vocabulary test at the start and at the end."
+    ],
+    2,
+    {
+     "type": "evidence",
+     "evidence": "They admit that the volunteers may have been more motivated from the beginning",
+     "answer": "They admit that the volunteers may have been more motivated from the beginning.",
+     "patternId": "b1-104-evidence"
+    }
+   ],
+   [
+    "Berapa rata-rata kenaikan nilai kelompok yang tidak mengubah kebiasaannya?",
+    [
+     "Three points",
+     "Nine points",
+     "Six points",
+     "Sixty points"
+    ],
+    0,
+    {
+     "type": "detail",
+     "evidence": "the second group gained three",
+     "answer": "Three points",
+     "patternId": "b1-104-detail"
+    }
+   ],
+   [
+    "Bagaimana hubungan antara kedua kelompok dalam penelitian itu?",
+    [
+     "Both groups slept one extra hour but studied different subjects",
+     "One group changed its sleeping habit while the other did not, so the results could be compared",
+     "The two groups sat different tests in two different schools",
+     "One group taught the other group how to learn vocabulary"
+    ],
+    1,
+    {
+     "type": "relationship",
+     "evidence": "while sixty others kept their normal habits",
+     "answer": "One group changed its sleeping habit while the other did not, so the results could be compared",
+     "patternId": "b1-104-relationship"
+    }
+   ],
+   [
+    "Pernyataan 'Sekolah membatalkan kelas bimbingan malamnya' termasuk ...",
+    [
+     "Benar menurut teks",
+     "Salah menurut teks",
+     "Tidak disebutkan dalam teks",
+     "Benar hanya bagi kelompok kedua"
+    ],
+    1,
+    {
+     "type": "true_false_not_stated",
+     "evidence": "the school has decided to move its evening tutoring class from nine o'clock to seven",
+     "answer": "Salah menurut teks",
+     "patternId": "b1-104-true_false_not_stated"
+    }
+   ]
+  ],
+  "topic": "tidur-dan-belajar",
+  "author": "Dwi Anggraeni",
+  "setting": "SMA di Malang",
+  "focus": "laporan-penelitian"
+ },
+ {
+  "id": "r0105",
+  "level": "B1",
+  "title": "A Novel of Salt and Rain",
+  "text": "'The Boat That Waited' tells the story of Nurma, a girl who inherits her father's fishing boat and refuses to sell it. The first half of the novel moves slowly, and readers who want action may lose patience. I nearly did. Yet those slow chapters build something a faster book could never manage: you learn the smell of the harbour, the price of ice, the exact hour when the wind turns. By the time a storm destroys half the fleet, Nurma's stubbornness feels earned rather than romantic. The dialogue is the weakest part, since the fishermen sometimes speak like textbooks. Even so, this is a warm and honest first novel, and I have already lent my copy to two friends.",
+  "qs": [
+   [
+    "Bagaimana sikap penulis ulasan terhadap novel ini secara keseluruhan?",
+    [
+     "Warm, although he mentions clear faults",
+     "Completely negative from the first line",
+     "Bored and unwilling to finish it",
+     "Surprised that anyone published it"
+    ],
+    0,
+    {
+     "type": "tone",
+     "evidence": "this is a warm and honest first novel, and I have already lent my copy to two friends",
+     "answer": "Warm, although he mentions clear faults",
+     "patternId": "b1-105-tone"
+    }
+   ],
+   [
+    "Apa penilaian utama ulasan tentang bagian awal novel tersebut?",
+    [
+     "It is slow, yet the slowness gives the later story its strength",
+     "It is the most exciting part of the whole book",
+     "It should have been removed by the editor",
+     "It explains the ending far too early"
+    ],
+    0,
+    {
+     "type": "main_idea",
+     "evidence": "Yet those slow chapters build something a faster book could never manage",
+     "answer": "It is slow, yet the slowness gives the later story its strength",
+     "patternId": "b1-105-main_idea"
+    }
+   ],
+   [
+    "Ungkapan 'feels earned' dalam ulasan ini paling dekat maknanya dengan ...",
+    [
+     "seems paid for by her family",
+     "seems believable because the story has prepared it",
+     "seems sudden and hard to accept",
+     "seems copied from another novel"
+    ],
+    1,
+    {
+     "type": "vocabulary_context",
+     "evidence": "Nurma's stubbornness feels earned rather than romantic",
+     "answer": "seems believable because the story has prepared it",
+     "patternId": "b1-105-vocabulary_context"
+    }
+   ],
+   [
+    "Rincian mana yang mendukung pendapat bahwa novel ini punya kelemahan?",
+    [
+     "Nurma refuses to sell her father's boat",
+     "A storm destroys half of the fishing fleet",
+     "The fishermen sometimes speak like textbooks",
+     "The reviewer lent the book to two friends"
+    ],
+    2,
+    {
+     "type": "supporting_detail",
+     "evidence": "the fishermen sometimes speak like textbooks",
+     "answer": "The fishermen sometimes speak like textbooks",
+     "patternId": "b1-105-supporting_detail"
+    }
+   ],
+   [
+    "Bagaimana novel itu membuat pembaca mengenal dunia pelabuhan?",
+    [
+     "By describing small ordinary facts such as the price of ice",
+     "By adding a long historical introduction",
+     "By printing interviews with real fishermen",
+     "By explaining the rules of the fish market"
+    ],
+    0,
+    {
+     "type": "how",
+     "evidence": "you learn the smell of the harbour, the price of ice, the exact hour when the wind turns",
+     "answer": "By describing small ordinary facts such as the price of ice",
+     "patternId": "b1-105-how"
+    }
+   ]
+  ],
+  "topic": "ulasan-novel",
+  "author": "Teguh Nugroho",
+  "setting": "rubrik buku surat kabar",
+  "focus": "menilai-karya"
+ },
+ {
+  "id": "r0106",
+  "level": "B1",
+  "title": "Dear Miss Yanti: My House Is Loud",
+  "text": "A reader writes that she cannot concentrate, because her family watches television in the same room where she studies. Miss Yanti replies that arguing about the volume rarely works. Instead, she suggests trading time. Offer to wash the dishes every evening if the television goes off between seven and eight. One hour of quiet, used well, beats three hours of half-attention. She also recommends cheap earplugs and a fixed corner, even a small one, that the family learns to respect. Finally, she warns against studying on the bed. 'Your body has learned that a bed means sleep,' she writes, 'and it will keep that promise while you read.' If none of these ideas helps, the town library opens at eight.",
+  "qs": [
+   [
+    "Untuk apa kolom saran ini ditulis?",
+    [
+     "To give a reader practical ways of studying in a noisy home",
+     "To explain why televisions are bad for families",
+     "To advertise a new town library service",
+     "To describe the daily routine of Miss Yanti"
+    ],
+    0,
+    {
+     "type": "purpose",
+     "evidence": "Miss Yanti replies that arguing about the volume rarely works.",
+     "answer": "To give a reader practical ways of studying in a noisy home",
+     "patternId": "b1-106-purpose"
+    }
+   ],
+   [
+    "Apa yang ditawarkan pembaca itu sebagai pertukaran menurut saran Miss Yanti?",
+    [
+     "Buying new earplugs for the family",
+     "Washing the dishes every evening",
+     "Paying part of the electricity bill",
+     "Studying in the town library instead"
+    ],
+    1,
+    {
+     "type": "detail",
+     "evidence": "Offer to wash the dishes every evening if the television goes off between seven and eight.",
+     "answer": "Washing the dishes every evening",
+     "patternId": "b1-106-detail"
+    }
+   ],
+   [
+    "Apa yang mungkin terjadi jika pembaca tetap belajar di atas tempat tidur?",
+    [
+     "She will read faster than before",
+     "She will remember more vocabulary",
+     "She will become sleepy while reading",
+     "She will disturb the rest of her family"
+    ],
+    2,
+    {
+     "type": "likely",
+     "evidence": "Your body has learned that a bed means sleep",
+     "answer": "She will become sleepy while reading",
+     "patternId": "b1-106-likely"
+    }
+   ],
+   [
+    "Kata 'that promise' dalam kalimat terakhir Miss Yanti merujuk pada apa?",
+    [
+     "The promise to wash the dishes",
+     "The promise that a bed means sleep",
+     "The promise made by the family",
+     "The promise to visit the library"
+    ],
+    1,
+    {
+     "type": "reference",
+     "evidence": "and it will keep that promise while you read",
+     "answer": "The promise that a bed means sleep",
+     "patternId": "b1-106-reference"
+    }
+   ],
+   [
+    "Kalimat mana yang menyampaikan kembali nasihat Miss Yanti tentang waktu belajar?",
+    [
+     "A short period of real quiet is worth more than a long distracted one",
+     "Students should study for at least three hours every night",
+     "Nobody can study while a television is switched on",
+     "Families should agree to sell their television set"
+    ],
+    0,
+    {
+     "type": "paraphrase",
+     "evidence": "One hour of quiet, used well, beats three hours of half-attention.",
+     "answer": "A short period of real quiet is worth more than a long distracted one",
+     "patternId": "b1-106-paraphrase"
+    }
+   ]
+  ],
+  "topic": "kebiasaan-belajar",
+  "author": "Yanti Kurnia",
+  "setting": "kolom saran mingguan",
+  "focus": "saran-praktis"
+ },
+ {
+  "id": "r0107",
+  "level": "B1",
+  "title": "Driving the Quiet Bus",
+  "text": "Q: How different is the electric bus? A: The first week felt strange. There is no engine noise, so I could hear every conversation behind me. Q: Do the passengers notice? A: Older passengers say the ride is smoother. A few complain that the bus is too silent near markets, because people step onto the road without looking. We use the horn far more than before. Q: And the charging? A: That is the real change in my day. I finish my route, plug the bus in, and wait forty minutes. I have started bringing a book. Q: Would you go back to diesel? A: Never. My throat used to hurt every evening. It has not hurt since March, and that is enough for me.",
+  "qs": [
+   [
+    "Apa gagasan utama wawancara dengan sopir bus listrik ini?",
+    [
+     "The driver accepts small problems because the bus has improved his health",
+     "The driver wants the company to buy diesel buses again",
+     "The driver believes electric buses are dangerous for passengers",
+     "The driver explains how an electric motor works"
+    ],
+    0,
+    {
+     "type": "main_idea",
+     "evidence": "It has not hurt since March, and that is enough for me.",
+     "answer": "The driver accepts small problems because the bus has improved his health",
+     "patternId": "b1-107-main_idea"
+    }
+   ],
+   [
+    "Bagaimana reaksi penumpang tua dibandingkan dengan sebagian penumpang lain?",
+    [
+     "Older passengers praise the smoother ride while others worry about the silence",
+     "Older passengers dislike the bus while younger ones enjoy it",
+     "Both groups complain about the length of the journey",
+     "Older passengers ask the driver to use the horn less often"
+    ],
+    0,
+    {
+     "type": "comparison",
+     "evidence": "Older passengers say the ride is smoother.",
+     "answer": "Older passengers praise the smoother ride while others worry about the silence",
+     "patternId": "b1-107-comparison"
+    }
+   ],
+   [
+    "Mengapa sopir kini lebih sering membunyikan klakson?",
+    [
+     "Because the traffic near the markets has grown heavier",
+     "Because passengers ask him to signal every stop",
+     "Because the silent bus is not heard by people crossing the road",
+     "Because the horn is part of the new safety training"
+    ],
+    2,
+    {
+     "type": "cause_effect",
+     "evidence": "the bus is too silent near markets, because people step onto the road without looking",
+     "answer": "Because the silent bus is not heard by people crossing the road",
+     "patternId": "b1-107-cause_effect"
+    }
+   ],
+   [
+    "Apa yang dapat disimpulkan tentang cara sopir mengisi waktu menunggu?",
+    [
+     "He has found a calm way to spend the charging time",
+     "He is angry about losing forty minutes each day",
+     "He uses the time to repair the bus himself",
+     "He drives a second route while the bus charges"
+    ],
+    0,
+    {
+     "type": "inference",
+     "evidence": "I have started bringing a book.",
+     "answer": "He has found a calm way to spend the charging time",
+     "patternId": "b1-107-inference"
+    }
+   ],
+   [
+    "Jawaban mana yang menjadi bukti bahwa bus listrik baik untuk kesehatan sopir?",
+    [
+     "There is no engine noise, so I could hear every conversation behind me.",
+     "My throat used to hurt every evening.",
+     "I finish my route, plug the bus in, and wait forty minutes.",
+     "We use the horn far more than before."
+    ],
+    1,
+    {
+     "type": "evidence",
+     "evidence": "My throat used to hurt every evening.",
+     "answer": "My throat used to hurt every evening.",
+     "patternId": "b1-107-evidence"
+    }
+   ]
+  ],
+  "topic": "transportasi-listrik",
+  "author": "Marlina Sagala",
+  "setting": "wawancara di depot bus kota",
+  "focus": "memahami-wawancara"
+ },
+ {
+  "id": "r0108",
+  "level": "B1",
+  "title": "Six O'Clock at the Market",
+  "text": "Before the sun clears the roofs, the market is already loud. Crates of chillies land on wet concrete. A woman stacks pyramids of tomatoes with the concentration of someone building a wall, and she rebuilds them each time a customer takes one from the bottom. The fish sellers work fastest, since their ice is melting, and melting ice is money leaving the table. Down the middle aisle an old man sells only two things, ginger and turmeric, from a mat the size of a newspaper. He has sat there for thirty-one years. By nine o'clock the noise has thinned, the concrete is drying, and the market smells of coffee instead of fish. That is the hour when the sellers finally eat.",
+  "qs": [
+   [
+    "Ungkapan 'money leaving the table' dalam teks berarti ...",
+    [
+     "profit that is being lost",
+     "cash that a thief has stolen",
+     "coins that fall on the floor",
+     "a payment made to the market office"
+    ],
+    0,
+    {
+     "type": "vocabulary_context",
+     "evidence": "melting ice is money leaving the table",
+     "answer": "profit that is being lost",
+     "patternId": "b1-108-vocabulary_context"
+    }
+   ],
+   [
+    "Bagaimana perasaan penulis terhadap pasar yang digambarkannya?",
+    [
+     "Respectful towards the work he watches",
+     "Disgusted by the smell and the noise",
+     "Amused by the sellers' mistakes",
+     "Impatient to leave the place"
+    ],
+    0,
+    {
+     "type": "tone",
+     "evidence": "with the concentration of someone building a wall",
+     "answer": "Respectful towards the work he watches",
+     "patternId": "b1-108-tone"
+    }
+   ],
+   [
+    "Apa yang dijual lelaki tua di lorong tengah pasar?",
+    [
+     "Chillies and tomatoes",
+     "Fish and ice",
+     "Ginger and turmeric",
+     "Coffee and newspapers"
+    ],
+    2,
+    {
+     "type": "detail",
+     "evidence": "an old man sells only two things, ginger and turmeric",
+     "answer": "Ginger and turmeric",
+     "patternId": "b1-108-detail"
+    }
+   ],
+   [
+    "Kata 'them' dalam kalimat tentang perempuan penjual tomat merujuk pada apa?",
+    [
+     "The customers at her stall",
+     "The pyramids of tomatoes",
+     "The crates of chillies",
+     "The wet concrete floors"
+    ],
+    1,
+    {
+     "type": "reference",
+     "evidence": "she rebuilds them each time a customer takes one from the bottom",
+     "answer": "The pyramids of tomatoes",
+     "patternId": "b1-108-reference"
+    }
+   ],
+   [
+    "Kesimpulan apa yang paling tepat tentang pukul sembilan di pasar itu?",
+    [
+     "The market has closed completely for the day",
+     "The busiest work is over and the sellers can rest",
+     "The fish sellers arrive with fresh ice",
+     "The customers arrive in their largest numbers"
+    ],
+    1,
+    {
+     "type": "conclusion",
+     "evidence": "That is the hour when the sellers finally eat.",
+     "answer": "The busiest work is over and the sellers can rest",
+     "patternId": "b1-108-conclusion"
+    }
+   ]
+  ],
+  "topic": "pasar-pagi",
+  "author": "Hendra Wijaya",
+  "setting": "pasar basah di kota kecil",
+  "focus": "esai-deskriptif"
+ },
+ {
+  "id": "r0109",
+  "level": "B1",
+  "title": "The Bridge Nobody Wanted",
+  "text": "When the bamboo bridge over the Cikapundung collapsed in 1972, the village council voted against rebuilding it. The old route was longer but safer, they argued, and the river rose without warning. Three years later a schoolteacher named Pak Sutrisno began collecting signatures, because children were walking ninety minutes each way. He gathered four hundred names, then persuaded a cement company to donate broken bags that were too damaged to sell. Villagers built the new bridge in eleven weekends. It still stands today. The council that had refused the project later placed a small plaque at the eastern end, and every year on the seventeenth of August the schoolchildren repaint the railings white before the flag ceremony.",
+  "qs": [
+   [
+    "Apa yang dilakukan Pak Sutrisno lebih dahulu sebelum meminta bantuan perusahaan semen?",
+    [
+     "He built a temporary bamboo bridge",
+     "He collected four hundred signatures",
+     "He asked the council to vote again",
+     "He measured the width of the river"
+    ],
+    1,
+    {
+     "type": "sequence",
+     "evidence": "He gathered four hundred names, then persuaded a cement company",
+     "answer": "He collected four hundred signatures",
+     "patternId": "b1-109-sequence"
+    }
+   ],
+   [
+    "Berapa lama warga desa membangun jembatan baru itu?",
+    [
+     "Three years",
+     "Ninety minutes",
+     "Eleven weekends",
+     "Seventeen days"
+    ],
+    2,
+    {
+     "type": "detail",
+     "evidence": "Villagers built the new bridge in eleven weekends.",
+     "answer": "Eleven weekends",
+     "patternId": "b1-109-detail"
+    }
+   ],
+   [
+    "Mengapa dewan desa menolak membangun kembali jembatan pada tahun 1972?",
+    [
+     "Because the village had no money at all",
+     "Because the river was thought to be dangerous",
+     "Because the children preferred the longer route",
+     "Because the cement company refused to help"
+    ],
+    1,
+    {
+     "type": "why",
+     "evidence": "and the river rose without warning",
+     "answer": "Because the river was thought to be dangerous",
+     "patternId": "b1-109-why"
+    }
+   ],
+   [
+    "Apa inti catatan sejarah lokal ini?",
+    [
+     "A rejected project was completed by the villagers themselves",
+     "A council built a bridge to help a schoolteacher",
+     "A cement company opened a factory in the village",
+     "A flood destroyed a village school in 1972"
+    ],
+    0,
+    {
+     "type": "main_idea",
+     "evidence": "the village council voted against rebuilding it",
+     "answer": "A rejected project was completed by the villagers themselves",
+     "patternId": "b1-109-main_idea"
+    }
+   ],
+   [
+    "Rincian mana yang menunjukkan bahwa jembatan itu kini dihargai?",
+    [
+     "The old route was longer but safer",
+     "The bridge was made from damaged cement bags",
+     "Children once walked ninety minutes each way",
+     "Schoolchildren repaint its railings every August"
+    ],
+    3,
+    {
+     "type": "supporting_detail",
+     "evidence": "the schoolchildren repaint the railings white before the flag ceremony",
+     "answer": "Schoolchildren repaint its railings every August",
+     "patternId": "b1-109-supporting_detail"
+    }
+   ]
+  ],
+  "topic": "sejarah-desa",
+  "author": "Sutrisno Adi",
+  "setting": "desa di tepi Sungai Cikapundung",
+  "focus": "catatan-sejarah"
+ },
+ {
+  "id": "r0110",
+  "level": "B1",
+  "title": "Five Minutes for a Slow Laptop",
+  "text": "If your laptop has become slow, do not buy a new one yet. Start with the programs that open automatically when the machine starts, since most of them are not needed, and switching them off often returns half the speed. Next, look at storage. A disk that is almost full behaves like a crowded room where nobody can move. Delete the videos you have already watched, then empty the recycle bin, which people forget surprisingly often. Third, clean the vents with a soft brush, because heat makes a processor slow itself down on purpose. Only after these three steps should you consider buying extra memory. A machine treated in this way can serve a student for another two years.",
+  "qs": [
+   [
+    "Bagaimana cara mengembalikan sebagian kecepatan laptop menurut langkah pertama?",
+    [
+     "By turning off programs that start automatically",
+     "By deleting every photograph on the disk",
+     "By buying a larger battery",
+     "By reinstalling the operating system"
+    ],
+    0,
+    {
+     "type": "how",
+     "evidence": "switching them off often returns half the speed",
+     "answer": "By turning off programs that start automatically",
+     "patternId": "b1-110-how"
+    }
+   ],
+   [
+    "Apa maksud panduan ini ditulis?",
+    [
+     "To sell a cleaning service for computers",
+     "To show cheap steps before spending money on hardware",
+     "To explain how processors are manufactured",
+     "To warn students against using old laptops"
+    ],
+    1,
+    {
+     "type": "purpose",
+     "evidence": "do not buy a new one yet",
+     "answer": "To show cheap steps before spending money on hardware",
+     "patternId": "b1-110-purpose"
+    }
+   ],
+   [
+    "Apa yang dapat disimpulkan dari urutan langkah dalam panduan ini?",
+    [
+     "Extra memory is treated as the last and most expensive option",
+     "Cleaning the vents is the least useful step",
+     "The writer expects readers to skip the first two steps",
+     "Storage problems cannot be solved by a student"
+    ],
+    0,
+    {
+     "type": "inference",
+     "evidence": "Only after these three steps should you consider buying extra memory.",
+     "answer": "Extra memory is treated as the last and most expensive option",
+     "patternId": "b1-110-inference"
+    }
+   ],
+   [
+    "Apa hubungan antara panas dan kecepatan prosesor menurut teks?",
+    [
+     "Heat has no effect on how a processor works",
+     "Heat makes the processor reduce its own speed",
+     "Heat improves the speed of an old processor",
+     "Heat damages only the screen of the laptop"
+    ],
+    1,
+    {
+     "type": "relationship",
+     "evidence": "heat makes a processor slow itself down on purpose",
+     "answer": "Heat makes the processor reduce its own speed",
+     "patternId": "b1-110-relationship"
+    }
+   ],
+   [
+    "Pernyataan 'Panduan ini menyebutkan merek laptop tertentu' termasuk ...",
+    [
+     "Benar menurut teks",
+     "Salah, sebab teks menolak merek itu",
+     "Tidak disebutkan dalam teks",
+     "Benar untuk langkah ketiga saja"
+    ],
+    2,
+    {
+     "type": "true_false_not_stated",
+     "evidence": "A machine treated in this way can serve a student for another two years.",
+     "answer": "Tidak disebutkan dalam teks",
+     "patternId": "b1-110-true_false_not_stated"
+    }
+   ]
+  ],
+  "topic": "perawatan-komputer",
+  "author": "Fajar Ramadhan",
+  "setting": "panduan praktis daring",
+  "focus": "teks-prosedur"
+ },
+ {
+  "id": "r0111",
+  "level": "B1",
+  "title": "A Letter About the New Bike Lane",
+  "text": "Sir, I read last week that shopkeepers on Jalan Merdeka want the new bike lane removed. I understand their fear. When the lane was painted, they lost eleven parking spaces, and for one month their sales fell. But I have counted the bicycles myself every Tuesday since April, and the number has risen from forty to more than two hundred. Those cyclists are customers too, and a bicycle needs one twentieth of the space that a car does. If the council removes the lane now, it will be judging a young experiment by its worst month. I ask only for patience until December. Then let us look at the figures together, rather than at our feelings.",
+  "qs": [
+   [
+    "Apa tujuan utama surat pembaca tentang jalur sepeda ini?",
+    [
+     "To ask the council to wait before removing the lane",
+     "To demand more parking spaces for the shopkeepers",
+     "To complain about cyclists who ride too fast",
+     "To announce that the lane will soon be widened"
+    ],
+    0,
+    {
+     "type": "author_purpose",
+     "evidence": "I ask only for patience until December.",
+     "answer": "To ask the council to wait before removing the lane",
+     "patternId": "b1-111-author_purpose"
+    }
+   ],
+   [
+    "Bagaimana sikap penulis surat terhadap para pemilik toko?",
+    [
+     "Openly hostile and mocking",
+     "Completely indifferent to their problem",
+     "Sympathetic, although he disagrees with them",
+     "Frightened of their influence in the town"
+    ],
+    2,
+    {
+     "type": "tone",
+     "evidence": "I understand their fear.",
+     "answer": "Sympathetic, although he disagrees with them",
+     "patternId": "b1-111-tone"
+    }
+   ],
+   [
+    "Apa gagasan pokok surat pembaca tersebut?",
+    [
+     "The bike lane has destroyed the shops on Jalan Merdeka",
+     "The bike lane should be judged later, when more figures exist",
+     "Cyclists should pay for the parking spaces that were lost",
+     "The council has already decided to keep the lane"
+    ],
+    1,
+    {
+     "type": "main_idea",
+     "evidence": "Then let us look at the figures together, rather than at our feelings.",
+     "answer": "The bike lane should be judged later, when more figures exist",
+     "patternId": "b1-111-main_idea"
+    }
+   ],
+   [
+    "Menurut penulis, apa akibatnya jika dewan kota membongkar jalur itu sekarang?",
+    [
+     "It will save the shops from bankruptcy",
+     "It will double the number of parking spaces",
+     "It will encourage far more people to cycle",
+     "It will judge a young experiment by its worst month"
+    ],
+    3,
+    {
+     "type": "likely",
+     "evidence": "it will be judging a young experiment by its worst month",
+     "answer": "It will judge a young experiment by its worst month",
+     "patternId": "b1-111-likely"
+    }
+   ],
+   [
+    "Pernyataan mana yang menyampaikan kembali alasan penulis tentang ruang jalan?",
+    [
+     "Bicycles are much cheaper to buy than cars",
+     "A bicycle takes up far less street space than a car",
+     "Cars should be banned from Jalan Merdeka completely",
+     "Shoppers who cycle always spend more money"
+    ],
+    1,
+    {
+     "type": "paraphrase",
+     "evidence": "a bicycle needs one twentieth of the space that a car does",
+     "answer": "A bicycle takes up far less street space than a car",
+     "patternId": "b1-111-paraphrase"
+    }
+   ]
+  ],
+  "topic": "jalur-sepeda",
+  "author": "Iwan Setiadi",
+  "setting": "surat pembaca koran kota",
+  "focus": "argumen-berdasarkan-data"
+ },
+ {
+  "id": "r0112",
+  "level": "B1",
+  "title": "Vegetables Above the Classrooms",
+  "text": "The roof of a state high school in Surabaya used to hold nothing but water tanks. Today it holds ninety plastic barrels of spinach, chilli and pak choi, cared for by students who arrive an hour before the first lesson. The project began when a science teacher noticed how hot the top-floor classrooms were. Soil and leaves, she guessed, might work like a blanket. Measurements taken this year support her idea: rooms under the garden are on average two degrees cooler, so the fans are switched on less often. The harvest goes to the school canteen, which now spends less on vegetables than in 2023. Other schools have visited, though two of them decided that their own roofs were not strong enough.",
+  "qs": [
+   [
+    "Apa yang dahulu ada di atap sekolah tersebut?",
+    [
+     "Only water tanks",
+     "Ninety plastic barrels",
+     "A canteen kitchen",
+     "A row of electric fans"
+    ],
+    0,
+    {
+     "type": "detail",
+     "evidence": "used to hold nothing but water tanks",
+     "answer": "Only water tanks",
+     "patternId": "b1-112-detail"
+    }
+   ],
+   [
+    "Apa akibat langsung dari adanya kebun di atap bagi ruang kelas di bawahnya?",
+    [
+     "The classrooms became darker",
+     "The classrooms became about two degrees cooler",
+     "The classrooms were closed for repairs",
+     "The classrooms were moved downstairs"
+    ],
+    1,
+    {
+     "type": "cause_effect",
+     "evidence": "rooms under the garden are on average two degrees cooler",
+     "answer": "The classrooms became about two degrees cooler",
+     "patternId": "b1-112-cause_effect"
+    }
+   ],
+   [
+    "Kesimpulan apa yang wajar tentang biaya kantin sekolah itu?",
+    [
+     "The canteen has stopped selling vegetables",
+     "The canteen now charges students much more",
+     "The canteen saves money because of the harvest",
+     "The canteen buys vegetables from other schools"
+    ],
+    2,
+    {
+     "type": "conclusion",
+     "evidence": "which now spends less on vegetables than in 2023",
+     "answer": "The canteen saves money because of the harvest",
+     "patternId": "b1-112-conclusion"
+    }
+   ],
+   [
+    "Bagaimana sekolah lain menanggapi kunjungan mereka ke kebun atap itu?",
+    [
+     "All of them started the same project immediately",
+     "Two of them judged their roofs too weak for barrels",
+     "None of them was allowed to enter the roof",
+     "All of them asked for barrels as a gift"
+    ],
+    1,
+    {
+     "type": "comparison",
+     "evidence": "though two of them decided that their own roofs were not strong enough",
+     "answer": "Two of them judged their roofs too weak for barrels",
+     "patternId": "b1-112-comparison"
+    }
+   ],
+   [
+    "Kalimat mana yang menjadi bukti bahwa dugaan guru sains itu benar?",
+    [
+     "The project began when a science teacher noticed how hot the top-floor classrooms were.",
+     "Measurements taken this year support her idea.",
+     "The harvest goes to the school canteen.",
+     "Other schools have visited the roof garden."
+    ],
+    1,
+    {
+     "type": "evidence",
+     "evidence": "Measurements taken this year support her idea",
+     "answer": "Measurements taken this year support her idea.",
+     "patternId": "b1-112-evidence"
+    }
+   ]
+  ],
+  "topic": "kebun-atap",
+  "author": "Ayu Lestari",
+  "setting": "SMA negeri di Surabaya",
+  "focus": "berita-lingkungan"
+ },
+ {
+  "id": "r0113",
+  "level": "B1",
+  "title": "The Reef in Slow Motion",
+  "text": "Most nature films want you to gasp. 'Shallow Water' wants you to wait. The camera stays on one square metre of reef near Wakatobi for minutes at a time, and at first this feels like a mistake. Then you begin to notice things: a shrimp cleaning the mouth of a fish, coral that has grown two centimetres since the previous scene. The film has no famous narrator, only the voice of a local diver who has watched this reef since 1989. When he describes the bleaching of 2016, he does not raise his voice, and that quietness is more frightening than any warning music. The final ten minutes, showing new coral on an old wreck, left our whole row silent.",
+  "qs": [
+   [
+    "Apa gagasan utama ulasan film dokumenter ini?",
+    [
+     "The film's patient style makes its message stronger",
+     "The film fails because nothing happens in it",
+     "The film uses a famous narrator to attract viewers",
+     "The film explains how coral is grown in laboratories"
+    ],
+    0,
+    {
+     "type": "main_idea",
+     "evidence": "'Shallow Water' wants you to wait.",
+     "answer": "The film's patient style makes its message stronger",
+     "patternId": "b1-113-main_idea"
+    }
+   ],
+   [
+    "Bagaimana nada penyelam ketika menceritakan pemutihan karang tahun 2016?",
+    [
+     "Loud and angry",
+     "Calm, which makes the story more disturbing",
+     "Cheerful and hopeful",
+     "Confused about the facts"
+    ],
+    1,
+    {
+     "type": "tone",
+     "evidence": "he does not raise his voice, and that quietness is more frightening than any warning music",
+     "answer": "Calm, which makes the story more disturbing",
+     "patternId": "b1-113-tone"
+    }
+   ],
+   [
+    "Kata 'gasp' dalam kalimat pertama paling dekat maknanya dengan ...",
+    [
+     "to fall asleep quietly",
+     "to take a sudden breath in shock",
+     "to laugh at a joke",
+     "to shout an answer"
+    ],
+    1,
+    {
+     "type": "vocabulary_context",
+     "evidence": "Most nature films want you to gasp.",
+     "answer": "to take a sudden breath in shock",
+     "patternId": "b1-113-vocabulary_context"
+    }
+   ],
+   [
+    "Apa yang dapat disimpulkan tentang reaksi penonton di bioskop?",
+    [
+     "They left before the film ended",
+     "They complained about the slow camera",
+     "They were deeply moved by the ending",
+     "They applauded loudly during the film"
+    ],
+    2,
+    {
+     "type": "inference",
+     "evidence": "left our whole row silent",
+     "answer": "They were deeply moved by the ending",
+     "patternId": "b1-113-inference"
+    }
+   ],
+   [
+    "Rincian mana yang mendukung pendapat bahwa menunggu membuat penonton melihat lebih banyak?",
+    [
+     "The film was shot near Wakatobi",
+     "A shrimp is seen cleaning the mouth of a fish",
+     "The diver has worked on the reef since 1989",
+     "The film has no famous narrator"
+    ],
+    1,
+    {
+     "type": "supporting_detail",
+     "evidence": "a shrimp cleaning the mouth of a fish",
+     "answer": "A shrimp is seen cleaning the mouth of a fish",
+     "patternId": "b1-113-supporting_detail"
+    }
+   ]
+  ],
+  "topic": "film-dokumenter",
+  "author": "Rio Pratama",
+  "setting": "ulasan film di majalah remaja",
+  "focus": "menilai-gaya"
+ },
+ {
+  "id": "r0114",
+  "level": "B1",
+  "title": "Seeing the Sound",
+  "text": "Photographer Laras Ayu lost most of her hearing at the age of six, after a long fever. She says the illness made her a better observer, because she had to read faces instead of voices. Her latest exhibition, held in a former warehouse in Makassar, contains forty portraits of street musicians. She photographs them at the moment just before they play, when their hands are ready and their eyes are still calm. Visitors often ask how a deaf artist can photograph music. Laras answers that she is not photographing sound at all; she is photographing attention. Her assistant signs the questions for her, and Laras replies by writing on a small board that she carries everywhere.",
+  "qs": [
+   [
+    "Kapan Laras Ayu memotret para musisi jalanan?",
+    [
+     "While they are playing loudly",
+     "Just before they begin to play",
+     "After the audience has left",
+     "During their journey home"
+    ],
+    1,
+    {
+     "type": "sequence",
+     "evidence": "She photographs them at the moment just before they play",
+     "answer": "Just before they begin to play",
+     "patternId": "b1-114-sequence"
+    }
+   ],
+   [
+    "Berapa jumlah potret dalam pameran terbaru Laras?",
+    [
+     "Six",
+     "Forty",
+     "Fourteen",
+     "Four hundred"
+    ],
+    1,
+    {
+     "type": "detail",
+     "evidence": "contains forty portraits of street musicians",
+     "answer": "Forty",
+     "patternId": "b1-114-detail"
+    }
+   ],
+   [
+    "Bagaimana Laras berkomunikasi dengan pengunjung pamerannya?",
+    [
+     "An assistant signs to her and Laras writes her replies",
+     "She speaks through a microphone on the wall",
+     "She sends her answers by email afterwards",
+     "She asks the musicians to answer for her"
+    ],
+    0,
+    {
+     "type": "relationship",
+     "evidence": "Her assistant signs the questions for her, and Laras replies by writing on a small board",
+     "answer": "An assistant signs to her and Laras writes her replies",
+     "patternId": "b1-114-relationship"
+    }
+   ],
+   [
+    "Mengapa Laras menganggap dirinya pengamat yang lebih baik?",
+    [
+     "Because she studied photography at a famous school",
+     "Because she has travelled to many countries",
+     "Because she had to read faces instead of voices",
+     "Because she works only in bright daylight"
+    ],
+    2,
+    {
+     "type": "why",
+     "evidence": "she had to read faces instead of voices",
+     "answer": "Because she had to read faces instead of voices",
+     "patternId": "b1-114-why"
+    }
+   ],
+   [
+    "Kesimpulan apa yang paling sesuai dengan jawaban Laras kepada pengunjung?",
+    [
+     "Her true subject is concentration, not sound",
+     "She wishes she could hear the music again",
+     "She believes photography is easier than music",
+     "She plans to stop photographing musicians"
+    ],
+    0,
+    {
+     "type": "conclusion",
+     "evidence": "she is photographing attention",
+     "answer": "Her true subject is concentration, not sound",
+     "patternId": "b1-114-conclusion"
+    }
+   ]
+  ],
+  "topic": "fotografi",
+  "author": "Nadia Ramli",
+  "setting": "gudang tua yang menjadi galeri di Makassar",
+  "focus": "profil-seniman"
+ },
+ {
+  "id": "r0115",
+  "level": "B1",
+  "title": "Ten Minutes of Reading Aloud",
+  "text": "Can reading aloud improve pronunciation more than listening alone? A university team in Yogyakarta asked ninety first-year students to record a short English paragraph in September and again in December. One third read aloud for ten minutes daily, one third only listened to recordings, and one third did neither. Three teachers who did not know the groups scored every recording. The readers improved most, especially in word stress, while the listeners improved a little in rhythm. The team warns that ten minutes is not magic: students who read badly and never checked a dictionary simply repeated their errors. Reading aloud helps, the report concludes, if learners also hear a correct model of the same text.",
+  "qs": [
+   [
+    "Apa pertanyaan yang ingin dijawab oleh tim peneliti Yogyakarta?",
+    [
+     "Whether reading aloud beats listening alone for pronunciation",
+     "Whether students prefer reading or listening",
+     "How many words students learn in one term",
+     "Which dictionary is best for first-year students"
+    ],
+    0,
+    {
+     "type": "purpose",
+     "evidence": "Can reading aloud improve pronunciation more than listening alone?",
+     "answer": "Whether reading aloud beats listening alone for pronunciation",
+     "patternId": "b1-115-purpose"
+    }
+   ],
+   [
+    "Bagaimana tim peneliti menjaga agar penilaian rekaman tetap adil?",
+    [
+     "They used a computer instead of teachers",
+     "The teachers who scored did not know the groups",
+     "Each student scored his or her own recording",
+     "They recorded the students only once"
+    ],
+    1,
+    {
+     "type": "how",
+     "evidence": "Three teachers who did not know the groups scored every recording.",
+     "answer": "The teachers who scored did not know the groups",
+     "patternId": "b1-115-how"
+    }
+   ],
+   [
+    "Kalimat mana yang menjadi bukti bahwa membaca nyaring saja belum cukup?",
+    [
+     "The readers improved most, especially in word stress.",
+     "One third only listened to recordings.",
+     "Students who read badly and never checked a dictionary simply repeated their errors.",
+     "The study took place between September and December."
+    ],
+    2,
+    {
+     "type": "evidence",
+     "evidence": "students who read badly and never checked a dictionary simply repeated their errors",
+     "answer": "Students who read badly and never checked a dictionary simply repeated their errors.",
+     "patternId": "b1-115-evidence"
+    }
+   ],
+   [
+    "Pernyataan 'Kelompok yang hanya mendengarkan sama sekali tidak maju' termasuk ...",
+    [
+     "Benar menurut teks",
+     "Salah menurut teks",
+     "Tidak disebutkan dalam teks",
+     "Benar untuk tekanan kata saja"
+    ],
+    1,
+    {
+     "type": "true_false_not_stated",
+     "evidence": "while the listeners improved a little in rhythm",
+     "answer": "Salah menurut teks",
+     "patternId": "b1-115-true_false_not_stated"
+    }
+   ],
+   [
+    "Apa simpulan pokok laporan penelitian tersebut?",
+    [
+     "Reading aloud works best together with a correct model to copy",
+     "Listening to recordings is useless for learners",
+     "Ten minutes a day is enough to master pronunciation",
+     "Dictionaries should replace listening practice"
+    ],
+    0,
+    {
+     "type": "main_idea",
+     "evidence": "if learners also hear a correct model of the same text",
+     "answer": "Reading aloud works best together with a correct model to copy",
+     "patternId": "b1-115-main_idea"
+    }
+   ]
+  ],
+  "topic": "pelafalan-bahasa",
+  "author": "Retno Wulandari",
+  "setting": "kampus di Yogyakarta",
+  "focus": "ringkasan-penelitian"
+ },
+ {
+  "id": "r0116",
+  "level": "B1",
+  "title": "Your First CV, One Page Only",
+  "text": "A first CV is short because your career is short, and that is completely normal. Begin with your name, your telephone number and one email address that sounds serious. Then list your education, the most recent first. Under it, add a section called Experience, and remember that experience is not only paid work: running a class fundraising stall taught you budgeting, and every employer knows this. Describe each item in a single line beginning with a verb, such as 'organised' or 'repaired'. Leave out your religion, your family details and your photograph, unless the advertisement asks for them. Finally, read the whole page aloud before you send it. If a sentence is hard to say, it will be hard to read.",
+  "qs": [
+   [
+    "Bagian apa yang ditulis tepat sesudah daftar pendidikan?",
+    [
+     "The list of references",
+     "The section called Experience",
+     "The applicant's photograph",
+     "The telephone number"
+    ],
+    1,
+    {
+     "type": "sequence",
+     "evidence": "Under it, add a section called Experience",
+     "answer": "The section called Experience",
+     "patternId": "b1-116-sequence"
+    }
+   ],
+   [
+    "Bagaimana cara menuliskan setiap butir pengalaman menurut panduan ini?",
+    [
+     "In one line that starts with a verb",
+     "In a full paragraph of five sentences",
+     "In a table with three columns",
+     "In capital letters throughout"
+    ],
+    0,
+    {
+     "type": "how",
+     "evidence": "Describe each item in a single line beginning with a verb",
+     "answer": "In one line that starts with a verb",
+     "patternId": "b1-116-how"
+    }
+   ],
+   [
+    "Apa yang sebaiknya tidak dicantumkan kecuali diminta iklan lowongan?",
+    [
+     "Your education and your email address",
+     "Your religion, family details and photograph",
+     "Your telephone number and your name",
+     "Your unpaid work at school"
+    ],
+    1,
+    {
+     "type": "detail",
+     "evidence": "Leave out your religion, your family details and your photograph",
+     "answer": "Your religion, family details and photograph",
+     "patternId": "b1-116-detail"
+    }
+   ],
+   [
+    "Mengapa penulis menyebut contoh kegiatan penggalangan dana di kelas?",
+    [
+     "To show that unpaid activities also count as experience",
+     "To advise students to start a small business",
+     "To warn readers against writing about school",
+     "To prove that employers dislike young applicants"
+    ],
+    0,
+    {
+     "type": "purpose",
+     "evidence": "running a class fundraising stall taught you budgeting",
+     "answer": "To show that unpaid activities also count as experience",
+     "patternId": "b1-116-purpose"
+    }
+   ],
+   [
+    "Apa yang akan diketahui pelamar jika membaca CV-nya dengan suara keras?",
+    [
+     "The number of spelling mistakes on the page",
+     "The exact salary the employer will offer",
+     "Which sentences are difficult to read",
+     "Whether the paper is thick enough"
+    ],
+    2,
+    {
+     "type": "likely",
+     "evidence": "If a sentence is hard to say, it will be hard to read.",
+     "answer": "Which sentences are difficult to read",
+     "patternId": "b1-116-likely"
+    }
+   ]
+  ],
+  "topic": "melamar-kerja",
+  "author": "Dimas Prakoso",
+  "setting": "panduan karier untuk pelajar",
+  "focus": "menulis-terstruktur"
+ },
+ {
+  "id": "r0117",
+  "level": "B1",
+  "title": "Keep the Subtitles",
+  "text": "Every few months someone proposes that foreign films on our television should be dubbed rather than subtitled. I disagree, and not only for artistic reasons. Countries where subtitles are normal tend to have stronger foreign-language skills, because their citizens hear real speech for hours each week without calling it study. Dubbing removes that free lesson. Of course, subtitles have costs: they are hard for small children and for viewers with weak eyesight, and a fast comedy can lose half of its jokes. My suggestion is simple. Broadcasters should offer both versions on the same channel, as several streaming services already do. Then families can choose, and nobody has to defend a rule that suits only one group of viewers.",
+  "qs": [
+   [
+    "Mengapa penulis opini ini menulis paragraf tentang kelemahan teks terjemahan?",
+    [
+     "To admit honest weaknesses before offering a solution",
+     "To change his mind and support dubbing",
+     "To attack viewers who have weak eyesight",
+     "To prove that comedies should not be shown"
+    ],
+    0,
+    {
+     "type": "author_purpose",
+     "evidence": "Of course, subtitles have costs",
+     "answer": "To admit honest weaknesses before offering a solution",
+     "patternId": "b1-117-author_purpose"
+    }
+   ],
+   [
+    "Apa perbedaan utama antara negara dengan teks terjemahan dan negara dengan sulih suara?",
+    [
+     "Their citizens watch fewer foreign films",
+     "Their citizens hear real speech far more often",
+     "Their citizens pay less for television",
+     "Their citizens prefer comedies to dramas"
+    ],
+    1,
+    {
+     "type": "comparison",
+     "evidence": "because their citizens hear real speech for hours each week without calling it study",
+     "answer": "Their citizens hear real speech far more often",
+     "patternId": "b1-117-comparison"
+    }
+   ],
+   [
+    "Kalimat mana yang paling dekat maknanya dengan usul penulis?",
+    [
+     "Dubbing should be forbidden by law",
+     "Only children's films should be dubbed",
+     "Viewers should be able to select either version themselves",
+     "Broadcasters should show fewer foreign films"
+    ],
+    2,
+    {
+     "type": "paraphrase",
+     "evidence": "Broadcasters should offer both versions on the same channel",
+     "answer": "Viewers should be able to select either version themselves",
+     "patternId": "b1-117-paraphrase"
+    }
+   ],
+   [
+    "Ungkapan 'that free lesson' merujuk pada apa?",
+    [
+     "The subtitles printed at the bottom of the screen",
+     "The hours of real speech that viewers hear",
+     "The language classes offered by broadcasters",
+     "The jokes that a fast comedy contains"
+    ],
+    1,
+    {
+     "type": "reference",
+     "evidence": "Dubbing removes that free lesson.",
+     "answer": "The hours of real speech that viewers hear",
+     "patternId": "b1-117-reference"
+    }
+   ],
+   [
+    "Apa pesan utama opini tentang sulih suara ini?",
+    [
+     "Offering both versions is better than forcing one on everyone",
+     "Subtitles are perfect and have no disadvantages",
+     "Television should stop buying foreign films",
+     "Language learning should happen only at school"
+    ],
+    0,
+    {
+     "type": "main_idea",
+     "evidence": "nobody has to defend a rule that suits only one group of viewers",
+     "answer": "Offering both versions is better than forcing one on everyone",
+     "patternId": "b1-117-main_idea"
+    }
+   ]
+  ],
+  "topic": "film-dan-bahasa",
+  "author": "Clara Simanjuntak",
+  "setting": "kolom opini media daring",
+  "focus": "menimbang-dua-sisi"
+ },
+ {
+  "id": "r0118",
+  "level": "B1",
+  "title": "The Ward at Three in the Morning",
+  "text": "Q: What is the hardest hour of your shift? A: Three o'clock. The building is quiet, and quiet makes small worries grow. Patients who have slept badly want to talk then, and I have learned to let them. Q: Does that not slow you down? A: It saves time later. A patient who has been heard at three rarely rings the bell six times at five. Q: How do you stay awake? A: Cold water on the wrists, and never sugar; sugar lifts you for twenty minutes and drops you for two hours. Q: Do you regret choosing night work? A: My daughter and I have breakfast together every morning. Day nurses I know have not done that for years.",
+  "qs": [
+   [
+    "Apa yang perawat itu hindari agar tetap terjaga?",
+    [
+     "Cold water",
+     "Sugar",
+     "Coffee",
+     "Conversation"
+    ],
+    1,
+    {
+     "type": "detail",
+     "evidence": "and never sugar",
+     "answer": "Sugar",
+     "patternId": "b1-118-detail"
+    }
+   ],
+   [
+    "Bagaimana nada perawat ketika berbicara tentang pekerjaan malamnya?",
+    [
+     "Bitter and full of regret",
+     "Nervous and uncertain",
+     "Calm and satisfied with her choice",
+     "Proud but secretly angry"
+    ],
+    2,
+    {
+     "type": "tone",
+     "evidence": "My daughter and I have breakfast together every morning.",
+     "answer": "Calm and satisfied with her choice",
+     "patternId": "b1-118-tone"
+    }
+   ],
+   [
+    "Mengapa perawat membiarkan pasien berbicara pada pukul tiga pagi?",
+    [
+     "Because the doctors have asked her to do so",
+     "Because there is no other work at that hour",
+     "Because it prevents repeated calls later in the shift",
+     "Because the patients pay for extra attention"
+    ],
+    2,
+    {
+     "type": "why",
+     "evidence": "A patient who has been heard at three rarely rings the bell six times at five.",
+     "answer": "Because it prevents repeated calls later in the shift",
+     "patternId": "b1-118-why"
+    }
+   ],
+   [
+    "Apa yang dapat disimpulkan tentang pengalaman perawat tersebut?",
+    [
+     "She has worked long enough to build her own methods",
+     "She has just started her first month of work",
+     "She dislikes talking to patients at any hour",
+     "She hopes to move to a day shift soon"
+    ],
+    0,
+    {
+     "type": "inference",
+     "evidence": "I have learned to let them",
+     "answer": "She has worked long enough to build her own methods",
+     "patternId": "b1-118-inference"
+    }
+   ],
+   [
+    "Rincian mana yang mendukung pendapat bahwa kesunyian membuat pekerjaan lebih berat?",
+    [
+     "Cold water on the wrists keeps her awake",
+     "Quiet makes small worries grow",
+     "Her daughter eats breakfast with her",
+     "Day nurses work different hours"
+    ],
+    1,
+    {
+     "type": "supporting_detail",
+     "evidence": "quiet makes small worries grow",
+     "answer": "Quiet makes small worries grow",
+     "patternId": "b1-118-supporting_detail"
+    }
+   ]
+  ],
+  "topic": "pekerjaan-malam",
+  "author": "Siti Rahmawati",
+  "setting": "rumah sakit umum, wawancara malam hari",
+  "focus": "wawancara-profesi"
+ },
+ {
+  "id": "r0119",
+  "level": "B1",
+  "title": "The Town's First Radio Voice",
+  "text": "In 1954 a mechanic named Pak Harun built a small transmitter in the back room of his bicycle shop. He had learned about valves during the war, and he wanted the fishermen of the town to hear the weather forecast before dawn. The first broadcast lasted eleven minutes and reached perhaps thirty houses. Within two years the station was reading school announcements, lost-property notices and, on Fridays, poems sent in by listeners. The town council never gave money, but it stopped charging Pak Harun for electricity, which was help enough. When the station finally closed in 1981, three hundred people came to the shop to say goodbye. The transmitter now sits in a glass case in the public library.",
+  "qs": [
+   [
+    "Apa yang terjadi dua tahun setelah siaran pertama?",
+    [
+     "The station closed for repairs",
+     "The station began reading announcements and poems",
+     "Pak Harun sold his bicycle shop",
+     "The council built a new studio"
+    ],
+    1,
+    {
+     "type": "sequence",
+     "evidence": "Within two years the station was reading school announcements",
+     "answer": "The station began reading announcements and poems",
+     "patternId": "b1-119-sequence"
+    }
+   ],
+   [
+    "Apa yang mendorong Pak Harun membangun pemancarnya?",
+    [
+     "He wanted fishermen to hear the forecast before dawn",
+     "He wanted to sell more bicycles in the town",
+     "He wanted to teach schoolchildren about valves",
+     "He wanted the council to give him money"
+    ],
+    0,
+    {
+     "type": "cause_effect",
+     "evidence": "he wanted the fishermen of the town to hear the weather forecast before dawn",
+     "answer": "He wanted fishermen to hear the forecast before dawn",
+     "patternId": "b1-119-cause_effect"
+    }
+   ],
+   [
+    "Berapa lama siaran pertama stasiun radio itu berlangsung?",
+    [
+     "Thirty minutes",
+     "Two years",
+     "Eleven minutes",
+     "Three hundred minutes"
+    ],
+    2,
+    {
+     "type": "detail",
+     "evidence": "The first broadcast lasted eleven minutes",
+     "answer": "Eleven minutes",
+     "patternId": "b1-119-detail"
+    }
+   ],
+   [
+    "Kata 'it' dalam kalimat tentang dewan kota merujuk pada apa?",
+    [
+     "The bicycle shop",
+     "The town council",
+     "The transmitter",
+     "The public library"
+    ],
+    1,
+    {
+     "type": "reference",
+     "evidence": "but it stopped charging Pak Harun for electricity",
+     "answer": "The town council",
+     "patternId": "b1-119-reference"
+    }
+   ],
+   [
+    "Kesimpulan apa yang dapat ditarik dari akhir catatan sejarah ini?",
+    [
+     "The station was forgotten as soon as it closed",
+     "The station mattered to the town long after 1954",
+     "The council regretted supporting the station",
+     "The transmitter was destroyed in 1981"
+    ],
+    1,
+    {
+     "type": "conclusion",
+     "evidence": "three hundred people came to the shop to say goodbye",
+     "answer": "The station mattered to the town long after 1954",
+     "patternId": "b1-119-conclusion"
+    }
+   ]
+  ],
+  "topic": "radio-lokal",
+  "author": "Harun Basri",
+  "setting": "kota nelayan pada tahun 1950-an",
+  "focus": "narasi-sejarah"
+ },
+ {
+  "id": "r0120",
+  "level": "B1",
+  "title": "Four Hours by Slow Train",
+  "text": "The slow train leaves at half past five, when the platform still smells of rain. It stops at every village, which is why nobody in a hurry takes it. For the first hour the windows show only grey shapes; then the light arrives all at once, and the rice fields turn from black to silver to green. A man opposite me peels an orange with a pocket knife and offers half of it to a stranger, who accepts without surprise. Somewhere after the fourth stop the carriage begins to talk, quietly, about prices and grandchildren. When the express passes us near noon, going twice our speed, nobody on our train even looks up.",
+  "qs": [
+   [
+    "Ungkapan 'the carriage begins to talk' berarti bahwa ...",
+    [
+     "the passengers start chatting with one another",
+     "the train makes a loud mechanical noise",
+     "an announcement is played through speakers",
+     "the driver speaks to the passengers"
+    ],
+    0,
+    {
+     "type": "vocabulary_context",
+     "evidence": "the carriage begins to talk, quietly, about prices and grandchildren",
+     "answer": "the passengers start chatting with one another",
+     "patternId": "b1-120-vocabulary_context"
+    }
+   ],
+   [
+    "Bagaimana perasaan penulis terhadap perjalanan kereta lambat itu?",
+    [
+     "Irritated by the many stops",
+     "Quietly fond of its unhurried rhythm",
+     "Worried about arriving late",
+     "Disappointed by the scenery"
+    ],
+    1,
+    {
+     "type": "tone",
+     "evidence": "nobody on our train even looks up",
+     "answer": "Quietly fond of its unhurried rhythm",
+     "patternId": "b1-120-tone"
+    }
+   ],
+   [
+    "Apa yang dapat disimpulkan tentang lelaki yang mengupas jeruk?",
+    [
+     "Sharing with strangers is ordinary on this train",
+     "He is selling fruit to the other passengers",
+     "He knows the stranger very well already",
+     "He is angry that nobody thanks him"
+    ],
+    0,
+    {
+     "type": "inference",
+     "evidence": "offers half of it to a stranger, who accepts without surprise",
+     "answer": "Sharing with strangers is ordinary on this train",
+     "patternId": "b1-120-inference"
+    }
+   ],
+   [
+    "Bagaimana hubungan antara kereta lambat dan kereta ekspres dalam teks?",
+    [
+     "The express is far faster, yet the slow passengers are unimpressed",
+     "The two trains always travel together",
+     "The express stops at every village as well",
+     "The slow train overtakes the express near noon"
+    ],
+    0,
+    {
+     "type": "relationship",
+     "evidence": "When the express passes us near noon, going twice our speed",
+     "answer": "The express is far faster, yet the slow passengers are unimpressed",
+     "patternId": "b1-120-relationship"
+    }
+   ],
+   [
+    "Kalimat mana yang menjadi bukti bahwa penumpang kereta ini tidak terburu-buru?",
+    [
+     "The slow train leaves at half past five.",
+     "It stops at every village, which is why nobody in a hurry takes it.",
+     "The rice fields turn from black to silver to green.",
+     "The platform still smells of rain."
+    ],
+    1,
+    {
+     "type": "evidence",
+     "evidence": "It stops at every village, which is why nobody in a hurry takes it.",
+     "answer": "It stops at every village, which is why nobody in a hurry takes it.",
+     "patternId": "b1-120-evidence"
+    }
+   ]
+  ],
+  "topic": "perjalanan-kereta",
+  "author": "Gilang Saputra",
+  "setting": "kereta lokal antar-desa",
+  "focus": "deskripsi-suasana"
+ },
+ {
+  "id": "r0121",
+  "level": "B1",
+  "title": "Two Tonnes from the River",
+  "text": "Volunteers pulled two tonnes of rubbish out of a two-kilometre stretch of river last Sunday, and nearly half of it was plastic packaging from food stalls. The clean-up was organised by university students who have repeated the same activity every three months since 2022. Their leader, Wulan, says the point is not the rubbish itself. 'We weigh everything and publish the list,' she explains. 'When a company sees its own wrappers on that list, the conversation changes.' Two producers have since agreed to test paper packaging in the district. The city has promised three new bins along the bank, but the students reply that bins alone have never solved the problem, because the water carries waste from further upstream.",
+  "qs": [
+   [
+    "Apa gagasan utama berita tentang pembersihan sungai ini?",
+    [
+     "Publishing what is collected pushes companies to change their packaging",
+     "The city has finally solved the rubbish problem with new bins",
+     "Students earn money by selling the plastic they collect",
+     "The river has become clean after a single Sunday of work"
+    ],
+    0,
+    {
+     "type": "main_idea",
+     "evidence": "When a company sees its own wrappers on that list, the conversation changes.",
+     "answer": "Publishing what is collected pushes companies to change their packaging",
+     "patternId": "b1-121-main_idea"
+    }
+   ],
+   [
+    "Seberapa sering kelompok mahasiswa itu mengadakan kegiatan yang sama?",
+    [
+     "Every week",
+     "Every month",
+     "Every three months",
+     "Once a year"
+    ],
+    2,
+    {
+     "type": "detail",
+     "evidence": "who have repeated the same activity every three months since 2022",
+     "answer": "Every three months",
+     "patternId": "b1-121-detail"
+    }
+   ],
+   [
+    "Mengapa para mahasiswa menganggap tempat sampah baru tidak cukup?",
+    [
+     "Because the bins are too small for plastic wrappers",
+     "Because rubbish arrives in the water from further upstream",
+     "Because the city refuses to empty the bins",
+     "Because volunteers cannot reach the riverbank"
+    ],
+    1,
+    {
+     "type": "cause_effect",
+     "evidence": "because the water carries waste from further upstream",
+     "answer": "Because rubbish arrives in the water from further upstream",
+     "patternId": "b1-121-cause_effect"
+    }
+   ],
+   [
+    "Apa yang mungkin dilakukan dua produsen tersebut dalam waktu dekat?",
+    [
+     "They will close their factories in the district",
+     "They will pay the volunteers for their work",
+     "They will publish their own rubbish list",
+     "They will try paper packaging in the district"
+    ],
+    3,
+    {
+     "type": "likely",
+     "evidence": "Two producers have since agreed to test paper packaging in the district.",
+     "answer": "They will try paper packaging in the district",
+     "patternId": "b1-121-likely"
+    }
+   ],
+   [
+    "Pernyataan 'Kota membayar para relawan atas kerja mereka' termasuk ...",
+    [
+     "Benar menurut teks",
+     "Salah, karena mereka membayar sendiri",
+     "Tidak disebutkan dalam teks",
+     "Benar sejak tahun 2022"
+    ],
+    2,
+    {
+     "type": "true_false_not_stated",
+     "evidence": "The city has promised three new bins along the bank",
+     "answer": "Tidak disebutkan dalam teks",
+     "patternId": "b1-121-true_false_not_stated"
+    }
+   ]
+  ],
+  "topic": "sampah-sungai",
+  "author": "Wulan Anindita",
+  "setting": "tepi sungai kota besar",
+  "focus": "berita-aksi-warga"
+ },
+ {
+  "id": "r0122",
+  "level": "B1",
+  "title": "When a Friend Copies Your Work",
+  "text": "A student in Solo asks what to do about a close friend who copies her homework every morning before class. She refused once, and the friendship turned cold for a week. Our columnist answers that the real problem is not honesty but timing. Saying no at seven in the morning, in front of other people, feels like an attack. Choose a calmer moment instead, and offer something genuine: work through one exercise together at lunchtime. In that way you refuse the copying, not the friend. She adds a warning at the end. If a teacher notices two identical sets of answers, both students are usually punished, and the one who lent the book is rarely believed.",
+  "qs": [
+   [
+    "Apa tujuan jawaban kolumnis dalam rubrik ini?",
+    [
+     "To help the reader refuse without losing the friendship",
+     "To report the friend to her class teacher",
+     "To explain the school rules about examinations",
+     "To persuade the reader to keep lending her homework"
+    ],
+    0,
+    {
+     "type": "purpose",
+     "evidence": "In that way you refuse the copying, not the friend.",
+     "answer": "To help the reader refuse without losing the friendship",
+     "patternId": "b1-122-purpose"
+    }
+   ],
+   [
+    "Kalimat mana yang paling dekat maknanya dengan nasihat tentang waktu bicara?",
+    [
+     "Never discuss the matter with your friend at all",
+     "A refusal in public at a busy moment feels like an insult",
+     "Morning is the only honest time to say no",
+     "Only a teacher should raise the subject"
+    ],
+    1,
+    {
+     "type": "paraphrase",
+     "evidence": "Saying no at seven in the morning, in front of other people, feels like an attack.",
+     "answer": "A refusal in public at a busy moment feels like an insult",
+     "patternId": "b1-122-paraphrase"
+    }
+   ],
+   [
+    "Bagaimana cara pembaca dapat menolong temannya tanpa memberi contekan?",
+    [
+     "By doing one exercise together at lunchtime",
+     "By writing the answers in a different order",
+     "By asking another classmate to help instead",
+     "By giving the friend an older exercise book"
+    ],
+    0,
+    {
+     "type": "how",
+     "evidence": "work through one exercise together at lunchtime",
+     "answer": "By doing one exercise together at lunchtime",
+     "patternId": "b1-122-how"
+    }
+   ],
+   [
+    "Bagaimana nada kolumnis terhadap pembaca yang bertanya?",
+    [
+     "Practical and understanding",
+     "Sharp and disappointed",
+     "Amused by her difficulty",
+     "Uninterested in her problem"
+    ],
+    0,
+    {
+     "type": "tone",
+     "evidence": "Our columnist answers that the real problem is not honesty but timing.",
+     "answer": "Practical and understanding",
+     "patternId": "b1-122-tone"
+    }
+   ],
+   [
+    "Rincian mana yang mendukung peringatan bahwa meminjamkan buku itu berisiko?",
+    [
+     "The friendship turned cold for a week",
+     "The friend copies the homework every morning",
+     "The lender is rarely believed by teachers",
+     "The columnist writes for a weekly page"
+    ],
+    2,
+    {
+     "type": "supporting_detail",
+     "evidence": "the one who lent the book is rarely believed",
+     "answer": "The lender is rarely believed by teachers",
+     "patternId": "b1-122-supporting_detail"
+    }
+   ]
+  ],
+  "topic": "kejujuran-akademik",
+  "author": "Maya Kusuma",
+  "setting": "rubrik saran untuk pelajar",
+  "focus": "memecahkan-masalah-sosial"
+ },
+ {
+  "id": "r0123",
+  "level": "B1",
+  "title": "What the Old Phone Drawer Contains",
+  "text": "For one month a school in Denpasar asked families to bring in electronic items they no longer used. The collection filled twenty-two boxes. Students then sorted everything and counted what they had received: two hundred and sixteen chargers, ninety-four phones, and only three broken televisions. The surprise was the chargers, which nobody had expected in such numbers. Most of them still worked; they had simply lost the device that matched them. A repair shop agreed to take the phones, and the working chargers were labelled and offered free at the school gate. Within two weeks all but eleven had gone. The students argue that the drawer at home, not the rubbish tip, is where most electronic waste is really hiding.",
+  "qs": [
+   [
+    "Apa yang dilakukan murid segera setelah pengumpulan barang selesai?",
+    [
+     "They sold the boxes to a repair shop",
+     "They sorted and counted the items",
+     "They repaired every broken television",
+     "They wrote letters to the families"
+    ],
+    1,
+    {
+     "type": "sequence",
+     "evidence": "Students then sorted everything and counted what they had received",
+     "answer": "They sorted and counted the items",
+     "patternId": "b1-123-sequence"
+    }
+   ],
+   [
+    "Berapa jumlah telepon yang terkumpul dalam kegiatan itu?",
+    [
+     "Twenty-two",
+     "Three",
+     "Ninety-four",
+     "Two hundred and sixteen"
+    ],
+    2,
+    {
+     "type": "detail",
+     "evidence": "ninety-four phones",
+     "answer": "Ninety-four",
+     "patternId": "b1-123-detail"
+    }
+   ],
+   [
+    "Apa perbedaan antara pengisi daya dan televisi dalam hasil pengumpulan?",
+    [
+     "Chargers arrived in huge numbers while televisions were very few",
+     "Both arrived in roughly equal numbers",
+     "Televisions were mostly still working, unlike the chargers",
+     "Chargers were sold while televisions were given away"
+    ],
+    0,
+    {
+     "type": "comparison",
+     "evidence": "two hundred and sixteen chargers, ninety-four phones, and only three broken televisions",
+     "answer": "Chargers arrived in huge numbers while televisions were very few",
+     "patternId": "b1-123-comparison"
+    }
+   ],
+   [
+    "Kesimpulan apa yang ditarik para murid dari kegiatan ini?",
+    [
+     "Repair shops should be paid to collect old phones",
+     "Families in Denpasar own too many televisions",
+     "Most electronic waste sits unused in drawers at home",
+     "Chargers stop working faster than telephones do"
+    ],
+    2,
+    {
+     "type": "conclusion",
+     "evidence": "the drawer at home, not the rubbish tip, is where most electronic waste is really hiding",
+     "answer": "Most electronic waste sits unused in drawers at home",
+     "patternId": "b1-123-conclusion"
+    }
+   ],
+   [
+    "Mengapa banyak pengisi daya itu tidak lagi dipakai pemiliknya?",
+    [
+     "Because they were broken beyond repair",
+     "Because the school had asked for them",
+     "Because they used too much electricity",
+     "Because the matching device had disappeared"
+    ],
+    3,
+    {
+     "type": "why",
+     "evidence": "they had simply lost the device that matched them",
+     "answer": "Because the matching device had disappeared",
+     "patternId": "b1-123-why"
+    }
+   ]
+  ],
+  "topic": "limbah-elektronik",
+  "author": "Komang Aditya",
+  "setting": "sekolah di Denpasar",
+  "focus": "laporan-kegiatan"
+ },
+ {
+  "id": "r0124",
+  "level": "B1",
+  "title": "Colours from the Kitchen",
+  "text": "Sekar Dewanti learned batik from her mother, but her dyes come from places her mother never considered: onion skins, used coffee grounds, and the leaves that mango sellers throw away. She began experimenting in 2019, after reading that textile dye was polluting the small river behind her workshop in Pekalongan. Natural colour is harder to control, she admits, and two cloths from the same pot are never quite identical. Her customers now treat that difference as the point rather than the problem. She trains six young women every year, and she insists that each of them keeps a written record of every recipe. 'A colour you cannot repeat,' she says, 'is a story, not a business.'",
+  "qs": [
+   [
+    "Apa inti profil tentang Sekar Dewanti ini?",
+    [
+     "She has rebuilt a traditional craft around waste materials",
+     "She has given up batik in order to protect a river",
+     "She sells coffee and onions to other workshops",
+     "She teaches batik only to members of her family"
+    ],
+    0,
+    {
+     "type": "main_idea",
+     "evidence": "her dyes come from places her mother never considered",
+     "answer": "She has rebuilt a traditional craft around waste materials",
+     "patternId": "b1-124-main_idea"
+    }
+   ],
+   [
+    "Kata 'identical' dalam teks paling dekat maknanya dengan ...",
+    [
+     "exactly the same",
+     "clearly cheaper",
+     "carefully folded",
+     "completely dry"
+    ],
+    0,
+    {
+     "type": "vocabulary_context",
+     "evidence": "two cloths from the same pot are never quite identical",
+     "answer": "exactly the same",
+     "patternId": "b1-124-vocabulary_context"
+    }
+   ],
+   [
+    "Apa yang dapat disimpulkan tentang pandangan pelanggan Sekar?",
+    [
+     "They accept small variations as a mark of handmade cloth",
+     "They demand that every cloth looks the same",
+     "They prefer chemical dyes for their brightness",
+     "They buy the cloth only as a gift"
+    ],
+    0,
+    {
+     "type": "inference",
+     "evidence": "Her customers now treat that difference as the point rather than the problem.",
+     "answer": "They accept small variations as a mark of handmade cloth",
+     "patternId": "b1-124-inference"
+    }
+   ],
+   [
+    "Apa hubungan antara sungai di belakang bengkel dan keputusan Sekar?",
+    [
+     "The river gave her the water she needed for dyeing",
+     "Pollution in the river made her look for new dyes",
+     "She moved her workshop away from the river",
+     "The river was cleaned by her six trainees"
+    ],
+    1,
+    {
+     "type": "relationship",
+     "evidence": "after reading that textile dye was polluting the small river behind her workshop",
+     "answer": "Pollution in the river made her look for new dyes",
+     "patternId": "b1-124-relationship"
+    }
+   ],
+   [
+    "Mengapa penulis menutup profil ini dengan kutipan Sekar tentang warna?",
+    [
+     "To show that she values recipes that can be repeated",
+     "To prove that natural dyes are cheaper than chemicals",
+     "To warn readers against buying handmade cloth",
+     "To explain how batik wax is applied"
+    ],
+    0,
+    {
+     "type": "author_purpose",
+     "evidence": "A colour you cannot repeat,",
+     "answer": "To show that she values recipes that can be repeated",
+     "patternId": "b1-124-author_purpose"
+    }
+   ]
+  ],
+  "topic": "batik-pewarna-alami",
+  "author": "Sekar Ningtyas",
+  "setting": "bengkel batik di Pekalongan",
+  "focus": "profil-usaha"
+ },
+ {
+  "id": "r0125",
+  "level": "B1",
+  "title": "Three Minutes in Front of the Class",
+  "text": "A short presentation fails for one reason more often than any other: too much material. Decide first what single sentence your audience should remember, and write it at the top of your notes. Everything that does not serve that sentence must go, however interesting it may be. Next, plan your opening, because the first fifteen seconds decide whether people listen. A question or a surprising number works better than your name and title. Practise standing up and out loud at least twice, since reading silently trains your eyes but not your mouth. Keep your slides almost empty, because an audience cannot read and listen at the same time. Finish early. Nobody has ever complained that a talk was too short.",
+  "qs": [
+   [
+    "Bagaimana cara menyiapkan pembukaan presentasi menurut panduan ini?",
+    [
+     "Begin with a question or a surprising number",
+     "Begin with your name and your title",
+     "Begin by reading the first slide aloud",
+     "Begin by apologising for being nervous"
+    ],
+    0,
+    {
+     "type": "how",
+     "evidence": "A question or a surprising number works better than your name and title.",
+     "answer": "Begin with a question or a surprising number",
+     "patternId": "b1-125-how"
+    }
+   ],
+   [
+    "Apa langkah pertama yang disarankan sebelum menyusun bahan?",
+    [
+     "Designing the slides",
+     "Choosing the one sentence to be remembered",
+     "Practising in front of a mirror",
+     "Timing the whole talk"
+    ],
+    1,
+    {
+     "type": "sequence",
+     "evidence": "Decide first what single sentence your audience should remember",
+     "answer": "Choosing the one sentence to be remembered",
+     "patternId": "b1-125-sequence"
+    }
+   ],
+   [
+    "Untuk apa panduan ini disusun?",
+    [
+     "To explain how slides are designed on a computer",
+     "To describe a competition for young speakers",
+     "To help students prepare a very short talk",
+     "To list the mistakes teachers make in class"
+    ],
+    2,
+    {
+     "type": "purpose",
+     "evidence": "A short presentation fails for one reason more often than any other",
+     "answer": "To help students prepare a very short talk",
+     "patternId": "b1-125-purpose"
+    }
+   ],
+   [
+    "Berapa kali penulis menyarankan berlatih dengan berdiri dan bersuara?",
+    [
+     "Once",
+     "At least twice",
+     "Five times",
+     "Every evening for a week"
+    ],
+    1,
+    {
+     "type": "detail",
+     "evidence": "Practise standing up and out loud at least twice",
+     "answer": "At least twice",
+     "patternId": "b1-125-detail"
+    }
+   ],
+   [
+    "Kalimat mana yang menjadi alasan mengapa salindia harus hampir kosong?",
+    [
+     "Finish early.",
+     "An audience cannot read and listen at the same time.",
+     "The first fifteen seconds decide whether people listen.",
+     "Reading silently trains your eyes but not your mouth."
+    ],
+    1,
+    {
+     "type": "evidence",
+     "evidence": "an audience cannot read and listen at the same time",
+     "answer": "An audience cannot read and listen at the same time.",
+     "patternId": "b1-125-evidence"
+    }
+   ]
+  ],
+  "topic": "presentasi",
+  "author": "Bimo Hartanto",
+  "setting": "buku pegangan keterampilan belajar",
+  "focus": "berbicara-di-depan-umum"
+ },
+ {
+  "id": "r0126",
+  "level": "B1",
+  "title": "Where the Shade Has Gone",
+  "text": "Madam, last month the eleven old trees on Jalan Kenanga were cut down so that the pavement could be widened. I have lived on that street for twenty-six years. Since the trees went, the shops close their doors by two in the afternoon, because the heat is unbearable, and the wide new pavement stands empty from noon until five. Nobody walks in the sun. The young trees planted in their place are welcome, but they will need fifteen years to give the shade that we destroyed in a single morning. I am not writing in anger. I am writing so that the next street to be improved is measured in summers, not only in metres.",
+  "qs": [
+   [
+    "Apa maksud penulis mengirim surat tentang pohon di Jalan Kenanga?",
+    [
+     "To ask that future street projects consider shade",
+     "To demand that the pavement be made narrower",
+     "To complain about the shopkeepers who close early",
+     "To request payment for the trees that were cut"
+    ],
+    0,
+    {
+     "type": "author_purpose",
+     "evidence": "I am writing so that the next street to be improved is measured in summers",
+     "answer": "To ask that future street projects consider shade",
+     "patternId": "b1-126-author_purpose"
+    }
+   ],
+   [
+    "Bagaimana nada surat pembaca ini?",
+    [
+     "Furious and threatening",
+     "Regretful but reasonable",
+     "Joking and light-hearted",
+     "Cold and official"
+    ],
+    1,
+    {
+     "type": "tone",
+     "evidence": "I am not writing in anger.",
+     "answer": "Regretful but reasonable",
+     "patternId": "b1-126-tone"
+    }
+   ],
+   [
+    "Apa akibat penebangan pohon bagi toko-toko di jalan itu?",
+    [
+     "They have moved to another street",
+     "They now open earlier in the morning",
+     "They close in the afternoon because of the heat",
+     "They have hired more staff for the pavement"
+    ],
+    2,
+    {
+     "type": "cause_effect",
+     "evidence": "the shops close their doors by two in the afternoon, because the heat is unbearable",
+     "answer": "They close in the afternoon because of the heat",
+     "patternId": "b1-126-cause_effect"
+    }
+   ],
+   [
+    "Kapan pohon-pohon muda itu kemungkinan akan memberi keteduhan yang cukup?",
+    [
+     "Within a single morning",
+     "Within twenty-six years",
+     "After about fifteen years",
+     "Before the next summer"
+    ],
+    2,
+    {
+     "type": "likely",
+     "evidence": "they will need fifteen years to give the shade",
+     "answer": "After about fifteen years",
+     "patternId": "b1-126-likely"
+    }
+   ],
+   [
+    "Ungkapan 'in their place' dalam surat itu merujuk pada apa?",
+    [
+     "The place of the shopkeepers",
+     "The place of the eleven old trees",
+     "The place of the wide pavement",
+     "The place of the writer's house"
+    ],
+    1,
+    {
+     "type": "reference",
+     "evidence": "The young trees planted in their place are welcome",
+     "answer": "The place of the eleven old trees",
+     "patternId": "b1-126-reference"
+    }
+   ]
+  ],
+  "topic": "pohon-kota",
+  "author": "Suryani Dewi",
+  "setting": "surat untuk redaksi harian daerah",
+  "focus": "menyuarakan-keberatan"
+ },
+ {
+  "id": "r0127",
+  "level": "B1",
+  "title": "A Podcast Worth the Walk",
+  "text": "'Rumah Kata' releases one episode a week, and each episode is a single conversation with somebody who does an unusual job: a puppet maker, a mountain rescue volunteer, a woman who tunes pianos. Compared with most interview programmes, it is remarkably slow. The host asks perhaps eight questions in forty minutes, and she is not afraid of silence. That patience is exactly what makes her guests say something true near the end. The sound quality varies, and episodes recorded outdoors can be tiring on cheap earphones. If you download only one, choose the piano tuner, who spends her final five minutes describing how she listens to a room before she listens to an instrument.",
+  "qs": [
+   [
+    "Apa yang membedakan siniar ini dari kebanyakan program wawancara?",
+    [
+     "It invites several guests into one episode",
+     "It asks far fewer questions and allows silence",
+     "It is published every single day",
+     "It uses music between the questions"
+    ],
+    1,
+    {
+     "type": "comparison",
+     "evidence": "Compared with most interview programmes, it is remarkably slow.",
+     "answer": "It asks far fewer questions and allows silence",
+     "patternId": "b1-127-comparison"
+    }
+   ],
+   [
+    "Berapa lama satu episode siniar tersebut kira-kira berlangsung?",
+    [
+     "Five minutes",
+     "Eight minutes",
+     "Forty minutes",
+     "One week"
+    ],
+    2,
+    {
+     "type": "detail",
+     "evidence": "The host asks perhaps eight questions in forty minutes",
+     "answer": "Forty minutes",
+     "patternId": "b1-127-detail"
+    }
+   ],
+   [
+    "Pernyataan mana yang menyampaikan kembali pendapat pengulas tentang kesabaran pembawa acara?",
+    [
+     "Slow questioning makes the guests more honest at the end",
+     "Slow questioning makes the episodes boring",
+     "The host should prepare more questions",
+     "The guests decide how long the episode lasts"
+    ],
+    0,
+    {
+     "type": "paraphrase",
+     "evidence": "That patience is exactly what makes her guests say something true near the end.",
+     "answer": "Slow questioning makes the guests more honest at the end",
+     "patternId": "b1-127-paraphrase"
+    }
+   ],
+   [
+    "Kata 'one' dalam kalimat 'If you download only one' merujuk pada apa?",
+    [
+     "One earphone",
+     "One episode",
+     "One question",
+     "One guest"
+    ],
+    1,
+    {
+     "type": "reference",
+     "evidence": "If you download only one, choose the piano tuner",
+     "answer": "One episode",
+     "patternId": "b1-127-reference"
+    }
+   ],
+   [
+    "Kesimpulan apa yang paling sesuai dengan ulasan siniar ini?",
+    [
+     "The programme is worth hearing despite uneven sound",
+     "The programme should be recorded only outdoors",
+     "The programme is unsuitable for cheap earphones",
+     "The programme has too many episodes to follow"
+    ],
+    0,
+    {
+     "type": "conclusion",
+     "evidence": "The sound quality varies",
+     "answer": "The programme is worth hearing despite uneven sound",
+     "patternId": "b1-127-conclusion"
+    }
+   ]
+  ],
+  "topic": "siniar",
+  "author": "Larasati Ayu",
+  "setting": "rubrik ulasan media",
+  "focus": "menilai-program-audio"
+ },
+ {
+  "id": "r0128",
+  "level": "B1",
+  "title": "Signal on the Hill",
+  "text": "Until January the only reliable signal in the village was found on a hill twenty minutes above the houses, where students sat on plastic chairs to upload their assignments. A cooperative of forty families has now paid for a small tower and a shared connection, each household contributing what it could over eighteen months. The school benefits most: teachers download materials late at night, when the line is faster, and print them before the first lesson. Not everyone is satisfied. Several farmers argue that the same money would have repaired the irrigation channel, which failed twice last year. The cooperative has promised that any surplus from the monthly fees will go to that repair.",
+  "qs": [
+   [
+    "Apa pokok berita tentang desa ini?",
+    [
+     "Families paid together for a connection that mainly helps the school",
+     "The government built a tower for the village school",
+     "Farmers have repaired the irrigation channel themselves",
+     "Students have stopped uploading their assignments"
+    ],
+    0,
+    {
+     "type": "main_idea",
+     "evidence": "A cooperative of forty families has now paid for a small tower and a shared connection",
+     "answer": "Families paid together for a connection that mainly helps the school",
+     "patternId": "b1-128-main_idea"
+    }
+   ],
+   [
+    "Mengapa guru mengunduh bahan pelajaran pada larut malam?",
+    [
+     "Because the school building is quiet then",
+     "Because the connection is faster at that hour",
+     "Because the printer only works at night",
+     "Because the students are asleep then"
+    ],
+    1,
+    {
+     "type": "why",
+     "evidence": "teachers download materials late at night, when the line is faster",
+     "answer": "Because the connection is faster at that hour",
+     "patternId": "b1-128-why"
+    }
+   ],
+   [
+    "Di mana murid dahulu mengunggah tugas mereka?",
+    [
+     "In the school library",
+     "At the cooperative office",
+     "On a hill above the houses",
+     "Beside the irrigation channel"
+    ],
+    2,
+    {
+     "type": "detail",
+     "evidence": "was found on a hill twenty minutes above the houses",
+     "answer": "On a hill above the houses",
+     "patternId": "b1-128-detail"
+    }
+   ],
+   [
+    "Rincian mana yang mendukung keberatan para petani?",
+    [
+     "The tower was paid for over eighteen months",
+     "The irrigation channel failed twice last year",
+     "Teachers print materials before the first lesson",
+     "The village has forty families in the cooperative"
+    ],
+    1,
+    {
+     "type": "supporting_detail",
+     "evidence": "which failed twice last year",
+     "answer": "The irrigation channel failed twice last year",
+     "patternId": "b1-128-supporting_detail"
+    }
+   ],
+   [
+    "Pernyataan 'Koperasi berjanji memakai kelebihan iuran untuk perbaikan saluran' termasuk ...",
+    [
+     "Benar menurut teks",
+     "Salah menurut teks",
+     "Tidak disebutkan dalam teks",
+     "Salah, sebab uang itu untuk sekolah"
+    ],
+    0,
+    {
+     "type": "true_false_not_stated",
+     "evidence": "any surplus from the monthly fees will go to that repair",
+     "answer": "Benar menurut teks",
+     "patternId": "b1-128-true_false_not_stated"
+    }
+   ]
+  ],
+  "topic": "internet-desa",
+  "author": "Fitri Handayani",
+  "setting": "nagari di dataran tinggi Sumatera",
+  "focus": "berita-pembangunan"
+ },
+ {
+  "id": "r0129",
+  "level": "B1",
+  "title": "Less Homework, Better Homework",
+  "text": "I am not one of those students who believe homework should disappear completely. What I question is its quantity. Last term I counted my own hours: four and a half every evening, of which perhaps one was genuinely useful. The rest was copying, colouring, and repeating exercises I had already understood in class. Teachers are not the villains here; many of them set long tasks because parents ask for visible proof of work. But a page of neat copying proves nothing except that a student can copy neatly. Give me three difficult questions instead of thirty easy ones. I will spend longer on them, I will remember them, and my family will finally see me at dinner.",
+  "qs": [
+   [
+    "Mengapa penulis membuka esainya dengan mengatakan bahwa ia bukan penentang pekerjaan rumah?",
+    [
+     "To show that his complaint is about quantity, not homework itself",
+     "To please his teachers before criticising his parents",
+     "To admit that he never finishes his own homework",
+     "To argue that homework should be given at weekends"
+    ],
+    0,
+    {
+     "type": "author_purpose",
+     "evidence": "I am not one of those students who believe homework should disappear completely.",
+     "answer": "To show that his complaint is about quantity, not homework itself",
+     "patternId": "b1-129-author_purpose"
+    }
+   ],
+   [
+    "Kalimat mana yang menjadi bukti utama pendapat penulis?",
+    [
+     "Teachers are not the villains here.",
+     "Last term I counted my own hours: four and a half every evening, of which perhaps one was genuinely useful.",
+     "Give me three difficult questions instead of thirty easy ones.",
+     "My family will finally see me at dinner."
+    ],
+    1,
+    {
+     "type": "evidence",
+     "evidence": "Last term I counted my own hours: four and a half every evening, of which perhaps one was genuinely useful.",
+     "answer": "Last term I counted my own hours: four and a half every evening, of which perhaps one was genuinely useful.",
+     "patternId": "b1-129-evidence"
+    }
+   ],
+   [
+    "Apa yang dapat disimpulkan tentang sikap penulis terhadap guru?",
+    [
+     "He blames teachers for every long task",
+     "He believes teachers act under pressure from parents",
+     "He thinks teachers do not read the work at all",
+     "He wants teachers to stop setting difficult questions"
+    ],
+    1,
+    {
+     "type": "inference",
+     "evidence": "many of them set long tasks because parents ask for visible proof of work",
+     "answer": "He believes teachers act under pressure from parents",
+     "patternId": "b1-129-inference"
+    }
+   ],
+   [
+    "Apa perbedaan antara tugas yang diinginkan penulis dan tugas yang biasa ia terima?",
+    [
+     "A few hard questions rather than many easy ones",
+     "Written work rather than oral work",
+     "Group projects rather than individual tasks",
+     "Tasks from parents rather than from teachers"
+    ],
+    0,
+    {
+     "type": "comparison",
+     "evidence": "Give me three difficult questions instead of thirty easy ones.",
+     "answer": "A few hard questions rather than many easy ones",
+     "patternId": "b1-129-comparison"
+    }
+   ],
+   [
+    "Apa gagasan utama esai tentang pekerjaan rumah ini?",
+    [
+     "Homework should be shorter but more demanding",
+     "Homework should be abolished in every school",
+     "Parents should decide how much homework is set",
+     "Copying exercises is the best way to revise"
+    ],
+    0,
+    {
+     "type": "main_idea",
+     "evidence": "What I question is its quantity.",
+     "answer": "Homework should be shorter but more demanding",
+     "patternId": "b1-129-main_idea"
+    }
+   ]
+  ],
+  "topic": "pekerjaan-rumah",
+  "author": "Arya Nugraha",
+  "setting": "esai siswa untuk buletin sekolah",
+  "focus": "menyusun-pendapat"
+ },
+ {
+  "id": "r0130",
+  "level": "B1",
+  "title": "Translating a Game, Not a Book",
+  "text": "Q: Is translating a game like translating a novel? A: Not at all. A novel gives you the whole sentence. A game gives you fragments, and you often do not know who is speaking or whether the character is angry. Q: What is the hardest part? A: Space. A button in English may hold twelve characters. My translation needs twenty, and nobody will redesign the screen for me. Q: Do players notice good translation? A: They notice bad translation. Good work is invisible, which is a strange kind of success. Q: Any advice for students? A: Play the game you are translating, right to the end. You cannot translate a joke you have never seen work.",
+  "qs": [
+   [
+    "Menurut penerjemah, apa bagian tersulit dari pekerjaannya?",
+    [
+     "Learning new vocabulary",
+     "Fitting the words into a small space",
+     "Understanding the novel behind the game",
+     "Working with angry players"
+    ],
+    1,
+    {
+     "type": "detail",
+     "evidence": "A button in English may hold twelve characters.",
+     "answer": "Fitting the words into a small space",
+     "patternId": "b1-130-detail"
+    }
+   ],
+   [
+    "Bagaimana penerjemah menyarankan mahasiswa menyiapkan diri?",
+    [
+     "By reading the novel version first",
+     "By redesigning the game screens",
+     "By playing the game right to the end",
+     "By asking the players for their opinion"
+    ],
+    2,
+    {
+     "type": "how",
+     "evidence": "Play the game you are translating, right to the end.",
+     "answer": "By playing the game right to the end",
+     "patternId": "b1-130-how"
+    }
+   ],
+   [
+    "Kata 'invisible' dalam jawaban penerjemah berarti bahwa hasil kerjanya ...",
+    [
+     "is written in very small letters",
+     "is not noticed when it is done well",
+     "cannot be read on a screen",
+     "disappears after the game ends"
+    ],
+    1,
+    {
+     "type": "vocabulary_context",
+     "evidence": "Good work is invisible, which is a strange kind of success.",
+     "answer": "is not noticed when it is done well",
+     "patternId": "b1-130-vocabulary_context"
+    }
+   ],
+   [
+    "Apa perbedaan antara menerjemahkan novel dan menerjemahkan permainan?",
+    [
+     "A novel supplies whole sentences while a game supplies fragments",
+     "A novel is always longer than a game",
+     "A game is translated by a whole team",
+     "A novel gives no information about its characters"
+    ],
+    0,
+    {
+     "type": "relationship",
+     "evidence": "A novel gives you the whole sentence.",
+     "answer": "A novel supplies whole sentences while a game supplies fragments",
+     "patternId": "b1-130-relationship"
+    }
+   ],
+   [
+    "Apa yang mungkin terjadi jika penerjemah tidak pernah memainkan permainan itu?",
+    [
+     "The buttons on the screen will change size",
+     "The players will translate the game themselves",
+     "Jokes and situations may be translated wrongly",
+     "The game will be released much earlier"
+    ],
+    2,
+    {
+     "type": "likely",
+     "evidence": "You cannot translate a joke you have never seen work.",
+     "answer": "Jokes and situations may be translated wrongly",
+     "patternId": "b1-130-likely"
+    }
+   ]
+  ],
+  "topic": "penerjemahan",
+  "author": "Yoga Permana",
+  "setting": "wawancara daring dengan penerjemah gim",
+  "focus": "bahasa-dan-pekerjaan"
+ },
+ {
+  "id": "r0131",
+  "level": "B1",
+  "title": "From Screen to Shelf",
+  "text": "The Rex Cinema in Bukittinggi sold its last ticket in 1998, when a second multiplex opened near the bus station. For nine years the building stood empty, and pigeons lived in the projection room. In 2007 two sisters rented it for very little money and opened a bookshop, keeping the sloping floor exactly as it was. Customers now read on the old seats, which were repaired but never replaced. The screen has become a wall for local painters. One thing was lost: the balcony was unsafe, and the fire officer refused to let visitors go upstairs. Even so, the sisters say the strange floor is their best advertisement, because nobody forgets a shop where the ground tilts.",
+  "qs": [
+   [
+    "Apa yang terjadi pada gedung bioskop itu selama sembilan tahun setelah 1998?",
+    [
+     "It was used as a bus station",
+     "It stood empty with pigeons inside",
+     "It was rebuilt as a multiplex",
+     "It became a bookshop at once"
+    ],
+    1,
+    {
+     "type": "sequence",
+     "evidence": "For nine years the building stood empty, and pigeons lived in the projection room.",
+     "answer": "It stood empty with pigeons inside",
+     "patternId": "b1-131-sequence"
+    }
+   ],
+   [
+    "Mengapa Bioskop Rex berhenti menjual tiket pada tahun 1998?",
+    [
+     "Because the roof collapsed during a storm",
+     "Because two sisters rented the building",
+     "Because a second multiplex opened near the bus station",
+     "Because the fire officer closed the balcony"
+    ],
+    2,
+    {
+     "type": "cause_effect",
+     "evidence": "when a second multiplex opened near the bus station",
+     "answer": "Because a second multiplex opened near the bus station",
+     "patternId": "b1-131-cause_effect"
+    }
+   ],
+   [
+    "Apa yang kini menempati bekas layar bioskop tersebut?",
+    [
+     "Shelves of second-hand books",
+     "Paintings by local artists",
+     "A row of repaired seats",
+     "A small coffee counter"
+    ],
+    1,
+    {
+     "type": "detail",
+     "evidence": "The screen has become a wall for local painters.",
+     "answer": "Paintings by local artists",
+     "patternId": "b1-131-detail"
+    }
+   ],
+   [
+    "Apa inti kisah gedung bioskop di Bukittinggi ini?",
+    [
+     "A bookshop failed because of its sloping floor",
+     "A town lost its last cinema in a fire",
+     "Two sisters restored a cinema to show films again",
+     "An old cinema found a new life as a bookshop"
+    ],
+    3,
+    {
+     "type": "main_idea",
+     "evidence": "opened a bookshop, keeping the sloping floor exactly as it was",
+     "answer": "An old cinema found a new life as a bookshop",
+     "patternId": "b1-131-main_idea"
+    }
+   ],
+   [
+    "Kata 'which' dalam kalimat tentang kursi lama merujuk pada apa?",
+    [
+     "The old cinema seats",
+     "The two sisters",
+     "The local painters",
+     "The projection room"
+    ],
+    0,
+    {
+     "type": "reference",
+     "evidence": "Customers now read on the old seats, which were repaired but never replaced.",
+     "answer": "The old cinema seats",
+     "patternId": "b1-131-reference"
+    }
+   ]
+  ],
+  "topic": "bangunan-tua",
+  "author": "Elvira Tanjung",
+  "setting": "bekas bioskop di Bukittinggi",
+  "focus": "sejarah-dan-perubahan"
+ },
+ {
+  "id": "r0132",
+  "level": "B1",
+  "title": "Standing Desks in Room Twelve",
+  "text": "For one term a classroom in a Bogor school replaced half of its chairs with high tables where students could stand. The aim was not exercise but attention. Teachers recorded how often each student looked away from a task during a forty-minute lesson. Standing students looked away less, although the difference was smaller than the school had hoped: eleven times against fourteen. Some pupils disliked the tables and asked for their chairs back after two weeks, especially those who were taller than their neighbours and felt watched. The school will keep the tables but allow students to choose freely, which the head teacher calls the only honest result of the whole experiment.",
+  "qs": [
+   [
+    "Apa yang sebenarnya ingin diuji oleh sekolah di Bogor tersebut?",
+    [
+     "Whether standing improves students' attention",
+     "Whether standing makes students healthier",
+     "Whether high tables are cheaper than chairs",
+     "Whether lessons should last forty minutes"
+    ],
+    0,
+    {
+     "type": "purpose",
+     "evidence": "The aim was not exercise but attention.",
+     "answer": "Whether standing improves students' attention",
+     "patternId": "b1-132-purpose"
+    }
+   ],
+   [
+    "Bagaimana hasil murid yang berdiri dibandingkan dengan yang duduk?",
+    [
+     "They looked away slightly less often",
+     "They looked away far more often",
+     "They looked away exactly as often",
+     "They were not recorded at all"
+    ],
+    0,
+    {
+     "type": "comparison",
+     "evidence": "Standing students looked away less",
+     "answer": "They looked away slightly less often",
+     "patternId": "b1-132-comparison"
+    }
+   ],
+   [
+    "Kesimpulan apa yang diambil sekolah setelah percobaan itu?",
+    [
+     "Every classroom will replace its chairs",
+     "The tables will be removed at once",
+     "Students will decide for themselves whether to stand",
+     "The experiment will be repeated next term"
+    ],
+    2,
+    {
+     "type": "conclusion",
+     "evidence": "but allow students to choose freely",
+     "answer": "Students will decide for themselves whether to stand",
+     "patternId": "b1-132-conclusion"
+    }
+   ],
+   [
+    "Rincian mana yang menjelaskan mengapa sebagian murid menolak meja tinggi?",
+    [
+     "The lessons became longer than before",
+     "Taller students felt that everyone was watching them",
+     "The tables were too heavy to move",
+     "The teachers did not explain the rules"
+    ],
+    1,
+    {
+     "type": "supporting_detail",
+     "evidence": "especially those who were taller than their neighbours and felt watched",
+     "answer": "Taller students felt that everyone was watching them",
+     "patternId": "b1-132-supporting_detail"
+    }
+   ],
+   [
+    "Pernyataan mana yang paling dekat maknanya dengan penilaian kepala sekolah?",
+    [
+     "Letting students choose is the fairest conclusion from the data",
+     "The experiment proved that standing is always better",
+     "The experiment was a complete waste of one term",
+     "Only tall students should be allowed to stand"
+    ],
+    0,
+    {
+     "type": "paraphrase",
+     "evidence": "which the head teacher calls the only honest result of the whole experiment",
+     "answer": "Letting students choose is the fairest conclusion from the data",
+     "patternId": "b1-132-paraphrase"
+    }
+   ]
+  ],
+  "topic": "ruang-kelas",
+  "author": "Rangga Mahendra",
+  "setting": "sekolah menengah di Bogor",
+  "focus": "membaca-data"
+ },
+ {
+  "id": "r0133",
+  "level": "B1",
+  "title": "Before Sunrise on the Terraces",
+  "text": "At half past four the terraces are only sounds: water moving from one level to the next, a dog somewhere below, the first motorbike on the road above the village. Then the sky turns the colour of weak tea, and the shapes appear. Each terrace holds its own thin sheet of water, and for twenty minutes the whole hillside looks like a staircase made of mirrors. Pak Umar is already there, walking the narrow walls with a hoe on his shoulder. He has opened and closed these channels for forty years, and he can tell from the sound alone whether the flow is right. By the time the tourists arrive with their cameras, the mirrors have gone.",
+  "qs": [
+   [
+    "Bagaimana suasana yang dibangun penulis dalam esai ini?",
+    [
+     "Peaceful and full of quiet admiration",
+     "Tense and full of danger",
+     "Comic and full of jokes",
+     "Sad and full of complaint"
+    ],
+    0,
+    {
+     "type": "tone",
+     "evidence": "the whole hillside looks like a staircase made of mirrors",
+     "answer": "Peaceful and full of quiet admiration",
+     "patternId": "b1-133-tone"
+    }
+   ],
+   [
+    "Ungkapan 'a staircase made of mirrors' menggambarkan ...",
+    [
+     "glass steps built for visitors",
+     "flooded terraces reflecting the early sky",
+     "a path of polished stone",
+     "the windows of the village houses"
+    ],
+    1,
+    {
+     "type": "vocabulary_context",
+     "evidence": "Each terrace holds its own thin sheet of water",
+     "answer": "flooded terraces reflecting the early sky",
+     "patternId": "b1-133-vocabulary_context"
+    }
+   ],
+   [
+    "Apa yang dapat disimpulkan tentang keahlian Pak Umar?",
+    [
+     "He learned his work from a training course",
+     "He works only when tourists are watching",
+     "His long experience lets him judge water by ear",
+     "He prefers to repair the walls at midday"
+    ],
+    2,
+    {
+     "type": "inference",
+     "evidence": "he can tell from the sound alone whether the flow is right",
+     "answer": "His long experience lets him judge water by ear",
+     "patternId": "b1-133-inference"
+    }
+   ],
+   [
+    "Apa yang dibawa Pak Umar saat berjalan di atas pematang?",
+    [
+     "A camera",
+     "A hoe",
+     "A bucket of seedlings",
+     "A small radio"
+    ],
+    1,
+    {
+     "type": "detail",
+     "evidence": "walking the narrow walls with a hoe on his shoulder",
+     "answer": "A hoe",
+     "patternId": "b1-133-detail"
+    }
+   ],
+   [
+    "Apa gagasan utama tulisan tentang teras sawah ini?",
+    [
+     "The most beautiful moment on the terraces passes before visitors come",
+     "Tourists have damaged the terraces with their cameras",
+     "Farmers there work mainly at midday",
+     "The village plans to build a new road"
+    ],
+    0,
+    {
+     "type": "main_idea",
+     "evidence": "By the time the tourists arrive with their cameras, the mirrors have gone.",
+     "answer": "The most beautiful moment on the terraces passes before visitors come",
+     "patternId": "b1-133-main_idea"
+    }
+   ]
+  ],
+  "topic": "sawah-terasering",
+  "author": "Umar Setiawan",
+  "setting": "lereng sawah sebelum matahari terbit",
+  "focus": "menangkap-suasana"
+ },
+ {
+  "id": "r0134",
+  "level": "B1",
+  "title": "Before You Forward It",
+  "text": "A message arrives on your phone: shocking news, capital letters, and a request to send it to ten friends. Stop for thirty seconds. First, look for a date, since old stories come back every year wearing new clothes. Second, search for two or three words of the message online; if no newspaper has reported it, that silence tells you something. Third, ask yourself who benefits from your fear. Messages that demand speed are usually hiding weakness, because a true story does not need you to hurry. If you cannot check it, do not forward it. Nobody has ever regretted a message they did not send, and your silence costs the world nothing at all.",
+  "qs": [
+   [
+    "Bagaimana cara sederhana memeriksa apakah pesan itu benar-benar baru?",
+    [
+     "Count the capital letters in the message",
+     "Look for a date in the message",
+     "Send it to ten friends and wait",
+     "Ask the person who forwarded it"
+    ],
+    1,
+    {
+     "type": "how",
+     "evidence": "First, look for a date",
+     "answer": "Look for a date in the message",
+     "patternId": "b1-134-how"
+    }
+   ],
+   [
+    "Apa maksud panduan singkat ini ditulis?",
+    [
+     "To teach readers to check a message before sharing it",
+     "To explain how newspapers report shocking news",
+     "To warn readers against owning a mobile phone",
+     "To describe how false messages are produced"
+    ],
+    0,
+    {
+     "type": "purpose",
+     "evidence": "If you cannot check it, do not forward it.",
+     "answer": "To teach readers to check a message before sharing it",
+     "patternId": "b1-134-purpose"
+    }
+   ],
+   [
+    "Apa langkah kedua yang disarankan penulis?",
+    [
+     "Ask who benefits from your fear",
+     "Wait for thirty seconds",
+     "Search a few words of the message online",
+     "Delete the message immediately"
+    ],
+    2,
+    {
+     "type": "sequence",
+     "evidence": "Second, search for two or three words of the message online",
+     "answer": "Search a few words of the message online",
+     "patternId": "b1-134-sequence"
+    }
+   ],
+   [
+    "Apa yang mungkin ditemukan pembaca jika tidak ada surat kabar yang memberitakan pesan itu?",
+    [
+     "That the story may not be true",
+     "That the story is very recent",
+     "That the newspapers are on holiday",
+     "That the message was written by a friend"
+    ],
+    0,
+    {
+     "type": "likely",
+     "evidence": "if no newspaper has reported it, that silence tells you something",
+     "answer": "That the story may not be true",
+     "patternId": "b1-134-likely"
+    }
+   ],
+   [
+    "Pernyataan 'Penulis menyebutkan nama aplikasi pesan tertentu' termasuk ...",
+    [
+     "Benar menurut teks",
+     "Salah, sebab teks memuji aplikasi itu",
+     "Tidak disebutkan dalam teks",
+     "Benar pada langkah ketiga"
+    ],
+    2,
+    {
+     "type": "true_false_not_stated",
+     "evidence": "A message arrives on your phone",
+     "answer": "Tidak disebutkan dalam teks",
+     "patternId": "b1-134-true_false_not_stated"
+    }
+   ]
+  ],
+  "topic": "literasi-digital",
+  "author": "Nurul Aisyah",
+  "setting": "panduan untuk pengguna telepon pintar",
+  "focus": "berpikir-kritis"
+ },
+ {
+  "id": "r0135",
+  "level": "B1",
+  "title": "Teaching Hands to Stay Calm",
+  "text": "Every Thursday, Yusuf Amrullah teaches first aid to security guards, drivers and shop assistants in Balikpapan. He worked in an ambulance for eleven years, and he says the hardest thing to teach is not a technique but a pause. Most people rush: they pull an injured motorcyclist off the road before checking anything. His course therefore begins with a game in which students must do nothing for ten seconds while a recording of a shouting crowd is played. Several of them find this harder than the bandaging. Yusuf keeps a list of former students who have used their training, and it now holds fifty-three names. He reads that list whenever a class goes badly.",
+  "qs": [
+   [
+    "Apa gagasan utama profil Yusuf Amrullah ini?",
+    [
+     "He teaches people to stop and think before they act",
+     "He trains ambulance drivers for eleven years each",
+     "He collects stories about traffic accidents",
+     "He believes bandaging is the hardest skill"
+    ],
+    0,
+    {
+     "type": "main_idea",
+     "evidence": "the hardest thing to teach is not a technique but a pause",
+     "answer": "He teaches people to stop and think before they act",
+     "patternId": "b1-135-main_idea"
+    }
+   ],
+   [
+    "Apa hubungan antara permainan sepuluh detik dan tujuan kursus itu?",
+    [
+     "The game trains students to wait under pressure",
+     "The game tests how loudly students can shout",
+     "The game teaches students to bandage quickly",
+     "The game selects the strongest students"
+    ],
+    0,
+    {
+     "type": "relationship",
+     "evidence": "students must do nothing for ten seconds while a recording of a shouting crowd is played",
+     "answer": "The game trains students to wait under pressure",
+     "patternId": "b1-135-relationship"
+    }
+   ],
+   [
+    "Mengapa Yusuf membaca daftar nama muridnya?",
+    [
+     "Because he must report the names to his employer",
+     "Because he wants to remember his ambulance years",
+     "Because it encourages him after a difficult class",
+     "Because the list decides who may join the course"
+    ],
+    2,
+    {
+     "type": "why",
+     "evidence": "He reads that list whenever a class goes badly.",
+     "answer": "Because it encourages him after a difficult class",
+     "patternId": "b1-135-why"
+    }
+   ],
+   [
+    "Berapa nama yang kini tercatat dalam daftar Yusuf?",
+    [
+     "Eleven",
+     "Ten",
+     "Fifty-three",
+     "Thirty"
+    ],
+    2,
+    {
+     "type": "detail",
+     "evidence": "it now holds fifty-three names",
+     "answer": "Fifty-three",
+     "patternId": "b1-135-detail"
+    }
+   ],
+   [
+    "Kesimpulan apa yang dapat ditarik tentang kesalahan penolong yang tidak terlatih?",
+    [
+     "They usually move an injured person too soon",
+     "They usually refuse to help at all",
+     "They always call an ambulance first",
+     "They spend too long looking for bandages"
+    ],
+    0,
+    {
+     "type": "conclusion",
+     "evidence": "they pull an injured motorcyclist off the road before checking anything",
+     "answer": "They usually move an injured person too soon",
+     "patternId": "b1-135-conclusion"
+    }
+   ]
+  ],
+  "topic": "pertolongan-pertama",
+  "author": "Yusuf Amrullah",
+  "setting": "kelas pelatihan di Balikpapan",
+  "focus": "profil-pelatih"
+ },
+ {
+  "id": "r0136",
+  "level": "B1",
+  "title": "The Market That Moved Two Streets",
+  "text": "When the night market was moved from the square to a car park two streets away, traders were told that business would improve, because there would be more space. Six months later, seventeen of the forty-two stalls have closed. Sellers of cooked food have survived best, since customers still make a special journey for them. Those who sold small useful things, such as phone cases, socks and batteries, depended on people passing by, and in the car park nobody passes by. The city has now agreed to run a free shuttle bus from the square on Saturday nights. 'Space was never our problem,' one trader said quietly. 'Footsteps were.'",
+  "qs": [
+   [
+    "Mengapa banyak kios kecil di pasar malam itu tutup?",
+    [
+     "Because the car park charged them higher rent",
+     "Because they lost the customers who used to walk past",
+     "Because the city forbade the sale of batteries",
+     "Because cooked food was banned in the car park"
+    ],
+    1,
+    {
+     "type": "cause_effect",
+     "evidence": "depended on people passing by, and in the car park nobody passes by",
+     "answer": "Because they lost the customers who used to walk past",
+     "patternId": "b1-136-cause_effect"
+    }
+   ],
+   [
+    "Berapa jumlah kios yang tutup dalam enam bulan?",
+    [
+     "Two",
+     "Seventeen",
+     "Forty-two",
+     "Six"
+    ],
+    1,
+    {
+     "type": "detail",
+     "evidence": "seventeen of the forty-two stalls have closed",
+     "answer": "Seventeen",
+     "patternId": "b1-136-detail"
+    }
+   ],
+   [
+    "Kalimat mana yang membuktikan bahwa penjual makanan lebih bertahan?",
+    [
+     "The city has now agreed to run a free shuttle bus.",
+     "Customers still make a special journey for them.",
+     "Traders were told that business would improve.",
+     "Seventeen of the forty-two stalls have closed."
+    ],
+    1,
+    {
+     "type": "evidence",
+     "evidence": "customers still make a special journey for them",
+     "answer": "Customers still make a special journey for them.",
+     "patternId": "b1-136-evidence"
+    }
+   ],
+   [
+    "Bagaimana nada ucapan pedagang pada akhir berita?",
+    [
+     "Resigned but clear-sighted",
+     "Cheerful and hopeful",
+     "Furious and threatening",
+     "Confused about the move"
+    ],
+    0,
+    {
+     "type": "tone",
+     "evidence": "one trader said quietly",
+     "answer": "Resigned but clear-sighted",
+     "patternId": "b1-136-tone"
+    }
+   ],
+   [
+    "Rincian mana yang menunjukkan bahwa kota mengakui adanya masalah?",
+    [
+     "Traders were promised more space",
+     "A free shuttle bus will run on Saturday nights",
+     "The market used to stand in the square",
+     "Socks and batteries were sold at the stalls"
+    ],
+    1,
+    {
+     "type": "supporting_detail",
+     "evidence": "The city has now agreed to run a free shuttle bus from the square on Saturday nights.",
+     "answer": "A free shuttle bus will run on Saturday nights",
+     "patternId": "b1-136-supporting_detail"
+    }
+   ]
+  ],
+  "topic": "pasar-malam",
+  "author": "Bambang Prasetyo",
+  "setting": "kota kecamatan setelah relokasi pasar",
+  "focus": "sebab-akibat-ekonomi"
+ },
+ {
+  "id": "r0137",
+  "level": "B1",
+  "title": "Dear Coach: My Hands Shake",
+  "text": "A reader who must sing at a school ceremony writes that her hands shake so badly that she cannot hold the microphone. Our coach replies that shaking is not a sign of weakness. It is a body preparing for effort, and the same chemicals help athletes run faster. The trick is to give that energy somewhere to go. Walk quickly for two minutes before you step onto the stage. Then breathe out longer than you breathe in, four counts out and two counts in, for one minute. She also suggests rehearsing the first line until it is automatic, because once the first line is safe, the body usually agrees to follow it.",
+  "qs": [
+   [
+    "Apa tujuan pelatih dalam menjawab surat pembaca ini?",
+    [
+     "To calm the reader by explaining what shaking really means",
+     "To advise the reader to leave the ceremony",
+     "To recommend singing lessons with a teacher",
+     "To criticise schools that hold ceremonies"
+    ],
+    0,
+    {
+     "type": "purpose",
+     "evidence": "Our coach replies that shaking is not a sign of weakness.",
+     "answer": "To calm the reader by explaining what shaking really means",
+     "patternId": "b1-137-purpose"
+    }
+   ],
+   [
+    "Bagaimana cara bernapas yang disarankan sebelum tampil?",
+    [
+     "Breathe in longer than you breathe out",
+     "Breathe out longer than you breathe in",
+     "Hold your breath for four counts",
+     "Breathe through the microphone"
+    ],
+    1,
+    {
+     "type": "how",
+     "evidence": "breathe out longer than you breathe in",
+     "answer": "Breathe out longer than you breathe in",
+     "patternId": "b1-137-how"
+    }
+   ],
+   [
+    "Pernyataan mana yang menyampaikan kembali penjelasan pelatih tentang gemetar?",
+    [
+     "Shaking shows that a singer is unprepared",
+     "Shaking is the body getting ready for effort",
+     "Shaking can be stopped only by medicine",
+     "Shaking happens to athletes but not to singers"
+    ],
+    1,
+    {
+     "type": "paraphrase",
+     "evidence": "It is a body preparing for effort",
+     "answer": "Shaking is the body getting ready for effort",
+     "patternId": "b1-137-paraphrase"
+    }
+   ],
+   [
+    "Apa yang mungkin terjadi setelah baris pertama lagu berhasil dinyanyikan?",
+    [
+     "The audience will begin to sing along",
+     "The microphone will be taken away",
+     "The rest of the performance becomes easier",
+     "The coach will come onto the stage"
+    ],
+    2,
+    {
+     "type": "likely",
+     "evidence": "once the first line is safe, the body usually agrees to follow it",
+     "answer": "The rest of the performance becomes easier",
+     "patternId": "b1-137-likely"
+    }
+   ],
+   [
+    "Apa hubungan antara berjalan cepat dan rasa gugup menurut pelatih?",
+    [
+     "Walking uses the extra energy that nervousness creates",
+     "Walking makes the ceremony start later",
+     "Walking replaces the need to rehearse",
+     "Walking warms the voice for singing"
+    ],
+    0,
+    {
+     "type": "relationship",
+     "evidence": "The trick is to give that energy somewhere to go.",
+     "answer": "Walking uses the extra energy that nervousness creates",
+     "patternId": "b1-137-relationship"
+    }
+   ]
+  ],
+  "topic": "demam-panggung",
+  "author": "Ratna Sulistyo",
+  "setting": "rubrik pelatihan tampil",
+  "focus": "mengelola-kecemasan"
+ },
+ {
+  "id": "r0138",
+  "level": "B1",
+  "title": "Ten Rooms of Rice",
+  "text": "The new exhibition at the provincial museum tells the history of a single crop, and it is far better than that description sounds. The first rooms are conventional: tools behind glass, maps, an old plough. Room four changes everything. Visitors walk between two walls of recorded voices, farmers from six provinces describing the same harvest month in different words. After that, the tools in the earlier rooms seem to belong to somebody. The labels, sadly, are printed in grey on white and are hard to read for anyone over fifty, which is a strange choice for an exhibition about memory. Entry is free on Wednesdays, and the last room, full of seed varieties, deserves an hour by itself.",
+  "qs": [
+   [
+    "Bagaimana sikap pengulas terhadap pameran tersebut?",
+    [
+     "Enthusiastic, with one clear criticism",
+     "Completely disappointed",
+     "Politely bored throughout",
+     "Angry about the entrance fee"
+    ],
+    0,
+    {
+     "type": "tone",
+     "evidence": "it is far better than that description sounds",
+     "answer": "Enthusiastic, with one clear criticism",
+     "patternId": "b1-138-tone"
+    }
+   ],
+   [
+    "Apa perbedaan antara ruang pertama dan ruang keempat?",
+    [
+     "The first rooms are ordinary while room four surprises the visitor",
+     "Room four is smaller and darker than the first rooms",
+     "The first rooms contain voices and room four contains tools",
+     "Room four is closed on Wednesdays"
+    ],
+    0,
+    {
+     "type": "comparison",
+     "evidence": "The first rooms are conventional",
+     "answer": "The first rooms are ordinary while room four surprises the visitor",
+     "patternId": "b1-138-comparison"
+    }
+   ],
+   [
+    "Apa yang ditemukan pengunjung di ruang terakhir pameran?",
+    [
+     "Maps of six provinces",
+     "An old plough",
+     "A collection of seed varieties",
+     "Recorded voices of farmers"
+    ],
+    2,
+    {
+     "type": "detail",
+     "evidence": "the last room, full of seed varieties",
+     "answer": "A collection of seed varieties",
+     "patternId": "b1-138-detail"
+    }
+   ],
+   [
+    "Kata 'which' dalam kalimat tentang label pameran merujuk pada apa?",
+    [
+     "The choice of grey printing on white",
+     "The age of the visitors",
+     "The history of the crop",
+     "The free entry on Wednesdays"
+    ],
+    0,
+    {
+     "type": "reference",
+     "evidence": "which is a strange choice for an exhibition about memory",
+     "answer": "The choice of grey printing on white",
+     "patternId": "b1-138-reference"
+    }
+   ],
+   [
+    "Mengapa pengulas menyebut bahwa alat-alat lama 'seem to belong to somebody'?",
+    [
+     "To show that the recorded voices give the objects an owner",
+     "To complain that the tools were stolen from farmers",
+     "To explain that the museum bought the tools cheaply",
+     "To suggest that visitors may touch the objects"
+    ],
+    0,
+    {
+     "type": "author_purpose",
+     "evidence": "the tools in the earlier rooms seem to belong to somebody",
+     "answer": "To show that the recorded voices give the objects an owner",
+     "patternId": "b1-138-author_purpose"
+    }
+   ]
+  ],
+  "topic": "pameran-museum",
+  "author": "Andini Prameswari",
+  "setting": "museum provinsi",
+  "focus": "ulasan-pameran"
+ },
+ {
+  "id": "r0139",
+  "level": "B1",
+  "title": "Counting Birds Before Breakfast",
+  "text": "Since 2021, students at three schools in Sleman have counted birds in the same six gardens on the first Saturday of every month. They begin at six o'clock and watch for fifteen minutes, writing down only what they can identify with certainty. The data are not perfect, and the students know it: new observers often miss small birds high in the branches. One pattern, however, has appeared clearly. In gardens where the owners stopped cutting the grass short, the number of species has risen by about a third. Two university researchers now use these records, and they say the value of the project lies in its regularity rather than in the skill of any single observer.",
+  "qs": [
+   [
+    "Apa yang dilakukan murid tepat setelah tiba di taman pada pukul enam?",
+    [
+     "They watch and record for fifteen minutes",
+     "They cut the grass in the garden",
+     "They interview the garden owners",
+     "They send the data to a university"
+    ],
+    0,
+    {
+     "type": "sequence",
+     "evidence": "They begin at six o'clock and watch for fifteen minutes",
+     "answer": "They watch and record for fifteen minutes",
+     "patternId": "b1-139-sequence"
+    }
+   ],
+   [
+    "Apa pokok laporan tentang penghitungan burung ini?",
+    [
+     "A simple but regular student survey has produced useful evidence",
+     "University researchers taught students to identify every bird",
+     "Six gardens in Sleman have been closed to visitors",
+     "Students proved that small birds are disappearing"
+    ],
+    0,
+    {
+     "type": "main_idea",
+     "evidence": "the value of the project lies in its regularity",
+     "answer": "A simple but regular student survey has produced useful evidence",
+     "patternId": "b1-139-main_idea"
+    }
+   ],
+   [
+    "Apa yang terjadi di taman yang rumputnya tidak lagi dipotong pendek?",
+    [
+     "The number of species rose by about a third",
+     "The birds left those gardens completely",
+     "The students stopped counting there",
+     "The owners planted new trees"
+    ],
+    0,
+    {
+     "type": "cause_effect",
+     "evidence": "the number of species has risen by about a third",
+     "answer": "The number of species rose by about a third",
+     "patternId": "b1-139-cause_effect"
+    }
+   ],
+   [
+    "Kesimpulan apa yang ditarik para peneliti universitas?",
+    [
+     "The project matters because it is repeated so regularly",
+     "The project should be run by trained observers only",
+     "The project has produced data that cannot be used",
+     "The project must move to a larger city"
+    ],
+    0,
+    {
+     "type": "conclusion",
+     "evidence": "rather than in the skill of any single observer",
+     "answer": "The project matters because it is repeated so regularly",
+     "patternId": "b1-139-conclusion"
+    }
+   ],
+   [
+    "Kalimat mana yang menunjukkan kejujuran murid tentang kelemahan data mereka?",
+    [
+     "Since 2021, students at three schools in Sleman have counted birds.",
+     "New observers often miss small birds high in the branches.",
+     "Two university researchers now use these records.",
+     "They watch for fifteen minutes every month."
+    ],
+    1,
+    {
+     "type": "evidence",
+     "evidence": "new observers often miss small birds high in the branches",
+     "answer": "New observers often miss small birds high in the branches.",
+     "patternId": "b1-139-evidence"
+    }
+   ]
+  ],
+  "topic": "pengamatan-burung",
+  "author": "Galih Prasetya",
+  "setting": "taman-taman rumah di Sleman",
+  "focus": "sains-warga"
+ },
+ {
+  "id": "r0140",
+  "level": "B1",
+  "title": "A Job at Seventeen",
+  "text": "Some parents believe that a student who works on Saturdays is a student who will fail. My own experience suggests the opposite, though not for the reason people expect. Eight hours a week in a small bakery did not teach me business; it taught me that time is finite. Once I had lost Saturday, I stopped wasting Tuesday. I do not pretend that this works for everybody. A friend of mine took a job of thirty hours a week, and her marks collapsed within a single term. The number of hours matters far more than the principle. If schools discussed that number honestly with families, fewer students would have to choose between money and study in silence.",
+  "qs": [
+   [
+    "Mengapa penulis menceritakan pengalaman temannya yang nilainya jatuh?",
+    [
+     "To admit that part-time work can also harm a student",
+     "To prove that bakeries are bad places to work",
+     "To show that his friend was lazier than he was",
+     "To argue that all part-time jobs should stop"
+    ],
+    0,
+    {
+     "type": "author_purpose",
+     "evidence": "A friend of mine took a job of thirty hours a week, and her marks collapsed within a single term.",
+     "answer": "To admit that part-time work can also harm a student",
+     "patternId": "b1-140-author_purpose"
+    }
+   ],
+   [
+    "Apa yang dapat disimpulkan tentang perubahan kebiasaan penulis?",
+    [
+     "He began to plan his weekdays more carefully",
+     "He gave up studying on Tuesdays",
+     "He worked longer hours each term",
+     "He asked his parents for more money"
+    ],
+    0,
+    {
+     "type": "inference",
+     "evidence": "Once I had lost Saturday, I stopped wasting Tuesday.",
+     "answer": "He began to plan his weekdays more carefully",
+     "patternId": "b1-140-inference"
+    }
+   ],
+   [
+    "Apa perbedaan penting antara pekerjaan penulis dan pekerjaan temannya?",
+    [
+     "The number of hours each of them worked",
+     "The kind of shop each of them worked in",
+     "The amount of money each of them earned",
+     "The school that each of them attended"
+    ],
+    0,
+    {
+     "type": "comparison",
+     "evidence": "The number of hours matters far more than the principle.",
+     "answer": "The number of hours each of them worked",
+     "patternId": "b1-140-comparison"
+    }
+   ],
+   [
+    "Rincian mana yang mendukung pendapat bahwa bekerja mengajarkan pengelolaan waktu?",
+    [
+     "He worked eight hours a week in a bakery",
+     "He learned that time is finite",
+     "His parents believed he would fail",
+     "Schools rarely discuss working hours"
+    ],
+    1,
+    {
+     "type": "supporting_detail",
+     "evidence": "it taught me that time is finite",
+     "answer": "He learned that time is finite",
+     "patternId": "b1-140-supporting_detail"
+    }
+   ],
+   [
+    "Pernyataan 'Penulis menyarankan agar sekolah melarang murid bekerja' termasuk ...",
+    [
+     "Benar menurut teks",
+     "Salah menurut teks",
+     "Tidak disebutkan dalam teks",
+     "Benar hanya untuk kerja tiga puluh jam"
+    ],
+    1,
+    {
+     "type": "true_false_not_stated",
+     "evidence": "If schools discussed that number honestly with families",
+     "answer": "Salah menurut teks",
+     "patternId": "b1-140-true_false_not_stated"
+    }
+   ]
+  ],
+  "topic": "kerja-paruh-waktu",
+  "author": "Reza Alfian",
+  "setting": "esai pengalaman pribadi",
+  "focus": "refleksi-dan-argumen"
+ }
+]

@@ -1,0 +1,4764 @@
+{
+ "sentences": [
+  "Once upon a time, there were three little pigs.",
+  "They left home to build their own houses.",
+  "The first pig was in a hurry.",
+  "He built his house with straw.",
+  "It took him only one hour.",
+  "The second pig built his house with sticks.",
+  "It took him one day.",
+  "The third pig was slow and careful.",
+  "He built his house with bricks.",
+  "It took him many weeks.",
+  "His brothers laughed at him.",
+  "\"Your work is too slow,\" they said.",
+  "One evening, a hungry wolf came to the village.",
+  "He knocked on the straw house.",
+  "\"Little pig, little pig, let me come in!\"",
+  "\"No, not by the hair on my chin!\"",
+  "So the wolf blew the straw house down.",
+  "The first pig ran to his brother's house."
+ ],
+ "book": "The Three Little Pigs",
+ "nextBlock": "The afternoon heat empties the lanes for an hour. Only the tea stall stays open, and its radio keeps playing.",
+ "rules": {
+  "v6_shipped": {
+   "lead": 80,
+   "factor": 1.15,
+   "settled": 224,
+   "max": 900
+  },
+  "v7_measured": {
+   "lead": 80,
+   "genSPerChar": 0.0583,
+   "speakSPerChar": 0.0669,
+   "boundarySlackS": 0.3,
+   "minRampChars": 70,
+   "settled": 226,
+   "max": 900
+  },
+  "v7_pure_cover": {
+   "lead": 80,
+   "genSPerChar": 0.0583,
+   "speakSPerChar": 0.0669,
+   "boundarySlackS": 0.3,
+   "minRampChars": 0,
+   "settled": 226,
+   "max": 900
+  }
+ },
+ "repeats": 2,
+ "blockSizes": {
+  "v6_shipped": [
+   47,
+   71,
+   57,
+   64,
+   67,
+   52,
+   35,
+   78,
+   75,
+   80
+  ],
+  "v7_measured": [
+   47,
+   41,
+   60,
+   70,
+   56,
+   55,
+   64,
+   78,
+   75,
+   80
+  ],
+  "v7_pure_cover": [
+   47,
+   41,
+   29,
+   30,
+   26,
+   43,
+   20,
+   35,
+   31,
+   23,
+   28,
+   35,
+   47,
+   30,
+   41,
+   33,
+   38,
+   41
+  ]
+ },
+ "blocks": {
+  "v6_shipped": [
+   "Once upon a time, there were three little pigs.",
+   "They left home to build their own houses. The first pig was in a hurry.",
+   "He built his house with straw. It took him only one hour.",
+   "The second pig built his house with sticks. It took him one day.",
+   "The third pig was slow and careful. He built his house with bricks.",
+   "It took him many weeks. His brothers laughed at him.",
+   "\"Your work is too slow,\" they said.",
+   "One evening, a hungry wolf came to the village. He knocked on the straw house.",
+   "\"Little pig, little pig, let me come in!\" \"No, not by the hair on my chin!\"",
+   "So the wolf blew the straw house down. The first pig ran to his brother's house."
+  ],
+  "v7_measured": [
+   "Once upon a time, there were three little pigs.",
+   "They left home to build their own houses.",
+   "The first pig was in a hurry. He built his house with straw.",
+   "It took him only one hour. The second pig built his house with sticks.",
+   "It took him one day. The third pig was slow and careful.",
+   "He built his house with bricks. It took him many weeks.",
+   "His brothers laughed at him. \"Your work is too slow,\" they said.",
+   "One evening, a hungry wolf came to the village. He knocked on the straw house.",
+   "\"Little pig, little pig, let me come in!\" \"No, not by the hair on my chin!\"",
+   "So the wolf blew the straw house down. The first pig ran to his brother's house."
+  ],
+  "v7_pure_cover": [
+   "Once upon a time, there were three little pigs.",
+   "They left home to build their own houses.",
+   "The first pig was in a hurry.",
+   "He built his house with straw.",
+   "It took him only one hour.",
+   "The second pig built his house with sticks.",
+   "It took him one day.",
+   "The third pig was slow and careful.",
+   "He built his house with bricks.",
+   "It took him many weeks.",
+   "His brothers laughed at him.",
+   "\"Your work is too slow,\" they said.",
+   "One evening, a hungry wolf came to the village.",
+   "He knocked on the straw house.",
+   "\"Little pig, little pig, let me come in!\"",
+   "\"No, not by the hair on my chin!\"",
+   "So the wolf blew the straw house down.",
+   "The first pig ran to his brother's house."
+  ]
+ },
+ "runs": {
+  "v6_shipped#1": {
+   "rule": "v6_shipped",
+   "repeat": 1,
+   "blockSizes": [
+    47,
+    71,
+    57,
+    64,
+    67,
+    52,
+    35,
+    78,
+    75,
+    80
+   ],
+   "metrics": {
+    "sayCalls": 10,
+    "renders": 10,
+    "audioSources": 10,
+    "firstSoundMs": 2722.3,
+    "meanSchedulingGapMs": 648.2,
+    "meanAudibleGapMs": 1394.3,
+    "maxAudibleGapMs": 3534.0,
+    "totalSpanS": 40.44,
+    "audioS": 34.61,
+    "silentShare": 0.1442,
+    "guardHits": [],
+    "boundaries": [
+     {
+      "boundary": "1->2",
+      "schedulingGapMs": 1859.3,
+      "tailSilenceMs": 407.4,
+      "headSilenceMs": 284.4,
+      "audibleGapMs": 2551.1
+     },
+     {
+      "boundary": "2->3",
+      "schedulingGapMs": 20.6,
+      "tailSilenceMs": 342.2,
+      "headSilenceMs": 418,
+      "audibleGapMs": 780.8
+     },
+     {
+      "boundary": "3->4",
+      "schedulingGapMs": 502.0,
+      "tailSilenceMs": 309.8,
+      "headSilenceMs": 360.6,
+      "audibleGapMs": 1172.4
+     },
+     {
+      "boundary": "4->5",
+      "schedulingGapMs": 84.9,
+      "tailSilenceMs": 383.2,
+      "headSilenceMs": 441.8,
+      "audibleGapMs": 909.9
+     },
+     {
+      "boundary": "5->6",
+      "schedulingGapMs": 11.5,
+      "tailSilenceMs": 199.9,
+      "headSilenceMs": 510.9,
+      "audibleGapMs": 722.3
+     },
+     {
+      "boundary": "6->7",
+      "schedulingGapMs": 23.1,
+      "tailSilenceMs": 471.6,
+      "headSilenceMs": 378.8,
+      "audibleGapMs": 873.5
+     },
+     {
+      "boundary": "7->8",
+      "schedulingGapMs": 2792.9,
+      "tailSilenceMs": 386.5,
+      "headSilenceMs": 354.6,
+      "audibleGapMs": 3534.0
+     },
+     {
+      "boundary": "8->9",
+      "schedulingGapMs": 520.7,
+      "tailSilenceMs": 85.4,
+      "headSilenceMs": 445.6,
+      "audibleGapMs": 1051.7
+     },
+     {
+      "boundary": "9->10",
+      "schedulingGapMs": 18.6,
+      "tailSilenceMs": 568.8,
+      "headSilenceMs": 365.6,
+      "audibleGapMs": 953.0
+     }
+    ]
+   },
+   "dump": {
+    "events": [
+     {
+      "type": "scenario_start",
+      "scenario": "ramped_blocks_prefetch",
+      "sentences": 10,
+      "wall": 4133.6
+     },
+     {
+      "type": "say_call",
+      "index": 0,
+      "text": "Once upon a time, there were three little pigs.",
+      "wall": 4133.6
+     },
+     {
+      "type": "generate_enter",
+      "chars": 47,
+      "text": "Once upon a time, there were three little pigs.",
+      "wall": 4134.3
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 0,
+      "elapsedMs": 2717,
+      "audioSeconds": 3.109,
+      "rtf": 0.874,
+      "headMs": 382,
+      "tailMs": 407.4,
+      "chars": 47,
+      "wall": 6851.6
+     },
+     {
+      "type": "generate_enter",
+      "chars": 71,
+      "text": "They left home to build their own houses. The first pig was in a hurry.",
+      "wall": 6851.9
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 5.08517,
+      "ctxNow": 5.08517,
+      "durationS": 2.343537,
+      "wall": 6855.9
+     },
+     {
+      "type": "say_resolved",
+      "index": 0,
+      "spoke": true,
+      "wall": 9189.2
+     },
+     {
+      "type": "say_call",
+      "index": 1,
+      "text": "They left home to build their own houses. The first pig was in a hurry.",
+      "wall": 9189.2
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 1,
+      "elapsedMs": 4198.9,
+      "audioSeconds": 4.5294,
+      "rtf": 0.927,
+      "headMs": 284.4,
+      "tailMs": 342.2,
+      "chars": 71,
+      "wall": 11050.9
+     },
+     {
+      "type": "generate_enter",
+      "chars": 57,
+      "text": "He built his house with straw. It took him only one hour.",
+      "wall": 11050.9
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 9.287982,
+      "ctxNow": 9.287982,
+      "durationS": 3.926803,
+      "wall": 11054.1
+     },
+     {
+      "type": "prefetch_result",
+      "index": 1,
+      "ok": true,
+      "wall": 11054.2
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 2,
+      "elapsedMs": 3330.9,
+      "audioSeconds": 3.7081,
+      "rtf": 0.898,
+      "headMs": 418,
+      "tailMs": 309.8,
+      "chars": 57,
+      "wall": 14381.8
+     },
+     {
+      "type": "prefetch_result",
+      "index": 2,
+      "ok": true,
+      "wall": 14382
+     },
+     {
+      "type": "say_resolved",
+      "index": 1,
+      "spoke": true,
+      "wall": 14993.9
+     },
+     {
+      "type": "say_call",
+      "index": 2,
+      "text": "He built his house with straw. It took him only one hour.",
+      "wall": 14993.9
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 13.235374,
+      "ctxNow": 13.235374,
+      "durationS": 3.004218,
+      "wall": 14995.8
+     },
+     {
+      "type": "generate_enter",
+      "chars": 64,
+      "text": "The second pig built his house with sticks. It took him one day.",
+      "wall": 14996.2
+     },
+     {
+      "type": "say_resolved",
+      "index": 2,
+      "spoke": true,
+      "wall": 18012.7
+     },
+     {
+      "type": "say_call",
+      "index": 3,
+      "text": "The second pig built his house with sticks. It took him one day.",
+      "wall": 18012.7
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 3,
+      "elapsedMs": 3504.8,
+      "audioSeconds": 4.1875,
+      "rtf": 0.837,
+      "headMs": 360.6,
+      "tailMs": 383.2,
+      "chars": 64,
+      "wall": 18501.1
+     },
+     {
+      "type": "generate_enter",
+      "chars": 67,
+      "text": "The third pig was slow and careful. He built his house with bricks.",
+      "wall": 18501.2
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 16.741587,
+      "ctxNow": 16.741587,
+      "durationS": 3.467755,
+      "wall": 18514.4
+     },
+     {
+      "type": "prefetch_result",
+      "index": 3,
+      "ok": true,
+      "wall": 18514.5
+     },
+     {
+      "type": "say_resolved",
+      "index": 3,
+      "spoke": true,
+      "wall": 21983.7
+     },
+     {
+      "type": "say_call",
+      "index": 4,
+      "text": "The third pig was slow and careful. He built his house with bricks.",
+      "wall": 21983.7
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 4,
+      "elapsedMs": 3559.4,
+      "audioSeconds": 4.3911,
+      "rtf": 0.811,
+      "headMs": 441.8,
+      "tailMs": 199.9,
+      "chars": 67,
+      "wall": 22060.7
+     },
+     {
+      "type": "generate_enter",
+      "chars": 52,
+      "text": "It took him many weeks. His brothers laughed at him.",
+      "wall": 22060.7
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 20.29424,
+      "ctxNow": 20.29424,
+      "durationS": 3.773379,
+      "wall": 22065
+     },
+     {
+      "type": "prefetch_result",
+      "index": 4,
+      "ok": true,
+      "wall": 22065
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 5,
+      "elapsedMs": 3447.5,
+      "audioSeconds": 3.5592,
+      "rtf": 0.969,
+      "headMs": 510.9,
+      "tailMs": 471.6,
+      "chars": 52,
+      "wall": 25508.3
+     },
+     {
+      "type": "prefetch_result",
+      "index": 5,
+      "ok": true,
+      "wall": 25508.5
+     },
+     {
+      "type": "say_resolved",
+      "index": 4,
+      "spoke": true,
+      "wall": 25837.6
+     },
+     {
+      "type": "say_call",
+      "index": 5,
+      "text": "It took him many weeks. His brothers laughed at him.",
+      "wall": 25837.6
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 24.079093,
+      "ctxNow": 24.079093,
+      "durationS": 2.600726,
+      "wall": 25840.6
+     },
+     {
+      "type": "generate_enter",
+      "chars": 35,
+      "text": "\"Your work is too slow,\" they said.",
+      "wall": 25841
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 6,
+      "elapsedMs": 2487.8,
+      "audioSeconds": 2.3834,
+      "rtf": 1.044,
+      "headMs": 378.8,
+      "tailMs": 386.5,
+      "chars": 35,
+      "wall": 28328.8
+     },
+     {
+      "type": "prefetch_result",
+      "index": 6,
+      "ok": true,
+      "wall": 28329
+     },
+     {
+      "type": "say_resolved",
+      "index": 5,
+      "spoke": true,
+      "wall": 28461.5
+     },
+     {
+      "type": "say_call",
+      "index": 6,
+      "text": "\"Your work is too slow,\" they said.",
+      "wall": 28461.5
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 26.702948,
+      "ctxNow": 26.702948,
+      "durationS": 1.642154,
+      "wall": 28463.3
+     },
+     {
+      "type": "generate_enter",
+      "chars": 78,
+      "text": "One evening, a hungry wolf came to the village. He knocked on the straw house.",
+      "wall": 28463.6
+     },
+     {
+      "type": "say_resolved",
+      "index": 6,
+      "spoke": true,
+      "wall": 30110.2
+     },
+     {
+      "type": "say_call",
+      "index": 7,
+      "text": "One evening, a hungry wolf came to the village. He knocked on the straw house.",
+      "wall": 30110.2
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 7,
+      "elapsedMs": 4428.9,
+      "audioSeconds": 5.0037,
+      "rtf": 0.885,
+      "headMs": 354.6,
+      "tailMs": 85.4,
+      "chars": 78,
+      "wall": 32892.6
+     },
+     {
+      "type": "generate_enter",
+      "chars": 75,
+      "text": "\"Little pig, little pig, let me come in!\" \"No, not by the hair on my chin!\"",
+      "wall": 32892.6
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 31.137959,
+      "ctxNow": 31.137959,
+      "durationS": 4.587642,
+      "wall": 32898.3
+     },
+     {
+      "type": "prefetch_result",
+      "index": 7,
+      "ok": true,
+      "wall": 32898.3
+     },
+     {
+      "type": "say_resolved",
+      "index": 7,
+      "spoke": true,
+      "wall": 37494.1
+     },
+     {
+      "type": "say_call",
+      "index": 8,
+      "text": "\"Little pig, little pig, let me come in!\" \"No, not by the hair on my chin!\"",
+      "wall": 37494.1
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 8,
+      "elapsedMs": 5124.8,
+      "audioSeconds": 6.1266,
+      "rtf": 0.836,
+      "headMs": 445.6,
+      "tailMs": 568.8,
+      "chars": 75,
+      "wall": 38017.5
+     },
+     {
+      "type": "generate_enter",
+      "chars": 80,
+      "text": "So the wolf blew the straw house down. The first pig ran to his brother's house.",
+      "wall": 38017.5
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 36.246349,
+      "ctxNow": 36.246349,
+      "durationS": 5.136236,
+      "wall": 38026.2
+     },
+     {
+      "type": "prefetch_result",
+      "index": 8,
+      "ok": true,
+      "wall": 38026.3
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 9,
+      "elapsedMs": 4592.7,
+      "audioSeconds": 4.8651,
+      "rtf": 0.944,
+      "headMs": 365.6,
+      "tailMs": 398,
+      "chars": 80,
+      "wall": 42610.3
+     },
+     {
+      "type": "prefetch_result",
+      "index": 9,
+      "ok": true,
+      "wall": 42621.2
+     },
+     {
+      "type": "say_resolved",
+      "index": 8,
+      "spoke": true,
+      "wall": 43160
+     },
+     {
+      "type": "say_call",
+      "index": 9,
+      "text": "So the wolf blew the straw house down. The first pig ran to his brother's house.",
+      "wall": 43161.3
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 41.401179,
+      "ctxNow": 41.401179,
+      "durationS": 4.125442,
+      "wall": 43167.3
+     },
+     {
+      "type": "generate_enter",
+      "chars": 109,
+      "text": "The afternoon heat empties the lanes for an hour. Only the tea stall stays open, and its radio keeps playing.",
+      "wall": 43172.6
+     },
+     {
+      "type": "say_resolved",
+      "index": 9,
+      "spoke": true,
+      "wall": 47315.4
+     },
+     {
+      "type": "scenario_end",
+      "wall": 47324.5
+     }
+    ],
+    "notes": [
+     "engine booted, speech={\"streamSentences\":true,\"streamMaxWords\":26,\"silenceScale\":0.4}",
+     "door=/features/neural-voice/fiezel-voice-say.js"
+    ],
+    "pcmMeta": [
+     {
+      "index": 0,
+      "text": "Once upon a time, there were three little pigs.",
+      "sampleRate": 44100,
+      "length": 137105,
+      "headMs": 382,
+      "tailMs": 407.4
+     },
+     {
+      "index": 1,
+      "text": "They left home to build their own houses. The first pig was in a hurry.",
+      "sampleRate": 44100,
+      "length": 199745,
+      "headMs": 284.4,
+      "tailMs": 342.2
+     },
+     {
+      "index": 2,
+      "text": "He built his house with straw. It took him only one hour.",
+      "sampleRate": 44100,
+      "length": 163528,
+      "headMs": 418,
+      "tailMs": 309.8
+     },
+     {
+      "index": 3,
+      "text": "The second pig built his house with sticks. It took him one day.",
+      "sampleRate": 44100,
+      "length": 184669,
+      "headMs": 360.6,
+      "tailMs": 383.2
+     },
+     {
+      "index": 4,
+      "text": "The third pig was slow and careful. He built his house with bricks.",
+      "sampleRate": 44100,
+      "length": 193649,
+      "headMs": 441.8,
+      "tailMs": 199.9
+     },
+     {
+      "index": 5,
+      "text": "It took him many weeks. His brothers laughed at him.",
+      "sampleRate": 44100,
+      "length": 156962,
+      "headMs": 510.9,
+      "tailMs": 471.6
+     },
+     {
+      "index": 6,
+      "text": "\"Your work is too slow,\" they said.",
+      "sampleRate": 44100,
+      "length": 105110,
+      "headMs": 378.8,
+      "tailMs": 386.5
+     },
+     {
+      "index": 7,
+      "text": "One evening, a hungry wolf came to the village. He knocked on the straw house.",
+      "sampleRate": 44100,
+      "length": 220661,
+      "headMs": 354.6,
+      "tailMs": 85.4
+     },
+     {
+      "index": 8,
+      "text": "\"Little pig, little pig, let me come in!\" \"No, not by the hair on my chin!\"",
+      "sampleRate": 44100,
+      "length": 270184,
+      "headMs": 445.6,
+      "tailMs": 568.8
+     },
+     {
+      "index": 9,
+      "text": "So the wolf blew the straw house down. The first pig ran to his brother's house.",
+      "sampleRate": 44100,
+      "length": 214552,
+      "headMs": 365.6,
+      "tailMs": 398
+     }
+    ],
+    "guardHits": []
+   }
+  },
+  "v7_measured#1": {
+   "rule": "v7_measured",
+   "repeat": 1,
+   "blockSizes": [
+    47,
+    41,
+    60,
+    70,
+    56,
+    55,
+    64,
+    78,
+    75,
+    80
+   ],
+   "metrics": {
+    "sayCalls": 10,
+    "renders": 10,
+    "audioSources": 10,
+    "firstSoundMs": 2656.8,
+    "meanSchedulingGapMs": 547.5,
+    "meanAudibleGapMs": 1339.9,
+    "maxAudibleGapMs": 2178.1,
+    "totalSpanS": 39.42,
+    "audioS": 34.49,
+    "silentShare": 0.125,
+    "guardHits": [],
+    "boundaries": [
+     {
+      "boundary": "1->2",
+      "schedulingGapMs": 113.2,
+      "tailSilenceMs": 418.5,
+      "headSilenceMs": 227.8,
+      "audibleGapMs": 759.5
+     },
+     {
+      "boundary": "2->3",
+      "schedulingGapMs": 1430.4,
+      "tailSilenceMs": 363.8,
+      "headSilenceMs": 383.9,
+      "audibleGapMs": 2178.1
+     },
+     {
+      "boundary": "3->4",
+      "schedulingGapMs": 1091.3,
+      "tailSilenceMs": 465.6,
+      "headSilenceMs": 302.2,
+      "audibleGapMs": 1859.1
+     },
+     {
+      "boundary": "4->5",
+      "schedulingGapMs": 19.7,
+      "tailSilenceMs": 337.3,
+      "headSilenceMs": 331.5,
+      "audibleGapMs": 688.5
+     },
+     {
+      "boundary": "5->6",
+      "schedulingGapMs": 71.9,
+      "tailSilenceMs": 424.9,
+      "headSilenceMs": 343.6,
+      "audibleGapMs": 840.4
+     },
+     {
+      "boundary": "6->7",
+      "schedulingGapMs": 562.0,
+      "tailSilenceMs": 504.3,
+      "headSilenceMs": 423.5,
+      "audibleGapMs": 1489.8
+     },
+     {
+      "boundary": "7->8",
+      "schedulingGapMs": 914.6,
+      "tailSilenceMs": 511.2,
+      "headSilenceMs": 268.1,
+      "audibleGapMs": 1693.9
+     },
+     {
+      "boundary": "8->9",
+      "schedulingGapMs": 709.0,
+      "tailSilenceMs": 360.1,
+      "headSilenceMs": 517,
+      "audibleGapMs": 1586.1
+     },
+     {
+      "boundary": "9->10",
+      "schedulingGapMs": 15.8,
+      "tailSilenceMs": 633.9,
+      "headSilenceMs": 313.7,
+      "audibleGapMs": 963.4
+     }
+    ]
+   },
+   "dump": {
+    "events": [
+     {
+      "type": "scenario_start",
+      "scenario": "ramped_blocks_prefetch",
+      "sentences": 10,
+      "wall": 51971.4
+     },
+     {
+      "type": "say_call",
+      "index": 0,
+      "text": "Once upon a time, there were three little pigs.",
+      "wall": 51971.4
+     },
+     {
+      "type": "generate_enter",
+      "chars": 47,
+      "text": "Once upon a time, there were three little pigs.",
+      "wall": 51971.9
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 0,
+      "elapsedMs": 2654.7,
+      "audioSeconds": 3.109,
+      "rtf": 0.854,
+      "headMs": 343.1,
+      "tailMs": 418.5,
+      "chars": 47,
+      "wall": 54626.6
+     },
+     {
+      "type": "generate_enter",
+      "chars": 41,
+      "text": "They left home to build their own houses.",
+      "wall": 54626.7
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 52.848617,
+      "ctxNow": 52.848617,
+      "durationS": 2.371338,
+      "wall": 54628.2
+     },
+     {
+      "type": "say_resolved",
+      "index": 0,
+      "spoke": true,
+      "wall": 56999
+     },
+     {
+      "type": "say_call",
+      "index": 1,
+      "text": "They left home to build their own houses.",
+      "wall": 56999.1
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 1,
+      "elapsedMs": 2474,
+      "audioSeconds": 2.5738,
+      "rtf": 0.961,
+      "headMs": 227.8,
+      "tailMs": 363.8,
+      "chars": 41,
+      "wall": 57100.8
+     },
+     {
+      "type": "generate_enter",
+      "chars": 60,
+      "text": "The first pig was in a hurry. He built his house with straw.",
+      "wall": 57100.8
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 55.333152,
+      "ctxNow": 55.333152,
+      "durationS": 2.006122,
+      "wall": 57102.2
+     },
+     {
+      "type": "prefetch_result",
+      "index": 1,
+      "ok": true,
+      "wall": 57102.2
+     },
+     {
+      "type": "say_resolved",
+      "index": 1,
+      "spoke": true,
+      "wall": 59111.9
+     },
+     {
+      "type": "say_call",
+      "index": 2,
+      "text": "The first pig was in a hurry. He built his house with straw.",
+      "wall": 59111.9
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 2,
+      "elapsedMs": 3436.7,
+      "audioSeconds": 3.937,
+      "rtf": 0.873,
+      "headMs": 383.9,
+      "tailMs": 465.6,
+      "chars": 60,
+      "wall": 60537.5
+     },
+     {
+      "type": "generate_enter",
+      "chars": 70,
+      "text": "It took him only one hour. The second pig built his house with sticks.",
+      "wall": 60537.5
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 58.769705,
+      "ctxNow": 58.769705,
+      "durationS": 3.111519,
+      "wall": 60540.9
+     },
+     {
+      "type": "prefetch_result",
+      "index": 2,
+      "ok": true,
+      "wall": 60540.9
+     },
+     {
+      "type": "say_resolved",
+      "index": 2,
+      "spoke": true,
+      "wall": 63663
+     },
+     {
+      "type": "say_call",
+      "index": 3,
+      "text": "It took him only one hour. The second pig built his house with sticks.",
+      "wall": 63663
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 3,
+      "elapsedMs": 4211.4,
+      "audioSeconds": 4.6825,
+      "rtf": 0.899,
+      "headMs": 302.2,
+      "tailMs": 337.3,
+      "chars": 70,
+      "wall": 64748.9
+     },
+     {
+      "type": "generate_enter",
+      "chars": 56,
+      "text": "It took him one day. The third pig was slow and careful.",
+      "wall": 64748.9
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 62.972517,
+      "ctxNow": 62.972517,
+      "durationS": 4.067029,
+      "wall": 64750.6
+     },
+     {
+      "type": "prefetch_result",
+      "index": 3,
+      "ok": true,
+      "wall": 64750.6
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 4,
+      "elapsedMs": 3358.6,
+      "audioSeconds": 3.9344,
+      "rtf": 0.854,
+      "headMs": 331.5,
+      "tailMs": 424.9,
+      "chars": 56,
+      "wall": 68107.6
+     },
+     {
+      "type": "prefetch_result",
+      "index": 4,
+      "ok": true,
+      "wall": 68107.8
+     },
+     {
+      "type": "say_resolved",
+      "index": 3,
+      "spoke": true,
+      "wall": 68818.1
+     },
+     {
+      "type": "say_call",
+      "index": 4,
+      "text": "It took him one day. The third pig was slow and careful.",
+      "wall": 68818.1
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 67.059229,
+      "ctxNow": 67.059229,
+      "durationS": 3.202086,
+      "wall": 68819.5
+     },
+     {
+      "type": "generate_enter",
+      "chars": 55,
+      "text": "He built his house with bricks. It took him many weeks.",
+      "wall": 68819.9
+     },
+     {
+      "type": "say_resolved",
+      "index": 4,
+      "spoke": true,
+      "wall": 72022.2
+     },
+     {
+      "type": "say_call",
+      "index": 5,
+      "text": "He built his house with bricks. It took him many weeks.",
+      "wall": 72022.2
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 5,
+      "elapsedMs": 3275.7,
+      "audioSeconds": 3.6752,
+      "rtf": 0.891,
+      "headMs": 343.6,
+      "tailMs": 504.3,
+      "chars": 55,
+      "wall": 72095.6
+     },
+     {
+      "type": "generate_enter",
+      "chars": 64,
+      "text": "His brothers laughed at him. \"Your work is too slow,\" they said.",
+      "wall": 72095.6
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 70.333243,
+      "ctxNow": 70.333243,
+      "durationS": 2.851293,
+      "wall": 72097.1
+     },
+     {
+      "type": "prefetch_result",
+      "index": 5,
+      "ok": true,
+      "wall": 72097.1
+     },
+     {
+      "type": "say_resolved",
+      "index": 5,
+      "spoke": true,
+      "wall": 74947.8
+     },
+     {
+      "type": "say_call",
+      "index": 6,
+      "text": "His brothers laughed at him. \"Your work is too slow,\" they said.",
+      "wall": 74947.8
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 6,
+      "elapsedMs": 3420.6,
+      "audioSeconds": 4.2222,
+      "rtf": 0.81,
+      "headMs": 423.5,
+      "tailMs": 511.2,
+      "chars": 64,
+      "wall": 75516.2
+     },
+     {
+      "type": "generate_enter",
+      "chars": 78,
+      "text": "One evening, a hungry wolf came to the village. He knocked on the straw house.",
+      "wall": 75516.2
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 73.746576,
+      "ctxNow": 73.746576,
+      "durationS": 3.311429,
+      "wall": 75517.8
+     },
+     {
+      "type": "prefetch_result",
+      "index": 6,
+      "ok": true,
+      "wall": 75517.8
+     },
+     {
+      "type": "say_resolved",
+      "index": 6,
+      "spoke": true,
+      "wall": 78825.6
+     },
+     {
+      "type": "say_call",
+      "index": 7,
+      "text": "One evening, a hungry wolf came to the village. He knocked on the straw house.",
+      "wall": 78825.6
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 7,
+      "elapsedMs": 4232.5,
+      "audioSeconds": 5.0037,
+      "rtf": 0.846,
+      "headMs": 268.1,
+      "tailMs": 360.1,
+      "chars": 78,
+      "wall": 79748.8
+     },
+     {
+      "type": "generate_enter",
+      "chars": 75,
+      "text": "\"Little pig, little pig, let me come in!\" \"No, not by the hair on my chin!\"",
+      "wall": 79748.8
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 77.972608,
+      "ctxNow": 77.972608,
+      "durationS": 4.399388,
+      "wall": 79750.6
+     },
+     {
+      "type": "prefetch_result",
+      "index": 7,
+      "ok": true,
+      "wall": 79750.6
+     },
+     {
+      "type": "say_resolved",
+      "index": 7,
+      "spoke": true,
+      "wall": 84143.4
+     },
+     {
+      "type": "say_call",
+      "index": 8,
+      "text": "\"Little pig, little pig, let me come in!\" \"No, not by the hair on my chin!\"",
+      "wall": 84143.4
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 8,
+      "elapsedMs": 5109.2,
+      "audioSeconds": 6.1266,
+      "rtf": 0.834,
+      "headMs": 517,
+      "tailMs": 633.9,
+      "chars": 75,
+      "wall": 84858.1
+     },
+     {
+      "type": "generate_enter",
+      "chars": 80,
+      "text": "So the wolf blew the straw house down. The first pig ran to his brother's house.",
+      "wall": 84858.1
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 83.080998,
+      "ctxNow": 83.080998,
+      "durationS": 4.999751,
+      "wall": 84859.9
+     },
+     {
+      "type": "prefetch_result",
+      "index": 8,
+      "ok": true,
+      "wall": 84860
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 9,
+      "elapsedMs": 4227.2,
+      "audioSeconds": 4.8651,
+      "rtf": 0.869,
+      "headMs": 313.7,
+      "tailMs": 406.9,
+      "chars": 80,
+      "wall": 89085.4
+     },
+     {
+      "type": "prefetch_result",
+      "index": 9,
+      "ok": true,
+      "wall": 89085.8
+     },
+     {
+      "type": "say_resolved",
+      "index": 8,
+      "spoke": true,
+      "wall": 89855.6
+     },
+     {
+      "type": "say_call",
+      "index": 9,
+      "text": "So the wolf blew the straw house down. The first pig ran to his brother's house.",
+      "wall": 89855.6
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 88.096508,
+      "ctxNow": 88.096508,
+      "durationS": 4.168526,
+      "wall": 89861
+     },
+     {
+      "type": "generate_enter",
+      "chars": 109,
+      "text": "The afternoon heat empties the lanes for an hour. Only the tea stall stays open, and its radio keeps playing.",
+      "wall": 89864.4
+     },
+     {
+      "type": "say_resolved",
+      "index": 9,
+      "spoke": true,
+      "wall": 94035.3
+     },
+     {
+      "type": "scenario_end",
+      "wall": 94035.3
+     }
+    ],
+    "notes": [
+     "engine booted, speech={\"streamSentences\":true,\"streamMaxWords\":26,\"silenceScale\":0.4}",
+     "door=/features/neural-voice/fiezel-voice-say.js"
+    ],
+    "pcmMeta": [
+     {
+      "index": 0,
+      "text": "Once upon a time, there were three little pigs.",
+      "sampleRate": 44100,
+      "length": 137105,
+      "headMs": 343.1,
+      "tailMs": 418.5
+     },
+     {
+      "index": 1,
+      "text": "They left home to build their own houses.",
+      "sampleRate": 44100,
+      "length": 113503,
+      "headMs": 227.8,
+      "tailMs": 363.8
+     },
+     {
+      "index": 2,
+      "text": "The first pig was in a hurry. He built his house with straw.",
+      "sampleRate": 44100,
+      "length": 173620,
+      "headMs": 383.9,
+      "tailMs": 465.6
+     },
+     {
+      "index": 3,
+      "text": "It took him only one hour. The second pig built his house with sticks.",
+      "sampleRate": 44100,
+      "length": 206500,
+      "headMs": 302.2,
+      "tailMs": 337.3
+     },
+     {
+      "index": 4,
+      "text": "It took him one day. The third pig was slow and careful.",
+      "sampleRate": 44100,
+      "length": 173509,
+      "headMs": 331.5,
+      "tailMs": 424.9
+     },
+     {
+      "index": 5,
+      "text": "He built his house with bricks. It took him many weeks.",
+      "sampleRate": 44100,
+      "length": 162076,
+      "headMs": 343.6,
+      "tailMs": 504.3
+     },
+     {
+      "index": 6,
+      "text": "His brothers laughed at him. \"Your work is too slow,\" they said.",
+      "sampleRate": 44100,
+      "length": 186200,
+      "headMs": 423.5,
+      "tailMs": 511.2
+     },
+     {
+      "index": 7,
+      "text": "One evening, a hungry wolf came to the village. He knocked on the straw house.",
+      "sampleRate": 44100,
+      "length": 220661,
+      "headMs": 268.1,
+      "tailMs": 360.1
+     },
+     {
+      "index": 8,
+      "text": "\"Little pig, little pig, let me come in!\" \"No, not by the hair on my chin!\"",
+      "sampleRate": 44100,
+      "length": 270184,
+      "headMs": 517,
+      "tailMs": 633.9
+     },
+     {
+      "index": 9,
+      "text": "So the wolf blew the straw house down. The first pig ran to his brother's house.",
+      "sampleRate": 44100,
+      "length": 214552,
+      "headMs": 313.7,
+      "tailMs": 406.9
+     }
+    ],
+    "guardHits": []
+   }
+  },
+  "v7_pure_cover#1": {
+   "rule": "v7_pure_cover",
+   "repeat": 1,
+   "blockSizes": [
+    47,
+    41,
+    29,
+    30,
+    26,
+    43,
+    20,
+    35,
+    31,
+    23,
+    28,
+    35,
+    47,
+    30,
+    41,
+    33,
+    38,
+    41
+   ],
+   "metrics": {
+    "sayCalls": 18,
+    "renders": 18,
+    "audioSources": 18,
+    "firstSoundMs": 2810.3,
+    "meanSchedulingGapMs": 488.4,
+    "meanAudibleGapMs": 1030.8,
+    "maxAudibleGapMs": 2643.2,
+    "totalSpanS": 42.32,
+    "audioS": 34.02,
+    "silentShare": 0.1962,
+    "guardHits": [],
+    "boundaries": [
+     {
+      "boundary": "1->2",
+      "schedulingGapMs": 3.0,
+      "tailSilenceMs": 158.3,
+      "headSilenceMs": 143.9,
+      "audibleGapMs": 305.2
+     },
+     {
+      "boundary": "2->3",
+      "schedulingGapMs": 7.8,
+      "tailSilenceMs": 162.9,
+      "headSilenceMs": 267.7,
+      "audibleGapMs": 438.4
+     },
+     {
+      "boundary": "3->4",
+      "schedulingGapMs": 107.8,
+      "tailSilenceMs": 192.4,
+      "headSilenceMs": 292,
+      "audibleGapMs": 592.2
+     },
+     {
+      "boundary": "4->5",
+      "schedulingGapMs": 116.0,
+      "tailSilenceMs": 160.8,
+      "headSilenceMs": 179.8,
+      "audibleGapMs": 456.6
+     },
+     {
+      "boundary": "5->6",
+      "schedulingGapMs": 929.0,
+      "tailSilenceMs": 57.8,
+      "headSilenceMs": 453,
+      "audibleGapMs": 1439.8
+     },
+     {
+      "boundary": "6->7",
+      "schedulingGapMs": 9.6,
+      "tailSilenceMs": 256.9,
+      "headSilenceMs": 204.1,
+      "audibleGapMs": 470.6
+     },
+     {
+      "boundary": "7->8",
+      "schedulingGapMs": 1240.6,
+      "tailSilenceMs": 174.5,
+      "headSilenceMs": 284.2,
+      "audibleGapMs": 1699.3
+     },
+     {
+      "boundary": "8->9",
+      "schedulingGapMs": 28.1,
+      "tailSilenceMs": 443.8,
+      "headSilenceMs": 214.6,
+      "audibleGapMs": 686.5
+     },
+     {
+      "boundary": "9->10",
+      "schedulingGapMs": 67.0,
+      "tailSilenceMs": 291.7,
+      "headSilenceMs": 213,
+      "audibleGapMs": 571.7
+     },
+     {
+      "boundary": "10->11",
+      "schedulingGapMs": 270.2,
+      "tailSilenceMs": 2.6,
+      "headSilenceMs": 226.9,
+      "audibleGapMs": 499.7
+     },
+     {
+      "boundary": "11->12",
+      "schedulingGapMs": 1039.8,
+      "tailSilenceMs": 317.4,
+      "headSilenceMs": 307.8,
+      "audibleGapMs": 1665.0
+     },
+     {
+      "boundary": "12->13",
+      "schedulingGapMs": 925.9,
+      "tailSilenceMs": 355.2,
+      "headSilenceMs": 307.8,
+      "audibleGapMs": 1588.9
+     },
+     {
+      "boundary": "13->14",
+      "schedulingGapMs": 5.3,
+      "tailSilenceMs": 421.8,
+      "headSilenceMs": 214.6,
+      "audibleGapMs": 641.7
+     },
+     {
+      "boundary": "14->15",
+      "schedulingGapMs": 1960.0,
+      "tailSilenceMs": 188.5,
+      "headSilenceMs": 494.7,
+      "audibleGapMs": 2643.2
+     },
+     {
+      "boundary": "15->16",
+      "schedulingGapMs": 505.9,
+      "tailSilenceMs": 597,
+      "headSilenceMs": 401.4,
+      "audibleGapMs": 1504.3
+     },
+     {
+      "boundary": "16->17",
+      "schedulingGapMs": 521.1,
+      "tailSilenceMs": 344,
+      "headSilenceMs": 318.3,
+      "audibleGapMs": 1183.4
+     },
+     {
+      "boundary": "17->18",
+      "schedulingGapMs": 565.1,
+      "tailSilenceMs": 223.9,
+      "headSilenceMs": 348.5,
+      "audibleGapMs": 1137.5
+     }
+    ]
+   },
+   "dump": {
+    "events": [
+     {
+      "type": "scenario_start",
+      "scenario": "ramped_blocks_prefetch",
+      "sentences": 18,
+      "wall": 97940.5
+     },
+     {
+      "type": "say_call",
+      "index": 0,
+      "text": "Once upon a time, there were three little pigs.",
+      "wall": 97940.5
+     },
+     {
+      "type": "generate_enter",
+      "chars": 47,
+      "text": "Once upon a time, there were three little pigs.",
+      "wall": 97940.9
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 0,
+      "elapsedMs": 2808.7,
+      "audioSeconds": 3.109,
+      "rtf": 0.903,
+      "headMs": 307.3,
+      "tailMs": 158.3,
+      "chars": 47,
+      "wall": 100749.6
+     },
+     {
+      "type": "generate_enter",
+      "chars": 41,
+      "text": "They left home to build their own houses.",
+      "wall": 100749.7
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 98.986667,
+      "ctxNow": 98.986667,
+      "durationS": 2.667279,
+      "wall": 100750.8
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 1,
+      "elapsedMs": 2520.4,
+      "audioSeconds": 2.5738,
+      "rtf": 0.979,
+      "headMs": 143.9,
+      "tailMs": 162.9,
+      "chars": 41,
+      "wall": 103270.2
+     },
+     {
+      "type": "prefetch_result",
+      "index": 1,
+      "ok": true,
+      "wall": 103270.6
+     },
+     {
+      "type": "say_resolved",
+      "index": 0,
+      "spoke": true,
+      "wall": 103415.7
+     },
+     {
+      "type": "say_call",
+      "index": 1,
+      "text": "They left home to build their own houses.",
+      "wall": 103415.7
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 101.656961,
+      "ctxNow": 101.656961,
+      "durationS": 2.290975,
+      "wall": 103417.2
+     },
+     {
+      "type": "generate_enter",
+      "chars": 29,
+      "text": "The first pig was in a hurry.",
+      "wall": 103417.9
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 2,
+      "elapsedMs": 1820.9,
+      "audioSeconds": 2.0931,
+      "rtf": 0.87,
+      "headMs": 267.7,
+      "tailMs": 192.4,
+      "chars": 29,
+      "wall": 105238.8
+     },
+     {
+      "type": "prefetch_result",
+      "index": 2,
+      "ok": true,
+      "wall": 105239.2
+     },
+     {
+      "type": "say_resolved",
+      "index": 1,
+      "spoke": true,
+      "wall": 105714.4
+     },
+     {
+      "type": "say_call",
+      "index": 2,
+      "text": "The first pig was in a hurry.",
+      "wall": 105714.4
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 103.955737,
+      "ctxNow": 103.955737,
+      "durationS": 1.656961,
+      "wall": 105715.9
+     },
+     {
+      "type": "generate_enter",
+      "chars": 30,
+      "text": "He built his house with straw.",
+      "wall": 105716.5
+     },
+     {
+      "type": "say_resolved",
+      "index": 2,
+      "spoke": true,
+      "wall": 107386.2
+     },
+     {
+      "type": "say_call",
+      "index": 3,
+      "text": "He built his house with straw.",
+      "wall": 107386.2
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 3,
+      "elapsedMs": 1775.2,
+      "audioSeconds": 2.0775,
+      "rtf": 0.854,
+      "headMs": 292,
+      "tailMs": 160.8,
+      "chars": 30,
+      "wall": 107491.7
+     },
+     {
+      "type": "generate_enter",
+      "chars": 26,
+      "text": "It took him only one hour.",
+      "wall": 107491.7
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 105.720454,
+      "ctxNow": 105.720454,
+      "durationS": 1.648753,
+      "wall": 107492.9
+     },
+     {
+      "type": "prefetch_result",
+      "index": 3,
+      "ok": true,
+      "wall": 107492.9
+     },
+     {
+      "type": "say_resolved",
+      "index": 3,
+      "spoke": true,
+      "wall": 109151.5
+     },
+     {
+      "type": "say_call",
+      "index": 4,
+      "text": "It took him only one hour.",
+      "wall": 109151.5
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 4,
+      "elapsedMs": 1758.8,
+      "audioSeconds": 1.9085,
+      "rtf": 0.922,
+      "headMs": 179.8,
+      "tailMs": 57.8,
+      "chars": 26,
+      "wall": 109250.5
+     },
+     {
+      "type": "generate_enter",
+      "chars": 43,
+      "text": "The second pig built his house with sticks.",
+      "wall": 109250.5
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 107.48517,
+      "ctxNow": 107.48517,
+      "durationS": 1.694898,
+      "wall": 109252
+     },
+     {
+      "type": "prefetch_result",
+      "index": 4,
+      "ok": true,
+      "wall": 109252.1
+     },
+     {
+      "type": "say_resolved",
+      "index": 4,
+      "spoke": true,
+      "wall": 110939
+     },
+     {
+      "type": "say_call",
+      "index": 5,
+      "text": "The second pig built his house with sticks.",
+      "wall": 110939
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 5,
+      "elapsedMs": 2616.2,
+      "audioSeconds": 2.8589,
+      "rtf": 0.915,
+      "headMs": 453,
+      "tailMs": 256.9,
+      "chars": 43,
+      "wall": 111866.7
+     },
+     {
+      "type": "generate_enter",
+      "chars": 20,
+      "text": "It took him one day.",
+      "wall": 111866.7
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 110.109025,
+      "ctxNow": 110.109025,
+      "durationS": 2.173039,
+      "wall": 111869.4
+     },
+     {
+      "type": "prefetch_result",
+      "index": 5,
+      "ok": true,
+      "wall": 111869.5
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 6,
+      "elapsedMs": 1667.2,
+      "audioSeconds": 1.5985,
+      "rtf": 1.043,
+      "headMs": 204.1,
+      "tailMs": 174.5,
+      "chars": 20,
+      "wall": 113534
+     },
+     {
+      "type": "prefetch_result",
+      "index": 6,
+      "ok": true,
+      "wall": 113534.3
+     },
+     {
+      "type": "say_resolved",
+      "index": 5,
+      "spoke": true,
+      "wall": 114050.4
+     },
+     {
+      "type": "say_call",
+      "index": 6,
+      "text": "It took him one day.",
+      "wall": 114050.5
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 112.291701,
+      "ctxNow": 112.291701,
+      "durationS": 1.2439,
+      "wall": 114051.7
+     },
+     {
+      "type": "generate_enter",
+      "chars": 35,
+      "text": "The third pig was slow and careful.",
+      "wall": 114052.4
+     },
+     {
+      "type": "say_resolved",
+      "index": 6,
+      "spoke": true,
+      "wall": 115304.8
+     },
+     {
+      "type": "say_call",
+      "index": 7,
+      "text": "The third pig was slow and careful.",
+      "wall": 115304.8
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 7,
+      "elapsedMs": 2483.5,
+      "audioSeconds": 2.4638,
+      "rtf": 1.008,
+      "headMs": 284.2,
+      "tailMs": 443.8,
+      "chars": 35,
+      "wall": 116536
+     },
+     {
+      "type": "generate_enter",
+      "chars": 31,
+      "text": "He built his house with bricks.",
+      "wall": 116536
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 114.776236,
+      "ctxNow": 114.776236,
+      "durationS": 1.759841,
+      "wall": 116537.4
+     },
+     {
+      "type": "prefetch_result",
+      "index": 7,
+      "ok": true,
+      "wall": 116537.4
+     },
+     {
+      "type": "say_resolved",
+      "index": 7,
+      "spoke": true,
+      "wall": 118299.7
+     },
+     {
+      "type": "say_call",
+      "index": 8,
+      "text": "He built his house with bricks.",
+      "wall": 118299.7
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 8,
+      "elapsedMs": 1789.1,
+      "audioSeconds": 2.1569,
+      "rtf": 0.829,
+      "headMs": 214.6,
+      "tailMs": 291.7,
+      "chars": 31,
+      "wall": 118325.2
+     },
+     {
+      "type": "generate_enter",
+      "chars": 23,
+      "text": "It took him many weeks.",
+      "wall": 118325.2
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 116.564172,
+      "ctxNow": 116.564172,
+      "durationS": 1.674535,
+      "wall": 118329.4
+     },
+     {
+      "type": "prefetch_result",
+      "index": 8,
+      "ok": true,
+      "wall": 118329.4
+     },
+     {
+      "type": "say_resolved",
+      "index": 8,
+      "spoke": true,
+      "wall": 120018.5
+     },
+     {
+      "type": "say_call",
+      "index": 9,
+      "text": "It took him many weeks.",
+      "wall": 120018.6
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 9,
+      "elapsedMs": 1752.4,
+      "audioSeconds": 1.7883,
+      "rtf": 0.98,
+      "headMs": 213,
+      "tailMs": 2.6,
+      "chars": 23,
+      "wall": 120077.7
+     },
+     {
+      "type": "generate_enter",
+      "chars": 28,
+      "text": "His brothers laughed at him.",
+      "wall": 120077.7
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 118.305669,
+      "ctxNow": 118.305669,
+      "durationS": 1.587347,
+      "wall": 120079.1
+     },
+     {
+      "type": "prefetch_result",
+      "index": 9,
+      "ok": true,
+      "wall": 120079.2
+     },
+     {
+      "type": "say_resolved",
+      "index": 9,
+      "spoke": true,
+      "wall": 121667.1
+     },
+     {
+      "type": "say_call",
+      "index": 10,
+      "text": "His brothers laughed at him.",
+      "wall": 121667.1
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 10,
+      "elapsedMs": 1859.6,
+      "audioSeconds": 2.0115,
+      "rtf": 0.924,
+      "headMs": 226.9,
+      "tailMs": 317.4,
+      "chars": 28,
+      "wall": 121937.4
+     },
+     {
+      "type": "generate_enter",
+      "chars": 35,
+      "text": "\"Your work is too slow,\" they said.",
+      "wall": 121937.4
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 120.163265,
+      "ctxNow": 120.163265,
+      "durationS": 1.491179,
+      "wall": 121939.3
+     },
+     {
+      "type": "prefetch_result",
+      "index": 10,
+      "ok": true,
+      "wall": 121939.3
+     },
+     {
+      "type": "say_resolved",
+      "index": 10,
+      "spoke": true,
+      "wall": 123432.1
+     },
+     {
+      "type": "say_call",
+      "index": 11,
+      "text": "\"Your work is too slow,\" they said.",
+      "wall": 123432.1
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 11,
+      "elapsedMs": 2526.6,
+      "audioSeconds": 2.3834,
+      "rtf": 1.06,
+      "headMs": 307.8,
+      "tailMs": 355.2,
+      "chars": 35,
+      "wall": 124464.1
+     },
+     {
+      "type": "generate_enter",
+      "chars": 47,
+      "text": "One evening, a hungry wolf came to the village.",
+      "wall": 124464.1
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 122.69424,
+      "ctxNow": 122.69424,
+      "durationS": 1.744444,
+      "wall": 124465.8
+     },
+     {
+      "type": "prefetch_result",
+      "index": 11,
+      "ok": true,
+      "wall": 124465.8
+     },
+     {
+      "type": "say_resolved",
+      "index": 11,
+      "spoke": true,
+      "wall": 126217.8
+     },
+     {
+      "type": "say_call",
+      "index": 12,
+      "text": "One evening, a hungry wolf came to the village.",
+      "wall": 126217.8
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 12,
+      "elapsedMs": 2662.5,
+      "audioSeconds": 3.1849,
+      "rtf": 0.836,
+      "headMs": 307.8,
+      "tailMs": 421.8,
+      "chars": 47,
+      "wall": 127126.7
+     },
+     {
+      "type": "generate_enter",
+      "chars": 30,
+      "text": "He knocked on the straw house.",
+      "wall": 127126.7
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 125.364535,
+      "ctxNow": 125.364535,
+      "durationS": 2.479274,
+      "wall": 127128.5
+     },
+     {
+      "type": "prefetch_result",
+      "index": 12,
+      "ok": true,
+      "wall": 127128.5
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 13,
+      "elapsedMs": 1783.4,
+      "audioSeconds": 2.111,
+      "rtf": 0.845,
+      "headMs": 214.6,
+      "tailMs": 188.5,
+      "chars": 30,
+      "wall": 128910.2
+     },
+     {
+      "type": "prefetch_result",
+      "index": 13,
+      "ok": true,
+      "wall": 128910.4
+     },
+     {
+      "type": "say_resolved",
+      "index": 12,
+      "spoke": true,
+      "wall": 129608
+     },
+     {
+      "type": "say_call",
+      "index": 13,
+      "text": "He knocked on the straw house.",
+      "wall": 129608
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 127.84907,
+      "ctxNow": 127.84907,
+      "durationS": 1.731995,
+      "wall": 129609.3
+     },
+     {
+      "type": "generate_enter",
+      "chars": 41,
+      "text": "\"Little pig, little pig, let me come in!\"",
+      "wall": 129609.8
+     },
+     {
+      "type": "say_resolved",
+      "index": 13,
+      "spoke": true,
+      "wall": 131350.2
+     },
+     {
+      "type": "say_call",
+      "index": 14,
+      "text": "\"Little pig, little pig, let me come in!\"",
+      "wall": 131350.3
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 14,
+      "elapsedMs": 3709.6,
+      "audioSeconds": 3.4179,
+      "rtf": 1.085,
+      "headMs": 494.7,
+      "tailMs": 597,
+      "chars": 41,
+      "wall": 133319.5
+     },
+     {
+      "type": "generate_enter",
+      "chars": 33,
+      "text": "\"No, not by the hair on my chin!\"",
+      "wall": 133319.5
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 131.541043,
+      "ctxNow": 131.541043,
+      "durationS": 2.350204,
+      "wall": 133321.5
+     },
+     {
+      "type": "prefetch_result",
+      "index": 14,
+      "ok": true,
+      "wall": 133321.5
+     },
+     {
+      "type": "say_resolved",
+      "index": 14,
+      "spoke": true,
+      "wall": 135707.2
+     },
+     {
+      "type": "say_call",
+      "index": 15,
+      "text": "\"No, not by the hair on my chin!\"",
+      "wall": 135707.2
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 15,
+      "elapsedMs": 2822.7,
+      "audioSeconds": 2.7314,
+      "rtf": 1.033,
+      "headMs": 401.4,
+      "tailMs": 344,
+      "chars": 33,
+      "wall": 136142.3
+     },
+     {
+      "type": "generate_enter",
+      "chars": 38,
+      "text": "So the wolf blew the straw house down.",
+      "wall": 136142.3
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 134.397098,
+      "ctxNow": 134.397098,
+      "durationS": 2.009909,
+      "wall": 136167.9
+     },
+     {
+      "type": "prefetch_result",
+      "index": 15,
+      "ok": true,
+      "wall": 136167.9
+     },
+     {
+      "type": "say_resolved",
+      "index": 15,
+      "spoke": true,
+      "wall": 138175.8
+     },
+     {
+      "type": "say_call",
+      "index": 16,
+      "text": "So the wolf blew the straw house down.",
+      "wall": 138175.9
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 16,
+      "elapsedMs": 2559.6,
+      "audioSeconds": 2.4608,
+      "rtf": 1.04,
+      "headMs": 318.3,
+      "tailMs": 223.9,
+      "chars": 38,
+      "wall": 138701.9
+     },
+     {
+      "type": "generate_enter",
+      "chars": 41,
+      "text": "The first pig ran to his brother's house.",
+      "wall": 138701.9
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 136.928073,
+      "ctxNow": 136.928073,
+      "durationS": 1.942676,
+      "wall": 138704
+     },
+     {
+      "type": "prefetch_result",
+      "index": 16,
+      "ok": true,
+      "wall": 138704.1
+     },
+     {
+      "type": "say_resolved",
+      "index": 16,
+      "spoke": true,
+      "wall": 140637.3
+     },
+     {
+      "type": "say_call",
+      "index": 17,
+      "text": "The first pig ran to his brother's house.",
+      "wall": 140637.3
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 17,
+      "elapsedMs": 2512.6,
+      "audioSeconds": 2.5485,
+      "rtf": 0.986,
+      "headMs": 348.5,
+      "tailMs": 352.8,
+      "chars": 41,
+      "wall": 141214.5
+     },
+     {
+      "type": "generate_enter",
+      "chars": 109,
+      "text": "The afternoon heat empties the lanes for an hour. Only the tea stall stays open, and its radio keeps playing.",
+      "wall": 141214.6
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 139.435828,
+      "ctxNow": 139.435828,
+      "durationS": 1.871179,
+      "wall": 141216.2
+     },
+     {
+      "type": "prefetch_result",
+      "index": 17,
+      "ok": true,
+      "wall": 141216.2
+     },
+     {
+      "type": "say_resolved",
+      "index": 17,
+      "spoke": true,
+      "wall": 143076
+     },
+     {
+      "type": "scenario_end",
+      "wall": 143076
+     }
+    ],
+    "notes": [
+     "engine booted, speech={\"streamSentences\":true,\"streamMaxWords\":26,\"silenceScale\":0.4}",
+     "door=/features/neural-voice/fiezel-voice-say.js"
+    ],
+    "pcmMeta": [
+     {
+      "index": 0,
+      "text": "Once upon a time, there were three little pigs.",
+      "sampleRate": 44100,
+      "length": 137105,
+      "headMs": 307.3,
+      "tailMs": 158.3
+     },
+     {
+      "index": 1,
+      "text": "They left home to build their own houses.",
+      "sampleRate": 44100,
+      "length": 113503,
+      "headMs": 143.9,
+      "tailMs": 162.9
+     },
+     {
+      "index": 2,
+      "text": "The first pig was in a hurry.",
+      "sampleRate": 44100,
+      "length": 92304,
+      "headMs": 267.7,
+      "tailMs": 192.4
+     },
+     {
+      "index": 3,
+      "text": "He built his house with straw.",
+      "sampleRate": 44100,
+      "length": 91619,
+      "headMs": 292,
+      "tailMs": 160.8
+     },
+     {
+      "index": 4,
+      "text": "It took him only one hour.",
+      "sampleRate": 44100,
+      "length": 84167,
+      "headMs": 179.8,
+      "tailMs": 57.8
+     },
+     {
+      "index": 5,
+      "text": "The second pig built his house with sticks.",
+      "sampleRate": 44100,
+      "length": 126078,
+      "headMs": 453,
+      "tailMs": 256.9
+     },
+     {
+      "index": 6,
+      "text": "It took him one day.",
+      "sampleRate": 44100,
+      "length": 70494,
+      "headMs": 204.1,
+      "tailMs": 174.5
+     },
+     {
+      "index": 7,
+      "text": "The third pig was slow and careful.",
+      "sampleRate": 44100,
+      "length": 108654,
+      "headMs": 284.2,
+      "tailMs": 443.8
+     },
+     {
+      "index": 8,
+      "text": "He built his house with bricks.",
+      "sampleRate": 44100,
+      "length": 95119,
+      "headMs": 214.6,
+      "tailMs": 291.7
+     },
+     {
+      "index": 9,
+      "text": "It took him many weeks.",
+      "sampleRate": 44100,
+      "length": 78866,
+      "headMs": 213,
+      "tailMs": 2.6
+     },
+     {
+      "index": 10,
+      "text": "His brothers laughed at him.",
+      "sampleRate": 44100,
+      "length": 88706,
+      "headMs": 226.9,
+      "tailMs": 317.4
+     },
+     {
+      "index": 11,
+      "text": "\"Your work is too slow,\" they said.",
+      "sampleRate": 44100,
+      "length": 105110,
+      "headMs": 307.8,
+      "tailMs": 355.2
+     },
+     {
+      "index": 12,
+      "text": "One evening, a hungry wolf came to the village.",
+      "sampleRate": 44100,
+      "length": 140455,
+      "headMs": 307.8,
+      "tailMs": 421.8
+     },
+     {
+      "index": 13,
+      "text": "He knocked on the straw house.",
+      "sampleRate": 44100,
+      "length": 93097,
+      "headMs": 214.6,
+      "tailMs": 188.5
+     },
+     {
+      "index": 14,
+      "text": "\"Little pig, little pig, let me come in!\"",
+      "sampleRate": 44100,
+      "length": 150730,
+      "headMs": 494.7,
+      "tailMs": 597
+     },
+     {
+      "index": 15,
+      "text": "\"No, not by the hair on my chin!\"",
+      "sampleRate": 44100,
+      "length": 120453,
+      "headMs": 401.4,
+      "tailMs": 344
+     },
+     {
+      "index": 16,
+      "text": "So the wolf blew the straw house down.",
+      "sampleRate": 44100,
+      "length": 108523,
+      "headMs": 318.3,
+      "tailMs": 223.9
+     },
+     {
+      "index": 17,
+      "text": "The first pig ran to his brother's house.",
+      "sampleRate": 44100,
+      "length": 112388,
+      "headMs": 348.5,
+      "tailMs": 352.8
+     }
+    ],
+    "guardHits": []
+   }
+  },
+  "v6_shipped#2": {
+   "rule": "v6_shipped",
+   "repeat": 2,
+   "blockSizes": [
+    47,
+    71,
+    57,
+    64,
+    67,
+    52,
+    35,
+    78,
+    75,
+    80
+   ],
+   "metrics": {
+    "sayCalls": 10,
+    "renders": 10,
+    "audioSources": 10,
+    "firstSoundMs": 2626.9,
+    "meanSchedulingGapMs": 600.6,
+    "meanAudibleGapMs": 1244.1,
+    "maxAudibleGapMs": 3323.6,
+    "totalSpanS": 41.12,
+    "audioS": 35.72,
+    "silentShare": 0.1315,
+    "guardHits": [],
+    "boundaries": [
+     {
+      "boundary": "1->2",
+      "schedulingGapMs": 1529.9,
+      "tailSilenceMs": 141.3,
+      "headSilenceMs": 353.8,
+      "audibleGapMs": 2025.0
+     },
+     {
+      "boundary": "2->3",
+      "schedulingGapMs": 8.2,
+      "tailSilenceMs": 330,
+      "headSilenceMs": 307.1,
+      "audibleGapMs": 645.3
+     },
+     {
+      "boundary": "3->4",
+      "schedulingGapMs": 270.6,
+      "tailSilenceMs": 96.5,
+      "headSilenceMs": 431,
+      "audibleGapMs": 798.1
+     },
+     {
+      "boundary": "4->5",
+      "schedulingGapMs": 279.3,
+      "tailSilenceMs": 483.9,
+      "headSilenceMs": 342.6,
+      "audibleGapMs": 1105.8
+     },
+     {
+      "boundary": "5->6",
+      "schedulingGapMs": 20.8,
+      "tailSilenceMs": 29.8,
+      "headSilenceMs": 389.7,
+      "audibleGapMs": 440.3
+     },
+     {
+      "boundary": "6->7",
+      "schedulingGapMs": 22.1,
+      "tailSilenceMs": 406,
+      "headSilenceMs": 331,
+      "audibleGapMs": 759.1
+     },
+     {
+      "boundary": "7->8",
+      "schedulingGapMs": 2571.0,
+      "tailSilenceMs": 421.4,
+      "headSilenceMs": 331.2,
+      "audibleGapMs": 3323.6
+     },
+     {
+      "boundary": "8->9",
+      "schedulingGapMs": 687.9,
+      "tailSilenceMs": 206.3,
+      "headSilenceMs": 511.6,
+      "audibleGapMs": 1405.8
+     },
+     {
+      "boundary": "9->10",
+      "schedulingGapMs": 15.6,
+      "tailSilenceMs": 360.5,
+      "headSilenceMs": 317.8,
+      "audibleGapMs": 693.9
+     }
+    ]
+   },
+   "dump": {
+    "events": [
+     {
+      "type": "scenario_start",
+      "scenario": "ramped_blocks_prefetch",
+      "sentences": 10,
+      "wall": 149538.9
+     },
+     {
+      "type": "say_call",
+      "index": 0,
+      "text": "Once upon a time, there were three little pigs.",
+      "wall": 149538.9
+     },
+     {
+      "type": "generate_enter",
+      "chars": 47,
+      "text": "Once upon a time, there were three little pigs.",
+      "wall": 149539.6
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 0,
+      "elapsedMs": 2622.1,
+      "audioSeconds": 3.109,
+      "rtf": 0.843,
+      "headMs": 295.4,
+      "tailMs": 141.3,
+      "chars": 47,
+      "wall": 152161.7
+     },
+     {
+      "type": "generate_enter",
+      "chars": 71,
+      "text": "They left home to build their own houses. The first pig was in a hurry.",
+      "wall": 152161.7
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 150.395646,
+      "ctxNow": 150.395646,
+      "durationS": 2.696168,
+      "wall": 152165.8
+     },
+     {
+      "type": "say_resolved",
+      "index": 0,
+      "spoke": true,
+      "wall": 154871.1
+     },
+     {
+      "type": "say_call",
+      "index": 1,
+      "text": "They left home to build their own houses. The first pig was in a hurry.",
+      "wall": 154871.1
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 1,
+      "elapsedMs": 4238.1,
+      "audioSeconds": 4.5294,
+      "rtf": 0.936,
+      "headMs": 353.8,
+      "tailMs": 330,
+      "chars": 71,
+      "wall": 156399.8
+     },
+     {
+      "type": "generate_enter",
+      "chars": 57,
+      "text": "He built his house with straw. It took him only one hour.",
+      "wall": 156399.8
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 154.621678,
+      "ctxNow": 154.621678,
+      "durationS": 3.869546,
+      "wall": 156401.4
+     },
+     {
+      "type": "prefetch_result",
+      "index": 1,
+      "ok": true,
+      "wall": 156401.5
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 2,
+      "elapsedMs": 3690.9,
+      "audioSeconds": 3.7081,
+      "rtf": 0.995,
+      "headMs": 307.1,
+      "tailMs": 96.5,
+      "chars": 57,
+      "wall": 160090.7
+     },
+     {
+      "type": "prefetch_result",
+      "index": 2,
+      "ok": true,
+      "wall": 160091.1
+     },
+     {
+      "type": "say_resolved",
+      "index": 1,
+      "spoke": true,
+      "wall": 160258
+     },
+     {
+      "type": "say_call",
+      "index": 2,
+      "text": "He built his house with straw. It took him only one hour.",
+      "wall": 160258
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 158.49941,
+      "ctxNow": 158.49941,
+      "durationS": 3.328458,
+      "wall": 160262
+     },
+     {
+      "type": "generate_enter",
+      "chars": 64,
+      "text": "The second pig built his house with sticks. It took him one day.",
+      "wall": 160262.8
+     },
+     {
+      "type": "say_resolved",
+      "index": 2,
+      "spoke": true,
+      "wall": 163601.8
+     },
+     {
+      "type": "say_call",
+      "index": 3,
+      "text": "The second pig built his house with sticks. It took him one day.",
+      "wall": 163601.8
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 3,
+      "elapsedMs": 3601.4,
+      "audioSeconds": 4.1875,
+      "rtf": 0.86,
+      "headMs": 431,
+      "tailMs": 483.9,
+      "chars": 64,
+      "wall": 163864.3
+     },
+     {
+      "type": "generate_enter",
+      "chars": 67,
+      "text": "The third pig was slow and careful. He built his house with bricks.",
+      "wall": 163864.3
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 162.098503,
+      "ctxNow": 162.098503,
+      "durationS": 3.296599,
+      "wall": 163865.9
+     },
+     {
+      "type": "prefetch_result",
+      "index": 3,
+      "ok": true,
+      "wall": 163866
+     },
+     {
+      "type": "say_resolved",
+      "index": 3,
+      "spoke": true,
+      "wall": 167154.4
+     },
+     {
+      "type": "say_call",
+      "index": 4,
+      "text": "The third pig was slow and careful. He built his house with bricks.",
+      "wall": 167154.4
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 4,
+      "elapsedMs": 3576.6,
+      "audioSeconds": 4.3911,
+      "rtf": 0.815,
+      "headMs": 342.6,
+      "tailMs": 29.8,
+      "chars": 67,
+      "wall": 167440.9
+     },
+     {
+      "type": "generate_enter",
+      "chars": 52,
+      "text": "It took him many weeks. His brothers laughed at him.",
+      "wall": 167440.9
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 165.674376,
+      "ctxNow": 165.674376,
+      "durationS": 4.042653,
+      "wall": 167443.9
+     },
+     {
+      "type": "prefetch_result",
+      "index": 4,
+      "ok": true,
+      "wall": 167444
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 5,
+      "elapsedMs": 3274.7,
+      "audioSeconds": 3.5592,
+      "rtf": 0.92,
+      "headMs": 389.7,
+      "tailMs": 406,
+      "chars": 52,
+      "wall": 170715.6
+     },
+     {
+      "type": "prefetch_result",
+      "index": 5,
+      "ok": true,
+      "wall": 170716
+     },
+     {
+      "type": "say_resolved",
+      "index": 4,
+      "spoke": true,
+      "wall": 171496.9
+     },
+     {
+      "type": "say_call",
+      "index": 5,
+      "text": "It took him many weeks. His brothers laughed at him.",
+      "wall": 171496.9
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 169.737868,
+      "ctxNow": 169.737868,
+      "durationS": 2.787506,
+      "wall": 171498.8
+     },
+     {
+      "type": "generate_enter",
+      "chars": 35,
+      "text": "\"Your work is too slow,\" they said.",
+      "wall": 171499.4
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 6,
+      "elapsedMs": 2451.9,
+      "audioSeconds": 2.3834,
+      "rtf": 1.029,
+      "headMs": 331,
+      "tailMs": 421.4,
+      "chars": 35,
+      "wall": 173951.3
+     },
+     {
+      "type": "prefetch_result",
+      "index": 6,
+      "ok": true,
+      "wall": 173951.8
+     },
+     {
+      "type": "say_resolved",
+      "index": 5,
+      "spoke": true,
+      "wall": 174306.2
+     },
+     {
+      "type": "say_call",
+      "index": 6,
+      "text": "\"Your work is too slow,\" they said.",
+      "wall": 174306.2
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 172.547483,
+      "ctxNow": 172.547483,
+      "durationS": 1.655079,
+      "wall": 174307.6
+     },
+     {
+      "type": "generate_enter",
+      "chars": 78,
+      "text": "One evening, a hungry wolf came to the village. He knocked on the straw house.",
+      "wall": 174308.3
+     },
+     {
+      "type": "say_resolved",
+      "index": 6,
+      "spoke": true,
+      "wall": 175978.4
+     },
+     {
+      "type": "say_call",
+      "index": 7,
+      "text": "One evening, a hungry wolf came to the village. He knocked on the straw house.",
+      "wall": 175978.4
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 7,
+      "elapsedMs": 4235.2,
+      "audioSeconds": 5.0037,
+      "rtf": 0.846,
+      "headMs": 331.2,
+      "tailMs": 206.3,
+      "chars": 78,
+      "wall": 178543.5
+     },
+     {
+      "type": "generate_enter",
+      "chars": 75,
+      "text": "\"Little pig, little pig, let me come in!\" \"No, not by the hair on my chin!\"",
+      "wall": 178543.5
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 176.773515,
+      "ctxNow": 176.773515,
+      "durationS": 4.490136,
+      "wall": 178546
+     },
+     {
+      "type": "prefetch_result",
+      "index": 7,
+      "ok": true,
+      "wall": 178546.1
+     },
+     {
+      "type": "say_resolved",
+      "index": 7,
+      "spoke": true,
+      "wall": 183037.3
+     },
+     {
+      "type": "say_call",
+      "index": 8,
+      "text": "\"Little pig, little pig, let me come in!\" \"No, not by the hair on my chin!\"",
+      "wall": 183037.3
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 8,
+      "elapsedMs": 5184.1,
+      "audioSeconds": 6.1266,
+      "rtf": 0.846,
+      "headMs": 511.6,
+      "tailMs": 360.5,
+      "chars": 75,
+      "wall": 183727.7
+     },
+     {
+      "type": "generate_enter",
+      "chars": 80,
+      "text": "So the wolf blew the straw house down. The first pig ran to his brother's house.",
+      "wall": 183727.7
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 181.951565,
+      "ctxNow": 181.951565,
+      "durationS": 5.278549,
+      "wall": 183730
+     },
+     {
+      "type": "prefetch_result",
+      "index": 8,
+      "ok": true,
+      "wall": 183730.1
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 9,
+      "elapsedMs": 4268.7,
+      "audioSeconds": 4.8651,
+      "rtf": 0.877,
+      "headMs": 317.8,
+      "tailMs": 300.5,
+      "chars": 80,
+      "wall": 187996.4
+     },
+     {
+      "type": "prefetch_result",
+      "index": 9,
+      "ok": true,
+      "wall": 187996.9
+     },
+     {
+      "type": "say_resolved",
+      "index": 8,
+      "spoke": true,
+      "wall": 189004.5
+     },
+     {
+      "type": "say_call",
+      "index": 9,
+      "text": "So the wolf blew the straw house down. The first pig ran to his brother's house.",
+      "wall": 189004.5
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 187.245714,
+      "ctxNow": 187.245714,
+      "durationS": 4.270771,
+      "wall": 189006.3
+     },
+     {
+      "type": "generate_enter",
+      "chars": 109,
+      "text": "The afternoon heat empties the lanes for an hour. Only the tea stall stays open, and its radio keeps playing.",
+      "wall": 189011
+     },
+     {
+      "type": "say_resolved",
+      "index": 9,
+      "spoke": true,
+      "wall": 193277.2
+     },
+     {
+      "type": "scenario_end",
+      "wall": 193277.2
+     }
+    ],
+    "notes": [
+     "engine booted, speech={\"streamSentences\":true,\"streamMaxWords\":26,\"silenceScale\":0.4}",
+     "door=/features/neural-voice/fiezel-voice-say.js"
+    ],
+    "pcmMeta": [
+     {
+      "index": 0,
+      "text": "Once upon a time, there were three little pigs.",
+      "sampleRate": 44100,
+      "length": 137105,
+      "headMs": 295.4,
+      "tailMs": 141.3
+     },
+     {
+      "index": 1,
+      "text": "They left home to build their own houses. The first pig was in a hurry.",
+      "sampleRate": 44100,
+      "length": 199745,
+      "headMs": 353.8,
+      "tailMs": 330
+     },
+     {
+      "index": 2,
+      "text": "He built his house with straw. It took him only one hour.",
+      "sampleRate": 44100,
+      "length": 163528,
+      "headMs": 307.1,
+      "tailMs": 96.5
+     },
+     {
+      "index": 3,
+      "text": "The second pig built his house with sticks. It took him one day.",
+      "sampleRate": 44100,
+      "length": 184669,
+      "headMs": 431,
+      "tailMs": 483.9
+     },
+     {
+      "index": 4,
+      "text": "The third pig was slow and careful. He built his house with bricks.",
+      "sampleRate": 44100,
+      "length": 193649,
+      "headMs": 342.6,
+      "tailMs": 29.8
+     },
+     {
+      "index": 5,
+      "text": "It took him many weeks. His brothers laughed at him.",
+      "sampleRate": 44100,
+      "length": 156962,
+      "headMs": 389.7,
+      "tailMs": 406
+     },
+     {
+      "index": 6,
+      "text": "\"Your work is too slow,\" they said.",
+      "sampleRate": 44100,
+      "length": 105110,
+      "headMs": 331,
+      "tailMs": 421.4
+     },
+     {
+      "index": 7,
+      "text": "One evening, a hungry wolf came to the village. He knocked on the straw house.",
+      "sampleRate": 44100,
+      "length": 220661,
+      "headMs": 331.2,
+      "tailMs": 206.3
+     },
+     {
+      "index": 8,
+      "text": "\"Little pig, little pig, let me come in!\" \"No, not by the hair on my chin!\"",
+      "sampleRate": 44100,
+      "length": 270184,
+      "headMs": 511.6,
+      "tailMs": 360.5
+     },
+     {
+      "index": 9,
+      "text": "So the wolf blew the straw house down. The first pig ran to his brother's house.",
+      "sampleRate": 44100,
+      "length": 214552,
+      "headMs": 317.8,
+      "tailMs": 300.5
+     }
+    ],
+    "guardHits": []
+   }
+  },
+  "v7_measured#2": {
+   "rule": "v7_measured",
+   "repeat": 2,
+   "blockSizes": [
+    47,
+    41,
+    60,
+    70,
+    56,
+    55,
+    64,
+    78,
+    75,
+    80
+   ],
+   "metrics": {
+    "sayCalls": 10,
+    "renders": 10,
+    "audioSources": 10,
+    "firstSoundMs": 2668.5,
+    "meanSchedulingGapMs": 563.3,
+    "meanAudibleGapMs": 1284.2,
+    "maxAudibleGapMs": 2426.2,
+    "totalSpanS": 40.45,
+    "audioS": 35.38,
+    "silentShare": 0.1253,
+    "guardHits": [],
+    "boundaries": [
+     {
+      "boundary": "1->2",
+      "schedulingGapMs": 21.2,
+      "tailSilenceMs": 268.4,
+      "headSilenceMs": 392.6,
+      "audibleGapMs": 682.2
+     },
+     {
+      "boundary": "2->3",
+      "schedulingGapMs": 1730.1,
+      "tailSilenceMs": 359.3,
+      "headSilenceMs": 336.8,
+      "audibleGapMs": 2426.2
+     },
+     {
+      "boundary": "3->4",
+      "schedulingGapMs": 1067.5,
+      "tailSilenceMs": 395.9,
+      "headSilenceMs": 354.7,
+      "audibleGapMs": 1818.1
+     },
+     {
+      "boundary": "4->5",
+      "schedulingGapMs": 15.9,
+      "tailSilenceMs": 327.5,
+      "headSilenceMs": 255.5,
+      "audibleGapMs": 598.9
+     },
+     {
+      "boundary": "5->6",
+      "schedulingGapMs": 15.2,
+      "tailSilenceMs": 281.6,
+      "headSilenceMs": 401.2,
+      "audibleGapMs": 698.0
+     },
+     {
+      "boundary": "6->7",
+      "schedulingGapMs": 480.5,
+      "tailSilenceMs": 249.1,
+      "headSilenceMs": 276.8,
+      "audibleGapMs": 1006.4
+     },
+     {
+      "boundary": "7->8",
+      "schedulingGapMs": 984.2,
+      "tailSilenceMs": 449,
+      "headSilenceMs": 366.6,
+      "audibleGapMs": 1799.8
+     },
+     {
+      "boundary": "8->9",
+      "schedulingGapMs": 740.5,
+      "tailSilenceMs": 316.4,
+      "headSilenceMs": 558.1,
+      "audibleGapMs": 1615.0
+     },
+     {
+      "boundary": "9->10",
+      "schedulingGapMs": 14.2,
+      "tailSilenceMs": 591.2,
+      "headSilenceMs": 307.6,
+      "audibleGapMs": 913.0
+     }
+    ]
+   },
+   "dump": {
+    "events": [
+     {
+      "type": "scenario_start",
+      "scenario": "ramped_blocks_prefetch",
+      "sentences": 10,
+      "wall": 197158.3
+     },
+     {
+      "type": "say_call",
+      "index": 0,
+      "text": "Once upon a time, there were three little pigs.",
+      "wall": 197158.3
+     },
+     {
+      "type": "generate_enter",
+      "chars": 47,
+      "text": "Once upon a time, there were three little pigs.",
+      "wall": 197160.5
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 0,
+      "elapsedMs": 2664.9,
+      "audioSeconds": 3.109,
+      "rtf": 0.857,
+      "headMs": 378,
+      "tailMs": 268.4,
+      "chars": 47,
+      "wall": 199825.4
+     },
+     {
+      "type": "generate_enter",
+      "chars": 41,
+      "text": "They left home to build their own houses.",
+      "wall": 199825.4
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 198.066213,
+      "ctxNow": 198.066213,
+      "durationS": 2.486531,
+      "wall": 199826.8
+     },
+     {
+      "type": "say_resolved",
+      "index": 0,
+      "spoke": true,
+      "wall": 202332.6
+     },
+     {
+      "type": "say_call",
+      "index": 1,
+      "text": "They left home to build their own houses.",
+      "wall": 202332.6
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 1,
+      "elapsedMs": 2517,
+      "audioSeconds": 2.5738,
+      "rtf": 0.978,
+      "headMs": 392.6,
+      "tailMs": 359.3,
+      "chars": 41,
+      "wall": 202342.4
+     },
+     {
+      "type": "generate_enter",
+      "chars": 60,
+      "text": "The first pig was in a hurry. He built his house with straw.",
+      "wall": 202342.4
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 200.573968,
+      "ctxNow": 200.573968,
+      "durationS": 1.845805,
+      "wall": 202344
+     },
+     {
+      "type": "prefetch_result",
+      "index": 1,
+      "ok": true,
+      "wall": 202344
+     },
+     {
+      "type": "say_resolved",
+      "index": 1,
+      "spoke": true,
+      "wall": 204190.4
+     },
+     {
+      "type": "say_call",
+      "index": 2,
+      "text": "The first pig was in a hurry. He built his house with straw.",
+      "wall": 204190.4
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 2,
+      "elapsedMs": 3567.6,
+      "audioSeconds": 3.937,
+      "rtf": 0.906,
+      "headMs": 336.8,
+      "tailMs": 395.9,
+      "chars": 60,
+      "wall": 205910
+     },
+     {
+      "type": "generate_enter",
+      "chars": 70,
+      "text": "It took him only one hour. The second pig built his house with sticks.",
+      "wall": 205910
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 204.149841,
+      "ctxNow": 204.149841,
+      "durationS": 3.228231,
+      "wall": 205911.7
+     },
+     {
+      "type": "prefetch_result",
+      "index": 2,
+      "ok": true,
+      "wall": 205911.7
+     },
+     {
+      "type": "say_resolved",
+      "index": 2,
+      "spoke": true,
+      "wall": 209159.2
+     },
+     {
+      "type": "say_call",
+      "index": 3,
+      "text": "It took him only one hour. The second pig built his house with sticks.",
+      "wall": 209159.3
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 3,
+      "elapsedMs": 4315.5,
+      "audioSeconds": 4.6825,
+      "rtf": 0.922,
+      "headMs": 354.7,
+      "tailMs": 327.5,
+      "chars": 70,
+      "wall": 210225.5
+     },
+     {
+      "type": "generate_enter",
+      "chars": 56,
+      "text": "It took him one day. The third pig was slow and careful.",
+      "wall": 210225.5
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 208.445533,
+      "ctxNow": 208.445533,
+      "durationS": 4.024331,
+      "wall": 210227.5
+     },
+     {
+      "type": "prefetch_result",
+      "index": 3,
+      "ok": true,
+      "wall": 210227.5
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 4,
+      "elapsedMs": 3788.4,
+      "audioSeconds": 3.9344,
+      "rtf": 0.963,
+      "headMs": 255.5,
+      "tailMs": 281.6,
+      "chars": 56,
+      "wall": 214013.9
+     },
+     {
+      "type": "prefetch_result",
+      "index": 4,
+      "ok": true,
+      "wall": 214014.3
+     },
+     {
+      "type": "say_resolved",
+      "index": 3,
+      "spoke": true,
+      "wall": 214244.7
+     },
+     {
+      "type": "say_call",
+      "index": 4,
+      "text": "It took him one day. The third pig was slow and careful.",
+      "wall": 214244.7
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 212.485805,
+      "ctxNow": 212.485805,
+      "durationS": 3.421383,
+      "wall": 214250.3
+     },
+     {
+      "type": "generate_enter",
+      "chars": 55,
+      "text": "He built his house with bricks. It took him many weeks.",
+      "wall": 214252.7
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 5,
+      "elapsedMs": 3410.1,
+      "audioSeconds": 3.6752,
+      "rtf": 0.928,
+      "headMs": 401.2,
+      "tailMs": 249.1,
+      "chars": 55,
+      "wall": 217662.8
+     },
+     {
+      "type": "prefetch_result",
+      "index": 5,
+      "ok": true,
+      "wall": 217663.2
+     },
+     {
+      "type": "say_resolved",
+      "index": 4,
+      "spoke": true,
+      "wall": 217681.2
+     },
+     {
+      "type": "say_call",
+      "index": 5,
+      "text": "He built his house with bricks. It took him many weeks.",
+      "wall": 217681.2
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 215.922358,
+      "ctxNow": 215.922358,
+      "durationS": 3.048889,
+      "wall": 217683.4
+     },
+     {
+      "type": "generate_enter",
+      "chars": 64,
+      "text": "His brothers laughed at him. \"Your work is too slow,\" they said.",
+      "wall": 217688.7
+     },
+     {
+      "type": "say_resolved",
+      "index": 5,
+      "spoke": true,
+      "wall": 220746
+     },
+     {
+      "type": "say_call",
+      "index": 6,
+      "text": "His brothers laughed at him. \"Your work is too slow,\" they said.",
+      "wall": 220746
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 6,
+      "elapsedMs": 3529.7,
+      "audioSeconds": 4.2222,
+      "rtf": 0.836,
+      "headMs": 276.8,
+      "tailMs": 449,
+      "chars": 64,
+      "wall": 221218.4
+     },
+     {
+      "type": "generate_enter",
+      "chars": 78,
+      "text": "One evening, a hungry wolf came to the village. He knocked on the straw house.",
+      "wall": 221218.4
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 219.451791,
+      "ctxNow": 219.451791,
+      "durationS": 3.520454,
+      "wall": 221220.2
+     },
+     {
+      "type": "prefetch_result",
+      "index": 6,
+      "ok": true,
+      "wall": 221220.2
+     },
+     {
+      "type": "say_resolved",
+      "index": 6,
+      "spoke": true,
+      "wall": 224740.1
+     },
+     {
+      "type": "say_call",
+      "index": 7,
+      "text": "One evening, a hungry wolf came to the village. He knocked on the straw house.",
+      "wall": 224740.1
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 7,
+      "elapsedMs": 4495.2,
+      "audioSeconds": 5.0037,
+      "rtf": 0.898,
+      "headMs": 366.6,
+      "tailMs": 316.4,
+      "chars": 78,
+      "wall": 225713.6
+     },
+     {
+      "type": "generate_enter",
+      "chars": 75,
+      "text": "\"Little pig, little pig, let me come in!\" \"No, not by the hair on my chin!\"",
+      "wall": 225713.6
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 223.956463,
+      "ctxNow": 223.956463,
+      "durationS": 4.344649,
+      "wall": 225716.6
+     },
+     {
+      "type": "prefetch_result",
+      "index": 7,
+      "ok": true,
+      "wall": 225716.6
+     },
+     {
+      "type": "say_resolved",
+      "index": 7,
+      "spoke": true,
+      "wall": 230080.8
+     },
+     {
+      "type": "say_call",
+      "index": 8,
+      "text": "\"Little pig, little pig, let me come in!\" \"No, not by the hair on my chin!\"",
+      "wall": 230080.9
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 8,
+      "elapsedMs": 5089.6,
+      "audioSeconds": 6.1266,
+      "rtf": 0.831,
+      "headMs": 558.1,
+      "tailMs": 591.2,
+      "chars": 75,
+      "wall": 230803.2
+     },
+     {
+      "type": "generate_enter",
+      "chars": 80,
+      "text": "So the wolf blew the straw house down. The first pig ran to his brother's house.",
+      "wall": 230803.3
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 229.041633,
+      "ctxNow": 229.041633,
+      "durationS": 5.001293,
+      "wall": 230805.2
+     },
+     {
+      "type": "prefetch_result",
+      "index": 8,
+      "ok": true,
+      "wall": 230805.2
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 9,
+      "elapsedMs": 4257.1,
+      "audioSeconds": 4.8651,
+      "rtf": 0.875,
+      "headMs": 307.6,
+      "tailMs": 120.4,
+      "chars": 80,
+      "wall": 235060.4
+     },
+     {
+      "type": "prefetch_result",
+      "index": 9,
+      "ok": true,
+      "wall": 235060.9
+     },
+     {
+      "type": "say_resolved",
+      "index": 8,
+      "spoke": true,
+      "wall": 235815.8
+     },
+     {
+      "type": "say_call",
+      "index": 9,
+      "text": "So the wolf blew the straw house down. The first pig ran to his brother's house.",
+      "wall": 235815.8
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 234.057143,
+      "ctxNow": 234.057143,
+      "durationS": 4.461088,
+      "wall": 235817.8
+     },
+     {
+      "type": "generate_enter",
+      "chars": 109,
+      "text": "The afternoon heat empties the lanes for an hour. Only the tea stall stays open, and its radio keeps playing.",
+      "wall": 235818.4
+     },
+     {
+      "type": "say_resolved",
+      "index": 9,
+      "spoke": true,
+      "wall": 240297.6
+     },
+     {
+      "type": "scenario_end",
+      "wall": 240297.6
+     }
+    ],
+    "notes": [
+     "engine booted, speech={\"streamSentences\":true,\"streamMaxWords\":26,\"silenceScale\":0.4}",
+     "door=/features/neural-voice/fiezel-voice-say.js"
+    ],
+    "pcmMeta": [
+     {
+      "index": 0,
+      "text": "Once upon a time, there were three little pigs.",
+      "sampleRate": 44100,
+      "length": 137105,
+      "headMs": 378,
+      "tailMs": 268.4
+     },
+     {
+      "index": 1,
+      "text": "They left home to build their own houses.",
+      "sampleRate": 44100,
+      "length": 113503,
+      "headMs": 392.6,
+      "tailMs": 359.3
+     },
+     {
+      "index": 2,
+      "text": "The first pig was in a hurry. He built his house with straw.",
+      "sampleRate": 44100,
+      "length": 173620,
+      "headMs": 336.8,
+      "tailMs": 395.9
+     },
+     {
+      "index": 3,
+      "text": "It took him only one hour. The second pig built his house with sticks.",
+      "sampleRate": 44100,
+      "length": 206500,
+      "headMs": 354.7,
+      "tailMs": 327.5
+     },
+     {
+      "index": 4,
+      "text": "It took him one day. The third pig was slow and careful.",
+      "sampleRate": 44100,
+      "length": 173509,
+      "headMs": 255.5,
+      "tailMs": 281.6
+     },
+     {
+      "index": 5,
+      "text": "He built his house with bricks. It took him many weeks.",
+      "sampleRate": 44100,
+      "length": 162076,
+      "headMs": 401.2,
+      "tailMs": 249.1
+     },
+     {
+      "index": 6,
+      "text": "His brothers laughed at him. \"Your work is too slow,\" they said.",
+      "sampleRate": 44100,
+      "length": 186200,
+      "headMs": 276.8,
+      "tailMs": 449
+     },
+     {
+      "index": 7,
+      "text": "One evening, a hungry wolf came to the village. He knocked on the straw house.",
+      "sampleRate": 44100,
+      "length": 220661,
+      "headMs": 366.6,
+      "tailMs": 316.4
+     },
+     {
+      "index": 8,
+      "text": "\"Little pig, little pig, let me come in!\" \"No, not by the hair on my chin!\"",
+      "sampleRate": 44100,
+      "length": 270184,
+      "headMs": 558.1,
+      "tailMs": 591.2
+     },
+     {
+      "index": 9,
+      "text": "So the wolf blew the straw house down. The first pig ran to his brother's house.",
+      "sampleRate": 44100,
+      "length": 214552,
+      "headMs": 307.6,
+      "tailMs": 120.4
+     }
+    ],
+    "guardHits": []
+   }
+  },
+  "v7_pure_cover#2": {
+   "rule": "v7_pure_cover",
+   "repeat": 2,
+   "blockSizes": [
+    47,
+    41,
+    29,
+    30,
+    26,
+    43,
+    20,
+    35,
+    31,
+    23,
+    28,
+    35,
+    47,
+    30,
+    41,
+    33,
+    38,
+    41
+   ],
+   "metrics": {
+    "sayCalls": 18,
+    "renders": 18,
+    "audioSources": 18,
+    "firstSoundMs": 2625.3,
+    "meanSchedulingGapMs": 506.4,
+    "meanAudibleGapMs": 1144.0,
+    "maxAudibleGapMs": 2977.3,
+    "totalSpanS": 41.06,
+    "audioS": 32.45,
+    "silentShare": 0.2097,
+    "guardHits": [],
+    "boundaries": [
+     {
+      "boundary": "1->2",
+      "schedulingGapMs": 50.9,
+      "tailSilenceMs": 303.7,
+      "headSilenceMs": 237.9,
+      "audibleGapMs": 592.5
+     },
+     {
+      "boundary": "2->3",
+      "schedulingGapMs": 8.3,
+      "tailSilenceMs": 185.5,
+      "headSilenceMs": 290.7,
+      "audibleGapMs": 484.5
+     },
+     {
+      "boundary": "3->4",
+      "schedulingGapMs": 235.4,
+      "tailSilenceMs": 297,
+      "headSilenceMs": 319.8,
+      "audibleGapMs": 852.2
+     },
+     {
+      "boundary": "4->5",
+      "schedulingGapMs": 241.8,
+      "tailSilenceMs": 258.8,
+      "headSilenceMs": 261.2,
+      "audibleGapMs": 761.8
+     },
+     {
+      "boundary": "5->6",
+      "schedulingGapMs": 1089.3,
+      "tailSilenceMs": 229.6,
+      "headSilenceMs": 395.1,
+      "audibleGapMs": 1714.0
+     },
+     {
+      "boundary": "6->7",
+      "schedulingGapMs": 12.9,
+      "tailSilenceMs": 364.5,
+      "headSilenceMs": 128,
+      "audibleGapMs": 505.4
+     },
+     {
+      "boundary": "7->8",
+      "schedulingGapMs": 1210.5,
+      "tailSilenceMs": 266.9,
+      "headSilenceMs": 249.7,
+      "audibleGapMs": 1727.1
+     },
+     {
+      "boundary": "8->9",
+      "schedulingGapMs": 4.5,
+      "tailSilenceMs": 431.5,
+      "headSilenceMs": 237.4,
+      "audibleGapMs": 673.4
+     },
+     {
+      "boundary": "9->10",
+      "schedulingGapMs": 155.4,
+      "tailSilenceMs": 403.8,
+      "headSilenceMs": 232.7,
+      "audibleGapMs": 791.9
+     },
+     {
+      "boundary": "10->11",
+      "schedulingGapMs": 452.5,
+      "tailSilenceMs": 267.4,
+      "headSilenceMs": 238,
+      "audibleGapMs": 957.9
+     },
+     {
+      "boundary": "11->12",
+      "schedulingGapMs": 786.9,
+      "tailSilenceMs": 146.3,
+      "headSilenceMs": 354.5,
+      "audibleGapMs": 1287.7
+     },
+     {
+      "boundary": "12->13",
+      "schedulingGapMs": 890.9,
+      "tailSilenceMs": 343.2,
+      "headSilenceMs": 297.1,
+      "audibleGapMs": 1531.2
+     },
+     {
+      "boundary": "13->14",
+      "schedulingGapMs": 17.7,
+      "tailSilenceMs": 445,
+      "headSilenceMs": 326.3,
+      "audibleGapMs": 789.0
+     },
+     {
+      "boundary": "14->15",
+      "schedulingGapMs": 1939.3,
+      "tailSilenceMs": 520.5,
+      "headSilenceMs": 517.5,
+      "audibleGapMs": 2977.3
+     },
+     {
+      "boundary": "15->16",
+      "schedulingGapMs": 284.5,
+      "tailSilenceMs": 678,
+      "headSilenceMs": 456.1,
+      "audibleGapMs": 1418.6
+     },
+     {
+      "boundary": "16->17",
+      "schedulingGapMs": 617.9,
+      "tailSilenceMs": 386.2,
+      "headSilenceMs": 213.4,
+      "audibleGapMs": 1217.5
+     },
+     {
+      "boundary": "17->18",
+      "schedulingGapMs": 610.8,
+      "tailSilenceMs": 328.1,
+      "headSilenceMs": 226.3,
+      "audibleGapMs": 1165.2
+     }
+    ]
+   },
+   "dump": {
+    "events": [
+     {
+      "type": "scenario_start",
+      "scenario": "ramped_blocks_prefetch",
+      "sentences": 18,
+      "wall": 244018.8
+     },
+     {
+      "type": "say_call",
+      "index": 0,
+      "text": "Once upon a time, there were three little pigs.",
+      "wall": 244018.8
+     },
+     {
+      "type": "generate_enter",
+      "chars": 47,
+      "text": "Once upon a time, there were three little pigs.",
+      "wall": 244019.6
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 0,
+      "elapsedMs": 2622.4,
+      "audioSeconds": 3.109,
+      "rtf": 0.843,
+      "headMs": 302.7,
+      "tailMs": 303.7,
+      "chars": 47,
+      "wall": 246642
+     },
+     {
+      "type": "generate_enter",
+      "chars": 41,
+      "text": "They left home to build their own houses.",
+      "wall": 246642
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 244.877642,
+      "ctxNow": 244.877642,
+      "durationS": 2.526553,
+      "wall": 246644.1
+     },
+     {
+      "type": "say_resolved",
+      "index": 0,
+      "spoke": true,
+      "wall": 249179.7
+     },
+     {
+      "type": "say_call",
+      "index": 1,
+      "text": "They left home to build their own houses.",
+      "wall": 249179.7
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 1,
+      "elapsedMs": 2578,
+      "audioSeconds": 2.5738,
+      "rtf": 1.002,
+      "headMs": 237.9,
+      "tailMs": 185.5,
+      "chars": 41,
+      "wall": 249220.1
+     },
+     {
+      "type": "generate_enter",
+      "chars": 29,
+      "text": "The first pig was in a hurry.",
+      "wall": 249220.1
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 247.455057,
+      "ctxNow": 247.455057,
+      "durationS": 2.174331,
+      "wall": 249227
+     },
+     {
+      "type": "prefetch_result",
+      "index": 1,
+      "ok": true,
+      "wall": 249227.1
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 2,
+      "elapsedMs": 1801,
+      "audioSeconds": 2.0931,
+      "rtf": 0.86,
+      "headMs": 290.7,
+      "tailMs": 297,
+      "chars": 29,
+      "wall": 251021.2
+     },
+     {
+      "type": "prefetch_result",
+      "index": 2,
+      "ok": true,
+      "wall": 251021.4
+     },
+     {
+      "type": "say_resolved",
+      "index": 1,
+      "spoke": true,
+      "wall": 251396.4
+     },
+     {
+      "type": "say_call",
+      "index": 2,
+      "text": "The first pig was in a hurry.",
+      "wall": 251396.4
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 249.637732,
+      "ctxNow": 249.637732,
+      "durationS": 1.529297,
+      "wall": 251397.6
+     },
+     {
+      "type": "generate_enter",
+      "chars": 30,
+      "text": "He built his house with straw.",
+      "wall": 251398.4
+     },
+     {
+      "type": "say_resolved",
+      "index": 2,
+      "spoke": true,
+      "wall": 252929.2
+     },
+     {
+      "type": "say_call",
+      "index": 3,
+      "text": "He built his house with straw.",
+      "wall": 252929.2
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 3,
+      "elapsedMs": 1783.2,
+      "audioSeconds": 2.0775,
+      "rtf": 0.858,
+      "headMs": 319.8,
+      "tailMs": 258.8,
+      "chars": 30,
+      "wall": 253181.7
+     },
+     {
+      "type": "generate_enter",
+      "chars": 26,
+      "text": "It took him only one hour.",
+      "wall": 253181.7
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 251.402449,
+      "ctxNow": 251.402449,
+      "durationS": 1.522948,
+      "wall": 253183
+     },
+     {
+      "type": "prefetch_result",
+      "index": 3,
+      "ok": true,
+      "wall": 253183
+     },
+     {
+      "type": "say_resolved",
+      "index": 3,
+      "spoke": true,
+      "wall": 254693.5
+     },
+     {
+      "type": "say_call",
+      "index": 4,
+      "text": "It took him only one hour.",
+      "wall": 254693.5
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 4,
+      "elapsedMs": 1745.4,
+      "audioSeconds": 1.9085,
+      "rtf": 0.915,
+      "headMs": 261.2,
+      "tailMs": 229.6,
+      "chars": 26,
+      "wall": 254927.2
+     },
+     {
+      "type": "generate_enter",
+      "chars": 43,
+      "text": "The second pig built his house with sticks.",
+      "wall": 254927.2
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 253.167166,
+      "ctxNow": 253.167166,
+      "durationS": 1.441701,
+      "wall": 254928.8
+     },
+     {
+      "type": "prefetch_result",
+      "index": 4,
+      "ok": true,
+      "wall": 254928.8
+     },
+     {
+      "type": "say_resolved",
+      "index": 4,
+      "spoke": true,
+      "wall": 256389
+     },
+     {
+      "type": "say_call",
+      "index": 5,
+      "text": "The second pig built his house with sticks.",
+      "wall": 256389
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 5,
+      "elapsedMs": 2543.5,
+      "audioSeconds": 2.8589,
+      "rtf": 0.89,
+      "headMs": 395.1,
+      "tailMs": 364.5,
+      "chars": 43,
+      "wall": 257470.9
+     },
+     {
+      "type": "generate_enter",
+      "chars": 20,
+      "text": "It took him one day.",
+      "wall": 257470.9
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 255.698141,
+      "ctxNow": 255.698141,
+      "durationS": 2.123311,
+      "wall": 257472.9
+     },
+     {
+      "type": "prefetch_result",
+      "index": 5,
+      "ok": true,
+      "wall": 257472.9
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 6,
+      "elapsedMs": 1658.6,
+      "audioSeconds": 1.5985,
+      "rtf": 1.038,
+      "headMs": 128,
+      "tailMs": 266.9,
+      "chars": 20,
+      "wall": 259129.6
+     },
+     {
+      "type": "prefetch_result",
+      "index": 6,
+      "ok": true,
+      "wall": 259129.9
+     },
+     {
+      "type": "say_resolved",
+      "index": 5,
+      "spoke": true,
+      "wall": 259593
+     },
+     {
+      "type": "say_call",
+      "index": 6,
+      "text": "It took him one day.",
+      "wall": 259593
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 257.834376,
+      "ctxNow": 257.834376,
+      "durationS": 1.227619,
+      "wall": 259594.1
+     },
+     {
+      "type": "generate_enter",
+      "chars": 35,
+      "text": "The third pig was slow and careful.",
+      "wall": 259594.6
+     },
+     {
+      "type": "say_resolved",
+      "index": 6,
+      "spoke": true,
+      "wall": 260823.5
+     },
+     {
+      "type": "say_call",
+      "index": 7,
+      "text": "The third pig was slow and careful.",
+      "wall": 260823.6
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 7,
+      "elapsedMs": 2446.5,
+      "audioSeconds": 2.4638,
+      "rtf": 0.993,
+      "headMs": 249.7,
+      "tailMs": 431.5,
+      "chars": 35,
+      "wall": 262041.1
+     },
+     {
+      "type": "generate_enter",
+      "chars": 31,
+      "text": "He built his house with bricks.",
+      "wall": 262041.1
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 260.272472,
+      "ctxNow": 260.272472,
+      "durationS": 1.806667,
+      "wall": 262042.5
+     },
+     {
+      "type": "prefetch_result",
+      "index": 7,
+      "ok": true,
+      "wall": 262042.5
+     },
+     {
+      "type": "say_resolved",
+      "index": 7,
+      "spoke": true,
+      "wall": 263842.3
+     },
+     {
+      "type": "say_call",
+      "index": 8,
+      "text": "He built his house with bricks.",
+      "wall": 263842.4
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 8,
+      "elapsedMs": 1815.2,
+      "audioSeconds": 2.1569,
+      "rtf": 0.842,
+      "headMs": 237.4,
+      "tailMs": 403.8,
+      "chars": 31,
+      "wall": 263856.4
+     },
+     {
+      "type": "generate_enter",
+      "chars": 23,
+      "text": "It took him many weeks.",
+      "wall": 263856.4
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 262.083628,
+      "ctxNow": 262.083628,
+      "durationS": 1.539683,
+      "wall": 263857.8
+     },
+     {
+      "type": "prefetch_result",
+      "index": 8,
+      "ok": true,
+      "wall": 263857.9
+     },
+     {
+      "type": "say_resolved",
+      "index": 8,
+      "spoke": true,
+      "wall": 265398
+     },
+     {
+      "type": "say_call",
+      "index": 9,
+      "text": "It took him many weeks.",
+      "wall": 265398
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 9,
+      "elapsedMs": 1703.3,
+      "audioSeconds": 1.7883,
+      "rtf": 0.952,
+      "headMs": 232.7,
+      "tailMs": 267.4,
+      "chars": 23,
+      "wall": 265559.7
+     },
+     {
+      "type": "generate_enter",
+      "chars": 28,
+      "text": "His brothers laughed at him.",
+      "wall": 265559.7
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 263.778685,
+      "ctxNow": 263.778685,
+      "durationS": 1.312245,
+      "wall": 265560.8
+     },
+     {
+      "type": "prefetch_result",
+      "index": 9,
+      "ok": true,
+      "wall": 265560.8
+     },
+     {
+      "type": "say_resolved",
+      "index": 9,
+      "spoke": true,
+      "wall": 266860.8
+     },
+     {
+      "type": "say_call",
+      "index": 10,
+      "text": "His brothers laughed at him.",
+      "wall": 266860.8
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 10,
+      "elapsedMs": 1753.3,
+      "audioSeconds": 2.0115,
+      "rtf": 0.872,
+      "headMs": 238,
+      "tailMs": 146.3,
+      "chars": 28,
+      "wall": 267313.1
+     },
+     {
+      "type": "generate_enter",
+      "chars": 35,
+      "text": "\"Your work is too slow,\" they said.",
+      "wall": 267313.1
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 265.543401,
+      "ctxNow": 265.543401,
+      "durationS": 1.651156,
+      "wall": 267314.5
+     },
+     {
+      "type": "prefetch_result",
+      "index": 10,
+      "ok": true,
+      "wall": 267314.5
+     },
+     {
+      "type": "say_resolved",
+      "index": 10,
+      "spoke": true,
+      "wall": 268974.2
+     },
+     {
+      "type": "say_call",
+      "index": 11,
+      "text": "\"Your work is too slow,\" they said.",
+      "wall": 268974.2
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 11,
+      "elapsedMs": 2434.9,
+      "audioSeconds": 2.3834,
+      "rtf": 1.022,
+      "headMs": 354.5,
+      "tailMs": 343.2,
+      "chars": 35,
+      "wall": 269748
+     },
+     {
+      "type": "generate_enter",
+      "chars": 47,
+      "text": "One evening, a hungry wolf came to the village.",
+      "wall": 269748
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 267.981497,
+      "ctxNow": 267.981497,
+      "durationS": 1.709773,
+      "wall": 269749.4
+     },
+     {
+      "type": "prefetch_result",
+      "index": 11,
+      "ok": true,
+      "wall": 269749.6
+     },
+     {
+      "type": "say_resolved",
+      "index": 11,
+      "spoke": true,
+      "wall": 271458.6
+     },
+     {
+      "type": "say_call",
+      "index": 12,
+      "text": "One evening, a hungry wolf came to the village.",
+      "wall": 271458.6
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 12,
+      "elapsedMs": 2613,
+      "audioSeconds": 3.1849,
+      "rtf": 0.82,
+      "headMs": 297.1,
+      "tailMs": 445,
+      "chars": 47,
+      "wall": 272361
+     },
+     {
+      "type": "generate_enter",
+      "chars": 30,
+      "text": "He knocked on the straw house.",
+      "wall": 272361
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 270.582132,
+      "ctxNow": 270.582132,
+      "durationS": 2.466803,
+      "wall": 272362.9
+     },
+     {
+      "type": "prefetch_result",
+      "index": 12,
+      "ok": true,
+      "wall": 272363
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 13,
+      "elapsedMs": 1782,
+      "audioSeconds": 2.111,
+      "rtf": 0.844,
+      "headMs": 326.3,
+      "tailMs": 520.5,
+      "chars": 30,
+      "wall": 274143.1
+     },
+     {
+      "type": "prefetch_result",
+      "index": 13,
+      "ok": true,
+      "wall": 274143.4
+     },
+     {
+      "type": "say_resolved",
+      "index": 12,
+      "spoke": true,
+      "wall": 274825.3
+     },
+     {
+      "type": "say_call",
+      "index": 13,
+      "text": "He knocked on the straw house.",
+      "wall": 274825.3
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 273.066667,
+      "ctxNow": 273.066667,
+      "durationS": 1.288231,
+      "wall": 274826.5
+     },
+     {
+      "type": "generate_enter",
+      "chars": 41,
+      "text": "\"Little pig, little pig, let me come in!\"",
+      "wall": 274826.9
+     },
+     {
+      "type": "say_resolved",
+      "index": 13,
+      "spoke": true,
+      "wall": 276125.7
+     },
+     {
+      "type": "say_call",
+      "index": 14,
+      "text": "\"Little pig, little pig, let me come in!\"",
+      "wall": 276125.7
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 14,
+      "elapsedMs": 3228.1,
+      "audioSeconds": 3.4179,
+      "rtf": 0.944,
+      "headMs": 517.5,
+      "tailMs": 678,
+      "chars": 41,
+      "wall": 278055.1
+     },
+     {
+      "type": "generate_enter",
+      "chars": 33,
+      "text": "\"No, not by the hair on my chin!\"",
+      "wall": 278055.1
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 276.29424,
+      "ctxNow": 276.29424,
+      "durationS": 2.246463,
+      "wall": 278056.4
+     },
+     {
+      "type": "prefetch_result",
+      "index": 14,
+      "ok": true,
+      "wall": 278056.4
+     },
+     {
+      "type": "say_resolved",
+      "index": 14,
+      "spoke": true,
+      "wall": 280305.6
+     },
+     {
+      "type": "say_call",
+      "index": 15,
+      "text": "\"No, not by the hair on my chin!\"",
+      "wall": 280305.6
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 15,
+      "elapsedMs": 2545.6,
+      "audioSeconds": 2.7314,
+      "rtf": 0.932,
+      "headMs": 456.1,
+      "tailMs": 386.2,
+      "chars": 33,
+      "wall": 280600.7
+     },
+     {
+      "type": "generate_enter",
+      "chars": 38,
+      "text": "So the wolf blew the straw house down.",
+      "wall": 280600.8
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 278.825215,
+      "ctxNow": 278.825215,
+      "durationS": 1.913061,
+      "wall": 280602.5
+     },
+     {
+      "type": "prefetch_result",
+      "index": 15,
+      "ok": true,
+      "wall": 280602.5
+     },
+     {
+      "type": "say_resolved",
+      "index": 15,
+      "spoke": true,
+      "wall": 282514
+     },
+     {
+      "type": "say_call",
+      "index": 16,
+      "text": "So the wolf blew the straw house down.",
+      "wall": 282514
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 16,
+      "elapsedMs": 2522.1,
+      "audioSeconds": 2.4608,
+      "rtf": 1.025,
+      "headMs": 213.4,
+      "tailMs": 328.1,
+      "chars": 38,
+      "wall": 283122.9
+     },
+     {
+      "type": "generate_enter",
+      "chars": 41,
+      "text": "The first pig ran to his brother's house.",
+      "wall": 283122.9
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 281.35619,
+      "ctxNow": 281.35619,
+      "durationS": 1.943379,
+      "wall": 283127.1
+     },
+     {
+      "type": "prefetch_result",
+      "index": 16,
+      "ok": true,
+      "wall": 283127.2
+     },
+     {
+      "type": "say_resolved",
+      "index": 16,
+      "spoke": true,
+      "wall": 285066
+     },
+     {
+      "type": "say_call",
+      "index": 17,
+      "text": "The first pig ran to his brother's house.",
+      "wall": 285066
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 17,
+      "elapsedMs": 2562.1,
+      "audioSeconds": 2.5485,
+      "rtf": 1.005,
+      "headMs": 226.3,
+      "tailMs": 323.6,
+      "chars": 41,
+      "wall": 285685.1
+     },
+     {
+      "type": "generate_enter",
+      "chars": 109,
+      "text": "The afternoon heat empties the lanes for an hour. Only the tea stall stays open, and its radio keeps playing.",
+      "wall": 285685.1
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 283.910385,
+      "ctxNow": 283.910385,
+      "durationS": 2.022608,
+      "wall": 285688.5
+     },
+     {
+      "type": "prefetch_result",
+      "index": 17,
+      "ok": true,
+      "wall": 285688.5
+     },
+     {
+      "type": "say_resolved",
+      "index": 17,
+      "spoke": true,
+      "wall": 287712.7
+     },
+     {
+      "type": "scenario_end",
+      "wall": 287712.7
+     }
+    ],
+    "notes": [
+     "engine booted, speech={\"streamSentences\":true,\"streamMaxWords\":26,\"silenceScale\":0.4}",
+     "door=/features/neural-voice/fiezel-voice-say.js"
+    ],
+    "pcmMeta": [
+     {
+      "index": 0,
+      "text": "Once upon a time, there were three little pigs.",
+      "sampleRate": 44100,
+      "length": 137105,
+      "headMs": 302.7,
+      "tailMs": 303.7
+     },
+     {
+      "index": 1,
+      "text": "They left home to build their own houses.",
+      "sampleRate": 44100,
+      "length": 113503,
+      "headMs": 237.9,
+      "tailMs": 185.5
+     },
+     {
+      "index": 2,
+      "text": "The first pig was in a hurry.",
+      "sampleRate": 44100,
+      "length": 92304,
+      "headMs": 290.7,
+      "tailMs": 297
+     },
+     {
+      "index": 3,
+      "text": "He built his house with straw.",
+      "sampleRate": 44100,
+      "length": 91619,
+      "headMs": 319.8,
+      "tailMs": 258.8
+     },
+     {
+      "index": 4,
+      "text": "It took him only one hour.",
+      "sampleRate": 44100,
+      "length": 84167,
+      "headMs": 261.2,
+      "tailMs": 229.6
+     },
+     {
+      "index": 5,
+      "text": "The second pig built his house with sticks.",
+      "sampleRate": 44100,
+      "length": 126078,
+      "headMs": 395.1,
+      "tailMs": 364.5
+     },
+     {
+      "index": 6,
+      "text": "It took him one day.",
+      "sampleRate": 44100,
+      "length": 70494,
+      "headMs": 128,
+      "tailMs": 266.9
+     },
+     {
+      "index": 7,
+      "text": "The third pig was slow and careful.",
+      "sampleRate": 44100,
+      "length": 108654,
+      "headMs": 249.7,
+      "tailMs": 431.5
+     },
+     {
+      "index": 8,
+      "text": "He built his house with bricks.",
+      "sampleRate": 44100,
+      "length": 95119,
+      "headMs": 237.4,
+      "tailMs": 403.8
+     },
+     {
+      "index": 9,
+      "text": "It took him many weeks.",
+      "sampleRate": 44100,
+      "length": 78866,
+      "headMs": 232.7,
+      "tailMs": 267.4
+     },
+     {
+      "index": 10,
+      "text": "His brothers laughed at him.",
+      "sampleRate": 44100,
+      "length": 88706,
+      "headMs": 238,
+      "tailMs": 146.3
+     },
+     {
+      "index": 11,
+      "text": "\"Your work is too slow,\" they said.",
+      "sampleRate": 44100,
+      "length": 105110,
+      "headMs": 354.5,
+      "tailMs": 343.2
+     },
+     {
+      "index": 12,
+      "text": "One evening, a hungry wolf came to the village.",
+      "sampleRate": 44100,
+      "length": 140455,
+      "headMs": 297.1,
+      "tailMs": 445
+     },
+     {
+      "index": 13,
+      "text": "He knocked on the straw house.",
+      "sampleRate": 44100,
+      "length": 93097,
+      "headMs": 326.3,
+      "tailMs": 520.5
+     },
+     {
+      "index": 14,
+      "text": "\"Little pig, little pig, let me come in!\"",
+      "sampleRate": 44100,
+      "length": 150730,
+      "headMs": 517.5,
+      "tailMs": 678
+     },
+     {
+      "index": 15,
+      "text": "\"No, not by the hair on my chin!\"",
+      "sampleRate": 44100,
+      "length": 120453,
+      "headMs": 456.1,
+      "tailMs": 386.2
+     },
+     {
+      "index": 16,
+      "text": "So the wolf blew the straw house down.",
+      "sampleRate": 44100,
+      "length": 108523,
+      "headMs": 213.4,
+      "tailMs": 328.1
+     },
+     {
+      "index": 17,
+      "text": "The first pig ran to his brother's house.",
+      "sampleRate": 44100,
+      "length": 112388,
+      "headMs": 226.3,
+      "tailMs": 323.6
+     }
+    ],
+    "guardHits": []
+   }
+  }
+ },
+ "bootSeconds": 1.76
+}

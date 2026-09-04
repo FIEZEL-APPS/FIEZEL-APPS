@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=390, initial-scale=1">
+<title>FIEZEL — Vocabulary · Flashcard (Rebrand C)</title>
+<link rel="stylesheet" href="c.css">
+</head>
+<body>
+
+  <!-- ============ TOPBAR ============ -->
+  <header class="topbar">
+    <div class="wordmark" role="img" aria-label="FIEZEL">
+      <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true">
+        <rect width="30" height="30" rx="9" fill="#FFC700"/>
+        <rect x="9" y="7" width="4.2" height="16" rx="2.1" fill="#241A11"/>
+        <rect x="9" y="7" width="13" height="4.2" rx="2.1" fill="#241A11"/>
+        <rect x="9" y="13.5" width="10" height="4.2" rx="2.1" fill="#241A11"/>
+      </svg>
+      <span style="font-size:17px;font-weight:700;letter-spacing:.08em">FIEZEL</span>
+    </div>
+    <div class="topbar-spacer"></div>
+    <button class="btn-ask" type="button">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12h2"/><path d="M6 8v8"/><path d="M10 5v14"/><path d="M14 8v8"/><path d="M18 10v4"/><path d="M22 12h-2"/></svg>
+      Tanya FIEZEL?
+    </button>
+    <button class="icon-btn" type="button" aria-label="Pengaturan">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+    </button>
+  </header>
+
+  <!-- ============ KONTEKS DECK ============ -->
+  <div class="context-strip">
+    <button class="chip-back" type="button">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+      Vocabulary
+    </button>
+    <span class="context-meta">Kartu <b>12/310</b></span>
+  </div>
+
+  <main class="main">
+    <!-- Progress deck -->
+    <div class="deck-progress">
+      <div class="dp-row">
+        <span class="dp-label">Deck A2 · sesi hari ini</span>
+        <span class="dp-count">12 dari 310</span>
+      </div>
+      <div class="dp-track" role="progressbar" aria-valuenow="12" aria-valuemin="0" aria-valuemax="310" aria-label="Progres deck">
+        <div class="dp-fill" style="width:18%"></div>
+      </div>
+    </div>
+
+    <!-- ============ FLASHCARD: SISI DEPAN ============ -->
+    <section class="flashcard front" aria-label="Flashcard sisi depan">
+      <span class="side-tag">Depan</span>
+      <div class="chips-row">
+        <span class="chip chip-level">A2</span>
+        <!-- FIX AUDIT: dulu bocor kunci internal "PARTOFSPEECH" → label manusiawi -->
+        <span class="chip chip-cat">Kelas kata · <b>Kata benda</b></span>
+      </div>
+      <h1 class="word">cricket</h1>
+      <p class="ipa">/ˈkrɪkɪt/</p>
+      <p class="flip-hint">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+        Ketuk kartu untuk membalik
+      </p>
+    </section>
+
+    <!-- ============ FLASHCARD: SISI BELAKANG (state flip) ============ -->
+    <section class="flashcard back-card" aria-label="Flashcard sisi belakang">
+      <span class="side-tag">Belakang</span>
+      <div class="chips-row">
+        <span class="chip chip-cat">Kelas kata · <b>Kata benda</b></span>
+        <span class="chip chip-status">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/></svg>
+          Kata baru
+        </span>
+      </div>
+      <p class="meaning">jangkrik</p>
+      <p class="example">“I heard a <b>cricket</b> singing outside my window.”<br>Aku dengar jangkrik bernyanyi di luar jendelaku.</p>
+    </section>
+
+    <!-- Aksi kartu -->
+    <div class="vocab-actions">
+      <button class="btn-pill" type="button">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg>
+        Dengar kata
+      </button>
+      <button class="btn-pill" type="button">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M2 12h2"/><path d="M6 8v8"/><path d="M10 5v14"/><path d="M14 8v8"/><path d="M18 10v4"/><path d="M22 12h-2"/></svg>
+        Dengar kalimat
+      </button>
+      <button class="btn-pill ai" type="button">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z"/></svg>
+        Tanya AI
+      </button>
+    </div>
+
+    <p class="swipe-hint">Geser ke kiri atau kanan untuk berpindah kartu</p>
+  </main>
+
+  <!-- Maskot: slot dock khusus, tidak menutupi konten interaktif -->
+  <div class="mascot-dock" aria-hidden="true">
+    <div class="coach-bubble">Review dulu yang hampir lupa, baru tambah baru.</div>
+    <div class="paw">
+      <svg viewBox="36 -18 248 232">
+        <path d="M76 66 L 95 0 L 140 34 Z" fill="#FFD94F"/>
+        <path d="M90 52 L 101 17 L 125 35 Z" fill="#8C2233"/>
+        <path d="M244 66 L 225 0 L 180 34 Z" fill="#FFD94F"/>
+        <path d="M230 52 L 219 17 L 195 35 Z" fill="#8C2233"/>
+        <circle cx="160" cy="106" r="88" fill="#FFD94F"/>
+        <ellipse cx="160" cy="140" rx="36" ry="25" fill="#FFF4DA"/>
+        <path d="M153 126 L 167 126 L 160 136 Z" fill="#8C2233"/>
+        <circle cx="102" cy="126" r="11" fill="#F0A0AC"/>
+        <circle cx="218" cy="126" r="11" fill="#F0A0AC"/>
+        <g><circle cx="126" cy="98" r="14.5" fill="#33201F"/><circle cx="130" cy="93" r="5" fill="#fff"/><circle cx="122" cy="103" r="2.6" fill="#fff" opacity=".7"/></g>
+        <g><circle cx="194" cy="98" r="14.5" fill="#33201F"/><circle cx="198" cy="93" r="5" fill="#fff"/><circle cx="190" cy="103" r="2.6" fill="#fff" opacity=".7"/></g>
+        <path d="M148 148 C 154 155 166 155 172 148" stroke="#33201F" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- ============ BOTTOM NAV ============ -->
+  <nav class="bottom-nav" aria-label="Navigasi utama">
+    <a class="nav-item" href="#">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Home
+    </a>
+    <a class="nav-item active" href="#" aria-current="page">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="m9 16 3-8 3 8"/><path d="M10.2 13.5h3.6"/></svg>
+      Vocab
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 9h8"/><path d="M8 13h5"/></svg>
+      Grammar
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      Reading
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+      Peta
+    </a>
+  </nav>
+
+</body>
+</html>

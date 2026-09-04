@@ -1,0 +1,33 @@
+# FIEZEL M025-223 — Neural Voice Gapless Pipeline Handoff
+
+**Handoff version:** 1.0
+**Target Build:** m025-223 / m025-225
+**Fitur:** Neural Voice Gapless Pipeline & Backpressure Repair
+
+---
+
+## 1. Ringkasan Perubahan
+
+Perbaikan pada jalur pemutaran suara neural (eatures/neural-voice/fiezel-web-audio-player.js, iezel-voice-say.js, dan oice-pipeline-gap-test.js):
+
+1. **Backpressure & PlaySequence Underrun Fix**:
+   - Menghilangkan celah keheningan tak disengaja di antara potongan audio (*PCM transient discontinuities*).
+   - Penjadwalan segmen audio dengan waktu presisi menggunakan Web Audio API AudioContext.currentTime cursor.
+   - Pipa pemutaran multi-chunk yang mengisi diri secara asinkron sebelum buffer habis (*lookahead generation*).
+
+2. **Pengondisian Sinyal Bersih**:
+   - Pemangkasan keheningan di kepala dan ekor potongan (*trim silence*).
+   - Pemeliharaan jeda prosodi alami antar batas tanda baca (koma, titik, paragraf).
+   - Pencegahan *underrun* pada latensi inferensi variabel.
+
+3. **Verifikasi Gerbang**:
+   - Gerbang oice-pipeline-gap-test.js diperkuat (36/36 invariant PASS).
+   - oice-fallback-chain-test.js dan oice-offline-fallback-test.js lulus 100%.
+
+---
+
+## 2. Poin Penting untuk Sesi Berikutnya
+
+- **AudioContext Singleton**: Selalu gunakan satu instans AudioContext bersama yang diaktivasi melalui *user gesture* resmi.
+- **Fail-closed Fallback**: Jika sintesis neural lokal belum siap atau gagal, alihkan dengan tenang ke cadangan (Puter TTS -> browser SpeechSynthesis) tanpa melempar galat ke antarmuka murid.
+- **Precache Integrity**: Semua berkas suara dan pembungkus diagnostik wajib terdaftar di sw.js precache list.

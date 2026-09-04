@@ -50,7 +50,7 @@ function makeSandbox(options) {
       createElement: makeElement,
       addEventListener() {}
     },
-    location: { origin: 'https://fitrajft-ux.github.io', href: 'https://fitrajft-ux.github.io/FIEZEL-APPS/' },
+    location: { origin: 'https://fiezel-apps.github.io', href: 'https://fiezel-apps.github.io/FIEZEL-APPS/' },
     navigator: options.navigator !== undefined ? options.navigator : { userAgent: 'test-ua' },
     localStorage: {
       getItem(key) { return Object.prototype.hasOwnProperty.call(store, key) ? store[key] : null; }
@@ -193,6 +193,26 @@ async function main() {
     check('hanya satu host di body',
       body.children.filter(c => c.id === 'fiezelDiagHost').length === 1,
       String(body.children.length));
+  }
+
+  console.log('\nkasus 5 — m025-124: panelnya bisa digulir, dan bank tombol basi tidak kembali');
+  {
+    // OWNER: "PANELNYA PENUH, DAN GA BISA DI GERAKIN ATAU DI SCROLL SAMA SEKALI".
+    // Sebabnya aritmetika flexbox: kolom setinggi layar tanpa overflow, dengan textarea
+    // flex:1 yang menyusut sampai nyaris nol begitu isi di atasnya melebihi layar. Kedua
+    // sisi perbaikannya dijaga, karena memperbaiki satu saja tidak menyelesaikan apa pun.
+    check('sheet diagnostik menggulir sendiri',
+      /#fiezelDiagSheet\{[^]*?overflow-y:auto/.test(SOURCE) || SOURCE.indexOf('overflow-y:auto;-webkit-overflow-scrolling:touch') !== -1,
+      'sheet tanpa overflow: isi yang melebihi layar terpotong tanpa jalan menggulirnya');
+    check('kotak diagnostik berhenti menyusut sampai nol',
+      SOURCE.indexOf('min-height:46vh') !== -1,
+      'textarea masih flex:1 dengan min-height:0, jadi ia yang mengorbankan diri lebih dulu');
+    check('bank tombol PCM dan LANGKAH tidak kembali',
+      !/PCM: NADA UJI|LANGKAH: 16|setPcmDiagnosticMode\(mode/.test(SOURCE),
+      'tombol penyelidikan m025-64..72 hidup lagi dan memenuhi seluruh layar panel');
+    check('sisa setelan uji lama dibersihkan, bukan ditinggal tanpa jalan keluar',
+      SOURCE.indexOf("setPcmDiagnosticMode('', root)") !== -1 && SOURCE.indexOf('setDenoiseSteps(0, root)') !== -1,
+      'tombolnya hilang tanpa ada yang mematikan arm yang tersimpan di localStorage');
   }
 
   console.log('');

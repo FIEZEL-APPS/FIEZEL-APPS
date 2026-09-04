@@ -25,12 +25,12 @@
     <div class="brand">FIE<span>ZEL</span> · Creator Hub</div>
     <section class="panel">
       <div class="kicker">ONE-CLICK SECURE SETUP</div>
-      <h1>Aktifkan laporan Jahran.</h1>
+      <h1>Aktifkan laporan belajar murid.</h1>
       <p class="lead">Halaman ini memasang Puter Worker milik creator, mengunci penyimpanan laporan di akun creator, lalu menyambungkan endpoint ke FIEZEL pada perangkat ini. Tidak ada API key atau password yang ditaruh di source code.</p>
       <div class="steps">
         <div class="step"><b>01 · Login creator</b><span>Puter mengingat sesi browser. Login tidak diminta di setiap kunjungan.</span></div>
         <div class="step"><b>02 · Deploy Worker</b><span>Collector tervalidasi disimpan sebagai resource milik creator.</span></div>
-        <div class="step"><b>03 · Consent Jahran</b><span>Aktifkan persetujuan dari Settings FIEZEL sebelum laporan dikirim.</span></div>
+        <div class="step"><b>03 · Consent murid</b><span>Aktifkan persetujuan dari Settings FIEZEL sebelum laporan dikirim.</span></div>
       </div>
       <button type="button" id="deploy">Pasang Creator Hub</button>
       <div id="status" class="status" role="status" aria-live="polite"></div>
@@ -58,7 +58,7 @@
       function saveEndpoint(url){
         var current={};
         try{current=JSON.parse(localStorage.getItem('fiezel-v4-state')||'{}')}catch{}
-        current.preferences=Object.assign({haptics:true,soundtrack:true,motion:true,reportConsent:false},current.preferences||{},{reportEndpoint:url});
+        current.preferences=Object.assign({haptics:true,motion:true,reportConsent:false},current.preferences||{},{reportEndpoint:url});
         current.reportMeta=Object.assign({lastSentAnswered:0,lastSentAt:0,lastStatus:'not_configured',lastReceipt:'',lastAccessReportDay:'',queue:[]},current.reportMeta||{},{lastStatus:'ready'});
         localStorage.setItem('fiezel-v4-state',JSON.stringify(current));
         localStorage.setItem('fiezel-creator-endpoint',url);

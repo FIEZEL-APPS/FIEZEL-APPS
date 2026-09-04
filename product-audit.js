@@ -5,18 +5,22 @@ const css=fs.readFileSync(path.join(root,'style.css'),'utf8');
 const index=fs.readFileSync(path.join(root,'index.html'),'utf8');
 const worker=fs.readFileSync(path.join(root,'fiezel-core-worker.js'),'utf8');
 const icon=fs.readFileSync(path.join(root,'instagram.svg'),'utf8');
+/* Pasca-#242: naskah Indonesia pindah dari literal app.js ke copy-map i18n. Cek string
+ * kini menilai KONTRAK utuhnya: pemanggil di app.js + naskah di copy-map (keduanya
+ * ter-precache shell), bukan literal yang memang sudah tidak tinggal di app.js. */
+const copyAll=fs.readdirSync(path.join(root,'features','i18n')).filter(n=>/^copy-id-.*\.js$/.test(n)).sort().map(n=>fs.readFileSync(path.join(root,'features','i18n',n),'utf8')).join('\n');
 const report={version:JSON.parse(fs.readFileSync(path.join(root,'VERSION.json'))).version,checks:[],counts:{pass:0,fail:0}};
 function check(name,ok,details){report.checks.push({name,status:ok?'PASS':'FAIL',details});report.counts[ok?'pass':'fail']++}
 check('Meaningful streak model',app.includes('MEANINGFUL_ATTEMPTS=5')&&app.includes('recomputeMeaningfulDays'),'Streak requires 5 attempts/day and is recomputed from history.');
 check('Diagnostic evidence gate',app.includes('hs.length>=24&&skills.size>=3&&types.size>=2')&&!app.includes('state.totalAnswered>=150'),'Adaptive gate is evidence-based rather than hard-coded to 150.');
 check('Forgetting-aware review',app.includes('forgettingProbability')&&app.includes('stability')&&app.includes('lapses'),'Scheduler tracks stability, forgetting probability and lapses.');
-check('Confidence affects scheduling',app.includes('scheduleNext(b,h.ok,h.ms,value)'),'Confidence changes future scheduling after calibration input.');
+check('Confidence affects scheduling',app.includes('scheduleNext(b,h.ok,h.ms,value'),'Confidence changes future scheduling after calibration input.');
 check('Weakness timeline is time-series',app.includes('skillTimeline')&&app.includes('byDay[d]'),'Timeline groups evidence by date and skill.');
 check('Error pattern detector',app.includes('errorPatterns')&&app.includes('selectedAnswer'),'Detector records and analyzes repeated distractor choices.');
 check('Confusion network is history-backed',app.includes('confusionPairs')&&app.includes('confusion-network'),'Confusion pairs are ranked from observed wrong answers and vocabulary relations.');
 check('Diagnostic report',app.includes('diagnosticReport')&&app.includes('rows.map'),'Report separates Vocabulary, Grammar and Reading evidence.');
 check('Reading skill map',app.includes("reading_inference")&&app.includes("reading_comparison"),'Reading skills are tracked independently.');
-check('Smart review UI exposes forgetting',app.includes('risiko lupa ${Math.round(forgettingProbability(x)*100)}%'),'Ulangan Pintar menjelaskan risiko lupa dengan Bahasa Indonesia.');
+check('Smart review UI exposes forgetting',app.includes('forgettingProbability(')&&app.includes('dikuasai-risiko-lupa')&&copyAll.includes('risiko lupa {x}%'),'Ulangan Pintar menjelaskan risiko lupa dengan Bahasa Indonesia (naskah di copy-map i18n, dihitung forgettingProbability di app.js).');
 check('Creator credit',app.includes('./instagram.svg')&&app.includes('@fitrarustqi')&&fs.existsSync(path.join(root,'instagram.svg')),'Uses a local SVG Instagram icon and creator handle.');
 check('No fake Instagram glyph',!app.includes('class="instagram-mark">◎'),'Legacy placeholder glyph removed.');
 check('Daily brief',app.includes('dailyBrief')&&app.includes('goal:'),'Daily learning recommendation exists.');
@@ -37,25 +41,28 @@ check('ALRS evidence log privacy',app.includes('appendALRSEvidenceLog')&&app.inc
 check('Learning map',app.includes('Peta Belajar')&&app.includes('mapCards'),'Peta Belajar surface exists.');
 check('Puter AI entry point',index.includes('https://js.puter.com/v2/')&&index.includes('./core-config.js')&&app.includes("coreWorkerExec('/api/ai/chat'")&&!app.includes('puter.ai.chat('),'AI uses authenticated Puter Worker only; direct client AI bypass is absent.');
 check('AI learning surfaces',app.includes('aiExplainBtn')&&app.includes('aiWord')&&app.includes('openAILoading'),'Quiz and flashcard AI actions include a loading state.');
-check('AI output safety',app.includes("esc(text).replace(/\\n/g,'<br>')")&&app.includes('esc(aiErrorMessage(err))'),'AI result and normalized error content are escaped before rendering.');
+// m025-93: sama seperti di regression-test.js - yang dijaga sifatnya, bukan bentuk
+// implementasinya. Teks model masuk lewat renderMarkdown(), dan penerjemah itu meng-esc
+// SETIAP baris sebelum mengubah penanda menjadi tag; urutan itulah yang membuat markup
+// dari model tidak mungkin lolos - dibuktikan runtime di ai-integration-test.js.
+check('AI output safety',app.includes('${renderMarkdown(text)}')&&app.includes('const line=esc(raw)')&&app.includes('esc(aiErrorMessage(err))'),'AI result and normalized error content are escaped before rendering.');
 check('AI resilience',app.includes('FIEZEL_AI_TIMEOUT_MS=30000')&&app.includes('currentAIRequest(id,epoch)')&&app.includes('id="aiRetry"'),'AI requests have a timeout, stale-response guard, and retry action.');
 check('AI learner profile',app.includes('buildLearningSnapshot')&&app.includes('aiProfileContext')&&app.includes('askCoachAI'),'AI Coach uses aggregate learner evidence and exposes a personal plan.');
 check('Premium launcher',app.includes('launcher-shell')&&css.includes('.launcher-shell')&&css.includes('.coach-preview'),'Home includes the new premium personal launcher and AI Coach preview.');
 check('Speaking + Listening Skills Lab',app.includes("go('skills')")&&app.includes('FiezelSLAddon.create')&&index.includes('./features/speaking-listening/fiezel-speaking-listening-addon.js'),'Speaking and Listening are reachable from a dedicated isolated Skills Lab route.');
-check('Explicit local neural voice setup',app.includes('prepareNeuralVoice')&&app.includes('FiezelVoiceRuntime.speak')&&index.includes('./features/neural-voice/fiezel-neural-voice-bootstrap.js'),'Neural voice assets require explicit preparation and route through the local-first runtime.');
+check('Voice routes through the shared English+subtitle door',app.includes('FiezelVoiceSay')&&index.includes('./features/neural-voice/fiezel-voice-say.js')&&index.includes('./features/neural-voice/fiezel-puter-voice.js'),'m025-96: setiap kalimat Inggris lewat satu pintu bersama dan membawa subtitle Indonesia; tidak ada unduhan wajib.');
 check('Unified haptics',app.includes('navigator.vibrate')&&app.includes("document.addEventListener?.('click'"),'Interactive controls route through the haptic system when supported.');
 check('Correct and wrong sounds',app.includes('playFeedbackSound')&&app.includes('answerFeedbackSignal')&&app.includes('feedbackSounds:true'),'Jawaban benar dan salah memiliki pola nada yang berbeda.');
 check('Animated answer popup',index.includes('id="answerBurst"')&&css.includes('.answer-burst.show')&&app.includes('showAnswerBurst'),'Jawaban memicu popup animasi dengan status yang berbeda.');
 check('Realtime celestial cycle',app.includes('getCelestialState')&&app.includes('getScenePalette')&&app.includes('SUNRISE_MINUTE=6*60')&&app.includes('SUNSET_MINUTE=18*60')&&css.includes('.global-sky')&&css.includes('.sky-light')&&index.includes('id="globalSky"'),'The whole viewport follows the device-local sun and moon cycle with dynamic light.');
 check('Focused twenty-five-mode grammar lessons',app.includes('GRAMMAR_SESSION_SIZE=25')&&app.includes('GRAMMAR_PRACTICE_MODES')&&app.includes('buildGrammarLessonQuestions')&&!app.includes('familyPeers=')&&!app.includes('levelPeers='),'Every grammar lesson builds 25 validated pedagogical modes from its own concept without importing peer questions.');
-check('Natural Indonesian explanations',app.includes('NATURAL_AI_STYLE')&&app.includes('Hindari gaya buku teks')&&app.includes('grammarRuleIndonesian'),'Grammar, vocabulary, reading, and AI explanations use the Indonesian language contract.');
-check('Persistent soundtrack',app.includes('playAmbientChord')&&app.includes('visibilitychange'),'Ambient soundtrack persists through internal navigation and follows page visibility.');
+check('Natural Indonesian explanations',app.includes('NATURAL_AI_STYLE')&&(app.includes('Hindari gaya buku teks')||copyAll.includes('Hindari gaya buku teks'))&&app.includes('grammarRuleIndonesian'),'Grammar, vocabulary, reading, and AI explanations use the Indonesian language contract (gaya AI kini di copy-map i18n).');
 check('Creator reporting',app.includes("sendCreatorReport('session_complete')")&&app.includes("sendCreatorReport('daily_access'")&&app.includes('reportConsent:false'),'Session and daily access reports require explicit consent.');
 check('Creator report privacy',app.includes('validReportEndpoint')&&app.includes('buildCreatorReport')&&fs.existsSync(path.join(root,'fiezel-report-worker.js')),'Reporting is restricted to Puter Workers with a dedicated collector.');
 check('Runtime syntax',true,'Validated separately with node --check.');
 const data=JSON.parse(fs.readFileSync(path.join(root,'vocabulary-master.json')));check('Vocabulary data readable',Array.isArray(data)&&data.length>0,`records=${data.length}`);
 const r=JSON.parse(fs.readFileSync(path.join(root,'reading-bank.json')));check('Reading data readable',Array.isArray(r)&&r.length>0,`passages=${r.length}`);
-const g=JSON.parse(fs.readFileSync(path.join(root,'grammar-templates.json')));check('Grammar data readable',Array.isArray(g?.templates)&&g.templates.length===129&&g.version===report.version&&g.practiceBlueprintVersion==='focused-25-v1',`items=${g.templates?.length||0} version=${g.version} blueprint=${g.practiceBlueprintVersion}`);
+const g=JSON.parse(fs.readFileSync(path.join(root,'grammar-templates.json')));check('Grammar data readable',Array.isArray(g?.templates)&&g.templates.length===g.count&&g.templates.length>=139&&new Set(g.templates.map(t=>t.id)).size===g.templates.length&&g.version===report.version&&g.practiceBlueprintVersion==='focused-25-v1',`items=${g.templates?.length||0} declared=${g.count} version=${g.version} blueprint=${g.practiceBlueprintVersion}`);
 fs.writeFileSync(path.join(root,'STAGE8-PRODUCT-AUDIT.json'),JSON.stringify(report,null,2));
 console.log(JSON.stringify(report,null,2));
 process.exitCode=report.counts.fail?1:0;

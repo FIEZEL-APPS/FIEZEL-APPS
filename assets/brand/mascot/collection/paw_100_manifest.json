@@ -1,0 +1,802 @@
+[
+  {
+    "id": 1,
+    "slug": "001-reading-book",
+    "title": "PAW Sedang Membaca Buku Bahasa Inggris",
+    "category": "DAILY LIFE",
+    "pose": "Sitting Cross-Legged",
+    "activity": "Duduk bersila santai sambil memegang buku terbuka di kedua tangan"
+  },
+  {
+    "id": 2,
+    "slug": "002-writing-notebook",
+    "title": "PAW Sedang Menulis di Notebook",
+    "category": "DAILY LIFE",
+    "pose": "Leaning Forward Writing",
+    "activity": "Membungkuk fokus di atas meja sambil mencatat dengan pensil"
+  },
+  {
+    "id": 3,
+    "slug": "003-laptop-study",
+    "title": "PAW Sedang Belajar Menggunakan Laptop",
+    "category": "DAILY LIFE",
+    "pose": "Typing on Desk",
+    "activity": "Duduk antusias mengetik di keyboard laptop yang memancarkan cahaya biru"
+  },
+  {
+    "id": 4,
+    "slug": "004-listening-music",
+    "title": "PAW Mendengarkan Musik dengan Headphone Besar",
+    "category": "DAILY LIFE",
+    "pose": "Grooving to Beats",
+    "activity": "Kepala miring bergoyang asyik memegang headphone besar di kedua telinga"
+  },
+  {
+    "id": 5,
+    "slug": "005-drinking-coconut",
+    "title": "PAW Sedang Minum Air Kelapa Segar",
+    "category": "DAILY LIFE",
+    "pose": "Sipping Coconut",
+    "activity": "Kedua tangan memeluk kelapa hijau muda dengan sedotan merah"
+  },
+  {
+    "id": 6,
+    "slug": "006-drinking-boba",
+    "title": "PAW Sedang Minum Bubble Tea Sambil Berjalan",
+    "category": "DAILY LIFE",
+    "pose": "Walking Striding",
+    "activity": "Berjalan ceria dengan kaki melangkah sambil menyeruput gelas boba besar"
+  },
+  {
+    "id": 7,
+    "slug": "007-eating-ice-cream",
+    "title": "PAW Sedang Makan Es Krim Bahagia",
+    "category": "DAILY LIFE",
+    "pose": "Excited Licking Ice Cream",
+    "activity": "Mengangkat es krim cone tiga tingkat ke dekat mulut dengan ekspresi super bahagia"
+  },
+  {
+    "id": 8,
+    "slug": "008-school-backpack",
+    "title": "PAW Membawa Tas Sekolah Menuju Kelas",
+    "category": "DAILY LIFE",
+    "pose": "Walking with Backpack",
+    "activity": "Berjalan mantap dengan ransel biru sekolah di punggung"
+  },
+  {
+    "id": 9,
+    "slug": "009-cleaning-desk",
+    "title": "PAW Sedang Merapikan Meja Belajar",
+    "category": "DAILY LIFE",
+    "pose": "Tidying Desk Items",
+    "activity": "Berdiri di dekat meja belajar sambil menata tumpukan buku dan tempat pensil"
+  },
+  {
+    "id": 10,
+    "slug": "010-mopping-floor",
+    "title": "PAW Sedang Mengepel Lantai Bersih",
+    "category": "DAILY LIFE",
+    "pose": "Pushing Floor Mop",
+    "activity": "Badan condong mendorong gagang pel lantai dengan busa pembersih berkilau"
+  },
+  {
+    "id": 11,
+    "slug": "011-vespa-scooter",
+    "title": "PAW Sedang Naik Vespa Klasik Memakai Helm",
+    "category": "TRAVEL & CULTURE",
+    "pose": "Riding Vintage Vespa",
+    "activity": "Duduk di jok vespa dengan kedua tangan memegang stang dan helm merah"
+  },
+  {
+    "id": 12,
+    "slug": "012-riding-bicycle",
+    "title": "PAW Sedang Mengendarai Sepeda",
+    "category": "TRAVEL & CULTURE",
+    "pose": "Cycling on Bike",
+    "activity": "Mengayuh sepeda biru cerah dengan helm pelindung"
+  },
+  {
+    "id": 13,
+    "slug": "013-skateboarding",
+    "title": "PAW Sedang Naik Skateboard Keren",
+    "category": "TRAVEL & CULTURE",
+    "pose": "Skating Balance Pose",
+    "activity": "Berdiri miring di atas skateboard dengan tangan terentang menjaga keseimbangan"
+  },
+  {
+    "id": 14,
+    "slug": "014-airport-luggage",
+    "title": "PAW Sedang Membawa Koper di Bandara",
+    "category": "TRAVEL & CULTURE",
+    "pose": "Pulling Trolley Suitcase",
+    "activity": "Berjalan menarik koper kuning-oranye beroda siap berlibur"
+  },
+  {
+    "id": 15,
+    "slug": "015-batik-shirt",
+    "title": "PAW Memakai Kemeja Batik Nusantara",
+    "category": "TRAVEL & CULTURE",
+    "pose": "Cultural Stance",
+    "activity": "Berpose anggun dan bangga mengenakan busana khas daerah"
+  },
+  {
+    "id": 16,
+    "slug": "016-bali-traditional",
+    "title": "PAW Pakaian Adat Bali (Udeng & Kemben)",
+    "category": "TRAVEL & CULTURE",
+    "pose": "Cultural Stance",
+    "activity": "Berpose anggun dan bangga mengenakan busana khas daerah"
+  },
+  {
+    "id": 17,
+    "slug": "017-jawa-beskap",
+    "title": "PAW Pakaian Tradisional Jawa (Blangkon & Beskap)",
+    "category": "TRAVEL & CULTURE",
+    "pose": "Cultural Stance",
+    "activity": "Berpose anggun dan bangga mengenakan busana khas daerah"
+  },
+  {
+    "id": 18,
+    "slug": "018-sumatra-adat",
+    "title": "PAW Pakaian Tradisional Sumatra (Suntiang Emas)",
+    "category": "TRAVEL & CULTURE",
+    "pose": "Cultural Stance",
+    "activity": "Berpose anggun dan bangga mengenakan busana khas daerah"
+  },
+  {
+    "id": 19,
+    "slug": "019-kalimantan-adat",
+    "title": "PAW Pakaian Tradisional Kalimantan (Bulu Enggang)",
+    "category": "TRAVEL & CULTURE",
+    "pose": "Cultural Stance",
+    "activity": "Berpose anggun dan bangga mengenakan busana khas daerah"
+  },
+  {
+    "id": 20,
+    "slug": "020-sulawesi-adat",
+    "title": "PAW Pakaian Tradisional Sulawesi (Baju Bodo)",
+    "category": "TRAVEL & CULTURE",
+    "pose": "Cultural Stance",
+    "activity": "Berpose anggun dan bangga mengenakan busana khas daerah"
+  },
+  {
+    "id": 21,
+    "slug": "021-hawaiian-shirt-shades",
+    "title": "PAW Kemeja Hawaii & Kacamata Pantai",
+    "category": "BEACH / HAWAIIAN",
+    "pose": "Casual Cool Stance",
+    "activity": "Berdiri santai dengan kacamata hitam keren dan kemeja motif bunga tropis"
+  },
+  {
+    "id": 22,
+    "slug": "022-grass-skirt-hula",
+    "title": "PAW Rok Rumput Hula & Flower Lei",
+    "category": "BEACH / HAWAIIAN",
+    "pose": "Hula Dancing Sway",
+    "activity": "Menari hula dengan mahkota bunga, rok rumput berlapis, dan gelang bunga"
+  },
+  {
+    "id": 23,
+    "slug": "023-surfing-wave",
+    "title": "PAW Berselancar di Atas Ombak",
+    "category": "BEACH / HAWAIIAN",
+    "pose": "Surfing Wave Ride",
+    "activity": "Berdiri tegak di atas papan selancar kuning meluncur di gelombang ombak biru"
+  },
+  {
+    "id": 24,
+    "slug": "024-beach-volleyball",
+    "title": "PAW Bermain Voli Pantai",
+    "category": "BEACH / HAWAIIAN",
+    "pose": "Beach Activity",
+    "activity": "PAW Bermain Voli Pantai"
+  },
+  {
+    "id": 25,
+    "slug": "025-carrying-surfboard",
+    "title": "PAW Membawa Papan Selancar",
+    "category": "BEACH / HAWAIIAN",
+    "pose": "Beach Activity",
+    "activity": "PAW Membawa Papan Selancar"
+  },
+  {
+    "id": 26,
+    "slug": "026-beach-umbrella-relax",
+    "title": "PAW Santai di Bawah Payung Pantai",
+    "category": "BEACH / HAWAIIAN",
+    "pose": "Beach Activity",
+    "activity": "PAW Santai di Bawah Payung Pantai"
+  },
+  {
+    "id": 27,
+    "slug": "027-sandcastle-builder",
+    "title": "PAW Membangun Istana Pasir",
+    "category": "BEACH / HAWAIIAN",
+    "pose": "Beach Activity",
+    "activity": "PAW Membangun Istana Pasir"
+  },
+  {
+    "id": 28,
+    "slug": "028-snorkeling-gear",
+    "title": "PAW Memakai Snorkeling Gear",
+    "category": "BEACH / HAWAIIAN",
+    "pose": "Beach Activity",
+    "activity": "PAW Memakai Snorkeling Gear"
+  },
+  {
+    "id": 29,
+    "slug": "029-beach-walking-sandals",
+    "title": "PAW Berjalan di Pantai Menenteng Sandal",
+    "category": "BEACH / HAWAIIAN",
+    "pose": "Beach Activity",
+    "activity": "PAW Berjalan di Pantai Menenteng Sandal"
+  },
+  {
+    "id": 30,
+    "slug": "030-tropical-dancer",
+    "title": "PAW Menari Tarian Tropis",
+    "category": "BEACH / HAWAIIAN",
+    "pose": "Beach Activity",
+    "activity": "PAW Menari Tarian Tropis"
+  },
+  {
+    "id": 31,
+    "slug": "031-running-sportswear",
+    "title": "PAW Berlari Memakai Sportswear",
+    "category": "SPORTS",
+    "pose": "Sports Dynamics",
+    "activity": "PAW Berlari Memakai Sportswear"
+  },
+  {
+    "id": 32,
+    "slug": "032-smartwatch-jogging",
+    "title": "PAW Jogging Memakai Smartwatch",
+    "category": "SPORTS",
+    "pose": "Sports Dynamics",
+    "activity": "PAW Jogging Memakai Smartwatch"
+  },
+  {
+    "id": 33,
+    "slug": "033-soccer-player",
+    "title": "PAW Bermain Sepak Bola",
+    "category": "SPORTS",
+    "pose": "Sports Dynamics",
+    "activity": "PAW Bermain Sepak Bola"
+  },
+  {
+    "id": 34,
+    "slug": "034-basketball-star",
+    "title": "PAW Bermain Bola Basket",
+    "category": "SPORTS",
+    "pose": "Sports Dynamics",
+    "activity": "PAW Bermain Bola Basket"
+  },
+  {
+    "id": 35,
+    "slug": "035-badminton-player",
+    "title": "PAW Bermain Bulu Tangkis",
+    "category": "SPORTS",
+    "pose": "Sports Dynamics",
+    "activity": "PAW Bermain Bulu Tangkis"
+  },
+  {
+    "id": 36,
+    "slug": "036-tennis-ace",
+    "title": "PAW Bermain Tenis Lapangan",
+    "category": "SPORTS",
+    "pose": "Sports Dynamics",
+    "activity": "PAW Bermain Tenis Lapangan"
+  },
+  {
+    "id": 37,
+    "slug": "037-table-tennis",
+    "title": "PAW Bermain Tenis Meja",
+    "category": "SPORTS",
+    "pose": "Sports Dynamics",
+    "activity": "PAW Bermain Tenis Meja"
+  },
+  {
+    "id": 38,
+    "slug": "038-mountain-biking",
+    "title": "PAW Bersepeda Gunung",
+    "category": "SPORTS",
+    "pose": "Sports Dynamics",
+    "activity": "PAW Bersepeda Gunung"
+  },
+  {
+    "id": 39,
+    "slug": "039-stretching-yoga",
+    "title": "PAW Melakukan Stretching Yoga",
+    "category": "SPORTS",
+    "pose": "Sports Dynamics",
+    "activity": "PAW Melakukan Stretching Yoga"
+  },
+  {
+    "id": 40,
+    "slug": "040-gold-medal-winner",
+    "title": "PAW Mengangkat Medali Emas",
+    "category": "SPORTS",
+    "pose": "Sports Dynamics",
+    "activity": "PAW Mengangkat Medali Emas"
+  },
+  {
+    "id": 41,
+    "slug": "041-teacher-pointer",
+    "title": "PAW Guru Memegang Pointer & Buku",
+    "category": "PROFESSIONS",
+    "pose": "Professional Rig",
+    "activity": "PAW Guru Memegang Pointer & Buku"
+  },
+  {
+    "id": 42,
+    "slug": "042-doctor-stethoscope",
+    "title": "PAW Dokter Jas Putih & Stetoskop",
+    "category": "PROFESSIONS",
+    "pose": "Professional Rig",
+    "activity": "PAW Dokter Jas Putih & Stetoskop"
+  },
+  {
+    "id": 43,
+    "slug": "043-chef-spatula",
+    "title": "PAW Chef Topi Koki & Spatula",
+    "category": "PROFESSIONS",
+    "pose": "Professional Rig",
+    "activity": "PAW Chef Topi Koki & Spatula"
+  },
+  {
+    "id": 44,
+    "slug": "044-barista-coffee",
+    "title": "PAW Barista Membuat Kopi Latte Art",
+    "category": "PROFESSIONS",
+    "pose": "Professional Rig",
+    "activity": "PAW Barista Membuat Kopi Latte Art"
+  },
+  {
+    "id": 45,
+    "slug": "045-pilot-uniform",
+    "title": "PAW Pilot Seragam Lengkap",
+    "category": "PROFESSIONS",
+    "pose": "Professional Rig",
+    "activity": "PAW Pilot Seragam Lengkap"
+  },
+  {
+    "id": 46,
+    "slug": "046-flight-attendant",
+    "title": "PAW Pramugara Membawa Trolley",
+    "category": "PROFESSIONS",
+    "pose": "Professional Rig",
+    "activity": "PAW Pramugara Membawa Trolley"
+  },
+  {
+    "id": 47,
+    "slug": "047-police-officer",
+    "title": "PAW Polisi Berseragam Lengkap",
+    "category": "PROFESSIONS",
+    "pose": "Professional Rig",
+    "activity": "PAW Polisi Berseragam Lengkap"
+  },
+  {
+    "id": 48,
+    "slug": "048-firefighter-hero",
+    "title": "PAW Pemadam Kebakaran Membawa Selang",
+    "category": "PROFESSIONS",
+    "pose": "Professional Rig",
+    "activity": "PAW Pemadam Kebakaran Membawa Selang"
+  },
+  {
+    "id": 49,
+    "slug": "049-farmer-harvest",
+    "title": "PAW Petani Membawa Keranjang Panen",
+    "category": "PROFESSIONS",
+    "pose": "Professional Rig",
+    "activity": "PAW Petani Membawa Keranjang Panen"
+  },
+  {
+    "id": 50,
+    "slug": "050-astronaut-spacesuit",
+    "title": "PAW Astronaut Baju Luar Angkasa",
+    "category": "PROFESSIONS",
+    "pose": "Professional Rig",
+    "activity": "PAW Astronaut Baju Luar Angkasa"
+  },
+  {
+    "id": 51,
+    "slug": "051-painter-artist",
+    "title": "PAW Pelukis Memegang Kuas & Palet",
+    "category": "CREATIVE",
+    "pose": "Creative Arts",
+    "activity": "PAW Pelukis Memegang Kuas & Palet"
+  },
+  {
+    "id": 52,
+    "slug": "052-photographer",
+    "title": "PAW Fotografer Membawa Kamera DSLR",
+    "category": "CREATIVE",
+    "pose": "Creative Arts",
+    "activity": "PAW Fotografer Membawa Kamera DSLR"
+  },
+  {
+    "id": 53,
+    "slug": "053-guitar-musician",
+    "title": "PAW Musisi Memainkan Gitar Akustik",
+    "category": "CREATIVE",
+    "pose": "Creative Arts",
+    "activity": "PAW Musisi Memainkan Gitar Akustik"
+  },
+  {
+    "id": 54,
+    "slug": "054-drummer-beat",
+    "title": "PAW Drummer Drum Kit & Stick Drum",
+    "category": "CREATIVE",
+    "pose": "Creative Arts",
+    "activity": "PAW Drummer Drum Kit & Stick Drum"
+  },
+  {
+    "id": 55,
+    "slug": "055-dj-turntable",
+    "title": "PAW DJ di DJ Booth",
+    "category": "CREATIVE",
+    "pose": "Creative Arts",
+    "activity": "PAW DJ di DJ Booth"
+  },
+  {
+    "id": 56,
+    "slug": "056-singer-vocalist",
+    "title": "PAW Penyanyi Memegang Mic",
+    "category": "CREATIVE",
+    "pose": "Creative Arts",
+    "activity": "PAW Penyanyi Memegang Mic"
+  },
+  {
+    "id": 57,
+    "slug": "057-writer-typewriter",
+    "title": "PAW Penulis Mengetik di Mesin Tik",
+    "category": "CREATIVE",
+    "pose": "Creative Arts",
+    "activity": "PAW Penulis Mengetik di Mesin Tik"
+  },
+  {
+    "id": 58,
+    "slug": "058-digital-designer",
+    "title": "PAW Desainer Menggambar di Tablet",
+    "category": "CREATIVE",
+    "pose": "Creative Arts",
+    "activity": "PAW Desainer Menggambar di Tablet"
+  },
+  {
+    "id": 59,
+    "slug": "059-filmmaker-director",
+    "title": "PAW Sutradara Membawa Kamera Video",
+    "category": "CREATIVE",
+    "pose": "Creative Arts",
+    "activity": "PAW Sutradara Membawa Kamera Video"
+  },
+  {
+    "id": 60,
+    "slug": "060-mural-street-artist",
+    "title": "PAW Seniman Mural Grafiti",
+    "category": "CREATIVE",
+    "pose": "Creative Arts",
+    "activity": "PAW Seniman Mural Grafiti"
+  },
+  {
+    "id": 61,
+    "slug": "061-explorer-backpack",
+    "title": "PAW Explorer Backpack Petualang",
+    "category": "ADVENTURE",
+    "pose": "Adventure Dynamics",
+    "activity": "PAW Explorer Backpack Petualang"
+  },
+  {
+    "id": 62,
+    "slug": "062-mountain-climber",
+    "title": "PAW Pendaki Gunung Tongkat Trekking",
+    "category": "ADVENTURE",
+    "pose": "Adventure Dynamics",
+    "activity": "PAW Pendaki Gunung Tongkat Trekking"
+  },
+  {
+    "id": 63,
+    "slug": "063-camping-bonfire",
+    "title": "PAW Berkemah di Dekat Api Unggun",
+    "category": "ADVENTURE",
+    "pose": "Adventure Dynamics",
+    "activity": "PAW Berkemah di Dekat Api Unggun"
+  },
+  {
+    "id": 64,
+    "slug": "064-campfire-cooking",
+    "title": "PAW Bakar Marshmallow di Campfire",
+    "category": "ADVENTURE",
+    "pose": "Adventure Dynamics",
+    "activity": "PAW Bakar Marshmallow di Campfire"
+  },
+  {
+    "id": 65,
+    "slug": "065-compass-map",
+    "title": "PAW Memegang Kompas & Peta",
+    "category": "ADVENTURE",
+    "pose": "Adventure Dynamics",
+    "activity": "PAW Memegang Kompas & Peta"
+  },
+  {
+    "id": 66,
+    "slug": "066-binoculars-scout",
+    "title": "PAW Menggunakan Teropong Binokular",
+    "category": "ADVENTURE",
+    "pose": "Adventure Dynamics",
+    "activity": "PAW Menggunakan Teropong Binokular"
+  },
+  {
+    "id": 67,
+    "slug": "067-fishing-rod",
+    "title": "PAW Sedang Memancing Ikan",
+    "category": "ADVENTURE",
+    "pose": "Adventure Dynamics",
+    "activity": "PAW Sedang Memancing Ikan"
+  },
+  {
+    "id": 68,
+    "slug": "068-rowing-boat",
+    "title": "PAW Naik Perahu Dayung",
+    "category": "ADVENTURE",
+    "pose": "Adventure Dynamics",
+    "activity": "PAW Naik Perahu Dayung"
+  },
+  {
+    "id": 69,
+    "slug": "069-pirate-captain",
+    "title": "PAW Kapten Bajak Laut Topi Pirate",
+    "category": "ADVENTURE",
+    "pose": "Adventure Dynamics",
+    "activity": "PAW Kapten Bajak Laut Topi Pirate"
+  },
+  {
+    "id": 70,
+    "slug": "070-adventurer-lantern",
+    "title": "PAW Petualang Membawa Lentera",
+    "category": "ADVENTURE",
+    "pose": "Adventure Dynamics",
+    "activity": "PAW Petualang Membawa Lentera"
+  },
+  {
+    "id": 71,
+    "slug": "071-futuristic-headset",
+    "title": "PAW Tech Expert Headset Neon",
+    "category": "TECHNOLOGY / FUTURE",
+    "pose": "Future Tech Rig",
+    "activity": "PAW Tech Expert Headset Neon"
+  },
+  {
+    "id": 72,
+    "slug": "072-coding-developer",
+    "title": "PAW Software Developer Coding di Laptop",
+    "category": "TECHNOLOGY / FUTURE",
+    "pose": "Future Tech Rig",
+    "activity": "PAW Software Developer Coding di Laptop"
+  },
+  {
+    "id": 73,
+    "slug": "073-tablet-touch",
+    "title": "PAW Mengoperasikan Smart Tablet",
+    "category": "TECHNOLOGY / FUTURE",
+    "pose": "Future Tech Rig",
+    "activity": "PAW Mengoperasikan Smart Tablet"
+  },
+  {
+    "id": 74,
+    "slug": "074-vr-headset-gamer",
+    "title": "PAW Gamer Memakai VR Headset",
+    "category": "TECHNOLOGY / FUTURE",
+    "pose": "Future Tech Rig",
+    "activity": "PAW Gamer Memakai VR Headset"
+  },
+  {
+    "id": 75,
+    "slug": "075-robotics-engineer",
+    "title": "PAW Robotics Bersama Robot Mini",
+    "category": "TECHNOLOGY / FUTURE",
+    "pose": "Future Tech Rig",
+    "activity": "PAW Robotics Bersama Robot Mini"
+  },
+  {
+    "id": 76,
+    "slug": "076-space-explorer-cyber",
+    "title": "PAW Space Cyber Explorer",
+    "category": "TECHNOLOGY / FUTURE",
+    "pose": "Future Tech Rig",
+    "activity": "PAW Space Cyber Explorer"
+  },
+  {
+    "id": 77,
+    "slug": "077-hover-scooter",
+    "title": "PAW Mengendarai Hover Scooter Melayang",
+    "category": "TECHNOLOGY / FUTURE",
+    "pose": "Future Tech Rig",
+    "activity": "PAW Mengendarai Hover Scooter Melayang"
+  },
+  {
+    "id": 78,
+    "slug": "078-smart-glasses",
+    "title": "PAW Memakai Kacamata AR Pintar",
+    "category": "TECHNOLOGY / FUTURE",
+    "pose": "Future Tech Rig",
+    "activity": "PAW Memakai Kacamata AR Pintar"
+  },
+  {
+    "id": 79,
+    "slug": "079-hologram-interface",
+    "title": "PAW Mengendalikan Hologram Melayang",
+    "category": "TECHNOLOGY / FUTURE",
+    "pose": "Future Tech Rig",
+    "activity": "PAW Mengendalikan Hologram Melayang"
+  },
+  {
+    "id": 80,
+    "slug": "080-ai-researcher-lab",
+    "title": "PAW Peneliti AI di Lab Canggih",
+    "category": "TECHNOLOGY / FUTURE",
+    "pose": "Future Tech Rig",
+    "activity": "PAW Peneliti AI di Lab Canggih"
+  },
+  {
+    "id": 81,
+    "slug": "081-pajamas-pillow",
+    "title": "PAW Memakai Piyama Memeluk Bantal",
+    "category": "FUN / COMEDY",
+    "pose": "Fun Comedy Rig",
+    "activity": "PAW Memakai Piyama Memeluk Bantal"
+  },
+  {
+    "id": 82,
+    "slug": "082-morning-bedhead",
+    "title": "PAW Baru Bangun Tidur Acak-acakan",
+    "category": "FUN / COMEDY",
+    "pose": "Fun Comedy Rig",
+    "activity": "PAW Baru Bangun Tidur Acak-acakan"
+  },
+  {
+    "id": 83,
+    "slug": "083-raincoat-boots",
+    "title": "PAW Jas Hujan Kuning & Boots",
+    "category": "FUN / COMEDY",
+    "pose": "Fun Comedy Rig",
+    "activity": "PAW Jas Hujan Kuning & Boots"
+  },
+  {
+    "id": 84,
+    "slug": "084-umbrella-rain",
+    "title": "PAW Membawa Payung Hujan",
+    "category": "FUN / COMEDY",
+    "pose": "Fun Comedy Rig",
+    "activity": "PAW Membawa Payung Hujan"
+  },
+  {
+    "id": 85,
+    "slug": "085-kite-flying",
+    "title": "PAW Mengejar Layang-Layang",
+    "category": "FUN / COMEDY",
+    "pose": "Fun Comedy Rig",
+    "activity": "PAW Mengejar Layang-Layang"
+  },
+  {
+    "id": 86,
+    "slug": "086-soap-bubbles",
+    "title": "PAW Meniup Gelembung Sabun",
+    "category": "FUN / COMEDY",
+    "pose": "Fun Comedy Rig",
+    "activity": "PAW Meniup Gelembung Sabun"
+  },
+  {
+    "id": 87,
+    "slug": "087-birthday-party-cake",
+    "title": "PAW Topi Ulang Tahun & Kue",
+    "category": "FUN / COMEDY",
+    "pose": "Fun Comedy Rig",
+    "activity": "PAW Topi Ulang Tahun & Kue"
+  },
+  {
+    "id": 88,
+    "slug": "088-gift-wrapping",
+    "title": "PAW Membungkus Kado Pita Merah",
+    "category": "FUN / COMEDY",
+    "pose": "Fun Comedy Rig",
+    "activity": "PAW Membungkus Kado Pita Merah"
+  },
+  {
+    "id": 89,
+    "slug": "089-nerd-big-glasses",
+    "title": "PAW Kutu Buku Kacamata Bulat Besar",
+    "category": "FUN / COMEDY",
+    "pose": "Fun Comedy Rig",
+    "activity": "PAW Kutu Buku Kacamata Bulat Besar"
+  },
+  {
+    "id": 90,
+    "slug": "090-instant-camera-selfie",
+    "title": "PAW Selfie dengan Kamera Instan",
+    "category": "FUN / COMEDY",
+    "pose": "Fun Comedy Rig",
+    "activity": "PAW Selfie dengan Kamera Instan"
+  },
+  {
+    "id": 91,
+    "slug": "091-black-tuxedo",
+    "title": "PAW Tuxedo Hitam Premium Mewah",
+    "category": "PREMIUM / SPECIAL",
+    "pose": "Signature Special Rig",
+    "activity": "PAW Tuxedo Hitam Premium Mewah"
+  },
+  {
+    "id": 92,
+    "slug": "092-executive-briefcase",
+    "title": "PAW Eksekutif Bisnis Briefcase",
+    "category": "PREMIUM / SPECIAL",
+    "pose": "Signature Special Rig",
+    "activity": "PAW Eksekutif Bisnis Briefcase"
+  },
+  {
+    "id": 93,
+    "slug": "093-premium-yellow-coat",
+    "title": "PAW Jas Hujan Kuning Emas Signature",
+    "category": "PREMIUM / SPECIAL",
+    "pose": "Signature Special Rig",
+    "activity": "PAW Jas Hujan Kuning Emas Signature"
+  },
+  {
+    "id": 94,
+    "slug": "094-detective-trenchcoat",
+    "title": "PAW Detektif Kaca Pembesar",
+    "category": "PREMIUM / SPECIAL",
+    "pose": "Signature Special Rig",
+    "activity": "PAW Detektif Kaca Pembesar"
+  },
+  {
+    "id": 95,
+    "slug": "095-royal-explorer-crown",
+    "title": "PAW Penjelajah Kerajaan Mahkota Emas",
+    "category": "PREMIUM / SPECIAL",
+    "pose": "Signature Special Rig",
+    "activity": "PAW Penjelajah Kerajaan Mahkota Emas"
+  },
+  {
+    "id": 96,
+    "slug": "096-samurai-warrior",
+    "title": "PAW Samurai Tradisional Zirah",
+    "category": "PREMIUM / SPECIAL",
+    "pose": "Signature Special Rig",
+    "activity": "PAW Samurai Tradisional Zirah"
+  },
+  {
+    "id": 97,
+    "slug": "097-indonesian-traditional-dancer",
+    "title": "PAW Penari Tradisional Mahkota Emas",
+    "category": "PREMIUM / SPECIAL",
+    "pose": "Signature Special Rig",
+    "activity": "PAW Penari Tradisional Mahkota Emas"
+  },
+  {
+    "id": 98,
+    "slug": "098-festival-carnival",
+    "title": "PAW Festival Penuh Bunga & Ornamen",
+    "category": "PREMIUM / SPECIAL",
+    "pose": "Signature Special Rig",
+    "activity": "PAW Festival Penuh Bunga & Ornamen"
+  },
+  {
+    "id": 99,
+    "slug": "099-language-ambassador",
+    "title": "PAW Duta Bahasa FIEZEL Globe & Buku",
+    "category": "PREMIUM / SPECIAL",
+    "pose": "Signature Special Rig",
+    "activity": "PAW Duta Bahasa FIEZEL Globe & Buku"
+  },
+  {
+    "id": 100,
+    "slug": "100-hero-mascot-signature",
+    "title": "PAW HERO CHARACTER — Maskot Utama FIEZEL",
+    "category": "PREMIUM / SPECIAL",
+    "pose": "Signature Special Rig",
+    "activity": "PAW HERO CHARACTER — Maskot Utama FIEZEL"
+  }
+]
