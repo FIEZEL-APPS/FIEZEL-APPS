@@ -121,6 +121,8 @@
     'tour.menu-reading-body': 'Di sini kamu lihat jalur belajarmu dari A1 sampai C2, materi yang udah kuat, dan pola kesalahan yang masih sering muncul \u2014 biar arahmu jelas.',
     'tour.menu-ask-title': 'Tanya FIEZEL?',
     'tour.menu-ask-body': 'Tombol di kanan ini pintu ke PAW, pembimbing kamu. Bingung apa pun, tanya di sini (butuh jaringan).',
+    'tour.menu-notif-title': 'Notifikasi',
+    'tour.menu-notif-body': 'Lonceng di kanan ini tempat kabar masuk: tugas dari guru, teman baru, dan sorakan. Ketuk tugasnya, sesinya langsung terbuka.',
     'tour.menu-level-title': 'Chip level kamu',
     'tour.menu-level-body': 'Chip ini nunjukin level aktifmu. Ketuk buat pindah level \u2014 materi dan latihan langsung ngikutin pilihanmu.',
     'tour.menu-settings-title': 'Tombol Pengaturan',

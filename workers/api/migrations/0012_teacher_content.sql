@@ -161,3 +161,14 @@ CREATE TABLE IF NOT EXISTS tc_class_report (
   updated_at INTEGER NOT NULL,
   PRIMARY KEY (class_code, learner_key)
 ) WITHOUT ROWID;
+
+CREATE TABLE IF NOT EXISTS tc_class_assignment (
+  class_code TEXT NOT NULL,
+  id TEXT NOT NULL,
+  teacher_sub TEXT NOT NULL,
+  payload_json TEXT NOT NULL,
+  targets_json TEXT,
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL,
+  PRIMARY KEY (class_code, id)
+) WITHOUT ROWID;

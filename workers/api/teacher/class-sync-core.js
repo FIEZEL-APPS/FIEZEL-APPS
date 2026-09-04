@@ -71,6 +71,55 @@ export function normalizeReport(body, nowMs) {
   return { ok: true, code, name, key: learnerKey(name), report: { v: 1, name, at: reportedAt, goal, skills, lessons, cls: code, assign } };
 }
 
+export const ASSIGN_LIMITS = Object.freeze({
+  ID_MAX: 40, TITLE_MAX: 80, SKILLS_MAX: 3, ITEMS_MAX: 40, ITEM_ID_MAX: 40, FROM_MAX: 60, TARGETS_MAX: 80,
+  PAGE: 20, LEARNER_POLL_MIN_INTERVAL_MS: 5000
+});
+
+/**
+ * normalizeAssignment(body) -> { ok:true, code, id, payload, targets } | { ok:false, reason }
+ * `payload` = bentuk yang SAMA dengan "kode tugas" (assignmentCode v1) sisi klien,
+ * `targets` = null (seluruh kelas) atau daftar learner_key.
+ */
+export function normalizeAssignment(body) {
+  if (!body || typeof body !== 'object' || Array.isArray(body)) return { ok: false, reason: 'not_object' };
+  const code = normalizeClassCode(body.code);
+  if (!code) return { ok: false, reason: 'bad_class_code' };
+  const a = body.assignment;
+  if (!a || typeof a !== 'object' || Array.isArray(a)) return { ok: false, reason: 'bad_assignment' };
+  const id = typeof a.id === 'string' && /^[A-Za-z0-9_-]{1,40}$/.test(a.id) ? a.id : null;
+  if (!id) return { ok: false, reason: 'bad_assign_id' };
+  const title = String(a.title || '').trim().slice(0, ASSIGN_LIMITS.TITLE_MAX) || 'Tugas';
+  if (!Array.isArray(a.skills) || !a.skills.length || a.skills.length > ASSIGN_LIMITS.SKILLS_MAX) return { ok: false, reason: 'bad_skills' };
+  for (const k of a.skills) if (!/^[a-z0-9_]{1,32}$/.test(String(k))) return { ok: false, reason: 'bad_skill_key' };
+  if (!Array.isArray(a.itemIds) || !a.itemIds.length || a.itemIds.length > ASSIGN_LIMITS.ITEMS_MAX) return { ok: false, reason: 'bad_items' };
+  for (const it of a.itemIds) if (typeof it !== 'string' || !it || it.length > ASSIGN_LIMITS.ITEM_ID_MAX) return { ok: false, reason: 'bad_item_id' };
+  const minutes = intIn(a.minutes, 240) || 5;
+  const mode = a.mode === 'ujian' ? 'ujian' : 'latihan';
+  const timer = intIn(a.timer, 240) || 0;
+  const deadline = typeof a.deadline === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(a.deadline) ? a.deadline : null;
+  const from = String(a.from || '').trim().slice(0, ASSIGN_LIMITS.FROM_MAX);
+  const payload = { v: 1, t: 'assign', id, title, skills: a.skills.map(String), itemIds: a.itemIds.slice(), minutes, from, cls: code, deadline, mode, timer, shuffle: !!a.shuffle };
+  let targets = null;
+  if (body.targets != null) {
+    if (!Array.isArray(body.targets) || body.targets.length > ASSIGN_LIMITS.TARGETS_MAX) return { ok: false, reason: 'bad_targets' };
+    targets = [];
+    for (const t of body.targets) { const k = learnerKey(t); if (k && targets.indexOf(k) < 0) targets.push(k); }
+    if (!targets.length) return { ok: false, reason: 'bad_targets' };
+  }
+  return { ok: true, code, id, payload, targets };
+}
+
+/** Baris D1 -> tugas untuk murid; targets yang tidak memuat kunci murid dibuang. */
+export function rowToAssignment(row, key) {
+  let payload = null, targets = null;
+  try { payload = JSON.parse(row.payload_json); } catch { payload = null; }
+  if (!payload || typeof payload !== 'object') return null;
+  if (row.targets_json) { try { targets = JSON.parse(row.targets_json); } catch { targets = null; } }
+  if (Array.isArray(targets) && targets.indexOf(key) < 0) return null;
+  return { id: row.id, at: Number(row.updated_at) || 0, assignment: payload };
+}
+
 /** normalizeClaim(body) -> { ok, code, title, level } | { ok:false, reason } */
 export function normalizeClaim(body) {
   if (!body || typeof body !== 'object') return { ok: false, reason: 'not_object' };
