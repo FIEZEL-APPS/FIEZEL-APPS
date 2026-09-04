@@ -1282,23 +1282,6 @@ body.voice-bundle-locked .bottomnav,body.voice-bundle-locked .app-header{pointer
 .voice-bundle-pill{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0));z-index:60;padding:9px 16px;border-radius:var(--radius-pill);background:var(--panel,#fff);color:var(--text,#241A11);border:1px solid var(--line,#F0E4CF);box-shadow:0 10px 30px rgba(7,13,29,.18);font:600 .86rem/1.3 -apple-system,system-ui,sans-serif}
 @media (prefers-reduced-motion:reduce){.voice-bundle-track span{transition:none}}
 
-/* m025-42 mandatory daily target lock */
-.daily-lock{position:fixed;inset:0;z-index:90;display:grid;place-items:center;padding:18px;background:linear-gradient(160deg,rgba(7,13,29,.94),rgba(45,37,86,.94));backdrop-filter:blur(10px)}
-.daily-lock-panel{width:min(460px,100%);display:grid;gap:12px;padding:24px;border-radius:var(--radius-lg);background:var(--panel,#fff);color:var(--text,#241A11);text-align:center;box-shadow:var(--shadow-lg)}
-.daily-lock-mark{font:700 11px/1.4 -apple-system,system-ui,sans-serif;letter-spacing:.12em;color:var(--accent,#C2402C)}
-.daily-lock-panel h2{margin:0}
-.daily-lock-panel p{margin:0;color:var(--muted,#6E5E47);line-height:1.55}
-.daily-lock-track{height:10px;border-radius:var(--radius-pill);background:var(--line-soft,var(--panel-soft));overflow:hidden}
-.daily-lock-track span{display:block;height:100%;border-radius:var(--radius-pill);background:var(--sun-deep);transition:width .35s ease}
-.daily-lock-count{font-weight:700;color:var(--text,#241A11)}
-.daily-lock-panel .wide{width:100%;min-height:52px;border-radius:var(--radius-md)}
-.daily-lock-note{font-size:.86rem}
-/* While the lock is armed every escape route inside the app is inert, including the
-   bottom navigation and the header controls. */
-body.daily-locked .bottomnav,body.daily-locked .app-header,body.daily-locked .icon-button{pointer-events:none;opacity:.35}
-body.daily-locked{overflow:hidden}
-@media (prefers-reduced-motion:reduce){.daily-lock-track span{transition:none}}
-
 /* m025-44 FIEZEL Library: shelf, reader, audiobook, tap-to-translate */
 .library-page{display:grid;gap:14px}
 .library-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:11px}

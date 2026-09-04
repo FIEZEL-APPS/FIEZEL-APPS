@@ -532,7 +532,7 @@ test('token permukaan terang persis seperti literal yang digantikannya', () => {
 const LEGIT = [
   /(^|[\s,])\.?(primary|auth-primary|quiz-next|luxe)\b/,
   /\.toast\b/, /\.launcher-/, /\.ghost-dark\b/, /\.coach-/, /\.celestial-status\b/,
-  /\.notification-gate\b/, /\.voice-bundle-sheet\b/, /\.daily-lock\b/, /\.library-\w+-sheet\b/,
+  /\.notification-gate\b/, /\.voice-bundle-sheet\b/, /\.library-\w+-sheet\b/,
   /\.fiezel-/, /\.fz-/, /\.launch-icon\b/, /\.result-icon\b/, /\.setting-icon\b/,
   /\.global-celestial\b/, /\.progress-tab\.active\b/, /::selection\b/,
   /\.notification-status\.(success|error)\b/, /\.bundle-ready\b/,

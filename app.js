@@ -5665,19 +5665,13 @@ function openApp(){
   try{self.FiezelLazy?.start?.()}catch{}
   startReminderEngine();showBrandSplash();if(CORE_WORKER_URL){coreBrainHealth().then(health=>{const quietToast=m=>{try{if(self.FiezelStage?.lessonMode?.())return console.debug('FIEZEL:',m);showToast(m)}catch(_){showToast(m)}};/* q19-P3: jargon infra tidak memotong ujian pertama */if(!health.ok){if(REMOTE_PUSH_REQUIRED)quietToast(FiezelI18n.t('sys.core-belum-tersambung'));return}return ensureRemotePushSubscription().then(result=>{if(result.ok){syncRemoteLearningActivity();quietToast(FiezelI18n.t('sys.core-push-aktif'))}else if(REMOTE_PUSH_REQUIRED)quietToast(FiezelI18n.t('sys.core-push-belum'))})})}// m025-42: the third install prompt. It runs after the notification gate clears so the
 // three popups never stack, and it silences itself for good once both bundles exist.
-// m025-43: the gates used to be called straight from here, but this runs while app.js
-// is still parsing, before the later <script> tags exist - so the daily-target call hit
-// an undefined global and did nothing. Both gates now self-start; this only nudges them.
 // m025-96: gerbang unduhan suara dipensiunkan - tidak ada lagi bundel yang diunduh.
-bindAudioUnlockGestures();// m025-42: the mandatory daily target arms itself only once the learner qualifies
-// (notifications granted + assessed), which is checked inside the module.
-// D6 §5 (P2): nudge `FiezelDailyTarget.start()` dari sini DIHAPUS. Modulnya sudah
-// self-arm 1,2 dtk setelah DOM siap (fiezel-daily-target.js, catatan m025-43 di sana),
-// dan setiap panggilan start() memasang listener visibilitychange BARU tanpa guard -
-// "calling start() again is harmless" hanya benar untuk interval-nya, listenernya
-// menumpuk. Menghapus nudge = tepat satu listener; satu-satunya biaya adalah kunci
-// target bisa telat maksimal 1,2 dtk setelah openApp, dan refresh() poll 4 dtk
-// menutupinya. Guard sisi modul milik pemilik fiezel-daily-target.js.
+// m025-254: kunci "target harian WAJIB" (m025-42/43) DIHAPUS seluruhnya - modul, lembar,
+// pembungkus go(), dan kelas body.daily-locked. Ia membuka diri sendiri 1,2 dtk setelah
+// boot lalu menolak setiap perpindahan sampai targetnya beres; OWNER menilai biayanya
+// (aplikasi yang menyandera pemakainya sejak cat pertama) jauh melebihi gunanya. Yang
+// tersisa dari gagasan itu hanya pengakuan pasif di kartu Home - lihat todayHomeMarkup().
+bindAudioUnlockGestures();
 const reports=setTimeout(async()=>{await flushReportQueue();await maybeSendAccessReport()},1200);reports?.unref?.();
 // m025-78: an onboarding shortcut ("Mulai tes penempatan" di langkah 3) can ask to jump
 // straight into the real placement quiz once the gate clears - see afterOnboardingExit().
@@ -6308,9 +6302,10 @@ function pushBackNavView(v){try{return self.FiezelBackNav?.pushView?.(v)===true}
  * terjadi apa-apa sama sekali.
  *
  * Stage menutup celah itu TANPA menambah pemilik riwayat kedua - pelajaran mahal dari
- * fiezel-daily-target.js, yang dulu mendorong entrinya sendiri dan membuat kedalaman riwayat
- * tidak lagi sejajar dengan tumpukan. Stage memakai pushLayer() milik modul back-nav,
- * mekanisme yang sama persis dengan modal dan pembaca perpustakaan.
+ * kunci target harian (m025-42, sudah dihapus di m025-254), yang dulu mendorong entrinya
+ * sendiri dan membuat kedalaman riwayat tidak lagi sejajar dengan tumpukan. Stage memakai
+ * pushLayer() milik modul back-nav, mekanisme yang sama persis dengan modal dan pembaca
+ * perpustakaan.
  *
  * Setiap stage membawa fungsi PEMULIH layar induknya, bukan nama view. Itu disengaja: induk
  * sebuah stage sering kali stage lain (kategori -> topik -> pelajaran), dan nama view tidak
@@ -6959,16 +6954,33 @@ function todaySessionShape(){
   try{const p=buildAdaptivePolicy();if(p)return{soal:p.sessionSize,menit:p.estimatedMinutes}}catch(_){}
   return{soal:10,menit:10};
 }
+/* m025-254: satu-satunya sisa dari "target harian" - sebuah PERTANYAAN, bukan gerbang.
+   Versi lamanya (features/daily-target/, m025-42) menjawab pertanyaan yang sama lalu
+   MENGUNCI aplikasi sampai jawabannya "sudah"; yang dihapus adalah kuncinya, bukan
+   kemampuan aplikasi mengenali hari yang sudah tuntas. Dipakai dua tempat dan hanya dua:
+   kartu Home (berganti isi) dan bukti sosial daily_target (satu ring per hari, di-cap
+   server). Tidak ada pemanggil yang boleh memakainya untuk menahan navigasi.
+   Hitungan hari basi dibaca NOL - kerja kemarin tidak boleh menyelesaikan hari ini. */
+function dailySessionDone(target){
+  try{
+    const d=state.daily||{};
+    if(!d.date||d.date!==studyDayKey())return false;
+    const perlu=Number(target)>0?Math.round(Number(target)):todaySessionShape().soal;
+    return (Number(d.attempts)||0)>=perlu;
+  }catch(_){return false}
+}
 function todayHomeMarkup(){
   const trust=levelTrustState(state),locked=trust.locked===true;
   const examLevel=nextVerifiableLevel(state)||verifiedLevel(state);
   const streak=Number(state.streak)||0;
-  /* Modul target harian dimuat malas dan bisa belum ada saat cat pertama; opsional-
-     berantai + `===true` membuat "belum tahu" dibaca sebagai BELUM selesai, yang
-     adalah arah aman: kartu yang menawarkan sesi lebih baik daripada kartu yang
-     mengumumkan selesai kepada murid yang belum mengerjakan apa pun hari ini. */
-  let selesai=false;try{selesai=!state.activeSession&&self.FiezelDailyTarget?.status?.().met===true}catch(_){}
   const shape=todaySessionShape();
+  /* m025-254: pertanyaan ini dulu dijawab modul target harian yang WAJIB itu. Modulnya
+     dihapus bersama kuncinya, dan jawabannya sekarang dihitung di sini dari bukti yang
+     memang sudah ada di state: soal hari ini setidaknya sepanjang sesi yang FIEZEL
+     rencanakan. Bedanya dengan yang lama BUKAN angkanya, melainkan akibatnya - kartu
+     ini berganti isi, dan tidak ada satu pun pintu yang dikunci karenanya. Hitungan
+     hari basi dibaca NOL supaya kerja kemarin tidak menyelesaikan hari ini. */
+  let selesai=false;try{selesai=!state.activeSession&&dailySessionDone(shape.soal)}catch(_){}
   const blocks=todayPlanBlocks();
   /* SATU aksi, dipilih di satu tempat. Urutannya adalah urutan kepentingan, dan
      tiap cabang sudah ada di aplikasi sebelum layar ini - tidak ada jalur baru yang
@@ -12724,7 +12736,7 @@ function queueSocialEvidence(extraEvents){
     const core=socialCore();if(!core)return null;
     const events=[];
     if(state.daily?.meaningful)events.push({kind:'meaningful_day'});
-    try{if(self.FiezelDailyTarget?.status?.().met)events.push({kind:'daily_target'})}catch(_){}
+    try{if(dailySessionDone())events.push({kind:'daily_target'})}catch(_){}
     try{
       const sent=socialMasteredLedger(),fresh=[];
       for(const [skill,b] of Object.entries(state.grammar||{}))if((Number(b?.mastery)||0)>=GRAMMAR_UNLOCK_MASTERY&&!sent.includes(skill))fresh.push(skill);
@@ -12765,18 +12777,15 @@ function installBackNav(){
       // diganti dengan pertanyaan yang sebenarnya: apakah panelnya sedang di layar. Panel
       // undangan memang tidak mengunci aplikasi, tetapi selama ia terbuka ia tetap dialog -
       // tombol kembali harus menutupnya, bukan menavigasi di belakangnya.
-      // m025-117: kunci target harian ikut dihitung di sini. Sampai rilis ini
-      // features/daily-target/fiezel-daily-target.js menahan tekanan kembali dengan
-      // mendorong entri riwayatnya SENDIRI - pemilik riwayat kedua yang tidak diketahui
-      // tumpukan modul back-nav, dan sumber ketidaksejajaran yang membuat satu tekanan
-      // kembali kadang tidak melakukan apa pun. Sekarang ia cukup mengumumkan dirinya
-      // lewat body.daily-locked, dan penahanannya dikerjakan di satu tempat: di sini.
+      // m025-254: baris `daily-locked` di sini ikut hilang bersama kunci target harian.
+      // Kelas itu dipasang oleh satu-satunya modul yang pernah menuliskannya, dan modul
+      // itu sudah tidak ada - memeriksanya hanya akan membuat pembaca berikutnya mencari
+      // gerbang yang tidak pernah menyala.
       locked:()=>{
         try{
           const welcome=document.getElementById?.('welcome');
           if(welcome&&!welcome.classList.contains('hidden'))return true;
           if(document.body?.classList?.contains?.('auth-locked'))return true;
-          if(document.body?.classList?.contains?.('daily-locked'))return true;
           return !!document.querySelector?.('.fiezel-splash,.fiezel-ob');
         }catch{return false}
       },

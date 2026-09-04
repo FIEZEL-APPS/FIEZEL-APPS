@@ -583,39 +583,43 @@ test('gerbang wajib disebut namanya pada pemasangan', () => {
   assert.ok(/knownView:v=>VALID_VIEWS\.has\(v\)/.test(app), 'tujuan kembali diverifikasi ke daftar view sah');
 });
 
-// ---- m025-117: penyebab "stuck screen" yang dilaporkan OWNER ---------------------------
+// ---- m025-117 -> m025-254: penyebab "stuck screen" yang dilaporkan OWNER --------------
 //
-// OWNER: "swipe back masih cacat sistem, meski di perbaiki, misalnya sudah masuk kedalam
-// folder, dan ingin kembali, ketika swipe back malah stuck screen".
+// OWNER (m025-117): "swipe back masih cacat sistem, meski di perbaiki, misalnya sudah masuk
+// kedalam folder, dan ingin kembali, ketika swipe back malah stuck screen".
 //
-// Diagnosisnya dijalankan di peramban sungguhan, dan penyebab utamanya BUKAN di modul ini:
+// Diagnosisnya dijalankan di peramban sungguhan, dan penyebab utamanya BUKAN modul ini:
 // features/daily-target/fiezel-daily-target.js membungkus window.go dengan
 // `function (view) { ... return baseGo(view) }`. go() punya dua parameter - go(view, opts) -
 // dan `opts.viaHistory === true` adalah SATU-SATUNYA hal yang menahan go() supaya tidak
 // mendorong entri riwayat baru. Pembungkus yang menjatuhkan argumen kedua membuat setiap
 // perpindahan MUNDUR mendorong entri MAJU, jadi riwayat berubah menjadi dua entri yang
 // saling menunjuk dan murid berpindah-pindah di antara dua layar yang sama selamanya.
-// Itulah "stuck screen"-nya. Gate ini menahan ketiga bagiannya.
+//
+// m025-254: seluruh kunci target harian dihapus (OWNER: "annoying banget"), jadi berkas yang
+// dulu dibaca gerbang di bawah tidak ada lagi. Gerbangnya TIDAK ikut dihapus, hanya berpindah
+// sasaran: yang dijaga sekarang adalah ketiadaan KELAS bugnya di seluruh aplikasi - tidak ada
+// pembungkus go() yang menjatuhkan argumen, dan tidak ada pemilik riwayat kedua.
 
-const dailyTarget = fs.readFileSync('./features/daily-target/fiezel-daily-target.js', 'utf8');
-
-test('pembungkus go() meneruskan SELURUH argumen, bukan hanya nama view', () => {
-  assert.ok(/return baseGo\.apply\(this, arguments\);/.test(dailyTarget),
-    'menjatuhkan opts.viaHistory membuat jalur kembali mendorong entri maju: gelung back->push->back');
-  assert.ok(!/return baseGo\(view\);/.test(dailyTarget));
+test('tidak ada pembungkus go() yang menjatuhkan argumen keduanya', () => {
+  // Pola terlarangnya spesifik: membungkus go lalu memanggil ulang dengan SATU argumen.
+  // Yang sah adalah .apply(this, arguments) - meneruskan opts.viaHistory apa adanya.
+  const wrappers = [...app.matchAll(/baseGo\s*\(([^)]*)\)/g)].map(m => m[1].trim());
+  for (const argsPassed of wrappers) {
+    assert.ok(/^this,\s*arguments$/.test(argsPassed),
+      'pembungkus go() harus meneruskan seluruh argumen: gelung back->push->back lahir dari yang tidak');
+  }
+  assert.ok(!/__dailyTargetGuarded/.test(app), 'pembungkus penolak navigasi milik target harian sudah tidak ada');
 });
 
-test('hanya ADA SATU pemilik riwayat: kunci target harian tidak mendorong entrinya sendiri', () => {
+test('hanya ADA SATU pemilik riwayat: tidak ada modul lain yang mendorong entrinya sendiri', () => {
   // Entri asing menggeser kesejajaran antara tumpukan modul ini dan riwayat sungguhan, dan
-  // sejak itu satu tekanan kembali bisa memakan entri yang tidak diketahui siapa pun.
-  assert.ok(!/function guardHistory/.test(dailyTarget));
-  // Kode, bukan komentar: catatan m025-117 di berkas itu memang MENYEBUT entri lama supaya
-  // alasannya bisa dibaca, jadi yang diperiksa adalah pemakaian History API-nya.
-  const dailyCode = dailyTarget.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
-  assert.ok(!/pushState|popstate|history\.go|history\.back/.test(dailyCode),
-    'kunci harian tidak boleh punya entri riwayatnya sendiri - itu pemilik riwayat kedua');
-  assert.ok(/daily-locked/.test(dailyTarget), 'ia cukup mengumumkan dirinya lewat kelas di <body>');
-  assert.ok(/daily-locked/.test(app), 'dan app.js yang menyerahkannya ke hook locked milik modul ini');
+  // sejak itu satu tekanan kembali bisa memakan entri yang tidak diketahui siapa pun. Kunci
+  // target harian dulu melakukannya; ia sudah dihapus seluruhnya (m025-254).
+  assert.ok(!fs.existsSync('./features/daily-target/fiezel-daily-target.js'),
+    'berkas kunci target harian harus benar-benar terhapus, bukan sekadar tidak dimuat');
+  assert.ok(!/contains\?\.\('daily-locked'\)/.test(app),
+    'hook locked tidak boleh menunggu kelas yang tidak ada modulnya lagi');
 });
 
 test('gerbang wajib menahan tekanan kembali bahkan saat belum ada navigasi apa pun', () => {
