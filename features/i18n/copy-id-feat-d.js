@@ -84,6 +84,52 @@
     'library.status-reading': 'Membacakan…',
     'library.ask-default-topic': 'bacaan ini',
     'library.ask-thinking': 'Fiezel sedang menjawab…',
-    'library.loading': 'Memuat perpustakaan…'
+    'library.loading': 'Memuat perpustakaan…',
+
+    /* ---------------------------------------------------------------- AKUN (§21/§22/§27)
+     * Naskah lapis akun: masuk, daftar, dan aktivasi guru lewat kode undangan.
+     * Naskah GALAT sengaja SATU kalimat untuk `invalid_credentials`, apa pun sebabnya —
+     * membedakan "nama tidak ada" dari "sandi salah" mengubah layar masuk menjadi
+     * mesin pencari daftar pengguna, dan membatalkan seluruh kerja anti-enumerasi
+     * di `route-account.js`. */
+    'account.err-offline': 'Kamu lagi offline. Coba lagi kalau sudah ada internet ya.',
+    'account.err-unavailable': 'Servernya lagi nggak bisa dihubungi. Coba lagi sebentar lagi.',
+    'account.err-disabled': 'Fitur akun belum aktif di aplikasi ini.',
+    'account.err-invalid': 'Nama atau kata sandinya nggak cocok. Coba cek lagi.',
+    'account.err-locked': 'Terlalu banyak percobaan. Tunggu sebentar sebelum coba lagi.',
+    'account.err-handle-invalid': 'Nama pengguna cuma boleh huruf kecil, angka, dan garis bawah (3-20 karakter).',
+    'account.err-handle-taken': 'Nama itu sudah dipakai orang lain. Coba nama lain ya.',
+    'account.err-exists': 'Perangkat ini sudah punya akun. Masuk saja pakai akun itu.',
+    'account.err-invite': 'Kode undangannya nggak bisa dipakai. Minta kode baru ke pengelola.',
+    'account.err-code': 'Bentuk kode undangannya nggak benar. Cek lagi ketikannya.',
+    'account.err-pass-empty': 'Kata sandinya belum diisi.',
+    'account.err-pass-short': 'Kata sandi minimal 10 karakter.',
+    'account.err-pass-long': 'Kata sandinya kepanjangan.',
+    'account.err-pass-simple': 'Campur huruf dengan angka atau simbol biar lebih aman.',
+    'account.err-pass-common': 'Kata sandi itu terlalu gampang ditebak. Pilih yang lain ya.',
+    'account.err-unauthorized': 'Sesimu sudah habis. Masuk lagi ya.',
+    'account.err-forbidden': 'Akun ini nggak punya akses ke sana.',
+    'account.err-unknown': 'Ada yang nggak beres. Coba lagi sebentar lagi.',
+    'account.title-login': 'Masuk ke akunmu',
+    'account.title-register': 'Bikin akun',
+    'account.title-teacher': 'Aktivasi akun guru',
+    'account.body-login': 'Masuk supaya progres belajarmu bisa dibuka dari perangkat lain.',
+    'account.body-register': 'Progres yang sudah kamu kumpulkan di perangkat ini ikut terbawa.',
+    'account.body-teacher': 'Masukkan kode undangan dari pengelola sekolahmu.',
+    'account.label-handle': 'Nama pengguna',
+    'account.label-password': 'Kata sandi',
+    'account.label-code': 'Kode undangan',
+    'account.hint-password': 'Minimal 10 karakter, campur huruf dengan angka.',
+    'account.btn-login': 'Masuk',
+    'account.btn-register': 'Daftar',
+    'account.btn-teacher': 'Aktifkan',
+    'account.btn-cancel': 'Nanti saja',
+    'account.btn-logout': 'Keluar akun',
+    'account.to-register': 'Belum punya akun? Daftar di sini',
+    'account.to-login': 'Sudah punya akun? Masuk di sini',
+    'account.to-teacher': 'Punya kode undangan guru?',
+    'account.signed-in': 'Masuk sebagai {handle}',
+    'account.logout-done': 'Kamu sudah keluar. Progres di perangkat ini tetap aman.',
+    'account.busy': 'Sebentar…'
   });
 }());

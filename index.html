@@ -598,6 +598,13 @@ html.fz-booting body{overflow:hidden}
        seluruh pemanggilnya di app.js guarded dan fitur teman kembali ke jalur manual. -->
   <script defer src="./features/social/fiezel-invite-link.js"></script>
   <script defer src="./features/social/fiezel-social-notify.js"></script>
+  <!-- LAPIS AKUN (masuk / daftar / aktivasi guru). Inti murni tanpa DOM, seperti
+       gems-core: seluruh UI-nya hidup di app.js. Dimuat SEBELUM app.js karena alur
+       boot menanyakan sesi (`FiezelAccount.refresh()`) sebelum Home digambar, jadi
+       cangkang yang benar dipilih sekali — bukan digambar sebagai murid lalu
+       melompat ke cangkang guru sesudahnya. Kalau berkas ini gagal dimuat, seluruh
+       pemanggilnya di app.js guarded dan aplikasi tetap jalan sebagai anonim. -->
+  <script defer src="./features/auth/fiezel-account.js"></script>
   <script defer src="./features/speaking-listening/fiezel-speaking-listening-addon.js"></script>
   <script defer src="./fiezel-lazy-loader.js"></script>
 

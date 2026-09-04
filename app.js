@@ -5459,6 +5459,9 @@ function openApp(){
   // sendiri menunggu alur sambutan selesai — lihat armSocialInviteSheet() di bawah.
   try{socialInviteBoot()}catch(_){}
   armSocialInviteSheet();
+  // Sesi akun ditanyakan di gelombang yang sama: sesudah sambutan selesai, sebelum murid
+  // menyentuh Pengaturan. 401 = anonim dan itu normal, jadi jalur ini senyap.
+  try{accountBootRefresh()}catch(_){}
   // Layar utama sudah tergambar - INI momen yang benar untuk mengambil tumpukan berat.
   // Mengambilnya lebih awal (mis. begitu DOM siap) justru merebut pita dari app.js dan
   // ~2,7 MB JSON kontennya di jaringan seluler, sehingga penghematannya hilang seluruhnya.
@@ -10067,7 +10070,7 @@ function openSettings(){const p=state.preferences||defaultPreferences,endpoint=p
   /* SOSIAL (SLOT 7): pintu masuk Profil Online + sakelar Mode Privat papan. Sakelar bicara
      ke server SAAT diubah (bukan saat Simpan) karena janjinya "hilang dari papan seketika";
      tanpa profil/offline ia menolak jujur lewat toast dan kembali ke posisi semula. */
-  const grupOnline=`<div class="settings-list"><button type="button" class="setting-row setting-row-action" onclick="openOnlineView()"><span class="setting-icon"><i data-lucide="users"></i></span><span><b>${FiezelI18n.t('settings.online-profile-label')}</b><small>${FiezelI18n.t('settings.online-profile-desc')}</small></span><i data-lucide="chevron-right"></i></button><label class="setting-row"><span class="setting-icon"><i data-lucide="eye-off"></i></span><span><b>${FiezelI18n.t('settings.private-mode-label')}</b><small>${FiezelI18n.t('settings.private-mode-desc')}</small></span><input id="settingBoardHidden" type="checkbox" ${socialProfileCache?.flags?.boardHidden?'checked':''} aria-label="${FiezelI18n.t('settings.private-mode-aria')}"></label></div>`;
+  const grupOnline=`<div class="settings-list"><button type="button" class="setting-row setting-row-action" onclick="closeModal();openAccountSheet('login')"><span class="setting-icon"><i data-lucide="log-in"></i></span><span><b>${FiezelI18n.t('account.title-login')}</b><small>${accountStatusLine()||FiezelI18n.t('account.body-login')}</small></span><i data-lucide="chevron-right"></i></button><button type="button" class="setting-row setting-row-action" onclick="openOnlineView()"><span class="setting-icon"><i data-lucide="users"></i></span><span><b>${FiezelI18n.t('settings.online-profile-label')}</b><small>${FiezelI18n.t('settings.online-profile-desc')}</small></span><i data-lucide="chevron-right"></i></button><label class="setting-row"><span class="setting-icon"><i data-lucide="eye-off"></i></span><span><b>${FiezelI18n.t('settings.private-mode-label')}</b><small>${FiezelI18n.t('settings.private-mode-desc')}</small></span><input id="settingBoardHidden" type="checkbox" ${socialProfileCache?.flags?.boardHidden?'checked':''} aria-label="${FiezelI18n.t('settings.private-mode-aria')}"></label></div>`;
   openModal(`<div class="settings-head"><div class="modal-mark">FIEZEL CONTROL ROOM</div><h2>${FiezelI18n.t('settings.title',{name:esc(learnerName())})}</h2><p>${FiezelI18n.t('settings.all-can-diatur-dikelompokkan-each')}</p></div>`
     +settingsFold(FiezelI18n.t('settings.profil-amp-level'),grupProfil,true)
     +settingsFold(FiezelI18n.t('settings.study'),grupBelajar,false)
@@ -11451,6 +11454,135 @@ function armSocialInviteSheet(tries){
 function socialUnreadCount(){try{return socialNotifyCore()?.unreadCount()||0}catch(_){return 0}}
 function socialPendingInvite(){try{return inviteLink()?.pending()||null}catch(_){return null}}
 window.socialNotifyPoll=socialNotifyPoll;
+/* ---------------------------------------------------------------- LAPIS AKUN (§21/§22/§27) */
+/**
+ * Lembar akun: masuk, daftar, dan aktivasi guru. SATU lembar tiga mode, bukan tiga layar —
+ * murid yang salah pintu tinggal menukar mode, dan guru yang memegang kode undangan tidak
+ * perlu mencari menu tersembunyi.
+ *
+ * Seluruh keputusan yang berbahaya ada di server: peran, cangkang, dan navigasi datang dari
+ * jawaban `/api/account/*` dan disalin apa adanya (`features/auth/fiezel-account.js`). Berkas
+ * ini hanya menggambar dan meneruskan ketikan — ia TIDAK punya cabang yang menyimpulkan
+ * seseorang guru, karena cangkang guru yang bisa disimpulkan klien adalah cangkang guru yang
+ * bisa dipaksa klien.
+ *
+ * Akun Puter di Pengaturan (`bindAccountSettingControls`) adalah hal LAIN: itu platform suara
+ * dan AI pihak ketiga. Keduanya sengaja tidak dinamai sama supaya tidak ada yang mengira
+ * keluar dari salah satunya berarti keluar dari keduanya.
+ */
+function accountCore(){try{return self.FiezelAccount||null}catch(_){return null}}
+let accountSheetMode='login',accountSheetBusy=false;
+function accountSheetShell(inner){return `<div class="modal-mark">FIEZEL</div><div id="accountSheet">${inner}</div>`}
+/** Mode -> {judul, isi, tombol, path}. Dipisah supaya markup di bawah tetap satu bentuk. */
+const ACCOUNT_MODES={
+  login:{title:'account.title-login',body:'account.body-login',btn:'account.btn-login'},
+  register:{title:'account.title-register',body:'account.body-register',btn:'account.btn-register'},
+  teacher:{title:'account.title-teacher',body:'account.body-teacher',btn:'account.btn-teacher'}
+};
+function accountSheetMarkup(mode,message){
+  const m=ACCOUNT_MODES[mode]||ACCOUNT_MODES.login;
+  const codeField=mode==='teacher'
+    ? `<div class="field"><label for="accountCode">${FiezelI18n.t('account.label-code')}</label>
+       <input id="accountCode" type="text" autocomplete="one-time-code" inputmode="text" spellcheck="false"></div>`
+    : '';
+  // Petunjuk sandi hanya ditampilkan di jalur yang MEMBUAT sandi. Menampilkannya saat masuk
+  // memberi tahu penebak bentuk sandi yang sah, dan tidak menolong siapa pun yang sudah punya.
+  const passHint=mode==='login'?'':`<small class="field-msg">${FiezelI18n.t('account.hint-password')}</small>`;
+  const links=mode==='login'
+    ? `<button type="button" class="setup-link" onclick="accountSetMode('register')">${FiezelI18n.t('account.to-register')}</button>
+       <button type="button" class="setup-link" onclick="accountSetMode('teacher')">${FiezelI18n.t('account.to-teacher')}</button>`
+    : `<button type="button" class="setup-link" onclick="accountSetMode('login')">${FiezelI18n.t('account.to-login')}</button>`;
+  // Pesan galat memakai `.field.is-error` yang SUDAH ada (warna var(--bad), lolos kontras)
+  // alih-alih kelas baru: satu palet, satu resep fokus, nol warna tambahan untuk diaudit.
+  const msg=message?`<div class="field is-error"><p id="accountMsg" class="field-msg" role="alert">${esc(String(message))}</p></div>`:'';
+  return `<h2>${FiezelI18n.t(m.title)}</h2>
+    <p>${FiezelI18n.t(m.body)}</p>
+    ${codeField}
+    <div class="field"><label for="accountHandle">${FiezelI18n.t('account.label-handle')}</label>
+    <input id="accountHandle" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" inputmode="text"></div>
+    <div class="field"><label for="accountPassword">${FiezelI18n.t('account.label-password')}</label>
+    <input id="accountPassword" type="password" autocomplete="${mode==='login'?'current-password':'new-password'}">
+    ${passHint}</div>
+    ${msg}
+    <div class="modal-actions">
+      <button type="button" onclick="closeModal()">${FiezelI18n.t('account.btn-cancel')}</button>
+      <button type="button" class="primary" id="accountSubmitBtn" onclick="accountSubmit()">${FiezelI18n.t(m.btn)}</button>
+    </div>
+    <div>${links}</div>`;
+}
+function accountPaint(message){
+  const host=$('accountSheet');
+  if(host){host.innerHTML=accountSheetMarkup(accountSheetMode,message);enhanceUI();return true}
+  openModal(accountSheetShell(accountSheetMarkup(accountSheetMode,message)));return true;
+}
+function openAccountSheet(mode){
+  if(!accountCore()){showToast(FiezelI18n.t('account.err-disabled'));return false}
+  accountSheetMode=ACCOUNT_MODES[mode]?mode:'login';accountSheetBusy=false;
+  accountPaint('');
+  return true;
+}
+/** Tukar mode TANPA menutup lembar — ketikan handle sengaja dibawa, sandi sengaja tidak. */
+function accountSetMode(mode){
+  if(accountSheetBusy)return false;
+  const handle=$('accountHandle')?.value||'';
+  accountSheetMode=ACCOUNT_MODES[mode]?mode:'login';
+  accountPaint('');
+  const field=$('accountHandle');if(field)field.value=handle;
+  return true;
+}
+/**
+ * Kirim. Jawaban modul SELALU seragam ({ok,error,message}) dan tidak pernah melempar, jadi
+ * di sini tidak ada try/catch yang menelan galat diam-diam: setiap jalan punya kalimatnya.
+ */
+async function accountSubmit(){
+  const core=accountCore();
+  if(!core||accountSheetBusy)return false;
+  const handle=$('accountHandle')?.value||'',password=$('accountPassword')?.value||'';
+  const code=$('accountCode')?.value||'';
+  accountSheetBusy=true;
+  const btn=$('accountSubmitBtn');
+  if(btn){btn.disabled=true;btn.textContent=FiezelI18n.t('account.busy')}
+  const res=accountSheetMode==='register'?await core.register(handle,password)
+    :accountSheetMode==='teacher'?await core.activateTeacher(code,handle,password)
+      :await core.login(handle,password);
+  accountSheetBusy=false;
+  if(res&&res.ok){
+    closeModal();
+    const st=core.state();
+    showToast(FiezelI18n.t('account.signed-in',{handle:st?.handle||handle}));
+    try{render()}catch(_){}
+    return true;
+  }
+  accountPaint(res?res.message:FiezelI18n.t('account.err-unknown'));
+  return false;
+}
+/** Keluar akun. Cookie identitas TIDAK disentuh: ia pembawa progres anonim, bukan sesi akun. */
+async function fiezelAccountLogout(){
+  const core=accountCore();if(!core)return false;
+  await core.logout();
+  showToast(FiezelI18n.t('account.logout-done'));
+  try{render()}catch(_){}
+  return true;
+}
+/** Baris status untuk Pengaturan. Kosong = anonim, dan itu keadaan yang sah. */
+function accountStatusLine(){
+  const st=accountCore()?.state?.();
+  return st&&st.handle?FiezelI18n.t('account.signed-in',{handle:st.handle}):'';
+}
+/**
+ * Tanya sesi sekali saat boot. 401 = anonim dan itu NORMAL, jadi modul menjawabnya senyap
+ * dan tidak ada toast yang muncul untuk murid yang memang belum punya akun.
+ */
+function accountBootRefresh(){
+  const core=accountCore();if(!core)return false;
+  const t=setTimeout(()=>{core.refresh().then(r=>{if(r&&r.ok){try{render()}catch(_){}}}).catch(()=>{})},2200);
+  t?.unref?.();
+  return true;
+}
+window.openAccountSheet=openAccountSheet;
+window.accountSetMode=accountSetMode;
+window.accountSubmit=accountSubmit;
+window.fiezelAccountLogout=fiezelAccountLogout;
 /* ---------------------------------------------------------------- kait bukti (evidence ingest) */
 // Ledger lesson yang SUDAH dilaporkan lesson_mastered — di localStorage terpisah, bukan di
 // state belajar (sanitizeState tidak perlu tahu; hilang ledger = paling buruk event ganda,

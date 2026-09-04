@@ -232,6 +232,14 @@ jobs:
           node social-frontend-test.js
           node social-schema-contract-test.js
           node social-invite-link-test.js
+          # Lapis AKUN sisi murid (masuk/daftar/aktivasi guru). Ditempatkan tepat sesudah
+          # gerbang sosial karena keduanya memakai lane transport yang sama (panggilan
+          # langsung ke Worker dengan cookie fz_id), dan cacat di lane itu akan memerahkan
+          # keduanya berdampingan alih-alih terpisah 100 baris. Ia MENJALANKAN modulnya di
+          # vm dengan fetch tiruan: yang dijaga adalah apa yang benar-benar berangkat ke
+          # server (nol field identitas, credentials:include, peran hanya dari server,
+          # sandi tidak pernah tersimpan), bukan ejaan kodenya.
+          node account-auth-client-test.js
           node audio-locale-guard-test.js
           node id-golden-snapshot-test.js
           node locale-enum-test.js
