@@ -15,7 +15,14 @@ const checks={
   schedulerAuth:worker.includes('cronAuthorized')&&worker.includes("/api/reminders/due")&&worker.includes("/api/reminders/ack"),
   webPushDispatcher:dispatcher.includes('webpush.sendNotification')&&dispatcher.includes('VAPID_PRIVATE_KEY')&&dispatcher.includes('FIEZEL_REMINDER_CRON_TOKEN'),
   newUserInactivityGuard:dispatcher.includes('looksUninitialized')&&dispatcher.includes("notification.kind==='inactivity_7'")&&dispatcher.includes("meta.trigger==='inactive_7_plus_days'")&&dispatcher.includes('suppressed++'),
-  rfc8030TopicSanitized:dispatcher.includes('safeTopic')&&dispatcher.includes('replace(/[^A-Za-z0-9_-]+/g')&&dispatcher.includes('topic:safeTopic(notification.tag)')&&!dispatcher.includes('topic:String(notification.tag'),
+  // Nilai topic sekarang dihitung sekali ke `sentTopic` supaya bisa ikut dicetak saat gagal;
+  // yang dijaga tetap sama: topic berasal dari safeTopic(notification.tag), bukan tag mentah.
+  rfc8030TopicSanitized:dispatcher.includes('safeTopic')&&dispatcher.includes('replace(/[^A-Za-z0-9_-]+/g')&&dispatcher.includes('const sentTopic=safeTopic(notification.tag)')&&dispatcher.includes('topic:sentTopic')&&!dispatcher.includes('topic:String(notification.tag'),
+  // Tanpa host endpoint dan nilai topic yang benar-benar terkirim, log 400 BadWebPushTopic
+  // tidak bisa dibedakan antar layanan push - itulah yang membuat kegagalan ini bertahan.
+  topicFailureDiagnostics:dispatcher.includes('const endpointHost=')&&dispatcher.includes('topicLength:sentTopic.length')&&dispatcher.includes('host:endpointHost(item.subscription)'),
+  // Endpoint penuh dan kunci langganan adalah data murid: host saja, tidak lebih.
+  subscriptionNotLogged:!dispatcher.includes('endpoint:')&&!dispatcher.includes('keys:')&&dispatcher.includes('.host'),
   hourlySchedule:workflow.includes("cron: '17 * * * *'")&&workflow.includes('workflow_dispatch:'),
   secretsNotRuntime:!app.includes('VAPID_PRIVATE_KEY')&&!worker.includes('VAPID_PRIVATE_KEY')&&!cfg.includes('VAPID_PRIVATE_KEY')&&!cfg.includes('VAPID_PRIVATE_KEY')&&!cfg.includes('FIEZEL_REMINDER_CRON_TOKEN')&&!cfg.includes('PUTER_AUTH_TOKEN'),
   coreDeploymentConfig:cfg.includes("aiGateway:'core-only'")&&deploymentConfigValid,
