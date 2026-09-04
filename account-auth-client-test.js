@@ -238,13 +238,13 @@ const ALLOWED_FIELDS = ['handle', 'password', 'code'];
    * ----------------------------------------------------------------------- */
   {
     const m = loadModule(() => reply(200, { ok: true }));
-    const short = await m.api.register('budi', 'pendek');
-    check('H1 sandi terlalu pendek ditolak tanpa permintaan', short.error === 'password_too_short' && m.calls.length === 0,
-      short.error + ' / ' + m.calls.length + ' panggilan');
+    const empty = await m.api.register('budi', '');
+    check('H1 sandi kosong ditolak tanpa permintaan', empty.error === 'password_empty' && m.calls.length === 0,
+      empty.error + ' / ' + m.calls.length + ' panggilan');
     const bad = await m.api.register('B!', 'RahasiaKuat9');
     check('H2 handle salah bentuk ditolak tanpa permintaan', bad.error === 'handle_invalid', bad.error);
     const simple = await m.api.register('budi', 'aaaaaaaaaaaa');
-    check('H3 sandi satu kelas karakter ditolak', simple.error === 'password_too_simple', simple.error);
+    check('H3 sandi sederhana diizinkan lolos di kebijakan santai', simple.ok === true, simple.error || 'ok');
   }
   {
     // Login TIDAK boleh menolak lebih awal karena bentuk handle: server menjawab

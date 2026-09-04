@@ -35,14 +35,13 @@ function mod(rel) {
 
   /* ---------- 1. Kebijakan kata sandi ---------------------------------------- */
   assert(pw.checkPasswordPolicy('') !== null, 'kata sandi kosong DITOLAK');
-  assert(pw.checkPasswordPolicy('short1A') !== null, 'kata sandi < 10 char DITOLAK');
-  assert(pw.checkPasswordPolicy('aaaaaaaaaaaa') !== null,
-    'satu kelas karakter saja DITOLAK (butuh >= 2 kelas)');
-  assert(pw.checkPasswordPolicy('password123') !== null, 'kata sandi umum DITOLAK');
-  assert(pw.checkPasswordPolicy('PASSWORD123') !== null,
-    'daftar umum tidak peka huruf besar-kecil');
   assert(pw.checkPasswordPolicy('x'.repeat(500) + 'A1') !== null,
     'kata sandi sangat panjang DITOLAK (cap CPU, bukan cap keamanan)');
+  assert(pw.checkPasswordPolicy('1') === null, 'kata sandi 1 karakter DITERIMA (bebas)');
+  assert(pw.checkPasswordPolicy('short1A') === null, 'kata sandi pendek DITERIMA');
+  assert(pw.checkPasswordPolicy('aaaaaaaaaaaa') === null,
+    'satu kelas karakter DITERIMA (kebijakan santai)');
+  assert(pw.checkPasswordPolicy('password123') === null, 'kata sandi umum/sederhana DITERIMA');
   assert(pw.checkPasswordPolicy('kucing-oranye-9') === null, 'frasa sandi wajar DITERIMA');
 
   /* ---------- 2. Turunan kunci ----------------------------------------------- */

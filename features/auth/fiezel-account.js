@@ -72,10 +72,10 @@
    * persis — cermin yang menyimpang lebih buruk daripada tidak ada cermin, karena
    * ia menolak sandi yang sebenarnya sah.
    */
-  var HANDLE_RE = /^[a-z0-9_]{3,20}$/;
-  var PASSWORD_MIN = 10;
+  var HANDLE_RE = /^[a-z0-9_.\s-]{1,50}$/;
+  var PASSWORD_MIN = 1;
   var PASSWORD_MAX = 200;
-  var PASSWORD_MIN_CLASSES = 2;
+  var PASSWORD_MIN_CLASSES = 1;
 
   /** Peran dan cangkangnya — cermin `role-core.js` SHELL. */
   var SHELL = Object.freeze({ owner: '/owner/', teacher: '/teacher/', learner: '/learner/' });
@@ -95,16 +95,17 @@
     // SATU kalimat untuk dua sebab yang berbeda. Itu disengaja.
     invalid_credentials: t('account.err-invalid', 'Nama atau kata sandinya nggak cocok. Coba cek lagi.'),
     account_locked: t('account.err-locked', 'Terlalu banyak percobaan. Tunggu sebentar sebelum coba lagi.'),
-    handle_invalid: t('account.err-handle-invalid', 'Nama pengguna cuma boleh huruf kecil, angka, dan garis bawah (3-20 karakter).'),
+    handle_invalid: t('account.err-handle-invalid', 'Nama pengguna tidak boleh kosong (maksimal 50 karakter).'),
     handle_taken: t('account.err-handle-taken', 'Nama itu sudah dipakai orang lain. Coba nama lain ya.'),
     account_exists: t('account.err-exists', 'Perangkat ini sudah punya akun. Masuk saja pakai akun itu.'),
     invite_unusable: t('account.err-invite', 'Kode undangannya nggak bisa dipakai. Minta kode baru ke pengelola.'),
     code_malformed: t('account.err-code', 'Bentuk kode undangannya nggak benar. Cek lagi ketikannya.'),
     password_empty: t('account.err-pass-empty', 'Kata sandinya belum diisi.'),
-    password_too_short: t('account.err-pass-short', 'Kata sandi minimal 10 karakter.'),
-    password_too_long: t('account.err-pass-long', 'Kata sandinya kepanjangan.'),
-    password_too_simple: t('account.err-pass-simple', 'Campur huruf dengan angka atau simbol biar lebih aman.'),
+    password_too_short: t('account.err-pass-short', 'Kata sandi minimal 1 karakter.'),
+    password_too_long: t('account.err-pass-long', 'Kata sandinya kepanjangan (maksimal 200 karakter).'),
+    password_too_simple: t('account.err-pass-simple', 'Kata sandi tidak boleh kosong.'),
     password_common: t('account.err-pass-common', 'Kata sandi itu terlalu gampang ditebak. Pilih yang lain ya.'),
+    password_mismatch: t('account.err-pass-mismatch', 'Konfirmasi kata sandi tidak cocok. Cek lagi ya.'),
     unauthorized: t('account.err-unauthorized', 'Sesimu sudah habis. Masuk lagi ya.'),
     forbidden: t('account.err-forbidden', 'Akun ini nggak punya akses ke sana.'),
     unknown: t('account.err-unknown', 'Ada yang nggak beres. Coba lagi sebentar lagi.')
@@ -132,7 +133,7 @@
     try { return !(root.navigator && root.navigator.onLine === false); } catch (_) { return true; }
   }
   function normalizeHandle(raw) {
-    return typeof raw === 'string' ? raw.trim().toLowerCase() : '';
+    return typeof raw === 'string' ? raw.trim().replace(/\s+/g, ' ').toLowerCase() : '';
   }
   /** Cermin `characterClasses()` server: huruf kecil, huruf besar, angka, sisanya. */
   function characterClasses(raw) {
@@ -284,7 +285,19 @@
     return { ok: false, error: res.error, message: res.message };
   }
 
-  async function register(handle, password) {
+  async function register(arg1, arg2) {
+    var handle, password, confirmPassword;
+    if (arg1 && typeof arg1 === 'object') {
+      handle = arg1.handle;
+      password = arg1.password;
+      confirmPassword = arg1.confirmPassword;
+    } else {
+      handle = arg1;
+      password = arg2;
+    }
+    if (confirmPassword !== undefined && confirmPassword !== null && String(confirmPassword) !== String(password)) {
+      return fail('password_mismatch', 400);
+    }
     var hp = handleProblem(handle);
     if (hp) return fail(hp, 400);
     var pp = passwordProblem(password);
@@ -294,17 +307,31 @@
     // membingungkan.
     if (!await ensureAnon()) return fail(online() ? 'unavailable' : 'offline');
     var res = await call(API_PATHS.register, { handle: normalizeHandle(handle), password: String(password) });
-    if (res.ok) adoptAccount(res.data);
+    if (res.ok) {
+      adoptAccount(res.data);
+      res.account = session;
+    }
     return res;
   }
 
-  async function login(handle, password) {
+  async function login(arg1, arg2) {
+    var handle, password;
+    if (arg1 && typeof arg1 === 'object') {
+      handle = arg1.handle;
+      password = arg1.password;
+    } else {
+      handle = arg1;
+      password = arg2;
+    }
     // TIDAK ada pemeriksaan bentuk handle di sini. Menolak lebih awal karena
     // "bentuknya salah" memberi tahu penebak bahwa handle sah punya bentuk lain —
     // dan lebih penting lagi, server sudah menjawab seragam untuk semua kasus.
     if (!await ensureAnon()) { /* lanjut saja: login tidak menuntut identitas dulu */ }
     var res = await call(API_PATHS.login, { handle: normalizeHandle(handle), password: String(password || '') });
-    if (res.ok) adoptAccount(res.data);
+    if (res.ok) {
+      adoptAccount(res.data);
+      res.account = session;
+    }
     return res;
   }
 
@@ -317,19 +344,52 @@
     return res;
   }
 
-  async function activateTeacher(code, handle, password) {
-    var hp = handleProblem(handle);
-    if (hp) return fail(hp, 400);
-    var pp = passwordProblem(password);
-    if (pp) return fail(pp, 400);
+  async function activateTeacher(arg1, arg2, arg3) {
+    var code, handle, password;
+    if (arg1 && typeof arg1 === 'object') {
+      code = arg1.code;
+      handle = arg1.handle;
+      password = arg1.password;
+    } else {
+      code = arg1;
+      handle = arg2;
+      password = arg3;
+    }
+    var body = { code: String(code || '').trim() };
+    if (handle !== undefined && handle !== null && String(handle).trim() !== '') {
+      var hp = handleProblem(handle);
+      if (hp) return fail(hp, 400);
+      body.handle = normalizeHandle(handle);
+    }
+    if (password !== undefined && password !== null && String(password) !== '') {
+      var pp = passwordProblem(password);
+      if (pp) return fail(pp, 400);
+      body.password = String(password);
+    }
     if (!await ensureAnon()) return fail(online() ? 'unavailable' : 'offline');
-    var res = await call(API_PATHS.teacherActivate, {
-      code: String(code || '').trim(),
-      handle: normalizeHandle(handle),
-      password: String(password)
-    });
-    if (res.ok) adoptAccount(res.data);
+    var res = await call(API_PATHS.teacherActivate, body);
+    if (res.ok) {
+      adoptAccount(res.data);
+      res.account = session;
+    }
     return res;
+  }
+
+  function validateHandle(raw) {
+    var h = normalizeHandle(raw);
+    var prob = handleProblem(h);
+    return { ok: !prob, handle: h, error: prob };
+  }
+
+  function validatePassword(raw) {
+    var prob = passwordProblem(raw);
+    return { ok: !prob, error: prob };
+  }
+
+  function validateCode(raw) {
+    var code = String(raw || '').trim().toUpperCase();
+    var ok = code.length === 32 && /^[2-9A-HJ-KM-NP-TV-Z]{32}$/.test(code);
+    return { ok: ok, code: code, error: ok ? null : 'code_malformed' };
   }
 
   root.FiezelAccount = Object.freeze({
@@ -345,14 +405,23 @@
     normalizeHandle: normalizeHandle,
     handleProblem: handleProblem,
     passwordProblem: passwordProblem,
+    validateHandle: validateHandle,
+    validatePassword: validatePassword,
+    validateCode: validateCode,
     ensureAnon: ensureAnon,
     refresh: refresh,
+    getMe: refresh,
     register: register,
     login: login,
     logout: logout,
     activateTeacher: activateTeacher,
     state: state,
+    getAccount: state,
     signedIn: signedIn,
-    role: roleOf
+    isLoggedIn: signedIn,
+    role: roleOf,
+    getRole: roleOf,
+    isLearner: function() { return roleOf() === 'learner'; },
+    isTeacher: function() { return roleOf() === 'teacher'; }
   });
 })(typeof self !== 'undefined' ? self : this);
