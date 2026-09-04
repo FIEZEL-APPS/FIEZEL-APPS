@@ -223,6 +223,14 @@ const BREAKER_REASONS = ['timeout', 'rate-limit', 'upstream-5xx', 'quota', 'unkn
 const ACCOUNT_KINDS = ['anon_learner', 'authenticated'];
 const ATTEMPT_BUCKETS = ['5-9', '10-29', '30+'];
 const DURATION_BUCKETS = ['<2m', '2-10m', '10-30m', '30m+'];
+/* m025-246 — dua ember baru untuk funnel masuk. Nilainya WAJIB byte-identik dengan
+   FIREST_QUESTION_BUCKETS/SKIP_REASONS di features/analytics/fiezel-analytics-client.js:
+   sisi klien memvalidasi sebelum mengirim dan sisi ini memvalidasi lagi sebelum menulis,
+   jadi satu nilai yang menyimpang berarti event yang lolos di klien lalu ditolak 400 di
+   server - kelas kegagalan yang hanya terlihat sebagai "angkanya nol", bukan sebagai galat.
+   analytics-client-test.js membandingkan kedua daftar event; enum-nya dijaga di sini. */
+const FIRST_QUESTION_BUCKETS = ['<30s', '30-60s', '60-180s', '180s+'];
+const SKIP_REASONS = ['audio_failed', 'learner_choice', 'timeout'];
 const CHAR_BUCKETS = ['<200', '200-1k', '1k-5k', '5k+'];
 
 const T = {
@@ -248,6 +256,12 @@ export const EVENT_SPEC = Object.freeze({
   lesson_completed: { origin: 'client', fields: { domain: T.enum(DOMAINS), level: T.enum(LEVELS) } },
   question_answered: { origin: 'client', fields: { domain: T.enum(DOMAINS), level: T.enum(LEVELS), ok: T.bool() } },
   retention_ping: { origin: 'client', fields: { cohort_day: T.day(), day_index: T.int(0, 400) } },
+  /* m025-246 (OWNER: "Instrumentasi funnel ... launch->soal pertama, ... skip rate").
+     Keduanya origin:'client' - hanya perangkat murid yang tahu kapan soal pertamanya
+     tercat dan kapan sebuah soal dilewati. Tanpa entri di sini, kedua event itu ditolak
+     400 oleh Worker dan instrumentasinya tidak akan pernah menghasilkan satu baris pun. */
+  first_question: { origin: 'client', fields: { elapsed_bucket: T.enum(FIRST_QUESTION_BUCKETS), cold: T.bool() } },
+  question_skipped: { origin: 'client', fields: { domain: T.enum(DOMAINS), level: T.enum(LEVELS), reason: T.enum(SKIP_REASONS) } },
 
   // --- MULAI BLOK SERVER-ONLY (klien ditolak 400) ---------------------------
   user_created: { origin: 'server', fields: { kind: T.enum(ACCOUNT_KINDS), platform: T.enum(PLATFORMS) } },

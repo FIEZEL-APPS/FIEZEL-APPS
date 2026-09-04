@@ -241,6 +241,10 @@ jobs:
           # server (nol field identitas, credentials:include, peran hanya dari server,
           # sandi tidak pernah tersimpan), bukan ejaan kodenya.
           node account-auth-client-test.js
+          # m025-250: auth-account-test.js ADA di repo sejak gelombang akun murid tapi tidak
+          # pernah didaftarkan, jadi CI tidak pernah menjalankannya - gate-registry-test.js
+          # memerahkan tepat keadaan itu. Ia hijau; yang hilang hanya barisnya.
+          node auth-account-test.js
           node audio-locale-guard-test.js
           node id-golden-snapshot-test.js
           node locale-enum-test.js
@@ -308,6 +312,11 @@ jobs:
           node pastel-field-contrast-test.js
           node topbar-logo-contrast-test.js
           node paw-mascot-test.js
+          # m025-246 (edge case wajib OWNER): "Kurangi-gerak: 14 state maskot harus punya
+          # fallback statis - verifikasi dengan test." Ditaruh tepat di sini karena ia
+          # memperluas kontrak yang sama dengan paw-mascot-test.js: satu sumber bentuk,
+          # dan sekarang juga satu bingkai statis per state.
+          node mascot-reduced-motion-test.js
           # Lima gerbang redesign maskot PAW (spec §35 "New regression nets" + A-10).
           # Ditaruh tepat sesudah paw-mascot-test.js karena kelimanya memperluas kontrak
           # yang gerbang itu mulai jaga: satu sumber bentuk (geometri + checksum ekspor),
@@ -439,6 +448,16 @@ jobs:
           # m025-212: kabar pembaruan wajib TERLIHAT murid - kartu di layar, tombolnya
           # yang memicu perpindahan generasi controller, bukan muat ulang diam-diam.
           node update-prompt-test.js
+          # m025-246 gelombang penyederhanaan pengalaman. Tiga gerbang, tiga lapis:
+          #   ux-flags-test.js    - nilai bawaan sakelar + salinan app.js tidak menyimpang
+          #   ux-redesign-test.js - apa yang ada DI BALIK sakelar (nav 4 tab, Home Hari ini,
+          #                         placement-lite, ringkasan sesi, keadaan gagal audio,
+          #                         funnel, nama internal, tipografi, gerbang akun offline)
+          #   night-theme-test.js - Tema Malam: dua pintu aktivasi identik, token --core*,
+          #                         kontras AA, dan pilihan murid menang atas perangkat
+          node ux-flags-test.js
+          node ux-redesign-test.js
+          node night-theme-test.js
           # pwa-release-coherence memeriksa keempat penanda SELARAS satu sama lain; ia tidak
           # bisa tahu nomornya sudah dipakai jalur lain. Itu celah yang meloloskan tabrakan
           # m025-196..199 (BUILD-NUMBER-COLLISION-2026-08-30.md). --strict: di CI, dasar yang

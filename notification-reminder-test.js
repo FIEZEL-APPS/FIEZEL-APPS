@@ -47,7 +47,12 @@ setTimeout(async()=>{
   try{
     // WAJIB -> DIUNDANG, TIDAK DIPAKSA: izin 'denied' tidak boleh mengunci apa pun.
     assert(!bodyClasses.contains('notification-locked'),'izin ditolak TIDAK boleh mengunci aplikasi lagi');
-    assert(/launcher-shell/.test(element('app').innerHTML),'Home harus tergambar walaupun izin notifikasi ditolak');
+    /* m025-246: yang diuji adalah "Home TERGAMBAR", bukan tata letak tertentu. Pola lama
+       memaku `launcher-shell` - kelas milik beranda lama - jadi ia ikut merah begitu
+       berandanya diganti kartu "Hari ini", padahal yang dijaga gerbang ini (izin ditolak
+       tidak boleh mengunci apa pun) sama sekali tidak berubah. `home-page` adalah kelas
+       pembungkus yang dipakai KEDUA tata letak. */
+    assert(/home-page/.test(element('app').innerHTML),'Home harus tergambar walaupun izin notifikasi ditolak');
     // Panel undangan pun tidak ditawarkan pada izin yang sudah 'denied': browser tidak akan
     // menampilkan dialognya lagi, jadi tawaran itu hanya akan jadi panel buntu.
     assert(element('welcome').classList.contains('hidden')||!/terkunci|belum bisa dibuka|wajib/i.test(element('notificationGateBody').textContent),'tidak boleh ada naskah "terkunci"/"wajib" yang tersisa di panel');
@@ -56,7 +61,7 @@ setTimeout(async()=>{
     // Menolak lewat "Nanti saja" tetap meninggalkan aplikasi yang utuh dan terpakai.
     context.declineStudyNotifications();
     assert(!bodyClasses.contains('notification-locked'),'"Nanti saja" tidak boleh mengunci aplikasi');
-    assert(/launcher-shell/.test(element('app').innerHTML),'Home tetap ada setelah menolak pengingat');
+    assert(/home-page/.test(element('app').innerHTML),'Home tetap ada setelah menolak pengingat');
     // Izin yang kemudian diberikan tetap menyalakan pengingatnya seperti sebelumnya.
     Notification.permission='granted';await context.requestStudyNotificationPermission();
     assert(!bodyClasses.contains('notification-locked'),'izin diberikan tetap tidak boleh menyentuh kunci apa pun');

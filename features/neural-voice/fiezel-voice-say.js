@@ -38,6 +38,19 @@
  * Yang menggantikannya adalah L5 apa adanya: DIAM, teks tetap terbaca. Tidak ada lapisan
  * suara baru yang boleh disisipkan di bawah L3 - lihat speakWithLocal().
  *
+ * m025-246 - ATURAN ITU DITEGASKAN ULANG, dan kali ini dengan kalimat owner sendiri.
+ * Brief 3 Sep 2026 sempat meminta "fallback suara peramban" untuk Android kelas bawah, dan
+ * satu jalur tombol sempat dipasang di keadaan gagal audio. OWNER membatalkannya sehari
+ * kemudian: "aku ga mau lagi ada tts browser, tts browser harus mati total."
+ *
+ * Jadi tidak ada suara peramban di mana pun - bukan sebagai lapisan, bukan sebagai tombol,
+ * bukan sebagai jalan keluar darurat. Yang tersisa saat SELURUH tangga gagal tetap L5: DIAM,
+ * teks tetap terbaca, dan di layar soal dengar murid diberi dua jalan keluar yang tidak
+ * butuh suara sama sekali (coba lagi, atau lewati tanpa penalti).
+ *
+ * audio-locale-guard-test.js menegakkannya: SETIAP sebutan speechSynthesis di zona audio
+ * maupun di app.js memerahkan gerbang.
+ *
  * S6 — LAPISAN CLOUDFLARE, DUA SISIPAN DAN TIDAK LEBIH. Saat
  * `FIEZEL_CF_CONFIG.endpoints.tts === 'on'` (dan `enabled:true` + `base` terisi), tangga di
  * atas menjadi:

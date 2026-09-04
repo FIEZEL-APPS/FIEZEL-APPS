@@ -82,9 +82,9 @@
     'settings.laporan-privat': 'รายงานเป็นส่วนตัว',
     'settings.laporan-terkirim': 'ส่งแล้ว {tanggal}',
     'settings.laporan-terkirim-polos': 'ส่งแล้ว',
-    'sys.core-belum-tersambung': 'Core Brain ยังเชื่อมต่อไม่สมบูรณ์',
-    'sys.core-push-aktif': 'Core Brain + push ทำงานแล้ว',
-    'sys.core-push-belum': 'Core Brain ทำงานอยู่ แต่ remote push ยังไม่เชื่อมต่อ',
+    'sys.core-belum-tersambung': 'บริการ FIEZEL ยังเชื่อมต่อไม่สมบูรณ์',
+    'sys.core-push-aktif': 'บริการ FIEZEL + การแจ้งเตือน ทำงานแล้ว',
+    'sys.core-push-belum': 'บริการ FIEZEL ทำงานอยู่ แต่การแจ้งเตือนยังไม่เชื่อมต่อ',
     'tutor.tuntunan-eyebrow': 'ไกด์ทีละขั้น',
 
     // ---------- pasangan entri W2-REGEN di copy-id-app-b.js ----------

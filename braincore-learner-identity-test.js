@@ -696,8 +696,22 @@ function babKlien() {
     /function forgetLearnerEvidence\(\)[\s\S]{0,300}q\.purge\(\)/.test(app));
   check('(F) klien: reset progres ikut mengosongkan antrean lane per-murid',
     /function resetProgress\(\)[\s\S]{0,4000}identityEvidenceQueue\(\)[\s\S]{0,200}q\.purge\(\)/.test(app));
-  check('(F) klien: reset progres menghapus penanda lane per-murid dari localStorage',
-    /resetProgress\(\)[\s\S]{0,4000}IDENTITY_EVIDENCE_ATTEMPT_KEY,LEARNER_NAME_SYNC_KEY\]/.test(app));
+  /* m025-250: pola lama memaku kedua kunci sebagai DUA ANGGOTA TERAKHIR daftar
+     (`...ATTEMPT_KEY,LEARNER_NAME_SYNC_KEY]`), jadi menambahkan kunci apa pun sesudahnya
+     memerahkannya tanpa satu janji pun yang dilanggar. Janji baris ini adalah "penanda lane
+     per-murid ikut dihapus saat reset"; yang diuji sekarang KEANGGOTAANNYA di dalam daftar
+     removeItem milik resetProgress(), di posisi mana pun. Daftarnya diambil dari sumber yang
+     sama - blok `for(const k of [...])` di dalam fungsi itu - supaya gerbang ini tidak bisa
+     lulus dengan mencocokkan teks yang kebetulan ada di tempat lain di app.js. */
+  {
+    const reset = app.slice(app.indexOf('function resetProgress()'));
+    const daftar = (reset.match(/for\s*\(\s*const\s+k\s+of\s*\[([^\]]*)\]/) || ['', ''])[1]
+      .split(',').map((x) => x.trim());
+    const wajib = ['IDENTITY_EVIDENCE_ATTEMPT_KEY', 'LEARNER_NAME_SYNC_KEY'];
+    check('(F) klien: reset progres menghapus penanda lane per-murid dari localStorage',
+      wajib.every((k) => daftar.includes(k)),
+      'hilang dari daftar reset: ' + wajib.filter((k) => !daftar.includes(k)).join(', '));
+  }
   check('(B) klien: antrean IndexedDB lane per-murid TERPISAH dari lane agregat',
     /IDENTITY_EVIDENCE_DB_NAME='fiezel-braincore-learner-evidence-v1'/.test(app) &&
     /EVIDENCE_DB_NAME='fiezel-braincore-evidence-v1'/.test(app));

@@ -167,7 +167,10 @@ test('integration loads correction after Tutor v3 and preserves five primary des
   assert.ok(app.includes("'classroom'"));
   assert.ok(app.includes('classroom-launch is-coming-soon'), 'kartu Classroom harus tampil terkunci Coming Soon');
   assert.ok(!app.includes("onclick=\"go('classroom')\""), 'kartu Classroom tidak boleh lagi bernavigasi');
-  assert.strictEqual((index.match(/class="nav"/g) || []).length + 1, 5);
+  // m025-246: tab bar dipangkas ke empat tujuan (Hari ini / Latihan / Progres / Pengaturan).
+  // Pola lama menghitung `class="nav"` lalu menambah 1 untuk tab aktif; pola ini langsung
+  // menghitung keduanya, jadi ia tidak lagi bergantung pada asumsi "tepat satu tab aktif".
+  assert.strictEqual((index.match(/class="nav(?: active)?"/g) || []).length, 4);
   assert.ok(index.includes('./features/tutor-classroom/fiezel-tutor-v3.js'));
   // m025-95: tambalan suara Indonesia dihapus; Classroom kini bicara Inggris bersubtitle.
   assert.ok(!index.includes('fiezel-tutor-indonesian-voice-fix.js'),

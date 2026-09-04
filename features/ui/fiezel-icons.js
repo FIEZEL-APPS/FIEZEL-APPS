@@ -124,6 +124,18 @@
       '<path class="fz-line" d="M12 15v3.4M8.6 18.4h6.8M8 9.2h5.6M8 11.8h3.4"/>',
     skills: '<path class="fz-fill" d="M6 10h2.2v4H6zM10.9 7.4h2.2v9.2h-2.2zM15.8 9h2.2v6h-2.2z"/>' +
       '<path class="fz-line" d="M6.9 9.4v5.2M12 6.6v10.8M17.1 8.4v7.2M3.6 11.2v1.6M20.4 11.2v1.6"/>',
+    /* m025-246: tab bar sekarang punya EMPAT tujuan dan salah satunya Pengaturan.
+       Ikon lucide `sliders-horizontal` sudah dipakai tombol gigi di topbar, tetapi
+       tab bar adalah wilayah set duotone (kontrak refreshIcons di app.js: duotone
+       memegang kroma yang dilihat murid tiap hari, lucide memegang ikon sekali-pakai
+       DI DALAM layar). Meminjam ikon lucide ke sana akan membuat satu dari empat tab
+       digambar dengan berat garis dan bahasa bentuk yang berbeda dari tiga tetangganya.
+       Aturan keluarga yang sama dengan ikon lain: kanvas 24x24, isi di kotak 3..21,
+       satu bidang, tanpa warna yang dipaku. */
+    settings: '<path class="fz-fill" d="M4.2 7.2h15.6v2.4H4.2zM4.2 14.4h15.6v2.4H4.2z"/>' +
+      '<path class="fz-line" d="M3.6 8.4h16.8M3.6 15.6h16.8"/>' +
+      '<circle class="fz-line" cx="9.2" cy="8.4" r="2.3"/>' +
+      '<circle class="fz-line" cx="15" cy="15.6" r="2.3"/>',
     /* Wajah pembimbing FIEZEL - bentuknya milik FIEZEL sendiri, bukan maskot pihak lain:
        satu kotak membulat (huruf F yang dibulatkan), dua mata, satu percik. */
     coach: '<rect class="fz-fill" x="4.2" y="4.6" width="15.6" height="14.4" rx="5"/>' +
