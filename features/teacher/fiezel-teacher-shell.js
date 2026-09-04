@@ -81,7 +81,26 @@
   }
   function unmount() { stopAutoSync(); document.body.classList.remove('fz-teacher-mode'); document.removeEventListener('keydown', onKey); if (el) { el.removeEventListener('click', onClick); el.removeEventListener('submit', onSubmit); el.removeEventListener('change', onChange); el.removeEventListener('input', onInput); } el = null; ui.modal = null; ui.drawer = null; }
   function onKey(e) { if (e.key === 'Escape' && (ui.modal || ui.drawer)) { ui.modal = null; ui.drawer = null; render(); } }
-  function exit() { unmount(); if (env.exit) env.exit(); }
+  function isTeacherRole() {
+    try {
+      return (root.FiezelAccount && root.FiezelAccount.isTeacher && root.FiezelAccount.isTeacher()) ||
+             (root.FiezelAccount && root.FiezelAccount.state && root.FiezelAccount.state() && root.FiezelAccount.state().role === 'teacher');
+    } catch (_) { return false; }
+  }
+  function exit() {
+    if (isTeacherRole()) {
+      if (confirm('Keluar dari akun guru?')) {
+        if (root.FiezelAccount && root.FiezelAccount.logout) {
+          root.FiezelAccount.logout().then(function () {
+            location.reload();
+          });
+        }
+      }
+      return;
+    }
+    unmount();
+    if (env.exit) env.exit();
+  }
 
   function render() {
     if (!el) return;
@@ -93,12 +112,15 @@
 
   // ---- kerangka ---------------------------------------------------------------------------
   function sidebar(c) {
+    var teacherVerified = isTeacherRole();
+    var exitLabel = teacherVerified ? 'Keluar akun guru' : 'Ke mode murid';
+    var exitAction = teacherVerified ? 'logout' : 'exit';
     return '<aside class="tg-side"><div class="tg-brand"><span class="tg-brand-mark">F</span><div><b>FIEZEL</b><small>Ruang Guru</small></div></div>' +
       '<button type="button" class="tg-teacher" data-tg="view" data-view="settings" data-testid="tg-profile">' + icon('user-round') + '<div><b>' + esc(st.teacher.name || accountHandle() || 'Guru FIEZEL') + '</b><small>' + esc(st.teacher.school || 'Atur profil →') + '</small></div></button>' +
       (st.classes.length ? '<label class="tg-class-switch">Kelas aktif<select data-tg-select="class" data-testid="tg-class-select">' + st.classes.map(function (k) { return '<option value="' + k.id + '"' + (c && k.id === c.id ? ' selected' : '') + '>' + esc(k.name) + '</option>'; }).join('') + '</select></label>' : '') +
       '<nav class="tg-nav">' + NAV.map(function (n) { return '<button type="button" class="tg-nav-item' + (st.view === n[0] ? ' is-active' : '') + '" data-tg="view" data-view="' + n[0] + '" data-testid="tg-nav-' + n[0] + '">' + icon(n[2]) + '<span>' + n[1] + '</span></button>'; }).join('') + '</nav>' +
       '<div class="tg-side-foot"><div class="tg-saved" title="Perkiraan waktu administrasi yang FIEZEL kerjakan untukmu">' + icon('hourglass') + '<div><small>Waktu terhemat</small><b>' + Math.round(st.savedMinutes || 0) + ' menit</b></div></div>' +
-      '<button type="button" class="tg-exit" data-tg="exit" data-testid="tg-exit">' + icon('log-out') + ' Ke mode murid</button></div></aside>';
+      '<button type="button" class="tg-exit" data-tg="' + exitAction + '" data-testid="tg-exit">' + icon('log-out') + ' ' + exitLabel + '</button></div></aside>';
   }
   function topbar(c) {
     var d = new Date();
@@ -279,6 +301,18 @@
     switch (act) {
       case 'view': st.view = btn.getAttribute('data-view'); if (btn.getAttribute('data-skill')) ui.insightSkill = btn.getAttribute('data-skill'); ui.modal = null; ui.drawer = null; ui.filter = ''; break;
       case 'exit': persist(); exit(); return;
+      case 'logout':
+        persist();
+        if (confirm('Keluar dari akun guru?')) {
+          if (root.FiezelAccount && root.FiezelAccount.logout) {
+            root.FiezelAccount.logout().then(function () {
+              location.reload();
+            });
+          } else {
+            exit();
+          }
+        }
+        return;
       case 'sync': syncAll(false); return;
       case 'modal': ui.modal = { kind: btn.getAttribute('data-kind'), id: id, skill: btn.getAttribute('data-skill'), target: btn.getAttribute('data-target') }; break;
       case 'drawer': ui.drawer = id; ui.modal = null; break;

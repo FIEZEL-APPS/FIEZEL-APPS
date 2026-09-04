@@ -62,13 +62,17 @@ function normalizeHandle(raw) {
 const LOCK = Object.freeze({ MAX_FAILED: 8, WINDOW_MS: 15 * 60 * 1000 });
 
 function accountView(account, role) {
-  return {
+  const view = {
     handle: account.login_handle,
     role,
     shell: shellForRole(role),
     navigation: navigationFor(role),
     institutionId: account.institution_id || null
   };
+  if (account.teacher_name) view.teacherName = account.teacher_name;
+  if (account.institution) view.institution = account.institution;
+  if (account.institution_type) view.institutionType = account.institution_type;
+  return view;
 }
 
 /* ========================================================================== */
@@ -221,7 +225,23 @@ export async function routeAccountLogout(ctx) {
 export async function routeAccountMe(ctx) {
   const gate = await roleGate(ctx);
   if (!gate.ok) return gate.response;
-  return jsonResponse({ account: accountView(gate.account, gate.role) }, gate.opt);
+  let accountData = gate.account;
+  if (gate.role === 'teacher') {
+    const tp = await gate.db
+      .prepare('SELECT teacher_name, institution, institution_type FROM teacher_profile WHERE sub = ?1')
+      .bind(gate.sub)
+      .first()
+      .catch(() => null);
+    if (tp) {
+      accountData = {
+        ...gate.account,
+        teacher_name: tp.teacher_name,
+        institution: tp.institution,
+        institution_type: tp.institution_type
+      };
+    }
+  }
+  return jsonResponse({ account: accountView(accountData, gate.role) }, gate.opt);
 }
 
 /* ========================================================================== */
@@ -295,15 +315,31 @@ export async function routeTeacherActivate(ctx) {
 
     return jsonResponse({
       ok: true,
-      account: accountView({ login_handle: existingAccount.login_handle, institution_id: institutionId }, ROLE.TEACHER)
+      account: accountView({
+        login_handle: existingAccount.login_handle,
+        institution_id: institutionId,
+        teacher_name: invite.teacher_name,
+        institution: invite.institution,
+        institution_type: invite.institution_type
+      }, ROLE.TEACHER)
     }, { headers: ctx.corsHeaders });
   }
 
-  // Belum punya akun: wajib menyertakan handle dan kata sandi baru.
-  const handle = normalizeHandle(body.value.handle);
-  if (!HANDLE_RE.test(handle)) return jsonError(400, 'handle_invalid', {}, opt);
-  const problem = checkPasswordPolicy(body.value.password);
-  if (problem) return jsonError(400, problem.problem, {}, opt);
+  // Belum punya akun: jika handle/password tidak disertakan, otomatis diturunkan dari token guru
+  let handle = normalizeHandle(body.value && body.value.handle);
+  let rawPassword = body.value && body.value.password;
+
+  if (!handle && !rawPassword) {
+    const rawName = typeof invite.teacher_name === 'string' ? invite.teacher_name.trim().toLowerCase() : '';
+    const cleanName = rawName.replace(/[^a-z0-9_]/g, '').slice(0, 14);
+    const prefix = cleanName.length >= 2 ? cleanName : 'guru';
+    handle = `${prefix}_${codeHash.slice(0, 6)}`;
+    rawPassword = `fz_teacher_${codeHash.slice(0, 20)}`;
+  } else {
+    if (!HANDLE_RE.test(handle)) return jsonError(400, 'handle_invalid', {}, opt);
+    const problem = checkPasswordPolicy(rawPassword);
+    if (problem) return jsonError(400, problem.problem, {}, opt);
+  }
 
   const claimed = await db.prepare(
     'UPDATE teacher_invite SET used_at = ?2, used_by = ?3 WHERE code_hash = ?1 AND used_at IS NULL ' +
@@ -329,7 +365,7 @@ export async function routeTeacherActivate(ctx) {
     return jsonError(409, 'handle_taken', {}, opt);
   }
 
-  const passHash = await hashPassword(body.value.password);
+  const passHash = await hashPassword(rawPassword);
 
   await db.batch([
     db.prepare('INSERT INTO auth_account (sub, role, login_handle, status, created_at, institution_id) ' +
@@ -345,7 +381,13 @@ export async function routeTeacherActivate(ctx) {
 
   return jsonResponse({
     ok: true,
-    account: accountView({ login_handle: handle, institution_id: institutionId }, ROLE.TEACHER)
+    account: accountView({
+      login_handle: handle,
+      institution_id: institutionId,
+      teacher_name: invite.teacher_name,
+      institution: invite.institution,
+      institution_type: invite.institution_type
+    }, ROLE.TEACHER)
   }, { headers: ctx.corsHeaders });
 }
 
