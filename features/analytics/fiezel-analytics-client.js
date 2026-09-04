@@ -134,6 +134,23 @@
   var PLATFORMS = Object.freeze(['android', 'ios', 'desktop']);
   var ATTEMPT_BUCKETS = Object.freeze(['5-9', '10-29', '30+']);
   var DURATION_BUCKETS = Object.freeze(['<2m', '2-10m', '10-30m', '30m+']);
+  /* m025-246 — DUA EMBER BARU UNTUK FUNNEL MASUK.
+     OWNER: "Instrumentasi funnel (opt-in, agregat, tanpa PII): launch->soal pertama,
+     selesai sesi, kembali D1/D7, skip rate."
+
+     Tiga dari empat sudah punya event: `session_ended` (selesai sesi),
+     `retention_ping` (D1/D7), dan `day_active`. Dua yang belum: berapa lama dari
+     peluncuran sampai SOAL PERTAMA, dan berapa sering soal dilewati.
+
+     EMBER, BUKAN MILIDETIK, dan itu bagian dari jaminan privasi berkas ini, bukan
+     kemalasan: satu stempel waktu presisi tinggi adalah sidik jari perilaku, dan
+     gabungan beberapa di antaranya bisa menautkan dua kunjungan pada satu orang.
+     Yang perlu dijawab produk adalah "apakah murid sampai ke soal pertama di bawah
+     60 detik", dan ember di bawah menjawabnya persis - batas 60 detik berdiri
+     sendiri sebagai tepi ember, jadi angkanya bisa dibaca langsung tanpa hitungan
+     lanjutan di server. */
+  var FIRST_QUESTION_BUCKETS = Object.freeze(['<30s', '30-60s', '60-180s', '180s+']);
+  var SKIP_REASONS = Object.freeze(['audio_failed', 'learner_choice', 'timeout']);
 
   var DAY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
   // Sengaja LEBIH KETAT daripada sisi Worker (yang mengizinkan empat komponen):
@@ -199,6 +216,20 @@
     retention_ping: Object.freeze({
       cohort_day: T('day', { managed: true }),
       day_index: T('int', { min: 0, max: 400, managed: true })
+    }),
+    /* m025-246: launch -> soal pertama. `cold` memisahkan peluncuran dingin dari
+       kebangkitan hangat, karena keduanya punya anggaran waktu yang sangat berbeda
+       dan merata-ratakannya menyembunyikan justru masalah yang dicari. */
+    first_question: Object.freeze({
+      elapsed_bucket: T('enum', { values: FIRST_QUESTION_BUCKETS }),
+      cold: T('bool')
+    }),
+    /* m025-246: skip rate. `reason` dibatasi tiga nilai tertutup - tanpa itu ia akan
+       jadi kolom teks bebas, dan kolom teks bebas adalah tempat PII bocor. */
+    question_skipped: Object.freeze({
+      domain: T('enum', { values: DOMAINS }),
+      level: T('enum', { values: LEVELS }),
+      reason: T('enum', { values: SKIP_REASONS })
     })
   });
 
@@ -220,7 +251,9 @@
     Object.freeze({ event: 'lesson_started', where: 'app.js openLesson()', how: "track('lesson_started',{domain,level})" }),
     Object.freeze({ event: 'lesson_completed', where: 'app.js finishLesson()', how: "track('lesson_completed',{domain,level})" }),
     Object.freeze({ event: 'question_answered', where: 'app.js recordAnswer()', how: "track('question_answered',{domain,level,ok})" }),
-    Object.freeze({ event: 'retention_ping', where: 'otomatis di start(), maksimal sekali per hari', how: "FiezelAnalytics.start()" })
+    Object.freeze({ event: 'retention_ping', where: 'otomatis di start(), maksimal sekali per hari', how: "FiezelAnalytics.start()" }),
+    Object.freeze({ event: 'first_question', where: 'app.js quizLoop() saat soal pertama tercat', how: "track('first_question',{elapsed_bucket,cold})" }),
+    Object.freeze({ event: 'question_skipped', where: 'app.js saat soal dilewati (termasuk audio gagal)', how: "track('question_skipped',{domain,level,reason})" })
   ]);
 
   /* =====================================================================
@@ -913,6 +946,8 @@
     CLIENT_EVENTS: CLIENT_EVENTS,
     CLIENT_EVENT_SPEC: CLIENT_EVENT_SPEC,
     SERVER_ONLY_EVENTS: SERVER_ONLY_EVENTS,
+    FIRST_QUESTION_BUCKETS: FIRST_QUESTION_BUCKETS,
+    SKIP_REASONS: SKIP_REASONS,
     TOKEN_EVENTS: TOKEN_EVENTS,
     RECOMMENDED_CALL_SITES: RECOMMENDED_CALL_SITES
   };

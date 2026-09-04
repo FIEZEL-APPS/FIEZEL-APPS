@@ -129,6 +129,59 @@
   // jadi nomornya harus punya nama - angka lepas di dalam bind() adalah persis yang patah
   // ketika penomoran bergeser.
   var PLACEMENT_STEP = 4;
+
+  /* m025-246 — PERKENALAN RINGKAS (<=3 LAYAR).
+     ==========================================================================
+     OWNER: "Alur masuk: Splash (cold saja) -> perkenalan <=3 layar ->
+     placement-lite 8-12 soal -> soal pertama <60 detik."
+
+     Perkenalan lama enam langkah: nama, karosel dua slide, tujuan+level,
+     penempatan, jadwal, ringkasan. Dihitung sebagai LAYAR yang harus ditekan
+     murid, itu tujuh ketukan sebelum satu soal pun muncul.
+
+     Yang tersisa tiga, dan alasan tiap pemotongan disebut, bukan disimpulkan:
+       1  nama + peran  - WAJIB, tanpa nama Home menyapa dengan sapaan netral
+                          selamanya (m025-117), dan peran memutuskan murid/guru.
+       3  tujuan + level- yang mengisi model murid sebelum soal pertama.
+       4  penempatan    - pintu ke placement-lite. Ini ujung perkenalan.
+     Yang dipotong:
+       2  karosel       - dua slide iklan fitur, nol masukan dari murid. Fitur
+                          yang sama diperkenalkan tur menu, di dalam aplikasi,
+                          saat murid sudah punya alasan memedulikannya.
+       5  jadwal        - pengingat sudah punya undangannya sendiri di UJUNG alur
+                          (startNotificationInvitation), jadi langkah ini
+                          menanyakan hal yang sama dua kali.
+       6  ringkasan     - layar yang mengulang apa yang baru saja diketik murid.
+                          Ringkasan yang berguna ada di UJUNG SESI, bukan sebelum
+                          sesi pertama - dan itu memang ditambahkan di gelombang
+                          yang sama (ringkasan akhir sesi).
+
+     Pemilih bahasa (LANGUAGE_STEP = 0) TIDAK dihitung sebagai salah satu dari
+     tiga layar, dan itu bukan akal-akalan angka: ia sudah dideklarasikan sebagai
+     gerbang pra-langkah sejak dibuat (lihat komentar LANGUAGE_STEP di atas), ia
+     hanya muncul untuk perangkat yang bahasanya belum pernah ditentukan, dan ia
+     satu ketukan. Menghapusnya akan membuat murid Thai membaca seluruh
+     perkenalan dalam bahasa Indonesia.
+
+     Langkah yang dipotong TIDAK dihapus dari berkas ini - markup dan
+     penanganannya tetap utuh, dan urutan enam langkah lama kembali seluruhnya
+     begitu bendera `leanIntro` dimatikan. */
+  var UX_OB_FALLBACK = { leanIntro: true };
+  function uxOn(flag) {
+    try {
+      var api = (typeof globalThis !== 'undefined' && globalThis.FiezelUX) || null;
+      if (api && typeof api.on === 'function') return api.on(flag) === true;
+    } catch (_) {}
+    if (typeof require === 'function' && typeof module === 'object') {
+      try { return require('../../fiezel-ux-flags.js').on(flag) === true; } catch (_) {}
+    }
+    return UX_OB_FALLBACK[flag] === true;
+  }
+  var LEAN_SEQUENCE = Object.freeze([NAME_STEP, 3, PLACEMENT_STEP]);
+  var FULL_SEQUENCE = Object.freeze([1, 2, 3, 4, 5, 6]);
+  /** Urutan langkah yang berlaku. Dibaca saat show() dipanggil, bukan saat modul
+   *  dievaluasi: bendera bisa mendarat setelah berkas ini diurai. */
+  function stepSequence() { return uxOn('leanIntro') ? LEAN_SEQUENCE : FULL_SEQUENCE; }
   // Cukup panjang untuk nama panggilan apa pun, cukup pendek untuk muat di sapaan Home
   // tanpa memotong barisnya. Nama yang lebih panjang dipotong, bukan ditolak - menolak
   // masukan yang wajar hanya membuat langkah wajib terasa seperti dinding.
@@ -338,9 +391,21 @@
 
   // Stepper enam segmen. Murni turunan dari nomor langkah yang sudah ada - ia tidak
   // menyimpan keadaan apa pun, jadi tidak bisa melenceng dari langkah yang sebenarnya.
+  /* m025-246: stepper membaca URUTAN yang berlaku, bukan seluruh STEP_LABEL_KEYS.
+     Kalau tidak, perkenalan ringkas akan mengumumkan "Langkah 1 dari 6" lalu selesai
+     di langkah ketiga - janji yang dilanggar di layar pertama, dan itu persis kesan
+     "aplikasi ini panjang" yang sedang dicoba dihilangkan. */
+  function sequenceLabels() {
+    var seq = stepSequence(), all = stepLabels(), out = [], i;
+    for (i = 0; i < seq.length; i++) out.push(all[seq[i] - 1] || all[all.length - 1]);
+    return out;
+  }
   function stepper(step) {
-    var labels = stepLabels();
-    var current = Math.min(labels.length, Math.max(1, Number(step) || 1));
+    var labels = sequenceLabels();
+    var seq = stepSequence();
+    var pos = 0;
+    for (var s = 0; s < seq.length; s++) if (seq[s] <= (Number(step) || 1)) pos = s;
+    var current = Math.min(labels.length, Math.max(1, pos + 1));
     var bars = '';
     for (var i = 1; i <= labels.length; i++) {
       bars += '<i' + (i <= current ? ' class="is-done"' : '') + '></i>';
@@ -1177,8 +1242,31 @@
       try { if (host.parentNode) host.parentNode.removeChild(host); } catch (_) {}
     }
 
+    /* m025-246: penjepit langkah sekarang mengikuti URUTAN, bukan rentang angka.
+       Aritmetika lama (step+1, dijepit 1..LAST_STEP) hanya benar selama urutannya
+       1,2,3,4,5,6 tanpa lubang. Dengan urutan ringkas [1,3,4], `step+1` dari 1
+       mendarat di 2 - layar karosel yang justru dipotong. Semua perpindahan karena
+       itu lewat sequenceStep(); nilai di luar urutan dibulatkan ke anggota terdekat,
+       supaya state lama yang tersimpan di tengah perkenalan tidak pernah mengurung
+       murid di layar yang tidak punya tombol lanjut. */
+    function sequenceIndex(value) {
+      var seq = stepSequence(), i;
+      for (i = 0; i < seq.length; i++) if (seq[i] === value) return i;
+      for (i = 0; i < seq.length; i++) if (seq[i] >= value) return i;
+      return seq.length - 1;
+    }
+    function sequenceStep(delta) {
+      var seq = stepSequence();
+      var next = Math.min(seq.length - 1, Math.max(0, sequenceIndex(step) + delta));
+      return seq[next];
+    }
+    function isLastStep() {
+      var seq = stepSequence();
+      return step === seq[seq.length - 1];
+    }
     function goStep(next) {
-      step = Math.min(LAST_STEP, Math.max(1, next));
+      var seq = stepSequence();
+      step = seq[Math.min(seq.length - 1, Math.max(0, sequenceIndex(next)))];
       paint();
     }
 
@@ -1242,22 +1330,23 @@
         commitName();
         if (nameOnly) { finish('name'); return; }
         if (selectedRole === 'guru') { finish('finish'); return; }
-        goStep(step + 1);
+        goStep(sequenceStep(1));
         return;
       }
       if (step === 2 && slide < CAROUSEL_SLIDES.length - 1) { slide += 1; paint(); return; }
-      if (step === LAST_STEP) { finish('finish'); return; }
+      if (isLastStep()) { finish('finish'); return; }
       if (step === 3 && selectedGoal && typeof opts.onGoal === 'function') {
         try { opts.onGoal({ goal: selectedGoal, level: selectedLevel }); } catch (_) {}
       }
-      goStep(step + 1);
+      goStep(sequenceStep(1));
     }
 
     function back() {
       if (step === 2 && slide > 0) { slide -= 1; paint(); return; }
-      // Langkah nama tidak punya langkah sebelumnya, dan mundur ke sana dari Step 2 tidak
-      // menghapus nama yang sudah diberikan - kolomnya terisi kembali apa adanya.
-      goStep(step - 1);
+      // Langkah nama tidak punya langkah sebelumnya, dan mundur ke sana dari langkah
+      // berikutnya tidak menghapus nama yang sudah diberikan - kolomnya terisi kembali
+      // apa adanya.
+      goStep(sequenceStep(-1));
     }
 
     function startPlacementNow() {
@@ -1343,8 +1432,8 @@
           // Di langkah terakhir tidak ada langkah berikutnya untuk dilewati: goStep(6) dijepit
           // kembali ke 5 dan hanya mengecat ulang layar yang sama, jadi tombolnya mati persis
           // di tempat ia paling terbaca sebagai jalan keluar - di sebelah "Mulai Belajar".
-          if (step >= LAST_STEP) { finish('skip'); return; }
-          goStep(step + 1);
+          if (isLastStep()) { finish('skip'); return; }
+          goStep(sequenceStep(1));
         });
         // m025-117: pada langkah nama tombol ini LAHIR nonaktif lalu menyala saat murid
         // mengetik. Memasang listener hanya ketika ia sudah aktif berarti tombol yang

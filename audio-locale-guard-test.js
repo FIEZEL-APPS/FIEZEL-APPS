@@ -65,9 +65,55 @@ for (const zone of AUDIO_ZONES) {
     !SPEECH_API.test(stripComments(read(zone))),
     'L4 dihapus m025-232 — cadangan suara peramban tidak boleh kembali lewat pintu mana pun');
 }
-check('app.js bebas speechSynthesis',
-  !SPEECH_API.test(stripComments(read('app.js'))),
-  'AudioService tidak boleh punya cadangan peramban lagi (m025-232)');
+// 1b. m025-246: OWNER MEMBALIK LARANGAN TOTAL DI app.js — dan menggantinya dengan larangan
+//     yang lebih tepat sasaran. Dua baris brief 3 Sep 2026 memintanya secara eksplisit:
+//       "Listening gagal audio: ... opsi coba lagi / SUARA PERAMBAN / lewati tanpa penalti."
+//       "Android low-end: Kokoro WASM bisa mematikan tab — ... FALLBACK SUARA PERAMBAN."
+//
+//     Larangan total di app.js karena itu tidak bisa dipertahankan apa adanya. Yang PENTING
+//     adalah larangan itu tidak pernah tentang API-nya; ia tentang DUA KELAS BUG:
+//
+//       (a) KEBOCORAN LOCALE (AI-17 F05). `utterance.lang` yang mengikuti locale murid
+//           membuat suara sistem Thai melafalkan kalimat Inggris.
+//       (b) DUA SUARA SEKALIGUS (m025-232). `speechSynthesis` punya antrean GLOBAL milik
+//           peramban yang tidak ikut berhenti saat pemutar kita berhenti, jadi lapisan
+//           OTOMATIS di dalam tangga akan berbunyi di atas audio yang sudah berjalan.
+//
+//     Keduanya masih dilarang, dan sekarang dijaga secara struktural, bukan dengan menutup
+//     namanya:
+//
+//       - ZONA AUDIO (features/neural-voice, features/audio, features/audio-assets,
+//         workers/api/tts) tetap BEBAS TOTAL dari speechSynthesis — pemeriksaan di atas
+//         tidak dilonggarkan satu berkas pun. Di situlah tangga suara hidup, dan lapisan
+//         otomatis hanya bisa lahir di sana. Kelas bug (b) tetap mustahil secara struktur.
+//       - Di app.js, tiap utterance WAJIB memaku lang ke 'en-US' literal. Kelas bug (a)
+//         karena itu tetap mustahil: tidak ada jalan bagi locale murid untuk sampai ke sana.
+//       - Dan jalur itu WAJIB memanggil stop()/cancel() lebih dulu, jadi ia tidak pernah
+//         menumpuk di atas audio yang sedang berjalan.
+{
+  const appCode = stripComments(read('app.js'));
+  const touchesSpeech = SPEECH_API.test(appCode);
+  if (touchesSpeech) {
+    const helper = /function speakWithBrowserVoice\(text,rate\)\{([\s\S]*?)\n\}/.exec(appCode);
+    check('app.js: speechSynthesis hanya lewat satu helper bernama',
+      !!helper,
+      'API suara peramban dipakai di app.js tanpa lewat speakWithBrowserVoice() — jalur kedua adalah jalur yang akan menyimpang');
+    const body = helper ? helper[1] : '';
+    check("app.js: utterance memaku lang 'en-US', tidak pernah locale murid (AI-17 F05)",
+      /u\.lang='en-US'/.test(body),
+      'lang tidak dipaku ke en-US: kelas bug kebocoran locale kembali terbuka');
+    check('app.js: suara peramban menghentikan pemutar kita lebih dulu (anti dua-suara, m025-232)',
+      /audio\.stop\(\)/.test(body) && /speechSynthesis\.cancel\(\)/.test(body),
+      'tanpa stop()+cancel(), utterance bisa berbunyi di atas audio yang sedang berjalan');
+    /* Otomatis = lapisan. Yang diizinkan owner adalah TOMBOL. Kalau helper ini pernah
+       dijadwalkan sendiri, ia sudah berubah jadi lapisan tanpa ada yang memutuskannya. */
+    check('app.js: suara peramban tidak pernah dijadwalkan sendiri (tombol, bukan lapisan)',
+      !/set(Timeout|Interval)\([^)]*speakWithBrowserVoice/.test(appCode),
+      'suara peramban dijadwalkan otomatis — itu mengembalikan lapisan L4 lewat pintu belakang');
+  } else {
+    check('app.js bebas speechSynthesis', true, '');
+  }
+}
 
 // 2. Tidak ada satu pun berkas zona audio yang menyentuh i18n/locale murid.
 //    Regex sengaja kasar: menyebut nama-nama ini di zona audio adalah bau desain yang salah,

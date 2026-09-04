@@ -133,11 +133,11 @@
     // app.js:2435 — status laporan terkirim tanpa tanggal (hasil .trim() lama)
     'settings.laporan-terkirim-polos': 'Terkirim',
     // app.js:3725 — toast boot: health gagal
-    'sys.core-belum-tersambung': 'Core Brain belum tersambung dengan benar.',
+    'sys.core-belum-tersambung': 'Layanan FIEZEL belum tersambung dengan benar.',
     // app.js:3725 — toast boot: push aktif
-    'sys.core-push-aktif': 'Core Brain + push aktif.',
+    'sys.core-push-aktif': 'Layanan FIEZEL + pengingat aktif.',
     // app.js:3725 — toast boot: push belum tersambung
-    'sys.core-push-belum': 'Core Brain aktif, tetapi remote push belum tersambung.',
+    'sys.core-push-belum': 'Layanan FIEZEL aktif, tetapi pengingat belum tersambung.',
     // app.js:2243 — eyebrow tuntunan langkah (kapital = bagian naskah, bukan CSS)
     'tutor.tuntunan-eyebrow': 'TUNTUNAN LANGKAH',
 

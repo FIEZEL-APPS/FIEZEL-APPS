@@ -35,6 +35,26 @@ const fs = require('fs');
     if (hadSelf) global.self = prevSelf; else delete global.self;
   }
 }());
+/* m025-246 — GERBANG INI MENGUJI DUA ALUR, BUKAN SATU.
+ *
+ * Perkenalan sekarang punya dua urutan: RINGKAS (bendera `leanIntro` hidup, tiga layar -
+ * nama, tujuan, penempatan) dan LENGKAP (bendera mati, enam langkah seperti semula).
+ * Keduanya adalah kode yang benar-benar dikirim, jadi keduanya wajib dijaga.
+ *
+ * Stub di bawah memberi berkas ini kendali atas bendera itu. Ia dipasang di `globalThis`
+ * karena `uxOn()` di dalam modul membacanya dari sana LEBIH DULU sebelum jatuh ke
+ * require() - jadi menyetel `leanIntroFlag` benar-benar mengubah alur yang dijalankan
+ * modul, bukan sekadar memberitahu tes.
+ *
+ * BAWAANNYA `false` supaya ~35 asersi yang sudah ada di bawah tetap menguji hal yang sama
+ * persis seperti sebelum gelombang ini - kalau mereka dibiarkan berjalan di alur ringkas,
+ * yang merah bukan cacat melainkan langkah yang memang sengaja dipotong. Blok "ALUR
+ * RINGKAS" di ujung berkas ini yang menyalakannya. */
+let leanIntroFlag = false;
+globalThis.FiezelUX = {
+  on(flag) { return flag === 'leanIntro' ? leanIntroFlag === true : false; },
+  off(flag) { return !this.on(flag); }
+};
 const splash = require('./features/brand/fiezel-splash.js');
 const journey = require('./features/personal-journey/fiezel-personal-journey.js');
 const onboarding = require('./features/onboarding/fiezel-onboarding.js');
@@ -792,6 +812,106 @@ test('aplikasi tidak lagi memaku nama siapa pun sebagai nilai bawaan', () => {
   assert.ok(/onName:\(\{name\}\)=>/.test(app), 'app.js harus menyambungkan langkah nama ke state');
   assert.ok(/function askLearnerNameIfMissing/.test(app), 'murid lama tetap harus ditanya sekali');
   assert.ok(/if\(askLearnerNameIfMissing\(at\)\)return null;/.test(app), 'pertanyaan itu harus berada di jalur boot');
+});
+
+/* ======================================================================================
+   ALUR RINGKAS (m025-246) — perkenalan <=3 layar
+   ======================================================================================
+   OWNER: "perkenalan <=3 layar -> placement-lite 8-12 soal -> soal pertama <60 detik."
+
+   Yang dijaga di sini bukan "tiga layar itu ada", melainkan tiga hal yang bisa PATAH
+   diam-diam ketika urutan langkah punya lubang di dalamnya:
+     1. jumlah layarnya benar-benar <=3, dan yang ketiga adalah pintu penempatan;
+     2. maju/mundur MELOMPATI langkah yang dipotong, bukan mendarat di layar tanpa
+        tombol lanjut (kegagalan khas aritmetika `step+1` di atas urutan berlubang);
+     3. stepper mengumumkan total yang sama dengan jumlah layar sungguhan - "Langkah 1
+        dari 6" pada alur tiga layar adalah janji yang dilanggar di layar pertama.
+   ==================================================================================== */
+function withLeanIntro(fn) {
+  const before = leanIntroFlag;
+  leanIntroFlag = true;
+  try { return fn(); } finally { leanIntroFlag = before; }
+}
+
+test('alur ringkas: tepat tiga layar, dan yang terakhir adalah pintu penempatan', () => {
+  withLeanIntro(() => {
+    const env = fakeEnv();
+    const run = onboarding.show(env, { now: NOW, onName() {}, onGoal() {}, onPlacement() {}, onFinish() {} });
+    const seen = [];
+    let guard = 0;
+    seen.push(run.stepIndex());
+    typeName(run, 'Ayu');
+    run.element.querySelector('[data-ob-advance]').listeners.click[0]();
+    while (run.stepIndex() !== seen[seen.length - 1] && guard++ < 10) {
+      seen.push(run.stepIndex());
+      if (run.stepIndex() === onboarding.PLACEMENT_STEP) break;
+      const goal = run.element.querySelectorAll('[data-ob-goal]')[0];
+      if (goal) goal.listeners.click[0]();
+      run.element.querySelector('[data-ob-advance]').listeners.click[0]();
+    }
+    assert.deepStrictEqual(seen, [onboarding.NAME_STEP, 3, onboarding.PLACEMENT_STEP],
+      'urutan layar ringkas harus nama -> tujuan -> penempatan, dapat: ' + JSON.stringify(seen));
+    assert.ok(seen.length <= 3, 'perkenalan ringkas tidak boleh lebih dari tiga layar');
+  });
+});
+
+test('alur ringkas: karosel, jadwal, dan ringkasan tidak pernah tercat', () => {
+  withLeanIntro(() => {
+    const env = fakeEnv();
+    const run = onboarding.show(env, { now: NOW, onName() {}, onGoal() {}, onPlacement() {}, onFinish() {} });
+    const dilihat = [];
+    let guard = 0;
+    while (guard++ < 12) {
+      dilihat.push(run.stepIndex());
+      if (run.stepIndex() === onboarding.PLACEMENT_STEP) break;
+      if (run.stepIndex() === onboarding.NAME_STEP) typeName(run, 'Ayu');
+      const goal = run.element.querySelectorAll('[data-ob-goal]')[0];
+      if (goal) goal.listeners.click[0]();
+      const next = run.element.querySelector('[data-ob-advance]');
+      if (!next) break;
+      next.listeners.click[0]();
+    }
+    for (const dipotong of [2, 5, 6]) {
+      assert.ok(dilihat.indexOf(dipotong) === -1,
+        'langkah ' + dipotong + ' seharusnya dipotong di alur ringkas, tapi tercat');
+    }
+  });
+});
+
+test('alur ringkas: mundur dari penempatan mendarat di tujuan, bukan di layar kosong', () => {
+  withLeanIntro(() => {
+    const env = fakeEnv();
+    const run = onboarding.show(env, { now: NOW, onName() {}, onGoal() {}, onPlacement() {}, onFinish() {} });
+    typeName(run, 'Ayu');
+    run.element.querySelector('[data-ob-advance]').listeners.click[0]();
+    run.element.querySelectorAll('[data-ob-goal]')[0].listeners.click[0]();
+    run.element.querySelector('[data-ob-advance]').listeners.click[0]();
+    assert.strictEqual(run.stepIndex(), onboarding.PLACEMENT_STEP);
+    const back = run.element.querySelector('[data-ob-back]');
+    assert.ok(back, 'langkah penempatan wajib punya jalan mundur');
+    back.listeners.click[0]();
+    assert.strictEqual(run.stepIndex(), 3,
+      'mundur harus melompati langkah yang dipotong, bukan mendarat di karosel');
+  });
+});
+
+test('alur ringkas: stepper menghitung tiga, bukan enam', () => {
+  withLeanIntro(() => {
+    const env = fakeEnv();
+    const run = onboarding.show(env, { now: NOW, onName() {}, onGoal() {}, onPlacement() {}, onFinish() {} });
+    const html = run.element.innerHTML;
+    const total = /aria-valuemax="(\d+)"/.exec(html);
+    assert.ok(total, 'stepper harus punya aria-valuemax');
+    assert.strictEqual(total[1], '3',
+      'stepper mengumumkan total ' + total[1] + ' padahal layarnya tiga');
+  });
+});
+
+test('alur lengkap tetap utuh saat bendera ringkas dimatikan', () => {
+  const env = fakeEnv();
+  const run = onboarding.show(env, { now: NOW, onName() {}, onGoal() {}, onPlacement() {}, onFinish() {} });
+  advanceTo(run, 2);
+  assert.strictEqual(run.stepIndex(), 2, 'karosel harus tetap tercat di alur lengkap');
 });
 
 test('gate onboarding sudah terdaftar di CI', () => {
