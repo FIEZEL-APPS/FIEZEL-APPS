@@ -149,6 +149,7 @@ html.fz-booting body{overflow:hidden}
        dan bukan :root. Urutan terakhir memastikan aturan penempatan maskotnya menang
        atas ukuran wajah pembimbing lama tanpa perlu !important. -->
   <link rel="stylesheet" href="./features/mascot/fiezel-motion.css">
+  <link rel="stylesheet" href="./features/ui/fiezel-lux.css">
 </head>
 <body class="scene-day">
   <!-- Splash frame-pertama. Isinya WAJIB sama persis dengan FiezelSplash.markup(); modul
@@ -380,7 +381,7 @@ html.fz-booting body{overflow:hidden}
            bisa) login terkurung di balik .auth-locked - dark-pattern yang sama yang sudah
            dibongkar OWNER di gerbang notifikasi. Pengaturan > Akun Puter adalah jalan
            masuknya kembali. -->
-      <button id="authGateSkip" type="button" class="text-button wide" onclick="skipPuterSignIn()" data-i18n="auth.skip-btn">Lanjut tanpa akun</button>
+      <button id="authGateSkip" data-testid="auth-gate-skip" type="button" class="text-button wide" onclick="skipPuterSignIn()" data-i18n="auth.skip-btn">Lanjut tanpa akun</button>
       <p id="authGateSkipHelp" class="auth-help" data-i18n="auth.skip-help">Semua materi dan latihan tetap jalan tanpa akun — tutor AI dan suara neural baru bisa dipakai kalau kamu masuk akun Puter dan ada jaringan.</p>
       <p id="authGateHelp" class="auth-help" data-i18n="auth.puter-help">Jendela login Puter terbuka sebentar di atas FIEZEL, lalu tertutup sendiri begitu selesai - kamu tidak akan dipindahkan ke browser lain.</p>
       <p class="auth-legal" data-i18n="auth.legal-note">Dengan melanjutkan, kamu menyetujui progres belajarmu disimpan di akun Puter milikmu sendiri.</p>
@@ -445,10 +446,10 @@ html.fz-booting body{overflow:hidden}
        Pengaturan di dalam sesi - dan tiga tur (menu, library, listening) menunjuk
        tepat ke sana untuk menjelaskan pengatur kecepatan suara. -->
   <nav class="bottomnav" aria-label="Navigasi utama" data-i18n-aria-label="nav.main-aria">
-    <button type="button" class="nav active" data-view="home" onclick="go('home')" aria-label="Hari ini" data-i18n-aria-label="nav.hari-ini-aria"><i class="fz-i" data-fz-icon="home" aria-hidden="true"></i><span data-i18n="nav.hari-ini">Hari ini</span></button>
-    <button type="button" class="nav" data-view="latihan" onclick="go('latihan')" aria-label="Latihan" data-i18n-aria-label="nav.latihan-aria"><i class="fz-i" data-fz-icon="skills" aria-hidden="true"></i><span data-i18n="nav.latihan">Latihan</span></button>
-    <button type="button" class="nav" data-view="progress" onclick="go('progress')" aria-label="Progres" data-i18n-aria-label="nav.progres-aria"><i class="fz-i" data-fz-icon="map" aria-hidden="true"></i><span data-i18n="nav.progres">Progres</span></button>
-    <button type="button" class="nav" onclick="openSettings()" aria-label="Buka pengaturan" data-i18n-aria-label="nav.pengaturan-aria"><i class="fz-i" data-fz-icon="settings" aria-hidden="true"></i><span data-i18n="nav.pengaturan">Pengaturan</span></button>
+    <button type="button" class="nav active" data-view="home" data-testid="nav-home" onclick="go('home')" aria-label="Hari ini" data-i18n-aria-label="nav.hari-ini-aria"><i class="fz-i" data-fz-icon="home" aria-hidden="true"></i><span data-i18n="nav.hari-ini">Hari ini</span></button>
+    <button type="button" class="nav" data-view="latihan" data-testid="nav-latihan" onclick="go('latihan')" aria-label="Latihan" data-i18n-aria-label="nav.latihan-aria"><i class="fz-i" data-fz-icon="skills" aria-hidden="true"></i><span data-i18n="nav.latihan">Latihan</span></button>
+    <button type="button" class="nav" data-view="progress" data-testid="nav-progress" onclick="go('progress')" aria-label="Progres" data-i18n-aria-label="nav.progres-aria"><i class="fz-i" data-fz-icon="map" aria-hidden="true"></i><span data-i18n="nav.progres">Progres</span></button>
+    <button type="button" class="nav" data-testid="nav-settings" onclick="openSettings()" aria-label="Buka pengaturan" data-i18n-aria-label="nav.pengaturan-aria"><i class="fz-i" data-fz-icon="settings" aria-hidden="true"></i><span data-i18n="nav.pengaturan">Pengaturan</span></button>
   </nav>
 
   <!-- OWNER: "Terlalu banyak script terpisah (30+ file JS) dimuat sinkron di <head>/<body>
@@ -518,6 +519,7 @@ html.fz-booting body{overflow:hidden}
        pindahan, jadi regenerasi baseline emasnya bisa dibaca sebagai satu blok. -->
   <script defer src="./features/i18n/copy-id-redesign.js"></script>
   <script defer src="./features/i18n/copy-id-grammar-labels.js"></script>
+  <script defer src="./features/i18n/copy-id-student.js"></script>
   <!-- W4-MERGE: aset th TIDAK dimuat statis (copy-th-*, naskah-th-brain, dua dataset th) —
        semuanya disuntik/difetch DINAMIS oleh pemuat kecil di bawah HANYA saat locale th
        (AI-13 F02/F05: murid Indonesia nol byte th). Pemuat wajib SETELAH fiezel-i18n.js
@@ -741,6 +743,7 @@ html.fz-booting body{overflow:hidden}
   <script defer src="./features/health/fiezel-install-health.js"></script>
   <script defer src="./features/ui/fiezel-report-gesture-isolation.js"></script>
   <script defer src="./features/ui/fiezel-ui-manager.js"></script>
+  <script defer src="./features/ui/fiezel-student-mode.js"></script>
   <!-- T-031: berkas ini memasang `window.FiezelABAnalytics` (pipa eksperimen UI). Ia TIDAK
        BOLEH menyentuh `window.FiezelAnalytics` — nama itu milik modul analytics
        privasi-maksimal yang disuntik app.js di idle, dan `<script defer>` di sini selalu

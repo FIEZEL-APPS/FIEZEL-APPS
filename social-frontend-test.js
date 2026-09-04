@@ -195,7 +195,7 @@ function freshCore(opts={}){
  assert(b1.ctx.go('online')===true,"go('online') gagal");
  await sleep(120);
  const appHtml1=b1.elements.app.innerHTML+b1.elements.onlineRoot.innerHTML;
- assert(/Online & Teman|Online &amp; Teman/.test(appHtml1),'judul view online tidak dirender');
+ assert(/Online & Teman|Online &amp; Teman|>Teman</.test(appHtml1),'judul view online tidak dirender');
  assert(/Fitur online belum aktif/.test(b1.elements.onlineRoot.innerHTML),'flag mati tidak menghasilkan kartu "fitur online belum aktif"');
  assert(!/error_system/.test(b1.elements.onlineRoot.innerHTML),'flag mati diperlakukan sebagai error sistem');
  // navigasi keluar-masuk tetap hidup setelah flag mati (aplikasi tidak patah)

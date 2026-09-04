@@ -1,0 +1,54 @@
+{
+  "summary": "Frontend-only UI/UX review of the FIEZEL premium redesign (vanilla-JS PWA). Executed 9 Playwright runs at 430x900 mobile + one 1440x900 desktop pass covering: language chooser -> ID onboarding (name/Lanjut/Lewati) -> auth gate 'Lanjut tanpa akun' -> Home; bottom-nav routing (5 tabs) and window.go(); Kosakata (incl. vocab quiz answer/feedback/Lanjut gating/Keluar and flashcards); Grammar (hub, lock notes, Dikuasai, lesson detail); Kemajuan (stats, tab visibility, Kemampuan switch); Membaca; Skills hub; Level modal + Settings modal (open + Escape); full Thai locale flow; desktop rail layout; Ruang Guru isolation via ?teacher=preview. Result: every functional requirement in the review request PASSED and zero uncaught JS errors were observed on any view. Found 1 medium interaction defect (grammar lesson title not clickable), 1 English literal leak (flashcard header 'Vocabulary'), unhydrated lucide icon placeholders, a grammar lesson-count data mismatch (30 vs 17), and several minor i18n/design nits. NOTE: the public preview URL intermittently serves a Cloudflare 'Performing security verification' challenge on repeat navigations/reloads, so most runs were done against the same static server on localhost:3000; a final confirmation run on the public URL reproduced identical Home/nav output.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "Grammar lesson path", "issue": "Lesson row title/label is NOT clickable. Only the small numbered ring button opens the lesson (onclick=openGrammarLesson). Clicking '1. Kata ganti subjek, objek, dan bentuk kepemilikan' does nothing. The ring also runs a perpetual pulse animation - Playwright reports 'element is not stable' for 30s, i.e. it is a continuously moving ~50px tap target for students.", "selector": "#app .path-step .path-label b / #app .path-node", "priority": "HIGH"},
+      {"component": "Vocabulary flashcards", "issue": "Flashcard screen header shows English literal 'Vocabulary' while ID locale is active (rest of app uses 'Kosakata'). Reached via Kosakata -> 'Belajar dengan kartu'.", "selector": "#app (flashcard topbar title)", "priority": "MEDIUM"},
+      {"component": "Lucide icons (Settings modal + Grammar hub)", "issue": "Several icons are never hydrated and render as empty boxes: Settings modal rows keep raw <i data-lucide=\"user\">, <i data-lucide=\"user-x\">, <i data-lucide=\"languages\">; Grammar hub keeps <i data-lucide=\"award\"> on the 'Ujian Naik Level' chip and <i data-lucide=\"list\"> on 'Lihat daftar'. Other rows in the same modal DO contain real <svg>, so icon hydration is inconsistent (lucide.createIcons not re-run after dynamic render).", "selector": "#modal .setting-icon i[data-lucide], #app .exam-entry-chip i[data-lucide]", "priority": "MEDIUM"},
+      {"component": "Vocab quiz exit", "issue": "'Keluar' in the vocabulary quiz returns to Home instead of back to the Kosakata page the quiz was launched from.", "selector": "#app button:has-text('Keluar')", "priority": "LOW"}
+    ],
+    "integration_issues": [
+      {"flow": "Grammar lesson count", "issue": "Home launch card advertises '30 materi · A1' (TH: '30 บทเรียน · A1') but the Grammar page states '17 materi untuk level A1. Kerjakan dari nomor 1, ya.' - two different counts for the same level.", "affected_selectors": ["#app .launch-card (Grammar)", "#app .section-head p"]},
+      {"flow": "Thai locale copy", "issue": "Untranslated / mixed-language strings inside the Thai UI: Membaca page button 'Reading adaptif' (Indonesian word 'adaptif'), progress 'แบบฝึกถัดไป -> Grammar', skill card names Listening/Speaking/Reading/Writing. Thai pronoun register is also inconsistent (Home uses 'คุณ', progress copy uses 'เธอ').", "affected_selectors": ["#app button:has-text('Reading adaptif')"]}
+    ],
+    "design_issues": [
+      {"screen": "Kemajuan (progress)", "issues": ["Heading 'Peta kemampuan' is rendered twice back-to-back (section heading + card heading with 'Target kamu · Sekolah' in between)", "Prasasti badge copy still uses English jargon in Indonesian text: 'Kuasai 10 lesson sampai ambang mastery' - the word 'mastery'/'lesson' contradicts the 'Mastery -> Dikuasai' student-language goal"]},
+      {"screen": "Skills (Bicara & Dengar)", "issues": ["Title and subtitle are duplicated: shell header shows 'Bicara & Dengar' + 'Latihan bicara dan mendengar. Suaramu tidak disimpan...' and directly below the hub renders kicker 'LATIHAN SUARA' + h1 'Bicara & Dengar' + a near-identical subtitle"]},
+      {"screen": "Grammar hub", "issues": ["'Ujian Naik Level' chip subtitle 'Sudah jago? Coba naik level' is cream rgba(255,249,238,.72) with an extra opacity:.75 on ink #241A11 => effective ~5.2:1 at 13px. It is readable (not ink-on-ink) but visibly dim; recommend dropping the extra .75 opacity"]},
+      {"screen": "Desktop 1440x900", "issues": ["Content column measures 584px wide, not the intended max 720px", "Content block spans x=478..1062 (center 770) while the viewport center is 720, so the column is visually off-centre with a large empty right gutter (rail itself does NOT overlap content: rail x=20 w=84)", "Home hero 'PESAN UNTUKMU' body text is clamped with an ellipsis at this width"]},
+      {"screen": "Thai bottom nav", "issues": ["Label 'ความก้าวหน้า' wraps onto two lines inside the tab pill"]},
+      {"screen": "Language chooser", "issues": ["'Bahasa Indonesia' label wraps to two lines inside its card while 'ภาษาไทย' fits on one, making the two choice cards visually unbalanced"]}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Make the whole grammar lesson row (.path-label / .path-step) open the lesson, not just the animated numbered ring; consider pausing the pulse animation once focused/hovered",
+    "Translate the flashcard screen header 'Vocabulary' -> 'Kosakata' / Thai equivalent",
+    "Re-run lucide icon hydration after every dynamic render (Settings modal rows user/user-x/languages, grammar chip award, 'Lihat daftar' list) so no blank icon boxes remain",
+    "Reconcile the grammar lesson count between Home launch card (30) and the Grammar page (17)",
+    "Fix Thai copy leaks: 'Reading adaptif' button, 'Grammar' label on progress, and unify the คุณ/เธอ pronoun register",
+    "Remove the duplicated 'Peta kemampuan' heading on Kemajuan and the duplicated title/subtitle block on the Skills hub",
+    "Replace remaining English jargon in ID copy: 'ambang mastery' / 'lesson' in the Prasasti badge descriptions",
+    "Desktop: widen the centred column to the intended 720px and centre it against the viewport (currently 584px, centre offset +50px)",
+    "Add data-testid attributes to the student flow (language choice, onboarding next/skip, #authGateSkip, nav tabs, .path-node lesson buttons, quiz .option, level/settings modal roots) - only the teacher panel currently exposes tg-* testids",
+    "Make 'Keluar' in the vocab quiz return to the Kosakata page instead of Home"
+  ],
+  "critical_code_review_comments": [
+    "features/ui/fiezel-student-mode.js hides panels by matching normalised heading TEXT against i18n keys. This is brittle: any copy edit or a new locale silently un-hides 'Laporan Diagnostik'/'Analisis'/'Cara soal dipilih'. Prefer a stable data-attribute/id on the panels instead of text matching.",
+    "The same file toggles body.fz-lux from a MutationObserver on body[class]; combined with wrapping global enhanceUI/render this is invisible coupling to app.js internals. It worked in all tested transitions (student <-> teacher) but should be driven by an explicit mode API.",
+    "Dynamic HTML strings emit <i data-lucide=\"...\"> placeholders that depend on a later createIcons() pass; several code paths never run it, producing empty icon boxes. Centralise icon rendering (or inline the SVG) at markup-build time.",
+    "Grammar lesson affordance: clickable behaviour lives only on the decorative .path-node ring while the semantic label is inert - an accessibility/hit-area problem for the primary learning action."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "not tested (frontend-only request)", "frontend": "100% of the 14 requested scenarios verified; ~93% fully clean (grammar lesson-title click + flashcard 'Vocabulary' literal are the two spec deviations)"},
+  "seed_data_creation": "None. Guest mode only (name 'Rara' for ID, 'Nok' for TH); teacher preview used the built-in demo class (18 students) via data-testid='tg-welcome-demo'. All state is localStorage-local.",
+  "should_call_test_agent_after_fix": true,
+  "should_main_agent_self_test": false,
+  "test_credentials": "None needed - static PWA, guest via 'Lanjut tanpa akun' (#authGateSkip); teacher preview via ?teacher=preview then window.go('tutor')",
+  "context_for_next_testing_agent": "Public preview URL intermittently returns a Cloudflare 'Performing security verification' interstitial on page.reload()/second goto - when that happens the app boots into the 'Materi belum bisa dimuat' error card with English fallback nav labels (NOT an app bug). Test against http://localhost:3000 (same tools/preview-server.mjs static server) or use only the harness's single initial navigation. Onboarding has no data-testid; working selectors: [data-ob-locale=\"id\"] / [data-ob-locale=\"th\"], .fiezel-ob input (placeholder 'Tulis nama kamu' / 'พิมพ์ชื่อของคุณ'), .fiezel-ob button:has-text('Lanjut'|'ต่อไป'), .fiezel-ob button:has-text('Lewati'|'ข้าม'), #authGateSkip, then remove '.fiezel-splash,.fiezel-ob,.fz-tour'. Splash needs ~7s before the chooser is interactive. Grammar lesson opens ONLY via #app .path-node (needs click(force=True) - perpetual animation). Progress hidden tabs are marked data-fz-student-hide. #fiezelDiagHost contains the text 'Diagnostics' but is 0x0 and off-viewport, so text-only scans give a false positive - it is NOT visible to users. Verified clean: fz-lux applied, all forbidden literals absent (Vocabulary Hub / Today Plan / Grammar Hub / FIEZEL CONTROL ROOM / Classroom / Coming Soon / Laporan Diagnostik), teacher mode has no fz-lux and reverts correctly.",
+  "rca_of_the_issue": "Grammar lesson click failure: in app.js the grammar path markup binds onclick=openGrammarLesson(id) to the decorative <button class=\"path-node\"> ring only; the sibling <div class=\"path-label\"> containing the lesson title/meta has no handler, so tapping the visually dominant title is a no-op. Blank settings/grammar icons: those code paths render <i data-lucide=\"name\"> placeholders and lucide.createIcons() is not re-invoked for that subtree after the dynamic render, so the <i> is never replaced by an <svg> (confirmed in DOM: '<i data-lucide=\"user\"></i>' still present while sibling rows contain real <svg>)."
+}

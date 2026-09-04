@@ -1,0 +1,314 @@
+/* ==========================================================================
+   FIEZEL · features/ui/fiezel-lux.css — LAPISAN TAMPILAN PREMIUM (murid)
+   Palet resmi tidak berubah: kuning #FFC700 / #E6A800, tinta #241A11, krem #FFF9EE.
+   Yang berubah: cara palet dipakai — tinta pekat sebagai "kartu hitam" eksklusif,
+   kuning hanya untuk aksi & sorotan, garis tipis, bayangan lembut, tipografi serif.
+   Aktif hanya bila <body class="fz-lux">. Ruang Guru (body.fz-teacher-mode) tidak disentuh.
+   ========================================================================== */
+body.fz-lux:not(.fz-teacher-mode){
+  --lux-ink:#241A11;
+  --lux-ink-2:#3A2C1F;
+  --lux-cream:#FFF9EE;
+  --lux-paper:#FFFFFF;
+  --lux-paper-warm:#FFFDF7;
+  --lux-yellow:#FFC700;
+  --lux-yellow-deep:#E6A800;
+  --lux-yellow-soft:#FFF3C4;
+  --lux-line:rgba(36,26,17,.10);
+  --lux-line-soft:rgba(36,26,17,.06);
+  --lux-muted:#6E5E47;
+  --lux-shadow-sm:0 1px 2px rgba(36,26,17,.04),0 6px 18px -6px rgba(36,26,17,.08);
+  --lux-shadow-md:0 2px 4px rgba(36,26,17,.04),0 16px 36px -12px rgba(36,26,17,.16);
+  --lux-shadow-lg:0 30px 70px -20px rgba(36,26,17,.28);
+  --lux-glow:0 10px 28px -6px rgba(255,199,0,.45);
+  --lux-r-xl:28px;--lux-r-lg:22px;--lux-r-md:16px;--lux-r-sm:12px;
+  --panel:var(--lux-paper);
+  --line:var(--lux-line);
+  --line-soft:var(--lux-line-soft);
+  --radius-lg:var(--lux-r-lg);
+  --radius-md:var(--lux-r-md);
+  --shadow-sm:var(--lux-shadow-sm);
+  --shadow-md:var(--lux-shadow-md);
+  --shadow-lg:var(--lux-shadow-lg);
+  --accent:var(--lux-ink);
+  --accent-strong:var(--lux-ink);
+  --accent-on-glass:var(--lux-ink);
+  --accent-soft:var(--lux-yellow-soft);
+  --surface-edge:var(--lux-line);
+  background:var(--lux-cream);
+  color:var(--lux-ink);
+  -webkit-font-smoothing:antialiased;
+}
+body.fz-lux:not(.fz-teacher-mode)::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(60% 40% at 50% -5%,rgba(255,199,0,.22),rgba(255,199,0,0) 70%),
+    radial-gradient(40% 30% at 100% 100%,rgba(255,243,196,.55),rgba(255,243,196,0) 70%);
+}
+body.fz-lux:not(.fz-teacher-mode) ::selection{background:var(--lux-yellow);color:var(--lux-ink)}
+
+/* ---------- cangkang ---------- */
+body.fz-lux .app{max-width:720px;padding:14px 18px calc(124px + env(safe-area-inset-bottom))}
+@media(min-width:760px){body.fz-lux .app{padding-top:24px}}
+
+/* ---------- topbar ---------- */
+body.fz-lux .topbar{
+  position:sticky;top:0;z-index:30;margin:0 -18px 14px;padding:10px 18px;
+  background:rgba(255,249,238,.78);backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3);
+  border-bottom:1px solid var(--lux-line-soft);
+}
+body.fz-lux .brand-button{padding:4px 0}
+body.fz-lux .brand{width:96px}
+body.fz-lux .topbar-actions{gap:8px}
+body.fz-lux .icon-button{
+  width:42px;height:42px;border-radius:999px;background:var(--lux-paper);
+  border:1px solid var(--lux-line);color:var(--lux-ink);box-shadow:var(--lux-shadow-sm);
+}
+body.fz-lux .icon-button:hover{transform:translateY(-1px);box-shadow:var(--lux-shadow-md);border-color:var(--lux-ink)}
+body.fz-lux .ask-button{width:auto;height:42px;flex-direction:row;padding:0 14px 0 12px;gap:8px}
+body.fz-lux .ask-button .fiezel-ask-mark{height:16px;width:auto}
+body.fz-lux .ask-button .ask-label{font-size:.8rem;font-weight:700;letter-spacing:.01em;text-transform:none}
+
+/* ---------- kartu rencana belajar (learner-flow) ---------- */
+body.fz-lux #app .learner-flow-launcher{grid-template-columns:1fr;gap:12px;margin:0 0 6px}
+body.fz-lux #app .learner-flow-launcher .launch-card{min-height:0;padding:18px 20px;border-radius:var(--lux-r-lg);border:1px solid var(--lux-line);box-shadow:var(--lux-shadow-sm)}
+body.fz-lux #app .learner-flow-launcher .launch-card::before,body.fz-lux #app .learner-flow-launcher .launch-card::after{display:none}
+body.fz-lux #app .learner-flow-launcher .learn-launch{background:var(--lux-paper);color:var(--lux-ink)}
+body.fz-lux #app .learner-flow-launcher .learn-launch .launch-icon{background:var(--lux-yellow);color:var(--lux-ink);width:44px;height:44px;border-radius:14px}
+body.fz-lux #app .learner-flow-launcher .learn-launch .launch-icon .fz-i{--fz-i-fill:var(--lux-ink);--fz-i-line:var(--lux-ink)}
+body.fz-lux #app .learner-flow-launcher .launch-card b{font:400 1.3rem/1.1 var(--fz-display);letter-spacing:-.01em}
+body.fz-lux #app .learner-flow-launcher .launch-card small{font-size:.82rem;opacity:.7}
+body.fz-lux #app .learner-flow-launcher .launch-card:hover{transform:translateY(-2px);box-shadow:var(--lux-shadow-md)}
+
+/* ---------- judul layar ---------- */
+body.fz-lux .section-head{padding:6px 0 0;margin-bottom:18px;align-items:flex-start}
+body.fz-lux .section-head h1{
+  font:400 clamp(1.9rem,6vw,2.4rem)/1.05 var(--fz-display);letter-spacing:-.02em;color:var(--lux-ink);
+}
+body.fz-lux .section-head p{font-size:.9rem;line-height:1.5;color:var(--lux-muted);margin-top:6px;max-width:34ch}
+body.fz-lux .home-section-head{margin:26px 0 12px}
+body.fz-lux .home-section-head h2{font:400 1.5rem/1.1 var(--fz-display);letter-spacing:-.01em;color:var(--lux-ink)}
+body.fz-lux .home-section-head h3{font:400 1.25rem/1.1 var(--fz-display)}
+body.fz-lux .home-section-head .text-button{font-size:.82rem;font-weight:700;color:var(--lux-ink);padding:8px 12px;border-radius:999px;background:transparent;border:1px solid var(--lux-line)}
+body.fz-lux .home-section-head .text-button:hover{background:var(--lux-paper)}
+body.fz-lux .journey-week{display:none}
+
+/* ---------- kartu ---------- */
+body.fz-lux .card{
+  background:var(--lux-paper);border:1px solid var(--lux-line);border-radius:var(--lux-r-lg);
+  padding:20px;box-shadow:var(--lux-shadow-sm);margin-bottom:12px;
+}
+body.fz-lux .card h3{font:400 1.25rem/1.15 var(--fz-display);letter-spacing:-.01em;margin:0 0 10px;color:var(--lux-ink)}
+body.fz-lux .muted{color:var(--lux-muted)}
+
+/* ---------- tombol ---------- */
+body.fz-lux button{
+  border-radius:999px;border:1px solid var(--lux-line);background:var(--lux-paper);color:var(--lux-ink);
+  font-weight:700;letter-spacing:-.005em;box-shadow:none;
+  transition:transform .16s var(--ease),box-shadow .16s var(--ease),background-color .16s var(--ease),border-color .16s var(--ease);
+}
+body.fz-lux button:hover{border-color:var(--lux-ink);box-shadow:var(--lux-shadow-sm)}
+body.fz-lux button:active{transform:scale(.98)}
+body.fz-lux button.primary,body.fz-lux .primary,body.fz-lux .primary.luxe,body.fz-lux .quiz-next:not(:disabled){
+  background:var(--lux-yellow);color:var(--lux-ink);border-color:var(--lux-yellow);box-shadow:var(--lux-glow);
+}
+body.fz-lux button.primary:hover,body.fz-lux .primary:hover,body.fz-lux .primary.luxe:hover{background:var(--lux-yellow-deep);border-color:var(--lux-yellow-deep);color:var(--lux-ink)}
+body.fz-lux .primary.wide,body.fz-lux .coach-strip-go{min-height:54px;font-size:1rem}
+body.fz-lux .danger{background:transparent;color:#B8432D;border-color:rgba(184,67,45,.25)}
+body.fz-lux .danger:hover{background:#FDE3DE;border-color:#B8432D}
+body.fz-lux .text-button{border:0;background:transparent;box-shadow:none;color:var(--lux-ink)}
+body.fz-lux .text-button:hover{box-shadow:none;text-decoration:underline;text-underline-offset:3px}
+body.fz-lux button:focus-visible{outline:2px solid var(--lux-yellow);outline-offset:3px}
+
+/* ---------- BERANDA: kartu hitam eksklusif ---------- */
+body.fz-lux .launcher-shell{
+  position:relative;overflow:hidden;
+  background:var(--lux-ink);color:#FFF9EE;
+  border:1px solid rgba(255,199,0,.22);border-radius:var(--lux-r-xl);
+  padding:22px 20px 20px;box-shadow:var(--lux-shadow-lg);
+}
+body.fz-lux .launcher-shell::after{
+  content:"";position:absolute;width:320px;height:320px;right:-120px;top:-160px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,199,0,.55) 0%,rgba(255,199,0,.12) 40%,rgba(255,199,0,0) 70%);
+  filter:none;pointer-events:none;
+}
+body.fz-lux .launcher-shell::before{
+  content:"";position:absolute;left:20px;right:20px;top:0;height:1px;
+  background:linear-gradient(90deg,rgba(255,199,0,0),rgba(255,199,0,.9),rgba(255,199,0,0));
+}
+body.fz-lux .launcher-meta{color:rgba(255,249,238,.6);opacity:1;font-size:.62rem;letter-spacing:.2em;font-weight:700}
+body.fz-lux .launcher-meta .live-signal{background:var(--lux-yellow);box-shadow:0 0 0 4px rgba(255,199,0,.18)}
+body.fz-lux .hero-stats{margin:18px 0 12px;gap:8px}
+body.fz-lux .hero-stat{
+  background:rgba(255,249,238,.08);border:1px solid rgba(255,249,238,.16);box-shadow:none;
+  color:#FFF9EE;border-radius:14px;padding:9px 13px;backdrop-filter:blur(6px);
+}
+body.fz-lux .hero-stat small{color:rgba(255,249,238,.62);letter-spacing:.14em}
+body.fz-lux .hero-stat b{color:#FFF9EE}
+body.fz-lux .hero-stat.is-level{background:var(--lux-yellow);border-color:var(--lux-yellow);color:var(--lux-ink);box-shadow:var(--lux-glow)}
+body.fz-lux .hero-stat.is-level small,body.fz-lux .hero-stat.is-level b{color:var(--lux-ink)}
+body.fz-lux .hero-stat.is-streak{background:rgba(255,249,238,.08)}
+body.fz-lux .hero-stat.is-streak svg{color:var(--lux-yellow)}
+body.fz-lux .hero-line{
+  font:400 clamp(1.45rem,5.2vw,1.9rem)/1.2 var(--fz-display);letter-spacing:-.015em;
+  color:#FFF9EE;margin:6px 0 18px;max-width:26ch;-webkit-line-clamp:3;line-clamp:3;
+}
+body.fz-lux .hero-line span{font-weight:400;color:var(--lux-yellow)}
+body.fz-lux .trust-line{color:var(--lux-yellow)}
+body.fz-lux .coach-strip{
+  background:var(--lux-cream);color:var(--lux-ink);border:1px solid rgba(255,249,238,.2);
+  border-radius:20px;box-shadow:0 12px 30px -10px rgba(0,0,0,.45);padding:16px;
+}
+body.fz-lux .coach-strip-face{background:var(--lux-yellow);border:2px solid var(--lux-ink)}
+body.fz-lux .coach-strip-say small{color:var(--lux-muted);letter-spacing:.16em}
+body.fz-lux .coach-strip-say b{font-size:1rem;font-weight:600;line-height:1.4;-webkit-line-clamp:3;line-clamp:3}
+body.fz-lux .coach-strip-more{font-size:.82rem;font-weight:700;color:var(--lux-ink);opacity:.8;border:0;box-shadow:none;background:transparent}
+
+/* ---------- kartu skill & pintu belajar ---------- */
+body.fz-lux .skill-hub{gap:12px}
+body.fz-lux .skill-card{
+  --skill-bg:var(--lux-paper);--skill-line:var(--lux-line);
+  background:var(--lux-paper);border:1px solid var(--lux-line);border-radius:var(--lux-r-lg);
+  padding:16px;box-shadow:var(--lux-shadow-sm);min-height:128px;
+  transition:transform .18s var(--ease),box-shadow .18s var(--ease),border-color .18s var(--ease);
+}
+body.fz-lux .skill-card:hover{transform:translateY(-2px);box-shadow:var(--lux-shadow-md);border-color:rgba(36,26,17,.22)}
+body.fz-lux .skill-card:active{transform:translateY(0) scale(.99);box-shadow:var(--lux-shadow-sm)}
+body.fz-lux .skill-card .fz-i{--fz-i-fill:var(--lux-yellow);--fz-i-line:var(--lux-ink)}
+body.fz-lux .skill-card b{font-size:1.02rem;font-weight:700}
+body.fz-lux .skill-card small{opacity:.62}
+body.fz-lux .skill-badge{opacity:.55}
+body.fz-lux .skill-ring{background:conic-gradient(var(--lux-yellow) var(--ring,0%),rgba(36,26,17,.08) 0)}
+body.fz-lux .skill-ring::before{background:var(--lux-paper)}
+body.fz-lux .learning-launcher{gap:12px}
+body.fz-lux .launch-card{
+  background:var(--lux-paper);border:1px solid var(--lux-line);border-radius:var(--lux-r-lg);
+  padding:16px;box-shadow:var(--lux-shadow-sm);text-align:left;
+}
+body.fz-lux .launch-card:hover{transform:translateY(-2px);box-shadow:var(--lux-shadow-md);border-color:rgba(36,26,17,.22)}
+body.fz-lux .launch-card b{font-size:1rem;font-weight:700}
+body.fz-lux .launch-card small{color:var(--lux-muted)}
+body.fz-lux .launch-icon{width:40px;height:40px;border-radius:12px;background:var(--lux-yellow-soft);color:var(--lux-ink)}
+body.fz-lux .launch-icon .fz-i{--fz-i-fill:var(--lux-yellow);--fz-i-line:var(--lux-ink)}
+body.fz-lux .launch-card>i[data-lucide],body.fz-lux .launch-card>svg.lucide{color:var(--lux-muted)}
+
+/* ---------- kontrol level & catatan ---------- */
+body.fz-lux .active-level-control,body.fz-lux .home-level-context{
+  border:1px solid var(--lux-line);border-radius:14px;background:var(--lux-paper);box-shadow:var(--lux-shadow-sm);
+}
+body.fz-lux .active-level-control strong{color:var(--lux-ink);font-family:var(--fz-display);font-weight:400;font-size:1.25rem}
+body.fz-lux .active-level-control span,body.fz-lux .active-level-control small{color:var(--lux-muted)}
+body.fz-lux .grammar-level-note{padding:14px 16px;border-radius:var(--lux-r-md);background:var(--lux-yellow-soft);border:1px solid rgba(230,168,0,.25)}
+body.fz-lux .grammar-level-note b{color:var(--lux-ink)}
+body.fz-lux .exam-entry-chip{background:var(--lux-ink);color:#FFF9EE;border-radius:var(--lux-r-md);border:0}
+body.fz-lux .exam-entry-chip *{color:#FFF9EE}
+body.fz-lux .exam-entry-chip small,body.fz-lux .exam-entry-chip span{color:rgba(255,249,238,.85);opacity:1}
+body.fz-lux .exam-entry-chip b,body.fz-lux .exam-entry-chip strong{color:var(--lux-yellow)}
+body.fz-lux .exam-entry-chip svg,body.fz-lux .exam-entry-chip i{color:var(--lux-yellow)}
+
+/* ---------- desktop: rel navigasi kiri (html.fiezel-ui-v6 ≥1000px) ---------- */
+@media (min-width:1000px){
+  html.fiezel-ui-v6 body.fz-lux .bottomnav{
+    left:20px;top:50%;bottom:auto;transform:translateY(-50%);width:84px;padding:10px 8px;
+    display:grid;grid-template-columns:1fr;gap:6px;border-radius:28px;
+  }
+  html.fiezel-ui-v6 body.fz-lux .nav{min-height:60px;display:grid;place-items:center;gap:4px;padding:8px 4px;border-radius:18px}
+  html.fiezel-ui-v6 body.fz-lux .nav span{font-size:.58rem}
+  html.fiezel-ui-v6 body.fz-lux .nav-scrim{display:none}
+  html.fiezel-ui-v6 body.fz-lux .app{max-width:956px;padding-left:118px;padding-right:118px;padding-bottom:48px}
+}
+
+/* ---------- jalur materi (grammar) ---------- */
+body.fz-lux .path-ring{background:conic-gradient(var(--lux-yellow) calc(var(--pm,0)*1%),rgba(36,26,17,.08) 0);box-shadow:var(--lux-shadow-sm)}
+body.fz-lux .path-ring>i{background:var(--lux-paper)}
+body.fz-lux .path-node-exam .path-ring{background:var(--lux-ink)}
+body.fz-lux .path-node-exam .path-ring>i{background:var(--lux-ink);color:var(--lux-yellow)}
+body.fz-lux .path-step-exam .path-label b{color:var(--lux-ink)}
+body.fz-lux .path-label b{font-weight:700;font-size:.98rem}
+body.fz-lux .path-label[role="button"]{cursor:pointer;border-radius:12px}
+body.fz-lux .path-label[role="button"]:hover b{text-decoration:underline;text-underline-offset:3px}
+body.fz-lux .fsl-shell .fsl-head>div>span.fsl-kicker,body.fz-lux .fsl-shell .fsl-head h1,body.fz-lux .fsl-shell .fsl-head>div>p:first-of-type{display:none}
+body.fz-lux .path-label>span{color:var(--lux-muted)}
+body.fz-lux .lesson-skip-link{border-radius:999px;font-size:.74rem;padding:6px 12px;border:1px solid var(--lux-line);background:var(--lux-paper)}
+body.fz-lux .path-view-toggle,body.fz-lux .grammar-hub-tools button{border-radius:999px}
+
+/* ---------- tab & statistik ---------- */
+body.fz-lux .progress-tabs{background:rgba(36,26,17,.06);border-radius:999px;padding:4px;gap:4px;margin:6px 0 16px}
+body.fz-lux .progress-tab{border-radius:999px;color:var(--lux-muted);font-weight:700;border:0;background:transparent;box-shadow:none}
+body.fz-lux .progress-tab.active{background:var(--lux-ink);color:#FFF9EE}
+body.fz-lux .stats>div{border-radius:var(--lux-r-md);background:var(--lux-paper-warm);border:1px solid var(--lux-line-soft)}
+body.fz-lux .stats b,body.fz-lux .stats strong{font-family:var(--fz-display);font-weight:400;font-size:1.6rem;letter-spacing:-.02em}
+body.fz-lux .meter,body.fz-lux .bar{background:rgba(36,26,17,.08);border-radius:999px;overflow:hidden}
+body.fz-lux .meter>span,body.fz-lux .meter>b,body.fz-lux .bar>span,body.fz-lux .bar>b,body.fz-lux .mp{background:var(--lux-yellow)}
+
+/* ---------- soal & pilihan jawaban ---------- */
+body.fz-lux .option{
+  border-radius:var(--lux-r-md);border:1px solid var(--lux-line);background:var(--lux-paper);
+  padding:16px 18px;min-height:56px;font-weight:600;box-shadow:var(--lux-shadow-sm);
+}
+body.fz-lux .option:hover:not(:disabled){border-color:var(--lux-ink);transform:translateY(-1px);box-shadow:var(--lux-shadow-md)}
+body.fz-lux .option.selected,body.fz-lux .option.is-selected,body.fz-lux .option[aria-pressed="true"]{border:2px solid var(--lux-yellow);background:var(--lux-yellow-soft)}
+body.fz-lux .option.correct,body.fz-lux .option.correct:disabled{border:2px solid #10B981;background:#ECFDF5;color:#065F46}
+body.fz-lux .option.wrong,body.fz-lux .option.wrong:disabled{border:2px solid #EF4444;background:#FEF2F2;color:#991B1B}
+body.fz-lux .quiz-progress-bar{height:5px;border-radius:999px;background:rgba(36,26,17,.08)}
+body.fz-lux .quiz-progress-bar b{background:var(--lux-yellow)}
+body.fz-lux .quiz-exit{border-radius:999px}
+body.fz-lux .quiz-listen-btn{background:var(--lux-ink);color:#FFF9EE;border-color:var(--lux-ink);border-radius:999px}
+
+/* ---------- dialog, toast, lembar ---------- */
+body.fz-lux .modal{background:rgba(36,26,17,.45);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+body.fz-lux .welcome-panel,body.fz-lux .modal-panel{
+  border-radius:var(--lux-r-xl);border:1px solid var(--lux-line);background:var(--lux-paper);box-shadow:var(--lux-shadow-lg);padding:24px 22px;
+}
+body.fz-lux .modal-panel h2,body.fz-lux .welcome-panel h2{font:400 1.7rem/1.1 var(--fz-display);letter-spacing:-.015em}
+body.fz-lux .modal-mark,body.fz-lux .eyebrow,body.fz-lux .fsl-kicker{color:var(--lux-yellow-deep);letter-spacing:.18em;font-size:.62rem;font-weight:800}
+body.fz-lux .toast{background:var(--lux-ink);color:#FFF9EE;border:1px solid rgba(255,199,0,.3);box-shadow:var(--lux-shadow-lg)}
+body.fz-lux .settings-fold,body.fz-lux .home-fold{border-radius:var(--lux-r-lg);border:1px solid var(--lux-line);background:var(--lux-paper)}
+body.fz-lux .setting-row{border-radius:var(--lux-r-sm)}
+body.fz-lux .setting-icon{background:var(--lux-yellow-soft);border-radius:12px;color:var(--lux-ink)}
+body.fz-lux .setting-icon .fz-i,body.fz-lux .settings-fold .fz-i{--fz-i-fill:var(--lux-yellow);--fz-i-line:var(--lux-ink)}
+body.fz-lux .option.was-tried,body.fz-lux .option.was-tried:disabled{border:1px dashed rgba(36,26,17,.35);background:var(--lux-paper-warm);color:var(--lux-muted);box-shadow:none}
+body.fz-lux .level-picker-grid button,body.fz-lux .level-picker-grid .level-pick{border-radius:var(--lux-r-md)}
+
+/* ---------- tab bar bawah: pil kaca mengambang ---------- */
+body.fz-lux .nav-scrim{height:calc(110px + env(safe-area-inset-bottom));background:linear-gradient(to top,var(--lux-cream) 40%,rgba(255,249,238,0))}
+body.fz-lux .bottomnav{
+  width:min(560px,calc(100% - 28px));padding:6px;gap:2px;
+  background:rgba(255,255,255,.86);backdrop-filter:blur(22px) saturate(1.4);-webkit-backdrop-filter:blur(22px) saturate(1.4);
+  border:1px solid var(--lux-line);border-radius:999px;box-shadow:var(--lux-shadow-md);
+}
+body.fz-lux .nav{
+  min-height:52px;border-radius:999px;color:var(--lux-muted);font-size:.66rem;font-weight:700;letter-spacing:.01em;
+  border:0;background:transparent;box-shadow:none;gap:3px;
+}
+body.fz-lux .nav:hover{color:var(--lux-ink);border-color:transparent;box-shadow:none}
+body.fz-lux .nav svg,body.fz-lux .nav .fz-i{width:20px;height:20px}
+body.fz-lux .nav span{white-space:nowrap}
+body.fz-lux:lang(th) .nav span,body.fz-lux .nav span:lang(th){font-size:.58rem;letter-spacing:0}
+body.fz-lux .nav.active{background:var(--lux-ink);color:var(--lux-yellow);font-weight:800;transform:none}
+body.fz-lux .nav.active .fz-i{--fz-i-fill:var(--lux-yellow);--fz-i-line:var(--lux-yellow)}
+
+/* ---------- menyembunyikan panel yang tidak penting bagi murid ---------- */
+body.fz-lux .progress-tab[onclick*="'analysis'"],
+body.fz-lux .progress-tab[onclick*="'adaptive'"],
+body.fz-lux .launch-card.classroom-launch.is-coming-soon,
+body.fz-lux .launcher-meta .celestial-status,
+body.fz-lux .card:has(> .row > .creator-link),
+body.fz-lux .card:has(.creator-link),
+body.fz-lux [data-fz-student-hide]{display:none !important}
+
+/* ---------- gerak masuk yang bertahap ---------- */
+@media (prefers-reduced-motion:no-preference){
+  body.fz-lux .fade>*{animation:luxRise .5s var(--ease) both}
+  body.fz-lux .fade>*:nth-child(2){animation-delay:.05s}
+  body.fz-lux .fade>*:nth-child(3){animation-delay:.1s}
+  body.fz-lux .fade>*:nth-child(4){animation-delay:.15s}
+  body.fz-lux .fade>*:nth-child(n+5){animation-delay:.2s}
+}
+@keyframes luxRise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes luxPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,199,0,.0)}50%{box-shadow:0 0 0 8px rgba(255,199,0,.18)}}
+
+/* ---------- Thai ---------- */
+body.fz-lux:lang(th),body.fz-lux :lang(th){font-family:'FZ Plus Jakarta Sans','Noto Sans Thai','Sarabun','Tahoma',sans-serif}
+body.fz-lux :lang(th) .section-head h1,body.fz-lux :lang(th) .hero-line,body.fz-lux :lang(th) .home-section-head h2,
+body.fz-lux :lang(th) .modal-panel h2,body.fz-lux :lang(th) .card h3{font-family:'Noto Serif Thai','FZ Instrument Serif','Noto Sans Thai',serif;line-height:1.3}

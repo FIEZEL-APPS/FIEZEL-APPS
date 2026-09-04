@@ -11,3 +11,8 @@ Tidak ada akun server yang bisa dipakai di lingkungan pratinjau ini (API produks
 ## Data
 - Semua data Ruang Guru lokal: localStorage key `fiezel-teacher-v1`.
 - Kelas contoh: tombol "Coba dengan kelas contoh (18 siswa)" (`data-testid="tg-welcome-demo"`).
+
+## Sisi murid (redesign 2026-09-04)
+- Tidak perlu akun: pilih bahasa → nama → Lanjut → Lewati → `Lanjut tanpa akun` (`data-testid="auth-gate-skip"`).
+- Tab bar: `data-testid="nav-home|nav-vocab|nav-grammar|nav-reading|nav-progress"`; lesson grammar: `data-testid="grammar-lesson-<id>"`.
+- Navigasi cepat di console: `window.go('home'|'vocab'|'grammar'|'reading'|'progress'|'skills'|'test')`.
