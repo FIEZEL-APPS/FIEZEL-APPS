@@ -190,13 +190,68 @@ setTimeout(async()=>{
   assert(adaptive.some(q=>q.type==='reading'&&q.passage?.text),'adaptive reading question is missing its passage');
   for(const q of adaptive)assert(q.options?.length>=2&&q.answerIndex>=0&&q.answerIndex<q.options.length,'adaptive answer synchronization failed');
   const placement=await ctx.buildPlacement();
-  assert(placement.length===25,`placement runtime produced ${placement.length}/25 questions`);
+  /* m025-246: jumlahnya dibaca dari aplikasi, bukan dipaku 25. Placement-lite memangkasnya
+     ke 12 (enam band CEFR x PLACEMENT_BAND_MIN_EVIDENCE=2), dan angka yang dipaku di sini
+     akan merah untuk alasan yang salah - yang dijaga asersi ini adalah "buildPlacement
+     benar-benar MENGISI rencananya", bukan berapa besar rencananya. Ukuran rencana itu
+     sendiri dijaga ux-redesign-test.js blok D. */
+  const placementTarget=ctx.__fiezelAudit?.placementSize?.()??ctx.placementSize?.()??25;
+  assert(placement.length===placementTarget,`placement runtime produced ${placement.length}/${placementTarget} questions`);
   const difficulty=placement.reduce((m,q)=>{m[q.difficulty]=(m[q.difficulty]||0)+1;return m},{});
-  assert([6,5,4,4,3,3].every((n,i)=>difficulty[i+1]===n),`placement weighting is wrong: ${JSON.stringify(difficulty)}`);
+  /* m025-246: bobot per band DITURUNKAN dari cetak biru yang berlaku, bukan dipaku [6,5,4,4,3,3].
+     Angka itu adalah bentuk cetak biru PENUH (berat di pangkal); placement-lite sengaja rata
+     2 per band. Yang dijaga asersi ini adalah "soal yang dibangun benar-benar mengikuti
+     cetak birunya", dan itu tetap terjaga - sekarang untuk cetak biru mana pun yang aktif. */
+  const blueprint=ctx.__fiezelAudit?.placementBlueprint?.()||{};
+  const levels=['A1','A2','B1','B2','C1','C2'];
+  const expected=levels.map(l=>Object.values(blueprint[l]||{}).reduce((a,b)=>a+Number(b||0),0));
+  assert(expected.every((n,i)=>(difficulty[i+1]||0)===n),
+    `placement weighting is wrong: ${JSON.stringify(difficulty)} vs cetak biru ${JSON.stringify(expected)}`);
+  /* Dan bobot itu harus cukup untuk tangga bukti per band: band dengan bukti kurang dari
+     PLACEMENT_BAND_MIN_EVIDENCE tidak akan pernah bisa dinaiki, apa pun kemampuan murid. */
+  assert(expected.every(n=>n>=2),
+    `ada band placement dengan bukti < 2, band itu mustahil dinaiki: ${JSON.stringify(expected)}`);
   const types=placement.reduce((m,q)=>{m[q.type]=(m[q.type]||0)+1;return m},{});
-  assert(types.vocab>0&&types.grammar>0&&types.listening>0,'placement blueprint lost a core content type');
+  /* m025-246 — INVARIAN INI DIPERSEMPIT, dan penyempitannya adalah keputusan produk yang
+     harus dibaca, bukan disimpulkan dari kode.
+
+     Asersi lama menuntut placement memuat KETIGA jenis konten inti, termasuk listening.
+     Placement-lite (12 soal) TIDAK memuat listening, dan itu disengaja - tetapi ia juga
+     bukan penghematan gratis, jadi ongkosnya ditulis di sini:
+
+       KENAPA DIBUANG. Tangga band menuntut >=2 bukti di dalam SATU band sebelum band itu
+       boleh dinaiki. Dengan plafon 12 soal dan enam band, tiap band dapat TEPAT dua. Soal
+       dengar diambil lewat jaringan dan boleh gagal dimuat (lihat guard `type!=='listening'`
+       di buildPlacement) - jadi band mana pun yang berisi satu soal dengar akan turun ke
+       satu bukti begitu jaringannya buruk, dan band itu jadi MUSTAHIL dinaiki karena alasan
+       jaringan, bukan alasan kemampuan. Menaruh listening di sini berarti menukar kepastian
+       naik-band dengan satu jenis bukti.
+
+       ONGKOSNYA. Perkiraan level dari placement-lite tidak melihat kemampuan MENYIMAK sama
+       sekali. Ia titik awal, bukan vonis: bukti dengar terkumpul dari sesi harian (blok
+       dengar/bicara ada di kartu Hari ini), dan mesin adaptif terus mengoreksi levelnya.
+       Tes 25 soal - yang tetap memuat listening - juga tetap satu ketukan dari layar
+       penempatan.
+
+     Yang dijaga sekarang: cetak biru PENUH tetap wajib bertiga (invarian lama, utuh), dan
+     cetak biru mana pun wajib memuat vocabulary DAN grammar. */
+  assert(types.vocab>0&&types.grammar>0,'placement blueprint lost vocabulary or grammar');
+  const fullBlueprint=ctx.__fiezelAudit?.PLACEMENT_BLUEPRINT_FULL;
+  if(fullBlueprint){
+    const fullTypes=Object.values(fullBlueprint).reduce((m,plan)=>{
+      for(const [t,n] of Object.entries(plan))if(Number(n)>0)m[t]=(m[t]||0)+Number(n);
+      return m;
+    },{});
+    assert(fullTypes.vocab>0&&fullTypes.grammar>0&&fullTypes.listening>0,
+      'cetak biru penempatan PENUH kehilangan satu jenis konten inti');
+  }
   assert(!types.reading,'placement must contain no reading questions');
-  assert(new Set(placement.map(q=>q.id||q.question)).size===25,'placement contains duplicate question ids');
+  /* m025-246: dibandingkan dengan panjang yang SUNGGUHAN, bukan angka 25 yang dipaku.
+     Yang dijaga adalah "tidak ada soal kembar", dan itu benar untuk rencana berukuran apa
+     pun; memaku 25 membuat asersi ini merah karena ukurannya berubah, bukan karena ada
+     duplikat - dan pesan galatnya akan menuduh hal yang salah. */
+  assert(new Set(placement.map(q=>q.id||q.question)).size===placement.length,
+    `placement contains duplicate question ids (${placement.length} soal, ${new Set(placement.map(q=>q.id||q.question)).size} unik)`);
   for(const q of placement){
     assert(q.options?.length>=2&&q.answerIndex>=0&&q.answerIndex<q.options.length,'placement answer synchronization failed');
     // Naskah listening harus tetap hanya di q.script. Begitu ia bocor ke q.question, soalnya

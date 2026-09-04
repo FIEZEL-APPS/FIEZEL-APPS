@@ -50,10 +50,14 @@ const COPY = {
   menu: [
     ['Mulai dari Home',
       'Ini beranda kamu: progres harian, streak, dan saran latihan dari PAW. Semua perjalananmu berangkat dari sini.'],
-    ['Vocab dan Grammar',
-      'Tab Vocab buat nambah kosakata, tab Grammar buat materi tata bahasa \u2014 dua fondasi yang saling nguatin.'],
-    ['Reading dan Peta',
-      'Reading isinya bacaan berjenjang plus soalnya. Peta nunjukin jalur belajarmu dari A1 sampai C2 \u2014 biar arahmu jelas.'],
+    /* m025-246: dua langkah ini menunjuk tab yang berbeda sekarang - Vocab dan Reading
+       tidak lagi punya tab sendiri; keduanya hidup di dalam Latihan, dan Peta berganti
+       nama jadi Progres. Naskahnya diperbarui bersama reports/copy-tour-gems.md, sesuai
+       aturan di kepala berkas ini: copy berubah = laporan DAN gerbang berubah bersama. */
+    ['Tab Latihan',
+      'Semua latihan mandiri ada di sini: Vocabulary, Grammar, Reading, bicara & dengar, nulis, sama perpustakaan. Buka kalau kamu pengin ngelatih satu hal tertentu.'],
+    ['Tab Progres',
+      'Di sini kamu lihat jalur belajarmu dari A1 sampai C2, materi yang udah kuat, dan pola kesalahan yang masih sering muncul — biar arahmu jelas.'],
     ['Tanya FIEZEL?',
       'Tombol di kanan ini pintu ke PAW, pembimbing kamu. Bingung apa pun, tanya di sini (butuh jaringan).'],
     ['Chip level kamu',
