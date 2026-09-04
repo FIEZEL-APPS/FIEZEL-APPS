@@ -46,6 +46,7 @@
     './features/i18n/copy-th-quota.js',
     './features/i18n/copy-th-settings-locale.js',
     './features/i18n/copy-th-grammar-labels.js',
+    './features/i18n/copy-th-student.js',
     './features/i18n/naskah-th-brain.js'
   ];
   var GRAMMAR_TH = './grammar-explanations-th.json';
