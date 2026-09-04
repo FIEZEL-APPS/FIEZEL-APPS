@@ -69,6 +69,8 @@ body.fz-teacher-mode #app{font-family:var(--tg-body)}
 .tg-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:99px;border:1px solid var(--tg-line);background:var(--tg-paper-2);font:inherit;font-size:.83rem;font-weight:500;cursor:pointer;color:var(--tg-text);transition:border-color .18s,background-color .18s,transform .18s}
 .tg-chip:hover{border-color:var(--tg-sage);transform:translateY(-1px)}.tg-chip svg{width:13px;height:13px}
 .tg-chip.has-phone{border-color:var(--tg-sage-soft);background:var(--tg-sage-soft);color:var(--tg-sage-2)}
+.tg-sync{font-weight:500}.tg-sync.is-ok{border-color:var(--tg-sage-soft);background:var(--tg-sage-soft);color:var(--tg-sage-2)}.tg-sync.is-err{border-color:var(--tg-brick-soft);background:var(--tg-brick-soft);color:var(--tg-brick)}.tg-sync.is-need,.tg-sync.is-off{color:var(--tg-muted)}.tg-sync.is-busy .tg-i{animation:tg-spin 1s linear infinite}
+@keyframes tg-spin{to{transform:rotate(360deg)}}
 .tg-chip.tg-code{font-family:var(--tg-mono);letter-spacing:.06em;font-weight:500}
 .tg-chip.is-check{position:relative;padding-left:12px}.tg-chip.is-check input{position:absolute;inset:0;opacity:0;cursor:pointer;margin:0}
 .tg-chip.is-check:has(input:checked){background:var(--tg-ink);color:#fff;border-color:var(--tg-ink)}

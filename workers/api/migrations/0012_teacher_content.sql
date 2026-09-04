@@ -141,3 +141,23 @@ CREATE TABLE IF NOT EXISTS tc_lesson_evidence (
   day TEXT NOT NULL,
   PRIMARY KEY (lesson_id, learner_sub, question_id)
 ) WITHOUT ROWID;
+
+CREATE TABLE IF NOT EXISTS tc_class (
+  code TEXT PRIMARY KEY,
+  teacher_sub TEXT NOT NULL,
+  title TEXT NOT NULL,
+  level TEXT,
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS tc_class_report (
+  class_code TEXT NOT NULL,
+  learner_key TEXT NOT NULL,
+  display_name TEXT NOT NULL,
+  learner_sub TEXT,
+  reported_at INTEGER NOT NULL,
+  report_json TEXT NOT NULL,
+  updated_at INTEGER NOT NULL,
+  PRIMARY KEY (class_code, learner_key)
+) WITHOUT ROWID;

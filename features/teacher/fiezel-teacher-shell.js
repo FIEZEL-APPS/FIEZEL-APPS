@@ -7,7 +7,8 @@
   'use strict';
   if (!root) return;
   var S = function () { return root.FiezelTeacherStore; };
-  var el = null, env = {}, st = null, ui = { modal: null, drawer: null, filter: '', insightSkill: 'past_tense', attDate: null, pick: {} };
+  var el = null, env = {}, st = null, ui = { modal: null, drawer: null, filter: '', insightSkill: 'past_tense', attDate: null, pick: {}, syncing: false }, syncTimer = null;
+  var SYNC_EVERY_MS = 90000;
   var NAV = [['briefing', 'Briefing', 'sunrise'], ['classes', 'Kelas & Siswa', 'users'], ['assignments', 'Tugas & Ujian', 'clipboard-list'], ['insights', 'Analitik', 'activity'], ['comms', 'Komunikasi', 'megaphone'], ['journal', 'Jurnal Guru', 'notebook-pen']];
   var TITLE = { briefing: 'Briefing hari ini', classes: 'Kelas & Siswa', assignments: 'Tugas & Ujian', insights: 'Analitik & Deteksi Dini', comms: 'Komunikasi', journal: 'Jurnal Guru', settings: 'Profil Guru' };
 
@@ -18,6 +19,7 @@
   function copy(text, msg) { try { navigator.clipboard.writeText(text).then(function () { toast(msg || 'Tersalin.'); }, function () { toast('Tidak bisa menyalin otomatis.'); }); } catch (_) { toast('Tidak bisa menyalin otomatis.'); } }
   function saveMinutes(n) { st.savedMinutes = (st.savedMinutes || 0) + n; }
   function persist() { S().save(st); }
+  function accountHandle() { try { var a = root.FiezelAccount && root.FiezelAccount.state && root.FiezelAccount.state(); return a && a.handle ? a.handle : ''; } catch (_) { return ''; } }
   function cls() { return st.classes.filter(function (c) { return c.id === st.activeClassId; })[0] || null; }
   function student(id) { var c = cls(); return c ? c.students.filter(function (s) { return s.id === id; })[0] : null; }
   function initials(n) { return String(n || '?').trim().slice(0, 2).toUpperCase(); }
@@ -36,6 +38,35 @@
     } catch (_) { return false; }
   }
 
+  // ---- sinkron server ---------------------------------------------------------------------
+  function startAutoSync() {
+    stopAutoSync();
+    if (S().syncAvailable() !== 'ok') return;
+    syncAll(true);
+    syncTimer = setInterval(function () { if (el && !ui.syncing) syncAll(true); }, SYNC_EVERY_MS);
+  }
+  function stopAutoSync() { if (syncTimer) clearInterval(syncTimer); syncTimer = null; }
+  /** Sinkron semua kelas: klaim kode yang belum diklaim, tarik laporan murid, ingest. */
+  function syncAll(quiet) {
+    var T = S(), avail = T.syncAvailable();
+    if (avail !== 'ok') { if (!quiet) toast(T.syncLabel(cls()).text); return Promise.resolve(); }
+    if (ui.syncing || !st.classes.length) return Promise.resolve();
+    ui.syncing = true; render();
+    var total = { ingested: 0, graded: 0, names: [], failed: 0 };
+    return st.classes.reduce(function (p, c) { return p.then(function () { return T.syncClass(c).then(function (r) { if (r.ok) { total.ingested += r.ingested; total.graded += r.graded; total.names = total.names.concat(r.names || []); } else total.failed++; }); }); }, Promise.resolve())
+      .then(function () {
+        ui.syncing = false; st.lastSyncAt = Date.now();
+        if (total.ingested) saveMinutes(total.ingested * 4 + total.graded * 5);
+        persist(); render();
+        if (total.ingested) toast(total.ingested + ' laporan murid masuk' + (total.graded ? ' · ' + total.graded + ' tugas dinilai otomatis' : '') + (total.names.length ? ' (' + total.names.slice(0, 3).join(', ') + (total.names.length > 3 ? '…' : '') + ')' : '') + '.');
+        else if (!quiet) toast(total.failed ? 'Sinkron gagal untuk ' + total.failed + ' kelas.' : 'Tersinkron — belum ada laporan baru.');
+      });
+  }
+  function syncChip(c) {
+    var L = S().syncLabel(c);
+    return '<button type="button" class="tg-chip tg-sync is-' + (ui.syncing ? 'busy' : L.state) + '" data-tg="sync" title="Sinkron laporan murid dari server" data-testid="tg-sync">' + icon(ui.syncing ? 'refresh-cw' : L.state === 'ok' ? 'cloud-check' : L.state === 'err' ? 'cloud-alert' : 'cloud') + '<span>' + esc(ui.syncing ? 'Menyinkron…' : L.text) + '</span></button>';
+  }
+
   // ---- mount ------------------------------------------------------------------------------
   function mount(target, options) {
     el = target; env = options || {}; st = S().load();
@@ -46,8 +77,9 @@
     el.addEventListener('click', onClick); el.addEventListener('submit', onSubmit); el.addEventListener('change', onChange); el.addEventListener('input', onInput);
     document.addEventListener('keydown', onKey);
     render();
+    startAutoSync();
   }
-  function unmount() { document.body.classList.remove('fz-teacher-mode'); document.removeEventListener('keydown', onKey); if (el) { el.removeEventListener('click', onClick); el.removeEventListener('submit', onSubmit); el.removeEventListener('change', onChange); el.removeEventListener('input', onInput); } el = null; ui.modal = null; ui.drawer = null; }
+  function unmount() { stopAutoSync(); document.body.classList.remove('fz-teacher-mode'); document.removeEventListener('keydown', onKey); if (el) { el.removeEventListener('click', onClick); el.removeEventListener('submit', onSubmit); el.removeEventListener('change', onChange); el.removeEventListener('input', onInput); } el = null; ui.modal = null; ui.drawer = null; }
   function onKey(e) { if (e.key === 'Escape' && (ui.modal || ui.drawer)) { ui.modal = null; ui.drawer = null; render(); } }
   function exit() { unmount(); if (env.exit) env.exit(); }
 
@@ -62,7 +94,7 @@
   // ---- kerangka ---------------------------------------------------------------------------
   function sidebar(c) {
     return '<aside class="tg-side"><div class="tg-brand"><span class="tg-brand-mark">F</span><div><b>FIEZEL</b><small>Ruang Guru</small></div></div>' +
-      '<button type="button" class="tg-teacher" data-tg="view" data-view="settings" data-testid="tg-profile">' + icon('user-round') + '<div><b>' + esc(st.teacher.name || 'Guru FIEZEL') + '</b><small>' + esc(st.teacher.school || 'Atur profil →') + '</small></div></button>' +
+      '<button type="button" class="tg-teacher" data-tg="view" data-view="settings" data-testid="tg-profile">' + icon('user-round') + '<div><b>' + esc(st.teacher.name || accountHandle() || 'Guru FIEZEL') + '</b><small>' + esc(st.teacher.school || 'Atur profil →') + '</small></div></button>' +
       (st.classes.length ? '<label class="tg-class-switch">Kelas aktif<select data-tg-select="class" data-testid="tg-class-select">' + st.classes.map(function (k) { return '<option value="' + k.id + '"' + (c && k.id === c.id ? ' selected' : '') + '>' + esc(k.name) + '</option>'; }).join('') + '</select></label>' : '') +
       '<nav class="tg-nav">' + NAV.map(function (n) { return '<button type="button" class="tg-nav-item' + (st.view === n[0] ? ' is-active' : '') + '" data-tg="view" data-view="' + n[0] + '" data-testid="tg-nav-' + n[0] + '">' + icon(n[2]) + '<span>' + n[1] + '</span></button>'; }).join('') + '</nav>' +
       '<div class="tg-side-foot"><div class="tg-saved" title="Perkiraan waktu administrasi yang FIEZEL kerjakan untukmu">' + icon('hourglass') + '<div><small>Waktu terhemat</small><b>' + Math.round(st.savedMinutes || 0) + ' menit</b></div></div>' +
@@ -71,7 +103,7 @@
   function topbar(c) {
     var d = new Date();
     return '<header class="tg-top"><div><p class="tg-kicker">' + esc(d.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' })) + '</p><h1>' + esc(st.classes.length ? (TITLE[st.view] || 'Ruang Guru') : 'Ruang Guru') + '</h1></div>' +
-      (c ? '<div class="tg-top-actions"><button type="button" class="tg-chip tg-code" data-tg="copy" data-text="' + esc(c.code) + '" title="Salin kode kelas" data-testid="tg-class-code">' + icon('hash') + '<span>' + esc(c.code) + '</span></button><button type="button" class="tg-btn is-ghost" data-tg="modal" data-kind="board" data-testid="tg-open-board">' + icon('presentation') + '<span>Mode papan</span></button><button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="assign" data-testid="tg-quick-assign">' + icon('plus') + '<span>Tugas baru</span></button></div>' : '') + '</header>';
+      (c ? '<div class="tg-top-actions">' + syncChip(c) + '<button type="button" class="tg-chip tg-code" data-tg="copy" data-text="' + esc(c.code) + '" title="Salin kode kelas" data-testid="tg-class-code">' + icon('hash') + '<span>' + esc(c.code) + '</span></button><button type="button" class="tg-btn is-ghost" data-tg="modal" data-kind="board" data-testid="tg-open-board">' + icon('presentation') + '<span>Mode papan</span></button><button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="assign" data-testid="tg-quick-assign">' + icon('plus') + '<span>Tugas baru</span></button></div>' : '') + '</header>';
   }
   function mobileNav() { return '<nav class="tg-mnav">' + NAV.map(function (n) { return '<button type="button" class="' + (st.view === n[0] ? 'is-active' : '') + '" data-tg="view" data-view="' + n[0] + '">' + icon(n[2]) + '<span>' + n[1].split(' ')[0] + '</span></button>'; }).join('') + '</nav>'; }
 
@@ -102,7 +134,7 @@
     var T = S(), q = ui.filter.toLowerCase(), list = c.students.filter(function (s) { return !q || s.name.toLowerCase().indexOf(q) !== -1; }).map(function (s) { return { s: s, r: T.risk(c, s) }; }).sort(function (a, b) { return b.r.score - a.r.score; });
     return '<div class="tg-toolbar"><div class="tg-tabs">' + st.classes.map(function (k) { return '<button type="button" class="tg-tab' + (k.id === c.id ? ' is-active' : '') + '" data-tg="pick-class" data-id="' + k.id + '">' + esc(k.name) + '<small>' + k.students.length + '</small></button>'; }).join('') + '<button type="button" class="tg-tab is-add" data-tg="modal" data-kind="new-class" data-testid="tg-new-class">+ Kelas</button></div>' +
       '<div class="tg-toolbar-actions"><label class="tg-search">' + icon('search') + '<input type="search" placeholder="Cari siswa…" value="' + esc(ui.filter) + '" data-tg-input="filter" data-testid="tg-student-search"></label><button type="button" class="tg-btn is-ghost" data-tg="modal" data-kind="attendance" data-testid="tg-attendance">' + icon('check-square') + '<span>Absensi</span></button><button type="button" class="tg-btn is-ghost" data-tg="export-csv" data-testid="tg-export-csv">' + icon('download') + '<span>CSV</span></button><button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="add-students" data-testid="tg-add-students">' + icon('user-plus') + '<span>Tambah siswa</span></button></div></div>' +
-      '<section class="tg-card tg-class-meta"><div><p class="tg-kicker">' + esc(c.subject || 'English') + ' · Level ' + esc(c.level) + (c.demo ? ' · <span class="tg-demo">data contoh</span>' : '') + '</p><h3>' + esc(c.name) + '</h3><small>Kode kelas <b class="tg-mono">' + esc(c.code) + '</b> — murid mengetiknya saat onboarding; hasil latihannya masuk ke sini otomatis.</small></div><div class="tg-actions"><button type="button" class="tg-btn is-ghost is-small" data-tg="modal" data-kind="edit-class">' + icon('pencil') + ' Ubah</button><button type="button" class="tg-btn is-danger is-small" data-tg="delete-class" data-testid="tg-delete-class">' + icon('trash-2') + ' Hapus kelas</button></div></section>' +
+      '<section class="tg-card tg-class-meta"><div><p class="tg-kicker">' + esc(c.subject || 'English') + ' · Level ' + esc(c.level) + (c.demo ? ' · <span class="tg-demo">data contoh</span>' : '') + '</p><h3>' + esc(c.name) + '</h3><small>Kode kelas <b class="tg-mono">' + esc(c.code) + '</b> — murid mengetiknya saat onboarding; setiap selesai sesi, hasilnya dikirim ke server dan masuk ke sini otomatis. ' + (c.sync && c.sync.claimed ? '<span class="tg-ok">Kode terdaftar di server.</span>' : S().syncAvailable() === 'ok' ? '<span class="tg-muted">Kode belum terdaftar — tekan Sinkron.</span>' : '<span class="tg-muted">Tanpa akun guru, tempel kode hasil murid secara manual.</span>') + '</small></div><div class="tg-actions"><button type="button" class="tg-btn is-ghost is-small" data-tg="modal" data-kind="edit-class">' + icon('pencil') + ' Ubah</button><button type="button" class="tg-btn is-danger is-small" data-tg="delete-class" data-testid="tg-delete-class">' + icon('trash-2') + ' Hapus kelas</button></div></section>' +
       (list.length ? '<div class="tg-table-wrap"><table class="tg-table" data-testid="tg-student-table"><thead><tr><th>Siswa</th><th>Status</th><th>Akurasi</th><th>Terakhir aktif</th><th>Kehadiran</th><th>Tugas</th><th></th></tr></thead><tbody>' +
         list.map(function (x) { var s = x.s, d = T.daysSince(s.lastActiveAt), att = T.attendanceRate(s, 10); return '<tr data-tg="drawer" data-id="' + s.id + '" data-testid="tg-student-row-' + s.id + '"><td><div class="tg-who">' + avatar(s) + '<div><b>' + esc(s.name) + '</b><small>' + (s.parentPhone ? icon('phone') + ' ortu tersimpan' : '<span class="tg-muted">belum ada kontak ortu</span>') + '</small></div></div></td><td>' + riskPill(x.r) + '</td><td><div class="tg-acc">' + bar(T.overallAcc(s)) + '<span>' + pct(T.overallAcc(s)) + '</span></div></td><td>' + (d == null ? '<span class="tg-muted">—</span>' : d === 0 ? 'Hari ini' : d + ' hari lalu') + '</td><td>' + (att == null ? '—' : Math.round(att * 100) + '%') + '</td><td>' + (x.r.pending ? x.r.pending + ' belum' + (x.r.late ? ' <strong class="tg-late">' + x.r.late + ' lewat</strong>' : '') : '<span class="tg-ok">beres</span>') + '</td><td class="tg-row-end">' + icon('chevron-right') + '</td></tr>'; }).join('') + '</tbody></table></div>' :
         '<section class="tg-card tg-center"><h3>Belum ada siswa di kelas ini</h3><p class="tg-muted">Tambah nama siswa (bisa tempel dari daftar absen), atau bagikan kode kelas <b>' + esc(c.code) + '</b> supaya hasil latihan murid masuk sendiri.</p><button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="add-students">' + icon('user-plus') + ' Tambah siswa</button></section>');
@@ -247,6 +279,7 @@
     switch (act) {
       case 'view': st.view = btn.getAttribute('data-view'); if (btn.getAttribute('data-skill')) ui.insightSkill = btn.getAttribute('data-skill'); ui.modal = null; ui.drawer = null; ui.filter = ''; break;
       case 'exit': persist(); exit(); return;
+      case 'sync': syncAll(false); return;
       case 'modal': ui.modal = { kind: btn.getAttribute('data-kind'), id: id, skill: btn.getAttribute('data-skill'), target: btn.getAttribute('data-target') }; break;
       case 'drawer': ui.drawer = id; ui.modal = null; break;
       case 'close': ui.modal = null; ui.drawer = null; break;
@@ -276,8 +309,8 @@
     var form = e.target.closest ? e.target.closest('[data-tg-form]') : null; if (!form) return;
     e.preventDefault();
     var kind = form.getAttribute('data-tg-form'), fd = new FormData(form), c = cls(), T = S(), viaWa = e.submitter && e.submitter.name === 'wa';
-    if (kind === 'new-class') { var k = T.newClass(fd.get('name'), fd.get('level'), fd.get('subject')); st.classes.push(k); st.activeClassId = k.id; st.onboarded = true; ui.modal = null; st.view = 'classes'; toast('Kelas ' + k.name + ' dibuat. Kode: ' + k.code); }
-    else if (kind === 'edit-class' && c) { c.name = String(fd.get('name')).slice(0, 60); c.level = fd.get('level'); c.subject = fd.get('subject'); ui.modal = null; }
+    if (kind === 'new-class') { var k = T.newClass(fd.get('name'), fd.get('level'), fd.get('subject')); st.classes.push(k); st.activeClassId = k.id; st.onboarded = true; ui.modal = null; st.view = 'classes'; toast('Kelas ' + k.name + ' dibuat. Kode: ' + k.code); if (S().syncAvailable() === 'ok') setTimeout(function () { syncAll(true); }, 400); }
+    else if (kind === 'edit-class' && c) { c.name = String(fd.get('name')).slice(0, 60); c.level = fd.get('level'); c.subject = fd.get('subject'); if (c.sync) c.sync.claimed = false; ui.modal = null; }
     else if (kind === 'add-students' && c) { var names = T.parseNames(fd.get('names')), added = 0; names.forEach(function (n) { var fn = T.firstName(n); if (!c.students.some(function (s) { return s.name.toLowerCase() === fn.toLowerCase(); })) { c.students.push(T.newStudent(fn)); added++; } }); ui.modal = null; st.view = 'classes'; saveMinutes(added * 0.5); toast(added + ' siswa ditambahkan.'); }
     else if (kind === 'import-code' && c) { var p = T.parseLearnerCode(fd.get('code')); if (!p) { ui.modal = { kind: 'import-code', error: 'Kode tidak dikenali. Pastikan menyalin utuh "Kode hasil untuk tutor" dari murid.' }; render(); return; } var res = T.ingest(c, p); ui.modal = null; ui.drawer = res.student.id; saveMinutes(4 + res.graded.length * 5); toast('Hasil ' + res.student.name + ' masuk' + (res.graded.length ? ' · ' + res.graded.length + ' tugas dinilai otomatis' : '') + '.'); }
     else if (kind === 'assign' && c) { var skills = fd.getAll('skills').slice(0, 3), targets = fd.getAll('targets'); if (!skills.length) { toast('Pilih minimal satu skill.'); return; } var a = T.buildAssignment({ title: fd.get('title'), skills: skills, count: fd.get('count'), deadline: fd.get('deadline'), mode: fd.get('mode'), targets: targets, avoid: c.sentItemIds }); c.assignments.push(a); c.sentItemIds = (c.sentItemIds || []).concat(a.itemIds).slice(-120); st.view = 'assignments'; ui.modal = { kind: 'share-assign', id: a.id }; ui.drawer = null; saveMinutes(25); toast('Tugas tersusun: ' + a.itemIds.length + ' soal dari bank FIEZEL.'); }

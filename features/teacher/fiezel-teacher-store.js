@@ -152,8 +152,12 @@
 
   // ---- kode tukar (murid <-> guru) -----------------------------------------------------------
   function parseLearnerCode(code) {
+    try { return parseLearnerPayload(b64d(code)); } catch (_) { return null; }
+  }
+  /** Bentuk payload v1 yang sama dipakai kode tempel DAN laporan server (report_json). */
+  function parseLearnerPayload(p) {
     try {
-      var p = b64d(code); if (!p || p.v !== 1 || !p.skills) return null;
+      if (!p || p.v !== 1 || !p.skills) return null;
       var results = Object.keys(p.skills).map(function (k) { return { skill: k, correct: Number(p.skills[k].c) || 0, total: Number(p.skills[k].t) || 0 }; });
       return { name: firstName(p.name), lastActiveAt: Number(p.at) || Date.now(), targetDone: (p.lessons || 0) >= 3, results: results, goal: p.goal || null, cls: normalizeClassCode(p.cls) || null, assignments: Array.isArray(p.assign) ? p.assign : (p.assign ? [{ id: p.assign }] : []) };
     } catch (_) { return null; }
@@ -240,9 +244,72 @@
   function timeGreeting() { var h = new Date().getHours(); return h < 11 ? 'pagi' : h < 15 ? 'siang' : h < 18 ? 'sore' : 'malam'; }
   function fmtDate(ts) { try { return new Date(ts).toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short' }); } catch (_) { return today(ts); } }
 
+  // ---- sinkron server (kode kelas diklaim guru; murid melapor otomatis) -----------------------
+  var SYNC_PATHS = { claim: '/api/teacher/class/claim', list: '/api/teacher/class/list', reports: '/api/teacher/class/reports', report: '/api/learner/class-report' };
+  function account() { return root.FiezelAccount || null; }
+  /** syncAvailable() -> 'ok' | 'offline' | 'no_account' | 'not_teacher' | 'disabled' */
+  function syncAvailable() {
+    var A = account(); if (!A || typeof A.api !== 'function') return 'disabled';
+    try { if (root.navigator && root.navigator.onLine === false) return 'offline'; } catch (_) {}
+    var role = A.role ? A.role() : null;
+    if (!role) return 'no_account';
+    if (role !== 'teacher') return 'not_teacher';
+    return 'ok';
+  }
+  /** Klaim kode kelas di server (idempoten untuk pemilik yang sama). */
+  function claimClass(c) {
+    var A = account();
+    return A.api(SYNC_PATHS.claim, { code: c.code, title: c.name, level: c.level }).then(function (r) {
+      if (r.ok) { c.sync = Object.assign(c.sync || {}, { claimed: true, claimedAt: Date.now(), error: '' }); return { ok: true }; }
+      c.sync = Object.assign(c.sync || {}, { claimed: false, error: r.error || 'unknown' });
+      return { ok: false, error: r.error || 'unknown' };
+    });
+  }
+  /** Tarik laporan murid yang berubah sejak kursor terakhir, lalu ingest. */
+  function pullReports(c) {
+    var A = account(), since = (c.sync && c.sync.cursor) || 0;
+    return A.api(SYNC_PATHS.reports + '?code=' + encodeURIComponent(c.code) + '&since=' + since).then(function (r) {
+      if (!r.ok) {
+        if (r.status === 404 && c.sync && c.sync.claimed) c.sync.claimed = false;
+        c.sync = Object.assign(c.sync || {}, { error: r.error || 'unknown' });
+        return { ok: false, error: r.error || 'unknown', ingested: 0, graded: 0 };
+      }
+      var d = r.data || {}, ingested = 0, graded = 0, names = [];
+      (d.reports || []).forEach(function (rep) {
+        var p = parseLearnerPayload(rep.report); if (!p) return;
+        var res = ingest(c, p); ingested++; graded += res.graded.length; names.push(res.student.name);
+      });
+      c.sync = Object.assign(c.sync || {}, { claimed: true, cursor: Number(d.cursor) || since, lastPullAt: Date.now(), error: '' });
+      return { ok: true, ingested: ingested, graded: graded, names: names, more: !!d.more };
+    });
+  }
+  /** Satu putaran sinkron untuk satu kelas: klaim bila perlu, lalu tarik. */
+  function syncClass(c) {
+    var avail = syncAvailable();
+    if (avail !== 'ok') return Promise.resolve({ ok: false, error: avail, ingested: 0, graded: 0 });
+    var step = (c.sync && c.sync.claimed) ? Promise.resolve({ ok: true }) : claimClass(c);
+    return step.then(function (r) { return r.ok ? pullReports(c) : { ok: false, error: r.error, ingested: 0, graded: 0 }; })
+      .catch(function () { return { ok: false, error: 'unavailable', ingested: 0, graded: 0 }; });
+  }
+  /** Sisi murid: kirim laporan agregat ke kelas (tanpa tempel kode). Diam-diam gagal bila offline/tanpa kode. */
+  function reportToClass(payload) {
+    var A = account(); if (!A || typeof A.api !== 'function' || !payload || !payload.cls) return Promise.resolve({ ok: false, error: 'disabled' });
+    return A.api(SYNC_PATHS.report, payload).then(function (r) { return { ok: !!r.ok, status: r.status, error: r.error || '' }; }).catch(function () { return { ok: false, error: 'unavailable' }; });
+  }
+  function syncLabel(c) {
+    var avail = syncAvailable(), s = c && c.sync;
+    if (avail === 'disabled') return { state: 'off', text: 'Sinkron nonaktif' };
+    if (avail === 'offline') return { state: 'off', text: 'Offline — data lokal' };
+    if (avail === 'no_account' || avail === 'not_teacher') return { state: 'need', text: 'Masuk akun guru untuk sinkron' };
+    if (s && s.error) return { state: 'err', text: s.error === 'class_code_taken' ? 'Kode kelas dipakai guru lain' : 'Sinkron gagal — coba lagi' };
+    if (s && s.lastPullAt) { var m = Math.round((Date.now() - s.lastPullAt) / 60000); return { state: 'ok', text: m < 1 ? 'Tersinkron baru saja' : 'Tersinkron ' + m + ' mnt lalu' }; }
+    return { state: 'idle', text: 'Belum tersinkron' };
+  }
+
   return { KEY: KEY, ASSIGN_KEY: ASSIGN_KEY, SKILL_LABEL: SKILL_LABEL, SKILL_ORDER: SKILL_ORDER, ATT: ATT, DAY: DAY,
     load: load, save: save, defaults: defaults, uid: uid, today: today, firstName: firstName, newClass: newClass, newStudent: newStudent, normalizeClass: normalizeClass, seedDemo: seedDemo, makeClassCode: makeClassCode, normalizeClassCode: normalizeClassCode,
     skillAcc: skillAcc, overallAcc: overallAcc, daysSince: daysSince, risk: risk, classStats: classStats, classSkillMap: classSkillMap, heatmap: heatmap, studyGroups: studyGroups, misconceptions: misconceptions, needsGreeting: needsGreeting, agenda: agenda, pendingAssignments: pendingAssignments, targeted: targeted, recentAttendance: recentAttendance, attendanceRate: attendanceRate, weakestSkill: weakestSkill,
-    parseLearnerCode: parseLearnerCode, ingest: ingest, assignmentCode: assignmentCode, parseAssignmentCode: parseAssignmentCode, acceptAssignmentCode: acceptAssignmentCode, buildAssignment: buildAssignment,
+    parseLearnerCode: parseLearnerCode, parseLearnerPayload: parseLearnerPayload, ingest: ingest, assignmentCode: assignmentCode, parseAssignmentCode: parseAssignmentCode, acceptAssignmentCode: acceptAssignmentCode, buildAssignment: buildAssignment,
+    SYNC_PATHS: SYNC_PATHS, syncAvailable: syncAvailable, claimClass: claimClass, pullReports: pullReports, syncClass: syncClass, reportToClass: reportToClass, syncLabel: syncLabel,
     greetingCard: greetingCard, parentReport: parentReport, weeklyClassReport: weeklyClassReport, csvStudents: csvStudents, parseNames: parseNames, waLink: waLink, fmtDate: fmtDate, pct: pct };
 });

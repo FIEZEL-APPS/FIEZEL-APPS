@@ -136,6 +136,7 @@
     if (L.blockId.indexOf('assign-') === 0) { st.doneAssign = (st.doneAssign || []).concat([{ id: L.blockId.slice(7), at: Date.now(), c: correct, t: L.results.length }]).slice(-6); try { localStorage.setItem(ASSIGN_KEY, JSON.stringify(loadAssignments().filter(function (a) { return 'assign-' + a.id !== L.blockId; }))); } catch (_) {} }
     st.lastNext = buildNext(st, L, correct);
     st.activeLesson = null;
+    pushToClass();
     st.step = 'next';
   }
   function buildNext(st, L, correct) {
@@ -183,8 +184,14 @@
   function classCode() { try { var r = JSON.parse(localStorage.getItem('fiezel-onboarding-v1') || '{}'); return String(r.classCode || ''); } catch (_) { return ''; } }
   // Di perangkat yang sama (kelas demo/uji), hasil diagnostic langsung masuk ke kelas berkode.
   function pushToClass() {
-    var T = root.FiezelTutorActionCenter; if (!T || !classCode()) return false;
-    try { return T.ingestLearnerResult(JSON.parse(decodeURIComponent(escape(atob(tutorCode(st, env.learnerName ? env.learnerName() : '')))))); } catch (_) { return false; }
+    if (!classCode()) return false;
+    var payload = null;
+    try { payload = JSON.parse(decodeURIComponent(escape(atob(tutorCode(st, env.learnerName ? env.learnerName() : ''))))); } catch (_) { return false; }
+    // Sinkron server: laporan agregat ke kelas yang kodenya diklaim guru (tanpa tempel kode). Gagal diam-diam bila offline.
+    var TS = root.FiezelTeacherStore;
+    if (TS && TS.reportToClass) { try { TS.reportToClass(payload).then(function (r) { st.classReport = { at: Date.now(), ok: !!r.ok, error: r.error || '' }; save(st); }); } catch (_) {} }
+    var T = root.FiezelTutorActionCenter; if (!T) return true;
+    try { return T.ingestLearnerResult(payload) || true; } catch (_) { return true; }
   }
   function tutorCode(st, name) {
     var B = bank(), skills = {};
@@ -350,7 +357,7 @@
       '<p class="lf-muted">Istilah yang dipakai: practice completed, target coverage, review needed, confidence belum cukup, session completed. Menyelesaikan soal bukan berarti "menguasai" skill.</p>' +
       '<div class="lf-actions"><button type="button" class="lf-primary" data-lf="copy-summary" data-testid="lf-copy-summary">Salin ringkasan</button>' +
       (typeof navigator !== 'undefined' && navigator.share ? '<button type="button" class="lf-ghost" data-lf="share-summary" data-testid="lf-share-summary">Bagikan</button>' : '') + '</div></div>' +
-      '<div class="lf-card"><h3>Kode hasil untuk tutor</h3>' + (classCode() ? '<p class="lf-chip" data-testid="lf-class-code">Kelas ' + esc(classCode()) + '</p>' : '') + '<p class="lf-muted">Berisi nama depan dan akurasi per skill saja — tanpa jawaban mentah atau audio. Tempel di Tutor Action Center → Tambah murid dari kode.</p>' +
+      '<div class="lf-card"><h3>Kode hasil untuk tutor</h3>' + (classCode() ? '<p class="lf-chip" data-testid="lf-class-code">Kelas ' + esc(classCode()) + (st.classReport && st.classReport.ok ? ' · terkirim otomatis' : '') + '</p>' : '') + '<p class="lf-muted">Berisi nama depan dan akurasi per skill saja — tanpa jawaban mentah atau audio. ' + (classCode() ? (st.classReport && st.classReport.ok ? 'Hasilmu sudah dikirim ke guru lewat kode kelas; kode di bawah hanya cadangan.' : 'Saat online, hasil dikirim otomatis ke guru lewat kode kelas. Kode di bawah untuk cadangan bila offline.') : 'Tempel di Ruang Guru → Tempel kode hasil murid.') + '</p>' +
       '<textarea class="lf-code" readonly rows="3" data-testid="lf-tutor-code">' + esc(tutorCode(st, name)) + '</textarea>' +
       '<div class="lf-actions"><button type="button" class="lf-ghost" data-lf="copy-code" data-testid="lf-copy-code">Salin kode</button></div></div>';
   }
