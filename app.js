@@ -7393,7 +7393,8 @@ function bindFiezelAccountControls(){
   });
 
   $('btnOpenTeacherRoom')?.addEventListener('click',()=>{
-    openTeacherRoomModal();
+    closeModal();
+    go('tutor');
   });
 }
 
@@ -10231,18 +10232,48 @@ function nextSessionPanelMarkup(){
 // Alur learner (diagnostic → rencana → lesson → feedback) dan Tutor Action Center. Logikanya
 // hidup di features/learner-flow dan features/tutor-action-center; di sini hanya jembatan layar.
 function learnerFlowView(){setApp('<div id="fzLearnerFlow" class="learner-flow-shell"></div>');const mod=self.FiezelLearnerFlow;if(!mod){$('fzLearnerFlow').innerHTML='<p class="muted">Modul alur belajar belum termuat.</p>';return}mod.mount($('fzLearnerFlow'),{toast:showToast,appVersion:APP_VERSION,learnerName,afterRender:enhanceUI})}
-function tutorCenterView(){setApp('<div id="fzTutorCenter" class="tutor-center-shell"></div>');const mod=self.FiezelTutorActionCenter;if(!mod){$('fzTutorCenter').innerHTML='<p class="muted">Modul Tutor Action Center belum termuat.</p>';return}mod.mount($('fzTutorCenter'),{toast:showToast,afterRender:enhanceUI})}
+function isVerifiedTeacher(){
+  return (self.FiezelAccount?.role?.() === 'teacher') || (self.FiezelAccount?.state?.()?.role === 'teacher');
+}
+function tutorCenterView(){
+  if(!isVerifiedTeacher()){
+    setApp(`<section class="fade error-view" style="max-width:480px;margin:40px auto;text-align:center;padding:24px">
+      <div class="card" style="padding:28px 20px;border-radius:var(--radius);border:1px solid var(--line);box-shadow:0 8px 24px rgba(0,0,0,0.06)">
+        <div style="font-size:2.8rem;margin-bottom:12px">🔒</div>
+        <div class="modal-mark">AKSES TERBATAS</div>
+        <h2 style="margin:8px 0 12px 0">Ruang Guru Memerlukan Kode Undangan</h2>
+        <p class="muted" style="margin-bottom:20px;line-height:1.5;font-size:0.95rem">
+          Ruang Guru dan Tutor Action Center hanya dapat diakses oleh akun guru yang telah terverifikasi dengan kode undangan resmi dari Owner FIEZEL.
+        </p>
+        <button type="button" class="primary" id="btnGateAktivasiGuru" style="width:100%;margin-bottom:8px">
+          <i data-lucide="key"></i> Aktivasi Akun Guru dengan Kode
+        </button>
+        <button type="button" class="secondary" id="btnGateBackHome" style="width:100%">
+          <i data-lucide="arrow-left"></i> Kembali ke Beranda
+        </button>
+      </div>
+    </section>`);
+    $('btnGateAktivasiGuru')?.addEventListener('click',()=>openFiezelAuthModal('teacher'));
+    $('btnGateBackHome')?.addEventListener('click',()=>go('home'));
+    enhanceUI();
+    return;
+  }
+  setApp('<div id="fzTutorCenter" class="tutor-center-shell"></div>');
+  const mod=self.FiezelTutorActionCenter;
+  if(!mod){$('fzTutorCenter').innerHTML='<p class="muted">Modul Tutor Action Center belum termuat.</p>';return}
+  mod.mount($('fzTutorCenter'),{toast:showToast,afterRender:enhanceUI});
+}
 function learnerFlowHomeMarkup(){
   const mod=self.FiezelLearnerFlow;let plan=null,lf=null,invite=null;
   try{lf=mod?mod.load():null;plan=lf&&lf.plan&&lf.plan.date===new Date().toISOString().slice(0,10)?lf.plan:null}catch(_){}
   try{const code=new URL(location.href).searchParams.get('duel');invite=code&&self.FiezelDuel?self.FiezelDuel.decode(code):null}catch(_){}
   const sub=plan?`Rencana hari ini — ${plan.minutes} menit · ${plan.done.length}/${plan.blocks.length} sesi selesai`:lf&&lf.diagnostic?'Rencana hari ini siap disusun dari skill map kamu':'Pilih tujuan → 5 soal singkat → rencana hari ini';
-  const isGuru=(state.preferences?.role||self.FiezelOnboarding?.storedRole?.(self))==='guru';
+  const isGuru=isVerifiedTeacher();
   const inviteCard=invite?`<button class="launch-card duel-invite-card" onclick="go('learn')" data-testid="home-duel-invite"><span class="launch-icon"><i class="fz-i" data-fz-icon="speaking" aria-hidden="true"></i></span><span><small>${esc(invite.from||'Teman')} menantangmu · ${invite.score} poin</small><b>Terima Duel Belajar</b></span><i data-lucide="arrow-up-right"></i></button>`:'';
   const learnCard=`<button class="launch-card learn-launch" onclick="go('learn')" data-testid="home-learn-flow"><span class="launch-icon"><i class="fz-i" data-fz-icon="grammar" aria-hidden="true"></i></span><span><small>${esc(sub)}</small><b>Today Plan</b></span><i data-lucide="arrow-up-right"></i></button>`;
-  const tutorCard=`<button class="launch-card tutor-launch" onclick="go('tutor')" data-testid="home-tutor-center"><span class="launch-icon"><i class="fz-i" data-fz-icon="map" aria-hidden="true"></i></span><span><small>${isGuru?'Peranmu: Guru · kelas, pola kesalahan, sesi review':'Dari pola kesalahan ke rencana mengajar'}</small><b>Tutor Action Center</b></span><i data-lucide="arrow-up-right"></i></button>`;
+  const tutorCard=`<button class="launch-card tutor-launch" onclick="go('tutor')" data-testid="home-tutor-center"><span class="launch-icon"><i class="fz-i" data-fz-icon="map" aria-hidden="true"></i></span><span><small>Peranmu: Guru · kelas, pola kesalahan, sesi review</small><b>Tutor Action Center</b></span><i data-lucide="arrow-up-right"></i></button>`;
   return `<div class="home-section-head"><div><h2>${isGuru?'Ruang guru':'Alur belajar'}</h2></div></div>
-<div class="learning-launcher learner-flow-launcher">${inviteCard}${isGuru?tutorCard+learnCard:learnCard+tutorCard}
+<div class="learning-launcher learner-flow-launcher">${inviteCard}${isGuru?tutorCard+learnCard:learnCard}
 </div>`;
 }
 function progress(){
