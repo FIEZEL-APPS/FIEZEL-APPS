@@ -1,0 +1,1295 @@
+{
+  "schema": "fiezel-grammar-new-templates-v1",
+  "catatan": "Gelombang 2. Label '@sibling:N' = pakai label/miskonsepsi distraktor ke-N dari template pertama lesson yang sama (diselesaikan oleh tools/apply-grammar-upgrade.js).",
+  "newLabels": {},
+  "templates": [
+    {
+      "id": "EC-201",
+      "family": "error_correction",
+      "subskill": "article_omission_with_uncountable",
+      "cefr": "A2",
+      "questionType": "error_correction",
+      "en": {
+        "objective": "Remove the indefinite article before the uncountable noun 'information'.",
+        "misconception": "Learner treats 'information' as a countable noun and gives it 'an' or a plural -s.",
+        "reasoning": "identify the uncountable noun -> remove the indefinite article -> keep the noun singular",
+        "stem": "Find and correct the error: \"Can you give me an information about the bus times?\"",
+        "options": [
+          "Can you give me some information about the bus times?",
+          "Can you give me an informations about the bus times?",
+          "Can you give me the information about the bus times?",
+          "Can you give me some informations about the bus times?"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "Can you give me an informations about the bus times?",
+            "misconception": "@sibling:0",
+            "whyFails": "It keeps 'an' and adds a plural -s; 'information' takes neither."
+          },
+          {
+            "option": "Can you give me the information about the bus times?",
+            "misconception": "@sibling:1",
+            "whyFails": "'The' points to information already known; the speaker is asking for any information, so 'some' fits."
+          },
+          {
+            "option": "Can you give me some informations about the bus times?",
+            "misconception": "@sibling:2",
+            "whyFails": "'Some' is right, but 'information' never takes a plural -s."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "'Information' is uncountable, so it cannot take 'an' or -s; 'some information' is the natural form.",
+          "rule": "Uncountable nouns (information, advice, furniture) take no a/an and no plural -s; use some or a piece of.",
+          "whyOthersFail": "Two options keep a plural -s, and 'the' refers to specific information the listener already knows about.",
+          "howToAvoid": "Can you count it (one information, two informations)? If not, drop a/an and -s.",
+          "memoryCue": "Some information, not an information."
+        }
+      },
+      "id_": {
+        "objective": "Buang “an” di depan kata benda tak terhitung “information”.",
+        "misconception": "Kamu nganggap “information” bisa dihitung, jadi dikasih “an” atau -s jamak.",
+        "reasoning": "kenali kata benda tak terhitung → buang artikel a/an → kata bendanya tetap tunggal",
+        "rule": "Kata benda tak terhitung (information, advice, furniture) nggak pakai a/an dan nggak pakai -s. Pakai some atau a piece of.",
+        "whyCorrect": "“Information” nggak bisa dihitung, jadi nggak bisa pakai “an” atau -s. “Some information” bentuk yang wajar.",
+        "whyOthersFail": "Dua pilihan masih pakai -s jamak, dan “the” nunjuk info tertentu yang udah diketahui pendengar.",
+        "howToAvoid": "Bisa dihitung (one information, two informations)? Kalau nggak, buang a/an dan -s.",
+        "memoryCue": "Some information, bukan an information.",
+        "distractors": {
+          "Can you give me an informations about the bus times?": {
+            "misconception": "@sibling:0",
+            "whyFails": "masih pakai “an” dan nambah -s jamak. “Information” nggak pakai keduanya."
+          },
+          "Can you give me the information about the bus times?": {
+            "misconception": "@sibling:1",
+            "whyFails": "“the” nunjuk info yang udah diketahui. Pembicara minta info apa aja, jadi “some” yang pas."
+          },
+          "Can you give me some informations about the bus times?": {
+            "misconception": "@sibling:2",
+            "whyFails": "“some” udah bener, tapi “information” nggak pernah pakai -s jamak."
+          }
+        }
+      },
+      "th": {
+        "objective": "ตัด 'an' หน้าคำนามนับไม่ได้ 'information'",
+        "misconception": "ผู้เรียนมอง 'information' เป็นคำนามนับได้ จึงใส่ 'an' หรือ -s พหูพจน์",
+        "reasoning": "ระบุคำนามนับไม่ได้ → ตัดคำนำหน้านาม a/an → คงคำนามเป็นเอกพจน์",
+        "rule": "คำนามนับไม่ได้ (information, advice, furniture) ไม่ใช้ a/an และไม่เติม -s ใช้ some หรือ a piece of",
+        "whyCorrect": "'Information' นับไม่ได้ จึงใช้ 'an' หรือ -s ไม่ได้ 'some information' คือรูปที่เป็นธรรมชาติ",
+        "whyOthersFail": "สองตัวเลือกยังเติม -s พหูพจน์ ส่วน 'the' ชี้ไปที่ข้อมูลเฉพาะที่ผู้ฟังรู้อยู่แล้ว",
+        "howToAvoid": "นับได้ไหม (one information, two informations)? ถ้าไม่ได้ ให้ตัด a/an และ -s",
+        "memoryCue": "Some information ไม่ใช่ an information",
+        "distractors": {
+          "Can you give me an informations about the bus times?": {
+            "misconception": "@sibling:0",
+            "whyFails": "ยังคง 'an' และเติม -s พหูพจน์ 'information' ใช้ทั้งสองอย่างไม่ได้"
+          },
+          "Can you give me the information about the bus times?": {
+            "misconception": "@sibling:1",
+            "whyFails": "'the' ชี้ไปที่ข้อมูลที่รู้อยู่แล้ว ผู้พูดขอข้อมูลอะไรก็ได้ จึงต้องใช้ 'some'"
+          },
+          "Can you give me some informations about the bus times?": {
+            "misconception": "@sibling:2",
+            "whyFails": "'some' ถูกแล้ว แต่ 'information' ไม่เคยเติม -s พหูพจน์"
+          }
+        }
+      }
+    },
+    {
+      "id": "QT-202",
+      "family": "quantifiers",
+      "subskill": "indefinite_compounds_something_anything_nothing",
+      "cefr": "A2",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Use 'anything' after a negative verb instead of 'nothing' or 'something'.",
+        "misconception": "Learner pairs 'didn't' with 'nothing' or uses 'something' in a negative clause.",
+        "reasoning": "check that the verb is negative -> select anything -> avoid a second negative",
+        "stem": "I was very tired, so I didn't do ___ last night.",
+        "options": [
+          "anything",
+          "nothing",
+          "something",
+          "any"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "nothing",
+            "misconception": "@sibling:1",
+            "whyFails": "'Didn't' is already negative, so 'nothing' makes a double negative."
+          },
+          {
+            "option": "something",
+            "misconception": "@sibling:0",
+            "whyFails": "'Something' belongs in positive sentences; after 'didn't' the word is 'anything'."
+          },
+          {
+            "option": "any",
+            "misconception": "@sibling:2",
+            "whyFails": "'Any' needs a noun after it ('any work'); alone it cannot be the object of 'do'."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "The verb 'didn't do' is negative, so the object is 'anything': didn't do anything.",
+          "rule": "Negative verb + anything; positive verb + something; 'nothing' only with a positive verb (I did nothing).",
+          "whyOthersFail": "'Nothing' doubles the negative, 'something' is for positive clauses, and bare 'any' needs a noun.",
+          "howToAvoid": "See 'not' or 'n't' in the verb? The compound word starts with any-.",
+          "memoryCue": "Didn't … anything / did … nothing."
+        }
+      },
+      "id_": {
+        "objective": "Sesudah kata kerja negatif pakai “anything”, bukan “nothing” atau “something”.",
+        "misconception": "Kamu masangin “didn't” sama “nothing”, atau pakai “something” di kalimat negatif.",
+        "reasoning": "cek kata kerjanya negatif → pilih anything → hindari negatif kedua",
+        "rule": "Kata kerja negatif + anything. Kata kerja positif + something. “Nothing” cuma sama kata kerja positif (I did nothing).",
+        "whyCorrect": "“Didn't do” udah negatif, jadi objeknya “anything”: didn't do anything.",
+        "whyOthersFail": "“Nothing” bikin negatif dobel. “Something” buat kalimat positif. “Any” polos butuh kata benda.",
+        "howToAvoid": "Ada “not” atau “n't” di kata kerjanya? Kata gabungannya mulai dari any-.",
+        "memoryCue": "Didn't … anything / did … nothing.",
+        "distractors": {
+          "nothing": {
+            "misconception": "@sibling:1",
+            "whyFails": "“didn't” udah negatif, jadi “nothing” bikin negatif dobel."
+          },
+          "something": {
+            "misconception": "@sibling:0",
+            "whyFails": "“something” buat kalimat positif. Sesudah “didn't” katanya “anything”."
+          },
+          "any": {
+            "misconception": "@sibling:2",
+            "whyFails": "“any” butuh kata benda sesudahnya (“any work”). Sendirian nggak bisa jadi objek “do”."
+          }
+        }
+      },
+      "th": {
+        "objective": "หลังคำกริยาปฏิเสธใช้ 'anything' แทน 'nothing' หรือ 'something'",
+        "misconception": "ผู้เรียนจับคู่ 'didn't' กับ 'nothing' หรือใช้ 'something' ในอนุประโยคปฏิเสธ",
+        "reasoning": "เช็กว่าคำกริยาเป็นปฏิเสธ → เลือก anything → เลี่ยงปฏิเสธตัวที่สอง",
+        "rule": "คำกริยาปฏิเสธ + anything; คำกริยาบวก + something; 'nothing' ใช้กับคำกริยาบวกเท่านั้น (I did nothing)",
+        "whyCorrect": "คำกริยา 'didn't do' เป็นปฏิเสธ กรรมจึงเป็น 'anything': didn't do anything",
+        "whyOthersFail": "'nothing' ทำให้ปฏิเสธซ้อน 'something' ใช้กับประโยคบวก ส่วน 'any' เปล่า ๆ ต้องมีคำนาม",
+        "howToAvoid": "เห็น 'not' หรือ 'n't' ในคำกริยา? คำประสมต้องเริ่มด้วย any-",
+        "memoryCue": "Didn't … anything / did … nothing — ปฏิเสธตัวเดียวพอ",
+        "distractors": {
+          "nothing": {
+            "misconception": "@sibling:1",
+            "whyFails": "'didn't' เป็นปฏิเสธอยู่แล้ว 'nothing' จึงทำให้ปฏิเสธซ้อน"
+          },
+          "something": {
+            "misconception": "@sibling:0",
+            "whyFails": "'something' ใช้ในประโยคบวก หลัง 'didn't' ต้องใช้ 'anything'"
+          },
+          "any": {
+            "misconception": "@sibling:2",
+            "whyFails": "'any' ต้องมีคำนามตามหลัง ('any work') ลำพังเป็นกรรมของ 'do' ไม่ได้"
+          }
+        }
+      }
+    },
+    {
+      "id": "PA-203",
+      "family": "passive",
+      "subskill": "agent_omission_when_irrelevant",
+      "cefr": "B1",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Use the passive without an agent when the doer is unknown.",
+        "misconception": "Learner keeps the active voice or adds a vague 'by someone' when nobody knows who did it.",
+        "reasoning": "check that the doer is unknown -> select the passive -> remove the vague agent",
+        "stem": "My bike ___ last night. I have no idea who did it.",
+        "options": [
+          "was stolen",
+          "stole",
+          "has stole",
+          "was stolen by someone"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "stole",
+            "misconception": "@sibling:0",
+            "whyFails": "'My bike stole' makes the bike the thief; the bike received the action, so the passive is needed."
+          },
+          {
+            "option": "has stole",
+            "misconception": "@sibling:1",
+            "whyFails": "'Has stole' mixes a perfect auxiliary with a past simple form; neither the tense nor the form works here."
+          },
+          {
+            "option": "was stolen by someone",
+            "misconception": "@sibling:2",
+            "whyFails": "'By someone' adds nothing — the next sentence already says nobody knows who did it."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "The thief is unknown, so the passive 'was stolen' keeps the focus on the bike and leaves the agent out.",
+          "rule": "Passive without agent: be + past participle, when the doer is unknown, obvious, or unimportant.",
+          "whyOthersFail": "'Stole' is active with the wrong subject, 'has stole' is malformed, and 'by someone' repeats what we already know.",
+          "howToAvoid": "Ask: do we know or care who did it? If not, use the passive and stop after the participle.",
+          "memoryCue": "Unknown doer → was stolen (no 'by')."
+        }
+      },
+      "id_": {
+        "objective": "Pakai pasif tanpa pelaku kalau pelakunya nggak diketahui.",
+        "misconception": "Kamu tetap pakai kalimat aktif atau nambahin “by someone” padahal nggak ada yang tahu pelakunya.",
+        "reasoning": "cek pelakunya nggak diketahui → pilih pasif → buang pelaku yang samar",
+        "rule": "Pasif tanpa pelaku: be + past participle, kalau pelakunya nggak diketahui, udah jelas, atau nggak penting.",
+        "whyCorrect": "Pencurinya nggak diketahui, jadi pasif “was stolen” fokus ke sepedanya dan pelakunya nggak disebut.",
+        "whyOthersFail": "“Stole” aktif dengan subjek yang salah. “Has stole” bentuknya rusak. “By someone” ngulang yang udah kita tahu.",
+        "howToAvoid": "Tanya: kita tahu atau peduli siapa pelakunya? Kalau nggak, pakai pasif dan berhenti di participle.",
+        "memoryCue": "Pelaku nggak diketahui → was stolen (tanpa “by”).",
+        "distractors": {
+          "stole": {
+            "misconception": "@sibling:0",
+            "whyFails": "“my bike stole” bikin sepedanya jadi pencuri. Sepedanya yang kena aksi, jadi butuh pasif."
+          },
+          "has stole": {
+            "misconception": "@sibling:1",
+            "whyFails": "“has stole” nyampur kata bantu perfect sama bentuk past simple. Bentuk maupun waktunya nggak cocok."
+          },
+          "was stolen by someone": {
+            "misconception": "@sibling:2",
+            "whyFails": "“by someone” nggak nambah apa-apa. Kalimat berikutnya udah bilang nggak ada yang tahu pelakunya."
+          }
+        }
+      },
+      "th": {
+        "objective": "ใช้ passive โดยไม่ระบุผู้กระทำเมื่อไม่รู้ว่าใครทำ",
+        "misconception": "ผู้เรียนคง active ไว้ หรือเติม 'by someone' แบบเลือนราง ทั้งที่ไม่มีใครรู้ว่าใครทำ",
+        "reasoning": "เช็กว่าไม่รู้ผู้กระทำ → เลือก passive → ตัดผู้กระทำที่เลือนราง",
+        "rule": "Passive ไม่ระบุผู้กระทำ: be + past participle เมื่อผู้กระทำไม่ทราบ ชัดเจนอยู่แล้ว หรือไม่สำคัญ",
+        "whyCorrect": "ไม่รู้ว่าขโมยคือใคร passive 'was stolen' จึงเน้นที่จักรยานและละผู้กระทำไว้",
+        "whyOthersFail": "'stole' เป็น active ที่ประธานผิด 'has stole' รูปผิดเพี้ยน ส่วน 'by someone' ทวนสิ่งที่รู้อยู่แล้ว",
+        "howToAvoid": "ถามว่าเรารู้หรือสนใจไหมว่าใครทำ ถ้าไม่ ให้ใช้ passive และหยุดที่ participle",
+        "memoryCue": "ไม่รู้ผู้กระทำ → was stolen (ไม่มี 'by')",
+        "distractors": {
+          "stole": {
+            "misconception": "@sibling:0",
+            "whyFails": "'my bike stole' ทำให้จักรยานเป็นขโมย จักรยานเป็นผู้รับการกระทำ จึงต้องใช้ passive"
+          },
+          "has stole": {
+            "misconception": "@sibling:1",
+            "whyFails": "'has stole' ผสมกริยาช่วย perfect กับรูป past simple ทั้งกาลและรูปใช้ตรงนี้ไม่ได้"
+          },
+          "was stolen by someone": {
+            "misconception": "@sibling:2",
+            "whyFails": "'by someone' ไม่เพิ่มอะไรเลย ประโยคถัดไปบอกแล้วว่าไม่มีใครรู้ว่าใครทำ"
+          }
+        }
+      }
+    },
+    {
+      "id": "RS-202",
+      "family": "reported_speech",
+      "subskill": "backshift_statement",
+      "cefr": "B1",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Backshift a present simple verb to the past simple after 'said'.",
+        "misconception": "Learner keeps the present tense or jumps to the wrong past form after a past reporting verb.",
+        "reasoning": "identify the past reporting verb said -> shift the present simple one step back -> select the past simple",
+        "stem": "Ali said, \"I live in Surabaya.\" → Ali said he ___ in Surabaya.",
+        "options": [
+          "lived",
+          "lives",
+          "has lived",
+          "would live"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "lives",
+            "misconception": "@sibling:0",
+            "whyFails": "'Said' is past, so 'lives' should move back to 'lived'."
+          },
+          {
+            "option": "has lived",
+            "misconception": "@sibling:1",
+            "whyFails": "Present simple shifts to past simple, not to the present perfect."
+          },
+          {
+            "option": "would live",
+            "misconception": "@sibling:2",
+            "whyFails": "'Would' is the backshift of 'will'; the original sentence has no 'will'."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "After the past reporting verb 'said', present simple 'live' moves one step back to 'lived'.",
+          "rule": "Backshift: present simple → past simple; will → would; present perfect → past perfect.",
+          "whyOthersFail": "'Lives' does not shift, 'has lived' shifts to the wrong tense, and 'would live' reports a 'will' that was never said.",
+          "howToAvoid": "Find the original verb, then move it exactly one step into the past.",
+          "memoryCue": "Live → lived after said."
+        }
+      },
+      "id_": {
+        "objective": "Mundurin present simple jadi past simple sesudah “said”.",
+        "misconception": "Kamu biarin bentuk sekarang atau loncat ke bentuk lampau yang salah sesudah kata pelapor lampau.",
+        "reasoning": "kenali kata pelapor lampau said → geser present simple satu langkah ke belakang → pilih past simple",
+        "rule": "Mundur: present simple → past simple; will → would; present perfect → past perfect.",
+        "whyCorrect": "Sesudah kata pelapor lampau “said”, present simple “live” mundur satu langkah jadi “lived”.",
+        "whyOthersFail": "“Lives” nggak mundur. “Has lived” mundur ke bentuk yang salah. “Would live” laporin “will” yang nggak pernah diucapin.",
+        "howToAvoid": "Cari kata kerja aslinya, lalu geser tepat satu langkah ke lampau.",
+        "memoryCue": "Live → lived sesudah said.",
+        "distractors": {
+          "lives": {
+            "misconception": "@sibling:0",
+            "whyFails": "“said” lampau, jadi “lives” harus mundur jadi “lived”."
+          },
+          "has lived": {
+            "misconception": "@sibling:1",
+            "whyFails": "present simple mundur ke past simple, bukan ke present perfect."
+          },
+          "would live": {
+            "misconception": "@sibling:2",
+            "whyFails": "“would” itu mundurnya “will”. Kalimat aslinya nggak ada “will”."
+          }
+        }
+      },
+      "th": {
+        "objective": "เลื่อน present simple เป็น past simple หลัง 'said'",
+        "misconception": "ผู้เรียนคงรูปปัจจุบันไว้ หรือกระโดดไปรูปอดีตที่ผิดหลังคำกริยารายงานที่เป็นอดีต",
+        "reasoning": "ระบุคำกริยารายงานอดีต said → เลื่อน present simple ถอยหนึ่งขั้น → เลือก past simple",
+        "rule": "การเลื่อนกาล: present simple → past simple; will → would; present perfect → past perfect",
+        "whyCorrect": "หลังคำกริยารายงานอดีต 'said' present simple 'live' เลื่อนถอยหนึ่งขั้นเป็น 'lived'",
+        "whyOthersFail": "'lives' ไม่เลื่อน 'has lived' เลื่อนไปผิดกาล ส่วน 'would live' รายงาน 'will' ที่ไม่เคยถูกพูด",
+        "howToAvoid": "หาคำกริยาต้นฉบับ แล้วเลื่อนถอยไปในอดีตหนึ่งขั้นพอดี",
+        "memoryCue": "Live → lived หลัง said",
+        "distractors": {
+          "lives": {
+            "misconception": "@sibling:0",
+            "whyFails": "'said' เป็นอดีต 'lives' จึงต้องเลื่อนเป็น 'lived'"
+          },
+          "has lived": {
+            "misconception": "@sibling:1",
+            "whyFails": "present simple เลื่อนเป็น past simple ไม่ใช่ present perfect"
+          },
+          "would live": {
+            "misconception": "@sibling:2",
+            "whyFails": "'would' คือรูปเลื่อนของ 'will' แต่ประโยคต้นฉบับไม่มี 'will'"
+          }
+        }
+      }
+    },
+    {
+      "id": "EC-202",
+      "family": "error_correction",
+      "subskill": "subject_verb_agreement_with_intervening_phrase",
+      "cefr": "B1",
+      "questionType": "error_correction",
+      "en": {
+        "objective": "Match the verb to the head noun, not to the nearer noun inside 'of' phrase.",
+        "misconception": "Learner makes the verb agree with the plural noun right before it instead of the singular subject.",
+        "reasoning": "identify the head noun of the subject -> check its number -> match the verb to it",
+        "stem": "Find and correct the error: \"The price of these shoes are too high.\"",
+        "options": [
+          "The price of these shoes is too high.",
+          "The price of these shoes were too high.",
+          "The prices of these shoes are too high.",
+          "The price of these shoes be too high."
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "The price of these shoes were too high.",
+            "misconception": "@sibling:0",
+            "whyFails": "It only changes the tense; the verb still agrees with 'shoes' instead of 'price'."
+          },
+          {
+            "option": "The prices of these shoes are too high.",
+            "misconception": "@sibling:1",
+            "whyFails": "It changes the subject to fit the verb instead of fixing the verb."
+          },
+          {
+            "option": "The price of these shoes be too high.",
+            "misconception": "@sibling:2",
+            "whyFails": "Bare 'be' is not a finite verb; the sentence needs 'is'."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "The subject is 'the price' (singular); 'of these shoes' only describes it, so the verb is 'is'.",
+          "rule": "The verb agrees with the head noun of the subject, not with a noun inside a following 'of' phrase.",
+          "whyOthersFail": "'Were' keeps the wrong agreement, 'prices' rewrites the subject, and 'be' is not a proper verb form.",
+          "howToAvoid": "Cover the 'of …' phrase with your finger and read subject + verb: the price is.",
+          "memoryCue": "The price (of anything) is."
+        }
+      },
+      "id_": {
+        "objective": "Cocokin kata kerja sama kata benda intinya, bukan sama kata benda di dalam frasa “of”.",
+        "misconception": "Kamu nyocokin kata kerja sama kata benda jamak yang paling dekat, bukan sama subjek tunggalnya.",
+        "reasoning": "kenali inti subjeknya → cek tunggal atau jamak → cocokin kata kerjanya",
+        "rule": "Kata kerja ngikut inti subjek, bukan kata benda di dalam frasa “of” yang ngikut.",
+        "whyCorrect": "Subjeknya “the price” (tunggal). “Of these shoes” cuma ngejelasin, jadi kata kerjanya “is”.",
+        "whyOthersFail": "“Were” tetap salah cocok. “Prices” ngubah subjeknya. “Be” bukan bentuk kata kerja yang utuh.",
+        "howToAvoid": "Tutup frasa “of …” pakai jari, lalu baca subjek + kata kerja: the price is.",
+        "memoryCue": "The price (of apa pun) is.",
+        "distractors": {
+          "The price of these shoes were too high.": {
+            "misconception": "@sibling:0",
+            "whyFails": "cuma ganti waktunya. Kata kerjanya masih ngikut “shoes”, bukan “price”."
+          },
+          "The prices of these shoes are too high.": {
+            "misconception": "@sibling:1",
+            "whyFails": "ngubah subjeknya supaya cocok sama kata kerja, bukan ngebetulin kata kerjanya."
+          },
+          "The price of these shoes be too high.": {
+            "misconception": "@sibling:2",
+            "whyFails": "“be” polos bukan kata kerja utuh. Kalimatnya butuh “is”."
+          }
+        }
+      },
+      "th": {
+        "objective": "ให้คำกริยาสอดคล้องกับคำนามหลัก ไม่ใช่คำนามที่อยู่ในวลี 'of'",
+        "misconception": "ผู้เรียนทำให้คำกริยาสอดคล้องกับคำนามพหูพจน์ที่อยู่ใกล้ แทนประธานเอกพจน์",
+        "reasoning": "ระบุคำนามหลักของประธาน → เช็กพจน์ → ให้คำกริยาสอดคล้อง",
+        "rule": "คำกริยาสอดคล้องกับคำนามหลักของประธาน ไม่ใช่คำนามในวลี 'of' ที่ตามมา",
+        "whyCorrect": "ประธานคือ 'the price' (เอกพจน์) ส่วน 'of these shoes' แค่ขยาย คำกริยาจึงเป็น 'is'",
+        "whyOthersFail": "'were' ยังสอดคล้องผิด 'prices' เขียนประธานใหม่ ส่วน 'be' ไม่ใช่รูปคำกริยาที่ถูกต้อง",
+        "howToAvoid": "ใช้นิ้วปิดวลี 'of …' แล้วอ่านประธาน + คำกริยา: the price is",
+        "memoryCue": "The price (of อะไรก็ตาม) is",
+        "distractors": {
+          "The price of these shoes were too high.": {
+            "misconception": "@sibling:0",
+            "whyFails": "แค่เปลี่ยนกาล คำกริยายังสอดคล้องกับ 'shoes' แทน 'price'"
+          },
+          "The prices of these shoes are too high.": {
+            "misconception": "@sibling:1",
+            "whyFails": "เปลี่ยนประธานให้เข้ากับคำกริยา แทนที่จะแก้คำกริยา"
+          },
+          "The price of these shoes be too high.": {
+            "misconception": "@sibling:2",
+            "whyFails": "'be' รูปเปล่าไม่ใช่คำกริยาแท้ ประโยคต้องใช้ 'is'"
+          }
+        }
+      }
+    },
+    {
+      "id": "RS-203",
+      "family": "reported_speech",
+      "subskill": "reported_commands_infinitive",
+      "cefr": "B1",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Report a negative command with 'not to + verb'.",
+        "misconception": "Learner reports a command with a 'that' clause or keeps the imperative unchanged.",
+        "reasoning": "identify a command -> select told + object + to-infinitive -> place not before to",
+        "stem": "\"Don't touch the wet paint,\" Mum said. → Mum told us ___ the wet paint.",
+        "options": [
+          "not to touch",
+          "that we don't touch",
+          "didn't touch",
+          "don't touch"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "that we don't touch",
+            "misconception": "@sibling:0",
+            "whyFails": "Commands are reported with an infinitive, not a 'that' clause."
+          },
+          {
+            "option": "didn't touch",
+            "misconception": "@sibling:1",
+            "whyFails": "'Didn't touch' reports what happened, not what Mum ordered."
+          },
+          {
+            "option": "don't touch",
+            "misconception": "@sibling:2",
+            "whyFails": "The direct imperative cannot be pasted after 'told us'; it needs 'not to'."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "A negative command becomes 'told + person + not to + verb': told us not to touch.",
+          "rule": "Reported commands: tell/ask + object + (not) to + base verb.",
+          "whyOthersFail": "'That we don't touch' is the statement pattern, 'didn't touch' is a past fact, and 'don't touch' keeps the direct form.",
+          "howToAvoid": "Hear an order? Rebuild it as 'told someone (not) to do'.",
+          "memoryCue": "Don't touch → told us not to touch."
+        }
+      },
+      "id_": {
+        "objective": "Laporin larangan pakai “not to + kata kerja”.",
+        "misconception": "Kamu laporin perintah pakai klausa “that” atau biarin bentuk perintahnya apa adanya.",
+        "reasoning": "kenali perintah → pilih told + objek + to-infinitive → taruh not sebelum to",
+        "rule": "Perintah yang dilaporin: tell/ask + objek + (not) to + kata kerja dasar.",
+        "whyCorrect": "Larangan jadi “told + orang + not to + kata kerja”: told us not to touch.",
+        "whyOthersFail": "“That we don't touch” pola kalimat berita. “Didn't touch” fakta lampau. “Don't touch” masih bentuk langsung.",
+        "howToAvoid": "Denger perintah? Susun ulang jadi “told someone (not) to do”.",
+        "memoryCue": "Perintah “Don't touch” dilaporin jadi “told us not to touch”.",
+        "distractors": {
+          "that we don't touch": {
+            "misconception": "@sibling:0",
+            "whyFails": "perintah dilaporin pakai infinitive, bukan klausa “that”."
+          },
+          "didn't touch": {
+            "misconception": "@sibling:1",
+            "whyFails": "“didn't touch” laporin apa yang terjadi, bukan apa yang Ibu perintahin."
+          },
+          "don't touch": {
+            "misconception": "@sibling:2",
+            "whyFails": "bentuk perintah langsung nggak bisa ditempel sesudah “told us”. Butuh “not to”."
+          }
+        }
+      },
+      "th": {
+        "objective": "รายงานคำสั่งห้ามด้วย 'not to + คำกริยา'",
+        "misconception": "ผู้เรียนรายงานคำสั่งด้วยอนุประโยค 'that' หรือคงรูปคำสั่งไว้เหมือนเดิม",
+        "reasoning": "ระบุคำสั่ง → เลือก told + กรรม + to-infinitive → วาง not หน้า to",
+        "rule": "รายงานคำสั่ง: tell/ask + กรรม + (not) to + คำกริยารูปพื้นฐาน",
+        "whyCorrect": "คำสั่งห้ามกลายเป็น 'told + คน + not to + คำกริยา': told us not to touch",
+        "whyOthersFail": "'that we don't touch' เป็นแบบแผนของประโยคบอกเล่า 'didn't touch' เป็นข้อเท็จจริงในอดีต ส่วน 'don't touch' คงรูปตรงไว้",
+        "howToAvoid": "ได้ยินคำสั่ง? สร้างใหม่เป็น 'told someone (not) to do'",
+        "memoryCue": "คำสั่ง 'Don't touch' รายงานเป็น 'told us not to touch'",
+        "distractors": {
+          "that we don't touch": {
+            "misconception": "@sibling:0",
+            "whyFails": "คำสั่งรายงานด้วย infinitive ไม่ใช่อนุประโยค 'that'"
+          },
+          "didn't touch": {
+            "misconception": "@sibling:1",
+            "whyFails": "'didn't touch' รายงานสิ่งที่เกิดขึ้น ไม่ใช่สิ่งที่แม่สั่ง"
+          },
+          "don't touch": {
+            "misconception": "@sibling:2",
+            "whyFails": "รูปคำสั่งตรงวางต่อจาก 'told us' ไม่ได้ ต้องใช้ 'not to'"
+          }
+        }
+      }
+    },
+    {
+      "id": "PR-201",
+      "family": "prepositions",
+      "subskill": "dependent_prepositions_after_adjectives",
+      "cefr": "B1",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Use 'at' after 'good' to name a skill.",
+        "misconception": "Learner picks 'in' or 'about' after 'good' by translating from Indonesian.",
+        "reasoning": "identify the adjective good -> recall its fixed preposition -> select at",
+        "stem": "My sister is really good ___ maths, so she helps me with homework.",
+        "options": [
+          "at",
+          "in",
+          "about",
+          "for"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "in",
+            "misconception": "@sibling:0",
+            "whyFails": "'Good in' is a direct translation of 'pandai dalam'; English pairs 'good' with 'at'."
+          },
+          {
+            "option": "about",
+            "misconception": "@sibling:1",
+            "whyFails": "'About' follows feeling adjectives like 'happy about', not skill adjectives."
+          },
+          {
+            "option": "for",
+            "misconception": "@sibling:2",
+            "whyFails": "'Good for' means beneficial ('good for your health'), not skilled."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "'Good' takes the fixed preposition 'at' when it describes a skill: good at maths.",
+          "rule": "Skill adjectives use at: good at, bad at, brilliant at. Emotion adjectives use about or of.",
+          "whyOthersFail": "'In' is a translation error, 'about' belongs to feelings, and 'for' changes the meaning to 'healthy for'.",
+          "howToAvoid": "Learn the adjective together with its preposition as one chunk: good at.",
+          "memoryCue": "Good at, bad at."
+        }
+      },
+      "id_": {
+        "objective": "Pakai “at” sesudah “good” buat nyebut keahlian.",
+        "misconception": "Kamu pilih “in” atau “about” sesudah “good” karena nerjemahin dari bahasa Indonesia.",
+        "reasoning": "kenali kata sifat good → ingat kata depan tetapnya → pilih at",
+        "rule": "Kata sifat keahlian pakai at: good at, bad at, brilliant at. Kata sifat perasaan pakai about atau of.",
+        "whyCorrect": "“Good” pakai kata depan tetap “at” kalau ngomongin keahlian: good at maths.",
+        "whyOthersFail": "“In” salah terjemah. “About” buat perasaan. “For” ngubah maknanya jadi “baik buat”.",
+        "howToAvoid": "Hafalin kata sifat sama kata depannya sebagai satu paket: good at.",
+        "memoryCue": "Good at, bad at.",
+        "distractors": {
+          "in": {
+            "misconception": "@sibling:0",
+            "whyFails": "“good in” terjemahan langsung dari “pandai dalam”. Bahasa Inggris masangin “good” sama “at”."
+          },
+          "about": {
+            "misconception": "@sibling:1",
+            "whyFails": "“about” ngikut kata sifat perasaan kayak “happy about”, bukan kata sifat keahlian."
+          },
+          "for": {
+            "misconception": "@sibling:2",
+            "whyFails": "“good for” artinya bermanfaat (“good for your health”), bukan mahir."
+          }
+        }
+      },
+      "th": {
+        "objective": "ใช้ 'at' หลัง 'good' เพื่อบอกทักษะ",
+        "misconception": "ผู้เรียนเลือก 'in' หรือ 'about' หลัง 'good' โดยแปลจากภาษาอินโดนีเซีย",
+        "reasoning": "ระบุคำคุณศัพท์ good → นึกถึงบุพบทคู่ประจำ → เลือก at",
+        "rule": "คำคุณศัพท์บอกทักษะใช้ at: good at, bad at, brilliant at ส่วนคำคุณศัพท์บอกอารมณ์ใช้ about หรือ of",
+        "whyCorrect": "'Good' ใช้บุพบทคู่ประจำ 'at' เมื่อบรรยายทักษะ: good at maths",
+        "whyOthersFail": "'in' เป็นข้อผิดพลาดจากการแปล 'about' ใช้กับความรู้สึก ส่วน 'for' เปลี่ยนความหมายเป็น 'ดีต่อ'",
+        "howToAvoid": "จำคำคุณศัพท์พร้อมบุพบทเป็นก้อนเดียว: good at",
+        "memoryCue": "Good at, bad at — ทักษะคู่กับ at เสมอ",
+        "distractors": {
+          "in": {
+            "misconception": "@sibling:0",
+            "whyFails": "'good in' เป็นการแปลตรงตัวจาก 'pandai dalam' ภาษาอังกฤษจับคู่ 'good' กับ 'at'"
+          },
+          "about": {
+            "misconception": "@sibling:1",
+            "whyFails": "'about' ตามหลังคำคุณศัพท์บอกความรู้สึกอย่าง 'happy about' ไม่ใช่คำคุณศัพท์บอกทักษะ"
+          },
+          "for": {
+            "misconception": "@sibling:2",
+            "whyFails": "'good for' หมายถึงมีประโยชน์ ('good for your health') ไม่ใช่เก่ง"
+          }
+        }
+      }
+    },
+    {
+      "id": "QN-204",
+      "family": "question_negation",
+      "subskill": "negative_questions_expecting_agreement",
+      "cefr": "B1",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Use a negative question with 'Isn't' to invite agreement.",
+        "misconception": "Learner asks a neutral question or uses the wrong auxiliary when expecting the listener to agree.",
+        "reasoning": "identify that the speaker expects agreement -> select a negative question -> match the auxiliary to the verb be",
+        "stem": "What a view! ___ it beautiful here?",
+        "options": [
+          "Isn't",
+          "Is",
+          "Doesn't",
+          "Wasn't"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "Is",
+            "misconception": "@sibling:0",
+            "whyFails": "'Is it beautiful?' is a neutral question; the speaker clearly already thinks so."
+          },
+          {
+            "option": "Doesn't",
+            "misconception": "@sibling:2",
+            "whyFails": "'Beautiful' is an adjective after 'be', so the auxiliary is 'is', not 'does'."
+          },
+          {
+            "option": "Wasn't",
+            "misconception": "@sibling:1",
+            "whyFails": "The view is in front of them now, so the past 'wasn't' does not fit."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "The speaker admires the view and expects agreement, so the negative question 'Isn't it beautiful?' is used.",
+          "rule": "Negative question (Isn't / Don't / Didn't …?) = the speaker expects a 'yes'.",
+          "whyOthersFail": "'Is' sounds unsure, 'doesn't' is the wrong auxiliary for 'be', and 'wasn't' points to the past.",
+          "howToAvoid": "Already sure and just want agreement? Start with the negative auxiliary.",
+          "memoryCue": "Isn't it…? = I think so, don't you?"
+        }
+      },
+      "id_": {
+        "objective": "Pakai pertanyaan negatif “Isn't” buat ngajak setuju.",
+        "misconception": "Kamu nanya datar atau salah kata bantu padahal ngarep pendengar setuju.",
+        "reasoning": "kenali pembicara ngarep setuju → pilih pertanyaan negatif → cocokin kata bantu sama kata kerja be",
+        "rule": "Pertanyaan negatif (Isn't / Don't / Didn't …?) = pembicara ngarep jawaban “ya”.",
+        "whyCorrect": "Pembicara kagum sama pemandangannya dan ngarep setuju, jadi pakai pertanyaan negatif “Isn't it beautiful?”.",
+        "whyOthersFail": "“Is” kedengeran ragu. “Doesn't” salah kata bantu buat “be”. “Wasn't” nunjuk lampau.",
+        "howToAvoid": "Udah yakin dan cuma mau diajak setuju? Mulai dari kata bantu negatif.",
+        "memoryCue": "Isn't it…? = menurutku iya, kamu juga kan?",
+        "distractors": {
+          "Is": {
+            "misconception": "@sibling:0",
+            "whyFails": "“Is it beautiful?” pertanyaan datar. Pembicaranya jelas udah berpikir begitu."
+          },
+          "Doesn't": {
+            "misconception": "@sibling:2",
+            "whyFails": "“beautiful” kata sifat sesudah “be”, jadi kata bantunya “is”, bukan “does”."
+          },
+          "Wasn't": {
+            "misconception": "@sibling:1",
+            "whyFails": "pemandangannya ada di depan mereka sekarang, jadi “wasn't” yang lampau nggak cocok."
+          }
+        }
+      },
+      "th": {
+        "objective": "ใช้คำถามปฏิเสธ 'Isn't' เพื่อชวนให้เห็นด้วย",
+        "misconception": "ผู้เรียนถามแบบกลาง ๆ หรือใช้กริยาช่วยผิด ทั้งที่คาดว่าผู้ฟังจะเห็นด้วย",
+        "reasoning": "ระบุว่าผู้พูดคาดหวังการเห็นด้วย → เลือกคำถามปฏิเสธ → จับคู่กริยาช่วยกับกริยา be",
+        "rule": "คำถามปฏิเสธ (Isn't / Don't / Didn't …?) = ผู้พูดคาดหวังคำตอบว่า 'ใช่'",
+        "whyCorrect": "ผู้พูดชื่นชมทิวทัศน์และคาดว่าอีกฝ่ายจะเห็นด้วย จึงใช้คำถามปฏิเสธ 'Isn't it beautiful?'",
+        "whyOthersFail": "'Is' ฟังดูไม่แน่ใจ 'doesn't' เป็นกริยาช่วยที่ผิดสำหรับ 'be' ส่วน 'wasn't' ชี้ไปที่อดีต",
+        "howToAvoid": "แน่ใจอยู่แล้วและแค่อยากให้เห็นด้วย? เริ่มด้วยกริยาช่วยปฏิเสธ",
+        "memoryCue": "Isn't it…? = ฉันว่าใช่ คุณก็ว่าใช่ไหม",
+        "distractors": {
+          "Is": {
+            "misconception": "@sibling:0",
+            "whyFails": "'Is it beautiful?' เป็นคำถามกลาง ๆ แต่ผู้พูดคิดเช่นนั้นอยู่แล้วอย่างชัดเจน"
+          },
+          "Doesn't": {
+            "misconception": "@sibling:2",
+            "whyFails": "'beautiful' เป็นคำคุณศัพท์หลัง 'be' กริยาช่วยจึงเป็น 'is' ไม่ใช่ 'does'"
+          },
+          "Wasn't": {
+            "misconception": "@sibling:1",
+            "whyFails": "ทิวทัศน์อยู่ตรงหน้าตอนนี้ 'wasn't' ที่เป็นอดีตจึงไม่เข้ากัน"
+          }
+        }
+      }
+    },
+    {
+      "id": "EC-203",
+      "family": "error_correction",
+      "subskill": "word_order_adverb_placement",
+      "cefr": "B1",
+      "questionType": "error_correction",
+      "en": {
+        "objective": "Place a frequency adverb between the subject and an ordinary verb.",
+        "misconception": "Learner puts the frequency adverb after the verb or at the end of the sentence.",
+        "reasoning": "identify the frequency adverb -> check that the verb is not be -> place the adverb before the verb",
+        "stem": "Find and correct the error: \"We eat usually dinner at seven.\"",
+        "options": [
+          "We usually eat dinner at seven.",
+          "Usually we eat dinner at seven usually.",
+          "We eat dinner usually at seven.",
+          "We eat dinner at seven usually eat."
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "Usually we eat dinner at seven usually.",
+            "misconception": "@sibling:0",
+            "whyFails": "It repeats the adverb at both ends; one 'usually' before the verb is enough."
+          },
+          {
+            "option": "We eat dinner usually at seven.",
+            "misconception": "@sibling:1",
+            "whyFails": "It moves the adverb after the object instead of before the verb."
+          },
+          {
+            "option": "We eat dinner at seven usually eat.",
+            "misconception": "@sibling:2",
+            "whyFails": "It adds a second verb and leaves the adverb in the wrong place."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "'Eat' is an ordinary verb, so the frequency adverb goes right before it: we usually eat.",
+          "rule": "Frequency adverbs (usually, always, often) go before an ordinary verb but after be.",
+          "whyOthersFail": "One option doubles the adverb, one parks it after the object, and one adds an extra verb.",
+          "howToAvoid": "Say the subject, then the adverb, then the verb: we – usually – eat.",
+          "memoryCue": "Subject + usually + verb."
+        }
+      },
+      "id_": {
+        "objective": "Taruh kata keterangan frekuensi di antara subjek dan kata kerja biasa.",
+        "misconception": "Kamu naruh kata keterangan frekuensi sesudah kata kerja atau di ujung kalimat.",
+        "reasoning": "kenali kata keterangan frekuensi → cek kata kerjanya bukan be → taruh kata keterangan di depan kata kerja",
+        "rule": "Kata keterangan frekuensi (usually, always, often) di depan kata kerja biasa, tapi sesudah be.",
+        "whyCorrect": "“Eat” kata kerja biasa, jadi kata keterangan frekuensinya pas di depannya: we usually eat.",
+        "whyOthersFail": "Satu pilihan ngulang kata keterangannya, satu naruhnya sesudah objek, satu nambah kata kerja ekstra.",
+        "howToAvoid": "Ucapin subjek, lalu kata keterangan, lalu kata kerja: we – usually – eat.",
+        "memoryCue": "Subjek + usually + kata kerja.",
+        "distractors": {
+          "Usually we eat dinner at seven usually.": {
+            "misconception": "@sibling:0",
+            "whyFails": "kata keterangannya diulang di dua ujung. Satu “usually” di depan kata kerja udah cukup."
+          },
+          "We eat dinner usually at seven.": {
+            "misconception": "@sibling:1",
+            "whyFails": "kata keterangannya dipindah ke sesudah objek, bukan ke depan kata kerja."
+          },
+          "We eat dinner at seven usually eat.": {
+            "misconception": "@sibling:2",
+            "whyFails": "nambah kata kerja kedua dan kata keterangannya tetap salah tempat."
+          }
+        }
+      },
+      "th": {
+        "objective": "วางคำบอกความถี่ไว้ระหว่างประธานกับคำกริยาทั่วไป",
+        "misconception": "ผู้เรียนวางคำบอกความถี่ไว้หลังคำกริยาหรือท้ายประโยค",
+        "reasoning": "ระบุคำบอกความถี่ → เช็กว่าคำกริยาไม่ใช่ be → วางคำบอกความถี่หน้าคำกริยา",
+        "rule": "คำบอกความถี่ (usually, always, often) อยู่หน้าคำกริยาทั่วไป แต่อยู่หลัง be",
+        "whyCorrect": "'Eat' เป็นคำกริยาทั่วไป คำบอกความถี่จึงอยู่หน้ามันทันที: we usually eat",
+        "whyOthersFail": "ตัวเลือกหนึ่งใช้คำบอกความถี่ซ้ำ หนึ่งวางไว้หลังกรรม และอีกหนึ่งเพิ่มคำกริยาเกินมา",
+        "howToAvoid": "พูดประธาน แล้วคำบอกความถี่ แล้วคำกริยา: we – usually – eat",
+        "memoryCue": "ประธาน + usually + คำกริยา",
+        "distractors": {
+          "Usually we eat dinner at seven usually.": {
+            "misconception": "@sibling:0",
+            "whyFails": "ใช้คำบอกความถี่ซ้ำทั้งสองปลาย 'usually' ตัวเดียวหน้าคำกริยาก็พอ"
+          },
+          "We eat dinner usually at seven.": {
+            "misconception": "@sibling:1",
+            "whyFails": "ย้ายคำบอกความถี่ไปหลังกรรม แทนที่จะอยู่หน้าคำกริยา"
+          },
+          "We eat dinner at seven usually eat.": {
+            "misconception": "@sibling:2",
+            "whyFails": "เพิ่มคำกริยาตัวที่สองและคำบอกความถี่ยังอยู่ผิดที่"
+          }
+        }
+      }
+    },
+    {
+      "id": "RS-204",
+      "family": "reported_speech",
+      "subskill": "time_and_place_reference_shift",
+      "cefr": "B1",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Shift 'tomorrow' to 'the next day' when reporting later.",
+        "misconception": "Learner keeps the original time word although the report happens on a different day.",
+        "reasoning": "identify the time word tomorrow -> check that the report is made later -> shift it to the next day",
+        "stem": "On Friday Dina said, \"I'll call you tomorrow.\" A week later: Dina said she would call me ___.",
+        "options": [
+          "the next day",
+          "tomorrow",
+          "yesterday",
+          "next day"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "tomorrow",
+            "misconception": "@sibling:0",
+            "whyFails": "'Tomorrow' would mean the day after the report, not the Saturday Dina meant."
+          },
+          {
+            "option": "yesterday",
+            "misconception": "@sibling:1",
+            "whyFails": "'Yesterday' points backwards from now; Dina was talking about a day after Friday."
+          },
+          {
+            "option": "next day",
+            "misconception": "@sibling:2",
+            "whyFails": "The phrase needs 'the': the next day / the following day."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "The report is made a week later, so 'tomorrow' shifts to 'the next day'.",
+          "rule": "Time shifts in reported speech: today → that day, tomorrow → the next day, yesterday → the day before.",
+          "whyOthersFail": "'Tomorrow' keeps the original view, 'yesterday' looks the wrong way, and 'next day' is missing 'the'.",
+          "howToAvoid": "Ask: does 'tomorrow' still mean the same day from today? If not, shift it.",
+          "memoryCue": "Tomorrow → the next day."
+        }
+      },
+      "id_": {
+        "objective": "Geser “tomorrow” jadi “the next day” waktu dilaporin belakangan.",
+        "misconception": "Kamu biarin kata waktunya padahal laporannya dibuat di hari yang beda.",
+        "reasoning": "kenali kata waktu tomorrow → cek laporannya dibuat belakangan → geser jadi the next day",
+        "rule": "Geseran waktu di kalimat laporan: today → that day, tomorrow → the next day, yesterday → the day before.",
+        "whyCorrect": "Laporannya dibuat seminggu kemudian, jadi “tomorrow” geser jadi “the next day”.",
+        "whyOthersFail": "“Tomorrow” masih pakai sudut pandang asli. “Yesterday” ngarah ke arah yang salah. “Next day” kurang “the”.",
+        "howToAvoid": "Tanya: “tomorrow” masih nunjuk hari yang sama dari hari ini? Kalau nggak, geser.",
+        "memoryCue": "Tomorrow → the next day.",
+        "distractors": {
+          "tomorrow": {
+            "misconception": "@sibling:0",
+            "whyFails": "“tomorrow” bakal berarti sehari sesudah laporan, bukan hari Sabtu yang Dina maksud."
+          },
+          "yesterday": {
+            "misconception": "@sibling:1",
+            "whyFails": "“yesterday” nunjuk ke belakang dari sekarang. Dina ngomongin hari sesudah Jumat."
+          },
+          "next day": {
+            "misconception": "@sibling:2",
+            "whyFails": "frasanya butuh “the”: the next day / the following day."
+          }
+        }
+      },
+      "th": {
+        "objective": "เลื่อน 'tomorrow' เป็น 'the next day' เมื่อรายงานในภายหลัง",
+        "misconception": "ผู้เรียนคงคำบอกเวลาเดิมไว้ ทั้งที่รายงานเกิดขึ้นคนละวัน",
+        "reasoning": "ระบุคำบอกเวลา tomorrow → เช็กว่ารายงานทำในภายหลัง → เลื่อนเป็น the next day",
+        "rule": "การเลื่อนเวลาใน reported speech: today → that day, tomorrow → the next day, yesterday → the day before",
+        "whyCorrect": "รายงานเกิดขึ้นหนึ่งสัปดาห์ต่อมา 'tomorrow' จึงเลื่อนเป็น 'the next day'",
+        "whyOthersFail": "'tomorrow' คงมุมมองเดิม 'yesterday' มองผิดทิศ ส่วน 'next day' ขาด 'the'",
+        "howToAvoid": "ถามว่า 'tomorrow' ยังหมายถึงวันเดียวกันเมื่อนับจากวันนี้ไหม ถ้าไม่ ให้เลื่อน",
+        "memoryCue": "Tomorrow → the next day เมื่อรายงานทีหลัง",
+        "distractors": {
+          "tomorrow": {
+            "misconception": "@sibling:0",
+            "whyFails": "'tomorrow' จะหมายถึงวันถัดจากวันรายงาน ไม่ใช่วันเสาร์ที่ Dina หมายถึง"
+          },
+          "yesterday": {
+            "misconception": "@sibling:1",
+            "whyFails": "'yesterday' ชี้ย้อนหลังจากตอนนี้ แต่ Dina พูดถึงวันหลังวันศุกร์"
+          },
+          "next day": {
+            "misconception": "@sibling:2",
+            "whyFails": "วลีนี้ต้องมี 'the': the next day / the following day"
+          }
+        }
+      }
+    },
+    {
+      "id": "EC-204",
+      "family": "error_correction",
+      "subskill": "comma_splice_run_on_correction",
+      "cefr": "B1",
+      "questionType": "error_correction",
+      "en": {
+        "objective": "Join two full sentences with a comma plus 'but', not a comma alone.",
+        "misconception": "Learner links two independent clauses with only a comma, or misplaces 'however'.",
+        "reasoning": "identify two independent clauses -> check that a comma alone cannot join them -> add a connector or a full stop",
+        "stem": "Find and correct the error: \"I wanted to go out, it was raining.\"",
+        "options": [
+          "I wanted to go out, but it was raining.",
+          "I wanted to go out, but it is raining.",
+          "I wanted to go out however, it was raining.",
+          "I wanted to go out, it was however raining."
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "I wanted to go out, but it is raining.",
+            "misconception": "@sibling:0",
+            "whyFails": "'But' fixes the join, but 'is' breaks the past-tense agreement with 'wanted'."
+          },
+          {
+            "option": "I wanted to go out however, it was raining.",
+            "misconception": "@sibling:1",
+            "whyFails": "'However' cannot glue two clauses like 'but'; it needs a semicolon or a new sentence."
+          },
+          {
+            "option": "I wanted to go out, it was however raining.",
+            "misconception": "@sibling:2",
+            "whyFails": "The comma splice is still there; adding 'however' inside the clause does not join the sentences."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "Two complete sentences need a real connector, so ', but' joins them correctly and keeps both verbs in the past.",
+          "rule": "Comma splice fix: clause, + and/but/so + clause — or use a full stop / semicolon.",
+          "whyOthersFail": "One option changes the tense, and the other two leave the comma splice while sprinkling 'however' around.",
+          "howToAvoid": "Two subjects and two verbs with only a comma between them? Add and/but/so.",
+          "memoryCue": "Comma alone can't join — comma + but can."
+        }
+      },
+      "id_": {
+        "objective": "Gabungin dua kalimat utuh pakai koma plus “but”, bukan koma aja.",
+        "misconception": "Kamu nyambung dua klausa mandiri cuma pakai koma, atau salah naruh “however”.",
+        "reasoning": "kenali dua klausa mandiri → cek koma aja nggak bisa ngegabung → tambah penghubung atau titik",
+        "rule": "Perbaikan comma splice: klausa, + and/but/so + klausa — atau pakai titik / titik koma.",
+        "whyCorrect": "Dua kalimat utuh butuh penghubung sungguhan, jadi “, but” ngegabungnya dengan benar dan dua kata kerjanya tetap lampau.",
+        "whyOthersFail": "Satu pilihan ganti waktunya, dua lainnya masih comma splice sambil nyelipin “however” sembarangan.",
+        "howToAvoid": "Dua subjek dan dua kata kerja cuma dipisah koma? Tambah and/but/so.",
+        "memoryCue": "Koma aja nggak bisa ngegabung — koma + but bisa.",
+        "distractors": {
+          "I wanted to go out, but it is raining.": {
+            "misconception": "@sibling:0",
+            "whyFails": "“but” ngebetulin sambungannya, tapi “is” ngerusak keselarasan lampau sama “wanted”."
+          },
+          "I wanted to go out however, it was raining.": {
+            "misconception": "@sibling:1",
+            "whyFails": "“however” nggak bisa nempelin dua klausa kayak “but”. Dia butuh titik koma atau kalimat baru."
+          },
+          "I wanted to go out, it was however raining.": {
+            "misconception": "@sibling:2",
+            "whyFails": "comma splice-nya masih ada. Nambah “however” di dalam klausa nggak ngegabung kalimatnya."
+          }
+        }
+      },
+      "th": {
+        "objective": "เชื่อมสองประโยคสมบูรณ์ด้วยจุลภาคบวก 'but' ไม่ใช่จุลภาคอย่างเดียว",
+        "misconception": "ผู้เรียนเชื่อมสองอนุประโยคอิสระด้วยจุลภาคอย่างเดียว หรือวาง 'however' ผิดที่",
+        "reasoning": "ระบุสองอนุประโยคอิสระ → เช็กว่าจุลภาคอย่างเดียวเชื่อมไม่ได้ → เพิ่มตัวเชื่อมหรือมหัพภาค",
+        "rule": "แก้ comma splice: อนุประโยค, + and/but/so + อนุประโยค — หรือใช้มหัพภาค / อัฒภาค",
+        "whyCorrect": "สองประโยคสมบูรณ์ต้องมีตัวเชื่อมจริง ', but' จึงเชื่อมได้ถูกต้องและคงคำกริยาทั้งสองในอดีต",
+        "whyOthersFail": "ตัวเลือกหนึ่งเปลี่ยนกาล ส่วนอีกสองยังคง comma splice ไว้พร้อมโปรย 'however' ผิดที่",
+        "howToAvoid": "มีสองประธานและสองคำกริยาโดยมีแค่จุลภาคคั่น? เพิ่ม and/but/so",
+        "memoryCue": "จุลภาคอย่างเดียวเชื่อมไม่ได้ — จุลภาค + but เชื่อมได้",
+        "distractors": {
+          "I wanted to go out, but it is raining.": {
+            "misconception": "@sibling:0",
+            "whyFails": "'but' แก้การเชื่อมได้ แต่ 'is' ทำลายความสอดคล้องของกาลอดีตกับ 'wanted'"
+          },
+          "I wanted to go out however, it was raining.": {
+            "misconception": "@sibling:1",
+            "whyFails": "'however' ติดสองอนุประโยคเข้าด้วยกันแบบ 'but' ไม่ได้ ต้องใช้อัฒภาคหรือประโยคใหม่"
+          },
+          "I wanted to go out, it was however raining.": {
+            "misconception": "@sibling:2",
+            "whyFails": "comma splice ยังอยู่ การเพิ่ม 'however' ในอนุประโยคไม่ได้เชื่อมประโยค"
+          }
+        }
+      }
+    },
+    {
+      "id": "TA-206",
+      "family": "tense_aspect",
+      "subskill": "present_simple_for_fixed_schedules_not_personal_plans",
+      "cefr": "B1",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Use the present simple for a fixed public schedule such as a shop's opening time.",
+        "misconception": "Learner uses a future or continuous form for an official timetable.",
+        "reasoning": "identify a fixed public schedule -> select the present simple -> avoid personal-plan forms",
+        "stem": "The museum ___ at 9 a.m. every day, so let's be there early.",
+        "options": [
+          "opens",
+          "is opening",
+          "is going to open",
+          "will have opened"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "is opening",
+            "misconception": "@sibling:0",
+            "whyFails": "Present continuous is for personal arrangements, not an official daily time."
+          },
+          {
+            "option": "is going to open",
+            "misconception": "@sibling:1",
+            "whyFails": "'Going to' shows an intention or prediction; a fixed timetable is just stated as a fact."
+          },
+          {
+            "option": "will have opened",
+            "misconception": "@sibling:2",
+            "whyFails": "Future perfect means 'finished before a point'; the sentence gives a regular opening time."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "'Every day' and the official time make this a fixed schedule, so the present simple 'opens' is used.",
+          "rule": "Present simple for timetables and schedules: the train leaves, the museum opens, the class starts.",
+          "whyOthersFail": "The other forms describe personal plans, intentions, or completion, not a fixed public schedule.",
+          "howToAvoid": "Is it printed on a timetable or sign? Then use the present simple.",
+          "memoryCue": "Timetable → present simple."
+        }
+      },
+      "id_": {
+        "objective": "Pakai present simple buat jadwal umum tetap kayak jam buka museum.",
+        "misconception": "Kamu pakai bentuk masa depan atau -ing buat jadwal resmi.",
+        "reasoning": "kenali jadwal umum tetap → pilih present simple → hindari bentuk rencana pribadi",
+        "rule": "Present simple buat jadwal tetap: “the train leaves”, “the museum opens”, “the class starts”.",
+        "whyCorrect": "“Every day” dan jam resminya bikin ini jadwal tetap, jadi pakai present simple “opens”.",
+        "whyOthersFail": "Bentuk lain ngegambarin rencana pribadi, niat, atau selesainya sesuatu, bukan jadwal umum tetap.",
+        "howToAvoid": "Tercetak di jadwal atau papan? Pakai present simple.",
+        "memoryCue": "Jadwal → present simple.",
+        "distractors": {
+          "is opening": {
+            "misconception": "@sibling:0",
+            "whyFails": "present continuous buat janji pribadi, bukan jam resmi harian."
+          },
+          "is going to open": {
+            "misconception": "@sibling:1",
+            "whyFails": "“going to” nunjukin niat atau perkiraan. Jadwal tetap cukup dinyatain sebagai fakta."
+          },
+          "will have opened": {
+            "misconception": "@sibling:2",
+            "whyFails": "future perfect artinya “selesai sebelum suatu titik”. Kalimatnya ngasih jam buka rutin."
+          }
+        }
+      },
+      "th": {
+        "objective": "ใช้ present simple กับตารางเวลาสาธารณะที่ตายตัว เช่น เวลาเปิดของพิพิธภัณฑ์",
+        "misconception": "ผู้เรียนใช้รูปอนาคตหรือ continuous กับตารางเวลาทางการ",
+        "reasoning": "ระบุตารางเวลาสาธารณะที่ตายตัว → เลือก present simple → เลี่ยงรูปที่ใช้กับแผนส่วนตัว",
+        "rule": "Present simple สำหรับตารางเวลา: the train leaves, the museum opens, the class starts",
+        "whyCorrect": "'Every day' และเวลาทางการทำให้นี่เป็นตารางที่ตายตัว จึงใช้ present simple 'opens'",
+        "whyOthersFail": "รูปอื่นบรรยายแผนส่วนตัว ความตั้งใจ หรือความเสร็จสิ้น ไม่ใช่ตารางเวลาสาธารณะ",
+        "howToAvoid": "พิมพ์อยู่บนตารางเวลาหรือป้ายไหม? ถ้าใช่ ใช้ present simple",
+        "memoryCue": "ตารางเวลา → present simple",
+        "distractors": {
+          "is opening": {
+            "misconception": "@sibling:0",
+            "whyFails": "present continuous ใช้กับนัดหมายส่วนตัว ไม่ใช่เวลาทางการประจำวัน"
+          },
+          "is going to open": {
+            "misconception": "@sibling:1",
+            "whyFails": "'going to' แสดงความตั้งใจหรือการคาดเดา ตารางเวลาตายตัวแค่บอกเป็นข้อเท็จจริง"
+          },
+          "will have opened": {
+            "misconception": "@sibling:2",
+            "whyFails": "future perfect หมายถึง 'เสร็จก่อนจุดหนึ่ง' แต่ประโยคบอกเวลาเปิดประจำ"
+          }
+        }
+      }
+    },
+    {
+      "id": "RS-205",
+      "family": "reported_speech",
+      "subskill": "reported_speech_modal_shift_can_to_could",
+      "cefr": "B1",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Shift 'will' to 'would' when reporting a promise later.",
+        "misconception": "Learner keeps 'will' unchanged or treats the modal like a regular verb after a past reporting verb.",
+        "reasoning": "identify the modal will -> check that the reporting verb is past -> shift will to would",
+        "stem": "\"I will help you move,\" Rio said. → Rio said he ___ help me move.",
+        "options": [
+          "would",
+          "will",
+          "wills",
+          "would to"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "will",
+            "misconception": "@sibling:0",
+            "whyFails": "After past 'said', 'will' normally shifts back to 'would'."
+          },
+          {
+            "option": "wills",
+            "misconception": "@sibling:1",
+            "whyFails": "Modals never take -s; 'wills' treats 'will' like an ordinary verb."
+          },
+          {
+            "option": "would to",
+            "misconception": "@sibling:2",
+            "whyFails": "A modal is followed directly by the base verb; there is no 'to' after 'would'."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "The promise is reported in the past, so 'will' becomes 'would': said he would help.",
+          "rule": "Modal backshift: will → would, can → could, may → might. Modals take no -s and no 'to'.",
+          "whyOthersFail": "'Will' does not shift, 'wills' adds an impossible -s, and 'would to' inserts an extra 'to'.",
+          "howToAvoid": "See a modal in the direct speech? Swap it for its past partner and keep the bare verb.",
+          "memoryCue": "Will → would after said."
+        }
+      },
+      "id_": {
+        "objective": "Geser “will” jadi “would” waktu laporin janji belakangan.",
+        "misconception": "Kamu biarin “will” apa adanya atau nganggap modal kayak kata kerja biasa sesudah kata pelapor lampau.",
+        "reasoning": "kenali modal will → cek kata pelapornya lampau → geser will jadi would",
+        "rule": "Mundurnya modal: will → would, can → could, may → might. Modal nggak pakai -s dan nggak pakai “to”.",
+        "whyCorrect": "Janjinya dilaporin di masa lampau, jadi “will” jadi “would”: said he would help.",
+        "whyOthersFail": "“Will” nggak mundur. “Wills” nambah -s yang nggak mungkin. “Would to” nyelipin “to” ekstra.",
+        "howToAvoid": "Ada modal di kalimat langsungnya? Tuker sama pasangan lampaunya dan kata kerjanya tetap polos.",
+        "memoryCue": "Will → would sesudah said.",
+        "distractors": {
+          "will": {
+            "misconception": "@sibling:0",
+            "whyFails": "sesudah “said” yang lampau, “will” biasanya mundur jadi “would”."
+          },
+          "wills": {
+            "misconception": "@sibling:1",
+            "whyFails": "modal nggak pernah pakai -s. “Wills” nganggap “will” kayak kata kerja biasa."
+          },
+          "would to": {
+            "misconception": "@sibling:2",
+            "whyFails": "modal langsung diikuti kata kerja dasar. Nggak ada “to” sesudah “would”."
+          }
+        }
+      },
+      "th": {
+        "objective": "เลื่อน 'will' เป็น 'would' เมื่อรายงานคำสัญญาในภายหลัง",
+        "misconception": "ผู้เรียนคง 'will' ไว้ หรือปฏิบัติกับ modal เหมือนคำกริยาปกติหลังคำกริยารายงานที่เป็นอดีต",
+        "reasoning": "ระบุ modal will → เช็กว่าคำกริยารายงานเป็นอดีต → เลื่อน will เป็น would",
+        "rule": "การเลื่อน modal: will → would, can → could, may → might; modal ไม่เติม -s และไม่มี 'to'",
+        "whyCorrect": "คำสัญญาถูกรายงานในอดีต 'will' จึงกลายเป็น 'would': said he would help",
+        "whyOthersFail": "'will' ไม่เลื่อน 'wills' เติม -s ที่เป็นไปไม่ได้ ส่วน 'would to' แทรก 'to' เกินมา",
+        "howToAvoid": "เห็น modal ในคำพูดตรง? เปลี่ยนเป็นคู่อดีตของมันและคงคำกริยารูปเปล่า",
+        "memoryCue": "Will → would หลัง said",
+        "distractors": {
+          "will": {
+            "misconception": "@sibling:0",
+            "whyFails": "หลัง 'said' ที่เป็นอดีต 'will' ปกติเลื่อนเป็น 'would'"
+          },
+          "wills": {
+            "misconception": "@sibling:1",
+            "whyFails": "modal ไม่เคยเติม -s 'wills' ปฏิบัติกับ 'will' เหมือนคำกริยาธรรมดา"
+          },
+          "would to": {
+            "misconception": "@sibling:2",
+            "whyFails": "modal ตามด้วยคำกริยารูปพื้นฐานทันที ไม่มี 'to' หลัง 'would'"
+          }
+        }
+      }
+    },
+    {
+      "id": "RS-206",
+      "family": "reported_speech",
+      "subskill": "reported_yes_no_questions_if_whether",
+      "cefr": "B1",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Report a yes/no question with 'if' and statement word order.",
+        "misconception": "Learner keeps the question inversion or uses 'that' when reporting a yes/no question.",
+        "reasoning": "identify a yes/no question -> select if or whether -> restore subject + verb order and backshift",
+        "stem": "\"Are you hungry?\" she asked. → She asked me ___ hungry.",
+        "options": [
+          "if I was",
+          "was I",
+          "that I was",
+          "if was I"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "was I",
+            "misconception": "@sibling:0",
+            "whyFails": "It keeps the question inversion and has no 'if' to introduce the reported question."
+          },
+          {
+            "option": "that I was",
+            "misconception": "@sibling:1",
+            "whyFails": "'That' reports statements; a yes/no question needs 'if' or 'whether'."
+          },
+          {
+            "option": "if was I",
+            "misconception": "@sibling:2",
+            "whyFails": "'If' is right, but the subject must come before the verb: if I was."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "A yes/no question is reported with 'if' plus statement order, and 'are' shifts back to 'was'.",
+          "rule": "Reported yes/no question: asked + if/whether + subject + verb (backshifted).",
+          "whyOthersFail": "'Was I' and 'if was I' keep the inversion, and 'that I was' uses the statement connector.",
+          "howToAvoid": "Can the direct question be answered with yes or no? Then start the report with 'if'.",
+          "memoryCue": "Are you…? → asked if I was…"
+        }
+      },
+      "id_": {
+        "objective": "Laporin pertanyaan ya/tidak pakai “if” dan urutan kalimat berita.",
+        "misconception": "Kamu tetap pakai urutan pertanyaan atau pakai “that” waktu laporin pertanyaan ya/tidak.",
+        "reasoning": "kenali pertanyaan ya/tidak → pilih if atau whether → balikin urutan subjek + kata kerja dan mundurin waktunya",
+        "rule": "Pertanyaan ya/tidak yang dilaporin: asked + if/whether + subjek + kata kerja (dimundurin).",
+        "whyCorrect": "Pertanyaan ya/tidak dilaporin pakai “if” plus urutan kalimat berita, dan “are” mundur jadi “was”.",
+        "whyOthersFail": "“Was I” dan “if was I” masih kebalik. “That I was” pakai penghubung kalimat berita.",
+        "howToAvoid": "Pertanyaan langsungnya bisa dijawab ya atau tidak? Mulai laporannya pakai “if”.",
+        "memoryCue": "Pertanyaan “Are you…?” dilaporin jadi “asked if I was…”.",
+        "distractors": {
+          "was I": {
+            "misconception": "@sibling:0",
+            "whyFails": "masih urutan pertanyaan dan nggak ada “if” buat ngenalin pertanyaan yang dilaporin."
+          },
+          "that I was": {
+            "misconception": "@sibling:1",
+            "whyFails": "“that” buat laporin kalimat berita. Pertanyaan ya/tidak butuh “if” atau “whether”."
+          },
+          "if was I": {
+            "misconception": "@sibling:2",
+            "whyFails": "“if” udah bener, tapi subjeknya harus sebelum kata kerja: if I was."
+          }
+        }
+      },
+      "th": {
+        "objective": "รายงานคำถามใช่/ไม่ใช่ด้วย 'if' และลำดับคำแบบประโยคบอกเล่า",
+        "misconception": "ผู้เรียนคงการสลับที่แบบคำถาม หรือใช้ 'that' เมื่อรายงานคำถามใช่/ไม่ใช่",
+        "reasoning": "ระบุคำถามใช่/ไม่ใช่ → เลือก if หรือ whether → คืนลำดับประธาน + คำกริยาและเลื่อนกาล",
+        "rule": "รายงานคำถามใช่/ไม่ใช่: asked + if/whether + ประธาน + คำกริยา (เลื่อนกาล)",
+        "whyCorrect": "คำถามใช่/ไม่ใช่รายงานด้วย 'if' บวกลำดับแบบประโยคบอกเล่า และ 'are' เลื่อนเป็น 'was'",
+        "whyOthersFail": "'was I' และ 'if was I' คงการสลับที่ไว้ ส่วน 'that I was' ใช้ตัวเชื่อมของประโยคบอกเล่า",
+        "howToAvoid": "คำถามตรงตอบได้ด้วยใช่หรือไม่ใช่ไหม? ถ้าได้ เริ่มรายงานด้วย 'if'",
+        "memoryCue": "คำถาม 'Are you…?' รายงานเป็น 'asked if I was…'",
+        "distractors": {
+          "was I": {
+            "misconception": "@sibling:0",
+            "whyFails": "คงการสลับที่แบบคำถามและไม่มี 'if' นำคำถามที่รายงาน"
+          },
+          "that I was": {
+            "misconception": "@sibling:1",
+            "whyFails": "'that' ใช้รายงานประโยคบอกเล่า คำถามใช่/ไม่ใช่ต้องใช้ 'if' หรือ 'whether'"
+          },
+          "if was I": {
+            "misconception": "@sibling:2",
+            "whyFails": "'if' ถูกแล้ว แต่ประธานต้องมาก่อนคำกริยา: if I was"
+          }
+        }
+      }
+    }
+  ]
+}

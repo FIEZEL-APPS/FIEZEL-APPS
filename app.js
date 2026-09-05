@@ -618,7 +618,9 @@ function stableGrammarHash(value){let h=2166136261;for(const c of String(value))
 // dilarang saling meminjam meta - penolakan "itu ngejelasin kalimat di lesson lain" jadi
 // bohong untuk mereka (PA-004#25 vs b4_008#25, TA-005 vs b5_002).
 const GRAMMAR_PEER_BLOCKLIST={'A1-004':["CG-001"],'A1-005':["CG-003"],'A1-006':["CG-002"],'A1-008':["AR-007"],'A1-009':["PS-001"],'A1-011':["A1-111"],'A1-012':["NN-001"],'A1-013':["PR-006"],'A1-015':["QF-001"],'A1-016':["A1-116"],'A1-017':["PD-001"],'A1-111':["A1-011"],'A1-116':["A1-016"],'AR-001':["AR-101"],'AR-002':["AR-031"],'AR-003':["AR-103"],'AR-005':["AR-008"],'AR-007':["A1-008"],'AR-008':["AR-005"],'AR-012':["b4_013"],'AR-031':["AR-002"],'AR-101':["AR-001"],'AR-103':["AR-003"],'CG-001':["A1-004"],'CG-002':["A1-006"],'CG-003':["A1-005"],'CM-001':["CM-101"],'CM-002':["CM-006"],'CM-004':["CM-037"],'CM-006':["CM-002"],'CM-037':["CM-004"],'CM-101':["CM-001"],'CO-001':["CO-101"],'CO-005':["CO-030"],'CO-012':["b4_007"],'CO-017':["b5_006"],'CO-030':["CO-005"],'CO-101':["CO-001"],'EC-005':["EC-039"],'EC-039':["EC-005"],'GI-001':["GI-010"],'GI-003':["GI-032"],'GI-005':["GI-036"],'GI-009':["b4_017"],'GI-010':["GI-001"],'GI-011':["b4_016"],'GI-012':["b5_015"],'GI-013':["b5_016"],'GI-032':["GI-003"],'GI-036':["GI-005"],'LD-001':["b5_021"],'MO-001':["MO-101"],'MO-002':["MO-010"],'MO-003':["MO-011"],'MO-004':["MO-016"],'MO-005':["MO-012"],'MO-006':["MO-033"],'MO-007':["MO-034"],'MO-008':["MO-017"],'MO-010':["MO-002"],'MO-011':["MO-003"],'MO-012':["MO-005"],'MO-015':["b4_005"],'MO-016':["MO-004"],'MO-017':["MO-008"],'MO-018':["b5_003"],'MO-033':["MO-006"],'MO-034':["MO-007"],'MO-101':["MO-001"],'NN-001':["A1-012"],'PA-003':["PA-008"],'PA-004':["b4_008"],'PA-008':["PA-003"],'PA-009':["b4_008"],'PA-010':["b5_007"],'PA-011':["b5_008"],'PD-001':["A1-017"],'PR-001':["PR-101"],'PR-002':["PR-008"],'PR-004':["PR-035"],'PR-005':["PR-009"],'PR-006':["A1-013"],'PR-008':["PR-002"],'PR-009':["PR-005"],'PR-010':["b4_014"],'PR-012':["b4_015"],'PR-013':["b5_013"],'PR-035':["PR-004"],'PR-101':["PR-001"],'PS-001':["A1-009"],'QF-001':["A1-015"],'QN-005':["QN-038"],'QN-006':["b5_019"],'QN-038':["QN-005"],'RC-001':["RC-006"],'RC-004':["RC-007"],'RC-006':["RC-001"],'RC-007':["RC-004"],'RC-008':["b5_017"],'RS-004':["RS-008"],'RS-008':["RS-004"],'RS-009':["b5_010"],'TA-001':["TA-101"],'TA-002':["TA-016"],'TA-003':["TA-017"],'TA-004':["TA-104"],'TA-005':["TA-019", "b5_002"],'TA-007':["TA-020"],'TA-008':["TA-021"],'TA-016':["TA-002"],'TA-017':["TA-003"],'TA-018':["b5_001"],'TA-019':["TA-005"],'TA-020':["TA-007"],'TA-021':["TA-008"],'TA-022':["b4_002"],'TA-101':["TA-001"],'TA-104':["TA-004"],'b4_002':["TA-022"],'b4_005':["MO-015"],'b4_007':["CO-012"],'b4_008':["PA-004", "PA-009"],'b4_013':["AR-012"],'b4_014':["PR-010"],'b4_015':["PR-012"],'b4_016':["GI-011"],'b4_017':["GI-009"],'b5_001':["TA-018"],'b5_002':["TA-005"],'b5_003':["MO-018"],'b5_006':["CO-017"],'b5_007':["PA-010"],'b5_008':["PA-011"],'b5_010':["RS-009"],'b5_013':["PR-013"],'b5_015':["GI-012"],'b5_016':["GI-013"],'b5_017':["RC-008"],'b5_019':["QN-006"],'b5_021':["LD-001"]};
-const grammarPeerBlocked=item=>new Set(GRAMMAR_PEER_BLOCKLIST[String(item?.[8]||'')]||[]);
+// Grammar Quality Upgrade A1-B2: saudara satu lesson (subskill sama) otomatis ikut diblokir,
+// supaya template kedua per lesson tidak pernah dipinjam sebagai "penjelasan lesson lain".
+const grammarPeerBlocked=item=>{const set=new Set(GRAMMAR_PEER_BLOCKLIST[String(item?.[8]||'')]||[]);const skill=GRAMMAR_ITEMS.find(x=>x.item===item)?.skill;if(skill)for(const x of GRAMMAR_ITEMS)if(x.skill===skill&&x.item!==item)set.add(String(x.item?.[8]||''));return set};
 function grammarAlternativeMeta(item,field,count=3,opts={}){const own=grammarMeta(item),ownLevel=String(item?.[5]||''),blocked=grammarPeerBlocked(item);
   // m025-155: salt membedakan seed antar-mode (locate_decision_cue tak lagi kembar dengan
   // sequence_reasoning); exclude menolak value (norm) yang sudah dipakai mode lain. Salt
@@ -631,15 +633,34 @@ function grammarAlternativeMeta(item,field,count=3,opts={}){const own=grammarMet
   // mulainya melompat ke mana saja di dalamnya.
   const tiers=[peers.filter(x=>x.family===own.family),peers.filter(x=>x.family!==own.family&&String(x.level||'')===ownLevel),peers];
   const out=[];
+  /* m025-257: BELAHAN BAHASA DI KOLAM PINJAMAN.
+   * contentIntegrityGate() menolak soal yang pilihannya campur Inggris-Indonesia (>=3 opsi
+   * prosa, ada 'en' DAN ada 'id'): bahasanya sendiri yang menunjuk jawaban, jadi soal itu
+   * tidak menguji apa pun. Kolam pinjaman di bawah tidak pernah tahu aturan itu - ia
+   * mengambil peer berdasarkan keluarga/level saja. Selama bank kecil, kebetulan menutupinya;
+   * begitu bank grammar tumbuh (A1-B2 upgrade: 249 -> 328 templat) satu isyarat ingat
+   * berbahasa Inggris murni tertarik ke kolam Indonesia, gerbang menolak soalnya, dan mode
+   * recall_memory_cue HILANG dari dua lesson tanpa satu pun pesan galat.
+   * Perbaikannya bukan menghapus teks Inggris - contoh Inggris memang naskah sah - melainkan
+   * MENDAHULUKAN peer yang bingkai bahasanya sama dengan milik sendiri. Kalau yang sebingkai
+   * tidak cukup, kolam campuran tetap dipakai (perilaku lama) supaya tidak ada lesson yang
+   * kehilangan pilihannya; urutan deterministiknya tidak berubah di dalam tiap kelompok. */
+  const ownFrame=contentLanguageFrame(own[field]);
+  const isProse=v=>norm(v).split(' ').filter(Boolean).length>=6;
+  const frameRank=v=>(!isProse(own[field])||!isProse(v)||ownFrame==='neutral')?0:(contentLanguageFrame(v)===ownFrame?0:1);
   for(const tier of tiers){
     if(out.length>=count)break;
     const pool=[],poolSeen=new Set();
     for(const x of tier){const value=grammarMeta(x.item)?.[field];const key=norm(value);if(value&&key&&!poolSeen.has(key)){poolSeen.add(key);pool.push({value,sourceId:String(x.item?.[8]||''),sourceLevel:String(x.level||'')})}}
     if(!pool.length)continue;
     const start=stableGrammarHash(salt?`${own.id}:${field}:${salt}`:`${own.id}:${field}`)%pool.length;
+    // m025-257: rotasi deterministik lama DIPERTAHANKAN, hanya dibaca dua kali - sebingkai
+    // dulu, baru sisanya. Untuk kolam yang seluruhnya sebingkai (mayoritas) hasilnya identik
+    // byte per byte dengan sebelum perubahan ini.
+    const ordered=[];for(const rank of [0,1])for(let i=0;i<pool.length;i++){const e=pool[(start+i)%pool.length];if(frameRank(e.value)===rank)ordered.push(e)}
     // m025-155: entry kini membawa level dan origin asalnya - pinjaman lintas level dalam
     // keluarga yang sama tidak lagi tanpa label.
-    for(let i=0;i<pool.length&&out.length<count;i++){const entry=pool[(start+i)%pool.length];const value=String(entry.value||'').trim();if(value&&norm(value)!==norm(own[field])&&!excluded.has(norm(value))&&!out.some(x=>norm(x.value)===norm(value)))out.push({value,sourceId:entry.sourceId,sourceLevel:entry.sourceLevel,origin:'peer'})}
+    for(let i=0;i<ordered.length&&out.length<count;i++){const entry=ordered[i];const value=String(entry.value||'').trim();if(value&&norm(value)!==norm(own[field])&&!excluded.has(norm(value))&&!out.some(x=>norm(x.value)===norm(value)))out.push({value,sourceId:entry.sourceId,sourceLevel:entry.sourceLevel,origin:'peer'})}
   }
   // m025-155: filler generik memakai sentinel 'fallback:generic', bukan sourceId kosong yang
   // dulu terstempel own:true + sourceId lesson di makeGrammarQuestion (klaim palsu).
@@ -9115,7 +9136,7 @@ function grammar(){const level=getActiveLevel(),entries=grammarItemsForLevel(lev
   // R2-1: node emas Ujian Skip Level duduk di UJUNG jalur — tak terlihat tanpa scroll
   // panjang. Chip lengket di puncak hub memanggil panel ujian yang SAMA, node ujungnya tetap.
   const examChip=`<button type="button" class="exam-entry-chip${examEntry?.passed?' is-passed':''}" onclick="openActiveLevelExamPanel()" aria-label="${FiezelI18n.t('grammar.ujian-skip-level-level',{level:esc(level),ujian:examEntry?.passed?FiezelI18n.t('level.ujian-sudah-lulus'):FiezelI18n.t('level.ujian-buka-panel')})}"><i data-lucide="${examEntry?.passed?'badge-check':'award'}"></i><span><b>${FiezelI18n.t('level.ujian-judul')}</b><small>${examEntry?.passed?FiezelI18n.t('level.ujian-lulus-terverifikasi'):FiezelI18n.t('level.ujian-merasa-bisa')}</small></span><i data-lucide="arrow-right"></i></button>`;
-  shell(FiezelI18n.t('student.grammar-title'),FiezelI18n.t('grammar.lesson-terurut-for-level-start',{jumlahLesson:skills.length,level:level}),`<div class="grammar-level-note"><b>${FiezelI18n.t('grammar.jalur',{level:esc(level)})}</b><span>${esc(levelDescriptor(level))}</span><small>${FiezelI18n.t('grammar.item-pilihan-boleh-bervariasi-tetapi')}</small></div><div class="grammar-hub-tools">${examChip}<div class="path-view-toggle"><button type="button" onclick="toggleGrammarHubView()" aria-pressed="${grammarHubListView}"><i data-lucide="${grammarHubListView?'route':'list'}"></i> ${grammarHubListView?FiezelI18n.t('level.toggle-path-view'):FiezelI18n.t('level.toggle-list-view')}</button></div></div>${grammarHubListView?listBody:pathBody}`);
+  shell(FiezelI18n.t('student.grammar-title'),FiezelI18n.t('grammar.lesson-terurut-for-level-start',{jumlahLesson:skills.length,level:level}),`<div class="grammar-level-note"><b>${FiezelI18n.t('grammar.jalur',{level:esc(level)})}</b><span>${esc(levelDescriptor(level))}</span><small>${FiezelI18n.t('grammar.item-pilihan-boleh-bervariasi-tetapi')}</small></div><div class="grammar-hub-tools">${examChip}<div class="path-view-toggle"><button type="button" data-testid="grammar-quick-session-btn" onclick="startGrammarQuickSession()"><i data-lucide="zap"></i> ${FiezelI18n.t('grammar.sesi-kilat')}</button></div><div class="path-view-toggle"><button type="button" onclick="toggleGrammarHubView()" aria-pressed="${grammarHubListView}"><i data-lucide="${grammarHubListView?'route':'list'}"></i> ${grammarHubListView?FiezelI18n.t('level.toggle-path-view'):FiezelI18n.t('level.toggle-list-view')}</button></div></div>${grammarHubListView?listBody:pathBody}`);
   // Auto-scroll ke node aktif — sesudah renderInner mengembalikan scroll ke atas.
   // Reduced-motion: lompat tanpa animasi (behavior 'auto'), bukan tanpa fungsi.
   if(!grammarHubListView&&current)setTimeout(()=>{try{document.querySelector('.path-step.is-current')?.scrollIntoView({block:'center',behavior:(prefersReducedMotion()||state.preferences?.motion===false)?'auto':'smooth'})}catch(_){}},140);
@@ -9181,6 +9202,35 @@ function buildGrammarLessonQuestions(skill,count=GRAMMAR_SESSION_SIZE){const met
   for(let variant=0;variant<GRAMMAR_PRACTICE_MODES.length&&unique.length<count;variant++)for(const item of own){if(unique.length>=count)break;take(makeGrammarQuestion(skill,item,variant,skill))}
   return unique}
 function practiceSkill(skill){if((GRAMMAR_ITEMS.find(x=>x.skill===skill)?.level||'')!==getActiveLevel())return showToast(FiezelI18n.t('grammar.pilih-lesson-terlebih-dahulu',{level:getActiveLevel()}));const unlock=lessonUnlockState(skill);if(unlock.locked)return showToast(lessonLockMessage(unlock));const questions=buildGrammarLessonQuestions(skill,GRAMMAR_SESSION_SIZE);if(questions.length<GRAMMAR_SESSION_SIZE)return showToast(FiezelI18n.t('grammar.lesson-new-memiliki-item-valid',{jumlahSoal:questions.length}));quizLoop({type:'grammar',count:GRAMMAR_SESSION_SIZE,pool:questions,factory:item=>item,preserveOrder:true})}
+/* ---- Sesi Kilat: 10 soal grammar campuran lintas lesson satu level ----------------------
+ * Latihan singkat harian. Hanya lesson yang sudah terbuka di level aktif; soal dirotasi antar
+ * lesson (satu per lesson per putaran) dan dibatasi ke mode BENTUK (apply/complete/repair)
+ * supaya cepat dijawab - grammar-nya yang menantang, bukan bacaannya. Direkam sebagai sesi
+ * 'grammar' biasa, jadi mastery per lesson tetap ikut naik. */
+const GRAMMAR_QUICK_SIZE=10;
+const GRAMMAR_QUICK_MODES=new Set(['apply_form','complete_sentence','repair_distractor_1','repair_distractor_2','repair_distractor_3']);
+function buildGrammarQuickQuestions(level=getActiveLevel(),count=GRAMMAR_QUICK_SIZE){
+  const skills=shuffle(grammarItemsForLevel(level).map(x=>x.skill).filter((x,i,a)=>a.indexOf(x)===i).filter(skill=>!lessonUnlockState(skill).locked));
+  if(!skills.length)return[];
+  const pools=new Map(skills.map(skill=>[skill,shuffle(buildGrammarLessonQuestions(skill,GRAMMAR_SESSION_SIZE).filter(q=>GRAMMAR_QUICK_MODES.has(q.practiceMode)))]));
+  const out=[],seen=new Set();
+  for(let round=0;round<GRAMMAR_QUICK_MODES.size&&out.length<count;round++){
+    for(const skill of skills){
+      if(out.length>=count)break;
+      const pool=pools.get(skill);let q;
+      while(pool.length&&!q){const cand=pool.shift();const key=String(cand.question||'').toLowerCase().replace(/\s+/g,' ').trim();if(!seen.has(key)){seen.add(key);q=cand}}
+      if(q)out.push(q);
+    }
+  }
+  return out;
+}
+function startGrammarQuickSession(){
+  const level=getActiveLevel(),questions=buildGrammarQuickQuestions(level);
+  // Level yang baru dibuka cuma punya satu lesson: sesi tetap jalan dengan 5 soal bentuk, bukan ditolak.
+  if(questions.length<GRAMMAR_QUICK_MODES.size)return showToast(FiezelI18n.t('grammar.sesi-kilat-belum-cukup',{level,jumlahSoal:questions.length}));
+  quizLoop({type:'grammar',count:Math.min(GRAMMAR_QUICK_SIZE,questions.length),pool:questions,factory:x=>x,preserveOrder:true});
+}
+window.startGrammarQuickSession=startGrammarQuickSession;
 /* ---- R2-2 GERBANG "LEWATI MATERI" ------------------------------------------------------
  * OWNER: murid yang sudah menguasai satu materi tertentu (mis. kata sandang) harus bisa
  * melewatinya TANPA pindah level. Filosofinya sama dengan Ujian Skip Level: lompatan
