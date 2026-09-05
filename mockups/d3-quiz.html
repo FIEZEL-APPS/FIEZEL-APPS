@@ -1,0 +1,44 @@
+<!doctype html><html lang="id"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<style>
+body{width:auto;min-height:900px}
+.wrap{max-width:760px;margin:0 auto;padding:28px 24px 40px;min-height:900px;position:relative}
+.q{font-size:32px;font-weight:700;line-height:1.35;margin-top:16px}
+.q u{text-decoration:none;background:var(--sun-soft);border-bottom:4px solid var(--sun);padding:0 8px;border-radius:8px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.opt{height:72px;font-size:18px}
+.paws{position:fixed;right:40px;bottom:40px;width:190px;display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+.paws .paw{width:140px}
+.audio{display:inline-flex;align-items:center;gap:10px;height:44px;padding:0 16px;border-radius:999px;background:var(--ink);color:#FDFAF3;font-weight:700;font-size:14px;margin-top:14px}
+.audio .wave i{display:inline-block;width:3px;height:14px;border-radius:2px;background:var(--sun);margin-right:2px}
+.foot{display:flex;justify-content:space-between;align-items:center;margin-top:28px}
+</style></head><body>
+<div class="wrap">
+  <div class="toprow">
+    <span class="iconbtn"><i data-lucide="x" class="i"></i></span>
+    <div style="flex:1"><div class="dots"><i class="g"></i><i class="g"></i><i class="b"></i><i class="g"></i><i class="g"></i><i class="g"></i><i class="d"></i><i></i><i></i><i></i></div></div>
+    <span class="chip flame"><i data-lucide="flame" class="i sm"></i>3</span>
+  </div>
+  <div class="mt-4">
+    <div class="row" style="gap:8px"><span class="pill maroon">Lesson 4</span><span class="pill line">Present Simple</span><span class="pill line">Soal 7 dari 10</span></div>
+    <h2 class="mt-2" style="font-size:20px;color:var(--muted);font-family:var(--body);font-weight:600">Lengkapi kalimatnya.</h2>
+    <p class="q">She <u>______</u> to school by bus every morning.</p>
+    <span class="audio"><i data-lucide="volume-2" class="i sm"></i>Dengarkan <span class="wave"><i style="height:8px"></i><i style="height:16px"></i><i style="height:10px"></i><i style="height:18px"></i><i style="height:7px"></i></span></span>
+  </div>
+  <div class="opts mt-4">
+    <div class="opt"><span class="k">A</span>go</div>
+    <div class="opt"><span class="k">B</span>goes</div>
+    <div class="opt"><span class="k">C</span>going</div>
+    <div class="opt"><span class="k">D</span>is go</div>
+  </div>
+  <div class="foot">
+    <span class="small muted">Tekan <b>A–D</b> di keyboard untuk memilih</span>
+    <a class="btn ghost" style="color:var(--muted)">Lewati</a>
+  </div>
+  <div class="paws">
+    <div class="bubble tail-r" style="font-size:13px">Petunjuk: subjeknya “she”.</div>
+    <img class="paw" src="/assets/brand/paw-mascot-full.svg" alt="">
+  </div>
+</div>
+<script src="/lucide.min.js"></script><script>lucide.createIcons()</script></body></html>

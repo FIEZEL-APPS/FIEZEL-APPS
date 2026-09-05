@@ -7084,7 +7084,7 @@ function todayHomeMarkup(){
     ? `Runtun ${streak} hari! Mantap sekali, ${esc(learnerName())}. Siap lanjut 10 menit hari ini?`
     : `Halo, ${esc(learnerName())}! Belajar 10 menit hari ini untuk mulai runtun barumu.`;
 
-  const heroMascotMarkup=`<aside class="paw-hero-cockpit" onclick="pawReact('celebrate');uiSfx('paw_greet')">
+  const heroMascotMarkup=`<aside class="paw-hero-cockpit" onclick="pawReact('wake');uiSfx('paw_greet')">
     <div class="paw-hero-avatar" aria-label="Maskot PAW">${pawFaceMarkup()}</div>
     <div class="paw-speech-bubble">
       <div class="paw-bubble-title"><span>Kata PAW</span> <i class="fz-i" data-fz-icon="flame" style="width:14px;height:14px"></i></div>
@@ -7125,6 +7125,7 @@ function todayHomeMarkup(){
 
   return `<div class="today-home-cockpit">
   ${heroMascotMarkup}
+  ${learnerFlowHomeMarkup()}
   <section class="today-card" aria-label="${esc(FiezelI18n.t('today.aria-kartu'))}">
     <div class="today-head"><span class="today-eyebrow">${FiezelI18n.t('today.eyebrow')}</span>${pawFaceMarkup()}</div>
     ${rhythmBar}
@@ -7133,6 +7134,7 @@ function todayHomeMarkup(){
     ${activeLevelTrustLineMarkup()}
   </section>
   ${quickChips}
+  ${socialHomeMarkup()}
 </div>`;
 }
 function home(){pawStreakWatch();/* m028-06: kabar demosi yang tertahan selama kuis dibuka di sini, bukan di tengah soal. */if(!state.activeSession&&levelTrustState(state).pendingNotice)setTimeout(()=>{try{flushLevelGuardNotice()}catch(_){}},280);/* W1 P1-2: kabar percobaan-terputus dari boot (sanitizeState) diumumkan SEKALI di beranda. */if(state.pendingInterruptNotice){const iNotice=state.pendingInterruptNotice;state.pendingInterruptNotice='';save();setTimeout(()=>{try{showToast(iNotice)}catch(_){}},900)}/* m025-166: gerbang level yang dipasang di perkenalan muncul di sini - saat murid sudah
@@ -9217,7 +9219,7 @@ function grammar(){const level=getActiveLevel(),entries=grammarItemsForLevel(lev
     // R2-2: FiezelI18n.t('grammar.lewati-materi') pada node yang belum selesai (terbuka ATAU terkunci) — gerbang
     // bukti 5 soal dari templat lesson itu sendiri, bukan lompatan gratis (openLessonSkipGate).
     const skipLink=!r.completed&&!r.examVerified?`<button type="button" class="lesson-skip-link" onclick="openLessonSkipGate('${esc(r.k)}')" aria-label="${FiezelI18n.t('grammar.lewati-materi-lewat-gerbang-bukti',{title:esc(r.title),jumlahSoalGerbang:LESSON_SKIP_GATE_SIZE})}"><i data-lucide="fast-forward"></i> ${FiezelI18n.t('grammar.lewati-materi')}</button>`:'';
-    return `<li class="path-step ${stateClass}${isCurrent?' is-current':''}">${nodeButton}<div class="path-label"${r.unlock.locked?'':` role="button" tabindex="0" onclick="openGrammarLesson('${esc(r.k)}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openGrammarLesson('${esc(r.k)}')}"`}><b>${r.index+1}. ${esc(r.title)}</b><span>${esc(r.family)} · ${FiezelI18n.t('grammar.mastery',{mastery:r.mastery})}${r.examVerified?FiezelI18n.t('level.exam-verified-pill'):''}${isCurrent?FiezelI18n.t('level.current-pill'):''}</span>${showLockNote?`<p class="lesson-lock-note"><i data-lucide="lock"></i><span>${esc(lessonLockMessage(r.unlock))}</span></p>`:''}${skipLink}</div>${isCurrent?`<span class="path-mascot" aria-hidden="true">${pawFaceMarkup()}</span>`:''}</li>`;
+    return `<li class="path-step ${stateClass}${isCurrent?' is-current':''}">${nodeButton}<div class="path-label"${r.unlock.locked?'':` role="button" tabindex="0" onclick="openGrammarLesson('${esc(r.k)}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openGrammarLesson('${esc(r.k)}')}"`}><b>${r.index+1}. ${esc(r.title)}</b><span>${esc(r.family)} · ${FiezelI18n.t('grammar.mastery',{mastery:r.mastery})}${r.examVerified?FiezelI18n.t('level.exam-verified-pill'):''}${isCurrent?FiezelI18n.t('level.current-pill'):''}</span>${showLockNote?`<p class="lesson-lock-note"><i data-lucide="lock"></i><span>${esc(lessonLockMessage(r.unlock))}</span></p>`:''}${isCurrent?`<div class="path-progress" aria-hidden="true"><i style="width:${Math.max(4,Math.min(100,r.mastery))}%"></i></div><button type="button" class="primary path-cta" data-testid="grammar-path-continue" onclick="openGrammarLesson('${esc(r.k)}')">${r.mastery>0?FiezelI18n.t('today.cta-lanjut'):FiezelI18n.t('grammar.buka-lesson')} <i data-lucide="arrow-right"></i></button>`:''}${skipLink}</div>${isCurrent?`<span class="path-mascot" aria-hidden="true">${pawFaceMarkup()}</span>`:''}</li>`;
   }).join('');
   // Ujung jalur: node Ujian Skip Level bergaya emas — tujuan jangka menengah terlihat
   // dari simpul pertama. Panelnya panel ujian yang sudah ada (openActiveLevelExamPanel).
@@ -9228,7 +9230,7 @@ function grammar(){const level=getActiveLevel(),entries=grammarItemsForLevel(lev
   // R2-1: node emas Ujian Skip Level duduk di UJUNG jalur — tak terlihat tanpa scroll
   // panjang. Chip lengket di puncak hub memanggil panel ujian yang SAMA, node ujungnya tetap.
   const examChip=`<button type="button" class="exam-entry-chip${examEntry?.passed?' is-passed':''}" onclick="openActiveLevelExamPanel()" aria-label="${FiezelI18n.t('grammar.ujian-skip-level-level',{level:esc(level),ujian:examEntry?.passed?FiezelI18n.t('level.ujian-sudah-lulus'):FiezelI18n.t('level.ujian-buka-panel')})}"><i data-lucide="${examEntry?.passed?'badge-check':'award'}"></i><span><b>${FiezelI18n.t('level.ujian-judul')}</b><small>${examEntry?.passed?FiezelI18n.t('level.ujian-lulus-terverifikasi'):FiezelI18n.t('level.ujian-merasa-bisa')}</small></span><i data-lucide="arrow-right"></i></button>`;
-  shell(FiezelI18n.t('student.grammar-title'),FiezelI18n.t('grammar.lesson-terurut-for-level-start',{jumlahLesson:skills.length,level:level}),`<div class="grammar-level-note"><b>${FiezelI18n.t('grammar.jalur',{level:esc(level)})}</b><span>${esc(levelDescriptor(level))}</span><small>${FiezelI18n.t('grammar.item-pilihan-boleh-bervariasi-tetapi')}</small></div><div class="grammar-hub-tools">${examChip}<div class="path-view-toggle"><button type="button" data-testid="grammar-quick-session-btn" onclick="startGrammarQuickSession()"><i data-lucide="zap"></i> ${FiezelI18n.t('grammar.sesi-kilat')}</button></div><div class="path-view-toggle"><button type="button" onclick="toggleGrammarHubView()" aria-pressed="${grammarHubListView}"><i data-lucide="${grammarHubListView?'route':'list'}"></i> ${grammarHubListView?FiezelI18n.t('level.toggle-path-view'):FiezelI18n.t('level.toggle-list-view')}</button></div></div>${grammarHubListView?listBody:pathBody}`);
+  shell(FiezelI18n.t('student.grammar-title'),FiezelI18n.t('grammar.lesson-terurut-for-level-start',{jumlahLesson:skills.length,level:level}),`<div class="grammar-level-note fz2-path-summary"><span class="fz2-path-ring" style="--p:${skills.length?Math.round(rows.filter(r=>r.completed||r.examVerified).length/skills.length*100):0}" aria-hidden="true"><span class="fz2-path-ring-count">${rows.filter(r=>r.completed||r.examVerified).length}/${skills.length}</span></span><div><b>${FiezelI18n.t('grammar.jalur',{level:esc(level)})}</b><span>${esc(levelDescriptor(level))}</span><small>${FiezelI18n.t('grammar.item-pilihan-boleh-bervariasi-tetapi')}</small></div></div><div class="grammar-hub-tools">${examChip}<div class="path-view-toggle"><button type="button" data-testid="grammar-quick-session-btn" onclick="startGrammarQuickSession()"><i data-lucide="zap"></i> ${FiezelI18n.t('grammar.sesi-kilat')}</button></div><div class="path-view-toggle"><button type="button" onclick="toggleGrammarHubView()" aria-pressed="${grammarHubListView}"><i data-lucide="${grammarHubListView?'route':'list'}"></i> ${grammarHubListView?FiezelI18n.t('level.toggle-path-view'):FiezelI18n.t('level.toggle-list-view')}</button></div></div>${grammarHubListView?listBody:pathBody}`);
   // Auto-scroll ke node aktif — sesudah renderInner mengembalikan scroll ke atas.
   // Reduced-motion: lompat tanpa animasi (behavior 'auto'), bukan tanpa fungsi.
   if(!grammarHubListView&&current)setTimeout(()=>{try{document.querySelector('.path-step.is-current')?.scrollIntoView({block:'center',behavior:(prefersReducedMotion()||state.preferences?.motion===false)?'auto':'smooth'})}catch(_){}},140);
@@ -11167,59 +11169,51 @@ function learnerFlowHomeMarkup(){
   try{const code=new URL(location.href).searchParams.get('duel');invite=code&&self.FiezelDuel?self.FiezelDuel.decode(code):null}catch(_){}
   const sub=plan?FiezelI18n.t('student.flow-sub-plan',{menit:plan.minutes,done:plan.done.length,total:plan.blocks.length}):lf&&lf.diagnostic?FiezelI18n.t('student.flow-sub-ready'):FiezelI18n.t('student.flow-sub-start');
   const isGuru=isVerifiedTeacher();
-  const inviteCard=invite?`<button class="launch-card duel-invite-card" onclick="go('learn')" data-testid="home-duel-invite"><span class="launch-icon"><i class="fz-i" data-fz-icon="speaking" aria-hidden="true"></i></span><span><small>${esc(invite.from||'Teman')} menantangmu · ${invite.score} poin</small><b>Terima Duel Belajar</b></span><i data-lucide="arrow-up-right"></i></button>`:'';
+  const inviteCard=invite?`<button class="launch-card duel-invite-card" onclick="go('learn')" data-testid="home-duel-invite"><span class="launch-icon"><i class="fz-i" data-fz-icon="speaking" aria-hidden="true"></i></span><span><small>${esc(FiezelI18n.t('student.duel-invite-sub',{from:invite.from||FiezelI18n.t('student.duel-invite-anon'),score:Number(invite.score)||0}))}</small><b>${FiezelI18n.t('student.duel-invite-title')}</b></span><i data-lucide="arrow-up-right"></i></button>`:'';
   const learnCard=`<button class="launch-card learn-launch" onclick="go('learn')" data-testid="home-learn-flow"><span class="launch-icon"><i class="fz-i" data-fz-icon="grammar" aria-hidden="true"></i></span><span><small>${esc(sub)}</small><b>${FiezelI18n.t('student.flow-title')}</b></span><i data-lucide="arrow-up-right"></i></button>`;
-  const tutorCard=`<button class="launch-card tutor-launch" onclick="go('tutor')" data-testid="home-tutor-center"><span class="launch-icon"><i class="fz-i" data-fz-icon="map" aria-hidden="true"></i></span><span><small>Peranmu: Guru · briefing, deteksi dini, tugas, laporan ortu</small><b>Ruang Guru</b></span><i data-lucide="arrow-up-right"></i></button>`;
-  return `<div class="home-section-head"><div><h2>${isGuru?'Ruang guru':FiezelI18n.t('student.flow-heading')}</h2></div></div>
+  const tutorCard=`<button class="launch-card tutor-launch" onclick="go('tutor')" data-testid="home-tutor-center"><span class="launch-icon"><i class="fz-i" data-fz-icon="map" aria-hidden="true"></i></span><span><small>${esc(FiezelI18n.t('student.tutor-sub'))}</small><b>${FiezelI18n.t('student.tutor-title')}</b></span><i data-lucide="arrow-up-right"></i></button>`;
+  return `<div class="home-section-head"><div><h2>${isGuru?FiezelI18n.t('student.tutor-heading'):FiezelI18n.t('student.flow-heading')}</h2></div></div>
 <div class="learning-launcher learner-flow-launcher">${inviteCard}${isGuru?tutorCard+learnCard:learnCard}
 </div>`;
 }
 function cefrRoadmapMarkup(){
   const activeLevel=getActiveLevel();
-  const levels=['A1','A2','B1','B2'];
-  const activeIdx=levels.indexOf(activeLevel)>=0?levels.indexOf(activeLevel):1;
-  const steps=levels.map((lvl,idx)=>{
-    const isPassed=idx<activeIdx;
-    const isActive=idx===activeIdx;
-    const cls=isPassed?'passed':(isActive?'active':'');
-    return `<div class="cefr-step ${cls}">
-      <div class="cefr-dot">${isPassed?'✓':lvl}</div>
-      <span class="cefr-step-label">${isActive?lvl+' (Kamu)':lvl}</span>
-    </div>`;
-  }).join('');
-  return `<div class="cefr-roadmap-card">
-    <div style="display:flex;align-items:center;justify-content:space-between">
-      <div>
-        <h3 style="margin:0;font-size:15px;color:var(--text)">Jalur Kemahiran CEFR</h3>
-        <small style="color:var(--muted)">Target kurikulum: B1 Mandiri</small>
-      </div>
-      <span class="skill-badge" style="background:var(--sun-soft);padding:4px 8px;border-radius:6px;color:var(--text)">Level ${esc(activeLevel)}</span>
-    </div>
-    <div class="cefr-track-line">${steps}</div>
-  </div>`;
+  const activeIdx=Math.max(0,LEVELS.indexOf(activeLevel));
+  const nextLevel=LEVELS[activeIdx+1]||null;
+  // Kemajuan menuju level berikutnya = porsi lesson grammar level aktif yang sudah menembus ambang unlock.
+  let total=0,done=0;
+  try{const skills=grammarItemsForLevel(activeLevel).map(x=>x.skill).filter((x,i,a)=>a.indexOf(x)===i);total=skills.length;done=skills.filter(k=>(state.grammar[k]?.mastery||0)>=GRAMMAR_UNLOCK_MASTERY).length}catch(_){}
+  const pct=total?Math.round(done/total*100):0;
+  const streak=Number(state.streak)||0;
+  const track=LEVELS.map((lvl,idx)=>`<span class="fz2-lvl${idx<activeIdx?' is-done':idx===activeIdx?' is-now':''}" style="${idx===activeIdx?`--p:${pct}`:''}">${esc(lvl)}</span>`).join('');
+  const lead=nextLevel
+    ?FiezelI18n.t('progress2.level-lead',{pct,next:nextLevel,sisa:Math.max(0,total-done)})
+    :FiezelI18n.t('progress2.level-top');
+  return `<section class="fz2-level card" data-testid="progress-level-card" aria-label="${FiezelI18n.t('progress2.level-aria')}">
+    <div class="fz2-level-head"><span class="eyebrow">${FiezelI18n.t('progress2.level-eyebrow')}</span>${streak>0?`<span class="fz2-level-streak"><i class="fz-i" data-fz-icon="flame" aria-hidden="true"></i>${FiezelI18n.t('progress2.streak',{days:streak})}</span>`:''}</div>
+    <div class="fz2-level-body"><b class="fz2-level-big">${esc(activeLevel)}</b><p class="fz2-level-lead">${esc(lead)}</p><span class="fz2-level-paw" aria-hidden="true">${pawFaceMarkup()}</span></div>
+    <div class="fz2-lvls" aria-hidden="true">${track}</div>
+  </section>`;
 }
 function weeklyActivityChartMarkup(){
-  const days=['Sen','Sel','Rab','Kam','Jum','Sab','Min'];
-  const todayIdx=(new Date().getDay()+6)%7;
-  const heights=[45,60,30,80,65,90,40];
-  const cols=days.map((day,idx)=>{
-    const isToday=idx===todayIdx;
-    const h=isToday?Math.max(heights[idx],60):heights[idx];
-    return `<div class="weekly-bar-col ${isToday?'today':''}">
-      <div class="weekly-bar-pillar ${isToday?'active':''}" style="height:${h}%"></div>
-      <span class="weekly-day-label">${day}</span>
-    </div>`;
-  }).join('');
-  return `<div class="weekly-activity-card">
-    <div style="display:flex;align-items:center;justify-content:space-between">
-      <div>
-        <h3 style="margin:0;font-size:15px;color:var(--text)">Aktivitas 7 Hari Terakhir</h3>
-        <small style="color:var(--muted)">Rata-rata 12 menit / hari</small>
-      </div>
-      <span style="font-weight:700;color:var(--good,#2E7D32);font-size:12px">↑ 18% dari pekan lalu</span>
-    </div>
-    <div class="weekly-bars">${cols}</div>
-  </div>`;
+  const tl=skillTimeline();
+  const today=new Date();today.setHours(12,0,0,0);
+  const dayNames=FiezelI18n.t('progress2.days').split(',');
+  let activeDays=0,totalItems=0;
+  const cells=[];
+  for(let i=6;i>=0;i--){
+    const d=new Date(today);d.setDate(today.getDate()-i);
+    const key=dayKey(d.getTime());
+    const n=Object.values(tl[key]||{}).reduce((a,x)=>a+(x.total||0),0);
+    if(n>0)activeDays++;totalItems+=n;
+    const cls=n>=20?'is-big':n>0?'is-on':i===0?'is-today':'';
+    cells.push(`<div class="fz2-day"><i class="${cls}" title="${n} soal"></i><span>${esc(dayNames[(d.getDay()+6)%7]||'')}</span></div>`);
+  }
+  return `<section class="fz2-week card" data-testid="progress-week-card">
+    <div class="fz2-week-head"><b>${FiezelI18n.t('progress2.week-title')}</b><span class="fz2-week-pill">${FiezelI18n.t('progress2.week-pill',{days:activeDays})}</span></div>
+    <div class="fz2-days">${cells.join('')}</div>
+    <p class="muted fz2-week-note">${esc(totalItems?FiezelI18n.t('progress2.week-note',{items:totalItems}):FiezelI18n.t('progress2.week-empty'))}</p>
+  </section>`;
 }
 function progress(){
  const active=getActiveLevel(),snapshot=buildLearningSnapshot(),acc=snapshot.totalAccuracy??0;const profile=getDiagnosticProfile();const map=[[FiezelI18n.t('progress.vocab'),'vocab',state.vocab],['Grammar','grammar',state.grammar],['Reading','reading',state.reading]];
@@ -12107,10 +12101,11 @@ async function renderOnlineTab(){
   const seq=++onlineSeq;
   const put=html=>{if(seq!==onlineSeq||state.view!=='online')return;const el=$('onlineRoot');if(el){el.innerHTML=html;enhanceUI()}};
   const core=socialCore();
-  if(!core)return put(card(`<h3>${FiezelI18n.t('social.not-loaded-title')}</h3><p class="muted">${FiezelI18n.t('social.not-loaded-body')}</p>`,'social-card'));
-  if(typeof navigator!=='undefined'&&navigator.onLine===false)return put(socialOfflineCard());
+  const extra=onlineTab==='teman'?socialClassCardMarkup():'';
+  if(!core)return put(card(`<h3>${FiezelI18n.t('social.not-loaded-title')}</h3><p class="muted">${FiezelI18n.t('social.not-loaded-body')}</p>`,'social-card')+extra);
+  if(typeof navigator!=='undefined'&&navigator.onLine===false)return put(socialOfflineCard()+extra);
   let flag='off';try{flag=await core.probeFlag()}catch(_){flag='off'}
-  if(flag!=='on')return put(socialFlagOffCard(flag));
+  if(flag!=='on')return put(socialFlagOffCard(flag)+extra);
   try{await core.ensureAnon()}catch(_){}
   try{
     if(onlineTab==='teman')return put(await socialTemanMarkup(core));
@@ -12185,10 +12180,11 @@ async function socialCreateProfile(){
 }
 window.socialCreateProfile=socialCreateProfile;
 /* ---------------------------------------------------------------- tab TEMAN */
+function socialClassCardMarkup(){const classCode=learnerClassCode();return card(`<div class="fz2-classrow"><div><h3>${FiezelI18n.t('social2.class-title')}</h3><p class="muted">${classCode?esc(FiezelI18n.t('social2.class-current',{code:classCode})):FiezelI18n.t('social2.class-desc')}</p></div><button type="button" class="${classCode?'':'primary'}" onclick="openJoinClassModal()" data-testid="teman-join-class"><i data-lucide="school"></i> ${classCode?FiezelI18n.t('social2.class-change'):FiezelI18n.t('social2.class-btn')}</button></div>`,'social-card')}
 function socialNeedProfileCard(){return card(`<h3>${FiezelI18n.t('social.need-profile-title')}</h3><p class="muted">${FiezelI18n.t('social.need-profile-body')}</p><div class="modal-actions"><button class="primary" onclick="switchOnlineTab('profil')"><i data-lucide="user-plus"></i> ${FiezelI18n.t('social.create-btn')}</button></div>`,'social-card')}
 async function socialTemanMarkup(core){
   const fr=await core.api.friends();
-  if(fr.error==='profile_required')return socialNeedProfileCard();
+  if(fr.error==='profile_required')return socialNeedProfileCard()+socialClassCardMarkup();
   if(!fr.ok)return card(`<h3>${FiezelI18n.t('social.friends-error-title')}</h3><p class="muted">${esc(fr.message)}</p>`,'social-card');
   const friends=Array.isArray(fr.data?.friends)?fr.data.friends:[];
   const cheers=Array.isArray(fr.data?.cheersToday)?fr.data.cheersToday:[];
@@ -12199,12 +12195,15 @@ async function socialTemanMarkup(core){
     <div class="modal-actions"><button ${socialInviteLast?'':'class="primary"'} id="socialMintBtn" onclick="socialMintInvite()"><i data-lucide="ticket"></i> ${socialInviteLast?FiezelI18n.t('social.new-code-btn'):FiezelI18n.t('social.print-code-btn')}</button></div>`,'social-card');
   const redeemCard=card(`<h3>${FiezelI18n.t('social.have-code-title')}</h3><label class="endpoint-label">${FiezelI18n.t('social.invite-code-label')}<input id="socialRedeemInput" type="text" maxlength="12" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="mis. K3JQ7W2A" value="${esc(urlInvite)}"></label><div class="modal-actions"><button class="primary" onclick="socialRedeem()"><i data-lucide="handshake"></i> ${FiezelI18n.t('social.redeem-btn')}</button></div>`,'social-card');
   const cheerFeed=cheers.length?card(`<h3>${FiezelI18n.t('social.cheers-title')}</h3>${cheers.map(c=>{const m=core.stickerMeta(c.sticker);return `<div class="row"><span>${m?m.emoji:''} ${FiezelI18n.t('social.cheer-from',{handle:esc(c.handle)})}</span><b>×${Math.max(1,Number(c.cnt)||1)}</b></div>`}).join('<hr>')}`,'social-card'):'';
+  const myHandle=socialProfileCache?.handle||'';
+  const addCard=card(`<h3>${FiezelI18n.t('social2.add-title')}</h3><p class="muted">${FiezelI18n.t('social2.add-desc')}</p>${myHandle?`<p class="fz2-myid" data-testid="my-social-id">${esc(FiezelI18n.t('social2.my-id',{handle:myHandle}))}</p>`:''}<div class="fz2-inline"><input id="socialAddInput" type="text" maxlength="21" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="@nama_teman" aria-label="${FiezelI18n.t('social2.add-label')}" data-testid="add-friend-input"><button class="primary" id="socialAddBtn" onclick="socialAddByHandle()" data-testid="add-friend-submit"><i data-lucide="user-plus"></i> ${FiezelI18n.t('social2.add-btn')}</button></div>`,'social-card fz2-add-card');
+  const classCard=socialClassCardMarkup();
   const list=friends.length?friends.map(f=>{
     const vis=f.visible!==false;
     const milestones=vis&&Array.isArray(f.milestones)?f.milestones.slice(0,3).map(m=>`<span class="social-chip">${esc(core.milestoneLabel(m.kind))}</span>`).join(''):'';
     return `<div class="social-friend"><span class="social-avatar" aria-hidden="true">${esc(String(f.handle||'?').charAt(0).toUpperCase())}</span><div class="social-friend-body"><b>@${esc(f.handle)}</b><small>${esc(core.presenceLabel(f))}${vis&&f.band?` · ${esc(f.band)}`:''}${vis&&Number(f.streakDays)>0?` · 🔥 ${Number(f.streakDays)} hari`:''}</small>${milestones?`<div class="social-chips">${milestones}</div>`:''}</div><button type="button" class="social-cheer-btn" onclick="socialOpenCheer('${esc(f.handle)}')" aria-label="${FiezelI18n.t('social.cheer-modal-title',{handle:esc(f.handle)})}">👏 ${FiezelI18n.t('social.cheer-btn')}</button></div>`;
   }).join(''):`<div class="social-empty"><p><b>${FiezelI18n.t('social.no-friends-title')}</b></p><p class="muted">${FiezelI18n.t('social.no-friends-body')}</p></div>`;
-  return inviteCard+redeemCard+cheerFeed+card(`<h3>${FiezelI18n.t('social.friends-list-title',{count:friends.length})}</h3><p class="muted">${FiezelI18n.t('social.friends-list-desc')}</p>${list}`,'social-card');
+  return addCard+classCard+card(`<h3>${FiezelI18n.t('social.friends-list-title',{count:friends.length})}</h3><p class="muted">${FiezelI18n.t('social.friends-list-desc')}</p>${list}`,'social-card')+cheerFeed+`<details class="fz2-more"><summary>${FiezelI18n.t('social2.more-ways')}</summary>${inviteCard}${redeemCard}</details>`;
 }
 async function socialMintInvite(){
   const core=socialCore();if(!core)return;
@@ -12350,7 +12349,12 @@ async function refreshSocialSummaryCard(){
   if(me.ok&&me.data?.profile){
     socialProfileCache=me.data.profile;
     const board=await core.api.boardFriends();
-    socialSummaryCache={kind:'profile',handle:me.data.profile.handle,pb:board.ok&&board.data?.me?Number(board.data.me.pb)||0:null};
+    let friends=[];try{const fr=await core.api.friends();if(fr.ok&&Array.isArray(fr.data?.friends))friends=fr.data.friends}catch(_){}
+    /* Hitungan permintaan diambil di sini, sekali per penyegaran ringkasan, supaya
+       tombol "Permintaan" di panel Home tahu ada berapa yang menunggu tanpa satu
+       ronde jaringan sendiri tiap render. */
+    try{await refreshFriendRequestCount()}catch(_){}
+    socialSummaryCache={kind:'profile',handle:me.data.profile.handle,pb:board.ok&&board.data?.me?Number(board.data.me.pb)||0:null,friends};
   }else if(me.error==='profile_required')socialSummaryCache={kind:'cta'};
   else socialSummaryCache={kind:'off'};
   socialSummaryAt=Date.now();
@@ -12374,30 +12378,131 @@ function socialHomeMarkup(){
 }
 function socialHomeBody(){
   const c=socialSummaryCache;
-  if(!c||c.kind==='off'||c.kind==='offline')return '';
-  // Undangan yang belum dijawab MENANG atas kartu biasa. Ini keadaan yang dicatat handoff
-  // m025-240 §8 sebagai yang paling layak dikerjakan berikutnya: sebelum ini kartu Home
-  // hanya membedakan sudah/belum punya profil, jadi undangan yang tiba lewat tautan tidak
-  // meninggalkan satu pun jejak yang bisa dilihat murid dari layar yang ia lewati tiap hari.
   const pendingInvite=socialPendingInvite();
-  if(pendingInvite&&pendingInvite.kind==='friend'){
-    return `<div class="home-section-head"><div><h2>${FiezelI18n.t('social.summary-title')}</h2></div></div>
-<div class="learning-launcher social-home-launcher">
-  <button class="launch-card social-launch social-launch-invite" onclick="socialHomeOpenInvite()" data-testid="home-social-invite"><span class="launch-icon"><i data-lucide="mail-open" aria-hidden="true"></i></span><span><small>${FiezelI18n.t('social.home-pending-sub')}</small><b>${FiezelI18n.t('social.home-pending-open')}</b></span><i data-lucide="arrow-up-right"></i></button>
-</div>`;
-  }
   const unread=socialUnreadCount();
-  const sub=unread>0
-    ?FiezelI18n.t('social.home-sub-unread',{count:unread})
-    :c.kind==='profile'
-      ?FiezelI18n.t('social.home-sub-profile',{handle:esc(c.handle||''),pb:c.pb==null?'—':c.pb})
-      :FiezelI18n.t('social.home-sub-cta');
+  const cls=learnerClassCode();
+  const friends=c&&c.kind==='profile'&&Array.isArray(c.friends)?c.friends:[];
+  const online=friends.filter(f=>f.studiedToday===true).length;
+  let sub;
+  if(!c)sub=FiezelI18n.t('social.summary-loading');
+  else if(c.kind==='off'||c.kind==='offline')sub=FiezelI18n.t('social2.panel-sub-off');
+  else if(c.kind==='cta')sub=FiezelI18n.t('social2.panel-sub-cta');
+  else if(!friends.length)sub=FiezelI18n.t('social2.panel-sub-none');
+  else sub=FiezelI18n.t('social2.panel-sub-friends',{count:friends.length,online});
+  const canSocial=c&&c.kind==='profile';
+  const avatars=friends.length?`<div class="fz2-friends" aria-hidden="true">${friends.slice(0,6).map(f=>`<span class="fz2-friend${f.studiedToday?' is-online':''}" title="@${esc(f.handle)}">${esc(String(f.handle||'?').charAt(0).toUpperCase())}</span>`).join('')}${friends.length>6?`<span class="fz2-friend fz2-friend-more">+${friends.length-6}</span>`:''}</div>`:'';
+  const inviteBtn=pendingInvite&&pendingInvite.kind==='friend'?`<button type="button" class="fz2-act is-hot" onclick="socialHomeOpenInvite()" data-testid="home-social-invite"><i data-lucide="mail-open"></i><span>${FiezelI18n.t('social.home-pending-open')}</span></button>`:'';
   const badge=unread>0?`<span class="social-badge" aria-hidden="true">${unread>9?'9+':unread}</span>`:'';
-  return `<div class="home-section-head"><div><h2>${FiezelI18n.t('social.summary-title')}</h2></div></div>
-<div class="learning-launcher social-home-launcher">
-  <button class="launch-card social-launch${unread>0?' social-launch-news':''}" onclick="socialHomeOpenOnline()" data-testid="home-online-teman"><span class="launch-icon"><i data-lucide="users" aria-hidden="true"></i>${badge}</span><span><small>${sub}</small><b>${FiezelI18n.t('social.home-open')}</b></span><i data-lucide="arrow-up-right"></i></button>
-</div>`;
+  return `<section class="fz2-social card" data-testid="home-online-panel">
+  <div class="fz2-social-head"><div><span class="eyebrow">${FiezelI18n.t('social2.panel-title')}</span><p class="fz2-social-sub">${esc(sub)}</p></div><button type="button" class="fz2-link" onclick="socialHomeOpenOnline()" data-testid="home-online-teman">${FiezelI18n.t('social2.open-friends')} <i data-lucide="arrow-right"></i>${badge}</button></div>
+  ${avatars}
+  <div class="fz2-acts">
+    ${inviteBtn}
+    ${canSocial&&socialRequestCount>0?`<button type="button" class="fz2-act is-hot" onclick="openFriendRequestsModal()" data-testid="home-friend-requests"><i data-lucide="handshake"></i><span>${esc(FiezelI18n.t('social2.req-title'))} · ${esc(FiezelI18n.t('social2.req-count',{n:socialRequestCount}))}</span></button>`:''}
+    <button type="button" class="fz2-act" onclick="${canSocial?'openAddFriendModal()':'socialHomeOpenOnline()'}" data-testid="home-add-friend"><i data-lucide="user-plus"></i><span>${FiezelI18n.t('social2.add-friend')}</span></button>
+    <button type="button" class="fz2-act${cls?' is-set':''}" onclick="openJoinClassModal()" data-testid="home-join-class"><i data-lucide="school"></i><span>${cls?esc(FiezelI18n.t('social2.class-current',{code:cls})):FiezelI18n.t('social2.join-class')}</span></button>
+  </div>
+</section>`;
 }
+/* ------------------------------------------------ tambah teman lewat ID + gabung kelas */
+function learnerClassCode(){try{const r=JSON.parse(localStorage.getItem('fiezel-onboarding-v1')||'{}');return String(r.classCode||'').trim()}catch(_){return ''}}
+function openAddFriendModal(){
+  const me=socialProfileCache?.handle?`<p class="fz2-myid" data-testid="my-social-id">${esc(FiezelI18n.t('social2.my-id',{handle:socialProfileCache.handle}))}</p>`:'';
+  openModal(`<div class="modal-mark">${FiezelI18n.t('social2.panel-title')}</div><h2>${FiezelI18n.t('social2.add-title')}</h2><p class="muted">${FiezelI18n.t('social2.add-desc')}</p>${me}
+    <label class="endpoint-label">${FiezelI18n.t('social2.add-label')}<input id="socialAddInput" type="text" maxlength="21" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="@nama_teman" data-testid="add-friend-input"></label>
+    <div class="modal-actions"><button onclick="closeModal()">${FiezelI18n.t('coach.close-aria')}</button><button class="primary" id="socialAddBtn" onclick="socialAddByHandle()" data-testid="add-friend-submit"><i data-lucide="user-plus"></i> ${FiezelI18n.t('social2.add-btn')}</button></div>`);
+  setTimeout(()=>{try{$('socialAddInput')?.focus()}catch(_){}},60);
+}
+window.openAddFriendModal=openAddFriendModal;
+async function socialAddByHandle(){
+  const core=socialCore();if(!core)return;
+  const raw=String($('socialAddInput')?.value||'').trim().replace(/^@/,'').toLowerCase();
+  if(!raw)return showToast(FiezelI18n.t('social2.add-empty'));
+  const btn=$('socialAddBtn');if(btn)btn.disabled=true;
+  const res=await core.api.friendAdd(raw);
+  if(res.ok){const h=res.data?.friend?.handle||raw;showToast(FiezelI18n.t(res.data?.status==='friends'?'social2.add-ok':'social2.add-pending',{handle:h}));socialSummaryAt=0;closeModal();try{socialMicroMoment('friend')}catch(_){}if(state.view==='online')renderOnlineTab();else refreshSocialSummaryCard();return}
+  if(btn)btn.disabled=false;
+  showToast(res.error==='code_invalid'||res.status===400?FiezelI18n.t('social2.add-invalid'):res.message);
+}
+window.socialAddByHandle=socialAddByHandle;
+/* ---------------------------------------------- permintaan teman: terima / tolak ------
+   Menambah teman lewat ID hanya MENGIRIM permintaan; pertemanan baru terjadi kalau
+   yang diminta menekan Terima di sini. Hitungannya diambil bersama ringkasan sosial
+   supaya tombolnya cuma muncul ketika memang ada yang menunggu - kalau tidak, ia
+   hanya menambah satu tombol mati di panel yang sudah padat. */
+let socialRequestCount=0;
+async function refreshFriendRequestCount(){
+  const core=socialCore();if(!core)return 0;
+  try{
+    const res=await core.api.friendRequests();
+    socialRequestCount=res.ok&&Array.isArray(res.data?.requests)?res.data.requests.length:0;
+  }catch(_){socialRequestCount=0}
+  return socialRequestCount;
+}
+window.refreshFriendRequestCount=refreshFriendRequestCount;
+function friendRequestRow(r){
+  const h=esc(String(r.handle||''));
+  const name=esc(String(r.displayName||r.handle||''));
+  return `<div class="social-request-row" data-testid="friend-request-${h}">
+    <span class="social-avatar" aria-hidden="true">${esc(String(r.handle||'?').charAt(0).toUpperCase())}</span>
+    <div class="social-request-who"><b>${name}</b><small>@${h}</small></div>
+    <div class="social-request-acts">
+      <button type="button" class="text-button" onclick="decideFriendRequest('${h}',false)" data-testid="reject-${h}">${FiezelI18n.t('social2.req-reject')}</button>
+      <button type="button" class="primary" onclick="decideFriendRequest('${h}',true)" data-testid="accept-${h}">${FiezelI18n.t('social2.req-accept')}</button>
+    </div>
+  </div>`;
+}
+async function openFriendRequestsModal(){
+  const core=socialCore();if(!core)return;
+  openModal(`<div class="modal-mark">${FiezelI18n.t('social2.panel-title')}</div><h2>${FiezelI18n.t('social2.req-title')}</h2>
+    <div id="socialRequestList"><p class="muted">${FiezelI18n.t('social2.req-loading')}</p></div>
+    <div class="modal-actions"><button onclick="closeModal()">${FiezelI18n.t('coach.close-aria')}</button></div>`);
+  await renderFriendRequests();
+}
+window.openFriendRequestsModal=openFriendRequestsModal;
+async function renderFriendRequests(){
+  const core=socialCore(),box=$('socialRequestList');if(!core||!box)return;
+  const res=await core.api.friendRequests();
+  const list=res.ok&&Array.isArray(res.data?.requests)?res.data.requests:[];
+  socialRequestCount=list.length;
+  box.innerHTML=list.length?list.map(friendRequestRow).join(''):`<p class="muted">${FiezelI18n.t('social2.req-empty')}</p>`;
+  try{enhanceUI()}catch(_){}
+}
+async function decideFriendRequest(handle,accept){
+  const core=socialCore();if(!core)return;
+  const h=String(handle||'').trim().replace(/^@/,'').toLowerCase();
+  if(!h)return;
+  const res=accept?await core.api.friendAccept(h):await core.api.friendReject(h);
+  if(!res.ok)return showToast(res.error==='code_invalid'||res.status===400?FiezelI18n.t('social2.add-invalid'):res.message);
+  showToast(FiezelI18n.t(accept?'social2.req-accepted':'social2.req-rejected',{handle:h}));
+  socialSummaryAt=0;
+  await renderFriendRequests();
+  if(accept){try{socialMicroMoment('friend')}catch(_){}}
+  if(state.view==='home')render();
+}
+window.decideFriendRequest=decideFriendRequest;
+function openJoinClassModal(){
+  const cur=learnerClassCode();
+  openModal(`<div class="modal-mark">${FiezelI18n.t('nav.school')}</div><h2>${FiezelI18n.t('social2.class-title')}</h2><p class="muted">${FiezelI18n.t('social2.class-desc')}</p>
+    ${cur?`<p class="fz2-myid" data-testid="current-class-code">${esc(FiezelI18n.t('social2.class-current',{code:cur}))}</p>`:''}
+    <label class="endpoint-label">${FiezelI18n.t('social2.class-label')}<input id="classJoinInput" type="text" maxlength="12" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="mis. 7A-2026" value="${esc(cur)}" data-testid="join-class-input"></label>
+    <div class="modal-actions">${cur?`<button class="danger" onclick="leaveClassCode()" data-testid="leave-class-btn">${FiezelI18n.t('social2.class-leave')}</button>`:`<button onclick="closeModal()">${FiezelI18n.t('coach.close-aria')}</button>`}<button class="primary" onclick="joinClassWithCode()" data-testid="join-class-submit"><i data-lucide="school"></i> ${FiezelI18n.t('social2.class-btn')}</button></div>`);
+  setTimeout(()=>{try{$('classJoinInput')?.focus()}catch(_){}},60);
+}
+window.openJoinClassModal=openJoinClassModal;
+function saveClassCode(code){try{const ob=JSON.parse(localStorage.getItem('fiezel-onboarding-v1')||'{}');ob.classCode=code;localStorage.setItem('fiezel-onboarding-v1',JSON.stringify(ob))}catch(_){}}
+function joinClassWithCode(){
+  const raw=String($('classJoinInput')?.value||'').trim().toUpperCase();
+  if(!raw)return showToast(FiezelI18n.t('social2.class-empty'));
+  if(!/^[A-Z0-9][A-Z0-9-]{2,11}$/.test(raw))return showToast(FiezelI18n.t('social2.class-invalid'));
+  saveClassCode(raw);
+  showToast(FiezelI18n.t('social2.class-ok',{code:raw}));
+  try{self.FiezelLearnerFlow?.pushToClass?.()}catch(_){}
+  closeModal();render();
+}
+window.joinClassWithCode=joinClassWithCode;
+function leaveClassCode(){saveClassCode('');showToast(FiezelI18n.t('social2.class-left'));closeModal();render()}
+window.leaveClassCode=leaveClassCode;
 /** Ketukan pada kartu undangan = membuka lembar yang sama, bukan melempar ke layar lain. */
 function socialHomeOpenInvite(){
   const link=inviteLink();const entry=link?link.pending():null;

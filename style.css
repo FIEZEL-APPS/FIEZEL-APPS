@@ -61,6 +61,10 @@
   --green-soft:#E9F7F0;
   --red:#B8432D;
   --red-soft:#FDE3DE;
+  /* --radius-xl dipakai 13 kali oleh kartu besar redesign (kokpit Home, hero PAW, kartu
+     fz2) tetapi tidak pernah didefinisikan - tiap call site hidup dari nilai cadangannya
+     sendiri, dan gerbang token search-feedback menandainya. Didefinisikan sekali di sini. */
+  --radius-xl:28px;
   --radius-lg:24px;
   --radius-md:16px;
   --radius-sm:12px;
@@ -805,6 +809,10 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
   --green-soft:#E9F7F0;
   --red:#B8432D;
   --red-soft:#FDE3DE;
+  /* --radius-xl dipakai 13 kali oleh kartu besar redesign (kokpit Home, hero PAW, kartu
+     fz2) tetapi tidak pernah didefinisikan - tiap call site hidup dari nilai cadangannya
+     sendiri, dan gerbang token search-feedback menandainya. Didefinisikan sekali di sini. */
+  --radius-xl:28px;
   --radius-lg:24px;
   --radius-md:16px;
   --radius-sm:12px;
@@ -978,7 +986,7 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 .primary:hover{background:var(--sun-deep);border-color:var(--sun-deep)}
 
 /* Premium Home Launcher */
-.home-page{display:grid;gap:var(--sp-6)}
+.home-page{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--sp-6)}/* kolom minmax(0,1fr): tanpa itu kolom implisit dilebarkan oleh min-content anak terlebar, dan di 320px Home menggeser horizontal (gerbang T6). */
 .launcher-shell{
   position:relative;overflow:hidden;display:grid;grid-template-columns:minmax(0,1.42fr) minmax(300px,.72fr);gap:36px;
   grid-template-rows:1fr;
@@ -4978,7 +4986,11 @@ html body #app .social-home-launcher .launch-card{background:var(--pz-sky);borde
   height: 40px;
 }
 .paw-speech-bubble {
-  flex: 1;
+  /* min-width:0 wajib: tanpa itu balon adalah flex-item yang menolak menyusut di bawah
+     lebar min-content-nya, dan di 320px seluruh kokpit Home ikut melebar sampai halaman
+     menggeser horizontal (gerbang T6 ui-render-audit). */
+  flex: 1 1 0;
+  min-width: 0;
   position: relative;
   background: var(--panel-soft, #FFFDF8);
   border: 1.5px solid var(--line);
@@ -5014,6 +5026,7 @@ html body #app .social-home-launcher .launch-card{background:var(--pz-sky);borde
   margin-bottom: 3px;
 }
 .paw-speech-bubble .paw-bubble-text {
+  overflow-wrap: anywhere;
   font-size: 12px;
   line-height: 1.4;
   color: var(--muted);
@@ -5056,7 +5069,8 @@ html body #app .social-home-launcher .launch-card{background:var(--pz-sky);borde
 }
 .quick-chips-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  /* minmax(0,...): chip berisi label nowrap, jadi kolom 1fr biasa menolak menyusut di 320px. */
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
   margin-top: 10px;
 }
@@ -5174,7 +5188,9 @@ html body #app .social-home-launcher .launch-card{background:var(--pz-sky);borde
   gap: 4px;
   padding: 3px 8px;
   border-radius: 99px;
-  background: #FFFFFF;
+  /* Latar dipaku putih di bawah teks bertema = 1,08:1 saat Tema Malam (gerbang kontras
+     m025-85). Token panel mengikuti tema, jadi lencana tetap terbaca di kedua tema. */
+  background: var(--panel);
   color: var(--pz-pink-ink);
   font-size: 10px;
   font-weight: 700;
@@ -5344,3 +5360,13 @@ html body #app .social-home-launcher .launch-card{background:var(--pz-sky);borde
 }
 
 
+
+/* Kartu permintaan teman (modal Terima/Tolak). Barisnya sengaja memakai token yang
+   sama dengan .social-me supaya modal ini tidak jadi pulau gaya sendiri. */
+.social-request-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.social-request-row:last-child{border-bottom:0}
+.social-request-who{flex:1 1 0;min-width:0;display:flex;flex-direction:column}
+.social-request-who b{font-size:.95rem;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.social-request-who small{color:var(--muted)}
+.social-request-acts{display:flex;align-items:center;gap:8px;flex:none}
+.social-request-acts .primary{padding:8px 14px;min-height:40px}
