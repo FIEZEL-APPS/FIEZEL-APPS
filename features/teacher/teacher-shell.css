@@ -293,8 +293,15 @@ html.fiezel-ui-v6 body.fz-teacher-mode .tg button.tg-seg-btn:not(.primary):not(.
 @keyframes tg-ring{0%,100%{transform:rotate(0)}15%{transform:rotate(14deg)}30%{transform:rotate(-12deg)}45%{transform:rotate(8deg)}60%{transform:rotate(-4deg)}}
 .tg-bell-badge{position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;padding:0 5px;border-radius:99px;background:var(--tg-brick);color:#fff;font-size:.68rem;font-weight:700;display:grid;place-items:center;line-height:1;border:2px solid var(--tg-paper)}
 .tg-inbox-scrim{position:fixed;inset:0;z-index:58;background:transparent}
-.tg-inbox{position:fixed;top:74px;right:26px;width:min(400px,calc(100vw - 32px));max-height:min(70vh,560px);overflow:auto;background:var(--tg-paper-2);border:1px solid var(--tg-line);border-radius:var(--tg-r-lg);box-shadow:0 24px 50px -20px rgba(18,33,31,.45);z-index:59;animation:tg-pop .18s ease-out}
-@keyframes tg-pop{from{opacity:0;transform:translateY(-6px) scale(.98)}to{opacity:1;transform:none}}
+/* NAMA keyframe itu GLOBAL, dan definisi belakangan MENANG. Blok ini dulu bernama `tg-pop`
+   juga - nama yang sama dengan animasi modal 85 baris di atasnya - jadi ia diam-diam
+   membajak .tg-modal. Modal dipusatkan lewat transform:translate(-50%,-50%); keyframe
+   inbox ini berakhir di transform:none, yang MENGHAPUS pemusatan itu selama animasi
+   berjalan: modal muncul di bawah-kanan titik tengah lalu menjentik balik ke tengah saat
+   animasinya habis. Persis kembaran bug @keyframes pageIn di style.css (tombstone audit
+   12-003). Gerbang tests/css-keyframe-uniq-test.js sekarang menolak nama kembar. */
+.tg-inbox{position:fixed;top:74px;right:26px;width:min(400px,calc(100vw - 32px));max-height:min(70vh,560px);overflow:auto;background:var(--tg-paper-2);border:1px solid var(--tg-line);border-radius:var(--tg-r-lg);box-shadow:0 24px 50px -20px rgba(18,33,31,.45);z-index:59;animation:tg-pop-inbox .18s ease-out}
+@keyframes tg-pop-inbox{from{opacity:0;transform:translateY(-6px) scale(.98)}to{opacity:1;transform:none}}
 .tg-inbox-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px 8px}
 .tg-inbox-head h3{font-size:1.05rem}
 .tg-inbox-list{list-style:none;margin:0;padding:4px 8px 10px}
