@@ -3,7 +3,7 @@
 # Dibaca oleh TIGA tempat sekaligus supaya tidak pernah ada dua daftar yang berbeda:
 #   1. .github/workflows/deploy-site.yml  (rsync --exclude-from / filter FTP)
 #   2. .cpanel.yml                        (jalur cPanel Git Version Control)
-#   3. deploy-site-gate-test.js           (gerbang: membuktikan daftar ini TIDAK pernah
+#   3. tests/deploy-site-gate-test.js           (gerbang: membuktikan daftar ini TIDAK pernah
 #                                          membuang satu pun entri ASSETS sw.js)
 #
 # ATURAN YANG MENGIKAT: kalau sebuah pola di sini membuang berkas yang ada di daftar
@@ -40,7 +40,7 @@ deploy/
 # dalam KOMENTAR (`app.js:359` "harness audit/dump di node", dan satu rujukan dokumen di
 # fiezel-neural-voice-ios-cache-fix.js), bukan sebagai berkas yang di-fetch. `design/`
 # SENGAJA TIDAK ada di sini — ia benar-benar dimuat fiezel-splash.js dan fiezel-ui-sfx.js.
-# Cek (F) di deploy-site-gate-test.js menegakkan pembedaan itu, jadi menambahkan direktori
+# Cek (F) di tests/deploy-site-gate-test.js menegakkan pembedaan itu, jadi menambahkan direktori
 # ke daftar ini tanpa memeriksanya akan MEMERAHKAN gerbang, bukan mematikan produksi diam-diam.
 audit/
 analysis/
@@ -52,29 +52,29 @@ ecohero-quest/
 # --- HARNESS DEBUG & SKRIP OPS: jangan pernah publik ---
 # Ini bukan kerapian, ini Fase 10 audit rilis: "debug endpoints / test routes / development
 # routes — produksi harus fail closed. Jangan terima 'kemungkinan tidak terjangkau', buktikan."
-# Menyajikan `m02526-probe.html` atau `audit-harness.html` di `fiezel.my.id/app/` berarti
+# Menyajikan `tools/dev/m02526-probe.html` atau `tools/dev/audit-harness.html` di `fiezel.my.id/app/` berarti
 # halaman uji internal bisa dibuka siapa pun dengan menebak namanya. Skrip `.mjs`/`.sh` tidak
 # pernah dimuat peramban (index.html hanya memuat `.js`) tetapi membocorkan prosedur deploy,
 # nama secret, dan bentuk endpoint internal kalau disajikan sebagai teks.
 *.sh
 *.mjs
 m02526-*
-audit-harness.html
-sfx-preview.html
+tools/dev/audit-harness.html
+tools/dev/sfx-preview.html
 
 # --- bukti internal: tidak dirujuk aplikasi, tidak perlu publik ---
 # Berkas-berkas ini adalah bukti gerbang mutu, bukan bahan ajar. Tidak ada rahasia di
 # dalamnya, tetapi menyajikannya di `fiezel.my.id/app/` berarti menerbitkan catatan audit
 # internal ke publik tanpa alasan, dan menambah bita yang harus diunduh murid.
-A12-RED-PROOF.json
-CONTENT-INTEGRITY-AUDIT.json
+reports/A12-RED-PROOF.json
+reports/CONTENT-INTEGRITY-AUDIT.json
 FIEZEL-5.18.0-*.json
 FIEZEL-5.18.0-*.jsonl
-SECURITY-SCAN.json
-QUALITY-GATE-EVIDENCE.json
+reports/SECURITY-SCAN.json
+reports/QUALITY-GATE-EVIDENCE.json
 NEURAL-VOICE-SOURCE-LOCK.json
 VENDOR-VOICE-INVENTORY.json
-FILE-MANIFEST.txt
+reports/FILE-MANIFEST.txt
 TASKS-LEDGER.json
 
 # --- dokumen, laporan, dan bahan pemasaran ---

@@ -280,5 +280,5 @@ oscillator `VOICES` synth table is replaced by a **sample manifest**:
 | OI-2 | ~~Human blind test of the 4 PAW sounds (§G.7)~~ **MOOT under OA-8** — replaced by the §8-4 character audition (`qa/paw_final_audition.wav`) | OWNER/QA at integration |
 | OI-3 | Human x30 fatigue audition sign-off (renders ready in `qa/`) | OWNER/QA at integration |
 | OI-4 | PAW Spark choreography re-sync: 17 R-4's short-form audio assumed 3 synth notes ≤420 ms; the replacing `paw_greet` is two chirps / 880 ms (OA-8 raw version) — realign the 3 gesture beats (0/105/210 ms) to chirp 1 / chirp 2 / decay peak, or trim a Spark-specific variant from the generator | Component implementer + Foundation |
-| OI-5 | `sfx-preview.html` audition page update from synth demos to the 27 files (14 §3.2's audition-home duty) | Integrator |
+| OI-5 | `tools/dev/sfx-preview.html` audition page update from synth demos to the 27 files (14 §3.2's audition-home duty) | Integrator |
 | OI-6 | *(OA-8/OA-9)* QA refreshes: `qa/acceptance_audit.py` expected tuples for the 5 paw files (v3 values in `reports/paw.md`) + stamp_thud row (master now in `qa/retired/`); optional overlay re-render vs the raw `paw_celebrate` (its 1-3 kHz share rose 0.013→0.048, still ~½ of exam_pass's) | QA |

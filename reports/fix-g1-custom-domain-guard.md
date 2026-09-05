@@ -19,8 +19,8 @@ mengubah sisanya menjadi **default-deny**.
 | Berkas | Status klaim | Perubahan |
 |---|---|---|
 | `workers/api/mw-edge.js` | wilayahku | dua jalur sah + default-deny + dokumentasi keputusan |
-| `edge-guard-test.js` | wilayahku | butir **(h)** baru (h1–h9) + assert `edgeGuardPath` di butir (c) |
-| `owner-edge-guard-test.js` | wilayahku | butir **(f)** baru: asimetri api vs owner |
+| `tests/edge-guard-test.js` | wilayahku | butir **(h)** baru (h1–h9) + assert `edgeGuardPath` di butir (c) |
+| `tests/owner-edge-guard-test.js` | wilayahku | butir **(f)** baru: asimetri api vs owner |
 | `deploy/edge/README.md` | wilayahku | jembatan = **JALUR CADANGAN**, daftar periksa pembongkaran jalur header |
 | `workers/api/route-health.js` | **di luar** daftar klaimku | satu field baru `edgeGuardPath` (perlu untuk butir 5 brief); bukan berkas terlarang |
 | `docs/CF-MIGRATION-RUNBOOK.md` | dokumen bersama | blok `🔄 TEMUAN LAPANGAN 28 Agu 2026` di Bagian 2A |
@@ -81,7 +81,7 @@ gerbang) sehingga **tetap** di belakang gerbang. Assert (h6) menjaga keduanya, t
 
 Field baru `edgeGuardPath`: `"custom-domain"` | `"header"` | `"off"` | `"free-path"` | `"unknown"`.
 Field lama `edgeGuard` **tetap** `"on"`/`"off"` — tidak diubah karena `tools/fiezel-health-probe.mjs`
-dan `staging-live-test.js` menilai `edgeGuard !== 'on'` sebagai KRITIS; mengubah nilainya akan
+dan `tests/staging-live-test.js` menilai `edgeGuard !== 'on'` sebagai KRITIS; mengubah nilainya akan
 memadamkan monitor hidup tanpa alasan.
 
 ### Kapan jalur header boleh dihapus
@@ -112,8 +112,8 @@ sungguhan, menjalankan gerbang, mencatat butir yang jatuh, lalu memulihkan berka
 | M10 bab syarat penghapusan jalur header dihapus dari kode | edge-guard | 1 | (h9) |
 | M11 penjaga owner ikut meloloskan hostname | owner-edge-guard | 1 | (f) |
 
-Pemulihan **dibuktikan**, bukan diasumsikan: sesudah semua mutasi, `edge-guard-test.js` exit 0 dan
-`owner-edge-guard-test.js` exit 0.
+Pemulihan **dibuktikan**, bukan diasumsikan: sesudah semua mutasi, `tests/edge-guard-test.js` exit 0 dan
+`tests/owner-edge-guard-test.js` exit 0.
 
 Pemetaan ke butir brief: (a) hostname tepercaya lolos tanpa header → h1/h2 (merah lewat M1);
 (b) `*.workers.dev` ditolak → h3 (merah lewat M3); (c) hostname asing ditolak → h4 (merah lewat

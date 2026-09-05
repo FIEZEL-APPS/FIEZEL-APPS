@@ -654,7 +654,7 @@ terkirim ke subdomain itu.
 
 **JANGAN:** menambahkan route apa pun ke Worker `fiezel-audio`. Worker itu **wajib tetap
 read-only** — sifatnya adalah kontrol biaya yang dijaga tiga gerbang CI, dan kata `generate` saja
-di berkasnya sudah membuat `audio-asset-pipeline-test.js` merah
+di berkasnya sudah membuat `tests/audio-asset-pipeline-test.js` merah
 (`reports/cf-a2-cf-existing.md` "Peringatan arsitektur").
 
 ---
@@ -701,7 +701,7 @@ yang sama menjaga cookie tetap pihak pertama **tanpa** menunggu zona DNS.
 
 **Terbukti jalan, bukan diasumsikan:** `/api/auth/anon` memasang cookie `fz_id`
 `Domain=fiezel.my.id`; `/api/user/me` dan `/api/quota` menjawab **200** dengan cookie itu; dan
-`cf-live-contract-test.js` lulus **33 assert** melawan `https://api.fiezel.my.id`.
+`tests/cf-live-contract-test.js` lulus **33 assert** melawan `https://api.fiezel.my.id`.
 
 ### Lubang keamanan yang jembatan ini BUKA, dan cara menutupnya
 
@@ -794,7 +794,7 @@ diakses langsung oleh monitor.
 2. **Hapus subdomain cPanel `api.fiezel.my.id`** + `rm -rf ~/public_html/api` — record DNS-nya
    bertabrakan dengan record proxied yang dibuat Wrangler, dan berkas itu memuat secret.
 3. Pasang **custom domain** Worker (Bagian 2), verifikasi `/health`, cookie `Domain=fiezel.my.id`,
-   dan `cf-live-contract-test.js` terhadap hostname baru.
+   dan `tests/cf-live-contract-test.js` terhadap hostname baru.
 4. **Matikan `workers.dev`** (`workers_dev = false`, lalu deploy). Sesudah ini lubang di atas hilang
    **secara struktural**, bukan karena header.
 5. `npx wrangler@3 secret delete EDGE_SHARED_SECRET`; lalu putuskan sadar soal `mw-edge.js` — mode
@@ -1087,7 +1087,7 @@ curl -s -o /dev/null -w "%{http_code}\n" https://owner.fiezel.my.id/api/owner/su
 > **tanpa satu pun galat** dan owner mengira sudah mematikan fitur padahal tidak ada satu bit
 > pun yang berubah. Ini kegagalan paling berbahaya di seluruh runbook: kill switch yang
 > menjawab "sukses" saat tidak melakukan apa-apa. Bentuk yang BENAR ada di bawah, dan gerbang
-> `config-consistency-test.js` sekarang menolak bentuk datar/string masuk ke dokumen ini lagi.
+> `tests/config-consistency-test.js` sekarang menolak bentuk datar/string masuk ke dokumen ini lagi.
 
 **Bentuk KV yang sesungguhnya dibaca** (`workers/api/route-config.js:53-54`) — dua objek
 bersarang, nilainya **boolean** (`true`/`false`), bukan string:
@@ -1234,7 +1234,7 @@ massal**, dan tidak bisa dipulihkan dari server karena progres memang tidak pern
 > `route-config.js:53-54` dan string `"off"` bukan boolean, jadi `wrangler` menjawab sukses
 > sementara flag di server tetap seperti semula. Kalau kamu pernah menyalin perintah lama ke
 > catatan insidenmu, **hapus dan ganti dengan yang di bawah**, lalu uji sekarang — bukan saat
-> insiden. Bentuk di bawah dijaga gerbang `config-consistency-test.js`.
+> insiden. Bentuk di bawah dijaga gerbang `tests/config-consistency-test.js`.
 
 **Urutan tercepat ke terlambat. Selalu mulai dari nomor 1.**
 
@@ -1414,7 +1414,7 @@ Ingat: push = produksi dalam ≤5 menit. Tidak ada langkah "batalkan sebelum sam
 - [ ] KV `cfg:flags` di produksi juga **semua mati** — setiap kunci di `flags` dan `enabled`
       bernilai `false` (boolean, bukan string `"off"`; lihat 4.5):
       `curl -s https://api.fiezel.my.id/api/config`
-- [ ] Field `workerUrl` di `core-config.js` **tidak diubah** — `remote-push-test.js:6` mengunci
+- [ ] Field `workerUrl` di `core-config.js` **tidak diubah** — `tests/remote-push-test.js:6` mengunci
       ke regex `*.puter.work`. Sakelar CF adalah **field baru**, bukan timpaan.
 - [ ] Tidak ada nilai secret di diff: `git diff --cached | grep -Ei "api[_-]?key|token|secret|BEGIN .*PRIVATE"`
 - [ ] Invarian build tiga titik (`SW_REV`, `DIAG_BUILD`, `FIEZEL_PAGE_BUILD`) — **subagent commit
@@ -1423,12 +1423,12 @@ Ingat: push = produksi dalam ≤5 menit. Tidak ada langkah "batalkan sebelum sam
 **B. Gerbang test**
 
 - [ ] `node validator.js`
-- [ ] Gerbang yang relevan dengan perubahanmu + wajib: `node regression-test.js`,
-      `node ui-structure-test.js`, `node install-health-test.js`
+- [ ] Gerbang yang relevan dengan perubahanmu + wajib: `node tests/regression-test.js`,
+      `node tests/ui-structure-test.js`, `node tests/install-health-test.js`
 - [ ] `python3 release-audit.py`
 - [ ] `git status` **bersih** dari `*-REPORT.json` yang berubah — restore artefak sebelum commit:
       `git checkout -- '*-REPORT.json'`
-- [ ] Gerbang audio tidak tersentuh: `node audio-asset-pipeline-test.js` hijau (bukti Worker audio
+- [ ] Gerbang audio tidak tersentuh: `node tests/audio-asset-pipeline-test.js` hijau (bukti Worker audio
       tetap read-only)
 
 **C. Sisi Cloudflare (kalau rilis ini menyentuh jalur CF)**

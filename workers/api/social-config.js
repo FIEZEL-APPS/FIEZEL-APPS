@@ -5,8 +5,8 @@
  * bab 10: "jangan sebarkan angka ke banyak file"). Desain: FIEZEL-ONLINE-SOCIAL-SFX-SPEC.md
  * §2 (identitas/profil), §3 (undangan/sorakan), §4 (Poin Bukti + anti-cheat).
  *
- * ATURAN BERKAS INI, ditegakkan gerbang `social-schema-contract-test.js`
- * (cermin aturan `quota-core-test.js` atas quota-config):
+ * ATURAN BERKAS INI, ditegakkan gerbang `tests/social-schema-contract-test.js`
+ * (cermin aturan `tests/quota-core-test.js` atas quota-config):
  *   - TANPA impor apa pun          → tidak bisa menarik state dari mana pun
  *   - TANPA pembacaan jam          → waktu selalu parameter di pemakainya
  *   - TANPA env / global           → nilainya sama di test dan di produksi
@@ -15,7 +15,7 @@
  *
  * KEPUTUSAN PENAMAAN YANG WAJIB DIBACA: pengenal publik dinamai `handle`, BUKAN
  * `username`. Alasannya keras, bukan selera: `schema.js` PII_FORBIDDEN_KEYS
- * (dan pemindai gerbang `cf-api-contract-test.js` §11) MELARANG kunci `username`
+ * (dan pemindai gerbang `tests/cf-api-contract-test.js` §11) MELARANG kunci `username`
  * muncul di body respons mana pun. Daftar beku itu tidak dilonggarkan demi fitur
  * baru — fitur baru yang menyesuaikan diri. `handle` adalah pseudonim yang
  * dibuat khusus (spec §2.3: "nama samaran/handle tanpa PII"), bukan nama akun.

@@ -27,7 +27,7 @@
  * Lapis 1 tanpa lapis 2 adalah IDOR: setiap guru berperan sah dan bisa membaca
  * konten guru mana pun hanya dengan menebak ID. Lapis 2 tanpa lapis 1 berarti
  * murid mencapai handler guru dan bergantung pada handler itu tidak lupa. Karena
- * itu keduanya ada, dan `role-security-test.js` menguji keduanya terpisah.
+ * itu keduanya ada, dan `tests/role-security-test.js` menguji keduanya terpisah.
  */
 
 import { jsonError, ERR } from '../errors.js';

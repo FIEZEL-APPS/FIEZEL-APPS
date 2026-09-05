@@ -50,7 +50,7 @@ export async function routeConfig(ctx) {
     {
       protocol: PROTOCOL,
       // Flag klien: nama-nama ini adalah field BARU. JANGAN menimpa
-      // `workerUrl` di core-config.js — `remote-push-test.js:6` mengunci field
+      // `workerUrl` di core-config.js — `tests/remote-push-test.js:6` mengunci field
       // itu ke regex `*.puter.work`.
       flags,
       // Kill switch tingkat server: klien boleh memakainya untuk menyembunyikan

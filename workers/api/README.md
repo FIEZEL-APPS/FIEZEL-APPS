@@ -29,7 +29,7 @@ melewati batas itu, jawabannya bukan menyiasati kode — jawabannya adalah
 | `migrations/0001_identity.sql` | skema `identity`, `session`, `anon_issue` |
 | `STUB-PUTER-CLAIM-TICKET.md` | kontrak penerbit tiket di sisi Puter yang **belum ada** |
 
-Gerbangnya: `cf-api-contract-test.js` di akar repo (terdaftar di
+Gerbangnya: `tests/cf-api-contract-test.js` di akar repo (terdaftar di
 `.github/workflows/quality.yml`). Gerbang itu **mengeksekusi Worker sungguhan**
 dengan stub binding, bukan membaca sumbernya saja.
 
@@ -137,7 +137,7 @@ pembatas tidak hilang: ia pindah ke memori isolate dengan batas DIPERKETAT (5).
 Var `ANON_ISSUE_LIMIT_PER_HOUR`, `ANON_ISSUE_LIMIT_BRIDGE_PER_HOUR`,
 `ANON_ISSUE_LIMIT_DEGRADED_PER_HOUR`, dan `ANON_JITTER_MAX_MS` mengatur angkanya;
 panggilan ber-cookie sah tidak pernah kena batas ini. Gerbangnya:
-`rate-anon-test.js`.
+`tests/rate-anon-test.js`.
 
 Cara membuat nilainya:
 

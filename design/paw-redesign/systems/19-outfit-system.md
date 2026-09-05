@@ -210,7 +210,7 @@ PAW's system is different **in mechanics and in style**, and must stay so:
 2. **`audit/02-brand-system.md` §5.5 + checklist A5** and **08 §1.6 staging note ("no book prop") / §4 accessories line:** still state blanket no-new-accessories; need an amendment pointer to 19. The reading-pose "no book" ruling stays valid until a book/buku item is proposed as a registry row.
 3. **BRAND-GUIDE §1 identity lock** (repo file, read-only this cycle): "no hats" wording needs the OWNER-signed edit when the repo change lands.
 4. **`features/mascot/fiezel-mascot.js`:** add the three empty `fz-outfit-*` anchor groups at the §4.1 insertion points + the `outfitFor` context hook (additive, G12-safe). All outfit statics regenerate from the canonical rig (G11); `gen_outfit_sheet.py` is the reference implementation.
-5. **`paw-mascot-test.js`:** extend gates — anchors present, ≤2 items, head-slot exclusivity incl. headphones, keep-out overlap checks, palette scan incl. the pending `--fz-leaf` guard.
+5. **`tests/paw-mascot-test.js`:** extend gates — anchors present, ≤2 items, head-slot exclusivity incl. headphones, keep-out overlap checks, palette scan incl. the pending `--fz-leaf` guard.
 6. **OWNER sign-off requests:** (a) §3.2 leaf-green accessory token; (b) confirmation of the two curator additions (OF-07 pensil, OF-08 topi tidur) and the beret-over-sun-hat choice; (c) the two sanctioned Large/Full combos (§6.2).
 7. **09-states / 12-lesson-layer:** wire the §5 context column into the state machine tables (which surfaces call `outfitFor`), keeping G10 zero-CLS (outfit chosen before paint, at mount).
 8. **15-pawprint-alignment:** already flagged by 08 for the chest-only revision; that pass should also note that outfit items must respect the emblem keep-out (§4.3-2).

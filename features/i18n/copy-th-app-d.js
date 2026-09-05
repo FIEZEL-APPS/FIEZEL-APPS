@@ -77,6 +77,8 @@
     'grammar.lesson-belum-memiliki-materi': 'Lesson นี้ยังไม่มีเนื้อหา',
     'grammar.lesson-fondasi-pertama': 'นี่คือ lesson พื้นฐานตัวแรก',
     'grammar.lesson-hanya-tersedia-pada-level': 'Lesson นี้มีเฉพาะในระดับ {level}',
+    'grammar.sesi-kilat': 'เซสชันสายฟ้า: 10 ข้อ',
+    'grammar.sesi-kilat-belum-cukup': 'เซสชันสายฟ้า {level} มีโจทย์แค่ {jumlahSoal} ข้อ ปลดล็อกบทเรียนอื่นก่อนนะ',
     'grammar.lesson-new-memiliki-item-valid': 'Lesson นี้เพิ่งมีโจทย์ที่ใช้ได้ {jumlahSoal} ข้อ',
     'grammar.lesson-terurut-for-level-start': '{jumlahLesson} lesson เรียงลำดับไว้สำหรับระดับ {level} เริ่มจากลำดับแรกเพื่อไม่ให้พลาดสิ่งที่ต้องเรียนก่อน',
     'grammar.lewati': 'ข้าม “{title}” ไหม?',

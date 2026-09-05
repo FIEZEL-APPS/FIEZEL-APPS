@@ -7,7 +7,7 @@
  * KENAPA KOTAK MASUKNYA DI KLIEN, DAN KAPAN IA PINDAH KE SERVER
  * ==========================================================================
  * `workers/api/social/notify-core.js` sudah memuat kebijakan pusat notifikasi
- * server (§25) beserta gerbangnya (`social-notify-test.js`) — TETAPI ia belum
+ * server (§25) beserta gerbangnya (`tests/social-notify-test.js`) — TETAPI ia belum
  * punya rute, belum punya tabel, dan belum punya satu pun pemanggil. Sampai
  * OWNER menurunkan migrasi + kunci VAPID, TIDAK ADA push server yang bisa
  * dijanjikan, dan berpura-pura ada akan melahirkan fitur yang tidak pernah

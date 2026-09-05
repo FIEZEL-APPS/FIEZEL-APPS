@@ -19,7 +19,7 @@
  * arsitektur FIEZEL yang zero-runtime-cost dan offline penuh.
  *
  * KONTRAK SINKRONISASI: nilai default di sini WAJIB identik dengan konstanta aktual di
- * modul sumbernya. brain-config-test.js membaca ulang modul-modul sumber dan gagal keras
+ * modul sumbernya. tests/brain-config-test.js membaca ulang modul-modul sumber dan gagal keras
  * kalau ada satu angka pun yang menyimpang — jadi drift diam-diam tidak mungkin lolos CI.
  * Modul ini TIDAK dibaca oleh modul brain lain saat runtime (mereka tetap memakai
  * konstanta lokalnya); ia adalah sumber kebenaran untuk MANUSIA dan untuk tooling.
@@ -66,7 +66,7 @@
 
   // ====================================================================================
   // DEFAULT — salinan verbatim dari konstanta modul sumber. JANGAN mengubah angka di sini
-  // tanpa mengubah modul sumbernya juga; brain-config-test.js menegakkan kesetaraan itu.
+  // tanpa mengubah modul sumbernya juga; tests/brain-config-test.js menegakkan kesetaraan itu.
   // ====================================================================================
   var DEFAULTS = deepFreeze({
     schema: SCHEMA,

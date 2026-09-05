@@ -2,7 +2,7 @@
 #
 # Workflow ini menyalin SETIAP properti keamanan audio-generate.yml, bukan meniru sebagiannya:
 # hanya workflow_dispatch, apply bawaan kosong, concurrency, masukan pengguna lewat env, rahasia
-# hanya di langkah Produksi, dan audio-asset-pipeline-test.js dijalankan sebelum commit.
+# hanya di langkah Produksi, dan tests/audio-asset-pipeline-test.js dijalankan sebelum commit.
 #
 # SATU PROPERTI DITAMBAHKAN yang tidak ada di audio-generate.yml: gate aktor. cf-a2 mencatat
 # asimetri itu sebagai temuan — workflow Cloudflare yang sudah ada (deploy-core-worker.yml:17,
@@ -65,7 +65,7 @@ jobs:
     runs-on: ubuntu-latest
     # Batas keras: tanpa ini GitHub memakai 360 menit, dan satu langkah
     # yang menggantung membakar enam jam dalam diam (lihat
-    # workflow-timeout-gate-test.js).
+    # tests/workflow-timeout-gate-test.js).
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
@@ -77,12 +77,12 @@ jobs:
       # belum ada dan dibayar ulang; memeriksanya di sini berbiaya nol detik dibanding sembilan dolar.
       - name: Gerbang kunci dan rencana
         run: |
-          node tts-key-test.js
-          node prerender-dryrun-test.js
+          node tests/tts-key-test.js
+          node tests/prerender-dryrun-test.js
           # Gerbang aritmetika: 604.962 karakter, 5.657 objek/286.851 karakter sesudah dedup,
           # biaya aura-1 dan aura-2-en, daftar frasa berisiko, dan override model per-item.
           # Node murni, nol jaringan, nol rahasia.
-          node prerender-plan-test.js
+          node tests/prerender-plan-test.js
 
       # Masukan pengguna TIDAK PERNAH ditanam langsung ke dalam run:. Ia lewat env, dibaca sebagai
       # variabel shell yang dikutip. Langkah Produksi di bawah memegang CLOUDFLARE_API_TOKEN; satu
@@ -122,7 +122,7 @@ jobs:
 
       - name: Pemeriksaan rahasia sebelum commit
         if: ${{ inputs.apply == 'APPLY' }}
-        run: node audio-asset-pipeline-test.js
+        run: node tests/audio-asset-pipeline-test.js
 
       # Yang di-commit hanya manifest. Binernya tinggal di R2 — Git bukan basis data media.
       - name: Simpan manifest

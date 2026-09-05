@@ -215,7 +215,7 @@ dari 12 mutasi menghasilkan MERAH pada assert yang dimaksud.**
 
 Catatan jujur soal #12: pada percobaan pertama mutasi ini **tetap hijau** — tidak ada satu pun
 assert yang menangkap `releaseQuota` yang berbohong. Itu lubang gerbang yang nyata, jadi saya
-menambahkan dua assert di `ai-response-shape-test.js` (pembatal mengembalikan `false`, dan
+menambahkan dua assert di `tests/ai-response-shape-test.js` (pembatal mengembalikan `false`, dan
 pembatal melempar) dan mengulang mutasinya sampai merah. Tanpa langkah ini, perbaikan #3 hanya
 setengah terkunci.
 
@@ -231,7 +231,7 @@ exit 0: `ai-integration-test`, `cf-shadow-mode-test`, `cf-live-contract-test`,
 `core-worker-contract-test`, `quota-manipulation-test`, `quota-notice-a11y-test`,
 `neural-voice-m02593-subtitle-translate-test`, `d1-schema-contract-test`.
 
-17 assert baru ada di bagian **G** `cf-wiring-test.js` ("FLAG DITEGAKKAN, PAGAR AKUN MENGIKAT,
+17 assert baru ada di bagian **G** `tests/cf-wiring-test.js` ("FLAG DITEGAKKAN, PAGAR AKUN MENGIKAT,
 ROLLBACK JUJUR"). Tidak ada berkas gerbang baru, jadi `.github/workflows/quality.yml` tidak
 perlu disunting.
 
@@ -373,8 +373,8 @@ Baru: `workers/api/feature-gate.js`, `workers/api/ai/ai-account-budget.js`,
 
 Disunting: `workers/api/ai/ai-tasks.js`, `workers/api/ai/route-ai.js`,
 `workers/api/route-wiring.js`, `workers/api/route-config.js`,
-`workers/api/migrations/MIGRATIONS.md`, `tools/ai-live-verify.mjs`, `cf-wiring-test.js`,
-`ai-task-contract-test.js`, `ai-response-shape-test.js`, `config-consistency-test.js`.
+`workers/api/migrations/MIGRATIONS.md`, `tools/ai-live-verify.mjs`, `tests/cf-wiring-test.js`,
+`tests/ai-task-contract-test.js`, `tests/ai-response-shape-test.js`, `tests/config-consistency-test.js`.
 
 Tidak disentuh: `workers/owner/`, `features/`, `app.js`, `sw.js`, `core-config.js`,
 `coordination/`, versi build.

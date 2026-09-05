@@ -48,7 +48,7 @@ dashboard. Tambahan penting yang ditemukan paket ini: bahkan **kalau** data nant
 6. **Jebakan nama Secret ditemukan:** catatan owner menyebut `EDGE_SECRET`; kode membaca
    `env.EDGE_SHARED_SECRET`. Salah nama menghasilkan gejala yang identik dengan "belum dipasang"
    (semua rute 403). Tertulis eksplisit di DEPLOY.md §2.
-7. **`owner-dashboard-test.js` diperluas** dengan empat keluarga assert: (f) kosong ≠ nol terukur ≠
+7. **`tests/owner-dashboard-test.js` diperluas** dengan empat keluarga assert: (f) kosong ≠ nol terukur ≠
    tidak tersedia, (g) default deny untuk 31 jalur tak dikenal × 7 metode HTTP, (h) nol rute owner
    yang bisa diakses tanpa gerbang (termasuk: `/login` tidak menyentuh D1), (i) nol identitas murid
    perorangan di HTML maupun keempat rute JSON. Fixture D1 barunya meniru perilaku SQL sungguhan
@@ -87,7 +87,7 @@ satu assert tunggal yang menjadi satu-satunya penjaga.
    `retention_daily(cohort_day, day_index, count)`, `dau_dedup`, `pepper_state`.
    Sekarang gejalanya tidak terlihat karena tabel kosong. Begitu data masuk, setiap panel akan
    berbunyi "pengukuran tidak tersedia" — jujur, tetapi tetap tanpa angka.
-   Yang memperkeras: `analytics-privacy-test.js` mengunci database analytics pada **tepat lima
+   Yang memperkeras: `tests/analytics-privacy-test.js` mengunci database analytics pada **tepat lima
    tabel**, jadi `cost_daily` dan `retention_cohort` tidak boleh dibuat di sana. Perbaikannya
    adaptor pembaca bentuk panjang, bukan migrasi tabel baru — dan penulisnya hidup di
    `workers/api/`, yang terlarang di paket ini. **Paket kerja tersendiri.**
@@ -101,7 +101,7 @@ satu assert tunggal yang menjadi satu-satunya penjaga.
    adalah pekerjaan owner; agen tidak punya kredensial dan tidak meminta nilai Secret apa pun.
 4. **`EXEC-BRIEF-CF.md` tidak ada di repo** walau dirujuk sebagai otoritas privasi di banyak
    berkas. Kontraknya sendiri ditegakkan gerbang, jadi ini utang dokumen, bukan celah penegakan.
-5. **Gerbang lama mengunci skema yang salah.** `owner-dashboard-test.js` memakai fixture bentuk
+5. **Gerbang lama mengunci skema yang salah.** `tests/owner-dashboard-test.js` memakai fixture bentuk
    lebar, sehingga hijau ≠ bisa dideploy — cacat #1 di atas lolos justru karena fixture-nya cocok
    dengan `queries.js`, bukan dengan produksi. Saya **tidak** memperbaiki ini di paket ini:
    menulis ulang fixture ke bentuk panjang berarti memerahkan gerbang tanpa bisa memperbaiki
@@ -115,13 +115,13 @@ satu assert tunggal yang menjadi satu-satunya penjaga.
 
 Sebelas gerbang, semuanya exit 0 setelah seluruh perubahan:
 
-`owner-dashboard-test.js`, `owner-edge-guard-test.js`, `analytics-privacy-test.js`,
-`analytics-aggregate-test.js`, `d1-schema-contract-test.js`, `no-network-test.js`,
-`secret-scan-test.js`, `gate-registry-test.js`, `coordination-guard-test.js`,
-`regression-test.js`, `install-health-test.js`.
+`tests/owner-dashboard-test.js`, `tests/owner-edge-guard-test.js`, `tests/analytics-privacy-test.js`,
+`tests/analytics-aggregate-test.js`, `tests/d1-schema-contract-test.js`, `tests/no-network-test.js`,
+`tests/secret-scan-test.js`, `tests/gate-registry-test.js`, `tests/coordination-guard-test.js`,
+`tests/regression-test.js`, `tests/install-health-test.js`.
 
 Berkas yang disentuh: `workers/owner/index.js`, `workers/owner/wrangler.toml`,
-`workers/owner/README.md`, `workers/owner/DEPLOY.md` (baru), `owner-dashboard-test.js`,
+`workers/owner/README.md`, `workers/owner/DEPLOY.md` (baru), `tests/owner-dashboard-test.js`,
 `tools/owner-dashboard-red-proof.js` (baru), `reports/owner-dashboard-red-proof.md` (baru),
 berkas ini.
 

@@ -231,7 +231,7 @@ App wrappers (`app.js`): `pawReact`/`pawSetState`/`pawFaceMarkup` unchanged; add
 - **Concurrency caps**: idle ≤4 animated nodes + 2 JS timers/instance; richest state (completion) ≤9 animated nodes + ≤46 confetti (`CONFETTI_MAX` 120 cap kept); speaking adds exactly 1 interval + display toggles (no animation nodes for the mouth).
 - **Instances**: typical live count ≤3 (bubble + strip + one contextual). Budget assumes 4.
 - **No `will-change`**, no forced reflow — new code must use the `[P2-1]` `getAnimations()` restart pattern, never `void offsetWidth` (the two legacy uses in `fiezel-coach-bubble.js` are grandfathered).
-- **Frame budget**: state change ≤4ms style+paint on mid-range Android; steady-state idle ≤1ms/frame. Verify with the existing `paw-mascot-test.js` amplitude guards plus a new assertion: no keyframe rule on `.fz-all/.fz-body/.fz-head` may contain `rotate`.
+- **Frame budget**: state change ≤4ms style+paint on mid-range Android; steady-state idle ≤1ms/frame. Verify with the existing `tests/paw-mascot-test.js` amplitude guards plus a new assertion: no keyframe rule on `.fz-all/.fz-body/.fz-head` may contain `rotate`.
 
 ### 5.5 Reduced motion — 3 layers extended to new motions
 
@@ -316,5 +316,5 @@ ring face          ├ fzMEnterPeek 420ms ┤
 - [ ] Every appearance/disappearance uses a §2 variant; grep confirms no `display:none` toggles on `fiezel-mascot` hosts.
 - [ ] `speak-start/end`, `level-up`, `milestone`, `welcome-back`, `lesson-start`, `reward` events wired; `app.js:3836` call site changed to `pawReact('reward')`; deprecation alias `correct-streak`→`reward` in place (17 R-1).
 - [ ] Reduced-motion: all three layers verified with the new JS timers (gaze, beat) — frozen poses still readable.
-- [ ] `paw-mascot-test.js` suite passes; amplitude guards updated to the §1 clamps.
+- [ ] `tests/paw-mascot-test.js` suite passes; amplitude guards updated to the §1 clamps.
 - [ ] 60fps spot-check on a mid-range Android during completion with 3 live instances.

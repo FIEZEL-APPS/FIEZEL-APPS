@@ -106,7 +106,7 @@ export function rotatePepperDue(now, lastRotatedAt) {
  * `previous` hanya jendela toleransi satu putaran, untuk event yang tertahan
  * offline melewati tengah malam. Pepper dua putaran lalu HILANG PERMANEN di
  * sini — inilah yang membuat "hari-1 tidak bisa disambung ke hari-2" jadi sifat
- * sistem, bukan janji. Gerbang `analytics-privacy-test.js` menguji tepat ini.
+ * sistem, bukan janji. Gerbang `tests/analytics-privacy-test.js` menguji tepat ini.
  */
 export function rotatePepper(state, now, pepper) {
   const current = typeof pepper === 'string' && pepper.length >= 32 ? pepper : newPepper();
@@ -228,7 +228,7 @@ const DURATION_BUCKETS = ['<2m', '2-10m', '10-30m', '30m+'];
    sisi klien memvalidasi sebelum mengirim dan sisi ini memvalidasi lagi sebelum menulis,
    jadi satu nilai yang menyimpang berarti event yang lolos di klien lalu ditolak 400 di
    server - kelas kegagalan yang hanya terlihat sebagai "angkanya nol", bukan sebagai galat.
-   analytics-client-test.js membandingkan kedua daftar event; enum-nya dijaga di sini. */
+   tests/analytics-client-test.js membandingkan kedua daftar event; enum-nya dijaga di sini. */
 const FIRST_QUESTION_BUCKETS = ['<30s', '30-60s', '60-180s', '180s+'];
 const SKIP_REASONS = ['audio_failed', 'learner_choice', 'timeout'];
 const CHAR_BUCKETS = ['<200', '200-1k', '1k-5k', '5k+'];

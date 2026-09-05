@@ -258,7 +258,7 @@ Aturan selama T-007:
 2. Regresi eksisting TETAP PASS (tidak boleh rusak):
    `ios-wasm-module-test.js`, `ios-cache-compat-test.js`,
    `neural-voice-audibility-test.js`, `neural-voice-http-test.js`,
-   `neural-voice-test.js`, `pwa-cache-test.js` → kontrak & 100% CacheStorage
+   `neural-voice-test.js`, `tests/pwa-cache-test.js` → kontrak & 100% CacheStorage
    fallback masih valid.
 3. `node --check` semua `.js` (sintaks).
 

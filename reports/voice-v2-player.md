@@ -74,11 +74,11 @@ ikut memanggil `playerRef.cancel()`. `prepare()`, `ensureReady()`, daftar 11 ase
 (158.889.523 byte) dan `verifyCachedAssets()` tidak disentuh; penjaga unduhan 152 MB utuh dan
 diuji ulang oleh gerbang.
 
-## 3. Gerbang baru: `voice-pipeline-gap-test.js`
+## 3. Gerbang baru: `tests/voice-pipeline-gap-test.js`
 
 Node murni, tanpa dependency, pola `vm`/`sourceBlock` yang sama dengan
-`voice-fallback-chain-test.js`. Terdaftar di `.github/workflows/quality.yml` (baris sesudah
-`node voice-fallback-chain-test.js`). **36/36 lolos**, exit 0.
+`tests/voice-fallback-chain-test.js`. Terdaftar di `.github/workflows/quality.yml` (baris sesudah
+`node tests/voice-fallback-chain-test.js`). **36/36 lolos**, exit 0.
 
 Yang di-assert (label sesuai keluaran):
 

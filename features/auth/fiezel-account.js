@@ -24,7 +24,7 @@
  * paling mahal dan paling tidak terlihat sampai murid pertama mengeluh.
  *
  * ==========================================================================
- * EMPAT INVARIAN YANG DIJAGA `account-auth-client-test.js`
+ * EMPAT INVARIAN YANG DIJAGA `tests/account-auth-client-test.js`
  * ==========================================================================
  *  1. PERANGKAT TIDAK PERNAH MENGIRIM IDENTITAS. Body yang berangkat hanya
  *     `handle`, `password`, dan `code`. Tidak ada `sub`, `userId`, `role`, atau
@@ -68,7 +68,7 @@
    * `workers/api/auth/password-core.js` (PASSWORD_RULES) dan `route-account.js`
    * (HANDLE_RE) supaya murid mendapat koreksi SEBELUM satu permintaan pun
    * berangkat. Server tetap satu-satunya otoritas: pemeriksaan di sini murni
-   * kenyamanan, dan `account-auth-client-test.js` menuntut keduanya tetap sama
+   * kenyamanan, dan `tests/account-auth-client-test.js` menuntut keduanya tetap sama
    * persis — cermin yang menyimpang lebih buruk daripada tidak ada cermin, karena
    * ia menolak sandi yang sebenarnya sah.
    */

@@ -97,7 +97,7 @@ rollback tidak bisa dipastikan, amplop tetap melaporkan `quotaCharged:false`.
 
 ## Gerbang
 
-**Baru: `tts-provider-contract-test.js`** — node murni, nol jaringan, memakai
+**Baru: `tests/tts-provider-contract-test.js`** — node murni, nol jaringan, memakai
 `tools/cf-test-harness.js`. 21 assert, semua PASS. Yang dijaga:
 - `voiceId` benar-benar ada di badan permintaan `env.AI.run`, dan **kunci cache dihitung ulang dari
   voice yang benar-benar dikirim** lalu dibandingkan dengan `audioKey` di amplop. Kalau berbeda,
@@ -116,7 +116,7 @@ rollback tidak bisa dipastikan, amplop tetap melaporkan `quotaCharged:false`.
   tulis R2 — sementara render pertama (miss) memang memanggil gerbang kuota, supaya "nol lawan nol"
   tidak bisa lolos sebagai hijau.
 
-**Diperluas: `ai-response-shape-test.js`** — 69 assert, semua PASS (sebelumnya 40-an). Tambahannya:
+**Diperluas: `tests/ai-response-shape-test.js`** — 69 assert, semua PASS (sebelumnya 40-an). Tambahannya:
 - Sepuluh jalur `route-ai.js` dipanggil sungguhan dan **semuanya** wajib membawa `quotaCharged`
   bertipe boolean; `true` hanya di jalur sukses; tidak ada penolakan yang menagih; 429 tetap 429.
 - Keadaan breaker OPEN dibangun lewat modul breaker sungguhan, plus assert bahwa jalur itu benar-benar
@@ -127,26 +127,26 @@ rollback tidak bisa dipastikan, amplop tetap melaporkan `quotaCharged:false`.
 - Sisi sebaliknya: enam bentuk keluaran yang sah tidak boleh dianggap kosong, dan satu jawaban
   `writing_feedback` yang berisi tetap sukses **dan menagih**.
 
-Terdaftar di `.github/workflows/quality.yml`: `tts-provider-contract-test.js` tepat sesudah
-`tts-key-test.js` (dua sisi dari satu invarian biaya), dan komentar `ai-response-shape-test.js`
+Terdaftar di `.github/workflows/quality.yml`: `tests/tts-provider-contract-test.js` tepat sesudah
+`tests/tts-key-test.js` (dua sisi dari satu invarian biaya), dan komentar `tests/ai-response-shape-test.js`
 diperbarui.
 
 ### Matriks bukti merah
 
 `node tools/a12-red-proof.mjs` (alat sekali jalan, bukan bagian CI) mengembalikan setiap cacat satu
-per satu, menjalankan gerbangnya, lalu memulihkan berkasnya. Hasil di `A12-RED-PROOF.json`:
+per satu, menjalankan gerbangnya, lalu memulihkan berkasnya. Hasil di `reports/A12-RED-PROOF.json`:
 
 | Cacat yang dikembalikan | Gerbang | Exit | Merah? |
 |---|---|---|---|
-| D1 `voiceId` tidak diteruskan ke provider (cacat staging asli) | tts-provider-contract-test.js | 1 | ya |
-| D1b voice bawaan runtime beda dari korpus | tts-provider-contract-test.js | 1 | ya |
-| D1c nama parameter route-tts menyimpang dari pra-render | tts-provider-contract-test.js | 1 | ya |
-| D1d mesin tak dikenal ditebak `{text}` alih-alih melempar | tts-provider-contract-test.js | 1 | ya |
-| D1e cache hit mengaku menagih kuota | tts-provider-contract-test.js | 1 | ya |
-| D2 `quotaCharged` hilang dari penolakan kuota 429 | ai-response-shape-test.js | 1 | ya |
-| D2b jalur sukses mengaku tidak menagih (field jadi konstanta) | ai-response-shape-test.js | 1 | ya |
-| D3 keluaran kosong dideteksi `.trim()` saja (lolos `"{}"`) | ai-response-shape-test.js | 1 | ya |
-| D3b keluaran kosong ditolak tapi kuota tidak dikembalikan | ai-response-shape-test.js | 1 | ya |
+| D1 `voiceId` tidak diteruskan ke provider (cacat staging asli) | tests/tts-provider-contract-test.js | 1 | ya |
+| D1b voice bawaan runtime beda dari korpus | tests/tts-provider-contract-test.js | 1 | ya |
+| D1c nama parameter route-tts menyimpang dari pra-render | tests/tts-provider-contract-test.js | 1 | ya |
+| D1d mesin tak dikenal ditebak `{text}` alih-alih melempar | tests/tts-provider-contract-test.js | 1 | ya |
+| D1e cache hit mengaku menagih kuota | tests/tts-provider-contract-test.js | 1 | ya |
+| D2 `quotaCharged` hilang dari penolakan kuota 429 | tests/ai-response-shape-test.js | 1 | ya |
+| D2b jalur sukses mengaku tidak menagih (field jadi konstanta) | tests/ai-response-shape-test.js | 1 | ya |
+| D3 keluaran kosong dideteksi `.trim()` saja (lolos `"{}"`) | tests/ai-response-shape-test.js | 1 | ya |
+| D3b keluaran kosong ditolak tapi kuota tidak dikembalikan | tests/ai-response-shape-test.js | 1 | ya |
 
 9 dari 9 merah; sesudah pemulihan kedua gerbang exit 0. Dua catatan jujur dari proses ini: percobaan
 pertama D3b **hijau** karena patch-nya salah sasaran — keluaran kosong diklasifikasikan sebagai
@@ -156,13 +156,13 @@ gerbangnya lemah.
 
 ### Verifikasi
 
-Semua exit 0: `tts-provider-contract-test.js`, `tts-key-test.js`, `ai-task-contract-test.js`,
-`ai-response-shape-test.js`, `cf-wiring-test.js`, `cf-api-contract-test.js`, `quota-core-test.js`,
-`prerender-plan-test.js`, `prerender-dryrun-test.js`, `regression-test.js`, `install-health-test.js`.
-Ikut dijalankan hijau: `breaker-test.js`, `quota-manipulation-test.js`, `quota-reset-test.js`,
-`tts-transport-switch-test.js`.
+Semua exit 0: `tests/tts-provider-contract-test.js`, `tests/tts-key-test.js`, `tests/ai-task-contract-test.js`,
+`tests/ai-response-shape-test.js`, `tests/cf-wiring-test.js`, `tests/cf-api-contract-test.js`, `tests/quota-core-test.js`,
+`tests/prerender-plan-test.js`, `tests/prerender-dryrun-test.js`, `tests/regression-test.js`, `tests/install-health-test.js`.
+Ikut dijalankan hijau: `tests/breaker-test.js`, `tests/quota-manipulation-test.js`, `tests/quota-reset-test.js`,
+`tests/tts-transport-switch-test.js`.
 
-### Temuan sampingan: `cf-api-contract-test.js` sebelumnya FLAKY
+### Temuan sampingan: `tests/cf-api-contract-test.js` sebelumnya FLAKY
 
 Bukan bagian dari brief, tapi ditemukan saat verifikasi dan diperbaiki karena ia merusak arti "exit 0".
 Gerbang itu memalsukan tanda tangan cookie dengan mengubah **karakter terakhir** base64url. Karakter
@@ -203,4 +203,4 @@ Sumber angka & perilaku yang dirujuk laporan ini: `tools/prerender-tts.mjs` (reg
 `REJECTED_MODELS`, `ENGINE`, `CANONICAL`), `workers/api/tts/tts-key.js`,
 `workers/api/route-wiring.js`, `workers/api/quota/quota-core.js`, `reports/roll-s6-tts.md`,
 `reports/voice-v4-aifix.md`, dan artefak gerbang `TTS-PROVIDER-CONTRACT-REPORT.json` +
-`A12-RED-PROOF.json` di root repo.
+`reports/A12-RED-PROOF.json` di root repo.

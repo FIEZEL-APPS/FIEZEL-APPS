@@ -7,13 +7,13 @@ const APP_VERSION=self.FIEZEL_VERSION||'5.19.0';
    itu perlu penjelasan, karena duplikasi konfigurasi biasanya cacat.
 
    Kenapa salinannya ada: ~40 gerbang tes menjalankan app.js di dalam konteks `vm`
-   yang dibangun tangan (lihat adaptive-policy-test.js) dan konteks itu TIDAK
+   yang dibangun tangan (lihat tests/adaptive-policy-test.js) dan konteks itu TIDAK
    memuat fiezel-ux-flags.js. Tanpa nilai bawaan lokal, `uxOn()` di sana menjawab
    undefined untuk SEMUA bendera, jadi setiap gerbang render akan menguji jalur
    "semua fitur mati" — termasuk yang seharusnya hidup — dan hijau-nya tidak lagi
    berarti apa-apa.
 
-   Kenapa duplikasinya aman: ux-flags-test.js membandingkan tabel di bawah dengan
+   Kenapa duplikasinya aman: tests/ux-flags-test.js membandingkan tabel di bawah dengan
    FIEZEL_UX_FLAGS milik berkas benderanya, kunci demi kunci, dan MERAH kalau
    keduanya menyimpang satu nilai pun. Jadi ini duplikasi berpagar, bukan dua
    sumber kebenaran yang saling bersaing. */
@@ -525,7 +525,7 @@ function grammarClue(base){const text=String(base||'');const hit=text.match(/\b(
 let GRAMMAR_MISCONCEPTION_ID=Object.create(null);
 // GRAMMAR_MISCONCEPTION_BASE menyimpan rujukan sumber apa adanya: overlay th menulis SALINAN,
 // jadi berpindah balik ke id harus bisa memulihkan byte aslinya tanpa fetch ulang. Ditaruh di
-// LUAR badan loadMisconceptionDiagnoses dengan sengaja — misconception-diagnosis-test.js
+// LUAR badan loadMisconceptionDiagnoses dengan sengaja — tests/misconception-diagnosis-test.js
 // memeriksa try/catch pemuat itu dalam jendela 500 aksara dari nama fungsinya, dan komentar di
 // dalam badannya mendorong catch{} keluar jendela sehingga penjaga fail-soft terbaca hilang.
 let GRAMMAR_MISCONCEPTION_BASE=null;
@@ -618,7 +618,9 @@ function stableGrammarHash(value){let h=2166136261;for(const c of String(value))
 // dilarang saling meminjam meta - penolakan "itu ngejelasin kalimat di lesson lain" jadi
 // bohong untuk mereka (PA-004#25 vs b4_008#25, TA-005 vs b5_002).
 const GRAMMAR_PEER_BLOCKLIST={'A1-004':["CG-001"],'A1-005':["CG-003"],'A1-006':["CG-002"],'A1-008':["AR-007"],'A1-009':["PS-001"],'A1-011':["A1-111"],'A1-012':["NN-001"],'A1-013':["PR-006"],'A1-015':["QF-001"],'A1-016':["A1-116"],'A1-017':["PD-001"],'A1-111':["A1-011"],'A1-116':["A1-016"],'AR-001':["AR-101"],'AR-002':["AR-031"],'AR-003':["AR-103"],'AR-005':["AR-008"],'AR-007':["A1-008"],'AR-008':["AR-005"],'AR-012':["b4_013"],'AR-031':["AR-002"],'AR-101':["AR-001"],'AR-103':["AR-003"],'CG-001':["A1-004"],'CG-002':["A1-006"],'CG-003':["A1-005"],'CM-001':["CM-101"],'CM-002':["CM-006"],'CM-004':["CM-037"],'CM-006':["CM-002"],'CM-037':["CM-004"],'CM-101':["CM-001"],'CO-001':["CO-101"],'CO-005':["CO-030"],'CO-012':["b4_007"],'CO-017':["b5_006"],'CO-030':["CO-005"],'CO-101':["CO-001"],'EC-005':["EC-039"],'EC-039':["EC-005"],'GI-001':["GI-010"],'GI-003':["GI-032"],'GI-005':["GI-036"],'GI-009':["b4_017"],'GI-010':["GI-001"],'GI-011':["b4_016"],'GI-012':["b5_015"],'GI-013':["b5_016"],'GI-032':["GI-003"],'GI-036':["GI-005"],'LD-001':["b5_021"],'MO-001':["MO-101"],'MO-002':["MO-010"],'MO-003':["MO-011"],'MO-004':["MO-016"],'MO-005':["MO-012"],'MO-006':["MO-033"],'MO-007':["MO-034"],'MO-008':["MO-017"],'MO-010':["MO-002"],'MO-011':["MO-003"],'MO-012':["MO-005"],'MO-015':["b4_005"],'MO-016':["MO-004"],'MO-017':["MO-008"],'MO-018':["b5_003"],'MO-033':["MO-006"],'MO-034':["MO-007"],'MO-101':["MO-001"],'NN-001':["A1-012"],'PA-003':["PA-008"],'PA-004':["b4_008"],'PA-008':["PA-003"],'PA-009':["b4_008"],'PA-010':["b5_007"],'PA-011':["b5_008"],'PD-001':["A1-017"],'PR-001':["PR-101"],'PR-002':["PR-008"],'PR-004':["PR-035"],'PR-005':["PR-009"],'PR-006':["A1-013"],'PR-008':["PR-002"],'PR-009':["PR-005"],'PR-010':["b4_014"],'PR-012':["b4_015"],'PR-013':["b5_013"],'PR-035':["PR-004"],'PR-101':["PR-001"],'PS-001':["A1-009"],'QF-001':["A1-015"],'QN-005':["QN-038"],'QN-006':["b5_019"],'QN-038':["QN-005"],'RC-001':["RC-006"],'RC-004':["RC-007"],'RC-006':["RC-001"],'RC-007':["RC-004"],'RC-008':["b5_017"],'RS-004':["RS-008"],'RS-008':["RS-004"],'RS-009':["b5_010"],'TA-001':["TA-101"],'TA-002':["TA-016"],'TA-003':["TA-017"],'TA-004':["TA-104"],'TA-005':["TA-019", "b5_002"],'TA-007':["TA-020"],'TA-008':["TA-021"],'TA-016':["TA-002"],'TA-017':["TA-003"],'TA-018':["b5_001"],'TA-019':["TA-005"],'TA-020':["TA-007"],'TA-021':["TA-008"],'TA-022':["b4_002"],'TA-101':["TA-001"],'TA-104':["TA-004"],'b4_002':["TA-022"],'b4_005':["MO-015"],'b4_007':["CO-012"],'b4_008':["PA-004", "PA-009"],'b4_013':["AR-012"],'b4_014':["PR-010"],'b4_015':["PR-012"],'b4_016':["GI-011"],'b4_017':["GI-009"],'b5_001':["TA-018"],'b5_002':["TA-005"],'b5_003':["MO-018"],'b5_006':["CO-017"],'b5_007':["PA-010"],'b5_008':["PA-011"],'b5_010':["RS-009"],'b5_013':["PR-013"],'b5_015':["GI-012"],'b5_016':["GI-013"],'b5_017':["RC-008"],'b5_019':["QN-006"],'b5_021':["LD-001"]};
-const grammarPeerBlocked=item=>new Set(GRAMMAR_PEER_BLOCKLIST[String(item?.[8]||'')]||[]);
+// Grammar Quality Upgrade A1-B2: saudara satu lesson (subskill sama) otomatis ikut diblokir,
+// supaya template kedua per lesson tidak pernah dipinjam sebagai "penjelasan lesson lain".
+const grammarPeerBlocked=item=>{const set=new Set(GRAMMAR_PEER_BLOCKLIST[String(item?.[8]||'')]||[]);const skill=GRAMMAR_ITEMS.find(x=>x.item===item)?.skill;if(skill)for(const x of GRAMMAR_ITEMS)if(x.skill===skill&&x.item!==item)set.add(String(x.item?.[8]||''));return set};
 function grammarAlternativeMeta(item,field,count=3,opts={}){const own=grammarMeta(item),ownLevel=String(item?.[5]||''),blocked=grammarPeerBlocked(item);
   // m025-155: salt membedakan seed antar-mode (locate_decision_cue tak lagi kembar dengan
   // sequence_reasoning); exclude menolak value (norm) yang sudah dipakai mode lain. Salt
@@ -629,17 +631,47 @@ function grammarAlternativeMeta(item,field,count=3,opts={}){const own=grammarMet
   // level yang sama, baru sisanya. Mengumpulkan ketiganya ke satu kolam lalu mengambil dari
   // titik acak akan mengembalikan perilaku lama - kolamnya memang tersusun, tetapi titik
   // mulainya melompat ke mana saja di dalamnya.
-  const tiers=[peers.filter(x=>x.family===own.family),peers.filter(x=>x.family!==own.family&&String(x.level||'')===ownLevel),peers];
+  /* m025-257: TINGKATAN KETIGA DIBUANG - "peers" tanpa syarat.
+   * content-integrity-audit membedakan dua jenis pinjaman: lintas-KELUARGA tapi seband CEFR
+   * adalah utang mutu yang diterima (keluarga kecil memang tidak punya tiga saudara), sedangkan
+   * lintas-keluarga DAN lintas-level adalah KORUPSI - aturan C1 yang muncul di lesson A1 bisa
+   * dijawab tanpa tahu grammar mana pun. Tingkatan ketiga lama adalah satu-satunya sumber
+   * kelas itu. Selama bank kecil ia jarang terpakai; setelah upgrade A1-B2 (249 -> 328 templat,
+   * dan saudara satu lesson kini ikut diblokir) dua tingkatan pertama lebih sering habis, dan
+   * gerbang menemukan 30 temuan KRITIS di head PR #345.
+   * Yang menggantikannya bukan pinjaman yang lebih longgar melainkan filler generik di bawah
+   * (origin 'fallback', sudah dikontrak provenance) - lebih jujur daripada menawarkan aturan
+   * dari level dan topik yang sama sekali lain sebagai pilihan. */
+  const tiers=[peers.filter(x=>x.family===own.family),peers.filter(x=>x.family!==own.family&&String(x.level||'')===ownLevel)];
   const out=[];
+  /* m025-257: BELAHAN BAHASA DI KOLAM PINJAMAN.
+   * contentIntegrityGate() menolak soal yang pilihannya campur Inggris-Indonesia (>=3 opsi
+   * prosa, ada 'en' DAN ada 'id'): bahasanya sendiri yang menunjuk jawaban, jadi soal itu
+   * tidak menguji apa pun. Kolam pinjaman di bawah tidak pernah tahu aturan itu - ia
+   * mengambil peer berdasarkan keluarga/level saja. Selama bank kecil, kebetulan menutupinya;
+   * begitu bank grammar tumbuh (A1-B2 upgrade: 249 -> 328 templat) satu isyarat ingat
+   * berbahasa Inggris murni tertarik ke kolam Indonesia, gerbang menolak soalnya, dan mode
+   * recall_memory_cue HILANG dari dua lesson tanpa satu pun pesan galat.
+   * Perbaikannya bukan menghapus teks Inggris - contoh Inggris memang naskah sah - melainkan
+   * MENDAHULUKAN peer yang bingkai bahasanya sama dengan milik sendiri. Kalau yang sebingkai
+   * tidak cukup, kolam campuran tetap dipakai (perilaku lama) supaya tidak ada lesson yang
+   * kehilangan pilihannya; urutan deterministiknya tidak berubah di dalam tiap kelompok. */
+  const ownFrame=contentLanguageFrame(own[field]);
+  const isProse=v=>norm(v).split(' ').filter(Boolean).length>=6;
+  const frameRank=v=>(!isProse(own[field])||!isProse(v)||ownFrame==='neutral')?0:(contentLanguageFrame(v)===ownFrame?0:1);
   for(const tier of tiers){
     if(out.length>=count)break;
     const pool=[],poolSeen=new Set();
     for(const x of tier){const value=grammarMeta(x.item)?.[field];const key=norm(value);if(value&&key&&!poolSeen.has(key)){poolSeen.add(key);pool.push({value,sourceId:String(x.item?.[8]||''),sourceLevel:String(x.level||'')})}}
     if(!pool.length)continue;
     const start=stableGrammarHash(salt?`${own.id}:${field}:${salt}`:`${own.id}:${field}`)%pool.length;
+    // m025-257: rotasi deterministik lama DIPERTAHANKAN, hanya dibaca dua kali - sebingkai
+    // dulu, baru sisanya. Untuk kolam yang seluruhnya sebingkai (mayoritas) hasilnya identik
+    // byte per byte dengan sebelum perubahan ini.
+    const ordered=[];for(const rank of [0,1])for(let i=0;i<pool.length;i++){const e=pool[(start+i)%pool.length];if(frameRank(e.value)===rank)ordered.push(e)}
     // m025-155: entry kini membawa level dan origin asalnya - pinjaman lintas level dalam
     // keluarga yang sama tidak lagi tanpa label.
-    for(let i=0;i<pool.length&&out.length<count;i++){const entry=pool[(start+i)%pool.length];const value=String(entry.value||'').trim();if(value&&norm(value)!==norm(own[field])&&!excluded.has(norm(value))&&!out.some(x=>norm(x.value)===norm(value)))out.push({value,sourceId:entry.sourceId,sourceLevel:entry.sourceLevel,origin:'peer'})}
+    for(let i=0;i<ordered.length&&out.length<count;i++){const entry=ordered[i];const value=String(entry.value||'').trim();if(value&&norm(value)!==norm(own[field])&&!excluded.has(norm(value))&&!out.some(x=>norm(x.value)===norm(value)))out.push({value,sourceId:entry.sourceId,sourceLevel:entry.sourceLevel,origin:'peer'})}
   }
   // m025-155: filler generik memakai sentinel 'fallback:generic', bukan sourceId kosong yang
   // dulu terstempel own:true + sourceId lesson di makeGrammarQuestion (klaim palsu).
@@ -660,7 +692,18 @@ function joinSentences(a,b){const first=String(a??'').trim(),second=String(b??''
 function grammarAlternativePairs(item,fieldA,fieldB,count=3){
   const own=grammarMeta(item),ownLevel=String(item?.[5]||''),blocked=grammarPeerBlocked(item);
   const peers=GRAMMAR_ITEMS.filter(x=>x.item!==item&&!blocked.has(String(x.item?.[8]||'')));
-  const tiers=[peers.filter(x=>x.family===own.family),peers.filter(x=>x.family!==own.family&&String(x.level||'')===ownLevel),peers];
+  /* m025-257: TINGKATAN KETIGA DIBUANG - "peers" tanpa syarat.
+   * content-integrity-audit membedakan dua jenis pinjaman: lintas-KELUARGA tapi seband CEFR
+   * adalah utang mutu yang diterima (keluarga kecil memang tidak punya tiga saudara), sedangkan
+   * lintas-keluarga DAN lintas-level adalah KORUPSI - aturan C1 yang muncul di lesson A1 bisa
+   * dijawab tanpa tahu grammar mana pun. Tingkatan ketiga lama adalah satu-satunya sumber
+   * kelas itu. Selama bank kecil ia jarang terpakai; setelah upgrade A1-B2 (249 -> 328 templat,
+   * dan saudara satu lesson kini ikut diblokir) dua tingkatan pertama lebih sering habis, dan
+   * gerbang menemukan 30 temuan KRITIS di head PR #345.
+   * Yang menggantikannya bukan pinjaman yang lebih longgar melainkan filler generik di bawah
+   * (origin 'fallback', sudah dikontrak provenance) - lebih jujur daripada menawarkan aturan
+   * dari level dan topik yang sama sekali lain sebagai pilihan. */
+  const tiers=[peers.filter(x=>x.family===own.family),peers.filter(x=>x.family!==own.family&&String(x.level||'')===ownLevel)];
   const out=[],seen=new Set();
   for(const tier of tiers){
     if(out.length>=count)break;
@@ -1149,11 +1192,11 @@ function lessonLockMessage(unlock){if(!unlock?.locked)return'';const names=unloc
  * Semua fungsi di blok ini MURNI terhadap state yang dikirimkan (pola lessonUnlockState dan
  * diagnosticEvidenceReady): tidak menyentuh DOM, tidak menyimpan, tidak memanggil render.
  * Itu yang membuat panel level, record(), finishQuiz(), dan gerbang test memakai jawaban
- * yang SAMA - dan yang membuat gerbang level-guard-test.js bisa menjalankannya di vm.
+ * yang SAMA - dan yang membuat gerbang tests/level-guard-test.js bisa menjalankannya di vm.
  *
  * KOMPATIBILITAS (kontrak owner 4): state lama tanpa `levelTrust` harus DEFAULT-ALLOW.
  * levelTrustState() selalu memulangkan bentuk lengkap, verified='A1', locked=false - jadi
- * fixture kontrak A1->B1 (level-grammar-contract-test.js) tetap lulus: guard menghitung,
+ * fixture kontrak A1->B1 (tests/level-grammar-contract-test.js) tetap lulus: guard menghitung,
  * bukan memblokir pindah level. Yang diblokir hanya level yang TERKUNCI akibat demosi. */
 function defaultLevelTrust(){return{schema:'fiezel-level-trust-v1',verified:'A1',verifiedSource:'',locked:false,probation:{level:'',mistakesByLevel:{},startedAt:0,lastMistakeAt:0},exams:{},demotions:[],pendingNotice:null}}
 function sanitizeLevelTrust(raw){
@@ -2549,7 +2592,7 @@ function policyOutcomeSessionRows(session){const start=Date.parse(session?.start
  * Akibatnya nyata dan buruk: tanpa riwayat pembanding, 'positive' tidak akan pernah tercapai,
  * sehingga jalur recent_policy_outcome_positive di deriveAdaptivePolicy — yang menaikkan
  * kesulitan setelah dua sesi positif — MATI, dan otak berhenti menaikkan tingkat. Gerbang
- * policy-outcome-test.js menangkapnya; local run saya tidak, karena saya hanya menjalankan
+ * tests/policy-outcome-test.js menangkapnya; local run saya tidak, karena saya hanya menjalankan
  * gerbang kebijakan adaptif dan paritas.
  *
  * Bentuk yang benar: status deskriptif dihitung seperti dulu, lalu verdict MENIMPA-nya HANYA
@@ -2595,7 +2638,7 @@ function queuePolicyOutcomeSync(outcome){const clean=sanitizePolicyOutcome(outco
  *
  * capRationaleCodes memotong dengan PRIORITAS: yang bertahan adalah kode yang TIDAK bisa
  * direkonstruksi pembaca lapisan v1 sendirian. Salinan fungsi ini di fiezel-core-worker.js
- * wajib identik - dijaga core-policy-parity-test.js.
+ * wajib identik - dijaga tests/core-policy-parity-test.js.
  */
 const POLICY_RATIONALE_MAX=12;
 const RATIONALE_PRIORITY=/^(brain_|server_|policy_trend_|recent_policy_outcome_)/;
@@ -2693,12 +2736,12 @@ function deriveAdaptivePolicy(input={}){
  *
  * Seluruh model penalarannya hidup di features/brain/fiezel-core-brain.js sebagai fungsi
  * murni - tanpa DOM, tanpa jaringan, tanpa state - supaya setiap keputusannya bisa diuji
- * sebagai ANGKA (lihat core-brain-v2-test.js), bukan sebagai tampilan. Yang ada di sini
+ * sebagai ANGKA (lihat tests/core-brain-v2-test.js), bukan sebagai tampilan. Yang ada di sini
  * hanyalah penerjemah: dari bentuk state FIEZEL ke bentuk yang dimengerti modul itu.
  *
  * Penalarannya berjalan DI SINI, bukan di Core Worker, karena di sinilah datanya: riwayat
  * jawaban lengkap, jadwal ulang per materi, dan waktu jawab tiap soal tidak pernah dikirim
- * ke mana pun (observability-privacy-test.js menjaga batas itu). Yang dikirim ke worker
+ * ke mana pun (tests/observability-privacy-test.js menjaga batas itu). Yang dikirim ke worker
  * hanyalah RINGKASAN keputusannya, sehingga kebijakan sisi server ikut lebih pintar tanpa
  * satu pun jawaban murid berpindah tempat.
  */
@@ -3261,7 +3304,7 @@ async function brainSyncFlush(){
  * Inilah panen dari bukti S4. Model otak tidak punya operasi gabungan yang bermakna — BKT
  * adalah pembaruan Bayesian berurutan, ledger akumulasi log-odds dengan peluruhan waktu.
  * Yang digabung adalah ALIRAN BUKTI-nya; modelnya dihitung ulang dari nol di atas aliran
- * gabungan itu. brain-replay-equivalence-test.js sudah membuktikan hasilnya identik dengan
+ * gabungan itu. tests/brain-replay-equivalence-test.js sudah membuktikan hasilnya identik dengan
  * pembaruan bertahap, dan tidak bergantung pada perangkat mana yang menyetor duluan.
  *
  * TIDAK PERNAH DITERAPKAN DIAM-DIAM. brainSyncRebuild() menghitung dan MENGEMBALIKAN model
@@ -4905,9 +4948,9 @@ cfConfigBootOnce();
 /* A1-ANALYTICS-EMITTER-BEGIN — pemancar analytics sisi klien.
  *
  * MASALAH YANG DITUTUP BLOK INI. Sisi Worker analytics lengkap dan dijaga tiga gerbang
- * (`analytics-privacy-test.js`, `analytics-aggregate-test.js`, `analytics-server-only-test.js`),
+ * (`tests/analytics-privacy-test.js`, `tests/analytics-aggregate-test.js`, `tests/analytics-server-only-test.js`),
  * dan modul klien `features/analytics/fiezel-analytics-client.js` juga lengkap dan dijaga
- * `analytics-client-test.js`. Yang tidak ada sampai blok ini: SATU PUN PEMANGGIL. ~1.960
+ * `tests/analytics-client-test.js`. Yang tidak ada sampai blok ini: SATU PUN PEMANGGIL. ~1.960
  * baris kode analytics hijau sementara nol event murid pernah terkirim, jadi DAU dan retensi
  * mustahil dihitung dan dashboard owner cuma cangkang. Blok ini adalah pemanggilnya.
  *
@@ -4983,7 +5026,7 @@ const AN_MODULE_URL='./features/analytics/fiezel-analytics-client.js';
  *
  * Sifat fire-and-forget TIDAK berubah: nol `await`, nol lemparan ke pemanggil, dan setiap
  * kegagalan tetap senyap bagi murid.
- * Dijaga: `analytics-client-test.js` (§T-031) + `global-name-collision-test.js`. */
+ * Dijaga: `tests/analytics-client-test.js` (§T-031) + `tests/global-name-collision-test.js`. */
 const AN_GLOBAL='FiezelAnalytics';
 const AN_PINNED='__fiezelAnalyticsModule';
 /* Penanda "ini modul analytics, mungkin rusak" vs "ini objek asing". Dipakai HANYA untuk
@@ -5193,7 +5236,7 @@ if(cfStaticMode('usage')!=='off')anBootSchedule();
 /* CF-TRANSPORT-BEGIN — sakelar transport Cloudflare (core-config.js: FIEZEL_CF_CONFIG).
  * Blok ini adalah PRA-CABANG di depan jalur Puter, bukan penulisan ulang jalur itu:
  * `corePuterExec` di bawah memuat badan `coreWorkerExec` HARI INI apa adanya (termasuk
- * ekor `const sdk=await awaitPuter();…` yang dijaga boot-order-test.js:273).
+ * ekor `const sdk=await awaitPuter();…` yang dijaga tests/boot-order-test.js:273).
  *
  * Keadaan hari ini: `enabled:false` + `base:''` ⇒ `cfEndpointMode()` selalu 'off' ⇒ nol
  * fetch tambahan, nol perubahan perilaku. Kode ada, jalurnya mati.
@@ -5283,7 +5326,7 @@ function cfShadowGate(at){
   if(cfShadowSent>0&&at-cfShadowLastAt<CF_SHADOW_MIN_GAP_MS)return 'rate';
   return 'ok';
 }
-// Dibaca gerbang cf-shadow-ledger-test.js dan boleh dibaca panel diagnostik. Angka saja.
+// Dibaca gerbang tests/cf-shadow-ledger-test.js dan boleh dibaca panel diagnostik. Angka saja.
 function cfShadowPolicy(){return{minGapMs:CF_SHADOW_MIN_GAP_MS,maxPerSession:CF_SHADOW_MAX_PER_SESSION,lowBattery:CF_SHADOW_LOW_BATTERY,sent:cfShadowSent,skipped:cfShadowSkipped,gate:cfShadowGate(cfShadowNow())}}
 // Penanda waktu per sisi, supaya selisih latensi Puter vs CF bisa dibandingkan. Diukur dari
 // saat cabang bayangan dimulai — jadi ini latensi yang DIRASAKAN klien, bukan waktu server.
@@ -5665,19 +5708,13 @@ function openApp(){
   try{self.FiezelLazy?.start?.()}catch{}
   startReminderEngine();showBrandSplash();if(CORE_WORKER_URL){coreBrainHealth().then(health=>{const quietToast=m=>{try{if(self.FiezelStage?.lessonMode?.())return console.debug('FIEZEL:',m);showToast(m)}catch(_){showToast(m)}};/* q19-P3: jargon infra tidak memotong ujian pertama */if(!health.ok){if(REMOTE_PUSH_REQUIRED)quietToast(FiezelI18n.t('sys.core-belum-tersambung'));return}return ensureRemotePushSubscription().then(result=>{if(result.ok){syncRemoteLearningActivity();quietToast(FiezelI18n.t('sys.core-push-aktif'))}else if(REMOTE_PUSH_REQUIRED)quietToast(FiezelI18n.t('sys.core-push-belum'))})})}// m025-42: the third install prompt. It runs after the notification gate clears so the
 // three popups never stack, and it silences itself for good once both bundles exist.
-// m025-43: the gates used to be called straight from here, but this runs while app.js
-// is still parsing, before the later <script> tags exist - so the daily-target call hit
-// an undefined global and did nothing. Both gates now self-start; this only nudges them.
 // m025-96: gerbang unduhan suara dipensiunkan - tidak ada lagi bundel yang diunduh.
-bindAudioUnlockGestures();// m025-42: the mandatory daily target arms itself only once the learner qualifies
-// (notifications granted + assessed), which is checked inside the module.
-// D6 §5 (P2): nudge `FiezelDailyTarget.start()` dari sini DIHAPUS. Modulnya sudah
-// self-arm 1,2 dtk setelah DOM siap (fiezel-daily-target.js, catatan m025-43 di sana),
-// dan setiap panggilan start() memasang listener visibilitychange BARU tanpa guard -
-// "calling start() again is harmless" hanya benar untuk interval-nya, listenernya
-// menumpuk. Menghapus nudge = tepat satu listener; satu-satunya biaya adalah kunci
-// target bisa telat maksimal 1,2 dtk setelah openApp, dan refresh() poll 4 dtk
-// menutupinya. Guard sisi modul milik pemilik fiezel-daily-target.js.
+// m025-254: kunci "target harian WAJIB" (m025-42/43) DIHAPUS seluruhnya - modul, lembar,
+// pembungkus go(), dan kelas body.daily-locked. Ia membuka diri sendiri 1,2 dtk setelah
+// boot lalu menolak setiap perpindahan sampai targetnya beres; OWNER menilai biayanya
+// (aplikasi yang menyandera pemakainya sejak cat pertama) jauh melebihi gunanya. Yang
+// tersisa dari gagasan itu hanya pengakuan pasif di kartu Home - lihat todayHomeMarkup().
+bindAudioUnlockGestures();
 const reports=setTimeout(async()=>{await flushReportQueue();await maybeSendAccessReport()},1200);reports?.unref?.();
 // m025-78: an onboarding shortcut ("Mulai tes penempatan" di langkah 3) can ask to jump
 // straight into the real placement quiz once the gate clears - see afterOnboardingExit().
@@ -5937,7 +5974,7 @@ function dismissWelcome(){return declineStudyNotifications()}
 // m028 fase3: toast dapat ikon centang. Teksnya TETAP lewat textContent - ikonnya
 // ditulis sekali sebagai markup statis, isi pesannya tidak pernah ikut jalur innerHTML,
 // jadi tidak ada pintu injeksi yang dibuka oleh perubahan ini. Atribut role="status" +
-// aria-live="polite" tinggal di index.html dan tidak disentuh (a11y-test.js:68-69).
+// aria-live="polite" tinggal di index.html dan tidak disentuh (tests/a11y-test.js:68-69).
 function showToast(text){const t=$('toast');t.innerHTML='<svg class="toast-mark" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span></span>';const slot=t.querySelector?.('span');if(slot)slot.textContent=text;else t.textContent=text;t.classList.add('show');clearTimeout(showToast.timer);showToast.timer=setTimeout(()=>t.classList.remove('show'),2600)}
 let speakingListeningController=null,speakingListeningMountToken=0;
 
@@ -6308,9 +6345,10 @@ function pushBackNavView(v){try{return self.FiezelBackNav?.pushView?.(v)===true}
  * terjadi apa-apa sama sekali.
  *
  * Stage menutup celah itu TANPA menambah pemilik riwayat kedua - pelajaran mahal dari
- * fiezel-daily-target.js, yang dulu mendorong entrinya sendiri dan membuat kedalaman riwayat
- * tidak lagi sejajar dengan tumpukan. Stage memakai pushLayer() milik modul back-nav,
- * mekanisme yang sama persis dengan modal dan pembaca perpustakaan.
+ * kunci target harian (m025-42, sudah dihapus di m025-254), yang dulu mendorong entrinya
+ * sendiri dan membuat kedalaman riwayat tidak lagi sejajar dengan tumpukan. Stage memakai
+ * pushLayer() milik modul back-nav, mekanisme yang sama persis dengan modal dan pembaca
+ * perpustakaan.
  *
  * Setiap stage membawa fungsi PEMULIH layar induknya, bukan nama view. Itu disengaja: induk
  * sebuah stage sering kali stage lain (kategori -> topik -> pelajaran), dan nama view tidak
@@ -6440,7 +6478,7 @@ function usePlacementLevel(){try{if(state.activeSession)abandonActiveSession('le
    percobaan dengan hitungan salah, atau terkunci setelah demosi) dan level terkunci benar-
    benar disabled. Penolakannya tetap ada di setActiveLevel(), jadi menyembunyikan tombol
    bukan satu-satunya pertahanan. Nama fungsi ini sengaja tetap openLevelPanel: kontrak
-   level-grammar-contract-test.js hanya mengizinkan iterasi LEVELS di pemilih level. */
+   tests/level-grammar-contract-test.js hanya mengizinkan iterasi LEVELS di pemilih level. */
 function openLevelPanel(){const current=getActiveLevel(),estimated=placementLevel(),manual=activeLevelIsManual(),verified=verifiedLevel(state),trust=levelTrustState(state),examLevel=nextVerifiableLevel(state),examWait=examLevel?levelExamCooldownRemaining(examLevel,state):0;
  const cards=LEVELS.map(level=>{
   const locked=isLevelLocked(state,level),position=LEVELS.indexOf(level)-LEVELS.indexOf(verified);
@@ -6980,16 +7018,33 @@ function todaySessionShape(){
   try{const p=buildAdaptivePolicy();if(p)return{soal:p.sessionSize,menit:p.estimatedMinutes}}catch(_){}
   return{soal:10,menit:10};
 }
+/* m025-254: satu-satunya sisa dari "target harian" - sebuah PERTANYAAN, bukan gerbang.
+   Versi lamanya (features/daily-target/, m025-42) menjawab pertanyaan yang sama lalu
+   MENGUNCI aplikasi sampai jawabannya "sudah"; yang dihapus adalah kuncinya, bukan
+   kemampuan aplikasi mengenali hari yang sudah tuntas. Dipakai dua tempat dan hanya dua:
+   kartu Home (berganti isi) dan bukti sosial daily_target (satu ring per hari, di-cap
+   server). Tidak ada pemanggil yang boleh memakainya untuk menahan navigasi.
+   Hitungan hari basi dibaca NOL - kerja kemarin tidak boleh menyelesaikan hari ini. */
+function dailySessionDone(target){
+  try{
+    const d=state.daily||{};
+    if(!d.date||d.date!==studyDayKey())return false;
+    const perlu=Number(target)>0?Math.round(Number(target)):todaySessionShape().soal;
+    return (Number(d.attempts)||0)>=perlu;
+  }catch(_){return false}
+}
 function todayHomeMarkup(){
   const trust=levelTrustState(state),locked=trust.locked===true;
   const examLevel=nextVerifiableLevel(state)||verifiedLevel(state);
   const streak=Number(state.streak)||0;
-  /* Modul target harian dimuat malas dan bisa belum ada saat cat pertama; opsional-
-     berantai + `===true` membuat "belum tahu" dibaca sebagai BELUM selesai, yang
-     adalah arah aman: kartu yang menawarkan sesi lebih baik daripada kartu yang
-     mengumumkan selesai kepada murid yang belum mengerjakan apa pun hari ini. */
-  let selesai=false;try{selesai=!state.activeSession&&self.FiezelDailyTarget?.status?.().met===true}catch(_){}
   const shape=todaySessionShape();
+  /* m025-254: pertanyaan ini dulu dijawab modul target harian yang WAJIB itu. Modulnya
+     dihapus bersama kuncinya, dan jawabannya sekarang dihitung di sini dari bukti yang
+     memang sudah ada di state: soal hari ini setidaknya sepanjang sesi yang FIEZEL
+     rencanakan. Bedanya dengan yang lama BUKAN angkanya, melainkan akibatnya - kartu
+     ini berganti isi, dan tidak ada satu pun pintu yang dikunci karenanya. Hitungan
+     hari basi dibaca NOL supaya kerja kemarin tidak menyelesaikan hari ini. */
+  let selesai=false;try{selesai=!state.activeSession&&dailySessionDone(shape.soal)}catch(_){}
   const blocks=todayPlanBlocks();
   /* SATU aksi, dipilih di satu tempat. Urutannya adalah urutan kepentingan, dan
      tiap cabang sudah ada di aplikasi sebelum layar ini - tidak ada jalur baru yang
@@ -8934,7 +8989,7 @@ function AudioService(){
 
    TIDAK ADA opsi "suara peramban", dan itu keputusan OWNER yang tegas (4 Sep 2026:
    "aku ga mau lagi ada tts browser, tts browser harus mati total"). Larangannya
-   ditegakkan gerbang: audio-locale-guard-test.js menolak SETIAP sebutan
+   ditegakkan gerbang: tests/audio-locale-guard-test.js menolak SETIAP sebutan
    speechSynthesis di app.js dan di seluruh zona audio. Jangan tambahkan kembali. */
 function showListeningFailureActions(q,cfg){
   const note=$('quizListenNote');if(!note||!note.parentNode)return false;
@@ -9173,7 +9228,7 @@ function grammar(){const level=getActiveLevel(),entries=grammarItemsForLevel(lev
   // R2-1: node emas Ujian Skip Level duduk di UJUNG jalur — tak terlihat tanpa scroll
   // panjang. Chip lengket di puncak hub memanggil panel ujian yang SAMA, node ujungnya tetap.
   const examChip=`<button type="button" class="exam-entry-chip${examEntry?.passed?' is-passed':''}" onclick="openActiveLevelExamPanel()" aria-label="${FiezelI18n.t('grammar.ujian-skip-level-level',{level:esc(level),ujian:examEntry?.passed?FiezelI18n.t('level.ujian-sudah-lulus'):FiezelI18n.t('level.ujian-buka-panel')})}"><i data-lucide="${examEntry?.passed?'badge-check':'award'}"></i><span><b>${FiezelI18n.t('level.ujian-judul')}</b><small>${examEntry?.passed?FiezelI18n.t('level.ujian-lulus-terverifikasi'):FiezelI18n.t('level.ujian-merasa-bisa')}</small></span><i data-lucide="arrow-right"></i></button>`;
-  shell(FiezelI18n.t('student.grammar-title'),FiezelI18n.t('grammar.lesson-terurut-for-level-start',{jumlahLesson:skills.length,level:level}),`<div class="grammar-level-note"><b>${FiezelI18n.t('grammar.jalur',{level:esc(level)})}</b><span>${esc(levelDescriptor(level))}</span><small>${FiezelI18n.t('grammar.item-pilihan-boleh-bervariasi-tetapi')}</small></div><div class="grammar-hub-tools">${examChip}<div class="path-view-toggle"><button type="button" onclick="toggleGrammarHubView()" aria-pressed="${grammarHubListView}"><i data-lucide="${grammarHubListView?'route':'list'}"></i> ${grammarHubListView?FiezelI18n.t('level.toggle-path-view'):FiezelI18n.t('level.toggle-list-view')}</button></div></div>${grammarHubListView?listBody:pathBody}`);
+  shell(FiezelI18n.t('student.grammar-title'),FiezelI18n.t('grammar.lesson-terurut-for-level-start',{jumlahLesson:skills.length,level:level}),`<div class="grammar-level-note"><b>${FiezelI18n.t('grammar.jalur',{level:esc(level)})}</b><span>${esc(levelDescriptor(level))}</span><small>${FiezelI18n.t('grammar.item-pilihan-boleh-bervariasi-tetapi')}</small></div><div class="grammar-hub-tools">${examChip}<div class="path-view-toggle"><button type="button" data-testid="grammar-quick-session-btn" onclick="startGrammarQuickSession()"><i data-lucide="zap"></i> ${FiezelI18n.t('grammar.sesi-kilat')}</button></div><div class="path-view-toggle"><button type="button" onclick="toggleGrammarHubView()" aria-pressed="${grammarHubListView}"><i data-lucide="${grammarHubListView?'route':'list'}"></i> ${grammarHubListView?FiezelI18n.t('level.toggle-path-view'):FiezelI18n.t('level.toggle-list-view')}</button></div></div>${grammarHubListView?listBody:pathBody}`);
   // Auto-scroll ke node aktif — sesudah renderInner mengembalikan scroll ke atas.
   // Reduced-motion: lompat tanpa animasi (behavior 'auto'), bukan tanpa fungsi.
   if(!grammarHubListView&&current)setTimeout(()=>{try{document.querySelector('.path-step.is-current')?.scrollIntoView({block:'center',behavior:(prefersReducedMotion()||state.preferences?.motion===false)?'auto':'smooth'})}catch(_){}},140);
@@ -9239,6 +9294,35 @@ function buildGrammarLessonQuestions(skill,count=GRAMMAR_SESSION_SIZE){const met
   for(let variant=0;variant<GRAMMAR_PRACTICE_MODES.length&&unique.length<count;variant++)for(const item of own){if(unique.length>=count)break;take(makeGrammarQuestion(skill,item,variant,skill))}
   return unique}
 function practiceSkill(skill){if((GRAMMAR_ITEMS.find(x=>x.skill===skill)?.level||'')!==getActiveLevel())return showToast(FiezelI18n.t('grammar.pilih-lesson-terlebih-dahulu',{level:getActiveLevel()}));const unlock=lessonUnlockState(skill);if(unlock.locked)return showToast(lessonLockMessage(unlock));const questions=buildGrammarLessonQuestions(skill,GRAMMAR_SESSION_SIZE);if(questions.length<GRAMMAR_SESSION_SIZE)return showToast(FiezelI18n.t('grammar.lesson-new-memiliki-item-valid',{jumlahSoal:questions.length}));quizLoop({type:'grammar',count:GRAMMAR_SESSION_SIZE,pool:questions,factory:item=>item,preserveOrder:true})}
+/* ---- Sesi Kilat: 10 soal grammar campuran lintas lesson satu level ----------------------
+ * Latihan singkat harian. Hanya lesson yang sudah terbuka di level aktif; soal dirotasi antar
+ * lesson (satu per lesson per putaran) dan dibatasi ke mode BENTUK (apply/complete/repair)
+ * supaya cepat dijawab - grammar-nya yang menantang, bukan bacaannya. Direkam sebagai sesi
+ * 'grammar' biasa, jadi mastery per lesson tetap ikut naik. */
+const GRAMMAR_QUICK_SIZE=10;
+const GRAMMAR_QUICK_MODES=new Set(['apply_form','complete_sentence','repair_distractor_1','repair_distractor_2','repair_distractor_3']);
+function buildGrammarQuickQuestions(level=getActiveLevel(),count=GRAMMAR_QUICK_SIZE){
+  const skills=shuffle(grammarItemsForLevel(level).map(x=>x.skill).filter((x,i,a)=>a.indexOf(x)===i).filter(skill=>!lessonUnlockState(skill).locked));
+  if(!skills.length)return[];
+  const pools=new Map(skills.map(skill=>[skill,shuffle(buildGrammarLessonQuestions(skill,GRAMMAR_SESSION_SIZE).filter(q=>GRAMMAR_QUICK_MODES.has(q.practiceMode)))]));
+  const out=[],seen=new Set();
+  for(let round=0;round<GRAMMAR_QUICK_MODES.size&&out.length<count;round++){
+    for(const skill of skills){
+      if(out.length>=count)break;
+      const pool=pools.get(skill);let q;
+      while(pool.length&&!q){const cand=pool.shift();const key=String(cand.question||'').toLowerCase().replace(/\s+/g,' ').trim();if(!seen.has(key)){seen.add(key);q=cand}}
+      if(q)out.push(q);
+    }
+  }
+  return out;
+}
+function startGrammarQuickSession(){
+  const level=getActiveLevel(),questions=buildGrammarQuickQuestions(level);
+  // Level yang baru dibuka cuma punya satu lesson: sesi tetap jalan dengan 5 soal bentuk, bukan ditolak.
+  if(questions.length<GRAMMAR_QUICK_MODES.size)return showToast(FiezelI18n.t('grammar.sesi-kilat-belum-cukup',{level,jumlahSoal:questions.length}));
+  quizLoop({type:'grammar',count:Math.min(GRAMMAR_QUICK_SIZE,questions.length),pool:questions,factory:x=>x,preserveOrder:true});
+}
+window.startGrammarQuickSession=startGrammarQuickSession;
 /* ---- R2-2 GERBANG "LEWATI MATERI" ------------------------------------------------------
  * OWNER: murid yang sudah menguasai satu materi tertentu (mis. kata sandang) harus bisa
  * melewatinya TANPA pindah level. Filosofinya sama dengan Ujian Skip Level: lompatan
@@ -9395,7 +9479,7 @@ function reading(){const level=getActiveLevel(),active=R.filter(r=>r.level===lev
   /* m025-246: blok "Latihan berformat ujian" di layar Reading disembunyikan bersama
   pintu ujian per skill lainnya (OWNER: "Ujian per skill ... SEMBUNYIKAN"). Bank
   soalnya (reading-exam-v1.json), startReadingExam(), dan seluruh mesin penilaiannya
-  tetap utuh dan tetap dijaga reading-exam-test.js - yang mati hanya pintunya. */
+  tetap utuh dan tetap dijaga tests/reading-exam-test.js - yang mati hanya pintunya. */
   const examMarkup=(uxOn('skillExams')&&readingExamSets().length)?`<div class="card reading-exam"><div class="row"><b>${FiezelI18n.t('reading.practice-berformat-ujian')}</b><span>${FiezelI18n.t('reading.set-untuk',{length:examSets.length,level:esc(level)})}</span></div>${examSets.length?examSets.map(set=>{const f=readingExamFormat(set);return `<div class="reading-exam-set"><b>${esc(set.title)}</b><span>${FiezelI18n.t('reading.kata-item-menit',{label:esc(f?.label||''),wordCount:set.wordCount,jumlahSoal:set.questions.length,minutesPerPassage:f?.minutesPerPassage||'-'})}</span><small>${esc(f?.note||'')}</small><button onclick="startReadingExam('${esc(set.id)}')">${FiezelI18n.t('reading.mulai-set')} <i data-lucide="arrow-right"></i></button></div>`}).join(''):`<p class="muted">${FiezelI18n.t('reading.belum-ada-set-berformat-ujian',{level:esc(level),join:esc(examLevels.join(', ')||'-')})}</p>`}<p class="muted">${esc(READING_EXAM?.honesty||'')}</p></div>`:'';shell(FiezelI18n.t('reading.ruang-reading'),FiezelI18n.t('reading.bacaan-item-for-level',{length:active.length,total:total,level:level}),`<div class="level-scope-note"><b>${esc(level)}</b> · ${esc(levelDescriptor(level))}<span>${FiezelI18n.t('reading.bacaan-level-lain-tersimpan-tetapi')}</span></div>${examMarkup}<div class="toolbar"><button class="${state.adaptiveReady?'':'primary'}" onclick="startReadingRandom()"><i data-lucide="shuffle"></i> ${FiezelI18n.t('reading.bacaan-acak',{level:esc(level)})}</button><button class="${state.adaptiveReady?'primary':''}" onclick="startReadingAdaptive()"${state.adaptiveReady?'':' title="'+FiezelI18n.t('reading.terbuka-setelah-tes-awal-selesai')+'"'}><i data-lucide="zap"></i> ${FiezelI18n.t('student.reading-adaptive')}</button></div><div class="grid"><div class="card"><div class="row"><b>${FiezelI18n.t('grammar.jalur',{level:esc(level)})}</b><span>${FiezelI18n.t('reading.bacaan',{length:active.length})}</span></div><p class="muted">${active.length?FiezelI18n.t('reading.hub-instruction'):FiezelI18n.t('reading.hub-empty')}</p>${active.length?`<button onclick="openReadingLevel('${level}')">${FiezelI18n.t('reading.buka-bacaan')} <i data-lucide="arrow-right"></i></button>`:''}</div></div>`)}
 function openReadingLevel(l){const active=getActiveLevel();if(String(l||'')!==active)return showToast(FiezelI18n.t('reading.reading-dikunci-level',{active:active}));const r=pick(R.filter(x=>x.level===active));if(r)readingSession(r);else showToast(FiezelI18n.t('reading.reading-belum-tersedia',{active:active}))}
 function startReadingRandom(){const active=getActiveLevel(),pool=R.filter(r=>r.level===active);if(pool.length)readingSession(pick(pool));else showToast(FiezelI18n.t('reading.reading-belum-tersedia',{active:active}))}
@@ -10482,7 +10566,7 @@ function finishQuiz(cfg,score,total,tutorReport){
   //      empiris memang menemukan satu run tebakan acak (seed 1337, 36%) diumumkan A2.
   //
   // Baris skoringnya sengaja hanya bergantung pada `accuracy` dan `state`, tanpa konstanta lain:
-  // itulah yang membuat placement-accuracy-test.js bisa mengeksekusinya hermetis di vm dan
+  // itulah yang membuat tests/placement-accuracy-test.js bisa mengeksekusinya hermetis di vm dan
   // menguji PERILAKUnya (monotonik, selalu-salah -> A1, acak tidak boleh > A2) tanpa memaku
   // angka ambangnya. `state.placementBandLevel` yang belum ada berarti "tidak ada plafon dari
   // bukti band", jadi di dalam test yang berjalan tanpa sesi ia jatuh ke plafon akurasi murni.
@@ -10770,7 +10854,7 @@ function olmPanelMarkup(){
        `esc(cal.message||cal.status)`, dan itu mencetak "insufficient_data" mentah-mentah
        ke layar murid. Bukan salah modulnya: fiezel-olm.js memang SENGAJA memulangkan
        status tanpa pesan di bawah 20 pasangan ("tanpa angka yang berlagak tahu"), dan
-       olm-test.js:91 mengunci token itu sebagai KONTRAK. Jadi status adalah bahasa mesin,
+       tests/olm-test.js:91 mengunci token itu sebagai KONTRAK. Jadi status adalah bahasa mesin,
        dan menerjemahkannya adalah tugas lapisan tampilan - di sini.
        Aturannya: token yang TIDAK dikenali tidak pernah dicetak, barisnya yang dibuang.
        Lebih baik kehilangan satu baris daripada memamerkan enum internal ke murid. */
@@ -10855,7 +10939,7 @@ function learningMetricsMarkup(){
   // yang ditahan ditulis "belum cukup bukti", BUKAN diisi nol - nol yang dikarang lebih
   // berbahaya daripada kolom kosong, karena ia terlihat seperti pengukuran.
   // Dirakit dengan concat, BUKAN template bersarang. Alasannya bukan gaya: lexer
-  // id-golden-snapshot-test.js berjalan karakter demi karakter dan tidak mengenal ${...},
+  // tests/id-golden-snapshot-test.js berjalan karakter demi karakter dan tidak mengenal ${...},
   // jadi backtick di dalam interpolasi membuatnya berhenti di backtick yang salah lalu
   // membekukan potongan KODE sebagai "kalimat murid Indonesia".
   // JUJURNYA: menulis rata di sini TIDAK menyembuhkan gerbangnya, karena desync-nya sudah
@@ -11479,7 +11563,7 @@ function closeModal(){try{self.FiezelBackNav?.dismiss?.('modal')}catch{}return c
 // kalimat umum. Isi mentah tetap tersedia untuk diagnostik lewat console.debug di
 // renderAIError (konsol bukan DOM), tidak pernah lewat nilai kembalian ini.
 //
-// `esc(aiErrorMessage(err))` di renderAIError DIPERTAHANKAN (dijaga regression-test.js:23
+// `esc(aiErrorMessage(err))` di renderAIError DIPERTAHANKAN (dijaga tests/regression-test.js:23
 // dan product-audit.js:44): pelolosan HTML tetap lapis terakhir walau isinya kini naskah
 // kami sendiri - naskah statis hari ini bisa memuat placeholder besok.
 function aiErrorMessage(err){
@@ -11786,7 +11870,7 @@ function openAILoading(title){return openModal(`<div class="modal-mark">FIEZEL A
 //
 // URUTANNYA yang menjaga keamanannya, dan urutan itu tidak boleh dibalik: esc() DULU, baru
 // penanda diubah menjadi tag. Dengan begitu tidak satu pun karakter dari model bisa menjadi
-// markup - yang menjadi tag hanya pola yang dikenali di bawah ini. ai-integration-test.js
+// markup - yang menjadi tag hanya pola yang dikenali di bawah ini. tests/ai-integration-test.js
 // menembakkan <script> lewat jalur yang sama dan menjaga batas itu tetap utuh.
 function mdInline(escaped){
   return String(escaped)
@@ -11894,7 +11978,7 @@ function resetProgress(){openModal(`<div class="modal-mark">FIEZEL</div><h2>${Fi
      Temuan OWNER (audit cross-device, head e68b59c): RETENTION_PROBE_KEY mendarat di Langkah 1
      TANPA ikut daftar ini. Akibatnya jadwal probe DAN userSeed murid lama selamat dari reset,
      lalu ikut membentuk state probe sesudahnya - persis kebocoran yang komentar di atas
-     bilang tidak boleh ada. Gerbang reset-side-state-test.js sekarang menuntut setiap kunci
+     bilang tidak boleh ada. Gerbang tests/reset-side-state-test.js sekarang menuntut setiap kunci
      bukti murid baru masuk daftar ini (atau didaftarkan sebagai pengecualian beralasan),
      supaya kelas cacat ini tidak bisa mendarat diam-diam lagi. */
   /* S1: hapus kunci milik AKUN INI. Kunci datar ikut dihapus karena perangkat yang belum
@@ -11920,7 +12004,7 @@ function resetProgress(){openModal(`<div class="modal-mark">FIEZEL</div><h2>${Fi
      lagi, dan sesudahnya ia memang tidak punya akun - jadi dorongan itu kembali
      berguna. Meninggalkannya berarti murid yang baru saja mereset progresnya justru
      kehilangan satu-satunya ajakan mencadangkan progres barunya.
-     Komentar ini sengaja DI LUAR literal array: reset-side-state-test.js mengurai
+     Komentar ini sengaja DI LUAR literal array: tests/reset-side-state-test.js mengurai
      daftar itu dengan split(','), jadi satu koma di dalam komentar membuat gerbangnya
      membaca kunci yang salah. */
   for(const k of [BKT_KEY,MISCONCEPTION_LEDGER_KEY,ITEM_CALIBRATION_KEY,CONFUSION_MATRIX_KEY,OLM_NEGOTIATION_KEY,SRL_KEY,EVIDENCE_COHORT_KEY,EVIDENCE_LAST_KEY,EVIDENCE_ATTEMPT_KEY,RETENTION_PROBE_KEY,SL_STATE_KEY,IDENTITY_EVIDENCE_ATTEMPT_KEY,LEARNER_NAME_SYNC_KEY,ACCOUNT_NUDGE_KEY]){
@@ -12922,7 +13006,7 @@ function queueSocialEvidence(extraEvents){
     const core=socialCore();if(!core)return null;
     const events=[];
     if(state.daily?.meaningful)events.push({kind:'meaningful_day'});
-    try{if(self.FiezelDailyTarget?.status?.().met)events.push({kind:'daily_target'})}catch(_){}
+    try{if(dailySessionDone())events.push({kind:'daily_target'})}catch(_){}
     try{
       const sent=socialMasteredLedger(),fresh=[];
       for(const [skill,b] of Object.entries(state.grammar||{}))if((Number(b?.mastery)||0)>=GRAMMAR_UNLOCK_MASTERY&&!sent.includes(skill))fresh.push(skill);
@@ -12941,7 +13025,7 @@ window.queueSocialEvidence=queueSocialEvidence;window.socialSummaryCardMarkup=so
 // karena murid menutup aplikasi saat offline berangkat di sini.
 setTimeout(()=>{try{socialCore()?.flushOutbox()}catch(_){}},4500);
 /* ============================== akhir blok SOSIAL (SLOT 7) ========================== */
-window.istilahMurid=istilahMurid;/* dipapar untuk gerbang QA: penerjemah enum harus bisa disapu penuh */window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,/* m025-246: dipapar untuk regression-test - gerbang itu harus bisa MENANYAKAN ukuran rencana penempatan, bukan memaku 25 dan merah setiap kali ukurannya berubah dengan sengaja. */placementSize,placementBlueprint,/* cetak biru PENUH dipapar terpisah: gerbang harus tetap bisa menjaga invarian 'penempatan penuh memuat ketiga jenis konten' walau jalur murid memakai cetak biru lite */PLACEMENT_BLUEPRINT_FULL:PLACEMENT_BLUEPRINT,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,/* m025-201: dipapar untuk core-policy-parity-test.js - gerbang paritas tidak bisa membandingkan apa yang tidak bisa ia panggil */capRationaleCodes,policyEffectiveness,sanitizePolicyEffectiveness,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,coreBrainMemory,tutorSession,tutorObserve,misconceptionLedgerRead,misconceptionLedgerActive,coreBrainAttempts,quizPredictedSuccess,evidenceKappa,bktRead,bktRecord,bktShadowMarkup,brainManifestMarkup,learningTelemetryMode,learningTelemetryEmitAnswer,learningTelemetryStudyDay,braincoreEvidenceMode,braincoreEvidenceCohort,braincoreEvidenceCohortForBuild,braincoreEvidenceDay,braincoreEvidenceEmitSnapshot,braincoreEvidenceEmitDecision,braincoreEvidenceFlush,braincoreEvidenceObserveSession,braincoreDecisionReason,braincoreEvidenceAnyLaneActive,identityEvidenceMode,learnerNameSyncToServer,maybeSyncLearnerName,identityEvidenceActive,identityEvidenceMirror,identityEvidenceFlush,forgetLearnerEvidence,confusionMatrixRead,confusionMatrixRecord,affectObserve,affectSessionSync,affectTargetSuccess,listeningAdaptivePolicy,olmPanelMarkup,coreBrainPanelMarkup,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession,/* Fase 3 (C5): kalibrasi item, cloze, OLM negotiated, SRL, speaking adaptif, step tutor */itemCalibrationRead,itemCalibrationObserve,itemCalibrationEffective,calibrationItemId,ensureClozeBank,makeClozeQuestion,clozeAdaptivePicks,clozeSkillReady,clozeProductionRecord,olmSummarizeInput,olmDispute,olmProbeNextSkill,olmProbeConsume,olmNegotiationRead,srlSessionPlan,srlPredictPrompt,srlCaptureConfidence,srlReflect,srlSessionSync,speakingCoverageRows,speakingAdaptiveEvidence,speakingAdaptivePolicy,stepTutorGuidance,stepTutorGuidanceMarkup,record,quizLoop,startAdaptive};
+window.istilahMurid=istilahMurid;/* dipapar untuk gerbang QA: penerjemah enum harus bisa disapu penuh */window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,/* m025-246: dipapar untuk regression-test - gerbang itu harus bisa MENANYAKAN ukuran rencana penempatan, bukan memaku 25 dan merah setiap kali ukurannya berubah dengan sengaja. */placementSize,placementBlueprint,/* cetak biru PENUH dipapar terpisah: gerbang harus tetap bisa menjaga invarian 'penempatan penuh memuat ketiga jenis konten' walau jalur murid memakai cetak biru lite */PLACEMENT_BLUEPRINT_FULL:PLACEMENT_BLUEPRINT,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,/* m025-201: dipapar untuk tests/core-policy-parity-test.js - gerbang paritas tidak bisa membandingkan apa yang tidak bisa ia panggil */capRationaleCodes,policyEffectiveness,sanitizePolicyEffectiveness,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,coreBrainMemory,tutorSession,tutorObserve,misconceptionLedgerRead,misconceptionLedgerActive,coreBrainAttempts,quizPredictedSuccess,evidenceKappa,bktRead,bktRecord,bktShadowMarkup,brainManifestMarkup,learningTelemetryMode,learningTelemetryEmitAnswer,learningTelemetryStudyDay,braincoreEvidenceMode,braincoreEvidenceCohort,braincoreEvidenceCohortForBuild,braincoreEvidenceDay,braincoreEvidenceEmitSnapshot,braincoreEvidenceEmitDecision,braincoreEvidenceFlush,braincoreEvidenceObserveSession,braincoreDecisionReason,braincoreEvidenceAnyLaneActive,identityEvidenceMode,learnerNameSyncToServer,maybeSyncLearnerName,identityEvidenceActive,identityEvidenceMirror,identityEvidenceFlush,forgetLearnerEvidence,confusionMatrixRead,confusionMatrixRecord,affectObserve,affectSessionSync,affectTargetSuccess,listeningAdaptivePolicy,olmPanelMarkup,coreBrainPanelMarkup,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession,/* Fase 3 (C5): kalibrasi item, cloze, OLM negotiated, SRL, speaking adaptif, step tutor */itemCalibrationRead,itemCalibrationObserve,itemCalibrationEffective,calibrationItemId,ensureClozeBank,makeClozeQuestion,clozeAdaptivePicks,clozeSkillReady,clozeProductionRecord,olmSummarizeInput,olmDispute,olmProbeNextSkill,olmProbeConsume,olmNegotiationRead,srlSessionPlan,srlPredictPrompt,srlCaptureConfidence,srlReflect,srlSessionSync,speakingCoverageRows,speakingAdaptiveEvidence,speakingAdaptivePolicy,stepTutorGuidance,stepTutorGuidanceMarkup,record,quizLoop,startAdaptive};
 window.startVocabQuiz=startVocabQuiz;window.buildAdaptivePool=buildAdaptivePool;window.buildGrammarLessonQuestions=buildGrammarLessonQuestions;window.getScenePalette=getScenePalette;window.getCelestialState=getCelestialState;window.playFeedbackSound=playFeedbackSound;window.updateMastery=updateMastery;window.markMastered=markMastered;window.__getFiezelState=()=>state;window.__fiezelValidViews=()=>[...VALID_VIEWS];window.__fiezelDueReviews=()=>dueItems().length;window.buildAdaptivePolicy=buildAdaptivePolicy;window.studyDayKey=studyDayKey;window.startAdaptive=startAdaptive;window.showToast=showToast;window.answerFeedbackSignal=answerFeedbackSignal;window.practiceSkill=practiceSkill;window.openReadingLevel=openReadingLevel;window.startReadingRandom=startReadingRandom;window.startReadingAdaptive=startReadingAdaptive;window.startPlacement=startPlacement;window.startLevelPractice=startLevelPractice;window.startAdaptive=startAdaptive;window.resetProgress=resetProgress;window.closeModal=closeModal;window.openSettings=openSettings;window.openReportPreview=openReportPreview;window.sendCreatorReport=sendCreatorReport;window.askCoachAI=askCoachAI;window.dismissWelcome=dismissWelcome;window.requestStudyNotificationPermission=requestStudyNotificationPermission;window.declineStudyNotifications=declineStudyNotifications;window.skipPuterSignIn=skipPuterSignIn;window.shouldPresentPuterPopup=shouldPresentPuterPopup;window.notifyAppUpdateIfNew=notifyAppUpdateIfNew;window.setConfidence=setConfidence;window.explainWithAI=explainWithAI;window.explainWordWithAI=explainWordWithAI;window.olmDispute=olmDispute;/* Fase 3 (C5 butir 3): handler tombol sanggah di panel OLM */
 // m025-84: dipasang di ujung berkas, saat go()/state/VALID_VIEWS sudah ada, dan SEBELUM
 // load() supaya navigasi pertama pun sudah terekam di riwayat.
@@ -12963,18 +13047,15 @@ function installBackNav(){
       // diganti dengan pertanyaan yang sebenarnya: apakah panelnya sedang di layar. Panel
       // undangan memang tidak mengunci aplikasi, tetapi selama ia terbuka ia tetap dialog -
       // tombol kembali harus menutupnya, bukan menavigasi di belakangnya.
-      // m025-117: kunci target harian ikut dihitung di sini. Sampai rilis ini
-      // features/daily-target/fiezel-daily-target.js menahan tekanan kembali dengan
-      // mendorong entri riwayatnya SENDIRI - pemilik riwayat kedua yang tidak diketahui
-      // tumpukan modul back-nav, dan sumber ketidaksejajaran yang membuat satu tekanan
-      // kembali kadang tidak melakukan apa pun. Sekarang ia cukup mengumumkan dirinya
-      // lewat body.daily-locked, dan penahanannya dikerjakan di satu tempat: di sini.
+      // m025-254: baris `daily-locked` di sini ikut hilang bersama kunci target harian.
+      // Kelas itu dipasang oleh satu-satunya modul yang pernah menuliskannya, dan modul
+      // itu sudah tidak ada - memeriksanya hanya akan membuat pembaca berikutnya mencari
+      // gerbang yang tidak pernah menyala.
       locked:()=>{
         try{
           const welcome=document.getElementById?.('welcome');
           if(welcome&&!welcome.classList.contains('hidden'))return true;
           if(document.body?.classList?.contains?.('auth-locked'))return true;
-          if(document.body?.classList?.contains?.('daily-locked'))return true;
           return !!document.querySelector?.('.fiezel-splash,.fiezel-ob');
         }catch{return false}
       },

@@ -25,7 +25,7 @@
  * senyap itu persis yang §8 larang. Parser di bawah menangani RFC 4180:
  * kutipan, kutipan ganda yang di-escape, baris baru DI DALAM sel, dan CRLF.
  * Dependency dilarang di jalur produksi (lihat kepala workers/api/index.js),
- * jadi parsernya ada di sini, dan gerbang `teacher-csv-test.js` mengujinya.
+ * jadi parsernya ada di sini, dan gerbang `tests/teacher-csv-test.js` mengujinya.
  *
  * ==========================================================================
  * SUNTIKAN RUMUS (§8 "dangerous formulas")

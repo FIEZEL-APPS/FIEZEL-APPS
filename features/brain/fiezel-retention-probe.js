@@ -41,7 +41,7 @@
  * yang boleh dipakai atau diabaikan pemanggil. Dua penulis pada satu angka memori
  * adalah resep drift yang tidak bisa diaudit; satu penulis + satu penasihat bisa.
  *
- * ATURAN KERAS v3 (BRAINCORE-V3-CONTRACTS.md): modul murni — tanpa DOM, tanpa jaringan,
+ * ATURAN KERAS v3 (docs/BRAINCORE-V3-CONTRACTS.md): modul murni — tanpa DOM, tanpa jaringan,
  * tanpa penyimpanan, tanpa Math.random, tanpa Date.now internal; waktu selalu argumen;
  * state milik pemanggil TIDAK PERNAH dimutasi; masukan korup tidak boleh melempar.
  */
@@ -198,7 +198,7 @@
    * = momen mastery dalam ms; tanpa `at`, nowMs dipakai sebagai jangkar.
    *
    * opts.userSeed: bilangan identitas murid LOKAL (bukan ID stabil yang dikirim ke
-   * server — lihat BRAIN-DATA-PRIVACY.md) untuk menyebar jitter antar murid. Sekali
+   * server — lihat docs/BRAIN-DATA-PRIVACY.md) untuk menyebar jitter antar murid. Sekali
    * terekam di state, seed di state yang menang supaya jadwal tidak berubah-ubah.
    *
    * Idempoten per lesson: lesson yang sudah punya jadwal TIDAK dijadwalkan ulang —

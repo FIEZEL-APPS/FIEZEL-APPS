@@ -1,0 +1,24 @@
+PASS  Ada sumber yang dipindai (pemindaian tidak vakum)
+PASS  (N1) NOL berkas selain `features/analytics/fiezel-analytics-client.js` menugaskan `FiezelAnalytics` (modul analytics privasi-maksimal)
+PASS  (N2) Pemiliknya MEMANG menugaskan `FiezelAnalytics` (anti-vakum)
+PASS  (N1) NOL berkas selain `features/ui/fiezel-ab-testing.js` menugaskan `FiezelABAnalytics` (pipa eksperimen A/B UI)
+PASS  (N2) Pemiliknya MEMANG menugaskan `FiezelABAnalytics` (anti-vakum)
+PASS  (N3) Pemindai menangkap setiap bentuk penugasan sintetis
+PASS  (N3) Pemindai TIDAK menangkap pembacaan/perbandingan
+PASS  (N4) Modul A/B memasang `window.FiezelABAnalytics`
+PASS  (N4) Modul A/B nol sebutan `FiezelAnalytics` di kode (hanya boleh di komentar)
+PASS  (N6) Kunci penyimpanan A/B `fiezel_ab_events` tidak berganti nama (data murid utuh)
+PASS  (N4) Modul A/B punya `track()` (pemanggil UI tidak lagi memanggil metode hantu)
+PASS  (N5) `fiezel-ui-manager.js` memanggil `FiezelABAnalytics`
+PASS  (N5) `fiezel-ui-manager.js` NOL sebutan `FiezelAnalytics` di kode
+PASS  (N5) Pemanggil memeriksa bentuk sebelum memakai global
+PASS  (N7) Pola lama "percayai global apa adanya" sudah tidak ada
+PASS  (N7) Pemuat memeriksa bentuk lewat penjaga khusus (`anIsModule`)
+PASS  (N7) Pemuat memakai slot patok khas miliknya sendiri
+PASS  (N7) Kode galat dibedakan per sebab (nol pemakaian `module_shape` lama)
+PASS  (N7) `stats()` melaporkan `nameConflict` (tabrakan yang sudah dipulihkan tetap terlihat)
+PASS  (N7) Blok pemancar ditemukan lewat penanda BEGIN/END
+PASS  (N7) Pemuat tetap nol `await` (fire-and-forget tidak berubah)
+PASS  (N8) Gerbang ini terdaftar di quality.yml
+
+22/22 PASS · GLOBAL-NAME-COLLISION-REPORT.json

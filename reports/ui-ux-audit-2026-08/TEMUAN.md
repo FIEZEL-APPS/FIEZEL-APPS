@@ -61,7 +61,7 @@ Hasil terukur: **1,18:1** (ambang 3:1). "Vocabulary Hub", "Ruang Reading", "Peta
 
 Ini persis kelas bug yang blok `m025-113` **di file yang sama** sudah perbaiki untuk
 `.launch-card` ("kartunya putih dan tintanya juga hampir putih"); perbaikan itu tidak pernah
-sampai ke judulnya. Dan `contrast-test.js:353` **sudah punya kasus** untuk pemilih ini — tetapi
+sampai ke judulnya. Dan `tests/contrast-test.js:353` **sudah punya kasus** untuk pemilih ini — tetapi
 ia memodelkan warnanya sebagai `var(--ambient-text)` alih-alih menghitung kaskade, jadi override
 di file lain lolos begitu saja.
 
@@ -125,7 +125,7 @@ lesson checkpoint", dst. — sementara satu paragraf di layar yang **sama** suda
 pilihan desain.
 
 Ini nyata dan menyumbang langsung ke "susah dimengerti". Tetapi memperbaikinya berarti menambah
-kunci i18n baru dan menyentuh kontrak `id-golden-snapshot-test.js` serta `th-coverage-test.js`
+kunci i18n baru dan menyentuh kontrak `tests/id-golden-snapshot-test.js` serta `tests/th-coverage-test.js`
 (cabang Thai wajib ikut) — pekerjaan konten yang lebih besar dari perbaikan bug, dan yang
 sebaiknya diputuskan owner, bukan dikerjakan sepihak di tengah audit tampilan.
 
@@ -144,7 +144,7 @@ menggulir untuk menemukannya. Panelnya `overflow-y:auto` sehingga tetap terjangk
 
 ## 5. Gerbang baru
 
-`ui-render-audit-test.js`, terdaftar di `quality.yml` tepat setelah `contrast-test.js`.
+`tests/ui-render-audit-test.js`, terdaftar di `quality.yml` tepat setelah `tests/contrast-test.js`.
 Ia menjalankan aplikasi di Chromium dan menjaga sembilan invarian (T1 nilai mentah, T2a/T2b
 pengurungan fokus, T3 kontras judul lintas fase langit, T4 area sentuh efektif, T5/T5a/T5b
 penumpukan dialog **dan** hasil ritualnya, T6 scroll horizontal).

@@ -27,7 +27,7 @@
  *   Butuh playwright ter-install (repo dev env sudah punya 1.59).
  *   TIDAK dipasang di quality.yml (butuh browser); jalankan manual pada
  *   setiap perubahan fiezel-mascot.js / fiezel-motion.css, atau dari QA.
- *   Kontrak statisnya (mekanisme styleAt) dijaga paw-mascot-test.js.
+ *   Kontrak statisnya (mekanisme styleAt) dijaga tests/paw-mascot-test.js.
  */
 import { chromium } from 'playwright';
 import fs from 'node:fs';

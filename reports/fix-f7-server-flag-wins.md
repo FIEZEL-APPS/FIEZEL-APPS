@@ -101,7 +101,7 @@ bukan assert merah. Putaran ulang bersih dan itulah yang dilaporkan di atas.
 
 ## 5. Matriks self-test loopback: 21 → 24 skenario
 
-`node e2e-bridge-selftest.js` → **PASS (36 assert, 24 skenario loopback), exit 0.** Jumlah
+`node tests/e2e-bridge-selftest.js` → **PASS (36 assert, 24 skenario loopback), exit 0.** Jumlah
 skenario tidak turun. Empat skenario yang menyangkut assert baru:
 
 | Mutasi jembatan/aplikasi tiruan | Diharapkan | Hasil |
@@ -132,7 +132,7 @@ Batas lain yang tidak boleh dibaca berlebihan:
 
 * Gerbang ini membuktikan **perilaku transport klien** terhadap flag server. Ia tidak
   membuktikan server benar-benar menolak permintaan seandainya klien nakal — itu ranah
-  `cf-config-killswitch-test.js` dan kontrak sisi Worker.
+  `tests/cf-config-killswitch-test.js` dan kontrak sisi Worker.
 * Arah "harus nol" dibuktikan lewat kehabisan waktu 4000 ms. Itu bukti negatif berbatas waktu;
   permintaan yang tertunda lebih lama dari itu tidak akan tertangkap.
 * Ketiga assert baru dievaluasi hanya di skenario `B-config-on`. Skenario lain tidak punya
@@ -140,7 +140,7 @@ Batas lain yang tidak boleh dibaca berlebihan:
 
 ## 7. Efek samping yang saya kerjakan dan alasannya
 
-`secret-scan-test.js` **sudah MERAH sebelum pekerjaan ini dimulai**: commit F6 (`9a3316b`)
+`tests/secret-scan-test.js` **sudah MERAH sebelum pekerjaan ini dimulai**: commit F6 (`9a3316b`)
 ikut men-commit `reports/fix-f6-data/e2e-after.json` dan `e2e-after-2.json` yang memuat nilai
 cookie sesi NYATA (`fz_id`, `AWSALB`, `AWSALBCORS`) apa adanya, plus URL tantangan Cloudflare.
 Artefak bukti F7 saya akan menambah masalah yang sama. Jadi:
@@ -150,7 +150,7 @@ Artefak bukti F7 saya akan menambah masalah yang sama. Jadi:
   jalur tantangan Cloudflare diganti `<REDAKSI len=N sha256=…>`, sehingga nama cookie,
   jumlah, panjang, dan sidik jarinya tetap bisa diperiksa;
 * dijalankan atas empat berkas: dua artefak F7 saya dan dua artefak F6 yang bikin merah.
-  Setelah itu `secret-scan-test.js` **46/46 assert PASS, 0 temuan, exit 0**.
+  Setelah itu `tests/secret-scan-test.js` **46/46 assert PASS, 0 temuan, exit 0**.
 
 **Yang TIDAK selesai:** riwayat git masih memuat nilai asli untuk berkas F6 yang sudah pernah
 ter-commit. Token itu harus dianggap bocor dan dirotasi owner. Memasukkannya ke allowlist akan
@@ -159,7 +159,7 @@ salah — itu kredensial, bukan fixture.
 `GATE-REGISTRY-REPORT.json` dan `EDGE-PROXY-HOPBYHOP-REPORT.json` yang ikut berubah saat
 menjalankan gerbang sudah di-restore ke keadaan commit. Catatan kecil: artefak
 `GATE-REGISTRY-REPORT.json` di commit menyebut `gateFilesInRepo: 148`, sedangkan angka nyata
-sekarang 149 karena `cf-client-timeout-test.js` belum terlacak saat F6 membuat artefaknya.
+sekarang 149 karena `tests/cf-client-timeout-test.js` belum terlacak saat F6 membuat artefaknya.
 Gerbangnya tetap PASS; artefaknya saja yang basi, dan saya tidak menyentuhnya karena bukan
 lingkup paket ini.
 
@@ -167,16 +167,16 @@ lingkup paket ini.
 
 | Gerbang | Exit |
 |---|---|
-| `node e2e-bridge-selftest.js` | 0 (PASS, 36 assert, 24 skenario) |
-| `node no-network-test.js` | 0 |
-| `node gate-registry-test.js` | 0 |
-| `node cf-config-killswitch-test.js` | 0 |
-| `node cf-client-timeout-test.js` | 0 |
-| `node secret-scan-test.js` | 0 (setelah redaksi §7) |
-| `node regression-test.js` | 0 |
-| `node install-health-test.js` | 0 |
+| `node tests/e2e-bridge-selftest.js` | 0 (PASS, 36 assert, 24 skenario) |
+| `node tests/no-network-test.js` | 0 |
+| `node tests/gate-registry-test.js` | 0 |
+| `node tests/cf-config-killswitch-test.js` | 0 |
+| `node tests/cf-client-timeout-test.js` | 0 |
+| `node tests/secret-scan-test.js` | 0 (setelah redaksi §7) |
+| `node tests/regression-test.js` | 0 |
+| `node tests/install-health-test.js` | 0 |
 | `FIEZEL_E2E_BRIDGE_BASE=https://api.fiezel.my.id node tools/fiezel-e2e-bridge.mjs` | 0 (24/24 HIJAU) |
 
-Berkas yang berubah: `tools/fiezel-e2e-bridge.mjs`, `e2e-bridge-selftest.js`,
+Berkas yang berubah: `tools/fiezel-e2e-bridge.mjs`, `tests/e2e-bridge-selftest.js`,
 `tools/redact-live-cookies.mjs` (baru), `reports/fix-f7-data/*.json` (baru),
 `reports/fix-f6-data/e2e-after*.json` (redaksi), dan catatan ini.
