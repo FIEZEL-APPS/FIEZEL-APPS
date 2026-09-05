@@ -374,12 +374,12 @@ export function registerAnalyticsRoutes(router) {
    * analytics membaca jam dinding, melanggar disiplin yang ditulis harness-nya sendiri
    * ("Waktu SELALU masuk sebagai parameter; tidak ada Date.now() di jalur keputusan").
    *
-   * Yang meledak karenanya: `day` ditolak di luar ±2 hari, jadi cf-wiring-test.js dengan
+   * Yang meledak karenanya: `day` ditolak di luar ±2 hari, jadi tests/cf-wiring-test.js dengan
    * DAY tetap '2026-08-27' HIJAU sampai 29 Agu lalu MERAH sendiri pada 30 Agu tanpa satu
    * baris kode pun berubah. Gerbang yang pecah karena kalender tidak menguji apa pun.
    *
    * Produksi tidak berubah: TEST_CLOCK_MS tidak ada di wrangler.toml (dan
-   * cf-api-contract-test.js meng-assert ia tidak boleh ada), jadi nilainya tetap Date.now(). */
+   * tests/cf-api-contract-test.js meng-assert ia tidak boleh ada), jadi nilainya tetap Date.now(). */
   const nowFrom = (env) => {
     const injected = Number(env && env.TEST_CLOCK_MS);
     return Number.isFinite(injected) && injected > 0 ? injected : Date.now();

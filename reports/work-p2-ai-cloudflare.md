@@ -35,13 +35,13 @@ Tiga hal yang harus kamu baca sampai habis sebelum menyalakan apa pun:
 **Repo sudah benar. Tidak ada yang perlu disunting.** `workers/api/wrangler.toml` `[vars]`
 sudah memuat `AI_LIMIT_PER_DAY = "25"` dan `TTS_CHARS_PER_DAY = "12000"`, dan keduanya cocok
 dengan `workers/api/quota/quota-config.js` (`FREE_AI_DAILY_LIMIT: 25`,
-`FREE_TTS_DAILY_CHARS: 12000`). `config-consistency-test.js` sudah menegakkan pasangan itu
+`FREE_TTS_DAILY_CHARS: 12000`). `tests/config-consistency-test.js` sudah menegakkan pasangan itu
 plus lantai nilainya (`FLOOR = { FREE_AI_DAILY_LIMIT: 25, FREE_TTS_DAILY_CHARS: 12000 }`),
 jadi "menyelaraskan angka dengan menurunkan jatah murid" akan memerahkan gerbang — sesuai
 mandat.
 
 Var batas lain yang menyimpang dari padanan penegakan, semuanya SUDAH terdaftar sebagai
-pengecualian beralasan di `config-consistency-test.js`, dan saya setuju dengan alasannya:
+pengecualian beralasan di `tests/config-consistency-test.js`, dan saya setuju dengan alasannya:
 
 | Var | Nilai | Status |
 |---|---|---|
@@ -73,7 +73,7 @@ Alat baru, nol dependency, menembak `https://api.fiezel.my.id` sungguhan.
 
 - **Tanpa `FIEZEL_AI_LIVE_BASE`:** cetak alasan jujur, `status:"SKIP"`, `pass:null`, exit 0.
   Tidak ada URL bawaan (`|| 'https://…'`) — larangan itu diperiksa dengan MENJALANKAN berkasnya
-  di `no-network-test.js` blok 2d, bukan dipercaya dari komentar.
+  di `tests/no-network-test.js` blok 2d, bukan dipercaya dari komentar.
 - **Env diset tapi tidak sah:** MERAH (exit 1), bukan SKIP. Seseorang memang meminta pengujian
   nyata; "produksi tidak bisa dihubungi" tidak boleh berubah menjadi hijau.
 - **Registry sebagai sumber kebenaran:** daftar task, `FORBIDDEN_FIELDS`, nama skema, dan
@@ -94,8 +94,8 @@ Batasi lebih jauh dengan `FIEZEL_AI_LIVE_TASKS=tutor_turn` bila hanya mau membay
 
 Registrasi CI: satu langkah `workflow_dispatch` bergerbang aktor di `quality.yml` (input
 `ai_live_base`), **tidak ada** di jalur per-push. Dua gerbang menjaga itu dari dua sisi —
-`no-network-test.js` (langkahnya wajib tepat satu dan wajib bergerbang) dan
-`workflow-actor-gate-test.js` cek (H), yang regexnya saya perluas supaya langkah termahal di
+`tests/no-network-test.js` (langkahnya wajib tepat satu dan wajib bergerbang) dan
+`tests/workflow-actor-gate-test.js` cek (H), yang regexnya saya perluas supaya langkah termahal di
 workflow tidak menjadi satu-satunya yang penjaganya tak pernah diverifikasi.
 
 ---
@@ -169,7 +169,7 @@ kanon kata, berlaku untuk SEMUA task termasuk `translate_subtitle` yang `sentenc
 Pembatas `DATA_DELIM` sekarang satu sumber untuk pembangun prompt DAN pendeteksinya. Polanya
 sengaja sempit (dua tanda hubung atau lebih di kedua sisi kata DATA, plus kalimat pembuka
 penjaga) supaya tanda hubung sah dan kata "data" biasa tidak kena — dan sisi itu ikut
-di-assert. Blok 6 baru di `ai-response-shape-test.js` menutupnya ujung-ke-ujung: handler
+di-assert. Blok 6 baru di `tests/ai-response-shape-test.js` menutupnya ujung-ke-ujung: handler
 membuang jawaban itu, mengganti dengan fallback, dan TIDAK menagih.
 
 **Perbaikan ini ada di repo, BELUM di Worker terpasang.** Sampai di-deploy, murid masih bisa
@@ -233,7 +233,7 @@ memasukkan cacat baru.
    lain butuh perbaikan prompt/model dulu kalau tidak mau murid membaca "Mode hemat" sambil
    owner membayar token.
 6. **Jangan** memakai jalan pintas apa pun yang menurunkan `FREE_AI_DAILY_LIMIT` atau
-   `FREE_TTS_DAILY_CHARS` untuk "merapikan angka". `config-consistency-test.js` akan merah, dan
+   `FREE_TTS_DAILY_CHARS` untuk "merapikan angka". `tests/config-consistency-test.js` akan merah, dan
    itu memang tujuannya.
 
 ---
@@ -256,13 +256,13 @@ bukan nol, supaya laporan biayanya tidak lebih kecil dari tagihan yang benar-ben
 
 ## 9. Gerbang
 
-Semua exit 0 di cabang ini: `ai-task-contract-test.js`, `ai-response-shape-test.js`,
-`cf-api-contract-test.js`, `cf-wiring-test.js`, `quota-core-test.js`,
-`config-consistency-test.js`, `no-network-test.js`, `secret-scan-test.js`,
-`gate-registry-test.js`, `coordination-guard-test.js`, `regression-test.js`,
-`install-health-test.js`, plus `workflow-actor-gate-test.js` yang ikut tersentuh.
+Semua exit 0 di cabang ini: `tests/ai-task-contract-test.js`, `tests/ai-response-shape-test.js`,
+`tests/cf-api-contract-test.js`, `tests/cf-wiring-test.js`, `tests/quota-core-test.js`,
+`tests/config-consistency-test.js`, `tests/no-network-test.js`, `tests/secret-scan-test.js`,
+`tests/gate-registry-test.js`, `tests/coordination-guard-test.js`, `tests/regression-test.js`,
+`tests/install-health-test.js`, plus `tests/workflow-actor-gate-test.js` yang ikut tersentuh.
 
 Berkas yang berubah: `tools/ai-live-verify.mjs` (baru), `workers/api/ai/ai-tasks.js`,
-`ai-response-shape-test.js`, `no-network-test.js`, `workflow-actor-gate-test.js`,
+`tests/ai-response-shape-test.js`, `tests/no-network-test.js`, `tests/workflow-actor-gate-test.js`,
 `.github/workflows/quality.yml`. Tidak ada gerbang duplikat — dua gerbang AI yang ada
 diperluas, bukan digandakan.

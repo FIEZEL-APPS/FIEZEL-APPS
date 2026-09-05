@@ -77,7 +77,7 @@ export function dayWindow(day, n) {
 }
 
 /* -------------------------------------------------------------------------- */
-/* Perhitungan murni (diuji langsung oleh analytics-aggregate-test.js)         */
+/* Perhitungan murni (diuji langsung oleh tests/analytics-aggregate-test.js)         */
 /* -------------------------------------------------------------------------- */
 
 /**
@@ -230,8 +230,8 @@ export async function runDailyRollup(db, opts = {}) {
     // baris pepper_state hanya memuat `current` + satu `previous`. `writePepper`
     // menimpa KETIGA kolom sekaligus (`ON CONFLICT ... SET rotated_at, current,
     // previous`), jadi nilai lama tidak tertinggal di kolom mana pun dan tidak
-    // ada tabel arsip pepper di skema. Ditegakkan `cron-contract-test.js` (c)
-    // dan `analytics-privacy-test.js`.
+    // ada tabel arsip pepper di skema. Ditegakkan `tests/cron-contract-test.js` (c)
+    // dan `tests/analytics-privacy-test.js`.
   }
 
   // 5. Purge retensi.

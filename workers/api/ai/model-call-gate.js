@@ -22,7 +22,7 @@
  *
  *   - rute baru yang ingin memanggil model HARUS lewat sini, karena tidak ada
  *     tempat lain di repo yang menyentuh binding AI (di-assert secara
- *     PROGRAMATIK oleh `ai-account-cap-gate-test.js`, dengan memindai sumber —
+ *     PROGRAMATIK oleh `tests/ai-account-cap-gate-test.js`, dengan memindai sumber —
  *     bukan dari daftar rute yang diketik tangan, karena daftar tangan basi
  *     begitu rute baru lahir, dan itu persis cara celah S1 muncul);
  *   - rute baru yang lupa memesan neuron tidak diam-diam gratis: ia MELEMPAR

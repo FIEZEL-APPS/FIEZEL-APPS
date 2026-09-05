@@ -17,7 +17,7 @@
  * Ia HANYA MEMBACA. Tidak ada satu pun jalur di sini yang menulis ke grammar-templates.json,
  * vocabulary-master.json, atau reading-bank.json — dan itu diperiksa, bukan dijanjikan:
  * validateCandidate() menghitung sha256 ketiga berkas sebelum dan sesudah, dan gerbang
- * content-chain-report-test.js menghitungnya sekali lagi dari luar.
+ * tests/content-chain-report-test.js menghitungnya sekali lagi dari luar.
  *
  * Yang paling jauh bisa dilaporkannya adalah `owner_decision`: semua yang bisa dibuktikan
  * mesin sudah terbukti, sisanya tanda tangan manusia. Tidak ada bendera, argumen, atau

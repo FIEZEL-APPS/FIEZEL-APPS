@@ -34,7 +34,7 @@ payload = {
 }
 ```
 
-Aturan yang ditegakkan verifier (semua sudah diuji di `cf-api-contract-test.js`):
+Aturan yang ditegakkan verifier (semua sudah diuji di `tests/cf-api-contract-test.js`):
 
 | Aturan | Jawaban kalau dilanggar |
 |---|---|

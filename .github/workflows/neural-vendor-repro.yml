@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     # Batas keras: tanpa ini GitHub memakai 360 menit, dan satu langkah
     # yang menggantung membakar enam jam dalam diam (lihat
-    # workflow-timeout-gate-test.js).
+    # tests/workflow-timeout-gate-test.js).
     timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4

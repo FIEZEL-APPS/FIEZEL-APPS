@@ -9,7 +9,7 @@
  *
  * Pemisahan itu disengaja: mesin yang punya kredensial Cloudflare (mesin owner)
  * menjalankan wrangler; pembandingnya adalah kode yang bisa diuji di CI tanpa
- * kredensial apa pun. Gerbang `d1-schema-contract-test.js` menguji skrip ini
+ * kredensial apa pun. Gerbang `tests/d1-schema-contract-test.js` menguji skrip ini
  * dengan fixture — termasuk fixture yang SENGAJA rusak — supaya terbukti skrip
  * ini bisa MERAH, bukan hanya bisa hijau.
  *
@@ -68,7 +68,7 @@ const DB_ALIAS = { 'fiezel-core': 'core', 'fiezel-stats': 'stats', 'fiezel-learn
  *
  * Satu direktori melayani DUA database, jadi pemetaan berkas->database wajib
  * eksplisit. Sebelumnya pemetaan itu berupa literal di berkas ini DAN literal
- * kembar di `d1-schema-contract-test.js`. Ketika `0003_cron.sql` mendarat, kedua
+ * kembar di `tests/d1-schema-contract-test.js`. Ketika `0003_cron.sql` mendarat, kedua
  * literal itu tidak diperbarui, jadi tabel `cron_run` lenyap dari "skema harapan"
  * di kedua sisi sekaligus — persis kegagalan diam-diam yang paling berbahaya:
  * gerbang tetap HIJAU untuk hal yang tidak pernah ia periksa.

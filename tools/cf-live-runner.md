@@ -1,8 +1,8 @@
 # cf-live-runner — cara menjalankan gerbang runtime nyata
 
-`cf-live-contract-test.js` adalah satu-satunya gerbang di repo ini yang menguji Worker
-`fiezel-api` **yang hidup** lewat HTTP nyata. Semua gerbang CF lain (`cf-api-contract-test.js`,
-`cf-wiring-test.js`, `quota-*`, `analytics-*`, `tts-key-test.js`) berjalan di atas binding palsu
+`tests/cf-live-contract-test.js` adalah satu-satunya gerbang di repo ini yang menguji Worker
+`fiezel-api` **yang hidup** lewat HTTP nyata. Semua gerbang CF lain (`tests/cf-api-contract-test.js`,
+`tests/cf-wiring-test.js`, `quota-*`, `analytics-*`, `tests/tts-key-test.js`) berjalan di atas binding palsu
 `tools/cf-test-harness.js` — batas kejujuran yang sudah dicatat sendiri di
 `reports/exec-wiring.md` §6.
 
@@ -10,10 +10,10 @@
 
 ```bash
 # produksi (setelah rute api.fiezel.my.id dibuka)
-FIEZEL_CF_LIVE_BASE=https://api.fiezel.my.id node cf-live-contract-test.js --report
+FIEZEL_CF_LIVE_BASE=https://api.fiezel.my.id node tests/cf-live-contract-test.js --report
 
 # deploy sementara di *.workers.dev
-FIEZEL_CF_LIVE_BASE=https://fiezel-api.<akun>.workers.dev node cf-live-contract-test.js --report
+FIEZEL_CF_LIVE_BASE=https://fiezel-api.<akun>.workers.dev node tests/cf-live-contract-test.js --report
 ```
 
 Tanpa `FIEZEL_CF_LIVE_BASE` gerbang mencetak alasan jujur lalu **exit 0 (SKIP)**. SKIP bukan
@@ -30,7 +30,7 @@ ditembakkan). Berkas itu **gitignored**: isinya bergantung lingkungan.
 | `FIEZEL_CF_LIVE_BASE` | ya | *(tidak ada)* | base URL Worker. Tanpa ini → SKIP. Sengaja tanpa bawaan: satu URL bawaan akan membuat CI publik menembak produksi pada setiap push. |
 | `FIEZEL_CF_LIVE_ORIGIN` | tidak | `https://fiezel.my.id` | Origin yang **harus** mendapat `access-control-allow-origin`. Harus salah satu isi `ALLOWED_ORIGINS` di `workers/api/wrangler.toml`. |
 | `FIEZEL_CF_LIVE_COOKIE_DOMAIN` | tidak | `fiezel.my.id` | Nilai `Domain` yang diharapkan pada cookie `fz_id` = `COOKIE_DOMAIN` di `wrangler.toml`. |
-| `FIEZEL_CF_LIVE_REPORT` | tidak | `./CF-LIVE-REPORT.json` | Alihkan laporan ke berkas lain (dipakai `cf-live-selftest.js` agar tidak mengotori working tree). |
+| `FIEZEL_CF_LIVE_REPORT` | tidak | `./CF-LIVE-REPORT.json` | Alihkan laporan ke berkas lain (dipakai `tests/cf-live-selftest.js` agar tidak mengotori working tree). |
 
 ### Menjalankan terhadap *.workers.dev
 
@@ -41,7 +41,7 @@ ter-deploy. Jangan melunakkan gerbangnya — sesuaikan yang diharapkan:
 FIEZEL_CF_LIVE_BASE=https://fiezel-api.<akun>.workers.dev \
 FIEZEL_CF_LIVE_ORIGIN=https://fiezel.my.id \
 FIEZEL_CF_LIVE_COOKIE_DOMAIN=fiezel.my.id \
-node cf-live-contract-test.js --report
+node tests/cf-live-contract-test.js --report
 ```
 
 Kalau `COOKIE_DOMAIN` memang belum diisi di deployment itu, assert `cookie-domain` akan **merah**
@@ -71,13 +71,13 @@ gerbang), `ALLOWED_ORIGINS` + `COOKIE_DOMAIN` terisi, dan migrasi D1 di
 
 Gerbang ini **tidak** menguji kuota 25/26, cache TTS, maupun cron. Ketiganya menulis state nyata
 di `fiezel-core`/`fiezel-stats` — menjalankannya terhadap produksi berarti menghabiskan jatah
-harian murid dan mengotori tabel agregat. Buktinya tetap ada di `cf-wiring-test.js` **di atas
+harian murid dan mengotori tabel agregat. Buktinya tetap ada di `tests/cf-wiring-test.js` **di atas
 stub**, dan itu batas kejujuran yang **masih terbuka** sampai owner menyediakan lingkungan
 staging terpisah (D1 + KV + R2 sendiri). Jangan menambahkannya ke gerbang ini tanpa staging.
 
 ## 5. Menjalankan di CI
 
-Langkah `node cf-live-contract-test.js` sudah ada di `.github/workflows/quality.yml` dan **SKIP**
+Langkah `node tests/cf-live-contract-test.js` sudah ada di `.github/workflows/quality.yml` dan **SKIP**
 sampai owner menyetel base URL. Untuk mengaktifkannya, tambahkan `env:` pada step *Core
 validation* (atau pecah menjadi step sendiri):
 
@@ -91,10 +91,10 @@ Base URL Worker bukan rahasia, jadi *repository variable* cukup — `secrets` ti
 ## 6. Membuktikan gerbangnya sendiri
 
 ```bash
-node cf-live-selftest.js
+node tests/cf-live-selftest.js
 ```
 
-`cf-live-selftest.js` menyalakan Worker tiruan di `127.0.0.1` (port dipilih kernel) dan
+`tests/cf-live-selftest.js` menyalakan Worker tiruan di `127.0.0.1` (port dipilih kernel) dan
 menjalankan gerbang terhadap 21 skenario: satu jawaban benar (harus LULUS) dan 20 jawaban salah
 (harus GAGAL, **pada id assert yang tepat** — bukan sekadar exit 1). Ia juga membuktikan SKIP
 bersih tanpa env dan MERAH untuk base URL yang tidak sah. Jalankan ini setiap kali assert di

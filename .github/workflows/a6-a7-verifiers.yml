@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     # Batas keras: tanpa ini GitHub memakai 360 menit, dan satu langkah
     # yang menggantung membakar enam jam dalam diam (lihat
-    # workflow-timeout-gate-test.js).
+    # tests/workflow-timeout-gate-test.js).
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
@@ -79,9 +79,9 @@ jobs:
 
       - name: Focused neural runtime verification
         run: |
-          node diag-search-test.js
-          node puter-auth-coop-test.js
-          node sw-corp-test.js
+          node tests/diag-search-test.js
+          node tests/puter-auth-coop-test.js
+          node tests/sw-corp-test.js
 
   a7-automated-release-safety:
     name: A7 Automated Release Safety
@@ -89,7 +89,7 @@ jobs:
     runs-on: ubuntu-latest
     # Batas keras: tanpa ini GitHub memakai 360 menit, dan satu langkah
     # yang menggantung membakar enam jam dalam diam (lihat
-    # workflow-timeout-gate-test.js).
+    # tests/workflow-timeout-gate-test.js).
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
@@ -144,8 +144,8 @@ jobs:
 
       - name: Release-safety regressions
         run: |
-          node pwa-cache-test.js
-          node pwa-release-coherence-test.js
-          node sw-corp-test.js
-          node puter-auth-coop-test.js
-          node diag-search-test.js
+          node tests/pwa-cache-test.js
+          node tests/pwa-release-coherence-test.js
+          node tests/sw-corp-test.js
+          node tests/puter-auth-coop-test.js
+          node tests/diag-search-test.js

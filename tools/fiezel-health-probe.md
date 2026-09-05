@@ -5,7 +5,7 @@ ArenHost (`api.fiezel.my.id`) → Worker Cloudflare `fiezel-api`. Node murni (>=
 **nol dependency**, **nol rahasia**, aman dijalankan berulang kali (tidak menulis
 apa pun kecuali diminta `--out=`).
 
-Gerbang yang menjaga berkas ini: `health-probe-test.js` (terdaftar di
+Gerbang yang menjaga berkas ini: `tests/health-probe-test.js` (terdaftar di
 `.github/workflows/quality.yml`, **hanya** dalam mode `--selftest`).
 
 ---
@@ -49,7 +49,7 @@ Contoh cron tiap 10 menit yang hanya berbunyi saat KRITIS:
 - Satu-satunya alamat internal yang disebut adalah
   `fiezel-api.fitrajft.workers.dev`, dan **hanya** untuk membuktikan ia menjawab
   403. Kalau suatu hari ada yang menambah host lain atau satu header rahasia,
-  `health-probe-test.js` merah.
+  `tests/health-probe-test.js` merah.
 
 ---
 
@@ -165,7 +165,7 @@ terhadap 13 skenario: `sehat`, `workers_dev_terbuka`, `workers_dev_404`,
 
 Dalam mode selftest, lapis I/O **menolak** host non-loopback dan **mencatat**
 pelanggaran di `jaringan.nonLoopbackAttempts` — jadi klaim "tidak menembak jaringan"
-diperiksa, bukan dipercaya. `health-probe-test.js` membaca angka itu, dan CI hanya
+diperiksa, bukan dipercaya. `tests/health-probe-test.js` membaca angka itu, dan CI hanya
 pernah memanggil probe dengan `--selftest`, sehingga **tidak ada** push yang menembak
 produksi.
 
@@ -176,7 +176,7 @@ produksi.
 - `docs/CF-MIGRATION-RUNBOOK.md` — Bagian 5 (tabel keputusan batas plan gratis).
 - `workers/api/mw-edge.js`, `workers/api/route-health.js` — penegakan penjaga dan
   alasan `/health` dilindungi sementara `/healthz` tidak.
-- `edge-guard-test.js` — gerbang yang menguji penjaga dari dalam (Worker sungguhan);
+- `tests/edge-guard-test.js` — gerbang yang menguji penjaga dari dalam (Worker sungguhan);
   probe ini melengkapinya dari luar (produksi yang sedang berjalan).
 - Batas Workers (CPU 10 ms Free): https://developers.cloudflare.com/workers/platform/limits/
 - Batas KV (1.000 tulis/hari Free): https://developers.cloudflare.com/kv/platform/limits/

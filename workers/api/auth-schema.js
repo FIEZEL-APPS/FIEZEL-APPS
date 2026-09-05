@@ -7,7 +7,7 @@
  * dijamin sudah terpasang saat kode ini tiba di produksi.
  *
  * DUA PAGAR yang membuat ini bukan migrasi bayangan:
- *   1. Berkas migrasi TETAP sumber resmi. Gerbang `auth-schema-contract-test.js`
+ *   1. Berkas migrasi TETAP sumber resmi. Gerbang `tests/auth-schema-contract-test.js`
  *      memerah kalau daftar DDL di bawah tidak setara pernyataan-per-pernyataan
  *      (ternormalisasi) dengan kedua berkas itu.
  *   2. Penerapan di-cache per handle DB (WeakMap): biayanya satu rangkaian

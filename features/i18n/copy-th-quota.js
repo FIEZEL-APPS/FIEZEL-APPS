@@ -2,7 +2,7 @@
  * FIEZEL · features/i18n/copy-th-quota.js — COPY-MAP THAI, naskah blok notice app.js (W3-COPY-C)
  *
  * ⚠ DRAFT AI — seluruh nilai Thai di berkas ini adalah terjemahan draft AI dan WAJIB
- * direview penutur asli sebelum rilis. LEBIH DARI ITU: quota-notice-a11y-test.js memasang
+ * direview penutur asli sebelum rilis. LEBIH DARI ITU: tests/quota-notice-a11y-test.js memasang
  * slot kanon th FAIL-CLOSED (CANON_TH_RULES=null; keberadaan berkas ini tanpa kanon th yang
  * ditulis penutur asli = gerbang MERAH, by design). Berkas ini dibuat atas penugasan
  * eksplisit W3-COPY-C; status merah gerbang itu DIHARAPKAN dan dilaporkan ke orkestrator —

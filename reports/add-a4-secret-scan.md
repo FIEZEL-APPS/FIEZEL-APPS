@@ -1,4 +1,4 @@
-# A4 — Pemindai rahasia: `secret-scan-test.js`
+# A4 — Pemindai rahasia: `tests/secret-scan-test.js`
 
 Branch `add/a4secret`, worktree `/home/user/workspace/wt-a4secret`.
 **Tidak ada bump versi build. Tidak ada push.** Semua gerbang verifikasi exit 0 (§7).
@@ -15,7 +15,7 @@ dan permukaan itu bertambah justru karena pekerjaan yang benar:
 |---|---|
 | `deploy/edge/api-index.php` | Memuat placeholder `__EDGE_SECRET__` yang **diganti nilai sungguhan saat pemasangan** di origin ArenHost. Satu `scp` balik berkas hasil edit ke repo = secret jembatan edge (`X-Fiezel-Edge`) bocor permanen ke riwayat git. |
 | `workers/api/wrangler.toml`, `workers/owner/wrangler.toml` | Memuat **daftar nama** secret (`wrangler secret put SESSION_HMAC_KEY_CURRENT`, `… EDGE_SHARED_SECRET`, dst). Nama tidak berbahaya; satu orang yang "melengkapi" daftar itu dengan nilainya membuatnya berbahaya. |
-| 690 berkas teks terlacak lainnya | `edge-guard-test.js` hanya menjaga **satu** berkas. Kebocoran tidak memilih berkas yang sudah dijaga. |
+| 690 berkas teks terlacak lainnya | `tests/edge-guard-test.js` hanya menjaga **satu** berkas. Kebocoran tidak memilih berkas yang sudah dijaga. |
 
 Gerbang ini menjaga **seluruh** berkas yang dilacak git: node murni, nol dependency, nol
 jaringan, satu-satunya berkas yang ditulisnya adalah `SECRET-SCAN-REPORT.json`.
@@ -50,7 +50,7 @@ melindungi apa pun. Angka terukur pada repo ini:
 | + tolak heksa polos (digest sha256/git sha) | ~4.400 | 300+ |
 | + wajib ada huruf kecil **dan** besar **dan** angka | ~40 | 20+ |
 | + tolak nama berpemisah bersegmen pendek (`past_continuous_vs_past_simple_interrupted_action`) | 2 | 1 |
-| + entropi ≥ 4,0 | **2** | **1** (fixture `edge-guard-test.js`) |
+| + entropi ≥ 4,0 | **2** | **1** (fixture `tests/edge-guard-test.js`) |
 
 Penyaringnya **struktural**, bukan berbasis nama berkas — tidak satu pun berkas dimaafkan
 karena namanya. Yang dikenali sebagai konteks sah:
@@ -62,7 +62,7 @@ karena namanya. Yang dikenali sebagai konteks sah:
   sementara **nilai** apa pun sesudah nama itu memerahkan gerbang (§4b).
 - **Contoh yang ditandai oleh bentuknya**: urutan berjalan (`1234567890ABCDEFGHIJ`),
   karakter berulang, entropi < 3,0. Ini yang memaafkan fixture
-  `fiezel-prompt-library-test.js:39` dan `fiezel-self-refine-test.js:64` —
+  `tests/fiezel-prompt-library-test.js:39` dan `tests/fiezel-self-refine-test.js:64` —
   dua tes yang justru **mencegah** kebocoran. Menghukum keduanya = memaksa orang
   menghapus pertahanan.
 
@@ -80,7 +80,7 @@ di-memori setiap berkas allowlist lalu memastikan detektor tetap menyala
 | 22 ekstensi biner (`.png`, `.woff2`, `.onnx`, `.wasm`, `.mp3`, …) | biner | Diff-nya tidak bisa di-review manusia ⇒ temuan tidak bisa ditindaklanjuti, dan entropi byte acak menyala di setiap berkas. **Sifat binernya dibuktikan** lewat byte NUL, bukan dipercaya dari ekstensi: berkas berekstensi biner yang ternyata teks tetap dipindai penuh, dan berkas biner **tanpa** ekstensi terdaftar memerahkan gerbang (anomali harus dilihat orang). 205 berkas dilewati. |
 | `vendor/` | path, heuristik-off | Runtime TTS pihak ketiga (sherpa-onnx/supertonic). Glue WASM Emscripten adalah rimba simbol panjang (`_SherpaOnnxOfflineTtsNumSpeakers`) dan provenance-nya ribuan digest — tak satu pun ditulis proyek ini. Integritasnya dijaga terpisah (`SHA256SUMS.txt` + `neural-vendor-repro.yml`). |
 | `audio/manifest.json` | path, heuristik-off | 1.170 alamat objek R2 `a/<sha256>.mp3` — digest konten publik, bukan kredensial. |
-| 2 digest token di `edge-guard-test.js` | **per-nilai (sha256)** | Tiga fixture baris 425-427 yang disuntikkan ke salinan `api-index.php` **di memori** untuk membuktikan pemindai gerbang itu bisa merah. Diidentifikasi lewat **digest nilai**, bukan nama berkas: memaafkan fixture **tidak** memaafkan berkasnya. Nilai acak *kedua* di berkas yang sama tetap memerahkan gerbang. |
+| 2 digest token di `tests/edge-guard-test.js` | **per-nilai (sha256)** | Tiga fixture baris 425-427 yang disuntikkan ke salinan `api-index.php` **di memori** untuk membuktikan pemindai gerbang itu bisa merah. Diidentifikasi lewat **digest nilai**, bukan nama berkas: memaafkan fixture **tidak** memaafkan berkasnya. Nilai acak *kedua* di berkas yang sama tetap memerahkan gerbang. |
 
 Setiap entri diperiksa **masih relevan**: path yang hilang dari repo dan digest yang sudah
 tidak ada lagi dilaporkan sebagai **entri basi = FAIL**, supaya daftar ini tidak menjadi
@@ -123,7 +123,7 @@ Tidak ada `*.bak/*.orig/*.rej/*.save/*.swp` terlacak (0), tidak ada `.env` terla
 
 **(d) Gerbang memindai dirinya sendiri.** Semua fixture dibangun dengan penggabungan
 string (`'sk' + '-' + …`) dan tiap potongan dijaga <32 karakter, sehingga tidak ada satu
-pun literal di `secret-scan-test.js` yang cocok dengan detektornya sendiri. Kalau
+pun literal di `tests/secret-scan-test.js` yang cocok dengan detektornya sendiri. Kalau
 seseorang menempel nilai sungguhan ke berkas itu, pemindaian-diri memerahkannya.
 
 ## 5. Daftar temuan pada keadaan repo sekarang
@@ -136,9 +136,9 @@ Tiga kecocokan **dimaafkan beralasan** dan tercatat terbuka di
 
 | Berkas | Baris | Detektor | Alasan |
 |---|---|---|---|
-| `edge-guard-test.js` | 425 | `base64urlToken` | fixture anti-vakum bentuk base64url — hanya masuk `String.replace` di memori |
-| `edge-guard-test.js` | 427 | `base64urlToken` | fixture anti-vakum bentuk base64 ber-padding (satu nilai, dua detektor) |
-| `edge-guard-test.js` | 427 | `base64Blob` | idem |
+| `tests/edge-guard-test.js` | 425 | `base64urlToken` | fixture anti-vakum bentuk base64url — hanya masuk `String.replace` di memori |
+| `tests/edge-guard-test.js` | 427 | `base64urlToken` | fixture anti-vakum bentuk base64 ber-padding (satu nilai, dua detektor) |
+| `tests/edge-guard-test.js` | 427 | `base64Blob` | idem |
 
 Tidak ada satu pun nilai rahasia sungguhan yang ditemukan di berkas terlacak — termasuk
 di `deploy/edge/api-index.php` (placeholder utuh) dan di kedua `wrangler.toml`
@@ -173,14 +173,14 @@ menunggu insiden.
 ## 7. Verifikasi
 
 ```
-node secret-scan-test.js    exit=0   46/46 assert PASS, 690 berkas teks, 205 biner, 0 temuan, 3 dimaafkan
-node regression-test.js     exit=0
-node install-health-test.js exit=0   FIEZEL install health: PASS
-node no-network-test.js     exit=0   PASS (35 assert, 128 gerbang dipindai — termasuk gerbang baru ini)
-node edge-guard-test.js     exit=0   119/119 assert PASS
+node tests/secret-scan-test.js    exit=0   46/46 assert PASS, 690 berkas teks, 205 biner, 0 temuan, 3 dimaafkan
+node tests/regression-test.js     exit=0
+node tests/install-health-test.js exit=0   FIEZEL install health: PASS
+node tests/no-network-test.js     exit=0   PASS (35 assert, 128 gerbang dipindai — termasuk gerbang baru ini)
+node tests/edge-guard-test.js     exit=0   119/119 assert PASS
 ```
 
-Gerbang terdaftar di `.github/workflows/quality.yml` tepat sesudah `node edge-guard-test.js`
+Gerbang terdaftar di `.github/workflows/quality.yml` tepat sesudah `node tests/edge-guard-test.js`
 (alasan urutan ada di komentar workflow), dan gerbang **meng-assert pendaftarannya
 sendiri** — gerbang yang tidak dijalankan workflow apa pun adalah gerbang yang tidak ada
 (temuan K13, dikutip di `reports/work-e9-edge.md`).

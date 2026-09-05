@@ -29,8 +29,8 @@ gerbang yang menjaganya.
 | Berkas | Status | Isi |
 |---|---|---|
 | `features/analytics/fiezel-analytics-client.js` | BARU | modul klien, UMD, 0 dependency, 0 DOM |
-| `analytics-client-test.js` | BARU | gerbang node murni + `vm`, 90 assert, nol jaringan |
-| `.github/workflows/quality.yml` | +1 langkah | `node analytics-client-test.js` sesudah `analytics-server-only-test.js` |
+| `tests/analytics-client-test.js` | BARU | gerbang node murni + `vm`, 90 assert, nol jaringan |
+| `.github/workflows/quality.yml` | +1 langkah | `node tests/analytics-client-test.js` sesudah `tests/analytics-server-only-test.js` |
 | `ANALYTICS-CLIENT-REPORT.json` | BARU | bukti jalan gerbang (90/90 PASS) |
 
 **TIDAK disentuh:** `app.js`, `features/neural-voice/**`, `workers/**`,
@@ -171,16 +171,16 @@ merge, karena keduanya menyentuh berkas yang dikunci paket lain:
 
 | Gerbang | Hasil |
 |---|---|
-| `analytics-client-test.js` (BARU) | **90/90 PASS**, exit 0 |
-| `observability-privacy-test.js` (tidak dilemahkan) | exit 0 |
-| `analytics-privacy-test.js` | exit 0 |
-| `analytics-server-only-test.js` | exit 0 |
-| `analytics-aggregate-test.js` | exit 0 |
-| `regression-test.js` | exit 0 |
-| `install-health-test.js` | exit 0 |
-| `no-network-test.js` | exit 0 |
-| `ui-structure-test.js` | exit 0 |
-| `cf-transport-test.js`, `cf-wiring-test.js`, `workflow-actor-gate-test.js`, `pwa-cache-test.js` | exit 0 |
+| `tests/analytics-client-test.js` (BARU) | **90/90 PASS**, exit 0 |
+| `tests/observability-privacy-test.js` (tidak dilemahkan) | exit 0 |
+| `tests/analytics-privacy-test.js` | exit 0 |
+| `tests/analytics-server-only-test.js` | exit 0 |
+| `tests/analytics-aggregate-test.js` | exit 0 |
+| `tests/regression-test.js` | exit 0 |
+| `tests/install-health-test.js` | exit 0 |
+| `tests/no-network-test.js` | exit 0 |
+| `tests/ui-structure-test.js` | exit 0 |
+| `tests/cf-transport-test.js`, `tests/cf-wiring-test.js`, `tests/workflow-actor-gate-test.js`, `tests/pwa-cache-test.js` | exit 0 |
 
 Gerbang barunya sengaja membuktikan dirinya bisa merah (anti-vakum): pemindai PII
 diuji terhadap payload sintetis yang bocor dan harus menangkapnya, dan payload
@@ -188,7 +188,7 @@ klien yang sah dijalankan lewat `processClientBatch()` / `processRetentionPing()
 Worker sungguhan dan harus menjawab **202** — privasi yang benar tapi ditolak
 server tetap berarti DAU nol.
 
-`no-network-test.js` menerima berkas baru ini karena transportnya adalah mock
+`tests/no-network-test.js` menerima berkas baru ini karena transportnya adalah mock
 lokal bernama sendiri (`transport.http`, disuntik lewat `fetchImpl:`), bukan
 `fetch` global; tidak ada `require('http')`, tidak ada URL literal non-loopback
 yang dipanggil.

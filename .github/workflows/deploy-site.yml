@@ -19,7 +19,7 @@ name: FIEZEL Deploy Site
 # 2. sw.js PALING AKHIR. Dua langkah unggah, bukan satu, dan urutannya BUKAN selera:
 #    `sw.js` memanggil `caches.addAll(ASSETS)` atas 157 berkas. Kalau ia mendarat lebih dulu,
 #    service worker generasi baru mem-precache bita LAMA (atau 404) di bawah nama revisi baru
-#    — kondisi "shell tidak sepadan" yang dilarang audit §22. `deploy-site-gate-test.js`
+#    — kondisi "shell tidak sepadan" yang dilarang audit §22. `tests/deploy-site-gate-test.js`
 #    menegakkan urutan ini di sumber, jadi membaliknya memerahkan CI.
 #
 # 3. SKIP YANG BERSUARA. Tanpa secret hosting, workflow ini TIDAK gagal dan TIDAK diam: ia
@@ -45,7 +45,7 @@ concurrency:
 
 jobs:
   publish:
-    # Penjaga aktor tingkat JOB — dituntut workflow-actor-gate-test.js untuk setiap workflow
+    # Penjaga aktor tingkat JOB — dituntut tests/workflow-actor-gate-test.js untuk setiap workflow
     # yang menyentuh `secrets.`, dan tidak bisa di-allowlist. Pada `workflow_run`, github.actor
     # adalah aktor yang memicu jalannya Quality Gate, yaitu pemilik yang mem-push ke main.
     # DUA medan aktor diterima, dan itu perbaikan cacat DIAM. Pada `workflow_run`, GitHub
@@ -53,7 +53,7 @@ jobs:
     # workflow. Kalau hanya satu medan yang diperiksa dan medan itu meleset, deploy TIDAK
     # gagal: ia tidak pernah berjalan sama sekali, dan tidak ada lampu merah yang menyala.
     # Keduanya tetap dipagari ke login owner yang SAMA, jadi ini melebarkan ketahanan,
-    # bukan kewenangan. (`workflow-actor-gate-test.js` cek B tetap terpenuhi: ACTOR_COMPARE
+    # bukan kewenangan. (`tests/workflow-actor-gate-test.js` cek B tetap terpenuhi: ACTOR_COMPARE
     # hanya mengenali `github.actor ==`, dan hasilnya di-dedup jadi satu login.)
     if: >-
       ( github.actor == 'FIEZEL-APPS' ||
@@ -63,7 +63,7 @@ jobs:
     runs-on: ubuntu-latest
     # Batas keras: tanpa ini GitHub memakai 360 menit, dan satu langkah
     # yang menggantung membakar enam jam dalam diam (lihat
-    # workflow-timeout-gate-test.js).
+    # tests/workflow-timeout-gate-test.js).
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
@@ -127,7 +127,7 @@ jobs:
           chmod 644 ~/.ssh/known_hosts
 
       # FIEZEL_DEPLOY_STEP_ASSETS — gelombang PERTAMA: semua kecuali sw.js.
-      # Penanda di nama langkah ini dibaca deploy-site-gate-test.js untuk membuktikan urutannya.
+      # Penanda di nama langkah ini dibaca tests/deploy-site-gate-test.js untuk membuktikan urutannya.
       - name: 'FIEZEL_DEPLOY_STEP_ASSETS — unggah seluruh aset (sw.js sengaja ditahan)'
         if: steps.creds.outputs.ready == 'true'
         shell: bash

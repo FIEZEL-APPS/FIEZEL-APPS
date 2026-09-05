@@ -122,7 +122,7 @@ diakses. Penjaga meloloskan hostname kanonik sendiri.
 ```bash
 # 0) pastikan berada di cabang yang benar dan gerbang hijau
 cd FIEZEL-APPS
-node owner-dashboard-test.js && node owner-edge-guard-test.js && node analytics-privacy-test.js
+node tests/owner-dashboard-test.js && node tests/owner-edge-guard-test.js && node tests/analytics-privacy-test.js
 
 # 1) database: JANGAN buat yang baru. Hanya pastikan yang benar dipakai.
 wrangler d1 info fiezel-stats
@@ -258,7 +258,7 @@ Yang **membedakan** dashboard ini dari dashboard nol-palsu:
 
 Tiga keadaan itu dirender berbeda di HTML **dan** di JSON (`measurement.state`,
 `measurement.zeroMeansMeasured`, `measurement.daysTotal`). Perbedaan itu diassert
-`owner-dashboard-test.js` bagian (f), dan tiap assert-nya sudah dibuktikan bisa merah
+`tests/owner-dashboard-test.js` bagian (f), dan tiap assert-nya sudah dibuktikan bisa merah
 (`reports/owner-dashboard-red-proof.md`).
 
 Alasannya bukan estetika: **keputusan kuota** diambil dari halaman ini. Dashboard yang menulis
@@ -281,7 +281,7 @@ rollup berjalan sekali (00:05 WIB). Panel harian terisi H+1, bukan seketika. Ret
    praktis: begitu tabel benar-benar berisi, setiap query gagal dan halaman akan menampilkan
    "pengukuran tidak tersedia" beserta nama query — **jujur, tetapi tetap tanpa angka**.
    Hari ini gejalanya tersembunyi karena tabel kosong.
-   Yang memperkeras: `analytics-privacy-test.js` mengunci database analytics pada **tepat lima
+   Yang memperkeras: `tests/analytics-privacy-test.js` mengunci database analytics pada **tepat lima
    tabel** (`workers/api/analytics/analytics-tables.js`), jadi `cost_daily` dan `retention_cohort`
    **tidak boleh** dibuat di sana. Perbaikannya adalah adaptor pembaca bentuk panjang di
    `queries.js` (dan tempat lain untuk data biaya), bukan migrasi tabel baru.

@@ -1,7 +1,7 @@
 /**
  * FIEZEL · features/i18n/copy-id-quota.js — COPY-MAP INDONESIA, naskah blok notice app.js
  *
- * MENGAPA BERKAS TERPISAH: quota-notice-a11y-test.js meng-union korpus kanonnya (K3) HANYA
+ * MENGAPA BERKAS TERPISAH: tests/quota-notice-a11y-test.js meng-union korpus kanonnya (K3) HANYA
  * dari daftar eksplisit [copy-id-quota.js, copy-id-notice.js] (handoff W2-TEST-A §3).
  * Kalimat blok aiErrorMessage yang pindah ke copy-map WAJIB mendarat di sini supaya tetap
  * terhitung kanon register (nggak/kamu/no-blame) — pindah ke file lain = kalimat keluar

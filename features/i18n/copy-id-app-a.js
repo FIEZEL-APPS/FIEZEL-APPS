@@ -5,7 +5,7 @@
  * ini memindahkan literal Indonesia segmen A (login, push, grammar, level, policy,
  * reading, quiz, vocab, progress, home, common) ke copy-map sesuai plan W1-APPJS-A,
  * supaya copy-th-app-a.js bisa 1:1. Nilai DISALIN BYTE-PER-BYTE dari app.js — gerbang
- * id-golden-snapshot-test.js membekukan himpunan literal (PINDAH boleh, BERUBAH tidak).
+ * tests/id-golden-snapshot-test.js membekukan himpunan literal (PINDAH boleh, BERUBAH tidak).
  * Kunci ber-slug netral: lexer gerbang menghitung kunci berpenanda Indonesia sebagai
  * "tambahan liar" (laporan W1-INFRA). Placeholder BERNAMA {nama} (konvensi brief);
  * nama placeholder juga wajib lolos lexer (mis. {stem}, bukan {soal}).

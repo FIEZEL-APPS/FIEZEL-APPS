@@ -28,7 +28,7 @@
  *      ada di PATH; kalau keduanya absen, langkah PNG dilewati dengan
  *      pengumuman keras — jalankan manual: lihat pesan di output).
  *   4. Menyinkronkan kembar website byte-demi-byte (kontrak lapis 1 gerbang
- *      e5-checksum-gate-test.js): website/assets/mascot/{fiezel-mascot.js,
+ *      tests/e5-checksum-gate-test.js): website/assets/mascot/{fiezel-mascot.js,
  *      fiezel-motion.css} + website/assets/brand/{fiezel-paw,paw-mascot-full,
  *      paw-mascot-head}.svg.
  *   5. Menulis assets/brand/mascot-checksums.json — kontrak manifest lapis 2
@@ -92,7 +92,7 @@ function extractRig(src) {
   );
 }
 
-/** Rig kanonik — algoritme DISALIN dari e5-checksum-gate-test.js (kontrak
+/** Rig kanonik — algoritme DISALIN dari tests/e5-checksum-gate-test.js (kontrak
  *  manifest.rig): template <svg> pertama sesudah token svgMarkup, id mask
  *  dinormalkan, whitespace di-collapse. Warna TIDAK dinormalkan. */
 function canonicalRig(src) {
@@ -370,7 +370,7 @@ const MANIFEST_FILES = [
    ============================================================ */
 function selfCheckSvg(file, text, { needEmblem, needRing }) {
   parseXml(text); // well-formedness
-  // palet tertutup G1 — cermin palette-gate-test.js
+  // palet tertutup G1 — cermin tests/palette-gate-test.js
   const bad = new Map();
   for (const m of text.matchAll(/#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})\b/g)) {
     const h = m[1].toLowerCase();

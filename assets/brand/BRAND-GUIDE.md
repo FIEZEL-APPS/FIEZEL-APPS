@@ -25,7 +25,7 @@ organik hancur di ujung bawah rentang itu. Bentuk geometris tetap terbaca.
 | `fiezel-paw.svg` | jejak kaki (bukan maskot). Ini tanda tempel merek, dipakai lewat `FiezelIcons.markup('paw')` |
 
 Satu sumber bentuk paw: `features/ui/fiezel-icons.js`. Jangan menyalin path SVG paw ke berkas lain.
-`paw-mascot-test.js` menjaga aturan ini dan akan gagal kalau dilanggar.
+`tests/paw-mascot-test.js` menjaga aturan ini dan akan gagal kalau dilanggar.
 
 ### Yang tidak boleh dilakukan pada maskot
 
@@ -59,12 +59,12 @@ Nama token `--fz-gold`, `--fz-ink`, dan `--fz-line` sudah dipakai `style.css` de
 berbeda dari paket motion (`#d9a441`, `#2c1b1c`, `#ecdec0`). Karena itu
 `features/mascot/fiezel-motion.css` memasang tokennya pada kelas `.fz-mascot` / `.fz-motion`,
 BUKAN di `:root`. Kalau ada yang memindahkannya ke `:root`, palet seluruh aplikasi ikut berubah
-dan kontrasnya berhenti sesuai `contrast-test.js`.
+dan kontrasnya berhenti sesuai `tests/contrast-test.js`.
 
 ## 3. Tipografi
 
 **Plus Jakarta Sans** untuk semuanya. Bobot 400 badan teks, 700 penekanan, 800 angka besar.
-Tidak ada huruf display kedua, tidak ada serif. `paw-mascot-test.js` menjaga agar Home tidak
+Tidak ada huruf display kedua, tidak ada serif. `tests/paw-mascot-test.js` menjaga agar Home tidak
 kembali memakai huruf display.
 
 ## 4. Token gerak
@@ -135,7 +135,7 @@ cepat daripada fitur yang hilang bisa memperbaikinya.
   pembimbing AI butuh jaringan. Mengklaim tanpa kuota adalah klaim yang salah, bukan
   penyederhanaan.
 - **Dilarang menjanjikan suara neural yang jalan offline.** Model suaranya tidak ikut
-  di-precache (`pwa-cache-test.js` justru MELARANG `vendor/kokoro-*` masuk precache — 265 KB+
+  di-precache (`tests/pwa-cache-test.js` justru MELARANG `vendor/kokoro-*` masuk precache — 265 KB+
   di jalur pemasangan akan mematikan pemasangan di jaringan lemah). Kalau jaringan tidak ada,
   yang jalan adalah suara bawaan peranti. Katakan begitu.
 - Dilarang mengklaim jaminan hasil ("pasti lulus", "naik level dalam 30 hari").
@@ -168,5 +168,5 @@ Angka yang berbeda-beda antar halaman lebih merusak daripada angka yang sedikit 
 - Komponen dan CSS gerak: `features/mascot/` (`fiezel-mascot.js`, `fiezel-motion.css`,
   `micro-ui.css` sebagai referensi yang belum dipakai)
 - Satu sumber bentuk paw: `features/ui/fiezel-icons.js`
-- Gerbang otomatis yang menjaga panduan ini: `paw-mascot-test.js`, `ui-structure-test.js`,
-  `contrast-test.js`, `a11y-test.js`, `pwa-cache-test.js`, `boot-order-test.js`
+- Gerbang otomatis yang menjaga panduan ini: `tests/paw-mascot-test.js`, `tests/ui-structure-test.js`,
+  `tests/contrast-test.js`, `tests/a11y-test.js`, `tests/pwa-cache-test.js`, `tests/boot-order-test.js`

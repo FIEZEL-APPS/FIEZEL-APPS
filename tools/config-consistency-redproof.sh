@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# tools/config-consistency-redproof.sh — BUKTI bahwa config-consistency-test.js bisa MERAH.
+# tools/config-consistency-redproof.sh — BUKTI bahwa tests/config-consistency-test.js bisa MERAH.
 #
 # Gerbang yang tidak pernah terbukti gagal adalah dekorasi. Skrip ini merusak SATU nilai per
 # kasus, menjalankan gerbang, lalu MEMULIHKAN berkas dari git (`git checkout --`) sebelum
@@ -10,7 +10,7 @@
 set -u
 cd "$(dirname "$0")/.."
 
-GATE="config-consistency-test.js"
+GATE="tests/config-consistency-test.js"
 RUNBOOK="docs/CF-MIGRATION-RUNBOOK.md"
 TOML="workers/api/wrangler.toml"
 QUOTA="workers/api/quota/quota-config.js"
@@ -74,7 +74,7 @@ run_case 'runbook: kunci flag karangan cfCoachEnabled' \
   sed -i '0,/"cfQuotaEnabled":false/s//"cfCoachEnabled":false/' "$RUNBOOK"
 
 run_case 'quality.yml: gerbang dihapus dari daftar' \
-  sed -i '/node config-consistency-test.js/d' "$FLOW"
+  sed -i '/node tests/config-consistency-test.js/d' "$FLOW"
 
 restore
 echo

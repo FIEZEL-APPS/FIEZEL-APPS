@@ -6,10 +6,10 @@
  * Rancangan sinkron antar-perangkat bersandar pada satu gagasan: jangan menggabungkan model
  * otak (BKT/FSRS/ledger tidak punya operasi gabungan yang bermakna), melainkan gabungkan
  * ALIRAN PERCOBAAN lalu putar ulang modul murninya. Kesetaraan putar-ulang itu sudah
- * dibuktikan gerbang brain-replay-equivalence-test.js.
+ * dibuktikan gerbang tests/brain-replay-equivalence-test.js.
  *
  * Tetapi "kirim aliran percobaan" apa adanya MELANGGAR kontrak yang sudah ditegakkan
- * observability-privacy-test.js: tidak boleh ada riwayat jawaban mentah yang bisa keluar dari
+ * tests/observability-privacy-test.js: tidak boleh ada riwayat jawaban mentah yang bisa keluar dari
  * perangkat. Baris riwayat membawa kalimat soal, jawaban yang dipilih murid, dan jawaban yang
  * benar — tiga hal yang tidak satu pun dibutuhkan untuk memutar ulang model.
  *

@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     # Batas keras: tanpa ini GitHub memakai 360 menit, dan satu langkah
     # yang menggantung membakar enam jam dalam diam (lihat
-    # workflow-timeout-gate-test.js).
+    # tests/workflow-timeout-gate-test.js).
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
@@ -131,7 +131,7 @@ jobs:
     runs-on: ubuntu-latest
     # Batas keras: tanpa ini GitHub memakai 360 menit, dan satu langkah
     # yang menggantung membakar enam jam dalam diam (lihat
-    # workflow-timeout-gate-test.js).
+    # tests/workflow-timeout-gate-test.js).
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
@@ -207,44 +207,44 @@ jobs:
       - name: Full Quality core validation in simulated promoted state
         run: |
           node validator.js
-          node regression-test.js
+          node tests/regression-test.js
           node content-audit.js
           node content-qa-agent.js
-          node content-qa-agent-test.js
-          node content-patch-gate-test.js
-          node content-canary-test.js
-          node content-promotion-test.js
-          node content-adoption-evidence-test.js
-          node content-evidence-origin-test.js
-          node content-adoption-rehearsal-test.js
-          node content-adoption-test.js
+          node tests/content-qa-agent-test.js
+          node tests/content-patch-gate-test.js
+          node tests/content-canary-test.js
+          node tests/content-promotion-test.js
+          node tests/content-adoption-evidence-test.js
+          node tests/content-evidence-origin-test.js
+          node tests/content-adoption-rehearsal-test.js
+          node tests/content-adoption-test.js
           node product-audit.js
-          node runtime-stage8-test.js
-          node ai-integration-test.js
-          node experience-integration-test.js
-          node lesson-experience-test.js
-          node ui-structure-test.js
+          node tests/runtime-stage8-test.js
+          node tests/ai-integration-test.js
+          node tests/experience-integration-test.js
+          node tests/lesson-experience-test.js
+          node tests/ui-structure-test.js
           node grammar-quality-audit.js
-          node notification-reminder-test.js
-          node remote-push-test.js
-          node core-brain-test.js
-          node core-worker-contract-test.js
-          node learner-evidence-test.js
-          node alrs-behavior-test.js
-          node adaptive-policy-test.js
-          node policy-outcome-test.js
-          node pwa-cache-test.js
-          node http-smoke-test.js
-          node speaking-listening-test.js
+          node tests/notification-reminder-test.js
+          node tests/remote-push-test.js
+          node tests/core-brain-test.js
+          node tests/core-worker-contract-test.js
+          node tests/learner-evidence-test.js
+          node tests/alrs-behavior-test.js
+          node tests/adaptive-policy-test.js
+          node tests/policy-outcome-test.js
+          node tests/pwa-cache-test.js
+          node tests/http-smoke-test.js
+          node tests/speaking-listening-test.js
           node neural-voice-test.js
           node ios-wasm-module-test.js
           node ios-cache-compat-test.js
           node neural-voice-http-test.js
           node neural-voice-audibility-test.js
-          node diag-panel-test.js
-          node diag-search-test.js
+          node tests/diag-panel-test.js
+          node tests/diag-search-test.js
           node neural-voice-fix-test.js
-          node sw-corp-test.js
+          node tests/sw-corp-test.js
           node neural-voice-product-repair-test.js
           node neural-voice-device-hotfix-test.js
           node neural-voice-m0255-promotion-test.js
@@ -252,5 +252,5 @@ jobs:
           node neural-voice-generation-timeout-test.js
           node neural-voice-single-flight-test.js
           node neural-voice-diagnostics-retention-test.js
-          node puter-auth-coop-test.js
-          node puter-auth-diagnostics-test.js
+          node tests/puter-auth-coop-test.js
+          node tests/puter-auth-diagnostics-test.js

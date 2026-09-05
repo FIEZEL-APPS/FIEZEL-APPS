@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     # Batas keras: tanpa ini GitHub memakai 360 menit, dan satu langkah
     # yang menggantung membakar enam jam dalam diam (lihat
-    # workflow-timeout-gate-test.js).
+    # tests/workflow-timeout-gate-test.js).
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
@@ -38,15 +38,15 @@ jobs:
         run: node tools/fiezel-guardians.mjs a9
       - name: Existing auth and response-policy regressions
         run: |
-          node puter-auth-coop-test.js
-          node sw-corp-test.js
+          node tests/puter-auth-coop-test.js
+          node tests/sw-corp-test.js
 
   a10-regression-watcher:
     name: A10 Regression Watcher
     runs-on: ubuntu-latest
     # Batas keras: tanpa ini GitHub memakai 360 menit, dan satu langkah
     # yang menggantung membakar enam jam dalam diam (lihat
-    # workflow-timeout-gate-test.js).
+    # tests/workflow-timeout-gate-test.js).
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
@@ -62,16 +62,16 @@ jobs:
         run: node tools/fiezel-guardians.mjs a10
       - name: High-value cross-cutting regressions
         run: |
-          node diag-search-test.js
-          node pwa-cache-test.js
-          node pwa-release-coherence-test.js
+          node tests/diag-search-test.js
+          node tests/pwa-cache-test.js
+          node tests/pwa-release-coherence-test.js
 
   a11-release-readiness-auditor:
     name: A11 Release Readiness Auditor
     runs-on: ubuntu-latest
     # Batas keras: tanpa ini GitHub memakai 360 menit, dan satu langkah
     # yang menggantung membakar enam jam dalam diam (lihat
-    # workflow-timeout-gate-test.js).
+    # tests/workflow-timeout-gate-test.js).
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
@@ -91,7 +91,7 @@ jobs:
     runs-on: ubuntu-latest
     # Batas keras: tanpa ini GitHub memakai 360 menit, dan satu langkah
     # yang menggantung membakar enam jam dalam diam (lihat
-    # workflow-timeout-gate-test.js).
+    # tests/workflow-timeout-gate-test.js).
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
@@ -117,7 +117,7 @@ jobs:
     runs-on: ubuntu-latest
     # Batas keras: tanpa ini GitHub memakai 360 menit, dan satu langkah
     # yang menggantung membakar enam jam dalam diam (lihat
-    # workflow-timeout-gate-test.js).
+    # tests/workflow-timeout-gate-test.js).
     timeout-minutes: 20
     permissions:
       contents: read

@@ -49,7 +49,7 @@ self.FIEZEL_CORE_CONFIG=Object.freeze({
 // `enabled:false`, sehingga `coreWorkerExec` di app.js tidak pernah menyentuh Cloudflare.
 //
 // FIELD BARU, BUKAN TIMPAAN. `FIEZEL_CORE_CONFIG.workerUrl` di atas TIDAK disentuh:
-// `remote-push-test.js:6` mengunci nilainya ke `^https://[a-z0-9-]+\.puter\.work$`, dan
+// `tests/remote-push-test.js:6` mengunci nilainya ke `^https://[a-z0-9-]+\.puter\.work$`, dan
 // mengarahkannya ke domain Cloudflare akan memerahkan gerbang push sekaligus memutus jalur
 // pengingat yang hari ini berjalan. Alamat CF hidup HANYA di `base` di bawah.
 //
@@ -86,7 +86,7 @@ self.FIEZEL_CORE_CONFIG=Object.freeze({
 // `base` = 'https://api.fiezel.my.id': custom domain Worker `fiezel-api` yang sudah aktif
 // (zona Cloudflare `active`, p95 `GET /api/config` 97 ms pada 20 sampel). BUKAN workers.dev
 // (sengaja dimatikan) dan BUKAN `FIEZEL_CORE_CONFIG.workerUrl` di atas - yang itu tetap
-// `*.puter.work` karena `remote-push-test.js:6` mengunci polanya dan jalur pengingat push
+// `*.puter.work` karena `tests/remote-push-test.js:6` mengunci polanya dan jalur pengingat push
 // hari ini bergantung padanya.
 //
 // DUA endpoint 'on', dan HANYA dua. Alasan tiap satu, bukan selera:
@@ -116,7 +116,7 @@ self.FIEZEL_CORE_CONFIG=Object.freeze({
 //                 binding `env.AI` yang sama. Itu keputusan owner terpisah dan BUKAN bagian
 //                 paket ini. Selama keduanya 'off', murid tetap memakai Puter untuk suara
 //                 dan AI persis seperti hari ini - dan analytics tidak butuh keduanya sama
-//                 sekali. Dijaga assert (b) cf-config-killswitch-test.js ATAS BERKAS INI,
+//                 sekali. Dijaga assert (b) tests/cf-config-killswitch-test.js ATAS BERKAS INI,
 //                 bukan atas harness sintetis.
 //   quota:'off' - plafon per murid hanya relevan untuk jalur berbiaya (ai/tts). Analytics
 //                 tidak menagih apa pun, jadi menyalakannya hanya menambah permukaan.

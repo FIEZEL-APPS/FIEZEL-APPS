@@ -335,7 +335,7 @@ data), itu adalah operasi manual per-`sub`, tercatat, dan bukan pekerjaan cron:
 -- Urutan ini WAJIB: anak dulu, induk terakhir. Bentuk `rowid IN (SELECT … LIMIT n)`
 -- dipakai juga di sini walaupun satu orang hanya punya sedikit baris, karena
 -- aturannya mutlak: TIDAK ADA `DELETE` di repo ini tanpa `WHERE` DAN `LIMIT`.
--- Aturan mutlak bisa digerbangi (`d1-schema-contract-test.js`); "biasanya kecil"
+-- Aturan mutlak bisa digerbangi (`tests/d1-schema-contract-test.js`); "biasanya kecil"
 -- tidak bisa. Ulangi tiap pernyataan sampai `meta.changes` = 0.
 DELETE FROM session WHERE rowid IN (
   SELECT rowid FROM session WHERE sub = :sub LIMIT 500);

@@ -29,7 +29,7 @@ self.FIEZEL_CF_CONFIG=Object.freeze({
 | Nilai | Kenapa perlu |
 |---|---|
 | `enabled:true` | Sakelar induk statis. `cfEndpointMode()`/`cfStaticMode()` menuntut `CF_CONFIG.enabled===true` sebelum melihat endpoint mana pun. Tanpa ini seluruh isi tabel di bawah tidak dibaca. |
-| `base:'https://api.fiezel.my.id'` | Custom domain Worker `fiezel-api` (bukan `workers.dev`, bukan `*.puter.work`). `cf-transport-test.js` mengunci pola `^https://[a-z0-9-]+\.fiezel\.my\.id$`; alamat ini memenuhinya. `FIEZEL_CORE_CONFIG.workerUrl` TIDAK disentuh — jalur pengingat push masih bergantung pada `*.puter.work` (`remote-push-test.js:6`). |
+| `base:'https://api.fiezel.my.id'` | Custom domain Worker `fiezel-api` (bukan `workers.dev`, bukan `*.puter.work`). `tests/cf-transport-test.js` mengunci pola `^https://[a-z0-9-]+\.fiezel\.my\.id$`; alamat ini memenuhinya. `FIEZEL_CORE_CONFIG.workerUrl` TIDAK disentuh — jalur pengingat push masih bergantung pada `*.puter.work` (`tests/remote-push-test.js:6`). |
 | `usage:'on'` | Sakelar analytics itu sendiri, dan satu-satunya yang benar-benar wajib. Tiga pembacanya: `anGateOpen()` menuntut `cfStaticMode('usage')==='on'`; ekor blok pemancar hanya memasang timer kalau nilainya bukan `'off'`; dan `features/analytics/fiezel-analytics-client.js` menuntut `endpoints.usage==='on'` sebelum membuat `installId`, menulis antrean, atau mengirim. Biayanya tulisan D1 — gratis pada skala ini, nol neuron. |
 | `config:'on'` | Tidak dituntut kode: `cfFetchServerConfig()` memakai `fetch()` langsung ke `base+'/api/config'`, bukan lewat `cfEndpointMode`. Tapi `tools/flag-plan-check.mjs` aturan 4 (`KILL_SWITCH_TAK_TERBACA`) menilai DANGER kalau ada endpoint hidup sementara `config` mati, dan itu penilaian yang benar: jalur hidup tanpa pengakuan jalur kill switch. Biaya permintaan tambahan: **nol** — tidak ada satu pun pemanggil `coreWorkerExec('/api/config')` di repo. Dengan nilai ini `node tools/flag-plan-check.mjs` melaporkan `0 DANGER, 0 WARN`. |
 
@@ -78,7 +78,7 @@ Konsekuensinya, urutan yang HARUS terjadi:
 
 ## 5. Kill switch: dua-duanya masih hidup, dan dibuktikan gerbang
 
-Bukan klaim; semuanya assert yang dijalankan di `cf-config-killswitch-test.js` (86 assert, exit 0):
+Bukan klaim; semuanya assert yang dijalankan di `tests/cf-config-killswitch-test.js` (86 assert, exit 0):
 
 - **Rollback klien** — `(a-A6)`: `enabled:false` + ketujuh endpoint `'on'` + server menjawab semua `true` ⇒ ketujuh mode gabungan `'off'`, **nol** fetch CF (termasuk `/api/config`), ketujuh path dilayani Puter, nol timer dipasang.
 - **Kill switch server tanpa deploy klien** — `(A6)`: dengan `core-config.js` apa adanya, `cfAnalyticsEnabled:false` dari `GET /api/config` mematikan `usage` (nol permintaan data CF, jatuh ke Puter). Tuas kedua `enabled:{analytics:false}` juga mematikannya. Arah AND tetap utuh: server tidak bisa **menyalakan** apa pun yang statisnya off (`(a)`).
@@ -92,7 +92,7 @@ Bukan klaim; semuanya assert yang dijalankan di `cf-config-killswitch-test.js` (
 
 Setiap assert dibuktikan bisa merah lewat mutasi lalu dipulihkan. 21 mutasi, semuanya MERAH pada percobaan akhir:
 
-`ai:'on'`, `tts:'on'`, `usage:'off'`, `config:'off'`, `enabled:false`, `base:''`, `quota:'on'`, `Object.freeze` dibuang, `./core-config.js` dicabut dari ASSETS, `SHELL_CACHE` dilepas dari `SW_REV`, `cache:'reload'`→`'default'` di jalur precache, `skipWaiting()` disisipkan, `skipWaiting` lewat alias, `clients.claim()` disisipkan, `addAll(shellRequests())`→`addAll(ASSETS)`, `registration.update()` dibuang, gerbang pemancar dipaksa selalu terbuka, dipaksa selalu tertutup, lapis server dibuang dari gerbang pemancar, timer pemancar tidak dipasang, dan empat mutasi silang ke `cf-transport-test.js` / `analytics-client-test.js` / `rollout-plan-test.js` / `cf-shadow-mode-test.js`.
+`ai:'on'`, `tts:'on'`, `usage:'off'`, `config:'off'`, `enabled:false`, `base:''`, `quota:'on'`, `Object.freeze` dibuang, `./core-config.js` dicabut dari ASSETS, `SHELL_CACHE` dilepas dari `SW_REV`, `cache:'reload'`→`'default'` di jalur precache, `skipWaiting()` disisipkan, `skipWaiting` lewat alias, `clients.claim()` disisipkan, `addAll(shellRequests())`→`addAll(ASSETS)`, `registration.update()` dibuang, gerbang pemancar dipaksa selalu terbuka, dipaksa selalu tertutup, lapis server dibuang dari gerbang pemancar, timer pemancar tidak dipasang, dan empat mutasi silang ke `tests/cf-transport-test.js` / `tests/analytics-client-test.js` / `tests/rollout-plan-test.js` / `tests/cf-shadow-mode-test.js`.
 
 **Dua lubang gerbang ditemukan dan sudah ditutup** (percobaan pertama tetap hijau):
 
@@ -158,7 +158,7 @@ ini supaya tidak ada yang bisa berpura-pura kaget nanti.
 
 ## 8. Berkas yang saya sentuh di luar wilayah, dan kenapa
 
-Wilayah yang diberikan: `core-config.js`, `sw.js`, `cf-config-killswitch-test.js`.
+Wilayah yang diberikan: `core-config.js`, `sw.js`, `tests/cf-config-killswitch-test.js`.
 `sw.js` **tidak saya ubah sama sekali** (SW_REV bukan wewenang saya).
 
 Empat berkas gerbang lain saya ubah karena kontraknya secara harfiah berbunyi "semua flag CF
@@ -167,13 +167,13 @@ perubahan diberi komentar yang menyebut bentuk lamanya:
 
 | Berkas | Perubahan |
 |---|---|
-| `analytics-client-test.js` | assert "core-config.js tetap usage:off" → "pemancar tidak menulis `FIEZEL_CF_CONFIG` sendiri" + "ai/tts tetap off". Berkas ini ada di daftar verifikasi wajib, jadi tidak ada pilihan lain. |
-| `cf-transport-test.js` | lima assert "default OFF" → daftar putih tahap rilis (`config`,`usage`), ai/tts/auth/quota/health wajib off, `base` terisi hanya kalau ada endpoint hidup, `enabled` konsisten dengan ada/tidaknya endpoint hidup. |
-| `cf-shadow-mode-test.js` | assert "repo SEMUA off" → "yang hidup hanya config+usage"; skenario mode-off berhenti meminjam config repo dan memakai `ALL_OFF` eksplisit (kalau tidak, ia menguji hal lain sambil mengaku menguji mode off). |
-| `rollout-plan-test.js` | assert "repo masih SEMUA off" → "tidak melampaui tahap rilis" + "ai/tts masih off". |
+| `tests/analytics-client-test.js` | assert "core-config.js tetap usage:off" → "pemancar tidak menulis `FIEZEL_CF_CONFIG` sendiri" + "ai/tts tetap off". Berkas ini ada di daftar verifikasi wajib, jadi tidak ada pilihan lain. |
+| `tests/cf-transport-test.js` | lima assert "default OFF" → daftar putih tahap rilis (`config`,`usage`), ai/tts/auth/quota/health wajib off, `base` terisi hanya kalau ada endpoint hidup, `enabled` konsisten dengan ada/tidaknya endpoint hidup. |
+| `tests/cf-shadow-mode-test.js` | assert "repo SEMUA off" → "yang hidup hanya config+usage"; skenario mode-off berhenti meminjam config repo dan memakai `ALL_OFF` eksplisit (kalau tidak, ia menguji hal lain sambil mengaku menguji mode off). |
+| `tests/rollout-plan-test.js` | assert "repo masih SEMUA off" → "tidak melampaui tahap rilis" + "ai/tts masih off". |
 
 **Kontradiksi rencana yang harus MASTER putuskan.** Dokumen rencana rollout (yang dijaga
-`rollout-plan-test.js`) berbunyi "DILARANG menyalakan/mematikan dengan mengedit
+`tests/rollout-plan-test.js`) berbunyi "DILARANG menyalakan/mematikan dengan mengedit
 core-config.js" dan "server hanya bisa MEMATIKAN". Dua aturan itu bersama-sama tidak bisa
 menghasilkan penyalaan pertama: selama flag statis `'off'`, `cfStaticMode()` menjawab `'off'`
 dan nilai KV apa pun tidak pernah dibaca. Jadi penyalaan pertama **harus** sekali lewat

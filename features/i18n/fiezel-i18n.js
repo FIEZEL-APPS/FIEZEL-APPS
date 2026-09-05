@@ -11,7 +11,7 @@
  *   - 'id' adalah baseline emas. Fallback: locale aktif → 'id' → kunci mentah. Murid
  *     Indonesia TIDAK PERNAH melihat perubahan apa pun selama copy-map 'id' berisi kalimat
  *     yang byte-identik dengan naskah hari ini — dan itu dijaga gerbang
- *     id-golden-snapshot-test.js, yang menghitung himpunan literal dari app.js + features/**
+ *     tests/id-golden-snapshot-test.js, yang menghitung himpunan literal dari app.js + features/**
  *     (termasuk folder ini; karena itu copy-map WAJIB tinggal di features/i18n/).
  *   - Placeholder BERNAMA ({nama}, {waktuReset}) — pola rumah yang sudah terbukti di
  *     features/quota/quota-copy.js dan GEMS_COPY — bukan urutan posisi, karena sintaks Thai
@@ -24,7 +24,7 @@
  *   - JANGAN PERNAH meneruskan locale UI ini ke opsi audio/voice-say. Kunci cache audio
  *     memuat locale; kalau locale UI bocor ke sana, SELURUH korpus berbayar (1.170 aset
  *     ElevenLabs + korpus Deepgram) yatim diam-diam — aset tetap di R2, kuncinya tidak
- *     pernah cocok lagi (AI-17 F02, P0). Gerbang audio-locale-guard-test.js menegakkan ini.
+ *     pernah cocok lagi (AI-17 F02, P0). Gerbang tests/audio-locale-guard-test.js menegakkan ini.
  *   - setLocale() TIDAK menulis state sendiri. Pemanggil (layar Pengaturan) yang menulis
  *     preferences.learnerLocale lewat jalur penulisan state yang sudah ada, lalu wajib
  *     leaveAllStages() + render() — stage stack menyimpan closure gambar berbahasa lama

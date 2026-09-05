@@ -1,7 +1,7 @@
 # A8 · Naskah murid + aksesibilitas pemberitahuan (kuota, suara, jembatan)
 
 Cabang `add/a8a11y`. Tanpa bump versi build, tanpa push.
-Gerbang baru: `quota-notice-a11y-test.js` (node murni, memindai sumber), terdaftar di
+Gerbang baru: `tests/quota-notice-a11y-test.js` (node murni, memindai sumber), terdaftar di
 `.github/workflows/quality.yml`.
 
 ---
@@ -22,7 +22,7 @@ memindahkannya ke cabang ini — itu merge orang lain, bukan pekerjaan A8.
 
 Konsekuensinya: sumber kanon yang saya pakai adalah yang benar-benar ada di cabang ini —
 peta `COPY_KEY` di `workers/api/quota/route-quota.js:36-50`, `GEMS_COPY` (kanon "nggak",
-kanon anti-jualan, dijaga `gems-test.js`), dan satu-satunya naskah kegagalan yang sudah
+kanon anti-jualan, dijaga `tests/gems-test.js`), dan satu-satunya naskah kegagalan yang sudah
 dipakai murid: `noteNoAudio()` di
 `features/speaking-listening/fiezel-speaking-listening-addon.js:689-695` ("Suaranya sedang
 bermasalah, bukan kamu." + item tidak dinilai + satu jalan terus). Kalau cf-b8 kelak
@@ -102,7 +102,7 @@ ini.
 
 Pola masalahnya sama: "tidak" bukan "nggak", nada laporan galat, dan tanpa jalan terus.
 Semua nilai ditulis ulang ke kamu-POV dengan satu langkah lanjut yang nyata, ditambah
-`quota_unavailable`. `ai-task-contract-test.js:309-314` (panjang > 15 karakter, tanpa
+`quota_unavailable`. `tests/ai-task-contract-test.js:309-314` (panjang > 15 karakter, tanpa
 `429|5xx|@cf/|token|account`, kunci `quota_exceeded`/`breaker_open`/`degraded` ada) tetap
 hijau — tidak ada gerbang yang memaku kalimat persisnya, jadi naskahnya boleh membaik.
 
@@ -110,7 +110,7 @@ hijau — tidak ada gerbang yang memaku kalimat persisnya, jadi naskahnya boleh 
 
 | Teks sekarang | Masalah | Perbaikan |
 |---|---|---|
-| Pesan galat mentah dari provider dicetak ke layar (di-escape) | Murid membaca istilah mesin yang tidak pernah dimaksudkan untuknya, dan kadang berisi nama layanan/kode status. | Galat mentah sekarang **hanya** masuk `console.debug`. Layar mendapat kalimat yang ditulis untuk murid. `ai-integration-test.js` diperkuat: markup dari provider tidak boleh muncul mentah **maupun** ter-escape. |
+| Pesan galat mentah dari provider dicetak ke layar (di-escape) | Murid membaca istilah mesin yang tidak pernah dimaksudkan untuknya, dan kadang berisi nama layanan/kode status. | Galat mentah sekarang **hanya** masuk `console.debug`. Layar mendapat kalimat yang ditulis untuk murid. `tests/ai-integration-test.js` diperkuat: markup dari provider tidak boleh muncul mentah **maupun** ter-escape. |
 | "Permintaan AI melewati **batas waktu**." | Bahasa mesin. | "Jawabannya nggak datang dalam waktu yang wajar." (`Error` internalnya boleh tetap teknis — ia tidak pernah dibaca murid.) |
 | "Pastikan **Anda** sudah login" | "Anda" + "login". | "Pastikan kamu sudah masuk ke akunmu dan internetnya nyala." |
 | Blok galat tanpa wilayah live | Pembaca layar tidak mengumumkan apa pun. | Dibungkus `role="status" aria-live="polite" aria-atomic="true"`. |
@@ -163,7 +163,7 @@ juga **menolak merender** selama `puterListeningActive()`. Dijaga (g).
 
 ## 4 · Gerbang baru
 
-`quota-notice-a11y-test.js` — node murni, tanpa dependensi, memindai tiga korpus: modul
+`tests/quota-notice-a11y-test.js` — node murni, tanpa dependensi, memindai tiga korpus: modul
 naskah, peta `POLITE` kedua rute, dan blok fungsi pemberitahuan di `app.js` (diambil dengan
 penghitungan kurung, bukan regex baris, dan komentarnya dibuang supaya kutipan penjelasan
 tidak disalahartikan sebagai kode).
@@ -201,14 +201,14 @@ habis.
 
 Saya tidak melonggarkan keduanya; saya memindahkan assert-nya ke properti yang lebih kuat.
 
-- **`puter-popup-once-test.js`** dulu mewajibkan `app.js` memuat
+- **`tests/puter-popup-once-test.js`** dulu mewajibkan `app.js` memuat
   `/Kredit AI Puter kamu habis/` dan `/Pelajari opsi upgrade/`. Keduanya justru yang
   dilarang kanon (nama mesin; permukaan bayar). Assert-nya sekarang: pemberitahuannya
   memanggil `presentQuotaNotice({copyKey:'quota.ai.exhausted'…})`, tetap milik FIEZEL
   (bukan dialog SDK, tidak pernah `requestUpgrade`), tetap mengatakan aplikasinya jalan
   penuh tanpa bayar, dan **tautan berbayarnya harus hilang**. Yang dijaga aslinya —
   sekali per periode, hanya di akhir sesi — tidak disentuh.
-- **`ai-integration-test.js`** dulu mewajibkan pesan provider ter-escape muncul di layar
+- **`tests/ai-integration-test.js`** dulu mewajibkan pesan provider ter-escape muncul di layar
   (`&lt;img`). Sekarang pesan provider tidak dicetak sama sekali, jadi assert-nya menjadi
   lebih ketat: tidak ada markup provider dalam bentuk apa pun, judul tetap di-escape,
   naskah murid tetap ada. Assert `diblokir peramban` dan timeout mengikuti naskah barunya.
@@ -221,28 +221,28 @@ Semua dijalankan di `/home/user/workspace/wt-a8a11y`.
 
 | Gerbang | Hasil |
 |---|---|
-| `quota-notice-a11y-test.js` (baru) | exit 0 — PASS 13/0 |
-| `a11y-test.js` | exit 0 |
-| `ui-structure-test.js` | exit 0 |
-| `gems-test.js` | exit 0 (34 pemeriksaan) |
-| `speaking-listening-test.js` | exit 0 (45/0) |
-| `listening-exam-test.js` | exit 0 |
-| `regression-test.js` | exit 0 |
-| `install-health-test.js` | exit 0 |
+| `tests/quota-notice-a11y-test.js` (baru) | exit 0 — PASS 13/0 |
+| `tests/a11y-test.js` | exit 0 |
+| `tests/ui-structure-test.js` | exit 0 |
+| `tests/gems-test.js` | exit 0 (34 pemeriksaan) |
+| `tests/speaking-listening-test.js` | exit 0 (45/0) |
+| `tests/listening-exam-test.js` | exit 0 |
+| `tests/regression-test.js` | exit 0 |
+| `tests/install-health-test.js` | exit 0 |
 | `validator.js` | exit 0 |
 
-Tambahan, karena masukannya saya sentuh: `ai-task-contract-test.js`, `cf-api-contract-test.js`,
-`quota-core-test.js`, `quota-manipulation-test.js`, `puter-popup-once-test.js`,
-`ai-integration-test.js`, `pwa-cache-test.js`, `pwa-release-coherence-test.js`,
-`sw-corp-test.js`, `contrast-test.js`, `pastel-field-contrast-test.js`,
-`topbar-logo-contrast-test.js`, `no-network-test.js`, `http-smoke-test.js`,
-`boot-order-test.js`, `product-audit.js`, `onboarding-test.js`, `back-nav-test.js`,
-`settings-cache-test.js`, `classroom-test.js`, `breaker-test.js`, `tts-key-test.js`,
-`ai-response-shape-test.js`, `diag-panel-test.js`, `lesson-experience-test.js`,
-`experience-integration-test.js`, `tours-test.js` — semuanya exit 0.
+Tambahan, karena masukannya saya sentuh: `tests/ai-task-contract-test.js`, `tests/cf-api-contract-test.js`,
+`tests/quota-core-test.js`, `tests/quota-manipulation-test.js`, `tests/puter-popup-once-test.js`,
+`tests/ai-integration-test.js`, `tests/pwa-cache-test.js`, `tests/pwa-release-coherence-test.js`,
+`tests/sw-corp-test.js`, `tests/contrast-test.js`, `tests/pastel-field-contrast-test.js`,
+`tests/topbar-logo-contrast-test.js`, `tests/no-network-test.js`, `tests/http-smoke-test.js`,
+`tests/boot-order-test.js`, `product-audit.js`, `tests/onboarding-test.js`, `tests/back-nav-test.js`,
+`tests/settings-cache-test.js`, `tests/classroom-test.js`, `tests/breaker-test.js`, `tests/tts-key-test.js`,
+`tests/ai-response-shape-test.js`, `tests/diag-panel-test.js`, `tests/lesson-experience-test.js`,
+`tests/experience-integration-test.js`, `tests/tours-test.js` — semuanya exit 0.
 
 Menambahkan `./features/quota/quota-copy.js` ke daftar precache `sw.js` **tidak** menuntut
-bump versi: `pwa-cache-test.js` dan `pwa-release-coherence-test.js` hijau tanpa perubahan
+bump versi: `tests/pwa-cache-test.js` dan `tests/pwa-release-coherence-test.js` hijau tanpa perubahan
 versi build. Versi build tidak disentuh.
 
 ### 5.1 Bukti visual 390px — BELUM BISA DIAMBIL DI MESIN INI
@@ -250,7 +250,7 @@ versi build. Versi build tidak disentuh.
 Jujur, dan ini bukan alasan yang dikarang: mesin ini tidak punya peramban.
 `npx playwright install chromium` menolak dengan *"Playwright does not support chromium on
 ubuntu26.04-x64"*, tidak ada `chrome`/`chromium` di sistem, dan gerbang e2e repo sendiri
-(`e2e-level-grammar-test.js`) melaporkan `SKIPPED — tidak ada Chromium/Chrome yang bisa
+(`tests/e2e-level-grammar-test.js`) melaporkan `SKIPPED — tidak ada Chromium/Chrome yang bisa
 dipakai di mesin ini`. Saya tidak akan menempelkan gambar yang tidak berasal dari render
 sungguhan.
 
@@ -275,13 +275,13 @@ announce=false tunda=true`), plus panel jatah dengan hitungan `elemen <a>: 0`,
 
 ## 6 · Berkas
 
-Baru: `features/quota/quota-copy.js`, `quota-notice-a11y-test.js`,
+Baru: `features/quota/quota-copy.js`, `tests/quota-notice-a11y-test.js`,
 `reports/add-a8-a11y.md`, `reports/add-a8-shots/{notice-harness.html, shoot.js,
 dump-notice-markup.js, a8-notice-markup.txt}`, `QUOTA-NOTICE-A11Y-REPORT.json`.
 
 Diubah: `workers/api/tts/route-tts.js`, `workers/api/ai/route-ai.js`, `app.js`,
 `index.html`, `sw.js`, `style.css`, `.github/workflows/quality.yml`,
-`puter-popup-once-test.js`, `ai-integration-test.js`, `NO-NETWORK-REPORT.json` +
+`tests/puter-popup-once-test.js`, `tests/ai-integration-test.js`, `NO-NETWORK-REPORT.json` +
 `PUTER-POPUP-ONCE-REPORT.json` (dibuat ulang oleh gerbangnya).
 
 ## 7 · Yang masih terbuka

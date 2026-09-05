@@ -48,7 +48,7 @@ import { QUOTA_CONFIG } from '../quota/quota-config.js';
 // hanya boleh LEBIH KECIL dari ini (lihat `accountCapNeurons()`).
 const ACCOUNT_DAILY_NEURON_BUDGET = QUOTA_CONFIG.ACCOUNT_DAILY_NEURON_BUDGET;
 
-/** Semua SQL tabel ini tinggal di satu tempat, supaya `d1-schema-contract-test.js`
+/** Semua SQL tabel ini tinggal di satu tempat, supaya `tests/d1-schema-contract-test.js`
  *  bisa mencocokkan kolom dan indeks yang benar-benar dipakai. */
 export const ACCOUNT_SQL = Object.freeze({
   // Dibuat kalau belum ada. `DO NOTHING` supaya dua permintaan bersamaan di hari

@@ -5,7 +5,7 @@
  * memindahkan literal Indonesia segmen B (progress/OLM, quiz SRL+burst, tutor, home coach +
  * jam langit, settings laporan, grammar fallback, notif, auth Puter, quota fallback, sys,
  * ask) ke copy-map sesuai plan W1-APPJS-B, supaya copy-th-app-b.js bisa 1:1. Nilai DISALIN
- * BYTE-PER-BYTE dari app.js — gerbang id-golden-snapshot-test.js membekukan HIMPUNAN literal
+ * BYTE-PER-BYTE dari app.js — gerbang tests/id-golden-snapshot-test.js membekukan HIMPUNAN literal
  * (PINDAH boleh, BERUBAH tidak). Kunci ber-slug netral: lexer gerbang menghitung kunci
  * berpenanda Indonesia sebagai "tambahan liar" (laporan W1-INFRA; auth.tombol-retry dan
  * auth.galat-unfinished di-rename karena itu). Placeholder BERNAMA {nama} (konvensi brief).

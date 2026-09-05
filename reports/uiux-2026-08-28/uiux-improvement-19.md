@@ -5,7 +5,7 @@ Timestamp: 2026-08-28T16:30+07 · Inputs: uiux-audit-01..18, uiux-redteam-20 (al
 **Identity contract (non-negotiable):** FIEZEL stays FIEZEL — warm yellow/cream v6 "Warm Paper, Bright Mind" palette (`--sun #FFC700`, `--bg #FFF9EE`, `--accent #C2402C`, style.css:652-778), Pau the cat mascot, casual Indonesian kamu/aku register, offline-first single-user PWA, tactile hard-offset shadows, once-per-day splash ritual. Nothing below clones Duolingo; every fix strengthens what already exists.
 
 **Test-gate constraints honored throughout** (verified live in repo):
-- `splash-first-paint-test.js` requires: (a) static splash markup in index.html byte-identical to `FiezelSplash.markup()` (splash-first-paint-test.js:187-191), (b) every splash rule copied into `<style id="fiezelBootCritical">` to exist verbatim in style.css — **but boot-only rules ("aturan khusus-boot") are exempt from comparison** (splash-first-paint-test.js:206-218), (c) critical CSS block must precede the style.css `<link>` (:202-203). All splash fixes below use either fiezel-splash.js changes, boot-only rules, or synchronized style.css+index.html edits in one commit.
+- `tests/splash-first-paint-test.js` requires: (a) static splash markup in index.html byte-identical to `FiezelSplash.markup()` (tests/splash-first-paint-test.js:187-191), (b) every splash rule copied into `<style id="fiezelBootCritical">` to exist verbatim in style.css — **but boot-only rules ("aturan khusus-boot") are exempt from comparison** (tests/splash-first-paint-test.js:206-218), (c) critical CSS block must precede the style.css `<link>` (:202-203). All splash fixes below use either fiezel-splash.js changes, boot-only rules, or synchronized style.css+index.html edits in one commit.
 - `release-audit.py` requires these literals in app.js and must not be broken by any quiz-loop edit: render gate regex `if(!(?:q||!)?validateQuestion(q).ok)continue` (release-audit.py:107-108), `function validateQuestion`, evidence gate `hs.length>=24&&skills.size>=3&&types.size>=2`, absence of `state.totalAnswered>=150`, `GRAMMAR_SESSION_SIZE=25`, `id="answerBurst"`/`showAnswerBurst`/`.answer-burst.show`, `feedbackSounds:true`, `FIEZEL_AI_TIMEOUT_MS=30000`, `currentAIRequest(id,epoch)`, `id="aiRetry"` (release-audit.py:109-127). All sketches below are additive around these literals.
 
 ---
@@ -288,7 +288,7 @@ Exam badge scope label or listening parity (09-008, app.js:102) — P3; placemen
 ### 6.1 Bank fetch timeout + retry (P0-1) — see §2 sketch. 20s `AbortSignal.timeout`, branched Indonesian error copy, `Coba lagi` button re-running `load()`.
 
 ### 6.2 Returning-user splash (12-001, 17-004, 07-011, 12-002)
-Constraint: splash-test compares copied rules to style.css but **exempts boot-only rules** (splash-first-paint-test.js:211) and requires markup identical to `FiezelSplash.markup()`.
+Constraint: splash-test compares copied rules to style.css but **exempts boot-only rules** (tests/splash-first-paint-test.js:211) and requires markup identical to `FiezelSplash.markup()`.
 Design:
 - **Inline boot script** (index.html, inside the existing early script that owns the watchdog): read `localStorage['fiezel-splash-seen-v1']` synchronously; if seen today, add class `fz-splash-fast` on `<html>`.
 - **Boot-only CSS** (new rules in `#fiezelBootCritical` only — exempt from the style.css comparison): under `.fz-splash-fast`, show the composed logo statically at full opacity (`html.fz-splash-fast #fiezelBootSplash .fz-fgroup{opacity:1}`) + a subtle indeterminate shimmer bar. No choreography.
@@ -309,7 +309,7 @@ Phase 2: split banks per CEFR level (`reading-bank.A2.json`…), load active lev
 Phase 3 (SW): move giant JSON banks out of the atomic shell precache into a versioned data cache filled lazily (17-005) — big win for the ~9.6MB install and full re-download per SW_REV. Requires careful sw.js work; schedule after Phases 1-2 prove out. Verify against sw-precache tests and the health-ping protocol (sw.js:40-47).
 
 ### 6.5 Preload set fix (17-006) + render-blocking CSS (17-003)
-index.html:40-44: preload `PlusJakartaSans-700.woff2` (used by boot-visible text) instead of InstrumentSerif-400 + Fredoka-var (~50.7KB unused on the critical path — neither activates during splash→onboarding). Make tutor-v3.css and speaking-listening-addon.css non-render-blocking (index.html:82-84, `media="print"` swap or inject on view entry — neither styles splash/home). Keep the `#fiezelBootCritical` before-style.css ordering (splash-first-paint-test.js:202).
+index.html:40-44: preload `PlusJakartaSans-700.woff2` (used by boot-visible text) instead of InstrumentSerif-400 + Fredoka-var (~50.7KB unused on the critical path — neither activates during splash→onboarding). Make tutor-v3.css and speaking-listening-addon.css non-render-blocking (index.html:82-84, `media="print"` swap or inject on view entry — neither styles splash/home). Keep the `#fiezelBootCritical` before-style.css ordering (tests/splash-first-paint-test.js:202).
 
 ### 6.6 View-switch cost (17-007) — P3, larger refactor
 Cache per-view DOM or keyed containers so tab switches stop re-parsing innerHTML (401-783ms today). Do after the P0/P1 wave; guard with the existing boot-order and back-nav tests. Also `t.finished.catch(()=>{})` on `startViewTransition` (20-009, one line at app.js:3865).

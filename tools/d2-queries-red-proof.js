@@ -36,7 +36,7 @@ const CASES = [
     file: QUERIES,
     from: 'FROM retention_daily\n',
     to: 'FROM retention_cohort\n',
-    gate: 'd1-schema-contract-test.js',
+    gate: 'tests/d1-schema-contract-test.js',
     expect: 'owner_queries_tabel_ada_di_ddl',
     why: 'Ini CACAT ASLI paket sebelumnya: kueri menunjuk `retention_cohort`, tabel yang tidak '
       + 'pernah dibuat. Selama semua tabel kosong cacat ini tidak terlihat.'
@@ -46,7 +46,7 @@ const CASES = [
     file: QUERIES,
     from: 'SELECT COUNT(*) AS days_broken FROM metrics_daily',
     to: 'SELECT COUNT(*) AS days_broken, metric_name FROM metrics_daily',
-    gate: 'd1-schema-contract-test.js',
+    gate: 'tests/d1-schema-contract-test.js',
     expect: 'owner_queries_kolom_ada_di_ddl',
     why: 'Kolom yang tidak ada di DDL hanya melempar SETELAH tabel berisi data.'
   },
@@ -55,7 +55,7 @@ const CASES = [
     file: QUERIES,
     from: 'FROM usage_daily\n',
     to: 'FROM dau_dedup\n',
-    gate: 'd1-schema-contract-test.js',
+    gate: 'tests/d1-schema-contract-test.js',
     expect: 'owner_queries_nol_tabel_di_luar_tiga_agregat',
     why: '`dau_dedup` ADA di database yang sama dan memuat token per-perangkat. Tanpa larangan '
       + 'eksplisit, membacanya tidak melanggar skema apa pun — hanya melanggar privasi.'
@@ -65,7 +65,7 @@ const CASES = [
     file: QUERIES,
     from: "const SERIES_METRICS = Object.freeze([\n  'dau',",
     to: "const SERIES_METRICS = Object.freeze([\n  'visitors',\n  'dau',",
-    gate: 'd1-schema-contract-test.js',
+    gate: 'tests/d1-schema-contract-test.js',
     expect: 'setiap_metrik_owner_ditulis_jalur_server',
     why: 'Bentuk PANJANG menerima nama metrik APA PUN, jadi salah nama tidak pernah menghasilkan '
       + 'galat SQL. `visitors` adalah metrik yang dipakai queries.js versi lama dan tidak pernah '
@@ -76,7 +76,7 @@ const CASES = [
     file: QUERIES,
     from: '  LATEST_DAY: \'SELECT MAX(day) AS day FROM metrics_daily\',',
     to: '  LATEST_DAY: \'SELECT MAX(day) AS day \'\n    + \'FROM metrics_daily\',',
-    gate: 'd1-schema-contract-test.js',
+    gate: 'tests/d1-schema-contract-test.js',
     expect: 'owner_queries_tanpa_sambung_string',
     why: 'SQL yang dirakit dari potongan string membuat pemindai token hanya melihat pecahannya '
       + 'dan bisa mengaku hijau atas kueri yang tidak pernah ia baca utuh.'
@@ -86,7 +86,7 @@ const CASES = [
     file: INDEX,
     from: 'const daysTotal = Number(start && start.days_total);',
     to: 'const daysTotal = Number(totals && totals.events_total);',
-    gate: 'owner-dashboard-test.js',
+    gate: 'tests/owner-dashboard-test.js',
     expect: 'belum ada pengukuran',
     why: 'Inti aturan #3: keadaan HARUS diputuskan dari jumlah hari terrollup. Memutuskannya dari '
       + 'nilai metrik membuat "nol terukur" tidak bisa dibedakan dari "belum ada pengukuran", '
@@ -97,7 +97,7 @@ const CASES = [
     file: INDEX,
     from: 'else if (!Number.isFinite(daysCounted) || daysCounted <= 0) state = STATE_NO_DATA_IN_PERIOD;',
     to: 'else if (!Number.isFinite(daysCounted) || daysCounted < 0) state = STATE_NO_DATA_IN_PERIOD;',
-    gate: 'owner-dashboard-test.js',
+    gate: 'tests/owner-dashboard-test.js',
     expect: 'belum ada pengukuran',
     why: 'Menghapus keadaan `no-data-in-period` membuat periode yang memang belum punya hari '
       + 'terrollup tampil sebagai TERUKUR dengan angka nol. Owner akan menyimpulkan pemakaian '
@@ -147,7 +147,7 @@ for (const c of CASES) {
 // Setelah semua pemulihan, gerbang WAJIB hijau kembali. Tanpa pemeriksaan ini, "pulih" hanya
 // berarti berkasnya sama, bukan bahwa sistemnya sehat.
 const hijauLagi = {};
-for (const gate of ['d1-schema-contract-test.js', 'owner-dashboard-test.js']) {
+for (const gate of ['tests/d1-schema-contract-test.js', 'tests/owner-dashboard-test.js']) {
   const r = runGate(gate);
   hijauLagi[gate] = r.code;
   if (r.code !== 0) allOk = false;

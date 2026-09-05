@@ -14,7 +14,7 @@
  *             broken question, so the source alone proves nothing.
  *
  * Run:  node content-integrity-audit.js            (gate: exits 1 on CRITICAL)
- *       node content-integrity-audit.js --report   (also writes CONTENT-INTEGRITY-AUDIT.json)
+ *       node content-integrity-audit.js --report   (also writes reports/CONTENT-INTEGRITY-AUDIT.json)
  *       node content-integrity-audit.js --sample=N (cap runtime sampling, default all)
  */
 
@@ -482,7 +482,7 @@ function bootApp() {
   const index = new Map();
   (function walk(dir) {
     for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
-      if (['node_modules', '.git', 'vendor', 'assets', 'docs', '.audit-tmp'].includes(e.name)) continue; // .audit-tmp: release-audit.py sets TMPDIR=ROOT/.audit-tmp; leftover adoption/rehearsal snapshots there shadow the canonical root data files in this basename index (precedent: level-grammar-contract-test.js)
+      if (['node_modules', '.git', 'vendor', 'assets', 'docs', '.audit-tmp'].includes(e.name)) continue; // .audit-tmp: release-audit.py sets TMPDIR=ROOT/.audit-tmp; leftover adoption/rehearsal snapshots there shadow the canonical root data files in this basename index (precedent: tests/level-grammar-contract-test.js)
       const full = path.join(dir, e.name);
       if (e.isDirectory()) walk(full); else if (!index.has(e.name)) index.set(e.name, full);
     }
@@ -790,7 +790,7 @@ async function auditPlacementRuntime(ctx) {
   }
 
   if (WRITE_REPORT) {
-    fs.writeFileSync(path.join(root, 'CONTENT-INTEGRITY-AUDIT.json'), JSON.stringify({
+    fs.writeFileSync(path.join(root, 'reports/CONTENT-INTEGRITY-AUDIT.json'), JSON.stringify({
       schema: 'fiezel-content-integrity-audit-v1',
       generatedFrom: 'content-integrity-audit.js',
       version: readJson('VERSION.json').version,
@@ -798,7 +798,7 @@ async function auditPlacementRuntime(ctx) {
       findings: findings.slice(0, 4000),
       truncated: findings.length > 4000 ? findings.length - 4000 : 0,
     }, null, 2) + '\n');
-    console.log('\nWrote CONTENT-INTEGRITY-AUDIT.json');
+    console.log('\nWrote reports/CONTENT-INTEGRITY-AUDIT.json');
   }
 
   const criticals = bySeverity.CRITICAL || 0;

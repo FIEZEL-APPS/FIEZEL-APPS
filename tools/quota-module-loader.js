@@ -5,7 +5,7 @@
  * supaya gerbang kuota bisa mengeksekusi kode Worker APA ADANYA di Node polos.
  *
  * MENGAPA vm dan bukan `import()`:
- *   1. Aturan kuota tidak boleh diuji lewat tiruan aturannya (pola `gems-test.js`).
+ *   1. Aturan kuota tidak boleh diuji lewat tiruan aturannya (pola `tests/gems-test.js`).
  *   2. Sandbox-nya SENGAJA kosong: tanpa `Date`, tanpa `fetch`, tanpa `localStorage`,
  *      tanpa `document`, tanpa `crypto`, tanpa `process`. Kalau suatu hari ada yang
  *      menyelipkan waktu tersembunyi atau jaringan ke dalam aturan kuota, gerbang gagal

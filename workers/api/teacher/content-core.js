@@ -14,7 +14,7 @@
  * makna diam-diam berubah. Jadi enum di bawah DIAMBIL dari yang sudah dipakai
  * mesin: SKILLS = features/personal-journey/fiezel-personal-journey.js:44,
  * LEVELS = features/brain/fiezel-core-brain.js:60. Gerbang
- * `teacher-content-test.js` mengunci kesamaan itu; kalau salah satu berubah
+ * `tests/teacher-content-test.js` mengunci kesamaan itu; kalau salah satu berubah
  * sepihak, gerbang merah.
  *
  * Yang DITAMBAHKAN di atas model inti hanyalah yang tidak punya padanan:

@@ -23,14 +23,14 @@ sini yang menjadi urutan resmi.
 | `0012_teacher_content.sql` | `fiezel-core` (binding `CORE_DB`) | `tc_node`, `tc_question`, `tc_assignment`, `tc_assignment_target`, `tc_lesson_evidence`, `tc_class`, `tc_class_report` |
 
 Tabel di atas adalah **satu-satunya** daftar berkas→database yang ditulis manusia.
-`tools/d1-schema-check.mjs` dan `d1-schema-contract-test.js` **menurunkan** peta itu
+`tools/d1-schema-check.mjs` dan `tests/d1-schema-contract-test.js` **menurunkan** peta itu
 dari perintah `wrangler d1 execute … --file=migrations/<berkas>` di dokumen ini,
 lalu MEMERAH kalau ada satu berkas `.sql` di direktori yang tidak punya perintah
 penerapan di sini. Jadi migrasi baru tanpa dokumentasi = gerbang merah, bukan
 migrasi yang tidak pernah diperiksa (lihat "Cacat yang pernah terjadi" di bawah).
 
 `0003_cron.sql` masuk `fiezel-core` dan bukan `fiezel-stats` karena dua alasan
-yang keduanya keras: (1) `analytics-privacy-test.js` menuntut database analytics
+yang keduanya keras: (1) `tests/analytics-privacy-test.js` menuntut database analytics
 memuat **tepat lima tabel** yang terdaftar di `analytics-tables.js`; (2) rollup
 yang gagal karena database analytics tidak bisa ditulis **tidak akan bisa
 mencatat kegagalannya sendiri di database yang sama**. Catatan kegagalan harus
@@ -124,7 +124,7 @@ purge-nya ada di `docs/D1-RETENTION.md`.
 
 `0007_learning.sql` masuk database KETIGA (`fiezel-learning`), bukan
 `fiezel-stats`, karena dua alasan yang sama kerasnya dengan penempatan
-`0003_cron.sql`: (1) `analytics-privacy-test.js` menuntut database analytics
+`0003_cron.sql`: (1) `tests/analytics-privacy-test.js` menuntut database analytics
 memuat **tepat lima tabel** — menaruh `learning_daily` di sana membuat gerbang
 analytics merah selamanya atau, lebih buruk, tergoda dilonggarkan; (2) kontrak
 `BRAIN-TELEMETRY-SCHEMA.md` memisahkan lane kehadiran perangkat (analytics)
@@ -163,7 +163,7 @@ lewat binding `CORE_DB` pada permintaan sosial pertama per isolate. Dua pagar
 supaya ini tidak menjadi migrasi bayangan:
 
 1. Berkas `.sql` ini tetap **sumber resmi** skema; gerbang
-   `social-schema-contract-test.js` MEMERAH kalau `SOCIAL_DDL` runtime tidak
+   `tests/social-schema-contract-test.js` MEMERAH kalau `SOCIAL_DDL` runtime tidak
    setara pernyataan-per-pernyataan (ternormalisasi) dengan berkas ini.
 2. Perintah `wrangler d1 execute` di atas tetap dianjurkan dijalankan owner —
    `CREATE TABLE IF NOT EXISTS` membuat urutan mana pun aman.
@@ -202,7 +202,7 @@ wrangler d1 execute fiezel-stats --remote \
   --command "SELECT name FROM sqlite_master WHERE name IN ('learning_daily','learning_dedup')"
 ```
 
-Gerbang `cf-wiring-test.js` memeriksa hal yang sama di tingkat berkas: tidak ada
+Gerbang `tests/cf-wiring-test.js` memeriksa hal yang sama di tingkat berkas: tidak ada
 tabrakan nama tabel antar berkas, dan tidak ada satu pun kolom penghubung
 (`user_id`, `sub`, `install_id`) di `0002_analytics.sql`.
 
@@ -210,20 +210,20 @@ tabrakan nama tabel antar berkas, dan tidak ada satu pun kolom penghubung
 
 `quota/migrations/0001_quota.sql` dan `analytics/migrations/0002_analytics.sql`
 **tetap ada di tempat asalnya** karena gerbang paket kerja masing-masing membaca
-path itu (mis. `analytics-privacy-test.js` membaca
+path itu (mis. `tests/analytics-privacy-test.js` membaca
 `analytics/migrations/0002_analytics.sql`). Salinan di direktori ini wajib
-**byte-identik** dengan aslinya, dan `cf-wiring-test.js` yang membuktikannya —
+**byte-identik** dengan aslinya, dan `tests/cf-wiring-test.js` yang membuktikannya —
 jadi tidak ada kemungkinan dua versi skema yang berbeda hidup berdampingan tanpa
 ada yang tahu.
 
 `analytics/migrations/0006_analytics_batch_dedup.sql` mengikuti pola yang sama:
-aslinya hidup di `analytics/migrations/` (dibaca gerbang `analytics-dedup-test.js`),
+aslinya hidup di `analytics/migrations/` (dibaca gerbang `tests/analytics-dedup-test.js`),
 salinan di direktori ini wajib **byte-identik**. Catatan jujur: pasangan `0006`
-belum terdaftar di cek byte-identik `cf-wiring-test.js` — penambahan pasangan itu
+belum terdaftar di cek byte-identik `tests/cf-wiring-test.js` — penambahan pasangan itu
 milik pemilik gerbang wiring.
 
 `evidence/migrations/0008_evidence.sql` mengikuti pola yang sama: aslinya hidup
-di `evidence/migrations/` (dibaca gerbang `braincore-evidence-test.js`), salinan
+di `evidence/migrations/` (dibaca gerbang `tests/braincore-evidence-test.js`), salinan
 di direktori ini wajib **byte-identik**. `0008` masuk database KEEMPAT
 (`fiezel-evidence`), bukan `fiezel-learning`, karena inilah satu-satunya database
 yang menyimpan pengenal per-perangkat (`evidence_learner_day.cohort`, TTL 14
@@ -231,10 +231,10 @@ hari); selama ia berdiri sendiri, "cohort tidak bisa disambungkan ke identitas,
 kuota, kehadiran, atau jawaban" adalah sifat yang tidak bisa ditulis dalam SQL.
 
 `learning/migrations/0007_learning.sql` mengikuti pola yang sama lagi: aslinya
-hidup di `learning/migrations/` (dibaca gerbang `learning-lane-test.js` untuk
+hidup di `learning/migrations/` (dibaca gerbang `tests/learning-lane-test.js` untuk
 membangun D1 palsu dari DDL nyata), salinan di direktori ini wajib
 **byte-identik**. Catatan jujur yang sama: pasangan `0007` juga belum terdaftar
-di cek byte-identik `cf-wiring-test.js`; `learning-lane-test.js` yang saat ini
+di cek byte-identik `tests/cf-wiring-test.js`; `tests/learning-lane-test.js` yang saat ini
 membandingkan kedua salinan byte demi byte.
 
 ## 0004_indexes.sql — hanya `fiezel-core` (A6/D1)
@@ -266,7 +266,7 @@ menyentuh indeks `quota_daily`/`quota_reservation`.
 ## Cacat yang pernah terjadi: `cron_run` "hilang" dari skema harapan
 
 `0003_cron.sql` dan gerbang skema A6/D1 lahir di dua paket kerja paralel. Gerbang
-(`d1-schema-contract-test.js`) dan pembanding (`tools/d1-schema-check.mjs`)
+(`tests/d1-schema-contract-test.js`) dan pembanding (`tools/d1-schema-check.mjs`)
 masing-masing memuat daftar berkas migrasi **yang ditulis tangan**, dan daftar itu
 tidak ikut berubah saat `0003_cron.sql` mendarat. Akibatnya "skema harapan"
 dibangun tanpa `cron_run`, lalu gerbang menuduh `cron-status.js` memakai tabel
@@ -314,7 +314,7 @@ Keluar 0 = skema nyata identik dengan berkas migrasi di repo (nama tabel, kolom,
 nama indeks, kolom indeks, UNIQUE, dan klausa WHERE indeks partial). Keluar 1 =
 ada beda, dan laporannya menyebut tabel/kolom/indeks mana. Skrip itu **nol
 jaringan**: ia hanya membaca STDIN dan berkas migrasi, jadi CI bisa mengujinya
-tanpa kredensial Cloudflare (`d1-schema-contract-test.js`).
+tanpa kredensial Cloudflare (`tests/d1-schema-contract-test.js`).
 
 Dokumen terkait: `docs/D1-CAPACITY.md` (batas plan gratis + ambang kapan owner
 harus khawatir), `docs/D1-RETENTION.md` (kebijakan retensi per tabel),

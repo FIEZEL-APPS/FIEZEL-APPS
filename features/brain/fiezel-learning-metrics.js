@@ -67,7 +67,7 @@
   });
 
   // Konstanta peluruhan keyakinan miskonsepsi — DISALIN dari kontrak beku
-  // FiezelMisconceptionLedger (BRAINCORE-V3-CONTRACTS.md: prior logit(0.1), half-life 14
+  // FiezelMisconceptionLedger (docs/BRAINCORE-V3-CONTRACTS.md: prior logit(0.1), half-life 14
   // hari, gerbang aktif 0.7 / resolved 0.3, >=3 bukti, >=2 sesi). Disalin, bukan
   // di-require: modul murni UMD tidak boleh bergantung pada urutan pemuatan global di
   // browser, dan kontraknya memang FINAL sehingga duplikasi ini aman dan teruji di gate.

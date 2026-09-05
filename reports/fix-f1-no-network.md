@@ -1,4 +1,4 @@
-# F1 — `no-network-test.js` merah setelah merge: mock TTS yang tak dikenali pemindai
+# F1 — `tests/no-network-test.js` merah setelah merge: mock TTS yang tak dikenali pemindai
 
 Cabang: `fix/f1net` · pohon kerja: `wt-f1net` · tanpa push, tanpa bump versi.
 
@@ -6,13 +6,13 @@ Cabang: `fix/f1net` · pohon kerja: `wt-f1net` · tanpa push, tanpa bump versi.
 
 ```
 Tak ada `fetch` global asli yang disuntikkan ke konteks vm => FAIL
-  tts-transport-switch-test.js:84  menyuntik `fetch` tanpa mock lokal yang mendahului
-  tts-transport-switch-test.js:201 menyuntik `fetch` tanpa mock lokal yang mendahului
+  tests/tts-transport-switch-test.js:84  menyuntik `fetch` tanpa mock lokal yang mendahului
+  tests/tts-transport-switch-test.js:201 menyuntik `fetch` tanpa mock lokal yang mendahului
 ```
 
 ## 2. Aturan pemindai — apa yang SEBENARNYA dipakai (bukan tebakan)
 
-`no-network-test.js` memotong komentar lebih dulu (`stripComments`), lalu untuk setiap
+`tests/no-network-test.js` memotong komentar lebih dulu (`stripComments`), lalu untuk setiap
 penyuntikan `fetch` ke konteks `vm` menerapkan empat aturan berurutan di `analyzeSource()`:
 
 | # | Bentuk | Putusan |
@@ -49,11 +49,11 @@ untuk satu alamat (`base() + RENDER_PATH`).
 
 Kesimpulan: **tidak ada kebocoran jaringan**. Yang salah adalah bentuk penulisan di sisi
 gerbang TTS — pesan lokasinya menyesatkan, dan bentuk metode shorthand membuat penyuntikan
-tak terperiksa. Keduanya diperbaiki di sisi TTS. `no-network-test.js` **tidak disentuh sama
+tak terperiksa. Keduanya diperbaiki di sisi TTS. `tests/no-network-test.js` **tidak disentuh sama
 sekali** (lihat `git diff --stat`): melemahkan aturan (d) akan membebaskan pula gerbang lain
 yang benar-benar menyuntikkan `fetch` global.
 
-## 4. Perbaikan di `tts-transport-switch-test.js`
+## 4. Perbaikan di `tests/tts-transport-switch-test.js`
 
 1. Mock jaringan didefinisikan **eksplisit dan bernama** sebelum `sandbox`:
    `function cfTtsRenderFetchMock(url, init)`, disuntikkan sebagai `fetch: cfTtsRenderFetchMock`
@@ -85,7 +85,7 @@ CF, tangga aset → Puter → speechSynthesis utuh, prefetch juga bersih).
 ## 5. Bukti pemindai masih bisa merah
 
 Berkas sementara `tmp-f1net-probe-test.js` disuntik empat pola berbahaya satu per satu, lalu
-dihapus. Setiap probe membuat `no-network-test.js` **exit 1**:
+dihapus. Setiap probe membuat `tests/no-network-test.js` **exit 1**:
 
 | Probe | Pola | Exit | Assert yang merah |
 |---|---|---|---|
@@ -94,13 +94,13 @@ dihapus. Setiap probe membuat `no-network-test.js` **exit 1**:
 | literal-remote-fetch | `await fetch('https://api.fiezel.my.id/api/tts/render')` | **1** | Tak ada fetch( ke URL literal non-loopback |
 | mock-delegates-to-real | `const fetch=async u=>globalThis.fetch(u)` lalu disuntikkan | **1** | Tak ada mock `fetch` yang meneruskan ke fetch global |
 
-Sesudah berkas probe dihapus: `no-network-test.js` exit **0** (36 assert, 144 gerbang dipindai).
+Sesudah berkas probe dihapus: `tests/no-network-test.js` exit **0** (36 assert, 144 gerbang dipindai).
 
 ## 6. Catatan jujur — celah yang TIDAK ditutup di paket ini
 
 Bentuk penyuntikan **metode shorthand** (`fetch(url, init) { … }` sebagai properti objek
-sandbox) masih tidak dikenali `no-network-test.js`. Sesudah perbaikan ini, satu berkas lain
-masih memakainya: `audio-asset-pipeline-test.js`. Memperlebar detektor ke bentuk itu akan
+sandbox) masih tidak dikenali `tests/no-network-test.js`. Sesudah perbaikan ini, satu berkas lain
+masih memakainya: `tests/audio-asset-pipeline-test.js`. Memperlebar detektor ke bentuk itu akan
 memerahkan berkas tersebut sekaligus, jadi ia tidak diselundupkan ke paket F1 — dicatat di
 sini sebagai tindak lanjut, bukan disembunyikan. Lapis 3 (`tools/no-net-preload.js` via
 `NODE_OPTIONS`) tetap BELUM dipasang, sesuai laporan gerbang itu sendiri.
@@ -109,13 +109,13 @@ sini sebagai tindak lanjut, bukan disembunyikan. Lapis 3 (`tools/no-net-preload.
 
 | Gerbang | Exit | Catatan |
 |---|---|---|
-| `no-network-test.js` | 0 | PASS, 36 assert, 144 gerbang dipindai |
-| `tts-transport-switch-test.js` | 0 | PASS, 33 pass / 0 fail |
-| `cf-live-contract-test.js` | 0 | SKIP bersih (tanpa `FIEZEL_CF_LIVE_BASE`) |
-| `staging-live-test.js` | 0 | SKIP bersih (tanpa `FIEZEL_STAGING_BASE`) |
-| `regression-test.js` | 0 | PASS |
-| `install-health-test.js` | 0 | PASS |
+| `tests/no-network-test.js` | 0 | PASS, 36 assert, 144 gerbang dipindai |
+| `tests/tts-transport-switch-test.js` | 0 | PASS, 33 pass / 0 fail |
+| `tests/cf-live-contract-test.js` | 0 | SKIP bersih (tanpa `FIEZEL_CF_LIVE_BASE`) |
+| `tests/staging-live-test.js` | 0 | SKIP bersih (tanpa `FIEZEL_STAGING_BASE`) |
+| `tests/regression-test.js` | 0 | PASS |
+| `tests/install-health-test.js` | 0 | PASS |
 
-Berkas yang berubah: `tts-transport-switch-test.js`, plus dua `*-REPORT.json` milik gerbang
+Berkas yang berubah: `tests/tts-transport-switch-test.js`, plus dua `*-REPORT.json` milik gerbang
 yang diperbaiki (`NO-NETWORK-REPORT.json`, `TTS-TRANSPORT-SWITCH-REPORT.json`). Tidak ada
 `*-REPORT.json` lain yang berubah; `VERSION.json` tidak disentuh.

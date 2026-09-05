@@ -1,4 +1,4 @@
-# F2/D1 — `d1-schema-contract-test.js` merah setelah merge: dua cacat, dua sebab berbeda
+# F2/D1 — `tests/d1-schema-contract-test.js` merah setelah merge: dua cacat, dua sebab berbeda
 
 Branch: `fix/f2d1` · commit: lihat `git log fix/f2d1` · **tanpa bump versi build**, **tanpa push**.
 
@@ -24,7 +24,7 @@ Yang salah: parser **tidak pernah membuka berkasnya**. Daftar berkas per databas
 ditulis TANGAN sebagai literal di dua tempat:
 
 ```js
-// d1-schema-contract-test.js (lama)  DAN  tools/d1-schema-check.mjs (lama)
+// tests/d1-schema-contract-test.js (lama)  DAN  tools/d1-schema-check.mjs (lama)
 const FILES_BY_DB = {
   core: ['0001_identity.sql', '0001_quota.sql', '0004_indexes.sql'],
   stats: ['0002_analytics.sql']
@@ -46,8 +46,8 @@ untuk hal yang tidak pernah ia baca adalah kegagalan yang paling mahal.
 1. **Peta berkas→database diturunkan, tidak ditulis tangan.** Sumber kebenarannya
    perintah penerapan resmi di `workers/api/migrations/MIGRATIONS.md`:
    `wrangler d1 execute <fiezel-core|fiezel-stats> --remote --file=migrations/<berkas>`.
-   Dokumen itu sudah wajib benar (`cron-contract-test.js` butir h dan
-   `cf-wiring-test.js` sudah memeriksa isinya), jadi memakainya sebagai sumber
+   Dokumen itu sudah wajib benar (`tests/cron-contract-test.js` butir h dan
+   `tests/cf-wiring-test.js` sudah memeriksa isinya), jadi memakainya sebagai sumber
    membuat "dokumentasi benar" dan "gerbang membaca semua migrasi" menjadi satu
    fakta, bukan dua disiplin terpisah.
 2. **Pemeriksaan baru `semua_berkas_migrasi_terbaca`** (inilah cek ke-28). Merah bila:
@@ -164,7 +164,7 @@ Bukti di `D1-SCHEMA-CONTRACT-REPORT.json`:
 - `0001_identity.sql`, `0001_quota.sql`, `0002_analytics.sql` **TIDAK DISENTUH**
   (dan tidak boleh: keduanya sudah dijalankan, dan salinannya di
   `quota/migrations/` + `analytics/migrations/` wajib byte-identik — dijaga
-  `cf-wiring-test.js`);
+  `tests/cf-wiring-test.js`);
 - konsekuensi operasional saat penerapan: jalankan `0003` seperti tertulis di
   `MIGRATIONS.md`; hasilnya `cron_run` + satu indeks. Sampai itu dijalankan,
   `recordCronRun()` tetap menelan `D1_UNKNOWN_TABLE` dan
@@ -185,13 +185,13 @@ Semua exit 0 (dijalankan di `wt-f2d1`, branch `fix/f2d1`):
 
 | gerbang | exit |
 |---|---|
-| `d1-schema-contract-test.js` | 0 — `LULUS 28/28` |
-| `cron-contract-test.js` | 0 |
-| `cf-wiring-test.js` | 0 |
-| `quota-core-test.js` | 0 |
-| `analytics-privacy-test.js` | 0 |
-| `regression-test.js` | 0 |
-| `install-health-test.js` | 0 |
+| `tests/d1-schema-contract-test.js` | 0 — `LULUS 28/28` |
+| `tests/cron-contract-test.js` | 0 |
+| `tests/cf-wiring-test.js` | 0 |
+| `tests/quota-core-test.js` | 0 |
+| `tests/analytics-privacy-test.js` | 0 |
+| `tests/regression-test.js` | 0 |
+| `tests/install-health-test.js` | 0 |
 
 `VERSION.json`, `version.js`, `package.json`: **tidak disentuh** (nol bump versi
 build). Tidak ada `git push`.
@@ -241,7 +241,7 @@ tidak punya kueri nyata di kode — persis mekanisme yang membenarkan penghapusa
 
 | berkas | perubahan |
 |---|---|
-| `d1-schema-contract-test.js` | peta migrasi diturunkan dari `MIGRATIONS.md`; cek `semua_berkas_migrasi_terbaca`; parser toleran kutip identifier + catat pernyataan tak dikenali; gabung literal SQL bersambung; verifikasi klaim indeks terhadap kode; laporan pembanding dibaca tanpa meledak |
+| `tests/d1-schema-contract-test.js` | peta migrasi diturunkan dari `MIGRATIONS.md`; cek `semua_berkas_migrasi_terbaca`; parser toleran kutip identifier + catat pernyataan tak dikenali; gabung literal SQL bersambung; verifikasi klaim indeks terhadap kode; laporan pembanding dibaca tanpa meledak |
 | `tools/d1-schema-check.mjs` | `filesByDbFromDoc()` (implementasi terpisah), keluar 2 untuk `.sql` tak terpetakan; `FILES_BY_DB` literal dihapus dari ekspor |
 | `workers/api/migrations/0003_cron.sql` | `idx_cron_run_job_day` DIHAPUS + alasan tertulis; klaim `DIPAKAI OLEH` untuk `idx_cron_run_day` mengutip kueri nyata |
 | `workers/api/migrations/MIGRATIONS.md` | baris `0004` di tabel; catatan cacat "`cron_run` hilang"; koreksi klaim usang "tidak ada berkas `0003_*`"; catatan satu indeks di 0003 |
