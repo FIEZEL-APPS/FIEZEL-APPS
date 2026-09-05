@@ -7,8 +7,13 @@
   'use strict';
   if (!root) return;
   var S = function () { return root.FiezelTeacherStore; };
-  var el = null, env = {}, st = null, ui = { modal: null, drawer: null, filter: '', insightSkill: 'past_tense', attDate: null, pick: {}, syncing: false }, syncTimer = null;
-  var SYNC_EVERY_MS = 45000;
+  var el = null, env = {}, st = null, ui = { modal: null, drawer: null, filter: '', insightSkill: 'past_tense', attDate: null, pick: {}, syncing: false }, syncTimer = null, visListener = null;
+  /* 3 detik: owner ingin chip Sinkron selalu berbunyi "Tersinkron baru saja" tanpa harus
+     menutup dan membuka PWA. Yang membuat ini aman bukan angkanya, melainkan tiga pagar di
+     bawah: ronde tidak pernah bertumpuk (ui.syncing), timer tidur saat tab tidak dilihat,
+     dan kegagalan beruntun menaikkan jeda supaya server yang sedang sakit tidak dihujani. */
+  var SYNC_EVERY_MS = 3000;
+  var syncFailStreak = 0;
   var NAV = [['hub', 'Kelas', 'school'], ['briefing', 'Briefing', 'sunrise'], ['classes', 'Kelas & Siswa', 'users'], ['assignments', 'Tugas & Ujian', 'clipboard-list'], ['insights', 'Analitik', 'activity'], ['comms', 'Komunikasi', 'megaphone'], ['journal', 'Jurnal Guru', 'notebook-pen']];
   var TITLE = { hub: 'Kelas — Guru · Murid · Braincore', briefing: 'Briefing hari ini', classes: 'Kelas & Siswa', assignments: 'Tugas & Ujian', insights: 'Analitik & Deteksi Dini', comms: 'Komunikasi', journal: 'Jurnal Guru', settings: 'Profil Guru' };
 
@@ -47,13 +52,33 @@
   }
 
   // ---- sinkron server ---------------------------------------------------------------------
+  function pageHidden() { try { return root.document && root.document.visibilityState === 'hidden'; } catch (_) { return false; } }
   function startAutoSync() {
     stopAutoSync();
     if (S().syncAvailable() !== 'ok') return;
+    syncFailStreak = 0;
     syncAll(true);
-    syncTimer = setInterval(function () { if (el && !ui.syncing) syncAll(true); }, SYNC_EVERY_MS);
+    syncTimer = setInterval(function () {
+      if (!el || ui.syncing) return;
+      if (pageHidden()) return;                      // tab tak dilihat: tidak ada yang perlu disegarkan
+      /* Jeda menanjak sesudah gagal beruntun: 1 ronde dilewati per kegagalan, sampai 10.
+         Server yang sakit tidak dihujani 20 permintaan per menit sampai ia pulih. */
+      if (syncFailStreak > 0 && (Date.now() / SYNC_EVERY_MS | 0) % (Math.min(syncFailStreak, 10) + 1) !== 0) return;
+      syncAll(true);
+    }, SYNC_EVERY_MS);
+    /* Kembali terlihat = satu ronde SEGERA, tidak menunggu tick berikutnya. */
+    try {
+      if (!visListener) {
+        visListener = function () { if (!pageHidden() && el && !ui.syncing) syncAll(true); };
+        root.document.addEventListener('visibilitychange', visListener);
+      }
+    } catch (_) {}
   }
-  function stopAutoSync() { if (syncTimer) clearInterval(syncTimer); syncTimer = null; }
+  function stopAutoSync() {
+    if (syncTimer) clearInterval(syncTimer);
+    syncTimer = null;
+    try { if (visListener) { root.document.removeEventListener('visibilitychange', visListener); visListener = null; } } catch (_) {}
+  }
   /** Sinkron semua kelas: klaim kode yang belum diklaim, tarik laporan murid, ingest. */
   function syncAll(quiet) {
     var T = S(), avail = T.syncAvailable();
@@ -71,18 +96,47 @@
       return Promise.resolve();
     }
     if (ui.syncing || !st.classes.length) return Promise.resolve();
-    ui.syncing = true; render();
+    ui.syncing = true;
+    if (quiet) paintSyncChip(); else render();
     var total = { ingested: 0, graded: 0, names: [], failed: 0, events: [] };
     return st.classes.reduce(function (p, c) { return p.then(function () { return T.syncClass(c).then(function (r) { if (r.ok) { total.ingested += r.ingested; total.graded += r.graded; total.names = total.names.concat(r.names || []); total.events = total.events.concat(r.events || []); } else total.failed++; }); }); }, Promise.resolve())
       .then(function () {
         ui.syncing = false; st.lastSyncAt = Date.now();
+        syncFailStreak = total.failed ? syncFailStreak + 1 : 0;
         if (total.ingested) saveMinutes(total.ingested * 4 + total.graded * 5);
         total.events.forEach(function (e) { T.notify(st, e); });
-        persist(); render();
+        persist();
+        /* Render penuh hanya bila ronde ini benar-benar membawa sesuatu. Ronde kosong -
+           yang mayoritas pada jeda 3 detik - cukup menyegarkan chipnya. */
+        var berubah = total.ingested || total.graded || total.events.length;
+        if (!quiet || berubah) render(); else paintSyncChip();
         if (total.events.length) { var top = total.events.filter(function (e) { return e.kind === 'assignment_done'; })[0] || total.events[0]; toast(T.inboxText(top) + (total.events.length > 1 ? ' · +' + (total.events.length - 1) + ' kabar lain' : '')); }
         else if (total.ingested) toast(total.ingested + ' laporan murid masuk' + (total.graded ? ' · ' + total.graded + ' tugas dinilai otomatis' : '') + '.');
         else if (!quiet) toast(total.failed ? 'Sinkron gagal untuk ' + total.failed + ' kelas.' : 'Tersinkron — belum ada laporan baru.');
       });
+  }
+  /*
+   * Mengecat ulang HANYA chip sinkron, bukan seluruh cangkang.
+   *
+   * Ini pagar yang membuat ronde 3 detik aman. syncAll() dulu memanggil render() dua kali
+   * per ronde - sekali saat mulai, sekali saat selesai. Pada 45 detik itu tidak terasa; pada
+   * 3 detik ia mencabut fokus dari kolom yang sedang diketik guru, menutup dropdown yang
+   * sedang dibuka, dan melompatkan posisi gulir - setiap tiga detik. Ronde yang TIDAK membawa
+   * data baru karena itu hanya menyegarkan label chip di tempat.
+   */
+  function paintSyncChip() {
+    try {
+      if (!el) return false;
+      var node = el.querySelector('[data-tg="sync"]');
+      var c = cls();
+      if (!node || !c) return false;
+      var tmp = root.document.createElement('div');
+      tmp.innerHTML = syncChip(c);
+      var fresh = tmp.firstElementChild;
+      if (!fresh) return false;
+      node.replaceWith(fresh);
+      return true;
+    } catch (_) { return false; }
   }
   function syncChip(c) {
     var L = S().syncLabel(c);
