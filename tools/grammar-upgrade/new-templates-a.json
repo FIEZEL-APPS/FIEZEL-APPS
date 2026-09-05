@@ -1,0 +1,1835 @@
+{
+  "schema": "fiezel-grammar-new-templates-v1",
+  "newLabels": {
+    "adds -s to the verb although the subject is plural": {
+      "id": "nambahin -s ke kata kerja, padahal subjeknya jamak.",
+      "th": "เติม -s ให้คำกริยาทั้งที่ประธานเป็นพหูพจน์"
+    },
+    "uses the past form for a present ability": {
+      "id": "pakai bentuk lampau, padahal yang dibicarain kemampuan sekarang.",
+      "th": "ใช้รูปอดีตทั้งที่พูดถึงความสามารถในปัจจุบัน"
+    },
+    "adds 'to' after the modal can": {
+      "id": "nambahin “to” sesudah can, padahal can langsung ketemu kata kerja dasar.",
+      "th": "เติม 'to' หลัง can ทั้งที่ can ต้องตามด้วยคำกริยารูปพื้นฐานทันที"
+    },
+    "doubles the past marking with 'did' plus -ed": {
+      "id": "nandain lampau dua kali: “did” plus -ed.",
+      "th": "ทำเครื่องหมายอดีตซ้ำสองครั้ง: ใช้ 'did' บวก -ed"
+    },
+    "uses the third-person -s form after 'you' in a command": {
+      "id": "nambahin -s ke perintah, padahal perintah nggak punya subjek yang butuh -s.",
+      "th": "เติม -s ให้คำสั่ง ทั้งที่คำสั่งไม่มีประธานที่ต้องการ -s"
+    },
+    "puts the frequency adverb after the object": {
+      "id": "naruh kata keterangan frekuensi di belakang objek, padahal tempatnya di depan kata kerja.",
+      "th": "วางคำบอกความถี่ไว้หลังกรรม ทั้งที่ตำแหน่งของมันอยู่หน้าคำกริยา"
+    },
+    "puts the frequency adverb before the verb be": {
+      "id": "naruh kata keterangan frekuensi di depan 'is/are', padahal harusnya sesudahnya.",
+      "th": "วางคำบอกความถี่ไว้หน้า is/are ทั้งที่ควรอยู่หลัง"
+    },
+    "uses the object pronoun instead of the possessive": {
+      "id": "pakai kata ganti objek, padahal yang dibutuhin bentuk milik.",
+      "th": "ใช้สรรพนามกรรมแทนรูปแสดงความเป็นเจ้าของ"
+    },
+    "uses 'want' where the polite would-like formula is expected": {
+      "id": "pakai “want” yang terlalu langsung, padahal konteksnya minta dengan sopan.",
+      "th": "ใช้ 'want' ที่ตรงเกินไป ทั้งที่บริบทต้องการการขอแบบสุภาพ"
+    },
+    "uses a to-infinitive after 'enjoy'": {
+      "id": "pakai “to” sesudah enjoy, padahal enjoy selalu diikuti bentuk -ing.",
+      "th": "ใช้ 'to' หลัง enjoy ทั้งที่ enjoy ต้องตามด้วยรูป -ing เสมอ"
+    },
+    "uses the past simple for a life experience without a time": {
+      "id": "pakai past simple buat pengalaman hidup yang nggak disebut waktunya.",
+      "th": "ใช้ past simple กับประสบการณ์ชีวิตที่ไม่ได้ระบุเวลา"
+    },
+    "uses 'since' before a length of time": {
+      "id": "pakai “since” di depan lamanya waktu, padahal since buat titik mulai.",
+      "th": "ใช้ 'since' หน้าช่วงเวลา ทั้งที่ since ใช้กับจุดเริ่มต้น"
+    },
+    "uses 'for' before a starting point": {
+      "id": "pakai “for” di depan titik mulai, padahal for buat lamanya waktu.",
+      "th": "ใช้ 'for' หน้าจุดเริ่มต้น ทั้งที่ for ใช้กับช่วงเวลา"
+    },
+    "uses the superlative after 'the' for a two-item comparison": {
+      "id": "pakai bentuk paling, padahal cuma dua hal yang dibandingin.",
+      "th": "ใช้รูปขั้นสูงสุด ทั้งที่เปรียบเทียบแค่สองสิ่ง"
+    },
+    "adds -er to a long adjective": {
+      "id": "nambahin -er ke kata sifat panjang, padahal yang panjang pakai more.",
+      "th": "เติม -er ให้คำคุณศัพท์ยาว ทั้งที่คำยาวต้องใช้ more"
+    },
+    "uses the adverb where an adjective after 'be' is needed": {
+      "id": "pakai bentuk -ly sesudah 'is/are', padahal sesudah be yang dibutuhin kata sifat.",
+      "th": "ใช้รูป -ly หลัง is/are ทั้งที่หลัง be ต้องใช้คำคุณศัพท์"
+    },
+    "asks about a countable plural noun with 'how much'": {
+      "id": "nanya benda yang bisa dihitung pakai “how much”, padahal harusnya “how many”.",
+      "th": "ถามถึงคำนามนับได้ด้วย 'how much' ทั้งที่ควรใช้ 'how many'"
+    },
+    "introduces the result clause with 'because'": {
+      "id": "pakai 'because' di depan akibat, padahal kata itu buat alasan.",
+      "th": "ใช้ 'because' นำหน้าผลลัพธ์ ทั้งที่ because ใช้กับสาเหตุ"
+    },
+    "uses 'no' before a verb already negated with 'not'": {
+      "id": "pakai “no” sesudah kata kerja yang udah negatif, jadi negatifnya dobel.",
+      "th": "ใช้ 'no' หลังคำกริยาที่เป็นปฏิเสธอยู่แล้ว ทำให้ปฏิเสธซ้อนกัน"
+    },
+    "uses the indefinite article before 'first'": {
+      "id": "pakai 'a' di depan 'first', padahal kata urutan kayak itu selalu pakai 'the'.",
+      "th": "ใช้ 'a' หน้า first ทั้งที่คำบอกลำดับอย่าง first ต้องใช้ the เสมอ"
+    }
+  },
+  "templates": [
+    {
+      "id": "A1-201",
+      "family": "core_grammar",
+      "subskill": "present_simple_basics",
+      "cefr": "A1",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Keep the base form of the present simple verb after a plural subject.",
+        "misconception": "Learner adds -s to every present simple verb, even after a plural subject like 'we'.",
+        "reasoning": "identify the subject -> check whether it is singular or plural -> keep the base form after a plural subject",
+        "stem": "We ___ to school by bus.",
+        "options": [
+          "go",
+          "goes",
+          "going",
+          "went"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "goes",
+            "misconception": "adds -s to the verb although the subject is plural",
+            "whyFails": "'Goes' is only for he, she, or it; 'we' takes the base form 'go'."
+          },
+          {
+            "option": "going",
+            "misconception": "progressive confusion",
+            "whyFails": "'Going' needs 'are' before it and describes an action right now, not a daily routine."
+          },
+          {
+            "option": "went",
+            "misconception": "past-tense confusion",
+            "whyFails": "'Went' is the past form; the sentence describes a present routine."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "'We' is plural, so the present simple verb stays in the base form: we go.",
+          "rule": "Present simple: add -s only after he, she, or it. I, you, we, and they keep the base form.",
+          "whyOthersFail": "'Goes' belongs to a singular subject; 'going' is missing 'are'; 'went' is the past.",
+          "howToAvoid": "Look at the subject first. If it is we, you, they, or I, do not add -s.",
+          "memoryCue": "We go, she goes."
+        }
+      },
+      "id_": {
+        "objective": "Kata kerja present simple tetap bentuk dasar sesudah subjek jamak.",
+        "misconception": "Kamu nambahin -s ke semua kata kerja present simple, padahal sesudah “we” nggak perlu.",
+        "reasoning": "cari subjeknya → cek tunggal atau jamak → jamak tetap bentuk dasar",
+        "rule": "Present simple: -s cuma buat he, she, it. I, you, we, they tetap bentuk dasar.",
+        "whyCorrect": "“We” itu jamak, jadi kata kerjanya tetap bentuk dasar: we go.",
+        "whyOthersFail": "“Goes” buat subjek tunggal. “Going” kurang “are”. “Went” bentuk lampau.",
+        "howToAvoid": "Lihat subjeknya dulu. Kalau we, you, they, atau I, jangan tambah -s.",
+        "memoryCue": "Ingat aturannya: “we go”, tapi “she goes”.",
+        "distractors": {
+          "goes": {
+            "misconception": "nambahin -s ke kata kerja, padahal subjeknya jamak.",
+            "whyFails": "“goes” cuma buat he, she, it. “We” pakai “go”."
+          },
+          "going": {
+            "misconception": "bentuk -ing dipakai buat kebiasaan.",
+            "whyFails": "“going” butuh “are” di depannya dan artinya lagi jalan sekarang, bukan rutinitas."
+          },
+          "went": {
+            "misconception": "bentuk lampau dipakai buat kebiasaan sekarang.",
+            "whyFails": "“went” bentuk lampau, padahal kalimatnya soal kebiasaan sekarang."
+          }
+        }
+      },
+      "th": {
+        "objective": "คงรูปพื้นฐานของคำกริยา present simple หลังประธานพหูพจน์",
+        "misconception": "ผู้เรียนเติม -s ให้คำกริยา present simple ทุกตัว แม้หลังประธานพหูพจน์อย่าง 'we'",
+        "reasoning": "หาประธาน → เช็กว่าเอกพจน์หรือพหูพจน์ → พหูพจน์คงรูปพื้นฐาน",
+        "rule": "Present simple: เติม -s เฉพาะหลัง he, she, it ส่วน I, you, we, they คงรูปพื้นฐาน",
+        "whyCorrect": "'We' เป็นพหูพจน์ คำกริยาจึงคงรูปพื้นฐาน: we go",
+        "whyOthersFail": "'goes' ใช้กับประธานเอกพจน์ 'going' ขาด 'are' ส่วน 'went' เป็นรูปอดีต",
+        "howToAvoid": "ดูประธานก่อน ถ้าเป็น we, you, they หรือ I อย่าเติม -s",
+        "memoryCue": "จำกฎไว้: 'we go' แต่ 'she goes'",
+        "distractors": {
+          "goes": {
+            "misconception": "เติม -s ให้คำกริยาทั้งที่ประธานเป็นพหูพจน์",
+            "whyFails": "'goes' ใช้กับ he, she, it เท่านั้น 'we' ต้องใช้ 'go'"
+          },
+          "going": {
+            "misconception": "ใช้รูป -ing กับกิจวัตร",
+            "whyFails": "'going' ต้องมี 'are' นำหน้า และหมายถึงกำลังทำอยู่ตอนนี้ ไม่ใช่กิจวัตร"
+          },
+          "went": {
+            "misconception": "ใช้รูปอดีตกับกิจวัตรปัจจุบัน",
+            "whyFails": "'went' เป็นรูปอดีต แต่ประโยคพูดถึงกิจวัตรในปัจจุบัน"
+          }
+        }
+      }
+    },
+    {
+      "id": "A1-202",
+      "family": "core_grammar",
+      "subskill": "can_ability",
+      "cefr": "A1",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Form a negative ability statement with can't plus a base verb.",
+        "misconception": "Learner builds the negative of 'can' with 'don't' or adds 'to' after the modal.",
+        "reasoning": "identify the meaning as not able -> select can't -> keep the verb in base form",
+        "stem": "I ___ ride a bike, but I want to learn.",
+        "options": [
+          "can't",
+          "don't can",
+          "can't to",
+          "couldn't"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "don't can",
+            "misconception": "do auxiliary",
+            "whyFails": "'Can' makes its own negative with 'not'; it never takes 'don't'."
+          },
+          {
+            "option": "can't to",
+            "misconception": "adds 'to' after the modal can",
+            "whyFails": "After 'can' or 'can't' the verb is bare: can't ride, not can't to ride."
+          },
+          {
+            "option": "couldn't",
+            "misconception": "uses the past form for a present ability",
+            "whyFails": "'Couldn't' is the past form; 'I want to learn' shows the sentence is about now."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "'Can't' expresses a present inability and is followed directly by the base verb 'ride'.",
+          "rule": "Negative ability: can't (cannot) + base verb. No 'don't', no 'to'.",
+          "whyOthersFail": "'Don't can' mixes two negatives that never combine; 'can't to' adds an extra 'to'; 'couldn't' points to the past.",
+          "howToAvoid": "Treat can like a switch: can / can't, then the verb with nothing in between.",
+          "memoryCue": "Can't + verb: can't ride, can't swim."
+        }
+      },
+      "id_": {
+        "objective": "Bikin kalimat nggak bisa pakai can't plus kata kerja dasar.",
+        "misconception": "Kamu bikin negatif can pakai “don't” atau nambahin “to” sesudahnya.",
+        "reasoning": "kenali maknanya nggak mampu → pakai can't → kata kerjanya tetap dasar",
+        "rule": "Nggak bisa: can't (cannot) + kata kerja dasar. Tanpa don't, tanpa to.",
+        "whyCorrect": "“Can't” artinya nggak bisa sekarang, langsung diikuti kata kerja dasar “ride”.",
+        "whyOthersFail": "“Don't can” nyampur dua negatif. “Can't to” kelebihan “to”. “Couldn't” nunjuk masa lampau.",
+        "howToAvoid": "Anggap can kayak tombol: can atau can't, lalu langsung kata kerjanya.",
+        "memoryCue": "Can't + kata kerja: can't ride, can't swim.",
+        "distractors": {
+          "don't can": {
+            "misconception": "kata bantu do.",
+            "whyFails": "“can” punya negatif sendiri pakai “not”, nggak pernah pakai “don't”."
+          },
+          "can't to": {
+            "misconception": "nambahin “to” sesudah can, padahal can langsung ketemu kata kerja dasar.",
+            "whyFails": "sesudah “can't” kata kerjanya polos: can't ride, bukan can't to ride."
+          },
+          "couldn't": {
+            "misconception": "pakai bentuk lampau, padahal yang dibicarain kemampuan sekarang.",
+            "whyFails": "“couldn't” bentuk lampau, padahal “I want to learn” nunjukin ini soal sekarang."
+          }
+        }
+      },
+      "th": {
+        "objective": "สร้างประโยคปฏิเสธบอกความสามารถด้วย can't บวกคำกริยารูปพื้นฐาน",
+        "misconception": "ผู้เรียนสร้างรูปปฏิเสธของ 'can' ด้วย 'don't' หรือเติม 'to' หลัง modal",
+        "reasoning": "จับความหมายว่า 'ทำไม่ได้' → ใช้ can't → คงคำกริยารูปพื้นฐาน",
+        "rule": "บอกว่าทำไม่ได้: can't (cannot) + คำกริยารูปพื้นฐาน ไม่มี 'don't' ไม่มี 'to'",
+        "whyCorrect": "'Can't' บอกว่าตอนนี้ทำไม่ได้ และตามด้วยคำกริยารูปพื้นฐาน 'ride' ทันที",
+        "whyOthersFail": "'don't can' ผสมปฏิเสธสองแบบที่ใช้ร่วมกันไม่ได้ 'can't to' เติม 'to' เกินมา ส่วน 'couldn't' ชี้ไปที่อดีต",
+        "howToAvoid": "มอง can เหมือนสวิตช์: can หรือ can't แล้วตามด้วยคำกริยาโดยไม่มีอะไรคั่น",
+        "memoryCue": "Can't + คำกริยา: can't ride, can't swim.",
+        "distractors": {
+          "don't can": {
+            "misconception": "กริยาช่วย do",
+            "whyFails": "'can' มีรูปปฏิเสธของตัวเองด้วย 'not' ไม่เคยใช้กับ 'don't'"
+          },
+          "can't to": {
+            "misconception": "เติม 'to' หลัง can ทั้งที่ can ต้องตามด้วยคำกริยารูปพื้นฐานทันที",
+            "whyFails": "หลัง 'can't' คำกริยาต้องเป็นรูปเปล่า: can't ride ไม่ใช่ can't to ride"
+          },
+          "couldn't": {
+            "misconception": "ใช้รูปอดีตทั้งที่พูดถึงความสามารถในปัจจุบัน",
+            "whyFails": "'couldn't' เป็นรูปอดีต แต่ 'I want to learn' บอกว่าประโยคนี้พูดถึงตอนนี้"
+          }
+        }
+      }
+    },
+    {
+      "id": "A1-203",
+      "family": "tense_aspect",
+      "subskill": "past_simple_regular_forms",
+      "cefr": "A1",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Add -ed to a regular verb for a finished action with a past time word.",
+        "misconception": "Learner keeps the base verb after 'last night' or doubles the past marking with 'did'.",
+        "reasoning": "identify the past time word -> check that the verb is regular -> add -ed once",
+        "stem": "Last night I ___ a film with my family.",
+        "options": [
+          "watch",
+          "watched",
+          "did watched",
+          "watching"
+        ],
+        "correctIndex": 1,
+        "distractors": [
+          {
+            "option": "watch",
+            "misconception": "missing-past-marking",
+            "whyFails": "'Last night' is finished, so the verb needs the past ending -ed."
+          },
+          {
+            "option": "did watched",
+            "misconception": "doubles the past marking with 'did' plus -ed",
+            "whyFails": "'Did' already carries the past, so the verb after it stays bare; a statement does not need 'did' at all."
+          },
+          {
+            "option": "watching",
+            "misconception": "progressive-form substitution",
+            "whyFails": "'Watching' needs 'was' before it and does not simply state a finished event."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "'Last night' places the action in the finished past, so the regular verb takes -ed: watched.",
+          "rule": "Past simple of regular verbs: verb + -ed, used once, with no 'did' in a statement.",
+          "whyOthersFail": "'Watch' has no past marking; 'did watched' marks the past twice; 'watching' is not a finished-action form.",
+          "howToAvoid": "See a past time word? Add -ed to the verb and stop there.",
+          "memoryCue": "Last night → -ed."
+        }
+      },
+      "id_": {
+        "objective": "Tambahin -ed ke kata kerja teratur buat kejadian selesai yang ada kata waktu lampaunya.",
+        "misconception": "Kamu biarin kata kerjanya polos sesudah “last night”, atau nandain lampau dua kali pakai “did”.",
+        "reasoning": "cari kata waktu lampaunya → kata kerja teratur → tambah -ed sekali",
+        "rule": "Past simple kata kerja teratur: kata kerja + -ed, cukup sekali, tanpa did di kalimat berita.",
+        "whyCorrect": "“Last night” udah lewat, jadi kata kerjanya pakai -ed: watched.",
+        "whyOthersFail": "“Watch” nggak ada tanda lampaunya. “Did watched” nandain lampau dua kali. “Watching” bukan bentuk kejadian selesai.",
+        "howToAvoid": "Lihat kata waktu lampau? Tambah -ed ke kata kerjanya, lalu berhenti di situ.",
+        "memoryCue": "Ada “last night”? Kata kerjanya pakai -ed.",
+        "distractors": {
+          "watch": {
+            "misconception": "tanda lampaunya hilang.",
+            "whyFails": "“last night” udah lewat, jadi kata kerjanya butuh akhiran -ed."
+          },
+          "did watched": {
+            "misconception": "nandain lampau dua kali: “did” plus -ed.",
+            "whyFails": "“did” udah bawa makna lampau, jadi kata kerjanya harus polos. Kalimat berita malah nggak butuh “did”."
+          },
+          "watching": {
+            "misconception": "bentuk -ing dipakai buat kejadian selesai.",
+            "whyFails": "“watching” butuh “was” di depannya dan nggak nyatain kejadian yang udah selesai."
+          }
+        }
+      },
+      "th": {
+        "objective": "เติม -ed ให้คำกริยาปกติเมื่อเป็นเหตุการณ์ที่จบแล้วและมีคำบอกเวลาอดีต",
+        "misconception": "ผู้เรียนคงคำกริยารูปพื้นฐานไว้หลัง 'last night' หรือทำเครื่องหมายอดีตซ้ำด้วย 'did'",
+        "reasoning": "หาคำบอกเวลาอดีต → คำกริยาปกติ → เติม -ed ครั้งเดียว",
+        "rule": "Past simple ของคำกริยาปกติ: คำกริยา + -ed ใช้ครั้งเดียว และไม่มี 'did' ในประโยคบอกเล่า",
+        "whyCorrect": "'Last night' บอกว่าเหตุการณ์จบไปแล้ว คำกริยาปกติจึงเติม -ed: watched",
+        "whyOthersFail": "'watch' ไม่มีเครื่องหมายอดีต 'did watched' ทำเครื่องหมายอดีตซ้ำสองครั้ง ส่วน 'watching' ไม่ใช่รูปของเหตุการณ์ที่จบแล้ว",
+        "howToAvoid": "เห็นคำบอกเวลาอดีต? เติม -ed ให้คำกริยาแล้วหยุดแค่นั้น",
+        "memoryCue": "มี 'last night'? คำกริยาต้องเติม -ed",
+        "distractors": {
+          "watch": {
+            "misconception": "ขาดเครื่องหมายอดีต",
+            "whyFails": "'last night' จบไปแล้ว คำกริยาจึงต้องมี -ed"
+          },
+          "did watched": {
+            "misconception": "ทำเครื่องหมายอดีตซ้ำสองครั้ง: ใช้ 'did' บวก -ed",
+            "whyFails": "'did' บอกอดีตอยู่แล้ว คำกริยาที่ตามมาจึงต้องเป็นรูปเปล่า และประโยคบอกเล่าไม่ต้องใช้ 'did' เลย"
+          },
+          "watching": {
+            "misconception": "ใช้รูป -ing กับเหตุการณ์ที่จบแล้ว",
+            "whyFails": "'watching' ต้องมี 'was' นำหน้า และไม่ได้บอกเหตุการณ์ที่จบแล้วตรง ๆ"
+          }
+        }
+      }
+    },
+    {
+      "id": "A1-204",
+      "family": "tense_aspect",
+      "subskill": "present_continuous_basics",
+      "cefr": "A1",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Pair 'are' with the -ing verb for a plural subject acting right now.",
+        "misconception": "Learner chooses 'is' for a plural subject or drops the be-auxiliary before the -ing verb.",
+        "reasoning": "identify 'Look!' as a now cue -> check the subject is plural -> apply are + verb-ing",
+        "stem": "Look! The children ___ in the garden.",
+        "options": [
+          "is playing",
+          "are playing",
+          "playing",
+          "play"
+        ],
+        "correctIndex": 1,
+        "distractors": [
+          {
+            "option": "is playing",
+            "misconception": "be verb",
+            "whyFails": "'Children' is plural, so the auxiliary must be 'are', not 'is'."
+          },
+          {
+            "option": "playing",
+            "misconception": "missing-be-auxiliary",
+            "whyFails": "The -ing verb cannot stand alone; it needs 'are' to make a full sentence."
+          },
+          {
+            "option": "play",
+            "misconception": "present-simple-habit",
+            "whyFails": "'Play' describes a habit; 'Look!' shows the action is happening right now."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "'Look!' points to an action in progress now, and 'the children' is plural, so the form is 'are playing'.",
+          "rule": "Present continuous: am/is/are + verb-ing. Plural subjects take 'are'.",
+          "whyOthersFail": "'Is playing' has the wrong auxiliary for a plural subject; 'playing' has no auxiliary; 'play' is a habit form.",
+          "howToAvoid": "Two checks: is it happening now (use -ing) and is the subject plural (use are)?",
+          "memoryCue": "Look! → are + -ing."
+        }
+      },
+      "id_": {
+        "objective": "Pasangin “are” sama kata kerja -ing buat subjek jamak yang lagi beraksi sekarang.",
+        "misconception": "Kamu pilih “is” buat subjek jamak, atau ngilangin kata bantu be di depan kata kerja -ing.",
+        "reasoning": "lihat “Look!” → kejadian lagi jalan → subjek jamak pakai are + -ing",
+        "rule": "Present continuous: am/is/are + kata kerja -ing. Subjek jamak pakai “are”.",
+        "whyCorrect": "“Look!” nunjuk kejadian yang lagi jalan, dan “the children” itu jamak, jadi bentuknya “are playing”.",
+        "whyOthersFail": "“Is playing” salah kata bantu buat subjek jamak. “Playing” nggak punya kata bantu. “Play” bentuk kebiasaan.",
+        "howToAvoid": "Dua cek: lagi jalan sekarang (pakai -ing) dan subjeknya jamak (pakai are)?",
+        "memoryCue": "Ada “Look!”? Pakai are + -ing.",
+        "distractors": {
+          "is playing": {
+            "misconception": "kata kerja be.",
+            "whyFails": "“children” itu jamak, jadi kata bantunya “are”, bukan “is”."
+          },
+          "playing": {
+            "misconception": "kata bantu be-nya hilang.",
+            "whyFails": "kata kerja -ing nggak bisa berdiri sendiri, butuh “are” supaya jadi kalimat utuh."
+          },
+          "play": {
+            "misconception": "bentuk kebiasaan dipakai buat kejadian yang lagi jalan.",
+            "whyFails": "“play” nyatain kebiasaan, padahal “Look!” nunjukin kejadiannya lagi jalan sekarang."
+          }
+        }
+      },
+      "th": {
+        "objective": "จับคู่ 'are' กับคำกริยา -ing สำหรับประธานพหูพจน์ที่กำลังทำอยู่ตอนนี้",
+        "misconception": "ผู้เรียนเลือก 'is' ให้ประธานพหูพจน์ หรือตัดกริยาช่วย be หน้าคำกริยา -ing",
+        "reasoning": "เห็น 'Look!' → เหตุการณ์กำลังเกิด → ประธานพหูพจน์ใช้ are + -ing",
+        "rule": "Present continuous: am/is/are + คำกริยา -ing ประธานพหูพจน์ใช้ 'are'",
+        "whyCorrect": "'Look!' ชี้ว่าเหตุการณ์กำลังเกิดขึ้น และ 'the children' เป็นพหูพจน์ รูปจึงเป็น 'are playing'",
+        "whyOthersFail": "'is playing' ใช้กริยาช่วยผิดกับประธานพหูพจน์ 'playing' ไม่มีกริยาช่วย ส่วน 'play' เป็นรูปกิจวัตร",
+        "howToAvoid": "เช็กสองอย่าง: กำลังเกิดตอนนี้ไหม (ใช้ -ing) และประธานเป็นพหูพจน์ไหม (ใช้ are)",
+        "memoryCue": "มี 'Look!'? ใช้ are + -ing",
+        "distractors": {
+          "is playing": {
+            "misconception": "กริยา be",
+            "whyFails": "'children' เป็นพหูพจน์ กริยาช่วยจึงต้องเป็น 'are' ไม่ใช่ 'is'"
+          },
+          "playing": {
+            "misconception": "ขาดกริยาช่วย be",
+            "whyFails": "คำกริยา -ing อยู่ลำพังไม่ได้ ต้องมี 'are' จึงเป็นประโยคสมบูรณ์"
+          },
+          "play": {
+            "misconception": "ใช้รูปกิจวัตรกับเหตุการณ์ที่กำลังเกิด",
+            "whyFails": "'play' บอกกิจวัตร แต่ 'Look!' แสดงว่าเหตุการณ์กำลังเกิดขึ้นตอนนี้"
+          }
+        }
+      }
+    },
+    {
+      "id": "A1-205",
+      "family": "core_grammar",
+      "subskill": "imperative_commands_base_form",
+      "cefr": "A2",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Form a negative command with don't plus the base verb.",
+        "misconception": "Learner negates a command with 'not' alone or adds -s to the verb.",
+        "reasoning": "identify a warning to the listener -> select the negative command -> apply don't + base verb",
+        "stem": "The floor is wet. ___ here, please!",
+        "options": [
+          "Not run",
+          "Don't run",
+          "Doesn't run",
+          "Don't runs"
+        ],
+        "correctIndex": 1,
+        "distractors": [
+          {
+            "option": "Not run",
+            "misconception": "using the -ing form on its own, which describes an activity instead of telling someone to act",
+            "whyFails": "A command cannot be negated with bare 'not'; English needs 'don't' before the verb."
+          },
+          {
+            "option": "Doesn't run",
+            "misconception": "adding -s as if the command needed subject-verb agreement with a singular subject",
+            "whyFails": "'Doesn't' is for he, she, or it in statements; a command to the listener uses 'don't'."
+          },
+          {
+            "option": "Don't runs",
+            "misconception": "uses the third-person -s form after 'you' in a command",
+            "whyFails": "After 'don't' the verb stays bare: don't run, never don't runs."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "The speaker tells the listener not to do something, so the negative command is 'Don't run'.",
+          "rule": "Negative imperative: Don't + base verb. No subject, no -s.",
+          "whyOthersFail": "'Not run' lacks 'do'; 'doesn't run' treats the listener as he/she; 'don't runs' adds an -s the base form never takes.",
+          "howToAvoid": "Telling someone not to do something? Start with 'Don't' and keep the verb bare.",
+          "memoryCue": "Don't + verb: Don't run, Don't touch."
+        }
+      },
+      "id_": {
+        "objective": "Bikin larangan pakai don't plus kata kerja dasar.",
+        "misconception": "Kamu bikin larangan pakai “not” aja, atau nambahin -s ke kata kerjanya.",
+        "reasoning": "kenali ini peringatan buat lawan bicara → larangan → don't + kata kerja dasar",
+        "rule": "Larangan: Don't + kata kerja dasar. Tanpa subjek, tanpa -s.",
+        "whyCorrect": "Pembicara ngelarang lawan bicaranya, jadi larangannya “Don't run”.",
+        "whyOthersFail": "“Not run” kurang “do”. “Doesn't run” nganggap lawan bicara kayak he/she. “Don't runs” nambah -s yang nggak pernah ada di bentuk dasar.",
+        "howToAvoid": "Mau ngelarang orang? Mulai dari “Don't”, lalu kata kerjanya tetap polos.",
+        "memoryCue": "Don't + kata kerja: Don't run, Don't touch.",
+        "distractors": {
+          "Not run": {
+            "misconception": "larangannya cuma pakai not tanpa do.",
+            "whyFails": "larangan nggak bisa cuma pakai “not”. Bahasa Inggris butuh “don't” di depan kata kerjanya."
+          },
+          "Doesn't run": {
+            "misconception": "perintah dikasih -s seolah butuh subjek tunggal.",
+            "whyFails": "“doesn't” buat he, she, it di kalimat berita. Larangan ke lawan bicara pakai “don't”."
+          },
+          "Don't runs": {
+            "misconception": "nambahin -s ke perintah, padahal perintah nggak punya subjek yang butuh -s.",
+            "whyFails": "sesudah “don't” kata kerjanya tetap polos: don't run, bukan don't runs."
+          }
+        }
+      },
+      "th": {
+        "objective": "สร้างประโยคคำสั่งห้ามด้วย don't บวกคำกริยารูปพื้นฐาน",
+        "misconception": "ผู้เรียนใช้ 'not' ลำพังในการห้าม หรือเติม -s ให้คำกริยา",
+        "reasoning": "มองว่าเป็นคำเตือนถึงผู้ฟัง → คำสั่งห้าม → don't + คำกริยารูปพื้นฐาน",
+        "rule": "คำสั่งห้าม: Don't + คำกริยารูปพื้นฐาน ไม่มีประธาน ไม่เติม -s",
+        "whyCorrect": "ผู้พูดบอกผู้ฟังไม่ให้ทำบางอย่าง คำสั่งห้ามจึงเป็น 'Don't run'",
+        "whyOthersFail": "'Not run' ขาด 'do' 'doesn't run' ปฏิบัติกับผู้ฟังเหมือน he/she ส่วน 'don't runs' เติม -s ที่รูปพื้นฐานไม่เคยมี",
+        "howToAvoid": "จะบอกใครไม่ให้ทำอะไร? เริ่มด้วย 'Don't' แล้วคงคำกริยารูปเปล่า",
+        "memoryCue": "Don't + คำกริยา: Don't run, Don't touch.",
+        "distractors": {
+          "Not run": {
+            "misconception": "ห้ามด้วย not โดยไม่มี do",
+            "whyFails": "คำสั่งห้ามใช้ 'not' ลำพังไม่ได้ ภาษาอังกฤษต้องมี 'don't' หน้าคำกริยา"
+          },
+          "Doesn't run": {
+            "misconception": "เติม -s ให้คำสั่งเหมือนต้องการประธานเอกพจน์",
+            "whyFails": "'doesn't' ใช้กับ he, she, it ในประโยคบอกเล่า คำสั่งถึงผู้ฟังใช้ 'don't'"
+          },
+          "Don't runs": {
+            "misconception": "เติม -s ให้คำสั่ง ทั้งที่คำสั่งไม่มีประธานที่ต้องการ -s",
+            "whyFails": "หลัง 'don't' คำกริยาต้องเป็นรูปเปล่า: don't run ไม่ใช่ don't runs"
+          }
+        }
+      }
+    },
+    {
+      "id": "A1-206",
+      "family": "core_grammar",
+      "subskill": "adverbs_of_frequency_mid_position",
+      "cefr": "A2",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Place a frequency adverb after the verb be.",
+        "misconception": "Learner puts the frequency adverb before 'is/are', copying its position with ordinary verbs.",
+        "reasoning": "identify the main verb -> check whether it is be -> place the adverb after be",
+        "stem": "Rudi ___ for class.",
+        "options": [
+          "is never late",
+          "never is late",
+          "is late never",
+          "never be late"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "never is late",
+            "misconception": "puts the frequency adverb before the verb be",
+            "whyFails": "With 'be', the adverb comes after the verb: is never, not never is."
+          },
+          {
+            "option": "is late never",
+            "misconception": "puts the frequency adverb after the object",
+            "whyFails": "Frequency adverbs sit in the middle of the sentence, not at the end after the adjective."
+          },
+          {
+            "option": "never be late",
+            "misconception": "leaving the bare verb with no third-person marking after a singular subject",
+            "whyFails": "'Rudi' needs the finite form 'is'; bare 'be' cannot carry the sentence."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "The verb is 'be', so the frequency adverb follows it: Rudi is never late.",
+          "rule": "Frequency adverbs go before an ordinary verb but after the verb be (am/is/are).",
+          "whyOthersFail": "'Never is' reverses the order; 'is late never' pushes the adverb to the end; 'never be' has no finite verb.",
+          "howToAvoid": "Ask: is the verb 'be'? If yes, adverb after it. If not, adverb before it.",
+          "memoryCue": "Be first, then never: is never late."
+        }
+      },
+      "id_": {
+        "objective": "Taruh kata keterangan frekuensi sesudah kata kerja be.",
+        "misconception": "Kamu naruh kata keterangan frekuensi di depan “is/are”, niru posisinya di kata kerja biasa.",
+        "reasoning": "cari kata kerja utamanya → ternyata be → taruh kata keterangannya sesudah be",
+        "rule": "Kata keterangan frekuensi di depan kata kerja biasa, tapi sesudah be (am/is/are).",
+        "whyCorrect": "Kata kerjanya be, jadi kata keterangan frekuensinya nyusul: Rudi is never late.",
+        "whyOthersFail": "“Never is” urutannya kebalik. “Is late never” ngedorong kata keterangannya ke ujung. “Never be” nggak punya kata kerja utuh.",
+        "howToAvoid": "Tanya: kata kerjanya be? Kalau ya, kata keterangan sesudahnya. Kalau bukan, di depannya.",
+        "memoryCue": "Be dulu, baru never: is never late.",
+        "distractors": {
+          "never is late": {
+            "misconception": "naruh kata keterangan frekuensi di depan is/are, padahal harusnya sesudahnya.",
+            "whyFails": "sama be, kata keterangannya sesudah kata kerja: is never, bukan never is."
+          },
+          "is late never": {
+            "misconception": "naruh kata keterangan frekuensi di belakang objek, padahal tempatnya di depan kata kerja.",
+            "whyFails": "kata keterangan frekuensi duduk di tengah kalimat, bukan di ujung sesudah kata sifat."
+          },
+          "never be late": {
+            "misconception": "kata kerja dibiarin polos padahal subjeknya tunggal.",
+            "whyFails": "“Rudi” butuh bentuk “is”. “Be” polos nggak bisa jadi kata kerja utama kalimat."
+          }
+        }
+      },
+      "th": {
+        "objective": "วางคำบอกความถี่ไว้หลังกริยา be",
+        "misconception": "ผู้เรียนวางคำบอกความถี่ไว้หน้า 'is/are' โดยเลียนตำแหน่งของมันกับคำกริยาทั่วไป",
+        "reasoning": "หาคำกริยาหลัก → เป็น 'be' → วางคำบอกความถี่ไว้หลังมัน",
+        "rule": "คำบอกความถี่อยู่หน้าคำกริยาทั่วไป แต่อยู่หลังกริยา be (am/is/are)",
+        "whyCorrect": "คำกริยาคือ 'be' คำบอกความถี่จึงตามหลังมัน: Rudi is never late",
+        "whyOthersFail": "'never is' สลับลำดับ 'is late never' ผลักคำบอกความถี่ไปท้ายประโยค ส่วน 'never be' ไม่มีคำกริยาแท้",
+        "howToAvoid": "ถามว่าคำกริยาคือ 'be' ไหม ถ้าใช่ วางคำบอกความถี่ไว้หลัง ถ้าไม่ใช่ วางไว้หน้า",
+        "memoryCue": "Be มาก่อน แล้วค่อย never: is never late",
+        "distractors": {
+          "never is late": {
+            "misconception": "วางคำบอกความถี่ไว้หน้า is/are ทั้งที่ควรอยู่หลัง",
+            "whyFails": "กับ be คำบอกความถี่ต้องอยู่หลังคำกริยา: is never ไม่ใช่ never is"
+          },
+          "is late never": {
+            "misconception": "วางคำบอกความถี่ไว้หลังกรรม ทั้งที่ตำแหน่งของมันอยู่หน้าคำกริยา",
+            "whyFails": "คำบอกความถี่อยู่กลางประโยค ไม่ใช่ท้ายประโยคหลังคำคุณศัพท์"
+          },
+          "never be late": {
+            "misconception": "ปล่อยคำกริยาเป็นรูปเปล่าทั้งที่ประธานเป็นเอกพจน์",
+            "whyFails": "'Rudi' ต้องใช้รูป 'is' ส่วน 'be' รูปเปล่าเป็นคำกริยาหลักของประโยคไม่ได้"
+          }
+        }
+      }
+    },
+    {
+      "id": "A1-207",
+      "family": "possession",
+      "subskill": "possessive_s_noun_ownership",
+      "cefr": "A2",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Use apostrophe-s on a singular noun to show who owns something.",
+        "misconception": "Learner writes the owner's name with no marker or with a plain -s and no apostrophe.",
+        "reasoning": "identify the owner -> check that the owner is singular -> add 's before the thing owned",
+        "stem": "This is my ___ car. He bought it last year.",
+        "options": [
+          "father",
+          "father's",
+          "fathers",
+          "father his"
+        ],
+        "correctIndex": 1,
+        "distractors": [
+          {
+            "option": "father",
+            "misconception": "drops the marker of ownership entirely, lining up two nouns as Indonesian does",
+            "whyFails": "'My father car' puts two nouns side by side with no sign of ownership."
+          },
+          {
+            "option": "fathers",
+            "misconception": "writes a plain -s ending that superficially resembles the possessive but loses the apostrophe",
+            "whyFails": "'Fathers' means more than one father; ownership needs the apostrophe: father's."
+          },
+          {
+            "option": "father his",
+            "misconception": "inserting a duplicate owner pronoun after the name, marking possession twice",
+            "whyFails": "English does not add 'his' after the owner's name; the 's already shows possession."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "The car belongs to one person, my father, so the owner takes 's: my father's car.",
+          "rule": "Singular owner + 's + thing owned: father's car, Sinta's bag.",
+          "whyOthersFail": "'Father' has no marker; 'fathers' is a plural, not a possessive; 'father his' doubles the owner.",
+          "howToAvoid": "Who owns it? Put 's right after that person, then the thing.",
+          "memoryCue": "Owner + 's + thing."
+        }
+      },
+      "id_": {
+        "objective": "Pakai tanda 's di kata benda tunggal buat nunjukin siapa pemiliknya.",
+        "misconception": "Kamu nulis nama pemiliknya tanpa tanda apa pun, atau cuma -s tanpa tanda petik.",
+        "reasoning": "cari pemiliknya → kata benda tunggal → tambah 's di depan barang yang dimiliki",
+        "rule": "Pemilik tunggal + 's + barangnya: father's car, Sinta's bag.",
+        "whyCorrect": "Mobilnya punya satu orang, ayahku, jadi pemiliknya dapet 's: my father's car.",
+        "whyOthersFail": "“Father” nggak ada tandanya. “Fathers” itu jamak, bukan kepemilikan. “Father his” pemiliknya dobel.",
+        "howToAvoid": "Siapa pemiliknya? Taruh 's langsung sesudah orang itu, baru barangnya.",
+        "memoryCue": "Pemilik + 's + barang.",
+        "distractors": {
+          "father": {
+            "misconception": "tanda kepemilikannya dibuang, dua kata benda dijejerin kayak di bahasa Indonesia.",
+            "whyFails": "“my father car” cuma nyandingin dua kata benda tanpa tanda kepemilikan."
+          },
+          "fathers": {
+            "misconception": "cuma nulis -s tanpa tanda petik.",
+            "whyFails": "“fathers” artinya lebih dari satu ayah. Kepemilikan butuh tanda petik: father's."
+          },
+          "father his": {
+            "misconception": "nambahin kata ganti pemilik sesudah nama, jadi kepemilikannya dobel.",
+            "whyFails": "bahasa Inggris nggak nambahin “his” sesudah nama pemilik. Tanda 's udah nunjukin kepemilikan."
+          }
+        }
+      },
+      "th": {
+        "objective": "ใช้ apostrophe-s กับคำนามเอกพจน์เพื่อบอกว่าใครเป็นเจ้าของ",
+        "misconception": "ผู้เรียนเขียนชื่อเจ้าของโดยไม่มีเครื่องหมาย หรือใส่แค่ -s โดยไม่มี apostrophe",
+        "reasoning": "หาเจ้าของ → คำนามเอกพจน์ → เติม 's หน้าสิ่งที่ถูกครอบครอง",
+        "rule": "เจ้าของเอกพจน์ + 's + สิ่งของ: father's car, Sinta's bag",
+        "whyCorrect": "รถเป็นของคนเดียวคือพ่อของฉัน เจ้าของจึงได้ 's: my father's car",
+        "whyOthersFail": "'father' ไม่มีเครื่องหมาย 'fathers' เป็นพหูพจน์ ไม่ใช่รูปแสดงความเป็นเจ้าของ ส่วน 'father his' ระบุเจ้าของซ้ำ",
+        "howToAvoid": "ใครเป็นเจ้าของ? ใส่ 's ต่อจากคนนั้นทันที แล้วตามด้วยสิ่งของ",
+        "memoryCue": "เจ้าของ + 's + สิ่งของ",
+        "distractors": {
+          "father": {
+            "misconception": "ตัดเครื่องหมายแสดงความเป็นเจ้าของทิ้ง วางคำนามสองคำเรียงกันแบบภาษาอินโดนีเซีย",
+            "whyFails": "'my father car' วางคำนามสองคำเรียงกันโดยไม่มีเครื่องหมายแสดงความเป็นเจ้าของ"
+          },
+          "fathers": {
+            "misconception": "ใส่แค่ -s โดยไม่มี apostrophe",
+            "whyFails": "'fathers' หมายถึงพ่อมากกว่าหนึ่งคน การแสดงความเป็นเจ้าของต้องมี apostrophe: father's"
+          },
+          "father his": {
+            "misconception": "เพิ่มสรรพนามเจ้าของหลังชื่อ ทำให้แสดงความเป็นเจ้าของซ้ำสองครั้ง",
+            "whyFails": "ภาษาอังกฤษไม่เติม 'his' หลังชื่อเจ้าของ เพราะ 's แสดงความเป็นเจ้าของอยู่แล้ว"
+          }
+        }
+      }
+    },
+    {
+      "id": "MO-201",
+      "family": "modals",
+      "subskill": "would_like_polite_requests",
+      "cefr": "A2",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Ask a polite offer question with 'Would you like' plus a noun.",
+        "misconception": "Learner offers with flat 'Do you want' or breaks the fixed 'would like' shape.",
+        "reasoning": "identify a polite offer to a guest -> select would like -> apply question order Would you like",
+        "stem": "A guest arrives at your house. You ask: “___ some tea?”",
+        "options": [
+          "Would you like",
+          "Do you like",
+          "Would you liking",
+          "You would like"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "Do you like",
+            "misconception": "stating a general preference in casual flat form instead of the polite request formula",
+            "whyFails": "'Do you like tea?' asks about general taste, not whether the guest wants some now."
+          },
+          {
+            "option": "Would you liking",
+            "misconception": "gluing an -ing onto the verb after 'would', a blend of two separate patterns",
+            "whyFails": "After 'would' the verb stays bare: would like, never would liking."
+          },
+          {
+            "option": "You would like",
+            "misconception": "uses 'want' where the polite would-like formula is expected",
+            "whyFails": "A question needs 'would' before 'you'; statement order does not ask anything."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "Offering something politely uses the fixed question 'Would you like...?'",
+          "rule": "Polite offer: Would + you + like + noun? The verb 'like' stays in its base form.",
+          "whyOthersFail": "'Do you like' asks about taste in general; 'would you liking' adds an -ing; 'you would like' is not a question.",
+          "howToAvoid": "Offering food or drink? Start with 'Would you like'.",
+          "memoryCue": "Would you like...? = a polite offer."
+        }
+      },
+      "id_": {
+        "objective": "Nawarin sesuatu dengan sopan pakai “Would you like” plus kata benda.",
+        "misconception": "Kamu nawarin pakai “Do you want” yang datar, atau ngerusak bentuk tetap “would like”.",
+        "reasoning": "kenali ini tawaran sopan ke tamu → pakai would + like → urutan tanya: Would you like",
+        "rule": "Tawaran sopan: Would + you + like + kata benda? Kata “like” tetap bentuk dasar.",
+        "whyCorrect": "Nawarin sesuatu dengan sopan pakai pertanyaan tetap “Would you like...?”",
+        "whyOthersFail": "“Do you like” nanya selera secara umum. “Would you liking” nambah -ing. “You would like” bukan pertanyaan.",
+        "howToAvoid": "Nawarin makanan atau minuman? Mulai dari “Would you like”.",
+        "memoryCue": "Would you like...? = tawaran sopan.",
+        "distractors": {
+          "Do you like": {
+            "misconception": "nanya selera umum, bukan nawarin dengan sopan.",
+            "whyFails": "“Do you like tea?” nanya suka teh atau nggak secara umum, bukan nawarin teh sekarang."
+          },
+          "Would you liking": {
+            "misconception": "nempelin -ing sesudah would, nyampur dua pola.",
+            "whyFails": "sesudah “would” kata kerjanya tetap polos: would like, bukan would liking."
+          },
+          "You would like": {
+            "misconception": "pakai “want” yang terlalu langsung, padahal konteksnya minta dengan sopan.",
+            "whyFails": "pertanyaan butuh “would” di depan “you”. Urutan kalimat berita nggak nanya apa-apa."
+          }
+        }
+      },
+      "th": {
+        "objective": "ถามเสนอสิ่งของอย่างสุภาพด้วย 'Would you like' บวกคำนาม",
+        "misconception": "ผู้เรียนเสนอด้วย 'Do you want' แบบห้วน ๆ หรือทำลายรูปตายตัวของ 'would like'",
+        "reasoning": "มองว่าเป็นการเสนออย่างสุภาพแก่แขก → ใช้ would + like → เรียงเป็นคำถาม: Would you like",
+        "rule": "เสนออย่างสุภาพ: Would + you + like + คำนาม? คำกริยา 'like' คงรูปพื้นฐาน",
+        "whyCorrect": "การเสนอสิ่งของอย่างสุภาพใช้คำถามตายตัว 'Would you like...?'",
+        "whyOthersFail": "'Do you like' ถามถึงรสนิยมทั่วไป 'would you liking' เติม -ing ส่วน 'you would like' ไม่ใช่คำถาม",
+        "howToAvoid": "จะเสนออาหารหรือเครื่องดื่ม? เริ่มด้วย 'Would you like'",
+        "memoryCue": "Would you like...? = การเสนออย่างสุภาพ",
+        "distractors": {
+          "Do you like": {
+            "misconception": "ถามรสนิยมทั่วไปแทนการเสนออย่างสุภาพ",
+            "whyFails": "'Do you like tea?' ถามว่าชอบชาไหมโดยทั่วไป ไม่ใช่เสนอชาให้ตอนนี้"
+          },
+          "Would you liking": {
+            "misconception": "ติด -ing หลัง would ผสมสองแบบแผนเข้าด้วยกัน",
+            "whyFails": "หลัง 'would' คำกริยาต้องเป็นรูปเปล่า: would like ไม่ใช่ would liking"
+          },
+          "You would like": {
+            "misconception": "ใช้ 'want' ที่ตรงเกินไป ทั้งที่บริบทต้องการการขอแบบสุภาพ",
+            "whyFails": "คำถามต้องมี 'would' หน้า 'you' ลำดับแบบประโยคบอกเล่าไม่ได้ถามอะไรเลย"
+          }
+        }
+      }
+    },
+    {
+      "id": "GI-201",
+      "family": "gerunds_infinitives",
+      "subskill": "like_love_hate_plus_gerund_preferences",
+      "cefr": "A2",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Follow 'enjoy' with the -ing form of the next verb.",
+        "misconception": "Learner puts a to-infinitive or a bare verb after 'enjoy'.",
+        "reasoning": "identify the preference verb enjoy -> select the -ing form for the next verb",
+        "stem": "I really enjoy ___ to music while I study.",
+        "options": [
+          "listen",
+          "listening",
+          "to listen",
+          "listens"
+        ],
+        "correctIndex": 1,
+        "distractors": [
+          {
+            "option": "listen",
+            "misconception": "following the feeling verb with a bare infinitive, chaining verbs directly as Indonesian does",
+            "whyFails": "Two verbs cannot sit side by side; after 'enjoy' the second verb needs -ing."
+          },
+          {
+            "option": "to listen",
+            "misconception": "uses a to-infinitive after 'enjoy'",
+            "whyFails": "'Enjoy' never takes 'to'; it is always followed by -ing."
+          },
+          {
+            "option": "listens",
+            "misconception": "base-form overuse",
+            "whyFails": "'Listens' is a present simple form for he/she; it cannot follow another verb."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "'Enjoy' is a preference verb, and the verb after it takes -ing: enjoy listening.",
+          "rule": "Like, love, hate, and enjoy are followed by verb + -ing.",
+          "whyOthersFail": "'Listen' is bare; 'to listen' uses the wrong pattern for enjoy; 'listens' is a finite verb, not a verb form that can follow enjoy.",
+          "howToAvoid": "After a feeling verb, picture the -ing ending before you write the next verb.",
+          "memoryCue": "Enjoy + -ing: enjoy listening, enjoy cooking."
+        }
+      },
+      "id_": {
+        "objective": "Sesudah “enjoy”, kata kerja berikutnya pakai bentuk -ing.",
+        "misconception": "Kamu naruh “to” atau kata kerja polos sesudah “enjoy”.",
+        "reasoning": "lihat kata kerja perasaan enjoy → kata kerja berikutnya pakai -ing",
+        "rule": "Like, love, hate, dan enjoy diikuti kata kerja + -ing.",
+        "whyCorrect": "“Enjoy” kata kerja kesukaan, jadi kata kerja sesudahnya pakai -ing: enjoy listening.",
+        "whyOthersFail": "“Listen” polos. “To listen” pola yang salah buat enjoy. “Listens” kata kerja berkonjugasi yang nggak bisa nempel di belakang enjoy.",
+        "howToAvoid": "Sesudah kata kerja perasaan, bayangin akhiran -ing sebelum nulis kata kerja berikutnya.",
+        "memoryCue": "Enjoy selalu ketemu -ing: enjoy listening, enjoy cooking.",
+        "distractors": {
+          "listen": {
+            "misconception": "kata kerja perasaan langsung disambung kata kerja polos kayak di bahasa Indonesia.",
+            "whyFails": "dua kata kerja nggak bisa nempel begitu aja. Sesudah “enjoy” kata kerja keduanya butuh -ing."
+          },
+          "to listen": {
+            "misconception": "pakai “to” sesudah enjoy, padahal enjoy selalu diikuti bentuk -ing.",
+            "whyFails": "“enjoy” nggak pernah pakai “to”. Selalu diikuti -ing."
+          },
+          "listens": {
+            "misconception": "bentuk kata kerja berkonjugasi dipakai sesudah kata kerja lain.",
+            "whyFails": "“listens” bentuk present simple buat he/she, nggak bisa ngikut di belakang kata kerja lain."
+          }
+        }
+      },
+      "th": {
+        "objective": "หลัง 'enjoy' คำกริยาถัดไปต้องเป็นรูป -ing",
+        "misconception": "ผู้เรียนใส่ to-infinitive หรือคำกริยารูปเปล่าหลัง 'enjoy'",
+        "reasoning": "เห็นคำกริยาบอกความชอบ enjoy → คำกริยาถัดไปใช้ -ing",
+        "rule": "Like, love, hate และ enjoy ตามด้วยคำกริยา + -ing",
+        "whyCorrect": "'Enjoy' เป็นคำกริยาบอกความชอบ คำกริยาที่ตามมาจึงใช้ -ing: enjoy listening",
+        "whyOthersFail": "'listen' เป็นรูปเปล่า 'to listen' ใช้แบบแผนที่ผิดสำหรับ enjoy ส่วน 'listens' เป็นคำกริยาแท้ที่ตามหลังคำกริยาอื่นไม่ได้",
+        "howToAvoid": "หลังคำกริยาบอกความรู้สึก ให้นึกถึงส่วนท้าย -ing ก่อนเขียนคำกริยาถัดไป",
+        "memoryCue": "Enjoy ต้องเจอ -ing เสมอ: enjoy listening, enjoy cooking",
+        "distractors": {
+          "listen": {
+            "misconception": "ต่อคำกริยารูปเปล่าหลังคำกริยาบอกความรู้สึกแบบภาษาอินโดนีเซีย",
+            "whyFails": "คำกริยาสองคำวางติดกันไม่ได้ หลัง 'enjoy' คำกริยาที่สองต้องมี -ing"
+          },
+          "to listen": {
+            "misconception": "ใช้ 'to' หลัง enjoy ทั้งที่ enjoy ต้องตามด้วยรูป -ing เสมอ",
+            "whyFails": "'enjoy' ไม่เคยใช้กับ 'to' ต้องตามด้วย -ing เสมอ"
+          },
+          "listens": {
+            "misconception": "ใช้คำกริยาที่ผันแล้วตามหลังคำกริยาอื่น",
+            "whyFails": "'listens' เป็นรูป present simple สำหรับ he/she ตามหลังคำกริยาอื่นไม่ได้"
+          }
+        }
+      }
+    },
+    {
+      "id": "TA-201",
+      "family": "tense_aspect",
+      "subskill": "present_perfect_experience_ever_never",
+      "cefr": "A2",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Use 'have never + past participle' for an experience that has not happened in someone's life.",
+        "misconception": "Learner uses the past simple for a life experience that has no specific time.",
+        "reasoning": "check that no time is given -> identify a life experience -> apply have/has + never + past participle",
+        "stem": "My grandmother ___ a plane. She always travels by train.",
+        "options": [
+          "has never flown",
+          "never flew",
+          "has never fly",
+          "never has flying"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "never flew",
+            "misconception": "uses the past simple for a life experience without a time",
+            "whyFails": "There is no finished time like 'last year'; the sentence covers her whole life up to now, so present perfect is needed."
+          },
+          {
+            "option": "has never fly",
+            "misconception": "leaving the bare verb although 'have' needs the past participle after it",
+            "whyFails": "After 'has', the verb must be the past participle 'flown', not the bare 'fly'."
+          },
+          {
+            "option": "never has flying",
+            "misconception": "mixes 'have' with a finite past form of 'be' instead of the participle",
+            "whyFails": "'Has' pairs with a past participle, not an -ing form, and 'never' goes after 'has'."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "Her whole life up to now is the time frame, and 'she always travels by train' shows it is still true, so 'has never flown' fits.",
+          "rule": "Life experience without a specific time: have/has + never/ever + past participle.",
+          "whyOthersFail": "'Never flew' closes the time off in the past; 'has never fly' lacks the participle; 'never has flying' uses -ing and the wrong word order.",
+          "howToAvoid": "No date or finished time word? Use have/has + past participle.",
+          "memoryCue": "Never in my life → has never flown."
+        }
+      },
+      "id_": {
+        "objective": "Pakai “have never + past participle” buat pengalaman yang belum pernah terjadi seumur hidup.",
+        "misconception": "Kamu pakai past simple buat pengalaman hidup yang nggak disebut waktunya.",
+        "reasoning": "nggak ada waktu yang disebut → pengalaman hidup → have/has + never + past participle",
+        "rule": "Pengalaman hidup tanpa waktu pasti: have/has + never/ever + past participle.",
+        "whyCorrect": "Rentang waktunya seumur hidup sampai sekarang, dan “she always travels by train” nunjukin itu masih berlaku, jadi “has never flown” yang pas.",
+        "whyOthersFail": "“Never flew” nutup waktunya di masa lampau. “Has never fly” kurang past participle. “Never has flying” pakai -ing dan urutannya salah.",
+        "howToAvoid": "Nggak ada tanggal atau kata waktu selesai? Pakai have/has + past participle.",
+        "memoryCue": "Belum pernah seumur hidup → has never flown.",
+        "distractors": {
+          "never flew": {
+            "misconception": "pakai past simple buat pengalaman hidup yang nggak disebut waktunya.",
+            "whyFails": "nggak ada waktu selesai kayak “last year”. Kalimatnya nyakup seumur hidup sampai sekarang, jadi butuh present perfect."
+          },
+          "has never fly": {
+            "misconception": "kata kerja dibiarin polos padahal sesudah have butuh past participle.",
+            "whyFails": "sesudah “has” kata kerjanya harus past participle “flown”, bukan “fly” polos."
+          },
+          "never has flying": {
+            "misconception": "have dicampur sama bentuk -ing, bukan past participle.",
+            "whyFails": "“has” berpasangan sama past participle, bukan -ing. “Never” juga tempatnya sesudah “has”."
+          }
+        }
+      },
+      "th": {
+        "objective": "ใช้ 'have never + past participle' กับประสบการณ์ที่ไม่เคยเกิดขึ้นในชีวิต",
+        "misconception": "ผู้เรียนใช้ past simple กับประสบการณ์ชีวิตที่ไม่ได้ระบุเวลา",
+        "reasoning": "ไม่ระบุเวลา → ประสบการณ์ชีวิต → have/has + never + past participle",
+        "rule": "ประสบการณ์ชีวิตที่ไม่ระบุเวลาแน่ชัด: have/has + never/ever + past participle",
+        "whyCorrect": "กรอบเวลาคือทั้งชีวิตจนถึงตอนนี้ และ 'she always travels by train' บอกว่ายังเป็นจริงอยู่ จึงใช้ 'has never flown'",
+        "whyOthersFail": "'never flew' ปิดเวลาไว้ในอดีต 'has never fly' ขาด past participle ส่วน 'never has flying' ใช้ -ing และเรียงคำผิด",
+        "howToAvoid": "ไม่มีวันที่หรือคำบอกเวลาที่จบแล้ว? ใช้ have/has + past participle",
+        "memoryCue": "ไม่เคยเลยในชีวิต → has never flown",
+        "distractors": {
+          "never flew": {
+            "misconception": "ใช้ past simple กับประสบการณ์ชีวิตที่ไม่ได้ระบุเวลา",
+            "whyFails": "ไม่มีเวลาที่จบแล้วอย่าง 'last year' ประโยคครอบคลุมทั้งชีวิตจนถึงตอนนี้ จึงต้องใช้ present perfect"
+          },
+          "has never fly": {
+            "misconception": "ปล่อยคำกริยารูปเปล่าทั้งที่หลัง have ต้องใช้ past participle",
+            "whyFails": "หลัง 'has' คำกริยาต้องเป็น past participle 'flown' ไม่ใช่ 'fly' รูปเปล่า"
+          },
+          "never has flying": {
+            "misconception": "ผสม have กับรูป -ing แทน past participle",
+            "whyFails": "'has' จับคู่กับ past participle ไม่ใช่รูป -ing และ 'never' ต้องอยู่หลัง 'has'"
+          }
+        }
+      }
+    },
+    {
+      "id": "TA-202",
+      "family": "tense_aspect",
+      "subskill": "present_perfect_with_for_since_duration",
+      "cefr": "A2",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Choose 'for' before a length of time in a present perfect sentence.",
+        "misconception": "Learner uses 'since' before a period like 'ten years' or drops the present perfect link.",
+        "reasoning": "identify the length of time -> keep the present perfect -> select for, not since",
+        "stem": "Mr. Hadi has taught at our school ___ ten years, and he still loves it.",
+        "options": [
+          "for",
+          "since",
+          "during",
+          "from"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "since",
+            "misconception": "uses 'since' before a length of time",
+            "whyFails": "'Since' introduces a starting point like 2015, not a length like 'ten years'."
+          },
+          {
+            "option": "during",
+            "misconception": "sealing the period off as a completed event, though the family still lives there",
+            "whyFails": "'During' says when something happened inside a period; it does not measure how long a state has lasted."
+          },
+          {
+            "option": "from",
+            "misconception": "uses 'for' before a starting point",
+            "whyFails": "'From' needs an end point ('from 2015 to 2025'); on its own it cannot follow the present perfect here."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "'Ten years' is a length of time, so the present perfect takes 'for': has taught for ten years.",
+          "rule": "Present perfect + for + length of time; present perfect + since + starting point.",
+          "whyOthersFail": "'Since' wants a starting point; 'during' names when, not how long; 'from' needs a 'to' to close the range.",
+          "howToAvoid": "Ask: is it a number of years or a date? Number → for. Date → since.",
+          "memoryCue": "For ten years, since 2015."
+        }
+      },
+      "id_": {
+        "objective": "Pilih “for” di depan lamanya waktu di kalimat present perfect.",
+        "misconception": "Kamu pakai “since” di depan rentang kayak “ten years”, atau ngilangin present perfect-nya.",
+        "reasoning": "kenali lamanya waktu → present perfect tetap → pakai for, bukan since",
+        "rule": "Present perfect + for + lamanya waktu. Present perfect + since + titik mulai.",
+        "whyCorrect": "“Ten years” itu lamanya waktu, jadi present perfect-nya pakai “for”: has taught for ten years.",
+        "whyOthersFail": "“Since” minta titik mulai. “During” nyebut kapan, bukan berapa lama. “From” butuh “to” buat nutup rentangnya.",
+        "howToAvoid": "Tanya: ini jumlah tahun atau tanggal? Jumlah → for. Tanggal → since.",
+        "memoryCue": "Lamanya waktu pakai “for”, titik mulai pakai “since”: “for ten years”, “since 2015”.",
+        "distractors": {
+          "since": {
+            "misconception": "pakai “since” di depan lamanya waktu, padahal since buat titik mulai.",
+            "whyFails": "“since” buat titik mulai kayak 2015, bukan lamanya kayak “ten years”."
+          },
+          "during": {
+            "misconception": "rentangnya ditutup seolah udah selesai.",
+            "whyFails": "“during” bilang kapan sesuatu terjadi di dalam suatu masa, bukan ngukur berapa lama keadaan itu bertahan."
+          },
+          "from": {
+            "misconception": "pakai “for” di depan titik mulai, padahal for buat lamanya waktu.",
+            "whyFails": "“from” butuh titik akhir (“from 2015 to 2025”). Sendirian, dia nggak bisa ngikut present perfect di sini."
+          }
+        }
+      },
+      "th": {
+        "objective": "เลือก 'for' หน้าช่วงเวลาในประโยค present perfect",
+        "misconception": "ผู้เรียนใช้ 'since' หน้าช่วงเวลาอย่าง 'ten years' หรือตัดการเชื่อมของ present perfect ทิ้ง",
+        "reasoning": "จับช่วงเวลา → คง present perfect → ใช้ for ไม่ใช่ since",
+        "rule": "Present perfect + for + ช่วงเวลา; present perfect + since + จุดเริ่มต้น",
+        "whyCorrect": "'Ten years' เป็นช่วงเวลา present perfect จึงใช้ 'for': has taught for ten years",
+        "whyOthersFail": "'since' ต้องการจุดเริ่มต้น 'during' บอกว่าเมื่อไหร่ ไม่ใช่นานเท่าไหร่ ส่วน 'from' ต้องมี 'to' เพื่อปิดช่วง",
+        "howToAvoid": "ถามว่าเป็นจำนวนปีหรือวันที่? จำนวน → for วันที่ → since",
+        "memoryCue": "ช่วงเวลาใช้ 'for' จุดเริ่มต้นใช้ 'since': 'for ten years', 'since 2015'",
+        "distractors": {
+          "since": {
+            "misconception": "ใช้ 'since' หน้าช่วงเวลา ทั้งที่ since ใช้กับจุดเริ่มต้น",
+            "whyFails": "'since' ใช้นำจุดเริ่มต้นอย่าง 2015 ไม่ใช่ช่วงเวลาอย่าง 'ten years'"
+          },
+          "during": {
+            "misconception": "ปิดช่วงเวลาราวกับจบไปแล้ว",
+            "whyFails": "'during' บอกว่าเกิดอะไรขึ้นเมื่อไหร่ภายในช่วงหนึ่ง ไม่ได้วัดว่าสภาพนั้นกินเวลานานเท่าไหร่"
+          },
+          "from": {
+            "misconception": "ใช้ 'for' หน้าจุดเริ่มต้น ทั้งที่ for ใช้กับช่วงเวลา",
+            "whyFails": "'from' ต้องมีจุดสิ้นสุด ('from 2015 to 2025') ลำพังตัวมันตามหลัง present perfect ตรงนี้ไม่ได้"
+          }
+        }
+      }
+    },
+    {
+      "id": "CM-201",
+      "family": "comparison",
+      "subskill": "irregular_comparative_better_worse_forms",
+      "cefr": "A2",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Use the irregular comparative 'worse' for 'bad' in a comparison with 'than'.",
+        "misconception": "Learner builds the comparative of 'bad' with -er or 'more', or reaches for the superlative.",
+        "reasoning": "identify 'than' -> select a comparative -> recall that bad is irregular -> apply worse",
+        "stem": "The traffic today is ___ than yesterday. We will be late.",
+        "options": [
+          "worse",
+          "badder",
+          "more bad",
+          "worst"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "badder",
+            "misconception": "regular -er ending forced onto an irregular adjective",
+            "whyFails": "'Bad' is irregular; it never takes -er."
+          },
+          {
+            "option": "more bad",
+            "misconception": "regular 'more + adjective' pattern applied to an irregular adjective",
+            "whyFails": "'More bad' follows the regular pattern, but 'bad' has its own form: worse."
+          },
+          {
+            "option": "worst",
+            "misconception": "superlative 'best' used where 'than' demands a comparative",
+            "whyFails": "'Worst' compares three or more things; 'than' signals a two-way comparison."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "'Than' asks for a comparative, and the comparative of 'bad' is the irregular 'worse'.",
+          "rule": "Irregular comparatives: good → better, bad → worse, far → further.",
+          "whyOthersFail": "'Badder' and 'more bad' apply regular patterns to an irregular word; 'worst' is the superlative.",
+          "howToAvoid": "Memorize the short list of irregular pairs before you reach for -er or more.",
+          "memoryCue": "Good, better — bad, worse."
+        }
+      },
+      "id_": {
+        "objective": "Pakai bentuk tak beraturan “worse” buat “bad” di perbandingan dengan “than”.",
+        "misconception": "Kamu bikin perbandingan “bad” pakai -er atau “more”, atau malah ambil bentuk paling.",
+        "reasoning": "lihat “than” → butuh bentuk banding → bad itu tak beraturan → worse",
+        "rule": "Bentuk banding tak beraturan: good → better, bad → worse, far → further.",
+        "whyCorrect": "“Than” minta bentuk banding, dan bentuk banding “bad” itu “worse”.",
+        "whyOthersFail": "“Badder” dan “more bad” nerapin pola biasa ke kata tak beraturan. “Worst” bentuk paling.",
+        "howToAvoid": "Hafalin daftar pendek pasangan tak beraturan sebelum kamu ambil -er atau more.",
+        "memoryCue": "Hafalin pasangannya: good jadi better, bad jadi worse.",
+        "distractors": {
+          "badder": {
+            "misconception": "akhiran -er dipaksain ke kata sifat tak beraturan.",
+            "whyFails": "“bad” itu tak beraturan, nggak pernah pakai -er."
+          },
+          "more bad": {
+            "misconception": "pola “more + kata sifat” dipakai buat kata sifat tak beraturan.",
+            "whyFails": "“more bad” ngikutin pola biasa, padahal “bad” punya bentuk sendiri: worse."
+          },
+          "worst": {
+            "misconception": "bentuk paling dipakai padahal “than” minta bentuk banding.",
+            "whyFails": "“worst” buat bandingin tiga atau lebih. “Than” nandain perbandingan dua hal."
+          }
+        }
+      },
+      "th": {
+        "objective": "ใช้รูปเปรียบเทียบไม่ปกติ 'worse' ของ 'bad' ในการเปรียบเทียบด้วย 'than'",
+        "misconception": "ผู้เรียนสร้างรูปเปรียบเทียบของ 'bad' ด้วย -er หรือ 'more' หรือหยิบรูปขั้นสูงสุดมาใช้",
+        "reasoning": "เห็น 'than' → ต้องใช้รูปเปรียบเทียบ → bad ไม่ปกติ → worse",
+        "rule": "รูปเปรียบเทียบไม่ปกติ: good → better, bad → worse, far → further",
+        "whyCorrect": "'Than' ต้องการรูปเปรียบเทียบ และรูปเปรียบเทียบของ 'bad' คือ 'worse' ซึ่งไม่ปกติ",
+        "whyOthersFail": "'badder' และ 'more bad' ใช้แบบแผนปกติกับคำไม่ปกติ ส่วน 'worst' เป็นรูปขั้นสูงสุด",
+        "howToAvoid": "จำรายการสั้น ๆ ของคู่คำไม่ปกติไว้ก่อนจะหยิบ -er หรือ more",
+        "memoryCue": "จำคู่ไว้: good เป็น better, bad เป็น worse",
+        "distractors": {
+          "badder": {
+            "misconception": "บังคับใส่ -er ให้คำคุณศัพท์ไม่ปกติ",
+            "whyFails": "'bad' เป็นคำไม่ปกติ ไม่เคยเติม -er"
+          },
+          "more bad": {
+            "misconception": "ใช้แบบแผน 'more + คำคุณศัพท์' กับคำคุณศัพท์ไม่ปกติ",
+            "whyFails": "'more bad' ทำตามแบบแผนปกติ แต่ 'bad' มีรูปของตัวเอง: worse"
+          },
+          "worst": {
+            "misconception": "ใช้รูปขั้นสูงสุดทั้งที่ 'than' ต้องการรูปเปรียบเทียบ",
+            "whyFails": "'worst' ใช้เปรียบเทียบสามสิ่งขึ้นไป ส่วน 'than' บ่งบอกการเปรียบเทียบสองสิ่ง"
+          }
+        }
+      }
+    },
+    {
+      "id": "CM-202",
+      "family": "comparison",
+      "subskill": "comparative_formation_er_vs_more_no_double_marking",
+      "cefr": "A2",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Use 'more' before a long adjective in a comparison.",
+        "misconception": "Learner adds -er to a long adjective or stacks 'more' and -er together.",
+        "reasoning": "count the syllables -> identify a long adjective -> apply more + adjective without -er",
+        "stem": "This book is ___ (interesting) than the film.",
+        "options": [
+          "more interesting",
+          "interestinger",
+          "more interestinger",
+          "the most interesting"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "interestinger",
+            "misconception": "adds -er to a long adjective",
+            "whyFails": "'Interesting' has three syllables, so it takes 'more', not -er."
+          },
+          {
+            "option": "more interestinger",
+            "misconception": "doubles the comparative marking by putting 'more' before an adjective already ending in '-er'",
+            "whyFails": "'More' and -er both mark the comparative; use only one."
+          },
+          {
+            "option": "the most interesting",
+            "misconception": "uses the superlative after 'the' for a two-item comparison",
+            "whyFails": "'Than' compares two things, so the comparative is needed, not the superlative."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "'Interesting' is a long adjective, so its comparative is 'more interesting'.",
+          "rule": "Short adjectives take -er (cheaper); long adjectives take more (more interesting). Never both.",
+          "whyOthersFail": "'Interestinger' forces -er onto a long word; 'more interestinger' marks the comparative twice; 'the most interesting' is a superlative.",
+          "howToAvoid": "Say the adjective aloud: three syllables or more → more.",
+          "memoryCue": "Long word → more; short word → -er."
+        }
+      },
+      "id_": {
+        "objective": "Pakai “more” di depan kata sifat panjang saat membandingkan.",
+        "misconception": "Kamu nambahin -er ke kata sifat panjang, atau numpuk “more” sama -er sekaligus.",
+        "reasoning": "hitung suku katanya → kata sifat panjang → more + kata sifat, tanpa -er",
+        "rule": "Kata sifat pendek pakai -er (cheaper). Kata sifat panjang pakai more (more interesting). Jangan dua-duanya.",
+        "whyCorrect": "“Interesting” kata sifat panjang, jadi bentuk bandingnya “more interesting”.",
+        "whyOthersFail": "“Interestinger” maksain -er ke kata panjang. “More interestinger” nandain banding dua kali. “The most interesting” bentuk paling.",
+        "howToAvoid": "Ucapin kata sifatnya: tiga suku kata atau lebih → more.",
+        "memoryCue": "Kata panjang → more. Kata pendek → -er.",
+        "distractors": {
+          "interestinger": {
+            "misconception": "nambahin -er ke kata sifat panjang, padahal yang panjang pakai more.",
+            "whyFails": "“interesting” tiga suku kata, jadi pakai “more”, bukan -er."
+          },
+          "more interestinger": {
+            "misconception": "tanda bandingnya dobel: more plus -er.",
+            "whyFails": "“more” dan -er sama-sama nandain banding. Pakai satu aja."
+          },
+          "the most interesting": {
+            "misconception": "pakai bentuk paling, padahal cuma dua hal yang dibandingin.",
+            "whyFails": "“than” bandingin dua hal, jadi butuh bentuk banding, bukan bentuk paling."
+          }
+        }
+      },
+      "th": {
+        "objective": "ใช้ 'more' หน้าคำคุณศัพท์ยาวในการเปรียบเทียบ",
+        "misconception": "ผู้เรียนเติม -er ให้คำคุณศัพท์ยาว หรือใช้ 'more' ซ้อนกับ -er",
+        "reasoning": "นับพยางค์ → คำคุณศัพท์ยาว → more + คำคุณศัพท์ ไม่เติม -er",
+        "rule": "คำคุณศัพท์สั้นเติม -er (cheaper) คำคุณศัพท์ยาวใช้ more (more interesting) ห้ามใช้ทั้งสองอย่าง",
+        "whyCorrect": "'Interesting' เป็นคำคุณศัพท์ยาว รูปเปรียบเทียบจึงเป็น 'more interesting'",
+        "whyOthersFail": "'interestinger' บังคับใส่ -er ให้คำยาว 'more interestinger' ทำเครื่องหมายเปรียบเทียบซ้ำสองครั้ง ส่วน 'the most interesting' เป็นรูปขั้นสูงสุด",
+        "howToAvoid": "ลองออกเสียงคำคุณศัพท์ดู: สามพยางค์ขึ้นไป → more",
+        "memoryCue": "คำยาว → more คำสั้น → -er",
+        "distractors": {
+          "interestinger": {
+            "misconception": "เติม -er ให้คำคุณศัพท์ยาว ทั้งที่คำยาวต้องใช้ more",
+            "whyFails": "'interesting' มีสามพยางค์ จึงต้องใช้ 'more' ไม่ใช่ -er"
+          },
+          "more interestinger": {
+            "misconception": "ทำเครื่องหมายเปรียบเทียบซ้ำ: more บวก -er",
+            "whyFails": "'more' และ -er ต่างก็เป็นเครื่องหมายเปรียบเทียบ ใช้แค่อย่างเดียว"
+          },
+          "the most interesting": {
+            "misconception": "ใช้รูปขั้นสูงสุด ทั้งที่เปรียบเทียบแค่สองสิ่ง",
+            "whyFails": "'than' เปรียบเทียบสองสิ่ง จึงต้องใช้รูปเปรียบเทียบ ไม่ใช่รูปขั้นสูงสุด"
+          }
+        }
+      }
+    },
+    {
+      "id": "A1-208",
+      "family": "core_grammar",
+      "subskill": "adverb_of_manner_ly_vs_adjective_after_verb",
+      "cefr": "A2",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Keep an adjective, not an -ly adverb, after the verb be.",
+        "misconception": "Learner adds -ly after 'is/are' because the word describes how something seems.",
+        "reasoning": "identify the verb -> check whether it is be -> select an adjective to describe the subject",
+        "stem": "Be careful, the soup is very ___.",
+        "options": [
+          "hot",
+          "hotly",
+          "heat",
+          "hotter"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "hotly",
+            "misconception": "uses the adverb where an adjective after 'be' is needed",
+            "whyFails": "After 'is', the word describes the soup itself, so it must be an adjective, not an -ly adverb."
+          },
+          {
+            "option": "heat",
+            "misconception": "uses the bare adjective after an action verb where a manner adverb in '-ly' is required",
+            "whyFails": "'Heat' is a noun or verb; 'very' needs an adjective after it."
+          },
+          {
+            "option": "hotter",
+            "misconception": "switches to a comparative adjective although nothing is being compared and the slot needs an adverb",
+            "whyFails": "Nothing is being compared, and 'very' does not go with a comparative."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "'Is' links the soup to a description, so the adjective 'hot' is required.",
+          "rule": "After be (am/is/are) use an adjective; after an action verb use an -ly adverb.",
+          "whyOthersFail": "'Hotly' is an adverb; 'heat' is not an adjective; 'hotter' compares, but nothing is compared here.",
+          "howToAvoid": "See is/are before the gap? Choose the plain adjective.",
+          "memoryCue": "Is hot, walks slowly."
+        }
+      },
+      "id_": {
+        "objective": "Sesudah kata kerja be, pakai kata sifat, bukan kata keterangan -ly.",
+        "misconception": "Kamu nambahin -ly sesudah “is/are” karena kata itu ngegambarin sesuatu.",
+        "reasoning": "cari kata kerjanya → ternyata be → gambarkan subjeknya pakai kata sifat",
+        "rule": "Sesudah be (am/is/are) pakai kata sifat. Sesudah kata kerja aksi pakai kata keterangan -ly.",
+        "whyCorrect": "“Is” nyambungin sup sama gambarannya, jadi butuh kata sifat “hot”.",
+        "whyOthersFail": "“Hotly” kata keterangan. “Heat” bukan kata sifat. “Hotter” bentuk banding, padahal nggak ada yang dibandingin.",
+        "howToAvoid": "Ada is/are di depan titik-titik? Pilih kata sifat polos.",
+        "memoryCue": "Sesudah is pakai kata sifat: is hot. Sesudah kata kerja aksi pakai -ly: walks slowly.",
+        "distractors": {
+          "hotly": {
+            "misconception": "pakai bentuk -ly sesudah is/are, padahal sesudah be yang dibutuhin kata sifat.",
+            "whyFails": "sesudah “is”, katanya ngegambarin supnya sendiri, jadi harus kata sifat, bukan -ly."
+          },
+          "heat": {
+            "misconception": "kata benda dipakai di tempat kata sifat.",
+            "whyFails": "“heat” itu kata benda atau kata kerja. “Very” butuh kata sifat sesudahnya."
+          },
+          "hotter": {
+            "misconception": "bentuk banding dipakai padahal nggak ada yang dibandingin.",
+            "whyFails": "nggak ada yang dibandingin, dan “very” nggak cocok sama bentuk banding."
+          }
+        }
+      },
+      "th": {
+        "objective": "หลังกริยา be ใช้คำคุณศัพท์ ไม่ใช่คำกริยาวิเศษณ์ -ly",
+        "misconception": "ผู้เรียนเติม -ly หลัง 'is/are' เพราะคำนั้นบรรยายว่าสิ่งนั้นเป็นอย่างไร",
+        "reasoning": "หาคำกริยา → เป็น 'be' → บรรยายประธานด้วยคำคุณศัพท์",
+        "rule": "หลัง be (am/is/are) ใช้คำคุณศัพท์ หลังคำกริยาแสดงการกระทำใช้คำกริยาวิเศษณ์ -ly",
+        "whyCorrect": "'Is' เชื่อมซุปกับคำบรรยาย จึงต้องใช้คำคุณศัพท์ 'hot'",
+        "whyOthersFail": "'hotly' เป็นคำกริยาวิเศษณ์ 'heat' ไม่ใช่คำคุณศัพท์ ส่วน 'hotter' ใช้เปรียบเทียบ แต่ตรงนี้ไม่ได้เปรียบเทียบอะไร",
+        "howToAvoid": "เห็น is/are หน้าช่องว่าง? เลือกคำคุณศัพท์ธรรมดา",
+        "memoryCue": "หลัง is ใช้คำคุณศัพท์: is hot หลังคำกริยาแสดงการกระทำใช้ -ly: walks slowly",
+        "distractors": {
+          "hotly": {
+            "misconception": "ใช้รูป -ly หลัง is/are ทั้งที่หลัง be ต้องใช้คำคุณศัพท์",
+            "whyFails": "หลัง 'is' คำนั้นบรรยายตัวซุปเอง จึงต้องเป็นคำคุณศัพท์ ไม่ใช่ -ly"
+          },
+          "heat": {
+            "misconception": "ใช้คำนามในตำแหน่งคำคุณศัพท์",
+            "whyFails": "'heat' เป็นคำนามหรือคำกริยา 'very' ต้องตามด้วยคำคุณศัพท์"
+          },
+          "hotter": {
+            "misconception": "ใช้รูปเปรียบเทียบทั้งที่ไม่ได้เปรียบเทียบอะไร",
+            "whyFails": "ไม่มีการเปรียบเทียบ และ 'very' ใช้กับรูปเปรียบเทียบไม่ได้"
+          }
+        }
+      }
+    },
+    {
+      "id": "QT-201",
+      "family": "quantifiers",
+      "subskill": "how_much_vs_how_many_quantity_questions",
+      "cefr": "A2",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Ask about a countable plural noun with 'How many'.",
+        "misconception": "Learner asks about countable things with 'how much' or drops the quantity word.",
+        "reasoning": "identify the noun -> check that it is plural and countable -> select How many",
+        "stem": "___ brothers and sisters do you have?",
+        "options": [
+          "How many",
+          "How much",
+          "How",
+          "How many of"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "How much",
+            "misconception": "asks about a countable plural noun with 'how much'",
+            "whyFails": "'Brothers and sisters' can be counted, so the question word is 'how many'."
+          },
+          {
+            "option": "How",
+            "misconception": "asks quantity with bare 'how' and drops the quantity word entirely",
+            "whyFails": "Bare 'how' asks about manner, not number."
+          },
+          {
+            "option": "How many of",
+            "misconception": "adds a partitive 'of' straight after 'how much' before a bare noun",
+            "whyFails": "'Of' only fits before 'the/your/them': how many of your friends, not how many of brothers."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "'Brothers and sisters' is a plural countable noun, so the question starts with 'How many'.",
+          "rule": "How many + plural countable noun; how much + uncountable noun.",
+          "whyOthersFail": "'How much' is for uncountable nouns; 'how' alone asks about manner; 'how many of' needs 'the/your' after it.",
+          "howToAvoid": "Can you put a number before the noun (two brothers)? Then ask 'How many'.",
+          "memoryCue": "Count it → how many."
+        }
+      },
+      "id_": {
+        "objective": "Nanya jumlah benda yang bisa dihitung pakai “How many”.",
+        "misconception": "Kamu nanya benda yang bisa dihitung pakai “how much”, atau ngilangin kata jumlahnya.",
+        "reasoning": "lihat kata bendanya → jamak dan bisa dihitung → How many",
+        "rule": "How many + kata benda jamak yang bisa dihitung. How much + kata benda yang nggak bisa dihitung.",
+        "whyCorrect": "“Brothers and sisters” bisa dihitung dan jamak, jadi pertanyaannya mulai dari “How many”.",
+        "whyOthersFail": "“How much” buat yang nggak bisa dihitung. “How” sendirian nanya cara. “How many of” butuh “the/your” sesudahnya.",
+        "howToAvoid": "Bisa ditaruh angka di depannya (two brothers)? Tanyanya pakai “How many”.",
+        "memoryCue": "Bisa dihitung → how many.",
+        "distractors": {
+          "How much": {
+            "misconception": "nanya benda yang bisa dihitung pakai “how much”, padahal harusnya “how many”.",
+            "whyFails": "“brothers and sisters” bisa dihitung, jadi kata tanyanya “how many”."
+          },
+          "How": {
+            "misconception": "nanya jumlah cuma pakai “how”, kata jumlahnya hilang.",
+            "whyFails": "“how” sendirian nanya cara, bukan jumlah."
+          },
+          "How many of": {
+            "misconception": "nambahin “of” langsung di depan kata benda polos.",
+            "whyFails": "“of” cuma pas di depan “the/your/them”: how many of your friends, bukan how many of brothers."
+          }
+        }
+      },
+      "th": {
+        "objective": "ถามถึงคำนามนับได้พหูพจน์ด้วย 'How many'",
+        "misconception": "ผู้เรียนถามถึงสิ่งที่นับได้ด้วย 'how much' หรือตัดคำบอกจำนวนทิ้ง",
+        "reasoning": "ดูคำนาม → นับได้และเป็นพหูพจน์ → How many",
+        "rule": "How many + คำนามนับได้พหูพจน์; how much + คำนามนับไม่ได้",
+        "whyCorrect": "'Brothers and sisters' เป็นคำนามนับได้พหูพจน์ คำถามจึงเริ่มด้วย 'How many'",
+        "whyOthersFail": "'how much' ใช้กับคำนามนับไม่ได้ 'how' ลำพังถามถึงวิธี ส่วน 'how many of' ต้องมี 'the/your' ตามหลัง",
+        "howToAvoid": "ใส่ตัวเลขหน้าคำนามได้ไหม (two brothers)? ถ้าได้ ให้ถามด้วย 'How many'",
+        "memoryCue": "นับได้ → how many",
+        "distractors": {
+          "How much": {
+            "misconception": "ถามถึงคำนามนับได้ด้วย 'how much' ทั้งที่ควรใช้ 'how many'",
+            "whyFails": "'brothers and sisters' นับได้ คำถามจึงต้องใช้ 'how many'"
+          },
+          "How": {
+            "misconception": "ถามจำนวนด้วย 'how' เปล่า ๆ โดยตัดคำบอกจำนวนทิ้ง",
+            "whyFails": "'how' ลำพังถามถึงวิธี ไม่ใช่จำนวน"
+          },
+          "How many of": {
+            "misconception": "เติม 'of' ตรงหน้าคำนามเปล่า",
+            "whyFails": "'of' ใช้ได้เฉพาะหน้า 'the/your/them': how many of your friends ไม่ใช่ how many of brothers"
+          }
+        }
+      }
+    },
+    {
+      "id": "LD-201",
+      "family": "linking_devices",
+      "subskill": "cause_result_connectors_because_vs_so",
+      "cefr": "A2",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Introduce a result with 'so' after the reason has been stated.",
+        "misconception": "Learner uses 'because' in front of the result instead of the reason.",
+        "reasoning": "identify which clause is the reason and which is the result -> apply so to the result clause",
+        "stem": "It was raining hard, ___ we stayed at home.",
+        "options": [
+          "so",
+          "because",
+          "because of",
+          "so that"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "because",
+            "misconception": "introduces the result clause with 'because'",
+            "whyFails": "'Because' introduces the reason, but 'we stayed at home' is the result of the rain."
+          },
+          {
+            "option": "because of",
+            "misconception": "puts 'because of' before a full clause although it only takes a noun phrase",
+            "whyFails": "'Because of' is followed by a noun ('because of the rain'), not a full clause."
+          },
+          {
+            "option": "so that",
+            "misconception": "uses the purpose connector 'so that' where a plain reason connector is needed",
+            "whyFails": "'So that' shows a purpose or goal; staying home was a result, not a plan."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "The rain is the reason and staying home is the result, so the result clause starts with 'so'.",
+          "rule": "Reason + so + result. Because + reason.",
+          "whyOthersFail": "'Because' would mark staying home as the reason; 'because of' needs a noun; 'so that' expresses purpose.",
+          "howToAvoid": "Ask: does this clause explain why (because) or what happened next (so)?",
+          "memoryCue": "Rain → so → stayed home."
+        }
+      },
+      "id_": {
+        "objective": "Buka akibat pakai “so” sesudah alasannya disebut.",
+        "misconception": "Kamu pakai “because” di depan akibat, bukan di depan alasan.",
+        "reasoning": "mana alasan dan mana akibat → klausa akibat pakai so",
+        "rule": "Alasan + so + akibat. Because + alasan.",
+        "whyCorrect": "Hujan itu alasannya dan tinggal di rumah itu akibatnya, jadi klausa akibat mulai dari “so”.",
+        "whyOthersFail": "“Because” bakal bikin tinggal di rumah jadi alasannya. “Because of” butuh kata benda. “So that” nyatain tujuan.",
+        "howToAvoid": "Tanya: klausa ini jelasin kenapa (because) atau apa yang terjadi berikutnya (so)?",
+        "memoryCue": "Hujan → so → tinggal di rumah.",
+        "distractors": {
+          "because": {
+            "misconception": "pakai “because” di depan akibat, padahal because buat alasan.",
+            "whyFails": "“because” buka alasan, padahal “we stayed at home” itu akibat dari hujannya."
+          },
+          "because of": {
+            "misconception": "“because of” ditaruh di depan klausa utuh, padahal cuma buat kata benda.",
+            "whyFails": "“because of” diikuti kata benda (“because of the rain”), bukan klausa utuh."
+          },
+          "so that": {
+            "misconception": "pakai penghubung tujuan “so that”, padahal butuh penghubung akibat.",
+            "whyFails": "“so that” nunjukin tujuan. Tinggal di rumah itu akibat, bukan rencana."
+          }
+        }
+      },
+      "th": {
+        "objective": "นำหน้าผลลัพธ์ด้วย 'so' หลังจากบอกสาเหตุแล้ว",
+        "misconception": "ผู้เรียนใช้ 'because' หน้าผลลัพธ์แทนที่จะใช้หน้าสาเหตุ",
+        "reasoning": "อนุประโยคไหนคือสาเหตุ อนุประโยคไหนคือผล → อนุประโยคผลใช้ so",
+        "rule": "สาเหตุ + so + ผลลัพธ์ Because + สาเหตุ",
+        "whyCorrect": "ฝนคือสาเหตุ และการอยู่บ้านคือผลลัพธ์ อนุประโยคผลจึงเริ่มด้วย 'so'",
+        "whyOthersFail": "'because' จะทำให้การอยู่บ้านกลายเป็นสาเหตุ 'because of' ต้องตามด้วยคำนาม ส่วน 'so that' บอกจุดประสงค์",
+        "howToAvoid": "ถามว่าอนุประโยคนี้อธิบายว่าทำไม (because) หรือเกิดอะไรขึ้นต่อ (so)",
+        "memoryCue": "ฝนตก → so → อยู่บ้าน",
+        "distractors": {
+          "because": {
+            "misconception": "ใช้ 'because' นำหน้าผลลัพธ์ ทั้งที่ because ใช้กับสาเหตุ",
+            "whyFails": "'because' นำหน้าสาเหตุ แต่ 'we stayed at home' คือผลของฝน"
+          },
+          "because of": {
+            "misconception": "วาง 'because of' หน้าอนุประโยคเต็ม ทั้งที่มันใช้กับคำนามเท่านั้น",
+            "whyFails": "'because of' ตามด้วยคำนาม ('because of the rain') ไม่ใช่อนุประโยคเต็ม"
+          },
+          "so that": {
+            "misconception": "ใช้ตัวเชื่อมบอกจุดประสงค์ 'so that' ทั้งที่ต้องการตัวเชื่อมบอกผล",
+            "whyFails": "'so that' บอกจุดประสงค์ การอยู่บ้านเป็นผลลัพธ์ ไม่ใช่แผน"
+          }
+        }
+      }
+    },
+    {
+      "id": "TA-203",
+      "family": "tense_aspect",
+      "subskill": "state_verbs_resist_continuous_form",
+      "cefr": "A2",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Keep the state verb 'know' in the present simple even when talking about now.",
+        "misconception": "Learner puts 'know' into the continuous because the situation is happening at the moment.",
+        "reasoning": "identify a state verb -> recall that states do not take -ing -> keep the present simple",
+        "stem": "Sorry, I ___ the answer right now.",
+        "options": [
+          "don't know",
+          "am not knowing",
+          "not know",
+          "don't knowing"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "am not knowing",
+            "misconception": "Assumes present time always requires present continuous.",
+            "whyFails": "'Know' is a state verb, so it stays in the present simple even with 'right now'."
+          },
+          {
+            "option": "not know",
+            "misconception": "reduces the sentence to a fragment: an -ing form with no finite verb to carry the tense",
+            "whyFails": "A negative present simple needs 'don't'; bare 'not know' is not a full verb."
+          },
+          {
+            "option": "don't knowing",
+            "misconception": "bare-verb-without-auxiliary",
+            "whyFails": "After 'don't' the verb is bare: don't know, never don't knowing."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "'Know' describes a state, not an action, so even 'right now' takes the present simple: don't know.",
+          "rule": "State verbs (know, like, want, belong) normally stay in the present simple, not the continuous.",
+          "whyOthersFail": "'Am not knowing' forces a state into -ing; 'not know' has no auxiliary; 'don't knowing' adds -ing after don't.",
+          "howToAvoid": "'Right now' does not mean -ing automatically; check whether the verb is a state first.",
+          "memoryCue": "Know, like, want — no -ing."
+        }
+      },
+      "id_": {
+        "objective": "Kata kerja keadaan “know” tetap present simple walau ngomongin sekarang.",
+        "misconception": "Kamu bikin “know” jadi bentuk -ing karena kejadiannya lagi berlangsung.",
+        "reasoning": "kenali kata kerja keadaan → keadaan nggak pakai -ing → present simple",
+        "rule": "Kata kerja keadaan (know, like, want, belong) biasanya tetap present simple, bukan bentuk -ing.",
+        "whyCorrect": "“Know” ngegambarin keadaan, bukan aksi, jadi walau ada “right now” tetap present simple: don't know.",
+        "whyOthersFail": "“Am not knowing” maksain keadaan jadi -ing. “Not know” nggak punya kata bantu. “Don't knowing” nambah -ing sesudah don't.",
+        "howToAvoid": "“Right now” nggak otomatis berarti -ing. Cek dulu kata kerjanya keadaan atau bukan.",
+        "memoryCue": "Know, like, want — tanpa -ing.",
+        "distractors": {
+          "am not knowing": {
+            "misconception": "ngira waktu sekarang selalu butuh bentuk -ing.",
+            "whyFails": "“know” kata kerja keadaan, jadi tetap present simple walau ada “right now”."
+          },
+          "not know": {
+            "misconception": "kalimatnya jadi potongan tanpa kata kerja utuh.",
+            "whyFails": "negatif present simple butuh “don't”. “Not know” polos bukan kata kerja utuh."
+          },
+          "don't knowing": {
+            "misconception": "kata kerja polos tanpa kata bantu.",
+            "whyFails": "sesudah “don't” kata kerjanya polos: don't know, bukan don't knowing."
+          }
+        }
+      },
+      "th": {
+        "objective": "คงคำกริยาบอกสภาวะ 'know' ไว้ใน present simple แม้พูดถึงตอนนี้",
+        "misconception": "ผู้เรียนทำให้ 'know' เป็นรูป continuous เพราะสถานการณ์กำลังเกิดอยู่ตอนนี้",
+        "reasoning": "ระบุคำกริยาบอกสภาวะ → สภาวะไม่ใช้ -ing → present simple",
+        "rule": "คำกริยาบอกสภาวะ (know, like, want, belong) ปกติคงอยู่ใน present simple ไม่ใช่ continuous",
+        "whyCorrect": "'Know' บรรยายสภาวะ ไม่ใช่การกระทำ แม้มี 'right now' ก็ใช้ present simple: don't know",
+        "whyOthersFail": "'am not knowing' บังคับสภาวะให้เป็น -ing 'not know' ไม่มีกริยาช่วย ส่วน 'don't knowing' เติม -ing หลัง don't",
+        "howToAvoid": "'Right now' ไม่ได้แปลว่าต้องใช้ -ing เสมอ ให้เช็กก่อนว่าคำกริยาเป็นสภาวะหรือไม่",
+        "memoryCue": "Know, like, want — ไม่มี -ing",
+        "distractors": {
+          "am not knowing": {
+            "misconception": "คิดว่าเวลาปัจจุบันต้องใช้รูป -ing เสมอ",
+            "whyFails": "'know' เป็นคำกริยาบอกสภาวะ จึงคง present simple แม้มี 'right now'"
+          },
+          "not know": {
+            "misconception": "ประโยคกลายเป็นเศษที่ไม่มีคำกริยาแท้",
+            "whyFails": "ปฏิเสธใน present simple ต้องมี 'don't' ส่วน 'not know' เปล่า ๆ ไม่ใช่คำกริยาที่สมบูรณ์"
+          },
+          "don't knowing": {
+            "misconception": "คำกริยารูปเปล่าโดยไม่มีกริยาช่วย",
+            "whyFails": "หลัง 'don't' คำกริยาต้องเป็นรูปเปล่า: don't know ไม่ใช่ don't knowing"
+          }
+        }
+      }
+    },
+    {
+      "id": "QN-201",
+      "family": "question_negation",
+      "subskill": "double_negative_avoidance_single_negation_rule",
+      "cefr": "A2",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Use 'any' after a negative verb instead of a second negative word.",
+        "misconception": "Learner adds 'no' after 'don't', producing a double negative.",
+        "reasoning": "check that the verb is already negative -> recall the one-negative rule -> select any",
+        "stem": "We don't have ___ milk left, so I'll buy some.",
+        "options": [
+          "any",
+          "no",
+          "nothing",
+          "none"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "no",
+            "misconception": "uses 'no' before a verb already negated with 'not'",
+            "whyFails": "'Don't' is already negative; adding 'no' makes a double negative."
+          },
+          {
+            "option": "nothing",
+            "misconception": "combining a negated verb ('didn't') with a negative pronoun, creating a non-standard double negative",
+            "whyFails": "'Nothing' is a negative pronoun and cannot stand before the noun 'milk' after 'don't'."
+          },
+          {
+            "option": "none",
+            "misconception": "incorrectly splitting the compound negative pronoun into two words",
+            "whyFails": "'None' replaces a noun ('we have none'); it cannot go directly before 'milk'."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "The verb 'don't have' already carries the negative, so the noun takes 'any': don't have any milk.",
+          "rule": "One negative per clause: don't + any, or have + no. Never don't + no.",
+          "whyOthersFail": "'No' and 'nothing' double the negative; 'none' cannot sit before a noun.",
+          "howToAvoid": "Count the negatives. If the verb has 'not', the next word is 'any'.",
+          "memoryCue": "Don't … any / have … no."
+        }
+      },
+      "id_": {
+        "objective": "Sesudah kata kerja negatif, pakai “any”, bukan kata negatif kedua.",
+        "misconception": "Kamu nambahin “no” sesudah “don't”, jadi negatifnya dobel.",
+        "reasoning": "kata kerjanya udah negatif → cuma boleh satu negatif → pakai any",
+        "rule": "Satu negatif per klausa: don't + any, atau have + no. Jangan don't + no.",
+        "whyCorrect": "“Don't have” udah negatif, jadi kata bendanya pakai “any”: don't have any milk.",
+        "whyOthersFail": "“No” dan “nothing” bikin negatif dobel. “None” nggak bisa duduk di depan kata benda.",
+        "howToAvoid": "Hitung negatifnya. Kalau kata kerjanya udah ada “not”, kata berikutnya “any”.",
+        "memoryCue": "Satu negatif aja: don't … any, atau have … no.",
+        "distractors": {
+          "no": {
+            "misconception": "pakai “no” sesudah kata kerja yang udah negatif, jadi negatifnya dobel.",
+            "whyFails": "“don't” udah negatif. Nambah “no” bikin negatif dobel."
+          },
+          "nothing": {
+            "misconception": "kata kerja negatif digabung sama kata ganti negatif.",
+            "whyFails": "“nothing” itu kata ganti negatif, nggak bisa berdiri di depan kata benda “milk” sesudah “don't”."
+          },
+          "none": {
+            "misconception": "kata ganti dipakai di depan kata benda.",
+            "whyFails": "“none” ngegantiin kata benda (“we have none”), nggak bisa langsung di depan “milk”."
+          }
+        }
+      },
+      "th": {
+        "objective": "หลังคำกริยาปฏิเสธใช้ 'any' แทนคำปฏิเสธคำที่สอง",
+        "misconception": "ผู้เรียนเติม 'no' หลัง 'don't' ทำให้เกิดปฏิเสธซ้อน",
+        "reasoning": "คำกริยาเป็นปฏิเสธอยู่แล้ว → มีปฏิเสธได้ตัวเดียว → ใช้ any",
+        "rule": "หนึ่งอนุประโยคมีปฏิเสธได้ตัวเดียว: don't + any หรือ have + no ห้าม don't + no",
+        "whyCorrect": "คำกริยา 'don't have' เป็นปฏิเสธอยู่แล้ว คำนามจึงใช้ 'any': don't have any milk",
+        "whyOthersFail": "'no' และ 'nothing' ทำให้ปฏิเสธซ้อน ส่วน 'none' วางหน้าคำนามไม่ได้",
+        "howToAvoid": "นับคำปฏิเสธ ถ้าคำกริยามี 'not' แล้ว คำถัดไปคือ 'any'",
+        "memoryCue": "ปฏิเสธตัวเดียวพอ: don't … any หรือ have … no",
+        "distractors": {
+          "no": {
+            "misconception": "ใช้ 'no' หลังคำกริยาที่เป็นปฏิเสธอยู่แล้ว ทำให้ปฏิเสธซ้อนกัน",
+            "whyFails": "'don't' เป็นปฏิเสธอยู่แล้ว เติม 'no' จะกลายเป็นปฏิเสธซ้อน"
+          },
+          "nothing": {
+            "misconception": "รวมคำกริยาปฏิเสธกับสรรพนามปฏิเสธ",
+            "whyFails": "'nothing' เป็นสรรพนามปฏิเสธ วางหน้าคำนาม 'milk' หลัง 'don't' ไม่ได้"
+          },
+          "none": {
+            "misconception": "ใช้สรรพนามในตำแหน่งหน้าคำนาม",
+            "whyFails": "'none' ใช้แทนคำนาม ('we have none') วางตรงหน้า 'milk' ไม่ได้"
+          }
+        }
+      }
+    },
+    {
+      "id": "AR-201",
+      "family": "articles_determiners",
+      "subskill": "definite_article_with_unique_referents_and_superlatives",
+      "cefr": "A2",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Use 'the' before an ordinal like 'first' because it points to one specific item.",
+        "misconception": "Learner treats 'first day' as a new, indefinite noun and uses 'a'.",
+        "reasoning": "identify the ordinal first -> recall that only one first exists -> select the",
+        "stem": "Today is ___ first day of the school year.",
+        "options": [
+          "the",
+          "a",
+          "an",
+          "(no article)"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "a",
+            "misconception": "uses the indefinite article before 'first'",
+            "whyFails": "There is only one first day, so it is specific and takes 'the'."
+          },
+          {
+            "option": "an",
+            "misconception": "same indefinite-article error as 'a', plus a vowel-sound trigger confusion",
+            "whyFails": "'An' is indefinite and also wrong before the consonant sound in 'first'."
+          },
+          {
+            "option": "(no article)",
+            "misconception": "assuming proper-noun-adjacent phrases never take an article",
+            "whyFails": "A singular noun phrase like 'first day' cannot stand without an article."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "'First' picks out one unique day, so the noun phrase is definite: the first day.",
+          "rule": "Use 'the' with ordinals (the first, the second) and superlatives (the best), because only one thing fits.",
+          "whyOthersFail": "'A' and 'an' present the day as one of many; leaving out the article is not possible with a singular count noun.",
+          "howToAvoid": "Ordinal or superlative in front of the noun? Reach for 'the'.",
+          "memoryCue": "The first, the last, the best."
+        }
+      },
+      "id_": {
+        "objective": "Pakai “the” di depan urutan kayak “first” karena nunjuk satu hal yang pasti.",
+        "misconception": "Kamu nganggap “first day” kata benda baru yang belum jelas, jadi pakai “a”.",
+        "reasoning": "lihat kata urutan “first” → yang pertama cuma satu → the",
+        "rule": "Pakai “the” sama kata urutan (the first, the second) dan bentuk paling (the best), karena yang cocok cuma satu.",
+        "whyCorrect": "“First” nunjuk satu hari yang unik, jadi frasanya pasti: the first day.",
+        "whyOthersFail": "“A” dan “an” nampilin harinya sebagai salah satu dari banyak. Tanpa artikel nggak mungkin buat kata benda tunggal yang bisa dihitung.",
+        "howToAvoid": "Ada kata urutan atau bentuk paling di depan kata benda? Ambil “the”.",
+        "memoryCue": "Urutan dan bentuk paling selalu pakai the: the first, the last, the best.",
+        "distractors": {
+          "a": {
+            "misconception": "pakai “a” di depan first, padahal urutan kayak first selalu pakai the.",
+            "whyFails": "hari pertama cuma ada satu, jadi udah pasti dan pakai “the”."
+          },
+          "an": {
+            "misconception": "artikel nggak pasti dipakai dan bunyi awalnya juga bukan vokal.",
+            "whyFails": "“an” itu artikel nggak pasti, dan juga salah di depan bunyi konsonan di “first”."
+          },
+          "(no article)": {
+            "misconception": "ngira frasa yang mirip nama nggak butuh artikel.",
+            "whyFails": "frasa kata benda tunggal kayak “first day” nggak bisa berdiri tanpa artikel."
+          }
+        }
+      },
+      "th": {
+        "objective": "ใช้ 'the' หน้าคำบอกลำดับอย่าง 'first' เพราะชี้ไปที่สิ่งเดียวที่เจาะจง",
+        "misconception": "ผู้เรียนมอง 'first day' เป็นคำนามใหม่ที่ไม่เจาะจงและใช้ 'a'",
+        "reasoning": "เห็นคำบอกลำดับ 'first' → วันแรกมีแค่วันเดียว → the",
+        "rule": "ใช้ 'the' กับคำบอกลำดับ (the first, the second) และรูปขั้นสูงสุด (the best) เพราะมีสิ่งเดียวที่ตรง",
+        "whyCorrect": "'First' เลือกวันเดียวที่ไม่ซ้ำใคร วลีนามจึงเจาะจง: the first day",
+        "whyOthersFail": "'a' และ 'an' นำเสนอวันนั้นเป็นหนึ่งในหลายวัน ส่วนการละคำนำหน้านามทำไม่ได้กับคำนามนับได้เอกพจน์",
+        "howToAvoid": "มีคำบอกลำดับหรือรูปขั้นสูงสุดหน้าคำนาม? หยิบ 'the'",
+        "memoryCue": "คำบอกลำดับและขั้นสูงสุดใช้ the เสมอ: the first, the last, the best",
+        "distractors": {
+          "a": {
+            "misconception": "ใช้ 'a' หน้า first ทั้งที่คำบอกลำดับอย่าง first ต้องใช้ the เสมอ",
+            "whyFails": "วันแรกมีเพียงวันเดียว จึงเจาะจงและใช้ 'the'"
+          },
+          "an": {
+            "misconception": "ใช้คำนำหน้านามไม่เจาะจง และเสียงต้นก็ไม่ใช่สระ",
+            "whyFails": "'an' ไม่เจาะจง และยังผิดเมื่ออยู่หน้าเสียงพยัญชนะใน 'first'"
+          },
+          "(no article)": {
+            "misconception": "คิดว่าวลีที่คล้ายชื่อเฉพาะไม่ต้องมีคำนำหน้านาม",
+            "whyFails": "วลีนามเอกพจน์อย่าง 'first day' อยู่ลำพังโดยไม่มีคำนำหน้านามไม่ได้"
+          }
+        }
+      }
+    }
+  ]
+}

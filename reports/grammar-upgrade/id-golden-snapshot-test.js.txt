@@ -1,0 +1,22 @@
+PASS  FILE grammar-explanations-id.json — identik
+PASS  FILE grammar-misconception-id.json — identik
+PASS  FILE grammar-labels-id.js — identik
+PASS  FILE grammar-templates.json — identik
+PASS  FILE vocabulary-master.json — identik
+PASS  FILE misconception-taxonomy-v1.json — identik
+PASS  FILE manifest.json — identik
+PASS  FILE 404.html — identik
+PASS  FILE features/quota/quota-copy.js — identik
+PASS  FILE features/speaking-listening/gems-core.js — identik
+PASS  FILE features/prasasti/fiezel-prasasti-core.js — identik
+PASS  FILE workers/api/tts/tts-key.js — identik
+PASS  FILE features/audio-assets/fiezel-audio-key.js — identik
+PASS  LITERAL Indonesia: tidak ada yang hilang/berubah — utuh
+PASS  LITERAL Indonesia: tidak ada tambahan liar — bersih
+PASS  ANCHOR html lang="id" (index.html) — sesuai
+PASS  ANCHOR locale AI request dari FiezelI18n.getLocale() (app.js) — sesuai
+PASS  ANCHOR GUARD berbahasa Indonesia (ai-tasks.js) — sesuai
+PASS  ANCHOR locale aset audio default en-US (voice-say) — sesuai
+PASS  ANCHOR nama manifest tetap — sesuai
+
+HIJAU: baseline emas Indonesia utuh.

@@ -1,0 +1,9 @@
+ok - template 2 operasi menghasilkan 2 langkah dan finalAsk
+ok - frasa tak dikenal jatuh ke fallback tanpa melempar
+    coverage nyata: 282/328 template multi-langkah (86.0%)
+ok - coverage grammar-templates.json nyata >= 50% dan dilaporkan
+    naskah diperiksa: 717 langkah, 646 dari kamus operasi
+ok - semua ask di data nyata diakhiri tanda tanya dan berbahasa Indonesia
+ok - input null dan rusak aman
+ok - rantai 4 operasi dipadatkan ke 3 dan mempertahankan operasi terakhir
+Step Tutor: PASS

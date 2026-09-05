@@ -647,7 +647,42 @@
     "confuses focus particle 'even' with concessive 'even if' or 'even though'": "'even' เดี่ยว ๆ แปลว่า 'แม้กระทั่ง' ใช้กับสิ่งที่สุดขั้วที่สุด ส่วนการยอมรับข้อโต้แย้งต้องใช้ 'even if/though' หรือ 'albeit'",
     "keeps 'whom' and patches the clause with a resumptive 'he', mirroring Indonesian 'yang dia'": "ติดโครงสร้าง 'ที่เขา' มา ทั้งที่อนุประโยคขยายนามในภาษาอังกฤษห้ามเติมคำสรรพนามซ้ำหลัง 'who/whom'",
     "swaps in 'which' although the antecedent is a person": "'which' ใช้กับสิ่งของหรือสิ่งที่ไม่ใช่คนเท่านั้น ถ้าเป็นคนต้องใช้ 'who'",
-    "reads formal-sounding 'whose' as another safe upgrade of 'who'": "'whose' เป็นรูปแสดงความเป็นเจ้าของและต้องตามด้วยคำนาม มันไม่ใช่รูปทางการของ 'who'"
+    "reads formal-sounding 'whose' as another safe upgrade of 'who'": "'whose' เป็นรูปแสดงความเป็นเจ้าของและต้องตามด้วยคำนาม มันไม่ใช่รูปทางการของ 'who'",
+    "adds -s to the verb although the subject is plural": "เติม -s ให้คำกริยาทั้งที่ประธานเป็นพหูพจน์",
+    "adds 'to' after the modal can": "เติม 'to' หลัง can ทั้งที่ can ต้องตามด้วยคำกริยารูปพื้นฐานทันที",
+    "uses the past form for a present ability": "ใช้รูปอดีตทั้งที่พูดถึงความสามารถในปัจจุบัน",
+    "doubles the past marking with 'did' plus -ed": "ทำเครื่องหมายอดีตซ้ำสองครั้ง: ใช้ 'did' บวก -ed",
+    "uses the third-person -s form after 'you' in a command": "เติม -s ให้คำสั่ง ทั้งที่คำสั่งไม่มีประธานที่ต้องการ -s",
+    "puts the frequency adverb before the verb be": "วางคำบอกความถี่ไว้หน้า is/are ทั้งที่ควรอยู่หลัง",
+    "puts the frequency adverb after the object": "วางคำบอกความถี่ไว้หลังกรรม ทั้งที่ตำแหน่งของมันอยู่หน้าคำกริยา",
+    "uses 'want' where the polite would-like formula is expected": "ใช้ 'want' ที่ตรงเกินไป ทั้งที่บริบทต้องการการขอแบบสุภาพ",
+    "uses a to-infinitive after 'enjoy'": "ใช้ 'to' หลัง enjoy ทั้งที่ enjoy ต้องตามด้วยรูป -ing เสมอ",
+    "uses the past simple for a life experience without a time": "ใช้ past simple กับประสบการณ์ชีวิตที่ไม่ได้ระบุเวลา",
+    "uses 'since' before a length of time": "ใช้ 'since' หน้าช่วงเวลา ทั้งที่ since ใช้กับจุดเริ่มต้น",
+    "uses 'for' before a starting point": "ใช้ 'for' หน้าจุดเริ่มต้น ทั้งที่ for ใช้กับช่วงเวลา",
+    "adds -er to a long adjective": "เติม -er ให้คำคุณศัพท์ยาว ทั้งที่คำยาวต้องใช้ more",
+    "uses the superlative after 'the' for a two-item comparison": "ใช้รูปขั้นสูงสุด ทั้งที่เปรียบเทียบแค่สองสิ่ง",
+    "uses the adverb where an adjective after 'be' is needed": "ใช้รูป -ly หลัง is/are ทั้งที่หลัง be ต้องใช้คำคุณศัพท์",
+    "asks about a countable plural noun with 'how much'": "ถามถึงคำนามนับได้ด้วย 'how much' ทั้งที่ควรใช้ 'how many'",
+    "introduces the result clause with 'because'": "ใช้ 'because' นำหน้าผลลัพธ์ ทั้งที่ because ใช้กับสาเหตุ",
+    "uses 'no' before a verb already negated with 'not'": "ใช้ 'no' หลังคำกริยาที่เป็นปฏิเสธอยู่แล้ว ทำให้ปฏิเสธซ้อนกัน",
+    "uses the indefinite article before 'first'": "ใช้ 'a' หน้า first ทั้งที่คำบอกลำดับอย่าง first ต้องใช้ the เสมอ",
+    "uses a positive tag after a positive statement": "ใช้ tag บวกหลังประโยคบอกเล่าเชิงบวก ทั้งที่ต้องกลับเป็นปฏิเสธ",
+    "repeats the noun instead of using a pronoun in the tag": "ใช้คำนามซ้ำใน tag ทั้งที่ tag ต้องใช้สรรพนาม",
+    "uses the present perfect for an event before another past event": "ใช้ present perfect กับเหตุการณ์ที่เกิดก่อนเหตุการณ์อดีตอีกเหตุการณ์หนึ่ง",
+    "keeps the present tense inside a reported question after a past reporting verb": "คงรูปปัจจุบันไว้ในคำถามที่รายงาน ทั้งที่คำกริยารายงานเป็นอดีต",
+    "adds 'do' to an embedded question": "เติม 'do' ในคำถามที่ฝังอยู่ในประโยค ทั้งที่ภายในประโยคไม่ต้องใช้ do",
+    "uses 'would' in the wish clause about one's own situation": "ใช้ 'would' ในอนุประโยค wish เกี่ยวกับสถานการณ์ของตัวเอง ทั้งที่ต้องใช้ wish + past simple",
+    "uses 'yet' in a positive statement": "ใช้ 'yet' ในประโยคบอกเล่าเชิงบวก ทั้งที่ yet ใช้กับปฏิเสธและคำถาม",
+    "uses a reflexive pronoun where the plain object pronoun is needed": "ใช้สรรพนามสะท้อน (-self) ทั้งที่ผู้กระทำและกรรมเป็นคนละคน",
+    "uses the past simple in the result clause of a third conditional": "ใช้ past simple ในอนุประโยคผลของเงื่อนไขแบบที่สาม ทั้งที่ต้องใช้ would have + past participle",
+    "puts 'be' after the past participle in a modal passive": "วาง 'be' หลัง past participle ทั้งที่ลำดับต้องเป็น modal + be + past participle",
+    "puts 'by' before the person who has the work done": "วาง 'by' หน้าคนที่สั่งให้ทำ ทั้งที่คนนั้นเป็นประธาน ไม่ใช่ผู้กระทำ",
+    "uses 'which' for a person": "ใช้ 'which' กับคน ทั้งที่ which ใช้กับสิ่งของหรือสัตว์เท่านั้น",
+    "puts 'despite' before a full clause": "วาง 'despite' หน้าอนุประโยคเต็ม ทั้งที่ despite ใช้กับคำนามหรือรูป -ing เท่านั้น",
+    "uses 'but' as a subordinating connector at the start of the sentence": "ใช้ 'but' ต้นประโยคเพื่อรวมสองอนุประโยค ทั้งที่ but ใช้เชื่อมตรงกลางเท่านั้น",
+    "uses 'so' before a noun phrase with an adjective": "ใช้ 'so' หน้าคำคุณศัพท์ + คำนาม ทั้งที่ตรงนั้นต้องใช้ 'such'",
+    "drops the article after 'such' before a singular noun": "ตัด 'a' หลัง such ทิ้ง ทั้งที่คำนามเอกพจน์ต้องมีคำนำหน้านาม"
   },
   "codes": {
     "tense_aspect.aspect_for_completed": {
@@ -847,5 +882,5 @@
       "description": "การถ่ายโอนจากภาษาแม่ เช่น ละคำกริยา be แบบที่ภาษาไทยละคำว่า “เป็น” ได้ ไม่เติมพหูพจน์ให้คำนาม (two book) หรือแปลคำแสดงคำถามแบบตรงตัว เป็นการคงโครงสร้างภาษาแม่ไว้ในประโยคภาษาอังกฤษ"
     }
   },
-  "count": 644
+  "count": 679
 }
