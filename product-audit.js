@@ -1,6 +1,6 @@
 const fs=require('fs');const path=require('path');
 const root=__dirname;
-const app=fs.readFileSync(path.join(root,'app.js'),'utf8');
+const app=fs.readFileSync(path.join(root,'app.js'),'utf8')+'\n'+fs.readFileSync(path.join(root,'features/i18n/fiezel-i18n-strings.js'),'utf8');
 const css=fs.readFileSync(path.join(root,'style.css'),'utf8');
 const index=fs.readFileSync(path.join(root,'index.html'),'utf8');
 const worker=fs.readFileSync(path.join(root,'fiezel-core-worker.js'),'utf8');
@@ -16,7 +16,7 @@ check('Error pattern detector',app.includes('errorPatterns')&&app.includes('sele
 check('Confusion network is history-backed',app.includes('confusionPairs')&&app.includes('confusion-network'),'Confusion pairs are ranked from observed wrong answers and vocabulary relations.');
 check('Diagnostic report',app.includes('diagnosticReport')&&app.includes('rows.map'),'Report separates Vocabulary, Grammar and Reading evidence.');
 check('Reading skill map',app.includes("reading_inference")&&app.includes("reading_comparison"),'Reading skills are tracked independently.');
-check('Smart review UI exposes forgetting',app.includes('risiko lupa ${Math.round(forgettingProbability(x)*100)}%'),'Ulangan Pintar menjelaskan risiko lupa dengan Bahasa Indonesia.');
+check('Smart review UI exposes forgetting',app.includes("tr('progress.reviewRow',{mastery:x.mastery||0,risk:Math.round(forgettingProbability(x)*100)})")&&app.includes('risiko lupa {risk}%'),'Ulangan Pintar menjelaskan risiko lupa dengan Bahasa Indonesia.');
 check('Creator credit',app.includes('./instagram.svg')&&app.includes('@fitrarustqi')&&fs.existsSync(path.join(root,'instagram.svg')),'Uses a local SVG Instagram icon and creator handle.');
 check('No fake Instagram glyph',!app.includes('class="instagram-mark">◎'),'Legacy placeholder glyph removed.');
 check('Daily brief',app.includes('dailyBrief')&&app.includes('goal:'),'Daily learning recommendation exists.');

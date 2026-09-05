@@ -15,7 +15,7 @@ let oscillatorStarts=0;
 class FakeAudioContext{constructor(){this.currentTime=0;this.state='running';this.destination={}}createGain(){return{gain:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){}},connect(){}}}createOscillator(){return{type:'sine',frequency:{value:0,setValueAtTime(){}},connect(){},start(){oscillatorStarts++},stop(){}}}resume(){this.state='running'}suspend(){this.state='suspended'}close(){this.state='closed'}}
 const context={console,Notification,document,localStorage,fetch,window:null,self:null,navigator:{vibrate(){return true}},Date,Intl,Math,URL,Error,Promise,setTimeout,clearTimeout,setInterval:()=>({unref(){}}),clearInterval(){},SpeechSynthesisUtterance:function(){},speechSynthesis:{cancel(){},speak(){}},AudioContext:FakeAudioContext};
 context.window=context;context.self=context;context.FIEZEL_VERSION=JSON.parse(fs.readFileSync(path.join(root,'VERSION.json'),'utf8')).version;context.window.scrollTo=()=>{};context.window.requestAnimationFrame=fn=>fn();
-vm.createContext(context);vm.runInContext(app,context,{filename:'app.js'});
+vm.createContext(context);vm.runInContext(fs.readFileSync(path.join(root,'features/i18n/fiezel-i18n-strings.js'),'utf8')+'\n'+fs.readFileSync(path.join(root,'features/i18n/fiezel-i18n.js'),'utf8'),context,{filename:'fiezel-i18n.js'});vm.runInContext(app,context,{filename:'app.js'});
 const signature=q=>String(q.question).toLowerCase().replace(/\s+/g,' ').trim()+'||'+q.options.map(x=>String(x).toLowerCase()).sort().join('|');
 
 setTimeout(()=>{try{

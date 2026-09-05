@@ -37,34 +37,49 @@
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <div id="answerBurst" class="answer-burst hidden" role="status" aria-live="assertive" aria-atomic="true"></div>
 
-  <div id="welcome" class="welcome notification-gate" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle" aria-describedby="notificationGateBody">
+  <div id="languageGate" class="welcome notification-gate language-gate hidden" role="dialog" aria-modal="true" aria-labelledby="languageGateTitle" data-testid="language-gate">
     <div class="welcome-panel notification-panel">
-      <div class="welcome-icon"><i data-lucide="bell-ring"></i></div>
-      <div class="welcome-mark">FIEZEL REMINDER · WAJIB NYALA</div>
-      <h2 id="welcomeTitle">Oii Jahran, nyalain notifikasi dulu 👀</h2>
-      <p id="notificationGateBody">Biar FIEZEL bisa nyolek kalau lu kelamaan nggak belajar, target harian belum beres, atau ada materi yang waktunya direview.</p>
-      <div class="notification-requirement"><i data-lucide="shield-check"></i><span>Statusnya harus <b>Allow / Izinkan</b>. Kalau ditolak atau dicabut, FIEZEL belum bisa dibuka.</span></div>
-      <p id="notificationGateStatus" class="notification-status" role="status">Memeriksa izin notifikasi…</p>
-      <button id="notificationGateButton" type="button" class="primary wide" onclick="requestRequiredNotificationPermission()">Aktifkan notifikasi <i data-lucide="bell-ring"></i></button>
-      <p id="notificationGateHelp" class="notification-help">Browser akan menampilkan permintaan izin. Pilih <b>Allow / Izinkan</b> untuk melanjutkan.</p>
+      <div class="welcome-icon"><i data-lucide="languages"></i></div>
+      <div class="welcome-mark">FIEZEL · เลือกภาษา / PILIH BAHASA</div>
+      <h2 id="languageGateTitle">เลือกภาษาของแอป · Pilih bahasa aplikasi</h2>
+      <p class="language-gate-body">ภาษานี้ใช้กับหน้าจอ คำสั่ง และคำอธิบาย ส่วนเนื้อหาภาษาอังกฤษที่เรียนจะยังคงเป็นภาษาอังกฤษ<br>Bahasa ini dipakai untuk antarmuka, instruksi, dan penjelasan. Materi bahasa Inggris tetap dalam bahasa Inggris.</p>
+      <div class="language-options">
+        <button type="button" class="language-option" data-locale="th" onclick="chooseLocale('th')" data-testid="language-option-th"><strong>ภาษาไทย</strong><span>อินเทอร์เฟซไทย · เรียนภาษาอังกฤษ</span></button>
+        <button type="button" class="language-option" data-locale="id" onclick="chooseLocale('id')" data-testid="language-option-id"><strong>Bahasa Indonesia</strong><span>Antarmuka Indonesia · belajar English</span></button>
+      </div>
     </div>
   </div>
 
-  <div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Dialog FIEZEL">
+  <div id="welcome" class="welcome notification-gate" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle" aria-describedby="notificationGateBody">
+    <div class="welcome-panel notification-panel">
+      <div class="welcome-icon"><i data-lucide="bell-ring"></i></div>
+      <div class="welcome-mark" data-i18n="gate.mark">FIEZEL REMINDER · WAJIB NYALA</div>
+      <h2 id="welcomeTitle" data-i18n="gate.title">Oii Jahran, nyalain notifikasi dulu 👀</h2>
+      <p id="notificationGateBody" data-i18n="gate.body">Biar FIEZEL bisa nyolek kalau lu kelamaan nggak belajar, target harian belum beres, atau ada materi yang waktunya direview.</p>
+      <div class="notification-requirement"><i data-lucide="shield-check"></i><span data-i18n="gate.requirement" data-i18n-html>Statusnya harus <b>Allow / Izinkan</b>. Kalau ditolak atau dicabut, FIEZEL belum bisa dibuka.</span></div>
+      <p id="notificationGateStatus" class="notification-status" role="status" data-i18n="gate.checking">Memeriksa izin notifikasi…</p>
+      <button id="notificationGateButton" type="button" class="primary wide" onclick="requestRequiredNotificationPermission()" data-testid="notification-gate-button"><span data-i18n="gate.button">Aktifkan notifikasi</span> <i data-lucide="bell-ring"></i></button>
+      <p id="notificationGateHelp" class="notification-help" data-i18n="gate.help" data-i18n-html>Browser akan menampilkan permintaan izin. Pilih <b>Allow / Izinkan</b> untuk melanjutkan.</p>
+    </div>
+  </div>
+
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Dialog FIEZEL" data-i18n-aria-label="nav.aria.dialog">
     <div class="modal-panel" id="modalPanel"></div>
   </div>
 
-  <nav class="bottomnav" aria-label="Navigasi utama">
-    <button type="button" class="nav active" data-view="home" onclick="go('home')" aria-label="Beranda"><i data-lucide="house"></i><span>Home</span></button>
-    <button type="button" class="nav" data-view="vocab" onclick="go('vocab')" aria-label="Vocabulary"><i data-lucide="book-a"></i><span>Vocab</span></button>
-    <button type="button" class="nav" data-view="grammar" onclick="go('grammar')" aria-label="Grammar"><i data-lucide="braces"></i><span>Grammar</span></button>
-    <button type="button" class="nav" data-view="reading" onclick="go('reading')" aria-label="Reading"><i data-lucide="book-open-text"></i><span>Reading</span></button>
-    <button type="button" class="nav" data-view="progress" onclick="go('progress')" aria-label="Peta belajar"><i data-lucide="chart-no-axes-combined"></i><span>Peta</span></button>
+  <nav class="bottomnav" aria-label="Navigasi utama" data-i18n-aria-label="nav.aria.main">
+    <button type="button" class="nav active" data-view="home" onclick="go('home')" aria-label="Beranda" data-i18n-aria-label="nav.aria.homeTab" data-testid="nav-home"><i data-lucide="house"></i><span data-i18n="nav.home">Home</span></button>
+    <button type="button" class="nav" data-view="vocab" onclick="go('vocab')" aria-label="Vocabulary" data-i18n-aria-label="nav.vocab" data-testid="nav-vocab"><i data-lucide="book-a"></i><span data-i18n="nav.vocab">Vocab</span></button>
+    <button type="button" class="nav" data-view="grammar" onclick="go('grammar')" aria-label="Grammar" data-i18n-aria-label="nav.grammar" data-testid="nav-grammar"><i data-lucide="braces"></i><span data-i18n="nav.grammar">Grammar</span></button>
+    <button type="button" class="nav" data-view="reading" onclick="go('reading')" aria-label="Reading" data-i18n-aria-label="nav.reading" data-testid="nav-reading"><i data-lucide="book-open-text"></i><span data-i18n="nav.reading">Reading</span></button>
+    <button type="button" class="nav" data-view="progress" onclick="go('progress')" aria-label="Peta belajar" data-i18n-aria-label="nav.aria.progress" data-testid="nav-progress"><i data-lucide="chart-no-axes-combined"></i><span data-i18n="nav.map">Peta</span></button>
   </nav>
 
   <script src="https://js.puter.com/v2/"></script>
   <script src="./lucide.min.js"></script>
   <script src="./version.js"></script>
+  <script src="./features/i18n/fiezel-i18n-strings.js"></script>
+  <script src="./features/i18n/fiezel-i18n.js"></script>
   <script src="./report-config.js"></script>
   <script src="./core-config.js"></script>
   <script src="./content-canary.js"></script>

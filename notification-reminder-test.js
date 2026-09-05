@@ -6,13 +6,14 @@ function classList(){const s=new Set();return{add(...xs){xs.forEach(x=>s.add(x))
 const elements={};function element(id){return elements[id]||=( {id,innerHTML:'',textContent:'',disabled:false,onclick:null,className:'',classList:classList(),setAttribute(){},addEventListener(){},focus(){}} )}
 const bodyClasses=classList();
 const document={baseURI:'http://localhost/',body:{classList:bodyClasses},visibilityState:'visible',getElementById:element,querySelector(){return null},querySelectorAll(){return[]},createElement(){return{className:'',textContent:'',disabled:false,onclick:null,classList:classList(),append(){},addEventListener(){}}},addEventListener(){}};
-const store={};const localStorage={getItem:k=>Object.prototype.hasOwnProperty.call(store,k)?store[k]:null,setItem:(k,v)=>store[k]=String(v),removeItem:k=>delete store[k]};
+const store={'fiezel-locale':'id'};// language already chosen; the gate under test is the notification gate
+const localStorage={getItem:k=>Object.prototype.hasOwnProperty.call(store,k)?store[k]:null,setItem:(k,v)=>store[k]=String(v),removeItem:k=>delete store[k]};
 const notifications=[];const Notification=function(title,options){notifications.push({title,options});this.close=()=>{};};Notification.permission='denied';Notification.requestPermission=async()=>Notification.permission;
 const fetch=async u=>{const file=String(u).split('/').pop();return{ok:true,json:async()=>JSON.parse(fs.readFileSync(path.join(root,file),'utf8'))}};
 const noopTimer=()=>({unref(){}});
 const navigator={vibrate(){return true}};
 const context={console,document,localStorage,Notification,navigator,fetch,location:{href:'http://localhost/'},window:null,self:null,Date,Intl,Math,URL,Error,Promise,setTimeout,clearTimeout,setInterval:noopTimer,clearInterval(){},SpeechSynthesisUtterance:function(){},speechSynthesis:{cancel(){},speak(){}},FIEZEL_REQUIRE_NOTIFICATIONS:true};context.window=context;context.self=context;context.window.scrollTo=()=>{};context.window.focus=()=>{};
-vm.createContext(context);vm.runInContext(app,context,{filename:'app.js'});
+vm.createContext(context);vm.runInContext(fs.readFileSync(path.join(root,'features/i18n/fiezel-i18n-strings.js'),'utf8')+'\n'+fs.readFileSync(path.join(root,'features/i18n/fiezel-i18n.js'),'utf8'),context,{filename:'fiezel-i18n.js'});vm.runInContext(app,context,{filename:'app.js'});
 setTimeout(async()=>{
   try{
     assert(bodyClasses.contains('notification-locked'),'denied permission must lock the application');

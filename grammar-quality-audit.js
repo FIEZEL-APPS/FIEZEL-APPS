@@ -88,7 +88,7 @@ seededMath.random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed
 class FakeAudioContext{constructor(){this.currentTime=0;this.state='running';this.destination={}}createGain(){return{gain:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){}},connect(){}}}createOscillator(){return{type:'sine',frequency:{value:0,setValueAtTime(){}},connect(){},start(){},stop(){}}}resume(){this.state='running'}suspend(){this.state='suspended'}close(){this.state='closed'}}
 const context={console,Notification,document,localStorage,fetch,window:null,self:null,navigator:{vibrate(){return true}},Date,Intl,Math:seededMath,URL,Error,Promise,setTimeout,clearTimeout,setInterval:()=>({unref(){}}),clearInterval(){},SpeechSynthesisUtterance:function(){},speechSynthesis:{cancel(){},speak(){}},AudioContext:FakeAudioContext};
 context.window=context;context.self=context;context.FIEZEL_VERSION='5.19.0';context.window.scrollTo=()=>{};context.window.requestAnimationFrame=fn=>fn();
-vm.createContext(context);vm.runInContext(app,context,{filename:'app.js'});
+vm.createContext(context);vm.runInContext(fs.readFileSync(path.join(root,'features/i18n/fiezel-i18n-strings.js'),'utf8')+'\n'+fs.readFileSync(path.join(root,'features/i18n/fiezel-i18n.js'),'utf8'),context,{filename:'fiezel-i18n.js'});vm.runInContext(app,context,{filename:'app.js'});
 
 setTimeout(()=>{
   try{

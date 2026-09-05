@@ -1,6 +1,6 @@
 const fs=require('fs'),path=require('path'),vm=require('vm');
 const root=__dirname;
-const app=fs.readFileSync(path.join(root,'app.js'),'utf8');
+const app=fs.readFileSync(path.join(root,'app.js'),'utf8')+'\n'+fs.readFileSync(path.join(root,'features/i18n/fiezel-i18n-strings.js'),'utf8');
 const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
 const css=fs.readFileSync(path.join(root,'style.css'),'utf8');
 const VERSION=JSON.parse(fs.readFileSync(path.join(root,'VERSION.json'),'utf8')).version;
@@ -56,7 +56,7 @@ const localStorage={getItem:k=>store[k]||null,setItem:(k,v)=>store[k]=v,removeIt
 const fetch=async url=>{const file=String(url).split('/').pop();return {ok:true,json:async()=>JSON.parse(fs.readFileSync(path.join(root,file),'utf8'))}};
 const ctx={console,Notification,self:null,document,localStorage,fetch,location:{href:'http://localhost/'},window:{},Date,Math,URL,setTimeout,clearTimeout};
 ctx.window=ctx;ctx.self=ctx;ctx.window.scrollTo=()=>{};ctx.window.speechSynthesis={cancel(){},speak(){}};ctx.window.SpeechSynthesisUtterance=function(text){this.text=text};
-vm.createContext(ctx);vm.runInContext(app,ctx,{filename:'app.js'});
+vm.createContext(ctx);vm.runInContext(fs.readFileSync(path.join(root,'features/i18n/fiezel-i18n-strings.js'),'utf8')+'\n'+fs.readFileSync(path.join(root,'features/i18n/fiezel-i18n.js'),'utf8'),ctx,{filename:'fiezel-i18n.js'});vm.runInContext(app,ctx,{filename:'app.js'});
 setTimeout(()=>{
  try{
   const st=ctx.__getFiezelState();

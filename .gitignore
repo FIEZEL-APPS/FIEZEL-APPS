@@ -25,3 +25,8 @@ CONTENT-ADOPTION-PROOF.json
 push-secrets*.json
 push-secrets*.txt
 fiezel-autonomy-config.json
+*.env
+credentials.json
+*.pem
+*.key
+.credentials

@@ -2,7 +2,7 @@ require('./app-report-control-path-test.js');
 const fs=require('fs'),path=require('path');
 const root=__dirname;
 const read=name=>fs.readFileSync(path.join(root,name),'utf8');
-const app=read('app.js'),css=read('style.css'),html=read('index.html'),worker=read('fiezel-report-worker.js'),setup=read('creator-report-setup.html'),dashboard=read('creator-report-dashboard.html');
+const app=read('app.js')+'\n'+read('features/i18n/fiezel-i18n-strings.js'),css=read('style.css'),html=read('index.html'),worker=read('fiezel-report-worker.js'),setup=read('creator-report-setup.html'),dashboard=read('creator-report-dashboard.html');
 const failures=[];
 const check=(condition,message)=>{if(!condition)failures.push(message)};
 

@@ -7,7 +7,7 @@ const localStorage={getItem:k=>store[k]||null,setItem:(k,v)=>store[k]=String(v),
 const fetch=async url=>{if(String(url).includes('/health'))return{ok:true,json:async()=>({status:'ok',protocol:'1.7'})};const file=String(url).split('/').pop();return{ok:true,json:async()=>JSON.parse(fs.readFileSync(path.join(root,file),'utf8'))}};
 const context={console,Notification,document,localStorage,fetch,window:null,self:null,Date,Math,URL,Error,Promise,setTimeout,clearTimeout,SpeechSynthesisUtterance:function(){},speechSynthesis:{cancel(){},speak(){}}};
 context.window=context;context.self=context;context.FIEZEL_VERSION=JSON.parse(fs.readFileSync(path.join(root,'VERSION.json'),'utf8')).version;context.FIEZEL_CORE_CONFIG={workerUrl:'https://fiezel-core-test.puter.work',protocolVersion:'1.7',aiGateway:'core-only',remotePushRequired:true};context.window.scrollTo=()=>{};
-vm.createContext(context);vm.runInContext(app,context,{filename:'app.js'});
+vm.createContext(context);vm.runInContext(fs.readFileSync(path.join(root,'features/i18n/fiezel-i18n-strings.js'),'utf8')+'\n'+fs.readFileSync(path.join(root,'features/i18n/fiezel-i18n.js'),'utf8'),context,{filename:'fiezel-i18n.js'});vm.runInContext(app,context,{filename:'app.js'});
 const response=text=>({ok:true,status:200,json:async()=>({text,model:'gpt-5.4-nano',via:'fiezel-core-worker',protocol:'1.7'})});
 setTimeout(async()=>{try{
   assert(html.indexOf('https://js.puter.com/v2/')>=0&&html.indexOf('https://js.puter.com/v2/')<html.indexOf('./version.js'),'Puter.js script order is invalid');
