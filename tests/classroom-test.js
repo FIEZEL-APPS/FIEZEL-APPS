@@ -170,7 +170,11 @@ test('integration loads correction after Tutor v3 and preserves five primary des
   // m025-246: tab bar dipangkas ke empat tujuan (Hari ini / Latihan / Progres / Pengaturan).
   // Pola lama menghitung `class="nav"` lalu menambah 1 untuk tab aktif; pola ini langsung
   // menghitung keduanya, jadi ia tidak lagi bergantung pada asumsi "tepat satu tab aktif".
-  assert.strictEqual((index.match(/class="nav(?: active)?"/g) || []).length, 4);
+  // m025-258: redesign hybrid mengembalikan tab bar ke LIMA tujuan (Latihan / Kelas /
+  // Hari ini / Progres / Profil) - Pengaturan pindah ke topbar dan ke tab Profil. Angkanya
+  // ikut naik ke 5; yang dijaga gerbang ini tetap sama: jumlah tab tidak boleh berubah
+  // diam-diam.
+  assert.strictEqual((index.match(/class="nav(?: active)?"/g) || []).length, 5);
   assert.ok(index.includes('./features/tutor-classroom/fiezel-tutor-v3.js'));
   // m025-95: tambalan suara Indonesia dihapus; Classroom kini bicara Inggris bersubtitle.
   assert.ok(!index.includes('fiezel-tutor-indonesian-voice-fix.js'),
