@@ -1,6 +1,6 @@
 {
   "schema": "id-golden-baseline/1",
-  "generatedAt": "2026-09-05T17:45:42.026Z",
+  "generatedAt": "2026-09-05T19:21:47.014Z",
   "root": "/home/user/FIEZEL-APPS",
   "files": {
     "grammar-explanations-id.json": "90912890391b2e491f31a6558aec5b7cecccbf56bc7c341fb1106291b5c721b6",
@@ -18,8 +18,8 @@
     "features/audio-assets/fiezel-audio-key.js": "11624e303917fe0df881ac3f410911587766fd6f4d2491ca6687ec42de8d457d"
   },
   "literals": {
-    "count": 2708,
-    "sha256": "099be513dfcc0e6b7b8ca499c94cabdefa1fd8a94b0d1a480314ec4c1ec3ec73",
+    "count": 2707,
+    "sha256": "e0fbd6d803ca3848e5eb77e444afb6a873e0bc192d707f2121e49d6b9dac18af",
     "list": [
       "\n      SETELAH beat concern ≤1000ms selesai (13 §2.2), bukan menimpanya. Tanpa bunyi:\n      SFX hint sudah dipensiunkan (20 §4); cooldown 8 detiknya dijaga komponen. */\n   setTimeout(()=>{try{pawReact(",
       "\n      case 'silent':                        // L5: kalau mulut sempat mulai (taksiran L3 kandas), tutup SEKARANG\n        degradedLatch = false;\n        closeTurn(false);\n        break;\n      case 'interrupt':                     // stop(): snap tutup\n        degradedLatch = false;\n        closeTurn(true);\n        break;\n      default:\n        break;                              // fase asing dari versi fasad lebih baru: diabaikan tanpa suara\n    }\n  }\n\n  try { doc.addEventListener('fiezel-speech', onSpeech); } catch (_) {}\n\n  /* Suara terdegradasi (audibility-fix): mulut mati SEKETIKA dan tidak boleh\n     hidup lagi untuk sisa giliran — apa pun yang masih dikirim lapisan bawah. */\n  try {\n    root.addEventListener('fiezel-neural-voice-degraded', function () {\n      if (turn) closeTurn(true);\n      degradedLatch = true;                 // dilepas oleh end/silent/interrupt fasad berikutnya\n    });\n  } catch (_) {}\n\n  /* Permukaan kecil untuk Diagnostics/tes — bukan API pemanggil biasa:\n     satu-satunya pintu bicara tetap FiezelVoiceSay.say(). */\n  root.FiezelSpeechBridge = Object.freeze({\n    SCHEMA: SCHEMA,\n    speaking: function () { return !!turn; },\n    degraded: function () { return !!degradedLatch; },\n    motionAllowed: motionAllowed\n  });\n})(typeof self !== 'undefined' ? self : (typeof window !== 'undefined' ? window : this));\n",
@@ -1252,6 +1252,8 @@
       "Hasil tes awal: <b>{placement}</b>. Level yang sudah lulus ujian: <b>{verif}</b>.",
       "Hujan yang turun di sawah sepanjang pagi",
       "ID kamu: @{handle} · bagikan ke teman",
+      "ID online kamu belum aktif. Aktifkan sekali dari tab Profil.",
+      "ID online kamu memakai nama yang kamu isi saat pertama masuk. Cukup sekali, tidak ada formulir lagi.",
       "IELTS kelas 2 kedengerannya masih jauh? Itu jebakannya, bro.",
       "IELTS/TOEFL bakal jadi salah satu pintunya. Mumpung masih kelas 1, cicil skill-nya biar kelas 2 nggak panik.",
       "Ia bekerja di kamar belakang itu",
@@ -2086,7 +2088,6 @@
       "Presentasi yang sudah ia bawakan pada Kamis",
       "Printer yang berhenti di tengah pencetakan laporannya",
       "Prioritas berikutnya adalah {name} karena akurasinya paling rendah di antara area yang sudah terukur.",
-      "Profil = main bareng teman + papan mingguan. Pakai nama samaran — tanpa email, tanpa nama asli, gratis, dan sepenuhnya opsional: semua fitur belajar tetap terbuka tanpa profil.",
       "Profil adaptif belum memiliki area yang cukup terukur. Lanjutkan latihan level terlebih dahulu.",
       "Profil belum bisa dibuka",
       "Profil murid dan teman",
@@ -2308,7 +2309,6 @@
       "Tandai semua dibaca",
       "Tanggal makin jalan, semester nggak nunggu siapa-siapa.",
       "Tangkap inti cerita, detail, dan tulis yang kamu dengar. Jawaban terbuka setelah audio diputar.",
-      "Tanpa email, tanpa nomor HP, tanpa nama asli. Yang tersimpan di server hanya nama samaran, level, dan runtun harian (granularitas hari, tanpa jam). Sembunyikan diri dari papan kapan pun lewat Pengaturan → Online &amp; Teman → Mode privat papan.",
       "Tanpa petunjuk · kalau keluar di tengah, kesempatannya terpakai",
       "Tanya apa saja yang belum kamu mengerti, pakai bahasa sehari-hari. Misalnya <b>kenapa pakai did bukan do</b>. Materi terkait dibatasi ke level {level}.",
       "Target bermakna hari ini tercapai.",
@@ -2327,7 +2327,6 @@
       "Teksnya jalan bareng audionya, kalimat demi kalimat. Sambil dengar sambil baca \\u2014 telinga dan mata belajar bareng.",
       "Telur yang ia jual di warung kecil",
       "Teman belajar ({count})",
-      "Teman boleh melihat progres belajarku (runtun &amp; level — granularitas hari)",
       "Temanmu milih {opsiDikutip}. Alasan mana yang paling pas jelasin kenapa pilihan itu meleset?\\n{stem}",
       "Tempat gratis untuk semua anggota",
       "Tempat ia mengikuti pelajaran daringnya",

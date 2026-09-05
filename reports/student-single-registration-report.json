@@ -1,0 +1,77 @@
+{
+  "schema": "fiezel-student-single-registration-v1",
+  "generatedAt": "2026-09-05T19:23:04.305Z",
+  "pass": true,
+  "checks": [
+    {
+      "name": "socialHandleCandidates() bisa di-extract dari app.js",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "modul sosial memuat validateHandle",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "R1 setiap nama melahirkan minimal satu handle yang lolos aturan server",
+      "pass": true,
+      "detail": "nama tanpa kandidat sah: []"
+    },
+    {
+      "name": "R1 kandidat bersifat murni (dua panggilan dengan seed sama = hasil sama)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "R1 nama sama menghasilkan handle pertama yang sama — ID online tidak berpindah",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "R2 profileCreate memakai friendsVisible:true dan leagueOptIn:true",
+      "pass": true,
+      "detail": "sudah mendaftar = wajib tampil di papan dengan nama yang dipilih sendiri"
+    },
+    {
+      "name": "R2 nol kotak centang persetujuan sosial di app.js",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "R2 nol kartu disclaimer profil di app.js",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "R2 naskah persetujuan ikut dihapus dari copy-map Indonesia",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "R3 boot tidak memanggil armPuterAuthGate() lagi",
+      "pass": true,
+      "detail": "satu-satunya kemunculan yang boleh tersisa adalah definisinya"
+    },
+    {
+      "name": "R3 perkenalan yang selesai langsung memicu pendaftaran",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "R4 Pengaturan memuat kartu pendaftaran sekali ketuk",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "R5 pendaftaran memeriksa profil yang sudah ada lebih dulu",
+      "pass": true,
+      "detail": "mendaftar dua kali adalah persis keluhan owner"
+    },
+    {
+      "name": "R5 panggilan yang tumpang tindih berbagi satu promise",
+      "pass": true,
+      "detail": ""
+    }
+  ]
+}
