@@ -28,6 +28,13 @@
  *   - satu literal di app.js adalah potongan PROMPT AI (rubrik penilaian), bukan naskah UI.
  *   - beberapa berkas menyimpan naskahnya sebagai tabel copy id yang padanan th-nya hidup
  *     di naskah-th-brain.js (brain-olm.*, brain-tutor.*), jadi ia bukan kebocoran.
+ *   - ZONA AUDIO (fiezel-diag-panel.js, fiezel-neural-voice-audibility-fix.js): gerbang P0
+ *     tests/audio-locale-guard-test.js melarang berkas zona audio menyebut FiezelI18n SAMA
+ *     SEKALI — locale yang bocor ke sana pernah ikut ter-hash ke kunci cache audio (AI-17
+ *     F02). Sapuan m025-266 sempat memindahkan naskah kedua berkas ini lalu DIKEMBALIKAN
+ *     ketika gerbang itu merah: pagar P0 tidak dilonggarkan demi naskah. Utangnya nyata dan
+ *     tercatat di sini; jalan keluarnya adalah menyuntik label dari LUAR zona audio, bukan
+ *     menambah pengecualian di audio-locale-guard.
  *
  * Turunkan angkanya saat utangnya dibayar. JANGAN menaikkannya untuk membuat gerbang hijau.
  */
@@ -44,6 +51,8 @@ const ALLOWLIST = Object.freeze({
   'features/class-hub/fiezel-class-hub.js': 1,                  // fallback t() dengan kutip ganda di dalamnya
   'features/neural-voice/fiezel-cf-voice-notice.js': 3,         // cermin naskah kanon quota
   'features/onboarding/fiezel-onboarding.js': 1,                // pemilih bahasa memang dwibahasa
+  'features/neural-voice/fiezel-diag-panel.js': 6,              // zona audio: AI-17 F02 melarang FiezelI18n di sini
+  'features/neural-voice/fiezel-neural-voice-audibility-fix.js': 2, // idem — lihat catatan ZONA AUDIO di bawah
   'features/prasasti/fiezel-prasasti-core.js': 3,               // berkas kanon, sha dikunci
   'features/quota/quota-copy.js': 5,                            // berkas kanon, sha dikunci + CANON_TH_RULES
   'features/speaking-listening/listening-scenarios-a1.js': 11,  // konten belajar, jalur th lewat sidecar

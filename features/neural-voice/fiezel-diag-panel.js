@@ -1,11 +1,6 @@
 (function(root){
   'use strict';
 
-  /* m025-265 · sapuan kebocoran Thai: naskah modul ini dulu literal Indonesia, jadi murid
-     yang memilih th tetap membacanya dalam bahasa Indonesia. t() fail-soft: kalau copy-map
-     belum termuat, fallback id yang tampil — bukan kunci mentah. */
-  function t(k, fb) { try { var I = (typeof self !== 'undefined' ? self : this).FiezelI18n; return I && I.t ? I.t(k) : fb; } catch (_) { return fb; } }
-
   // FIEZEL diagnostics exporter (M-019)
   //
   // Tujuan: owner memakai FIEZEL dari ikon Home Screen (PWA standalone) dan tidak
@@ -20,7 +15,7 @@
   // DIAG_BUILD adalah penanda deploy manual yang sekarang dijaga A7. Untuk setiap
   // product deploy, angka m025-N wajib naik tepat +1 dan SW_REV wajib membawa build
   // yang sama. Ini membedakan build baru aktif vs shell lama dari service worker.
-  var DIAG_BUILD = 'm025-266';
+  var DIAG_BUILD = 'm025-264';
 
   var KEY = 'fiezel-neural-voice-diagnostics-v1';
   var Z = 2147483000;
@@ -330,7 +325,7 @@
     heading.textContent = 'Diagnostics · ' + DIAG_BUILD;
 
     var note = root.document.createElement('p');
-    note.textContent = t('diag.cari-event-desc', 'Cari event penting langsung di bawah. Kirim isi kotak ini ke coordinator bila perlu.');
+    note.textContent = 'Cari event penting langsung di bawah. Kirim isi kotak ini ke coordinator bila perlu.';
 
     var searchBar = root.document.createElement('div');
     searchBar.id = 'fiezelDiagSearchBar';
@@ -338,12 +333,12 @@
     var search = root.document.createElement('input');
     search.id = 'fiezelDiagSearch';
     search.type = 'search';
-    search.placeholder = t('diag.cari-placeholder', 'Cari: wasm_policy, timeout, adapter...');
+    search.placeholder = 'Cari: wasm_policy, timeout, adapter...';
     search.autocomplete = 'off';
     search.spellcheck = false;
     var searchCount = root.document.createElement('span');
     searchCount.id = 'fiezelDiagSearchCount';
-    searchCount.textContent = t('umum.cari', 'Cari');
+    searchCount.textContent = 'Cari';
 
     var previous = root.document.createElement('button');
     previous.type = 'button';
@@ -369,15 +364,15 @@
     var send = root.document.createElement('button');
     send.type = 'button';
     send.className = 'primary';
-    send.textContent = t('umum.kirim', 'Kirim');
+    send.textContent = 'Kirim';
 
     var sendTarget = root.document.createElement('button');
     sendTarget.type = 'button';
-    sendTarget.textContent = t('diag.kirim-ringkas', 'Kirim ringkas');
+    sendTarget.textContent = 'Kirim ringkas';
 
     var close = root.document.createElement('button');
     close.type = 'button';
-    close.textContent = t('umum.tutup', 'Tutup');
+    close.textContent = 'Tutup';
 
     // m025-34: per-module badges so the user sees which module is broken without
     // reading raw JSON, and a plain-text summary they can paste straight into a chat.
@@ -561,7 +556,7 @@
       if (!query) {
         matches = [];
         matchIndex = -1;
-        ui.searchCount.textContent = t('umum.cari', 'Cari');
+        ui.searchCount.textContent = 'Cari';
         return;
       }
       matches = findMatches(ui.text.value, query);
@@ -584,7 +579,7 @@
       if (!query) {
         matches = [];
         matchIndex = -1;
-        ui.searchCount.textContent = t('umum.cari', 'Cari');
+        ui.searchCount.textContent = 'Cari';
         return;
       }
       selectMatch(0);
@@ -695,7 +690,7 @@
     ui.previous.addEventListener('click', function(){ selectMatch(matchIndex - 1); });
     ui.next.addEventListener('click', function(){ selectMatch(matchIndex + 1); });
     ui.send.addEventListener('click', function(){
-      share(ui.send, t('umum.kirim', 'Kirim'), ui.text.value);
+      share(ui.send, 'Kirim', ui.text.value);
     });
     // S2 butir 6: ekspor teks yang bisa di-copy. Tanpa PII secara konstruksi — yang diekspor
     // adalah agregat ledger, dan ledger tidak pernah menerima field di luar allowlist-nya.
@@ -708,7 +703,7 @@
     });
     ui.copySummary.addEventListener('click', function(){
       // Human-readable digest, not JSON: this is the paste-into-chat path.
-      var text = dump.universalSummary || t('diag.ringkasan-belum-siap', 'Ringkasan belum siap. Tutup lalu buka lagi Diagnostics.');
+      var text = dump.universalSummary || 'Ringkasan belum siap. Tutup lalu buka lagi Diagnostics.';
       copy(ui.copySummary, function(label){ ui.copySummary.textContent = label; setTimeout(function(){ ui.copySummary.textContent = 'Copy ringkasan'; }, 1800); }, text);
     });
     ui.sendTarget.addEventListener('click', function(){
@@ -721,7 +716,7 @@
         target: dump && dump.target,
         storageEstimate: dump && dump.storageEstimate
       };
-      share(ui.sendTarget, t('diag.kirim-ringkas', 'Kirim ringkas'), serialize(slim));
+      share(ui.sendTarget, 'Kirim ringkas', serialize(slim));
     });
   }
 
