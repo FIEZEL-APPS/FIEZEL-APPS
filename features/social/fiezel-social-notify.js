@@ -38,11 +38,12 @@
   // Cermin NOTIFY_KIND (workers/api/social/notify-core.js). Hanya tiga yang bisa
   // DIHITUNG dari selisih daftar teman; sisanya menunggu lane server.
   var KIND = Object.freeze({
+    FRIEND_REQUEST: 'friend_request',
     FRIEND_ACCEPTED: 'friend_accepted',
     CHEER_RECEIVED: 'cheer_received',
     FRIEND_MILESTONE: 'friend_milestone'
   });
-  var KINDS = Object.freeze([KIND.FRIEND_ACCEPTED, KIND.CHEER_RECEIVED, KIND.FRIEND_MILESTONE]);
+  var KINDS = Object.freeze([KIND.FRIEND_REQUEST, KIND.FRIEND_ACCEPTED, KIND.CHEER_RECEIVED, KIND.FRIEND_MILESTONE]);
 
   var SNAPSHOT_KEY = 'fiezel-social-snapshot-v1';
   var INBOX_KEY = 'fiezel-social-inbox-v1';
@@ -79,7 +80,13 @@
    * Bentuk asing / field asing DIBUANG — potret ini dibaca lagi setelah pembaruan
    * aplikasi, jadi ia harus tahan terhadap perubahan bentuk respons.
    */
-  function snapshotOf(data, nowMs) {
+  /**
+   * `requestHandles` = permintaan teman MASUK yang belum dijawab. Ia ikut potret karena
+   * permintaan BUKAN teman - ia tidak pernah muncul di data.friends, jadi tanpa larik ini
+   * tidak ada satu pun tempat yang bisa melahirkan kabarnya. Itulah cacat yang membuat
+   * "ada yang meminta berteman" tidak pernah terdengar sama sekali.
+   */
+  function snapshotOf(data, nowMs, requestHandles) {
     var friends = (data && Array.isArray(data.friends)) ? data.friends : [];
     var cheersToday = (data && Array.isArray(data.cheersToday)) ? data.cheersToday : [];
     var handles = [], milestones = {}, cheers = {};
@@ -97,7 +104,15 @@
       cheers[ch] = (cheers[ch] || 0) + n;
     }
     handles.sort();
-    return { handles: handles, cheers: cheers, milestones: milestones, at: now(nowMs) };
+    var requests = [];
+    if (Array.isArray(requestHandles)) {
+      for (var k = 0; k < requestHandles.length; k += 1) {
+        var rh = handleOf(typeof requestHandles[k] === 'string' ? { handle: requestHandles[k] } : requestHandles[k]);
+        if (rh && requests.indexOf(rh) < 0) requests.push(rh);
+      }
+      requests.sort();
+    }
+    return { handles: handles, cheers: cheers, milestones: milestones, requests: requests, at: now(nowMs) };
   }
 
   /**
@@ -118,6 +133,19 @@
     var handles = Array.isArray(next.handles) ? next.handles : [];
     for (var j = 0; j < handles.length; j += 1) {
       if (!seen[handles[j]]) out.push({ kind: KIND.FRIEND_ACCEPTED, handle: handles[j] });
+    }
+
+    /* Permintaan masuk yang BARU. Potret lama (sebelum versi ini) tidak punya medan
+       `requests` sama sekali; kalau itu diperlakukan sebagai "kosong", setiap permintaan
+       yang sudah lama menggantung akan meledak jadi kabar sekaligus pada pembaruan
+       pertama. Jadi ketiadaannya diperlakukan sebagai garis dasar, sama seperti potret
+       pertama di atas. */
+    if (Array.isArray(prev && prev.requests) && Array.isArray(next.requests)) {
+      var seenReq = {};
+      for (var p = 0; p < prev.requests.length; p += 1) seenReq[prev.requests[p]] = true;
+      for (var q = 0; q < next.requests.length; q += 1) {
+        if (!seenReq[next.requests[q]]) out.push({ kind: KIND.FRIEND_REQUEST, handle: next.requests[q] });
+      }
     }
 
     var prevCheers = (prev && prev.cheers) || {};
@@ -202,7 +230,7 @@
     for (var i = 0; i < (Array.isArray(events) ? events.length : 0) && out.length < NOTIFY_BURST_MAX; i += 1) {
       var e = events[i];
       if (!e) continue;
-      if (e.kind === KIND.FRIEND_ACCEPTED || e.kind === KIND.CHEER_RECEIVED) out.push(e);
+      if (e.kind === KIND.FRIEND_REQUEST || e.kind === KIND.FRIEND_ACCEPTED || e.kind === KIND.CHEER_RECEIVED) out.push(e);
     }
     return out;
   }
