@@ -208,6 +208,31 @@
     'diag.status-audio': 'Status audio: {konteks}.',
     'settings.online-pengaturan-judul': 'Pengaturan & Preferensi',
     'guru.nama-lembaga-token': 'Nama dan lembaga terisi otomatis dari token.',
-    'home.pilih-fokus-label': 'Pilih fokus'
+    'home.pilih-fokus-label': 'Pilih fokus',
+
+    /* Kata umum lintas modul (m025-265): dipakai ulang oleh features/* supaya satu
+       kata tidak lahir sepuluh kali dengan sepuluh kunci berbeda. */
+    'umum.materi': 'Materi',
+    'umum.soal': 'Soal',
+    'umum.kelas': 'Kelas',
+    'umum.simpan': 'Simpan',
+    'umum.status': 'Status',
+    'umum.tambah': 'Tambah',
+    'umum.murid': 'Murid',
+    'umum.kirim': 'Kirim',
+    'umum.tutup': 'Tutup',
+    'umum.tugas': 'Tugas',
+    'umum.guru': 'Guru',
+    'umum.selesai': 'Selesai',
+    'umum.batal': 'Batal',
+    'umum.coba-lagi': 'Coba lagi',
+    'umum.lanjut': 'Lanjut',
+    'umum.ubah': 'Ubah',
+    'umum.hapus': 'Hapus',
+    'umum.buat': 'Buat',
+    'umum.cari': 'Cari',
+    'umum.riwayat': 'Riwayat',
+    'umum.notifikasi': 'Notifikasi',
+    'umum.belum-ada-data': 'Belum ada data.'
   });
 }());
