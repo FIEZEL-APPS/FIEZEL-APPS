@@ -4,8 +4,12 @@
  */
 (function () {
   'use strict';
-  if (typeof FiezelI18n === 'undefined' || !FiezelI18n || typeof FiezelI18n.registerCopy !== 'function') return;
-  FiezelI18n.registerCopy('th', {
+  /* Akses lewat `self`, bukan identifier telanjang: gerbang paritas (th-ui-leak-test) memuat
+     berkas ini di Node dengan `self` yang disuntik, dan berkas yang menyebut FiezelI18n
+     telanjang tidak terlihat olehnya — kuncinya lolos tanpa pernah dihitung. */
+  var I18N = (typeof self !== 'undefined' ? self : globalThis).FiezelI18n;
+  if (!I18N || typeof I18N.registerCopy !== 'function') return;
+  I18N.registerCopy('th', {
     'proctor.aktif': 'โหมดสอบ: ถ้าคุณออกจากหน้าจอนี้ ครูของคุณจะได้รับบันทึกไว้',
     'proctor.tercatat': 'บันทึกการออกจากหน้าจอแล้ว {n} ครั้ง ({detik} วินาที) ครูของคุณได้รับบันทึกนี้แล้ว',
     'proctor.kembali-toast': 'คุณออกจากหน้าจอสอบ {n} ครั้ง (ครั้งล่าสุด {detik} วินาที) บันทึกถูกส่งถึงครูของคุณแล้ว',

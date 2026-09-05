@@ -12,8 +12,12 @@
  */
 (function () {
   'use strict';
-  if (typeof FiezelI18n === 'undefined' || !FiezelI18n || typeof FiezelI18n.registerCopy !== 'function') return;
-  FiezelI18n.registerCopy('id', {
+  /* Akses lewat `self`, bukan identifier telanjang: gerbang paritas (th-ui-leak-test) memuat
+     berkas ini di Node dengan `self` yang disuntik, dan berkas yang menyebut FiezelI18n
+     telanjang tidak terlihat olehnya — kuncinya lolos tanpa pernah dihitung. */
+  var I18N = (typeof self !== 'undefined' ? self : globalThis).FiezelI18n;
+  if (!I18N || typeof I18N.registerCopy !== 'function') return;
+  I18N.registerCopy('id', {
     'proctor.aktif': 'Mode ujian: kalau kamu keluar dari layar ini, gurumu menerima catatannya.',
     'proctor.tercatat': 'Tercatat keluar layar {n}× ({detik} detik). Gurumu sudah menerima catatannya.',
     'proctor.kembali-toast': 'Kamu keluar dari layar ujian {n}× ({detik} detik terakhir). Catatannya sudah sampai ke gurumu.',
