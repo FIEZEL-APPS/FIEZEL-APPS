@@ -213,66 +213,36 @@ test('tinta brief terbaca di atas setiap warna brief', () => {
 
 const THEME_JS = fs.readFileSync(path.join(__dirname, 'features/ui/fiezel-ui-manager.js'), 'utf8');
 
-/* m025-246 — DUA ASERSI DI BAWAH DIBALIK, karena keputusan yang dijaganya sudah dibalik.
- *
- * RIWAYAT LENGKAP, supaya orang berikutnya tidak membaliknya untuk keempat kali:
- *   m025-120  OWNER: "MODE GELAP ATAU TIDAK GELAP TIDAK BERFUNGSI DI APLIKASI, INTINYA
- *             AKU TETAP MAU DASAR CREAM."
- *   m025-134  Mode gelap DICABUT. Dua asersi di sini dipasang untuk menjaganya tetap mati.
- *   m025-246  OWNER MEMBALIKNYA, dengan syarat teknis eksplisit: "Tema Malam: pakai token
- *             --core* yang sudah ada, hormati prefers-color-scheme."
- *
- * Yang RUSAK pada percobaan pertama bisa disebut persis, dan itu sebabnya pembalikan ini
- * bukan pengulangan kesalahan: puluhan permukaan waktu itu memaku warnanya sendiri (#fff,
- * #f6f4ed) sementara teks memakai var(--text), jadi "gelap" berarti tinta terang di atas
- * bidang putih - 1,08:1. Sejak m025-85 permukaan-permukaan itu sudah pindah ke token.
- *
- * Yang dijaga SEKARANG adalah kebalikannya, dan syaratnya lebih ketat daripada sekadar
- * "boleh gelap": malam WAJIB memakai keluarga --core* yang sudah ada (bukan palet gelap
- * kedua), dan preferensi perangkat WAJIB punya suara. Rinciannya - dua pintu aktivasi yang
- * identik, kontras AA, tiga keadaan tema - dijaga night-theme-test.js. Di sini hanya
- * dijaga bahwa jalurnya ADA dan tidak dipaku mati lagi.
+/* Mode gelap dicabut. Dua asersi di sini dipasang untuk memastikannya tetap mati.
  *
  * "DASAR CREAM" TETAP BERLAKU dan tidak dilonggarkan satu piksel pun: seluruh asersi palet
- * pastel di berkas ini menguji mode TERANG, dan mode terang tetap bawaan untuk perangkat
- * yang tidak meminta gelap. */
-test('tema bisa dinyatakan eksplisit DAN bisa mengikuti perangkat', () => {
-  // 'light' dan 'dark' dipasang sebagai atribut; 'system' MENGHAPUSnya supaya @media yang
-  // memutuskan. Menuliskan data-theme="system" akan membuat kedua selektor tema di
-  // style.css meleset - murid tersangkut terang apa pun setelan perangkatnya, yaitu
-  // persis "sakelar yang tidak berfungsi" dari keluhan m025-120.
-  if (!/setAttribute\('data-theme', want\)/.test(THEME_JS)) {
-    throw new Error('tidak ada yang memasang data-theme dari pilihan murid');
+ * pastel di berkas ini menguji mode TERANG, dan mode terang tetap satu-satunya tema. */
+test('tema terang dinyatakan, bukan sekadar dibiarkan', () => {
+  // OWNER: "hapus mode gelap". Yang dijaga di sini: terang tetap DINYATAKAN
+  // sebagai atribut, bukan dibiarkan kosong - konvensi data-theme masih dibaca stylesheet
+  // atau ekstensi lain, dan atribut yang absen berarti "terserah perangkat".
+  if (!/setAttribute\(\s*['"]data-theme['"]\s*,\s*['"]light['"]\s*\)/.test(THEME_JS)) {
+    throw new Error('tidak ada yang memasang data-theme="light" secara eksplisit');
   }
-  if (!/removeAttribute\('data-theme'\)/.test(THEME_JS)) {
-    throw new Error("pilihan 'system' harus MENGHAPUS atribut, bukan menuliskan nilai ketiga");
+  if (/removeAttribute\(\s*['"]data-theme['"]\s*\)/.test(THEME_JS)) {
+    throw new Error('data-theme masih dihapus; terang harus dinyatakan');
   }
 });
 
-test('Tema Malam ada, memakai keluarga --core*, dan menghormati preferensi perangkat', () => {
-  if (!/prefers-color-scheme/.test(THEME_JS)) {
-    throw new Error('pengelola UI tidak lagi menyelesaikan "system" lewat preferensi perangkat');
+test('tidak ada sisa mode gelap di kode maupun palet', () => {
+  // Mode gelap dihapus seluruhnya: tidak ada sakelar, tidak ada pasangan token gelap,
+  // dan preferensi sistem tidak lagi punya suara atas tampilan aplikasi.
+  if (/toggleDarkMode|getSystemPreference|prefers-color-scheme/.test(THEME_JS)) {
+    throw new Error('pengelola UI masih memegang jalur mode gelap');
   }
-  const css = fs.readFileSync(path.join(__dirname, 'style.css'), 'utf8');
-  if (!/@media \(prefers-color-scheme:dark\)/.test(css)) {
-    throw new Error('style.css tidak punya pintu preferensi perangkat untuk Tema Malam');
+  const leftovers = [];
+  for (const file of ['style.css', 'features/tutor-classroom/tutor-v3.css', 'features/ui/fiezel-boot-tail.js']) {
+    let text;
+    try { text = fs.readFileSync(path.join(__dirname, file), 'utf8'); } catch { continue; }
+    if (/prefers-color-scheme|data-theme="dark"|settingDarkMode/.test(text)) leftovers.push(file);
   }
-  if (!/:root:not\(\[data-theme="light"\]\)/.test(css)) {
-    throw new Error('pintu @media tidak dibatasi :not([data-theme="light"]) - pilihan murid akan diabaikan');
-  }
-  // Palet malam WAJIB turun dari keluarga --core* yang sudah ada. Kalau keluarga itu hilang,
-  // yang tersisa adalah palet gelap kedua yang kebetulan mirip - dan palet kedua itulah yang
-  // dulu menyimpang dari permukaan yang memaku warnanya sendiri.
-  for (const token of ['--core:', '--core-soft:', '--core-line:', '--on-core:']) {
-    if (css.indexOf(token) === -1) {
-      throw new Error('keluarga ' + token.slice(0, -1) + ' hilang; Tema Malam tidak lagi memakai token yang sudah ada');
-    }
-  }
-  // <html> tidak boleh memaku tema: nilai statis menang atas @media selamanya.
-  const html = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
-  const htmlTag = (/<html[^>]*>/.exec(html) || [''])[0];
-  if (/data-theme=/.test(htmlTag)) {
-    throw new Error('<html> memaku data-theme; Tema Malam tidak akan pernah menyala');
+  if (leftovers.length) {
+    throw new Error('sisa mode gelap masih ada di: ' + leftovers.join(', '));
   }
 });
 

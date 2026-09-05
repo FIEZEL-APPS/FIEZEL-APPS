@@ -147,7 +147,7 @@ test('target yang tidak ada dibuang sebelum tur dimulai', () => {
 test('target berukuran nol tidak bisa disorot, jadi ikut dibuang', () => {
   const nol = el('div');
   nol._box = { top: 0, left: 0, width: 0, height: 0 };
-  const env = fakeEnv({ '.learning-launcher': nol, '.topbar .notif-button': el('button') });
+  const env = fakeEnv({ '.learning-launcher': nol, '.topbar .ask-button': el('button') });
   assert.strictEqual(tour.show(env, {}).steps, 1);
 });
 

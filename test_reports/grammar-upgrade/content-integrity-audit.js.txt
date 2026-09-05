@@ -1,0 +1,39 @@
+========================================================================
+FIEZEL SYSTEM-WIDE CONTENT INTEGRITY AUDIT
+========================================================================
+
+Inspection volume:
+  classroom.recordsInspected             38
+  grammar.questionsInspected             7050
+  grammar.recordsInspected               282
+  library.recordsInspected               9
+  listening-exam.recordsInspected        57
+  listening.recordsInspected             1407
+  placement.blueprintSize                12
+  placement.cefrDistribution             {"A1":2,"A2":2,"B1":2,"B2":2,"C1":2,"C2":2}
+  placement.questionsInspected           12
+  reading-exam.recordsInspected          96
+  reading.questionsInSource              1560
+  reading.questionsInspected             1560
+  reading.recordsInspected               312
+  speaking-exam.recordsInspected         17
+  speaking.recordsInspected              36
+  vocabulary.questionsInspected          9760
+  vocabulary.recordsInspected            2440
+  vocabulary.shippedRecords              2440
+  writing.recordsInspected               45
+
+Findings by severity:
+  CRITICAL                               0
+  MAJOR                                  192
+  MINOR                                  0
+
+Findings by class:
+  grammar/CROSS_FAMILY_FALLBACK                        192
+
+Representative evidence (first occurrence per class):
+  [MAJOR] grammar/CROSS_FAMILY_FALLBACK @ b4_024
+      lesson "cleft_sentences_it_was_x_that_emphasis" (emphasis_inversion/C1) offers an answer option authored for b5_008 (passive/C1)
+      evidence: kenali jenis pelengkap yang dituntut kata kerjanya, bentuk -ing atau bentuk to → terapkan bentuk pasif yang cocok
+
+PASS — 0 critical integrity failures.

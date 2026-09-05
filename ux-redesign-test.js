@@ -49,19 +49,19 @@ function check(ok, name, detail) {
 /* ================================ A · NAVIGASI ==================================== */
 {
   const navButtons = INDEX.match(/<button[^>]*class="nav(?: active)?"[^>]*>/g) || [];
-  check(navButtons.length === 5,
-    'A1 tab bar berisi tepat lima tujuan (Home / Vocab / Grammar / Reading / Peta — UI klasik kembali atas permintaan owner)',
+  check(navButtons.length === 4,
+    'A1 tab bar berisi tepat empat tujuan',
     'ditemukan ' + navButtons.length);
-  for (const label of ['nav.home', 'nav.vocab', 'nav.grammar', 'nav.reading', 'nav.peta']) {
+  for (const label of ['nav.hari-ini', 'nav.latihan', 'nav.progres', 'nav.pengaturan']) {
     check(INDEX.indexOf('data-i18n="' + label + '"') !== -1,
       'A2 tab ' + label + ' ada di tab bar');
   }
   /* Tab Pengaturan membuka modal dan SENGAJA tidak membawa data-view: renderInner()
      menambahkan .active ke elemen ber-data-view dan hanya membersihkannya dari .nav lain,
      jadi atribut itu akan membuat tab ini tersangkut menyala setelah sekali dibuka. */
-  const settingsBtn = (INDEX.match(/<button[^>]*onclick="openSettings\(\)"[^>]*>/g) || [])[0];
-  check(!!settingsBtn && !/data-view=/.test(settingsBtn),
-    'A3 tombol Pengaturan (topbar) tidak membawa data-view (kalau tidak, ia tersangkut aktif)');
+  const settingsTab = navButtons.find(b => /openSettings\(\)/.test(b));
+  check(!!settingsTab && !/data-view=/.test(settingsTab),
+    'A3 tab Pengaturan tidak membawa data-view (kalau tidak, ia tersangkut aktif)');
   /* Rute lama TIDAK boleh dibuang bersama tabnya - tautan dalam layar, riwayat back-nav,
      dan tur masih membawa nama-nama itu. */
   for (const view of ['vocab', 'grammar', 'reading', 'skills', 'library', 'latihan']) {

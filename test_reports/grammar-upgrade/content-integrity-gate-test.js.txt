@@ -1,0 +1,20 @@
+PASS rejects the English authoring prefix leaking into an option
+PASS rejects raw English authoring prose offered as the answer under an Indonesian stem
+PASS rejects an Indonesian word spliced into an English sentence frame
+PASS rejects an explanation that points at an option not on screen
+PASS rejects reading evidence that is not in the passage it quotes
+PASS rejects a question carrying another lesson’s identity
+PASS rejects duplicated and empty options
+PASS rejects an out-of-range answer index
+PASS rejects a runtime value that leaked into an option
+PASS accepts a normal fill-in-the-blank item
+PASS accepts an all-English sentence-completion item under an Indonesian stem
+PASS accepts Indonesian explanations that quote English grammar terms
+PASS every grammar lesson still fills all 25 practice modes through the gate
+PASS the reading bank declares one answer, not two that disagree
+PASS no listening item mixes Indonesian words into an English option
+PASS every grammar template ships its Indonesian counterpart
+PASS every cloze distractor and item carries its Indonesian explanation
+PASS no two distractors in a template share one misconception label
+
+FIEZEL content integrity gate: 18 PASS / 0 FAIL

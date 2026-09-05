@@ -1,0 +1,1371 @@
+{
+  "schema": "fiezel-grammar-new-templates-v1",
+  "newLabels": {
+    "uses 'will' inside the if-clause of an unreal condition": {
+      "id": "pakai “will” di dalam klausa if pengandaian, padahal if-clause pakai bentuk lampau.",
+      "th": "ใช้ 'will' ในอนุประโยค if ของเงื่อนไขสมมติ ทั้งที่อนุประโยค if ต้องใช้รูปอดีต"
+    },
+    "uses a positive tag after a positive statement": {
+      "id": "tag-nya positif sesudah kalimat positif, padahal harusnya dibalik jadi negatif.",
+      "th": "ใช้ tag บวกหลังประโยคบอกเล่าเชิงบวก ทั้งที่ต้องกลับเป็นปฏิเสธ"
+    },
+    "repeats the noun instead of using a pronoun in the tag": {
+      "id": "ngulang kata bendanya di tag, padahal tag pakai kata ganti.",
+      "th": "ใช้คำนามซ้ำใน tag ทั้งที่ tag ต้องใช้สรรพนาม"
+    },
+    "uses the present perfect for an event before another past event": {
+      "id": "pakai present perfect buat kejadian yang terjadi sebelum kejadian lampau lain.",
+      "th": "ใช้ present perfect กับเหตุการณ์ที่เกิดก่อนเหตุการณ์อดีตอีกเหตุการณ์หนึ่ง"
+    },
+    "keeps the present tense inside a reported question after a past reporting verb": {
+      "id": "tetap pakai bentuk sekarang di dalam pertanyaan yang dilaporin, padahal kata pelapornya lampau.",
+      "th": "คงรูปปัจจุบันไว้ในคำถามที่รายงาน ทั้งที่คำกริยารายงานเป็นอดีต"
+    },
+    "adds 'do' to an embedded question": {
+      "id": "nambahin “do” ke pertanyaan yang ditempel, padahal di dalam kalimat nggak butuh do.",
+      "th": "เติม 'do' ในคำถามที่ฝังอยู่ในประโยค ทั้งที่ภายในประโยคไม่ต้องใช้ do"
+    },
+    "uses 'would' in the wish clause about one's own situation": {
+      "id": "pakai 'would' di klausa wish soal diri sendiri, padahal wish + past simple.",
+      "th": "ใช้ 'would' ในอนุประโยค wish เกี่ยวกับสถานการณ์ของตัวเอง ทั้งที่ต้องใช้ wish + past simple"
+    },
+    "uses 'yet' in a positive statement": {
+      "id": "pakai “yet” di kalimat positif, padahal yet buat negatif dan pertanyaan.",
+      "th": "ใช้ 'yet' ในประโยคบอกเล่าเชิงบวก ทั้งที่ yet ใช้กับปฏิเสธและคำถาม"
+    },
+    "uses a reflexive pronoun where the plain object pronoun is needed": {
+      "id": "pakai kata ganti diri (-self), padahal pelaku dan objeknya orang yang beda.",
+      "th": "ใช้สรรพนามสะท้อน (-self) ทั้งที่ผู้กระทำและกรรมเป็นคนละคน"
+    },
+    "uses the past simple in the result clause of a third conditional": {
+      "id": "pakai past simple di klausa akibat pengandaian lampau, padahal butuh 'would have' + past participle.",
+      "th": "ใช้ past simple ในอนุประโยคผลของเงื่อนไขแบบที่สาม ทั้งที่ต้องใช้ would have + past participle"
+    },
+    "uses the present perfect in a third-conditional if-clause": {
+      "id": "pakai present perfect di klausa if pengandaian lampau, padahal butuh past perfect.",
+      "th": "ใช้ present perfect ในอนุประโยค if ของเงื่อนไขแบบที่สาม ทั้งที่ต้องใช้ past perfect"
+    },
+    "puts 'be' after the past participle in a modal passive": {
+      "id": "naruh “be” sesudah past participle, padahal urutannya modal + be + past participle.",
+      "th": "วาง 'be' หลัง past participle ทั้งที่ลำดับต้องเป็น modal + be + past participle"
+    },
+    "puts 'by' before the person who has the work done": {
+      "id": "naruh “by” di depan orang yang nyuruh, padahal dia subjeknya, bukan pelakunya.",
+      "th": "วาง 'by' หน้าคนที่สั่งให้ทำ ทั้งที่คนนั้นเป็นประธาน ไม่ใช่ผู้กระทำ"
+    },
+    "uses 'whose' where 'who' is the subject of the clause": {
+      "id": "pakai “whose”, padahal nggak ada kepemilikan; klausanya butuh “who”.",
+      "th": "ใช้ 'whose' ทั้งที่ไม่มีความเป็นเจ้าของ อนุประโยคต้องใช้ 'who'"
+    },
+    "uses 'which' for a person": {
+      "id": "pakai 'which' buat orang, padahal kata itu cuma buat benda atau hewan.",
+      "th": "ใช้ 'which' กับคน ทั้งที่ which ใช้กับสิ่งของหรือสัตว์เท่านั้น"
+    },
+    "puts 'despite' before a full clause": {
+      "id": "naruh “despite” di depan klausa utuh, padahal despite cuma buat kata benda atau -ing.",
+      "th": "วาง 'despite' หน้าอนุประโยคเต็ม ทั้งที่ despite ใช้กับคำนามหรือรูป -ing เท่านั้น"
+    },
+    "uses 'but' as a subordinating connector at the start of the sentence": {
+      "id": "pakai “but” di awal kalimat buat ngegabung dua klausa, padahal but cuma nyambung di tengah.",
+      "th": "ใช้ 'but' ต้นประโยคเพื่อรวมสองอนุประโยค ทั้งที่ but ใช้เชื่อมตรงกลางเท่านั้น"
+    },
+    "uses 'so' before a noun phrase with an adjective": {
+      "id": "pakai “so” di depan kata sifat + kata benda, padahal di situ butuh “such”.",
+      "th": "ใช้ 'so' หน้าคำคุณศัพท์ + คำนาม ทั้งที่ตรงนั้นต้องใช้ 'such'"
+    },
+    "drops the article after 'such' before a singular noun": {
+      "id": "ngilangin “a” sesudah such, padahal kata benda tunggalnya butuh artikel.",
+      "th": "ตัด 'a' หลัง such ทิ้ง ทั้งที่คำนามเอกพจน์ต้องมีคำนำหน้านาม"
+    }
+  },
+  "templates": [
+    {
+      "id": "CO-201",
+      "family": "conditionals",
+      "subskill": "second_conditional_unreal_present",
+      "cefr": "B1",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Use 'would + base verb' in the result clause of an unreal present condition.",
+        "misconception": "Learner puts 'will' or the past simple in the result clause after an unreal if-clause.",
+        "reasoning": "identify a past simple unreal if-clause -> apply would + base verb in the result clause",
+        "stem": "If I had more free time, I ___ a new language.",
+        "options": [
+          "would learn",
+          "will learn",
+          "learned",
+          "would learned"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "will learn",
+            "misconception": "real/likely framing applied to an admittedly unlikely event",
+            "whyFails": "'Will' is for real future plans; the past 'had' shows this is imaginary, so 'would' is needed."
+          },
+          {
+            "option": "learned",
+            "misconception": "if-clause verb form mismatched with 'would' in the main clause",
+            "whyFails": "The past simple belongs in the if-clause; the result clause needs 'would'."
+          },
+          {
+            "option": "would learned",
+            "misconception": "duplicating 'would' in both clauses",
+            "whyFails": "After 'would' the verb is bare: would learn, not would learned."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "'If I had more free time' describes an unreal present situation, so the result uses 'would learn'.",
+          "rule": "Second conditional: If + past simple, would + base verb.",
+          "whyOthersFail": "'Will learn' treats the situation as real; 'learned' is the if-clause form; 'would learned' adds -ed after would.",
+          "howToAvoid": "See a past-tense if-clause about an imaginary now? Put 'would' plus a bare verb in the result.",
+          "memoryCue": "If I had… I would…"
+        }
+      },
+      "id_": {
+        "objective": "Pakai “would + kata kerja dasar” di klausa akibat pengandaian yang nggak nyata sekarang.",
+        "misconception": "Kamu naruh “will” atau past simple di klausa akibat sesudah klausa if pengandaian.",
+        "reasoning": "klausa if past simple dan nggak nyata → klausa akibat pakai would + kata kerja dasar",
+        "rule": "Second conditional: If + past simple, would + kata kerja dasar.",
+        "whyCorrect": "“If I had more free time” ngegambarin keadaan sekarang yang nggak nyata, jadi akibatnya pakai “would learn”.",
+        "whyOthersFail": "“Will learn” nganggap situasinya nyata. “Learned” bentuk buat klausa if. “Would learned” nambah -ed sesudah would.",
+        "howToAvoid": "Ada klausa if bentuk lampau soal khayalan sekarang? Taruh “would” plus kata kerja polos di akibatnya.",
+        "memoryCue": "Khayalan sekarang: If I had…, I would…",
+        "distractors": {
+          "will learn": {
+            "misconception": "situasi yang jelas nggak nyata dibingkai seolah nyata.",
+            "whyFails": "“will” buat rencana nyata. “Had” yang lampau nunjukin ini khayalan, jadi butuh “would”."
+          },
+          "learned": {
+            "misconception": "bentuk klausa if nyasar ke klausa akibat.",
+            "whyFails": "past simple tempatnya di klausa if. Klausa akibat butuh “would”."
+          },
+          "would learned": {
+            "misconception": "would digabung sama bentuk -ed.",
+            "whyFails": "sesudah “would” kata kerjanya polos: would learn, bukan would learned."
+          }
+        }
+      },
+      "th": {
+        "objective": "ใช้ 'would + คำกริยารูปพื้นฐาน' ในอนุประโยคผลของเงื่อนไขสมมติในปัจจุบัน",
+        "misconception": "ผู้เรียนใส่ 'will' หรือ past simple ในอนุประโยคผลหลังอนุประโยค if ที่เป็นสมมติ",
+        "reasoning": "อนุประโยค if เป็น past simple และไม่จริง → อนุประโยคผลใช้ would + คำกริยารูปพื้นฐาน",
+        "rule": "Second conditional: If + past simple, would + คำกริยารูปพื้นฐาน",
+        "whyCorrect": "'If I had more free time' บรรยายสถานการณ์ปัจจุบันที่ไม่จริง ผลจึงใช้ 'would learn'",
+        "whyOthersFail": "'will learn' มองสถานการณ์ว่าเป็นจริง 'learned' เป็นรูปของอนุประโยค if ส่วน 'would learned' เติม -ed หลัง would",
+        "howToAvoid": "เห็นอนุประโยค if รูปอดีตที่พูดถึงปัจจุบันในจินตนาการ? ใส่ 'would' บวกคำกริยารูปเปล่าในส่วนผล",
+        "memoryCue": "จินตนาการปัจจุบัน: If I had…, I would…",
+        "distractors": {
+          "will learn": {
+            "misconception": "มองสถานการณ์ที่ไม่จริงชัด ๆ ราวกับเป็นจริง",
+            "whyFails": "'will' ใช้กับแผนจริง ส่วน 'had' รูปอดีตบอกว่านี่คือจินตนาการ จึงต้องใช้ 'would'"
+          },
+          "learned": {
+            "misconception": "รูปของอนุประโยค if หลงมาอยู่ในอนุประโยคผล",
+            "whyFails": "past simple อยู่ในอนุประโยค if ส่วนอนุประโยคผลต้องใช้ 'would'"
+          },
+          "would learned": {
+            "misconception": "รวม would กับรูป -ed",
+            "whyFails": "หลัง 'would' คำกริยาต้องเป็นรูปเปล่า: would learn ไม่ใช่ would learned"
+          }
+        }
+      }
+    },
+    {
+      "id": "QN-202",
+      "family": "question_negation",
+      "subskill": "question_tag_polarity",
+      "cefr": "B1",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Add a negative tag with the matching auxiliary after a positive statement.",
+        "misconception": "Learner keeps the tag positive or repeats the noun instead of a pronoun.",
+        "reasoning": "check that the statement is positive -> select a negative tag -> match the auxiliary and add a pronoun",
+        "stem": "Your sister works at the hospital, ___?",
+        "options": [
+          "doesn't she",
+          "does she",
+          "isn't she",
+          "doesn't your sister"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "does she",
+            "misconception": "uses a positive tag after a positive statement",
+            "whyFails": "The statement is positive, so the tag must flip to negative: doesn't she."
+          },
+          {
+            "option": "isn't she",
+            "misconception": "wrong auxiliary borrowed from a different tense",
+            "whyFails": "'Works' is present simple, so the tag needs 'does', not 'is'."
+          },
+          {
+            "option": "doesn't your sister",
+            "misconception": "repeats the noun instead of using a pronoun in the tag",
+            "whyFails": "Tags use a pronoun, not the full noun: doesn't she."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "'Works' is a positive present simple verb, so the tag is negative with 'does' and the pronoun 'she': doesn't she?",
+          "rule": "Positive statement → negative tag; the tag copies the auxiliary of the statement and uses a pronoun.",
+          "whyOthersFail": "'Does she' keeps the same polarity; 'isn't she' uses the wrong auxiliary; 'doesn't your sister' repeats the noun.",
+          "howToAvoid": "Three checks: flip the polarity, match the auxiliary, swap the noun for a pronoun.",
+          "memoryCue": "Works → doesn't she?"
+        }
+      },
+      "id_": {
+        "objective": "Tambahin tag negatif dengan kata bantu yang cocok sesudah kalimat positif.",
+        "misconception": "Kamu biarin tag-nya positif atau ngulang kata bendanya, bukan kata ganti.",
+        "reasoning": "kalimatnya positif → tag jadi negatif → kata bantu yang sama + kata ganti",
+        "rule": "Kalimat positif → tag negatif. Tag niru kata bantu kalimatnya dan pakai kata ganti.",
+        "whyCorrect": "“Works” itu present simple positif, jadi tag-nya negatif pakai “does” dan kata ganti “she”: doesn't she?",
+        "whyOthersFail": "“Does she” nggak dibalik. “Isn't she” salah kata bantu. “Doesn't your sister” ngulang kata benda.",
+        "howToAvoid": "Tiga cek: balik positif-negatifnya, samain kata bantunya, ganti kata benda jadi kata ganti.",
+        "memoryCue": "Kalimat positif, tag negatif: works → doesn't she?",
+        "distractors": {
+          "does she": {
+            "misconception": "tag-nya positif sesudah kalimat positif, padahal harusnya dibalik jadi negatif.",
+            "whyFails": "kalimatnya positif, jadi tag-nya harus dibalik jadi negatif: doesn't she."
+          },
+          "isn't she": {
+            "misconception": "kata bantunya nyasar dari bentuk lain.",
+            "whyFails": "“works” itu present simple, jadi tag-nya butuh “does”, bukan “is”."
+          },
+          "doesn't your sister": {
+            "misconception": "ngulang kata bendanya di tag, padahal tag pakai kata ganti.",
+            "whyFails": "tag pakai kata ganti, bukan kata benda utuh: doesn't she."
+          }
+        }
+      },
+      "th": {
+        "objective": "เติม tag ปฏิเสธพร้อมกริยาช่วยที่ตรงกันหลังประโยคบอกเล่าเชิงบวก",
+        "misconception": "ผู้เรียนคง tag เป็นบวก หรือใช้คำนามซ้ำแทนสรรพนาม",
+        "reasoning": "ประโยคเป็นบวก → tag กลายเป็นปฏิเสธ → กริยาช่วยเดียวกัน + สรรพนาม",
+        "rule": "ประโยคบวก → tag ปฏิเสธ; tag ลอกกริยาช่วยของประโยคและใช้สรรพนาม",
+        "whyCorrect": "'Works' เป็น present simple เชิงบวก tag จึงเป็นปฏิเสธด้วย 'does' และสรรพนาม 'she': doesn't she?",
+        "whyOthersFail": "'does she' คงขั้วเดิม 'isn't she' ใช้กริยาช่วยผิด ส่วน 'doesn't your sister' ใช้คำนามซ้ำ",
+        "howToAvoid": "เช็กสามอย่าง: กลับขั้ว จับคู่กริยาช่วย และเปลี่ยนคำนามเป็นสรรพนาม",
+        "memoryCue": "ประโยคบวก tag ปฏิเสธ: works → doesn't she?",
+        "distractors": {
+          "does she": {
+            "misconception": "ใช้ tag บวกหลังประโยคบอกเล่าเชิงบวก ทั้งที่ต้องกลับเป็นปฏิเสธ",
+            "whyFails": "ประโยคเป็นบวก tag จึงต้องกลับเป็นปฏิเสธ: doesn't she"
+          },
+          "isn't she": {
+            "misconception": "หยิบกริยาช่วยมาจากกาลอื่น",
+            "whyFails": "'works' เป็น present simple tag จึงต้องใช้ 'does' ไม่ใช่ 'is'"
+          },
+          "doesn't your sister": {
+            "misconception": "ใช้คำนามซ้ำใน tag ทั้งที่ tag ต้องใช้สรรพนาม",
+            "whyFails": "tag ใช้สรรพนาม ไม่ใช่คำนามเต็ม: doesn't she"
+          }
+        }
+      }
+    },
+    {
+      "id": "TA-204",
+      "family": "tense_aspect",
+      "subskill": "past_perfect_sequencing_two_past_events",
+      "cefr": "B1",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Use the past perfect for the action that happened first when 'when' introduces a later past action.",
+        "misconception": "Learner uses the past simple or present perfect for the earlier of two past events.",
+        "reasoning": "identify two past events -> select the earlier one -> apply had + past participle",
+        "stem": "When we got to the cinema, the film ___ already ___.",
+        "options": [
+          "had / started",
+          "has / started",
+          "was / starting",
+          "did / start"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "has / started",
+            "misconception": "uses the present perfect for an event before another past event",
+            "whyFails": "'Has started' links to now, but both events are in the past; the earlier one needs 'had'."
+          },
+          {
+            "option": "was / starting",
+            "misconception": "keeps the action in progress at 'now' instead of marking it completed before the past reference point",
+            "whyFails": "'Already' shows the start was complete, not in progress, when we arrived."
+          },
+          {
+            "option": "did / start",
+            "misconception": "uses past simple for the earlier event, flattening the sequence",
+            "whyFails": "'Did start' is an emphatic past simple; it does not show that the start came before our arrival."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "The film started before we arrived, so the earlier event takes the past perfect: had already started.",
+          "rule": "Past perfect (had + past participle) marks the earlier of two past events.",
+          "whyOthersFail": "'Has started' points to now; 'was starting' says it was still beginning; 'did start' does not order the two events.",
+          "howToAvoid": "Two past events? Give 'had' to the one that happened first.",
+          "memoryCue": "First event → had done."
+        }
+      },
+      "id_": {
+        "objective": "Pakai past perfect buat kejadian yang lebih dulu waktu “when” ngenalin kejadian lampau berikutnya.",
+        "misconception": "Kamu pakai past simple atau present perfect buat kejadian yang lebih dulu dari dua kejadian lampau.",
+        "reasoning": "dua kejadian lampau → cari yang lebih dulu → had + past participle",
+        "rule": "Past perfect (had + past participle) nandain yang lebih dulu dari dua kejadian lampau.",
+        "whyCorrect": "Filmnya mulai sebelum kami sampai, jadi kejadian yang lebih dulu pakai past perfect: had already started.",
+        "whyOthersFail": "“Has started” nunjuk ke sekarang. “Was starting” bilang masih lagi mulai. “Did start” nggak ngurutin dua kejadiannya.",
+        "howToAvoid": "Dua kejadian lampau? Kasih “had” ke yang terjadi lebih dulu.",
+        "memoryCue": "Kejadian pertama → had done.",
+        "distractors": {
+          "has / started": {
+            "misconception": "pakai present perfect buat kejadian yang terjadi sebelum kejadian lampau lain.",
+            "whyFails": "“has started” nyambung ke sekarang, padahal dua kejadiannya di masa lampau. Yang lebih dulu butuh “had”."
+          },
+          "was / starting": {
+            "misconception": "kejadiannya dibiarin masih berlangsung, padahal udah selesai sebelum titik lampau itu.",
+            "whyFails": "“already” nunjukin mulainya udah selesai, bukan lagi berlangsung, waktu kami sampai."
+          },
+          "did / start": {
+            "misconception": "past simple dipakai buat kejadian yang lebih dulu, urutannya jadi rata.",
+            "whyFails": "“did start” itu past simple penegas. Nggak nunjukin mulainya lebih dulu dari kedatangan kami."
+          }
+        }
+      },
+      "th": {
+        "objective": "ใช้ past perfect กับการกระทำที่เกิดก่อน เมื่อ 'when' นำหน้าการกระทำในอดีตที่เกิดทีหลัง",
+        "misconception": "ผู้เรียนใช้ past simple หรือ present perfect กับเหตุการณ์ที่เกิดก่อนในสองเหตุการณ์อดีต",
+        "reasoning": "สองเหตุการณ์ในอดีต → หาเหตุการณ์ที่เกิดก่อน → had + past participle",
+        "rule": "Past perfect (had + past participle) ทำเครื่องหมายเหตุการณ์ที่เกิดก่อนในสองเหตุการณ์อดีต",
+        "whyCorrect": "หนังเริ่มก่อนที่เราจะไปถึง เหตุการณ์ที่เกิดก่อนจึงใช้ past perfect: had already started",
+        "whyOthersFail": "'has started' ชี้ไปที่ตอนนี้ 'was starting' บอกว่ายังเริ่มอยู่ ส่วน 'did start' ไม่ได้เรียงลำดับสองเหตุการณ์",
+        "howToAvoid": "มีสองเหตุการณ์ในอดีต? ให้ 'had' กับเหตุการณ์ที่เกิดก่อน",
+        "memoryCue": "เหตุการณ์แรก → had done",
+        "distractors": {
+          "has / started": {
+            "misconception": "ใช้ present perfect กับเหตุการณ์ที่เกิดก่อนเหตุการณ์อดีตอีกเหตุการณ์หนึ่ง",
+            "whyFails": "'has started' เชื่อมกับตอนนี้ แต่ทั้งสองเหตุการณ์อยู่ในอดีต เหตุการณ์ที่เกิดก่อนต้องใช้ 'had'"
+          },
+          "was / starting": {
+            "misconception": "ปล่อยให้การกระทำยังดำเนินอยู่ ทั้งที่มันเสร็จก่อนจุดอ้างอิงในอดีต",
+            "whyFails": "'already' บอกว่าการเริ่มเสร็จสิ้นแล้ว ไม่ได้กำลังดำเนินอยู่ตอนที่เราไปถึง"
+          },
+          "did / start": {
+            "misconception": "ใช้ past simple กับเหตุการณ์ที่เกิดก่อน ทำให้ลำดับแบนราบ",
+            "whyFails": "'did start' เป็น past simple แบบเน้น ไม่ได้แสดงว่าการเริ่มเกิดก่อนการมาถึงของเรา"
+          }
+        }
+      }
+    },
+    {
+      "id": "RS-201",
+      "family": "reported_speech",
+      "subskill": "reported_questions_word_order",
+      "cefr": "B1",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Report a wh-question with statement word order and a backshifted verb.",
+        "misconception": "Learner keeps the question inversion or the present tense inside the reported clause.",
+        "reasoning": "identify a direct wh-question -> restore subject + verb order in the reported clause -> backshift the tense",
+        "stem": "\"What time does the shop open?\" → He asked me what time ___.",
+        "options": [
+          "the shop opened",
+          "did the shop open",
+          "the shop opens",
+          "does the shop open"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "did the shop open",
+            "misconception": "keeps the question-form inversion (auxiliary before subject) inside the reported clause",
+            "whyFails": "A reported question uses statement order, so 'did' cannot come before 'the shop'."
+          },
+          {
+            "option": "the shop opens",
+            "misconception": "keeps the present tense inside a reported question after a past reporting verb",
+            "whyFails": "'Asked' is past, so 'opens' normally shifts back to 'opened'."
+          },
+          {
+            "option": "does the shop open",
+            "misconception": "produces an ungrammatical inversion not used in either direct or reported questions in this pattern",
+            "whyFails": "This keeps both the inversion and the present tense of the direct question."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "In a reported question the subject comes before the verb and the tense shifts back: what time the shop opened.",
+          "rule": "Reported wh-question: question word + subject + verb (no do/does/did), with backshift after a past reporting verb.",
+          "whyOthersFail": "'Did the shop open' and 'does the shop open' keep question order; 'the shop opens' forgets the backshift.",
+          "howToAvoid": "Remove do/does/did, put the subject first, then move the verb one step into the past.",
+          "memoryCue": "Asked what time the shop opened — no 'did'."
+        }
+      },
+      "id_": {
+        "objective": "Laporin pertanyaan wh- pakai urutan kalimat berita dan kata kerja yang dimundurin.",
+        "misconception": "Kamu tetap pakai urutan pertanyaan atau bentuk sekarang di dalam klausa yang dilaporin.",
+        "reasoning": "pertanyaan wh- langsung → klausa laporan pakai urutan subjek + kata kerja → mundurin bentuk waktunya",
+        "rule": "Pertanyaan wh- yang dilaporin: kata tanya + subjek + kata kerja (tanpa do/does/did), bentuk waktunya mundur sesudah kata pelapor lampau.",
+        "whyCorrect": "Di pertanyaan yang dilaporin, subjek duluan baru kata kerja, dan bentuk waktunya mundur: what time the shop opened.",
+        "whyOthersFail": "“Did the shop open” dan “does the shop open” masih urutan pertanyaan. “The shop opens” lupa mundurin bentuk waktunya.",
+        "howToAvoid": "Buang do/does/did, taruh subjek duluan, lalu geser kata kerjanya satu langkah ke lampau.",
+        "memoryCue": "Asked what time the shop opened — tanpa “did”.",
+        "distractors": {
+          "did the shop open": {
+            "misconception": "urutan pertanyaan (kata bantu sebelum subjek) tetap dipakai di klausa laporan.",
+            "whyFails": "pertanyaan yang dilaporin pakai urutan kalimat berita, jadi “did” nggak boleh di depan “the shop”."
+          },
+          "the shop opens": {
+            "misconception": "tetap pakai bentuk sekarang di dalam pertanyaan yang dilaporin, padahal kata pelapornya lampau.",
+            "whyFails": "“asked” lampau, jadi “opens” biasanya mundur jadi “opened”."
+          },
+          "does the shop open": {
+            "misconception": "inversi yang nggak dipakai di pertanyaan langsung maupun laporan.",
+            "whyFails": "ini masih nyimpen urutan pertanyaan sekaligus bentuk sekarang dari pertanyaan langsungnya."
+          }
+        }
+      },
+      "th": {
+        "objective": "รายงานคำถาม wh- ด้วยลำดับคำแบบประโยคบอกเล่าและคำกริยาที่เลื่อนกาล",
+        "misconception": "ผู้เรียนคงการสลับที่แบบคำถามหรือรูปปัจจุบันไว้ในอนุประโยคที่รายงาน",
+        "reasoning": "คำถาม wh- ตรง → อนุประโยครายงานใช้ลำดับประธาน + คำกริยา → เลื่อนกาลถอยหลัง",
+        "rule": "รายงานคำถาม wh-: คำถาม + ประธาน + คำกริยา (ไม่มี do/does/did) และเลื่อนกาลหลังคำกริยารายงานที่เป็นอดีต",
+        "whyCorrect": "ในคำถามที่รายงาน ประธานมาก่อนคำกริยาและกาลเลื่อนถอยหลัง: what time the shop opened",
+        "whyOthersFail": "'did the shop open' และ 'does the shop open' คงลำดับคำถามไว้ ส่วน 'the shop opens' ลืมเลื่อนกาล",
+        "howToAvoid": "ตัด do/does/did วางประธานไว้ก่อน แล้วเลื่อนคำกริยาถอยไปในอดีตหนึ่งขั้น",
+        "memoryCue": "Asked what time the shop opened — ไม่มี 'did'",
+        "distractors": {
+          "did the shop open": {
+            "misconception": "คงการสลับที่แบบคำถาม (กริยาช่วยหน้าประธาน) ไว้ในอนุประโยคที่รายงาน",
+            "whyFails": "คำถามที่รายงานใช้ลำดับแบบประโยคบอกเล่า 'did' จึงมาก่อน 'the shop' ไม่ได้"
+          },
+          "the shop opens": {
+            "misconception": "คงรูปปัจจุบันไว้ในคำถามที่รายงาน ทั้งที่คำกริยารายงานเป็นอดีต",
+            "whyFails": "'asked' เป็นอดีต 'opens' จึงปกติเลื่อนเป็น 'opened'"
+          },
+          "does the shop open": {
+            "misconception": "สลับที่แบบที่ไม่ใช้ทั้งในคำถามตรงและคำถามที่รายงาน",
+            "whyFails": "แบบนี้ยังคงทั้งการสลับที่และรูปปัจจุบันของคำถามตรงไว้"
+          }
+        }
+      }
+    },
+    {
+      "id": "QN-203",
+      "family": "question_negation",
+      "subskill": "indirect_questions_embedded_word_order",
+      "cefr": "B1",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Use statement word order without 'do' inside an indirect question.",
+        "misconception": "Learner keeps 'does' or inverts the verb inside 'Do you know...?'.",
+        "reasoning": "identify the opener Do you know -> recall that the embedded part is a statement -> keep subject + verb without does",
+        "stem": "Do you know what time ___?",
+        "options": [
+          "the bank closes",
+          "does the bank close",
+          "the bank does close",
+          "closes the bank"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "does the bank close",
+            "misconception": "keeps direct-question inversion (verb before subject) inside the embedded clause",
+            "whyFails": "The question is already made by 'Do you know'; the embedded part cannot repeat the question form."
+          },
+          {
+            "option": "the bank does close",
+            "misconception": "adds 'do' to an embedded question",
+            "whyFails": "Statement order is right, but 'does' is not needed; the verb simply takes -s: closes."
+          },
+          {
+            "option": "closes the bank",
+            "misconception": "moves the auxiliary to the very front of the embedded clause, producing an invalid word order",
+            "whyFails": "Putting the verb before the subject is not English word order here."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "After 'Do you know what time', the rest is a normal statement: the bank closes.",
+          "rule": "Indirect question: introduction + question word + subject + verb. No do/does/did in the embedded part.",
+          "whyOthersFail": "'Does the bank close' repeats the question form; 'the bank does close' adds an unnecessary auxiliary; 'closes the bank' inverts wrongly.",
+          "howToAvoid": "Say the embedded part alone as a statement first, then attach it.",
+          "memoryCue": "Do you know + statement."
+        }
+      },
+      "id_": {
+        "objective": "Pakai urutan kalimat berita tanpa “do” di dalam pertanyaan nggak langsung.",
+        "misconception": "Kamu tetap pakai “does” atau ngebalik kata kerjanya di dalam “Do you know...?”.",
+        "reasoning": "pertanyaannya mulai dari “Do you know” → bagian dalamnya kalimat berita → subjek + kata kerja, tanpa does",
+        "rule": "Pertanyaan nggak langsung: pembuka + kata tanya + subjek + kata kerja. Tanpa do/does/did di bagian dalamnya.",
+        "whyCorrect": "Sesudah “Do you know what time”, sisanya kalimat berita biasa: the bank closes.",
+        "whyOthersFail": "“Does the bank close” ngulang bentuk pertanyaan. “The bank does close” nambah kata bantu yang nggak perlu. “Closes the bank” kebalik.",
+        "howToAvoid": "Ucapin bagian dalamnya sebagai kalimat berita dulu, baru tempelin.",
+        "memoryCue": "Do you know + kalimat berita.",
+        "distractors": {
+          "does the bank close": {
+            "misconception": "urutan pertanyaan langsung (kata kerja sebelum subjek) tetap dipakai di klausa yang ditempel.",
+            "whyFails": "pertanyaannya udah dibikin sama “Do you know”. Bagian dalamnya nggak boleh ngulang bentuk pertanyaan."
+          },
+          "the bank does close": {
+            "misconception": "nambahin “do” ke pertanyaan yang ditempel, padahal di dalam kalimat nggak butuh do.",
+            "whyFails": "urutannya udah bener, tapi “does” nggak dibutuhin. Kata kerjanya cukup pakai -s: closes."
+          },
+          "closes the bank": {
+            "misconception": "kata kerja dipindah ke depan subjek, urutannya nggak sah.",
+            "whyFails": "naruh kata kerja sebelum subjek bukan urutan bahasa Inggris di sini."
+          }
+        }
+      },
+      "th": {
+        "objective": "ใช้ลำดับคำแบบประโยคบอกเล่าโดยไม่มี 'do' ในคำถามทางอ้อม",
+        "misconception": "ผู้เรียนคง 'does' ไว้หรือสลับที่คำกริยาภายใน 'Do you know...?'",
+        "reasoning": "คำถามเริ่มด้วย 'Do you know' → ส่วนที่ฝังเป็นประโยคบอกเล่า → ประธาน + คำกริยา ไม่มี does",
+        "rule": "คำถามทางอ้อม: ส่วนนำ + คำถาม + ประธาน + คำกริยา ไม่มี do/does/did ในส่วนที่ฝัง",
+        "whyCorrect": "หลัง 'Do you know what time' ส่วนที่เหลือเป็นประโยคบอกเล่าปกติ: the bank closes",
+        "whyOthersFail": "'does the bank close' ทำซ้ำรูปคำถาม 'the bank does close' เพิ่มกริยาช่วยที่ไม่จำเป็น ส่วน 'closes the bank' สลับที่ผิด",
+        "howToAvoid": "ลองพูดส่วนที่ฝังเป็นประโยคบอกเล่าลำพังก่อน แล้วค่อยนำมาต่อ",
+        "memoryCue": "Do you know + ประโยคบอกเล่า",
+        "distractors": {
+          "does the bank close": {
+            "misconception": "คงการสลับที่แบบคำถามตรง (คำกริยาหน้าประธาน) ไว้ในอนุประโยคที่ฝัง",
+            "whyFails": "คำถามถูกสร้างด้วย 'Do you know' แล้ว ส่วนที่ฝังจะทำซ้ำรูปคำถามไม่ได้"
+          },
+          "the bank does close": {
+            "misconception": "เติม 'do' ในคำถามที่ฝังอยู่ในประโยค ทั้งที่ภายในประโยคไม่ต้องใช้ do",
+            "whyFails": "ลำดับถูกแล้ว แต่ไม่ต้องใช้ 'does' คำกริยาแค่เติม -s: closes"
+          },
+          "closes the bank": {
+            "misconception": "ย้ายคำกริยาไปหน้าประธาน ทำให้ลำดับคำผิด",
+            "whyFails": "การวางคำกริยาหน้าประธานไม่ใช่ลำดับคำภาษาอังกฤษตรงนี้"
+          }
+        }
+      }
+    },
+    {
+      "id": "CO-202",
+      "family": "conditionals",
+      "subskill": "wish_unreal_present_past_simple",
+      "cefr": "B1",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Use 'could' after 'wish' for an ability the speaker does not have now.",
+        "misconception": "Learner uses 'can' or 'would' after 'wish' for the speaker's own present situation.",
+        "reasoning": "identify a wish about now -> shift the verb one step back -> convert can to could",
+        "stem": "I can't swim. I wish I ___ swim like my brother.",
+        "options": [
+          "could",
+          "can",
+          "would",
+          "will"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "can",
+            "misconception": "keeping the present tense after 'wish', reading the situation as a real current fact",
+            "whyFails": "After 'wish' the verb steps back: 'can' becomes 'could'."
+          },
+          {
+            "option": "would",
+            "misconception": "uses 'would' in the wish clause about one's own situation",
+            "whyFails": "'Wish + would' is for other people's annoying behaviour, not the speaker's own ability."
+          },
+          {
+            "option": "will",
+            "misconception": "inserting 'would' for the speaker's own situation, as if the sentence were a result clause",
+            "whyFails": "'Will' points to a real future; 'wish' describes an unreal present."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "The speaker cannot swim now and wishes the opposite, so 'wish' takes the past form: could swim.",
+          "rule": "Wish about the present: wish + past simple (or could). Can → could.",
+          "whyOthersFail": "'Can' stays in the present; 'would' is for complaints about others; 'will' is a real future form.",
+          "howToAvoid": "Turn the real sentence into its opposite and move the verb one step back.",
+          "memoryCue": "Can't swim → wish I could."
+        }
+      },
+      "id_": {
+        "objective": "Pakai “could” sesudah “wish” buat kemampuan yang nggak dimiliki pembicara sekarang.",
+        "misconception": "Kamu pakai “can” atau “would” sesudah “wish” buat keadaan diri sendiri sekarang.",
+        "reasoning": "wish soal sekarang → mundur satu langkah → can jadi could",
+        "rule": "Wish soal sekarang: wish + past simple (atau could). Can → could.",
+        "whyCorrect": "Pembicara nggak bisa berenang sekarang dan berharap sebaliknya, jadi “wish” pakai bentuk lampau: could swim.",
+        "whyOthersFail": "“Can” tetap di sekarang. “Would” buat keluhan soal orang lain. “Will” bentuk masa depan nyata.",
+        "howToAvoid": "Balik kalimat nyatanya jadi kebalikannya, lalu geser kata kerjanya satu langkah ke lampau.",
+        "memoryCue": "Nggak bisa sekarang, jadi wish I could: can't swim → wish I could.",
+        "distractors": {
+          "can": {
+            "misconception": "bentuk sekarang dibiarin sesudah wish, situasinya dibaca sebagai fakta nyata.",
+            "whyFails": "sesudah “wish” kata kerjanya mundur: “can” jadi “could”."
+          },
+          "would": {
+            "misconception": "pakai “would” di klausa wish soal diri sendiri, padahal wish + past simple.",
+            "whyFails": "“wish + would” buat kelakuan orang lain yang nyebelin, bukan kemampuan diri sendiri."
+          },
+          "will": {
+            "misconception": "bentuk masa depan nyata dipakai buat harapan yang nggak nyata.",
+            "whyFails": "“will” nunjuk masa depan nyata. “Wish” ngegambarin keadaan sekarang yang nggak nyata."
+          }
+        }
+      },
+      "th": {
+        "objective": "ใช้ 'could' หลัง 'wish' สำหรับความสามารถที่ผู้พูดไม่มีในตอนนี้",
+        "misconception": "ผู้เรียนใช้ 'can' หรือ 'would' หลัง 'wish' กับสถานการณ์ปัจจุบันของตัวเอง",
+        "reasoning": "wish เกี่ยวกับตอนนี้ → เลื่อนถอยหนึ่งขั้น → can กลายเป็น could",
+        "rule": "Wish เกี่ยวกับปัจจุบัน: wish + past simple (หรือ could) Can → could",
+        "whyCorrect": "ผู้พูดว่ายน้ำไม่ได้ตอนนี้และปรารถนาสิ่งตรงข้าม 'wish' จึงใช้รูปอดีต: could swim",
+        "whyOthersFail": "'can' ยังอยู่ในปัจจุบัน 'would' ใช้บ่นเรื่องคนอื่น ส่วน 'will' เป็นรูปอนาคตจริง",
+        "howToAvoid": "เปลี่ยนประโยคจริงให้เป็นตรงข้าม แล้วเลื่อนคำกริยาถอยหนึ่งขั้น",
+        "memoryCue": "ตอนนี้ทำไม่ได้ จึงเป็น wish I could: can't swim → wish I could",
+        "distractors": {
+          "can": {
+            "misconception": "คงรูปปัจจุบันหลัง wish โดยมองสถานการณ์เป็นความจริงในปัจจุบัน",
+            "whyFails": "หลัง 'wish' คำกริยาต้องเลื่อนถอย: 'can' กลายเป็น 'could'"
+          },
+          "would": {
+            "misconception": "ใช้ 'would' ในอนุประโยค wish เกี่ยวกับสถานการณ์ของตัวเอง ทั้งที่ต้องใช้ wish + past simple",
+            "whyFails": "'wish + would' ใช้กับพฤติกรรมน่ารำคาญของคนอื่น ไม่ใช่ความสามารถของผู้พูดเอง"
+          },
+          "will": {
+            "misconception": "ใช้รูปอนาคตจริงกับความปรารถนาที่ไม่จริง",
+            "whyFails": "'will' ชี้ไปที่อนาคตจริง ส่วน 'wish' บรรยายปัจจุบันที่ไม่จริง"
+          }
+        }
+      }
+    },
+    {
+      "id": "TA-205",
+      "family": "tense_aspect",
+      "subskill": "present_perfect_just_already_yet_placement",
+      "cefr": "B1",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Place 'already' between 'have' and the past participle in a positive statement.",
+        "misconception": "Learner uses 'yet' in a positive statement or pushes 'already' to the end.",
+        "reasoning": "identify a positive statement about a completed action -> select already -> place it after have",
+        "stem": "You don't need to wash the dishes — I ___ them.",
+        "options": [
+          "have already washed",
+          "have washed yet",
+          "already have washed",
+          "have washed already yet"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "have washed yet",
+            "misconception": "uses 'yet' in a positive statement",
+            "whyFails": "'Yet' belongs in negatives and questions, not in a positive statement."
+          },
+          {
+            "option": "already have washed",
+            "misconception": "drags 'just' to the end of the clause instead of mid-position between the auxiliary and the participle",
+            "whyFails": "'Already' sits between 'have' and the participle, not before 'have'."
+          },
+          {
+            "option": "have washed already yet",
+            "misconception": "parks 'still' at the end of a negative clause instead of before the auxiliary",
+            "whyFails": "'Already' and 'yet' cannot be combined; one word is enough."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "The dishes are done, so the positive statement uses 'already' in mid-position: have already washed.",
+          "rule": "Have + already/just + past participle in positive statements; 'yet' goes at the end of negatives and questions.",
+          "whyOthersFail": "'Yet' is not for positive statements; 'already have washed' misplaces the adverb; 'already yet' doubles the time word.",
+          "howToAvoid": "Positive and finished? Slip 'already' right after 'have'.",
+          "memoryCue": "Have already done — not yet."
+        }
+      },
+      "id_": {
+        "objective": "Taruh “already” di antara “have” dan past participle di kalimat positif.",
+        "misconception": "Kamu pakai “yet” di kalimat positif atau ngedorong “already” ke ujung.",
+        "reasoning": "kalimat positif soal aksi yang selesai → already → posisi tengah sesudah have",
+        "rule": "Have + already/just + past participle di kalimat positif. “Yet” di ujung kalimat negatif dan pertanyaan.",
+        "whyCorrect": "Piringnya udah beres, jadi kalimat positifnya pakai “already” di posisi tengah: have already washed.",
+        "whyOthersFail": "“Yet” bukan buat kalimat positif. “Already have washed” salah tempat. “Already yet” kata waktunya dobel.",
+        "howToAvoid": "Positif dan udah selesai? Selipin “already” langsung sesudah “have”.",
+        "memoryCue": "Positif pakai already di tengah, negatif pakai yet di ujung.",
+        "distractors": {
+          "have washed yet": {
+            "misconception": "pakai “yet” di kalimat positif, padahal yet buat negatif dan pertanyaan.",
+            "whyFails": "“yet” tempatnya di kalimat negatif dan pertanyaan, bukan kalimat positif."
+          },
+          "already have washed": {
+            "misconception": "kata keterangannya nggak di posisi tengah antara kata bantu dan participle.",
+            "whyFails": "“already” duduk di antara “have” dan participle, bukan sebelum “have”."
+          },
+          "have washed already yet": {
+            "misconception": "kata keterangan waktunya ditumpuk di ujung.",
+            "whyFails": "“already” dan “yet” nggak bisa digabung. Satu kata udah cukup."
+          }
+        }
+      },
+      "th": {
+        "objective": "วาง 'already' ระหว่าง 'have' กับ past participle ในประโยคบอกเล่าเชิงบวก",
+        "misconception": "ผู้เรียนใช้ 'yet' ในประโยคบอกเล่าเชิงบวก หรือผลัก 'already' ไปท้ายประโยค",
+        "reasoning": "ประโยคบวกเกี่ยวกับการกระทำที่เสร็จแล้ว → already → ตำแหน่งกลางหลัง have",
+        "rule": "Have + already/just + past participle ในประโยคบวก; 'yet' อยู่ท้ายประโยคปฏิเสธและคำถาม",
+        "whyCorrect": "ล้างจานเสร็จแล้ว ประโยคบวกจึงใช้ 'already' ในตำแหน่งกลาง: have already washed",
+        "whyOthersFail": "'yet' ไม่ใช้ในประโยคบวก 'already have washed' วางคำผิดที่ ส่วน 'already yet' ใช้คำบอกเวลาซ้ำ",
+        "howToAvoid": "เป็นบวกและเสร็จแล้ว? แทรก 'already' ไว้หลัง 'have' ทันที",
+        "memoryCue": "ประโยคบวกใช้ already ตรงกลาง ประโยคปฏิเสธใช้ yet ท้ายประโยค",
+        "distractors": {
+          "have washed yet": {
+            "misconception": "ใช้ 'yet' ในประโยคบอกเล่าเชิงบวก ทั้งที่ yet ใช้กับปฏิเสธและคำถาม",
+            "whyFails": "'yet' อยู่ในประโยคปฏิเสธและคำถาม ไม่ใช่ประโยคบวก"
+          },
+          "already have washed": {
+            "misconception": "คำกริยาวิเศษณ์ไม่อยู่ตำแหน่งกลางระหว่างกริยาช่วยกับ participle",
+            "whyFails": "'already' อยู่ระหว่าง 'have' กับ participle ไม่ใช่หน้า 'have'"
+          },
+          "have washed already yet": {
+            "misconception": "กองคำบอกเวลาไว้ท้ายประโยค",
+            "whyFails": "'already' กับ 'yet' ใช้ร่วมกันไม่ได้ คำเดียวก็พอ"
+          }
+        }
+      }
+    },
+    {
+      "id": "PD-201",
+      "family": "pronouns_determiners",
+      "subskill": "reflexive_pronouns_myself_vs_each_other",
+      "cefr": "B1",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Use 'each other' when two people do the same action to one another.",
+        "misconception": "Learner uses a reflexive pronoun for a two-way action between two people.",
+        "reasoning": "identify two people acting on one another -> select each other, not -selves",
+        "stem": "Maya and Dito are best friends. They tell ___ everything.",
+        "options": [
+          "each other",
+          "themselves",
+          "them",
+          "theirselves"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "themselves",
+            "misconception": "uses a reflexive pronoun where the plain object pronoun is needed",
+            "whyFails": "'Themselves' means each person tells their own self; here Maya tells Dito and Dito tells Maya."
+          },
+          {
+            "option": "them",
+            "misconception": "uses the plain object pronoun although subject and object are the same person",
+            "whyFails": "'Them' points to other people outside the pair, not to Maya and Dito."
+          },
+          {
+            "option": "theirselves",
+            "misconception": "picks a reflexive that does not match the person of the subject",
+            "whyFails": "'Theirselves' is not an English word; the reflexive is 'themselves', and even that is wrong here."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "The telling goes in both directions between two people, so 'each other' is the right choice.",
+          "rule": "Each other = A → B and B → A. -selves = the subject acts on itself.",
+          "whyOthersFail": "'Themselves' turns the action inward; 'them' refers to outsiders; 'theirselves' does not exist.",
+          "howToAvoid": "Draw two arrows between the people. Both directions? Use 'each other'.",
+          "memoryCue": "Each other = two-way."
+        }
+      },
+      "id_": {
+        "objective": "Pakai “each other” kalau dua orang saling ngelakuin hal yang sama.",
+        "misconception": "Kamu pakai kata ganti diri (-selves) buat aksi timbal balik antara dua orang.",
+        "reasoning": "dua orang, aksinya dua arah → each other, bukan -selves",
+        "rule": "Each other = A → B dan B → A. -selves = subjek ngelakuin ke dirinya sendiri.",
+        "whyCorrect": "Ceritanya dua arah antara dua orang, jadi “each other” yang pas.",
+        "whyOthersFail": "“Themselves” bikin aksinya ke diri sendiri. “Them” nunjuk orang lain di luar. “Theirselves” nggak ada.",
+        "howToAvoid": "Gambar dua panah di antara orangnya. Dua arah? Pakai “each other”.",
+        "memoryCue": "Each other = dua arah.",
+        "distractors": {
+          "themselves": {
+            "misconception": "pakai kata ganti diri (-self), padahal pelaku dan objeknya orang yang beda.",
+            "whyFails": "“themselves” artinya tiap orang cerita ke dirinya sendiri. Di sini Maya cerita ke Dito dan Dito ke Maya."
+          },
+          "them": {
+            "misconception": "kata ganti objek biasa dipakai padahal subjek dan objeknya orang yang sama.",
+            "whyFails": "“them” nunjuk orang lain di luar mereka berdua, bukan Maya dan Dito."
+          },
+          "theirselves": {
+            "misconception": "kata ganti diri yang nggak cocok sama subjeknya.",
+            "whyFails": "“theirselves” bukan kata bahasa Inggris. Bentuknya “themselves”, dan itu pun salah di sini."
+          }
+        }
+      },
+      "th": {
+        "objective": "ใช้ 'each other' เมื่อสองคนทำการกระทำเดียวกันต่อกันและกัน",
+        "misconception": "ผู้เรียนใช้สรรพนามสะท้อนกับการกระทำสองทางระหว่างคนสองคน",
+        "reasoning": "คนสองคน การกระทำไปทั้งสองทาง → each other ไม่ใช่ -selves",
+        "rule": "Each other = A → B และ B → A ส่วน -selves = ประธานกระทำต่อตัวเอง",
+        "whyCorrect": "การเล่าเป็นไปทั้งสองทางระหว่างคนสองคน 'each other' จึงถูกต้อง",
+        "whyOthersFail": "'themselves' ทำให้การกระทำหันเข้าหาตัวเอง 'them' หมายถึงคนอื่น ส่วน 'theirselves' ไม่มีในภาษาอังกฤษ",
+        "howToAvoid": "วาดลูกศรสองอันระหว่างคนทั้งคู่ ไปทั้งสองทางไหม? ใช้ 'each other'",
+        "memoryCue": "Each other = สองทาง",
+        "distractors": {
+          "themselves": {
+            "misconception": "ใช้สรรพนามสะท้อน (-self) ทั้งที่ผู้กระทำและกรรมเป็นคนละคน",
+            "whyFails": "'themselves' หมายถึงแต่ละคนเล่าให้ตัวเองฟัง แต่ตรงนี้ Maya เล่าให้ Dito และ Dito เล่าให้ Maya"
+          },
+          "them": {
+            "misconception": "ใช้สรรพนามกรรมธรรมดาทั้งที่ประธานและกรรมเป็นคนเดียวกัน",
+            "whyFails": "'them' ชี้ไปที่คนอื่นนอกคู่นี้ ไม่ใช่ Maya กับ Dito"
+          },
+          "theirselves": {
+            "misconception": "เลือกสรรพนามสะท้อนที่ไม่ตรงกับบุรุษของประธาน",
+            "whyFails": "'theirselves' ไม่ใช่คำภาษาอังกฤษ รูปสะท้อนคือ 'themselves' และแม้แต่คำนั้นก็ผิดตรงนี้"
+          }
+        }
+      }
+    },
+    {
+      "id": "CO-203",
+      "family": "conditionals",
+      "subskill": "third_conditional_unreal_past",
+      "cefr": "B2",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Use 'would have + past participle' in the result clause of an unreal past condition.",
+        "misconception": "Learner puts the past simple or 'would + verb' in the result clause after a past perfect if-clause.",
+        "reasoning": "identify past perfect in the if-clause -> recall the unreal past -> apply would have + past participle in the result",
+        "stem": "If you had told me about the party, I ___.",
+        "options": [
+          "would have come",
+          "would come",
+          "came",
+          "had come"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "would come",
+            "misconception": "uses second-conditional past simple in an if-clause that needs third-conditional past perfect",
+            "whyFails": "'Would come' talks about an unreal present or future; the party is already in the past."
+          },
+          {
+            "option": "came",
+            "misconception": "uses the past simple in the result clause of a third conditional",
+            "whyFails": "'Came' states a real past event, but the speaker did not come."
+          },
+          {
+            "option": "had come",
+            "misconception": "duplicates 'would' in both clauses",
+            "whyFails": "'Had come' is the if-clause form; the result clause needs 'would have'."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "The party is over and the speaker did not go, so the imagined result uses 'would have come'.",
+          "rule": "Third conditional: If + past perfect, would have + past participle.",
+          "whyOthersFail": "'Would come' is second conditional; 'came' is a real past; 'had come' copies the if-clause form.",
+          "howToAvoid": "Past perfect in the if-clause? Answer with 'would have' plus the participle.",
+          "memoryCue": "If you had told me, I would have come."
+        }
+      },
+      "id_": {
+        "objective": "Pakai “would have + past participle” di klausa akibat pengandaian lampau yang nggak nyata.",
+        "misconception": "Kamu naruh past simple atau “would + kata kerja” di klausa akibat sesudah klausa if past perfect.",
+        "reasoning": "klausa if pakai past perfect → pengandaian lampau → akibatnya would have + past participle",
+        "rule": "Third conditional: If + past perfect, would have + past participle.",
+        "whyCorrect": "Pestanya udah lewat dan pembicara nggak datang, jadi akibat khayalannya pakai “would have come”.",
+        "whyOthersFail": "“Would come” itu second conditional. “Came” lampau nyata. “Had come” niru bentuk klausa if.",
+        "howToAvoid": "Past perfect di klausa if? Jawab pakai “would have” plus participle.",
+        "memoryCue": "Pengandaian lampau: If you had told me, I would have come.",
+        "distractors": {
+          "would come": {
+            "misconception": "bentuk second conditional dipakai buat pengandaian lampau.",
+            "whyFails": "“would come” ngomongin sekarang atau masa depan yang nggak nyata. Pestanya udah lewat."
+          },
+          "came": {
+            "misconception": "pakai past simple di klausa akibat pengandaian lampau, padahal butuh would have + past participle.",
+            "whyFails": "“came” nyatain kejadian lampau nyata, padahal pembicaranya nggak datang."
+          },
+          "had come": {
+            "misconception": "bentuk klausa if nyasar ke klausa akibat.",
+            "whyFails": "“had come” bentuk buat klausa if. Klausa akibat butuh “would have”."
+          }
+        }
+      },
+      "th": {
+        "objective": "ใช้ 'would have + past participle' ในอนุประโยคผลของเงื่อนไขสมมติในอดีต",
+        "misconception": "ผู้เรียนใส่ past simple หรือ 'would + คำกริยา' ในอนุประโยคผลหลังอนุประโยค if ที่เป็น past perfect",
+        "reasoning": "อนุประโยค if มี past perfect → อดีตที่ไม่จริง → ผลใช้ would have + past participle",
+        "rule": "Third conditional: If + past perfect, would have + past participle",
+        "whyCorrect": "งานเลี้ยงจบไปแล้วและผู้พูดไม่ได้ไป ผลที่จินตนาการจึงใช้ 'would have come'",
+        "whyOthersFail": "'would come' เป็น second conditional 'came' เป็นอดีตจริง ส่วน 'had come' ลอกรูปของอนุประโยค if",
+        "howToAvoid": "มี past perfect ในอนุประโยค if? ตอบด้วย 'would have' บวก participle",
+        "memoryCue": "เงื่อนไขในอดีต: If you had told me, I would have come.",
+        "distractors": {
+          "would come": {
+            "misconception": "ใช้รูป second conditional กับเงื่อนไขสมมติในอดีต",
+            "whyFails": "'would come' พูดถึงปัจจุบันหรืออนาคตที่ไม่จริง แต่งานเลี้ยงผ่านไปแล้ว"
+          },
+          "came": {
+            "misconception": "ใช้ past simple ในอนุประโยคผลของเงื่อนไขแบบที่สาม ทั้งที่ต้องใช้ would have + past participle",
+            "whyFails": "'came' บอกเหตุการณ์อดีตที่เกิดจริง แต่ผู้พูดไม่ได้มา"
+          },
+          "had come": {
+            "misconception": "รูปของอนุประโยค if หลงมาอยู่ในอนุประโยคผล",
+            "whyFails": "'had come' เป็นรูปของอนุประโยค if ส่วนอนุประโยคผลต้องใช้ 'would have'"
+          }
+        }
+      }
+    },
+    {
+      "id": "PA-201",
+      "family": "passive",
+      "subskill": "passive_with_modal_verbs",
+      "cefr": "B2",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Build a modal passive with 'can be + past participle'.",
+        "misconception": "Learner drops 'be' after the modal or puts it after the participle.",
+        "reasoning": "identify the modal with a passive meaning -> apply modal + be + past participle",
+        "stem": "These tickets ___ online or at the station.",
+        "options": [
+          "can be bought",
+          "can bought",
+          "can buy",
+          "can be buy"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "can bought",
+            "misconception": "omits the auxiliary 'be' required to form the passive after a modal",
+            "whyFails": "A passive needs 'be' between the modal and the participle: can be bought."
+          },
+          {
+            "option": "can buy",
+            "misconception": "leaves the verb in active form after the modal",
+            "whyFails": "'Tickets can buy' makes the tickets do the buying; the tickets are bought, so the passive is needed."
+          },
+          {
+            "option": "can be buy",
+            "misconception": "puts 'be' after the past participle in a modal passive",
+            "whyFails": "After 'be' the verb must be the past participle 'bought', not the bare 'buy'."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "Tickets receive the action, so the modal passive is 'can be bought'.",
+          "rule": "Modal passive: modal + be + past participle (must be signed, can be bought).",
+          "whyOthersFail": "'Can bought' lacks 'be'; 'can buy' is active; 'can be buy' uses the bare verb instead of the participle.",
+          "howToAvoid": "Three pieces, always in this order: modal, be, participle.",
+          "memoryCue": "Can + be + bought."
+        }
+      },
+      "id_": {
+        "objective": "Bikin pasif dengan modal pakai “can be + past participle”.",
+        "misconception": "Kamu ngilangin “be” sesudah modal atau naruhnya sesudah participle.",
+        "reasoning": "modal + makna pasif → modal + be + past participle",
+        "rule": "Pasif modal: modal + be + past participle (must be signed, can be bought).",
+        "whyCorrect": "Tiketnya yang dikenai aksi, jadi pasif modalnya “can be bought”.",
+        "whyOthersFail": "“Can bought” kurang “be”. “Can buy” aktif. “Can be buy” pakai kata kerja polos, bukan participle.",
+        "howToAvoid": "Tiga bagian, urutannya selalu: modal, be, participle.",
+        "memoryCue": "Modal pasif itu tiga bagian: can + be + bought.",
+        "distractors": {
+          "can bought": {
+            "misconception": "kata bantu be yang dibutuhin pasif sesudah modal dibuang.",
+            "whyFails": "pasif butuh “be” di antara modal dan participle: can be bought."
+          },
+          "can buy": {
+            "misconception": "kata kerjanya dibiarin aktif sesudah modal.",
+            "whyFails": "“tickets can buy” bikin tiketnya yang beli. Tiketnya yang dibeli, jadi butuh pasif."
+          },
+          "can be buy": {
+            "misconception": "naruh “be” sesudah past participle, padahal urutannya modal + be + past participle.",
+            "whyFails": "sesudah “be” kata kerjanya harus past participle “bought”, bukan “buy” polos."
+          }
+        }
+      },
+      "th": {
+        "objective": "สร้าง passive กับ modal ด้วย 'can be + past participle'",
+        "misconception": "ผู้เรียนตัด 'be' หลัง modal หรือวางมันไว้หลัง participle",
+        "reasoning": "modal + ความหมายถูกกระทำ → modal + be + past participle",
+        "rule": "Modal passive: modal + be + past participle (เช่น must be signed, can be bought)",
+        "whyCorrect": "ตั๋วเป็นผู้รับการกระทำ modal passive จึงเป็น 'can be bought'",
+        "whyOthersFail": "'can bought' ขาด 'be' 'can buy' เป็น active ส่วน 'can be buy' ใช้คำกริยารูปเปล่าแทน participle",
+        "howToAvoid": "สามชิ้นเรียงลำดับนี้เสมอ: modal, be, participle",
+        "memoryCue": "modal passive มีสามส่วน: can + be + bought",
+        "distractors": {
+          "can bought": {
+            "misconception": "ตัดกริยาช่วย 'be' ที่จำเป็นในการสร้าง passive หลัง modal",
+            "whyFails": "passive ต้องมี 'be' ระหว่าง modal กับ participle: can be bought"
+          },
+          "can buy": {
+            "misconception": "ปล่อยคำกริยาเป็น active หลัง modal",
+            "whyFails": "'tickets can buy' ทำให้ตั๋วเป็นผู้ซื้อ แต่ตั๋วถูกซื้อ จึงต้องใช้ passive"
+          },
+          "can be buy": {
+            "misconception": "วาง 'be' หลัง past participle ทั้งที่ลำดับต้องเป็น modal + be + past participle",
+            "whyFails": "หลัง 'be' คำกริยาต้องเป็น past participle 'bought' ไม่ใช่ 'buy' รูปเปล่า"
+          }
+        }
+      }
+    },
+    {
+      "id": "PA-202",
+      "family": "passive",
+      "subskill": "causative_have_get_something_done",
+      "cefr": "B2",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Use 'have + object + past participle' when someone else does the job for you.",
+        "misconception": "Learner says the subject did the job themselves or puts 'by' before the person who arranges it.",
+        "reasoning": "identify that someone else does the work -> apply have + object + past participle",
+        "stem": "My hair is too long. I'm going to ___ tomorrow.",
+        "options": [
+          "have it cut",
+          "cut it",
+          "have it cutting",
+          "have cut it by me"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "cut it",
+            "misconception": "confuses the causative 'have/get' pattern with 'make someone do something'",
+            "whyFails": "'Cut it' means I do the cutting myself; the speaker goes to a hairdresser."
+          },
+          {
+            "option": "have it cutting",
+            "misconception": "uses the -ing form instead of the past participle after 'get'",
+            "whyFails": "The causative needs the past participle 'cut', not '-ing'."
+          },
+          {
+            "option": "have cut it by me",
+            "misconception": "puts 'by' before the person who has the work done",
+            "whyFails": "The object comes before the participle, and 'by me' contradicts the idea that someone else does it."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "A hairdresser will do the cutting, so the causative 'have it cut' is used.",
+          "rule": "Causative: have/get + object + past participle = someone else does it for you.",
+          "whyOthersFail": "'Cut it' is doing it yourself; 'have it cutting' uses -ing; 'have cut it by me' breaks the order and the meaning.",
+          "howToAvoid": "Ask who really does the job. Someone else? Use have + thing + participle.",
+          "memoryCue": "Have it cut = the hairdresser cuts it."
+        }
+      },
+      "id_": {
+        "objective": "Pakai “have + objek + past participle” kalau orang lain yang ngerjain buat kamu.",
+        "misconception": "Kamu bilang subjeknya ngerjain sendiri, atau naruh “by” di depan orang yang nyuruh.",
+        "reasoning": "orang lain yang ngerjain → have + objek + past participle",
+        "rule": "Causative: have/get + objek + past participle = orang lain yang ngerjain buat kamu.",
+        "whyCorrect": "Tukang cukur yang bakal motong, jadi pakai causative “have it cut”.",
+        "whyOthersFail": "“Cut it” artinya motong sendiri. “Have it cutting” pakai -ing. “Have cut it by me” ngerusak urutan dan maknanya.",
+        "howToAvoid": "Tanya siapa yang beneran ngerjain. Orang lain? Pakai have + benda + participle.",
+        "memoryCue": "Have it cut = tukang cukur yang motong.",
+        "distractors": {
+          "cut it": {
+            "misconception": "pola have/get ketuker sama ngerjain sendiri.",
+            "whyFails": "“cut it” artinya aku yang motong sendiri, padahal pembicara pergi ke tukang cukur."
+          },
+          "have it cutting": {
+            "misconception": "bentuk -ing dipakai, bukan past participle.",
+            "whyFails": "causative butuh past participle “cut”, bukan -ing."
+          },
+          "have cut it by me": {
+            "misconception": "naruh “by” di depan orang yang nyuruh, padahal dia subjeknya, bukan pelakunya.",
+            "whyFails": "objeknya harus sebelum participle, dan “by me” bertentangan sama ide orang lain yang ngerjain."
+          }
+        }
+      },
+      "th": {
+        "objective": "ใช้ 'have + กรรม + past participle' เมื่อคนอื่นทำงานนั้นให้คุณ",
+        "misconception": "ผู้เรียนบอกว่าประธานทำงานเอง หรือวาง 'by' หน้าคนที่เป็นผู้จัดให้ทำ",
+        "reasoning": "คนอื่นเป็นผู้ทำงาน → have + กรรม + past participle",
+        "rule": "Causative: have/get + กรรม + past participle = คนอื่นทำให้คุณ",
+        "whyCorrect": "ช่างตัดผมจะเป็นผู้ตัด จึงใช้ causative 'have it cut'",
+        "whyOthersFail": "'cut it' คือทำเอง 'have it cutting' ใช้ -ing ส่วน 'have cut it by me' ทำลายทั้งลำดับและความหมาย",
+        "howToAvoid": "ถามว่าใครทำงานนั้นจริง ๆ คนอื่นใช่ไหม? ใช้ have + สิ่งของ + participle",
+        "memoryCue": "Have it cut = ช่างตัดผมเป็นคนตัด",
+        "distractors": {
+          "cut it": {
+            "misconception": "สับสนแบบแผน have/get กับการทำเอง",
+            "whyFails": "'cut it' หมายถึงฉันตัดเอง แต่ผู้พูดไปหาช่างตัดผม"
+          },
+          "have it cutting": {
+            "misconception": "ใช้รูป -ing แทน past participle",
+            "whyFails": "causative ต้องใช้ past participle 'cut' ไม่ใช่ -ing"
+          },
+          "have cut it by me": {
+            "misconception": "วาง 'by' หน้าคนที่สั่งให้ทำ ทั้งที่คนนั้นเป็นประธาน ไม่ใช่ผู้กระทำ",
+            "whyFails": "กรรมต้องมาก่อน participle และ 'by me' ขัดกับความคิดที่ว่าคนอื่นเป็นผู้ทำ"
+          }
+        }
+      }
+    },
+    {
+      "id": "RC-201",
+      "family": "relative_clauses",
+      "subskill": "relative_pronoun_whose_possession",
+      "cefr": "B2",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Use 'whose' to link a person to something they own inside a relative clause.",
+        "misconception": "Learner uses 'who' or 'which' although the clause shows possession.",
+        "reasoning": "check that the noun after the gap belongs to the person -> identify possession -> select whose",
+        "stem": "I have a friend ___ father is a pilot.",
+        "options": [
+          "whose",
+          "who",
+          "which",
+          "who's"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "who",
+            "misconception": "uses the subject relative pronoun without showing the required possessive relationship",
+            "whyFails": "'Who father' has no link of ownership; the father belongs to the friend, so 'whose' is needed."
+          },
+          {
+            "option": "which",
+            "misconception": "uses 'which' for a person",
+            "whyFails": "'Which' is for things, and it does not show possession either."
+          },
+          {
+            "option": "who's",
+            "misconception": "confuses the contraction 'who's' (who is / who has) with the possessive relative pronoun 'whose'",
+            "whyFails": "'Who's' means 'who is'; 'a friend who is father' makes no sense."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "The father is the friend's father, so the possessive relative pronoun 'whose' connects them.",
+          "rule": "Whose + noun shows that the noun belongs to the person or thing just mentioned.",
+          "whyOthersFail": "'Who' and 'which' show no possession; 'who's' is a contraction of 'who is'.",
+          "howToAvoid": "Can you say 'his/her/its' before the next noun? Then the relative word is 'whose'.",
+          "memoryCue": "Whose = his/her in a relative clause."
+        }
+      },
+      "id_": {
+        "objective": "Pakai “whose” buat nyambungin orang sama sesuatu yang dia punya di dalam klausa relatif.",
+        "misconception": "Kamu pakai “who” atau “which”, padahal klausanya nunjukin kepemilikan.",
+        "reasoning": "kata benda sesudah titik-titik itu milik orangnya → kepemilikan → whose",
+        "rule": "Whose + kata benda nunjukin kata benda itu milik orang atau benda yang baru disebut.",
+        "whyCorrect": "Ayahnya itu ayah si teman, jadi kata ganti relatif kepemilikan “whose” yang nyambungin.",
+        "whyOthersFail": "“Who” dan “which” nggak nunjukin kepemilikan. “Who's” singkatan “who is”.",
+        "howToAvoid": "Bisa bilang “his/her/its” di depan kata benda berikutnya? Kata relatifnya “whose”.",
+        "memoryCue": "Whose = his/her di klausa relatif.",
+        "distractors": {
+          "who": {
+            "misconception": "kata ganti relatif subjek dipakai tanpa nunjukin kepemilikan.",
+            "whyFails": "“who father” nggak ada hubungan kepemilikan. Ayahnya milik si teman, jadi butuh “whose”."
+          },
+          "which": {
+            "misconception": "pakai “which” buat orang, padahal which cuma buat benda atau hewan.",
+            "whyFails": "“which” buat benda, dan juga nggak nunjukin kepemilikan."
+          },
+          "who's": {
+            "misconception": "singkatan “who's” (who is) ketuker sama “whose”.",
+            "whyFails": "“who's” artinya “who is”. “A friend who is father” nggak masuk akal."
+          }
+        }
+      },
+      "th": {
+        "objective": "ใช้ 'whose' เชื่อมคนกับสิ่งที่เขาเป็นเจ้าของภายในอนุประโยคสัมพันธ์",
+        "misconception": "ผู้เรียนใช้ 'who' หรือ 'which' ทั้งที่อนุประโยคแสดงความเป็นเจ้าของ",
+        "reasoning": "คำนามหลังช่องว่างเป็นของคนนั้น → ความเป็นเจ้าของ → whose",
+        "rule": "Whose + คำนาม แสดงว่าคำนามนั้นเป็นของคนหรือสิ่งที่เพิ่งกล่าวถึง",
+        "whyCorrect": "พ่อคนนั้นเป็นพ่อของเพื่อน สรรพนามสัมพันธ์แสดงความเป็นเจ้าของ 'whose' จึงเชื่อมทั้งสอง",
+        "whyOthersFail": "'who' และ 'which' ไม่แสดงความเป็นเจ้าของ ส่วน 'who's' เป็นรูปย่อของ 'who is'",
+        "howToAvoid": "พูดว่า 'his/her/its' หน้าคำนามถัดไปได้ไหม? ถ้าได้ คำสัมพันธ์คือ 'whose'",
+        "memoryCue": "Whose = his/her ในอนุประโยคสัมพันธ์",
+        "distractors": {
+          "who": {
+            "misconception": "ใช้สรรพนามสัมพันธ์ประธานโดยไม่แสดงความเป็นเจ้าของ",
+            "whyFails": "'who father' ไม่มีความเชื่อมโยงของความเป็นเจ้าของ พ่อเป็นของเพื่อน จึงต้องใช้ 'whose'"
+          },
+          "which": {
+            "misconception": "ใช้ 'which' กับคน ทั้งที่ which ใช้กับสิ่งของหรือสัตว์เท่านั้น",
+            "whyFails": "'which' ใช้กับสิ่งของ และไม่แสดงความเป็นเจ้าของด้วย"
+          },
+          "who's": {
+            "misconception": "สับสนรูปย่อ 'who's' (who is) กับ 'whose'",
+            "whyFails": "'who's' หมายถึง 'who is' ส่วน 'a friend who is father' ไม่มีความหมาย"
+          }
+        }
+      }
+    },
+    {
+      "id": "LD-202",
+      "family": "linking_devices",
+      "subskill": "contrast_connectors_although_despite_however_distinction",
+      "cefr": "B2",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Use 'although' before a full clause to show contrast.",
+        "misconception": "Learner puts 'despite' or 'however' in front of a clause with a subject and verb.",
+        "reasoning": "check that what follows has a subject and verb -> identify a clause -> select although, not despite",
+        "stem": "___ she was tired, she finished her homework.",
+        "options": [
+          "Although",
+          "Despite",
+          "However",
+          "But"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "Despite",
+            "misconception": "puts 'despite' before a full clause",
+            "whyFails": "'Despite' takes a noun or -ing ('despite being tired'), not 'she was tired'."
+          },
+          {
+            "option": "However",
+            "misconception": "Treats 'however' as a subordinating connector that can start a sentence and directly attach to a noun.",
+            "whyFails": "'However' links two separate sentences and is followed by a comma; it cannot join two clauses in one sentence like this."
+          },
+          {
+            "option": "But",
+            "misconception": "uses 'but' as a subordinating connector at the start of the sentence",
+            "whyFails": "'But' joins clauses in the middle of a sentence, not at the very start before a comma-linked clause."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "'She was tired' is a full clause, so the contrast connector must be 'although'.",
+          "rule": "Although + clause; despite + noun/-ing; however + comma, starting a new sentence.",
+          "whyOthersFail": "'Despite' needs a noun; 'however' needs its own sentence; 'but' cannot open a two-clause sentence this way.",
+          "howToAvoid": "Look at what follows the gap: subject + verb means 'although'.",
+          "memoryCue": "Although + she was… / Despite + being…"
+        }
+      },
+      "id_": {
+        "objective": "Pakai “although” di depan klausa utuh buat nunjukin pertentangan.",
+        "misconception": "Kamu naruh “despite” atau “however” di depan klausa yang punya subjek dan kata kerja.",
+        "reasoning": "yang ngikut punya subjek + kata kerja → klausa → although, bukan despite",
+        "rule": "Although + klausa. Despite + kata benda/-ing. However + koma, buka kalimat baru.",
+        "whyCorrect": "“She was tired” klausa utuh, jadi penghubung pertentangannya harus “although”.",
+        "whyOthersFail": "“Despite” butuh kata benda. “However” butuh kalimat sendiri. “But” nggak bisa buka kalimat dua klausa kayak ini.",
+        "howToAvoid": "Lihat yang ngikut sesudah titik-titik: subjek + kata kerja berarti “although”.",
+        "memoryCue": "Although ketemu klausa, despite ketemu kata benda: although she was… / despite being…",
+        "distractors": {
+          "Despite": {
+            "misconception": "naruh “despite” di depan klausa utuh, padahal despite cuma buat kata benda atau -ing.",
+            "whyFails": "“despite” pakai kata benda atau -ing (“despite being tired”), bukan “she was tired”."
+          },
+          "However": {
+            "misconception": "“however” dianggap bisa buka kalimat dan langsung nyambung ke klausa.",
+            "whyFails": "“however” nyambungin dua kalimat terpisah dan diikuti koma. Nggak bisa ngegabung dua klausa dalam satu kalimat begini."
+          },
+          "But": {
+            "misconception": "pakai “but” di awal kalimat buat ngegabung dua klausa, padahal but cuma nyambung di tengah.",
+            "whyFails": "“but” ngegabung klausa di tengah kalimat, bukan di paling depan sebelum klausa berkoma."
+          }
+        }
+      },
+      "th": {
+        "objective": "ใช้ 'although' หน้าอนุประโยคเต็มเพื่อแสดงความขัดแย้ง",
+        "misconception": "ผู้เรียนวาง 'despite' หรือ 'however' หน้าอนุประโยคที่มีประธานและคำกริยา",
+        "reasoning": "สิ่งที่ตามมามีประธาน + คำกริยา → อนุประโยค → although ไม่ใช่ despite",
+        "rule": "Although + อนุประโยค; despite + คำนาม/-ing; however + จุลภาค เริ่มประโยคใหม่",
+        "whyCorrect": "'She was tired' เป็นอนุประโยคเต็ม ตัวเชื่อมแสดงความขัดแย้งจึงต้องเป็น 'although'",
+        "whyOthersFail": "'despite' ต้องการคำนาม 'however' ต้องมีประโยคของตัวเอง ส่วน 'but' เปิดประโยคสองอนุประโยคแบบนี้ไม่ได้",
+        "howToAvoid": "ดูสิ่งที่ตามหลังช่องว่าง: ประธาน + คำกริยา แปลว่า 'although'",
+        "memoryCue": "Although เจออนุประโยค despite เจอคำนาม: although she was… / despite being…",
+        "distractors": {
+          "Despite": {
+            "misconception": "วาง 'despite' หน้าอนุประโยคเต็ม ทั้งที่ despite ใช้กับคำนามหรือรูป -ing เท่านั้น",
+            "whyFails": "'despite' ใช้กับคำนามหรือ -ing ('despite being tired') ไม่ใช่ 'she was tired'"
+          },
+          "However": {
+            "misconception": "มอง 'however' เป็นตัวเชื่อมที่เริ่มประโยคและต่อกับอนุประโยคได้โดยตรง",
+            "whyFails": "'however' เชื่อมสองประโยคแยกกันและตามด้วยจุลภาค รวมสองอนุประโยคในประโยคเดียวแบบนี้ไม่ได้"
+          },
+          "But": {
+            "misconception": "ใช้ 'but' ต้นประโยคเพื่อรวมสองอนุประโยค ทั้งที่ but ใช้เชื่อมตรงกลางเท่านั้น",
+            "whyFails": "'but' เชื่อมอนุประโยคตรงกลางประโยค ไม่ใช่ต้นประโยคก่อนอนุประโยคที่คั่นด้วยจุลภาค"
+          }
+        }
+      }
+    },
+    {
+      "id": "LD-203",
+      "family": "linking_devices",
+      "subskill": "result_connectors_so_such_that_therefore_distinction",
+      "cefr": "B2",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Use 'such a' before adjective + singular noun in a result structure.",
+        "misconception": "Learner uses 'so' before a noun phrase or drops the article after 'such'.",
+        "reasoning": "identify adjective + singular noun after the gap -> select such a, not so",
+        "stem": "It was ___ good film that we watched it twice.",
+        "options": [
+          "such a",
+          "so",
+          "such",
+          "so a"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "so",
+            "misconception": "uses 'so' before a noun phrase with an adjective",
+            "whyFails": "'So' goes before an adjective alone ('so good'); before 'good film' the word is 'such a'."
+          },
+          {
+            "option": "such",
+            "misconception": "drops the article after 'such' before a singular noun",
+            "whyFails": "'Film' is singular and countable, so it needs 'a' after 'such'."
+          },
+          {
+            "option": "so a",
+            "misconception": "Inserts an article as if a noun were about to follow.",
+            "whyFails": "'So' never takes an article after it; the pattern with a noun is 'such a'."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "'Good film' is adjective + singular noun, so the result structure uses 'such a … that'.",
+          "rule": "So + adjective … that; such (a/an) + adjective + noun … that.",
+          "whyOthersFail": "'So' cannot stand before a noun phrase; 'such' needs 'a' before a singular noun; 'so a' is not a pattern.",
+          "howToAvoid": "Is there a noun after the adjective? Yes → such (a). No → so.",
+          "memoryCue": "So good / such a good film."
+        }
+      },
+      "id_": {
+        "objective": "Pakai “such a” di depan kata sifat + kata benda tunggal di struktur akibat.",
+        "misconception": "Kamu pakai “so” di depan frasa kata benda, atau ngilangin artikel sesudah “such”.",
+        "reasoning": "yang ngikut kata sifat + kata benda tunggal → such a, bukan so",
+        "rule": "So + kata sifat … that. Such (a/an) + kata sifat + kata benda … that.",
+        "whyCorrect": "“Good film” itu kata sifat + kata benda tunggal, jadi struktur akibatnya pakai “such a … that”.",
+        "whyOthersFail": "“So” nggak bisa berdiri di depan frasa kata benda. “Such” butuh “a” sebelum kata benda tunggal. “So a” bukan pola.",
+        "howToAvoid": "Ada kata benda sesudah kata sifatnya? Ya → such (a). Nggak → so.",
+        "memoryCue": "So ketemu kata sifat aja, such a ketemu kata sifat + kata benda: so good / such a good film.",
+        "distractors": {
+          "so": {
+            "misconception": "pakai “so” di depan kata sifat + kata benda, padahal di situ butuh “such”.",
+            "whyFails": "“so” di depan kata sifat aja (“so good”). Di depan “good film” katanya “such a”."
+          },
+          "such": {
+            "misconception": "ngilangin “a” sesudah such, padahal kata benda tunggalnya butuh artikel.",
+            "whyFails": "“film” tunggal dan bisa dihitung, jadi butuh “a” sesudah “such”."
+          },
+          "so a": {
+            "misconception": "artikel disisipin seolah ada kata benda yang ngikut so.",
+            "whyFails": "“so” nggak pernah diikuti artikel. Pola sama kata benda itu “such a”."
+          }
+        }
+      },
+      "th": {
+        "objective": "ใช้ 'such a' หน้าคำคุณศัพท์ + คำนามเอกพจน์ในโครงสร้างแสดงผล",
+        "misconception": "ผู้เรียนใช้ 'so' หน้าวลีนาม หรือตัดคำนำหน้านามหลัง 'such'",
+        "reasoning": "ตามด้วยคำคุณศัพท์ + คำนามเอกพจน์ → such a ไม่ใช่ so",
+        "rule": "So + คำคุณศัพท์ … that; such (a/an) + คำคุณศัพท์ + คำนาม … that",
+        "whyCorrect": "'Good film' เป็นคำคุณศัพท์ + คำนามเอกพจน์ โครงสร้างแสดงผลจึงใช้ 'such a … that'",
+        "whyOthersFail": "'so' อยู่หน้าวลีนามไม่ได้ 'such' ต้องมี 'a' หน้าคำนามเอกพจน์ ส่วน 'so a' ไม่ใช่แบบแผน",
+        "howToAvoid": "มีคำนามหลังคำคุณศัพท์ไหม? มี → such (a) ไม่มี → so",
+        "memoryCue": "So เจอคำคุณศัพท์อย่างเดียว such a เจอคำคุณศัพท์ + คำนาม: so good / such a good film",
+        "distractors": {
+          "so": {
+            "misconception": "ใช้ 'so' หน้าคำคุณศัพท์ + คำนาม ทั้งที่ตรงนั้นต้องใช้ 'such'",
+            "whyFails": "'so' อยู่หน้าคำคุณศัพท์ลำพัง ('so good') หน้า 'good film' ต้องใช้ 'such a'"
+          },
+          "such": {
+            "misconception": "ตัด 'a' หลัง such ทิ้ง ทั้งที่คำนามเอกพจน์ต้องมีคำนำหน้านาม",
+            "whyFails": "'film' เป็นเอกพจน์นับได้ จึงต้องมี 'a' หลัง 'such'"
+          },
+          "so a": {
+            "misconception": "แทรกคำนำหน้านามราวกับจะมีคำนามตามหลัง so",
+            "whyFails": "'so' ไม่เคยตามด้วยคำนำหน้านาม แบบแผนที่ใช้กับคำนามคือ 'such a'"
+          }
+        }
+      }
+    }
+  ]
+}

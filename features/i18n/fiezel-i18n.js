@@ -87,6 +87,12 @@
     }
   }
 
+  /** Timpa kalimat yang sudah terdaftar (lapisan "bahasa murid"). Tidak melempar pada kunci ganda. */
+  function overrideCopy(locale, map) {
+    var box = registry[normalize(locale)];
+    Object.keys(map).forEach(function (k) { box[k] = map[k]; });
+  }
+
   function hasCopy(locale, key) {
     var box = registry[normalize(locale)];
     return Object.prototype.hasOwnProperty.call(box, String(key));
@@ -151,6 +157,7 @@
     SUPPORTED: SUPPORTED.slice(),
     STATE_FIELD: STATE_FIELD,
     registerCopy: registerCopy,
+    overrideCopy: overrideCopy,
     hasCopy: hasCopy,
     whenAvailable: whenAvailable,
     t: t,

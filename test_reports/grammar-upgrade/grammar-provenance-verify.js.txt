@@ -1,0 +1,25 @@
+=== grammar-provenance-verify: ringkasan per level ===
+
+[A1] lesson: 34 | kartu: 850 | pelanggaran: 0
+  - bersih
+
+[A2] lesson: 56 | kartu: 1400 | pelanggaran: 0
+  - bersih
+
+[B1] lesson: 83 | kartu: 2075 | pelanggaran: 0
+  - bersih
+
+[B2] lesson: 61 | kartu: 1525 | pelanggaran: 0
+  - bersih
+
+[C1] lesson: 29 | kartu: 725 | pelanggaran: 0
+  - bersih
+
+[C2] lesson: 19 | kartu: 475 | pelanggaran: 0
+  - bersih
+
+=== status ===
+Pelanggaran kontrak total: 0 (aturan patch-independent: 0)
+Dump review: /review/questions-<LEVEL>.json
+
+PASS grammar-provenance-verify: seluruh kontrak provenance terpenuhi di 6 level.

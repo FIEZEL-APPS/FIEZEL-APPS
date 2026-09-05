@@ -1,0 +1,2 @@
+FIEZEL regression checks: PASS
+{"adaptive":12,"placement":12,"placementDifficulty":{"1":2,"2":2,"3":2,"4":2,"5":2,"6":2},"levelSourceCounts":{"A1":638,"A2":762,"B1":996,"B2":1026,"C1":484,"C2":376},"newUserReviewDue":0,"adaptiveLockedBeforeDiagnosis":true,"readingPassageAttached":true}

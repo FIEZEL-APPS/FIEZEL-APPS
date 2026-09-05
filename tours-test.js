@@ -54,12 +54,12 @@ const COPY = {
        tidak lagi punya tab sendiri; keduanya hidup di dalam Latihan, dan Peta berganti
        nama jadi Progres. Naskahnya diperbarui bersama reports/copy-tour-gems.md, sesuai
        aturan di kepala berkas ini: copy berubah = laporan DAN gerbang berubah bersama. */
-    ['Tab Vocab, Grammar, Reading',
+    ['Tab Latihan',
       'Semua latihan mandiri ada di sini: Vocabulary, Grammar, Reading, bicara & dengar, nulis, sama perpustakaan. Buka kalau kamu pengin ngelatih satu hal tertentu.'],
     ['Tab Progres',
       'Di sini kamu lihat jalur belajarmu dari A1 sampai C2, materi yang udah kuat, dan pola kesalahan yang masih sering muncul — biar arahmu jelas.'],
-    ['Notifikasi',
-      'Lonceng di kanan ini tempat kabar masuk: tugas dari guru, teman baru, dan sorakan. Ketuk tugasnya, sesinya langsung terbuka.'],
+    ['Tanya FIEZEL?',
+      'Tombol di kanan ini pintu ke PAW, pembimbing kamu. Bingung apa pun, tanya di sini (butuh jaringan).'],
     ['Chip level kamu',
       'Chip ini nunjukin level aktifmu. Ketuk buat pindah level \u2014 materi dan latihan langsung ngikutin pilihanmu.'],
     ['Tombol Pengaturan',

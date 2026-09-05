@@ -1,0 +1,63 @@
+ok - salah pada distraktor berbeda menghasilkan diagnosis berbeda, bukan sama-sama "salah"
+ok - soal tanpa peta miskonsepsi tetap terdiagnosis, tetapi mengakui presisinya lebih kasar
+ok - benar tetapi tersendat ditandai rapuh — penguasaan dan perhitungan ulang bukan hal yang sama
+ok - jawaban satu detik terbaca menebak, bukan mengingat
+ok - ambangnya ikut kebiasaan murid: 5 detik cepat bagi pembaca lambat, wajar bagi yang cepat
+ok - baseline memakai median, jadi satu jeda panjang tidak menggeser seluruh sesi
+ok - retry bantuan tidak dihitung sebagai jawaban ujian atau baseline waktu baru
+ok - kesalahan pertama tidak pernah membuka jawaban, bahkan untuk murid berpenguasaan nol
+ok - bantuan naik hanya setelah gagal lagi, dan akhirnya sampai ke jawaban
+ok - murid yang sudah menguasai mulai dari pertanyaan menggiring, bukan dari petunjuk
+ok - miskonsepsi berulang mempercepat tangga — mengulang cara yang sama bukan mengajar
+ok - tangga dihitung dari KEGAGALAN, bukan dari berapa kali konsepnya keluar
+ok - hitungan kegagalan nol lagi setelah konsepnya berhasil dilewati
+ok - kegagalan beruntun pada konsep yang sama menaikkan bantuan satu per satu
+ok - miskonsepsi yang sama dua kali mengubah tindakan menjadi mengajar ulang
+ok - salah karena sebab yang berbeda-beda tidak dianggap pola — tetapi tiga beruntun tetap dihentikan
+ok - menjawab benar setelah pernah keliru pada konsep itu terbaca sebagai terobosan
+ok - terobosan dicocokkan lewat konsep, bukan lewat teks nama miskonsepsi
+ok - benar tetapi lambat dimantapkan dulu, tidak langsung dinaikkan
+ok - beruntun benar dan cepat dinaikkan — soal di bawah kemampuan membuang giliran
+ok - empat tebakan benar TIDAK menaikkan kesulitan — tebakan bukan penguasaan
+ok - baseline waktu jawab bergulir mengikuti sesi, tidak beku di sampel pertama
+ok - murid lelah dihentikan, bukan dimudahkan — dan itu mengalahkan tindakan lain
+ok - lelah di awal sesi belum menghentikan apa pun — dua jawaban bukan bukti kelelahan
+ok - soal habis ditutup, tidak dibiarkan menggantung
+ok - nama miskonsepsi yang sama di konsep berbeda tidak saling menimpa
+ok - miskonsepsi persisten dari ledger langsung terdeteksi pada kemunculan pertama sesi ini
+ok - setelah mengajar ulang, soal berikutnya adalah konsep yang barusan diajarkan
+ok - konsep yang baru saja dikuasai dihindari — dua soal beruntun membuang giliran
+ok - soal yang terlalu sulit dihukum lebih keras daripada yang terlalu mudah
+ok - konsep yang sudah sering keluar turun peringkat, jadi sesi tidak terjebak di satu materi
+ok - target keberhasilan bawaan tetap delapan puluh persen
+ok - kolam kosong mengembalikan null, tidak mengarang soal
+ok - naskah tidak membuka jawaban sebelum tangga sampai di tell
+ok - naskah menyebut kesalahannya, bukan sekadar "belum tepat"
+ok - jawaban terlalu cepat ditegur soal caranya, bukan soal pilihannya
+ok - pujian mengarah ke yang DILAKUKAN, tidak pernah ke orangnya
+ok - ajakan berhenti menyebutnya capek, bukan tidak mampu
+ok - tidak satu pun naskah tutor keluar dalam bahasa Inggris
+ok - penjelasan yang gagal tidak pernah diulang dengan frasa yang sama
+ok - penjelasan yang BERHASIL tidak dicap gagal
+ok - level worked benar-benar berisi contoh yang dikerjakan, bukan sekadar mengutip aturan
+ok - naskah tidak pernah keluar dengan titik ganda
+ok - ringkasan melaporkan apa yang BERUBAH, bukan hanya berapa yang benar
+ok - pola yang masih mengganjal disebut sebagai sasaran berikutnya, bukan sebagai kegagalan
+ok - sesi kosong tidak mengarang akurasi
+ok - modul tetap murni: tanpa DOM, tanpa jaringan, tanpa jam sendiri
+ok - app.js memakai lapisan tutor lewat penjaga, bukan memanggilnya langsung
+ok - app.js tidak pernah menyuapkan penjelasan mentah bank soal ke naskah tutor
+ok - modul tutor ikut dimuat halaman dan ikut di-precache service worker
+ok - empat keadaan afek menghasilkan empat intervensi BERBEDA, netral tidak mengubah apa pun
+ok - afek fatigued hanya menutup sesi bila sisa soal masih panjang (remaining>2)
+ok - aturan keselamatan tetap menang atas afek: miskonsepsi persisten, rentetan salah, lelah kognitif
+ok - dua keberhasilan mandiri berturut menurunkan titik mulai tangga satu anak tangga
+ok - kegagalan menghapus kredit fading — kepercayaan dibangun ulang dari nol
+ok - sukses yang tidak mandiri tidak dihitung: retry tanpa nilai dan jawaban tepat setelah bantuan
+ok - kredit fading dihitung per konsep, tidak bocor ke konsep lain
+ok - seed yang sama selalu memilih soal yang sama — deterministik, bisa diuji ulang
+ok - seed berbeda pada kolam seragam bisa memilih soal berbeda — argmax murni adalah rel
+ok - tanpa seed perilakunya tetap argmax lama, dan seed tidak pernah mengalahkan skor yang jauh unggul
+ok - sampling berseed tidak pernah keluar dari empat kandidat teratas
+
+Tutor Brain v3: PASS

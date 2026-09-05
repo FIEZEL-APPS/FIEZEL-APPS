@@ -154,12 +154,7 @@ const indexSrc = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
 
 ok(/VALID_VIEWS[^;]*'ask'/.test(appSrc), 'rute Tanya FIEZEL belum terdaftar');
 ok(/state\.view==='ask'/.test(appSrc), 'rute Tanya FIEZEL tidak menggambar apa pun');
-// Pintu topbar sekarang LONCENG NOTIFIKASI (tugas guru, teman, sorakan), menggantikan tombol
-// Tanya FIEZEL atas permintaan owner. askView tetap hidup; yang dijaga di sini adalah lonceng
-// benar-benar ada di topbar dan membuka kotak masuknya.
-ok(/openNotifications\(\)/.test(indexSrc), 'tidak ada tombol lonceng notifikasi di topbar');
-ok(/id="fzNotifBadge"/.test(indexSrc), 'lencana notifikasi topbar tidak digambar');
-ok(/function openNotifications\(/.test(appSrc), 'openNotifications() belum ada di app.js');
+ok(/go\('ask'\)/.test(indexSrc), 'tidak ada satu pun tombol menuju Tanya FIEZEL');
 
 // state.view yang tersimpan di perangkat lama masih berisi 'search'. Mencabutnya dari
 // daftar sah membuat aplikasi terbuka di layar kosong bagi siapa pun yang terakhir kali
@@ -170,14 +165,14 @@ ok(/state\.view==='search'\)askView\(\)|state\.view==='ask'\|\|state\.view==='se
 
 // Penandaan aktif dibersihkan HANYA dari .nav. Elemen ber-data-view di luar nav akan
 // menyala sekali lalu tersangkut menyala selamanya.
-const entryAt = indexSrc.indexOf("openNotifications()");
+const entryAt = indexSrc.indexOf("go('ask')");
 const entry = indexSrc.slice(entryAt - 120, entryAt + 60);
 ok(!/data-view=/.test(entry),
-  'tombol lonceng notifikasi memakai data-view; penandaan aktifnya tidak akan pernah dibersihkan');
+  'tombol Tanya FIEZEL memakai data-view; penandaan aktifnya tidak akan pernah dibersihkan');
 
-// Tanda "Tanya FIEZEL" (dua balok emas) tetap milik brand: proporsinya diikat ke wordmark.
-// Ikon itu kini tidak lagi di topbar (digantikan lonceng), tetapi berkasnya tetap sumber
-// resmi untuk pintu Tanya FIEZEL di tempat lain.
+// Ikonnya adalah tanda FIEZEL sendiri, bukan ikon pustaka. Kalau proporsinya digeser ia
+// berhenti menjadi tanda itu dan hanya menjadi dua batang kuning, jadi ukurannya diikat
+// ke wordmark yang menjadi sumbernya.
 const wordmark = fs.readFileSync(path.join(__dirname, 'assets/brand/fiezel-wordmark.svg'), 'utf8');
 const askIcon = fs.readFileSync(path.join(__dirname, 'assets/brand/fiezel-ask.svg'), 'utf8');
 const goldBars = [...wordmark.matchAll(/<rect x="(?:192|240)" y="\d+" width="(\d+)" height="(\d+)" rx="(\d+)"/g)];
@@ -186,7 +181,9 @@ goldBars.forEach((bar) => {
   ok(askIcon.includes('width="' + bar[1] + '" height="' + bar[2] + '" rx="' + bar[3] + '"'),
     'balok ikon tidak sebangun dengan wordmark: h' + bar[2]);
 });
-ok(!/class="icon-button ask-button"/.test(indexSrc), 'tombol Tanya FIEZEL masih ada di topbar (harus diganti lonceng)');
+ok(indexSrc.includes('fiezel-ask-mark'), 'topbar tidak memakai ikon balok emas');
+ok(!/go\('ask'\)[^>]*>\s*<i data-lucide/.test(indexSrc),
+  'tombol Tanya FIEZEL memakai ikon pustaka, bukan tanda FIEZEL');
 
 // Tombol masukan di pengaturan punya penyakit yang sama: ada fungsinya, belum tentu ada
 // tombolnya.
@@ -233,8 +230,8 @@ ok(!/color:inherit/.test(askBox), 'kotak pertanyaan mewarisi warna halaman; kont
 // Materi terkait pernah kehilangan gayanya diam-diam saat style.css ditulis ulang.
 ok(/\.search-hit\{/.test(withoutComments), 'gaya materi terkait hilang dari stylesheet');
 
-// Label di bawah balok emas: hanya berlaku bila tombol Tanya FIEZEL digambar (kini diganti lonceng).
-ok(!/fiezel-ask-mark/.test(indexSrc) || /class="ask-label"/.test(indexSrc), 'label di bawah balok emas belum ada');
+// Label di bawah balok emas.
+ok(/class="ask-label"/.test(indexSrc), 'label di bawah balok emas belum ada');
 
 // OWNER melaporkan labelnya mendominasi. Yang menyumbang lebar bukan tinggi hurufnya
 // melainkan kapital, tebal, dan jarak huruf - ketiganya dicabut, dan ketiganya mudah

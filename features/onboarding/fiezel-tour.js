@@ -119,9 +119,9 @@
        menampung tujuannya sekarang: Vocab/Grammar/Reading hidup di dalam Latihan, dan Peta
        berganti nama jadi Progres. Naskahnya ikut diperbarui di copy-id-feat-b.js /
        copy-th-feat-b.js supaya kalimatnya menyebut tab yang benar-benar dilihat murid. */
-    localizedStep('vocab-grammar', '.bottomnav [data-view="vocab"]', 'tour.menu-vocab-title', 'tour.menu-vocab-body'),
+    localizedStep('vocab-grammar', '.bottomnav [data-view="latihan"]', 'tour.menu-vocab-title', 'tour.menu-vocab-body'),
     localizedStep('reading-peta', '.bottomnav [data-view="progress"]', 'tour.menu-reading-title', 'tour.menu-reading-body'),
-    localizedStep('notif', '.topbar .notif-button', 'tour.menu-notif-title', 'tour.menu-notif-body'),
+    localizedStep('ask', '.topbar .ask-button', 'tour.menu-ask-title', 'tour.menu-ask-body'),
     localizedStep('level', '.home-level-context', 'tour.menu-level-title', 'tour.menu-level-body'),
     localizedStep('settings', '.topbar-actions [aria-label="Buka pengaturan"]', 'tour.menu-settings-title', 'tour.menu-settings-body'),
     // PENUTUP. Targetnya wordmark FIEZEL - benda paling netral di layar, dan bukan pintu ke
