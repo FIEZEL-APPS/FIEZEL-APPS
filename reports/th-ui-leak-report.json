@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-09-05T21:35:15.384Z",
+  "generatedAt": "2026-09-05T21:45:55.192Z",
   "files": {
     "app.js": {
       "leaks": 1,
@@ -65,6 +65,46 @@
         {
           "line": 90,
           "text": "Suara belum tersedia untuk kalimat ini"
+        }
+      ]
+    },
+    "features/neural-voice/fiezel-diag-panel.js": {
+      "leaks": 6,
+      "budget": 6,
+      "sample": [
+        {
+          "line": 328,
+          "text": "Cari event penting langsung di bawah. Kirim isi kotak ini ke coordinator bila perlu."
+        },
+        {
+          "line": 336,
+          "text": "Cari: wasm_policy, timeout, adapter..."
+        },
+        {
+          "line": 367,
+          "text": "Kirim"
+        },
+        {
+          "line": 371,
+          "text": "Kirim ringkas"
+        },
+        {
+          "line": 375,
+          "text": "Tutup"
+        }
+      ]
+    },
+    "features/neural-voice/fiezel-neural-voice-audibility-fix.js": {
+      "leaks": 2,
+      "budget": 2,
+      "sample": [
+        {
+          "line": 129,
+          "text": "Suara neural aktif"
+        },
+        {
+          "line": 139,
+          "text": "Aktifkan suara neural"
         }
       ]
     },

@@ -1,11 +1,6 @@
 (function(root){
   'use strict';
 
-  /* m025-265 · sapuan kebocoran Thai: naskah di berkas ini dulu literal Indonesia,
-     jadi murid yang memilih th tetap membacanya dalam bahasa Indonesia. t() fail-soft:
-     kalau copy-map belum termuat, fallback id-lah yang tampil. */
-  function t(k, fb) { try { var I = (typeof self !== 'undefined' ? self : this).FiezelI18n; return I && I.t ? I.t(k) : fb; } catch (_) { return fb; } }
-
   const runtime=root.FiezelVoiceRuntime;
   if(!runtime||runtime.__audibilityPatched)return;
 
@@ -131,7 +126,7 @@
       }
       if(state.ready){
         setDisabled(prepareButton,true);
-        setHtml(prepareButton,'ready','<i data-lucide="badge-check"></i> ' + t('suara.neural-aktif', 'Suara neural aktif'));
+        setHtml(prepareButton,'ready','<i data-lucide="badge-check"></i> Suara neural aktif');
         setDisabled(testButton,false);
         if(hint&&/Model tersimpan|Aset suara offline|Mengaktifkan mesin neural/i.test(String(hint.textContent||'')))setText(hint,'Aset suara offline tersimpan. Mesin neural aktif dan siap dipakai.');
       }else if(backgroundReadyPromise){
@@ -141,7 +136,7 @@
         if(hint&&/Model tersimpan|Aset suara offline|Mengaktifkan mesin neural|Mengunduh aset suara|Menyiapkan mesin suara/i.test(String(hint.textContent||'')))setText(hint,'Aset suara offline sudah tersimpan. Mesin neural sedang diaktifkan di latar; selama pemanasan latihan Listening tampil sebagai teks tanpa suara.');
       }else{
         setDisabled(prepareButton,false);
-        setHtml(prepareButton,'cached-cold','<i data-lucide="zap"></i> ' + t('suara.neural-aktifkan', 'Aktifkan suara neural'));
+        setHtml(prepareButton,'cached-cold','<i data-lucide="zap"></i> Aktifkan suara neural');
         setDisabled(testButton,true);
         if(hint&&/Model tersimpan|Mengunduh aset suara|Menyiapkan mesin suara|Aset suara offline/i.test(String(hint.textContent||'')))setText(hint,'Aset suara offline sudah tersimpan. Aktifkan mesin neural tanpa mengunduh ulang aset.');
       }
