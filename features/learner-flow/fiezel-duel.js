@@ -46,7 +46,22 @@
       var s = String(code || '').trim(); var q = s.indexOf('duel=');
       if (q > -1) s = decodeURIComponent(s.slice(q + 5).split(/[&#\s]/)[0]);
       var o = JSON.parse(decodeURIComponent(escape(atob(s))));
-      return o && o.v === 1 && o.seed ? o : null;
+      if (!o || o.v !== 1 || !o.seed) return null;
+      /* Kode duel datang dari tautan yang dikirim ORANG LAIN (?duel=... di URL), jadi setiap
+         field di dalamnya dikendalikan pengirim. Dibersihkan SEKALI di sini, di batas masuk,
+         bukan di tiap tempat ia dicetak: skor/jumlah benar dipaksa jadi angka, mode dipaksa
+         jadi salah satu kunci MODES yang memang ada, dan nama dipotong sepanjang kolom nama.
+         Tanpa ini, `parsed.score` yang dicetak apa adanya ke innerHTML (joinView, dan kartu
+         undangan di Home) adalah HTML dari penyerang. */
+      return {
+        v: 1,
+        seed: String(o.seed).slice(0, 40),
+        mode: MODES[o.mode] ? o.mode : 'mix',
+        from: String(o.from == null ? '' : o.from).slice(0, 20),
+        score: Math.max(0, Math.round(Number(o.score) || 0)),
+        correct: Math.max(0, Math.round(Number(o.correct) || 0)),
+        reply: o.reply === true
+      };
     } catch (_) { return null; }
   }
   function shareLink(code) { try { var u = new URL(location.href); u.search = ''; u.hash = ''; u.searchParams.set('duel', code); return u.toString(); } catch (_) { return code; } }
