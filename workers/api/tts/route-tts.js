@@ -108,7 +108,7 @@
    * setiap nilai baru = kunci baru = render berbayar baru, dan korpus yang sudah dibayar
    * (1.170 aset ElevenLabs + 604.962 karakter Deepgram) diam-diam yatim. Seluruh korpus dan
    * semua klien hari ini memakai 'en-US' (bahasa TARGET pembelajaran, bukan bahasa UI murid) —
-   * locale UI dilarang masuk zona audio (audio-locale-guard-test.js).
+   * locale UI dilarang masuk zona audio (tests/audio-locale-guard-test.js).
    * Nilai kosong TIDAK diisi di sini: default 'en-US' tetap milik tts-key.js (canonicalLocale),
    * supaya tidak ada default kedua yang bisa menyimpang. Nilai di luar enum jatuh ke '' →
    * default yang sama — fail-open ke baseline, konsisten dengan ai-tasks.js.
@@ -129,7 +129,7 @@
   /**
    * A8 · Naskah murid, satu kanon dengan `features/quota/quota-copy.js`: bahasa sehari-hari,
    * "nggak" bukan "tidak", tanpa nama mesin, tanpa menyalahkan murid. Dijaga
-   * `quota-notice-a11y-test.js`.
+   * `tests/quota-notice-a11y-test.js`.
    */
   var POLITE = Object.freeze({
     bad_json: 'Aku belum paham kirimanmu. Muat ulang halaman lalu coba lagi, ya.',
@@ -154,7 +154,7 @@
     //
     // Penggantinya menjawab pertanyaan murid yang sebenarnya - "lalu aku harus apa?" -
     // dengan hal yang MASIH benar: teksnya tetap bisa dibaca. Gerbang S3-a5 di
-    // tts-provider-contract-test.js ikut dipindah ke janji baru itu.
+    // tests/tts-provider-contract-test.js ikut dipindah ke janji baru itu.
     account_budget: 'Pembuatan suara sedang penuh untuk hari ini, bukan karena jatahmu. Jatahmu nggak berkurang, dan teksnya tetap bisa kamu baca.',
     // S2 - pagar neuron akun BELUM TERPASANG (dep tidak disuntikkan / tanda terima tidak
     // sah). Salah pasang, bukan jatah penuh, dan bukan salah murid.

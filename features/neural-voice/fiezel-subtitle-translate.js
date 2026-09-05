@@ -23,7 +23,7 @@
  * seperti biasa tanpa baris di bawahnya. Tidak ada yang boleh melempar ke atas.
  *
  * Terjemahan berjalan lewat Worker terautentikasi, tidak pernah memanggil AI langsung
- * dari client - aturan yang ditegakkan ai-integration-test.js dan core-brain-test.js.
+ * dari client - aturan yang ditegakkan tests/ai-integration-test.js dan tests/core-brain-test.js.
  */
 (function (root, factory) {
   if (typeof module === 'object' && module.exports) module.exports = factory(root);

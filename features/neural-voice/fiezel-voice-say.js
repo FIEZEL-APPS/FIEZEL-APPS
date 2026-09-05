@@ -48,7 +48,7 @@
  * teks tetap terbaca, dan di layar soal dengar murid diberi dua jalan keluar yang tidak
  * butuh suara sama sekali (coba lagi, atau lewati tanpa penalti).
  *
- * audio-locale-guard-test.js menegakkannya: SETIAP sebutan speechSynthesis di zona audio
+ * tests/audio-locale-guard-test.js menegakkannya: SETIAP sebutan speechSynthesis di zona audio
  * maupun di app.js memerahkan gerbang.
  *
  * S6 — LAPISAN CLOUDFLARE, DUA SISIPAN DAN TIDAK LEBIH. Saat
@@ -63,7 +63,7 @@
  * SAAT FLAG BUKAN 'on', `cfEnabled()` menjawab false dan tangga ini SAMA PERSIS dengan hari
  * ini: `afterAssets()` memanggil `speakWithEngine()` langsung, tidak ada satu pun permintaan
  * jaringan tambahan, tidak ada Cache API yang dibuka. Itu properti yang dijaga gerbang
- * `tts-transport-switch-test.js` butir (a), dan alasannya sederhana: tangga ini baru selesai
+ * `tests/tts-transport-switch-test.js` butir (a), dan alasannya sederhana: tangga ini baru selesai
  * diperbaiki dua kali (kebisuan murid baru m026-BUG2, prefetch neural v5) dan tidak boleh
  * berubah perilaku demi jalur yang belum pernah hidup di perangkat murid.
  *

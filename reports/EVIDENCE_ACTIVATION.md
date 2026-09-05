@@ -63,7 +63,7 @@ Skrip ini membaca daftar database & KV di akun Anda lewat `wrangler`, lalu
 mengisi `wrangler.toml` — **tanpa Anda copy-paste UUID apa pun**. Ia
 mencocokkan nama database secara **persis** (`fiezel-core`, bukan
 `fiezel-core-staging`), jadi database staging tidak akan pernah tertukar ke
-Worker produksi. Logika ini diuji di `attach-live-bindings-test.js` (jalan
+Worker produksi. Logika ini diuji di `tests/attach-live-bindings-test.js` (jalan
 otomatis di CI setiap PR).
 
 Setelah skrip selesai, **wajib** periksa sebelum deploy:

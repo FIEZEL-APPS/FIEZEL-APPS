@@ -16,9 +16,9 @@ maupun disunting — modul di sini mengekspor `registerAiRoutes()`/`registerTtsR
 | `tools/prerender-tts.mjs` | Pipeline pra-render: sensus bank → kunci v2 → HEAD R2 → render yang belum ada → PUT → manifest |
 | `.github/workflows/audio-prerender-cf.yml` | Dispatch manual, gate aktor, dry-run bawaan, laporan biaya sebelum apply |
 
-Gerbang baru: `tts-key-test.js` (31 cek), `ai-task-contract-test.js` (107), `breaker-test.js` (51),
-`prerender-dryrun-test.js` (45). Semuanya Node murni, tanpa dependensi, terdaftar di
-`.github/workflows/quality.yml` setelah `puter-popup-once-test.js`.
+Gerbang baru: `tests/tts-key-test.js` (31 cek), `tests/ai-task-contract-test.js` (107), `tests/breaker-test.js` (51),
+`tests/prerender-dryrun-test.js` (45). Semuanya Node murni, tanpa dependensi, terdaftar di
+`.github/workflows/quality.yml` setelah `tests/puter-popup-once-test.js`.
 
 ## Cara memasang (untuk pemilik `workers/api/index.js`)
 
@@ -133,7 +133,7 @@ backoff sendiri.
 
 HALF-OPEN: **1 probe per 10 detik**, konkurensi 1. Ini bagian yang paling gampang salah — HALF-OPEN yang
 melepas semua permintaan yang menunggu berarti 200 murid menghantam mesin yang baru pulih dan langsung
-memicu 429 lagi. Gerbang `breaker-test.js` melempar 200 permintaan dalam 2 detik dan menuntut nol probe
+memicu 429 lagi. Gerbang `tests/breaker-test.js` melempar 200 permintaan dalam 2 detik dan menuntut nol probe
 tambahan. Butuh 2 probe sukses untuk menutup; satu probe gagal langsung membuka lagi ke tangga berikutnya.
 
 Satu hal ditambahkan di luar spesifikasi cf-b4 karena tanpa itu breaker bisa macet permanen: `staleProbeMs`
@@ -149,7 +149,7 @@ Cermin KV ber-TTL 60 s karena konsistensi akhir KV memang sampai ~60 s. State ru
 
 ## Pra-render: angka yang diukur, bukan dikutip
 
-`prerender-dryrun-test.js` menghitung ulang korpus dari bank pada setiap kali jalan:
+`tests/prerender-dryrun-test.js` menghitung ulang korpus dari bank pada setiap kali jalan:
 
 | Domain | Item | Karakter |
 | --- | --- | --- |
@@ -208,16 +208,16 @@ Properti lain: langkah rencana berjalan tanpa satu rahasia pun (jadi orang yang 
 tidak perlu diberi akses token); masukan pengguna masuk lewat `env:` dan tidak pernah ditanam ke dalam `run:`
 (satu dispatch dengan `limit` berisi payload shell bisa mengirim `CLOUDFLARE_API_TOKEN` keluar dan penyamaran
 log tidak menarik kembali apa pun yang sudah terkirim); `concurrency` grup tunggal dengan
-`cancel-in-progress: false` supaya dua jalan tidak membayar objek yang sama; `tts-key-test.js` +
-`prerender-dryrun-test.js` jalan lebih dulu (kunci yang salah hitung = seluruh batch dibayar ulang);
-`audio-asset-pipeline-test.js` jalan sebelum commit; hanya `audio/manifest-tts-v2.json` yang di-commit;
+`cancel-in-progress: false` supaya dua jalan tidak membayar objek yang sama; `tests/tts-key-test.js` +
+`tests/prerender-dryrun-test.js` jalan lebih dulu (kunci yang salah hitung = seluruh batch dibayar ulang);
+`tests/audio-asset-pipeline-test.js` jalan sebelum commit; hanya `audio/manifest-tts-v2.json` yang di-commit;
 push diulang 3× dengan `git pull --rebase --autostash` karena manifest yang tidak mendarat berarti seluruh
 batch diproduksi ulang pada jalan berikutnya.
 
 ## Status gerbang
 
-Hijau lokal: `tts-key-test.js`, `ai-task-contract-test.js`, `breaker-test.js`, `prerender-dryrun-test.js`,
-`regression-test.js`, `install-health-test.js`, `ui-structure-test.js`, `audio-asset-pipeline-test.js`.
+Hijau lokal: `tests/tts-key-test.js`, `tests/ai-task-contract-test.js`, `tests/breaker-test.js`, `tests/prerender-dryrun-test.js`,
+`tests/regression-test.js`, `tests/install-health-test.js`, `tests/ui-structure-test.js`, `tests/audio-asset-pipeline-test.js`.
 `node --check` lolos untuk enam berkas sumber baru dan empat gerbang; kedua YAML tervalidasi.
 Tidak ada `*-REPORT.json` yang berubah.
 

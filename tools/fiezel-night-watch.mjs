@@ -76,10 +76,10 @@ if (prev) {
 const gates = [
   runGate('node grammar-quality-audit.js', 'grammar-quality-audit'),
   runGate('node content-integrity-audit.js', 'content-integrity-audit'),
-  runGate('node cloze-bank-test.js', 'cloze-bank-test'),
+  runGate('node tests/cloze-bank-test.js', 'cloze-bank-test'),
   runGate('node validator.js', 'validator'),
-  runGate('node regression-test.js', 'regression-test'),
-  runGate('node bank-soal-audit-test.js', 'bank-soal-audit-test'),
+  runGate('node tests/regression-test.js', 'regression-test'),
+  runGate('node tests/bank-soal-audit-test.js', 'bank-soal-audit-test'),
 ];
 const status = alerts.some(a => a.level.endsWith('P0')) ? 'ALERT_P0' : alerts.length ? 'ALERTS' : 'CLEAN';
 const entry = { at: now(), status, alerts, gates, mode: prev ? 'watch' : 'baseline-init' };

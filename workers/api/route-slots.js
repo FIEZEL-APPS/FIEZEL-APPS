@@ -40,7 +40,7 @@
  * kuota di tempat yang tidak ada gerbangnya.
  *
  * Karena itu seluruh adaptasi tinggal di `route-wiring.js` (satu berkas, satu
- * gerbang: `cf-wiring-test.js`) dan berkas ini tetap menjadi apa yang
+ * gerbang: `tests/cf-wiring-test.js`) dan berkas ini tetap menjadi apa yang
  * dijanjikannya: satu titik yang menentukan rute tambahan mana yang hidup.
  *
  * SLOT 5 (warisan Puter) BELUM ada dan itu bukan kelalaian: `/api/policy/*`,

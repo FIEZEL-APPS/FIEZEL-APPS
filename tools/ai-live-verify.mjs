@@ -8,7 +8,7 @@
 // Perintah owner: "puter harus di hapus total dari sistem fiezel jika neural voice sudah
 // bagus, ai sudah bisa di ambil alih oleh cloudflare". Kalimat itu punya SATU syarat yang
 // tidak bisa dibuktikan stub: "AI sudah bisa diambil alih oleh Cloudflare". Seluruh gerbang
-// AI yang ada (`ai-task-contract-test.js`, `ai-response-shape-test.js`) berjalan di atas
+// AI yang ada (`tests/ai-task-contract-test.js`, `tests/ai-response-shape-test.js`) berjalan di atas
 // `tools/cf-test-harness.js` — Workers AI PALSU di dalam satu proses Node. Yang mereka
 // buktikan adalah logika kami, bukan bahwa model sungguhan menjawab, bahwa jawabannya lolos
 // kontrak mutu kami, dan bahwa jatah murid benar-benar berkurang tepat sekali.
@@ -34,7 +34,7 @@
 //   - dengan `FIEZEL_AI_LIVE_BASE` → jalan sungguhan dan MERAH kalau kontraknya patah.
 //     Tidak ada mode "jalan tapi maafkan".
 // TIDAK ADA URL bawaan (`|| 'https://api...'`): satu baris itu mengubah "SKIP di CI" menjadi
-// "tembak produksi setiap push". `no-network-test.js` blok 2d memeriksa larangan ini dengan
+// "tembak produksi setiap push". `tests/no-network-test.js` blok 2d memeriksa larangan ini dengan
 // MENJALANKAN berkas ini tanpa env, bukan dengan mempercayai komentar ini.
 //
 // ==========================================================================
@@ -507,7 +507,7 @@ async function main() {
     skip('keluaran-kosong', '(f) Keluaran kosong tidak dinyatakan sukses + kuota dikembalikan',
       'tidak ada task yang menjawab kosong pada jalan ini; alat ini SENGAJA tidak memancingnya '
       + 'dengan panggilan model tambahan. Buktinya tetap ada di gerbang luring '
-      + 'ai-response-shape-test.js (A12/3) — tapi itu di atas stub, jadi lubang ini tetap lubang.');
+      + 'tests/ai-response-shape-test.js (A12/3) — tapi itu di atas stub, jadi lubang ini tetap lubang.');
   } else {
     check('keluaran-kosong-bukan-sukses',
       '(f) Keluaran kosong TIDAK dinyatakan sukses (source bukan provider, degraded true)',

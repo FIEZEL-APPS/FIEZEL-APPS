@@ -12,7 +12,7 @@ Status: **selesai**. Repo `fiezel-apps` TIDAK diubah (read-only; branch tetap `m
 ## Temuan penting yang mengubah rencana (bukan sekadar mapping)
 
 1. **Dua blok `:root`** di style.css (b.6 pastel v5, b.594 v6 yang menang untuk token kembar) — swap token wajib di keduanya; kesalahan "hanya blok atas" pernah terjadi dan didokumentasikan di komentar CSS-nya sendiri.
-2. **`tokens.css` terpisah TIDAK aman**: `contrast-test.js` & `pastel-field-contrast-test.js` memarse `style.css`+`tutor-v3.css` secara statis. `pastel-field-contrast-test.js` **memaku literal** `--yellow:#FFD23F` dkk. Jadi Fase 1 = edit nilai in-place + pindahkan kunci test di commit yang sama (preseden resmi ada di komentar style.css).
+2. **`tokens.css` terpisah TIDAK aman**: `tests/contrast-test.js` & `tests/pastel-field-contrast-test.js` memarse `style.css`+`tutor-v3.css` secara statis. `tests/pastel-field-contrast-test.js` **memaku literal** `--yellow:#FFD23F` dkk. Jadi Fase 1 = edit nilai in-place + pindahkan kunci test di commit yang sama (preseden resmi ada di komentar style.css).
 3. **Toast bug terparah** terlokalisasi: `.toast` b.277 (bg coral, teks ink) + override `.toast{background:#101628}` b.806 → ink di navy. Fix satu baris hapus + satu resep `--core`/`--on-core`.
 4. **FZ Fredoka belum ada di repo app** — hanya Instrument Serif + Jakarta di `assets/fonts/`; `Fredoka-var.woff2` tersedia di `redesign/screens/a/assets/fonts/` dan harus disalin (self-host wajib, onboarding-test melarang CDN).
 5. **DESIGN-SYSTEM.md basi** (masih maroon #8C2233 + dark mode yang sudah dihapus m025-134); aturannya (token-only, lucide subset, reduced-motion, urutan gate) tetap diwariskan.

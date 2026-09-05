@@ -10,7 +10,7 @@
  * dibaca dari baris `auth_account.role` yang dikunci `sub` dari cookie fz_id
  * ber-HMAC (mw-identity). `resolveRole` di bawah SENGAJA tidak punya jalur
  * yang menerima peran sebagai masukan dari klien; kalau nanti ada yang
- * menambahkannya, `role-security-test.js` akan merah.
+ * menambahkannya, `tests/role-security-test.js` akan merah.
  *
  * Frontend TETAP menyimpan peran (untuk memilih cangkang tanpa satu round-trip
  * per navigasi), dan itu tidak apa-apa PERSIS KARENA setiap rute berdata

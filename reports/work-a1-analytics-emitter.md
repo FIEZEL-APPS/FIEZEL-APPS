@@ -22,10 +22,10 @@ pemanggil:
 | `workers/api/analytics/analytics-store-d1.js` | 227 | Tulis agregat. |
 | `workers/api/analytics/rollup.js` | 255 | Rollup harian. |
 | `migrations/0002_analytics.sql` | — | `metrics_daily`, `usage_daily`, `retention_daily`. |
-| `analytics-client-test.js` | 635 | Gerbang sisi klien. |
-| `analytics-privacy-test.js` | 311 | Gerbang kontrak privasi. |
-| `analytics-server-only-test.js` | 299 | Gerbang event server-only. |
-| `analytics-aggregate-test.js` | 348 | Gerbang agregat-saja. |
+| `tests/analytics-client-test.js` | 635 | Gerbang sisi klien. |
+| `tests/analytics-privacy-test.js` | 311 | Gerbang kontrak privasi. |
+| `tests/analytics-server-only-test.js` | 299 | Gerbang event server-only. |
+| `tests/analytics-aggregate-test.js` | 348 | Gerbang agregat-saja. |
 
 **Yang benar-benar hilang: pemanggil, dan hanya pemanggil.** `grep` untuk
 `installId`/`visitor_token` memang nol hasil di `app.js`, dan itu benar — bukan karena
@@ -34,7 +34,7 @@ persis seperti yang ditulis audit: kuota dipatok tanpa satu angka pengguna, dash
 owner cangkang. Tapi ukuran pekerjaan yang tersisa bukan 1.960 baris, melainkan satu blok
 pemanggil dan tiga titik sambung.
 
-Gerbang `analytics-client-test.js` bahkan MENGUNCI keadaan itu: assert terakhirnya adalah
+Gerbang `tests/analytics-client-test.js` bahkan MENGUNCI keadaan itu: assert terakhirnya adalah
 `!appSrc.includes('FiezelAnalytics')` — "app.js TIDAK disentuh paket kerja ini". Assert itu
 saya balik di A1. Assert semacam itu benar sebagai penanda serah-terima, tapi ia juga
 alasan struktural mengapa analytics bisa hijau tiga gerbang selama itu dengan nol event.
@@ -120,7 +120,7 @@ jadi kalau kill switch server berbalik di tengah sesi, permintaan berikutnya ber
 tanpa reload.
 
 **Nol biaya saat mati.** Modul TIDAK ada di `index.html` dan TIDAK di-precache `sw.js`
-(`sw.js` terlarang di paket kerja ini, dan `boot-order-test.js` akan memerahkan skrip
+(`sw.js` terlarang di paket kerja ini, dan `tests/boot-order-test.js` akan memerahkan skrip
 lazy yang tidak di-precache). Ia disuntik sebagai `<script async>` hanya kalau gerbang
 sudah terbuka. Kalau lapis statis `off`, bahkan TIMER-nya tidak dipasang — keadaan hari
 ini adalah nol timer, nol byte, nol kunci penyimpanan.
@@ -202,10 +202,10 @@ gerbang. Tidak ada satu pun kompromi bentuk di sisi klien.
 
 ---
 
-## 7. Gerbang `analytics-client-test.js` — dari 635 ke 984 baris
+## 7. Gerbang `tests/analytics-client-test.js` — dari 635 ke 984 baris
 
 Registrasi CI: sudah terdaftar di `.github/workflows/quality.yml` baris 117
-(`node analytics-client-test.js`), dan `gate-registry-test.js` hijau. Tidak perlu
+(`node tests/analytics-client-test.js`), dan `tests/gate-registry-test.js` hijau. Tidak perlu
 registrasi baru; blok komentar di sekitarnya saya biarkan karena masih akurat untuk sisi
 modul.
 
@@ -213,7 +213,7 @@ Bagian §10 diganti seluruhnya. Yang lama meng-assert `app.js` TIDAK disentuh; y
 mengekstrak blok `A1-ANALYTICS-EMITTER-BEGIN…END` dari `app.js` dan MENJALANKANNYA di `vm`
 bersama modul analytics yang sungguhan, dengan mock hanya di tepi paling luar
 (`localStorage`, `navigator.sendBeacon`, `fetch`, `document`, `cfStaticMode`,
-`cfServerAllows`). **167 assert, semuanya hijau. Nol jaringan** (`no-network-test.js` exit 0).
+`cfServerAllows`). **167 assert, semuanya hijau. Nol jaringan** (`tests/no-network-test.js` exit 0).
 
 Enam tuntutan mandat:
 
@@ -230,7 +230,7 @@ Enam tuntutan mandat:
 
 ## 8. Matriks bukti-merah
 
-Skripnya: `_a1_redproof.sh` (dapat dijalankan ulang; memulihkan berkas lewat `trap`).
+Skripnya: `tools/_a1_redproof.sh` (dapat dijalankan ulang; memulihkan berkas lewat `trap`).
 Hijau dasar sebelum dan sesudah seluruh matriks: identik.
 
 | # | Mutasi | Assert yang memerah |
@@ -286,18 +286,18 @@ matriks yang menipu:
 Semua exit 0, dijalankan di `wt-a1emit`:
 
 ```
-analytics-client-test.js        167/167 PASS   (gerbang A1, diperluas)
-analytics-privacy-test.js       exit 0
-analytics-server-only-test.js   exit 0
-analytics-aggregate-test.js     exit 0
-no-network-test.js              exit 0
-secret-scan-test.js             exit 0
-boot-order-test.js              exit 0
-install-health-test.js          exit 0
-regression-test.js              exit 0
-gate-registry-test.js           exit 0
-coordination-guard-test.js      exit 0
-ui-structure-test.js            exit 0
+tests/analytics-client-test.js        167/167 PASS   (gerbang A1, diperluas)
+tests/analytics-privacy-test.js       exit 0
+tests/analytics-server-only-test.js   exit 0
+tests/analytics-aggregate-test.js     exit 0
+tests/no-network-test.js              exit 0
+tests/secret-scan-test.js             exit 0
+tests/boot-order-test.js              exit 0
+tests/install-health-test.js          exit 0
+tests/regression-test.js              exit 0
+tests/gate-registry-test.js           exit 0
+tests/coordination-guard-test.js      exit 0
+tests/ui-structure-test.js            exit 0
 ```
 
 `app.js` lolos `new Function(...)` (sintaks valid). Versi build tidak diubah.
@@ -339,7 +339,7 @@ supaya tidak ada jendela di mana klien mengirim ke endpoint yang menjawab
 - **`session_ended.answered` harus konsisten dengan angka yang dilihat murid.** Kalau
   tidak, ambang aktif di dua tempat sudah bergeser dan salah satu angka mulai bohong.
 - **Nol baris di tabel analytics yang punya kolom penghubung ke tabel kuota.** Kontraknya
-  melarang join itu; `analytics-aggregate-test.js` menjaga skemanya, tapi migrasi berikutnya
+  melarang join itu; `tests/analytics-aggregate-test.js` menjaga skemanya, tapi migrasi berikutnya
   bisa merusaknya.
 - **Byte nyata vs perkiraan §5.** Kalau jauh lebih besar, cari flush yang terlalu sering.
 
@@ -423,10 +423,10 @@ pengguna yang boleh dipakai untuk memutuskan apa pun — termasuk kuota.
 | Berkas | Δ |
 | --- | --- |
 | `app.js` | +184 (blok pemancar + `anSwallow` + 3 titik pemanggil) |
-| `analytics-client-test.js` | 635 → 984 (§10 diganti, +8 skenario kegagalan) |
+| `tests/analytics-client-test.js` | 635 → 984 (§10 diganti, +8 skenario kegagalan) |
 | `features/analytics/fiezel-analytics-client.js` | +19 (kunci single-flight `flush()`) |
 | `reports/work-a1-analytics-emitter.md` | baru |
-| `_a1_redproof.sh` | baru (skrip matriks bukti-merah) |
+| `tools/_a1_redproof.sh` | baru (skrip matriks bukti-merah) |
 
 Tidak diubah: `core-config.js`, `index.html`, `sw.js`, `.github/workflows/quality.yml`
 (gerbang sudah terdaftar di baris 117), seluruh direktori terlarang.

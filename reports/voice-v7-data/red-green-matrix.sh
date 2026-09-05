@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Matriks merah/hijau untuk assert BARU di voice-callsite-prefetch-test.js (c9, c10, f1-f9).
+# Matriks merah/hijau untuk assert BARU di tests/voice-callsite-prefetch-test.js (c9, c10, f1-f9).
 #
 # Cara kerjanya: setiap mutasi merusak SATU perilaku di features/library/fiezel-library-ui.js,
 # lalu tes dijalankan. Assert yang diharapkan merah harus benar-benar merah, dan sesudah
@@ -15,7 +15,7 @@ run_case() {
   local name="$1"; local expect="$2"; shift 2
   cp "$BAK" "$LIB"
   "$@"
-  local out; out=$(node voice-callsite-prefetch-test.js 2>&1)
+  local out; out=$(node tests/voice-callsite-prefetch-test.js 2>&1)
   local failed; failed=$(printf '%s\n' "$out" | grep '^FAIL' | sed 's/^FAIL - \([a-z0-9]*\) .*/\1/' | tr '\n' ' ')
   local verdict="MERAH SESUAI HARAPAN"
   case " $failed " in *" $expect "*) ;; *) verdict="TIDAK MERAH - ASSERT INI BUKAN GERBANG" ;; esac
@@ -51,4 +51,4 @@ run_case "stopNarration tidak mereset kursor kirim"     f9  edit $LIB del 'reset
 
 cp "$BAK" "$LIB"
 echo "--- pulih: seluruh tes harus hijau lagi ---"
-node voice-callsite-prefetch-test.js 2>&1 | tail -1
+node tests/voice-callsite-prefetch-test.js 2>&1 | tail -1

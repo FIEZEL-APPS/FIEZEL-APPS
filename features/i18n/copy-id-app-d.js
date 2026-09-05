@@ -77,6 +77,8 @@
     'grammar.lesson-belum-memiliki-materi': 'Lesson ini belum memiliki materi.',
     'grammar.lesson-fondasi-pertama': 'Ini lesson fondasi pertama.',
     'grammar.lesson-hanya-tersedia-pada-level': 'Lesson ini hanya tersedia pada level {level}.',
+    'grammar.sesi-kilat': 'Sesi Kilat: 10 soal',
+    'grammar.sesi-kilat-belum-cukup': 'Sesi Kilat {level} baru punya {jumlahSoal} soal. Buka lesson lain dulu, ya.',
     'grammar.lesson-new-memiliki-item-valid': 'Lesson ini baru memiliki {jumlahSoal} soal valid.',
     'grammar.lesson-terurut-for-level-start': '{jumlahLesson} lesson terurut untuk level {level}. Mulai dari urutan pertama agar prasyaratnya tidak terlewat.',
     'grammar.lewati': 'Lewati “{title}”?',

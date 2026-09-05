@@ -31,8 +31,8 @@ Added:
 
 - `neural-voice-generation-timeout-test.js`
 - `neural-voice-diagnostics-retention-test.js`
-- `puter-auth-coop-test.js`
-- `puter-auth-diagnostics-test.js`
+- `tests/puter-auth-coop-test.js`
+- `tests/puter-auth-diagnostics-test.js`
 
 Updated the existing m024 timeout/device/SW/product gates to assert the m025 contract. `quality.yml` now runs the new regressions and recursively syntax-checks project JS/MJS while excluding `node_modules` and vendored code.
 

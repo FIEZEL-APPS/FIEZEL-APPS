@@ -13,7 +13,7 @@
  * sebagai gate CI: verdict-nya bisa merah karena TEMUAN NYATA tentang brain
  * (lihat forensik di bawah), dan gate CI yang merah permanen untuk PR yang
  * tidak bersalah adalah gate yang akan dimatikan orang. Yang masuk CI hanya
- * adaptivity-simulation-v3-extended-selftest.js — penjaga MEKANISME gate ini
+ * tests/adaptivity-simulation-v3-extended-selftest.js — penjaga MEKANISME gate ini
  * (arah perbandingan, determinisme, kejujuran pesan), bukan verdict brain-nya.
  *
  * FORENSIK — kenapa versi keras 7e2db07 GAGAL 3 gate, dan apa yang jujur

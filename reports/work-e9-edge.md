@@ -108,7 +108,7 @@ Penanda temuan lapangan yang sama dengan bagian lain
 (`🔄 TEMUAN LAPANGAN 27 Agu 2026 — BAGIAN INI BARU`), diletakkan tepat sesudah Bagian 2
 (custom domain yang masih terblokir) dan sebelum Bagian 3. Isinya: apa yang dipasang,
 kenapa bukan `*.workers.dev` langsung, bukti lapangan (33 assert
-`cf-live-contract-test.js` melawan `https://api.fiezel.my.id`), lubang yang dibuka +
+`tests/cf-live-contract-test.js` melawan `https://api.fiezel.my.id`), lubang yang dibuka +
 penutupnya, curl verifikasi, keputusan `/health` vs `/healthz`, allowlist, dan
 pembongkaran ringkas. `EDGE_SHARED_SECRET` juga masuk tabel Secret §3.1 dan blok
 `wrangler secret put`.
@@ -128,7 +128,7 @@ TIDAK lewat jembatan**: berkas ratusan kB–MB lewat satu proses PHP di hosting 
 mengubah hop 1 ms menjadi leher botol yang mematikan pelajaran mendengarkan. Audio
 tetap dari R2 / Worker `fiezel-audio`, dan `const ALLOW` proxy tidak boleh menerimanya.
 
-## 3. Gerbang baru: `edge-guard-test.js` — **119/119 assert PASS**
+## 3. Gerbang baru: `tests/edge-guard-test.js` — **119/119 assert PASS**
 
 Node murni, nol dependency, nol jaringan, nol berkas temporer. Memakai
 `tools/cf-test-harness.js` (`makeEnv`, `fakeClock`, `loadWorkerSource`) dan
@@ -146,34 +146,34 @@ bukan salinan logika. Laporan mesin: `EDGE-GUARD-REPORT.json`.
 | (g) | `deploy/edge/api-index.php` memakai placeholder (tepat sekali), mengirim `X-Fiezel-Edge`, memakai allowlist default-tolak, menyatakan sifat sementaranya. Pemindai nilai acak (base64url/hex/base64 ber-padding, entropi kasar) menemukan **0 kandidat** — dan **membuktikan dirinya bisa merah**: tiga bentuk secret sungguhan disuntikkan ke salinan **di memori** dan ketiganya tertangkap. Pemindai yang tidak pernah bisa merah adalah pemindai yang bohong. Ditambah pola PEM/`sk-`/JWT/hex-panjang, dan `deploy/edge/README.md` diperiksa memuat 13 hal wajib (scp, chmod 644, .htaccess, allowlist, PEMBONGKARAN, `workers_dev = false`, hapus secret, angka latensi, titik gagal tunggal, audio, …). |
 | + | Runbook Bagian 2A ada dengan penanda temuan lapangan, angka 2.214 / 1.051 / 1.163, kejujuran titik gagal tunggal, audio tidak lewat jembatan. Pemasangan di `index.js` diperiksa: `edgeGuardMiddleware` ada di rantai dan **posisinya paling luar** (indeksnya sebelum `guardMiddleware` dan `identityMiddleware`). Dan gerbang ini meng-assert **dirinya sendiri terdaftar** di `quality.yml` (temuan K13: gerbang yang tidak dijalankan workflow apa pun = gerbang yang tidak ada). |
 
-Terdaftar di `.github/workflows/quality.yml` tepat sesudah `cf-wiring-test.js`, dengan
+Terdaftar di `.github/workflows/quality.yml` tepat sesudah `tests/cf-wiring-test.js`, dengan
 komentar kenapa posisinya di situ.
 
 ## 4. Verifikasi
 
 | Gerbang | Hasil |
 |---|---|
-| `edge-guard-test.js` | **119/119 assert PASS**, exit 0 |
-| `cf-api-contract-test.js` | 215/215 assert PASS, exit 0 |
-| `cf-wiring-test.js` | PASS, exit 0 |
-| `cf-live-contract-test.js` | **SKIP bersih tanpa env** (`pass:null`), exit 0 |
-| `quota-core-test.js` | PASS, exit 0 |
-| `analytics-privacy-test.js` | PASS, exit 0 |
-| `no-network-test.js` | PASS (35 assert, **127** gerbang dipindai), exit 0 |
-| `regression-test.js` | PASS, exit 0 |
-| `install-health-test.js` | PASS, exit 0 |
+| `tests/edge-guard-test.js` | **119/119 assert PASS**, exit 0 |
+| `tests/cf-api-contract-test.js` | 215/215 assert PASS, exit 0 |
+| `tests/cf-wiring-test.js` | PASS, exit 0 |
+| `tests/cf-live-contract-test.js` | **SKIP bersih tanpa env** (`pass:null`), exit 0 |
+| `tests/quota-core-test.js` | PASS, exit 0 |
+| `tests/analytics-privacy-test.js` | PASS, exit 0 |
+| `tests/no-network-test.js` | PASS (35 assert, **127** gerbang dipindai), exit 0 |
+| `tests/regression-test.js` | PASS, exit 0 |
+| `tests/install-health-test.js` | PASS, exit 0 |
 
 `node --check` bersih pada semua berkas JS yang disentuh. **Tidak ada bump versi
 build** (`VERSION.json`, `version.js` tidak tersentuh). Tidak ada push.
 
-Catatan: `cf-api-contract-test.js` sekarang mencetak satu baris peringatan
+Catatan: `tests/cf-api-contract-test.js` sekarang mencetak satu baris peringatan
 `edgeGuard=off` saat berjalan. Itu **benar dan diinginkan** — env gerbang itu memang
 tidak memasang `EDGE_SHARED_SECRET`, jadi Worker melaporkan keadaan sebenarnya alih-alih
 diam. Gerbangnya tetap 215/215.
 
 ## 5. Berkas
 
-**Baru:** `workers/api/mw-edge.js`, `edge-guard-test.js`, `deploy/edge/api-index.php`,
+**Baru:** `workers/api/mw-edge.js`, `tests/edge-guard-test.js`, `deploy/edge/api-index.php`,
 `deploy/edge/README.md`, `EDGE-GUARD-REPORT.json`, `reports/work-e9-edge.md`.
 
 **Diubah:** `workers/api/index.js` (impor + `[M-1]` paling luar + rute `/healthz`),

@@ -384,7 +384,7 @@
    * `reasoning_overflow` bisa dibedakan dari "model hanya diam".
    *
    * `reasoning` dikembalikan HANYA untuk diklasifikasikan dan dicatat sebagai sebab; ia tidak
-   * pernah menjadi teks jawaban (lihat `route-ai.js`, dan gerbang ai-response-shape-test.js).
+   * pernah menjadi teks jawaban (lihat `route-ai.js`, dan gerbang tests/ai-response-shape-test.js).
    */
   function readModelText(result) {
     var out = { text: '', reasoning: '', finishReason: '', shape: 'unknown' };
@@ -794,7 +794,7 @@
    *      pernah menyusun dua label medan kami berturut-turut. Ambangnya dua.
    *
    * §21 mandat audit berlaku dua arah: pemeriksa yang menolak segalanya sama merusaknya
-   * dengan yang meloloskan. Korpus `SAH` di `ai-response-shape-test.js` yang menegakkan
+   * dengan yang meloloskan. Korpus `SAH` di `tests/ai-response-shape-test.js` yang menegakkan
    * batas itu, dan ia diperluas bersama blok ini.
    */
   var SCAFFOLD_ECHO_PATTERNS = Object.freeze([
@@ -916,7 +916,7 @@
    * Rubrik penilaian Writing DIEJA DI SINI karena Worker tidak bisa membaca
    * writing-prompts-v1.json saat runtime — dan penilai yang hanya menerima id rubrik akan
    * mengarang rubriknya sendiri. Salinan ini WAJIB identik dengan rubrik yang dilihat murid
-   * di bank (label, labelEn, asks per kriteria); writing-rubric-test.js membandingkan
+   * di bank (label, labelEn, asks per kriteria); tests/writing-rubric-test.js membandingkan
    * keduanya, jadi perubahan bank yang tidak diikuti di sini menggagalkan gerbang.
    */
   var WRITING_RUBRICS = Object.freeze({

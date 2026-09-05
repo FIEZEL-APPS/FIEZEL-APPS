@@ -4,7 +4,7 @@
   "mutations": [
     {
       "id": "M1-hostname-tepercaya-dimatikan",
-      "gate": "edge-guard-test.js",
+      "gate": "tests/edge-guard-test.js",
       "exit": 1,
       "merah": true,
       "butirYangJatuh": [
@@ -31,7 +31,7 @@
     },
     {
       "id": "M2-default-allow-hostname-asing",
-      "gate": "edge-guard-test.js",
+      "gate": "tests/edge-guard-test.js",
       "exit": 1,
       "merah": true,
       "butirYangJatuh": [
@@ -53,7 +53,7 @@
     },
     {
       "id": "M3-workers-dev-diloloskan-tanpa-header",
-      "gate": "edge-guard-test.js",
+      "gate": "tests/edge-guard-test.js",
       "exit": 1,
       "merah": true,
       "butirYangJatuh": [
@@ -88,7 +88,7 @@
     },
     {
       "id": "M4-health-dibebaskan-dari-gerbang",
-      "gate": "edge-guard-test.js",
+      "gate": "tests/edge-guard-test.js",
       "exit": 1,
       "merah": true,
       "butirYangJatuh": [
@@ -126,7 +126,7 @@
     },
     {
       "id": "M5-jalur-tidak-dilaporkan-di-health",
-      "gate": "edge-guard-test.js",
+      "gate": "tests/edge-guard-test.js",
       "exit": 1,
       "merah": true,
       "butirYangJatuh": [
@@ -155,7 +155,7 @@
     },
     {
       "id": "M6-daftar-hostname-menyimpang-dari-wrangler",
-      "gate": "edge-guard-test.js",
+      "gate": "tests/edge-guard-test.js",
       "exit": 1,
       "merah": true,
       "butirYangJatuh": [
@@ -174,7 +174,7 @@
     },
     {
       "id": "M7-pencocokan-hostname-jadi-substring",
-      "gate": "edge-guard-test.js",
+      "gate": "tests/edge-guard-test.js",
       "exit": 1,
       "merah": true,
       "butirYangJatuh": [
@@ -194,7 +194,7 @@
     },
     {
       "id": "M8-hostname-dibaca-dari-header-yang-bisa-dipalsukan",
-      "gate": "edge-guard-test.js",
+      "gate": "tests/edge-guard-test.js",
       "exit": 1,
       "merah": true,
       "butirYangJatuh": [
@@ -213,7 +213,7 @@
     },
     {
       "id": "M9-bentuk-galat-hostname-asing-dibedakan",
-      "gate": "edge-guard-test.js",
+      "gate": "tests/edge-guard-test.js",
       "exit": 1,
       "merah": true,
       "butirYangJatuh": [
@@ -233,7 +233,7 @@
     },
     {
       "id": "M10-syarat-penghapusan-jalur-header-dihapus-dari-kode",
-      "gate": "edge-guard-test.js",
+      "gate": "tests/edge-guard-test.js",
       "exit": 1,
       "merah": true,
       "butirYangJatuh": [
@@ -252,7 +252,7 @@
     },
     {
       "id": "M11-daftar-hostname-owner-bocor-ke-hostname-api",
-      "gate": "owner-edge-guard-test.js",
+      "gate": "tests/owner-edge-guard-test.js",
       "exit": 1,
       "merah": true,
       "butirYangJatuh": [
@@ -276,8 +276,8 @@
     }
   ],
   "pulihSesudahSemuaMutasi": {
-    "edge-guard-test.js": 0,
-    "owner-edge-guard-test.js": 0
+    "tests/edge-guard-test.js": 0,
+    "tests/owner-edge-guard-test.js": 0
   },
   "pass": true
 }

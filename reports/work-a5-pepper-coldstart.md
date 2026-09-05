@@ -3,7 +3,7 @@
 Cabang: `work/a5pep`. Tidak di-push. Tidak ada bump versi build.
 Berkas yang disentuh: `workers/api/analytics/analytics-core.js`,
 `analytics-store-d1.js`, `route-events.js`, `rollup.js` (komentar saja),
-`PRIVACY.md`, `analytics-privacy-test.js`, `_a5_redproof.sh` (baru).
+`PRIVACY.md`, `tests/analytics-privacy-test.js`, `tools/_a5_redproof.sh` (baru).
 Tidak ada berkas klien, `app.js`, `style.css`, `index.html`, `core-config.js`,
 `sw.js`, `features/`, `coordination/`, `workers/owner/`, `workers/api/ai/`,
 `workers/api/rate-anon.js` yang disentuh.
@@ -22,7 +22,7 @@ jadi selama pepper belum ada, tidak ada satu pun token yang bisa dibuat, dan
 Konsekuensinya bukan "hari ini datanya belum masuk". Konsekuensinya: **setiap
 basis data analytics yang baru selalu buta pada hari pertama pemakaiannya**, dan
 tidak ada gerbang yang menangkapnya, karena semua gerbang yang menguji jalur
-pepper lebih dulu menanam `pepper_state` lewat rollup (mis. `cf-wiring-test.js`
+pepper lebih dulu menanam `pepper_state` lewat rollup (mis. `tests/cf-wiring-test.js`
 memanggil rollup sebelum memanggil rute pepper). Kasus "basis data benar-benar
 kosong" tidak pernah diuji sekali pun.
 
@@ -189,14 +189,14 @@ masalah biaya privasi dengan cara mempertahankan angka yang salah nama. Yang
 tidak boleh terjadi adalah keadaan sebelum ini: token diminta, dikirim, disimpan
 sebentar, lalu dibuang tanpa dipakai. Itu biaya privasi tanpa manfaat.
 
-## 6. Gerbang: perluasan `analytics-privacy-test.js` (bagian 8)
+## 6. Gerbang: perluasan `tests/analytics-privacy-test.js` (bagian 8)
 
 Tanpa berkas gerbang baru. 90 pemeriksaan, exit 0. Isi bagian 8: fake D1 sendiri
 (mendukung seluruh pernyataan rollup/aggregate, menghormati `DO NOTHING`,
 menghitung perubahan baris **nyata**, dan punya penghalang dua-kedatangan untuk
 memaksa balapan pada dua `readPepper` pertama), lalu assert (a)–(f) sesuai brief.
 
-Bukti merah lewat `_a5_redproof.sh` — 12 mutasi terarah, semuanya merah, semuanya
+Bukti merah lewat `tools/_a5_redproof.sh` — 12 mutasi terarah, semuanya merah, semuanya
 dipulihkan, gerbang hijau kembali sesudahnya:
 
 | mutasi | assert yang merah |
@@ -220,7 +220,7 @@ dipulihkan, gerbang hijau kembali sesudahnya:
    memerahkan assert, sehingga `ANALYTICS-PRIVACY-REPORT.json` yang lama masih
    tergeletak dan mutasi **terlihat hijau**. Diperbaiki dua sisi: bagian 8
    memakai pembungkus `safe()` dan nilai bawaan yang aman sehingga kegagalan
-   dini memerahkan assert-nya sendiri, dan `_a5_redproof.sh` menghapus laporan
+   dini memerahkan assert-nya sendiri, dan `tools/_a5_redproof.sh` menghapus laporan
    lebih dulu lalu melaporkan "TANPA-LAPORAN" kalau gerbang meledak.
 2. Assert `previous === null` yang hanya membaca fake D1 **tidak bisa** merah,
    karena `SQL.initPepper` memang menulis `NULL` literal — mutasi di

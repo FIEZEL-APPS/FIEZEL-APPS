@@ -34,7 +34,7 @@ tepercaya (`TRUSTED_EDGE_HOSTS`, satu sumber kebenaran, wajib sama dengan
 `/health` melaporkan jalur yang benar-benar dipakai lewat field baru
 `edgeGuardPath`: `"custom-domain"` (utama), `"header"` (cadangan), `"off"` (transisi).
 Field lama `edgeGuard` **tetap** `"on"`/`"off"` karena probe hidup
-(`tools/fiezel-health-probe.mjs`, `staging-live-test.js`) menilai `!== "on"` sebagai
+(`tools/fiezel-health-probe.mjs`, `tests/staging-live-test.js`) menilai `!== "on"` sebagai
 KRITIS.
 
 Cara membaca keadaan nyata, bukan menebaknya:
@@ -49,7 +49,7 @@ curl -s https://api.fiezel.my.id/health | grep -o '"edgeGuardPath":"[a-z-]*"'
 untuk periode pengamatan penuh. Sisi `owner` **belum menjadi custom domain** sama
 sekali — `owner.fiezel.my.id` masih 100% bergantung pada `owner-index.php`, dan
 penjaga owner **sengaja tidak** punya jalur hostname-tepercaya
-(`owner-edge-guard-test.js` butir (f) menjaga asimetri itu).
+(`tests/owner-edge-guard-test.js` butir (f) menjaga asimetri itu).
 
 ## Isi
 
@@ -60,8 +60,8 @@ penjaga owner **sengaja tidak** punya jalur hostname-tepercaya
 
 **Nilai `EDGE_SHARED_SECRET` yang sungguhan TIDAK ADA di repo ini dan tidak boleh
 pernah masuk.** Yang tercatat hanya placeholder dan cara menyuntiknya saat
-pemasangan. Gerbang `edge-guard-test.js` butir (g) memindai `api-index.php` dan
-`owner-edge-guard-test.js` butir (d) memindai `owner-index.php` untuk memastikan itu
+pemasangan. Gerbang `tests/edge-guard-test.js` butir (g) memindai `api-index.php` dan
+`tests/owner-edge-guard-test.js` butir (d) memindai `owner-index.php` untuk memastikan itu
 tetap benar.
 
 **Dua proxy, dua nilai secret yang BERBEDA.** `fiezel-api` dan `fiezel-owner` adalah dua
@@ -94,7 +94,7 @@ dalamnya meneruskan ke `https://fiezel-api.fitrajft.workers.dev`.
 
 Terbukti jalan, bukan diasumsikan: `/api/auth/anon` memasang cookie `fz_id`
 `Domain=fiezel.my.id`, lalu `/api/user/me` dan `/api/quota` menjawab 200 dengan
-cookie itu, dan `cf-live-contract-test.js` lulus **33 assert** melawan
+cookie itu, dan `tests/cf-live-contract-test.js` lulus **33 assert** melawan
 `https://api.fiezel.my.id`.
 
 ## 2. Sifat yang disengaja
@@ -247,7 +247,7 @@ di origin ArenHost yang sama + `owner-index.php` yang meneruskan ke
   `Referrer-Policy: no-referrer`, `X-Content-Type-Options: nosniff`. Proxy yang
   menjatuhkan CSP mengubah halaman ber-CSP ketat menjadi halaman tanpa CSP **tanpa satu
   pun tanda yang terlihat** — halamannya tetap tampil benar. Karena itu keempat header itu
-  ada di `$passThrough`, dan `owner-edge-guard-test.js` butir (c) mengambil header dari
+  ada di `$passThrough`, dan `tests/owner-edge-guard-test.js` butir (c) mengambil header dari
   respons Worker yang sungguhan lalu menuntut setiap satu di antaranya ada di daftar itu.
 - **`Location` + `Set-Cookie` wajib lewat, redirect TIDAK diikuti proxy.** Login yang
   berhasil menjawab `303 → /` sambil memasang cookie `fz_owner`. Kalau curl mengikuti
@@ -418,7 +418,7 @@ master**, bukan klaim bahwa sudah beres.
 ### 5b.2 Sakelar yang dipasang — apa yang dihemat, apa risikonya
 
 Setiap baris di bawah punya komentar padanannya di `api-index.php` (gerbang
-`edge-proxy-contract-test.js` butir (g) menuntutnya, jadi ia tidak bisa hilang):
+`tests/edge-proxy-contract-test.js` butir (g) menuntutnya, jadi ia tidak bisa hilang):
 
 | Sakelar | Hemat | Risiko |
 |---|---|---|
@@ -548,7 +548,7 @@ Sifat temuan, semuanya penting untuk diagnosisnya:
 - **Reproducible** dari halaman kosong, pada **HTTP/2 maupun HTTP/1.1**.
 - **TIDAK terlihat oleh `curl`** apa adanya: satu proses `curl` = satu koneksi baru,
   jadi ia tidak pernah menganyam beberapa permintaan di atas **satu** koneksi
-  keep-alive seperti browser. Karena itu `cf-live-contract-test.js` (33 assert HIJAU)
+  keep-alive seperti browser. Karena itu `tests/cf-live-contract-test.js` (33 assert HIJAU)
   **tidak** menangkapnya, dan itu bukan kelemahan gerbang itu — ia menguji hal lain.
 - Artinya: aplikasi murid yang menembak `/api/config` → `/api/user/me` → `/api/quota`
   berurutan **menggantung pada panggilan ketiga**. Yang dilihat murid bukan galat,
@@ -589,7 +589,7 @@ pengukuran `tools/edge-latency-probe.mjs`.
 
 ### 5e.3 Yang dijaga gerbang CI — dan yang TIDAK bisa dijaganya
 
-`edge-proxy-hopbyhop-test.js` (node murni, **nol jaringan**) memuat **kedua** sumber PHP
+`tests/edge-proxy-hopbyhop-test.js` (node murni, **nol jaringan**) memuat **kedua** sumber PHP
 sebagai teks dan meng-assert strukturnya: (a) daftar hop-by-hop dibuang dua arah;
 (b) timeout cURL diset dan angkanya **lebih pendek** dari batas 8 s yang membuat browser
 menyerah — angka itu dibaca dari `tools/fiezel-e2e-bridge.mjs`, bukan ditulis dua kali;
@@ -750,7 +750,7 @@ langkah aman untuk dibatalkan sampai langkah 5.
    curl -s https://api.fiezel.my.id/health | grep -o '"protocol":"1.7"'
    curl -si https://api.fiezel.my.id/api/auth/anon -X POST -H 'Origin: https://fiezel.my.id' \
      | grep -i 'set-cookie'          # HARUS Domain=fiezel.my.id (pihak pertama, tetap)
-   node cf-live-contract-test.js     # dengan FIEZEL_CF_LIVE_BASE=https://api.fiezel.my.id
+   node tests/cf-live-contract-test.js     # dengan FIEZEL_CF_LIVE_BASE=https://api.fiezel.my.id
    ```
    Kalau TLS masih error, tunggu 2-5 menit (sertifikat sedang diterbitkan) —
    **jangan** lanjut ke langkah 5.
@@ -784,8 +784,8 @@ langkah aman untuk dibatalkan sampai langkah 5.
   (jembatan ini).
 - `workers/api/mw-edge.js` — penegakan header + alasan mode `off`.
 - `workers/api/route-health.js` — kenapa `/health` dilindungi dan `/healthz` tidak.
-- `edge-guard-test.js` — gerbang CI yang menjaga semua klaim jembatan `api` di atas.
-- `owner-edge-guard-test.js` — gerbang CI jembatan `owner`: semua rute 403 tanpa header
+- `tests/edge-guard-test.js` — gerbang CI yang menjaga semua klaim jembatan `api` di atas.
+- `tests/owner-edge-guard-test.js` — gerbang CI jembatan `owner`: semua rute 403 tanpa header
   edge, 403 tanpa sesi owner walau header benar (dua lapis), header keamanan HTML lolos
   daftar pass-through, `owner-index.php` bebas nilai secret, perbandingan waktu-konstan.
 - `workers/owner/index.js` — penjaga edge sisi owner (disalin dari `mw-edge.js`, alasan

@@ -68,11 +68,11 @@ Ukuran payload dipasang terpisah dari kuota: panggil `checkPromptSize(teksTernor
 
 | Gerbang | Lolos | Laporan |
 |---|---|---|
-| `quota-core-test.js` | 65/65 | `QUOTA-CORE-REPORT.json` |
-| `quota-manipulation-test.js` | 39/39 | `QUOTA-MANIPULATION-REPORT.json` |
-| `quota-reset-test.js` | 26/26 | `QUOTA-RESET-REPORT.json` |
+| `tests/quota-core-test.js` | 65/65 | `QUOTA-CORE-REPORT.json` |
+| `tests/quota-manipulation-test.js` | 39/39 | `QUOTA-MANIPULATION-REPORT.json` |
+| `tests/quota-reset-test.js` | 26/26 | `QUOTA-RESET-REPORT.json` |
 
-Regresi lama tetap hijau: `regression-test.js` exit 0, `install-health-test.js` exit 0, `node --check` lolos untuk semua berkas baru.
+Regresi lama tetap hijau: `tests/regression-test.js` exit 0, `tests/install-health-test.js` exit 0, `node --check` lolos untuk semua berkas baru.
 
 **Cara ketiga gerbang menguji modul ESM tanpa dependency** (ini bagian yang paling berguna untuk agen lain): `tools/quota-module-loader.js` membaca sumbernya, membuang baris `import`, menurunkan `export`, lalu menjalankannya di konteks `vm` yang **sengaja kosong** — tanpa `Date`, `fetch`, `document`, `localStorage`, `crypto`, `process`. Artinya kemurnian bukan diperiksa dengan regex saja: kalau ada yang menyelipkan jam atau jaringan ke dalam aturan kuota, gerbangnya gagal **saat memuat**.
 

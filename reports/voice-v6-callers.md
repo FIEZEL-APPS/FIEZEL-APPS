@@ -21,9 +21,9 @@ Berkas mesin (`fiezel-voice-say.js`, `fiezel-web-audio-player.js`, `fiezel-proso
 | `features/tutor-classroom/fiezel-tutor-v3.js` | `prefetchNextBeat()` menghangatkan beat berikutnya dari `session.snapshot().beatIndex + 1`; `stopVoice()` menaikkan generasi. |
 | `features/speaking-listening/fiezel-speaking-listening-addon.js` | `TTSService.prefetch()`; `Controller.prefetchNextScript()` dengan daftar putih domain; `cancelPrefetch()` di `open`/`exit`/`destroy`. `renderListeningExam` sengaja tidak disentuh. |
 | `features/library/fiezel-library-ui.js` | Narasi audiobook mengirim BLOK teks utuh satu kali lewat `planUtterance`, dengan anggaran blok bertangga; sorotan per kalimat digerakkan penanda batas dari `planUtterance`. |
-| `voice-callsite-prefetch-test.js` | Gerbang baru, 57 pemeriksaan, node murni. |
-| `.github/workflows/quality.yml` | Gerbang baru terdaftar setelah `voice-prefetch-neural-test.js`. |
-| `voice-fallback-chain-test.js` | Sandbox `audioHarness`-nya perlu stub `cancelVoicePrefetch`/`prefetchNextVoice` karena ia menjalankan blok `AudioService` terisolasi dan `stop()` sekarang memanggil helper induk. |
+| `tests/voice-callsite-prefetch-test.js` | Gerbang baru, 57 pemeriksaan, node murni. |
+| `.github/workflows/quality.yml` | Gerbang baru terdaftar setelah `tests/voice-prefetch-neural-test.js`. |
+| `tests/voice-fallback-chain-test.js` | Sandbox `audioHarness`-nya perlu stub `cancelVoicePrefetch`/`prefetchNextVoice` karena ia menjalankan blok `AudioService` terisolasi dan `stop()` sekarang memanggil helper induk. |
 
 Catatan jalur: berkas tutor ada di `features/tutor-classroom/fiezel-tutor-v3.js`, bukan
 `features/tutor/...` seperti tertulis di mandat.
@@ -143,7 +143,7 @@ menghapus 300 ms di batas kalimat kedua.
 `guardHits` kosong di semua run - tidak ada `prepare()`, `ensureReady()`, atau `prewarm()`
 yang tersentuh dari sisi pemanggil, jadi tidak ada risiko memicu unduhan model.
 
-## 6. Gerbang baru: `voice-callsite-prefetch-test.js`
+## 6. Gerbang baru: `tests/voice-callsite-prefetch-test.js`
 
 57 pemeriksaan, node murni, pola `sourceBlock`/`vm` repo, menulis
 `VOICE-CALLSITE-PREFETCH-REPORT.json`. Ia bukan pencari kata `prefetch`:
@@ -169,22 +169,22 @@ menggagalkan a17; menghapus `this.prefetchNextScript();` menggagalkan a12.
 
 Semua exit 0:
 
-`voice-callsite-prefetch-test.js` 57/0, `voice-prefetch-neural-test.js` 32/0,
-`voice-pipeline-gap-test.js` 36/36, `voice-chunker-test.js` 11/11,
-`voice-fallback-chain-test.js` 45/0, `voice-offline-fallback-test.js` 14,
-`speaking-listening-test.js` 45/0, `listening-exam-test.js`, `tutor-brain-v3-test.js`,
-`tutor-classroom-regression-test.js` 5/0, `tutor-reteach-card-test.js` 13/0,
-`regression-test.js`, `ui-structure-test.js`, `install-health-test.js`, `a11y-test.js`.
+`tests/voice-callsite-prefetch-test.js` 57/0, `tests/voice-prefetch-neural-test.js` 32/0,
+`tests/voice-pipeline-gap-test.js` 36/36, `tests/voice-chunker-test.js` 11/11,
+`tests/voice-fallback-chain-test.js` 45/0, `tests/voice-offline-fallback-test.js` 14,
+`tests/speaking-listening-test.js` 45/0, `tests/listening-exam-test.js`, `tests/tutor-brain-v3-test.js`,
+`tests/tutor-classroom-regression-test.js` 5/0, `tests/tutor-reteach-card-test.js` 13/0,
+`tests/regression-test.js`, `tests/ui-structure-test.js`, `tests/install-health-test.js`, `tests/a11y-test.js`.
 
 Ditambah semua gerbang lain yang menyentuh berkas yang diubah:
-`audio-asset-pipeline-test.js`, `back-nav-test.js`, `classroom-test.js`, `contrast-test.js`,
-`diagnostic-scanner-test.js`, `experience-integration-test.js`, `gems-test.js`,
-`library-integrity-test.js`, `m02542-experience-test.js`,
-`neural-voice-m02592-puter-subtitle-test.js`, `puter-popup-once-test.js`,
-`pwa-cache-test.js`, `search-feedback-test.js`, `speaking-exam-test.js`, `tours-test.js`.
+`tests/audio-asset-pipeline-test.js`, `tests/back-nav-test.js`, `tests/classroom-test.js`, `tests/contrast-test.js`,
+`tests/diagnostic-scanner-test.js`, `tests/experience-integration-test.js`, `tests/gems-test.js`,
+`tests/library-integrity-test.js`, `tests/m02542-experience-test.js`,
+`tests/neural-voice-m02592-puter-subtitle-test.js`, `tests/puter-popup-once-test.js`,
+`tests/pwa-cache-test.js`, `tests/search-feedback-test.js`, `tests/speaking-exam-test.js`, `tests/tours-test.js`.
 
 `library-test.js` tidak ada di repo; gerbang Library yang relevan adalah
-`library-integrity-test.js`.
+`tests/library-integrity-test.js`.
 
 `*-REPORT.json` selain milik gerbang baru sudah dipulihkan ke keadaan basis.
 

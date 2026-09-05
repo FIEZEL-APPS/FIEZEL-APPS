@@ -31,7 +31,7 @@
 
   /**
    * Akor pembuka: F mayor add9 yang diurai naik. Frekuensi sama dengan palet nada
-   * seluruh SFX transisi (diperiksa splash-choreography-test.js) - satu produk, satu akor.
+   * seluruh SFX transisi (diperiksa tests/splash-choreography-test.js) - satu produk, satu akor.
    */
   var PITCH = Object.freeze({
     F2: 87.31, F3: 174.61, C4: 261.63, F4: 349.23, A4: 440, C5: 523.25, G5: 783.99

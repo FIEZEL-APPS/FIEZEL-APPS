@@ -135,10 +135,10 @@ Yang diperiksa, dan hasilnya:
 3. Izin tanpa tanda terima diterima diam-diam. Sekarang `ModelCallGate.isReservation()`
    diwajibkan di kedua rute (`ai_budget_receipt_invalid`).
 
-## 6. Gerbangnya: `ai-account-cap-gate-test.js`
+## 6. Gerbangnya: `tests/ai-account-cap-gate-test.js`
 
-Terdaftar di `.github/workflows/quality.yml` (tepat sesudah `rate-anon-test.js`, karena
-keduanya menjaga dua sisi ancaman yang sama). Laporan mesin: `AI-ACCOUNT-CAP-GATE.json`,
+Terdaftar di `.github/workflows/quality.yml` (tepat sesudah `tests/rate-anon-test.js`, karena
+keduanya menjaga dua sisi ancaman yang sama). Laporan mesin: `reports/AI-ACCOUNT-CAP-GATE.json`,
 skema `fiezel-ai-account-cap-gate-v1`. 53 assert, exit 0.
 
 **Bagian yang paling penting: penemuannya PROGRAMATIK.** Daftar rute yang diketik tangan
@@ -161,7 +161,7 @@ Assert lain: refusal chokepoint (B), dep-less = 503 + `quotaCharged:false` + nol
 model + pesan jujur (D), angka plafon nyata (E), atomik (F), D1 fail-closed (G), pelepasan
 saat gagal dan TIDAK saat timeout (H), pendaftaran CI (I).
 
-Satu perbaikan di gerbang lama: `rate-anon-test.js` (g6) dulu meng-assert bahwa literal
+Satu perbaikan di gerbang lama: `tests/rate-anon-test.js` (g6) dulu meng-assert bahwa literal
 `typeof deps.accountBudget === 'function'` **tetap ada** — cara sah S1 mendokumentasikan
 celah tanpa menyentuh berkas paket lain. Tapi begitu celahnya ditambal, assert itu
 berubah fungsi jadi PENJAGA CELAH: merah pada perbaikan, hijau pada kerusakan. Arahnya
@@ -171,7 +171,7 @@ dibalik: sekarang ia menuntut penolakan `ai_budget_dep_missing` dan `quotaCharge
 ## 7. Matriks merah (`tools/account-cap-red-matrix.mjs`)
 
 Baseline HIJAU → mutasi → gerbang dijalankan → berkas dipulihkan → akhir HIJAU.
-Laporan mesin: `AI-ACCOUNT-CAP-RED-MATRIX.json`. **15 mutasi, 15 MERAH, 0 hijau.**
+Laporan mesin: `reports/AI-ACCOUNT-CAP-RED-MATRIX.json`. **15 mutasi, 15 MERAH, 0 hijau.**
 
 | # | Mutasi | Hasil | Assert yang jatuh (contoh) |
 |---|---|---|---|
@@ -200,12 +200,12 @@ karena itu runner-nya melempar, bukan menelan.
 
 Semua exit 0:
 
-`ai-account-cap-gate-test.js`, `tools/account-cap-red-matrix.mjs`,
-`ai-task-contract-test.js`, `ai-response-shape-test.js`, `cf-wiring-test.js`,
-`cf-api-contract-test.js`, `quota-core-test.js`, `d1-schema-contract-test.js`,
-`rate-anon-test.js`, `no-network-test.js`, `secret-scan-test.js`,
-`gate-registry-test.js`, `coordination-guard-test.js`, `regression-test.js`,
-`install-health-test.js`.
+`tests/ai-account-cap-gate-test.js`, `tools/account-cap-red-matrix.mjs`,
+`tests/ai-task-contract-test.js`, `tests/ai-response-shape-test.js`, `tests/cf-wiring-test.js`,
+`tests/cf-api-contract-test.js`, `tests/quota-core-test.js`, `tests/d1-schema-contract-test.js`,
+`tests/rate-anon-test.js`, `tests/no-network-test.js`, `tests/secret-scan-test.js`,
+`tests/gate-registry-test.js`, `tests/coordination-guard-test.js`, `tests/regression-test.js`,
+`tests/install-health-test.js`.
 
 ## 9. Apa yang MASIH TIDAK tertutup
 

@@ -13,9 +13,9 @@ satu flag. Berkas:
 | `features/neural-voice/fiezel-cf-tts-transport.js` | BARU | seluruh pengetahuan CF: mode flag, badan permintaan ber-allowlist, cache Cache API klien, penolakan URL jembatan, memo 429, metrik |
 | `features/neural-voice/fiezel-cf-voice-notice.js` | BARU | peta `copyKey → naskah`, dua varian per keadaan (ada suara / tidak ada suara sama sekali) |
 | `features/neural-voice/fiezel-voice-say.js` | DIUBAH | dua titik sisip (`cfCachedFirst`, `afterAssets`) + satu di prefetch (`prefetchAfterAssets`) |
-| `tts-transport-switch-test.js` | BARU | gerbang node murni, 31 assert |
+| `tests/tts-transport-switch-test.js` | BARU | gerbang node murni, 31 assert |
 | `index.html`, `sw.js` | DIUBAH | dua modul baru masuk grup malas `voice` dan daftar precache `ASSETS` |
-| `.github/workflows/quality.yml` | DIUBAH | gerbang baru didaftarkan sesudah `voice-callsite-prefetch-test.js` |
+| `.github/workflows/quality.yml` | DIUBAH | gerbang baru didaftarkan sesudah `tests/voice-callsite-prefetch-test.js` |
 
 **Tidak disentuh sama sekali:** `fiezel-web-audio-player.js`, `fiezel-prosody.js`,
 `fiezel-neural-voice.js`. Gerbang memeriksanya dua kali: lapisan CF tidak menyebut satu pun
@@ -121,7 +121,7 @@ diproduksi ulang. Jangan mengubahnya tanpa mengubah pra-render.
 
 ## 5. Gerbang
 
-`tts-transport-switch-test.js` — node murni, `vm`, sumber produksi asli dijalankan dengan
+`tests/tts-transport-switch-test.js` — node murni, `vm`, sumber produksi asli dijalankan dengan
 jaringan/Cache API/mesin suara tiruan. **31 pass, 0 fail.** Cakupan: (a) 'off' nol permintaan +
 tangga utuh; (b) urutan 'on' dan posisi sisipan; (c) tidak ada kunci cache di badan; (d) tidak
 ada `speed` di badan, dan `speed` tetap ada di pemutaran; (e) cache hit dari URL R2 langsung,
@@ -133,15 +133,15 @@ Didaftarkan di `.github/workflows/quality.yml`.
 Verifikasi penuh, semuanya exit 0:
 
 ```
-tts-transport-switch-test.js  voice-fallback-chain-test.js  voice-prefetch-neural-test.js
-voice-pipeline-gap-test.js    voice-offline-fallback-test.js tts-key-test.js
-speaking-listening-test.js    listening-exam-test.js         regression-test.js
-install-health-test.js
+tests/tts-transport-switch-test.js  tests/voice-fallback-chain-test.js  tests/voice-prefetch-neural-test.js
+tests/voice-pipeline-gap-test.js    tests/voice-offline-fallback-test.js tests/tts-key-test.js
+tests/speaking-listening-test.js    tests/listening-exam-test.js         tests/regression-test.js
+tests/install-health-test.js
 ```
 
-Tambahan yang ikut diperiksa karena `index.html`/`sw.js` disentuh: `boot-order-test.js`,
-`pwa-cache-test.js`, `gems-test.js`, `remote-push-test.js`, `content-integrity-audit.js`,
-`voice-callsite-prefetch-test.js` — semuanya exit 0. Seluruh `*-REPORT.json` yang tersentuh
+Tambahan yang ikut diperiksa karena `index.html`/`sw.js` disentuh: `tests/boot-order-test.js`,
+`tests/pwa-cache-test.js`, `tests/gems-test.js`, `tests/remote-push-test.js`, `content-integrity-audit.js`,
+`tests/voice-callsite-prefetch-test.js` — semuanya exit 0. Seluruh `*-REPORT.json` yang tersentuh
 saat menjalankan tes sudah dipulihkan (`git checkout -- '*-REPORT.json'`); yang baru hanya
 `TTS-TRANSPORT-SWITCH-REPORT.json`.
 

@@ -17,7 +17,7 @@ Desain: `reports/cf-b5-analytics.md` §5 · `reports/cf-a10-cost.md` + `cf-a10-c
 | `workers/owner/index.js` | Gate owner + sesi HMAC + 10 panel HTML yang dirender Worker + model biaya. 717 baris, nol dependency. |
 | `workers/owner/queries.js` | Seluruh SQL agregat (`SELECT` saja) + self-guard yang melempar bila ada kata tulis. |
 | `workers/owner/README.md` | Cara deploy, Secret yang dipasang owner, cara login, dan **13 batas kejujuran metrik**. |
-| `owner-dashboard-test.js` | Gerbang wajib (node murni, stub D1). Terdaftar di `.github/workflows/quality.yml`. |
+| `tests/owner-dashboard-test.js` | Gerbang wajib (node murni, stub D1). Terdaftar di `.github/workflows/quality.yml`. |
 
 ## 2. Keputusan arsitektur: hostname terpisah, bukan `/owner` di worker api
 
@@ -96,7 +96,7 @@ penagihan hanya cache-miss) supaya tidak ada angka ajaib. Kalibrasi yang dijaga 
 (TTS 157,30 + LLM 3,01 + langganan 5,00 − kredit 3,30). Pembagi nol → `null`, bukan `Infinity`/`NaN`.
 Token proksi (char ÷ 4) ditandai eksplisit di UI bila penyedia tak memberi objek usage.
 
-## 7. Gerbang `owner-dashboard-test.js`
+## 7. Gerbang `tests/owner-dashboard-test.js`
 
 Node murni, nol dependency. Worker ESM dimuat lewat `data:text/javascript;base64,...`
 (pola cf-b7 §2); impor `'./queries.js'` ditulis ulang jadi data: URL sendiri karena impor relatif
@@ -127,9 +127,9 @@ aura-1 15,0 → 12,0 → 1 gagal · mengganti `ctEq(...)` jadi `===` → 3 gagal
 
 ## 8. Hasil eksekusi
 
-Hijau semua: `owner-dashboard-test.js`, `regression-test.js`, `install-health-test.js`,
-`ui-structure-test.js`, `observability-privacy-test.js`, `audio-asset-pipeline-test.js`,
-`pwa-cache-test.js`, `sw-corp-test.js`, `core-worker-contract-test.js`, `validator.js`.
+Hijau semua: `tests/owner-dashboard-test.js`, `tests/regression-test.js`, `tests/install-health-test.js`,
+`tests/ui-structure-test.js`, `tests/observability-privacy-test.js`, `tests/audio-asset-pipeline-test.js`,
+`tests/pwa-cache-test.js`, `tests/sw-corp-test.js`, `tests/core-worker-contract-test.js`, `validator.js`.
 Nol berkas `*-REPORT.json` berubah. Satu-satunya berkas repo lama yang diubah: `.github/workflows/quality.yml`
 (+1 baris pendaftaran gerbang).
 

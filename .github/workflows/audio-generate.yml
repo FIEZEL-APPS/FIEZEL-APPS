@@ -62,7 +62,7 @@ jobs:
     runs-on: ubuntu-latest
     # Batas keras: tanpa ini GitHub memakai 360 menit, dan satu langkah
     # yang menggantung membakar enam jam dalam diam (lihat
-    # workflow-timeout-gate-test.js).
+    # tests/workflow-timeout-gate-test.js).
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
@@ -120,7 +120,7 @@ jobs:
 
       - name: Pemeriksaan rahasia sebelum commit
         if: ${{ inputs.apply == 'APPLY' }}
-        run: node audio-asset-pipeline-test.js
+        run: node tests/audio-asset-pipeline-test.js
 
       # Yang di-commit hanya manifest. Binernya sudah ada di R2 - lihat catatan kepala
       # tools/audio-batch-generate.mjs tentang mengapa Git tidak dijadikan basis data media.

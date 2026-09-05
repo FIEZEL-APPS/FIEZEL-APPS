@@ -29,6 +29,24 @@ check('Grammar lesson inventory',grammar.count===lessonCount,`declared=${grammar
 const ids=grammar.templates.map(x=>x.id),skills=grammar.templates.map(x=>x.subskill);
 check('Unique lesson identities (V18: multi-template per lesson)',new Set(ids).size===lessonCount,`ids=${new Set(ids).size} templates=${lessonCount} lessons=${new Set(skills).size}`);
 
+/* m025-257: SATU LESSON = SATU TOPIK, TERMASUK LABELNYA.
+ * V18 mengizinkan dua templat per lesson. Yang tidak pernah dijaga: kedua templat itu WAJIB
+ * menyebut keluarga dan level yang sama. Ketika templat kedua QN-206 mendarat dengan
+ * family 'question_negation' sementara saudaranya b5_023 'emphasis_inversion', runtime
+ * memilih kolam pinjaman dari keluarga saudaranya - dan content-integrity-audit menemukan 30
+ * temuan KRITIS "aturan B1 keluarga lain ditawarkan di lesson C1". Tidak ada satu pun gerbang
+ * yang melihat sumbernya; yang terlihat hanya akibatnya, jauh di hilir. */
+const lessonFamilyMismatch=[];
+{
+  const bySkill=new Map();
+  for(const t of grammar.templates){if(!bySkill.has(t.subskill))bySkill.set(t.subskill,[]);bySkill.get(t.subskill).push(t)}
+  for(const [skill,ts] of bySkill){
+    const fams=new Set(ts.map(t=>t.family)),lvls=new Set(ts.map(t=>t.cefr));
+    if(fams.size>1||lvls.size>1)lessonFamilyMismatch.push({lesson:skill,templates:ts.map(t=>`${t.id}:${t.family}/${t.cefr}`)});
+  }
+}
+check('Templat satu lesson sefamily dan selevel',lessonFamilyMismatch.length===0,lessonFamilyMismatch.length?lessonFamilyMismatch:`${new Set(grammar.templates.map(t=>t.subskill)).size} lesson konsisten`);
+
 const malformed=[],generic=[],badDistractors=[],badOptions=[],badCefr=[],unconstrainedAmbiguity=[];
 const bannedGeneric=/Each distractor conflicts|Check the subject, time reference|Match form to function and context|identify grammatical cue\s*->\s*select form/i;
 for(const item of grammar.templates){

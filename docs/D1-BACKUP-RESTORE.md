@@ -35,7 +35,7 @@ Kesimpulan operasionalnya: **backup `fiezel-stats` melindungi hal yang tidak bis
 dipulihkan dengan cara lain; backup `fiezel-core` melindungi kenyamanan dan
 kejujuran tagihan.** Dan tidak satu pun dari keduanya melindungi progres murid —
 yang melindungi progres murid adalah **fitur ekspor/backup di aplikasi** (lihat
-`backup-ui-test.js`). Kalau murid membersihkan data situsnya, backup D1 tidak
+`tests/backup-ui-test.js`). Kalau murid membersihkan data situsnya, backup D1 tidak
 menolong sedikit pun. Itu wajib disampaikan ke murid/wali apa adanya.
 
 ---

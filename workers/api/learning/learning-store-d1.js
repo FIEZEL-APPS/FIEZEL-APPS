@@ -1,8 +1,8 @@
 /**
  * FIEZEL — lapisan D1 untuk lane telemetri belajar. HANYA TABEL AGREGAT.
  *
- * OTORITAS: BRAIN-TELEMETRY-SCHEMA.md §5 (idempotency + dedup) dan
- * BRAIN-DATA-PRIVACY.md §7 (aggregate-only, tanpa baris per murid).
+ * OTORITAS: docs/BRAIN-TELEMETRY-SCHEMA.md §5 (idempotency + dedup) dan
+ * docs/BRAIN-DATA-PRIVACY.md §7 (aggregate-only, tanpa baris per murid).
  *
  * ###########################################################################
  * #  DATABASE INI (`fiezel-learning`, binding LEARNING_DB) TERPISAH DARI     #
@@ -22,7 +22,7 @@
  * Bentuk `db` yang diharapkan: antarmuka D1 standar
  *   db.prepare(sql).bind(...args) -> { run(), all(), first() }
  * Semua fungsi menerima `db` eksplisit supaya bisa diuji dengan D1 palsu
- * di learning-lane-test.js (pola analytics-dedup-test.js).
+ * di tests/learning-lane-test.js (pola tests/analytics-dedup-test.js).
  */
 
 import { aggregateLearning, LEARNING_LIMITS } from './learning-core.js';

@@ -3,7 +3,7 @@
  *
  * KENAPA BENTUK INI, DAN KENAPA A/B BIASA SUDAH DIBUNUH DENGAN ANGKA
  * ------------------------------------------------------------------
- * A/B antar-murid DIBATALKAN dan keputusannya tertulis di BRAIN-EVOLUTION-DECISIONS.md §1,
+ * A/B antar-murid DIBATALKAN dan keputusannya tertulis di docs/BRAIN-EVOLUTION-DECISIONS.md §1,
  * bulat 4/4 model council. Aritmetikanya tidak bisa ditawar: mendeteksi efek Cohen's d = 0,2
  * pada alpha 0,05 / power 0,80 butuh ~392 murid PER LENGAN, sementara kapasitas aplikasi
  * di-hard-cap 250 (MAX_USERS di fiezel-core-worker.js). Menambah SOAL per murid tidak

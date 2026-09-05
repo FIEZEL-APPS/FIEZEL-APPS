@@ -33,7 +33,7 @@ paling ingin disembunyikan bug yang dicari.
 
 Kenapa di `fiezel-core` dan bukan `fiezel-stats`:
 
-- `analytics-privacy-test.js` menuntut database analytics memuat TEPAT lima tabel
+- `tests/analytics-privacy-test.js` menuntut database analytics memuat TEPAT lima tabel
   yang terdaftar di `analytics-tables.js`;
 - rollup yang gagal karena database analytics tidak bisa ditulis **tidak akan
   bisa mencatat kegagalannya sendiri di database yang sama**. Catatan kegagalan
@@ -131,12 +131,12 @@ dipoles.
   barisnya dihapus, dihitung di `malformed`, dan `held` diperbaiki
   `reconcileHeld`.
 
-## Gerbang baru: `cron-contract-test.js`
+## Gerbang baru: `tests/cron-contract-test.js`
 
 Node murni + `tools/cf-test-harness.js`, mengeksekusi Worker sungguhan lewat
 jalur `scheduled()` (sisi yang tidak pernah disentuh gerbang lain). **60 assert,
 exit 0**, laporan `CRON-CONTRACT-REPORT.json`. Terdaftar di
-`.github/workflows/quality.yml` tepat sesudah `edge-guard-test.js`.
+`.github/workflows/quality.yml` tepat sesudah `tests/edge-guard-test.js`.
 
 | Butir | Yang dibuktikan |
 |---|---|
@@ -152,17 +152,17 @@ exit 0**, laporan `CRON-CONTRACT-REPORT.json`. Terdaftar di
 ## Verifikasi (semua exit 0)
 
 ```
-cron-contract-test.js      60 assert PASS
-cf-wiring-test.js          fail 0
-cf-api-contract-test.js    exit 0
-analytics-aggregate-test.js fail 0
-analytics-privacy-test.js  fail 0
-quota-core-test.js         fail 0
-regression-test.js         exit 0
-install-health-test.js     exit 0
+tests/cron-contract-test.js      60 assert PASS
+tests/cf-wiring-test.js          fail 0
+tests/cf-api-contract-test.js    exit 0
+tests/analytics-aggregate-test.js fail 0
+tests/analytics-privacy-test.js  fail 0
+tests/quota-core-test.js         fail 0
+tests/regression-test.js         exit 0
+tests/install-health-test.js     exit 0
 ```
 Tambahan yang juga dijalankan karena menyentuh berkas yang sama:
-`edge-guard-test.js`, `owner-dashboard-test.js`, `no-network-test.js`,
+`tests/edge-guard-test.js`, `tests/owner-dashboard-test.js`, `tests/no-network-test.js`,
 `tools/cf-test-harness.js` — semuanya exit 0. `node --check` bersih untuk semua
 berkas yang diubah.
 
@@ -171,7 +171,7 @@ berkas yang diubah.
 BARU:
 - `workers/api/migrations/0003_cron.sql`
 - `workers/api/cron-status.js`
-- `cron-contract-test.js`
+- `tests/cron-contract-test.js`
 - `reports/add-a3-cron.md`
 
 DIUBAH:
@@ -185,8 +185,8 @@ DIUBAH:
   `cron-status.js`.
 - `workers/api/migrations/MIGRATIONS.md` — baris `0003_cron.sql`, alasan
   pemilihan database, perintah penerapan.
-- `.github/workflows/quality.yml` — `node cron-contract-test.js`.
-- `analytics-aggregate-test.js` — tiruan D1 di gerbang itu **melempar untuk SQL
+- `.github/workflows/quality.yml` — `node tests/cron-contract-test.js`.
+- `tests/analytics-aggregate-test.js` — tiruan D1 di gerbang itu **melempar untuk SQL
   yang tidak dikenalnya**, jadi `SQL.countUsageRows` harus ditambahkan sebagai
   satu `case`. Ini perubahan pada TIRUAN, bukan pada assert: tidak ada satu pun
   assert yang dilonggarkan.
@@ -200,7 +200,7 @@ DIUBAH:
   satu-satunya tempat yang tahu job mana yang dijalankan cron mana. Pembungkusnya
   tidak mengubah nilai balik job dan tidak menelan galat (mencatat lalu melempar
   ulang), jadi `try/catch` per job tetap satu-satunya penentu bentuk hasil —
-  `cf-wiring-test.js` bab D tetap hijau tanpa perubahan.
+  `tests/cf-wiring-test.js` bab D tetap hijau tanpa perubahan.
 
 ## MIGRASI UNTUK MASTER — perintah yang harus dijalankan owner
 

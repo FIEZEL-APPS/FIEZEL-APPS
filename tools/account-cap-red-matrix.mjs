@@ -1,5 +1,5 @@
 /**
- * tools/account-cap-red-matrix.mjs — BUKTI MERAH untuk `ai-account-cap-gate-test.js`.
+ * tools/account-cap-red-matrix.mjs — BUKTI MERAH untuk `tests/ai-account-cap-gate-test.js`.
  *
  * Gerbang yang belum pernah dilihat MERAH bukan bukti apa pun: ia bisa hijau karena
  * assert-nya tidak menyentuh apa yang diklaimnya. Berkas ini merusak SATU titik pada
@@ -17,8 +17,8 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
 const root = path.resolve(new URL('..', import.meta.url).pathname);
-const GATE = path.join(root, 'ai-account-cap-gate-test.js');
-const REPORT = path.join(root, 'AI-ACCOUNT-CAP-RED-MATRIX.json');
+const GATE = path.join(root, 'tests/ai-account-cap-gate-test.js');
+const REPORT = path.join(root, 'reports/AI-ACCOUNT-CAP-RED-MATRIX.json');
 
 const F = {
   wiring: 'workers/api/route-wiring.js',

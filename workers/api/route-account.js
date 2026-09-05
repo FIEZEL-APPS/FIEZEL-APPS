@@ -251,7 +251,7 @@ export async function routeAccountMe(ctx) {
 /**
  * SATU-SATUNYA jalur di seluruh Worker yang bisa menghasilkan akun berperan
  * `teacher` (§22). Kalau pembaca berikutnya menambahkan jalur kedua, gerbang
- * `role-security-test.js` akan merah — ia menghitung berapa tempat yang menulis
+ * `tests/role-security-test.js` akan merah — ia menghitung berapa tempat yang menulis
  * peran guru ke D1.
  *
  * Pemakaian token adalah UPDATE ATOMIK ber-`WHERE used_at IS NULL`. Bukan

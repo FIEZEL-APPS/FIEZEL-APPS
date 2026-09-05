@@ -52,7 +52,7 @@
  *        Yang dijaga tetap terjaga: penegakannya TIDAK ada di dalam handler,
  *        melainkan di `route-wiring.js` yang menyuntikkan `enforceQuota` asli
  *        dari `quota/route-quota.js` ke setiap rute berbiaya. Rute berbiaya yang
- *        lupa memanggilnya akan merah di `cf-wiring-test.js` butir (b)/(c),
+ *        lupa memanggilnya akan merah di `tests/cf-wiring-test.js` butir (b)/(c),
  *        bukan lolos diam-diam.
  *        Urutan di dalam satu permintaan tetap seperti cf-b1 §4 dan tidak boleh
  *        ditukar: identitas -> gerbang payload -> breaker -> kuota -> provider.
@@ -139,7 +139,7 @@ function matchRoute(method, pathname) {
  *
  * `TEST_CLOCK_MS` hanya dihormati kalau ada di env, dan env hanya bisa diisi
  * OWNER lewat wrangler — bukan klien. `wrangler.toml` produksi TIDAK memuatnya,
- * dan gerbang `cf-api-contract-test.js` meng-assert itu.
+ * dan gerbang `tests/cf-api-contract-test.js` meng-assert itu.
  */
 function nowFrom(env) {
   const injected = Number(env && env.TEST_CLOCK_MS);
@@ -244,7 +244,7 @@ function needsCorsHeaders(response, ctx) {
  * Harness uji memuat modul Worker sebagai `data:text/javascript;base64,...`,
  * jadi SETIAP frame stack membawa satu modul UTUH ter-base64. Begitu `err.stack`
  * ikut dicetak mentah, satu galat saja bisa memuntahkan puluhan megabita.
- * Terukur pada `edge-guard-test.js` (gerbang yang memang sengaja menggiring
+ * Terukur pada `tests/edge-guard-test.js` (gerbang yang memang sengaja menggiring
  * banyak jalur galat), mesin sama, gerbang sama, hanya baris log yang beda:
  *
  *     tanpa err.stack :             64 bita

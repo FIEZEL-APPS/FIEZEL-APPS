@@ -348,4 +348,4 @@ Notes: `pawReact` already gates on reduced motion and never throws (`app.js:2697
 - [ ] No overlap with quiz-topbar, coach bubble lane, subtitle band, voice pill, bottom nav (C5); `#quizNext` reachable at all times.
 - [ ] Max one panel PAW per screen; hub/list screens show none (§4).
 - [ ] Reduced motion: static pose renders, zero reactions, layer still communicates (three layers, audit 03 B.6).
-- [ ] `paw-mascot-test.js` suite still green; no new copy of the rig anywhere (E5).
+- [ ] `tests/paw-mascot-test.js` suite still green; no new copy of the rig anywhere (E5).

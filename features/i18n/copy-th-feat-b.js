@@ -15,7 +15,7 @@
  * 3. Persona TH-STYLE: murid = คุณ; "aku/gue" PAW/tutor = เรา; suara murid pada contoh
  *    pertanyaan coach.* = ฉัน; tanpa ครับ/ค่ะ; angka Arab; istilah Inggris yang diajarkan
  *    (grammar, tense, structure, listening) tetap Inggris.
- * 4. Nilai tour.* th TIDAK diikat tours-test.js (tes itu membekukan naskah id); dua kunci
+ * 4. Nilai tour.* th TIDAK diikat tests/tours-test.js (tes itu membekukan naskah id); dua kunci
  *    terjemahan (tour.lib-translate-body, tour.listen-translate-*) menyebut target bahasa
  *    mengikuti locale murid (Thai) karena permintaan AI memakai FiezelI18n.getLocale() —
  *    tandai untuk review produk + penutur asli.

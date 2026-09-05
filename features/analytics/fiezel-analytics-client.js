@@ -26,7 +26,7 @@
  * oleh murid.
  *
  * ===========================================================================
- * LIMA JAMINAN YANG DIJAGA GERBANG `analytics-client-test.js`
+ * LIMA JAMINAN YANG DIJAGA GERBANG `tests/analytics-client-test.js`
  * ===========================================================================
  *
  * 1. `installId` TIDAK PERNAH DIKIRIM. Ia UUID acak (`crypto.randomUUID`) yang

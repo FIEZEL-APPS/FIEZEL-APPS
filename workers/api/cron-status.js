@@ -33,7 +33,7 @@
  *   - DATA MURID. Tidak ada `user_id`, tidak ada token pengunjung, tidak ada
  *     teks apa pun milik murid. Bahkan JUMLAH baris yang tersentuh disimpan
  *     sebagai angka, bukan sebagai daftar.
- * `cron-contract-test.js` butir (e) memindai isi tabel dan MEMERAH kalau salah
+ * `tests/cron-contract-test.js` butir (e) memindai isi tabel dan MEMERAH kalau salah
  * satu aturan ini dilanggar.
  *
  * ==========================================================================

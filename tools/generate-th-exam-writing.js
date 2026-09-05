@@ -9,7 +9,7 @@
  *
  * Sumber terjemahannya peta KALIMAT UTUH di tools/th-strings/: satu entri = satu kalimat
  * sumber, bukan peta token. Penerjemah token adalah yang melahirkan kolase Thai+Indonesia di
- * listening (lihat THAI-BANK-PURITY-HANDOFF.md); pola itu sengaja tidak diulang.
+ * listening (lihat docs/handoffs/THAI-BANK-PURITY-HANDOFF.md); pola itu sengaja tidak diulang.
  *
  * Idempoten, dan GAGAL KERAS saat menemui string yang belum terpeta — diam-diam melewatkannya
  * berarti membiarkan satu kalimat Indonesia lolos ke layar murid Thai, yaitu persis kegagalan

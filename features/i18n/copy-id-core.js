@@ -10,14 +10,14 @@
  * ATURAN untuk agent yang menyalin pola ini (pelanggaran = gerbang merah):
  *
  * 1. NILAI harus byte-identik dengan literal di app.js/features hari ini. Gerbang
- *    id-golden-snapshot-test.js membekukan HIMPUNAN literal Indonesia dari app.js +
+ *    tests/id-golden-snapshot-test.js membekukan HIMPUNAN literal Indonesia dari app.js +
  *    features/**: kalimat boleh pindah ke sini (himpunan tidak berubah), tapi satu
  *    karakter yang berubah = merah. Salin-tempel, jangan ketik ulang.
  *
  * 2. KUNCI: `<domain>.<slug-pendek>` huruf kecil, deskriptif, stabil. HATI-HATI: gerbang
  *    yang sama me-lexer SEMUA string literal di folder ini, termasuk kunci. Kunci yang
  *    mengandung kata penanda Indonesia (kamu, belajar, soal, jawaban, latihan, lanjut,
- *    mulai+pilih, dst — lihat daftar STRONG/COMMON di id-golden-snapshot-test.js) akan
+ *    mulai+pilih, dst — lihat daftar STRONG/COMMON di tests/id-golden-snapshot-test.js) akan
  *    dihitung sebagai "literal Indonesia baru" dan MERAH. Pakai slug netral/Inggris
  *    (placement-cta, auth-skip-status), bukan terjemahan kalimatnya.
  *

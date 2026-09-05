@@ -48,7 +48,7 @@
  * mengikuti urutan template di grammar-templates.json; id = templateId + '-cz' +
  * indeks item dalam template (stabil selama template tidak berubah).
  *
- * Skema keluaran (FINAL per BRAINCORE-V3-CONTRACTS.md Fase 2):
+ * Skema keluaran (FINAL per docs/BRAINCORE-V3-CONTRACTS.md Fase 2):
  * {schema:'fiezel-cloze-bank-v1', items:[{id, templateId, skill, level,
  *  sentence(berisi ___), blank:{answer, alternates[], position},
  *  distractors:[{text, misconception}]}]}
@@ -103,7 +103,7 @@ function escapeRegExp(s) {
  * ditulis pada frame sempit itu gugur (tidak mungkin diketik murid di frame baru).
  * Tidak ada konten baru yang dikarang: stem, jawaban, dan distraktor semuanya substring
  * kalimat target template yang sudah diaudit, dengan label miskonsepsi verbatim.
- * Kenapa di loadTemplates: gate cloze-bank-test.js membandingkan blank.answer dengan
+ * Kenapa di loadTemplates: gate tests/cloze-bank-test.js membandingkan blank.answer dengan
  * options[correctIndex] hasil loadTemplates — lensa yang sama untuk builder dan gate. */
 var BLANK_NARROWING = {
   /* "She asked me ___." -> "She asked me where I ___." (jawaban "lived"): urutan
@@ -424,7 +424,7 @@ function build(templates, alternatesById) {
 function loadTemplates() {
   var raw = JSON.parse(fs.readFileSync(TEMPLATES_PATH, 'utf8'));
   /* Lensa BLANK_NARROWING diterapkan DI SINI supaya builder dan gate
-   * (cloze-bank-test.js memakai loadTemplates yang sama) melihat template identik. */
+   * (tests/cloze-bank-test.js memakai loadTemplates yang sama) melihat template identik. */
   return raw.templates.map(applyBlankNarrowing);
 }
 

@@ -29,7 +29,7 @@
  * ambang + tempat melihatnya, bukan sebagai angka palsu.
  *
  * ==========================================================================
- * ATURAN RAHASIA (dijaga `health-probe-test.js`)
+ * ATURAN RAHASIA (dijaga `tests/health-probe-test.js`)
  * ==========================================================================
  * - Tidak ada secret, token, atau header edge di berkas ini, dan ia TIDAK membaca
  *   env secret apa pun.
@@ -534,7 +534,7 @@ function compareScenario(scn, report) {
 async function main() {
   if (MODE_SELFTEST && SCENARIO_NAME) {
     // Satu skenario, semantik NYATA (exit code = derajat terburuk). Dipakai gerbang
-    // `health-probe-test.js` untuk membuktikan exit code, bukan hanya isi laporan.
+    // `tests/health-probe-test.js` untuk membuktikan exit code, bukan hanya isi laporan.
     const scn = SCENARIOS.find(s => s.name === SCENARIO_NAME);
     if (!scn) { process.stderr.write('skenario tidak dikenal: ' + SCENARIO_NAME + '\nada: ' + SCENARIOS.map(s => s.name).join(', ') + '\n'); process.exit(2); }
     const report = await runScenario(scn);

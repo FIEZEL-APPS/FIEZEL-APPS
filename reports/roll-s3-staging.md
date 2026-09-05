@@ -3,7 +3,7 @@
 Tanggal jalan: 27 Agustus 2026, 16:18–17:18 UTC (23:18 WIB s/d 00:18 WIB 28 Agu).
 Sasaran: Worker `fiezel-api-staging` (D1 `fiezel-core-staging`/`fiezel-stats-staging`),
 `FEATURE_AI=on`, `FEATURE_TTS=on`, `ANALYTICS_ENABLED=on`. Produksi TIDAK disentuh.
-Gerbang baru: `staging-live-test.js` (SKIP bersih tanpa `FIEZEL_STAGING_BASE` +
+Gerbang baru: `tests/staging-live-test.js` (SKIP bersih tanpa `FIEZEL_STAGING_BASE` +
 `FIEZEL_STAGING_EDGE`). Nilai rahasia header edge tidak ada di repo, tidak ada di
 laporan, dan tidak ada di berkas ini — gerbang membacanya dari env saat jalan dan
 memindai laporannya sendiri sebelum menulis.
@@ -216,7 +216,7 @@ Yang tetap belum terbukti dan cara owner memverifikasinya:
    `wrangler d1 execute fiezel-stats-staging --command "SELECT * FROM metrics_daily ORDER BY day DESC LIMIT 3"`
    dan `SELECT rotated_at FROM pepper_state WHERE id = 1`.
 3. **Idempotensi** kedua job tetap terbukti hanya di atas stub
-   (`cf-wiring-test.js`), dan itu tidak berubah dari paket kerja ini.
+   (`tests/cf-wiring-test.js`), dan itu tidak berubah dari paket kerja ini.
 
 ---
 
@@ -224,16 +224,16 @@ Yang tetap belum terbukti dan cara owner memverifikasinya:
 
 | Berkas | Perubahan |
 |---|---|
-| `staging-live-test.js` | BARU. 40 assert terhadap runtime staging. SKIP bersih (exit 0, cetak alasan) tanpa `FIEZEL_STAGING_BASE`/`FIEZEL_STAGING_EDGE`. Menolak jalan kalau `/health` tidak mengaku staging — pengaman supaya ia tidak pernah menulis state di produksi. Rahasia hanya dari env; laporan dipindai dulu dan tidak ditulis kalau rahasianya muncul. |
-| `.github/workflows/quality.yml` | Langkah `node staging-live-test.js` sesudah `cf-live-contract-test.js`, dengan komentar bahwa ia SKIP sampai owner menyetel base URL Worker STAGING dan bahwa rahasia edge harus lewat repository secret, bukan berkas repo. |
+| `tests/staging-live-test.js` | BARU. 40 assert terhadap runtime staging. SKIP bersih (exit 0, cetak alasan) tanpa `FIEZEL_STAGING_BASE`/`FIEZEL_STAGING_EDGE`. Menolak jalan kalau `/health` tidak mengaku staging — pengaman supaya ia tidak pernah menulis state di produksi. Rahasia hanya dari env; laporan dipindai dulu dan tidak ditulis kalau rahasianya muncul. |
+| `.github/workflows/quality.yml` | Langkah `node tests/staging-live-test.js` sesudah `tests/cf-live-contract-test.js`, dengan komentar bahwa ia SKIP sampai owner menyetel base URL Worker STAGING dan bahwa rahasia edge harus lewat repository secret, bukan berkas repo. |
 | `.gitignore` | `STAGING-LIVE-REPORT.json` diabaikan, dengan alasan tertulis. |
-| `no-network-test.js` | `ENV_GATED_LIVE_ALLOWLIST` diubah dari Set (satu env global) menjadi Map berkas→env, supaya `staging-live-test.js` diperiksa terhadap `FIEZEL_STAGING_BASE` dan bukan terhadap env milik gerbang lain. Syarat lamanya tetap penuh (baca env, tanpa URL bawaan, tidak dobel-kelas, dan benar-benar dijalankan untuk membuktikan exit 0 + cetak `SKIP`). Satu assert baru: langkah staging harus terdaftar di `quality.yml` sebagai langkah yang mati secara bawaan. |
+| `tests/no-network-test.js` | `ENV_GATED_LIVE_ALLOWLIST` diubah dari Set (satu env global) menjadi Map berkas→env, supaya `tests/staging-live-test.js` diperiksa terhadap `FIEZEL_STAGING_BASE` dan bukan terhadap env milik gerbang lain. Syarat lamanya tetap penuh (baca env, tanpa URL bawaan, tidak dobel-kelas, dan benar-benar dijalankan untuk membuktikan exit 0 + cetak `SKIP`). Satu assert baru: langkah staging harus terdaftar di `quality.yml` sebagai langkah yang mati secara bawaan. |
 
 Versi build TIDAK dinaikkan. Commit di `roll/s3staging`, tidak di-push.
 
-Verifikasi: `regression-test.js` PASS, `install-health-test.js` PASS,
-`no-network-test.js` PASS (36 assert, 128 gerbang), `cf-live-contract-test.js`
-SKIP bersih (exit 0). `staging-live-test.js` FAIL 10/40 terhadap staging — itu
+Verifikasi: `tests/regression-test.js` PASS, `tests/install-health-test.js` PASS,
+`tests/no-network-test.js` PASS (36 assert, 128 gerbang), `tests/cf-live-contract-test.js`
+SKIP bersih (exit 0). `tests/staging-live-test.js` FAIL 10/40 terhadap staging — itu
 temuan, bukan kerusakan gerbang; tanpa env ia SKIP dan tidak memerahkan CI publik.
 
 ## 6. Data uji di staging

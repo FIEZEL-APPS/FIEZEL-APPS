@@ -6,7 +6,7 @@
  * `defer`, dan blok inline TIDAK ikut ditunda: ia akan dijalankan SEBELUM app.js sempat
  * dieksekusi, lalu `const baseFlushReportQueue = flushReportQueue;` melempar ReferenceError
  * di baris pertama boot. Sebagai berkas ber-`defer` ia kembali berjalan sesudah app.js,
- * persis seperti sebelumnya - lihat boot-order-test.js yang menjaga aturan itu.
+ * persis seperti sebelumnya - lihat tests/boot-order-test.js yang menjaga aturan itu.
  *
  * Perilakunya sendiri tidak diubah sama sekali.
  */
