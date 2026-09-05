@@ -5723,7 +5723,12 @@ if(pendingAfterGate==='placement'){pendingAfterGate=null;startPlacement()}
 // tidak lagi di layar. Urutannya sengaja sama dengan sebelumnya - yang hilang hanya
 // kemampuan undangan itu untuk menahan apa pun. Kalau tidak ada undangan yang layak
 // tampil, gerbang akun langsung dipasang seperti biasa.
-if(!offerNotificationInvitation('after_onboarding'))armPuterAuthGate();
+/* m025-262: gerbang akun Puter TIDAK LAGI dipasang otomatis. Pendaftaran murid terjadi
+   SEKALI di onboarding (registerStudentOnce), dan akun Puter menjadi tambahan opsional
+   yang pintunya ada di Pengaturan -> Akun Puter. Popup kedua yang menanyakan identitas
+   yang sudah diberikan murid adalah persis keluhan owner. */
+offerNotificationInvitation('after_onboarding');
+try{maybeRegisterStudentOnce()}catch(_){}
 armOfflineVoiceAutoload();
 // Creator Report menunggu SDK-nya, bukan menyerah. Antrean laporan dulu pasti terkirim
 // 1,2 detik setelah boot karena js.puter.com selalu sudah selesai dieksekusi sebelum
@@ -5865,7 +5870,8 @@ function settleNotificationInvitation(status){
   notificationInvitationSettled=true;
   setNotificationGateState(status);
   setTimeout(hideNotificationGate,220);
-  armPuterAuthGate();
+  /* m025-262: dulu gerbang akun Puter menyusul di sini. Sekarang tidak ada gerbang kedua —
+     identitas murid sudah lahir di onboarding. */
   return true
 }
 function acceptStudyNotifications(){
@@ -5928,6 +5934,10 @@ function afterOnboardingExit(action){
     return;
   }
   if(action==='placement')pendingAfterGate='placement';
+  /* m025-262 PENDAFTARAN SEKALI: begitu perkenalan selesai, nama yang baru saja diketik
+     LANGSUNG menjadi ID online murid. Tidak ada formulir kedua di Pengaturan, di Online &
+     Teman, atau di gerbang akun — jalur ini diam kalau offline dan dicoba lagi nanti. */
+  try{maybeRegisterStudentOnce()}catch(_){}
   // Peran dari perkenalan: hanya guru terverifikasi yang mendarat di Tutor Action Center.
   // Pengguna tanpa kode undangan diarahkan ke modal aktivasi guru.
   if(action==='home'){try{const role=self.FiezelOnboarding?.storedRole?.(self)||'murid';const verified=isVerifiedTeacher();if(role==='guru'&&!verified){showToast('Akses Guru memerlukan kode undangan resmi.');setTimeout(()=>{try{openFiezelAuthModal('teacher')}catch{}},420)}else{if(state.preferences?.role!==role){state.preferences={...state.preferences,role:verified?role:'murid'};save()}if(role==='guru'&&verified)setTimeout(()=>{try{go('tutor')}catch{}},420)}}catch{}}
@@ -11355,7 +11365,7 @@ function openSettings(){const p=state.preferences||defaultPreferences,endpoint=p
   // Kartu Akun Puter dibungkus lipatan bersarang, BUKAN dipindah atau dihapus: elemennya
   // tetap di DOM (bindAccountSettingControls dan refreshPuterAccountCard tetap menemukannya),
   // tetapi 330 px penjelasan akun tidak lagi ikut terbuka saat panel baru dibuka.
-  const grupProfil=`<label class="endpoint-label">${FiezelI18n.t('onboarding.name-field-label')}<input id="settingLearnerName" type="text" value="${esc(state.userName||'')}" maxlength="24" placeholder="${FiezelI18n.t('settings.nama-you')}" autocomplete="given-name"></label>${learnerLocaleRowMarkup()}`+settingsFold(FiezelI18n.t('settings.akun-puter'),accountSettingsMarkup(),false,'settings-subfold');
+  const grupProfil=`<label class="endpoint-label">${FiezelI18n.t('onboarding.name-field-label')}<input id="settingLearnerName" type="text" value="${esc(state.userName||'')}" maxlength="24" placeholder="${FiezelI18n.t('settings.nama-you')}" autocomplete="given-name"></label>${learnerLocaleRowMarkup()}${studentRegistrationMarkup()}`+settingsFold(FiezelI18n.t('settings.akun-puter'),accountSettingsMarkup(),false,'settings-subfold');
   const grupBelajar=`<div class="settings-list"><button type="button" class="setting-row setting-row-action" onclick="replayTour()"><span class="setting-icon"><i data-lucide="rotate-ccw"></i></span><span><b>${FiezelI18n.t('settings.redo-kenalan-cepat')}</b><small>${FiezelI18n.t('settings.menjalankan-ulang-tur-menu-awal')}</small></span><i data-lucide="chevron-right"></i></button><label class="setting-row"><span class="setting-icon"><i data-lucide="wand-sparkles"></i></span><span><b>${FiezelI18n.t('settings.animation-label')}</b><small>${FiezelI18n.t('settings.transisi-halaman-kartu-popup-feedback')}</small></span><input id="settingMotion" type="checkbox" ${p.motion?'checked':''}></label><label class="setting-row"><span class="setting-icon"><i data-lucide="vibrate"></i></span><span><b>${FiezelI18n.t('settings.vibration-label')}</b><small>${typeof navigator!=='undefined'&&typeof navigator.vibrate==='function'?FiezelI18n.t('settings.vibration-supported'):FiezelI18n.t('settings.vibration-fallback')}</small></span><input id="settingHaptics" type="checkbox" ${p.haptics?'checked':''}></label>${gemsSettingsRowMarkup()}</div>`;  const grupSuara=`<div class="settings-list"><label class="setting-row"><span class="setting-icon"><i data-lucide="bell-check"></i></span><span><b>${FiezelI18n.t('settings.pengingat-study')}</b><small>${esc(reminderSettingHint())}</small></span><input id="settingReminders" type="checkbox" ${remindersActive()?'checked':''} ${notificationPermission()==='denied'||notificationPermission()==='unsupported'?'disabled':''} aria-label="${FiezelI18n.t('settings.reminder-aria')}"></label><label class="setting-row"><span class="setting-icon"><i data-lucide="badge-check"></i></span><span><b>${FiezelI18n.t('settings.suara-answer')}</b><small>${FiezelI18n.t('settings.bunyi-naik-when-right-bunyi')}</small></span><input id="settingFeedbackSounds" type="checkbox" ${p.feedbackSounds!==false?'checked':''}></label><div class="setting-row" id="audioDiagRow"><span class="setting-icon"><i data-lucide="smartphone"></i></span><span><b>${FiezelI18n.t('settings.status-bunyi-perangkat')}</b><small id="audioDiagText">${FiezelI18n.t('settings.audio-checking')}</small></span></div></div><div id="voiceSettingsCard">${neuralVoiceStatusMarkup()}</div>`;
   // Tombol bersihkan-cache duduk di antara Backup dan Kesehatan Instalasi: kartu diagnosis
   // itulah yang melaporkan shell usang, jadi tombol perbaikannya berdampingan dengannya.
@@ -11364,9 +11374,12 @@ function openSettings(){const p=state.preferences||defaultPreferences,endpoint=p
   /* SOSIAL (SLOT 7): pintu masuk Profil Online + sakelar Mode Privat papan. Sakelar bicara
      ke server SAAT diubah (bukan saat Simpan) karena janjinya "hilang dari papan seketika";
      tanpa profil/offline ia menolak jujur lewat toast dan kembali ke posisi semula. */
-  const grupOnline=`<div class="settings-list"><button type="button" class="setting-row setting-row-action" onclick="closeModal();openAccountSheet('login')"><span class="setting-icon"><i data-lucide="log-in"></i></span><span><b>${FiezelI18n.t('account.title-login')}</b><small>${accountStatusLine()||FiezelI18n.t('account.body-login')}</small></span><i data-lucide="chevron-right"></i></button><button type="button" class="setting-row setting-row-action" onclick="openOnlineView()"><span class="setting-icon"><i data-lucide="users"></i></span><span><b>${FiezelI18n.t('settings.online-profile-label')}</b><small>${FiezelI18n.t('settings.online-profile-desc')}</small></span><i data-lucide="chevron-right"></i></button><label class="setting-row"><span class="setting-icon"><i data-lucide="eye-off"></i></span><span><b>${FiezelI18n.t('settings.private-mode-label')}</b><small>${FiezelI18n.t('settings.private-mode-desc')}</small></span><input id="settingBoardHidden" type="checkbox" ${socialProfileCache?.flags?.boardHidden?'checked':''} aria-label="${FiezelI18n.t('settings.private-mode-aria')}"></label></div>`;
+  const grupOnline=`<div class="settings-list"><button type="button" class="setting-row setting-row-action" onclick="openOnlineView()"><span class="setting-icon"><i data-lucide="users"></i></span><span><b>${FiezelI18n.t('settings.online-profile-label')}</b><small>${FiezelI18n.t('settings.online-profile-desc')}</small></span><i data-lucide="chevron-right"></i></button><label class="setting-row"><span class="setting-icon"><i data-lucide="eye-off"></i></span><span><b>${FiezelI18n.t('settings.private-mode-label')}</b><small>${FiezelI18n.t('settings.private-mode-desc')}</small></span><input id="settingBoardHidden" type="checkbox" ${socialProfileCache?.flags?.boardHidden?'checked':''} aria-label="${FiezelI18n.t('settings.private-mode-aria')}"></label></div>`;
   openModal(`<div class="settings-head"><div class="modal-mark">${FiezelI18n.t('student.settings-mark')}</div><h2>${FiezelI18n.t('settings.title',{name:esc(learnerName())})}</h2><p>${FiezelI18n.t('settings.all-can-diatur-dikelompokkan-each')}</p></div>`
-    +settingsFold('Akun FIEZEL',fiezelAccountSettingsMarkup(),true)
+    /* m025-262: fold ini dulu menawarkan 'Masuk / Daftar' kepada SETIAP murid — permukaan
+       pendaftaran keempat, sesudah onboarding, gerbang Puter, dan Online & Teman. Sekarang
+       ia hanya muncul untuk akun yang memang sudah ada (jalur aktivasi guru). */
+    +((()=>{try{return self.FiezelAccount?.getAccount?.()||isVerifiedTeacher()}catch(_){return false}})()?settingsFold('Akun FIEZEL',fiezelAccountSettingsMarkup(),true):'')
     +settingsFold(FiezelI18n.t('settings.profil-amp-level'),grupProfil,false)
     +settingsFold(FiezelI18n.t('settings.study'),grupBelajar,false)
     +settingsFold(FiezelI18n.t('settings.suara-amp-notifikasi'),grupSuara,false)
@@ -12091,7 +12104,7 @@ document.addEventListener?.('fiezel:lazy-group',event=>{if(event?.detail?.group=
 /*   4. Bunyi lewat gerbang feedbackSounds, gerak maskot lewat pawReact yang sudah    */
 /*      menghormati reduced-motion — tidak ada gerbang baru yang bisa berbeda.        */
 function onlineTabs(){return [['profil',FiezelI18n.t('social.tab-profile')],['teman',FiezelI18n.t('social.tab-friends')],['papan',FiezelI18n.t('social.tab-leaderboard')]]}
-let onlineTab='profil',onlineBoardTab='teman',onlineSeq=0,onlineHandleTimer=null;
+let onlineTab='profil',onlineBoardTab='teman',onlineSeq=0;
 let socialProfileCache=null,socialInviteLast=null,socialSummaryCache=null,socialSummaryAt=0;
 function socialCore(){try{return self.FiezelSocial||null}catch(_){return null}}
 // Momen mikro sosial: SATU bunyi (gerbang feedbackSounds) + SATU reaksi maskot (gerbang
@@ -12126,6 +12139,115 @@ async function renderOnlineTab(){
     return put(await socialProfilMarkup(core));
   }catch(_){return put(card(`<h3>${FiezelI18n.t('social.degraded-title')}</h3><p class="muted">${FiezelI18n.t('social.degraded-body')}</p>`,'social-card'))}
 }
+/* ============================ PENDAFTARAN SEKALI (m025-262) ============================
+   OWNER: "aktivasi murid ribet — daftar di onboarding, lalu Puter, lalu Pengaturan, lalu
+   Online & Teman. Aku mau prosesnya SEKALI SAJA, hanya di onboarding, dan ID online-nya
+   pakai yang dari daftar pertama kali."
+
+   Karena itu blok ini adalah SATU-SATUNYA tempat identitas online murid lahir:
+     1. Nama yang diketik di onboarding (Step 1) diubah jadi handle yang sah oleh
+        socialHandleCandidates() — murni, tanpa jaringan, jadi bisa diuji tanpa DOM.
+     2. registerStudentOnce() menerbitkan identitas anonim (cookie fz_id), memilih kandidat
+        pertama yang tersedia, lalu membuat profil dengan dua bekas centang persetujuan
+        DITANAMKAN: friendsVisible:true, leagueOptIn:true. Sudah mendaftar = tampil di papan
+        dengan nama yang dipilih sendiri. Tidak ada lagi kotak centang untuk itu.
+     3. Idempoten dan aman dipanggil berkali-kali: profil yang sudah ada dipakai apa adanya,
+        dan panggilan yang tumpang tindih berbagi satu promise.
+   Kegagalan (offline, flag mati, server diam) TIDAK PERNAH menahan belajar — ia diam, dan
+   pendaftaran dicoba lagi di boot berikutnya atau saat murid membuka Online & Teman. */
+function rememberSocialHandle(handle){
+  const h=String(handle||'').trim().toLowerCase();
+  if(!h)return '';
+  try{if(state.preferences?.socialHandle!==h){state.preferences={...state.preferences,socialHandle:h};save()}}catch(_){}
+  return h;
+}
+function storedSocialHandle(){try{return String(state.preferences?.socialHandle||'').trim().toLowerCase()}catch(_){return ''}}
+window.storedSocialHandle=storedSocialHandle;
+/** Nama murid -> daftar kandidat handle yang sah. Murni: nol jaringan, nol DOM. */
+function socialHandleCandidates(name,seed){
+  let base=String(name||'').toLowerCase();
+  try{base=base.normalize('NFD').replace(/[\u0300-\u036f]/g,'')}catch(_){}
+  base=base.replace(/[0-9]{6,}/g,'')            // deret mirip nomor HP dibuang, bukan ditolak
+           .replace(/[^a-z0-9]+/g,'_')
+           .replace(/_+/g,'_')
+           .replace(/^[^a-z]+/,'')              // handle wajib mulai dengan huruf
+           .replace(/_+$/,'');
+  if(base.length>16)base=base.slice(0,16).replace(/_+$/,'');
+  if(base.length<3)base='murid';
+  const rnd=Number.isFinite(Number(seed))?Math.abs(Math.floor(Number(seed))):Math.floor(Math.random()*1e6);
+  const out=[base];
+  for(let i=2;i<=5;i++)out.push(base+i);
+  out.push(base+((rnd%90)+10));
+  out.push(base+((rnd%900)+100));
+  out.push('murid'+((rnd%9000)+1000));
+  return out.filter((h,i)=>h.length>=3&&h.length<=20&&out.indexOf(h)===i);
+}
+window.__fzSocialHandleCandidates=socialHandleCandidates;
+let studentRegistrationPromise=null;
+/**
+ * Mendaftar SEKALI. Mengembalikan {ok, handle, profile} atau {ok:false, message}.
+ * @param {{name?:string}} [opts]
+ */
+function registerStudentOnce(opts){
+  if(studentRegistrationPromise)return studentRegistrationPromise;
+  studentRegistrationPromise=(async()=>{
+    const core=socialCore();
+    if(!core)return {ok:false,message:FiezelI18n.t('social.not-loaded-body')};
+    try{await core.ensureAnon()}catch(_){}
+    // Profil yang SUDAH ada selalu menang — mendaftar dua kali adalah persis keluhan owner.
+    try{
+      const me=await core.api.profileMe();
+      if(me.ok&&me.data?.profile){socialProfileCache=me.data.profile;return {ok:true,handle:rememberSocialHandle(me.data.profile.handle),profile:me.data.profile}}
+    }catch(_){}
+    const name=String(opts?.name||'').trim()||learnerName();
+    let lastMessage='';
+    for(const cand of socialHandleCandidates(name)){
+      const v=core.validateHandle(cand);
+      if(!v.ok)continue;
+      let free=false;
+      try{const chk=await core.api.profileCheck(v.handle);free=!!(chk.ok&&chk.data?.available===true);if(!chk.ok)lastMessage=chk.message||lastMessage}catch(_){}
+      if(!free)continue;
+      const res=await core.api.profileCreate({handle:v.handle,friendsVisible:true,leagueOptIn:true});
+      if(res.ok){socialProfileCache=res.data?.profile||null;socialSummaryAt=0;try{queueSocialEvidence()}catch(_){}return {ok:true,handle:rememberSocialHandle(v.handle),profile:socialProfileCache}}
+      if(res.error==='profile_exists'){
+        try{const me2=await core.api.profileMe();if(me2.ok&&me2.data?.profile){socialProfileCache=me2.data.profile;return {ok:true,handle:rememberSocialHandle(me2.data.profile.handle),profile:me2.data.profile}}}catch(_){}
+        return {ok:true,handle:rememberSocialHandle(v.handle)};
+      }
+      if(res.error==='handle_taken'){lastMessage=res.message;continue}
+      return {ok:false,message:res.message};
+    }
+    return {ok:false,message:lastMessage||FiezelI18n.t('social.degraded-body')};
+  })().finally(()=>{studentRegistrationPromise=null});
+  return studentRegistrationPromise;
+}
+window.registerStudentOnce=registerStudentOnce;
+/** Jalur diam: dipakai sesudah onboarding dan saat boot. Nol toast, nol gerbang. */
+async function maybeRegisterStudentOnce(){
+  if(isVerifiedTeacher())return false;
+  const core=socialCore();
+  if(!core)return false;
+  if(typeof navigator!=='undefined'&&navigator.onLine===false)return false;
+  try{if(await core.probeFlag()!=='on')return false}catch(_){return false}
+  const res=await registerStudentOnce();
+  if(res.ok)try{render()}catch(_){}
+  return res.ok===true;
+}
+window.maybeRegisterStudentOnce=maybeRegisterStudentOnce;
+/** Jalur Pengaturan (murid lama yang sudah belajar sebelum sistem ini ada). */
+async function registerStudentFromSettings(){
+  const btn=$('studentRegisterBtn');if(btn){btn.disabled=true;btn.textContent=FiezelI18n.t('social.creating')}
+  const res=await registerStudentOnce();
+  if(res.ok){showToast(FiezelI18n.t('social.created-toast',{handle:res.handle||storedSocialHandle()}));socialMicroMoment('profile');try{render()}catch(_){}return}
+  if(btn){btn.disabled=false;btn.textContent=FiezelI18n.t('social.create-btn')}
+  showToast(res.message||FiezelI18n.t('social.degraded-body'));
+}
+window.registerStudentFromSettings=registerStudentFromSettings;
+/** Kartu pendaftaran di Pengaturan -> Profil. Sudah terdaftar = hanya menampilkan ID. */
+function studentRegistrationMarkup(){
+  const handle=storedSocialHandle()||socialProfileCache?.handle||'';
+  if(handle)return `<div class="setting-row"><span class="setting-icon"><i data-lucide="at-sign"></i></span><span><b>${esc(FiezelI18n.t('social2.my-id',{handle}))}</b><small>${esc(FiezelI18n.t('social.profile-desc'))}</small></span></div>`;
+  return `<div class="setting-row"><span class="setting-icon"><i data-lucide="user-plus"></i></span><span><b>${esc(FiezelI18n.t('social.create-title'))}</b><small>${esc(FiezelI18n.t('social.create-desc'))}</small></span></div><div class="actions"><button type="button" class="primary" id="studentRegisterBtn" onclick="registerStudentFromSettings()"><i data-lucide="user-plus"></i> ${FiezelI18n.t('social.create-btn')}</button></div>`;
+}
 /* ---------------------------------------------------------------- tab PROFIL */
 async function socialProfilMarkup(core){
   const settingsCard=card(`<div style="display:flex;align-items:center;justify-content:space-between">
@@ -12144,51 +12266,25 @@ async function socialProfilMarkup(core){
     return card(`<div class="social-me"><span class="social-avatar" aria-hidden="true">${esc(String(p.handle||'?').charAt(0).toUpperCase())}</span><div><h3>@${esc(p.handle)}</h3><p class="muted">${FiezelI18n.t('social.profile-desc')}</p></div></div>
       <div class="stats social-stats"><div>${stat(FiezelI18n.t('social.stat-weekly-pb'),pb==null?'—':pb+' PB')}</div><div>${stat(FiezelI18n.t('level.source-manual'),esc(p.band||'—'))}</div><div>${stat(FiezelI18n.t('social.stat-streak'),FiezelI18n.t('social.stat-streak-value',{days:Number(p.streakDays)||0}))}</div></div>
       <p class="muted">${FiezelI18n.t('social.pb-explain')}</p>`,'social-card')
-      +card(`<h3>${FiezelI18n.t('social.privacy-heading')}</h3><p class="muted">${FiezelI18n.t('social.privacy-body')}</p>`,'social-card')
       +settingsCard;
   }
   if(me.error==='profile_required'){
     socialProfileCache=null;
+    // Tidak ada lagi formulir, tidak ada lagi kotak centang: ID online adalah nama dari
+    // pendaftaran pertama (onboarding). Yang belum punya profil didaftarkan di sini juga,
+    // sekali ketuk, dengan handle turunan nama yang sama.
     return card(`<h3>${FiezelI18n.t('social.create-title')}</h3>
       <p class="muted">${FiezelI18n.t('social.create-desc')}</p>
-      <label class="endpoint-label">${FiezelI18n.t('social.handle-label')}<input id="socialHandle" type="text" maxlength="20" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="mis. belajar_terus" oninput="socialHandleInput(this.value)"></label>
-      <p class="social-handle-status muted" id="socialHandleStatus">${FiezelI18n.t('social.handle-rules')}</p>
-      <label class="consent-row"><input id="socialFriendsVisible" type="checkbox" checked><span>${FiezelI18n.t('social.consent-progress')}</span></label>
-      <label class="consent-row"><input id="socialLeagueOptIn" type="checkbox"><span>${FiezelI18n.t('social.consent-league')}</span></label>
-      <div class="modal-actions"><button class="primary" id="socialCreateBtn" onclick="socialCreateProfile()" disabled><i data-lucide="user-plus"></i> ${FiezelI18n.t('social.create-btn')}</button></div>`,'social-card')
+      <div class="modal-actions"><button class="primary" id="socialCreateBtn" onclick="socialCreateProfile()"><i data-lucide="user-plus"></i> ${FiezelI18n.t('social.create-btn')}</button></div>`,'social-card')
       +settingsCard;
   }
   return card(`<h3>${FiezelI18n.t('social.profile-error-title')}</h3><p class="muted">${esc(me.message)}</p>`,'social-card')+settingsCard;
 }
-// Cek ketersediaan LIVE, debounce 500 ms (spec §2.4): validasi lokal dulu (alasan yang jelas,
-// tanpa jaringan), baru tanya server available:true/false.
-function socialHandleInput(value){
-  const status=$('socialHandleStatus'),btn=$('socialCreateBtn');
-  if(btn)btn.disabled=true;
-  clearTimeout(onlineHandleTimer);
-  const core=socialCore();if(!core||!status)return;
-  const v=core.validateHandle(value);
-  if(!v.ok){status.textContent=v.reason;status.classList.remove('social-ok');return}
-  status.textContent=FiezelI18n.t('social.handle-checking');status.classList.remove('social-ok');
-  onlineHandleTimer=setTimeout(async()=>{
-    const res=await core.api.profileCheck(v.handle);
-    const cur=$('socialHandle');if(!cur||String(cur.value||'').trim().toLowerCase()!==v.handle)return; // murid sudah mengetik lagi
-    if(res.ok&&res.data?.available===true){status.textContent=FiezelI18n.t('social.handle-available',{handle:v.handle});status.classList.add('social-ok');if($('socialCreateBtn'))$('socialCreateBtn').disabled=false}
-    else if(res.ok){status.textContent=FiezelI18n.t('social.handle-taken');status.classList.remove('social-ok')}
-    else{status.textContent=res.message;status.classList.remove('social-ok')}
-  },500);
-}
-window.socialHandleInput=socialHandleInput;
 async function socialCreateProfile(){
-  const core=socialCore();if(!core)return;
-  const v=core.validateHandle($('socialHandle')?.value);
-  if(!v.ok){showToast(v.reason);return}
   const btn=$('socialCreateBtn');if(btn){btn.disabled=true;btn.textContent=FiezelI18n.t('social.creating')}
-  const res=await core.api.profileCreate({handle:v.handle,friendsVisible:$('socialFriendsVisible')?.checked!==false,leagueOptIn:$('socialLeagueOptIn')?.checked===true});
-  if(res.ok){socialProfileCache=res.data?.profile||null;socialSummaryAt=0;showToast(FiezelI18n.t('social.created-toast',{handle:v.handle}));socialMicroMoment('profile');try{queueSocialEvidence()}catch(_){}renderOnlineTab();return}
-  if(res.error==='profile_exists'){showToast(FiezelI18n.t('social.already-exists-toast'));renderOnlineTab();return}
+  const res=await registerStudentOnce();
+  if(res.ok){showToast(FiezelI18n.t('social.created-toast',{handle:res.handle||''}));socialMicroMoment('profile');renderOnlineTab();return}
   if(btn){btn.disabled=false;btn.innerHTML=`<i data-lucide="user-plus"></i> ${FiezelI18n.t('social.create-btn')}`;enhanceUI()}
-  const status=$('socialHandleStatus');if(status)status.textContent=res.message;
   showToast(res.message);
 }
 window.socialCreateProfile=socialCreateProfile;
