@@ -235,6 +235,9 @@ body.fz-teacher-mode #app{font-family:var(--tg-body)}
 @keyframes tg-slide{from{transform:translateX(40px);opacity:0}to{transform:none;opacity:1}}
 @keyframes tg-pop{from{transform:translate(-50%,-48%) scale(.97);opacity:0}to{transform:translate(-50%,-50%) scale(1);opacity:1}}
 body.reduce-motion .tg-rise,body.reduce-motion .tg-drawer,body.reduce-motion .tg-modal,body.reduce-motion .tg-scrim{animation:none}
+/* Cat ulang karena data masuk BUKAN "masuk layar". Tanpa pagar ini setiap ronde sinkron
+   memutar ulang animasi masuk: kartu jatuh ke posisi awal lalu merangkak kembali, berulang. */
+.tg.is-repaint .tg-rise,.tg.is-repaint .tg-drawer,.tg.is-repaint .tg-modal,.tg.is-repaint .tg-scrim,.tg.is-repaint .tg-inbox,.tg.is-repaint .tg-board{animation:none}
 
 /* responsive */
 @media (max-width:1100px){.tg-grid-kpi{grid-template-columns:repeat(2,1fr)}.tg-grid-2{grid-template-columns:1fr}.tg-grid-skill{grid-template-columns:repeat(3,1fr)}.tg-quick-row{grid-template-columns:repeat(3,1fr)}}

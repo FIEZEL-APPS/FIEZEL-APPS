@@ -92,3 +92,47 @@ per menit.
 - **Semua kabar bergantung polling.** Push sungguhan (Web Push) sudah ada
   jalurnya di `push-dispatcher.mjs` tetapi belum menyalurkan kabar sosial maupun
   tugas guru.
+
+## Koreksi m025-262: dua detak, dan cat ulang yang tahu kapan harus diam
+
+m025-261 menurunkan ronde sinkron guru ke 3 detik dan memasang `paintSyncChip()` sebagai
+pagarnya. Pagar itu benar tetapi tidak cukup, dan angkanya salah. Owner melaporkan tiga
+gejala sekaligus; ketiganya berakar di dua kekeliruan yang sama.
+
+**1. 3000 ms adalah lantai server, bukan jarak aman.** `LIMITS.TEACHER_MIN_INTERVAL_MS`
+di `workers/api/teacher/class-sync-core.js` bernilai 3000 dan `makeRateLimiter` menolak
+dengan 429 apa pun yang lebih rapat dari itu. Klien yang memakai persis 3000 ms berdiri
+TEPAT di lantainya: jitter sekecil apa pun membuat sebagian ronde ditolak, `c.sync.error`
+terisi, dan `syncFailStreak` menanjak tanpa ada yang benar-benar rusak. Setiap klien yang
+memilih jeda polling wajib membacanya dari lantai server dan menambah marjin, tidak
+menyamainya.
+
+**2. Chip tidak butuh jaringan untuk tetap segar.** `syncLabel()` menghitung labelnya dari
+selisih MENIT terhadap `lastPullAt`. "Tersinkron baru saja" karena itu bisa dijaga oleh
+detak lokal 1 detik tanpa satu pun permintaan. Menyeret ronde jaringan ke 3 detik demi
+label yang berubah tiap menit adalah membayar mahal sesuatu yang gratis. Sekarang ada dua
+detak terpisah: `CHIP_TICK_MS` (1 detik, lokal) dan `SYNC_EVERY_MS` (10 detik, jaringan).
+
+**3. Cat ulang penuh tidak boleh menimpa guru yang sedang memegang layar.** `render()`
+mengganti `el.innerHTML`, jadi ia membuang simpul yang sedang dipegang. Inilah kenapa
+"tugas baru tidak pernah sampai ke murid": kirimannya tidak gagal — formulirnya yang
+dikosongkan sebelum guru sempat menekan kirim. Pagar `paintSyncChip()` hanya menahan ronde
+KOSONG; begitu satu laporan murid masuk, `berubah` menjadi benar dan cangkangnya dicat
+ulang, tepat di atas ketikan guru. Dengan beberapa murid aktif, itu terjadi hampir setiap
+ronde.
+
+Kontrak sekarang:
+
+- **Cat ulang yang dipicu SINKRON melewati `syncRender()`, dan `syncRender()` menunda
+  selama `busy()`** — ada modal/drawer/inbox terbuka, atau fokus berada di
+  `input`/`textarea`/`select`/contenteditable di dalam cangkang. Yang tertunda disusulkan
+  oleh detak chip begitu `busy()` reda. Cat ulang yang dipicu KETUKAN guru tetap memanggil
+  `render()` langsung: menundanya di sana terbaca sebagai tombol yang tidak bereaksi.
+- **Animasi masuk hanya berjalan saat layarnya berganti.** `render()` membandingkan
+  `lastPaintKey` (view + kelas aktif + modal + drawer); bila sama, pembungkusnya memakai
+  `.tg.is-repaint` dan `.tg-rise`/`tg-pop`/`tg-slide`/`chIn` dimatikan. Tanpa ini setiap
+  ronde memutar ulang animasi masuk — kartu jatuh ke posisi awalnya lalu merangkak kembali,
+  berulang. Yang guru lihat sebagai "kartu glitch berpindah-pindah" adalah animasi masuk
+  yang di-restart, bukan tata letak yang bergerak.
+- **`data-autofocus` juga hanya pada pergantian layar**, dengan alasan yang sama: pada cat
+  ulang ia merebut kursor dari tempat guru meletakkannya.
