@@ -50,19 +50,16 @@ function check(ok, name, detail) {
 /* ================================ A · NAVIGASI ==================================== */
 {
   const navButtons = INDEX.match(/<button[^>]*class="nav(?: active)?"[^>]*>/g) || [];
-  check(navButtons.length === 4,
-    'A1 tab bar berisi tepat empat tujuan',
+  check(navButtons.length === 5,
+    'A1 tab bar berisi tepat lima tujuan',
     'ditemukan ' + navButtons.length);
-  for (const label of ['nav.hari-ini', 'nav.latihan', 'nav.progres', 'nav.pengaturan']) {
+  for (const label of ['nav.practice', 'nav.school', 'nav.home-primary', 'nav.progress', 'nav.profile']) {
     check(INDEX.indexOf('data-i18n="' + label + '"') !== -1,
       'A2 tab ' + label + ' ada di tab bar');
   }
-  /* Tab Pengaturan membuka modal dan SENGAJA tidak membawa data-view: renderInner()
-     menambahkan .active ke elemen ber-data-view dan hanya membersihkannya dari .nav lain,
-     jadi atribut itu akan membuat tab ini tersangkut menyala setelah sekali dibuka. */
-  const settingsTab = navButtons.find(b => /openSettings\(\)/.test(b));
-  check(!!settingsTab && !/data-view=/.test(settingsTab),
-    'A3 tab Pengaturan tidak membawa data-view (kalau tidak, ia tersangkut aktif)');
+  /* Tombol Pengaturan ada di topbar dan profil dengan accessible name */
+  check(/openSettings\(\)/.test(INDEX),
+    'A3 tombol Pengaturan tersedia di aplikasi');
   /* Rute lama TIDAK boleh dibuang bersama tabnya - tautan dalam layar, riwayat back-nav,
      dan tur masih membawa nama-nama itu. */
   for (const view of ['vocab', 'grammar', 'reading', 'skills', 'library', 'latihan']) {
