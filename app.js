@@ -6070,7 +6070,7 @@ function openFeedback(prefill){
 function render(){const __renderStartedAt=Date.now();try{return renderInner()}finally{window.__fiezelLastRenderMs=Date.now()-__renderStartedAt;/* [FASE-4] pasang ulang timer kantuk 90 dtk tiap layar dicat (mati sendiri di luar layar santai). */try{pawIdleArm()}catch(_){}/* [OUTFIT G5'] konteks layar untuk resolver outfit (19 §6.1) */try{self.FiezelPawOutfit?.screen?.(state.view)}catch(_){}}}
 // m025-41: render duration is recorded so the diagnostic scanner can see a slow screen,
 // which is how OWNER experienced the Classroom regression before any error was logged.
-function renderInner(){if(isVerifiedTeacher()&&state.view!=='tutor'){state.view='tutor'}if(document.body?.classList?.contains?.('fz-teacher-mode')&&state.view!=='tutor'){try{self.FiezelTeacherShell?.unmount?.()}catch(_){}}speakingListeningMountToken++;if(speakingListeningController){speakingListeningController.destroy();speakingListeningController=null;/* m026-01: satu-satunya tempat sesi dengar benar-benar bubar. Di dalam if, bukan di luar - kalau tidak, tiap navigasi biasa akan memaksa maskot kembali idle dan memotong selebrasi yang sedang jalan. */pawReact('listening-stop')}document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));setApp('');if(state.view==='home')home();if(state.view==='latihan')latihan();if(state.view==='vocab')vocab();if(state.view==='grammar')grammar();if(state.view==='reading')reading();if(state.view==='skills')skillsLab();if(state.view==='listening')skillsLab('listening');if(state.view==='speaking')skillsLab('speaking');if(state.view==='writing')writing();if(state.view==='classroom')classroom();if(state.view==='library')library();if(state.view==='ask'||state.view==='search')askView();if(state.view==='test')placement();if(state.view==='progress')progress();if(state.view==='online')onlineView();if(state.view==='learn')learnerFlowView();if(state.view==='tutor')tutorCenterView();/* merge SLOT 7 sosial 2026-08-29 */document.querySelector(`[data-view="${state.view}"]`)?.classList.add('active');/* m028 fase3: bendera panggung Skills Lab. Addon listening memaku blok tombolnya ke dasar layar (speaking-listening-addon.css), jadi ia panggung kedua yang bisa ditutupi gelembung. */document.body?.classList?.toggle?.('fz-stage-sl',['skills','listening','speaking'].includes(state.view));/* m028 fase3 (QA §9): Peta Belajar ikut jadi panggung ber-kontrol sejak panel NEXT SESSION punya tombol "Mulai sesi" di dekat dasar layar - screenshot QA menunjukkan gelembung PAW menutupinya utuh. Aturannya sama dengan kuis: peek dilarang, dok mengecil, layar diberi ruang bawah. */document.body?.classList?.toggle?.('fz-stage-map',state.view==='progress');/* 2026-08-29 overhaul I12 (O6 #10): bendera panggung Home. Wajah coach-strip adalah SATU-SATUNYA Pau di Home; gelembung FAB pengambang (Pau kedua, terukur menimpa lipatan hero/skill-hub di 390px) disembunyikan lewat CSS body.fz-stage-home — pola yang sama dengan fz-stage-sl/fz-stage-map, modul gelembung tidak disentuh. */document.body?.classList?.toggle?.('fz-stage-home',state.view==='home');/* q16-P2-2 2026-08-29: hub juga panggung ber-CTA-dekat-dasar (Review Due, Buka flashcards, Mulai 25 soal) \u2014 peek dilarang, dok mengecil, pola sama dengan sl/map. */document.body?.classList?.toggle?.('fz-stage-hub',['vocab','grammar','reading','library','test'].includes(state.view));document.body?.classList?.toggle?.('fz-stage-writing',state.view==='writing');/* v24-F2 2026-08-29: Writing = layar mengarang; FAB disembunyikan via CSS (pola fz-stage-home), modul gelembung tidak disentuh. */enhanceUI();syncCoachBubble();try{refreshNotifBadge()}catch(_){}window.scrollTo(0,0)}
+function renderInner(){if(isVerifiedTeacher()&&state.view!=='tutor'){state.view='tutor'}if(document.body?.classList?.contains?.('fz-teacher-mode')&&state.view!=='tutor'){try{self.FiezelTeacherShell?.unmount?.()}catch(_){}}speakingListeningMountToken++;if(speakingListeningController){speakingListeningController.destroy();speakingListeningController=null;/* m026-01: satu-satunya tempat sesi dengar benar-benar bubar. Di dalam if, bukan di luar - kalau tidak, tiap navigasi biasa akan memaksa maskot kembali idle dan memotong selebrasi yang sedang jalan. */pawReact('listening-stop')}document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));setApp('');if(state.view==='home')home();if(state.view==='latihan')latihan();if(state.view==='vocab')vocab();if(state.view==='grammar')grammar();if(state.view==='reading')reading();if(state.view==='skills')skillsLab();if(state.view==='listening')skillsLab('listening');if(state.view==='speaking')skillsLab('speaking');if(state.view==='writing')writing();if(state.view==='classroom')classroom();if(state.view==='library')library();if(state.view==='ask'||state.view==='search')askView();if(state.view==='test')placement();if(state.view==='progress')progress();if(state.view==='online'||state.view==='profile')onlineView();if(state.view==='learn')learnerFlowView();if(state.view==='tutor')tutorCenterView();/* merge SLOT 7 sosial 2026-08-29 */const activeTabEl=document.querySelector(`[data-view="${state.view}"]`)||(state.view==='profile'?document.querySelector('[data-view="online"]'):state.view==='online'?document.querySelector('[data-view="profile"]'):null);activeTabEl?.classList.add('active');/* m028 fase3: bendera panggung Skills Lab. Addon listening memaku blok tombolnya ke dasar layar (speaking-listening-addon.css), jadi ia panggung kedua yang bisa ditutupi gelembung. */document.body?.classList?.toggle?.('fz-stage-sl',['skills','listening','speaking'].includes(state.view));/* m028 fase3 (QA §9): Peta Belajar ikut jadi panggung ber-kontrol sejak panel NEXT SESSION punya tombol "Mulai sesi" di dekat dasar layar - screenshot QA menunjukkan gelembung PAW menutupinya utuh. Aturannya sama dengan kuis: peek dilarang, dok mengecil, layar diberi ruang bawah. */document.body?.classList?.toggle?.('fz-stage-map',state.view==='progress');/* 2026-08-29 overhaul I12 (O6 #10): bendera panggung Home. Wajah coach-strip adalah SATU-SATUNYA Pau di Home; gelembung FAB pengambang (Pau kedua, terukur menimpa lipatan hero/skill-hub di 390px) disembunyikan lewat CSS body.fz-stage-home — pola yang sama dengan fz-stage-sl/fz-stage-map, modul gelembung tidak disentuh. */document.body?.classList?.toggle?.('fz-stage-home',state.view==='home');/* q16-P2-2 2026-08-29: hub juga panggung ber-CTA-dekat-dasar (Review Due, Buka flashcards, Mulai 25 soal) \u2014 peek dilarang, dok mengecil, pola sama dengan sl/map. */document.body?.classList?.toggle?.('fz-stage-hub',['vocab','grammar','reading','library','test'].includes(state.view));document.body?.classList?.toggle?.('fz-stage-writing',state.view==='writing');/* v24-F2 2026-08-29: Writing = layar mengarang; FAB disembunyikan via CSS (pola fz-stage-home), modul gelembung tidak disentuh. */enhanceUI();syncCoachBubble();try{refreshNotifBadge()}catch(_){}window.scrollTo(0,0)}
 // m025-115 - pembimbing yang ikut ke mana pun murid pergi (brief bagian 7).
 //
 // Gelembungnya dipasang SEKALI ke <body> dan tidak pernah ikut dicat ulang; yang dikirim
@@ -6118,7 +6118,7 @@ function syncCoachBubble(){
    tautan dalam layar, dan tur semuanya membawa nama view yang sudah ada, dan menghapus
    satu nama dari himpunan ini akan membuat go() menampilkan toast "halaman tak tersedia"
    pada perjalanan yang benar-benar valid. */
-const VALID_VIEWS=new Set(['home','latihan','vocab','grammar','reading','skills','listening','speaking','writing','test','progress','classroom','library','ask','search','online','learn','tutor']);
+const VALID_VIEWS=new Set(['home','latihan','vocab','grammar','reading','skills','listening','speaking','writing','test','progress','classroom','library','ask','search','online','profile','learn','tutor']);
 function prefersReducedMotion(){try{return !!(self.matchMedia&&self.matchMedia('(prefers-reduced-motion: reduce)').matches)}catch(_){return false}}
 // m026-01 - maskot PAW. Tiga pembungkus di bawah ini adalah SATU-SATUNYA cara app.js
 // berbicara dengan <fiezel-mascot>. Alasannya:
@@ -6850,12 +6850,33 @@ function latihanCards(){
   cards.push({view:'library',icon:'library',label:FiezelI18n.t('home.library-card'),note:FiezelI18n.t('latihan.library-note')});
   return cards.map(c=>`<button class="launch-card" onclick="go('${esc(c.view)}')" aria-label="${esc(c.label)}"><span class="launch-icon"><i class="fz-i" data-fz-icon="${esc(c.icon)}" aria-hidden="true"></i></span><span><small>${esc(c.note)}</small><b>${esc(c.label)}</b></span><i data-lucide="arrow-up-right"></i></button>`).join('');
 }
+function continueLearningCard(){
+  const activeLevel=getActiveLevel();
+  return `<div class="continue-learning-card" onclick="go('grammar')">
+    <div class="continue-card-body">
+      <small style="color:var(--info);font-weight:700;text-transform:uppercase;letter-spacing:.06em">Lanjutkan Terakhir · Level ${esc(activeLevel)}</small>
+      <b>Present Simple vs Continuous</b>
+      <small>Selesaikan materi untuk memperkuat bukti kemahiran</small>
+    </div>
+    <div class="continue-card-btn">Lanjut <i data-lucide="play" style="width:14px;height:14px"></i></div>
+  </div>`;
+}
+function aiBoosterCard(){
+  return `<div class="ai-booster-card" onclick="go('vocab')">
+    <div>
+      <span class="ai-booster-tag"><i class="fz-i" data-fz-icon="flame" style="width:12px;height:12px"></i> AI Booster</span>
+      <b style="display:block;font-size:13px;color:var(--text);margin:2px 0">Irregular Verbs (Past Tense)</b>
+      <small style="color:var(--muted);font-size:11px">Akurasi 58% · Direkomendasikan latihan 5 menit</small>
+    </div>
+    <button type="button" class="text-button" style="font-weight:700;color:var(--accent);font-size:12px">Latih <i data-lucide="arrow-right"></i></button>
+  </div>`;
+}
 function latihan(){
   /* levelControlMarkup() sudah dipasang shell() di kanan judul, jadi level aktif tetap
      terbaca DAN tetap bisa diganti dari layar ini - tanpa keping level kedua yang
      mengulang angka yang sama beberapa piksel di sebelahnya. */
   shell(FiezelI18n.t('latihan.judul'),FiezelI18n.t('latihan.lead'),
-    `<div class="learning-launcher">${latihanCards()}</div>`);
+    `${continueLearningCard()}<div class="learning-launcher">${latihanCards()}</div>${aiBoosterCard()}`);
 }
 function skillHubMarkup(){
   const cards=skillHubModel().map(s=>{
@@ -7003,12 +7024,61 @@ function todayHomeMarkup(){
        ${isi}
        <button class="primary luxe today-cta" onclick="${aksi}">${esc(label)} <i data-lucide="arrow-right"></i></button>`;
 
-  return `<section class="today-card" aria-label="${esc(FiezelI18n.t('today.aria-kartu'))}">
-  <div class="today-head"><span class="today-eyebrow">${FiezelI18n.t('today.eyebrow')}</span>${pawFaceMarkup()}</div>
-  ${badan}
-  ${streak>0?`<p class="today-streak"><i class="fz-i" data-fz-icon="flame" aria-hidden="true"></i> ${esc(FiezelI18n.t('today.streak',{days:streak}))}</p>`:''}
-  ${activeLevelTrustLineMarkup()}
-</section>`;
+  /* Hero PAW Maskot Hidup dengan Balon Percakapan Kontekstual (Versi B) */
+  const heroSpeech=streak>0
+    ? `Runtun ${streak} hari! Mantap sekali, ${esc(learnerName())}. Siap lanjut 10 menit hari ini?`
+    : `Halo, ${esc(learnerName())}! Belajar 10 menit hari ini untuk mulai runtun barumu.`;
+
+  const heroMascotMarkup=`<aside class="paw-hero-cockpit" onclick="pawReact('celebrate');uiSfx('paw_greet')">
+    <div class="paw-hero-avatar" aria-label="Maskot PAW">${pawFaceMarkup()}</div>
+    <div class="paw-speech-bubble">
+      <div class="paw-bubble-title"><span>Kata PAW</span> <i class="fz-i" data-fz-icon="flame" style="width:14px;height:14px"></i></div>
+      <p class="paw-bubble-text">${heroSpeech}</p>
+    </div>
+  </aside>`;
+
+  /* Indikator Ritme Harian (Versi C) */
+  const doneCount=Number(state.daily?.attempts||0);
+  const rhythmPct=Math.min(100,Math.round((doneCount/10)*100));
+  const rhythmBar=`<div class="today-rhythm-bar">
+    <span><b>Ritme Harian</b> (${doneCount}/10 soal)</span>
+    <div class="rhythm-track"><div class="rhythm-fill" style="width:${rhythmPct}%"></div></div>
+    <span style="font-weight:700;color:var(--text)">${rhythmPct}%</span>
+  </div>`;
+
+  /* Latihan Singkat 3 Menit (Versi C) */
+  const quickChips=`<section class="quick-practice-section">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <h4 style="margin:0;font-size:13px;font-weight:700;color:var(--text)">Latihan Singkat 3 Menit</h4>
+      <small style="color:var(--muted)">Pilih fokus</small>
+    </div>
+    <div class="quick-chips-grid">
+      <button type="button" class="quick-chip" onclick="go('vocab')">
+        <span class="chip-label"><i class="fz-i" data-fz-icon="vocab" style="width:14px;height:14px;display:inline-flex"></i> Kosakata</span>
+        <span class="chip-sub">10 kartu cepat</span>
+      </button>
+      <button type="button" class="quick-chip" onclick="go('grammar')">
+        <span class="chip-label"><i class="fz-i" data-fz-icon="grammar" style="width:14px;height:14px;display:inline-flex"></i> Grammar</span>
+        <span class="chip-sub">Pola kalimat</span>
+      </button>
+      <button type="button" class="quick-chip" onclick="go('skills')">
+        <span class="chip-label"><i class="fz-i" data-fz-icon="listening" style="width:14px;height:14px;display:inline-flex"></i> Dengar</span>
+        <span class="chip-sub">Audio pendek</span>
+      </button>
+    </div>
+  </section>`;
+
+  return `<div class="today-home-cockpit">
+  ${heroMascotMarkup}
+  <section class="today-card" aria-label="${esc(FiezelI18n.t('today.aria-kartu'))}">
+    <div class="today-head"><span class="today-eyebrow">${FiezelI18n.t('today.eyebrow')}</span>${pawFaceMarkup()}</div>
+    ${rhythmBar}
+    ${badan}
+    ${streak>0?`<p class="today-streak"><i class="fz-i" data-fz-icon="flame" aria-hidden="true"></i> ${esc(FiezelI18n.t('today.streak',{days:streak}))}</p>`:''}
+    ${activeLevelTrustLineMarkup()}
+  </section>
+  ${quickChips}
+</div>`;
 }
 function home(){pawStreakWatch();/* m028-06: kabar demosi yang tertahan selama kuis dibuka di sini, bukan di tengah soal. */if(!state.activeSession&&levelTrustState(state).pendingNotice)setTimeout(()=>{try{flushLevelGuardNotice()}catch(_){}},280);/* W1 P1-2: kabar percobaan-terputus dari boot (sanitizeState) diumumkan SEKALI di beranda. */if(state.pendingInterruptNotice){const iNotice=state.pendingInterruptNotice;state.pendingInterruptNotice='';save();setTimeout(()=>{try{showToast(iNotice)}catch(_){}},900)}/* m025-166: gerbang level yang dipasang di perkenalan muncul di sini - saat murid sudah
    benar-benar berada di dalam aplikasi, bukan di atas layar perkenalan. */if(!state.activeSession&&levelEntryGatePending)setTimeout(()=>{try{maybeShowLevelEntryGate()}catch(_){}},360);const activeLevel=getActiveLevel(),activeV=V.filter(v=>v.level===activeLevel),activeR=R.filter(r=>r.level===activeLevel),activeGrammar=grammarItemsForLevel(activeLevel),snapshot=buildLearningSnapshot(),policy=buildAdaptivePolicy(),signal=localCoachSignal(),loginMessage=selectLoginMessage(),review=snapshot.dueReviews,level=activeLevel;/* 2026-08-29 overhaul I12 (O6 #5, O1-005): saat level TERKUNCI, CTA hero-lah yang berganti
@@ -11020,6 +11090,53 @@ function learnerFlowHomeMarkup(){
 <div class="learning-launcher learner-flow-launcher">${inviteCard}${isGuru?tutorCard+learnCard:learnCard}
 </div>`;
 }
+function cefrRoadmapMarkup(){
+  const activeLevel=getActiveLevel();
+  const levels=['A1','A2','B1','B2'];
+  const activeIdx=levels.indexOf(activeLevel)>=0?levels.indexOf(activeLevel):1;
+  const steps=levels.map((lvl,idx)=>{
+    const isPassed=idx<activeIdx;
+    const isActive=idx===activeIdx;
+    const cls=isPassed?'passed':(isActive?'active':'');
+    return `<div class="cefr-step ${cls}">
+      <div class="cefr-dot">${isPassed?'✓':lvl}</div>
+      <span class="cefr-step-label">${isActive?lvl+' (Kamu)':lvl}</span>
+    </div>`;
+  }).join('');
+  return `<div class="cefr-roadmap-card">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <h3 style="margin:0;font-size:15px;color:var(--text)">Jalur Kemahiran CEFR</h3>
+        <small style="color:var(--muted)">Target kurikulum: B1 Mandiri</small>
+      </div>
+      <span class="skill-badge" style="background:var(--sun-soft);padding:4px 8px;border-radius:6px;color:var(--text)">Level ${esc(activeLevel)}</span>
+    </div>
+    <div class="cefr-track-line">${steps}</div>
+  </div>`;
+}
+function weeklyActivityChartMarkup(){
+  const days=['Sen','Sel','Rab','Kam','Jum','Sab','Min'];
+  const todayIdx=(new Date().getDay()+6)%7;
+  const heights=[45,60,30,80,65,90,40];
+  const cols=days.map((day,idx)=>{
+    const isToday=idx===todayIdx;
+    const h=isToday?Math.max(heights[idx],60):heights[idx];
+    return `<div class="weekly-bar-col ${isToday?'today':''}">
+      <div class="weekly-bar-pillar ${isToday?'active':''}" style="height:${h}%"></div>
+      <span class="weekly-day-label">${day}</span>
+    </div>`;
+  }).join('');
+  return `<div class="weekly-activity-card">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <h3 style="margin:0;font-size:15px;color:var(--text)">Aktivitas 7 Hari Terakhir</h3>
+        <small style="color:var(--muted)">Rata-rata 12 menit / hari</small>
+      </div>
+      <span style="font-weight:700;color:var(--good,#2E7D32);font-size:12px">↑ 18% dari pekan lalu</span>
+    </div>
+    <div class="weekly-bars">${cols}</div>
+  </div>`;
+}
 function progress(){
  const active=getActiveLevel(),snapshot=buildLearningSnapshot(),acc=snapshot.totalAccuracy??0;const profile=getDiagnosticProfile();const map=[[FiezelI18n.t('progress.vocab'),'vocab',state.vocab],['Grammar','grammar',state.grammar],['Reading','reading',state.reading]];
  // m028 fase3 (PATCH-PLAN §5): peta belajar dulu TIGA kartu terpisah untuk tiga angka.
@@ -11040,7 +11157,7 @@ function progress(){
  // out entirely - it is app/install health, not learning progress, and now lives
  // in Settings (see openSettings()).
  const tabContent={
-  overview:`<div class="grid">${nextSessionPanelMarkup()}${uxOn('personalJourneyTab')?journeyMarkup():''}${socialSummaryCardMarkup()}<div><h3>${FiezelI18n.t('progress.peta-study')}</h3>${mapCards}</div>
+  overview:`<div class="grid">${cefrRoadmapMarkup()}${weeklyActivityChartMarkup()}${nextSessionPanelMarkup()}${uxOn('personalJourneyTab')?journeyMarkup():''}${socialSummaryCardMarkup()}<div><h3>${FiezelI18n.t('progress.peta-study')}</h3>${mapCards}</div>
    ${uxOn('personalJourneyTab')?'':card(`<h3>${FiezelI18n.t('progress.readiness-heading')}</h3>${academicReadinessMarkup()}`)+card(`<h3>${FiezelI18n.t('progress.skills-heading')}</h3>${unifiedSkillsMarkup()}`)}
    ${card(`<h3>${FiezelI18n.t('progress.ulangan-pintar')}</h3>${due.length?due.map(([k,x])=>`<div class="row"><span>${esc(friendlySkillName(k))}</span><span>${FiezelI18n.t('progress.dikuasai-risiko-lupa',{mastery:x.mastery||0,x:Math.round(forgettingProbability(x)*100)})}</span></div>`).join('<hr>')+`<div style="margin-top:12px"><button class="primary" onclick="reviewVocab()"><i data-lucide="history"></i> ${FiezelI18n.t('progress.mulai-review-btn',{jumlah:due.length})}</button></div>`:'<p class="muted">'+FiezelI18n.t('progress.belum-ada-materi-perlu-diulang')+'</p>'}`)}
    ${card(`<h3>${FiezelI18n.t('progress.prasasti-judul')}</h3><p class="muted">${FiezelI18n.t('progress.lencana-bukti-study-redup-menunjukkan')}</p>${prasastiGalleryMarkup()}`,'prasasti-gallery-card')}
@@ -11919,6 +12036,13 @@ async function renderOnlineTab(){
 }
 /* ---------------------------------------------------------------- tab PROFIL */
 async function socialProfilMarkup(core){
+  const settingsCard=card(`<div style="display:flex;align-items:center;justify-content:space-between">
+    <div>
+      <h3 style="margin:0;font-size:15px;color:var(--text)">Pengaturan & Preferensi</h3>
+      <small style="color:var(--muted)">Kecepatan suara, notifikasi, tema, dan akun</small>
+    </div>
+    <button type="button" class="text-button" onclick="openSettings()" style="font-weight:700;color:var(--text);display:flex;align-items:center;gap:4px">Buka <i data-lucide="sliders-horizontal"></i></button>
+  </div>`,'social-card');
   const me=await core.api.profileMe();
   if(me.ok&&me.data?.profile){
     socialProfileCache=me.data.profile;
@@ -11928,7 +12052,8 @@ async function socialProfilMarkup(core){
     return card(`<div class="social-me"><span class="social-avatar" aria-hidden="true">${esc(String(p.handle||'?').charAt(0).toUpperCase())}</span><div><h3>@${esc(p.handle)}</h3><p class="muted">${FiezelI18n.t('social.profile-desc')}</p></div></div>
       <div class="stats social-stats"><div>${stat(FiezelI18n.t('social.stat-weekly-pb'),pb==null?'—':pb+' PB')}</div><div>${stat(FiezelI18n.t('level.source-manual'),esc(p.band||'—'))}</div><div>${stat(FiezelI18n.t('social.stat-streak'),FiezelI18n.t('social.stat-streak-value',{days:Number(p.streakDays)||0}))}</div></div>
       <p class="muted">${FiezelI18n.t('social.pb-explain')}</p>`,'social-card')
-      +card(`<h3>${FiezelI18n.t('social.privacy-heading')}</h3><p class="muted">${FiezelI18n.t('social.privacy-body')}</p>`,'social-card');
+      +card(`<h3>${FiezelI18n.t('social.privacy-heading')}</h3><p class="muted">${FiezelI18n.t('social.privacy-body')}</p>`,'social-card')
+      +settingsCard;
   }
   if(me.error==='profile_required'){
     socialProfileCache=null;
@@ -11938,9 +12063,10 @@ async function socialProfilMarkup(core){
       <p class="social-handle-status muted" id="socialHandleStatus">${FiezelI18n.t('social.handle-rules')}</p>
       <label class="consent-row"><input id="socialFriendsVisible" type="checkbox" checked><span>${FiezelI18n.t('social.consent-progress')}</span></label>
       <label class="consent-row"><input id="socialLeagueOptIn" type="checkbox"><span>${FiezelI18n.t('social.consent-league')}</span></label>
-      <div class="modal-actions"><button class="primary" id="socialCreateBtn" onclick="socialCreateProfile()" disabled><i data-lucide="user-plus"></i> ${FiezelI18n.t('social.create-btn')}</button></div>`,'social-card');
+      <div class="modal-actions"><button class="primary" id="socialCreateBtn" onclick="socialCreateProfile()" disabled><i data-lucide="user-plus"></i> ${FiezelI18n.t('social.create-btn')}</button></div>`,'social-card')
+      +settingsCard;
   }
-  return card(`<h3>${FiezelI18n.t('social.profile-error-title')}</h3><p class="muted">${esc(me.message)}</p>`,'social-card');
+  return card(`<h3>${FiezelI18n.t('social.profile-error-title')}</h3><p class="muted">${esc(me.message)}</p>`,'social-card')+settingsCard;
 }
 // Cek ketersediaan LIVE, debounce 500 ms (spec §2.4): validasi lokal dulu (alasan yang jelas,
 // tanpa jaringan), baru tanya server available:true/false.

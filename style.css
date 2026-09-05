@@ -4899,11 +4899,465 @@ html body #app .social-home-launcher .launch-card{background:var(--pz-sky);borde
 .notif-item.is-social{background:var(--pz-mint);border-color:var(--pz-mint-line)}
 .notif-item.is-invite{background:var(--pz-pink);border-color:var(--pz-pink-line)}
 /* Nav bawah: pil putih, tab aktif tinta gelap dengan ikon emas */
-.bottomnav{background:rgba(255,255,255,.92);border-color:#E6DCC8;box-shadow:0 14px 40px -18px rgba(36,26,17,.35)}
+.bottomnav{background:var(--glass-solid);border-color:#E6DCC8;box-shadow:0 14px 40px -18px rgba(36,26,17,.35)}
 .bottomnav .nav.active .fz-i{color:var(--yellow)}
 /* Topbar: lonceng & pengaturan sebagai chip pastel */
 .topbar .icon-button{background:#fff;border:1px solid var(--line)}
 .notif-button.has-new{background:var(--pz-yellow)}
 /* Tombol utama tetap kuning ceria */
 .primary{background:var(--yellow);color:var(--ink)}
+
+/* ==========================================================================
+   FIEZEL REDESIGN: Version B Tactile Bottom Navigation
+   ========================================================================== */
+.bottomnav {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 2px;
+  width: min(580px, calc(100% - 20px));
+  padding: 6px 4px;
+  border-radius: var(--radius-xl, 24px);
+  box-shadow: 0 10px 30px rgba(36, 26, 17, 0.12), 0 2px 0 var(--line);
+  background: var(--glass-solid);
+}
+.bottomnav .nav {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 8px 2px;
+  min-height: 48px;
+  border-radius: var(--radius-lg, 16px);
+  font-size: 11px;
+  font-weight: 600;
+  transition: transform var(--dur-s) var(--ease), background var(--dur-s) var(--ease), color var(--dur-s) var(--ease);
+}
+.bottomnav .nav .fz-i {
+  width: 22px;
+  height: 22px;
+}
+.bottomnav .nav:active {
+  transform: scale(0.94);
+}
+.bottomnav .nav.active {
+  background: var(--sun-soft);
+  color: var(--text);
+  font-weight: 700;
+  box-shadow: 0 2px 0 rgba(230, 168, 0, 0.35);
+  transform: translateY(-2px);
+}
+.bottomnav .nav.active .fz-i {
+  --fz-i-fill: var(--sun);
+  --fz-i-line: var(--text);
+}
+.bottomnav .nav[data-view="home"] {
+  position: relative;
+}
+.bottomnav .nav[data-view="home"].active {
+  background: var(--sun-soft);
+  box-shadow: 0 3px 0 rgba(230, 168, 0, 0.4);
+}
+
+/* ==========================================================================
+   FIEZEL REDESIGN: Version B PAW Mascot Hero & Contextual Speech Bubble
+   ========================================================================== */
+.paw-hero-cockpit {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  background: var(--panel);
+  border: 1.5px solid var(--surface-edge);
+  border-radius: var(--radius-xl, 22px);
+  box-shadow: 0 4px 16px rgba(36, 26, 17, 0.05);
+}
+.paw-hero-avatar {
+  flex: 0 0 60px;
+  width: 60px;
+  height: 60px;
+  border-radius: var(--radius-lg, 18px);
+  background: var(--sun-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 0 rgba(230, 168, 0, 0.4);
+  position: relative;
+  cursor: pointer;
+  transition: transform var(--dur-s) var(--ease-spring);
+}
+.paw-hero-avatar:hover, .paw-hero-avatar:active {
+  transform: scale(1.06) rotate(-2deg);
+}
+.paw-hero-avatar .fz-i {
+  width: 40px;
+  height: 40px;
+}
+.paw-speech-bubble {
+  flex: 1;
+  position: relative;
+  background: var(--panel-soft, #FFFDF8);
+  border: 1.5px solid var(--line);
+  border-radius: 16px;
+  padding: 10px 14px;
+  text-align: left;
+  cursor: pointer;
+  transition: transform var(--dur-s) var(--ease), box-shadow var(--dur-s) var(--ease);
+}
+.paw-speech-bubble:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(36, 26, 17, 0.06);
+}
+.paw-speech-bubble::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 50%;
+  transform: translateY(-50%) rotate(45deg);
+  width: 12px;
+  height: 12px;
+  background: var(--panel-soft, #FFFDF8);
+  border-left: 1.5px solid var(--line);
+  border-bottom: 1.5px solid var(--line);
+}
+.paw-speech-bubble .paw-bubble-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 3px;
+}
+.paw-speech-bubble .paw-bubble-text {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--muted);
+  margin: 0;
+}
+
+/* ==========================================================================
+   FIEZEL REDESIGN: Version C Components (Rings, Cockpit, Matrix, Classroom, Progress)
+   ========================================================================== */
+/* Daily Rhythm Progress Bar */
+.today-rhythm-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 10px 0 14px;
+  padding: 8px 12px;
+  background: var(--panel-soft);
+  border: 1px solid var(--surface-edge);
+  border-radius: var(--radius-md);
+  font-size: 12px;
+}
+.today-rhythm-bar .rhythm-track {
+  flex: 1;
+  height: 8px;
+  background: var(--line);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.today-rhythm-bar .rhythm-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--sun), var(--gold));
+  border-radius: 99px;
+  transition: width 0.4s var(--ease);
+}
+
+/* Quick Practice Chips */
+.quick-practice-section {
+  margin-top: 18px;
+}
+.quick-chips-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 10px;
+}
+.quick-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 12px 10px;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: transform var(--dur-s) var(--ease), box-shadow var(--dur-s) var(--ease);
+  text-align: left;
+}
+.quick-chip:nth-child(1) {
+  background: var(--pz-yellow);
+  border: 1.5px solid var(--pz-yellow-line);
+  box-shadow: 0 3px 0 var(--pz-yellow-line);
+}
+.quick-chip:nth-child(1) .chip-label {
+  color: var(--pz-yellow-ink);
+}
+.quick-chip:nth-child(2) {
+  background: var(--pz-mint);
+  border: 1.5px solid var(--pz-mint-line);
+  box-shadow: 0 3px 0 var(--pz-mint-line);
+}
+.quick-chip:nth-child(2) .chip-label {
+  color: var(--pz-mint-ink);
+}
+.quick-chip:nth-child(3) {
+  background: var(--pz-pink);
+  border: 1.5px solid var(--pz-pink-line);
+  box-shadow: 0 3px 0 var(--pz-pink-line);
+}
+.quick-chip:nth-child(3) .chip-label {
+  color: var(--pz-pink-ink);
+}
+.quick-chip:active {
+  transform: translateY(2px);
+  box-shadow: 0 0 0 transparent;
+}
+.quick-chip .chip-label {
+  font-size: 12px;
+  font-weight: 700;
+}
+.quick-chip .chip-sub {
+  font-size: 10px;
+  color: var(--muted);
+}
+
+/* Practice: Continue Learning Banner */
+.continue-learning-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 16px;
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, var(--pz-yellow) 0%, var(--pz-mint) 100%);
+  border: 1.5px solid var(--pz-mint-line);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 4px 14px rgba(31, 111, 87, 0.12), 0 2px 0 var(--pz-mint-line);
+  cursor: pointer;
+  text-align: left;
+}
+.continue-learning-card:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 var(--pz-mint-line);
+}
+.continue-card-body b {
+  display: block;
+  font-size: 14px;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.continue-card-body small {
+  font-size: 11px;
+  color: var(--muted);
+}
+.continue-card-btn {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 99px;
+  background: var(--sun);
+  color: var(--text);
+  font-weight: 700;
+  font-size: 12px;
+  box-shadow: 0 2px 0 var(--gold);
+}
+
+/* AI Weak-Spot Booster Card */
+.ai-booster-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  margin-top: 18px;
+  background: var(--pz-pink);
+  border: 1.5px dashed var(--pz-pink-line);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  text-align: left;
+}
+.ai-booster-card:active {
+  transform: translateY(1px);
+}
+.ai-booster-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 99px;
+  background: #FFFFFF;
+  color: var(--pz-pink-ink);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+/* School Tab */
+.school-active-card {
+  padding: 18px;
+  background: var(--pz-sky);
+  border: 1.5px solid var(--pz-sky-line);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 4px 0 var(--pz-sky-line), var(--shadow-sm);
+  margin-bottom: 16px;
+  text-align: left;
+}
+.school-badge-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.school-code-input-card {
+  padding: 24px 18px;
+  background: var(--panel);
+  border: 1.5px solid var(--surface-edge);
+  border-radius: var(--radius-xl);
+  text-align: center;
+}
+.school-code-digits {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 18px 0;
+}
+.school-code-digit {
+  width: 44px;
+  height: 52px;
+  border: 2px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  font-size: 22px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--text);
+}
+
+/* Progress: CEFR Roadmap */
+.cefr-roadmap-card {
+  padding: 18px;
+  background: var(--panel);
+  border: 1.5px solid var(--surface-edge);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 4px 0 var(--surface-edge);
+  margin-bottom: 18px;
+  text-align: left;
+}
+.cefr-track-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  margin: 24px 8px 12px;
+}
+.cefr-track-line::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 4px;
+  background: var(--line);
+  z-index: 1;
+}
+.cefr-step {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.cefr-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--panel);
+  border: 2px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+}
+.cefr-step.passed .cefr-dot {
+  background: var(--pz-mint);
+  border-color: var(--pz-mint-line);
+  color: var(--pz-mint-ink);
+}
+.cefr-step.active .cefr-dot {
+  background: var(--pz-yellow);
+  border-color: var(--pz-yellow-ink);
+  color: var(--pz-yellow-ink);
+  box-shadow: 0 0 0 4px var(--pz-yellow-line);
+  transform: scale(1.15);
+}
+.cefr-step-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--muted);
+}
+.cefr-step.active .cefr-step-label {
+  color: var(--text);
+  font-weight: 800;
+}
+
+/* 7-Day Activity Chart */
+.weekly-activity-card {
+  padding: 16px;
+  background: var(--panel);
+  border: 1.5px solid var(--surface-edge);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 4px 0 var(--surface-edge);
+  margin-bottom: 18px;
+  text-align: left;
+}
+.weekly-bars {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px;
+  height: 90px;
+  padding: 10px 0 0;
+  margin-top: 10px;
+}
+.weekly-bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  height: 100%;
+  justify-content: flex-end;
+}
+.weekly-bar-pillar {
+  width: 100%;
+  max-width: 28px;
+  background: var(--pz-mint);
+  border-radius: 6px 6px 0 0;
+  transition: height 0.4s var(--ease);
+}
+.weekly-bar-pillar.active {
+  background: var(--sun);
+  box-shadow: 0 2px 0 var(--pz-yellow-line);
+}
+.weekly-day-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.weekly-bar-col.today .weekly-day-label {
+  font-weight: 800;
+  color: var(--text);
+}
+
 
