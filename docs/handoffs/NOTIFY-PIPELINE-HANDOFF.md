@@ -57,6 +57,30 @@ terasa menyembuhkan hanya karena boot memaksa satu poll di detik 6,5.
 **Kontrak:** setiap poll yang dihentikan oleh visibilitas wajib dipasangkan
 dengan pembangun yang memanggilnya `force` begitu aplikasi terlihat lagi.
 
+## Sisi GURU: kontrak yang sama, timer yang berbeda (m025-261)
+
+Ruang Guru punya pipa ketiga yang tidak lewat `startNotifPolling`: `startAutoSync()` di
+`features/teacher/fiezel-teacher-shell.js`. Ia menarik laporan murid per kelas
+(`syncClass` → `claimClass` + `pullReports`) dan menyalakan chip "Tersinkron baru saja".
+
+Jedanya diturunkan 45 → **3 detik** atas permintaan OWNER, dan kontrak nomor 3 di atas
+berlaku penuh: timernya tidur saat tab tidak dilihat, dengan `visibilitychange` yang
+menjalankan satu ronde SEGERA saat guru kembali.
+
+Satu kontrak tambahan yang khusus milik sisi guru:
+
+**Ronde yang tidak membawa data baru TIDAK BOLEH mencat ulang cangkang.** `syncAll()`
+memanggil `render()` dua kali per ronde. Pada 45 detik itu tidak terasa; pada 3 detik ia
+mencabut fokus dari kolom yang sedang diketik guru, menutup dropdown yang terbuka, dan
+melompatkan posisi gulir — setiap tiga detik. Karena itu ronde senyap hanya memanggil
+`paintSyncChip()`, dan `render()` penuh disimpan untuk ronde yang benar-benar membawa
+laporan, tugas, atau kabar. Siapa pun yang mempercepat sebuah timer di aplikasi ini wajib
+memeriksa dulu apa yang dicat ulang setiap tick — bukan hanya berapa sering ia bertanya.
+
+Dua pagar sisanya: `ui.syncing` menahan ronde bertumpuk, dan `syncFailStreak` menaikkan
+jeda sesudah kegagalan beruntun supaya server yang sakit tidak dihujani 20 permintaan
+per menit.
+
 ## Yang masih rapuh, dan layak dikerjakan berikutnya
 
 - **`inbox.poll()` diam TANPA PESAN** bila murid belum memasukkan kode kelas atau
