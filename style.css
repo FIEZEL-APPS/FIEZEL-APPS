@@ -978,7 +978,7 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 .primary:hover{background:var(--sun-deep);border-color:var(--sun-deep)}
 
 /* Premium Home Launcher */
-.home-page{display:grid;gap:var(--sp-6)}
+.home-page{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--sp-6)}/* kolom minmax(0,1fr): tanpa itu kolom implisit dilebarkan oleh min-content anak terlebar, dan di 320px Home menggeser horizontal (gerbang T6). */
 .launcher-shell{
   position:relative;overflow:hidden;display:grid;grid-template-columns:minmax(0,1.42fr) minmax(300px,.72fr);gap:36px;
   grid-template-rows:1fr;
@@ -4978,7 +4978,11 @@ html body #app .social-home-launcher .launch-card{background:var(--pz-sky);borde
   height: 40px;
 }
 .paw-speech-bubble {
-  flex: 1;
+  /* min-width:0 wajib: tanpa itu balon adalah flex-item yang menolak menyusut di bawah
+     lebar min-content-nya, dan di 320px seluruh kokpit Home ikut melebar sampai halaman
+     menggeser horizontal (gerbang T6 ui-render-audit). */
+  flex: 1 1 0;
+  min-width: 0;
   position: relative;
   background: var(--panel-soft, #FFFDF8);
   border: 1.5px solid var(--line);
@@ -5005,6 +5009,7 @@ html body #app .social-home-launcher .launch-card{background:var(--pz-sky);borde
   border-bottom: 1.5px solid var(--line);
 }
 .paw-speech-bubble .paw-bubble-title {
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -5014,6 +5019,7 @@ html body #app .social-home-launcher .launch-card{background:var(--pz-sky);borde
   margin-bottom: 3px;
 }
 .paw-speech-bubble .paw-bubble-text {
+  overflow-wrap: anywhere;
   font-size: 12px;
   line-height: 1.4;
   color: var(--muted);
@@ -5056,7 +5062,8 @@ html body #app .social-home-launcher .launch-card{background:var(--pz-sky);borde
 }
 .quick-chips-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  /* minmax(0,...): chip berisi label nowrap, jadi kolom 1fr biasa menolak menyusut di 320px. */
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
   margin-top: 10px;
 }

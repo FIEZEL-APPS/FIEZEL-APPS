@@ -221,6 +221,11 @@ for (const match of allSource.matchAll(levelExpression)) {
   // justru kebalikan dari mencampur level, dan tanpa iterasi itu readiness kembali jadi satu
   // flag global (B-01). Pengecualiannya disebut per nama supaya tetap bisa diaudit.
   if (fn === 'diagnosticReadinessMap') continue;
+  // cefrRoadmapMarkup MENGGAMBAR trek CEFR (A1..C2) di kartu level Peta Belajar: iterasi
+  // LEVELS di sini adalah label jalur, bukan kolam soal - materinya tetap diambil per level
+  // aktif lewat grammarItemsForLevel(activeLevel) beberapa baris di atasnya. Disebut per
+  // nama supaya pengecualiannya tetap bisa diaudit, sama seperti diagnosticReadinessMap.
+  if (fn === 'cefrRoadmapMarkup') continue;
   if (!/placement|levelPicker|openLevelPanel|activeLevel|setLevel|chooseLevel|settings/i.test(fn)) crossLevelUses.push(`${fn}:${match[0]}`);
 }
 check('Non-placement learning panels do not use an unscoped cross-level pool', crossLevelUses.length === 0,
