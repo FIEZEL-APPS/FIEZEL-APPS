@@ -45,7 +45,7 @@ export const AUTH_TABLES = Object.freeze([
 /** Tabel konten guru. */
 export const TEACHER_TABLES = Object.freeze([
   'tc_node', 'tc_question', 'tc_assignment', 'tc_assignment_target', 'tc_lesson_evidence',
-  'tc_class', 'tc_class_report', 'tc_class_assignment'
+  'tc_class', 'tc_class_report'
 ]);
 
 /**
@@ -221,18 +221,6 @@ export const TEACHER_DDL = Object.freeze([
     ' report_json TEXT NOT NULL,' +
     ' updated_at INTEGER NOT NULL,' +
     ' PRIMARY KEY (class_code, learner_key)' +
-    ' ) WITHOUT ROWID',
-  // Tugas yang DIKIRIM guru ke murid lewat kode kelas (notifikasi tugas). targets_json
-  // NULL = seluruh kelas; selain itu daftar learner_key (nama depan huruf kecil).
-  'CREATE TABLE IF NOT EXISTS tc_class_assignment (' +
-    ' class_code TEXT NOT NULL,' +
-    ' id TEXT NOT NULL,' +
-    ' teacher_sub TEXT NOT NULL,' +
-    ' payload_json TEXT NOT NULL,' +
-    ' targets_json TEXT,' +
-    ' created_at INTEGER NOT NULL,' +
-    ' updated_at INTEGER NOT NULL,' +
-    ' PRIMARY KEY (class_code, id)' +
     ' ) WITHOUT ROWID',
 ]);
 

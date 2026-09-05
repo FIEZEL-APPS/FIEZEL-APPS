@@ -1,6 +1,6 @@
 {
   "version": "5.19.0",
-  "count": 249,
+  "count": 282,
   "templates": [
     {
       "id": "TA-001",
@@ -123,7 +123,7 @@
       "pedagogicalObjective": "Differentiate a pre-arranged plan (present continuous / going to) from a spontaneous decision (will)",
       "misconceptionTargeted": "Learner treats a spontaneous offer made at the moment of speaking as a pre-arranged plan, reaching for present continuous instead of 'will'",
       "reasoningOperation": "detect prior arrangement vs on-the-spot decision -> select future form",
-      "stem": "Which completion shows a decision made only at the moment of speaking? A: 'The phone's ringing.' B: 'Don't worry, I ___ it.'",
+      "stem": "A: 'The phone's ringing!' B: 'OK, I ___ it.' (a decision made right now)",
       "options": [
         "will get",
         "am getting",
@@ -179,7 +179,7 @@
       "pedagogicalObjective": "Distinguish external obligation (have to/must) from granted permission (can/may)",
       "misconceptionTargeted": "Learner treats all modals as interchangeable politeness markers",
       "reasoningOperation": "identify whose authority is being expressed -> select modal",
-      "stem": "Visitors ___ leave their bags at the front desk; it's a museum rule, not a choice.",
+      "stem": "Visitors ___ leave their bags at the desk. It's a museum rule, not a choice.",
       "options": [
         "must",
         "can",
@@ -235,7 +235,7 @@
       "pedagogicalObjective": "Use 'must' for confident logical deduction vs 'might/could' for uncertain speculation",
       "misconceptionTargeted": "Learner uses 'must' for any guess, not reserving it for strong evidence-based conclusions",
       "reasoningOperation": "spot a present-time deduction -> weigh how strong the visible evidence is -> pick must for near-certainty or can't for impossibility",
-      "stem": "Which option expresses the strongest negative deduction supported by the evidence? The lights are off and the car isn't in the driveway, so they ___ be home.",
+      "stem": "The lights are off and the car isn't here, so they ___ be home. (you are sure)",
       "options": [
         "mustn't",
         "might not",
@@ -291,7 +291,7 @@
       "pedagogicalObjective": "Distinguish general/scientific truth (zero conditional) from a specific likely future result (first conditional)",
       "misconceptionTargeted": "Learner uses 'will' in the if-clause for general truths",
       "reasoningOperation": "identify generality vs specific-future prediction -> select conditional type",
-      "stem": "Which completion states this as a general fact that is always true, not a prediction about one occasion? If you heat ice, it ___.",
+      "stem": "This is always true: if you heat ice, it ___.",
       "options": [
         "will melt",
         "melts",
@@ -347,7 +347,7 @@
       "pedagogicalObjective": "Use second conditional to express a hypothetical/unreal present situation, not a likely future one",
       "misconceptionTargeted": "Learner picks first conditional for any 'if' sentence about winning money, ignoring the unreal/imaginary framing",
       "reasoningOperation": "detect improbability/hypothetical framing -> select second conditional",
-      "stem": "If I ___ the lottery, I would travel the world — but let's be honest, it's not going to happen.",
+      "stem": "If I ___ the lottery, I would travel the world — but I never even buy a ticket.",
       "options": [
         "win",
         "would win",
@@ -403,7 +403,7 @@
       "pedagogicalObjective": "Recognize when passive voice is preferred because the agent is unknown or unimportant",
       "misconceptionTargeted": "Learner keeps 'by + agent' even when the actor is irrelevant, producing an unnatural sentence",
       "reasoningOperation": "assess relevance of the agent to the message -> choose passive with or without 'by'",
-      "stem": "Which completion most explicitly leaves the unknown builder out of the sentence? The bridge ___ in 1932; nobody today remembers who built it.",
+      "stem": "The bridge ___ in 1932 — nobody knows who built it, so don't name anyone.",
       "options": [
         "was constructed",
         "constructed",
@@ -429,7 +429,7 @@
         {
           "option": "was constructed by workers",
           "misconception": "adds a vague, uninformative agent instead of omitting it",
-          "whyFails": "This is grammatically correct, but naming a generic agent ('workers') adds nothing; the question asks for the version that leaves the unknown builder out.",
+          "whyFails": "'By workers' names a vague builder that adds nothing — the sentence says nobody knows who built it, so leave the agent out.",
           "whyFailsId": "bener tata bahasanya, tapi pelaku samar yang gini nggak nambah info.",
           "misconceptionId": "pelaku samar malah ditambahin, padahal mestinya dihilangin."
         }
@@ -459,7 +459,7 @@
       "pedagogicalObjective": "Apply tense backshift when reporting a statement made in the past",
       "misconceptionTargeted": "Learner copies the original tense verbatim into reported speech",
       "reasoningOperation": "check the reporting verb's tense -> shift the reported statement's main verb one step back, e.g. present simple 'am' to past simple 'was'",
-      "stem": "Apply conventional backshift to report the earlier state: Yesterday she said, ‘I am tired.’ Today we report that she ___ tired.",
+      "stem": "Yesterday she said, ‘I am tired.’ Today we report: she said she ___ tired.",
       "options": [
         "is",
         "was",
@@ -683,7 +683,7 @@
       "pedagogicalObjective": "Distinguish a defining relative clause (essential, no commas) from a non-defining one (extra info, commas)",
       "misconceptionTargeted": "Learner adds commas around identifying information, obscuring which noun is meant",
       "reasoningOperation": "assess whether the clause is essential for identifying the noun -> punctuate/select accordingly",
-      "stem": "Choose the sentence where the relative clause is ESSENTIAL to know which brother is meant: ",
+      "stem": "Which sentence needs the clause to tell us which brother is meant?",
       "options": [
         "My brother, who lives in Rome, called me yesterday.",
         "The brother who lives in Rome called me yesterday (I have three brothers).",
@@ -1075,7 +1075,7 @@
       "pedagogicalObjective": "Distinguish future continuous (action in progress at a future point) from future perfect (action completed before a future point)",
       "misconceptionTargeted": "Learner treats any future time expression as requiring 'will + base verb' and cannot separate 'in progress then' from 'finished by then'",
       "reasoningOperation": "locate the future reference point -> decide if the action is ongoing or already finished at that point",
-      "stem": "Which completion shows the action already in progress at that exact moment? Don't call at 8pm — I ___ dinner with my in-laws then.",
+      "stem": "Don't call at 8pm — at that moment I ___ dinner with my in-laws.",
       "options": [
         "will have",
         "will be having",
@@ -1187,7 +1187,7 @@
       "pedagogicalObjective": "Select the correct past modal of deduction based on whether the evidence supports a confident positive or negative conclusion about a past event",
       "misconceptionTargeted": "Learner reverses the polarity of a past deduction, reaching for 'can't have' even though the evidence confidently supports that the event did happen",
       "reasoningOperation": "evaluate evidence polarity -> match to must have (positive certainty) or can't have (negative certainty)",
-      "stem": "Which option expresses the strongest positive past deduction supported by the evidence? The lights are still off and his car isn't here — he ___ left for work already.",
+      "stem": "The lights are off and his car isn't here — he ___ left for work already. (you are sure)",
       "options": [
         "must have",
         "can't have",
@@ -1523,7 +1523,7 @@
       "pedagogicalObjective": "Recognize that 'get' passives are common in informal spoken English, especially for accidental/unexpected events, and choose the form matching register",
       "misconceptionTargeted": "Learner assumes 'get' and 'be' passives are always fully interchangeable regardless of register or the accidental-event nuance",
       "reasoningOperation": "assess register and event type (accidental/unplanned) -> select the natural passive form",
-      "stem": "To use the informal get-passive for an unexpected event: \"Ugh, my bike ___ stolen outside the station last night!\"",
+      "stem": "“Ugh, my bike ___ stolen outside the station last night!” (informal)",
       "options": [
         "was",
         "got",
@@ -2251,7 +2251,7 @@
       "pedagogicalObjective": "Use 'as...as' to express equality between two things instead of a comparative form, which would express inequality",
       "misconceptionTargeted": "Learner defaults to a comparative + 'than' structure even when the sentence intends to express that two things are equal, not different",
       "reasoningOperation": "detect whether the sentence expresses equality or difference -> select as...as or comparative + than",
-      "stem": "This laptop is ___ the one I had before — both take exactly ten seconds to start up.",
+      "stem": "This laptop is ___ my old one — both take exactly ten seconds to start up.",
       "options": [
         "faster than",
         "as fast as",
@@ -2307,7 +2307,7 @@
       "pedagogicalObjective": "Use the double comparative structure (comparative + and + comparative) to express a progressive/continuing change",
       "misconceptionTargeted": "Learner uses a single comparative with 'than' where the sentence actually requires the repeated-comparative pattern for ongoing change",
       "reasoningOperation": "identify that the sentence describes a trend continuing over time, not a single comparison -> apply comparative + and + comparative",
-      "stem": "Which completion best expresses a gradual increase that keeps continuing? As the deadline approached, the team's schedule became ___.",
+      "stem": "As the deadline approached, the team's schedule became ___ every day.",
       "options": [
         "busier than before",
         "busier and busier",
@@ -2699,7 +2699,7 @@
       "pedagogicalObjective": "Select 'had better' over 'should' when the context implies an urgent consequence if the advice is ignored",
       "misconceptionTargeted": "Learner uses 'should' for all advice regardless of urgency, missing that 'had better' signals a specific negative consequence is imminent",
       "reasoningOperation": "detect urgency/consequence marker -> select modal of urgent advice",
-      "stem": "Which completion gives the strongest urgent warning tied to the stated consequence? You ___ leave now — if you miss this train, there isn't another one until tomorrow.",
+      "stem": "You ___ leave now — if you miss this train, there isn't another one until tomorrow. (strong warning)",
       "options": [
         "should",
         "had better",
@@ -2755,7 +2755,7 @@
       "pedagogicalObjective": "Choose a modal expressing uncertain present speculation rather than confident prediction",
       "misconceptionTargeted": "Learner uses 'will' for any guess about the present, not distinguishing confident claims from tentative speculation",
       "reasoningOperation": "detect epistemic uncertainty marker -> select speculative modal over confident future modal",
-      "stem": "I'm not sure where Sam is, and I have no idea what the roads are like — he ___ still be stuck in traffic.",
+      "stem": "I'm not sure where Sam is — he ___ still be stuck in traffic.",
       "options": [
         "will",
         "might",
@@ -3091,7 +3091,7 @@
       "pedagogicalObjective": "Shift time and place deictic expressions (today, here) correctly when converting direct speech to reported speech at a later time/different place",
       "misconceptionTargeted": "Learner backshifts the verb tense correctly but forgets that time/place words like 'today' and 'here' must also change to match the new reporting context",
       "reasoningOperation": "detect deictic time/place word inside quoted speech -> convert to context-appropriate reported equivalent",
-      "stem": "On Monday, Maria said, 'I'll finish the report today.' A week later, reporting this, you'd say: Maria said she would finish the report ___.",
+      "stem": "On Monday, Maria said, 'I'll finish the report today.' A week later you report: Maria said she would finish it ___.",
       "options": [
         "today",
         "that day",
@@ -3427,7 +3427,7 @@
       "pedagogicalObjective": "Distinguish 'try + gerund' (experiment with a method) from 'try + infinitive' (make an effort to do something difficult)",
       "misconceptionTargeted": "Learner assumes 'try' always takes the same pattern regardless of whether the meaning is 'attempt something difficult' or 'experiment with an option'",
       "reasoningOperation": "identify whether context implies difficulty-of-achievement or experimentation-with-a-method -> select matching verb pattern",
-      "stem": "Which completion presents restarting as a troubleshooting method to experiment with? If the file won't open, try ___ the computer — that usually fixes it.",
+      "stem": "If the file won't open, try ___ the computer — that usually fixes it.",
       "options": [
         "to restart",
         "restarting",
@@ -3875,7 +3875,7 @@
       "pedagogicalObjective": "Use present simple (not present continuous or 'going to') for events on a fixed external timetable, distinct from personal future plans",
       "misconceptionTargeted": "Learner defaults to 'going to' or present continuous for all future events, missing that fixed timetables use present simple",
       "reasoningOperation": "detect externally fixed schedule (not a personal decision) -> select present simple for scheduled future",
-      "stem": "According to the timetable, the train ___ at 6:45, so we should leave home by 6:15.",
+      "stem": "According to the timetable, the train ___ at 6:45.",
       "options": [
         "is leaving",
         "leaves",
@@ -3987,7 +3987,7 @@
       "pedagogicalObjective": "Learner distinguishes past perfect (flashback before the main narrative line) from past simple (sequential main events).",
       "misconceptionTargeted": "Learners use past simple for every past event in a narrative, losing the flashback/sequence distinction.",
       "reasoningOperation": "Identify which event happened earlier relative to the narrative's main past timeline, then mark it with past perfect.",
-      "stem": "When I arrived at the station, the train ____ already, so I had to wait for the next one.",
+      "stem": "When I arrived at the station, the train ____ already, so I had to wait.",
       "options": [
         "had left",
         "left",
@@ -4099,7 +4099,7 @@
       "pedagogicalObjective": "Learner uses 'could have + past participle' to express an unrealized past possibility/missed opportunity, distinct from obligation forms.",
       "misconceptionTargeted": "Learners confuse missed-opportunity 'could have' with obligation-based 'should have' or ability 'was able to'.",
       "reasoningOperation": "Confirm the sentence merely notes a past opportunity that was open but not taken, without judging the decision, then use could have + past participle for that neutral possibility.",
-      "stem": "Which completion neutrally states an available past opportunity without criticizing the decision? You ____ the job — they offered it to you, but you turned it down.",
+      "stem": "You ____ the job — they offered it, but you turned it down. (just a fact, no criticism)",
       "options": [
         "could have taken",
         "should have taken",
@@ -4155,7 +4155,7 @@
       "pedagogicalObjective": "Learner selects 'may' over 'can' in a formal permission-granting context.",
       "misconceptionTargeted": "Learners treat 'can' and 'may' as fully interchangeable regardless of register.",
       "reasoningOperation": "Identify the formality level signaled by context (official notice) and match it to the appropriate permission modal.",
-      "stem": "For the conventionally most formal wording in an official notice: Visitors ___ enter the laboratory only when accompanied by staff.",
+      "stem": "Official notice (most formal wording): Visitors ___ enter the laboratory only with staff.",
       "options": [
         "may",
         "can",
@@ -4435,7 +4435,7 @@
       "pedagogicalObjective": "Learner backshifts the modal 'can' to 'could' correctly when reporting speech in a past reporting frame.",
       "misconceptionTargeted": "Learners leave 'can' unchanged in reported speech regardless of the past reporting verb.",
       "reasoningOperation": "Identify the reporting verb tense (past) and apply the standard modal backshift can→could.",
-      "stem": "Apply the standard can → could backshift in a later report. Direct: “I can finish the report by Friday.” Reported: She said she ____ finish the report by Friday.",
+      "stem": "Direct: “I can finish the report by Friday.” Reported later: She said she ____ finish the report by Friday.",
       "options": [
         "could",
         "can",
@@ -4547,7 +4547,7 @@
       "pedagogicalObjective": "Learner distinguishes zero article for an institution's primary purpose (attending school) from 'the' when referring to the physical building.",
       "misconceptionTargeted": "Learners add 'the' automatically to institution nouns even when referring to their institutional function rather than the building.",
       "reasoningOperation": "Determine whether the sentence refers to the institution's purpose (zero article) or the physical building itself (the).",
-      "stem": "To express attendance for the institution's normal purpose, not movement to a building: During term time, the children go to ____ every weekday to study.",
+      "stem": "Every weekday the children go to ____ to learn.",
       "options": [
         "school",
         "the school",
@@ -4659,7 +4659,7 @@
       "pedagogicalObjective": "Learner selects 'during' to indicate a time period within which something happens, distinct from 'for' (duration) and 'since' (starting point).",
       "misconceptionTargeted": "Learners use 'for' whenever a time-related word follows, regardless of whether duration, starting point, or a contained period is meant.",
       "reasoningOperation": "Determine whether the sentence expresses length of time (for), a starting point (since), or an event occurring within a period (during).",
-      "stem": "The fire alarm went off ____ the meeting, so everyone had to leave the building.",
+      "stem": "The fire alarm went off ____ the meeting, so we all left the building.",
       "options": [
         "during",
         "for",
@@ -4715,7 +4715,7 @@
       "pedagogicalObjective": "Learner selects the correct dependent preposition after an emotion adjective depending on whether the cause is a person/thing (with) or a situation/fact (about).",
       "misconceptionTargeted": "Learners use a single default preposition (usually 'about') after all emotion adjectives regardless of what follows.",
       "reasoningOperation": "Check whether the following noun refers to a person/achievement (pairs with 'with') or a situation/topic (pairs with 'about').",
-      "stem": "To use the conventional collocation for directly evaluating a specific result: I'm really pleased ____ your exam results.",
+      "stem": "Well done! I'm really pleased ____ your exam results.",
       "options": [
         "with",
         "about",
@@ -4883,7 +4883,7 @@
       "pedagogicalObjective": "Learner recognizes when the relative pronoun can be omitted because it functions as the object of the relative clause (contact clause).",
       "misconceptionTargeted": "Learners insist the relative pronoun must always be included, even when it is grammatically optional as the clause's object.",
       "reasoningOperation": "Identify whether the relative pronoun would be the subject (must keep) or object (may omit) of its own clause.",
-      "stem": "Which sentence about the library book is written correctly?",
+      "stem": "Which sentence about the library book is correct?",
       "options": [
         "The book I borrowed from the library was due back yesterday.",
         "The book who I borrowed from the library was due back yesterday.",
@@ -5331,7 +5331,7 @@
       "pedagogicalObjective": "Learner uses present perfect with an unfinished time period ('this week') to connect a past action to the still-ongoing present frame.",
       "misconceptionTargeted": "Learners default to past simple whenever a specific event is named, ignoring that the time period itself is still in progress.",
       "reasoningOperation": "confirm the tested contrast is present perfect versus past simple -> check the named period (this week) is still running -> reject the past form that would close it",
-      "stem": "So far this week I ___ three important emails, and there are two more to write before Friday.",
+      "stem": "So far this week I ___ three emails, and there are two more to write before Friday.",
       "options": [
         "have sent",
         "sent",
@@ -5387,7 +5387,7 @@
       "pedagogicalObjective": "Learner distinguishes 'should have' (criticizing a wrong decision) from 'could have' (noting an unused possibility) in a context calling for criticism.",
       "misconceptionTargeted": "Learners select 'could have' when the sentence context clearly implies blame/regret rather than a neutral missed option.",
       "reasoningOperation": "Find the blaming tone — a bad outcome now regretted — then mark that criticism of the past choice with should have + past participle.",
-      "stem": "Which completion explicitly criticizes the past decision rather than merely noting a possibility? You ____ more carefully before signing the contract — now we're stuck with these terms.",
+      "stem": "You ____ more carefully before signing — now we're stuck with these terms. (criticism)",
       "options": [
         "should have read",
         "could have read",
@@ -5723,7 +5723,7 @@
       "pedagogicalObjective": "Learner shifts first/second-person pronouns and possessives to third person when reporting speech from a different speaker's perspective.",
       "misconceptionTargeted": "Learners backshift the verb tense correctly but leave the original speaker's pronouns unchanged, producing a perspective mismatch.",
       "reasoningOperation": "Identify who is speaking (the reporter) versus who originally spoke, then shift pronouns/possessives to match the reporter's perspective, independent of tense backshift.",
-      "stem": "Direct speech (Tom to Anna): \"I've lost my keys.\" Anna reporting to someone else: Tom said ____ had lost ____ keys.",
+      "stem": "Tom tells Anna: \"I've lost my keys.\" Anna tells a friend: Tom said ____ had lost ____ keys.",
       "options": [
         "he; his",
         "I; my",
@@ -5891,7 +5891,7 @@
       "pedagogicalObjective": "Use 'of' between a quantifier and an object pronoun, producing 'both of them' rather than the ungrammatical 'both them'.",
       "misconceptionTargeted": "Learner drops 'of' before an object pronoun because 'both' can appear directly before some noun phrases.",
       "reasoningOperation": "notice the object pronoun 'them' -> insert of after the quantifier -> select both of",
-      "stem": "I have exactly two close friends. ____ them live in different countries now, so we rarely meet in person.",
+      "stem": "I have two close friends. ____ them live abroad now, so we rarely meet.",
       "options": [
         "Both of",
         "Both",
@@ -7963,7 +7963,7 @@
       "pedagogicalObjective": "Make polite requests and orders with 'would like' plus a noun",
       "misconceptionTargeted": "Learner answers a request situation with plain 'like' or squeezes the desire verb into -ing, because Indonesian 'mau' never changes shape",
       "reasoningOperation": "detect a polite here-and-now request -> select 'would like' with a bare verb after 'would'",
-      "stem": "At the café counter, the barista asks what you want. You say: “I ___ a glass of orange juice, please.”",
+      "stem": "At the café: “I ___ a glass of orange juice, please.”",
       "options": [
         "like",
         "would like",
@@ -8019,7 +8019,7 @@
       "pedagogicalObjective": "Use the -ing form after the preference verbs like, love, and hate",
       "misconceptionTargeted": "Learner chains a bare verb straight after like/love/hate or glues 'to' and -ing together, copying Indonesian verb strings like 'benci bangun'",
       "reasoningOperation": "spot a preference verb such as like, love, or hate -> select the -ing form for the activity that follows",
-      "stem": "My brother ___ up early on Sundays, so he never sets an alarm before the weekend.",
+      "stem": "My brother ___ up early on Sundays, so he never sets an alarm.",
       "options": [
         "hates get",
         "hates to getting",
@@ -8187,7 +8187,7 @@
       "pedagogicalObjective": "Express wishes about the unreal present with wish + past simple",
       "misconceptionTargeted": "Learner keeps the real-present tense after 'wish' or borrows 'would' and the past perfect from other unreal patterns",
       "reasoningOperation": "identify a wish about the present situation -> shift the verb one step back to the past simple",
-      "stem": "I wish I ___ closer to the office; the commute eats two hours of my day.",
+      "stem": "I wish I ___ closer to the office — the trip takes two hours a day.",
       "options": [
         "would live",
         "lived",
@@ -8747,7 +8747,7 @@
       "pedagogicalObjective": "Use the for a noun that has already been mentioned and is now known to the listener.",
       "misconceptionTargeted": "Learner repeats the indefinite article for a second mention instead of switching to the.",
       "reasoningOperation": "check whether the noun was already mentioned -> select the definite article",
-      "stem": "I bought a book and a pen yesterday. ___ book is very interesting.",
+      "stem": "I bought a book and a pen. ___ book is very interesting.",
       "options": [
         "A",
         "An",
@@ -8859,7 +8859,7 @@
       "pedagogicalObjective": "Match a singular, near demonstrative (this) to a singular noun close to the speaker.",
       "misconceptionTargeted": "Learner matches demonstratives to number but ignores the nearness cue, or vice versa.",
       "reasoningOperation": "identify noun number and distance cue -> select matching demonstrative",
-      "stem": "Look at ___ photo in my hand — it is from our holiday.",
+      "stem": "Look at ___ photo in my hand. It is from our holiday.",
       "options": [
         "this",
         "that",
@@ -8915,7 +8915,7 @@
       "pedagogicalObjective": "Their modifies the noun house to show possession by a plural owner.",
       "misconceptionTargeted": "Learner puts a subject, object, or stand-alone possessive pronoun in front of the noun, or forgets that plural owners take their.",
       "reasoningOperation": "identify Mr. and Mrs. Lee as the plural owners -> notice that 'house' follows the blank -> select the possessive adjective their",
-      "stem": "Mr. and Mrs. Lee live next door. ___ house is very big.",
+      "stem": "Mr. and Mrs. Lee live next door. ___ house is big.",
       "options": [
         "They",
         "Their",
@@ -9363,7 +9363,7 @@
       "pedagogicalObjective": "Choose present simple for a repeated routine marked by a frequency phrase, instead of present continuous.",
       "misconceptionTargeted": "Learner applies present continuous to a habitual routine because the action happens in present time",
       "reasoningOperation": "spot the frequency marker -> classify the action as a routine -> select present simple",
-      "stem": "My sister ___ the bus to work every day, so she knows the timetable by heart.",
+      "stem": "My sister ___ the bus every day, so she knows the timetable.",
       "options": [
         "is taking",
         "takes",
@@ -9531,7 +9531,7 @@
       "pedagogicalObjective": "Use the indefinite article a to introduce a singular countable noun at its first mention, before it is picked up later with the.",
       "misconceptionTargeted": "Learner reaches for the definite article at the first mention because the noun feels specific to the speaker",
       "reasoningOperation": "check whether the noun has been mentioned before -> first mention takes a",
-      "stem": "She adopted ___ kitten from the shelter, and now the kitten follows her everywhere.",
+      "stem": "She adopted ___ kitten last month. Now the kitten follows her everywhere.",
       "options": [
         "the",
         "a",
@@ -9811,7 +9811,7 @@
       "pedagogicalObjective": "Use the negative equality frame 'not as ... as' to say one thing falls below another, keeping both 'as' markers in place",
       "misconceptionTargeted": "Learner breaks the 'not as ... as' frame by closing it with 'than' or by keeping plain equality when the context states a difference",
       "reasoningOperation": "detect that the context states a lower degree -> build 'not as + adjective + as' with both 'as' markers",
-      "stem": "The sequel is fun, but it is ___ the first film — the first one still makes people laugh more.",
+      "stem": "The sequel is ___ the first film — the first one still makes people laugh more.",
       "options": [
         "not as funny as",
         "funnier than",
@@ -9867,7 +9867,7 @@
       "pedagogicalObjective": "Choose 'along' for movement that follows the length of a line such as a shore, road, or river",
       "misconceptionTargeted": "Learner picks crossing prepositions (across, over) or 'through' for movement that simply follows a line without crossing anything",
       "reasoningOperation": "trace the path shape -> if the mover follows the length of a line without crossing it, select 'along'",
-      "stem": "They walked ___ the beach for an hour, keeping the sea on their right the whole time.",
+      "stem": "They walked ___ the beach, keeping the sea on their right the whole time.",
       "options": [
         "across",
         "along",
@@ -9923,7 +9923,7 @@
       "pedagogicalObjective": "Choose 'since' before a starting point (a year, a date) when a present perfect verb shows the situation still continues",
       "misconceptionTargeted": "Learner marks a starting point with 'for' or 'during' because any time word after a perfect verb feels interchangeable",
       "reasoningOperation": "classify the time expression -> a starting point with present perfect takes 'since', a length takes 'for', an event period takes 'during'",
-      "stem": "She has worked at that small clinic ___ 2021, when she moved back to her hometown.",
+      "stem": "She has worked at that clinic ___ 2021.",
       "options": [
         "for",
         "since",
@@ -9979,7 +9979,7 @@
       "pedagogicalObjective": "Build an object question with 'who' using do-support and the base verb when the asker wants to know who received the action",
       "misconceptionTargeted": "Learner either omits 'did' in an object question or keeps the past-tense verb after 'did', because subject questions like 'Who broke...' need neither",
       "reasoningOperation": "decide whether 'who' is the doer or the receiver -> if receiver, add 'did' + subject + base verb",
-      "stem": "A: I met one of your neighbours at the market this morning. B: Oh, really? ___ exactly?",
+      "stem": "A: I met one of your neighbours today. B: Oh, really? ___?",
       "options": [
         "Who did you meet",
         "Who met you",
@@ -10091,7 +10091,7 @@
       "pedagogicalObjective": "Select 'be going to' for an intention decided before the moment of speaking, signalled by evidence of prior preparation",
       "misconceptionTargeted": "Learner defaults to 'will' for every future meaning, missing that a plan already prepared before speaking takes 'be going to'",
       "reasoningOperation": "locate when the decision was made -> decided before speaking (preparation already done) takes 'be going to'",
-      "stem": "Which completion shows a plan decided before the moment of speaking? 'We ___ my cousins in Lombok next month — we booked the flights last week.'",
+      "stem": "We ___ my cousins in Lombok next month — we booked the flights last week.",
       "options": [
         "will visit",
         "are going to visit",
@@ -10147,7 +10147,7 @@
       "pedagogicalObjective": "Select 'must' for a strong positive deduction when present evidence makes the conclusion almost certain",
       "misconceptionTargeted": "Learner weakens a well-supported conclusion to mere possibility or swaps in advice modals, instead of using 'must' for confident deduction",
       "reasoningOperation": "weigh the evidence -> strong supporting evidence with positive polarity takes 'must'",
-      "stem": "Which option expresses the strongest positive deduction supported by the evidence? The kitchen smells of garlic and I can hear pans clattering, so Dad ___ be cooking dinner.",
+      "stem": "The kitchen smells of garlic and I can hear pans clattering, so Dad ___ be cooking dinner. (you are sure)",
       "options": [
         "must",
         "can",
@@ -10371,7 +10371,7 @@
       "pedagogicalObjective": "Select 'the' before a plural noun that is pinned down as a specific, identifiable set by the surrounding context",
       "misconceptionTargeted": "Learner drops the article before every plural noun, overgeneralizing the zero-article rule to plurals that refer to a specific, already-identified group",
       "reasoningOperation": "check whether context identifies exactly which group is meant -> if identified, select 'the'; if generic, select zero article",
-      "stem": "We visited a small farm last weekend, and ___ animals we saw there were very friendly.",
+      "stem": "We visited a farm last weekend, and ___ animals we saw there were very friendly.",
       "options": [
         "the",
         "(no article)",
@@ -10539,7 +10539,7 @@
       "pedagogicalObjective": "Choose 'will' for a confident prediction backed by explicit certainty markers instead of a speculation modal",
       "misconceptionTargeted": "Learner hedges every future statement with may/might/could, even when the context states firm evidence and full certainty",
       "reasoningOperation": "detect certainty markers in the context -> select the confident prediction modal over speculative ones",
-      "stem": "I've checked the official timetable twice, so I'm completely sure: the last train ___ leave at exactly 11:40 tonight.",
+      "stem": "I've checked the timetable twice, so I'm completely sure: the last train ___ leave at 11:40.",
       "options": [
         "will",
         "might",
@@ -10595,7 +10595,7 @@
       "pedagogicalObjective": "Select the particle that gives 'turn' the intended meaning of reducing volume, distinguishing it from opposite or absolute particles",
       "misconceptionTargeted": "Learner picks a familiar particle for 'turn' without checking that each particle produces a different meaning (increase, switch off, flip)",
       "reasoningOperation": "match the intended meaning (lower the volume slightly) to the particle that produces exactly that meaning with 'turn'",
-      "stem": "The music is a bit too loud for the baby — could you turn it ___ a little?",
+      "stem": "The music is too loud for the baby — could you turn it ___ a little?",
       "options": [
         "down",
         "up",
@@ -10875,7 +10875,7 @@
       "pedagogicalObjective": "Learner chooses 'May I' over 'Can I' when making the most formal spoken permission request to a stranger.",
       "misconceptionTargeted": "Learners believe 'Can I' sounds just as formal as 'May I' when asking a stranger for permission.",
       "reasoningOperation": "gauge the formality demanded by the listener and setting -> pick the permission modal that matches that register",
-      "stem": "Choose the most formal wording to ask a stranger at the bank: '___ I borrow your pen for a moment, please?'",
+      "stem": "You ask a stranger at the bank, in the most formal way: '___ I borrow your pen, please?'",
       "options": [
         "May",
         "Can",
@@ -11211,7 +11211,7 @@
       "pedagogicalObjective": "Learner uses the fixed phrase 'on foot' for walking, resisting the 'by + vehicle' pattern.",
       "misconceptionTargeted": "Learners extend 'by' from vehicles (by bus, by car) to walking and produce 'by foot' instead of the fixed phrase 'on foot'.",
       "reasoningOperation": "check the transport noun: a vehicle pairs with 'by', but walking uses the fixed phrase 'on foot'",
-      "stem": "Which option best completes the fixed phrase? The lift was broken, so we climbed all six floors ____ foot.",
+      "stem": "The lift was broken, so we climbed six floors ____ foot.",
       "options": [
         "on",
         "by",
@@ -11491,7 +11491,7 @@
       "pedagogicalObjective": "Use future perfect for an action that must already be complete at a 'by the time' reference point, instead of future continuous or a plain future form",
       "misconceptionTargeted": "Learner reads 'by the time' as just another future time marker and picks a plain or continuous future form, losing the finished-before-that-point meaning",
       "reasoningOperation": "find the 'by the time' anchor -> ask whether the action must already be complete at that anchor -> choose will have + past participle",
-      "stem": "By the time your plane lands in Jakarta, we ___ the final report, so you can read it on the drive from the airport.",
+      "stem": "By the time your plane lands, we ___ the final report, so you can read it on the drive from the airport.",
       "options": [
         "will have finished",
         "will be finishing",
@@ -11547,7 +11547,7 @@
       "pedagogicalObjective": "Choose 'can't have' when the evidence confidently rules a past event out, resisting the pull of 'must have', 'needn't have', or a hedged 'might have'",
       "misconceptionTargeted": "Learner reaches for 'must have' or a softer modal even though the eyewitness evidence clearly shows the past event did not happen",
       "reasoningOperation": "check whether the evidence confirms or rules out the past event -> pick can't have for a confident negative conclusion",
-      "stem": "Which option shows the evidence rules the past event out? Anna ___ taken the 7:40 train — I stood on that platform the whole time and she never appeared.",
+      "stem": "Anna ___ taken the 7:40 train — I stood on that platform the whole time and never saw her.",
       "options": [
         "must have",
         "can't have",
@@ -11659,7 +11659,7 @@
       "pedagogicalObjective": "Report a direct instruction with 'tell + object + to-infinitive', resisting patterns that borrow 'suggest' or an -ing form for a command",
       "misconceptionTargeted": "Learner avoids the tell + object + to-infinitive frame when reporting a command, either forcing 'suggest' onto an instruction or attaching an -ing form after 'told'",
       "reasoningOperation": "identify the speech act as a direct instruction -> pick 'told' -> apply the object + to-infinitive pattern",
-      "stem": "\"Hand in the report by Friday,\" the manager said to us. -> The manager ___ in the report by Friday.",
+      "stem": "\"Hand in the report by Friday,\" the manager said. -> The manager ___ in the report by Friday.",
       "options": [
         "told us to hand",
         "suggested us to hand",
@@ -11715,7 +11715,7 @@
       "pedagogicalObjective": "Use 'was going to' for a stated past intention that was interrupted before it could be carried out, keeping the sentence anchored in past time",
       "misconceptionTargeted": "Learner reports an interrupted past intention with plain 'would' or a present-anchored future form instead of 'was going to'",
       "reasoningOperation": "spot the past intention plus the interruption -> choose was/were going to + verb",
-      "stem": "I ___ call you last night to explain everything, but my phone died before I got the chance.",
+      "stem": "I ___ call you last night, but my phone died.",
       "options": [
         "was going to",
         "would",
@@ -11771,7 +11771,7 @@
       "pedagogicalObjective": "Use affirmative 'should have + past participle' to regret a helpful action that was never taken",
       "misconceptionTargeted": "Learner picks the wrong polarity or wrong modal for a regret about an omission, negating 'should have' or drifting into deduction when the sentence mourns something left undone",
       "reasoningOperation": "decide whether the criticized action was done or skipped -> for a skipped action pick affirmative should have + past participle",
-      "stem": "The client is furious — we ___ them about the shipping delay the moment we found out, but we kept quiet.",
+      "stem": "The client is angry — we ___ them about the delay, but we kept quiet.",
       "options": [
         "should have warned",
         "shouldn't have warned",
@@ -11827,7 +11827,7 @@
       "pedagogicalObjective": "Keep past simple for equal forward-moving steps in a narrative chain instead of promoting one step to past perfect",
       "misconceptionTargeted": "Learner sprinkles past perfect over ordinary sequential events, treating it as a fancy past tense rather than a flashback marker for earlier events",
       "reasoningOperation": "check whether the event steps forward on the main storyline or jumps back before it -> keep past simple for forward steps",
-      "stem": "She unlocked the office at seven, ___ the windows to let some air in, and then switched on the coffee machine.",
+      "stem": "She unlocked the office at seven, ___ the windows, and then switched on the coffee machine.",
       "options": [
         "opened",
         "had opened",
@@ -11995,7 +11995,7 @@
       "pedagogicalObjective": "Learner selects 'could have' for a neutral unused past possibility, resisting the pull of 'should have' when the context explicitly signals that no criticism is intended.",
       "misconceptionTargeted": "Learners default to 'should have' for any unrealized past action, adding blame even when the context marks the alternative as perfectly acceptable.",
       "reasoningOperation": "Check the evaluative tone — 'either way was fine' signals no judgment -> mark the unused option neutrally with could have + past participle.",
-      "stem": "Which completion explicitly presents the taxi as a neutral unused possibility, without blaming anyone? We took the bus to the airport, but we ____ a taxi — either way was fine.",
+      "stem": "We took the bus to the airport, but we ____ a taxi — either way was fine.",
       "options": [
         "could have taken",
         "should have taken",
@@ -12499,7 +12499,7 @@
       "pedagogicalObjective": "Build two-item comparatives with '-er' for short adjectives and 'more' for long ones, without doubling the markers",
       "misconceptionTargeted": "Learner translates 'lebih murah' word by word, producing 'more cheap' or the doubled 'more cheaper' instead of 'cheaper'",
       "reasoningOperation": "count the syllables of 'cheap' and spot 'than' -> attach '-er' to the short adjective without adding 'more'",
-      "stem": "The bus to Bandung is ___ (cheap) than the train, so Andi always takes the bus.",
+      "stem": "The bus to Bandung is ___ (cheap) than the train.",
       "options": [
         "cheaper",
         "more cheap",
@@ -12667,7 +12667,7 @@
       "pedagogicalObjective": "Pick the indefinite compound (something, anything or nothing) that matches the polarity of the clause",
       "misconceptionTargeted": "Learner follows the meaning 'nggak ada apa-apa' without checking the verb, so 'anything' or 'something' lands in a positive clause",
       "reasoningOperation": "notice the positive verb 'was' plus the empty-fridge meaning -> pick the negative compound 'nothing'",
-      "stem": "The fridge was empty — there was ___ inside at all, so we went out to eat.",
+      "stem": "The fridge was empty — there was ___ inside at all.",
       "options": [
         "nothing",
         "anything",
@@ -12891,7 +12891,7 @@
       "pedagogicalObjective": "Replace a repeated countable noun with 'one' or 'ones' instead of repeating it or using 'it'",
       "misconceptionTargeted": "Learner repeats the noun or uses definite 'it' instead of the indefinite substitute 'one', because Indonesian simply drops the repeated noun",
       "reasoningOperation": "find the repeated countable noun after 'a new' -> substitute the singular indefinite 'one'",
-      "stem": "My old camera broke last month, so yesterday I bought a new ___ at the mall.",
+      "stem": "My old camera broke, so yesterday I bought a new ___.",
       "options": [
         "one",
         "it",
@@ -12947,7 +12947,7 @@
       "pedagogicalObjective": "Complain about someone else's repeated annoying behaviour with 'wish + would'",
       "misconceptionTargeted": "Learner freezes 'wish' with a past simple or plain present form, turning a demand that another person change their repeated behaviour into a wished-for state",
       "reasoningOperation": "spot the annoyance cues 'keeps borrowing' + 'drives me crazy' about another person -> choose 'wish + would + base' for a demanded change of willed behaviour",
-      "stem": "My flatmate keeps borrowing my charger without asking, and it drives me crazy. I really wish he ___ doing that.",
+      "stem": "My flatmate keeps borrowing my charger, and it drives me crazy. I wish he ___ doing that.",
       "options": [
         "stopped",
         "would stop",
@@ -13171,7 +13171,7 @@
       "pedagogicalObjective": "Use the unreal past simple after 'it's high time' to press for an overdue action",
       "misconceptionTargeted": "Learner matches the tense to the feel of 'sudah waktunya' and puts a present or future form after 'it's high time'",
       "reasoningOperation": "spot the overdue-action cue 'complaining for months' after 'it's high time' -> shift the verb into the unreal past simple",
-      "stem": "Residents have been complaining for months, so it's high time the city council ___ the potholes on Jalan Kenanga.",
+      "stem": "People have been complaining for months, so it's high time the council ___ the potholes.",
       "options": [
         "repairs",
         "will repair",
@@ -13945,13 +13945,1861 @@
       "pedagogicalObjectiveId": "Balikin “whom” hasil hiperkoreksi jadi “who” waktu pronomina relatifnya jadi subjek kata kerja sisipan.",
       "misconceptionTargetedId": "Kamu ngerasa “whom” lebih aman dan formal setelah “believed”, padahal yang dibutuhin subjek buat “was” — kasus objek malah bikin salah.",
       "reasoningOperationId": "kurung dulu komentar “everyone believed” → sisanya “... was the strongest candidate” masih butuh subjek → pronominanya harus “who”, bukan “whom”"
+    },
+    {
+      "id": "A1-201",
+      "family": "core_grammar",
+      "subskill": "present_simple_basics",
+      "cefr": "A1",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Keep the base form of the present simple verb after a plural subject.",
+      "misconceptionTargeted": "Learner adds -s to every present simple verb, even after a plural subject like 'we'.",
+      "reasoningOperation": "identify the subject -> check whether it is singular or plural -> keep the base form after a plural subject",
+      "stem": "We ___ to school by bus.",
+      "options": [
+        "go",
+        "goes",
+        "going",
+        "went"
+      ],
+      "correctIndex": 0,
+      "distractors": [
+        {
+          "option": "goes",
+          "misconception": "adds -s to the verb although the subject is plural",
+          "whyFails": "'Goes' is only for he, she, or it; 'we' takes the base form 'go'.",
+          "whyFailsId": "“goes” cuma buat he, she, it. “We” pakai “go”.",
+          "misconceptionId": "nambahin -s ke kata kerja, padahal subjeknya jamak."
+        },
+        {
+          "option": "going",
+          "misconception": "progressive confusion",
+          "whyFails": "'Going' needs 'are' before it and describes an action right now, not a daily routine.",
+          "whyFailsId": "“going” butuh “are” di depannya dan artinya lagi jalan sekarang, bukan rutinitas.",
+          "misconceptionId": "bentuk -ing dipakai buat kebiasaan."
+        },
+        {
+          "option": "went",
+          "misconception": "past-tense confusion",
+          "whyFails": "'Went' is the past form; the sentence describes a present routine.",
+          "whyFailsId": "“went” bentuk lampau, padahal kalimatnya soal kebiasaan sekarang.",
+          "misconceptionId": "bentuk lampau dipakai buat kebiasaan sekarang."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "'We' is plural, so the present simple verb stays in the base form: we go.",
+        "rule": "Present simple: add -s only after he, she, or it. I, you, we, and they keep the base form.",
+        "whyOthersFail": "'Goes' belongs to a singular subject; 'going' is missing 'are'; 'went' is the past.",
+        "howToAvoid": "Look at the subject first. If it is we, you, they, or I, do not add -s.",
+        "memoryCue": "We go, she goes.",
+        "ruleId": "Present simple: -s cuma buat he, she, it. I, you, we, they tetap bentuk dasar.",
+        "whyCorrectId": "“We” itu jamak, jadi kata kerjanya tetap bentuk dasar: we go.",
+        "whyOthersFailId": "“Goes” buat subjek tunggal. “Going” kurang “are”. “Went” bentuk lampau.",
+        "howToAvoidId": "Lihat subjeknya dulu. Kalau we, you, they, atau I, jangan tambah -s.",
+        "memoryCueId": "Ingat: we go, tapi she goes."
+      },
+      "pedagogicalObjectiveId": "Kata kerja present simple tetap bentuk dasar sesudah subjek jamak.",
+      "misconceptionTargetedId": "Kamu nambahin -s ke semua kata kerja present simple, padahal sesudah “we” nggak perlu.",
+      "reasoningOperationId": "cari subjeknya → cek tunggal atau jamak → jamak tetap bentuk dasar"
+    },
+    {
+      "id": "A1-202",
+      "family": "core_grammar",
+      "subskill": "can_ability",
+      "cefr": "A1",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Form a negative ability statement with can't plus a base verb.",
+      "misconceptionTargeted": "Learner builds the negative of 'can' with 'don't' or adds 'to' after the modal.",
+      "reasoningOperation": "identify the meaning as not able -> select can't -> keep the verb in base form",
+      "stem": "I ___ ride a bike, but I want to learn.",
+      "options": [
+        "can't",
+        "don't can",
+        "can't to",
+        "couldn't"
+      ],
+      "correctIndex": 0,
+      "distractors": [
+        {
+          "option": "don't can",
+          "misconception": "do auxiliary",
+          "whyFails": "'Can' makes its own negative with 'not'; it never takes 'don't'.",
+          "whyFailsId": "“can” punya negatif sendiri pakai “not”, nggak pernah pakai “don't”.",
+          "misconceptionId": "kata bantu do."
+        },
+        {
+          "option": "can't to",
+          "misconception": "adds 'to' after the modal can",
+          "whyFails": "After 'can' or 'can't' the verb is bare: can't ride, not can't to ride.",
+          "whyFailsId": "sesudah “can't” kata kerjanya polos: can't ride, bukan can't to ride.",
+          "misconceptionId": "nambahin “to” sesudah can, padahal can langsung ketemu kata kerja dasar."
+        },
+        {
+          "option": "couldn't",
+          "misconception": "uses the past form for a present ability",
+          "whyFails": "'Couldn't' is the past form; 'I want to learn' shows the sentence is about now.",
+          "whyFailsId": "“couldn't” bentuk lampau, padahal “I want to learn” nunjukin ini soal sekarang.",
+          "misconceptionId": "pakai bentuk lampau, padahal yang dibicarain kemampuan sekarang."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "'Can't' expresses a present inability and is followed directly by the base verb 'ride'.",
+        "rule": "Negative ability: can't (cannot) + base verb. No 'don't', no 'to'.",
+        "whyOthersFail": "'Don't can' mixes two negatives that never combine; 'can't to' adds an extra 'to'; 'couldn't' points to the past.",
+        "howToAvoid": "Treat can like a switch: can / can't, then the verb with nothing in between.",
+        "memoryCue": "Can't + verb: can't ride, can't swim.",
+        "ruleId": "Nggak bisa: can't (cannot) + kata kerja dasar. Tanpa don't, tanpa to.",
+        "whyCorrectId": "“Can't” artinya nggak bisa sekarang, langsung diikuti kata kerja dasar “ride”.",
+        "whyOthersFailId": "“Don't can” nyampur dua negatif. “Can't to” kelebihan “to”. “Couldn't” nunjuk masa lampau.",
+        "howToAvoidId": "Anggap can kayak tombol: can atau can't, lalu langsung kata kerjanya.",
+        "memoryCueId": "Can't + kata kerja: can't ride, can't swim."
+      },
+      "pedagogicalObjectiveId": "Bikin kalimat nggak bisa pakai can't plus kata kerja dasar.",
+      "misconceptionTargetedId": "Kamu bikin negatif can pakai “don't” atau nambahin “to” sesudahnya.",
+      "reasoningOperationId": "kenali maknanya nggak mampu → pakai can't → kata kerjanya tetap dasar"
+    },
+    {
+      "id": "A1-203",
+      "family": "tense_aspect",
+      "subskill": "past_simple_regular_forms",
+      "cefr": "A1",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Add -ed to a regular verb for a finished action with a past time word.",
+      "misconceptionTargeted": "Learner keeps the base verb after 'last night' or doubles the past marking with 'did'.",
+      "reasoningOperation": "identify the past time word -> check that the verb is regular -> add -ed once",
+      "stem": "Last night I ___ a film with my family.",
+      "options": [
+        "watch",
+        "watched",
+        "did watched",
+        "watching"
+      ],
+      "correctIndex": 1,
+      "distractors": [
+        {
+          "option": "watch",
+          "misconception": "missing-past-marking",
+          "whyFails": "'Last night' is finished, so the verb needs the past ending -ed.",
+          "whyFailsId": "“last night” udah lewat, jadi kata kerjanya butuh akhiran -ed.",
+          "misconceptionId": "tanda lampaunya hilang."
+        },
+        {
+          "option": "did watched",
+          "misconception": "doubles the past marking with 'did' plus -ed",
+          "whyFails": "'Did' already carries the past, so the verb after it stays bare; a statement does not need 'did' at all.",
+          "whyFailsId": "“did” udah bawa makna lampau, jadi kata kerjanya harus polos. Kalimat berita malah nggak butuh “did”.",
+          "misconceptionId": "nandain lampau dua kali: “did” plus -ed."
+        },
+        {
+          "option": "watching",
+          "misconception": "progressive-form substitution",
+          "whyFails": "'Watching' needs 'was' before it and does not simply state a finished event.",
+          "whyFailsId": "“watching” butuh “was” di depannya dan nggak nyatain kejadian yang udah selesai.",
+          "misconceptionId": "bentuk -ing dipakai buat kejadian selesai."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "'Last night' places the action in the finished past, so the regular verb takes -ed: watched.",
+        "rule": "Past simple of regular verbs: verb + -ed, used once, with no 'did' in a statement.",
+        "whyOthersFail": "'Watch' has no past marking; 'did watched' marks the past twice; 'watching' is not a finished-action form.",
+        "howToAvoid": "See a past time word? Add -ed to the verb and stop there.",
+        "memoryCue": "Last night → -ed.",
+        "ruleId": "Past simple kata kerja teratur: kata kerja + -ed, cukup sekali, tanpa did di kalimat berita.",
+        "whyCorrectId": "“Last night” udah lewat, jadi kata kerjanya pakai -ed: watched.",
+        "whyOthersFailId": "“Watch” nggak ada tanda lampaunya. “Did watched” nandain lampau dua kali. “Watching” bukan bentuk kejadian selesai.",
+        "howToAvoidId": "Lihat kata waktu lampau? Tambah -ed ke kata kerjanya, lalu berhenti di situ.",
+        "memoryCueId": "Ada “last night”? Kata kerjanya pakai -ed."
+      },
+      "pedagogicalObjectiveId": "Tambahin -ed ke kata kerja teratur buat kejadian selesai yang ada kata waktu lampaunya.",
+      "misconceptionTargetedId": "Kamu biarin kata kerjanya polos sesudah “last night”, atau nandain lampau dua kali pakai “did”.",
+      "reasoningOperationId": "cari kata waktu lampaunya → kata kerja teratur → tambah -ed sekali"
+    },
+    {
+      "id": "A1-204",
+      "family": "tense_aspect",
+      "subskill": "present_continuous_basics",
+      "cefr": "A1",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Pair 'are' with the -ing verb for a plural subject acting right now.",
+      "misconceptionTargeted": "Learner chooses 'is' for a plural subject or drops the be-auxiliary before the -ing verb.",
+      "reasoningOperation": "identify 'Look!' as a now cue -> check the subject is plural -> apply are + verb-ing",
+      "stem": "Look! The children ___ in the garden.",
+      "options": [
+        "is playing",
+        "are playing",
+        "playing",
+        "play"
+      ],
+      "correctIndex": 1,
+      "distractors": [
+        {
+          "option": "is playing",
+          "misconception": "be verb",
+          "whyFails": "'Children' is plural, so the auxiliary must be 'are', not 'is'.",
+          "whyFailsId": "“children” itu jamak, jadi kata bantunya “are”, bukan “is”.",
+          "misconceptionId": "kata kerja be."
+        },
+        {
+          "option": "playing",
+          "misconception": "missing-be-auxiliary",
+          "whyFails": "The -ing verb cannot stand alone; it needs 'are' to make a full sentence.",
+          "whyFailsId": "kata kerja -ing nggak bisa berdiri sendiri, butuh “are” supaya jadi kalimat utuh.",
+          "misconceptionId": "kata bantu be-nya hilang."
+        },
+        {
+          "option": "play",
+          "misconception": "present-simple-habit",
+          "whyFails": "'Play' describes a habit; 'Look!' shows the action is happening right now.",
+          "whyFailsId": "“play” nyatain kebiasaan, padahal “Look!” nunjukin kejadiannya lagi jalan sekarang.",
+          "misconceptionId": "bentuk kebiasaan dipakai buat kejadian yang lagi jalan."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "'Look!' points to an action in progress now, and 'the children' is plural, so the form is 'are playing'.",
+        "rule": "Present continuous: am/is/are + verb-ing. Plural subjects take 'are'.",
+        "whyOthersFail": "'Is playing' has the wrong auxiliary for a plural subject; 'playing' has no auxiliary; 'play' is a habit form.",
+        "howToAvoid": "Two checks: is it happening now (use -ing) and is the subject plural (use are)?",
+        "memoryCue": "Look! → are + -ing.",
+        "ruleId": "Present continuous: am/is/are + kata kerja -ing. Subjek jamak pakai “are”.",
+        "whyCorrectId": "“Look!” nunjuk kejadian yang lagi jalan, dan “the children” itu jamak, jadi bentuknya “are playing”.",
+        "whyOthersFailId": "“Is playing” salah kata bantu buat subjek jamak. “Playing” nggak punya kata bantu. “Play” bentuk kebiasaan.",
+        "howToAvoidId": "Dua cek: lagi jalan sekarang (pakai -ing) dan subjeknya jamak (pakai are)?",
+        "memoryCueId": "Ada “Look!”? Pakai are + -ing."
+      },
+      "pedagogicalObjectiveId": "Pasangin “are” sama kata kerja -ing buat subjek jamak yang lagi beraksi sekarang.",
+      "misconceptionTargetedId": "Kamu pilih “is” buat subjek jamak, atau ngilangin kata bantu be di depan kata kerja -ing.",
+      "reasoningOperationId": "lihat “Look!” → kejadian lagi jalan → subjek jamak pakai are + -ing"
+    },
+    {
+      "id": "A1-205",
+      "family": "core_grammar",
+      "subskill": "imperative_commands_base_form",
+      "cefr": "A2",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Form a negative command with don't plus the base verb.",
+      "misconceptionTargeted": "Learner negates a command with 'not' alone or adds -s to the verb.",
+      "reasoningOperation": "identify a warning to the listener -> select the negative command -> apply don't + base verb",
+      "stem": "The floor is wet. ___ here, please!",
+      "options": [
+        "Not run",
+        "Don't run",
+        "Doesn't run",
+        "Don't runs"
+      ],
+      "correctIndex": 1,
+      "distractors": [
+        {
+          "option": "Not run",
+          "misconception": "using the -ing form on its own, which describes an activity instead of telling someone to act",
+          "whyFails": "A command cannot be negated with bare 'not'; English needs 'don't' before the verb.",
+          "whyFailsId": "larangan nggak bisa cuma pakai “not”. Bahasa Inggris butuh “don't” di depan kata kerjanya.",
+          "misconceptionId": "larangannya cuma pakai not tanpa do."
+        },
+        {
+          "option": "Doesn't run",
+          "misconception": "adding -s as if the command needed subject-verb agreement with a singular subject",
+          "whyFails": "'Doesn't' is for he, she, or it in statements; a command to the listener uses 'don't'.",
+          "whyFailsId": "“doesn't” buat he, she, it di kalimat berita. Larangan ke lawan bicara pakai “don't”.",
+          "misconceptionId": "perintah dikasih -s seolah butuh subjek tunggal."
+        },
+        {
+          "option": "Don't runs",
+          "misconception": "uses the third-person -s form after 'you' in a command",
+          "whyFails": "After 'don't' the verb stays bare: don't run, never don't runs.",
+          "whyFailsId": "sesudah “don't” kata kerjanya tetap polos: don't run, bukan don't runs.",
+          "misconceptionId": "nambahin -s ke perintah, padahal perintah nggak punya subjek yang butuh -s."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "The speaker tells the listener not to do something, so the negative command is 'Don't run'.",
+        "rule": "Negative imperative: Don't + base verb. No subject, no -s.",
+        "whyOthersFail": "'Not run' lacks 'do'; 'doesn't run' treats the listener as he/she; 'don't runs' adds an -s the base form never takes.",
+        "howToAvoid": "Telling someone not to do something? Start with 'Don't' and keep the verb bare.",
+        "memoryCue": "Don't + verb: Don't run, Don't touch.",
+        "ruleId": "Larangan: Don't + kata kerja dasar. Tanpa subjek, tanpa -s.",
+        "whyCorrectId": "Pembicara ngelarang lawan bicaranya, jadi larangannya “Don't run”.",
+        "whyOthersFailId": "“Not run” kurang “do”. “Doesn't run” nganggap lawan bicara kayak he/she. “Don't runs” nambah -s yang nggak pernah ada di bentuk dasar.",
+        "howToAvoidId": "Mau ngelarang orang? Mulai dari “Don't”, lalu kata kerjanya tetap polos.",
+        "memoryCueId": "Don't + kata kerja: Don't run, Don't touch."
+      },
+      "pedagogicalObjectiveId": "Bikin larangan pakai don't plus kata kerja dasar.",
+      "misconceptionTargetedId": "Kamu bikin larangan pakai “not” aja, atau nambahin -s ke kata kerjanya.",
+      "reasoningOperationId": "kenali ini peringatan buat lawan bicara → larangan → don't + kata kerja dasar"
+    },
+    {
+      "id": "A1-206",
+      "family": "core_grammar",
+      "subskill": "adverbs_of_frequency_mid_position",
+      "cefr": "A2",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Place a frequency adverb after the verb be.",
+      "misconceptionTargeted": "Learner puts the frequency adverb before 'is/are', copying its position with ordinary verbs.",
+      "reasoningOperation": "identify the main verb -> check whether it is be -> place the adverb after be",
+      "stem": "Rudi ___ for class.",
+      "options": [
+        "is never late",
+        "never is late",
+        "is late never",
+        "never be late"
+      ],
+      "correctIndex": 0,
+      "distractors": [
+        {
+          "option": "never is late",
+          "misconception": "puts the frequency adverb before the verb be",
+          "whyFails": "With 'be', the adverb comes after the verb: is never, not never is.",
+          "whyFailsId": "sama be, kata keterangannya sesudah kata kerja: is never, bukan never is.",
+          "misconceptionId": "naruh kata keterangan frekuensi di depan is/are, padahal harusnya sesudahnya."
+        },
+        {
+          "option": "is late never",
+          "misconception": "puts the frequency adverb after the object",
+          "whyFails": "Frequency adverbs sit in the middle of the sentence, not at the end after the adjective.",
+          "whyFailsId": "kata keterangan frekuensi duduk di tengah kalimat, bukan di ujung sesudah kata sifat.",
+          "misconceptionId": "naruh kata keterangan frekuensi di belakang objek, padahal tempatnya di depan kata kerja."
+        },
+        {
+          "option": "never be late",
+          "misconception": "leaving the bare verb with no third-person marking after a singular subject",
+          "whyFails": "'Rudi' needs the finite form 'is'; bare 'be' cannot carry the sentence.",
+          "whyFailsId": "“Rudi” butuh bentuk “is”. “Be” polos nggak bisa jadi kata kerja utama kalimat.",
+          "misconceptionId": "kata kerja dibiarin polos padahal subjeknya tunggal."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "The verb is 'be', so the frequency adverb follows it: Rudi is never late.",
+        "rule": "Frequency adverbs go before an ordinary verb but after the verb be (am/is/are).",
+        "whyOthersFail": "'Never is' reverses the order; 'is late never' pushes the adverb to the end; 'never be' has no finite verb.",
+        "howToAvoid": "Ask: is the verb 'be'? If yes, adverb after it. If not, adverb before it.",
+        "memoryCue": "Be first, then never: is never late.",
+        "ruleId": "Kata keterangan frekuensi di depan kata kerja biasa, tapi sesudah be (am/is/are).",
+        "whyCorrectId": "Kata kerjanya be, jadi kata keterangan frekuensinya nyusul: Rudi is never late.",
+        "whyOthersFailId": "“Never is” urutannya kebalik. “Is late never” ngedorong kata keterangannya ke ujung. “Never be” nggak punya kata kerja utuh.",
+        "howToAvoidId": "Tanya: kata kerjanya be? Kalau ya, kata keterangan sesudahnya. Kalau bukan, di depannya.",
+        "memoryCueId": "Be dulu, baru never: is never late."
+      },
+      "pedagogicalObjectiveId": "Taruh kata keterangan frekuensi sesudah kata kerja be.",
+      "misconceptionTargetedId": "Kamu naruh kata keterangan frekuensi di depan “is/are”, niru posisinya di kata kerja biasa.",
+      "reasoningOperationId": "cari kata kerja utamanya → ternyata be → taruh kata keterangannya sesudah be"
+    },
+    {
+      "id": "A1-207",
+      "family": "possession",
+      "subskill": "possessive_s_noun_ownership",
+      "cefr": "A2",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Use apostrophe-s on a singular noun to show who owns something.",
+      "misconceptionTargeted": "Learner writes the owner's name with no marker or with a plain -s and no apostrophe.",
+      "reasoningOperation": "identify the owner -> check that the owner is singular -> add 's before the thing owned",
+      "stem": "This is my ___ car. He bought it last year.",
+      "options": [
+        "father",
+        "father's",
+        "fathers",
+        "father his"
+      ],
+      "correctIndex": 1,
+      "distractors": [
+        {
+          "option": "father",
+          "misconception": "drops the marker of ownership entirely, lining up two nouns as Indonesian does",
+          "whyFails": "'My father car' puts two nouns side by side with no sign of ownership.",
+          "whyFailsId": "“my father car” cuma nyandingin dua kata benda tanpa tanda kepemilikan.",
+          "misconceptionId": "tanda kepemilikannya dibuang, dua kata benda dijejerin kayak di bahasa Indonesia."
+        },
+        {
+          "option": "fathers",
+          "misconception": "writes a plain -s ending that superficially resembles the possessive but loses the apostrophe",
+          "whyFails": "'Fathers' means more than one father; ownership needs the apostrophe: father's.",
+          "whyFailsId": "“fathers” artinya lebih dari satu ayah. Kepemilikan butuh tanda petik: father's.",
+          "misconceptionId": "cuma nulis -s tanpa tanda petik."
+        },
+        {
+          "option": "father his",
+          "misconception": "inserting a duplicate owner pronoun after the name, marking possession twice",
+          "whyFails": "English does not add 'his' after the owner's name; the 's already shows possession.",
+          "whyFailsId": "bahasa Inggris nggak nambahin “his” sesudah nama pemilik. Tanda 's udah nunjukin kepemilikan.",
+          "misconceptionId": "nambahin kata ganti pemilik sesudah nama, jadi kepemilikannya dobel."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "The car belongs to one person, my father, so the owner takes 's: my father's car.",
+        "rule": "Singular owner + 's + thing owned: father's car, Sinta's bag.",
+        "whyOthersFail": "'Father' has no marker; 'fathers' is a plural, not a possessive; 'father his' doubles the owner.",
+        "howToAvoid": "Who owns it? Put 's right after that person, then the thing.",
+        "memoryCue": "Owner + 's + thing.",
+        "ruleId": "Pemilik tunggal + 's + barangnya: father's car, Sinta's bag.",
+        "whyCorrectId": "Mobilnya punya satu orang, ayahku, jadi pemiliknya dapet 's: my father's car.",
+        "whyOthersFailId": "“Father” nggak ada tandanya. “Fathers” itu jamak, bukan kepemilikan. “Father his” pemiliknya dobel.",
+        "howToAvoidId": "Siapa pemiliknya? Taruh 's langsung sesudah orang itu, baru barangnya.",
+        "memoryCueId": "Pemilik + 's + barang."
+      },
+      "pedagogicalObjectiveId": "Pakai tanda 's di kata benda tunggal buat nunjukin siapa pemiliknya.",
+      "misconceptionTargetedId": "Kamu nulis nama pemiliknya tanpa tanda apa pun, atau cuma -s tanpa tanda petik.",
+      "reasoningOperationId": "cari pemiliknya → kata benda tunggal → tambah 's di depan barang yang dimiliki"
+    },
+    {
+      "id": "MO-201",
+      "family": "modals",
+      "subskill": "would_like_polite_requests",
+      "cefr": "A2",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Ask a polite offer question with 'Would you like' plus a noun.",
+      "misconceptionTargeted": "Learner offers with flat 'Do you want' or breaks the fixed 'would like' shape.",
+      "reasoningOperation": "identify a polite offer to a guest -> select would like -> apply question order Would you like",
+      "stem": "A guest arrives at your house. You ask: “___ some tea?”",
+      "options": [
+        "Would you like",
+        "Do you like",
+        "Would you liking",
+        "You would like"
+      ],
+      "correctIndex": 0,
+      "distractors": [
+        {
+          "option": "Do you like",
+          "misconception": "stating a general preference in casual flat form instead of the polite request formula",
+          "whyFails": "'Do you like tea?' asks about general taste, not whether the guest wants some now.",
+          "whyFailsId": "“Do you like tea?” nanya suka teh atau nggak secara umum, bukan nawarin teh sekarang.",
+          "misconceptionId": "nanya selera umum, bukan nawarin dengan sopan."
+        },
+        {
+          "option": "Would you liking",
+          "misconception": "gluing an -ing onto the verb after 'would', a blend of two separate patterns",
+          "whyFails": "After 'would' the verb stays bare: would like, never would liking.",
+          "whyFailsId": "sesudah “would” kata kerjanya tetap polos: would like, bukan would liking.",
+          "misconceptionId": "nempelin -ing sesudah would, nyampur dua pola."
+        },
+        {
+          "option": "You would like",
+          "misconception": "uses 'want' where the polite would-like formula is expected",
+          "whyFails": "A question needs 'would' before 'you'; statement order does not ask anything.",
+          "whyFailsId": "pertanyaan butuh “would” di depan “you”. Urutan kalimat berita nggak nanya apa-apa.",
+          "misconceptionId": "pakai “want” yang terlalu langsung, padahal konteksnya minta dengan sopan."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "Offering something politely uses the fixed question 'Would you like...?'",
+        "rule": "Polite offer: Would + you + like + noun? The verb 'like' stays in its base form.",
+        "whyOthersFail": "'Do you like' asks about taste in general; 'would you liking' adds an -ing; 'you would like' is not a question.",
+        "howToAvoid": "Offering food or drink? Start with 'Would you like'.",
+        "memoryCue": "Would you like...? = a polite offer.",
+        "ruleId": "Tawaran sopan: Would + you + like + kata benda? Kata “like” tetap bentuk dasar.",
+        "whyCorrectId": "Nawarin sesuatu dengan sopan pakai pertanyaan tetap “Would you like...?”",
+        "whyOthersFailId": "“Do you like” nanya selera secara umum. “Would you liking” nambah -ing. “You would like” bukan pertanyaan.",
+        "howToAvoidId": "Nawarin makanan atau minuman? Mulai dari “Would you like”.",
+        "memoryCueId": "Would you like...? = tawaran sopan."
+      },
+      "pedagogicalObjectiveId": "Nawarin sesuatu dengan sopan pakai “Would you like” plus kata benda.",
+      "misconceptionTargetedId": "Kamu nawarin pakai “Do you want” yang datar, atau ngerusak bentuk tetap “would like”.",
+      "reasoningOperationId": "kenali ini tawaran sopan ke tamu → pakai would + like → urutan tanya: Would you like"
+    },
+    {
+      "id": "GI-201",
+      "family": "gerunds_infinitives",
+      "subskill": "like_love_hate_plus_gerund_preferences",
+      "cefr": "A2",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Follow 'enjoy' with the -ing form of the next verb.",
+      "misconceptionTargeted": "Learner puts a to-infinitive or a bare verb after 'enjoy'.",
+      "reasoningOperation": "identify the preference verb enjoy -> select the -ing form for the next verb",
+      "stem": "I really enjoy ___ to music while I study.",
+      "options": [
+        "listen",
+        "listening",
+        "to listen",
+        "listens"
+      ],
+      "correctIndex": 1,
+      "distractors": [
+        {
+          "option": "listen",
+          "misconception": "following the feeling verb with a bare infinitive, chaining verbs directly as Indonesian does",
+          "whyFails": "Two verbs cannot sit side by side; after 'enjoy' the second verb needs -ing.",
+          "whyFailsId": "dua kata kerja nggak bisa nempel begitu aja. Sesudah “enjoy” kata kerja keduanya butuh -ing.",
+          "misconceptionId": "kata kerja perasaan langsung disambung kata kerja polos kayak di bahasa Indonesia."
+        },
+        {
+          "option": "to listen",
+          "misconception": "uses a to-infinitive after 'enjoy'",
+          "whyFails": "'Enjoy' never takes 'to'; it is always followed by -ing.",
+          "whyFailsId": "“enjoy” nggak pernah pakai “to”. Selalu diikuti -ing.",
+          "misconceptionId": "pakai “to” sesudah enjoy, padahal enjoy selalu diikuti bentuk -ing."
+        },
+        {
+          "option": "listens",
+          "misconception": "base-form overuse",
+          "whyFails": "'Listens' is a present simple form for he/she; it cannot follow another verb.",
+          "whyFailsId": "“listens” bentuk present simple buat he/she, nggak bisa ngikut di belakang kata kerja lain.",
+          "misconceptionId": "bentuk kata kerja berkonjugasi dipakai sesudah kata kerja lain."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "'Enjoy' is a preference verb, and the verb after it takes -ing: enjoy listening.",
+        "rule": "Like, love, hate, and enjoy are followed by verb + -ing.",
+        "whyOthersFail": "'Listen' is bare; 'to listen' uses the wrong pattern for enjoy; 'listens' is a finite verb, not a verb form that can follow enjoy.",
+        "howToAvoid": "After a feeling verb, picture the -ing ending before you write the next verb.",
+        "memoryCue": "Enjoy + -ing: enjoy listening, enjoy cooking.",
+        "ruleId": "Like, love, hate, dan enjoy diikuti kata kerja + -ing.",
+        "whyCorrectId": "“Enjoy” kata kerja kesukaan, jadi kata kerja sesudahnya pakai -ing: enjoy listening.",
+        "whyOthersFailId": "“Listen” polos. “To listen” pola yang salah buat enjoy. “Listens” kata kerja berkonjugasi yang nggak bisa nempel di belakang enjoy.",
+        "howToAvoidId": "Sesudah kata kerja perasaan, bayangin akhiran -ing sebelum nulis kata kerja berikutnya.",
+        "memoryCueId": "Enjoy selalu ketemu -ing: enjoy listening, enjoy cooking."
+      },
+      "pedagogicalObjectiveId": "Sesudah “enjoy”, kata kerja berikutnya pakai bentuk -ing.",
+      "misconceptionTargetedId": "Kamu naruh “to” atau kata kerja polos sesudah “enjoy”.",
+      "reasoningOperationId": "lihat kata kerja perasaan enjoy → kata kerja berikutnya pakai -ing"
+    },
+    {
+      "id": "TA-201",
+      "family": "tense_aspect",
+      "subskill": "present_perfect_experience_ever_never",
+      "cefr": "A2",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Use 'have never + past participle' for an experience that has not happened in someone's life.",
+      "misconceptionTargeted": "Learner uses the past simple for a life experience that has no specific time.",
+      "reasoningOperation": "check that no time is given -> identify a life experience -> apply have/has + never + past participle",
+      "stem": "My grandmother ___ a plane. She always travels by train.",
+      "options": [
+        "has never flown",
+        "never flew",
+        "has never fly",
+        "never has flying"
+      ],
+      "correctIndex": 0,
+      "distractors": [
+        {
+          "option": "never flew",
+          "misconception": "uses the past simple for a life experience without a time",
+          "whyFails": "There is no finished time like 'last year'; the sentence covers her whole life up to now, so present perfect is needed.",
+          "whyFailsId": "nggak ada waktu selesai kayak “last year”. Kalimatnya nyakup seumur hidup sampai sekarang, jadi butuh present perfect.",
+          "misconceptionId": "pakai past simple buat pengalaman hidup yang nggak disebut waktunya."
+        },
+        {
+          "option": "has never fly",
+          "misconception": "leaving the bare verb although 'have' needs the past participle after it",
+          "whyFails": "After 'has', the verb must be the past participle 'flown', not the bare 'fly'.",
+          "whyFailsId": "sesudah “has” kata kerjanya harus past participle “flown”, bukan “fly” polos.",
+          "misconceptionId": "kata kerja dibiarin polos padahal sesudah have butuh past participle."
+        },
+        {
+          "option": "never has flying",
+          "misconception": "mixes 'have' with a finite past form of 'be' instead of the participle",
+          "whyFails": "'Has' pairs with a past participle, not an -ing form, and 'never' goes after 'has'.",
+          "whyFailsId": "“has” berpasangan sama past participle, bukan -ing. “Never” juga tempatnya sesudah “has”.",
+          "misconceptionId": "have dicampur sama bentuk -ing, bukan past participle."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "Her whole life up to now is the time frame, and 'she always travels by train' shows it is still true, so 'has never flown' fits.",
+        "rule": "Life experience without a specific time: have/has + never/ever + past participle.",
+        "whyOthersFail": "'Never flew' closes the time off in the past; 'has never fly' lacks the participle; 'never has flying' uses -ing and the wrong word order.",
+        "howToAvoid": "No date or finished time word? Use have/has + past participle.",
+        "memoryCue": "Never in my life → has never flown.",
+        "ruleId": "Pengalaman hidup tanpa waktu pasti: have/has + never/ever + past participle.",
+        "whyCorrectId": "Rentang waktunya seumur hidup sampai sekarang, dan “she always travels by train” nunjukin itu masih berlaku, jadi “has never flown” yang pas.",
+        "whyOthersFailId": "“Never flew” nutup waktunya di masa lampau. “Has never fly” kurang past participle. “Never has flying” pakai -ing dan urutannya salah.",
+        "howToAvoidId": "Nggak ada tanggal atau kata waktu selesai? Pakai have/has + past participle.",
+        "memoryCueId": "Belum pernah seumur hidup → has never flown."
+      },
+      "pedagogicalObjectiveId": "Pakai “have never + past participle” buat pengalaman yang belum pernah terjadi seumur hidup.",
+      "misconceptionTargetedId": "Kamu pakai past simple buat pengalaman hidup yang nggak disebut waktunya.",
+      "reasoningOperationId": "nggak ada waktu yang disebut → pengalaman hidup → have/has + never + past participle"
+    },
+    {
+      "id": "TA-202",
+      "family": "tense_aspect",
+      "subskill": "present_perfect_with_for_since_duration",
+      "cefr": "A2",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Choose 'for' before a length of time in a present perfect sentence.",
+      "misconceptionTargeted": "Learner uses 'since' before a period like 'ten years' or drops the present perfect link.",
+      "reasoningOperation": "identify the length of time -> keep the present perfect -> select for, not since",
+      "stem": "Mr. Hadi has taught at our school ___ ten years, and he still loves it.",
+      "options": [
+        "for",
+        "since",
+        "during",
+        "from"
+      ],
+      "correctIndex": 0,
+      "distractors": [
+        {
+          "option": "since",
+          "misconception": "uses 'since' before a length of time",
+          "whyFails": "'Since' introduces a starting point like 2015, not a length like 'ten years'.",
+          "whyFailsId": "“since” buat titik mulai kayak 2015, bukan lamanya kayak “ten years”.",
+          "misconceptionId": "pakai “since” di depan lamanya waktu, padahal since buat titik mulai."
+        },
+        {
+          "option": "during",
+          "misconception": "sealing the period off as a completed event, though the family still lives there",
+          "whyFails": "'During' says when something happened inside a period; it does not measure how long a state has lasted.",
+          "whyFailsId": "“during” bilang kapan sesuatu terjadi di dalam suatu masa, bukan ngukur berapa lama keadaan itu bertahan.",
+          "misconceptionId": "rentangnya ditutup seolah udah selesai."
+        },
+        {
+          "option": "from",
+          "misconception": "uses 'for' before a starting point",
+          "whyFails": "'From' needs an end point ('from 2015 to 2025'); on its own it cannot follow the present perfect here.",
+          "whyFailsId": "“from” butuh titik akhir (“from 2015 to 2025”). Sendirian, dia nggak bisa ngikut present perfect di sini.",
+          "misconceptionId": "pakai “for” di depan titik mulai, padahal for buat lamanya waktu."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "'Ten years' is a length of time, so the present perfect takes 'for': has taught for ten years.",
+        "rule": "Present perfect + for + length of time; present perfect + since + starting point.",
+        "whyOthersFail": "'Since' wants a starting point; 'during' names when, not how long; 'from' needs a 'to' to close the range.",
+        "howToAvoid": "Ask: is it a number of years or a date? Number → for. Date → since.",
+        "memoryCue": "For ten years, since 2015.",
+        "ruleId": "Present perfect + for + lamanya waktu. Present perfect + since + titik mulai.",
+        "whyCorrectId": "“Ten years” itu lamanya waktu, jadi present perfect-nya pakai “for”: has taught for ten years.",
+        "whyOthersFailId": "“Since” minta titik mulai. “During” nyebut kapan, bukan berapa lama. “From” butuh “to” buat nutup rentangnya.",
+        "howToAvoidId": "Tanya: ini jumlah tahun atau tanggal? Jumlah → for. Tanggal → since.",
+        "memoryCueId": "Lamanya pakai for, titik mulainya pakai since: for ten years, since 2015."
+      },
+      "pedagogicalObjectiveId": "Pilih “for” di depan lamanya waktu di kalimat present perfect.",
+      "misconceptionTargetedId": "Kamu pakai “since” di depan rentang kayak “ten years”, atau ngilangin present perfect-nya.",
+      "reasoningOperationId": "kenali lamanya waktu → present perfect tetap → pakai for, bukan since"
+    },
+    {
+      "id": "CM-201",
+      "family": "comparison",
+      "subskill": "irregular_comparative_better_worse_forms",
+      "cefr": "A2",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Use the irregular comparative 'worse' for 'bad' in a comparison with 'than'.",
+      "misconceptionTargeted": "Learner builds the comparative of 'bad' with -er or 'more', or reaches for the superlative.",
+      "reasoningOperation": "identify 'than' -> select a comparative -> recall that bad is irregular -> apply worse",
+      "stem": "The traffic today is ___ than yesterday. We will be late.",
+      "options": [
+        "worse",
+        "badder",
+        "more bad",
+        "worst"
+      ],
+      "correctIndex": 0,
+      "distractors": [
+        {
+          "option": "badder",
+          "misconception": "regular -er ending forced onto an irregular adjective",
+          "whyFails": "'Bad' is irregular; it never takes -er.",
+          "whyFailsId": "“bad” itu tak beraturan, nggak pernah pakai -er.",
+          "misconceptionId": "akhiran -er dipaksain ke kata sifat tak beraturan."
+        },
+        {
+          "option": "more bad",
+          "misconception": "regular 'more + adjective' pattern applied to an irregular adjective",
+          "whyFails": "'More bad' follows the regular pattern, but 'bad' has its own form: worse.",
+          "whyFailsId": "“more bad” ngikutin pola biasa, padahal “bad” punya bentuk sendiri: worse.",
+          "misconceptionId": "pola “more + kata sifat” dipakai buat kata sifat tak beraturan."
+        },
+        {
+          "option": "worst",
+          "misconception": "superlative 'best' used where 'than' demands a comparative",
+          "whyFails": "'Worst' compares three or more things; 'than' signals a two-way comparison.",
+          "whyFailsId": "“worst” buat bandingin tiga atau lebih. “Than” nandain perbandingan dua hal.",
+          "misconceptionId": "bentuk paling dipakai padahal “than” minta bentuk banding."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "'Than' asks for a comparative, and the comparative of 'bad' is the irregular 'worse'.",
+        "rule": "Irregular comparatives: good → better, bad → worse, far → further.",
+        "whyOthersFail": "'Badder' and 'more bad' apply regular patterns to an irregular word; 'worst' is the superlative.",
+        "howToAvoid": "Memorize the short list of irregular pairs before you reach for -er or more.",
+        "memoryCue": "Good, better — bad, worse.",
+        "ruleId": "Bentuk banding tak beraturan: good → better, bad → worse, far → further.",
+        "whyCorrectId": "“Than” minta bentuk banding, dan bentuk banding “bad” itu “worse”.",
+        "whyOthersFailId": "“Badder” dan “more bad” nerapin pola biasa ke kata tak beraturan. “Worst” bentuk paling.",
+        "howToAvoidId": "Hafalin daftar pendek pasangan tak beraturan sebelum kamu ambil -er atau more.",
+        "memoryCueId": "Hafalin pasangannya: good jadi better, bad jadi worse."
+      },
+      "pedagogicalObjectiveId": "Pakai bentuk tak beraturan “worse” buat “bad” di perbandingan dengan “than”.",
+      "misconceptionTargetedId": "Kamu bikin perbandingan “bad” pakai -er atau “more”, atau malah ambil bentuk paling.",
+      "reasoningOperationId": "lihat “than” → butuh bentuk banding → bad itu tak beraturan → worse"
+    },
+    {
+      "id": "CM-202",
+      "family": "comparison",
+      "subskill": "comparative_formation_er_vs_more_no_double_marking",
+      "cefr": "A2",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Use 'more' before a long adjective in a comparison.",
+      "misconceptionTargeted": "Learner adds -er to a long adjective or stacks 'more' and -er together.",
+      "reasoningOperation": "count the syllables -> identify a long adjective -> apply more + adjective without -er",
+      "stem": "This book is ___ (interesting) than the film.",
+      "options": [
+        "more interesting",
+        "interestinger",
+        "more interestinger",
+        "the most interesting"
+      ],
+      "correctIndex": 0,
+      "distractors": [
+        {
+          "option": "interestinger",
+          "misconception": "adds -er to a long adjective",
+          "whyFails": "'Interesting' has three syllables, so it takes 'more', not -er.",
+          "whyFailsId": "“interesting” tiga suku kata, jadi pakai “more”, bukan -er.",
+          "misconceptionId": "nambahin -er ke kata sifat panjang, padahal yang panjang pakai more."
+        },
+        {
+          "option": "more interestinger",
+          "misconception": "doubles the comparative marking by putting 'more' before an adjective already ending in '-er'",
+          "whyFails": "'More' and -er both mark the comparative; use only one.",
+          "whyFailsId": "“more” dan -er sama-sama nandain banding. Pakai satu aja.",
+          "misconceptionId": "tanda bandingnya dobel: more plus -er."
+        },
+        {
+          "option": "the most interesting",
+          "misconception": "uses the superlative after 'the' for a two-item comparison",
+          "whyFails": "'Than' compares two things, so the comparative is needed, not the superlative.",
+          "whyFailsId": "“than” bandingin dua hal, jadi butuh bentuk banding, bukan bentuk paling.",
+          "misconceptionId": "pakai bentuk paling, padahal cuma dua hal yang dibandingin."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "'Interesting' is a long adjective, so its comparative is 'more interesting'.",
+        "rule": "Short adjectives take -er (cheaper); long adjectives take more (more interesting). Never both.",
+        "whyOthersFail": "'Interestinger' forces -er onto a long word; 'more interestinger' marks the comparative twice; 'the most interesting' is a superlative.",
+        "howToAvoid": "Say the adjective aloud: three syllables or more → more.",
+        "memoryCue": "Long word → more; short word → -er.",
+        "ruleId": "Kata sifat pendek pakai -er (cheaper). Kata sifat panjang pakai more (more interesting). Jangan dua-duanya.",
+        "whyCorrectId": "“Interesting” kata sifat panjang, jadi bentuk bandingnya “more interesting”.",
+        "whyOthersFailId": "“Interestinger” maksain -er ke kata panjang. “More interestinger” nandain banding dua kali. “The most interesting” bentuk paling.",
+        "howToAvoidId": "Ucapin kata sifatnya: tiga suku kata atau lebih → more.",
+        "memoryCueId": "Kata panjang → more. Kata pendek → -er."
+      },
+      "pedagogicalObjectiveId": "Pakai “more” di depan kata sifat panjang saat membandingkan.",
+      "misconceptionTargetedId": "Kamu nambahin -er ke kata sifat panjang, atau numpuk “more” sama -er sekaligus.",
+      "reasoningOperationId": "hitung suku katanya → kata sifat panjang → more + kata sifat, tanpa -er"
+    },
+    {
+      "id": "A1-208",
+      "family": "core_grammar",
+      "subskill": "adverb_of_manner_ly_vs_adjective_after_verb",
+      "cefr": "A2",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Keep an adjective, not an -ly adverb, after the verb be.",
+      "misconceptionTargeted": "Learner adds -ly after 'is/are' because the word describes how something seems.",
+      "reasoningOperation": "identify the verb -> check whether it is be -> select an adjective to describe the subject",
+      "stem": "Be careful, the soup is very ___.",
+      "options": [
+        "hot",
+        "hotly",
+        "heat",
+        "hotter"
+      ],
+      "correctIndex": 0,
+      "distractors": [
+        {
+          "option": "hotly",
+          "misconception": "uses the adverb where an adjective after 'be' is needed",
+          "whyFails": "After 'is', the word describes the soup itself, so it must be an adjective, not an -ly adverb.",
+          "whyFailsId": "sesudah “is”, katanya ngegambarin supnya sendiri, jadi harus kata sifat, bukan -ly.",
+          "misconceptionId": "pakai bentuk -ly sesudah is/are, padahal sesudah be yang dibutuhin kata sifat."
+        },
+        {
+          "option": "heat",
+          "misconception": "uses the bare adjective after an action verb where a manner adverb in '-ly' is required",
+          "whyFails": "'Heat' is a noun or verb; 'very' needs an adjective after it.",
+          "whyFailsId": "“heat” itu kata benda atau kata kerja. “Very” butuh kata sifat sesudahnya.",
+          "misconceptionId": "kata benda dipakai di tempat kata sifat."
+        },
+        {
+          "option": "hotter",
+          "misconception": "switches to a comparative adjective although nothing is being compared and the slot needs an adverb",
+          "whyFails": "Nothing is being compared, and 'very' does not go with a comparative.",
+          "whyFailsId": "nggak ada yang dibandingin, dan “very” nggak cocok sama bentuk banding.",
+          "misconceptionId": "bentuk banding dipakai padahal nggak ada yang dibandingin."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "'Is' links the soup to a description, so the adjective 'hot' is required.",
+        "rule": "After be (am/is/are) use an adjective; after an action verb use an -ly adverb.",
+        "whyOthersFail": "'Hotly' is an adverb; 'heat' is not an adjective; 'hotter' compares, but nothing is compared here.",
+        "howToAvoid": "See is/are before the gap? Choose the plain adjective.",
+        "memoryCue": "Is hot, walks slowly.",
+        "ruleId": "Sesudah be (am/is/are) pakai kata sifat. Sesudah kata kerja aksi pakai kata keterangan -ly.",
+        "whyCorrectId": "“Is” nyambungin sup sama gambarannya, jadi butuh kata sifat “hot”.",
+        "whyOthersFailId": "“Hotly” kata keterangan. “Heat” bukan kata sifat. “Hotter” bentuk banding, padahal nggak ada yang dibandingin.",
+        "howToAvoidId": "Ada is/are di depan titik-titik? Pilih kata sifat polos.",
+        "memoryCueId": "Sesudah is pakai kata sifat: is hot. Sesudah kata kerja aksi pakai -ly: walks slowly."
+      },
+      "pedagogicalObjectiveId": "Sesudah kata kerja be, pakai kata sifat, bukan kata keterangan -ly.",
+      "misconceptionTargetedId": "Kamu nambahin -ly sesudah “is/are” karena kata itu ngegambarin sesuatu.",
+      "reasoningOperationId": "cari kata kerjanya → ternyata be → gambarkan subjeknya pakai kata sifat"
+    },
+    {
+      "id": "QT-201",
+      "family": "quantifiers",
+      "subskill": "how_much_vs_how_many_quantity_questions",
+      "cefr": "A2",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Ask about a countable plural noun with 'How many'.",
+      "misconceptionTargeted": "Learner asks about countable things with 'how much' or drops the quantity word.",
+      "reasoningOperation": "identify the noun -> check that it is plural and countable -> select How many",
+      "stem": "___ brothers and sisters do you have?",
+      "options": [
+        "How many",
+        "How much",
+        "How",
+        "How many of"
+      ],
+      "correctIndex": 0,
+      "distractors": [
+        {
+          "option": "How much",
+          "misconception": "asks about a countable plural noun with 'how much'",
+          "whyFails": "'Brothers and sisters' can be counted, so the question word is 'how many'.",
+          "whyFailsId": "“brothers and sisters” bisa dihitung, jadi kata tanyanya “how many”.",
+          "misconceptionId": "nanya benda yang bisa dihitung pakai “how much”, padahal harusnya “how many”."
+        },
+        {
+          "option": "How",
+          "misconception": "asks quantity with bare 'how' and drops the quantity word entirely",
+          "whyFails": "Bare 'how' asks about manner, not number.",
+          "whyFailsId": "“how” sendirian nanya cara, bukan jumlah.",
+          "misconceptionId": "nanya jumlah cuma pakai “how”, kata jumlahnya hilang."
+        },
+        {
+          "option": "How many of",
+          "misconception": "adds a partitive 'of' straight after 'how much' before a bare noun",
+          "whyFails": "'Of' only fits before 'the/your/them': how many of your friends, not how many of brothers.",
+          "whyFailsId": "“of” cuma pas di depan “the/your/them”: how many of your friends, bukan how many of brothers.",
+          "misconceptionId": "nambahin “of” langsung di depan kata benda polos."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "'Brothers and sisters' is a plural countable noun, so the question starts with 'How many'.",
+        "rule": "How many + plural countable noun; how much + uncountable noun.",
+        "whyOthersFail": "'How much' is for uncountable nouns; 'how' alone asks about manner; 'how many of' needs 'the/your' after it.",
+        "howToAvoid": "Can you put a number before the noun (two brothers)? Then ask 'How many'.",
+        "memoryCue": "Count it → how many.",
+        "ruleId": "How many + kata benda jamak yang bisa dihitung. How much + kata benda yang nggak bisa dihitung.",
+        "whyCorrectId": "“Brothers and sisters” bisa dihitung dan jamak, jadi pertanyaannya mulai dari “How many”.",
+        "whyOthersFailId": "“How much” buat yang nggak bisa dihitung. “How” sendirian nanya cara. “How many of” butuh “the/your” sesudahnya.",
+        "howToAvoidId": "Bisa ditaruh angka di depannya (two brothers)? Tanyanya pakai “How many”.",
+        "memoryCueId": "Bisa dihitung → how many."
+      },
+      "pedagogicalObjectiveId": "Nanya jumlah benda yang bisa dihitung pakai “How many”.",
+      "misconceptionTargetedId": "Kamu nanya benda yang bisa dihitung pakai “how much”, atau ngilangin kata jumlahnya.",
+      "reasoningOperationId": "lihat kata bendanya → jamak dan bisa dihitung → How many"
+    },
+    {
+      "id": "LD-201",
+      "family": "linking_devices",
+      "subskill": "cause_result_connectors_because_vs_so",
+      "cefr": "A2",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Introduce a result with 'so' after the reason has been stated.",
+      "misconceptionTargeted": "Learner uses 'because' in front of the result instead of the reason.",
+      "reasoningOperation": "identify which clause is the reason and which is the result -> apply so to the result clause",
+      "stem": "It was raining hard, ___ we stayed at home.",
+      "options": [
+        "so",
+        "because",
+        "because of",
+        "so that"
+      ],
+      "correctIndex": 0,
+      "distractors": [
+        {
+          "option": "because",
+          "misconception": "introduces the result clause with 'because'",
+          "whyFails": "'Because' introduces the reason, but 'we stayed at home' is the result of the rain.",
+          "whyFailsId": "“because” buka alasan, padahal “we stayed at home” itu akibat dari hujannya.",
+          "misconceptionId": "pakai “because” di depan akibat, padahal because buat alasan."
+        },
+        {
+          "option": "because of",
+          "misconception": "puts 'because of' before a full clause although it only takes a noun phrase",
+          "whyFails": "'Because of' is followed by a noun ('because of the rain'), not a full clause.",
+          "whyFailsId": "“because of” diikuti kata benda (“because of the rain”), bukan klausa utuh.",
+          "misconceptionId": "“because of” ditaruh di depan klausa utuh, padahal cuma buat kata benda."
+        },
+        {
+          "option": "so that",
+          "misconception": "uses the purpose connector 'so that' where a plain reason connector is needed",
+          "whyFails": "'So that' shows a purpose or goal; staying home was a result, not a plan.",
+          "whyFailsId": "“so that” nunjukin tujuan. Tinggal di rumah itu akibat, bukan rencana.",
+          "misconceptionId": "pakai penghubung tujuan “so that”, padahal butuh penghubung akibat."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "The rain is the reason and staying home is the result, so the result clause starts with 'so'.",
+        "rule": "Reason + so + result. Because + reason.",
+        "whyOthersFail": "'Because' would mark staying home as the reason; 'because of' needs a noun; 'so that' expresses purpose.",
+        "howToAvoid": "Ask: does this clause explain why (because) or what happened next (so)?",
+        "memoryCue": "Rain → so → stayed home.",
+        "ruleId": "Alasan + so + akibat. Because + alasan.",
+        "whyCorrectId": "Hujan itu alasannya dan tinggal di rumah itu akibatnya, jadi klausa akibat mulai dari “so”.",
+        "whyOthersFailId": "“Because” bakal bikin tinggal di rumah jadi alasannya. “Because of” butuh kata benda. “So that” nyatain tujuan.",
+        "howToAvoidId": "Tanya: klausa ini jelasin kenapa (because) atau apa yang terjadi berikutnya (so)?",
+        "memoryCueId": "Hujan → so → tinggal di rumah."
+      },
+      "pedagogicalObjectiveId": "Buka akibat pakai “so” sesudah alasannya disebut.",
+      "misconceptionTargetedId": "Kamu pakai “because” di depan akibat, bukan di depan alasan.",
+      "reasoningOperationId": "mana alasan dan mana akibat → klausa akibat pakai so"
+    },
+    {
+      "id": "TA-203",
+      "family": "tense_aspect",
+      "subskill": "state_verbs_resist_continuous_form",
+      "cefr": "A2",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Keep the state verb 'know' in the present simple even when talking about now.",
+      "misconceptionTargeted": "Learner puts 'know' into the continuous because the situation is happening at the moment.",
+      "reasoningOperation": "identify a state verb -> recall that states do not take -ing -> keep the present simple",
+      "stem": "Sorry, I ___ the answer right now.",
+      "options": [
+        "don't know",
+        "am not knowing",
+        "not know",
+        "don't knowing"
+      ],
+      "correctIndex": 0,
+      "distractors": [
+        {
+          "option": "am not knowing",
+          "misconception": "Assumes present time always requires present continuous.",
+          "whyFails": "'Know' is a state verb, so it stays in the present simple even with 'right now'.",
+          "whyFailsId": "“know” kata kerja keadaan, jadi tetap present simple walau ada “right now”.",
+          "misconceptionId": "ngira waktu sekarang selalu butuh bentuk -ing."
+        },
+        {
+          "option": "not know",
+          "misconception": "reduces the sentence to a fragment: an -ing form with no finite verb to carry the tense",
+          "whyFails": "A negative present simple needs 'don't'; bare 'not know' is not a full verb.",
+          "whyFailsId": "negatif present simple butuh “don't”. “Not know” polos bukan kata kerja utuh.",
+          "misconceptionId": "kalimatnya jadi potongan tanpa kata kerja utuh."
+        },
+        {
+          "option": "don't knowing",
+          "misconception": "bare-verb-without-auxiliary",
+          "whyFails": "After 'don't' the verb is bare: don't know, never don't knowing.",
+          "whyFailsId": "sesudah “don't” kata kerjanya polos: don't know, bukan don't knowing.",
+          "misconceptionId": "kata kerja polos tanpa kata bantu."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "'Know' describes a state, not an action, so even 'right now' takes the present simple: don't know.",
+        "rule": "State verbs (know, like, want, belong) normally stay in the present simple, not the continuous.",
+        "whyOthersFail": "'Am not knowing' forces a state into -ing; 'not know' has no auxiliary; 'don't knowing' adds -ing after don't.",
+        "howToAvoid": "'Right now' does not mean -ing automatically; check whether the verb is a state first.",
+        "memoryCue": "Know, like, want — no -ing.",
+        "ruleId": "Kata kerja keadaan (know, like, want, belong) biasanya tetap present simple, bukan bentuk -ing.",
+        "whyCorrectId": "“Know” ngegambarin keadaan, bukan aksi, jadi walau ada “right now” tetap present simple: don't know.",
+        "whyOthersFailId": "“Am not knowing” maksain keadaan jadi -ing. “Not know” nggak punya kata bantu. “Don't knowing” nambah -ing sesudah don't.",
+        "howToAvoidId": "“Right now” nggak otomatis berarti -ing. Cek dulu kata kerjanya keadaan atau bukan.",
+        "memoryCueId": "Know, like, want — tanpa -ing."
+      },
+      "pedagogicalObjectiveId": "Kata kerja keadaan “know” tetap present simple walau ngomongin sekarang.",
+      "misconceptionTargetedId": "Kamu bikin “know” jadi bentuk -ing karena kejadiannya lagi berlangsung.",
+      "reasoningOperationId": "kenali kata kerja keadaan → keadaan nggak pakai -ing → present simple"
+    },
+    {
+      "id": "QN-201",
+      "family": "question_negation",
+      "subskill": "double_negative_avoidance_single_negation_rule",
+      "cefr": "A2",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Use 'any' after a negative verb instead of a second negative word.",
+      "misconceptionTargeted": "Learner adds 'no' after 'don't', producing a double negative.",
+      "reasoningOperation": "check that the verb is already negative -> recall the one-negative rule -> select any",
+      "stem": "We don't have ___ milk left, so I'll buy some.",
+      "options": [
+        "any",
+        "no",
+        "nothing",
+        "none"
+      ],
+      "correctIndex": 0,
+      "distractors": [
+        {
+          "option": "no",
+          "misconception": "uses 'no' before a verb already negated with 'not'",
+          "whyFails": "'Don't' is already negative; adding 'no' makes a double negative.",
+          "whyFailsId": "“don't” udah negatif. Nambah “no” bikin negatif dobel.",
+          "misconceptionId": "pakai “no” sesudah kata kerja yang udah negatif, jadi negatifnya dobel."
+        },
+        {
+          "option": "nothing",
+          "misconception": "combining a negated verb ('didn't') with a negative pronoun, creating a non-standard double negative",
+          "whyFails": "'Nothing' is a negative pronoun and cannot stand before the noun 'milk' after 'don't'.",
+          "whyFailsId": "“nothing” itu kata ganti negatif, nggak bisa berdiri di depan kata benda “milk” sesudah “don't”.",
+          "misconceptionId": "kata kerja negatif digabung sama kata ganti negatif."
+        },
+        {
+          "option": "none",
+          "misconception": "incorrectly splitting the compound negative pronoun into two words",
+          "whyFails": "'None' replaces a noun ('we have none'); it cannot go directly before 'milk'.",
+          "whyFailsId": "“none” ngegantiin kata benda (“we have none”), nggak bisa langsung di depan “milk”.",
+          "misconceptionId": "kata ganti dipakai di depan kata benda."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "The verb 'don't have' already carries the negative, so the noun takes 'any': don't have any milk.",
+        "rule": "One negative per clause: don't + any, or have + no. Never don't + no.",
+        "whyOthersFail": "'No' and 'nothing' double the negative; 'none' cannot sit before a noun.",
+        "howToAvoid": "Count the negatives. If the verb has 'not', the next word is 'any'.",
+        "memoryCue": "Don't … any / have … no.",
+        "ruleId": "Satu negatif per klausa: don't + any, atau have + no. Jangan don't + no.",
+        "whyCorrectId": "“Don't have” udah negatif, jadi kata bendanya pakai “any”: don't have any milk.",
+        "whyOthersFailId": "“No” dan “nothing” bikin negatif dobel. “None” nggak bisa duduk di depan kata benda.",
+        "howToAvoidId": "Hitung negatifnya. Kalau kata kerjanya udah ada “not”, kata berikutnya “any”.",
+        "memoryCueId": "Satu negatif aja: don't … any, atau have … no."
+      },
+      "pedagogicalObjectiveId": "Sesudah kata kerja negatif, pakai “any”, bukan kata negatif kedua.",
+      "misconceptionTargetedId": "Kamu nambahin “no” sesudah “don't”, jadi negatifnya dobel.",
+      "reasoningOperationId": "kata kerjanya udah negatif → cuma boleh satu negatif → pakai any"
+    },
+    {
+      "id": "AR-201",
+      "family": "articles_determiners",
+      "subskill": "definite_article_with_unique_referents_and_superlatives",
+      "cefr": "A2",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Use 'the' before an ordinal like 'first' because it points to one specific item.",
+      "misconceptionTargeted": "Learner treats 'first day' as a new, indefinite noun and uses 'a'.",
+      "reasoningOperation": "identify the ordinal first -> recall that only one first exists -> select the",
+      "stem": "Today is ___ first day of the school year.",
+      "options": [
+        "the",
+        "a",
+        "an",
+        "(no article)"
+      ],
+      "correctIndex": 0,
+      "distractors": [
+        {
+          "option": "a",
+          "misconception": "uses the indefinite article before 'first'",
+          "whyFails": "There is only one first day, so it is specific and takes 'the'.",
+          "whyFailsId": "hari pertama cuma ada satu, jadi udah pasti dan pakai “the”.",
+          "misconceptionId": "pakai “a” di depan first, padahal urutan kayak first selalu pakai the."
+        },
+        {
+          "option": "an",
+          "misconception": "same indefinite-article error as 'a', plus a vowel-sound trigger confusion",
+          "whyFails": "'An' is indefinite and also wrong before the consonant sound in 'first'.",
+          "whyFailsId": "“an” itu artikel nggak pasti, dan juga salah di depan bunyi konsonan di “first”.",
+          "misconceptionId": "artikel nggak pasti dipakai dan bunyi awalnya juga bukan vokal."
+        },
+        {
+          "option": "(no article)",
+          "misconception": "assuming proper-noun-adjacent phrases never take an article",
+          "whyFails": "A singular noun phrase like 'first day' cannot stand without an article.",
+          "whyFailsId": "frasa kata benda tunggal kayak “first day” nggak bisa berdiri tanpa artikel.",
+          "misconceptionId": "ngira frasa yang mirip nama nggak butuh artikel."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "'First' picks out one unique day, so the noun phrase is definite: the first day.",
+        "rule": "Use 'the' with ordinals (the first, the second) and superlatives (the best), because only one thing fits.",
+        "whyOthersFail": "'A' and 'an' present the day as one of many; leaving out the article is not possible with a singular count noun.",
+        "howToAvoid": "Ordinal or superlative in front of the noun? Reach for 'the'.",
+        "memoryCue": "The first, the last, the best.",
+        "ruleId": "Pakai “the” sama kata urutan (the first, the second) dan bentuk paling (the best), karena yang cocok cuma satu.",
+        "whyCorrectId": "“First” nunjuk satu hari yang unik, jadi frasanya pasti: the first day.",
+        "whyOthersFailId": "“A” dan “an” nampilin harinya sebagai salah satu dari banyak. Tanpa artikel nggak mungkin buat kata benda tunggal yang bisa dihitung.",
+        "howToAvoidId": "Ada kata urutan atau bentuk paling di depan kata benda? Ambil “the”.",
+        "memoryCueId": "Urutan dan bentuk paling selalu pakai the: the first, the last, the best."
+      },
+      "pedagogicalObjectiveId": "Pakai “the” di depan urutan kayak “first” karena nunjuk satu hal yang pasti.",
+      "misconceptionTargetedId": "Kamu nganggap “first day” kata benda baru yang belum jelas, jadi pakai “a”.",
+      "reasoningOperationId": "lihat kata urutan “first” → yang pertama cuma satu → the"
+    },
+    {
+      "id": "CO-201",
+      "family": "conditionals",
+      "subskill": "second_conditional_unreal_present",
+      "cefr": "B1",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Use 'would + base verb' in the result clause of an unreal present condition.",
+      "misconceptionTargeted": "Learner puts 'will' or the past simple in the result clause after an unreal if-clause.",
+      "reasoningOperation": "identify a past simple unreal if-clause -> apply would + base verb in the result clause",
+      "stem": "If I had more free time, I ___ a new language.",
+      "options": [
+        "would learn",
+        "will learn",
+        "learned",
+        "would learned"
+      ],
+      "correctIndex": 0,
+      "distractors": [
+        {
+          "option": "will learn",
+          "misconception": "real/likely framing applied to an admittedly unlikely event",
+          "whyFails": "'Will' is for real future plans; the past 'had' shows this is imaginary, so 'would' is needed.",
+          "whyFailsId": "“will” buat rencana nyata. “Had” yang lampau nunjukin ini khayalan, jadi butuh “would”.",
+          "misconceptionId": "situasi yang jelas nggak nyata dibingkai seolah nyata."
+        },
+        {
+          "option": "learned",
+          "misconception": "if-clause verb form mismatched with 'would' in the main clause",
+          "whyFails": "The past simple belongs in the if-clause; the result clause needs 'would'.",
+          "whyFailsId": "past simple tempatnya di klausa if. Klausa akibat butuh “would”.",
+          "misconceptionId": "bentuk klausa if nyasar ke klausa akibat."
+        },
+        {
+          "option": "would learned",
+          "misconception": "duplicating 'would' in both clauses",
+          "whyFails": "After 'would' the verb is bare: would learn, not would learned.",
+          "whyFailsId": "sesudah “would” kata kerjanya polos: would learn, bukan would learned.",
+          "misconceptionId": "would digabung sama bentuk -ed."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "'If I had more free time' describes an unreal present situation, so the result uses 'would learn'.",
+        "rule": "Second conditional: If + past simple, would + base verb.",
+        "whyOthersFail": "'Will learn' treats the situation as real; 'learned' is the if-clause form; 'would learned' adds -ed after would.",
+        "howToAvoid": "See a past-tense if-clause about an imaginary now? Put 'would' plus a bare verb in the result.",
+        "memoryCue": "If I had… I would…",
+        "ruleId": "Second conditional: If + past simple, would + kata kerja dasar.",
+        "whyCorrectId": "“If I had more free time” ngegambarin keadaan sekarang yang nggak nyata, jadi akibatnya pakai “would learn”.",
+        "whyOthersFailId": "“Will learn” nganggap situasinya nyata. “Learned” bentuk buat klausa if. “Would learned” nambah -ed sesudah would.",
+        "howToAvoidId": "Ada klausa if bentuk lampau soal khayalan sekarang? Taruh “would” plus kata kerja polos di akibatnya.",
+        "memoryCueId": "Khayalan sekarang: If I had…, I would…"
+      },
+      "pedagogicalObjectiveId": "Pakai “would + kata kerja dasar” di klausa akibat pengandaian yang nggak nyata sekarang.",
+      "misconceptionTargetedId": "Kamu naruh “will” atau past simple di klausa akibat sesudah klausa if pengandaian.",
+      "reasoningOperationId": "klausa if past simple dan nggak nyata → klausa akibat pakai would + kata kerja dasar"
+    },
+    {
+      "id": "QN-202",
+      "family": "question_negation",
+      "subskill": "question_tag_polarity",
+      "cefr": "B1",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Add a negative tag with the matching auxiliary after a positive statement.",
+      "misconceptionTargeted": "Learner keeps the tag positive or repeats the noun instead of a pronoun.",
+      "reasoningOperation": "check that the statement is positive -> select a negative tag -> match the auxiliary and add a pronoun",
+      "stem": "Your sister works at the hospital, ___?",
+      "options": [
+        "doesn't she",
+        "does she",
+        "isn't she",
+        "doesn't your sister"
+      ],
+      "correctIndex": 0,
+      "distractors": [
+        {
+          "option": "does she",
+          "misconception": "uses a positive tag after a positive statement",
+          "whyFails": "The statement is positive, so the tag must flip to negative: doesn't she.",
+          "whyFailsId": "kalimatnya positif, jadi tag-nya harus dibalik jadi negatif: doesn't she.",
+          "misconceptionId": "tag-nya positif sesudah kalimat positif, padahal harusnya dibalik jadi negatif."
+        },
+        {
+          "option": "isn't she",
+          "misconception": "wrong auxiliary borrowed from a different tense",
+          "whyFails": "'Works' is present simple, so the tag needs 'does', not 'is'.",
+          "whyFailsId": "“works” itu present simple, jadi tag-nya butuh “does”, bukan “is”.",
+          "misconceptionId": "kata bantunya nyasar dari bentuk lain."
+        },
+        {
+          "option": "doesn't your sister",
+          "misconception": "repeats the noun instead of using a pronoun in the tag",
+          "whyFails": "Tags use a pronoun, not the full noun: doesn't she.",
+          "whyFailsId": "tag pakai kata ganti, bukan kata benda utuh: doesn't she.",
+          "misconceptionId": "ngulang kata bendanya di tag, padahal tag pakai kata ganti."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "'Works' is a positive present simple verb, so the tag is negative with 'does' and the pronoun 'she': doesn't she?",
+        "rule": "Positive statement → negative tag; the tag copies the auxiliary of the statement and uses a pronoun.",
+        "whyOthersFail": "'Does she' keeps the same polarity; 'isn't she' uses the wrong auxiliary; 'doesn't your sister' repeats the noun.",
+        "howToAvoid": "Three checks: flip the polarity, match the auxiliary, swap the noun for a pronoun.",
+        "memoryCue": "Works → doesn't she?",
+        "ruleId": "Kalimat positif → tag negatif. Tag niru kata bantu kalimatnya dan pakai kata ganti.",
+        "whyCorrectId": "“Works” itu present simple positif, jadi tag-nya negatif pakai “does” dan kata ganti “she”: doesn't she?",
+        "whyOthersFailId": "“Does she” nggak dibalik. “Isn't she” salah kata bantu. “Doesn't your sister” ngulang kata benda.",
+        "howToAvoidId": "Tiga cek: balik positif-negatifnya, samain kata bantunya, ganti kata benda jadi kata ganti.",
+        "memoryCueId": "Kalimat positif, tag negatif: works → doesn't she?"
+      },
+      "pedagogicalObjectiveId": "Tambahin tag negatif dengan kata bantu yang cocok sesudah kalimat positif.",
+      "misconceptionTargetedId": "Kamu biarin tag-nya positif atau ngulang kata bendanya, bukan kata ganti.",
+      "reasoningOperationId": "kalimatnya positif → tag jadi negatif → kata bantu yang sama + kata ganti"
+    },
+    {
+      "id": "TA-204",
+      "family": "tense_aspect",
+      "subskill": "past_perfect_sequencing_two_past_events",
+      "cefr": "B1",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Use the past perfect for the action that happened first when 'when' introduces a later past action.",
+      "misconceptionTargeted": "Learner uses the past simple or present perfect for the earlier of two past events.",
+      "reasoningOperation": "identify two past events -> select the earlier one -> apply had + past participle",
+      "stem": "When we got to the cinema, the film ___ already ___.",
+      "options": [
+        "had / started",
+        "has / started",
+        "was / starting",
+        "did / start"
+      ],
+      "correctIndex": 0,
+      "distractors": [
+        {
+          "option": "has / started",
+          "misconception": "uses the present perfect for an event before another past event",
+          "whyFails": "'Has started' links to now, but both events are in the past; the earlier one needs 'had'.",
+          "whyFailsId": "“has started” nyambung ke sekarang, padahal dua kejadiannya di masa lampau. Yang lebih dulu butuh “had”.",
+          "misconceptionId": "pakai present perfect buat kejadian yang terjadi sebelum kejadian lampau lain."
+        },
+        {
+          "option": "was / starting",
+          "misconception": "keeps the action in progress at 'now' instead of marking it completed before the past reference point",
+          "whyFails": "'Already' shows the start was complete, not in progress, when we arrived.",
+          "whyFailsId": "“already” nunjukin mulainya udah selesai, bukan lagi berlangsung, waktu kami sampai.",
+          "misconceptionId": "kejadiannya dibiarin masih berlangsung, padahal udah selesai sebelum titik lampau itu."
+        },
+        {
+          "option": "did / start",
+          "misconception": "uses past simple for the earlier event, flattening the sequence",
+          "whyFails": "'Did start' is an emphatic past simple; it does not show that the start came before our arrival.",
+          "whyFailsId": "“did start” itu past simple penegas. Nggak nunjukin mulainya lebih dulu dari kedatangan kami.",
+          "misconceptionId": "past simple dipakai buat kejadian yang lebih dulu, urutannya jadi rata."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "The film started before we arrived, so the earlier event takes the past perfect: had already started.",
+        "rule": "Past perfect (had + past participle) marks the earlier of two past events.",
+        "whyOthersFail": "'Has started' points to now; 'was starting' says it was still beginning; 'did start' does not order the two events.",
+        "howToAvoid": "Two past events? Give 'had' to the one that happened first.",
+        "memoryCue": "First event → had done.",
+        "ruleId": "Past perfect (had + past participle) nandain yang lebih dulu dari dua kejadian lampau.",
+        "whyCorrectId": "Filmnya mulai sebelum kami sampai, jadi kejadian yang lebih dulu pakai past perfect: had already started.",
+        "whyOthersFailId": "“Has started” nunjuk ke sekarang. “Was starting” bilang masih lagi mulai. “Did start” nggak ngurutin dua kejadiannya.",
+        "howToAvoidId": "Dua kejadian lampau? Kasih “had” ke yang terjadi lebih dulu.",
+        "memoryCueId": "Kejadian pertama → had done."
+      },
+      "pedagogicalObjectiveId": "Pakai past perfect buat kejadian yang lebih dulu waktu “when” ngenalin kejadian lampau berikutnya.",
+      "misconceptionTargetedId": "Kamu pakai past simple atau present perfect buat kejadian yang lebih dulu dari dua kejadian lampau.",
+      "reasoningOperationId": "dua kejadian lampau → cari yang lebih dulu → had + past participle"
+    },
+    {
+      "id": "RS-201",
+      "family": "reported_speech",
+      "subskill": "reported_questions_word_order",
+      "cefr": "B1",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Report a wh-question with statement word order and a backshifted verb.",
+      "misconceptionTargeted": "Learner keeps the question inversion or the present tense inside the reported clause.",
+      "reasoningOperation": "identify a direct wh-question -> restore subject + verb order in the reported clause -> backshift the tense",
+      "stem": "\"What time does the shop open?\" → He asked me what time ___.",
+      "options": [
+        "the shop opened",
+        "did the shop open",
+        "the shop opens",
+        "does the shop open"
+      ],
+      "correctIndex": 0,
+      "distractors": [
+        {
+          "option": "did the shop open",
+          "misconception": "keeps the question-form inversion (auxiliary before subject) inside the reported clause",
+          "whyFails": "A reported question uses statement order, so 'did' cannot come before 'the shop'.",
+          "whyFailsId": "pertanyaan yang dilaporin pakai urutan kalimat berita, jadi “did” nggak boleh di depan “the shop”.",
+          "misconceptionId": "urutan pertanyaan (kata bantu sebelum subjek) tetap dipakai di klausa laporan."
+        },
+        {
+          "option": "the shop opens",
+          "misconception": "keeps the present tense inside a reported question after a past reporting verb",
+          "whyFails": "'Asked' is past, so 'opens' normally shifts back to 'opened'.",
+          "whyFailsId": "“asked” lampau, jadi “opens” biasanya mundur jadi “opened”.",
+          "misconceptionId": "tetap pakai bentuk sekarang di dalam pertanyaan yang dilaporin, padahal kata pelapornya lampau."
+        },
+        {
+          "option": "does the shop open",
+          "misconception": "produces an ungrammatical inversion not used in either direct or reported questions in this pattern",
+          "whyFails": "This keeps both the inversion and the present tense of the direct question.",
+          "whyFailsId": "ini masih nyimpen urutan pertanyaan sekaligus bentuk sekarang dari pertanyaan langsungnya.",
+          "misconceptionId": "inversi yang nggak dipakai di pertanyaan langsung maupun laporan."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "In a reported question the subject comes before the verb and the tense shifts back: what time the shop opened.",
+        "rule": "Reported wh-question: question word + subject + verb (no do/does/did), with backshift after a past reporting verb.",
+        "whyOthersFail": "'Did the shop open' and 'does the shop open' keep question order; 'the shop opens' forgets the backshift.",
+        "howToAvoid": "Remove do/does/did, put the subject first, then move the verb one step into the past.",
+        "memoryCue": "Asked what time the shop opened — no 'did'.",
+        "ruleId": "Pertanyaan wh- yang dilaporin: kata tanya + subjek + kata kerja (tanpa do/does/did), bentuk waktunya mundur sesudah kata pelapor lampau.",
+        "whyCorrectId": "Di pertanyaan yang dilaporin, subjek duluan baru kata kerja, dan bentuk waktunya mundur: what time the shop opened.",
+        "whyOthersFailId": "“Did the shop open” dan “does the shop open” masih urutan pertanyaan. “The shop opens” lupa mundurin bentuk waktunya.",
+        "howToAvoidId": "Buang do/does/did, taruh subjek duluan, lalu geser kata kerjanya satu langkah ke lampau.",
+        "memoryCueId": "Asked what time the shop opened — tanpa “did”."
+      },
+      "pedagogicalObjectiveId": "Laporin pertanyaan wh- pakai urutan kalimat berita dan kata kerja yang dimundurin.",
+      "misconceptionTargetedId": "Kamu tetap pakai urutan pertanyaan atau bentuk sekarang di dalam klausa yang dilaporin.",
+      "reasoningOperationId": "pertanyaan wh- langsung → klausa laporan pakai urutan subjek + kata kerja → mundurin bentuk waktunya"
+    },
+    {
+      "id": "QN-203",
+      "family": "question_negation",
+      "subskill": "indirect_questions_embedded_word_order",
+      "cefr": "B1",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Use statement word order without 'do' inside an indirect question.",
+      "misconceptionTargeted": "Learner keeps 'does' or inverts the verb inside 'Do you know...?'.",
+      "reasoningOperation": "identify the opener Do you know -> recall that the embedded part is a statement -> keep subject + verb without does",
+      "stem": "Do you know what time ___?",
+      "options": [
+        "the bank closes",
+        "does the bank close",
+        "the bank does close",
+        "closes the bank"
+      ],
+      "correctIndex": 0,
+      "distractors": [
+        {
+          "option": "does the bank close",
+          "misconception": "keeps direct-question inversion (verb before subject) inside the embedded clause",
+          "whyFails": "The question is already made by 'Do you know'; the embedded part cannot repeat the question form.",
+          "whyFailsId": "pertanyaannya udah dibikin sama “Do you know”. Bagian dalamnya nggak boleh ngulang bentuk pertanyaan.",
+          "misconceptionId": "urutan pertanyaan langsung (kata kerja sebelum subjek) tetap dipakai di klausa yang ditempel."
+        },
+        {
+          "option": "the bank does close",
+          "misconception": "adds 'do' to an embedded question",
+          "whyFails": "Statement order is right, but 'does' is not needed; the verb simply takes -s: closes.",
+          "whyFailsId": "urutannya udah bener, tapi “does” nggak dibutuhin. Kata kerjanya cukup pakai -s: closes.",
+          "misconceptionId": "nambahin “do” ke pertanyaan yang ditempel, padahal di dalam kalimat nggak butuh do."
+        },
+        {
+          "option": "closes the bank",
+          "misconception": "moves the auxiliary to the very front of the embedded clause, producing an invalid word order",
+          "whyFails": "Putting the verb before the subject is not English word order here.",
+          "whyFailsId": "naruh kata kerja sebelum subjek bukan urutan bahasa Inggris di sini.",
+          "misconceptionId": "kata kerja dipindah ke depan subjek, urutannya nggak sah."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "After 'Do you know what time', the rest is a normal statement: the bank closes.",
+        "rule": "Indirect question: introduction + question word + subject + verb. No do/does/did in the embedded part.",
+        "whyOthersFail": "'Does the bank close' repeats the question form; 'the bank does close' adds an unnecessary auxiliary; 'closes the bank' inverts wrongly.",
+        "howToAvoid": "Say the embedded part alone as a statement first, then attach it.",
+        "memoryCue": "Do you know + statement.",
+        "ruleId": "Pertanyaan nggak langsung: pembuka + kata tanya + subjek + kata kerja. Tanpa do/does/did di bagian dalamnya.",
+        "whyCorrectId": "Sesudah “Do you know what time”, sisanya kalimat berita biasa: the bank closes.",
+        "whyOthersFailId": "“Does the bank close” ngulang bentuk pertanyaan. “The bank does close” nambah kata bantu yang nggak perlu. “Closes the bank” kebalik.",
+        "howToAvoidId": "Ucapin bagian dalamnya sebagai kalimat berita dulu, baru tempelin.",
+        "memoryCueId": "Do you know + kalimat berita."
+      },
+      "pedagogicalObjectiveId": "Pakai urutan kalimat berita tanpa “do” di dalam pertanyaan nggak langsung.",
+      "misconceptionTargetedId": "Kamu tetap pakai “does” atau ngebalik kata kerjanya di dalam “Do you know...?”.",
+      "reasoningOperationId": "pertanyaannya mulai dari “Do you know” → bagian dalamnya kalimat berita → subjek + kata kerja, tanpa does"
+    },
+    {
+      "id": "CO-202",
+      "family": "conditionals",
+      "subskill": "wish_unreal_present_past_simple",
+      "cefr": "B1",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Use 'could' after 'wish' for an ability the speaker does not have now.",
+      "misconceptionTargeted": "Learner uses 'can' or 'would' after 'wish' for the speaker's own present situation.",
+      "reasoningOperation": "identify a wish about now -> shift the verb one step back -> convert can to could",
+      "stem": "I can't swim. I wish I ___ swim like my brother.",
+      "options": [
+        "could",
+        "can",
+        "would",
+        "will"
+      ],
+      "correctIndex": 0,
+      "distractors": [
+        {
+          "option": "can",
+          "misconception": "keeping the present tense after 'wish', reading the situation as a real current fact",
+          "whyFails": "After 'wish' the verb steps back: 'can' becomes 'could'.",
+          "whyFailsId": "sesudah “wish” kata kerjanya mundur: “can” jadi “could”.",
+          "misconceptionId": "bentuk sekarang dibiarin sesudah wish, situasinya dibaca sebagai fakta nyata."
+        },
+        {
+          "option": "would",
+          "misconception": "uses 'would' in the wish clause about one's own situation",
+          "whyFails": "'Wish + would' is for other people's annoying behaviour, not the speaker's own ability.",
+          "whyFailsId": "“wish + would” buat kelakuan orang lain yang nyebelin, bukan kemampuan diri sendiri.",
+          "misconceptionId": "pakai “would” di klausa wish soal diri sendiri, padahal wish + past simple."
+        },
+        {
+          "option": "will",
+          "misconception": "inserting 'would' for the speaker's own situation, as if the sentence were a result clause",
+          "whyFails": "'Will' points to a real future; 'wish' describes an unreal present.",
+          "whyFailsId": "“will” nunjuk masa depan nyata. “Wish” ngegambarin keadaan sekarang yang nggak nyata.",
+          "misconceptionId": "bentuk masa depan nyata dipakai buat harapan yang nggak nyata."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "The speaker cannot swim now and wishes the opposite, so 'wish' takes the past form: could swim.",
+        "rule": "Wish about the present: wish + past simple (or could). Can → could.",
+        "whyOthersFail": "'Can' stays in the present; 'would' is for complaints about others; 'will' is a real future form.",
+        "howToAvoid": "Turn the real sentence into its opposite and move the verb one step back.",
+        "memoryCue": "Can't swim → wish I could.",
+        "ruleId": "Wish soal sekarang: wish + past simple (atau could). Can → could.",
+        "whyCorrectId": "Pembicara nggak bisa berenang sekarang dan berharap sebaliknya, jadi “wish” pakai bentuk lampau: could swim.",
+        "whyOthersFailId": "“Can” tetap di sekarang. “Would” buat keluhan soal orang lain. “Will” bentuk masa depan nyata.",
+        "howToAvoidId": "Balik kalimat nyatanya jadi kebalikannya, lalu geser kata kerjanya satu langkah ke lampau.",
+        "memoryCueId": "Nggak bisa sekarang, jadi wish I could: can't swim → wish I could."
+      },
+      "pedagogicalObjectiveId": "Pakai “could” sesudah “wish” buat kemampuan yang nggak dimiliki pembicara sekarang.",
+      "misconceptionTargetedId": "Kamu pakai “can” atau “would” sesudah “wish” buat keadaan diri sendiri sekarang.",
+      "reasoningOperationId": "wish soal sekarang → mundur satu langkah → can jadi could"
+    },
+    {
+      "id": "TA-205",
+      "family": "tense_aspect",
+      "subskill": "present_perfect_just_already_yet_placement",
+      "cefr": "B1",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Place 'already' between 'have' and the past participle in a positive statement.",
+      "misconceptionTargeted": "Learner uses 'yet' in a positive statement or pushes 'already' to the end.",
+      "reasoningOperation": "identify a positive statement about a completed action -> select already -> place it after have",
+      "stem": "You don't need to wash the dishes — I ___ them.",
+      "options": [
+        "have already washed",
+        "have washed yet",
+        "already have washed",
+        "have washed already yet"
+      ],
+      "correctIndex": 0,
+      "distractors": [
+        {
+          "option": "have washed yet",
+          "misconception": "uses 'yet' in a positive statement",
+          "whyFails": "'Yet' belongs in negatives and questions, not in a positive statement.",
+          "whyFailsId": "“yet” tempatnya di kalimat negatif dan pertanyaan, bukan kalimat positif.",
+          "misconceptionId": "pakai “yet” di kalimat positif, padahal yet buat negatif dan pertanyaan."
+        },
+        {
+          "option": "already have washed",
+          "misconception": "drags 'just' to the end of the clause instead of mid-position between the auxiliary and the participle",
+          "whyFails": "'Already' sits between 'have' and the participle, not before 'have'.",
+          "whyFailsId": "“already” duduk di antara “have” dan participle, bukan sebelum “have”.",
+          "misconceptionId": "kata keterangannya nggak di posisi tengah antara kata bantu dan participle."
+        },
+        {
+          "option": "have washed already yet",
+          "misconception": "parks 'still' at the end of a negative clause instead of before the auxiliary",
+          "whyFails": "'Already' and 'yet' cannot be combined; one word is enough.",
+          "whyFailsId": "“already” dan “yet” nggak bisa digabung. Satu kata udah cukup.",
+          "misconceptionId": "kata keterangan waktunya ditumpuk di ujung."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "The dishes are done, so the positive statement uses 'already' in mid-position: have already washed.",
+        "rule": "Have + already/just + past participle in positive statements; 'yet' goes at the end of negatives and questions.",
+        "whyOthersFail": "'Yet' is not for positive statements; 'already have washed' misplaces the adverb; 'already yet' doubles the time word.",
+        "howToAvoid": "Positive and finished? Slip 'already' right after 'have'.",
+        "memoryCue": "Have already done — not yet.",
+        "ruleId": "Have + already/just + past participle di kalimat positif. “Yet” di ujung kalimat negatif dan pertanyaan.",
+        "whyCorrectId": "Piringnya udah beres, jadi kalimat positifnya pakai “already” di posisi tengah: have already washed.",
+        "whyOthersFailId": "“Yet” bukan buat kalimat positif. “Already have washed” salah tempat. “Already yet” kata waktunya dobel.",
+        "howToAvoidId": "Positif dan udah selesai? Selipin “already” langsung sesudah “have”.",
+        "memoryCueId": "Positif pakai already di tengah, negatif pakai yet di ujung."
+      },
+      "pedagogicalObjectiveId": "Taruh “already” di antara “have” dan past participle di kalimat positif.",
+      "misconceptionTargetedId": "Kamu pakai “yet” di kalimat positif atau ngedorong “already” ke ujung.",
+      "reasoningOperationId": "kalimat positif soal aksi yang selesai → already → posisi tengah sesudah have"
+    },
+    {
+      "id": "PD-201",
+      "family": "pronouns_determiners",
+      "subskill": "reflexive_pronouns_myself_vs_each_other",
+      "cefr": "B1",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Use 'each other' when two people do the same action to one another.",
+      "misconceptionTargeted": "Learner uses a reflexive pronoun for a two-way action between two people.",
+      "reasoningOperation": "identify two people acting on one another -> select each other, not -selves",
+      "stem": "Maya and Dito are best friends. They tell ___ everything.",
+      "options": [
+        "each other",
+        "themselves",
+        "them",
+        "theirselves"
+      ],
+      "correctIndex": 0,
+      "distractors": [
+        {
+          "option": "themselves",
+          "misconception": "uses a reflexive pronoun where the plain object pronoun is needed",
+          "whyFails": "'Themselves' means each person tells their own self; here Maya tells Dito and Dito tells Maya.",
+          "whyFailsId": "“themselves” artinya tiap orang cerita ke dirinya sendiri. Di sini Maya cerita ke Dito dan Dito ke Maya.",
+          "misconceptionId": "pakai kata ganti diri (-self), padahal pelaku dan objeknya orang yang beda."
+        },
+        {
+          "option": "them",
+          "misconception": "uses the plain object pronoun although subject and object are the same person",
+          "whyFails": "'Them' points to other people outside the pair, not to Maya and Dito.",
+          "whyFailsId": "“them” nunjuk orang lain di luar mereka berdua, bukan Maya dan Dito.",
+          "misconceptionId": "kata ganti objek biasa dipakai padahal subjek dan objeknya orang yang sama."
+        },
+        {
+          "option": "theirselves",
+          "misconception": "picks a reflexive that does not match the person of the subject",
+          "whyFails": "'Theirselves' is not an English word; the reflexive is 'themselves', and even that is wrong here.",
+          "whyFailsId": "“theirselves” bukan kata bahasa Inggris. Bentuknya “themselves”, dan itu pun salah di sini.",
+          "misconceptionId": "kata ganti diri yang nggak cocok sama subjeknya."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "The telling goes in both directions between two people, so 'each other' is the right choice.",
+        "rule": "Each other = A → B and B → A. -selves = the subject acts on itself.",
+        "whyOthersFail": "'Themselves' turns the action inward; 'them' refers to outsiders; 'theirselves' does not exist.",
+        "howToAvoid": "Draw two arrows between the people. Both directions? Use 'each other'.",
+        "memoryCue": "Each other = two-way.",
+        "ruleId": "Each other = A → B dan B → A. -selves = subjek ngelakuin ke dirinya sendiri.",
+        "whyCorrectId": "Ceritanya dua arah antara dua orang, jadi “each other” yang pas.",
+        "whyOthersFailId": "“Themselves” bikin aksinya ke diri sendiri. “Them” nunjuk orang lain di luar. “Theirselves” nggak ada.",
+        "howToAvoidId": "Gambar dua panah di antara orangnya. Dua arah? Pakai “each other”.",
+        "memoryCueId": "Each other = dua arah."
+      },
+      "pedagogicalObjectiveId": "Pakai “each other” kalau dua orang saling ngelakuin hal yang sama.",
+      "misconceptionTargetedId": "Kamu pakai kata ganti diri (-selves) buat aksi timbal balik antara dua orang.",
+      "reasoningOperationId": "dua orang, aksinya dua arah → each other, bukan -selves"
+    },
+    {
+      "id": "CO-203",
+      "family": "conditionals",
+      "subskill": "third_conditional_unreal_past",
+      "cefr": "B2",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Use 'would have + past participle' in the result clause of an unreal past condition.",
+      "misconceptionTargeted": "Learner puts the past simple or 'would + verb' in the result clause after a past perfect if-clause.",
+      "reasoningOperation": "identify past perfect in the if-clause -> recall the unreal past -> apply would have + past participle in the result",
+      "stem": "If you had told me about the party, I ___.",
+      "options": [
+        "would have come",
+        "would come",
+        "came",
+        "had come"
+      ],
+      "correctIndex": 0,
+      "distractors": [
+        {
+          "option": "would come",
+          "misconception": "uses second-conditional past simple in an if-clause that needs third-conditional past perfect",
+          "whyFails": "'Would come' talks about an unreal present or future; the party is already in the past.",
+          "whyFailsId": "“would come” ngomongin sekarang atau masa depan yang nggak nyata. Pestanya udah lewat.",
+          "misconceptionId": "bentuk second conditional dipakai buat pengandaian lampau."
+        },
+        {
+          "option": "came",
+          "misconception": "uses the past simple in the result clause of a third conditional",
+          "whyFails": "'Came' states a real past event, but the speaker did not come.",
+          "whyFailsId": "“came” nyatain kejadian lampau nyata, padahal pembicaranya nggak datang.",
+          "misconceptionId": "pakai past simple di klausa akibat pengandaian lampau, padahal butuh would have + past participle."
+        },
+        {
+          "option": "had come",
+          "misconception": "duplicates 'would' in both clauses",
+          "whyFails": "'Had come' is the if-clause form; the result clause needs 'would have'.",
+          "whyFailsId": "“had come” bentuk buat klausa if. Klausa akibat butuh “would have”.",
+          "misconceptionId": "bentuk klausa if nyasar ke klausa akibat."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "The party is over and the speaker did not go, so the imagined result uses 'would have come'.",
+        "rule": "Third conditional: If + past perfect, would have + past participle.",
+        "whyOthersFail": "'Would come' is second conditional; 'came' is a real past; 'had come' copies the if-clause form.",
+        "howToAvoid": "Past perfect in the if-clause? Answer with 'would have' plus the participle.",
+        "memoryCue": "If you had told me, I would have come.",
+        "ruleId": "Third conditional: If + past perfect, would have + past participle.",
+        "whyCorrectId": "Pestanya udah lewat dan pembicara nggak datang, jadi akibat khayalannya pakai “would have come”.",
+        "whyOthersFailId": "“Would come” itu second conditional. “Came” lampau nyata. “Had come” niru bentuk klausa if.",
+        "howToAvoidId": "Past perfect di klausa if? Jawab pakai “would have” plus participle.",
+        "memoryCueId": "Pengandaian lampau: If you had told me, I would have come."
+      },
+      "pedagogicalObjectiveId": "Pakai “would have + past participle” di klausa akibat pengandaian lampau yang nggak nyata.",
+      "misconceptionTargetedId": "Kamu naruh past simple atau “would + kata kerja” di klausa akibat sesudah klausa if past perfect.",
+      "reasoningOperationId": "klausa if pakai past perfect → pengandaian lampau → akibatnya would have + past participle"
+    },
+    {
+      "id": "PA-201",
+      "family": "passive",
+      "subskill": "passive_with_modal_verbs",
+      "cefr": "B2",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Build a modal passive with 'can be + past participle'.",
+      "misconceptionTargeted": "Learner drops 'be' after the modal or puts it after the participle.",
+      "reasoningOperation": "identify the modal with a passive meaning -> apply modal + be + past participle",
+      "stem": "These tickets ___ online or at the station.",
+      "options": [
+        "can be bought",
+        "can bought",
+        "can buy",
+        "can be buy"
+      ],
+      "correctIndex": 0,
+      "distractors": [
+        {
+          "option": "can bought",
+          "misconception": "omits the auxiliary 'be' required to form the passive after a modal",
+          "whyFails": "A passive needs 'be' between the modal and the participle: can be bought.",
+          "whyFailsId": "pasif butuh “be” di antara modal dan participle: can be bought.",
+          "misconceptionId": "kata bantu be yang dibutuhin pasif sesudah modal dibuang."
+        },
+        {
+          "option": "can buy",
+          "misconception": "leaves the verb in active form after the modal",
+          "whyFails": "'Tickets can buy' makes the tickets do the buying; the tickets are bought, so the passive is needed.",
+          "whyFailsId": "“tickets can buy” bikin tiketnya yang beli. Tiketnya yang dibeli, jadi butuh pasif.",
+          "misconceptionId": "kata kerjanya dibiarin aktif sesudah modal."
+        },
+        {
+          "option": "can be buy",
+          "misconception": "puts 'be' after the past participle in a modal passive",
+          "whyFails": "After 'be' the verb must be the past participle 'bought', not the bare 'buy'.",
+          "whyFailsId": "sesudah “be” kata kerjanya harus past participle “bought”, bukan “buy” polos.",
+          "misconceptionId": "naruh “be” sesudah past participle, padahal urutannya modal + be + past participle."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "Tickets receive the action, so the modal passive is 'can be bought'.",
+        "rule": "Modal passive: modal + be + past participle (must be signed, can be bought).",
+        "whyOthersFail": "'Can bought' lacks 'be'; 'can buy' is active; 'can be buy' uses the bare verb instead of the participle.",
+        "howToAvoid": "Three pieces, always in this order: modal, be, participle.",
+        "memoryCue": "Can + be + bought.",
+        "ruleId": "Pasif modal: modal + be + past participle (must be signed, can be bought).",
+        "whyCorrectId": "Tiketnya yang dikenai aksi, jadi pasif modalnya “can be bought”.",
+        "whyOthersFailId": "“Can bought” kurang “be”. “Can buy” aktif. “Can be buy” pakai kata kerja polos, bukan participle.",
+        "howToAvoidId": "Tiga bagian, urutannya selalu: modal, be, participle.",
+        "memoryCueId": "Modal pasif itu tiga bagian: can + be + bought."
+      },
+      "pedagogicalObjectiveId": "Bikin pasif dengan modal pakai “can be + past participle”.",
+      "misconceptionTargetedId": "Kamu ngilangin “be” sesudah modal atau naruhnya sesudah participle.",
+      "reasoningOperationId": "modal + makna pasif → modal + be + past participle"
+    },
+    {
+      "id": "PA-202",
+      "family": "passive",
+      "subskill": "causative_have_get_something_done",
+      "cefr": "B2",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Use 'have + object + past participle' when someone else does the job for you.",
+      "misconceptionTargeted": "Learner says the subject did the job themselves or puts 'by' before the person who arranges it.",
+      "reasoningOperation": "identify that someone else does the work -> apply have + object + past participle",
+      "stem": "My hair is too long. I'm going to ___ tomorrow.",
+      "options": [
+        "have it cut",
+        "cut it",
+        "have it cutting",
+        "have cut it by me"
+      ],
+      "correctIndex": 0,
+      "distractors": [
+        {
+          "option": "cut it",
+          "misconception": "confuses the causative 'have/get' pattern with 'make someone do something'",
+          "whyFails": "'Cut it' means I do the cutting myself; the speaker goes to a hairdresser.",
+          "whyFailsId": "“cut it” artinya aku yang motong sendiri, padahal pembicara pergi ke tukang cukur.",
+          "misconceptionId": "pola have/get ketuker sama ngerjain sendiri."
+        },
+        {
+          "option": "have it cutting",
+          "misconception": "uses the -ing form instead of the past participle after 'get'",
+          "whyFails": "The causative needs the past participle 'cut', not '-ing'.",
+          "whyFailsId": "causative butuh past participle “cut”, bukan -ing.",
+          "misconceptionId": "bentuk -ing dipakai, bukan past participle."
+        },
+        {
+          "option": "have cut it by me",
+          "misconception": "puts 'by' before the person who has the work done",
+          "whyFails": "The object comes before the participle, and 'by me' contradicts the idea that someone else does it.",
+          "whyFailsId": "objeknya harus sebelum participle, dan “by me” bertentangan sama ide orang lain yang ngerjain.",
+          "misconceptionId": "naruh “by” di depan orang yang nyuruh, padahal dia subjeknya, bukan pelakunya."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "A hairdresser will do the cutting, so the causative 'have it cut' is used.",
+        "rule": "Causative: have/get + object + past participle = someone else does it for you.",
+        "whyOthersFail": "'Cut it' is doing it yourself; 'have it cutting' uses -ing; 'have cut it by me' breaks the order and the meaning.",
+        "howToAvoid": "Ask who really does the job. Someone else? Use have + thing + participle.",
+        "memoryCue": "Have it cut = the hairdresser cuts it.",
+        "ruleId": "Causative: have/get + objek + past participle = orang lain yang ngerjain buat kamu.",
+        "whyCorrectId": "Tukang cukur yang bakal motong, jadi pakai causative “have it cut”.",
+        "whyOthersFailId": "“Cut it” artinya motong sendiri. “Have it cutting” pakai -ing. “Have cut it by me” ngerusak urutan dan maknanya.",
+        "howToAvoidId": "Tanya siapa yang beneran ngerjain. Orang lain? Pakai have + benda + participle.",
+        "memoryCueId": "Have it cut = tukang cukur yang motong."
+      },
+      "pedagogicalObjectiveId": "Pakai “have + objek + past participle” kalau orang lain yang ngerjain buat kamu.",
+      "misconceptionTargetedId": "Kamu bilang subjeknya ngerjain sendiri, atau naruh “by” di depan orang yang nyuruh.",
+      "reasoningOperationId": "orang lain yang ngerjain → have + objek + past participle"
+    },
+    {
+      "id": "RC-201",
+      "family": "relative_clauses",
+      "subskill": "relative_pronoun_whose_possession",
+      "cefr": "B2",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Use 'whose' to link a person to something they own inside a relative clause.",
+      "misconceptionTargeted": "Learner uses 'who' or 'which' although the clause shows possession.",
+      "reasoningOperation": "check that the noun after the gap belongs to the person -> identify possession -> select whose",
+      "stem": "I have a friend ___ father is a pilot.",
+      "options": [
+        "whose",
+        "who",
+        "which",
+        "who's"
+      ],
+      "correctIndex": 0,
+      "distractors": [
+        {
+          "option": "who",
+          "misconception": "uses the subject relative pronoun without showing the required possessive relationship",
+          "whyFails": "'Who father' has no link of ownership; the father belongs to the friend, so 'whose' is needed.",
+          "whyFailsId": "“who father” nggak ada hubungan kepemilikan. Ayahnya milik si teman, jadi butuh “whose”.",
+          "misconceptionId": "kata ganti relatif subjek dipakai tanpa nunjukin kepemilikan."
+        },
+        {
+          "option": "which",
+          "misconception": "uses 'which' for a person",
+          "whyFails": "'Which' is for things, and it does not show possession either.",
+          "whyFailsId": "“which” buat benda, dan juga nggak nunjukin kepemilikan.",
+          "misconceptionId": "pakai “which” buat orang, padahal which cuma buat benda atau hewan."
+        },
+        {
+          "option": "who's",
+          "misconception": "confuses the contraction 'who's' (who is / who has) with the possessive relative pronoun 'whose'",
+          "whyFails": "'Who's' means 'who is'; 'a friend who is father' makes no sense.",
+          "whyFailsId": "“who's” artinya “who is”. “A friend who is father” nggak masuk akal.",
+          "misconceptionId": "singkatan “who's” (who is) ketuker sama “whose”."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "The father is the friend's father, so the possessive relative pronoun 'whose' connects them.",
+        "rule": "Whose + noun shows that the noun belongs to the person or thing just mentioned.",
+        "whyOthersFail": "'Who' and 'which' show no possession; 'who's' is a contraction of 'who is'.",
+        "howToAvoid": "Can you say 'his/her/its' before the next noun? Then the relative word is 'whose'.",
+        "memoryCue": "Whose = his/her in a relative clause.",
+        "ruleId": "Whose + kata benda nunjukin kata benda itu milik orang atau benda yang baru disebut.",
+        "whyCorrectId": "Ayahnya itu ayah si teman, jadi kata ganti relatif kepemilikan “whose” yang nyambungin.",
+        "whyOthersFailId": "“Who” dan “which” nggak nunjukin kepemilikan. “Who's” singkatan “who is”.",
+        "howToAvoidId": "Bisa bilang “his/her/its” di depan kata benda berikutnya? Kata relatifnya “whose”.",
+        "memoryCueId": "Whose = his/her di klausa relatif."
+      },
+      "pedagogicalObjectiveId": "Pakai “whose” buat nyambungin orang sama sesuatu yang dia punya di dalam klausa relatif.",
+      "misconceptionTargetedId": "Kamu pakai “who” atau “which”, padahal klausanya nunjukin kepemilikan.",
+      "reasoningOperationId": "kata benda sesudah titik-titik itu milik orangnya → kepemilikan → whose"
+    },
+    {
+      "id": "LD-202",
+      "family": "linking_devices",
+      "subskill": "contrast_connectors_although_despite_however_distinction",
+      "cefr": "B2",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Use 'although' before a full clause to show contrast.",
+      "misconceptionTargeted": "Learner puts 'despite' or 'however' in front of a clause with a subject and verb.",
+      "reasoningOperation": "check that what follows has a subject and verb -> identify a clause -> select although, not despite",
+      "stem": "___ she was tired, she finished her homework.",
+      "options": [
+        "Although",
+        "Despite",
+        "However",
+        "But"
+      ],
+      "correctIndex": 0,
+      "distractors": [
+        {
+          "option": "Despite",
+          "misconception": "puts 'despite' before a full clause",
+          "whyFails": "'Despite' takes a noun or -ing ('despite being tired'), not 'she was tired'.",
+          "whyFailsId": "“despite” pakai kata benda atau -ing (“despite being tired”), bukan “she was tired”.",
+          "misconceptionId": "naruh “despite” di depan klausa utuh, padahal despite cuma buat kata benda atau -ing."
+        },
+        {
+          "option": "However",
+          "misconception": "Treats 'however' as a subordinating connector that can start a sentence and directly attach to a noun.",
+          "whyFails": "'However' links two separate sentences and is followed by a comma; it cannot join two clauses in one sentence like this.",
+          "whyFailsId": "“however” nyambungin dua kalimat terpisah dan diikuti koma. Nggak bisa ngegabung dua klausa dalam satu kalimat begini.",
+          "misconceptionId": "“however” dianggap bisa buka kalimat dan langsung nyambung ke klausa."
+        },
+        {
+          "option": "But",
+          "misconception": "uses 'but' as a subordinating connector at the start of the sentence",
+          "whyFails": "'But' joins clauses in the middle of a sentence, not at the very start before a comma-linked clause.",
+          "whyFailsId": "“but” ngegabung klausa di tengah kalimat, bukan di paling depan sebelum klausa berkoma.",
+          "misconceptionId": "pakai “but” di awal kalimat buat ngegabung dua klausa, padahal but cuma nyambung di tengah."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "'She was tired' is a full clause, so the contrast connector must be 'although'.",
+        "rule": "Although + clause; despite + noun/-ing; however + comma, starting a new sentence.",
+        "whyOthersFail": "'Despite' needs a noun; 'however' needs its own sentence; 'but' cannot open a two-clause sentence this way.",
+        "howToAvoid": "Look at what follows the gap: subject + verb means 'although'.",
+        "memoryCue": "Although + she was… / Despite + being…",
+        "ruleId": "Although + klausa. Despite + kata benda/-ing. However + koma, buka kalimat baru.",
+        "whyCorrectId": "“She was tired” klausa utuh, jadi penghubung pertentangannya harus “although”.",
+        "whyOthersFailId": "“Despite” butuh kata benda. “However” butuh kalimat sendiri. “But” nggak bisa buka kalimat dua klausa kayak ini.",
+        "howToAvoidId": "Lihat yang ngikut sesudah titik-titik: subjek + kata kerja berarti “although”.",
+        "memoryCueId": "Although ketemu klausa, despite ketemu kata benda: although she was… / despite being…"
+      },
+      "pedagogicalObjectiveId": "Pakai “although” di depan klausa utuh buat nunjukin pertentangan.",
+      "misconceptionTargetedId": "Kamu naruh “despite” atau “however” di depan klausa yang punya subjek dan kata kerja.",
+      "reasoningOperationId": "yang ngikut punya subjek + kata kerja → klausa → although, bukan despite"
+    },
+    {
+      "id": "LD-203",
+      "family": "linking_devices",
+      "subskill": "result_connectors_so_such_that_therefore_distinction",
+      "cefr": "B2",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Use 'such a' before adjective + singular noun in a result structure.",
+      "misconceptionTargeted": "Learner uses 'so' before a noun phrase or drops the article after 'such'.",
+      "reasoningOperation": "identify adjective + singular noun after the gap -> select such a, not so",
+      "stem": "It was ___ good film that we watched it twice.",
+      "options": [
+        "such a",
+        "so",
+        "such",
+        "so a"
+      ],
+      "correctIndex": 0,
+      "distractors": [
+        {
+          "option": "so",
+          "misconception": "uses 'so' before a noun phrase with an adjective",
+          "whyFails": "'So' goes before an adjective alone ('so good'); before 'good film' the word is 'such a'.",
+          "whyFailsId": "“so” di depan kata sifat aja (“so good”). Di depan “good film” katanya “such a”.",
+          "misconceptionId": "pakai “so” di depan kata sifat + kata benda, padahal di situ butuh “such”."
+        },
+        {
+          "option": "such",
+          "misconception": "drops the article after 'such' before a singular noun",
+          "whyFails": "'Film' is singular and countable, so it needs 'a' after 'such'.",
+          "whyFailsId": "“film” tunggal dan bisa dihitung, jadi butuh “a” sesudah “such”.",
+          "misconceptionId": "ngilangin “a” sesudah such, padahal kata benda tunggalnya butuh artikel."
+        },
+        {
+          "option": "so a",
+          "misconception": "Inserts an article as if a noun were about to follow.",
+          "whyFails": "'So' never takes an article after it; the pattern with a noun is 'such a'.",
+          "whyFailsId": "“so” nggak pernah diikuti artikel. Pola sama kata benda itu “such a”.",
+          "misconceptionId": "artikel disisipin seolah ada kata benda yang ngikut so."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "'Good film' is adjective + singular noun, so the result structure uses 'such a … that'.",
+        "rule": "So + adjective … that; such (a/an) + adjective + noun … that.",
+        "whyOthersFail": "'So' cannot stand before a noun phrase; 'such' needs 'a' before a singular noun; 'so a' is not a pattern.",
+        "howToAvoid": "Is there a noun after the adjective? Yes → such (a). No → so.",
+        "memoryCue": "So good / such a good film.",
+        "ruleId": "So + kata sifat … that. Such (a/an) + kata sifat + kata benda … that.",
+        "whyCorrectId": "“Good film” itu kata sifat + kata benda tunggal, jadi struktur akibatnya pakai “such a … that”.",
+        "whyOthersFailId": "“So” nggak bisa berdiri di depan frasa kata benda. “Such” butuh “a” sebelum kata benda tunggal. “So a” bukan pola.",
+        "howToAvoidId": "Ada kata benda sesudah kata sifatnya? Ya → such (a). Nggak → so.",
+        "memoryCueId": "So ketemu kata sifat aja, such a ketemu kata sifat + kata benda: so good / such a good film."
+      },
+      "pedagogicalObjectiveId": "Pakai “such a” di depan kata sifat + kata benda tunggal di struktur akibat.",
+      "misconceptionTargetedId": "Kamu pakai “so” di depan frasa kata benda, atau ngilangin artikel sesudah “such”.",
+      "reasoningOperationId": "yang ngikut kata sifat + kata benda tunggal → such a, bukan so"
     }
   ],
   "schemaVersion": "2.0.0",
   "practiceBlueprintVersion": "focused-25-v1",
   "indonesianCoverage": {
-    "translated": 249,
-    "total": 249,
-    "updatedAt": "2026-08-31"
+    "translated": 282,
+    "total": 282,
+    "updatedAt": "2026-09-04"
   }
 }

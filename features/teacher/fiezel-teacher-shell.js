@@ -8,7 +8,7 @@
   if (!root) return;
   var S = function () { return root.FiezelTeacherStore; };
   var el = null, env = {}, st = null, ui = { modal: null, drawer: null, filter: '', insightSkill: 'past_tense', attDate: null, pick: {}, syncing: false }, syncTimer = null;
-  var SYNC_EVERY_MS = 45000;
+  var SYNC_EVERY_MS = 90000;
   var NAV = [['briefing', 'Briefing', 'sunrise'], ['classes', 'Kelas & Siswa', 'users'], ['assignments', 'Tugas & Ujian', 'clipboard-list'], ['insights', 'Analitik', 'activity'], ['comms', 'Komunikasi', 'megaphone'], ['journal', 'Jurnal Guru', 'notebook-pen']];
   var TITLE = { briefing: 'Briefing hari ini', classes: 'Kelas & Siswa', assignments: 'Tugas & Ujian', insights: 'Analitik & Deteksi Dini', comms: 'Komunikasi', journal: 'Jurnal Guru', settings: 'Profil Guru' };
 
@@ -52,15 +52,13 @@
     if (avail !== 'ok') { if (!quiet) toast(T.syncLabel(cls()).text); return Promise.resolve(); }
     if (ui.syncing || !st.classes.length) return Promise.resolve();
     ui.syncing = true; render();
-    var total = { ingested: 0, graded: 0, names: [], failed: 0, events: [] };
-    return st.classes.reduce(function (p, c) { return p.then(function () { return T.syncClass(c).then(function (r) { if (r.ok) { total.ingested += r.ingested; total.graded += r.graded; total.names = total.names.concat(r.names || []); total.events = total.events.concat(r.events || []); } else total.failed++; }); }); }, Promise.resolve())
+    var total = { ingested: 0, graded: 0, names: [], failed: 0 };
+    return st.classes.reduce(function (p, c) { return p.then(function () { return T.syncClass(c).then(function (r) { if (r.ok) { total.ingested += r.ingested; total.graded += r.graded; total.names = total.names.concat(r.names || []); } else total.failed++; }); }); }, Promise.resolve())
       .then(function () {
         ui.syncing = false; st.lastSyncAt = Date.now();
         if (total.ingested) saveMinutes(total.ingested * 4 + total.graded * 5);
-        total.events.forEach(function (e) { T.notify(st, e); });
         persist(); render();
-        if (total.events.length) { var top = total.events.filter(function (e) { return e.kind === 'assignment_done'; })[0] || total.events[0]; toast(T.inboxText(top) + (total.events.length > 1 ? ' · +' + (total.events.length - 1) + ' kabar lain' : '')); }
-        else if (total.ingested) toast(total.ingested + ' laporan murid masuk' + (total.graded ? ' · ' + total.graded + ' tugas dinilai otomatis' : '') + '.');
+        if (total.ingested) toast(total.ingested + ' laporan murid masuk' + (total.graded ? ' · ' + total.graded + ' tugas dinilai otomatis' : '') + (total.names.length ? ' (' + total.names.slice(0, 3).join(', ') + (total.names.length > 3 ? '…' : '') + ')' : '') + '.');
         else if (!quiet) toast(total.failed ? 'Sinkron gagal untuk ' + total.failed + ' kelas.' : 'Tersinkron — belum ada laporan baru.');
       });
   }
@@ -82,7 +80,7 @@
     startAutoSync();
   }
   function unmount() { stopAutoSync(); document.body.classList.remove('fz-teacher-mode'); document.removeEventListener('keydown', onKey); if (el) { el.removeEventListener('click', onClick); el.removeEventListener('submit', onSubmit); el.removeEventListener('change', onChange); el.removeEventListener('input', onInput); } el = null; ui.modal = null; ui.drawer = null; }
-  function onKey(e) { if (e.key === 'Escape' && (ui.modal || ui.drawer || ui.inbox)) { ui.modal = null; ui.drawer = null; ui.inbox = false; render(); } }
+  function onKey(e) { if (e.key === 'Escape' && (ui.modal || ui.drawer)) { ui.modal = null; ui.drawer = null; render(); } }
   function isTeacherRole() {
     try {
       return (root.FiezelAccount && root.FiezelAccount.isTeacher && root.FiezelAccount.isTeacher()) ||
@@ -127,20 +125,7 @@
   function topbar(c) {
     var d = new Date();
     return '<header class="tg-top"><div><p class="tg-kicker">' + esc(d.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' })) + '</p><h1>' + esc(st.classes.length ? (TITLE[st.view] || 'Ruang Guru') : 'Ruang Guru') + '</h1></div>' +
-      '<div class="tg-top-actions">' + (c ? syncChip(c) + '<button type="button" class="tg-chip tg-code" data-tg="copy" data-text="' + esc(c.code) + '" title="Salin kode kelas" data-testid="tg-class-code">' + icon('hash') + '<span>' + esc(c.code) + '</span></button>' : '') + bell() + (c ? '<button type="button" class="tg-btn is-ghost" data-tg="modal" data-kind="board" data-testid="tg-open-board">' + icon('presentation') + '<span>Mode papan</span></button><button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="assign" data-testid="tg-quick-assign">' + icon('plus') + '<span>Tugas baru</span></button>' : '') + '</div></header>' + inboxPanel();
-  }
-  function bell() {
-    var n = S().inboxUnread(st);
-    return '<button type="button" class="tg-icon-btn tg-bell' + (n ? ' has-new' : '') + (ui.inbox ? ' is-open' : '') + '" data-tg="inbox" aria-label="Notifikasi guru" title="Notifikasi" data-testid="tg-bell">' + icon('bell') + (n ? '<span class="tg-bell-badge" data-testid="tg-bell-badge">' + (n > 9 ? '9+' : n) + '</span>' : '') + '</button>';
-  }
-  function inboxPanel() {
-    if (!ui.inbox) return '';
-    var T = S(), list = (st.inbox || []).slice(0, 30);
-    return '<div class="tg-inbox-scrim" data-tg="close"></div><section class="tg-inbox" role="dialog" aria-label="Notifikasi" data-testid="tg-inbox"><div class="tg-inbox-head"><h3>Notifikasi</h3>' + (list.length ? '<button type="button" class="tg-link" data-tg="inbox-clear">Bersihkan</button>' : '') + '</div>' +
-      (list.length ? '<ul class="tg-inbox-list">' + list.map(function (e) {
-        var ic = e.kind === 'assignment_done' ? 'clipboard-check' : e.kind === 'student_joined' ? 'user-plus' : 'inbox';
-        return '<li><button type="button" class="tg-inbox-item' + (e.read ? '' : ' is-unread') + '" data-tg="inbox-open" data-id="' + esc(e.id) + '" data-testid="tg-inbox-' + esc(e.id) + '">' + icon(ic) + '<div><b>' + esc(T.inboxText(e)) + '</b><small>' + esc(T.fmtDate(e.at)) + ' · ' + esc(new Date(e.at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })) + '</small></div></button></li>';
-      }).join('') + '</ul>' : '<p class="tg-empty">Belum ada kabar. Saat murid selesai mengerjakan tugas yang kamu kirim, hasilnya muncul di sini otomatis.</p>') + '</section>';
+      (c ? '<div class="tg-top-actions">' + syncChip(c) + '<button type="button" class="tg-chip tg-code" data-tg="copy" data-text="' + esc(c.code) + '" title="Salin kode kelas" data-testid="tg-class-code">' + icon('hash') + '<span>' + esc(c.code) + '</span></button><button type="button" class="tg-btn is-ghost" data-tg="modal" data-kind="board" data-testid="tg-open-board">' + icon('presentation') + '<span>Mode papan</span></button><button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="assign" data-testid="tg-quick-assign">' + icon('plus') + '<span>Tugas baru</span></button></div>' : '') + '</header>';
   }
   function mobileNav() { return '<nav class="tg-mnav">' + NAV.map(function (n) { return '<button type="button" class="' + (st.view === n[0] ? 'is-active' : '') + '" data-tg="view" data-view="' + n[0] + '">' + icon(n[2]) + '<span>' + n[1].split(' ')[0] + '</span></button>'; }).join('') + '</nav>'; }
 
@@ -180,14 +165,14 @@
   // ---- TUGAS & UJIAN -------------------------------------------------------------------------
   function assignments(c) {
     var T = S(), td = T.today(), list = (c.assignments || []).slice().sort(function (a, b) { return b.createdAt - a.createdAt; });
-    return '<div class="tg-toolbar"><p class="tg-lead-sm">Tugas yang menilai dirinya sendiri: kirim ke murid, tugasnya <b>langsung masuk notifikasi</b> di aplikasi mereka; setelah selesai, hasilnya kembali ke sini otomatis — tidak ada koreksi manual.</p><div class="tg-toolbar-actions"><button type="button" class="tg-btn is-ghost" data-tg="modal" data-kind="import-code" data-testid="tg-grade-code">' + icon('clipboard-paste') + '<span>Tempel kode hasil</span></button><button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="assign" data-testid="tg-new-assign">' + icon('plus') + '<span>Buat tugas / ujian</span></button></div></div>' +
+    return '<div class="tg-toolbar"><p class="tg-lead-sm">Tugas yang menilai dirinya sendiri: murid mengerjakan di FIEZEL, hasilnya kembali sebagai <b>kode hasil</b> yang kamu tempel — tidak ada koreksi manual.</p><div class="tg-toolbar-actions"><button type="button" class="tg-btn is-ghost" data-tg="modal" data-kind="import-code" data-testid="tg-grade-code">' + icon('clipboard-paste') + '<span>Tempel kode hasil</span></button><button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="assign" data-testid="tg-new-assign">' + icon('plus') + '<span>Buat tugas / ujian</span></button></div></div>' +
       (list.length ? '<div class="tg-grid tg-grid-cards">' + list.map(function (a) {
         var tgt = c.students.filter(function (s) { return T.targeted(a, s); }), done = tgt.filter(function (s) { return a.done && a.done[s.id]; }), accs = done.map(function (s) { return a.done[s.id].acc; }).filter(function (v) { return v != null; }), avg = accs.length ? accs.reduce(function (x, y) { return x + y; }, 0) / accs.length : null;
         var late = a.deadline && a.deadline < td && done.length < tgt.length;
         return '<article class="tg-card tg-assign' + (a.mode === 'ujian' ? ' is-exam' : '') + '" data-testid="tg-assign-' + a.id + '"><div class="tg-card-head"><div><p class="tg-kicker">' + (a.mode === 'ujian' ? icon('shield') + ' Ujian · ' + a.timer + ' mnt · acak' : icon('pencil-ruler') + ' Latihan · ' + a.minutes + ' mnt') + '</p><h3>' + esc(a.title) + '</h3></div><button type="button" class="tg-icon-btn" data-tg="delete-assign" data-id="' + a.id + '" aria-label="Hapus tugas">' + icon('trash-2') + '</button></div>' +
           '<p class="tg-muted">' + a.skills.map(function (k) { return T.SKILL_LABEL[k]; }).join(' + ') + ' · ' + a.itemIds.length + ' soal · ' + (a.targets ? tgt.length + ' siswa terpilih' : 'seluruh kelas') + '</p>' +
           '<div class="tg-progress"><div class="tg-progress-head"><span>' + done.length + '/' + tgt.length + ' selesai' + (avg != null ? ' · rata-rata ' + pct(avg) : '') + '</span><span class="' + (late ? 'tg-late' : '') + '">' + (a.deadline ? 'Tenggat ' + esc(a.deadline) + (late ? ' (lewat)' : '') : 'Tanpa tenggat') + '</span></div>' + bar(tgt.length ? done.length / tgt.length : 0, avg != null && avg < 0.5 ? 'is-warn' : '') + '</div>' +
-          '<div class="tg-actions"><button type="button" class="tg-btn is-small is-primary" data-tg="send-assign" data-id="' + a.id + '" data-testid="tg-send-all-' + a.id + '"' + (ui.sending === a.id ? ' disabled' : '') + '>' + icon('send') + (a.targets ? (a.sent && a.sent.all ? ' Kirim ulang ke ' : ' Kirim ke ') + tgt.length + ' murid terpilih' : (a.sent && a.sent.all ? ' Kirim ulang ke semua' : ' Kirim ke semua murid')) + '</button><button type="button" class="tg-btn is-small is-ghost" data-tg="modal" data-kind="share-assign" data-id="' + a.id + '" data-testid="tg-share-assign-' + a.id + '">' + icon('users') + ' Pilih murid / kode</button><button type="button" class="tg-btn is-small is-ghost" data-tg="modal" data-kind="assign-detail" data-id="' + a.id + '">' + icon('list-checks') + ' Siapa yang belum</button></div>' + (a.sent && a.sent.all ? '<p class="tg-muted tg-sent-note">' + icon('check') + ' Terkirim ke semua murid ' + esc(T.fmtDate(a.sent.all)) + '</p>' : '') + '</article>';
+          '<div class="tg-actions"><button type="button" class="tg-btn is-small is-primary" data-tg="modal" data-kind="share-assign" data-id="' + a.id + '" data-testid="tg-share-assign-' + a.id + '">' + icon('send') + ' Bagikan ke murid</button><button type="button" class="tg-btn is-small is-ghost" data-tg="modal" data-kind="assign-detail" data-id="' + a.id + '">' + icon('list-checks') + ' Siapa yang belum</button></div></article>';
       }).join('') + '</div>' : '<section class="tg-card tg-center"><h3>Belum ada tugas</h3><p class="tg-muted">Buat tugas dari bank soal FIEZEL: pilih skill, jumlah soal, tenggat. Mode ujian mengacak urutan dan memberi timer.</p></section>');
   }
 
@@ -274,11 +259,9 @@
       var a = (c.assignments || []).filter(function (x) { return x.id === m.id; })[0]; if (!a) return '';
       var tg = c.students.filter(function (s) { return T.targeted(a, s); }), notDone = tg.filter(function (s) { return !(a.done && a.done[s.id]); }), code = T.assignmentCode(c, a);
       var msg = 'Halo! Tugas FIEZEL dari ' + (st.teacher.name || 'gurumu') + ': *' + a.title + '* (' + a.itemIds.length + ' soal, ±' + a.minutes + ' menit' + (a.deadline ? ', tenggat ' + a.deadline : '') + ').\nBuka FIEZEL → Today Plan → "Punya kode tugas dari guru?" → tempel kode ini:\n\n' + code + '\n\nSetelah selesai, kirim balik "Kode hasil untuk tutor" ya.';
-      title = m.kind === 'share-assign' ? 'Kirim tugas ke murid' : 'Status: ' + a.title;
-      var canSend = T.syncAvailable() === 'ok', busy = ui.sending === a.id;
-      body = (m.kind === 'share-assign' ? '<div class="tg-send-box" data-testid="tg-send-box"><p class="tg-kicker">Kirim langsung (notifikasi di aplikasi murid)</p><p class="tg-muted">' + (canSend ? 'Murid yang memakai kode kelas <b class="tg-mono">' + esc(c.code) + '</b> menerima tugas ini di lonceng notifikasi mereka. Sekali ketuk, sesinya langsung terbuka; hasilnya kembali ke sini otomatis.' : 'Masuk dengan akun guru dan online untuk mengirim langsung. Sementara itu pakai kode di bawah.') + '</p><div class="tg-actions"><button type="button" class="tg-btn is-primary" data-tg="send-assign" data-id="' + a.id + '" data-testid="tg-send-all"' + (!canSend || busy ? ' disabled' : '') + '>' + icon('send') + (busy ? ' Mengirim…' : a.targets ? ' Kirim ke ' + tg.length + ' murid terpilih' : ' Kirim ke semua murid') + '</button>' + (a.sent && a.sent.all ? '<span class="tg-ok">' + icon('check') + ' terkirim ' + esc(T.fmtDate(a.sent.all)) + '</span>' : '') + '</div></div>' +
-          '<details class="tg-fold"><summary>Kode tugas (cadangan bila murid offline)</summary><p class="tg-muted">Murid menempel kode ini di Today Plan → “Punya kode tugas dari guru?”.</p><textarea class="tg-code" readonly rows="3" data-testid="tg-assign-code">' + esc(code) + '</textarea><div class="tg-actions"><button type="button" class="tg-btn is-ghost is-small" data-tg="copy" data-text="' + esc(code) + '" data-testid="tg-copy-assign-code">' + icon('copy') + ' Salin kode</button><button type="button" class="tg-btn is-ghost is-small" data-tg="copy" data-text="' + esc(msg) + '">' + icon('message-square') + ' Salin pesan lengkap</button><a class="tg-btn is-ghost is-small" target="_blank" rel="noopener" href="' + T.waLink('', msg) + '">' + icon('message-circle') + ' WhatsApp</a></div></details><hr class="tg-hr">' : '') +
-        '<div class="tg-card-head"><h4>' + notDone.length + ' belum selesai · ' + (tg.length - notDone.length) + ' selesai</h4></div><ul class="tg-mini-list tg-send-list">' + tg.map(function (s) { var d = a.done && a.done[s.id], sent = T.sentTo(a, s); return '<li class="' + (d ? 'is-done' : '') + '">' + avatar(s, 'sm') + ' <span class="tg-grow">' + esc(s.name) + (sent && !d ? ' <small class="tg-muted">· terkirim</small>' : '') + '</span>' + (d ? ' <span class="tg-ok">' + pct(d.acc) + '</span>' : (canSend ? '<button type="button" class="tg-btn is-small ' + (sent ? 'is-ghost' : 'is-primary') + '" data-tg="send-assign" data-id="' + a.id + '" data-sid="' + s.id + '" data-testid="tg-send-one-' + s.id + '"' + (busy ? ' disabled' : '') + '>' + icon('send') + (sent ? ' Kirim ulang' : ' Kirim') + '</button>' : '') + ' <button type="button" class="tg-link" data-tg="mark-done" data-id="' + a.id + '" data-sid="' + s.id + '">tandai selesai</button>') + '</li>'; }).join('') + '</ul>' + (notDone.length ? '<div class="tg-actions"><button type="button" class="tg-btn is-ghost is-small" data-tg="copy" data-text="' + esc('Pengingat: tugas *' + a.title + '* belum selesai untuk: ' + notDone.map(function (s) { return s.name; }).join(', ') + (a.deadline ? '. Tenggat ' + a.deadline : '') + '. Semangat! 💪') + '">' + icon('bell') + ' Salin pengingat untuk yang belum</button></div>' : '');
+      title = m.kind === 'share-assign' ? 'Bagikan tugas' : 'Status: ' + a.title;
+      body = (m.kind === 'share-assign' ? '<p class="tg-muted">Murid menempel kode ini di Today Plan. Tugas muncul sebagai sesi pertama mereka.</p><textarea class="tg-code" readonly rows="3" data-testid="tg-assign-code">' + esc(code) + '</textarea><div class="tg-actions"><button type="button" class="tg-btn is-primary" data-tg="copy" data-text="' + esc(code) + '" data-testid="tg-copy-assign-code">' + icon('copy') + ' Salin kode</button><button type="button" class="tg-btn is-ghost" data-tg="copy" data-text="' + esc(msg) + '">' + icon('message-square') + ' Salin pesan lengkap</button><a class="tg-btn is-ghost" target="_blank" rel="noopener" href="' + T.waLink('', msg) + '">' + icon('message-circle') + ' WhatsApp</a></div><hr class="tg-hr">' : '') +
+        '<div class="tg-card-head"><h4>' + notDone.length + ' belum selesai · ' + (tg.length - notDone.length) + ' selesai</h4></div><ul class="tg-mini-list">' + tg.map(function (s) { var d = a.done && a.done[s.id]; return '<li class="' + (d ? 'is-done' : '') + '">' + avatar(s, 'sm') + ' ' + esc(s.name) + (d ? ' <span class="tg-ok">' + pct(d.acc) + '</span>' : ' <button type="button" class="tg-link" data-tg="mark-done" data-id="' + a.id + '" data-sid="' + s.id + '">tandai selesai</button>') + '</li>'; }).join('') + '</ul>' + (notDone.length ? '<div class="tg-actions"><button type="button" class="tg-btn is-ghost is-small" data-tg="copy" data-text="' + esc('Pengingat: tugas *' + a.title + '* belum selesai untuk: ' + notDone.map(function (s) { return s.name; }).join(', ') + (a.deadline ? '. Tenggat ' + a.deadline : '') + '. Semangat! 💪') + '">' + icon('bell') + ' Salin pengingat untuk yang belum</button></div>' : '');
     } else if (m.kind === 'greet' || m.kind === 'parent') {
       var s2 = student(m.id); if (!s2) return '';
       var text = m.kind === 'greet' ? T.greetingCard(c, s2, st.teacher) : T.parentReport(c, s2, st.teacher);
@@ -337,30 +320,9 @@
         }
         return;
       case 'sync': syncAll(false); return;
-      case 'inbox': ui.inbox = !ui.inbox; if (ui.inbox) { T.inboxMarkAllRead(st); } break;
-      case 'inbox-clear': st.inbox = []; ui.inbox = false; break;
-      case 'inbox-open': {
-        var ev = (st.inbox || []).filter(function (x) { return x.id === id; })[0]; ui.inbox = false;
-        if (ev) { ev.read = true; if (ev.clsId && st.classes.some(function (k) { return k.id === ev.clsId; })) st.activeClassId = ev.clsId; if (ev.kind === 'assignment_done' && ev.aid) { st.view = 'assignments'; ui.modal = { kind: 'assign-detail', id: ev.aid }; ui.drawer = null; } else if (ev.sid) { st.view = 'classes'; ui.drawer = ev.sid; ui.modal = null; } }
-        break;
-      }
-      case 'send-assign': {
-        if (!c) return;
-        var asg = (c.assignments || []).filter(function (x) { return x.id === id; })[0]; if (!asg) return;
-        var sid = btn.getAttribute('data-sid'), targets = sid ? [sid] : (asg.targets && asg.targets.length ? asg.targets : null);
-        if (T.syncAvailable() !== 'ok') { toast(T.syncLabel(c).text); return; }
-        ui.sending = asg.id; render();
-        T.sendAssignment(c, asg, targets).then(function (r) {
-          ui.sending = null;
-          if (r.ok) { saveMinutes(sid ? 1 : 5); toast(sid ? 'Tugas dikirim ke ' + (student(sid) || {}).name + ' — muncul di notifikasinya.' : 'Tugas dikirim ke ' + r.count + ' murid — muncul di notifikasi mereka.'); }
-          else toast(r.error === 'class_code_taken' ? 'Kode kelas dipakai guru lain — ubah kode kelas dulu.' : r.error === 'not_found' ? 'Kelas belum terdaftar di server — tekan Sinkron lalu coba lagi.' : 'Gagal mengirim (' + (r.error || 'unknown') + '). Coba lagi.');
-          persist(); render();
-        });
-        return;
-      }
       case 'modal': ui.modal = { kind: btn.getAttribute('data-kind'), id: id, skill: btn.getAttribute('data-skill'), target: btn.getAttribute('data-target') }; break;
       case 'drawer': ui.drawer = id; ui.modal = null; break;
-      case 'close': ui.modal = null; ui.drawer = null; ui.inbox = false; break;
+      case 'close': ui.modal = null; ui.drawer = null; break;
       case 'pick-class': st.activeClassId = id; break;
       case 'insight-skill': ui.insightSkill = btn.getAttribute('data-skill'); break;
       case 'copy': copy(btn.getAttribute('data-text'), 'Tersalin.'); return;

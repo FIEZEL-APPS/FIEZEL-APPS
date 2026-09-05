@@ -1,0 +1,145 @@
+PASS  copy core: kedua berkas ada
+PASS  copy core: copy-id mendaftar ke locale id saja
+PASS  copy core: copy-th mendaftar ke locale th saja
+PASS  copy core: paritas kunci id→th 0 selisih (9 kunci id)
+PASS  copy core: tanpa kunci th liar di luar 2 th-only gems yang sah
+PASS  copy core: tanpa nilai th kosong
+PASS  copy core: paritas himpunan {placeholder} per kunci 0 selisih
+PASS  copy core: semua nilai th ber-aksara Thai (atau locale-netral identik id)
+PASS  copy app-a: kedua berkas ada
+PASS  copy app-a: copy-id mendaftar ke locale id saja
+PASS  copy app-a: copy-th mendaftar ke locale th saja
+PASS  copy app-a: paritas kunci id→th 0 selisih (428 kunci id)
+PASS  copy app-a: tanpa kunci th liar di luar 2 th-only gems yang sah
+PASS  copy app-a: tanpa nilai th kosong
+PASS  copy app-a: paritas himpunan {placeholder} per kunci 0 selisih
+PASS  copy app-a: semua nilai th ber-aksara Thai (atau locale-netral identik id)
+PASS  copy app-b: kedua berkas ada
+PASS  copy app-b: copy-id mendaftar ke locale id saja
+PASS  copy app-b: copy-th mendaftar ke locale th saja
+PASS  copy app-b: paritas kunci id→th 0 selisih (118 kunci id)
+PASS  copy app-b: tanpa kunci th liar di luar 2 th-only gems yang sah
+PASS  copy app-b: tanpa nilai th kosong
+PASS  copy app-b: paritas himpunan {placeholder} per kunci 0 selisih
+PASS  copy app-b: semua nilai th ber-aksara Thai (atau locale-netral identik id)
+PASS  copy app-c: kedua berkas ada
+PASS  copy app-c: copy-id mendaftar ke locale id saja
+PASS  copy app-c: copy-th mendaftar ke locale th saja
+PASS  copy app-c: paritas kunci id→th 0 selisih (315 kunci id)
+PASS  copy app-c: tanpa kunci th liar di luar 2 th-only gems yang sah
+PASS  copy app-c: tanpa nilai th kosong
+PASS  copy app-c: paritas himpunan {placeholder} per kunci 0 selisih
+PASS  copy app-c: semua nilai th ber-aksara Thai (atau locale-netral identik id)
+PASS  copy app-d: kedua berkas ada
+PASS  copy app-d: copy-id mendaftar ke locale id saja
+PASS  copy app-d: copy-th mendaftar ke locale th saja
+PASS  copy app-d: paritas kunci id→th 0 selisih (485 kunci id)
+PASS  copy app-d: tanpa kunci th liar di luar 2 th-only gems yang sah
+PASS  copy app-d: tanpa nilai th kosong
+PASS  copy app-d: paritas himpunan {placeholder} per kunci 0 selisih
+PASS  copy app-d: semua nilai th ber-aksara Thai (atau locale-netral identik id)
+PASS  copy app-e: kedua berkas ada
+PASS  copy app-e: copy-id mendaftar ke locale id saja
+PASS  copy app-e: copy-th mendaftar ke locale th saja
+PASS  copy app-e: paritas kunci id→th 0 selisih (76 kunci id)
+PASS  copy app-e: tanpa kunci th liar di luar 2 th-only gems yang sah
+PASS  copy app-e: tanpa nilai th kosong
+PASS  copy app-e: paritas himpunan {placeholder} per kunci 0 selisih
+PASS  copy app-e: semua nilai th ber-aksara Thai (atau locale-netral identik id)
+PASS  copy app-f: kedua berkas ada
+PASS  copy app-f: copy-id mendaftar ke locale id saja
+PASS  copy app-f: copy-th mendaftar ke locale th saja
+PASS  copy app-f: paritas kunci id→th 0 selisih (155 kunci id)
+PASS  copy app-f: tanpa kunci th liar di luar 2 th-only gems yang sah
+PASS  copy app-f: tanpa nilai th kosong
+PASS  copy app-f: paritas himpunan {placeholder} per kunci 0 selisih
+PASS  copy app-f: semua nilai th ber-aksara Thai (atau locale-netral identik id)
+PASS  copy feat-a: kedua berkas ada
+PASS  copy feat-a: copy-id mendaftar ke locale id saja
+PASS  copy feat-a: copy-th mendaftar ke locale th saja
+PASS  copy feat-a: paritas kunci id→th 0 selisih (268 kunci id)
+PASS  copy feat-a: tanpa kunci th liar di luar 2 th-only gems yang sah
+PASS  copy feat-a: tanpa nilai th kosong
+PASS  copy feat-a: paritas himpunan {placeholder} per kunci 0 selisih
+PASS  copy feat-a: semua nilai th ber-aksara Thai (atau locale-netral identik id)
+PASS  copy feat-b: kedua berkas ada
+PASS  copy feat-b: copy-id mendaftar ke locale id saja
+PASS  copy feat-b: copy-th mendaftar ke locale th saja
+PASS  copy feat-b: paritas kunci id→th 0 selisih (296 kunci id)
+PASS  copy feat-b: tanpa kunci th liar di luar 2 th-only gems yang sah
+PASS  copy feat-b: tanpa nilai th kosong
+PASS  copy feat-b: paritas himpunan {placeholder} per kunci 0 selisih
+PASS  copy feat-b: semua nilai th ber-aksara Thai (atau locale-netral identik id)
+PASS  copy feat-c: kedua berkas ada
+PASS  copy feat-c: copy-id mendaftar ke locale id saja
+PASS  copy feat-c: copy-th mendaftar ke locale th saja
+PASS  copy feat-c: paritas kunci id→th 0 selisih (173 kunci id)
+PASS  copy feat-c: tanpa kunci th liar di luar 2 th-only gems yang sah
+PASS  copy feat-c: tanpa nilai th kosong
+PASS  copy feat-c: paritas himpunan {placeholder} per kunci 0 selisih
+PASS  copy feat-c: semua nilai th ber-aksara Thai (atau locale-netral identik id)
+PASS  copy feat-d: kedua berkas ada
+PASS  copy feat-d: copy-id mendaftar ke locale id saja
+PASS  copy feat-d: copy-th mendaftar ke locale th saja
+PASS  copy feat-d: paritas kunci id→th 0 selisih (120 kunci id)
+PASS  copy feat-d: tanpa kunci th liar di luar 2 th-only gems yang sah
+PASS  copy feat-d: tanpa nilai th kosong
+PASS  copy feat-d: paritas himpunan {placeholder} per kunci 0 selisih
+PASS  copy feat-d: semua nilai th ber-aksara Thai (atau locale-netral identik id)
+PASS  copy gems: kedua berkas ada
+PASS  copy gems: copy-id mendaftar ke locale id saja
+PASS  copy gems: copy-th mendaftar ke locale th saja
+PASS  copy gems: paritas kunci id→th 0 selisih (9 kunci id)
+PASS  copy gems: tanpa kunci th liar di luar 2 th-only gems yang sah
+PASS  copy gems: tanpa nilai th kosong
+PASS  copy gems: paritas himpunan {placeholder} per kunci 0 selisih
+PASS  copy gems: semua nilai th ber-aksara Thai (atau locale-netral identik id)
+PASS  copy quota: kedua berkas ada
+PASS  copy quota: copy-id mendaftar ke locale id saja
+PASS  copy quota: copy-th mendaftar ke locale th saja
+PASS  copy quota: paritas kunci id→th 0 selisih (4 kunci id)
+PASS  copy quota: tanpa kunci th liar di luar 2 th-only gems yang sah
+PASS  copy quota: tanpa nilai th kosong
+PASS  copy quota: paritas himpunan {placeholder} per kunci 0 selisih
+PASS  copy quota: semua nilai th ber-aksara Thai (atau locale-netral identik id)
+PASS  copy settings-locale: kedua berkas ada
+PASS  copy settings-locale: copy-id mendaftar ke locale id saja
+PASS  copy settings-locale: copy-th mendaftar ke locale th saja
+PASS  copy settings-locale: paritas kunci id→th 0 selisih (5 kunci id)
+PASS  copy settings-locale: tanpa kunci th liar di luar 2 th-only gems yang sah
+PASS  copy settings-locale: tanpa nilai th kosong
+PASS  copy settings-locale: paritas himpunan {placeholder} per kunci 0 selisih
+PASS  copy settings-locale: semua nilai th ber-aksara Thai (atau locale-netral identik id)
+PASS  copy grammar-labels: kedua berkas ada
+PASS  copy grammar-labels: copy-id mendaftar ke locale id saja
+PASS  copy grammar-labels: copy-th mendaftar ke locale th saja
+PASS  copy grammar-labels: paritas kunci id→th 0 selisih (180 kunci id)
+PASS  copy grammar-labels: tanpa kunci th liar di luar 2 th-only gems yang sah
+PASS  copy grammar-labels: tanpa nilai th kosong
+PASS  copy grammar-labels: paritas himpunan {placeholder} per kunci 0 selisih
+PASS  copy grammar-labels: semua nilai th ber-aksara Thai (atau locale-netral identik id)
+PASS  naskah: peta punya persis 6 domain modul brain
+PASS  naskah listening: paritas kunci vs tabel modul 0 selisih (15 kunci)
+PASS  naskah listening: semua nilai terisi dan ber-aksara Thai
+PASS  naskah speaking: paritas kunci vs tabel modul 0 selisih (21 kunci)
+PASS  naskah speaking: semua nilai terisi dan ber-aksara Thai
+PASS  naskah step: paritas kunci vs tabel modul 0 selisih (11 kunci)
+PASS  naskah step: semua nilai terisi dan ber-aksara Thai
+PASS  naskah tutor: paritas kunci vs tabel modul 0 selisih (25 kunci)
+PASS  naskah tutor: semua nilai terisi dan ber-aksara Thai
+PASS  naskah olm: paritas kunci vs tabel modul 0 selisih (13 kunci)
+PASS  naskah olm: semua nilai terisi dan ber-aksara Thai
+PASS  naskah srl: paritas kunci vs tabel modul 0 selisih (13 kunci)
+PASS  naskah srl: semua nilai terisi dan ber-aksara Thai
+PASS  grammar: skema & status DRAFT AI ada di header
+PASS  grammar: paritas penuh id template vs bank (lantai 153), urut bank, tanpa selisih
+PASS  grammar: 8 bidang wajib + bidang distraktor semuanya terisi
+PASS  grammar: semua bidang penjelasan ber-aksara Thai (atau locale-netral identik id)
+PASS  grammar: kunci distraktor byte-identik dengan opsi distraktor bank di 153 template
+PASS  grammar: nilai distraktor (misconception+whyFails) ber-aksara Thai — anti kolase tiga bahasa (AI-07 F08)
+PASS  vocab: skema & status DRAFT AI ada di header
+PASS  vocab: 2440/2440 id master tercakup, tanpa entri liar
+PASS  vocab: tanpa entri kosong (meaning+example terisi)
+PASS  vocab: semua meaning+example ber-aksara Thai
+
+th-coverage-test: 143/143 PASS

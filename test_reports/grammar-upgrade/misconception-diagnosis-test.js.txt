@@ -1,0 +1,19 @@
+ok - setiap distraktor di bank membawa nama miskonsepsi
+ok - setiap nama miskonsepsi punya diagnosis Indonesia — cakupan harus 100%
+ok - petanya tidak menyimpan entri yang tidak dipakai bank mana pun
+ok - jumlah yang diumumkan berkas cocok dengan isinya
+ok - tidak ada diagnosis yang tertinggal dalam bahasa Inggris
+ok - nama miskonsepsi yang berbahasa Inggris tidak pernah ikut terbawa ke naskah
+ok - setiap diagnosis dimulai huruf kecil, supaya menyambung setelah nama pilihan
+ok - setiap diagnosis diakhiri titik, jadi kalimatnya utuh di panel jawaban
+ok - panjangnya wajar untuk dibaca sekali lihat, tidak terpenggal dan tidak jadi paragraf
+ok - dua tempat pemakaian sama-sama menghasilkan kalimat yang wajar
+ok - tidak ada dua nama berbeda yang dijelaskan dengan kalimat yang sama persis
+ok - app.js mencoba nama miskonsepsi LEBIH DULU sebelum mencocokkan pola teks Inggris
+ok - nama miskonsepsi benar-benar diteruskan dari soal, bukan sekadar diterima parameternya
+ok - pilihan yang tampil sebagai kalimat utuh tetap ketemu diagnosisnya
+ok - berkas diagnosis dimuat terpisah dan berpenjaga — hilangnya tidak boleh mematikan kuis
+ok - diagnosis kembali ke jalur lama kalau petanya kosong
+ok - modul diagnosis ikut di-precache service worker
+
+Diagnosis miskonsepsi: semua gate lolos (679 nama, cakupan 100%).

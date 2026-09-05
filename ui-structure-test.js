@@ -14,7 +14,7 @@ const check=(ok,message)=>{if(!ok)failures.push(message)};
    Vocab/Grammar/Reading yang hilang tidak kehilangan tujuannya - ketiganya hidup di
    dalam view `latihan`, dan rutenya tetap sah di VALID_VIEWS. */
 const navButtons=(html.match(/class="nav(?: active)?"/g)||[]).length;
-check(navButtons===5,'Bottom navigation must contain exactly five primary destinations (Home / Vocab / Grammar / Reading / Peta), found '+navButtons+'.');
+check(navButtons===4,'Bottom navigation must contain exactly four primary destinations (Hari ini / Latihan / Progres / Pengaturan), found '+navButtons+'.');
 // m025-115: kroma inti pindah ke set ikon duotone milik FIEZEL sendiri
 // (features/ui/fiezel-icons.js), sesuai brief redesign OWNER bagian 4. Yang dijaga
 // pemeriksaan ini tidak berubah - ikon harus datang dari berkas LOKAL, bukan dari CDN -

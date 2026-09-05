@@ -2,15 +2,15 @@
   "schema": "fiezel-cloze-bank-v1",
   "generatedFrom": "grammar-templates.json",
   "counts": {
-    "templates": 249,
-    "items": 210,
-    "rejected": 39,
+    "templates": 282,
+    "items": 241,
+    "rejected": 41,
     "byLevel": {
-      "A2": 35,
-      "B1": 62,
-      "B2": 48,
+      "A2": 48,
+      "B1": 70,
+      "B2": 55,
       "C1": 26,
-      "A1": 22,
+      "A1": 25,
       "C2": 17
     }
   },
@@ -81,11 +81,6 @@
       "detail": "jawaban \"the\" muncul 2x sebagai frasa utuh di kalimat target"
     },
     {
-      "templateId": "GI-004",
-      "reason": "answer_ambiguous",
-      "detail": "jawaban \"restarting\" muncul 2x sebagai frasa utuh di kalimat target"
-    },
-    {
       "templateId": "EC-004",
       "reason": "no_blank_marker",
       "detail": "stem tidak memuat ___ — jawaban template bukan token/frasa di dalam kalimat target"
@@ -94,11 +89,6 @@
       "templateId": "EC-005",
       "reason": "no_blank_marker",
       "detail": "stem tidak memuat ___ — jawaban template bukan token/frasa di dalam kalimat target"
-    },
-    {
-      "templateId": "b4_010",
-      "reason": "answer_ambiguous",
-      "detail": "jawaban \"could\" muncul 2x sebagai frasa utuh di kalimat target"
     },
     {
       "templateId": "b4_017",
@@ -209,6 +199,26 @@
       "templateId": "EC-006",
       "reason": "no_blank_marker",
       "detail": "stem tidak memuat ___ — jawaban template bukan token/frasa di dalam kalimat target"
+    },
+    {
+      "templateId": "A1-201",
+      "reason": "answer_too_short",
+      "detail": "jawaban \"go\" <3 karakter — grading edit-distance tidak andal"
+    },
+    {
+      "templateId": "LD-201",
+      "reason": "answer_too_short",
+      "detail": "jawaban \"so\" <3 karakter — grading edit-distance tidak andal"
+    },
+    {
+      "templateId": "AR-201",
+      "reason": "answer_ambiguous",
+      "detail": "jawaban \"the\" muncul 2x sebagai frasa utuh di kalimat target"
+    },
+    {
+      "templateId": "TA-204",
+      "reason": "multi_blank",
+      "detail": "stem memuat 2 blank dengan jawaban gabungan \"had / started\" — pemecahan per posisi tidak mekanis"
     }
   ],
   "items": [
@@ -301,7 +311,7 @@
       "templateId": "TA-003",
       "skill": "future_forms_plan_vs_prediction",
       "level": "B1",
-      "sentence": "Which completion shows a decision made only at the moment of speaking? A: 'The phone's ringing.' B: 'Don't worry, I ___ it.'",
+      "sentence": "A: 'The phone's ringing!' B: 'OK, I ___ it.' (a decision made right now)",
       "blank": {
         "answer": "will get",
         "alternates": [
@@ -309,7 +319,7 @@
           "will answer",
           "'ll answer"
         ],
-        "position": 116
+        "position": 36
       },
       "distractors": [
         {
@@ -343,7 +353,7 @@
       "templateId": "MO-001",
       "skill": "obligation_vs_permission",
       "level": "A2",
-      "sentence": "Visitors ___ leave their bags at the front desk; it's a museum rule, not a choice.",
+      "sentence": "Visitors ___ leave their bags at the desk. It's a museum rule, not a choice.",
       "blank": {
         "answer": "must",
         "alternates": [
@@ -385,13 +395,13 @@
       "templateId": "MO-002",
       "skill": "deduction_present",
       "level": "B1",
-      "sentence": "Which option expresses the strongest negative deduction supported by the evidence? The lights are off and the car isn't in the driveway, so they ___ be home.",
+      "sentence": "The lights are off and the car isn't here, so they ___ be home. (you are sure)",
       "blank": {
         "answer": "can't",
         "alternates": [
           "cannot"
         ],
-        "position": 145
+        "position": 51
       },
       "distractors": [
         {
@@ -425,11 +435,11 @@
       "templateId": "CO-001",
       "skill": "zero_vs_first_conditional",
       "level": "A2",
-      "sentence": "Which completion states this as a general fact that is always true, not a prediction about one occasion? If you heat ice, it ___.",
+      "sentence": "This is always true: if you heat ice, it ___.",
       "blank": {
         "answer": "melts",
         "alternates": [],
-        "position": 125
+        "position": 41
       },
       "distractors": [
         {
@@ -463,7 +473,7 @@
       "templateId": "CO-002",
       "skill": "second_conditional_unreal_present",
       "level": "B1",
-      "sentence": "If I ___ the lottery, I would travel the world — but let's be honest, it's not going to happen.",
+      "sentence": "If I ___ the lottery, I would travel the world — but I never even buy a ticket.",
       "blank": {
         "answer": "won",
         "alternates": [
@@ -503,14 +513,14 @@
       "templateId": "PA-001",
       "skill": "agent_omission_when_irrelevant",
       "level": "B1",
-      "sentence": "Which completion most explicitly leaves the unknown builder out of the sentence? The bridge ___ in 1932; nobody today remembers who built it.",
+      "sentence": "The bridge ___ in 1932 — nobody knows who built it, so don't name anyone.",
       "blank": {
         "answer": "was constructed",
         "alternates": [
           "was built",
           "was erected"
         ],
-        "position": 92
+        "position": 11
       },
       "distractors": [
         {
@@ -544,11 +554,11 @@
       "templateId": "RS-001",
       "skill": "backshift_statement",
       "level": "B1",
-      "sentence": "Apply conventional backshift to report the earlier state: Yesterday she said, ‘I am tired.’ Today we report that she ___ tired.",
+      "sentence": "Yesterday she said, ‘I am tired.’ Today we report: she said she ___ tired.",
       "blank": {
         "answer": "was",
         "alternates": [],
-        "position": 117
+        "position": 64
       },
       "distractors": [
         {
@@ -832,7 +842,7 @@
       "templateId": "TA-007",
       "skill": "future_continuous_vs_future_perfect",
       "level": "B2",
-      "sentence": "Which completion shows the action already in progress at that exact moment? Don't call at 8pm — I ___ dinner with my in-laws then.",
+      "sentence": "Don't call at 8pm — at that moment I ___ dinner with my in-laws.",
       "blank": {
         "answer": "will be having",
         "alternates": [
@@ -840,7 +850,7 @@
           "will be eating",
           "'ll be eating"
         ],
-        "position": 98
+        "position": 37
       },
       "distractors": [
         {
@@ -915,13 +925,13 @@
       "templateId": "MO-004",
       "skill": "deduction_past_must_have_vs_cant_have",
       "level": "B2",
-      "sentence": "Which option expresses the strongest positive past deduction supported by the evidence? The lights are still off and his car isn't here — he ___ left for work already.",
+      "sentence": "The lights are off and his car isn't here — he ___ left for work already. (you are sure)",
       "blank": {
         "answer": "must have",
         "alternates": [
           "must've"
         ],
-        "position": 141
+        "position": 47
       },
       "distractors": [
         {
@@ -1159,11 +1169,11 @@
       "templateId": "PA-003",
       "skill": "get_passive_informal_vs_be_passive",
       "level": "B2",
-      "sentence": "To use the informal get-passive for an unexpected event: \"Ugh, my bike ___ stolen outside the station last night!\"",
+      "sentence": "“Ugh, my bike ___ stolen outside the station last night!” (informal)",
       "blank": {
         "answer": "got",
         "alternates": [],
-        "position": 71
+        "position": 14
       },
       "distractors": [
         {
@@ -1469,7 +1479,7 @@
       "templateId": "CM-002",
       "skill": "as_as_equality_vs_comparative",
       "level": "A2",
-      "sentence": "This laptop is ___ the one I had before — both take exactly ten seconds to start up.",
+      "sentence": "This laptop is ___ my old one — both take exactly ten seconds to start up.",
       "blank": {
         "answer": "as fast as",
         "alternates": [
@@ -1509,13 +1519,13 @@
       "templateId": "CM-003",
       "skill": "double_comparative_progressive_change",
       "level": "B2",
-      "sentence": "Which completion best expresses a gradual increase that keeps continuing? As the deadline approached, the team's schedule became ___.",
+      "sentence": "As the deadline approached, the team's schedule became ___ every day.",
       "blank": {
         "answer": "busier and busier",
         "alternates": [
           "increasingly busy"
         ],
-        "position": 129
+        "position": 55
       },
       "distractors": [
         {
@@ -1701,13 +1711,13 @@
       "templateId": "MO-006",
       "skill": "advice_should_vs_ought_to_vs_had_better",
       "level": "B1",
-      "sentence": "Which completion gives the strongest urgent warning tied to the stated consequence? You ___ leave now — if you miss this train, there isn't another one until tomorrow.",
+      "sentence": "You ___ leave now — if you miss this train, there isn't another one until tomorrow. (strong warning)",
       "blank": {
         "answer": "had better",
         "alternates": [
           "'d better"
         ],
-        "position": 88
+        "position": 4
       },
       "distractors": [
         {
@@ -1741,14 +1751,14 @@
       "templateId": "MO-007",
       "skill": "speculation_scale_may_might_could_vs_will",
       "level": "B1",
-      "sentence": "I'm not sure where Sam is, and I have no idea what the roads are like — he ___ still be stuck in traffic.",
+      "sentence": "I'm not sure where Sam is — he ___ still be stuck in traffic.",
       "blank": {
         "answer": "might",
         "alternates": [
           "may",
           "could"
         ],
-        "position": 75
+        "position": 31
       },
       "distractors": [
         {
@@ -1986,14 +1996,14 @@
       "templateId": "RS-005",
       "skill": "time_and_place_reference_shift",
       "level": "B1",
-      "sentence": "On Monday, Maria said, 'I'll finish the report today.' A week later, reporting this, you'd say: Maria said she would finish the report ___.",
+      "sentence": "On Monday, Maria said, 'I'll finish the report today.' A week later you report: Maria said she would finish it ___.",
       "blank": {
         "answer": "that day",
         "alternates": [
           "on that day",
           "that same day"
         ],
-        "position": 135
+        "position": 111
       },
       "distractors": [
         {
@@ -2138,6 +2148,44 @@
         "rule": "“Through” nembus ruang tertutup. “Across” nyeberangi bidang datar terbuka. “Along” nyusuri panjangnya sesuatu. “Over” lewat di atasnya.",
         "memory": "Celah punya bagian dalam, jadi ditembus pakai “through”.",
         "avoid": "Tulis bentuk lengkapnya, jangan hanya kata dasarnya."
+      }
+    },
+    {
+      "id": "GI-004-cz0",
+      "templateId": "GI-004",
+      "skill": "verb_pattern_try_meaning_change",
+      "level": "B2",
+      "sentence": "If the file won't open, try ___ the computer — that usually fixes it.",
+      "blank": {
+        "answer": "restarting",
+        "alternates": [],
+        "position": 28
+      },
+      "distractors": [
+        {
+          "text": "to restart",
+          "misconception": "using 'try to' (make a difficult effort) where 'try -ing' (experiment with a solution) is meant",
+          "whyFailsId": "“try to restart” nyiratin mulai ulang itu tantangan yang susah.",
+          "misconceptionId": "“try to” yang berarti usaha keras dipakai padahal maksudnya nyoba satu cara."
+        },
+        {
+          "text": "restart",
+          "misconception": "using the bare infinitive after 'try', which isn't a valid pattern",
+          "whyFailsId": "“try” minta pelengkap bentuk -ing atau bentuk to, nggak pernah bentuk dasar.",
+          "misconceptionId": "bentuk dasar dipakai sesudah “try” padahal itu bukan pola yang sah."
+        },
+        {
+          "text": "having restarted",
+          "misconception": "using a perfect gerund, implying the action is already completed",
+          "whyFailsId": "kalimatnya nyaranin tindakan yang dicoba sekarang, bukan yang udah terlanjur.",
+          "misconceptionId": "bentuk -ing perfect dipakai jadi tindakannya seolah udah kelar."
+        }
+      ],
+      "explain": {
+        "why": "“Try restarting” berarti nyoba mulai ulang sebagai kemungkinan jalan keluar. Itu pas sama saran buat berkas yang nggak mau kebuka.",
+        "rule": "“Try” + bentuk -ing berarti nyoba satu tindakan sebagai kemungkinan jalan keluar. “Try” + to berarti usaha ngelakuin sesuatu yang susah.",
+        "memory": "Saran ngatasi masalah pakai “try” + -ing.",
+        "avoid": "Tanya: ini disodorin sebagai jalan keluar yang dicoba, atau tugas susah yang harus diperjuangin?"
       }
     },
     {
@@ -2341,7 +2389,7 @@
       "templateId": "TA-010",
       "skill": "present_simple_for_fixed_schedules_not_personal_plans",
       "level": "B1",
-      "sentence": "According to the timetable, the train ___ at 6:45, so we should leave home by 6:15.",
+      "sentence": "According to the timetable, the train ___ at 6:45.",
       "blank": {
         "answer": "leaves",
         "alternates": [
@@ -2421,7 +2469,7 @@
       "templateId": "b4_002",
       "skill": "narrative_past_perfect_flashback_vs_past_simple_sequence",
       "level": "B2",
-      "sentence": "When I arrived at the station, the train ____ already, so I had to wait for the next one.",
+      "sentence": "When I arrived at the station, the train ____ already, so I had to wait.",
       "blank": {
         "answer": "had left",
         "alternates": [
@@ -2503,7 +2551,7 @@
       "templateId": "b4_004",
       "skill": "modal_perfect_could_have_missed_opportunity",
       "level": "B2",
-      "sentence": "Which completion neutrally states an available past opportunity without criticizing the decision? You ____ the job — they offered it to you, but you turned it down.",
+      "sentence": "You ____ the job — they offered it, but you turned it down. (just a fact, no criticism)",
       "blank": {
         "answer": "could have taken",
         "alternates": [
@@ -2511,7 +2559,7 @@
           "could have accepted",
           "could've accepted"
         ],
-        "position": 102
+        "position": 4
       },
       "distractors": [
         {
@@ -2545,11 +2593,11 @@
       "templateId": "b4_005",
       "skill": "possibility_vs_permission_can_vs_may_formal_register",
       "level": "B1",
-      "sentence": "For the conventionally most formal wording in an official notice: Visitors ___ enter the laboratory only when accompanied by staff.",
+      "sentence": "Official notice (most formal wording): Visitors ___ enter the laboratory only with staff.",
       "blank": {
         "answer": "may",
         "alternates": [],
-        "position": 75
+        "position": 48
       },
       "distractors": [
         {
@@ -2741,6 +2789,44 @@
       }
     },
     {
+      "id": "b4_010-cz0",
+      "templateId": "b4_010",
+      "skill": "reported_speech_modal_shift_can_to_could",
+      "level": "B1",
+      "sentence": "Direct: “I can finish the report by Friday.” Reported later: She said she ____ finish the report by Friday.",
+      "blank": {
+        "answer": "could",
+        "alternates": [],
+        "position": 74
+      },
+      "distractors": [
+        {
+          "text": "can",
+          "misconception": "Assumes modals don't need to shift in reported speech.",
+          "whyFailsId": "modalnya nggak ikut digeser ke bentuk lampau.",
+          "misconceptionId": "modal dikira nggak perlu ikut digeser di kalimat pelaporan."
+        },
+        {
+          "text": "cans",
+          "misconception": "Treats the modal as a regular verb that takes -s for third person.",
+          "whyFailsId": "modal nggak pernah nerima akhiran -s.",
+          "misconceptionId": "modal diperlakuin kayak kata kerja biasa yang nerima akhiran -s."
+        },
+        {
+          "text": "will can",
+          "misconception": "Attempts to stack two modals together.",
+          "whyFailsId": "dua modal nggak boleh berjajar dalam Bahasa Inggris.",
+          "misconceptionId": "dua modal ditumpuk berjajar."
+        }
+      ],
+      "explain": {
+        "why": "Kata kerja pelapornya “said”, jadi bentuknya lampau. Geseran baku dari “can” adalah “could”.",
+        "rule": "Di kalimat pelaporan sesudah kata kerja pelapor yang lampau, “can” biasanya digeser jadi “could”.",
+        "memory": "Ada “said”, modalnya ikut digeser ke bentuk lampau.",
+        "avoid": "Cek dulu tense kata kerja pelapornya, ya, sebelum ngegeser modalnya."
+      }
+    },
+    {
       "id": "b4_011-cz0",
       "templateId": "b4_011",
       "skill": "reported_yes_no_questions_if_whether",
@@ -2787,13 +2873,13 @@
       "templateId": "b4_012",
       "skill": "article_with_institutions_school_prison_hospital",
       "level": "B1",
-      "sentence": "To express attendance for the institution's normal purpose, not movement to a building: During term time, the children go to ____ every weekday to study.",
+      "sentence": "Every weekday the children go to ____ to learn.",
       "blank": {
         "answer": "school",
         "alternates": [
           "class"
         ],
-        "position": 125
+        "position": 33
       },
       "distractors": [
         {
@@ -2868,7 +2954,7 @@
       "templateId": "b4_014",
       "skill": "preposition_of_time_duration_for_vs_since_vs_during",
       "level": "A2",
-      "sentence": "The fire alarm went off ____ the meeting, so everyone had to leave the building.",
+      "sentence": "The fire alarm went off ____ the meeting, so we all left the building.",
       "blank": {
         "answer": "during",
         "alternates": [
@@ -2909,11 +2995,11 @@
       "templateId": "b4_015",
       "skill": "preposition_after_adjective_of_emotion_pleased_with_vs_about",
       "level": "B1",
-      "sentence": "To use the conventional collocation for directly evaluating a specific result: I'm really pleased ____ your exam results.",
+      "sentence": "Well done! I'm really pleased ____ your exam results.",
       "blank": {
         "answer": "with",
         "alternates": [],
-        "position": 98
+        "position": 30
       },
       "distractors": [
         {
@@ -3192,7 +3278,7 @@
       "templateId": "b5_002",
       "skill": "present_perfect_for_unfinished_time_period_this_week",
       "level": "B1",
-      "sentence": "So far this week I ___ three important emails, and there are two more to write before Friday.",
+      "sentence": "So far this week I ___ three emails, and there are two more to write before Friday.",
       "blank": {
         "answer": "have sent",
         "alternates": [
@@ -3234,14 +3320,14 @@
       "templateId": "b5_003",
       "skill": "modal_of_criticism_should_have_vs_could_have_contrast",
       "level": "B2",
-      "sentence": "Which completion explicitly criticizes the past decision rather than merely noting a possibility? You ____ more carefully before signing the contract — now we're stuck with these terms.",
+      "sentence": "You ____ more carefully before signing — now we're stuck with these terms. (criticism)",
       "blank": {
         "answer": "should have read",
         "alternates": [
           "should've read",
           "ought to have read"
         ],
-        "position": 102
+        "position": 4
       },
       "distractors": [
         {
@@ -3553,13 +3639,13 @@
       "templateId": "b5_012",
       "skill": "quantifier_of_before_object_pronoun",
       "level": "B1",
-      "sentence": "I have exactly two close friends. ____ them live in different countries now, so we rarely meet in person.",
+      "sentence": "I have two close friends. ____ them live abroad now, so we rarely meet.",
       "blank": {
         "answer": "Both of",
         "alternates": [
           "The two of"
         ],
-        "position": 34
+        "position": 26
       },
       "distractors": [
         {
@@ -4759,7 +4845,7 @@
       "templateId": "A1-021",
       "skill": "would_like_polite_requests",
       "level": "A2",
-      "sentence": "At the café counter, the barista asks what you want. You say: “I ___ a glass of orange juice, please.”",
+      "sentence": "At the café: “I ___ a glass of orange juice, please.”",
       "blank": {
         "answer": "would like",
         "alternates": [
@@ -4768,7 +4854,7 @@
           "will have",
           "would love"
         ],
-        "position": 65
+        "position": 16
       },
       "distractors": [
         {
@@ -4802,7 +4888,7 @@
       "templateId": "GI-006",
       "skill": "like_love_hate_plus_gerund_preferences",
       "level": "A2",
-      "sentence": "My brother ___ up early on Sundays, so he never sets an alarm before the weekend.",
+      "sentence": "My brother ___ up early on Sundays, so he never sets an alarm.",
       "blank": {
         "answer": "hates getting",
         "alternates": [
@@ -4928,7 +5014,7 @@
       "templateId": "CO-008",
       "skill": "wish_unreal_present_past_simple",
       "level": "B1",
-      "sentence": "I wish I ___ closer to the office; the commute eats two hours of my day.",
+      "sentence": "I wish I ___ closer to the office — the trip takes two hours a day.",
       "blank": {
         "answer": "lived",
         "alternates": [
@@ -5246,11 +5332,11 @@
       "templateId": "AR-007",
       "skill": "articles_a_an_the",
       "level": "A1",
-      "sentence": "I bought a book and a pen yesterday. ___ book is very interesting.",
+      "sentence": "I bought a book and a pen. ___ book is very interesting.",
       "blank": {
         "answer": "The",
         "alternates": [],
-        "position": 37
+        "position": 27
       },
       "distractors": [
         {
@@ -5284,7 +5370,7 @@
       "templateId": "AR-008",
       "skill": "demonstrative_reference_distance_this_these_that_those",
       "level": "A1",
-      "sentence": "Look at ___ photo in my hand — it is from our holiday.",
+      "sentence": "Look at ___ photo in my hand. It is from our holiday.",
       "blank": {
         "answer": "this",
         "alternates": [],
@@ -5322,7 +5408,7 @@
       "templateId": "CG-002",
       "skill": "possessive_adjectives",
       "level": "A1",
-      "sentence": "Mr. and Mrs. Lee live next door. ___ house is very big.",
+      "sentence": "Mr. and Mrs. Lee live next door. ___ house is big.",
       "blank": {
         "answer": "Their",
         "alternates": [],
@@ -5555,7 +5641,7 @@
       "templateId": "TA-101",
       "skill": "present_simple_vs_continuous",
       "level": "A2",
-      "sentence": "My sister ___ the bus to work every day, so she knows the timetable by heart.",
+      "sentence": "My sister ___ the bus every day, so she knows the timetable.",
       "blank": {
         "answer": "takes",
         "alternates": [],
@@ -5783,13 +5869,13 @@
       "templateId": "CM-006",
       "skill": "as_as_equality_vs_comparative",
       "level": "A2",
-      "sentence": "The sequel is fun, but it is ___ the first film — the first one still makes people laugh more.",
+      "sentence": "The sequel is ___ the first film — the first one still makes people laugh more.",
       "blank": {
         "answer": "not as funny as",
         "alternates": [
           "was"
         ],
-        "position": 29
+        "position": 14
       },
       "distractors": [
         {
@@ -5823,7 +5909,7 @@
       "templateId": "PR-009",
       "skill": "movement_prepositions_through_across_along_over",
       "level": "A2",
-      "sentence": "They walked ___ the beach for an hour, keeping the sea on their right the whole time.",
+      "sentence": "They walked ___ the beach, keeping the sea on their right the whole time.",
       "blank": {
         "answer": "along",
         "alternates": [],
@@ -5861,11 +5947,11 @@
       "templateId": "PR-010",
       "skill": "preposition_of_time_duration_for_vs_since_vs_during",
       "level": "A2",
-      "sentence": "She has worked at that small clinic ___ 2021, when she moved back to her hometown.",
+      "sentence": "She has worked at that clinic ___ 2021.",
       "blank": {
         "answer": "since",
         "alternates": [],
-        "position": 36
+        "position": 30
       },
       "distractors": [
         {
@@ -5899,7 +5985,7 @@
       "templateId": "QN-006",
       "skill": "subject_vs_object_questions_word_order",
       "level": "A2",
-      "sentence": "A: I met one of your neighbours at the market this morning. B: Oh, really? ___ exactly?",
+      "sentence": "A: I met one of your neighbours today. B: Oh, really? ___?",
       "blank": {
         "answer": "Who did you meet",
         "alternates": [
@@ -5912,7 +5998,7 @@
           "Hoping not",
           "Careful not"
         ],
-        "position": 75
+        "position": 54
       },
       "distractors": [
         {
@@ -5984,11 +6070,11 @@
       "templateId": "TA-017",
       "skill": "future_forms_plan_vs_prediction",
       "level": "B1",
-      "sentence": "Which completion shows a plan decided before the moment of speaking? 'We ___ my cousins in Lombok next month — we booked the flights last week.'",
+      "sentence": "We ___ my cousins in Lombok next month — we booked the flights last week.",
       "blank": {
         "answer": "are going to visit",
         "alternates": [],
-        "position": 73
+        "position": 3
       },
       "distractors": [
         {
@@ -6022,7 +6108,7 @@
       "templateId": "MO-010",
       "skill": "deduction_present",
       "level": "B1",
-      "sentence": "Which option expresses the strongest positive deduction supported by the evidence? The kitchen smells of garlic and I can hear pans clattering, so Dad ___ be cooking dinner.",
+      "sentence": "The kitchen smells of garlic and I can hear pans clattering, so Dad ___ be cooking dinner. (you are sure)",
       "blank": {
         "answer": "must",
         "alternates": [
@@ -6032,7 +6118,7 @@
           "ought not to have",
           "oughtn't to have"
         ],
-        "position": 151
+        "position": 68
       },
       "distractors": [
         {
@@ -6190,11 +6276,11 @@
       "templateId": "AR-031",
       "skill": "zero_article_generic_plural_vs_the_specific",
       "level": "B1",
-      "sentence": "We visited a small farm last weekend, and ___ animals we saw there were very friendly.",
+      "sentence": "We visited a farm last weekend, and ___ animals we saw there were very friendly.",
       "blank": {
         "answer": "the",
         "alternates": [],
-        "position": 42
+        "position": 36
       },
       "distractors": [
         {
@@ -6304,11 +6390,11 @@
       "templateId": "MO-034",
       "skill": "speculation_scale_may_might_could_vs_will",
       "level": "B1",
-      "sentence": "I've checked the official timetable twice, so I'm completely sure: the last train ___ leave at exactly 11:40 tonight.",
+      "sentence": "I've checked the timetable twice, so I'm completely sure: the last train ___ leave at 11:40.",
       "blank": {
         "answer": "will",
         "alternates": [],
-        "position": 82
+        "position": 73
       },
       "distractors": [
         {
@@ -6342,11 +6428,11 @@
       "templateId": "PR-035",
       "skill": "phrasal_verb_particle_changes_meaning",
       "level": "B1",
-      "sentence": "The music is a bit too loud for the baby — could you turn it ___ a little?",
+      "sentence": "The music is too loud for the baby — could you turn it ___ a little?",
       "blank": {
         "answer": "down",
         "alternates": [],
-        "position": 61
+        "position": 55
       },
       "distractors": [
         {
@@ -6494,11 +6580,11 @@
       "templateId": "MO-015",
       "skill": "possibility_vs_permission_can_vs_may_formal_register",
       "level": "B1",
-      "sentence": "Choose the most formal wording to ask a stranger at the bank: '___ I borrow your pen for a moment, please?'",
+      "sentence": "You ask a stranger at the bank, in the most formal way: '___ I borrow your pen, please?'",
       "blank": {
         "answer": "May",
         "alternates": [],
-        "position": 63
+        "position": 57
       },
       "distractors": [
         {
@@ -6892,11 +6978,11 @@
       "templateId": "TA-020",
       "skill": "future_continuous_vs_future_perfect",
       "level": "B2",
-      "sentence": "By the time your plane lands in Jakarta, we ___ the final report, so you can read it on the drive from the airport.",
+      "sentence": "By the time your plane lands, we ___ the final report, so you can read it on the drive from the airport.",
       "blank": {
         "answer": "will have finished",
         "alternates": [],
-        "position": 44
+        "position": 33
       },
       "distractors": [
         {
@@ -6930,11 +7016,11 @@
       "templateId": "MO-016",
       "skill": "deduction_past_must_have_vs_cant_have",
       "level": "B2",
-      "sentence": "Which option shows the evidence rules the past event out? Anna ___ taken the 7:40 train — I stood on that platform the whole time and she never appeared.",
+      "sentence": "Anna ___ taken the 7:40 train — I stood on that platform the whole time and never saw her.",
       "blank": {
         "answer": "can't have",
         "alternates": [],
-        "position": 63
+        "position": 5
       },
       "distractors": [
         {
@@ -7006,11 +7092,11 @@
       "templateId": "RS-008",
       "skill": "reporting_verb_choice_suggest_vs_tell",
       "level": "B2",
-      "sentence": "\"Hand in the report by Friday,\" the manager said to us. -> The manager ___ in the report by Friday.",
+      "sentence": "\"Hand in the report by Friday,\" the manager said. -> The manager ___ in the report by Friday.",
       "blank": {
         "answer": "told us to hand",
         "alternates": [],
-        "position": 71
+        "position": 65
       },
       "distractors": [
         {
@@ -7044,7 +7130,7 @@
       "templateId": "TA-021",
       "skill": "future_in_the_past_would_vs_was_going_to",
       "level": "B2",
-      "sentence": "I ___ call you last night to explain everything, but my phone died before I got the chance.",
+      "sentence": "I ___ call you last night, but my phone died.",
       "blank": {
         "answer": "was going to",
         "alternates": [],
@@ -7082,11 +7168,11 @@
       "templateId": "MO-017",
       "skill": "past_regret_should_have_vs_shouldnt_have",
       "level": "B2",
-      "sentence": "The client is furious — we ___ them about the shipping delay the moment we found out, but we kept quiet.",
+      "sentence": "The client is angry — we ___ them about the delay, but we kept quiet.",
       "blank": {
         "answer": "should have warned",
         "alternates": [],
-        "position": 27
+        "position": 25
       },
       "distractors": [
         {
@@ -7120,7 +7206,7 @@
       "templateId": "TA-022",
       "skill": "narrative_past_perfect_flashback_vs_past_simple_sequence",
       "level": "B2",
-      "sentence": "She unlocked the office at seven, ___ the windows to let some air in, and then switched on the coffee machine.",
+      "sentence": "She unlocked the office at seven, ___ the windows, and then switched on the coffee machine.",
       "blank": {
         "answer": "opened",
         "alternates": [],
@@ -7234,11 +7320,11 @@
       "templateId": "MO-018",
       "skill": "modal_of_criticism_should_have_vs_could_have_contrast",
       "level": "B2",
-      "sentence": "Which completion explicitly presents the taxi as a neutral unused possibility, without blaming anyone? We took the bus to the airport, but we ____ a taxi — either way was fine.",
+      "sentence": "We took the bus to the airport, but we ____ a taxi — either way was fine.",
       "blank": {
         "answer": "could have taken",
         "alternates": [],
-        "position": 142
+        "position": 39
       },
       "distractors": [
         {
@@ -7576,7 +7662,7 @@
       "templateId": "CM-009",
       "skill": "comparative_formation_er_vs_more_no_double_marking",
       "level": "A2",
-      "sentence": "The bus to Bandung is ___ (cheap) than the train, so Andi always takes the bus.",
+      "sentence": "The bus to Bandung is ___ (cheap) than the train.",
       "blank": {
         "answer": "cheaper",
         "alternates": [],
@@ -7695,7 +7781,7 @@
       "templateId": "A1-024",
       "skill": "indefinite_compounds_something_anything_nothing",
       "level": "A2",
-      "sentence": "The fridge was empty — there was ___ inside at all, so we went out to eat.",
+      "sentence": "The fridge was empty — there was ___ inside at all.",
       "blank": {
         "answer": "nothing",
         "alternates": [
@@ -7853,11 +7939,11 @@
       "templateId": "b6_002",
       "skill": "substitution_one_ones_avoid_repetition",
       "level": "B1",
-      "sentence": "My old camera broke last month, so yesterday I bought a new ___ at the mall.",
+      "sentence": "My old camera broke, so yesterday I bought a new ___.",
       "blank": {
         "answer": "one",
         "alternates": [],
-        "position": 60
+        "position": 49
       },
       "distractors": [
         {
@@ -7891,7 +7977,7 @@
       "templateId": "CO-010",
       "skill": "wish_would_annoyance_at_others_behaviour",
       "level": "B2",
-      "sentence": "My flatmate keeps borrowing my charger without asking, and it drives me crazy. I really wish he ___ doing that.",
+      "sentence": "My flatmate keeps borrowing my charger, and it drives me crazy. I wish he ___ doing that.",
       "blank": {
         "answer": "would stop",
         "alternates": [
@@ -7901,7 +7987,7 @@
           "would give up",
           "'d give up"
         ],
-        "position": 96
+        "position": 74
       },
       "distractors": [
         {
@@ -8066,7 +8152,7 @@
       "templateId": "CO-011",
       "skill": "its_high_time_past_simple_unreal",
       "level": "B2",
-      "sentence": "Residents have been complaining for months, so it's high time the city council ___ the potholes on Jalan Kenanga.",
+      "sentence": "People have been complaining for months, so it's high time the council ___ the potholes.",
       "blank": {
         "answer": "repaired",
         "alternates": [
@@ -8076,7 +8162,7 @@
           "filled",
           "filled in"
         ],
-        "position": 79
+        "position": 71
       },
       "distractors": [
         {
@@ -8574,6 +8660,1108 @@
         "rule": "“Albeit + kata sifat/adverbia/frasa preposisi” nyisipin konsesi tanpa klausa finit: “encouraging, albeit preliminary”; “albeit” nggak pernah bawa klausa berkata-kerja.",
         "memory": "“Albeit” = “although it be” — konsesi dipadetin jadi satu kata, tanpa kata kerja.",
         "avoid": "Konsesinya cuma satu kata sifat? Pakai “albeit” (atau “though”); jangan “despite” — dia minta kata benda, bukan kata sifat."
+      }
+    },
+    {
+      "id": "A1-202-cz0",
+      "templateId": "A1-202",
+      "skill": "can_ability",
+      "level": "A1",
+      "sentence": "I ___ ride a bike, but I want to learn.",
+      "blank": {
+        "answer": "can't",
+        "alternates": [],
+        "position": 2
+      },
+      "distractors": [
+        {
+          "text": "don't can",
+          "misconception": "do auxiliary",
+          "whyFailsId": "“can” punya negatif sendiri pakai “not”, nggak pernah pakai “don't”.",
+          "misconceptionId": "kata bantu do."
+        },
+        {
+          "text": "can't to",
+          "misconception": "adds 'to' after the modal can",
+          "whyFailsId": "sesudah “can't” kata kerjanya polos: can't ride, bukan can't to ride.",
+          "misconceptionId": "nambahin “to” sesudah can, padahal can langsung ketemu kata kerja dasar."
+        },
+        {
+          "text": "couldn't",
+          "misconception": "uses the past form for a present ability",
+          "whyFailsId": "“couldn't” bentuk lampau, padahal “I want to learn” nunjukin ini soal sekarang.",
+          "misconceptionId": "pakai bentuk lampau, padahal yang dibicarain kemampuan sekarang."
+        }
+      ],
+      "explain": {
+        "why": "“Can't” artinya nggak bisa sekarang, langsung diikuti kata kerja dasar “ride”.",
+        "rule": "Nggak bisa: can't (cannot) + kata kerja dasar. Tanpa don't, tanpa to.",
+        "memory": "Can't + kata kerja: can't ride, can't swim.",
+        "avoid": "Anggap can kayak tombol: can atau can't, lalu langsung kata kerjanya."
+      }
+    },
+    {
+      "id": "A1-203-cz0",
+      "templateId": "A1-203",
+      "skill": "past_simple_regular_forms",
+      "level": "A1",
+      "sentence": "Last night I ___ a film with my family.",
+      "blank": {
+        "answer": "watched",
+        "alternates": [],
+        "position": 13
+      },
+      "distractors": [
+        {
+          "text": "watch",
+          "misconception": "missing-past-marking",
+          "whyFailsId": "“last night” udah lewat, jadi kata kerjanya butuh akhiran -ed.",
+          "misconceptionId": "tanda lampaunya hilang."
+        },
+        {
+          "text": "did watched",
+          "misconception": "doubles the past marking with 'did' plus -ed",
+          "whyFailsId": "“did” udah bawa makna lampau, jadi kata kerjanya harus polos. Kalimat berita malah nggak butuh “did”.",
+          "misconceptionId": "nandain lampau dua kali: “did” plus -ed."
+        },
+        {
+          "text": "watching",
+          "misconception": "progressive-form substitution",
+          "whyFailsId": "“watching” butuh “was” di depannya dan nggak nyatain kejadian yang udah selesai.",
+          "misconceptionId": "bentuk -ing dipakai buat kejadian selesai."
+        }
+      ],
+      "explain": {
+        "why": "“Last night” udah lewat, jadi kata kerjanya pakai -ed: watched.",
+        "rule": "Past simple kata kerja teratur: kata kerja + -ed, cukup sekali, tanpa did di kalimat berita.",
+        "memory": "Ada “last night”? Kata kerjanya pakai -ed.",
+        "avoid": "Lihat kata waktu lampau? Tambah -ed ke kata kerjanya, lalu berhenti di situ."
+      }
+    },
+    {
+      "id": "A1-204-cz0",
+      "templateId": "A1-204",
+      "skill": "present_continuous_basics",
+      "level": "A1",
+      "sentence": "Look! The children ___ in the garden.",
+      "blank": {
+        "answer": "are playing",
+        "alternates": [],
+        "position": 19
+      },
+      "distractors": [
+        {
+          "text": "is playing",
+          "misconception": "be verb",
+          "whyFailsId": "“children” itu jamak, jadi kata bantunya “are”, bukan “is”.",
+          "misconceptionId": "kata kerja be."
+        },
+        {
+          "text": "playing",
+          "misconception": "missing-be-auxiliary",
+          "whyFailsId": "kata kerja -ing nggak bisa berdiri sendiri, butuh “are” supaya jadi kalimat utuh.",
+          "misconceptionId": "kata bantu be-nya hilang."
+        },
+        {
+          "text": "play",
+          "misconception": "present-simple-habit",
+          "whyFailsId": "“play” nyatain kebiasaan, padahal “Look!” nunjukin kejadiannya lagi jalan sekarang.",
+          "misconceptionId": "bentuk kebiasaan dipakai buat kejadian yang lagi jalan."
+        }
+      ],
+      "explain": {
+        "why": "“Look!” nunjuk kejadian yang lagi jalan, dan “the children” itu jamak, jadi bentuknya “are playing”.",
+        "rule": "Present continuous: am/is/are + kata kerja -ing. Subjek jamak pakai “are”.",
+        "memory": "Ada “Look!”? Pakai are + -ing.",
+        "avoid": "Dua cek: lagi jalan sekarang (pakai -ing) dan subjeknya jamak (pakai are)?"
+      }
+    },
+    {
+      "id": "A1-205-cz0",
+      "templateId": "A1-205",
+      "skill": "imperative_commands_base_form",
+      "level": "A2",
+      "sentence": "The floor is wet. ___ here, please!",
+      "blank": {
+        "answer": "Don't run",
+        "alternates": [],
+        "position": 18
+      },
+      "distractors": [
+        {
+          "text": "Not run",
+          "misconception": "using the -ing form on its own, which describes an activity instead of telling someone to act",
+          "whyFailsId": "larangan nggak bisa cuma pakai “not”. Bahasa Inggris butuh “don't” di depan kata kerjanya.",
+          "misconceptionId": "larangannya cuma pakai not tanpa do."
+        },
+        {
+          "text": "Doesn't run",
+          "misconception": "adding -s as if the command needed subject-verb agreement with a singular subject",
+          "whyFailsId": "“doesn't” buat he, she, it di kalimat berita. Larangan ke lawan bicara pakai “don't”.",
+          "misconceptionId": "perintah dikasih -s seolah butuh subjek tunggal."
+        },
+        {
+          "text": "Don't runs",
+          "misconception": "uses the third-person -s form after 'you' in a command",
+          "whyFailsId": "sesudah “don't” kata kerjanya tetap polos: don't run, bukan don't runs.",
+          "misconceptionId": "nambahin -s ke perintah, padahal perintah nggak punya subjek yang butuh -s."
+        }
+      ],
+      "explain": {
+        "why": "Pembicara ngelarang lawan bicaranya, jadi larangannya “Don't run”.",
+        "rule": "Larangan: Don't + kata kerja dasar. Tanpa subjek, tanpa -s.",
+        "memory": "Don't + kata kerja: Don't run, Don't touch.",
+        "avoid": "Mau ngelarang orang? Mulai dari “Don't”, lalu kata kerjanya tetap polos."
+      }
+    },
+    {
+      "id": "A1-206-cz0",
+      "templateId": "A1-206",
+      "skill": "adverbs_of_frequency_mid_position",
+      "level": "A2",
+      "sentence": "Rudi ___ for class.",
+      "blank": {
+        "answer": "is never late",
+        "alternates": [],
+        "position": 5
+      },
+      "distractors": [
+        {
+          "text": "never is late",
+          "misconception": "puts the frequency adverb before the verb be",
+          "whyFailsId": "sama be, kata keterangannya sesudah kata kerja: is never, bukan never is.",
+          "misconceptionId": "naruh kata keterangan frekuensi di depan is/are, padahal harusnya sesudahnya."
+        },
+        {
+          "text": "is late never",
+          "misconception": "puts the frequency adverb after the object",
+          "whyFailsId": "kata keterangan frekuensi duduk di tengah kalimat, bukan di ujung sesudah kata sifat.",
+          "misconceptionId": "naruh kata keterangan frekuensi di belakang objek, padahal tempatnya di depan kata kerja."
+        },
+        {
+          "text": "never be late",
+          "misconception": "leaving the bare verb with no third-person marking after a singular subject",
+          "whyFailsId": "“Rudi” butuh bentuk “is”. “Be” polos nggak bisa jadi kata kerja utama kalimat.",
+          "misconceptionId": "kata kerja dibiarin polos padahal subjeknya tunggal."
+        }
+      ],
+      "explain": {
+        "why": "Kata kerjanya be, jadi kata keterangan frekuensinya nyusul: Rudi is never late.",
+        "rule": "Kata keterangan frekuensi di depan kata kerja biasa, tapi sesudah be (am/is/are).",
+        "memory": "Be dulu, baru never: is never late.",
+        "avoid": "Tanya: kata kerjanya be? Kalau ya, kata keterangan sesudahnya. Kalau bukan, di depannya."
+      }
+    },
+    {
+      "id": "A1-207-cz0",
+      "templateId": "A1-207",
+      "skill": "possessive_s_noun_ownership",
+      "level": "A2",
+      "sentence": "This is my ___ car. He bought it last year.",
+      "blank": {
+        "answer": "father's",
+        "alternates": [],
+        "position": 11
+      },
+      "distractors": [
+        {
+          "text": "father",
+          "misconception": "drops the marker of ownership entirely, lining up two nouns as Indonesian does",
+          "whyFailsId": "“my father car” cuma nyandingin dua kata benda tanpa tanda kepemilikan.",
+          "misconceptionId": "tanda kepemilikannya dibuang, dua kata benda dijejerin kayak di bahasa Indonesia."
+        },
+        {
+          "text": "fathers",
+          "misconception": "writes a plain -s ending that superficially resembles the possessive but loses the apostrophe",
+          "whyFailsId": "“fathers” artinya lebih dari satu ayah. Kepemilikan butuh tanda petik: father's.",
+          "misconceptionId": "cuma nulis -s tanpa tanda petik."
+        },
+        {
+          "text": "father his",
+          "misconception": "inserting a duplicate owner pronoun after the name, marking possession twice",
+          "whyFailsId": "bahasa Inggris nggak nambahin “his” sesudah nama pemilik. Tanda 's udah nunjukin kepemilikan.",
+          "misconceptionId": "nambahin kata ganti pemilik sesudah nama, jadi kepemilikannya dobel."
+        }
+      ],
+      "explain": {
+        "why": "Mobilnya punya satu orang, ayahku, jadi pemiliknya dapet 's: my father's car.",
+        "rule": "Pemilik tunggal + 's + barangnya: father's car, Sinta's bag.",
+        "memory": "Pemilik + 's + barang.",
+        "avoid": "Siapa pemiliknya? Taruh 's langsung sesudah orang itu, baru barangnya."
+      }
+    },
+    {
+      "id": "MO-201-cz0",
+      "templateId": "MO-201",
+      "skill": "would_like_polite_requests",
+      "level": "A2",
+      "sentence": "A guest arrives at your house. You ask: “___ some tea?”",
+      "blank": {
+        "answer": "Would you like",
+        "alternates": [],
+        "position": 41
+      },
+      "distractors": [
+        {
+          "text": "Do you like",
+          "misconception": "stating a general preference in casual flat form instead of the polite request formula",
+          "whyFailsId": "“Do you like tea?” nanya suka teh atau nggak secara umum, bukan nawarin teh sekarang.",
+          "misconceptionId": "nanya selera umum, bukan nawarin dengan sopan."
+        },
+        {
+          "text": "Would you liking",
+          "misconception": "gluing an -ing onto the verb after 'would', a blend of two separate patterns",
+          "whyFailsId": "sesudah “would” kata kerjanya tetap polos: would like, bukan would liking.",
+          "misconceptionId": "nempelin -ing sesudah would, nyampur dua pola."
+        },
+        {
+          "text": "You would like",
+          "misconception": "uses 'want' where the polite would-like formula is expected",
+          "whyFailsId": "pertanyaan butuh “would” di depan “you”. Urutan kalimat berita nggak nanya apa-apa.",
+          "misconceptionId": "pakai “want” yang terlalu langsung, padahal konteksnya minta dengan sopan."
+        }
+      ],
+      "explain": {
+        "why": "Nawarin sesuatu dengan sopan pakai pertanyaan tetap “Would you like...?”",
+        "rule": "Tawaran sopan: Would + you + like + kata benda? Kata “like” tetap bentuk dasar.",
+        "memory": "Would you like...? = tawaran sopan.",
+        "avoid": "Nawarin makanan atau minuman? Mulai dari “Would you like”."
+      }
+    },
+    {
+      "id": "GI-201-cz0",
+      "templateId": "GI-201",
+      "skill": "like_love_hate_plus_gerund_preferences",
+      "level": "A2",
+      "sentence": "I really enjoy ___ to music while I study.",
+      "blank": {
+        "answer": "listening",
+        "alternates": [],
+        "position": 15
+      },
+      "distractors": [
+        {
+          "text": "listen",
+          "misconception": "following the feeling verb with a bare infinitive, chaining verbs directly as Indonesian does",
+          "whyFailsId": "dua kata kerja nggak bisa nempel begitu aja. Sesudah “enjoy” kata kerja keduanya butuh -ing.",
+          "misconceptionId": "kata kerja perasaan langsung disambung kata kerja polos kayak di bahasa Indonesia."
+        },
+        {
+          "text": "to listen",
+          "misconception": "uses a to-infinitive after 'enjoy'",
+          "whyFailsId": "“enjoy” nggak pernah pakai “to”. Selalu diikuti -ing.",
+          "misconceptionId": "pakai “to” sesudah enjoy, padahal enjoy selalu diikuti bentuk -ing."
+        },
+        {
+          "text": "listens",
+          "misconception": "base-form overuse",
+          "whyFailsId": "“listens” bentuk present simple buat he/she, nggak bisa ngikut di belakang kata kerja lain.",
+          "misconceptionId": "bentuk kata kerja berkonjugasi dipakai sesudah kata kerja lain."
+        }
+      ],
+      "explain": {
+        "why": "“Enjoy” kata kerja kesukaan, jadi kata kerja sesudahnya pakai -ing: enjoy listening.",
+        "rule": "Like, love, hate, dan enjoy diikuti kata kerja + -ing.",
+        "memory": "Enjoy selalu ketemu -ing: enjoy listening, enjoy cooking.",
+        "avoid": "Sesudah kata kerja perasaan, bayangin akhiran -ing sebelum nulis kata kerja berikutnya."
+      }
+    },
+    {
+      "id": "TA-201-cz0",
+      "templateId": "TA-201",
+      "skill": "present_perfect_experience_ever_never",
+      "level": "A2",
+      "sentence": "My grandmother ___ a plane. She always travels by train.",
+      "blank": {
+        "answer": "has never flown",
+        "alternates": [],
+        "position": 15
+      },
+      "distractors": [
+        {
+          "text": "never flew",
+          "misconception": "uses the past simple for a life experience without a time",
+          "whyFailsId": "nggak ada waktu selesai kayak “last year”. Kalimatnya nyakup seumur hidup sampai sekarang, jadi butuh present perfect.",
+          "misconceptionId": "pakai past simple buat pengalaman hidup yang nggak disebut waktunya."
+        },
+        {
+          "text": "has never fly",
+          "misconception": "leaving the bare verb although 'have' needs the past participle after it",
+          "whyFailsId": "sesudah “has” kata kerjanya harus past participle “flown”, bukan “fly” polos.",
+          "misconceptionId": "kata kerja dibiarin polos padahal sesudah have butuh past participle."
+        },
+        {
+          "text": "never has flying",
+          "misconception": "mixes 'have' with a finite past form of 'be' instead of the participle",
+          "whyFailsId": "“has” berpasangan sama past participle, bukan -ing. “Never” juga tempatnya sesudah “has”.",
+          "misconceptionId": "have dicampur sama bentuk -ing, bukan past participle."
+        }
+      ],
+      "explain": {
+        "why": "Rentang waktunya seumur hidup sampai sekarang, dan “she always travels by train” nunjukin itu masih berlaku, jadi “has never flown” yang pas.",
+        "rule": "Pengalaman hidup tanpa waktu pasti: have/has + never/ever + past participle.",
+        "memory": "Belum pernah seumur hidup → has never flown.",
+        "avoid": "Nggak ada tanggal atau kata waktu selesai? Pakai have/has + past participle."
+      }
+    },
+    {
+      "id": "TA-202-cz0",
+      "templateId": "TA-202",
+      "skill": "present_perfect_with_for_since_duration",
+      "level": "A2",
+      "sentence": "Mr. Hadi has taught at our school ___ ten years, and he still loves it.",
+      "blank": {
+        "answer": "for",
+        "alternates": [],
+        "position": 34
+      },
+      "distractors": [
+        {
+          "text": "since",
+          "misconception": "uses 'since' before a length of time",
+          "whyFailsId": "“since” buat titik mulai kayak 2015, bukan lamanya kayak “ten years”.",
+          "misconceptionId": "pakai “since” di depan lamanya waktu, padahal since buat titik mulai."
+        },
+        {
+          "text": "during",
+          "misconception": "sealing the period off as a completed event, though the family still lives there",
+          "whyFailsId": "“during” bilang kapan sesuatu terjadi di dalam suatu masa, bukan ngukur berapa lama keadaan itu bertahan.",
+          "misconceptionId": "rentangnya ditutup seolah udah selesai."
+        },
+        {
+          "text": "from",
+          "misconception": "uses 'for' before a starting point",
+          "whyFailsId": "“from” butuh titik akhir (“from 2015 to 2025”). Sendirian, dia nggak bisa ngikut present perfect di sini.",
+          "misconceptionId": "pakai “for” di depan titik mulai, padahal for buat lamanya waktu."
+        }
+      ],
+      "explain": {
+        "why": "“Ten years” itu lamanya waktu, jadi present perfect-nya pakai “for”: has taught for ten years.",
+        "rule": "Present perfect + for + lamanya waktu. Present perfect + since + titik mulai.",
+        "memory": "Lamanya pakai for, titik mulainya pakai since: for ten years, since 2015.",
+        "avoid": "Tanya: ini jumlah tahun atau tanggal? Jumlah → for. Tanggal → since."
+      }
+    },
+    {
+      "id": "CM-201-cz0",
+      "templateId": "CM-201",
+      "skill": "irregular_comparative_better_worse_forms",
+      "level": "A2",
+      "sentence": "The traffic today is ___ than yesterday. We will be late.",
+      "blank": {
+        "answer": "worse",
+        "alternates": [],
+        "position": 21
+      },
+      "distractors": [
+        {
+          "text": "badder",
+          "misconception": "regular -er ending forced onto an irregular adjective",
+          "whyFailsId": "“bad” itu tak beraturan, nggak pernah pakai -er.",
+          "misconceptionId": "akhiran -er dipaksain ke kata sifat tak beraturan."
+        },
+        {
+          "text": "more bad",
+          "misconception": "regular 'more + adjective' pattern applied to an irregular adjective",
+          "whyFailsId": "“more bad” ngikutin pola biasa, padahal “bad” punya bentuk sendiri: worse.",
+          "misconceptionId": "pola “more + kata sifat” dipakai buat kata sifat tak beraturan."
+        },
+        {
+          "text": "worst",
+          "misconception": "superlative 'best' used where 'than' demands a comparative",
+          "whyFailsId": "“worst” buat bandingin tiga atau lebih. “Than” nandain perbandingan dua hal.",
+          "misconceptionId": "bentuk paling dipakai padahal “than” minta bentuk banding."
+        }
+      ],
+      "explain": {
+        "why": "“Than” minta bentuk banding, dan bentuk banding “bad” itu “worse”.",
+        "rule": "Bentuk banding tak beraturan: good → better, bad → worse, far → further.",
+        "memory": "Hafalin pasangannya: good jadi better, bad jadi worse.",
+        "avoid": "Hafalin daftar pendek pasangan tak beraturan sebelum kamu ambil -er atau more."
+      }
+    },
+    {
+      "id": "CM-202-cz0",
+      "templateId": "CM-202",
+      "skill": "comparative_formation_er_vs_more_no_double_marking",
+      "level": "A2",
+      "sentence": "This book is ___ (interesting) than the film.",
+      "blank": {
+        "answer": "more interesting",
+        "alternates": [],
+        "position": 13
+      },
+      "distractors": [
+        {
+          "text": "interestinger",
+          "misconception": "adds -er to a long adjective",
+          "whyFailsId": "“interesting” tiga suku kata, jadi pakai “more”, bukan -er.",
+          "misconceptionId": "nambahin -er ke kata sifat panjang, padahal yang panjang pakai more."
+        },
+        {
+          "text": "more interestinger",
+          "misconception": "doubles the comparative marking by putting 'more' before an adjective already ending in '-er'",
+          "whyFailsId": "“more” dan -er sama-sama nandain banding. Pakai satu aja.",
+          "misconceptionId": "tanda bandingnya dobel: more plus -er."
+        },
+        {
+          "text": "the most interesting",
+          "misconception": "uses the superlative after 'the' for a two-item comparison",
+          "whyFailsId": "“than” bandingin dua hal, jadi butuh bentuk banding, bukan bentuk paling.",
+          "misconceptionId": "pakai bentuk paling, padahal cuma dua hal yang dibandingin."
+        }
+      ],
+      "explain": {
+        "why": "“Interesting” kata sifat panjang, jadi bentuk bandingnya “more interesting”.",
+        "rule": "Kata sifat pendek pakai -er (cheaper). Kata sifat panjang pakai more (more interesting). Jangan dua-duanya.",
+        "memory": "Kata panjang → more. Kata pendek → -er.",
+        "avoid": "Ucapin kata sifatnya: tiga suku kata atau lebih → more."
+      }
+    },
+    {
+      "id": "A1-208-cz0",
+      "templateId": "A1-208",
+      "skill": "adverb_of_manner_ly_vs_adjective_after_verb",
+      "level": "A2",
+      "sentence": "Be careful, the soup is very ___.",
+      "blank": {
+        "answer": "hot",
+        "alternates": [],
+        "position": 29
+      },
+      "distractors": [
+        {
+          "text": "hotly",
+          "misconception": "uses the adverb where an adjective after 'be' is needed",
+          "whyFailsId": "sesudah “is”, katanya ngegambarin supnya sendiri, jadi harus kata sifat, bukan -ly.",
+          "misconceptionId": "pakai bentuk -ly sesudah is/are, padahal sesudah be yang dibutuhin kata sifat."
+        },
+        {
+          "text": "heat",
+          "misconception": "uses the bare adjective after an action verb where a manner adverb in '-ly' is required",
+          "whyFailsId": "“heat” itu kata benda atau kata kerja. “Very” butuh kata sifat sesudahnya.",
+          "misconceptionId": "kata benda dipakai di tempat kata sifat."
+        },
+        {
+          "text": "hotter",
+          "misconception": "switches to a comparative adjective although nothing is being compared and the slot needs an adverb",
+          "whyFailsId": "nggak ada yang dibandingin, dan “very” nggak cocok sama bentuk banding.",
+          "misconceptionId": "bentuk banding dipakai padahal nggak ada yang dibandingin."
+        }
+      ],
+      "explain": {
+        "why": "“Is” nyambungin sup sama gambarannya, jadi butuh kata sifat “hot”.",
+        "rule": "Sesudah be (am/is/are) pakai kata sifat. Sesudah kata kerja aksi pakai kata keterangan -ly.",
+        "memory": "Sesudah is pakai kata sifat: is hot. Sesudah kata kerja aksi pakai -ly: walks slowly.",
+        "avoid": "Ada is/are di depan titik-titik? Pilih kata sifat polos."
+      }
+    },
+    {
+      "id": "QT-201-cz0",
+      "templateId": "QT-201",
+      "skill": "how_much_vs_how_many_quantity_questions",
+      "level": "A2",
+      "sentence": "___ brothers and sisters do you have?",
+      "blank": {
+        "answer": "How many",
+        "alternates": [],
+        "position": 0
+      },
+      "distractors": [
+        {
+          "text": "How much",
+          "misconception": "asks about a countable plural noun with 'how much'",
+          "whyFailsId": "“brothers and sisters” bisa dihitung, jadi kata tanyanya “how many”.",
+          "misconceptionId": "nanya benda yang bisa dihitung pakai “how much”, padahal harusnya “how many”."
+        },
+        {
+          "text": "How",
+          "misconception": "asks quantity with bare 'how' and drops the quantity word entirely",
+          "whyFailsId": "“how” sendirian nanya cara, bukan jumlah.",
+          "misconceptionId": "nanya jumlah cuma pakai “how”, kata jumlahnya hilang."
+        },
+        {
+          "text": "How many of",
+          "misconception": "adds a partitive 'of' straight after 'how much' before a bare noun",
+          "whyFailsId": "“of” cuma pas di depan “the/your/them”: how many of your friends, bukan how many of brothers.",
+          "misconceptionId": "nambahin “of” langsung di depan kata benda polos."
+        }
+      ],
+      "explain": {
+        "why": "“Brothers and sisters” bisa dihitung dan jamak, jadi pertanyaannya mulai dari “How many”.",
+        "rule": "How many + kata benda jamak yang bisa dihitung. How much + kata benda yang nggak bisa dihitung.",
+        "memory": "Bisa dihitung → how many.",
+        "avoid": "Bisa ditaruh angka di depannya (two brothers)? Tanyanya pakai “How many”."
+      }
+    },
+    {
+      "id": "TA-203-cz0",
+      "templateId": "TA-203",
+      "skill": "state_verbs_resist_continuous_form",
+      "level": "A2",
+      "sentence": "Sorry, I ___ the answer right now.",
+      "blank": {
+        "answer": "don't know",
+        "alternates": [],
+        "position": 9
+      },
+      "distractors": [
+        {
+          "text": "am not knowing",
+          "misconception": "Assumes present time always requires present continuous.",
+          "whyFailsId": "“know” kata kerja keadaan, jadi tetap present simple walau ada “right now”.",
+          "misconceptionId": "ngira waktu sekarang selalu butuh bentuk -ing."
+        },
+        {
+          "text": "not know",
+          "misconception": "reduces the sentence to a fragment: an -ing form with no finite verb to carry the tense",
+          "whyFailsId": "negatif present simple butuh “don't”. “Not know” polos bukan kata kerja utuh.",
+          "misconceptionId": "kalimatnya jadi potongan tanpa kata kerja utuh."
+        },
+        {
+          "text": "don't knowing",
+          "misconception": "bare-verb-without-auxiliary",
+          "whyFailsId": "sesudah “don't” kata kerjanya polos: don't know, bukan don't knowing.",
+          "misconceptionId": "kata kerja polos tanpa kata bantu."
+        }
+      ],
+      "explain": {
+        "why": "“Know” ngegambarin keadaan, bukan aksi, jadi walau ada “right now” tetap present simple: don't know.",
+        "rule": "Kata kerja keadaan (know, like, want, belong) biasanya tetap present simple, bukan bentuk -ing.",
+        "memory": "Know, like, want — tanpa -ing.",
+        "avoid": "“Right now” nggak otomatis berarti -ing. Cek dulu kata kerjanya keadaan atau bukan."
+      }
+    },
+    {
+      "id": "QN-201-cz0",
+      "templateId": "QN-201",
+      "skill": "double_negative_avoidance_single_negation_rule",
+      "level": "A2",
+      "sentence": "We don't have ___ milk left, so I'll buy some.",
+      "blank": {
+        "answer": "any",
+        "alternates": [],
+        "position": 14
+      },
+      "distractors": [
+        {
+          "text": "no",
+          "misconception": "uses 'no' before a verb already negated with 'not'",
+          "whyFailsId": "“don't” udah negatif. Nambah “no” bikin negatif dobel.",
+          "misconceptionId": "pakai “no” sesudah kata kerja yang udah negatif, jadi negatifnya dobel."
+        },
+        {
+          "text": "nothing",
+          "misconception": "combining a negated verb ('didn't') with a negative pronoun, creating a non-standard double negative",
+          "whyFailsId": "“nothing” itu kata ganti negatif, nggak bisa berdiri di depan kata benda “milk” sesudah “don't”.",
+          "misconceptionId": "kata kerja negatif digabung sama kata ganti negatif."
+        },
+        {
+          "text": "none",
+          "misconception": "incorrectly splitting the compound negative pronoun into two words",
+          "whyFailsId": "“none” ngegantiin kata benda (“we have none”), nggak bisa langsung di depan “milk”.",
+          "misconceptionId": "kata ganti dipakai di depan kata benda."
+        }
+      ],
+      "explain": {
+        "why": "“Don't have” udah negatif, jadi kata bendanya pakai “any”: don't have any milk.",
+        "rule": "Satu negatif per klausa: don't + any, atau have + no. Jangan don't + no.",
+        "memory": "Satu negatif aja: don't … any, atau have … no.",
+        "avoid": "Hitung negatifnya. Kalau kata kerjanya udah ada “not”, kata berikutnya “any”."
+      }
+    },
+    {
+      "id": "CO-201-cz0",
+      "templateId": "CO-201",
+      "skill": "second_conditional_unreal_present",
+      "level": "B1",
+      "sentence": "If I had more free time, I ___ a new language.",
+      "blank": {
+        "answer": "would learn",
+        "alternates": [],
+        "position": 27
+      },
+      "distractors": [
+        {
+          "text": "will learn",
+          "misconception": "real/likely framing applied to an admittedly unlikely event",
+          "whyFailsId": "“will” buat rencana nyata. “Had” yang lampau nunjukin ini khayalan, jadi butuh “would”.",
+          "misconceptionId": "situasi yang jelas nggak nyata dibingkai seolah nyata."
+        },
+        {
+          "text": "learned",
+          "misconception": "if-clause verb form mismatched with 'would' in the main clause",
+          "whyFailsId": "past simple tempatnya di klausa if. Klausa akibat butuh “would”.",
+          "misconceptionId": "bentuk klausa if nyasar ke klausa akibat."
+        },
+        {
+          "text": "would learned",
+          "misconception": "duplicating 'would' in both clauses",
+          "whyFailsId": "sesudah “would” kata kerjanya polos: would learn, bukan would learned.",
+          "misconceptionId": "would digabung sama bentuk -ed."
+        }
+      ],
+      "explain": {
+        "why": "“If I had more free time” ngegambarin keadaan sekarang yang nggak nyata, jadi akibatnya pakai “would learn”.",
+        "rule": "Second conditional: If + past simple, would + kata kerja dasar.",
+        "memory": "Khayalan sekarang: If I had…, I would…",
+        "avoid": "Ada klausa if bentuk lampau soal khayalan sekarang? Taruh “would” plus kata kerja polos di akibatnya."
+      }
+    },
+    {
+      "id": "QN-202-cz0",
+      "templateId": "QN-202",
+      "skill": "question_tag_polarity",
+      "level": "B1",
+      "sentence": "Your sister works at the hospital, ___?",
+      "blank": {
+        "answer": "doesn't she",
+        "alternates": [],
+        "position": 35
+      },
+      "distractors": [
+        {
+          "text": "does she",
+          "misconception": "uses a positive tag after a positive statement",
+          "whyFailsId": "kalimatnya positif, jadi tag-nya harus dibalik jadi negatif: doesn't she.",
+          "misconceptionId": "tag-nya positif sesudah kalimat positif, padahal harusnya dibalik jadi negatif."
+        },
+        {
+          "text": "isn't she",
+          "misconception": "wrong auxiliary borrowed from a different tense",
+          "whyFailsId": "“works” itu present simple, jadi tag-nya butuh “does”, bukan “is”.",
+          "misconceptionId": "kata bantunya nyasar dari bentuk lain."
+        },
+        {
+          "text": "doesn't your sister",
+          "misconception": "repeats the noun instead of using a pronoun in the tag",
+          "whyFailsId": "tag pakai kata ganti, bukan kata benda utuh: doesn't she.",
+          "misconceptionId": "ngulang kata bendanya di tag, padahal tag pakai kata ganti."
+        }
+      ],
+      "explain": {
+        "why": "“Works” itu present simple positif, jadi tag-nya negatif pakai “does” dan kata ganti “she”: doesn't she?",
+        "rule": "Kalimat positif → tag negatif. Tag niru kata bantu kalimatnya dan pakai kata ganti.",
+        "memory": "Kalimat positif, tag negatif: works → doesn't she?",
+        "avoid": "Tiga cek: balik positif-negatifnya, samain kata bantunya, ganti kata benda jadi kata ganti."
+      }
+    },
+    {
+      "id": "RS-201-cz0",
+      "templateId": "RS-201",
+      "skill": "reported_questions_word_order",
+      "level": "B1",
+      "sentence": "\"What time does the shop open?\" → He asked me what time ___.",
+      "blank": {
+        "answer": "the shop opened",
+        "alternates": [],
+        "position": 56
+      },
+      "distractors": [
+        {
+          "text": "did the shop open",
+          "misconception": "keeps the question-form inversion (auxiliary before subject) inside the reported clause",
+          "whyFailsId": "pertanyaan yang dilaporin pakai urutan kalimat berita, jadi “did” nggak boleh di depan “the shop”.",
+          "misconceptionId": "urutan pertanyaan (kata bantu sebelum subjek) tetap dipakai di klausa laporan."
+        },
+        {
+          "text": "the shop opens",
+          "misconception": "keeps the present tense inside a reported question after a past reporting verb",
+          "whyFailsId": "“asked” lampau, jadi “opens” biasanya mundur jadi “opened”.",
+          "misconceptionId": "tetap pakai bentuk sekarang di dalam pertanyaan yang dilaporin, padahal kata pelapornya lampau."
+        },
+        {
+          "text": "does the shop open",
+          "misconception": "produces an ungrammatical inversion not used in either direct or reported questions in this pattern",
+          "whyFailsId": "ini masih nyimpen urutan pertanyaan sekaligus bentuk sekarang dari pertanyaan langsungnya.",
+          "misconceptionId": "inversi yang nggak dipakai di pertanyaan langsung maupun laporan."
+        }
+      ],
+      "explain": {
+        "why": "Di pertanyaan yang dilaporin, subjek duluan baru kata kerja, dan bentuk waktunya mundur: what time the shop opened.",
+        "rule": "Pertanyaan wh- yang dilaporin: kata tanya + subjek + kata kerja (tanpa do/does/did), bentuk waktunya mundur sesudah kata pelapor lampau.",
+        "memory": "Asked what time the shop opened — tanpa “did”.",
+        "avoid": "Buang do/does/did, taruh subjek duluan, lalu geser kata kerjanya satu langkah ke lampau."
+      }
+    },
+    {
+      "id": "QN-203-cz0",
+      "templateId": "QN-203",
+      "skill": "indirect_questions_embedded_word_order",
+      "level": "B1",
+      "sentence": "Do you know what time ___?",
+      "blank": {
+        "answer": "the bank closes",
+        "alternates": [],
+        "position": 22
+      },
+      "distractors": [
+        {
+          "text": "does the bank close",
+          "misconception": "keeps direct-question inversion (verb before subject) inside the embedded clause",
+          "whyFailsId": "pertanyaannya udah dibikin sama “Do you know”. Bagian dalamnya nggak boleh ngulang bentuk pertanyaan.",
+          "misconceptionId": "urutan pertanyaan langsung (kata kerja sebelum subjek) tetap dipakai di klausa yang ditempel."
+        },
+        {
+          "text": "the bank does close",
+          "misconception": "adds 'do' to an embedded question",
+          "whyFailsId": "urutannya udah bener, tapi “does” nggak dibutuhin. Kata kerjanya cukup pakai -s: closes.",
+          "misconceptionId": "nambahin “do” ke pertanyaan yang ditempel, padahal di dalam kalimat nggak butuh do."
+        },
+        {
+          "text": "closes the bank",
+          "misconception": "moves the auxiliary to the very front of the embedded clause, producing an invalid word order",
+          "whyFailsId": "naruh kata kerja sebelum subjek bukan urutan bahasa Inggris di sini.",
+          "misconceptionId": "kata kerja dipindah ke depan subjek, urutannya nggak sah."
+        }
+      ],
+      "explain": {
+        "why": "Sesudah “Do you know what time”, sisanya kalimat berita biasa: the bank closes.",
+        "rule": "Pertanyaan nggak langsung: pembuka + kata tanya + subjek + kata kerja. Tanpa do/does/did di bagian dalamnya.",
+        "memory": "Do you know + kalimat berita.",
+        "avoid": "Ucapin bagian dalamnya sebagai kalimat berita dulu, baru tempelin."
+      }
+    },
+    {
+      "id": "CO-202-cz0",
+      "templateId": "CO-202",
+      "skill": "wish_unreal_present_past_simple",
+      "level": "B1",
+      "sentence": "I can't swim. I wish I ___ swim like my brother.",
+      "blank": {
+        "answer": "could",
+        "alternates": [],
+        "position": 23
+      },
+      "distractors": [
+        {
+          "text": "can",
+          "misconception": "keeping the present tense after 'wish', reading the situation as a real current fact",
+          "whyFailsId": "sesudah “wish” kata kerjanya mundur: “can” jadi “could”.",
+          "misconceptionId": "bentuk sekarang dibiarin sesudah wish, situasinya dibaca sebagai fakta nyata."
+        },
+        {
+          "text": "would",
+          "misconception": "uses 'would' in the wish clause about one's own situation",
+          "whyFailsId": "“wish + would” buat kelakuan orang lain yang nyebelin, bukan kemampuan diri sendiri.",
+          "misconceptionId": "pakai “would” di klausa wish soal diri sendiri, padahal wish + past simple."
+        },
+        {
+          "text": "will",
+          "misconception": "inserting 'would' for the speaker's own situation, as if the sentence were a result clause",
+          "whyFailsId": "“will” nunjuk masa depan nyata. “Wish” ngegambarin keadaan sekarang yang nggak nyata.",
+          "misconceptionId": "bentuk masa depan nyata dipakai buat harapan yang nggak nyata."
+        }
+      ],
+      "explain": {
+        "why": "Pembicara nggak bisa berenang sekarang dan berharap sebaliknya, jadi “wish” pakai bentuk lampau: could swim.",
+        "rule": "Wish soal sekarang: wish + past simple (atau could). Can → could.",
+        "memory": "Nggak bisa sekarang, jadi wish I could: can't swim → wish I could.",
+        "avoid": "Balik kalimat nyatanya jadi kebalikannya, lalu geser kata kerjanya satu langkah ke lampau."
+      }
+    },
+    {
+      "id": "TA-205-cz0",
+      "templateId": "TA-205",
+      "skill": "present_perfect_just_already_yet_placement",
+      "level": "B1",
+      "sentence": "You don't need to wash the dishes — I ___ them.",
+      "blank": {
+        "answer": "have already washed",
+        "alternates": [],
+        "position": 38
+      },
+      "distractors": [
+        {
+          "text": "have washed yet",
+          "misconception": "uses 'yet' in a positive statement",
+          "whyFailsId": "“yet” tempatnya di kalimat negatif dan pertanyaan, bukan kalimat positif.",
+          "misconceptionId": "pakai “yet” di kalimat positif, padahal yet buat negatif dan pertanyaan."
+        },
+        {
+          "text": "already have washed",
+          "misconception": "drags 'just' to the end of the clause instead of mid-position between the auxiliary and the participle",
+          "whyFailsId": "“already” duduk di antara “have” dan participle, bukan sebelum “have”.",
+          "misconceptionId": "kata keterangannya nggak di posisi tengah antara kata bantu dan participle."
+        },
+        {
+          "text": "have washed already yet",
+          "misconception": "parks 'still' at the end of a negative clause instead of before the auxiliary",
+          "whyFailsId": "“already” dan “yet” nggak bisa digabung. Satu kata udah cukup.",
+          "misconceptionId": "kata keterangan waktunya ditumpuk di ujung."
+        }
+      ],
+      "explain": {
+        "why": "Piringnya udah beres, jadi kalimat positifnya pakai “already” di posisi tengah: have already washed.",
+        "rule": "Have + already/just + past participle di kalimat positif. “Yet” di ujung kalimat negatif dan pertanyaan.",
+        "memory": "Positif pakai already di tengah, negatif pakai yet di ujung.",
+        "avoid": "Positif dan udah selesai? Selipin “already” langsung sesudah “have”."
+      }
+    },
+    {
+      "id": "PD-201-cz0",
+      "templateId": "PD-201",
+      "skill": "reflexive_pronouns_myself_vs_each_other",
+      "level": "B1",
+      "sentence": "Maya and Dito are best friends. They tell ___ everything.",
+      "blank": {
+        "answer": "each other",
+        "alternates": [],
+        "position": 42
+      },
+      "distractors": [
+        {
+          "text": "themselves",
+          "misconception": "uses a reflexive pronoun where the plain object pronoun is needed",
+          "whyFailsId": "“themselves” artinya tiap orang cerita ke dirinya sendiri. Di sini Maya cerita ke Dito dan Dito ke Maya.",
+          "misconceptionId": "pakai kata ganti diri (-self), padahal pelaku dan objeknya orang yang beda."
+        },
+        {
+          "text": "them",
+          "misconception": "uses the plain object pronoun although subject and object are the same person",
+          "whyFailsId": "“them” nunjuk orang lain di luar mereka berdua, bukan Maya dan Dito.",
+          "misconceptionId": "kata ganti objek biasa dipakai padahal subjek dan objeknya orang yang sama."
+        },
+        {
+          "text": "theirselves",
+          "misconception": "picks a reflexive that does not match the person of the subject",
+          "whyFailsId": "“theirselves” bukan kata bahasa Inggris. Bentuknya “themselves”, dan itu pun salah di sini.",
+          "misconceptionId": "kata ganti diri yang nggak cocok sama subjeknya."
+        }
+      ],
+      "explain": {
+        "why": "Ceritanya dua arah antara dua orang, jadi “each other” yang pas.",
+        "rule": "Each other = A → B dan B → A. -selves = subjek ngelakuin ke dirinya sendiri.",
+        "memory": "Each other = dua arah.",
+        "avoid": "Gambar dua panah di antara orangnya. Dua arah? Pakai “each other”."
+      }
+    },
+    {
+      "id": "CO-203-cz0",
+      "templateId": "CO-203",
+      "skill": "third_conditional_unreal_past",
+      "level": "B2",
+      "sentence": "If you had told me about the party, I ___.",
+      "blank": {
+        "answer": "would have come",
+        "alternates": [],
+        "position": 38
+      },
+      "distractors": [
+        {
+          "text": "would come",
+          "misconception": "uses second-conditional past simple in an if-clause that needs third-conditional past perfect",
+          "whyFailsId": "“would come” ngomongin sekarang atau masa depan yang nggak nyata. Pestanya udah lewat.",
+          "misconceptionId": "bentuk second conditional dipakai buat pengandaian lampau."
+        },
+        {
+          "text": "came",
+          "misconception": "uses the past simple in the result clause of a third conditional",
+          "whyFailsId": "“came” nyatain kejadian lampau nyata, padahal pembicaranya nggak datang.",
+          "misconceptionId": "pakai past simple di klausa akibat pengandaian lampau, padahal butuh would have + past participle."
+        },
+        {
+          "text": "had come",
+          "misconception": "duplicates 'would' in both clauses",
+          "whyFailsId": "“had come” bentuk buat klausa if. Klausa akibat butuh “would have”.",
+          "misconceptionId": "bentuk klausa if nyasar ke klausa akibat."
+        }
+      ],
+      "explain": {
+        "why": "Pestanya udah lewat dan pembicara nggak datang, jadi akibat khayalannya pakai “would have come”.",
+        "rule": "Third conditional: If + past perfect, would have + past participle.",
+        "memory": "Pengandaian lampau: If you had told me, I would have come.",
+        "avoid": "Past perfect di klausa if? Jawab pakai “would have” plus participle."
+      }
+    },
+    {
+      "id": "PA-201-cz0",
+      "templateId": "PA-201",
+      "skill": "passive_with_modal_verbs",
+      "level": "B2",
+      "sentence": "These tickets ___ online or at the station.",
+      "blank": {
+        "answer": "can be bought",
+        "alternates": [],
+        "position": 14
+      },
+      "distractors": [
+        {
+          "text": "can bought",
+          "misconception": "omits the auxiliary 'be' required to form the passive after a modal",
+          "whyFailsId": "pasif butuh “be” di antara modal dan participle: can be bought.",
+          "misconceptionId": "kata bantu be yang dibutuhin pasif sesudah modal dibuang."
+        },
+        {
+          "text": "can buy",
+          "misconception": "leaves the verb in active form after the modal",
+          "whyFailsId": "“tickets can buy” bikin tiketnya yang beli. Tiketnya yang dibeli, jadi butuh pasif.",
+          "misconceptionId": "kata kerjanya dibiarin aktif sesudah modal."
+        },
+        {
+          "text": "can be buy",
+          "misconception": "puts 'be' after the past participle in a modal passive",
+          "whyFailsId": "sesudah “be” kata kerjanya harus past participle “bought”, bukan “buy” polos.",
+          "misconceptionId": "naruh “be” sesudah past participle, padahal urutannya modal + be + past participle."
+        }
+      ],
+      "explain": {
+        "why": "Tiketnya yang dikenai aksi, jadi pasif modalnya “can be bought”.",
+        "rule": "Pasif modal: modal + be + past participle (must be signed, can be bought).",
+        "memory": "Modal pasif itu tiga bagian: can + be + bought.",
+        "avoid": "Tiga bagian, urutannya selalu: modal, be, participle."
+      }
+    },
+    {
+      "id": "PA-202-cz0",
+      "templateId": "PA-202",
+      "skill": "causative_have_get_something_done",
+      "level": "B2",
+      "sentence": "My hair is too long. I'm going to ___ tomorrow.",
+      "blank": {
+        "answer": "have it cut",
+        "alternates": [],
+        "position": 34
+      },
+      "distractors": [
+        {
+          "text": "cut it",
+          "misconception": "confuses the causative 'have/get' pattern with 'make someone do something'",
+          "whyFailsId": "“cut it” artinya aku yang motong sendiri, padahal pembicara pergi ke tukang cukur.",
+          "misconceptionId": "pola have/get ketuker sama ngerjain sendiri."
+        },
+        {
+          "text": "have it cutting",
+          "misconception": "uses the -ing form instead of the past participle after 'get'",
+          "whyFailsId": "causative butuh past participle “cut”, bukan -ing.",
+          "misconceptionId": "bentuk -ing dipakai, bukan past participle."
+        },
+        {
+          "text": "have cut it by me",
+          "misconception": "puts 'by' before the person who has the work done",
+          "whyFailsId": "objeknya harus sebelum participle, dan “by me” bertentangan sama ide orang lain yang ngerjain.",
+          "misconceptionId": "naruh “by” di depan orang yang nyuruh, padahal dia subjeknya, bukan pelakunya."
+        }
+      ],
+      "explain": {
+        "why": "Tukang cukur yang bakal motong, jadi pakai causative “have it cut”.",
+        "rule": "Causative: have/get + objek + past participle = orang lain yang ngerjain buat kamu.",
+        "memory": "Have it cut = tukang cukur yang motong.",
+        "avoid": "Tanya siapa yang beneran ngerjain. Orang lain? Pakai have + benda + participle."
+      }
+    },
+    {
+      "id": "RC-201-cz0",
+      "templateId": "RC-201",
+      "skill": "relative_pronoun_whose_possession",
+      "level": "B2",
+      "sentence": "I have a friend ___ father is a pilot.",
+      "blank": {
+        "answer": "whose",
+        "alternates": [],
+        "position": 16
+      },
+      "distractors": [
+        {
+          "text": "who",
+          "misconception": "uses the subject relative pronoun without showing the required possessive relationship",
+          "whyFailsId": "“who father” nggak ada hubungan kepemilikan. Ayahnya milik si teman, jadi butuh “whose”.",
+          "misconceptionId": "kata ganti relatif subjek dipakai tanpa nunjukin kepemilikan."
+        },
+        {
+          "text": "which",
+          "misconception": "uses 'which' for a person",
+          "whyFailsId": "“which” buat benda, dan juga nggak nunjukin kepemilikan.",
+          "misconceptionId": "pakai “which” buat orang, padahal which cuma buat benda atau hewan."
+        },
+        {
+          "text": "who's",
+          "misconception": "confuses the contraction 'who's' (who is / who has) with the possessive relative pronoun 'whose'",
+          "whyFailsId": "“who's” artinya “who is”. “A friend who is father” nggak masuk akal.",
+          "misconceptionId": "singkatan “who's” (who is) ketuker sama “whose”."
+        }
+      ],
+      "explain": {
+        "why": "Ayahnya itu ayah si teman, jadi kata ganti relatif kepemilikan “whose” yang nyambungin.",
+        "rule": "Whose + kata benda nunjukin kata benda itu milik orang atau benda yang baru disebut.",
+        "memory": "Whose = his/her di klausa relatif.",
+        "avoid": "Bisa bilang “his/her/its” di depan kata benda berikutnya? Kata relatifnya “whose”."
+      }
+    },
+    {
+      "id": "LD-202-cz0",
+      "templateId": "LD-202",
+      "skill": "contrast_connectors_although_despite_however_distinction",
+      "level": "B2",
+      "sentence": "___ she was tired, she finished her homework.",
+      "blank": {
+        "answer": "Although",
+        "alternates": [],
+        "position": 0
+      },
+      "distractors": [
+        {
+          "text": "Despite",
+          "misconception": "puts 'despite' before a full clause",
+          "whyFailsId": "“despite” pakai kata benda atau -ing (“despite being tired”), bukan “she was tired”.",
+          "misconceptionId": "naruh “despite” di depan klausa utuh, padahal despite cuma buat kata benda atau -ing."
+        },
+        {
+          "text": "However",
+          "misconception": "Treats 'however' as a subordinating connector that can start a sentence and directly attach to a noun.",
+          "whyFailsId": "“however” nyambungin dua kalimat terpisah dan diikuti koma. Nggak bisa ngegabung dua klausa dalam satu kalimat begini.",
+          "misconceptionId": "“however” dianggap bisa buka kalimat dan langsung nyambung ke klausa."
+        },
+        {
+          "text": "But",
+          "misconception": "uses 'but' as a subordinating connector at the start of the sentence",
+          "whyFailsId": "“but” ngegabung klausa di tengah kalimat, bukan di paling depan sebelum klausa berkoma.",
+          "misconceptionId": "pakai “but” di awal kalimat buat ngegabung dua klausa, padahal but cuma nyambung di tengah."
+        }
+      ],
+      "explain": {
+        "why": "“She was tired” klausa utuh, jadi penghubung pertentangannya harus “although”.",
+        "rule": "Although + klausa. Despite + kata benda/-ing. However + koma, buka kalimat baru.",
+        "memory": "Although ketemu klausa, despite ketemu kata benda: although she was… / despite being…",
+        "avoid": "Lihat yang ngikut sesudah titik-titik: subjek + kata kerja berarti “although”."
+      }
+    },
+    {
+      "id": "LD-203-cz0",
+      "templateId": "LD-203",
+      "skill": "result_connectors_so_such_that_therefore_distinction",
+      "level": "B2",
+      "sentence": "It was ___ good film that we watched it twice.",
+      "blank": {
+        "answer": "such a",
+        "alternates": [],
+        "position": 7
+      },
+      "distractors": [
+        {
+          "text": "so",
+          "misconception": "uses 'so' before a noun phrase with an adjective",
+          "whyFailsId": "“so” di depan kata sifat aja (“so good”). Di depan “good film” katanya “such a”.",
+          "misconceptionId": "pakai “so” di depan kata sifat + kata benda, padahal di situ butuh “such”."
+        },
+        {
+          "text": "such",
+          "misconception": "drops the article after 'such' before a singular noun",
+          "whyFailsId": "“film” tunggal dan bisa dihitung, jadi butuh “a” sesudah “such”.",
+          "misconceptionId": "ngilangin “a” sesudah such, padahal kata benda tunggalnya butuh artikel."
+        },
+        {
+          "text": "so a",
+          "misconception": "Inserts an article as if a noun were about to follow.",
+          "whyFailsId": "“so” nggak pernah diikuti artikel. Pola sama kata benda itu “such a”.",
+          "misconceptionId": "artikel disisipin seolah ada kata benda yang ngikut so."
+        }
+      ],
+      "explain": {
+        "why": "“Good film” itu kata sifat + kata benda tunggal, jadi struktur akibatnya pakai “such a … that”.",
+        "rule": "So + kata sifat … that. Such (a/an) + kata sifat + kata benda … that.",
+        "memory": "So ketemu kata sifat aja, such a ketemu kata sifat + kata benda: so good / such a good film.",
+        "avoid": "Ada kata benda sesudah kata sifatnya? Ya → such (a). Nggak → so."
       }
     }
   ]

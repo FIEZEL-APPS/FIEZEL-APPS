@@ -312,6 +312,26 @@ var CODES = {
  * Kunci HARUS persis sama dengan label di grammar-templates.json.
  * ============================================================ */
 var OVERRIDES = {
+  // === Grammar Quality Upgrade A1-B2 (template kedua per lesson, label baru) ===
+  'adds -s to the verb although the subject is plural': 'agreement.number_mismatch',
+  "adds 'to' after the modal can": 'complementation.bare_form_error',
+  "uses the third-person -s form after 'you' in a command": 'agreement.number_mismatch',
+  'puts the frequency adverb before the verb be': 'structure.word_order',
+  'puts the frequency adverb after the object': 'structure.word_order',
+  "uses 'want' where the polite would-like formula is expected": 'lexical.register_mismatch',
+  "uses 'since' before a length of time": 'prepositions.semantic_category',
+  "uses 'for' before a starting point": 'prepositions.semantic_category',
+  'adds -er to a long adjective': 'comparison.form_intensifier',
+  "uses the adverb where an adjective after 'be' is needed": 'lexical.form_confusion',
+  "uses 'no' before a verb already negated with 'not'": 'question.polarity_negation',
+  'uses a positive tag after a positive statement': 'question.polarity_negation',
+  'repeats the noun instead of using a pronoun in the tag': 'pronouns.case_form',
+  "adds 'do' to an embedded question": 'question.auxiliary_error',
+  "uses 'would' in the wish clause about one's own situation": 'conditionals.clause_form_swap',
+  "uses 'yet' in a positive statement": 'question.polarity_negation',
+  "puts 'by' before the person who has the work done": 'passive.causative_confusion',
+  "uses 'which' for a person": 'relative.pronoun_choice',
+  "uses 'so' before a noun phrase with an adjective": 'linking.connector_choice',
   // === V18 Wave-2: templat grammar baru G06-G12 (label ambigu bagi heuristik) ===
   'Blends the infinitive marker with the past participle, dropping the required \'be\'.': 'structure.malformed_blend',
   'Copies the preposition from \'apologize for\' onto \'deny\', which takes its gerund directly.': 'complementation.verb_pattern',

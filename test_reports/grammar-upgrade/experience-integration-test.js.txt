@@ -1,0 +1,4 @@
+FIEZEL experience integration: PASS
+{"aiSkillProfile":true,"haptics":true,"answerSounds":true,"answerPopups":true,"realtimeSky":true,"grammarQuestionsPerLesson":25,"naturalIndonesian":true,"motion":true,"creatorHub":true,"rotatingLoginReminder":true,"notificationsInvitedNotForced":true,"studyReminderEngine":true,"apiKeyBundled":false}
+FIEZEL app report control path: PASS
+{"captureGestureIsolated":true,"postUnlockPathCovered":true,"automaticReportNonInteractive":true,"sessionReportQueuedWithoutAuth":true,"dailyReportRemainsDueWithoutAuth":true,"explicitConsentPreserved":true}

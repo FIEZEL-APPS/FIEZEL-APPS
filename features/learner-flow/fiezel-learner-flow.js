@@ -83,8 +83,8 @@
 
   function buildPlan(st, now) {
     var B = bank(), ranked = rankedSkills(st), blocks = [], used = {};
-    loadAssignments().slice(-3).reverse().forEach(function (a) {
-      blocks.push({ id: 'assign-' + a.id, kind: a.mode === 'ujian' ? 'Ujian dari guru' : 'Tugas dari guru', skill: a.skills[0], title: a.title, minutes: a.minutes, itemIds: a.itemIds, from: a.from });
+    loadAssignments().slice(0, 1).forEach(function (a) {
+      blocks.push({ id: 'assign-' + a.id, kind: 'Latihan dari tutor', skill: a.skills[0], title: a.title, minutes: a.minutes, itemIds: a.itemIds, from: a.from });
       a.skills.forEach(function (s) { used[s] = true; });
     });
     var first = ranked[0], second = ranked[1];
@@ -203,28 +203,7 @@
   }
 
   // ---- render ----------------------------------------------------------------------------
-  var mountEl = null, env = {}, st = null, pendingRestore = null, pendingAssignment = null;
-
-  /**
-   * Buka tugas guru langsung dari notifikasi: sisipkan ke rencana hari ini bila belum ada,
-   * lalu mulai sesinya. Bila modul belum terpasang (navigasi masih berjalan), ditunda ke mount().
-   */
-  function openAssignment(id) {
-    if (!id) return false;
-    if (!mountEl || !st) { pendingAssignment = id; return true; }
-    var a = loadAssignments().filter(function (x) { return x.id === id; })[0];
-    if (!a) { if (env.toast) env.toast('Tugas ini sudah selesai atau tidak ditemukan.'); return false; }
-    if (!st.goal) st.goal = GOALS[0].id;
-    if (!st.diagnostic) st.diagnostic = { at: Date.now(), answers: [], skipped: true };
-    var plan = ensurePlan(st), bid = 'assign-' + a.id;
-    var block = plan.blocks.filter(function (b) { return b.id === bid; })[0];
-    if (!block) { block = { id: bid, kind: a.mode === 'ujian' ? 'Ujian dari guru' : 'Tugas dari guru', skill: a.skills[0], title: a.title, minutes: a.minutes, itemIds: a.itemIds, from: a.from }; plan.blocks.unshift(block); plan.minutes += block.minutes; }
-    if (plan.done.indexOf(bid) !== -1) { if (env.toast) env.toast('Tugas ini sudah kamu selesaikan.'); st.tab = 'flow'; st.step = 'plan'; save(st); render(); return true; }
-    st.tab = 'flow';
-    startLesson(st, block);
-    save(st); render();
-    return true;
-  }
+  var mountEl = null, env = {}, st = null, pendingRestore = null;
 
   function mount(el, options) {
     mountEl = el; env = options || {}; st = load();
@@ -232,7 +211,6 @@
     try { if (new URL(location.href).searchParams.get('duel')) st.tab = 'duel'; } catch (_) {}
     el.addEventListener('click', onClick);
     el.addEventListener('change', onChange);
-    if (pendingAssignment) { var pid = pendingAssignment; pendingAssignment = null; if (openAssignment(pid)) return; }
     render();
   }
 
@@ -250,7 +228,7 @@
   }
 
   function stepper() {
-    var steps = [['goal', 'Tujuan'], ['diagnostic', 'Diagnostic'], ['skillmap', 'Skill map'], ['plan', 'Today Plan'], ['lesson', 'Lesson'], ['next', 'Berikutnya']];
+    var steps = [['goal', 'Tujuan'], ['diagnostic', 'Tes singkat'], ['skillmap', 'Peta kemampuan'], ['plan', 'Rencana hari ini'], ['lesson', 'Materi'], ['next', 'Berikutnya']];
     var idx = steps.findIndex(function (s) { return s[0] === st.step; });
     return '<ol class="lf-stepper">' + steps.map(function (s, i) { return '<li class="' + (i < idx ? 'is-done' : i === idx ? 'is-current' : '') + '"><span>' + (i + 1) + '</span>' + s[1] + '</li>'; }).join('') + '</ol>';
   }
@@ -317,15 +295,15 @@
   function diagnosticView() {
     var run = ensureDiagRun(), B = bank(), item = B.byId(run.itemIds[run.index]);
     var fb = run.feedback, last = run.answers[run.answers.length - 1];
-    var footer = fb ? '<div class="lf-actions"><button type="button" class="lf-primary" data-lf="diag-next" data-testid="lf-diag-next">' + (run.index + 1 >= run.itemIds.length ? 'Lihat skill map' : 'Soal berikutnya') + '</button></div>' : '';
-    return '<div class="lf-intro"><h2>Diagnostic singkat</h2><p class="lf-muted">Lima soal, satu per skill. Hasilnya bukan nilai — ini peta awal untuk menyusun rencana hari ini.</p></div>' +
+    var footer = fb ? '<div class="lf-actions"><button type="button" class="lf-primary" data-lf="diag-next" data-testid="lf-diag-next">' + (run.index + 1 >= run.itemIds.length ? 'Lihat peta kemampuan' : 'Soal berikutnya') + '</button></div>' : '';
+    return '<div class="lf-intro"><h2>Tes singkat</h2><p class="lf-muted">Lima soal, satu untuk tiap kemampuan. Ini bukan nilai — cuma peta awal untuk menyusun rencana hari ini.</p></div>' +
       questionCard(item, { action: 'diag-answer', progress: 'Soal ' + (run.index + 1) + ' dari ' + run.itemIds.length, feedback: fb, revealed: !!fb, chosen: last && last.itemId === item.id ? last.chosen : null, locked: !!fb, showTranscript: !!fb || !!run.transcript, footer: footer });
   }
 
   function skillMapView() {
     var ranked = rankedSkills(st), B = bank();
     var order = B.SKILL_ORDER.map(function (id) { return ranked.filter(function (r) { return r.id === id; })[0]; });
-    return '<div class="lf-card"><p class="lf-kicker">Skill map</p><h2>Skill yang perlu diperkuat</h2>' +
+    return '<div class="lf-card"><p class="lf-kicker">Peta kemampuan</p><h2>Kemampuan yang perlu dilatih</h2>' +
       '<p class="lf-lead" data-testid="lf-skill-summary">' + esc(skillSummary(st)) + '</p>' +
       '<ul class="lf-skill-list">' + order.map(function (r) {
         var pct = r.acc == null ? '—' : Math.round(r.acc * 100) + '%';
@@ -337,7 +315,7 @@
   function planView() {
     var plan = ensurePlan(st), B = bank(), doneCount = plan.done.length;
     var mainSkill = B.SKILLS[plan.blocks.filter(function (b) { return b.id === 'b1'; })[0].skill];
-    return '<div class="lf-card lf-plan" data-testid="lf-today-plan"><p class="lf-kicker">Today Plan</p><h2>Rencana hari ini — ' + plan.minutes + ' menit</h2>' +
+    return '<div class="lf-card lf-plan" data-testid="lf-today-plan"><p class="lf-kicker">Rencana hari ini</p><h2>Rencana hari ini — ' + plan.minutes + ' menit</h2>' +
       '<div class="lf-plan-meta"><div><small>Target hari ini</small><b>' + plan.blocks.length + ' sesi · ' + plan.blocks.reduce(function (m, b) { return m + (b.count || (b.itemIds || []).length); }, 0) + ' soal</b></div>' +
       '<div><small>Durasi</small><b>' + plan.minutes + ' menit</b></div>' +
       '<div><small>Skill utama</small><b>' + esc(mainSkill.short) + '</b></div>' +
@@ -350,7 +328,7 @@
       '<p class="lf-reason" data-testid="lf-plan-reason"><b>Alasan sesi ini:</b> ' + esc(plan.reason) + '</p>' +
       '<div class="lf-assign-code" data-testid="lf-assign-code"><label class="lf-muted" for="lfAssignCode">Punya kode tugas dari guru?</label><div class="lf-actions"><input id="lfAssignCode" class="lf-code lf-code-input" placeholder="Tempel kode tugas di sini" autocomplete="off" data-testid="lf-assign-code-input"><button type="button" class="lf-mini" data-lf="accept-assign" data-testid="lf-accept-assign">Tambahkan ke rencana</button></div></div>' +
       '<div class="lf-actions">' + (doneCount < plan.blocks.length ? '<button type="button" class="lf-primary" data-lf="start-first" data-testid="lf-start-first">Mulai sesi berikutnya</button>' : '<span class="lf-done">Rencana hari ini selesai</span>') +
-      '<button type="button" class="lf-ghost" data-lf="to-skillmap" data-testid="lf-back-skillmap">Lihat skill map</button></div></div>';
+      '<button type="button" class="lf-ghost" data-lf="to-skillmap" data-testid="lf-back-skillmap">Lihat peta kemampuan</button></div></div>';
   }
 
   function lessonView() {
@@ -369,7 +347,7 @@
       '<div class="lf-reason" data-testid="lf-next-reason"><b>Kenapa rekomendasi ini:</b> ' + esc(n.reason) + '</div>' +
       (n.block ? '<div class="lf-next-block"><small>Berikutnya</small><b>' + esc(n.block.kind) + ': ' + esc(n.block.title) + '</b><span>' + n.block.minutes + ' menit</span></div>' : '') +
       '<div class="lf-actions">' + (n.block ? '<button type="button" class="lf-primary" data-lf="start-lesson" data-block="' + n.block.id + '" data-testid="lf-start-next">Mulai ' + esc(n.block.title) + '</button>' : '') +
-      '<button type="button" class="lf-ghost" data-lf="to-plan" data-testid="lf-back-plan">Lihat Today Plan</button><button type="button" class="lf-ghost" data-lf="tab" data-tab="summary">Lihat ringkasan</button></div></div>';
+      '<button type="button" class="lf-ghost" data-lf="to-plan" data-testid="lf-back-plan">Lihat rencana hari ini</button><button type="button" class="lf-ghost" data-lf="tab" data-tab="summary">Lihat ringkasan</button></div></div>';
   }
 
   function summaryView() {
@@ -526,5 +504,5 @@
     });
   }
 
-  return { KEY: KEY, ASSIGN_KEY: ASSIGN_KEY, GOALS: GOALS, mount: mount, render: render, load: load, buildPlan: buildPlan, skillSummary: skillSummary, weeklySummary: weeklySummary, tutorCode: tutorCode, rankedSkills: rankedSkills, statusOf: statusOf, openAssignment: openAssignment, _state: function () { return st; } };
+  return { KEY: KEY, ASSIGN_KEY: ASSIGN_KEY, GOALS: GOALS, mount: mount, render: render, load: load, buildPlan: buildPlan, skillSummary: skillSummary, weeklySummary: weeklySummary, tutorCode: tutorCode, rankedSkills: rankedSkills, statusOf: statusOf, _state: function () { return st; } };
 });

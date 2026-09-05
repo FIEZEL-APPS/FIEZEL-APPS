@@ -1,0 +1,11 @@
+ok - skema: schema id benar dan struktur atas lengkap
+ok - skema: setiap kode berformat family.mechanism dan punya label+familyHint+description_id
+ok - skema: setiap nilai map menunjuk ke kode yang terdefinisi
+  (info: 846 entri distraktor, 679 label unik, semua terpetakan)
+ok - cakupan: SETIAP label misconception di grammar-templates.json terpetakan (nol yatim)
+ok - cakupan: tidak ada kunci map yang mati (label yang sudah tidak ada di templates)
+ok - ringkas: jumlah kode <= 50 (dan cukup kaya, >= 30)
+ok - transfer: setiap kode dipakai >= 3 label (pengecualian eksplisit maks 8, beralasan)
+ok - generator: tools/build-misconception-taxonomy.js meregenerasi peta yang identik
+ok - mandat: kode transfer.id_l1_pattern ada dan terpakai
+Misconception Taxonomy: PASS

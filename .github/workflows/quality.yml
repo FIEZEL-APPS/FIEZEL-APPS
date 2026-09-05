@@ -268,6 +268,7 @@ jobs:
           node th-exam-overlay-test.js
           node boot-order-test.js
           node splash-first-paint-test.js
+          node teacher-instant-boot-test.js
           # m025-199: m025-84 memindahkan markup splash ke frame pertama, tetapi peramban
           # tetap menahan cat sampai style.css (286 KB) berlaku - separuh cacat yang sama
           # bertahan sampai pemilik melaporkannya lagi. Gerbang ini menjaga separuh kedua,

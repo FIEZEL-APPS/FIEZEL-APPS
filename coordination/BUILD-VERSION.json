@@ -1,7 +1,7 @@
 {
-  "version": "m025-254",
-  "claimedBy": "sesi notifikasi tugas guru-murid",
-  "claimedAt": "2026-09-04T21:37:12.359Z",
-  "reason": "notifikasi tugas guru ke murid + lonceng notifikasi topbar",
+  "version": "m025-255",
+  "claimedBy": "branch agent/a3-gate-audit-remediation-20260815",
+  "claimedAt": "2026-09-04T23:36:47.068Z",
+  "reason": "grammar quality upgrade A1-B2: 64 stem disederhanakan, 33 template baru, sinkron id+th",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

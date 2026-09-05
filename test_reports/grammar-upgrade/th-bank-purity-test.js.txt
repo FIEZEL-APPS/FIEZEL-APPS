@@ -1,0 +1,28 @@
+PASS  reading: seluruh bacaan A1/A2 punya sidecar th utuh (106 bacaan)
+PASS  reading: nol sisa bahasa Indonesia di jalur murid th (2650 bidang)
+PASS  reading: nol Thai kata-per-kata (jejak penerjemah token)
+PASS  cloze: seluruh butir bank punya sidecar th utuh (241 butir)
+PASS  cloze: nol sisa bahasa Indonesia di jalur murid th (2402 bidang)
+PASS  cloze: nol Thai kata-per-kata (jejak penerjemah token)
+PASS  reading-exam: format + penjelasan tiap soal tercakup th
+PASS  reading-exam: nol sisa bahasa Indonesia di jalur murid th (196 bidang)
+PASS  reading-exam: nol Thai kata-per-kata (jejak penerjemah token)
+PASS  writing: prompt + examTask + rubrik tercakup th
+PASS  writing: nol sisa bahasa Indonesia di jalur murid th (131 bidang)
+PASS  writing: nol Thai kata-per-kata (jejak penerjemah token)
+PASS  misconception: seluruh diagnosis + kode taksonomi tercakup th (679 diagnosis, 49 kode)
+PASS  misconception: nol sisa bahasa Indonesia di jalur murid th (777 bidang)
+PASS  misconception: nol Thai kata-per-kata (jejak penerjemah token)
+PASS  listening: seluruh butir bank punya sidecar th (1407 butir)
+PASS  listening: nol sisa bahasa Indonesia di jalur murid th (6654 bidang)
+PASS  listening: nol Thai kata-per-kata (jejak penerjemah token)
+PASS  speaking: nol sisa bahasa Indonesia di jalur murid th (53 bidang)
+PASS  speaking: nol Thai kata-per-kata (jejak penerjemah token)
+PASS  listening-exam: seluruh set punya sidecar th (8 set)
+PASS  listening-exam: seluruh soal punya penjelasan th
+PASS  listening-exam: seluruh format ujian punya padanan th (6 format)
+PASS  listening-exam: kutipan skrip audio tetap bahasa Inggris
+PASS  listening-exam: nol sisa bahasa Indonesia di jalur murid th (80 bidang)
+PASS  listening-exam: nol Thai kata-per-kata (jejak penerjemah token)
+
+th-bank-purity-test: 26/26 PASS

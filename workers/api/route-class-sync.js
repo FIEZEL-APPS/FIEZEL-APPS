@@ -20,10 +20,9 @@ import { jsonResponse, jsonError, ERR } from './errors.js';
 import { readJsonFromCtx } from './mw-guard.js';
 import { roleGate, coreDb, unauthenticated } from './auth/gate.js';
 import { ensureAuthSchema } from './auth-schema.js';
-import { normalizeReport, normalizeClaim, normalizeClassCode, normalizeAssignment, rowToAssignment, learnerKey, makeRateLimiter, rowToReport, LIMITS, ASSIGN_LIMITS } from './teacher/class-sync-core.js';
+import { normalizeReport, normalizeClaim, normalizeClassCode, makeRateLimiter, rowToReport, LIMITS } from './teacher/class-sync-core.js';
 
 const learnerAllowed = makeRateLimiter(LIMITS.LEARNER_MIN_INTERVAL_MS);
-const learnerPollAllowed = makeRateLimiter(ASSIGN_LIMITS.LEARNER_POLL_MIN_INTERVAL_MS);
 const teacherAllowed = makeRateLimiter(LIMITS.TEACHER_MIN_INTERVAL_MS);
 const opt = (ctx) => ({ headers: ctx.corsHeaders });
 
@@ -126,62 +125,7 @@ export async function routeClassReports(ctx) {
 
 export const ROUTES = [
   ['POST', '/api/learner/class-report', routeLearnerClassReport],
-  ['GET', '/api/learner/class-assignments', routeLearnerClassAssignments],
   ['POST', '/api/teacher/class/claim', routeClassClaim],
   ['GET', '/api/teacher/class/list', routeClassList],
-  ['GET', '/api/teacher/class/reports', routeClassReports],
-  ['POST', '/api/teacher/class/assign', routeClassAssign]
+  ['GET', '/api/teacher/class/reports', routeClassReports]
 ];
-
-/* ========================================================================== */
-/* POST /api/teacher/class/assign — guru MENGIRIM tugas ke murid (semua/terpilih) */
-/* ========================================================================== */
-
-export async function routeClassAssign(ctx) {
-  const gate = await roleGate(ctx);
-  if (!gate.ok) return gate.response;
-  const body = await readJsonFromCtx(ctx, gate.opt);
-  if (!body.ok) return body.response;
-  const a = normalizeAssignment(body.value);
-  if (!a.ok) return jsonError(400, ERR.SCHEMA_INVALID, { reason: a.reason }, gate.opt);
-
-  const owned = await gate.db.prepare('SELECT code FROM tc_class WHERE code = ?1 AND teacher_sub = ?2').bind(a.code, gate.sub).first();
-  if (!owned) return jsonError(404, ERR.NOT_FOUND, {}, gate.opt);
-
-  await gate.db.prepare(
-    'INSERT INTO tc_class_assignment (class_code, id, teacher_sub, payload_json, targets_json, created_at, updated_at) ' +
-    'VALUES (?1,?2,?3,?4,?5,?6,?6) ' +
-    'ON CONFLICT(class_code, id) DO UPDATE SET payload_json = excluded.payload_json, targets_json = excluded.targets_json, updated_at = excluded.updated_at'
-  ).bind(a.code, a.id, gate.sub, JSON.stringify(a.payload), a.targets ? JSON.stringify(a.targets) : null, ctx.now).run();
-
-  return jsonResponse({ ok: true, code: a.code, id: a.id, targets: a.targets ? a.targets.length : 'all', at: ctx.now }, gate.opt);
-}
-
-/* ========================================================================== */
-/* GET /api/learner/class-assignments?cls=FZ-XXXXXX&name=Rina&since=<ms>       */
-/* ========================================================================== */
-
-export async function routeLearnerClassAssignments(ctx) {
-  const o = opt(ctx);
-  if (!ctx.identity || !ctx.identity.verified || !ctx.identity.sub) return unauthenticated(ctx);
-  const db = coreDb(ctx.env);
-  if (!db) return jsonError(503, ERR.UNAVAILABLE, {}, o);
-  if (!learnerPollAllowed(ctx.identity.sub, ctx.now)) return jsonError(429, ERR.RATE_LIMITED, {}, o);
-  const code = normalizeClassCode(ctx.url.searchParams.get('cls'));
-  if (!code) return jsonError(400, ERR.SCHEMA_INVALID, { reason: 'bad_class_code' }, o);
-  const key = learnerKey(ctx.url.searchParams.get('name'));
-  if (!key) return jsonError(400, ERR.SCHEMA_INVALID, { reason: 'bad_name' }, o);
-  const since = Math.max(0, Number(ctx.url.searchParams.get('since')) || 0);
-
-  await ensureAuthSchema(db);
-  const cls = await db.prepare('SELECT code FROM tc_class WHERE code = ?1').bind(code).first();
-  if (!cls) return jsonError(404, ERR.NOT_FOUND, {}, o);
-
-  const rows = await db.prepare(
-    'SELECT id, payload_json, targets_json, updated_at FROM tc_class_assignment WHERE class_code = ?1 AND updated_at > ?2 ORDER BY updated_at LIMIT ?3'
-  ).bind(code, since, ASSIGN_LIMITS.PAGE).all();
-  const all = (rows && rows.results) || [];
-  const cursor = all.length ? Number(all[all.length - 1].updated_at) || since : since;
-  const assignments = all.map((r) => rowToAssignment(r, key)).filter(Boolean);
-  return jsonResponse({ cls: code, since, cursor, now: ctx.now, assignments, more: all.length >= ASSIGN_LIMITS.PAGE }, o);
-}

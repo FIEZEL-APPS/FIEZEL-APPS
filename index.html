@@ -1,10 +1,6 @@
 <!DOCTYPE html>
-<!-- m025-246: data-theme SENGAJA TIDAK dipaku di sini. Nilai statis "light" akan
-     menang atas @media (prefers-color-scheme) selamanya, jadi Tema Malam tidak akan
-     pernah menyala untuk siapa pun - sakelar yang tidak melakukan apa-apa, persis
-     keluhan m025-120. FiezelUIManager.initTheme() memasang atributnya hanya bila murid
-     PERNAH memilih; sampai saat itu perangkatlah yang memutuskan. -->
-<html lang="id" class="fz-booting">
+<!-- Mode gelap dihapus sesuai permintaan OWNER: aplikasi memiliki satu tampilan dasar cream. -->
+<html lang="id" class="fz-booting" data-theme="light">
 <head>
   <meta charset="utf-8">
   <!-- m025-186 — KEPUTUSAN OWNER, DIAMBIL SADAR, DAN INI CATATAN BIAYANYA.
@@ -34,13 +30,8 @@
        WebAssembly.instantiate - model 152 MB yang sudah diunduh jadi tidak terpakai. -->
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://js.puter.com; connect-src 'self' https: wss:; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; media-src 'self' blob: data:; worker-src 'self' blob:">
   <meta name="theme-color" content="#FFF9EE">
-  <!-- m025-246: mode gelap KEMBALI sebagai "Tema Malam" (OWNER membalik m025-134;
-       riwayat lengkapnya di blok TEMA MALAM style.css). `light dark` memberi tahu
-       peramban bahwa KEDUA skema didukung, sehingga scrollbar, input, dan tombol
-       bawaan ikut skema yang sedang berlaku alih-alih terkunci terang di atas
-       permukaan gelap. Skema yang berlaku sendiri diputuskan oleh CSS
-       (prefers-color-scheme) dan atribut data-theme, bukan oleh baris ini. -->
-  <meta name="color-scheme" content="light dark">
+  <!-- Mode gelap dihapus: color-scheme dipaku light agar kontrol form/scrollbar selalu terang. -->
+  <meta name="color-scheme" content="light">
   <meta name="description" content="FIEZEL adalah aplikasi belajar bahasa Inggris adaptif untuk vocabulary, grammar, reading, speaking, listening, dan tes diagnostik CEFR.">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -149,6 +140,7 @@ html.fz-booting body{overflow:hidden}
        dan bukan :root. Urutan terakhir memastikan aturan penempatan maskotnya menang
        atas ukuran wajah pembimbing lama tanpa perlu !important. -->
   <link rel="stylesheet" href="./features/mascot/fiezel-motion.css">
+  <link rel="stylesheet" href="./features/ui/fiezel-lux.css">
 </head>
 <body class="scene-day">
   <!-- Splash frame-pertama. Isinya WAJIB sama persis dengan FiezelSplash.markup(); modul
@@ -311,10 +303,18 @@ html.fz-booting body{overflow:hidden}
         <span class="brand"><svg class="fiezel-wordmark" id="fzTopMark" viewBox="0 0 1000 260" role="img" aria-label="FIEZEL"><g class="fzw-sparks" aria-hidden="true"><circle class="fzw-spark" cx="51" cy="51" r="15" style="--sx:-70px;--sy:-85px;--sd:0s"/><circle class="fzw-spark" cx="51" cy="205" r="15" style="--sx:-78px;--sy:80px;--sd:.03s"/><circle class="fzw-spark" cx="102" cy="51" r="15" style="--sx:-52px;--sy:-96px;--sd:.06s"/><circle class="fzw-spark" cx="88" cy="130" r="15" style="--sx:-92px;--sy:0px;--sd:.09s"/><circle class="fzw-spark" cx="205" cy="60" r="15" style="--sx:-30px;--sy:-92px;--sd:.12s"/><circle class="fzw-spark" cx="253" cy="168" r="15" style="--sx:-22px;--sy:78px;--sd:.15s"/><circle class="fzw-spark" cx="321" cy="51" r="15" style="--sx:-40px;--sy:-90px;--sd:.18s"/><circle class="fzw-spark" cx="350" cy="130" r="15" style="--sx:-60px;--sy:-6px;--sd:.21s"/><circle class="fzw-spark" cx="365" cy="209" r="15" style="--sx:-44px;--sy:86px;--sd:.24s"/><circle class="fzw-spark" cx="553" cy="51" r="15" style="--sx:6px;--sy:-98px;--sd:.27s"/><circle class="fzw-spark" cx="553" cy="209" r="15" style="--sx:6px;--sy:92px;--sd:.3s"/><circle class="fzw-spark" cx="683" cy="130" r="15" style="--sx:30px;--sy:-4px;--sd:.33s"/><circle class="fzw-spark" cx="734" cy="51" r="15" style="--sx:44px;--sy:-88px;--sd:.36s"/><circle class="fzw-spark" cx="727" cy="209" r="15" style="--sx:40px;--sy:90px;--sd:.39s"/><circle class="fzw-spark" cx="861" cy="130" r="15" style="--sx:86px;--sy:-8px;--sd:.42s"/><circle class="fzw-spark" cx="905" cy="209" r="15" style="--sx:96px;--sy:84px;--sd:.45s"/></g><defs><linearGradient id="fztIv" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--wordmark-ink-hi)"/><stop offset="100%" stop-color="var(--wordmark-ink-lo)"/></linearGradient><linearGradient id="fztGo" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--wordmark-accent-hi)"/><stop offset="100%" stop-color="var(--wordmark-accent-lo)"/></linearGradient></defs><g class="fzw-mark"><g fill="url(#fztIv)"><rect x="30" y="30" width="42" height="200" rx="21"/><rect x="30" y="30" width="144" height="42" rx="21"/><rect x="30" y="109" width="116" height="42" rx="21"/><rect x="300" y="30" width="42" height="200" rx="21"/><rect x="300" y="30" width="144" height="42" rx="21"/><rect x="300" y="109" width="100" height="42" rx="21"/><rect x="300" y="188" width="130" height="42" rx="21"/><rect x="478" y="30" width="150" height="42" rx="21"/><rect x="478" y="188" width="150" height="42" rx="21"/><rect x="607" y="30" width="191.38" height="42" rx="21" transform="rotate(124.354 607 51)"/><rect x="662" y="30" width="42" height="200" rx="21"/><rect x="662" y="30" width="144" height="42" rx="21"/><rect x="662" y="109" width="100" height="42" rx="21"/><rect x="662" y="188" width="130" height="42" rx="21"/><rect x="840" y="30" width="42" height="200" rx="21"/><rect x="840" y="188" width="130" height="42" rx="21"/></g><g fill="url(#fztGo)"><rect x="192" y="30" width="26" height="200" rx="13"/><rect x="240" y="106" width="26" height="124" rx="13"/></g></g></svg></span>
       </button>
       <div class="topbar-actions">
-        <!-- Lonceng notifikasi: tugas dari guru, teman baru, sorakan, undangan. Menggantikan
-             pintu topbar "Tanya FIEZEL" (askView tetap ada; aksesnya lewat pembimbing PAW).
-             TANPA data-view, dengan sengaja - lihat catatan renderInner() soal kelas active. -->
-        <button type="button" id="fzNotifBtn" class="icon-button notif-button" onclick="openNotifications()" aria-label="Notifikasi" data-i18n-aria-label="topbar.notif-aria" data-testid="topbar-notif-button"><i data-lucide="bell"></i><span id="fzNotifBadge" class="notif-badge hidden" aria-hidden="true" data-testid="topbar-notif-badge"></span></button>
+        <!-- m025-105: pintu ke Tanya FIEZEL. Ikonnya dua balok emas dari wordmark FIEZEL
+             sendiri, bukan ikon pustaka - inilah satu-satunya tempat di aplikasi yang
+             berbicara sebagai FIEZEL, jadi tandanya pun miliknya sendiri.
+
+             Digambar inline, bukan <img>: ikon topbar harus ikut warna dan ukuran
+             tombolnya, dan berkas terpisah akan berkedip datang belakangan pada muat
+             pertama. Sumbernya tetap ada di assets/brand/fiezel-ask.svg.
+
+             TANPA data-view, dengan sengaja. renderInner() menambahkan kelas active ke
+             elemen ber-data-view tetapi hanya membersihkannya dari .nav, jadi atribut itu
+             akan membuat ikon ini tersangkut menyala selamanya setelah sekali dibuka. -->
+        <button type="button" class="icon-button ask-button" onclick="go('ask')" aria-label="Tanya FIEZEL" data-i18n-aria-label="topbar.ask-aria"><svg class="fiezel-ask-mark" viewBox="0 0 74 200" aria-hidden="true"><defs><linearGradient id="fztAsk" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFDE59"/><stop offset="45%" stop-color="#FFC700"/><stop offset="100%" stop-color="#E6A800"/></linearGradient></defs><g fill="url(#fztAsk)"><rect x="0" y="0" width="26" height="200" rx="13"/><rect x="48" y="76" width="26" height="124" rx="13"/></g></svg><span class="ask-label" data-i18n="topbar.ask">Tanya FIEZEL?</span></button>
         <button type="button" class="icon-button" onclick="openSettings()" aria-label="Buka pengaturan" data-i18n-aria-label="nav.open-settings-aria"><i data-lucide="sliders-horizontal"></i></button>
         <div class="version" id="version"></div>
       </div>
@@ -372,7 +372,7 @@ html.fz-booting body{overflow:hidden}
            bisa) login terkurung di balik .auth-locked - dark-pattern yang sama yang sudah
            dibongkar OWNER di gerbang notifikasi. Pengaturan > Akun Puter adalah jalan
            masuknya kembali. -->
-      <button id="authGateSkip" type="button" class="text-button wide" onclick="skipPuterSignIn()" data-i18n="auth.skip-btn">Lanjut tanpa akun</button>
+      <button id="authGateSkip" data-testid="auth-gate-skip" type="button" class="text-button wide" onclick="skipPuterSignIn()" data-i18n="auth.skip-btn">Lanjut tanpa akun</button>
       <p id="authGateSkipHelp" class="auth-help" data-i18n="auth.skip-help">Semua materi dan latihan tetap jalan tanpa akun — tutor AI dan suara neural baru bisa dipakai kalau kamu masuk akun Puter dan ada jaringan.</p>
       <p id="authGateHelp" class="auth-help" data-i18n="auth.puter-help">Jendela login Puter terbuka sebentar di atas FIEZEL, lalu tertutup sendiri begitu selesai - kamu tidak akan dipindahkan ke browser lain.</p>
       <p class="auth-legal" data-i18n="auth.legal-note">Dengan melanjutkan, kamu menyetujui progres belajarmu disimpan di akun Puter milikmu sendiri.</p>
@@ -437,11 +437,10 @@ html.fz-booting body{overflow:hidden}
        Pengaturan di dalam sesi - dan tiga tur (menu, library, listening) menunjuk
        tepat ke sana untuk menjelaskan pengatur kecepatan suara. -->
   <nav class="bottomnav" aria-label="Navigasi utama" data-i18n-aria-label="nav.main-aria">
-    <button type="button" class="nav active" data-view="home" onclick="go('home')" aria-label="Home" data-i18n-aria-label="nav.home"><i class="fz-i" data-fz-icon="home" aria-hidden="true"></i><span data-i18n="nav.home">Home</span></button>
-    <button type="button" class="nav" data-view="vocab" onclick="go('vocab')" aria-label="Vocabulary" data-i18n-aria-label="nav.vocab-aria"><i class="fz-i" data-fz-icon="vocab" aria-hidden="true"></i><span data-i18n="nav.vocab">Vocab</span></button>
-    <button type="button" class="nav" data-view="grammar" onclick="go('grammar')" aria-label="Grammar" data-i18n-aria-label="nav.grammar-aria"><i class="fz-i" data-fz-icon="grammar" aria-hidden="true"></i><span data-i18n="nav.grammar">Grammar</span></button>
-    <button type="button" class="nav" data-view="reading" onclick="go('reading')" aria-label="Reading" data-i18n-aria-label="nav.reading-aria"><i class="fz-i" data-fz-icon="reading" aria-hidden="true"></i><span data-i18n="nav.reading">Reading</span></button>
-    <button type="button" class="nav" data-view="progress" onclick="go('progress')" aria-label="Peta belajar" data-i18n-aria-label="nav.map-aria"><i class="fz-i" data-fz-icon="map" aria-hidden="true"></i><span data-i18n="nav.peta">Peta</span></button>
+    <button type="button" class="nav active" data-view="home" data-testid="nav-home" onclick="go('home')" aria-label="Hari ini" data-i18n-aria-label="nav.hari-ini-aria"><i class="fz-i" data-fz-icon="home" aria-hidden="true"></i><span data-i18n="nav.hari-ini">Hari ini</span></button>
+    <button type="button" class="nav" data-view="latihan" data-testid="nav-latihan" onclick="go('latihan')" aria-label="Latihan" data-i18n-aria-label="nav.latihan-aria"><i class="fz-i" data-fz-icon="skills" aria-hidden="true"></i><span data-i18n="nav.latihan">Latihan</span></button>
+    <button type="button" class="nav" data-view="progress" data-testid="nav-progress" onclick="go('progress')" aria-label="Progres" data-i18n-aria-label="nav.progres-aria"><i class="fz-i" data-fz-icon="map" aria-hidden="true"></i><span data-i18n="nav.progres">Progres</span></button>
+    <button type="button" class="nav" data-testid="nav-settings" onclick="openSettings()" aria-label="Buka pengaturan" data-i18n-aria-label="nav.pengaturan-aria"><i class="fz-i" data-fz-icon="settings" aria-hidden="true"></i><span data-i18n="nav.pengaturan">Pengaturan</span></button>
   </nav>
 
   <!-- OWNER: "Terlalu banyak script terpisah (30+ file JS) dimuat sinkron di <head>/<body>
@@ -511,6 +510,7 @@ html.fz-booting body{overflow:hidden}
        pindahan, jadi regenerasi baseline emasnya bisa dibaca sebagai satu blok. -->
   <script defer src="./features/i18n/copy-id-redesign.js"></script>
   <script defer src="./features/i18n/copy-id-grammar-labels.js"></script>
+  <script defer src="./features/i18n/copy-id-student.js"></script>
   <!-- W4-MERGE: aset th TIDAK dimuat statis (copy-th-*, naskah-th-brain, dua dataset th) —
        semuanya disuntik/difetch DINAMIS oleh pemuat kecil di bawah HANYA saat locale th
        (AI-13 F02/F05: murid Indonesia nol byte th). Pemuat wajib SETELAH fiezel-i18n.js
@@ -630,8 +630,6 @@ html.fz-booting body{overflow:hidden}
        seluruh pemanggilnya di app.js guarded dan fitur teman kembali ke jalur manual. -->
   <script defer src="./features/social/fiezel-invite-link.js"></script>
   <script defer src="./features/social/fiezel-social-notify.js"></script>
-  <!-- KOTAK MASUK MURID: tugas dari guru (polling /api/learner/class-assignments) + lonceng topbar. -->
-  <script defer src="./features/notify/fiezel-inbox.js"></script>
   <!-- LAPIS AKUN (masuk / daftar / aktivasi guru). Inti murni tanpa DOM, seperti
        gems-core: seluruh UI-nya hidup di app.js. Dimuat SEBELUM app.js karena alur
        boot menanyakan sesi (`FiezelAccount.refresh()`) sebelum Home digambar, jadi
@@ -736,6 +734,7 @@ html.fz-booting body{overflow:hidden}
   <script defer src="./features/health/fiezel-install-health.js"></script>
   <script defer src="./features/ui/fiezel-report-gesture-isolation.js"></script>
   <script defer src="./features/ui/fiezel-ui-manager.js"></script>
+  <script defer src="./features/ui/fiezel-student-mode.js"></script>
   <!-- T-031: berkas ini memasang `window.FiezelABAnalytics` (pipa eksperimen UI). Ia TIDAK
        BOLEH menyentuh `window.FiezelAnalytics` — nama itu milik modul analytics
        privasi-maksimal yang disuntik app.js di idle, dan `<script defer>` di sini selalu
