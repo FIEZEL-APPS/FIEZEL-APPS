@@ -1,7 +1,7 @@
 {
-  "version": "m025-263",
-  "claimedBy": "branch claude/simplify-student-auth-dlz1d4",
-  "claimedAt": "2026-09-05T19:44:40.610Z",
-  "reason": "Pendaftaran murid sekali di onboarding, ID online dari nama pertama",
+  "version": "m025-264",
+  "claimedBy": "branch claude/cleanup-dead-handle-form-dlz1d4",
+  "claimedAt": "2026-09-05T20:21:00.289Z",
+  "reason": "Buang kode mati formulir handle sesudah pendaftaran sekali",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
