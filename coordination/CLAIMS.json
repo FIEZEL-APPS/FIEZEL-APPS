@@ -60,6 +60,19 @@
       ],
       "mulai": "2026-08-29T10:00:00+07:00",
       "catatan": "TIDAK menyentuh features/neural-voice/ (diag panel, diklaim opencode), sw.js atau core-config.js (diklaim A6). Kontrol <16px di diag panel dilaporkan ke pemiliknya, tidak diperbaiki dari sini. index.html TIDAK disentuh: viewport zoom 5x dipertahankan demi WCAG 1.4.4/1.4.10."
+    },
+    {
+      "sesi": "codex-student-redesign-20260905",
+      "peran": "Student UI/UX redesign for owner review",
+      "paths": [
+        "index.html",
+        "app.js",
+        "features/ui/fiezel-student-experience.js",
+        "features/ui/fiezel-student-experience.css",
+        "reports/student-redesign-20260905/"
+      ],
+      "mulai": "2026-09-05",
+      "catatan": "Owner explicitly requested draft PR before implementation, then comprehensive SMP/SMA UI redesign and screenshot review. Existing shared style.css and neural runtime are not edited. Claim registered before product edits; build ritual uses repository arbiter."
     }
   ],
   "finished": [
