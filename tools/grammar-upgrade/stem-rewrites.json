@@ -63,7 +63,21 @@
     "TA-022": "She unlocked the office at seven, ___ the windows, and then switched on the coffee machine.",
     "MO-018": "We took the bus to the airport, but we ____ a taxi — either way was fine.",
     "CO-010": "My flatmate keeps borrowing my charger, and it drives me crazy. I wish he ___ doing that.",
-    "CO-011": "People have been complaining for months, so it's high time the council ___ the potholes."
+    "CO-011": "People have been complaining for months, so it's high time the council ___ the potholes.",
+    "RC-002": "Shorten the clause: \"The scientists who were developing the vaccine at that time were awarded a prize.\" → The scientists ___ the vaccine at that time were awarded a prize.",
+    "TA-009": "His eyes were red because he ___ all night for the exam. (the long hours of studying are the cause)",
+    "RS-006": "He said, 'If it rains, I'll cancel the picnic.' The picnic day has passed. He said that if it ___, he ___ the picnic.",
+    "b4_001": "By the time she retires next year, Maria ____ at this company for over twenty years. (stress how long it has gone on)",
+    "b5_005": "If he ____ so afraid of flying, he would have joined us on the trip last year. He is still afraid today.",
+    "b5_016": "He admitted ____ the vase. (the breaking happened before he admitted it)",
+    "b5_022": "Formal report: The sample was too small to generalize the findings. ____, the participants were not randomly selected.",
+    "C2-002": "If the board had approved the budget last month, construction ___ next Monday. (already under way on that day)",
+    "GI-013": "She enjoys ____ to podcasts while she cooks dinner. (both actions happen at the same time)",
+    "RC-007": "Relaxed chat with a friend: That's the neighbour ____ at the bus stop yesterday.",
+    "PR-007": "___ any further objections from the regulator, the deal will be completed on Friday; if objections do come in, the deal will slip to March.",
+    "C2-003": "At 9 p.m. the office lights were on and I could hear keyboards, so the team ___ late at that moment.",
+    "AR-006": "___ Sumatran tiger is now on the brink of extinction, with fewer than 400 left in the wild.",
+    "MO-014": "She ___ tell her manager the real reason for the delay, so she blames the traffic instead."
   },
   "whyFails": {
     "PA-001": {

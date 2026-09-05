@@ -1,1 +1,1 @@
-PASS grammar-memory-scope: 322 recall_memory_cue questions are source-bound
+PASS grammar-memory-scope: 326 recall_memory_cue questions are source-bound

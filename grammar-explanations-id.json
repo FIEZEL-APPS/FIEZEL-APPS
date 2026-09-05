@@ -7729,6 +7729,150 @@
           "whyFails": "“would” tempatnya di klausa akibat, bukan di dalam klausa “as if”."
         }
       }
+    },
+    "CO-207": {
+      "objective": "Pakai “would + kata kerja dasar” buat akibat sekarang dari sebab lampau yang nggak nyata.",
+      "misconception": "Kamu nyalin past perfect dari klausa if ke akibat yang sebenarnya soal sekarang.",
+      "reasoning": "kenali sebab lampau dengan akibat sekarang → pilih would + kata kerja dasar buat akibat sekarang",
+      "rule": "Mixed conditional: If + past perfect (sebab lampau), would + kata kerja dasar (akibat sekarang).",
+      "whyCorrect": "Ketinggalan bus itu lampau, tapi “now” bikin akibatnya sekarang, jadi pakai “would be”.",
+      "whyOthersFail": "“Would have been” akibat lampau. “Was” fakta nyata. “Had been” punya klausa if.",
+      "howToAvoid": "Cari “now” atau “today” di akibatnya: itu berarti would + kata kerja dasar, bukan would have.",
+      "memoryCue": "Sebab lampau, akibat “now” → would be.",
+      "distractors": {
+        "would have been": {
+          "misconception": "akibatnya ditaruh di masa lalu yang nggak nyata, bukan di masa kini.",
+          "whyFails": "“would have been” ngegambarin akibat lampau, padahal “now” naruh akibatnya di sekarang."
+        },
+        "was": {
+          "misconception": "past simple polos “weren't” dipakai di induk kalimat akibat tanpa modal pengandai.",
+          "whyFails": "“was” polos nyatain fakta nyata, padahal situasinya khayalan."
+        },
+        "had been": {
+          "misconception": "past perfect diulang lagi di induk kalimat.",
+          "whyFails": "“had been” bentuk klausa if. Klausa akibat butuh “would”."
+        }
+      }
+    },
+    "CO-208": {
+      "objective": "Balik “had” dan subjek buat ngegantiin “if” di third conditional yang formal.",
+      "misconception": "Kamu masih pakai “if” bareng inversi, atau lupa mindahin “had” ke depan.",
+      "reasoning": "kenali pengandaian lampau nggak nyata yang formal → buang if → pindahin had ke depan subjek",
+      "rule": "Inversi formal: Had + subjek + past participle, … would have + past participle.",
+      "whyCorrect": "Di gaya formal “if” hilang dan “had” pindah ke depan subjek: Had we received the warning.",
+      "whyOthersFail": "“If we had” versi netral. “We had” kalimat berita. “Had received we” salah naruh subjek.",
+      "howToAvoid": "Hapus “if”, lalu tuker posisi subjek sama “had” — yang lain nggak pindah.",
+      "memoryCue": "If we had → Had we.",
+      "distractors": {
+        "If we had received": {
+          "misconception": "pembalikan formal dan kata sambung “if” dipakai bersamaan.",
+          "whyFails": "bener di gaya netral, tapi bentuk sasarannya buang “if” dan balik “had”."
+        },
+        "We had received": {
+          "misconception": "urutan subjek dan kata kerja tetap biasa jadi tanda pembalikannya hilang.",
+          "whyFails": "tanpa “if” atau inversi, ini cuma kalimat berita, bukan pengandaian."
+        },
+        "Had received we": {
+          "misconception": "susunan kata bantu milik anak kalimat hasil ditaruh di awal anak kalimat syarat.",
+          "whyFails": "cuma “had” yang pindah ke depan. Subjeknya tetap sebelum participle."
+        }
+      }
+    },
+    "QN-206": {
+      "objective": "Balik kata bantu dan subjek sesudah “Rarely” di depan kalimat.",
+      "misconception": "Kamu naruh kata keterangan negatif di depan tapi urutan subjek-kata kerjanya tetap biasa.",
+      "reasoning": "kenali kata keterangan negatif di depan → pindahin kata bantu ke depan subjek → kata kerja utama tetap sesudahnya",
+      "rule": "Kata keterangan negatif di depan (never, rarely, seldom, not only) + kata bantu + subjek + kata kerja.",
+      "whyCorrect": "“Rarely” di depan memicu inversi: kata bantu “have” pindah ke depan “I”.",
+      "whyOthersFail": "“I have seen” dan “I saw” urutannya biasa. “Saw I” ngebalik kata kerja utama, bukan kata bantu.",
+      "howToAvoid": "Rarely/never di depan? Susun kayak pertanyaan: have I seen.",
+      "memoryCue": "Rarely have I…",
+      "distractors": {
+        "I have seen": {
+          "misconception": "keterangan negatifnya dimajuin, tapi kata bantu “have” yang udah ada dibiarin di belakang subjek.",
+          "whyFails": "sesudah “Rarely” di depan, kata bantunya harus sebelum subjek."
+        },
+        "I saw": {
+          "misconception": "“Never” dimajuin tanpa kata bantu sama sekali, aturan pembalikan dan kebutuhan “have” sama-sama diabaikan.",
+          "whyFails": "nggak ada inversi dan nggak ada kata bantu. Kata keterangan di depan nuntut keduanya."
+        },
+        "saw I": {
+          "misconception": "“never” ditaruh sesudah kata bantunya, bukan di posisi paling depan kalimat.",
+          "whyFails": "inversi pakai kata bantu (have/do/did), bukan kata kerja utama sendirian."
+        }
+      }
+    },
+    "QN-207": {
+      "objective": "Balik pakai “did” sesudah klausa “Only when” di depan.",
+      "misconception": "Kamu biarin urutan kalimat berita di klausa utama sesudah frasa “Only…” di depan.",
+      "reasoning": "kenali klausa Only di depan → sisipin did sebelum subjek klausa utama → kata kerjanya tetap polos",
+      "rule": "Only + frasa waktu/syarat di depan → kata bantu + subjek + kata kerja dasar di klausa utama.",
+      "whyCorrect": "“Only when…” di depan memicu inversi kata bantu: did the boats leave.",
+      "whyOthersFail": "Dua pilihan urutannya biasa, satu mindahin kata kerja utama, bukan kata bantu.",
+      "howToAvoid": "Kalimatnya mulai dari “Only after/when/then”? Taruh did/does/have sebelum subjek.",
+      "memoryCue": "Only when … did the boats leave.",
+      "distractors": {
+        "the boats left": {
+          "misconception": "urutan pernyataan biasa dipertahanin sesudah frasa pembatas dimajuin.",
+          "whyFails": "klausa “Only when” di depan maksa inversi di klausa utama."
+        },
+        "left the boats": {
+          "misconception": "kata kerja utamanya langsung dibalik.",
+          "whyFails": "inversi butuh kata bantu. Kata kerja utama sendirian nggak bisa pindah ke depan."
+        },
+        "the boats did leave": {
+          "misconception": "kata bantu penegas ditambahin tapi nggak dibalik sama subjeknya.",
+          "whyFails": "“did” ada tapi tetap sesudah subjek, jadi nggak ada inversi."
+        }
+      }
+    },
+    "RS-208": {
+      "objective": "Pakai subjunctive polos sesudah “insisted that” walau subjeknya orang ketiga.",
+      "misconception": "Kamu nambah -s atau bentuk lampau ke kata kerja sesudah “insisted that”.",
+      "reasoning": "kenali kata kerja tuntutan insist → pilih bentuk polos sesudah that → abaikan subjeknya siapa",
+      "rule": "Demand/insist/recommend/suggest + that + subjek + kata kerja dasar (tanpa -s, tanpa penanda waktu).",
+      "whyCorrect": "“Insisted that” ngenalin tuntutan, jadi kata kerjanya subjunctive polos: the patient stay.",
+      "whyOthersFail": "“Stays” nambah -s. “Stayed” dimundurin. “Would stay” ngubah maknanya jadi perkiraan.",
+      "howToAvoid": "Sesudah kata kerja tuntutan + that, tulis kata kerjanya persis kayak di kamus.",
+      "memoryCue": "Insisted that she stay.",
+      "distractors": {
+        "stays": {
+          "misconception": "tuntutan dilembutin pakai “would”.",
+          "whyFails": "subjunctive nggak pakai -s, walau sesudah “the patient”."
+        },
+        "stayed": {
+          "misconception": "kata kerjanya dimundurin kayak laporan netral.",
+          "whyFails": "“insisted” yang lampau nggak mundurin subjunctive-nya. Tetap polos."
+        },
+        "would stay": {
+          "misconception": "kesesuaian subjek biasa dipaksain di klausa tuntutan.",
+          "whyFails": "“would” ngubah tuntutan jadi perkiraan. Tuntutan pakai kata kerja polos."
+        }
+      }
+    },
+    "CO-209": {
+      "objective": "Pakai “Were + subjek + to + kata kerja” buat pengandaian formal yang kecil kemungkinannya.",
+      "misconception": "Kamu pakai “was” atau masih pakai “if” bareng inversi.",
+      "reasoning": "kenali pengandaian formal yang kecil kemungkinannya → buang if → taruh were di depan subjek dan tambah to",
+      "rule": "Pengandaian formal kecil kemungkinan: Were + subjek + to + kata kerja dasar, … would + kata kerja dasar.",
+      "whyCorrect": "Buang “if” dan pindahin “were” ke depan jadi pengandaian formal: Were she to accept the offer.",
+      "whyOthersFail": "“Was” nggak dipakai di pola ini. “If were” penandanya dobel. “She were to” nggak ada inversi.",
+      "howToAvoid": "Tulis “If she were to accept”, lalu hapus “if” dan tuker: Were she to accept.",
+      "memoryCue": "If she were to → Were she to.",
+      "distractors": {
+        "Was she to accept": {
+          "misconception": "“was” dipakai gantiin “were” yang diwajibin di pembalikan pengandaian formal.",
+          "whyFails": "pengandaian terbalik selalu pakai “were”, nggak pernah “was”."
+        },
+        "If were she to accept": {
+          "misconception": "“if” ditambahin ke susunan yang udah nandain pengandaian lewat pembalikan.",
+          "whyFails": "“if” dan inversi nggak bisa muncul bareng. Pilih satu."
+        },
+        "She were to accept": {
+          "misconception": "pembalikannya dihilangin jadi tersisa penggalan tanpa “if”.",
+          "whyFails": "tanpa inversi atau “if”, ini bukan klausa pengandaian."
+        }
+      }
     }
   }
 }

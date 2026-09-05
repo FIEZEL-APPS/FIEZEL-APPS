@@ -4,8 +4,8 @@ FIEZEL SYSTEM-WIDE CONTENT INTEGRITY AUDIT
 
 Inspection volume:
   classroom.recordsInspected             38
-  grammar.questionsInspected             8050
-  grammar.recordsInspected               322
+  grammar.questionsInspected             8200
+  grammar.recordsInspected               328
   library.recordsInspected               9
   listening-exam.recordsInspected        57
   listening.recordsInspected             1407
@@ -24,20 +24,24 @@ Inspection volume:
   writing.recordsInspected               45
 
 Findings by severity:
-  CRITICAL                               0
-  MAJOR                                  214
+  CRITICAL                               30
+  MAJOR                                  235
   MINOR                                  0
 
 Findings by class:
-  grammar/CROSS_FAMILY_FALLBACK                        188
-  grammar/SEMANTIC_DUPLICATE_OPTIONS                   26
+  grammar/CROSS_FAMILY_FALLBACK                        212
+  grammar/CROSS_TOPIC_CONTAMINATION                    30
+  grammar/SEMANTIC_DUPLICATE_OPTIONS                   23
 
 Representative evidence (first occurrence per class):
-  [MAJOR] grammar/SEMANTIC_DUPLICATE_OPTIONS @ grammar-EC-203-complete_sentence-1788569209061-0.44963396315588033
+  [MAJOR] grammar/SEMANTIC_DUPLICATE_OPTIONS @ grammar-EC-203-complete_sentence-1788571667866-0.5196469126596288
       two options are near-identical, so the item has no single defensible answer
-      evidence: "Usually we eat dinner at seven usually." vs "We eat dinner at seven usually eat."
+      evidence: "We eat dinner at seven usually eat." vs "Usually we eat dinner at seven usually."
   [MAJOR] grammar/CROSS_FAMILY_FALLBACK @ b4_024
-      lesson "cleft_sentences_it_was_x_that_emphasis" (emphasis_inversion/C1) offers an answer option authored for b5_015 (gerunds_infinitives/C1)
-      evidence: tentuin kalimatnya nyampein kabar buruk resmi atau nyesalin tindakan lampau → pilih bentuk to atau bentuk -ing
+      lesson "cleft_sentences_it_was_x_that_emphasis" (emphasis_inversion/C1) offers an answer option authored for MO-013 (modals/C1)
+      evidence: kenali bahwa tindakannya udah terjadi (“printed”) tapi sia-sia (“reads everything on screen”) → pilih “needn't have” di depan past participle
+  [CRITICAL] grammar/CROSS_TOPIC_CONTAMINATION @ QN-206
+      lesson "negative_adverbial_inversion_never_rarely_not_only" (emphasis_inversion/C1) offers an answer option authored for QN-201 (question_negation/A2)
+      evidence: Satu negatif per klausa: don't + any, atau have + no. Jangan don't + no.
 
-PASS — 0 critical integrity failures.
+FAIL — 30 critical integrity failures.

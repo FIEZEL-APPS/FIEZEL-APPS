@@ -6,7 +6,7 @@ ok - setiap distractor membawa text + label misconception (umpan grader + ledger
 ok - id item unik dan stabil (templateId + indeks)
 ok - build deterministik: dua kali build identik byte, dan file di disk sinkron
 ok - setiap template masuk items ATAU rejected dengan alasan tercatat
-    cakupan level: A1=25, A2=49, B1=86, B2=70, C1=26, C2=17
+    cakupan level: A1=25, A2=49, B1=86, B2=70, C1=30, C2=19
 ok - cakupan level: minimal 4 level CEFR terwakili (dilaporkan)
 ok - jumlah item >= gate 120 (ambang dari data nyata, bukan target 200 aspirasional)
 ClozeBank: PASS

@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-level-grammar-contract-report-v1",
-  "generatedAt": "2026-09-05T00:45:27.678Z",
+  "generatedAt": "2026-09-05T01:28:24.786Z",
   "status": "PASS",
   "curriculum": "grammar-curriculum-v1.json",
   "counts": {
