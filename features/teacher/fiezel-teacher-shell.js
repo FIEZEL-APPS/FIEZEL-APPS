@@ -19,6 +19,14 @@
   function copy(text, msg) { try { navigator.clipboard.writeText(text).then(function () { toast(msg || 'Tersalin.'); }, function () { toast('Tidak bisa menyalin otomatis.'); }); } catch (_) { toast('Tidak bisa menyalin otomatis.'); } }
   function saveMinutes(n) { st.savedMinutes = (st.savedMinutes || 0) + n; }
   function persist() { S().save(st); }
+  /* Lembar akun hidup di app.js dan sudah dipasang di window. Ruang Guru memanggilnya
+     lewat satu pintu ini supaya tidak ada dua salinan alur masuk. */
+  function openAccount(mode) {
+    try { if (typeof root.openAccountSheet === 'function') { root.openAccountSheet(mode || 'login'); return true; } } catch (_) {}
+    toast('Lembar akun belum siap — muat ulang aplikasi lalu coba lagi.');
+    return false;
+  }
+  function accountRole() { try { return (root.FiezelAccount && root.FiezelAccount.role && root.FiezelAccount.role()) || ''; } catch (_) { return ''; } }
   function accountHandle() { try { var a = root.FiezelAccount && root.FiezelAccount.state && root.FiezelAccount.state(); return a && a.handle ? a.handle : ''; } catch (_) { return ''; } }
   function cls() { return st.classes.filter(function (c) { return c.id === st.activeClassId; })[0] || null; }
   function student(id) { var c = cls(); return c ? c.students.filter(function (s) { return s.id === id; })[0] : null; }
@@ -49,7 +57,19 @@
   /** Sinkron semua kelas: klaim kode yang belum diklaim, tarik laporan murid, ingest. */
   function syncAll(quiet) {
     var T = S(), avail = T.syncAvailable();
-    if (avail !== 'ok') { if (!quiet) toast(T.syncLabel(cls()).text); return Promise.resolve(); }
+    if (avail !== 'ok') {
+      /* Dulu di sini hanya ada toast yang MENGULANG kalimat yang sudah tertulis di tombolnya
+         sendiri ("Masuk akun guru untuk sinkron"), lalu berhenti. Tombol yang menyebut obatnya
+         tetapi tidak menyediakan jalannya terbaca sebagai tombol mati. Sekarang ia membuka
+         lembar akunnya: 'login' kalau belum ada akun, 'teacher' kalau akunnya ada tetapi
+         perannya belum guru - yang memang butuh kode aktivasi, bukan sekadar masuk. */
+      if (!quiet) {
+        if (avail === 'no_account') openAccount('login');
+        else if (avail === 'not_teacher') openAccount('teacher');
+        else toast(T.syncLabel(cls()).text);
+      }
+      return Promise.resolve();
+    }
     if (ui.syncing || !st.classes.length) return Promise.resolve();
     ui.syncing = true; render();
     var total = { ingested: 0, graded: 0, names: [], failed: 0, events: [] };
@@ -229,8 +249,30 @@
       '<form data-tg-form="journal" class="tg-form"><textarea name="text" rows="4" required placeholder="Contoh: Metode timeline di papan ampuh untuk yesterday/ago. Fikri masih tertukar verb 1/2." data-testid="tg-journal-text"></textarea><label class="tg-label">Tandai siswa (opsional)</label><div class="tg-chips tg-chips-select">' + c.students.map(function (s) { return '<label class="tg-chip is-check"><input type="checkbox" name="tags" value="' + s.id + '"><span>' + esc(s.name) + '</span></label>'; }).join('') + '</div><div class="tg-actions"><button type="submit" class="tg-btn is-primary is-small" data-testid="tg-journal-submit">' + icon('notebook-pen') + ' Simpan refleksi</button></div></form></section>' +
       '<section class="tg-card"><div class="tg-card-head"><div><p class="tg-kicker">Riwayat</p><h3>Jurnal ' + esc(c.name) + '</h3></div><span class="tg-count">' + list.length + '</span></div>' + (list.length ? '<ul class="tg-feed">' + list.map(function (j) { return '<li><small>' + esc(T.fmtDate(j.at)) + (j.tags && j.tags.length ? ' · ' + j.tags.map(function (id) { var s = student(id); return s ? esc(s.name) : ''; }).filter(Boolean).join(', ') : '') + '</small><p>' + esc(j.text) + '</p></li>'; }).join('') + '</ul>' : '<p class="tg-empty">Belum ada catatan.</p>') + '</section></div>';
   }
+  /* Kartu AKUN. Sebelum ini halaman ini hanya memuat profil LOKAL (nama & sekolah untuk
+     tanda tangan laporan), jadi guru tidak punya satu pun tempat untuk melihat ia masuk
+     sebagai siapa, apakah perannya sudah guru, atau untuk masuk/keluar akun - padahal
+     tepat tiga hal itu yang menentukan tombol Sinkron hidup atau mati. */
+  function accountCard() {
+    var role = accountRole(), handle = accountHandle();
+    var masuk = !!role, guru = role === 'teacher';
+    var status = !masuk
+      ? '<p class="tg-muted">Belum masuk akun. Sinkron laporan murid dan pengiriman tugas butuh akun guru.</p>'
+      : '<p class="tg-muted">Masuk sebagai <b>' + esc(handle || '—') + '</b> · peran <b>' + esc(guru ? 'guru' : role) + '</b>.'
+        + (guru ? ' Sinkron aktif.' : ' Peran ini belum guru, jadi Sinkron masih mati — aktivasi dengan kode undangan guru.') + '</p>';
+    var actions = !masuk
+      ? '<button type="button" class="tg-btn is-primary is-small" data-tg="account" data-mode="login" data-testid="tg-account-login">' + icon('log-out') + ' Masuk akun</button>'
+        + '<button type="button" class="tg-btn is-ghost is-small" data-tg="account" data-mode="teacher" data-testid="tg-account-teacher">' + icon('user-round') + ' Punya kode guru</button>'
+      : (guru
+        ? '<button type="button" class="tg-btn is-danger is-small" data-tg="logout" data-testid="tg-account-logout">' + icon('log-out') + ' Keluar akun</button>'
+        : '<button type="button" class="tg-btn is-primary is-small" data-tg="account" data-mode="teacher" data-testid="tg-account-teacher">' + icon('user-round') + ' Aktivasi guru</button>'
+          + '<button type="button" class="tg-btn is-danger is-small" data-tg="logout" data-testid="tg-account-logout">' + icon('log-out') + ' Keluar akun</button>');
+    return '<section class="tg-card tg-narrow" data-testid="tg-account"><p class="tg-kicker">Akun</p><h3>' + (guru ? 'Akun guru aktif' : 'Akun') + '</h3>'
+      + status + '<div class="tg-actions">' + actions + '</div></section>';
+  }
   function settings() {
-    return '<section class="tg-card tg-narrow" data-testid="tg-settings"><p class="tg-kicker">Profil guru</p><h3>Nama & sekolah dipakai di tanda tangan laporan</h3><form data-tg-form="teacher" class="tg-form"><label class="tg-label">Nama panggilan<input name="name" value="' + esc(st.teacher.name) + '" placeholder="Bu Rina / Pak Dimas" maxlength="40" data-testid="tg-teacher-name"></label><label class="tg-label">Sekolah / lembaga<input name="school" value="' + esc(st.teacher.school) + '" placeholder="SMA Negeri 3 Bandung" maxlength="60" data-testid="tg-teacher-school"></label><div class="tg-actions"><button type="submit" class="tg-btn is-primary is-small" data-testid="tg-teacher-save">Simpan</button></div></form>' +
+    return accountCard() +
+      '<section class="tg-card tg-narrow" data-testid="tg-settings"><p class="tg-kicker">Profil guru</p><h3>Nama & sekolah dipakai di tanda tangan laporan</h3><form data-tg-form="teacher" class="tg-form"><label class="tg-label">Nama panggilan<input name="name" value="' + esc(st.teacher.name) + '" placeholder="Bu Rina / Pak Dimas" maxlength="40" data-testid="tg-teacher-name"></label><label class="tg-label">Sekolah / lembaga<input name="school" value="' + esc(st.teacher.school) + '" placeholder="SMA Negeri 3 Bandung" maxlength="60" data-testid="tg-teacher-school"></label><div class="tg-actions"><button type="submit" class="tg-btn is-primary is-small" data-testid="tg-teacher-save">Simpan</button></div></form>' +
       '<hr class="tg-hr"><p class="tg-kicker">Data</p><p class="tg-muted">Semua data Ruang Guru tersimpan di perangkat ini. Ekspor cadangan sebelum ganti perangkat.</p><div class="tg-actions"><button type="button" class="tg-btn is-ghost is-small" data-tg="export-json">' + icon('download') + ' Ekspor cadangan</button><label class="tg-btn is-ghost is-small">' + icon('upload') + ' Pulihkan cadangan<input type="file" accept="application/json" hidden data-tg-file="import-json"></label><button type="button" class="tg-btn is-danger is-small" data-tg="reset-all" data-testid="tg-reset">' + icon('trash-2') + ' Hapus semua data guru</button></div></section>';
   }
   var views = { hub: function () { return '<div id="tgClassHub" class="tg-hub-host"></div>'; }, briefing: briefing, classes: classes, assignments: assignments, insights: insights, comms: comms, journal: journal, settings: settings };
@@ -322,6 +364,7 @@
     if (btn.tagName === 'A' && act === 'wa-draft') { return; }
     switch (act) {
       case 'view': st.view = btn.getAttribute('data-view'); if (btn.getAttribute('data-skill')) ui.insightSkill = btn.getAttribute('data-skill'); ui.modal = null; ui.drawer = null; ui.filter = ''; break;
+      case 'account': openAccount(btn.getAttribute('data-mode') || 'login'); return;
       case 'exit': persist(); exit(); return;
       case 'logout':
         persist();
