@@ -1,7 +1,7 @@
 {
-  "version": "m025-262",
-  "claimedBy": "branch fix/teacher-sync-no-wipe",
-  "claimedAt": "2026-09-05T19:30:00.000Z",
-  "reason": "Sinkron guru: chip dipisah dari ronde jaringan, cat ulang ditunda saat guru mengetik, animasi masuk tidak diputar ulang",
+  "version": "m025-263",
+  "claimedBy": "branch fix/teacher-modal-keyframe-clash",
+  "claimedAt": "2026-09-05T20:05:00.000Z",
+  "reason": "Nama @keyframes kembar: blok inbox membajak animasi modal Ruang Guru sehingga panel muncul di bawah-kanan",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
