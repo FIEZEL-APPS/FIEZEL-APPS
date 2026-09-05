@@ -142,7 +142,10 @@ test('smoke DOM-stub: alur murid (terima → kerjakan → hasil → laporan w/s)
   const store = {};
   globalThis.window = globalThis;
   globalThis.localStorage = { getItem: (k) => (k in store ? store[k] : null), setItem: (k, v) => { store[k] = String(v); }, removeItem: (k) => { delete store[k]; } };
-  globalThis.navigator = { onLine: false };
+  /* Node 22+ (yang dipakai quality.yml) memasang `navigator` sebagai getter global tanpa
+     setter, jadi penugasan biasa melempar TypeError dan gerbang ini merah di CI walau
+     hijau di mesin lama. defineProperty menembusnya tanpa mengubah apa pun yang diuji. */
+  Object.defineProperty(globalThis, 'navigator', { value: { onLine: false }, configurable: true, writable: true });
   globalThis.document = { body: { classList: { add() {}, remove() {} } }, getElementById: () => null };
   globalThis.fetch = () => Promise.reject(new Error('offline'));
   globalThis.btoa = (s) => Buffer.from(s, 'binary').toString('base64');
