@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-09-05T22:20:22.636Z",
+  "generatedAt": "2026-09-05T23:18:21.772Z",
   "files": {
     "app.js": {
       "leaks": 1,
@@ -45,7 +45,7 @@
       "budget": 1,
       "sample": [
         {
-          "line": 98,
+          "line": 221,
           "text": "Tugas disimpan sebagai"
         }
       ]
