@@ -125,6 +125,7 @@
     'social.deeplink-flag-off': 'ฟีเจอร์ออนไลน์ยังไม่เปิดใช้ ฉันเก็บคำเชิญไว้จนกว่าฟีเจอร์จะเปิด — การเรียนทั้งหมดยังทำงานปกติ',
     'social.deeplink-saved-toast': 'เก็บคำเชิญไว้แล้ว — อยู่ที่หน้าแรกเมื่อคุณพร้อม',
     'social.notify-title': 'FIEZEL · ข่าวจากเพื่อน',
+    'social.notify-friend-request': '@{handle} อยากเป็นเพื่อนกับคุณ — เปิดคำขอเพื่อรับหรือปฏิเสธ',
     'social.notify-friend-accepted': '@{handle} รับคำเชิญของคุณแล้ว — ตอนนี้เป็นเพื่อนเรียนกันแล้ว',
     'social.notify-cheer': '@{handle} ส่งกำลังใจให้การเรียนของคุณ {count} ครั้ง',
     'social.notify-milestone': '@{handle} เพิ่งทำสำเร็จบางอย่าง',

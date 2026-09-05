@@ -1,7 +1,7 @@
 {
   "version": "m025-259",
-  "claimedBy": "branch main",
-  "claimedAt": "2026-09-05T16:38:15.974Z",
-  "reason": "Class hub: Kelas = Guru ↔ Murid ↔ Braincore (class-hub, review lokal, payload items/w)",
+  "claimedBy": "branch fix/notify-friend-request-and-wake",
+  "claimedAt": "2026-09-05T16:09:04.757Z",
+  "reason": "kabar permintaan teman, poll bangun saat aplikasi kembali dilihat, dan kartu Akun di Ruang Guru",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
