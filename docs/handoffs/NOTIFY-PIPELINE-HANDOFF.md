@@ -136,3 +136,38 @@ Kontrak sekarang:
   yang di-restart, bukan tata letak yang bergerak.
 - **`data-autofocus` juga hanya pada pergantian layar**, dengan alasan yang sama: pada cat
   ulang ia merebut kursor dari tempat guru meletakkannya.
+
+## m025-263: nama @keyframes adalah ruang nama GLOBAL
+
+Sesudah m025-262 owner melaporkan panel yang MASIH tidak mulus: modal "Tugas baru" dan
+"Susun soal dari bank soal" muncul dari **bawah-kanan** layar lalu menjentik ke tengah. Itu
+bukan sisa masalah cat ulang; itu bug CSS yang jauh lebih tua dan berdiri sendiri.
+
+`features/teacher/teacher-shell.css` memuat **dua** blok bernama `@keyframes tg-pop` — satu
+untuk modal (baris 236), satu untuk inbox (baris 297). Nama keyframe tidak dibatasi berkas,
+selektor, atau komponen: ia satu ruang nama untuk seluruh dokumen, dan **definisi belakangan
+menang tanpa peringatan apa pun** dari browser, linter, atau build. Jadi modal memakai
+keyframe milik inbox.
+
+Kenapa akibatnya "bawah-kanan": `.tg-modal` dipusatkan lewat
+`transform: translate(-50%, -50%)` di atas `left:50%; top:50%`. Keyframe modal yang benar
+membawa pemusatan itu di kedua ujungnya. Keyframe inbox berakhir di `transform: none` — yang
+**menghapus** pemusatannya selama animasi berjalan. Selama 0,24 detik itu sudut kiri-atas
+modal duduk tepat di titik tengah layar, jadi ia tampak di bawah-kanan, lalu menjentik balik
+begitu animasinya habis dan aturan CSS statisnya berlaku lagi.
+
+**Ini kedua kalinya bug yang sama menembus produksi.** Yang pertama `@keyframes pageIn` di
+`style.css`, yang mematikan animasi masuk 15 layar `.fade`; ia ditutup pada 2026-08-29 dan
+meninggalkan tombstone `audit 12-003`. Tombstone itu hanya komentar, dan komentar tidak
+menahan siapa pun — sepuluh hari kemudian polanya terulang di berkas lain.
+
+Kontrak sekarang, dijaga `tests/css-keyframe-uniq-test.js`:
+
+- **Tidak boleh ada dua `@keyframes` bernama sama di antara CSS yang dimuat satu halaman.**
+  Gerbangnya membaca `<link rel=stylesheet>` dari setiap `.html` yang benar-benar dikirim
+  (PWA, website, halaman install) dan mengadu hanya berkas yang sedokumen. Nama yang sama di
+  dua halaman berbeda bukan tabrakan — `website/` memang menyalin `fiezel-motion.css`, dan
+  `design/redesign-v1/` prototipe yang tidak pernah dimuat.
+- **Keyframe untuk elemen yang dipusatkan-oleh-transform wajib membawa pemusatan itu di
+  kedua ujungnya**, dan tidak boleh berakhir di `transform: none`. Bentuk bug ini bisa
+  kembali tanpa nama kembar sama sekali, jadi `.tg-modal` diperiksa terpisah.

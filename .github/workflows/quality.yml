@@ -313,6 +313,7 @@ jobs:
           # Ia SKIP (keluar 0) kalau Playwright/Chromium tidak ada, jadi CI publik tidak berubah;
           # ia merah hanya kalau browsernya ada DAN invariannya benar-benar patah.
           node tests/ui-render-audit-test.js
+          node tests/css-keyframe-uniq-test.js
           node tests/pastel-field-contrast-test.js
           node tests/topbar-logo-contrast-test.js
           node tests/paw-mascot-test.js
