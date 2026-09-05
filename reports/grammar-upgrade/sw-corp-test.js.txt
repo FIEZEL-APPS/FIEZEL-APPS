@@ -1,0 +1,10 @@
+sw-corp-test
+  ok   COEP uses credentialless
+  ok   WebKit popup-compatible COOP exists
+  ok   SW revision marker exists
+  ok   shell reinstall forces reload
+  ok   cross-origin Puter request is not intercepted
+  ok   cross-origin Puter request triggers no synthetic fetch
+  ok   opaque synthetic 200 regression remains absent
+  ok   version remains 5.19.0
+semua gate sw-corp LOLOS

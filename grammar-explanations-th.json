@@ -2579,7 +2579,7 @@
       "whyCorrect": "'Solution to' คือแบบแผนคำบุพบทประจำตายตัว เมื่อ solution พูดถึงการแก้ปัญหาเรื่องใดเรื่องหนึ่ง",
       "whyOthersFail": "'for', 'of' และ 'with' ถูกยืมมาจากคู่คำอื่นที่เกี่ยวข้อง แต่ไม่ตรงกับคู่ตายตัวของคำนาม 'solution'",
       "howToAvoid": "จำคู่คำนาม + คำบุพบทเป็นคู่ตายตัว อย่าอนุมานจากคำกริยาหรือคำคุณศัพท์ที่เกี่ยวข้อง",
-      "memoryCue": "Solution TO a problem; reason FOR a decision; answer TO a question",
+      "memoryCue": "Solution TO a problem; reason FOR a decision; answer TO a question — จำบุพบทคู่กับคำนาม",
       "distractors": {
         "for": {
           "misconception": "ยกแบบแผนคำบุพบทจากวลีใกล้เคียงอย่าง 'search for' มาใส่ให้ 'solution'",
@@ -3131,7 +3131,7 @@
       "whyCorrect": "“She” เป็นบุรุษที่สามเอกพจน์ วลีจึงเป็น “has got”",
       "whyOthersFail": "“Have” ไม่ผันตาม “she” ส่วน “is” กับ “does” สร้างโครงสร้างแสดงความเป็นเจ้าของแบบ have got ไม่ได้",
       "howToAvoid": "เลือก have หรือ has จากประธานก่อน แล้วคง got ไว้ข้างหลัง",
-      "memoryCue": "He, she, it has got; I, you, we, they have got",
+      "memoryCue": "He, she, it ใช้ has got; I, you, we, they ใช้ have got",
       "distractors": {
         "have": {
           "misconception": "ย้ายรูปพหูพจน์มาใช้ผิดที่",
@@ -3227,7 +3227,7 @@
       "whyCorrect": "ใช้ “on” เมื่อวัตถุวางอยู่บนพื้นผิวอย่างโต๊ะ",
       "whyOthersFail": "“In” เปลี่ยนความสัมพันธ์เป็นอยู่ข้างใน “at” เป็นตัวบอกจุด และ “to” สื่อการเคลื่อนที่ ไม่ใช่ตำแหน่ง",
       "howToAvoid": "ถามคำถามเดียว: วัตถุอยู่ข้างใน แตะอยู่บนพื้นผิว หรืออยู่ที่จุดหนึ่ง?",
-      "memoryCue": "In a bag, on a table, at a bus stop",
+      "memoryCue": "In a bag (ในถุง), on a table (บนโต๊ะ), at a bus stop (ที่ป้ายรถเมล์)",
       "distractors": {
         "in": {
           "misconception": "อ่านเป็นภาชนะ",
@@ -4231,7 +4231,7 @@
       "objective": "เลือก “along” กับการเคลื่อนที่เลาะไปตามความยาวของเส้น เช่น ชายหาด ถนน หรือแม่น้ำ",
       "misconception": "คุณใช้ preposition ของการข้าม (across, over) หรือ “through” กับการเคลื่อนที่ที่แค่เลาะตามเส้นโดยไม่ได้ข้ามอะไรเลย",
       "reasoning": "ไล่ดูรูปร่างของเส้นทาง → ถ้าตามความยาวของเส้นโดยไม่ข้าม ให้เลือก “along”",
-      "rule": "“Along” ใช้เลาะตามเส้น (ชายหาด ถนน แม่น้ำ) “Across” ใช้ข้ามจากฝั่งหนึ่งไปอีกฝั่ง “Through” ใช้ทะลุพื้นที่ที่ล้อมรอบ “Over” ใช้ผ่านเหนือสิ่งกีดขวาง",
+      "rule": "'Along' เลาะตามเส้น (ชายหาด ถนน) 'Across' ข้ามจากฝั่งหนึ่งไปอีกฝั่ง 'Through' ทะลุผ่านพื้นที่ 'Over' ข้ามเหนือสิ่งกีดขวาง",
       "whyCorrect": "“Keeping the sea on their right the whole time” บอกว่าพวกเขาเดินตามความยาวของชายหาดโดยไม่ข้ามอะไร ซึ่งตรงกับความหมายของ “along” เป๊ะ",
       "whyOthersFail": "“Across” ตัดข้ามชายหาดจากฝั่งหนึ่งไปอีกฝั่ง “through” ต้องการพื้นที่ที่ล้อมรอบ ส่วน “over” ยกเส้นทางขึ้นไปลอยเหนือชายหาด",
       "howToAvoid": "วาดเส้นทางในหัว: เส้นที่เดินตามใช้ along เส้นที่ตัดข้ามใช้ across พื้นที่ที่เข้าไปข้างในใช้ through สิ่งกีดขวางที่ผ่านด้านบนใช้ over",
@@ -5723,7 +5723,7 @@
       "whyCorrect": "การยก “No sooner” ขึ้นหน้าบังคับให้กริยาช่วยขยับมาอยู่หน้าประธาน และเหตุการณ์แรกในสองเหตุการณ์อดีตใช้ past perfect: “No sooner had we begun ... than the projector broke down”",
       "whyOthersFail": "“We had begun” คงลำดับประโยคบอกเล่าไว้ทั้งที่ “no sooner” ข้างหน้าเรียกร้อง inversion “had we begin” สลับที่แล้วแต่ปล่อยกริยาเป็นรูปพื้นฐานทั้งที่ “had” ต้องการ “begun” ส่วน “we began” พลาดทั้งสองอย่าง ทั้ง inversion และ past perfect",
       "howToAvoid": "เห็น “No sooner” ขึ้นต้นและมี “than” ตามมา? สลับ “had” มาไว้หน้าประธานแล้วปิดด้วย participle",
-      "memoryCue": "“No sooner HAD I done ... THAN it happened.”",
+      "memoryCue": "“No sooner HAD I done ... THAN it happened.” — กลับที่ had แล้วปิดด้วย than",
       "distractors": {
         "we had begun": {
           "misconception": "ยก “no sooner” ขึ้นต้นแล้ว แต่ลำดับประธานกับกริยาช่วยยังเป็นลำดับประโยคปกติ",
@@ -5976,6 +5976,1902 @@
         "They hired the architect whose everyone believed was the strongest candidate.": {
           "misconception": "นึกว่า “whose” เป็นการอัปเกรดความเป็นทางการอีกขั้นของ “who”",
           "whyFails": "“whose” เป็นรูปแสดงความเป็นเจ้าของที่ต้องมีคำนามตามมา (“whose design”) พอยืนโดด ๆ หน้า “everyone believed” มันไม่มีอะไรให้ครอบครอง"
+        }
+      }
+    },
+    "A1-201": {
+      "objective": "คงรูปพื้นฐานของคำกริยา present simple หลังประธานพหูพจน์",
+      "misconception": "ผู้เรียนเติม -s ให้คำกริยา present simple ทุกตัว แม้หลังประธานพหูพจน์อย่าง 'we'",
+      "reasoning": "หาประธาน → เช็กว่าเอกพจน์หรือพหูพจน์ → พหูพจน์คงรูปพื้นฐาน",
+      "rule": "Present simple: เติม -s เฉพาะหลัง he, she, it ส่วน I, you, we, they คงรูปพื้นฐาน",
+      "whyCorrect": "'We' เป็นพหูพจน์ คำกริยาจึงคงรูปพื้นฐาน: we go",
+      "whyOthersFail": "'goes' ใช้กับประธานเอกพจน์ 'going' ขาด 'are' ส่วน 'went' เป็นรูปอดีต",
+      "howToAvoid": "ดูประธานก่อน ถ้าเป็น we, you, they หรือ I อย่าเติม -s",
+      "memoryCue": "จำกฎไว้: 'we go' แต่ 'she goes'",
+      "distractors": {
+        "goes": {
+          "misconception": "เติม -s ให้คำกริยาทั้งที่ประธานเป็นพหูพจน์",
+          "whyFails": "'goes' ใช้กับ he, she, it เท่านั้น 'we' ต้องใช้ 'go'"
+        },
+        "going": {
+          "misconception": "ใช้รูป -ing กับกิจวัตร",
+          "whyFails": "'going' ต้องมี 'are' นำหน้า และหมายถึงกำลังทำอยู่ตอนนี้ ไม่ใช่กิจวัตร"
+        },
+        "went": {
+          "misconception": "ใช้รูปอดีตกับกิจวัตรปัจจุบัน",
+          "whyFails": "'went' เป็นรูปอดีต แต่ประโยคพูดถึงกิจวัตรในปัจจุบัน"
+        }
+      }
+    },
+    "A1-202": {
+      "objective": "สร้างประโยคปฏิเสธบอกความสามารถด้วย can't บวกคำกริยารูปพื้นฐาน",
+      "misconception": "ผู้เรียนสร้างรูปปฏิเสธของ 'can' ด้วย 'don't' หรือเติม 'to' หลัง modal",
+      "reasoning": "จับความหมายว่า 'ทำไม่ได้' → ใช้ can't → คงคำกริยารูปพื้นฐาน",
+      "rule": "บอกว่าทำไม่ได้: can't (cannot) + คำกริยารูปพื้นฐาน ไม่มี 'don't' ไม่มี 'to'",
+      "whyCorrect": "'Can't' บอกว่าตอนนี้ทำไม่ได้ และตามด้วยคำกริยารูปพื้นฐาน 'ride' ทันที",
+      "whyOthersFail": "'don't can' ผสมปฏิเสธสองแบบที่ใช้ร่วมกันไม่ได้ 'can't to' เติม 'to' เกินมา ส่วน 'couldn't' ชี้ไปที่อดีต",
+      "howToAvoid": "มอง can เหมือนสวิตช์: can หรือ can't แล้วตามด้วยคำกริยาโดยไม่มีอะไรคั่น",
+      "memoryCue": "Can't + คำกริยา: can't ride, can't swim.",
+      "distractors": {
+        "don't can": {
+          "misconception": "กริยาช่วย do",
+          "whyFails": "'can' มีรูปปฏิเสธของตัวเองด้วย 'not' ไม่เคยใช้กับ 'don't'"
+        },
+        "can't to": {
+          "misconception": "เติม 'to' หลัง can ทั้งที่ can ต้องตามด้วยคำกริยารูปพื้นฐานทันที",
+          "whyFails": "หลัง 'can't' คำกริยาต้องเป็นรูปเปล่า: can't ride ไม่ใช่ can't to ride"
+        },
+        "couldn't": {
+          "misconception": "ใช้รูปอดีตทั้งที่พูดถึงความสามารถในปัจจุบัน",
+          "whyFails": "'couldn't' เป็นรูปอดีต แต่ 'I want to learn' บอกว่าประโยคนี้พูดถึงตอนนี้"
+        }
+      }
+    },
+    "A1-203": {
+      "objective": "เติม -ed ให้คำกริยาปกติเมื่อเป็นเหตุการณ์ที่จบแล้วและมีคำบอกเวลาอดีต",
+      "misconception": "ผู้เรียนคงคำกริยารูปพื้นฐานไว้หลัง 'last night' หรือทำเครื่องหมายอดีตซ้ำด้วย 'did'",
+      "reasoning": "หาคำบอกเวลาอดีต → คำกริยาปกติ → เติม -ed ครั้งเดียว",
+      "rule": "Past simple ของคำกริยาปกติ: คำกริยา + -ed ใช้ครั้งเดียว และไม่มี 'did' ในประโยคบอกเล่า",
+      "whyCorrect": "'Last night' บอกว่าเหตุการณ์จบไปแล้ว คำกริยาปกติจึงเติม -ed: watched",
+      "whyOthersFail": "'watch' ไม่มีเครื่องหมายอดีต 'did watched' ทำเครื่องหมายอดีตซ้ำสองครั้ง ส่วน 'watching' ไม่ใช่รูปของเหตุการณ์ที่จบแล้ว",
+      "howToAvoid": "เห็นคำบอกเวลาอดีต? เติม -ed ให้คำกริยาแล้วหยุดแค่นั้น",
+      "memoryCue": "มี 'last night'? คำกริยาต้องเติม -ed",
+      "distractors": {
+        "watch": {
+          "misconception": "ขาดเครื่องหมายอดีต",
+          "whyFails": "'last night' จบไปแล้ว คำกริยาจึงต้องมี -ed"
+        },
+        "did watched": {
+          "misconception": "ทำเครื่องหมายอดีตซ้ำสองครั้ง: ใช้ 'did' บวก -ed",
+          "whyFails": "'did' บอกอดีตอยู่แล้ว คำกริยาที่ตามมาจึงต้องเป็นรูปเปล่า และประโยคบอกเล่าไม่ต้องใช้ 'did' เลย"
+        },
+        "watching": {
+          "misconception": "ใช้รูป -ing กับเหตุการณ์ที่จบแล้ว",
+          "whyFails": "'watching' ต้องมี 'was' นำหน้า และไม่ได้บอกเหตุการณ์ที่จบแล้วตรง ๆ"
+        }
+      }
+    },
+    "A1-204": {
+      "objective": "จับคู่ 'are' กับคำกริยา -ing สำหรับประธานพหูพจน์ที่กำลังทำอยู่ตอนนี้",
+      "misconception": "ผู้เรียนเลือก 'is' ให้ประธานพหูพจน์ หรือตัดกริยาช่วย be หน้าคำกริยา -ing",
+      "reasoning": "เห็น 'Look!' → เหตุการณ์กำลังเกิด → ประธานพหูพจน์ใช้ are + -ing",
+      "rule": "Present continuous: am/is/are + คำกริยา -ing ประธานพหูพจน์ใช้ 'are'",
+      "whyCorrect": "'Look!' ชี้ว่าเหตุการณ์กำลังเกิดขึ้น และ 'the children' เป็นพหูพจน์ รูปจึงเป็น 'are playing'",
+      "whyOthersFail": "'is playing' ใช้กริยาช่วยผิดกับประธานพหูพจน์ 'playing' ไม่มีกริยาช่วย ส่วน 'play' เป็นรูปกิจวัตร",
+      "howToAvoid": "เช็กสองอย่าง: กำลังเกิดตอนนี้ไหม (ใช้ -ing) และประธานเป็นพหูพจน์ไหม (ใช้ are)",
+      "memoryCue": "มี 'Look!'? ใช้ are + -ing",
+      "distractors": {
+        "is playing": {
+          "misconception": "กริยา be",
+          "whyFails": "'children' เป็นพหูพจน์ กริยาช่วยจึงต้องเป็น 'are' ไม่ใช่ 'is'"
+        },
+        "playing": {
+          "misconception": "ขาดกริยาช่วย be",
+          "whyFails": "คำกริยา -ing อยู่ลำพังไม่ได้ ต้องมี 'are' จึงเป็นประโยคสมบูรณ์"
+        },
+        "play": {
+          "misconception": "ใช้รูปกิจวัตรกับเหตุการณ์ที่กำลังเกิด",
+          "whyFails": "'play' บอกกิจวัตร แต่ 'Look!' แสดงว่าเหตุการณ์กำลังเกิดขึ้นตอนนี้"
+        }
+      }
+    },
+    "A1-205": {
+      "objective": "สร้างประโยคคำสั่งห้ามด้วย don't บวกคำกริยารูปพื้นฐาน",
+      "misconception": "ผู้เรียนใช้ 'not' ลำพังในการห้าม หรือเติม -s ให้คำกริยา",
+      "reasoning": "มองว่าเป็นคำเตือนถึงผู้ฟัง → คำสั่งห้าม → don't + คำกริยารูปพื้นฐาน",
+      "rule": "คำสั่งห้าม: Don't + คำกริยารูปพื้นฐาน ไม่มีประธาน ไม่เติม -s",
+      "whyCorrect": "ผู้พูดบอกผู้ฟังไม่ให้ทำบางอย่าง คำสั่งห้ามจึงเป็น 'Don't run'",
+      "whyOthersFail": "'Not run' ขาด 'do' 'doesn't run' ปฏิบัติกับผู้ฟังเหมือน he/she ส่วน 'don't runs' เติม -s ที่รูปพื้นฐานไม่เคยมี",
+      "howToAvoid": "จะบอกใครไม่ให้ทำอะไร? เริ่มด้วย 'Don't' แล้วคงคำกริยารูปเปล่า",
+      "memoryCue": "Don't + คำกริยา: Don't run, Don't touch.",
+      "distractors": {
+        "Not run": {
+          "misconception": "ห้ามด้วย not โดยไม่มี do",
+          "whyFails": "คำสั่งห้ามใช้ 'not' ลำพังไม่ได้ ภาษาอังกฤษต้องมี 'don't' หน้าคำกริยา"
+        },
+        "Doesn't run": {
+          "misconception": "เติม -s ให้คำสั่งเหมือนต้องการประธานเอกพจน์",
+          "whyFails": "'doesn't' ใช้กับ he, she, it ในประโยคบอกเล่า คำสั่งถึงผู้ฟังใช้ 'don't'"
+        },
+        "Don't runs": {
+          "misconception": "เติม -s ให้คำสั่ง ทั้งที่คำสั่งไม่มีประธานที่ต้องการ -s",
+          "whyFails": "หลัง 'don't' คำกริยาต้องเป็นรูปเปล่า: don't run ไม่ใช่ don't runs"
+        }
+      }
+    },
+    "A1-206": {
+      "objective": "วางคำบอกความถี่ไว้หลังกริยา be",
+      "misconception": "ผู้เรียนวางคำบอกความถี่ไว้หน้า 'is/are' โดยเลียนตำแหน่งของมันกับคำกริยาทั่วไป",
+      "reasoning": "หาคำกริยาหลัก → เป็น 'be' → วางคำบอกความถี่ไว้หลังมัน",
+      "rule": "คำบอกความถี่อยู่หน้าคำกริยาทั่วไป แต่อยู่หลังกริยา be (am/is/are)",
+      "whyCorrect": "คำกริยาคือ 'be' คำบอกความถี่จึงตามหลังมัน: Rudi is never late",
+      "whyOthersFail": "'never is' สลับลำดับ 'is late never' ผลักคำบอกความถี่ไปท้ายประโยค ส่วน 'never be' ไม่มีคำกริยาแท้",
+      "howToAvoid": "ถามว่าคำกริยาคือ 'be' ไหม ถ้าใช่ วางคำบอกความถี่ไว้หลัง ถ้าไม่ใช่ วางไว้หน้า",
+      "memoryCue": "Be มาก่อน แล้วค่อย never: is never late",
+      "distractors": {
+        "never is late": {
+          "misconception": "วางคำบอกความถี่ไว้หน้า is/are ทั้งที่ควรอยู่หลัง",
+          "whyFails": "กับ be คำบอกความถี่ต้องอยู่หลังคำกริยา: is never ไม่ใช่ never is"
+        },
+        "is late never": {
+          "misconception": "วางคำบอกความถี่ไว้หลังกรรม ทั้งที่ตำแหน่งของมันอยู่หน้าคำกริยา",
+          "whyFails": "คำบอกความถี่อยู่กลางประโยค ไม่ใช่ท้ายประโยคหลังคำคุณศัพท์"
+        },
+        "never be late": {
+          "misconception": "ปล่อยคำกริยาเป็นรูปเปล่าทั้งที่ประธานเป็นเอกพจน์",
+          "whyFails": "'Rudi' ต้องใช้รูป 'is' ส่วน 'be' รูปเปล่าเป็นคำกริยาหลักของประโยคไม่ได้"
+        }
+      }
+    },
+    "A1-207": {
+      "objective": "ใช้ apostrophe-s กับคำนามเอกพจน์เพื่อบอกว่าใครเป็นเจ้าของ",
+      "misconception": "ผู้เรียนเขียนชื่อเจ้าของโดยไม่มีเครื่องหมาย หรือใส่แค่ -s โดยไม่มี apostrophe",
+      "reasoning": "หาเจ้าของ → คำนามเอกพจน์ → เติม 's หน้าสิ่งที่ถูกครอบครอง",
+      "rule": "เจ้าของเอกพจน์ + 's + สิ่งของ: father's car, Sinta's bag",
+      "whyCorrect": "รถเป็นของคนเดียวคือพ่อของฉัน เจ้าของจึงได้ 's: my father's car",
+      "whyOthersFail": "'father' ไม่มีเครื่องหมาย 'fathers' เป็นพหูพจน์ ไม่ใช่รูปแสดงความเป็นเจ้าของ ส่วน 'father his' ระบุเจ้าของซ้ำ",
+      "howToAvoid": "ใครเป็นเจ้าของ? ใส่ 's ต่อจากคนนั้นทันที แล้วตามด้วยสิ่งของ",
+      "memoryCue": "เจ้าของ + 's + สิ่งของ",
+      "distractors": {
+        "father": {
+          "misconception": "ตัดเครื่องหมายแสดงความเป็นเจ้าของทิ้ง วางคำนามสองคำเรียงกันแบบภาษาอินโดนีเซีย",
+          "whyFails": "'my father car' วางคำนามสองคำเรียงกันโดยไม่มีเครื่องหมายแสดงความเป็นเจ้าของ"
+        },
+        "fathers": {
+          "misconception": "ใส่แค่ -s โดยไม่มี apostrophe",
+          "whyFails": "'fathers' หมายถึงพ่อมากกว่าหนึ่งคน การแสดงความเป็นเจ้าของต้องมี apostrophe: father's"
+        },
+        "father his": {
+          "misconception": "เพิ่มสรรพนามเจ้าของหลังชื่อ ทำให้แสดงความเป็นเจ้าของซ้ำสองครั้ง",
+          "whyFails": "ภาษาอังกฤษไม่เติม 'his' หลังชื่อเจ้าของ เพราะ 's แสดงความเป็นเจ้าของอยู่แล้ว"
+        }
+      }
+    },
+    "MO-201": {
+      "objective": "ถามเสนอสิ่งของอย่างสุภาพด้วย 'Would you like' บวกคำนาม",
+      "misconception": "ผู้เรียนเสนอด้วย 'Do you want' แบบห้วน ๆ หรือทำลายรูปตายตัวของ 'would like'",
+      "reasoning": "มองว่าเป็นการเสนออย่างสุภาพแก่แขก → ใช้ would + like → เรียงเป็นคำถาม: Would you like",
+      "rule": "เสนออย่างสุภาพ: Would + you + like + คำนาม? คำกริยา 'like' คงรูปพื้นฐาน",
+      "whyCorrect": "การเสนอสิ่งของอย่างสุภาพใช้คำถามตายตัว 'Would you like...?'",
+      "whyOthersFail": "'Do you like' ถามถึงรสนิยมทั่วไป 'would you liking' เติม -ing ส่วน 'you would like' ไม่ใช่คำถาม",
+      "howToAvoid": "จะเสนออาหารหรือเครื่องดื่ม? เริ่มด้วย 'Would you like'",
+      "memoryCue": "Would you like...? = การเสนออย่างสุภาพ",
+      "distractors": {
+        "Do you like": {
+          "misconception": "ถามรสนิยมทั่วไปแทนการเสนออย่างสุภาพ",
+          "whyFails": "'Do you like tea?' ถามว่าชอบชาไหมโดยทั่วไป ไม่ใช่เสนอชาให้ตอนนี้"
+        },
+        "Would you liking": {
+          "misconception": "ติด -ing หลัง would ผสมสองแบบแผนเข้าด้วยกัน",
+          "whyFails": "หลัง 'would' คำกริยาต้องเป็นรูปเปล่า: would like ไม่ใช่ would liking"
+        },
+        "You would like": {
+          "misconception": "ใช้ 'want' ที่ตรงเกินไป ทั้งที่บริบทต้องการการขอแบบสุภาพ",
+          "whyFails": "คำถามต้องมี 'would' หน้า 'you' ลำดับแบบประโยคบอกเล่าไม่ได้ถามอะไรเลย"
+        }
+      }
+    },
+    "GI-201": {
+      "objective": "หลัง 'enjoy' คำกริยาถัดไปต้องเป็นรูป -ing",
+      "misconception": "ผู้เรียนใส่ to-infinitive หรือคำกริยารูปเปล่าหลัง 'enjoy'",
+      "reasoning": "เห็นคำกริยาบอกความชอบ enjoy → คำกริยาถัดไปใช้ -ing",
+      "rule": "Like, love, hate และ enjoy ตามด้วยคำกริยา + -ing",
+      "whyCorrect": "'Enjoy' เป็นคำกริยาบอกความชอบ คำกริยาที่ตามมาจึงใช้ -ing: enjoy listening",
+      "whyOthersFail": "'listen' เป็นรูปเปล่า 'to listen' ใช้แบบแผนที่ผิดสำหรับ enjoy ส่วน 'listens' เป็นคำกริยาแท้ที่ตามหลังคำกริยาอื่นไม่ได้",
+      "howToAvoid": "หลังคำกริยาบอกความรู้สึก ให้นึกถึงส่วนท้าย -ing ก่อนเขียนคำกริยาถัดไป",
+      "memoryCue": "Enjoy ต้องเจอ -ing เสมอ: enjoy listening, enjoy cooking",
+      "distractors": {
+        "listen": {
+          "misconception": "ต่อคำกริยารูปเปล่าหลังคำกริยาบอกความรู้สึกแบบภาษาอินโดนีเซีย",
+          "whyFails": "คำกริยาสองคำวางติดกันไม่ได้ หลัง 'enjoy' คำกริยาที่สองต้องมี -ing"
+        },
+        "to listen": {
+          "misconception": "ใช้ 'to' หลัง enjoy ทั้งที่ enjoy ต้องตามด้วยรูป -ing เสมอ",
+          "whyFails": "'enjoy' ไม่เคยใช้กับ 'to' ต้องตามด้วย -ing เสมอ"
+        },
+        "listens": {
+          "misconception": "ใช้คำกริยาที่ผันแล้วตามหลังคำกริยาอื่น",
+          "whyFails": "'listens' เป็นรูป present simple สำหรับ he/she ตามหลังคำกริยาอื่นไม่ได้"
+        }
+      }
+    },
+    "TA-201": {
+      "objective": "ใช้ 'have never + past participle' กับประสบการณ์ที่ไม่เคยเกิดขึ้นในชีวิต",
+      "misconception": "ผู้เรียนใช้ past simple กับประสบการณ์ชีวิตที่ไม่ได้ระบุเวลา",
+      "reasoning": "ไม่ระบุเวลา → ประสบการณ์ชีวิต → have/has + never + past participle",
+      "rule": "ประสบการณ์ชีวิตที่ไม่ระบุเวลาแน่ชัด: have/has + never/ever + past participle",
+      "whyCorrect": "กรอบเวลาคือทั้งชีวิตจนถึงตอนนี้ และ 'she always travels by train' บอกว่ายังเป็นจริงอยู่ จึงใช้ 'has never flown'",
+      "whyOthersFail": "'never flew' ปิดเวลาไว้ในอดีต 'has never fly' ขาด past participle ส่วน 'never has flying' ใช้ -ing และเรียงคำผิด",
+      "howToAvoid": "ไม่มีวันที่หรือคำบอกเวลาที่จบแล้ว? ใช้ have/has + past participle",
+      "memoryCue": "ไม่เคยเลยในชีวิต → has never flown",
+      "distractors": {
+        "never flew": {
+          "misconception": "ใช้ past simple กับประสบการณ์ชีวิตที่ไม่ได้ระบุเวลา",
+          "whyFails": "ไม่มีเวลาที่จบแล้วอย่าง 'last year' ประโยคครอบคลุมทั้งชีวิตจนถึงตอนนี้ จึงต้องใช้ present perfect"
+        },
+        "has never fly": {
+          "misconception": "ปล่อยคำกริยารูปเปล่าทั้งที่หลัง have ต้องใช้ past participle",
+          "whyFails": "หลัง 'has' คำกริยาต้องเป็น past participle 'flown' ไม่ใช่ 'fly' รูปเปล่า"
+        },
+        "never has flying": {
+          "misconception": "ผสม have กับรูป -ing แทน past participle",
+          "whyFails": "'has' จับคู่กับ past participle ไม่ใช่รูป -ing และ 'never' ต้องอยู่หลัง 'has'"
+        }
+      }
+    },
+    "TA-202": {
+      "objective": "เลือก 'for' หน้าช่วงเวลาในประโยค present perfect",
+      "misconception": "ผู้เรียนใช้ 'since' หน้าช่วงเวลาอย่าง 'ten years' หรือตัดการเชื่อมของ present perfect ทิ้ง",
+      "reasoning": "จับช่วงเวลา → คง present perfect → ใช้ for ไม่ใช่ since",
+      "rule": "Present perfect + for + ช่วงเวลา; present perfect + since + จุดเริ่มต้น",
+      "whyCorrect": "'Ten years' เป็นช่วงเวลา present perfect จึงใช้ 'for': has taught for ten years",
+      "whyOthersFail": "'since' ต้องการจุดเริ่มต้น 'during' บอกว่าเมื่อไหร่ ไม่ใช่นานเท่าไหร่ ส่วน 'from' ต้องมี 'to' เพื่อปิดช่วง",
+      "howToAvoid": "ถามว่าเป็นจำนวนปีหรือวันที่? จำนวน → for วันที่ → since",
+      "memoryCue": "ช่วงเวลาใช้ 'for' จุดเริ่มต้นใช้ 'since': 'for ten years', 'since 2015'",
+      "distractors": {
+        "since": {
+          "misconception": "ใช้ 'since' หน้าช่วงเวลา ทั้งที่ since ใช้กับจุดเริ่มต้น",
+          "whyFails": "'since' ใช้นำจุดเริ่มต้นอย่าง 2015 ไม่ใช่ช่วงเวลาอย่าง 'ten years'"
+        },
+        "during": {
+          "misconception": "ปิดช่วงเวลาราวกับจบไปแล้ว",
+          "whyFails": "'during' บอกว่าเกิดอะไรขึ้นเมื่อไหร่ภายในช่วงหนึ่ง ไม่ได้วัดว่าสภาพนั้นกินเวลานานเท่าไหร่"
+        },
+        "from": {
+          "misconception": "ใช้ 'for' หน้าจุดเริ่มต้น ทั้งที่ for ใช้กับช่วงเวลา",
+          "whyFails": "'from' ต้องมีจุดสิ้นสุด ('from 2015 to 2025') ลำพังตัวมันตามหลัง present perfect ตรงนี้ไม่ได้"
+        }
+      }
+    },
+    "CM-201": {
+      "objective": "ใช้รูปเปรียบเทียบไม่ปกติ 'worse' ของ 'bad' ในการเปรียบเทียบด้วย 'than'",
+      "misconception": "ผู้เรียนสร้างรูปเปรียบเทียบของ 'bad' ด้วย -er หรือ 'more' หรือหยิบรูปขั้นสูงสุดมาใช้",
+      "reasoning": "เห็น 'than' → ต้องใช้รูปเปรียบเทียบ → bad ไม่ปกติ → worse",
+      "rule": "รูปเปรียบเทียบไม่ปกติ: good → better, bad → worse, far → further",
+      "whyCorrect": "'Than' ต้องการรูปเปรียบเทียบ และรูปเปรียบเทียบของ 'bad' คือ 'worse' ซึ่งไม่ปกติ",
+      "whyOthersFail": "'badder' และ 'more bad' ใช้แบบแผนปกติกับคำไม่ปกติ ส่วน 'worst' เป็นรูปขั้นสูงสุด",
+      "howToAvoid": "จำรายการสั้น ๆ ของคู่คำไม่ปกติไว้ก่อนจะหยิบ -er หรือ more",
+      "memoryCue": "จำคู่ไว้: good เป็น better, bad เป็น worse",
+      "distractors": {
+        "badder": {
+          "misconception": "บังคับใส่ -er ให้คำคุณศัพท์ไม่ปกติ",
+          "whyFails": "'bad' เป็นคำไม่ปกติ ไม่เคยเติม -er"
+        },
+        "more bad": {
+          "misconception": "ใช้แบบแผน 'more + คำคุณศัพท์' กับคำคุณศัพท์ไม่ปกติ",
+          "whyFails": "'more bad' ทำตามแบบแผนปกติ แต่ 'bad' มีรูปของตัวเอง: worse"
+        },
+        "worst": {
+          "misconception": "ใช้รูปขั้นสูงสุดทั้งที่ 'than' ต้องการรูปเปรียบเทียบ",
+          "whyFails": "'worst' ใช้เปรียบเทียบสามสิ่งขึ้นไป ส่วน 'than' บ่งบอกการเปรียบเทียบสองสิ่ง"
+        }
+      }
+    },
+    "CM-202": {
+      "objective": "ใช้ 'more' หน้าคำคุณศัพท์ยาวในการเปรียบเทียบ",
+      "misconception": "ผู้เรียนเติม -er ให้คำคุณศัพท์ยาว หรือใช้ 'more' ซ้อนกับ -er",
+      "reasoning": "นับพยางค์ → คำคุณศัพท์ยาว → more + คำคุณศัพท์ ไม่เติม -er",
+      "rule": "คำคุณศัพท์สั้นเติม -er (cheaper) คำคุณศัพท์ยาวใช้ more (more interesting) ห้ามใช้ทั้งสองอย่าง",
+      "whyCorrect": "'Interesting' เป็นคำคุณศัพท์ยาว รูปเปรียบเทียบจึงเป็น 'more interesting'",
+      "whyOthersFail": "'interestinger' บังคับใส่ -er ให้คำยาว 'more interestinger' ทำเครื่องหมายเปรียบเทียบซ้ำสองครั้ง ส่วน 'the most interesting' เป็นรูปขั้นสูงสุด",
+      "howToAvoid": "ลองออกเสียงคำคุณศัพท์ดู: สามพยางค์ขึ้นไป → more",
+      "memoryCue": "คำยาว → more คำสั้น → -er",
+      "distractors": {
+        "interestinger": {
+          "misconception": "เติม -er ให้คำคุณศัพท์ยาว ทั้งที่คำยาวต้องใช้ more",
+          "whyFails": "'interesting' มีสามพยางค์ จึงต้องใช้ 'more' ไม่ใช่ -er"
+        },
+        "more interestinger": {
+          "misconception": "ทำเครื่องหมายเปรียบเทียบซ้ำ: more บวก -er",
+          "whyFails": "'more' และ -er ต่างก็เป็นเครื่องหมายเปรียบเทียบ ใช้แค่อย่างเดียว"
+        },
+        "the most interesting": {
+          "misconception": "ใช้รูปขั้นสูงสุด ทั้งที่เปรียบเทียบแค่สองสิ่ง",
+          "whyFails": "'than' เปรียบเทียบสองสิ่ง จึงต้องใช้รูปเปรียบเทียบ ไม่ใช่รูปขั้นสูงสุด"
+        }
+      }
+    },
+    "A1-208": {
+      "objective": "หลังกริยา be ใช้คำคุณศัพท์ ไม่ใช่คำกริยาวิเศษณ์ -ly",
+      "misconception": "ผู้เรียนเติม -ly หลัง 'is/are' เพราะคำนั้นบรรยายว่าสิ่งนั้นเป็นอย่างไร",
+      "reasoning": "หาคำกริยา → เป็น 'be' → บรรยายประธานด้วยคำคุณศัพท์",
+      "rule": "หลัง be (am/is/are) ใช้คำคุณศัพท์ หลังคำกริยาแสดงการกระทำใช้คำกริยาวิเศษณ์ -ly",
+      "whyCorrect": "'Is' เชื่อมซุปกับคำบรรยาย จึงต้องใช้คำคุณศัพท์ 'hot'",
+      "whyOthersFail": "'hotly' เป็นคำกริยาวิเศษณ์ 'heat' ไม่ใช่คำคุณศัพท์ ส่วน 'hotter' ใช้เปรียบเทียบ แต่ตรงนี้ไม่ได้เปรียบเทียบอะไร",
+      "howToAvoid": "เห็น is/are หน้าช่องว่าง? เลือกคำคุณศัพท์ธรรมดา",
+      "memoryCue": "หลัง is ใช้คำคุณศัพท์: is hot หลังคำกริยาแสดงการกระทำใช้ -ly: walks slowly",
+      "distractors": {
+        "hotly": {
+          "misconception": "ใช้รูป -ly หลัง is/are ทั้งที่หลัง be ต้องใช้คำคุณศัพท์",
+          "whyFails": "หลัง 'is' คำนั้นบรรยายตัวซุปเอง จึงต้องเป็นคำคุณศัพท์ ไม่ใช่ -ly"
+        },
+        "heat": {
+          "misconception": "ใช้คำนามในตำแหน่งคำคุณศัพท์",
+          "whyFails": "'heat' เป็นคำนามหรือคำกริยา 'very' ต้องตามด้วยคำคุณศัพท์"
+        },
+        "hotter": {
+          "misconception": "ใช้รูปเปรียบเทียบทั้งที่ไม่ได้เปรียบเทียบอะไร",
+          "whyFails": "ไม่มีการเปรียบเทียบ และ 'very' ใช้กับรูปเปรียบเทียบไม่ได้"
+        }
+      }
+    },
+    "QT-201": {
+      "objective": "ถามถึงคำนามนับได้พหูพจน์ด้วย 'How many'",
+      "misconception": "ผู้เรียนถามถึงสิ่งที่นับได้ด้วย 'how much' หรือตัดคำบอกจำนวนทิ้ง",
+      "reasoning": "ดูคำนาม → นับได้และเป็นพหูพจน์ → How many",
+      "rule": "How many + คำนามนับได้พหูพจน์; how much + คำนามนับไม่ได้",
+      "whyCorrect": "'Brothers and sisters' เป็นคำนามนับได้พหูพจน์ คำถามจึงเริ่มด้วย 'How many'",
+      "whyOthersFail": "'how much' ใช้กับคำนามนับไม่ได้ 'how' ลำพังถามถึงวิธี ส่วน 'how many of' ต้องมี 'the/your' ตามหลัง",
+      "howToAvoid": "ใส่ตัวเลขหน้าคำนามได้ไหม (two brothers)? ถ้าได้ ให้ถามด้วย 'How many'",
+      "memoryCue": "นับได้ → how many",
+      "distractors": {
+        "How much": {
+          "misconception": "ถามถึงคำนามนับได้ด้วย 'how much' ทั้งที่ควรใช้ 'how many'",
+          "whyFails": "'brothers and sisters' นับได้ คำถามจึงต้องใช้ 'how many'"
+        },
+        "How": {
+          "misconception": "ถามจำนวนด้วย 'how' เปล่า ๆ โดยตัดคำบอกจำนวนทิ้ง",
+          "whyFails": "'how' ลำพังถามถึงวิธี ไม่ใช่จำนวน"
+        },
+        "How many of": {
+          "misconception": "เติม 'of' ตรงหน้าคำนามเปล่า",
+          "whyFails": "'of' ใช้ได้เฉพาะหน้า 'the/your/them': how many of your friends ไม่ใช่ how many of brothers"
+        }
+      }
+    },
+    "LD-201": {
+      "objective": "นำหน้าผลลัพธ์ด้วย 'so' หลังจากบอกสาเหตุแล้ว",
+      "misconception": "ผู้เรียนใช้ 'because' หน้าผลลัพธ์แทนที่จะใช้หน้าสาเหตุ",
+      "reasoning": "อนุประโยคไหนคือสาเหตุ อนุประโยคไหนคือผล → อนุประโยคผลใช้ so",
+      "rule": "สาเหตุ + so + ผลลัพธ์ Because + สาเหตุ",
+      "whyCorrect": "ฝนคือสาเหตุ และการอยู่บ้านคือผลลัพธ์ อนุประโยคผลจึงเริ่มด้วย 'so'",
+      "whyOthersFail": "'because' จะทำให้การอยู่บ้านกลายเป็นสาเหตุ 'because of' ต้องตามด้วยคำนาม ส่วน 'so that' บอกจุดประสงค์",
+      "howToAvoid": "ถามว่าอนุประโยคนี้อธิบายว่าทำไม (because) หรือเกิดอะไรขึ้นต่อ (so)",
+      "memoryCue": "ฝนตก → so → อยู่บ้าน",
+      "distractors": {
+        "because": {
+          "misconception": "ใช้ 'because' นำหน้าผลลัพธ์ ทั้งที่ because ใช้กับสาเหตุ",
+          "whyFails": "'because' นำหน้าสาเหตุ แต่ 'we stayed at home' คือผลของฝน"
+        },
+        "because of": {
+          "misconception": "วาง 'because of' หน้าอนุประโยคเต็ม ทั้งที่มันใช้กับคำนามเท่านั้น",
+          "whyFails": "'because of' ตามด้วยคำนาม ('because of the rain') ไม่ใช่อนุประโยคเต็ม"
+        },
+        "so that": {
+          "misconception": "ใช้ตัวเชื่อมบอกจุดประสงค์ 'so that' ทั้งที่ต้องการตัวเชื่อมบอกผล",
+          "whyFails": "'so that' บอกจุดประสงค์ การอยู่บ้านเป็นผลลัพธ์ ไม่ใช่แผน"
+        }
+      }
+    },
+    "TA-203": {
+      "objective": "คงคำกริยาบอกสภาวะ 'know' ไว้ใน present simple แม้พูดถึงตอนนี้",
+      "misconception": "ผู้เรียนทำให้ 'know' เป็นรูป continuous เพราะสถานการณ์กำลังเกิดอยู่ตอนนี้",
+      "reasoning": "ระบุคำกริยาบอกสภาวะ → สภาวะไม่ใช้ -ing → present simple",
+      "rule": "คำกริยาบอกสภาวะ (know, like, want, belong) ปกติคงอยู่ใน present simple ไม่ใช่ continuous",
+      "whyCorrect": "'Know' บรรยายสภาวะ ไม่ใช่การกระทำ แม้มี 'right now' ก็ใช้ present simple: don't know",
+      "whyOthersFail": "'am not knowing' บังคับสภาวะให้เป็น -ing 'not know' ไม่มีกริยาช่วย ส่วน 'don't knowing' เติม -ing หลัง don't",
+      "howToAvoid": "'Right now' ไม่ได้แปลว่าต้องใช้ -ing เสมอ ให้เช็กก่อนว่าคำกริยาเป็นสภาวะหรือไม่",
+      "memoryCue": "Know, like, want — ไม่มี -ing",
+      "distractors": {
+        "am not knowing": {
+          "misconception": "คิดว่าเวลาปัจจุบันต้องใช้รูป -ing เสมอ",
+          "whyFails": "'know' เป็นคำกริยาบอกสภาวะ จึงคง present simple แม้มี 'right now'"
+        },
+        "not know": {
+          "misconception": "ประโยคกลายเป็นเศษที่ไม่มีคำกริยาแท้",
+          "whyFails": "ปฏิเสธใน present simple ต้องมี 'don't' ส่วน 'not know' เปล่า ๆ ไม่ใช่คำกริยาที่สมบูรณ์"
+        },
+        "don't knowing": {
+          "misconception": "คำกริยารูปเปล่าโดยไม่มีกริยาช่วย",
+          "whyFails": "หลัง 'don't' คำกริยาต้องเป็นรูปเปล่า: don't know ไม่ใช่ don't knowing"
+        }
+      }
+    },
+    "QN-201": {
+      "objective": "หลังคำกริยาปฏิเสธใช้ 'any' แทนคำปฏิเสธคำที่สอง",
+      "misconception": "ผู้เรียนเติม 'no' หลัง 'don't' ทำให้เกิดปฏิเสธซ้อน",
+      "reasoning": "คำกริยาเป็นปฏิเสธอยู่แล้ว → มีปฏิเสธได้ตัวเดียว → ใช้ any",
+      "rule": "หนึ่งอนุประโยคมีปฏิเสธได้ตัวเดียว: don't + any หรือ have + no ห้าม don't + no",
+      "whyCorrect": "คำกริยา 'don't have' เป็นปฏิเสธอยู่แล้ว คำนามจึงใช้ 'any': don't have any milk",
+      "whyOthersFail": "'no' และ 'nothing' ทำให้ปฏิเสธซ้อน ส่วน 'none' วางหน้าคำนามไม่ได้",
+      "howToAvoid": "นับคำปฏิเสธ ถ้าคำกริยามี 'not' แล้ว คำถัดไปคือ 'any'",
+      "memoryCue": "ปฏิเสธตัวเดียวพอ: don't … any หรือ have … no",
+      "distractors": {
+        "no": {
+          "misconception": "ใช้ 'no' หลังคำกริยาที่เป็นปฏิเสธอยู่แล้ว ทำให้ปฏิเสธซ้อนกัน",
+          "whyFails": "'don't' เป็นปฏิเสธอยู่แล้ว เติม 'no' จะกลายเป็นปฏิเสธซ้อน"
+        },
+        "nothing": {
+          "misconception": "รวมคำกริยาปฏิเสธกับสรรพนามปฏิเสธ",
+          "whyFails": "'nothing' เป็นสรรพนามปฏิเสธ วางหน้าคำนาม 'milk' หลัง 'don't' ไม่ได้"
+        },
+        "none": {
+          "misconception": "ใช้สรรพนามในตำแหน่งหน้าคำนาม",
+          "whyFails": "'none' ใช้แทนคำนาม ('we have none') วางตรงหน้า 'milk' ไม่ได้"
+        }
+      }
+    },
+    "AR-201": {
+      "objective": "ใช้ 'the' หน้าคำบอกลำดับอย่าง 'first' เพราะชี้ไปที่สิ่งเดียวที่เจาะจง",
+      "misconception": "ผู้เรียนมอง 'first day' เป็นคำนามใหม่ที่ไม่เจาะจงและใช้ 'a'",
+      "reasoning": "เห็นคำบอกลำดับ 'first' → วันแรกมีแค่วันเดียว → the",
+      "rule": "ใช้ 'the' กับคำบอกลำดับ (the first, the second) และรูปขั้นสูงสุด (the best) เพราะมีสิ่งเดียวที่ตรง",
+      "whyCorrect": "'First' เลือกวันเดียวที่ไม่ซ้ำใคร วลีนามจึงเจาะจง: the first day",
+      "whyOthersFail": "'a' และ 'an' นำเสนอวันนั้นเป็นหนึ่งในหลายวัน ส่วนการละคำนำหน้านามทำไม่ได้กับคำนามนับได้เอกพจน์",
+      "howToAvoid": "มีคำบอกลำดับหรือรูปขั้นสูงสุดหน้าคำนาม? หยิบ 'the'",
+      "memoryCue": "คำบอกลำดับและขั้นสูงสุดใช้ the เสมอ: the first, the last, the best",
+      "distractors": {
+        "a": {
+          "misconception": "ใช้ 'a' หน้า first ทั้งที่คำบอกลำดับอย่าง first ต้องใช้ the เสมอ",
+          "whyFails": "วันแรกมีเพียงวันเดียว จึงเจาะจงและใช้ 'the'"
+        },
+        "an": {
+          "misconception": "ใช้คำนำหน้านามไม่เจาะจง และเสียงต้นก็ไม่ใช่สระ",
+          "whyFails": "'an' ไม่เจาะจง และยังผิดเมื่ออยู่หน้าเสียงพยัญชนะใน 'first'"
+        },
+        "(no article)": {
+          "misconception": "คิดว่าวลีที่คล้ายชื่อเฉพาะไม่ต้องมีคำนำหน้านาม",
+          "whyFails": "วลีนามเอกพจน์อย่าง 'first day' อยู่ลำพังโดยไม่มีคำนำหน้านามไม่ได้"
+        }
+      }
+    },
+    "CO-201": {
+      "objective": "ใช้ 'would + คำกริยารูปพื้นฐาน' ในอนุประโยคผลของเงื่อนไขสมมติในปัจจุบัน",
+      "misconception": "ผู้เรียนใส่ 'will' หรือ past simple ในอนุประโยคผลหลังอนุประโยค if ที่เป็นสมมติ",
+      "reasoning": "อนุประโยค if เป็น past simple และไม่จริง → อนุประโยคผลใช้ would + คำกริยารูปพื้นฐาน",
+      "rule": "Second conditional: If + past simple, would + คำกริยารูปพื้นฐาน",
+      "whyCorrect": "'If I had more free time' บรรยายสถานการณ์ปัจจุบันที่ไม่จริง ผลจึงใช้ 'would learn'",
+      "whyOthersFail": "'will learn' มองสถานการณ์ว่าเป็นจริง 'learned' เป็นรูปของอนุประโยค if ส่วน 'would learned' เติม -ed หลัง would",
+      "howToAvoid": "เห็นอนุประโยค if รูปอดีตที่พูดถึงปัจจุบันในจินตนาการ? ใส่ 'would' บวกคำกริยารูปเปล่าในส่วนผล",
+      "memoryCue": "จินตนาการปัจจุบัน: If I had…, I would…",
+      "distractors": {
+        "will learn": {
+          "misconception": "มองสถานการณ์ที่ไม่จริงชัด ๆ ราวกับเป็นจริง",
+          "whyFails": "'will' ใช้กับแผนจริง ส่วน 'had' รูปอดีตบอกว่านี่คือจินตนาการ จึงต้องใช้ 'would'"
+        },
+        "learned": {
+          "misconception": "รูปของอนุประโยค if หลงมาอยู่ในอนุประโยคผล",
+          "whyFails": "past simple อยู่ในอนุประโยค if ส่วนอนุประโยคผลต้องใช้ 'would'"
+        },
+        "would learned": {
+          "misconception": "รวม would กับรูป -ed",
+          "whyFails": "หลัง 'would' คำกริยาต้องเป็นรูปเปล่า: would learn ไม่ใช่ would learned"
+        }
+      }
+    },
+    "QN-202": {
+      "objective": "เติม tag ปฏิเสธพร้อมกริยาช่วยที่ตรงกันหลังประโยคบอกเล่าเชิงบวก",
+      "misconception": "ผู้เรียนคง tag เป็นบวก หรือใช้คำนามซ้ำแทนสรรพนาม",
+      "reasoning": "ประโยคเป็นบวก → tag กลายเป็นปฏิเสธ → กริยาช่วยเดียวกัน + สรรพนาม",
+      "rule": "ประโยคบวก → tag ปฏิเสธ; tag ลอกกริยาช่วยของประโยคและใช้สรรพนาม",
+      "whyCorrect": "'Works' เป็น present simple เชิงบวก tag จึงเป็นปฏิเสธด้วย 'does' และสรรพนาม 'she': doesn't she?",
+      "whyOthersFail": "'does she' คงขั้วเดิม 'isn't she' ใช้กริยาช่วยผิด ส่วน 'doesn't your sister' ใช้คำนามซ้ำ",
+      "howToAvoid": "เช็กสามอย่าง: กลับขั้ว จับคู่กริยาช่วย และเปลี่ยนคำนามเป็นสรรพนาม",
+      "memoryCue": "ประโยคบวก tag ปฏิเสธ: works → doesn't she?",
+      "distractors": {
+        "does she": {
+          "misconception": "ใช้ tag บวกหลังประโยคบอกเล่าเชิงบวก ทั้งที่ต้องกลับเป็นปฏิเสธ",
+          "whyFails": "ประโยคเป็นบวก tag จึงต้องกลับเป็นปฏิเสธ: doesn't she"
+        },
+        "isn't she": {
+          "misconception": "หยิบกริยาช่วยมาจากกาลอื่น",
+          "whyFails": "'works' เป็น present simple tag จึงต้องใช้ 'does' ไม่ใช่ 'is'"
+        },
+        "doesn't your sister": {
+          "misconception": "ใช้คำนามซ้ำใน tag ทั้งที่ tag ต้องใช้สรรพนาม",
+          "whyFails": "tag ใช้สรรพนาม ไม่ใช่คำนามเต็ม: doesn't she"
+        }
+      }
+    },
+    "TA-204": {
+      "objective": "ใช้ past perfect กับการกระทำที่เกิดก่อน เมื่อ 'when' นำหน้าการกระทำในอดีตที่เกิดทีหลัง",
+      "misconception": "ผู้เรียนใช้ past simple หรือ present perfect กับเหตุการณ์ที่เกิดก่อนในสองเหตุการณ์อดีต",
+      "reasoning": "สองเหตุการณ์ในอดีต → หาเหตุการณ์ที่เกิดก่อน → had + past participle",
+      "rule": "Past perfect (had + past participle) ทำเครื่องหมายเหตุการณ์ที่เกิดก่อนในสองเหตุการณ์อดีต",
+      "whyCorrect": "หนังเริ่มก่อนที่เราจะไปถึง เหตุการณ์ที่เกิดก่อนจึงใช้ past perfect: had already started",
+      "whyOthersFail": "'has started' ชี้ไปที่ตอนนี้ 'was starting' บอกว่ายังเริ่มอยู่ ส่วน 'did start' ไม่ได้เรียงลำดับสองเหตุการณ์",
+      "howToAvoid": "มีสองเหตุการณ์ในอดีต? ให้ 'had' กับเหตุการณ์ที่เกิดก่อน",
+      "memoryCue": "เหตุการณ์แรก → had done",
+      "distractors": {
+        "has / started": {
+          "misconception": "ใช้ present perfect กับเหตุการณ์ที่เกิดก่อนเหตุการณ์อดีตอีกเหตุการณ์หนึ่ง",
+          "whyFails": "'has started' เชื่อมกับตอนนี้ แต่ทั้งสองเหตุการณ์อยู่ในอดีต เหตุการณ์ที่เกิดก่อนต้องใช้ 'had'"
+        },
+        "was / starting": {
+          "misconception": "ปล่อยให้การกระทำยังดำเนินอยู่ ทั้งที่มันเสร็จก่อนจุดอ้างอิงในอดีต",
+          "whyFails": "'already' บอกว่าการเริ่มเสร็จสิ้นแล้ว ไม่ได้กำลังดำเนินอยู่ตอนที่เราไปถึง"
+        },
+        "did / start": {
+          "misconception": "ใช้ past simple กับเหตุการณ์ที่เกิดก่อน ทำให้ลำดับแบนราบ",
+          "whyFails": "'did start' เป็น past simple แบบเน้น ไม่ได้แสดงว่าการเริ่มเกิดก่อนการมาถึงของเรา"
+        }
+      }
+    },
+    "RS-201": {
+      "objective": "รายงานคำถาม wh- ด้วยลำดับคำแบบประโยคบอกเล่าและคำกริยาที่เลื่อนกาล",
+      "misconception": "ผู้เรียนคงการสลับที่แบบคำถามหรือรูปปัจจุบันไว้ในอนุประโยคที่รายงาน",
+      "reasoning": "คำถาม wh- ตรง → อนุประโยครายงานใช้ลำดับประธาน + คำกริยา → เลื่อนกาลถอยหลัง",
+      "rule": "รายงานคำถาม wh-: คำถาม + ประธาน + คำกริยา (ไม่มี do/does/did) และเลื่อนกาลหลังคำกริยารายงานที่เป็นอดีต",
+      "whyCorrect": "ในคำถามที่รายงาน ประธานมาก่อนคำกริยาและกาลเลื่อนถอยหลัง: what time the shop opened",
+      "whyOthersFail": "'did the shop open' และ 'does the shop open' คงลำดับคำถามไว้ ส่วน 'the shop opens' ลืมเลื่อนกาล",
+      "howToAvoid": "ตัด do/does/did วางประธานไว้ก่อน แล้วเลื่อนคำกริยาถอยไปในอดีตหนึ่งขั้น",
+      "memoryCue": "Asked what time the shop opened — ไม่มี 'did'",
+      "distractors": {
+        "did the shop open": {
+          "misconception": "คงการสลับที่แบบคำถาม (กริยาช่วยหน้าประธาน) ไว้ในอนุประโยคที่รายงาน",
+          "whyFails": "คำถามที่รายงานใช้ลำดับแบบประโยคบอกเล่า 'did' จึงมาก่อน 'the shop' ไม่ได้"
+        },
+        "the shop opens": {
+          "misconception": "คงรูปปัจจุบันไว้ในคำถามที่รายงาน ทั้งที่คำกริยารายงานเป็นอดีต",
+          "whyFails": "'asked' เป็นอดีต 'opens' จึงปกติเลื่อนเป็น 'opened'"
+        },
+        "does the shop open": {
+          "misconception": "สลับที่แบบที่ไม่ใช้ทั้งในคำถามตรงและคำถามที่รายงาน",
+          "whyFails": "แบบนี้ยังคงทั้งการสลับที่และรูปปัจจุบันของคำถามตรงไว้"
+        }
+      }
+    },
+    "QN-203": {
+      "objective": "ใช้ลำดับคำแบบประโยคบอกเล่าโดยไม่มี 'do' ในคำถามทางอ้อม",
+      "misconception": "ผู้เรียนคง 'does' ไว้หรือสลับที่คำกริยาภายใน 'Do you know...?'",
+      "reasoning": "คำถามเริ่มด้วย 'Do you know' → ส่วนที่ฝังเป็นประโยคบอกเล่า → ประธาน + คำกริยา ไม่มี does",
+      "rule": "คำถามทางอ้อม: ส่วนนำ + คำถาม + ประธาน + คำกริยา ไม่มี do/does/did ในส่วนที่ฝัง",
+      "whyCorrect": "หลัง 'Do you know what time' ส่วนที่เหลือเป็นประโยคบอกเล่าปกติ: the bank closes",
+      "whyOthersFail": "'does the bank close' ทำซ้ำรูปคำถาม 'the bank does close' เพิ่มกริยาช่วยที่ไม่จำเป็น ส่วน 'closes the bank' สลับที่ผิด",
+      "howToAvoid": "ลองพูดส่วนที่ฝังเป็นประโยคบอกเล่าลำพังก่อน แล้วค่อยนำมาต่อ",
+      "memoryCue": "Do you know + ประโยคบอกเล่า",
+      "distractors": {
+        "does the bank close": {
+          "misconception": "คงการสลับที่แบบคำถามตรง (คำกริยาหน้าประธาน) ไว้ในอนุประโยคที่ฝัง",
+          "whyFails": "คำถามถูกสร้างด้วย 'Do you know' แล้ว ส่วนที่ฝังจะทำซ้ำรูปคำถามไม่ได้"
+        },
+        "the bank does close": {
+          "misconception": "เติม 'do' ในคำถามที่ฝังอยู่ในประโยค ทั้งที่ภายในประโยคไม่ต้องใช้ do",
+          "whyFails": "ลำดับถูกแล้ว แต่ไม่ต้องใช้ 'does' คำกริยาแค่เติม -s: closes"
+        },
+        "closes the bank": {
+          "misconception": "ย้ายคำกริยาไปหน้าประธาน ทำให้ลำดับคำผิด",
+          "whyFails": "การวางคำกริยาหน้าประธานไม่ใช่ลำดับคำภาษาอังกฤษตรงนี้"
+        }
+      }
+    },
+    "CO-202": {
+      "objective": "ใช้ 'could' หลัง 'wish' สำหรับความสามารถที่ผู้พูดไม่มีในตอนนี้",
+      "misconception": "ผู้เรียนใช้ 'can' หรือ 'would' หลัง 'wish' กับสถานการณ์ปัจจุบันของตัวเอง",
+      "reasoning": "wish เกี่ยวกับตอนนี้ → เลื่อนถอยหนึ่งขั้น → can กลายเป็น could",
+      "rule": "Wish เกี่ยวกับปัจจุบัน: wish + past simple (หรือ could) Can → could",
+      "whyCorrect": "ผู้พูดว่ายน้ำไม่ได้ตอนนี้และปรารถนาสิ่งตรงข้าม 'wish' จึงใช้รูปอดีต: could swim",
+      "whyOthersFail": "'can' ยังอยู่ในปัจจุบัน 'would' ใช้บ่นเรื่องคนอื่น ส่วน 'will' เป็นรูปอนาคตจริง",
+      "howToAvoid": "เปลี่ยนประโยคจริงให้เป็นตรงข้าม แล้วเลื่อนคำกริยาถอยหนึ่งขั้น",
+      "memoryCue": "ตอนนี้ทำไม่ได้ จึงเป็น wish I could: can't swim → wish I could",
+      "distractors": {
+        "can": {
+          "misconception": "คงรูปปัจจุบันหลัง wish โดยมองสถานการณ์เป็นความจริงในปัจจุบัน",
+          "whyFails": "หลัง 'wish' คำกริยาต้องเลื่อนถอย: 'can' กลายเป็น 'could'"
+        },
+        "would": {
+          "misconception": "ใช้ 'would' ในอนุประโยค wish เกี่ยวกับสถานการณ์ของตัวเอง ทั้งที่ต้องใช้ wish + past simple",
+          "whyFails": "'wish + would' ใช้กับพฤติกรรมน่ารำคาญของคนอื่น ไม่ใช่ความสามารถของผู้พูดเอง"
+        },
+        "will": {
+          "misconception": "ใช้รูปอนาคตจริงกับความปรารถนาที่ไม่จริง",
+          "whyFails": "'will' ชี้ไปที่อนาคตจริง ส่วน 'wish' บรรยายปัจจุบันที่ไม่จริง"
+        }
+      }
+    },
+    "TA-205": {
+      "objective": "วาง 'already' ระหว่าง 'have' กับ past participle ในประโยคบอกเล่าเชิงบวก",
+      "misconception": "ผู้เรียนใช้ 'yet' ในประโยคบอกเล่าเชิงบวก หรือผลัก 'already' ไปท้ายประโยค",
+      "reasoning": "ประโยคบวกเกี่ยวกับการกระทำที่เสร็จแล้ว → already → ตำแหน่งกลางหลัง have",
+      "rule": "Have + already/just + past participle ในประโยคบวก; 'yet' อยู่ท้ายประโยคปฏิเสธและคำถาม",
+      "whyCorrect": "ล้างจานเสร็จแล้ว ประโยคบวกจึงใช้ 'already' ในตำแหน่งกลาง: have already washed",
+      "whyOthersFail": "'yet' ไม่ใช้ในประโยคบวก 'already have washed' วางคำผิดที่ ส่วน 'already yet' ใช้คำบอกเวลาซ้ำ",
+      "howToAvoid": "เป็นบวกและเสร็จแล้ว? แทรก 'already' ไว้หลัง 'have' ทันที",
+      "memoryCue": "ประโยคบวกใช้ already ตรงกลาง ประโยคปฏิเสธใช้ yet ท้ายประโยค",
+      "distractors": {
+        "have washed yet": {
+          "misconception": "ใช้ 'yet' ในประโยคบอกเล่าเชิงบวก ทั้งที่ yet ใช้กับปฏิเสธและคำถาม",
+          "whyFails": "'yet' อยู่ในประโยคปฏิเสธและคำถาม ไม่ใช่ประโยคบวก"
+        },
+        "already have washed": {
+          "misconception": "คำกริยาวิเศษณ์ไม่อยู่ตำแหน่งกลางระหว่างกริยาช่วยกับ participle",
+          "whyFails": "'already' อยู่ระหว่าง 'have' กับ participle ไม่ใช่หน้า 'have'"
+        },
+        "have washed already yet": {
+          "misconception": "กองคำบอกเวลาไว้ท้ายประโยค",
+          "whyFails": "'already' กับ 'yet' ใช้ร่วมกันไม่ได้ คำเดียวก็พอ"
+        }
+      }
+    },
+    "PD-201": {
+      "objective": "ใช้ 'each other' เมื่อสองคนทำการกระทำเดียวกันต่อกันและกัน",
+      "misconception": "ผู้เรียนใช้สรรพนามสะท้อนกับการกระทำสองทางระหว่างคนสองคน",
+      "reasoning": "คนสองคน การกระทำไปทั้งสองทาง → each other ไม่ใช่ -selves",
+      "rule": "Each other = A → B และ B → A ส่วน -selves = ประธานกระทำต่อตัวเอง",
+      "whyCorrect": "การเล่าเป็นไปทั้งสองทางระหว่างคนสองคน 'each other' จึงถูกต้อง",
+      "whyOthersFail": "'themselves' ทำให้การกระทำหันเข้าหาตัวเอง 'them' หมายถึงคนอื่น ส่วน 'theirselves' ไม่มีในภาษาอังกฤษ",
+      "howToAvoid": "วาดลูกศรสองอันระหว่างคนทั้งคู่ ไปทั้งสองทางไหม? ใช้ 'each other'",
+      "memoryCue": "Each other = สองทาง",
+      "distractors": {
+        "themselves": {
+          "misconception": "ใช้สรรพนามสะท้อน (-self) ทั้งที่ผู้กระทำและกรรมเป็นคนละคน",
+          "whyFails": "'themselves' หมายถึงแต่ละคนเล่าให้ตัวเองฟัง แต่ตรงนี้ Maya เล่าให้ Dito และ Dito เล่าให้ Maya"
+        },
+        "them": {
+          "misconception": "ใช้สรรพนามกรรมธรรมดาทั้งที่ประธานและกรรมเป็นคนเดียวกัน",
+          "whyFails": "'them' ชี้ไปที่คนอื่นนอกคู่นี้ ไม่ใช่ Maya กับ Dito"
+        },
+        "theirselves": {
+          "misconception": "เลือกสรรพนามสะท้อนที่ไม่ตรงกับบุรุษของประธาน",
+          "whyFails": "'theirselves' ไม่ใช่คำภาษาอังกฤษ รูปสะท้อนคือ 'themselves' และแม้แต่คำนั้นก็ผิดตรงนี้"
+        }
+      }
+    },
+    "CO-203": {
+      "objective": "ใช้ 'would have + past participle' ในอนุประโยคผลของเงื่อนไขสมมติในอดีต",
+      "misconception": "ผู้เรียนใส่ past simple หรือ 'would + คำกริยา' ในอนุประโยคผลหลังอนุประโยค if ที่เป็น past perfect",
+      "reasoning": "อนุประโยค if มี past perfect → อดีตที่ไม่จริง → ผลใช้ would have + past participle",
+      "rule": "Third conditional: If + past perfect, would have + past participle — สมมติเรื่องในอดีตที่ไม่ได้เกิดขึ้น",
+      "whyCorrect": "งานเลี้ยงจบไปแล้วและผู้พูดไม่ได้ไป ผลที่จินตนาการจึงใช้ 'would have come'",
+      "whyOthersFail": "'would come' เป็น second conditional 'came' เป็นอดีตจริง ส่วน 'had come' ลอกรูปของอนุประโยค if",
+      "howToAvoid": "มี past perfect ในอนุประโยค if? ตอบด้วย 'would have' บวก participle",
+      "memoryCue": "เงื่อนไขในอดีต: If you had told me, I would have come.",
+      "distractors": {
+        "would come": {
+          "misconception": "ใช้รูป second conditional กับเงื่อนไขสมมติในอดีต",
+          "whyFails": "'would come' พูดถึงปัจจุบันหรืออนาคตที่ไม่จริง แต่งานเลี้ยงผ่านไปแล้ว"
+        },
+        "came": {
+          "misconception": "ใช้ past simple ในอนุประโยคผลของเงื่อนไขแบบที่สาม ทั้งที่ต้องใช้ would have + past participle",
+          "whyFails": "'came' บอกเหตุการณ์อดีตที่เกิดจริง แต่ผู้พูดไม่ได้มา"
+        },
+        "had come": {
+          "misconception": "รูปของอนุประโยค if หลงมาอยู่ในอนุประโยคผล",
+          "whyFails": "'had come' เป็นรูปของอนุประโยค if ส่วนอนุประโยคผลต้องใช้ 'would have'"
+        }
+      }
+    },
+    "PA-201": {
+      "objective": "สร้าง passive กับ modal ด้วย 'can be + past participle'",
+      "misconception": "ผู้เรียนตัด 'be' หลัง modal หรือวางมันไว้หลัง participle",
+      "reasoning": "modal + ความหมายถูกกระทำ → modal + be + past participle",
+      "rule": "Modal passive: modal + be + past participle (เช่น must be signed, can be bought)",
+      "whyCorrect": "ตั๋วเป็นผู้รับการกระทำ modal passive จึงเป็น 'can be bought'",
+      "whyOthersFail": "'can bought' ขาด 'be' 'can buy' เป็น active ส่วน 'can be buy' ใช้คำกริยารูปเปล่าแทน participle",
+      "howToAvoid": "สามชิ้นเรียงลำดับนี้เสมอ: modal, be, participle",
+      "memoryCue": "modal passive มีสามส่วน: can + be + bought",
+      "distractors": {
+        "can bought": {
+          "misconception": "ตัดกริยาช่วย 'be' ที่จำเป็นในการสร้าง passive หลัง modal",
+          "whyFails": "passive ต้องมี 'be' ระหว่าง modal กับ participle: can be bought"
+        },
+        "can buy": {
+          "misconception": "ปล่อยคำกริยาเป็น active หลัง modal",
+          "whyFails": "'tickets can buy' ทำให้ตั๋วเป็นผู้ซื้อ แต่ตั๋วถูกซื้อ จึงต้องใช้ passive"
+        },
+        "can be buy": {
+          "misconception": "วาง 'be' หลัง past participle ทั้งที่ลำดับต้องเป็น modal + be + past participle",
+          "whyFails": "หลัง 'be' คำกริยาต้องเป็น past participle 'bought' ไม่ใช่ 'buy' รูปเปล่า"
+        }
+      }
+    },
+    "PA-202": {
+      "objective": "ใช้ 'have + กรรม + past participle' เมื่อคนอื่นทำงานนั้นให้คุณ",
+      "misconception": "ผู้เรียนบอกว่าประธานทำงานเอง หรือวาง 'by' หน้าคนที่เป็นผู้จัดให้ทำ",
+      "reasoning": "คนอื่นเป็นผู้ทำงาน → have + กรรม + past participle",
+      "rule": "Causative: have/get + กรรม + past participle = คนอื่นทำให้คุณ",
+      "whyCorrect": "ช่างตัดผมจะเป็นผู้ตัด จึงใช้ causative 'have it cut'",
+      "whyOthersFail": "'cut it' คือทำเอง 'have it cutting' ใช้ -ing ส่วน 'have cut it by me' ทำลายทั้งลำดับและความหมาย",
+      "howToAvoid": "ถามว่าใครทำงานนั้นจริง ๆ คนอื่นใช่ไหม? ใช้ have + สิ่งของ + participle",
+      "memoryCue": "Have it cut = ช่างตัดผมเป็นคนตัด",
+      "distractors": {
+        "cut it": {
+          "misconception": "สับสนแบบแผน have/get กับการทำเอง",
+          "whyFails": "'cut it' หมายถึงฉันตัดเอง แต่ผู้พูดไปหาช่างตัดผม"
+        },
+        "have it cutting": {
+          "misconception": "ใช้รูป -ing แทน past participle",
+          "whyFails": "causative ต้องใช้ past participle 'cut' ไม่ใช่ -ing"
+        },
+        "have cut it by me": {
+          "misconception": "วาง 'by' หน้าคนที่สั่งให้ทำ ทั้งที่คนนั้นเป็นประธาน ไม่ใช่ผู้กระทำ",
+          "whyFails": "กรรมต้องมาก่อน participle และ 'by me' ขัดกับความคิดที่ว่าคนอื่นเป็นผู้ทำ"
+        }
+      }
+    },
+    "RC-201": {
+      "objective": "ใช้ 'whose' เชื่อมคนกับสิ่งที่เขาเป็นเจ้าของภายในอนุประโยคสัมพันธ์",
+      "misconception": "ผู้เรียนใช้ 'who' หรือ 'which' ทั้งที่อนุประโยคแสดงความเป็นเจ้าของ",
+      "reasoning": "คำนามหลังช่องว่างเป็นของคนนั้น → ความเป็นเจ้าของ → whose",
+      "rule": "Whose + คำนาม แสดงว่าคำนามนั้นเป็นของคนหรือสิ่งที่เพิ่งกล่าวถึง",
+      "whyCorrect": "พ่อคนนั้นเป็นพ่อของเพื่อน สรรพนามสัมพันธ์แสดงความเป็นเจ้าของ 'whose' จึงเชื่อมทั้งสอง",
+      "whyOthersFail": "'who' และ 'which' ไม่แสดงความเป็นเจ้าของ ส่วน 'who's' เป็นรูปย่อของ 'who is'",
+      "howToAvoid": "พูดว่า 'his/her/its' หน้าคำนามถัดไปได้ไหม? ถ้าได้ คำสัมพันธ์คือ 'whose'",
+      "memoryCue": "'Whose' คือ 'his/her' ในอนุประโยคสัมพันธ์",
+      "distractors": {
+        "who": {
+          "misconception": "ใช้สรรพนามสัมพันธ์ประธานโดยไม่แสดงความเป็นเจ้าของ",
+          "whyFails": "'who father' ไม่มีความเชื่อมโยงของความเป็นเจ้าของ พ่อเป็นของเพื่อน จึงต้องใช้ 'whose'"
+        },
+        "which": {
+          "misconception": "ใช้ 'which' กับคน ทั้งที่ which ใช้กับสิ่งของหรือสัตว์เท่านั้น",
+          "whyFails": "'which' ใช้กับสิ่งของ และไม่แสดงความเป็นเจ้าของด้วย"
+        },
+        "who's": {
+          "misconception": "สับสนรูปย่อ 'who's' (who is) กับ 'whose'",
+          "whyFails": "'who's' หมายถึง 'who is' ส่วน 'a friend who is father' ไม่มีความหมาย"
+        }
+      }
+    },
+    "LD-202": {
+      "objective": "ใช้ 'although' หน้าอนุประโยคเต็มเพื่อแสดงความขัดแย้ง",
+      "misconception": "ผู้เรียนวาง 'despite' หรือ 'however' หน้าอนุประโยคที่มีประธานและคำกริยา",
+      "reasoning": "สิ่งที่ตามมามีประธาน + คำกริยา → อนุประโยค → although ไม่ใช่ despite",
+      "rule": "Although + อนุประโยค; despite + คำนาม/-ing; however + จุลภาค เริ่มประโยคใหม่",
+      "whyCorrect": "'She was tired' เป็นอนุประโยคเต็ม ตัวเชื่อมแสดงความขัดแย้งจึงต้องเป็น 'although'",
+      "whyOthersFail": "'despite' ต้องการคำนาม 'however' ต้องมีประโยคของตัวเอง ส่วน 'but' เปิดประโยคสองอนุประโยคแบบนี้ไม่ได้",
+      "howToAvoid": "ดูสิ่งที่ตามหลังช่องว่าง: ประธาน + คำกริยา แปลว่า 'although'",
+      "memoryCue": "Although เจออนุประโยค despite เจอคำนาม: although she was… / despite being…",
+      "distractors": {
+        "Despite": {
+          "misconception": "วาง 'despite' หน้าอนุประโยคเต็ม ทั้งที่ despite ใช้กับคำนามหรือรูป -ing เท่านั้น",
+          "whyFails": "'despite' ใช้กับคำนามหรือ -ing ('despite being tired') ไม่ใช่ 'she was tired'"
+        },
+        "However": {
+          "misconception": "มอง 'however' เป็นตัวเชื่อมที่เริ่มประโยคและต่อกับอนุประโยคได้โดยตรง",
+          "whyFails": "'however' เชื่อมสองประโยคแยกกันและตามด้วยจุลภาค รวมสองอนุประโยคในประโยคเดียวแบบนี้ไม่ได้"
+        },
+        "But": {
+          "misconception": "ใช้ 'but' ต้นประโยคเพื่อรวมสองอนุประโยค ทั้งที่ but ใช้เชื่อมตรงกลางเท่านั้น",
+          "whyFails": "'but' เชื่อมอนุประโยคตรงกลางประโยค ไม่ใช่ต้นประโยคก่อนอนุประโยคที่คั่นด้วยจุลภาค"
+        }
+      }
+    },
+    "LD-203": {
+      "objective": "ใช้ 'such a' หน้าคำคุณศัพท์ + คำนามเอกพจน์ในโครงสร้างแสดงผล",
+      "misconception": "ผู้เรียนใช้ 'so' หน้าวลีนาม หรือตัดคำนำหน้านามหลัง 'such'",
+      "reasoning": "ตามด้วยคำคุณศัพท์ + คำนามเอกพจน์ → such a ไม่ใช่ so",
+      "rule": "So + คำคุณศัพท์ … that; such (a/an) + คำคุณศัพท์ + คำนาม … that",
+      "whyCorrect": "'Good film' เป็นคำคุณศัพท์ + คำนามเอกพจน์ โครงสร้างแสดงผลจึงใช้ 'such a … that'",
+      "whyOthersFail": "'so' อยู่หน้าวลีนามไม่ได้ 'such' ต้องมี 'a' หน้าคำนามเอกพจน์ ส่วน 'so a' ไม่ใช่แบบแผน",
+      "howToAvoid": "มีคำนามหลังคำคุณศัพท์ไหม? มี → such (a) ไม่มี → so",
+      "memoryCue": "So เจอคำคุณศัพท์อย่างเดียว such a เจอคำคุณศัพท์ + คำนาม: so good / such a good film",
+      "distractors": {
+        "so": {
+          "misconception": "ใช้ 'so' หน้าคำคุณศัพท์ + คำนาม ทั้งที่ตรงนั้นต้องใช้ 'such'",
+          "whyFails": "'so' อยู่หน้าคำคุณศัพท์ลำพัง ('so good') หน้า 'good film' ต้องใช้ 'such a'"
+        },
+        "such": {
+          "misconception": "ตัด 'a' หลัง such ทิ้ง ทั้งที่คำนามเอกพจน์ต้องมีคำนำหน้านาม",
+          "whyFails": "'film' เป็นเอกพจน์นับได้ จึงต้องมี 'a' หลัง 'such'"
+        },
+        "so a": {
+          "misconception": "แทรกคำนำหน้านามราวกับจะมีคำนามตามหลัง so",
+          "whyFails": "'so' ไม่เคยตามด้วยคำนำหน้านาม แบบแผนที่ใช้กับคำนามคือ 'such a'"
+        }
+      }
+    },
+    "EC-201": {
+      "objective": "ตัด 'an' หน้าคำนามนับไม่ได้ 'information'",
+      "misconception": "ผู้เรียนมอง 'information' เป็นคำนามนับได้ จึงใส่ 'an' หรือ -s พหูพจน์",
+      "reasoning": "ระบุคำนามนับไม่ได้ → ตัดคำนำหน้านาม a/an → คงคำนามเป็นเอกพจน์",
+      "rule": "คำนามนับไม่ได้ (information, advice, furniture) ไม่ใช้ a/an และไม่เติม -s ใช้ some หรือ a piece of",
+      "whyCorrect": "'Information' นับไม่ได้ จึงใช้ 'an' หรือ -s ไม่ได้ 'some information' คือรูปที่เป็นธรรมชาติ",
+      "whyOthersFail": "สองตัวเลือกยังเติม -s พหูพจน์ ส่วน 'the' ชี้ไปที่ข้อมูลเฉพาะที่ผู้ฟังรู้อยู่แล้ว",
+      "howToAvoid": "นับได้ไหม (one information, two informations)? ถ้าไม่ได้ ให้ตัด a/an และ -s",
+      "memoryCue": "Some information ไม่ใช่ an information",
+      "distractors": {
+        "Can you give me an informations about the bus times?": {
+          "misconception": "คงคำนำหน้านามไม่ชี้เฉพาะไว้ แถมเติมพหูพจน์ให้คำนามนับไม่ได้",
+          "whyFails": "ยังคง 'an' และเติม -s พหูพจน์ 'information' ใช้ทั้งสองอย่างไม่ได้"
+        },
+        "Can you give me the information about the bus times?": {
+          "misconception": "เปลี่ยนเป็นคำนำหน้านามชี้เฉพาะ แทนที่จะตัดคำนำหน้านามออกไปเลย",
+          "whyFails": "'the' ชี้ไปที่ข้อมูลที่รู้อยู่แล้ว ผู้พูดขอข้อมูลอะไรก็ได้ จึงต้องใช้ 'some'"
+        },
+        "Can you give me some informations about the bus times?": {
+          "misconception": "ตัดคำนำหน้านามถูกแล้ว แต่ยังเติมพหูพจน์ให้คำนามนับไม่ได้",
+          "whyFails": "'some' ถูกแล้ว แต่ 'information' ไม่เคยเติม -s พหูพจน์"
+        }
+      }
+    },
+    "QT-202": {
+      "objective": "หลังคำกริยาปฏิเสธใช้ 'anything' แทน 'nothing' หรือ 'something'",
+      "misconception": "ผู้เรียนจับคู่ 'didn't' กับ 'nothing' หรือใช้ 'something' ในอนุประโยคปฏิเสธ",
+      "reasoning": "เช็กว่าคำกริยาเป็นปฏิเสธ → เลือก anything → เลี่ยงปฏิเสธตัวที่สอง",
+      "rule": "คำกริยาปฏิเสธ + anything; คำกริยาบวก + something; 'nothing' ใช้กับคำกริยาบวกเท่านั้น (I did nothing)",
+      "whyCorrect": "คำกริยา 'didn't do' เป็นปฏิเสธ กรรมจึงเป็น 'anything': didn't do anything",
+      "whyOthersFail": "'nothing' ทำให้ปฏิเสธซ้อน 'something' ใช้กับประโยคบวก ส่วน 'any' เปล่า ๆ ต้องมีคำนาม",
+      "howToAvoid": "เห็น 'not' หรือ 'n't' ในคำกริยา? คำประสมต้องเริ่มด้วย any-",
+      "memoryCue": "Didn't … anything / did … nothing — ปฏิเสธตัวเดียวพอ",
+      "distractors": {
+        "nothing": {
+          "misconception": "ใช้สรรพนามเชิงบวกทั้งที่บริบทเป็นปฏิเสธ",
+          "whyFails": "'didn't' เป็นปฏิเสธอยู่แล้ว 'nothing' จึงทำให้ปฏิเสธซ้อน"
+        },
+        "something": {
+          "misconception": "ใช้ “anything” ในประโยคบวกโดยไม่มีคำปฏิเสธเลย",
+          "whyFails": "'something' ใช้ในประโยคบวก หลัง 'didn't' ต้องใช้ 'anything'"
+        },
+        "any": {
+          "misconception": "วาง “any” เดี่ยว ๆ โดยไม่มีคำนามในประโยคบวก",
+          "whyFails": "'any' ต้องมีคำนามตามหลัง ('any work') ลำพังเป็นกรรมของ 'do' ไม่ได้"
+        }
+      }
+    },
+    "PA-203": {
+      "objective": "ใช้ passive โดยไม่ระบุผู้กระทำเมื่อไม่รู้ว่าใครทำ",
+      "misconception": "ผู้เรียนคง active ไว้ หรือเติม 'by someone' แบบเลือนราง ทั้งที่ไม่มีใครรู้ว่าใครทำ",
+      "reasoning": "เช็กว่าไม่รู้ผู้กระทำ → เลือก passive → ตัดผู้กระทำที่เลือนราง",
+      "rule": "Passive ไม่ระบุผู้กระทำ: be + past participle เมื่อผู้กระทำไม่ทราบ ชัดเจนอยู่แล้ว หรือไม่สำคัญ",
+      "whyCorrect": "ไม่รู้ว่าขโมยคือใคร passive 'was stolen' จึงเน้นที่จักรยานและละผู้กระทำไว้",
+      "whyOthersFail": "'stole' เป็น active ที่ประธานผิด 'has stole' รูปผิดเพี้ยน ส่วน 'by someone' ทวนสิ่งที่รู้อยู่แล้ว",
+      "howToAvoid": "ถามว่าเรารู้หรือสนใจไหมว่าใครทำ ถ้าไม่ ให้ใช้ passive และหยุดที่ participle",
+      "memoryCue": "ไม่รู้ผู้กระทำ → was stolen (ไม่มี 'by')",
+      "distractors": {
+        "stole": {
+          "misconception": "ใช้ active voice ทั้งที่ผู้กระทำไม่รู้ตัวตน/ไม่สำคัญ",
+          "whyFails": "'my bike stole' ทำให้จักรยานเป็นขโมย จักรยานเป็นผู้รับการกระทำ จึงต้องใช้ passive"
+        },
+        "has stole": {
+          "misconception": "รูปผสม passive/perfect ที่ผิดรูป",
+          "whyFails": "'has stole' ผสมกริยาช่วย perfect กับรูป past simple ทั้งกาลและรูปใช้ตรงนี้ไม่ได้"
+        },
+        "was stolen by someone": {
+          "misconception": "เติมผู้กระทำกว้าง ๆ ที่ไม่ให้ข้อมูล แทนที่จะตัดทิ้ง",
+          "whyFails": "'by someone' ไม่เพิ่มอะไรเลย ประโยคถัดไปบอกแล้วว่าไม่มีใครรู้ว่าใครทำ"
+        }
+      }
+    },
+    "RS-202": {
+      "objective": "เลื่อน present simple เป็น past simple หลัง 'said'",
+      "misconception": "ผู้เรียนคงรูปปัจจุบันไว้ หรือกระโดดไปรูปอดีตที่ผิดหลังคำกริยารายงานที่เป็นอดีต",
+      "reasoning": "ระบุคำกริยารายงานอดีต said → เลื่อน present simple ถอยหนึ่งขั้น → เลือก past simple",
+      "rule": "การเลื่อนกาล: present simple → past simple; will → would; present perfect → past perfect",
+      "whyCorrect": "หลังคำกริยารายงานอดีต 'said' present simple 'live' เลื่อนถอยหนึ่งขั้นเป็น 'lived'",
+      "whyOthersFail": "'lives' ไม่เลื่อน 'has lived' เลื่อนไปผิดกาล ส่วน 'would live' รายงาน 'will' ที่ไม่เคยถูกพูด",
+      "howToAvoid": "หาคำกริยาต้นฉบับ แล้วเลื่อนถอยไปในอดีตหนึ่งขั้นพอดี",
+      "memoryCue": "Live → lived หลัง said",
+      "distractors": {
+        "lives": {
+          "misconception": "ไม่ได้ถอย tense เลย",
+          "whyFails": "'said' เป็นอดีต 'lives' จึงต้องเลื่อนเป็น 'lived'"
+        },
+        "has lived": {
+          "misconception": "ถอย tense ไปผิดเป้าเป็น present perfect",
+          "whyFails": "present simple เลื่อนเป็น past simple ไม่ใช่ present perfect"
+        },
+        "would live": {
+          "misconception": "เปลี่ยนหมวด tense แทนที่จะถอยหนึ่งขั้น",
+          "whyFails": "'would' คือรูปเลื่อนของ 'will' แต่ประโยคต้นฉบับไม่มี 'will'"
+        }
+      }
+    },
+    "EC-202": {
+      "objective": "ให้คำกริยาสอดคล้องกับคำนามหลัก ไม่ใช่คำนามที่อยู่ในวลี 'of'",
+      "misconception": "ผู้เรียนทำให้คำกริยาสอดคล้องกับคำนามพหูพจน์ที่อยู่ใกล้ แทนประธานเอกพจน์",
+      "reasoning": "ระบุคำนามหลักของประธาน → เช็กพจน์ → ให้คำกริยาสอดคล้อง",
+      "rule": "คำกริยาสอดคล้องกับคำนามหลักของประธาน ไม่ใช่คำนามในวลี 'of' ที่ตามมา",
+      "whyCorrect": "ประธานคือ 'the price' (เอกพจน์) ส่วน 'of these shoes' แค่ขยาย คำกริยาจึงเป็น 'is'",
+      "whyOthersFail": "'were' ยังสอดคล้องผิด 'prices' เขียนประธานใหม่ ส่วน 'be' ไม่ใช่รูปคำกริยาที่ถูกต้อง",
+      "howToAvoid": "ใช้นิ้วปิดวลี 'of …' แล้วอ่านประธาน + คำกริยา: the price is",
+      "memoryCue": "The price (of อะไรก็ตาม) is",
+      "distractors": {
+        "The price of these shoes were too high.": {
+          "misconception": "ยังคงผันตามพหูพจน์ แค่เปลี่ยน tense เลยพลาดจุดผิดตัวจริง",
+          "whyFails": "แค่เปลี่ยนกาล คำกริยายังสอดคล้องกับ 'shoes' แทน 'price'"
+        },
+        "The prices of these shoes are too high.": {
+          "misconception": "เปลี่ยนประธานให้ไปตรงกับคำกริยา แทนที่จะแก้คำกริยา",
+          "whyFails": "เปลี่ยนประธานให้เข้ากับคำกริยา แทนที่จะแก้คำกริยา"
+        },
+        "The price of these shoes be too high.": {
+          "misconception": "เพิ่มข้อผิดพลาดรูปคำกริยาตัวใหม่ ทั้งที่ยังไม่แก้เรื่องการผัน",
+          "whyFails": "'be' รูปเปล่าไม่ใช่คำกริยาแท้ ประโยคต้องใช้ 'is'"
+        }
+      }
+    },
+    "RS-203": {
+      "objective": "รายงานคำสั่งห้ามด้วย 'not to + คำกริยา'",
+      "misconception": "ผู้เรียนรายงานคำสั่งด้วยอนุประโยค 'that' หรือคงรูปคำสั่งไว้เหมือนเดิม",
+      "reasoning": "ระบุคำสั่ง → เลือก told + กรรม + to-infinitive → วาง not หน้า to",
+      "rule": "รายงานคำสั่ง: tell/ask + กรรม + (not) to + คำกริยารูปพื้นฐาน",
+      "whyCorrect": "คำสั่งห้ามกลายเป็น 'told + คน + not to + คำกริยา': told us not to touch",
+      "whyOthersFail": "'that we don't touch' เป็นแบบแผนของประโยคบอกเล่า 'didn't touch' เป็นข้อเท็จจริงในอดีต ส่วน 'don't touch' คงรูปตรงไว้",
+      "howToAvoid": "ได้ยินคำสั่ง? สร้างใหม่เป็น 'told someone (not) to do'",
+      "memoryCue": "คำสั่ง 'Don't touch' รายงานเป็น 'told us not to touch'",
+      "distractors": {
+        "that we don't touch": {
+          "misconception": "เอาโครงสร้างรายงานประโยคบอกเล่า (ท่อน 'that') มาใช้กับคำสั่ง",
+          "whyFails": "คำสั่งรายงานด้วย infinitive ไม่ใช่อนุประโยค 'that'"
+        },
+        "didn't touch": {
+          "misconception": "ถอย tense เหมือนกำลังรายงานประโยคบอกเล่าในอดีต ไม่ใช่คำสั่ง",
+          "whyFails": "'didn't touch' รายงานสิ่งที่เกิดขึ้น ไม่ใช่สิ่งที่แม่สั่ง"
+        },
+        "don't touch": {
+          "misconception": "ทิ้งรูปคำสั่งเดิมไว้เฉย ๆ โดยไม่ผนวกเข้ากับ reported speech",
+          "whyFails": "รูปคำสั่งตรงวางต่อจาก 'told us' ไม่ได้ ต้องใช้ 'not to'"
+        }
+      }
+    },
+    "PR-201": {
+      "objective": "ใช้ 'at' หลัง 'good' เพื่อบอกทักษะ",
+      "misconception": "ผู้เรียนเลือก 'in' หรือ 'about' หลัง 'good' โดยแปลจากภาษาอินโดนีเซีย",
+      "reasoning": "ระบุคำคุณศัพท์ good → นึกถึงบุพบทคู่ประจำ → เลือก at",
+      "rule": "คำคุณศัพท์บอกทักษะใช้ at: good at, bad at, brilliant at ส่วนคำคุณศัพท์บอกอารมณ์ใช้ about หรือ of",
+      "whyCorrect": "'Good' ใช้บุพบทคู่ประจำ 'at' เมื่อบรรยายทักษะ: good at maths",
+      "whyOthersFail": "'in' เป็นข้อผิดพลาดจากการแปล 'about' ใช้กับความรู้สึก ส่วน 'for' เปลี่ยนความหมายเป็น 'ดีต่อ'",
+      "howToAvoid": "จำคำคุณศัพท์พร้อมบุพบทเป็นก้อนเดียว: good at",
+      "memoryCue": "Good at, bad at — ทักษะคู่กับ at เสมอ",
+      "distractors": {
+        "in": {
+          "misconception": "เหมารวมว่า 'about' เป็นคำบุพบทมาตรฐานหลังคำคุณศัพท์บอกอารมณ์เสมอ",
+          "whyFails": "'good in' เป็นการแปลตรงตัวจาก 'pandai dalam' ภาษาอังกฤษจับคู่ 'good' กับ 'at'"
+        },
+        "about": {
+          "misconception": "สับสน 'proud of' กับคู่คำอารมณ์อื่นที่ใช้ 'for' ได้จริง (เช่น 'happy for someone')",
+          "whyFails": "'about' ตามหลังคำคุณศัพท์บอกความรู้สึกอย่าง 'happy about' ไม่ใช่คำคุณศัพท์บอกทักษะ"
+        },
+        "for": {
+          "misconception": "สับสน 'proud of' กับคำคุณศัพท์ที่จับคู่กับ 'with' (เช่น 'pleased with')",
+          "whyFails": "'good for' หมายถึงมีประโยชน์ ('good for your health') ไม่ใช่เก่ง"
+        }
+      }
+    },
+    "QN-204": {
+      "objective": "ใช้คำถามปฏิเสธ 'Isn't' เพื่อชวนให้เห็นด้วย",
+      "misconception": "ผู้เรียนถามแบบกลาง ๆ หรือใช้กริยาช่วยผิด ทั้งที่คาดว่าผู้ฟังจะเห็นด้วย",
+      "reasoning": "ระบุว่าผู้พูดคาดหวังการเห็นด้วย → เลือกคำถามปฏิเสธ → จับคู่กริยาช่วยกับกริยา be",
+      "rule": "คำถามปฏิเสธ (Isn't / Don't / Didn't …?) = ผู้พูดคาดหวังคำตอบว่า 'ใช่'",
+      "whyCorrect": "ผู้พูดชื่นชมทิวทัศน์และคาดว่าอีกฝ่ายจะเห็นด้วย จึงใช้คำถามปฏิเสธ 'Isn't it beautiful?'",
+      "whyOthersFail": "'Is' ฟังดูไม่แน่ใจ 'doesn't' เป็นกริยาช่วยที่ผิดสำหรับ 'be' ส่วน 'wasn't' ชี้ไปที่อดีต",
+      "howToAvoid": "แน่ใจอยู่แล้วและแค่อยากให้เห็นด้วย? เริ่มด้วยกริยาช่วยปฏิเสธ",
+      "memoryCue": "Isn't it…? = ฉันว่าใช่ คุณก็ว่าใช่ไหม",
+      "distractors": {
+        "Is": {
+          "misconception": "ใช้รูปคำถามบอกเล่าธรรมดา จนพลาดน้ำเสียงประหลาดใจ/การคาดเดาของผู้พูด",
+          "whyFails": "'Is it beautiful?' เป็นคำถามกลาง ๆ แต่ผู้พูดคิดเช่นนั้นอยู่แล้วอย่างชัดเจน"
+        },
+        "Doesn't": {
+          "misconception": "ใช้กริยาช่วยกลุ่ม 'be' แทนกริยาช่วยกลุ่ม 'do' ที่กริยาหลัก 'sleep' ต้องการ",
+          "whyFails": "'beautiful' เป็นคำคุณศัพท์หลัง 'be' กริยาช่วยจึงเป็น 'is' ไม่ใช่ 'does'"
+        },
+        "Wasn't": {
+          "misconception": "ใช้กริยาช่วยปฏิเสธรูปปัจจุบัน ทั้งที่บริบท 'last night' ต้องการรูปอดีต",
+          "whyFails": "ทิวทัศน์อยู่ตรงหน้าตอนนี้ 'wasn't' ที่เป็นอดีตจึงไม่เข้ากัน"
+        }
+      }
+    },
+    "EC-203": {
+      "objective": "วางคำบอกความถี่ไว้ระหว่างประธานกับคำกริยาทั่วไป",
+      "misconception": "ผู้เรียนวางคำบอกความถี่ไว้หลังคำกริยาหรือท้ายประโยค",
+      "reasoning": "ระบุคำบอกความถี่ → เช็กว่าคำกริยาไม่ใช่ be → วางคำบอกความถี่หน้าคำกริยา",
+      "rule": "คำบอกความถี่ (usually, always, often) อยู่หน้าคำกริยาทั่วไป แต่อยู่หลัง be",
+      "whyCorrect": "'Eat' เป็นคำกริยาทั่วไป คำบอกความถี่จึงอยู่หน้ามันทันที: we usually eat",
+      "whyOthersFail": "ตัวเลือกหนึ่งย้ายคำบอกความถี่ไปหน้าประโยคจนประธานสลับที่ หนึ่งวางไว้หลังกรรม และอีกหนึ่งแทรกกลางวลีบอกเวลา",
+      "howToAvoid": "พูดประธาน แล้วคำบอกความถี่ แล้วคำกริยา: we – usually – eat",
+      "memoryCue": "ประธาน + usually + คำกริยา",
+      "distractors": {
+        "Usually eat we dinner at seven.": {
+          "misconception": "ย้ายคำบอกความถี่ไปไว้หน้าสุดแล้วสลับประธานกับคำกริยา ซึ่งประโยคบอกเล่าภาษาอังกฤษไม่ทำแบบนั้น",
+          "whyFails": "วาง 'usually' ไว้หน้าสุดแล้วสลับ 'we' กับ 'eat' ประโยคบอกเล่ายังคงให้ประธานมาก่อนคำกริยา"
+        },
+        "We eat dinner usually at seven.": {
+          "misconception": "วางคำบอกความถี่ไว้หลังกรรม แทนที่จะอยู่ตรงกลางหน้าคำกริยาทั่วไป",
+          "whyFails": "ย้ายคำบอกความถี่ไปไว้หลังกรรม แทนที่จะอยู่หน้าคำกริยา 'eat'"
+        },
+        "We eat dinner at usually seven.": {
+          "misconception": "แทรกคำบอกความถี่เข้าไปกลางวลีบอกเวลา ทำให้บุพบทถูกแยกจากคำที่มันขยาย",
+          "whyFails": "แทรกคำบอกความถี่คั่น 'at seven' คำบอกความถี่ต้องอยู่หน้าคำกริยาหลัก"
+        }
+      }
+    },
+    "RS-204": {
+      "objective": "เลื่อน 'tomorrow' เป็น 'the next day' เมื่อรายงานในภายหลัง",
+      "misconception": "ผู้เรียนคงคำบอกเวลาเดิมไว้ ทั้งที่รายงานเกิดขึ้นคนละวัน",
+      "reasoning": "ระบุคำบอกเวลา tomorrow → เช็กว่ารายงานทำในภายหลัง → เลื่อนเป็น the next day",
+      "rule": "การเลื่อนเวลาใน reported speech: today → that day, tomorrow → the next day, yesterday → the day before",
+      "whyCorrect": "รายงานเกิดขึ้นหนึ่งสัปดาห์ต่อมา 'tomorrow' จึงเลื่อนเป็น 'the next day'",
+      "whyOthersFail": "'tomorrow' คงมุมมองเดิม 'yesterday' มองผิดทิศ ส่วน 'next day' ขาด 'the'",
+      "howToAvoid": "ถามว่า 'tomorrow' ยังหมายถึงวันเดียวกันเมื่อนับจากวันนี้ไหม ถ้าไม่ ให้เลื่อน",
+      "memoryCue": "Tomorrow → the next day เมื่อรายงานทีหลัง",
+      "distractors": {
+        "tomorrow": {
+          "misconception": "คงคำบอกเวลาเดิมไว้ ทั้งที่เวลารายงานเปลี่ยนไปแล้ว",
+          "whyFails": "'tomorrow' จะหมายถึงวันถัดจากวันรายงาน ไม่ใช่วันเสาร์ที่ Dina หมายถึง"
+        },
+        "yesterday": {
+          "misconception": "อ่าน 'today' ต้นฉบับผิด ราวกับหมายถึงวันถัดจากวันพูด",
+          "whyFails": "'yesterday' ชี้ย้อนหลังจากตอนนี้ แต่ Dina พูดถึงวันหลังวันศุกร์"
+        },
+        "next day": {
+          "misconception": "เลื่อนคำบอกเวลาไม่ครบ ขาดคำชี้เฉพาะที่ต้องมี",
+          "whyFails": "วลีนี้ต้องมี 'the': the next day / the following day"
+        }
+      }
+    },
+    "EC-204": {
+      "objective": "เชื่อมสองประโยคสมบูรณ์ด้วยจุลภาคบวก 'but' ไม่ใช่จุลภาคอย่างเดียว",
+      "misconception": "ผู้เรียนเชื่อมสองอนุประโยคอิสระด้วยจุลภาคอย่างเดียว หรือวาง 'however' ผิดที่",
+      "reasoning": "ระบุสองอนุประโยคอิสระ → เช็กว่าจุลภาคอย่างเดียวเชื่อมไม่ได้ → เพิ่มตัวเชื่อมหรือมหัพภาค",
+      "rule": "แก้ comma splice: อนุประโยค, + and/but/so + อนุประโยค — หรือใช้มหัพภาค / อัฒภาค",
+      "whyCorrect": "สองประโยคสมบูรณ์ต้องมีตัวเชื่อมจริง ', but' จึงเชื่อมได้ถูกต้องและคงคำกริยาทั้งสองในอดีต",
+      "whyOthersFail": "ตัวเลือกหนึ่งเปลี่ยนกาล ส่วนอีกสองยังคง comma splice ไว้พร้อมโปรย 'however' ผิดที่",
+      "howToAvoid": "มีสองประธานและสองคำกริยาโดยมีแค่จุลภาคคั่น? เพิ่ม and/but/so",
+      "memoryCue": "จุลภาคอย่างเดียวเชื่อมไม่ได้ — จุลภาค + but เชื่อมได้",
+      "distractors": {
+        "I wanted to go out, but it is raining.": {
+          "misconception": "รูปกาลไม่สม่ำเสมอหลังเหตุการณ์ในอดีต",
+          "whyFails": "'but' แก้การเชื่อมได้ แต่ 'is' ทำลายความสอดคล้องของกาลอดีตกับ 'wanted'"
+        },
+        "I wanted to go out however, it was raining.": {
+          "misconception": "วาง “therefore” ผิดตำแหน่งระหว่างอนุประโยคอิสระ",
+          "whyFails": "'however' ติดสองอนุประโยคเข้าด้วยกันแบบ 'but' ไม่ได้ ต้องใช้อัฒภาคหรือประโยคใหม่"
+        },
+        "I wanted to go out, it was however raining.": {
+          "misconception": "คง comma splice ไว้ แค่เติมคำวิเศษณ์เข้าไป",
+          "whyFails": "comma splice ยังอยู่ การเพิ่ม 'however' ในอนุประโยคไม่ได้เชื่อมประโยค"
+        }
+      }
+    },
+    "TA-206": {
+      "objective": "ใช้ present simple กับตารางเวลาสาธารณะที่ตายตัว เช่น เวลาเปิดของพิพิธภัณฑ์",
+      "misconception": "ผู้เรียนใช้รูปอนาคตหรือ continuous กับตารางเวลาทางการ",
+      "reasoning": "ระบุตารางเวลาสาธารณะที่ตายตัว → เลือก present simple → เลี่ยงรูปที่ใช้กับแผนส่วนตัว",
+      "rule": "Present simple สำหรับตารางเวลา: the train leaves, the museum opens, the class starts",
+      "whyCorrect": "'Every day' และเวลาทางการทำให้นี่เป็นตารางที่ตายตัว จึงใช้ present simple 'opens'",
+      "whyOthersFail": "รูปอื่นบรรยายแผนส่วนตัว ความตั้งใจ หรือความเสร็จสิ้น ไม่ใช่ตารางเวลาสาธารณะ",
+      "howToAvoid": "พิมพ์อยู่บนตารางเวลาหรือป้ายไหม? ถ้าใช่ ใช้ present simple",
+      "memoryCue": "ตารางเวลา → present simple",
+      "distractors": {
+        "is opening": {
+          "misconception": "ใช้ present continuous ซึ่งผูกกับนัดหมายส่วนตัว กับตารางเวลาที่กำหนดจากภายนอก",
+          "whyFails": "present continuous ใช้กับนัดหมายส่วนตัว ไม่ใช่เวลาทางการประจำวัน"
+        },
+        "is going to open": {
+          "misconception": "ใช้ “going to” สำหรับความตั้งใจหรือการคาดการณ์ กับกำหนดการที่ถูกกำหนดจากภายนอก",
+          "whyFails": "'going to' แสดงความตั้งใจหรือการคาดเดา ตารางเวลาตายตัวแค่บอกเป็นข้อเท็จจริง"
+        },
+        "will have opened": {
+          "misconception": "ใช้ future perfect ซึ่งบอกความเสร็จสิ้นก่อนจุดอ้างอิง ไม่ใช่ตัวกำหนดการออกรถเอง",
+          "whyFails": "future perfect หมายถึง 'เสร็จก่อนจุดหนึ่ง' แต่ประโยคบอกเวลาเปิดประจำ"
+        }
+      }
+    },
+    "RS-205": {
+      "objective": "เลื่อน 'will' เป็น 'would' เมื่อรายงานคำสัญญาในภายหลัง",
+      "misconception": "ผู้เรียนคง 'will' ไว้ หรือปฏิบัติกับ modal เหมือนคำกริยาปกติหลังคำกริยารายงานที่เป็นอดีต",
+      "reasoning": "ระบุ modal will → เช็กว่าคำกริยารายงานเป็นอดีต → เลื่อน will เป็น would",
+      "rule": "การเลื่อน modal: will → would, can → could, may → might; modal ไม่เติม -s และไม่มี 'to'",
+      "whyCorrect": "คำสัญญาถูกรายงานในอดีต 'will' จึงกลายเป็น 'would': said he would help",
+      "whyOthersFail": "'will' ไม่เลื่อน 'wills' เติม -s ที่เป็นไปไม่ได้ ส่วน 'would to' แทรก 'to' เกินมา",
+      "howToAvoid": "เห็น modal ในคำพูดตรง? เปลี่ยนเป็นคู่อดีตของมันและคงคำกริยารูปเปล่า",
+      "memoryCue": "Will → would หลัง said",
+      "distractors": {
+        "will": {
+          "misconception": "คิดว่า modal ไม่ต้องเลื่อนรูปใน reported speech",
+          "whyFails": "หลัง 'said' ที่เป็นอดีต 'will' ปกติเลื่อนเป็น 'would'"
+        },
+        "wills": {
+          "misconception": "มอง modal เป็นกริยาธรรมดาที่เติม -s สำหรับบุรุษที่สาม",
+          "whyFails": "modal ไม่เคยเติม -s 'wills' ปฏิบัติกับ 'will' เหมือนคำกริยาธรรมดา"
+        },
+        "would to": {
+          "misconception": "พยายามวาง modal สองตัวซ้อนกัน",
+          "whyFails": "modal ตามด้วยคำกริยารูปพื้นฐานทันที ไม่มี 'to' หลัง 'would'"
+        }
+      }
+    },
+    "RS-206": {
+      "objective": "รายงานคำถามใช่/ไม่ใช่ด้วย 'if' และลำดับคำแบบประโยคบอกเล่า",
+      "misconception": "ผู้เรียนคงการสลับที่แบบคำถาม หรือใช้ 'that' เมื่อรายงานคำถามใช่/ไม่ใช่",
+      "reasoning": "ระบุคำถามใช่/ไม่ใช่ → เลือก if หรือ whether → คืนลำดับประธาน + คำกริยาและเลื่อนกาล",
+      "rule": "รายงานคำถามใช่/ไม่ใช่: asked + if/whether + ประธาน + คำกริยา (เลื่อนกาล)",
+      "whyCorrect": "คำถามใช่/ไม่ใช่รายงานด้วย 'if' บวกลำดับแบบประโยคบอกเล่า และ 'are' เลื่อนเป็น 'was'",
+      "whyOthersFail": "'was I' และ 'if was I' คงการสลับที่ไว้ ส่วน 'that I was' ใช้ตัวเชื่อมของประโยคบอกเล่า",
+      "howToAvoid": "คำถามตรงตอบได้ด้วยใช่หรือไม่ใช่ไหม? ถ้าได้ เริ่มรายงานด้วย 'if'",
+      "memoryCue": "คำถาม 'Are you…?' รายงานเป็น 'asked if I was…'",
+      "distractors": {
+        "was I": {
+          "misconception": "คงการสลับลำดับแบบคำถามตรง แล้วยังตัด if/whether ทิ้งด้วย",
+          "whyFails": "คงการสลับที่แบบคำถามและไม่มี 'if' นำคำถามที่รายงาน"
+        },
+        "that I was": {
+          "misconception": "ใช้ “that” กับคำถาม yes/no ที่ถูกรายงาน",
+          "whyFails": "'that' ใช้รายงานประโยคบอกเล่า คำถามใช่/ไม่ใช่ต้องใช้ 'if' หรือ 'whether'"
+        },
+        "if was I": {
+          "misconception": "เติม whether แล้ว แต่ยังคงการสลับกริยาช่วย-ประธานไว้",
+          "whyFails": "'if' ถูกแล้ว แต่ประธานต้องมาก่อนคำกริยา: if I was"
+        }
+      }
+    },
+    "AR-202": {
+      "objective": "ไม่ใช้คำนำหน้านามกับ 'hospital' เมื่อคนนั้นอยู่ที่นั่นในฐานะผู้ป่วย",
+      "misconception": "ผู้เรียนเติม 'the' หรือ 'a' ให้คำนามสถาบันที่ใช้ตามหน้าที่ของมัน",
+      "reasoning": "ระบุคำนามสถาบัน → เช็กว่าคนนั้นอยู่ที่นั่นในฐานะผู้ป่วย → เลือกไม่ใช้คำนำหน้านาม",
+      "rule": "ไม่ใช้คำนำหน้านามเมื่อสถาบันถูกใช้ตามหน้าที่: in hospital, at school, in prison ใช้ 'the' เมื่อหมายถึงตัวอาคาร",
+      "whyCorrect": "คุณปู่อยู่ที่นั่นในฐานะผู้ป่วย 'in hospital' จึงไม่มีคำนำหน้านาม",
+      "whyOthersFail": "'the' และ 'a' มองโรงพยาบาลเป็นอาคาร และรูปพหูพจน์ไม่สมเหตุสมผลกับการพักรักษาครั้งเดียว",
+      "howToAvoid": "ถามว่าเป็นผู้ป่วย นักเรียน หรือนักโทษไหม ถ้าใช่ ตัดคำนำหน้านาม",
+      "memoryCue": "In hospital = ในฐานะผู้ป่วย",
+      "distractors": {
+        "the hospital": {
+          "misconception": "โฟกัสไปที่อาคารหลังใดหลังหนึ่ง แทนการเข้าเรียนเชิงสถาบัน",
+          "whyFails": "'the hospital' ชี้ไปที่อาคาร การเป็นผู้ป่วยที่นั่นไม่ใช้คำนำหน้านาม"
+        },
+        "a hospital": {
+          "misconception": "แนะนำอาคารหนึ่งหลังที่ไม่ระบุ แทนที่จะใช้สำนวนการเข้าเรียน",
+          "whyFails": "'a hospital' แนะนำอาคารสุ่มหนึ่งแห่ง ไม่ใช่การพักรักษาของคุณปู่"
+        },
+        "hospitals": {
+          "misconception": "เปลี่ยนกิจวัตรการเข้าเรียนที่เดียวให้กลายเป็นจุดหมายพหูพจน์แบบกว้าง ๆ",
+          "whyFails": "'hospitals' พหูพจน์เปลี่ยนการพักรักษาครั้งเดียวให้เป็นจุดหมายทั่วไป"
+        }
+      }
+    },
+    "RC-202": {
+      "objective": "ละสรรพนามสัมพันธ์ที่เป็นกรรม หรือใช้ 'that' กับสิ่งของ",
+      "misconception": "ผู้เรียนใช้ 'who', 'whose' หรือ 'what' กับกรรมที่ไม่ใช่คนในอนุประโยคสัมพันธ์",
+      "reasoning": "ระบุว่าคำที่ถูกขยายเป็นสิ่งของ → เช็กว่าเป็นกรรมของอนุประโยค → เลือก that หรือละไว้",
+      "rule": "สรรพนามสัมพันธ์กรรมสำหรับสิ่งของ: that / which หรือละไว้เลย: the film (that) we watched",
+      "whyCorrect": "'The film' เป็นสิ่งของและเป็นกรรมของ 'watched' 'that' จึงเหมาะ — และละไว้ก็ยังได้",
+      "whyOthersFail": "'who' ใช้กับคน 'whose' บอกความเป็นเจ้าของ ส่วน 'what' ตามหลังคำนามไม่ได้",
+      "howToAvoid": "ลองลบสรรพนามออก ถ้าประโยคยังใช้ได้ 'that' หรือละไว้คือถูก",
+      "memoryCue": "สรรพนามละได้: 'the film (that) we watched'",
+      "distractors": {
+        "who": {
+          "misconception": "ใช้ relative pronoun สำหรับคนกับคำนามที่ไม่ใช่คน",
+          "whyFails": "'who' ใช้กับคน หนังต้องใช้ 'that' หรือ 'which'"
+        },
+        "whose": {
+          "misconception": "ใช้ “whose” แสดงความเป็นเจ้าของ ในจุดที่อนุประโยคต้องการ relative pronoun ที่เป็นกรรม หรือไม่ต้องใส่อะไรเลย",
+          "whyFails": "'whose' แสดงความเป็นเจ้าของ ตรงนี้ไม่มีอะไรเป็นของใคร"
+        },
+        "what": {
+          "misconception": "ใช้ “what” เป็น relative pronoun ซึ่งเป็นข้อผิดพลาดจากการเทียบข้ามภาษาที่พบบ่อย",
+          "whyFails": "'what' ไม่เคยเป็นสรรพนามสัมพันธ์หลังคำนามในภาษาอังกฤษ"
+        }
+      }
+    },
+    "CM-203": {
+      "objective": "ใช้ 'a lot' หน้ารูปเปรียบเทียบเพื่อเน้นให้แรงขึ้น",
+      "misconception": "ผู้เรียนวาง 'very', 'so' หรือ 'too' หน้าคำคุณศัพท์รูปเปรียบเทียบ",
+      "reasoning": "ระบุรูปเปรียบเทียบ → เลือกคำเน้นที่ใช้กับรูปเปรียบเทียบได้ → เลี่ยง very/so/too",
+      "rule": "หน้ารูปเปรียบเทียบใช้ much, far, a lot หรือ a bit — ห้ามใช้ very",
+      "whyCorrect": "'Easier' เป็นรูปเปรียบเทียบ จึงใช้คำเน้นสำหรับรูปเปรียบเทียบ: a lot easier",
+      "whyOthersFail": "'very', 'so' และ 'too' ใช้กับคำคุณศัพท์ธรรมดา ไม่ใช่รูป -er",
+      "howToAvoid": "เห็น -er หรือ 'more'? หยิบ much / far / a lot",
+      "memoryCue": "Very easy แต่ a lot easier",
+      "distractors": {
+        "very": {
+          "misconception": "ยกตัวขยายยอดฮิตของคำคุณศัพท์รูปปกติ “very” มาใช้กับรูปขั้นกว่า",
+          "whyFails": "'very' อยู่หน้าคำคุณศัพท์ธรรมดา (very easy) ไม่ใช่หน้า 'easier'"
+        },
+        "so": {
+          "misconception": "ใช้ “so” ซึ่งต้องมี that-clause ตามมา หรือใช้ในบริบทอุทาน มาเป็นตัวขยายเปล่า ๆ หน้ารูปขั้นกว่า",
+          "whyFails": "'so' ต้องมีอนุประโยค 'that' หรือเป็นประโยคอุทาน และไม่ขยาย 'easier'"
+        },
+        "too": {
+          "misconception": "ใช้ “too” (ที่แปลว่ามากเกินไป) ราวกับเป็นตัวขยายกลาง ๆ",
+          "whyFails": "'too' หมายถึง 'มากเกินพอดี' และเน้นรูปเปรียบเทียบไม่ได้"
+        }
+      }
+    },
+    "QN-205": {
+      "objective": "ทวนประโยคที่น่าประหลาดใจโดยพูดซ้ำและแทนส่วนนั้นด้วยคำถาม",
+      "misconception": "ผู้เรียนสร้างคำถามสลับที่แบบเต็มใหม่ แทนที่จะทวนประโยคเดิม",
+      "reasoning": "ระบุว่าเป็นคำถามทวนเพื่อยืนยัน → คงลำดับแบบประโยคบอกเล่า → แทนส่วนที่น่าประหลาดใจด้วยคำถาม",
+      "rule": "คำถามทวน: พูดประโยคซ้ำ วางคำ wh- ในตำแหน่งข้อมูลที่น่าประหลาดใจ แล้วขึ้นเสียงสูง",
+      "whyCorrect": "คำถามทวนคงลำดับของประโยคและแทนส่วนที่น่าประหลาดใจด้วย 'where': He's moving where?",
+      "whyOthersFail": "ตัวเลือกอื่นสลับเป็นลำดับคำถามแบบสลับที่ หรือใช้คำที่มีอยู่ในประโยคทวนแล้วซ้ำ",
+      "howToAvoid": "ลอกประโยคมา แล้วใส่คำ wh- ตรงตำแหน่งที่คำน่าประหลาดใจเคยอยู่",
+      "memoryCue": "He's moving where? — ทวนประโยคแล้วแทนด้วยคำถาม",
+      "distractors": {
+        "where is he": {
+          "misconception": "สร้างคำถามสลับลำดับมาตรฐาน แทนที่จะทวนโครงสร้างของประโยคเดิม",
+          "whyFails": "เปลี่ยนประโยคทวนเป็นคำถามสลับที่แบบมาตรฐานและใช้ประธานซ้ำ"
+        },
+        "to where is he moving": {
+          "misconception": "เรียบเรียงคำถามใหม่ทั้งประโยคด้วยลำดับคำมาตรฐาน แทนที่จะทวน",
+          "whyFails": "สร้างคำถามทั้งประโยคใหม่ แทนที่จะทวนส่วนที่น่าประหลาดใจ"
+        },
+        "moving where": {
+          "misconception": "ใช้เศษ gerund แทนรูปกริยาเดิมของประโยค",
+          "whyFails": "ใช้ชิ้นส่วนคำกริยาซ้ำ ประโยคทวนมี 'He's moving' อยู่หน้าช่องว่างแล้ว"
+        }
+      }
+    },
+    "TA-207": {
+      "objective": "ใช้ present perfect กับ 'this month' เพราะช่วงเวลายังไม่จบ",
+      "misconception": "ผู้เรียนใช้ past simple เพราะการกระทำเสร็จแล้ว โดยไม่สนว่าช่วงเวลายังดำเนินอยู่",
+      "reasoning": "ระบุช่วงเวลาที่ยังไม่จบ this month → เลือก present perfect → เลี่ยงรูปอดีตที่ปิดแล้ว",
+      "rule": "Present perfect กับช่วงเวลาที่ยังไม่จบ: today, this week, this month, this year",
+      "whyCorrect": "'This month' ยังไม่จบ การกระทำที่เสร็จภายในนั้นจึงใช้ present perfect: have read",
+      "whyOthersFail": "'read' มองว่าเดือนจบแล้ว 'was reading' แสดงความกำลังดำเนิน ส่วน 'am reading' หมายถึงตอนนี้",
+      "howToAvoid": "ถามว่าช่วงเวลายังเปิดอยู่ไหม ถ้าใช่ ใช้ have/has + past participle",
+      "memoryCue": "This month (ยังเปิดอยู่) → have read",
+      "distractors": {
+        "read": {
+          "misconception": "ใช้ past simple เพียงเพราะมีการระบุจำนวนอีเมลชัดเจน",
+          "whyFails": "past simple ปิดช่วงเวลา แต่ 'this month' ยังดำเนินอยู่"
+        },
+        "was reading": {
+          "misconception": "ใช้ past continuous เล่าชุดการกระทำที่เสร็จสิ้นแล้ว",
+          "whyFails": "past continuous แสดงการกระทำที่กำลังดำเนิน ไม่ใช่หนังสือสองเล่มที่อ่านจบแล้ว"
+        },
+        "am reading": {
+          "misconception": "ใช้ present simple โดยมองข้ามว่าประโยคเล่าการกระทำที่ทำเสร็จไปแล้วในช่วงเวลาปัจจุบัน",
+          "whyFails": "present continuous หมายถึงตอนนี้ 'already' บอกว่าหนังสืออ่านจบแล้ว"
+        }
+      }
+    },
+    "MO-202": {
+      "objective": "ใช้ 'be able to' หลัง 'will' เพราะ modal สองตัวอยู่ติดกันไม่ได้",
+      "misconception": "ผู้เรียนซ้อน 'will can' หรือใส่ modal แท้ในตำแหน่งที่ต้องใช้รูปไม่ผัน",
+      "reasoning": "ระบุ modal will → นึกว่า can ตามหลัง modal อื่นไม่ได้ → เลือก be able to",
+      "rule": "ความสามารถหลัง modal อื่นหรือหลัง 'to': ใช้ be able to (will be able to, hope to be able to)",
+      "whyCorrect": "'Will' ครองตำแหน่ง modal อยู่แล้ว ความสามารถจึงแสดงด้วย 'be able to': will be able to speak",
+      "whyOthersFail": "'will can' และ 'will could' ซ้อน modal สองตัว ส่วน 'will being' ใช้รูปคำกริยาผิด",
+      "howToAvoid": "ต้องการ 'can' หลัง will, must หรือ to? เปลี่ยนเป็น 'be able to'",
+      "memoryCue": "Will + be able to — modal ซ้อนกันไม่ได้",
+      "distractors": {
+        "will can": {
+          "misconception": "วาง modal รูป finite 'can' ไว้หลัง infinitive 'to'",
+          "whyFails": "'can' เป็น modal แท้ ตามหลัง 'will' ไม่ได้"
+        },
+        "will could": {
+          "misconception": "ใช้ modal อดีต/เงื่อนไขรูป finite ในตำแหน่งที่ต้องเป็น non-finite",
+          "whyFails": "'could' ก็เป็น modal แท้เช่นกัน modal สองตัวไม่เคยซ้อนกัน"
+        },
+        "will being able to": {
+          "misconception": "ใช้รูป gerund-participle ในตำแหน่งที่ต้องการคำกริยารูปพื้นฐาน",
+          "whyFails": "หลัง 'will' คำกริยาต้องเป็นรูปเปล่า 'be' ไม่ใช่ 'being'"
+        }
+      }
+    },
+    "RS-207": {
+      "objective": "เลื่อน 'you' และ 'your' เป็น 'me' และ 'my' เมื่อผู้ฟังรายงานสิ่งที่ถูกพูดกับตน",
+      "misconception": "ผู้เรียนคงสรรพนามบุรุษที่สองเดิมไว้ หรือเลื่อนแค่ตัวใดตัวหนึ่ง",
+      "reasoning": "ระบุว่าใครกำลังพูดตอนนี้ → เลื่อนสรรพนามประธาน → เลื่อนสรรพนามแสดงความเป็นเจ้าของให้ตรงกัน",
+      "rule": "สรรพนามเลื่อนตามมุมมองของผู้รายงาน — และประธานกับความเป็นเจ้าของต้องเลื่อนไปด้วยกัน",
+      "whyCorrect": "Nina พูดกับฉัน 'you forgot your umbrella' จึงกลายเป็น 'I had forgotten my umbrella'",
+      "whyOthersFail": "ตัวเลือกหนึ่งไม่เลื่อนอะไรเลย ส่วนอีกสองเลื่อนแค่ครึ่งหนึ่งของคู่",
+      "howToAvoid": "เปลี่ยนสรรพนามประธานก่อน แล้วเช็กว่าสรรพนามเจ้าของตรงกัน",
+      "memoryCue": "'you/your' ที่พูดกับฉันเปลี่ยนเป็น 'I/my'",
+      "distractors": {
+        "you; your": {
+          "misconception": "คงคำสรรพนามบุรุษที่ 1 และคำแสดงความเป็นเจ้าของของผู้พูดคนเดิมไว้ในประโยครายงาน",
+          "whyFails": "คง 'you/your' เดิมของ Nina ไว้ ทั้งที่ตอนนี้ฉันรายงานเกี่ยวกับตัวเอง"
+        },
+        "I; your": {
+          "misconception": "เปลี่ยนคำสรรพนามประธานแล้ว แต่ลืมเปลี่ยนคำแสดงความเป็นเจ้าของที่คู่กัน",
+          "whyFails": "ประธานเลื่อนเป็น 'I' แต่สรรพนามเจ้าของยังเป็น 'your'"
+        },
+        "you; my": {
+          "misconception": "เปลี่ยนคำแสดงความเป็นเจ้าของ แต่ลืมเปลี่ยนคำสรรพนามประธาน",
+          "whyFails": "สรรพนามเจ้าของเลื่อนเป็น 'my' แต่ประธานยังเป็น 'you'"
+        }
+      }
+    },
+    "QT-203": {
+      "objective": "ใช้ 'none of' หน้าสรรพนามกรรมเพื่อบอกว่าศูนย์จากกลุ่ม",
+      "misconception": "ผู้เรียนตัด 'of' หน้าสรรพนาม หรือเลือกคำบอกปริมาณที่ความหมายผิด",
+      "reasoning": "ระบุสรรพนามกรรม them → เลือกคำบอกปริมาณพร้อม of → จับคู่ความหมายว่าศูนย์",
+      "rule": "คำบอกปริมาณ + of + สรรพนามกรรม: none of them, both of us, all of you, some of it",
+      "whyCorrect": "ไม่มีใครรับสาย และ 'them' เป็นสรรพนาม รูปจึงเป็น 'none of them'",
+      "whyOthersFail": "'none' และ 'no' ขาด 'of' ส่วน 'any of' ไม่ได้บอกว่าศูนย์",
+      "howToAvoid": "เห็น them / us / you / it หลังคำบอกปริมาณ? แทรก 'of'",
+      "memoryCue": "หน้าสรรพนามต้องมี 'of' เสมอ: 'none of them', 'both of us'",
+      "distractors": {
+        "none": {
+          "misconception": "ตัด 'of' หน้าคำสรรพนามกรรมทิ้ง",
+          "whyFails": "หน้าสรรพนามอย่าง 'them' 'none' ต้องมี 'of'"
+        },
+        "no": {
+          "misconception": "ตัด 'of' ทิ้ง แถมมองข้ามว่าโจทย์ระบุชัดว่ามีสองคน",
+          "whyFails": "'no' อยู่หน้าคำนามโดยตรง (no friends) ไม่เคยอยู่หน้า 'them'"
+        },
+        "any of": {
+          "misconception": "ตัด 'of' ทิ้ง แถมพลิกความหมายเชิงบวกให้กลายเป็นปฏิเสธ",
+          "whyFails": "'any of them answered' ไม่ใช่ปฏิเสธ ประโยคต้องใช้ 'none of'"
+        }
+      }
+    },
+    "PD-202": {
+      "objective": "ใช้ 'ones' แทนคำนามพหูพจน์หลังคำคุณศัพท์",
+      "misconception": "ผู้เรียนใช้ 'one' เอกพจน์, 'them' หรือใช้คำนามซ้ำหลังคำคุณศัพท์",
+      "reasoning": "ระบุคำนามพหูพจน์ที่ถูกแทน → เช็กว่ามีคำคุณศัพท์หน้าช่องว่าง → เลือก ones",
+      "rule": "คำคุณศัพท์ + one (เอกพจน์) / ones (พหูพจน์) แทนคำนามที่กล่าวถึงแล้ว",
+      "whyCorrect": "'Ones' แทน 'shoes' พหูพจน์หลังคำคุณศัพท์ 'bigger': any bigger ones",
+      "whyOthersFail": "'one' เป็นเอกพจน์ 'them' รับคำคุณศัพท์ไม่ได้ ส่วน 'shoes ones' ใช้คำนามซ้ำ",
+      "howToAvoid": "นับคำนามที่จะแทน: สิ่งเดียว → one หลายสิ่ง → ones",
+      "memoryCue": "Bigger ones = bigger shoes — พหูพจน์ใช้ ones",
+      "distractors": {
+        "one": {
+          "misconception": "ใช้ “ones” พหูพจน์แทนของแค่ชิ้นเดียว",
+          "whyFails": "'shoes' เป็นพหูพจน์ คำแทนจึงต้องเป็น 'ones' พหูพจน์"
+        },
+        "them": {
+          "misconception": "วาง “it” ที่ชี้เฉพาะไว้หลัง “a new” ทั้งที่ช่องนั้นต้องการตัวแทนไม่ชี้เฉพาะ “one”",
+          "whyFails": "'them' ตามหลังคำคุณศัพท์อย่าง 'bigger' ไม่ได้ มันอยู่ลำพัง"
+        },
+        "shoes ones": {
+          "misconception": "พูดคำนามซ้ำแล้วยังซ้อนตัวแทน “one” ทับอีกชั้น",
+          "whyFails": "ใช้คำนามซ้ำแล้วยังเพิ่มคำแทนซ้อนเข้าไปอีก"
+        }
+      }
+    },
+    "GI-202": {
+      "objective": "ใช้ 'forget to + คำกริยา' กับงานที่ไม่ได้ทำ",
+      "misconception": "ผู้เรียนใช้ 'forget -ing' (ความทรงจำเรื่องอดีต) ทั้งที่ความหมายคืองานที่ค้างไม่ได้ทำ",
+      "reasoning": "ระบุงานที่ไม่ได้ทำ → เลือก forget + to-infinitive → เลี่ยงแบบแผนความทรงจำที่ใช้ -ing",
+      "rule": "Forget/remember + to-infinitive = หน้าที่; forget/remember + -ing = ความทรงจำถึงสิ่งที่เกิดขึ้นแล้ว",
+      "whyCorrect": "ประตูไม่เคยถูกล็อก จึงต้องใช้ 'forget to lock' (งานที่ไม่ได้ทำ)",
+      "whyOthersFail": "'locking' ชี้ไปที่ความทรงจำ 'lock' เป็นรูปเปล่า ส่วน 'to have locked' เป็นแบบแผนที่ผิด",
+      "howToAvoid": "ถามว่าการกระทำเกิดขึ้นไหม ถ้าไม่ ใช้ 'forget to'",
+      "memoryCue": "Forgot to lock = ไม่ได้ล็อก",
+      "distractors": {
+        "locking": {
+          "misconception": "เอาแพตเทิร์น 'หน้าที่ในอนาคต' ('remember to do') มาใช้กับประโยคที่จริง ๆ กำลังนึกถึงการกระทำในอดีตที่ทำไปแล้ว",
+          "whyFails": "'forget locking' จะหมายถึงจำไม่ได้ว่าล็อก แต่ตรงนี้การล็อกไม่เคยเกิดขึ้น"
+        },
+        "lock": {
+          "misconception": "ใช้ infinitive เปล่า ซึ่งไม่ใช่แพตเทิร์นที่ถูกต้องหลัง 'remember' ไม่ว่าความหมายไหน",
+          "whyFails": "คำกริยารูปเปล่าตามหลัง 'forget' ไม่ได้"
+        },
+        "to have locked": {
+          "misconception": "ใช้ perfect to-infinitive หลัง 'remember' ซึ่งภาษาอังกฤษไม่ใช้สำหรับการนึกถึงการกระทำในอดีต",
+          "whyFails": "perfect infinitive ไม่ใช้หลัง 'forget' กับงานธรรมดาที่ไม่ได้ทำ"
+        }
+      }
+    },
+    "CM-204": {
+      "objective": "ใช้ 'more and more + คำคุณศัพท์' กับการเปลี่ยนแปลงที่เพิ่มขึ้นเรื่อย ๆ",
+      "misconception": "ผู้เรียนใช้รูปเปรียบเทียบเดี่ยวหรือขั้นสูงสุดกับการเปลี่ยนแปลงที่เพิ่มขึ้นต่อเนื่อง",
+      "reasoning": "ระบุการเปลี่ยนแปลงที่เพิ่มขึ้นต่อเนื่อง → เลือกรูปเปรียบเทียบซ้ำ → เลี่ยงขั้นสูงสุด",
+      "rule": "การเปลี่ยนแปลงต่อเนื่อง: -er and -er (bigger and bigger) หรือ more and more + คำคุณศัพท์ยาว",
+      "whyCorrect": "'Every year' แสดงการเพิ่มขึ้นต่อเนื่อง รูปเปรียบเทียบซ้ำ 'more and more expensive' จึงเหมาะ",
+      "whyOthersFail": "'than' ไม่มีคู่เปรียบ ขั้นสูงสุดเป็นจุดสูงสุดคงที่ และ -er ไม่เข้ากับคำคุณศัพท์ยาว",
+      "howToAvoid": "ยังเปลี่ยนแปลงอยู่ไหม? ใช้รูปเปรียบเทียบซ้ำสองครั้ง",
+      "memoryCue": "More and more expensive every year — เปลี่ยนแปลงต่อเนื่องใช้รูปซ้ำ",
+      "distractors": {
+        "more expensive than": {
+          "misconception": "มองการเปลี่ยนแปลงที่ต่อเนื่องเป็นการเปรียบเทียบจุดเดียวแบบตายตัว",
+          "whyFails": "'than' ต้องมีสิ่งที่สองไว้เปรียบเทียบ แต่ตรงนี้ไม่มีอะไรตามมา"
+        },
+        "the most expensive": {
+          "misconception": "สับสนการเปลี่ยนแปลงต่อเนื่องตามเวลากับการจัดอันดับขั้นสูงสุดในหลายสิ่ง",
+          "whyFails": "ขั้นสูงสุดระบุสิ่งที่อยู่บนสุด แสดงการเปลี่ยนแปลง 'every year' ไม่ได้"
+        },
+        "expensiver and expensiver": {
+          "misconception": "ใช้ 'more' กับคำคุณศัพท์สั้นที่ควรเติม '-er' แถมตีกรอบเป็นการเทียบกับค่าปกติแทนการเปลี่ยนแปลงต่อเนื่อง",
+          "whyFails": "'expensive' เป็นคำคุณศัพท์ยาว จึงใช้ 'more' ไม่ใช่ -er"
+        }
+      }
+    },
+    "PA-204": {
+      "objective": "ใช้ 'It is said that' รายงานความเห็นทั่วไปโดยไม่ระบุว่าใครพูด",
+      "misconception": "ผู้เรียนใช้ 'they say' แบบ active ในรูปที่ผิด หรือตัดประธานหลอก 'it'",
+      "reasoning": "ระบุความเชื่อทั่วไปที่ไม่มีแหล่งที่มาชัด → เลือก it + is + past participle + that",
+      "rule": "การรายงานแบบไม่ระบุบุคคล: It + is/was + said/believed/thought + that + อนุประโยค",
+      "whyCorrect": "ไม่มีใครเป็นแหล่งที่มาโดยเฉพาะ จึงใช้ passive แบบไม่ระบุบุคคล 'It is said that…'",
+      "whyOthersFail": "'They are saying' เป็น active และ continuous 'it says' ทำให้ 'it' เป็นผู้พูด ส่วน 'is said' ขาด 'it'",
+      "howToAvoid": "รายงานข่าวลือหรือความเชื่อทั่วไป? เริ่มด้วย 'It is said / believed that'",
+      "memoryCue": "ข่าวลือหรือความเชื่อทั่วไปเริ่มด้วย 'It is said that…'",
+      "distractors": {
+        "They are saying": {
+          "misconception": "ใช้รูป active กับ 'they' ที่คลุมเครือ แถมใช้รูป continuous ผิดกับความเชื่อทั่วไป",
+          "whyFails": "'they' ที่เลือนรางในรูป continuous ไม่ได้รายงานความเชื่อทั่วไป"
+        },
+        "It says": {
+          "misconception": "มอง 'it' เป็นประธานที่เชื่ออะไรเองได้",
+          "whyFails": "'it says' ทำให้ 'it' เป็นผู้พูด บ้านไม่ได้พูดอะไร"
+        },
+        "Is said": {
+          "misconception": "ตัดประธานหุ่น 'it' ที่จำเป็นออกจากแพตเทิร์น passive แบบไม่ระบุผู้กระทำ",
+          "whyFails": "passive แบบไม่ระบุบุคคลต้องมีประธานหลอก 'it' อยู่หน้า"
+        }
+      }
+    },
+    "PA-205": {
+      "objective": "ใช้ passive infinitive 'to be + past participle' หลัง 'expected'",
+      "misconception": "ผู้เรียนใช้ infinitive แบบ active หรือ gerund หลัง 'is expected'",
+      "reasoning": "ระบุว่าประธานเป็นผู้รับการกระทำ → เลือก to be + past participle หลัง expected",
+      "rule": "Be expected / supposed / likely + to be + past participle เมื่อประธานถูกกระทำ",
+      "whyCorrect": "ผลลัพธ์เป็นผู้รับการกระทำ หลัง 'expected' จึงใช้ passive infinitive 'to be published'",
+      "whyOthersFail": "'to publish' เป็น active 'publishing' เป็นแบบแผนที่ผิด ส่วน 'to be publishing' เพิ่ม continuous ที่ไม่จำเป็น",
+      "howToAvoid": "ถามว่าประธานทำการกระทำหรือรับการกระทำ รับ → to be + participle",
+      "memoryCue": "Expected to be published — ประธานถูกกระทำใช้ to be + participle",
+      "distractors": {
+        "to publish": {
+          "misconception": "ใช้ infinitive รูป active ทั้งที่ประธาน (นโยบาย) ประกาศเองไม่ได้",
+          "whyFails": "ผลลัพธ์ตีพิมพ์อะไรไม่ได้ มันถูกตีพิมพ์ จึงต้องใช้ passive"
+        },
+        "publishing": {
+          "misconception": "ใช้ gerund ในที่ที่ต้องใช้แพตเทิร์น infinitive หลัง 'expected'",
+          "whyFails": "'expected' ใช้กับ to-infinitive ไม่ใช่ gerund"
+        },
+        "to be publishing": {
+          "misconception": "เติม continuous ให้ passive infinitive โดยไม่จำเป็น",
+          "whyFails": "รูป continuous เพิ่มความหมายว่ากำลังดำเนิน ซึ่งไม่เข้ากับการเผยแพร่ครั้งเดียว"
+        }
+      }
+    },
+    "GI-203": {
+      "objective": "ใช้ 'try to + คำกริยา' กับการพยายามทำสิ่งที่ยาก",
+      "misconception": "ผู้เรียนใช้ 'try -ing' (ทดลองวิธี) ทั้งที่ความหมายคือความพยายามที่ยากลำบาก",
+      "reasoning": "ระบุว่าเป็นความพยายามที่ยาก ไม่ใช่การทดลอง → เลือก try + to-infinitive",
+      "rule": "Try + to-infinitive = พยายาม (ยาก); try + -ing = ทดลองวิธีดูว่าได้ผลไหม",
+      "whyCorrect": "การยกกล่องเป็นความพยายามที่ยากและล้มเหลว จึงต้องใช้ 'tried to lift'",
+      "whyOthersFail": "'lifting' คือความหมายแบบทดลอง 'lift' เป็นรูปเปล่า ส่วน 'having lifted' บอกว่าเกิดขึ้นแล้ว",
+      "howToAvoid": "ยากและอาจทำไม่ได้ใช่ไหม? ถ้าใช่ ใช้ 'try to'",
+      "memoryCue": "Tried to lift (พยายาม) vs. try restarting (วิธี)",
+      "distractors": {
+        "lifting": {
+          "misconception": "ใช้ 'try to' (พยายามทำสิ่งยาก) ในที่ที่หมายถึง 'try -ing' (ทดลองวิธีแก้)",
+          "whyFails": "'try lifting' หมายถึงทดลองยกเป็นวิธีหนึ่ง แต่ตรงนี้ผู้พูดพยายามอย่างหนักและล้มเหลว"
+        },
+        "lift": {
+          "misconception": "ใช้ infinitive เปล่าหลัง 'try' ซึ่งไม่ใช่แพตเทิร์นที่ถูกต้อง",
+          "whyFails": "คำกริยารูปเปล่าตามหลัง 'try' ไม่ได้"
+        },
+        "having lifted": {
+          "misconception": "ใช้ perfect gerund ซึ่งสื่อว่าการกระทำเสร็จไปแล้ว",
+          "whyFails": "perfect gerund บอกว่ายกเสร็จแล้ว ซึ่งขัดกับ 'I couldn't'"
+        }
+      }
+    },
+    "MO-203": {
+      "objective": "ใช้ 'could have + past participle' กับโอกาสในอดีตที่ไม่ได้คว้าไว้",
+      "misconception": "ผู้เรียนใช้ 'should have' (ตำหนิ) หรือ modal ปัจจุบันกับโอกาสในอดีตที่พลาดไป",
+      "reasoning": "ระบุโอกาสในอดีตที่ไม่ได้คว้า → เลือก could have + past participle → เลี่ยงรูปที่ใช้ตำหนิ",
+      "rule": "Could have + past participle = ความเป็นไปได้ในอดีตที่ไม่ได้ใช้; should have = การตำหนิ",
+      "whyCorrect": "การขึ้นรถไฟเป็นไปได้แต่ไม่ได้เกิดขึ้น และไม่มีการตำหนิ 'could have caught' จึงเหมาะ",
+      "whyOthersFail": "'should have' กล่าวโทษ 'were able to' บอกว่าเกิดขึ้นจริง ส่วน 'can' ไม่ใช่อดีต",
+      "howToAvoid": "ถามว่าเป็นไปได้แต่ไม่ได้ทำ และไม่โทษใครใช่ไหม ถ้าใช่ 'could have'",
+      "memoryCue": "Could have แต่ไม่ได้ทำ",
+      "distractors": {
+        "should have caught": {
+          "misconception": "สับสนระหว่างโอกาสที่พลาดไป กับคำแนะนำ/คำตำหนิย้อนหลัง",
+          "whyFails": "'should have' ตำหนิความผิดพลาด แต่ผู้พูดบอกว่า 'no regrets'"
+        },
+        "were able to catch": {
+          "misconception": "สับสนระหว่างการบอกความเป็นไปได้ในอดีต กับการรายงานความสามารถที่ทำสำเร็จแล้ว",
+          "whyFails": "'were able to' รายงานว่าเราขึ้นรถไฟทันจริง ๆ — แต่เราไม่ได้ขึ้น"
+        },
+        "can catch": {
+          "misconception": "ใช้ modal รูปปัจจุบันกับสถานการณ์สมมติในอดีต",
+          "whyFails": "'can' เป็นปัจจุบัน แต่รถไฟที่พลาดอยู่ในอดีต"
+        }
+      }
+    },
+    "AR-203": {
+      "objective": "ใช้ 'the' กับชื่อประเทศรูปพหูพจน์อย่าง 'the Philippines'",
+      "misconception": "ผู้เรียนใช้กฎไม่มีคำนำหน้านามสำหรับชื่อประเทศกับชื่อที่เป็นพหูพจน์หรือเชิงบรรยาย",
+      "reasoning": "ระบุชื่อประเทศรูปพหูพจน์ → นึกถึงข้อยกเว้น → เลือก the",
+      "rule": "ไม่มีคำนำหน้านามกับประเทศส่วนใหญ่ (Japan, Indonesia); ใช้ 'the' กับชื่อพหูพจน์หรือเชิงบรรยาย (the Philippines, the United States, the UK)",
+      "whyCorrect": "'Philippines' เป็นชื่อประเทศรูปพหูพจน์ จึงใช้ 'the': the Philippines",
+      "whyOthersFail": "'a' และ 'an' ไม่เคยใช้กับชื่อประเทศ ส่วนการไม่ใส่คำนำหน้านามละเลยข้อยกเว้นของชื่อพหูพจน์",
+      "howToAvoid": "ชื่อประเทศลงท้ายด้วย -s หรือมีคำอย่าง States/Republic ไหม? ใช้ 'the'",
+      "memoryCue": "ชื่อประเทศพหูพจน์ใช้ 'the': the Philippines, the Netherlands",
+      "distractors": {
+        "a": {
+          "misconception": "มองชื่อประเทศเป็นคำนามนับได้ธรรมดาที่ต้องมี indefinite article",
+          "whyFails": "ชื่อประเทศไม่ใช่คำนามนับได้ที่ใช้กับ 'a'"
+        },
+        "an": {
+          "misconception": "ใช้กฎ indefinite article ตามเสียงสระที่ตามมา โดยลืมไปว่าชื่อประเทศไม่ใช้ indefinite article เลย",
+          "whyFails": "'an' เลือกตามเสียงสระที่ตามมา แต่ไม่มีคำนำหน้านามไม่เจาะจงใดเข้ากับชื่อประเทศ"
+        },
+        "[no article]": {
+          "misconception": "เหมากฎยอดนิยม 'ไม่มี article หน้าชื่อประเทศ' ไปใช้กับทุกชื่อประเทศ",
+          "whyFails": "ประเทศส่วนใหญ่ไม่ใช้คำนำหน้านาม แต่ชื่อพหูพจน์อย่าง the Philippines และ the Netherlands ต้องใช้ 'the'"
+        }
+      }
+    },
+    "PR-202": {
+      "objective": "ใช้ 'for' หลังคำนาม 'reason'",
+      "misconception": "ผู้เรียนติด 'of' หรือบุพบทอื่นเข้ากับ 'reason' โดยเทียบกับคำนามคล้ายกัน",
+      "reasoning": "ระบุคำนาม reason → นึกถึงบุพบทคู่ประจำ → เลือก for",
+      "rule": "คู่คำนาม + บุพบทตายตัว: reason for, solution to, answer to, effect on",
+      "whyCorrect": "คำนาม 'reason' ตามด้วย 'for' เสมอ: the reason for his decision",
+      "whyOthersFail": "'of' เป็นการเดาแบบตั้งต้น 'to' เป็นของคำนามอื่น ส่วน 'about' นำหัวข้อ ไม่ใช่สาเหตุ",
+      "howToAvoid": "เก็บคำนามพร้อมบุพบทเป็นก้อนเดียว: reason for",
+      "memoryCue": "Reason for, solution to — จำคำนามคู่กับบุพบท",
+      "distractors": {
+        "of": {
+          "misconception": "เหมาว่า 'of' ใช้เชื่อมคำนามกับสิ่งที่มันเกี่ยวข้องได้เสมอ",
+          "whyFails": "'of' ดูเป็นธรรมชาติเพราะเชื่อมคำนามได้หลายคำ แต่ 'reason' ใช้ 'for'"
+        },
+        "to": {
+          "misconception": "ยกแบบแผนคำบุพบทจากวลีใกล้เคียงอย่าง 'search for' มาใส่ให้ 'solution'",
+          "whyFails": "'to' เป็นของ 'solution to' หรือ 'answer to' ไม่ใช่ 'reason'"
+        },
+        "about": {
+          "misconception": "ยืมคำบุพบทที่ผูกกับ 'deal with' หรือ 'cope with' a problem มาใช้",
+          "whyFails": "'about' นำหัวข้อ ส่วน 'reason' ต้องใช้ตัวบอกสาเหตุ 'for'"
+        }
+      }
+    },
+    "CM-205": {
+      "objective": "จับคู่ขั้นสูงสุดกับ 'have ever + past participle'",
+      "misconception": "ผู้เรียนใช้ past simple หรือใช้ 'have' ซ้ำโดยไม่มี participle หลังขั้นสูงสุด + ever",
+      "reasoning": "ระบุขั้นสูงสุด + ever → เลือก present perfect → ใช้ have + past participle",
+      "rule": "The + ขั้นสูงสุด + (that) + ประธาน + have/has ever + past participle",
+      "whyCorrect": "ขั้นสูงสุด + 'ever' ใช้ present perfect: the funniest film I have ever seen",
+      "whyOthersFail": "'had; saw' และ 'did; see' ใช้รูปอดีต ส่วน 'have; see' ขาด participle",
+      "howToAvoid": "ได้ยิน 'the -est … ever'? ปิดท้ายด้วย have/has + participle",
+      "memoryCue": "ขั้นสูงสุดบวก 'ever' ต้องเจอ present perfect เสมอ: 'the best I have ever seen'",
+      "distractors": {
+        "had; saw": {
+          "misconception": "ใช้ past simple สองครั้งแทนแบบแผนตายตัว present perfect + ever",
+          "whyFails": "หลังขั้นสูงสุด + ever แบบแผนตายตัวคือ present perfect ไม่ใช่รูปอดีต"
+        },
+        "have; see": {
+          "misconception": "ใช้กริยาช่วย 'have' ซ้ำ โดยไม่มี past participle 'had' ของกริยาหลัก 'eat/have (a meal)'",
+          "whyFails": "'have' ต้องใช้ past participle 'seen' ไม่ใช่ 'see' รูปพื้นฐาน"
+        },
+        "did; see": {
+          "misconception": "ผสมกริยาช่วยอดีต 'did' กับ present perfect 'have' จนโครงสร้างไม่คงเส้นคงวา",
+          "whyFails": "'did' เป็น past simple ใช้ร่วมกับ 'ever' หลังขั้นสูงสุดไม่ได้"
+        }
+      }
+    },
+    "EC-205": {
+      "objective": "ให้ทุกรายการในลิสต์อยู่ในรูป to-infinitive แบบเดียวกัน",
+      "misconception": "ผู้เรียนผสม infinitive กับ gerund ในลิสต์เดียว",
+      "reasoning": "ระบุลิสต์ → เช็กว่าทุกรายการมีรูปเดียวกัน → เปลี่ยนรายการที่แปลกให้ตรงกัน",
+      "rule": "โครงสร้างขนาน: รายการในลิสต์ต้องใช้รูปไวยากรณ์เดียวกัน",
+      "whyCorrect": "ทั้งสามรายการใช้ 'to' ร่วมกันหนึ่งตัว: to travel, (to) learn และ (to) meet — รูปเดียวกันตลอด",
+      "whyOthersFail": "สองตัวเลือกยังผสม -ing กับ infinitive และอีกหนึ่งคือประโยคเดิมที่ยังไม่แก้",
+      "howToAvoid": "อ่านแต่ละรายการต่อจาก 'wants to': เข้ากันไหม ถ้าไม่ ให้เปลี่ยนรูป",
+      "memoryCue": "To travel, learn, and meet — รูปเดียว",
+      "distractors": {
+        "She wants to travel, learning languages, and meeting new people.": {
+          "misconception": "แก้แค่ 2 ใน 3 ข้อ รายการโดยรวมจึงยังใช้รูปไม่สม่ำเสมอ",
+          "whyFails": "แก้แค่รายการสุดท้าย 'to travel' กับ 'learning' ยังขัดกัน"
+        },
+        "She wants travelling, learn languages, and to meet new people.": {
+          "misconception": "เปลี่ยนข้อแรกเป็น infinitive แต่ปล่อยอีกสองข้อเป็น gerund",
+          "whyFails": "เปลี่ยนรายการแรกและทิ้งไว้สามรูปที่ต่างกัน"
+        },
+        "She wants to travel, learning languages, and to meet new people.": {
+          "misconception": "นี่คือประโยคต้นฉบับที่ยังไม่ได้แก้อะไรเลย",
+          "whyFails": "นี่คือประโยคเดิมที่ยังไม่ได้แก้ข้อผิดพลาด"
+        }
+      }
+    },
+    "CO-204": {
+      "objective": "ใช้ past perfect หลัง 'If only' กับความเสียใจเรื่องอดีต",
+      "misconception": "ผู้เรียนใช้ past simple หรือ 'would have' หลัง 'If only' เกี่ยวกับเหตุการณ์ในอดีต",
+      "reasoning": "ระบุความเสียใจเรื่องเหตุการณ์อดีตที่จบแล้ว → เลือก had + past participle หลัง If only",
+      "rule": "If only / I wish + past perfect = เสียใจเรื่องอดีต; + past simple = ปรารถนาเรื่องปัจจุบัน",
+      "whyCorrect": "การสอบเกิดขึ้นสัปดาห์ก่อน ความเสียใจจึงใช้ past perfect: If only I had studied harder",
+      "whyOthersFail": "'studied' เป็นรูปปรารถนาปัจจุบัน 'would have' อยู่ในอนุประโยคผล ส่วน 'have studied' ยังไม่เป็นอดีตพอ",
+      "howToAvoid": "เห็นคำบอกเวลาอดีตกับ 'if only'? ถอยไปอีกหนึ่งขั้น: had + participle",
+      "memoryCue": "สายเกินไปที่จะเสียใจ: 'If only I had…'",
+      "distractors": {
+        "studied": {
+          "misconception": "ค้างอยู่ที่ past simple ซึ่งทำเครื่องหมายอดีตไม่จริงที่ความเสียดายต้องการไม่ได้",
+          "whyFails": "past simple หลัง 'if only' ใช้กับความปรารถนาปัจจุบัน 'last week' ทำให้นี่เป็นความเสียใจในอดีต"
+        },
+        "would have studied": {
+          "misconception": "ย้ายรูป “would have” ของอนุประโยคผลลัพธ์เข้ามาไว้ในอนุประโยคปรารถนาเสียเอง",
+          "whyFails": "'would have' เป็นรูปของอนุประโยคผล ไม่ตามหลัง 'if only'"
+        },
+        "have studied": {
+          "misconception": "เลือก present perfect ซึ่งผูกการอ่านที่พลาดไปเข้ากับช่วงเวลาปัจจุบัน",
+          "whyFails": "present perfect ผูกการเรียนไว้กับตอนนี้ แต่ 'last week' จบไปแล้ว"
+        }
+      }
+    },
+    "CO-205": {
+      "objective": "ใช้ 'wish + would' บ่นถึงพฤติกรรมซ้ำ ๆ ของคนอื่น",
+      "misconception": "ผู้เรียนใช้ past simple, ปัจจุบัน หรือ 'will' หลัง 'wish' เมื่อบ่นถึงนิสัยของคนอื่น",
+      "reasoning": "ระบุการบ่นถึงนิสัยของคนอื่น → เลือก wish + would + คำกริยารูปพื้นฐาน",
+      "rule": "Wish + would + คำกริยารูปพื้นฐาน = ความรำคาญต่อพฤติกรรมของคนอื่นที่เขาเปลี่ยนได้",
+      "whyCorrect": "ผู้พูดรำคาญนิสัยของเพื่อนบ้านและอยากให้เปลี่ยน จึงใช้ 'wish he would turn'",
+      "whyOthersFail": "'turned' ใช้กับสภาวะ 'turns' เป็นปัจจุบัน ส่วน 'will' ใช้หลัง 'wish' ไม่ได้",
+      "howToAvoid": "บ่นเรื่องที่คนอื่นทำซ้ำ ๆ? 'I wish they would…'",
+      "memoryCue": "รำคาญพฤติกรรมคนอื่น: 'I wish he would stop!'",
+      "distractors": {
+        "turned": {
+          "misconception": "ห่อคำบ่นเรื่องนิสัยคนอื่นด้วย “wish + past simple”",
+          "whyFails": "'wish + past simple' บรรยายสภาวะ การบ่นถึงพฤติกรรมซ้ำ ๆ ใช้ 'would'"
+        },
+        "turns": {
+          "misconception": "คงรูปปัจจุบันไว้หลัง “wish”",
+          "whyFails": "รูปปัจจุบันตามหลัง 'wish' ไม่ได้"
+        },
+        "will turn": {
+          "misconception": "ใส่ “will” หลัง “wish” เพราะติดความหมายว่า “จะ”",
+          "whyFails": "'will' ไม่เคยตามหลัง 'wish' รูปที่ใช้คือ 'would'"
+        }
+      }
+    },
+    "GI-204": {
+      "objective": "ใช้ 'get used to + -ing' สำหรับการเริ่มคุ้นชินกับสิ่งใหม่",
+      "misconception": "ผู้เรียนอ่าน 'to' ใน 'get used to' เป็นตัวบ่งชี้ infinitive และเติมคำกริยารูปเปล่า",
+      "reasoning": "ระบุว่า get used to เป็นแบบแผนบุพบท → เลือกรูป -ing หลัง to",
+      "rule": "Be/get used to + -ing = คุ้นชิน/เริ่มคุ้นชิน; used to + คำกริยารูปพื้นฐาน = นิสัยในอดีต",
+      "whyCorrect": "'Get used to' ตามด้วย gerund: get used to getting up at five",
+      "whyOthersFail": "'get', 'got' และ 'be getting' ต่างมอง 'to' เป็นส่วนของ infinitive แทนที่จะเป็นบุพบท",
+      "howToAvoid": "มี 'be' หรือ 'get' หน้า 'used to' ไหม? ถ้ามี คำกริยาถัดไปลงท้ายด้วย -ing",
+      "memoryCue": "Get used to getting up early — หลัง used to ใช้ -ing",
+      "distractors": {
+        "get": {
+          "misconception": "อ่าน “to” ใน “be used to” เป็นตัวบ่งชี้ infinitive",
+          "whyFails": "'to' ใน 'get used to' เป็นบุพบท คำกริยาที่ตามมาจึงใช้ -ing"
+        },
+        "got": {
+          "misconception": "วางรูปอดีตไว้หลังบุพบท “to” เพราะติดความรู้สึกอดีตของ “used to”",
+          "whyFails": "รูปอดีตตามหลังบุพบท 'to' ไม่ได้"
+        },
+        "be getting": {
+          "misconception": "แทรก “be” รูป infinitive เข้าไปหลัง “used to” ทั้งที่ “to” เป็นบุพบท",
+          "whyFails": "'be' มอง 'to' เป็นตัวบ่งชี้ infinitive แต่แบบแผนนี้ต้องใช้ -ing ทันที"
+        }
+      }
+    },
+    "GI-205": {
+      "objective": "ใช้คำกริยารูปเปล่าหลัง 'would rather'",
+      "misconception": "ผู้เรียนเติม 'to' หรือ -ing หลัง 'would rather' โดยเทียบกับ 'prefer'",
+      "reasoning": "ระบุ would rather → นึกว่ามันใช้กับคำกริยารูปเปล่า → เลือกรูปพื้นฐาน",
+      "rule": "Would rather + คำกริยารูปพื้นฐาน (+ than + คำกริยารูปพื้นฐาน); prefer + to-infinitive หรือ -ing",
+      "whyCorrect": "'Would rather' ตามด้วยคำกริยารูปพื้นฐานทันที: I'd rather drink tea",
+      "whyOthersFail": "'to drink' และ 'drinking' ลอกแบบแผนของ 'prefer' ส่วน 'drank' เป็นรูปอดีต",
+      "howToAvoid": "หลัง 'rather' เขียนคำกริยาโดยไม่มีอะไรนำหน้า",
+      "memoryCue": "หลัง 'would rather' คำกริยาต้องเป็นรูปเปล่า: 'I'd rather drink tea than coffee'",
+      "distractors": {
+        "to drink": {
+          "misconception": "“would rather” ติดแพตเทิร์น “prefer to” มา เลยพ่วง “to” เข้าไปด้วย",
+          "whyFails": "'prefer to drink' ใช้ 'to' แต่ 'would rather' ใช้คำกริยารูปเปล่า"
+        },
+        "drinking": {
+          "misconception": "เอาส่วนเติมเต็มรูป -ing ของ “prefer” มาใส่ในแพตเทิร์น “would rather”",
+          "whyFails": "-ing เป็นของ 'prefer drinking' ไม่ใช่ 'would rather'"
+        },
+        "drank": {
+          "misconception": "เลื่อนกริยาเป็นรูปอดีตทั้งที่ไม่มีประธานตัวที่สอง",
+          "whyFails": "รูปอดีตไม่ใช้หลัง 'would rather' เมื่อผู้พูดพูดถึงความชอบของตัวเองในตอนนี้"
+        }
+      }
+    },
+    "MO-204": {
+      "objective": "ใช้ 'was supposed to' กับนัดหมายในอดีตที่ไม่ได้เกิดขึ้น",
+      "misconception": "ผู้เรียนตัด 'be' หน้า 'supposed to' หรือมอง 'suppose' เป็นคำกริยาธรรมดา",
+      "reasoning": "ระบุความคาดหวังที่ไม่เป็นจริง → เลือก be + supposed to → จับคู่รูปอดีต was",
+      "rule": "Be supposed to + คำกริยา = สิ่งที่คาดหวังหรือนัดไว้; 'be' เปลี่ยนตามกาล (is/was)",
+      "whyCorrect": "การนัดพบตอนหกโมงคือข้อตกลง และมันล้มเหลว 'was supposed to meet' จึงแสดงความคาดหวังที่ไม่เป็นจริง",
+      "whyOthersFail": "'supposed to' ไม่มี 'be' 'supposes to' ใช้คำกริยาผิด ส่วน 'supposing' แทน participle ไม่ได้",
+      "howToAvoid": "พูด be + supposed to เป็นหน่วยเดียวเสมอ: is supposed to, was supposed to",
+      "memoryCue": "Was supposed to = ควรจะ แต่ไม่ได้ทำ",
+      "distractors": {
+        "supposed to": {
+          "misconception": "ตัด “be” หน้า “supposed to” ทิ้ง เพราะติดโครงสร้างภาษาไทยที่ไม่ต้องมีกริยาเชื่อม",
+          "whyFails": "'supposed to' ต้องมีรูปของ 'be' นำหน้าเสมอ: was supposed to"
+        },
+        "supposes to": {
+          "misconception": "ใช้ “suppose” เหมือนกริยาปัจจุบันธรรมดา ทั้งที่ความหมายนี้มีอยู่เฉพาะในแพตเทิร์นรูป passive “be supposed to”",
+          "whyFails": "'suppose' ในฐานะคำกริยาธรรมดาหมายถึง 'คิดว่า' แบบแผนความคาดหวังต้องใช้ 'be supposed to'"
+        },
+        "was supposing to": {
+          "misconception": "ฝืนบังคับ participle ที่ตายตัว “supposed” ให้เป็นรูป -ing",
+          "whyFails": "'supposed' ตรงนี้เป็น participle ตายตัวและไม่เคยใช้ -ing"
+        }
+      }
+    },
+    "CO-206": {
+      "objective": "ใช้ past simple หลัง 'It's time' เมื่อพูดถึงตอนนี้",
+      "misconception": "ผู้เรียนใช้คำกริยาปัจจุบันหรืออนาคตหลัง 'it's time' + ประธาน",
+      "reasoning": "ระบุ it's time + ประธาน → นึกถึงอดีตสมมติ → เลือก past simple",
+      "rule": "It's (high) time + ประธาน + past simple = บางสิ่งควรเกิดขึ้นตอนนี้หรือควรเกิดไปแล้ว",
+      "whyCorrect": "'It's time we' ตามด้วยอดีตสมมติแม้ความหมายคือตอนนี้: it's time we went home",
+      "whyOthersFail": "'go', 'will go' และ 'are going' ต่างละเลยกฎอดีตสมมติหลัง 'it's time we'",
+      "howToAvoid": "เห็น 'it's time' ที่มีประธานตามหลัง? ใส่คำกริยาเป็น past simple",
+      "memoryCue": "It's time we went — หลัง it's time ใช้ past simple",
+      "distractors": {
+        "go": {
+          "misconception": "ปล่อยกริยาเป็นรูปปัจจุบันหลัง “it's high time” เพราะติดโครงสร้าง “ถึงเวลาแล้ว” บวกกริยาธรรมดา",
+          "whyFails": "หลัง 'it's time + ประธาน' คำกริยาใช้อดีตสมมติ ไม่ใช่ปัจจุบัน"
+        },
+        "will go": {
+          "misconception": "เติม “will” หลัง “it's high time” เพราะการกระทำนั้นยังไม่เกิดขึ้นจริง",
+          "whyFails": "'will' ไม่ตามหลัง 'it's time we' รูปตายตัวคือ past simple"
+        },
+        "are going": {
+          "misconception": "ใช้รูปกำลังดำเนินอยู่หลัง “it's high time” ราวกับว่างานเริ่มไปแล้ว",
+          "whyFails": "รูป continuous บรรยายสิ่งที่กำลังเกิด ส่วน 'it's time' บอกสิ่งที่ควรเกิด"
+        }
+      }
+    },
+    "CM-206": {
+      "objective": "ใช้ past simple หลัง 'as if' กับสิ่งที่ชัดว่าไม่จริง",
+      "misconception": "ผู้เรียนคงรูปปัจจุบันหรือเติม 'would' หลัง 'as if' ทั้งที่การเปรียบเทียบไม่จริง",
+      "reasoning": "ระบุการเปรียบเทียบที่ไม่จริงหลัง as if → เลือก past simple → เลี่ยงปัจจุบันและ would",
+      "rule": "As if / as though + past simple = ไม่จริงในตอนนี้; + ปัจจุบัน = อาจเป็นจริง",
+      "whyCorrect": "เขาไม่เคยอาศัยที่นั่น การเปรียบเทียบที่ไม่จริงจึงใช้ past simple: as if he lived there",
+      "whyOthersFail": "'lives' และ 'has lived' มองว่าเป็นจริง ส่วน 'would live' วางรูปผลของเงื่อนไขผิดที่",
+      "howToAvoid": "การเปรียบเทียบเป็นเท็จชัด ๆ ไหม? เลื่อนคำกริยาถอยหนึ่งขั้น",
+      "memoryCue": "As if he lived there (แต่เขาไม่ได้อยู่)",
+      "distractors": {
+        "lives": {
+          "misconception": "คงรูปปัจจุบันที่เป็นจริงไว้หลัง “as if” ทั้งที่ประโยคเองปฏิเสธการเปรียบเทียบนั้น",
+          "whyFails": "รูปปัจจุบันบ่งว่าอาจเป็นจริง แต่ 'he has never left our village' บอกว่าไม่จริง"
+        },
+        "has lived": {
+          "misconception": "อ่าน “as if” เหมือนเป็นรายงานประสบการณ์จริง เลยจับคู่กับ present perfect",
+          "whyFails": "present perfect รายงานประสบการณ์จริง แต่เขาไม่มีประสบการณ์นั้น"
+        },
+        "would live": {
+          "misconception": "แทรก “would” เข้าไปในอนุประโยค “as if” เพราะสับสนกับอนุประโยคแสดงผลของประโยคเงื่อนไข",
+          "whyFails": "'would' อยู่ในอนุประโยคผล ไม่ใช่ในอนุประโยค 'as if'"
+        }
+      }
+    },
+    "CO-207": {
+      "objective": "ใช้ 'would + คำกริยารูปพื้นฐาน' กับผลในปัจจุบันของสาเหตุในอดีตที่ไม่จริง",
+      "misconception": "ผู้เรียนลอก past perfect จากอนุประโยค if มาใส่ในผลที่เป็นเรื่องตอนนี้",
+      "reasoning": "ระบุสาเหตุในอดีตที่มีผลในปัจจุบัน → เลือก would + คำกริยารูปพื้นฐานสำหรับผลปัจจุบัน",
+      "rule": "Mixed conditional: If + past perfect (สาเหตุอดีต), would + คำกริยารูปพื้นฐาน (ผลปัจจุบัน)",
+      "whyCorrect": "การพลาดรถเมล์อยู่ในอดีต แต่ 'now' ทำให้ผลเป็นปัจจุบัน จึงใช้ 'would be'",
+      "whyOthersFail": "'would have been' เป็นผลในอดีต 'was' เป็นเรื่องจริง ส่วน 'had been' อยู่ในอนุประโยค if",
+      "howToAvoid": "มองหา 'now' หรือ 'today' ในส่วนผล: นั่นหมายถึง would + คำกริยารูปพื้นฐาน ไม่ใช่ would have",
+      "memoryCue": "สาเหตุอดีต ผล 'now' → would be",
+      "distractors": {
+        "would have been": {
+          "misconception": "วางผลลัพธ์ไว้ในอดีตที่ไม่จริง แทนที่จะเป็นปัจจุบัน",
+          "whyFails": "'would have been' บรรยายผลในอดีต แต่ 'now' วางผลไว้ในปัจจุบัน"
+        },
+        "was": {
+          "misconception": "ใช้รูปอดีตโดยไม่มี modal ที่ประโยคผลต้องมี",
+          "whyFails": "'was' ธรรมดาบอกข้อเท็จจริง แต่สถานการณ์นี้เป็นจินตนาการ"
+        },
+        "had been": {
+          "misconception": "ใช้ past perfect ซ้ำในประโยคหลัก",
+          "whyFails": "'had been' เป็นรูปของอนุประโยค if ส่วนอนุประโยคผลต้องใช้ 'would'"
+        }
+      }
+    },
+    "CO-208": {
+      "objective": "สลับ 'had' กับประธานเพื่อแทน 'if' ใน third conditional แบบเป็นทางการ",
+      "misconception": "ผู้เรียนคง 'if' ไว้พร้อมการสลับที่ หรือลืมย้าย 'had' ไปหน้าประโยค",
+      "reasoning": "ระบุเงื่อนไขอดีตไม่จริงแบบเป็นทางการ → ตัด if → ย้าย had ไปหน้าประธาน",
+      "rule": "การสลับที่แบบเป็นทางการ: Had + ประธาน + past participle, … would have + past participle",
+      "whyCorrect": "ในแบบเป็นทางการ 'if' หายไปและ 'had' ย้ายไปหน้าประธาน: Had we received the warning",
+      "whyOthersFail": "'If we had' เป็นแบบกลาง 'we had' เป็นประโยคบอกเล่า ส่วน 'had received we' วางประธานผิดที่",
+      "howToAvoid": "ลบ 'if' แล้วสลับประธานกับ 'had' — ส่วนอื่นไม่ต้องย้าย",
+      "memoryCue": "If we had → Had we",
+      "distractors": {
+        "If we had received": {
+          "misconception": "ผสมการสลับตำแหน่งแบบทางการเข้ากับคำเชื่อม 'if' พร้อมกัน",
+          "whyFails": "ถูกในแบบกลาง แต่รูปเป้าหมายตัด 'if' และสลับ 'had'"
+        },
+        "We had received": {
+          "misconception": "ใช้ลำดับประธาน-กริยาปกติ จนพลาดสัญญาณการสลับตำแหน่ง",
+          "whyFails": "ไม่มี 'if' หรือการสลับที่ นี่เป็นแค่ประโยคบอกเล่า ไม่ใช่เงื่อนไข"
+        },
+        "Had received we": {
+          "misconception": "เอาโครงสร้างกริยาช่วยของอนุประโยคผลมาขึ้นต้นอนุประโยค if",
+          "whyFails": "มีแค่ 'had' ที่ย้ายไปหน้า ประธานยังอยู่หน้า participle"
+        }
+      }
+    },
+    "QN-206": {
+      "objective": "สลับกริยาช่วยกับประธานหลัง 'Rarely' ที่อยู่หน้าประโยค",
+      "misconception": "ผู้เรียนวางคำกริยาวิเศษณ์ปฏิเสธไว้หน้าแต่คงลำดับประธาน-คำกริยาแบบปกติ",
+      "reasoning": "ระบุคำกริยาวิเศษณ์ปฏิเสธที่อยู่หน้า → ย้ายกริยาช่วยไปหน้าประธาน → คงคำกริยาหลักไว้หลัง",
+      "rule": "คำกริยาวิเศษณ์ปฏิเสธหน้าประโยค (never, rarely, seldom, not only) + กริยาช่วย + ประธาน + คำกริยา",
+      "whyCorrect": "'Rarely' หน้าประโยคทำให้ต้องสลับที่: กริยาช่วย 'have' ย้ายไปหน้า 'I'",
+      "whyOthersFail": "'I have seen' และ 'I saw' คงลำดับปกติ ส่วน 'saw I' สลับคำกริยาหลักแทนกริยาช่วย",
+      "howToAvoid": "rarely/never อยู่หน้า? สร้างเหมือนคำถาม: have I seen",
+      "memoryCue": "Rarely have I…",
+      "distractors": {
+        "I have seen": {
+          "misconception": "ยกคำวิเศษณ์เชิงปฏิเสธขึ้นต้นแล้ว แต่ไม่ได้สลับประธานกับกริยาช่วยตามที่บังคับ",
+          "whyFails": "หลัง 'Rarely' หน้าประโยค กริยาช่วยต้องมาก่อนประธาน"
+        },
+        "I saw": {
+          "misconception": "ยก 'Never' ขึ้นต้นโดยไม่มีกริยาช่วยเลย มองข้ามทั้งกฎ inversion และความจำเป็นของ 'have' คู่กับ 'before'",
+          "whyFails": "ไม่มีการสลับที่และไม่มีกริยาช่วย คำกริยาวิเศษณ์หน้าประโยคต้องการทั้งสองอย่าง"
+        },
+        "saw I": {
+          "misconception": "วาง 'never' ไว้หลังกริยาช่วย แทนที่จะไว้หน้าสุดของประโยค",
+          "whyFails": "การสลับที่ใช้กริยาช่วย (have/do/did) ไม่ใช่คำกริยาหลักลำพัง"
+        }
+      }
+    },
+    "QN-207": {
+      "objective": "สลับที่ด้วย 'did' หลังอนุประโยค 'Only when' ที่อยู่หน้า",
+      "misconception": "ผู้เรียนคงลำดับแบบประโยคบอกเล่าในอนุประโยคหลักหลังวลี 'Only…' ที่อยู่หน้า",
+      "reasoning": "ระบุอนุประโยค Only ที่อยู่หน้า → แทรก did หน้าประธานของอนุประโยคหลัก → คงคำกริยารูปเปล่า",
+      "rule": "Only + วลีบอกเวลา/เงื่อนไขหน้าประโยค → กริยาช่วย + ประธาน + คำกริยารูปพื้นฐานในอนุประโยคหลัก",
+      "whyCorrect": "'Only when…' หน้าประโยคทำให้ต้องสลับกริยาช่วย: did the boats leave",
+      "whyOthersFail": "สองตัวเลือกคงลำดับปกติ และอีกหนึ่งย้ายคำกริยาหลักแทนกริยาช่วย",
+      "howToAvoid": "ประโยคเริ่มด้วย 'Only after/when/then' ไหม? วาง did/does/have หน้าประธาน",
+      "memoryCue": "Only when … did the boats leave.",
+      "distractors": {
+        "the boats left": {
+          "misconception": "คงลำดับประโยคบอกเล่าปกติไว้หลังวลีจำกัดความที่ย้ายมาหน้าประโยค",
+          "whyFails": "อนุประโยค 'Only when' ที่อยู่หน้าบังคับให้สลับที่ในอนุประโยคหลัก"
+        },
+        "left the boats": {
+          "misconception": "สลับตัวกริยาแท้โดยตรง",
+          "whyFails": "การสลับที่ต้องใช้กริยาช่วย คำกริยาหลักลำพังย้ายไปหน้าไม่ได้"
+        },
+        "the boats did leave": {
+          "misconception": "เติม do เพื่อเน้น แต่ไม่ได้สลับมันกับประธาน",
+          "whyFails": "มี 'did' แต่ยังอยู่หลังประธาน จึงไม่มีการสลับที่"
+        }
+      }
+    },
+    "RS-208": {
+      "objective": "ใช้ subjunctive รูปเปล่าหลัง 'insisted that' แม้ประธานเป็นบุรุษที่สาม",
+      "misconception": "ผู้เรียนเติม -s หรือใช้กาลอดีตกับคำกริยาหลัง 'insisted that'",
+      "reasoning": "ระบุคำกริยาบังคับ insist → เลือกรูปเปล่าหลัง that → ไม่สนบุรุษของประธาน",
+      "rule": "Demand/insist/recommend/suggest + that + ประธาน + คำกริยารูปพื้นฐาน (ไม่เติม -s ไม่มีกาล)",
+      "whyCorrect": "'Insisted that' นำข้อเรียกร้อง คำกริยาจึงเป็น subjunctive รูปเปล่า: the patient stay",
+      "whyOthersFail": "'stays' เติม -s 'stayed' เลื่อนกาล ส่วน 'would stay' เปลี่ยนความหมายเป็นการคาดการณ์",
+      "howToAvoid": "หลังคำกริยาเรียกร้อง + that ให้เขียนคำกริยาตามรูปในพจนานุกรม",
+      "memoryCue": "Insisted that she stay.",
+      "distractors": {
+        "stays": {
+          "misconception": "ทำให้ข้อเรียกร้องนุ่มลงด้วย “would” เชิงเงื่อนไข เหมือนอนุประโยคกำลังรายงานการสมมติ",
+          "whyFails": "subjunctive ไม่มี -s แม้หลัง 'the patient'"
+        },
+        "stayed": {
+          "misconception": "ถอย tense กริยาแบบรายงานธรรมดา แทนที่จะคง subjunctive รูปเดิม",
+          "whyFails": "'insisted' ที่เป็นอดีตไม่เลื่อนกาล subjunctive มันคงรูปเปล่า"
+        },
+        "would stay": {
+          "misconception": "ผันประธาน-กริยาตามปกติกับประธานเอกพจน์ข้างในอนุประโยคเรียกร้อง",
+          "whyFails": "'would' เปลี่ยนข้อเรียกร้องเป็นการคาดการณ์ ข้อเรียกร้องใช้คำกริยารูปเปล่า"
+        }
+      }
+    },
+    "CO-209": {
+      "objective": "ใช้ 'Were + ประธาน + to + คำกริยา' กับเงื่อนไขอนาคตที่ไม่น่าเป็นไปได้แบบเป็นทางการ",
+      "misconception": "ผู้เรียนใช้ 'was' หรือคง 'if' ไว้พร้อมการสลับที่",
+      "reasoning": "ระบุเงื่อนไขทางการที่ไม่น่าเกิด → ตัด if → วาง were หน้าประธานและเติม to",
+      "rule": "เงื่อนไขทางการที่ไม่น่าเกิด: Were + ประธาน + to + คำกริยารูปพื้นฐาน, … would + คำกริยารูปพื้นฐาน",
+      "whyCorrect": "ตัด 'if' และย้าย 'were' ไปหน้าได้เงื่อนไขทางการ: Were she to accept the offer",
+      "whyOthersFail": "'was' ไม่ใช้ในแบบแผนนี้ 'if were' ใช้ตัวบ่งชี้ซ้ำ ส่วน 'she were to' ไม่มีการสลับที่",
+      "howToAvoid": "เขียน 'If she were to accept' แล้วลบ 'if' และสลับ: Were she to accept",
+      "memoryCue": "If she were to → Were she to",
+      "distractors": {
+        "Was she to accept": {
+          "misconception": "ใช้ “was” แทน “were” แบบ subjunctive ที่การสลับลำดับเชิงสมมติแบบทางการต้องการ",
+          "whyFails": "เงื่อนไขแบบสลับที่ใช้ 'were' เสมอ ไม่เคยใช้ 'was'"
+        },
+        "If were she to accept": {
+          "misconception": "เติม “if” ให้โครงสร้างที่ส่งสัญญาณเงื่อนไขผ่านการสลับลำดับอยู่แล้ว",
+          "whyFails": "'if' และการสลับที่ปรากฏพร้อมกันไม่ได้ ต้องเลือกอย่างเดียว"
+        },
+        "She were to accept": {
+          "misconception": "ตัดการสลับลำดับทิ้ง เหลือเศษประโยคที่ไม่สลับและไม่มี “if”",
+          "whyFails": "ไม่มีการสลับที่หรือ 'if' นี่จึงไม่ใช่อนุประโยคเงื่อนไข"
         }
       }
     }

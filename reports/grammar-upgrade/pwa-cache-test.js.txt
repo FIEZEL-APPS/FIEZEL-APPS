@@ -1,0 +1,187 @@
+{
+  "version": "5.19.0",
+  "runtimeCacheStable": true,
+  "revisionedShellCache": true,
+  "eagerActivationDisabled": true,
+  "staleShellOnlyInvalidation": true,
+  "stableRuntimeNotInvalidated": true,
+  "navigationFallbackCurrentShell": true,
+  "shellReloadInstall": true,
+  "neuralInstallPrecacheExcluded": true,
+  "neuralRuntimeLookupStable": true,
+  "heavyImplicitCacheExcluded": true,
+  "assets": [
+    {
+      "asset": "./",
+      "exists": true,
+      "precache": true
+    },
+    {
+      "asset": "./index.html",
+      "exists": true,
+      "precache": true
+    },
+    {
+      "asset": "./style.css",
+      "exists": true,
+      "precache": true
+    },
+    {
+      "asset": "./version.js",
+      "exists": true,
+      "precache": true
+    },
+    {
+      "asset": "./report-config.js",
+      "exists": true,
+      "precache": true
+    },
+    {
+      "asset": "./core-config.js",
+      "exists": true,
+      "precache": true
+    },
+    {
+      "asset": "./content-canary.js",
+      "exists": true,
+      "precache": true
+    },
+    {
+      "asset": "./content-promotion.js",
+      "exists": true,
+      "precache": true
+    },
+    {
+      "asset": "./content-canary-config.js",
+      "exists": true,
+      "precache": true
+    },
+    {
+      "asset": "./lucide.min.js",
+      "exists": true,
+      "precache": true
+    },
+    {
+      "asset": "./app.js",
+      "exists": true,
+      "precache": true
+    },
+    {
+      "asset": "./validator.js",
+      "exists": true,
+      "precache": true
+    },
+    {
+      "asset": "./manifest.json",
+      "exists": true,
+      "precache": true
+    },
+    {
+      "asset": "./vocabulary-master.json",
+      "exists": true,
+      "precache": true
+    },
+    {
+      "asset": "./reading-bank.json",
+      "exists": true,
+      "precache": true
+    },
+    {
+      "asset": "./grammar-templates.json",
+      "exists": true,
+      "precache": true
+    },
+    {
+      "asset": "./grammar-curriculum-v1.json",
+      "exists": true,
+      "precache": true
+    },
+    {
+      "asset": "./favicon-64.png",
+      "exists": true,
+      "precache": true
+    },
+    {
+      "asset": "./apple-touch-icon.png",
+      "exists": true,
+      "precache": true
+    },
+    {
+      "asset": "./instagram.svg",
+      "exists": true,
+      "precache": true
+    },
+    {
+      "asset": "./creator-report-setup.html",
+      "exists": true,
+      "precache": true
+    },
+    {
+      "asset": "./creator-report-dashboard.html",
+      "exists": true,
+      "precache": true
+    },
+    {
+      "asset": "./fiezel-report-worker.js",
+      "exists": true,
+      "precache": true
+    },
+    {
+      "asset": "./features/neural-voice/fiezel-neural-voice-config.js",
+      "exists": true,
+      "precache": true
+    },
+    {
+      "asset": "./features/neural-voice/fiezel-puter-voice.js",
+      "exists": true,
+      "precache": true
+    },
+    {
+      "asset": "./features/neural-voice/fiezel-subtitle.js",
+      "exists": true,
+      "precache": true
+    },
+    {
+      "asset": "./features/neural-voice/fiezel-subtitle-translate.js",
+      "exists": true,
+      "precache": true
+    },
+    {
+      "asset": "./features/neural-voice/fiezel-voice-say.js",
+      "exists": true,
+      "precache": true
+    },
+    {
+      "asset": "./features/neural-voice/fiezel-diag-panel.js",
+      "exists": true,
+      "precache": true
+    },
+    {
+      "asset": "./features/speaking-listening/speaking-listening-config.js",
+      "exists": true,
+      "precache": true
+    },
+    {
+      "asset": "./features/speaking-listening/fiezel-speaking-listening-addon.js",
+      "exists": true,
+      "precache": true
+    },
+    {
+      "asset": "./features/speaking-listening/speaking-listening-addon.css",
+      "exists": true,
+      "precache": true
+    },
+    {
+      "asset": "./features/speaking-listening/listening-bank-v1.json",
+      "exists": true,
+      "precache": true
+    },
+    {
+      "asset": "./features/speaking-listening/speaking-bank-v1.json",
+      "exists": true,
+      "precache": true
+    }
+  ],
+  "neuralPrecache": [],
+  "pass": true
+}
