@@ -11,4 +11,4 @@ ok - racun C: whyFailsId diedit di bank tanpa backport (pola 5643a32) terdeteksi
 ok - racun D: menambah template tanpa merge ulang (pola f87a39a, 222/222 vs 249) terdeteksi
 ok - racun E: count vocabulary-th digeser satu terdeteksi
 
-content-drift: PASS (282 template sinkron dua arah dengan sumber terjemahannya).
+content-drift: PASS (322 template sinkron dua arah dengan sumber terjemahannya).

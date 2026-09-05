@@ -9105,7 +9105,7 @@ function grammar(){const level=getActiveLevel(),entries=grammarItemsForLevel(lev
   // R2-1: node emas Ujian Skip Level duduk di UJUNG jalur — tak terlihat tanpa scroll
   // panjang. Chip lengket di puncak hub memanggil panel ujian yang SAMA, node ujungnya tetap.
   const examChip=`<button type="button" class="exam-entry-chip${examEntry?.passed?' is-passed':''}" onclick="openActiveLevelExamPanel()" aria-label="${FiezelI18n.t('grammar.ujian-skip-level-level',{level:esc(level),ujian:examEntry?.passed?FiezelI18n.t('level.ujian-sudah-lulus'):FiezelI18n.t('level.ujian-buka-panel')})}"><i data-lucide="${examEntry?.passed?'badge-check':'award'}"></i><span><b>${FiezelI18n.t('level.ujian-judul')}</b><small>${examEntry?.passed?FiezelI18n.t('level.ujian-lulus-terverifikasi'):FiezelI18n.t('level.ujian-merasa-bisa')}</small></span><i data-lucide="arrow-right"></i></button>`;
-  shell(FiezelI18n.t('student.grammar-title'),FiezelI18n.t('grammar.lesson-terurut-for-level-start',{jumlahLesson:skills.length,level:level}),`<div class="grammar-level-note"><b>${FiezelI18n.t('grammar.jalur',{level:esc(level)})}</b><span>${esc(levelDescriptor(level))}</span><small>${FiezelI18n.t('grammar.item-pilihan-boleh-bervariasi-tetapi')}</small></div><div class="grammar-hub-tools">${examChip}<div class="path-view-toggle"><button type="button" onclick="toggleGrammarHubView()" aria-pressed="${grammarHubListView}"><i data-lucide="${grammarHubListView?'route':'list'}"></i> ${grammarHubListView?FiezelI18n.t('level.toggle-path-view'):FiezelI18n.t('level.toggle-list-view')}</button></div></div>${grammarHubListView?listBody:pathBody}`);
+  shell(FiezelI18n.t('student.grammar-title'),FiezelI18n.t('grammar.lesson-terurut-for-level-start',{jumlahLesson:skills.length,level:level}),`<div class="grammar-level-note"><b>${FiezelI18n.t('grammar.jalur',{level:esc(level)})}</b><span>${esc(levelDescriptor(level))}</span><small>${FiezelI18n.t('grammar.item-pilihan-boleh-bervariasi-tetapi')}</small></div><div class="grammar-hub-tools">${examChip}<div class="path-view-toggle"><button type="button" data-testid="grammar-quick-session-btn" onclick="startGrammarQuickSession()"><i data-lucide="zap"></i> ${FiezelI18n.t('grammar.sesi-kilat')}</button></div><div class="path-view-toggle"><button type="button" onclick="toggleGrammarHubView()" aria-pressed="${grammarHubListView}"><i data-lucide="${grammarHubListView?'route':'list'}"></i> ${grammarHubListView?FiezelI18n.t('level.toggle-path-view'):FiezelI18n.t('level.toggle-list-view')}</button></div></div>${grammarHubListView?listBody:pathBody}`);
   // Auto-scroll ke node aktif — sesudah renderInner mengembalikan scroll ke atas.
   // Reduced-motion: lompat tanpa animasi (behavior 'auto'), bukan tanpa fungsi.
   if(!grammarHubListView&&current)setTimeout(()=>{try{document.querySelector('.path-step.is-current')?.scrollIntoView({block:'center',behavior:(prefersReducedMotion()||state.preferences?.motion===false)?'auto':'smooth'})}catch(_){}},140);
@@ -9171,6 +9171,35 @@ function buildGrammarLessonQuestions(skill,count=GRAMMAR_SESSION_SIZE){const met
   for(let variant=0;variant<GRAMMAR_PRACTICE_MODES.length&&unique.length<count;variant++)for(const item of own){if(unique.length>=count)break;take(makeGrammarQuestion(skill,item,variant,skill))}
   return unique}
 function practiceSkill(skill){if((GRAMMAR_ITEMS.find(x=>x.skill===skill)?.level||'')!==getActiveLevel())return showToast(FiezelI18n.t('grammar.pilih-lesson-terlebih-dahulu',{level:getActiveLevel()}));const unlock=lessonUnlockState(skill);if(unlock.locked)return showToast(lessonLockMessage(unlock));const questions=buildGrammarLessonQuestions(skill,GRAMMAR_SESSION_SIZE);if(questions.length<GRAMMAR_SESSION_SIZE)return showToast(FiezelI18n.t('grammar.lesson-new-memiliki-item-valid',{jumlahSoal:questions.length}));quizLoop({type:'grammar',count:GRAMMAR_SESSION_SIZE,pool:questions,factory:item=>item,preserveOrder:true})}
+/* ---- Sesi Kilat: 10 soal grammar campuran lintas lesson satu level ----------------------
+ * Latihan singkat harian. Hanya lesson yang sudah terbuka di level aktif; soal dirotasi antar
+ * lesson (satu per lesson per putaran) dan dibatasi ke mode BENTUK (apply/complete/repair)
+ * supaya cepat dijawab - grammar-nya yang menantang, bukan bacaannya. Direkam sebagai sesi
+ * 'grammar' biasa, jadi mastery per lesson tetap ikut naik. */
+const GRAMMAR_QUICK_SIZE=10;
+const GRAMMAR_QUICK_MODES=new Set(['apply_form','complete_sentence','repair_distractor_1','repair_distractor_2','repair_distractor_3']);
+function buildGrammarQuickQuestions(level=getActiveLevel(),count=GRAMMAR_QUICK_SIZE){
+  const skills=shuffle(grammarItemsForLevel(level).map(x=>x.skill).filter((x,i,a)=>a.indexOf(x)===i).filter(skill=>!lessonUnlockState(skill).locked));
+  if(!skills.length)return[];
+  const pools=new Map(skills.map(skill=>[skill,shuffle(buildGrammarLessonQuestions(skill,GRAMMAR_SESSION_SIZE).filter(q=>GRAMMAR_QUICK_MODES.has(q.practiceMode)))]));
+  const out=[],seen=new Set();
+  for(let round=0;round<GRAMMAR_QUICK_MODES.size&&out.length<count;round++){
+    for(const skill of skills){
+      if(out.length>=count)break;
+      const pool=pools.get(skill);let q;
+      while(pool.length&&!q){const cand=pool.shift();const key=String(cand.question||'').toLowerCase().replace(/\s+/g,' ').trim();if(!seen.has(key)){seen.add(key);q=cand}}
+      if(q)out.push(q);
+    }
+  }
+  return out;
+}
+function startGrammarQuickSession(){
+  const level=getActiveLevel(),questions=buildGrammarQuickQuestions(level);
+  // Level yang baru dibuka cuma punya satu lesson: sesi tetap jalan dengan 5 soal bentuk, bukan ditolak.
+  if(questions.length<GRAMMAR_QUICK_MODES.size)return showToast(FiezelI18n.t('grammar.sesi-kilat-belum-cukup',{level,jumlahSoal:questions.length}));
+  quizLoop({type:'grammar',count:Math.min(GRAMMAR_QUICK_SIZE,questions.length),pool:questions,factory:x=>x,preserveOrder:true});
+}
+window.startGrammarQuickSession=startGrammarQuickSession;
 /* ---- R2-2 GERBANG "LEWATI MATERI" ------------------------------------------------------
  * OWNER: murid yang sudah menguasai satu materi tertentu (mis. kata sandang) harus bisa
  * melewatinya TANPA pindah level. Filosofinya sama dengan Ujian Skip Level: lompatan

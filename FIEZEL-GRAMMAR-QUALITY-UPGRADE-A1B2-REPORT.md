@@ -89,3 +89,43 @@ Log: `test_reports/grammar-upgrade/`.
 
 Pra-eksis (bukan dampak perubahan ini): `e2e-level-grammar-test.js` butuh `WebSocket` global
 (Node ≥ 22 / browser) — gagal identik pada checkout bersih di lingkungan ini.
+
+---
+
+## Gelombang 2 (build m025-256)
+
+### 1. Template kedua untuk 40 lesson A1–B2 yang masih tunggal → **semua 139 lesson A1–B2 kini ≥ 2 template**
+Sumber: `tools/grammar-upgrade/new-templates-{c,d,e}.json` (A2 2, B1 21, B2 17; termasuk 5 soal
+`error_correction`). Total template 282 → **322**; soal runtime 7.050 → **8.050**; cloze 241 → 273 butir.
+Label miskonsepsi memakai shorthand `@sibling:N` (label distraktor ke-N template pertama lesson yang
+sama) — diselesaikan oleh `tools/apply-grammar-upgrade.js`, sehingga taksonomi/diagnosis id+th tidak
+bertambah dan tiap lesson tetap menargetkan miskonsepsi yang sama dari dua kalimat berbeda.
+
+Pelajaran teknis yang ditemukan dan dipatuhi:
+- `contentLanguageFrame()` menilai KERANGKA bahasa opsi (kutipan diabaikan). Field Indonesia yang
+  isinya contoh Inggris polos (mis. `None of them, both of us.`) dianggap Inggris dan membuat mode
+  `recall_memory_cue`/`recognize_rule`/`teach_back` ditolak — bukan hanya di lesson-nya sendiri, tetapi
+  juga di lesson lain yang meminjamnya (TA-013, CO-013, GI-014). Semua memoryCueId/ruleId baru kini
+  berkerangka Indonesia dengan contoh Inggris di dalam tanda kutip.
+- `step-tutor` menuntut setiap langkah `reasoningOperation` diawali verba kamus (identify/select/
+  apply/…); semua template baru mengikuti itu.
+
+### 2. Explanation A1–A2 diringkas
+12 field Indonesia A1–A2 yang > 170 karakter (whyOthersFailId, ruleId, howToAvoidId, whyCorrectId,
+satu whyFailsId) dipangkas menjadi 1–3 kalimat pendek tanpa mengubah maknanya; kini **0** field
+A1–A2 di atas 170 karakter. Peta Thai cloze diperbarui mengikuti kunci Indonesia yang baru.
+
+### 3. Sesi Kilat (latihan singkat harian)
+`app.js`: `buildGrammarQuickQuestions()` + `startGrammarQuickSession()`; tombol
+`data-testid="grammar-quick-session-btn"` di `.grammar-hub-tools` halaman Grammar.
+- 10 soal dari lesson berbeda di level aktif yang SUDAH terbuka (satu soal per lesson per putaran);
+  hanya mode bentuk (`apply_form`, `complete_sentence`, `repair_distractor_*`) supaya cepat dijawab.
+- Level yang baru dibuka (satu lesson): sesi tetap jalan dengan 5 soal; < 5 → toast.
+- Dicatat sebagai sesi `grammar` biasa → mastery per lesson ikut naik; tidak menyentuh lesson terkunci.
+- Copy i18n: `grammar.sesi-kilat`, `grammar.sesi-kilat-belum-cukup` (id + th).
+
+### Verifikasi gelombang 2
+Hijau: grammar-quality-audit (8.050/8.050), content-integrity-audit/gate, grammar-provenance-verify,
+grammar-memory-scope, curriculum, unlock, level-guard, bank-soal-audit, content-drift, cloze-bank,
+misconception-diagnosis/taxonomy, th-coverage, th-bank-purity, scan-th-bank-leak, id-golden, step-tutor,
+regression, locale-enum, global-name-collision. Log: `test_reports/grammar-upgrade/`.

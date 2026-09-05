@@ -26,7 +26,7 @@ const diag = read('grammar-misconception-id.json');
 const diagTh = read('tools/th-strings/misconception-diagnosis.json');
 const clozeTh = read('tools/th-strings/cloze.json');
 const rewrites = read('tools/grammar-upgrade/stem-rewrites.json');
-const packs = ['tools/grammar-upgrade/new-templates-a.json', 'tools/grammar-upgrade/new-templates-b.json'].map(read);
+const packs = ['a', 'b', 'c', 'd', 'e'].map((k) => read('tools/grammar-upgrade/new-templates-' + k + '.json'));
 
 const byId = new Map(bank.templates.map((t) => [t.id, t]));
 let stemChanged = 0, added = 0, labelsAdded = 0, clozeMapped = 0;
@@ -52,6 +52,14 @@ for (const pack of packs) {
   for (const n of pack.templates) {
     if (byId.has(n.id)) continue;
     const en = n.en, id_ = n.id_, tth = n.th;
+    /* '@sibling:N' -> label/miskonsepsi distraktor ke-N dari template pertama lesson yang sama */
+    const sib = bank.templates.find((t) => t.subskill === n.subskill && t.id !== n.id);
+    const resolve = (v, pick) => { const m = /^@sibling:(\d)$/.exec(String(v || '')); if (!m) return v; if (!sib) throw new Error(n.id + ': tidak ada template saudara'); return pick(sib.distractors[Number(m[1])]); };
+    for (const d of en.distractors) {
+      d.misconception = resolve(d.misconception, (x) => x.misconception);
+      id_.distractors[d.option].misconception = resolve(id_.distractors[d.option].misconception, (x) => x.misconceptionId);
+      tth.distractors[d.option].misconception = resolve(tth.distractors[d.option].misconception, (x) => th.templates[sib.id].distractors[x.option].misconception);
+    }
     if (en.options.length !== 4 || en.distractors.length !== 3) throw new Error(n.id + ': opsi/distraktor tidak 4/3');
     const wrong = en.options.filter((_, i) => i !== en.correctIndex);
     for (const d of en.distractors) {

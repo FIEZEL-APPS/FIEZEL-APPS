@@ -1142,7 +1142,7 @@
         "whyCorrect": "Ayahnya itu ayah si teman, jadi kata ganti relatif kepemilikan “whose” yang nyambungin.",
         "whyOthersFail": "“Who” dan “which” nggak nunjukin kepemilikan. “Who's” singkatan “who is”.",
         "howToAvoid": "Bisa bilang “his/her/its” di depan kata benda berikutnya? Kata relatifnya “whose”.",
-        "memoryCue": "Whose = his/her di klausa relatif.",
+        "memoryCue": "“Whose” itu “his/her” di dalam klausa relatif.",
         "distractors": {
           "who": {
             "misconception": "kata ganti relatif subjek dipakai tanpa nunjukin kepemilikan.",
@@ -1166,7 +1166,7 @@
         "whyCorrect": "พ่อคนนั้นเป็นพ่อของเพื่อน สรรพนามสัมพันธ์แสดงความเป็นเจ้าของ 'whose' จึงเชื่อมทั้งสอง",
         "whyOthersFail": "'who' และ 'which' ไม่แสดงความเป็นเจ้าของ ส่วน 'who's' เป็นรูปย่อของ 'who is'",
         "howToAvoid": "พูดว่า 'his/her/its' หน้าคำนามถัดไปได้ไหม? ถ้าได้ คำสัมพันธ์คือ 'whose'",
-        "memoryCue": "Whose = his/her ในอนุประโยคสัมพันธ์",
+        "memoryCue": "'Whose' คือ 'his/her' ในอนุประโยคสัมพันธ์",
         "distractors": {
           "who": {
             "misconception": "ใช้สรรพนามสัมพันธ์ประธานโดยไม่แสดงความเป็นเจ้าของ",
