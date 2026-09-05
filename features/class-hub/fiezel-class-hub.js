@@ -24,6 +24,11 @@
   function statusOf(a, rec) { return R().assignmentStatus(a, rec, today()); }
   function statusChip(s) { return '<span class="ch-status is-' + s.id + (s.late && s.id === 'selesai' ? ' is-late-done' : '') + '">' + esc(s.label) + (s.id === 'selesai' && s.late ? ' (terlambat)' : '') + '</span>'; }
   function deadlineText(a) { if (!a.deadline) return 'Tanpa tenggat'; var d = R().daysLeft(a.deadline, today()); return d < 0 ? 'Lewat ' + (-d) + ' hari' : d === 0 ? 'Tenggat hari ini' : d === 1 ? 'Tenggat besok' : 'Tenggat ' + d + ' hari lagi · ' + fmtDate(a.deadline); }
+  /* Satu pintu ke markup gambar bank; kalau banknya belum termuat, soal tetap tercetak. */
+  function bankPicture(item) {
+    try { var bank = B(); return bank && bank.pictureHtml ? bank.pictureHtml(item, 'ch-picture') : ''; }
+    catch (_) { return ''; }
+  }
   function resolveItem(a, id) { var q = (a.items || []).filter(function (x) { return x.id === id; })[0]; if (q) return q; var bank = B(); return bank ? bank.byId(id) : null; }
   function shuffle(arr, seed) { var a = arr.slice(), s = seed || 1; for (var i = a.length - 1; i > 0; i--) { s = (s * 9301 + 49297) % 233280; var j = Math.floor(s / 233280 * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
 
@@ -147,7 +152,11 @@
     if (r.revealed) { var ok = r.chosen === item.answer, why = item.why && item.why[r.chosen]; fb = '<div class="ch-feedback ' + (ok ? 'is-ok' : 'is-no') + '" data-testid="class-feedback"><b>' + (ok ? 'Benar!' : 'Belum tepat.') + '</b> ' + (ok ? esc(item.note || '') : esc(why || ('Jawaban yang benar: ' + item.options[item.answer] + '.' + (item.note ? ' ' + item.note : '')))) + '</div>'; }
     return '<div class="ch-body ch-runner" data-testid="class-runner"><div class="ch-runner-top"><button type="button" class="ch-btn is-ghost is-small" data-ch="close-runner">' + icon('chevron-left') + ' Simpan & keluar</button><span class="ch-muted">' + esc(a.teacher ? 'Dari ' + a.teacher : a.from || '') + '</span>' + (r.timerEnd ? '<span class="ch-timer" data-ch-timer>' + timerText(r) + '</span>' : '') + '</div>' +
       '<p class="ch-progress-text">Soal ' + (r.idx + 1) + ' dari ' + r.order.length + '</p><span class="ch-bar is-thin"><i style="width:' + Math.round(r.idx / r.order.length * 100) + '%"></i></span>' +
-      '<article class="ch-card ch-question">' + (item.context ? '<p class="ch-context">' + esc(item.context) + '</p>' : '') + '<h2>' + esc(item.prompt) + '</h2>' + optionButtons(item, r.chosen, r.revealed) + fb +
+      /* Gambar soal HARUS ikut tercetak. Soal `contextKind:'picture'` menaruh
+         pertanyaannya sepenuhnya pada gambarnya; tanpa itu murid membaca "Kata Inggris apa
+         yang cocok untuk gambar ini?" tanpa satu pun gambar dan hanya bisa menebak.
+         Markupnya datang dari bank (RV/B().pictureHtml), bukan disalin ke sini. */
+      '<article class="ch-card ch-question">' + bankPicture(item) + (item.context ? '<p class="ch-context">' + esc(item.context) + '</p>' : '') + '<h2>' + esc(item.prompt) + '</h2>' + optionButtons(item, r.chosen, r.revealed) + fb +
       (r.revealed ? '<div class="ch-actions"><button type="button" class="ch-btn is-primary" data-ch="next" data-testid="class-next">' + (r.idx + 1 >= r.order.length ? 'Selesai' : 'Lanjut') + ' ' + icon('arrow-right') + '</button></div>' : '') + '</article></div>';
   }
   function reviewView(id) {
