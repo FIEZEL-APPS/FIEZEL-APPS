@@ -106,7 +106,11 @@ jobs:
           # Every product deploy must advance Diagnostics exactly one build and
           # carry the same build in SW_REV so cache-first PWA clients refresh shell.
           if grep -Eq '^(index\.html|style\.css|app\.js|sw\.js|version\.js|manifest\.json|core-config\.js|report-config\.js|content-.*\.js|features/)' /tmp/changed.txt; then
-            base_diag=$(git show "$BASE_SHA:features/neural-voice/fiezel-diag-panel.js" | sed -nE "s/.*var DIAG_BUILD = 'm025-([0-9]+)'.*/\1/p" | head -n1)
+            # Pembanding rilis adalah TIP main SEKARANG (sudah dipastikan leluhur HEAD di
+            # atas), bukan BASE_SHA: GitHub membekukan pull_request.base.sha saat PR dibuka
+            # dan tidak menyegarkannya, jadi kalau PR lain merge duluan +1 yang benar
+            # terbaca sebagai +2.
+            base_diag=$(git show "origin/main:features/neural-voice/fiezel-diag-panel.js" | sed -nE "s/.*var DIAG_BUILD = 'm025-([0-9]+)'.*/\1/p" | head -n1)
             head_diag=$(sed -nE "s/.*var DIAG_BUILD = 'm025-([0-9]+)'.*/\1/p" features/neural-voice/fiezel-diag-panel.js | head -n1)
             if [[ -z "$base_diag" || -z "$head_diag" ]]; then
               echo "A7 FAIL: unable to parse m025-N Diagnostics build"
