@@ -125,6 +125,7 @@
     'social.deeplink-flag-off': 'Fitur online belum aktif. Undangannya aku simpan sampai fiturnya menyala — semua belajarmu tetap jalan seperti biasa.',
     'social.deeplink-saved-toast': 'Undangannya disimpan — ada di Home kapan pun kamu siap.',
     'social.notify-title': 'FIEZEL · Kabar teman',
+    'social.notify-friend-request': '@{handle} ingin berteman denganmu — buka Permintaan untuk menerima atau menolak.',
     'social.notify-friend-accepted': '@{handle} menerima undanganmu — kalian sekarang teman belajar.',
     'social.notify-cheer': '@{handle} menyoraki belajarmu {count}×.',
     'social.notify-milestone': '@{handle} baru saja mencapai sesuatu.',

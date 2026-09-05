@@ -12779,7 +12779,16 @@ async function socialNotifyPoll(force){
     const fr=await core.api.friends();
     if(!fr.ok||!fr.data)return null;
     socialNotifyAt=Date.now();
-    const next=notify.snapshotOf(fr.data);
+    /* Permintaan masuk ditarik BERSAMA daftar teman, di ronde yang sama. Ia bukan teman,
+       jadi ia tidak pernah muncul di fr.data - tanpa panggilan ini tidak ada tempat mana pun
+       yang bisa melahirkan kabar "ada yang ingin berteman denganmu". */
+    let reqHandles=null;
+    try{const rq=await core.api.friendRequests();
+      if(rq.ok&&Array.isArray(rq.data?.requests)){
+        reqHandles=rq.data.requests.map(x=>String(x&&x.handle||''));
+        socialRequestCount=reqHandles.length;
+      }}catch(_){}
+    const next=notify.snapshotOf(fr.data,undefined,reqHandles);
     const prev=notify.readSnapshot();
     const events=notify.diff(prev,next);
     notify.writeSnapshot(next);
@@ -12795,7 +12804,16 @@ async function socialNotifyPoll(force){
 function socialNotifyResync(){
   const core=socialCore(),notify=socialNotifyCore();
   if(!core||!notify)return false;
-  (async()=>{try{const fr=await core.api.friends();if(fr.ok&&fr.data)notify.writeSnapshot(notify.snapshotOf(fr.data))}catch(_){}})();
+  (async()=>{try{
+    const fr=await core.api.friends();
+    if(!fr.ok||!fr.data)return;
+    /* Permintaan ikut dipotret di sini juga. Kalau tidak, resync menulis potret tanpa medan
+       `requests`, dan ronde berikutnya memperlakukannya sebagai garis dasar baru - setiap
+       permintaan yang sedang menggantung kehilangan kabarnya diam-diam. */
+    let rh=null;
+    try{const rq=await core.api.friendRequests();if(rq.ok&&Array.isArray(rq.data?.requests))rh=rq.data.requests.map(x=>String(x&&x.handle||''))}catch(_){}
+    notify.writeSnapshot(notify.snapshotOf(fr.data,undefined,rh));
+  }catch(_){}})();
   return true;
 }
 /**
@@ -12818,6 +12836,7 @@ function socialNotifyAnnounce(events){
 }
 function socialNotifyText(e){
   if(!e)return '';
+  if(e.kind==='friend_request')return FiezelI18n.t('social.notify-friend-request',{handle:String(e.handle||'')});
   if(e.kind==='friend_accepted')return FiezelI18n.t('social.notify-friend-accepted',{handle:String(e.handle||'')});
   if(e.kind==='cheer_received')return FiezelI18n.t('social.notify-cheer',{handle:String(e.handle||''),count:Math.max(1,Number(e.count)||1)});
   if(e.kind==='friend_milestone')return FiezelI18n.t('social.notify-milestone',{handle:String(e.handle||'')});
@@ -12931,6 +12950,18 @@ function startNotifPolling(){
   if(notifPollTimer)return false;
   notifPollTimer=setInterval(()=>{try{if(document.visibilityState!=='visible')return}catch(_){}inboxPoll(false);socialNotifyPoll(false)},NOTIF_POLL_MS);
   notifPollTimer?.unref?.();
+  /* Timer di atas SENGAJA diam saat aplikasi tidak terlihat - menanyai server untuk layar
+     yang tidak dipandang hanya membakar baterai. Tapi tanpa baris di bawah ini, murid yang
+     kembali ke aplikasi harus menunggu sampai tick 60 detik berikutnya, dan itulah sebab
+     kabar terasa "baru muncul setelah keluar-masuk PWA, itu pun lama". Kembali terlihat =
+     satu tanya SEGERA, dengan force supaya jeda 90 detik socialNotifyPoll tidak menahannya. */
+  try{
+    document.addEventListener('visibilitychange',()=>{
+      try{if(document.visibilityState!=='visible')return}catch(_){return}
+      inboxPoll(true);socialNotifyPoll(true);
+    });
+    self.addEventListener?.('focus',()=>{inboxPoll(true);socialNotifyPoll(true)});
+  }catch(_){}
   inboxPoll(true);
   return true;
 }
