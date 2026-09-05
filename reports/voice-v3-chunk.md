@@ -152,7 +152,7 @@ Kunci cache TTS bergantung pada teks kanonik, jadi ini harus dinyatakan terang:
 - **Aset R2 / prerender tidak terpengaruh.** Kunci dibangun dari teks item PENUH, bukan dari
   potongan lokal: `workers/api/tts/tts-key.js` (`build()` → `sha256(material)`, objek
   `<audioKey>.mp3`) dan `features/audio-assets/fiezel-audio-key.js`. Pemecahan ulang terjadi
-  setelah kunci ditentukan, jadi aset lama tetap cocok. Gerbang `tts-key-test.js` yang
+  setelah kunci ditentukan, jadi aset lama tetap cocok. Gerbang `tests/tts-key-test.js` yang
   menjaga kunci ini tetap hijau dan tidak disentuh.
 - **Jalur Puter tidak terpengaruh.** `features/neural-voice/fiezel-puter-voice.js:115` punya
   `cacheKey(text, opts)` sendiri dan dipanggil dengan teks penuh, bukan lewat `planChunks`.
@@ -169,7 +169,7 @@ opt-out), dan tidak menyentuh pembangun kunci aset mana pun.
 
 ## 5. Gerbang baru
 
-`voice-chunker-test.js` (node murni, tanpa dependency), terdaftar di
+`tests/voice-chunker-test.js` (node murni, tanpa dependency), terdaftar di
 `.github/workflows/quality.yml:146`. Sebelas pemeriksaan:
 
 | Kode | Yang diassert |
@@ -191,22 +191,22 @@ opt-out), dan tidak menyentuh pembangun kunci aset mana pun.
 Semua exit 0:
 
 ```
-node voice-chunker-test.js          # 11/11
-node prosody-test.js
-node voice-fallback-chain-test.js
-node regression-test.js
-node ui-structure-test.js
-node install-health-test.js
+node tests/voice-chunker-test.js          # 11/11
+node tests/prosody-test.js
+node tests/voice-fallback-chain-test.js
+node tests/regression-test.js
+node tests/ui-structure-test.js
+node tests/install-health-test.js
 node content-integrity-audit.js
 node validator.js
 ```
 
-Tambahan yang juga dijalankan dan hijau: `tts-key-test.js`,
-`neural-cache-isolation-test.js`, `voice-offline-fallback-test.js`,
-`neural-voice-m02592-puter-subtitle-test.js`, `neural-voice-m02593-subtitle-translate-test.js`,
-`boot-order-test.js`, `no-network-test.js`, `audio-asset-pipeline-test.js`,
-`runtime-stage8-test.js`, `release-audit-gate-test.js`, `workflow-actor-gate-test.js`,
-`pwa-release-coherence-test.js`.
+Tambahan yang juga dijalankan dan hijau: `tests/tts-key-test.js`,
+`tests/neural-cache-isolation-test.js`, `tests/voice-offline-fallback-test.js`,
+`tests/neural-voice-m02592-puter-subtitle-test.js`, `tests/neural-voice-m02593-subtitle-translate-test.js`,
+`tests/boot-order-test.js`, `tests/no-network-test.js`, `tests/audio-asset-pipeline-test.js`,
+`tests/runtime-stage8-test.js`, `tests/release-audit-gate-test.js`, `tests/workflow-actor-gate-test.js`,
+`tests/pwa-release-coherence-test.js`.
 
 Satu gerbang merah dan itu **bukan** dari perubahan ini: `neural-voice-m02520-webgpu-acceleration-test.js`
 gagal `MODULE_NOT_FOUND` pada `features/neural-voice/fiezel-kokoro-adapter.js`. Diverifikasi

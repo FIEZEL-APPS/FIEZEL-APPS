@@ -8,7 +8,7 @@
  * header `Cookie` yang BENAR-BENAR dikirim di kabel — itu justru inti buktinya (assert
  * `cookie-replayed`). Konsekuensinya artefak itu memuat nilai `fz_id` SUNGGUHAN (token sesi)
  * dan cookie AWS ALB apa adanya. Itu kredensial, bukan fixture, jadi memasukkannya ke
- * allowlist `secret-scan-test.js` akan salah: yang benar adalah menghapus nilainya.
+ * allowlist `tests/secret-scan-test.js` akan salah: yang benar adalah menghapus nilainya.
  *
  * Pendahulunya `tools/redact-a5-live-cookies.mjs` melakukan hal yang sama untuk SATU berkas
  * yang alamatnya ditulis keras di dalam kode. Berkas ini generik karena masalahnya berulang
@@ -44,7 +44,7 @@ const MIN_LEN = 20;
 const COOKIE = /([A-Za-z0-9_.-]+)=([A-Za-z0-9+/_=.-]{20,})/g;
 // Subdomainnya berubah-ubah (`challenges.cloudflare.com`, `brunhild.challenges.cloudflare.com`,
 // dan seterusnya), jadi pola ini SENGAJA menerima label di depannya. Versi pertama tidak, dan
-// akibatnya separuh URL tantangan lolos dari redaksi — ketahuan lewat secret-scan-test.js.
+// akibatnya separuh URL tantangan lolos dari redaksi — ketahuan lewat tests/secret-scan-test.js.
 const CF_CHALLENGE = /(https:\/\/(?:[a-z0-9-]+\.)*challenges\.cloudflare\.com\/cdn-cgi\/challenge-platform\/)([^"'\s]+)/g;
 
 let redacted = 0;

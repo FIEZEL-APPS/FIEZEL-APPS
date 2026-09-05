@@ -19,7 +19,7 @@
  *   E5 AI/TTS     : handler(request, env, executionCtx)-> Response
  * Ketiganya dikumpulkan lewat "collector router" yang tahu konvensi miliknya,
  * jadi tidak ada handler yang dipanggil dengan bentuk argumen orang lain. Kalau
- * satu paket kerja mengubah konvensinya, yang merah adalah `cf-wiring-test.js`,
+ * satu paket kerja mengubah konvensinya, yang merah adalah `tests/cf-wiring-test.js`,
  * bukan produksi.
  *
  * ==========================================================================
@@ -56,7 +56,7 @@
  *
  * TTS cache hit TIDAK PERNAH lewat sini: `route-tts.js` menjawab dari R2
  * (LANGKAH 2) sebelum menyentuh kuota, jadi replay tetap nol kuota. Itu
- * dibuktikan `cf-wiring-test.js` butir (c), bukan dipercaya.
+ * dibuktikan `tests/cf-wiring-test.js` butir (c), bukan dipercaya.
  */
 
 import { FREE_BUCKET_LIMITS } from './quota/quota-config.js';
@@ -69,7 +69,7 @@ import { registerQuotaRoutes, enforceQuota, NO_STORE_HEADERS } from './quota/rou
 import { sweepExpiredReservations, reconcileHeld } from './quota/quota-store-d1.js';
 import { registerAnalyticsRoutes } from './analytics/route-events.js';
 import { scheduledAnalytics } from './analytics/rollup.js';
-// Lane telemetri BELAJAR (BRAIN-TELEMETRY-SCHEMA.md) — SENGAJA modul terpisah
+// Lane telemetri BELAJAR (docs/BRAIN-TELEMETRY-SCHEMA.md) — SENGAJA modul terpisah
 // dari analytics: skema lain, database lain (LEARNING_DB), kill switch lain.
 import { registerLearningRoutes } from './learning/route-learning-events.js';
 // Lane KETIGA (bukti belajar Braincore): schema lain, database lain
@@ -210,7 +210,7 @@ function randomToken() {
 /**
  * ctx untuk modul kuota. `userId` HANYA dari identitas terverifikasi HMAC —
  * tidak pernah dari body, query, atau header (kelas kerentanan yang
- * `quota-manipulation-test.js` jaga).
+ * `tests/quota-manipulation-test.js` jaga).
  */
 function quotaCtxFor(ctx, extra) {
   const base = {
@@ -439,7 +439,7 @@ export function providerFailed(body) {
  *
  * `quotaCharged` di amplop TTS/AI hanya jujur kalau ia setuju dengan fungsi INI, karena
  * fungsi inilah yang benar-benar menggerakkan (atau membatalkan) buku jatah. Gerbang
- * `tts-provider-contract-test.js` mengimpornya untuk menjalankan buku jatah palsu, jadi
+ * `tests/tts-provider-contract-test.js` mengimpornya untuk menjalankan buku jatah palsu, jadi
  * tidak ada versi kedua dari aturan ini yang bisa hanyut dari yang dipakai produksi.
  */
 export function quotaSettlementFailed(response, body, rollbackRequested) {
@@ -567,7 +567,7 @@ export function buildExtraRoutes() {
   //      sendiri yang menjawab 202 `{disabled:true}`, alasan yang sama dengan
   //      analytics — 404 membuat klien retry tanpa henti, 202 membuatnya
   //      berhenti sopan. Identitas SENGAJA tidak dituntut: payload-nya memang
-  //      tidak boleh punya identitas (BRAIN-TELEMETRY-SCHEMA.md §1.3).
+  //      tidak boleh punya identitas (docs/BRAIN-TELEMETRY-SCHEMA.md §1.3).
   registerLearningRoutes(collector(routes, wrapLearning));
 
   // [BRAIN] LANE BUKTI BELAJAR BRAINCORE - POST /api/braincore/evidence.
@@ -719,7 +719,7 @@ export async function runAnalyticsRollup(event, env, executionCtx) {
  *
  * CATATAN JUJUR SOAL OBSERVABILITAS: job ini SENGAJA belum dibungkus `withCronRun`.
  * Daftar job cron (`CRON_JOBS` di cron-status.js) adalah enum tertutup yang dikunci
- * `cron-contract-test.js` sampai ke JUMLAH baris yang ditinggalkan satu putaran cron;
+ * `tests/cron-contract-test.js` sampai ke JUMLAH baris yang ditinggalkan satu putaran cron;
  * menambah job ketiga adalah perubahan kontrak tersendiri. Sampai itu dikerjakan,
  * hasil purge hanya muncul di nilai balik `runScheduled` — artinya purge yang gagal
  * TIDAK akan terlihat di `/api/owner/cron-status`. Itu lubang yang diketahui, bukan

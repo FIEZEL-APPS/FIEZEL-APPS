@@ -12,8 +12,8 @@
  * yang menang balapan, muatan eksperimen UI di sini akan masuk ke pipa yang diatur
  * kontrak privasi-maksimal.
  *
- * Dua pipa ini TIDAK BOLEH berbagi nama. Yang menjaganya: `global-name-collision-test.js`
- * (memindai SUMBER seluruh repo secara programatik) dan `analytics-client-test.js`.
+ * Dua pipa ini TIDAK BOLEH berbagi nama. Yang menjaganya: `tests/global-name-collision-test.js`
+ * (memindai SUMBER seluruh repo secara programatik) dan `tests/analytics-client-test.js`.
  *
  * DATA MURID: kunci penyimpanan `fiezel_ab_events` TIDAK berganti nama walau global-nya
  * berganti. Event A/B yang sudah ada di perangkat murid tetap terbaca dan tetap ikut

@@ -46,7 +46,7 @@ export function routeHealth(ctx) {
       //   'off'           = mode transisi eksplisit (tidak ada penegakan).
       // Dipisah dari `edgeGuard` dengan sengaja: `edgeGuard` adalah kontrak
       // on/off yang sudah dibaca `tools/fiezel-health-probe.mjs` dan
-      // `staging-live-test.js`, sedangkan field ini menjawab pertanyaan yang
+      // `tests/staging-live-test.js`, sedangkan field ini menjawab pertanyaan yang
       // berbeda — "lewat mana permintaan ini masuk" — supaya keadaan nyata
       // terbaca dan pembongkaran jembatan tidak perlu ditebak. Aman diumumkan
       // di sini karena `/health` sendiri ikut dilindungi gerbang.
@@ -77,7 +77,7 @@ export function routeHealth(ctx) {
  *     dan '1.7' sudah publik di klien (app.js), jadi bukan kebocoran baru.
  * Yang DILARANG ditambahkan ke sini, sekarang atau nanti: `capabilities`, nama
  *   layanan, versi, mode gateway, status `edgeGuard`, waktu server, angka kuota,
- *   atau apa pun yang berubah menurut konfigurasi. `edge-guard-test.js` butir (f)
+ *   atau apa pun yang berubah menurut konfigurasi. `tests/edge-guard-test.js` butir (f)
  *   memindai badan respons ini dan akan MERAH kalau ada yang menyelinap.
  *
  * Nol baca D1, nol baca KV, nol tulis — rute ini dipanggil monitor setiap menit,

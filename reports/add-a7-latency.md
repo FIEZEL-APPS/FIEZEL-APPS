@@ -8,7 +8,7 @@ Berkas yang disentuh (dan hanya ini):
 |---|---|
 | `deploy/edge/api-index.php` | transport + timeout + kompresi + `Server-Timing` |
 | `deploy/edge/README.md` | §5b/5c/5d — analisis, cara ukur, pengakuan angka sesudah |
-| `edge-proxy-contract-test.js` | **baru** — gerbang kontrak proxy (a)–(h) |
+| `tests/edge-proxy-contract-test.js` | **baru** — gerbang kontrak proxy (a)–(h) |
 | `tools/edge-latency-probe.mjs` | **baru** — alat ukur p50/p95, node murni |
 | `.github/workflows/quality.yml` | mendaftarkan gerbang baru |
 | `reports/add-a7-latency.md` | catatan ini |
@@ -120,7 +120,7 @@ node tools/edge-latency-probe.mjs https://api.fiezel.my.id --n=30 \
 # (4) verifikasi kontrak masih utuh setelah versi baru terpasang
 curl -s https://api.fiezel.my.id/health | grep -o '"edgeGuard":"[a-z]*"'   # HARUS "on"
 curl -s https://fiezel-api.fitrajft.workers.dev/healthz                    # {"ok":true,"protocol":"1.7"}
-FIEZEL_CF_LIVE_BASE=https://api.fiezel.my.id node cf-live-contract-test.js
+FIEZEL_CF_LIVE_BASE=https://api.fiezel.my.id node tests/cf-live-contract-test.js
 ```
 
 Kalau p95 **memburuk**, tersangka pertama TCP Fast Open: ubah `ENABLE_TCP_FASTOPEN = false`,
@@ -129,11 +129,11 @@ yang menghapusnya bukan PHP, melainkan **pembongkaran jembatan** (README §6).
 
 Status yang benar hari ini: **"diperkirakan membaik, belum terbukti"** — bukan "lebih cepat".
 
-## 6. Gerbang `edge-proxy-contract-test.js` — 120 assert PASS
+## 6. Gerbang `tests/edge-proxy-contract-test.js` — 120 assert PASS
 
 Node murni, nol dependency, nol jaringan; **memindai berkas PHP sebagai teks** (tidak ada
 PHP di runner CI, dan batas itu ditulis di kepala gerbang, bukan disembunyikan).
-Terdaftar di `.github/workflows/quality.yml` tepat sesudah `edge-guard-test.js`, dan
+Terdaftar di `.github/workflows/quality.yml` tepat sesudah `tests/edge-guard-test.js`, dan
 gerbang itu **menjaga pendaftarannya sendiri**.
 
 | Butir | Yang dijaga |
@@ -158,13 +158,13 @@ klien, teruskan `X-Forwarded-For`+`REMOTE_ADDR`, opsi curl baru tanpa komentar,
 
 | Gerbang | Hasil |
 |---|---|
-| `edge-proxy-contract-test.js` | **exit 0** — 120/120 assert |
-| `edge-guard-test.js` | **exit 0** — 119/119 assert |
-| `regression-test.js` | **exit 0** |
-| `install-health-test.js` | **exit 0** |
-| `no-network-test.js` | **exit 0** |
-| `secret-scan-test.js` | **belum ada di repo** — instruksinya "bila sudah ada", jadi tidak dijalankan dan tidak dibuat-buat |
-| tambahan: `workflow-actor-gate-test.js`, `cf-wiring-test.js`, `cf-api-contract-test.js` | exit 0 |
+| `tests/edge-proxy-contract-test.js` | **exit 0** — 120/120 assert |
+| `tests/edge-guard-test.js` | **exit 0** — 119/119 assert |
+| `tests/regression-test.js` | **exit 0** |
+| `tests/install-health-test.js` | **exit 0** |
+| `tests/no-network-test.js` | **exit 0** |
+| `tests/secret-scan-test.js` | **belum ada di repo** — instruksinya "bila sudah ada", jadi tidak dijalankan dan tidak dibuat-buat |
+| tambahan: `tests/workflow-actor-gate-test.js`, `tests/cf-wiring-test.js`, `tests/cf-api-contract-test.js` | exit 0 |
 
 `node --check` lulus untuk kedua berkas JS/MJS baru (step `Syntax` di `quality.yml`
 memindai seluruh `*.js`/`*.mjs`). **PHP tidak bisa di-lint di sandbox ini** (`php` tidak
@@ -177,7 +177,7 @@ mengunggah.
 - Nol perubahan di `workers/**` dan `app.js`.
 - **Tidak ada bump versi build.**
 - **Tidak ada push.** Commit hanya ke `add/a7latency`.
-- Nol nilai secret masuk repo (`edge-guard-test.js` butir (g) + butir (b) gerbang baru).
+- Nol nilai secret masuk repo (`tests/edge-guard-test.js` butir (g) + butir (b) gerbang baru).
 - Tidak ada pemasangan ke server; tidak ada klaim angka "sesudah".
 
 ## Sumber

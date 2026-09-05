@@ -1,6 +1,6 @@
 /**
  * Logika murni attach-live-bindings.mjs, dipisah dari I/O (child_process/fs) supaya
- * diuji langsung oleh `attach-live-bindings-test.js` dengan data akun tiruan —
+ * diuji langsung oleh `tests/attach-live-bindings-test.js` dengan data akun tiruan —
  * termasuk kasus staging yang harus TIDAK PERNAH cocok dengan nama produksi.
  *
  * Tidak melakukan fetch/exec/baca-tulis apa pun. `attach-live-bindings.mjs` adalah

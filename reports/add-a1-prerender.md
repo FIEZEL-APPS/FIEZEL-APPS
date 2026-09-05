@@ -101,7 +101,7 @@ kedaluwarsa.
   logika kunci (diperiksa gerbang: tanpa `sha256`, tanpa `canonicalText`, tanpa literal skema).
   Jalur rencana tetap **nol jaringan**; `fetch` hanya hidup di helper R2/AI di belakang `--apply`,
   HEAD-sebelum-provider dan HEAD-verifikasi-sesudah-PUT tetap seperti sebelumnya.
-- `prerender-plan-test.js` — gerbang baru, node murni, nol jaringan: **63 assert PASS**.
+- `tests/prerender-plan-test.js` — gerbang baru, node murni, nol jaringan: **63 assert PASS**.
 - `.github/workflows/audio-prerender-cf.yml` — gate aktor kini memakai pola repo huruf demi huruf
   (`github.event_name == 'workflow_dispatch' && github.actor == 'fitrajft-ux'`, sama seperti
   `deploy-core-worker.yml:17`). Syarat `event_name` bukan hiasan meski `on:` hari ini hanya
@@ -109,12 +109,12 @@ kedaluwarsa.
   aktor sendirian akan lolos untuk jalan yang tidak pernah ditekan siapa pun. Gerbang rencana baru
   dijalankan sebelum langkah Produksi. Input APPLY (bawaan kosong), `budget_usd` (bawaan 1.00), dan
   dry-run bawaan tetap sebagaimana adanya.
-- `.github/workflows/quality.yml` — `node prerender-plan-test.js` terdaftar sesudah
-  `prerender-dryrun-test.js`.
+- `.github/workflows/quality.yml` — `node tests/prerender-plan-test.js` terdaftar sesudah
+  `tests/prerender-dryrun-test.js`.
 - `NO-NETWORK-REPORT.json` — hasil regenerasi gerbang (127 → 128 berkas dipindai).
 
 Catatan sengaja: gerbang baru hanya menjerat `fetch`, tidak me-`require` http/https/net/dns.
-`no-network-test.js` menjaga daftar "jerat saja"-nya tetap satu nama; menambah nama kedua akan
+`tests/no-network-test.js` menjaga daftar "jerat saja"-nya tetap satu nama; menambah nama kedua akan
 melemahkan gerbang itu demi kenyamanan gerbang ini. Sebagai gantinya dipasang pemeriksaan teks:
 skrip pra-render dilarang memuat http/https/net/tls/dns/child_process sama sekali, jadi satu-satunya
 pintu jaringannya memang `fetch` yang dijerat.
@@ -122,14 +122,14 @@ pintu jaringannya memang `fetch` yang dijerat.
 ## 6. Verifikasi (semua exit 0, dijalankan lokal)
 
 ```
-node prerender-plan-test.js      # 63 PASS, 0 FAIL, network.calls = 0
-node prerender-dryrun-test.js    # 45 PASS, 0 FAIL
-node tts-key-test.js
-node no-network-test.js          # 35 PASS (128 berkas dipindai)
-node regression-test.js
-node install-health-test.js
-node workflow-actor-gate-test.js
-node audio-asset-pipeline-test.js
+node tests/prerender-plan-test.js      # 63 PASS, 0 FAIL, network.calls = 0
+node tests/prerender-dryrun-test.js    # 45 PASS, 0 FAIL
+node tests/tts-key-test.js
+node tests/no-network-test.js          # 35 PASS (128 berkas dipindai)
+node tests/regression-test.js
+node tests/install-health-test.js
+node tests/workflow-actor-gate-test.js
+node tests/audio-asset-pipeline-test.js
 node tools/prerender-tts.mjs                      # dry-run bawaan, exit 0, nol jaringan
 node tools/prerender-tts.mjs --model=@cf/myshell-ai/melotts   # exit 1, model DITOLAK
 ```

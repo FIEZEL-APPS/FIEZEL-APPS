@@ -1,6 +1,6 @@
 /**
  * reports/d4-owner-brake-red-proof.mjs — BUKTI MERAH untuk butir (b-a)…(b-g) dan bagian KV
- * butir (g-g) di `owner-edge-guard-test.js` (rem penebakan halaman masuk owner + pengalihan
+ * butir (g-g) di `tests/owner-edge-guard-test.js` (rem penebakan halaman masuk owner + pengalihan
  * penanda buku `GET /` → `/login`).
  *
  * Kenapa berkas ini ada: rem yang diganti hari ini adalah rem yang SELALU HIJAU di gerbang lama
@@ -19,7 +19,7 @@ import { execFileSync } from 'node:child_process';
 const ROOT = path.resolve(import.meta.dirname, '..');
 const OWNER = path.join(ROOT, 'workers', 'owner', 'index.js');
 const TOML = path.join(ROOT, 'workers', 'owner', 'wrangler.toml');
-const GATE = 'owner-edge-guard-test.js';
+const GATE = 'tests/owner-edge-guard-test.js';
 const REPORT = path.join(ROOT, 'OWNER-EDGE-GUARD-REPORT.json');
 
 const MUTATIONS = [

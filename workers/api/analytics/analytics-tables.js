@@ -3,7 +3,7 @@
  *
  * Berkas ini sengaja dipisah supaya gerbang bisa membacanya sebagai satu
  * sumber kebenaran: kalau ada tabel baru di migrasi tapi tidak terdaftar di
- * sini (atau sebaliknya), `analytics-privacy-test.js` merah.
+ * sini (atau sebaliknya), `tests/analytics-privacy-test.js` merah.
  *
  * Semua tabel di bawah adalah AGREGAT, kecuali `dau_dedup` yang berisi token
  * harian dan dihapus setiap malam. NOL tabel per-orang.

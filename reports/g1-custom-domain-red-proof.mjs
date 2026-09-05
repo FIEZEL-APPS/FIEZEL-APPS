@@ -1,6 +1,6 @@
 /**
- * reports/g1-custom-domain-red-proof.mjs — BUKTI MERAH untuk butir (h) `edge-guard-test.js`
- * dan butir (f) `owner-edge-guard-test.js`.
+ * reports/g1-custom-domain-red-proof.mjs — BUKTI MERAH untuk butir (h) `tests/edge-guard-test.js`
+ * dan butir (f) `tests/owner-edge-guard-test.js`.
  *
  * Gerbang yang tidak pernah bisa merah adalah gerbang yang bohong. Skrip ini
  * menyuntikkan satu mutasi pada satu waktu ke berkas SUNGGUHAN, menjalankan gerbang,
@@ -23,7 +23,7 @@ const OWNER_REPORT = path.join(ROOT, 'OWNER-EDGE-GUARD-REPORT.json');
 const MUTATIONS = [
   {
     id: 'M1-hostname-tepercaya-dimatikan',
-    gate: 'edge-guard-test.js',
+    gate: 'tests/edge-guard-test.js',
     file: MW,
     from: "  if (isTrustedEdgeHost(host)) return allow(ctx, 'custom-domain');",
     to: "  if (false && isTrustedEdgeHost(host)) return allow(ctx, 'custom-domain');",
@@ -31,7 +31,7 @@ const MUTATIONS = [
   },
   {
     id: 'M2-default-allow-hostname-asing',
-    gate: 'edge-guard-test.js',
+    gate: 'tests/edge-guard-test.js',
     file: MW,
     from: '  // [3] DEFAULT-DENY: hostname asing',
     to: "  return allow(ctx, 'custom-domain'); // MUTASI: default-allow\n  // [3] DEFAULT-DENY: hostname asing",
@@ -39,7 +39,7 @@ const MUTATIONS = [
   },
   {
     id: 'M3-workers-dev-diloloskan-tanpa-header',
-    gate: 'edge-guard-test.js',
+    gate: 'tests/edge-guard-test.js',
     file: MW,
     from: '  if (isWorkersDevHost(host)) {\n    const presented',
     to: "  if (isWorkersDevHost(host)) return allow(ctx, 'header'); // MUTASI\n  if (isWorkersDevHost(host)) {\n    const presented",
@@ -47,7 +47,7 @@ const MUTATIONS = [
   },
   {
     id: 'M4-health-dibebaskan-dari-gerbang',
-    gate: 'edge-guard-test.js',
+    gate: 'tests/edge-guard-test.js',
     file: MW,
     from: "export const EDGE_FREE_PATHS = Object.freeze(['/healthz']);",
     to: "export const EDGE_FREE_PATHS = Object.freeze(['/healthz', '/health']);",
@@ -55,7 +55,7 @@ const MUTATIONS = [
   },
   {
     id: 'M5-jalur-tidak-dilaporkan-di-health',
-    gate: 'edge-guard-test.js',
+    gate: 'tests/edge-guard-test.js',
     file: HEALTH,
     from: '      edgeGuardPath: edgeGuardPath(ctx),',
     to: '',
@@ -63,7 +63,7 @@ const MUTATIONS = [
   },
   {
     id: 'M6-daftar-hostname-menyimpang-dari-wrangler',
-    gate: 'edge-guard-test.js',
+    gate: 'tests/edge-guard-test.js',
     file: MW,
     from: "export const TRUSTED_EDGE_HOSTS = Object.freeze(['api.fiezel.my.id']);",
     to: "export const TRUSTED_EDGE_HOSTS = Object.freeze(['api.fiezel.my.id', 'api2.fiezel.my.id']);",
@@ -71,7 +71,7 @@ const MUTATIONS = [
   },
   {
     id: 'M7-pencocokan-hostname-jadi-substring',
-    gate: 'edge-guard-test.js',
+    gate: 'tests/edge-guard-test.js',
     file: MW,
     from: '  return TRUSTED_EDGE_HOSTS.includes(h);',
     to: '  return TRUSTED_EDGE_HOSTS.some((t) => h.includes(t));',
@@ -79,7 +79,7 @@ const MUTATIONS = [
   },
   {
     id: 'M8-hostname-dibaca-dari-header-yang-bisa-dipalsukan',
-    gate: 'edge-guard-test.js',
+    gate: 'tests/edge-guard-test.js',
     file: MW,
     from: "  if (ctx && ctx.url && ctx.url.hostname) return normalizeHost(ctx.url.hostname);",
     to: "  const spoof = ctx && ctx.request && ctx.request.headers.get('x-forwarded-host');\n  if (spoof) return normalizeHost(spoof);\n  if (ctx && ctx.url && ctx.url.hostname) return normalizeHost(ctx.url.hostname);",
@@ -87,7 +87,7 @@ const MUTATIONS = [
   },
   {
     id: 'M9-bentuk-galat-hostname-asing-dibedakan',
-    gate: 'edge-guard-test.js',
+    gate: 'tests/edge-guard-test.js',
     file: MW,
     from: '  // [3] DEFAULT-DENY: hostname asing',
     to: "  if (String(ctx.pathname).length >= 0) return jsonError(403, 'forbidden_host', { message: 'Hostname tidak dikenal.' }, { headers: Object.assign({ vary: 'Origin' }, ctx.corsHeaders || {}) }); // MUTASI\n  // [3] DEFAULT-DENY: hostname asing",
@@ -95,7 +95,7 @@ const MUTATIONS = [
   },
   {
     id: 'M10-syarat-penghapusan-jalur-header-dihapus-dari-kode',
-    gate: 'edge-guard-test.js',
+    gate: 'tests/edge-guard-test.js',
     file: MW,
     from: ' * KAPAN JALUR HEADER BOLEH DIHAPUS (DAN SIAPA YANG MEMUTUSKAN)',
     to: ' * (bab dihapus)',
@@ -110,7 +110,7 @@ const MUTATIONS = [
     // tidak boleh saling bocor. Bukti merah lengkap untuk jalur owner ada di
     // reports/d3-owner-guard-red-proof.mjs.
     id: 'M11-daftar-hostname-owner-bocor-ke-hostname-api',
-    gate: 'owner-edge-guard-test.js',
+    gate: 'tests/owner-edge-guard-test.js',
     file: OWNER,
     from: "const TRUSTED_EDGE_HOSTS = Object.freeze(['owner.fiezel.my.id']);",
     to: "const TRUSTED_EDGE_HOSTS = Object.freeze(['owner.fiezel.my.id', 'api.fiezel.my.id']);",
@@ -147,7 +147,7 @@ for (const m of MUTATIONS) {
   let failed = [];
   try {
     run = runGate(m.gate);
-    const rep = readReport(m.gate === 'edge-guard-test.js' ? REPORT : OWNER_REPORT);
+    const rep = readReport(m.gate === 'tests/edge-guard-test.js' ? REPORT : OWNER_REPORT);
     failed = ((rep && rep.checks) || []).filter((c) => !c.ok).map((c) => c.message);
   } finally {
     fs.writeFileSync(m.file, original);
@@ -168,8 +168,8 @@ for (const m of MUTATIONS) {
 
 // Pemulihan wajib terbukti, bukan diasumsikan: kedua gerbang harus HIJAU lagi.
 const pulih = {
-  'edge-guard-test.js': runGate('edge-guard-test.js').exit,
-  'owner-edge-guard-test.js': runGate('owner-edge-guard-test.js').exit
+  'tests/edge-guard-test.js': runGate('tests/edge-guard-test.js').exit,
+  'tests/owner-edge-guard-test.js': runGate('tests/owner-edge-guard-test.js').exit
 };
 
 const out = {
@@ -177,7 +177,7 @@ const out = {
   generatedAt: new Date().toISOString(),
   mutations: results,
   pulihSesudahSemuaMutasi: pulih,
-  pass: results.every((r) => r.ok) && pulih['edge-guard-test.js'] === 0 && pulih['owner-edge-guard-test.js'] === 0
+  pass: results.every((r) => r.ok) && pulih['tests/edge-guard-test.js'] === 0 && pulih['tests/owner-edge-guard-test.js'] === 0
 };
 fs.writeFileSync(path.join(ROOT, 'reports', 'g1-custom-domain-red-proof.json'), JSON.stringify(out, null, 2) + '\n');
 
@@ -185,6 +185,6 @@ for (const r of results) {
   console.log((r.ok ? 'MERAH-OK  ' : 'GAGAL     ') + r.id + '  exit=' + r.exit
     + '  butir jatuh: ' + (r.butirYangJatuh || []).join(' ') + (r.why ? '  ' + r.why : ''));
 }
-console.log('pulih: edge-guard=' + pulih['edge-guard-test.js'] + ' owner-edge-guard=' + pulih['owner-edge-guard-test.js']);
+console.log('pulih: edge-guard=' + pulih['tests/edge-guard-test.js'] + ' owner-edge-guard=' + pulih['tests/owner-edge-guard-test.js']);
 console.log(out.pass ? 'RED-PROOF PASS' : 'RED-PROOF GAGAL');
 process.exit(out.pass ? 0 : 1);

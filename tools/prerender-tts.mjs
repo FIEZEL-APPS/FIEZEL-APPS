@@ -18,7 +18,7 @@
  *     dibelanjakan owner. Karena itu `--budget-usd` ada, bawaannya kecil, dan `--apply` wajib.
  *
  * DRY-RUN ADALAH BAWAAN dan dry-run TIDAK MENYENTUH JARINGAN SAMA SEKALI. Bukan "tidak memanggil
- * provider" — tidak memanggil apa pun. Sifat itu diuji `prerender-dryrun-test.js` dengan mengganti
+ * provider" — tidak memanggil apa pun. Sifat itu diuji `tests/prerender-dryrun-test.js` dengan mengganti
  * `fetch` global menjadi fungsi yang melempar: satu permintaan HTTP saja membuat gerbang merah.
  * Alasannya sederhana: satu salah ketik `--content` tidak boleh berbiaya, dan seorang peninjau
  * harus bisa menjalankan rencana ini di laptopnya tanpa satu kredensial pun.
@@ -601,7 +601,7 @@ async function r2Put(env, key, body) {
 }
 
 /**
- * DIEKSPOR sejak A12 dengan satu alasan: `tts-provider-contract-test.js` memanggil jalur INI
+ * DIEKSPOR sejak A12 dengan satu alasan: `tests/tts-provider-contract-test.js` memanggil jalur INI
  * (dengan `fetch` global distub) lalu membandingkan badan permintaannya dengan badan yang dikirim
  * `route-tts.js`. Tanpa itu, "kedua jalur cocok" hanya bisa diuji dengan menuliskan daftar
  * parameter untuk KEDUA kalinya di dalam gerbang — tepat duplikasi yang melahirkan cacat ini.

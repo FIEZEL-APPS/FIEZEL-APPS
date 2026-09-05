@@ -28,7 +28,7 @@
  *     Trace item-nya boleh berbeda SETELAH keputusan pertama berbeda — memang itu
  *     yang diukur: konsekuensi keputusan, pada murid yang identik.
  *
- * Aturan kontrak yang dipatuhi (BRAINCORE-V3-CONTRACTS.md):
+ * Aturan kontrak yang dipatuhi (docs/BRAINCORE-V3-CONTRACTS.md):
  *   - modul murni: tanpa DOM/network/storage, tanpa Math.random tanpa seed,
  *     waktu selalu argumen (NOW konstan, bukan Date.now());
  *   - pola UMD sama dengan features/brain/fiezel-core-brain.js;
@@ -1746,7 +1746,7 @@
     // runtime tanpa menambah daya deteksi berarti — sumber keacakan liar akan
     // muncul di unit MANA PUN. Spot-check: unit pertama dan terakhir dihitung
     // ulang dan digest-nya wajib identik dengan yang tercatat; ditambah gate
-    // eksternal di adaptivity-simulation-v3-hardened-test.js yang menjalankan
+    // eksternal di tests/adaptivity-simulation-v3-hardened-test.js yang menjalankan
     // CLI ini dua kali penuh dan menuntut stdout byte-identik.
     var seedsUlang = turunkanSeeds(seed, multi.seedCount);
     var deterministikMulti =

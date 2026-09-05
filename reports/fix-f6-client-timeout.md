@@ -121,9 +121,9 @@ berharga detik, dan dari sandbox ini klaimnya tidak bisa dijatuhkan maupun dibuk
 Kalau kamu tetap mau keduanya, minta paket terpisah dengan pengukuran dari jaringan
 produksi — jangan dari sini, karena di sini angkanya tidak mendukung perubahannya.
 
-## 5. Gerbang baru `cf-client-timeout-test.js` (72/72, nol jaringan)
+## 5. Gerbang baru `tests/cf-client-timeout-test.js` (72/72, nol jaringan)
 
-Terdaftar di `.github/workflows/quality.yml` sesudah `cf-config-killswitch-test.js`.
+Terdaftar di `.github/workflows/quality.yml` sesudah `tests/cf-config-killswitch-test.js`.
 Empat kebenaran yang dijaganya persis kontrak paket: (1) setiap batas waktu klien di jalur
 CF punya nilai eksplisit; (2) nilainya ≥ p95 terukur (1410 ms) + margin minimum 3000 ms,
 margin itu DISEBUT di komentar sumber, dan untuk config harus > `TIMEOUT_FAST_S` proksi;
@@ -189,19 +189,19 @@ atur, bukan kode di cabang ini.
 
 | Gerbang | Hasil |
 |---|---|
-| `cf-client-timeout-test.js` (baru) | PASS 72/72, matriks racun 19 baris |
-| `edge-proxy-hopbyhop-test.js` | PASS 133/133 |
-| `edge-proxy-contract-test.js` | PASS 120/120 |
-| `cf-transport-test.js` | PASS 25 assert |
-| `cf-config-killswitch-test.js` | PASS 58 assert |
-| `cf-shadow-ledger-test.js` | PASS 94 assert |
-| `ai-transport-switch-test.js` | PASS 113 assert |
-| `e2e-bridge-selftest.js` | PASS 32 assert / 21 skenario loopback |
-| `no-network-test.js` | PASS 39 assert, 148 gerbang dipindai |
-| `secret-scan-test.js` | PASS 46/46, 0 temuan |
-| `regression-test.js` | PASS |
-| `install-health-test.js` | PASS |
-| `gate-registry-test.js` | PASS 10/0 |
+| `tests/cf-client-timeout-test.js` (baru) | PASS 72/72, matriks racun 19 baris |
+| `tests/edge-proxy-hopbyhop-test.js` | PASS 133/133 |
+| `tests/edge-proxy-contract-test.js` | PASS 120/120 |
+| `tests/cf-transport-test.js` | PASS 25 assert |
+| `tests/cf-config-killswitch-test.js` | PASS 58 assert |
+| `tests/cf-shadow-ledger-test.js` | PASS 94 assert |
+| `tests/ai-transport-switch-test.js` | PASS 113 assert |
+| `tests/e2e-bridge-selftest.js` | PASS 32 assert / 21 skenario loopback |
+| `tests/no-network-test.js` | PASS 39 assert, 148 gerbang dipindai |
+| `tests/secret-scan-test.js` | PASS 46/46, 0 temuan |
+| `tests/regression-test.js` | PASS |
+| `tests/install-health-test.js` | PASS |
+| `tests/gate-registry-test.js` | PASS 10/0 |
 
 ## 8. Berkas yang berubah
 
@@ -210,9 +210,9 @@ atur, bukan kode di cabang ini.
 - `deploy/edge/api-index.php` — header CORS pada `fail()`. **Perlu diunggah olehmu.**
 - `tools/fiezel-e2e-bridge.mjs` — `--disable-quic`, `CONFIG_DELAY` bawaan 8000→4500 ms
   (harus di bawah anggaran klien 8000 ms, tetap di atas boot ~3,5 s + margin 100 ms).
-- `cf-client-timeout-test.js` — gerbang baru; terdaftar di `.github/workflows/quality.yml`.
+- `tests/cf-client-timeout-test.js` — gerbang baru; terdaftar di `.github/workflows/quality.yml`.
 - `tools/f6-*.mjs` — instrumentasi bukti (probe abort, isolasi hop, matriks cookie,
   aplikasi-vs-fetch-mentah, cek h3). Bukan gerbang, tidak dipanggil CI, tidak dipindai
-  `no-network-test.js` (ia hanya memindai `*-test.js` di akar). Sengaja disimpan supaya
+  `tests/no-network-test.js` (ia hanya memindai `*-test.js` di akar). Sengaja disimpan supaya
   klaim di laporan ini bisa dijalankan ulang orang lain, bukan dipercaya.
 - `reports/fix-f6-data/` — bukti mentah, laporan E2E, tangkapan layar.

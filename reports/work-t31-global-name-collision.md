@@ -80,7 +80,7 @@ alih-alih hilang bersama `lastError` yang dibersihkan saat sukses.
 
 ## 5. Gerbang
 
-### Baru: `global-name-collision-test.js` (terdaftar di `quality.yml`)
+### Baru: `tests/global-name-collision-test.js` (terdaftar di `quality.yml`)
 Menjaga KELAS cacatnya, bukan satu berkas. Ia memindai **sumber** setiap berkas `.js`/`.html`
 yang dilacak git (`git ls-files`) dan mendeteksi **penugasan** nama global
 (`window.X=`, `self.X=`, `globalThis.X=`, `root.X=`, `this.X=`, `window['X']=`, `var|let|const X=`,
@@ -93,7 +93,7 @@ pemindai menangkap enam bentuk penugasan sintetis dan TIDAK menangkap pembacaan/
 ui-manager memakai nama baru, kunci `fiezel_ab_events` utuh, pola lama "percayai global" hilang,
 kode galat dibedakan, `stats().nameConflict` ada, dan nol `await` di blok pemancar. 22/22 PASS.
 
-### Diperluas: `analytics-client-test.js` (186 → 190 assert, semuanya PASS)
+### Diperluas: `tests/analytics-client-test.js` (186 → 190 assert, semuanya PASS)
 Bagian §T-031 **menjalankan** blok pemancar NYATA yang dipotong dari `app.js` (penanda
 `A1-ANALYTICS-EMITTER-BEGIN/END`, tidak ditulis ulang) di dalam `vm`, dengan `<script>` yang
 benar-benar mengeksekusi modul analytics nyata seperti di peramban:
@@ -137,10 +137,10 @@ direbut di tengah sesi modul dipulihkan dari patok tanpa unduhan baru. M9 sekara
 `(T4) nol unduhan tambahan` (`createElement` 1 → 2).
 
 ### Verifikasi (semua exit 0)
-`global-name-collision-test.js`, `analytics-client-test.js`, `cf-config-killswitch-test.js`,
-`analytics-privacy-test.js`, `boot-order-test.js`, `no-network-test.js`, `secret-scan-test.js`,
-`gate-registry-test.js`, `coordination-guard-test.js`, `regression-test.js`,
-`install-health-test.js`.
+`tests/global-name-collision-test.js`, `tests/analytics-client-test.js`, `tests/cf-config-killswitch-test.js`,
+`tests/analytics-privacy-test.js`, `tests/boot-order-test.js`, `tests/no-network-test.js`, `tests/secret-scan-test.js`,
+`tests/gate-registry-test.js`, `tests/coordination-guard-test.js`, `tests/regression-test.js`,
+`tests/install-health-test.js`.
 
 ## 6. Haruskah kegagalan pemuat analytics tetap SENYAP?
 

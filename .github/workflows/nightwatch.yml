@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     # Batas keras: tanpa ini GitHub memakai 360 menit, dan satu langkah
     # yang menggantung membakar enam jam dalam diam (lihat
-    # workflow-timeout-gate-test.js).
+    # tests/workflow-timeout-gate-test.js).
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
@@ -30,14 +30,14 @@ jobs:
         run: npm install --ignore-scripts
       - name: Siapkan direktori log
         run: mkdir -p .nightwatch/logs
-      - name: 'Gate: regression-test.js'
+      - name: 'Gate: tests/regression-test.js'
         id: gate_regression_test
         continue-on-error: true
         shell: bash
         run: |
           rc=0
-          node regression-test.js 2>&1 | tee '.nightwatch/logs/regression-test.js.log' || rc=$?
-          printf '%s\t%s\n' 'regression-test.js' "$rc" >> .nightwatch/status.tsv
+          node tests/regression-test.js 2>&1 | tee '.nightwatch/logs/regression-test.js.log' || rc=$?
+          printf '%s\t%s\n' 'tests/regression-test.js' "$rc" >> .nightwatch/status.tsv
           exit "$rc"
       - name: 'Gate: validator.js'
         id: gate_validator
@@ -48,158 +48,158 @@ jobs:
           node validator.js 2>&1 | tee '.nightwatch/logs/validator.js.log' || rc=$?
           printf '%s\t%s\n' 'validator.js' "$rc" >> .nightwatch/status.tsv
           exit "$rc"
-      - name: 'Gate: core-brain-v2-test.js'
+      - name: 'Gate: tests/core-brain-v2-test.js'
         id: gate_core_brain_v2_test
         continue-on-error: true
         shell: bash
         run: |
           rc=0
-          node core-brain-v2-test.js 2>&1 | tee '.nightwatch/logs/core-brain-v2-test.js.log' || rc=$?
-          printf '%s\t%s\n' 'core-brain-v2-test.js' "$rc" >> .nightwatch/status.tsv
+          node tests/core-brain-v2-test.js 2>&1 | tee '.nightwatch/logs/core-brain-v2-test.js.log' || rc=$?
+          printf '%s\t%s\n' 'tests/core-brain-v2-test.js' "$rc" >> .nightwatch/status.tsv
           exit "$rc"
-      - name: 'Gate: core-brain-v3-upgrade-test.js'
+      - name: 'Gate: tests/core-brain-v3-upgrade-test.js'
         id: gate_core_brain_v3_upgrade_test
         continue-on-error: true
         shell: bash
         run: |
           rc=0
-          node core-brain-v3-upgrade-test.js 2>&1 | tee '.nightwatch/logs/core-brain-v3-upgrade-test.js.log' || rc=$?
-          printf '%s\t%s\n' 'core-brain-v3-upgrade-test.js' "$rc" >> .nightwatch/status.tsv
+          node tests/core-brain-v3-upgrade-test.js 2>&1 | tee '.nightwatch/logs/core-brain-v3-upgrade-test.js.log' || rc=$?
+          printf '%s\t%s\n' 'tests/core-brain-v3-upgrade-test.js' "$rc" >> .nightwatch/status.tsv
           exit "$rc"
-      - name: 'Gate: tutor-brain-v3-test.js'
+      - name: 'Gate: tests/tutor-brain-v3-test.js'
         id: gate_tutor_brain_v3_test
         continue-on-error: true
         shell: bash
         run: |
           rc=0
-          node tutor-brain-v3-test.js 2>&1 | tee '.nightwatch/logs/tutor-brain-v3-test.js.log' || rc=$?
-          printf '%s\t%s\n' 'tutor-brain-v3-test.js' "$rc" >> .nightwatch/status.tsv
+          node tests/tutor-brain-v3-test.js 2>&1 | tee '.nightwatch/logs/tutor-brain-v3-test.js.log' || rc=$?
+          printf '%s\t%s\n' 'tests/tutor-brain-v3-test.js' "$rc" >> .nightwatch/status.tsv
           exit "$rc"
-      - name: 'Gate: affect-test.js'
+      - name: 'Gate: tests/affect-test.js'
         id: gate_affect_test
         continue-on-error: true
         shell: bash
         run: |
           rc=0
-          node affect-test.js 2>&1 | tee '.nightwatch/logs/affect-test.js.log' || rc=$?
-          printf '%s\t%s\n' 'affect-test.js' "$rc" >> .nightwatch/status.tsv
+          node tests/affect-test.js 2>&1 | tee '.nightwatch/logs/affect-test.js.log' || rc=$?
+          printf '%s\t%s\n' 'tests/affect-test.js' "$rc" >> .nightwatch/status.tsv
           exit "$rc"
-      - name: 'Gate: confusion-matrix-test.js'
+      - name: 'Gate: tests/confusion-matrix-test.js'
         id: gate_confusion_matrix_test
         continue-on-error: true
         shell: bash
         run: |
           rc=0
-          node confusion-matrix-test.js 2>&1 | tee '.nightwatch/logs/confusion-matrix-test.js.log' || rc=$?
-          printf '%s\t%s\n' 'confusion-matrix-test.js' "$rc" >> .nightwatch/status.tsv
+          node tests/confusion-matrix-test.js 2>&1 | tee '.nightwatch/logs/confusion-matrix-test.js.log' || rc=$?
+          printf '%s\t%s\n' 'tests/confusion-matrix-test.js' "$rc" >> .nightwatch/status.tsv
           exit "$rc"
-      - name: 'Gate: core-brain-test.js'
+      - name: 'Gate: tests/core-brain-test.js'
         id: gate_core_brain_test
         continue-on-error: true
         shell: bash
         run: |
           rc=0
-          node core-brain-test.js 2>&1 | tee '.nightwatch/logs/core-brain-test.js.log' || rc=$?
-          printf '%s\t%s\n' 'core-brain-test.js' "$rc" >> .nightwatch/status.tsv
+          node tests/core-brain-test.js 2>&1 | tee '.nightwatch/logs/core-brain-test.js.log' || rc=$?
+          printf '%s\t%s\n' 'tests/core-brain-test.js' "$rc" >> .nightwatch/status.tsv
           exit "$rc"
-      - name: 'Gate: evidence-credibility-test.js'
+      - name: 'Gate: tests/evidence-credibility-test.js'
         id: gate_evidence_credibility_test
         continue-on-error: true
         shell: bash
         run: |
           rc=0
-          node evidence-credibility-test.js 2>&1 | tee '.nightwatch/logs/evidence-credibility-test.js.log' || rc=$?
-          printf '%s\t%s\n' 'evidence-credibility-test.js' "$rc" >> .nightwatch/status.tsv
+          node tests/evidence-credibility-test.js 2>&1 | tee '.nightwatch/logs/evidence-credibility-test.js.log' || rc=$?
+          printf '%s\t%s\n' 'tests/evidence-credibility-test.js' "$rc" >> .nightwatch/status.tsv
           exit "$rc"
-      - name: 'Gate: item-calibration-test.js'
+      - name: 'Gate: tests/item-calibration-test.js'
         id: gate_item_calibration_test
         continue-on-error: true
         shell: bash
         run: |
           rc=0
-          node item-calibration-test.js 2>&1 | tee '.nightwatch/logs/item-calibration-test.js.log' || rc=$?
-          printf '%s\t%s\n' 'item-calibration-test.js' "$rc" >> .nightwatch/status.tsv
+          node tests/item-calibration-test.js 2>&1 | tee '.nightwatch/logs/item-calibration-test.js.log' || rc=$?
+          printf '%s\t%s\n' 'tests/item-calibration-test.js' "$rc" >> .nightwatch/status.tsv
           exit "$rc"
-      - name: 'Gate: item-prior-test.js'
+      - name: 'Gate: tests/item-prior-test.js'
         id: gate_item_prior_test
         continue-on-error: true
         shell: bash
         run: |
           rc=0
-          node item-prior-test.js 2>&1 | tee '.nightwatch/logs/item-prior-test.js.log' || rc=$?
-          printf '%s\t%s\n' 'item-prior-test.js' "$rc" >> .nightwatch/status.tsv
+          node tests/item-prior-test.js 2>&1 | tee '.nightwatch/logs/item-prior-test.js.log' || rc=$?
+          printf '%s\t%s\n' 'tests/item-prior-test.js' "$rc" >> .nightwatch/status.tsv
           exit "$rc"
-      - name: 'Gate: listening-adaptive-test.js'
+      - name: 'Gate: tests/listening-adaptive-test.js'
         id: gate_listening_adaptive_test
         continue-on-error: true
         shell: bash
         run: |
           rc=0
-          node listening-adaptive-test.js 2>&1 | tee '.nightwatch/logs/listening-adaptive-test.js.log' || rc=$?
-          printf '%s\t%s\n' 'listening-adaptive-test.js' "$rc" >> .nightwatch/status.tsv
+          node tests/listening-adaptive-test.js 2>&1 | tee '.nightwatch/logs/listening-adaptive-test.js.log' || rc=$?
+          printf '%s\t%s\n' 'tests/listening-adaptive-test.js' "$rc" >> .nightwatch/status.tsv
           exit "$rc"
-      - name: 'Gate: mastery-bkt-test.js'
+      - name: 'Gate: tests/mastery-bkt-test.js'
         id: gate_mastery_bkt_test
         continue-on-error: true
         shell: bash
         run: |
           rc=0
-          node mastery-bkt-test.js 2>&1 | tee '.nightwatch/logs/mastery-bkt-test.js.log' || rc=$?
-          printf '%s\t%s\n' 'mastery-bkt-test.js' "$rc" >> .nightwatch/status.tsv
+          node tests/mastery-bkt-test.js 2>&1 | tee '.nightwatch/logs/mastery-bkt-test.js.log' || rc=$?
+          printf '%s\t%s\n' 'tests/mastery-bkt-test.js' "$rc" >> .nightwatch/status.tsv
           exit "$rc"
-      - name: 'Gate: misconception-ledger-test.js'
+      - name: 'Gate: tests/misconception-ledger-test.js'
         id: gate_misconception_ledger_test
         continue-on-error: true
         shell: bash
         run: |
           rc=0
-          node misconception-ledger-test.js 2>&1 | tee '.nightwatch/logs/misconception-ledger-test.js.log' || rc=$?
-          printf '%s\t%s\n' 'misconception-ledger-test.js' "$rc" >> .nightwatch/status.tsv
+          node tests/misconception-ledger-test.js 2>&1 | tee '.nightwatch/logs/misconception-ledger-test.js.log' || rc=$?
+          printf '%s\t%s\n' 'tests/misconception-ledger-test.js' "$rc" >> .nightwatch/status.tsv
           exit "$rc"
-      - name: 'Gate: olm-test.js'
+      - name: 'Gate: tests/olm-test.js'
         id: gate_olm_test
         continue-on-error: true
         shell: bash
         run: |
           rc=0
-          node olm-test.js 2>&1 | tee '.nightwatch/logs/olm-test.js.log' || rc=$?
-          printf '%s\t%s\n' 'olm-test.js' "$rc" >> .nightwatch/status.tsv
+          node tests/olm-test.js 2>&1 | tee '.nightwatch/logs/olm-test.js.log' || rc=$?
+          printf '%s\t%s\n' 'tests/olm-test.js' "$rc" >> .nightwatch/status.tsv
           exit "$rc"
-      - name: 'Gate: production-grader-test.js'
+      - name: 'Gate: tests/production-grader-test.js'
         id: gate_production_grader_test
         continue-on-error: true
         shell: bash
         run: |
           rc=0
-          node production-grader-test.js 2>&1 | tee '.nightwatch/logs/production-grader-test.js.log' || rc=$?
-          printf '%s\t%s\n' 'production-grader-test.js' "$rc" >> .nightwatch/status.tsv
+          node tests/production-grader-test.js 2>&1 | tee '.nightwatch/logs/production-grader-test.js.log' || rc=$?
+          printf '%s\t%s\n' 'tests/production-grader-test.js' "$rc" >> .nightwatch/status.tsv
           exit "$rc"
-      - name: 'Gate: speaking-adaptive-test.js'
+      - name: 'Gate: tests/speaking-adaptive-test.js'
         id: gate_speaking_adaptive_test
         continue-on-error: true
         shell: bash
         run: |
           rc=0
-          node speaking-adaptive-test.js 2>&1 | tee '.nightwatch/logs/speaking-adaptive-test.js.log' || rc=$?
-          printf '%s\t%s\n' 'speaking-adaptive-test.js' "$rc" >> .nightwatch/status.tsv
+          node tests/speaking-adaptive-test.js 2>&1 | tee '.nightwatch/logs/speaking-adaptive-test.js.log' || rc=$?
+          printf '%s\t%s\n' 'tests/speaking-adaptive-test.js' "$rc" >> .nightwatch/status.tsv
           exit "$rc"
-      - name: 'Gate: srl-coach-test.js'
+      - name: 'Gate: tests/srl-coach-test.js'
         id: gate_srl_coach_test
         continue-on-error: true
         shell: bash
         run: |
           rc=0
-          node srl-coach-test.js 2>&1 | tee '.nightwatch/logs/srl-coach-test.js.log' || rc=$?
-          printf '%s\t%s\n' 'srl-coach-test.js' "$rc" >> .nightwatch/status.tsv
+          node tests/srl-coach-test.js 2>&1 | tee '.nightwatch/logs/srl-coach-test.js.log' || rc=$?
+          printf '%s\t%s\n' 'tests/srl-coach-test.js' "$rc" >> .nightwatch/status.tsv
           exit "$rc"
-      - name: 'Gate: step-tutor-test.js'
+      - name: 'Gate: tests/step-tutor-test.js'
         id: gate_step_tutor_test
         continue-on-error: true
         shell: bash
         run: |
           rc=0
-          node step-tutor-test.js 2>&1 | tee '.nightwatch/logs/step-tutor-test.js.log' || rc=$?
-          printf '%s\t%s\n' 'step-tutor-test.js' "$rc" >> .nightwatch/status.tsv
+          node tests/step-tutor-test.js 2>&1 | tee '.nightwatch/logs/step-tutor-test.js.log' || rc=$?
+          printf '%s\t%s\n' 'tests/step-tutor-test.js' "$rc" >> .nightwatch/status.tsv
           exit "$rc"
       - name: 'Gate: content-audit.js'
         id: gate_content_audit
@@ -219,41 +219,41 @@ jobs:
           node grammar-quality-audit.js 2>&1 | tee '.nightwatch/logs/grammar-quality-audit.js.log' || rc=$?
           printf '%s\t%s\n' 'grammar-quality-audit.js' "$rc" >> .nightwatch/status.tsv
           exit "$rc"
-      - name: 'Gate: pwa-cache-test.js'
+      - name: 'Gate: tests/pwa-cache-test.js'
         id: gate_pwa_cache_test
         continue-on-error: true
         shell: bash
         run: |
           rc=0
-          node pwa-cache-test.js 2>&1 | tee '.nightwatch/logs/pwa-cache-test.js.log' || rc=$?
-          printf '%s\t%s\n' 'pwa-cache-test.js' "$rc" >> .nightwatch/status.tsv
+          node tests/pwa-cache-test.js 2>&1 | tee '.nightwatch/logs/pwa-cache-test.js.log' || rc=$?
+          printf '%s\t%s\n' 'tests/pwa-cache-test.js' "$rc" >> .nightwatch/status.tsv
           exit "$rc"
-      - name: 'Gate: level-grammar-contract-test.js'
+      - name: 'Gate: tests/level-grammar-contract-test.js'
         id: gate_level_grammar_contract_test
         continue-on-error: true
         shell: bash
         run: |
           rc=0
-          node level-grammar-contract-test.js 2>&1 | tee '.nightwatch/logs/level-grammar-contract-test.js.log' || rc=$?
-          printf '%s\t%s\n' 'level-grammar-contract-test.js' "$rc" >> .nightwatch/status.tsv
+          node tests/level-grammar-contract-test.js 2>&1 | tee '.nightwatch/logs/level-grammar-contract-test.js.log' || rc=$?
+          printf '%s\t%s\n' 'tests/level-grammar-contract-test.js' "$rc" >> .nightwatch/status.tsv
           exit "$rc"
-      - name: 'Gate: level-guard-test.js'
+      - name: 'Gate: tests/level-guard-test.js'
         id: gate_level_guard_test
         continue-on-error: true
         shell: bash
         run: |
           rc=0
-          node level-guard-test.js 2>&1 | tee '.nightwatch/logs/level-guard-test.js.log' || rc=$?
-          printf '%s\t%s\n' 'level-guard-test.js' "$rc" >> .nightwatch/status.tsv
+          node tests/level-guard-test.js 2>&1 | tee '.nightwatch/logs/level-guard-test.js.log' || rc=$?
+          printf '%s\t%s\n' 'tests/level-guard-test.js' "$rc" >> .nightwatch/status.tsv
           exit "$rc"
-      - name: 'Gate: level-evidence-test.js'
+      - name: 'Gate: tests/level-evidence-test.js'
         id: gate_level_evidence_test
         continue-on-error: true
         shell: bash
         run: |
           rc=0
-          node level-evidence-test.js 2>&1 | tee '.nightwatch/logs/level-evidence-test.js.log' || rc=$?
-          printf '%s\t%s\n' 'level-evidence-test.js' "$rc" >> .nightwatch/status.tsv
+          node tests/level-evidence-test.js 2>&1 | tee '.nightwatch/logs/level-evidence-test.js.log' || rc=$?
+          printf '%s\t%s\n' 'tests/level-evidence-test.js' "$rc" >> .nightwatch/status.tsv
           exit "$rc"
       - name: 'Gate: adaptivity-simulation-v3.js'
         id: gate_adaptivity_simulation_v3

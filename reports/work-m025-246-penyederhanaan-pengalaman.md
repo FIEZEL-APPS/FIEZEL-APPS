@@ -27,14 +27,14 @@ Berkas baru `fiezel-ux-flags.js` (di-precache `sw.js`, dimuat sebelum `app.js`).
 
 **Kenapa bendera, bukan `git rm`.** Lima permukaan yang disembunyikan punya mesin yang sudah
 terbukti benar dan dijaga puluhan gerbang (ujian per skill sendiri dijaga
-`speaking-exam-test.js`, `listening-exam-test.js`, `reading-exam-test.js`). Menghapus kodenya
+`tests/speaking-exam-test.js`, `tests/listening-exam-test.js`, `tests/reading-exam-test.js`). Menghapus kodenya
 berarti membuang mesin yang benar demi keputusan tampilan yang bisa dibalik minggu depan,
 sekaligus memerahkan gerbang yang tidak ada hubungannya dengan keluhan owner. Yang dimatikan
 adalah **pintunya**; mesinnya tetap hidup dan tetap diuji.
 
 `app.js` memegang salinan nilai bawaan (`UX_FALLBACK_FLAGS`) karena ~40 gerbang
 menjalankannya di konteks `vm` yang tidak memuat berkas benderanya. Duplikasi itu **berpagar**:
-`ux-flags-test.js` T3 membandingkan kedua daftar kunci demi kunci.
+`tests/ux-flags-test.js` T3 membandingkan kedua daftar kunci demi kunci.
 
 ---
 
@@ -73,7 +73,7 @@ diam-diam di background, jangan kamu sentuh." Perubahan itu direvert seluruhnya 
 dan `voicePackOptIn`/`voicePackAsked` dihapus dari `defaultPreferences` dan sanitizer.
 
 Bendera `voicePackGate` tetap didaftarkan (bukan dihapus) sebagai tempat tertulis keputusan
-itu, dan `ux-flags-test.js` T6b menjaga agar unduhannya tidak berpagar lagi.
+itu, dan `tests/ux-flags-test.js` T6b menjaga agar unduhannya tidak berpagar lagi.
 
 ---
 
@@ -119,7 +119,7 @@ hanya di kalimatnya: soal yang dilewati dikeluarkan dari **penyebut** akurasi
 Opsi ketiga — "suara peramban" — sempat dipasang atas baris brief 3 Sep, lalu **dicabut atas
 perintah OWNER 4 Sep**: "aku ga mau lagi ada tts browser, tts browser harus mati total."
 Seluruh jalurnya dihapus dari `app.js` dan dari addon, naskahnya dicabut dari copy-map, dan
-`audio-locale-guard-test.js` dikembalikan ke larangan total m025-232 (setiap sebutan
+`tests/audio-locale-guard-test.js` dikembalikan ke larangan total m025-232 (setiap sebutan
 `speechSynthesis` di zona audio maupun `app.js` memerahkan gerbang).
 
 **Prompt "Versi baru".** Ditunda selama `FiezelStage.lessonMode()` aktif, dilepas
@@ -129,7 +129,7 @@ dan kalau `flush()` tidak pernah dipanggil, pengecekan berkala berikutnya tetap 
 
 **Tipografi.** Tiga keluarga → dua. `@font-face 'FZ Fredoka'` dicabut, preload dicabut dari
 `index.html`, `Fredoka-var.woff2` dicabut dari precache `sw.js`, dan **berkasnya sendiri
-dihapus** dari `assets/fonts/`. Penghapusan berkas itu bukan kerapian: `splash-choreography-test.js`
+dihapus** dari `assets/fonts/`. Penghapusan berkas itu bukan kerapian: `tests/splash-choreography-test.js`
 menjaga kontrak "tidak boleh ada font yatim" — berkas yang tergeletak di `assets/fonts` tanpa
 satu pun aturan CSS merujuknya adalah persis alasan Fredoka dulu dilepas di m028 fase 1, karena
 ia ikut ter-precache dan dibayar setiap murid tanpa pernah tergambar. Mencabut rujukannya tapi
@@ -139,7 +139,7 @@ Cabang `else` gerbang itu — yang selama ini tidak pernah dijalankan siapa pun 
 `!/Fredoka/.test(css)`, artinya ia ikut memerahkan **komentar** yang menerangkan pencabutannya.
 Larangannya dipersempit ke KODE (komentar CSS dilucuti dulu), ditambah satu asersi baru yang
 menjaga bahaya yang sebenarnya: tidak boleh ada `url()` menunjuk berkas yang sudah tidak ada.
-Pola yang sama dipakai `audio-locale-guard-test.js` — yang dilarang pemakaiannya, bukan
+Pola yang sama dipakai `tests/audio-locale-guard-test.js` — yang dilarang pemakaiannya, bukan
 penyebutan namanya di catatan sejarah.
 
 Token `--fz-display-round` **dipertahankan** (menunjuk Jakarta 700) alih-alih dicari-ganti di
@@ -226,7 +226,7 @@ guru/murid yang baru mendarat (#336, #338) tidak disentuh.
 | Offline saat gerbang akun | `OFFLINE_AUTH_ESCAPE_MS = 3000`, memanggil `skipPuterSignIn()` yang sudah ada — kunci dilepas **dan** kuis yang tertunda ikut jalan, satu perilaku bukan dua. |
 | Autoplay | Tidak ada jalur yang memutar audio tanpa klik. Jatuh-balik suara peramban hanya berjalan dari tombolnya. |
 | Android low-end (Kokoro WASM) | Mesin utama (supertonic/sherpa) sudah berjalan di Worker. Cabang Kokoro lama — yang menjalankan WASM di jalur yang bisa membuat proses konten dihentikan OS — kini **menolak** di perangkat `deviceMemory ≤ 2` atau `hardwareConcurrency ≤ 2`. Menolak bukan berarti kehilangan suara: L1 (aset R2) dan L2 (Puter) ada di atas lapisan itu. Kalau seluruh tangga gagal, jawabannya DIAM + teks (L5) — **bukan** suara peramban. |
-| Kurangi-gerak: fallback statis maskot | `STATIC_FACE_FOR_STATE` memetakan **19** state ke 14 ekspresi statis; `setState()` memanggil `applyFace()` di bawah gerbang `_reducedMotion()`. Diverifikasi `mascot-reduced-motion-test.js`. |
+| Kurangi-gerak: fallback statis maskot | `STATIC_FACE_FOR_STATE` memetakan **19** state ke 14 ekspresi statis; `setState()` memanggil `applyFace()` di bawah gerbang `_reducedMotion()`. Diverifikasi `tests/mascot-reduced-motion-test.js`. |
 | Kompatibilitas state lama | `VALID_VIEWS` tidak dikurangi; `sanitizeState` menerima preferensi baru dengan pola fail-closed yang sama dengan `brainSync`; `progressTabSafe()` menjaga tab tersimpan yang sudah tidak ada agar tidak mengecat layar kosong. |
 
 **Suara peramban: MATI TOTAL.** L4 dicabut di m025-232 karena `speechSynthesis` punya antrean
@@ -234,7 +234,7 @@ guru/murid yang baru mendarat (#336, #338) tidak disentuh.
 suara sekaligus". Brief 3 Sep sempat memintanya kembali sebagai jalan keluar; **OWNER
 membatalkannya 4 Sep**: "tts browser harus mati total." Tidak ada suara peramban di mana pun —
 bukan lapisan, bukan tombol, bukan jalan keluar darurat. Ditegakkan
-`audio-locale-guard-test.js`.
+`tests/audio-locale-guard-test.js`.
 
 ---
 
@@ -242,28 +242,28 @@ bukan lapisan, bukan tombol, bukan jalan keluar darurat. Ditegakkan
 
 Empat gerbang baru, terdaftar di `.github/workflows/quality.yml`:
 
-- `ux-flags-test.js` — nilai bawaan tiap bendera (dengan kalimat owner sebagai alasan), tidak
+- `tests/ux-flags-test.js` — nilai bawaan tiap bendera (dengan kalimat owner sebagai alasan), tidak
   ada bendera liar, salinan `app.js` tidak menyimpang, nama tak dikenal gagal ke `false`,
   berkasnya benar-benar dimuat sebelum `app.js` dan ikut precache, dan tiap bendera
   benar-benar **dibaca** kode yang dikirim.
-- `ux-redesign-test.js` — dua belas blok (A–L) yang menahan satu janji brief masing-masing.
-- `night-theme-test.js` — dua pintu aktivasi identik token demi token, `:not([data-theme="light"])`
+- `tests/ux-redesign-test.js` — dua belas blok (A–L) yang menahan satu janji brief masing-masing.
+- `tests/night-theme-test.js` — dua pintu aktivasi identik token demi token, `:not([data-theme="light"])`
   terpasang, palet turun dari `--core*`, `<html>` tidak memaku tema, kontras AA, tiga keadaan
   di pengelola tema.
-- `mascot-reduced-motion-test.js` — setiap state punya bingkai statis, setiap bingkai menunjuk
+- `tests/mascot-reduced-motion-test.js` — setiap state punya bingkai statis, setiap bingkai menunjuk
   ekspresi yang ada, jalurnya benar-benar dipanggil `setState()` sebelum `_choreo`, dan
   gerbangnya membaca kedua sumber kurangi-gerak.
 
 Gerbang yang **diperbarui** karena kontraknya memang berubah:
-`ui-structure-test.js` (lima tab → empat, dan angkanya kini plafon yang diminta owner),
-`a11y-test.js` (pola lama `class="nav"` melewatkan tab aktif — pola baru menangkap keduanya),
-`classroom-test.js` (hitungan tab), `onboarding-test.js` (stub bendera + lima asersi alur
+`tests/ui-structure-test.js` (lima tab → empat, dan angkanya kini plafon yang diminta owner),
+`tests/a11y-test.js` (pola lama `class="nav"` melewatkan tab aktif — pola baru menangkap keduanya),
+`tests/classroom-test.js` (hitungan tab), `tests/onboarding-test.js` (stub bendera + lima asersi alur
 ringkas; ~35 asersi lama tetap menguji alur lengkap dengan bendera dimatikan),
-`analytics-client-test.js` dan `analytics-server-only-test.js` (delapan event klien jadi
+`tests/analytics-client-test.js` dan `tests/analytics-server-only-test.js` (delapan event klien jadi
 sepuluh, delapan belas event terdaftar jadi dua puluh — angkanya sengaja tetap dipaku tangan
 supaya setiap event telemetri baru melewati review manusia).
 
-`splash-choreography-test.js` — cabang `else` Fredoka dipersempit ke kode (lihat §3
+`tests/splash-choreography-test.js` — cabang `else` Fredoka dipersempit ke kode (lihat §3
 Tipografi); asersi wajah-bulat/serif/precache lainnya tidak disentuh.
 
 Baseline emas `id-golden-baseline.json` diregenerasi — perubahan naskah di gelombang ini
@@ -294,12 +294,12 @@ konflik merge; hijau begitu diulang). Delapan sisanya nyata, dan pembagiannya pe
 
 **Milik gelombang ini (empat):**
 
-1. **`voice-fallback-chain-test.js`** — naskah gagal-audio yang saya tulis ulang menghapus dua
+1. **`tests/voice-fallback-chain-test.js`** — naskah gagal-audio yang saya tulis ulang menghapus dua
    janji yang dijaga gerbang: "tidak dinilai" dan "tidak dikunci". Kalimatnya benar secara
    aritmetika (soal yang dilewati memang keluar dari penyebut) tetapi murid tidak membaca
    aritmetika; ia membaca kalimat. Dikembalikan: *"Soal yang dilewati karena audio gagal tidak
    dinilai, dan sesimu tidak dikunci."*
-2. **`ui-render-audit-test.js` T3** — judul halaman 1,12:1 di Tema Malam pada `vocab` dan
+2. **`tests/ui-render-audit-test.js` T3** — judul halaman 1,12:1 di Tema Malam pada `vocab` dan
    `reading`. Sebabnya bukan token: `--ambient-text`, `--sky-*`, dan palet malam semuanya
    BENAR. Kelas fase langit (`.scene-day` dst) dipasang di `<body>` dan MENDEFINISIKAN ULANG
    `--sky-*` di elemen itu, jadi ia menang atas nilai malam di `:root` maupun nilai inline
@@ -307,10 +307,10 @@ konflik merge; hijau begitu diulang). Delapan sisanya nyata, dan pembagiannya pe
    judul `#FDFAF3`. Diperbaiki dengan `--sky-*:inherit` di bawah kedua pintu tema gelap —
    bukan nilai gelap yang dipaku, supaya animasi fase tetap hidup kalau `scenePhases`
    dinyalakan lagi.
-3. **`reset-side-state-test.js`** — `ACCOUNT_NUDGE_KEY` lolos reset tanpa keputusan. Dimasukkan
+3. **`tests/reset-side-state-test.js`** — `ACCOUNT_NUDGE_KEY` lolos reset tanpa keputusan. Dimasukkan
    ke daftar hapus, bukan dikecualikan: sesudah reset murid memang tidak punya akun lagi, jadi
    dorongan mencadangkan progres justru kembali berguna.
-4. **`r2-ux-overhaul-smoke-test.js` + `experience-integration-test.js`** — dua asersi memaku
+4. **`tests/r2-ux-overhaul-smoke-test.js` + `tests/experience-integration-test.js`** — dua asersi memaku
    BENTUK tata letak lama (kelas `coach-strip-go`, keberadaan kartu Classroom di Home,
    keberdampingan `nextSessionPanelMarkup()}${journeyMarkup()`, dan lima nama pertama
    `VALID_VIEWS` berikut urutannya). Semuanya dibalik ke janjinya: Home punya TEPAT satu tombol
@@ -318,7 +318,7 @@ konflik merge; hijau begitu diulang). Delapan sisanya nyata, dan pembagiannya pe
    dari Home, `journeyMarkup()` ada di template Ringkasan, dan kelima rute wajib ada di
    `VALID_VIEWS` di mana pun letaknya.
 
-5. **`braincore-learner-identity-test.js`** — akibat langsung dari perbaikan (3) di atas.
+5. **`tests/braincore-learner-identity-test.js`** — akibat langsung dari perbaikan (3) di atas.
    Gerbang itu memaku dua penanda lane per-murid sebagai DUA ANGGOTA TERAKHIR daftar reset
    (`...ATTEMPT_KEY,LEARNER_NAME_SYNC_KEY]`), jadi menambahkan `ACCOUNT_NUDGE_KEY` sesudahnya
    memerahkannya tanpa satu janji pun yang dilanggar. Dibalik ke keanggotaan: kedua kunci wajib
@@ -331,19 +331,19 @@ konflik merge; hijau begitu diulang). Delapan sisanya nyata, dan pembagiannya pe
 
 | Gerbang | Sebab di `main` | Yang diporting ke sini |
 |---|---|---|
-| `id-golden-snapshot-test.js` | 95 literal Ruang Guru tanpa regenerasi baseline | baseline diregenerasi (memuat naskah kedua belah pihak) |
-| `social-frontend-test.js` | `contains(` bukan `contains?.(` di `renderInner()` | `main` memperbaikinya sendiri (e3afd0d8) beberapa menit setelah cabang ini |
-| `gate-registry-test.js` | `auth-account-test.js` ada di repo tapi tidak pernah didaftarkan | didaftarkan di `quality.yml` (gerbangnya hijau; yang hilang cuma barisnya) |
-| `app-interaction-policy-test.js` | `.auth-field-label input:focus` — `:focus` telanjang | jadi `:focus-visible` (nol perubahan perilaku untuk kolom teks) |
-| `secret-scan-test.js` | fixture kata sandi yang sengaja SALAH di `auth-account-test.js:175` | entri allowlist beralasan (didaftarkan lewat digest, per-berkas) |
+| `tests/id-golden-snapshot-test.js` | 95 literal Ruang Guru tanpa regenerasi baseline | baseline diregenerasi (memuat naskah kedua belah pihak) |
+| `tests/social-frontend-test.js` | `contains(` bukan `contains?.(` di `renderInner()` | `main` memperbaikinya sendiri (e3afd0d8) beberapa menit setelah cabang ini |
+| `tests/gate-registry-test.js` | `tests/auth-account-test.js` ada di repo tapi tidak pernah didaftarkan | didaftarkan di `quality.yml` (gerbangnya hijau; yang hilang cuma barisnya) |
+| `tests/app-interaction-policy-test.js` | `.auth-field-label input:focus` — `:focus` telanjang | jadi `:focus-visible` (nol perubahan perilaku untuk kolom teks) |
+| `tests/secret-scan-test.js` | fixture kata sandi yang sengaja SALAH di `tests/auth-account-test.js:175` | entri allowlist beralasan (didaftarkan lewat digest, per-berkas) |
 
-Nilai fixture itu sengaja TIDAK dikutip di laporan ini. Allowlist `secret-scan-test.js`
+Nilai fixture itu sengaja TIDAK dikutip di laporan ini. Allowlist `tests/secret-scan-test.js`
 memaafkan digest **per berkas** — itu pagarnya, bukan kelalaiannya — jadi menuliskan nilainya di
 sini akan memerahkan gerbang lagi di berkas yang berbeda, dan "perbaikannya" akan berupa entri
 allowlist kedua untuk sebuah dokumen. Yang benar adalah dokumen tidak perlu memuat polanya.
 
 Kenapa empat kegagalan `main` baru terlihat sekarang: CI `main` berhenti di
-`id-golden-snapshot-test.js` (baris 244 `quality.yml`) dan tidak pernah sampai ke gerbang
+`tests/id-golden-snapshot-test.js` (baris 244 `quality.yml`) dan tidak pernah sampai ke gerbang
 sesudahnya. Begitu baseline diperbaiki di cabang ini, sisanya ikut terlihat satu per satu.
 Semuanya diporting karena tanpa itu PR ini tidak bisa hijau; tiap perbaikan akan no-op begitu
 `main` memperbaiki miliknya sendiri.

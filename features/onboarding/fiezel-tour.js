@@ -104,7 +104,7 @@
    * (app.js), supaya ikut backup/restore dan tidak bocor antar akun Puter.
    *
    * Semua teks di bawah ini VERBATIM dari reports/copy-tour-gems.md (§1 menu, §2 audiobook,
-   * §3 listening). Gate `tours-test.js` membandingkannya karakter demi karakter; kalau copy
+   * §3 listening). Gate `tests/tours-test.js` membandingkannya karakter demi karakter; kalau copy
    * berubah, ubah laporan copy-nya dan gate-nya sekaligus, bukan diam-diam di sini.
    *
    * Semua selector di bawah ini DIVERIFIKASI hidup pada 390x844 lewat serve+Playwright

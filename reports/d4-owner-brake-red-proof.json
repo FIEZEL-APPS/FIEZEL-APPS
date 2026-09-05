@@ -1,7 +1,7 @@
 {
   "schema": "fiezel-d4-owner-brake-red-proof-v1",
   "generatedAt": "2026-08-28T15:43:53.089Z",
-  "gate": "owner-edge-guard-test.js",
+  "gate": "tests/owner-edge-guard-test.js",
   "mutations": [
     {
       "id": "M1-rem-kembali-per-isolate",

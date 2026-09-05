@@ -15,7 +15,7 @@ mengukur:
 Reproducible pada HTTP/2 **maupun** HTTP/1.1. **Tidak terlihat oleh `curl`** apa adanya,
 karena satu proses `curl` = satu koneksi baru; ia tidak pernah menganyam tiga permintaan
 di atas satu koneksi keep-alive seperti browser. Itu juga sebabnya
-`cf-live-contract-test.js` (33 assert hijau) tidak menangkapnya — ia menguji hal lain, dan
+`tests/cf-live-contract-test.js` (33 assert hijau) tidak menangkapnya — ia menguji hal lain, dan
 itu bukan kelemahannya.
 
 Akibat nyatanya: aplikasi murid yang menembak `/api/config` → `/api/user/me` →
@@ -61,11 +61,11 @@ Pertukarannya disengaja: respons yang benar lebih penting daripada respons yang 
 Nyalakan lagi satu per satu, masing-masing dengan satu jalannya gerbang E2E browser +
 satu pengukuran `tools/edge-latency-probe.mjs`.
 
-## 3. Gerbang baru: `edge-proxy-hopbyhop-test.js`
+## 3. Gerbang baru: `tests/edge-proxy-hopbyhop-test.js`
 
 Node murni, **nol jaringan**, nol berkas temporer. Memuat **kedua** sumber PHP sebagai
 teks (komentar dibuang tapi jumlah baris dipertahankan, pola yang sama dengan
-`edge-proxy-contract-test.js` — kedua berkas menyebut nama header hop-by-hop di dalam
+`tests/edge-proxy-contract-test.js` — kedua berkas menyebut nama header hop-by-hop di dalam
 prosanya, dan detektor yang membaca komentar akan menghukum dokumentasi yang benar).
 **133/133 assert PASS.** Laporan: `EDGE-PROXY-HOPBYHOP-REPORT.json`.
 
@@ -131,9 +131,9 @@ dibaca dari sumber, bukan pencocokan pola yang bisa lolos setengah.
 - `deploy/edge/api-index.php` — docblock F4 + `[F4-1]`…`[F4-7]`.
 - `deploy/edge/owner-index.php` — docblock F4 + `[F4-1]`, `[F4-3]`, `[F4-4]`, `[F4-5]`,
   `CONNECT_S` 8 → 4.
-- `edge-proxy-hopbyhop-test.js` — **baru**.
+- `tests/edge-proxy-hopbyhop-test.js` — **baru**.
 - `.github/workflows/quality.yml` — gerbang baru terdaftar tepat sesudah
-  `edge-proxy-contract-test.js`, dengan alasan penempatannya.
+  `tests/edge-proxy-contract-test.js`, dengan alasan penempatannya.
 - `deploy/edge/README.md` — **§5e baru**: pengukuran, tabel lima hipotesis, batas gerbang,
   dan **§5e.4 langkah verifikasi pemilik** (5 permintaan berurutan pada satu koneksi via
   `--next`, cadangan `-H 'Connection: keep-alive'`, cara membaca `http_code`/`time_total`/
@@ -141,10 +141,10 @@ dibaca dari sumber, bukan pencocokan pola yang bisa lolos setengah.
   hipotesis 5 baru masuk giliran).
 - `reports/add-a5-data/e2e-bridge-live-2026-08-28.json` — **temuan sampingan yang harus
   disebut**: berkas bukti dari commit `c1ee32e` memuat **nilai cookie sungguhan**
-  (`fz_id=` JWT identitas + `AWSALB`/`AWSALBCORS`), dan `secret-scan-test.js` sudah merah
+  (`fz_id=` JWT identitas + `AWSALB`/`AWSALBCORS`), dan `tests/secret-scan-test.js` sudah merah
   karena itu **sebelum** kerja ini dimulai (dipastikan dengan `git stash` di tree bersih).
   Nilai-nilai itu **diredaksi**; struktur JSON, jumlah entri, dan makna buktinya utuh, dan
-  `e2e-bridge-selftest.js` tetap hijau. Nilai `fz_id` yang ter-commit itu **tetap harus
+  `tests/e2e-bridge-selftest.js` tetap hijau. Nilai `fz_id` yang ter-commit itu **tetap harus
   dianggap bocor**: redaksi menutup repo ke depan, ia tidak menarik kembali apa yang sudah
   ada di riwayat git. Kalau token itu masih berlaku, master perlu memutar `AUTH_PEPPER`/
   kunci penanda tangan sesi. Itu keputusan master, bukan keputusan agen.
@@ -155,15 +155,15 @@ Semua exit 0:
 
 | Gerbang | Hasil |
 |---|---|
-| `edge-proxy-hopbyhop-test.js` (baru) | 133/133 assert PASS |
-| `edge-proxy-contract-test.js` | 120/120 assert PASS |
-| `edge-guard-test.js` | 119/119 assert PASS |
-| `owner-edge-guard-test.js` | 576/576 assert PASS |
-| `secret-scan-test.js` | 46/46 assert PASS, 0 temuan |
-| `no-network-test.js` | PASS (38 assert, 146 gerbang dipindai) |
-| `e2e-bridge-selftest.js` | PASS (32 assert, 21 skenario loopback) |
-| `regression-test.js` | PASS |
-| `install-health-test.js` | PASS |
+| `tests/edge-proxy-hopbyhop-test.js` (baru) | 133/133 assert PASS |
+| `tests/edge-proxy-contract-test.js` | 120/120 assert PASS |
+| `tests/edge-guard-test.js` | 119/119 assert PASS |
+| `tests/owner-edge-guard-test.js` | 576/576 assert PASS |
+| `tests/secret-scan-test.js` | 46/46 assert PASS, 0 temuan |
+| `tests/no-network-test.js` | PASS (38 assert, 146 gerbang dipindai) |
+| `tests/e2e-bridge-selftest.js` | PASS (32 assert, 21 skenario loopback) |
+| `tests/regression-test.js` | PASS |
+| `tests/install-health-test.js` | PASS |
 
 ## 6. Yang BELUM terbukti — batas jujurnya
 

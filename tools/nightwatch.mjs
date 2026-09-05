@@ -155,12 +155,12 @@ if (cek && cek.galat) {
 }
 
 /* ---------------------------------------------------- 3-5. penjaga koordinasi ----------- */
-const guard = shAman('node coordination-guard-test.js');
+const guard = shAman('node tests/coordination-guard-test.js');
 if (guard && guard.galat) {
-  lapor('kritis', 'KOORDINASI_MERAH', 'coordination-guard-test.js MERAH: penanda konflik ter-commit, klaim bertumpang-tindih, atau versi tidak selaras. Baca MASTER-BROADCAST.md prosedur P10.', String(guard.galat).slice(0, 600));
+  lapor('kritis', 'KOORDINASI_MERAH', 'tests/coordination-guard-test.js MERAH: penanda konflik ter-commit, klaim bertumpang-tindih, atau versi tidak selaras. Baca docs/MASTER-BROADCAST.md prosedur P10.', String(guard.galat).slice(0, 600));
 }
 
-const registry = shAman('node gate-registry-test.js');
+const registry = shAman('node tests/gate-registry-test.js');
 if (registry && registry.galat) {
   lapor('kritis', 'GERBANG_TAK_TERDAFTAR', 'Ada berkas uji di repo yang tidak dipanggil quality.yml. Gerbang yang tidak terdaftar tidak pernah merah, jadi "semua hijau" jadi angka bohong.', String(registry.galat).slice(0, 600));
 }

@@ -8,8 +8,8 @@ sama sekali, dan tidak satu pun berkas yang dimuat oleh harness proof ini beruba
 
 Repo: `/home/user/workspace/FIEZEL-APPS`, branch `main`, HEAD `b43152d`. Tidak ada commit,
 push, atau perubahan kode produksi yang dilakukan. Berkas kerja yang saya tambahkan hanya
-harness lokal (`m02526-probe.html`, `m02526-local-runner.mjs`, `m02526-repeat*.mjs`,
-`m02526-pre-e1-runner.mjs`) — belum di-stage, silakan hapus.
+harness lokal (`tools/dev/m02526-probe.html`, `tools/dev/m02526-local-runner.mjs`, `m02526-repeat*.mjs`,
+`tools/dev/m02526-pre-e1-runner.mjs`) — belum di-stage, silakan hapus.
 
 ---
 
@@ -36,7 +36,7 @@ $ git show --stat --format="" ec2b119
  app.js                                                   |  72 +-
  features/neural-voice/fiezel-voice-say.js                | 109 +-
  features/speaking-listening/fiezel-speaking-listening-addon.js | 89 +-
- voice-fallback-chain-test.js                             | 510 ++
+ tests/voice-fallback-chain-test.js                             | 510 ++
 ```
 
 Rantai: `ec2b119` (E1, 22:24) → `2c60ab7` (m031 Worker CF, 23:10) → `b43152d` (00:06).
@@ -58,7 +58,7 @@ Probe page dibuat inline di workflow dan memuat **tepat tujuh** skrip
 
 Tidak ada `fiezel-voice-say.js`. Tidak ada `fiezel-speaking-listening-addon.js`. Tidak ada
 `app.js`. Probe juga **tidak** memuat `core-config.js` dan **tidak** mendaftarkan service
-worker (`grep -c "core-config\|serviceWorker" m02526-probe.html` → `0`), jadi bump
+worker (`grep -c "core-config\|serviceWorker" tools/dev/m02526-probe.html` → `0`), jadi bump
 `FIEZEL_PAGE_BUILD` dan `SW_REV` di b43152d pun tidak terlihat olehnya. Nama cache neural
 adalah `fiezel-v${version}` (`features/neural-voice/fiezel-neural-voice-bootstrap.js:9`)
 yang bersumber dari `window.FIEZEL_VERSION='5.19.0'` yang di-hardcode probe di
@@ -209,7 +209,7 @@ probe yang sama, server yang sama, port yang sama) dua kali lagi memberi kegagal
 di `prepare()`, tanpa satu baris kode berubah:
 
 ```
-$ node m02526-repeat2.mjs   # dan m02526-repeat3.mjs
+$ node tools/dev/m02526-repeat2.mjs   # dan tools/dev/m02526-repeat3.mjs
 "engine": null, "plays": [], "success": false,
 "errors": ["Offline voice storage failed: vendor/supertonic-3/sherpa-onnx-wasm-main-tts.wasm
            · Failed to execute 'put' on 'Cache': Cache.put() encountered a network error"]
@@ -240,7 +240,7 @@ tree yang identik pada kode yang dieksekusi tidak bisa berperilaku berbeda karen
 ## 8. Gerbang E1 sendiri hijau
 
 ```
-$ node voice-fallback-chain-test.js
+$ node tests/voice-fallback-chain-test.js
 FIEZEL tangga suara: PASS (45 pass, 0 fail)
 ```
 
@@ -272,7 +272,7 @@ Yang layak diperbaiki adalah **workflow-nya**, bukan kode suara:
    assertion, tapi ia menambah noise pada setiap investigasi.
 4. **Kalau harness E1 memang ingin diuji**, workflow ini bukan tempatnya — ia sama sekali
    tidak memuat `fiezel-voice-say.js`, `app.js`, atau addon listening. Gerbang node
-   `voice-fallback-chain-test.js` (sudah terdaftar di `quality.yml`) adalah gerbang E1.
+   `tests/voice-fallback-chain-test.js` (sudah terdaftar di `quality.yml`) adalah gerbang E1.
 
 ### Satu risiko produksi yang tetap layak diawasi (di luar lingkup kegagalan ini)
 
@@ -294,5 +294,5 @@ Semua di `/home/user/workspace/reports/audit-safari-proof-evidence/`:
 | `m02526-run1.json`, `m02526-run2.json` | hasil probe di b43152d — 13/13 assertion lulus |
 | `rep2-out.txt`, `rep3-out.txt` | dua rerun tree identik yang GAGAL — bukti nondeterminisme |
 | `pre-e1-run1.json` | run worktree pra-E1 (inkonklusif, `Cache.put()`) |
-| `m02526-probe.html` | probe page verbatim dari workflow |
-| `m02526-local-runner.mjs` | driver Playwright/Chromium |
+| `tools/dev/m02526-probe.html` | probe page verbatim dari workflow |
+| `tools/dev/m02526-local-runner.mjs` | driver Playwright/Chromium |

@@ -1,6 +1,6 @@
 /**
  * FIEZEL · features/i18n/copy-th-feat-a.js — COPY-MAP THAI, domain features A–M (W3-COPY-C)
- * (splash, daily-target, install-health, academic-readiness, diagnostics, brain A–M, pustaka).
+ * (splash, install-health, academic-readiness, diagnostics, brain A–M, pustaka).
  *
  * ⚠ DRAFT AI — seluruh nilai Thai di berkas ini adalah terjemahan draft AI dan WAJIB
  * direview penutur asli sebelum rilis (keputusan provisional orkestrator, IMPL-BRIEF).
@@ -30,17 +30,6 @@
   I18N.registerCopy('th', {
     // ---------- splash.* ----------
     'splash.welcome-aria': 'ยินดีต้อนรับสู่ FIEZEL',
-
-    // ---------- daily.* ----------
-    'daily.lock-mark': '<div class="daily-lock-mark">เป้าหมายรายวัน FIEZEL · ต้องทำ</div>',
-    'daily.lock-title': '<h2>เป้าหมายวันนี้ยังไม่เสร็จ</h2>',
-    'daily.lock-body': '<p>FIEZEL ประเมินว่าวันนี้คุณควรทำ <b>{total} ข้อ</b> เหลืออีก <b>{remaining}</b> ข้อ แอปจะเปิดเต็มรูปแบบเมื่อเป้าหมายเสร็จ</p>',
-    'daily.lock-count': '<p class="daily-lock-count">{done} / {total} ข้อ</p>',
-    'daily.lock-start-btn': '<button type="button" class="primary wide" id="dailyLockStart">ทำเลยตอนนี้</button>',
-    'daily.lock-note': '<p class="daily-lock-note">ออกจากแอปไม่ได้ทำให้เป้าหมายหายไป กลับมาเมื่อไหร่ เป้าหมายนี้ยังรออยู่</p>',
-    'daily.lock-aria': 'เป้าหมายรายวัน FIEZEL',
-    'daily.done-toast': 'เป้าหมายรายวันเสร็จแล้ว แอปเปิดเต็มรูปแบบแล้ว',
-    'daily.finish-first-toast': 'ทำเป้าหมายรายวันให้เสร็จก่อนนะ',
 
     // ---------- health.* ----------
     'health.build-unreadable-title': 'อ่านตัวระบุ build ไม่ได้',

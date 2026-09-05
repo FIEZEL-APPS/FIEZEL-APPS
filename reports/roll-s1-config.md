@@ -19,9 +19,9 @@ pun yang bisa dimatikan, dan pengambil sengaja tidak menembak server sama sekali
 | `app.js` | Blok BARU `CF-KILLSWITCH-BEGIN/END` (±200 baris, tepat di depan blok transport): pengambil `GET /api/config`, penggabungan AND, cermin `sessionStorage` 5 menit, snapshot untuk panel, `self.FiezelCfKillSwitch`. |
 | `app.js` (transport) | `cfEndpointMode()` kini meminta izin lapis server: `if(self.FiezelCfKillSwitch?.allows?.(key)!==true)return 'off'`. Tiga baris; sisa blok transport utuh. |
 | `features/neural-voice/fiezel-diag-panel.js` | Field `cfKillSwitch` di `collectSync()`, membaca `FiezelCfKillSwitch.snapshot()` (bukan memparse ulang). |
-| `cf-shadow-mode-test.js` | Harness menyuntikkan stub kill switch permisif + DUA assert baru: tanpa stub, jalur CF mati (fail-closed); izin `false` mematikan endpoint statis `'on'`. 36 → **38 assert**. |
-| `cf-config-killswitch-test.js` | **BARU** — 58 assert, node murni (`vm` + mock `fetch`), menjalankan blok kill switch **dan** blok transport bersama-sama. |
-| `.github/workflows/quality.yml` | `node cf-config-killswitch-test.js` sesudah `cf-shadow-mode-test.js`. |
+| `tests/cf-shadow-mode-test.js` | Harness menyuntikkan stub kill switch permisif + DUA assert baru: tanpa stub, jalur CF mati (fail-closed); izin `false` mematikan endpoint statis `'on'`. 36 → **38 assert**. |
+| `tests/cf-config-killswitch-test.js` | **BARU** — 58 assert, node murni (`vm` + mock `fetch`), menjalankan blok kill switch **dan** blok transport bersama-sama. |
+| `.github/workflows/quality.yml` | `node tests/cf-config-killswitch-test.js` sesudah `tests/cf-shadow-mode-test.js`. |
 
 Tidak ada bump invarian build: `FIEZEL_PAGE_BUILD`/`DIAG_BUILD`/`SW_REV` tetap `m025-172`
 (di-assert oleh gerbang baru). Tidak ada berkas baru di `features/`, jadi tidak ada
@@ -136,10 +136,10 @@ kegagalan), `gabungan` (tujuh mode yang BENAR-BENAR dipakai transport), dan
 Snapshot tidak membawa alamat server, token, atau nilai rahasia apa pun — dump panel ini
 ditempel ke chat, jadi itu syarat, bukan selera. Di-assert.
 
-## 6. Gerbang `cf-config-killswitch-test.js` (58 assert, PASS)
+## 6. Gerbang `tests/cf-config-killswitch-test.js` (58 assert, PASS)
 
 Node murni, nol dependency, nol jaringan (`fetchMock` lokal — pola yang dikenali
-`no-network-test.js`, 120 gerbang dipindai, PASS). Ia memotong **kedua** blok dari `app.js`
+`tests/no-network-test.js`, 120 gerbang dipindai, PASS). Ia memotong **kedua** blok dari `app.js`
 lewat sentinel dan menjalankannya bersama di `vm`, dengan `requestIdleCallback` yang DIREKAM
 (bukan dijalankan) supaya (g) bisa dibuktikan.
 

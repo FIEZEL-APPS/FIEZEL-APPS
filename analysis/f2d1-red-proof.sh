@@ -8,7 +8,7 @@
 # Jalankan dari akar repo:  bash analysis/f2d1-red-proof.sh
 set -u
 cd "$(dirname "$0")/.."
-GATE=d1-schema-contract-test.js
+GATE=tests/d1-schema-contract-test.js
 
 say() { printf '\n=== %s ===\n' "$1"; }
 status() { node "$GATE" >/tmp/f2d1-gate.out 2>/tmp/f2d1-gate.err; echo "exit=$?"; tail -4 /tmp/f2d1-gate.err; }
@@ -72,4 +72,4 @@ git checkout -- workers/api/migrations/0003_cron.sql
 # --------------------------------------------------------------------------
 say "4. PULIH: repo kembali bersih (harus LULUS lagi)"
 status
-git status --porcelain workers/api d1-schema-contract-test.js tools || true
+git status --porcelain workers/api tests/d1-schema-contract-test.js tools || true

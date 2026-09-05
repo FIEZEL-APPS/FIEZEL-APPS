@@ -110,7 +110,7 @@ body.fz-stage-sl .fsl-feedback{padding-bottom:120px}
 /* ===== I9 2026-08-28 (O5 §5.3 + Fase 8): sesi dengar = audio pahlawan =====
    Nilai hanya dari token v6 - tidak ada hex mentah baru di blok ini. */
 /* Ekonomi gem keluar dari zona latihan aktif (O1-002) - markup gemBarMarkup() TETAP
-   (kontrak gems-test.js + tur: #fslGemChip, #fslTranslateToggle), posisinya turun ke
+   (kontrak tests/gems-test.js + tur: #fslGemChip, #fslTranslateToggle), posisinya turun ke
    kaki kartu dan mengecil. Chip & toggle tetap ≥44px (aturan target sentuh). */
 .fsl-gem-footer{margin-top:14px;padding-top:12px;border-top:1px solid var(--line-soft)}
 .fsl-gem-footer .fsl-gem-bar{margin:0;font-size:.82rem;opacity:.92}

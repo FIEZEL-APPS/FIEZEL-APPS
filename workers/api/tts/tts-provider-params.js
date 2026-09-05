@@ -12,7 +12,7 @@
  *
  * Karena itu nama parameter dan voice bawaan tidak boleh hidup di dua berkas. Keduanya hidup di
  * SINI, dan `route-tts.js` maupun `tools/prerender-tts.mjs` sama-sama membangun badan permintaan
- * lewat `buildProviderInput()`. Gerbang `tts-provider-contract-test.js` membandingkan hasil kedua
+ * lewat `buildProviderInput()`. Gerbang `tests/tts-provider-contract-test.js` membandingkan hasil kedua
  * jalur secara programatik — bukan dengan dua daftar hardcode yang bisa menyimpang diam-diam.
  *
  * DASAR NAMA PARAMETER (bukan tebakan; sumbernya ada di repo ini):

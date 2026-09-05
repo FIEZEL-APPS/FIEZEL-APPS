@@ -7,7 +7,7 @@
  * ==========================================================================
  * Repo ini menuntut berkas migrasi (sumber resmi) dan DDL runtime (jalur
  * `ensureAuthSchema`, ada karena token CI tidak bisa `wrangler d1 execute
- * --remote`) SETARA pernyataan-per-pernyataan — `auth-schema-contract-test.js`
+ * --remote`) SETARA pernyataan-per-pernyataan — `tests/auth-schema-contract-test.js`
  * memerahkan selisihnya. Dua berkas yang wajib identik dan ditulis tangan akan
  * menyimpang pada suntingan berikutnya; yang satu diturunkan dari yang lain
  * tidak bisa.
@@ -18,7 +18,7 @@
  * ==========================================================================
  * BUKTI PEMAKAIAN INDEKS (INDEX_PROOF di bawah)
  * ==========================================================================
- * `d1-schema-contract-test.js` menolak indeks yang tidak punya kueri nyata yang
+ * `tests/d1-schema-contract-test.js` menolak indeks yang tidak punya kueri nyata yang
  * memakainya — pada plan gratis, indeks tanpa kueri adalah baris tertulis
  * sia-sia pada setiap INSERT selamanya. Gerbang itu TIDAK menerima komentar
  * sebagai bukti dengan sendirinya: string kueri yang dikutip harus BENAR-BENAR
@@ -83,7 +83,7 @@ function pretty(stmt) {
     if (!proof) {
       throw new Error(
         'indeks `' + index[1] + '` tidak punya entri INDEX_PROOF. Tambahkan kueri '
-        + 'NYATA yang memakainya, atau buang indeksnya — d1-schema-contract-test.js '
+        + 'NYATA yang memakainya, atau buang indeksnya — tests/d1-schema-contract-test.js '
         + 'akan menolaknya juga.'
       );
     }
@@ -117,7 +117,7 @@ const HEAD_AUTH = `-- 0011_auth_roles.sql — skema AKUN, PERAN, UNDANGAN GURU, 
 --
 -- PENERAPAN: token CI juga tidak bisa \`wrangler d1 execute --remote\`. Runtime
 -- punya \`ensureAuthSchema()\` yang menerapkan DDL YANG SAMA secara idempoten.
--- Berkas ini TETAP SUMBER RESMI; gerbang \`auth-schema-contract-test.js\`
+-- Berkas ini TETAP SUMBER RESMI; gerbang \`tests/auth-schema-contract-test.js\`
 -- menegakkan keduanya setara pernyataan-per-pernyataan (ternormalisasi).
 --
 -- ==========================================================================
@@ -182,7 +182,7 @@ const HEAD_TEACHER = `-- 0012_teacher_content.sql — hierarki konten guru (subj
 -- HARGA YANG DIBAYAR, disebut supaya jujur: D1 tidak bisa menegakkan "induk
 -- sebuah lesson wajib bertipe topic" lewat FK. Penegakannya ada di
 -- \`checkParent()\` (workers/api/teacher/content-core.js) dan gerbang
--- \`teacher-content-test.js\` mengujinya langsung. Aturan yang ditegakkan kode
+-- \`tests/teacher-content-test.js\` mengujinya langsung. Aturan yang ditegakkan kode
 -- WAJIB punya gerbang; itu syarat memilih desain ini.
 --
 -- TANPA FK CASCADE lintas paket (pola yang sama dengan 0006_social.sql) supaya

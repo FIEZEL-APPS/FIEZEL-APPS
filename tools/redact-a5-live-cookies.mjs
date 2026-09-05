@@ -4,7 +4,7 @@
  *
  * Kenapa: artefak itu hasil uji E2E terhadap jembatan PRODUKSI, dan ia menyimpan nilai
  * `fz_id` (token sesi pengguna 8d6a635e-...) plus cookie AWS ALB apa adanya.
- * `secret-scan-test.js` sudah MERAH karena itu sebelum pekerjaan F5 dimulai - jadi ini
+ * `tests/secret-scan-test.js` sudah MERAH karena itu sebelum pekerjaan F5 dimulai - jadi ini
  * cacat yang ada, bukan yang saya buat. Memasukkannya ke allowlist akan salah: ini bukan
  * fixture, ini kredensial sungguhan.
  *

@@ -49,7 +49,7 @@
 
   /* ---------------------------------------------------------------- enum */
   /* Daftar ini WAJIB identik dengan workers/api/evidence/evidence-core.js.
-   * `braincore-evidence-test.js` mengadu kedua berkas dan memerah kalau
+   * `tests/braincore-evidence-test.js` mengadu kedua berkas dan memerah kalau
    * menyimpang: klien yang mengirim nilai yang ditolak server akan retry
    * selamanya tanpa ada yang tahu. */
   var LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1'];

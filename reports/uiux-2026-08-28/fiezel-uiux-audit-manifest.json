@@ -14,18 +14,18 @@
   {
    "id": "02-001",
    "screen": "all (documentation vs product)",
-   "route": "/ (DESIGN-SYSTEM.md, website/)",
+   "route": "/ (docs/DESIGN-SYSTEM.md, website/)",
    "component": "design tokens documentation",
    "state": "static",
    "viewport": "all",
    "issue": "Canonical design doc contradicts shipped product on brand accent (#8C2233 maroon vs #C2402C terracotta), gold value (#d8b36b vs #C9A24B), heading font (Fredoka vs Plus Jakarta Sans), and dark mode (documented but removed). The marketing site (website/tokens.css) still ships the maroon palette, so app and website present two different brands.",
    "severity": "P2",
    "evidence": [
-    "DESIGN-SYSTEM.md:22",
-    "DESIGN-SYSTEM.md:25",
-    "DESIGN-SYSTEM.md:34",
-    "DESIGN-SYSTEM.md:48-52",
-    "DESIGN-SYSTEM.md:73-74",
+    "docs/DESIGN-SYSTEM.md:22",
+    "docs/DESIGN-SYSTEM.md:25",
+    "docs/DESIGN-SYSTEM.md:34",
+    "docs/DESIGN-SYSTEM.md:48-52",
+    "docs/DESIGN-SYSTEM.md:73-74",
     "style.css:646-648",
     "style.css:661",
     "style.css:665",
@@ -34,7 +34,7 @@
     "website/tokens.css (contains #8C2233)",
     "shots/agent02-home-390.png"
    ],
-   "recommendation": "Rewrite DESIGN-SYSTEM.md from the second :root block (style.css:652-778) as source of truth; delete the dark-mode section; align or explicitly version the website palette.",
+   "recommendation": "Rewrite docs/DESIGN-SYSTEM.md from the second :root block (style.css:652-778) as source of truth; delete the dark-mode section; align or explicitly version the website palette.",
    "concurrent_change_risk": "none known; docs are frequently touched by other agents",
    "_agent": "02 — Visual Design Auditor",
    "_file": "uiux-audit-02-visual.json"
@@ -108,16 +108,16 @@
    "component": "headings",
    "state": "static",
    "viewport": "390x844",
-   "issue": "Three different heading typefaces appear within one continuous flow: hub/lesson h1 = FZ Instrument Serif (28px/700), lesson title h2 = FZ Fredoka (24.8px/600, style.css:3185-3190), quiz question h2 = FZ Plus Jakarta Sans (21.6px/700). Fredoka appears on exactly two selectors app-wide (.word, .lesson-title) yet ships as a 29KB variable font; on all other audited screens document.fonts reports 'FZ Fredoka unloaded'. The mix reads as three products, and DESIGN-SYSTEM.md:73 claims Fredoka is THE heading face.",
+   "issue": "Three different heading typefaces appear within one continuous flow: hub/lesson h1 = FZ Instrument Serif (28px/700), lesson title h2 = FZ Fredoka (24.8px/600, style.css:3185-3190), quiz question h2 = FZ Plus Jakarta Sans (21.6px/700). Fredoka appears on exactly two selectors app-wide (.word, .lesson-title) yet ships as a 29KB variable font; on all other audited screens document.fonts reports 'FZ Fredoka unloaded'. The mix reads as three products, and docs/DESIGN-SYSTEM.md:73 claims Fredoka is THE heading face.",
    "severity": "P3",
    "evidence": [
     "evidence/agent02-lesson-styles.json (lesson-intro: h1 serif 28px/700, h2.lesson-title Fredoka 24.8px, h2.question Jakarta 21.6px)",
     "style.css:3185-3190",
     "style.css:3100-3117 (comment admitting the 'DEVIASI SADAR')",
     "evidence/agent02-computed-styles.json (tokens.fonts: 'FZ Fredoka 300 700 unloaded')",
-    "DESIGN-SYSTEM.md:73"
+    "docs/DESIGN-SYSTEM.md:73"
    ],
-   "recommendation": "Pick two faces max per flow (serif display + Jakarta UI, or Fredoka display + Jakarta UI); update DESIGN-SYSTEM.md to match the decision.",
+   "recommendation": "Pick two faces max per flow (serif display + Jakarta UI, or Fredoka display + Jakarta UI); update docs/DESIGN-SYSTEM.md to match the decision.",
    "concurrent_change_risk": "none",
    "_agent": "02 — Visual Design Auditor",
    "_file": "uiux-audit-02-visual.json"
@@ -298,19 +298,19 @@
   {
    "id": "03-001",
    "screen": "n/a (documentation)",
-   "route": "DESIGN-SYSTEM.md",
+   "route": "docs/DESIGN-SYSTEM.md",
    "component": "canonical design doc",
    "state": "stale",
    "viewport": "n/a",
-   "issue": "DESIGN-SYSTEM.md is stale in nearly every section and actively misleads the concurrent AI agents told to treat it as canonical. Stale statements verified one by one: (1) Palette table §1: --accent claimed #8C2233 maroon / dark #e0708a — actual is #C2402C terracotta (style.css:660) and live computed --accent = #C2402C; every other light value in the table is also wrong: --bg #faf7f6 vs actual #FFF9EE (style.css:653), --panel #fffdfc vs #FFFFFF (654), --panel-soft #f6eef0 vs #FFF3DC (655), --line #e9dfe1 vs #F0E4CF (656), --text #1d1114 vs #241A11 (658), --muted #6b5a60 vs #6E5E47 (659), --gold #d8b36b vs #C9A24B (665), --green #278268 vs #2E8B69 (679), --red #bd4f63 vs #B8432D (681). (2) The doc never mentions the --sun/--core/--good/--bad/--info/--focus-ring families the product actually runs on: the primary CTA renders --sun #FFC700 (style.css:698, 813 '.primary{background:var(--sun)}', live computed .primary background rgb(255,199,0)), matching the yellow/gold branding in shots/baseline-home-390.png and manifest.json:8 theme_color #FFC700. (3) Dark mode §1: doc documents @media(prefers-color-scheme:dark)+:root[data-theme=dark] and features/ui/fiezel-dark-mode.js — NONE exist: zero matches for prefers-color-scheme or data-theme=\"dark\" in style.css; features/ui/ contains no fiezel-dark-mode.js; index.html:18-20 comment 'm025-134: mode gelap dihapus' + <meta name=color-scheme content=light>; features/ui/fiezel-ui-manager.js:18 force-pins data-theme='light'; live dataTheme='light', window.fiezelDarkMode undefined. The entire dark column of the token table and the '--black dark = #8C2233' trap note are dead. (4) Typography §2: doc claims --fz-heading = FZ Fredoka — actual --fz-heading = 'FZ Plus Jakarta Sans' (style.css:776); Fredoka is --fz-display-round (775); the doc never mentions FZ Instrument Serif (--fz-display, style.css:771) even though it is the rendered h1/section-title face (style.css:786-787; live h1 computed font = 'FZ Instrument Serif'; index.html:40 preloads InstrumentSerif-400.woff2). (5) Shape §3: --radius-lg claimed 22px vs actual 24px (style.css:683); shadow values claimed 0 8px 24px / 0 20px 50px / 0 34px 90px vs actual 0 2px 10px / 0 10px 30px / 0 24px 60px (style.css:687-689). (6) Brand §8: manifest background_color claimed #120C0F vs actual #FFF9EE (manifest.json:7). (7) Mascot note §8 says character was deleted at m025-80 and no new illustration style may be introduced — features/mascot/fiezel-mascot.js + fiezel-motion.css + micro-ui.css implement the live 'Pau' mascot visible in baseline-home-390.png. (8) §1 says the SECOND :root block is the single source of truth and block 1 is merely 'overridden' — in reality 31 live tokens (--ease, --ease-spring, --dur-*, all --glass-*, --ambient-*, --chrome-bg, --sky-*, --launcher-*, --cream*, --yellow*, --accent-on-glass) are defined ONLY in block 1 (style.css:6-89) and a THIRD :root block exists at style.css:3210.",
+   "issue": "docs/DESIGN-SYSTEM.md is stale in nearly every section and actively misleads the concurrent AI agents told to treat it as canonical. Stale statements verified one by one: (1) Palette table §1: --accent claimed #8C2233 maroon / dark #e0708a — actual is #C2402C terracotta (style.css:660) and live computed --accent = #C2402C; every other light value in the table is also wrong: --bg #faf7f6 vs actual #FFF9EE (style.css:653), --panel #fffdfc vs #FFFFFF (654), --panel-soft #f6eef0 vs #FFF3DC (655), --line #e9dfe1 vs #F0E4CF (656), --text #1d1114 vs #241A11 (658), --muted #6b5a60 vs #6E5E47 (659), --gold #d8b36b vs #C9A24B (665), --green #278268 vs #2E8B69 (679), --red #bd4f63 vs #B8432D (681). (2) The doc never mentions the --sun/--core/--good/--bad/--info/--focus-ring families the product actually runs on: the primary CTA renders --sun #FFC700 (style.css:698, 813 '.primary{background:var(--sun)}', live computed .primary background rgb(255,199,0)), matching the yellow/gold branding in shots/baseline-home-390.png and manifest.json:8 theme_color #FFC700. (3) Dark mode §1: doc documents @media(prefers-color-scheme:dark)+:root[data-theme=dark] and features/ui/fiezel-dark-mode.js — NONE exist: zero matches for prefers-color-scheme or data-theme=\"dark\" in style.css; features/ui/ contains no fiezel-dark-mode.js; index.html:18-20 comment 'm025-134: mode gelap dihapus' + <meta name=color-scheme content=light>; features/ui/fiezel-ui-manager.js:18 force-pins data-theme='light'; live dataTheme='light', window.fiezelDarkMode undefined. The entire dark column of the token table and the '--black dark = #8C2233' trap note are dead. (4) Typography §2: doc claims --fz-heading = FZ Fredoka — actual --fz-heading = 'FZ Plus Jakarta Sans' (style.css:776); Fredoka is --fz-display-round (775); the doc never mentions FZ Instrument Serif (--fz-display, style.css:771) even though it is the rendered h1/section-title face (style.css:786-787; live h1 computed font = 'FZ Instrument Serif'; index.html:40 preloads InstrumentSerif-400.woff2). (5) Shape §3: --radius-lg claimed 22px vs actual 24px (style.css:683); shadow values claimed 0 8px 24px / 0 20px 50px / 0 34px 90px vs actual 0 2px 10px / 0 10px 30px / 0 24px 60px (style.css:687-689). (6) Brand §8: manifest background_color claimed #120C0F vs actual #FFF9EE (manifest.json:7). (7) Mascot note §8 says character was deleted at m025-80 and no new illustration style may be introduced — features/mascot/fiezel-mascot.js + fiezel-motion.css + micro-ui.css implement the live 'Pau' mascot visible in baseline-home-390.png. (8) §1 says the SECOND :root block is the single source of truth and block 1 is merely 'overridden' — in reality 31 live tokens (--ease, --ease-spring, --dur-*, all --glass-*, --ambient-*, --chrome-bg, --sky-*, --launcher-*, --cream*, --yellow*, --accent-on-glass) are defined ONLY in block 1 (style.css:6-89) and a THIRD :root block exists at style.css:3210.",
    "severity": "P1",
    "evidence": [
-    "DESIGN-SYSTEM.md:22-34",
-    "DESIGN-SYSTEM.md:43-53",
-    "DESIGN-SYSTEM.md:71-80",
-    "DESIGN-SYSTEM.md:86-93",
-    "DESIGN-SYSTEM.md:188",
-    "DESIGN-SYSTEM.md:191-193",
+    "docs/DESIGN-SYSTEM.md:22-34",
+    "docs/DESIGN-SYSTEM.md:43-53",
+    "docs/DESIGN-SYSTEM.md:71-80",
+    "docs/DESIGN-SYSTEM.md:86-93",
+    "docs/DESIGN-SYSTEM.md:188",
+    "docs/DESIGN-SYSTEM.md:191-193",
     "style.css:653-689",
     "style.css:698",
     "style.css:771-777",
@@ -322,7 +322,7 @@
     "shots/agent03-home-390.png",
     "shots/baseline-home-390.png"
    ],
-   "recommendation": "Rewrite DESIGN-SYSTEM.md against the live v6/m028 'Warm Paper, Bright Mind' tokens: correct every hex in the palette table, add the --sun/--core/--good/--bad/--info/--focus-ring families, delete the dark-mode section (note removal at m025-134), fix the typography table (--fz-display Instrument Serif, --fz-display-round Fredoka, --fz-heading/--fz-body Jakarta), fix radius/shadow values, fix manifest colors, and document the mascot. Add a doc-vs-tokens CI check so it cannot rot again.",
+   "recommendation": "Rewrite docs/DESIGN-SYSTEM.md against the live v6/m028 'Warm Paper, Bright Mind' tokens: correct every hex in the palette table, add the --sun/--core/--good/--bad/--info/--focus-ring families, delete the dark-mode section (note removal at m025-134), fix the typography table (--fz-display Instrument Serif, --fz-display-round Fredoka, --fz-heading/--fz-body Jakarta), fix radius/shadow values, fix manifest colors, and document the mascot. Add a doc-vs-tokens CI check so it cannot rot again.",
    "concurrent_change_risk": "high — other agents are instructed to follow this doc right now",
    "_agent": "03 — Design System Auditor",
    "_file": "uiux-audit-03-design-system.json"
@@ -406,15 +406,15 @@
    "component": "typography & spacing & shadow scales",
    "state": "n/a",
    "viewport": "all",
-   "issue": "No type-scale or spacing tokens exist at all (zero matches for --space-*, --gap-*, --fs-*, --font-size-*). Font sizing is ad hoc: 48 raw px font-size declarations in style.css (25x 12px, 9x 13px, 6x 14px, 4x 16px, 3x 15px, 1x 17px) mixed with rem/clamp values elsewhere, plus 9 raw px font-sizes in features/mascot/micro-ui.css. Shadows: 93 box-shadow declarations in style.css bypass the --shadow-sm/md/lg tokens (e.g. style.css:830 '0 34px 80px rgba(10,14,31,.2)' on .launcher-shell, style.css:836 '0 14px 34px rgba(0,0,0,.22)'), plus 14 raw shadows in tutor-v3.css, 5 in fiezel-motion.css, 3 in micro-ui.css, 2 in speaking-listening-addon.css. DESIGN-SYSTEM.md's own rule ('jangan pernah menulis nilai mentah', line 6) and §10 checklist are not met by the current codebase.",
+   "issue": "No type-scale or spacing tokens exist at all (zero matches for --space-*, --gap-*, --fs-*, --font-size-*). Font sizing is ad hoc: 48 raw px font-size declarations in style.css (25x 12px, 9x 13px, 6x 14px, 4x 16px, 3x 15px, 1x 17px) mixed with rem/clamp values elsewhere, plus 9 raw px font-sizes in features/mascot/micro-ui.css. Shadows: 93 box-shadow declarations in style.css bypass the --shadow-sm/md/lg tokens (e.g. style.css:830 '0 34px 80px rgba(10,14,31,.2)' on .launcher-shell, style.css:836 '0 14px 34px rgba(0,0,0,.22)'), plus 14 raw shadows in tutor-v3.css, 5 in fiezel-motion.css, 3 in micro-ui.css, 2 in speaking-listening-addon.css. docs/DESIGN-SYSTEM.md's own rule ('jangan pernah menulis nilai mentah', line 6) and §10 checklist are not met by the current codebase.",
    "severity": "P3",
    "evidence": [
     "style.css:830",
     "style.css:836",
     "features/mascot/micro-ui.css:25-33",
     "features/tutor-classroom/tutor-v3.css:14-30",
-    "DESIGN-SYSTEM.md:6-8",
-    "DESIGN-SYSTEM.md:216"
+    "docs/DESIGN-SYSTEM.md:6-8",
+    "docs/DESIGN-SYSTEM.md:216"
    ],
    "recommendation": "Introduce a documented minor-scale of --fs-* and --space-* tokens and 2-3 additional shadow tokens for the recurring bespoke values; migrate the 12px/13px cluster first (highest repetition).",
    "concurrent_change_risk": "style.css under concurrent edit",
@@ -454,7 +454,7 @@
     "index.html:18-20",
     "features/ui/fiezel-ui-manager.js:14-18"
    ],
-   "recommendation": "When DESIGN-SYSTEM.md is rewritten (03-001), sweep the stale comments in the same commit and decide whether the data-theme pinning shim stays as defensive code (document it) or goes.",
+   "recommendation": "When docs/DESIGN-SYSTEM.md is rewritten (03-001), sweep the stale comments in the same commit and decide whether the data-theme pinning shim stays as defensive code (document it) or goes.",
    "concurrent_change_risk": "none",
    "_agent": "03 — Design System Auditor",
    "_file": "uiux-audit-03-design-system.json"
@@ -678,7 +678,7 @@
     "index.html:30 (title)"
    ],
    "recommendation": "Add <meta name=\"mobile-web-app-capable\" content=\"yes\"> and <meta name=\"apple-mobile-web-app-title\" content=\"FIEZEL\">. Optionally generate apple-touch-startup-image set (or accept the blank-then-splash tradeoff and document it).",
-   "concurrent_change_risk": "index.html boot-critical block is contested by splash/rebrand waves; splash-first-paint-test.js compares it to style.css",
+   "concurrent_change_risk": "index.html boot-critical block is contested by splash/rebrand waves; tests/splash-first-paint-test.js compares it to style.css",
    "_agent": "05 — PWA & Device Experience Auditor",
    "_file": "uiux-audit-05-pwa.json"
   },
@@ -1583,7 +1583,7 @@
     "shots/agent11-confidence-pop-q1-390.png vs shots/agent11-analyzing-q3-390.png (no confidence sheet on later questions)"
    ],
    "recommendation": "Add role=\"status\" aria-live=\"polite\" to #feedback (or announce a short verdict string via an existing live region) when reveal() populates it.",
-   "concurrent_change_risk": "Low — attribute-only change; a11y-test.js already asserts other live regions (see app.js:3656 comment).",
+   "concurrent_change_risk": "Low — attribute-only change; tests/a11y-test.js already asserts other live regions (see app.js:3656 comment).",
    "_agent": "11 — Feedback & Explanation UX Auditor",
    "_file": "uiux-audit-11-feedback.json"
   },
@@ -1925,11 +1925,11 @@
    "component": "SFX manifest utilization",
    "state": "n/a",
    "viewport": "n/a",
-   "issue": "9 of the 27 shipped-and-precached sounds have no product trigger: 7 marked caller:'preview' (answer_correct_perfect, answer_wrong_retry, level_up, streak_10, exam_result_reveal, exam_score_tick, notif_achievement — only playable from sfx-preview.html audition page) plus splash_paw_appear (reserved) and stamp_thud (retired by owner decision). All 27 .ogg sit in the offline shell (~370KB total incl. never-playing assets). Every case is deliberately documented in the manifest; flagged only so future 'why does level-up make no sound?' reports trace here — notably level_up and streak_10 are plausible product moments that exist (streak_5 IS wired at app.js:5107) but their siblings are not.",
+   "issue": "9 of the 27 shipped-and-precached sounds have no product trigger: 7 marked caller:'preview' (answer_correct_perfect, answer_wrong_retry, level_up, streak_10, exam_result_reveal, exam_score_tick, notif_achievement — only playable from tools/dev/sfx-preview.html audition page) plus splash_paw_appear (reserved) and stamp_thud (retired by owner decision). All 27 .ogg sit in the offline shell (~370KB total incl. never-playing assets). Every case is deliberately documented in the manifest; flagged only so future 'why does level-up make no sound?' reports trace here — notably level_up and streak_10 are plausible product moments that exist (streak_5 IS wired at app.js:5107) but their siblings are not.",
    "severity": "P4",
    "evidence": [
     "features/audio/fiezel-ui-sfx.js:116-152 (caller annotations)",
-    "sfx-preview.html:66-92 (audition catalog, 'belum ada pemicunya di produk')",
+    "tools/dev/sfx-preview.html:66-92 (audition catalog, 'belum ada pemicunya di produk')",
     "sw.js:79-81 (reserved/retired included in precache by design)",
     "app.js:5107 (streak_5 wired; streak_10/level_up absent from app.js)"
    ],
@@ -2642,7 +2642,7 @@
     "evidence/a17-loads.json (precache_runtime.entries=157)"
    ],
    "recommendation": "Adopt per-file revision hashing (Workbox-style) so unchanged bytes are copied from the old cache instead of re-downloaded; move giant JSON banks out of the atomic shell into a versioned data cache filled lazily/idle; drop creator-report pages from precache.",
-   "concurrent_change_risk": "sw.js is release-coordination-sensitive (MASTER-BROADCAST.md); precache list changes need SW_REV bump",
+   "concurrent_change_risk": "sw.js is release-coordination-sensitive (docs/MASTER-BROADCAST.md); precache list changes need SW_REV bump",
    "_agent": "17 — Performance Perception Auditor",
    "_file": "uiux-audit-17-performance.json"
   },
@@ -2653,16 +2653,16 @@
    "component": "font preloads / @font-face",
    "state": "cold load",
    "viewport": "390x844",
-   "issue": "Font strategy is internally inconsistent: (a) index.html preloads InstrumentSerif-400 (21,032 B) and Fredoka-var (29,704 B), but during splash→onboarding→settle NEITHER activates (document.fonts shows only 'FZ Plus Jakarta Sans 400/500/600/700' loaded) — ~50.7 KB spent on the critical path for faces first used on later screens (display serif: style.css:787; Fredoka only on .word/.lesson-title, style.css:3192). (b) The splash wordmark text uses weight 700 (index.html:63) but Jakarta-700 is NOT preloaded, so with font-display:swap all boot text renders in fallback and swaps at 2,899 ms — ~700 ms after FCP (2,196 ms) on localhost, ~1.5 s window when throttled. (c) DESIGN-SYSTEM.md:73 declares --fz-heading = FZ Fredoka while style.css:776 sets --fz-heading = Jakarta — the doc/code drift makes it likely stale preloads survive future edits. Total font bytes are small (77.5 KB / 6 files, all self-hosted), so severity is limited to the visible swap flash + doc drift.",
+   "issue": "Font strategy is internally inconsistent: (a) index.html preloads InstrumentSerif-400 (21,032 B) and Fredoka-var (29,704 B), but during splash→onboarding→settle NEITHER activates (document.fonts shows only 'FZ Plus Jakarta Sans 400/500/600/700' loaded) — ~50.7 KB spent on the critical path for faces first used on later screens (display serif: style.css:787; Fredoka only on .word/.lesson-title, style.css:3192). (b) The splash wordmark text uses weight 700 (index.html:63) but Jakarta-700 is NOT preloaded, so with font-display:swap all boot text renders in fallback and swaps at 2,899 ms — ~700 ms after FCP (2,196 ms) on localhost, ~1.5 s window when throttled. (c) docs/DESIGN-SYSTEM.md:73 declares --fz-heading = FZ Fredoka while style.css:776 sets --fz-heading = Jakarta — the doc/code drift makes it likely stale preloads survive future edits. Total font bytes are small (77.5 KB / 6 files, all self-hosted), so severity is limited to the visible swap flash + doc drift.",
    "severity": "P3",
    "evidence": [
     "index.html:40-44 (3 preloads)",
     "index.html:63 (splash word font-weight:700)",
     "evidence/a17-loads.json (cold_unthrottled loadedFonts=Jakarta only; fontEvents t=2899 vs first-paint 2196)",
     "style.css:768,776,787,1284-1299,3192",
-    "DESIGN-SYSTEM.md:73"
+    "docs/DESIGN-SYSTEM.md:73"
    ],
-   "recommendation": "Preload PlusJakartaSans-700 (used by boot-visible text) instead of InstrumentSerif/Fredoka; consider font-display:optional for the boot frame; reconcile DESIGN-SYSTEM.md with the actual v6 font roles.",
+   "recommendation": "Preload PlusJakartaSans-700 (used by boot-visible text) instead of InstrumentSerif/Fredoka; consider font-display:optional for the boot frame; reconcile docs/DESIGN-SYSTEM.md with the actual v6 font roles.",
    "concurrent_change_risk": "m028 rebrand phases are actively touching fonts/tokens",
    "_agent": "17 — Performance Perception Auditor",
    "_file": "uiux-audit-17-performance.json"

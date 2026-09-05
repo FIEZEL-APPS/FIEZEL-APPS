@@ -11,8 +11,8 @@ Yang berubah:
 | `workers/owner/index.js` | rem login baru (KV, per-sumber, jendela bergulir) + `GET /` → 303 `/login` |
 | `workers/owner/wrangler.toml` | binding KV `CFG` → `fiezel-CFG`, plus koreksi klaim "Nol tulis KV" yang kini salah |
 | `workers/owner/README.md` | §1, §4, §5 #12/#13 ditulis ulang supaya cocok dengan perilaku yang sebenarnya |
-| `owner-edge-guard-test.js` | butir `(b-a)`…`(b-g)` baru; butir `(g-g)` diperketat untuk KV; `(b)`/`(g-a)`/`(g-f)` menilai pengalihan, bukan dilonggarkan |
-| `owner-dashboard-test.js` | empat titik yang mengassert 403 di `GET /` kini mengassert pengalihan secara ketat |
+| `tests/owner-edge-guard-test.js` | butir `(b-a)`…`(b-g)` baru; butir `(g-g)` diperketat untuk KV; `(b)`/`(g-a)`/`(g-f)` menilai pengalihan, bukan dilonggarkan |
+| `tests/owner-dashboard-test.js` | empat titik yang mengassert 403 di `GET /` kini mengassert pengalihan secara ketat |
 | `reports/d4-owner-brake-red-proof.mjs` + `.json` | 24 mutasi terarah, semuanya terbukti merah |
 
 ## 1. Apa yang sebenarnya salah
@@ -29,7 +29,7 @@ Dua cacat yang diberikan di tugas, dan keduanya cocok dengan kode yang saya baca
 
 **Batas kejujuran bukti:** angka "12 percobaan token salah → 403 dua belas kali, nol 429" berasal
 dari pengujian lapangan yang diberikan bersama tugas ini. Saya TIDAK memverifikasinya ulang;
-gerbang repo dijalankan tanpa jaringan (`no-network-test.js` memang melarangnya). Yang saya
+gerbang repo dijalankan tanpa jaringan (`tests/no-network-test.js` memang melarangnya). Yang saya
 verifikasi sendiri adalah sebabnya di kode (Map lingkup modul), dan saya mereproduksi POLANYA di
 gerbang: butir `(b-a)` menjalankan 8 permintaan token salah lewat 8 modul yang diimpor terpisah
 TANPA penyimpanan bersama dan mendapat 403 delapan kali, nol 429. Jadi klaim mekanismenya berdiri
@@ -43,7 +43,7 @@ menit, itu kejadian harian, bukan kasus tepi.
 
 **Kenapa bukan D1 `fiezel-stats`** meski sudah terikat sebagai `ANALYTICS`:
 
-- Ia database ANALYTICS. `analytics-privacy-test.js` menguncinya pada lima tabel agregat dan
+- Ia database ANALYTICS. `tests/analytics-privacy-test.js` menguncinya pada lima tabel agregat dan
   `DEPLOY.md` melarang mencampur data auth ke sana. Penghitung rem login adalah data auth.
 - Worker owner HANYA-BACA terhadap database itu, dan sifat itu ditegakkan gerbang (`queries.js`
   menolak memuat kata tulis). Rem yang menulis akan mengubah pembaca menjadi penulis: satu
@@ -185,14 +185,14 @@ dari galat itu, TETAPI lapis memori tetap mengerem di dalam satu isolate.
 - **Byte-identik** entah Secret sudah dipasang atau belum: tanpa badan, tanpa `Set-Cookie` (cookie
   basi sengaja tidak dihapus di sini — menghapusnya membuat respons berbeda antara "punya cookie"
   dan "tidak", dan itu oracle gratis), tanpa nama Secret, tanpa kunci metrik. `(g-f)` dan
-  `owner-dashboard-test.js` membandingkan sidik jari respons kedua keadaan itu, jadi kalau
+  `tests/owner-dashboard-test.js` membandingkan sidik jari respons kedua keadaan itu, jadi kalau
   seseorang menambahkan pesan "belum dikonfigurasi", gerbangnya merah.
 - Halaman masuk tetap dapat diakses sumber yang sedang terkunci: rem hanya di `POST /login`. Kalau
   `GET /` ikut kena 429, statusnya sendiri menjadi oracle riwayat sumber (`(b-e)`).
 
 ## 8. Gerbang dan bukti merah
 
-Butir baru di `owner-edge-guard-test.js` (satu berkas, tidak ada duplikat):
+Butir baru di `tests/owner-edge-guard-test.js` (satu berkas, tidak ada duplikat):
 
 | Butir | Yang dibuktikan |
 |---|---|
@@ -221,16 +221,16 @@ adalah gerbang dekoratif, kelas cacat yang sama dengan rem yang sedang saya gant
 Semua exit 0:
 
 ```
-owner-edge-guard-test.js       exit=0   (1117/1117 assert)
-owner-dashboard-test.js        exit=0
-analytics-privacy-test.js      exit=0
-d1-schema-contract-test.js     exit=0
-no-network-test.js             exit=0
-secret-scan-test.js            exit=0
-gate-registry-test.js          exit=0
-coordination-guard-test.js     exit=0
-regression-test.js             exit=0
-install-health-test.js         exit=0
+tests/owner-edge-guard-test.js       exit=0   (1117/1117 assert)
+tests/owner-dashboard-test.js        exit=0
+tests/analytics-privacy-test.js      exit=0
+tests/d1-schema-contract-test.js     exit=0
+tests/no-network-test.js             exit=0
+tests/secret-scan-test.js            exit=0
+tests/gate-registry-test.js          exit=0
+tests/coordination-guard-test.js     exit=0
+tests/regression-test.js             exit=0
+tests/install-health-test.js         exit=0
 reports/d4-owner-brake-red-proof.mjs   exit=0 (24/24 mutasi merah, pulih hijau)
 ```
 

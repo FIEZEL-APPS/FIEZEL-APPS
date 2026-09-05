@@ -5,7 +5,7 @@
  *
  * ATURAN (lihat copy-id-core.js untuk penjelasan penuh):
  * 1. NILAI byte-identik dengan naskah hari ini — kalimat PINDAH ke sini, tidak BERUBAH
- *    (gerbang id-golden-snapshot-test.js membekukan himpunan literal).
+ *    (gerbang tests/id-golden-snapshot-test.js membekukan himpunan literal).
  * 2. Kunci netral/Inggris (bukan terjemahan kalimatnya) supaya kunci tidak terhitung
  *    sebagai literal Indonesia baru oleh lexer gerbang.
  * 3. Interpolasi: template literal `${x}` menjadi placeholder BERNAMA `{nama}`;
@@ -111,7 +111,7 @@
     'journey.why-transfer': 'Soal campur biar nggak kaku.',
 
     // ---------- features/onboarding/fiezel-tour.js ----------
-    // Copy VERBATIM dari reports/copy-tour-gems.md; tours-test.js membandingkan karakter
+    // Copy VERBATIM dari reports/copy-tour-gems.md; tests/tours-test.js membandingkan karakter
     // demi karakter dengan nilai runtime langkah tur.
     'tour.menu-home-title': 'Mulai dari Home',
     'tour.menu-home-body': 'Ini beranda kamu: progres harian, streak, dan saran latihan dari PAW. Semua perjalananmu berangkat dari sini.',

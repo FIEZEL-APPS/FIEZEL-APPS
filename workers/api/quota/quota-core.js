@@ -13,7 +13,7 @@
  *   Cetakan yang ditiru: `gems-core.js` dan `shouldPresentPuterPopup()` — dua fungsi yang
  *   cf-a12 tandai "pakai ulang, jangan kotori".
  *
- * INVARIAN PUSAT (dijaga `quota-core-test.js`):
+ * INVARIAN PUSAT (dijaga `tests/quota-core-test.js`):
  *     used_effective(bucket) = counters[bucket] + Σ reservasi terbuka untuk bucket itu
  *
  * POLA TAGIHAN JUJUR (cf-b3 §1.3), tiga janji yang bisa diperiksa mesin:
@@ -145,7 +145,7 @@ function normaliseLimits(limits) {
 
 /**
  * State kuota satu pengguna untuk satu hari. Dibuat server; klien tidak pernah mengirim
- * bentuk ini (lihat `quota-manipulation-test.js`).
+ * bentuk ini (lihat `tests/quota-manipulation-test.js`).
  */
 export function createState(now, limits) {
   return {

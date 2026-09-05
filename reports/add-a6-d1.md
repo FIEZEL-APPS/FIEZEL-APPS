@@ -163,9 +163,9 @@ migrasi stats (5 tabel, 2 indeks): keduanya `COCOK`.
 Yang **tidak** dibandingkan, dan itu batas yang dinyatakan di kepala berkas: tipe
 kolom, DEFAULT, urutan kolom, dan trigger.
 
-## 6. Gerbang `d1-schema-contract-test.js` — 27/27 LULUS
+## 6. Gerbang `tests/d1-schema-contract-test.js` — 27/27 LULUS
 
-Terdaftar di `.github/workflows/quality.yml` tepat sesudah `node cf-wiring-test.js`.
+Terdaftar di `.github/workflows/quality.yml` tepat sesudah `node tests/cf-wiring-test.js`.
 Node murni, nol dependensi, nol jaringan, laporan ke `D1-SCHEMA-CONTRACT-REPORT.json`.
 Parser DDL-nya sengaja ditulis ulang terpisah dari parser di
 `tools/d1-schema-check.mjs`; kalau keduanya berbagi kode, bug parser lolos di
@@ -200,12 +200,12 @@ tidak membuktikan apa pun.
 
 | Gerbang | Exit |
 |---|---|
-| `d1-schema-contract-test.js` (baru, 27/27) | **0** |
-| `cf-wiring-test.js` | **0** |
-| `quota-core-test.js` | **0** |
-| `analytics-privacy-test.js` | **0** |
-| `regression-test.js` | **0** |
-| `install-health-test.js` | **0** |
+| `tests/d1-schema-contract-test.js` (baru, 27/27) | **0** |
+| `tests/cf-wiring-test.js` | **0** |
+| `tests/quota-core-test.js` | **0** |
+| `tests/analytics-privacy-test.js` | **0** |
+| `tests/regression-test.js` | **0** |
+| `tests/install-health-test.js` | **0** |
 
 Versi build **tidak** diubah. `CF-WIRING-REPORT.json` dikembalikan ke keadaan
 semula karena satu-satunya perbedaannya adalah UUID dan pepper acak per
@@ -239,7 +239,7 @@ eksekusi — bukan perubahan bermakna.
 | `docs/D1-RETENTION.md` | baru |
 | `docs/D1-BACKUP-RESTORE.md` | baru |
 | `tools/d1-schema-check.mjs` | baru |
-| `d1-schema-contract-test.js` | baru (gerbang) |
+| `tests/d1-schema-contract-test.js` | baru (gerbang) |
 | `D1-SCHEMA-CONTRACT-REPORT.json` | baru (keluaran gerbang) |
 | `analysis/a6-d1-index-plans.py` / `.json` | baru (bukti EXPLAIN QUERY PLAN, regenerable) |
 | `.github/workflows/quality.yml` | gerbang didaftarkan |

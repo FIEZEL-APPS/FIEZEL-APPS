@@ -12,7 +12,7 @@
  *
  * Karena itu SETIAP kueri di berkas ini membawa `teacher_sub = ?` di WHERE-nya,
  * dan tidak ada satu pun `SELECT ... WHERE id = ?` sendirian. Ini bukan
- * kebiasaan yang dianjurkan — `role-security-test.js` membacanya sebagai teks
+ * kebiasaan yang dianjurkan — `tests/role-security-test.js` membacanya sebagai teks
  * dan memerah kalau ada kueri tc_* di berkas ini yang tidak menyebut
  * `teacher_sub`.
  */

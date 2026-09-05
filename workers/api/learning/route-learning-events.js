@@ -15,7 +15,7 @@
  *   1. `batchId` WAJIB — lane ini belum punya klien, jadi tidak ada
  *      kompatibilitas mundur yang membenarkan batch tanpa jaminan idempotensi.
  *   2. Dedup per-EVENT (learning_dedup, kunci eventId), bukan per-batch:
- *      BRAIN-TELEMETRY-SCHEMA.md §5.1 menuntut replay batch campuran
+ *      docs/BRAIN-TELEMETRY-SCHEMA.md §5.1 menuntut replay batch campuran
  *      lama+baru hanya menghitung yang baru.
  *   3. Database TERPISAH (LEARNING_DB / fiezel-learning) — bukan STATS_DB.
  *      Handler ini tidak pernah menerima binding identitas/kuota/analytics.
@@ -90,7 +90,7 @@ export async function readBoundedJson(request, maxBytes = LIMITS.MAX_BODY_BYTES)
 /**
  * processLearningBatch(body, now) -> { status, payload, envelope? }
  *
- * Aturan yang tidak boleh dilemahkan (BRAIN-TELEMETRY-SCHEMA.md §5.5:
+ * Aturan yang tidak boleh dilemahkan (docs/BRAIN-TELEMETRY-SCHEMA.md §5.5:
  * "4xx skema = payload salah, buang event" — server harus memberi tahu, bukan
  * menoleransi):
  *  - skema/versi tak dikenal      -> 400 bad_schema (fail-closed, §2)

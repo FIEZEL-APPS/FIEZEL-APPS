@@ -28,7 +28,7 @@ askFiezelAI(prompt, task, ctx)        -> STRING   (kontrak lama, tidak berubah)
 
 ### Kenapa TIDAK jadi modul di `features/`
 
-Brief mengizinkan modul baru "bila perlu". Ternyata tidak perlu, dan biayanya nyata: berkas baru harus masuk `index.html` **dan** daftar `ASSETS` precache `sw.js`, dan perubahan precache mewajibkan `SW_REV`/`DIAG_BUILD`/`FIEZEL_PAGE_BUILD` naik bersamaan (`install-health-test.js`, `pwa-release-coherence-test.js`). Brief melarang bump versi build. Jadi blok bersentinel di `app.js` adalah satu-satunya bentuk yang memenuhi kedua batasan sekaligus. Blok itu bisa diangkat menjadi modul kapan saja dalam commit yang memang menaikkan versi.
+Brief mengizinkan modul baru "bila perlu". Ternyata tidak perlu, dan biayanya nyata: berkas baru harus masuk `index.html` **dan** daftar `ASSETS` precache `sw.js`, dan perubahan precache mewajibkan `SW_REV`/`DIAG_BUILD`/`FIEZEL_PAGE_BUILD` naik bersamaan (`tests/install-health-test.js`, `tests/pwa-release-coherence-test.js`). Brief melarang bump versi build. Jadi blok bersentinel di `app.js` adalah satu-satunya bentuk yang memenuhi kedua batasan sekaligus. Blok itu bisa diangkat menjadi modul kapan saja dalam commit yang memang menaikkan versi.
 
 ## 3. Pemetaan task ke registry Worker
 
@@ -75,9 +75,9 @@ Semua kalimat dikutip dari `reports/cf-b8-ux-quota.md` dan dari `POLITE` milik W
 - Jalur `/api/ai/task` punya kontraknya sendiri: `fiezel-ai-response-v2`. Jawaban tanpa skema itu **mematikan jalur CF** untuk sisa umur halaman (latch `aiTaskProtocolOk`) dan jawabannya tidak ditampilkan. Sesudah latch, `aiTaskTransportMode()` mengembalikan `'off'` dan murid dilayani jalur Puter. Latch tidak ditulis ke `localStorage` — ia keadaan halaman, bukan keputusan permanen.
 - Pemeriksaan skema dilakukan **sebelum** status HTTP diperiksa, termasuk pada 429. Server yang salah kontrak tidak boleh dipercaya bahkan soal kuota.
 
-## 7. Gerbang baru: `ai-transport-switch-test.js`
+## 7. Gerbang baru: `tests/ai-transport-switch-test.js`
 
-Node murni, tanpa dependency, tanpa jaringan (`fetchMock` lokal, dikenali `no-network-test.js`). Blok transport dan fungsi render dipotong dari `app.js` lewat sentinel dan dijalankan di `vm` — perilaku diuji, bukan teks dicocokkan. Terdaftar di `.github/workflows/quality.yml` sesudah `cf-shadow-mode-test.js`. **113 assert, semuanya PASS.**
+Node murni, tanpa dependency, tanpa jaringan (`fetchMock` lokal, dikenali `tests/no-network-test.js`). Blok transport dan fungsi render dipotong dari `app.js` lewat sentinel dan dijalankan di `vm` — perilaku diuji, bukan teks dicocokkan. Terdaftar di `.github/workflows/quality.yml` sesudah `tests/cf-shadow-mode-test.js`. **113 assert, semuanya PASS.**
 
 | Tuntutan | Cara diassert |
 |---|---|
@@ -93,7 +93,7 @@ Ditambah assert struktural: blok transport tidak menyentuh `localStorage`/`docum
 
 ## 8. Satu gerbang lama diubah — ini alasannya
 
-`ai-integration-test.js` dulu memanggil `renderAIError('<svg onload=x>',{message:'<img src=x onerror=x>'})` lalu menuntut `&lt;img` **muncul** di DOM. Tuntutan itu kini bertabrakan dengan kontrak baru: isi `err.message` tidak boleh sampai ke DOM sama sekali. Menuntut versi ter-esc-nya muncul sama dengan menuntut kebocoran yang baru ditutup.
+`tests/ai-integration-test.js` dulu memanggil `renderAIError('<svg onload=x>',{message:'<img src=x onerror=x>'})` lalu menuntut `&lt;img` **muncul** di DOM. Tuntutan itu kini bertabrakan dengan kontrak baru: isi `err.message` tidak boleh sampai ke DOM sama sekali. Menuntut versi ter-esc-nya muncul sama dengan menuntut kebocoran yang baru ditutup.
 
 Perubahannya minimal dan tidak melemahkan apa pun: teks bermarkup dipindahkan ke argumen **judul** (judul berasal dari kode kami sendiri dan tetap harus diloloskan), jadi jalur pelolosan HTML tetap diuji lewat fungsi yang sama. Satu assert **ditambah**: isi galat provider tidak boleh muncul. Bersihnya cek jadi lebih kuat, bukan lebih lemah.
 
@@ -108,7 +108,7 @@ Tiga hal ini sengaja tidak diselesaikan. Menyebutnya di sini supaya tidak dibaca
 Dua catatan kecil lain:
 
 - `bankVersion` diisi dari `self.FIEZEL_VERSION`, bukan nomor bank yang sebenarnya. Klien tidak punya konstanta versi bank. Nilainya naik setiap rilis, jadi ia aman sebagai kunci cache (paling buruk: cache dibuang lebih sering dari yang perlu), tetapi ia bukan versi bank yang jujur.
-- `aiErrorMessage` masih menyebut "Puter" pada cabang `popup_blocked` dan `auth_window_closed`. Itu naskah lama untuk galat login, di luar lingkup tugas ini, dan `ai-integration-test.js` masih mengassert kalimat "diblokir browser". Kalau naskah login mau dibersihkan dari nama vendor, itu perubahan tersendiri beserta gerbangnya.
+- `aiErrorMessage` masih menyebut "Puter" pada cabang `popup_blocked` dan `auth_window_closed`. Itu naskah lama untuk galat login, di luar lingkup tugas ini, dan `tests/ai-integration-test.js` masih mengassert kalimat "diblokir browser". Kalau naskah login mau dibersihkan dari nama vendor, itu perubahan tersendiri beserta gerbangnya.
 - `.ai-degraded-note` di `style.css` memakai `--panel-soft`/`--muted`/`--line`, bukan warna galat. Ikonnya `cloud-cog` karena `battery-low` tidak ada di subset `lucide.min.js` yang dibundel; ikon yang tidak ada akan gagal senyap.
 
 ## 10. Verifikasi
@@ -118,9 +118,9 @@ Default repo tetap `endpoints.ai:'off'` di `core-config.js` — diassert oleh ge
 Semua exit 0:
 
 ```
-ai-transport-switch-test.js   ai-integration-test.js   cf-transport-test.js
-cf-shadow-mode-test.js        tutor-reteach-card-test.js  regression-test.js
-ui-structure-test.js          install-health-test.js   a11y-test.js
+tests/ai-transport-switch-test.js   tests/ai-integration-test.js   tests/cf-transport-test.js
+tests/cf-shadow-mode-test.js        tests/tutor-reteach-card-test.js  tests/regression-test.js
+tests/ui-structure-test.js          tests/install-health-test.js   tests/a11y-test.js
 ```
 
-Gerbang tetangga yang menyentuh literal yang sama, juga exit 0: `product-audit.js`, `core-brain-test.js`, `boot-order-test.js`, `no-network-test.js`, `contrast-test.js`, `validator.js`, `cf-live-contract-test.js`, `release-audit-gate-test.js`, `pwa-release-coherence-test.js`, `grammar-quality-audit.js`, `content-integrity-audit.js`.
+Gerbang tetangga yang menyentuh literal yang sama, juga exit 0: `product-audit.js`, `tests/core-brain-test.js`, `tests/boot-order-test.js`, `tests/no-network-test.js`, `tests/contrast-test.js`, `validator.js`, `tests/cf-live-contract-test.js`, `tests/release-audit-gate-test.js`, `tests/pwa-release-coherence-test.js`, `grammar-quality-audit.js`, `content-integrity-audit.js`.

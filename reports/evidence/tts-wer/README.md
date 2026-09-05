@@ -1,7 +1,7 @@
 # Bukti WER pemilihan model TTS Cloudflare (aura-1 vs aura-2-en vs melotts)
 
 **Angka yang dijelaskan berkas ini:** `wer: 0.038` (aura-1) dan `wer: 0.018` (aura-2-en) di
-`tools/prerender-tts.mjs:87,96`, yang dipaku oleh gerbang `prerender-plan-test.js:146`.
+`tools/prerender-tts.mjs:87,96`, yang dipaku oleh gerbang `tests/prerender-plan-test.js:146`.
 
 **Kenapa direktori ini ada.** `reports/add-a10-kepatuhan.md` §2.3 mencatat kedua angka itu
 sebagai **"TIDAK ADA BUKTI SAMA SEKALI"**: mereka hidup di `tools/prerender-tts.mjs`, dijaga
@@ -94,7 +94,7 @@ for (const m of ["aura-1","aura-2-en"]) {
 dituliskan `0.038` (dipotong) sedangkan 0,01775 dituliskan `0.018` (dibulatkan ke atas).
 Dua arah pembulatan yang berbeda pada satu blok data yang sama. Selisihnya tidak mengubah
 keputusan apa pun (aura-2-en tetap ±2× lebih akurat pada sampel ini), dan angka di kode
-**tidak diubah** oleh berkas ini — mengubahnya akan memutus `prerender-plan-test.js:146`
+**tidak diubah** oleh berkas ini — mengubahnya akan memutus `tests/prerender-plan-test.js:146`
 tanpa satu pengukuran baru pun yang membenarkannya. Yang berubah hanya: sekarang siapa pun
 bisa melihat asal pembulatannya.
 
@@ -153,7 +153,7 @@ gerbang.
 ## Sumber
 
 - Angka yang dijelaskan: `tools/prerender-tts.mjs:87,96` (`MODELS[].wer`), dijaga
-  `prerender-plan-test.js:146`
+  `tests/prerender-plan-test.js:146`
 - Temuan utang bukti: `reports/add-a10-kepatuhan.md` §2.3 ("TIDAK ADA BUKTI SAMA SEKALI") dan §3 R9
 - Artefak mentah asal: `/home/user/workspace/tts-pilot/` (`quality.json`, `_tx.json`,
   `melotts.json`, `m.out`, 22 berkas audio yang tidak dibawa masuk)

@@ -13,7 +13,7 @@
 //      pentingnya dengan "dipanggil dengan benar" (mis. Worker aset dilarang `put`).
 //   2. Waktu SELALU masuk sebagai parameter (`fakeClock`). Tidak ada `Date.now()` di jalur
 //      keputusan, supaya reset kuota harian/DAU bisa diuji tanpa menunggu sehari —
-//      disiplin yang sama dengan puter-popup-once-test.js:78-80.
+//      disiplin yang sama dengan tests/puter-popup-once-test.js:78-80.
 //   3. Apa pun yang tidak dikenali MELEMPAR. Stub yang diam-diam mengembalikan `undefined`
 //      membuat gerbang hijau tanpa menguji apa pun; itu lebih buruk daripada gerbang merah.
 //
@@ -725,7 +725,7 @@ function makeEnv(options = {}) {
 /* =======================================================================================
  * 9. Loader Worker ESM tanpa flag, tanpa berkas temporer
  * ===================================================================================== */
-// `vm.runInContext` (pola core-worker-contract-test.js:12) TIDAK bisa memuat ESM, dan
+// `vm.runInContext` (pola tests/core-worker-contract-test.js:12) TIDAK bisa memuat ESM, dan
 // `vm.SourceTextModule` butuh --experimental-vm-modules. data: URL menghindari keduanya
 // sekaligus tidak mengotori working tree dengan berkas temporer.
 async function loadWorkerModule(absolutePath, fsImpl) {

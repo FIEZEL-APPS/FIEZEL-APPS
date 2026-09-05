@@ -170,7 +170,7 @@ Dashboard yang sudah ada:
   `cron-status.js` (sha256 hex di `OWNER_TOKEN_HASH`, banding waktu-konstan,
   fail-closed), hanya `SELECT` atas `evidence_daily`.
 
-**Kenapa subrequest, bukan binding D1 kedua**: `owner-edge-guard-test.js` butir (g-g)
+**Kenapa subrequest, bukan binding D1 kedua**: `tests/owner-edge-guard-test.js` butir (g-g)
 mengunci Worker owner pada TEPAT SATU binding D1 (`ANALYTICS`), dan gerbang itu benar —
 menambah `EVIDENCE_DB` akan menaruh database yang memuat satu-satunya pengenal perangkat
 di isolate yang sama dengan seluruh kode dashboard. Dua secret opsional mengaktifkannya:
@@ -195,19 +195,19 @@ satu sama lain dan dari **nol murid**.
 
 ## 8. Gerbang
 
-`braincore-evidence-test.js` (138 pemeriksaan, terdaftar di `.github/workflows/quality.yml`):
+`tests/braincore-evidence-test.js` (138 pemeriksaan, terdaftar di `.github/workflows/quality.yml`):
 privasi, malformed, offline, retry, duplicate, kegagalan server, kebenaran agregasi,
 isolasi terhadap pipeline lama, dan paritas enum klien↔server. Ditambah
-`d1-schema-contract-test.js` + `tools/d1-schema-check.mjs` yang kini mengenal database
-keempat dan arah larangan tabelnya, serta `owner-dashboard-test.js` /
-`owner-edge-guard-test.js` yang tetap hijau tanpa dilonggarkan.
+`tests/d1-schema-contract-test.js` + `tools/d1-schema-check.mjs` yang kini mengenal database
+keempat dan arah larangan tabelnya, serta `tests/owner-dashboard-test.js` /
+`tests/owner-edge-guard-test.js` yang tetap hijau tanpa dilonggarkan.
 
 Seluruh 233 gerbang di `quality.yml` dijalankan pada branch ini. Dua merah, dan
 keduanya sudah dibuktikan BUKAN akibat perubahan ini:
 
-- `release-audit-gate-test.js` — merah juga pada checkout bersih tanpa perubahan
+- `tests/release-audit-gate-test.js` — merah juga pada checkout bersih tanpa perubahan
   ini (diverifikasi dengan `git stash`).
-- `id-golden-snapshot-test.js` — merah hanya kalau seluruh suite dijalankan
+- `tests/id-golden-snapshot-test.js` — merah hanya kalau seluruh suite dijalankan
   berurutan di satu working tree: gerbang konten lain menulis ulang
   `grammar-templates.json` (`indonesianCoverage.updatedAt`) sebagai efek samping,
   dan snapshot golden mengunci hash berkas itu. Hijau kembali begitu berkasnya
@@ -227,7 +227,7 @@ keduanya sudah dibuktikan BUKAN akibat perubahan ini:
 3. **Hasil purge belum terlihat di observabilitas cron.** `purgeEvidence()` SUDAH
    dipasang ke jalur cron harian (`runScheduled` → `runEvidencePurge`), tetapi SENGAJA
    belum dibungkus `withCronRun`: daftar job cron adalah enum tertutup yang dikunci
-   `cron-contract-test.js` sampai ke jumlah baris per putaran, dan menambah job ketiga
+   `tests/cron-contract-test.js` sampai ke jumlah baris per putaran, dan menambah job ketiga
    adalah perubahan kontrak tersendiri. Akibatnya purge yang GAGAL tidak akan muncul di
    `/api/owner/cron-status` — lubang yang diketahui, bukan yang tersembunyi.
 4. **Consent belum ada.** Belum ada pintu di UI tempat murid/wali menyetujui pengiriman

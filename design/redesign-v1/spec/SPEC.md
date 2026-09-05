@@ -10,9 +10,9 @@ Semua jumlah kemunculan di bawah dihitung dengan grep `var(--token…)` nyata pa
 
 1. **Ada DUA blok `:root` di style.css.** Blok 1 (baris 6, "Design System v5 / palet pastel m025-115") mendefinisikan palet pastel lengkap (`--cream`, `--yellow`, `--coral`, dst) *plus* netral (`--bg`, `--panel`, `--text`, radius 26/18/13). Blok 2 (baris 594, "v6") **menimpa** netral-netral itu (`--bg`, `--panel`, `--text`, `--muted`, radius 22/16/12, shadow set kedua) dan menambah keluarga `--surface-*`, `--glass-text/muted/line`, `--wordmark-*`, `--fz-*`. Untuk token yang didefinisikan dua kali, **blok 2 yang menang**. Perubahan token harus diterapkan di **kedua blok** (atau blok 1 dibersihkan dari duplikat) — jangan hanya blok atas (kesalahan ini sudah pernah terjadi, lihat komentar baris 590–593).
 2. **Empat stylesheet dimuat** (index.html baris 77–85): `style.css` → `features/speaking-listening/speaking-listening-addon.css` → `features/tutor-classroom/tutor-v3.css` → `features/mascot/fiezel-motion.css` (sengaja terakhir). `tutor-v3.css` punya blok token sendiri `html.fiezel-ui-v6{--ui-*}` (baris 2) yang meng-hardcode palet pastel — ikut dimigrasi.
-3. **Test memarse CSS secara statis dari file**, bukan dari browser: `contrast-test.js` membaca `style.css` + `tutor-v3.css` langsung (`SOURCE = {style, tutor}`); `pastel-field-contrast-test.js` **memaku literal palet** (`BRIEF_PALETTE: --cream #FFF8ED, --ink #2B2118, --yellow #FFD23F, --coral #EE5D4A, --gold #C9A24B`) dan mem-blacklist palet lama (`SUPERSEDED`). Konsekuensi arsitektural: **file `tokens.css` terpisah TIDAK akan terlihat oleh test-test ini.** Keputusan spec: nilai token diedit **in-place di `:root` style.css** (kedua blok), dan kunci literal di test **dipindahkan ke nilai baru pada commit yang sama** — preseden resminya ada di komentar style.css baris ±640: *"kuncinya dipindahkan ke nilai baru di contrast-test, bukan dibuang."* (Alternatif: buat `tokens.css` + tambahkan ia ke `SOURCE` test — boleh, tapi lebih banyak titik sentuh; lihat MIGRATION.md Fase 1.)
-4. **Font**: `assets/fonts/` saat ini hanya berisi `InstrumentSerif-400.woff2` + `PlusJakartaSans-400/500/600/700.woff2`. **FZ Fredoka belum ada di repo app** — file `Fredoka-var.woff2` tersedia di `redesign/screens/a/assets/fonts/` dan harus disalin ke `fiezel-apps/assets/fonts/` (self-host wajib; `onboarding-test.js` menggagalkan Google Fonts CDN).
-5. **DESIGN-SYSTEM.md sudah basi terhadap kode**: §1 masih mendokumentasikan palet maroon `#8C2233` dan mode gelap, padahal `:root` aktual sudah pastel dan mode gelap dihapus sejak m025-134 (dicatat sendiri di contrast-test.js). Dokumen itu tetap benar soal *aturan* (token-only, dua font, lucide subset, reduced-motion, urutan gate) — aturan-aturan itu **dibawa serta** ke sistem baru.
+3. **Test memarse CSS secara statis dari file**, bukan dari browser: `tests/contrast-test.js` membaca `style.css` + `tutor-v3.css` langsung (`SOURCE = {style, tutor}`); `tests/pastel-field-contrast-test.js` **memaku literal palet** (`BRIEF_PALETTE: --cream #FFF8ED, --ink #2B2118, --yellow #FFD23F, --coral #EE5D4A, --gold #C9A24B`) dan mem-blacklist palet lama (`SUPERSEDED`). Konsekuensi arsitektural: **file `tokens.css` terpisah TIDAK akan terlihat oleh test-test ini.** Keputusan spec: nilai token diedit **in-place di `:root` style.css** (kedua blok), dan kunci literal di test **dipindahkan ke nilai baru pada commit yang sama** — preseden resminya ada di komentar style.css baris ±640: *"kuncinya dipindahkan ke nilai baru di contrast-test, bukan dibuang."* (Alternatif: buat `tokens.css` + tambahkan ia ke `SOURCE` test — boleh, tapi lebih banyak titik sentuh; lihat MIGRATION.md Fase 1.)
+4. **Font**: `assets/fonts/` saat ini hanya berisi `InstrumentSerif-400.woff2` + `PlusJakartaSans-400/500/600/700.woff2`. **FZ Fredoka belum ada di repo app** — file `Fredoka-var.woff2` tersedia di `redesign/screens/a/assets/fonts/` dan harus disalin ke `fiezel-apps/assets/fonts/` (self-host wajib; `tests/onboarding-test.js` menggagalkan Google Fonts CDN).
+5. **DESIGN-SYSTEM.md sudah basi terhadap kode**: §1 masih mendokumentasikan palet maroon `#8C2233` dan mode gelap, padahal `:root` aktual sudah pastel dan mode gelap dihapus sejak m025-134 (dicatat sendiri di tests/contrast-test.js). Dokumen itu tetap benar soal *aturan* (token-only, dua font, lucide subset, reduced-motion, urutan gate) — aturan-aturan itu **dibawa serta** ke sistem baru.
 
 ---
 
@@ -87,7 +87,7 @@ Coral tidak lagi jadi permukaan tombol/aksi (DIRECTION: "coral/mint/lilac TIDAK 
 
 **`--coral-soft` #FDE3DE — 5 pemakaian:** b.536 tombol confidence-1 → `--bad-soft` #FDE3DE (hex sama, **rename semantik**: "kurang yakin" memang semantik negatif); b.2093 `.grammar-launch .launch-icon` tile → boleh tetap sebagai **stiker modul** (ilustrasi, ikon ink) — rename token stiker `--sticker-coral:#FDE3DE`; b.2155 `.fz-coach-msg.is-user` bubble → `--sun-soft` #FFF3C4; b.2207 `.streak-badge` bg → `--sun-soft`; b.2534 `.hero-stat.is-streak` bg → `--sun-soft`.
 
-**Hex coral mentah:** `#EE5D4A` app.js:3141 (array warna confetti `['#FFD23F','#EE5D4A','#A8DCC4','#C9BCE4','#C9A24B']`) → ganti array jadi keluarga baru `['#FFC700','#FFA500','#FFDE59','#2E8B69','#B8432D']` (confetti = perayaan, boleh warna-warni tapi dari palet baru); `#C9432F` juga hidup sebagai `--wordmark-accent-hi` (index.html SVG wordmark) → **pertahankan** (identitas wordmark F + dua balok terracotta; dijaga `topbar-logo-contrast-test.js` terhadap bg — verifikasi ulang terhadap #FFF9EE).
+**Hex coral mentah:** `#EE5D4A` app.js:3141 (array warna confetti `['#FFD23F','#EE5D4A','#A8DCC4','#C9BCE4','#C9A24B']`) → ganti array jadi keluarga baru `['#FFC700','#FFA500','#FFDE59','#2E8B69','#B8432D']` (confetti = perayaan, boleh warna-warni tapi dari palet baru); `#C9432F` juga hidup sebagai `--wordmark-accent-hi` (index.html SVG wordmark) → **pertahankan** (identitas wordmark F + dua balok terracotta; dijaga `tests/topbar-logo-contrast-test.js` terhadap bg — verifikasi ulang terhadap #FFF9EE).
 
 ### 1e. Pastel lain — demosi ke stiker
 
@@ -107,7 +107,7 @@ Coral tidak lagi jadi permukaan tombol/aksi (DIRECTION: "coral/mint/lilac TIDAK 
 | `--accent-strong` | #A33422 | **25** | Tetap (6,5:1). |
 | `--accent-soft` | #FDE3DE | **12** | Tetap (hex = `--bad-soft`; satukan literal). |
 | `--accent-on-glass` | var(--accent-strong) | **8** | Tetap. |
-| `--wordmark-ink-hi/lo`, `--wordmark-accent-hi/lo` | #2B2118/#4A382A/#C9432F/#A33422 | **2/1/1/1** (index.html SVG) | ink-hi/lo geser ke #241A11/#4A382A; accent tetap. Wajib lolos `topbar-logo-contrast-test.js` di atas #FFF9EE. |
+| `--wordmark-ink-hi/lo`, `--wordmark-accent-hi/lo` | #2B2118/#4A382A/#C9432F/#A33422 | **2/1/1/1** (index.html SVG) | ink-hi/lo geser ke #241A11/#4A382A; accent tetap. Wajib lolos `tests/topbar-logo-contrast-test.js` di atas #FFF9EE. |
 
 ### 1g. Semantic
 
@@ -128,7 +128,7 @@ Tidak ada padanan lama. Ditambahkan di Fase 1, dipakai Fase 3:
 --on-core:#FDFAF3; --on-core-muted:rgba(253,250,243,.68);
 ```
 
-Pemakai: toast (Fase 2), panel BrainCore/analyzing/diagnosis/adaptive path (Fase 3), splash (sudah gelap — jembatani dengan `--core`). HEMAT: panel/kartu momen AI saja, bukan layar penuh. Catatan: `manifest.json background_color:#120C0F` disamakan ke `--core` #1B1418 di Fase 3 (mengubah manifest = perilaku install PWA; cek `install-health-test.js` & `pwa-release-coherence-test.js`).
+Pemakai: toast (Fase 2), panel BrainCore/analyzing/diagnosis/adaptive path (Fase 3), splash (sudah gelap — jembatani dengan `--core`). HEMAT: panel/kartu momen AI saja, bukan layar penuh. Catatan: `manifest.json background_color:#120C0F` disamakan ke `--core` #1B1418 di Fase 3 (mengubah manifest = perilaku install PWA; cek `tests/install-health-test.js` & `tests/pwa-release-coherence-test.js`).
 
 ### 1i. Bentuk, bayangan, gerak
 
@@ -149,7 +149,7 @@ Pemakai: toast (Fase 2), panel BrainCore/analyzing/diagnosis/adaptive path (Fase
 
 | Lama | Nilai | Pakai | Baru |
 |---|---|---|---|
-| `--fz-display` | 'FZ Instrument Serif' | **7** (`.section-head h1`, `.welcome-panel h2`, `.modal-panel h2`, `.fiezel-title`) | **'FZ Fredoka'** (variable, 500–700). Instrument Serif dihapus perannya (REPLACE) kecuali kutipan testimonial — buat `--fz-quote:'FZ Instrument Serif'` bila dipakai. **Prasyarat: salin `Fredoka-var.woff2` ke `assets/fonts/` + `@font-face` self-host** (onboarding-test.js melarang CDN). |
+| `--fz-display` | 'FZ Instrument Serif' | **7** (`.section-head h1`, `.welcome-panel h2`, `.modal-panel h2`, `.fiezel-title`) | **'FZ Fredoka'** (variable, 500–700). Instrument Serif dihapus perannya (REPLACE) kecuali kutipan testimonial — buat `--fz-quote:'FZ Instrument Serif'` bila dipakai. **Prasyarat: salin `Fredoka-var.woff2` ke `assets/fonts/` + `@font-face` self-host** (tests/onboarding-test.js melarang CDN). |
 | `--fz-heading` | 'FZ Plus Jakarta Sans' | **6** (h1–h4, `.brand`, `.welcome-mark`, `.modal-mark`) | Tetap Jakarta — judul kartu/UI = Jakarta 700 (DIRECTION). |
 | `--fz-body` | 'FZ Plus Jakarta Sans' | **16** | Tetap. |
 
@@ -233,7 +233,7 @@ Semua nilai = token; dilarang hex mentah (aturan DESIGN-SYSTEM.md dipertahankan)
 `.feedback` (b.257): panel `--panel`, border `--line`, radius 18px→`--radius-lg`, aksen kiri inset 4px `--good`/`--bad`; judul 18px/700 warna `--good`/`--bad`; explain 15px/1.6 `--text`; `.memory-tip` bg `--sun-soft` + ikon; `.ai-btn` = tombol sekunder + ikon sparkles. Tutor-turn lama → collapse accordion; CTA "Lanjut" sticky (audit REFINE). Confidence pop: sheet `--panel` radius-atas 24px; tombol 1/2/3 = `--bad-soft` / `--sun-soft` / `--sun` (teks selalu ink), tinggi 52px; "Baca penjelasan dulu" = text-button 13px `--accent-strong`.
 
 ### 3.6 Topbar & kartu
-Topbar: bg `--chrome-bg` (basis #FFF9EE), wordmark SVG token `--wordmark-*` (jaga `topbar-logo-contrast-test.js`); `.icon-button` 42px visual + hit-area 44px; `.ask-button` label **12px**. Launch-card: bg `--panel`, border `--line`, radius 20px→`--radius-lg` 24px, padding 24px, judul Jakarta 15px/700, meta 13px `--muted`, tile ikon = stiker (`--sun-soft`/stiker pastel) dengan ikon ink. Kartu AI/BrainCore (Fase 3): bg `--core`, teks `--on-core`, garis neural `--sun` alpha, radius 24px — panel saja, bukan layar penuh.
+Topbar: bg `--chrome-bg` (basis #FFF9EE), wordmark SVG token `--wordmark-*` (jaga `tests/topbar-logo-contrast-test.js`); `.icon-button` 42px visual + hit-area 44px; `.ask-button` label **12px**. Launch-card: bg `--panel`, border `--line`, radius 20px→`--radius-lg` 24px, padding 24px, judul Jakarta 15px/700, meta 13px `--muted`, tile ikon = stiker (`--sun-soft`/stiker pastel) dengan ikon ink. Kartu AI/BrainCore (Fase 3): bg `--core`, teks `--on-core`, garis neural `--sun` alpha, radius 24px — panel saja, bukan layar penuh.
 
 ### 3.7 Focus & motion
 Focus-visible **konsisten satu resep**: `outline:2px solid var(--sun-deep); outline-offset:2px` — mengganti 7 aturan `:focus-visible` yang kini campur (`--gold` b.364/1781, rgba merah). Motion: pakai token `--ease/--ease-spring/--dur-*`, durasi 160–420ms, hormati `prefers-reduced-motion` (blok global sudah ada — pertahankan).
@@ -247,7 +247,7 @@ Aturan baru (DIRECTION §maskot):
 3. **Reaksi kontekstual state nyata**: `correct / encouraging / hinting / listening / celebrating / thinking` — dipetakan ke scene `data-fz-scene` yang sudah ada di fiezel-motion.css (home/vocab/grammar/reading); jangan animasi acak.
 4. **Bubble coach maks 2 baris**, 12–13px, auto-dismiss ≤5s, `pointer-events:none` pada bubble agar tak menghalangi tap target; dot badge `--bad` + teks putih.
 5. Reduced-motion: semua animasi paw idle mati (blok sudah ada — pertahankan).
-6. Aset: `assets/brand/paw-mascot-full.svg` + `features/mascot/fiezel-mascot.js`; `paw-mascot-test.js` wajib tetap hijau.
+6. Aset: `assets/brand/paw-mascot-full.svg` + `features/mascot/fiezel-mascot.js`; `tests/paw-mascot-test.js` wajib tetap hijau.
 
 ### 3.9 Label internal & copy
 Perbaikan wajib #5: key internal tidak bocor — `indonesianPartOfSpeech()` sudah ada di app.js (b.3178, 3241); pastikan SEMUA jalur judul quiz vocab memakainya (audit menemukan "VOCABULARY PARTOFSPEECH · 2" di f08b — cari template yang menampilkan `type` mentah di app.js ±3235 dan map `partOfSpeech→'Jenis kata'`, dst). Copy konsisten: satu bentuk "Belum tepat, tidak apa-apa." (audit §3e).
@@ -270,4 +270,4 @@ Perbaikan wajib #5: key internal tidak bocor — `indonesianPartOfSpeech()` suda
 | `--muted` #6E5E47 di `--panel-soft` #FFF3DC (disabled) | ≈5,5:1 | AA (naik dari 3,42) |
 | `--sun` vs `--bg` (bidang) | ≈1,35:1 | non-teks — wajib border/ink outline (sudah pola chunky) |
 
-Finalisasi angka presisi = tanggung jawab pembaruan `contrast-test.js`/`pastel-field-contrast-test.js` (test menghitung sendiri dari CSS — angka di atas panduan desain).
+Finalisasi angka presisi = tanggung jawab pembaruan `tests/contrast-test.js`/`tests/pastel-field-contrast-test.js` (test menghitung sendiri dari CSS — angka di atas panduan desain).

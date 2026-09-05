@@ -14,7 +14,7 @@
  * HTML-TRUSTED (ikut copy-id-app-b.js): notif.bantuan-ditolak (<b>Allow / อนุญาต</b>)
  * dan ask.intro (<b>...</b>) dikonsumsi lewat innerHTML — markup dipertahankan persis;
  * nilai berinterpolasi dari input murid tetap di-esc() di sisi pemanggil (app.js:3954).
- * Nilai Thai TIDAK masuk himpunan literal gerbang id-golden-snapshot-test.js; kunci
+ * Nilai Thai TIDAK masuk himpunan literal gerbang tests/id-golden-snapshot-test.js; kunci
  * duplikat byte-identik kunci copy-id sehingga himpunan literal tidak berubah.
  */
 (function () {

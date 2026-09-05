@@ -12,7 +12,7 @@
 - Explicit neural voice preparation UI dengan progress asset.
 - Patched Kokoro.js 1.2.1 browser bundle, q8 ONNX model, enam locked voices, ONNX Runtime Web WASM, dan dependency licenses.
 - Source lock berisi immutable upstream commits, asset sizes, dan SHA-256.
-- Gate baru: `speaking-listening-test.js`, `neural-voice-test.js`, dan `neural-voice-http-test.js`.
+- Gate baru: `tests/speaking-listening-test.js`, `neural-voice-test.js`, dan `neural-voice-http-test.js`.
 
 ## Repairs from audit
 

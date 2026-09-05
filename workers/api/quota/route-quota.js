@@ -15,7 +15,7 @@
  *     `plan` datang dari D1; jenis permintaan ditentukan RUTE. Body boleh berisi
  *     `plan:'plus'`, `used:0`, `quota:{remaining:99}`, `cacheHit:true`, `reservationId:…` —
  *     semuanya diabaikan tanpa galat (cf-b3 §7). Ini dijaga statis oleh
- *     `quota-manipulation-test.js`.
+ *     `tests/quota-manipulation-test.js`.
  *  2. **Server mengirim FAKTA + `copyKey`, bukan kalimat.** Tidak ada satu pun prosa
  *     Bahasa Indonesia di badan respons; naskah tinggal di `features/quota/quota-copy.js`
  *     (rekomendasi F7 cf-a12) supaya bisa diuji seperti `GEMS_COPY`.
