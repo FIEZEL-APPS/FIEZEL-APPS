@@ -49,7 +49,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cat > tools/dev/m02526-probe.html <<'HTML'
+          # Ditulis di AKAR, bukan tools/dev/, karena tiga baris di bawah membacanya sebagai
+          # http://127.0.0.1:8000/m02526-probe.html - dan karena skrip di dalamnya memanggil
+          # ./features/... yang hanya benar bila halamannya duduk di akar yang disajikan.
+          # Berkas ini dibuat di runner dan tidak pernah di-commit, jadi ia tidak mengotori
+          # repo. Memindahkannya ke tools/dev/ (7dd4480) membuat halamannya 404 dan gerbang
+          # ini merah lima merge berturut-turut tanpa satu pun pesan yang menyebut sebabnya.
+          cat > m02526-probe.html <<'HTML'
           <!doctype html><meta charset="utf-8"><title>m025-26 product neural proof</title>
           <script>window.FIEZEL_VERSION='5.19.0';</script>
           <script src="./features/neural-voice/fiezel-neural-voice-config.js"></script>
@@ -118,6 +124,13 @@ jobs:
           set -euo pipefail
           python3 -m http.server 8000 >/tmp/m02526-http.log 2>&1 &
           for i in $(seq 1 40); do curl -fsS "http://127.0.0.1:8000/m02526-probe.html" >/dev/null 2>&1 && break; sleep 1; done
+          # Gagal DI SINI kalau halamannya tidak terjangkau. Tanpa baris ini, loop di atas
+          # habis tanpa suara, Safari memuat halaman 404, window.__probeStatus tidak pernah
+          # ada, dan poll() memutar 900 detik sebelum keluar 1 - lima belas menit yang tidak
+          # menyebut satu pun sebabnya. Persis cacat yang membuat gerbang ini merah sejak
+          # 7dd4480: yang salah cuma URL-nya, tapi tidak ada yang mengatakannya.
+          curl -fsS "http://127.0.0.1:8000/m02526-probe.html" >/dev/null \
+            || { echo "::error::halaman probe tidak terjangkau di http://127.0.0.1:8000/m02526-probe.html - cek tempat langkah 'Create product-runtime probe page' menulisnya"; exit 1; }
           sudo /usr/bin/safaridriver --enable || true
           /usr/bin/safaridriver -p 4444 >/tmp/m02526-safaridriver.log 2>&1 &
           for i in $(seq 1 40); do curl -fsS http://127.0.0.1:4444/status >/dev/null 2>&1 && break; sleep 1; done
@@ -136,6 +149,7 @@ jobs:
               if [[ "$s" == done || "$s" == error ]]; then echo "$resp" | jq -c '.value.result'; return 0; fi
               sleep 1
             done
+            echo "::error::probe tidak pernah menyetel window.__probeStatus dalam 900 detik - halaman termuat tetapi runtime neural tidak pernah selesai" >&2
             return 1
           }
           nav "http://127.0.0.1:8000/m02526-probe.html"
