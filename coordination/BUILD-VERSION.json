@@ -1,7 +1,7 @@
 {
-  "version": "m025-258",
-  "claimedBy": "branch a3-grammar",
-  "claimedAt": "2026-09-05T02:15:14.213Z",
-  "reason": "grammar A1-B2 upgrade + sesi kilat + Thai penuh (PR #345)",
+  "version": "m025-259",
+  "claimedBy": "branch main",
+  "claimedAt": "2026-09-05T16:38:15.974Z",
+  "reason": "Class hub: Kelas = Guru ↔ Murid ↔ Braincore (class-hub, review lokal, payload items/w)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
