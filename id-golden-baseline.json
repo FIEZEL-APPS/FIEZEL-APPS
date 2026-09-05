@@ -1,12 +1,12 @@
 {
   "schema": "id-golden-baseline/1",
-  "generatedAt": "2026-09-05T02:50:37.590Z",
+  "generatedAt": "2026-09-05T04:17:09.898Z",
   "root": "/home/user/FIEZEL-APPS",
   "files": {
     "grammar-explanations-id.json": "10e79dbbcd836cbfefb77727d6cd981b15fca156e6a42e638bed339f0c41f0e2",
     "grammar-misconception-id.json": "0a3f7af2a1c4e3f8d3ec682f915f5aad10fa0bc152f9cb835c6304653954815d",
     "grammar-labels-id.js": "dfd86bd7591f7cba9327e9f14e6aa05e38e7ff15036c7d7741493ad166d297d7",
-    "grammar-templates.json": "73a12ece9b6209a7b82014e1f44263cc52e0b74504b7115b8b03860c2e07abfb",
+    "grammar-templates.json": "c368cce9b1a790796d2298897d6afd2a1db398d0c6401422f44638215c10ef5e",
     "vocabulary-master.json": "9c32e169a25116f2e2f394ca21266c48e54935b06149e9cfe55c3645b094c96c",
     "misconception-taxonomy-v1.json": "74abc80d90ccdc507f8c00c5bdcb17d9c8ff6a495a10ce0620e3273b7cff37b8",
     "manifest.json": "3ff4250b536549a8638323db6cee13a7fc61a36d3f39ff6945009b44c25b9532",

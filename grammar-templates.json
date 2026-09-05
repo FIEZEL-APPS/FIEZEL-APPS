@@ -16254,43 +16254,43 @@
       "stem": "Find and correct the error: \"We eat usually dinner at seven.\"",
       "options": [
         "We usually eat dinner at seven.",
-        "Usually we eat dinner at seven usually.",
+        "Usually eat we dinner at seven.",
         "We eat dinner usually at seven.",
-        "We eat dinner at seven usually eat."
+        "We eat dinner at usually seven."
       ],
       "correctIndex": 0,
       "distractors": [
         {
-          "option": "Usually we eat dinner at seven usually.",
-          "misconception": "moves the adverb to the front of the sentence, a position frequency adverbs don't naturally take in a simple statement like this",
-          "whyFails": "It repeats the adverb at both ends; one 'usually' before the verb is enough.",
-          "whyFailsId": "kata keterangannya diulang di dua ujung. Satu “usually” di depan kata kerja udah cukup.",
-          "misconceptionId": "keterangannya dipindah ke awal kalimat, posisi yang nggak wajar."
+          "option": "Usually eat we dinner at seven.",
+          "misconception": "fronts the frequency adverb and then inverts subject and verb, which English statements never do",
+          "whyFails": "It puts 'usually' first and swaps 'we' and 'eat'; a statement keeps the subject before the verb.",
+          "whyFailsId": "“usually” ditaruh paling depan lalu subjek dan kata kerjanya ketuker. Kalimat berita tetap subjek dulu, baru kata kerja.",
+          "misconceptionId": "keterangannya dimajuin ke depan sampai subjek dan kata kerjanya kebalik."
         },
         {
           "option": "We eat dinner usually at seven.",
-          "misconception": "moves the adverb to the end instead of its standard mid-position with 'be'",
-          "whyFails": "It moves the adverb after the object instead of before the verb.",
-          "whyFailsId": "kata keterangannya dipindah ke sesudah objek, bukan ke depan kata kerja.",
-          "misconceptionId": "keterangannya dipindah ke akhir, bukan ke posisi tengah bareng be."
+          "misconception": "parks the adverb after the object instead of in its mid-position before an ordinary verb",
+          "whyFails": "It moves the adverb after the object instead of before the verb 'eat'.",
+          "whyFailsId": "kata keterangannya dipindah ke sesudah objek, bukan ke depan kata kerja “eat”.",
+          "misconceptionId": "keterangannya ditaruh sesudah objek, bukan di posisi tengah sebelum kata kerja biasa."
         },
         {
-          "option": "We eat dinner at seven usually eat.",
-          "misconception": "keeps the adverb in the wrong place while incorrectly reordering 'late' and 'is'",
-          "whyFails": "It adds a second verb and leaves the adverb in the wrong place.",
-          "whyFailsId": "nambah kata kerja kedua dan kata keterangannya tetap salah tempat.",
-          "misconceptionId": "keterangannya masih salah tempat dan urutan “late” dan “is” ikut ketuker."
+          "option": "We eat dinner at usually seven.",
+          "misconception": "drops the adverb inside the time phrase, splitting the preposition from its object",
+          "whyFails": "It splits 'at seven' with the adverb; a frequency adverb belongs before the main verb.",
+          "whyFailsId": "“at seven” kepotong sama keterangannya. Keterangan frekuensi tempatnya di depan kata kerja utama.",
+          "misconceptionId": "keterangannya diselipin di tengah keterangan waktu sampai “at” kepisah dari “seven”."
         }
       ],
       "explanation": {
         "whyCorrect": "'Eat' is an ordinary verb, so the frequency adverb goes right before it: we usually eat.",
         "rule": "Frequency adverbs (usually, always, often) go before an ordinary verb but after be.",
-        "whyOthersFail": "One option doubles the adverb, one parks it after the object, and one adds an extra verb.",
+        "whyOthersFail": "One option fronts the adverb and inverts the subject, one parks it after the object, and one splits the time phrase.",
         "howToAvoid": "Say the subject, then the adverb, then the verb: we – usually – eat.",
         "memoryCue": "Subject + usually + verb.",
         "ruleId": "Kata keterangan frekuensi (usually, always, often) di depan kata kerja biasa, tapi sesudah be.",
         "whyCorrectId": "“Eat” kata kerja biasa, jadi kata keterangan frekuensinya pas di depannya: we usually eat.",
-        "whyOthersFailId": "Satu pilihan ngulang kata keterangannya, satu naruhnya sesudah objek, satu nambah kata kerja ekstra.",
+        "whyOthersFailId": "Satu pilihan majuin keterangannya sampai subjeknya kebalik, satu naruhnya sesudah objek, satu motong keterangan waktunya.",
         "howToAvoidId": "Ucapin subjek, lalu kata keterangan, lalu kata kerja: we – usually – eat.",
         "memoryCueId": "Subjek + usually + kata kerja."
       },

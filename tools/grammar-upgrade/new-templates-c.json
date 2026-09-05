@@ -752,32 +752,32 @@
         "stem": "Find and correct the error: \"We eat usually dinner at seven.\"",
         "options": [
           "We usually eat dinner at seven.",
-          "Usually we eat dinner at seven usually.",
+          "Usually eat we dinner at seven.",
           "We eat dinner usually at seven.",
-          "We eat dinner at seven usually eat."
+          "We eat dinner at usually seven."
         ],
         "correctIndex": 0,
         "distractors": [
           {
-            "option": "Usually we eat dinner at seven usually.",
+            "option": "Usually eat we dinner at seven.",
             "misconception": "@sibling:0",
-            "whyFails": "It repeats the adverb at both ends; one 'usually' before the verb is enough."
+            "whyFails": "It puts 'usually' first and swaps 'we' and 'eat'; a statement keeps the subject before the verb."
           },
           {
             "option": "We eat dinner usually at seven.",
             "misconception": "@sibling:1",
-            "whyFails": "It moves the adverb after the object instead of before the verb."
+            "whyFails": "It moves the adverb after the object instead of before the verb 'eat'."
           },
           {
-            "option": "We eat dinner at seven usually eat.",
+            "option": "We eat dinner at usually seven.",
             "misconception": "@sibling:2",
-            "whyFails": "It adds a second verb and leaves the adverb in the wrong place."
+            "whyFails": "It splits 'at seven' with the adverb; a frequency adverb belongs before the main verb."
           }
         ],
         "explanation": {
           "whyCorrect": "'Eat' is an ordinary verb, so the frequency adverb goes right before it: we usually eat.",
           "rule": "Frequency adverbs (usually, always, often) go before an ordinary verb but after be.",
-          "whyOthersFail": "One option doubles the adverb, one parks it after the object, and one adds an extra verb.",
+          "whyOthersFail": "One option fronts the adverb and inverts the subject, one parks it after the object, and one splits the time phrase.",
           "howToAvoid": "Say the subject, then the adverb, then the verb: we – usually – eat.",
           "memoryCue": "Subject + usually + verb."
         }
@@ -788,7 +788,7 @@
         "reasoning": "kenali kata keterangan frekuensi → cek kata kerjanya bukan be → taruh kata keterangan di depan kata kerja",
         "rule": "Kata keterangan frekuensi (usually, always, often) di depan kata kerja biasa, tapi sesudah be.",
         "whyCorrect": "“Eat” kata kerja biasa, jadi kata keterangan frekuensinya pas di depannya: we usually eat.",
-        "whyOthersFail": "Satu pilihan ngulang kata keterangannya, satu naruhnya sesudah objek, satu nambah kata kerja ekstra.",
+        "whyOthersFail": "Satu pilihan majuin keterangannya sampai subjeknya kebalik, satu naruhnya sesudah objek, satu motong keterangan waktunya.",
         "howToAvoid": "Ucapin subjek, lalu kata keterangan, lalu kata kerja: we – usually – eat.",
         "memoryCue": "Subjek + usually + kata kerja.",
         "distractors": {
