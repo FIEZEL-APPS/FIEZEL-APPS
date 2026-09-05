@@ -12104,7 +12104,7 @@ document.addEventListener?.('fiezel:lazy-group',event=>{if(event?.detail?.group=
 /*   4. Bunyi lewat gerbang feedbackSounds, gerak maskot lewat pawReact yang sudah    */
 /*      menghormati reduced-motion — tidak ada gerbang baru yang bisa berbeda.        */
 function onlineTabs(){return [['profil',FiezelI18n.t('social.tab-profile')],['teman',FiezelI18n.t('social.tab-friends')],['papan',FiezelI18n.t('social.tab-leaderboard')]]}
-let onlineTab='profil',onlineBoardTab='teman',onlineSeq=0,onlineHandleTimer=null;
+let onlineTab='profil',onlineBoardTab='teman',onlineSeq=0;
 let socialProfileCache=null,socialInviteLast=null,socialSummaryCache=null,socialSummaryAt=0;
 function socialCore(){try{return self.FiezelSocial||null}catch(_){return null}}
 // Momen mikro sosial: SATU bunyi (gerbang feedbackSounds) + SATU reaksi maskot (gerbang
@@ -12280,25 +12280,6 @@ async function socialProfilMarkup(core){
   }
   return card(`<h3>${FiezelI18n.t('social.profile-error-title')}</h3><p class="muted">${esc(me.message)}</p>`,'social-card')+settingsCard;
 }
-// Cek ketersediaan LIVE, debounce 500 ms (spec §2.4): validasi lokal dulu (alasan yang jelas,
-// tanpa jaringan), baru tanya server available:true/false.
-function socialHandleInput(value){
-  const status=$('socialHandleStatus'),btn=$('socialCreateBtn');
-  if(btn)btn.disabled=true;
-  clearTimeout(onlineHandleTimer);
-  const core=socialCore();if(!core||!status)return;
-  const v=core.validateHandle(value);
-  if(!v.ok){status.textContent=v.reason;status.classList.remove('social-ok');return}
-  status.textContent=FiezelI18n.t('social.handle-checking');status.classList.remove('social-ok');
-  onlineHandleTimer=setTimeout(async()=>{
-    const res=await core.api.profileCheck(v.handle);
-    const cur=$('socialHandle');if(!cur||String(cur.value||'').trim().toLowerCase()!==v.handle)return; // murid sudah mengetik lagi
-    if(res.ok&&res.data?.available===true){status.textContent=FiezelI18n.t('social.handle-available',{handle:v.handle});status.classList.add('social-ok');if($('socialCreateBtn'))$('socialCreateBtn').disabled=false}
-    else if(res.ok){status.textContent=FiezelI18n.t('social.handle-taken');status.classList.remove('social-ok')}
-    else{status.textContent=res.message;status.classList.remove('social-ok')}
-  },500);
-}
-window.socialHandleInput=socialHandleInput;
 async function socialCreateProfile(){
   const btn=$('socialCreateBtn');if(btn){btn.disabled=true;btn.textContent=FiezelI18n.t('social.creating')}
   const res=await registerStudentOnce();
