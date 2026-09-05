@@ -1,6 +1,6 @@
 {
   "schema": "id-golden-baseline/1",
-  "generatedAt": "2026-09-05T13:21:52.011Z",
+  "generatedAt": "2026-09-05T15:27:21.778Z",
   "root": "/home/user/FIEZEL-APPS",
   "files": {
     "grammar-explanations-id.json": "90912890391b2e491f31a6558aec5b7cecccbf56bc7c341fb1106291b5c721b6",
@@ -18,8 +18,8 @@
     "features/audio-assets/fiezel-audio-key.js": "11624e303917fe0df881ac3f410911587766fd6f4d2491ca6687ec42de8d457d"
   },
   "literals": {
-    "count": 2619,
-    "sha256": "ac19d84aadd46e04afc2a7f712a3093393f7ea1f2fcfb1b58e9db7a325e02d99",
+    "count": 2620,
+    "sha256": "5612bf0de8809bc216e4f427c5dad1907c4ed0d7a5e04bc9d0f8d64efdd9b241",
     "list": [
       "\n      SETELAH beat concern ≤1000ms selesai (13 §2.2), bukan menimpanya. Tanpa bunyi:\n      SFX hint sudah dipensiunkan (20 §4); cooldown 8 detiknya dijaga komponen. */\n   setTimeout(()=>{try{pawReact(",
       "\n      case 'silent':                        // L5: kalau mulut sempat mulai (taksiran L3 kandas), tutup SEKARANG\n        degradedLatch = false;\n        closeTurn(false);\n        break;\n      case 'interrupt':                     // stop(): snap tutup\n        degradedLatch = false;\n        closeTurn(true);\n        break;\n      default:\n        break;                              // fase asing dari versi fasad lebih baru: diabaikan tanpa suara\n    }\n  }\n\n  try { doc.addEventListener('fiezel-speech', onSpeech); } catch (_) {}\n\n  /* Suara terdegradasi (audibility-fix): mulut mati SEKETIKA dan tidak boleh\n     hidup lagi untuk sisa giliran — apa pun yang masih dikirim lapisan bawah. */\n  try {\n    root.addEventListener('fiezel-neural-voice-degraded', function () {\n      if (turn) closeTurn(true);\n      degradedLatch = true;                 // dilepas oleh end/silent/interrupt fasad berikutnya\n    });\n  } catch (_) {}\n\n  /* Permukaan kecil untuk Diagnostics/tes — bukan API pemanggil biasa:\n     satu-satunya pintu bicara tetap FiezelVoiceSay.say(). */\n  root.FiezelSpeechBridge = Object.freeze({\n    SCHEMA: SCHEMA,\n    speaking: function () { return !!turn; },\n    degraded: function () { return !!degradedLatch; },\n    motionAllowed: motionAllowed\n  });\n})(typeof self !== 'undefined' ? self : (typeof window !== 'undefined' ? window : this));\n",
@@ -655,6 +655,7 @@
       "?level:x.src.sourceLevel,origin:x.src.origin,lessonSkill,skill,conceptId:lessonId}))}}\n\nfunction reading(){const level=getActiveLevel(),active=R.filter(r=>r.level===level),total=active.reduce((n,r)=>n+(r.qs?.length||0),0);\n  const examSets=readingExamSetsForLevel(level),examLevels=readingExamLevels();\n  /* m025-246: blok \"Latihan berformat ujian\" di layar Reading disembunyikan bersama\n  pintu ujian per skill lainnya (OWNER: \"Ujian per skill ... SEMBUNYIKAN\"). Bank\n  soalnya (reading-exam-v1.json), startReadingExam(), dan seluruh mesin penilaiannya\n  tetap utuh dan tetap dijaga tests/reading-exam-test.js - yang mati hanya pintunya. */\n  const examMarkup=(uxOn(",
       "?new Promise(r=>setTimeout(()=>r(PENDING),9000)):new Promise(()=>{});\n   /* m025-201 (REGRESI PRODUKSI). `say` di baris berikutnya adalah identifier BEBAS - tidak\n    * pernah dideklarasikan di AudioService(). `typeof` pada identifier tak dideklarasikan\n    * TIDAK melempar, ia mengembalikan ",
       "?q[3]:{};\n  if(meta0.fixedOptions===true)return(q[1]||[]).map(x=>String(x));\n  const clean=[];const seen=new Set();\n  for(const x of q[1]||[]){const n=norm(x);if(n&&!seen.has(n)){seen.add(n);clean.push(x)}}\n  const ans=q[1]?.[answer];\n  if(ans&&!seen.has(norm(ans))){clean.unshift(ans);seen.add(norm(ans))}\n  const candidates=[];\n  for(const rr of R.filter(x=>x.level===r.level))for(const qq of rr.qs||[])for(const x of qq[1]||[]){const n=norm(x);if(n&&!seen.has(n)&&n!==norm(ans)){seen.add(n);candidates.push(x)}}\n  for(const x of candidates){if(clean.length>=4)break;clean.push(x)}\n  return clean.slice(0,4)\n}\nfunction makeReadingQuestion(r,q,i){\n  // m025-149: identitas jawaban dipegang oleh INDEKS, bukan oleh meta.answer. Bank soal\n  // menyimpan keduanya, dan ketika terjemahan merusak salah satunya keduanya berselisih -\n  // 170 soal begitu. Urutan lama mendahulukan meta.answer, tidak menemukan padanannya di\n  // daftar pilihan, lalu \"memperbaiki\" keadaan dengan MENIMPA pilihan pertama hasil acak.\n  // Artinya satu pengecoh sungguhan lenyap, dan pengecoh yang lenyap berbeda tiap kali soal\n  // dibuka. meta.answer sekarang hanya cadangan kalau indeksnya sendiri tidak sehat.\n  const meta=q[3]&&typeof q[3]===",
+      "@{handle} ingin berteman denganmu — buka Permintaan untuk menerima atau menolak.",
       "@{handle} menerima undanganmu — kalian sekarang teman belajar.",
       "AI Core tidak mengembalikan jawaban teks.",
       "AI Tutor sedang nggak bisa dihubungi",
