@@ -27,8 +27,8 @@
   function firstName(n) { return String(n || 'Murid').trim().split(/\s+/)[0].slice(0, 24); }
 
   // ---- persist -------------------------------------------------------------------------
-  function defaults() { return { schema: KEY, teacher: { name: '', school: '' }, classes: [], activeClassId: null, view: 'briefing', savedMinutes: 0, createdAt: Date.now() }; }
-  function load() { try { var raw = JSON.parse(localStorage.getItem(KEY)); if (raw && raw.schema === KEY) return Object.assign(defaults(), raw); } catch (_) {} return defaults(); }
+  function defaults() { return { schema: KEY, teacher: { name: '', school: '' }, classes: [], activeClassId: null, view: 'briefing', savedMinutes: 0, inbox: [], createdAt: Date.now() }; }
+  function load() { try { var raw = JSON.parse(localStorage.getItem(KEY)); if (raw && raw.schema === KEY) { var st = Object.assign(defaults(), raw); st.inbox = Array.isArray(st.inbox) ? st.inbox : []; return st; } } catch (_) {} return defaults(); }
   function save(st) { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (_) {} return st; }
   function normalizeStudent(s) {
     s.results = Array.isArray(s.results) ? s.results : [];
@@ -164,8 +164,8 @@
   }
   /** Masukkan hasil murid ke kelas: perbarui murid yang ada (nama depan sama) atau tambah baru. Skill digabung per-skill. */
   function ingest(c, parsed) {
-    var s = c.students.filter(function (x) { return x.name.toLowerCase() === parsed.name.toLowerCase(); })[0];
-    if (!s) { s = newStudent(parsed.name); c.students.push(s); }
+    var s = c.students.filter(function (x) { return x.name.toLowerCase() === parsed.name.toLowerCase(); })[0], isNew = false;
+    if (!s) { s = newStudent(parsed.name); c.students.push(s); isNew = true; }
     var incoming = {}; parsed.results.forEach(function (r) { incoming[r.skill] = r; });
     s.results = s.results.filter(function (r) { return !incoming[r.skill]; }).concat(parsed.results);
     s.lastActiveAt = parsed.lastActiveAt; s.targetDone = parsed.targetDone || s.targetDone; s.goal = parsed.goal || s.goal;
@@ -177,13 +177,20 @@
       var implicit = !explicit.length && targeted(a, s) && parsed.lastActiveAt >= a.createdAt && a.skills.some(function (k) { return incoming[k]; });
       if (hit || implicit) { a.done = a.done || {}; a.done[s.id] = { at: Number(hit && hit.at) || parsed.lastActiveAt, acc: hit && hit.t ? hit.c / hit.t : skillAcc(s, a.skills[0]) }; graded.push(a); }
     });
-    return { student: s, graded: graded };
+    return { student: s, graded: graded, isNew: isNew };
   }
-  function assignmentCode(c, a) { return b64e({ v: 1, t: 'assign', id: a.id, title: a.title, skills: a.skills, itemIds: a.itemIds, minutes: a.minutes, from: c.name, cls: c.code, deadline: a.deadline || null, mode: a.mode || 'latihan', timer: a.timer || 0, shuffle: !!a.shuffle }); }
+  /** Bentuk payload tugas yang dikirim ke server = isi kode tugas (tanpa base64). */
+  function assignmentPayload(c, a) { return { v: 1, t: 'assign', id: a.id, title: a.title, skills: a.skills, itemIds: a.itemIds, minutes: a.minutes, from: c.name, cls: c.code, deadline: a.deadline || null, mode: a.mode || 'latihan', timer: a.timer || 0, shuffle: !!a.shuffle }; }
+  function assignmentCode(c, a) { return b64e(assignmentPayload(c, a)); }
   function parseAssignmentCode(code) { try { var p = b64d(code); if (!p || p.t !== 'assign' || !Array.isArray(p.itemIds)) return null; return p; } catch (_) { return null; } }
   /** Sisi murid: simpan tugas dari kode guru ke antrean Today Plan (dipakai learner-flow). */
   function acceptAssignmentCode(code) {
     var p = parseAssignmentCode(code); if (!p) return null;
+    return acceptAssignmentPayload(p);
+  }
+  /** Sisi murid: simpan payload tugas (dari kode ATAU notifikasi server) ke antrean Today Plan. */
+  function acceptAssignmentPayload(p) {
+    if (!p || p.t !== 'assign' || !Array.isArray(p.itemIds)) return null;
     try {
       var a = JSON.parse(localStorage.getItem(ASSIGN_KEY)) || [];
       if (!a.some(function (x) { return x.id === p.id; })) a.push({ id: p.id, title: p.title, skills: p.skills, itemIds: p.itemIds, minutes: p.minutes, from: p.from, at: Date.now(), deadline: p.deadline, mode: p.mode });
@@ -245,8 +252,49 @@
   function fmtDate(ts) { try { return new Date(ts).toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short' }); } catch (_) { return today(ts); } }
 
   // ---- sinkron server (kode kelas diklaim guru; murid melapor otomatis) -----------------------
-  var SYNC_PATHS = { claim: '/api/teacher/class/claim', list: '/api/teacher/class/list', reports: '/api/teacher/class/reports', report: '/api/learner/class-report' };
+  var SYNC_PATHS = { claim: '/api/teacher/class/claim', list: '/api/teacher/class/list', reports: '/api/teacher/class/reports', report: '/api/learner/class-report', assign: '/api/teacher/class/assign', learnerAssignments: '/api/learner/class-assignments' };
   function account() { return root.FiezelAccount || null; }
+  /**
+   * Kirim tugas ke murid lewat server (masuk ke notifikasi murid). studentIds: null = seluruh
+   * kelas; selain itu daftar id murid di kelas ini (dikirim sebagai nama depan).
+   */
+  function sendAssignment(c, a, studentIds) {
+    var avail = syncAvailable();
+    if (avail !== 'ok') return Promise.resolve({ ok: false, error: avail });
+    var A = account(), names = null;
+    if (Array.isArray(studentIds) && studentIds.length) {
+      names = c.students.filter(function (s) { return studentIds.indexOf(s.id) !== -1; }).map(function (s) { return s.name; });
+      if (!names.length) return Promise.resolve({ ok: false, error: 'no_targets' });
+    }
+    var step = (c.sync && c.sync.claimed) ? Promise.resolve({ ok: true }) : claimClass(c);
+    return step.then(function (r) {
+      if (!r.ok) return { ok: false, error: r.error };
+      return A.api(SYNC_PATHS.assign, { code: c.code, assignment: assignmentPayload(c, a), targets: names }).then(function (res) {
+        if (!res.ok) return { ok: false, error: res.error || 'unknown' };
+        a.sent = a.sent || { all: null, to: {} };
+        if (!names) a.sent.all = Date.now(); else (studentIds || []).forEach(function (id) { a.sent.to[id] = Date.now(); });
+        return { ok: true, count: names ? names.length : c.students.length };
+      });
+    }).catch(function () { return { ok: false, error: 'unavailable' }; });
+  }
+  function sentTo(a, s) { return !!(a.sent && (a.sent.all || (a.sent.to && a.sent.to[s.id]))); }
+  // ---- kotak masuk guru (lokal; diisi dari hasil sinkron) --------------------------------------
+  var INBOX_MAX = 60;
+  function notify(st, entry) {
+    st.inbox = Array.isArray(st.inbox) ? st.inbox : [];
+    var e = Object.assign({ id: uid('nt'), at: Date.now(), read: false }, entry);
+    st.inbox.unshift(e); st.inbox = st.inbox.slice(0, INBOX_MAX);
+    return e;
+  }
+  function inboxUnread(st) { return (st.inbox || []).filter(function (e) { return !e.read; }).length; }
+  function inboxMarkAllRead(st) { (st.inbox || []).forEach(function (e) { e.read = true; }); }
+  function inboxText(e) {
+    if (!e) return '';
+    if (e.kind === 'assignment_done') return e.student + ' selesai mengerjakan “' + e.title + '”' + (e.acc != null ? ' · ' + pct(e.acc) : '');
+    if (e.kind === 'student_joined') return e.student + ' bergabung ke kelas ' + (e.cls || '');
+    if (e.kind === 'report_in') return 'Laporan latihan baru dari ' + e.student;
+    return e.text || '';
+  }
   /** syncAvailable() -> 'ok' | 'offline' | 'no_account' | 'not_teacher' | 'disabled' */
   function syncAvailable() {
     var A = account(); if (!A || typeof A.api !== 'function') return 'disabled';
@@ -274,13 +322,16 @@
         c.sync = Object.assign(c.sync || {}, { error: r.error || 'unknown' });
         return { ok: false, error: r.error || 'unknown', ingested: 0, graded: 0 };
       }
-      var d = r.data || {}, ingested = 0, graded = 0, names = [];
+      var d = r.data || {}, ingested = 0, graded = 0, names = [], events = [];
       (d.reports || []).forEach(function (rep) {
         var p = parseLearnerPayload(rep.report); if (!p) return;
         var res = ingest(c, p); ingested++; graded += res.graded.length; names.push(res.student.name);
+        if (res.isNew) events.push({ kind: 'student_joined', student: res.student.name, sid: res.student.id, cls: c.name, clsId: c.id });
+        res.graded.forEach(function (a) { var dn = a.done && a.done[res.student.id]; events.push({ kind: 'assignment_done', student: res.student.name, sid: res.student.id, title: a.title, aid: a.id, acc: dn ? dn.acc : null, clsId: c.id }); });
+        if (!res.isNew && !res.graded.length) events.push({ kind: 'report_in', student: res.student.name, sid: res.student.id, clsId: c.id });
       });
       c.sync = Object.assign(c.sync || {}, { claimed: true, cursor: Number(d.cursor) || since, lastPullAt: Date.now(), error: '' });
-      return { ok: true, ingested: ingested, graded: graded, names: names, more: !!d.more };
+      return { ok: true, ingested: ingested, graded: graded, names: names, events: events, more: !!d.more };
     });
   }
   /** Satu putaran sinkron untuk satu kelas: klaim bila perlu, lalu tarik. */
@@ -309,7 +360,8 @@
   return { KEY: KEY, ASSIGN_KEY: ASSIGN_KEY, SKILL_LABEL: SKILL_LABEL, SKILL_ORDER: SKILL_ORDER, ATT: ATT, DAY: DAY,
     load: load, save: save, defaults: defaults, uid: uid, today: today, firstName: firstName, newClass: newClass, newStudent: newStudent, normalizeClass: normalizeClass, seedDemo: seedDemo, makeClassCode: makeClassCode, normalizeClassCode: normalizeClassCode,
     skillAcc: skillAcc, overallAcc: overallAcc, daysSince: daysSince, risk: risk, classStats: classStats, classSkillMap: classSkillMap, heatmap: heatmap, studyGroups: studyGroups, misconceptions: misconceptions, needsGreeting: needsGreeting, agenda: agenda, pendingAssignments: pendingAssignments, targeted: targeted, recentAttendance: recentAttendance, attendanceRate: attendanceRate, weakestSkill: weakestSkill,
-    parseLearnerCode: parseLearnerCode, parseLearnerPayload: parseLearnerPayload, ingest: ingest, assignmentCode: assignmentCode, parseAssignmentCode: parseAssignmentCode, acceptAssignmentCode: acceptAssignmentCode, buildAssignment: buildAssignment,
-    SYNC_PATHS: SYNC_PATHS, syncAvailable: syncAvailable, claimClass: claimClass, pullReports: pullReports, syncClass: syncClass, reportToClass: reportToClass, syncLabel: syncLabel,
+    parseLearnerCode: parseLearnerCode, parseLearnerPayload: parseLearnerPayload, ingest: ingest, assignmentCode: assignmentCode, assignmentPayload: assignmentPayload, parseAssignmentCode: parseAssignmentCode, acceptAssignmentCode: acceptAssignmentCode, acceptAssignmentPayload: acceptAssignmentPayload, buildAssignment: buildAssignment,
+    SYNC_PATHS: SYNC_PATHS, syncAvailable: syncAvailable, claimClass: claimClass, pullReports: pullReports, syncClass: syncClass, reportToClass: reportToClass, syncLabel: syncLabel, sendAssignment: sendAssignment, sentTo: sentTo,
+    notify: notify, inboxUnread: inboxUnread, inboxMarkAllRead: inboxMarkAllRead, inboxText: inboxText,
     greetingCard: greetingCard, parentReport: parentReport, weeklyClassReport: weeklyClassReport, csvStudents: csvStudents, parseNames: parseNames, waLink: waLink, fmtDate: fmtDate, pct: pct };
 });

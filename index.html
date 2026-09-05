@@ -303,18 +303,10 @@ html.fz-booting body{overflow:hidden}
         <span class="brand"><svg class="fiezel-wordmark" id="fzTopMark" viewBox="0 0 1000 260" role="img" aria-label="FIEZEL"><g class="fzw-sparks" aria-hidden="true"><circle class="fzw-spark" cx="51" cy="51" r="15" style="--sx:-70px;--sy:-85px;--sd:0s"/><circle class="fzw-spark" cx="51" cy="205" r="15" style="--sx:-78px;--sy:80px;--sd:.03s"/><circle class="fzw-spark" cx="102" cy="51" r="15" style="--sx:-52px;--sy:-96px;--sd:.06s"/><circle class="fzw-spark" cx="88" cy="130" r="15" style="--sx:-92px;--sy:0px;--sd:.09s"/><circle class="fzw-spark" cx="205" cy="60" r="15" style="--sx:-30px;--sy:-92px;--sd:.12s"/><circle class="fzw-spark" cx="253" cy="168" r="15" style="--sx:-22px;--sy:78px;--sd:.15s"/><circle class="fzw-spark" cx="321" cy="51" r="15" style="--sx:-40px;--sy:-90px;--sd:.18s"/><circle class="fzw-spark" cx="350" cy="130" r="15" style="--sx:-60px;--sy:-6px;--sd:.21s"/><circle class="fzw-spark" cx="365" cy="209" r="15" style="--sx:-44px;--sy:86px;--sd:.24s"/><circle class="fzw-spark" cx="553" cy="51" r="15" style="--sx:6px;--sy:-98px;--sd:.27s"/><circle class="fzw-spark" cx="553" cy="209" r="15" style="--sx:6px;--sy:92px;--sd:.3s"/><circle class="fzw-spark" cx="683" cy="130" r="15" style="--sx:30px;--sy:-4px;--sd:.33s"/><circle class="fzw-spark" cx="734" cy="51" r="15" style="--sx:44px;--sy:-88px;--sd:.36s"/><circle class="fzw-spark" cx="727" cy="209" r="15" style="--sx:40px;--sy:90px;--sd:.39s"/><circle class="fzw-spark" cx="861" cy="130" r="15" style="--sx:86px;--sy:-8px;--sd:.42s"/><circle class="fzw-spark" cx="905" cy="209" r="15" style="--sx:96px;--sy:84px;--sd:.45s"/></g><defs><linearGradient id="fztIv" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--wordmark-ink-hi)"/><stop offset="100%" stop-color="var(--wordmark-ink-lo)"/></linearGradient><linearGradient id="fztGo" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--wordmark-accent-hi)"/><stop offset="100%" stop-color="var(--wordmark-accent-lo)"/></linearGradient></defs><g class="fzw-mark"><g fill="url(#fztIv)"><rect x="30" y="30" width="42" height="200" rx="21"/><rect x="30" y="30" width="144" height="42" rx="21"/><rect x="30" y="109" width="116" height="42" rx="21"/><rect x="300" y="30" width="42" height="200" rx="21"/><rect x="300" y="30" width="144" height="42" rx="21"/><rect x="300" y="109" width="100" height="42" rx="21"/><rect x="300" y="188" width="130" height="42" rx="21"/><rect x="478" y="30" width="150" height="42" rx="21"/><rect x="478" y="188" width="150" height="42" rx="21"/><rect x="607" y="30" width="191.38" height="42" rx="21" transform="rotate(124.354 607 51)"/><rect x="662" y="30" width="42" height="200" rx="21"/><rect x="662" y="30" width="144" height="42" rx="21"/><rect x="662" y="109" width="100" height="42" rx="21"/><rect x="662" y="188" width="130" height="42" rx="21"/><rect x="840" y="30" width="42" height="200" rx="21"/><rect x="840" y="188" width="130" height="42" rx="21"/></g><g fill="url(#fztGo)"><rect x="192" y="30" width="26" height="200" rx="13"/><rect x="240" y="106" width="26" height="124" rx="13"/></g></g></svg></span>
       </button>
       <div class="topbar-actions">
-        <!-- m025-105: pintu ke Tanya FIEZEL. Ikonnya dua balok emas dari wordmark FIEZEL
-             sendiri, bukan ikon pustaka - inilah satu-satunya tempat di aplikasi yang
-             berbicara sebagai FIEZEL, jadi tandanya pun miliknya sendiri.
-
-             Digambar inline, bukan <img>: ikon topbar harus ikut warna dan ukuran
-             tombolnya, dan berkas terpisah akan berkedip datang belakangan pada muat
-             pertama. Sumbernya tetap ada di assets/brand/fiezel-ask.svg.
-
-             TANPA data-view, dengan sengaja. renderInner() menambahkan kelas active ke
-             elemen ber-data-view tetapi hanya membersihkannya dari .nav, jadi atribut itu
-             akan membuat ikon ini tersangkut menyala selamanya setelah sekali dibuka. -->
-        <button type="button" class="icon-button ask-button" onclick="go('ask')" aria-label="Tanya FIEZEL" data-i18n-aria-label="topbar.ask-aria"><svg class="fiezel-ask-mark" viewBox="0 0 74 200" aria-hidden="true"><defs><linearGradient id="fztAsk" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFDE59"/><stop offset="45%" stop-color="#FFC700"/><stop offset="100%" stop-color="#E6A800"/></linearGradient></defs><g fill="url(#fztAsk)"><rect x="0" y="0" width="26" height="200" rx="13"/><rect x="48" y="76" width="26" height="124" rx="13"/></g></svg><span class="ask-label" data-i18n="topbar.ask">Tanya FIEZEL?</span></button>
+        <!-- Lonceng notifikasi: tugas dari guru, teman baru, sorakan, undangan. Menggantikan
+             pintu topbar "Tanya FIEZEL" (askView tetap ada; aksesnya lewat pembimbing PAW).
+             TANPA data-view, dengan sengaja - lihat catatan renderInner() soal kelas active. -->
+        <button type="button" id="fzNotifBtn" class="icon-button notif-button" onclick="openNotifications()" aria-label="Notifikasi" data-i18n-aria-label="topbar.notif-aria" data-testid="topbar-notif-button"><i data-lucide="bell"></i><span id="fzNotifBadge" class="notif-badge hidden" aria-hidden="true" data-testid="topbar-notif-badge"></span></button>
         <button type="button" class="icon-button" onclick="openSettings()" aria-label="Buka pengaturan" data-i18n-aria-label="nav.open-settings-aria"><i data-lucide="sliders-horizontal"></i></button>
         <div class="version" id="version"></div>
       </div>
@@ -630,6 +622,8 @@ html.fz-booting body{overflow:hidden}
        seluruh pemanggilnya di app.js guarded dan fitur teman kembali ke jalur manual. -->
   <script defer src="./features/social/fiezel-invite-link.js"></script>
   <script defer src="./features/social/fiezel-social-notify.js"></script>
+  <!-- KOTAK MASUK MURID: tugas dari guru (polling /api/learner/class-assignments) + lonceng topbar. -->
+  <script defer src="./features/notify/fiezel-inbox.js"></script>
   <!-- LAPIS AKUN (masuk / daftar / aktivasi guru). Inti murni tanpa DOM, seperti
        gems-core: seluruh UI-nya hidup di app.js. Dimuat SEBELUM app.js karena alur
        boot menanyakan sesi (`FiezelAccount.refresh()`) sebelum Home digambar, jadi

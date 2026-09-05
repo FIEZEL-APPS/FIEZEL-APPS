@@ -13,7 +13,7 @@ function assert(c, m) { results.push({ ok: !!c, message: m }); if (!c) failures 
 
 /** D1 palsu: cukup untuk kueri yang dipakai lane ini. */
 function fakeD1() {
-  const cls = new Map(), rep = new Map(), accounts = new Map();
+  const cls = new Map(), rep = new Map(), accounts = new Map(), asg = new Map();
   function stmt(sql) {
     let args = [];
     const s = sql.replace(/\s+/g, ' ');
@@ -23,6 +23,7 @@ function fakeD1() {
         if (/CREATE /.test(s)) return { success: true };
         if (/INSERT INTO tc_class \(/.test(s)) { cls.set(args[0], { code: args[0], teacher_sub: args[1], title: args[2], level: args[3], created_at: args[4], updated_at: args[4] }); return { meta: { changes: 1 } }; }
         if (/UPDATE tc_class SET/.test(s)) { const c = cls.get(args[0]); if (c && c.teacher_sub === args[4]) { c.title = args[1]; c.level = args[2]; c.updated_at = args[3]; } return { meta: { changes: 1 } }; }
+        if (/INSERT INTO tc_class_assignment/.test(s)) { asg.set(args[0] + '|' + args[1], { class_code: args[0], id: args[1], teacher_sub: args[2], payload_json: args[3], targets_json: args[4], created_at: args[5], updated_at: args[5] }); return { meta: { changes: 1 } }; }
         if (/INSERT INTO tc_class_report/.test(s)) { rep.set(args[0] + '|' + args[1], { class_code: args[0], learner_key: args[1], display_name: args[2], learner_sub: args[3], reported_at: args[4], report_json: args[5], updated_at: args[6] }); return { meta: { changes: 1 } }; }
         throw new Error('run tak dikenal: ' + s);
       },
@@ -35,13 +36,14 @@ function fakeD1() {
       },
       async all() {
         if (/FROM tc_class c WHERE c.teacher_sub/.test(s)) return { results: [...cls.values()].filter((c) => c.teacher_sub === args[0]).map((c) => ({ ...c, reports: [...rep.values()].filter((r) => r.class_code === c.code).length })) };
+        if (/FROM tc_class_assignment WHERE class_code/.test(s)) return { results: [...asg.values()].filter((a) => a.class_code === args[0] && a.updated_at > args[1]).sort((a, b) => a.updated_at - b.updated_at).slice(0, args[2]) };
         if (/FROM tc_class_report r/.test(s)) { const c = cls.get(args[0]); if (!c || c.teacher_sub !== args[1]) return { results: [] }; return { results: [...rep.values()].filter((r) => r.class_code === args[0] && r.updated_at > args[2]).sort((a, b) => a.updated_at - b.updated_at).slice(0, args[3]) }; }
         throw new Error('all tak dikenal: ' + s);
       }
     };
     return api;
   }
-  return { prepare: stmt, batch: async (xs) => Promise.all(xs.map((x) => x.run())), _accounts: accounts, _cls: cls, _rep: rep };
+  return { prepare: stmt, batch: async (xs) => Promise.all(xs.map((x) => x.run())), _accounts: accounts, _cls: cls, _rep: rep, _asg: asg };
 }
 
 function ctxOf(db, { sub, method, pathname, body, query, now }) {
@@ -109,6 +111,27 @@ async function json(res) { return { status: res.status, body: JSON.parse(await r
   r = await json(await routes.routeClassList(ctxOf(db, { sub: 't2', method: 'GET', pathname: '/api/teacher/class/list' })));
   assert(r.status === 200 && r.body.classes.length === 0, 'guru t2 melihat daftar kosong');
 
+  /* ---------- 2b. kirim tugas (guru) -> tarik tugas (murid) ------------------------ */
+  const asgBody = { id: 'as-77', title: 'Review Past Tense', skills: ['past_tense'], itemIds: ['pt-1', 'pt-2', 'pt-3'], minutes: 4, mode: 'latihan', deadline: '2026-09-10', from: 'Kelas 10A' };
+  const na = core.normalizeAssignment({ code: 'fz-ab2c3d', assignment: asgBody, targets: ['Rina Kartika', 'Dimas', 'rina'] });
+  assert(na.ok && na.payload.cls === 'FZ-AB2C3D' && na.payload.t === 'assign' && na.targets.join(',') === 'rina,dimas', 'tugas dinormalisasi; target = learner_key unik');
+  assert(!core.normalizeAssignment({ code: 'FZ-AB2C3D', assignment: { ...asgBody, itemIds: [] } }).ok, 'tugas tanpa soal ditolak');
+  assert(!core.normalizeAssignment({ code: 'FZ-AB2C3D', assignment: { ...asgBody, id: 'bad id!' } }).ok, 'id tugas liar ditolak');
+  r = await json(await routes.routeClassAssign(ctxOf(db, { sub: 't2', method: 'POST', pathname: '/api/teacher/class/assign', body: { code: 'FZ-AB2C3D', assignment: asgBody }, now: 1_700_000_040_000 })));
+  assert(r.status === 404, 'guru t2 tidak bisa mengirim tugas ke kelas guru t1');
+  r = await json(await routes.routeClassAssign(ctxOf(db, { sub: 't1', method: 'POST', pathname: '/api/teacher/class/assign', body: { code: 'FZ-AB2C3D', assignment: asgBody, targets: ['Rina'] }, now: 1_700_000_040_000 })));
+  assert(r.status === 200 && r.body.ok && r.body.targets === 1, 'guru t1 mengirim tugas ke 1 murid terpilih');
+  r = await json(await routes.routeClassAssign(ctxOf(db, { sub: 't1', method: 'POST', pathname: '/api/teacher/class/assign', body: { code: 'FZ-AB2C3D', assignment: { ...asgBody, id: 'as-78', title: 'Untuk semua' } }, now: 1_700_000_041_000 })));
+  assert(r.status === 200 && r.body.targets === 'all', 'guru t1 mengirim tugas ke seluruh kelas');
+  r = await json(await routes.routeLearnerClassAssignments(ctxOf(db, { sub: 'anon-1', method: 'GET', pathname: '/api/learner/class-assignments', query: { cls: 'FZ-AB2C3D', name: 'Rina Kartika', since: '0' }, now: 1_700_000_050_000 })));
+  assert(r.status === 200 && r.body.assignments.length === 2 && r.body.assignments[0].assignment.id === 'as-77' && r.body.cursor === 1_700_000_041_000, 'Rina menerima tugas terpilih + tugas kelas, kursor maju');
+  r = await json(await routes.routeLearnerClassAssignments(ctxOf(db, { sub: 'anon-2', method: 'GET', pathname: '/api/learner/class-assignments', query: { cls: 'FZ-AB2C3D', name: 'Dimas' }, now: 1_700_000_051_000 })));
+  assert(r.status === 200 && r.body.assignments.length === 1 && r.body.assignments[0].assignment.id === 'as-78', 'Dimas hanya menerima tugas seluruh kelas');
+  r = await json(await routes.routeLearnerClassAssignments(ctxOf(db, { sub: 'anon-2', method: 'GET', pathname: '/api/learner/class-assignments', query: { cls: 'FZ-AB2C3D', name: 'Dimas', since: '1700000041000' }, now: 1_700_000_060_000 })));
+  assert(r.status === 200 && r.body.assignments.length === 0, 'kursor since menyaring tugas yang sudah ditarik');
+  r = await json(await routes.routeLearnerClassAssignments(ctxOf(db, { sub: 'anon-3', method: 'GET', pathname: '/api/learner/class-assignments', query: { cls: 'FZ-ZZZ234', name: 'X' }, now: 1_700_000_061_000 })));
+  assert(r.status === 404, 'kode kelas tak dikenal -> 404');
+
   /* ---------- 3. kontrak statis -------------------------------------------------- */
   const fs = require('fs');
   const src = fs.readFileSync(path.join(API, 'route-class-sync.js'), 'utf8');
@@ -118,8 +141,8 @@ async function json(res) { return { status: res.status, body: JSON.parse(await r
     assert(/teacher_sub/.test(q) || /INSERT INTO tc_class_report|SELECT code FROM tc_class WHERE code = \?1'/.test(q), 'kueri lane guru ber-teacher_sub: ' + q.slice(0, 60));
   }
   const rc = await import('file://' + path.join(API, 'auth', 'role-core.js'));
-  for (const p of ['/api/teacher/class/claim', '/api/teacher/class/list', '/api/teacher/class/reports']) assert(rc.ROUTE_CAPABILITY[p], 'rute ' + p + ' terdaftar di ROUTE_CAPABILITY');
-  assert(!rc.ROUTE_CAPABILITY['/api/learner/class-report'], 'lane murid TIDAK lewat matriks peran (murid lokal-dulu tanpa akun)');
+  for (const p of ['/api/teacher/class/claim', '/api/teacher/class/list', '/api/teacher/class/reports', '/api/teacher/class/assign']) assert(rc.ROUTE_CAPABILITY[p], 'rute ' + p + ' terdaftar di ROUTE_CAPABILITY');
+  assert(!rc.ROUTE_CAPABILITY['/api/learner/class-report'] && !rc.ROUTE_CAPABILITY['/api/learner/class-assignments'], 'lane murid TIDAK lewat matriks peran (murid lokal-dulu tanpa akun)');
 
   for (const r2 of results) console.log((r2.ok ? 'ok   - ' : 'FAIL - ') + r2.message);
   console.log('\n' + (results.length - failures) + '/' + results.length + ' PASS · tests/class-sync-test.js');
