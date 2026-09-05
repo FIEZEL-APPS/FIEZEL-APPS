@@ -207,6 +207,31 @@
     'diag.status-audio': 'สถานะเสียง: {konteks}',
     'settings.online-pengaturan-judul': 'การตั้งค่าและค่าที่ต้องการ',
     'guru.nama-lembaga-token': 'ชื่อและสถาบันถูกกรอกอัตโนมัติจากรหัส',
-    'home.pilih-fokus-label': 'เลือกสิ่งที่จะเน้น'
+    'home.pilih-fokus-label': 'เลือกสิ่งที่จะเน้น',
+
+    /* Kata umum lintas modul (m025-265): dipakai ulang oleh features/* supaya satu
+       kata tidak lahir sepuluh kali dengan sepuluh kunci berbeda. */
+    'umum.materi': 'เนื้อหา',
+    'umum.soal': 'ข้อสอบ',
+    'umum.kelas': 'ชั้นเรียน',
+    'umum.simpan': 'บันทึก',
+    'umum.status': 'สถานะ',
+    'umum.tambah': 'เพิ่ม',
+    'umum.murid': 'นักเรียน',
+    'umum.kirim': 'ส่ง',
+    'umum.tutup': 'ปิด',
+    'umum.tugas': 'งาน',
+    'umum.guru': 'ครู',
+    'umum.selesai': 'เสร็จแล้ว',
+    'umum.batal': 'ยกเลิก',
+    'umum.coba-lagi': 'ลองอีกครั้ง',
+    'umum.lanjut': 'ไปต่อ',
+    'umum.ubah': 'แก้ไข',
+    'umum.hapus': 'ลบ',
+    'umum.buat': 'สร้าง',
+    'umum.cari': 'ค้นหา',
+    'umum.riwayat': 'ประวัติ',
+    'umum.notifikasi': 'การแจ้งเตือน',
+    'umum.belum-ada-data': 'ยังไม่มีข้อมูล'
   });
 }());
