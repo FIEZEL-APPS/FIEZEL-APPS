@@ -160,3 +160,65 @@ body.fz-lux .fz2-more[open] summary,body .fz2-more[open] summary{margin-bottom:8
   body.fz-lux .fz2-acts,body .fz2-acts{grid-template-columns:repeat(3,1fr)}
   body.fz-lux .fz2-act.is-hot,body .fz2-act.is-hot{grid-column:auto}
 }
+
+/* ---------- Jalur Grammar bernode ---------- */
+body.fz-lux .fz2-path-summary,body .fz2-path-summary{display:flex;align-items:center;gap:14px;border-radius:var(--radius-lg);background:var(--cream);border:1px solid var(--line);padding:14px 16px}
+body.fz-lux .fz2-path-summary>div,body .fz2-path-summary>div{display:flex;flex-direction:column;gap:2px;min-width:0}
+body.fz-lux .fz2-path-summary>div>b,body .fz2-path-summary>div>b{font-size:1rem}
+body .fz2-path-ring{--p:0;flex:none;width:56px;height:56px;border-radius:50%;background:conic-gradient(var(--maroon) calc(var(--p)*1%),rgba(36,26,17,.08) 0);display:grid;place-items:center;position:relative}
+body .fz2-path-ring::after{content:"";position:absolute;inset:6px;border-radius:50%;background:var(--panel)}
+body .fz2-path-ring b{position:relative;z-index:1;font-size:.78rem;font-weight:700}
+body.fz-lux .lesson-path,body .lesson-path{padding:6px 0 18px 4px}
+body.fz-lux .path-step,body .path-step{grid-template-columns:28px minmax(0,1fr);gap:12px;padding:0 0 12px;align-items:start}
+body.fz-lux .path-step::after,body .path-step::after{left:12px;top:26px;bottom:-2px;width:3px;background:var(--line);opacity:1}
+body.fz-lux .path-step.is-mastered::after,body .path-step.is-mastered::after,body .path-step.is-completed::after{background:var(--good-bright)}
+body.fz-lux .path-node,body .path-node{width:28px;height:28px;margin-top:16px}
+body.fz-lux .path-ring,body .path-ring{width:16px;height:16px;background:var(--panel);box-shadow:inset 0 0 0 3px var(--line)}
+body .path-ring>b,body .path-ring>i,body .path-ring>svg{display:none}
+body.fz-lux .path-step.is-mastered .path-ring,body .path-step.is-mastered .path-ring,body .path-step.is-completed .path-ring{background:var(--good-bright);box-shadow:inset 0 0 0 3px var(--good-bright)}
+body.fz-lux .path-step.is-current .path-ring,body .path-step.is-current .path-ring{background:var(--sun);box-shadow:inset 0 0 0 3px var(--sun-deep),0 0 0 5px var(--sun-soft)}
+body.fz-lux .path-step.is-locked .path-ring,body .path-step.is-locked .path-ring{background:var(--line-soft);box-shadow:inset 0 0 0 3px var(--line)}
+body.fz-lux .path-label,body .path-label{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:14px 16px;cursor:pointer;position:relative}
+body.fz-lux .path-label b,body .path-label b{font-size:.98rem;font-weight:700;padding-right:32px}
+body.fz-lux .path-label>span,body .path-label>span{font-weight:600}
+body.fz-lux .path-step.is-mastered .path-label::after,body .path-step.is-mastered .path-label::after,body .path-step.is-completed .path-label::after{content:"✓";position:absolute;right:14px;top:14px;width:26px;height:26px;border-radius:9px;background:var(--good-soft);color:var(--good);display:grid;place-items:center;font-weight:700;font-size:.85rem}
+body.fz-lux .path-step.is-current .path-label,body .path-step.is-current .path-label{border:2px solid var(--sun);box-shadow:0 4px 0 var(--sun-deep)}
+body.fz-lux .path-step.is-locked .path-label,body .path-step.is-locked .path-label{background:var(--line-soft);cursor:default}
+body .path-progress{height:6px;border-radius:999px;background:rgba(36,26,17,.08);margin-top:10px;overflow:hidden}
+body .path-progress i{display:block;height:100%;border-radius:999px;background:var(--sun)}
+body .path-cta,body.fz-lux .path-cta{margin-top:12px;min-height:44px;padding:0 18px;font-size:.92rem}
+body.fz-lux .path-mascot,body .path-mascot{position:absolute;right:14px;top:-18px;width:44px}
+body.fz-lux .path-step.is-current,body .path-step.is-current{position:relative}
+body.fz-lux .lesson-skip-link,body .lesson-skip-link{margin-top:8px}
+body.fz-lux .path-node-exam,body .path-node-exam{width:28px;height:28px}
+body.fz-lux .path-node-exam .path-ring,body .path-node-exam .path-ring{background:var(--gold);box-shadow:inset 0 0 0 3px #C9A24B}
+body.fz-lux .path-step-exam .path-label,body .path-step-exam .path-label{background:linear-gradient(140deg,#FFF6DF,#FCEBC4);border-color:#EED9A6}
+
+/* ---------- Progres: kartu level gelap + minggu ini ---------- */
+body.fz-lux .fz2-level,body .fz2-level{background:var(--core);color:var(--on-core);border:0;border-radius:var(--radius-xl);padding:20px;position:relative;overflow:hidden}
+body .fz2-level .eyebrow{color:rgba(253,250,243,.7)}
+body .fz2-level-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+body .fz2-level-streak{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 10px;border-radius:999px;background:rgba(255,199,0,.16);color:var(--sun);font-weight:700;font-size:.8rem}
+body .fz2-level-streak .fz-i{width:16px;height:16px;--fz-i-fill:var(--sun);--fz-i-line:var(--sun)}
+body .fz2-level-body{display:flex;align-items:center;gap:14px;margin-top:8px;padding-right:96px}
+body .fz2-level-big{font-family:var(--fz-display);font-size:3rem;line-height:1;font-weight:700;color:var(--sun);letter-spacing:-.04em}
+body .fz2-level-lead{margin:0;font-size:.9rem;line-height:1.45;color:rgba(253,250,243,.88);max-width:200px}
+body .fz2-level-paw{position:absolute;right:12px;bottom:-6px;width:96px;height:96px;display:grid;place-items:end}
+body .fz2-level-paw :is(svg,img,canvas){width:96px;height:96px}
+body .fz2-lvls{display:flex;gap:6px;margin-top:18px;max-width:280px}
+body .fz2-lvl{flex:1;text-align:center;font-size:.72rem;font-weight:700;color:rgba(253,250,243,.5)}
+body .fz2-lvl::before{content:"";display:block;height:8px;border-radius:999px;background:rgba(255,255,255,.16);margin-bottom:6px}
+body .fz2-lvl.is-done{color:#7FD1B0}body .fz2-lvl.is-done::before{background:#7FD1B0}
+body .fz2-lvl.is-now{color:var(--sun)}body .fz2-lvl.is-now::before{background:linear-gradient(90deg,var(--sun) calc(var(--p,0)*1%),rgba(255,255,255,.16) 0)}
+body.fz-lux .fz2-week,body .fz2-week{border-radius:var(--radius-xl)}
+body .fz2-week-head{display:flex;align-items:center;justify-content:space-between}
+body .fz2-week-head b{font-size:1rem}
+body .fz2-week-pill{display:inline-flex;align-items:center;height:28px;padding:0 10px;border-radius:999px;background:var(--sun);font-weight:700;font-size:.75rem}
+body .fz2-days{display:flex;gap:6px;margin-top:14px}
+body .fz2-day{flex:1;text-align:center}
+body .fz2-day i{display:block;height:36px;border-radius:11px;background:var(--line-soft)}
+body .fz2-day i.is-on{background:var(--sun)}
+body .fz2-day i.is-big{background:var(--sun-deep)}
+body .fz2-day i.is-today{background:transparent;border:2px dashed var(--sun-deep)}
+body .fz2-day span{display:block;margin-top:6px;font-size:.7rem;font-weight:700;color:var(--muted)}
+body .fz2-week-note{margin:12px 0 0;font-size:.8rem}

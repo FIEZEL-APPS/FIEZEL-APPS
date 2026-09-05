@@ -292,6 +292,16 @@
     'social2.class-left': 'Kamu keluar dari kelas.',
     'social2.online-now': 'online',
     'social2.class-change': 'Ganti',
-    'social2.more-ways': 'Cara lain: kode undangan'
+    'social2.more-ways': 'Cara lain: kode undangan',
+    'progress2.level-eyebrow': 'Level kamu',
+    'progress2.level-aria': 'Kartu level dan kemajuan',
+    'progress2.level-lead': '{pct}% menuju {next}. Tinggal {sisa} lesson grammar lagi.',
+    'progress2.level-top': 'Level tertinggi. Pertahankan dengan sesi rutin.',
+    'progress2.streak': '{days} hari',
+    'progress2.week-title': 'Minggu ini',
+    'progress2.week-pill': '{days}/7 hari aktif',
+    'progress2.week-note': '{items} soal dikerjakan 7 hari terakhir.',
+    'progress2.week-empty': 'Belum ada latihan minggu ini. Satu sesi kecil sudah cukup untuk mulai.',
+    'progress2.days': 'Sen,Sel,Rab,Kam,Jum,Sab,Min'
   });
 })();

@@ -17,7 +17,10 @@ Redesign UI/UX FIEZEL menyeluruh: cheerful + premium + modern, palet pastel dipe
 - Mock design HTML statis di `/app/mockups/` (referensi arah desain).
 - Gate lokal hijau: pwa-release-coherence, install-health, boot-order, lucide-icon-coverage, th-coverage, social-frontend, social-api-contract.
 
+- Jalur Grammar bernode (`grammar()`): ringkasan ring X/N di atas, node dot + kartu lesson, node aktif berbingkai kuning dengan progress bar + CTA `grammar-path-continue`, lesson selesai bertanda ✓, terkunci redup.
+- Progres: `cefrRoadmapMarkup` → kartu level gelap (`progress-level-card`, % menuju level berikut dari lesson grammar yang tembus ambang, track A1–C2, streak); `weeklyActivityChartMarkup` → "Minggu ini" (`progress-week-card`) dari data nyata `skillTimeline()` (kotak per hari, hari ini putus-putus). Kunci i18n `progress2.*` id+th.
+
 ## Backlog
-- P1: polish layar Progres (kartu level gelap seperti mock), layar hasil sesi, jalur grammar bernode ala mock.
+- P1: layar hasil sesi ala mock (skor besar, mastery naik, langkah berikutnya).
 - P1: desktop layout sidebar (mock d1–d3) untuk ≥1024px.
 - P2: deploy worker (`wrangler deploy`) supaya endpoint friends/add aktif di produksi.
