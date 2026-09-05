@@ -1,7 +1,7 @@
 /**
  * A8 · bukti tanpa peramban. Mesin ini nggak punya Chromium/Chrome (Playwright ada sebagai
  * modul, tetapi `npx playwright install chromium` menolak: "Playwright does not support
- * chromium on ubuntu26.04-x64", dan e2e-level-grammar-test.js sendiri melaporkan SKIPPED
+ * chromium on ubuntu26.04-x64", dan tests/e2e-level-grammar-test.js sendiri melaporkan SKIPPED
  * dengan alasan yang sama). Jadi bukti visualnya belum bisa diambil di sini.
  *
  * Yang MASIH bisa dibuktikan tanpa peramban dicetak di sini: markup persis yang akan dilihat

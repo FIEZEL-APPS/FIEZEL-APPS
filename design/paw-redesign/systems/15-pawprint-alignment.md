@@ -18,7 +18,7 @@ Binding base: `assets/brand/fiezel-paw.svg` (repo, read-only), `directions/direc
 
 - **Source of truth:** `assets/brand/fiezel-paw.svg` (viewBox `0 0 24 24`), whose header
   declares it the single shape source together with `ICONS.paw` in
-  `features/ui/fiezel-icons.js`, guarded by `paw-mascot-test.js`. Verified: the five
+  `features/ui/fiezel-icons.js`, guarded by `tests/paw-mascot-test.js`. Verified: the five
   shape elements in `ICONS.paw` (`fz-paw-bar` ×4 + `fz-paw-pad`) carry **byte-identical
   coordinates** to the SVG. The mascot now joins that single source.
 - **Glyph geometry** (the only legal coordinates):
@@ -179,7 +179,7 @@ Add to the pose-consistency gate (08-poses D3 / audit 01 §5 ADD):
    - extract the five shapes from `assets/brand/fiezel-paw.svg`, from `ICONS.paw`, from
      `direction-c.svg`'s `#fz-pawprint` def, and from `gen_poses_sheet.PAWPRINT`;
      normalize as above; all four hashes must equal the checksum. (This extends the
-     existing `paw-mascot-test.js` two-way gate to a four-way gate; the repo test itself
+     existing `tests/paw-mascot-test.js` two-way gate to a four-way gate; the repo test itself
      is updated at implementation time, not in this cycle.)
    - every `fz-pads-*` / `fz-emblem` group must contain ONLY a `fz-pawprint` reference
      (or the verbatim inlined geometry in generated exports) — grep-reject the legacy

@@ -30,7 +30,7 @@ import { QUERIES, UNMEASURABLE, SERIES_METRICS } from './queries.js';
 
 // Rate card biaya — SUMBER: reports/cf-a10-cost-model.json + reports/cf-a10-cost.md.
 // KOREKSI D2: versi sebelumnya menjanjikan "tarif yang tersimpan bersama baris biaya hari itu".
-// Tabel `cost_daily` yang menyimpannya TIDAK ADA dan TIDAK BOLEH ada (analytics-privacy-test.js
+// Tabel `cost_daily` yang menyimpannya TIDAK ADA dan TIDAK BOLEH ada (tests/analytics-privacy-test.js
 // mengunci database analytics pada lima tabel). Jadi tarif SELALU dibaca dari kartu di bawah,
 // dan konsekuensinya dicetak apa adanya di panel biaya: mengubah tarif di sini mengubah angka
 // bulan lalu juga, sehingga angka biaya adalah ESTIMASI SEKARANG, bukan jejak audit.
@@ -300,14 +300,14 @@ function deny() {
 // dan deploy sendiri — tidak ada modul bersama di antara keduanya. Ini pola yang sama, dan alasan
 // yang sama, seperti `ctEq()` yang disalin ke arah sebaliknya (mw-edge.js menyalinnya dari berkas
 // ini). Kalau salah satu berubah, yang lain harus ikut; gerbang yang menjaganya:
-// `edge-guard-test.js` (sisi api) dan `owner-edge-guard-test.js` (sisi owner).
+// `tests/edge-guard-test.js` (sisi api) dan `tests/owner-edge-guard-test.js` (sisi owner).
 
 const EDGE_HEADER = 'x-fiezel-edge';
 
 // SATU SUMBER KEBENARAN hostname yang boleh lolos TANPA header jembatan: hostname yang benar-benar
 // terikat ke Worker ini sebagai CUSTOM DOMAIN. Harus identik dengan
 // `routes = [{ pattern = ..., custom_domain = true }]` di `workers/owner/wrangler.toml` —
-// `owner-edge-guard-test.js` butir (g-a) memaksa keduanya sama, supaya daftar ini tidak bisa
+// `tests/owner-edge-guard-test.js` butir (g-a) memaksa keduanya sama, supaya daftar ini tidak bisa
 // tumbuh diam-diam menjadi hostname yang tidak pernah berdiri di Cloudflare.
 // Huruf kecil semua; pembanding menormalkan masukan.
 const TRUSTED_EDGE_HOSTS = Object.freeze(['owner.fiezel.my.id']);
@@ -619,7 +619,7 @@ function sanitizeRows(rows, droppedInto) {
  * BUKTI BELAJAR BRAINCORE — dibaca lewat SUBREQUEST, BUKAN lewat binding D1 baru
  * ==========================================================================================
  * Godaannya jelas: tambahkan `[[d1_databases]] binding = "EVIDENCE_DB"` di wrangler Worker ini
- * dan SELECT langsung. Itu ditolak, dan bukan karena gerbang `owner-edge-guard-test.js` butir
+ * dan SELECT langsung. Itu ditolak, dan bukan karena gerbang `tests/owner-edge-guard-test.js` butir
  * (g-g) melarang binding D1 kedua — melainkan karena gerbang itu BENAR: satu Worker owner, satu
  * database agregat, radius ledakan tetap sekecil hari ini. Menambah binding kedua akan menaruh
  * database yang memuat SATU-SATUNYA pengenal perangkat (`evidence_learner_day.cohort`) di
@@ -708,7 +708,7 @@ function sanitizeEvidenceSummary(raw) {
  * ==========================================================================================
  * Yang berubah dibanding panel agregat: data yang dibaca di sini BERIDENTITAS. Justru karena
  * itu jalannya TIDAK boleh berubah menjadi "tambahkan binding CORE_DB di sini". Binding itu
- * dilarang butir (g-g) `owner-edge-guard-test.js`, dan larangan itu BENAR: `fiezel-core`
+ * dilarang butir (g-g) `tests/owner-edge-guard-test.js`, dan larangan itu BENAR: `fiezel-core`
  * memegang `identity`, `session`, dan `quota_daily`. Menariknya ke isolate dashboard akan
  * menaruh seluruh tabel identitas di Worker yang merender HTML, demi dua daftar.
  *
@@ -2092,12 +2092,12 @@ function csvKepala(model, judul) {
 // ==========================================================================================
 // D1 `fiezel-stats` sudah terikat di Worker ini sebagai `ANALYTICS`, jadi memakainya "gratis"
 // dari sisi konfigurasi. Ia tetap DITOLAK, dan alasannya bisa diperiksa:
-//   1. Ia database ANALYTICS. `DEPLOY.md` + `analytics-privacy-test.js` mengunci database itu
+//   1. Ia database ANALYTICS. `DEPLOY.md` + `tests/analytics-privacy-test.js` mengunci database itu
 //      pada LIMA tabel agregat; tabel rem login adalah data AUTH, dan menaruhnya di sana
 //      melanggar pemisahan yang justru menjadi alasan Worker ini berdiri sendiri (README §1
 //      "radius ledakan").
 //   2. Worker ini HANYA-BACA terhadap `fiezel-stats`, dan sifat itu ditegakkan gerbang
-//      (`queries.js` menolak memuat kata tulis; `owner-dashboard-test.js` gagal bila ada
+//      (`queries.js` menolak memuat kata tulis; `tests/owner-dashboard-test.js` gagal bila ada
 //      pernyataan tulis). Rem yang menulis akan mengubah pembaca menjadi penulis — satu
 //      invarian hilang untuk satu penghitung.
 //   3. D1 single-threaded per database (cf-a11 risiko 5): tulis rem login akan berebut dengan
@@ -2154,7 +2154,7 @@ function csvKepala(model, judul) {
 // (d) NOL binding baru ke `fiezel-core`. Binding yang ditambahkan HANYA `CFG` -> `fiezel-CFG`
 //     (namespace flag/config yang sudah ada, id 6386fc9752e14afd8a8f76a8d45e47d1). Database
 //     `fiezel-core` (identity/session/quota_daily = data per-orang) TIDAK pernah terikat di
-//     Worker ini, dan `owner-edge-guard-test.js` butir (g-g) tetap memaksanya.
+//     Worker ini, dan `tests/owner-edge-guard-test.js` butir (g-g) tetap memaksanya.
 //     Klaim "nol tulis KV" di `wrangler.toml`/README SUDAH DIPERBAIKI, bukan dibiarkan bohong.
 //
 // ==========================================================================================

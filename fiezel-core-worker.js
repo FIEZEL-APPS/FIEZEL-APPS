@@ -223,7 +223,7 @@ function boundedPolicyOutcome(raw={}){const clamp=(v,min,max)=>Math.max(min,Math
  * masukan TIDAK TEPERCAYA. Proyeksi di perangkat menjaga murid dari kebocoran yang tidak ia
  * sengaja; validasi di worker menjaga penyimpanan dari klien yang dimodifikasi, dan keduanya
  * bukan pekerjaan yang sama. Daftar field di bawah WAJIB identik dengan ALLOWED di modul itu —
- * core-worker-contract-test.js mengadu keduanya dan gagal keras kalau menyimpang.
+ * tests/core-worker-contract-test.js mengadu keduanya dan gagal keras kalau menyimpang.
  *
  * Aturan yang menutup satu kelas kebocoran sekaligus: pengenal konten tidak boleh mengandung
  * spasi. Kalimat soal selalu punya spasi, pengenal tidak. */
@@ -320,7 +320,7 @@ function policyEffectiveness(outcomes){
  *
  * Penalaran v2 berjalan DI PERANGKAT MURID (features/brain/fiezel-core-brain.js), karena
  * di sanalah datanya: riwayat jawaban lengkap, waktu jawab tiap soal, dan jadwal ulang per
- * materi tidak pernah dikirim ke sini - batas itu dijaga observability-privacy-test.js dan
+ * materi tidak pernah dikirim ke sini - batas itu dijaga tests/observability-privacy-test.js dan
  * tidak dilonggarkan oleh rilis ini. Yang sampai ke worker hanyalah RINGKASAN keputusannya.
  *
  * Cermin di bawah ini memakai ringkasan itu supaya kebijakan sisi server tidak lebih bodoh
@@ -387,7 +387,7 @@ function refinePolicyWithBrain(policy,digest){
  *
  *  - Ia TIDAK berpura-pura menjadi Core Brain. Estimasi kemampuan IRT butuh riwayat jawaban
  *    per soal, dan itu memang TIDAK PERNAH dikirim ke sini - batas privasi yang dijaga
- *    observability-privacy-test.js dan tidak dilonggarkan satu byte pun oleh rilis ini.
+ *    tests/observability-privacy-test.js dan tidak dilonggarkan satu byte pun oleh rilis ini.
  *  - Ia TIDAK mengarang targetDifficulty/difficultyBand/reviewShare. v1 sudah menghitung
  *    ketiganya dari masukan yang sama; menghitungnya lagi hanya akan menghitung ganda.
  *  - Yang ia kerjakan adalah satu penalaran yang memang BISA dilakukan server dan TIDAK
@@ -449,7 +449,7 @@ function refinePolicyWithServerMirror(policy,mirror){
  * berasal dari lapisan yang sudah ditimpa sebelum sampai ke perangkat.
  *
  * Selama dua rute memanggil dua fungsi berbeda, cacat itu bisa lahir kembali kapan saja.
- * Maka jalannya dijadikan satu di sini, dan core-policy-parity-test.js melarang rute mana
+ * Maka jalannya dijadikan satu di sini, dan tests/core-policy-parity-test.js melarang rute mana
  * pun memanggil deriveAdaptivePolicy langsung. */
 function resolvePolicyForRequest(input={}){
   const now=Number(input.now)||Date.now();
@@ -821,7 +821,7 @@ router.post('/api/policy/outcome',async({request,user})=>{
  *
  * Yang disimpan adalah BUKTI, bukan jawaban: proyeksi ber-allowlist tertutup, nol teks bebas.
  * Model otak TIDAK pernah dikirim — ia dihitung ulang di perangkat dari aliran ini, dan
- * kesetaraan putar-ulang itu dijaga brain-replay-equivalence-test.js.
+ * kesetaraan putar-ulang itu dijaga tests/brain-replay-equivalence-test.js.
  *
  * Idempoten lewat attemptId, dengan pola yang sama seperti /api/policy/outcome: kunci per
  * murid, mutasi di bawah kunci antrean, dan pengiriman ulang batch yang sama tidak pernah
@@ -842,7 +842,7 @@ router.post('/api/brain/attempts',async({request,user})=>{
     const punya=new Set(ada.map(x=>x.attemptId));
     const baru=bersih.filter(x=>!punya.has(x.attemptId));
     // Urut waktu lalu id: putar-ulang menuntut urutan deterministik, dan urutan kedatangan
-    // batch TIDAK boleh menentukannya (dibuktikan E2 di brain-replay-equivalence-test.js).
+    // batch TIDAK boleh menentukannya (dibuktikan E2 di tests/brain-replay-equivalence-test.js).
     const gabung=[...ada,...baru].sort((a,b)=>a.at-b.at||(a.attemptId<b.attemptId?-1:a.attemptId>b.attemptId?1:0)).slice(-ATTEMPT_LIMIT);
     await me.puter.kv.set(key,{schema:ATTEMPT_SCHEMA,updatedAt:new Date().toISOString(),attempts:gabung});
     return {stored:true,idempotent:true,accepted:baru.length,duplicate:bersih.length-baru.length,rejected:ditolak,count:gabung.length,protocol:'1.7',attemptSchema:ATTEMPT_SCHEMA};

@@ -20,7 +20,7 @@ import { execFileSync } from 'node:child_process';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
 const R = (p) => path.join(ROOT, p);
-const GATE = 'tts-provider-contract-test.js';
+const GATE = 'tests/tts-provider-contract-test.js';
 const WIRING = R('workers/api/route-wiring.js');
 const TTS = R('workers/api/tts/route-tts.js');
 const FLAGS = R('workers/api/feature-gate.js');
@@ -202,6 +202,6 @@ const out = {
   matrix,
   sesudahPemulihan: after
 };
-fs.writeFileSync(R('S3-TTS-HONEST-RED-MATRIX.json'), JSON.stringify(out, null, 2) + '\n');
+fs.writeFileSync(R('reports/S3-TTS-HONEST-RED-MATRIX.json'), JSON.stringify(out, null, 2) + '\n');
 console.log(JSON.stringify(out, null, 2));
 if (!out.semuaMerah || !out.pulihHijau || !out.semuaSasaranTertangkap) process.exitCode = 1;

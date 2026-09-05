@@ -116,7 +116,7 @@ function dayDrift(day, nowMs) {
  * ==========================================================================
  * Aturan ini adalah salinan sadar dari `normalizeName()` di
  * features/onboarding/fiezel-onboarding.js, dan gerbang
- * braincore-learner-identity-test.js mengadu keduanya. Alasannya bukan
+ * tests/braincore-learner-identity-test.js mengadu keduanya. Alasannya bukan
  * kerapian: kalau server menormalkan berbeda dari klien, nama yang tampil di HP
  * murid dan nama yang dilihat owner pelan-pelan menyimpang — dan yang pertama
  * menyadarinya adalah murid yang merasa namanya salah tulis.

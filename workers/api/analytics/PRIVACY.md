@@ -2,8 +2,8 @@
 
 Dokumen ini bisa dipakai apa adanya untuk menjawab murid, orang tua, atau sekolah.
 Isinya bukan janji pemasaran — setiap baris di sini dijaga oleh gerbang otomatis
-(`analytics-privacy-test.js`, `analytics-aggregate-test.js`,
-`analytics-server-only-test.js`) yang gagal kalau kodenya menyimpang.
+(`tests/analytics-privacy-test.js`, `tests/analytics-aggregate-test.js`,
+`tests/analytics-server-only-test.js`) yang gagal kalau kodenya menyimpang.
 
 Acuan: `PROMT-BARU.txt` bab 29 dan keputusan owner di `EXEC-BRIEF-CF.md`
 bagian "KONTRAK ANALYTICS PRIVASI-MAKSIMAL".
@@ -100,7 +100,7 @@ pola kehadiran seseorang, dan itu tidak dibutuhkan untuk mengelola produk.
 Kenapa ini harus dari server: semua event di atas berkaitan dengan **uang**
 (biaya AI/TTS) dan **keamanan** (kuota, pemutus arus). Kalau perangkat yang jadi
 sumbernya, satu skrip bisa mengarang ribuan pengguna baru atau menyembunyikan
-kegagalan. Gerbang `analytics-server-only-test.js` menolak event-event ini
+kegagalan. Gerbang `tests/analytics-server-only-test.js` menolak event-event ini
 kalau datang dari klien, dengan kode `400 server_only`.
 
 ### 3.3 Yang benar-benar disimpan di basis data

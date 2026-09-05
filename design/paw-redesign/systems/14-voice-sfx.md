@@ -152,7 +152,7 @@ Global rules, in priority order:
 | 5 | **Celebration** | the existing `uiSfx('celebrate')` full broken chord (F4 A4 C5 G5) **is** the character celebration — it already fires beside `lesson-complete` (`app.js:4954-4957`); the mascot's completion jump is choreographed *to* it (first jump lands on the C5 at ~160 ms) | existing VOICES.celebrate | ~1.0 s (existing) | `finishQuiz` | already single-fire per completion; **no additional mascot-emitted sound** — the fix is choreography sync, not a new asset | as above |
 | 6 | **Level / Milestone** | the signature flourish: full ta-ta-TAAA motif one octave context — F2 sub root under F4→A4→C5, closing G5 shimmer with the long room tail; the most complete motif statement outside the splash | F2 + F4 → A4 → C5 → G5 | ≤1.1 s | level-exam pass (`app.js:3035` — the "PAW sampai lompat-lompat" copy moment that currently has **no** reaction, audit 03 finding), promotion, day-streak milestones, first-badge | max once per session; ≥60 s from any Celebration; suppressed entirely during placement tests (assessment ≠ party) | as above |
 
-Prototyping/QA home: `sfx-preview.html` (existing preview page) gains the six entries for OWNER audition before any wiring.
+Prototyping/QA home: `tools/dev/sfx-preview.html` (existing preview page) gains the six entries for OWNER audition before any wiring.
 
 ---
 
@@ -199,7 +199,7 @@ Selectivity is what makes a signature: **≤2 occurrences in a normal session**,
 | `speaking` state + mouth flap engine + micro-motion | `fiezel-mascot.js` + `fiezel-motion.css` | additive state, Direction C rig |
 | ~6 `fiezel-speech` event emissions | `fiezel-voice-say.js` seams (say/onProgress/end/stop/L3/L4) | one-line emits; **no ladder logic changes** |
 | Speech bridge (events → `pawSetState`) | new small module | additive |
-| 6 `VOICES` entries + cooldown table | `fiezel-ui-sfx.js` (+ `sfx-preview.html` audition) | additive |
+| 6 `VOICES` entries + cooldown table | `fiezel-ui-sfx.js` (+ `tools/dev/sfx-preview.html` audition) | additive |
 | Optional manifest `visemes` field + CI alignment step | `audio/manifest.json` schema, `audio-generate.yml` | optional, backward-compatible |
 | Fix while in there | `app.js:3836` dead `'correct-streak'` react → call site changed to `'reward'` (13 §1.3 / 17 R-1) | 1-line call-site change + new `react()` case, flagged in audit 03 |
 

@@ -129,7 +129,7 @@
   /* ---- Gem Terjemahan (reports/recon-listening-gems.md Bagian B) ---------------------
    *
    * Aturan ekonominya TIDAK ditulis di sini. Ia hidup di features/speaking-listening/gems-core.js
-   * sebagai fungsi murni supaya gems-test.js bisa mengujinya tanpa DOM, dan supaya app.js
+   * sebagai fungsi murni supaya tests/gems-test.js bisa mengujinya tanpa DOM, dan supaya app.js
    * (pemegang state kanonik) memakai aturan yang sama persis. Addon hanya menyumbang dua hal
    * yang memang miliknya: penghitung runtun PER SESI dan tempat baris terjemahan dirender.
    *
@@ -139,7 +139,7 @@
    */
   // `global` di pembungkus UMD ini adalah `self` di peramban, tetapi di Node ia jatuh ke
   // `this` alias module.exports - bukan lingkup global. Tanpa penyelesai ini, gerbang
-  // gems-test.js akan lolos secara palsu: gemsApi() selalu null, jadi tidak ada satu pun
+  // tests/gems-test.js akan lolos secara palsu: gemsApi() selalu null, jadi tidak ada satu pun
   // aturan ekonomi yang benar-benar dijalankan. Lingkup nyata dicari eksplisit.
   function hostScope(){
     if(global&&(global.FiezelGems||global.FiezelSubtitleTranslate))return global;
@@ -631,7 +631,7 @@
        single-flight ia juga bisa membuat pemutaran ujian ditolak dengan `superseded`
        (fiezel-neural-voice.js). Karena itu pagarnya bentuk daftar-putih: HANYA domain
        'listening'. Menambah domain baru ke sini harus jadi keputusan sadar, bukan efek
-       samping - dan voice-callsite-prefetch-test.js mengunci itu.
+       samping - dan tests/voice-callsite-prefetch-test.js mengunci itu.
        ================================================================================= */
     prefetchNextScript(){
       if(this.domain!=='listening')return false;
@@ -703,8 +703,8 @@
        jadi tidak ada informasi yang benar-benar hilang dari alur.
        Ekonomi gem TIDAK boleh berdiri di antara soal dan pemutar — gemBarMarkup()
        turun ke kaki kartu di dalam .fsl-gem-footer. Markup-nya sendiri TETAP byte-identik
-       (kontrak gems-test.js + tur: #fslGemChip, #fslTranslateToggle); hanya POSISI panggilan
-       yang pindah, dan ia tetap satu baris sumber dengan kicker karena gems-test.js G8
+       (kontrak tests/gems-test.js + tur: #fslGemChip, #fslTranslateToggle); hanya POSISI panggilan
+       yang pindah, dan ia tetap satu baris sumber dengan kicker karena tests/gems-test.js G8
        menjangkarkan keduanya pada baris yang sama. */
     renderListening(item,progress){const isDict=item.mode==='dictation';this.root.innerHTML=`<section class="fsl-shell"><div class="fsl-progress"><span style="width:${progress}%"></span></div><article class="fsl-card fsl-card-listening"><h2>${esc(item.question)}</h2>${slPlayerMarkup()}<div class="fsl-actions fsl-audio-actions"><button class="fsl-primary fsl-play-hero" data-play>${T('fsl.play-btn', 'Dengarkan')}</button><button data-exit>${T('fsl.exit-btn', 'Keluar')}</button></div><fieldset class="fsl-work" data-work disabled>${isDict?`<input class="fsl-input" data-dictation autocomplete="off" spellcheck="false" placeholder="${T('fsl.dictation-placeholder', 'Ketik yang kamu dengar…')}"><div class="fsl-actions"><button class="fsl-primary" data-submit>${T('fsl.submit-btn', 'Nilai jawaban')}</button></div>`:`<div class="fsl-options">${item.options.map((o,i)=>`<button class="fsl-option" data-choice="${i}">${esc(o)}</button>`).join('')}</div>`}</fieldset><div data-feedback></div><div class="fsl-gem-footer">${this.gemBarMarkup()}</div></article></section>`;
       this.root.querySelector('[data-play]').addEventListener('click',async event=>{
@@ -736,7 +736,7 @@
           this.replays--;
           this.store.noteCapability('tts','unavailable');
           this.noteNoAudio(item);
-        /* Penutup handler ditulis rapat (`}finally{...}});`) karena gems-test.js:420
+        /* Penutup handler ditulis rapat (`}finally{...}});`) karena tests/gems-test.js:420
            mengambil seluruh penangan tombol Dengarkan dengan pola itu untuk membuktikan ia
            tidak menyentuh terjemahan. Merapikannya menjadi baris terpisah membuat gerbang
            itu kehilangan handler-nya dan gagal tanpa sebab yang terlihat. */
@@ -753,7 +753,7 @@
      * menuju hadiah ("Runtun 3/5") justru paling berguna ketika belum punya gem.
      *
      * #fslTranslateToggle adalah id KONTRAK BERSAMA (dipakai tur fitur & tes browser).
-     * Jangan diganti tanpa memperbarui gems-test.js dan tur.
+     * Jangan diganti tanpa memperbarui tests/gems-test.js dan tur.
      */
     gemBarMarkup(){
       const g=gemsApi();if(!g)return '';

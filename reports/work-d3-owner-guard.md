@@ -2,7 +2,7 @@
 
 Cabang `work/d3own`. Tidak di-push, versi build tidak dinaikkan.
 Berkas yang disentuh: `workers/owner/index.js`, `workers/owner/DEPLOY.md`,
-`owner-edge-guard-test.js`, `reports/g1-custom-domain-red-proof.mjs` (satu mutasi basi),
+`tests/owner-edge-guard-test.js`, `reports/g1-custom-domain-red-proof.mjs` (satu mutasi basi),
 `reports/d3-owner-guard-red-proof.mjs` (baru). Tidak menyentuh `app.js`, `style.css`,
 `index.html`, `features/`, `coordination/`, `workers/api/`.
 
@@ -162,7 +162,7 @@ ke berkas sungguhan, satu per satu, dan dipulihkan di `finally`.
 
 Pemetaan butir tugas → tag assert: (a)→`(g-a)`, (b)→`(g-b)`, (c)→`(g-c)`, (d)→`(g-d)`,
 (e)→`(g-e)`, (f)→`(g-f)`, (g)→`(g-g)`. Namespace `(g-*)` sengaja dipisah dari blok `(a)`–`(e)`
-lama di `owner-edge-guard-test.js` supaya dua penomoran tidak tertukar.
+lama di `tests/owner-edge-guard-test.js` supaya dua penomoran tidak tertukar.
 
 Blok `(f)` lama — yang meng-assert owner **tidak boleh** punya jalur hostname — dihapus, bukan
 dilonggarkan diam-diam: premisnya (owner masih di balik proxy PHP) sudah tidak benar, dan justru
@@ -174,10 +174,10 @@ hostname yang benar-benar terikat di Cloudflare, sementara `*.workers.dev` kini 
 
 Sepuluh gerbang, semuanya **exit 0**:
 
-`owner-edge-guard-test.js` (941/941 assert), `owner-dashboard-test.js`,
-`analytics-privacy-test.js`, `d1-schema-contract-test.js`, `no-network-test.js`,
-`secret-scan-test.js`, `gate-registry-test.js`, `coordination-guard-test.js`,
-`regression-test.js`, `install-health-test.js`.
+`tests/owner-edge-guard-test.js` (941/941 assert), `tests/owner-dashboard-test.js`,
+`tests/analytics-privacy-test.js`, `tests/d1-schema-contract-test.js`, `tests/no-network-test.js`,
+`tests/secret-scan-test.js`, `tests/gate-registry-test.js`, `tests/coordination-guard-test.js`,
+`tests/regression-test.js`, `tests/install-health-test.js`.
 Plus `reports/d3-owner-guard-red-proof.mjs` (20/20) dan
 `reports/g1-custom-domain-red-proof.mjs` (11/11, sesudah M11 diperbaiki).
 

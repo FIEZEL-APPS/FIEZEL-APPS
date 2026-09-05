@@ -13,8 +13,8 @@
        WCAG 1.4.4 (Resize Text) dan 1.4.10 (Reflow).
 
        JANGAN membalik baris ini tanpa OWNER. Ia bukan kelalaian dan bukan sisa eksperimen;
-       ia keputusan produk. Gerbang `app-interaction-policy-test.js` dan
-       `m02542-experience-test.js` menegakkan keadaan TERKUNCI ini, jadi mengembalikannya
+       ia keputusan produk. Gerbang `tests/app-interaction-policy-test.js` dan
+       `tests/m02542-experience-test.js` menegakkan keadaan TERKUNCI ini, jadi mengembalikannya
        diam-diam akan memerahkan CI.
 
        MITIGASI YANG DISARANKAN (belum ada, dan ini utang yang jujur): pengatur ukuran teks
@@ -49,7 +49,7 @@
 
        Aturan splash di bawah disalin APA ADANYA dari style.css (selector dan nilai identik),
        jadi begitu style.css tiba tidak ada satu piksel pun yang berubah di layar.
-       splash-first-paint-test.js membandingkan keduanya dan gagal kalau salah satunya
+       tests/splash-first-paint-test.js membandingkan keduanya dan gagal kalau salah satunya
        bergeser sendiri. -->
   <link rel="preload" as="font" type="font/woff2" href="./assets/fonts/InstrumentSerif-400.woff2" crossorigin>
   <link rel="preload" as="font" type="font/woff2" href="./assets/fonts/PlusJakartaSans-400.woff2" crossorigin>
@@ -60,11 +60,11 @@ html.fz-booting,html.fz-booting body{background:#1B1418}
 html.fz-booting body{overflow:hidden}
 #fiezelBootSplash:not(.is-leaving){animation:none}
 /* Ketukan koreografi v4. Nilai ini WAJIB sama dengan tabel di
-   features/brand/fiezel-choreography.js; splash-choreography-test.js gagal kalau
+   features/brand/fiezel-choreography.js; tests/splash-choreography-test.js gagal kalau
    keduanya menyimpang. Ada di sini karena jalur kurangi-gerak splash frame-pertama
    memudar pada ketukan ini sebelum satu baris JavaScript pun sempat berjalan. */
 #fiezelBootSplash{--fz-b1:0ms;--fz-b2:240ms;--fz-b3:470ms;--fz-b4:690ms;--fz-b5:870ms;--fz-b6:1060ms;--fz-b7:1150ms;--fz-b8:1400ms;--fz-b9:1520ms;--fz-b10:1655ms;--fz-b11:1780ms;--fz-b12:1900ms}
-/* Salinan APA ADANYA dari style.css (diperiksa splash-first-paint-test.js). */
+/* Salinan APA ADANYA dari style.css (diperiksa tests/splash-first-paint-test.js). */
 .fiezel-wordmark{display:block;width:100%;height:auto}
 .fiezel-splash,.fiezel-ob{--fz-bg:#FFF9EE;--fz-paper:#FFFFFF;--fz-ink:#241A11;--fz-ink-muted:#6E5E47;--fz-accent:#241A11;--fz-accent-deep:#120C07;--fz-gold:#E6A800;--fz-soft:#FFF3C4;--fz-line:#F0E4CF;--fz-sun:#FFC700;--fz-sun-soft:#FFF3C4;--fz-sun-press:#CC9600;--fz-sun-grad:linear-gradient(180deg,#FFDE59,#FFA500);--fz-info:#7A5F1B;--fz-core:#1B1418;--fz-core-soft:#2A2126;--fz-on-core:#FDFAF3;--fz-display:'FZ Instrument Serif',Georgia,'Times New Roman',serif;--fz-heading:'FZ Plus Jakarta Sans',-apple-system,'Segoe UI',sans-serif;--fz-body:'FZ Plus Jakarta Sans',-apple-system,'Segoe UI',sans-serif}
 .fiezel-splash,.fiezel-ob{position:fixed;inset:0;z-index:2147482000;display:flex;flex-direction:column;background:var(--fz-bg);font-family:var(--fz-body);color:var(--fz-ink);padding-top:max(18px,env(safe-area-inset-top));animation:fzm-page-in .4s cubic-bezier(.22,.61,.36,1) both}
@@ -448,7 +448,7 @@ html.fz-booting body{overflow:hidden}
        Keduanya benar dan keduanya berasal dari daftar di bawah ini, yang dulu seluruhnya
        parser-blocking dengan js.puter.com di baris pertama.
 
-       Tiga aturan sekarang berlaku di sini, dan boot-order-test.js menggagalkan build kalau
+       Tiga aturan sekarang berlaku di sini, dan tests/boot-order-test.js menggagalkan build kalau
        salah satunya dilanggar:
 
        1. js.puter.com `async` - permintaan pihak ketiga tidak boleh berada di jalur kritis
@@ -737,7 +737,7 @@ html.fz-booting body{overflow:hidden}
   <!-- T-031: berkas ini memasang `window.FiezelABAnalytics` (pipa eksperimen UI). Ia TIDAK
        BOLEH menyentuh `window.FiezelAnalytics` — nama itu milik modul analytics
        privasi-maksimal yang disuntik app.js di idle, dan `<script defer>` di sini selalu
-       menang balapan terhadap idle. Dijaga `global-name-collision-test.js`. -->
+       menang balapan terhadap idle. Dijaga `tests/global-name-collision-test.js`. -->
   <script defer src="./features/ui/fiezel-ab-testing.js"></script>
   <script defer src="./features/ui/skeleton-helpers.js"></script>
   <script defer src="./features/ui/fiezel-boot-tail.js"></script>

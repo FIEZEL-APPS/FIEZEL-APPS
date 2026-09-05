@@ -32,7 +32,7 @@ commit ke main
 service worker generasi baru mem-precache bita **lama** (atau 404) di bawah nama revisi baru —
 murid memegang shell yang tidak sepadan. Satu entri gagal membuat **seluruh** precache gagal.
 
-Urutan ini ditegakkan `deploy-site-gate-test.js` di sumber, bukan diserahkan ke kebiasaan:
+Urutan ini ditegakkan `tests/deploy-site-gate-test.js` di sumber, bukan diserahkan ke kebiasaan:
 membalik urutannya memerahkan CI.
 
 ---
@@ -67,7 +67,7 @@ Opsional:
 | `FIEZEL_SITE_BASE` | `https://fiezel.my.id/app` | kalau aplikasi pindah path |
 
 > Tempel kunci privat **utuh**, termasuk baris `-----BEGIN ...-----` dan `-----END ...-----`.
-> Kunci privat tidak pernah masuk repo — `secret-scan-test.js` menjaga itu.
+> Kunci privat tidak pernah masuk repo — `tests/secret-scan-test.js` menjaga itu.
 
 ### Langkah 3 — buktikan
 

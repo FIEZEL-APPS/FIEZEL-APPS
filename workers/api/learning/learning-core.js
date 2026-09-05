@@ -2,8 +2,8 @@
  * FIEZEL — inti lane telemetri belajar `fiezel-learning-event-v1` (fungsi murni,
  * tanpa I/O, tanpa D1, tanpa jaringan, tanpa `env`).
  *
- * OTORITAS: `BRAIN-TELEMETRY-SCHEMA.md` (kontrak DESAIN yang mengikat) +
- * `BRAIN-DATA-PRIVACY.md` §7. Lane ini SENGAJA TERPISAH TOTAL dari lane
+ * OTORITAS: `docs/BRAIN-TELEMETRY-SCHEMA.md` (kontrak DESAIN yang mengikat) +
+ * `docs/BRAIN-DATA-PRIVACY.md` §7. Lane ini SENGAJA TERPISAH TOTAL dari lane
  * analytics (`workers/api/analytics/*`): skema berbeda, database berbeda
  * (`LEARNING_DB` / `fiezel-learning`), rute berbeda (`/api/learning/events`).
  * Memisahkan lane bukan estetika — analytics menghitung KEHADIRAN perangkat
@@ -12,7 +12,7 @@
  *
  * Prinsip yang ditegakkan DI KODE, bukan hanya ditulis di dokumen:
  *  1. DUA tipe event saja: `answer_outcome` + `session_summary`
- *     (BRAIN-TELEMETRY-SCHEMA.md §1.1). Tipe lain = bump versi skema.
+ *     (docs/BRAIN-TELEMETRY-SCHEMA.md §1.1). Tipe lain = bump versi skema.
  *  2. ENUM TERTUTUP TOTAL: setiap field string harus persis salah satu nilai
  *     di daftar bawah. Tidak ada teks bebas, tidak ada float presisi.
  *  3. TANPA timestamp presisi: satu-satunya penanda waktu adalah `day`
@@ -24,13 +24,13 @@
  *     dibuang diam-diam (klien harus tahu payload-nya salah, kebijakan yang
  *     sama dengan `foreign_field` di route-events.js analytics).
  *  5. Grammar-only: `domain` hanya punya satu nilai sah (`grammar`),
- *     BRAIN-TELEMETRY-SCHEMA.md §1.4.
+ *     docs/BRAIN-TELEMETRY-SCHEMA.md §1.4.
  */
 
 export const LEARNING_SCHEMA_ID = 'fiezel-learning-event-v1';
 
 /* ==========================================================================
- * 1. ENUM TERTUTUP (BRAIN-TELEMETRY-SCHEMA.md §3–§4 — jangan tambah nilai
+ * 1. ENUM TERTUTUP (docs/BRAIN-TELEMETRY-SCHEMA.md §3–§4 — jangan tambah nilai
  *    tanpa bump versi skema; "cuma nambah satu nilai" adalah cara kardinalitas
  *    mati pelan-pelan, §6)
  * ========================================================================== */

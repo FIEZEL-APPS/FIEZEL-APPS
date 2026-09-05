@@ -1,7 +1,7 @@
 # V7 - jeda narasi Library: dari 603,6 ms ke 533,5 ms tanpa menunda suara pertama
 
 Cabang `work/v7lib`. Wilayah yang disentuh HANYA `features/library/fiezel-library-ui.js` dan
-`voice-callsite-prefetch-test.js`, ditambah data pengukuran baru di `reports/voice-v7-data/`.
+`tests/voice-callsite-prefetch-test.js`, ditambah data pengukuran baru di `reports/voice-v7-data/`.
 Tidak ada satu berkas pun di `features/neural-voice/` yang diubah. Tidak ada push, tidak ada
 bump versi build.
 
@@ -206,7 +206,7 @@ blok sudah terbukti lebih buruk. Sisa perbaikannya ada di mesin, bagian 5.
 
 ## 4. Gerbang baru dan matriks merah/hijau
 
-`voice-callsite-prefetch-test.js`: **68 assert, semua hijau**. Sebelas assert baru (c9, c10,
+`tests/voice-callsite-prefetch-test.js`: **68 assert, semua hijau**. Sebelas assert baru (c9, c10,
 f1-f9). Bagian (f) tidak membaca sumber, ia **menjalankan** `dispatchBlock`, `warmNext`, dan
 `resetDispatchCursor` di dalam `vm` dengan data buku nyata.
 
@@ -255,18 +255,18 @@ Isi assertnya:
 
 | gerbang | hasil |
 |---|---|
-| `voice-callsite-prefetch-test.js` | PASS (68 pass, 0 fail) |
-| `voice-fallback-chain-test.js` | PASS (45 pass, 0 fail) |
-| `voice-pipeline-gap-test.js` | PASS (36/36) |
-| `library-integrity-test.js` | PASS |
-| `no-network-test.js` | PASS (39 assert, 168 gerbang dipindai) |
-| `regression-test.js` | PASS |
-| `install-health-test.js` | PASS |
-| `gate-registry-test.js` | PASS (10 pass, 0 fail) |
-| `coordination-guard-test.js` | PASS (24/24) |
-| `ui-structure-test.js` | PASS |
+| `tests/voice-callsite-prefetch-test.js` | PASS (68 pass, 0 fail) |
+| `tests/voice-fallback-chain-test.js` | PASS (45 pass, 0 fail) |
+| `tests/voice-pipeline-gap-test.js` | PASS (36/36) |
+| `tests/library-integrity-test.js` | PASS |
+| `tests/no-network-test.js` | PASS (39 assert, 168 gerbang dipindai) |
+| `tests/regression-test.js` | PASS |
+| `tests/install-health-test.js` | PASS |
+| `tests/gate-registry-test.js` | PASS (10 pass, 0 fail) |
+| `tests/coordination-guard-test.js` | PASS (24/24) |
+| `tests/ui-structure-test.js` | PASS |
 
-`library-test.js` **tidak ada** di repo ini; yang ada `library-integrity-test.js` dan itu yang
+`library-test.js` **tidak ada** di repo ini; yang ada `tests/library-integrity-test.js` dan itu yang
 dijalankan.
 
 ---
@@ -335,14 +335,14 @@ milik pemilik wilayah `features/neural-voice/`.
 - Sesi ini tidak punya entri di `coordination/CLAIMS.json`, dan `coordination/` sendiri diklaim
   MASTER, jadi saya tidak menambahkan klaim sendiri. Kalau protokolnya menuntut setiap wilayah
   kerja punya klaim, entri untuk `features/library/fiezel-library-ui.js` +
-  `voice-callsite-prefetch-test.js` perlu ditambahkan oleh pemilik `coordination/`.
+  `tests/voice-callsite-prefetch-test.js` perlu ditambahkan oleh pemilik `coordination/`.
 - Playwright di lingkungan ini butuh `executable_path` eksplisit ke
   `chromium_headless_shell-1217`; `measure_v7.py` sudah memakainya. Tanpa itu harness gagal boot,
   bukan gagal ukur.
 
 ## Berkas
 
-- diubah: `features/library/fiezel-library-ui.js`, `voice-callsite-prefetch-test.js`
+- diubah: `features/library/fiezel-library-ui.js`, `tests/voice-callsite-prefetch-test.js`
 - baru: `reports/voice-v7-data/measure_v7.py`, `aggregate_v7.py`, `red-green-matrix.sh`,
   `red-green-matrix.txt`, `block-measurements-v7.json`, `block-measurements-v7b.json`,
   `block-measurements-v7c.json`, `reports/work-v7-library-gap.md`

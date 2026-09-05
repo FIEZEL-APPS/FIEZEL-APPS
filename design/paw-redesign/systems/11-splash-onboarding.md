@@ -177,7 +177,7 @@ Radically simpler than the rejected mascot design: the paw glyph is **~5 inline 
 
 ### 1S.7 Paw glyph: geometry and splash recolor
 
-**Geometry is `assets/brand/fiezel-paw.svg`, exact and untouched** (the paw-print mark, single shape source with `ICONS.paw`, guarded by `paw-mascot-test.js`): viewBox `0 0 24 24`, four toe bars `(4.6,7.5,3.1,4.6) (8.9,5.1,3.1,7) (13.2,3.4,3.1,8.7) (17.5,6.2,3.1,5.9)` all rx 1.55, plus the heel-pad path. **Recolor for the splash field (binding):** the source fill `#2B2118` is invisible on `#1B1418` (≈1.1:1); on the splash the glyph is filled with the **existing splash gold gradient** `fzsGold` (`#FFDE59 → 45% #FFC700 → #E6A800`, vertical) — the seal echoes the two gold bars, and gold-on-dark is the field's established accent pair (audit 02 §1c). Ivory is reserved for letterforms; the paw is an accent event. No stroke, no shadow, no third color. Everywhere else in the product the glyph keeps its themed `ICONS.paw` fill — this recolor is splash-scoped only.
+**Geometry is `assets/brand/fiezel-paw.svg`, exact and untouched** (the paw-print mark, single shape source with `ICONS.paw`, guarded by `tests/paw-mascot-test.js`): viewBox `0 0 24 24`, four toe bars `(4.6,7.5,3.1,4.6) (8.9,5.1,3.1,7) (13.2,3.4,3.1,8.7) (17.5,6.2,3.1,5.9)` all rx 1.55, plus the heel-pad path. **Recolor for the splash field (binding):** the source fill `#2B2118` is invisible on `#1B1418` (≈1.1:1); on the splash the glyph is filled with the **existing splash gold gradient** `fzsGold` (`#FFDE59 → 45% #FFC700 → #E6A800`, vertical) — the seal echoes the two gold bars, and gold-on-dark is the field's established accent pair (audit 02 §1c). Ivory is reserved for letterforms; the paw is an accent event. No stroke, no shadow, no third color. Everywhere else in the product the glyph keeps its themed `ICONS.paw` fill — this recolor is splash-scoped only.
 
 ### 1S.8 Assets, wiring & gates (supersedes §4.1 rows A1–A5/A9 and §4.2 E7 for the splash)
 
@@ -189,9 +189,9 @@ Radically simpler than the rejected mascot design: the paw glyph is **~5 inline 
 | S-A4 | `FiezelUiSfx`: `thud` voice (§1S.4) scheduled from the beats table | Single-engine rule |
 | S-A5 | `VISIBLE_MS` 3400 → 2000 in `fiezel-splash.js` | m025-88 note in §1S.2 |
 | S-A6 | Reduced-motion overrides for the six new keyframes (§1S.5) | Extends the existing `.fiezel-splash-still` block |
-| S-G1 | `splash-choreography-test.js` updated in the same change (beat table ↔ index.html identity, incl. s-rows) | |
-| S-G2 | `splash-first-paint-test.js`: assert paw markup present in static block | |
-| S-G3 | `paw-mascot-test.js` glyph-coordinate gate now also covers the splash instance (same rect set) | |
+| S-G1 | `tests/splash-choreography-test.js` updated in the same change (beat table ↔ index.html identity, incl. s-rows) | |
+| S-G2 | `tests/splash-first-paint-test.js`: assert paw markup present in static block | |
+| S-G3 | `tests/paw-mascot-test.js` glyph-coordinate gate now also covers the splash instance (same rect set) | |
 | S-G4 | No `<fiezel-mascot>` anywhere in splash markup — a greppable m025-80 guard | |
 
 The former OWNER-approval flag (§4.2 E7, `splash: 'paw'|'lite'|'logo'`) is **retired** — there is exactly one splash ~~and it is this one~~ *(v3 note: and it is §1S-v3; the S-A/S-G rows above are superseded by §1S-v3.9 except S-G3/S-G4, which carry forward)*.
@@ -391,7 +391,7 @@ Boot facts (`app.js:2493-2511, 3502-3519`): the boot path **forces** the splash 
 |---|---|---|---|
 | A1 | Splash PAW layer markup: one `<fiezel-mascot class="fz-splash-paw">` slot in `markup()` + adopted-splash injection path | §1.2 | Sized `clamp(160px,44vw,220px)`; full body; shadow on (dark field) |
 | A2 | CSS keyframes `fz-splash-paw-in` (pop entrance), `fzm-ob-paw-handoff` (corner shrink) | §1.2 p1, §2.3 | Transform/opacity only; `--fz-spring` / `--fz-out` |
-| A3 | Choreography extension: PAW beats **p1–p4** as rows in the `FiezelChoreography` BEATS table (css vars `--fz-p1..p4`, `pitch: null` — they borrow the existing notes) + the compressed b1–b8 timings behind an OWNER-gated flag | §1.2 | One clock rule (m025-86); `splash-choreography-test.js` must be updated in the same change |
+| A3 | Choreography extension: PAW beats **p1–p4** as rows in the `FiezelChoreography` BEATS table (css vars `--fz-p1..p4`, `pitch: null` — they borrow the existing notes) + the compressed b1–b8 timings behind an OWNER-gated flag | §1.2 | One clock rule (m025-86); `tests/splash-choreography-test.js` must be updated in the same change |
 | A4 | Splash-lite head-crop: reuse head-crop placement pattern classes; optional static head export 72 px for the still variant | §1.6, §1.5 | Generated from canonical rig; no hand-drawn twin |
 | A5 | Static Welcoming-pose composition for `fiezel-splash-still` (PAW `st-greeting`/Welcoming static + assembled logo) | §1.5 | Must communicate with zero motion (checklist D3) |
 | A6 | `MASCOT_CHAIN` additions: `calm: ['calm','sleepy']`, `welcoming: ['welcoming','greeting']`, `welcome-back: ['welcome-back','greeting']` | §2.2, §3 | Chain pattern already exists; intents stay honest in DOM attrs |
@@ -413,7 +413,7 @@ Boot facts (`app.js:2493-2511, 3502-3519`): the boot path **forces** the splash 
 
 ### 4.3 Gates that must keep passing / be updated
 
-`splash-choreography-test.js` (beat table ↔ index.html defaults identity — must be updated with any timing change), `onboarding-test.js`, `paw-mascot-test.js` (single shape source, controlled amplitude), `topbar-logo-contrast-test.js` (untouched), the three reduced-motion layers (audit 03 B.6), and the two-copy sync duty (`features/mascot/` + `website/assets/mascot/`) if any rig state is added.
+`tests/splash-choreography-test.js` (beat table ↔ index.html defaults identity — must be updated with any timing change), `tests/onboarding-test.js`, `tests/paw-mascot-test.js` (single shape source, controlled amplitude), `tests/topbar-logo-contrast-test.js` (untouched), the three reduced-motion layers (audit 03 B.6), and the two-copy sync duty (`features/mascot/` + `website/assets/mascot/`) if any rig state is added.
 
 ### 4.4 Open decisions for OWNER
 

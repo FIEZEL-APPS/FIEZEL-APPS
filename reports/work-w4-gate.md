@@ -54,7 +54,7 @@ subdomain produksi `fitrajft.workers.dev` (`audio/manifest.json:5`), dan diatur
 
 Kolom **terjaring** = memenuhi salah satu kriteria gerbang: mereferensikan `secrets.` di luar
 komentar, ATAU memuat kata kunci `wrangler` / `deploy*` / `publish*` di luar komentar.
-Data diambil dari keluaran `workflow-actor-gate-test.js` (`WORKFLOW-ACTOR-GATE-REPORT.json`).
+Data diambil dari keluaran `tests/workflow-actor-gate-test.js` (`WORKFLOW-ACTOR-GATE-REPORT.json`).
 
 | # | Workflow | secrets. | kata kunci deploy | terjaring | gate aktor SEBELUM | gate aktor SESUDAH | Keputusan |
 |---|---|---|---|---|---|---|---|
@@ -77,12 +77,12 @@ Data diambil dari keluaran `workflow-actor-gate-test.js` (`WORKFLOW-ACTOR-GATE-R
 Rekapitulasi: 15 workflow · 8 terjaring · 6 bergerbang owner (naik dari 4) · 2 di-allowlist dengan
 alasan · 7 tidak terjaring. **Nol** workflow terjaring-tanpa-gate-tanpa-alasan.
 
-## 4. Gerbang baru: `workflow-actor-gate-test.js`
+## 4. Gerbang baru: `tests/workflow-actor-gate-test.js`
 
 Node murni, nol dependency, nol jaringan, nol parser YAML pihak ketiga (repo tidak punya
 `js-yaml`, dan gerbang tidak boleh menambah dependensi hanya untuk membaca 15 berkas). Ia
 memindai **semua** `.github/workflows/*.yml` dan menulis `WORKFLOW-ACTOR-GATE-REPORT.json`
-mengikuti pola pelaporan `cf-wiring-test.js`.
+mengikuti pola pelaporan `tests/cf-wiring-test.js`.
 
 Menambahkan satu baris `if:` menutup celah **hari ini**. Yang tidak ditutup baris itu adalah
 **besok** — workflow ke-16 yang men-deploy tanpa gate akan lolos review dengan mudah, karena tidak
@@ -139,7 +139,7 @@ FAIL: A zz-fake-rogue-deploy.yml punya penjaga aktor atau ada di allowlist
    -> terjaring karena secrets: CLOUDFLARE_API_TOKEN + kata kunci deploy. Tambahkan
       `if: github.event_name == 'workflow_dispatch' && github.actor == 'fitrajft-ux'`
       pada tingkat job (pola deploy-core-worker.yml:17), atau daftarkan berkas ini di
-      ALLOWLIST workflow-actor-gate-test.js dengan alasan.
+      ALLOWLIST tests/workflow-actor-gate-test.js dengan alasan.
 ```
 
 **(2) Gate yang hanya menutup sebagian job → `exit 1`.** `zz-fake-partial.yml`, dua job, satu
@@ -168,12 +168,12 @@ FAIL: E entri allowlist audio-deploy-worker.yml masih diperlukan
 
 | Perintah | Hasil |
 |---|---|
-| `node workflow-actor-gate-test.js` | **exit 0** — 32 PASS / 0 FAIL, `ungated: []` |
-| `node --check workflow-actor-gate-test.js` | OK |
+| `node tests/workflow-actor-gate-test.js` | **exit 0** — 32 PASS / 0 FAIL, `ungated: []` |
+| `node --check tests/workflow-actor-gate-test.js` | OK |
 | `python3 -c "import yaml,glob; [yaml.safe_load(open(f)) for f in glob.glob('.github/workflows/*.yml')]"` | **semua 15 workflow YAML sah** |
-| `node regression-test.js` | **exit 0** — `FIEZEL regression checks: PASS` |
-| `node install-health-test.js` | **exit 0** — `FIEZEL install health: PASS` |
-| `node audio-asset-pipeline-test.js` | **exit 0** — dijalankan tambahan karena `:318-321` mengunci isi `audio-deploy-worker.yml` (uji `PUT`→405); masih hijau |
+| `node tests/regression-test.js` | **exit 0** — `FIEZEL regression checks: PASS` |
+| `node tests/install-health-test.js` | **exit 0** — `FIEZEL install health: PASS` |
+| `node tests/audio-asset-pipeline-test.js` | **exit 0** — dijalankan tambahan karena `:318-321` mengunci isi `audio-deploy-worker.yml` (uji `PUT`→405); masih hijau |
 | Bump versi | **tidak dilakukan** — `VERSION.json` dan `version.js` tidak tersentuh |
 | Push | **tidak dilakukan** — commit hanya di `work/gate` |
 
@@ -183,8 +183,8 @@ FAIL: E entri allowlist audio-deploy-worker.yml masih diperlukan
 |---|---|
 | `.github/workflows/audio-deploy-worker.yml` | + gate aktor tingkat job (baris 40) + komentar alasan |
 | `.github/workflows/audio-generate.yml` | + gate aktor tingkat job (baris 61) + komentar alasan |
-| `.github/workflows/quality.yml` | + `node workflow-actor-gate-test.js` di akhir `Core validation` |
-| `workflow-actor-gate-test.js` | **baru** — gerbang, 7 kelas pemeriksaan, allowlist beralasan |
+| `.github/workflows/quality.yml` | + `node tests/workflow-actor-gate-test.js` di akhir `Core validation` |
+| `tests/workflow-actor-gate-test.js` | **baru** — gerbang, 7 kelas pemeriksaan, allowlist beralasan |
 | `WORKFLOW-ACTOR-GATE-REPORT.json` | **baru** — keluaran gerbang (pola sama dengan `CF-WIRING-REPORT.json`) |
 | `reports/work-w4-gate.md` | **baru** — catatan ini |
 

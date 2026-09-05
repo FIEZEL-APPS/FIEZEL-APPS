@@ -3,8 +3,8 @@
  * POLA: meniru content-canary-config.js — saklar BEKU yang hanya berubah lewat
  * release train (commit + gates + MASTER + bump build), bukan lewat server.
  *
- * KENAPA default OFF: kontrak dua-lane council (BRAIN-TELEMETRY-SCHEMA.md,
- * BRAIN-DATA-PRIVACY.md) menuntut consent eksplisit + endpoint server yang
+ * KENAPA default OFF: kontrak dua-lane council (docs/BRAIN-TELEMETRY-SCHEMA.md,
+ * docs/BRAIN-DATA-PRIVACY.md) menuntut consent eksplisit + endpoint server yang
  * sudah diverifikasi idempoten SEBELUM satu event pun keluar dari perangkat.
  * Sampai kedua syarat itu terbukti, lane ini mati dan antrean tidak menulis.
  *
@@ -28,7 +28,7 @@
     endpoint: '',
     // Batas antrean disalin dari kontrak fiezel-learning-queue.js.
     queue: Object.freeze({ maxEvents: 2000, maxBytes: 2 * 1024 * 1024, maxAgeDays: 45 }),
-    // Scope domain: grammar-only sesuai keputusan council (BRAIN-EVOLUTION-DECISIONS.md).
+    // Scope domain: grammar-only sesuai keputusan council (docs/BRAIN-EVOLUTION-DECISIONS.md).
     domains: Object.freeze(['grammar']),
     /* Lane KETIGA: bukti belajar Braincore (fiezel-braincore-evidence-v1).
      * Saklarnya SENDIRI, bukan menumpang `mode` di atas, karena lane ini

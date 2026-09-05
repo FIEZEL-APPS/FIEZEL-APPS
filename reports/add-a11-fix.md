@@ -3,7 +3,7 @@
 Branch `add/a11fix` · 28 Agustus 2026 · tanpa bump versi build, tanpa push.
 
 Dua cacat nyata di `main` diperbaiki, dan satu gerbang baru dipasang supaya keduanya tidak
-bisa kembali secara senyap: **`config-consistency-test.js`** (node murni, nol dependency,
+bisa kembali secara senyap: **`tests/config-consistency-test.js`** (node murni, nol dependency,
 nol jaringan), terdaftar di `.github/workflows/quality.yml`.
 
 ---
@@ -85,16 +85,16 @@ merah kalau ada var batas baru yang tidak masuk salah satu daftar):
 - `MAX_USERS = "250"` — batas kapasitas pemasangan (cermin `fiezel-core-worker.js:5`), bukan
   kuota per-pengguna.
 
-Harness `cf-api-contract-test.js` ikut disesuaikan (fixture `'20'`/`'6000'` → `'25'`/`'12000'`
+Harness `tests/cf-api-contract-test.js` ikut disesuaikan (fixture `'20'`/`'6000'` → `'25'`/`'12000'`
 dan assert `aiPerDay === 25`): sebelumnya harness mengabadikan angka naskah yang membohongi
 murid, jadi membiarkannya berarti gerbang "hijau" atas perilaku yang salah.
 
 ---
 
-## Gerbang baru: `config-consistency-test.js`
+## Gerbang baru: `tests/config-consistency-test.js`
 
 Node murni (`fs` + `path`), keluar 0/1, menulis `CONFIG-CONSISTENCY-REPORT.json`. Terdaftar di
-`.github/workflows/quality.yml` tepat sesudah `cf-config-killswitch-test.js` (keduanya menjaga
+`.github/workflows/quality.yml` tepat sesudah `tests/cf-config-killswitch-test.js` (keduanya menjaga
 sakelar yang sama dari dua sisi: perilaku kode vs perintah yang benar-benar diketik owner).
 
 Yang di-assert — 23 pemeriksaan:
@@ -135,7 +135,7 @@ menjalankan gerbang, lalu memulihkan berkas dari git sebelum kasus berikutnya:
 | runbook: kunci karangan `cfCoachEnabled` | exit 1 | (a) `flags.cfCoachEnabled` tidak ada di `CLIENT_FLAG_DEFAULTS` |
 | quality.yml: gerbang dihapus dari daftar | exit 1 | "Gerbang ini terdaftar di quality.yml" |
 
-Baseline setelah semua pemulihan: `node config-consistency-test.js` **exit 0**, `git status`
+Baseline setelah semua pemulihan: `node tests/config-consistency-test.js` **exit 0**, `git status`
 bersih untuk keempat berkas yang disentuh skrip. Skrip melaporkan `BUKTI MERAH: LENGKAP`.
 
 Catatan proses yang layak dicatat: versi pertama skrip ini memakai `sed` untuk kasus bentuk
@@ -149,16 +149,16 @@ pada teks target — suntikan yang gagal **menggagalkan skrip**, bukan menuduh g
 
 | Gerbang | Exit |
 |---|---|
-| `config-consistency-test.js` (baru) | 0 |
-| `cf-api-contract-test.js` | 0 |
-| `cf-wiring-test.js` | 0 |
-| `quota-core-test.js` | 0 |
-| `cf-config-killswitch-test.js` | 0 |
-| `regression-test.js` | 0 |
-| `install-health-test.js` | 0 |
-| `rollout-plan-test.js` | **tidak ada di branch ini** — lihat catatan |
+| `tests/config-consistency-test.js` (baru) | 0 |
+| `tests/cf-api-contract-test.js` | 0 |
+| `tests/cf-wiring-test.js` | 0 |
+| `tests/quota-core-test.js` | 0 |
+| `tests/cf-config-killswitch-test.js` | 0 |
+| `tests/regression-test.js` | 0 |
+| `tests/install-health-test.js` | 0 |
+| `tests/rollout-plan-test.js` | **tidak ada di branch ini** — lihat catatan |
 
-**`rollout-plan-test.js`.** Berkasnya belum ada di `main` maupun `add/a11fix`; ia lahir di
+**`tests/rollout-plan-test.js`.** Berkasnya belum ada di `main` maupun `add/a11fix`; ia lahir di
 `add/a9rollout` (commit `20b54b7`) bersama `docs/CF-ROLLOUT-PLAN.md` dan
 `tools/flag-plan-check.mjs`, dan gerbang itu berhenti lebih awal ("berkas wajib tidak ada")
 kalau dua berkas itu tidak ada. Jadi ia tidak bisa dijalankan di sini, dan itu dilaporkan
@@ -177,10 +177,10 @@ tidak disentuh). Tidak ada push.
 |---|---|
 | `docs/CF-MIGRATION-RUNBOOK.md` | §4.5 ditulis ulang, §4.6/§4.7 diperbaiki, dua butir checklist + dua baris tabel pembatalan diselaraskan |
 | `workers/api/wrangler.toml` | `AI_LIMIT_PER_DAY` 20→25, `TTS_CHARS_PER_DAY` 6000→12000, + alasan & pasangan penegakan ditulis di tempat angkanya hidup |
-| `cf-api-contract-test.js` | fixture env + assert `aiPerDay` diselaraskan ke nilai yang ditegakkan |
-| `config-consistency-test.js` | **baru** — gerbang (a)(b)(c)(d) |
+| `tests/cf-api-contract-test.js` | fixture env + assert `aiPerDay` diselaraskan ke nilai yang ditegakkan |
+| `tests/config-consistency-test.js` | **baru** — gerbang (a)(b)(c)(d) |
 | `tools/config-consistency-redproof.sh` | **baru** — skrip bukti merah yang memulihkan dirinya |
-| `.github/workflows/quality.yml` | gerbang baru didaftarkan sesudah `cf-config-killswitch-test.js` |
+| `.github/workflows/quality.yml` | gerbang baru didaftarkan sesudah `tests/cf-config-killswitch-test.js` |
 | `CONFIG-CONSISTENCY-REPORT.json` | artefak gerbang |
 
 ## Yang TIDAK dikerjakan (sengaja, untuk pembaca berikutnya)

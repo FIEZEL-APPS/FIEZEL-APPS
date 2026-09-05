@@ -2,7 +2,7 @@
 
 Ringkas: satu skrip pemantauan yang bisa dijalankan berulang (`tools/fiezel-health-probe.mjs`),
 satu runbook mini (`tools/fiezel-health-probe.md`), dan satu gerbang CI
-(`health-probe-test.js`) yang menjaga sifat-sifat yang paling mudah rusak diam-diam.
+(`tests/health-probe-test.js`) yang menjaga sifat-sifat yang paling mudah rusak diam-diam.
 **Versi build TIDAK dinaikkan** (`VERSION.json` tetap `5.19.0`).
 
 ---
@@ -13,8 +13,8 @@ satu runbook mini (`tools/fiezel-health-probe.md`), dan satu gerbang CI
 |---|---|
 | `tools/fiezel-health-probe.mjs` | Probe Node murni (>=18), nol dependency, nol rahasia, nol berkas temporer (hanya menulis kalau diberi `--out=`). Mode: produksi, `--json`, `--selftest`, `--selftest --scenario=<nama>`. |
 | `tools/fiezel-health-probe.md` | Cara menjalankan (termasuk contoh cron), arti tiap status + exit code, dan runbook mini per gejala untuk kedelapan pemeriksaan. |
-| `health-probe-test.js` | Gerbang: 49 assert, menjalankan probe sungguhan dalam 13 skenario loopback. |
-| `.github/workflows/quality.yml` | Dua langkah baru sesudah `edge-guard-test.js`: `node health-probe-test.js` dan `node tools/fiezel-health-probe.mjs --selftest`. **Tidak ada** pemanggilan mode produksi di CI. |
+| `tests/health-probe-test.js` | Gerbang: 49 assert, menjalankan probe sungguhan dalam 13 skenario loopback. |
+| `.github/workflows/quality.yml` | Dua langkah baru sesudah `tests/edge-guard-test.js`: `node tests/health-probe-test.js` dan `node tools/fiezel-health-probe.mjs --selftest`. **Tidak ada** pemanggilan mode produksi di CI. |
 
 ## 2. Pemeriksaan dan derajatnya
 
@@ -97,9 +97,9 @@ Yang dijaga gerbang, sesuai permintaan paket kerja:
 - (c) exit non-nol untuk 6 skenario kritis, exit **0** untuk 4 skenario peringatan-saja;
 - (d) tidak menembak jaringan dalam `--selftest`.
 
-### Catatan jujur soal `no-network-test.js`
+### Catatan jujur soal `tests/no-network-test.js`
 
-`no-network-test.js` memindai `readdirSync(root)` dengan pola
+`tests/no-network-test.js` memindai `readdirSync(root)` dengan pola
 `-(test|audit|selftest).js$` — **hanya berkas gerbang di akar repo**. Karena itu
 `tools/fiezel-health-probe.mjs` tidak pernah masuk pemindaiannya (sama seperti
 `tools/cf-test-harness.js`), dan **tidak** ditambahkan ke allowlist mana pun di sana:
@@ -108,19 +108,19 @@ menambahkan nama ke sana akan mengubah assert ukuran daftar (`SOCKET_ALLOWLIST.s
 `TRAP_ONLY_ALLOWLIST.size === 1`, `ENV_GATED_LIVE_ALLOWLIST.size === 1`) tanpa alasan
 arsitektur. Yang menjaga CI tetap bebas jaringan adalah dua hal yang diperiksa:
 `quality.yml` hanya memanggil probe dengan `--selftest` (di-assert), dan probe menolak
-host non-loopback dalam mode itu (di-assert per skenario). `health-probe-test.js` sendiri
-tetap ikut dipindai `no-network-test.js` — dan lolos, karena ia hanya `spawnSync` probe,
+host non-loopback dalam mode itu (di-assert per skenario). `tests/health-probe-test.js` sendiri
+tetap ikut dipindai `tests/no-network-test.js` — dan lolos, karena ia hanya `spawnSync` probe,
 tanpa modul socket dan tanpa `fetch` remote.
 
 ## 7. Verifikasi (dijalankan di worktree ini, Node v20.20.1)
 
 | Perintah | Hasil |
 |---|---|
-| `node health-probe-test.js` | **exit 0** — PASS, 49 assert, 13 skenario selftest |
+| `node tests/health-probe-test.js` | **exit 0** — PASS, 49 assert, 13 skenario selftest |
 | `node tools/fiezel-health-probe.mjs --selftest` | **exit 0** — PASS 13/13 skenario, 0 percobaan non-loopback |
-| `node no-network-test.js` | **exit 0** — PASS, 35 assert, 128 gerbang dipindai (naik dari 127: `health-probe-test.js` ikut dipindai dan lolos) |
-| `node regression-test.js` | **exit 0** — PASS |
-| `node install-health-test.js` | **exit 0** — PASS |
+| `node tests/no-network-test.js` | **exit 0** — PASS, 35 assert, 128 gerbang dipindai (naik dari 127: `tests/health-probe-test.js` ikut dipindai dan lolos) |
+| `node tests/regression-test.js` | **exit 0** — PASS |
+| `node tests/install-health-test.js` | **exit 0** — PASS |
 
 ## 8. Probe SUNGGUHAN terhadap produksi — dijalankan sekali, dilaporkan apa adanya
 
@@ -172,7 +172,7 @@ Catatan apa adanya, bukan dipoles:
   ~1.051–1.163 ms hangat), §6 (pembongkaran jembatan).
 - `docs/CF-MIGRATION-RUNBOOK.md` — Bagian 5 (tabel keputusan batas plan gratis: CPU 10 ms,
   KV 1.000 tulis/hari, Workers AI 10.000 neuron/hari).
-- `workers/api/mw-edge.js`, `workers/api/route-health.js`, `edge-guard-test.js` — penjaga
+- `workers/api/mw-edge.js`, `workers/api/route-health.js`, `tests/edge-guard-test.js` — penjaga
   edge dari dalam; probe ini melengkapinya dari luar.
 - Batas Workers: https://developers.cloudflare.com/workers/platform/limits/
 - Batas KV: https://developers.cloudflare.com/kv/platform/limits/

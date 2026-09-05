@@ -54,9 +54,9 @@ Satu titik pemasangan. Alasannya ditulis di header berkas, bukan di sini saja.
 - Tidak ada tabrakan nama tabel antar kedua berkas, dan 0002 tidak punya kolom `user_id`/`sub`/
   `install_id` — jadi tidak ada kolom penghubung ke tabel kuota (kontrak `EXEC-BRIEF-CF.md`).
   Berkas asli di `workers/api/analytics/migrations/` dibiarkan di tempat (dibaca
-  `analytics-privacy-test.js`) dan salinannya byte-identik; itu ikut di-assert gerbang baru.
+  `tests/analytics-privacy-test.js`) dan salinannya byte-identik; itu ikut di-assert gerbang baru.
 
-### `cf-wiring-test.js` (baru, gerbang) — 101 assert, PASS
+### `tests/cf-wiring-test.js` (baru, gerbang) — 101 assert, PASS
 Terdaftar di `.github/workflows/quality.yml`. Membuktikan, bukan mempercayai:
 - (a) semua rute terdaftar dan menjawab bukan 404 (`/api/quota` 200, `/api/ai/task` 200,
   `/api/tts/render` 200, `/api/tts/manifest` 200, `/api/usage/events` 202, `/api/usage/pepper`
@@ -88,15 +88,15 @@ Terdaftar di `.github/workflows/quality.yml`. Membuktikan, bukan mempercayai:
 
 ### Gerbang yang assert-nya diperbarui (bukan dilemahkan)
 Tiga assert masih menuliskan invarian **pra-merge** dan karena itu menuntut agar rute tetap tidak terpasang:
-- `ai-task-contract-test.js:214` dulu `!fs.existsSync('workers/api/index.js')` → sekarang: rute AI
+- `tests/ai-task-contract-test.js:214` dulu `!fs.existsSync('workers/api/index.js')` → sekarang: rute AI
   dipasang lewat satu titik `route-wiring.js` dan `index.js` tidak mengimpor modul AI.
-- `analytics-server-only-test.js:277` — sama, untuk analytics.
-- `cf-api-contract-test.js` `inlineModule()` — perakit modulnya hanya bisa menyelesaikan `./x.js`
+- `tests/analytics-server-only-test.js:277` — sama, untuk analytics.
+- `tests/cf-api-contract-test.js` `inlineModule()` — perakit modulnya hanya bisa menyelesaikan `./x.js`
   satu direktori. Setelah merge grafnya bersarang (`route-wiring.js` → `./quota/route-quota.js` →
   `./quota-core.js`) dan gerbangnya **ERROR**, bukan gagal-assert. Sekarang path diselesaikan
   relatif terhadap modul pengimpor, plus dukungan `await import('./x.js')` dan `import './x.js'`.
-- `no-network-test.js` — kelas allowlist kedua `TRAP_ONLY_ALLOWLIST` untuk
-  `prerender-dryrun-test.js`, yang me-`require('https')` **semata-mata untuk menimpa
+- `tests/no-network-test.js` — kelas allowlist kedua `TRAP_ONLY_ALLOWLIST` untuk
+  `tests/prerender-dryrun-test.js`, yang me-`require('https')` **semata-mata untuk menimpa
   `request`/`get` dengan jerat yang melempar**. Kelonggaran hanya menyangkut `require`, dan hanya
   bila penugasan jerat benar-benar ada; larangan MEMANGGIL socket tetap penuh. Dua fixture baru
   membuktikan kedua arah. Assert `SOCKET_ALLOWLIST.size === 2` tetap utuh.
@@ -127,7 +127,7 @@ install-health-test          exit=0
 Tambahan: `node --check` bersih untuk seluruh `*.js`/`*.mjs` (kecuali `node_modules`/`vendor`),
 `tools/cf-test-harness.js` selfTest PASS 45/45.
 
-**Catatan jujur soal dua gerbang di atas**: `ai-task-contract-test.js` dan `no-network-test.js`
+**Catatan jujur soal dua gerbang di atas**: `tests/ai-task-contract-test.js` dan `tests/no-network-test.js`
 sudah **MERAH sebelum** pekerjaan ini dimulai (baseline diambil di awal). Keduanya sekarang hijau,
 tapi hijaunya datang dari mengubah assert, bukan dari mengubah produksi — dan itu perlu ditinjau
 owner. Argumennya ada di atas dan di komentar berkasnya; kalau owner tidak menerima argumen itu,

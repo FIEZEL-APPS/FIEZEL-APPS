@@ -104,7 +104,7 @@
  *   - berkas ini tidak pernah membaca `X-Fiezel-Edge`, `X-Forwarded-*`, atau
  *     header apa pun untuk memilih cabang. Satu-satunya header yang dibaca
  *     adalah `CF-Connecting-IP` (dan `X-Real-IP` untuk harness) — dan itu hanya
- *     untuk KUNCI ember, bukan untuk tarif. `rate-anon-test.js` butir (a)
+ *     untuk KUNCI ember, bukan untuk tarif. `tests/rate-anon-test.js` butir (a)
  *     memindai hal ini dari kode + membuktikannya lewat permintaan nyata.
  *
  * ==========================================================================
@@ -247,7 +247,7 @@
  * `migrations/0005_ai_account_budget.sql`), karena ia menghitung di dimensi yang
  * dibayar (neuron per AKUN per hari), bukan per identitas. Berkas AI itu MILIK
  * PAKET LAIN dan TIDAK disentuh dari sini; hasil verifikasi + celah yang
- * ditemukan ditulis di `reports/work-s1-auth-anon.md`, dan `rate-anon-test.js`
+ * ditemukan ditulis di `reports/work-s1-auth-anon.md`, dan `tests/rate-anon-test.js`
  * butir (g) meng-assert pengikatannya dari luar (nol edit).
  *
  * ==========================================================================
@@ -259,7 +259,7 @@
  * "terbit" / "cookie stabil" / "ditolak" jadi lebih sulit dijadikan oracle.
  * `Math.random` di sini BUKAN untuk nilai keamanan (bukan token/secret) —
  * hanya penundaan; token identitas tetap `crypto.randomUUID()` di
- * `mw-identity.js`. DIPERTAHANKAN apa adanya; `rate-anon-test.js` butir (c)
+ * `mw-identity.js`. DIPERTAHANKAN apa adanya; `tests/rate-anon-test.js` butir (c)
  * menjaganya tetap ada dan tetap dipanggil untuk SEMUA respons rute anon.
  */
 

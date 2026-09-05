@@ -2,7 +2,7 @@
  * tools/print-live-evidence.mjs — cetak ulang laporan gerbang live di AKHIR log CI.
  *
  * KENAPA BERKAS INI ADA, dan kenapa ia bukan hiasan.
- * Kedua gerbang live (`cf-live-contract-test.js`, `tools/ai-live-verify.mjs`) menghasilkan
+ * Kedua gerbang live (`tests/cf-live-contract-test.js`, `tools/ai-live-verify.mjs`) menghasilkan
  * bukti terkaya di seluruh workflow: assert per assert terhadap sistem yang sungguhan hidup,
  * panggilan model sungguhan, kuota yang benar-benar terpakai. Lalu bukti itu terkubur di
  * TENGAH log job, di belakang keluaran simulasi adaptivitas yang puluhan ribu baris — jadi

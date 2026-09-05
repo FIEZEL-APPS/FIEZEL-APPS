@@ -1,7 +1,7 @@
 # V4 — Gerbang AI: bentuk jawaban, model terukur, kontrak mutu keluaran
 
 Cabang `voice/aifix`. Berkas yang disunting: `workers/api/ai/ai-tasks.js`,
-`workers/api/ai/route-ai.js`, `ai-task-contract-test.js`, `ai-response-shape-test.js` (baru),
+`workers/api/ai/route-ai.js`, `tests/ai-task-contract-test.js`, `tests/ai-response-shape-test.js` (baru),
 `.github/workflows/quality.yml`. Tidak ada berkas suara, tidak ada `app.js`, tidak ada bump versi
 (`VERSION.json` tetap 5.19.0).
 
@@ -114,7 +114,7 @@ styleCheckedTasks [tutor_turn, writing_feedback, context_coach, session_recap]
 
 ## 5. Gerbang
 
-`ai-response-shape-test.js` (baru, node murni + `tools/cf-test-harness.js` `makeEnv`/`fakeAI`) —
+`tests/ai-response-shape-test.js` (baru, node murni + `tools/cf-test-harness.js` `makeEnv`/`fakeAI`) —
 **48 assert PASS**, exit 0. Yang dibuktikan: kedua bentuk jawaban terbaca; `content` kosong +
 `reasoning_content` terisi = `reasoning_overflow`; lima variasi jawaban kosong tidak pernah lolos
 sebagai sukses; jawaban 8 kalimat pada batas 6 ditolak sementara tepat 6 diterima; pola pelanggaran
@@ -123,17 +123,17 @@ task naskah dan diizinkan pada terjemahan verbatim; sebab dicatat dengan `breake
 registry tidak memakai granite untuk tugas analisa (model maupun tier degradasi); sea-lion tercatat
 kandidat; gemma-4-26b tidak dirujuk task mana pun.
 
-`ai-task-contract-test.js` (diperluas) — **125 assert PASS**, exit 0. Tiga assert lama yang membagi
+`tests/ai-task-contract-test.js` (diperluas) — **125 assert PASS**, exit 0. Tiga assert lama yang membagi
 model berdasarkan frekuensi/harga diganti assert berbasis bukti, ditambah: granite dilarang di
 tugas analisa, degradasi tidak mendarat di granite, batas kalimat ada di satu kontrak, prompt
 memakai batas dari kontrak itu, dan fallback lulus kontraknya sendiri.
 
-Terdaftar di `.github/workflows/quality.yml` (`node ai-response-shape-test.js`, tepat sesudah
-`ai-task-contract-test.js`).
+Terdaftar di `.github/workflows/quality.yml` (`node tests/ai-response-shape-test.js`, tepat sesudah
+`tests/ai-task-contract-test.js`).
 
-Verifikasi exit 0: `ai-response-shape-test.js`, `ai-task-contract-test.js`, `cf-wiring-test.js`,
-`cf-api-contract-test.js`, `quota-core-test.js`, `regression-test.js`, `install-health-test.js`
-(ikut diperiksa: `ai-integration-test.js`, `breaker-test.js`, `core-worker-contract-test.js`).
+Verifikasi exit 0: `tests/ai-response-shape-test.js`, `tests/ai-task-contract-test.js`, `tests/cf-wiring-test.js`,
+`tests/cf-api-contract-test.js`, `tests/quota-core-test.js`, `tests/regression-test.js`, `tests/install-health-test.js`
+(ikut diperiksa: `tests/ai-integration-test.js`, `tests/breaker-test.js`, `tests/core-worker-contract-test.js`).
 
 ## 6. Yang masih terbuka
 

@@ -5,7 +5,7 @@
  *
  * ATURAN (penjelasan penuh: copy-id-core.js):
  * 1. NILAI byte-identik dengan naskah hari ini — kalimat PINDAH ke sini, tidak BERUBAH
- *    (gerbang id-golden-snapshot-test.js membekukan himpunan literal, AI-02 F01).
+ *    (gerbang tests/id-golden-snapshot-test.js membekukan himpunan literal, AI-02 F01).
  * 2. Kunci netral/Inggris supaya tidak terhitung literal Indonesia baru oleh lexer gerbang.
  * 3. Interpolasi: potongan sumber direkat dengan placeholder BERNAMA '{nama}';
  *    pemanggil memakai t('kunci', {nama: x}) — potongan aslinya tetap byte-identik.

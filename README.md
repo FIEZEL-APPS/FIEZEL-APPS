@@ -2,7 +2,26 @@
 
 FIEZEL adalah Personal English OS. Build 5.19.0 mengintegrasikan **Speaking + Listening Skills Lab**, **Core Brain adaptif**, dan jalur **local neural voice** yang tetap menjaga privasi, biaya runtime nol, serta kompatibilitas state lama.
 
-Handoff berikutnya memakai master prompt v2.0 dan roadmap berbasis gerbang bukti. Baca `FIEZEL-5.18.0-NEXT-HANDOFF-MASTER-PROMPT.md` bersama `FIEZEL-PRODUCT-ROADMAP-2026-2027.md`. GitHub dan archive wajib direkonsiliasi sebelum promosi bila version surfaces berbeda.
+Handoff berikutnya memakai master prompt v2.0 dan roadmap berbasis gerbang bukti. Baca `docs/handoffs/FIEZEL-5.18.0-NEXT-HANDOFF-MASTER-PROMPT.md` bersama `docs/FIEZEL-PRODUCT-ROADMAP-2026-2027.md`. GitHub dan archive wajib direkonsiliasi sebelum promosi bila version surfaces berbeda.
+
+## Struktur repo
+
+Sampai m025-253 akar repo memuat 498 berkas terlacak: aplikasi, 243 gerbang uji, dan 129
+dokumen handoff bercampur dalam satu daftar. m025-254 memisahkannya — akar kini hanya berisi
+apa yang benar-benar dijalankan atau disajikan aplikasi.
+
+| Tempat | Isinya |
+| --- | --- |
+| akar | shell aplikasi (`index.html`, `app.js`, `style.css`, `sw.js`), konfigurasi, bank data JSON, dan skrip rilis yang dipanggil CI (`validator.js`, `*-audit.js`, `release-audit.py`) |
+| `tests/` | seluruh gerbang mutu (`*-test.js`, `*-selftest.js`). Jalankan dari akar repo: `node tests/<nama>-test.js` |
+| `features/` | modul fitur yang dimuat `index.html` dan di-precache `sw.js` |
+| `tools/` | perkakas rilis dan pemeliharaan; `tools/dev/` untuk harness sekali pakai dan probe |
+| `docs/` | dokumen arsitektur, kontrak, runbook; `docs/handoffs/` untuk seluruh handoff milestone |
+| `reports/` | laporan audit dan berkas bukti (evidence, red-proof, checkpoint) |
+| `workers/`, `deploy/` | Cloudflare Worker dan berkas penyebaran |
+
+Gerbang di `tests/` membaca berkas produksi lewat `__fzRoot` (alias `path.join(__dirname, '..')`),
+jadi maknanya sama persis seperti saat berkas itu masih di akar. Jalankan gerbang dari akar repo.
 
 ## Fitur 5.18
 
@@ -31,15 +50,15 @@ Handoff berikutnya memakai master prompt v2.0 dan roadmap berbasis gerbang bukti
 
 ```bash
 node validator.js
-node regression-test.js
+node tests/regression-test.js
 node content-audit.js
 node product-audit.js
 node grammar-quality-audit.js
-node speaking-listening-test.js
+node tests/speaking-listening-test.js
 node neural-voice-test.js
 node neural-voice-http-test.js
-node pwa-cache-test.js
-node http-smoke-test.js
+node tests/pwa-cache-test.js
+node tests/http-smoke-test.js
 python3 release-audit.py
 ```
 

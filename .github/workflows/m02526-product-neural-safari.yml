@@ -49,7 +49,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cat > m02526-probe.html <<'HTML'
+          cat > tools/dev/m02526-probe.html <<'HTML'
           <!doctype html><meta charset="utf-8"><title>m025-26 product neural proof</title>
           <script>window.FIEZEL_VERSION='5.19.0';</script>
           <script src="./features/neural-voice/fiezel-neural-voice-config.js"></script>

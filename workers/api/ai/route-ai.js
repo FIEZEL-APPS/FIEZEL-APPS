@@ -103,7 +103,7 @@
    * Kalimat di sini sengaja tetap tinggal di rute (bukan dipindah ke klien) karena ia
    * dipakai untuk keadaan yang klien belum tentu bisa menyimpulkan sendiri — tetapi
    * nadanya wajib satu suara dengan naskah klien, dan itu dijaga
-   * `quota-notice-a11y-test.js`.
+   * `tests/quota-notice-a11y-test.js`.
    */
   var POLITE = Object.freeze({
     schema_mismatch: 'Aku belum paham kirimanmu. Muat ulang halaman lalu coba lagi, ya.',
@@ -156,7 +156,7 @@
    * reservasi dengan melihat AMPLOP jawaban — `providerFailed(body)` true (`source` =
    * `deterministic-fallback`/`unavailable`, atau `degraded:true`) ⇒ `rollback`, selain itu
    * `commit`. Jadi predikat di bawah dieja mengikuti predikat itu, bukan menebaknya. Kalau salah
-   * satu berubah tanpa yang lain, `ai-response-shape-test.js` merah.
+   * satu berubah tanpa yang lain, `tests/ai-response-shape-test.js` merah.
    *
    * `deps.rollbackQuota` opsional: pemanggil yang TIDAK lewat wiring (uji, worker lain) bisa
    * menyuntikkan pembatal eksplisit. Kalau tidak ada, rollback tetap terjadi lewat amplop.

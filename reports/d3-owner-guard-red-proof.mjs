@@ -1,6 +1,6 @@
 /**
  * reports/d3-owner-guard-red-proof.mjs — BUKTI MERAH untuk butir (g-a)…(g-g)
- * `owner-edge-guard-test.js` (gerbang jalur hostname kanonik dashboard owner).
+ * `tests/owner-edge-guard-test.js` (gerbang jalur hostname kanonik dashboard owner).
  *
  * Gerbang yang tidak pernah bisa merah adalah gerbang yang bohong. Skrip ini
  * menyuntikkan SATU mutasi pada satu waktu ke berkas SUNGGUHAN (`workers/owner/index.js`,
@@ -18,7 +18,7 @@ const ROOT = path.resolve(import.meta.dirname, '..');
 const OWNER = path.join(ROOT, 'workers', 'owner', 'index.js');
 const TOML = path.join(ROOT, 'workers', 'owner', 'wrangler.toml');
 const DEPLOY = path.join(ROOT, 'workers', 'owner', 'DEPLOY.md');
-const GATE = 'owner-edge-guard-test.js';
+const GATE = 'tests/owner-edge-guard-test.js';
 const REPORT = path.join(ROOT, 'OWNER-EDGE-GUARD-REPORT.json');
 
 const MUTATIONS = [

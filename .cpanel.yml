@@ -7,7 +7,7 @@
 # m025-179 tidak punya mekanisme yang bisa ditunjukkan di dalam repo.
 #
 # URUTANNYA SAMA PERSIS dengan .github/workflows/deploy-site.yml, dan itu bukan kebetulan:
-# `deploy-site-gate-test.js` cek (E) menuntut kedua jalur memakai urutan yang sama dan
+# `tests/deploy-site-gate-test.js` cek (E) menuntut kedua jalur memakai urutan yang sama dan
 # membaca daftar kecualian yang SAMA. Dua jalur penerbitan dengan dua urutan berbeda adalah
 # dua peluang berbeda untuk mengirim shell campur ke murid.
 #

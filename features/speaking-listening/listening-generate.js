@@ -17,7 +17,7 @@
  * itulah yang membuat bank lama memakai ulang satu string pengecoh 19-20 kali per
  * level - pelajar cukup menghafal 27 label untuk menebak seluruh level.
  *
- * TETAP DETERMINISTIK. speaking-listening-test.js menjalankan ulang rebuild lalu
+ * TETAP DETERMINISTIK. tests/speaking-listening-test.js menjalankan ulang rebuild lalu
  * membandingkan hash berkasnya, jadi satu Math.random saja membuat tes itu gagal
  * setiap kali dijalankan. Pengacakan yang dilihat pelajar terjadi saat sesi dibuka
  * (DataRepository.for), bukan di sini.

@@ -142,7 +142,7 @@ ketidakpastian yang harus diketahui owner, bukan dipoles:
    - Menghapus data browser / mode privat / perangkat baru = **"pengguna baru" palsu** dan
      **retensi jatuh palsu**.
 2. **DAU/WAU/MAU dibaca dari tabel agregat harian** yang dibekukan job rollup. Dashboard tidak
-   punya jalan untuk membaca baris per-orang — dan itu diassert gerbang `owner-dashboard-test.js`.
+   punya jalan untuk membaca baris per-orang — dan itu diassert gerbang `tests/owner-dashboard-test.js`.
    Konsekuensinya: tidak ada (dan tidak akan ada) daftar "top users", tidak ada drill-down
    per murid, tidak ada nama, surel, isi jawaban, atau percakapan AI di dashboard ini.
 3. **"Aktif" = hari dengan ≥5 jawaban** (`MEANINGFUL_ATTEMPTS` di `app.js:73`), dengan batas hari
@@ -177,7 +177,7 @@ ketidakpastian yang harus diketahui owner, bukan dipoles:
    yang bisa dipulihkan ke belakang.
 10. **"Read-only" pada D1 ditegakkan kode + gerbang, bukan oleh Cloudflare.** D1 belum punya
     binding read-only. Yang memaksanya: `queries.js` hanya memuat `SELECT` dan menolak dimuat bila
-    ada kata tulis, plus `owner-dashboard-test.js` yang gagal bila pernyataan tulis muncul.
+    ada kata tulis, plus `tests/owner-dashboard-test.js` yang gagal bila pernyataan tulis muncul.
 11. **Panel latensi p50/p95 dan cache/error 90 hari (Analytics Engine) belum dibangun.** Membaca AE
     butuh SQL API + token akun (binding AE hanya bisa **menulis**), dan retensi AE hanya 3 bulan.
     Binding AE di sini dipakai **hanya** untuk jejak audit akses owner (tanpa IP, tanpa identitas).
@@ -212,7 +212,7 @@ ketidakpastian yang harus diketahui owner, bukan dipoles:
 ## 6. Gerbang
 
 ```bash
-node owner-dashboard-test.js     # di akar FIEZEL-APPS
+node tests/owner-dashboard-test.js     # di akar FIEZEL-APPS
 ```
 
 Terdaftar di `.github/workflows/quality.yml`. Yang diassert: semua rute 403 tanpa sesi owner

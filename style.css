@@ -105,7 +105,7 @@ input,textarea,select,[contenteditable="true"]{-webkit-user-select:text;user-sel
    terlihat, dan akarnya fokus - bukan pinch. 16px adalah ambang perilaku Safari: 15,9px
    tetap memicu. Deklarasi ini didahulukan sebagai LANTAI; komponen boleh menaikkan, tidak
    boleh menurunkan. Ukuran visual yang ringkas dicapai lewat padding/tinggi, bukan huruf
-   kecil. Ditegakkan `app-interaction-policy-test.js` di peramban sungguhan, bukan di teks
+   kecil. Ditegakkan `tests/app-interaction-policy-test.js` di peramban sungguhan, bukan di teks
    CSS - jadi override dari berkas mana pun tetap tertangkap. */
 input,textarea,select{font-size:16px}
 ::selection{background:var(--accent);color:#fff}
@@ -2321,7 +2321,7 @@ button:active {
 /* Audit 14-002 (satu-satunya pelanggaran axe): opacity .75 menurunkan --muted jadi
    #928673 efektif - 3,4:1 di atas krem topbar, di bawah ambang 4,5:1. --muted penuh
    (#6E5E47) sudah cukup kalem; kontrasnya ±5,7:1 tanpa mengubah kesan visualnya. */
-.ask-button .ask-label{font-size:12px;/* q20-B1: literal dipin search-feedback-test.js:239 — jangan tokenkan */font-weight:500;letter-spacing:0;
+.ask-button .ask-label{font-size:12px;/* q20-B1: literal dipin tests/search-feedback-test.js:239 — jangan tokenkan */font-weight:500;letter-spacing:0;
   color:var(--muted);white-space:nowrap}
 
 .ask-box{display:flex;gap:8px;align-items:center;margin:4px 0 16px}
@@ -2749,7 +2749,7 @@ html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.tex
    oleh fokus. Diukur sebelum perbaikan: textarea ini 13,76px (`.86rem`).
    Nilainya dipaku 16px, BUKAN dinaikkan sedikit, karena 16px adalah ambang perilaku Safari -
    15,9px tetap memicu zoom. Ukuran tampil dijaga tetap ringkas lewat padding dan tinggi,
-   bukan lewat mengecilkan huruf. `app-interaction-policy-test.js` menegakkan ambang ini. */
+   bukan lewat mengecilkan huruf. `tests/app-interaction-policy-test.js` menegakkan ambang ini. */
 .fz-coach-form textarea{
   flex:1;min-height:44px;max-height:110px;padding:11px 13px;border-radius:var(--radius-md);resize:none;
   border:1.5px solid var(--surface-edge);background:var(--panel);color:var(--text);font:inherit;font-size:16px}
@@ -3823,7 +3823,7 @@ body.fz-lesson-mode .topline{position:sticky;top:0;z-index:30;
 
 /* Kartu ajar-ulang dan pijakan: aksennya lepas dari marun kontrol dan pindah ke
    keluarga sun, sekeluarga dengan panel FIEZEL. Nama kelas tidak ada yang berubah -
-   tutor-reteach-card-test.js dan tutor-classroom-regression-test.js memeriksa
+   tests/tutor-reteach-card-test.js dan tests/tutor-classroom-regression-test.js memeriksa
    strukturnya, dan struktur itu memang tidak boleh bergeser. */
 .tutor-turn,.tutor-card-why{border-left-color:var(--sun-deep)}
 .tutor-card-why{background:var(--sun-soft)}
@@ -4207,7 +4207,7 @@ body.fz-lesson-mode .topline{position:sticky;top:0;z-index:30;
    tidak bersinggungan, jadi keduanya disimpan utuh; tidak ada yang dibuang. */
 /* ===================================================== A8 · pemberitahuan jatah/suara =====
    Naskahnya di features/quota/quota-copy.js; di sini hanya bentuknya. Empat angka di bawah
-   dijaga quota-notice-a11y-test.js dan nggak boleh diturunkan tanpa mengubah gerbangnya:
+   dijaga tests/quota-notice-a11y-test.js dan nggak boleh diturunkan tanpa mengubah gerbangnya:
 
    1. WARNA. Tinta #241A11 di atas bidang #FFF3DC = 14,6:1, jauh di atas syarat 4,5:1 WCAG AA.
       Hex-nya ditulis eksplisit (bukan hanya var()) supaya gerbang bisa menghitung rasionya

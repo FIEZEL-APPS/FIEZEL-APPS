@@ -10,7 +10,7 @@
  * `CREATE TABLE IF NOT EXISTS`) pada permintaan sosial pertama per isolate.
  * Dipilih (b), dengan dua pagar supaya ini tidak menjadi migrasi bayangan:
  *   1. `migrations/0006_social.sql` TETAP sumber resmi skema, dan gerbang
- *      `social-schema-contract-test.js` MEMERAH kalau daftar `SOCIAL_DDL` di
+ *      `tests/social-schema-contract-test.js` MEMERAH kalau daftar `SOCIAL_DDL` di
  *      bawah tidak setara pernyataan-per-pernyataan dengan berkas migrasi itu.
  *   2. Penerapan di-cache per handle DB (WeakMap): biaya nyatanya satu rangkaian
  *      `CREATE TABLE IF NOT EXISTS` per isolate dingin, bukan per permintaan;

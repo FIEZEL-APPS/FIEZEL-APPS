@@ -71,7 +71,7 @@ export const BYTE_LIMITS = Object.freeze({
   '/api/teacher/question/save': 16384,     // batang soal + opsi + penjelasan + contoh
   // Dua ini SENGAJA jauh lebih besar: mereka menerima BERKAS. Angkanya = 2 MiB,
   // sama persis dengan CSV_LIMITS.MAX_BYTES di teacher/csv-core.js — dua tempat
-  // yang WAJIB sama, dan `teacher-csv-test.js` mengunci kesamaannya. Kalau cap
+  // yang WAJIB sama, dan `tests/teacher-csv-test.js` mengunci kesamaannya. Kalau cap
   // di sini lebih kecil, guru mendapat 413 tanpa penjelasan alih-alih laporan
   // "berkas kebesaran" yang bisa ia tindaklanjuti.
   '/api/teacher/csv/preview': 2097152,
@@ -146,7 +146,7 @@ export const COOKIE_PAYLOAD_KEYS = Object.freeze(['v', 'kid', 'sub', 'iat']);
 
 /**
  * Nama field yang DILARANG muncul di payload cookie maupun di body respons apa
- * pun. Daftar ini bukan hiasan: gerbang `cf-api-contract-test.js` memakainya
+ * pun. Daftar ini bukan hiasan: gerbang `tests/cf-api-contract-test.js` memakainya
  * untuk memindai setiap respons Worker.
  */
 export const PII_FORBIDDEN_KEYS = Object.freeze([

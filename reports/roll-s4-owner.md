@@ -33,8 +33,8 @@ Yang **tidak** diselesaikan, dan jangan dianggap selesai:
 |---|---|---|
 | `deploy/edge/owner-index.php` | **BARU** | Proxy origin → `fiezel-owner.fitrajft.workers.dev`. Allowlist default-tolak, header `X-Fiezel-Edge` dengan placeholder `__EDGE_SECRET__`, cap byte 8 KiB, timeout 25 s / connect 8 s, cookie + `Set-Cookie` diteruskan, IP mentah TIDAK diteruskan, galat mentah hanya ke `error_log`. |
 | `workers/owner/index.js` | diubah | Penjaga edge `edgeGuard()` disalin dari `workers/api/mw-edge.js` (alasan penyalinan ditulis di berkasnya), dipasang **paling luar** di `handle()`, fail-closed, tidak membocorkan status secret. |
-| `owner-edge-guard-test.js` | **BARU** | 576 assert, butir (a)-(e) di bawah. |
-| `.github/workflows/quality.yml` | diubah | `node owner-edge-guard-test.js` terdaftar tepat sesudah `owner-dashboard-test.js`, dengan alasan penempatan. |
+| `tests/owner-edge-guard-test.js` | **BARU** | 576 assert, butir (a)-(e) di bawah. |
+| `.github/workflows/quality.yml` | diubah | `node tests/owner-edge-guard-test.js` terdaftar tepat sesudah `tests/owner-dashboard-test.js`, dengan alasan penempatan. |
 | `deploy/edge/README.md` | diubah | §4A pemasangan `owner.fiezel.my.id` + langkah 3a pembongkaran + catatan "dua proxy, dua nilai secret berbeda". |
 | `OWNER-EDGE-GUARD-REPORT.json` | **BARU** | Artefak bukti gerbang (pola `EDGE-GUARD-REPORT.json`). |
 
@@ -103,12 +103,12 @@ Semua dijalankan lokal, nol jaringan:
 
 | Gerbang | Exit | Hasil |
 |---|---|---|
-| `owner-edge-guard-test.js` | **0** | 576/576 assert PASS |
-| `owner-dashboard-test.js` | **0** | LULUS |
-| `edge-guard-test.js` | **0** | 119/119 assert PASS |
-| `cf-api-contract-test.js` | **0** | 215/215 assert PASS |
-| `regression-test.js` | **0** | PASS |
-| `install-health-test.js` | **0** | PASS |
+| `tests/owner-edge-guard-test.js` | **0** | 576/576 assert PASS |
+| `tests/owner-dashboard-test.js` | **0** | LULUS |
+| `tests/edge-guard-test.js` | **0** | 119/119 assert PASS |
+| `tests/cf-api-contract-test.js` | **0** | 215/215 assert PASS |
+| `tests/regression-test.js` | **0** | PASS |
+| `tests/install-health-test.js` | **0** | PASS |
 
 Gerbang hijau yang tidak pernah bisa merah adalah gerbang yang bohong. Tiga peracunan sengaja:
 
@@ -141,7 +141,7 @@ Sesudah pemulihan: 576/576 PASS kembali.
   bertahan. Plus bukti kejujuran: daftar tanpa CSP benar-benar **kehilangan** CSP di tiruan itu.
 - **(d)** Pemindai **pola nilai acak panjang** (base64url/hex, ≥24 karakter, ≥3 kelas karakter,
   ≥12 karakter unik) — bukan pencarian string yang sudah diketahui, karena yang sudah diketahui
-  tidak perlu dijaga. Disalin dari `edge-guard-test.js` butir (g) supaya dua artefak deployment
+  tidak perlu dijaga. Disalin dari `tests/edge-guard-test.js` butir (g) supaya dua artefak deployment
   dipindai dengan ukuran yang **sama**. Ditambah pola PEM / `sk-` / JWT / hex ≥40, dan bukti
   bahwa pemindai menangkap tiga bentuk nilai sungguhan yang disuntikkan.
 - **(e)** `ctEq` dipakai untuk header edge, digest token owner, dan tanda tangan sesi; bentuk
