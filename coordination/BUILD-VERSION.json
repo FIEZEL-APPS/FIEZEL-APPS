@@ -1,7 +1,7 @@
 {
-  "version": "m025-255",
+  "version": "m025-256",
   "claimedBy": "branch claude/hapus-popup-target-harian-b96rws",
-  "claimedAt": "2026-09-05T00:43:20.403Z",
-  "reason": "rapikan akar repo + hapus kunci target harian",
+  "claimedAt": "2026-09-05T01:39:38.339Z",
+  "reason": "ikon lucide yang hilang + gerbang cakupan ikon",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
