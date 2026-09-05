@@ -886,7 +886,7 @@
         "objective": "ใช้ 'would have + past participle' ในอนุประโยคผลของเงื่อนไขสมมติในอดีต",
         "misconception": "ผู้เรียนใส่ past simple หรือ 'would + คำกริยา' ในอนุประโยคผลหลังอนุประโยค if ที่เป็น past perfect",
         "reasoning": "อนุประโยค if มี past perfect → อดีตที่ไม่จริง → ผลใช้ would have + past participle",
-        "rule": "Third conditional: If + past perfect, would have + past participle",
+        "rule": "Third conditional: If + past perfect, would have + past participle — สมมติเรื่องในอดีตที่ไม่ได้เกิดขึ้น",
         "whyCorrect": "งานเลี้ยงจบไปแล้วและผู้พูดไม่ได้ไป ผลที่จินตนาการจึงใช้ 'would have come'",
         "whyOthersFail": "'would come' เป็น second conditional 'came' เป็นอดีตจริง ส่วน 'had come' ลอกรูปของอนุประโยค if",
         "howToAvoid": "มี past perfect ในอนุประโยค if? ตอบด้วย 'would have' บวก participle",

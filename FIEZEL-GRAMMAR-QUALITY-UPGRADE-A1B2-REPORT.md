@@ -129,3 +129,12 @@ Hijau: grammar-quality-audit (8.050/8.050), content-integrity-audit/gate, gramma
 grammar-memory-scope, curriculum, unlock, level-guard, bank-soal-audit, content-drift, cloze-bank,
 misconception-diagnosis/taxonomy, th-coverage, th-bank-purity, scan-th-bank-leak, id-golden, step-tutor,
 regression, locale-enum, global-name-collision. Log: `test_reports/grammar-upgrade/`.
+
+---
+
+## Thai penuh (build m025-257)
+16 bidang penjelasan grammar yang masih locale-netral (rule CO-203 + 15 memoryCue, termasuk 4 warisan
+lama: b5_014, A1-009, A1-013, b6_003) kini diberi aksara Thai dengan contoh Inggris dipertahankan.
+`grammar-explanations-th.json`: **0 bidang tanpa aksara Thai** (322 template × 8 bidang + distraktor).
+Peta `tools/th-strings/cloze.json` dan `features/i18n/cloze-bank-th.json` mengikuti. Gate th-coverage,
+th-bank-purity, scan-th-bank-leak, cloze-bank, content-drift, id-golden, grammar-quality-audit hijau.

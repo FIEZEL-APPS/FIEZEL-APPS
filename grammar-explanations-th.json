@@ -2579,7 +2579,7 @@
       "whyCorrect": "'Solution to' คือแบบแผนคำบุพบทประจำตายตัว เมื่อ solution พูดถึงการแก้ปัญหาเรื่องใดเรื่องหนึ่ง",
       "whyOthersFail": "'for', 'of' และ 'with' ถูกยืมมาจากคู่คำอื่นที่เกี่ยวข้อง แต่ไม่ตรงกับคู่ตายตัวของคำนาม 'solution'",
       "howToAvoid": "จำคู่คำนาม + คำบุพบทเป็นคู่ตายตัว อย่าอนุมานจากคำกริยาหรือคำคุณศัพท์ที่เกี่ยวข้อง",
-      "memoryCue": "Solution TO a problem; reason FOR a decision; answer TO a question",
+      "memoryCue": "Solution TO a problem; reason FOR a decision; answer TO a question — จำบุพบทคู่กับคำนาม",
       "distractors": {
         "for": {
           "misconception": "ยกแบบแผนคำบุพบทจากวลีใกล้เคียงอย่าง 'search for' มาใส่ให้ 'solution'",
@@ -3131,7 +3131,7 @@
       "whyCorrect": "“She” เป็นบุรุษที่สามเอกพจน์ วลีจึงเป็น “has got”",
       "whyOthersFail": "“Have” ไม่ผันตาม “she” ส่วน “is” กับ “does” สร้างโครงสร้างแสดงความเป็นเจ้าของแบบ have got ไม่ได้",
       "howToAvoid": "เลือก have หรือ has จากประธานก่อน แล้วคง got ไว้ข้างหลัง",
-      "memoryCue": "He, she, it has got; I, you, we, they have got",
+      "memoryCue": "He, she, it ใช้ has got; I, you, we, they ใช้ have got",
       "distractors": {
         "have": {
           "misconception": "ย้ายรูปพหูพจน์มาใช้ผิดที่",
@@ -3227,7 +3227,7 @@
       "whyCorrect": "ใช้ “on” เมื่อวัตถุวางอยู่บนพื้นผิวอย่างโต๊ะ",
       "whyOthersFail": "“In” เปลี่ยนความสัมพันธ์เป็นอยู่ข้างใน “at” เป็นตัวบอกจุด และ “to” สื่อการเคลื่อนที่ ไม่ใช่ตำแหน่ง",
       "howToAvoid": "ถามคำถามเดียว: วัตถุอยู่ข้างใน แตะอยู่บนพื้นผิว หรืออยู่ที่จุดหนึ่ง?",
-      "memoryCue": "In a bag, on a table, at a bus stop",
+      "memoryCue": "In a bag (ในถุง), on a table (บนโต๊ะ), at a bus stop (ที่ป้ายรถเมล์)",
       "distractors": {
         "in": {
           "misconception": "อ่านเป็นภาชนะ",
@@ -5723,7 +5723,7 @@
       "whyCorrect": "การยก “No sooner” ขึ้นหน้าบังคับให้กริยาช่วยขยับมาอยู่หน้าประธาน และเหตุการณ์แรกในสองเหตุการณ์อดีตใช้ past perfect: “No sooner had we begun ... than the projector broke down”",
       "whyOthersFail": "“We had begun” คงลำดับประโยคบอกเล่าไว้ทั้งที่ “no sooner” ข้างหน้าเรียกร้อง inversion “had we begin” สลับที่แล้วแต่ปล่อยกริยาเป็นรูปพื้นฐานทั้งที่ “had” ต้องการ “begun” ส่วน “we began” พลาดทั้งสองอย่าง ทั้ง inversion และ past perfect",
       "howToAvoid": "เห็น “No sooner” ขึ้นต้นและมี “than” ตามมา? สลับ “had” มาไว้หน้าประธานแล้วปิดด้วย participle",
-      "memoryCue": "“No sooner HAD I done ... THAN it happened.”",
+      "memoryCue": "“No sooner HAD I done ... THAN it happened.” — กลับที่ had แล้วปิดด้วย than",
       "distractors": {
         "we had begun": {
           "misconception": "ยก “no sooner” ขึ้นต้นแล้ว แต่ลำดับประธานกับกริยาช่วยยังเป็นลำดับประโยคปกติ",
@@ -6631,7 +6631,7 @@
       "objective": "ใช้ 'would have + past participle' ในอนุประโยคผลของเงื่อนไขสมมติในอดีต",
       "misconception": "ผู้เรียนใส่ past simple หรือ 'would + คำกริยา' ในอนุประโยคผลหลังอนุประโยค if ที่เป็น past perfect",
       "reasoning": "อนุประโยค if มี past perfect → อดีตที่ไม่จริง → ผลใช้ would have + past participle",
-      "rule": "Third conditional: If + past perfect, would have + past participle",
+      "rule": "Third conditional: If + past perfect, would have + past participle — สมมติเรื่องในอดีตที่ไม่ได้เกิดขึ้น",
       "whyCorrect": "งานเลี้ยงจบไปแล้วและผู้พูดไม่ได้ไป ผลที่จินตนาการจึงใช้ 'would have come'",
       "whyOthersFail": "'would come' เป็น second conditional 'came' เป็นอดีตจริง ส่วน 'had come' ลอกรูปของอนุประโยค if",
       "howToAvoid": "มี past perfect ในอนุประโยค if? ตอบด้วย 'would have' บวก participle",
@@ -6803,7 +6803,7 @@
       "whyCorrect": "คำกริยา 'didn't do' เป็นปฏิเสธ กรรมจึงเป็น 'anything': didn't do anything",
       "whyOthersFail": "'nothing' ทำให้ปฏิเสธซ้อน 'something' ใช้กับประโยคบวก ส่วน 'any' เปล่า ๆ ต้องมีคำนาม",
       "howToAvoid": "เห็น 'not' หรือ 'n't' ในคำกริยา? คำประสมต้องเริ่มด้วย any-",
-      "memoryCue": "Didn't … anything / did … nothing.",
+      "memoryCue": "Didn't … anything / did … nothing — ปฏิเสธตัวเดียวพอ",
       "distractors": {
         "nothing": {
           "misconception": "ใช้สรรพนามเชิงบวกทั้งที่บริบทเป็นปฏิเสธ",
@@ -6923,7 +6923,7 @@
       "whyCorrect": "'Good' ใช้บุพบทคู่ประจำ 'at' เมื่อบรรยายทักษะ: good at maths",
       "whyOthersFail": "'in' เป็นข้อผิดพลาดจากการแปล 'about' ใช้กับความรู้สึก ส่วน 'for' เปลี่ยนความหมายเป็น 'ดีต่อ'",
       "howToAvoid": "จำคำคุณศัพท์พร้อมบุพบทเป็นก้อนเดียว: good at",
-      "memoryCue": "Good at, bad at.",
+      "memoryCue": "Good at, bad at — ทักษะคู่กับ at เสมอ",
       "distractors": {
         "in": {
           "misconception": "เหมารวมว่า 'about' เป็นคำบุพบทมาตรฐานหลังคำคุณศัพท์บอกอารมณ์เสมอ",
@@ -6995,7 +6995,7 @@
       "whyCorrect": "รายงานเกิดขึ้นหนึ่งสัปดาห์ต่อมา 'tomorrow' จึงเลื่อนเป็น 'the next day'",
       "whyOthersFail": "'tomorrow' คงมุมมองเดิม 'yesterday' มองผิดทิศ ส่วน 'next day' ขาด 'the'",
       "howToAvoid": "ถามว่า 'tomorrow' ยังหมายถึงวันเดียวกันเมื่อนับจากวันนี้ไหม ถ้าไม่ ให้เลื่อน",
-      "memoryCue": "Tomorrow → the next day",
+      "memoryCue": "Tomorrow → the next day เมื่อรายงานทีหลัง",
       "distractors": {
         "tomorrow": {
           "misconception": "คงคำบอกเวลาเดิมไว้ ทั้งที่เวลารายงานเปลี่ยนไปแล้ว",
@@ -7187,7 +7187,7 @@
       "whyCorrect": "คำถามทวนคงลำดับของประโยคและแทนส่วนที่น่าประหลาดใจด้วย 'where': He's moving where?",
       "whyOthersFail": "ตัวเลือกอื่นสลับเป็นลำดับคำถามแบบสลับที่ หรือใช้คำที่มีอยู่ในประโยคทวนแล้วซ้ำ",
       "howToAvoid": "ลอกประโยคมา แล้วใส่คำ wh- ตรงตำแหน่งที่คำน่าประหลาดใจเคยอยู่",
-      "memoryCue": "He's moving where?",
+      "memoryCue": "He's moving where? — ทวนประโยคแล้วแทนด้วยคำถาม",
       "distractors": {
         "where is he": {
           "misconception": "สร้างคำถามสลับลำดับมาตรฐาน แทนที่จะทวนโครงสร้างของประโยคเดิม",
@@ -7235,7 +7235,7 @@
       "whyCorrect": "'Will' ครองตำแหน่ง modal อยู่แล้ว ความสามารถจึงแสดงด้วย 'be able to': will be able to speak",
       "whyOthersFail": "'will can' และ 'will could' ซ้อน modal สองตัว ส่วน 'will being' ใช้รูปคำกริยาผิด",
       "howToAvoid": "ต้องการ 'can' หลัง will, must หรือ to? เปลี่ยนเป็น 'be able to'",
-      "memoryCue": "Will + be able to",
+      "memoryCue": "Will + be able to — modal ซ้อนกันไม่ได้",
       "distractors": {
         "will can": {
           "misconception": "วาง modal รูป finite 'can' ไว้หลัง infinitive 'to'",
@@ -7307,7 +7307,7 @@
       "whyCorrect": "'Ones' แทน 'shoes' พหูพจน์หลังคำคุณศัพท์ 'bigger': any bigger ones",
       "whyOthersFail": "'one' เป็นเอกพจน์ 'them' รับคำคุณศัพท์ไม่ได้ ส่วน 'shoes ones' ใช้คำนามซ้ำ",
       "howToAvoid": "นับคำนามที่จะแทน: สิ่งเดียว → one หลายสิ่ง → ones",
-      "memoryCue": "Bigger ones = bigger shoes",
+      "memoryCue": "Bigger ones = bigger shoes — พหูพจน์ใช้ ones",
       "distractors": {
         "one": {
           "misconception": "ใช้ “ones” พหูพจน์แทนของแค่ชิ้นเดียว",
@@ -7355,7 +7355,7 @@
       "whyCorrect": "'Every year' แสดงการเพิ่มขึ้นต่อเนื่อง รูปเปรียบเทียบซ้ำ 'more and more expensive' จึงเหมาะ",
       "whyOthersFail": "'than' ไม่มีคู่เปรียบ ขั้นสูงสุดเป็นจุดสูงสุดคงที่ และ -er ไม่เข้ากับคำคุณศัพท์ยาว",
       "howToAvoid": "ยังเปลี่ยนแปลงอยู่ไหม? ใช้รูปเปรียบเทียบซ้ำสองครั้ง",
-      "memoryCue": "More and more expensive every year.",
+      "memoryCue": "More and more expensive every year — เปลี่ยนแปลงต่อเนื่องใช้รูปซ้ำ",
       "distractors": {
         "more expensive than": {
           "misconception": "มองการเปลี่ยนแปลงที่ต่อเนื่องเป็นการเปรียบเทียบจุดเดียวแบบตายตัว",
@@ -7403,7 +7403,7 @@
       "whyCorrect": "ผลลัพธ์เป็นผู้รับการกระทำ หลัง 'expected' จึงใช้ passive infinitive 'to be published'",
       "whyOthersFail": "'to publish' เป็น active 'publishing' เป็นแบบแผนที่ผิด ส่วน 'to be publishing' เพิ่ม continuous ที่ไม่จำเป็น",
       "howToAvoid": "ถามว่าประธานทำการกระทำหรือรับการกระทำ รับ → to be + participle",
-      "memoryCue": "Expected to be published.",
+      "memoryCue": "Expected to be published — ประธานถูกกระทำใช้ to be + participle",
       "distractors": {
         "to publish": {
           "misconception": "ใช้ infinitive รูป active ทั้งที่ประธาน (นโยบาย) ประกาศเองไม่ได้",
@@ -7499,7 +7499,7 @@
       "whyCorrect": "คำนาม 'reason' ตามด้วย 'for' เสมอ: the reason for his decision",
       "whyOthersFail": "'of' เป็นการเดาแบบตั้งต้น 'to' เป็นของคำนามอื่น ส่วน 'about' นำหัวข้อ ไม่ใช่สาเหตุ",
       "howToAvoid": "เก็บคำนามพร้อมบุพบทเป็นก้อนเดียว: reason for",
-      "memoryCue": "Reason for, solution to.",
+      "memoryCue": "Reason for, solution to — จำคำนามคู่กับบุพบท",
       "distractors": {
         "of": {
           "misconception": "เหมาว่า 'of' ใช้เชื่อมคำนามกับสิ่งที่มันเกี่ยวข้องได้เสมอ",
@@ -7619,7 +7619,7 @@
       "whyCorrect": "'Get used to' ตามด้วย gerund: get used to getting up at five",
       "whyOthersFail": "'get', 'got' และ 'be getting' ต่างมอง 'to' เป็นส่วนของ infinitive แทนที่จะเป็นบุพบท",
       "howToAvoid": "มี 'be' หรือ 'get' หน้า 'used to' ไหม? ถ้ามี คำกริยาถัดไปลงท้ายด้วย -ing",
-      "memoryCue": "Get used to getting up early.",
+      "memoryCue": "Get used to getting up early — หลัง used to ใช้ -ing",
       "distractors": {
         "get": {
           "misconception": "อ่าน “to” ใน “be used to” เป็นตัวบ่งชี้ infinitive",
@@ -7691,7 +7691,7 @@
       "whyCorrect": "'It's time we' ตามด้วยอดีตสมมติแม้ความหมายคือตอนนี้: it's time we went home",
       "whyOthersFail": "'go', 'will go' และ 'are going' ต่างละเลยกฎอดีตสมมติหลัง 'it's time we'",
       "howToAvoid": "เห็น 'it's time' ที่มีประธานตามหลัง? ใส่คำกริยาเป็น past simple",
-      "memoryCue": "It's time we went.",
+      "memoryCue": "It's time we went — หลัง it's time ใช้ past simple",
       "distractors": {
         "go": {
           "misconception": "ปล่อยกริยาเป็นรูปปัจจุบันหลัง “it's high time” เพราะติดโครงสร้าง “ถึงเวลาแล้ว” บวกกริยาธรรมดา",

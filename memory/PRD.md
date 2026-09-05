@@ -90,6 +90,7 @@ Tambahan user: semua soal & jawaban harus selaras dengan i18n Thai.
 - Sesi Kilat: `startGrammarQuickSession()` + tombol `grammar-quick-session-btn` di hub Grammar; 10 soal bentuk lintas lesson terbuka di level aktif; i18n id+th.
 
 ## Backlog
-- P2: C1–C2 di luar scope (masih banyak lesson tunggal). P2: Thai untuk 4 rule locale-netral (CO-203, PA-201, PA-202, LD-202) bila ingin 100% aksara Thai.
+- Selesai (m025-257): grammar-explanations-th 100% ber-aksara Thai (16 bidang locale-netral diterjemahkan).
+- P2: C1–C2 di luar scope (masih banyak lesson tunggal).
 - P3: statistik Sesi Kilat (streak harian) bila diminta.
 - Pra-eksis lingkungan: e2e-level-grammar-test (WebSocket global), cf-live-selftest, gerbang vendor/kokoro.

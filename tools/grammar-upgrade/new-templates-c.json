@@ -170,7 +170,7 @@
         "whyCorrect": "คำกริยา 'didn't do' เป็นปฏิเสธ กรรมจึงเป็น 'anything': didn't do anything",
         "whyOthersFail": "'nothing' ทำให้ปฏิเสธซ้อน 'something' ใช้กับประโยคบวก ส่วน 'any' เปล่า ๆ ต้องมีคำนาม",
         "howToAvoid": "เห็น 'not' หรือ 'n't' ในคำกริยา? คำประสมต้องเริ่มด้วย any-",
-        "memoryCue": "Didn't … anything / did … nothing.",
+        "memoryCue": "Didn't … anything / did … nothing — ปฏิเสธตัวเดียวพอ",
         "distractors": {
           "nothing": {
             "misconception": "@sibling:1",
@@ -630,7 +630,7 @@
         "whyCorrect": "'Good' ใช้บุพบทคู่ประจำ 'at' เมื่อบรรยายทักษะ: good at maths",
         "whyOthersFail": "'in' เป็นข้อผิดพลาดจากการแปล 'about' ใช้กับความรู้สึก ส่วน 'for' เปลี่ยนความหมายเป็น 'ดีต่อ'",
         "howToAvoid": "จำคำคุณศัพท์พร้อมบุพบทเป็นก้อนเดียว: good at",
-        "memoryCue": "Good at, bad at.",
+        "memoryCue": "Good at, bad at — ทักษะคู่กับ at เสมอ",
         "distractors": {
           "in": {
             "misconception": "@sibling:0",
@@ -906,7 +906,7 @@
         "whyCorrect": "รายงานเกิดขึ้นหนึ่งสัปดาห์ต่อมา 'tomorrow' จึงเลื่อนเป็น 'the next day'",
         "whyOthersFail": "'tomorrow' คงมุมมองเดิม 'yesterday' มองผิดทิศ ส่วน 'next day' ขาด 'the'",
         "howToAvoid": "ถามว่า 'tomorrow' ยังหมายถึงวันเดียวกันเมื่อนับจากวันนี้ไหม ถ้าไม่ ให้เลื่อน",
-        "memoryCue": "Tomorrow → the next day",
+        "memoryCue": "Tomorrow → the next day เมื่อรายงานทีหลัง",
         "distractors": {
           "tomorrow": {
             "misconception": "@sibling:0",
