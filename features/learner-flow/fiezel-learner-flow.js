@@ -84,7 +84,7 @@
   function buildPlan(st, now) {
     var B = bank(), ranked = rankedSkills(st), blocks = [], used = {};
     loadAssignments().slice(-3).reverse().forEach(function (a) {
-      blocks.push({ id: 'assign-' + a.id, kind: a.mode === 'ujian' ? 'Ujian dari guru' : 'Tugas dari guru', skill: a.skills[0], title: a.title, minutes: a.minutes, itemIds: a.itemIds, from: a.from });
+      blocks.push({ id: 'assign-' + a.id, kind: a.mode === 'ujian' ? 'Ujian dari guru' : 'Tugas dari guru', skill: a.skills[0], title: a.title, minutes: a.minutes, itemIds: a.itemIds, from: a.teacher ? a.teacher + ' · ' + a.from : a.from });
       a.skills.forEach(function (s) { used[s] = true; });
     });
     var first = ranked[0], second = ranked[1];
@@ -106,6 +106,8 @@
 
   function startLesson(st, block) {
     var B = bank();
+    // Tugas guru dikerjakan DI DALAM Kelas (class-hub): satu tempat, mendukung soal kustom guru + bukti per-soal.
+    if (block.id.indexOf('assign-') === 0 && root.FiezelClassHub && typeof root.go === 'function') { root.FiezelClassHub.openAssignment(block.id.slice(7)); root.go('classroom'); return; }
     var ids = block.itemIds || B.pickFresh(block.skill, block.count, { avoid: seenFor(block.skill), seed: (Date.now() % 9000) + 3 }).map(function (it) { return it.id; });
     ids.forEach(function (id) { markSeen(block.skill, id); });
     st.activeLesson = { blockId: block.id, skill: block.skill, title: block.title, kind: block.kind, minutes: block.minutes, itemIds: ids, index: 0, attempt: 0, results: [], feedback: null, revealed: false, startedAt: Date.now() };
@@ -196,10 +198,36 @@
   function tutorCode(st, name) {
     var B = bank(), skills = {};
     B.SKILL_ORDER.forEach(function (id) { var s = st.skills[id]; if (s) skills[id] = { c: s.correct, t: s.total }; });
+    Object.keys(st.skills || {}).forEach(function (id) { var s = st.skills[id]; if (s && !skills[id] && /^[a-z0-9_]{1,32}$/.test(id) && Object.keys(skills).length < 12) skills[id] = { c: s.correct, t: s.total }; });
     var nm = String(name || '').trim();
     if (!nm || /^(sobat|murid|teman)$/i.test(nm)) { try { nm = String(JSON.parse(localStorage.getItem('fiezel-onboarding-v1') || '{}').name || nm || 'Murid'); } catch (_) { nm = nm || 'Murid'; } }
-    var payload = { v: 1, name: nm.split(' ')[0], at: Date.now(), goal: st.goal, skills: skills, lessons: st.lessons.length, cls: classCode() || undefined, assign: (st.doneAssign || []).length ? st.doneAssign : undefined };
+    var payload = { v: 1, name: nm.split(' ')[0], at: Date.now(), goal: st.goal, skills: skills, lessons: st.lessons.length, cls: classCode() || undefined, assign: (st.doneAssign || []).length ? st.doneAssign.slice(-8) : undefined };
     try { return btoa(unescape(encodeURIComponent(JSON.stringify(payload)))); } catch (_) { return ''; }
+  }
+  function ensureState() { if (!st) st = load(); return st; }
+  /** Sisi Kelas (class-hub): murid membuka tugas — dilaporkan sebagai "sedang mengerjakan" (assign.s). */
+  function markAssignmentStarted(id) {
+    if (!id) return false; var s = ensureState();
+    s.doneAssign = (s.doneAssign || []).filter(function (x) { return x.id !== id; }).concat([{ id: id, at: Date.now(), s: 1 }]).slice(-8);
+    save(s); pushToClass(); return true;
+  }
+  /**
+   * Sisi Kelas (class-hub): hasil tugas guru masuk ke mesin skill & laporan yang SAMA dengan
+   * Rencana hari ini — satu jalur bukti, bukan dua. res = { id, title, skill, mode, minutes,
+   * results:[{itemId, skill, correct, chosen}] }. Bukti per-soal yang salah ikut ke guru (assign.w).
+   */
+  function recordAssignmentResult(res) {
+    if (!res || !res.id || !Array.isArray(res.results)) return null; var s = ensureState(), B = bank();
+    var correct = res.results.filter(function (r) { return r.correct; }).length;
+    res.results.forEach(function (r) { record(s, r.skill || res.skill || 'grammar', !!r.correct); });
+    var meta = B && B.SKILLS[res.skill]; s.lessons.push({ at: Date.now(), skill: res.skill, area: meta ? meta.area : (res.skill || 'grammar'), kind: res.mode === 'ujian' ? 'Ujian dari guru' : 'Tugas dari guru', title: res.title, correct: correct, total: res.results.length, minutes: res.minutes || 0 });
+    var wrong = res.results.filter(function (r) { return !r.correct; }).slice(0, 40).map(function (r) { return { i: String(r.itemId).slice(0, 40), o: Number(r.chosen) >= 0 ? Number(r.chosen) : 0 }; });
+    var entry = { id: res.id, at: Date.now(), c: correct, t: res.results.length }; if (wrong.length) entry.w = wrong;
+    s.doneAssign = (s.doneAssign || []).filter(function (x) { return x.id !== res.id; }).concat([entry]).slice(-8);
+    if (s.plan && s.plan.done.indexOf('assign-' + res.id) === -1) s.plan.done.push('assign-' + res.id);
+    try { localStorage.setItem(ASSIGN_KEY, JSON.stringify(loadAssignments().filter(function (a) { return a.id !== res.id; }))); } catch (_) {}
+    save(s); pushToClass();
+    return { correct: correct, total: res.results.length, entry: entry };
   }
 
   // ---- render ----------------------------------------------------------------------------
@@ -526,5 +554,5 @@
     });
   }
 
-  return { KEY: KEY, ASSIGN_KEY: ASSIGN_KEY, GOALS: GOALS, mount: mount, render: render, load: load, buildPlan: buildPlan, skillSummary: skillSummary, weeklySummary: weeklySummary, tutorCode: tutorCode, rankedSkills: rankedSkills, statusOf: statusOf, openAssignment: openAssignment, _state: function () { return st; } };
+  return { KEY: KEY, ASSIGN_KEY: ASSIGN_KEY, GOALS: GOALS, mount: mount, render: render, load: load, buildPlan: buildPlan, skillSummary: skillSummary, weeklySummary: weeklySummary, tutorCode: tutorCode, rankedSkills: rankedSkills, statusOf: statusOf, openAssignment: openAssignment, markAssignmentStarted: markAssignmentStarted, recordAssignmentResult: recordAssignmentResult, pushToClass: function () { ensureState(); return pushToClass(); }, _state: function () { return st; } };
 });

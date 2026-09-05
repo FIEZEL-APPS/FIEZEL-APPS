@@ -24,3 +24,12 @@ Redesign UI/UX FIEZEL menyeluruh: cheerful + premium + modern, palet pastel dipe
 - P1: layar hasil sesi ala mock (skor besar, mastery naik, langkah berikutnya).
 - P1: desktop layout sidebar (mock d1–d3) untuk ≥1024px.
 - P2: deploy worker (`wrangler deploy`) supaya endpoint friends/add aktif di produksi.
+
+## Class Hub — Kelas = Guru ↔ Murid ↔ Braincore (Sep 2026, build m025-259)
+Problem statement: rebuild "Class" di bottom nav sebagai learning hub guru–murid (audit dulu; jangan buang fondasi; Braincore di tengah loop, tanpa Puter/API key/cloud AI). Audit + flow + gap + arsitektur + 3 konsep UI: `docs/class-hub-audit.md`.
+- `features/class-hub/fiezel-braincore-review.js`: review lokal soal guru (parser impor, CEFR estimasi, skill, kesulitan via FiezelItemPrior, 9 cek kualitas, distraktor → kode taksonomi miskonsepsi, saran perbaikan, status tugas 4 warna).
+- `features/class-hub/fiezel-class-hub.js` + `class-hub.css`: wajah murid (Tugas / Kelas Saya / Progres + runner tugas di dalam Kelas) dan wajah guru (Kelas Saya / Tugas / Buat Tugas 3 langkah / Hasil / Braincore) yang dipasang di Ruang Guru sebagai view `hub` (landing default).
+- Kontrak data diperluas aditif: payload tugas `teacher`, `items[]` (soal kustom); laporan murid `assign[].s` (sedang) dan `assign[].w` (soal salah); byte limit assign 32 KB / class-report 8 KB.
+- app.js: view `classroom` → `classHubView()`; tutor bersuara tetap hidup lewat kartu "Tutor FIEZEL"; notifikasi tugas → Kelas; learner-flow merutekan blok tugas guru ke hub.
+- Gate baru `tests/class-hub-test.js` (unit + smoke DOM-stub loop penuh) masuk quality.yml.
+Backlog: satukan `route-teacher.js` (pohon konten server) sebagai sumber impor; kalibrasi review dengan bukti; ledger miskonsepsi murid dari `w[]`; i18n TH hub.

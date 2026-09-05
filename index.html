@@ -134,6 +134,7 @@ html.fz-booting body{overflow:hidden}
   <link rel="stylesheet" href="./features/learner-flow/home-polish.css">
   <!-- Ruang Guru: tema terpisah untuk cangkang guru (features/teacher). Hanya aktif saat body.fz-teacher-mode. -->
   <link rel="stylesheet" href="./features/teacher/teacher-shell.css">
+  <link rel="stylesheet" href="./features/class-hub/class-hub.css">
   <!-- m026-01: motion system maskot PAW. Sengaja PALING AKHIR di antara stylesheet:
        berkasnya memakai nama token yang bertabrakan dengan style.css (--fz-gold,
        --fz-ink, --fz-line), jadi di sana token dipasang pada kelas .fz-mascot/.fz-motion
@@ -721,6 +722,9 @@ html.fz-booting body{overflow:hidden}
        dan isVerifiedTeacher() menanyakan previewAllowed() saat Home digambar pertama kali. -->
   <script defer src="./features/teacher/fiezel-teacher-icons.js"></script>
   <script defer src="./features/teacher/fiezel-teacher-store.js"></script>
+  <!-- Class hub: Kelas = pusat Guru ↔ Murid ↔ Braincore (dipakai tab Kelas murid & view Kelas Ruang Guru). Harus sebelum teacher-shell. -->
+  <script defer src="./features/class-hub/fiezel-braincore-review.js"></script>
+  <script defer src="./features/class-hub/fiezel-class-hub.js"></script>
   <script defer src="./features/teacher/fiezel-teacher-shell.js"></script>
   <script defer src="./app.js"></script>
   <script defer src="./features/skills-evidence/fiezel-skills-evidence.js"></script>
