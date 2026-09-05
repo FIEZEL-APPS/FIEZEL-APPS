@@ -242,7 +242,7 @@ body.reduce-motion .tg-rise,body.reduce-motion .tg-drawer,body.reduce-motion .tg
   .tg{grid-template-columns:1fr}.tg-side{display:none}
   .tg-top{padding:22px 18px 14px;flex-direction:column;align-items:flex-start}.tg-content{padding:16px 16px calc(96px + env(safe-area-inset-bottom))}
   .tg-btn span{display:none}.tg-btn.is-primary span,.tg-modal .tg-btn span,.tg-card .tg-btn span,.tg-welcome .tg-btn span{display:inline}
-  .tg-mnav{display:grid;grid-template-columns:repeat(6,1fr);position:fixed;left:0;right:0;bottom:0;background:var(--tg-ink);padding:8px 6px calc(8px + env(safe-area-inset-bottom));z-index:50}
+  .tg-mnav{display:grid;grid-template-columns:repeat(7,1fr);position:fixed;left:0;right:0;bottom:0;background:var(--tg-ink);padding:8px 6px calc(8px + env(safe-area-inset-bottom));z-index:50}
   .tg-mnav button{display:flex;flex-direction:column;align-items:center;gap:3px;background:transparent;border:0;color:#C8D6D1;font:inherit;font-size:.62rem;font-weight:600;padding:6px 2px;border-radius:10px}.tg-mnav button svg{width:18px;height:18px}.tg-mnav button.is-active{color:#fff;background:var(--tg-sage)}
   .tg-quick-row{grid-template-columns:repeat(2,1fr)}.tg-grid-skill{grid-template-columns:repeat(2,1fr)}.tg-welcome-list{grid-template-columns:1fr}.tg-form-row,.tg-mode{grid-template-columns:1fr}
   .tg-board-kpi{grid-template-columns:1fr}.tg-board-skills div{grid-template-columns:1fr 3fr 60px;gap:10px}.tg-board{padding:70px 20px 24px}

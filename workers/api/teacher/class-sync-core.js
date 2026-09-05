@@ -11,7 +11,7 @@
 export const CLASS_CODE_RE = /^FZ-[A-HJ-NP-Z2-9]{6}$/;
 export const LIMITS = Object.freeze({
   NAME_MAX: 24, TITLE_MAX: 60, SKILLS_MAX: 12, SKILL_KEY_MAX: 32, COUNT_MAX: 5000,
-  ASSIGN_MAX: 8, ASSIGN_ID_MAX: 40, REPORTS_PAGE: 200,
+  ASSIGN_MAX: 8, ASSIGN_ID_MAX: 40, WRONG_MAX: 40, REPORTS_PAGE: 200,
   LEARNER_MIN_INTERVAL_MS: 15000, TEACHER_MIN_INTERVAL_MS: 3000
 });
 
@@ -65,7 +65,20 @@ export function normalizeReport(body, nowMs) {
       const id = a && typeof a.id === 'string' && /^[A-Za-z0-9_-]{1,40}$/.test(a.id) ? a.id : null;
       if (!id) return { ok: false, reason: 'bad_assign_id' };
       const c = intIn(a.c, LIMITS.COUNT_MAX), t = intIn(a.t, LIMITS.COUNT_MAX);
-      assign.push({ id, at: Number(a.at) || reportedAt, c: c == null ? undefined : c, t: t == null ? undefined : t });
+      const entry = { id, at: Number(a.at) || reportedAt, c: c == null ? undefined : c, t: t == null ? undefined : t };
+      // s = sedang mengerjakan (dibuka, belum selesai); w = soal yang salah {i:itemId, o:pilihan}.
+      if (a.s) entry.s = 1;
+      if (a.w !== undefined) {
+        if (!Array.isArray(a.w) || a.w.length > LIMITS.WRONG_MAX) return { ok: false, reason: 'bad_assign_wrong' };
+        entry.w = [];
+        for (const x of a.w) {
+          const i = x && typeof x.i === 'string' && x.i.length >= 1 && x.i.length <= 40 ? x.i : null;
+          const o = intIn(x && x.o, 7);
+          if (i == null || o == null) return { ok: false, reason: 'bad_assign_wrong' };
+          entry.w.push({ i, o });
+        }
+      }
+      assign.push(entry);
     }
   }
   return { ok: true, code, name, key: learnerKey(name), report: { v: 1, name, at: reportedAt, goal, skills, lessons, cls: code, assign } };
@@ -73,8 +86,41 @@ export function normalizeReport(body, nowMs) {
 
 export const ASSIGN_LIMITS = Object.freeze({
   ID_MAX: 40, TITLE_MAX: 80, SKILLS_MAX: 3, ITEMS_MAX: 40, ITEM_ID_MAX: 40, FROM_MAX: 60, TARGETS_MAX: 80,
+  TEACHER_MAX: 60, CUSTOM_MAX: 40, PROMPT_MAX: 400, CONTEXT_MAX: 1200, OPTION_MAX: 120, OPTIONS_MAX: 6, WHY_MAX: 240,
   PAGE: 20, LEARNER_POLL_MIN_INTERVAL_MS: 5000
 });
+
+/**
+ * normalizeCustomItems(items) -> { ok, items } | { ok:false, reason }
+ * Soal kustom guru (tulis sendiri / impor) yang ikut dalam payload tugas. Hanya teks soal,
+ * pilihan, kunci, skill, dan alasan distraktor — bentuk yang sama dengan item bank FIEZEL.
+ */
+export function normalizeCustomItems(items) {
+  if (!Array.isArray(items) || !items.length || items.length > ASSIGN_LIMITS.CUSTOM_MAX) return { ok: false, reason: 'bad_custom_items' };
+  const out = [];
+  for (const q of items) {
+    if (!q || typeof q !== 'object') return { ok: false, reason: 'bad_custom_item' };
+    const id = typeof q.id === 'string' && /^[A-Za-z0-9_-]{1,40}$/.test(q.id) ? q.id : null;
+    if (!id) return { ok: false, reason: 'bad_custom_id' };
+    const prompt = String(q.prompt || '').trim().slice(0, ASSIGN_LIMITS.PROMPT_MAX);
+    if (!prompt) return { ok: false, reason: 'bad_custom_prompt' };
+    if (!Array.isArray(q.options) || q.options.length < 2 || q.options.length > ASSIGN_LIMITS.OPTIONS_MAX) return { ok: false, reason: 'bad_custom_options' };
+    const options = q.options.map((o) => String(o == null ? '' : o).trim().slice(0, ASSIGN_LIMITS.OPTION_MAX));
+    if (options.some((o) => !o)) return { ok: false, reason: 'bad_custom_options' };
+    const answer = intIn(q.answer, options.length - 1);
+    if (answer == null) return { ok: false, reason: 'bad_custom_answer' };
+    const skill = typeof q.skill === 'string' && /^[a-z0-9_]{1,32}$/.test(q.skill) ? q.skill : 'grammar';
+    const item = { id, prompt, options, answer, skill };
+    if (typeof q.context === 'string' && q.context.trim()) item.context = q.context.trim().slice(0, ASSIGN_LIMITS.CONTEXT_MAX);
+    if (q.why && typeof q.why === 'object' && !Array.isArray(q.why)) {
+      const why = {};
+      for (const k of Object.keys(q.why)) { const ki = intIn(k, options.length - 1); const txt = String(q.why[k] || '').trim().slice(0, ASSIGN_LIMITS.WHY_MAX); if (ki != null && txt) why[ki] = txt; }
+      if (Object.keys(why).length) item.why = why;
+    }
+    out.push(item);
+  }
+  return { ok: true, items: out };
+}
 
 /**
  * normalizeAssignment(body) -> { ok:true, code, id, payload, targets } | { ok:false, reason }
@@ -100,6 +146,13 @@ export function normalizeAssignment(body) {
   const deadline = typeof a.deadline === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(a.deadline) ? a.deadline : null;
   const from = String(a.from || '').trim().slice(0, ASSIGN_LIMITS.FROM_MAX);
   const payload = { v: 1, t: 'assign', id, title, skills: a.skills.map(String), itemIds: a.itemIds.slice(), minutes, from, cls: code, deadline, mode, timer, shuffle: !!a.shuffle };
+  const teacher = String(a.teacher || '').trim().slice(0, ASSIGN_LIMITS.TEACHER_MAX);
+  if (teacher) payload.teacher = teacher;
+  if (a.items !== undefined) {
+    const ci = normalizeCustomItems(a.items);
+    if (!ci.ok) return { ok: false, reason: ci.reason };
+    payload.items = ci.items;
+  }
   let targets = null;
   if (body.targets != null) {
     if (!Array.isArray(body.targets) || body.targets.length > ASSIGN_LIMITS.TARGETS_MAX) return { ok: false, reason: 'bad_targets' };

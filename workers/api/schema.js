@@ -81,12 +81,12 @@ export const BYTE_LIMITS = Object.freeze({
   '/api/teacher/assign': 32768,            // sampai 500 sub murid
   '/api/teacher/progress': 512,            // GET
   // --- SLOT 11: sinkron Ruang Guru lewat kode kelas + notifikasi tugas.
-  '/api/learner/class-report': 4096,
+  '/api/learner/class-report': 8192,       // + assign[].w (≤8 tugas × ≤40 soal salah)
   '/api/learner/class-assignments': 512,   // GET
   '/api/teacher/class/claim': 1024,
   '/api/teacher/class/list': 512,          // GET
   '/api/teacher/class/reports': 512,       // GET
-  '/api/teacher/class/assign': 16384,      // 40 itemIds + 80 nama target + amplop
+  '/api/teacher/class/assign': 32768,      // 40 itemIds + 80 nama target + ≤40 soal kustom (class-hub) + amplop
   // --- SLOT 7: lapisan sosial (route-social.js). Payload kecil = CPU kecil;
   // satu-satunya yang besar adalah evidence batch (maks 20 event, pola LIMITS
   // analytics 8KB — spec sosial §4.4.2).
