@@ -1,0 +1,32 @@
+<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=390">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<style>
+body{background:linear-gradient(180deg,#FFE9B8 0%,#FFF9EE 55%)}
+.stage{height:420px;position:relative;display:grid;place-items:center}
+.stage .paw{width:250px;filter:drop-shadow(0 18px 30px rgba(140,34,51,.15))}
+.stage .blob{width:320px;height:320px;background:radial-gradient(circle,#FFDE59 0%,rgba(255,222,89,0) 70%);top:40px}
+.float{position:absolute;background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:8px 12px;font-size:13px;font-weight:700;box-shadow:var(--sh-sm);display:flex;gap:6px;align-items:center}
+.lang{display:flex;gap:10px}
+.lang span{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;height:48px;border-radius:999px;background:var(--paper);border:1.5px solid var(--line);font-weight:700}
+.lang span.on{border-color:var(--ink);box-shadow:0 3px 0 var(--ink)}
+</style></head><body>
+<div class="screen plain">
+  <div class="row between"><span class="wordmark">F<b>I</b>EZEL</span><span class="pill line">Lewati</span></div>
+  <div class="stage">
+    <span class="blob"></span>
+    <img class="paw" src="/assets/brand/mascot/paw-mascot-hello.png" alt="PAW">
+    <span class="float" style="left:6px;top:70px"><i data-lucide="headphones" class="i sm" style="color:var(--pink-ink)"></i>Listening</span>
+    <span class="float" style="right:0;top:120px"><i data-lucide="mic" class="i sm" style="color:var(--mint-ink)"></i>Speaking</span>
+    <span class="float" style="left:18px;bottom:60px"><i data-lucide="book-open" class="i sm" style="color:var(--lilac-ink)"></i>Reading</span>
+    <span class="float" style="right:14px;bottom:30px"><i data-lucide="spell-check-2" class="i sm" style="color:var(--yellow-ink)"></i>Grammar</span>
+  </div>
+  <h1 style="font-size:34px;text-align:center">Halo, aku <span class="txt-maroon">PAW</span>.<br>Belajar Inggris bareng, yuk.</h1>
+  <p class="muted mt-2" style="text-align:center;font-size:16px">10 menit sehari. Aku ikuti ritmemu, bukan sebaliknya.</p>
+  <div class="mt-4 lang">
+    <span class="on">🇮🇩 Bahasa Indonesia</span><span>🇹🇭 ภาษาไทย</span>
+  </div>
+  <a class="btn sun block mt-2" style="height:58px;font-size:17px">Mulai sekarang <i data-lucide="arrow-right" class="i"></i></a>
+  <p class="tiny muted mt-2" style="text-align:center">Sudah punya akun? <b class="txt-maroon">Masuk</b></p>
+</div>
+<script src="/lucide.min.js"></script><script>lucide.createIcons()</script></body></html>

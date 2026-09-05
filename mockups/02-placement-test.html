@@ -1,0 +1,37 @@
+<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=390">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<style>
+.qcard{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-xl);padding:24px 22px;box-shadow:var(--sh-md);margin-top:18px}
+.qcard .q{font-size:22px;font-weight:700;line-height:1.35;margin-top:10px}
+.qcard .q u{text-decoration:none;background:var(--sun-soft);border-bottom:3px solid var(--sun);padding:0 4px;border-radius:6px}
+.pawdock{position:fixed;left:50%;transform:translateX(-50%);bottom:110px;width:350px;display:flex;align-items:flex-end;gap:10px}
+.pawdock .paw{width:64px}
+</style></head><body>
+<div class="screen">
+  <div class="toprow">
+    <span class="iconbtn"><i data-lucide="x" class="i"></i></span>
+    <div style="flex:1"><div class="dots"><i class="d"></i><i class="d"></i><i class="d"></i><i class="d"></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+    <span class="pill line"><i data-lucide="clock-3" class="i sm"></i> 2 mnt</span>
+  </div>
+  <div class="mt-3">
+    <span class="eyebrow">Tes level · soal 4 dari 10</span>
+    <h2 class="mt-1">Pilih yang paling pas.</h2>
+  </div>
+  <div class="qcard">
+    <span class="pill lilac" style="background:var(--lilac);color:var(--lilac-ink)"><i data-lucide="spell-check-2" class="i sm"></i> Grammar</span>
+    <p class="q">She <u>____</u> to school by bus every morning.</p>
+  </div>
+  <div class="stack mt-3">
+    <div class="opt"><span class="k">A</span>go</div>
+    <div class="opt"><span class="k">B</span>goes</div>
+    <div class="opt"><span class="k">C</span>going</div>
+    <div class="opt"><span class="k">D</span>is go</div>
+  </div>
+  <div class="pawdock">
+    <img class="paw" src="/assets/brand/paw-mascot-full.svg" alt="">
+    <div class="bubble tail-l" style="flex:1">Santai, ini bukan ujian. Aku cuma mau tahu mulai dari mana.</div>
+  </div>
+  <a class="btn ghost block" style="position:fixed;left:50%;transform:translateX(-50%);bottom:34px;width:350px;color:var(--muted)">Lewati soal ini</a>
+</div>
+<script src="/lucide.min.js"></script><script>lucide.createIcons()</script></body></html>
