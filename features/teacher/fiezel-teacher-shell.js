@@ -9,8 +9,8 @@
   var S = function () { return root.FiezelTeacherStore; };
   var el = null, env = {}, st = null, ui = { modal: null, drawer: null, filter: '', insightSkill: 'past_tense', attDate: null, pick: {}, syncing: false }, syncTimer = null;
   var SYNC_EVERY_MS = 45000;
-  var NAV = [['briefing', 'Briefing', 'sunrise'], ['classes', 'Kelas & Siswa', 'users'], ['assignments', 'Tugas & Ujian', 'clipboard-list'], ['insights', 'Analitik', 'activity'], ['comms', 'Komunikasi', 'megaphone'], ['journal', 'Jurnal Guru', 'notebook-pen']];
-  var TITLE = { briefing: 'Briefing hari ini', classes: 'Kelas & Siswa', assignments: 'Tugas & Ujian', insights: 'Analitik & Deteksi Dini', comms: 'Komunikasi', journal: 'Jurnal Guru', settings: 'Profil Guru' };
+  var NAV = [['hub', 'Kelas', 'school'], ['briefing', 'Briefing', 'sunrise'], ['classes', 'Kelas & Siswa', 'users'], ['assignments', 'Tugas & Ujian', 'clipboard-list'], ['insights', 'Analitik', 'activity'], ['comms', 'Komunikasi', 'megaphone'], ['journal', 'Jurnal Guru', 'notebook-pen']];
+  var TITLE = { hub: 'Kelas — Guru · Murid · Braincore', briefing: 'Briefing hari ini', classes: 'Kelas & Siswa', assignments: 'Tugas & Ujian', insights: 'Analitik & Deteksi Dini', comms: 'Komunikasi', journal: 'Jurnal Guru', settings: 'Profil Guru' };
 
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (m) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[m]; }); }
   function pct(v) { return S().pct(v); }
@@ -95,6 +95,9 @@
     st.classes = st.classes.map(S().normalizeClass);
     if (!cls() && st.classes.length) st.activeClassId = st.classes[0].id;
     if (!st.classes.length && !st.onboarded) { st.view = 'briefing'; }
+    // Kelas (class-hub) = landing default Ruang Guru: guru, murid, tugas, hasil, Braincore satu tempat.
+    if (st.classes.length && (!st.view || st.view === 'briefing') && !st.hubSeen && root.FiezelClassHub) { st.view = 'hub'; st.hubSeen = true; }
+    if (st.view === 'hub' && !root.FiezelClassHub) st.view = 'briefing';
     document.body.classList.add('fz-teacher-mode');
     el.addEventListener('click', onClick); el.addEventListener('submit', onSubmit); el.addEventListener('change', onChange); el.addEventListener('input', onInput);
     document.addEventListener('keydown', onKey);
@@ -128,6 +131,8 @@
     if (!el) return;
     var c = cls();
     el.innerHTML = '<div class="tg' + (ui.modal && ui.modal.kind === 'board' ? ' tg-board-open' : '') + '" data-testid="teacher-shell">' + sidebar(c) + '<div class="tg-main">' + topbar(c) + '<div class="tg-content">' + (st.classes.length ? views[st.view || 'briefing'](c) : welcome()) + '</div></div>' + mobileNav() + drawer(c) + modal(c) + '</div>';
+    var hubEl = el.querySelector('#tgClassHub');
+    if (hubEl && root.FiezelClassHub) root.FiezelClassHub.mountTeacher(hubEl, { st: function () { return st; }, cls: cls, persist: persist, toast: toast, rerender: render });
     if (env.afterRender) try { env.afterRender(); } catch (_) {}
     var f = el.querySelector('[data-autofocus]'); if (f) try { f.focus(); } catch (_) {}
   }
@@ -270,7 +275,7 @@
       '<section class="tg-card tg-narrow" data-testid="tg-settings"><p class="tg-kicker">Profil guru</p><h3>Nama & sekolah dipakai di tanda tangan laporan</h3><form data-tg-form="teacher" class="tg-form"><label class="tg-label">Nama panggilan<input name="name" value="' + esc(st.teacher.name) + '" placeholder="Bu Rina / Pak Dimas" maxlength="40" data-testid="tg-teacher-name"></label><label class="tg-label">Sekolah / lembaga<input name="school" value="' + esc(st.teacher.school) + '" placeholder="SMA Negeri 3 Bandung" maxlength="60" data-testid="tg-teacher-school"></label><div class="tg-actions"><button type="submit" class="tg-btn is-primary is-small" data-testid="tg-teacher-save">Simpan</button></div></form>' +
       '<hr class="tg-hr"><p class="tg-kicker">Data</p><p class="tg-muted">Semua data Ruang Guru tersimpan di perangkat ini. Ekspor cadangan sebelum ganti perangkat.</p><div class="tg-actions"><button type="button" class="tg-btn is-ghost is-small" data-tg="export-json">' + icon('download') + ' Ekspor cadangan</button><label class="tg-btn is-ghost is-small">' + icon('upload') + ' Pulihkan cadangan<input type="file" accept="application/json" hidden data-tg-file="import-json"></label><button type="button" class="tg-btn is-danger is-small" data-tg="reset-all" data-testid="tg-reset">' + icon('trash-2') + ' Hapus semua data guru</button></div></section>';
   }
-  var views = { briefing: briefing, classes: classes, assignments: assignments, insights: insights, comms: comms, journal: journal, settings: settings };
+  var views = { hub: function () { return '<div id="tgClassHub" class="tg-hub-host"></div>'; }, briefing: briefing, classes: classes, assignments: assignments, insights: insights, comms: comms, journal: journal, settings: settings };
 
   // ---- DRAWER siswa -------------------------------------------------------------------------------
   function drawer(c) {

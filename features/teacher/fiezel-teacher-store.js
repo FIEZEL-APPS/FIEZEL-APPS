@@ -172,15 +172,16 @@
     s.attendance[today(parsed.lastActiveAt)] = s.attendance[today(parsed.lastActiveAt)] || 'H';
     var graded = [], explicit = parsed.assignments || [];
     (c.assignments || []).forEach(function (a) {
-      if (a.done && a.done[s.id]) return;
       var hit = explicit.filter(function (x) { return x.id === a.id; })[0];
+      if (hit && hit.s && !(hit.t > 0) && !(a.done && a.done[s.id])) { a.progress = a.progress || {}; a.progress[s.id] = Number(hit.at) || parsed.lastActiveAt; return; }
+      if (a.done && a.done[s.id]) return;
       var implicit = !explicit.length && targeted(a, s) && parsed.lastActiveAt >= a.createdAt && a.skills.some(function (k) { return incoming[k]; });
-      if (hit || implicit) { a.done = a.done || {}; a.done[s.id] = { at: Number(hit && hit.at) || parsed.lastActiveAt, acc: hit && hit.t ? hit.c / hit.t : skillAcc(s, a.skills[0]) }; graded.push(a); }
+      if (hit || implicit) { a.done = a.done || {}; a.done[s.id] = { at: Number(hit && hit.at) || parsed.lastActiveAt, acc: hit && hit.t ? hit.c / hit.t : skillAcc(s, a.skills[0]), c: hit ? hit.c : undefined, t: hit ? hit.t : undefined, w: hit && Array.isArray(hit.w) ? hit.w : undefined }; if (a.progress) delete a.progress[s.id]; graded.push(a); }
     });
     return { student: s, graded: graded, isNew: isNew };
   }
   /** Bentuk payload tugas yang dikirim ke server = isi kode tugas (tanpa base64). */
-  function assignmentPayload(c, a) { return { v: 1, t: 'assign', id: a.id, title: a.title, skills: a.skills, itemIds: a.itemIds, minutes: a.minutes, from: c.name, cls: c.code, deadline: a.deadline || null, mode: a.mode || 'latihan', timer: a.timer || 0, shuffle: !!a.shuffle }; }
+  function assignmentPayload(c, a) { var p = { v: 1, t: 'assign', id: a.id, title: a.title, skills: a.skills, itemIds: a.itemIds, minutes: a.minutes, from: c.name, cls: c.code, deadline: a.deadline || null, mode: a.mode || 'latihan', timer: a.timer || 0, shuffle: !!a.shuffle }; if (a.teacher) p.teacher = String(a.teacher).slice(0, 60); if (Array.isArray(a.items) && a.items.length) p.items = a.items.map(function (q) { var o = { id: q.id, prompt: q.prompt, options: q.options, answer: q.answer, skill: q.skill }; if (q.context) o.context = q.context; if (q.why && Object.keys(q.why).length) o.why = q.why; return o; }); return p; }
   function assignmentCode(c, a) { return b64e(assignmentPayload(c, a)); }
   function parseAssignmentCode(code) { try { var p = b64d(code); if (!p || p.t !== 'assign' || !Array.isArray(p.itemIds)) return null; return p; } catch (_) { return null; } }
   /** Sisi murid: simpan tugas dari kode guru ke antrean Today Plan (dipakai learner-flow). */
@@ -193,19 +194,29 @@
     if (!p || p.t !== 'assign' || !Array.isArray(p.itemIds)) return null;
     try {
       var a = JSON.parse(localStorage.getItem(ASSIGN_KEY)) || [];
-      if (!a.some(function (x) { return x.id === p.id; })) a.push({ id: p.id, title: p.title, skills: p.skills, itemIds: p.itemIds, minutes: p.minutes, from: p.from, at: Date.now(), deadline: p.deadline, mode: p.mode });
-      localStorage.setItem(ASSIGN_KEY, JSON.stringify(a.slice(-5)));
+      if (!a.some(function (x) { return x.id === p.id; })) a.push({ id: p.id, title: p.title, skills: p.skills, itemIds: p.itemIds, minutes: p.minutes, from: p.from, teacher: p.teacher || '', cls: p.cls || '', items: Array.isArray(p.items) ? p.items : undefined, timer: p.timer || 0, shuffle: !!p.shuffle, at: Date.now(), deadline: p.deadline, mode: p.mode });
+      localStorage.setItem(ASSIGN_KEY, JSON.stringify(a.slice(-12)));
       if (p.cls) { var ob = JSON.parse(localStorage.getItem('fiezel-onboarding-v1') || '{}'); if (!ob.classCode) { ob.classCode = p.cls; localStorage.setItem('fiezel-onboarding-v1', JSON.stringify(ob)); } }
     } catch (_) {}
     return p;
   }
   function buildAssignment(opts) {
-    var B = bank(), skills = (opts.skills || []).filter(function (k) { return B && B.SKILLS[k]; });
+    var B = bank(), custom = Array.isArray(opts.items) ? opts.items.filter(function (q) { return q && q.prompt && Array.isArray(q.options) && q.options.length >= 2; }).slice(0, 40) : [];
+    var skills = (opts.skills || []).filter(function (k) { return (B && B.SKILLS[k]) || custom.some(function (q) { return q.skill === k; }); });
+    custom.forEach(function (q) { if (q.skill && skills.indexOf(q.skill) === -1 && skills.length < 3) skills.push(q.skill); });
     if (!skills.length) skills = ['past_tense'];
-    var per = Math.max(1, Math.round((Number(opts.count) || 10) / skills.length)), ids = [], seed = Date.now() % 997;
-    skills.forEach(function (k, i) { B.pickFresh(k, per, { avoid: opts.avoid || [], seed: seed + i }).forEach(function (it) { ids.push(it.id); }); });
+    var ids = [], seed = Date.now() % 997;
+    if (Array.isArray(opts.itemIds) && opts.itemIds.length) ids = opts.itemIds.slice(0, 40);
+    else if (!custom.length || opts.count) { var per = Math.max(1, Math.round((Number(opts.count) || 10) / skills.length)); skills.forEach(function (k, i) { if (B && B.SKILLS[k]) B.pickFresh(k, per, { avoid: opts.avoid || [], seed: seed + i }).forEach(function (it) { ids.push(it.id); }); }); }
+    custom.forEach(function (q) { if (ids.indexOf(q.id) === -1) ids.push(q.id); });
+    ids = ids.slice(0, 40);
     var minutes = Math.max(3, Math.round(ids.length * 0.9));
-    return { id: uid('as'), title: String(opts.title || ('Latihan ' + skills.map(function (k) { return SKILL_LABEL[k]; }).join(' + '))).slice(0, 80), skills: skills, itemIds: ids, minutes: minutes, mode: opts.mode || 'latihan', timer: opts.mode === 'ujian' ? (Number(opts.timer) || minutes) : 0, shuffle: opts.mode === 'ujian', deadline: opts.deadline || null, createdAt: Date.now(), targets: opts.targets && opts.targets.length ? opts.targets : null, done: {} };
+    var a = { id: uid('as'), title: String(opts.title || ('Latihan ' + skills.map(function (k) { return SKILL_LABEL[k] || k; }).join(' + '))).slice(0, 80), skills: skills, itemIds: ids, minutes: minutes, mode: opts.mode || 'latihan', timer: opts.mode === 'ujian' ? (Number(opts.timer) || minutes) : 0, shuffle: opts.mode === 'ujian', deadline: opts.deadline || null, createdAt: Date.now(), targets: opts.targets && opts.targets.length ? opts.targets : null, done: {}, progress: {} };
+    if (custom.length) a.items = custom;
+    if (opts.teacher) a.teacher = String(opts.teacher).slice(0, 60);
+    if (opts.source) a.source = opts.source;
+    if (opts.review) a.review = opts.review;
+    return a;
   }
 
   // ---- naskah komunikasi (tanpa AI, template berisi data) ----------------------------------

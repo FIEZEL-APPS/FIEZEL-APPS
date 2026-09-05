@@ -224,6 +224,7 @@ jobs:
           node tests/teacher-csv-test.js
           node tests/teacher-braincore-test.js
           node tests/class-sync-test.js
+          node tests/class-hub-test.js
           node tests/social-notify-test.js
           node tests/braincore-learner-identity-test.js
           node tests/learning-metrics-test.js

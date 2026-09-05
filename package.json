@@ -38,6 +38,7 @@
     "test:social-notify": "node tests/social-notify-test.js",
     "test:auth-account": "node tests/auth-account-test.js",
     "test:class-sync": "node tests/class-sync-test.js",
+    "test:class-hub": "node tests/class-hub-test.js",
     "test:owner-teacher-panel": "node tests/owner-teacher-panel-test.js",
     "invite:teacher": "node tools/mint-teacher-invite.mjs"
   }
