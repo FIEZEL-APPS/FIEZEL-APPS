@@ -18148,7 +18148,7 @@
     },
     {
       "id": "QN-206",
-      "family": "question_negation",
+      "family": "emphasis_inversion",
       "subskill": "negative_adverbial_inversion_never_rarely_not_only",
       "cefr": "C1",
       "questionType": "multiple_choice",
@@ -18204,7 +18204,7 @@
     },
     {
       "id": "QN-207",
-      "family": "question_negation",
+      "family": "advanced_grammar",
       "subskill": "inversion_after_only_restrictive_phrase",
       "cefr": "C2",
       "questionType": "multiple_choice",
