@@ -263,6 +263,12 @@
     'student.flow-sub-plan': '{menit} menit · {done}/{total} bagian selesai',
     'student.flow-sub-ready': 'Rencana siap dibuat dari hasil tes singkatmu',
     'student.flow-sub-start': 'Pilih tujuan → 5 soal singkat → rencana hari ini',
+    'student.duel-invite-title': 'Terima Duel Belajar',
+    'student.duel-invite-sub': '{from} menantangmu · {score} poin',
+    'student.duel-invite-anon': 'Teman',
+    'student.tutor-heading': 'Ruang guru',
+    'student.tutor-title': 'Ruang Guru',
+    'student.tutor-sub': 'Peranmu: Guru · briefing, deteksi dini, tugas, laporan ortu',
     // ── Online & Teman (FIEZEL 2.0) ──
     'social2.panel-title': 'Online & Teman',
     'social2.panel-sub-off': 'Belajar bareng lebih seru. Sambungkan internet untuk lihat teman.',

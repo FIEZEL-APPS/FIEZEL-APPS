@@ -7084,7 +7084,7 @@ function todayHomeMarkup(){
     ? `Runtun ${streak} hari! Mantap sekali, ${esc(learnerName())}. Siap lanjut 10 menit hari ini?`
     : `Halo, ${esc(learnerName())}! Belajar 10 menit hari ini untuk mulai runtun barumu.`;
 
-  const heroMascotMarkup=`<aside class="paw-hero-cockpit" onclick="pawReact('celebrate');uiSfx('paw_greet')">
+  const heroMascotMarkup=`<aside class="paw-hero-cockpit" onclick="pawReact('wake');uiSfx('paw_greet')">
     <div class="paw-hero-avatar" aria-label="Maskot PAW">${pawFaceMarkup()}</div>
     <div class="paw-speech-bubble">
       <div class="paw-bubble-title"><span>Kata PAW</span> <i class="fz-i" data-fz-icon="flame" style="width:14px;height:14px"></i></div>
@@ -11169,10 +11169,10 @@ function learnerFlowHomeMarkup(){
   try{const code=new URL(location.href).searchParams.get('duel');invite=code&&self.FiezelDuel?self.FiezelDuel.decode(code):null}catch(_){}
   const sub=plan?FiezelI18n.t('student.flow-sub-plan',{menit:plan.minutes,done:plan.done.length,total:plan.blocks.length}):lf&&lf.diagnostic?FiezelI18n.t('student.flow-sub-ready'):FiezelI18n.t('student.flow-sub-start');
   const isGuru=isVerifiedTeacher();
-  const inviteCard=invite?`<button class="launch-card duel-invite-card" onclick="go('learn')" data-testid="home-duel-invite"><span class="launch-icon"><i class="fz-i" data-fz-icon="speaking" aria-hidden="true"></i></span><span><small>${esc(invite.from||'Teman')} menantangmu · ${invite.score} poin</small><b>Terima Duel Belajar</b></span><i data-lucide="arrow-up-right"></i></button>`:'';
+  const inviteCard=invite?`<button class="launch-card duel-invite-card" onclick="go('learn')" data-testid="home-duel-invite"><span class="launch-icon"><i class="fz-i" data-fz-icon="speaking" aria-hidden="true"></i></span><span><small>${esc(FiezelI18n.t('student.duel-invite-sub',{from:invite.from||FiezelI18n.t('student.duel-invite-anon'),score:Number(invite.score)||0}))}</small><b>${FiezelI18n.t('student.duel-invite-title')}</b></span><i data-lucide="arrow-up-right"></i></button>`:'';
   const learnCard=`<button class="launch-card learn-launch" onclick="go('learn')" data-testid="home-learn-flow"><span class="launch-icon"><i class="fz-i" data-fz-icon="grammar" aria-hidden="true"></i></span><span><small>${esc(sub)}</small><b>${FiezelI18n.t('student.flow-title')}</b></span><i data-lucide="arrow-up-right"></i></button>`;
-  const tutorCard=`<button class="launch-card tutor-launch" onclick="go('tutor')" data-testid="home-tutor-center"><span class="launch-icon"><i class="fz-i" data-fz-icon="map" aria-hidden="true"></i></span><span><small>Peranmu: Guru · briefing, deteksi dini, tugas, laporan ortu</small><b>Ruang Guru</b></span><i data-lucide="arrow-up-right"></i></button>`;
-  return `<div class="home-section-head"><div><h2>${isGuru?'Ruang guru':FiezelI18n.t('student.flow-heading')}</h2></div></div>
+  const tutorCard=`<button class="launch-card tutor-launch" onclick="go('tutor')" data-testid="home-tutor-center"><span class="launch-icon"><i class="fz-i" data-fz-icon="map" aria-hidden="true"></i></span><span><small>${esc(FiezelI18n.t('student.tutor-sub'))}</small><b>${FiezelI18n.t('student.tutor-title')}</b></span><i data-lucide="arrow-up-right"></i></button>`;
+  return `<div class="home-section-head"><div><h2>${isGuru?FiezelI18n.t('student.tutor-heading'):FiezelI18n.t('student.flow-heading')}</h2></div></div>
 <div class="learning-launcher learner-flow-launcher">${inviteCard}${isGuru?tutorCard+learnCard:learnCard}
 </div>`;
 }
