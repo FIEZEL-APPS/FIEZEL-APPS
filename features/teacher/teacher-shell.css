@@ -281,3 +281,35 @@ html.fiezel-ui-v6 body.fz-teacher-mode .tg button.tg-kpi:not(.primary):not(.nav)
 html.fiezel-ui-v6 body.fz-teacher-mode .tg button.tg-exit:not(.primary):not(.nav):not(.icon-button):not(.text-button):not(.coach-link):not(.fz-coach-bubble):not(.launch-card):not(.skill-card):not(.option):not(.skill-help-dot):not(.olm-dispute){border:1px solid var(--tg-ink-3);border-radius:12px}
 html.fiezel-ui-v6 body.fz-teacher-mode .tg button.tg-board-close:not(.primary):not(.nav):not(.icon-button):not(.text-button):not(.coach-link):not(.fz-coach-bubble):not(.launch-card):not(.skill-card):not(.option):not(.skill-help-dot):not(.olm-dispute){border:1px solid var(--tg-ink-3);border-radius:99px}
 html.fiezel-ui-v6 body.fz-teacher-mode .tg button.tg-seg-btn:not(.primary):not(.nav):not(.icon-button):not(.text-button):not(.coach-link):not(.fz-coach-bubble):not(.launch-card):not(.skill-card):not(.option):not(.skill-help-dot):not(.olm-dispute){border:1px solid var(--tg-line);border-radius:9px}
+
+/* ---- Notifikasi guru (lonceng topbar + panel) ------------------------------------------- */
+.tg-bell{position:relative;width:40px;height:40px;border-radius:50%;background:var(--tg-paper-2);border:1px solid var(--tg-line);display:grid;place-items:center;color:var(--tg-ink);cursor:pointer;transition:background-color .2s,transform .2s,box-shadow .2s}
+.tg-bell:hover,.tg-bell.is-open{background:var(--tg-sage-soft);transform:translateY(-1px)}
+.tg-bell.has-new{box-shadow:0 0 0 3px rgba(217,142,31,.25)}
+.tg-bell.has-new .tg-i,.tg-bell.has-new i{animation:tg-ring 1.6s ease-in-out 1}
+@keyframes tg-ring{0%,100%{transform:rotate(0)}15%{transform:rotate(14deg)}30%{transform:rotate(-12deg)}45%{transform:rotate(8deg)}60%{transform:rotate(-4deg)}}
+.tg-bell-badge{position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;padding:0 5px;border-radius:99px;background:var(--tg-brick);color:#fff;font-size:.68rem;font-weight:700;display:grid;place-items:center;line-height:1;border:2px solid var(--tg-paper)}
+.tg-inbox-scrim{position:fixed;inset:0;z-index:58;background:transparent}
+.tg-inbox{position:fixed;top:74px;right:26px;width:min(400px,calc(100vw - 32px));max-height:min(70vh,560px);overflow:auto;background:var(--tg-paper-2);border:1px solid var(--tg-line);border-radius:var(--tg-r-lg);box-shadow:0 24px 50px -20px rgba(18,33,31,.45);z-index:59;animation:tg-pop .18s ease-out}
+@keyframes tg-pop{from{opacity:0;transform:translateY(-6px) scale(.98)}to{opacity:1;transform:none}}
+.tg-inbox-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px 8px}
+.tg-inbox-head h3{font-size:1.05rem}
+.tg-inbox-list{list-style:none;margin:0;padding:4px 8px 10px}
+.tg-inbox-item{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;background:transparent;border:0;border-radius:var(--tg-r);padding:10px 10px;cursor:pointer;font:inherit;color:inherit;transition:background-color .15s}
+.tg-inbox-item:hover{background:var(--tg-sage-soft)}
+.tg-inbox-item .tg-i,.tg-inbox-item i{width:1.1em;height:1.1em;margin-top:3px;color:var(--tg-sage)}
+.tg-inbox-item b{display:block;font-weight:500;font-size:.92rem;line-height:1.35}
+.tg-inbox-item small{color:var(--tg-muted);font-size:.75rem}
+.tg-inbox-item.is-unread{background:#fff}
+.tg-inbox-item.is-unread b{font-weight:600}
+.tg-inbox-item.is-unread::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--tg-amber);flex:none;margin-top:8px}
+.tg-inbox .tg-empty{padding:10px 20px 24px;font-size:.88rem}
+.tg-send-box{background:var(--tg-sage-soft);border-radius:var(--tg-r);padding:14px 16px;margin-bottom:14px}
+.tg-send-box .tg-actions{margin-top:10px;align-items:center;gap:12px}
+.tg-fold{border:1px solid var(--tg-line);border-radius:var(--tg-r);padding:10px 14px;margin-bottom:6px}
+.tg-fold summary{cursor:pointer;font-weight:600;font-size:.88rem}
+.tg-fold .tg-code{margin-top:10px}
+.tg-send-list li{display:flex;align-items:center;gap:8px}
+.tg-send-list .tg-grow{flex:1}
+.tg-sent-note{display:flex;align-items:center;gap:6px;margin:8px 0 0;font-size:.8rem}
+@media (max-width:760px){.tg-inbox{top:auto;bottom:76px;right:12px;left:12px;width:auto;max-height:60vh}}

@@ -6064,7 +6064,7 @@ function openFeedback(prefill){
 function render(){const __renderStartedAt=Date.now();try{return renderInner()}finally{window.__fiezelLastRenderMs=Date.now()-__renderStartedAt;/* [FASE-4] pasang ulang timer kantuk 90 dtk tiap layar dicat (mati sendiri di luar layar santai). */try{pawIdleArm()}catch(_){}/* [OUTFIT G5'] konteks layar untuk resolver outfit (19 §6.1) */try{self.FiezelPawOutfit?.screen?.(state.view)}catch(_){}}}
 // m025-41: render duration is recorded so the diagnostic scanner can see a slow screen,
 // which is how OWNER experienced the Classroom regression before any error was logged.
-function renderInner(){if(isVerifiedTeacher()&&state.view!=='tutor'){state.view='tutor'}if(document.body?.classList?.contains?.('fz-teacher-mode')&&state.view!=='tutor'){try{self.FiezelTeacherShell?.unmount?.()}catch(_){}}speakingListeningMountToken++;if(speakingListeningController){speakingListeningController.destroy();speakingListeningController=null;/* m026-01: satu-satunya tempat sesi dengar benar-benar bubar. Di dalam if, bukan di luar - kalau tidak, tiap navigasi biasa akan memaksa maskot kembali idle dan memotong selebrasi yang sedang jalan. */pawReact('listening-stop')}document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));setApp('');if(state.view==='home')home();if(state.view==='latihan')latihan();if(state.view==='vocab')vocab();if(state.view==='grammar')grammar();if(state.view==='reading')reading();if(state.view==='skills')skillsLab();if(state.view==='listening')skillsLab('listening');if(state.view==='speaking')skillsLab('speaking');if(state.view==='writing')writing();if(state.view==='classroom')classroom();if(state.view==='library')library();if(state.view==='ask'||state.view==='search')askView();if(state.view==='test')placement();if(state.view==='progress')progress();if(state.view==='online')onlineView();if(state.view==='learn')learnerFlowView();if(state.view==='tutor')tutorCenterView();/* merge SLOT 7 sosial 2026-08-29 */document.querySelector(`[data-view="${state.view}"]`)?.classList.add('active');/* m028 fase3: bendera panggung Skills Lab. Addon listening memaku blok tombolnya ke dasar layar (speaking-listening-addon.css), jadi ia panggung kedua yang bisa ditutupi gelembung. */document.body?.classList?.toggle?.('fz-stage-sl',['skills','listening','speaking'].includes(state.view));/* m028 fase3 (QA §9): Peta Belajar ikut jadi panggung ber-kontrol sejak panel NEXT SESSION punya tombol "Mulai sesi" di dekat dasar layar - screenshot QA menunjukkan gelembung PAW menutupinya utuh. Aturannya sama dengan kuis: peek dilarang, dok mengecil, layar diberi ruang bawah. */document.body?.classList?.toggle?.('fz-stage-map',state.view==='progress');/* 2026-08-29 overhaul I12 (O6 #10): bendera panggung Home. Wajah coach-strip adalah SATU-SATUNYA Pau di Home; gelembung FAB pengambang (Pau kedua, terukur menimpa lipatan hero/skill-hub di 390px) disembunyikan lewat CSS body.fz-stage-home — pola yang sama dengan fz-stage-sl/fz-stage-map, modul gelembung tidak disentuh. */document.body?.classList?.toggle?.('fz-stage-home',state.view==='home');/* q16-P2-2 2026-08-29: hub juga panggung ber-CTA-dekat-dasar (Review Due, Buka flashcards, Mulai 25 soal) \u2014 peek dilarang, dok mengecil, pola sama dengan sl/map. */document.body?.classList?.toggle?.('fz-stage-hub',['vocab','grammar','reading','library','test'].includes(state.view));document.body?.classList?.toggle?.('fz-stage-writing',state.view==='writing');/* v24-F2 2026-08-29: Writing = layar mengarang; FAB disembunyikan via CSS (pola fz-stage-home), modul gelembung tidak disentuh. */enhanceUI();syncCoachBubble();window.scrollTo(0,0)}
+function renderInner(){if(isVerifiedTeacher()&&state.view!=='tutor'){state.view='tutor'}if(document.body?.classList?.contains?.('fz-teacher-mode')&&state.view!=='tutor'){try{self.FiezelTeacherShell?.unmount?.()}catch(_){}}speakingListeningMountToken++;if(speakingListeningController){speakingListeningController.destroy();speakingListeningController=null;/* m026-01: satu-satunya tempat sesi dengar benar-benar bubar. Di dalam if, bukan di luar - kalau tidak, tiap navigasi biasa akan memaksa maskot kembali idle dan memotong selebrasi yang sedang jalan. */pawReact('listening-stop')}document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));setApp('');if(state.view==='home')home();if(state.view==='latihan')latihan();if(state.view==='vocab')vocab();if(state.view==='grammar')grammar();if(state.view==='reading')reading();if(state.view==='skills')skillsLab();if(state.view==='listening')skillsLab('listening');if(state.view==='speaking')skillsLab('speaking');if(state.view==='writing')writing();if(state.view==='classroom')classroom();if(state.view==='library')library();if(state.view==='ask'||state.view==='search')askView();if(state.view==='test')placement();if(state.view==='progress')progress();if(state.view==='online')onlineView();if(state.view==='learn')learnerFlowView();if(state.view==='tutor')tutorCenterView();/* merge SLOT 7 sosial 2026-08-29 */document.querySelector(`[data-view="${state.view}"]`)?.classList.add('active');/* m028 fase3: bendera panggung Skills Lab. Addon listening memaku blok tombolnya ke dasar layar (speaking-listening-addon.css), jadi ia panggung kedua yang bisa ditutupi gelembung. */document.body?.classList?.toggle?.('fz-stage-sl',['skills','listening','speaking'].includes(state.view));/* m028 fase3 (QA §9): Peta Belajar ikut jadi panggung ber-kontrol sejak panel NEXT SESSION punya tombol "Mulai sesi" di dekat dasar layar - screenshot QA menunjukkan gelembung PAW menutupinya utuh. Aturannya sama dengan kuis: peek dilarang, dok mengecil, layar diberi ruang bawah. */document.body?.classList?.toggle?.('fz-stage-map',state.view==='progress');/* 2026-08-29 overhaul I12 (O6 #10): bendera panggung Home. Wajah coach-strip adalah SATU-SATUNYA Pau di Home; gelembung FAB pengambang (Pau kedua, terukur menimpa lipatan hero/skill-hub di 390px) disembunyikan lewat CSS body.fz-stage-home — pola yang sama dengan fz-stage-sl/fz-stage-map, modul gelembung tidak disentuh. */document.body?.classList?.toggle?.('fz-stage-home',state.view==='home');/* q16-P2-2 2026-08-29: hub juga panggung ber-CTA-dekat-dasar (Review Due, Buka flashcards, Mulai 25 soal) \u2014 peek dilarang, dok mengecil, pola sama dengan sl/map. */document.body?.classList?.toggle?.('fz-stage-hub',['vocab','grammar','reading','library','test'].includes(state.view));document.body?.classList?.toggle?.('fz-stage-writing',state.view==='writing');/* v24-F2 2026-08-29: Writing = layar mengarang; FAB disembunyikan via CSS (pola fz-stage-home), modul gelembung tidak disentuh. */enhanceUI();syncCoachBubble();try{refreshNotifBadge()}catch(_){}window.scrollTo(0,0)}
 // m025-115 - pembimbing yang ikut ke mana pun murid pergi (brief bagian 7).
 //
 // Gelembungnya dipasang SEKALI ke <body> dan tidak pernah ikut dicat ulang; yang dikirim
@@ -12294,6 +12294,7 @@ function socialInviteBoot(){
         try{link.capture({})}catch(_){}
         maybeOpenSocialInviteSheet();
         socialNotifyPoll();
+        try{inboxPoll(false)}catch(_){}
       });
       // launch_handler:focus-existing memakai ulang jendela PWA yang sudah terbuka; alamat
       // barunya sampai lewat navigasi, jadi popstate adalah tanda "ada alamat baru" juga.
@@ -12553,13 +12554,84 @@ function armSocialInviteSheet(tries){
   const first=setTimeout(tick,1600);first?.unref?.();
   // Kabar dari teman ditanyakan sekali sesudah boot tenang — sesudah konten dan suara
   // selesai berebut pita, bukan di tengahnya.
-  const poll=setTimeout(()=>{socialNotifyPoll(true)},6500);poll?.unref?.();
+  const poll=setTimeout(()=>{socialNotifyPoll(true);try{startNotifPolling()}catch(_){}},6500);poll?.unref?.();
   return true;
 }
 /** Jumlah kabar belum terbaca — dipakai lencana kartu Home. */
 function socialUnreadCount(){try{return socialNotifyCore()?.unreadCount()||0}catch(_){return 0}}
 function socialPendingInvite(){try{return inviteLink()?.pending()||null}catch(_){return null}}
 window.socialNotifyPoll=socialNotifyPoll;
+/* ---------------------------------------------------------------- LONCENG NOTIFIKASI (topbar) */
+/* Satu lonceng, semua kabar: tugas dari guru (features/notify/fiezel-inbox.js, polling
+ * /api/learner/class-assignments), teman baru / sorakan / milestone (fiezel-social-notify.js),
+ * dan undangan teman yang menunggu. Ketuk tugas = sesinya langsung terbuka di Belajar hari ini;
+ * hasilnya kembali ke guru lewat jalur class-report yang sudah ada. */
+function inboxCore(){try{return self.FiezelInbox||null}catch(_){return null}}
+function notifUnreadTotal(){let n=0;try{n+=inboxCore()?.unread()||0}catch(_){}n+=socialUnreadCount();if(socialPendingInvite())n+=1;return n}
+function refreshNotifBadge(){const b=$('fzNotifBadge');if(!b)return false;const n=notifUnreadTotal();b.textContent=n>9?'9+':String(n);b.classList.toggle('hidden',n<=0);$('fzNotifBtn')?.classList.toggle('has-new',n>0);return true}
+function notifTimeLabel(ts){try{const d=new Date(Number(ts)||Date.now()),diff=Date.now()-d.getTime();if(diff<60000)return 'baru saja';if(diff<3600000)return Math.round(diff/60000)+' mnt lalu';if(diff<86400000)return Math.round(diff/3600000)+' jam lalu';return d.toLocaleDateString('id-ID',{day:'numeric',month:'short'})}catch(_){return ''}}
+function notifItemMarkup(e){
+  const time=`<small>${esc(notifTimeLabel(e.at))}</small>`;
+  if(e.kind==='teacher_assignment'){
+    const meta=[(e.mode==='ujian'?'Ujian mini':'Latihan'),e.count?e.count+' soal':'',e.minutes?'±'+e.minutes+' mnt':'',e.deadline?'tenggat '+e.deadline:''].filter(Boolean).join(' · ');
+    return `<li class="notif-item is-teacher${e.read?'':' is-unread'}" data-testid="notif-item-${esc(e.id)}"><span class="notif-icon"><i data-lucide="${e.mode==='ujian'?'shield-check':'clipboard-list'}" aria-hidden="true"></i></span><div class="notif-body"><b>${esc(inboxCore()?.text(e)||e.title||'')}</b><small>${esc(meta)}</small>${time}</div><button type="button" class="notif-cta" onclick="openAssignmentFromNotif('${esc(e.id)}')" data-testid="notif-open-${esc(e.id)}">${FiezelI18n.t('notif.open-assignment')} <i data-lucide="arrow-right" aria-hidden="true"></i></button></li>`;
+  }
+  const icon=e.kind==='cheer_received'?'party-popper':e.kind==='friend_milestone'?'trophy':'user-plus';
+  return `<li class="notif-item is-social${e.read?'':' is-unread'}" data-testid="notif-item-social"><span class="notif-icon"><i data-lucide="${icon}" aria-hidden="true"></i></span><div class="notif-body"><b>${esc(socialNotifyText(e))}</b>${time}</div><button type="button" class="notif-cta is-ghost" onclick="closeModal();socialHomeOpenOnline()">${FiezelI18n.t('social.home-open')}</button></li>`;
+}
+function openNotifications(){
+  const inbox=inboxCore(),notify=socialNotifyCore();
+  const teacher=(inbox?inbox.items():[]).filter(e=>e.kind==='teacher_assignment');
+  const social=notify?notify.inbox():[];
+  const invite=socialPendingInvite();
+  const total=teacher.length+social.length+(invite?1:0);
+  let list='';
+  if(invite)list+=`<li class="notif-item is-invite is-unread" data-testid="notif-item-invite"><span class="notif-icon"><i data-lucide="mail-open" aria-hidden="true"></i></span><div class="notif-body"><b>${FiezelI18n.t('notif.invite-pending')}</b></div><button type="button" class="notif-cta" onclick="closeModal();socialHomeOpenInvite()">${FiezelI18n.t('social.home-open')}</button></li>`;
+  if(teacher.length)list+=`<li class="notif-section">${FiezelI18n.t('notif.section-teacher')}</li>`+teacher.map(notifItemMarkup).join('');
+  if(social.length)list+=`<li class="notif-section">${FiezelI18n.t('notif.section-social')}</li>`+social.slice(0,20).map(notifItemMarkup).join('');
+  const html=`<div class="modal-mark">FIEZEL</div><div class="notif-sheet" data-testid="notif-sheet"><div class="notif-head"><h2>${FiezelI18n.t('notif.title')}</h2>${total?`<button type="button" class="text-button notif-readall" onclick="notifMarkAllRead()" data-testid="notif-mark-all">${FiezelI18n.t('notif.mark-read')}</button>`:''}</div>`+
+    (total?`<ul class="notif-list">${list}</ul>`:`<p class="notif-empty" data-testid="notif-empty"><i data-lucide="bell-off" aria-hidden="true"></i>${FiezelI18n.t('notif.empty')}</p>`)+
+    `<div class="modal-actions"><button type="button" class="text-button" onclick="closeModal()" data-testid="notif-close">${FiezelI18n.t('modal.tutup')}</button></div></div>`;
+  openModal(html);
+  try{notify?.markAllRead()}catch(_){}
+  refreshNotifBadge();
+  try{inbox?.poll(true).then(r=>{if(r&&r.added&&r.added.length&&modalOpen&&$('modalPanel')?.querySelector('.notif-sheet'))openNotifications()})}catch(_){}
+  return true;
+}
+function openAssignmentFromNotif(id){
+  const inbox=inboxCore(),e=inbox?inbox.get(id):null;
+  try{inbox?.markRead(id)}catch(_){}
+  closeModal();refreshNotifBadge();
+  if(!e)return false;
+  try{self.FiezelLearnerFlow?.openAssignment?.(e.aid)}catch(_){}
+  go('learn');
+  return true;
+}
+function notifMarkAllRead(){try{inboxCore()?.markAllRead()}catch(_){}try{socialNotifyCore()?.markAllRead()}catch(_){}closeModal();refreshNotifBadge();return true}
+async function inboxPoll(force){
+  const inbox=inboxCore();if(!inbox)return null;
+  let r=null;try{r=await inbox.poll(force)}catch(_){r=null}
+  if(r&&r.added&&r.added.length){
+    const e=r.added[0];
+    const text=FiezelI18n.t('notif.assignment-toast',{from:e.from||'guru',title:e.title||''});
+    const visible=(()=>{try{return document.visibilityState==='visible'}catch(_){return true}})();
+    if(visible)showToast(text);else socialNotifySystem(text,{kind:'teacher_assignment'});
+    try{uiSfx('open')}catch(_){}
+    try{if(state.view==='learn'||state.view==='home')render()}catch(_){}
+  }
+  refreshNotifBadge();
+  return r;
+}
+let notifPollTimer=null;
+const NOTIF_POLL_MS=60000;
+function startNotifPolling(){
+  if(notifPollTimer)return false;
+  notifPollTimer=setInterval(()=>{try{if(document.visibilityState!=='visible')return}catch(_){}inboxPoll(false);socialNotifyPoll(false)},NOTIF_POLL_MS);
+  notifPollTimer?.unref?.();
+  inboxPoll(true);
+  return true;
+}
+window.openNotifications=openNotifications;window.openAssignmentFromNotif=openAssignmentFromNotif;window.notifMarkAllRead=notifMarkAllRead;window.refreshNotifBadge=refreshNotifBadge;window.inboxPoll=inboxPoll;
 /* ---------------------------------------------------------------- LAPIS AKUN (§21/§22/§27) */
 /**
  * Lembar akun: masuk, daftar, dan aktivasi guru. SATU lembar tiga mode, bukan tiga layar —
