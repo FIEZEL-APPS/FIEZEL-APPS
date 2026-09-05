@@ -6968,21 +6968,21 @@
       "reasoning": "kenali kata keterangan frekuensi → cek kata kerjanya bukan be → taruh kata keterangan di depan kata kerja",
       "rule": "Kata keterangan frekuensi (usually, always, often) di depan kata kerja biasa, tapi sesudah be.",
       "whyCorrect": "“Eat” kata kerja biasa, jadi kata keterangan frekuensinya pas di depannya: we usually eat.",
-      "whyOthersFail": "Satu pilihan ngulang kata keterangannya, satu naruhnya sesudah objek, satu nambah kata kerja ekstra.",
+      "whyOthersFail": "Satu pilihan majuin keterangannya sampai subjeknya kebalik, satu naruhnya sesudah objek, satu motong keterangan waktunya.",
       "howToAvoid": "Ucapin subjek, lalu kata keterangan, lalu kata kerja: we – usually – eat.",
       "memoryCue": "Subjek + usually + kata kerja.",
       "distractors": {
-        "Usually we eat dinner at seven usually.": {
-          "misconception": "keterangannya dipindah ke awal kalimat, posisi yang nggak wajar.",
-          "whyFails": "kata keterangannya diulang di dua ujung. Satu “usually” di depan kata kerja udah cukup."
+        "Usually eat we dinner at seven.": {
+          "misconception": "keterangannya dimajuin ke depan sampai subjek dan kata kerjanya kebalik.",
+          "whyFails": "“usually” ditaruh paling depan lalu subjek dan kata kerjanya ketuker. Kalimat berita tetap subjek dulu, baru kata kerja."
         },
         "We eat dinner usually at seven.": {
-          "misconception": "keterangannya dipindah ke akhir, bukan ke posisi tengah bareng be.",
-          "whyFails": "kata keterangannya dipindah ke sesudah objek, bukan ke depan kata kerja."
+          "misconception": "keterangannya ditaruh sesudah objek, bukan di posisi tengah sebelum kata kerja biasa.",
+          "whyFails": "kata keterangannya dipindah ke sesudah objek, bukan ke depan kata kerja “eat”."
         },
-        "We eat dinner at seven usually eat.": {
-          "misconception": "keterangannya masih salah tempat dan urutan “late” dan “is” ikut ketuker.",
-          "whyFails": "nambah kata kerja kedua dan kata keterangannya tetap salah tempat."
+        "We eat dinner at usually seven.": {
+          "misconception": "keterangannya diselipin di tengah keterangan waktu sampai “at” kepisah dari “seven”.",
+          "whyFails": "“at seven” kepotong sama keterangannya. Keterangan frekuensi tempatnya di depan kata kerja utama."
         }
       }
     },

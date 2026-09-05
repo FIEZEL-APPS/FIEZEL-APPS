@@ -926,6 +926,9 @@
     "puts 'despite' before a full clause": "linking.connector_choice",
     "uses 'but' as a subordinating connector at the start of the sentence": "linking.connector_choice",
     "uses 'so' before a noun phrase with an adjective": "linking.connector_choice",
-    "drops the article after 'such' before a singular noun": "linking.connector_choice"
+    "drops the article after 'such' before a singular noun": "linking.connector_choice",
+    "fronts the frequency adverb and then inverts subject and verb, which English statements never do": "structure.inversion_error",
+    "parks the adverb after the object instead of in its mid-position before an ordinary verb": "structure.word_order",
+    "drops the adverb inside the time phrase, splitting the preposition from its object": "prepositions.semantic_category"
   }
 }
