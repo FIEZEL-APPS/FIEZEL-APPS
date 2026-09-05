@@ -2,7 +2,7 @@
 
 Branch: `work/d2q`. Tidak di-push. Tidak ada bump versi build.
 Berkas yang disunting: `workers/owner/queries.js`, `workers/owner/index.js`,
-`owner-dashboard-test.js`, `d1-schema-contract-test.js`, `tools/d2-queries-red-proof.js` (baru).
+`tests/owner-dashboard-test.js`, `tests/d1-schema-contract-test.js`, `tools/d2-queries-red-proof.js` (baru).
 `workers/api/`, `features/`, `app.js`, `sw.js`, `core-config.js`, `coordination/` hanya DIBACA.
 
 ## 0. Ringkas: apa yang sebenarnya rusak
@@ -21,7 +21,7 @@ jaringan yang membuktikan itu dengan mem-parse DDL migrasi.
 
 Otoritas: `workers/api/migrations/0001_quota.sql` dan `0002_analytics.sql`.
 Bentuk di bawah bukan hasil pembacaan manual — ia diekstrak oleh parser DDL di
-`d1-schema-contract-test.js` dan tercetak di `D1-SCHEMA-CONTRACT-REPORT.json`
+`tests/d1-schema-contract-test.js` dan tercetak di `D1-SCHEMA-CONTRACT-REPORT.json`
 (check `owner_queries_kolom_ada_di_ddl` → `bentuk_tabel_menurut_ddl`).
 
 Database analytics `fiezel-stats` (`c712000c-aab9-4a1d-b43d-e6d4c9b36ee8`, binding `ANALYTICS`) —
@@ -49,7 +49,7 @@ Tiga konsekuensi yang mengubah seluruh isi `queries.js`:
    memecah error AI/TTS dan penolakan kuota. Nol identitas di dalamnya.
 
 `retention_cohort` dan `cost_daily` **tidak ada, dan tidak diusulkan.**
-`analytics-privacy-test.js` mengunci database ini pada tepat lima tabel dan larangan itu benar:
+`tests/analytics-privacy-test.js` mengunci database ini pada tepat lima tabel dan larangan itu benar:
 tiap tabel tambahan adalah satu permukaan lagi yang bisa membocorkan identitas.
 
 ## 2. Nama metrik: mana yang terbukti ditulis server, mana yang tidak
@@ -98,7 +98,7 @@ Alasan rotasi pepper (yang membuat dedup lintas hari mustahil) ada di `rollup.js
 
 **Konsekuensi yang tidak bisa dihindari:** WAU dan MAU tidak pernah ada sebagai satu angka.
 Yang ditulis server adalah sepasang batas. Dashboard sekarang memajangnya sebagai rentang
-`bawah–atas`, dan `owner-dashboard-test.js` mengunci bentuk berpasangan itu supaya tidak ada
+`bawah–atas`, dan `tests/owner-dashboard-test.js` mengunci bentuk berpasangan itu supaya tidak ada
 yang "merapikan" UI dengan satu angka yang mengarang presisi.
 
 ### 2b. Bucket `usage_daily` yang terbukti ditulis (14 bucket, 18 dimensi)
@@ -142,7 +142,7 @@ owner, bukan hanya terbaca reviewer. Kalimat penandanya persis:
 | Active users | WAU/MAU sebagai satu angka pasti | Alasan yang sama. Yang tersimpan adalah `wau_lower/upper` dan `mau_lower/upper`. Dipajang sebagai rentang. |
 | Retention | Kohor lebih rinci dari `retention_daily` | `retention_daily` hanya menyimpan (cohort_day, day_index, count). Kurva per perangkat atau per segmen butuh menyimpan jejak per-perangkat lintas hari — tepat yang sengaja tidak dilakukan. |
 | Infrastructure | Permintaan Worker, objek/byte R2, error backend | Angka ini hidup di Cloudflare GraphQL Analytics API (butuh jaringan + token akun), tidak di D1. Panel disempitkan jadi hanya `breaker_trips`, `breaker_recoveries`, `events_total`. |
-| Cost estimation | Biaya per hari yang bisa diaudit | Tidak ada tabel biaya, dan `analytics-privacy-test.js` mengunci database pada lima tabel. Volume penggerak biaya ADA (`tts_chars_rendered`, `ai_tokens_in/out`), jadi biaya dihitung ulang dari tarif in-repo tiap render. Konsekuensi jujur: mengubah tarif ikut mengubah angka historis. Ini estimasi, bukan tagihan. |
+| Cost estimation | Biaya per hari yang bisa diaudit | Tidak ada tabel biaya, dan `tests/analytics-privacy-test.js` mengunci database pada lima tabel. Volume penggerak biaya ADA (`tts_chars_rendered`, `ai_tokens_in/out`), jadi biaya dihitung ulang dari tarif in-repo tiap render. Konsekuensi jujur: mengubah tarif ikut mengubah angka historis. Ini estimasi, bukan tagihan. |
 | Cost estimation | Biaya infrastruktur, langganan, kredit gratis | Nilainya tidak pernah masuk D1. Baris Infrastruktur, Kredit gratis, dan Biaya-per-perangkat-terdaftar DIHAPUS, tidak dinolkan diam-diam. |
 | Quota exhaustion | Jumlah PERANGKAT yang kena batas | Yang dicatat adalah PERISTIWA (`quota_exhausted`) dan jenisnya (`quota:*`), bukan siapa. Satu perangkat yang kena batas 10 kali terhitung 10. |
 | AI usage | Penanda token nyata vs proksi (chars ÷ 4) | Penanda per-hari itu tidak ditulis ke `metrics_daily`. Rumus biaya tetap membawa `tokensAreEstimated` sebagai asumsi eksplisit. |
@@ -153,14 +153,14 @@ satu pun kueri yang berpura-pura bisa menjawab panel di atas.
 
 ## 4. Gerbang: mana yang diperluas dan mengapa bukan gerbang baru
 
-Diperluas: **`d1-schema-contract-test.js`** (37 → 38 check).
+Diperluas: **`tests/d1-schema-contract-test.js`** (37 → 38 check).
 
 Alasannya bukan selera. Berkas itu SUDAH memegang tanggung jawab "SQL di kode vs DDL migrasi"
 dan sudah punya parser DDL independen (`schemaFromMigrations`, `statements`, `splitTop`,
 `closingParen`, `unquoteIdents`). Yang hilang hanyalah CAKUPANNYA: pemindaiannya berhenti di
 `workers/api/`, sehingga `workers/owner/` bisa memuat kueri untuk skema yang tidak pernah ada
 dan seluruh suite tetap hijau. Itu persis yang terjadi. Menaruh pemeriksaan ini di
-`owner-dashboard-test.js` akan memaksa parser DDL KEDUA di repo yang sama, dan dua parser yang
+`tests/owner-dashboard-test.js` akan memaksa parser DDL KEDUA di repo yang sama, dan dua parser yang
 boleh berbeda pendapat tentang bentuk tabel adalah cara paling rapi untuk kehilangan kepercayaan
 pada keduanya. Cakupan pemindaian `API_DIR` yang lama tidak diubah; bagian D2q murni tambahan.
 
@@ -181,7 +181,7 @@ Check baru:
 
 Semuanya tanpa jaringan: DDL dari berkas migrasi, kueri dari berkas sumber.
 
-### Perubahan cakupan di `owner-dashboard-test.js` yang perlu dibenarkan
+### Perubahan cakupan di `tests/owner-dashboard-test.js` yang perlu dibenarkan
 
 `usage_daily` DIKELUARKAN dari daftar "tabel per-orang yang dilarang". Ini bukan pelemahan.
 Larangan lama berdiri di atas `reports/cf-b5-analytics.md` §2.1, yang memuat varian PER-ORANG
@@ -190,7 +190,7 @@ Yang ada di produksi adalah `(day, bucket, count)` dengan bucket berenum tertutu
 identitas. Gantinya, dua tabel yang MEMANG berbahaya dimasukkan eksplisit ke daftar larangan:
 `dau_dedup` (token per-perangkat) dan `pepper_state` (bahan rahasia HMAC). Keduanya ada di
 database yang sama, jadi tanpa baris itu tidak ada apa pun yang mencegah dashboard membacanya.
-Cakupan lima-tabel yang lengkap ditegakkan di `d1-schema-contract-test.js` langsung terhadap DDL.
+Cakupan lima-tabel yang lengkap ditegakkan di `tests/d1-schema-contract-test.js` langsung terhadap DDL.
 
 Fixture D1 di gerbang itu juga ditulis ulang ke bentuk PANJANG dan dua pabrik stub yang dulu
 terpisah disatukan (`makeD1`). Fixture LEBAR yang lama bukan sekadar usang — ia MENGUNCI skema
@@ -276,7 +276,7 @@ Kasus `metrik_tanpa_penulis` memakai `visitors`, metrik yang benar-benar dirujuk
 versi lama dan tidak pernah ditulis siapa pun.
 
 Selama menyusun matriks ini, dua kasus awalnya TIDAK memerah dan itu mengungkap lubang nyata di
-gerbang, bukan kesalahan skrip: (a) `owner-dashboard-test.js` menerima `STATE_MEASURED` sebagai
+gerbang, bukan kesalahan skrip: (a) `tests/owner-dashboard-test.js` menerima `STATE_MEASURED` sebagai
 jawaban sah untuk periode di luar rentang, dan (b) keadaan `no-data-in-period` mustahil terjadi
 secara struktural. Keduanya ditutup di §5. Ini juga alasan matriks bukti merah dijalankan
 sebelum laporan ditulis, bukan sesudah.
@@ -286,16 +286,16 @@ sebelum laporan ditulis, bukan sesudah.
 Semua exit 0:
 
 ```
-owner-dashboard-test.js        0
-owner-edge-guard-test.js       0
-analytics-privacy-test.js      0
-d1-schema-contract-test.js     0   (38/38)
-no-network-test.js             0
-secret-scan-test.js            0
-gate-registry-test.js          0
-coordination-guard-test.js     0
-regression-test.js             0
-install-health-test.js         0
+tests/owner-dashboard-test.js        0
+tests/owner-edge-guard-test.js       0
+tests/analytics-privacy-test.js      0
+tests/d1-schema-contract-test.js     0   (38/38)
+tests/no-network-test.js             0
+tests/secret-scan-test.js            0
+tests/gate-registry-test.js          0
+tests/coordination-guard-test.js     0
+tests/regression-test.js             0
+tests/install-health-test.js         0
 tools/d2-queries-red-proof.js  0   (PASS 7/7)
 ```
 

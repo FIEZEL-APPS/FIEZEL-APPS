@@ -143,7 +143,7 @@
  * hosting bersama, risiko keracunan, risiko menyimpan `Set-Cookie`) demi 0 ms.
  * Jadi tidak dipasang. Kalau suatu hari Worker mengirim `Cache-Control: public,
  * max-age=N` pada satu jalur bebas-identitas, cache boleh dipertimbangkan lagi —
- * dan `edge-proxy-contract-test.js` butir (c) sudah menunggu untuk menuntut
+ * dan `tests/edge-proxy-contract-test.js` butir (c) sudah menunggu untuk menuntut
  * penjaganya (denylist identitas/kuota + bypass `Set-Cookie`).
  */
 
@@ -188,7 +188,7 @@ const TIMEOUT_FAST_S = 6;
 // [F4-2] Batas kesabaran klien yang dilawan angka di atas, ditulis sebagai konstanta
 // supaya hubungan keduanya tidak hanya hidup di dalam komentar. SUMBER: `HOP_TIMEOUT`
 // di `tools/fiezel-e2e-bridge.mjs`. Kalau angka di sana berubah, angka ini ikut, dan
-// `edge-proxy-hopbyhop-test.js` butir (b) memerah bila TIMEOUT_FAST_S tidak lagi lebih
+// `tests/edge-proxy-hopbyhop-test.js` butir (b) memerah bila TIMEOUT_FAST_S tidak lagi lebih
 // pendek darinya.
 const CLIENT_ABANDON_S = 8;
 

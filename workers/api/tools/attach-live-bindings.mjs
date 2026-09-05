@@ -11,11 +11,11 @@
  *    peringatan, deploy tetap "sukses". Pencocokan nama di `attach-live-bindings-core.mjs`
  *    memakai `===` (nama persis), bukan substring, sehingga "fiezel-core-staging"
  *    tidak akan pernah cocok dengan permintaan "fiezel-core". Diuji langsung di
- *    `attach-live-bindings-test.js` (root repo).
+ *    `tests/attach-live-bindings-test.js` (root repo).
  *  - Placeholder yang tidak ada di akun (mis. EVIDENCE_DB sebelum dibuat) harus
  *    LEPAS bloknya, bukan gagal — aturan yang identik dengan
  *    `.github/workflows/deploy-api-worker.yml` (dan diuji bersama di
- *    `deploy-api-binding-guard-test.js`), supaya CI dan penempelan manual
+ *    `tests/deploy-api-binding-guard-test.js`), supaya CI dan penempelan manual
  *    pertama tidak punya dua kebijakan berbeda.
  *  - Berkas ini TIDAK PERNAH commit `wrangler.toml` yang sudah terisi: ia
  *    menulis lalu MENCETAK PENGINGAT untuk mengembalikannya. `wrangler.toml`

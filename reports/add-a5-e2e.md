@@ -5,10 +5,10 @@ Cabang: `add/a5e2e`. Tidak ada bump versi build. Tidak ada push.
 Berkas baru:
 
 - `tools/fiezel-e2e-bridge.mjs` — gerbang E2E browser (Playwright/Chromium), env-gated, TIDAK didaftarkan di CI.
-- `e2e-bridge-selftest.js` — self-test 21 skenario loopback (1 benar, 20 salah) untuk gerbang di atas. Didaftarkan di CI.
+- `tests/e2e-bridge-selftest.js` — self-test 21 skenario loopback (1 benar, 20 salah) untuk gerbang di atas. Didaftarkan di CI.
 - `reports/add-a5-data/` — bukti mentah: laporan JSON live, 4 tangkapan layar, log self-test.
 
-Berkas yang disentuh: `.github/workflows/quality.yml` (satu langkah baru + alasan), `no-network-test.js` (allowlist + blok pemeriksaan baru).
+Berkas yang disentuh: `.github/workflows/quality.yml` (satu langkah baru + alasan), `tests/no-network-test.js` (allowlist + blok pemeriksaan baru).
 
 ---
 
@@ -90,7 +90,7 @@ Diagnosis (lima spike terpisah, kontrol curl lengkap):
 - Tidak bergantung pada aplikasi FIEZEL (terulang di halaman kosong), tidak bergantung HTTP/2 vs HTTP/1.1 (`--disable-http2`), dan tidak bergantung pada `POST /api/auth/anon` (terulang dengan cookie yang sudah disemai lebih dulu).
 - **curl tidak mereproduksinya**: 5 permintaan pada satu koneksi HTTP/2 yang sama semuanya ~0,9 s, bahkan dengan header lengkap gaya browser (`Accept-Encoding: gzip, deflate, br, zstd`, `Sec-Fetch-*`, `Referer`, UA iPhone).
 
-Kesimpulan: ini cacat interop Chromium ↔ jembatan di sisi origin (kemungkinan proxy PHP ArenHost), bukan cacat Worker dan bukan cacat aplikasi. Ia **tidak terlihat** oleh `cf-live-contract-test.js` yang lulus 33 assert lewat curl. Persis kelas cacat yang membuat gerbang browser layak ada. Untuk pengguna nyata artinya: sesi ke-3 dan seterusnya dalam satu koneksi hangat bisa menggantung sampai ~30 s sebelum gagal.
+Kesimpulan: ini cacat interop Chromium ↔ jembatan di sisi origin (kemungkinan proxy PHP ArenHost), bukan cacat Worker dan bukan cacat aplikasi. Ia **tidak terlihat** oleh `tests/cf-live-contract-test.js` yang lulus 33 assert lewat curl. Persis kelas cacat yang membuat gerbang browser layak ada. Untuk pengguna nyata artinya: sesi ke-3 dan seterusnya dalam satu koneksi hangat bisa menggantung sampai ~30 s sebelum gagal.
 
 Karena cacat ini akan meracuni assert lain (panggilan yang menggantung tampak seperti "aplikasi tidak memanggil"), ia dijadikan assert kelas satu (`bridge-hop-stable`, skenario `D-hop-stabil`) dengan browser terpisah per skenario — bukan dibiarkan mengotori skenario cookie.
 
@@ -119,7 +119,7 @@ Cara kerjanya, dan mengapa begitu:
 
 Batas kejujuran yang perlu dicatat:
 
-1. **Service worker tidak teruji.** Sertifikat self-signed membuat pendaftaran SW gagal, jadi jalur cache SW tidak masuk gerbang ini. Itu ditutup `pwa-cache-test.js` dan `sw-corp-test.js`, bukan di sini.
+1. **Service worker tidak teruji.** Sertifikat self-signed membuat pendaftaran SW gagal, jadi jalur cache SW tidak masuk gerbang ini. Itu ditutup `tests/pwa-cache-test.js` dan `tests/sw-corp-test.js`, bukan di sini.
 2. **Probe boot mengukur "ada isi ter-render", bukan "aplikasi benar".** Ia menuntut ≥200 karakter `innerText` dari elemen yang benar-benar tercat, disisipkan **sesudah** `DOMContentLoaded`, di luar splash statis. Aturan "sesudah DOMContentLoaded" itu bukan hiasan: tanpanya markup statis panjang membuat probe mengaku "boot" tanpa satu byte pun render JS.
 3. Gerbang ini menguji satu aplikasi di satu viewport ponsel (390×844, dsf 3, UA iPhone). Ia bukan uji lintas-browser.
 
@@ -133,18 +133,18 @@ Ini alasan kontrol negatif wajib ada. Kedua cacat di bawah membuat gerbang melap
 2. Pendengar `response` menunggu `response.text()` **sebelum** mendaftarkan entri ⇒ jawaban yang badannya tidak selesai dibaca hilang total dari daftar ⇒ gerbang kembali bilang "tidak pernah menerima jawaban" untuk jawaban yang jelas diterima. Diganti: daftarkan entri dulu, isi badan belakangan.
 3. `config-non-blocking` semula membandingkan `Date.now()` di Node saat peristiwa `response` tiba. CDP mengantar peristiwa beberapa milidetik terlambat, jadi aplikasi yang **jelas menahan boot** sampai config datang tetap dinilai lulus. Diganti: cap waktu dari timing browser (`startTime + responseStart`) dengan margin 100 ms, dan penundaan bawaan dinaikkan ke 8.000 ms supaya uji ini bukan lomba antara boot lambat (~3,5 s) dan jawaban cepat.
 
-4. Jalur SKIP menulis `E2E-BRIDGE-REPORT.json` ke akar repo setiap kali `no-network-test.js` menjalankannya untuk membuktikan SKIP-nya bersih — artefak yang mengotori working tree hanya karena ada uji lain yang memeriksanya. Sekarang SKIP menulis laporan **hanya** kalau `FIEZEL_E2E_REPORT` diset eksplisit, dan self-test punya probe khusus tanpa env itu yang menuntut akar repo tetap bersih.
+4. Jalur SKIP menulis `E2E-BRIDGE-REPORT.json` ke akar repo setiap kali `tests/no-network-test.js` menjalankannya untuk membuktikan SKIP-nya bersih — artefak yang mengotori working tree hanya karena ada uji lain yang memeriksanya. Sekarang SKIP menulis laporan **hanya** kalau `FIEZEL_E2E_REPORT` diset eksplisit, dan self-test punya probe khusus tanpa env itu yang menuntut akar repo tetap bersih.
 
 Sebelum perbaikan ini, gerbang "live" akan tetap merah dan laporannya akan menuduh produk. Tanpa self-test, tuduhan itu akan saya tulis sebagai temuan.
 
 ---
 
-## 4. Pendaftaran CI dan `no-network-test.js`
+## 4. Pendaftaran CI dan `tests/no-network-test.js`
 
-- `quality.yml`: **hanya** `node e2e-bridge-selftest.js` yang didaftarkan, sesudah `node no-network-test.js`, dengan komentar yang menyebut alasannya.
-- `tools/fiezel-e2e-bridge.mjs` **sengaja tidak** didaftarkan. Mendaftarkannya berarti setiap push memaksa produksi melayani sesi anon baru dengan browser sungguhan, dan membuat CI merah karena jaringan, bukan karena kode. Pilihan ini di-assert **dua arah** di `no-network-test.js`: self-test wajib ada di `quality.yml`, gerbang live-nya wajib TIDAK ada. Jadi kalau seseorang memasukkannya "supaya lebih aman", gerbangnya bicara.
-- `SOCKET_ALLOWLIST` naik dari 3 ke 4 nama (`e2e-bridge-selftest.js`), assert jumlahnya diikutkan, dan alasannya ditulis di header berkas: self-test itu butuh server **HTTPS sungguhan** karena browser hanya menyimpan cookie `Secure` dari konteks aman, dan seluruh bukti gerbangnya adalah soal cookie. Semua nama host uji dipetakan ke `127.0.0.1` lewat `--host-resolver-rules`: tanpa DNS, tanpa egress. Pemindainya **tidak** dilonggarkan.
-- Blok baru §2c di `no-network-test.js`: `tools/fiezel-e2e-bridge.mjs` lolos pemindaian hanya karena kebetulan lokasi (`tools/`) dan ekstensi (`.mjs`). Itu justru yang tidak boleh dibiarkan, jadi perilakunya **dijalankan**: harus membaca `FIEZEL_E2E_BRIDGE_BASE`, tidak boleh punya URL remote bawaan (satu `|| 'https://…'` cukup untuk membuat CI publik menembak produksi), dan harus exit 0 + mencetak `SKIP` tanpa env itu.
+- `quality.yml`: **hanya** `node tests/e2e-bridge-selftest.js` yang didaftarkan, sesudah `node tests/no-network-test.js`, dengan komentar yang menyebut alasannya.
+- `tools/fiezel-e2e-bridge.mjs` **sengaja tidak** didaftarkan. Mendaftarkannya berarti setiap push memaksa produksi melayani sesi anon baru dengan browser sungguhan, dan membuat CI merah karena jaringan, bukan karena kode. Pilihan ini di-assert **dua arah** di `tests/no-network-test.js`: self-test wajib ada di `quality.yml`, gerbang live-nya wajib TIDAK ada. Jadi kalau seseorang memasukkannya "supaya lebih aman", gerbangnya bicara.
+- `SOCKET_ALLOWLIST` naik dari 3 ke 4 nama (`tests/e2e-bridge-selftest.js`), assert jumlahnya diikutkan, dan alasannya ditulis di header berkas: self-test itu butuh server **HTTPS sungguhan** karena browser hanya menyimpan cookie `Secure` dari konteks aman, dan seluruh bukti gerbangnya adalah soal cookie. Semua nama host uji dipetakan ke `127.0.0.1` lewat `--host-resolver-rules`: tanpa DNS, tanpa egress. Pemindainya **tidak** dilonggarkan.
+- Blok baru §2c di `tests/no-network-test.js`: `tools/fiezel-e2e-bridge.mjs` lolos pemindaian hanya karena kebetulan lokasi (`tools/`) dan ekstensi (`.mjs`). Itu justru yang tidak boleh dibiarkan, jadi perilakunya **dijalankan**: harus membaca `FIEZEL_E2E_BRIDGE_BASE`, tidak boleh punya URL remote bawaan (satu `|| 'https://…'` cukup untuk membuat CI publik menembak produksi), dan harus exit 0 + mencetak `SKIP` tanpa env itu.
 
 Cara menjalankan gerbang live secara sadar:
 
@@ -165,11 +165,11 @@ Semua dijalankan di worktree ini:
 
 | gerbang | hasil |
 |---|---|
-| `node e2e-bridge-selftest.js` | exit 0 — PASS (32 assert, 21 skenario) |
-| `node no-network-test.js` | exit 0 |
-| `node regression-test.js` | exit 0 |
-| `node install-health-test.js` | exit 0 |
-| `node ui-structure-test.js` | exit 0 |
+| `node tests/e2e-bridge-selftest.js` | exit 0 — PASS (32 assert, 21 skenario) |
+| `node tests/no-network-test.js` | exit 0 |
+| `node tests/regression-test.js` | exit 0 |
+| `node tests/install-health-test.js` | exit 0 |
+| `node tests/ui-structure-test.js` | exit 0 |
 | `node tools/fiezel-e2e-bridge.mjs` (live, opsional) | exit 1 — MERAH 6/22, dua temuan di §1 |
 
 Versi build tidak dinaikkan. Tidak ada push.

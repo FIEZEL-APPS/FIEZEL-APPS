@@ -1,4 +1,4 @@
-# F3 — `cf-shadow-ledger-test.js` merah sesudah merge: diagnosis, akar masalah, perbaikan
+# F3 — `tests/cf-shadow-ledger-test.js` merah sesudah merge: diagnosis, akar masalah, perbaikan
 
 Cabang: `fix/f3ledger`. Tidak ada bump versi (`VERSION.json` tetap `5.19.0`), tidak ada push.
 
@@ -9,7 +9,7 @@ Cabang: `fix/f3ledger`. Tidak ada bump versi (`VERSION.json` tetap `5.19.0`), ti
 ```
 FIEZEL cf-shadow-ledger gate: FAIL (harness melempar)
 TypeError: Cannot read properties of undefined (reading 'match')
-    at cf-shadow-ledger-test.js:473:21
+    at tests/cf-shadow-ledger-test.js:473:21
 ```
 
 Baris 473 adalah assert `(e)`:
@@ -56,21 +56,21 @@ if(self.FiezelCfKillSwitch?.allows?.(key)!==true)return 'off';
 ```
 
 Sejak paket kerja kill switch (`CF-KILLSWITCH-BEGIN/END`) masuk, izin lapis **server** adalah
-gerbang WAJIB dan gagal ke arah MATI. Sandbox `makeTransport` di `cf-shadow-ledger-test.js`
+gerbang WAJIB dan gagal ke arah MATI. Sandbox `makeTransport` di `tests/cf-shadow-ledger-test.js`
 tidak pernah memasang `self.FiezelCfKillSwitch` ⇒ setiap mode jatuh ke `'off'` ⇒
 `cfShadowProbe` tidak pernah dipanggil ⇒ `fetch` mock nol ⇒ `FiezelShadowLedger.observe()`
 tidak pernah menulis ⇒ `rows` kosong ⇒ `rows[0].match` melempar `TypeError`.
 
 Jadi rantainya: **bukan** ekstraksi blok, **bukan** modul ledger, **bukan** blok transport.
 Yang basi adalah ASUMSI harness tentang prasyarat blok transport. Bukti pendukung: gerbang
-saudara `cf-shadow-mode-test.js` sudah diperbarui saat paket itu masuk
-(`if (killSwitch) sandbox.FiezelCfKillSwitch = killSwitch;`, baris 138) — `cf-shadow-ledger-test.js`
+saudara `tests/cf-shadow-mode-test.js` sudah diperbarui saat paket itu masuk
+(`if (killSwitch) sandbox.FiezelCfKillSwitch = killSwitch;`, baris 138) — `tests/cf-shadow-ledger-test.js`
 terlewat. Semua assert `(d)` juga sedang merah/lulus-kosong; `TypeError` di `(e)` hanya
 kegagalan pertama yang berisik.
 
 ## 3. Perbaikan akar masalah (tidak ada assert yang dilemahkan)
 
-Semua perubahan ada di `cf-shadow-ledger-test.js`. `app.js` dan
+Semua perubahan ada di `tests/cf-shadow-ledger-test.js`. `app.js` dan
 `features/cf-shadow/fiezel-shadow-ledger.js` **tidak disentuh** — keduanya benar.
 
 1. **Rantai izin yang nyata, bukan stub.** Harness sekarang memotong DUA blok dari `app.js`
@@ -126,14 +126,14 @@ EXIT=1
 
 | gerbang | exit | hasil |
 |---|---|---|
-| `cf-shadow-ledger-test.js` | 0 | PASS (94 assert; sebelumnya melempar) |
-| `cf-shadow-mode-test.js` | 0 | PASS (38 assert) |
-| `cf-transport-test.js` | 0 | PASS (25 assert) |
-| `cf-config-killswitch-test.js` | 0 | PASS (58 assert) |
-| `ai-transport-switch-test.js` | 0 | PASS (113 assert) |
-| `regression-test.js` | 0 | PASS |
-| `install-health-test.js` | 0 | PASS |
-| `observability-privacy-test.js` | 0 | PASS |
+| `tests/cf-shadow-ledger-test.js` | 0 | PASS (94 assert; sebelumnya melempar) |
+| `tests/cf-shadow-mode-test.js` | 0 | PASS (38 assert) |
+| `tests/cf-transport-test.js` | 0 | PASS (25 assert) |
+| `tests/cf-config-killswitch-test.js` | 0 | PASS (58 assert) |
+| `tests/ai-transport-switch-test.js` | 0 | PASS (113 assert) |
+| `tests/regression-test.js` | 0 | PASS |
+| `tests/install-health-test.js` | 0 | PASS |
+| `tests/observability-privacy-test.js` | 0 | PASS |
 
 ## 5. Jawaban jujur: apakah mode bayangan hari ini benar-benar mencatat?
 

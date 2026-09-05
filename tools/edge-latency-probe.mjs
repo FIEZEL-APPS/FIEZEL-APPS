@@ -16,7 +16,7 @@
  *   cara pakai lalu keluar 2 — supaya ia tidak bisa tersangkut di CI dan menembak
  *   produksi pada setiap push.
  * - BUKAN gerbang CI. Ia berada di `tools/` dan namanya bukan `*-test.js` justru
- *   supaya `no-network-test.js` tidak perlu memberinya pengecualian: gerbang mutu
+ *   supaya `tests/no-network-test.js` tidak perlu memberinya pengecualian: gerbang mutu
  *   tetap nol jaringan, alat ukur tetap alat ukur.
  *
  * PEMAKAIAN

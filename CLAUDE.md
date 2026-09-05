@@ -10,9 +10,14 @@ pre-authorized the following so Claude can work without stopping to ask each tim
 - Still ask first for anything genuinely destructive or hard to undo in a way a normal merge
   isn't: `git push --force` to `main`, `git reset --hard`, deleting data, or anything outside
   this repo.
+- **Repo layout (m025-254)**: root holds the app shell, config, data banks, and the release
+  scripts CI calls; every gate lives in `tests/` (run them from the repo root, e.g.
+  `node tests/regression-test.js`); handoffs in `docs/handoffs/`, other docs in `docs/`,
+  evidence and audit output in `reports/`, one-off harnesses in `tools/dev/`. Gates reach
+  production files through `__fzRoot` (`path.join(__dirname, '..')`) — see `tests/README.md`.
 - Version/build bump ritual (see `core-config.js` `FIEZEL_PAGE_BUILD`, `fiezel-diag-panel.js`
   `DIAG_BUILD`, `sw.js` `SW_REV`) must stay coherent — bump all three together, +1 from the
-  current `m025-N`, per the tests in `install-health-test.js` / `pwa-release-coherence-test.js`.
+  current `m025-N`, per the tests in `tests/install-health-test.js` / `tests/pwa-release-coherence-test.js`.
 - Before calling any change done, run the local test suite (see `.github/workflows/quality.yml`
   for the exact list) and loop until green. Pre-existing unrelated failures (e.g. the
   `vendor/kokoro-js/kokoro.web.js` hash-lock tests, which fail even on a clean `main` checkout

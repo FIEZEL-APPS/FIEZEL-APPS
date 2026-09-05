@@ -17,7 +17,7 @@
  * BEDANYA DENGAN api-index.php — dan alasannya, bukan selera:
  *  - Upstream-nya Worker owner, dan allowlist-nya rute dashboard owner (SUMBER: daftar rute
  *    sungguhan di `workers/owner/index.js` -> `OWNER_ROUTES` + `PUBLIC_ROUTES`; tidak ada rute
- *    yang dikarang di sini, dan gerbang `owner-edge-guard-test.js` membandingkan dua daftar itu
+ *    yang dikarang di sini, dan gerbang `tests/owner-edge-guard-test.js` membandingkan dua daftar itu
  *    baris per baris).
  *  - Jawaban utamanya HTML, bukan JSON. Karena itu `Content-Type: text/html` harus lewat utuh,
  *    dan header keamanan yang sudah dipasang Worker (`Content-Security-Policy`, `X-Robots-Tag:
@@ -104,7 +104,7 @@ const CONNECT_S     = 4;
 
 // Endpoint yang boleh lewat. Default TOLAK: rute baru harus didaftarkan sadar.
 // SUMBER daftar ini: `workers/owner/index.js` (OWNER_ROUTES + PUBLIC_ROUTES). Kalau Worker
-// menambah rute dan daftar ini tidak, gerbang `owner-edge-guard-test.js` MERAH — bukan diam.
+// menambah rute dan daftar ini tidak, gerbang `tests/owner-edge-guard-test.js` MERAH — bukan diam.
 const ALLOW = [
   '/'                => ['GET'],          // HTML dashboard (?period=today|7d|30d|90d)
   '/login'           => ['GET', 'POST'],  // satu-satunya rute publik Worker; POST = form token
@@ -235,7 +235,7 @@ http_response_code($status);
  * `content-type` wajib lewat utuh supaya `text/html; charset=utf-8` tetap HTML (kalau hilang,
  * browser menebak, dan halaman bisa tampil sebagai teks mentah).
  * `location` wajib lewat supaya 303 login/logout berfungsi.
- * Gerbang `owner-edge-guard-test.js` butir (c) mengambil header dari respons HTML Worker yang
+ * Gerbang `tests/owner-edge-guard-test.js` butir (c) mengambil header dari respons HTML Worker yang
  * SUNGGUHAN lalu menuntut setiap satu di antaranya ada di daftar ini — jadi header baru yang
  * dipasang Worker tidak bisa hilang diam-diam di jembatan.
  */

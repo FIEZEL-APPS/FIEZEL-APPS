@@ -2,8 +2,8 @@
 
 Cabang: `work/s1auth` (tidak di-push, versi build tidak diubah)
 Tanggal: 28 Agustus 2026
-Berkas yang disentuh: `workers/api/rate-anon.js`, `rate-anon-test.js` (baru),
-`tools/rate-anon-red-matrix.mjs` (baru, alat bukti merah), `cf-api-contract-test.js`
+Berkas yang disentuh: `workers/api/rate-anon.js`, `tests/rate-anon-test.js` (baru),
+`tools/rate-anon-red-matrix.mjs` (baru, alat bukti merah), `tests/cf-api-contract-test.js`
 (fixture D1), `.github/workflows/quality.yml`, `workers/api/wrangler.toml`,
 `workers/api/README.md`, laporan ini.
 NOL berkas di `features/`, `app.js`, `sw.js`, `core-config.js`, `workers/owner/`,
@@ -40,7 +40,7 @@ Dua hal yang perlu dicatat supaya diagnosisnya tidak salah alamat:
 
 - `CF-Connecting-IP` **tidak pernah** menjadi sinyal cabang. Ia hanya kunci ember.
   Jadi "jembatan sudah lepas dan IP sudah asli" tidak otomatis memperbaiki tarif.
-- Tidak ada satu pun gerbang yang menjaga pemilihan cabang ini. `edge-guard-test.js`
+- Tidak ada satu pun gerbang yang menjaga pemilihan cabang ini. `tests/edge-guard-test.js`
   hanya meng-assert bahwa `mw-edge.js` MENYEBUT `rate-anon.js`, bukan bahwa tarif
   yang terpilih benar. Itu sebabnya kesalahannya bisa hidup tanpa terlihat.
 
@@ -144,7 +144,7 @@ Catatan jujur soal cakupan: gerbang menguji kegagalan pada pernyataan `anon_issu
 saja. Kalau SELURUH D1 mati, penerbitan gagal di tempat lain (`ensureIdentityRow`)
 dan itu keadaan berbeda yang bukan wewenang berkas ini.
 
-## 5. Gerbang `rate-anon-test.js` — matriks merah/hijau
+## 5. Gerbang `tests/rate-anon-test.js` — matriks merah/hijau
 
 Node murni, nol jaringan, menjalankan Worker `workers/api/` yang sungguhan lewat
 `tools/cf-test-harness.js`. **76/76 assert PASS.** Setiap kelompok assert dibuktikan
@@ -171,7 +171,7 @@ memenuhi batas pada 09:52 tetap 429 pada 10:01 (assert e4) dan baru lolos pada 1
 ketika ember tertua benar-benar keluar dari jendela (e5).
 
 Gerbang terdaftar di `.github/workflows/quality.yml` tepat sesudah
-`node edge-guard-test.js`, dan gerbang itu meng-assert pendaftarannya sendiri (h).
+`node tests/edge-guard-test.js`, dan gerbang itu meng-assert pendaftarannya sendiri (h).
 
 ## 6. Lapisan kedua: plafon neuron tingkat AKUN (verifikasi, nol edit)
 
@@ -195,11 +195,11 @@ Penegakan itu OPSIONAL per pemanggil: `route-ai.js` hanya memakai pagar akun kal
 `typeof deps.accountBudget === 'function'`. Jalur registrasi lain (atau yang ditulis
 nanti) yang lupa menyuntikkan dep itu akan melewati plafon akun **tanpa satu pun
 galat** — fail-open karena kelalaian. Tidak ada gerbang yang saat ini meng-assert
-penyambungan itu (`grep accountBudget` di `cf-wiring-test.js`, `quota-*-test.js`,
-`d1-schema-contract-test.js` nol hasil). Yang menutupnya: assert di `cf-wiring-test.js`
+penyambungan itu (`grep accountBudget` di `tests/cf-wiring-test.js`, `quota-*-test.js`,
+`tests/d1-schema-contract-test.js` nol hasil). Yang menutupnya: assert di `tests/cf-wiring-test.js`
 bahwa setiap pemanggil `routeAi` menyertakan `accountBudget`, atau ubah dep itu jadi
 WAJIB di `route-ai.js` (menolak kalau tidak ada) — keduanya menyentuh berkas milik
-paket lain. `rate-anon-test.js` menahannya secara sah: ia meng-assert celah ini
+paket lain. `tests/rate-anon-test.js` menahannya secara sah: ia meng-assert celah ini
 tertulis di laporan ini (g6), jadi ia tidak bisa hilang tanpa jejak.
 
 Dua catatan lain, bukan celah tetapi batas cakupan: jalur TTS tidak dilindungi
@@ -274,9 +274,9 @@ degradasi — cek `wrangler tail` untuk galat binding.
 
 ## 9. Gerbang yang dijalankan (semua exit 0)
 
-`rate-anon-test.js` (76/76), `cf-api-contract-test.js` (237/237), `cf-wiring-test.js`,
-`quota-core-test.js`, `quota-manipulation-test.js`, `d1-schema-contract-test.js`
-(38/38), `analytics-privacy-test.js`, `no-network-test.js` (41 assert, 169 gerbang
-dipindai), `secret-scan-test.js` (46/46), `gate-registry-test.js`,
-`coordination-guard-test.js` (24/24), `regression-test.js`, `install-health-test.js`,
-`edge-guard-test.js` (190/190).
+`tests/rate-anon-test.js` (76/76), `tests/cf-api-contract-test.js` (237/237), `tests/cf-wiring-test.js`,
+`tests/quota-core-test.js`, `tests/quota-manipulation-test.js`, `tests/d1-schema-contract-test.js`
+(38/38), `tests/analytics-privacy-test.js`, `tests/no-network-test.js` (41 assert, 169 gerbang
+dipindai), `tests/secret-scan-test.js` (46/46), `tests/gate-registry-test.js`,
+`tests/coordination-guard-test.js` (24/24), `tests/regression-test.js`, `tests/install-health-test.js`,
+`tests/edge-guard-test.js` (190/190).

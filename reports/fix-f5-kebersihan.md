@@ -23,20 +23,20 @@ diam-diam:
 
 | Berkas | Hasil dijalankan | Tindakan |
 |---|---|---|
-| `bank-soal-audit-test.js` | exit 0 | **DIDAFTARKAN**, tepat setelah `node content-integrity-gate-test.js` |
-| `app-report-control-path-test.js` | exit 0 | **DIDAFTARKAN**, tepat setelah `node remote-push-test.js` |
+| `tests/bank-soal-audit-test.js` | exit 0 | **DIDAFTARKAN**, tepat setelah `node tests/content-integrity-gate-test.js` |
+| `tests/app-report-control-path-test.js` | exit 0 | **DIDAFTARKAN**, tepat setelah `node tests/remote-push-test.js` |
 | `audit/bank-audit.js` | exit 0 — tapi **selalu** exit 0 | **TIDAK didaftarkan**, masuk daftar pengecualian |
 
 Kenapa `audit/bank-audit.js` tidak didaftarkan: ia bukan gerbang, ia penghasil laporan. Nol
 assert, nol `process.exitCode`, menulis `audit/BANK-SOAL-AUDIT.json` lalu keluar 0 apa pun
 yang ia temukan — dan temuannya hari ini pun tidak nol. Mendaftarkannya berarti menambah satu
 langkah yang hijau selamanya, yaitu tepat jenis langkah yang membuat hitungan "gerbang hijau"
-berbohong. Sisi bank soal yang **harus** bisa merah sudah dijaga `bank-soal-audit-test.js`.
+berbohong. Sisi bank soal yang **harus** bisa merah sudah dijaga `tests/bank-soal-audit-test.js`.
 
 Tidak ada gerbang yang gagal saat dijalankan, jadi tidak ada cacat produk maupun gerbang basi
 yang perlu dilaporkan di sini.
 
-### Gerbang meta: `gate-registry-test.js` (baru, 382 baris, 10 assert, exit 0)
+### Gerbang meta: `tests/gate-registry-test.js` (baru, 382 baris, 10 assert, exit 0)
 
 Ia membuat kondisi di atas mustahil terulang tanpa terlihat:
 
@@ -70,21 +70,21 @@ terdokumentasi. Menghapusnya bukan keputusan saya, jadi ini daftarnya untuk owne
 
 `analysis/vchunk-baseline.js`, `audit/repair-listening-bank.js`, `audit/repair-reading-bank.js`,
 `audit/repair-reading-stem-unique.js`, `audit/translate-listening-full.js`,
-`fiezel-evolution-loop-demo.js`, `repair-content-integrity.js`, `tools/run-core-batch.js`,
-`adaptivity-simulation.js`, `grammar-provenance-verify.js`, `m02526-*.mjs`,
+`tools/dev/fiezel-evolution-loop-demo.js`, `tools/dev/repair-content-integrity.js`, `tools/run-core-batch.js`,
+`adaptivity-simulation.js`, `tools/dev/grammar-provenance-verify.js`, `m02526-*.mjs`,
 `tools/reading-bank-*.mjs`, `design/redesign-v1/**`.
 
 Positif palsu yang sempat muncul dan sengaja dibiarkan:
 `features/speaking-listening/listening-scenarios-a2..c2.js` terlihat berujuk-nol oleh grep
 statis tapi di-`require()` secara dinamis dari `listening-lint.js:20` dan
-`rebuild-speaking-listening-data.js:63,81`.
+`tools/dev/rebuild-speaking-listening-data.js:63,81`.
 
 ---
 
 ## 3. Bukti WER yang hilang
 
 Angka `0.038` dan `0.018` (`tools/prerender-tts.mjs:87,96`, di-assert
-`prerender-plan-test.js:146`) memang tidak punya bukti di repo. Artefak mentahnya **ADA** di
+`tests/prerender-plan-test.js:146`) memang tidak punya bukti di repo. Artefak mentahnya **ADA** di
 `/home/user/workspace/tts-pilot/` dan sudah dipindahkan ke `reports/evidence/tts-wer/`
 (total 20 KB):
 
@@ -128,9 +128,9 @@ Tiga tempat diperbaiki:
    bawah judul V6 tanpa menyebut metriknya. Sekarang setiap angka membawa nama metrik, cara
    ukur, pola pemanggilan, dan status produksinya; ditambah kalimat tegas bahwa 449 ms bukan
    angka Library.
-2. **`voice-callsite-prefetch-test.js` header** — sama, plus alinea khusus "angka mana untuk
+2. **`tests/voice-callsite-prefetch-test.js` header** — sama, plus alinea khusus "angka mana untuk
    pekerjaan mana" dan "angka mana yang berlaku untuk produksi".
-3. **`voice-callsite-prefetch-test.js` blok laporan** — dulu memancarkan
+3. **`tests/voice-callsite-prefetch-test.js` blok laporan** — dulu memancarkan
    `jedaTerdengarSebelumMs: 4510.7` / `jedaTerdengarSesudahMs: 797.2` seolah itu hasil ukur
    gerbang V6 ini. Diganti objek `metrics` dengan tiga cabang bernama
    (`v5MesinPrefetch`, `v6SisiPemanggil`, `v6NarasiLibraryTerkirim`), masing-masing membawa
@@ -150,7 +150,7 @@ merangkai kedua angka; `RELEASE-NOTES.md` dan CHANGELOG tidak menyebutnya sama s
 
 ## 5. Gerbang cf-live yang SKIP diam-diam di CI
 
-Sebelumnya `node cf-live-contract-test.js` dan `node staging-live-test.js` ikut dijalankan di
+Sebelumnya `node tests/cf-live-contract-test.js` dan `node tests/staging-live-test.js` ikut dijalankan di
 dalam blok besar "Core validation" **tanpa env apa pun**, jadi keduanya SKIP dalam senyap dan
 ikut terhitung ke dalam "146 hijau". CI tidak boleh menembak produksi setiap push, jadi
 solusinya bukan mengaktifkannya, melainkan membuat SKIP-nya jujur dan menyediakan jalur
@@ -164,15 +164,15 @@ sengaja:
 - Jalur sengaja: `workflow_dispatch` dengan input `cf_live_base` dan `staging_base`, keduanya
   default kosong. Env diambil dari input itu (`FIEZEL_CF_LIVE_BASE`, `FIEZEL_STAGING_BASE`,
   plus `FIEZEL_STAGING_EDGE` dari secret). **Tidak ada URL bawaan** di workflow.
-- `gate-registry-test.js` meng-assert tujuh sifat (L1–L7), termasuk: langkahnya punya nama
+- `tests/gate-registry-test.js` meng-assert tujuh sifat (L1–L7), termasuk: langkahnya punya nama
   sendiri, namanya menyebut SKIP, alasannya dicetak ke `::notice` + step summary, env-nya
   datang dari input dispatch dan bukan URL yang dipaku, input dispatch-nya benar ada,
   **gerbang live tidak dihitung ke `evidenceGates`**, dan gerbang live tetap **gagal keras**
   (exit ≠ 0) kalau env-nya diisi nilai rusak — diuji dengan `bukan-url-sama-sekali`.
 
-### Efek samping yang harus disebut: `no-network-test.js` ikut diperbaiki
+### Efek samping yang harus disebut: `tests/no-network-test.js` ikut diperbaiki
 
-Dua assert di `no-network-test.js` dulu memeriksa **kalimat komentar literal** ("SKIP sampai
+Dua assert di `tests/no-network-test.js` dulu memeriksa **kalimat komentar literal** ("SKIP sampai
 owner menyetel base URL") sebagai bukti bahwa langkah live mati secara bawaan. Itu proksi
 lemah dari dua arah, dan justru terbukti: komentarnya lolos hijau padahal mekanismenya tidak
 ada sama sekali. Sekarang yang di-assert adalah mekanismenya — env live terikat ke input
@@ -183,7 +183,7 @@ live. Gerbangnya jadi 39 assert, exit 0.
 
 ## 6. Di luar lingkup, tapi ikut ditutup: kredensial sesi nyata ter-commit
 
-`secret-scan-test.js` sudah **MERAH sebelum** pekerjaan ini dimulai (diverifikasi dengan
+`tests/secret-scan-test.js` sudah **MERAH sebelum** pekerjaan ini dimulai (diverifikasi dengan
 menjalankannya pada HEAD bersih lewat `git stash -u`). Penyebabnya:
 `reports/add-a5-data/e2e-bridge-live-2026-08-28.json`, artefak uji E2E terhadap jembatan
 **produksi** yang ikut menyimpan nilai cookie apa adanya — token sesi `fz_id` (JWT lengkap
@@ -207,13 +207,13 @@ bisa diselesaikan dari branch ini.
 
 Semua exit 0, dijalankan di `/home/user/workspace/wt-f5house`:
 
-`gate-registry-test.js`, `bank-soal-audit-test.js`, `app-report-control-path-test.js`,
-`voice-callsite-prefetch-test.js`, `no-network-test.js`, `regression-test.js`,
-`install-health-test.js`, `secret-scan-test.js`, `pwa-cache-test.js`, `sw-corp-test.js`,
-`boot-order-test.js`.
+`tests/gate-registry-test.js`, `tests/bank-soal-audit-test.js`, `tests/app-report-control-path-test.js`,
+`tests/voice-callsite-prefetch-test.js`, `tests/no-network-test.js`, `tests/regression-test.js`,
+`tests/install-health-test.js`, `tests/secret-scan-test.js`, `tests/pwa-cache-test.js`, `tests/sw-corp-test.js`,
+`tests/boot-order-test.js`.
 
 Tidak ada bump versi (`VERSION.json`, `version.js`, `sw.js` `SW_REV` tidak berubah — cek
 `git diff --cached` bersih untuk ketiganya). Tidak ada push.
 
-Catatan lingkungan, bukan kegagalan: `e2e-level-grammar-test.js` mencetak SKIPPED karena tidak
-ada Chromium di sandbox, dan `release-audit-gate-test.js` butuh ~339 detik kalau dijalankan.
+Catatan lingkungan, bukan kegagalan: `tests/e2e-level-grammar-test.js` mencetak SKIPPED karena tidak
+ada Chromium di sandbox, dan `tests/release-audit-gate-test.js` butuh ~339 detik kalau dijalankan.

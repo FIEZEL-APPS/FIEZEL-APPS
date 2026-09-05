@@ -13,9 +13,9 @@ benar-benar memanggil CF, dan memang tidak bisa: `FIEZEL_CF_CONFIG.base` kosong 
 |---|---|
 | `core-config.js` | Blok BARU `self.FIEZEL_CF_CONFIG` = `{enabled:false, base:'', endpoints:{health,config,auth,quota,ai,tts,usage → 'off'}}`, `Object.freeze` dua lapis. `FIEZEL_CORE_CONFIG.workerUrl` **tidak disentuh**. |
 | `app.js` | Blok `CF-TRANSPORT-BEGIN/END` di depan `coreWorkerExec`: pra-cabang `on`/`shadow`/`off`. Jalur Puter hari ini dipindahkan APA ADANYA ke `corePuterExec` (ekor `const sdk=await awaitPuter();…` utuh). |
-| `cf-transport-test.js` | `REQUIRE_CF_FLAGS = true`; tiga assert yang dulu SKIP kini berjalan atas NILAI hasil evaluasi vm. |
-| `cf-shadow-mode-test.js` | **BARU** — gerbang perilaku (36 assert), menjalankan blok transport `app.js` di dalam `vm`. |
-| `.github/workflows/quality.yml` | `node cf-shadow-mode-test.js` didaftarkan sesudah `cf-transport-test.js`. |
+| `tests/cf-transport-test.js` | `REQUIRE_CF_FLAGS = true`; tiga assert yang dulu SKIP kini berjalan atas NILAI hasil evaluasi vm. |
+| `tests/cf-shadow-mode-test.js` | **BARU** — gerbang perilaku (36 assert), menjalankan blok transport `app.js` di dalam `vm`. |
+| `.github/workflows/quality.yml` | `node tests/cf-shadow-mode-test.js` didaftarkan sesudah `tests/cf-transport-test.js`. |
 
 Tidak ada bump invarian build (`SW_REV`, `DIAG_BUILD`, `FIEZEL_PAGE_BUILD` tetap `m025-168`) —
 itu wewenang MASTER saat merge. `*-REPORT.json` yang berubah sudah di-restore.
@@ -31,7 +31,7 @@ runbook, dan jawaban `GET /api/config` di server. Dua kosakata berbeda untuk sat
 adalah cara paling mudah memutar flag yang salah pada jam paling buruk.
 
 Konsekuensinya: assertion `routes`/`fallbackToPuter`/`shadowSampleRate` di
-`cf-transport-test.js` disesuaikan ke `enabled`/`base`/`endpoints`. **Tidak ada jaminan yang
+`tests/cf-transport-test.js` disesuaikan ke `enabled`/`base`/`endpoints`. **Tidak ada jaminan yang
 dilonggarkan** — daftarnya justru bertambah (nilai mode divalidasi terhadap himpunan
 `off|shadow|on`, tujuh kunci endpoint wajib ada, `endpoints` wajib ikut `Object.freeze`).
 Rollback per-request `fallbackToPuter` dari draf **tidak** dipasang: pada fase ini tidak ada
@@ -42,7 +42,7 @@ menyalakan endpoint pertama, `fallbackToPuter` (atau padanannya) HARUS ditambahk
 endpoint itu, bukan sesudahnya.
 
 `workerUrl` tetap `https://fiezel-core.puter.work` + `deploymentState:'validated'`;
-`remote-push-test.js` hijau (`liveDeploymentConfigured:true`).
+`tests/remote-push-test.js` hijau (`liveDeploymentConfigured:true`).
 
 ## 2. Pra-cabang di `coreWorkerExec`
 
@@ -74,9 +74,9 @@ Yang dijaga di mode `shadow`, karena inilah yang bisa melukai murid:
 - Perbandingan status Puter vs CF hanya masuk `console.debug('[cf-shadow]', …)`.
 
 Gate yang tetap hijau karena pra-cabangnya sisipan, bukan penulisan ulang:
-`boot-order-test.js:273` (ekor `const sdk=await awaitPuter();if(sdk?.workers?.exec)` utuh di
-`corePuterExec`), `core-brain-test.js:3-4`, `remote-push-test.js:10`
-(`puter.workers.exec` + `coreWorkerExec` masih ada), `regression-test.js:14`.
+`tests/boot-order-test.js:273` (ekor `const sdk=await awaitPuter();if(sdk?.workers?.exec)` utuh di
+`corePuterExec`), `tests/core-brain-test.js:3-4`, `tests/remote-push-test.js:10`
+(`puter.workers.exec` + `coreWorkerExec` masih ada), `tests/regression-test.js:14`.
 
 ## 3. `protocol:'1.7'` tidak dilonggarkan
 
@@ -92,10 +92,10 @@ ukuran yang sama dengan jawaban Puter.
 `FIEZEL_CF_CONFIG.enabled=false` mematikan SELURUH jalur CF walau ketujuh endpoint bernilai
 `'on'`: `CF_ENABLED = enabled===true && base!==''`, dan `cfEndpointMode()` mengembalikan
 `'off'` sebelum melihat nilai endpoint. Diuji dengan menjalankan sepuluh path
-(`cf-shadow-mode-test.js` butir d), bukan dengan membaca kode.
+(`tests/cf-shadow-mode-test.js` butir d), bukan dengan membaca kode.
 
 **Sakelar statis ini BUKAN kill switch instan** — dicatat sebagai komentar di `core-config.js`
-dan di-assert oleh `cf-transport-test.js`. `core-config.js` ada di daftar precache
+dan di-assert oleh `tests/cf-transport-test.js`. `core-config.js` ada di daftar precache
 `sw.js:35` (ASSETS) dan dilayani cache-first, jadi mengubah nilainya **tidak** menjangkau PWA
 yang sudah terpasang sampai `SW_REV` naik dan generasi shell baru terpasang. Kill switch yang
 nyata ada di server: `GET /api/config` pada Worker CF (KV `cfg:flags`), efek ≤60 detik tanpa
@@ -103,20 +103,20 @@ rilis. Flag statis = lapis KEDUA.
 
 ## 5. Gerbang
 
-`cf-transport-test.js`: `REQUIRE_CF_FLAGS = true`. Tiga assert yang sebelumnya SKIP sekarang
+`tests/cf-transport-test.js`: `REQUIRE_CF_FLAGS = true`. Tiga assert yang sebelumnya SKIP sekarang
 berjalan dan lulus dengan nama yang sama — `Struktur FIEZEL_CF_CONFIG`,
 `Semua nilai flag CF default OFF`, `Jalur rollback CF ada dan hidup` — masing-masing atas
 nilai hasil evaluasi `core-config.js` di dalam `vm`, ditambah assert pecahan supaya kegagalan
 menunjuk bagian mana yang salah. Hasil: **PASS 25 assert, 0 SKIP**.
 
-`cf-shadow-mode-test.js` (BARU, 36 assert, nol dependency/jaringan): memotong blok transport
+`tests/cf-shadow-mode-test.js` (BARU, 36 assert, nol dependency/jaringan): memotong blok transport
 dari `app.js` lewat sentinel `CF-TRANSPORT-BEGIN/END`, menjalankannya di `vm` dengan `fetch`
 mock lokal, lalu meng-assert (a) mode off = jalur pemanggilan identik + nol fetch + objek
 `options` yang sama, (b) shadow tidak pernah memakai jawaban CF, (c) shadow tidak menggandakan
 efek samping, (d) `enabled:false` mengalahkan semua `'on'`, (e) nol URL Cloudflare hardcode di
 `app.js`. Anti-vakum: mode `'on'` ikut dijalankan dan dibuktikan benar-benar memakai CF dengan
 `credentials:'include'` — tanpa itu, (a)-(d) hanya menguji ruang kosong. Terdaftar di
-`quality.yml` (dan `cf-transport-test.js` ikut meng-assert pendaftaran itu).
+`quality.yml` (dan `tests/cf-transport-test.js` ikut meng-assert pendaftaran itu).
 
 ## 6. Verifikasi (semua exit 0, dijalankan lokal)
 

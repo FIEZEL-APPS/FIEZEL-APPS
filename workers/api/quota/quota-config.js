@@ -4,7 +4,7 @@
  * SATU-SATUNYA tempat angka kuota hidup (bab 10: "jangan sebarkan angka quota ke banyak
  * file"). Desain: reports/cf-b3-quota.md §2. Angka: reports/cf-a10-cost.md §6.
  *
- * ATURAN BERKAS INI, ditegakkan gerbang `quota-core-test.js`:
+ * ATURAN BERKAS INI, ditegakkan gerbang `tests/quota-core-test.js`:
  *   - TANPA `import` / `require`  → tidak bisa menarik state dari mana pun
  *   - TANPA `Date.now()`          → tidak ada waktu tersembunyi; waktu selalu parameter
  *   - TANPA `env` / `globalThis`  → nilainya sama di test dan di produksi

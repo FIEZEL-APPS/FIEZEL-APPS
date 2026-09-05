@@ -21,7 +21,7 @@ satu pun gerbang:
 
 ## 2. Berkas baru
 
-### `cf-live-contract-test.js` (gerbang, 33 assert saat semua rute hidup)
+### `tests/cf-live-contract-test.js` (gerbang, 33 assert saat semua rute hidup)
 
 Menguji Worker HIDUP lewat HTTP nyata. Tanpa `FIEZEL_CF_LIVE_BASE` ia mencetak alasan jujur dan
 **exit 0 (SKIP)**. SKIP sengaja **bukan** PASS: statusnya `SKIP` dengan `pass: null` di laporan, dan
@@ -30,7 +30,7 @@ mengutipnya sebagai bukti runtime.
 
 Tidak ada URL bawaan. `|| 'https://api.fiezel.my.id'` di dalam kode akan membuat CI publik
 menembak produksi pada setiap push; larangan itu bukan hanya komentar, ia ikut di-assert oleh
-`no-network-test.js`.
+`tests/no-network-test.js`.
 
 `FIEZEL_CF_LIVE_BASE` yang diset **tapi tak sah** = MERAH, bukan SKIP: env yang diset berarti
 seseorang memang meminta pengujian nyata, jadi typo harus terlihat.
@@ -56,7 +56,7 @@ Dua kontrol positif itu load-bearing, bukan hiasan:
 - `anon-200` dengan body `{}` — tanpanya, 413 pada butir cap byte bisa datang dari "semua POST
   ditolak".
 
-### `cf-live-selftest.js` (pembuktian bahwa gerbang di atas bisa MERAH)
+### `tests/cf-live-selftest.js` (pembuktian bahwa gerbang di atas bisa MERAH)
 
 Aku **tidak punya** akses ke Worker hidup, jadi tidak ada satu pun hasil uji nyata yang diklaim di
 sini. Yang dibuktikan adalah hal lain: gerbangnya tidak vakum. Server HTTP loopback
@@ -76,7 +76,7 @@ hijau; alasannya ditulis di komentar berkas supaya tidak diperbaiki balik.
 
 ## 3. Matriks hasil self-test (dijalankan, bukan diperkirakan)
 
-`node cf-live-selftest.js` → **PASS (30 assert, 21 skenario loopback)**, exit 0.
+`node tests/cf-live-selftest.js` → **PASS (30 assert, 21 skenario loopback)**, exit 0.
 
 | skenario yang disuntikkan | diharapkan | hasil | assert yang gagal |
 |---|---|---|---|
@@ -106,28 +106,28 @@ Ditambah tiga assert perilaku lingkungan: tanpa env → exit 0 + label `SKIP` + 
 pesannya menyebut apa yang belum terbukti; base URL tak sah → exit 1; skenario benar menjalankan
 ≥20 assert (hijau-karena-kosong tertangkap).
 
-## 4. `no-network-test.js` — kelonggaran yang ditambahkan, dan kenapa begitu
+## 4. `tests/no-network-test.js` — kelonggaran yang ditambahkan, dan kenapa begitu
 
 Dua perubahan, keduanya membuat kelonggaran **terlihat** alih-alih membiarkannya lolos:
 
-**(a) `SOCKET_ALLOWLIST` 2 → 3 nama**, tambahan `cf-live-selftest.js`. Ia me-`require('node:http')`
+**(a) `SOCKET_ALLOWLIST` 2 → 3 nama**, tambahan `tests/cf-live-selftest.js`. Ia me-`require('node:http')`
 dan `listen(0,'127.0.0.1')` karena server tiruan harus server HTTP sungguhan; kalau tidak, jalur
 yang diuji bukan lagi jalur HTTP gerbang live. Loopback murni, tanpa DNS, tanpa keluar mesin —
-kelas yang sama dengan `http-smoke-test.js`. Assert `SOCKET_ALLOWLIST.size === 2` dinaikkan ke `3`
+kelas yang sama dengan `tests/http-smoke-test.js`. Assert `SOCKET_ALLOWLIST.size === 2` dinaikkan ke `3`
 dengan komentar alasannya; syarat existing tetap diperiksa (berkasnya harus benar-benar loopback
 dan benar-benar masih butuh socket).
 
 **(b) Cakupan pemindaian diperluas ke `*-selftest.js`.** Ini yang paling penting untuk kejujuran:
-pola lama `/-(test|audit)\.js$/` **tidak** mencocokkan `cf-live-selftest.js`, jadi berkas itu akan
+pola lama `/-(test|audit)\.js$/` **tidak** mencocokkan `tests/cf-live-selftest.js`, jadi berkas itu akan
 lolos hanya karena namanya — "lolos karena nama berkas" adalah kebalikan dari daftar yang
 disengaja. Setelah diperluas, ia terpindai, tertangkap sebagai pengguna socket, lalu dimaafkan
 **lewat allowlist**. Cakupan itu ikut di-assert supaya tidak bisa dipersempit balik diam-diam.
 
-**(c) Kelas ketiga baru: `ENV_GATED_LIVE_ALLOWLIST` = {`cf-live-contract-test.js`}.**
-`cf-live-contract-test.js` sebenarnya **tidak** perlu allowlist apa pun: ia tidak me-`require`
+**(c) Kelas ketiga baru: `ENV_GATED_LIVE_ALLOWLIST` = {`tests/cf-live-contract-test.js`}.**
+`tests/cf-live-contract-test.js` sebenarnya **tidak** perlu allowlist apa pun: ia tidak me-`require`
 modul socket dan URL-nya datang dari `process.env`, bukan literal — jadi pemindai teks tidak
 melihatnya sama sekali. Justru itu masalahnya. Gerbang yang lolos diam-diam membuat
-`no-network-test.js` **tampak** melindungi sesuatu yang sudah bocor. Jadi namanya didaftarkan
+`tests/no-network-test.js` **tampak** melindungi sesuatu yang sudah bocor. Jadi namanya didaftarkan
 eksplisit, dengan syarat yang diperiksa (bukan dipercaya):
 
 - harus membaca `FIEZEL_CF_LIVE_BASE`;
@@ -150,7 +150,7 @@ belum dipasang — status itu sudah dilaporkan berkas tersebut sejak sebelum pak
 
 | Berkas | Perubahan |
 |---|---|
-| `.github/workflows/quality.yml` | `node cf-live-selftest.js` lalu `node cf-live-contract-test.js` sesudah `node no-network-test.js`, dengan komentar bahwa langkah live **SKIP sampai owner menyetel base URL** + cara meneruskan `vars.FIEZEL_CF_LIVE_BASE`. Self-test diletakkan sesudah `no-network-test.js` karena ia membuka socket loopback. |
+| `.github/workflows/quality.yml` | `node tests/cf-live-selftest.js` lalu `node tests/cf-live-contract-test.js` sesudah `node tests/no-network-test.js`, dengan komentar bahwa langkah live **SKIP sampai owner menyetel base URL** + cara meneruskan `vars.FIEZEL_CF_LIVE_BASE`. Self-test diletakkan sesudah `tests/no-network-test.js` karena ia membuka socket loopback. |
 | `.gitignore` | `CF-LIVE-REPORT.json` + alasan: isinya bergantung lingkungan (base URL, hasil per assert, daftar permintaan), jadi men-commit-nya hanya menghasilkan konflik dan bukti menyesatkan ("hijau di repo" padahal hijaunya milik lingkungan orang lain). |
 | `tools/cf-live-runner.md` | cara menjalankan (produksi + `*.workers.dev`), tabel env, tabel assert, prasyarat deployment, apa yang **tidak** diuji, cara mengaktifkan di CI, cara menjalankan self-test. |
 
@@ -194,7 +194,7 @@ disunting paket kerja ini. `node --check` bersih untuk kedua berkas baru.
    hanya jalan sungguhan yang akan menunjukkannya. Itu memang gunanya gerbang ini.
 3. **Kuota 25/26, cache TTS, dan cron tidak diuji** oleh gerbang live: ketiganya menulis state
    nyata di `fiezel-core`/`fiezel-stats` dan menjalankannya terhadap produksi akan menghabiskan
-   jatah murid serta mengotori tabel agregat. Buktinya tetap di `cf-wiring-test.js` **di atas
+   jatah murid serta mengotori tabel agregat. Buktinya tetap di `tests/cf-wiring-test.js` **di atas
    stub**. Batas `reports/exec-wiring.md` §6 karena itu **menyempit, tidak hilang**: ia sekarang
    berlaku untuk kuota/TTS/cron saja, bukan untuk seluruh permukaan HTTP. Penutupan penuh butuh
    lingkungan staging terpisah (D1 + KV + R2 sendiri) — itu keputusan owner, bukan pekerjaan agen.
@@ -210,7 +210,7 @@ disunting paket kerja ini. `node --check` bersih untuk kedua berkas baru.
 2. Pastikan prasyarat deploy sudah ada, kalau tidak gerbang akan merah **dengan benar**:
    `SESSION_HMAC_KEY_CURRENT` (tanpa itu `/api/auth/anon` 500), `ALLOWED_ORIGINS`, `COOKIE_DOMAIN`,
    dan migrasi D1 di `workers/api/migrations/MIGRATIONS.md`.
-3. Tinjau kelonggaran `no-network-test.js` di §4. Kalau argumennya tidak diterima, yang benar adalah
+3. Tinjau kelonggaran `tests/no-network-test.js` di §4. Kalau argumennya tidak diterima, yang benar adalah
    mengembalikan assert-nya dan mendiskusikan ulang cakupan gerbang live — bukan mempertahankan
    hijaunya.
 4. Bump invarian build tiga titik saat merge (bukan wewenang paket kerja ini).

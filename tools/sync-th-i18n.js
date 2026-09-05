@@ -424,10 +424,10 @@ function main() {
 
   if (isFixMode && !hasErrors) {
     try {
-      console.log(`Menjalankan uji cakupan Thai (th-coverage-test.js)...`);
-      execSync('node th-coverage-test.js', { stdio: 'inherit', cwd: ROOT });
-      console.log(`\nMenjalankan verifikasi baseline emas (id-golden-snapshot-test.js)...`);
-      execSync('node id-golden-snapshot-test.js', { stdio: 'inherit', cwd: ROOT });
+      console.log(`Menjalankan uji cakupan Thai (tests/th-coverage-test.js)...`);
+      execSync('node tests/th-coverage-test.js', { stdio: 'inherit', cwd: ROOT });
+      console.log(`\nMenjalankan verifikasi baseline emas (tests/id-golden-snapshot-test.js)...`);
+      execSync('node tests/id-golden-snapshot-test.js', { stdio: 'inherit', cwd: ROOT });
     } catch (e) {
       console.error(`\nTest failure during sync verification: ${e.message}`);
       process.exit(1);

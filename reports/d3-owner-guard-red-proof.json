@@ -1,7 +1,7 @@
 {
   "schema": "fiezel-d3-owner-guard-red-proof-v1",
   "generatedAt": "2026-08-28T12:49:49.038Z",
-  "gate": "owner-edge-guard-test.js",
+  "gate": "tests/owner-edge-guard-test.js",
   "mutations": [
     {
       "id": "M1-jalur-hostname-dimatikan",

@@ -124,8 +124,8 @@ gagal-senyap, bukan prasyarat) adalah bentuk yang cocok untuk enam titik di atas
 
 ## 4. Gerbang baru
 
-`voice-prefetch-neural-test.js` (node murni, tanpa dependency, pola `vm` + `sourceBlock`
-seperti `voice-fallback-chain-test.js`), terdaftar di
+`tests/voice-prefetch-neural-test.js` (node murni, tanpa dependency, pola `vm` + `sourceBlock`
+seperti `tests/voice-fallback-chain-test.js`), terdaftar di
 `.github/workflows/quality.yml:81`. **32 pass, 0 fail.** Ia menjalankan `prefetch()` yang
 asli di dalam `vm`, bukan mencocokkan kata kunci, dan membuktikan:
 
@@ -154,10 +154,10 @@ membuat 4 assert gagal. Gerbangnya benar-benar mengikat, bukan hiasan.
 
 Semua exit 0:
 
-`voice-prefetch-neural-test.js` (32/0) · `voice-fallback-chain-test.js` (45/0) ·
-`voice-offline-fallback-test.js` (14) · `speaking-listening-test.js` (45/0) ·
-`listening-exam-test.js` · `regression-test.js` · `ui-structure-test.js` ·
-`install-health-test.js` · `pwa-cache-test.js`.
+`tests/voice-prefetch-neural-test.js` (32/0) · `tests/voice-fallback-chain-test.js` (45/0) ·
+`tests/voice-offline-fallback-test.js` (14) · `tests/speaking-listening-test.js` (45/0) ·
+`tests/listening-exam-test.js` · `tests/regression-test.js` · `tests/ui-structure-test.js` ·
+`tests/install-health-test.js` · `tests/pwa-cache-test.js`.
 
 `*-REPORT.json` yang sudah ada dikembalikan ke isi commit (hanya
 `VOICE-PREFETCH-NEURAL-REPORT.json` yang baru, milik gerbang baru). Versi build tidak

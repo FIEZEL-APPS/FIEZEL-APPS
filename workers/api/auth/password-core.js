@@ -66,7 +66,7 @@
  *     benar, karena hash begitu memang tidak pernah bisa ada di produksi
  *     (penerbitannya selalu gagal sebelum tersimpan);
  *   - kalau suatu hari Workers menaikkan batasnya, naikkan `PBKDF2_MAX_ITERATIONS`
- *     LEBIH DULU, baru `ITERATIONS`. Tes `auth-role-test.js` menjaga urutan itu.
+ *     LEBIH DULU, baru `ITERATIONS`. Tes `tests/auth-role-test.js` menjaga urutan itu.
  */
 export const PBKDF2_MAX_ITERATIONS = 100000;
 

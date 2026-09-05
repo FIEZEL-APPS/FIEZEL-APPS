@@ -14,10 +14,10 @@ ini idle — nol permintaan bayangan, nol tulisan ke penyimpanan.
 | Berkas | Perubahan |
 |---|---|
 | `features/cf-shadow/fiezel-shadow-ledger.js` | **BARU** (~485 baris). Ledger agregat: `record`, `observe`, `read`, `summary`, `exportText`, `reset`, `sanitizeInput`, `shapeOf`, `compareShapes`. Allowlist field, allowlist endpoint, batas bita tegas + pemangkasan. |
-| `cf-shadow-ledger-test.js` | **BARU** — gerbang node murni, **83 assert**, tujuh bagian (a)–(g). Tanpa dependensi, tanpa jaringan (lolos `no-network-test.js`). |
+| `tests/cf-shadow-ledger-test.js` | **BARU** — gerbang node murni, **83 assert**, tujuh bagian (a)–(g). Tanpa dependensi, tanpa jaringan (lolos `tests/no-network-test.js`). |
 | `app.js` | HANYA di dalam blok `CF-TRANSPORT-BEGIN/END`: pembatas laju + pagar daya + pemanggil ledger. Di luar blok: nol baris. |
 | `features/neural-voice/fiezel-diag-panel.js` | Tabel ringkasan bayangan per endpoint + tombol **Copy bayangan CF**. `DIAG_BUILD` tetap `m025-172`. |
-| `.github/workflows/quality.yml` | `node cf-shadow-ledger-test.js` didaftarkan tepat sesudah `node cf-shadow-mode-test.js`. |
+| `.github/workflows/quality.yml` | `node tests/cf-shadow-ledger-test.js` didaftarkan tepat sesudah `node tests/cf-shadow-mode-test.js`. |
 
 Tidak ada bump invarian build (`SW_REV`, `DIAG_BUILD`, `FIEZEL_PAGE_BUILD` tetap `m025-172`) —
 itu wewenang MASTER saat merge. `*-REPORT.json` yang berubah sudah di-restore;
@@ -68,7 +68,7 @@ pernah keluar dari fungsi ini. Bukti di gerbang: dua jawaban dengan isi yang bed
 `match:true`, dan pada jalur nyata (jawaban AI palsu yang panjang lewat) tidak ada satu pun
 substring nilai yang muncul di penyimpanan maupun ekspor.
 
-Kenapa pembandingnya di modul dan BUKAN di blok transport: `cf-shadow-mode-test.js` melarang token
+Kenapa pembandingnya di modul dan BUKAN di blok transport: `tests/cf-shadow-mode-test.js` melarang token
 `.json()`, `.text()`, `.arrayBuffer()`, `document`, `innerHTML`, dan `localStorage` di dalam blok
 sentinel. Itu pagar yang benar dan tidak saya lemahkan. Blok transport hanya meneruskan objek
 respons; yang membaca body adalah ledger, dan HANYA lewat `response.clone().json()`. Respons yang
@@ -140,7 +140,7 @@ Tombol **Copy bayangan CF** menyalin ringkasan sebagai teks. Ekspor dibangun dar
 sudah tersaring, jadi jaminan privasinya sama dengan butir 1 — gerbang tetap mengujinya terpisah
 dengan menyuntikkan penanda PII di semua jalur lalu memastikan tidak satu pun muncul di teks
 ekspor. Kalau modul ledger belum dimuat, panel menulis `(modul cf-shadow belum dimuat)` dan dump
-JSON-nya tetap valid (`diag-panel-test.js` mem-`JSON.parse` dump itu).
+JSON-nya tetap valid (`tests/diag-panel-test.js` mem-`JSON.parse` dump itu).
 
 ## 6. Verifikasi
 
@@ -148,17 +148,17 @@ Semua exit 0:
 
 | Gerbang | Hasil |
 |---|---|
-| `cf-shadow-ledger-test.js` (BARU) | PASS — 83 assert |
-| `cf-shadow-mode-test.js` | PASS — 36 assert |
-| `cf-transport-test.js` | PASS — 25 assert |
-| `observability-privacy-test.js` | PASS (tidak dilemahkan, tidak disentuh) |
-| `analytics-privacy-test.js` | PASS |
-| `diag-panel-test.js` | PASS |
-| `regression-test.js` | PASS |
-| `ui-structure-test.js` | PASS |
-| `install-health-test.js` | PASS |
-| `no-network-test.js` | PASS — 35 assert, 128 gerbang dipindai |
-| `boot-order-test.js`, `validator.js` | PASS |
+| `tests/cf-shadow-ledger-test.js` (BARU) | PASS — 83 assert |
+| `tests/cf-shadow-mode-test.js` | PASS — 36 assert |
+| `tests/cf-transport-test.js` | PASS — 25 assert |
+| `tests/observability-privacy-test.js` | PASS (tidak dilemahkan, tidak disentuh) |
+| `tests/analytics-privacy-test.js` | PASS |
+| `tests/diag-panel-test.js` | PASS |
+| `tests/regression-test.js` | PASS |
+| `tests/ui-structure-test.js` | PASS |
+| `tests/install-health-test.js` | PASS |
+| `tests/no-network-test.js` | PASS — 35 assert, 128 gerbang dipindai |
+| `tests/boot-order-test.js`, `validator.js` | PASS |
 
 Cakupan gerbang baru: (a) allowlist field — prompt/jawaban/teks murid/nama/email/uuid/IP/cookie
 disuntikkan dan dibuktikan tersaring, dengan `dropped = 16`; (b) deteksi kunci hilang/tipe beda

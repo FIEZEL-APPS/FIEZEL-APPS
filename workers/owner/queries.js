@@ -9,7 +9,7 @@
 // berbunyi "pengukuran tidak tersedia" dan itu terlihat sama dengan "belum ada data".
 //
 // Bentuk NYATA (workers/api/migrations/0001_quota.sql + 0002_analytics.sql, keduanya SUDAH
-// jalan di produksi; `analytics-privacy-test.js` mengunci database analytics pada TEPAT LIMA
+// jalan di produksi; `tests/analytics-privacy-test.js` mengunci database analytics pada TEPAT LIMA
 // tabel di bawah dan larangan itu benar — makin banyak tabel makin banyak permukaan identitas):
 //
 //   metrics_daily(day TEXT, metric TEXT, value INTEGER)              PK (day, metric)
@@ -58,7 +58,7 @@
 
 /* ============================ Katalog metrik yang TERBUKTI DITULIS ========================= */
 // Setiap nama di bawah dibuktikan ada penulisnya di jalur server. Berkas dan barisnya ditulis
-// di sebelahnya, dan `d1-schema-contract-test.js` MEMBACA berkas penulis itu lalu memerah kalau
+// di sebelahnya, dan `tests/d1-schema-contract-test.js` MEMBACA berkas penulis itu lalu memerah kalau
 // satu nama pun tidak ditemukan di sana. Nama metrik yang tidak pernah ditulis siapa pun =
 // panel yang selamanya kosong, dan itu jenis kekosongan yang paling menyesatkan: ia terlihat
 // persis seperti "belum ada murid".
@@ -188,7 +188,7 @@ const UNMEASURABLE = Object.freeze([
   {
     panel: 'Cost estimation',
     hal: 'Biaya per hari yang bisa DIAUDIT (tarif yang berlaku saat itu)',
-    sebab: 'Tidak ada tabel `cost_daily`, dan tidak boleh ada: analytics-privacy-test.js '
+    sebab: 'Tidak ada tabel `cost_daily`, dan tidak boleh ada: tests/analytics-privacy-test.js '
       + 'mengunci database ini pada lima tabel. Volume penggerak biaya (karakter TTS dirender, '
       + 'token AI masuk/keluar) TERUKUR, jadi biaya dihitung ULANG dari kartu tarif di repo '
       + 'setiap kali halaman dirender. Konsekuensi jujur: mengubah tarif mengubah angka bulan '

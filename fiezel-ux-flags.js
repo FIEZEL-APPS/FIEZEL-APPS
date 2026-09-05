@@ -6,7 +6,7 @@
  *
  * KENAPA BENDERA, BUKAN `git rm`. Lima permukaan di atas punya mesin yang sudah
  * terbukti benar dan dijaga puluhan gerbang tes (ujian per skill sendiri dijaga
- * speaking-exam-test.js, listening-exam-test.js, reading-exam-test.js). Menghapus
+ * tests/speaking-exam-test.js, tests/listening-exam-test.js, tests/reading-exam-test.js). Menghapus
  * kodenya berarti membuang mesin yang benar demi keputusan tampilan yang bisa
  * dibalik minggu depan, DAN memerahkan gerbang yang tidak ada hubungannya dengan
  * keluhan owner. Yang dimatikan di sini adalah PINTUNYA: murid tidak pernah lagi

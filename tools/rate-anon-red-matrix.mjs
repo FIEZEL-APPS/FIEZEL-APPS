@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * rate-anon-red-matrix.mjs — bukti bahwa setiap assert di `rate-anon-test.js`
+ * rate-anon-red-matrix.mjs — bukti bahwa setiap assert di `tests/rate-anon-test.js`
  * BISA MERAH. Gerbang yang tidak pernah terbukti merah tidak membuktikan apa pun.
  *
  * Cara kerja: untuk setiap mutasi, berkas asli dicadangkan, dirusak satu titik,
@@ -42,12 +42,12 @@ const MUTATIONS = [
   { id: 'M9 celah lapisan-2 tidak tertulis di laporan', file: REPORT, expect: ['(g6)'],
     apply: (s) => s.replace(/deps\.accountBudget/g, 'pagar akun') },
   { id: 'M10 gerbang dicabut dari CI', file: YML, expect: ['(h)'],
-    apply: (s) => s.replace('          node rate-anon-test.js\n', '') }
+    apply: (s) => s.replace('          node tests/rate-anon-test.js\n', '') }
 ];
 
 function runGate() {
   try {
-    const out = execFileSync('node', ['rate-anon-test.js'], { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+    const out = execFileSync('node', ['tests/rate-anon-test.js'], { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
     return { exit: 0, out };
   } catch (e) {
     return { exit: e.status === undefined ? 1 : e.status, out: (e.stdout || '') + (e.stderr || '') };

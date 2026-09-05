@@ -1,4 +1,4 @@
-# Matriks bukti merah — owner-dashboard-test.js (paket D1-owner)
+# Matriks bukti merah — tests/owner-dashboard-test.js (paket D1-owner)
 
 Dihasilkan `tools/owner-dashboard-red-proof.js`. Setiap baris: satu invarian dirusak di
 `workers/owner/index.js`, gerbang dijalankan, lalu berkas dipulihkan (hash sha256 dicek identik).

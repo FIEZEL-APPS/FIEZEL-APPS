@@ -1,7 +1,7 @@
 /**
  * FIEZEL Open Learner Model (OLM) v1 — cermin belajar untuk MURID, bukan panel developer.
  *
- * Desain: council C9 (claude_opus_5_0) + P6 (claude_fable_5), kontrak BRAINCORE-V3-CONTRACTS.md.
+ * Desain: council C9 (claude_opus_5_0) + P6 (claude_fable_5), kontrak docs/BRAINCORE-V3-CONTRACTS.md.
  *
  * KENAPA MODUL INI ADA
  * --------------------

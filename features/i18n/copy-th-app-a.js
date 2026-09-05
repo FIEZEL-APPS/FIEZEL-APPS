@@ -12,7 +12,7 @@
  * Istilah Inggris yang DIAJARKAN aplikasi (nama tense, part of speech konteks belajar,
  * subject/verb/auxiliary, IELTS/TOEFL, nama fitur Core Brain/Smart Review/Skip Level)
  * TETAP Inggris — hanya penjelasannya yang Thai. Nilai berkas ini TIDAK masuk himpunan
- * literal gerbang id-golden-snapshot-test.js (bukan bahasa Indonesia); kunci-kuncinya
+ * literal gerbang tests/id-golden-snapshot-test.js (bukan bahasa Indonesia); kunci-kuncinya
  * duplikat byte-identik kunci copy-id sehingga himpunan literal tidak berubah.
  */
 (function () {

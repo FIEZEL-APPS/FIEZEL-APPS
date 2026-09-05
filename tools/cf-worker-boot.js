@@ -5,13 +5,13 @@
  * menagih kalau buku jatah tidak bergerak" TIDAK BISA membuktikannya dengan memanggil
  * handler langsung: yang benar-benar menggerakkan buku jatah adalah `settleQuota()` di
  * `workers/api/route-wiring.js`, dan itu hanya jalan kalau permintaannya lewat Worker.
- * Sebelum ini satu-satunya gerbang yang bisa melakukan itu (`ai-account-cap-gate-test.js`)
+ * Sebelum ini satu-satunya gerbang yang bisa melakukan itu (`tests/ai-account-cap-gate-test.js`)
  * memuat perakit graf ESM + boot env-nya sendiri, ~200 baris, di dalam berkasnya. Menyalin
  * 200 baris itu ke gerbang kedua adalah cara paling pasti membuat dua versi lingkungan uji
  * yang perlahan berbeda, lalu dua gerbang yang menguji dua Worker berbeda tanpa ada yang
  * tahu. Jadi mekanismenya dipindah ke satu tempat.
  *
- * `ai-account-cap-gate-test.js` SENGAJA belum diubah untuk memakainya: gerbang itu hijau
+ * `tests/ai-account-cap-gate-test.js` SENGAJA belum diubah untuk memakainya: gerbang itu hijau
  * hari ini, dan memindahkan pijakannya di paket yang sama dengan perbaikan produksi berarti
  * kalau ia merah kita tidak tahu penyebabnya yang mana. Utang itu dicatat terbuka di
  * `reports/work-s3-tts-honest.md`, bukan disembunyikan.

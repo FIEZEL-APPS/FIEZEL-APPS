@@ -174,7 +174,7 @@ buktinya yang usang, bukan produksinya. `tools/account-cap-red-matrix.mjs` exit 
 
 ## 5. Gerbang
 
-Diperluas, bukan diduplikasi: `tts-provider-contract-test.js` (sudah terdaftar di
+Diperluas, bukan diduplikasi: `tests/tts-provider-contract-test.js` (sudah terdaftar di
 `.github/workflows/quality.yml`). Dari 21 assert menjadi **54 assert, semuanya PASS**.
 
 Tambahan infrastruktur: `tools/cf-worker-boot.js` — mem-boot Worker API PENUH di dalam
@@ -203,7 +203,7 @@ aturan yang sama yang dipakai produksi (di-assert di S3-0). Fungsi itu diekspor 
 mengembalikan 17 cacat satu per satu ke berkas sumber produksi, menjalankan gerbang, lalu
 memulihkan berkasnya.
 
-Hasil (`S3-TTS-HONEST-RED-MATRIX.json`): **17/17 merah, 17/17 assert sasaran benar-benar
+Hasil (`reports/S3-TTS-HONEST-RED-MATRIX.json`): **17/17 merah, 17/17 assert sasaran benar-benar
 ikut merah (bukan cuma "ada yang merah"), dan gerbang hijau kembali sesudah pemulihan.**
 Mutasinya mencakup: pagar flag dicabut; fail-open saat flag tak terbaca; var wrangler
 diabaikan; `retryAfter` dijanjikan; naskah memakai bahasa jatah; `copyKey` menyimpang; 403
@@ -241,14 +241,14 @@ var yang tidak mengikat apa pun adalah jenis kebohongan konfigurasi yang sama de
 
 ### 5.3 Verifikasi (semua exit 0)
 
-`tts-provider-contract-test.js`, `tts-transport-switch-test.js`, `tts-key-test.js`,
-`ai-account-cap-gate-test.js`, `ai-task-contract-test.js`, `ai-response-shape-test.js`,
-`cf-wiring-test.js`, `quota-core-test.js`, `rate-anon-test.js`, `no-network-test.js`,
-`secret-scan-test.js`, `gate-registry-test.js`, `coordination-guard-test.js`,
-`regression-test.js`, `install-health-test.js`. Ditambah `tools/cf-test-harness.js`
+`tests/tts-provider-contract-test.js`, `tests/tts-transport-switch-test.js`, `tests/tts-key-test.js`,
+`tests/ai-account-cap-gate-test.js`, `tests/ai-task-contract-test.js`, `tests/ai-response-shape-test.js`,
+`tests/cf-wiring-test.js`, `tests/quota-core-test.js`, `tests/rate-anon-test.js`, `tests/no-network-test.js`,
+`tests/secret-scan-test.js`, `tests/gate-registry-test.js`, `tests/coordination-guard-test.js`,
+`tests/regression-test.js`, `tests/install-health-test.js`. Ditambah `tools/cf-test-harness.js`
 self-test (PASS) karena harness-nya diubah.
 
-Catatan temuan sampingan: gerbang `tts-provider-contract-test.js` sudah **MERAH sejak paket
+Catatan temuan sampingan: gerbang `tests/tts-provider-contract-test.js` sudah **MERAH sejak paket
 S2** (`tts_key_missing_voice`), karena S2 membuat `deps.accountBudget` wajib sementara
 gerbang ini menyuntikkan `enforceQuota` saja — setiap render dijawab 503 dan seluruh assert
 A12 di atasnya menguji jalur yang salah. S2 tidak pernah menjalankan gerbang ini. Sudah
@@ -296,7 +296,7 @@ kuota tidak bergerak).
 | `workers/api/feature-gate.js` | `PAID_FEATURES`, `featureAllowedFrom`, `ttsAllowedFrom`, `checkTtsEnabled`, `TTS_GATE_REASONS` |
 | `workers/api/route-wiring.js` | pagar `checkTtsEnabled` di `wrapMetered` sink TTS; ekspor `providerFailed` dan `quotaSettlementFailed` |
 | `workers/api/tts/route-tts.js` | `ttsDisabledResponse`, buku jatah + `chargedFor`, `decodeBase64`/`byteSize` jujur, single-flight dipindah sebelum kuota |
-| `tts-provider-contract-test.js` | +33 assert S3 (total 54) |
+| `tests/tts-provider-contract-test.js` | +33 assert S3 (total 54) |
 | `tools/cf-test-harness.js` | `r2BodySize()` — ukuran objek per byte, termasuk body biner |
 | `tools/cf-worker-boot.js` | BARU — boot Worker API penuh untuk gerbang |
 | `tools/tts-honest-red-matrix.mjs` | BARU — 17 mutasi terarah, bukti merah |

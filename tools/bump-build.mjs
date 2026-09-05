@@ -7,7 +7,7 @@
  * keduanya memilih m025-174. Akibatnya bukan cuma repot merge: satu revisi service worker
  * memayungi DUA daftar precache berbeda, jadi sebagian murid memegang shell cache campur.
  *
- * AGENTS-COORDINATION.md sudah melarang tabrakan sejak v1.2, dan tabrakan tetap terjadi.
+ * docs/AGENTS-COORDINATION.md sudah melarang tabrakan sejak v1.2, dan tabrakan tetap terjadi.
  * Aturan yang tidak ditegakkan alat bukan aturan. Jadi nomor build sekarang punya satu
  * sumber (coordination/BUILD-VERSION.json) dan satu pintu (berkas ini).
  *

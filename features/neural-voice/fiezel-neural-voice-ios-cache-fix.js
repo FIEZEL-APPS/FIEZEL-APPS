@@ -19,7 +19,7 @@
   // the normal prepare()/warmAssets() flow (which already retries and
   // surfaces errors to the UI) do the actual work instead.
   // [DOC-SYNC-M017-20260814] PRIME_TIMEOUT_MS default = 45000 ms = 45 detik.
-  // Dokumentasi di FIEZEL-Orkestrasi-Protokol-Pelengkap.md (fix_applied_this_round)
+  // Dokumentasi di docs/FIEZEL-Orkestrasi-Protokol-Pelengkap.md (fix_applied_this_round)
   // sudah diselaraskan ke "45 detik (45.000 ms)" pada 2026-08-14 (sebelumnya
   // tertulis "25 detik"). Nilai runtime TIDAK diubah di sini.
   const PRIME_TIMEOUT_MS=Number(root.FIEZEL_IOS_PRIME_TIMEOUT_MS)||45000;

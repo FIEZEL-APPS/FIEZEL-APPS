@@ -12,12 +12,12 @@ cara menyalakannya.
 |---|---|---|
 | `docs/CF-ROLLOUT-PLAN.md` | BARU | Rencana penyalaan bertahap: urutan R1–R7 satu rilis per endpoint, ambang batal berangka per langkah, tahap bayangan, prasyarat belum terpenuhi, aturan mengikat, kriteria BERHENTI TOTAL |
 | `tools/flag-plan-check.mjs` | BARU | Node murni, nol jaringan/dependency/tulis-berkas. `core-config.js` (tri-state) × `/api/config` dari stdin (boolean) = keadaan efektif per endpoint + deteksi kombinasi berbahaya |
-| `rollout-plan-test.js` | BARU | Gerbang, **141 assert**, nol jaringan. Menjaga dokumen bisa dieksekusi dan membuktikan kalkulator di atas benar-benar mendeteksi kombinasi berbahaya |
-| `.github/workflows/quality.yml` | diubah | `node rollout-plan-test.js` didaftarkan sesudah `cf-shadow-mode-test.js`, dengan alasan penempatan ditulis di komentar |
+| `tests/rollout-plan-test.js` | BARU | Gerbang, **141 assert**, nol jaringan. Menjaga dokumen bisa dieksekusi dan membuktikan kalkulator di atas benar-benar mendeteksi kombinasi berbahaya |
+| `.github/workflows/quality.yml` | diubah | `node tests/rollout-plan-test.js` didaftarkan sesudah `tests/cf-shadow-mode-test.js`, dengan alasan penempatan ditulis di komentar |
 | `NO-NETWORK-REPORT.json` | diubah | `scanned` 127 → 128 (gerbang baru ikut terpindai dan lulus) |
 | `ROLLOUT-PLAN-REPORT.json` | BARU | Keluaran gerbang |
 
-`CF-TRANSPORT-REPORT.json` sengaja **di-restore**: menjalankan `cf-transport-test.js` memperbarui
+`CF-TRANSPORT-REPORT.json` sengaja **di-restore**: menjalankan `tests/cf-transport-test.js` memperbarui
 isinya (laporan di HEAD masih dari keadaan sebelum W1 mendarat, `skipped:true`), tetapi
 pembaruan itu bukan milik paket kerja ini.
 
@@ -79,7 +79,7 @@ lama) adalah keputusan MASTER, bukan keputusan saya di paket kerja dokumentasi.
 ## 4. Prasyarat yang BELUM terpenuhi (bagian 3 dokumen) — sepuluh, bukan enam
 
 Enam yang diminta brief, semuanya diverifikasi dari repo dan **masing-masing diikat gerbang**
-(`rollout-plan-test.js` memverifikasi pernyataannya masih benar terhadap repo, jadi dokumen
+(`tests/rollout-plan-test.js` memverifikasi pernyataannya masih benar terhadap repo, jadi dokumen
 tidak bisa membusuk menjadi klaim basi):
 
 - **P2** kuota 25/26 belum diuji di runtime nyata (`reports/exec-e3-quota.md` §2/§4). Bonus temuan:
@@ -134,7 +134,7 @@ Alat ini **tidak pernah** memanggil HTTP sendiri: alat yang boleh menembak produ
 sama dengan alat yang dipakai saat panik. Gerbang meng-assert ketiadaan `fetch(`, import modul
 socket, URL literal `http(s)://`, dan penulisan berkas di dalam sumbernya.
 
-## 6. Gerbang `rollout-plan-test.js` — 141 assert, dan buktinya bisa MERAH
+## 6. Gerbang `tests/rollout-plan-test.js` — 141 assert, dan buktinya bisa MERAH
 
 Yang dijaga, semuanya diperiksa mesin (bukan gaya bahasa):
 
@@ -187,12 +187,12 @@ menjadi kalimat `kalau bermasalah, batalkan` → gerbang **exit 1** dengan asser
 
 | Perintah | Hasil |
 |---|---|
-| `node rollout-plan-test.js` | **PASS (141 assert)**, exit 0 |
-| `node cf-transport-test.js` | exit 0 |
-| `node cf-shadow-mode-test.js` | exit 0 |
-| `node no-network-test.js` | exit 0 (`scanned` 128; gerbang baru ikut terpindai dan bersih) |
-| `node regression-test.js` | exit 0 |
-| `node install-health-test.js` | exit 0 |
+| `node tests/rollout-plan-test.js` | **PASS (141 assert)**, exit 0 |
+| `node tests/cf-transport-test.js` | exit 0 |
+| `node tests/cf-shadow-mode-test.js` | exit 0 |
+| `node tests/no-network-test.js` | exit 0 (`scanned` 128; gerbang baru ikut terpindai dan bersih) |
+| `node tests/regression-test.js` | exit 0 |
+| `node tests/install-health-test.js` | exit 0 |
 | `node --check tools/flag-plan-check.mjs` | lulus (step `Syntax` di quality.yml memindai `*.mjs`) |
 
 Tidak ada bump versi build. Tidak ada push. Commit di `add/a9rollout`.

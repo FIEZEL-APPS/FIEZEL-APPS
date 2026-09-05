@@ -6,7 +6,7 @@
  * ritual, journey, diagnostik, kesiapan, backup, health, akun/suara, classroom, skills,
  * writing, prasasti, adaptif, vocab, flashcards, ulangan) ke copy-map sesuai plan
  * W1-APPJS-C, supaya copy-th-app-c.js bisa 1:1. Nilai DISALIN BYTE-PER-BYTE dari app.js —
- * gerbang id-golden-snapshot-test.js membekukan himpunan literal (PINDAH boleh, BERUBAH
+ * gerbang tests/id-golden-snapshot-test.js membekukan himpunan literal (PINDAH boleh, BERUBAH
  * tidak). Kunci ber-slug netral: lexer gerbang menghitung kunci berpenanda Indonesia
  * sebagai "tambahan liar" (laporan W1-INFRA). Placeholder BERNAMA {nama}, nama placeholder
  * juga wajib lolos lexer (mis. {items}, bukan {soal}).

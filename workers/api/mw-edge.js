@@ -161,7 +161,7 @@
  * SATU SUMBER KEBENARAN untuk daftar hostname: konstanta `TRUSTED_EDGE_HOSTS` di
  * berkas ini. SENGAJA bukan var env: var bisa diubah di dashboard tanpa jejak di
  * repo, dan daftar host tepercaya adalah keputusan keamanan yang harus terbaca
- * di kode + terjaga gerbang. `edge-guard-test.js` butir (h) meng-assert daftar
+ * di kode + terjaga gerbang. `tests/edge-guard-test.js` butir (h) meng-assert daftar
  * ini SAMA dengan `custom_domain` di `workers/api/wrangler.toml` — jadi kalau
  * hostname baru dipasang di konfigurasi tanpa dimasukkan ke daftar (atau
  * sebaliknya), CI merah, bukan lolos.
@@ -197,7 +197,7 @@
  * ==========================================================================
  * `edgeGuardStatus()` tetap menjawab `'on'`/`'off'` — kontrak lama yang dibaca
  * probe hidup (`tools/fiezel-health-probe.mjs` MENGANGGAP KRITIS kalau
- * `edgeGuard !== 'on'`, dan `staging-live-test.js` ikut meng-assert itu). Yang
+ * `edgeGuard !== 'on'`, dan `tests/staging-live-test.js` ikut meng-assert itu). Yang
  * BARU adalah `edgeGuardPath()`: `'custom-domain'` | `'header'` | `'off'`
  * | `'free-path'`, diisi gerbang ini pada `ctx.edgePath` saat ia meloloskan
  * permintaan. Dengan begitu keadaan nyata TERBACA ("permintaan ini sampai lewat
@@ -227,7 +227,7 @@ export const EDGE_FREE_PATHS = Object.freeze(['/healthz']);
  * SATU SUMBER KEBENARAN hostname yang boleh lolos TANPA header jembatan, yaitu
  * hostname yang benar-benar terikat ke Worker ini sebagai CUSTOM DOMAIN.
  * Harus identik dengan `routes = [{ pattern = ..., custom_domain = true }]` di
- * `workers/api/wrangler.toml` — `edge-guard-test.js` butir (h) memaksa keduanya
+ * `workers/api/wrangler.toml` — `tests/edge-guard-test.js` butir (h) memaksa keduanya
  * sama. Huruf kecil semua; pembanding menormalkan masukan.
  *
  * `owner.fiezel.my.id` SENGAJA TIDAK ADA di sini: ia milik Worker LAIN
@@ -286,7 +286,7 @@ export function isTrustedEdgeHost(host) {
  * dijalankan sampai habis di sini.
  *
  * TIDAK ADA satu pun operator kesetaraan langsung yang diterapkan pada nilai
- * rahasia di berkas ini — `edge-guard-test.js` butir (d) memindai itu.
+ * rahasia di berkas ini — `tests/edge-guard-test.js` butir (d) memindai itu.
  */
 export function ctEq(a, b) {
   const enc = new TextEncoder();
@@ -316,7 +316,7 @@ export function edgeSecret(env) {
  *
  * KENAPA `'on'` TIDAK BOLEH DIGANTI dengan nama jalur: probe hidup
  * `tools/fiezel-health-probe.mjs:247` menilai `edgeGuard !== 'on'` sebagai
- * KRITIS ("penjaga edge MATI"), dan `staging-live-test.js:251` meng-assert hal
+ * KRITIS ("penjaga edge MATI"), dan `tests/staging-live-test.js:251` meng-assert hal
  * yang sama terhadap produksi. Mengubah nilai ini menjadi `'custom-domain'`
  * akan membuat kedua alat itu melaporkan kerusakan palsu tepat pada hari zona
  * aktif. Jalur yang dipakai dilaporkan di field TERPISAH — `edgeGuardPath()`.

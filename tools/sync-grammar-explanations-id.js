@@ -22,7 +22,7 @@
  * Alat ini membuat kedua berkas bisa DISAMAKAN secara mekanis — nol karangan:
  * setiap nilai yang ditulis ke berkas sumber disalin verbatim dari field
  * "...Id" bank yang sudah lolos QA. Invarian kesamaannya dijaga oleh
- * content-drift-test.js; alat ini adalah tombol perbaikannya.
+ * tests/content-drift-test.js; alat ini adalah tombol perbaikannya.
  *
  * Cara pakai:
  *   node tools/sync-grammar-explanations-id.js           -> cek; exit 1 bila drift

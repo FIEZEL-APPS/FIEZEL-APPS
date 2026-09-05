@@ -4,7 +4,7 @@
 // ==========================================================================================
 // APA YANG DIBUKTIKAN DI SINI, DAN KENAPA `curl` TIDAK CUKUP
 // ==========================================================================================
-// `cf-live-contract-test.js` sudah membuktikan Worker + jembatan PHP menjawab benar lewat
+// `tests/cf-live-contract-test.js` sudah membuktikan Worker + jembatan PHP menjawab benar lewat
 // HTTP nyata (33 assert). Yang TIDAK bisa dibuktikan alat baris perintah:
 //
 //   1. Apakah aplikasi FIEZEL yang sesungguhnya — index.html + app.js, dimuat browser dengan
@@ -41,7 +41,7 @@
 // `Domain=fiezel.my.id` bahkan menjadi cookie PIHAK PERTAMA seperti di ponsel murid.
 // Sertifikat self-signed ditolak service worker (`sw.js` tidak terdaftar). Itu disengaja dan
 // dicatat: gerbang ini menguji jalur jaringan, bukan lapisan cache PWA (yang dijaga
-// `pwa-cache-test.js` dan `sw-corp-test.js`).
+// `tests/pwa-cache-test.js` dan `tests/sw-corp-test.js`).
 //
 // ==========================================================================================
 // FLAG DI-OVERRIDE TANPA MENYENTUH BERKAS REPO
@@ -59,9 +59,9 @@
 // (`status:'SKIP'`, `pass:null`). Sengaja tanpa nilai bawaan: satu URL bawaan akan membuat
 // CI mana pun menembak produksi pada setiap push. Karena itu pula gerbang ini TIDAK
 // didaftarkan di `.github/workflows/quality.yml`; yang didaftarkan adalah
-// `e2e-bridge-selftest.js` yang membuktikan gerbang ini bisa merah, seluruhnya di loopback.
+// `tests/e2e-bridge-selftest.js` yang membuktikan gerbang ini bisa merah, seluruhnya di loopback.
 //
-// Kebenarannya sendiri dibuktikan `e2e-bridge-selftest.js`: satu aplikasi+jembatan tiruan
+// Kebenarannya sendiri dibuktikan `tests/e2e-bridge-selftest.js`: satu aplikasi+jembatan tiruan
 // yang BENAR (gerbang harus hijau) dan 14 yang SALAH (gerbang harus merah pada id assert
 // yang tepat).
 //
@@ -96,7 +96,7 @@ const COOKIE_DOMAIN = String(env.FIEZEL_E2E_COOKIE_DOMAIN || 'fiezel.my.id').tri
 const PROTOCOL = String(env.FIEZEL_E2E_PROTOCOL || '1.7').trim();
 const REPORT_PATH = path.resolve(env.FIEZEL_E2E_REPORT || path.join(REPO, 'E2E-BRIDGE-REPORT.json'));
 // Jalur SKIP TIDAK menulis laporan kecuali tujuannya dipilih eksplisit. Alasannya konkret:
-// no-network-test.js menjalankan berkas ini tanpa env untuk membuktikan SKIP-nya bersih, dan
+// tests/no-network-test.js menjalankan berkas ini tanpa env untuk membuktikan SKIP-nya bersih, dan
 // versi pertama menjatuhkan E2E-BRIDGE-REPORT.json ke akar repo setiap kali gerbang itu
 // jalan - artefak yang mengotori working tree hanya karena ada uji lain yang memeriksanya.
 const REPORT_EXPLICIT = !!env.FIEZEL_E2E_REPORT;
@@ -304,7 +304,7 @@ const BOOT_PROBE = ({ cfg, minText }) => {
   // ATURAN TERAKHIR, dan yang paling menentukan: simpul yang sudah ada saat DOMContentLoaded
   // adalah MARKUP STATIS, bukan bukti aplikasi hidup. Tanpa aturan ini probe bisa ditipu oleh
   // index.html yang isinya panjang tetapi nol render JS - dan itu bukan dugaan: kontrol negatif
-  // di e2e-bridge-selftest.js ("isi HANYA markup statis") membuat gerbang HIJAU, dan skenario
+  // di tests/e2e-bridge-selftest.js ("isi HANYA markup statis") membuat gerbang HIJAU, dan skenario
   // "aplikasi MENAHAN boot sampai /api/config datang" pun lolos karena alasan yang sama.
   // Aplikasi FIEZEL sungguhan me-render ~3,5 s sesudah DOMContentLoaded, jadi aturan ini tidak
   // memotong apa pun yang nyata.
@@ -380,7 +380,7 @@ const scenarioLog = [];
 // skenario adalah gerbang yang hijau karena diam).
 const ALL_SCENARIOS = ['A-semua-off', 'A2-enabled-false', 'B-config-on', 'C0-pra-auth', 'C-auth-on', 'D-hop-stabil'];
 // FIEZEL_E2E_ONLY membatasi skenario yang dijalankan. Gunanya BUKAN untuk jalan hidup
-// (di sana selalu keenamnya): `e2e-bridge-selftest.js` menjalankan gerbang ini puluhan kali
+// (di sana selalu keenamnya): `tests/e2e-bridge-selftest.js` menjalankan gerbang ini puluhan kali
 // terhadap aplikasi+jembatan tiruan, dan tiap kasus salah hanya butuh satu-dua skenario.
 // Tanpa ini satu matriks self-test memakan belasan menit dan tak akan pernah dijalankan.
 const ONLY = String(env.FIEZEL_E2E_ONLY || '').split(',').map(x => x.trim()).filter(Boolean);
@@ -451,7 +451,7 @@ async function withScenario({ name, cfg, delayConfig = false, cookies = null }, 
       // Date.now() saat peristiwa ini tiba di Node. Versi pertama memakai Date.now(): CDP
       // mengantar peristiwa beberapa milidetik terlambat, jadi "jawaban config" tercatat
       // LEBIH LAMBAT dari kenyataan dan aplikasi yang jelas-jelas MENAHAN boot sampai config
-      // datang tetap dinilai lulus. Ketahuan lewat kontrol negatif di e2e-bridge-selftest.js.
+      // datang tetap dinilai lulus. Ketahuan lewat kontrol negatif di tests/e2e-bridge-selftest.js.
       let arrival = 0;
       try {
         const timing = response.request().timing();
@@ -463,7 +463,7 @@ async function withScenario({ name, cfg, delayConfig = false, cookies = null }, 
     // response.text() sebelum push) membuat jawaban yang badannya tidak bisa/tidak selesai
     // dibaca - yang persis terjadi pada jawaban yang lewat page.route - hilang sama sekali
     // dari daftar, dan gerbang lalu bilang "aplikasi tidak pernah menerima jawaban" untuk
-    // jawaban yang jelas diterima aplikasi. Ketahuan lewat e2e-bridge-selftest.js.
+    // jawaban yang jelas diterima aplikasi. Ketahuan lewat tests/e2e-bridge-selftest.js.
     const entry = { at: Date.now(), url, status: response.status(), body: '' };
     responses.push(entry);
     try { entry.body = String(await response.text()).slice(0, 600); } catch { /* boleh kosong */ }
@@ -481,7 +481,7 @@ async function withScenario({ name, cfg, delayConfig = false, cookies = null }, 
     // lokal: `route.fetch()` berjalan lewat APIRequestContext, yang menolak sertifikat
     // self-signed jembatan tiruan, jadi permintaannya di-abort dan gerbang melaporkan
     // "aplikasi tidak pernah menerima jawaban /api/config" - cacat harness yang menyamar
-    // jadi cacat produk. Ketahuannya di e2e-bridge-selftest.js: skenario BENAR ikut merah.
+    // jadi cacat produk. Ketahuannya di tests/e2e-bridge-selftest.js: skenario BENAR ikut merah.
     await page.route(url => url.href.startsWith(BRIDGE_ORIGIN) && url.pathname.startsWith('/api/config'), async route => {
       await new Promise(resolve => setTimeout(resolve, CONFIG_DELAY));
       try { await route.continue(); } catch { /* halaman mungkin sudah tutup */ }

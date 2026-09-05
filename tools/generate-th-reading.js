@@ -4,7 +4,7 @@
  *
  * Sumbernya reading-bank.json, HANYA bacaan A1/A2. Mulai B1 pertanyaan dan pilihannya
  * memang berbahasa Inggris — itu imersi yang disengaja dan sama untuk murid id maupun th,
- * jadi B1+ sengaja tidak punya sidecar (lihat aturan level di th-bank-purity-test.js).
+ * jadi B1+ sengaja tidak punya sidecar (lihat aturan level di tests/th-bank-purity-test.js).
  *
  * Bentuk soal di sumber adalah LARIK: [stem, options[], indeksJawaban, meta]. Sidecar
  * menyimpannya sebagai objek {stem, options} per soal, berurutan sama persis dengan sumber.

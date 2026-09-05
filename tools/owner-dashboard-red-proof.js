@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * BUKTI MERAH untuk assert baru di owner-dashboard-test.js (paket D1-owner).
+ * BUKTI MERAH untuk assert baru di tests/owner-dashboard-test.js (paket D1-owner).
  *
  * Gerbang yang tidak pernah dibuktikan bisa merah adalah dekorasi. Skrip ini merusak SATU
  * invarian pada satu waktu di salinan sementara `workers/owner/index.js`, menjalankan gerbang,
@@ -17,7 +17,7 @@ const { execFileSync } = require('child_process');
 
 const ROOT = path.join(__dirname, '..');
 const TARGET = path.join(ROOT, 'workers/owner/index.js');
-const GATE = path.join(ROOT, 'owner-dashboard-test.js');
+const GATE = path.join(ROOT, 'tests/owner-dashboard-test.js');
 
 const ORIGINAL = fs.readFileSync(TARGET, 'utf8');
 const ORIGINAL_HASH = crypto.createHash('sha256').update(ORIGINAL).digest('hex');
@@ -151,7 +151,7 @@ const after = runGate();
 console.log('\npasca-pemulihan: ' + (after.exit === 0 ? 'HIJAU (exit 0)' : 'MERAH exit=' + after.exit));
 if (after.exit !== 0) ok = false;
 
-const md = ['# Matriks bukti merah — owner-dashboard-test.js (paket D1-owner)', '',
+const md = ['# Matriks bukti merah — tests/owner-dashboard-test.js (paket D1-owner)', '',
   'Dihasilkan `tools/owner-dashboard-red-proof.js`. Setiap baris: satu invarian dirusak di',
   '`workers/owner/index.js`, gerbang dijalankan, lalu berkas dipulihkan (hash sha256 dicek identik).',
   '', '| Mutasi | Invarian yang dirusak | Cara merusak | exit | assert gugur | contoh assert yang merah |',

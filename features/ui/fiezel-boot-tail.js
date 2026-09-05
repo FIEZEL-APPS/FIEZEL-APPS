@@ -1,7 +1,7 @@
 /**
  * FIEZEL — ekor boot: pendaftaran service worker.
  *
- * Berkas ini dimuat ber-`defer` sesudah app.js; urutannya dijaga boot-order-test.js.
+ * Berkas ini dimuat ber-`defer` sesudah app.js; urutannya dijaga tests/boot-order-test.js.
  * Dulu ia juga menyuntikkan baris "Mode gelap" ke Pengaturan dengan membungkus
  * window.openSettings. m025-134 menghapus mode gelap, jadi pembungkus itu ikut hilang
  * dan yang tersisa hanyalah pendaftaran service worker.
