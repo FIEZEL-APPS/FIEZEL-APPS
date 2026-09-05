@@ -58,7 +58,7 @@ import { readServerFlags, featureAllowedFrom } from './feature-gate.js';
 import { ensureSocialSchema } from './social-schema.js';
 import {
   HANDLE_RULES, DISPLAY_RULES, AVATAR_MAX_ID, PROFILE_FLAGS, INVITE_RULES,
-  FRIENDS_MAX, CHEER_STICKERS, CHEER_PER_FRIEND_PER_DAY, LEVEL_BANDS,
+  FRIENDS_MAX, REQUESTS_MAX, CHEER_STICKERS, CHEER_PER_FRIEND_PER_DAY, LEVEL_BANDS,
   PB_RULES, MILESTONE_KINDS, EVIDENCE_RULES, COHORT_RULES, SOCIAL_FEATURE_SPEC
 } from './social-config.js';
 
@@ -390,11 +390,7 @@ async function routeFriendsRedeem(ctx) {
   const code = String(body.value.code).toUpperCase();
   if (!/^[A-Z0-9]{8}$/.test(code)) return invalid();
 
-  const friendCount = await gate.db
-    .prepare('SELECT COUNT(*) AS n FROM social_friend WHERE a = ?1')
-    .bind(gate.sub)
-    .first();
-  if (friendCount && Number(friendCount.n) >= FRIENDS_MAX) {
+  if ((await mutualFriendCount(gate.db, gate.sub)) >= FRIENDS_MAX) {
     return jsonError(409, ERR.LIMIT_REACHED, {}, gate.opt);
   }
 
@@ -434,9 +430,96 @@ async function routeFriendsRedeem(ctx) {
   );
 }
 
-/* ================================================= tambah teman lewat ID (@handle) ====== */
+/* ============================================ permintaan teman lewat ID (@handle) ====== */
+
+/*
+ * SATU baris `social_friend` = SATU arah, dan arah itu berarti "aku mau berteman
+ * dengan dia". Berteman baru terjadi ketika KEDUA arah ada. Model ini yang
+ * membuat persetujuan tidak bisa dilewati:
+ *
+ *   /friends/add     → menulis SATU baris (aku → dia). Dia belum jadi temanku.
+ *   /friends/accept  → dia menulis baris balasannya. Sekarang berteman.
+ *   /friends/reject  → dia MENGHAPUS baris permintaanku. Tidak pernah berteman.
+ *
+ * Sebelumnya /friends/add menulis KEDUA baris sekaligus: siapa pun yang tahu
+ * @handle seorang murid bisa memasukkan dirinya ke daftar teman murid itu tanpa
+ * pernah ditanya, dan karena FRIENDS_MAX hanya dihitung untuk pihak penambah,
+ * daftar teman korban bisa dipenuhi orang asing sampai ia tidak bisa lagi
+ * menambah temannya sendiri. Dua hal itu yang ditutup di sini.
+ *
+ * Undangan lewat kode (/friends/redeem) TETAP menulis kedua baris, dan itu benar:
+ * pengundang sudah menyatakan persetujuannya saat membuat kode, penerima saat
+ * menebusnya. Persetujuan dua-duanya sudah ada sebelum baris ditulis.
+ */
 
 const SCHEMA_ADD = { allow: { handle: { type: 'string', max: 24, required: true } } };
+
+/*
+ * Irisan dua arah dihitung di sini, bukan lewat sub-query berkorelasi, supaya
+ * SQL-nya tetap satu tabel tanpa alias — bentuk yang sama-sama dimengerti D1 dan
+ * harness uji.
+ *
+ * Kedua LIMIT-nya aman karena kedua sisi memang dibatasi saat MENULIS: tepi
+ * keluar tidak pernah lebih dari FRIENDS_MAX (dijaga /friends/add dan
+ * /friends/redeem), tepi masuk tidak pernah lebih dari FRIENDS_MAX +
+ * REQUESTS_MAX (dijaga pagar permintaan menggantung di /friends/add). 200 duduk
+ * di atas keduanya, jadi tidak ada pertemanan sah yang bisa terpotong keluar
+ * jendela oleh banjir permintaan orang asing.
+ */
+const EDGE_SCAN_LIMIT = 200;
+
+async function friendEdges(db, sub) {
+  const out = await db
+    .prepare('SELECT b, since_day FROM social_friend WHERE a = ?1 LIMIT ' + EDGE_SCAN_LIMIT)
+    .bind(sub)
+    .all();
+  const inc = await db
+    .prepare('SELECT a, since_day FROM social_friend WHERE b = ?1 LIMIT ' + EDGE_SCAN_LIMIT)
+    .bind(sub)
+    .all();
+  const outgoing = ((out && out.results) || []);
+  const incoming = ((inc && inc.results) || []);
+  const incomingSubs = new Set(incoming.map((r) => r.a));
+  const outgoingSubs = new Set(outgoing.map((r) => r.b));
+  return {
+    /** Teman SEJATI: aku menunjuk dia DAN dia menunjuk aku. */
+    friends: outgoing.filter((r) => incomingSubs.has(r.b)),
+    /** Permintaan MASUK yang belum kujawab. */
+    pending: incoming.filter((r) => !outgoingSubs.has(r.a)),
+    outgoingSubs,
+    incomingSubs
+  };
+}
+
+/** Jumlah teman SEJATI (dua arah). Permintaan yang menggantung tidak dihitung. */
+async function mutualFriendCount(db, sub) {
+  return (await friendEdges(db, sub)).friends.length;
+}
+
+/**
+ * Menerjemahkan @handle jadi sub + profil, dengan SATU bentuk galat untuk semua
+ * sebab (bentuk salah / tidak ada / diri sendiri) — pola anti-oracle yang sama
+ * dengan kode undangan: tidak ada cara memakai rute ini untuk memindai handle
+ * mana yang terdaftar.
+ */
+async function resolveHandle(gate, me, raw) {
+  const handle = String(raw).trim().replace(/^@/, '').toLowerCase();
+  if (!/^[a-z0-9_]{3,20}$/.test(handle)) return null;
+  if (handle === String(me.handle || '').toLowerCase()) return null;
+  const target = await gate.db.prepare('SELECT sub FROM social_handle WHERE handle = ?1').bind(handle).first();
+  if (!target || !target.sub || target.sub === gate.sub) return null;
+  const profile = await readProfile(gate.db, target.sub);
+  if (!profile) return null;
+  return { sub: target.sub, profile };
+}
+
+function friendPayload(profile) {
+  return {
+    handle: profile.handle,
+    displayName: profile.display_name || null,
+    avatarId: Number(profile.avatar_id) || 0
+  };
+}
 
 async function routeFriendsAdd(ctx) {
   const gate = await socialGate(ctx);
@@ -449,35 +532,130 @@ async function routeFriendsAdd(ctx) {
   if (!me) return jsonError(404, ERR.PROFILE_REQUIRED, {}, gate.opt);
 
   const invalid = () => jsonError(400, ERR.CODE_INVALID, {}, gate.opt);
-  const handle = String(body.value.handle).trim().replace(/^@/, '').toLowerCase();
-  if (!/^[a-z0-9_]{3,20}$/.test(handle) || handle === String(me.handle || '').toLowerCase()) return invalid();
+  const target = await resolveHandle(gate, me, body.value.handle);
+  if (!target) return invalid();
 
-  const friendCount = await gate.db
+  /* Batas dihitung dari baris KELUAR-ku (teman + permintaan yang kukirim), jadi
+     satu orang tidak bisa menghujani seluruh sekolah dengan permintaan. */
+  const outgoing = await gate.db
     .prepare('SELECT COUNT(*) AS n FROM social_friend WHERE a = ?1')
     .bind(gate.sub)
     .first();
-  if (friendCount && Number(friendCount.n) >= FRIENDS_MAX) {
+  if (outgoing && Number(outgoing.n) >= FRIENDS_MAX) {
     return jsonError(409, ERR.LIMIT_REACHED, {}, gate.opt);
   }
 
-  const target = await gate.db.prepare('SELECT sub FROM social_handle WHERE handle = ?1').bind(handle).first();
-  if (!target || !target.sub || target.sub === gate.sub) return invalid();
-  const friend = await readProfile(gate.db, target.sub);
-  if (!friend) return invalid();
+  /* Pagar di sisi YANG DIMINTA: satu murid tidak boleh punya lebih dari
+     REQUESTS_MAX permintaan menggantung. Ini yang menahan banjir permintaan dari
+     orang asing - dan yang membuat jendela baca tepi di friendEdges() cukup. */
+  const theirEdges = await friendEdges(gate.db, target.sub);
+  const myEdges = await friendEdges(gate.db, gate.sub);
+  const theirs = theirEdges.outgoingSubs.has(gate.sub);
+  if (!theirs && theirEdges.pending.length >= REQUESTS_MAX) {
+    return jsonError(409, ERR.LIMIT_REACHED, {}, gate.opt);
+  }
+
+  /* Dia sudah lebih dulu memintaku? Maka menekan "tambah" ADALAH persetujuanku,
+     dan kami langsung berteman - murid tidak perlu menerima permintaan yang
+     sudah ia jawab dengan permintaan tandingan. */
+  if (theirs && myEdges.friends.length >= FRIENDS_MAX) {
+    return jsonError(409, ERR.LIMIT_REACHED, {}, gate.opt);
+  }
 
   await gate.db
     .prepare('INSERT OR IGNORE INTO social_friend (a, b, since_day) VALUES (?1, ?2, ?3)')
     .bind(gate.sub, target.sub, gate.day)
     .run();
-  await gate.db
-    .prepare('INSERT OR IGNORE INTO social_friend (a, b, since_day) VALUES (?1, ?2, ?3)')
-    .bind(target.sub, gate.sub, gate.day)
-    .run();
 
   return jsonResponse(
-    { friend: { handle: friend.handle, displayName: friend.display_name || null, avatarId: Number(friend.avatar_id) || 0 } },
+    { status: theirs ? 'friends' : 'pending', friend: friendPayload(target.profile) },
     gate.opt
   );
+}
+
+/* ===================================== permintaan masuk: daftar, terima, tolak ========= */
+
+const SCHEMA_DECIDE = { allow: { handle: { type: 'string', max: 24, required: true } } };
+
+async function routeFriendsRequests(ctx) {
+  const gate = await socialGate(ctx);
+  if (gate.deny) return gate.deny;
+  const me = await requireProfile(gate);
+  if (!me) return jsonError(404, ERR.PROFILE_REQUIRED, {}, gate.opt);
+
+  const { pending } = await friendEdges(gate.db, gate.sub);
+  const requests = [];
+  for (const row of pending) {
+    const profile = await readProfile(gate.db, row.a);
+    if (profile) requests.push({ ...friendPayload(profile), sinceDay: row.since_day });
+  }
+  return jsonResponse({ requests }, gate.opt);
+}
+
+async function routeFriendsAccept(ctx) {
+  const gate = await socialGate(ctx);
+  if (gate.deny) return gate.deny;
+  const body = await readJsonFromCtx(ctx, gate.opt);
+  if (!body.ok) return body.response;
+  const shape = validateShape(body.value, SCHEMA_DECIDE);
+  if (!shape.ok) return jsonError(400, ERR.SCHEMA_INVALID, {}, gate.opt);
+  const me = await requireProfile(gate);
+  if (!me) return jsonError(404, ERR.PROFILE_REQUIRED, {}, gate.opt);
+
+  const invalid = () => jsonError(400, ERR.CODE_INVALID, {}, gate.opt);
+  const target = await resolveHandle(gate, me, body.value.handle);
+  if (!target) return invalid();
+
+  /* Tidak ada permintaan darinya = tidak ada yang bisa diterima. Dijawab dengan
+     galat yang SAMA seperti handle tak dikenal: rute ini tidak boleh jadi cara
+     menanyakan apakah seseorang pernah meminta berteman denganku. */
+  const theirs = await gate.db
+    .prepare('SELECT since_day FROM social_friend WHERE a = ?1 AND b = ?2')
+    .bind(target.sub, gate.sub)
+    .first();
+  if (!theirs) return invalid();
+
+  /* Batasnya dicek untuk YANG MENERIMA - inilah pihak yang daftar temannya
+     bertambah, dan pihak yang dulu tidak pernah dihitung sama sekali. */
+  if ((await mutualFriendCount(gate.db, gate.sub)) >= FRIENDS_MAX) {
+    return jsonError(409, ERR.LIMIT_REACHED, {}, gate.opt);
+  }
+
+  await gate.db
+    .prepare('INSERT OR IGNORE INTO social_friend (a, b, since_day) VALUES (?1, ?2, ?3)')
+    .bind(gate.sub, target.sub, gate.day)
+    .run();
+
+  return jsonResponse({ status: 'friends', friend: friendPayload(target.profile) }, gate.opt);
+}
+
+async function routeFriendsReject(ctx) {
+  const gate = await socialGate(ctx);
+  if (gate.deny) return gate.deny;
+  const body = await readJsonFromCtx(ctx, gate.opt);
+  if (!body.ok) return body.response;
+  const shape = validateShape(body.value, SCHEMA_DECIDE);
+  if (!shape.ok) return jsonError(400, ERR.SCHEMA_INVALID, {}, gate.opt);
+  const me = await requireProfile(gate);
+  if (!me) return jsonError(404, ERR.PROFILE_REQUIRED, {}, gate.opt);
+
+  const invalid = () => jsonError(400, ERR.CODE_INVALID, {}, gate.opt);
+  const target = await resolveHandle(gate, me, body.value.handle);
+  if (!target) return invalid();
+
+  /* Menolak hanya menghapus baris MASUK (dia -> aku). Baris keluarku tidak
+     disentuh: kalau kami memang sudah berteman, "tolak" tidak boleh diam-diam
+     jadi "putus pertemanan" dari sisi yang salah. */
+  await gate.db
+    .prepare(
+      'DELETE FROM social_friend WHERE a = ?1 AND b = ?2' +
+      ' AND NOT EXISTS (SELECT 1 FROM social_friend r WHERE r.a = ?2 AND r.b = ?1)'
+    )
+    .bind(target.sub, gate.sub)
+    .run();
+
+  /* Selalu dijawab sama, ada atau tidak ada permintaannya - anti-oracle. */
+  return jsonResponse({ status: 'rejected' }, gate.opt);
 }
 
 /* ========================================================== daftar teman =========== */
@@ -488,11 +666,7 @@ async function routeFriendsList(ctx) {
   const me = await requireProfile(gate);
   if (!me) return jsonError(404, ERR.PROFILE_REQUIRED, {}, gate.opt);
 
-  const edges = await gate.db
-    .prepare('SELECT b, since_day FROM social_friend WHERE a = ?1 LIMIT 50')
-    .bind(gate.sub)
-    .all();
-  const rows = (edges && edges.results) || [];
+  const rows = (await friendEdges(gate.db, gate.sub)).friends;
   const subs = rows.map((r) => r.b);
 
   let profiles = new Map();
@@ -590,11 +764,13 @@ async function routeCheer(ctx) {
     .first();
   // "tidak ada" dan "bukan teman" dijawab SAMA (anti-oracle keanggotaan).
   if (!target || target.sub === gate.sub) return notFound(gate.opt);
-  const edge = await gate.db
-    .prepare('SELECT since_day FROM social_friend WHERE a = ?1 AND b = ?2')
-    .bind(gate.sub, target.sub)
-    .first();
-  if (!edge) return notFound(gate.opt);
+  /* Dua arah, bukan satu: tanpa ini seseorang bisa menyoraki murid yang belum
+     pernah menerima permintaannya - notifikasi dari orang asing lewat pintu
+     yang sama. */
+  const edges = await friendEdges(gate.db, gate.sub);
+  if (!edges.outgoingSubs.has(target.sub) || !edges.incomingSubs.has(target.sub)) {
+    return notFound(gate.opt);
+  }
 
   const granted = await grantCapped(
     gate.db, gate.sub, gate.day, 'cheer:' + target.sub, 1, CHEER_PER_FRIEND_PER_DAY
@@ -803,11 +979,8 @@ async function routeBoardFriends(ctx) {
   const me = await requireProfile(gate);
   if (!me) return jsonError(404, ERR.PROFILE_REQUIRED, {}, gate.opt);
 
-  const edges = await gate.db
-    .prepare('SELECT b, since_day FROM social_friend WHERE a = ?1 LIMIT 50')
-    .bind(gate.sub)
-    .all();
-  const subs = [gate.sub, ...((edges && edges.results) || []).map((r) => r.b)];
+  const mutual = (await friendEdges(gate.db, gate.sub)).friends;
+  const subs = [gate.sub, ...mutual.map((r) => r.b)];
   // Baris "aku" selalu terlihat OLEH DIRIKU walau Mode privat (PB pribadi tetap
   // terlihat sendiri, spec §4.3); teman yang hidden tersaring di boardRowsFor.
   const rows = await boardRowsFor(gate, subs, true);
@@ -940,6 +1113,9 @@ export const ROUTES = [
   ['POST', '/api/social/friends/invite', routeFriendsInvite],
   ['POST', '/api/social/friends/redeem', routeFriendsRedeem],
   ['POST', '/api/social/friends/add', routeFriendsAdd],
+  ['GET', '/api/social/friends/requests', routeFriendsRequests],
+  ['POST', '/api/social/friends/accept', routeFriendsAccept],
+  ['POST', '/api/social/friends/reject', routeFriendsReject],
   ['GET', '/api/social/friends', routeFriendsList],
   ['POST', '/api/social/cheer', routeCheer],
   ['POST', '/api/social/rank/evidence', routeRankEvidence],

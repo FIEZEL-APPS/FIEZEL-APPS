@@ -1,6 +1,6 @@
 {
   "schema": "id-golden-baseline/1",
-  "generatedAt": "2026-09-05T09:37:51.047Z",
+  "generatedAt": "2026-09-05T13:21:52.011Z",
   "root": "/home/user/FIEZEL-APPS",
   "files": {
     "grammar-explanations-id.json": "90912890391b2e491f31a6558aec5b7cecccbf56bc7c341fb1106291b5c721b6",
@@ -18,8 +18,8 @@
     "features/audio-assets/fiezel-audio-key.js": "11624e303917fe0df881ac3f410911587766fd6f4d2491ca6687ec42de8d457d"
   },
   "literals": {
-    "count": 2618,
-    "sha256": "69bf0a0b93ced2e4e0b75efb373510519b24450f6ffddec1f4b9a106fe7847f6",
+    "count": 2619,
+    "sha256": "ac19d84aadd46e04afc2a7f712a3093393f7ea1f2fcfb1b58e9db7a325e02d99",
     "list": [
       "\n      SETELAH beat concern ≤1000ms selesai (13 §2.2), bukan menimpanya. Tanpa bunyi:\n      SFX hint sudah dipensiunkan (20 §4); cooldown 8 detiknya dijaga komponen. */\n   setTimeout(()=>{try{pawReact(",
       "\n      case 'silent':                        // L5: kalau mulut sempat mulai (taksiran L3 kandas), tutup SEKARANG\n        degradedLatch = false;\n        closeTurn(false);\n        break;\n      case 'interrupt':                     // stop(): snap tutup\n        degradedLatch = false;\n        closeTurn(true);\n        break;\n      default:\n        break;                              // fase asing dari versi fasad lebih baru: diabaikan tanpa suara\n    }\n  }\n\n  try { doc.addEventListener('fiezel-speech', onSpeech); } catch (_) {}\n\n  /* Suara terdegradasi (audibility-fix): mulut mati SEKETIKA dan tidak boleh\n     hidup lagi untuk sisa giliran — apa pun yang masih dikirim lapisan bawah. */\n  try {\n    root.addEventListener('fiezel-neural-voice-degraded', function () {\n      if (turn) closeTurn(true);\n      degradedLatch = true;                 // dilepas oleh end/silent/interrupt fasad berikutnya\n    });\n  } catch (_) {}\n\n  /* Permukaan kecil untuk Diagnostics/tes — bukan API pemanggil biasa:\n     satu-satunya pintu bicara tetap FiezelVoiceSay.say(). */\n  root.FiezelSpeechBridge = Object.freeze({\n    SCHEMA: SCHEMA,\n    speaking: function () { return !!turn; },\n    degraded: function () { return !!degradedLatch; },\n    motionAllowed: motionAllowed\n  });\n})(typeof self !== 'undefined' ? self : (typeof window !== 'undefined' ? window : this));\n",
@@ -866,6 +866,7 @@
       "Belum ada latihan ujian untuk level {level}. Sudah ada untuk: {available}.",
       "Belum ada materi yang perlu diulang sekarang.",
       "Belum ada pasangan kata yang terlihat sering tertukar dari riwayat jawaban.",
+      "Belum ada permintaan teman yang menunggu.",
       "Belum ada pilihan keliru yang cukup sering muncul.",
       "Belum ada pola kesalahan yang berulang.",
       "Belum ada review yang jatuh tempo.",
