@@ -277,6 +277,16 @@
     'social2.class-left': 'คุณออกจากชั้นเรียนแล้ว',
     'social2.online-now': 'ออนไลน์',
     'social2.class-change': 'เปลี่ยน',
-    'social2.more-ways': 'วิธีอื่น: รหัสเชิญ'
+    'social2.more-ways': 'วิธีอื่น: รหัสเชิญ',
+    'progress2.level-eyebrow': 'ระดับของคุณ',
+    'progress2.level-aria': 'การ์ดระดับและความก้าวหน้า',
+    'progress2.level-lead': '{pct}% สู่ระดับ {next} เหลืออีก {sisa} บทไวยากรณ์',
+    'progress2.level-top': 'ระดับสูงสุดแล้ว รักษาไว้ด้วยการฝึกสม่ำเสมอ',
+    'progress2.streak': '{days} วัน',
+    'progress2.week-title': 'สัปดาห์นี้',
+    'progress2.week-pill': 'ฝึก {days}/7 วัน',
+    'progress2.week-note': 'ทำไป {items} ข้อใน 7 วันที่ผ่านมา',
+    'progress2.week-empty': 'สัปดาห์นี้ยังไม่ได้ฝึก เริ่มด้วยเซสชันเล็ก ๆ ก็พอ',
+    'progress2.days': 'จ,อ,พ,พฤ,ศ,ส,อา'
   });
 })();
