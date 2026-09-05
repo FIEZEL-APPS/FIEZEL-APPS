@@ -4,8 +4,8 @@ FIEZEL SYSTEM-WIDE CONTENT INTEGRITY AUDIT
 
 Inspection volume:
   classroom.recordsInspected             38
-  grammar.questionsInspected             7050
-  grammar.recordsInspected               282
+  grammar.questionsInspected             8050
+  grammar.recordsInspected               322
   library.recordsInspected               9
   listening-exam.recordsInspected        57
   listening.recordsInspected             1407
@@ -25,15 +25,19 @@ Inspection volume:
 
 Findings by severity:
   CRITICAL                               0
-  MAJOR                                  192
+  MAJOR                                  214
   MINOR                                  0
 
 Findings by class:
-  grammar/CROSS_FAMILY_FALLBACK                        192
+  grammar/CROSS_FAMILY_FALLBACK                        188
+  grammar/SEMANTIC_DUPLICATE_OPTIONS                   26
 
 Representative evidence (first occurrence per class):
+  [MAJOR] grammar/SEMANTIC_DUPLICATE_OPTIONS @ grammar-EC-203-complete_sentence-1788569209061-0.44963396315588033
+      two options are near-identical, so the item has no single defensible answer
+      evidence: "Usually we eat dinner at seven usually." vs "We eat dinner at seven usually eat."
   [MAJOR] grammar/CROSS_FAMILY_FALLBACK @ b4_024
-      lesson "cleft_sentences_it_was_x_that_emphasis" (emphasis_inversion/C1) offers an answer option authored for b5_008 (passive/C1)
-      evidence: kenali jenis pelengkap yang dituntut kata kerjanya, bentuk -ing atau bentuk to → terapkan bentuk pasif yang cocok
+      lesson "cleft_sentences_it_was_x_that_emphasis" (emphasis_inversion/C1) offers an answer option authored for b5_015 (gerunds_infinitives/C1)
+      evidence: tentuin kalimatnya nyampein kabar buruk resmi atau nyesalin tindakan lampau → pilih bentuk to atau bentuk -ing
 
 PASS — 0 critical integrity failures.

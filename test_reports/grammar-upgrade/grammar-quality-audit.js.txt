@@ -4,8 +4,8 @@
   "counts": {
     "pass": 28,
     "fail": 0,
-    "lessons": 282,
-    "runtimeQuestions": 7050,
+    "lessons": 322,
+    "runtimeQuestions": 8050,
     "practiceModes": 25,
     "crossLessonDuplicates": 0,
     "focusLeaks": 0,
@@ -22,12 +22,12 @@
     {
       "name": "Grammar lesson inventory",
       "status": "PASS",
-      "details": "declared=282 actual=282"
+      "details": "declared=322 actual=322"
     },
     {
       "name": "Unique lesson identities (V18: multi-template per lesson)",
       "status": "PASS",
-      "details": "ids=282 templates=282 lessons=180"
+      "details": "ids=322 templates=322 lessons=180"
     },
     {
       "name": "Template field completeness",
@@ -62,12 +62,12 @@
     {
       "name": "Unique authored stems",
       "status": "PASS",
-      "details": "unique=282/282"
+      "details": "unique=322/322"
     },
     {
       "name": "Unique pedagogical objectives",
       "status": "PASS",
-      "details": "unique=282/282"
+      "details": "unique=322/322"
     },
     {
       "name": "Known pedagogical collision regressions absent",
@@ -89,17 +89,17 @@
     {
       "name": "Runtime question inventory",
       "status": "PASS",
-      "details": "generated=7050 expected=7050"
+      "details": "generated=8050 expected=8050"
     },
     {
       "name": "Twenty-five questions per lesson",
       "status": "PASS",
-      "details": "282/282 lessons complete"
+      "details": "322/322 lessons complete"
     },
     {
       "name": "Twenty-five distinct pedagogical modes",
       "status": "PASS",
-      "details": "25 modes x 282 lessons"
+      "details": "25 modes x 322 lessons"
     },
     {
       "name": "Within-lesson question uniqueness",
@@ -109,7 +109,7 @@
     {
       "name": "Lesson focus purity",
       "status": "PASS",
-      "details": "all 7,050 questions use the active lesson concept"
+      "details": "all 8,050 questions use the active lesson concept"
     },
     {
       "name": "Option provenance contract (m025-155)",
@@ -155,31 +155,31 @@
       "name": "Balanced mode coverage",
       "status": "PASS",
       "details": {
-        "apply_form": 282,
-        "complete_sentence": 282,
-        "justify_correct": 282,
-        "recognize_rule": 282,
-        "recognize_objective": 282,
-        "sequence_reasoning": 282,
-        "identify_misconception": 282,
-        "recall_memory_cue": 282,
-        "choose_avoidance": 282,
-        "diagnose_distractor_1": 282,
-        "diagnose_distractor_2": 282,
-        "diagnose_distractor_3": 282,
-        "label_misconception_1": 282,
-        "label_misconception_2": 282,
-        "label_misconception_3": 282,
-        "repair_distractor_1": 282,
-        "repair_distractor_2": 282,
-        "repair_distractor_3": 282,
-        "contrast_distractor_1": 282,
-        "contrast_distractor_2": 282,
-        "contrast_distractor_3": 282,
-        "classify_family": 282,
-        "locate_decision_cue": 282,
-        "teach_back": 282,
-        "mastery_check": 282
+        "apply_form": 322,
+        "complete_sentence": 322,
+        "justify_correct": 322,
+        "recognize_rule": 322,
+        "recognize_objective": 322,
+        "sequence_reasoning": 322,
+        "identify_misconception": 322,
+        "recall_memory_cue": 322,
+        "choose_avoidance": 322,
+        "diagnose_distractor_1": 322,
+        "diagnose_distractor_2": 322,
+        "diagnose_distractor_3": 322,
+        "label_misconception_1": 322,
+        "label_misconception_2": 322,
+        "label_misconception_3": 322,
+        "repair_distractor_1": 322,
+        "repair_distractor_2": 322,
+        "repair_distractor_3": 322,
+        "contrast_distractor_1": 322,
+        "contrast_distractor_2": 322,
+        "contrast_distractor_3": 322,
+        "classify_family": 322,
+        "locate_decision_cue": 322,
+        "teach_back": 322,
+        "mastery_check": 322
       }
     },
     {

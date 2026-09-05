@@ -134,7 +134,7 @@
         "whyCorrect": "“We” itu jamak, jadi kata kerjanya tetap bentuk dasar: we go.",
         "whyOthersFail": "“Goes” buat subjek tunggal. “Going” kurang “are”. “Went” bentuk lampau.",
         "howToAvoid": "Lihat subjeknya dulu. Kalau we, you, they, atau I, jangan tambah -s.",
-        "memoryCue": "Ingat: we go, tapi she goes.",
+        "memoryCue": "Ingat aturannya: “we go”, tapi “she goes”.",
         "distractors": {
           "goes": {
             "misconception": "nambahin -s ke kata kerja, padahal subjeknya jamak.",
@@ -158,7 +158,7 @@
         "whyCorrect": "'We' เป็นพหูพจน์ คำกริยาจึงคงรูปพื้นฐาน: we go",
         "whyOthersFail": "'goes' ใช้กับประธานเอกพจน์ 'going' ขาด 'are' ส่วน 'went' เป็นรูปอดีต",
         "howToAvoid": "ดูประธานก่อน ถ้าเป็น we, you, they หรือ I อย่าเติม -s",
-        "memoryCue": "จำไว้: we go แต่ she goes",
+        "memoryCue": "จำกฎไว้: 'we go' แต่ 'she goes'",
         "distractors": {
           "goes": {
             "misconception": "เติม -s ให้คำกริยาทั้งที่ประธานเป็นพหูพจน์",
@@ -1054,7 +1054,7 @@
         "whyCorrect": "“Ten years” itu lamanya waktu, jadi present perfect-nya pakai “for”: has taught for ten years.",
         "whyOthersFail": "“Since” minta titik mulai. “During” nyebut kapan, bukan berapa lama. “From” butuh “to” buat nutup rentangnya.",
         "howToAvoid": "Tanya: ini jumlah tahun atau tanggal? Jumlah → for. Tanggal → since.",
-        "memoryCue": "Lamanya pakai for, titik mulainya pakai since: for ten years, since 2015.",
+        "memoryCue": "Lamanya waktu pakai “for”, titik mulai pakai “since”: “for ten years”, “since 2015”.",
         "distractors": {
           "since": {
             "misconception": "pakai “since” di depan lamanya waktu, padahal since buat titik mulai.",
@@ -1078,7 +1078,7 @@
         "whyCorrect": "'Ten years' เป็นช่วงเวลา present perfect จึงใช้ 'for': has taught for ten years",
         "whyOthersFail": "'since' ต้องการจุดเริ่มต้น 'during' บอกว่าเมื่อไหร่ ไม่ใช่นานเท่าไหร่ ส่วน 'from' ต้องมี 'to' เพื่อปิดช่วง",
         "howToAvoid": "ถามว่าเป็นจำนวนปีหรือวันที่? จำนวน → for วันที่ → since",
-        "memoryCue": "ช่วงเวลาใช้ for จุดเริ่มต้นใช้ since: for ten years, since 2015",
+        "memoryCue": "ช่วงเวลาใช้ 'for' จุดเริ่มต้นใช้ 'since': 'for ten years', 'since 2015'",
         "distractors": {
           "since": {
             "misconception": "ใช้ 'since' หน้าช่วงเวลา ทั้งที่ since ใช้กับจุดเริ่มต้น",

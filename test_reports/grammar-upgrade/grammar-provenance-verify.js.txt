@@ -3,13 +3,13 @@
 [A1] lesson: 34 | kartu: 850 | pelanggaran: 0
   - bersih
 
-[A2] lesson: 56 | kartu: 1400 | pelanggaran: 0
+[A2] lesson: 58 | kartu: 1450 | pelanggaran: 0
   - bersih
 
-[B1] lesson: 83 | kartu: 2075 | pelanggaran: 0
+[B1] lesson: 104 | kartu: 2600 | pelanggaran: 0
   - bersih
 
-[B2] lesson: 61 | kartu: 1525 | pelanggaran: 0
+[B2] lesson: 78 | kartu: 1950 | pelanggaran: 0
   - bersih
 
 [C1] lesson: 29 | kartu: 725 | pelanggaran: 0

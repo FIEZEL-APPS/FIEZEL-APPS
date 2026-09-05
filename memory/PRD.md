@@ -84,7 +84,12 @@ Tambahan user: semua soal & jawaban harus selaras dengan i18n Thai.
 - 33 template kedua tri-bahasa (en/id/th) untuk lesson yang tadinya tunggal (A1 4, A2 15, B1 8, B2 6).
 - Semua gerbang grammar/konten/i18n hijau.
 
+## Gelombang 2 (selesai, build m025-256)
+- 40 template kedua tambahan (packs c/d/e, shorthand `@sibling:N`) → 322 template, semua 139 lesson A1–B2 ≥ 2 template, 8.050 soal runtime.
+- 12 explanation Indonesia A1–A2 > 170 karakter diringkas (kini 0), peta th cloze disinkronkan.
+- Sesi Kilat: `startGrammarQuickSession()` + tombol `grammar-quick-session-btn` di hub Grammar; 10 soal bentuk lintas lesson terbuka di level aktif; i18n id+th.
+
 ## Backlog
-- P1: template kedua untuk 40 lesson A1–B2 yang masih tunggal.
-- P2: pemendekan whyOthersFailId A1/A2 >170 karakter (butuh sinkron th). P2: C1–C2 di luar scope.
+- P2: C1–C2 di luar scope (masih banyak lesson tunggal). P2: Thai untuk 4 rule locale-netral (CO-203, PA-201, PA-202, LD-202) bila ingin 100% aksara Thai.
+- P3: statistik Sesi Kilat (streak harian) bila diminta.
 - Pra-eksis lingkungan: e2e-level-grammar-test (WebSocket global), cf-live-selftest, gerbang vendor/kokoro.
