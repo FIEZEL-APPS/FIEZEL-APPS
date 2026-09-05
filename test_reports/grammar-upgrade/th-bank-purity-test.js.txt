@@ -1,8 +1,8 @@
 PASS  reading: seluruh bacaan A1/A2 punya sidecar th utuh (106 bacaan)
 PASS  reading: nol sisa bahasa Indonesia di jalur murid th (2650 bidang)
 PASS  reading: nol Thai kata-per-kata (jejak penerjemah token)
-PASS  cloze: seluruh butir bank punya sidecar th utuh (273 butir)
-PASS  cloze: nol sisa bahasa Indonesia di jalur murid th (2722 bidang)
+PASS  cloze: seluruh butir bank punya sidecar th utuh (279 butir)
+PASS  cloze: nol sisa bahasa Indonesia di jalur murid th (2782 bidang)
 PASS  cloze: nol Thai kata-per-kata (jejak penerjemah token)
 PASS  reading-exam: format + penjelasan tiap soal tercakup th
 PASS  reading-exam: nol sisa bahasa Indonesia di jalur murid th (196 bidang)

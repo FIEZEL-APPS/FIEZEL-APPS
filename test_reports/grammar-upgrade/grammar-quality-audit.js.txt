@@ -1,11 +1,11 @@
 {
   "version": "5.19.0",
-  "status": "PASS",
+  "status": "NOT READY",
   "counts": {
-    "pass": 28,
-    "fail": 0,
-    "lessons": 322,
-    "runtimeQuestions": 8050,
+    "pass": 26,
+    "fail": 2,
+    "lessons": 328,
+    "runtimeQuestions": 8200,
     "practiceModes": 25,
     "crossLessonDuplicates": 0,
     "focusLeaks": 0,
@@ -22,12 +22,12 @@
     {
       "name": "Grammar lesson inventory",
       "status": "PASS",
-      "details": "declared=322 actual=322"
+      "details": "declared=328 actual=328"
     },
     {
       "name": "Unique lesson identities (V18: multi-template per lesson)",
       "status": "PASS",
-      "details": "ids=322 templates=322 lessons=180"
+      "details": "ids=328 templates=328 lessons=180"
     },
     {
       "name": "Template field completeness",
@@ -62,12 +62,12 @@
     {
       "name": "Unique authored stems",
       "status": "PASS",
-      "details": "unique=322/322"
+      "details": "unique=328/328"
     },
     {
       "name": "Unique pedagogical objectives",
       "status": "PASS",
-      "details": "unique=322/322"
+      "details": "unique=328/328"
     },
     {
       "name": "Known pedagogical collision regressions absent",
@@ -89,17 +89,20 @@
     {
       "name": "Runtime question inventory",
       "status": "PASS",
-      "details": "generated=8050 expected=8050"
+      "details": "generated=8200 expected=8200"
     },
     {
       "name": "Twenty-five questions per lesson",
       "status": "PASS",
-      "details": "322/322 lessons complete"
+      "details": "328/328 lessons complete"
     },
     {
       "name": "Twenty-five distinct pedagogical modes",
-      "status": "PASS",
-      "details": "25 modes x 322 lessons"
+      "status": "FAIL",
+      "details": [
+        "indirect_questions_embedded_word_order",
+        "indirect_questions_embedded_word_order"
+      ]
     },
     {
       "name": "Within-lesson question uniqueness",
@@ -109,7 +112,7 @@
     {
       "name": "Lesson focus purity",
       "status": "PASS",
-      "details": "all 8,050 questions use the active lesson concept"
+      "details": "all 8,200 questions use the active lesson concept"
     },
     {
       "name": "Option provenance contract (m025-155)",
@@ -153,33 +156,33 @@
     },
     {
       "name": "Balanced mode coverage",
-      "status": "PASS",
+      "status": "FAIL",
       "details": {
-        "apply_form": 322,
-        "complete_sentence": 322,
-        "justify_correct": 322,
-        "recognize_rule": 322,
-        "recognize_objective": 322,
-        "sequence_reasoning": 322,
-        "identify_misconception": 322,
-        "recall_memory_cue": 322,
-        "choose_avoidance": 322,
-        "diagnose_distractor_1": 322,
-        "diagnose_distractor_2": 322,
-        "diagnose_distractor_3": 322,
-        "label_misconception_1": 322,
-        "label_misconception_2": 322,
-        "label_misconception_3": 322,
-        "repair_distractor_1": 322,
-        "repair_distractor_2": 322,
-        "repair_distractor_3": 322,
-        "contrast_distractor_1": 322,
-        "contrast_distractor_2": 322,
-        "contrast_distractor_3": 322,
-        "classify_family": 322,
-        "locate_decision_cue": 322,
-        "teach_back": 322,
-        "mastery_check": 322
+        "apply_form": 330,
+        "complete_sentence": 328,
+        "justify_correct": 328,
+        "recognize_rule": 328,
+        "recognize_objective": 328,
+        "sequence_reasoning": 328,
+        "identify_misconception": 328,
+        "recall_memory_cue": 326,
+        "choose_avoidance": 328,
+        "diagnose_distractor_1": 328,
+        "diagnose_distractor_2": 328,
+        "diagnose_distractor_3": 328,
+        "label_misconception_1": 328,
+        "label_misconception_2": 328,
+        "label_misconception_3": 328,
+        "repair_distractor_1": 328,
+        "repair_distractor_2": 328,
+        "repair_distractor_3": 328,
+        "contrast_distractor_1": 328,
+        "contrast_distractor_2": 328,
+        "contrast_distractor_3": 328,
+        "classify_family": 328,
+        "locate_decision_cue": 328,
+        "teach_back": 328,
+        "mastery_check": 328
       }
     },
     {

@@ -7730,6 +7730,150 @@
           "whyFails": "'would' อยู่ในอนุประโยคผล ไม่ใช่ในอนุประโยค 'as if'"
         }
       }
+    },
+    "CO-207": {
+      "objective": "ใช้ 'would + คำกริยารูปพื้นฐาน' กับผลในปัจจุบันของสาเหตุในอดีตที่ไม่จริง",
+      "misconception": "ผู้เรียนลอก past perfect จากอนุประโยค if มาใส่ในผลที่เป็นเรื่องตอนนี้",
+      "reasoning": "ระบุสาเหตุในอดีตที่มีผลในปัจจุบัน → เลือก would + คำกริยารูปพื้นฐานสำหรับผลปัจจุบัน",
+      "rule": "Mixed conditional: If + past perfect (สาเหตุอดีต), would + คำกริยารูปพื้นฐาน (ผลปัจจุบัน)",
+      "whyCorrect": "การพลาดรถเมล์อยู่ในอดีต แต่ 'now' ทำให้ผลเป็นปัจจุบัน จึงใช้ 'would be'",
+      "whyOthersFail": "'would have been' เป็นผลในอดีต 'was' เป็นเรื่องจริง ส่วน 'had been' อยู่ในอนุประโยค if",
+      "howToAvoid": "มองหา 'now' หรือ 'today' ในส่วนผล: นั่นหมายถึง would + คำกริยารูปพื้นฐาน ไม่ใช่ would have",
+      "memoryCue": "สาเหตุอดีต ผล 'now' → would be",
+      "distractors": {
+        "would have been": {
+          "misconception": "วางผลลัพธ์ไว้ในอดีตที่ไม่จริง แทนที่จะเป็นปัจจุบัน",
+          "whyFails": "'would have been' บรรยายผลในอดีต แต่ 'now' วางผลไว้ในปัจจุบัน"
+        },
+        "was": {
+          "misconception": "ใช้รูปอดีตโดยไม่มี modal ที่ประโยคผลต้องมี",
+          "whyFails": "'was' ธรรมดาบอกข้อเท็จจริง แต่สถานการณ์นี้เป็นจินตนาการ"
+        },
+        "had been": {
+          "misconception": "ใช้ past perfect ซ้ำในประโยคหลัก",
+          "whyFails": "'had been' เป็นรูปของอนุประโยค if ส่วนอนุประโยคผลต้องใช้ 'would'"
+        }
+      }
+    },
+    "CO-208": {
+      "objective": "สลับ 'had' กับประธานเพื่อแทน 'if' ใน third conditional แบบเป็นทางการ",
+      "misconception": "ผู้เรียนคง 'if' ไว้พร้อมการสลับที่ หรือลืมย้าย 'had' ไปหน้าประโยค",
+      "reasoning": "ระบุเงื่อนไขอดีตไม่จริงแบบเป็นทางการ → ตัด if → ย้าย had ไปหน้าประธาน",
+      "rule": "การสลับที่แบบเป็นทางการ: Had + ประธาน + past participle, … would have + past participle",
+      "whyCorrect": "ในแบบเป็นทางการ 'if' หายไปและ 'had' ย้ายไปหน้าประธาน: Had we received the warning",
+      "whyOthersFail": "'If we had' เป็นแบบกลาง 'we had' เป็นประโยคบอกเล่า ส่วน 'had received we' วางประธานผิดที่",
+      "howToAvoid": "ลบ 'if' แล้วสลับประธานกับ 'had' — ส่วนอื่นไม่ต้องย้าย",
+      "memoryCue": "If we had → Had we",
+      "distractors": {
+        "If we had received": {
+          "misconception": "ผสมการสลับตำแหน่งแบบทางการเข้ากับคำเชื่อม 'if' พร้อมกัน",
+          "whyFails": "ถูกในแบบกลาง แต่รูปเป้าหมายตัด 'if' และสลับ 'had'"
+        },
+        "We had received": {
+          "misconception": "ใช้ลำดับประธาน-กริยาปกติ จนพลาดสัญญาณการสลับตำแหน่ง",
+          "whyFails": "ไม่มี 'if' หรือการสลับที่ นี่เป็นแค่ประโยคบอกเล่า ไม่ใช่เงื่อนไข"
+        },
+        "Had received we": {
+          "misconception": "เอาโครงสร้างกริยาช่วยของอนุประโยคผลมาขึ้นต้นอนุประโยค if",
+          "whyFails": "มีแค่ 'had' ที่ย้ายไปหน้า ประธานยังอยู่หน้า participle"
+        }
+      }
+    },
+    "QN-206": {
+      "objective": "สลับกริยาช่วยกับประธานหลัง 'Rarely' ที่อยู่หน้าประโยค",
+      "misconception": "ผู้เรียนวางคำกริยาวิเศษณ์ปฏิเสธไว้หน้าแต่คงลำดับประธาน-คำกริยาแบบปกติ",
+      "reasoning": "ระบุคำกริยาวิเศษณ์ปฏิเสธที่อยู่หน้า → ย้ายกริยาช่วยไปหน้าประธาน → คงคำกริยาหลักไว้หลัง",
+      "rule": "คำกริยาวิเศษณ์ปฏิเสธหน้าประโยค (never, rarely, seldom, not only) + กริยาช่วย + ประธาน + คำกริยา",
+      "whyCorrect": "'Rarely' หน้าประโยคทำให้ต้องสลับที่: กริยาช่วย 'have' ย้ายไปหน้า 'I'",
+      "whyOthersFail": "'I have seen' และ 'I saw' คงลำดับปกติ ส่วน 'saw I' สลับคำกริยาหลักแทนกริยาช่วย",
+      "howToAvoid": "rarely/never อยู่หน้า? สร้างเหมือนคำถาม: have I seen",
+      "memoryCue": "Rarely have I…",
+      "distractors": {
+        "I have seen": {
+          "misconception": "ยกคำวิเศษณ์เชิงปฏิเสธขึ้นต้นแล้ว แต่ไม่ได้สลับประธานกับกริยาช่วยตามที่บังคับ",
+          "whyFails": "หลัง 'Rarely' หน้าประโยค กริยาช่วยต้องมาก่อนประธาน"
+        },
+        "I saw": {
+          "misconception": "ยก 'Never' ขึ้นต้นโดยไม่มีกริยาช่วยเลย มองข้ามทั้งกฎ inversion และความจำเป็นของ 'have' คู่กับ 'before'",
+          "whyFails": "ไม่มีการสลับที่และไม่มีกริยาช่วย คำกริยาวิเศษณ์หน้าประโยคต้องการทั้งสองอย่าง"
+        },
+        "saw I": {
+          "misconception": "วาง 'never' ไว้หลังกริยาช่วย แทนที่จะไว้หน้าสุดของประโยค",
+          "whyFails": "การสลับที่ใช้กริยาช่วย (have/do/did) ไม่ใช่คำกริยาหลักลำพัง"
+        }
+      }
+    },
+    "QN-207": {
+      "objective": "สลับที่ด้วย 'did' หลังอนุประโยค 'Only when' ที่อยู่หน้า",
+      "misconception": "ผู้เรียนคงลำดับแบบประโยคบอกเล่าในอนุประโยคหลักหลังวลี 'Only…' ที่อยู่หน้า",
+      "reasoning": "ระบุอนุประโยค Only ที่อยู่หน้า → แทรก did หน้าประธานของอนุประโยคหลัก → คงคำกริยารูปเปล่า",
+      "rule": "Only + วลีบอกเวลา/เงื่อนไขหน้าประโยค → กริยาช่วย + ประธาน + คำกริยารูปพื้นฐานในอนุประโยคหลัก",
+      "whyCorrect": "'Only when…' หน้าประโยคทำให้ต้องสลับกริยาช่วย: did the boats leave",
+      "whyOthersFail": "สองตัวเลือกคงลำดับปกติ และอีกหนึ่งย้ายคำกริยาหลักแทนกริยาช่วย",
+      "howToAvoid": "ประโยคเริ่มด้วย 'Only after/when/then' ไหม? วาง did/does/have หน้าประธาน",
+      "memoryCue": "Only when … did the boats leave.",
+      "distractors": {
+        "the boats left": {
+          "misconception": "คงลำดับประโยคบอกเล่าปกติไว้หลังวลีจำกัดความที่ย้ายมาหน้าประโยค",
+          "whyFails": "อนุประโยค 'Only when' ที่อยู่หน้าบังคับให้สลับที่ในอนุประโยคหลัก"
+        },
+        "left the boats": {
+          "misconception": "สลับตัวกริยาแท้โดยตรง",
+          "whyFails": "การสลับที่ต้องใช้กริยาช่วย คำกริยาหลักลำพังย้ายไปหน้าไม่ได้"
+        },
+        "the boats did leave": {
+          "misconception": "เติม do เพื่อเน้น แต่ไม่ได้สลับมันกับประธาน",
+          "whyFails": "มี 'did' แต่ยังอยู่หลังประธาน จึงไม่มีการสลับที่"
+        }
+      }
+    },
+    "RS-208": {
+      "objective": "ใช้ subjunctive รูปเปล่าหลัง 'insisted that' แม้ประธานเป็นบุรุษที่สาม",
+      "misconception": "ผู้เรียนเติม -s หรือใช้กาลอดีตกับคำกริยาหลัง 'insisted that'",
+      "reasoning": "ระบุคำกริยาบังคับ insist → เลือกรูปเปล่าหลัง that → ไม่สนบุรุษของประธาน",
+      "rule": "Demand/insist/recommend/suggest + that + ประธาน + คำกริยารูปพื้นฐาน (ไม่เติม -s ไม่มีกาล)",
+      "whyCorrect": "'Insisted that' นำข้อเรียกร้อง คำกริยาจึงเป็น subjunctive รูปเปล่า: the patient stay",
+      "whyOthersFail": "'stays' เติม -s 'stayed' เลื่อนกาล ส่วน 'would stay' เปลี่ยนความหมายเป็นการคาดการณ์",
+      "howToAvoid": "หลังคำกริยาเรียกร้อง + that ให้เขียนคำกริยาตามรูปในพจนานุกรม",
+      "memoryCue": "Insisted that she stay.",
+      "distractors": {
+        "stays": {
+          "misconception": "ทำให้ข้อเรียกร้องนุ่มลงด้วย “would” เชิงเงื่อนไข เหมือนอนุประโยคกำลังรายงานการสมมติ",
+          "whyFails": "subjunctive ไม่มี -s แม้หลัง 'the patient'"
+        },
+        "stayed": {
+          "misconception": "ถอย tense กริยาแบบรายงานธรรมดา แทนที่จะคง subjunctive รูปเดิม",
+          "whyFails": "'insisted' ที่เป็นอดีตไม่เลื่อนกาล subjunctive มันคงรูปเปล่า"
+        },
+        "would stay": {
+          "misconception": "ผันประธาน-กริยาตามปกติกับประธานเอกพจน์ข้างในอนุประโยคเรียกร้อง",
+          "whyFails": "'would' เปลี่ยนข้อเรียกร้องเป็นการคาดการณ์ ข้อเรียกร้องใช้คำกริยารูปเปล่า"
+        }
+      }
+    },
+    "CO-209": {
+      "objective": "ใช้ 'Were + ประธาน + to + คำกริยา' กับเงื่อนไขอนาคตที่ไม่น่าเป็นไปได้แบบเป็นทางการ",
+      "misconception": "ผู้เรียนใช้ 'was' หรือคง 'if' ไว้พร้อมการสลับที่",
+      "reasoning": "ระบุเงื่อนไขทางการที่ไม่น่าเกิด → ตัด if → วาง were หน้าประธานและเติม to",
+      "rule": "เงื่อนไขทางการที่ไม่น่าเกิด: Were + ประธาน + to + คำกริยารูปพื้นฐาน, … would + คำกริยารูปพื้นฐาน",
+      "whyCorrect": "ตัด 'if' และย้าย 'were' ไปหน้าได้เงื่อนไขทางการ: Were she to accept the offer",
+      "whyOthersFail": "'was' ไม่ใช้ในแบบแผนนี้ 'if were' ใช้ตัวบ่งชี้ซ้ำ ส่วน 'she were to' ไม่มีการสลับที่",
+      "howToAvoid": "เขียน 'If she were to accept' แล้วลบ 'if' และสลับ: Were she to accept",
+      "memoryCue": "If she were to → Were she to",
+      "distractors": {
+        "Was she to accept": {
+          "misconception": "ใช้ “was” แทน “were” แบบ subjunctive ที่การสลับลำดับเชิงสมมติแบบทางการต้องการ",
+          "whyFails": "เงื่อนไขแบบสลับที่ใช้ 'were' เสมอ ไม่เคยใช้ 'was'"
+        },
+        "If were she to accept": {
+          "misconception": "เติม “if” ให้โครงสร้างที่ส่งสัญญาณเงื่อนไขผ่านการสลับลำดับอยู่แล้ว",
+          "whyFails": "'if' และการสลับที่ปรากฏพร้อมกันไม่ได้ ต้องเลือกอย่างเดียว"
+        },
+        "She were to accept": {
+          "misconception": "ตัดการสลับลำดับทิ้ง เหลือเศษประโยคที่ไม่สลับและไม่มี “if”",
+          "whyFails": "ไม่มีการสลับที่หรือ 'if' นี่จึงไม่ใช่อนุประโยคเงื่อนไข"
+        }
+      }
     }
   }
 }

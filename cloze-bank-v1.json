@@ -2,16 +2,16 @@
   "schema": "fiezel-cloze-bank-v1",
   "generatedFrom": "grammar-templates.json",
   "counts": {
-    "templates": 322,
-    "items": 273,
+    "templates": 328,
+    "items": 279,
     "rejected": 49,
     "byLevel": {
       "A2": 49,
       "B1": 86,
       "B2": 70,
-      "C1": 26,
+      "C1": 30,
       "A1": 25,
-      "C2": 17
+      "C2": 19
     }
   },
   "rejected": [
@@ -1710,14 +1710,14 @@
       "templateId": "TA-009",
       "skill": "past_perfect_continuous_background_cause",
       "level": "C1",
-      "sentence": "Which completion foregrounds the accumulated duration of the studying as the cause of his red eyes? His eyes were red because he ___ all night for the exam.",
+      "sentence": "His eyes were red because he ___ all night for the exam. (the long hours of studying are the cause)",
       "blank": {
         "answer": "had been studying",
         "alternates": [
           "had been revising",
           "had been cramming"
         ],
-        "position": 129
+        "position": 29
       },
       "distractors": [
         {
@@ -2469,13 +2469,13 @@
       "templateId": "b4_001",
       "skill": "future_perfect_continuous_duration_before_deadline",
       "level": "C1",
-      "sentence": "Which completion emphasizes the duration accumulating up to the deadline rather than merely the fact of completion? By the time she retires next year, Maria ____ at this company for over two decades.",
+      "sentence": "By the time she retires next year, Maria ____ at this company for over twenty years. (stress how long it has gone on)",
       "blank": {
         "answer": "will have been working",
         "alternates": [
           "'ll have been working"
         ],
-        "position": 157
+        "position": 41
       },
       "distractors": [
         {
@@ -3439,13 +3439,13 @@
       "templateId": "b5_005",
       "skill": "mixed_conditional_present_cause_past_result",
       "level": "C1",
-      "sentence": "In formal written English, which completion presents his fear as an ongoing trait he still has, rather than only a past state? If he ____ so afraid of flying, he would have joined us on the trip to Japan last year.",
+      "sentence": "If he ____ so afraid of flying, he would have joined us on the trip last year. He is still afraid today.",
       "blank": {
         "answer": "weren't",
         "alternates": [
           "were not"
         ],
-        "position": 133
+        "position": 6
       },
       "distractors": [
         {
@@ -3760,13 +3760,13 @@
       "templateId": "b5_016",
       "skill": "perfect_gerund_vs_simple_gerund_time_reference",
       "level": "C1",
-      "sentence": "Which completion most explicitly marks the breaking as earlier than the later admission? He admitted ____ the vase.",
+      "sentence": "He admitted ____ the vase. (the breaking happened before he admitted it)",
       "blank": {
         "answer": "having broken",
         "alternates": [
           "to having broken"
         ],
-        "position": 101
+        "position": 12
       },
       "distractors": [
         {
@@ -3923,7 +3923,7 @@
       "templateId": "b5_022",
       "skill": "addition_connectors_furthermore_in_addition_moreover_register",
       "level": "C1",
-      "sentence": "Which formal conjunctive adverb best completes this academic passage? The study's sample size was too small to generalize the findings. ____, the participants were not randomly selected, further weakening the results.",
+      "sentence": "Formal report: The sample was too small to generalize the findings. ____, the participants were not randomly selected.",
       "blank": {
         "answer": "Furthermore",
         "alternates": [
@@ -3931,7 +3931,7 @@
           "In addition",
           "Additionally"
         ],
-        "position": 136
+        "position": 68
       },
       "distractors": [
         {
@@ -4247,11 +4247,11 @@
       "templateId": "C2-002",
       "skill": "mixed_conditional_past_cause_future_result",
       "level": "C2",
-      "sentence": "Which completion presents the start as something that would still be under way on that future day? If the board had approved the budget last month, construction ___ next Monday.",
+      "sentence": "If the board had approved the budget last month, construction ___ next Monday. (already under way on that day)",
       "blank": {
         "answer": "would be starting",
         "alternates": [],
-        "position": 161
+        "position": 62
       },
       "distractors": [
         {
@@ -4285,13 +4285,13 @@
       "templateId": "C2-003",
       "skill": "modal_deduction_past_progressive",
       "level": "C2",
-      "sentence": "At 9 p.m. the office lights were on and keyboards could be heard, so the team ___ late at that moment.",
+      "sentence": "At 9 p.m. the office lights were on and I could hear keyboards, so the team ___ late at that moment.",
       "blank": {
         "answer": "must have been working",
         "alternates": [
           "must've been working"
         ],
-        "position": 78
+        "position": 76
       },
       "distractors": [
         {
@@ -7512,11 +7512,11 @@
       "templateId": "RC-007",
       "skill": "preposition_placement_formal_vs_informal_relative_clause",
       "level": "C1",
-      "sentence": "Which version best fits a relaxed, everyday chat? That's the neighbour ____ at the bus stop yesterday.",
+      "sentence": "Relaxed chat with a friend: That's the neighbour ____ at the bus stop yesterday.",
       "blank": {
         "answer": "I was chatting to",
         "alternates": [],
-        "position": 71
+        "position": 49
       },
       "distractors": [
         {
@@ -7626,11 +7626,11 @@
       "templateId": "GI-013",
       "skill": "perfect_gerund_vs_simple_gerund_time_reference",
       "level": "C1",
-      "sentence": "Which completion best fits an action unfolding at the same time as the main verb, not before it? She enjoys ____ to podcasts while she cooks dinner.",
+      "sentence": "She enjoys ____ to podcasts while she cooks dinner. (both actions happen at the same time)",
       "blank": {
         "answer": "listening",
         "alternates": [],
-        "position": 108
+        "position": 11
       },
       "distractors": [
         {
@@ -8473,7 +8473,7 @@
       "templateId": "MO-014",
       "skill": "semi_modal_dare_bare_infinitive_negative",
       "level": "C2",
-      "sentence": "She ___ tell her manager the real reason for the delay, so she keeps blaming the traffic instead.",
+      "sentence": "She ___ tell her manager the real reason for the delay, so she blames the traffic instead.",
       "blank": {
         "answer": "daren't",
         "alternates": [],
@@ -8549,7 +8549,7 @@
       "templateId": "PR-007",
       "skill": "marginal_prepositions_notwithstanding_pending_barring",
       "level": "C2",
-      "sentence": "___ any further objections from the regulator, the takeover will be completed on Friday; if objections do come in, the deal will slip to March.",
+      "sentence": "___ any further objections from the regulator, the deal will be completed on Friday; if objections do come in, the deal will slip to March.",
       "blank": {
         "answer": "Barring",
         "alternates": [],
@@ -11018,6 +11018,234 @@
         "rule": "As if / as though + past simple = nggak nyata sekarang. + bentuk sekarang = mungkin benar.",
         "memory": "As if he lived there (padahal nggak).",
         "avoid": "Perbandingannya jelas salah? Geser kata kerjanya satu langkah ke belakang."
+      }
+    },
+    {
+      "id": "CO-207-cz0",
+      "templateId": "CO-207",
+      "skill": "mixed_conditional_past_cause_present_result",
+      "level": "C1",
+      "sentence": "If she had caught the earlier bus, she ___ here with us now.",
+      "blank": {
+        "answer": "would be",
+        "alternates": [],
+        "position": 39
+      },
+      "distractors": [
+        {
+          "text": "would have been",
+          "misconception": "places the result in the unreal past instead of the present",
+          "whyFailsId": "“would have been” ngegambarin akibat lampau, padahal “now” naruh akibatnya di sekarang.",
+          "misconceptionId": "akibatnya ditaruh di masa lalu yang nggak nyata, bukan di masa kini."
+        },
+        {
+          "text": "was",
+          "misconception": "uses a past form without the modal required in the result clause",
+          "whyFailsId": "“was” polos nyatain fakta nyata, padahal situasinya khayalan.",
+          "misconceptionId": "past simple polos “weren't” dipakai di induk kalimat akibat tanpa modal pengandai."
+        },
+        {
+          "text": "had been",
+          "misconception": "repeats past perfect in the main clause",
+          "whyFailsId": "“had been” bentuk klausa if. Klausa akibat butuh “would”.",
+          "misconceptionId": "past perfect diulang lagi di induk kalimat."
+        }
+      ],
+      "explain": {
+        "why": "Ketinggalan bus itu lampau, tapi “now” bikin akibatnya sekarang, jadi pakai “would be”.",
+        "rule": "Mixed conditional: If + past perfect (sebab lampau), would + kata kerja dasar (akibat sekarang).",
+        "memory": "Sebab lampau, akibat “now” → would be.",
+        "avoid": "Cari “now” atau “today” di akibatnya: itu berarti would + kata kerja dasar, bukan would have."
+      }
+    },
+    {
+      "id": "CO-208-cz0",
+      "templateId": "CO-208",
+      "skill": "formal_inversion_had_i_known",
+      "level": "C1",
+      "sentence": "___ the warning earlier, we would have cancelled the trip.",
+      "blank": {
+        "answer": "Had we received",
+        "alternates": [],
+        "position": 0
+      },
+      "distractors": [
+        {
+          "text": "If we had received",
+          "misconception": "mixing formal inversion with the conjunction 'if' at the same time",
+          "whyFailsId": "bener di gaya netral, tapi bentuk sasarannya buang “if” dan balik “had”.",
+          "misconceptionId": "pembalikan formal dan kata sambung “if” dipakai bersamaan."
+        },
+        {
+          "text": "We had received",
+          "misconception": "using normal subject-verb order, missing the inversion signal",
+          "whyFailsId": "tanpa “if” atau inversi, ini cuma kalimat berita, bukan pengandaian.",
+          "misconceptionId": "urutan subjek dan kata kerja tetap biasa jadi tanda pembalikannya hilang."
+        },
+        {
+          "text": "Had received we",
+          "misconception": "using the result-clause auxiliary structure at the start of the if-clause",
+          "whyFailsId": "cuma “had” yang pindah ke depan. Subjeknya tetap sebelum participle.",
+          "misconceptionId": "susunan kata bantu milik anak kalimat hasil ditaruh di awal anak kalimat syarat."
+        }
+      ],
+      "explain": {
+        "why": "Di gaya formal “if” hilang dan “had” pindah ke depan subjek: Had we received the warning.",
+        "rule": "Inversi formal: Had + subjek + past participle, … would have + past participle.",
+        "memory": "If we had → Had we.",
+        "avoid": "Hapus “if”, lalu tuker posisi subjek sama “had” — yang lain nggak pindah."
+      }
+    },
+    {
+      "id": "QN-206-cz0",
+      "templateId": "QN-206",
+      "skill": "negative_adverbial_inversion_never_rarely_not_only",
+      "level": "C1",
+      "sentence": "Rarely ___ such a quiet morning in this city.",
+      "blank": {
+        "answer": "have I seen",
+        "alternates": [],
+        "position": 7
+      },
+      "distractors": [
+        {
+          "text": "I have seen",
+          "misconception": "Fronts the negative adverbial without applying the required subject-auxiliary inversion.",
+          "whyFailsId": "sesudah “Rarely” di depan, kata bantunya harus sebelum subjek.",
+          "misconceptionId": "keterangan negatifnya dimajuin, tapi kata bantu “have” yang udah ada dibiarin di belakang subjek."
+        },
+        {
+          "text": "I saw",
+          "misconception": "Fronts 'Never' with no auxiliary at all, ignoring both the inversion rule and the need for 'have' with 'before'.",
+          "whyFailsId": "nggak ada inversi dan nggak ada kata bantu. Kata keterangan di depan nuntut keduanya.",
+          "misconceptionId": "“Never” dimajuin tanpa kata bantu sama sekali, aturan pembalikan dan kebutuhan “have” sama-sama diabaikan."
+        },
+        {
+          "text": "saw I",
+          "misconception": "Places 'never' after the auxiliary instead of at the very front of the sentence.",
+          "whyFailsId": "inversi pakai kata bantu (have/do/did), bukan kata kerja utama sendirian.",
+          "misconceptionId": "“never” ditaruh sesudah kata bantunya, bukan di posisi paling depan kalimat."
+        }
+      ],
+      "explain": {
+        "why": "“Rarely” di depan memicu inversi: kata bantu “have” pindah ke depan “I”.",
+        "rule": "Kata keterangan negatif di depan (never, rarely, seldom, not only) + kata bantu + subjek + kata kerja.",
+        "memory": "Rarely have I…",
+        "avoid": "Rarely/never di depan? Susun kayak pertanyaan: have I seen."
+      }
+    },
+    {
+      "id": "QN-207-cz0",
+      "templateId": "QN-207",
+      "skill": "inversion_after_only_restrictive_phrase",
+      "level": "C2",
+      "sentence": "Only when the storm passed ___ the harbour.",
+      "blank": {
+        "answer": "did the boats leave",
+        "alternates": [],
+        "position": 27
+      },
+      "distractors": [
+        {
+          "text": "the boats left",
+          "misconception": "keeps ordinary statement order after a fronted restrictive phrase",
+          "whyFailsId": "klausa “Only when” di depan maksa inversi di klausa utama.",
+          "misconceptionId": "urutan pernyataan biasa dipertahanin sesudah frasa pembatas dimajuin."
+        },
+        {
+          "text": "left the boats",
+          "misconception": "inverts the lexical verb directly",
+          "whyFailsId": "inversi butuh kata bantu. Kata kerja utama sendirian nggak bisa pindah ke depan.",
+          "misconceptionId": "kata kerja utamanya langsung dibalik."
+        },
+        {
+          "text": "the boats did leave",
+          "misconception": "adds emphatic do but does not invert it with the subject",
+          "whyFailsId": "“did” ada tapi tetap sesudah subjek, jadi nggak ada inversi.",
+          "misconceptionId": "kata bantu penegas ditambahin tapi nggak dibalik sama subjeknya."
+        }
+      ],
+      "explain": {
+        "why": "“Only when…” di depan memicu inversi kata bantu: did the boats leave.",
+        "rule": "Only + frasa waktu/syarat di depan → kata bantu + subjek + kata kerja dasar di klausa utama.",
+        "memory": "Only when … did the boats leave.",
+        "avoid": "Kalimatnya mulai dari “Only after/when/then”? Taruh did/does/have sebelum subjek."
+      }
+    },
+    {
+      "id": "RS-208-cz0",
+      "templateId": "RS-208",
+      "skill": "mandative_subjunctive_after_demand_insist",
+      "level": "C2",
+      "sentence": "The doctor insisted that the patient ___ in bed for a week.",
+      "blank": {
+        "answer": "stay",
+        "alternates": [],
+        "position": 37
+      },
+      "distractors": [
+        {
+          "text": "stays",
+          "misconception": "softening the demand with a conditional 'would', as if the clause reported a hypothetical",
+          "whyFailsId": "subjunctive nggak pakai -s, walau sesudah “the patient”.",
+          "misconceptionId": "tuntutan dilembutin pakai “would”."
+        },
+        {
+          "text": "stayed",
+          "misconception": "backshifting the verb as ordinary reported speech instead of keeping the base subjunctive",
+          "whyFailsId": "“insisted” yang lampau nggak mundurin subjunctive-nya. Tetap polos.",
+          "misconceptionId": "kata kerjanya dimundurin kayak laporan netral."
+        },
+        {
+          "text": "would stay",
+          "misconception": "applying ordinary subject-verb agreement with a singular subject inside the demand clause",
+          "whyFailsId": "“would” ngubah tuntutan jadi perkiraan. Tuntutan pakai kata kerja polos.",
+          "misconceptionId": "kesesuaian subjek biasa dipaksain di klausa tuntutan."
+        }
+      ],
+      "explain": {
+        "why": "“Insisted that” ngenalin tuntutan, jadi kata kerjanya subjunctive polos: the patient stay.",
+        "rule": "Demand/insist/recommend/suggest + that + subjek + kata kerja dasar (tanpa -s, tanpa penanda waktu).",
+        "memory": "Insisted that she stay.",
+        "avoid": "Sesudah kata kerja tuntutan + that, tulis kata kerjanya persis kayak di kamus."
+      }
+    },
+    {
+      "id": "CO-209-cz0",
+      "templateId": "CO-209",
+      "skill": "conditional_inversion_were_i_to",
+      "level": "C1",
+      "sentence": "___ the offer, she would move to Tokyo next spring.",
+      "blank": {
+        "answer": "Were she to accept",
+        "alternates": [],
+        "position": 0
+      },
+      "distractors": [
+        {
+          "text": "Was she to accept",
+          "misconception": "Uses 'was' instead of the subjunctive 'were' required in formal hypothetical inversion.",
+          "whyFailsId": "pengandaian terbalik selalu pakai “were”, nggak pernah “was”.",
+          "misconceptionId": "“was” dipakai gantiin “were” yang diwajibin di pembalikan pengandaian formal."
+        },
+        {
+          "text": "If were she to accept",
+          "misconception": "Adds 'if' to a structure that already signals conditionality through inversion.",
+          "whyFailsId": "“if” dan inversi nggak bisa muncul bareng. Pilih satu.",
+          "misconceptionId": "“if” ditambahin ke susunan yang udah nandain pengandaian lewat pembalikan."
+        },
+        {
+          "text": "She were to accept",
+          "misconception": "Drops the inversion, leaving a non-inverted fragment without 'if'.",
+          "whyFailsId": "tanpa inversi atau “if”, ini bukan klausa pengandaian.",
+          "misconceptionId": "pembalikannya dihilangin jadi tersisa penggalan tanpa “if”."
+        }
+      ],
+      "explain": {
+        "why": "Buang “if” dan pindahin “were” ke depan jadi pengandaian formal: Were she to accept the offer.",
+        "rule": "Pengandaian formal kecil kemungkinan: Were + subjek + to + kata kerja dasar, … would + kata kerja dasar.",
+        "memory": "If she were to → Were she to.",
+        "avoid": "Tulis “If she were to accept”, lalu hapus “if” dan tuker: Were she to accept."
       }
     }
   ]

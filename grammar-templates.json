@@ -1,6 +1,6 @@
 {
   "version": "5.19.0",
-  "count": 322,
+  "count": 328,
   "templates": [
     {
       "id": "TA-001",
@@ -2139,7 +2139,7 @@
       "pedagogicalObjective": "Reduce a relative clause to a participle phrase when the relative pronoun is the subject of the clause",
       "misconceptionTargeted": "Learner keeps the relative pronoun and full auxiliary when a reduced participle clause would be more natural and idiomatic",
       "reasoningOperation": "confirm the relative pronoun is the subject of an active/passive clause -> reduce to present or past participle",
-      "stem": "Choose the reduced relative-clause form: \"The scientists who were developing the vaccine at that time were awarded a major prize.\" → The scientists ___ the vaccine at that time were awarded a major prize.",
+      "stem": "Shorten the clause: \"The scientists who were developing the vaccine at that time were awarded a prize.\" → The scientists ___ the vaccine at that time were awarded a prize.",
       "options": [
         "who developed",
         "developing",
@@ -2643,7 +2643,7 @@
       "pedagogicalObjective": "Use past perfect continuous to show a duration-based cause behind a past state/result, distinct from past perfect simple's completed-fact focus",
       "misconceptionTargeted": "Learner treats past perfect simple and past perfect continuous as interchangeable whenever two past events are sequenced",
       "reasoningOperation": "detect duration-as-cause meaning -> select past perfect continuous over past perfect simple",
-      "stem": "Which completion foregrounds the accumulated duration of the studying as the cause of his red eyes? His eyes were red because he ___ all night for the exam.",
+      "stem": "His eyes were red because he ___ all night for the exam. (the long hours of studying are the cause)",
       "options": [
         "had studied",
         "had been studying",
@@ -3147,7 +3147,7 @@
       "pedagogicalObjective": "Correctly report a first conditional sentence, applying backshift to both clauses consistently",
       "misconceptionTargeted": "Learner either backshifts nothing in reported conditionals, or over-backshifts both clauses into third-conditional forms",
       "reasoningOperation": "identify original conditional type -> apply correct backshift pattern for reported conditional speech",
-      "stem": "Apply conventional backshift after the picnic date has passed. He said, 'If it rains, I'll cancel the picnic.' Reported later: He said that if it ___, he ___ the picnic.",
+      "stem": "He said, 'If it rains, I'll cancel the picnic.' The picnic day has passed. He said that if it ___, he ___ the picnic.",
       "options": [
         "rained / would cancel",
         "rains / will cancel",
@@ -3931,7 +3931,7 @@
       "pedagogicalObjective": "Learner selects future perfect continuous to express duration accumulating up to a stated future reference point.",
       "misconceptionTargeted": "Learners default to future continuous or future perfect simple when duration-up-to-a-point is required.",
       "reasoningOperation": "Identify the future time anchor, then check whether the sentence asks about ongoing duration vs completion/progress.",
-      "stem": "Which completion emphasizes the duration accumulating up to the deadline rather than merely the fact of completion? By the time she retires next year, Maria ____ at this company for over two decades.",
+      "stem": "By the time she retires next year, Maria ____ at this company for over twenty years. (stress how long it has gone on)",
       "options": [
         "will have been working",
         "will be working",
@@ -5499,7 +5499,7 @@
       "pedagogicalObjective": "Learner constructs a mixed conditional where a present unreal state explains a past unreal result.",
       "misconceptionTargeted": "Learners force both clauses of a mixed conditional into the same tense, missing that present cause and past result require different forms.",
       "reasoningOperation": "Identify that the condition describes a permanent present trait while the result describes a specific past event, requiring mixed tenses.",
-      "stem": "In formal written English, which completion presents his fear as an ongoing trait he still has, rather than only a past state? If he ____ so afraid of flying, he would have joined us on the trip to Japan last year.",
+      "stem": "If he ____ so afraid of flying, he would have joined us on the trip last year. He is still afraid today.",
       "options": [
         "weren't",
         "hadn't been",
@@ -6115,7 +6115,7 @@
       "pedagogicalObjective": "Learner uses the perfect gerund ('having + past participle') to emphasize that the gerund's action happened before the main verb's time.",
       "misconceptionTargeted": "Learners use the simple gerund even when the sentence needs to clearly mark that one action preceded another.",
       "reasoningOperation": "Determine whether the timing relationship between the gerund action and the main verb needs to be explicitly marked as earlier, requiring the perfect gerund.",
-      "stem": "Which completion most explicitly marks the breaking as earlier than the later admission? He admitted ____ the vase.",
+      "stem": "He admitted ____ the vase. (the breaking happened before he admitted it)",
       "options": [
         "having broken",
         "breaking",
@@ -6451,7 +6451,7 @@
       "pedagogicalObjective": "Learner selects a formal addition connector ('furthermore') appropriate for academic/written register, distinguishing it from informal equivalents.",
       "misconceptionTargeted": "Learners use informal addition connectors like 'also' or 'plus' in a clearly formal academic context.",
       "reasoningOperation": "Match the connector's formality level to the register signaled by the surrounding academic context.",
-      "stem": "Which formal conjunctive adverb best completes this academic passage? The study's sample size was too small to generalize the findings. ____, the participants were not randomly selected, further weakening the results.",
+      "stem": "Formal report: The sample was too small to generalize the findings. ____, the participants were not randomly selected.",
       "options": [
         "Furthermore",
         "What's more",
@@ -6899,7 +6899,7 @@
       "pedagogicalObjective": "Construct a mixed conditional in which an unreal past decision controls a hypothetical future event.",
       "misconceptionTargeted": "Learner forces both clauses into the same time frame and loses the past-to-future relationship.",
       "reasoningOperation": "place the unreal condition in the past -> place the consequence in the future -> combine past perfect with would be + -ing",
-      "stem": "Which completion presents the start as something that would still be under way on that future day? If the board had approved the budget last month, construction ___ next Monday.",
+      "stem": "If the board had approved the budget last month, construction ___ next Monday. (already under way on that day)",
       "options": [
         "would be starting",
         "would have started",
@@ -6955,7 +6955,7 @@
       "pedagogicalObjective": "Use a modal perfect progressive to deduce that an activity was in progress at a specific past moment.",
       "misconceptionTargeted": "Learner notices past evidence but ignores the ongoing-at-that-moment meaning and chooses a completed-action form.",
       "reasoningOperation": "evaluate the evidence strength -> locate the past reference point -> mark the deduced activity as ongoing with must have been + -ing",
-      "stem": "At 9 p.m. the office lights were on and keyboards could be heard, so the team ___ late at that moment.",
+      "stem": "At 9 p.m. the office lights were on and I could hear keyboards, so the team ___ late at that moment.",
       "options": [
         "must have been working",
         "must have worked",
@@ -8523,7 +8523,7 @@
       "pedagogicalObjective": "Use generic 'the' with a singular noun for statements about a species or class as a whole",
       "misconceptionTargeted": "Learner picks an article or determiner that quantifies individual animals, although extinction is a property of the class itself",
       "reasoningOperation": "check whether the predicate applies to individuals or to the class as one unit -> select generic 'the' for class-level statements",
-      "stem": "___ Sumatran tiger is now on the brink of extinction, with fewer than four hundred individuals left in the wild.",
+      "stem": "___ Sumatran tiger is now on the brink of extinction, with fewer than 400 left in the wild.",
       "options": [
         "A",
         "Every",
@@ -12219,7 +12219,7 @@
       "pedagogicalObjective": "Learner chooses the informal relative clause that strands the preposition at the clause end (with the relative pronoun omitted), matching a casual spoken register.",
       "misconceptionTargeted": "Learners carry the formal fronted-preposition pattern (to whom) into casual speech, or garble the stranded pattern by leaving 'whom' after the stranded preposition.",
       "reasoningOperation": "Read the register cue — relaxed chat -> strand the preposition at the clause end and drop the relative pronoun.",
-      "stem": "Which version best fits a relaxed, everyday chat? That's the neighbour ____ at the bus stop yesterday.",
+      "stem": "Relaxed chat with a friend: That's the neighbour ____ at the bus stop yesterday.",
       "options": [
         "I was chatting to",
         "to whom I was chatting",
@@ -12387,7 +12387,7 @@
       "pedagogicalObjective": "Learner selects the simple gerund when the gerund's action is simultaneous with the main verb, reserving the perfect gerund for actions explicitly earlier in time.",
       "misconceptionTargeted": "Learners overuse the perfect gerund ('having + past participle') even when the two actions happen at the same time.",
       "reasoningOperation": "Compare the timing of the two actions — simultaneous with the main verb -> simple gerund; explicitly earlier -> perfect gerund.",
-      "stem": "Which completion best fits an action unfolding at the same time as the main verb, not before it? She enjoys ____ to podcasts while she cooks dinner.",
+      "stem": "She enjoys ____ to podcasts while she cooks dinner. (both actions happen at the same time)",
       "options": [
         "listening",
         "having listened",
@@ -13563,7 +13563,7 @@
       "pedagogicalObjective": "Use the semi-modal 'daren't' with a bare infinitive to say someone lacks the courage to do something",
       "misconceptionTargeted": "Learner translates Indonesian 'tidak berani' word by word or treats modal 'dare' like an ordinary verb that needs 'to', so the negative ends up without a working operator",
       "reasoningOperation": "read the cover-story consequence in the second clause -> the gap must mean 'lacks the courage to' -> select 'daren't', the semi-modal that carries its own negation and takes a bare infinitive",
-      "stem": "She ___ tell her manager the real reason for the delay, so she keeps blaming the traffic instead.",
+      "stem": "She ___ tell her manager the real reason for the delay, so she blames the traffic instead.",
       "options": [
         "daren't",
         "daren't to",
@@ -13675,7 +13675,7 @@
       "pedagogicalObjective": "Use the marginal preposition 'barring' with a noun phrase to mean 'if X does not happen'",
       "misconceptionTargeted": "Learner swaps the categories 'meskipun ada' (despite) and 'kecuali kalau ada' (barring), because both feel like formal exception words although their meanings run in opposite directions",
       "reasoningOperation": "check the follow-up clause: objections would push the deal to March -> the gap must mean 'if no objections arise' -> select 'Barring', not a concession or an exclusion word",
-      "stem": "___ any further objections from the regulator, the takeover will be completed on Friday; if objections do come in, the deal will slip to March.",
+      "stem": "___ any further objections from the regulator, the deal will be completed on Friday; if objections do come in, the deal will slip to March.",
       "options": [
         "Barring",
         "Despite",
@@ -18033,13 +18033,349 @@
       "pedagogicalObjectiveId": "Pakai past simple sesudah “as if” buat sesuatu yang jelas nggak benar.",
       "misconceptionTargetedId": "Kamu biarin bentuk sekarang atau nambah “would” sesudah “as if” padahal perbandingannya nggak nyata.",
       "reasoningOperationId": "kenali perbandingan nggak nyata sesudah as if → pilih past simple → hindari bentuk sekarang dan would"
+    },
+    {
+      "id": "CO-207",
+      "family": "conditionals",
+      "subskill": "mixed_conditional_past_cause_present_result",
+      "cefr": "C1",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Use 'would + base verb' for a present result of an unreal past cause.",
+      "misconceptionTargeted": "Learner copies the past perfect of the if-clause into a result that is about now.",
+      "reasoningOperation": "identify a past cause with a present result -> select would + base verb for the present result",
+      "stem": "If she had caught the earlier bus, she ___ here with us now.",
+      "options": [
+        "would be",
+        "would have been",
+        "was",
+        "had been"
+      ],
+      "correctIndex": 0,
+      "distractors": [
+        {
+          "option": "would have been",
+          "misconception": "places the result in the unreal past instead of the present",
+          "whyFails": "'Would have been' describes a past result, but 'now' places the result in the present.",
+          "whyFailsId": "“would have been” ngegambarin akibat lampau, padahal “now” naruh akibatnya di sekarang.",
+          "misconceptionId": "akibatnya ditaruh di masa lalu yang nggak nyata, bukan di masa kini."
+        },
+        {
+          "option": "was",
+          "misconception": "uses a past form without the modal required in the result clause",
+          "whyFails": "Plain past 'was' states a real fact; the situation is imaginary.",
+          "whyFailsId": "“was” polos nyatain fakta nyata, padahal situasinya khayalan.",
+          "misconceptionId": "past simple polos “weren't” dipakai di induk kalimat akibat tanpa modal pengandai."
+        },
+        {
+          "option": "had been",
+          "misconception": "repeats past perfect in the main clause",
+          "whyFails": "'Had been' is the if-clause form; the result clause needs 'would'.",
+          "whyFailsId": "“had been” bentuk klausa if. Klausa akibat butuh “would”.",
+          "misconceptionId": "past perfect diulang lagi di induk kalimat."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "The missed bus is in the past, but 'now' makes the result present, so 'would be' is used.",
+        "rule": "Mixed conditional: If + past perfect (past cause), would + base verb (present result).",
+        "whyOthersFail": "'Would have been' is a past result, 'was' is real, and 'had been' belongs in the if-clause.",
+        "howToAvoid": "Look for 'now' or 'today' in the result: that means would + base verb, not would have.",
+        "memoryCue": "Past cause, present 'now' → would be.",
+        "ruleId": "Mixed conditional: If + past perfect (sebab lampau), would + kata kerja dasar (akibat sekarang).",
+        "whyCorrectId": "Ketinggalan bus itu lampau, tapi “now” bikin akibatnya sekarang, jadi pakai “would be”.",
+        "whyOthersFailId": "“Would have been” akibat lampau. “Was” fakta nyata. “Had been” punya klausa if.",
+        "howToAvoidId": "Cari “now” atau “today” di akibatnya: itu berarti would + kata kerja dasar, bukan would have.",
+        "memoryCueId": "Sebab lampau, akibat “now” → would be."
+      },
+      "pedagogicalObjectiveId": "Pakai “would + kata kerja dasar” buat akibat sekarang dari sebab lampau yang nggak nyata.",
+      "misconceptionTargetedId": "Kamu nyalin past perfect dari klausa if ke akibat yang sebenarnya soal sekarang.",
+      "reasoningOperationId": "kenali sebab lampau dengan akibat sekarang → pilih would + kata kerja dasar buat akibat sekarang"
+    },
+    {
+      "id": "CO-208",
+      "family": "conditionals",
+      "subskill": "formal_inversion_had_i_known",
+      "cefr": "C1",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Invert 'had' and the subject to replace 'if' in a formal third conditional.",
+      "misconceptionTargeted": "Learner keeps 'if' together with the inversion or forgets to move 'had' to the front.",
+      "reasoningOperation": "identify a formal unreal past condition -> remove if -> move had before the subject",
+      "stem": "___ the warning earlier, we would have cancelled the trip.",
+      "options": [
+        "Had we received",
+        "If we had received",
+        "We had received",
+        "Had received we"
+      ],
+      "correctIndex": 0,
+      "distractors": [
+        {
+          "option": "If we had received",
+          "misconception": "mixing formal inversion with the conjunction 'if' at the same time",
+          "whyFails": "This is correct in neutral style, but the target form drops 'if' and inverts 'had'.",
+          "whyFailsId": "bener di gaya netral, tapi bentuk sasarannya buang “if” dan balik “had”.",
+          "misconceptionId": "pembalikan formal dan kata sambung “if” dipakai bersamaan."
+        },
+        {
+          "option": "We had received",
+          "misconception": "using normal subject-verb order, missing the inversion signal",
+          "whyFails": "Without 'if' or inversion, this is just a statement, not a condition.",
+          "whyFailsId": "tanpa “if” atau inversi, ini cuma kalimat berita, bukan pengandaian.",
+          "misconceptionId": "urutan subjek dan kata kerja tetap biasa jadi tanda pembalikannya hilang."
+        },
+        {
+          "option": "Had received we",
+          "misconception": "using the result-clause auxiliary structure at the start of the if-clause",
+          "whyFails": "Only 'had' moves to the front; the subject stays before the participle.",
+          "whyFailsId": "cuma “had” yang pindah ke depan. Subjeknya tetap sebelum participle.",
+          "misconceptionId": "susunan kata bantu milik anak kalimat hasil ditaruh di awal anak kalimat syarat."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "In formal style 'if' disappears and 'had' moves in front of the subject: Had we received the warning.",
+        "rule": "Formal inversion: Had + subject + past participle, … would have + past participle.",
+        "whyOthersFail": "'If we had' is the neutral version, 'we had' is a statement, and 'had received we' misplaces the subject.",
+        "howToAvoid": "Delete 'if', then swap the subject and 'had' — nothing else moves.",
+        "memoryCue": "If we had → Had we.",
+        "ruleId": "Inversi formal: Had + subjek + past participle, … would have + past participle.",
+        "whyCorrectId": "Di gaya formal “if” hilang dan “had” pindah ke depan subjek: Had we received the warning.",
+        "whyOthersFailId": "“If we had” versi netral. “We had” kalimat berita. “Had received we” salah naruh subjek.",
+        "howToAvoidId": "Hapus “if”, lalu tuker posisi subjek sama “had” — yang lain nggak pindah.",
+        "memoryCueId": "If we had → Had we."
+      },
+      "pedagogicalObjectiveId": "Balik “had” dan subjek buat ngegantiin “if” di third conditional yang formal.",
+      "misconceptionTargetedId": "Kamu masih pakai “if” bareng inversi, atau lupa mindahin “had” ke depan.",
+      "reasoningOperationId": "kenali pengandaian lampau nggak nyata yang formal → buang if → pindahin had ke depan subjek"
+    },
+    {
+      "id": "QN-206",
+      "family": "question_negation",
+      "subskill": "negative_adverbial_inversion_never_rarely_not_only",
+      "cefr": "C1",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Invert the auxiliary and subject after fronted 'Rarely'.",
+      "misconceptionTargeted": "Learner fronts the negative adverb but keeps normal subject-verb order.",
+      "reasoningOperation": "identify a fronted negative adverb -> move the auxiliary before the subject -> keep the main verb after",
+      "stem": "Rarely ___ such a quiet morning in this city.",
+      "options": [
+        "have I seen",
+        "I have seen",
+        "I saw",
+        "saw I"
+      ],
+      "correctIndex": 0,
+      "distractors": [
+        {
+          "option": "I have seen",
+          "misconception": "Fronts the negative adverbial without applying the required subject-auxiliary inversion.",
+          "whyFails": "After fronted 'Rarely', the auxiliary must come before the subject.",
+          "whyFailsId": "sesudah “Rarely” di depan, kata bantunya harus sebelum subjek.",
+          "misconceptionId": "keterangan negatifnya dimajuin, tapi kata bantu “have” yang udah ada dibiarin di belakang subjek."
+        },
+        {
+          "option": "I saw",
+          "misconception": "Fronts 'Never' with no auxiliary at all, ignoring both the inversion rule and the need for 'have' with 'before'.",
+          "whyFails": "No inversion and no auxiliary: the fronted adverb demands both.",
+          "whyFailsId": "nggak ada inversi dan nggak ada kata bantu. Kata keterangan di depan nuntut keduanya.",
+          "misconceptionId": "“Never” dimajuin tanpa kata bantu sama sekali, aturan pembalikan dan kebutuhan “have” sama-sama diabaikan."
+        },
+        {
+          "option": "saw I",
+          "misconception": "Places 'never' after the auxiliary instead of at the very front of the sentence.",
+          "whyFails": "Inversion uses an auxiliary (have/do/did), not the main verb alone.",
+          "whyFailsId": "inversi pakai kata bantu (have/do/did), bukan kata kerja utama sendirian.",
+          "misconceptionId": "“never” ditaruh sesudah kata bantunya, bukan di posisi paling depan kalimat."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "'Rarely' at the front triggers inversion: auxiliary 'have' moves before 'I'.",
+        "rule": "Fronted negative adverb (never, rarely, seldom, not only) + auxiliary + subject + verb.",
+        "whyOthersFail": "'I have seen' and 'I saw' keep normal order, and 'saw I' inverts the main verb instead of an auxiliary.",
+        "howToAvoid": "Fronted rarely/never? Build it like a question: have I seen.",
+        "memoryCue": "Rarely have I…",
+        "ruleId": "Kata keterangan negatif di depan (never, rarely, seldom, not only) + kata bantu + subjek + kata kerja.",
+        "whyCorrectId": "“Rarely” di depan memicu inversi: kata bantu “have” pindah ke depan “I”.",
+        "whyOthersFailId": "“I have seen” dan “I saw” urutannya biasa. “Saw I” ngebalik kata kerja utama, bukan kata bantu.",
+        "howToAvoidId": "Rarely/never di depan? Susun kayak pertanyaan: have I seen.",
+        "memoryCueId": "Rarely have I…"
+      },
+      "pedagogicalObjectiveId": "Balik kata bantu dan subjek sesudah “Rarely” di depan kalimat.",
+      "misconceptionTargetedId": "Kamu naruh kata keterangan negatif di depan tapi urutan subjek-kata kerjanya tetap biasa.",
+      "reasoningOperationId": "kenali kata keterangan negatif di depan → pindahin kata bantu ke depan subjek → kata kerja utama tetap sesudahnya"
+    },
+    {
+      "id": "QN-207",
+      "family": "question_negation",
+      "subskill": "inversion_after_only_restrictive_phrase",
+      "cefr": "C2",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Invert with 'did' after a fronted 'Only when' clause.",
+      "misconceptionTargeted": "Learner keeps statement order in the main clause after a fronted 'Only…' phrase.",
+      "reasoningOperation": "identify the fronted Only-clause -> insert did before the subject of the main clause -> keep the verb bare",
+      "stem": "Only when the storm passed ___ the harbour.",
+      "options": [
+        "did the boats leave",
+        "the boats left",
+        "left the boats",
+        "the boats did leave"
+      ],
+      "correctIndex": 0,
+      "distractors": [
+        {
+          "option": "the boats left",
+          "misconception": "keeps ordinary statement order after a fronted restrictive phrase",
+          "whyFails": "A fronted 'Only when' clause forces inversion in the main clause.",
+          "whyFailsId": "klausa “Only when” di depan maksa inversi di klausa utama.",
+          "misconceptionId": "urutan pernyataan biasa dipertahanin sesudah frasa pembatas dimajuin."
+        },
+        {
+          "option": "left the boats",
+          "misconception": "inverts the lexical verb directly",
+          "whyFails": "Inversion needs an auxiliary; the main verb alone cannot move in front.",
+          "whyFailsId": "inversi butuh kata bantu. Kata kerja utama sendirian nggak bisa pindah ke depan.",
+          "misconceptionId": "kata kerja utamanya langsung dibalik."
+        },
+        {
+          "option": "the boats did leave",
+          "misconception": "adds emphatic do but does not invert it with the subject",
+          "whyFails": "'Did' is present but stays after the subject, so there is no inversion.",
+          "whyFailsId": "“did” ada tapi tetap sesudah subjek, jadi nggak ada inversi.",
+          "misconceptionId": "kata bantu penegas ditambahin tapi nggak dibalik sama subjeknya."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "'Only when…' at the front triggers auxiliary inversion: did the boats leave.",
+        "rule": "Only + time/condition phrase at the front → auxiliary + subject + base verb in the main clause.",
+        "whyOthersFail": "Two options keep normal order and one moves the main verb instead of the auxiliary.",
+        "howToAvoid": "Does the sentence start with 'Only after/when/then'? Put did/does/have before the subject.",
+        "memoryCue": "Only when … did the boats leave.",
+        "ruleId": "Only + frasa waktu/syarat di depan → kata bantu + subjek + kata kerja dasar di klausa utama.",
+        "whyCorrectId": "“Only when…” di depan memicu inversi kata bantu: did the boats leave.",
+        "whyOthersFailId": "Dua pilihan urutannya biasa, satu mindahin kata kerja utama, bukan kata bantu.",
+        "howToAvoidId": "Kalimatnya mulai dari “Only after/when/then”? Taruh did/does/have sebelum subjek.",
+        "memoryCueId": "Only when … did the boats leave."
+      },
+      "pedagogicalObjectiveId": "Balik pakai “did” sesudah klausa “Only when” di depan.",
+      "misconceptionTargetedId": "Kamu biarin urutan kalimat berita di klausa utama sesudah frasa “Only…” di depan.",
+      "reasoningOperationId": "kenali klausa Only di depan → sisipin did sebelum subjek klausa utama → kata kerjanya tetap polos"
+    },
+    {
+      "id": "RS-208",
+      "family": "reported_speech",
+      "subskill": "mandative_subjunctive_after_demand_insist",
+      "cefr": "C2",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Use the bare subjunctive after 'insisted that' even with a third-person subject.",
+      "misconceptionTargeted": "Learner adds -s or a past tense to the verb after 'insisted that'.",
+      "reasoningOperation": "identify the mandative verb insist -> select the bare form after that -> ignore the subject's person",
+      "stem": "The doctor insisted that the patient ___ in bed for a week.",
+      "options": [
+        "stay",
+        "stays",
+        "stayed",
+        "would stay"
+      ],
+      "correctIndex": 0,
+      "distractors": [
+        {
+          "option": "stays",
+          "misconception": "softening the demand with a conditional 'would', as if the clause reported a hypothetical",
+          "whyFails": "The subjunctive has no -s, even after 'the patient'.",
+          "whyFailsId": "subjunctive nggak pakai -s, walau sesudah “the patient”.",
+          "misconceptionId": "tuntutan dilembutin pakai “would”."
+        },
+        {
+          "option": "stayed",
+          "misconception": "backshifting the verb as ordinary reported speech instead of keeping the base subjunctive",
+          "whyFails": "The past 'insisted' does not backshift the subjunctive; it stays bare.",
+          "whyFailsId": "“insisted” yang lampau nggak mundurin subjunctive-nya. Tetap polos.",
+          "misconceptionId": "kata kerjanya dimundurin kayak laporan netral."
+        },
+        {
+          "option": "would stay",
+          "misconception": "applying ordinary subject-verb agreement with a singular subject inside the demand clause",
+          "whyFails": "'Would' turns the demand into a prediction; a demand takes the bare verb.",
+          "whyFailsId": "“would” ngubah tuntutan jadi perkiraan. Tuntutan pakai kata kerja polos.",
+          "misconceptionId": "kesesuaian subjek biasa dipaksain di klausa tuntutan."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "'Insisted that' introduces a demand, so the verb is the bare subjunctive: the patient stay.",
+        "rule": "Demand/insist/recommend/suggest + that + subject + base verb (no -s, no tense).",
+        "whyOthersFail": "'Stays' adds -s, 'stayed' backshifts, and 'would stay' changes the meaning to a prediction.",
+        "howToAvoid": "After a demand verb + that, write the verb exactly as in the dictionary.",
+        "memoryCue": "Insisted that she stay.",
+        "ruleId": "Demand/insist/recommend/suggest + that + subjek + kata kerja dasar (tanpa -s, tanpa penanda waktu).",
+        "whyCorrectId": "“Insisted that” ngenalin tuntutan, jadi kata kerjanya subjunctive polos: the patient stay.",
+        "whyOthersFailId": "“Stays” nambah -s. “Stayed” dimundurin. “Would stay” ngubah maknanya jadi perkiraan.",
+        "howToAvoidId": "Sesudah kata kerja tuntutan + that, tulis kata kerjanya persis kayak di kamus.",
+        "memoryCueId": "Insisted that she stay."
+      },
+      "pedagogicalObjectiveId": "Pakai subjunctive polos sesudah “insisted that” walau subjeknya orang ketiga.",
+      "misconceptionTargetedId": "Kamu nambah -s atau bentuk lampau ke kata kerja sesudah “insisted that”.",
+      "reasoningOperationId": "kenali kata kerja tuntutan insist → pilih bentuk polos sesudah that → abaikan subjeknya siapa"
+    },
+    {
+      "id": "CO-209",
+      "family": "conditionals",
+      "subskill": "conditional_inversion_were_i_to",
+      "cefr": "C1",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Use 'Were + subject + to + verb' for a formal, unlikely future condition.",
+      "misconceptionTargeted": "Learner uses 'was' or keeps 'if' together with the inversion.",
+      "reasoningOperation": "identify a formal unlikely condition -> remove if -> place were before the subject and add to",
+      "stem": "___ the offer, she would move to Tokyo next spring.",
+      "options": [
+        "Were she to accept",
+        "Was she to accept",
+        "If were she to accept",
+        "She were to accept"
+      ],
+      "correctIndex": 0,
+      "distractors": [
+        {
+          "option": "Was she to accept",
+          "misconception": "Uses 'was' instead of the subjunctive 'were' required in formal hypothetical inversion.",
+          "whyFails": "The inverted conditional always uses 'were', never 'was'.",
+          "whyFailsId": "pengandaian terbalik selalu pakai “were”, nggak pernah “was”.",
+          "misconceptionId": "“was” dipakai gantiin “were” yang diwajibin di pembalikan pengandaian formal."
+        },
+        {
+          "option": "If were she to accept",
+          "misconception": "Adds 'if' to a structure that already signals conditionality through inversion.",
+          "whyFails": "'If' and the inversion cannot appear together; choose one.",
+          "whyFailsId": "“if” dan inversi nggak bisa muncul bareng. Pilih satu.",
+          "misconceptionId": "“if” ditambahin ke susunan yang udah nandain pengandaian lewat pembalikan."
+        },
+        {
+          "option": "She were to accept",
+          "misconception": "Drops the inversion, leaving a non-inverted fragment without 'if'.",
+          "whyFails": "Without inversion or 'if', this is not a conditional clause.",
+          "whyFailsId": "tanpa inversi atau “if”, ini bukan klausa pengandaian.",
+          "misconceptionId": "pembalikannya dihilangin jadi tersisa penggalan tanpa “if”."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "Dropping 'if' and moving 'were' in front gives the formal condition: Were she to accept the offer.",
+        "rule": "Formal unlikely condition: Were + subject + to + base verb, … would + base verb.",
+        "whyOthersFail": "'Was' is not used in this pattern, 'if were' doubles the marker, and 'she were to' lacks the inversion.",
+        "howToAvoid": "Write 'If she were to accept', then delete 'if' and swap: Were she to accept.",
+        "memoryCue": "If she were to → Were she to.",
+        "ruleId": "Pengandaian formal kecil kemungkinan: Were + subjek + to + kata kerja dasar, … would + kata kerja dasar.",
+        "whyCorrectId": "Buang “if” dan pindahin “were” ke depan jadi pengandaian formal: Were she to accept the offer.",
+        "whyOthersFailId": "“Was” nggak dipakai di pola ini. “If were” penandanya dobel. “She were to” nggak ada inversi.",
+        "howToAvoidId": "Tulis “If she were to accept”, lalu hapus “if” dan tuker: Were she to accept.",
+        "memoryCueId": "If she were to → Were she to."
+      },
+      "pedagogicalObjectiveId": "Pakai “Were + subjek + to + kata kerja” buat pengandaian formal yang kecil kemungkinannya.",
+      "misconceptionTargetedId": "Kamu pakai “was” atau masih pakai “if” bareng inversi.",
+      "reasoningOperationId": "kenali pengandaian formal yang kecil kemungkinannya → buang if → taruh were di depan subjek dan tambah to"
     }
   ],
   "schemaVersion": "2.0.0",
   "practiceBlueprintVersion": "focused-25-v1",
   "indonesianCoverage": {
-    "translated": 322,
-    "total": 322,
+    "translated": 328,
+    "total": 328,
     "updatedAt": "2026-09-05"
   }
 }

@@ -26,7 +26,7 @@ const diag = read('grammar-misconception-id.json');
 const diagTh = read('tools/th-strings/misconception-diagnosis.json');
 const clozeTh = read('tools/th-strings/cloze.json');
 const rewrites = read('tools/grammar-upgrade/stem-rewrites.json');
-const packs = ['a', 'b', 'c', 'd', 'e'].map((k) => read('tools/grammar-upgrade/new-templates-' + k + '.json'));
+const packs = ['a', 'b', 'c', 'd', 'e', 'f'].map((k) => read('tools/grammar-upgrade/new-templates-' + k + '.json'));
 
 const byId = new Map(bank.templates.map((t) => [t.id, t]));
 let stemChanged = 0, added = 0, labelsAdded = 0, clozeMapped = 0;
