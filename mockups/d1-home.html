@@ -1,0 +1,72 @@
+<!doctype html><html lang="id"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css"><link rel="stylesheet" href="desk.css">
+<style>
+.hero{padding:30px 32px;min-height:250px}
+.hero h2{font-size:32px;max-width:420px;margin-top:10px}
+.hero .paw{position:absolute;right:26px;bottom:-10px;width:190px}
+.hero .btn{margin-top:22px}
+.skills{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.sk{border-radius:18px;padding:14px;border:1px solid transparent}
+.sk .ic{width:36px;height:36px;border-radius:12px;background:rgba(255,255,255,.8);display:grid;place-items:center;margin-bottom:10px}
+.sk b{display:block;font-size:14px;color:var(--ink)}
+.sk .bar{margin-top:8px;background:rgba(255,255,255,.7)}
+.cc{padding:16px;border-radius:18px;background:var(--paper);border:1px solid var(--line)}
+.week{display:flex;gap:6px}
+.day{flex:1;text-align:center}
+.day i{display:block;height:30px;border-radius:9px;background:var(--line-soft);margin-bottom:5px}
+.day i.on{background:var(--sun)}
+.day span{font-size:11px;font-weight:700;color:var(--muted)}
+</style></head><body>
+<div class="app">
+  <aside class="side">
+    <span class="wordmark">F<b>I</b>EZEL</span>
+    <a class="on"><i data-lucide="house" class="i"></i>Hari ini</a>
+    <a><i data-lucide="zap" class="i"></i>Latihan</a>
+    <a><i data-lucide="school" class="i"></i>Kelas</a>
+    <a><i data-lucide="route" class="i"></i>Progres</a>
+    <a><i data-lucide="user-round" class="i"></i>Profil</a>
+    <span class="spacer"></span>
+    <div class="pawcard"><img src="/assets/brand/paw-mascot-head.svg" alt=""><div><b>Tanya PAW</b><span>Bingung? Tanya aja.</span></div></div>
+  </aside>
+  <main class="main">
+    <div class="mainhead">
+      <div><h1 style="font-size:30px">Halo, Rani</h1><div class="small muted">Selasa, 25 Agustus · 1 sesi lagi hari ini</div></div>
+      <div class="row"><span class="chip flame"><i data-lucide="flame" class="i sm"></i>7 hari</span><span class="chip">A1 · 68%</span><span class="iconbtn"><i data-lucide="bell" class="i sm"></i></span><span class="avatar"><img src="/assets/brand/paw-mascot-head.svg" alt=""></span></div>
+    </div>
+
+    <div class="cols mt-3">
+      <div class="stack" style="gap:18px">
+        <div class="hero">
+          <span class="blob" style="width:320px;height:320px;background:#FFDE59;opacity:.5;right:-80px;top:-140px"></span>
+          <div class="row" style="gap:8px"><span class="pill maroon">Fokus hari ini</span><span class="pill"><i data-lucide="clock-3" class="i sm"></i>10 mnt</span><span class="pill">Grammar · A1</span></div>
+          <h2>Present Simple untuk kebiasaan sehari-hari</h2>
+          <p class="muted mt-1" style="max-width:380px">10 soal, lanjut dari kemarin. Dua soal yang salah minggu lalu ikut masuk supaya nggak lupa.</p>
+          <a class="btn ink" style="width:220px">Mulai sesi <i data-lucide="arrow-right" class="i sm"></i></a>
+          <img class="paw" src="/assets/brand/paw-mascot-full.svg" alt="">
+        </div>
+        <div class="row between"><h3>Skill kamu</h3><span class="small txt-maroon" style="font-weight:700">Buka Latihan →</span></div>
+        <div class="skills">
+          <div class="sk tile pink"><span class="ic"><i data-lucide="headphones" class="i sm"></i></span><b>Listening</b><div class="bar thin"><i style="width:72%;background:var(--pink-ink)"></i></div></div>
+          <div class="sk tile mint"><span class="ic"><i data-lucide="mic" class="i sm"></i></span><b>Speaking</b><div class="bar thin"><i style="width:40%;background:var(--mint-ink)"></i></div></div>
+          <div class="sk tile lilac"><span class="ic"><i data-lucide="book-open" class="i sm"></i></span><b>Reading</b><div class="bar thin"><i style="width:55%;background:var(--lilac-ink)"></i></div></div>
+          <div class="sk tile peach"><span class="ic"><i data-lucide="book-open-text" class="i sm"></i></span><b>Writing</b><div class="bar thin"><i style="width:30%;background:var(--peach-ink)"></i></div></div>
+          <div class="sk tile yellow"><span class="ic"><i data-lucide="book-a" class="i sm"></i></span><b>Vocab</b><div class="bar thin"><i style="width:64%;background:var(--yellow-ink)"></i></div></div>
+          <div class="sk tile sky"><span class="ic"><i data-lucide="spell-check-2" class="i sm"></i></span><b>Grammar</b><div class="bar thin"><i style="width:24%;background:var(--sky-ink)"></i></div></div>
+        </div>
+      </div>
+      <div class="stack" style="gap:14px">
+        <div class="card">
+          <div class="row between"><b>Minggu ini</b><span class="pill sun"><i data-lucide="flame" class="i sm"></i>7</span></div>
+          <div class="week mt-2"><div class="day"><i class="on"></i><span>S</span></div><div class="day"><i class="on"></i><span>S</span></div><div class="day"><i class="on"></i><span>R</span></div><div class="day"><i class="on"></i><span>K</span></div><div class="day"><i class="on"></i><span>J</span></div><div class="day"><i class="on"></i><span>S</span></div><div class="day"><i style="border:2px dashed var(--sun-deep);background:transparent"></i><span>M</span></div></div>
+        </div>
+        <div class="card row" style="gap:14px"><span class="ring" style="--p:66"><span>2/3</span></span><div><b>Sesi hari ini</b><div class="small muted">1 lagi, streak aman.</div></div></div>
+        <h3 class="mt-1">Lanjutkan</h3>
+        <div class="cc"><div class="row between"><span class="pill" style="background:var(--pink);color:var(--pink-ink)"><i data-lucide="book-a" class="i sm"></i>Vocab</span><span class="tiny muted">12/20</span></div><b style="display:block;margin-top:10px">Makanan & minuman</b><div class="bar thin mt-1"><i style="width:60%"></i></div></div>
+        <div class="cc"><div class="row between"><span class="pill" style="background:var(--lilac);color:var(--lilac-ink)"><i data-lucide="book-open" class="i sm"></i>Reading</span><span class="tiny muted">2 mnt</span></div><b style="display:block;margin-top:10px">Kabar dari Bali</b><div class="bar thin mt-1"><i style="width:25%;background:var(--lilac-ink)"></i></div></div>
+        <div class="cc" style="background:var(--lilac);border-color:var(--lilac-line)"><div class="row between"><b>Tugas kelas</b><span class="pill bad">2 belum</span></div><div class="small mt-1" style="color:var(--lilac-ink)">Bu Sari · Grammar lesson 4 & 5 · Kamis</div></div>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="/lucide.min.js"></script><script>lucide.createIcons()</script></body></html>

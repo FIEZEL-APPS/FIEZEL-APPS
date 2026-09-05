@@ -19,7 +19,7 @@
   'use strict';
   if (typeof FiezelI18n === 'undefined' || !FiezelI18n || typeof FiezelI18n.registerCopy !== 'function') return;
   FiezelI18n.registerCopy('id', {
-    /* ── Navigasi 4 tab ─────────────────────────────────────────────────────── */
+    /* ── Navigasi 4 tab legacy & 5 tab utama ────────────────────────────────── */
     'nav.hari-ini': 'Hari ini',
     'nav.hari-ini-aria': 'Hari ini',
     'nav.latihan': 'Latihan',
@@ -28,6 +28,16 @@
     'nav.progres-aria': 'Progres',
     'nav.pengaturan': 'Pengaturan',
     'nav.pengaturan-aria': 'Buka pengaturan',
+    'nav.practice': 'Latihan',
+    'nav.practice-aria': 'Latihan mandiri dan skill',
+    'nav.school': 'Kelas',
+    'nav.school-aria': 'Ruang kelas dan tugas sekolah',
+    'nav.home-primary': 'Hari ini',
+    'nav.home-primary-aria': 'Beranda dan fokus harian',
+    'nav.progress': 'Progres',
+    'nav.progress-aria': 'Peta CEFR dan kemahiran',
+    'nav.profile': 'Profil',
+    'nav.profile-aria': 'Profil murid dan teman',
 
     /* ── Home "Hari ini" ────────────────────────────────────────────────────── */
     'today.eyebrow': 'Hari ini',

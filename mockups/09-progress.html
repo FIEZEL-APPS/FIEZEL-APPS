@@ -1,0 +1,63 @@
+<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=390">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<style>
+.lvl{display:flex;align-items:center;gap:0;margin-top:14px}
+.lvl span{flex:1;text-align:center;font-weight:700;font-size:13px;position:relative;color:var(--muted-2)}
+.lvl span::before{content:'';display:block;height:8px;border-radius:999px;background:var(--line);margin-bottom:8px}
+.lvl span.done{color:var(--good)}.lvl span.done::before{background:var(--good)}
+.lvl span.now{color:var(--sun)}.lvl span.now::before{background:linear-gradient(90deg,var(--sun) 68%,rgba(255,255,255,.18) 68%)}
+.lvl span::before{background:rgba(255,255,255,.18)}
+.lvl span{color:rgba(253,250,243,.55)}
+.lvl span.done{color:#7FD1B0}.lvl span.done::before{background:#7FD1B0}
+.week{display:flex;gap:6px;justify-content:space-between}
+.day{flex:1;text-align:center}
+.day i{display:block;height:34px;border-radius:10px;background:var(--line-soft);margin-bottom:6px}
+.day i.on{background:var(--sun)}.day i.big{background:var(--sun-deep)}
+.day span{font-size:11px;font-weight:700;color:var(--muted)}
+.skl{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line-soft)}
+.skl:last-child{border:0}
+.skl .ic{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;flex:none}
+.skl .bar{flex:1}
+.skl b{width:40px;text-align:right;font-size:14px}
+.hero2{background:var(--ink);color:#FDFAF3;border-radius:var(--r-xl);padding:20px;position:relative;overflow:hidden}
+.hero2 .paw{position:absolute;right:10px;bottom:-14px;width:96px;opacity:.95}
+.hero2 .display{font-size:44px;line-height:1;font-weight:700;color:var(--sun)}
+</style></head><body>
+<div class="screen">
+  <div class="top"><h1>Progres</h1><span class="chip"><i data-lucide="history" class="i sm"></i>Riwayat</span></div>
+
+  <div class="hero2 mt-2">
+    <span class="eyebrow" style="color:rgba(253,250,243,.7)">Level kamu</span>
+    <div class="row" style="gap:12px;margin-top:6px"><span class="display">A1</span><div class="small" style="opacity:.85;max-width:170px">68% menuju <b>A2</b>. Sekitar 9 sesi lagi kalau tetap 1 sesi/hari.</div></div>
+    <div class="lvl" style="max-width:250px"><span class="done">Pre</span><span class="now">A1</span><span>A2</span><span>B1</span><span>B2</span></div>
+    <img class="paw" src="/assets/brand/mascot/collection/paw-001-reading-book.png" alt="">
+  </div>
+
+  <div class="card mt-2">
+    <div class="row between"><b>Minggu ini</b><span class="pill sun"><i data-lucide="flame" class="i sm"></i>7 hari</span></div>
+    <div class="week mt-2">
+      <div class="day"><i class="on"></i><span>S</span></div><div class="day"><i class="on"></i><span>S</span></div><div class="day"><i class="big"></i><span>R</span></div><div class="day"><i class="on"></i><span>K</span></div><div class="day"><i class="on"></i><span>J</span></div><div class="day"><i class="on"></i><span>S</span></div><div class="day"><i style="border:2px dashed var(--sun-deep);background:transparent"></i><span>M</span></div>
+    </div>
+  </div>
+
+  <div class="card mt-2">
+    <div class="row between"><b>Skill</b><span class="tiny muted">mastery · 30 hari</span></div>
+    <div class="mt-1">
+      <div class="skl"><span class="ic" style="background:var(--pink);color:var(--pink-ink)"><i data-lucide="headphones" class="i sm"></i></span><div class="bar"><i style="width:72%;background:var(--pink-ink)"></i></div><b>72%</b></div>
+      <div class="skl"><span class="ic" style="background:var(--mint);color:var(--mint-ink)"><i data-lucide="mic" class="i sm"></i></span><div class="bar"><i style="width:40%;background:var(--mint-ink)"></i></div><b>40%</b></div>
+      <div class="skl"><span class="ic" style="background:var(--lilac);color:var(--lilac-ink)"><i data-lucide="book-open" class="i sm"></i></span><div class="bar"><i style="width:55%;background:var(--lilac-ink)"></i></div><b>55%</b></div>
+      <div class="skl"><span class="ic" style="background:var(--peach);color:var(--peach-ink)"><i data-lucide="book-open-text" class="i sm"></i></span><div class="bar"><i style="width:30%;background:var(--peach-ink)"></i></div><b>30%</b></div>
+      <div class="skl"><span class="ic" style="background:var(--yellow);color:var(--yellow-ink)"><i data-lucide="book-a" class="i sm"></i></span><div class="bar"><i style="width:64%;background:var(--yellow-ink)"></i></div><b>64%</b></div>
+      <div class="skl"><span class="ic" style="background:var(--sky);color:var(--sky-ink)"><i data-lucide="spell-check-2" class="i sm"></i></span><div class="bar"><i style="width:24%;background:var(--sky-ink)"></i></div><b>24%</b></div>
+    </div>
+  </div>
+</div>
+<nav class="nav">
+  <a><i data-lucide="house" class="i"></i>Hari ini</a>
+  <a><i data-lucide="zap" class="i"></i>Latihan</a>
+  <a><i data-lucide="school" class="i"></i>Kelas</a>
+  <a class="on"><i data-lucide="route" class="i"></i>Progres</a>
+  <a><i data-lucide="user-round" class="i"></i>Profil</a>
+</nav>
+<script src="/lucide.min.js"></script><script>lucide.createIcons()</script></body></html>
