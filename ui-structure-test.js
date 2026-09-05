@@ -14,14 +14,14 @@ const check=(ok,message)=>{if(!ok)failures.push(message)};
    Vocab/Grammar/Reading yang hilang tidak kehilangan tujuannya - ketiganya hidup di
    dalam view `latihan`, dan rutenya tetap sah di VALID_VIEWS. */
 const navButtons=(html.match(/class="nav(?: active)?"/g)||[]).length;
-check(navButtons===4,'Bottom navigation must contain exactly four primary destinations (Hari ini / Latihan / Progres / Pengaturan), found '+navButtons+'.');
+check(navButtons===5,'Bottom navigation must contain exactly five primary destinations (Practice / School / Home / Progress / Profile), found '+navButtons+'.');
 // m025-115: kroma inti pindah ke set ikon duotone milik FIEZEL sendiri
 // (features/ui/fiezel-icons.js), sesuai brief redesign OWNER bagian 4. Yang dijaga
 // pemeriksaan ini tidak berubah - ikon harus datang dari berkas LOKAL, bukan dari CDN -
 // jadi kedua sistem lokal dihitung bersama. Tab bar wajib memakai set sendiri, karena
 // di situlah "template vs eksklusif" paling terasa.
 check(((html.match(/data-lucide=/g)||[]).length+(html.match(/data-fz-icon=/g)||[]).length)>=9,'Core chrome must use the local icon system.');
-check((html.match(/data-fz-icon=/g)||[]).length>=4,'Bottom navigation must use the FIEZEL duotone icon set.');
+check((html.match(/data-fz-icon=/g)||[]).length>=5,'Bottom navigation must use the FIEZEL duotone icon set.');
 check(/features\/ui\/fiezel-icons\.js/.test(html)&&/data-fz-icon/.test(fs.readFileSync(path.join(root,'features','ui','fiezel-icons.js'),'utf8')),'FIEZEL icon runtime must ship and hydrate its own markers.');
 check(/aria-label="Buka pengaturan"/.test(html),'Icon-only topbar controls need accessible names.');
 // m025-131: coach-preview berganti nama jadi coach-strip. Kartu Coach yang lama berisi

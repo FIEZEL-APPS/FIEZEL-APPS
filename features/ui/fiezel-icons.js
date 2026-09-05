@@ -145,7 +145,11 @@
     /* Streak: dipakai badge, satu-satunya tempat koral jadi bidang penuh. */
     flame: '<path class="fz-fill" d="M12 3.8c3.4 3 5 5.3 5 7.9a5 5 0 0 1-10 0c0-1.5.6-2.9 1.8-4.4.5 1 .9 1.6 1.6 2 .2-2.1.7-3.9 1.6-5.5z"/>' +
       '<path class="fz-line" d="M12 3.8c3.4 3 5 5.3 5 7.9a5 5 0 0 1-10 0c0-1.5.6-2.9 1.8-4.4.5 1 .9 1.6 1.6 2 .2-2.1.7-3.9 1.6-5.5z"/>' +
-      '<path class="fz-line" d="M12 12.6c1.2 1 1.8 1.9 1.8 2.8a1.8 1.8 0 0 1-3.6 0c0-.9.6-1.8 1.8-2.8z"/>'
+      '<path class="fz-line" d="M12 12.6c1.2 1 1.8 1.9 1.8 2.8a1.8 1.8 0 0 1-3.6 0c0-.9.6-1.8 1.8-2.8z"/>',
+    /* Profil murid / akun dan teman untuk navigasi utama */
+    profile: '<circle class="fz-fill" cx="12" cy="8" r="4.2"/>' +
+      '<circle class="fz-line" cx="12" cy="8" r="4.2"/>' +
+      '<path class="fz-line" d="M4.6 20.2c0-3.6 3.3-6.4 7.4-6.4s7.4 2.8 7.4 6.4"/>'
   };
 
   var SVG_HEAD = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">';
