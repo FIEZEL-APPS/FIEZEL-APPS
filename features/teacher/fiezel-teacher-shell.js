@@ -7,13 +7,28 @@
   'use strict';
   if (!root) return;
   var S = function () { return root.FiezelTeacherStore; };
-  var el = null, env = {}, st = null, ui = { modal: null, drawer: null, filter: '', insightSkill: 'past_tense', attDate: null, pick: {}, syncing: false }, syncTimer = null, visListener = null;
-  /* 3 detik: owner ingin chip Sinkron selalu berbunyi "Tersinkron baru saja" tanpa harus
-     menutup dan membuka PWA. Yang membuat ini aman bukan angkanya, melainkan tiga pagar di
-     bawah: ronde tidak pernah bertumpuk (ui.syncing), timer tidur saat tab tidak dilihat,
-     dan kegagalan beruntun menaikkan jeda supaya server yang sedang sakit tidak dihujani. */
-  var SYNC_EVERY_MS = 3000;
+  var el = null, env = {}, st = null, ui = { modal: null, drawer: null, filter: '', insightSkill: 'past_tense', attDate: null, pick: {}, syncing: false }, syncTimer = null, chipTimer = null, visListener = null;
+  /*
+   * DUA detak, bukan satu. m025-261 menyatukan keduanya pada 3 detik dan itu merusak dua hal
+   * sekaligus; m025-262 memisahkannya lagi.
+   *
+   * 1. CHIP_TICK_MS - hanya mengecat ulang label chipnya. Yang owner minta adalah chip yang
+   *    selalu berbunyi "Tersinkron baru saja"; label itu dihitung dari selisih MENIT terhadap
+   *    lastPullAt (lihat syncLabel di store), jadi menjaganya tetap segar TIDAK butuh jaringan
+   *    sama sekali. Menyeret permintaan jaringan ke 3 detik demi label yang berubah tiap menit
+   *    adalah harga yang dibayar untuk sesuatu yang bisa gratis.
+   *
+   * 2. SYNC_EVERY_MS - ronde jaringan yang sesungguhnya. Server memasang lantainya sendiri di
+   *    LIMITS.TEACHER_MIN_INTERVAL_MS = 3000 ms (workers/api/teacher/class-sync-core.js) dan
+   *    menolak dengan 429 apa pun yang lebih rapat. Klien m025-261 memakai persis 3000 ms -
+   *    tepat DI lantai itu, jadi jitter sekecil apa pun membuat sebagian ronde ditolak, chip
+   *    berkedip merah, dan syncFailStreak menanjak tanpa sebab nyata. Jarak amannya bukan
+   *    selera: ia harus berada di atas lantai server, dengan marjin.
+   */
+  var CHIP_TICK_MS = 1000;
+  var SYNC_EVERY_MS = 10000;
   var syncFailStreak = 0;
+  var pendingRender = false;
   var NAV = [['hub', 'Kelas', 'school'], ['briefing', 'Briefing', 'sunrise'], ['classes', 'Kelas & Siswa', 'users'], ['assignments', 'Tugas & Ujian', 'clipboard-list'], ['insights', 'Analitik', 'activity'], ['comms', 'Komunikasi', 'megaphone'], ['journal', 'Jurnal Guru', 'notebook-pen']];
   var TITLE = { hub: 'Kelas — Guru · Murid · Braincore', briefing: 'Briefing hari ini', classes: 'Kelas & Siswa', assignments: 'Tugas & Ujian', insights: 'Analitik & Deteksi Dini', comms: 'Komunikasi', journal: 'Jurnal Guru', settings: 'Profil Guru' };
 
@@ -62,10 +77,17 @@
       if (!el || ui.syncing) return;
       if (pageHidden()) return;                      // tab tak dilihat: tidak ada yang perlu disegarkan
       /* Jeda menanjak sesudah gagal beruntun: 1 ronde dilewati per kegagalan, sampai 10.
-         Server yang sakit tidak dihujani 20 permintaan per menit sampai ia pulih. */
+         Server yang sakit tidak dihujani sampai ia pulih. */
       if (syncFailStreak > 0 && (Date.now() / SYNC_EVERY_MS | 0) % (Math.min(syncFailStreak, 10) + 1) !== 0) return;
       syncAll(true);
     }, SYNC_EVERY_MS);
+    /* Detak chip: murni lokal, tanpa jaringan. Ia juga yang menyusulkan render yang tertunda
+       karena guru sedang mengetik - begitu kolomnya dilepas, cat ulangnya menyusul sendiri. */
+    chipTimer = setInterval(function () {
+      if (!el || pageHidden()) return;
+      if (pendingRender && !busy()) { render(); return; }
+      paintSyncChip();
+    }, CHIP_TICK_MS);
     /* Kembali terlihat = satu ronde SEGERA, tidak menunggu tick berikutnya. */
     try {
       if (!visListener) {
@@ -76,7 +98,8 @@
   }
   function stopAutoSync() {
     if (syncTimer) clearInterval(syncTimer);
-    syncTimer = null;
+    if (chipTimer) clearInterval(chipTimer);
+    syncTimer = null; chipTimer = null; pendingRender = false;
     try { if (visListener) { root.document.removeEventListener('visibilitychange', visListener); visListener = null; } } catch (_) {}
   }
   /** Sinkron semua kelas: klaim kode yang belum diklaim, tarik laporan murid, ingest. */
@@ -97,7 +120,7 @@
     }
     if (ui.syncing || !st.classes.length) return Promise.resolve();
     ui.syncing = true;
-    if (quiet) paintSyncChip(); else render();
+    if (quiet) paintSyncChip(); else render();   // sinkron manual = ketukan guru, jangan ditunda
     var total = { ingested: 0, graded: 0, names: [], failed: 0, events: [] };
     return st.classes.reduce(function (p, c) { return p.then(function () { return T.syncClass(c).then(function (r) { if (r.ok) { total.ingested += r.ingested; total.graded += r.graded; total.names = total.names.concat(r.names || []); total.events = total.events.concat(r.events || []); } else total.failed++; }); }); }, Promise.resolve())
       .then(function () {
@@ -109,11 +132,39 @@
         /* Render penuh hanya bila ronde ini benar-benar membawa sesuatu. Ronde kosong -
            yang mayoritas pada jeda 3 detik - cukup menyegarkan chipnya. */
         var berubah = total.ingested || total.graded || total.events.length;
-        if (!quiet || berubah) render(); else paintSyncChip();
+        if (!quiet) render(); else if (berubah) syncRender(); else paintSyncChip();
         if (total.events.length) { var top = total.events.filter(function (e) { return e.kind === 'assignment_done'; })[0] || total.events[0]; toast(T.inboxText(top) + (total.events.length > 1 ? ' · +' + (total.events.length - 1) + ' kabar lain' : '')); }
         else if (total.ingested) toast(total.ingested + ' laporan murid masuk' + (total.graded ? ' · ' + total.graded + ' tugas dinilai otomatis' : '') + '.');
         else if (!quiet) toast(total.failed ? 'Sinkron gagal untuk ' + total.failed + ' kelas.' : 'Tersinkron — belum ada laporan baru.');
       });
+  }
+  /*
+   * Apakah guru sedang MEMEGANG cangkang ini?
+   *
+   * Cat ulang penuh mengganti el.innerHTML, jadi ia membuang simpul yang sedang dipegang guru:
+   * teks yang sedang diketik hilang di tengah kalimat, dropdown yang terbuka tertutup, pilihan
+   * murid pada tugas baru ter-reset. Itulah kenapa "tugas baru tidak pernah sampai": bukan
+   * kiriman yang gagal, melainkan formulirnya yang dikosongkan sebelum guru sempat menekan
+   * kirim. Selama salah satu dari ini benar, cat ulang yang dipicu SINKRON harus menunggu.
+   */
+  function busy() {
+    try {
+      if (ui.modal || ui.drawer || ui.inbox) return true;
+      var a = root.document.activeElement;
+      if (!a || !el || !el.contains(a)) return false;
+      if (a.isContentEditable) return true;
+      return /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName || '');
+    } catch (_) { return false; }
+  }
+  /*
+   * Cat ulang yang dipicu sinkron - satu-satunya yang boleh ditunda. Cat ulang yang dipicu
+   * KETUKAN guru tetap memanggil render() langsung: di sana penundaan justru terbaca sebagai
+   * tombol yang tidak bereaksi. Yang tertunda disusulkan oleh detak chip begitu busy() reda.
+   */
+  function syncRender() {
+    if (busy()) { pendingRender = true; paintSyncChip(); return false; }
+    render();
+    return true;
   }
   /*
    * Mengecat ulang HANYA chip sinkron, bukan seluruh cangkang.
@@ -158,7 +209,7 @@
     render();
     startAutoSync();
   }
-  function unmount() { stopAutoSync(); document.body.classList.remove('fz-teacher-mode'); document.removeEventListener('keydown', onKey); if (el) { el.removeEventListener('click', onClick); el.removeEventListener('submit', onSubmit); el.removeEventListener('change', onChange); el.removeEventListener('input', onInput); } el = null; ui.modal = null; ui.drawer = null; }
+  function unmount() { stopAutoSync(); document.body.classList.remove('fz-teacher-mode'); document.removeEventListener('keydown', onKey); if (el) { el.removeEventListener('click', onClick); el.removeEventListener('submit', onSubmit); el.removeEventListener('change', onChange); el.removeEventListener('input', onInput); } el = null; ui.modal = null; ui.drawer = null; lastPaintKey = null; }
   function onKey(e) { if (e.key === 'Escape' && (ui.modal || ui.drawer || ui.inbox)) { ui.modal = null; ui.drawer = null; ui.inbox = false; render(); } }
   function isTeacherRole() {
     try {
@@ -181,14 +232,28 @@
     if (env.exit) env.exit();
   }
 
+  /*
+   * Kunci "layar mana yang sedang dicat". Animasi masuk (.tg-rise) hanya boleh berjalan saat
+   * layarnya BERGANTI. m025-261 memutarnya ulang pada setiap cat ulang sinkron: kartu jatuh
+   * kembali ke posisi awalnya - turun dan bergeser - lalu merangkak ke tempatnya, berulang
+   * setiap ronde. Yang guru lihat sebagai "kartu glitch berpindah-pindah" adalah animasi masuk
+   * yang di-restart, bukan tata letak yang bergerak.
+   */
+  var lastPaintKey = null;
   function render() {
     if (!el) return;
+    pendingRender = false;
     var c = cls();
-    el.innerHTML = '<div class="tg' + (ui.modal && ui.modal.kind === 'board' ? ' tg-board-open' : '') + '" data-testid="teacher-shell">' + sidebar(c) + '<div class="tg-main">' + topbar(c) + '<div class="tg-content">' + (st.classes.length ? views[st.view || 'briefing'](c) : welcome()) + '</div></div>' + mobileNav() + drawer(c) + modal(c) + '</div>';
+    var key = (st.view || 'briefing') + '|' + (st.activeClassId || '') + '|' + (ui.modal ? ui.modal.kind : '') + '|' + (ui.drawer || '');
+    var repaint = key === lastPaintKey;
+    lastPaintKey = key;
+    el.innerHTML = '<div class="tg' + (repaint ? ' is-repaint' : '') + (ui.modal && ui.modal.kind === 'board' ? ' tg-board-open' : '') + '" data-testid="teacher-shell">' + sidebar(c) + '<div class="tg-main">' + topbar(c) + '<div class="tg-content">' + (st.classes.length ? views[st.view || 'briefing'](c) : welcome()) + '</div></div>' + mobileNav() + drawer(c) + modal(c) + '</div>';
     var hubEl = el.querySelector('#tgClassHub');
     if (hubEl && root.FiezelClassHub) root.FiezelClassHub.mountTeacher(hubEl, { st: function () { return st; }, cls: cls, persist: persist, toast: toast, rerender: render });
     if (env.afterRender) try { env.afterRender(); } catch (_) {}
-    var f = el.querySelector('[data-autofocus]'); if (f) try { f.focus(); } catch (_) {}
+    /* Autofokus hanya saat layarnya benar-benar berganti. Pada cat ulang ia akan merebut kursor
+       dari tempat guru meletakkannya. */
+    if (!repaint) { var f = el.querySelector('[data-autofocus]'); if (f) try { f.focus(); } catch (_) {} }
   }
 
   // ---- kerangka ---------------------------------------------------------------------------

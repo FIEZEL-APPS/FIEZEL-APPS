@@ -1,7 +1,7 @@
 {
-  "version": "m025-261",
-  "claimedBy": "branch fix/teacher-live-sync",
-  "claimedAt": "2026-09-05T17:45:33.505Z",
-  "reason": "Sinkron guru langsung: ronde 3 detik dengan chip dicat di tempat, tidur saat tab tersembunyi",
+  "version": "m025-262",
+  "claimedBy": "branch fix/teacher-sync-no-wipe",
+  "claimedAt": "2026-09-05T19:30:00.000Z",
+  "reason": "Sinkron guru: chip dipisah dari ronde jaringan, cat ulang ditunda saat guru mengetik, animasi masuk tidak diputar ulang",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
