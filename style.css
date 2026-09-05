@@ -5360,3 +5360,13 @@ html body #app .social-home-launcher .launch-card{background:var(--pz-sky);borde
 }
 
 
+
+/* Kartu permintaan teman (modal Terima/Tolak). Barisnya sengaja memakai token yang
+   sama dengan .social-me supaya modal ini tidak jadi pulau gaya sendiri. */
+.social-request-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.social-request-row:last-child{border-bottom:0}
+.social-request-who{flex:1 1 0;min-width:0;display:flex;flex-direction:column}
+.social-request-who b{font-size:.95rem;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.social-request-who small{color:var(--muted)}
+.social-request-acts{display:flex;align-items:center;gap:8px;flex:none}
+.social-request-acts .primary{padding:8px 14px;min-height:40px}

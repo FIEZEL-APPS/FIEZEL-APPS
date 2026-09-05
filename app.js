@@ -12350,6 +12350,10 @@ async function refreshSocialSummaryCard(){
     socialProfileCache=me.data.profile;
     const board=await core.api.boardFriends();
     let friends=[];try{const fr=await core.api.friends();if(fr.ok&&Array.isArray(fr.data?.friends))friends=fr.data.friends}catch(_){}
+    /* Hitungan permintaan diambil di sini, sekali per penyegaran ringkasan, supaya
+       tombol "Permintaan" di panel Home tahu ada berapa yang menunggu tanpa satu
+       ronde jaringan sendiri tiap render. */
+    try{await refreshFriendRequestCount()}catch(_){}
     socialSummaryCache={kind:'profile',handle:me.data.profile.handle,pb:board.ok&&board.data?.me?Number(board.data.me.pb)||0:null,friends};
   }else if(me.error==='profile_required')socialSummaryCache={kind:'cta'};
   else socialSummaryCache={kind:'off'};
@@ -12394,6 +12398,7 @@ function socialHomeBody(){
   ${avatars}
   <div class="fz2-acts">
     ${inviteBtn}
+    ${canSocial&&socialRequestCount>0?`<button type="button" class="fz2-act is-hot" onclick="openFriendRequestsModal()" data-testid="home-friend-requests"><i data-lucide="handshake"></i><span>${esc(FiezelI18n.t('social2.req-title'))} · ${esc(FiezelI18n.t('social2.req-count',{n:socialRequestCount}))}</span></button>`:''}
     <button type="button" class="fz2-act" onclick="${canSocial?'openAddFriendModal()':'socialHomeOpenOnline()'}" data-testid="home-add-friend"><i data-lucide="user-plus"></i><span>${FiezelI18n.t('social2.add-friend')}</span></button>
     <button type="button" class="fz2-act${cls?' is-set':''}" onclick="openJoinClassModal()" data-testid="home-join-class"><i data-lucide="school"></i><span>${cls?esc(FiezelI18n.t('social2.class-current',{code:cls})):FiezelI18n.t('social2.join-class')}</span></button>
   </div>
@@ -12415,11 +12420,67 @@ async function socialAddByHandle(){
   if(!raw)return showToast(FiezelI18n.t('social2.add-empty'));
   const btn=$('socialAddBtn');if(btn)btn.disabled=true;
   const res=await core.api.friendAdd(raw);
-  if(res.ok){const h=res.data?.friend?.handle||raw;showToast(FiezelI18n.t('social2.add-ok',{handle:h}));socialSummaryAt=0;closeModal();try{socialMicroMoment('friend')}catch(_){}if(state.view==='online')renderOnlineTab();else refreshSocialSummaryCard();return}
+  if(res.ok){const h=res.data?.friend?.handle||raw;showToast(FiezelI18n.t(res.data?.status==='friends'?'social2.add-ok':'social2.add-pending',{handle:h}));socialSummaryAt=0;closeModal();try{socialMicroMoment('friend')}catch(_){}if(state.view==='online')renderOnlineTab();else refreshSocialSummaryCard();return}
   if(btn)btn.disabled=false;
   showToast(res.error==='code_invalid'||res.status===400?FiezelI18n.t('social2.add-invalid'):res.message);
 }
 window.socialAddByHandle=socialAddByHandle;
+/* ---------------------------------------------- permintaan teman: terima / tolak ------
+   Menambah teman lewat ID hanya MENGIRIM permintaan; pertemanan baru terjadi kalau
+   yang diminta menekan Terima di sini. Hitungannya diambil bersama ringkasan sosial
+   supaya tombolnya cuma muncul ketika memang ada yang menunggu - kalau tidak, ia
+   hanya menambah satu tombol mati di panel yang sudah padat. */
+let socialRequestCount=0;
+async function refreshFriendRequestCount(){
+  const core=socialCore();if(!core)return 0;
+  try{
+    const res=await core.api.friendRequests();
+    socialRequestCount=res.ok&&Array.isArray(res.data?.requests)?res.data.requests.length:0;
+  }catch(_){socialRequestCount=0}
+  return socialRequestCount;
+}
+window.refreshFriendRequestCount=refreshFriendRequestCount;
+function friendRequestRow(r){
+  const h=esc(String(r.handle||''));
+  const name=esc(String(r.displayName||r.handle||''));
+  return `<div class="social-request-row" data-testid="friend-request-${h}">
+    <span class="social-avatar" aria-hidden="true">${esc(String(r.handle||'?').charAt(0).toUpperCase())}</span>
+    <div class="social-request-who"><b>${name}</b><small>@${h}</small></div>
+    <div class="social-request-acts">
+      <button type="button" class="text-button" onclick="decideFriendRequest('${h}',false)" data-testid="reject-${h}">${FiezelI18n.t('social2.req-reject')}</button>
+      <button type="button" class="primary" onclick="decideFriendRequest('${h}',true)" data-testid="accept-${h}">${FiezelI18n.t('social2.req-accept')}</button>
+    </div>
+  </div>`;
+}
+async function openFriendRequestsModal(){
+  const core=socialCore();if(!core)return;
+  openModal(`<div class="modal-mark">${FiezelI18n.t('social2.panel-title')}</div><h2>${FiezelI18n.t('social2.req-title')}</h2>
+    <div id="socialRequestList"><p class="muted">${FiezelI18n.t('social2.req-loading')}</p></div>
+    <div class="modal-actions"><button onclick="closeModal()">${FiezelI18n.t('coach.close-aria')}</button></div>`);
+  await renderFriendRequests();
+}
+window.openFriendRequestsModal=openFriendRequestsModal;
+async function renderFriendRequests(){
+  const core=socialCore(),box=$('socialRequestList');if(!core||!box)return;
+  const res=await core.api.friendRequests();
+  const list=res.ok&&Array.isArray(res.data?.requests)?res.data.requests:[];
+  socialRequestCount=list.length;
+  box.innerHTML=list.length?list.map(friendRequestRow).join(''):`<p class="muted">${FiezelI18n.t('social2.req-empty')}</p>`;
+  try{enhanceUI()}catch(_){}
+}
+async function decideFriendRequest(handle,accept){
+  const core=socialCore();if(!core)return;
+  const h=String(handle||'').trim().replace(/^@/,'').toLowerCase();
+  if(!h)return;
+  const res=accept?await core.api.friendAccept(h):await core.api.friendReject(h);
+  if(!res.ok)return showToast(res.error==='code_invalid'||res.status===400?FiezelI18n.t('social2.add-invalid'):res.message);
+  showToast(FiezelI18n.t(accept?'social2.req-accepted':'social2.req-rejected',{handle:h}));
+  socialSummaryAt=0;
+  await renderFriendRequests();
+  if(accept){try{socialMicroMoment('friend')}catch(_){}}
+  if(state.view==='home')render();
+}
+window.decideFriendRequest=decideFriendRequest;
 function openJoinClassModal(){
   const cur=learnerClassCode();
   openModal(`<div class="modal-mark">${FiezelI18n.t('nav.school')}</div><h2>${FiezelI18n.t('social2.class-title')}</h2><p class="muted">${FiezelI18n.t('social2.class-desc')}</p>
