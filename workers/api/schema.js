@@ -95,6 +95,7 @@ export const BYTE_LIMITS = Object.freeze({
   '/api/social/profile/me': 512,        // GET, tanpa body
   '/api/social/friends/invite': 512,
   '/api/social/friends/redeem': 512,
+  '/api/social/friends/add': 512,
   '/api/social/friends': 512,           // GET, tanpa body
   '/api/social/cheer': 512,
   '/api/social/rank/evidence': 8192,

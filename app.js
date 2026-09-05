@@ -7133,6 +7133,7 @@ function todayHomeMarkup(){
     ${activeLevelTrustLineMarkup()}
   </section>
   ${quickChips}
+  ${socialHomeMarkup()}
 </div>`;
 }
 function home(){pawStreakWatch();/* m028-06: kabar demosi yang tertahan selama kuis dibuka di sini, bukan di tengah soal. */if(!state.activeSession&&levelTrustState(state).pendingNotice)setTimeout(()=>{try{flushLevelGuardNotice()}catch(_){}},280);/* W1 P1-2: kabar percobaan-terputus dari boot (sanitizeState) diumumkan SEKALI di beranda. */if(state.pendingInterruptNotice){const iNotice=state.pendingInterruptNotice;state.pendingInterruptNotice='';save();setTimeout(()=>{try{showToast(iNotice)}catch(_){}},900)}/* m025-166: gerbang level yang dipasang di perkenalan muncul di sini - saat murid sudah
@@ -12107,10 +12108,11 @@ async function renderOnlineTab(){
   const seq=++onlineSeq;
   const put=html=>{if(seq!==onlineSeq||state.view!=='online')return;const el=$('onlineRoot');if(el){el.innerHTML=html;enhanceUI()}};
   const core=socialCore();
-  if(!core)return put(card(`<h3>${FiezelI18n.t('social.not-loaded-title')}</h3><p class="muted">${FiezelI18n.t('social.not-loaded-body')}</p>`,'social-card'));
-  if(typeof navigator!=='undefined'&&navigator.onLine===false)return put(socialOfflineCard());
+  const extra=onlineTab==='teman'?socialClassCardMarkup():'';
+  if(!core)return put(card(`<h3>${FiezelI18n.t('social.not-loaded-title')}</h3><p class="muted">${FiezelI18n.t('social.not-loaded-body')}</p>`,'social-card')+extra);
+  if(typeof navigator!=='undefined'&&navigator.onLine===false)return put(socialOfflineCard()+extra);
   let flag='off';try{flag=await core.probeFlag()}catch(_){flag='off'}
-  if(flag!=='on')return put(socialFlagOffCard(flag));
+  if(flag!=='on')return put(socialFlagOffCard(flag)+extra);
   try{await core.ensureAnon()}catch(_){}
   try{
     if(onlineTab==='teman')return put(await socialTemanMarkup(core));
@@ -12185,10 +12187,11 @@ async function socialCreateProfile(){
 }
 window.socialCreateProfile=socialCreateProfile;
 /* ---------------------------------------------------------------- tab TEMAN */
+function socialClassCardMarkup(){const classCode=learnerClassCode();return card(`<div class="fz2-classrow"><div><h3>${FiezelI18n.t('social2.class-title')}</h3><p class="muted">${classCode?esc(FiezelI18n.t('social2.class-current',{code:classCode})):FiezelI18n.t('social2.class-desc')}</p></div><button type="button" class="${classCode?'':'primary'}" onclick="openJoinClassModal()" data-testid="teman-join-class"><i data-lucide="school"></i> ${classCode?FiezelI18n.t('social2.class-change'):FiezelI18n.t('social2.class-btn')}</button></div>`,'social-card')}
 function socialNeedProfileCard(){return card(`<h3>${FiezelI18n.t('social.need-profile-title')}</h3><p class="muted">${FiezelI18n.t('social.need-profile-body')}</p><div class="modal-actions"><button class="primary" onclick="switchOnlineTab('profil')"><i data-lucide="user-plus"></i> ${FiezelI18n.t('social.create-btn')}</button></div>`,'social-card')}
 async function socialTemanMarkup(core){
   const fr=await core.api.friends();
-  if(fr.error==='profile_required')return socialNeedProfileCard();
+  if(fr.error==='profile_required')return socialNeedProfileCard()+socialClassCardMarkup();
   if(!fr.ok)return card(`<h3>${FiezelI18n.t('social.friends-error-title')}</h3><p class="muted">${esc(fr.message)}</p>`,'social-card');
   const friends=Array.isArray(fr.data?.friends)?fr.data.friends:[];
   const cheers=Array.isArray(fr.data?.cheersToday)?fr.data.cheersToday:[];
@@ -12199,12 +12202,15 @@ async function socialTemanMarkup(core){
     <div class="modal-actions"><button ${socialInviteLast?'':'class="primary"'} id="socialMintBtn" onclick="socialMintInvite()"><i data-lucide="ticket"></i> ${socialInviteLast?FiezelI18n.t('social.new-code-btn'):FiezelI18n.t('social.print-code-btn')}</button></div>`,'social-card');
   const redeemCard=card(`<h3>${FiezelI18n.t('social.have-code-title')}</h3><label class="endpoint-label">${FiezelI18n.t('social.invite-code-label')}<input id="socialRedeemInput" type="text" maxlength="12" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="mis. K3JQ7W2A" value="${esc(urlInvite)}"></label><div class="modal-actions"><button class="primary" onclick="socialRedeem()"><i data-lucide="handshake"></i> ${FiezelI18n.t('social.redeem-btn')}</button></div>`,'social-card');
   const cheerFeed=cheers.length?card(`<h3>${FiezelI18n.t('social.cheers-title')}</h3>${cheers.map(c=>{const m=core.stickerMeta(c.sticker);return `<div class="row"><span>${m?m.emoji:''} ${FiezelI18n.t('social.cheer-from',{handle:esc(c.handle)})}</span><b>×${Math.max(1,Number(c.cnt)||1)}</b></div>`}).join('<hr>')}`,'social-card'):'';
+  const myHandle=socialProfileCache?.handle||'';
+  const addCard=card(`<h3>${FiezelI18n.t('social2.add-title')}</h3><p class="muted">${FiezelI18n.t('social2.add-desc')}</p>${myHandle?`<p class="fz2-myid" data-testid="my-social-id">${esc(FiezelI18n.t('social2.my-id',{handle:myHandle}))}</p>`:''}<div class="fz2-inline"><input id="socialAddInput" type="text" maxlength="21" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="@nama_teman" aria-label="${FiezelI18n.t('social2.add-label')}" data-testid="add-friend-input"><button class="primary" id="socialAddBtn" onclick="socialAddByHandle()" data-testid="add-friend-submit"><i data-lucide="user-plus"></i> ${FiezelI18n.t('social2.add-btn')}</button></div>`,'social-card fz2-add-card');
+  const classCard=socialClassCardMarkup();
   const list=friends.length?friends.map(f=>{
     const vis=f.visible!==false;
     const milestones=vis&&Array.isArray(f.milestones)?f.milestones.slice(0,3).map(m=>`<span class="social-chip">${esc(core.milestoneLabel(m.kind))}</span>`).join(''):'';
     return `<div class="social-friend"><span class="social-avatar" aria-hidden="true">${esc(String(f.handle||'?').charAt(0).toUpperCase())}</span><div class="social-friend-body"><b>@${esc(f.handle)}</b><small>${esc(core.presenceLabel(f))}${vis&&f.band?` · ${esc(f.band)}`:''}${vis&&Number(f.streakDays)>0?` · 🔥 ${Number(f.streakDays)} hari`:''}</small>${milestones?`<div class="social-chips">${milestones}</div>`:''}</div><button type="button" class="social-cheer-btn" onclick="socialOpenCheer('${esc(f.handle)}')" aria-label="${FiezelI18n.t('social.cheer-modal-title',{handle:esc(f.handle)})}">👏 ${FiezelI18n.t('social.cheer-btn')}</button></div>`;
   }).join(''):`<div class="social-empty"><p><b>${FiezelI18n.t('social.no-friends-title')}</b></p><p class="muted">${FiezelI18n.t('social.no-friends-body')}</p></div>`;
-  return inviteCard+redeemCard+cheerFeed+card(`<h3>${FiezelI18n.t('social.friends-list-title',{count:friends.length})}</h3><p class="muted">${FiezelI18n.t('social.friends-list-desc')}</p>${list}`,'social-card');
+  return addCard+classCard+card(`<h3>${FiezelI18n.t('social.friends-list-title',{count:friends.length})}</h3><p class="muted">${FiezelI18n.t('social.friends-list-desc')}</p>${list}`,'social-card')+cheerFeed+`<details class="fz2-more"><summary>${FiezelI18n.t('social2.more-ways')}</summary>${inviteCard}${redeemCard}</details>`;
 }
 async function socialMintInvite(){
   const core=socialCore();if(!core)return;
@@ -12350,7 +12356,8 @@ async function refreshSocialSummaryCard(){
   if(me.ok&&me.data?.profile){
     socialProfileCache=me.data.profile;
     const board=await core.api.boardFriends();
-    socialSummaryCache={kind:'profile',handle:me.data.profile.handle,pb:board.ok&&board.data?.me?Number(board.data.me.pb)||0:null};
+    let friends=[];try{const fr=await core.api.friends();if(fr.ok&&Array.isArray(fr.data?.friends))friends=fr.data.friends}catch(_){}
+    socialSummaryCache={kind:'profile',handle:me.data.profile.handle,pb:board.ok&&board.data?.me?Number(board.data.me.pb)||0:null,friends};
   }else if(me.error==='profile_required')socialSummaryCache={kind:'cta'};
   else socialSummaryCache={kind:'off'};
   socialSummaryAt=Date.now();
@@ -12374,30 +12381,74 @@ function socialHomeMarkup(){
 }
 function socialHomeBody(){
   const c=socialSummaryCache;
-  if(!c||c.kind==='off'||c.kind==='offline')return '';
-  // Undangan yang belum dijawab MENANG atas kartu biasa. Ini keadaan yang dicatat handoff
-  // m025-240 §8 sebagai yang paling layak dikerjakan berikutnya: sebelum ini kartu Home
-  // hanya membedakan sudah/belum punya profil, jadi undangan yang tiba lewat tautan tidak
-  // meninggalkan satu pun jejak yang bisa dilihat murid dari layar yang ia lewati tiap hari.
   const pendingInvite=socialPendingInvite();
-  if(pendingInvite&&pendingInvite.kind==='friend'){
-    return `<div class="home-section-head"><div><h2>${FiezelI18n.t('social.summary-title')}</h2></div></div>
-<div class="learning-launcher social-home-launcher">
-  <button class="launch-card social-launch social-launch-invite" onclick="socialHomeOpenInvite()" data-testid="home-social-invite"><span class="launch-icon"><i data-lucide="mail-open" aria-hidden="true"></i></span><span><small>${FiezelI18n.t('social.home-pending-sub')}</small><b>${FiezelI18n.t('social.home-pending-open')}</b></span><i data-lucide="arrow-up-right"></i></button>
-</div>`;
-  }
   const unread=socialUnreadCount();
-  const sub=unread>0
-    ?FiezelI18n.t('social.home-sub-unread',{count:unread})
-    :c.kind==='profile'
-      ?FiezelI18n.t('social.home-sub-profile',{handle:esc(c.handle||''),pb:c.pb==null?'—':c.pb})
-      :FiezelI18n.t('social.home-sub-cta');
+  const cls=learnerClassCode();
+  const friends=c&&c.kind==='profile'&&Array.isArray(c.friends)?c.friends:[];
+  const online=friends.filter(f=>f.studiedToday===true).length;
+  let sub;
+  if(!c)sub=FiezelI18n.t('social.summary-loading');
+  else if(c.kind==='off'||c.kind==='offline')sub=FiezelI18n.t('social2.panel-sub-off');
+  else if(c.kind==='cta')sub=FiezelI18n.t('social2.panel-sub-cta');
+  else if(!friends.length)sub=FiezelI18n.t('social2.panel-sub-none');
+  else sub=FiezelI18n.t('social2.panel-sub-friends',{count:friends.length,online});
+  const canSocial=c&&c.kind==='profile';
+  const avatars=friends.length?`<div class="fz2-friends" aria-hidden="true">${friends.slice(0,6).map(f=>`<span class="fz2-friend${f.studiedToday?' is-online':''}" title="@${esc(f.handle)}">${esc(String(f.handle||'?').charAt(0).toUpperCase())}</span>`).join('')}${friends.length>6?`<span class="fz2-friend fz2-friend-more">+${friends.length-6}</span>`:''}</div>`:'';
+  const inviteBtn=pendingInvite&&pendingInvite.kind==='friend'?`<button type="button" class="fz2-act is-hot" onclick="socialHomeOpenInvite()" data-testid="home-social-invite"><i data-lucide="mail-open"></i><span>${FiezelI18n.t('social.home-pending-open')}</span></button>`:'';
   const badge=unread>0?`<span class="social-badge" aria-hidden="true">${unread>9?'9+':unread}</span>`:'';
-  return `<div class="home-section-head"><div><h2>${FiezelI18n.t('social.summary-title')}</h2></div></div>
-<div class="learning-launcher social-home-launcher">
-  <button class="launch-card social-launch${unread>0?' social-launch-news':''}" onclick="socialHomeOpenOnline()" data-testid="home-online-teman"><span class="launch-icon"><i data-lucide="users" aria-hidden="true"></i>${badge}</span><span><small>${sub}</small><b>${FiezelI18n.t('social.home-open')}</b></span><i data-lucide="arrow-up-right"></i></button>
-</div>`;
+  return `<section class="fz2-social card" data-testid="home-online-panel">
+  <div class="fz2-social-head"><div><span class="eyebrow">${FiezelI18n.t('social2.panel-title')}</span><p class="fz2-social-sub">${esc(sub)}</p></div><button type="button" class="fz2-link" onclick="socialHomeOpenOnline()" data-testid="home-online-teman">${FiezelI18n.t('social2.open-friends')} <i data-lucide="arrow-right"></i>${badge}</button></div>
+  ${avatars}
+  <div class="fz2-acts">
+    ${inviteBtn}
+    <button type="button" class="fz2-act" onclick="${canSocial?'openAddFriendModal()':'socialHomeOpenOnline()'}" data-testid="home-add-friend"><i data-lucide="user-plus"></i><span>${FiezelI18n.t('social2.add-friend')}</span></button>
+    <button type="button" class="fz2-act${cls?' is-set':''}" onclick="openJoinClassModal()" data-testid="home-join-class"><i data-lucide="school"></i><span>${cls?esc(FiezelI18n.t('social2.class-current',{code:cls})):FiezelI18n.t('social2.join-class')}</span></button>
+  </div>
+</section>`;
 }
+/* ------------------------------------------------ tambah teman lewat ID + gabung kelas */
+function learnerClassCode(){try{const r=JSON.parse(localStorage.getItem('fiezel-onboarding-v1')||'{}');return String(r.classCode||'').trim()}catch(_){return ''}}
+function openAddFriendModal(){
+  const me=socialProfileCache?.handle?`<p class="fz2-myid" data-testid="my-social-id">${esc(FiezelI18n.t('social2.my-id',{handle:socialProfileCache.handle}))}</p>`:'';
+  openModal(`<div class="modal-mark">${FiezelI18n.t('social2.panel-title')}</div><h2>${FiezelI18n.t('social2.add-title')}</h2><p class="muted">${FiezelI18n.t('social2.add-desc')}</p>${me}
+    <label class="endpoint-label">${FiezelI18n.t('social2.add-label')}<input id="socialAddInput" type="text" maxlength="21" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="@nama_teman" data-testid="add-friend-input"></label>
+    <div class="modal-actions"><button onclick="closeModal()">${FiezelI18n.t('coach.close-aria')}</button><button class="primary" id="socialAddBtn" onclick="socialAddByHandle()" data-testid="add-friend-submit"><i data-lucide="user-plus"></i> ${FiezelI18n.t('social2.add-btn')}</button></div>`);
+  setTimeout(()=>{try{$('socialAddInput')?.focus()}catch(_){}},60);
+}
+window.openAddFriendModal=openAddFriendModal;
+async function socialAddByHandle(){
+  const core=socialCore();if(!core)return;
+  const raw=String($('socialAddInput')?.value||'').trim().replace(/^@/,'').toLowerCase();
+  if(!raw)return showToast(FiezelI18n.t('social2.add-empty'));
+  const btn=$('socialAddBtn');if(btn)btn.disabled=true;
+  const res=await core.api.friendAdd(raw);
+  if(res.ok){const h=res.data?.friend?.handle||raw;showToast(FiezelI18n.t('social2.add-ok',{handle:h}));socialSummaryAt=0;closeModal();try{socialMicroMoment('friend')}catch(_){}if(state.view==='online')renderOnlineTab();else refreshSocialSummaryCard();return}
+  if(btn)btn.disabled=false;
+  showToast(res.error==='code_invalid'||res.status===400?FiezelI18n.t('social2.add-invalid'):res.message);
+}
+window.socialAddByHandle=socialAddByHandle;
+function openJoinClassModal(){
+  const cur=learnerClassCode();
+  openModal(`<div class="modal-mark">${FiezelI18n.t('nav.school')}</div><h2>${FiezelI18n.t('social2.class-title')}</h2><p class="muted">${FiezelI18n.t('social2.class-desc')}</p>
+    ${cur?`<p class="fz2-myid" data-testid="current-class-code">${esc(FiezelI18n.t('social2.class-current',{code:cur}))}</p>`:''}
+    <label class="endpoint-label">${FiezelI18n.t('social2.class-label')}<input id="classJoinInput" type="text" maxlength="12" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="mis. 7A-2026" value="${esc(cur)}" data-testid="join-class-input"></label>
+    <div class="modal-actions">${cur?`<button class="danger" onclick="leaveClassCode()" data-testid="leave-class-btn">${FiezelI18n.t('social2.class-leave')}</button>`:`<button onclick="closeModal()">${FiezelI18n.t('coach.close-aria')}</button>`}<button class="primary" onclick="joinClassWithCode()" data-testid="join-class-submit"><i data-lucide="school"></i> ${FiezelI18n.t('social2.class-btn')}</button></div>`);
+  setTimeout(()=>{try{$('classJoinInput')?.focus()}catch(_){}},60);
+}
+window.openJoinClassModal=openJoinClassModal;
+function saveClassCode(code){try{const ob=JSON.parse(localStorage.getItem('fiezel-onboarding-v1')||'{}');ob.classCode=code;localStorage.setItem('fiezel-onboarding-v1',JSON.stringify(ob))}catch(_){}}
+function joinClassWithCode(){
+  const raw=String($('classJoinInput')?.value||'').trim().toUpperCase();
+  if(!raw)return showToast(FiezelI18n.t('social2.class-empty'));
+  if(!/^[A-Z0-9][A-Z0-9-]{2,11}$/.test(raw))return showToast(FiezelI18n.t('social2.class-invalid'));
+  saveClassCode(raw);
+  showToast(FiezelI18n.t('social2.class-ok',{code:raw}));
+  try{self.FiezelLearnerFlow?.pushToClass?.()}catch(_){}
+  closeModal();render();
+}
+window.joinClassWithCode=joinClassWithCode;
+function leaveClassCode(){saveClassCode('');showToast(FiezelI18n.t('social2.class-left'));closeModal();render()}
+window.leaveClassCode=leaveClassCode;
 /** Ketukan pada kartu undangan = membuka lembar yang sama, bukan melempar ke layar lain. */
 function socialHomeOpenInvite(){
   const link=inviteLink();const entry=link?link.pending():null;

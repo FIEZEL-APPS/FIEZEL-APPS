@@ -1,5 +1,5 @@
 {
-  "version": "m025-257",
+  "version": "m025-258",
   "claimedBy": "branch a3-grammar",
   "claimedAt": "2026-09-05T02:15:14.213Z",
   "reason": "grammar A1-B2 upgrade + sesi kilat + Thai penuh (PR #345)",

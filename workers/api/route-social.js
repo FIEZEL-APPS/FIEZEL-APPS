@@ -434,6 +434,52 @@ async function routeFriendsRedeem(ctx) {
   );
 }
 
+/* ================================================= tambah teman lewat ID (@handle) ====== */
+
+const SCHEMA_ADD = { allow: { handle: { type: 'string', max: 24, required: true } } };
+
+async function routeFriendsAdd(ctx) {
+  const gate = await socialGate(ctx);
+  if (gate.deny) return gate.deny;
+  const body = await readJsonFromCtx(ctx, gate.opt);
+  if (!body.ok) return body.response;
+  const shape = validateShape(body.value, SCHEMA_ADD);
+  if (!shape.ok) return jsonError(400, ERR.SCHEMA_INVALID, {}, gate.opt);
+  const me = await requireProfile(gate);
+  if (!me) return jsonError(404, ERR.PROFILE_REQUIRED, {}, gate.opt);
+
+  const invalid = () => jsonError(400, ERR.CODE_INVALID, {}, gate.opt);
+  const handle = String(body.value.handle).trim().replace(/^@/, '').toLowerCase();
+  if (!/^[a-z0-9_]{3,20}$/.test(handle) || handle === String(me.handle || '').toLowerCase()) return invalid();
+
+  const friendCount = await gate.db
+    .prepare('SELECT COUNT(*) AS n FROM social_friend WHERE a = ?1')
+    .bind(gate.sub)
+    .first();
+  if (friendCount && Number(friendCount.n) >= FRIENDS_MAX) {
+    return jsonError(409, ERR.LIMIT_REACHED, {}, gate.opt);
+  }
+
+  const target = await gate.db.prepare('SELECT sub FROM social_handle WHERE handle = ?1').bind(handle).first();
+  if (!target || !target.sub || target.sub === gate.sub) return invalid();
+  const friend = await readProfile(gate.db, target.sub);
+  if (!friend) return invalid();
+
+  await gate.db
+    .prepare('INSERT OR IGNORE INTO social_friend (a, b, since_day) VALUES (?1, ?2, ?3)')
+    .bind(gate.sub, target.sub, gate.day)
+    .run();
+  await gate.db
+    .prepare('INSERT OR IGNORE INTO social_friend (a, b, since_day) VALUES (?1, ?2, ?3)')
+    .bind(target.sub, gate.sub, gate.day)
+    .run();
+
+  return jsonResponse(
+    { friend: { handle: friend.handle, displayName: friend.display_name || null, avatarId: Number(friend.avatar_id) || 0 } },
+    gate.opt
+  );
+}
+
 /* ========================================================== daftar teman =========== */
 
 async function routeFriendsList(ctx) {
@@ -893,6 +939,7 @@ export const ROUTES = [
   ['GET', '/api/social/profile/me', routeProfileMe],
   ['POST', '/api/social/friends/invite', routeFriendsInvite],
   ['POST', '/api/social/friends/redeem', routeFriendsRedeem],
+  ['POST', '/api/social/friends/add', routeFriendsAdd],
   ['GET', '/api/social/friends', routeFriendsList],
   ['POST', '/api/social/cheer', routeCheer],
   ['POST', '/api/social/rank/evidence', routeRankEvidence],
