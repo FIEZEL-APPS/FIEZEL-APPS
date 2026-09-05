@@ -340,6 +340,7 @@ jobs:
           node tests/experience-integration-test.js
           node tests/lesson-experience-test.js
           node tests/ui-structure-test.js
+          node tests/lucide-icon-coverage-test.js
           node tests/settings-cache-test.js
           node tests/gems-test.js
           node tests/back-nav-test.js
