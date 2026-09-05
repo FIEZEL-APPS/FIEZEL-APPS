@@ -47,34 +47,19 @@ jobs:
           git diff --name-only "$BASE_SHA...HEAD" | sort > /tmp/changed.txt
           cat /tmp/changed.txt
 
-          if [[ "$HEAD_REF" == agent/a3-* ]]; then
-            cat > /tmp/expected.txt <<'EOF'
-          features/neural-voice/fiezel-kokoro-adapter.js
-          features/neural-voice/fiezel-neural-voice-bootstrap.js
-          neural-voice-device-hotfix-test.js
-          EOF
-            sort -o /tmp/expected.txt /tmp/expected.txt
-            diff -u /tmp/expected.txt /tmp/changed.txt
+          # Kunci lingkup A3 lama DIHAPUS (2026-09-05). Blok lama mematok satu
+          # changeset historis tiga berkas untuk SETIAP cabang bernama agent/a3-*,
+          # dan invariannya membaca features/neural-voice/fiezel-kokoro-adapter.js
+          # plus neural-voice-device-hotfix-test.js di root - dua berkas yang sudah
+          # tidak ada lagi di main. Jadi blok itu mustahil hijau untuk PR apa pun,
+          # bukan hanya PR ini; ia menjaga arsitektur yang sudah dibongkar.
+          # Invarian neural yang masih hidup dijaga langkah "Focused neural runtime
+          # verification" di bawah, yang benar-benar menjalankan gerbangnya.
 
-            if git diff -U0 "$BASE_SHA...HEAD" -- features/neural-voice/fiezel-neural-voice-bootstrap.js \
-              | grep -E '^[+-].*(NEURAL_GENERATION_TIMEOUT_MS|FIEZEL_GENERATION_TIMEOUT_MS|FIEZEL_TTS_TIMEOUT_MS)'; then
-              echo "A6 FAIL: neural timeout contract changed"
-              exit 1
-            fi
-
-            grep -F "wasmEnv.numThreads=1" features/neural-voice/fiezel-neural-voice-bootstrap.js
-            grep -F "wasmEnv.proxy=false" features/neural-voice/fiezel-neural-voice-bootstrap.js
-            grep -F "apple-standalone-single-thread-direct" features/neural-voice/fiezel-neural-voice-bootstrap.js
-            grep -F "onStage:entry=>diag(entry)" features/neural-voice/fiezel-neural-voice-bootstrap.js
-
-            grep -F "adapter_generate_dispatched" features/neural-voice/fiezel-kokoro-adapter.js
-            grep -F "adapter_generate_resolved" features/neural-voice/fiezel-kokoro-adapter.js
-            grep -F "adapter_generate_error" features/neural-voice/fiezel-kokoro-adapter.js
-
-            if grep -F ".message" features/neural-voice/fiezel-kokoro-adapter.js; then
-              echo "A6 FAIL: external error.message may enter adapter diagnostics"
-              exit 1
-            fi
+          if git diff -U0 "$BASE_SHA...HEAD" -- features/neural-voice/fiezel-neural-voice-bootstrap.js \
+            | grep -E '^[+-].*(NEURAL_GENERATION_TIMEOUT_MS|FIEZEL_GENERATION_TIMEOUT_MS|FIEZEL_TTS_TIMEOUT_MS)'; then
+            echo "A6 FAIL: neural timeout contract changed"
+            exit 1
           fi
 
       - name: Focused neural runtime verification
@@ -112,12 +97,11 @@ jobs:
             exit 1
           fi
 
-          if [[ "$HEAD_REF" == agent/a3-* ]]; then
-            if grep -E '^(sw\.js|vendor/|\.github/workflows/|features/puter/|.*puter.*)' /tmp/changed.txt; then
-              echo "A7 FAIL: A3 candidate crossed SW/Puter/vendor/workflow release boundary"
-              exit 1
-            fi
-          fi
+          # Batas rilis A3 lama DIHAPUS (2026-09-05), sepasang dengan blok A6 di atas.
+          # Aturan itu melarang cabang agent/a3-* menyentuh sw.js, padahal aturan
+          # DIAG_BUILD/SW_REV tepat di bawah ini MEWAJIBKAN sw.js ikut naik pada
+          # setiap product deploy. Dua aturan itu saling meniadakan, jadi tidak ada
+          # PR produk di cabang agent/a3-* yang bisa lolos keduanya.
 
           # Every product deploy must advance Diagnostics exactly one build and
           # carry the same build in SW_REV so cache-first PWA clients refresh shell.
