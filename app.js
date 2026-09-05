@@ -631,7 +631,18 @@ function grammarAlternativeMeta(item,field,count=3,opts={}){const own=grammarMet
   // level yang sama, baru sisanya. Mengumpulkan ketiganya ke satu kolam lalu mengambil dari
   // titik acak akan mengembalikan perilaku lama - kolamnya memang tersusun, tetapi titik
   // mulainya melompat ke mana saja di dalamnya.
-  const tiers=[peers.filter(x=>x.family===own.family),peers.filter(x=>x.family!==own.family&&String(x.level||'')===ownLevel),peers];
+  /* m025-257: TINGKATAN KETIGA DIBUANG - "peers" tanpa syarat.
+   * content-integrity-audit membedakan dua jenis pinjaman: lintas-KELUARGA tapi seband CEFR
+   * adalah utang mutu yang diterima (keluarga kecil memang tidak punya tiga saudara), sedangkan
+   * lintas-keluarga DAN lintas-level adalah KORUPSI - aturan C1 yang muncul di lesson A1 bisa
+   * dijawab tanpa tahu grammar mana pun. Tingkatan ketiga lama adalah satu-satunya sumber
+   * kelas itu. Selama bank kecil ia jarang terpakai; setelah upgrade A1-B2 (249 -> 328 templat,
+   * dan saudara satu lesson kini ikut diblokir) dua tingkatan pertama lebih sering habis, dan
+   * gerbang menemukan 30 temuan KRITIS di head PR #345.
+   * Yang menggantikannya bukan pinjaman yang lebih longgar melainkan filler generik di bawah
+   * (origin 'fallback', sudah dikontrak provenance) - lebih jujur daripada menawarkan aturan
+   * dari level dan topik yang sama sekali lain sebagai pilihan. */
+  const tiers=[peers.filter(x=>x.family===own.family),peers.filter(x=>x.family!==own.family&&String(x.level||'')===ownLevel)];
   const out=[];
   /* m025-257: BELAHAN BAHASA DI KOLAM PINJAMAN.
    * contentIntegrityGate() menolak soal yang pilihannya campur Inggris-Indonesia (>=3 opsi
@@ -681,7 +692,18 @@ function joinSentences(a,b){const first=String(a??'').trim(),second=String(b??''
 function grammarAlternativePairs(item,fieldA,fieldB,count=3){
   const own=grammarMeta(item),ownLevel=String(item?.[5]||''),blocked=grammarPeerBlocked(item);
   const peers=GRAMMAR_ITEMS.filter(x=>x.item!==item&&!blocked.has(String(x.item?.[8]||'')));
-  const tiers=[peers.filter(x=>x.family===own.family),peers.filter(x=>x.family!==own.family&&String(x.level||'')===ownLevel),peers];
+  /* m025-257: TINGKATAN KETIGA DIBUANG - "peers" tanpa syarat.
+   * content-integrity-audit membedakan dua jenis pinjaman: lintas-KELUARGA tapi seband CEFR
+   * adalah utang mutu yang diterima (keluarga kecil memang tidak punya tiga saudara), sedangkan
+   * lintas-keluarga DAN lintas-level adalah KORUPSI - aturan C1 yang muncul di lesson A1 bisa
+   * dijawab tanpa tahu grammar mana pun. Tingkatan ketiga lama adalah satu-satunya sumber
+   * kelas itu. Selama bank kecil ia jarang terpakai; setelah upgrade A1-B2 (249 -> 328 templat,
+   * dan saudara satu lesson kini ikut diblokir) dua tingkatan pertama lebih sering habis, dan
+   * gerbang menemukan 30 temuan KRITIS di head PR #345.
+   * Yang menggantikannya bukan pinjaman yang lebih longgar melainkan filler generik di bawah
+   * (origin 'fallback', sudah dikontrak provenance) - lebih jujur daripada menawarkan aturan
+   * dari level dan topik yang sama sekali lain sebagai pilihan. */
+  const tiers=[peers.filter(x=>x.family===own.family),peers.filter(x=>x.family!==own.family&&String(x.level||'')===ownLevel)];
   const out=[],seen=new Set();
   for(const tier of tiers){
     if(out.length>=count)break;
