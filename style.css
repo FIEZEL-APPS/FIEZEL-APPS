@@ -61,6 +61,10 @@
   --green-soft:#E9F7F0;
   --red:#B8432D;
   --red-soft:#FDE3DE;
+  /* --radius-xl dipakai 13 kali oleh kartu besar redesign (kokpit Home, hero PAW, kartu
+     fz2) tetapi tidak pernah didefinisikan - tiap call site hidup dari nilai cadangannya
+     sendiri, dan gerbang token search-feedback menandainya. Didefinisikan sekali di sini. */
+  --radius-xl:28px;
   --radius-lg:24px;
   --radius-md:16px;
   --radius-sm:12px;
@@ -805,6 +809,10 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
   --green-soft:#E9F7F0;
   --red:#B8432D;
   --red-soft:#FDE3DE;
+  /* --radius-xl dipakai 13 kali oleh kartu besar redesign (kokpit Home, hero PAW, kartu
+     fz2) tetapi tidak pernah didefinisikan - tiap call site hidup dari nilai cadangannya
+     sendiri, dan gerbang token search-feedback menandainya. Didefinisikan sekali di sini. */
+  --radius-xl:28px;
   --radius-lg:24px;
   --radius-md:16px;
   --radius-sm:12px;
@@ -5009,7 +5017,6 @@ html body #app .social-home-launcher .launch-card{background:var(--pz-sky);borde
   border-bottom: 1.5px solid var(--line);
 }
 .paw-speech-bubble .paw-bubble-title {
-  min-width: 0;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -5181,7 +5188,9 @@ html body #app .social-home-launcher .launch-card{background:var(--pz-sky);borde
   gap: 4px;
   padding: 3px 8px;
   border-radius: 99px;
-  background: #FFFFFF;
+  /* Latar dipaku putih di bawah teks bertema = 1,08:1 saat Tema Malam (gerbang kontras
+     m025-85). Token panel mengikuti tema, jadi lencana tetap terbaca di kedua tema. */
+  background: var(--panel);
   color: var(--pz-pink-ink);
   font-size: 10px;
   font-weight: 700;
