@@ -1,7 +1,7 @@
 {
-  "version": "m025-256",
+  "version": "m025-257",
   "claimedBy": "branch agent/a3-gate-audit-remediation-20260815",
-  "claimedAt": "2026-09-05T00:51:37.751Z",
-  "reason": "grammar wave 2: 40 template kedua A1-B2 (semua lesson >=2 template), explanation A1-A2 diringkas, Sesi Kilat 10 soal",
+  "claimedAt": "2026-09-05T01:14:57.993Z",
+  "reason": "grammar th penuh: 16 bidang penjelasan grammar terakhir kini ber-aksara Thai (100%)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

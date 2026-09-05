@@ -33,7 +33,7 @@ PASS  copy app-c: semua nilai th ber-aksara Thai (atau locale-netral identik id)
 PASS  copy app-d: kedua berkas ada
 PASS  copy app-d: copy-id mendaftar ke locale id saja
 PASS  copy app-d: copy-th mendaftar ke locale th saja
-PASS  copy app-d: paritas kunci id→th 0 selisih (485 kunci id)
+PASS  copy app-d: paritas kunci id→th 0 selisih (487 kunci id)
 PASS  copy app-d: tanpa kunci th liar di luar 2 th-only gems yang sah
 PASS  copy app-d: tanpa nilai th kosong
 PASS  copy app-d: paritas himpunan {placeholder} per kunci 0 selisih

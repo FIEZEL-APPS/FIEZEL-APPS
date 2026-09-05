@@ -353,7 +353,7 @@
         "whyCorrect": "คำนาม 'reason' ตามด้วย 'for' เสมอ: the reason for his decision",
         "whyOthersFail": "'of' เป็นการเดาแบบตั้งต้น 'to' เป็นของคำนามอื่น ส่วน 'about' นำหัวข้อ ไม่ใช่สาเหตุ",
         "howToAvoid": "เก็บคำนามพร้อมบุพบทเป็นก้อนเดียว: reason for",
-        "memoryCue": "Reason for, solution to.",
+        "memoryCue": "Reason for, solution to — จำคำนามคู่กับบุพบท",
         "distractors": {
           "of": {
             "misconception": "@sibling:1",
@@ -813,7 +813,7 @@
         "whyCorrect": "'Get used to' ตามด้วย gerund: get used to getting up at five",
         "whyOthersFail": "'get', 'got' และ 'be getting' ต่างมอง 'to' เป็นส่วนของ infinitive แทนที่จะเป็นบุพบท",
         "howToAvoid": "มี 'be' หรือ 'get' หน้า 'used to' ไหม? ถ้ามี คำกริยาถัดไปลงท้ายด้วย -ing",
-        "memoryCue": "Get used to getting up early.",
+        "memoryCue": "Get used to getting up early — หลัง used to ใช้ -ing",
         "distractors": {
           "get": {
             "misconception": "@sibling:0",
@@ -1089,7 +1089,7 @@
         "whyCorrect": "'It's time we' ตามด้วยอดีตสมมติแม้ความหมายคือตอนนี้: it's time we went home",
         "whyOthersFail": "'go', 'will go' และ 'are going' ต่างละเลยกฎอดีตสมมติหลัง 'it's time we'",
         "howToAvoid": "เห็น 'it's time' ที่มีประธานตามหลัง? ใส่คำกริยาเป็น past simple",
-        "memoryCue": "It's time we went.",
+        "memoryCue": "It's time we went — หลัง it's time ใช้ past simple",
         "distractors": {
           "go": {
             "misconception": "@sibling:0",

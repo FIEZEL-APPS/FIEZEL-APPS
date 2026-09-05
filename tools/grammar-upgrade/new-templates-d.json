@@ -353,7 +353,7 @@
         "whyCorrect": "คำถามทวนคงลำดับของประโยคและแทนส่วนที่น่าประหลาดใจด้วย 'where': He's moving where?",
         "whyOthersFail": "ตัวเลือกอื่นสลับเป็นลำดับคำถามแบบสลับที่ หรือใช้คำที่มีอยู่ในประโยคทวนแล้วซ้ำ",
         "howToAvoid": "ลอกประโยคมา แล้วใส่คำ wh- ตรงตำแหน่งที่คำน่าประหลาดใจเคยอยู่",
-        "memoryCue": "He's moving where?",
+        "memoryCue": "He's moving where? — ทวนประโยคแล้วแทนด้วยคำถาม",
         "distractors": {
           "where is he": {
             "misconception": "@sibling:0",
@@ -537,7 +537,7 @@
         "whyCorrect": "'Will' ครองตำแหน่ง modal อยู่แล้ว ความสามารถจึงแสดงด้วย 'be able to': will be able to speak",
         "whyOthersFail": "'will can' และ 'will could' ซ้อน modal สองตัว ส่วน 'will being' ใช้รูปคำกริยาผิด",
         "howToAvoid": "ต้องการ 'can' หลัง will, must หรือ to? เปลี่ยนเป็น 'be able to'",
-        "memoryCue": "Will + be able to",
+        "memoryCue": "Will + be able to — modal ซ้อนกันไม่ได้",
         "distractors": {
           "will can": {
             "misconception": "@sibling:0",
@@ -813,7 +813,7 @@
         "whyCorrect": "'Ones' แทน 'shoes' พหูพจน์หลังคำคุณศัพท์ 'bigger': any bigger ones",
         "whyOthersFail": "'one' เป็นเอกพจน์ 'them' รับคำคุณศัพท์ไม่ได้ ส่วน 'shoes ones' ใช้คำนามซ้ำ",
         "howToAvoid": "นับคำนามที่จะแทน: สิ่งเดียว → one หลายสิ่ง → ones",
-        "memoryCue": "Bigger ones = bigger shoes",
+        "memoryCue": "Bigger ones = bigger shoes — พหูพจน์ใช้ ones",
         "distractors": {
           "one": {
             "misconception": "@sibling:1",
@@ -997,7 +997,7 @@
         "whyCorrect": "'Every year' แสดงการเพิ่มขึ้นต่อเนื่อง รูปเปรียบเทียบซ้ำ 'more and more expensive' จึงเหมาะ",
         "whyOthersFail": "'than' ไม่มีคู่เปรียบ ขั้นสูงสุดเป็นจุดสูงสุดคงที่ และ -er ไม่เข้ากับคำคุณศัพท์ยาว",
         "howToAvoid": "ยังเปลี่ยนแปลงอยู่ไหม? ใช้รูปเปรียบเทียบซ้ำสองครั้ง",
-        "memoryCue": "More and more expensive every year.",
+        "memoryCue": "More and more expensive every year — เปลี่ยนแปลงต่อเนื่องใช้รูปซ้ำ",
         "distractors": {
           "more expensive than": {
             "misconception": "@sibling:0",
@@ -1181,7 +1181,7 @@
         "whyCorrect": "ผลลัพธ์เป็นผู้รับการกระทำ หลัง 'expected' จึงใช้ passive infinitive 'to be published'",
         "whyOthersFail": "'to publish' เป็น active 'publishing' เป็นแบบแผนที่ผิด ส่วน 'to be publishing' เพิ่ม continuous ที่ไม่จำเป็น",
         "howToAvoid": "ถามว่าประธานทำการกระทำหรือรับการกระทำ รับ → to be + participle",
-        "memoryCue": "Expected to be published.",
+        "memoryCue": "Expected to be published — ประธานถูกกระทำใช้ to be + participle",
         "distractors": {
           "to publish": {
             "misconception": "@sibling:0",
