@@ -1,0 +1,18 @@
+  ok   workflow-ada
+  ok   setiap-gerbang-terdaftar-atau-dikecualikan
+  ok   setiap-pengecualian-beralasan
+  ok   nol-pengecualian-basi
+  ok   nol-gerbang-hantu
+  ok   gerbang-live-terdaftar
+  ok   gerbang-live-skip-eksplisit-dan-terlihat
+  ok   hitungan-bukti-tidak-memuat-gerbang-live
+  ok   gerbang-live-merah-bila-env-diisi-tapi-rusak
+  ok   gerbang-meta-ini-terdaftar
+
+Berkas uji di repo         : 253
+Invokasi node di workflow  : 259
+Gerbang yang BOLEH dihitung sebagai bukti: 257
+Gerbang live (SKIP di CI, BUKAN bukti)  : 2 — cf-live-contract-test.js, staging-live-test.js
+Pengecualian beralasan     : 2
+
+FIEZEL gate registry: PASS (10 pass, 0 fail)

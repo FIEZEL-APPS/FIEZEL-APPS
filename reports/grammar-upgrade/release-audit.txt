@@ -1,0 +1,3740 @@
+{
+  "version": "5.19.0",
+  "status": "NOT READY",
+  "checks": [
+    {
+      "name": "Package version alignment",
+      "status": "PASS",
+      "details": "package=5.19.0 source=5.19.0"
+    },
+    {
+      "name": "README version alignment",
+      "status": "PASS",
+      "details": "expected heading=# FIEZEL 5.19.0"
+    },
+    {
+      "name": "Vocabulary unique",
+      "status": "PASS",
+      "details": "total=2440 unique=2440"
+    },
+    {
+      "name": "Vocabulary completeness",
+      "status": "PASS",
+      "details": "missing=0"
+    },
+    {
+      "name": "All CEFR levels active",
+      "status": "PASS",
+      "details": {
+        "A1": 339,
+        "A2": 441,
+        "B1": 653,
+        "B2": 705,
+        "C2": 102,
+        "C1": 200
+      }
+    },
+    {
+      "name": "C2 active content",
+      "status": "PASS",
+      "details": "C2=102"
+    },
+    {
+      "name": "No runtime quarantine",
+      "status": "PASS",
+      "details": "quarantine is non-runtime and empty"
+    },
+    {
+      "name": "Grammar bank",
+      "status": "PASS",
+      "details": "items=180 invalid=0"
+    },
+    {
+      "name": "Grammar exact stem duplicates",
+      "status": "PASS",
+      "details": "duplicates=0"
+    },
+    {
+      "name": "Per-distractor grammar explanations",
+      "status": "PASS",
+      "details": "all grammar items have four explanations"
+    },
+    {
+      "name": "Grammar dangerous unnatural regression absent",
+      "status": "PASS",
+      "details": "known regression absent"
+    },
+    {
+      "name": "Grammar schema contract",
+      "status": "PASS",
+      "details": "version=5.19.0 schema=2.0.0 blueprint=focused-25-v1"
+    },
+    {
+      "name": "Reading inventory",
+      "status": "PASS",
+      "details": "passages=312 questions=1560"
+    },
+    {
+      "name": "Reading question integrity data",
+      "status": "PASS",
+      "details": "bad=0"
+    },
+    {
+      "name": "Reading option uniqueness",
+      "status": "PASS",
+      "details": "duplicated_options=0"
+    },
+    {
+      "name": "Reading type diversity",
+      "status": "PASS",
+      "details": "types=27"
+    },
+    {
+      "name": "Reading semantic duplicates",
+      "status": "PASS",
+      "details": "duplicates=0 max_threshold=.92"
+    },
+    {
+      "name": "Reading template reuse",
+      "status": "PASS",
+      "details": "max_reuse=3 threshold=5"
+    },
+    {
+      "name": "Reading passage semantic duplicates",
+      "status": "PASS",
+      "details": "duplicates=0 max_similarity=0.177 threshold=.92"
+    },
+    {
+      "name": "Placement blueprint defined",
+      "status": "PASS",
+      "details": "25 questions/level: 10 vocab + 7 grammar + 8 reading"
+    },
+    {
+      "name": "Render-time integrity gate",
+      "status": "PASS",
+      "details": "if\\(!(?:q\\|\\|!)?validateQuestion\\(q\\)\\.ok\\)\\s*continue"
+    },
+    {
+      "name": "Central question integrity guard",
+      "status": "PASS",
+      "details": "function validateQuestion"
+    },
+    {
+      "name": "Evidence adaptive gate",
+      "status": "PASS",
+      "details": "hs.length>=24&&skills.size>=3&&types.size>=2"
+    },
+    {
+      "name": "No hardcoded adaptive 150 gate",
+      "status": "PASS",
+      "details": "state.totalAnswered>=150"
+    },
+    {
+      "name": "Security direct AI dependency",
+      "status": "PASS",
+      "details": "direct vendor API references=0"
+    },
+    {
+      "name": "Puter AI integration",
+      "status": "PASS",
+      "details": "Puter.js is present and client AI is Core-Worker-only; direct Puter AI bypass is absent"
+    },
+    {
+      "name": "AI output escaping",
+      "status": "PASS",
+      "details": "AI result and error text are escaped before innerHTML"
+    },
+    {
+      "name": "AI request resilience",
+      "status": "PASS",
+      "details": "AI requests have a timeout, stale-response guard, and retry action"
+    },
+    {
+      "name": "Security secrets",
+      "status": "PASS",
+      "details": "secret patterns=0"
+    },
+    {
+      "name": "AI learner profile",
+      "status": "PASS",
+      "details": "AI receives an aggregate evidence snapshot for personalization"
+    },
+    {
+      "name": "Haptic navigation",
+      "status": "PASS",
+      "details": "interactive controls use capability-gated vibration"
+    },
+    {
+      "name": "Correct/wrong audio feedback",
+      "status": "PASS",
+      "details": "answer feedback includes separate success and error tones"
+    },
+    {
+      "name": "Animated answer popup",
+      "status": "PASS",
+      "details": "answer feedback includes an animated status popup"
+    },
+    {
+      "name": "Realtime sun and moon",
+      "status": "PASS",
+      "details": "celestial position, light, and whole-screen palette follow device-local time across a 24-hour loop"
+    },
+    {
+      "name": "Grammar lesson focused-25 contract",
+      "status": "PASS",
+      "details": "every grammar lesson builds 25 focused pedagogical modes without importing peer concepts"
+    },
+    {
+      "name": "Natural Indonesian explanations",
+      "status": "PASS",
+      "details": "grammar, vocabulary, reading, and AI share a natural Indonesian explanation contract"
+    },
+    {
+      "name": "Ambient audio lifecycle",
+      "status": "PASS",
+      "details": "continuous generative soundtrack is retired; answer feedback and neural voice are silenced on tab hide"
+    },
+    {
+      "name": "Rotating login reminders",
+      "status": "PASS",
+      "details": "each app session receives a varied learner-stage reminder without immediate repetition"
+    },
+    {
+      "name": "Optional notification invitation",
+      "status": "PASS",
+      "details": "notification reminders are opt-in and never block the learning surface"
+    },
+    {
+      "name": "Study reminder notification engine",
+      "status": "PASS",
+      "details": "local reminder engine covers inactivity, daily target, due review, and notification click return"
+    },
+    {
+      "name": "ALRS escalation and fatigue guards",
+      "status": "PASS",
+      "details": "1/2/3/7+ escalation, quiet hours, cooldown, one-per-day fatigue guard and reinforcement are present"
+    },
+    {
+      "name": "Learner Evidence Model runtime",
+      "status": "PASS",
+      "details": "runtime derives behavior, confidence, memory and skill evidence without raw remote answer history"
+    },
+    {
+      "name": "Remote Web Push architecture",
+      "status": "PASS",
+      "details": "Push API subscription, service-worker receive path, Puter backend, and VAPID dispatcher are present"
+    },
+    {
+      "name": "Remote push secret separation",
+      "status": "PASS",
+      "details": "VAPID private key is scheduler-only and not bundled in browser or Puter Worker runtime"
+    },
+    {
+      "name": "Core-only AI runtime contract",
+      "status": "PASS",
+      "details": "Core Worker is the sole client AI gateway and protocol 1.7 is pinned"
+    },
+    {
+      "name": "Adaptive policy runtime contract",
+      "status": "PASS",
+      "details": "deterministic policy derives next-best action and Core exposes authenticated policy endpoint"
+    },
+    {
+      "name": "Policy Outcome runtime contract",
+      "status": "PASS",
+      "details": "bounded outcomes, dedupe/backfill, and deterministic policy feedback are present"
+    },
+    {
+      "name": "Context Coach runtime contract",
+      "status": "PASS",
+      "details": "Context Coach explains bounded evidence/policy/outcome without replacing policy authority"
+    },
+    {
+      "name": "Speaking and Listening route",
+      "status": "PASS",
+      "details": "72 A1-C2 Speaking/Listening items are exposed through the isolated Skills Lab route"
+    },
+    {
+      "name": "Speaking and Listening privacy boundary",
+      "status": "PASS",
+      "details": "sidecar uses isolated state and forbids raw audio/transcript persistence"
+    },
+    {
+      "name": "Neural voice fail-closed and shell-excluded",
+      "status": "PASS",
+      "details": "every not-prepared call fails closed with no browser-TTS escape hatch, and heavy assets remain excluded from implicit service-worker caching; since m025-235 the download itself is automatic on first launch for all students, by explicit owner decision"
+    },
+    {
+      "name": "Neural voice source lock",
+      "status": "PASS",
+      "details": "Supertonic-3 fallback assets are present, manifest-declared, and covered by the vendored SHA256 inventory"
+    },
+    {
+      "name": "Versioned next-handoff artifact",
+      "status": "PASS",
+      "details": "versioned next-handoff master prompt exists and is locked to 5.18.0"
+    },
+    {
+      "name": "Resumable execution handoff contract",
+      "status": "PASS",
+      "details": "next-handoff requires persistent atomic checkpoints, stable last-processed IDs, and safe resume semantics"
+    },
+    {
+      "name": "Continuous autonomous recovery contract",
+      "status": "PASS",
+      "details": "recovery resumes the original autonomous workflow instead of blind full-pipeline restart"
+    },
+    {
+      "name": "Content QA runtime contract",
+      "status": "PASS",
+      "details": "deterministic read-only scan plus bounded owner-only advisory AI review; no mutation endpoint"
+    },
+    {
+      "name": "Guarded Content Patch runtime contract",
+      "status": "PASS",
+      "details": "AI output is candidate-only; source-hash local gate owns schema/answer/pedagogy/regression validation and no mutation/publish endpoint exists"
+    },
+    {
+      "name": "Shadow/Canary runtime contract",
+      "status": "PASS",
+      "details": "gated candidate overlay is isolated, bounded by cohort/session/expiry, records aggregate evidence, and falls back to immutable canonical data"
+    },
+    {
+      "name": "Autonomous Promotion runtime contract",
+      "status": "PASS",
+      "details": "deterministic evidence thresholds may activate only an isolated overlay; canonical data stays immutable and post-promotion regression rolls back"
+    },
+    {
+      "name": "Canonical Adoption release-only contract",
+      "status": "PASS",
+      "details": "owner/audit-gated canonical adoption is release-time tooling only; no browser/Core canonical mutation route exists"
+    },
+    {
+      "name": "Adoption Evidence Attestation release-only contract",
+      "status": "PASS",
+      "details": "aggregate evidence attestation is deterministic release-time tooling only; no learner/browser/Core export endpoint exists"
+    },
+    {
+      "name": "Production Evidence Origin release-only contract",
+      "status": "PASS",
+      "details": "signed production origin verification is release-time only and requires external operator trust policy"
+    },
+    {
+      "name": "Operator Adoption Rehearsal release-only contract",
+      "status": "PASS",
+      "details": "rehearsal is local release tooling with staging/rollback verification and no runtime/Core mutation endpoint"
+    },
+    {
+      "name": "CI Adoption Evidence Attestation coverage",
+      "status": "PASS",
+      "details": "repository CI executes attestation and canonical-adoption failure probes"
+    },
+    {
+      "name": "CI Production Origin/Rehearsal coverage",
+      "status": "PASS",
+      "details": "repository CI executes origin-authenticity and operator-rehearsal failure probes"
+    },
+    {
+      "name": "Core activation tooling",
+      "status": "PASS",
+      "details": "preflight, live smoke, local activation, and manual-only Puter deploy workflow present"
+    },
+    {
+      "name": "Creator report authentication",
+      "status": "PASS",
+      "details": "collector requires Puter authentication, binds the learner, and gates creator reads"
+    },
+    {
+      "name": "Creator report whitelist",
+      "status": "PASS",
+      "details": "collector bounds and whitelists centralized report data"
+    },
+    {
+      "name": "Creator report consent",
+      "status": "PASS",
+      "details": "reporting defaults off and sessions use the consent-gated sender"
+    },
+    {
+      "name": "Version single-source runtime",
+      "status": "PASS",
+      "details": "version.js drives runtime and service worker"
+    },
+    {
+      "name": "PWA manifest version",
+      "status": "PASS",
+      "details": "manifest=5.19.0 source=5.19.0"
+    },
+    {
+      "name": "PWA cache version",
+      "status": "PASS",
+      "details": "cache derives from runtime version"
+    },
+    {
+      "name": "PWA asset precache",
+      "status": "PASS",
+      "details": "required small runtime assets present; heavy neural assets remain explicit opt-in"
+    },
+    {
+      "name": "HTTP release smoke test",
+      "status": "PASS",
+      "details": "FIEZEL HTTP smoke test: PASS\n{\"status\":\"PASS\",\"httpAssets\":3,\"version\":\"5.19.0\",\"grammarLessons\":282,\"blueprint\":\"focused-25-v1\"}"
+    },
+    {
+      "name": "Speaking and Listening gate",
+      "status": "PASS",
+      "details": "e sanitizer strips raw media claims\nPASS urutan sesi diacak, bank soal tidak\nPASS pengacakan tidak memihak posisi awal\nPASS sesi mengambil soal lewat jalur yang diacak\nPASS tombol Lanjut Skills Lab mengambang, tidak ikut tergulung\nPASS data rebuild is idempotent\nPASS replay pengguna tercatat pada event, bukan dibuang\nPASS replay yang tidak wajar dibatasi sebelum disimpan\nPASS sanitizer mempertahankan replay dan tetap membatasinya\nPASS pemanggil meneruskan jumlah replay yang benar-benar terjadi\nPASS level contract normalizes safely and accepts initialLevel alias\nPASS host-selected level isolates speaking and listening sessions\nPASS dynamic host level change clears a stale Skills Lab session\nPASS external level contract bypasses the sidecar level picker\nFIEZEL Speaking + Listening: PASS 45/0"
+    },
+    {
+      "name": "Neural voice fallback and account gate",
+      "status": "FAIL",
+      "details": " disimpan per potongan, bukan per berkas\nok - potongan tidak pernah dirakit dari data yang tidak utuh\nok - pengunduh menghormati Mode Hemat Data dan keadaan luring\nok - pengunduh dan bootstrap memakai SATU nama cache\nok - cadangan hanya dipanggil di jalur gagal\nok - cadangan menolak menyala bila asetnya belum lengkap\nok - unduhan menyala untuk SEMUA murid, tanpa menunggu login\nok - Background Fetch mengambil alih, dan jalur potongan berhenti saat itu\nok - id Background Fetch: halaman dan service worker sepakat, dan cache lain ditolak\nok - \"Ganti akun\" keluar dulu, baru masuk\nok - kartu akun menawarkan keluar DAN ganti akun\nok - pengaturan tidak lagi menjual unduhan kepada murid\nFAIL - mesin cadangan bukan kokoro, dan alasannya tertulis: vendor/kokoro-model kembali; jalur yang pernah membunuh proses iOS tidak boleh hidup lagi\nok - kemajuan unduhan bisa diperiksa, dan dihitung dari isi cache\nok - kemajuan muncul di Diagnostics, bukan di layar murid\n\nFIEZEL suara cadangan + akun: FAIL (1)"
+    },
+    {
+      "name": "Puter voice and subtitle gate",
+      "status": "PASS",
+      "details": "m025-92 puter voice + subtitle: 27 pemeriksaan lolos\nm025-95 voice-say: pemeriksaan pintu bicara bersama lolos"
+    },
+    {
+      "name": "Subtitle translation gate",
+      "status": "PASS",
+      "details": "m025-93 subtitle translate: 24 pemeriksaan lolos"
+    },
+    {
+      "name": "Service worker CORP compatibility gate",
+      "status": "PASS",
+      "details": "sw-corp-test\n  ok   COEP uses credentialless\n  ok   WebKit popup-compatible COOP exists\n  ok   SW revision marker exists\n  ok   shell reinstall forces reload\n  ok   cross-origin Puter request is not intercepted\n  ok   cross-origin Puter request triggers no synthetic fetch\n  ok   opaque synthetic 200 regression remains absent\n  ok   version remains 5.19.0\nsemua gate sw-corp LOLOS"
+    },
+    {
+      "name": "Neural voice readiness regression gate",
+      "status": "FAIL",
+      "details": " disimpan per potongan, bukan per berkas\nok - potongan tidak pernah dirakit dari data yang tidak utuh\nok - pengunduh menghormati Mode Hemat Data dan keadaan luring\nok - pengunduh dan bootstrap memakai SATU nama cache\nok - cadangan hanya dipanggil di jalur gagal\nok - cadangan menolak menyala bila asetnya belum lengkap\nok - unduhan menyala untuk SEMUA murid, tanpa menunggu login\nok - Background Fetch mengambil alih, dan jalur potongan berhenti saat itu\nok - id Background Fetch: halaman dan service worker sepakat, dan cache lain ditolak\nok - \"Ganti akun\" keluar dulu, baru masuk\nok - kartu akun menawarkan keluar DAN ganti akun\nok - pengaturan tidak lagi menjual unduhan kepada murid\nFAIL - mesin cadangan bukan kokoro, dan alasannya tertulis: vendor/kokoro-model kembali; jalur yang pernah membunuh proses iOS tidak boleh hidup lagi\nok - kemajuan unduhan bisa diperiksa, dan dihitung dari isi cache\nok - kemajuan muncul di Diagnostics, bukan di layar murid\n\nFIEZEL suara cadangan + akun: FAIL (1)"
+    },
+    {
+      "name": "Notification runtime behavior",
+      "status": "PASS",
+      "details": "FIEZEL notification reminder: PASS\n{\"deniedNeverLocksApp\":true,\"homeRendersWithoutPermission\":true,\"declineKeepsAppUsable\":true,\"grantedEnablesReminders\":true,\"inviteOfferCapped\":true,\"settingsCanReEnable\":true,\"inactivityNotification\":true,\"rotatingLoginMessage\":true,\"silentUpdate\":true,\"updateNoRepeat\":true}"
+    },
+    {
+      "name": "Remote push architecture test",
+      "status": "PASS",
+      "details": "FIEZEL remote push architecture: PASS\n{\"status\":\"PASS\",\"checks\":{\"coreConfigBeforeApp\":true,\"browserSubscription\":true,\"authenticatedPuterWorker\":true,\"serviceWorkerPush\":true,\"centralizedStore\":true,\"boundedActivity\":true,\"ownerOnlyConfig\":true,\"schedulerAuth\":true,\"webPushDispatcher\":true,\"newUserInactivityGuard\":true,\"rfc8030TopicSanitized\":true,\"hourlySchedule\":true,\"secretsNotRuntime\":true,\"coreDeploymentConfig\":true,\"pinnedWebPush\":true,\"secretGenerator\":true},\"liveDeploymentConfigured\":true}"
+    },
+    {
+      "name": "FIEZEL Core Brain architecture",
+      "status": "PASS",
+      "details": "FIEZEL core brain: PASS\n{\"unifiedWorker\":true,\"coreOnlyAI\":true,\"serverOwnedModel\":true,\"rateGuard\":true,\"authenticatedAI\":true,\"genAlphaTone\":true,\"guardedAutonomy\":true,\"contentQa\":true}"
+    },
+    {
+      "name": "FIEZEL Core Worker deterministic contract",
+      "status": "PASS",
+      "details": "FIEZEL core worker contract: PASS\n{\"protocol\":\"1.7\",\"coreOnlyAI\":true,\"serverModel\":\"gpt-5.4-nano\",\"rateLimit\":40,\"unauthRejected\":true,\"learnerEvidenceBounded\":true,\"adaptivePolicy\":true,\"policyOutcome\":true,\"contextCoach\":true,\"contentQa\":true,\"guardedContentPatch\":true,\"brainAttempts\":true,\"remoteALRS\":true,\"legacyDueReviewCompatible\":true}"
+    },
+    {
+      "name": "Learner Evidence Model v1",
+      "status": "PASS",
+      "details": "FIEZEL learner evidence: PASS\n{\"schema\":\"fiezel-learner-evidence-v1\",\"consistency14d\":71,\"abandonmentRate\":50,\"maxForgettingRisk\":99,\"weakSkills\":3}"
+    },
+    {
+      "name": "ALRS full behavior policy",
+      "status": "PASS",
+      "details": "FIEZEL ALRS behavior: PASS\n{\"escalation\":[\"1\",\"2\",\"3\",\"7+\"],\"quietHours\":true,\"cooldownHours\":18,\"positiveReinforcement\":true,\"onePerDay\":true}"
+    },
+    {
+      "name": "Adaptive Policy Engine v1",
+      "status": "PASS",
+      "details": "FIEZEL adaptive policy: PASS\n{\"mode\":\"recovery\",\"sessionSize\":6,\"targetSkill\":\"past_simple_vs_present_perfect\",\"primaryDomain\":\"grammar\",\"difficultyBand\":\"foundation\",\"poolGrammar\":6}"
+    },
+    {
+      "name": "Policy Outcome Evaluation v1",
+      "status": "PASS",
+      "details": "FIEZEL policy outcome: PASS\n{\"status\":\"positive\",\"score\":93,\"completionRate\":100,\"targetAdherence\":100,\"masteryDelta\":17,\"negativeSessionSize\":9,\"negativeDifficulty\":1}"
+    },
+    {
+      "name": "Content QA Agent v1",
+      "status": "PASS",
+      "details": {
+        "grammar": 282,
+        "vocabulary": 2440,
+        "readingPassages": 312,
+        "readingQuestions": 1560,
+        "blockers": 0,
+        "review": 68,
+        "queued": 68
+      }
+    },
+    {
+      "name": "Guarded Content Patch gate v1",
+      "status": "PASS",
+      "details": "{\"schema\":\"fiezel-content-patch-v1\",\"gateVersion\":\"guarded-patch-v1\",\"proofPass\":true,\"baselineReview\":68,\"patchedReview\":67,\"staleHashRejected\":true,\"identityMutationRejected\":true,\"noOpRejected\":true,\"answerMismatchRejected\":true,\"securityRejected\":true,\"canonicalImmutable\":true}"
+    },
+    {
+      "name": "Shadow/Canary overlay gate v1",
+      "status": "PASS",
+      "details": {
+        "schema": "fiezel-content-canary-v1",
+        "version": "5.19.0",
+        "status": "PASS",
+        "mode": "shadow/canary",
+        "patchId": "proof-vocab_00006-5.19.0",
+        "gateVersion": "guarded-patch-v1",
+        "baselineQa": {
+          "blockers": 0,
+          "review": 68
+        },
+        "patchedQa": {
+          "blockers": 0,
+          "review": 67
+        },
+        "maxExposurePercent": 10,
+        "maxExposureSessions": 20,
+        "maxWindowDays": 30,
+        "canonicalImmutable": true,
+        "staleRollback": true,
+        "tamperRollback": true,
+        "builderRejectsUngated": true,
+        "boundedEvidence": true,
+        "privacy": {
+          "rawAnswersIncluded": false,
+          "rawHistoryIncluded": false
+        }
+      }
+    },
+    {
+      "name": "Autonomous Promotion gate v1",
+      "status": "PASS",
+      "details": {
+        "schema": "fiezel-content-promotion-v1",
+        "version": "5.19.0",
+        "status": "PASS",
+        "patchId": "proof-vocab_00006-5.19.0",
+        "thresholds": {
+          "minExposureSessions": 3,
+          "minControlAttempts": 8,
+          "minCanaryAttempts": 8,
+          "minCanaryAccuracy": 70,
+          "maxCanaryRegressionPp": 5,
+          "minNPerArm": 25,
+          "statMarginPp": 5,
+          "attemptFloorSemantics": "runtime_safety_threshold_not_learning_promotion_evidence",
+          "minPostPromotionAttempts": 5,
+          "minPostPromotionAccuracy": 60,
+          "maxPostPromotionRegressionPp": 10
+        },
+        "statGateWired": true,
+        "nullScenarioNeverPromotes": true,
+        "thinDataHolds": true,
+        "indefiniteHoldIsValidOutcome": true,
+        "eightAttemptIsRuntimeSafetyOnly": true,
+        "provenRegressionRejects": true,
+        "absoluteFloorHolds": true,
+        "postPromotionRollback": true,
+        "priorRuntimeRollbackBlocksPromotion": true,
+        "privacyFailClosed": true,
+        "auditableBoundedLedger": true,
+        "canonicalImmutable": true,
+        "activeOverlayOnly": true
+      }
+    },
+    {
+      "name": "Adoption Evidence Attestation gate v1",
+      "status": "PASS",
+      "details": {
+        "schema": "fiezel-adoption-evidence-attestation-v1",
+        "gateVersion": "adoption-evidence-attestation-v1",
+        "version": "5.19.0",
+        "status": "PASS",
+        "deterministicExport": true,
+        "importVerification": true,
+        "sourceVersionLocked": true,
+        "candidateHashLocked": true,
+        "canaryConfigLocked": true,
+        "aggregateOnly": true,
+        "privacyWhitelist": true,
+        "boundedEvidence": true,
+        "countConsistency": true,
+        "tamperRejected": true,
+        "ownerApprovalSeparate": true,
+        "canonicalImmutable": true,
+        "productionAuthenticityClaimed": false
+      }
+    },
+    {
+      "name": "Production Evidence Origin Verification v1",
+      "status": "PASS",
+      "details": {
+        "schema": "fiezel-evidence-origin-envelope-v1",
+        "gateVersion": "evidence-origin-verification-v1",
+        "version": "5.19.0",
+        "status": "PASS",
+        "algorithm": "ed25519",
+        "separateOperatorTrustPolicy": true,
+        "trustPolicyNotEmbedded": true,
+        "publicKeyFingerprintLocked": true,
+        "attestationDigestLocked": true,
+        "productionEnvironmentRequired": true,
+        "signatureFreshnessBounded": true,
+        "tamperRejected": true,
+        "keySubstitutionRejected": true,
+        "controlledOriginRejectedForProduction": true,
+        "canonicalImmutable": true,
+        "syntheticOriginKeyOnly": true,
+        "productionOriginClaimed": false,
+        "privateKeyStoredInSource": false
+      }
+    },
+    {
+      "name": "Operator Adoption Rehearsal v1",
+      "status": "PASS",
+      "details": {
+        "schema": "fiezel-content-adoption-rehearsal-v1",
+        "gateVersion": "operator-adoption-rehearsal-v1",
+        "version": "5.19.0",
+        "status": "PASS",
+        "signedOriginRequired": true,
+        "separateOperatorTrustPolicy": true,
+        "stagingVerified": true,
+        "rollbackVerified": true,
+        "sourceRootWriteRejected": true,
+        "canonicalImmutable": true,
+        "syntheticEvidenceOnly": true,
+        "syntheticOriginKeyOnly": true,
+        "realProductionEvidenceUsed": false,
+        "productionRehearsalPerformed": false,
+        "actualCanonicalAdoptionPerformed": false
+      }
+    },
+    {
+      "name": "Canonical Adoption gate v1",
+      "status": "PASS",
+      "details": {
+        "schema": "fiezel-content-adoption-v1",
+        "gateVersion": "canonical-adoption-v1",
+        "version": "5.19.0",
+        "status": "PASS",
+        "syntheticEvidenceOnly": true,
+        "syntheticOriginKeyOnly": true,
+        "productionOriginClaimed": false,
+        "canonicalAdoptionPerformed": false,
+        "proofFixtureRejected": true,
+        "extendedEvidenceThresholds": {
+          "minExposureSessions": 10,
+          "minControlAttempts": 30,
+          "minCanaryAttempts": 30,
+          "minPromotedAttempts": 20,
+          "minPromotedAccuracy": 75,
+          "maxPromotedRegressionPp": 3,
+          "minObservationDays": 7,
+          "minReleaseAuditPass": 111,
+          "minProductAuditPass": 44
+        },
+        "ownerReleaseBoundary": true,
+        "releaseAuditBoundary": true,
+        "canaryGateDigestLocked": true,
+        "evidenceAttestationRequired": true,
+        "evidenceAttestationDigestLocked": true,
+        "evidenceOriginRequired": true,
+        "evidenceOriginSignatureVerified": true,
+        "originTrustPolicySeparate": true,
+        "originTrustPolicyDigestLocked": true,
+        "ownerApprovalStillSeparate": true,
+        "deterministicRebuild": true,
+        "stagedCanonicalSha256": {
+          "grammar": "8a111be1fea28f9597139e870efce7c3bcee0c5da20d13336e635c091fc720aa",
+          "vocabulary": "4cd304429c4f3b04fa315bc0cfba4b6645da6e3a87d9dadd81a0a876719cf1a6",
+          "reading": "195c398e61d8415df277d632005409753bda725d0c43c693ce83ae1433ad0af0"
+        },
+        "rollbackSourceCanonicalSha256": {
+          "grammar": "76217bee3334241667e3f8fba346957f2221ac92687f55f74fbb4e9049bba6dd",
+          "vocabulary": "d27359a40939f3c8dc58543e3af5a5e094fdadc2b1ff325151f827519dc1029f",
+          "reading": "195c398e61d8415df277d632005409753bda725d0c43c693ce83ae1433ad0af0"
+        },
+        "rollbackArtifact": true,
+        "sourceRootWriteRejected": true,
+        "privacyFailClosed": true,
+        "canonicalImmutable": true,
+        "productionRequiresRealExtendedEvidence": true,
+        "productionRequiresOperatorTrustRoot": true
+      }
+    },
+    {
+      "name": "Dedicated grammar quality audit",
+      "status": "PASS",
+      "details": {
+        "pass": 28,
+        "fail": 0,
+        "lessons": 282,
+        "runtimeQuestions": 7050,
+        "practiceModes": 25,
+        "crossLessonDuplicates": 0,
+        "focusLeaks": 0,
+        "provenanceViolations": 0,
+        "sequenceCueCollisions": 0,
+        "classifyFamilyIssues": 0
+      }
+    },
+    {
+      "name": "JS syntax a11y-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax academic-readiness-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax account-auth-client-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax adaptive-policy-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax adaptivity-simulation-v3-extended-selftest.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax adaptivity-simulation-v3-extended.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax adaptivity-simulation-v3-hardened-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax adaptivity-simulation-v3.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax adaptivity-simulation.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax affect-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax ai-account-cap-gate-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax ai-integration-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax ai-response-shape-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax ai-task-contract-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax ai-transport-switch-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax alrs-behavior-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax analysis/vchunk-baseline.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax analytics-aggregate-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax analytics-client-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax analytics-dedup-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax analytics-privacy-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax analytics-server-only-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax analytics-stable-id-guard-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax app-interaction-policy-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax app-report-control-path-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax app-telemetry-wiring-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax app.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax attach-live-bindings-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax attempt-identity-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax attempt-record-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax audio-asset-pipeline-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax audio-locale-guard-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax audit/bank-audit.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax audit/merge-grammar-id.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax audit/repair-listening-bank.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax audit/repair-reading-bank.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax audit/repair-reading-stem-unique.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax audit/translate-listening-full.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax auth-account-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax auth-role-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax auth-schema-contract-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax back-nav-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax backup-ui-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax bank-soal-audit-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax boot-first-paint-nonblocking-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax boot-order-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax brain-config-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax brain-manifest-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax brain-page-wiring-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax brain-replay-equivalence-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax brain-sync-failclosed-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax brain-sync-rebuild-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax braincore-evidence-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax braincore-learner-identity-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax braincore-purity-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax breaker-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax build-number-uniqueness-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax cf-api-contract-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax cf-client-timeout-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax cf-config-killswitch-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax cf-live-contract-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax cf-live-selftest.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax cf-shadow-ledger-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax cf-shadow-mode-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax cf-transport-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax cf-wiring-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax check-listening-similarity.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax class-sync-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax classroom-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax cloze-bank-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax config-consistency-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax confusion-matrix-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax content-adoption-evidence-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax content-adoption-evidence.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax content-adoption-receipt-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax content-adoption-receipt.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax content-adoption-rehearsal-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax content-adoption-rehearsal.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax content-adoption-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax content-adoption.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax content-audit.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax content-canary-config-builder.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax content-canary-config.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax content-canary-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax content-canary.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax content-chain-report-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax content-chain-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax content-drift-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax content-evidence-origin-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax content-evidence-origin.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax content-integrity-audit.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax content-integrity-gate-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax content-patch-gate-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax content-patch-gate.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax content-promotion-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax content-promotion.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax content-qa-agent-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax content-qa-agent.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax continuity-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax contrast-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax coordination-guard-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax core-activate.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax core-brain-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax core-brain-v2-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax core-brain-v3-upgrade-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax core-config.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax core-deploy-preflight.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax core-live-smoke.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax core-policy-parity-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax core-proof-build.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax core-worker-contract-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax cors-envelope-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax cron-contract-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax d1-schema-contract-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax deploy-api-binding-guard-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax deploy-site-gate-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax design/redesign-v1/prototype/app.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax design/redesign-v1/prototype/qa/qa_flow.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax design/redesign-v1/screens/a/render_audit.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax diag-panel-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax diag-search-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax diagnostic-scanner-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax e2e-bridge-selftest.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax e2e-level-grammar-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax e5-checksum-gate-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax ecohero-quest/app.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax edge-guard-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax edge-proxy-contract-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax edge-proxy-hopbyhop-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax event-vocabulary-gate-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax evidence-credibility-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax experience-integration-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/academic-readiness/fiezel-academic-readiness.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/analytics/fiezel-analytics-client.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/audio/fiezel-ui-sfx.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/audio-assets/fiezel-audio-key.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/audio-assets/fiezel-audio-manifest.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/audio-assets/fiezel-audio-resolver.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/auth/fiezel-account.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/brain/fiezel-affect.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/brain/fiezel-attempt-record.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/brain/fiezel-brain-config.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/brain/fiezel-brain-manifest.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/brain/fiezel-confusion-matrix.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/brain/fiezel-content-chain.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/brain/fiezel-core-brain.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/brain/fiezel-evidence-credibility.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/brain/fiezel-item-calibration.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/brain/fiezel-item-prior.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/brain/fiezel-learning-metrics.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/brain/fiezel-listening-adaptive.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/brain/fiezel-mastery-bkt.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/brain/fiezel-metrics-digest.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/brain/fiezel-misconception-ledger.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/brain/fiezel-nof1.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/brain/fiezel-olm.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/brain/fiezel-param-ledger.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/brain/fiezel-policy-verdict.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/brain/fiezel-production-grader.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/brain/fiezel-retention-probe.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/brain/fiezel-self-tune.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/brain/fiezel-speaking-adaptive.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/brain/fiezel-srl-coach.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/brain/fiezel-stat-gate.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/brain/fiezel-step-tutor.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/brain/fiezel-tutor-brain.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/brand/fiezel-choreography.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/brand/fiezel-splash-equalizer.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/brand/fiezel-splash-particles.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/brand/fiezel-splash-pawstamp.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/brand/fiezel-splash.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/cf-shadow/fiezel-shadow-ledger.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/classroom/fiezel-classroom.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/continuity/fiezel-continuity.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/daily-target/fiezel-daily-target.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/diagnostics/fiezel-diagnostic-bus.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/diagnostics/fiezel-diagnostic-register.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/diagnostics/fiezel-diagnostic-targets.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/diagnostics/fiezel-module-selftests.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/health/fiezel-install-health.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/i18n/copy-id-app-a.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/i18n/copy-id-app-b.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/i18n/copy-id-app-c.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/i18n/copy-id-app-d.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/i18n/copy-id-app-e.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/i18n/copy-id-app-f.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/i18n/copy-id-core.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/i18n/copy-id-feat-a.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/i18n/copy-id-feat-b.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/i18n/copy-id-feat-c.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/i18n/copy-id-feat-d.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/i18n/copy-id-gems.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/i18n/copy-id-grammar-labels.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/i18n/copy-id-quota.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/i18n/copy-id-redesign.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/i18n/copy-id-settings-locale.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/i18n/copy-id-student.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/i18n/copy-th-app-a.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/i18n/copy-th-app-b.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/i18n/copy-th-app-c.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/i18n/copy-th-app-d.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/i18n/copy-th-app-e.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/i18n/copy-th-app-f.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/i18n/copy-th-core.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/i18n/copy-th-feat-a.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/i18n/copy-th-feat-b.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/i18n/copy-th-feat-c.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/i18n/copy-th-feat-d.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/i18n/copy-th-gems.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/i18n/copy-th-grammar-labels.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/i18n/copy-th-quota.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/i18n/copy-th-settings-locale.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/i18n/copy-th-student.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/i18n/fiezel-i18n.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/i18n/fiezel-th-loader.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/i18n/naskah-th-brain.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/learner-flow/fiezel-duel.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/learner-flow/fiezel-learner-flow.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/learner-flow/fiezel-progress-backup.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/learner-flow/fiezel-review-bank.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/library/fiezel-library-ui.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/library/fiezel-library.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/mascot/fiezel-mascot.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/mascot/fiezel-paw-outfit.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/mascot/fiezel-paw-slot.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/mascot/qa/bbox-probe.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/neural-voice/fiezel-cf-tts-transport.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/neural-voice/fiezel-cf-voice-notice.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/neural-voice/fiezel-diag-panel.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/neural-voice/fiezel-m0281-prebootstrap-hotfix.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/neural-voice/fiezel-neural-voice-audibility-fix.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/neural-voice/fiezel-neural-voice-bootstrap.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/neural-voice/fiezel-neural-voice-cache-integrity-repair.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/neural-voice/fiezel-neural-voice-config.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/neural-voice/fiezel-neural-voice-ios-cache-fix.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/neural-voice/fiezel-neural-voice.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/neural-voice/fiezel-pcm-renderer-worklet.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/neural-voice/fiezel-prosody.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/neural-voice/fiezel-puter-voice.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/neural-voice/fiezel-sherpa-vits-adapter.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/neural-voice/fiezel-speech-bridge.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/neural-voice/fiezel-subtitle-translate.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/neural-voice/fiezel-subtitle.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/neural-voice/fiezel-voice-diagnostics.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/neural-voice/fiezel-voice-offline-autoload.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/neural-voice/fiezel-voice-persona.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/neural-voice/fiezel-voice-say.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/neural-voice/fiezel-web-audio-player.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/notify/fiezel-inbox.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/onboarding/fiezel-onboarding.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/onboarding/fiezel-tour.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/personal-journey/fiezel-personal-journey.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/prasasti/fiezel-prasasti-core.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/quota/quota-copy.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/search/fiezel-search.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/skills-evidence/fiezel-skills-evidence.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/social/fiezel-invite-link.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/social/fiezel-social-notify.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/social/fiezel-social.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/speaking-listening/fiezel-speaking-listening-addon.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/speaking-listening/gems-core.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/speaking-listening/listening-generate.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/speaking-listening/listening-lint.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/speaking-listening/listening-quality.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/speaking-listening/listening-scenarios-a1.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/speaking-listening/listening-scenarios-a2.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/speaking-listening/listening-scenarios-b1.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/speaking-listening/listening-scenarios-b2.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/speaking-listening/listening-scenarios-c1.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/speaking-listening/listening-scenarios-c2.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/speaking-listening/speaking-listening-config.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/teacher/fiezel-teacher-icons.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/teacher/fiezel-teacher-shell.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/teacher/fiezel-teacher-store.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/telemetry/fiezel-braincore-evidence.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/telemetry/fiezel-learning-events.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/telemetry/fiezel-learning-queue.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/telemetry/fiezel-learning-transport.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/telemetry/fiezel-telemetry-config.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/tutor-action-center/fiezel-tutor-action-center.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/tutor-classroom/fiezel-tutor-dialog.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/tutor-classroom/fiezel-tutor-v3.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/tutor-classroom/fiezel-tutor-voice-chat.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/ui/fiezel-ab-testing.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/ui/fiezel-back-nav.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/ui/fiezel-boot-tail.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/ui/fiezel-coach-bubble.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/ui/fiezel-icons.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/ui/fiezel-report-gesture-isolation.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/ui/fiezel-student-mode.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/ui/fiezel-ui-manager.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/ui/fiezel-update-prompt.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/ui/fiezel-zoom-lock.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax features/ui/skeleton-helpers.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax fiezel-autonomy-config-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax fiezel-autonomy-config.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax fiezel-core-worker-proof-route.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax fiezel-core-worker.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax fiezel-evolution-ledger-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax fiezel-evolution-ledger.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax fiezel-evolution-loop-demo.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax fiezel-evolution-loop-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax fiezel-evolution-loop.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax fiezel-lazy-loader.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax fiezel-meta-learning-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax fiezel-meta-learning.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax fiezel-post-test-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax fiezel-prompt-library-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax fiezel-prompt-library.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax fiezel-puter-ready.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax fiezel-report-worker.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax fiezel-self-refine-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax fiezel-self-refine.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax fiezel-stat-gate-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax fiezel-ux-flags.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax gate-registry-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax gems-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax generate-push-secrets.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax global-name-collision-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax grammar-curriculum-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax grammar-labels-id.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax grammar-memory-scope-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax grammar-provenance-verify.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax grammar-quality-audit.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax grammar-unlock-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax health-probe-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax http-smoke-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax id-golden-snapshot-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax install-health-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax item-calibration-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax item-prior-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax keyframe-rotation-gate-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax learner-evidence-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax learning-lane-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax learning-metrics-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax learning-telemetry-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax lesson-experience-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax level-evidence-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax level-grammar-contract-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax level-guard-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax level-source-difficulty-variance-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax library-integrity-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax listening-adaptive-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax listening-exam-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax listening-subtitle-suppression-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax locale-enum-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax lucide.min.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax m02526-local-runner.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax m02526-pre-e1-runner.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax m02526-repeat2.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax m02526-repeat3.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax m02542-experience-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax mascot-reduced-motion-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax mastery-bkt-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax metrics-digest-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax misconception-diagnosis-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax misconception-ledger-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax misconception-taxonomy-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax neural-cache-isolation-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax neural-voice-m02592-puter-subtitle-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax neural-voice-m02593-subtitle-translate-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax night-theme-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax no-network-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax nof1-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax notification-reminder-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax observability-privacy-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax olm-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax onboarding-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax owner-dashboard-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax owner-edge-guard-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax owner-export-csv-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax owner-teacher-panel-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax p1-game-layer-smoke-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax palette-gate-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax param-ledger-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax pastel-field-contrast-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax paw-mascot-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax pawprint-geometry-gate-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax personal-journey-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax personal-journey-ui-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax placement-accuracy-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax policy-outcome-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax policy-verdict-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax prasasti-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax prerender-dryrun-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax prerender-plan-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax prerequisite-graph-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax product-audit.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax production-grader-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax prosody-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax push-dispatcher.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax push-proof-dispatcher.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax puter-auth-coop-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax puter-auth-diagnostics-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax puter-popup-once-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax pwa-cache-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax pwa-release-coherence-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax pwa-startup-white-screen-recovery-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax quota-core-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax quota-manipulation-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax quota-notice-a11y-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax quota-reset-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax r2-ux-overhaul-smoke-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax rate-anon-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax reading-exam-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax rebuild-grammar-data.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax rebuild-speaking-listening-data.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax regression-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax release-audit-gate-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax reminder-struggle-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax remote-push-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax repair-content-integrity.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax report-config.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax reports/add-a8-shots/dump-notice-markup.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax reports/add-a8-shots/shoot.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax reports/d3-owner-guard-red-proof.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax reports/d4-owner-brake-red-proof.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax reports/g1-custom-domain-red-proof.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax reports/voice-v5-data/fiezel-voice-say-before.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax reset-side-state-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax role-security-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax rollout-plan-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax runtime-stage8-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax save-path-perf-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax search-feedback-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax secret-scan-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax self-tune-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax settings-cache-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax side-state-scope-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax skills-dashboard-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax skills-evidence-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax social-api-contract-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax social-frontend-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax social-invite-link-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax social-notify-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax social-schema-contract-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax speaking-adaptive-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax speaking-exam-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax speaking-listening-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax splash-choreography-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax splash-first-paint-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax srl-coach-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax staging-live-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax step-tutor-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax sw-corp-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax sw-nav-shell-first-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax sw.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax teacher-braincore-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax teacher-content-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax teacher-csv-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax teacher-instant-boot-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax th-bank-purity-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax th-coverage-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax th-exam-overlay-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax th-purity-lexicon.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/a12-red-proof.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/account-cap-red-matrix.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/ai-live-verify.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/apply-grammar-upgrade.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/audio-batch-generate.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/build-cloze-bank.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/build-misconception-taxonomy.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/build-wordmark.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/bump-build.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/cf-test-harness.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/cf-worker-boot.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/content-chain-report.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/d1-schema-check.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/d2-queries-red-proof.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/deploy-site-verify.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/edge-latency-probe.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/export-mascot.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/f6-app-vs-raw.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/f6-client-timeout-probe.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/f6-cookie-matrix.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/f6-h3-check.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/f6-hop-isolate.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/fiezel-e2e-bridge.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/fiezel-guardians.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/fiezel-health-probe.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/fiezel-night-watch.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/flag-plan-check.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/gen-auth-migrations.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/generate-th-cloze.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/generate-th-exam-writing.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/generate-th-listening-bank.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/generate-th-misconception.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/generate-th-reading.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/mint-teacher-invite.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/nightwatch.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/owner-dashboard-red-proof.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/prerender-tts.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/preview-server.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/print-live-evidence.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/promote-m0255-runtime.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/quota-module-loader.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/rate-anon-red-matrix.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/reading-bank-assemble.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/reading-bank-validate.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/redact-a5-live-cookies.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/redact-live-cookies.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/release-check.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/repair-th-listening-bank.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/run-core-batch.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/scan-th-bank-leak.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/sync-grammar-explanations-id.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/sync-th-i18n.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/tts-honest-red-matrix.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tools/update-th-exam-banks.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax topbar-logo-contrast-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tour-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tours-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tts-key-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tts-provider-contract-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tts-transport-switch-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tutor-brain-v3-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tutor-classroom-regression-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax tutor-reteach-card-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax ui-render-audit-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax ui-structure-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax update-prompt-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax ux-flags-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax ux-redesign-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax validator.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax vendor/kokoro-js/kokoro.web.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax vendor/kokoro-js/wasm/ort-wasm-simd-threaded.jsep.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax vendor/supertonic-3/sherpa-onnx-tts.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax vendor/supertonic-3/sherpa-onnx-tts.worker.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax vendor/supertonic-3/sherpa-onnx-wasm-main-tts.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax version.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax voice-callsite-prefetch-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax voice-chunker-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax voice-fallback-chain-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax voice-offline-fallback-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax voice-pipeline-gap-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax voice-prefetch-neural-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax voice-turn-ownership-regression.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax wave-f1-censoring-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax website/assets/mascot/fiezel-mascot.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax website/site.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/ai/ai-account-budget.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/ai/ai-tasks.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/ai/model-call-gate.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/ai/route-ai.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/analytics/analytics-core.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/analytics/analytics-store-d1.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/analytics/analytics-tables.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/analytics/rollup.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/analytics/route-events.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/auth/gate.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/auth/invite-core.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/auth/password-core.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/auth/role-core.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/auth-schema.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/breaker/breaker.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/cron-status.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/errors.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/evidence/evidence-core.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/evidence/evidence-store-d1.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/evidence/learner-evidence-core.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/evidence/learner-evidence-store-d1.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/evidence/route-evidence.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/evidence/route-learner-evidence.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/feature-gate.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/index.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/learner-evidence-config.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/learning/learning-core.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/learning/learning-store-d1.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/learning/route-learning-events.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/mw-edge.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/mw-guard.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/mw-identity.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/quota/quota-config.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/quota/quota-core.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/quota/quota-store-d1.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/quota/route-quota.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/rate-anon.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/route-account.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/route-auth.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/route-class-sync.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/route-config.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/route-health.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/route-owner-teachers.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/route-slots.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/route-social.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/route-teacher.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/route-user.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/route-wiring.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/schema.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/social/notify-core.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/social-config.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/social-schema.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/teacher/braincore-bridge.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/teacher/class-sync-core.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/teacher/content-core.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/teacher/csv-core.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/tools/attach-live-bindings-core.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/tools/attach-live-bindings.mjs",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/tts/route-tts.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/tts/tts-key.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/tts/tts-provider-params.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/api/util-hmac.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/fiezel-audio-worker.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/owner/index.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workers/owner/queries.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workflow-actor-gate-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax workflow-timeout-gate-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    },
+    {
+      "name": "JS syntax writing-rubric-test.js",
+      "status": "PASS",
+      "details": "PASS"
+    }
+  ],
+  "counts": {
+    "pass": 703,
+    "fail": 2
+  },
+  "content": {
+    "vocabulary": 2440,
+    "reading_passages": 312,
+    "reading_questions": 1560,
+    "grammar_items": 282,
+    "grammar_runtime_questions": 7050,
+    "listening_items": 36,
+    "speaking_items": 36,
+    "reading_types": 27,
+    "content_qa": {
+      "grammar": 282,
+      "vocabulary": 2440,
+      "readingPassages": 312,
+      "readingQuestions": 1560,
+      "blockers": 0,
+      "review": 68,
+      "queued": 68
+    }
+  },
+  "sha256": "28780259643180d55d8dcf29a85d4184fc928f9bbc3e1b899daaf1f63ceccdf8"
+}

@@ -1,0 +1,14 @@
+ok - kartu memakai aturan dan pegangan dari soal yang BARU SAJA keliru
+ok - sebab kegagalan mengikuti pilihan yang DIAMBIL, bukan pilihan mana pun
+ok - tanpa aturan dan tanpa pegangan, kartu TIDAK dibuat
+ok - naskah berbahasa Inggris tidak pernah sampai ke kartu
+ok - reteach menyiapkan kartu dari soal yang gagal, bukan dari soal berikutnya
+ok - kartu menahan alur SEBELUM soal berikutnya digambar
+ok - tombol lanjut di kartu membuang kartunya, jadi ia tidak bisa muncul dua kali
+ok - kartu punya jalan keluar yang sama dengan layar kuis
+ok - tawaran berhenti benar-benar menutup sesi dan menghitung soal yang barusan
+ok - tawaran berhenti hanya sekali per sesi
+ok - murid boleh menolak berhenti, dan penolakannya tidak menghukum apa pun
+ok - kedua naskah baru berbahasa Indonesia
+ok - gaya kartu memakai bidang yang punya pasangan gelap
+FIEZEL m025-126 kartu konsep + tawaran berhenti: PASS 13/0

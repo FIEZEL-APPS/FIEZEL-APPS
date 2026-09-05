@@ -1,0 +1,5 @@
+ok - versi lokal terbaca: m025-255
+ok - m025-255 belum pernah diklaim di origin/main - nomor ini bebas.
+ok - versi naik melewati klaim tertinggi di hulu (m025-254 -> m025-255).
+
+Gerbang keunikan nomor build: PASS.

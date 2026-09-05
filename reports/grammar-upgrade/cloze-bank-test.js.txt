@@ -1,0 +1,12 @@
+ok - skema fiezel-cloze-bank-v1 dan bentuk item sesuai kontrak
+ok - setiap sentence memuat TEPAT SATU blank ___
+ok - blank.answer non-kosong, >=3 karakter, sama dengan jawaban benar template
+ok - jawaban tidak bocor: answer tidak muncul lagi sebagai frasa utuh di sentence
+ok - setiap distractor membawa text + label misconception (umpan grader + ledger)
+ok - id item unik dan stabil (templateId + indeks)
+ok - build deterministik: dua kali build identik byte, dan file di disk sinkron
+ok - setiap template masuk items ATAU rejected dengan alasan tercatat
+    cakupan level: A1=25, A2=49, B1=86, B2=70, C1=30, C2=19
+ok - cakupan level: minimal 4 level CEFR terwakili (dilaporkan)
+ok - jumlah item >= gate 120 (ambang dari data nyata, bukan target 200 aspirasional)
+ClozeBank: PASS

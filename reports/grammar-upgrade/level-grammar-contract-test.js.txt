@@ -1,0 +1,106 @@
+{
+  "schema": "fiezel-level-grammar-contract-report-v1",
+  "generatedAt": "2026-09-05T01:28:24.786Z",
+  "status": "PASS",
+  "curriculum": "grammar-curriculum-v1.json",
+  "counts": {
+    "pass": 18,
+    "fail": 0,
+    "curriculumRows": 180,
+    "a1Rows": 17,
+    "domainLeaks": 0,
+    "crossLevelUses": 0
+  },
+  "checks": [
+    {
+      "name": "Ordered grammar curriculum exists",
+      "status": "PASS",
+      "details": "grammar-curriculum-v1.json"
+    },
+    {
+      "name": "Curriculum schema carries stable identity, CEFR level, and integer sequence",
+      "status": "PASS",
+      "details": "rows=180 invalid=0"
+    },
+    {
+      "name": "Curriculum lesson ids and per-level sequence numbers are unique",
+      "status": "PASS",
+      "details": "duplicateIds=0 duplicateOrders=0"
+    },
+    {
+      "name": "Grammar curriculum is serialized in deterministic learning order",
+      "status": "PASS",
+      "details": "every CEFR track is strictly ordered"
+    },
+    {
+      "name": "Grammar prerequisites point to earlier curriculum lessons",
+      "status": "PASS",
+      "details": "all prerequisite links resolve"
+    },
+    {
+      "name": "A1 grammar track contains a usable foundation",
+      "status": "PASS",
+      "details": "A1 lessons=17; expected at least 14 ordered foundations"
+    },
+    {
+      "name": "Grammar hub consumes curriculum order instead of object/insertion order",
+      "status": "PASS",
+      "details": "grammar renderer exposes an explicit curriculum/order path"
+    },
+    {
+      "name": "Grammar option order may shuffle while lesson order remains stable",
+      "status": "PASS",
+      "details": "option randomization is allowed in question construction; lesson traversal must remain ordered"
+    },
+    {
+      "name": "Active learner level is a named persisted concept",
+      "status": "PASS",
+      "details": "state/preferences must carry activeLevel or an equivalent learner-level field"
+    },
+    {
+      "name": "A single active-level resolver exists",
+      "status": "PASS",
+      "details": "all panels should call one resolver rather than reading placement state directly"
+    },
+    {
+      "name": "Every learning domain reads the global active level",
+      "status": "PASS",
+      "details": "vocabulary, grammar, reading, writing, classroom, adaptive, and speaking/listening are scoped"
+    },
+    {
+      "name": "Non-placement learning panels do not use an unscoped cross-level pool",
+      "status": "PASS",
+      "details": "cross-level access is isolated to placement/level selection"
+    },
+    {
+      "name": "Placement remains the only explicit cross-level exception",
+      "status": "PASS",
+      "details": "placement must declare placement:true when it builds the cross-level assessment"
+    },
+    {
+      "name": "Domain progress remains separate from active-level preference",
+      "status": "PASS",
+      "details": "vocab/grammar/reading progress must not be stored as a replaceable level bucket"
+    },
+    {
+      "name": "Active-level changes are implemented through an explicit setter",
+      "status": "PASS",
+      "details": "setActiveLevel"
+    },
+    {
+      "name": "Level switching persists without resetting learner progress",
+      "status": "PASS",
+      "details": "setter saves the preference and does not clear domain evidence"
+    },
+    {
+      "name": "State revision or equivalent cache invalidation follows a level switch",
+      "status": "PASS",
+      "details": "Core/adaptive caches must not keep the previous level after switching"
+    },
+    {
+      "name": "Behavioral progress continuity fixture",
+      "status": "PASS",
+      "details": "active level changed A1 -> B1 and all evidence remained intact"
+    }
+  ]
+}

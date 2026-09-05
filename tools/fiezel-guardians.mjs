@@ -151,7 +151,11 @@ function runA11() {
   if (mergeTree.status !== 0 || !mergeTree.stdout.trim()) error('candidate does not produce a clean merge-tree against current main');
 
   if (files.some(isProductFile)) {
-    const baseDiag = parseDiag(fileText('features/neural-voice/fiezel-diag-panel.js', env('BASE_SHA')));
+    // Pembanding rilis adalah TIP main SEKARANG, bukan BASE_SHA. GitHub membekukan
+    // pull_request.base.sha pada saat PR dibuka dan tidak pernah menyegarkannya; kalau
+    // PR lain merge duluan, base.sha tertinggal dan +1 yang benar terbaca sebagai +2.
+    // origin/main sudah di-fetch di atas dan sudah dipastikan menjadi leluhur HEAD.
+    const baseDiag = parseDiag(fileText('features/neural-voice/fiezel-diag-panel.js', 'origin/main'));
     const headDiag = parseDiag(fileText('features/neural-voice/fiezel-diag-panel.js'));
     const headSw = parseSw(fileText('sw.js'));
     if (baseDiag == null || headDiag == null || headSw == null) error('unable to parse DIAG_BUILD/SW_REV release boundary');
