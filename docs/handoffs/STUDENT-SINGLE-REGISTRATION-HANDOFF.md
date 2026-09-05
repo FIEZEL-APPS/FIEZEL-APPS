@@ -65,9 +65,11 @@ R4 satu pintu untuk murid lama, R5 pendaftaran idempoten.
 1. Kalau owner mau ID online bisa DIGANTI sekali (ganti nama = ganti handle),
    itu perlu endpoint `profile/rename` di `workers/api/route-social.js`; hari ini
    handle terbit sekali dan tetap.
-2. `socialHandleInput()` dan naskah `social.handle-*` masih ada di pohon meski
-   formulirnya hilang — biarkan sampai keputusan (1) diambil, karena jalur ganti
-   nama akan memakainya kembali.
+2. `socialHandleInput()` dan naskah `social.handle-checking/-available/-taken`
+   SUDAH DIHAPUS (m025-264): kode mati yang tidak dipanggil siapa pun sesudah
+   formulirnya hilang. `validateHandle()` di modul sosial dan naskah
+   `social.handle-label/-rules` tetap ada — keduanya masih dipakai lembar undangan
+   dan jalur pendaftaran, dan itulah yang akan dipakai ulang kalau (1) jadi.
 3. Akun FIEZEL berkata sandi (`features/auth/fiezel-account.js`) kini murni jalur
    guru. Kalau kelak murid butuh sinkron antar-perangkat, ia harus menempel pada
    identitas yang sudah lahir di onboarding — bukan menjadi pendaftaran kelima.
