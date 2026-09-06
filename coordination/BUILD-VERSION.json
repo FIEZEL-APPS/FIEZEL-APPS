@@ -1,7 +1,7 @@
 {
-  "version": "m025-270",
+  "version": "m025-275",
   "claimedBy": "branch claude/lanjut-bottomnav-367",
-  "claimedAt": "2026-09-06T01:22:35.153Z",
-  "reason": "Bottom nav satu definisi: kapsul aktif + dua ikon baru",
+  "claimedAt": "2026-09-06T11:11:34.566Z",
+  "reason": "Chrome: bottom nav + topbar satu definisi",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

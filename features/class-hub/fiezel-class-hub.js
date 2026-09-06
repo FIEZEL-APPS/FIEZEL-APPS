@@ -11,10 +11,20 @@
   /* m025-265 · sapuan kebocoran Thai: naskah modul ini dulu literal Indonesia, jadi murid
      yang memilih th tetap membacanya dalam bahasa Indonesia. t() fail-soft: kalau copy-map
      belum termuat, fallback id yang tampil — bukan kunci mentah. */
-  function t(k, fb) { try { var I = (typeof self !== 'undefined' ? self : this).FiezelI18n; return I && I.t ? I.t(k) : fb; } catch (_) { return fb; } }
+  /* `params` menyusul m025-267 (pendeteksi keluar layar): kalimatnya membawa angka
+     ({n}, {detik}), dan menempelkan angka DI LUAR t() akan memaksa urutan kata Indonesia
+     ke naskah Thai. Pemanggil lama yang hanya mengirim (k, fb) tidak berubah artinya. */
+  function t(k, fb, params) {
+    var s;
+    try { var I = (typeof self !== 'undefined' ? self : this).FiezelI18n; s = I && I.t ? I.t(k, params) : undefined; } catch (_) {}
+    if (s === undefined || s === k) s = fb == null ? k : fb;
+    if (params) s = String(s).replace(/\{(\w+)\}/g, function (m, n) { return Object.prototype.hasOwnProperty.call(params, n) ? String(params[n]) : m; });
+    return s;
+  }
   if (!root) return;
   var SUB_KEY = 'fiezel-class-submissions-v1', UI_KEY = 'fiezel-class-hub-v1';
   function R() { return root.FiezelBraincoreReview; }
+  function FG() { return root.FiezelFocusGuard; }
   function T() { return root.FiezelTeacherStore; }
   function B() { return root.FiezelReviewBank; }
   function LF() { return root.FiezelLearnerFlow; }
@@ -46,7 +56,18 @@
   function assignments() { var TS = T(); return readJson(TS ? TS.ASSIGN_KEY : 'fiezel-learner-assignments-v1', []); }
   function subs() { return readJson(SUB_KEY, []); }
   function classCode() { return String((readJson('fiezel-onboarding-v1', {}) || {}).classCode || ''); }
-  function setClassCode(code) { var TS = T(), c = TS ? TS.normalizeClassCode(code) : String(code || '').toUpperCase(); if (!c) return false; var ob = readJson('fiezel-onboarding-v1', {}) || {}; ob.classCode = c; writeJson('fiezel-onboarding-v1', ob); try { root.FiezelInbox && root.FiezelInbox.poll(true).then(function () { renderStudent(); }); } catch (_) {} return true; }
+  function setClassCode(code) {
+    var TS = T(), c = TS ? TS.normalizeClassCode(code) : String(code || '').toUpperCase();
+    if (!c) return false;
+    var ob = readJson('fiezel-onboarding-v1', {}) || {}; ob.classCode = c; writeJson('fiezel-onboarding-v1', ob);
+    /* Ketukan ke guru dikirim SEKARANG, bukan menunggu tugas pertama selesai. Sebelum ini,
+       murid yang sudah mengetik kode tetap tidak terlihat oleh gurunya sampai ia menyelesaikan
+       sesuatu — dan murid yang salah ketik kode mengira dirinya sudah tergabung padahal tidak
+       ada siapa pun di ujung sana. */
+    try { LF() && LF().announceJoin(); } catch (_) {}
+    try { root.FiezelInbox && root.FiezelInbox.poll(true).then(function () { renderStudent(); }); } catch (_) {}
+    return true;
+  }
   function latestMeta() { var all = assignments().concat(subs()).sort(function (a, b) { return (b.at || 0) - (a.at || 0); }); return all[0] || null; }
   function teacherName() { var m = latestMeta(); return m && m.teacher ? m.teacher : ''; }
   function className() { var m = latestMeta(); return m && m.from ? m.from : ''; }
@@ -55,9 +76,10 @@
     sEl = el; sEnv = env || {}; ui();
     el.addEventListener('click', onStudentClick); el.addEventListener('submit', onStudentSubmit);
     if (pendingOpen) { var id = pendingOpen; pendingOpen = null; if (openAssignment(id)) return; }
+    resumeFocus();
     renderStudent();
   }
-  function unmountStudent() { if (timerTick) clearInterval(timerTick); timerTick = null; sEl = null; }
+  function unmountStudent() { if (timerTick) clearInterval(timerTick); timerTick = null; unbindFocus(); sEl = null; }
   /** Dibuka dari notifikasi: satu ketuk = sesi tugas terbuka di dalam Kelas. */
   function openAssignment(id) {
     if (!id) return false;
@@ -66,12 +88,123 @@
     if (!a) { var done = subs().filter(function (x) { return x.id === id; })[0]; if (done) { ui().tab = 'tugas'; ui().review = id; saveUi(); renderStudent(); return true; } if (sEnv.toast) sEnv.toast(t('kelas.tugas-tidak-ditemukan', 'Tugas ini tidak ditemukan atau sudah selesai.')); return false; }
     startRunner(a); return true;
   }
+  /* ===================================================================================== */
+  /* PENDETEKSI KELUAR LAYAR (ujian)                                                        */
+  /* -------------------------------------------------------------------------------------
+   * Ujian dari guru dikerjakan tanpa pengawas. Selama sesi ujian berjalan, setiap kali
+   * halaman kehilangan layar (Home ditekan, pindah tab, pindah aplikasi) satu episode
+   * dicatat dan ringkasannya langsung dikirim ke guru lewat laporan kelas yang sudah ada.
+   * Hitungannya hidup di dalam ui().focus supaya memuat ulang halaman di tengah ujian —
+   * cara paling gampang menghapus jejak — tidak mengosongkan catatan.
+   *
+   * SENGAJA HANYA UNTUK mode 'ujian'. Latihan harian dikerjakan sambil hidup berjalan
+   * (dipanggil orang rumah, membuka kamus, membalas pesan); memantaunya akan mengubah
+   * latihan menjadi pengawasan dan tidak menjawab satu pun pertanyaan guru.
+   * ===================================================================================== */
+  var focusBound = null, focusGraceTimer = null, focusSentAt = 0, focusTrailTimer = null;
+  /* Server membatasi laporan murid ke satu per 15 detik (LIMITS.LEARNER_MIN_INTERVAL_MS).
+     Kepergian yang datang beruntun karena itu bisa DITOLAK 429 dan hilang tanpa jejak —
+     tepat pada pola yang paling perlu dilihat guru. Karena laporan kelas adalah upsert
+     (selalu membawa angka terbaru, bukan selisih), satu kiriman menyusul di ujung jendela
+     pembatas sudah cukup: yang tertinggal bukan satu peristiwa, melainkan keterlambatan. */
+  var REPORT_GAP_MS = 16000;
+  function isExamRunner() { var u = ui(), a = currentAssignment(); return !!(u.runner && !u.runner.finished && a && a.mode === 'ujian'); }
+  function saveFocus(st) { ui().focus = st; saveUi(); }
+  /** Kirim ringkasan ke guru sekarang juga (lewat learner-flow -> class-report). */
+  function reportFocus(st) {
+    if (!st || !FG()) return;
+    var now = Date.now();
+    if (now - focusSentAt < REPORT_GAP_MS) {
+      if (focusTrailTimer) return;
+      focusTrailTimer = setTimeout(function () {
+        focusTrailTimer = null;
+        var cur = ui().focus;
+        if (cur) reportFocus(cur);
+      }, REPORT_GAP_MS - (now - focusSentAt));
+      return;
+    }
+    focusSentAt = now;
+    try { LF() && LF().recordAssignmentFocus(st.aid, FG().payload(st, now)); } catch (_) {}
+  }
+  function onFocusLost(reason) {
+    var u = ui(), st = u.focus; if (!st || !FG() || !isExamRunner()) return;
+    FG().leave(st, Date.now(), reason); saveFocus(st);
+    /* Murid yang keluar dan TIDAK kembali (aplikasi ditutup, ponsel dikunci) tidak akan
+       pernah memicu jalur kembali — maka laporannya dikirim begitu masa tenggang lewat,
+       memakai episode yang masih berjalan. Inilah yang membuat guru melihat kepergian
+       saat sedang terjadi, bukan sesudahnya. */
+    if (focusGraceTimer) clearTimeout(focusGraceTimer);
+    focusGraceTimer = setTimeout(function () {
+      focusGraceTimer = null;
+      var cur = ui().focus;
+      if (cur && cur.awaySince) reportFocus(cur);
+    }, FG().GRACE_MS + 200);
+  }
+  function onFocusBack() {
+    var u = ui(), st = u.focus; if (!st || !FG()) return;
+    if (focusGraceTimer) { clearTimeout(focusGraceTimer); focusGraceTimer = null; }
+    var ep = FG().back(st, Date.now());
+    saveFocus(st);
+    if (!ep) return;
+    reportFocus(st);
+    var sum = FG().summary(st, Date.now());
+    if (sEl) renderStudent();
+    if (sEnv.toast) sEnv.toast(t('proctor.kembali-toast', 'Kamu keluar dari layar ujian {n}× ({detik} detik terakhir). Catatannya sudah sampai ke gurumu.', { n: sum.n, detik: Math.round(ep.ms / 1000) }));
+  }
+  function bindFocus() {
+    if (focusBound || !root.document || !root.addEventListener) return;
+    focusBound = {
+      vis: function () { if (!isExamRunner()) return; if (root.document.visibilityState === 'hidden') onFocusLost('hidden'); else onFocusBack(); },
+      hide: function () { if (isExamRunner()) onFocusLost('pagehide'); },
+      blur: function () { if (isExamRunner()) onFocusLost('blur'); },
+      focus: function () { onFocusBack(); }
+    };
+    root.document.addEventListener('visibilitychange', focusBound.vis);
+    root.addEventListener('pagehide', focusBound.hide);
+    root.addEventListener('blur', focusBound.blur);
+    root.addEventListener('focus', focusBound.focus);
+  }
+  function unbindFocus() {
+    if (focusGraceTimer) { clearTimeout(focusGraceTimer); focusGraceTimer = null; }
+    if (focusTrailTimer) { clearTimeout(focusTrailTimer); focusTrailTimer = null; }
+    if (!focusBound) return;
+    try {
+      root.document.removeEventListener('visibilitychange', focusBound.vis);
+      root.removeEventListener('pagehide', focusBound.hide);
+      root.removeEventListener('blur', focusBound.blur);
+      root.removeEventListener('focus', focusBound.focus);
+    } catch (_) {}
+    focusBound = null;
+  }
+  /** Dipanggil saat sesi ujian dibuka DAN saat modul dipasang ulang (mis. sesudah reload). */
+  function resumeFocus() {
+    var u = ui(), a = currentAssignment();
+    if (!isExamRunner() || !FG()) { unbindFocus(); return; }
+    var st = FG().restore(u.focus);
+    if (!st || st.aid !== a.id) st = FG().start(a.id, u.runner.startedAt || Date.now());
+    /* Halaman yang baru dimuat SEDANG terlihat: episode yang masih terbuka di state lama
+       berarti murid keluar lalu kembali lewat jalan yang tidak mengirim event (aplikasi
+       dimatikan, PWA dibuka ulang). Tutup episodenya sekarang supaya waktunya tetap terhitung. */
+    if (st.awaySince) { FG().back(st, Date.now()); reportFocus(st); }
+    saveFocus(st); bindFocus();
+  }
+  function focusBanner() {
+    var st = ui().focus, sum = st && FG() ? FG().summary(st, Date.now()) : null;
+    if (!sum || !sum.n) return '<p class="ch-proctor" data-testid="class-proctor-notice">' + icon('shield-check') + ' ' + esc(t('proctor.aktif', 'Mode ujian: kalau kamu keluar dari layar ini, gurumu menerima catatannya.')) + '</p>';
+    return '<p class="ch-proctor is-warn" data-testid="class-proctor-warn">' + icon('eye-off') + ' ' + esc(t('proctor.tercatat', 'Tercatat keluar layar {n}× ({detik} detik). Gurumu sudah menerima catatannya.', { n: sum.n, detik: Math.round(sum.ms / 1000) })) + '</p>';
+  }
   function startRunner(a) {
     var u = ui(), order = a.itemIds.map(function (_, i) { return i; });
     if (a.shuffle || a.mode === 'ujian') order = shuffle(order, a.id.length * 7 + Date.now() % 1000);
     u.runner = { aid: a.id, idx: 0, order: order, answers: [], chosen: null, revealed: false, startedAt: Date.now(), timerEnd: a.mode === 'ujian' && a.timer ? Date.now() + a.timer * 60000 : 0, finished: false, result: null };
-    u.tab = 'tugas'; u.review = null; saveUi();
+    u.tab = 'tugas'; u.review = null;
+    u.focus = a.mode === 'ujian' && FG() ? FG().start(a.id, Date.now()) : null;
+    /* Kunci ujian global: ia yang membuat pembimbing PAW dan layar Tanya FIEZEL menutup
+       diri, dan ia sama untuk SEMUA permukaan ujian — bukan hanya runner ini. */
+    try { if (a.mode === 'ujian' && root.FiezelExamLock) root.FiezelExamLock.begin('assignment', { id: a.id }); } catch (_) {}
+    saveUi();
     try { LF() && LF().markAssignmentStarted(a.id); } catch (_) {}
+    if (a.mode === 'ujian') { bindFocus(); } else { unbindFocus(); }
     if (u.runner.timerEnd) { if (timerTick) clearInterval(timerTick); timerTick = setInterval(function () { var rr = ui().runner; if (!rr || rr.finished || !sEl) { clearInterval(timerTick); timerTick = null; return; } if (Date.now() >= rr.timerEnd) { finishRunner(); return; } var t = sEl.querySelector('[data-ch-timer]'); if (t) t.textContent = timerText(rr); }, 1000); }
     renderStudent();
   }
@@ -91,7 +224,12 @@
     var r = ui().runner, a = currentAssignment(); if (!r || r.finished) return;
     if (timerTick) { clearInterval(timerTick); timerTick = null; }
     if (!a) { ui().runner = null; saveUi(); renderStudent(); return; }
-    var res = null; try { res = LF() ? LF().recordAssignmentResult({ id: a.id, title: a.title, skill: a.skills[0], mode: a.mode, minutes: Math.round((Date.now() - r.startedAt) / 60000), results: r.answers }) : null; } catch (_) {}
+    var focus = null;
+    focusSentAt = 0;
+    try { if (root.FiezelExamLock) root.FiezelExamLock.end('assignment'); } catch (_) {}
+    if (ui().focus && FG()) { var fst = ui().focus; if (fst.awaySince) FG().back(fst, Date.now()); focus = FG().payload(fst, Date.now()); }
+    unbindFocus();
+    var res = null; try { res = LF() ? LF().recordAssignmentResult({ id: a.id, title: a.title, skill: a.skills[0], mode: a.mode, minutes: Math.round((Date.now() - r.startedAt) / 60000), results: r.answers, focus: focus }) : null; } catch (_) {}
     var correct = r.answers.filter(function (x) { return x.correct; }).length;
     var sub = { id: a.id, title: a.title, from: a.from, teacher: a.teacher || '', cls: a.cls || classCode(), skills: a.skills, mode: a.mode, deadline: a.deadline || null, at: Date.now(), c: correct, t: r.answers.length, results: r.answers, itemIds: a.itemIds, items: a.items || undefined, sent: !!res };
     var list = subs().filter(function (x) { return x.id !== a.id; }); list.push(sub); writeJson(SUB_KEY, list.slice(-30));
@@ -100,7 +238,7 @@
     try { root.refreshNotifBadge && root.refreshNotifBadge(); } catch (_) {}
     renderStudent();
   }
-  function closeRunner() { var u = ui(); if (u.runner && !u.runner.finished && sEnv.toast) sEnv.toast(t('kelas.toast-disimpan-sedang', 'Tugas disimpan sebagai "sedang mengerjakan". Lanjutkan kapan saja.')); if (u.runner && u.runner.finished) u.runner = null; u.paused = !!u.runner; saveUi(); renderStudent(); }
+  function closeRunner() { var u = ui(); if (u.focus && FG()) { if (u.focus.awaySince) FG().back(u.focus, Date.now()); reportFocus(u.focus); } unbindFocus(); try { if (root.FiezelExamLock) root.FiezelExamLock.end('assignment'); } catch (_) {} if (u.runner && u.runner.finished) u.focus = null; if (u.runner && !u.runner.finished && sEnv.toast) sEnv.toast(t('kelas.toast-disimpan-sedang', 'Tugas disimpan sebagai "sedang mengerjakan". Lanjutkan kapan saja.')); if (u.runner && u.runner.finished) u.runner = null; u.paused = !!u.runner; saveUi(); renderStudent(); }
 
   function renderStudent() {
     if (!sEl) return; var u = ui(), pend = assignments(), done = subs();
@@ -129,7 +267,7 @@
   function kelasView() {
     var lf = null; try { lf = LF() ? LF().load() : null; } catch (_) {}
     var rep = lf && lf.classReport;
-    return '<div class="ch-body"><section class="ch-card ch-class-card" data-testid="class-my-class">' + (classCode() ? '<p class="ch-kicker">' + t('kelas.kelas-terhubung', 'Kelas terhubung') + '</p><h3>' + esc(className() || 'Kelas ' + classCode()) + '</h3><p class="ch-muted">Kode kelas <b class="ch-mono">' + esc(classCode()) + '</b>' + (teacherName() ? ' · Guru <b>' + esc(teacherName()) + '</b>' : '') + '</p><p class="ch-muted ch-small">' + (rep ? (rep.ok ? icon('check') + ' Laporan terakhir terkirim ke guru ' + esc(fmtDate(rep.at)) : icon('clock') + ' Laporan terakhir belum terkirim (' + esc(rep.error || 'offline') + ') — dikirim ulang otomatis saat online.') : 'Setiap tugas yang selesai dikirim ke guru sebagai ringkasan: nama depan, akurasi per skill, dan soal yang keliru. Tanpa transkrip.') + '</p><div class="ch-actions"><button type="button" class="ch-btn is-ghost" data-ch="resend">' + icon('refresh-cw') + ' ' + t('kelas.kirim-ulang-laporan', 'Kirim ulang laporan') + '</button><button type="button" class="ch-btn is-ghost" data-ch="change-code">Ganti kode</button></div>' : '<p class="ch-kicker">Gabung kelas</p><h3>Masukkan kode dari gurumu</h3><p class="ch-muted">Kode berbentuk FZ-XXXXXX. Setelah tergabung, tugas guru masuk otomatis dan hasilmu kembali ke guru.</p>') +
+    return '<div class="ch-body"><section class="ch-card ch-class-card" data-testid="class-my-class">' + (classCode() ? '<p class="ch-kicker">' + t('kelas.kelas-terhubung', 'Kelas terhubung') + '</p><h3>' + esc(className() || 'Kelas ' + classCode()) + '</h3><p class="ch-muted">Kode kelas <b class="ch-mono">' + esc(classCode()) + '</b>' + (teacherName() ? ' · Guru <b>' + esc(teacherName()) + '</b>' : '') + '</p><p class="ch-muted ch-small">' + (rep ? (rep.ok ? icon('check') + ' Laporan terakhir terkirim ke guru ' + esc(fmtDate(rep.at)) : icon('clock') + ' Laporan terakhir belum terkirim (' + esc(rep.error || 'offline') + ') — dikirim ulang otomatis saat online.') : 'Setiap tugas yang selesai dikirim ke guru sebagai ringkasan: nama depan, akurasi per skill, dan soal yang keliru. Tanpa transkrip.') + '</p><div class="ch-actions"><button type="button" class="ch-btn is-ghost" data-ch="change-code">Ganti kode</button></div>' : '<p class="ch-kicker">Gabung kelas</p><h3>Masukkan kode dari gurumu</h3><p class="ch-muted">Kode berbentuk FZ-XXXXXX. Setelah tergabung, tugas guru masuk otomatis dan hasilmu kembali ke guru.</p>') +
       (!classCode() || ui().editCode ? '<form class="ch-form" data-ch-form="join"><input name="code" placeholder="FZ-ABC234" maxlength="9" autocomplete="off" required data-testid="class-code-input"><button type="submit" class="ch-btn is-primary" data-testid="class-code-submit">Gabung</button></form>' : '') + '</section>' +
       '<section class="ch-grid2"><button type="button" class="ch-card ch-link-card" data-ch="tutor" data-testid="class-open-tutor"><span class="ch-link-icon">' + icon('mic') + '</span><div><b>Tutor FIEZEL</b><small>Pelajaran bersuara Inggris + subtitle Indonesia, sesuai levelmu.</small></div>' + icon('arrow-up-right') + '</button>' +
       '<button type="button" class="ch-card ch-link-card" data-ch="learn" data-testid="class-open-learn"><span class="ch-link-icon">' + icon('route') + '</span><div><b>' + t('kelas.belajar-mandiri', 'Belajar mandiri hari ini') + '</b><small>Rencana harian dari peta kemampuanmu — tugas guru ikut masuk ke sana.</small></div>' + icon('arrow-up-right') + '</button></section></div>';
@@ -156,6 +294,7 @@
     var fb = '';
     if (r.revealed) { var ok = r.chosen === item.answer, why = item.why && item.why[r.chosen]; fb = '<div class="ch-feedback ' + (ok ? 'is-ok' : 'is-no') + '" data-testid="class-feedback"><b>' + (ok ? 'Benar!' : t('kelas.belum-tepat', 'Belum tepat.')) + '</b> ' + (ok ? esc(item.note || '') : esc(why || ('Jawaban yang benar: ' + item.options[item.answer] + '.' + (item.note ? ' ' + item.note : '')))) + '</div>'; }
     return '<div class="ch-body ch-runner" data-testid="class-runner"><div class="ch-runner-top"><button type="button" class="ch-btn is-ghost is-small" data-ch="close-runner">' + icon('chevron-left') + ' ' + t('kelas.simpan-keluar', 'Simpan & keluar') + '</button><span class="ch-muted">' + esc(a.teacher ? 'Dari ' + a.teacher : a.from || '') + '</span>' + (r.timerEnd ? '<span class="ch-timer" data-ch-timer>' + timerText(r) + '</span>' : '') + '</div>' +
+      (a.mode === 'ujian' ? focusBanner() : '') +
       '<p class="ch-progress-text">' + t('flow.soal-progress', 'Soal {n} dari {total}').replace('{n}', r.idx + 1).replace('{total}', r.order.length) + '</p><span class="ch-bar is-thin"><i style="width:' + Math.round(r.idx / r.order.length * 100) + '%"></i></span>' +
       /* Gambar soal HARUS ikut tercetak. Soal `contextKind:'picture'` menaruh
          pertanyaannya sepenuhnya pada gambarnya; tanpa itu murid membaca "Kata Inggris apa
@@ -180,6 +319,11 @@
       case 'close-runner': closeRunner(); return;
       case 'review': u.review = id; if (u.runner && u.runner.finished) u.runner = null; u.paused = false; break;
       case 'back': u.review = null; break;
+      /* Tombolnya sudah TIDAK ADA sejak m025-270: menyegarkan papan adalah tugas sistem, bukan
+         pekerjaan rumah murid — laporan yang gagal sudah dikirim ulang sendiri oleh
+         pushToClass (backoff 16 detik → 2 menit) dan detak murid berdenyut tiap 15 detik.
+         Pintunya dibiarkan hidup untuk jalur pemulihan (diagnostik, tes) yang memanggilnya
+         langsung; menghapusnya hanya menyisakan satu cabang mati di dua tempat. */
       case 'resend': try { LF() && LF().pushToClass(); } catch (_) {} if (sEnv.toast) sEnv.toast('Laporan dikirim ulang ke guru.'); return;
       case 'change-code': u.editCode = true; break;
       case 'tutor': if (sEnv.openTutor) { sEnv.openTutor(); } return;
@@ -190,7 +334,7 @@
   }
   function onStudentSubmit(e) {
     var f = e.target.closest ? e.target.closest('[data-ch-form]') : null; if (!f) return; e.preventDefault();
-    if (f.getAttribute('data-ch-form') === 'join') { var ok = setClassCode(new FormData(f).get('code')); if (sEnv.toast) sEnv.toast(ok ? 'Kode kelas tersimpan. Tugas guru akan muncul otomatis.' : 'Kode tidak valid — bentuknya FZ-XXXXXX.'); ui().editCode = false; saveUi(); renderStudent(); }
+    if (f.getAttribute('data-ch-form') === 'join') { var ok = setClassCode(new FormData(f).get('code')); if (sEnv.toast) sEnv.toast(ok ? t('kelas.gabung-terkirim', 'Kode tersimpan. Permintaan bergabung sudah dikirim ke gurumu — tugas muncul otomatis setelah kamu ditambahkan.') : t('kelas.gabung-kode-salah', 'Kode tidak valid — bentuknya FZ-XXXXXX.')); ui().editCode = false; saveUi(); renderStudent(); }
   }
 
   /* ===================================================================================== */
@@ -207,13 +351,38 @@
     var body = !c ? '<section class="ch-card ch-empty">' + icon('school') + '<p>' + t('kelas.buat-kelas-dulu', 'Buat kelas dulu, lalu Kelas menjadi pusat tugas, hasil, dan insight.') + '</p><button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="new-class">' + t('kelas.buat-kelas', 'Buat kelas') + '</button></section>' : tUi.tab === 'tugas' ? tTugas(c, env) : tUi.tab === 'buat' ? tBuat(c, env) : tUi.tab === 'hasil' ? tHasil(c, env) : tUi.tab === 'braincore' ? tBraincore(c, env) : tKelas(c, env);
     return '<div class="ch ch-teacher" data-testid="class-hub-teacher"><p class="ch-principle">' + icon('brain') + ' ' + t('kelas.braincore-alur-dot', 'Braincore menyarankan · Guru memutuskan · Murid belajar') + '</p><nav class="ch-tabs is-teacher" role="tablist">' + TABS.map(function (t) { return '<button type="button" role="tab" class="ch-tab' + (tUi.tab === t[0] ? ' is-active' : '') + '" data-ch="ttab" data-tab="' + t[0] + '" data-testid="tclass-tab-' + t[0] + '">' + icon(t[2]) + '<span>' + t[1] + '</span></button>'; }).join('') + '</nav>' + body + '</div>';
   }
+  /* Permintaan bergabung: murid sudah mengetik kode kelas ini, guru yang memutuskan ia masuk
+     atau tidak. Kartunya hanya muncul kalau memang ada yang menunggu — kelas yang tidak
+     kedatangan siapa pun tidak perlu melihat kotak kosong tiap hari. */
+  function pendingCard(c) {
+    var TS = T(), list = TS.pendingJoins ? TS.pendingJoins(c) : [];
+    if (!list.length) return '';
+    return '<section class="ch-card ch-pending" data-testid="tclass-pending"><p class="ch-kicker">' + icon('user-plus') + ' ' + t('kelas.menunggu-persetujuan', 'Menunggu persetujuan') + '</p>' +
+      '<p class="ch-muted ch-small">' + t('kelas.menunggu-penjelasan', 'Mereka memasukkan kode kelas ini. Tambahkan yang kamu kenal; yang tidak ditambahkan tidak menerima tugas apa pun.') + '</p>' +
+      '<ul class="ch-mini-list">' + list.map(function (p) {
+        return '<li><span class="ch-grow"><b>' + esc(p.name) + '</b> <small class="ch-muted">' + esc(fmtDate(p.at)) + '</small></span>' +
+          '<button type="button" class="tg-btn is-small is-primary" data-ch="join-accept" data-name="' + esc(p.name) + '" data-testid="tclass-join-accept">' + icon('user-plus') + ' ' + t('kelas.tambahkan', 'Tambahkan') + '</button>' +
+          '<button type="button" class="tg-btn is-small is-ghost" data-ch="join-reject" data-name="' + esc(p.name) + '">' + t('kelas.abaikan', 'Abaikan') + '</button></li>';
+      }).join('') + '</ul></section>';
+  }
   function studentRec(a, s) { return { done: a.done && a.done[s.id], startedAt: a.progress && a.progress[s.id] }; }
+  /* Sisi guru dari pendeteksi keluar layar. Chip hanya muncul bila memang ADA kepergian:
+     menempelkan "0×" pada setiap murid akan mengubah daftar kelas menjadi papan kecurigaan,
+     padahal yang perlu dilihat guru hanya baris yang menyimpang. */
+  function focusChip(a, s) {
+    var TS = T(), f = TS.focusOf ? TS.focusOf(a, s) : null;
+    if (!f || !f.n) return '';
+    return '<span class="ch-focus is-' + TS.focusLevel(f) + '" title="Terdeteksi meninggalkan layar saat mengerjakan" data-testid="tclass-focus-' + esc(a.id) + '-' + esc(s.id) + '">' + icon('eye-off') + ' ' + esc(TS.focusLabel(f)) + '</span>';
+  }
+  /** Ringkasan satu tugas: berapa murid yang terdeteksi keluar layar. */
+  function focusCount(c, a) { var TS = T(); return c.students.filter(function (s) { var f = TS.focusOf ? TS.focusOf(a, s) : null; return f && f.n; }).length; }
   function statusCounts(c, a) { var TS = T(), out = { belum: 0, sedang: 0, selesai: 0, terlambat: 0, total: 0 }; c.students.filter(function (s) { return TS.targeted(a, s); }).forEach(function (s) { out.total++; out[statusOf(a, studentRec(a, s)).id]++; }); return out; }
   function tKelas(c, env) {
     var TS = T(), stt = TS.classStats(c), sync = TS.syncLabel(c);
     return '<div class="ch-body"><section class="ch-card ch-class-card"><div class="ch-card-top"><div><p class="ch-kicker">' + esc(c.level) + ' · ' + esc(c.subject || 'English') + '</p><h2>' + esc(c.name) + '</h2></div><span class="ch-sync is-' + sync.state + '">' + esc(sync.text) + '</span></div><p class="ch-muted">Kode kelas <b class="ch-mono">' + esc(c.code) + '</b> — murid memasukkannya di tab Kelas ▸ Kelas Saya. Setelah itu tugasmu masuk ke lonceng mereka dan hasilnya kembali ke sini.</p>' +
       '<div class="ch-kpis"><div class="ch-kpi"><b>' + stt.total + '</b><span>murid</span></div><div class="ch-kpi"><b>' + stt.active7 + '</b><span>aktif 7 hari</span></div><div class="ch-kpi"><b>' + pct(stt.avgAcc) + '</b><span>akurasi</span></div><div class="ch-kpi"><b>' + stt.openAssignments + '</b><span>tugas terbuka</span></div></div>' +
       '<div class="ch-actions"><button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="add-students" data-testid="tclass-add-students">' + icon('user-plus') + ' ' + t('kelas.tambah-murid', 'Tambah murid') + '</button><button type="button" class="tg-btn is-ghost" data-tg="sync" data-testid="tclass-sync">' + icon('refresh-cw') + ' Sinkron</button><button type="button" class="tg-btn is-ghost" data-tg="copy" data-text="' + esc(c.code) + '">' + icon('copy') + ' Salin kode</button><button type="button" class="tg-btn is-ghost" data-ch="ttab" data-tab="buat">' + icon('plus') + ' ' + t('kelas.buat-tugas', 'Buat tugas') + '</button></div></section>' +
+      pendingCard(c) +
       '<section><h3 class="ch-h2">' + t('umum.murid', 'Murid') + ' <small>' + c.students.length + '</small></h3>' + (c.students.length ? '<div class="ch-students">' + c.students.map(function (s) { var r = TS.risk(c, s), pend = TS.pendingAssignments(c, s), d = TS.daysSince(s.lastActiveAt); return '<button type="button" class="ch-card ch-student" data-tg="drawer" data-id="' + esc(s.id) + '" data-testid="tclass-student-' + esc(s.id) + '"><b>' + esc(s.name) + '</b><small>' + (d == null ? 'belum pernah aktif' : d === 0 ? 'aktif hari ini' : 'aktif ' + d + ' hari lalu') + '</small><span class="ch-row"><span class="ch-status is-' + (r.level === 'aman' ? 'selesai' : r.level === 'risiko' ? 'terlambat' : 'sedang') + '">' + esc(r.level === 'aman' ? 'Aman' : r.level === 'risiko' ? 'Berisiko' : 'Pantau') + '</span>' + (pend.length ? '<small>' + pend.length + ' tugas tertunda</small>' : '') + '</span></button>'; }).join('') + '</div>' : '<p class="ch-muted">' + t('kelas.belum-ada-murid', 'Belum ada murid. Tambahkan nama, atau biarkan murid bergabung sendiri lewat kode kelas.') + '</p>') + '</section></div>';
   }
   function itemList(a) { return a.itemIds.map(function (id, i) { var q = resolveItem(a, id); if (!q) return '<li class="ch-muted">Soal ' + (i + 1) + ' (' + esc(id) + ') tidak dapat ditampilkan.</li>'; var custom = (a.items || []).some(function (x) { return x.id === id; }); return '<li><p class="ch-muted">Soal ' + (i + 1) + ' · ' + esc(skillLabel(q.skill)) + ' · ' + (custom ? 'soal guru' : 'bank FIEZEL') + '</p>' + (q.context ? '<p class="ch-context">' + esc(q.context) + '</p>' : '') + '<b>' + esc(q.prompt) + '</b><ol class="ch-opts-inline">' + q.options.map(function (o, j) { return '<li class="' + (j === q.answer ? 'is-key' : '') + '">' + esc(o) + '</li>'; }).join('') + '</ol></li>'; }).join(''); }
@@ -224,9 +393,9 @@
         var sc = statusCounts(c, a), open = tUi.expand === a.id, sentAll = a.sent && a.sent.all;
         return '<article class="ch-card ch-assign' + (a.mode === 'ujian' ? ' is-exam' : '') + '" data-testid="tclass-assign-' + esc(a.id) + '"><div class="ch-card-top"><div><p class="ch-kicker">' + (a.mode === 'ujian' ? 'Ujian mini · ' + a.timer + ' mnt' : 'Latihan · ±' + a.minutes + ' mnt') + ' · ' + (a.source === 'tulis' ? 'soal guru' : a.source === 'impor' ? 'soal impor' : a.items && a.items.length ? 'campuran' : 'bank FIEZEL') + (a.review ? ' · Braincore ' + a.review.ready + '/' + a.review.count + ' siap' : '') + '</p><h3>' + esc(a.title) + '</h3></div><span class="ch-deadline' + (a.deadline && a.deadline < today() && sc.selesai < sc.total ? ' is-late' : '') + '">' + icon('calendar') + ' ' + esc(a.deadline ? 'Tenggat ' + fmtDate(a.deadline) : 'Tanpa tenggat') + '</span></div>' +
           '<p class="ch-muted">' + a.skills.map(skillLabel).join(' + ') + ' · ' + a.itemIds.length + ' soal · ' + (a.targets ? sc.total + ' murid terpilih' : 'seluruh kelas') + (sentAll ? ' · terkirim ' + esc(fmtDate(sentAll)) : ' · <b>belum dikirim</b>') + '</p>' +
-          '<div class="ch-status-row" data-testid="tclass-status-' + esc(a.id) + '"><span class="ch-status is-belum">' + sc.belum + ' belum mulai</span><span class="ch-status is-sedang">' + sc.sedang + ' mengerjakan</span><span class="ch-status is-selesai">' + sc.selesai + ' selesai</span><span class="ch-status is-terlambat">' + sc.terlambat + ' terlambat</span></div>' +
+          '<div class="ch-status-row" data-testid="tclass-status-' + esc(a.id) + '"><span class="ch-status is-belum">' + sc.belum + ' belum mulai</span><span class="ch-status is-sedang">' + sc.sedang + ' mengerjakan</span><span class="ch-status is-selesai">' + sc.selesai + ' selesai</span><span class="ch-status is-terlambat">' + sc.terlambat + ' terlambat</span>' + (focusCount(c, a) ? '<span class="ch-focus is-berat" data-testid="tclass-focus-count-' + esc(a.id) + '">' + icon('eye-off') + ' ' + focusCount(c, a) + ' keluar layar</span>' : '') + '</div>' +
           '<div class="ch-actions"><button type="button" class="tg-btn is-small is-primary" data-tg="send-assign" data-id="' + esc(a.id) + '" data-testid="tclass-send-' + esc(a.id) + '">' + icon('send') + (sentAll ? ' Kirim ulang' : ' ' + t('kelas.kirim-ke-murid', 'Kirim ke murid')) + '</button><button type="button" class="tg-btn is-small is-ghost" data-ch="expand" data-id="' + esc(a.id) + '" data-testid="tclass-expand-' + esc(a.id) + '">' + icon(open ? 'chevron-up' : 'list-checks') + (open ? ' ' + t('umum.tutup', 'Tutup') : ' ' + t('kelas.status-murid-soal', 'Status murid & soal')) + '</button><button type="button" class="tg-btn is-small is-ghost" data-ch="result" data-id="' + esc(a.id) + '">' + icon('bar-chart-3') + ' Hasil</button><button type="button" class="tg-btn is-small is-ghost" data-tg="modal" data-kind="share-assign" data-id="' + esc(a.id) + '">' + icon('qr-code') + ' Kode</button></div>' +
-          (open ? '<div class="ch-expand"><h4>' + t('kelas.status-per-murid', 'Status per murid') + '</h4><ul class="ch-mini-list">' + c.students.filter(function (s) { return TS.targeted(a, s); }).map(function (s) { var st = statusOf(a, studentRec(a, s)), d = a.done && a.done[s.id]; return '<li><span class="ch-grow">' + esc(s.name) + '</span>' + statusChip(st) + (d ? '<b>' + pct(d.acc) + '</b>' : '<button type="button" class="tg-btn is-small is-ghost" data-tg="send-assign" data-id="' + esc(a.id) + '" data-sid="' + esc(s.id) + '">' + icon('send') + '</button>') + '</li>'; }).join('') + '</ul><h4>' + t('kelas.soal-persis', 'Soal persis yang diterima murid') + '</h4><ol class="ch-item-list" data-testid="tclass-items-' + esc(a.id) + '">' + itemList(a) + '</ol></div>' : '') + '</article>';
+          (open ? '<div class="ch-expand"><h4>' + t('kelas.status-per-murid', 'Status per murid') + '</h4><ul class="ch-mini-list">' + c.students.filter(function (s) { return TS.targeted(a, s); }).map(function (s) { var st = statusOf(a, studentRec(a, s)), d = a.done && a.done[s.id]; return '<li><span class="ch-grow">' + esc(s.name) + '</span>' + focusChip(a, s) + statusChip(st) + (d ? '<b>' + pct(d.acc) + '</b>' : '<button type="button" class="tg-btn is-small is-ghost" data-tg="send-assign" data-id="' + esc(a.id) + '" data-sid="' + esc(s.id) + '">' + icon('send') + '</button>') + '</li>'; }).join('') + '</ul><h4>' + t('kelas.soal-persis', 'Soal persis yang diterima murid') + '</h4><ol class="ch-item-list" data-testid="tclass-items-' + esc(a.id) + '">' + itemList(a) + '</ol></div>' : '') + '</article>';
       }).join('') : '<section class="ch-card ch-empty">' + icon('clipboard-list') + '<p>' + t('kelas.belum-ada-tugas', 'Belum ada tugas. Susun dari bank FIEZEL, tulis sendiri, atau impor — Braincore meninjau sebelum dikirim.') + '</p></section>') + '</div>';
   }
   // ---- Buat tugas: 3 langkah (Sumber → Tinjauan Braincore → Kirim) ----------------------------
@@ -324,6 +493,20 @@
     var act = b.getAttribute('data-ch'), id = b.getAttribute('data-id'), i = Number(b.getAttribute('data-i')), c = env.cls(), d;
     switch (act) {
       case 'ttab': tUi.tab = b.getAttribute('data-tab'); break;
+      case 'join-accept': {
+        if (!c) return;
+        var nm = b.getAttribute('data-name');
+        T().acceptJoin(c, nm);
+        env.persist();
+        if (env.toast) env.toast(t('kelas.gabung-diterima', '{nama} ditambahkan ke {kelas}. Tugas berikutnya ikut terkirim ke dia.').replace('{nama}', nm).replace('{kelas}', c.name));
+        break;
+      }
+      case 'join-reject': {
+        if (!c) return;
+        T().rejectJoin(c, b.getAttribute('data-name'));
+        env.persist();
+        break;
+      }
       case 'expand': tUi.expand = tUi.expand === id ? null : id; break;
       case 'result': tUi.resultId = id; tUi.tab = 'hasil'; break;
       case 'source': d = draft(c); syncDraftForm(b.closest('form'), d); d.source = b.getAttribute('data-source'); if (d.source !== 'bank') d.skills = d.skills.slice(0, 1); break;
@@ -363,5 +546,5 @@
     if (field === 'prompt') q.prompt = t.value; else if (field === 'answer') q.answer = Number(t.value); else if (field === 'opt') q.options[Number(t.getAttribute('data-j'))] = t.value;
   }
 
-  root.FiezelClassHub = { mountStudent: mountStudent, unmountStudent: unmountStudent, renderStudent: renderStudent, openAssignment: openAssignment, mountTeacher: mountTeacher, SUB_KEY: SUB_KEY, _teacherUi: function () { return tUi; }, _studentUi: ui };
+  root.FiezelClassHub = { mountStudent: mountStudent, unmountStudent: unmountStudent, renderStudent: renderStudent, openAssignment: openAssignment, mountTeacher: mountTeacher, SUB_KEY: SUB_KEY, _teacherUi: function () { return tUi; }, _studentUi: ui, _focusEvents: function () { return focusBound; } };
 })(typeof window !== 'undefined' ? window : null);

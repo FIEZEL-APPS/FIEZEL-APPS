@@ -16,7 +16,7 @@ self.FIEZEL_REQUIRE_NOTIFICATIONS=false;
 // m025-61: penanda build halaman, dipakai health check untuk membandingkan versi yang
 // benar-benar dimuat dengan shell yang dipegang service worker. Nilainya dijaga gate agar
 // selalu sama dengan DIAG_BUILD; kalau keduanya berbeda, install-health-test gagal.
-self.FIEZEL_PAGE_BUILD='m025-270';
+self.FIEZEL_PAGE_BUILD='m025-275';
 // m025-150 profil suara ElevenLabs untuk sisi klien.
 //
 // Isinya sengaja hanya penanda, BUKAN rahasia apa pun: kunci API ElevenLabs hidup di
@@ -144,6 +144,21 @@ self.FIEZEL_CF_CONFIG=Object.freeze({
   enabled:true,
   base:'https://api.fiezel.my.id',
   endpoints:Object.freeze({health:'off',config:'on',auth:'off',quota:'off',ai:'off',tts:'off',usage:'on'})
+});
+// ── MASUK DENGAN GOOGLE (m025-269) ────────────────────────────────────────────────────
+//
+// `clientId` BUKAN rahasia dan tempatnya memang di berkas yang terkirim ke browser: ia ikut
+// setiap permintaan yang menggambar tombol Google, jadi menyembunyikannya tidak mungkin dan
+// tidak ada gunanya. Yang rahasia adalah client SECRET — dan alur yang dipakai FIEZEL (ID
+// token, bukan authorization code) tidak memakainya sama sekali, sehingga tidak ada satu pun
+// nilai rahasia yang perlu hidup di repo ini atau di perangkat murid.
+//
+// `enabled:false` (atau clientId kosong) = tombolnya tidak digambar sama sekali dan formulir
+// akun FIEZEL berdiri sendiri. Itu jalur mati yang AMAN, bukan jalur setengah hidup: modul
+// `features/auth/fiezel-google.js` memeriksa nilai ini sebelum menyentuh apa pun milik Google.
+self.FIEZEL_GOOGLE_AUTH=Object.freeze({
+  enabled:true,
+  clientId:'1084250087-hvfdttommi8gnkguc5rlqidpkiptopf0.apps.googleusercontent.com'
 });
 // ── KILL SWITCH SERVER: parameter pengambil `GET /api/config` (m031-killswitch) ────────
 //
