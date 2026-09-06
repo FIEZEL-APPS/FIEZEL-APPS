@@ -1,7 +1,7 @@
 {
-  "version": "m025-279",
-  "claimedBy": "branch claude/japanese-course-n5",
-  "claimedAt": "2026-09-06T16:39:33.293Z",
-  "reason": "Graf keluarga brain bisa diganti bahasa (langkah 1 kursus Jepang)",
+  "version": "m025-278",
+  "claimedBy": "branch claude/th-redesign-copy-dlz1d4",
+  "claimedAt": "2026-09-06T12:53:13.289Z",
+  "reason": "m025-278: BANKOR menyala di latihan mandiri murid",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
