@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-06T18:44:26.116Z",
+  "updated": "2026-09-06T19:46:35.110Z",
   "active": [
     {
       "sesi": "ses_0034e69d3ffes3kjiFLNDzYXUZ",
@@ -107,14 +107,14 @@
       "catatan": "Langkah 2 kursus Jepang: kunci penyimpanan per bahasa. Kunci Inggris identik byte per byte; modul off di manifest karena belum ada pemanggil."
     },
     {
-      "sesi": "claude-code-fix-th-branding",
-      "peran": "claude-code / tutup kebocoran th rebranding",
+      "sesi": "claude-code-gerbang-konten-ja",
+      "peran": "claude-code / gerbang konten Jepang",
       "paths": [
-        "features/i18n/copy-id-feat-d.js",
-        "features/i18n/copy-th-feat-d.js"
+        "tests/japanese-content-test.js",
+        "docs/japanese/n5-a1-sample-templates.json"
       ],
-      "mulai": "2026-09-06T18:44:26Z",
-      "catatan": "Menyentuh juga app.js dan features/teacher/fiezel-teacher-shell.js (dua baris merek), id-golden-baseline."
+      "mulai": "2026-09-06T19:46:35Z",
+      "catatan": "Langkah 3: gerbang skema+pengecoh+concept. Nol byte produksi."
     }
   ],
   "finished": [
@@ -356,6 +356,18 @@
       "catatan": "Normalisasi dua berkas kosakata milik owner jadi satu bank JSON per tingkat JLPT. Nol byte produksi.",
       "selesai": "2026-09-06T18:09:26Z",
       "hasil": "Mendarat lewat PR #374."
+    },
+    {
+      "sesi": "claude-code-fix-th-branding",
+      "peran": "claude-code / tutup kebocoran th rebranding",
+      "paths": [
+        "features/i18n/copy-id-feat-d.js",
+        "features/i18n/copy-th-feat-d.js"
+      ],
+      "mulai": "2026-09-06T18:44:26Z",
+      "catatan": "Menyentuh juga app.js dan features/teacher/fiezel-teacher-shell.js (dua baris merek), id-golden-baseline.",
+      "selesai": "2026-09-06T19:46:35Z",
+      "hasil": "Mendarat lewat PR #381 (m025-282)."
     }
   ],
   "protocol": "coordination-claims-v1",
