@@ -139,3 +139,33 @@ seluruh copy-th lain di berkas ini. Wewenang tetap pada OWNER.
 
 Tidak berubah dari daftar di atas: label zona audio (8 kalimat), lencana prasasti (3),
 dan skenario listening (23).
+
+## m025-282 — kebocoran merek "KelasKu untuk Guru" ditutup
+
+Commit `4406515a` (rebranding + landing page baru) didorong **langsung ke main**, bukan
+lewat PR, jadi tidak ada gerbang yang menahannya sebelum mendarat. Ia memasukkan `untuk
+Guru` ke tiga jalur render sekaligus dan memerahkan gerbang ini di `quality` — yang berarti
+**setiap PR siapa pun ikut merah** sampai ditutup.
+
+| Berkas | Tempat | Terlihat kapan |
+|---|---|---|
+| `features/teacher/fiezel-teacher-shell.js:317` | sidebar dashboard guru | setiap layar guru |
+| `features/teacher/fiezel-teacher-shell.js:326` | header dashboard guru | setiap layar guru |
+| `app.js` | kartu pintu guru di Home | layar Home murid/guru |
+
+Ditutup **lewat i18n, bukan lewat menaikkan anggaran**: menaikkan anggaran menyembunyikan
+kebocoran, tidak menutupnya. Dua kunci baru di pasangan `copy-id-feat-d` / `copy-th-feat-d`:
+
+- `guru.merek-tag` — id `untuk Guru`, th `สำหรับครู`
+- `guru.merek-penuh` — id `KelasKu untuk Guru`, th `KelasKu สำหรับครู`
+
+**`KelasKu` sengaja TIDAK diterjemahkan** — itu nama merek, bukan naskah. Yang berbahasa
+hanya taglinenya. Naskah Thai berstatus DRAFT AI dan wajib review penutur asli, sama seperti
+seluruh copy-th lain.
+
+`id-golden-baseline` diregenerate di commit yang sama; selisihnya diperiksa lebih dulu —
+hanya dua fragmen merek yang berubah, **nol kalimat murid hilang**.
+
+### Yang masih terbuka sesudah ini
+
+Tidak berubah: label zona audio (8 kalimat), lencana prasasti (3), skenario listening (23).

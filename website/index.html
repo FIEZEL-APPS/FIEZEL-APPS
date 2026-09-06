@@ -1,806 +1,419 @@
 <!DOCTYPE html>
-<!-- FIEZEL Landing Page — Next-Generation Redesign v2.0
-     - Preserves 100% of the LOCKED legacy hero assets: original iPhone mockup + original Hawaiian PAW mascot with complete SVG & motion choreography + orbits + solar sparks.
-     - Realistic Apple MacBook Pro mockup with authentic FaceTime notch, unibody aluminum chassis, hinge slit, and thumb scoop.
-     - ACTUAL SCREENSHOT of the real FIEZEL KelasKu untuk Guru Teacher Dashboard (assets/shots/teacher-desktop.png) inside the MacBook display.
-     - Completely redesigned, gorgeous Teacher Mascot (MIRA) positioned BEHIND the laptop screen with chin resting on both hands atop the bezel.
-     - Continuous, lifelike CSS animations: breathing bob, automatic eyelid blinking, and attentive head micro-glances.
-     - Full Indonesian (ID) & Thai (TH) localization with instant switcher and verified visual parity. -->
-<html lang="id" data-locale="id" class="anim">
+<html lang="id" data-music="assets/music/ambient.mp3?v=20260903-joyclean02">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#FFF9EE">
-  <title>FIEZEL — Platform Belajar Bahasa Cerdas untuk Murid &amp; Guru</title>
-  <meta name="description" content="FIEZEL adalah platform belajar bahasa cerdas dan adaptif. Bahasa Inggris &amp; Jepang. Vocabulary, Grammar, Reading, Listening, Speaking. AI Tutor &amp; Teacher Dashboard.">
-  <meta property="og:title" content="FIEZEL — Learning That Learns You.">
-  <meta property="og:description" content="Platform belajar bahasa cerdas untuk murid &amp; guru. Bahasa Inggris &amp; Jepang, adaptif, dengan AI tutor.">
-  <meta property="og:image" content="assets/shots/teacher-desktop.png">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FIEZEL — Ruang Belajar Bahasa Inggris Personal, Gratis</title>
+<meta name="description" content="180 grammar lesson, 2.440 kosakata, 312 bacaan berjenjang, dan latihan speaking–listening. Dipetakan ke tingkat CEFR A1–C2. Gratis, tanpa langganan.">
+<meta name="theme-color" content="#FFF9EE">
+<link rel="icon" href="assets/brand/fiezel-icon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/brand/fiezel-icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/brand/fiezel-icon-192.png">
+<!-- AI-15-F04 (W3-WEB): hreflang timbal-balik id/th; x-default = halaman id yang sudah terindeks. Konten Indonesia tidak diubah. -->
+<link rel="alternate" hreflang="id" href="https://fiezel.my.id/">
+<link rel="alternate" hreflang="th" href="https://fiezel.my.id/th/">
+<link rel="alternate" hreflang="x-default" href="https://fiezel.my.id/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="id_ID">
+<meta property="og:site_name" content="FIEZEL">
+<meta property="og:title" content="FIEZEL — Ruang Belajar Bahasa Inggris Personal">
+<meta property="og:description" content="Belajar grammar, kosakata, reading, speaking, dan listening dalam satu aplikasi gratis yang bisa dipasang ke layar utama.">
+<!-- AI-15-F08 (W3-WEB): og:image/twitter:image wajib URL absolut — scraper OG (LINE/WhatsApp/FB) tidak me-resolve path relatif. -->
+<meta property="og:image" content="https://fiezel.my.id/assets/shots/home-desktop.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="FIEZEL — Ruang Belajar Bahasa Inggris Personal">
+<meta name="twitter:description" content="Belajar grammar, kosakata, reading, speaking, dan listening dalam satu aplikasi gratis yang bisa dipasang ke layar utama.">
+<meta name="twitter:image" content="https://fiezel.my.id/assets/shots/home-desktop.png">
+<link rel="preload" href="assets/fonts/PlusJakartaSans-700.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/PlusJakartaSans-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="tokens.css?v=20260903-hula02">
+<link rel="stylesheet" href="style.css?v=20260903-hula02">
+<link rel="stylesheet" href="assets/mascot/fiezel-motion.css?v=20260903-hula02">
+<script>if(!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches))document.documentElement.className+=' anim';</script>
+<!-- m026 GEO: pengunjung dari Thailand yang BELUM memilih bahasa manual diarahkan otomatis ke /th/.
+     Pilihan manual (localStorage fiezel-site-locale) SELALU menang. Gagal/timeout/offline = tetap
+     di halaman Indonesia (fail-soft, tidak memblokir). 'th' tersimpan -> alihkan instan tanpa fetch. -->
+<script>(function(){try{
+  var KEY='fiezel-site-locale',saved=null;
+  try{saved=localStorage.getItem(KEY)}catch(_){}
+  if(saved==='id')return;
+  if(saved==='th'){location.replace('th/');return;}
+  if(typeof fetch!=='function')return;
+  var ctrl=('AbortController' in window)?new AbortController():null;
+  var timer=setTimeout(function(){try{ctrl&&ctrl.abort()}catch(_){}}, 2000);
+  fetch('https://ipwho.is/?fields=success,country_code', ctrl?{signal:ctrl.signal}:{})
+    .then(function(r){return (r&&r.ok)?r.json():null})
+    .then(function(d){clearTimeout(timer);
+      if(d&&d.success!==false&&d.country_code==='TH'){try{localStorage.setItem(KEY,'th')}catch(_){}location.replace('th/');}
+    })
+    .catch(function(){try{clearTimeout(timer)}catch(_){}});
+}catch(_){}})();</script>
 
-  
-  <link rel="icon" href="assets/brand/fiezel-icon.svg" type="image/svg+xml">
-  <link rel="icon" href="assets/brand/fiezel-icon-192.png" type="image/png">
-  <link rel="apple-touch-icon" href="assets/brand/fiezel-icon-192.png">
-  <link rel="alternate" hreflang="id" href="https://fiezel.my.id/">
-  <link rel="alternate" hreflang="th" href="https://fiezel.my.id/th/">
-  <link rel="alternate" hreflang="x-default" href="https://fiezel.my.id/">
-  <meta property="og:type" content="website">
-  <meta property="og:locale" content="id_ID">
-  <meta property="og:site_name" content="FIEZEL">
-  <meta property="og:title" content="FIEZEL — Platform Belajar Bahasa Cerdas untuk Murid & Guru">
-  <meta property="og:description" content="Platform belajar adaptif untuk murid (Bahasa Inggris & Jepang) dan KelasKu untuk Guru (manajemen kelas & analitik cerdas). Gratis.">
-  <meta property="og:image" content="https://fiezel.my.id/assets/shots/landing-hero-review.png">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="FIEZEL — Platform Belajar Bahasa Cerdas untuk Murid & Guru">
-  <meta name="twitter:description" content="Platform belajar adaptif untuk murid (Bahasa Inggris & Jepang) dan KelasKu untuk Guru (manajemen kelas & analitik cerdas). Gratis.">
-  <meta name="twitter:image" content="https://fiezel.my.id/assets/shots/landing-hero-review.png">
+<style>
+  /* Wordmark KelasKu untuk Guru — Satu baris horizontal ketat */
+  .kelasku-brand {
+    display: inline-flex !important;
+    align-items: baseline !important;
+    gap: 8px !important;
+    white-space: nowrap !important;
+    vertical-align: baseline !important;
+  }
+  .kelasku-main {
+    font-weight: 800 !important;
+    letter-spacing: -0.02em !important;
+    line-height: 1 !important;
+  }
+  .kelasku-tag {
+    font-weight: 600 !important;
+    font-size: 0.68em !important;
+    opacity: 0.88 !important;
+    letter-spacing: -0.01em !important;
+    line-height: 1 !important;
+  }
 
-  <!-- Preload fonts & assets -->
-  <link rel="preload" href="assets/fonts/PlusJakartaSans-700.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="assets/fonts/PlusJakartaSans-400.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="assets/shots/home-mobile.png" as="image">
-  <link rel="preload" href="assets/shots/teacher-desktop.png" as="image">
+  /* Dual Ecosystem Stage in Hero */
+  .hero-dual-stage {
+    display: grid;
+    grid-template-columns: minmax(320px, 1fr) minmax(340px, 1.25fr);
+    gap: 32px;
+    align-items: center;
+    max-width: 1240px;
+    margin: 24px auto 0;
+    padding: 0 16px;
+    position: relative;
+    z-index: 2;
+  }
 
-  <style>
-    /* =====================================================================
-       FIEZEL DESIGN TOKENS (Tokens matching style.css & tokens.css)
-       ===================================================================== */
-    @font-face {
-      font-family: 'FZ Plus Jakarta Sans';
-      src: url('assets/fonts/PlusJakartaSans-400.woff2') format('woff2');
-      font-weight: 400; font-style: normal; font-display: swap;
-    }
-    @font-face {
-      font-family: 'FZ Plus Jakarta Sans';
-      src: url('assets/fonts/PlusJakartaSans-700.woff2') format('woff2');
-      font-weight: 700; font-style: normal; font-display: swap;
-    }
+  /* Left Side: Student Showcase wrapper */
+  .stage-student {
+    position: relative;
+    width: 100%;
+    overflow: visible;
+  }
+  /* Preserve 100% of the original .showcase behavior */
+  .stage-student .showcase {
+    margin-top: 0;
+    min-height: clamp(340px, 48vh, 460px);
+  }
 
-    :root {
-      --bg: #FFF9EE;
-      --cream: #FFF9EE;
-      --cream-warm: #FFF4DA;
-      --panel: #FFFFFF;
-      --panel-soft: #FFF3DC;
-      --line: #F0E4CF;
-      --line-soft: #F7EFDF;
-      --text: #241A11;
-      --body: #4A3A28;
-      --muted: #6E5E47;
-      --maroon: #8C2233;
-      --maroon-deep: #5A1420;
-      --maroon-line: rgba(140,34,51,0.18);
-      --maroon-line-strong: rgba(140,34,51,0.32);
-      --sun: #FFC700;
-      --sun-deep: #E6A800;
-      --sun-soft: #FFF3C4;
-      --gold: #C9A24B;
-      --gold-line: rgba(201,162,75,0.38);
-      --gold-line-soft: rgba(201,162,75,0.2);
-      --green: #2E8B69;
-      --green-soft: #E9F7F0;
-      --tg-ink: #12211F;
-      --tg-paper: #F3EFE6;
-      --tg-sage: #1F7A63;
-      --tg-sage-soft: #DDEFE7;
-      --tg-amber: #D98E1F;
-      --tg-mist: #A9C4BC;
-      --radius-lg: 24px;
-      --radius-md: 16px;
-      --radius-sm: 12px;
-      --radius-pill: 999px;
-      --shadow-sm: 0 2px 10px rgba(36,26,17,.06);
-      --shadow-md: 0 10px 30px rgba(36,26,17,.09);
-      --shadow-lg: 0 24px 60px rgba(36,26,17,.15);
-      --ease: cubic-bezier(.22,.8,.28,1);
-      --ease-spring: cubic-bezier(.34,1.4,.4,1);
-      --fz-font: 'FZ Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    }
+  /* Right Side: Teacher MacBook Showcase wrapper */
+  .stage-teacher {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding-top: 50px; /* space for Mira behind screen */
+  }
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--fz-font);
-      line-height: 1.55;
-      -webkit-font-smoothing: antialiased;
-      overflow-x: hidden;
-    }
-    ::selection { background: var(--sun); color: var(--text); }
+  /* Accurate Apple MacBook Pro Mockup */
+  .mac-container {
+    position: relative;
+    width: 100%;
+    max-width: 560px;
+    margin: 0 auto;
+    filter: drop-shadow(0 24px 48px rgba(36,26,17,0.18));
+  }
 
-    
-    /* Credit strip */
-    .credit-strip {
-      background: var(--cream-warm);
-      color: var(--maroon);
-      border-bottom: 1px solid var(--gold-line-soft);
-      padding: 4px 16px;
-      margin: -12px -28px 10px -28px;
-    }
-    .credit-in {
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      min-height: 26px; font-size: 0.72rem; letter-spacing: .12em; text-transform: uppercase;
-      flex-wrap: nowrap; white-space: nowrap;
-    }
-    .credit-ig {
-      display: inline-flex; align-items: center; gap: 6px; padding: 2px 8px; border-radius: var(--radius-pill);
-      color: var(--maroon); text-decoration: none; font-weight: 700; transition: transform .18s ease;
-    }
-    .credit-ig:hover { transform: scale(1.05); }
-    .credit-ig svg { width: 14px; height: 14px; flex-shrink: 0; }
-    .credit-ig strong { color: var(--maroon-deep); }
-    @media (max-width: 720px) {
-      .credit-strip { margin: -12px -16px 8px -16px; }
-    }
+  /* Teacher Mascot (MIRA) — Situated strictly BEHIND the laptop lid */
+  .mira-teacher-wrapper {
+    position: absolute;
+    top: -95px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 220px;
+    height: 140px;
+    z-index: 1; /* Behind lid (z-index 2) */
+    pointer-events: none;
+  }
+  .mira-svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
 
-    /* =====================================================================
-       TOPBAR NAVIGATION
-       ===================================================================== */
-    .topbar {
-      position: sticky; top: 0; z-index: 1000;
-      background: rgba(255, 249, 238, 0.92);
-      backdrop-filter: blur(18px) saturate(180%);
-      -webkit-backdrop-filter: blur(18px) saturate(180%);
-      border-bottom: 1px solid var(--line);
-      padding: 12px 28px;
-    }
-    .topbar-in {
-      max-width: 1240px; margin: 0 auto;
-      display: flex; align-items: center; justify-content: space-between; gap: 16px;
-    }
-    .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); }
-    .brand-icon { width: 28px; height: 28px; color: var(--maroon); }
-    .brand-word { height: 24px; width: auto; color: var(--text); display: block; }
-    .topnav { display: flex; align-items: center; gap: 12px; }
-    .nav-link {
-      font-size: .88rem; font-weight: 700; color: var(--muted); text-decoration: none;
-      padding: 7px 14px; border-radius: var(--radius-sm);
-      transition: color .2s, background-color .2s;
-    }
-    .nav-link:hover { color: var(--text); background: rgba(36,26,17,.05); }
-    .nav-link.is-teacher { color: var(--tg-sage); }
-    .nav-link.is-teacher:hover { background: var(--tg-sage-soft); }
-    .lang-switcher {
-      display: inline-flex; align-items: center; gap: 3px;
-      background: var(--panel); border: 1px solid var(--line);
-      border-radius: var(--radius-pill); padding: 3px;
-    }
-    .lang-btn {
-      padding: 4px 11px; border-radius: var(--radius-pill); border: 0;
-      font: inherit; font-size: .78rem; font-weight: 700; cursor: pointer;
-      color: var(--muted); background: transparent; transition: all .2s;
-    }
-    .lang-btn.active { background: var(--maroon); color: #fff; }
-    .btn {
-      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-      padding: 11px 22px; border-radius: var(--radius-pill);
-      font-size: .92rem; font-weight: 700; text-decoration: none; border: 0; cursor: pointer;
-      transition: transform .18s var(--ease), box-shadow .18s var(--ease), background .18s;
-    }
-    .btn-primary {
-      background: var(--sun); color: var(--text);
-      box-shadow: 0 4px 0 var(--sun-deep), var(--shadow-sm);
-    }
-    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 0 var(--sun-deep), var(--shadow-md); }
-    .btn-primary:active { transform: translateY(1px); box-shadow: 0 2px 0 var(--sun-deep); }
-    .btn-teacher {
-      background: var(--tg-sage); color: #fff;
-      box-shadow: 0 4px 0 #166052, var(--shadow-sm);
-    }
-    .btn-teacher:hover { transform: translateY(-2px); box-shadow: 0 6px 0 #166052, var(--shadow-md); }
-    .btn-ghost {
-      background: var(--panel); color: var(--text); border: 1.5px solid var(--line);
-      box-shadow: 0 3px 0 var(--line);
-    }
-    .btn-ghost:hover { transform: translateY(-2px); border-color: var(--gold); }
+  /* Animations for MIRA */
+  .anim .mira-teacher-wrapper {
+    animation: miraBreathing 4.8s ease-in-out infinite;
+  }
+  @keyframes miraBreathing {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(-5px); }
+  }
 
-    /* Reusable Wordmark: KelasKu untuk Guru */
-    .kelasku-brand { display: inline-flex; align-items: baseline; gap: 7px; white-space: nowrap; line-height: 1; }
-    .kelasku-main { font-family: var(--fz-font); font-weight: 700; color: #0F224A; letter-spacing: -0.02em; }
-    .kelasku-tag { font-family: var(--fz-font); font-size: 0.62em; font-weight: 500; color: #5B6B82; letter-spacing: 0.01em; text-transform: none; }
-    .btn-teacher .kelasku-main { color: #FFFFFF; }
-    .btn-teacher .kelasku-tag { color: rgba(255,255,255,0.85); }
+  .anim .mira-anim-head {
+    transform-origin: 110px 105px;
+    animation: miraHeadGlance 9s ease-in-out infinite;
+  }
+  @keyframes miraHeadGlance {
+    0%, 35%, 65%, 100% { transform: rotate(0deg); }
+    40%, 60% { transform: rotate(2.5deg); }
+    70%, 90% { transform: rotate(-2deg); }
+  }
 
-    /* =====================================================================
-       HERO STAGE
-       ===================================================================== */
-    .hero {
-      position: relative;
-      padding: 48px 24px 60px;
-      background: radial-gradient(ellipse 90% 60% at 50% -10%, #FFE9B8 0%, rgba(255,249,238,0) 75%);
-      overflow: hidden;
-    }
-    .hero-header {
-      max-width: 820px; margin: 0 auto 40px; text-align: center;
-    }
-    .hero-kicker {
-      display: inline-flex; align-items: center; gap: 8px;
-      font-size: .78rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase;
-      color: var(--maroon); margin-bottom: 12px;
-    }
-    .kicker-dot {
-      width: 7px; height: 7px; border-radius: 50%; background: var(--sun-deep);
-      animation: pulseDot 2s infinite ease-in-out;
-    }
-    @keyframes pulseDot { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.4); opacity: .6; } }
-    .hero-title {
-      font-size: clamp(2.3rem, 5.5vw, 3.8rem);
-      font-weight: 800; line-height: 1.12; letter-spacing: -.03em;
-      color: var(--text); margin-bottom: 16px;
-    }
-    .hero-title em { font-style: normal; color: var(--maroon); }
-    .hero-desc {
-      font-size: clamp(1.05rem, 2.2vw, 1.25rem);
-      color: var(--muted); max-width: 58ch; margin: 0 auto 28px; line-height: 1.6;
-    }
-    .hero-cta-row {
-      display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; margin-bottom: 24px;
-    }
-    .hero-badges {
-      display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap;
-    }
-    .lang-badge {
-      display: inline-flex; align-items: center; gap: 7px;
-      background: var(--panel); border: 1.5px solid var(--line);
-      border-radius: var(--radius-pill); padding: 5px 14px;
-      font-size: .84rem; font-weight: 700; color: var(--text); box-shadow: var(--shadow-sm);
-    }
+  .anim .mira-eyelid {
+    animation: miraBlink 5.2s infinite;
+  }
+  @keyframes miraBlink {
+    0%, 46%, 50%, 96%, 100% { transform: scaleY(1); }
+    48%, 98% { transform: scaleY(0.08); }
+  }
+  .mira-eyelid {
+    transform-origin: center 80px;
+  }
 
-    /* =====================================================================
-       DUAL-ECOSYSTEM HERO STAGE (STUDENT + TEACHER)
-       ===================================================================== */
-    .hero-stage {
-      max-width: 1200px; margin: 20px auto 0;
-      display: grid;
-      grid-template-columns: minmax(360px, 460px) minmax(480px, 680px);
-      align-items: flex-end;
-      justify-content: center;
-      gap: 32px;
-      position: relative;
-    }
+  /* MacBook Screen Lid */
+  .mac-lid {
+    position: relative;
+    z-index: 2; /* In front of Mira's body */
+    background: #0B0C0E;
+    border-radius: 16px 16px 0 0;
+    padding: 10px 10px 0 10px;
+    box-shadow:
+      inset 0 0 0 1.5px #A1A5A9,
+      inset 0 0 0 3px #1F2226,
+      0 -2px 8px rgba(0,0,0,0.15);
+  }
+  .mac-screen {
+    position: relative;
+    background: #0D1117;
+    border-radius: 9px 9px 0 0;
+    overflow: hidden;
+    aspect-ratio: 16 / 10;
+    border: 1px solid #1c2024;
+  }
+  .mac-screen img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    display: block;
+  }
 
-    /* ---------------------------------------------------------------------
-       LEFT: LOCKED LEGACY HERO ASSET (iPhone + PAW Mascot + Orbits)
-       100% UNTOUCHED GEOMETRY & PROPORTIONS
-       --------------------------------------------------------------------- */
-    .student-cluster {
-      position: relative;
-      width: 100%;
-      height: 480px;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-    }
+  /* FaceTime Notch */
+  .mac-notch {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 72px;
+    height: 14px;
+    background: #0B0C0E;
+    border-radius: 0 0 7px 7px;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  }
+  .mac-camera {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #111B27;
+    border: 0.8px solid #203045;
+    position: relative;
+  }
+  .mac-camera::after {
+    content: '';
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    border-radius: 50%;
+    background: #2563EB;
+    top: 1px; left: 1px;
+    opacity: 0.75;
+  }
+  .mac-led {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: #22C55E;
+    opacity: 0.85;
+    box-shadow: 0 0 4px #22C55E;
+  }
 
-    /* Showcase effects (lines & orbits) */
-    .showcase-fx {
-      position: absolute; inset: 0; pointer-events: none; z-index: 1;
-    }
-    .fx-lines {
-      position: absolute; left: 50%; top: 50%; width: 440px; height: 440px;
-      transform: translate(-50%, -50%); overflow: visible; opacity: 0.65;
-    }
-    .fx-ring { fill: none; stroke: var(--gold-line-soft); stroke-width: 1; stroke-dasharray: 6 9; }
-    .fx-ring-1 { transform-origin: center; animation: fxSpin 80s linear infinite; }
-    .fx-ring-2 { transform-origin: center; animation: fxSpin 55s linear infinite reverse; }
-    @keyframes fxSpin { from { transform: rotate(0); } to { transform: rotate(360deg); } }
+  /* MacBook Keyboard Base */
+  .mac-base {
+    position: relative;
+    z-index: 3;
+    height: 14px;
+    background: linear-gradient(180deg, #D4D8DC 0%, #B8BCC0 35%, #9CA0A4 100%);
+    border-radius: 0 0 16px 16px;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.7),
+      0 4px 12px rgba(0,0,0,0.18);
+  }
+  .mac-hinge {
+    position: absolute;
+    top: 0; left: 12%; right: 12%;
+    height: 3px;
+    background: #2E3236;
+    border-radius: 0 0 2px 2px;
+  }
+  .mac-scoop {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 68px;
+    height: 5px;
+    background: #7B8085;
+    border-radius: 0 0 5px 5px;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.35);
+  }
 
-    .orbit {
-      position: absolute; left: 50%; top: 50%; width: 340px; height: 340px;
-      transform: translate(-50%, -50%);
-    }
-    .orbit-a { animation: fxOrbit 40s linear infinite; }
-    .orbit-b { animation: fxOrbit 32s linear infinite reverse; }
-    @keyframes fxOrbit { from { transform: translate(-50%, -50%) rotate(0); } to { transform: translate(-50%, -50%) rotate(360deg); } }
+  /* Badge caption under laptop */
+  .teacher-hero-meta {
+    margin-top: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .teacher-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: var(--cream-warm);
+    border: 1px solid var(--gold-line);
+    border-radius: var(--radius-pill);
+    padding: 6px 14px;
+    font-size: var(--fs-micro);
+    font-weight: 700;
+    color: var(--maroon-deep);
+    box-shadow: var(--shadow-sm);
+  }
+  .btn-teacher-hero {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: #1F7A63;
+    color: #FFFFFF !important;
+    padding: 9px 18px;
+    border-radius: var(--radius-pill);
+    font-size: var(--fs-micro);
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 3px 0 #145545, var(--shadow-sm);
+    transition: transform .18s var(--fz-out);
+  }
+  .btn-teacher-hero:hover {
+    transform: translateY(-2px);
+    background: #279478;
+    color: #FFFFFF !important;
+  }
+  .btn-teacher-hero .kelasku-brand {
+    color: #FFFFFF !important;
+  }
+  .btn-teacher-hero .kelasku-main {
+    color: #FFFFFF !important;
+  }
+  .btn-teacher-hero .kelasku-tag {
+    color: rgba(255,255,255,0.85) !important;
+  }
 
-    .orb {
-      position: absolute; display: inline-flex; align-items: center; gap: 6px;
-      padding: 5px 10px; border-radius: var(--radius-pill);
-      background: var(--cream-warm); border: 1px solid var(--maroon-line);
-      color: var(--maroon-deep); box-shadow: var(--shadow-sm);
-      font-size: .68rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
-      white-space: nowrap; transform: translate(-50%, -50%);
+  @media (max-width: 980px) {
+    .hero-dual-stage {
+      grid-template-columns: 1fr;
+      gap: 40px;
     }
-    .orb svg { width: 12px; height: 12px; color: var(--maroon); }
-    .orbit-a .orb { animation: fxUpright 40s linear infinite reverse; }
-    .orbit-b .orb { animation: fxUpright 32s linear infinite; }
-    @keyframes fxUpright { from { transform: translate(-50%, -50%) rotate(0); } to { transform: translate(-50%, -50%) rotate(360deg); } }
-    .orb-1 { left: 50%; top: 2%; }
-    .orb-2 { left: 92%; top: 68%; }
-    .orb-3 { left: 8%; top: 68%; }
-    .orb-4 { left: 50%; top: 98%; }
-    .orb-5 { left: 94%; top: 26%; }
-    .orb-6 { left: 6%; top: 26%; }
-
-    /* Phone device */
-    .device { position: relative; z-index: 2; margin-bottom: 20px; }
-    .phone-hero {
-      width: 196px; padding: 9px; background: var(--cream-warm);
-      border: 1px solid var(--maroon-line-strong); border-radius: 34px;
-      box-shadow: 0 20px 45px rgba(36,26,17,0.18);
-      animation: deviceFloat 7.4s ease-in-out infinite;
+    .stage-teacher {
+      padding-top: 40px;
     }
-    .phone-hero::before {
-      content: ""; position: absolute; top: 15px; left: 50%; transform: translateX(-50%);
-      width: 52px; height: 4px; border-radius: 99px; background: var(--maroon-line); z-index: 2;
+    .mac-container {
+      max-width: 480px;
     }
-    .phone-screen { overflow: hidden; border-radius: 26px; background: var(--cream); border: 1px solid var(--line-soft); }
-    .phone-screen img { width: 100%; height: auto; display: block; }
-    @keyframes deviceFloat {
-      0%, 100% { transform: translate3d(0,0,0) rotate(-.5deg); }
-      50% { transform: translate3d(0,-13px,0) rotate(.6deg); }
-    }
-
-    .fx-progress {
-      position: absolute; top: -24px; right: -36px; width: 72px; height: 72px; z-index: 3;
-    }
-    .pg-track { fill: none; stroke: var(--gold-line-soft); stroke-width: 6; }
-    .pg-bar {
-      fill: none; stroke: var(--maroon); stroke-width: 6; stroke-linecap: round;
-      stroke-dasharray: 327; stroke-dashoffset: 327; transform: rotate(-90deg); transform-origin: 36px 36px;
-      animation: pgFill 7.2s var(--ease) infinite;
-    }
-    @keyframes pgFill { 0% { stroke-dashoffset: 327; } 42%, 74% { stroke-dashoffset: 85; } 100% { stroke-dashoffset: 327; } }
-
-    /* PAW Mascot */
-    .hero-paw {
-      position: absolute; z-index: 3; left: -18px; bottom: 0;
-      width: 178px; height: auto;
-      filter: drop-shadow(0 14px 28px rgba(36,26,17,0.14));
-    }
-
-    /* ---------------------------------------------------------------------
-       RIGHT: TEACHER ECOSYSTEM (Accurate MacBook Pro + MIRA Mascot Behind)
-       --------------------------------------------------------------------- */
-    .teacher-cluster {
-      position: relative;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-end;
-    }
-
-    /* TEACHER MASCOT (MIRA) — POSITIONED STRICTLY BEHIND THE LAPTOP SCREEN */
-    .mira-teacher-wrapper {
-      position: absolute;
-      top: -125px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 270px;
-      height: 200px;
-      z-index: 1; /* Strictly behind the laptop screen */
-      pointer-events: auto;
-    }
-    .mira-svg {
-      width: 100%;
-      height: auto;
-      display: block;
-      filter: drop-shadow(0 10px 20px rgba(18,33,31,0.2));
-    }
-
-    /* MIRA MOTION SYSTEM */
-    /* 1. Living breathing & gentle head sway */
-    .mira-anim-head {
-      transform-origin: 135px 155px;
-      animation: miraBreathe 4.5s ease-in-out infinite;
-    }
-    @keyframes miraBreathe {
-      0%, 100% { transform: translateY(0) rotate(0deg); }
-      50% { transform: translateY(-7px) rotate(1deg); }
-    }
-    /* 2. Natural eyelid blink loop */
-    .mira-eyelid {
-      animation: miraBlink 3.6s infinite;
-      transform-origin: 50% 0%;
-    }
-    @keyframes miraBlink {
-      0%, 93%, 100% { transform: scaleY(0); opacity: 0; }
-      95%, 98% { transform: scaleY(1); opacity: 1; }
-    }
-    /* 3. Curious glance on hover */
-    .teacher-cluster:hover .mira-anim-head {
-      animation: miraCurious 2.4s ease-in-out infinite alternate;
-    }
-    @keyframes miraCurious {
-      0% { transform: translateY(-5px) rotate(-2deg); }
-      100% { transform: translateY(-10px) rotate(2.5deg); }
-    }
-
-    /* ACCURATE APPLE MACBOOK PRO MOCKUP */
-    .macbook-pro {
-      position: relative;
-      z-index: 2; /* In front of teacher mascot body */
-      width: 100%;
-      max-width: 580px;
-    }
-
-    /* Screen Lid */
-    .mac-lid {
-      position: relative;
-      background: #141416;
-      border: 3.5px solid #2B2C30;
-      border-bottom: 0;
-      border-radius: 18px 18px 0 0;
-      padding: 9px 9px 0 9px;
-      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.28), 0 0 0 1px rgba(255,255,255,0.06) inset;
-    }
-    /* FaceTime Camera Notch */
-    .mac-notch {
-      position: absolute;
-      top: 9px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 48px;
-      height: 10px;
-      background: #141416;
-      border-radius: 0 0 7px 7px;
-      z-index: 10;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .mac-camera {
-      width: 4px;
-      height: 4px;
-      border-radius: 50%;
-      background: #092019;
-      border: 0.5px solid #1f3a30;
-    }
-
-    /* Glass Display with Real Screenshot */
-    .mac-screen {
-      position: relative;
-      border-radius: 9px 9px 0 0;
-      overflow: hidden;
-      aspect-ratio: 16 / 10;
-      background: #12211F;
-    }
-    .mac-screen img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-    /* Realistic Screen Glass Reflection */
-    .mac-screen::after {
-      content: "";
-      position: absolute; inset: 0;
-      background: linear-gradient(118deg, rgba(255,255,255,0.13) 0%, rgba(255,255,255,0.02) 42%, transparent 60%);
-      pointer-events: none;
-    }
-
-    /* Unibody Aluminum Base */
-    .mac-base {
-      position: relative;
-      height: 16px;
-      background: linear-gradient(180deg, #D4D6DC 0%, #A8ABB3 60%, #8D9098 100%);
-      border-radius: 0 0 16px 16px;
-      box-shadow: 0 16px 36px rgba(18, 33, 31, 0.3), 0 1px 0 rgba(255,255,255,0.4) inset;
-    }
-    /* Hinge slit */
-    .mac-hinge {
-      position: absolute;
-      top: -3px;
-      left: 12%;
-      right: 12%;
-      height: 3px;
-      background: #1C1D20;
-      border-radius: 1.5px;
-    }
-    /* Center Thumb Opening Scoop */
-    .mac-scoop {
-      position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 72px;
-      height: 5px;
-      background: #5E6168;
-      border-radius: 0 0 5px 5px;
-      box-shadow: 0 1px 1px rgba(0,0,0,0.4) inset;
-    }
-    /* Bottom rubber feet shadow */
-    .mac-base-shadow {
-      position: absolute;
-      bottom: -6px;
-      left: 4%;
-      right: 4%;
-      height: 8px;
-      background: rgba(18, 33, 31, 0.22);
-      filter: blur(6px);
-      border-radius: 50%;
-      z-index: -1;
-    }
-
-    /* Label tag below MacBook */
-    .teacher-badge-caption {
-      margin-top: 14px;
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      background: var(--tg-sage-soft);
-      border: 1px solid rgba(31,122,99,0.25);
-      border-radius: var(--radius-pill);
-      padding: 6px 14px;
-      font-size: .8rem;
-      font-weight: 700;
-      color: var(--tg-sage);
-    }
-
-    /* =====================================================================
-       SECTION STYLES
-       ===================================================================== */
-    .section { padding: 80px 24px; }
-    .wrap { max-width: 1140px; margin: 0 auto; }
-    .sec-kicker {
-      font-size: .74rem; font-weight: 800; letter-spacing: .15em; text-transform: uppercase;
-      color: var(--maroon); margin-bottom: 8px;
-    }
-    .sec-title {
-      font-size: clamp(1.85rem, 4vw, 2.75rem);
-      font-weight: 800; line-height: 1.2; letter-spacing: -.03em;
-      color: var(--text); margin-bottom: 14px;
-    }
-    .sec-lead {
-      font-size: 1.05rem; color: var(--muted); max-width: 58ch; line-height: 1.65; margin-bottom: 36px;
-    }
-
-    /* Language highlight */
-    .lang-section {
-      background: var(--panel); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
-      padding: 42px 24px; text-align: center;
-    }
-    .lang-cards { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
-    .lang-card {
-      display: flex; align-items: center; gap: 14px;
-      background: var(--bg); border: 1.5px solid var(--line); border-radius: var(--radius-lg);
-      padding: 16px 26px; text-decoration: none; color: var(--text); box-shadow: var(--shadow-sm);
-      transition: transform .2s, border-color .2s; min-width: 240px; text-align: left;
-    }
-    .lang-card:hover { transform: translateY(-3px); border-color: var(--sun-deep); }
-    .lang-flag { font-size: 2.2rem; }
-    .lang-card b { display: block; font-size: 1.05rem; font-weight: 800; }
-    .lang-card small { font-size: .8rem; color: var(--muted); font-weight: 600; }
-
-    /* How it works */
-    .how-steps {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 36px;
-    }
-    .step-card {
-      background: var(--panel); border: 1.5px solid var(--line); border-radius: var(--radius-lg);
-      padding: 28px 24px; box-shadow: var(--shadow-sm); position: relative;
-    }
-    .step-card.is-accent { background: var(--sun-soft); border-color: var(--sun-deep); }
-    .step-num { font-size: .75rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--maroon); margin-bottom: 8px; }
-    .step-card h3 { font-size: 1.15rem; font-weight: 800; margin-bottom: 8px; }
-    .step-card p { font-size: .9rem; color: var(--muted); line-height: 1.6; }
-
-    /* Features Grid (6 Skills) */
-    .feat-section { background: var(--panel-soft); }
-    .feat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 36px; }
-    .feat-card {
-      background: var(--panel); border: 1.5px solid var(--line); border-radius: var(--radius-lg);
-      padding: 24px; box-shadow: var(--shadow-sm); transition: transform .2s, box-shadow .2s;
-    }
-    .feat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
-    .feat-icon { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; font-size: 1.4rem; margin-bottom: 14px; }
-    .feat-card h3 { font-size: 1.08rem; font-weight: 800; margin-bottom: 6px; }
-    .feat-card p { font-size: .88rem; color: var(--muted); line-height: 1.6; }
-
-    /* Teacher Deep-Dive Section */
-    .teacher-section {
-      background: var(--tg-ink); color: #EAF1EE;
-    }
-    .teacher-section .sec-kicker { color: var(--tg-amber); }
-    .teacher-section .sec-title { color: #EAF1EE; }
-    .teacher-section .sec-lead { color: var(--tg-mist); }
-    .teacher-split {
-      display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; align-items: center;
-    }
-    .teacher-shot-frame {
-      border-radius: 18px; overflow: hidden; border: 1px solid rgba(234,241,238,0.15);
-      box-shadow: 0 25px 60px rgba(0,0,0,0.5);
-    }
-    .teacher-shot-frame img { width: 100%; height: auto; display: block; }
-    .teacher-benefits { display: flex; flex-direction: column; gap: 14px; }
-    .t-benefit {
-      display: flex; align-items: flex-start; gap: 14px;
-      background: rgba(234,241,238,0.06); border: 1px solid rgba(234,241,238,0.1);
-      border-radius: var(--radius-md); padding: 18px;
-    }
-    .t-benefit-icon {
-      width: 36px; height: 36px; border-radius: 10px; background: var(--tg-sage);
-      color: #fff; display: grid; place-items: center; flex-shrink: 0; font-size: 1.1rem;
-    }
-    .t-benefit h4 { font-size: 1rem; font-weight: 800; color: #fff; margin-bottom: 4px; }
-    .t-benefit p { font-size: .85rem; color: var(--tg-mist); line-height: 1.55; }
-
-    /* Educational Hook Articles */
-    .edu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 36px; }
-    .edu-card {
-      background: var(--panel); border: 1.5px solid var(--line); border-radius: var(--radius-lg);
-      padding: 26px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 10px;
-    }
-    .edu-tag {
-      align-self: flex-start; font-size: .7rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase;
-      background: var(--sun-soft); color: var(--maroon); padding: 3px 10px; border-radius: var(--radius-pill);
-    }
-    .edu-card h3 { font-size: 1.05rem; font-weight: 800; line-height: 1.35; }
-    .edu-card p { font-size: .88rem; color: var(--muted); line-height: 1.6; flex: 1; }
-
-    /* Final CTA */
-    .final-cta {
-      background: var(--sun-soft); border-top: 1px solid var(--gold-line); border-bottom: 1px solid var(--gold-line);
-      padding: 70px 24px; text-align: center;
-    }
-    .final-cta .sec-title { margin-bottom: 12px; }
-    .final-cta .sec-lead { margin: 0 auto 32px; }
-
-    /* Footer */
-    .footer {
-      background: var(--text); color: rgba(253,250,243,.65); padding: 40px 24px; font-size: .85rem;
-    }
-    .footer-in {
-      max-width: 1140px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px;
-    }
-    .footer-brand { font-weight: 800; font-size: 1.15rem; color: #FDFAF3; }
-    .footer-brand span { color: var(--sun); }
-    .footer-links { display: flex; gap: 18px; }
-    .footer-link { color: rgba(253,250,243,.65); text-decoration: none; }
-    .footer-link:hover { color: #FDFAF3; }
-
-    /* Responsive */
-    @media (max-width: 1040px) {
-      .hero-stage { grid-template-columns: 1fr; gap: 48px; }
-      .student-cluster { height: 420px; }
-      .teacher-split { grid-template-columns: 1fr; }
-      .feat-grid, .edu-grid, .how-steps { grid-template-columns: repeat(2, 1fr); }
-    }
-    @media (max-width: 720px) {
-      .topbar { padding: 12px 16px; }
-      .nav-link { display: none; }
-      .hero-stage { margin-top: 10px; }
-      .student-cluster { height: 360px; }
-      .phone-hero { width: 160px; }
-      .hero-paw { width: 140px; left: -10px; }
-      .mac-lid { border-radius: 12px 12px 0 0; padding: 6px 6px 0 6px; }
-      .mira-teacher-wrapper { width: 170px; top: -90px; }
-      .feat-grid, .edu-grid, .how-steps { grid-template-columns: 1fr; }
-      .hero-cta-row { flex-direction: column; width: 100%; }
-      .btn { width: 100%; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: .01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: .01ms !important;
-      }
-    }
-  </style>
-
-  <!-- GEO locale detector -->
-  <script>(function(){try{
-    var KEY='fiezel-site-locale',saved=null;
-    try{saved=localStorage.getItem(KEY)}catch(_){}
-    if(saved==='id')return;
-    if(saved==='th'){location.replace('th/');return;}
-    if(typeof fetch!=='function')return;
-    var ctrl=('AbortController' in window)?new AbortController():null;
-    var timer=setTimeout(function(){try{ctrl&&ctrl.abort()}catch(_){}}, 2000);
-    fetch('https://ipwho.is/?fields=success,country_code', ctrl?{signal:ctrl.signal}:{})
-      .then(function(r){return (r&&r.ok)?r.json():null})
-      .then(function(d){clearTimeout(timer);
-        if(d&&d.success!==false&&d.country_code==='TH'){try{localStorage.setItem(KEY,'th')}catch(_){}location.replace('th/');}
-      })
-      .catch(function(){try{clearTimeout(timer)}catch(_){}});
-  }catch(_){}})();</script>
+  }
+</style>
 </head>
 <body>
+<a class="skip" href="#main">Lewati ke konten utama</a>
 
-  <!-- ===================================================================
-       TOPBAR
-       =================================================================== -->
-  <header class="topbar">
-    <div class="credit-strip">
-      <div class="wrap credit-in">
-        <span>Create by</span>
-        <a class="credit-ig" href="https://instagram.com/fitrarustqi" target="_blank" rel="noopener" aria-label="Instagram @fitrarustqi">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.2" fill="currentColor" stroke="none"/></svg>
-          <strong>@fitrarustqi</strong>
-        </a>
-      </div>
-    </div>
-    <div class="topbar-in">
-      <a class="brand" href="./" aria-label="FIEZEL">
-        <!-- Official maroon paw logo -->
-        <svg class="brand-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <g fill="currentColor">
-            <rect x="4.6" y="7.5" width="3.1" height="4.6" rx="1.55"/>
-            <rect x="8.9" y="5.1" width="3.1" height="7" rx="1.55"/>
-            <rect x="13.2" y="3.4" width="3.1" height="8.7" rx="1.55"/>
-            <rect x="17.5" y="6.2" width="3.1" height="5.9" rx="1.55"/>
-            <path d="M12.6 14c3.5 0 5.9 1.9 5.9 4.1 0 2-2 3.4-5.9 3.4s-5.9-1.4-5.9-3.4c0-2.2 2.4-4.1 5.9-4.1Z"/>
-          </g>
-        </svg>
-        <svg class="brand-word" viewBox="0 0 968 260" role="img" aria-label="FIEZEL Wordmark">
-          <g fill="currentColor">
-            <rect x="30" y="30" width="42" height="200" rx="21"/><rect x="30" y="30" width="144" height="42" rx="21"/><rect x="30" y="109" width="116" height="42" rx="21"/><rect x="268" y="30" width="42" height="200" rx="21"/><rect x="268" y="30" width="144" height="42" rx="21"/><rect x="268" y="109" width="100" height="42" rx="21"/><rect x="268" y="188" width="130" height="42" rx="21"/><rect x="446" y="30" width="150" height="42" rx="21"/><rect x="446" y="188" width="150" height="42" rx="21"/><rect x="575" y="30" width="191.38" height="42" rx="21" transform="rotate(124.354 575 51)"/><rect x="630" y="30" width="42" height="200" rx="21"/><rect x="630" y="30" width="144" height="42" rx="21"/><rect x="630" y="109" width="100" height="42" rx="21"/><rect x="630" y="188" width="130" height="42" rx="21"/><rect x="808" y="30" width="42" height="200" rx="21"/><rect x="808" y="188" width="130" height="42" rx="21"/><rect x="192" y="30" width="42" height="200" rx="21"/>
-          </g>
-        </svg>
+<header class="topbar">
+  <div class="credit-strip">
+    <div class="wrap credit-in">
+      <span>Create by</span>
+      <a class="credit-ig" href="https://instagram.com/fitrarustqi" target="_blank" rel="noopener" aria-label="Instagram @fitrarustqi">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.2" fill="currentColor" stroke="none"/></svg>
+        <strong>@fitrarustqi</strong>
       </a>
-
-      <nav class="topnav">
-        <a class="nav-link" href="app/#home" data-i18n="nav.students">Untuk Murid</a>
-        <a class="nav-link is-teacher" href="app/?teacher=preview" data-i18n="nav.teachers"><span class="kelasku-brand"><span class="kelasku-main" style="color:var(--tg-sage)">KelasKu</span> <span class="kelasku-tag" style="color:var(--muted)">untuk Guru</span></span></a>
-        <a class="nav-link" href="install/">Cara Install</a>
-        <div class="lang-switcher" role="group" aria-label="Bahasa">
-          <button type="button" class="lang-btn active" data-lang="id" onclick="setLang('id')">ID</button>
-          <button type="button" class="lang-btn" data-lang="th" onclick="setLang('th')">TH</button>
-        </div>
-        <a class="btn btn-primary" href="app/" data-i18n="nav.start">Mulai Belajar</a>
-      </nav>
     </div>
-  </header>
+  </div>
+  <div class="wrap topbar-in">
+    <a class="brand" href="./" aria-label="FIEZEL — halaman utama">
+      <!-- ikon logo resmi: geometri asli assets/brand/fiezel-paw.svg, diwarnai maroon -->
+      <svg class="brand-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><g fill="currentColor"><rect x="4.6" y="7.5" width="3.1" height="4.6" rx="1.55"/><rect x="8.9" y="5.1" width="3.1" height="7" rx="1.55"/><rect x="13.2" y="3.4" width="3.1" height="8.7" rx="1.55"/><rect x="17.5" y="6.2" width="3.1" height="5.9" rx="1.55"/><path d="M12.6 14c3.5 0 5.9 1.9 5.9 4.1 0 2-2 3.4-5.9 3.4s-5.9-1.4-5.9-3.4c0-2.2 2.4-4.1 5.9-4.1Z"/></g></svg>
+      <svg class="brand-word" viewBox="0 0 968 260" role="img" aria-label="Wordmark FIEZEL"><g fill="currentColor"><rect x="30" y="30" width="42" height="200" rx="21"/><rect x="30" y="30" width="144" height="42" rx="21"/><rect x="30" y="109" width="116" height="42" rx="21"/><rect x="268" y="30" width="42" height="200" rx="21"/><rect x="268" y="30" width="144" height="42" rx="21"/><rect x="268" y="109" width="100" height="42" rx="21"/><rect x="268" y="188" width="130" height="42" rx="21"/><rect x="446" y="30" width="150" height="42" rx="21"/><rect x="446" y="188" width="150" height="42" rx="21"/><rect x="575" y="30" width="191.38" height="42" rx="21" transform="rotate(124.354 575 51)"/><rect x="630" y="30" width="42" height="200" rx="21"/><rect x="630" y="30" width="144" height="42" rx="21"/><rect x="630" y="109" width="100" height="42" rx="21"/><rect x="630" y="188" width="130" height="42" rx="21"/><rect x="808" y="30" width="42" height="200" rx="21"/><rect x="808" y="188" width="130" height="42" rx="21"/><rect x="192" y="30" width="42" height="200" rx="21"/></g></svg>
+    </a>
+    <nav class="topnav" aria-label="Navigasi utama">
+      <a href="app/?teacher=preview"><span class="kelasku-brand"><span class="kelasku-main" style="color:#1F7A63">KelasKu</span> <span class="kelasku-tag" style="color:var(--maroon-mid)">untuk Guru</span></span></a>
+      <a href="install/">Cara Install</a>
+      <a class="lang-switch" href="th/" hreflang="th" lang="th" aria-label="เปลี่ยนเป็นภาษาไทย" onclick="try{localStorage.setItem('fiezel-site-locale','th')}catch(e){}">ไทย</a>
+      <a class="btn btn-sm btn-primary" href="app/">Mulai Belajar</a>
+    </nav>
+  </div>
+</header>
 
-  <!-- ===================================================================
-       HERO SECTION
-       =================================================================== -->
-  <section class="hero">
-    <div class="hero-header">
-      <div class="hero-kicker">
-        <span class="kicker-dot" aria-hidden="true"></span>
-        <span data-i18n="hero.kicker">Platform Belajar Bahasa Cerdas &amp; Terpadu</span>
+<main id="main">
+
+  <!-- ============ HERO — PANGGUNG VISUAL (arahan owner #2) ============
+       Layar pertama = pertunjukan, bukan artikel: wordmark resmi + tagline 1 baris +
+       CTA, lalu panggung motion graphic (mockup app di frame device + orbit skill +
+       partikel solar + garis path menggambar diri + ring progress + chip CEFR).
+       SEMUA teks panjang pindah ke seksi di bawah panggung ini. -->
+  <section class="hero" id="hero">
+    <span class="decor decor-glow" data-parallax="0.10" aria-hidden="true"></span>
+    <span class="decor decor-arc" data-parallax="-0.05" aria-hidden="true"></span>
+
+    <div class="wrap masthead">
+      <div class="mast-lock seq seq-1">
+        <!-- wordmark RESMI repo: assets/brand/fiezel-wordmark.svg (inline, tint maroon) -->
+        <svg class="mast-word" viewBox="0 0 1000 260" role="img" aria-label="FIEZEL"><defs><linearGradient id="fzwMaroon-mast" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8C2233"/><stop offset="100%" stop-color="#6D1926"/></linearGradient><linearGradient id="fzwGold-mast" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFDE59"/><stop offset="45%" stop-color="#FFC700"/><stop offset="100%" stop-color="#E6A800"/></linearGradient></defs><g fill="url(#fzwMaroon-mast)"><rect x="30" y="30" width="42" height="200" rx="21"/><rect x="30" y="30" width="144" height="42" rx="21"/><rect x="30" y="109" width="116" height="42" rx="21"/><rect x="300" y="30" width="42" height="200" rx="21"/><rect x="300" y="30" width="144" height="42" rx="21"/><rect x="300" y="109" width="100" height="42" rx="21"/><rect x="300" y="188" width="130" height="42" rx="21"/><rect x="478" y="30" width="150" height="42" rx="21"/><rect x="478" y="188" width="150" height="42" rx="21"/><rect x="607" y="30" width="191.38" height="42" rx="21" transform="rotate(124.354 607 51)"/><rect x="662" y="30" width="42" height="200" rx="21"/><rect x="662" y="30" width="144" height="42" rx="21"/><rect x="662" y="109" width="100" height="42" rx="21"/><rect x="662" y="188" width="130" height="42" rx="21"/><rect x="840" y="30" width="42" height="200" rx="21"/><rect x="840" y="188" width="130" height="42" rx="21"/></g><g fill="url(#fzwGold-mast)"><rect x="192" y="30" width="26" height="200" rx="13"/><rect x="240" y="106" width="26" height="124" rx="13"/></g></svg>
       </div>
-      <h1 class="hero-title">
-        <span data-i18n="hero.title1">Belajar yang</span> <em data-i18n="hero.title2">Mengenal Kamu.</em>
-      </h1>
-      <p class="hero-desc" data-i18n="hero.desc">
-        FIEZEL menyesuaikan diri dengan polamu. Bahasa Inggris &amp; Jepang adaptif untuk murid, serta KelasKu untuk Guru terpadu untuk pendidik.
-      </p>
-      <div class="hero-cta-row">
-        <a class="btn btn-primary" href="app/" data-i18n="hero.cta-student">Mulai Belajar Gratis</a>
-        <a class="btn btn-teacher" href="app/?teacher=preview" data-i18n="hero.cta-teacher">Buka <span class="kelasku-brand"><span class="kelasku-main">KelasKu</span> <span class="kelasku-tag">untuk Guru</span></span> →</a>
-      </div>
-      <div class="hero-badges">
-        <span class="lang-badge"><span>🇬🇧</span> <b>English</b> <small>(A1–C1 Adaptif)</small></span>
-        <span class="lang-badge"><span>🇯🇵</span> <b>日本語</b> <small>(Pemula AI-Guided)</small></span>
+      <p class="mast-sub seq seq-2">Not just learning with you. Learning about you.</p>
+      <div class="cta-row cta-center mast-cta seq seq-3">
+        <a class="btn btn-primary" href="app/">Mulai Belajar</a>
+        <a class="btn btn-teacher-hero" href="app/?teacher=preview">Buka <span class="kelasku-brand"><span class="kelasku-main">KelasKu</span> <span class="kelasku-tag">untuk Guru</span></span> →</a>
+        <a class="btn btn-ghost" href="install/">Cara Install</a>
       </div>
     </div>
 
-    <!-- Dual-Ecosystem Stage: Student (Left) + Teacher (Right) -->
-    <div class="hero-stage">
-
-      <!-- ===============================================================
-           LEFT: LOCKED LEGACY HERO ASSET (iPhone + PAW Mascot + Orbits)
-           =============================================================== -->
-      <div class="student-cluster" aria-label="Sisi Pelajar: Latihan Adaptif di Ponsel bersama PAW">
-        
-        <!-- Showcase FX & Orbits -->
+    
+    <!-- Panggung Ganda: Sisi Murid (Kiri) + Sisi Guru (Kanan) -->
+    <div class="hero-dual-stage">
+      <!-- SISI PELAJAR (100% PERSIS SEPERTI SEBELUMNYA) -->
+      <div class="stage-student">
+        <div class="showcase seq seq-4">
         <div class="showcase-fx" aria-hidden="true">
-          <svg class="fx-lines" viewBox="0 0 640 640" preserveAspectRatio="xMidYMid meet">
+          <svg class="fx-lines" viewBox="0 0 640 640" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
             <circle class="fx-ring fx-ring-1" cx="320" cy="320" r="252"/>
             <circle class="fx-ring fx-ring-2" cx="320" cy="320" r="196"/>
+            <path class="fx-draw fx-draw-1" d="M28 470C142 470 172 302 320 302c148 0 178-158 292-158"/>
+            <path class="fx-draw fx-draw-2" d="M36 190C154 190 186 376 320 376s170 128 284 128"/>
           </svg>
+          <span class="spark sp1"></span><span class="spark sp2"></span><span class="spark sp3"></span>
+          <span class="spark sp4"></span><span class="spark sp5"></span><span class="spark sp6"></span>
+          <span class="spark sp7"></span><span class="spark sp8"></span>
           <div class="orbit orbit-a">
-            <span class="orb orb-1"><b>Grammar</b></span>
-            <span class="orb orb-2"><b>Reading</b></span>
-            <span class="orb orb-3"><b>Kosakata</b></span>
+            <span class="orb orb-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19V6a2 2 0 0 1 2-2h9l5 5v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"/><path d="M14 4v5h5"/><path d="M8 13h7M8 16.5h4"/></svg><b>Grammar</b></span>
+            <span class="orb orb-2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5.5A2.5 2.5 0 0 1 5.5 3H11v18H5.5A2.5 2.5 0 0 1 3 18.5Z"/><path d="M21 5.5A2.5 2.5 0 0 0 18.5 3H13v18h5.5A2.5 2.5 0 0 0 21 18.5Z"/></svg><b>Reading</b></span>
+            <span class="orb orb-3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3Z"/><path d="M5 17h14"/><path d="M9 8h6M9 11.5h4"/></svg><b>Kosakata</b></span>
           </div>
           <div class="orbit orbit-b">
-            <span class="orb orb-4"><b>Speaking</b></span>
-            <span class="orb orb-5"><b>Listening</b></span>
-            <span class="orb orb-6"><b>Adaptif</b></span>
+            <span class="orb orb-4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5V21M9 21h6"/></svg><b>Speaking</b></span>
+            <span class="orb orb-5"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 13a8 8 0 0 1 16 0v5a2 2 0 0 1-2 2h-1.5v-6H20"/><path d="M4 14h3.5v6H6a2 2 0 0 1-2-2Z"/></svg><b>Listening</b></span>
+            <span class="orb orb-6"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17c3.5 0 4.5-10 8-10s4.5 10 8 10"/><path d="M3 12.5h4M17 12.5h4"/></svg><b>Adaptif</b></span>
           </div>
         </div>
 
-        <!-- Phone Device Mockup with Real Home Shot -->
-        <div class="device">
+        <div class="device" data-parallax="-0.035">
           <div class="phone phone-hero">
             <div class="phone-screen">
-              <img src="assets/shots/home-mobile.png" alt="Layar Home FIEZEL" width="780" height="1688">
+              <img src="assets/shots/home-mobile.png" alt="Layar Home FIEZEL dengan target harian dan empat skill inti" width="780" height="1688" fetchpriority="high" decoding="async">
             </div>
           </div>
           <svg class="fx-progress" viewBox="0 0 120 120" aria-hidden="true">
@@ -809,537 +422,700 @@
           </svg>
         </div>
 
-        <!-- Original Hawaiian PAW Mascot (100% Locked Legacy Asset) -->
-        <svg class="hero-paw hula-paw" viewBox="0 0 320 310" role="img" aria-label="PAW — maskot FIEZEL">
-          <ellipse cx="160" cy="292" rx="88" ry="11" fill="#33201F" opacity="0.12"/>
-          <g>
-            <g><!-- Tail -->
-              <path d="M 212 244 C 266 258 298 238 296 200 C 294 178 282 163 268 158" stroke="#EDB93A" stroke-width="25" stroke-linecap="round" fill="none"/>
-              <path d="M 278 162 C 274 160 270 159 268 158" stroke="#8C2233" stroke-width="25" stroke-linecap="round" fill="none"/>
-            </g>
-            <g><!-- Torso -->
-              <rect x="102" y="164" width="116" height="96" rx="42" fill="#FFD94F"/>
-              <ellipse cx="160" cy="226" rx="36" ry="28" fill="#FFF4DA"/>
-              <g transform="translate(160,225) scale(1.75) translate(-12.6,-12.45)" fill="#8C2233">
-                <rect x="4.6" y="7.5" width="3.1" height="4.6" rx="1.55"/>
-                <rect x="8.9" y="5.1" width="3.1" height="7" rx="1.55"/>
-                <rect x="13.2" y="3.4" width="3.1" height="8.7" rx="1.55"/>
-                <rect x="17.5" y="6.2" width="3.1" height="5.9" rx="1.55"/>
-                <path d="M12.6 14c3.5 0 5.9 1.9 5.9 4.1 0 2-2 3.4-5.9 3.4s-5.9-1.4-5.9-3.4c0-2.2 2.4-4.1 5.9-4.1Z"/>
+        <!-- Maskot PAW: Hawaiian Hula Dance (3s Dynamic Auto-Cycle) -->
+        <svg class="hero-paw hula-paw hula-playing routine-1" viewBox="0 0 320 310" role="img" aria-label="PAW — maskot FIEZEL menari Hula Hawaii">
+          <defs>
+            <clipPath id="hula-eyeL-hero"><circle cx="126" cy="98" r="16"/></clipPath>
+            <clipPath id="hula-eyeR-hero"><circle cx="194" cy="98" r="16"/></clipPath>
+            <mask id="hula-tailTip-hero" maskUnits="userSpaceOnUse" x="230" y="120" width="110" height="120">
+              <path d="M296 200 C 295 180 284 164 268 158" stroke="#fff" stroke-width="25" fill="none" stroke-linecap="round"/>
+            </mask>
+            <linearGradient id="leafGrad1-hero" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#4CAF50"/>
+              <stop offset="100%" stop-color="#1B5E20"/>
+            </linearGradient>
+            <linearGradient id="leafGrad2-hero" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#81C784"/>
+              <stop offset="100%" stop-color="#2E7D32"/>
+            </linearGradient>
+            <linearGradient id="flowerPlumeria-hero" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#FFFFFF"/>
+              <stop offset="60%" stop-color="#FFF9C4"/>
+              <stop offset="100%" stop-color="#FBC02D"/>
+            </linearGradient>
+            <linearGradient id="flowerHibiscus-hero" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#FF5252"/>
+              <stop offset="100%" stop-color="#C2185B"/>
+            </linearGradient>
+          </defs>
+
+          <!-- Shadow -->
+          <ellipse class="fz-shadow" cx="160" cy="292" rx="88" ry="11" fill="#33201F" opacity="0.12"/>
+
+          <!-- Root Hula Structure -->
+          <g class="fz-hula-all">
+            
+            <!-- BODY & TORSO -->
+            <g class="fz-body">
+              <g class="fz-hula-torso">
+                
+                <!-- TAIL (Inside torso transform, 100% permanently anchored to body) -->
+                <g class="fz-tail">
+                  <path d="M 212 244 C 266 258 298 238 296 200 C 294 178 282 163 268 158" stroke="#EDB93A" stroke-width="25" stroke-linecap="round" fill="none"/>
+                  <path d="M 278 162 C 274 160 270 159 268 158" stroke="#8C2233" stroke-width="25" stroke-linecap="round" fill="none"/>
+                </g>
+
+                <rect x="102" y="164" width="116" height="96" rx="42" fill="#FFD94F"/>
+                
+                <!-- Chest & Pawprint Emblem -->
+                <g class="fz-chest">
+                  <ellipse cx="160" cy="226" rx="36" ry="28" fill="#FFF4DA"/>
+                  <g class="fz-emblem" transform="translate(160,225) scale(1.75) translate(-12.6,-12.45)">
+                    <g fill="#8C2233">
+                      <rect x="4.6" y="7.5" width="3.1" height="4.6" rx="1.55"/>
+                      <rect x="8.9" y="5.1" width="3.1" height="7" rx="1.55"/>
+                      <rect x="13.2" y="3.4" width="3.1" height="8.7" rx="1.55"/>
+                      <rect x="17.5" y="6.2" width="3.1" height="5.9" rx="1.55"/>
+                      <path d="M12.6 14c3.5 0 5.9 1.9 5.9 4.1 0 2-2 3.4-5.9 3.4s-5.9-1.4-5.9-3.4c0-2.2 2.4-4.1 5.9-4.1Z"/>
+                    </g>
+                  </g>
+                </g>
+
+                <!-- PĀʻŪ (GRASS SKIRT) -->
+                <g class="fz-hula-skirt">
+                  <path d="M100 226 Q160 236 220 226 L226 274 Q160 286 94 274 Z" fill="#1B5E20" opacity="0.75"/>
+                  <g class="fz-skirt-blade-left">
+                    <path d="M102 224 Q88 248 92 278 Q106 254 114 226 Z" fill="url(#leafGrad1-hero)"/>
+                    <path d="M110 224 Q98 252 104 282 Q118 254 122 226 Z" fill="url(#leafGrad2-hero)"/>
+                    <path d="M118 225 Q108 255 116 284 Q128 256 130 226 Z" fill="url(#leafGrad1-hero)"/>
+                  </g>
+                  <g class="fz-skirt-blade-center">
+                    <path d="M126 226 Q122 258 128 285 Q138 258 138 227 Z" fill="url(#leafGrad2-hero)"/>
+                    <path d="M136 227 Q134 260 142 287 Q150 260 148 227 Z" fill="url(#leafGrad1-hero)"/>
+                    <path d="M146 227 Q148 262 154 288 Q162 262 158 227 Z" fill="url(#leafGrad2-hero)"/>
+                    <path d="M156 227 Q162 262 168 288 Q174 262 168 227 Z" fill="url(#leafGrad1-hero)"/>
+                    <path d="M166 227 Q174 260 180 287 Q188 260 178 227 Z" fill="url(#leafGrad2-hero)"/>
+                    <path d="M176 226 Q186 258 194 285 Q200 258 188 227 Z" fill="url(#leafGrad1-hero)"/>
+                  </g>
+                  <g class="fz-skirt-blade-right">
+                    <path d="M186 225 Q200 255 206 284 Q214 256 198 226 Z" fill="url(#leafGrad2-hero)"/>
+                    <path d="M196 224 Q212 252 218 282 Q224 254 208 226 Z" fill="url(#leafGrad1-hero)"/>
+                    <path d="M206 224 Q226 248 230 278 Q234 254 218 226 Z" fill="url(#leafGrad2-hero)"/>
+                  </g>
+                  <g class="fz-skirt-layer-front">
+                    <path d="M102 224 C138 236 182 236 218 224 C214 254 186 284 160 288 C134 284 106 254 102 224 Z" fill="#4CAF50" opacity="0.35"/>
+                    <path d="M98 223 Q160 236 222 223 Q222 229 220 231 Q160 242 100 231 Z" fill="#FDD835"/>
+                    <circle cx="160" cy="232" r="5.5" fill="#FF5252"/>
+                    <circle cx="160" cy="232" r="2.5" fill="#FFF59D"/>
+                  </g>
+                </g>
+
+                <!-- Feet -->
+                <g class="fz-legs">
+                  <rect class="fz-foot fz-foot-l" x="108" y="246" width="48" height="22" rx="11" fill="#EDB93A"/>
+                  <rect class="fz-foot fz-foot-r" x="164" y="246" width="48" height="22" rx="11" fill="#EDB93A"/>
+                </g>
               </g>
-              <!-- Grass Skirt -->
-              <path d="M100 226 Q160 236 220 226 L226 274 Q160 286 94 274 Z" fill="#1B5E20" opacity="0.8"/>
-              <!-- Feet -->
-              <rect x="108" y="246" width="48" height="22" rx="11" fill="#EDB93A"/>
-              <rect x="164" y="246" width="48" height="22" rx="11" fill="#EDB93A"/>
-            </g>
-            <g><!-- Head -->
-              <path d="M76 66 L95 0 L140 34 Q104 66 76 66 Z" fill="#FFD94F"/>
-              <path d="M90 52 L 101 17 L 125 35 Z" fill="#8C2233"/>
-              <path d="M244 66 L225 0 L180 34 Q216 66 244 66 Z" fill="#FFD94F"/>
-              <path d="M230 52 L 219 17 L 195 35 Z" fill="#8C2233"/>
-              <circle cx="160" cy="106" r="88" fill="#FFD94F"/>
-              <ellipse cx="160" cy="140" rx="36" ry="25" fill="#FFF4DA"/>
-              <path d="M153 126 L 167 126 L 160 136 Z" fill="#8C2233"/>
-              <circle cx="102" cy="126" r="11" fill="#F0A0AC"/>
-              <circle cx="218" cy="126" r="11" fill="#F0A0AC"/>
-              <!-- Eyes -->
-              <circle cx="126" cy="98" r="16" fill="#33201F"/>
-              <circle cx="130.5" cy="92.5" r="5.5" fill="#fff"/>
-              <circle cx="121.5" cy="104" r="2.8" fill="#fff" opacity=".7"/>
-              <circle cx="194" cy="98" r="16" fill="#33201F"/>
-              <circle cx="198.5" cy="92.5" r="5.5" fill="#fff"/>
-              <circle cx="189.5" cy="104" r="2.8" fill="#fff" opacity=".7"/>
-              <!-- Smile -->
-              <path d="M148 148 C 154 155 166 155 172 148" stroke="#33201F" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+
+              <!-- HEAD & HAKU LEI -->
+              <g class="fz-head fz-hula-head">
+                <!-- Ears -->
+                <g class="fz-ear fz-ear-l">
+                  <path d="M76 66 L95 0 L140 34 Q104 66 76 66 Z" fill="#FFD94F"/>
+                  <path d="M90 52 L 101 17 L 125 35 Z" fill="#8C2233"/>
+                </g>
+                <g class="fz-ear fz-ear-r">
+                  <path d="M244 66 L225 0 L180 34 Q216 66 244 66 Z" fill="#FFD94F"/>
+                  <path d="M230 52 L 219 17 L 195 35 Z" fill="#8C2233"/>
+                </g>
+
+                <!-- Head Base -->
+                <circle cx="160" cy="106" r="88" fill="#FFD94F"/>
+
+                <!-- Dynamic Expressions Rig -->
+                <g class="fz-face">
+                  <ellipse cx="160" cy="140" rx="36" ry="25" fill="#FFF4DA"/>
+                  <path d="M153 126 L 167 126 L 160 136 Z" fill="#8C2233"/>
+                  <circle class="fz-blush" cx="102" cy="126" r="11" fill="#F0A0AC"/>
+                  <circle class="fz-blush" cx="218" cy="126" r="11" fill="#F0A0AC"/>
+                  
+                  <!-- EXPRESSION 1: OPEN HAPPY EYES -->
+                  <g id="hulaEyesOpen">
+                    <g class="fz-eye fz-eye-l">
+                      <circle cx="126" cy="98" r="16" fill="#33201F"/>
+                      <g class="fz-pupil" clip-path="url(#hula-eyeL-hero)">
+                        <circle cx="130.5" cy="92.5" r="5.5" fill="#fff"/>
+                        <circle cx="121.5" cy="104" r="2.8" fill="#fff" opacity=".7"/>
+                      </g>
+                    </g>
+                    <g class="fz-eye fz-eye-r">
+                      <circle cx="194" cy="98" r="16" fill="#33201F"/>
+                      <g class="fz-pupil" clip-path="url(#hula-eyeR-hero)">
+                        <circle cx="198.5" cy="92.5" r="5.5" fill="#fff"/>
+                        <circle cx="189.5" cy="104" r="2.8" fill="#fff" opacity=".7"/>
+                      </g>
+                    </g>
+                  </g>
+
+                  <!-- EXPRESSION 2: JOYFUL ARCH EYES -->
+                  <g id="hulaEyesJoy" style="display:none;">
+                    <path d="M112 101 C 119 88 133 88 140 101" stroke="#33201F" stroke-width="6.5" stroke-linecap="round" fill="none"/>
+                    <path d="M180 101 C 187 88 201 88 208 101" stroke="#33201F" stroke-width="6.5" stroke-linecap="round" fill="none"/>
+                  </g>
+
+                  <!-- EXPRESSION 3: WINK -->
+                  <g id="hulaEyesWink" style="display:none;">
+                    <g class="fz-eye fz-eye-l">
+                      <circle cx="126" cy="98" r="16" fill="#33201F"/>
+                      <g class="fz-pupil" clip-path="url(#hula-eyeL-hero)">
+                        <circle cx="130.5" cy="92.5" r="5.5" fill="#fff"/>
+                        <circle cx="121.5" cy="104" r="2.8" fill="#fff" opacity=".7"/>
+                      </g>
+                    </g>
+                    <path d="M180 100 C 187 90 201 90 208 100" stroke="#33201F" stroke-width="6.5" stroke-linecap="round" fill="none"/>
+                  </g>
+
+                  <!-- EXPRESSION 4: STAR/HEART JOY -->
+                  <g id="hulaEyesLove" style="display:none;" fill="#8C2233">
+                    <g transform="translate(126,98) scale(0.95)">
+                      <path d="M0 11 C -7 4 -12 1 -12 -4.5 C -12 -9 -8 -12 -4.5 -12 C -2.5 -12 -0.8 -10.5 0 -8 C 0.8 -10.5 2.5 -12 4.5 -12 C 8 -12 12 -9 12 -4.5 C 12 1 7 4 0 11 Z"/>
+                      <circle cx="-3.5" cy="-6" r="2" fill="#fff" opacity=".9"/>
+                    </g>
+                    <g transform="translate(194,98) scale(0.95)">
+                      <path d="M0 11 C -7 4 -12 1 -12 -4.5 C -12 -9 -8 -12 -4.5 -12 C -2.5 -12 -0.8 -10.5 0 -8 C 0.8 -10.5 2.5 -12 4.5 -12 C 8 -12 12 -9 12 -4.5 C 12 1 7 4 0 11 Z"/>
+                      <circle cx="-3.5" cy="-6" r="2" fill="#fff" opacity=".9"/>
+                    </g>
+                  </g>
+
+                  <!-- DYNAMIC MOUTH -->
+                  <g class="fz-mouth">
+                    <path id="hulaMouthSmile" class="fz-m fz-m-smile" d="M148 148 C 154 155 166 155 172 148" stroke="#33201F" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+                    <path id="hulaMouthOpen" style="display:none;" d="M146 146 C 148 158 172 158 174 146 Z" fill="#8C2233" stroke="#33201F" stroke-width="3"/>
+                  </g>
+                </g>
+
+                <!-- HAKU LEI CROWN -->
+                <g class="fz-haku-lei">
+                  <g class="fz-lei-leaves" fill="#2E7D32">
+                    <path d="M96 52 C84 40 102 30 114 44 Z"/>
+                    <path d="M116 42 C108 26 128 22 136 36 Z"/>
+                    <path d="M142 34 C148 16 166 16 168 32 Z" fill="#388E3C"/>
+                    <path d="M178 36 C186 20 206 24 200 40 Z"/>
+                    <path d="M202 44 C216 32 232 44 220 54 Z"/>
+                  </g>
+
+                  <!-- Flower 1 -->
+                  <g transform="translate(108, 48) scale(0.95)">
+                    <g fill="url(#flowerHibiscus-hero)">
+                      <circle cx="0" cy="-7" r="6"/><circle cx="7" cy="-2" r="6"/><circle cx="4" cy="6" r="6"/><circle cx="-4" cy="6" r="6"/><circle cx="-7" cy="-2" r="6"/>
+                    </g>
+                    <circle cx="0" cy="0" r="3.5" fill="#FFD54F"/><circle cx="0" cy="0" r="1.5" fill="#E65100"/>
+                  </g>
+                  <!-- Flower 2 -->
+                  <g transform="translate(138, 40) scale(1.05)">
+                    <g fill="url(#flowerPlumeria-hero)">
+                      <path d="M0 0 C-6 -10 2 -16 6 -8 Z"/><path d="M0 0 C6 -10 14 -4 8 4 Z"/><path d="M0 0 C10 0 12 10 2 8 Z"/><path d="M0 0 C2 10 -8 10 -6 2 Z"/><path d="M0 0 C-10 4 -12 -6 -2 -6 Z"/>
+                    </g>
+                    <circle cx="1" cy="0" r="3" fill="#FBC02D"/>
+                  </g>
+                  <!-- Flower 3 -->
+                  <g transform="translate(164, 38) scale(1.15)">
+                    <g fill="url(#flowerHibiscus-hero)">
+                      <circle cx="0" cy="-7.5" r="6.5"/><circle cx="7.5" cy="-2.5" r="6.5"/><circle cx="4.5" cy="6.5" r="6.5"/><circle cx="-4.5" cy="6.5" r="6.5"/><circle cx="-7.5" cy="-2.5" r="6.5"/>
+                    </g>
+                    <circle cx="0" cy="0" r="4" fill="#FFF59D"/><circle cx="0" cy="0" r="2" fill="#E91E63"/>
+                  </g>
+                  <!-- Flower 4 -->
+                  <g transform="translate(190, 42) scale(1.02)">
+                    <g fill="url(#flowerPlumeria-hero)">
+                      <path d="M0 0 C-6 -10 2 -16 6 -8 Z"/><path d="M0 0 C6 -10 14 -4 8 4 Z"/><path d="M0 0 C10 0 12 10 2 8 Z"/><path d="M0 0 C2 10 -8 10 -6 2 Z"/><path d="M0 0 C-10 4 -12 -6 -2 -6 Z"/>
+                    </g>
+                    <circle cx="0" cy="0" r="2.8" fill="#FBC02D"/>
+                  </g>
+                  <!-- Flower 5 -->
+                  <g transform="translate(216, 50) scale(0.92)">
+                    <g fill="#FF4081">
+                      <circle cx="0" cy="-6.5" r="5.5"/><circle cx="6.5" cy="-2" r="5.5"/><circle cx="4" cy="5.5" r="5.5"/><circle cx="-4" cy="5.5" r="5.5"/><circle cx="-6.5" cy="-2" r="5.5"/>
+                    </g>
+                    <circle cx="0" cy="0" r="3" fill="#FFEB3B"/>
+                  </g>
+                </g>
+              </g>
+
+              <!-- ARMS WITH KUPEʻE -->
+              <g class="fz-arm fz-arm-l">
+                <ellipse cx="115" cy="208" rx="14" ry="30" fill="#FFD94F"/>
+                <g class="fz-kupee-l" transform="translate(114, 226)">
+                  <rect x="-12" y="-4" width="24" height="8" rx="4" fill="#2E7D32"/>
+                  <circle cx="-6" cy="0" r="3.5" fill="#FF5252"/><circle cx="0" cy="0" r="4" fill="#FFF59D"/><circle cx="6" cy="0" r="3.5" fill="#FF80AB"/>
+                </g>
+              </g>
+
+              <g class="fz-arm fz-arm-r">
+                <ellipse cx="198" cy="204" rx="14" ry="30" fill="#FFD94F"/>
+                <g class="fz-kupee-r" transform="translate(199, 222)">
+                  <rect x="-12" y="-4" width="24" height="8" rx="4" fill="#2E7D32"/>
+                  <circle cx="-6" cy="0" r="3.5" fill="#FF80AB"/><circle cx="0" cy="0" r="4" fill="#FFF59D"/><circle cx="6" cy="0" r="3.5" fill="#FF5252"/>
+                </g>
+              </g>
+
             </g>
           </g>
         </svg>
+
+        <ul class="cefr-cycle" aria-hidden="true">
+          <li>A1</li><li>A2</li><li>B1</li><li>B2</li><li>C1</li><li>C2</li>
+        </ul>
+      </div>
       </div>
 
-      <!-- ===============================================================
-           RIGHT: TEACHER ECOSYSTEM (Accurate MacBook + MIRA Mascot Behind)
-           =============================================================== -->
-      <div class="teacher-cluster" aria-label="Sisi Pendidik: KelasKu untuk Guru di Laptop bersama MIRA">
+      
+      <!-- SISI GURU (MacBook Pro + Screenshot Asli KelasKu + MIRA di Balik Layar) -->
+      <div class="stage-teacher">
+        <div class="mac-container">
+          
+          <!-- MIRA TEACHER MASCOT — Menopang dagu di balik laptop -->
+          <div class="mira-teacher-wrapper">
+            <svg class="mira-svg" viewBox="0 0 220 180" role="img" aria-label="MIRA — Maskot Guru FIEZEL menopang dagu di balik laptop">
+              <defs>
+                <linearGradient id="miraCardigan-hero" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#3AA385"/>
+                  <stop offset="100%" stop-color="#1F7A63"/>
+                </linearGradient>
+                <linearGradient id="miraHair-hero" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#6E4436"/>
+                  <stop offset="100%" stop-color="#4B281E"/>
+                </linearGradient>
+                <linearGradient id="miraSkin-hero" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#FFF8EE"/>
+                  <stop offset="100%" stop-color="#FDEFD8"/>
+                </linearGradient>
+                <clipPath id="miraEyeClipL-hero"><ellipse cx="88" cy="80" rx="13" ry="14"/></clipPath>
+                <clipPath id="miraEyeClipR-hero"><ellipse cx="132" cy="80" rx="13" ry="14"/></clipPath>
+              </defs>
 
-        <!-- TEACHER MASCOT (MIRA) — POSITIONED STRICTLY BEHIND LAPTOP SCREEN -->
-        <div class="mira-teacher-wrapper">
-          <svg class="mira-svg" viewBox="0 0 220 180" role="img" aria-label="MIRA — Maskot Guru FIEZEL menopang dagu di balik laptop">
-            <defs>
-              <linearGradient id="miraCardigan" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#3AA385"/>
-                <stop offset="100%" stop-color="#1F7A63"/>
-              </linearGradient>
-              <linearGradient id="miraHair" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#6E4436"/>
-                <stop offset="100%" stop-color="#4B281E"/>
-              </linearGradient>
-              <linearGradient id="miraSkin" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#FFF8EE"/>
-                <stop offset="100%" stop-color="#FDEFD8"/>
-              </linearGradient>
-              <clipPath id="miraEyeClipL"><ellipse cx="88" cy="80" rx="13" ry="14"/></clipPath>
-              <clipPath id="miraEyeClipR"><ellipse cx="132" cy="80" rx="13" ry="14"/></clipPath>
-            </defs>
-
-            <!-- Mascot Lower Body (Cardigan & Shoulders) — sits behind laptop screen -->
-            <g class="mira-shoulders">
-              <path d="M40 180 C40 140 70 128 110 128 C150 128 180 140 180 180 Z" fill="url(#miraCardigan)"/>
-              <!-- Cardigan Lapels -->
-              <path d="M110 134 L92 180" stroke="#166052" stroke-width="3" stroke-linecap="round"/>
-              <path d="M110 134 L128 180" stroke="#166052" stroke-width="3" stroke-linecap="round"/>
-              <polygon points="100,134 120,134 110,154" fill="#FDFBF7"/>
-            </g>
-
-            <!-- Animated Head & Hands Assembly -->
-            <g class="mira-anim-head">
-              <!-- Hair Back -->
-              <ellipse cx="110" cy="74" rx="58" ry="52" fill="url(#miraHair)"/>
-              <path d="M54 78 Q50 110 68 135 Q80 144 86 130 Q72 105 72 78 Z" fill="url(#miraHair)"/>
-              <path d="M166 78 Q170 110 152 135 Q140 144 134 130 Q148 105 148 78 Z" fill="url(#miraHair)"/>
-
-              <!-- Face -->
-              <circle cx="110" cy="84" r="44" fill="url(#miraSkin)"/>
-
-              <!-- Cheeks Blush -->
-              <ellipse cx="76" cy="98" rx="10" ry="6.5" fill="#F8A5B2" opacity="0.75"/>
-              <ellipse cx="144" cy="98" rx="10" ry="6.5" fill="#F8A5B2" opacity="0.75"/>
-
-              <!-- Hair Front & Bangs -->
-              <path d="M68 64 Q86 42 110 44 Q138 42 152 64 Q132 54 110 56 Q88 54 68 64 Z" fill="url(#miraHair)"/>
-              <path d="M72 62 Q92 72 104 68 Q90 52 72 62 Z" fill="#5A3428"/>
-              <path d="M148 62 Q128 72 116 68 Q130 52 148 62 Z" fill="#5A3428"/>
-
-              <!-- Round Gold Glasses -->
-              <circle cx="88" cy="80" r="17.5" fill="none" stroke="#C9A24B" stroke-width="3.2"/>
-              <circle cx="132" cy="80" r="17.5" fill="none" stroke="#C9A24B" stroke-width="3.2"/>
-              <line x1="105.5" y1="80" x2="114.5" y2="80" stroke="#C9A24B" stroke-width="2.8" stroke-linecap="round"/>
-              <line x1="70.5" y1="78" x2="63" y2="76" stroke="#C9A24B" stroke-width="2.5" stroke-linecap="round"/>
-              <line x1="149.5" y1="78" x2="157" y2="76" stroke="#C9A24B" stroke-width="2.5" stroke-linecap="round"/>
-
-              <!-- Eyes & Pupils (Warm Espresso with bright highlights) -->
-              <g clip-path="url(#miraEyeClipL)">
-                <ellipse cx="88" cy="80" rx="11" ry="12.5" fill="#241A11"/>
-                <circle cx="91.5" cy="75.5" r="4.2" fill="#fff"/>
-                <circle cx="84.5" cy="83.5" r="2.2" fill="#fff" opacity="0.8"/>
-                <!-- Animated Eyelid for Blinking -->
-                <rect class="mira-eyelid" x="75" y="66" width="26" height="28" fill="url(#miraSkin)"/>
+              <!-- Mascot Lower Body (Cardigan & Shoulders) — Berada di balik layar laptop -->
+              <g class="mira-shoulders">
+                <path d="M40 180 C40 140 70 128 110 128 C150 128 180 140 180 180 Z" fill="url(#miraCardigan-hero)"/>
+                <path d="M110 134 L92 180" stroke="#166052" stroke-width="3" stroke-linecap="round"/>
+                <path d="M110 134 L128 180" stroke="#166052" stroke-width="3" stroke-linecap="round"/>
+                <polygon points="100,134 120,134 110,154" fill="#FDFBF7"/>
               </g>
 
-              <g clip-path="url(#miraEyeClipR)">
-                <ellipse cx="132" cy="80" rx="11" ry="12.5" fill="#241A11"/>
-                <circle cx="135.5" cy="75.5" r="4.2" fill="#fff"/>
-                <circle cx="128.5" cy="83.5" r="2.2" fill="#fff" opacity="0.8"/>
-                <!-- Animated Eyelid for Blinking -->
-                <rect class="mira-eyelid" x="119" y="66" width="26" height="28" fill="url(#miraSkin)"/>
+              <!-- Animated Head & Hands Assembly -->
+              <g class="mira-anim-head">
+                <!-- Hair Back -->
+                <ellipse cx="110" cy="74" rx="58" ry="52" fill="url(#miraHair-hero)"/>
+                <path d="M54 78 Q50 110 68 135 Q80 144 86 130 Q72 105 72 78 Z" fill="url(#miraHair-hero)"/>
+                <path d="M166 78 Q170 110 152 135 Q140 144 134 130 Q148 105 148 78 Z" fill="url(#miraHair-hero)"/>
+
+                <!-- Head Base -->
+                <path d="M68 76 C68 44 86 36 110 36 C134 36 152 44 152 76 C152 104 136 122 110 122 C84 122 68 104 68 76 Z" fill="url(#miraSkin-hero)"/>
+
+                <!-- Hair Front & Bangs -->
+                <path d="M64 64 C76 40 102 38 114 48 C126 38 148 40 156 64 C160 52 152 32 110 32 C68 32 60 52 64 64 Z" fill="url(#miraHair-hero)"/>
+                <path d="M68 64 Q88 78 110 60 Q132 78 152 64 Q140 46 110 46 Q80 46 68 64 Z" fill="url(#miraHair-hero)"/>
+
+                <!-- Hair Bun / Scrunchie -->
+                <ellipse cx="110" cy="24" rx="22" ry="16" fill="url(#miraHair-hero)"/>
+                <ellipse cx="110" cy="26" rx="14" ry="7" fill="#1F7A63"/>
+
+                <!-- Glasses Frame -->
+                <g class="mira-glasses">
+                  <rect x="73" y="66" width="30" height="26" rx="9" fill="none" stroke="#634832" stroke-width="2.5"/>
+                  <rect x="117" y="66" width="30" height="26" rx="9" fill="none" stroke="#634832" stroke-width="2.5"/>
+                  <path d="M103 76 Q110 74 117 76" fill="none" stroke="#634832" stroke-width="2.5" stroke-linecap="round"/>
+                </g>
+
+                <!-- Animated Eyes with Natural Eyelid Blinking -->
+                <g class="mira-eyes">
+                  <g class="mira-eyelid">
+                    <ellipse cx="88" cy="79" rx="11" ry="12" fill="#FFFFFF"/>
+                    <circle cx="89" cy="79" r="7" fill="#3D2314"/>
+                    <circle cx="91" cy="76" r="2.8" fill="#FFFFFF"/>
+                    <circle cx="86" cy="82" r="1.3" fill="#FFFFFF" opacity="0.8"/>
+                  </g>
+                  <g class="mira-eyelid">
+                    <ellipse cx="132" cy="79" rx="11" ry="12" fill="#FFFFFF"/>
+                    <circle cx="133" cy="79" r="7" fill="#3D2314"/>
+                    <circle cx="135" cy="76" r="2.8" fill="#FFFFFF"/>
+                    <circle cx="130" cy="82" r="1.3" fill="#FFFFFF" opacity="0.8"/>
+                  </g>
+                </g>
+
+                <!-- Blush & Smile -->
+                <ellipse cx="76" cy="94" rx="8" ry="4.5" fill="#F43F5E" opacity="0.32"/>
+                <ellipse cx="144" cy="94" rx="8" ry="4.5" fill="#F43F5E" opacity="0.32"/>
+                <path d="M103 100 Q110 107 117 100" fill="none" stroke="#884232" stroke-width="2.5" stroke-linecap="round"/>
+
+                <!-- Two Hands Supporting Chin (Posed right on top of laptop bezel) -->
+                <g class="mira-hands-chin">
+                  <!-- Left Hand -->
+                  <path d="M84 126 C80 120 86 112 94 114 C98 115 102 119 104 124 C100 128 88 130 84 126 Z" fill="url(#miraSkin-hero)"/>
+                  <circle cx="91" cy="116" r="4.2" fill="#FDEFD8"/>
+                  <circle cx="96" cy="118" r="4.2" fill="#FDEFD8"/>
+                  <circle cx="101" cy="121" r="3.8" fill="#FDEFD8"/>
+                  
+                  <!-- Right Hand -->
+                  <path d="M136 126 C140 120 134 112 126 114 C122 115 118 119 116 124 C120 128 132 130 136 126 Z" fill="url(#miraSkin-hero)"/>
+                  <circle cx="129" cy="116" r="4.2" fill="#FDEFD8"/>
+                  <circle cx="124" cy="118" r="4.2" fill="#FDEFD8"/>
+                  <circle cx="119" cy="121" r="3.8" fill="#FDEFD8"/>
+                </g>
               </g>
+            </svg>
+          </div>
 
-              <!-- Eyebrows -->
-              <path d="M75 63 Q87 57 99 62" stroke="#5A3428" stroke-width="3" stroke-linecap="round" fill="none"/>
-              <path d="M121 62 Q133 57 145 63" stroke="#5A3428" stroke-width="3" stroke-linecap="round" fill="none"/>
-
-              <!-- Nose & Smile -->
-              <circle cx="110" cy="94" r="1.6" fill="#C49B7A"/>
-              <path d="M98 102 Q110 114 122 102" stroke="#241A11" stroke-width="3.8" stroke-linecap="round" fill="none"/>
-
-              <!-- HANDS: Resting right atop the laptop bezel, supporting the cheeks -->
-              <!-- Left hand -->
-              <g class="mira-hand-left">
-                <path d="M68 132 Q74 116 86 114 Q90 124 82 134 Z" fill="url(#miraSkin)" stroke="#E8D1B5" stroke-width="1"/>
-                <!-- Fingers cupping cheek -->
-                <circle cx="84" cy="116" r="4.5" fill="url(#miraSkin)"/>
-                <circle cx="80" cy="121" r="4.5" fill="url(#miraSkin)"/>
-                <circle cx="76" cy="127" r="4.5" fill="url(#miraSkin)"/>
-                <!-- Cardigan cuff -->
-                <rect x="58" y="130" width="20" height="12" rx="6" fill="#1F7A63" transform="rotate(-25 68 136)"/>
-              </g>
-
-              <!-- Right hand -->
-              <g class="mira-hand-right">
-                <path d="M152 132 Q146 116 134 114 Q130 124 138 134 Z" fill="url(#miraSkin)" stroke="#E8D1B5" stroke-width="1"/>
-                <!-- Fingers cupping cheek -->
-                <circle cx="136" cy="116" r="4.5" fill="url(#miraSkin)"/>
-                <circle cx="140" cy="121" r="4.5" fill="url(#miraSkin)"/>
-                <circle cx="144" cy="127" r="4.5" fill="url(#miraSkin)"/>
-                <!-- Cardigan cuff -->
-                <rect x="142" y="130" width="20" height="12" rx="6" fill="#1F7A63" transform="rotate(25 152 136)"/>
-              </g>
-            </g>
-          </svg>
-        </div>
-
-        <!-- ACCURATE APPLE MACBOOK PRO MOCKUP (Sits in front of MIRA) -->
-        <div class="macbook-pro">
-          <!-- Screen Display Lid -->
+          <!-- MacBook Pro Display Lid -->
           <div class="mac-lid">
-            <!-- Apple FaceTime Camera Notch -->
             <div class="mac-notch">
               <span class="mac-camera"></span>
+              <span class="mac-led"></span>
             </div>
-            <!-- Display Screen showing ACTUAL TEACHER DASHBOARD SCREENSHOT -->
             <div class="mac-screen">
-              <img src="assets/shots/teacher-desktop.png" alt="FIEZEL KelasKu untuk Guru — Briefing Hari Ini, Deteksi Dini Siswa, dan Analitik" width="1440" height="900" loading="eager">
+              <img src="assets/shots/teacher-desktop.png" alt="Tampilan Nyata Dashboard KelasKu untuk Guru" width="1440" height="900" loading="eager">
             </div>
           </div>
 
-          <!-- Unibody Aluminum Base -->
+          <!-- MacBook Pro Aluminium Unibody Base -->
           <div class="mac-base">
-            <span class="mac-hinge"></span>
-            <span class="mac-scoop"></span>
-            <span class="mac-base-shadow"></span>
+            <div class="mac-hinge"></div>
+            <div class="mac-scoop"></div>
           </div>
         </div>
 
-        <div class="teacher-badge-caption">
-          <span>👩‍🏫</span>
-          <span data-i18n="hero.teacher-badge">FIEZEL KelasKu untuk Guru — Briefing &amp; Analitik Kelas</span>
+        <div class="teacher-hero-meta">
+          <span class="teacher-hero-badge">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/></svg>
+            <span class="kelasku-brand"><span class="kelasku-main">KelasKu</span> <span class="kelasku-tag">untuk Guru</span></span> — Briefing &amp; Analitik Kelas
+          </span>
+          <a class="btn-teacher-hero" href="app/?teacher=preview">
+            Buka Demo Guru →
+          </a>
         </div>
+      </div>
 
-      </div><!-- End teacher-cluster -->
+    </div>
 
-    </div><!-- End hero-stage -->
   </section>
 
-  <!-- ===================================================================
-       LANGUAGE SHOWCASE
-       =================================================================== -->
-  <section class="lang-section">
-    <p class="sec-kicker" data-i18n="lang.kicker">Dua Bahasa. Satu Platform Cerdas.</p>
-    <h2 class="sec-title" data-i18n="lang.title">Bahasa Inggris &amp; Jepang dalam Satu Ekosistem</h2>
-    <div class="lang-cards">
-      <a class="lang-card" href="app/">
-        <span class="lang-flag">🇬🇧</span>
-        <div>
-          <b data-i18n="lang.en-title">Bahasa Inggris</b>
-          <small data-i18n="lang.en-desc">A1–C1 · 180 Pelajaran · Grammar &amp; Vocab Adaptif</small>
-        </div>
-      </a>
-      <a class="lang-card" href="app/">
-        <span class="lang-flag">🇯🇵</span>
-        <div>
-          <b data-i18n="lang.jp-title">Bahasa Jepang</b>
-          <small data-i18n="lang.jp-desc">Jalur Pemula · AI-Guided · Hiragana &amp; Kosakata</small>
-        </div>
-      </a>
+  <!-- ============ ADAPTIF DALAM TIGA LANGKAH ============
+       m029 FOCUS: "adaptif" adalah klaim pembeda FIEZEL, tetapi sampai commit ini ia hanya
+       DIKATAKAN ("menyesuaikan soal dengan jawabanmu") dan tidak pernah DITUNJUKKAN — dari
+       luar tidak ada bedanya dengan aplikasi kuis biasa. Strip ini memperlihatkan satu putaran
+       nyata: jawaban salah -> pola dibaca -> sesi berikutnya berubah.
+
+       Naskah langkah 2 BUKAN karangan halaman ini: ia disalin apa adanya dari entri TA-002 di
+       grammar-explanations-id.json (field `misconception` dan `rule`) — yaitu penjelasan yang
+       benar-benar dibaca murid di dalam aplikasi. Kalau bank soal berubah, perbarui di sini. -->
+  <section class="sec sec-loop" id="adaptif">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="sec-num" aria-hidden="true">01 — Adaptif</span>
+        <h2 class="sec-title">Apa yang terjadi saat kamu salah</h2>
+        <p class="sec-dek">Kebanyakan orang berhenti belajar bukan karena kurang materi, tapi karena tidak tahu harus mulai dari mana. Ini satu putaran nyata di dalam FIEZEL — bukan ilustrasi.</p>
+        <hr class="rule" aria-hidden="true">
+      </div>
+
+      <ol class="loop">
+        <li class="card loop-step reveal">
+          <p class="loop-n"><span aria-hidden="true">1</span>Kamu menjawab</p>
+          <p class="loop-q">I <s>have finished</s> it <b>yesterday</b>.</p>
+          <p class="loop-verdict loop-verdict-bad">Belum tepat</p>
+          <dl class="loop-ans">
+            <dt>Pilihanmu</dt><dd>have finished</dd>
+            <dt>Seharusnya</dt><dd>finished</dd>
+          </dl>
+          <p class="loop-note">FIEZEL berhenti di sini kalau ia aplikasi kuis biasa.</p>
+        </li>
+
+        <li class="card loop-step reveal">
+          <p class="loop-n"><span aria-hidden="true">2</span>FIEZEL menjelaskan polanya</p>
+          <p class="loop-exp">Kamu ngira present perfect selalu berarti masih jalan sekarang. Padahal maknanya lampau tanpa waktu pasti yang masih nyambung ke sekarang.</p>
+          <p class="loop-rule"><b>Aturannya:</b> present perfect nggak bisa jalan bareng keterangan waktu lampau yang pasti — “yesterday”, “in 2019”, “last week”.</p>
+          <p class="loop-note">Bukan cuma “salah”, tapi <b>kenapa</b> salah.</p>
+        </li>
+
+        <li class="card loop-step reveal">
+          <p class="loop-n"><span aria-hidden="true">3</span>Sesi berikutnya berubah</p>
+          <ul class="loop-plan">
+            <li><span class="loop-plan-k">Ditambahkan</span> Review past simple vs present perfect</li>
+            <li><span class="loop-plan-k">Alasan</span> Pola ini tertukar di latihan terakhirmu</li>
+            <li><span class="loop-plan-k">Muncul lagi</span> Di target harianmu besok</li>
+          </ul>
+          <p class="loop-note">Rencana besok disusun dari kesalahan hari ini.</p>
+        </li>
+      </ol>
     </div>
   </section>
 
-  <!-- ===================================================================
-       HOW IT WORKS (3-STEP ADAPTIVE LOOP)
-       =================================================================== -->
-  <section class="section">
-    <div class="wrap">
-      <p class="sec-kicker" data-i18n="how.kicker">Loop Adaptif Cerdas</p>
-      <h2 class="sec-title" data-i18n="how.title">Bagaimana FIEZEL Bekerja Bersamamu</h2>
-      <p class="sec-lead" data-i18n="how.lead">Bukan sekadar bank soal acak. Core Brain membaca pola jawabanmu dan merajut materi yang tepat di saat yang tepat.</p>
+  <!-- ============ RINGKASAN (teks panjang: turun setelah panggung visual) ============ -->
+  <section class="sec sec-intro" id="ringkasan">
+    <div class="wrap intro-grid">
+      <div class="intro-copy reveal">
+        <p class="eyebrow">Gratis, tanpa langganan</p>
+        <h1>Ruang belajar bahasa Inggris personal milikmu</h1>
+        <p class="lede">FIEZEL menyatukan grammar, kosakata, reading, speaking, dan listening dalam satu aplikasi yang menyesuaikan soal dengan jawabanmu. Semuanya dipetakan ke tingkat CEFR A1–C2 dan bisa kamu pakai tanpa biaya.</p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="app/">Mulai tes penempatan</a>
+          <a class="btn btn-ghost" href="install/">Cara Install</a>
+        </div>
+        <p class="fineprint">Tanpa akun. Progres belajarmu tersimpan di perangkatmu sendiri.</p>
+      </div>
+      <aside class="card intro-note reveal">
+        <p class="eyebrow-line">Adaptive learning companion</p>
+        <p class="tagline"><span class="t-1">Not just learning with you.</span> <span class="t-2">Learning about you.</span></p>
+        <p class="intro-note-body">FIEZEL membaca pola jawabanmu, lalu menyesuaikan soal berikutnya — bukan cuma menandai benar atau salah.</p>
+      </aside>
+    </div>
 
-      <div class="how-steps">
-        <div class="step-card">
-          <p class="step-num" data-i18n="how.s1-num">Langkah 01</p>
-          <h3 data-i18n="how.s1-title">Kamu Berlatih</h3>
-          <p data-i18n="how.s1-desc">Selesaikan sesi latihan singkat harian — kosakata, pola tata bahasa, teks bacaan, atau percakapan.</p>
+    <div class="wrap">
+      <ul class="stats">
+        <li class="reveal"><b>180</b><span>grammar lesson</span></li>
+        <li class="reveal"><b>2.440</b><span>kosakata</span></li>
+        <li class="reveal"><b>312</b><span>bacaan berjenjang</span></li>
+        <li class="reveal"><b>A1–C2</b><span>tingkat CEFR</span></li>
+      </ul>
+    </div>
+
+    <!-- marquee statistik: dekoratif, mengulang fakta yang sama (disembunyikan dari pembaca layar) -->
+    <div class="ticker" aria-hidden="true">
+      <ul class="ticker-track">
+        <li>180 grammar lesson</li><li>2.440 kosakata</li><li>312 bacaan berjenjang</li><li>1.560 soal membaca</li><li>36 sesi speaking</li><li>25 soal per lesson</li><li>CEFR A1–C2</li><li>Gratis, tanpa langganan</li>
+        <li>180 grammar lesson</li><li>2.440 kosakata</li><li>312 bacaan berjenjang</li><li>1.560 soal membaca</li><li>36 sesi speaking</li><li>25 soal per lesson</li><li>CEFR A1–C2</li><li>Gratis, tanpa langganan</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ TENTANG ============ -->
+  <section class="sec sec-about" id="tentang">
+    <div class="wrap about-grid">
+      <div class="reveal">
+        <div class="sec-head">
+          <span class="sec-num" aria-hidden="true">02 — Tentang</span>
+          <h2 class="sec-title">Apa itu FIEZEL</h2>
         </div>
-        <div class="step-card is-accent">
-          <p class="step-num" data-i18n="how.s2-num">Langkah 02</p>
-          <h3 data-i18n="how.s2-title">Core Brain Membaca Pola</h3>
-          <p data-i18n="how.s2-desc">Kesalahan bukan kegagalan; algoritma mendeteksi miskonsepsi spesifik dan tingkat retensi memori.</p>
-        </div>
-        <div class="step-card">
-          <p class="step-num" data-i18n="how.s3-num">Langkah 03</p>
-          <h3 data-i18n="how.s3-title">Rencana Menyesuaikan</h3>
-          <p data-i18n="how.s3-desc">Sesi berikutnya otomatis disesuaikan agar kamu menaklukkan kelemahan tanpa merasa terbebani.</p>
-        </div>
+        <p class="body-lg">FIEZEL adalah ruang belajar bahasa Inggris personal: satu aplikasi berisi 180 grammar lesson, 2.440 kosakata, 312 bacaan berjenjang dengan 1.560 soal membaca, 36 sesi speaking, dan 1.400+ latihan listening. Materinya dipetakan ke tingkat CEFR A1–C2, jadi kamu bisa mulai dari level yang benar-benar sesuai.</p>
+        <p class="body-lg">Cocok untuk pelajar, mahasiswa, dan siapa pun yang ingin belajar rutin tanpa kelas dan tanpa biaya: gratis, tanpa langganan, tanpa akun. Aplikasinya bisa dipasang ke layar utama seperti aplikasi biasa, dan menyesuaikan soal berikutnya dari jawabanmu.</p>
+      </div>
+      <div class="shot-pair reveal">
+        <figure class="phone phone-sm">
+          <div class="phone-screen">
+            <img src="assets/shots/grammar-mobile.png" alt="Grammar Hub dengan 17 lesson terurut untuk level A1" width="780" height="1688" loading="lazy" decoding="async">
+          </div>
+        </figure>
+        <figure class="phone phone-sm phone-lift">
+          <div class="phone-screen">
+            <img src="assets/shots/reading-mobile.png" alt="Layar Reading FIEZEL dengan daftar bacaan berjenjang" width="780" height="1688" loading="lazy" decoding="async">
+          </div>
+        </figure>
       </div>
     </div>
   </section>
 
-  <!-- ===================================================================
-       6 CORE SKILLS
-       =================================================================== -->
-  <section class="section feat-section">
+  <!-- ============ FITUR ============ -->
+  <section class="sec" id="fitur">
     <div class="wrap">
-      <p class="sec-kicker" data-i18n="skills.kicker">Keterampilan Menyeluruh</p>
-      <h2 class="sec-title" data-i18n="skills.title">Semua Keterampilan Bahasa dalam Satu Aplikasi</h2>
-      <p class="sec-lead" data-i18n="skills.lead">Dirancang berdasarkan standar CEFR internasional untuk penguasaan bahasa yang aktif dan percaya diri.</p>
-
+      <div class="sec-head reveal">
+        <span class="sec-num" aria-hidden="true">03 — Isi aplikasi</span>
+        <h2 class="sec-title">Yang kamu dapat di dalam</h2>
+        <hr class="rule" aria-hidden="true">
+      </div>
       <div class="feat-grid">
-        <div class="feat-card">
-          <div class="feat-icon" style="background:#FFF3C4">📖</div>
-          <h3 data-i18n="skills.v-title">Vocabulary</h3>
-          <p data-i18n="skills.v-desc">Spaced repetition pintar yang memastikan kosakata baru tersimpan kuat di memori jangka panjang.</p>
-        </div>
-        <div class="feat-card">
-          <div class="feat-icon" style="background:#E9F7F0">✏️</div>
-          <h3 data-i18n="skills.g-title">Grammar</h3>
-          <p data-i18n="skills.g-desc">180 materi terstruktur dari level dasar hingga mahir tanpa hafalan rumus yang membingungkan.</p>
-        </div>
-        <div class="feat-card">
-          <div class="feat-icon" style="background:#FDE3DE">📚</div>
-          <h3 data-i18n="skills.r-title">Reading</h3>
-          <p data-i18n="skills.r-desc">312 bacaan berjenjang yang melatih pemahaman konteks, ide pokok, dan inferensi bacaan.</p>
-        </div>
-        <div class="feat-card">
-          <div class="feat-icon" style="background:#E2EFF9">🎧</div>
-          <h3 data-i18n="skills.l-title">Listening</h3>
-          <p data-i18n="skills.l-desc">Latihan pendengaran interaktif dengan aksen natural untuk mengasah kepekaan telinga.</p>
-        </div>
-        <div class="feat-card">
-          <div class="feat-icon" style="background:#ECE6F8">🎙️</div>
-          <h3 data-i18n="skills.s-title">Speaking</h3>
-          <p data-i18n="skills.s-desc">Latihan pengucapan dan respons lisan terarah untuk membangun keberanian berbicara aktif.</p>
-        </div>
-        <div class="feat-card">
-          <div class="feat-icon" style="background:#FBE3E1">🤖</div>
-          <h3 data-i18n="skills.a-title">AI Tutor Brain</h3>
-          <p data-i18n="skills.a-desc">Pendamping pintar yang menjelaskan alasan di balik setiap koreksi secara ramah dan sabar.</p>
-        </div>
+        <article class="card feat feat-wide tint-sun reveal">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19V6a2 2 0 0 1 2-2h9l5 5v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"/><path d="M14 4v5h5"/><path d="M8 13h7M8 16.5h4"/></svg>
+          <h3>Grammar Hub berjenjang</h3>
+          <p>180 lesson dari A1 sampai C2, tiap lesson 25 soal latihan terfokus, terbuka bertahap lewat prasyarat.</p>
+          <ul class="chiplist">
+            <li>A1 17</li><li>A2 29</li><li>B1 52</li><li>B2 39</li><li>C1 24</li><li>C2 19</li>
+          </ul>
+        </article>
+
+        <article class="card feat tint-paper reveal">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5.5A2.5 2.5 0 0 1 5.5 3H11v18H5.5A2.5 2.5 0 0 1 3 18.5Z"/><path d="M21 5.5A2.5 2.5 0 0 0 18.5 3H13v18h5.5A2.5 2.5 0 0 0 21 18.5Z"/></svg>
+          <h3>Reading A1–C2</h3>
+          <p>312 bacaan berjenjang dengan 1.560 soal membaca, dari teks pendek pemula sampai bacaan panjang tingkat lanjut.</p>
+        </article>
+
+        <article class="card feat tint-sun reveal">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3Z"/><path d="M5 17h14"/><path d="M9 8h6M9 11.5h4"/></svg>
+          <h3>2.440 kosakata</h3>
+          <p>Bank kosakata bertingkat untuk dilatih berulang, tersusun mengikuti tingkat CEFR yang sedang kamu kerjakan.</p>
+        </article>
+
+        <article class="card feat tint-paper reveal">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5V21M9 21h6"/></svg>
+          <h3>Speaking dan Listening</h3>
+          <p>36 sesi speaking plus 1.400+ latihan listening dengan bank soal dan enam format ujian bergaya IELTS dan TOEFL. Audionya TTS dari skrip orisinal, bukan rekaman ujian asli.</p>
+        </article>
+
+        <article class="card feat tint-blush reveal">
+          <!-- maskot PAW inline (geometri asli assets/brand/paw-mascot-head.svg) + idle breathing -->
+          <svg class="ico-img paw-idle" viewBox="56 -10 208 216" role="img" aria-label="PAW — ikon kepala maskot FIEZEL"><g><path d="M76 66 L 95 0 L 140 34 Z" fill="#FFD94F"/><path d="M90 52 L 101 17 L 125 35 Z" fill="#8C2233"/><path d="M244 66 L 225 0 L 180 34 Z" fill="#FFD94F"/><path d="M230 52 L 219 17 L 195 35 Z" fill="#8C2233"/><circle cx="160" cy="106" r="88" fill="#FFD94F"/><ellipse cx="160" cy="140" rx="36" ry="25" fill="#FFF4DA"/><path d="M153 126 L 167 126 L 160 136 Z" fill="#8C2233"/><circle cx="102" cy="126" r="11" fill="#F0A0AC"/><circle cx="218" cy="126" r="11" fill="#F0A0AC"/><g><circle cx="126" cy="98" r="14.5" fill="#33201F"/><circle cx="130" cy="93" r="5" fill="#fff"/><circle cx="122" cy="103" r="2.6" fill="#fff" opacity=".7"/></g><g><circle cx="194" cy="98" r="14.5" fill="#33201F"/><circle cx="198" cy="93" r="5" fill="#fff"/><circle cx="190" cy="103" r="2.6" fill="#fff" opacity=".7"/></g><path d="M148 148 C 154 155 166 155 172 148" stroke="#33201F" stroke-width="5.5" stroke-linecap="round" fill="none"/></g></svg>
+          <h3>Maskot PAW</h3>
+          <p>PAW punya 14 ekspresi yang bereaksi ke jawabanmu: penasaran, memberi petunjuk, ikut senang, ikut bingung.</p>
+        </article>
+
+        <article class="card feat tint-blush reveal">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17c3.5 0 4.5-10 8-10s4.5 10 8 10"/><path d="M3 12.5h4M17 12.5h4"/></svg>
+          <h3>Belajar adaptif</h3>
+          <p>Aplikasi membaca pola jawabanmu, lalu menyesuaikan soal dan pengulangan berikutnya supaya latihan tidak terlalu mudah.</p>
+        </article>
+
+        <article class="card feat tint-sun reveal">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="3"/><path d="M10.5 18.5h3"/><path d="M12 6v6M9.5 9.5 12 12l2.5-2.5"/></svg>
+          <h3>Bisa dipasang (PWA)</h3>
+          <p>Pasang ke Home Screen seperti aplikasi biasa. Setelah terpasang, materi dan latihan bisa dibuka tanpa internet.</p>
+        </article>
+
+        <article class="card feat tint-paper reveal">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10v4M8 7v10M12 4.5v15M16 8v8M20 11v2"/></svg>
+          <h3>Suara neural opsional</h3>
+          <p>Suara perangkat aktif sejak awal. Suara neural diunduh sekali dan butuh jaringan saat mengunduh dan memakainya pertama kali.</p>
+        </article>
       </div>
     </div>
   </section>
 
-  <!-- ===================================================================
-       TEACHER ECOSYSTEM (KELASKU UNTUK GURU)
-       =================================================================== -->
-  <section class="section teacher-section">
+  <!-- ============ CARA PAKAI ============ -->
+  <section class="sec sec-steps" id="cara-pakai">
     <div class="wrap">
-      <div class="teacher-split">
-        <div class="teacher-shot-frame">
-          <img src="assets/shots/teacher-desktop.png" alt="Tampilan Nyata FIEZEL KelasKu untuk Guru">
-        </div>
-        <div class="teacher-benefits">
-          <p class="sec-kicker" data-i18n="teach.kicker">Ekosistem Pendidik</p>
-          <h2 class="sec-title" data-i18n="teach.title">KelasKu untuk Guru: Dasbor Manajemen Kelas Cerdas</h2>
-          <p class="sec-lead" data-i18n="teach.lead">Bebaskan guru dari beban administrasi manual. Pantau kemajuan siswa, deteksi dini siswa tertinggal, dan bagikan tugas dalam hitungan detik.</p>
-
-          <div class="t-benefit">
-            <span class="t-benefit-icon">🎯</span>
-            <div>
-              <h4 data-i18n="teach.b1-title">Deteksi Dini Siswa Tertinggal</h4>
-              <p data-i18n="teach.b1-desc">Algoritma langsung menandai siswa yang memerlukan perhatian khusus sebelum mereka tertinggal jauh.</p>
-            </div>
-          </div>
-
-          <div class="t-benefit">
-            <span class="t-benefit-icon">📋</span>
-            <div>
-              <h4 data-i18n="teach.b2-title">Tugas &amp; Ujian Dinilai Otomatis</h4>
-              <p data-i18n="teach.b2-desc">Buat kuis mini atau latihan dari ribuan bank soal kurikulum, hasil terkoreksi instan tanpa koreksi manual.</p>
-            </div>
-          </div>
-
-          <div class="t-benefit">
-            <span class="t-benefit-icon">💬</span>
-            <div>
-              <h4 data-i18n="teach.b3-title">Kartu Sapa &amp; Laporan Wali Murid</h4>
-              <p data-i18n="teach.b3-desc">Kirim apresiasi atau laporan perkembangan belajar ke WhatsApp orang tua hanya dengan satu klik.</p>
-            </div>
-          </div>
-
-          <div style="margin-top:10px">
-            <a class="btn btn-teacher" href="app/?teacher=preview" data-i18n="teach.cta">Buka Demo <span class="kelasku-brand"><span class="kelasku-main">KelasKu</span> <span class="kelasku-tag">untuk Guru</span></span> →</a>
-          </div>
-        </div>
+      <div class="sec-head reveal">
+        <span class="sec-num" aria-hidden="true">04 — Alur</span>
+        <h2 class="sec-title">Cara pakai</h2>
+        <hr class="rule" aria-hidden="true">
       </div>
+      <!-- m029 FOCUS: urutan disamakan dengan alur aplikasi yang SUNGGUHAN
+           (tes penempatan -> level -> target harian -> review), bukan "pilih level sendiri".
+           Yang menentukan level adalah tes penempatan; state.level tidak pernah diisi
+           dari tebakan murid (app.js ~7074). -->
+      <ol class="steps">
+        <li class="card step reveal"><span class="step-n">1</span><p>Buka FIEZEL langsung dari browser. Tanpa daftar akun, tanpa unduhan.</p></li>
+        <li class="card step reveal"><span class="step-n">2</span><p>Kerjakan tes penempatan 25 soal. FIEZEL memetakan levelmu di CEFR A1–C2.</p></li>
+        <li class="card step reveal"><span class="step-n">3</span><p>Dapatkan target harian yang disusun dari jawabanmu sendiri, bukan angka tetap.</p></li>
+        <li class="card step reveal"><span class="step-n">4</span><p>Setiap kesalahan kembali sebagai review. Progres tersimpan di perangkatmu.</p></li>
+      </ol>
+      <div class="steps-cta reveal"><a class="btn btn-primary" href="app/">Mulai tes penempatan</a></div>
     </div>
   </section>
 
-  <!-- ===================================================================
-       EDUCATIONAL HOOK ARTICLES
-       =================================================================== -->
-  <section class="section">
+  <!-- ============ INSTALL ============ -->
+  <section class="sec" id="pasang">
     <div class="wrap">
-      <p class="sec-kicker" data-i18n="articles.kicker">Wawasan Pembelajaran</p>
-      <h2 class="sec-title" data-i18n="articles.title">Mengapa Pendekatan FIEZEL Lebih Efektif</h2>
-      <div class="edu-grid">
-        <div class="edu-card">
-          <span class="edu-tag" data-i18n="articles.t1">Retensi Memori</span>
-          <h3 data-i18n="articles.h1">Mengapa Kosakata Cepat Hilang dari Ingatan?</h3>
-          <p data-i18n="articles.p1">Otak manusia secara alami melupakan informasi baru jika tidak dipicu pada interval retensi yang tepat. FIEZEL mengkalkulasi kurva lupa tiap individu.</p>
+      <div class="card install-card reveal">
+        <div class="install-copy">
+          <span class="sec-num" aria-hidden="true">05 — Pemasangan</span>
+          <h2 class="sec-title">Pasang di ponselmu</h2>
+          <p class="body-lg">FIEZEL bisa dipasang ke layar utama lewat menu browser, tanpa toko aplikasi. Materi dan latihan bisa dibuka tanpa internet. Suara neural dan tutor AI butuh jaringan.</p>
+          <ul class="howlist">
+            <li><b>Android, Chrome:</b> menu ⋮ → “Instal aplikasi”</li>
+            <li><b>iPhone, Safari:</b> Bagikan → “Tambah ke Layar Utama”</li>
+            <li><b>Desktop Chrome atau Edge:</b> ikon install di address bar</li>
+          </ul>
+          <p><a class="link-arrow" href="install/">Panduan lengkap per perangkat</a></p>
         </div>
-        <div class="edu-card">
-          <span class="edu-tag" data-i18n="articles.t2">Pedagogi</span>
-          <h3 data-i18n="articles.h2">Mengapa Jawaban Salah adalah Momen Emas?</h3>
-          <p data-i18n="articles.p2">Kesalahan menunjukkan batas pemahaman konseptualmu. AI kami menggunakan kesalahan untuk memetakan akar miskonsepsi tata bahasa.</p>
-        </div>
-        <div class="edu-card">
-          <span class="edu-tag" data-i18n="articles.t3">Komunikasi</span>
-          <h3 data-i18n="articles.h3">Menjembatani Teori Menjadi Keberanian Berbicara</h3>
-          <p data-i18n="articles.p3">Mampu membaca teks bahasa asing berbeda dengan refleks merespons saat diajak bicara. Skills Lab melatih spontanitas verbal.</p>
-        </div>
+        <figure class="phone phone-sm install-shot">
+          <div class="phone-screen">
+            <img src="assets/shots/extra-mobile.png" alt="Layar Vocabulary Hub FIEZEL dengan daftar latihan kosakata level A1" width="780" height="1688" loading="lazy" decoding="async">
+          </div>
+        </figure>
       </div>
     </div>
   </section>
 
-  <!-- ===================================================================
-       FINAL CTA
-       =================================================================== -->
-  <section class="final-cta">
-    <div class="wrap" style="max-width:720px">
-      <p class="sec-kicker" data-i18n="final.kicker">Mulai Melangkah</p>
-      <h2 class="sec-title" data-i18n="final.title">Siap untuk Pengalaman Belajar yang Berbeda?</h2>
-      <p class="sec-lead" data-i18n="final.lead">Gratis untuk murid, praktis dan menyeluruh untuk pendidik. Bahasa Inggris dan Jepang dalam genggamanmu.</p>
-      <div class="hero-cta-row">
-        <a class="btn btn-primary" href="app/" data-i18n="final.cta-student">Mulai Belajar Sekarang</a>
-        <a class="btn btn-teacher" href="app/?teacher=preview" data-i18n="final.cta-teacher">Buka <span class="kelasku-brand"><span class="kelasku-main">KelasKu</span> <span class="kelasku-tag">untuk Guru</span></span></a>
+  <!-- ============ FAQ ============ -->
+  <section class="sec sec-faq" id="faq">
+    <div class="wrap wrap-narrow">
+      <div class="sec-head reveal">
+        <span class="sec-num" aria-hidden="true">06 — Tanya jawab</span>
+        <h2 class="sec-title">Pertanyaan yang sering muncul</h2>
+        <hr class="rule" aria-hidden="true">
+      </div>
+      <div class="faq reveal">
+        <details>
+          <summary>Apakah FIEZEL gratis?<span class="chev" aria-hidden="true"></span></summary>
+          <div class="faq-body"><p>Ya. Gratis, tanpa langganan. Tidak ada paket premium, tidak ada fitur yang dikunci di balik pembayaran. Seluruh 180 grammar lesson, 2.440 kosakata, dan 312 bacaan bisa kamu buka sejak hari pertama.</p></div>
+        </details>
+        <details>
+          <summary>Perlu bikin akun?<span class="chev" aria-hidden="true"></span></summary>
+          <div class="faq-body"><p>Tidak perlu. Kamu bisa langsung belajar. Karena tidak ada akun, progresmu tersimpan di perangkat yang kamu pakai — kalau berpindah ke perangkat lain, kamu mulai dari awal lagi.</p></div>
+        </details>
+        <details>
+          <summary>Bisa dipakai tanpa internet?<span class="chev" aria-hidden="true"></span></summary>
+          <div class="faq-body"><p>Setelah FIEZEL terpasang ke layar utama: materi dan latihan bisa dibuka tanpa internet. Suara neural dan tutor AI butuh jaringan. Jadi belajar teks dan soal tetap jalan, sedangkan fitur suara neural dan tutor menunggu koneksi.</p></div>
+        </details>
+        <details>
+          <summary>Jalan di Android dan iPhone?<span class="chev" aria-hidden="true"></span></summary>
+          <div class="faq-body"><p>Ya, keduanya. Di Android pakai Chrome lewat menu ⋮. Di iPhone wajib pakai Safari lewat tombol Bagikan, karena hanya Safari yang bisa menambahkan aplikasi web ke Layar Utama iOS. Desktop Chrome dan Edge juga bisa.</p></div>
+        </details>
+        <details>
+          <summary>Apakah FIEZEL diakui resmi CEFR?<span class="chev" aria-hidden="true"></span></summary>
+          <div class="faq-body"><p>Tidak. Materi FIEZEL dipetakan ke tingkat CEFR A1–C2 sebagai acuan tingkat kesulitan. Itu bukan sertifikasi, bukan afiliasi, dan bukan pengakuan resmi dari lembaga mana pun. Hasil belajarmu di sini tidak berlaku sebagai sertifikat.</p></div>
+        </details>
+        <details>
+          <summary>Ada suaranya untuk latihan listening?<span class="chev" aria-hidden="true"></span></summary>
+          <div class="faq-body"><p>Ada. Suara bawaan perangkatmu dipakai sejak awal, dan suara neural tersedia sebagai pilihan tambahan yang diunduh sekali. Audio latihan ujian adalah TTS dari skrip orisinal, bukan rekaman ujian asli.</p></div>
+        </details>
+        <details>
+          <summary>Data pribadiku dipakai untuk apa?<span class="chev" aria-hidden="true"></span></summary>
+          <div class="faq-body"><p>Catatan belajarmu — lesson yang selesai, jawaban, dan progres level — tersimpan lokal di perangkatmu. Kami tidak meminta nama, email, atau nomor telepon untuk mulai belajar. Menghapus data browser berarti menghapus progres itu juga.</p></div>
+        </details>
+        <details>
+          <summary>Berapa banyak soal yang tersedia?<span class="chev" aria-hidden="true"></span></summary>
+          <div class="faq-body"><p>Setiap grammar lesson punya 25 soal latihan terfokus, dari total 180 lesson (A1 17 · A2 29 · B1 52 · B2 39 · C1 24 · C2 19). Reading menambah 1.560 soal membaca di 312 bacaan berjenjang.</p></div>
+        </details>
       </div>
     </div>
   </section>
 
-  <!-- ===================================================================
-       FOOTER
-       =================================================================== -->
-  <footer class="footer">
-    <div class="footer-in">
-      <div class="footer-brand">FIE<span>ZEL</span> · Learning That Learns You.</div>
-      <div class="footer-links">
-        <a class="footer-link" href="app/" data-i18n="footer.app">Buka Aplikasi Murid</a>
-        <a class="footer-link" href="app/?teacher=preview" data-i18n="footer.teacher">KelasKu untuk Guru</a>
-        <a class="footer-link" href="install/" data-i18n="footer.install">Panduan Pasang</a>
-        <a class="footer-link" href="privacy/">Privasi</a>
-        <a class="footer-link" href="terms/">Syarat</a>
+  <!-- ============ CTA AKHIR ============ -->
+  <section class="sec sec-final">
+    <div class="wrap">
+      <div class="stage final reveal">
+        <svg class="final-paw paw-idle" viewBox="56 -10 208 216" role="img" aria-label="PAW, maskot kucing geometris FIEZEL"><g><path d="M76 66 L 95 0 L 140 34 Z" fill="#FFD94F"/><path d="M90 52 L 101 17 L 125 35 Z" fill="#8C2233"/><path d="M244 66 L 225 0 L 180 34 Z" fill="#FFD94F"/><path d="M230 52 L 219 17 L 195 35 Z" fill="#8C2233"/><circle cx="160" cy="106" r="88" fill="#FFD94F"/><ellipse cx="160" cy="140" rx="36" ry="25" fill="#FFF4DA"/><path d="M153 126 L 167 126 L 160 136 Z" fill="#8C2233"/><circle cx="102" cy="126" r="11" fill="#F0A0AC"/><circle cx="218" cy="126" r="11" fill="#F0A0AC"/><g><circle cx="126" cy="98" r="14.5" fill="#33201F"/><circle cx="130" cy="93" r="5" fill="#fff"/><circle cx="122" cy="103" r="2.6" fill="#fff" opacity=".7"/></g><g><circle cx="194" cy="98" r="14.5" fill="#33201F"/><circle cx="198" cy="93" r="5" fill="#fff"/><circle cx="190" cy="103" r="2.6" fill="#fff" opacity=".7"/></g><path d="M148 148 C 154 155 166 155 172 148" stroke="#33201F" stroke-width="5.5" stroke-linecap="round" fill="none"/></g></svg>
+        <p class="tagline"><span class="t-1">Not just learning with you.</span> <span class="t-2">Learning about you.</span></p>
+        <h2>Mulai dari level yang tepat hari ini</h2>
+        <p>Buka FIEZEL, pilih tingkatmu, dan kerjakan satu lesson — gratis, tanpa langganan, tanpa akun.</p>
+        <div class="cta-row cta-center">
+          <a class="btn btn-primary" href="app/">Mulai Belajar</a>
+          <a class="btn btn-ghost" href="install/">Cara Install</a>
+        </div>
+        <hr class="rule rule-center" aria-hidden="true">
       </div>
-      <div class="footer-copy">© 2026 FIEZEL. Semua hak cipta dilindungi.</div>
     </div>
-  </footer>
+  </section>
 
-  <!-- ===================================================================
-       LOCALIZATION ENGINE
-       =================================================================== -->
-  <script>
-    'use strict';
-    var COPY = {
-      id: {
-        'nav.students': 'Untuk Murid',
-        'nav.teachers': '<span class="kelasku-brand"><span class="kelasku-main" style="color:var(--tg-sage)">KelasKu</span> <span class="kelasku-tag" style="color:var(--muted)">untuk Guru</span></span>',
-        'nav.start': 'Mulai Belajar',
-        'hero.kicker': 'Platform Belajar Bahasa Cerdas & Terpadu',
-        'hero.title1': 'Belajar yang',
-        'hero.title2': 'Mengenal Kamu.',
-        'hero.desc': 'FIEZEL menyesuaikan diri dengan polamu. Bahasa Inggris & Jepang adaptif untuk murid, serta KelasKu untuk Guru terpadu untuk pendidik.',
-        'hero.cta-student': 'Mulai Belajar Gratis',
-        'hero.cta-teacher': 'Buka <span class="kelasku-brand"><span class="kelasku-main">KelasKu</span> <span class="kelasku-tag">untuk Guru</span></span> →',
-        'hero.teacher-badge': 'FIEZEL KelasKu untuk Guru — Briefing & Analitik Kelas',
-        'lang.kicker': 'Dua Bahasa. Satu Platform Cerdas.',
-        'lang.title': 'Bahasa Inggris & Jepang dalam Satu Ekosistem',
-        'lang.en-title': 'Bahasa Inggris',
-        'lang.en-desc': 'A1–C1 · 180 Pelajaran · Grammar & Vocab Adaptif',
-        'lang.jp-title': 'Bahasa Jepang',
-        'lang.jp-desc': 'Jalur Pemula · AI-Guided · Hiragana & Kosakata',
-        'how.kicker': 'Loop Adaptif Cerdas',
-        'how.title': 'Bagaimana FIEZEL Bekerja Bersamamu',
-        'how.lead': 'Bukan sekadar bank soal acak. Core Brain membaca pola jawabanmu dan merajut materi yang tepat di saat yang tepat.',
-        'how.s1-num': 'Langkah 01', 'how.s1-title': 'Kamu Berlatih', 'how.s1-desc': 'Selesaikan sesi latihan singkat harian — kosakata, pola tata bahasa, teks bacaan, atau percakapan.',
-        'how.s2-num': 'Langkah 02', 'how.s2-title': 'Core Brain Membaca Pola', 'how.s2-desc': 'Kesalahan bukan kegagalan; algoritma mendeteksi miskonsepsi spesifik dan tingkat retensi memori.',
-        'how.s3-num': 'Langkah 03', 'how.s3-title': 'Rencana Menyesuaikan', 'how.s3-desc': 'Sesi berikutnya otomatis disesuaikan agar kamu menaklukkan kelemahan tanpa merasa terbebani.',
-        'skills.kicker': 'Keterampilan Menyeluruh',
-        'skills.title': 'Semua Keterampilan Bahasa dalam Satu Aplikasi',
-        'skills.lead': 'Dirancang berdasarkan standar CEFR internasional untuk penguasaan bahasa yang aktif dan percaya diri.',
-        'skills.v-title': 'Vocabulary', 'skills.v-desc': 'Spaced repetition pintar yang memastikan kosakata baru tersimpan kuat di memori jangka panjang.',
-        'skills.g-title': 'Grammar', 'skills.g-desc': '180 materi terstruktur dari level dasar hingga mahir tanpa hafalan rumus yang membingungkan.',
-        'skills.r-title': 'Reading', 'skills.r-desc': '312 bacaan berjenjang yang melatih pemahaman konteks, ide pokok, dan inferensi bacaan.',
-        'skills.l-title': 'Listening', 'skills.l-desc': 'Latihan pendengaran interaktif dengan aksen natural untuk mengasah kepekaan telinga.',
-        'skills.s-title': 'Speaking', 'skills.s-desc': 'Latihan pengucapan dan respons lisan terarah untuk membangun keberanian berbicara aktif.',
-        'skills.a-title': 'AI Tutor Brain', 'skills.a-desc': 'Pendamping pintar yang menjelaskan alasan di balik setiap koreksi secara ramah dan sabar.',
-        'teach.kicker': 'Ekosistem Pendidik',
-        'teach.title': 'KelasKu untuk Guru: Dasbor Manajemen Kelas Cerdas',
-        'teach.lead': 'Bebaskan guru dari beban administrasi manual. Pantau kemajuan siswa, deteksi dini siswa tertinggal, dan bagikan tugas dalam hitungan detik.',
-        'teach.b1-title': 'Deteksi Dini Siswa Tertinggal', 'teach.b1-desc': 'Algoritma langsung menandai siswa yang memerlukan perhatian khusus sebelum mereka tertinggal jauh.',
-        'teach.b2-title': 'Tugas & Ujian Dinilai Otomatis', 'teach.b2-desc': 'Buat kuis mini atau latihan dari ribuan bank soal kurikulum, hasil terkoreksi instan tanpa koreksi manual.',
-        'teach.b3-title': 'Kartu Sapa & Laporan Wali Murid', 'teach.b3-desc': 'Kirim apresiasi atau laporan perkembangan belajar ke WhatsApp orang tua hanya dengan satu klik.',
-        'teach.cta': 'Buka Demo <span class="kelasku-brand"><span class="kelasku-main">KelasKu</span> <span class="kelasku-tag">untuk Guru</span></span> →',
-        'articles.kicker': 'Wawasan Pembelajaran',
-        'articles.title': 'Mengapa Pendekatan FIEZEL Lebih Efektif',
-        'articles.t1': 'Retensi Memori', 'articles.h1': 'Mengapa Kosakata Cepat Hilang dari Ingatan?', 'articles.p1': 'Otak manusia secara alami melupakan informasi baru jika tidak dipicu pada interval retensi yang tepat. FIEZEL mengkalkulasi kurva lupa tiap individu.',
-        'articles.t2': 'Pedagogi', 'articles.h2': 'Mengapa Jawaban Salah adalah Momen Emas?', 'articles.p2': 'Kesalahan menunjukkan batas pemahaman konseptualmu. AI kami menggunakan kesalahan untuk memetakan akar miskonsepsi tata bahasa.',
-        'articles.t3': 'Komunikasi', 'articles.h3': 'Menjembatani Teori Menjadi Keberanian Berbicara', 'articles.p3': 'Mampu membaca teks bahasa asing berbeda dengan refleks merespons saat diajak bicara. Skills Lab melatih spontanitas verbal.',
-        'final.kicker': 'Mulai Melangkah',
-        'final.title': 'Siap untuk Pengalaman Belajar yang Berbeda?',
-        'final.lead': 'Gratis untuk murid, praktis dan menyeluruh untuk pendidik. Bahasa Inggris dan Jepang dalam genggamanmu.',
-        'final.cta-student': 'Mulai Belajar Sekarang',
-        'final.cta-teacher': 'Buka <span class="kelasku-brand"><span class="kelasku-main">KelasKu</span> <span class="kelasku-tag">untuk Guru</span></span>',
-        'footer.app': 'Buka Aplikasi Murid',
-        'footer.teacher': 'KelasKu untuk Guru',
-        'footer.install': 'Panduan Pasang'
-      },
-      th: {
-        'nav.students': 'สำหรับผู้เรียน',
-        'nav.teachers': 'KelasKu สำหรับครู',
-        'nav.start': 'เริ่มเรียน',
-        'hero.kicker': 'แพลตฟอร์มเรียนภาษาอัจฉริยะครบวงจร',
-        'hero.title1': 'การเรียนรู้ที่',
-        'hero.title2': 'เข้าใจคุณ',
-        'hero.desc': 'FIEZEL ปรับตัวตามรูปแบบของคุณ ภาษาอังกฤษและญี่ปุ่นแบบปรับตัวสำหรับผู้เรียน พร้อม KelasKu สำหรับครูผู้สอน',
-        'hero.cta-student': 'เริ่มเรียนฟรี',
-        'hero.cta-teacher': 'เข้าสู่ KelasKu สำหรับครู →',
-        'hero.teacher-badge': 'FIEZEL KelasKu สำหรับครู — สรุปข้อมูล & วิเคราะห์ชั้นเรียน',
-        'lang.kicker': 'สองภาษา แพลตฟอร์มอัจฉริยะเดียว',
-        'lang.title': 'ภาษาอังกฤษและภาษาญี่ปุ่นในระบบนิเวศเดียว',
-        'lang.en-title': 'ภาษาอังกฤษ',
-        'lang.en-desc': 'A1–C1 · 180 บทเรียน · ไวยากรณ์และคำศัพท์แบบปรับตัว',
-        'lang.jp-title': 'ภาษาญี่ปุ่น',
-        'lang.jp-desc': 'เส้นทางผู้เริ่มต้น · แนะนำด้วย AI · ฮิรางานะและคำศัพท์',
-        'how.kicker': 'วงจรอัจฉริยะที่ปรับตัวได้',
-        'how.title': 'FIEZEL ทำงานร่วมกับคุณอย่างไร',
-        'how.lead': 'ไม่ใช่แค่คลังข้อสอบสุ่ม Core Brain อ่านรูปแบบคำตอบของคุณและจัดเตรียมเนื้อหาที่ถูกต้องในเวลาที่เหมาะสม',
-        'how.s1-num': 'ขั้นตอน 01', 'how.s1-title': 'คุณฝึกฝน', 'how.s1-desc': 'ทำแบบฝึกหัดประจำวันสั้นๆ — คำศัพท์ ไวยากรณ์ การอ่าน หรือบทสนทนา',
-        'how.s2-num': 'ขั้นตอน 02', 'how.s2-title': 'Core Brain อ่านรูปแบบ', 'how.s2-desc': 'ข้อผิดพลาดไม่ใช่ความล้มเหลว อัลกอริทึมตรวจจับความเข้าใจผิดเฉพาะและอัตราการจำ',
-        'how.s3-num': 'ขั้นตอน 03', 'how.s3-title': 'แผนปรับเปลี่ยน', 'how.s3-desc': 'เซสชันถัดไปจะปรับตัวโดยอัตโนมัติเพื่อให้คุณเอาชนะจุดอ่อนได้อย่างมั่นใจ',
-        'skills.kicker': 'ทักษะครบถ้วน',
-        'skills.title': 'ทุกทักษะทางภาษาในแอปเดียว',
-        'skills.lead': 'ออกแบบตามมาตรฐาน CEFR สากล เพื่อความเชี่ยวชาญทางภาษาที่ใช้งานได้จริง',
-        'skills.v-title': 'คำศัพท์', 'skills.v-desc': 'ระบบทบทวนแบบเว้นระยะอัจฉริยะ ช่วยให้คำศัพท์ใหม่อยู่ในความจำระยะยาว',
-        'skills.g-title': 'ไวยากรณ์', 'skills.g-desc': '180 บทเรียนมีโครงสร้างตั้งแต่พื้นฐานจนถึงขั้นสูงโดยไม่ต้องท่องจำสูตร',
-        'skills.r-title': 'การอ่าน', 'skills.r-desc': '312 บทอ่านตามระดับ ช่วยฝึกความเข้าใจบริบทและใจความสำคัญ',
-        'skills.l-title': 'การฟัง', 'skills.l-desc': 'การฝึกฟังเชิงโต้ตอบด้วยสำเนียงที่เป็นธรรมชาติเพื่อฝึกความแม่นยำ',
-        'skills.s-title': 'การพูด', 'skills.s-desc': 'การออกเสียงและการตอบกลับที่มีเป้าหมายเพื่อสร้างความมั่นใจในการสื่อสาร',
-        'skills.a-title': 'AI Tutor Brain', 'skills.a-desc': 'ผู้ช่วยอัจฉริยะที่อธิบายเหตุผลเบื้องหลังทุกการแก้ไขอย่างเป็นมิตร',
-        'teach.kicker': 'ระบบนิเวศสำหรับครู',
-        'teach.title': 'FIEZEL KelasKu สำหรับครู: แดชบอร์ดจัดการชั้นเรียนอัจฉริยะ',
-        'teach.lead': 'ปลดปล่อยครูจากภาระงานเอกสาร ติดตามความก้าวหน้า ตรวจจับนักเรียนที่ต้องการความช่วยเหลือ และมอบหมายงานในไม่กี่วินาที',
-        'teach.b1-title': 'ตรวจจับนักเรียนที่เสี่ยงตามไม่ทัน', 'teach.b1-desc': 'อัลกอริทึมแจ้งเตือนนักเรียนที่ต้องการการดูแลเป็นพิเศษทันทีก่อนจะตามไม่ทัน',
-        'teach.b2-title': 'ตรวจการบ้านและข้อสอบอัตโนมัติ', 'teach.b2-desc': 'สร้างแบบทดสอบย่อยจากคลังข้อสอบตามหลักสูตร ตรวจผลทันทีโดยไม่ต้องตรวจมือ',
-        'teach.b3-title': 'การ์ดทักทายและรายงานผู้ปกครอง', 'teach.b3-desc': 'ส่งคำชมหรือรายงานพัฒนาการไปยัง WhatsApp ของผู้ปกครองได้ในคลิกเดียว',
-        'teach.cta': 'เปิดดูเดโม KelasKu สำหรับครู →',
-        'articles.kicker': 'มุมมองการเรียนรู้',
-        'articles.title': 'ทำไมวิธีของ FIEZEL จึงมีประสิทธิภาพมากกว่า',
-        'articles.t1': 'การจดจำ', 'articles.h1': 'ทำไมคำศัพท์ใหม่จึงหายไปจากความทรงจำอย่างรวดเร็ว?', 'articles.p1': 'สมองของมนุษย์ลืมข้อมูลใหม่ตามธรรมชาติหากไม่ได้รับการกระตุ้นในเวลาที่เหมาะสม FIEZEL คำนวณเส้นโค้งการลืมของแต่ละบุคคล',
-        'articles.t2': 'การสอน', 'articles.h2': 'ทำไมคำตอบที่ผิดจึงเป็นโอกาสทอง?', 'articles.p2': 'ข้อผิดพลาดแสดงถึงขอบเขตความเข้าใจของคุณ AI ของเราใช้ข้อผิดพลาดเพื่อระบุต้นตอของความเข้าใจผิด',
-        'articles.t3': 'การสื่อสาร', 'articles.h3': 'เปลี่ยนทฤษฎีให้เป็นความกล้าในการพูด', 'articles.p3': 'การอ่านข้อความได้แตกต่างจากการตอบสนองทันทีเมื่อต้องสนทนา Skills Lab ช่วยฝึกการโต้ตอบที่เป็นธรรมชาติ',
-        'final.kicker': 'เริ่มต้นก้าวแรก',
-        'final.title': 'พร้อมสำหรับประสบการณ์การเรียนรู้ใหม่หรือยัง?',
-        'final.lead': 'ฟรีสำหรับนักเรียน สะดวกและครบครันสำหรับครูผู้สอน ภาษาอังกฤษและภาษาญี่ปุ่นในมือคุณ',
-        'final.cta-student': 'เริ่มเรียนตอนนี้',
-        'final.cta-teacher': 'เข้าใช้งาน KelasKu สำหรับครู',
-        'footer.app': 'เปิดแอปผู้เรียน',
-        'footer.teacher': 'KelasKu สำหรับครู',
-        'footer.install': 'วิธีติดตั้ง'
-      }
-    };
+</main>
 
-    function setLang(lang) {
-      if (!COPY[lang]) return;
-      document.documentElement.lang = lang;
-      document.documentElement.dataset.locale = lang;
-      var c = COPY[lang];
-      document.querySelectorAll('[data-i18n]').forEach(function(el) {
-        var k = el.getAttribute('data-i18n');
-        if (c[k] !== undefined) {
-          if (c[k].indexOf('<') !== -1) el.innerHTML = c[k];
-          else el.textContent = c[k];
-        }
-      });
-      document.querySelectorAll('.lang-btn').forEach(function(b) {
-        b.classList.toggle('active', b.getAttribute('data-lang') === lang);
-      });
-      try { localStorage.setItem('fz-landing-locale', lang); } catch(_) {}
-    }
+<footer class="foot">
+  <div class="wrap foot-in">
+    <div class="foot-brand">
+      <svg class="foot-word" viewBox="0 0 1000 260" role="img" aria-label="FIEZEL"><defs><linearGradient id="fzwMaroon-foot" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8C2233"/><stop offset="100%" stop-color="#6D1926"/></linearGradient><linearGradient id="fzwGold-foot" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFDE59"/><stop offset="45%" stop-color="#FFC700"/><stop offset="100%" stop-color="#E6A800"/></linearGradient></defs><g fill="url(#fzwMaroon-foot)"><rect x="30" y="30" width="42" height="200" rx="21"/><rect x="30" y="30" width="144" height="42" rx="21"/><rect x="30" y="109" width="116" height="42" rx="21"/><rect x="300" y="30" width="42" height="200" rx="21"/><rect x="300" y="30" width="144" height="42" rx="21"/><rect x="300" y="109" width="100" height="42" rx="21"/><rect x="300" y="188" width="130" height="42" rx="21"/><rect x="478" y="30" width="150" height="42" rx="21"/><rect x="478" y="188" width="150" height="42" rx="21"/><rect x="607" y="30" width="191.38" height="42" rx="21" transform="rotate(124.354 607 51)"/><rect x="662" y="30" width="42" height="200" rx="21"/><rect x="662" y="30" width="144" height="42" rx="21"/><rect x="662" y="109" width="100" height="42" rx="21"/><rect x="662" y="188" width="130" height="42" rx="21"/><rect x="840" y="30" width="42" height="200" rx="21"/><rect x="840" y="188" width="130" height="42" rx="21"/></g><g fill="url(#fzwGold-foot)"><rect x="192" y="30" width="26" height="200" rx="13"/><rect x="240" y="106" width="26" height="124" rx="13"/></g></svg>
+      <p class="foot-tag">Ruang belajar bahasa Inggris personal.</p>
+      <nav class="foot-links" aria-label="Tautan footer">
+        <a href="app/">Buka Aplikasi Murid</a>
+        <span aria-hidden="true">·</span>
+        <a href="app/?teacher=preview"><span class="kelasku-brand"><span class="kelasku-main" style="color:var(--cream)">KelasKu</span> <span class="kelasku-tag" style="color:var(--gold)">untuk Guru</span></span></a>
+        <span aria-hidden="true">·</span>
+        <a href="install/">Cara Install</a>
+        <span aria-hidden="true">·</span>
+        <a href="https://fiezel-apps.github.io/FIEZEL-APPS/" rel="noopener">Cermin aplikasi</a>
+        <span aria-hidden="true">·</span>
+        <a href="privacy/">Kebijakan Privasi</a>
+        <span aria-hidden="true">·</span>
+        <a href="terms/">Syarat Penggunaan</a>
+      </nav>
+    </div>
+    <div class="foot-notes">
+      <p>Materi dipetakan ke tingkat CEFR A1–C2. Bukan sertifikasi resmi.</p>
+      <p>Materi dan latihan bisa dibuka tanpa internet. Suara neural dan tutor AI butuh jaringan.</p>
+      <p>Gratis, tanpa langganan. Progres belajar tersimpan di perangkatmu.</p>
+    </div>
+  </div>
+  <div class="wrap foot-copy"><p>© 2026 FIEZEL</p></div>
+</footer>
 
-    (function() {
-      try {
-        var s = localStorage.getItem('fz-landing-locale') || localStorage.getItem('fiezel-site-locale');
-        if (s && COPY[s]) setLang(s);
-      } catch(_) {}
-    })();
-  </script>
+<script src="assets/mascot/fiezel-mascot.js?v=20260903-hula02" defer></script>
+<script src="site.js?v=20260903-hula02" defer></script>
 </body>
 </html>
