@@ -188,6 +188,7 @@ test('token sah pada perangkat baru: identitas terbit lalu tertaut', async () =>
   assert.strictEqual(db._oauth.size, 1, 'satu baris tautan');
   assert.strictEqual(await cookieSub(ctx), body.userId, 'cookie memuat sub yang dijawab');
   assert.strictEqual(db._email.get(body.userId).email, 'murid@sekolah.sch.id', 'email tersimpan');
+  assert.strictEqual(body.email, 'murid@sekolah.sch.id', 'email dipantulkan untuk layar');
 });
 
 test('KUNCI: masuk ke akun tertaut MEMAKAI ULANG sub akun, bukan sub perangkat', async () => {

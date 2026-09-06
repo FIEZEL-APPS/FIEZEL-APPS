@@ -28,7 +28,7 @@
        'wasm-unsafe-eval' WAJIB ada: mesin suara neural mengompilasi sherpa-onnx .wasm
        (vendor/supertonic-3, 13 MB) di klien, dan tanpa token itu Chromium menolak
        WebAssembly.instantiate - model 152 MB yang sudah diunduh jadi tidak terpakai. -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://js.puter.com; connect-src 'self' https: wss:; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; media-src 'self' blob: data:; worker-src 'self' blob:">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://js.puter.com https://accounts.google.com; connect-src 'self' https: wss:; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline' https://accounts.google.com; frame-src 'self' https://accounts.google.com; media-src 'self' blob: data:; worker-src 'self' blob:">
   <meta name="theme-color" content="#FFF9EE">
   <!-- Mode gelap dihapus: color-scheme dipaku light agar kontrol form/scrollbar selalu terang. -->
   <meta name="color-scheme" content="light">
@@ -506,6 +506,11 @@ html.fz-booting body{overflow:hidden}
   <script defer src="./features/i18n/copy-id-redesign.js"></script>
   <script defer src="./features/i18n/copy-id-grammar-labels.js"></script>
   <script defer src="./features/i18n/copy-id-student.js"></script>
+  <!-- m025-269: naskah "masuk dengan Google". Domain sendiri, bukan tumpangan: gerbang
+       cakupan Thai menemukan domain dari isi features/i18n/, jadi berkas ini otomatis
+       menuntut copy-th-google.js — dan layar masuk adalah layar PERTAMA yang ditemui
+       murid Thai, tempat paling mahal untuk salah bahasa. -->
+  <script defer src="./features/i18n/copy-id-google.js"></script>
   <!-- W4-MERGE: aset th TIDAK dimuat statis (copy-th-*, naskah-th-brain, dua dataset th) —
        semuanya disuntik/difetch DINAMIS oleh pemuat kecil di bawah HANYA saat locale th
        (AI-13 F02/F05: murid Indonesia nol byte th). Pemuat wajib SETELAH fiezel-i18n.js
@@ -634,6 +639,11 @@ html.fz-booting body{overflow:hidden}
        melompat ke cangkang guru sesudahnya. Kalau berkas ini gagal dimuat, seluruh
        pemanggilnya di app.js guarded dan aplikasi tetap jalan sebagai anonim. -->
   <script defer src="./features/auth/fiezel-account.js"></script>
+  <!-- Tombol "Masuk dengan Google". Skrip Google TIDAK dimuat di sini dan tidak ikut boot:
+       berkas ini hanya memasang FiezelGoogle, dan skrip accounts.google.com baru disuntik
+       saat tombolnya benar-benar mau digambar di layar akun. Boot FIEZEL sudah pernah
+       tertahan berkas pihak ketiga (catatan m025-84 di atas); jalur itu tidak dibuka lagi. -->
+  <script defer src="./features/auth/fiezel-google.js"></script>
   <script defer src="./features/speaking-listening/fiezel-speaking-listening-addon.js"></script>
   <script defer src="./fiezel-lazy-loader.js"></script>
 

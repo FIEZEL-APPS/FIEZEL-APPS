@@ -33,6 +33,10 @@
  * dengan sandinya dulu, lalu menautkan dari Pengaturan. Merepotkan sekali, aman
  * selamanya.
  *
+ * `email` DIPANTULKAN kembali ke pemanggil supaya layar bisa berbunyi "kamu
+ * masuk sebagai <alamat>". Itu alamat MILIK PEMANGGIL SENDIRI, dari token yang
+ * ia kirim sendiri di permintaan yang sama — nol informasi tentang orang lain.
+ *
  * ==========================================================================
  * BIAYA: NOL SUBREQUEST PER LOGIN PADA JALUR PANAS
  * ==========================================================================
@@ -177,7 +181,9 @@ export async function routeAuthGoogle(ctx) {
     await ensureIdentityRow(ctx.env, link.sub, ctx.now);
     await attachIdentityCookie(ctx, link.sub);
     await upsertEmail(db, link.sub, check, ctx.now);
-    return jsonResponse({ ok: true, linked: false, signedIn: true, userId: link.sub }, opt);
+    return jsonResponse({
+      ok: true, linked: false, signedIn: true, userId: link.sub, email: check.email || null
+    }, opt);
   }
 
   /* Kasus B: menautkan ke identitas yang SEDANG dipakai. Kalau perangkat ini
@@ -222,7 +228,9 @@ export async function routeAuthGoogle(ctx) {
   }
 
   await upsertEmail(db, ownerSub, check, ctx.now);
-  return jsonResponse({ ok: true, linked: ownerSub === mySub, signedIn: true, userId: ownerSub }, opt);
+  return jsonResponse({
+    ok: true, linked: ownerSub === mySub, signedIn: true, userId: ownerSub, email: check.email || null
+  }, opt);
 }
 
 /** Email hanya ditulis kalau Google memberikannya DAN sudah terverifikasi. */
