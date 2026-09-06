@@ -77,18 +77,38 @@ Yang hilang sementara itu bukan lubang keamanan: menumpuk dua akun Google pada s
 berarti berbagi akun antara dua login yang pemiliknya buktikan sendiri, bukan
 pengambilalihan. Arah yang berbahaya sudah ditutup PK.
 
-## Yang belum — jangan anggap fitur ini hidup
+## Sudah selesai di gelombang m025-270
 
-- **Indeks `UNIQUE (sub, provider)`** — ditambahkan bersama rutenya, dengan entri
-  `INDEX_PROOF` di `tools/gen-auth-migrations.mjs` yang mengutip kueri sungguhan.
-- **Rute `POST /api/auth/google` belum ada.** Verifier sudah siap tetapi belum ada yang
-  memanggilnya. Rute itu harus: mengambil JWKS dari `GOOGLE_JWKS_URL` **dengan cache**
-  (jangan satu fetch per login), memakai `ctx.identity.sub` yang SUDAH ADA, menolak bila
-  akun ini sudah tertaut ke Google lain, lalu menulis `auth_oauth_identity` + `auth_email`.
-- **UI belum ada.** Tombol "Masuk dengan Google" dan teksnya wajib lahir dua bahasa
-  (pasangan `copy-id-*` / `copy-th-*`) seperti aturan CLAUDE.md.
-- **`GOOGLE_CLIENT_ID` belum masuk `wrangler.toml`.** Ia PUBLIK dan aman sebagai `[vars]`;
-  jangan diperlakukan sebagai secret. Client secret TIDAK dipakai sama sekali di alur ini.
+- **Indeks `UNIQUE (sub, provider)`** ada, bersama entri `INDEX_PROOF` di
+  `tools/gen-auth-migrations.mjs` yang mengutip kueri sungguhan dari rutenya.
+- **Rute `POST /api/auth/google`** hidup (`workers/api/route-auth-google.js`, SLOT 12).
+  JWKS di-cache di Cache API — bukan KV, karena plan gratis hanya 1.000 tulis/hari —
+  ditambah salinan dalam-isolate dan `stale-if-error`. Gerbangnya:
+  `tests/google-auth-route-test.js`.
+- **UI** ada: `features/auth/fiezel-google.js` + pasangan `copy-id-google.js` /
+  `copy-th-google.js`, digambar di modal akun `app.js`. Gerbangnya:
+  `tests/google-auth-ui-test.js`.
+- **`GOOGLE_CLIENT_ID`** ada di `wrangler.toml` `[vars]` dan `FIEZEL_GOOGLE_AUTH` di
+  `core-config.js`. Keduanya PUBLIK dengan sengaja; client secret tidak dipakai sama
+  sekali di alur ini, jadi tidak ada secret yang perlu disimpan di mana pun.
+
+## Langkah berikutnya — jangan anggap fitur ini selesai
+
+Urut dari yang paling mahal kalau dibiarkan:
+
+1. **Murid yang masuk HANYA dengan Google belum punya baris `auth_account`**, jadi
+   `/api/account/me` menjawab anonim untuknya dan layar akun tidak bisa menyapa dengan
+   handle. Sesi, kelas, dan tugas guru TETAP pulih (semuanya berkunci `sub` dari cookie);
+   yang hilang hanya handle. Memperbaikinya berarti menambah tempat KETIGA yang membuat
+   `auth_account`, dan `tests/role-security-test.js` menuntut tepat dua — pagar itu benar,
+   jadi perubahannya harus berdiri sendiri dan ditinjau, bukan disisipkan ke gelombang lain.
+   Handle turunan email JANGAN dipakai: handle bisa terlihat murid lain, dan email anak
+   bukan nama panggilan.
+2. **Menautkan Google dari Pengaturan** untuk pemilik akun sandi yang sudah ada. Rutenya
+   sudah mendukung (kasus B menautkan ke `sub` yang sedang dipakai); yang belum ada hanya
+   pintunya di layar Pengaturan.
+3. **Melepas tautan Google** (hapus baris `auth_oauth_identity`). Hari ini murid yang salah
+   menautkan akun Google harus meminta owner, dan tidak ada jalur owner untuk itu.
 - **Jalur `/api/auth/claim` (Puter) masih ada dan masih mati** — penerbit tiketnya tidak
   pernah dibangun, jadi ia selalu 401. Kalau Google menggantikannya, cabut rutenya beserta
   `STUB-PUTER-CLAIM-TICKET.md` dan secret `PUTER_CLAIM_SECRET_*`; jangan tinggalkan dua
