@@ -97,7 +97,7 @@
       "catatan": "Menyentuh juga app.js (kunci ujian di quizLoop/Skills Lab/Writing + gerbang pintu AI + pendeteksi ujian non-tugas), features/class-hub/fiezel-class-hub.js, features/learner-flow/fiezel-learner-flow.js, features/teacher/fiezel-teacher-store.js, workers/api/teacher/class-sync-core.js (fx), copy-*-proctor.js, index.html, sw.js, quality.yml. Build m025-273 lewat tools/bump-build.mjs."
     },
     {
-      "sesi": "ses_01GmUXhkAchQKMb5G24xTerU-vocab",
+      "sesi": "claude-code-kosakata-jepang",
       "peran": "claude-code / kosakata jepang",
       "paths": [
         "docs/japanese/kosakata-jlpt.json",
