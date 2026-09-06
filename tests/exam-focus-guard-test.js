@@ -196,6 +196,32 @@ test('class-sync-core: f = tiga bilangan diterima; bentuk lain ditolak', async (
   assert.ok(asing.ok && asing.report.assign[0].f.catatan === undefined, 'tanpa teks bebas: field asing tidak tersimpan');
 });
 
+/* ------------------------------------------- 3b · kiriman yang ditolak server --- */
+
+test('learner-flow: laporan yang ditolak server DIULANG, tidak hilang diam-diam', async () => {
+  const LF = globalThis.FiezelLearnerFlow, TS = globalThis.FiezelTeacherStore;
+  assert.ok(LF && TS, 'modul sudah dimuat oleh gerbang DOM-stub di atas');
+  const asli = TS.reportToClass;
+  let kiriman = 0;
+  try {
+    // Urutan yang menghasilkan keluhan nyata: murid membuka ujian (laporan #1), lalu keluar
+    // layar beberapa detik kemudian — laporan #2 jatuh di bawah lantai 15 detik server (429).
+    TS.reportToClass = function () { kiriman++; return Promise.resolve({ ok: false, status: 429, error: 'rate_limited' }); };
+    LF.recordAssignmentFocus('ujian-1', { n: 1, s: 20, x: 20 });
+    await new Promise((r) => setTimeout(r, 0));
+    assert.strictEqual(kiriman, 1, 'percobaan pertama terkirim');
+    const tunggu = LF._retryState();
+    assert.ok(tunggu.pending, 'penolakan server menjadwalkan percobaan ulang');
+    assert.ok(tunggu.delay >= 16000, 'jedanya di atas lantai server, bukan langsung menghujani: ' + tunggu.delay);
+
+    TS.reportToClass = function () { kiriman++; return Promise.resolve({ ok: true }); };
+    LF.pushToClass();
+    await new Promise((r) => setTimeout(r, 0));
+    assert.strictEqual(kiriman, 2);
+    assert.ok(!LF._retryState().pending, 'kiriman yang berhasil menghentikan pengulangan');
+  } finally { TS.reportToClass = asli; }
+});
+
 /* ----------------------------------------------------------------- 4 · sisi guru --- */
 
 test('teacher store: f tersimpan per murid dan kabar hanya lahir saat angkanya naik', () => {
@@ -218,7 +244,15 @@ test('teacher store: f tersimpan per murid dan kabar hanya lahir saat angkanya n
   assert.strictEqual(TS.focusLevel(c.assignments[0].focus[r1.student.id]), 'berat');
   assert.ok(/2×/.test(TS.focusLabel(c.assignments[0].focus[r1.student.id])));
   assert.strictEqual(TS.focusLabel({ n: 0, s: 0, x: 0 }), 'Tidak keluar layar');
-  assert.ok(/keluar dari layar ujian/.test(TS.inboxText(Object.assign({ at: Date.now() }, r3.focusEvents[0]))), 'kabar terbaca guru');
+  const kabar = TS.inboxText(Object.assign({ at: Date.now() }, r3.focusEvents[0]));
+  assert.ok(/^⚠/.test(kabar), 'kabar dibaca sebagai PERINGATAN, bukan catatan administratif: ' + kabar);
+  assert.ok(/Ani/.test(kabar) && /Ujian mini/.test(kabar) && /2×/.test(kabar), 'menyebut siapa, sedang apa, seberapa sering: ' + kabar);
+  assert.ok(!/curang|menyontek/i.test(kabar), 'menyebut fakta, tidak memvonis');
+
+  // Kabar generik tidak boleh lahir bersama peringatan untuk murid yang sama — dulu ia yang
+  // terbaca duluan di kotak masuk, dan peringatannya tertutup.
+  const src = read('features/teacher/fiezel-teacher-store.js');
+  assert.ok(/!\(res\.focusEvents \|\| \[\]\)\.length\) events\.push\(\{ kind: 'report_in'/.test(src), 'report_in ditahan saat ada focus_exit');
 });
 
 test('sisi guru: chip keluar-layar muncul di daftar status murid, cangkang mendahulukan kabarnya', () => {
@@ -231,6 +265,20 @@ test('sisi guru: chip keluar-layar muncul di daftar status murid, cangkang menda
   assert.ok(/if \(!rows\.length\) return '';/.test(shell), 'murid tanpa catatan tidak memunculkan bagian apa pun');
   assert.ok(/kind === 'focus_exit'; \}\)\[0\] \|\| total\.events\.filter/.test(shell), 'toast mendahulukan kabar keluar layar');
   assert.ok(/'focus_exit' \? 'eye-off'/.test(shell), 'ikon kabar di kotak masuk guru');
+});
+
+test('realtime: detak murid tidak boleh jauh lebih lambat daripada detak guru', () => {
+  const app = read('app.js'), inbox = read('features/notify/fiezel-inbox.js'), shell = read('features/teacher/fiezel-teacher-shell.js');
+  const murid = Number((app.match(/const NOTIF_POLL_MS=(\d+)/) || [])[1]);
+  const remKlien = Number((inbox.match(/var MIN_GAP_MS = (\d+)/) || [])[1]);
+  const guru = Number((shell.match(/var SYNC_EVERY_MS = (\d+)/) || [])[1]);
+  assert.ok(murid && remKlien && guru, 'ketiga detak terbaca');
+  /* Keluhan yang menutup angka lama: papan guru hidup sendiri tiap 10 detik sementara layar
+     murid menunggu satu menit penuh, jadi murid harus menutup-buka aplikasi. Batas 1,5×
+     membuat jarak itu tidak bisa melebar lagi tanpa seseorang menyadarinya. */
+  assert.ok(murid <= guru * 1.5, 'detak murid (' + murid + ') tidak boleh jauh di atas detak guru (' + guru + ')');
+  assert.ok(remKlien <= murid, 'rem klien (' + remKlien + ') tidak boleh membuang tanya yang sudah dijadwalkan (' + murid + ')');
+  assert.ok(murid >= 5000 && remKlien >= 5000, 'tetap di atas lantai server 5 detik');
 });
 
 /* --------------------------------------------------------- 5 · pemasangan & i18n --- */
