@@ -42,10 +42,21 @@ kali dengan sepuluh kunci berbeda.
 ## Yang SENGAJA tidak disentuh, dan alasannya
 
 1. **Berkas kanon ber-sha terkunci**: `features/quota/quota-copy.js` (5) dan
-   `features/prasasti/fiezel-prasasti-core.js` (3). Keduanya dikunci
-   `id-golden-snapshot` dan punya protokol th sendiri — `copy-th-quota.js` menunggu
-   `CANON_TH_RULES` yang harus ditulis penutur asli (fail-closed by design).
-   `features/neural-voice/fiezel-cf-voice-notice.js` (3) adalah cerminnya.
+   `features/prasasti/fiezel-prasasti-core.js` (3), dikunci `id-golden-snapshot`.
+   `features/neural-voice/fiezel-cf-voice-notice.js` (3) adalah cermin naskah quota.
+
+   **KOREKSI (diverifikasi m025-268)**: versi pertama dokumen ini menyebut penghalangnya
+   adalah `CANON_TH_RULES` yang "menunggu penutur asli, fail-closed". Itu TIDAK BENAR lagi —
+   `tests/quota-notice-a11y-test.js:164` sudah terisi (status `DRAFT AI`, empat aturan nada
+   th) dan gerbangnya HIJAU. Penghalang yang sebenarnya lebih sederhana dan lebih besar:
+   **naskah notice-nya tidak punya padanan th sama sekali.** `copy-th-quota.js` hanya
+   memuat 4 kunci `ai.*` yang tidak berhubungan; tabel kanon notice (`quota.ok`,
+   `quota.low`, `quota.exhausted`, `service.degraded`, `service.providerError`,
+   `service.unknown`, `quota.unavailable`, `network.offline` — masing-masing dengan
+   `title`/`spoken`/`silent`) hidup sebagai objek beku berbahasa Indonesia di
+   `quota-copy.js`, dan `presentQuotaNotice()` membacanya LANGSUNG lewat `copy.build()`,
+   bukan lewat `FiezelI18n.t()`. Jadi pekerjaannya dua bagian: (a) tulis padanan th untuk
+   tabel itu, (b) alirkan pembacaannya lewat copy-map dengan tabel id sebagai fallback.
 2. **ZONA AUDIO**: `fiezel-diag-panel.js` (6) dan
    `fiezel-neural-voice-audibility-fix.js` (2). Gerbang P0
    `tests/audio-locale-guard-test.js` melarang berkas zona audio menyebut
@@ -75,8 +86,17 @@ juga menuntut setiap kunci id punya padanan th.
    Thai. Selesaikan itu lebih dulu, baru quota/prasasti/cf-voice-notice ikut.
 3. **Sidecar listening**: petakan `listening-scenarios-*` ke `listening-bank-th.json`
    supaya pilihan jawaban komprehensi ikut berbahasa Thai.
-4. **Prompt AI**: locale murid belum ikut dikirim ke prompt penilaian tulisan —
-   murid th masih menerima umpan balik AI berbahasa Indonesia. Ini pekerjaan
-   terpisah dan lebih besar daripada sapuan naskah.
+4. ~~**Prompt AI**: locale murid belum ikut dikirim ke prompt.~~ **KOREKSI
+   (diverifikasi m025-268): butir ini SALAH dan sudah dicoret.** Jalur AI sudah
+   sadar-locale dari ujung ke ujung, jangan dikerjakan ulang:
+   - klien mengirimnya — `aiTaskRequestBody()` di `app.js` menyertakan
+     `locale: FiezelI18n.getLocale()` pada skema `fiezel-ai-task-v2`;
+   - server memakainya — `workers/api/ai/ai-tasks.js` punya `LANG_DIRECTIVE` per-locale
+     (`guardFor(locale)`) plus `checkOutputContractTh()` untuk memeriksa keluarannya;
+   - prompt di sisi klien bercabang pada th — Tanya FIEZEL (`app.js`), coach, dan rubrik
+     penilaian menulis semuanya punya cabang Thai penuh; literal Indonesia yang terlihat
+     di rubrik itu ada di dalam cabang `id`, bukan di jalur bersama.
+
+   Yang MASIH terbuka di wilayah ini hanyalah naskah notice kuota/suara di butir 1.
 5. Naskah Thai di commit ini adalah terjemahan yang ditulis mesin dan **wajib
    direview penutur asli** sebelum dianggap final, sama dengan aturan copy-th lain.
