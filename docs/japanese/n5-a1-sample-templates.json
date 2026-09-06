@@ -1,568 +1,638 @@
 {
-  "schema": "fiezel-japanese-templates-proposal-v0",
-  "status": "USULAN — menunggu penilaian owner. BUKAN konten produksi, tidak dimuat aplikasi.",
-  "level": "A1 (setara JLPT N5)",
-  "provenans": {
-    "silabus": "Struktur (poin tata bahasa apa, urutannya bagaimana, di tingkat berapa) diturunkan dari silabus Minna no Nihongo pelajaran 1-10 dan Irodori Starter/A1. Itu fakta kebahasaan yang sama di semua kursus Jepang.",
-    "kalimat": "SELURUH stem, opsi, pengecoh, penjelasan, dan petunjuk ingatan di berkas ini DITULIS BARU untuk FIEZEL. Nol kalimat, dialog, daftar kosakata, atau susunan latihan yang disalin dari kedua sumber.",
-    "irodori": "Dipakai sebagai SILABUS SAJA — tidak ada teks, ilustrasi, audio, atau latihan Irodori yang direproduksi atau diturunkan. FIEZEL karena itu TIDAK terikat kewajiban gratis-selamanya."
-  },
-  "catatanSkema": {
-    "warisan": "Nama bidang sama persis dengan grammar-templates.json (Inggris) supaya seluruh mesin — item-prior, misconception-ledger, confusion-matrix, question-allocator — membacanya tanpa satu pun cabang baru.",
-    "marker": "WAJIB slug ASCII, bukan kana/kanji. Alasannya di JAPANESE-COURSE-HANDOFF.md §Temuan mesin: conceptOf() di fiezel-question-memory.js membuang setiap karakter non-ASCII, jadi marker berkana menghasilkan concept null dan pembatas kebaruan konsep MATI DIAM.",
-    "aksara": "stem = yang dilihat murid pada tingkat itu. stemKana = bacaan penuh (kana saja). furigana = pasangan [kanji, bacaan] untuk setiap kanji yang muncul. Di A1 stem sengaja nyaris seluruhnya kana; kanji baru masuk bertahap dan furigana-nya selalu tersedia.",
-    "bahasaMetadata": "pedagogicalObjective/misconceptionTargeted/reasoningOperation ditulis Inggris seperti bank Inggris (dibaca alat, bukan murid), kembaran Indonesianya di *Id, dan padanan Thai menyusul lewat sidecar — pola yang sama persis dengan grammar-explanations-th.json."
-  },
-  "templates": [
+ "schema": "fiezel-japanese-templates-proposal-v0",
+ "status": "USULAN — menunggu penilaian owner. BUKAN konten produksi, tidak dimuat aplikasi.",
+ "level": "A1 (setara JLPT N5)",
+ "provenans": {
+  "silabus": "Struktur (poin tata bahasa apa, urutannya bagaimana, di tingkat berapa) diturunkan dari silabus Minna no Nihongo pelajaran 1-10 dan Irodori Starter/A1. Itu fakta kebahasaan yang sama di semua kursus Jepang.",
+  "kalimat": "SELURUH stem, opsi, pengecoh, penjelasan, dan petunjuk ingatan di berkas ini DITULIS BARU untuk FIEZEL. Nol kalimat, dialog, daftar kosakata, atau susunan latihan yang disalin dari kedua sumber.",
+  "irodori": "Dipakai sebagai SILABUS SAJA — tidak ada teks, ilustrasi, audio, atau latihan Irodori yang direproduksi atau diturunkan. FIEZEL karena itu TIDAK terikat kewajiban gratis-selamanya."
+ },
+ "catatanSkema": "[object Object] Medan skill wajib ada dan sama dengan family: conceptOf() di fiezel-question-memory.js membaca item.skill, dan butir tanpa skill jatuh ke ruang nama cadangan x| sehingga seluruh keluarga Jepang berbagi satu ruang nama.",
+ "templates": [
+  {
+   "id": "JP-PA-001",
+   "family": "particles",
+   "skill": "particles",
+   "subskill": "ga_marks_new_information_in_answer",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "wa-vs-ga-answer-to-question-word",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Choose GA, not WA, when the noun is the new information answering a question word",
+   "pedagogicalObjectiveId": "Pilih が, bukan は, saat kata bendanya adalah informasi baru yang menjawab kata tanya",
+   "misconceptionTargeted": "Learner treats WA as the default subject marker and uses it for information the listener does not yet have",
+   "misconceptionTargetedId": "Murid menganggap は penanda subjek serba guna, lalu memakainya untuk hal yang justru baru bagi lawan bicara",
+   "reasoningOperation": "identify question word in prompt -> mark the answering noun as new information",
+   "reasoningOperationId": "temukan kata tanya di pertanyaan -> tandai kata benda penjawabnya sebagai informasi baru",
+   "stem": "「だれが きましたか。」「たなかさん___ きました。」",
+   "stemKana": "「だれが きましたか。」「たなかさん___ きました。」",
+   "furigana": [],
+   "options": [
+    "が",
+    "は",
+    "を",
+    "も"
+   ],
+   "correctIndex": 0,
+   "distractors": [
     {
-      "id": "JP-PA-001",
-      "family": "particles",
-      "subskill": "ga_marks_new_information_in_answer",
-      "cefr": "A1",
-      "jlpt": "N5",
-      "marker": "wa-vs-ga-answer-to-question-word",
-      "questionType": "multiple_choice",
-      "pedagogicalObjective": "Choose GA, not WA, when the noun is the new information answering a question word",
-      "pedagogicalObjectiveId": "Pilih が, bukan は, saat kata bendanya adalah informasi baru yang menjawab kata tanya",
-      "misconceptionTargeted": "Learner treats WA as the default subject marker and uses it for information the listener does not yet have",
-      "misconceptionTargetedId": "Murid menganggap は penanda subjek serba guna, lalu memakainya untuk hal yang justru baru bagi lawan bicara",
-      "reasoningOperation": "identify question word in prompt -> mark the answering noun as new information",
-      "reasoningOperationId": "temukan kata tanya di pertanyaan -> tandai kata benda penjawabnya sebagai informasi baru",
-      "stem": "「だれが きましたか。」「たなかさん___ きました。」",
-      "stemKana": "「だれが きましたか。」「たなかさん___ きました。」",
-      "furigana": [],
-      "options": ["が", "は", "を", "も"],
-      "correctIndex": 0,
-      "distractors": [
-        {
-          "option": "は",
-          "misconception": "topic marker used for brand-new information",
-          "misconceptionId": "penanda topik dipakai untuk informasi yang justru baru",
-          "whyFails": "WA presents the noun as something already shared. The question asks WHO, so the name is exactly what the listener does not know yet.",
-          "whyFailsId": "は memperkenalkan kata benda sebagai hal yang sudah sama-sama diketahui. Pertanyaannya 'siapa', jadi namanya justru yang belum diketahui."
-        },
-        {
-          "option": "を",
-          "misconception": "object marker attached to the doer",
-          "misconceptionId": "penanda objek ditempel ke pelaku",
-          "whyFails": "O marks what receives the action. Tanaka is the one who came, not something that was come.",
-          "whyFailsId": "を menandai yang dikenai perbuatan. Tanaka yang datang, bukan yang didatangi."
-        },
-        {
-          "option": "も",
-          "misconception": "also-marker used without a previous mention",
-          "misconceptionId": "penanda 'juga' dipakai tanpa ada yang disebut sebelumnya",
-          "whyFails": "MO means 'also', which needs someone mentioned earlier. Nobody else has been named in this exchange.",
-          "whyFailsId": "も berarti 'juga', dan itu menuntut ada orang lain yang sudah disebut. Di percakapan ini belum ada."
-        }
-      ],
-      "explanation": {
-        "whyCorrect": "The question word DARE asks for information the speaker lacks; the noun that fills that gap takes GA.",
-        "whyCorrectId": "Kata tanya だれ menanyakan hal yang belum diketahui penanya; kata benda yang mengisi kekosongan itu memakai が.",
-        "rule": "Answer to a question word = new information = GA. Known, already-shared topic = WA.",
-        "ruleId": "Jawaban atas kata tanya = informasi baru = が. Topik yang sudah sama-sama diketahui = は.",
-        "whyOthersFail": "WA would present the name as old news; O would make Tanaka the object; MO would claim someone else came too.",
-        "whyOthersFailId": "は akan menyajikan namanya sebagai kabar lama; を menjadikan Tanaka objek; も mengklaim ada orang lain yang juga datang.",
-        "howToAvoid": "Before choosing, ask: does the listener already know this noun? If the question word is asking for it, the answer is no.",
-        "howToAvoidId": "Sebelum memilih, tanya: apakah lawan bicara sudah tahu kata benda ini? Kalau kata tanyanya justru menanyakannya, jawabannya tidak.",
-        "memoryCue": "Question word in, GA out.",
-        "memoryCueId": "Ada kata tanya, keluarnya が."
-      }
+     "option": "は",
+     "misconception": "topic marker used for brand-new information",
+     "misconceptionId": "penanda topik dipakai untuk informasi yang justru baru",
+     "whyFails": "WA presents the noun as something already shared. The question asks WHO, so the name is exactly what the listener does not know yet.",
+     "whyFailsId": "は memperkenalkan kata benda sebagai hal yang sudah sama-sama diketahui. Pertanyaannya 'siapa', jadi namanya justru yang belum diketahui."
     },
     {
-      "id": "JP-PA-002",
-      "family": "particles",
-      "subskill": "o_marks_direct_object",
-      "cefr": "A1",
-      "jlpt": "N5",
-      "marker": "o-direct-object",
-      "questionType": "multiple_choice",
-      "pedagogicalObjective": "Mark the thing that receives the action with O",
-      "pedagogicalObjectiveId": "Tandai benda yang dikenai perbuatan dengan を",
-      "misconceptionTargeted": "Learner marks the object with GA because it is the noun closest to the verb",
-      "misconceptionTargetedId": "Murid menandai objek dengan が karena itu kata benda yang paling dekat dengan kata kerja",
-      "reasoningOperation": "locate the verb -> ask what receives it -> mark that noun",
-      "reasoningOperationId": "temukan kata kerjanya -> tanyakan apa yang dikenai -> tandai kata benda itu",
-      "stem": "まいあさ コーヒー___ のみます。",
-      "stemKana": "まいあさ コーヒー___ のみます。",
-      "furigana": [],
-      "options": ["を", "が", "に", "で"],
-      "correctIndex": 0,
-      "distractors": [
-        {
-          "option": "が",
-          "misconception": "subject marker on the thing being acted upon",
-          "misconceptionId": "penanda subjek dipasang pada benda yang dikenai perbuatan",
-          "whyFails": "GA points at who or what does something. The coffee does not drink; it is drunk.",
-          "whyFailsId": "が menunjuk siapa atau apa yang melakukan. Kopinya tidak minum; kopinya yang diminum."
-        },
-        {
-          "option": "に",
-          "misconception": "destination marker used for the object",
-          "misconceptionId": "penanda tujuan dipakai untuk objek",
-          "whyFails": "NI points at a destination or a point in time, not at what is consumed.",
-          "whyFailsId": "に menunjuk tujuan atau titik waktu, bukan benda yang dikonsumsi."
-        },
-        {
-          "option": "で",
-          "misconception": "means/place marker used for the object",
-          "misconceptionId": "penanda alat/tempat dipakai untuk objek",
-          "whyFails": "DE says where the action happens or with what tool. Coffee is neither the place nor the tool here.",
-          "whyFailsId": "で menyatakan tempat berlangsungnya perbuatan atau alatnya. Kopi bukan tempat maupun alat di sini."
-        }
-      ],
-      "explanation": {
-        "whyCorrect": "NOMIMASU acts on something; the thing acted on is the coffee, so it takes O.",
-        "whyCorrectId": "のみます mengenai sesuatu; yang dikenai adalah kopinya, jadi memakai を.",
-        "rule": "Transitive verb + the thing it acts on = O.",
-        "ruleId": "Kata kerja transitif + benda yang dikenainya = を.",
-        "whyOthersFail": "GA would make the coffee the drinker; NI would make it a destination; DE would make it a place or a tool.",
-        "whyOthersFailId": "が menjadikan kopi si peminum; に menjadikannya tujuan; で menjadikannya tempat atau alat.",
-        "howToAvoid": "Say the sentence back as 'X does the verb to Y'. Y is the O.",
-        "howToAvoidId": "Ucapkan ulang kalimatnya sebagai 'X melakukan kata kerja pada Y'. Y itulah を.",
-        "memoryCue": "O = the thing on the receiving end.",
-        "memoryCueId": "を = yang kena, bukan yang melakukan."
-      }
+     "option": "を",
+     "misconception": "object marker attached to the doer",
+     "misconceptionId": "penanda objek ditempel ke pelaku",
+     "whyFails": "O marks what receives the action. Tanaka is the one who came, not something that was come.",
+     "whyFailsId": "を menandai yang dikenai perbuatan. Tanaka yang datang, bukan yang didatangi."
     },
     {
-      "id": "JP-PA-003",
-      "family": "particles",
-      "subskill": "de_place_of_action_vs_ni_place_of_existence",
-      "cefr": "A1",
-      "jlpt": "N5",
-      "marker": "de-place-of-action",
-      "questionType": "multiple_choice",
-      "pedagogicalObjective": "Use DE for the place where an action happens, not NI",
-      "pedagogicalObjectiveId": "Pakai で untuk tempat berlangsungnya perbuatan, bukan に",
-      "misconceptionTargeted": "Learner uses NI for every place because NI was learned first with ARIMASU",
-      "misconceptionTargetedId": "Murid memakai に untuk semua tempat karena に dipelajari lebih dulu bersama あります",
-      "reasoningOperation": "check whether the verb is existence or activity -> choose the matching place particle",
-      "reasoningOperationId": "periksa kata kerjanya menyatakan keberadaan atau kegiatan -> pilih penanda tempat yang cocok",
-      "stem": "としょかん___ ほんを よみます。",
-      "stemKana": "としょかん___ ほんを よみます。",
-      "furigana": [],
-      "options": ["で", "に", "を", "へ"],
-      "correctIndex": 0,
-      "distractors": [
-        {
-          "option": "に",
-          "misconception": "place-of-existence marker used for an activity",
-          "misconceptionId": "penanda tempat keberadaan dipakai untuk kegiatan",
-          "whyFails": "NI marks where something simply IS. Reading is an activity that takes place somewhere, and that is DE.",
-          "whyFailsId": "に menandai tempat sesuatu BERADA. Membaca adalah kegiatan yang berlangsung di suatu tempat, dan itu で."
-        },
-        {
-          "option": "を",
-          "misconception": "object marker on a place noun",
-          "misconceptionId": "penanda objek dipasang pada kata benda tempat",
-          "whyFails": "The sentence already has its object, HON. A library is not being read.",
-          "whyFailsId": "Kalimatnya sudah punya objek, yaitu ほん. Perpustakaannya bukan yang dibaca."
-        },
-        {
-          "option": "へ",
-          "misconception": "direction marker used for a static location",
-          "misconceptionId": "penanda arah dipakai untuk tempat yang diam",
-          "whyFails": "E points toward a destination you move to. Nobody is travelling in this sentence.",
-          "whyFailsId": "へ menunjuk arah tujuan perpindahan. Di kalimat ini tidak ada yang berpindah."
-        }
-      ],
-      "explanation": {
-        "whyCorrect": "YOMIMASU is an activity, and the library is where it happens, so DE is required.",
-        "whyCorrectId": "よみます adalah kegiatan, dan perpustakaan adalah tempat berlangsungnya, jadi harus で.",
-        "rule": "Activity happens at a place = DE. Something exists at a place = NI.",
-        "ruleId": "Kegiatan berlangsung di suatu tempat = で. Sesuatu berada di suatu tempat = に.",
-        "whyOthersFail": "NI belongs with ARIMASU/IMASU; O already belongs to HON; E needs movement.",
-        "whyOthersFailId": "に milik あります/います; を sudah dipakai ほん; へ menuntut ada perpindahan.",
-        "howToAvoid": "Ask whether the verb is 'to be' or 'to do'. Doing takes DE.",
-        "howToAvoidId": "Tanya apakah kata kerjanya 'berada' atau 'melakukan'. Melakukan memakai で.",
-        "memoryCue": "Doing happens DE-where.",
-        "memoryCueId": "Melakukan sesuatu: で. Sekadar ada: に."
-      }
-    },
-    {
-      "id": "JP-EX-001",
-      "family": "existence_location",
-      "subskill": "imasu_for_animate_arimasu_for_inanimate",
-      "cefr": "A1",
-      "jlpt": "N5",
-      "marker": "imasu-animate",
-      "questionType": "multiple_choice",
-      "pedagogicalObjective": "Select IMASU for living things and ARIMASU for non-living things",
-      "pedagogicalObjectiveId": "Pilih います untuk makhluk hidup dan あります untuk benda mati",
-      "misconceptionTargeted": "Learner picks the existence verb by sentence pattern rather than by whether the subject is alive",
-      "misconceptionTargetedId": "Murid memilih kata kerja keberadaan berdasarkan pola kalimat, bukan berdasarkan hidup atau tidaknya subjek",
-      "reasoningOperation": "check whether the subject can move on its own -> choose the existence verb",
-      "reasoningOperationId": "periksa apakah subjeknya bisa bergerak sendiri -> pilih kata kerja keberadaannya",
-      "stem": "にわに ねこが ___。",
-      "stemKana": "にわに ねこが ___。",
-      "furigana": [],
-      "options": ["います", "あります", "です", "なります"],
-      "correctIndex": 0,
-      "distractors": [
-        {
-          "option": "あります",
-          "misconception": "inanimate existence verb used for a living thing",
-          "misconceptionId": "kata kerja keberadaan benda mati dipakai untuk makhluk hidup",
-          "whyFails": "ARIMASU is for things that cannot move themselves. A cat can.",
-          "whyFailsId": "あります untuk benda yang tidak bisa bergerak sendiri. Kucing bisa."
-        },
-        {
-          "option": "です",
-          "misconception": "copula used to state existence",
-          "misconceptionId": "kata penghubung dipakai untuk menyatakan keberadaan",
-          "whyFails": "DESU links two nouns ('A is B'). It cannot say that something is present somewhere.",
-          "whyFailsId": "です menghubungkan dua kata benda ('A adalah B'). Ia tidak bisa menyatakan sesuatu ada di suatu tempat."
-        },
-        {
-          "option": "なります",
-          "misconception": "change-of-state verb mistaken for existence",
-          "misconceptionId": "kata kerja perubahan keadaan disangka keberadaan",
-          "whyFails": "NARIMASU means 'becomes'. Nothing is turning into anything here.",
-          "whyFailsId": "なります berarti 'menjadi'. Di sini tidak ada yang berubah menjadi apa pun."
-        }
-      ],
-      "explanation": {
-        "whyCorrect": "A cat is a living thing, so its presence is stated with IMASU.",
-        "whyCorrectId": "Kucing makhluk hidup, jadi keberadaannya dinyatakan dengan います.",
-        "rule": "Living thing exists = IMASU. Non-living thing exists = ARIMASU. The place takes NI.",
-        "ruleId": "Makhluk hidup ada = います. Benda mati ada = あります. Tempatnya memakai に.",
-        "whyOthersFail": "ARIMASU denies the cat its ability to move; DESU only links nouns; NARIMASU reports a change.",
-        "whyOthersFailId": "あります menyangkal kucing bisa bergerak; です hanya menghubungkan kata benda; なります melaporkan perubahan.",
-        "howToAvoid": "Ask: can it walk away by itself? If yes, IMASU.",
-        "howToAvoidId": "Tanya: bisakah ia pergi sendiri? Kalau bisa, います.",
-        "memoryCue": "It moves, it lives, it IMASU.",
-        "memoryCueId": "Bisa bergerak sendiri: います."
-      }
-    },
-    {
-      "id": "JP-AD-001",
-      "family": "adjectives",
-      "subskill": "na_adjective_negation",
-      "cefr": "A1",
-      "jlpt": "N5",
-      "marker": "na-adjective-negation",
-      "questionType": "multiple_choice",
-      "pedagogicalObjective": "Negate a NA-adjective with JA ARIMASEN, not with the I-adjective pattern",
-      "pedagogicalObjectiveId": "Membuat bentuk negatif kata sifat な dengan じゃ ありません, bukan dengan pola kata sifat い",
-      "misconceptionTargeted": "Learner applies the I-adjective negation KUNAI to a NA-adjective",
-      "misconceptionTargetedId": "Murid menerapkan bentuk negatif kata sifat い (くない) pada kata sifat な",
-      "reasoningOperation": "classify the adjective -> apply the negation pattern of its class",
-      "reasoningOperationId": "kenali golongan kata sifatnya -> terapkan pola negatif golongan itu",
-      "stem": "この へやは しずか___。",
-      "stemKana": "この へやは しずか___。",
-      "furigana": [],
-      "options": ["じゃ ありません", "くない です", "ありません", "じゃ ありませんでした"],
-      "correctIndex": 0,
-      "distractors": [
-        {
-          "option": "くない です",
-          "misconception": "i-adjective negation applied to a na-adjective",
-          "misconceptionId": "pola negatif kata sifat い diterapkan pada kata sifat な",
-          "whyFails": "KUNAI attaches only to adjectives whose dictionary form ends in I, like TAKAI. SHIZUKA is a NA-adjective.",
-          "whyFailsId": "くない hanya menempel pada kata sifat yang bentuk kamusnya berakhiran い, seperti たかい. しずか termasuk kata sifat な."
-        },
-        {
-          "option": "ありません",
-          "misconception": "existence negation used to negate a quality",
-          "misconceptionId": "negasi keberadaan dipakai untuk menyangkal sifat",
-          "whyFails": "ARIMASEN denies that something exists. The room exists; it is its quietness that is denied.",
-          "whyFailsId": "ありません menyangkal keberadaan. Kamarnya ada; yang disangkal adalah sifat tenangnya."
-        },
-        {
-          "option": "じゃ ありませんでした",
-          "misconception": "past negation used for a present state",
-          "misconceptionId": "negasi lampau dipakai untuk keadaan sekarang",
-          "whyFails": "The sentence describes how the room is now, not how it used to be.",
-          "whyFailsId": "Kalimatnya menggambarkan keadaan kamar sekarang, bukan dulu."
-        }
-      ],
-      "explanation": {
-        "whyCorrect": "SHIZUKA is a NA-adjective, and NA-adjectives are negated like nouns: JA ARIMASEN.",
-        "whyCorrectId": "しずか adalah kata sifat な, dan kata sifat な dinegasikan seperti kata benda: じゃ ありません.",
-        "rule": "NA-adjective: ... JA ARIMASEN. I-adjective: drop I, add KUNAI DESU.",
-        "ruleId": "Kata sifat な: … じゃ ありません. Kata sifat い: buang い, tambahkan くない です.",
-        "whyOthersFail": "KUNAI belongs to I-adjectives; ARIMASEN denies existence; the -DESHITA form moves the sentence into the past.",
-        "whyOthersFailId": "くない milik kata sifat い; ありません menyangkal keberadaan; bentuk -でした memindahkan kalimat ke masa lampau.",
-        "howToAvoid": "Check the dictionary form first. If it does not end in I, negate it like a noun.",
-        "howToAvoidId": "Periksa bentuk kamusnya dulu. Kalau tidak berakhiran い, negasikan seperti kata benda.",
-        "memoryCue": "NA behaves like a noun.",
-        "memoryCueId": "Kata sifat な berperilaku seperti kata benda."
-      }
-    },
-    {
-      "id": "JP-AD-002",
-      "family": "adjectives",
-      "subskill": "i_adjective_negation",
-      "cefr": "A1",
-      "jlpt": "N5",
-      "marker": "i-adjective-negation",
-      "questionType": "multiple_choice",
-      "pedagogicalObjective": "Negate an I-adjective by replacing the final I with KUNAI",
-      "pedagogicalObjectiveId": "Membuat bentuk negatif kata sifat い dengan mengganti い menjadi くない",
-      "misconceptionTargeted": "Learner keeps the final I and appends the noun-style negation",
-      "misconceptionTargetedId": "Murid mempertahankan い lalu menempelkan negasi bergaya kata benda",
-      "reasoningOperation": "classify the adjective -> transform its ending",
-      "reasoningOperationId": "kenali golongan kata sifatnya -> ubah akhirannya",
-      "stem": "この みずは つめた___ です。",
-      "stemKana": "この みずは つめた___ です。",
-      "furigana": [],
-      "options": ["くない", "じゃない", "いない", "くありませんでした"],
-      "correctIndex": 0,
-      "distractors": [
-        {
-          "option": "じゃない",
-          "misconception": "na-adjective negation applied to an i-adjective",
-          "misconceptionId": "pola negatif kata sifat な diterapkan pada kata sifat い",
-          "whyFails": "JA NAI is for nouns and NA-adjectives. TSUMETAI ends in I, so its own ending changes instead.",
-          "whyFailsId": "じゃない untuk kata benda dan kata sifat な. つめたい berakhiran い, jadi akhirannya sendiri yang berubah."
-        },
-        {
-          "option": "いない",
-          "misconception": "final I kept and negation glued on",
-          "misconceptionId": "い dipertahankan lalu negasinya ditempel begitu saja",
-          "whyFails": "The I is not kept: it is replaced. TSUMETAI becomes TSUMETAKUNAI.",
-          "whyFailsId": "い tidak dipertahankan, melainkan diganti. つめたい menjadi つめたくない."
-        },
-        {
-          "option": "くありませんでした",
-          "misconception": "past polite negation used for a present state",
-          "misconceptionId": "negasi sopan lampau dipakai untuk keadaan sekarang",
-          "whyFails": "This form says the water WAS not cold. The sentence is about now.",
-          "whyFailsId": "Bentuk ini berarti airnya DULU tidak dingin. Kalimatnya tentang sekarang."
-        }
-      ],
-      "explanation": {
-        "whyCorrect": "TSUMETAI is an I-adjective, so the I is replaced: TSUMETA + KUNAI.",
-        "whyCorrectId": "つめたい kata sifat い, jadi い-nya diganti: つめた + くない.",
-        "rule": "I-adjective negation: drop the final I, add KUNAI (+ DESU for politeness).",
-        "ruleId": "Negatif kata sifat い: buang い di ujung, tambahkan くない (+ です untuk ragam sopan).",
-        "whyOthersFail": "JA NAI belongs to nouns and NA-adjectives; keeping the I produces a form that does not exist; the -MASEN DESHITA form is past.",
-        "whyOthersFailId": "じゃない milik kata benda dan kata sifat な; mempertahankan い menghasilkan bentuk yang tidak ada; bentuk -ませんでした adalah lampau.",
-        "howToAvoid": "Cover the final I with your finger, then add KUNAI.",
-        "howToAvoidId": "Tutup い di ujungnya dengan jari, lalu tambahkan くない.",
-        "memoryCue": "I leaves, KUNAI arrives.",
-        "memoryCueId": "い pergi, くない datang."
-      }
-    },
-    {
-      "id": "JP-VB-001",
-      "family": "polite_forms",
-      "subskill": "masen_deshita_past_negative",
-      "cefr": "A1",
-      "jlpt": "N5",
-      "marker": "masen-deshita",
-      "questionType": "multiple_choice",
-      "pedagogicalObjective": "Form the polite past negative with MASEN DESHITA",
-      "pedagogicalObjectiveId": "Membentuk lampau negatif ragam sopan dengan ませんでした",
-      "misconceptionTargeted": "Learner marks the past on the wrong half of the polite form, or mixes plain and polite registers",
-      "misconceptionTargetedId": "Murid menaruh penanda lampau di bagian yang salah, atau mencampur ragam biasa dengan ragam sopan",
-      "reasoningOperation": "read the time word -> set tense -> set polarity -> keep one register",
-      "reasoningOperationId": "baca kata waktunya -> tetapkan kala -> tetapkan positif/negatif -> jaga ragamnya tetap satu",
-      "stem": "きのう えいがを ___。",
-      "stemKana": "きのう えいがを ___。",
-      "furigana": [["映画", "えいが"]],
-      "options": ["みませんでした", "みました", "みません", "みなかったです"],
-      "correctIndex": 0,
-      "distractors": [
-        {
-          "option": "みました",
-          "misconception": "polarity dropped: past affirmative for past negative",
-          "misconceptionId": "kutub jawaban hilang: lampau positif dipakai untuk lampau negatif",
-          "whyFails": "This says the film WAS watched. The sentence needs 'did not watch'.",
-          "whyFailsId": "Ini berarti filmnya DITONTON. Kalimatnya butuh 'tidak menonton'."
-        },
-        {
-          "option": "みません",
-          "misconception": "tense dropped: present negative for past negative",
-          "misconceptionId": "kala hilang: negatif sekarang dipakai untuk negatif lampau",
-          "whyFails": "KINOU fixes the sentence in the past, but MASEN alone is present or habitual.",
-          "whyFailsId": "きのう memakukan kalimat di masa lampau, sementara ません sendirian bermakna sekarang atau kebiasaan."
-        },
-        {
-          "option": "みなかったです",
-          "misconception": "plain past negative dressed with DESU",
-          "misconceptionId": "negatif lampau ragam biasa dipoles dengan です",
-          "whyFails": "This mixes registers: the verb is plain while DESU is polite. In the polite register the verb itself carries MASEN DESHITA.",
-          "whyFailsId": "Ini mencampur ragam: kata kerjanya ragam biasa, sementara です ragam sopan. Di ragam sopan, kata kerjanya sendiri yang membawa ませんでした."
-        }
-      ],
-      "explanation": {
-        "whyCorrect": "KINOU sets the past, the meaning is negative, and the register is polite, so MASEN DESHITA.",
-        "whyCorrectId": "きのう menetapkan lampau, maknanya negatif, ragamnya sopan — jadi ませんでした.",
-        "rule": "Polite verb endings: MASU / MASEN / MASHITA / MASEN DESHITA.",
-        "ruleId": "Akhiran kata kerja ragam sopan: ます / ません / ました / ませんでした.",
-        "whyOthersFail": "MASHITA keeps the affirmative; MASEN keeps the present; NAKATTA DESU mixes plain and polite.",
-        "whyOthersFailId": "ました tetap positif; ません tetap sekarang; なかったです mencampur ragam biasa dan sopan.",
-        "howToAvoid": "Settle two questions before answering: past or not, and negative or not. Then keep one register.",
-        "howToAvoidId": "Selesaikan dua pertanyaan sebelum menjawab: lampau atau bukan, negatif atau bukan. Lalu jaga ragamnya tetap satu.",
-        "memoryCue": "Not + yesterday = MASEN DESHITA.",
-        "memoryCueId": "Tidak + kemarin = ませんでした."
-      }
-    },
-    {
-      "id": "JP-CO-001",
-      "family": "counters",
-      "subskill": "counter_nin_for_people",
-      "cefr": "A1",
-      "jlpt": "N5",
-      "marker": "counter-nin-people",
-      "questionType": "multiple_choice",
-      "pedagogicalObjective": "Count people with the NIN counter",
-      "pedagogicalObjectiveId": "Menghitung orang dengan kata bantu bilangan にん",
-      "misconceptionTargeted": "Learner uses the general object counter for people, or picks a counter by shape association",
-      "misconceptionTargetedId": "Murid memakai kata bantu bilangan benda umum untuk orang, atau memilih berdasarkan tebakan bentuk",
-      "reasoningOperation": "identify what is being counted -> select the counter class",
-      "reasoningOperationId": "kenali apa yang dihitung -> pilih golongan kata bantu bilangannya",
-      "stem": "きょうしつに がくせいが ___ います。",
-      "stemKana": "きょうしつに がくせいが ___ います。",
-      "furigana": [["学生", "がくせい"]],
-      "options": ["さんにん", "みっつ", "さんまい", "さんぼん"],
-      "correctIndex": 0,
-      "distractors": [
-        {
-          "option": "みっつ",
-          "misconception": "general object counter used for people",
-          "misconceptionId": "kata bantu bilangan benda umum dipakai untuk orang",
-          "whyFails": "The TSU series counts unclassified objects. People have their own counter.",
-          "whyFailsId": "Deret つ menghitung benda yang tidak bergolongan khusus. Orang punya kata bantu bilangan sendiri."
-        },
-        {
-          "option": "さんまい",
-          "misconception": "flat-object counter used for people",
-          "misconceptionId": "kata bantu bilangan benda pipih dipakai untuk orang",
-          "whyFails": "MAI counts flat things such as paper or shirts.",
-          "whyFailsId": "まい menghitung benda pipih seperti kertas atau baju."
-        },
-        {
-          "option": "さんぼん",
-          "misconception": "long-object counter used for people",
-          "misconceptionId": "kata bantu bilangan benda panjang dipakai untuk orang",
-          "whyFails": "HON counts long, thin things such as pens or bottles.",
-          "whyFailsId": "ほん menghitung benda panjang dan ramping seperti pulpen atau botol."
-        }
-      ],
-      "explanation": {
-        "whyCorrect": "The sentence counts students, and people are counted with NIN.",
-        "whyCorrectId": "Kalimatnya menghitung murid, dan orang dihitung dengan にん.",
-        "rule": "Counter matches the KIND of thing: people NIN, flat things MAI, long things HON, unclassified things TSU.",
-        "ruleId": "Kata bantu bilangan mengikuti JENIS bendanya: orang にん, benda pipih まい, benda panjang ほん, benda tak bergolongan つ.",
-        "whyOthersFail": "TSU, MAI and HON all belong to objects, and students are not objects.",
-        "whyOthersFailId": "つ, まい, dan ほん semuanya untuk benda, sementara murid bukan benda.",
-        "howToAvoid": "Name the thing out loud first, then pick its counter — never pick the counter first.",
-        "howToAvoidId": "Sebut dulu bendanya, baru pilih kata bantu bilangannya — jangan sebaliknya.",
-        "memoryCue": "People come with NIN.",
-        "memoryCueId": "Orang selalu dengan にん."
-      }
-    },
-    {
-      "id": "JP-DM-001",
-      "family": "demonstratives",
-      "subskill": "kore_sore_are_by_distance",
-      "cefr": "A1",
-      "jlpt": "N5",
-      "marker": "kore-near-speaker",
-      "questionType": "multiple_choice",
-      "pedagogicalObjective": "Choose the demonstrative that matches the distance from speaker and listener",
-      "pedagogicalObjectiveId": "Memilih kata tunjuk yang sesuai dengan jarak dari pembicara dan lawan bicara",
-      "misconceptionTargeted": "Learner maps the three-way Japanese system onto a two-way this/that split",
-      "misconceptionTargetedId": "Murid memetakan sistem tiga arah bahasa Jepang ke pembagian dua arah 'ini/itu'",
-      "reasoningOperation": "locate the object relative to both speakers -> pick the matching series",
-      "reasoningOperationId": "tentukan posisi bendanya terhadap kedua pembicara -> pilih deret yang cocok",
-      "stem": "（じぶんの てに ある ほんを さして）___ は わたしの ほんです。",
-      "stemKana": "（じぶんの てに ある ほんを さして）___ は わたしの ほんです。",
-      "furigana": [],
-      "options": ["これ", "それ", "あれ", "どれ"],
-      "correctIndex": 0,
-      "distractors": [
-        {
-          "option": "それ",
-          "misconception": "listener-side demonstrative used for something in the speaker's own hand",
-          "misconceptionId": "kata tunjuk sisi lawan bicara dipakai untuk benda di tangan sendiri",
-          "whyFails": "SORE points at something near the listener, not at what the speaker is holding.",
-          "whyFailsId": "それ menunjuk benda dekat lawan bicara, bukan benda yang sedang dipegang pembicara."
-        },
-        {
-          "option": "あれ",
-          "misconception": "far-from-both demonstrative used for something in hand",
-          "misconceptionId": "kata tunjuk jauh dari keduanya dipakai untuk benda di tangan",
-          "whyFails": "ARE is for something away from both people. The book is in the speaker's hand.",
-          "whyFailsId": "あれ untuk benda yang jauh dari keduanya. Bukunya ada di tangan pembicara."
-        },
-        {
-          "option": "どれ",
-          "misconception": "question demonstrative used in a statement",
-          "misconceptionId": "kata tunjuk tanya dipakai di kalimat pernyataan",
-          "whyFails": "DORE asks 'which one'. This sentence answers, it does not ask.",
-          "whyFailsId": "どれ menanyakan 'yang mana'. Kalimat ini menjawab, bukan bertanya."
-        }
-      ],
-      "explanation": {
-        "whyCorrect": "The book is in the speaker's own hand, which is the KO series: KORE.",
-        "whyCorrectId": "Bukunya ada di tangan pembicara sendiri, dan itu deret こ: これ.",
-        "rule": "KO = near the speaker, SO = near the listener, A = far from both, DO = the question.",
-        "ruleId": "こ = dekat pembicara, そ = dekat lawan bicara, あ = jauh dari keduanya, ど = bentuk tanya.",
-        "whyOthersFail": "SORE moves the book to the listener; ARE moves it away from everyone; DORE turns a statement into a question.",
-        "whyOthersFailId": "それ memindahkan bukunya ke lawan bicara; あれ menjauhkannya dari semua orang; どれ mengubah pernyataan menjadi pertanyaan.",
-        "howToAvoid": "Before answering, ask whose hand the thing is closest to.",
-        "howToAvoidId": "Sebelum menjawab, tanya benda itu paling dekat dengan tangan siapa.",
-        "memoryCue": "In my hand: KO.",
-        "memoryCueId": "Di tanganku: こ."
-      }
-    },
-    {
-      "id": "JP-TE-001",
-      "family": "te_form",
-      "subskill": "te_form_of_godan_ru_verbs_for_requests",
-      "cefr": "A1",
-      "jlpt": "N5",
-      "marker": "te-form-request-godan-ru",
-      "questionType": "multiple_choice",
-      "pedagogicalObjective": "Build the TE-form of a godan verb ending in RU and use it to make a polite request",
-      "pedagogicalObjectiveId": "Membentuk bentuk て dari kata kerja golongan godan berakhiran る dan memakainya untuk permintaan sopan",
-      "misconceptionTargeted": "Learner builds the TE-form from the polite MASU-stem instead of from the verb group's own rule",
-      "misconceptionTargetedId": "Murid membentuk bentuk て dari akar ます, bukan dari aturan golongan kata kerjanya",
-      "reasoningOperation": "identify the verb group -> apply the group's TE rule -> attach KUDASAI",
-      "reasoningOperationId": "kenali golongan kata kerjanya -> terapkan aturan て golongan itu -> tempelkan ください",
-      "stem": "すみません、しゃしんを ___ ください。",
-      "stemKana": "すみません、しゃしんを ___ ください。",
-      "furigana": [["写真", "しゃしん"]],
-      "options": ["とって", "とりて", "とります", "とった"],
-      "correctIndex": 0,
-      "distractors": [
-        {
-          "option": "とりて",
-          "misconception": "te-form built from the polite masu-stem",
-          "misconceptionId": "bentuk て dibangun dari akar ます",
-          "whyFails": "TORIMASU gives the stem TORI-, but godan verbs ending in RU do not take TE on that stem; they double into TTE.",
-          "whyFailsId": "とります memberi akar とり-, tetapi kata kerja godan berakhiran る tidak menempelkan て pada akar itu; bunyinya merapat menjadi って."
-        },
-        {
-          "option": "とります",
-          "misconception": "polite non-past used where the te-form is required",
-          "misconceptionId": "bentuk sopan sekarang dipakai di tempat yang menuntut bentuk て",
-          "whyFails": "KUDASAI attaches only to a TE-form; MASU cannot carry a request.",
-          "whyFailsId": "ください hanya menempel pada bentuk て; ます tidak bisa membawa permintaan."
-        },
-        {
-          "option": "とった",
-          "misconception": "plain past used where the te-form is required",
-          "misconceptionId": "bentuk lampau biasa dipakai di tempat yang menuntut bentuk て",
-          "whyFails": "TOTTA reports something already done; a request has not happened yet.",
-          "whyFailsId": "とった melaporkan yang sudah terjadi; permintaan justru belum terjadi."
-        }
-      ],
-      "explanation": {
-        "whyCorrect": "TORU is a godan verb ending in RU, so its TE-form is TOTTE, and TOTTE KUDASAI is a polite request.",
-        "whyCorrectId": "とる kata kerja godan berakhiran る, jadi bentuk て-nya とって, dan とって ください adalah permintaan sopan.",
-        "rule": "Godan verbs ending in U, TSU or RU form the TE-form with a small TSU: -TTE.",
-        "ruleId": "Kata kerja godan berakhiran う, つ, atau る membentuk て dengan っ kecil: -って.",
-        "whyOthersFail": "TORITE follows no group's rule; TORIMASU cannot host KUDASAI; TOTTA is a report, not a request.",
-        "whyOthersFailId": "とりて tidak mengikuti aturan golongan mana pun; とります tidak bisa menampung ください; とった laporan, bukan permintaan.",
-        "howToAvoid": "Decide the verb group before touching the ending — the TE rule is chosen by group, not by feel.",
-        "howToAvoidId": "Tentukan golongan kata kerjanya sebelum menyentuh akhiran — aturan て dipilih berdasarkan golongan, bukan perasaan.",
-        "memoryCue": "U, TSU, RU: small TSU.",
-        "memoryCueId": "う, つ, る: pakai っ kecil."
-      }
+     "option": "も",
+     "misconception": "also-marker used without a previous mention",
+     "misconceptionId": "penanda 'juga' dipakai tanpa ada yang disebut sebelumnya",
+     "whyFails": "MO means 'also', which needs someone mentioned earlier. Nobody else has been named in this exchange.",
+     "whyFailsId": "も berarti 'juga', dan itu menuntut ada orang lain yang sudah disebut. Di percakapan ini belum ada."
     }
-  ]
+   ],
+   "explanation": {
+    "whyCorrect": "The question word DARE asks for information the speaker lacks; the noun that fills that gap takes GA.",
+    "whyCorrectId": "Kata tanya だれ menanyakan hal yang belum diketahui penanya; kata benda yang mengisi kekosongan itu memakai が.",
+    "rule": "Answer to a question word = new information = GA. Known, already-shared topic = WA.",
+    "ruleId": "Jawaban atas kata tanya = informasi baru = が. Topik yang sudah sama-sama diketahui = は.",
+    "whyOthersFail": "WA would present the name as old news; O would make Tanaka the object; MO would claim someone else came too.",
+    "whyOthersFailId": "は akan menyajikan namanya sebagai kabar lama; を menjadikan Tanaka objek; も mengklaim ada orang lain yang juga datang.",
+    "howToAvoid": "Before choosing, ask: does the listener already know this noun? If the question word is asking for it, the answer is no.",
+    "howToAvoidId": "Sebelum memilih, tanya: apakah lawan bicara sudah tahu kata benda ini? Kalau kata tanyanya justru menanyakannya, jawabannya tidak.",
+    "memoryCue": "Question word in, GA out.",
+    "memoryCueId": "Ada kata tanya, keluarnya が."
+   }
+  },
+  {
+   "id": "JP-PA-002",
+   "family": "particles",
+   "skill": "particles",
+   "subskill": "o_marks_direct_object",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "o-direct-object",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Mark the thing that receives the action with O",
+   "pedagogicalObjectiveId": "Tandai benda yang dikenai perbuatan dengan を",
+   "misconceptionTargeted": "Learner marks the object with GA because it is the noun closest to the verb",
+   "misconceptionTargetedId": "Murid menandai objek dengan が karena itu kata benda yang paling dekat dengan kata kerja",
+   "reasoningOperation": "locate the verb -> ask what receives it -> mark that noun",
+   "reasoningOperationId": "temukan kata kerjanya -> tanyakan apa yang dikenai -> tandai kata benda itu",
+   "stem": "まいあさ コーヒー___ のみます。",
+   "stemKana": "まいあさ コーヒー___ のみます。",
+   "furigana": [],
+   "options": [
+    "を",
+    "が",
+    "に",
+    "で"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "が",
+     "misconception": "subject marker on the thing being acted upon",
+     "misconceptionId": "penanda subjek dipasang pada benda yang dikenai perbuatan",
+     "whyFails": "GA points at who or what does something. The coffee does not drink; it is drunk.",
+     "whyFailsId": "が menunjuk siapa atau apa yang melakukan. Kopinya tidak minum; kopinya yang diminum."
+    },
+    {
+     "option": "に",
+     "misconception": "destination marker used for the object",
+     "misconceptionId": "penanda tujuan dipakai untuk objek",
+     "whyFails": "NI points at a destination or a point in time, not at what is consumed.",
+     "whyFailsId": "に menunjuk tujuan atau titik waktu, bukan benda yang dikonsumsi."
+    },
+    {
+     "option": "で",
+     "misconception": "means/place marker used for the object",
+     "misconceptionId": "penanda alat/tempat dipakai untuk objek",
+     "whyFails": "DE says where the action happens or with what tool. Coffee is neither the place nor the tool here.",
+     "whyFailsId": "で menyatakan tempat berlangsungnya perbuatan atau alatnya. Kopi bukan tempat maupun alat di sini."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "NOMIMASU acts on something; the thing acted on is the coffee, so it takes O.",
+    "whyCorrectId": "のみます mengenai sesuatu; yang dikenai adalah kopinya, jadi memakai を.",
+    "rule": "Transitive verb + the thing it acts on = O.",
+    "ruleId": "Kata kerja transitif + benda yang dikenainya = を.",
+    "whyOthersFail": "GA would make the coffee the drinker; NI would make it a destination; DE would make it a place or a tool.",
+    "whyOthersFailId": "が menjadikan kopi si peminum; に menjadikannya tujuan; で menjadikannya tempat atau alat.",
+    "howToAvoid": "Say the sentence back as 'X does the verb to Y'. Y is the O.",
+    "howToAvoidId": "Ucapkan ulang kalimatnya sebagai 'X melakukan kata kerja pada Y'. Y itulah を.",
+    "memoryCue": "O = the thing on the receiving end.",
+    "memoryCueId": "を = yang kena, bukan yang melakukan."
+   }
+  },
+  {
+   "id": "JP-PA-003",
+   "family": "particles",
+   "skill": "particles",
+   "subskill": "de_place_of_action_vs_ni_place_of_existence",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "de-place-of-action",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Use DE for the place where an action happens, not NI",
+   "pedagogicalObjectiveId": "Pakai で untuk tempat berlangsungnya perbuatan, bukan に",
+   "misconceptionTargeted": "Learner uses NI for every place because NI was learned first with ARIMASU",
+   "misconceptionTargetedId": "Murid memakai に untuk semua tempat karena に dipelajari lebih dulu bersama あります",
+   "reasoningOperation": "check whether the verb is existence or activity -> choose the matching place particle",
+   "reasoningOperationId": "periksa kata kerjanya menyatakan keberadaan atau kegiatan -> pilih penanda tempat yang cocok",
+   "stem": "としょかん___ ほんを よみます。",
+   "stemKana": "としょかん___ ほんを よみます。",
+   "furigana": [],
+   "options": [
+    "で",
+    "に",
+    "を",
+    "へ"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "に",
+     "misconception": "place-of-existence marker used for an activity",
+     "misconceptionId": "penanda tempat keberadaan dipakai untuk kegiatan",
+     "whyFails": "NI marks where something simply IS. Reading is an activity that takes place somewhere, and that is DE.",
+     "whyFailsId": "に menandai tempat sesuatu BERADA. Membaca adalah kegiatan yang berlangsung di suatu tempat, dan itu で."
+    },
+    {
+     "option": "を",
+     "misconception": "object marker on a place noun",
+     "misconceptionId": "penanda objek dipasang pada kata benda tempat",
+     "whyFails": "The sentence already has its object, HON. A library is not being read.",
+     "whyFailsId": "Kalimatnya sudah punya objek, yaitu ほん. Perpustakaannya bukan yang dibaca."
+    },
+    {
+     "option": "へ",
+     "misconception": "direction marker used for a static location",
+     "misconceptionId": "penanda arah dipakai untuk tempat yang diam",
+     "whyFails": "E points toward a destination you move to. Nobody is travelling in this sentence.",
+     "whyFailsId": "へ menunjuk arah tujuan perpindahan. Di kalimat ini tidak ada yang berpindah."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "YOMIMASU is an activity, and the library is where it happens, so DE is required.",
+    "whyCorrectId": "よみます adalah kegiatan, dan perpustakaan adalah tempat berlangsungnya, jadi harus で.",
+    "rule": "Activity happens at a place = DE. Something exists at a place = NI.",
+    "ruleId": "Kegiatan berlangsung di suatu tempat = で. Sesuatu berada di suatu tempat = に.",
+    "whyOthersFail": "NI belongs with ARIMASU/IMASU; O already belongs to HON; E needs movement.",
+    "whyOthersFailId": "に milik あります/います; を sudah dipakai ほん; へ menuntut ada perpindahan.",
+    "howToAvoid": "Ask whether the verb is 'to be' or 'to do'. Doing takes DE.",
+    "howToAvoidId": "Tanya apakah kata kerjanya 'berada' atau 'melakukan'. Melakukan memakai で.",
+    "memoryCue": "Doing happens DE-where.",
+    "memoryCueId": "Melakukan sesuatu: で. Sekadar ada: に."
+   }
+  },
+  {
+   "id": "JP-EX-001",
+   "family": "existence_location",
+   "skill": "existence_location",
+   "subskill": "imasu_for_animate_arimasu_for_inanimate",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "imasu-animate",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Select IMASU for living things and ARIMASU for non-living things",
+   "pedagogicalObjectiveId": "Pilih います untuk makhluk hidup dan あります untuk benda mati",
+   "misconceptionTargeted": "Learner picks the existence verb by sentence pattern rather than by whether the subject is alive",
+   "misconceptionTargetedId": "Murid memilih kata kerja keberadaan berdasarkan pola kalimat, bukan berdasarkan hidup atau tidaknya subjek",
+   "reasoningOperation": "check whether the subject can move on its own -> choose the existence verb",
+   "reasoningOperationId": "periksa apakah subjeknya bisa bergerak sendiri -> pilih kata kerja keberadaannya",
+   "stem": "にわに ねこが ___。",
+   "stemKana": "にわに ねこが ___。",
+   "furigana": [],
+   "options": [
+    "います",
+    "あります",
+    "です",
+    "なります"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "あります",
+     "misconception": "inanimate existence verb used for a living thing",
+     "misconceptionId": "kata kerja keberadaan benda mati dipakai untuk makhluk hidup",
+     "whyFails": "ARIMASU is for things that cannot move themselves. A cat can.",
+     "whyFailsId": "あります untuk benda yang tidak bisa bergerak sendiri. Kucing bisa."
+    },
+    {
+     "option": "です",
+     "misconception": "copula used to state existence",
+     "misconceptionId": "kata penghubung dipakai untuk menyatakan keberadaan",
+     "whyFails": "DESU links two nouns ('A is B'). It cannot say that something is present somewhere.",
+     "whyFailsId": "です menghubungkan dua kata benda ('A adalah B'). Ia tidak bisa menyatakan sesuatu ada di suatu tempat."
+    },
+    {
+     "option": "なります",
+     "misconception": "change-of-state verb mistaken for existence",
+     "misconceptionId": "kata kerja perubahan keadaan disangka keberadaan",
+     "whyFails": "NARIMASU means 'becomes'. Nothing is turning into anything here.",
+     "whyFailsId": "なります berarti 'menjadi'. Di sini tidak ada yang berubah menjadi apa pun."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "A cat is a living thing, so its presence is stated with IMASU.",
+    "whyCorrectId": "Kucing makhluk hidup, jadi keberadaannya dinyatakan dengan います.",
+    "rule": "Living thing exists = IMASU. Non-living thing exists = ARIMASU. The place takes NI.",
+    "ruleId": "Makhluk hidup ada = います. Benda mati ada = あります. Tempatnya memakai に.",
+    "whyOthersFail": "ARIMASU denies the cat its ability to move; DESU only links nouns; NARIMASU reports a change.",
+    "whyOthersFailId": "あります menyangkal kucing bisa bergerak; です hanya menghubungkan kata benda; なります melaporkan perubahan.",
+    "howToAvoid": "Ask: can it walk away by itself? If yes, IMASU.",
+    "howToAvoidId": "Tanya: bisakah ia pergi sendiri? Kalau bisa, います.",
+    "memoryCue": "It moves, it lives, it IMASU.",
+    "memoryCueId": "Bisa bergerak sendiri: います."
+   }
+  },
+  {
+   "id": "JP-AD-001",
+   "family": "adjectives",
+   "skill": "adjectives",
+   "subskill": "na_adjective_negation",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "na-adjective-negation",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Negate a NA-adjective with JA ARIMASEN, not with the I-adjective pattern",
+   "pedagogicalObjectiveId": "Membuat bentuk negatif kata sifat な dengan じゃ ありません, bukan dengan pola kata sifat い",
+   "misconceptionTargeted": "Learner applies the I-adjective negation KUNAI to a NA-adjective",
+   "misconceptionTargetedId": "Murid menerapkan bentuk negatif kata sifat い (くない) pada kata sifat な",
+   "reasoningOperation": "classify the adjective -> apply the negation pattern of its class",
+   "reasoningOperationId": "kenali golongan kata sifatnya -> terapkan pola negatif golongan itu",
+   "stem": "この へやは しずか___。",
+   "stemKana": "この へやは しずか___。",
+   "furigana": [],
+   "options": [
+    "じゃ ありません",
+    "くない です",
+    "ありません",
+    "じゃ ありませんでした"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "くない です",
+     "misconception": "i-adjective negation applied to a na-adjective",
+     "misconceptionId": "pola negatif kata sifat い diterapkan pada kata sifat な",
+     "whyFails": "KUNAI attaches only to adjectives whose dictionary form ends in I, like TAKAI. SHIZUKA is a NA-adjective.",
+     "whyFailsId": "くない hanya menempel pada kata sifat yang bentuk kamusnya berakhiran い, seperti たかい. しずか termasuk kata sifat な."
+    },
+    {
+     "option": "ありません",
+     "misconception": "existence negation used to negate a quality",
+     "misconceptionId": "negasi keberadaan dipakai untuk menyangkal sifat",
+     "whyFails": "ARIMASEN denies that something exists. The room exists; it is its quietness that is denied.",
+     "whyFailsId": "ありません menyangkal keberadaan. Kamarnya ada; yang disangkal adalah sifat tenangnya."
+    },
+    {
+     "option": "じゃ ありませんでした",
+     "misconception": "past negation used for a present state",
+     "misconceptionId": "negasi lampau dipakai untuk keadaan sekarang",
+     "whyFails": "The sentence describes how the room is now, not how it used to be.",
+     "whyFailsId": "Kalimatnya menggambarkan keadaan kamar sekarang, bukan dulu."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "SHIZUKA is a NA-adjective, and NA-adjectives are negated like nouns: JA ARIMASEN.",
+    "whyCorrectId": "しずか adalah kata sifat な, dan kata sifat な dinegasikan seperti kata benda: じゃ ありません.",
+    "rule": "NA-adjective: ... JA ARIMASEN. I-adjective: drop I, add KUNAI DESU.",
+    "ruleId": "Kata sifat な: … じゃ ありません. Kata sifat い: buang い, tambahkan くない です.",
+    "whyOthersFail": "KUNAI belongs to I-adjectives; ARIMASEN denies existence; the -DESHITA form moves the sentence into the past.",
+    "whyOthersFailId": "くない milik kata sifat い; ありません menyangkal keberadaan; bentuk -でした memindahkan kalimat ke masa lampau.",
+    "howToAvoid": "Check the dictionary form first. If it does not end in I, negate it like a noun.",
+    "howToAvoidId": "Periksa bentuk kamusnya dulu. Kalau tidak berakhiran い, negasikan seperti kata benda.",
+    "memoryCue": "NA behaves like a noun.",
+    "memoryCueId": "Kata sifat な berperilaku seperti kata benda."
+   }
+  },
+  {
+   "id": "JP-AD-002",
+   "family": "adjectives",
+   "skill": "adjectives",
+   "subskill": "i_adjective_negation",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "i-adjective-negation",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Negate an I-adjective by replacing the final I with KUNAI",
+   "pedagogicalObjectiveId": "Membuat bentuk negatif kata sifat い dengan mengganti い menjadi くない",
+   "misconceptionTargeted": "Learner keeps the final I and appends the noun-style negation",
+   "misconceptionTargetedId": "Murid mempertahankan い lalu menempelkan negasi bergaya kata benda",
+   "reasoningOperation": "classify the adjective -> transform its ending",
+   "reasoningOperationId": "kenali golongan kata sifatnya -> ubah akhirannya",
+   "stem": "この みずは つめた___ です。",
+   "stemKana": "この みずは つめた___ です。",
+   "furigana": [],
+   "options": [
+    "くない",
+    "じゃない",
+    "いない",
+    "くありませんでした"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "じゃない",
+     "misconception": "na-adjective negation applied to an i-adjective",
+     "misconceptionId": "pola negatif kata sifat な diterapkan pada kata sifat い",
+     "whyFails": "JA NAI is for nouns and NA-adjectives. TSUMETAI ends in I, so its own ending changes instead.",
+     "whyFailsId": "じゃない untuk kata benda dan kata sifat な. つめたい berakhiran い, jadi akhirannya sendiri yang berubah."
+    },
+    {
+     "option": "いない",
+     "misconception": "final I kept and negation glued on",
+     "misconceptionId": "い dipertahankan lalu negasinya ditempel begitu saja",
+     "whyFails": "The I is not kept: it is replaced. TSUMETAI becomes TSUMETAKUNAI.",
+     "whyFailsId": "い tidak dipertahankan, melainkan diganti. つめたい menjadi つめたくない."
+    },
+    {
+     "option": "くありませんでした",
+     "misconception": "past polite negation used for a present state",
+     "misconceptionId": "negasi sopan lampau dipakai untuk keadaan sekarang",
+     "whyFails": "This form says the water WAS not cold. The sentence is about now.",
+     "whyFailsId": "Bentuk ini berarti airnya DULU tidak dingin. Kalimatnya tentang sekarang."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "TSUMETAI is an I-adjective, so the I is replaced: TSUMETA + KUNAI.",
+    "whyCorrectId": "つめたい kata sifat い, jadi い-nya diganti: つめた + くない.",
+    "rule": "I-adjective negation: drop the final I, add KUNAI (+ DESU for politeness).",
+    "ruleId": "Negatif kata sifat い: buang い di ujung, tambahkan くない (+ です untuk ragam sopan).",
+    "whyOthersFail": "JA NAI belongs to nouns and NA-adjectives; keeping the I produces a form that does not exist; the -MASEN DESHITA form is past.",
+    "whyOthersFailId": "じゃない milik kata benda dan kata sifat な; mempertahankan い menghasilkan bentuk yang tidak ada; bentuk -ませんでした adalah lampau.",
+    "howToAvoid": "Cover the final I with your finger, then add KUNAI.",
+    "howToAvoidId": "Tutup い di ujungnya dengan jari, lalu tambahkan くない.",
+    "memoryCue": "I leaves, KUNAI arrives.",
+    "memoryCueId": "い pergi, くない datang."
+   }
+  },
+  {
+   "id": "JP-VB-001",
+   "family": "polite_forms",
+   "skill": "polite_forms",
+   "subskill": "masen_deshita_past_negative",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "masen-deshita",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Form the polite past negative with MASEN DESHITA",
+   "pedagogicalObjectiveId": "Membentuk lampau negatif ragam sopan dengan ませんでした",
+   "misconceptionTargeted": "Learner marks the past on the wrong half of the polite form, or mixes plain and polite registers",
+   "misconceptionTargetedId": "Murid menaruh penanda lampau di bagian yang salah, atau mencampur ragam biasa dengan ragam sopan",
+   "reasoningOperation": "read the time word -> set tense -> set polarity -> keep one register",
+   "reasoningOperationId": "baca kata waktunya -> tetapkan kala -> tetapkan positif/negatif -> jaga ragamnya tetap satu",
+   "stem": "きのう えいがを ___。",
+   "stemKana": "きのう えいがを ___。",
+   "furigana": [
+    [
+     "映画",
+     "えいが"
+    ]
+   ],
+   "options": [
+    "みませんでした",
+    "みました",
+    "みません",
+    "みなかったです"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "みました",
+     "misconception": "polarity dropped: past affirmative for past negative",
+     "misconceptionId": "kutub jawaban hilang: lampau positif dipakai untuk lampau negatif",
+     "whyFails": "This says the film WAS watched. The sentence needs 'did not watch'.",
+     "whyFailsId": "Ini berarti filmnya DITONTON. Kalimatnya butuh 'tidak menonton'."
+    },
+    {
+     "option": "みません",
+     "misconception": "tense dropped: present negative for past negative",
+     "misconceptionId": "kala hilang: negatif sekarang dipakai untuk negatif lampau",
+     "whyFails": "KINOU fixes the sentence in the past, but MASEN alone is present or habitual.",
+     "whyFailsId": "きのう memakukan kalimat di masa lampau, sementara ません sendirian bermakna sekarang atau kebiasaan."
+    },
+    {
+     "option": "みなかったです",
+     "misconception": "plain past negative dressed with DESU",
+     "misconceptionId": "negatif lampau ragam biasa dipoles dengan です",
+     "whyFails": "This mixes registers: the verb is plain while DESU is polite. In the polite register the verb itself carries MASEN DESHITA.",
+     "whyFailsId": "Ini mencampur ragam: kata kerjanya ragam biasa, sementara です ragam sopan. Di ragam sopan, kata kerjanya sendiri yang membawa ませんでした."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "KINOU sets the past, the meaning is negative, and the register is polite, so MASEN DESHITA.",
+    "whyCorrectId": "きのう menetapkan lampau, maknanya negatif, ragamnya sopan — jadi ませんでした.",
+    "rule": "Polite verb endings: MASU / MASEN / MASHITA / MASEN DESHITA.",
+    "ruleId": "Akhiran kata kerja ragam sopan: ます / ません / ました / ませんでした.",
+    "whyOthersFail": "MASHITA keeps the affirmative; MASEN keeps the present; NAKATTA DESU mixes plain and polite.",
+    "whyOthersFailId": "ました tetap positif; ません tetap sekarang; なかったです mencampur ragam biasa dan sopan.",
+    "howToAvoid": "Settle two questions before answering: past or not, and negative or not. Then keep one register.",
+    "howToAvoidId": "Selesaikan dua pertanyaan sebelum menjawab: lampau atau bukan, negatif atau bukan. Lalu jaga ragamnya tetap satu.",
+    "memoryCue": "Not + yesterday = MASEN DESHITA.",
+    "memoryCueId": "Tidak + kemarin = ませんでした."
+   }
+  },
+  {
+   "id": "JP-CO-001",
+   "family": "counters",
+   "skill": "counters",
+   "subskill": "counter_nin_for_people",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "counter-nin-people",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Count people with the NIN counter",
+   "pedagogicalObjectiveId": "Menghitung orang dengan kata bantu bilangan にん",
+   "misconceptionTargeted": "Learner uses the general object counter for people, or picks a counter by shape association",
+   "misconceptionTargetedId": "Murid memakai kata bantu bilangan benda umum untuk orang, atau memilih berdasarkan tebakan bentuk",
+   "reasoningOperation": "identify what is being counted -> select the counter class",
+   "reasoningOperationId": "kenali apa yang dihitung -> pilih golongan kata bantu bilangannya",
+   "stem": "きょうしつに がくせいが ___ います。",
+   "stemKana": "きょうしつに がくせいが ___ います。",
+   "furigana": [
+    [
+     "学生",
+     "がくせい"
+    ]
+   ],
+   "options": [
+    "さんにん",
+    "みっつ",
+    "さんまい",
+    "さんぼん"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "みっつ",
+     "misconception": "general object counter used for people",
+     "misconceptionId": "kata bantu bilangan benda umum dipakai untuk orang",
+     "whyFails": "The TSU series counts unclassified objects. People have their own counter.",
+     "whyFailsId": "Deret つ menghitung benda yang tidak bergolongan khusus. Orang punya kata bantu bilangan sendiri."
+    },
+    {
+     "option": "さんまい",
+     "misconception": "flat-object counter used for people",
+     "misconceptionId": "kata bantu bilangan benda pipih dipakai untuk orang",
+     "whyFails": "MAI counts flat things such as paper or shirts.",
+     "whyFailsId": "まい menghitung benda pipih seperti kertas atau baju."
+    },
+    {
+     "option": "さんぼん",
+     "misconception": "long-object counter used for people",
+     "misconceptionId": "kata bantu bilangan benda panjang dipakai untuk orang",
+     "whyFails": "HON counts long, thin things such as pens or bottles.",
+     "whyFailsId": "ほん menghitung benda panjang dan ramping seperti pulpen atau botol."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "The sentence counts students, and people are counted with NIN.",
+    "whyCorrectId": "Kalimatnya menghitung murid, dan orang dihitung dengan にん.",
+    "rule": "Counter matches the KIND of thing: people NIN, flat things MAI, long things HON, unclassified things TSU.",
+    "ruleId": "Kata bantu bilangan mengikuti JENIS bendanya: orang にん, benda pipih まい, benda panjang ほん, benda tak bergolongan つ.",
+    "whyOthersFail": "TSU, MAI and HON all belong to objects, and students are not objects.",
+    "whyOthersFailId": "つ, まい, dan ほん semuanya untuk benda, sementara murid bukan benda.",
+    "howToAvoid": "Name the thing out loud first, then pick its counter — never pick the counter first.",
+    "howToAvoidId": "Sebut dulu bendanya, baru pilih kata bantu bilangannya — jangan sebaliknya.",
+    "memoryCue": "People come with NIN.",
+    "memoryCueId": "Orang selalu dengan にん."
+   }
+  },
+  {
+   "id": "JP-DM-001",
+   "family": "demonstratives",
+   "skill": "demonstratives",
+   "subskill": "kore_sore_are_by_distance",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "kore-near-speaker",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Choose the demonstrative that matches the distance from speaker and listener",
+   "pedagogicalObjectiveId": "Memilih kata tunjuk yang sesuai dengan jarak dari pembicara dan lawan bicara",
+   "misconceptionTargeted": "Learner maps the three-way Japanese system onto a two-way this/that split",
+   "misconceptionTargetedId": "Murid memetakan sistem tiga arah bahasa Jepang ke pembagian dua arah 'ini/itu'",
+   "reasoningOperation": "locate the object relative to both speakers -> pick the matching series",
+   "reasoningOperationId": "tentukan posisi bendanya terhadap kedua pembicara -> pilih deret yang cocok",
+   "stem": "（じぶんの てに ある ほんを さして）___ は わたしの ほんです。",
+   "stemKana": "（じぶんの てに ある ほんを さして）___ は わたしの ほんです。",
+   "furigana": [],
+   "options": [
+    "これ",
+    "それ",
+    "あれ",
+    "どれ"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "それ",
+     "misconception": "listener-side demonstrative used for something in the speaker's own hand",
+     "misconceptionId": "kata tunjuk sisi lawan bicara dipakai untuk benda di tangan sendiri",
+     "whyFails": "SORE points at something near the listener, not at what the speaker is holding.",
+     "whyFailsId": "それ menunjuk benda dekat lawan bicara, bukan benda yang sedang dipegang pembicara."
+    },
+    {
+     "option": "あれ",
+     "misconception": "far-from-both demonstrative used for something in hand",
+     "misconceptionId": "kata tunjuk jauh dari keduanya dipakai untuk benda di tangan",
+     "whyFails": "ARE is for something away from both people. The book is in the speaker's hand.",
+     "whyFailsId": "あれ untuk benda yang jauh dari keduanya. Bukunya ada di tangan pembicara."
+    },
+    {
+     "option": "どれ",
+     "misconception": "question demonstrative used in a statement",
+     "misconceptionId": "kata tunjuk tanya dipakai di kalimat pernyataan",
+     "whyFails": "DORE asks 'which one'. This sentence answers, it does not ask.",
+     "whyFailsId": "どれ menanyakan 'yang mana'. Kalimat ini menjawab, bukan bertanya."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "The book is in the speaker's own hand, which is the KO series: KORE.",
+    "whyCorrectId": "Bukunya ada di tangan pembicara sendiri, dan itu deret こ: これ.",
+    "rule": "KO = near the speaker, SO = near the listener, A = far from both, DO = the question.",
+    "ruleId": "こ = dekat pembicara, そ = dekat lawan bicara, あ = jauh dari keduanya, ど = bentuk tanya.",
+    "whyOthersFail": "SORE moves the book to the listener; ARE moves it away from everyone; DORE turns a statement into a question.",
+    "whyOthersFailId": "それ memindahkan bukunya ke lawan bicara; あれ menjauhkannya dari semua orang; どれ mengubah pernyataan menjadi pertanyaan.",
+    "howToAvoid": "Before answering, ask whose hand the thing is closest to.",
+    "howToAvoidId": "Sebelum menjawab, tanya benda itu paling dekat dengan tangan siapa.",
+    "memoryCue": "In my hand: KO.",
+    "memoryCueId": "Di tanganku: こ."
+   }
+  },
+  {
+   "id": "JP-TE-001",
+   "family": "te_form",
+   "skill": "te_form",
+   "subskill": "te_form_of_godan_ru_verbs_for_requests",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "te-form-request-godan-ru",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Build the TE-form of a godan verb ending in RU and use it to make a polite request",
+   "pedagogicalObjectiveId": "Membentuk bentuk て dari kata kerja golongan godan berakhiran る dan memakainya untuk permintaan sopan",
+   "misconceptionTargeted": "Learner builds the TE-form from the polite MASU-stem instead of from the verb group's own rule",
+   "misconceptionTargetedId": "Murid membentuk bentuk て dari akar ます, bukan dari aturan golongan kata kerjanya",
+   "reasoningOperation": "identify the verb group -> apply the group's TE rule -> attach KUDASAI",
+   "reasoningOperationId": "kenali golongan kata kerjanya -> terapkan aturan て golongan itu -> tempelkan ください",
+   "stem": "すみません、しゃしんを ___ ください。",
+   "stemKana": "すみません、しゃしんを ___ ください。",
+   "furigana": [
+    [
+     "写真",
+     "しゃしん"
+    ]
+   ],
+   "options": [
+    "とって",
+    "とりて",
+    "とります",
+    "とった"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "とりて",
+     "misconception": "te-form built from the polite masu-stem",
+     "misconceptionId": "bentuk て dibangun dari akar ます",
+     "whyFails": "TORIMASU gives the stem TORI-, but godan verbs ending in RU do not take TE on that stem; they double into TTE.",
+     "whyFailsId": "とります memberi akar とり-, tetapi kata kerja godan berakhiran る tidak menempelkan て pada akar itu; bunyinya merapat menjadi って."
+    },
+    {
+     "option": "とります",
+     "misconception": "polite non-past used where the te-form is required",
+     "misconceptionId": "bentuk sopan sekarang dipakai di tempat yang menuntut bentuk て",
+     "whyFails": "KUDASAI attaches only to a TE-form; MASU cannot carry a request.",
+     "whyFailsId": "ください hanya menempel pada bentuk て; ます tidak bisa membawa permintaan."
+    },
+    {
+     "option": "とった",
+     "misconception": "plain past used where the te-form is required",
+     "misconceptionId": "bentuk lampau biasa dipakai di tempat yang menuntut bentuk て",
+     "whyFails": "TOTTA reports something already done; a request has not happened yet.",
+     "whyFailsId": "とった melaporkan yang sudah terjadi; permintaan justru belum terjadi."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "TORU is a godan verb ending in RU, so its TE-form is TOTTE, and TOTTE KUDASAI is a polite request.",
+    "whyCorrectId": "とる kata kerja godan berakhiran る, jadi bentuk て-nya とって, dan とって ください adalah permintaan sopan.",
+    "rule": "Godan verbs ending in U, TSU or RU form the TE-form with a small TSU: -TTE.",
+    "ruleId": "Kata kerja godan berakhiran う, つ, atau る membentuk て dengan っ kecil: -って.",
+    "whyOthersFail": "TORITE follows no group's rule; TORIMASU cannot host KUDASAI; TOTTA is a report, not a request.",
+    "whyOthersFailId": "とりて tidak mengikuti aturan golongan mana pun; とります tidak bisa menampung ください; とった laporan, bukan permintaan.",
+    "howToAvoid": "Decide the verb group before touching the ending — the TE rule is chosen by group, not by feel.",
+    "howToAvoidId": "Tentukan golongan kata kerjanya sebelum menyentuh akhiran — aturan て dipilih berdasarkan golongan, bukan perasaan.",
+    "memoryCue": "U, TSU, RU: small TSU.",
+    "memoryCueId": "う, つ, る: pakai っ kecil."
+   }
+  }
+ ]
 }
