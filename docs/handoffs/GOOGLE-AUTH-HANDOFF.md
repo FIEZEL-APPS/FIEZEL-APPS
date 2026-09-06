@@ -92,6 +92,43 @@ pengambilalihan. Arah yang berbahaya sudah ditutup PK.
   `core-config.js`. Keduanya PUBLIK dengan sengaja; client secret tidak dipakai sama
   sekali di alur ini, jadi tidak ada secret yang perlu disimpan di mana pun.
 
+## Gelombang m025-272 — tombolnya pindah ke depan
+
+Sampai m025-270 tombol masuk hidup TIGA ketukan di dalam Pengaturan (Pengaturan → kartu
+Akun FIEZEL → Masuk/Daftar). Owner melaporkan tidak menemukannya, dan itu gejala dari
+kerugian yang lebih mahal daripada sekadar sulit dicari.
+
+Murid yang ganti HP: buka aplikasi → pilih bahasa → ketik nama → pilih tujuan → tes
+penempatan → **baru** menemukan tombol masuk. Saat itu ia sudah terlanjur menjadi murid
+BARU bagi gurunya: `sub` perangkat ini bukan `sub` akunnya, jadi kelas, tugas guru, teman,
+dan notifikasinya tidak ada. **Tombol masuk yang baru bisa ditemukan sesudah kerugian itu
+terjadi adalah tombol yang datang terlambat.**
+
+Sekarang blok "Sudah punya akun?" berdiri di pra-langkah pemilih bahasa
+(`features/onboarding/fiezel-onboarding.js`, `LANGUAGE_STEP`), **di bawah** kedua pilihan
+bahasa. Gerbangnya: `tests/onboarding-test.js` (enam kasus, tiga mutasi terbukti merah).
+
+Tiga hal yang tidak boleh diubah tanpa membaca alasannya:
+
+1. **Sekunder, bukan aksi utama.** Mayoritas yang membuka layar itu murid BARU yang memang
+   harus memilih bahasa. Gerbangnya menegakkan urutan markup: blok masuk wajib berada
+   SESUDAH `data-ob-locale`.
+2. **`locale:'auto'`, bukan `'id'`.** Memaksa `id` pada layar yang JUSTRU sedang menanyakan
+   bahasa akan menyodorkan tombol berbahasa Indonesia kepada murid Thai. Mudah dibuat,
+   sulit terlihat dari Indonesia.
+3. **Naskahnya dwibahasa harfiah, bukan copy-map.** Pada cat PERTAMA belum ada locale
+   pilihan dan copy Thai memang belum diunduh. Anggaran `th-ui-leak` untuk berkas itu naik
+   1 → 3; setiap kalimat yang dihitung punya padanan Thai di baris yang sama.
+
+Digambar dari `bind()`, bukan sekali saat mount: `paint()` menulis ulang `innerHTML`, jadi
+tombol yang digambar skrip Google ikut terhapus tiap cat ulang.
+
+**BATASAN YANG HARUS DISEBUT KE MURID DAN KE OWNER:** masuk di layar ini memulihkan AKUN
+(kelas, tugas guru, teman, notifikasi — semuanya berkunci `sub` di server), TETAPI BUKAN
+profil belajar (nama, tujuan, level). Profil itu hidup di perangkat dan tidak pernah
+dikirim ke server, jadi di HP baru tetap diisi ulang. Kalimat status sesudah berhasil masuk
+karena itu tidak menjanjikan onboarding terlewat — ia berkata "pilih bahasamu untuk lanjut".
+
 ## Langkah berikutnya — jangan anggap fitur ini selesai
 
 Urut dari yang paling mahal kalau dibiarkan:
@@ -109,6 +146,11 @@ Urut dari yang paling mahal kalau dibiarkan:
    pintunya di layar Pengaturan.
 3. **Melepas tautan Google** (hapus baris `auth_oauth_identity`). Hari ini murid yang salah
    menautkan akun Google harus meminta owner, dan tidak ada jalur owner untuk itu.
+4. **Profil belajar ikut pulih.** Lihat batasan di gelombang m025-272 di atas. Ini butuh
+   menyimpan profil onboarding (nama, tujuan, level) di server berkunci `sub` — keputusan
+   privasi tersendiri, karena nama murid hari ini TIDAK pernah meninggalkan perangkat
+   kecuali lewat jalur kelas yang sudah punya kontraknya sendiri. Jangan kerjakan sebagai
+   tambahan diam-diam pada perubahan lain.
 - **Jalur `/api/auth/claim` (Puter) masih ada dan masih mati** — penerbit tiketnya tidak
   pernah dibangun, jadi ia selalu 401. Kalau Google menggantikannya, cabut rutenya beserta
   `STUB-PUTER-CLAIM-TICKET.md` dan secret `PUTER_CLAIM_SECRET_*`; jangan tinggalkan dua
