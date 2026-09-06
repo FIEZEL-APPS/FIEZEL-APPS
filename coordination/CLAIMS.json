@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-06T17:31:19.536Z",
+  "updated": "2026-09-06T18:09:26.241Z",
   "active": [
     {
       "sesi": "ses_0034e69d3ffes3kjiFLNDzYXUZ",
@@ -97,14 +97,14 @@
       "catatan": "Menyentuh juga app.js (kunci ujian di quizLoop/Skills Lab/Writing + gerbang pintu AI + pendeteksi ujian non-tugas), features/class-hub/fiezel-class-hub.js, features/learner-flow/fiezel-learner-flow.js, features/teacher/fiezel-teacher-store.js, workers/api/teacher/class-sync-core.js (fx), copy-*-proctor.js, index.html, sw.js, quality.yml. Build m025-273 lewat tools/bump-build.mjs."
     },
     {
-      "sesi": "claude-code-kosakata-jepang",
-      "peran": "claude-code / kosakata jepang",
+      "sesi": "claude-code-sumbu-bahasa",
+      "peran": "claude-code / sumbu bahasa target",
       "paths": [
-        "docs/japanese/kosakata-jlpt.json",
-        "docs/handoffs/JAPANESE-VOCAB-HANDOFF.md"
+        "features/brain/fiezel-target-language.js",
+        "tests/target-language-axis-test.js"
       ],
-      "mulai": "2026-09-06T17:30:59Z",
-      "catatan": "Normalisasi dua berkas kosakata milik owner jadi satu bank JSON per tingkat JLPT. Nol byte produksi."
+      "mulai": "2026-09-06T18:09:26Z",
+      "catatan": "Langkah 2 kursus Jepang: kunci penyimpanan per bahasa. Kunci Inggris identik byte per byte; modul off di manifest karena belum ada pemanggil."
     }
   ],
   "finished": [
@@ -334,6 +334,18 @@
       "catatan": "Langkah 1 kursus Jepang: setFamilyGraph/resetFamilyGraph/familyGraph. Graf Inggris tetap bawaan, dijaga patokan tulis-tangan di gerbang. Handoff JAPANESE-COURSE sudah diklaim entri sesi-claude-cq1nea di atas.",
       "selesai": "2026-09-06T17:31:19Z",
       "hasil": "Mendarat lewat PR #373 (m025-279)."
+    },
+    {
+      "sesi": "claude-code-kosakata-jepang",
+      "peran": "claude-code / kosakata jepang",
+      "paths": [
+        "docs/japanese/kosakata-jlpt.json",
+        "docs/handoffs/JAPANESE-VOCAB-HANDOFF.md"
+      ],
+      "mulai": "2026-09-06T17:30:59Z",
+      "catatan": "Normalisasi dua berkas kosakata milik owner jadi satu bank JSON per tingkat JLPT. Nol byte produksi.",
+      "selesai": "2026-09-06T18:09:26Z",
+      "hasil": "Mendarat lewat PR #374."
     }
   ],
   "protocol": "coordination-claims-v1",

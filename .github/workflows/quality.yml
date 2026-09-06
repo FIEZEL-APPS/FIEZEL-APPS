@@ -970,6 +970,15 @@ jobs:
         # Gerbang ini menahan graf Inggris pada patokan yang ditulis tangan, dan membuktikan
         # penyuntikan graf lain benar-benar berganti serta benar-benar bisa dipulihkan.
         run: node tests/family-graph-injection-test.js
+      - name: 'Sumbu bahasa target: kunci murid Inggris identik byte per byte'
+        # Menambah bahasa kedua punya satu cara gampang dan satu cara benar. Yang gampang:
+        # beri SEMUA kunci awalan bahasa, termasuk kunci Inggris. Sekali dikirim, setiap murid
+        # Inggris yang sudah ada membuka aplikasi dan menemukan dirinya kembali ke nol —
+        # progresnya tidak terhapus, ia hanya tidak lagi dicari di tempat ia disimpan. Tanpa
+        # error, tanpa gejala, baru ketahuan dari keluhan murid.
+        # Gerbang ini membaca daftar kunci LANGSUNG DARI SUMBER, jadi ia ikut tumbuh saat kunci
+        # baru lahir dan tidak bisa basi diam-diam.
+        run: node tests/target-language-axis-test.js
       - name: 'Wave E4: post-test tertunda / probe retensi (fiezel-post-test)'
         # Modul murni baru features/brain/fiezel-retention-probe.js: penjadwal probe retensi
         # deterministik (offset 3/7/21 hari, jitter seeded per lessonId+userSeed) +
