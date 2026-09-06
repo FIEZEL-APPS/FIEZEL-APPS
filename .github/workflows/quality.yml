@@ -213,11 +213,15 @@ jobs:
           node tests/app-telemetry-wiring-test.js
           node tests/brain-config-test.js
           node tests/brain-manifest-test.js
+          node tests/question-allocator-test.js
           node tests/fiezel-stat-gate-test.js
           node tests/learning-lane-test.js
           node tests/braincore-evidence-test.js
           # --- SLOT 10: akun, peran, konten guru, CSV, Braincore, sosial -------
           node tests/auth-schema-contract-test.js
+          node tests/google-auth-core-test.js
+          node tests/google-auth-route-test.js
+          node tests/google-auth-ui-test.js
           node tests/auth-role-test.js
           node tests/role-security-test.js
           node tests/teacher-content-test.js
@@ -225,6 +229,9 @@ jobs:
           node tests/teacher-braincore-test.js
           node tests/class-sync-test.js
           node tests/class-hub-test.js
+          node tests/exam-focus-guard-test.js
+          node tests/class-join-test.js
+          node tests/exam-lock-test.js
           node tests/social-notify-test.js
           node tests/braincore-learner-identity-test.js
           node tests/learning-metrics-test.js

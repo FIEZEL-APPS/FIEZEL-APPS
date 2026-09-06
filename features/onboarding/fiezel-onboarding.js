@@ -630,6 +630,44 @@
       + choice('th', '🇹🇭', 'ภาษาไทย', 'ไทย')
       + '</div>'
       + (busy === 'th' ? '<p class="fiezel-note" role="status">Menyiapkan Bahasa Thai · <span lang="th">กำลังเตรียมภาษาไทย…</span></p>' : '')
+      + signInMarkup(env)
+      + '</div>';
+  }
+
+  // ---------------------------------------------------------------------------------------
+  // Pra-langkah, bagian kedua: "sudah punya akun?".
+  //
+  // KENAPA DI SINI, LAYAR PALING AWAL, DAN BUKAN DI PENGATURAN SAJA
+  // ---------------------------------------------------------------
+  // Murid yang ganti HP membuka aplikasi ini dan langsung diminta memilih bahasa, mengetik
+  // nama, memilih tujuan, mengerjakan tes penempatan — lalu baru menemukan tombol masuk
+  // terkubur tiga ketukan di dalam Pengaturan. Saat itu ia sudah menjadi murid BARU bagi
+  // gurunya: `sub` perangkat ini bukan `sub` akunnya, jadi kelas, tugas, dan temannya tidak
+  // ada. Tombol masuk yang baru bisa ditemukan sesudah kerugian itu terjadi adalah tombol
+  // yang datang terlambat.
+  //
+  // KENAPA IA TIDAK MEMAKAI T()
+  // ---------------------------
+  // Alasan yang sama persis dengan pemilih bahasa di atas: pada cat pertama belum ada locale
+  // pilihan dan copy Thai memang belum diunduh. Naskah di sini karena itu ditulis bilingual
+  // secara harfiah, bukan lewat copy-map — dan `tests/th-coverage-test.js` tidak melihatnya
+  // sebagai utang karena ia memang tidak pernah menjadi kunci.
+  //
+  // KENAPA IA SEKUNDER, BUKAN TOMBOL UTAMA
+  // --------------------------------------
+  // Mayoritas yang membuka layar ini adalah murid baru yang memang harus memilih bahasa.
+  // Menaruh tombol masuk sebagai aksi utama akan membuat mereka ragu pada langkah pertama.
+  // Jadi ia berdiri di bawah, dengan garis pemisah, sebagai jalan bagi yang sudah punya akun.
+  // ---------------------------------------------------------------------------------------
+  function signInMarkup(env) {
+    var G = env && env.FiezelGoogle;
+    if (!G || typeof G.available !== 'function' || !G.available()) return '';
+    return '<div class="fiezel-language-signin">'
+      + '<span class="fiezel-language-sep"><span>Already have an account?</span></span>'
+      + '<p class="fiezel-language-signin-note">Sudah punya akun? Masuk dulu supaya kelas dan tugas gurumu ikut.'
+      + '<br><span lang="th">มีบัญชีอยู่แล้วใช่ไหม เข้าสู่ระบบก่อน แล้วห้องเรียนและงานจากครูจะตามมาด้วย</span></p>'
+      + '<div class="fiezel-language-google" data-ob-google></div>'
+      + '<p class="fiezel-note" data-ob-google-status role="status"></p>'
       + '</div>';
   }
 
@@ -1355,8 +1393,46 @@
       finish('placement');
     }
 
+    /**
+     * Gambar tombol Google ke layar pemilih bahasa yang SUDAH tercat.
+     *
+     * Kenapa dipanggil dari bind() dan bukan sekali saat mount: `paint()` menulis ulang
+     * `host.innerHTML` setiap kali, jadi tombol yang digambar skrip Google ikut terhapus
+     * pada setiap cat ulang (mis. saat menunggu unduhan copy Thai). Menggambarnya ulang
+     * di sini adalah satu-satunya tempat yang benar.
+     *
+     * Kegagalan di sini TIDAK menutup apa pun: pemilih bahasa sudah tergambar di atasnya,
+     * jadi murid tanpa Google — atau di jaringan sekolah yang memblokirnya — tetap bisa
+     * melanjutkan onboarding seperti biasa.
+     */
+    function mountSignIn() {
+      var slot = host.querySelector('[data-ob-google]');
+      var note = host.querySelector('[data-ob-google-status]');
+      var G = target && target.FiezelGoogle;
+      if (!slot || !G || typeof G.renderButton !== 'function') return;
+      try {
+        G.renderButton(slot, function (res) {
+          if (!note) return;
+          if (res && res.ok) {
+            /* Yang dipulihkan adalah AKUN (kelas, tugas guru, teman) — bukan profil
+               belajar, yang memang hidup di perangkat. Kalimatnya karena itu tidak
+               menjanjikan onboarding terlewat: murid tetap memilih bahasa di bawah. */
+            note.textContent = 'Berhasil masuk' + (res.email ? ' · ' + res.email : '')
+              + ' — pilih bahasamu untuk lanjut. · เข้าสู่ระบบแล้ว เลือกภาษาของคุณเพื่อไปต่อ';
+          } else {
+            note.textContent = (res && res.message)
+              || 'Belum berhasil masuk. Pilih bahasa dulu — masuk bisa nanti dari Pengaturan. · '
+                 + 'ยังเข้าสู่ระบบไม่สำเร็จ เลือกภาษาก่อนนะ เข้าสู่ระบบทีหลังได้จากการตั้งค่า';
+          }
+        }, { locale: 'auto' }).then(function (hasil) {
+          if (note && hasil && !hasil.ok) note.textContent = hasil.message || '';
+        }, function () {});
+      } catch (_) { /* onboarding tidak boleh mati karena satu tombol pihak ketiga */ }
+    }
+
     function bind() {
       try {
+        if (step === LANGUAGE_STEP) mountSignIn();
         var localeButtons = host.querySelectorAll('[data-ob-locale]');
         for (var l = 0; l < localeButtons.length; l++) {
           (function (button) {
