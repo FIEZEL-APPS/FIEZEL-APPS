@@ -13062,7 +13062,15 @@ async function inboxPoll(force){
   return r;
 }
 let notifPollTimer=null;
-const NOTIF_POLL_MS=60000;
+/* 15 detik, turun dari 60. Sisi guru menyegarkan dirinya tiap 10 detik (SYNC_EVERY_MS di
+   fiezel-teacher-shell.js), jadi pada angka lama papan guru hidup sementara layar murid
+   tertinggal satu menit penuh: tugas yang baru dikirim guru baru muncul setelah murid
+   menutup-buka aplikasi, dan itu terbaca sebagai "aplikasinya lambat", bukan sebagai jeda
+   polling. Lantai server untuk tanya ini 5 detik (ASSIGN_LIMITS.LEARNER_POLL_MIN_INTERVAL_MS),
+   jadi 15 detik masih tiga kali lipat di atasnya - dan timer ini SUDAH diam total saat
+   aplikasi tidak terlihat, sehingga biayanya hanya jatuh pada murid yang benar-benar sedang
+   memandang layarnya. */
+const NOTIF_POLL_MS=15000;
 function startNotifPolling(){
   if(notifPollTimer)return false;
   notifPollTimer=setInterval(()=>{try{if(document.visibilityState!=='visible')return}catch(_){}inboxPoll(false);socialNotifyPoll(false)},NOTIF_POLL_MS);

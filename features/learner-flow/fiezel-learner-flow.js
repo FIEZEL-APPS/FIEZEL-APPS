@@ -189,6 +189,28 @@
 
   /** Kode hasil untuk tutor: hanya nama depan + akurasi per skill, tanpa jawaban mentah. */
   function classCode() { try { var r = JSON.parse(localStorage.getItem('fiezel-onboarding-v1') || '{}'); return String(r.classCode || ''); } catch (_) { return ''; } }
+  /* KENAPA KIRIMAN YANG GAGAL DIULANG, DAN KENAPA INI BUKAN KEMEWAHAN
+   * ----------------------------------------------------------------
+   * Server memasang lantai satu laporan per 15 detik per murid (LIMITS.LEARNER_MIN_INTERVAL_MS
+   * di workers/api/teacher/class-sync-core.js) dan menjawab 429 di bawah itu. Sebelum ada
+   * pengulangan di sini, jawaban 429 itu DIBUANG diam-diam — dan justru pada urutan yang
+   * paling penting: murid membuka ujian (laporan #1), lalu keluar layar beberapa detik
+   * kemudian (laporan #2, ditolak). Yang sampai ke guru hanya "laporan masuk" yang biasa,
+   * dan peringatan keluar-layarnya hilang tanpa jejak sampai laporan berikutnya kebetulan
+   * terkirim. Laporan kelas adalah UPSERT — ia selalu membawa keadaan terbaru, bukan selisih —
+   * jadi mengirim ulang isi yang sama beberapa detik kemudian aman dan cukup.
+   * Jeda 16 detik: satu detik di atas lantai server, supaya percobaan kedua tidak jatuh
+   * di detik yang sama persis. Naik dua kali lipat sampai 2 menit supaya server yang benar-benar
+   * sakit tidak dihujani, dan berhenti sama sekali saat berhasil. */
+  var RETRY_BASE_MS = 16000, RETRY_MAX_MS = 120000;
+  var retryTimer = null, retryDelay = 0;
+  function clearRetry() { if (retryTimer) { try { clearTimeout(retryTimer); } catch (_) {} retryTimer = null; } retryDelay = 0; }
+  function scheduleRetry() {
+    if (retryTimer || typeof setTimeout !== 'function') return;
+    retryDelay = retryDelay ? Math.min(retryDelay * 2, RETRY_MAX_MS) : RETRY_BASE_MS;
+    retryTimer = setTimeout(function () { retryTimer = null; pushToClass(); }, retryDelay);
+    if (retryTimer && retryTimer.unref) retryTimer.unref();
+  }
   // Di perangkat yang sama (kelas demo/uji), hasil diagnostic langsung masuk ke kelas berkode.
   function pushToClass() {
     if (!classCode()) return false;
@@ -196,7 +218,14 @@
     try { payload = JSON.parse(decodeURIComponent(escape(atob(tutorCode(st, env.learnerName ? env.learnerName() : ''))))); } catch (_) { return false; }
     // Sinkron server: laporan agregat ke kelas yang kodenya diklaim guru (tanpa tempel kode). Gagal diam-diam bila offline.
     var TS = root.FiezelTeacherStore;
-    if (TS && TS.reportToClass) { try { TS.reportToClass(payload).then(function (r) { st.classReport = { at: Date.now(), ok: !!r.ok, error: r.error || '' }; save(st); }); } catch (_) {} }
+    if (TS && TS.reportToClass) {
+      try {
+        TS.reportToClass(payload).then(function (r) {
+          st.classReport = { at: Date.now(), ok: !!r.ok, error: r.error || '' }; save(st);
+          if (r && r.ok) clearRetry(); else scheduleRetry();
+        }, function () { scheduleRetry(); });
+      } catch (_) { scheduleRetry(); }
+    }
     var T = root.FiezelTutorActionCenter; if (!T) return true;
     try { return T.ingestLearnerResult(payload) || true; } catch (_) { return true; }
   }
@@ -582,5 +611,5 @@
     });
   }
 
-  return { KEY: KEY, ASSIGN_KEY: ASSIGN_KEY, GOALS: GOALS, mount: mount, render: render, load: load, buildPlan: buildPlan, skillSummary: skillSummary, weeklySummary: weeklySummary, tutorCode: tutorCode, rankedSkills: rankedSkills, statusOf: statusOf, openAssignment: openAssignment, markAssignmentStarted: markAssignmentStarted, recordAssignmentFocus: recordAssignmentFocus, recordAssignmentResult: recordAssignmentResult, pushToClass: function () { ensureState(); return pushToClass(); }, _state: function () { return st; } };
+  return { KEY: KEY, ASSIGN_KEY: ASSIGN_KEY, GOALS: GOALS, mount: mount, render: render, load: load, buildPlan: buildPlan, skillSummary: skillSummary, weeklySummary: weeklySummary, tutorCode: tutorCode, rankedSkills: rankedSkills, statusOf: statusOf, openAssignment: openAssignment, markAssignmentStarted: markAssignmentStarted, recordAssignmentFocus: recordAssignmentFocus, recordAssignmentResult: recordAssignmentResult, pushToClass: function () { ensureState(); return pushToClass(); }, _retryState: function () { return { pending: !!retryTimer, delay: retryDelay }; }, _state: function () { return st; } };
 });
