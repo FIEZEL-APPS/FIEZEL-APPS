@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-06T09:10:00+07:00",
+  "updated": "2026-09-06T10:05:00+07:00",
   "active": [
     {
       "sesi": "ses_0034e69d3ffes3kjiFLNDzYXUZ",
@@ -74,6 +74,17 @@
       ],
       "mulai": "2026-09-06T09:10:00+07:00",
       "catatan": "Temuan pemakaian pertama di kelas: kiriman yang ditolak 429 hilang diam-diam, kabar generik menenggelamkan peringatan, dan detak murid 60 detik jauh di belakang detak guru 10 detik. Menyentuh juga app.js (satu tetapan NOTIF_POLL_MS) dan features/learner-flow/fiezel-learner-flow.js (pengulangan kiriman gagal) — keduanya perubahan kecil di luar path yang diklaim, tidak bertabrakan dengan klaim aktif mana pun. Build dinaikkan lewat tools/bump-build.mjs (m025-270)."
+    },
+    {
+      "sesi": "sesi-claude-cq1nea/CLASS-JOIN",
+      "peran": "permintaan gabung kelas: ketukan murid sampai ke guru, guru menambahkan",
+      "paths": [
+        "features/i18n/copy-id-classjoin.js",
+        "features/i18n/copy-th-classjoin.js",
+        "tests/class-join-test.js"
+      ],
+      "mulai": "2026-09-06T10:05:00+07:00",
+      "catatan": "Menyentuh juga di luar path yang diklaim: features/class-hub/fiezel-class-hub.js, features/teacher/fiezel-teacher-store.js + fiezel-teacher-shell.js, features/learner-flow/fiezel-learner-flow.js, workers/api/teacher/class-sync-core.js (penanda j), index.html + sw.js + fiezel-th-loader.js (pendaftaran berkas), .github/workflows/quality.yml (gerbang baru). Build m025-272 lewat tools/bump-build.mjs."
     }
   ],
   "finished": [

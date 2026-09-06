@@ -56,7 +56,18 @@
   function assignments() { var TS = T(); return readJson(TS ? TS.ASSIGN_KEY : 'fiezel-learner-assignments-v1', []); }
   function subs() { return readJson(SUB_KEY, []); }
   function classCode() { return String((readJson('fiezel-onboarding-v1', {}) || {}).classCode || ''); }
-  function setClassCode(code) { var TS = T(), c = TS ? TS.normalizeClassCode(code) : String(code || '').toUpperCase(); if (!c) return false; var ob = readJson('fiezel-onboarding-v1', {}) || {}; ob.classCode = c; writeJson('fiezel-onboarding-v1', ob); try { root.FiezelInbox && root.FiezelInbox.poll(true).then(function () { renderStudent(); }); } catch (_) {} return true; }
+  function setClassCode(code) {
+    var TS = T(), c = TS ? TS.normalizeClassCode(code) : String(code || '').toUpperCase();
+    if (!c) return false;
+    var ob = readJson('fiezel-onboarding-v1', {}) || {}; ob.classCode = c; writeJson('fiezel-onboarding-v1', ob);
+    /* Ketukan ke guru dikirim SEKARANG, bukan menunggu tugas pertama selesai. Sebelum ini,
+       murid yang sudah mengetik kode tetap tidak terlihat oleh gurunya sampai ia menyelesaikan
+       sesuatu — dan murid yang salah ketik kode mengira dirinya sudah tergabung padahal tidak
+       ada siapa pun di ujung sana. */
+    try { LF() && LF().announceJoin(); } catch (_) {}
+    try { root.FiezelInbox && root.FiezelInbox.poll(true).then(function () { renderStudent(); }); } catch (_) {}
+    return true;
+  }
   function latestMeta() { var all = assignments().concat(subs()).sort(function (a, b) { return (b.at || 0) - (a.at || 0); }); return all[0] || null; }
   function teacherName() { var m = latestMeta(); return m && m.teacher ? m.teacher : ''; }
   function className() { var m = latestMeta(); return m && m.from ? m.from : ''; }
@@ -319,7 +330,7 @@
   }
   function onStudentSubmit(e) {
     var f = e.target.closest ? e.target.closest('[data-ch-form]') : null; if (!f) return; e.preventDefault();
-    if (f.getAttribute('data-ch-form') === 'join') { var ok = setClassCode(new FormData(f).get('code')); if (sEnv.toast) sEnv.toast(ok ? 'Kode kelas tersimpan. Tugas guru akan muncul otomatis.' : 'Kode tidak valid — bentuknya FZ-XXXXXX.'); ui().editCode = false; saveUi(); renderStudent(); }
+    if (f.getAttribute('data-ch-form') === 'join') { var ok = setClassCode(new FormData(f).get('code')); if (sEnv.toast) sEnv.toast(ok ? t('kelas.gabung-terkirim', 'Kode tersimpan. Permintaan bergabung sudah dikirim ke gurumu — tugas muncul otomatis setelah kamu ditambahkan.') : t('kelas.gabung-kode-salah', 'Kode tidak valid — bentuknya FZ-XXXXXX.')); ui().editCode = false; saveUi(); renderStudent(); }
   }
 
   /* ===================================================================================== */
@@ -335,6 +346,20 @@
     var c = env.cls();
     var body = !c ? '<section class="ch-card ch-empty">' + icon('school') + '<p>' + t('kelas.buat-kelas-dulu', 'Buat kelas dulu, lalu Kelas menjadi pusat tugas, hasil, dan insight.') + '</p><button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="new-class">' + t('kelas.buat-kelas', 'Buat kelas') + '</button></section>' : tUi.tab === 'tugas' ? tTugas(c, env) : tUi.tab === 'buat' ? tBuat(c, env) : tUi.tab === 'hasil' ? tHasil(c, env) : tUi.tab === 'braincore' ? tBraincore(c, env) : tKelas(c, env);
     return '<div class="ch ch-teacher" data-testid="class-hub-teacher"><p class="ch-principle">' + icon('brain') + ' ' + t('kelas.braincore-alur-dot', 'Braincore menyarankan · Guru memutuskan · Murid belajar') + '</p><nav class="ch-tabs is-teacher" role="tablist">' + TABS.map(function (t) { return '<button type="button" role="tab" class="ch-tab' + (tUi.tab === t[0] ? ' is-active' : '') + '" data-ch="ttab" data-tab="' + t[0] + '" data-testid="tclass-tab-' + t[0] + '">' + icon(t[2]) + '<span>' + t[1] + '</span></button>'; }).join('') + '</nav>' + body + '</div>';
+  }
+  /* Permintaan bergabung: murid sudah mengetik kode kelas ini, guru yang memutuskan ia masuk
+     atau tidak. Kartunya hanya muncul kalau memang ada yang menunggu — kelas yang tidak
+     kedatangan siapa pun tidak perlu melihat kotak kosong tiap hari. */
+  function pendingCard(c) {
+    var TS = T(), list = TS.pendingJoins ? TS.pendingJoins(c) : [];
+    if (!list.length) return '';
+    return '<section class="ch-card ch-pending" data-testid="tclass-pending"><p class="ch-kicker">' + icon('user-plus') + ' ' + t('kelas.menunggu-persetujuan', 'Menunggu persetujuan') + '</p>' +
+      '<p class="ch-muted ch-small">' + t('kelas.menunggu-penjelasan', 'Mereka memasukkan kode kelas ini. Tambahkan yang kamu kenal; yang tidak ditambahkan tidak menerima tugas apa pun.') + '</p>' +
+      '<ul class="ch-mini-list">' + list.map(function (p) {
+        return '<li><span class="ch-grow"><b>' + esc(p.name) + '</b> <small class="ch-muted">' + esc(fmtDate(p.at)) + '</small></span>' +
+          '<button type="button" class="tg-btn is-small is-primary" data-ch="join-accept" data-name="' + esc(p.name) + '" data-testid="tclass-join-accept">' + icon('user-plus') + ' ' + t('kelas.tambahkan', 'Tambahkan') + '</button>' +
+          '<button type="button" class="tg-btn is-small is-ghost" data-ch="join-reject" data-name="' + esc(p.name) + '">' + t('kelas.abaikan', 'Abaikan') + '</button></li>';
+      }).join('') + '</ul></section>';
   }
   function studentRec(a, s) { return { done: a.done && a.done[s.id], startedAt: a.progress && a.progress[s.id] }; }
   /* Sisi guru dari pendeteksi keluar layar. Chip hanya muncul bila memang ADA kepergian:
@@ -353,6 +378,7 @@
     return '<div class="ch-body"><section class="ch-card ch-class-card"><div class="ch-card-top"><div><p class="ch-kicker">' + esc(c.level) + ' · ' + esc(c.subject || 'English') + '</p><h2>' + esc(c.name) + '</h2></div><span class="ch-sync is-' + sync.state + '">' + esc(sync.text) + '</span></div><p class="ch-muted">Kode kelas <b class="ch-mono">' + esc(c.code) + '</b> — murid memasukkannya di tab Kelas ▸ Kelas Saya. Setelah itu tugasmu masuk ke lonceng mereka dan hasilnya kembali ke sini.</p>' +
       '<div class="ch-kpis"><div class="ch-kpi"><b>' + stt.total + '</b><span>murid</span></div><div class="ch-kpi"><b>' + stt.active7 + '</b><span>aktif 7 hari</span></div><div class="ch-kpi"><b>' + pct(stt.avgAcc) + '</b><span>akurasi</span></div><div class="ch-kpi"><b>' + stt.openAssignments + '</b><span>tugas terbuka</span></div></div>' +
       '<div class="ch-actions"><button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="add-students" data-testid="tclass-add-students">' + icon('user-plus') + ' ' + t('kelas.tambah-murid', 'Tambah murid') + '</button><button type="button" class="tg-btn is-ghost" data-tg="sync" data-testid="tclass-sync">' + icon('refresh-cw') + ' Sinkron</button><button type="button" class="tg-btn is-ghost" data-tg="copy" data-text="' + esc(c.code) + '">' + icon('copy') + ' Salin kode</button><button type="button" class="tg-btn is-ghost" data-ch="ttab" data-tab="buat">' + icon('plus') + ' ' + t('kelas.buat-tugas', 'Buat tugas') + '</button></div></section>' +
+      pendingCard(c) +
       '<section><h3 class="ch-h2">' + t('umum.murid', 'Murid') + ' <small>' + c.students.length + '</small></h3>' + (c.students.length ? '<div class="ch-students">' + c.students.map(function (s) { var r = TS.risk(c, s), pend = TS.pendingAssignments(c, s), d = TS.daysSince(s.lastActiveAt); return '<button type="button" class="ch-card ch-student" data-tg="drawer" data-id="' + esc(s.id) + '" data-testid="tclass-student-' + esc(s.id) + '"><b>' + esc(s.name) + '</b><small>' + (d == null ? 'belum pernah aktif' : d === 0 ? 'aktif hari ini' : 'aktif ' + d + ' hari lalu') + '</small><span class="ch-row"><span class="ch-status is-' + (r.level === 'aman' ? 'selesai' : r.level === 'risiko' ? 'terlambat' : 'sedang') + '">' + esc(r.level === 'aman' ? 'Aman' : r.level === 'risiko' ? 'Berisiko' : 'Pantau') + '</span>' + (pend.length ? '<small>' + pend.length + ' tugas tertunda</small>' : '') + '</span></button>'; }).join('') + '</div>' : '<p class="ch-muted">' + t('kelas.belum-ada-murid', 'Belum ada murid. Tambahkan nama, atau biarkan murid bergabung sendiri lewat kode kelas.') + '</p>') + '</section></div>';
   }
   function itemList(a) { return a.itemIds.map(function (id, i) { var q = resolveItem(a, id); if (!q) return '<li class="ch-muted">Soal ' + (i + 1) + ' (' + esc(id) + ') tidak dapat ditampilkan.</li>'; var custom = (a.items || []).some(function (x) { return x.id === id; }); return '<li><p class="ch-muted">Soal ' + (i + 1) + ' · ' + esc(skillLabel(q.skill)) + ' · ' + (custom ? 'soal guru' : 'bank FIEZEL') + '</p>' + (q.context ? '<p class="ch-context">' + esc(q.context) + '</p>' : '') + '<b>' + esc(q.prompt) + '</b><ol class="ch-opts-inline">' + q.options.map(function (o, j) { return '<li class="' + (j === q.answer ? 'is-key' : '') + '">' + esc(o) + '</li>'; }).join('') + '</ol></li>'; }).join(''); }
@@ -463,6 +489,20 @@
     var act = b.getAttribute('data-ch'), id = b.getAttribute('data-id'), i = Number(b.getAttribute('data-i')), c = env.cls(), d;
     switch (act) {
       case 'ttab': tUi.tab = b.getAttribute('data-tab'); break;
+      case 'join-accept': {
+        if (!c) return;
+        var nm = b.getAttribute('data-name');
+        T().acceptJoin(c, nm);
+        env.persist();
+        if (env.toast) env.toast(t('kelas.gabung-diterima', '{nama} ditambahkan ke {kelas}. Tugas berikutnya ikut terkirim ke dia.').replace('{nama}', nm).replace('{kelas}', c.name));
+        break;
+      }
+      case 'join-reject': {
+        if (!c) return;
+        T().rejectJoin(c, b.getAttribute('data-name'));
+        env.persist();
+        break;
+      }
       case 'expand': tUi.expand = tUi.expand === id ? null : id; break;
       case 'result': tUi.resultId = id; tUi.tab = 'hasil'; break;
       case 'source': d = draft(c); syncDraftForm(b.closest('form'), d); d.source = b.getAttribute('data-source'); if (d.source !== 'bank') d.skills = d.skills.slice(0, 1); break;
