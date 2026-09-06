@@ -1564,7 +1564,10 @@ function beginLearningSession(cfg,total){
   save();anSessionStarted(state.activeSession);/*A1-EMIT*/return state.activeSession
 }
 function abandonActiveSession(reason='exit'){
-  const a=state.activeSession;if(!a)return false;const now=Date.now(),answered=Math.max(0,Number(a.answered||0)),session={id:a.id,at:new Date(now).toISOString(),startedAt:new Date(Number(a.startedAt||now)).toISOString(),level:sessionLevel(a),type:a.type||'practice',planned:Number(a.planned||0),answered,score:null,total:Number(a.planned||0),accuracy:null,completed:false,abandoned:true,abandonReason:String(reason).slice(0,40),durationMs:Math.max(0,now-Number(a.startedAt||now)),policyId:String(a.policyId||''),policyMode:String(a.policyMode||''),targetSkill:String(a.targetSkill||''),primaryDomain:String(a.primaryDomain||''),policySource:String(a.policySource||''),baselineTargetMastery:a.baselineTargetMastery??null,baselineTargetAccuracy:a.baselineTargetAccuracy??null};
+  const a=state.activeSession;if(!a)return false;
+  /* Kunci ujian dilepas di DUA titik akhir sesi (selesai dan ditinggalkan), bukan di layar
+     hasil: murid yang menekan kembali di tengah ujian juga keluar dari ujian. */
+  try{['placement','level_exam','reading_exam'].forEach(k=>examLockEnd(k))}catch(_){}const now=Date.now(),answered=Math.max(0,Number(a.answered||0)),session={id:a.id,at:new Date(now).toISOString(),startedAt:new Date(Number(a.startedAt||now)).toISOString(),level:sessionLevel(a),type:a.type||'practice',planned:Number(a.planned||0),answered,score:null,total:Number(a.planned||0),accuracy:null,completed:false,abandoned:true,abandonReason:String(reason).slice(0,40),durationMs:Math.max(0,now-Number(a.startedAt||now)),policyId:String(a.policyId||''),policyMode:String(a.policyMode||''),targetSkill:String(a.targetSkill||''),primaryDomain:String(a.primaryDomain||''),policySource:String(a.policySource||''),baselineTargetMastery:a.baselineTargetMastery??null,baselineTargetAccuracy:a.baselineTargetAccuracy??null};
   /* m025-177 (audit skip RT20-02/A13): meninggalkan alat ukur di tengah jalan dulu GRATIS —
      tanpa catatan percobaan dan tanpa cooldown, ujian bisa di-reroll tanpa batas di hari yang
      sama (buka, intip soal, keluar kalau terasa berat). Kini: sudah menjawab >=1 soal berarti
@@ -1575,6 +1578,7 @@ function abandonActiveSession(reason='exit'){
   state.sessionHistory=[...(state.sessionHistory||[]),session].slice(-100);state.activeSession=null;state.inflightAttempt=null;/* W1 P1-2: penalti sudah diputuskan di atas \u2014 penandanya selesai. */const outcome=recordPolicyOutcomeFromSession(session,now);save();queueRemoteActivitySync();if(outcome)queuePolicyOutcomeSync(outcome);braincoreEvidenceObserveSession(outcome,now);/*Lane C*/anSessionEnded(session);/*A1-EMIT*/return true
 }
 function completeActiveSession(cfg,score,total){
+  try{['placement','level_exam','reading_exam'].forEach(k=>examLockEnd(k))}catch(_){}
   const now=Date.now(),a=state.activeSession,started=Number(a?.startedAt||now),accuracy=Math.round(score/Math.max(1,total)*100);state.activeSession=null;state.inflightAttempt=null;/* W1 P1-2: selesai bersih = penanda dilepas. */return{id:a?.id||`session-${now}`,at:new Date(now).toISOString(),startedAt:new Date(started).toISOString(),level:sessionLevel(a),type:cfg?.type||a?.type||'practice',planned:Number(a?.planned||total),answered:Number(a?.answered||total),score,total,accuracy,completed:true,abandoned:false,durationMs:Math.max(0,now-started),policyId:String(a?.policyId||cfg?.policy?.policyId||''),policyMode:String(a?.policyMode||cfg?.policy?.mode||''),targetSkill:String(a?.targetSkill||cfg?.policy?.targetSkill||''),primaryDomain:String(a?.primaryDomain||cfg?.policy?.primaryDomain||''),policySource:String(a?.policySource||cfg?.policy?.source||''),baselineTargetMastery:a?.baselineTargetMastery??null,baselineTargetAccuracy:a?.baselineTargetAccuracy??null}
 }
 /* ---- Gelombang 4 (Lane B): emisi telemetri belajar — OBSERVASI MURNI ---------------------
@@ -6117,7 +6121,7 @@ function openFeedback(prefill){
 function render(){const __renderStartedAt=Date.now();try{return renderInner()}finally{window.__fiezelLastRenderMs=Date.now()-__renderStartedAt;/* [FASE-4] pasang ulang timer kantuk 90 dtk tiap layar dicat (mati sendiri di luar layar santai). */try{pawIdleArm()}catch(_){}/* [OUTFIT G5'] konteks layar untuk resolver outfit (19 §6.1) */try{self.FiezelPawOutfit?.screen?.(state.view)}catch(_){}}}
 // m025-41: render duration is recorded so the diagnostic scanner can see a slow screen,
 // which is how OWNER experienced the Classroom regression before any error was logged.
-function renderInner(){if(isVerifiedTeacher()&&state.view!=='tutor'){state.view='tutor'}if(document.body?.classList?.contains?.('fz-teacher-mode')&&state.view!=='tutor'){try{self.FiezelTeacherShell?.unmount?.()}catch(_){}}speakingListeningMountToken++;if(speakingListeningController){speakingListeningController.destroy();speakingListeningController=null;/* m026-01: satu-satunya tempat sesi dengar benar-benar bubar. Di dalam if, bukan di luar - kalau tidak, tiap navigasi biasa akan memaksa maskot kembali idle dan memotong selebrasi yang sedang jalan. */pawReact('listening-stop')}document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));setApp('');if(state.view==='home')home();if(state.view==='latihan')latihan();if(state.view==='vocab')vocab();if(state.view==='grammar')grammar();if(state.view==='reading')reading();if(state.view==='skills')skillsLab();if(state.view==='listening')skillsLab('listening');if(state.view==='speaking')skillsLab('speaking');if(state.view==='writing')writing();if(state.view==='classroom')classHubView();if(state.view==='library')library();if(state.view==='ask'||state.view==='search')askView();if(state.view==='test')placement();if(state.view==='progress')progress();if(state.view==='online'||state.view==='profile')onlineView();if(state.view==='learn')learnerFlowView();if(state.view==='tutor')tutorCenterView();/* merge SLOT 7 sosial 2026-08-29 */const activeTabEl=document.querySelector(`[data-view="${state.view}"]`)||(state.view==='profile'?document.querySelector('[data-view="online"]'):state.view==='online'?document.querySelector('[data-view="profile"]'):null);activeTabEl?.classList.add('active');/* m028 fase3: bendera panggung Skills Lab. Addon listening memaku blok tombolnya ke dasar layar (speaking-listening-addon.css), jadi ia panggung kedua yang bisa ditutupi gelembung. */document.body?.classList?.toggle?.('fz-stage-sl',['skills','listening','speaking'].includes(state.view));/* m028 fase3 (QA §9): Peta Belajar ikut jadi panggung ber-kontrol sejak panel NEXT SESSION punya tombol "Mulai sesi" di dekat dasar layar - screenshot QA menunjukkan gelembung PAW menutupinya utuh. Aturannya sama dengan kuis: peek dilarang, dok mengecil, layar diberi ruang bawah. */document.body?.classList?.toggle?.('fz-stage-map',state.view==='progress');/* 2026-08-29 overhaul I12 (O6 #10): bendera panggung Home. Wajah coach-strip adalah SATU-SATUNYA Pau di Home; gelembung FAB pengambang (Pau kedua, terukur menimpa lipatan hero/skill-hub di 390px) disembunyikan lewat CSS body.fz-stage-home — pola yang sama dengan fz-stage-sl/fz-stage-map, modul gelembung tidak disentuh. */document.body?.classList?.toggle?.('fz-stage-home',state.view==='home');/* q16-P2-2 2026-08-29: hub juga panggung ber-CTA-dekat-dasar (Review Due, Buka flashcards, Mulai 25 soal) \u2014 peek dilarang, dok mengecil, pola sama dengan sl/map. */document.body?.classList?.toggle?.('fz-stage-hub',['vocab','grammar','reading','library','test'].includes(state.view));document.body?.classList?.toggle?.('fz-stage-writing',state.view==='writing');/* v24-F2 2026-08-29: Writing = layar mengarang; FAB disembunyikan via CSS (pola fz-stage-home), modul gelembung tidak disentuh. */enhanceUI();syncCoachBubble();try{refreshNotifBadge()}catch(_){}window.scrollTo(0,0)}
+function renderInner(){if(isVerifiedTeacher()&&state.view!=='tutor'){state.view='tutor'}if(document.body?.classList?.contains?.('fz-teacher-mode')&&state.view!=='tutor'){try{self.FiezelTeacherShell?.unmount?.()}catch(_){}}speakingListeningMountToken++;if(speakingListeningController){speakingListeningController.destroy();speakingListeningController=null;/* m026-01: satu-satunya tempat sesi dengar benar-benar bubar. Di dalam if, bukan di luar - kalau tidak, tiap navigasi biasa akan memaksa maskot kembali idle dan memotong selebrasi yang sedang jalan. */pawReact('listening-stop')}document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));setApp('');if(state.view==='home')home();if(state.view==='latihan')latihan();if(state.view==='vocab')vocab();if(state.view==='grammar')grammar();if(state.view==='reading')reading();if(state.view==='skills')skillsLab();if(state.view==='listening')skillsLab('listening');if(state.view==='speaking')skillsLab('speaking');if(state.view==='writing')writing();if(state.view==='classroom')classHubView();if(state.view==='library')library();if(state.view==='ask'||state.view==='search')askView();if(state.view==='test')placement();if(state.view==='progress')progress();if(state.view==='online'||state.view==='profile')onlineView();if(state.view==='learn')learnerFlowView();if(state.view==='tutor')tutorCenterView();/* merge SLOT 7 sosial 2026-08-29 */const activeTabEl=document.querySelector(`[data-view="${state.view}"]`)||(state.view==='profile'?document.querySelector('[data-view="online"]'):state.view==='online'?document.querySelector('[data-view="profile"]'):null);activeTabEl?.classList.add('active');/* m028 fase3: bendera panggung Skills Lab. Addon listening memaku blok tombolnya ke dasar layar (speaking-listening-addon.css), jadi ia panggung kedua yang bisa ditutupi gelembung. */document.body?.classList?.toggle?.('fz-stage-sl',['skills','listening','speaking'].includes(state.view));/* m028 fase3 (QA §9): Peta Belajar ikut jadi panggung ber-kontrol sejak panel NEXT SESSION punya tombol "Mulai sesi" di dekat dasar layar - screenshot QA menunjukkan gelembung PAW menutupinya utuh. Aturannya sama dengan kuis: peek dilarang, dok mengecil, layar diberi ruang bawah. */document.body?.classList?.toggle?.('fz-stage-map',state.view==='progress');/* 2026-08-29 overhaul I12 (O6 #10): bendera panggung Home. Wajah coach-strip adalah SATU-SATUNYA Pau di Home; gelembung FAB pengambang (Pau kedua, terukur menimpa lipatan hero/skill-hub di 390px) disembunyikan lewat CSS body.fz-stage-home — pola yang sama dengan fz-stage-sl/fz-stage-map, modul gelembung tidak disentuh. */document.body?.classList?.toggle?.('fz-stage-home',state.view==='home');/* q16-P2-2 2026-08-29: hub juga panggung ber-CTA-dekat-dasar (Review Due, Buka flashcards, Mulai 25 soal) \u2014 peek dilarang, dok mengecil, pola sama dengan sl/map. */document.body?.classList?.toggle?.('fz-stage-hub',['vocab','grammar','reading','library','test'].includes(state.view));document.body?.classList?.toggle?.('fz-stage-writing',state.view==='writing');/* v24-F2 2026-08-29: Writing = layar mengarang; FAB disembunyikan via CSS (pola fz-stage-home), modul gelembung tidak disentuh. */enhanceUI();syncExamLockForView();syncCoachBubble();try{refreshNotifBadge()}catch(_){}window.scrollTo(0,0)}
 // m025-115 - pembimbing yang ikut ke mana pun murid pergi (brief bagian 7).
 //
 // Gelembungnya dipasang SEKALI ke <body> dan tidak pernah ikut dicat ulang; yang dikirim
@@ -6159,7 +6163,9 @@ function syncCoachBubble(){
        yatim sebelas build. Nama view ditulis DI SINI, bukan di modul gelembung, supaya
        tests/view-reachability-test.js menemukannya sebagai go('ask') dan modul gelembung
        tetap tidak tahu nama rute apa pun. */
-    const api=self.FiezelCoachBubble?.install?.({ask:(question,ctx)=>askFiezelAI(coachAskPrompt(question,ctx),'coach_question',{question,level:getActiveLevel(),lessonId:String(ctx?.lessonId||ctx?.view||''),focusLabel:String(ctx?.focusLabel||ctx?.title||'')}),openAsk:()=>go('ask')});
+    /* m025-273: kedua pintu pembimbing lewat gerbang yang sama. Menutup hanya salah satunya
+       tidak menutup apa pun — gelembungnya sendiri sudah bisa menjawab tanpa membuka layar. */
+    const api=self.FiezelCoachBubble?.install?.({ask:(question,ctx)=>{if(!aiDoorAllowed())return Promise.resolve(FiezelI18n.t('ujian.ai-terkunci-singkat','Nonaktif selama ujian.'));return askFiezelAI(coachAskPrompt(question,ctx),'coach_question',{question,level:getActiveLevel(),lessonId:String(ctx?.lessonId||ctx?.view||''),focusLabel:String(ctx?.focusLabel||ctx?.title||'')})},openAsk:()=>{if(!aiDoorAllowed())return false;return go('ask')}});
     api?.update?.(coachBubbleContext());
   }catch(_){}
 }
@@ -6346,7 +6352,114 @@ function pawStreakWatch(){const now=Number(state.streak)||0;
    render() tetap di dalam callback. Cuplikan layar LAMA yang diambil startViewTransition
    karena itu tetap utuh - yang berubah hanya kapan sumber kebenaran ikut maju.
    pushBackNavView() tetap dipanggil SEBELUMNYA, sebab yang ia rekam adalah view ASAL. */
-function go(v,opts){if(isVerifiedTeacher()&&v!=='tutor'){v='tutor'}if(!VALID_VIEWS.has(v)){showToast(FiezelI18n.t('nav.halaman-tak-tersedia'));return false}uiSfx('nav');dropStages();if(opts?.viaHistory!==true)pushBackNavView(v);state.view=v;const swap=()=>{save();render()};if(document.startViewTransition&&state.preferences?.motion!==false&&!prefersReducedMotion())document.startViewTransition(swap);else swap();return true} window.go=go;
+/* ==========================================================================
+   KUNCI UJIAN — satu penanda, dua akibat (m025-273)
+   ==========================================================================
+   Owner, dari kelas: "detector hanya berfungsi di ujian mini" dan "pembimbing kamu berada
+   dalam semua sesi ujian, hasilnya sama aja, murid bisa menanyakan kepada AI".
+
+   Keduanya lahir dari kekurangan yang sama: sampai m025-272 tidak ada satu pun tempat di
+   aplikasi ini yang tahu jawaban atas "apakah murid sedang ujian sekarang?". Pendeteksi
+   keluar layar menanyakannya ke runner tugas Kelas (jadi hanya tahu ujian dari sana), dan
+   pintu AI tidak menanyakannya ke siapa pun (jadi selalu terbuka).
+
+   features/ui/fiezel-exam-lock.js menjadi tempat itu. Fungsi di bawah adalah satu-satunya
+   jalan app.js menyentuhnya, supaya "sedang ujian" tidak pernah punya dua definisi. */
+function examLock(){try{return self.FiezelExamLock||null}catch(_){return null}}
+/* Kunci ujian yang terikat LAYAR, bukan sesi: Writing berformat ujian adalah halaman, bukan
+   kuis dengan awal-akhir, dan set Skills Lab bisa ditinggalkan lewat navigasi biasa. Fungsi
+   ini dipanggil pada setiap cat ulang view dan menutup keduanya begitu muridnya pergi. */
+function syncExamLockForView(){
+  try{
+    const v=String(state.view||'');
+    if(!SKILLS_LAB_VIEWS.has(v)){examLockEnd('listening_exam');examLockEnd('speaking_exam')}
+    if(v!=='writing'){examLockEnd('writing_exam');return}
+    const prompt=writingPromptFor(state.writing?.promptIndex);
+    if(prompt&&writingExamTask(prompt))examLockBegin('writing_exam',{});else examLockEnd('writing_exam');
+  }catch(_){}
+}
+function examLockBegin(kind,meta){try{return !!examLock()?.begin(kind,meta)}catch(_){return false}}
+function examLockEnd(kind){try{return !!examLock()?.end(kind)}catch(_){return false}}
+function examLockActive(){try{return !!examLock()?.active()}catch(_){return false}}
+/* Satu kalimat untuk setiap pintu AI yang tertutup. Ia menyebut ALASAN dan BATAS waktunya
+   ("selama sesi ujian"), bukan sekadar menolak: murid yang ditolak tanpa alasan mengira
+   aplikasinya rusak, lalu keluar layar untuk mencari jawabannya di tempat lain — persis
+   perilaku yang sedang kita cegah. */
+function examLockNotice(){
+  const t=FiezelI18n.t('ujian.ai-terkunci','Pembimbing FIEZEL nonaktif selama sesi ujian. Kerjakan dengan kemampuanmu sendiri — ia kembali begitu ujian selesai.');
+  try{showToast(t)}catch(_){}
+  try{uiSfx('error_system')}catch(_){}
+  return false;
+}
+/** Gerbang tunggal untuk SETIAP pintu AI: pembimbing PAW, layar Tanya FIEZEL, dan tutor. */
+function aiDoorAllowed(){return examLockActive()?examLockNotice():true}
+window.examLockActive=examLockActive;
+
+/* ==========================================================================
+   PENDETEKSI KELUAR LAYAR UNTUK UJIAN NON-TUGAS (m025-273)
+   ==========================================================================
+   Runner tugas Kelas punya pendeteksinya sendiri karena catatannya menempel pada tugas yang
+   bersangkutan (assign.f). Ujian lain — penempatan, Skip Level, set berformat ujian Reading
+   dan Skills Lab, Writing berformat ujian — tidak punya tugas untuk ditempeli, jadi
+   catatannya berjalan di jalur terpisah (fx) yang membawa JENIS ujiannya, bukan idnya.
+
+   Intinya tetap satu: FiezelFocusGuard yang sama, masa tenggang yang sama, dan tiga bilangan
+   yang sama. Yang berbeda hanya ke mana catatannya menempel. */
+let examWatchState=null,examWatchBound=null,examWatchGrace=null;
+function examWatchGuard(){try{return self.FiezelFocusGuard||null}catch(_){return null}}
+function examWatchActive(){const L=examLock();return !!(L&&L.active()&&L.kind()!=='assignment')}
+function examWatchReport(){
+  const G=examWatchGuard();if(!G||!examWatchState)return;
+  try{self.FiezelLearnerFlow?.recordExamFocus?.(examLock()?.kind()||'',G.payload(examWatchState,Date.now()))}catch(_){}
+}
+function examWatchLost(reason){
+  const G=examWatchGuard();if(!G||!examWatchState||!examWatchActive())return;
+  G.leave(examWatchState,Date.now(),reason);
+  if(examWatchGrace)clearTimeout(examWatchGrace);
+  /* Sama dengan runner Kelas: murid yang keluar dan TIDAK kembali tetap terlaporkan, karena
+     laporannya dikirim begitu masa tenggang lewat — bukan menunggu ia kembali. */
+  examWatchGrace=setTimeout(()=>{examWatchGrace=null;if(examWatchState&&examWatchState.awaySince)examWatchReport()},G.GRACE_MS+200);
+}
+function examWatchBack(){
+  const G=examWatchGuard();if(!G||!examWatchState)return;
+  if(examWatchGrace){clearTimeout(examWatchGrace);examWatchGrace=null}
+  const ep=G.back(examWatchState,Date.now());
+  if(!ep)return;
+  examWatchReport();
+  const sum=G.summary(examWatchState,Date.now());
+  try{showToast(FiezelI18n.t('ujian.keluar-tercatat','Kamu keluar dari layar ujian {n}× ({detik} detik terakhir). Catatannya sudah sampai ke gurumu.',{n:sum.n,detik:Math.round(ep.ms/1000)}))}catch(_){}
+}
+function examWatchSync(){
+  const G=examWatchGuard();
+  if(!G)return;
+  if(examWatchActive()){
+    if(!examWatchState){
+      examWatchState=G.start('exam-'+(examLock()?.kind()||''),examLock()?.startedAt()||Date.now());
+      /* Murid diberi tahu SEBELUM ia sempat keluar, sama seperti pita di runner tugas Kelas.
+         Memantau tanpa mengatakannya mengubah alat bantu jujur menjadi jebakan — dan kontrak
+         itu tertulis di docs/handoffs/EXAM-FOCUS-GUARD-HANDOFF.md. */
+      try{showToast(FiezelI18n.t('ujian.mode-aktif','Mode ujian: pembimbing FIEZEL nonaktif, dan kalau kamu keluar dari layar ini gurumu menerima catatannya.'))}catch(_){}
+    }
+    if(examWatchBound)return;
+    examWatchBound={
+      vis:()=>{try{if(document.visibilityState==='hidden')examWatchLost('hidden');else examWatchBack()}catch(_){}},
+      hide:()=>examWatchLost('pagehide'),
+      blur:()=>examWatchLost('blur'),
+      focus:()=>examWatchBack()
+    };
+    try{document.addEventListener('visibilitychange',examWatchBound.vis);self.addEventListener('pagehide',examWatchBound.hide);self.addEventListener('blur',examWatchBound.blur);self.addEventListener('focus',examWatchBound.focus)}catch(_){}
+    return;
+  }
+  if(examWatchGrace){clearTimeout(examWatchGrace);examWatchGrace=null}
+  if(examWatchState){if(examWatchState.awaySince)G.back(examWatchState,Date.now());examWatchReport();examWatchState=null}
+  if(examWatchBound){
+    try{document.removeEventListener('visibilitychange',examWatchBound.vis);self.removeEventListener('pagehide',examWatchBound.hide);self.removeEventListener('blur',examWatchBound.blur);self.removeEventListener('focus',examWatchBound.focus)}catch(_){}
+    examWatchBound=null;
+  }
+}
+try{document.addEventListener('fiezel-exam-lock',examWatchSync)}catch(_){}
+
+function go(v,opts){if((v==='ask'||v==='search')&&!aiDoorAllowed())return false;if(isVerifiedTeacher()&&v!=='tutor'){v='tutor'}if(!VALID_VIEWS.has(v)){showToast(FiezelI18n.t('nav.halaman-tak-tersedia'));return false}uiSfx('nav');dropStages();if(opts?.viaHistory!==true)pushBackNavView(v);state.view=v;const swap=()=>{save();render()};if(document.startViewTransition&&state.preferences?.motion!==false&&!prefersReducedMotion())document.startViewTransition(swap);else swap();return true} window.go=go;
 function pushBackNavView(v){try{return self.FiezelBackNav?.pushView?.(v)===true}catch{return false}}
 /* ---- m025-117 lapisan layar-di-dalam-view (stage) ---------------------------------
  * OWNER: "misalnya sudah masuk ke dalam folder, dan ingin kembali, ketika swipe back malah
@@ -8548,7 +8661,11 @@ function gemsHook(){
     }
   };
 }
-async function skillsLab(domain){const token=speakingListeningMountToken;const copy=SKILL_PAGE_COPY[domain];const head=copy?`<div class="skill-page-topbar"><button type="button" class="skill-help-dot" onclick="openSkillHelp('${esc(domain)}')" aria-label="${esc(FiezelI18n.t('skills.bantuan'))}" title="${esc(FiezelI18n.t('skills.bantuan'))}"><span aria-hidden="true">?</span></button></div>`:`<div class="section-head"><div><h1>${esc(FiezelI18n.t('student.skills-title', FiezelI18n.t('latihan.bicara-dengar')))}</h1><p>${FiezelI18n.t('skills.lead-hub')}</p></div>${levelControlMarkup()}</div>`;setApp(`<section class="fade skills-page">${head}<div id="speakingListeningRoot"><div class="card skills-loading">${FiezelI18n.t('skills.memuat')}</div></div></section>`);enhanceUI();await ensureVoiceRuntime();try{if(!self.FiezelSLAddon)throw new Error(FiezelI18n.t('skills.runtime-hilang'));const tts={play:(text,options={})=>self.FiezelVoiceSay?.say?.(text,{speed:options.speed??selectedNeuralRate(),suppressSubtitles:!!options.suppressSubtitles})||Promise.reject(new Error('tts_unavailable')),/* V6: adaptor ini hanya meneruskan (voice-v5-prefetch.md §3 baris 10); keputusan APA yang dihangatkan - dan larangan menghangatkan item ujian - tetap milik addon. */prefetch:(text,options={})=>prefetchNextVoice(text,{speed:options.speed??selectedNeuralRate()}),stop:()=>{cancelVoicePrefetch();self.FiezelVoiceSay?.stop?.()}};const controller=await self.FiezelSLAddon.create({root:$('speakingListeningRoot'),baseUrl:'./features/speaking-listening/',/* S1b: satu-satunya PENULIS sidecar Speaking/Listening. Kuncinya di-override di sini, di titik mount, supaya penulis dan kedua pembacanya selalu menunjuk ruang akun yang sama. */config:{...self.FIEZEL_SPEAKING_LISTENING_CONFIG,storageKey:sideStateKey(SL_STATE_KEY)},getActiveLevel,activeLevel:getActiveLevel(),tts,/* m026-02: satu-satunya titik pemberitahuan Puter boleh muncul - sesi dengar sudah bubar (renderComplete/exit di addon). */onSessionEnd:()=>{try{maybePresentPuterCreditNotice()}catch{}},/* m025-246: kait skip rate. Addon melaporkan; app.js yang memutuskan boleh-tidaknya mengirim (satu gerbang persetujuan, bukan dua). */onSkip:info=>{try{anQuestionSkipped(info?.domain,info?.level,info?.reason)}catch(_){}},/* R2-4: ekspresi maskot dalam sesi Skills Lab — lewat pawReact host supaya gerbang reduced-motion/preferensi animasinya SATU. */onAnswerFeedback:ok=>{try{pawReact(ok?'correct':'wrong')}catch(_){}},/* Fase 3 (C5 butir 5): kait kebijakan speaking adaptif untuk addon - addon yang memutuskan kapan memakainya; kunci asing diabaikan addon lama, jadi ini aman untuk versi mana pun. */speakingAdaptive:speakingAdaptiveAvailable()?{evidence:speakingAdaptiveEvidence,policy:speakingAdaptivePolicy}:null,gems:gemsHook()});if(token!==speakingListeningMountToken||!SKILLS_LAB_VIEWS.has(state.view)){controller.destroy();return}speakingListeningController=controller;/* m026-03: kait tur listening. Addon-nya TIDAK diubah - renderListening dibungkus dari luar, pola yang sama dengan hook lain milik host. Tur diberi tahu setelah kartu soal tercat. */try{const baseRenderListening=controller.renderListening?.bind(controller);if(baseRenderListening)controller.renderListening=(...args)=>{const out=baseRenderListening(...args);notifyFeatureTour('listening');return out}}catch(_){}controller.mount($('speakingListeningRoot'));if(SKILL_PAGE_COPY[domain]){try{controller.open(domain)}catch(_){}}/* m026-01: hanya Listening yang memicu state dengar; Speaking dan lainnya cukup penasaran. */pawReact(domain==='listening'?'listening-start':'question-shown');enhanceUI()}catch(error){const root=$('speakingListeningRoot');if(root)root.innerHTML=`<div class="card"><b>${FiezelI18n.t('skills.gagal-muat')}</b><p class="muted">${esc(error?.message||error)}</p></div>`;/* [ADAPTASI] OA-7 §4: error_system hanya untuk kegagalan sistem, bukan jawaban salah. */uiSfx('error_system')}}// m025-115 - Writing: satu-satunya dari empat skill inti tes yang belum punya mesin sama
+async function skillsLab(domain){const token=speakingListeningMountToken;const copy=SKILL_PAGE_COPY[domain];const head=copy?`<div class="skill-page-topbar"><button type="button" class="skill-help-dot" onclick="openSkillHelp('${esc(domain)}')" aria-label="${esc(FiezelI18n.t('skills.bantuan'))}" title="${esc(FiezelI18n.t('skills.bantuan'))}"><span aria-hidden="true">?</span></button></div>`:`<div class="section-head"><div><h1>${esc(FiezelI18n.t('student.skills-title', FiezelI18n.t('latihan.bicara-dengar')))}</h1><p>${FiezelI18n.t('skills.lead-hub')}</p></div>${levelControlMarkup()}</div>`;setApp(`<section class="fade skills-page">${head}<div id="speakingListeningRoot"><div class="card skills-loading">${FiezelI18n.t('skills.memuat')}</div></div></section>`);enhanceUI();await ensureVoiceRuntime();try{if(!self.FiezelSLAddon)throw new Error(FiezelI18n.t('skills.runtime-hilang'));const tts={play:(text,options={})=>self.FiezelVoiceSay?.say?.(text,{speed:options.speed??selectedNeuralRate(),suppressSubtitles:!!options.suppressSubtitles})||Promise.reject(new Error('tts_unavailable')),/* V6: adaptor ini hanya meneruskan (voice-v5-prefetch.md §3 baris 10); keputusan APA yang dihangatkan - dan larangan menghangatkan item ujian - tetap milik addon. */prefetch:(text,options={})=>prefetchNextVoice(text,{speed:options.speed??selectedNeuralRate()}),stop:()=>{cancelVoicePrefetch();self.FiezelVoiceSay?.stop?.()}};const controller=await self.FiezelSLAddon.create({root:$('speakingListeningRoot'),baseUrl:'./features/speaking-listening/',/* S1b: satu-satunya PENULIS sidecar Speaking/Listening. Kuncinya di-override di sini, di titik mount, supaya penulis dan kedua pembacanya selalu menunjuk ruang akun yang sama. */config:{...self.FIEZEL_SPEAKING_LISTENING_CONFIG,storageKey:sideStateKey(SL_STATE_KEY)},getActiveLevel,activeLevel:getActiveLevel(),tts,/* m026-02: satu-satunya titik pemberitahuan Puter boleh muncul - sesi dengar sudah bubar (renderComplete/exit di addon). */onSessionEnd:()=>{try{maybePresentPuterCreditNotice()}catch{}/* m025-273: kunci ujian dilepas SESUDAH pemberitahuan Puter, bukan sebelumnya — dua gerbang (quota-notice-a11y, puter-popup-once) mengunci bentuk pembuka callback ini karena di sinilah pemberitahuan boleh muncul, dan menyisipkan apa pun di depannya memerahkan keduanya. */try{examLockEnd('listening_exam');examLockEnd('speaking_exam')}catch(_){}},/* m025-246: kait skip rate. Addon melaporkan; app.js yang memutuskan boleh-tidaknya mengirim (satu gerbang persetujuan, bukan dua). */onSkip:info=>{try{anQuestionSkipped(info?.domain,info?.level,info?.reason)}catch(_){}},/* R2-4: ekspresi maskot dalam sesi Skills Lab — lewat pawReact host supaya gerbang reduced-motion/preferensi animasinya SATU. */onAnswerFeedback:ok=>{try{pawReact(ok?'correct':'wrong')}catch(_){}},/* Fase 3 (C5 butir 5): kait kebijakan speaking adaptif untuk addon - addon yang memutuskan kapan memakainya; kunci asing diabaikan addon lama, jadi ini aman untuk versi mana pun. */speakingAdaptive:speakingAdaptiveAvailable()?{evidence:speakingAdaptiveEvidence,policy:speakingAdaptivePolicy}:null,gems:gemsHook()});if(token!==speakingListeningMountToken||!SKILLS_LAB_VIEWS.has(state.view)){controller.destroy();return}speakingListeningController=controller;/* m026-03: kait tur listening. Addon-nya TIDAK diubah - renderListening dibungkus dari luar, pola yang sama dengan hook lain milik host. Tur diberi tahu setelah kartu soal tercat. *//* m025-273: pintu ujian Skills Lab. Addon memanggil this.open('listening_exam'/'speaking_exam')
+     dari kartunya sendiri, jadi membungkus properti instans menangkap SEMUA jalur masuknya —
+     tanpa menyentuh satu baris pun di dalam addon. Kuncinya dilepas oleh onSessionEnd di atas. */
+  try{const baseOpen=controller.open?.bind(controller);if(baseOpen)controller.open=(d,...rest)=>{try{const k=String(d||'');if(k==='listening_exam')examLockBegin('listening_exam',{});else if(k==='speaking_exam')examLockBegin('speaking_exam',{})}catch(_){}return baseOpen(d,...rest)}}catch(_){}
+  try{const baseRenderListening=controller.renderListening?.bind(controller);if(baseRenderListening)controller.renderListening=(...args)=>{const out=baseRenderListening(...args);notifyFeatureTour('listening');return out}}catch(_){}controller.mount($('speakingListeningRoot'));if(SKILL_PAGE_COPY[domain]){try{controller.open(domain)}catch(_){}}/* m026-01: hanya Listening yang memicu state dengar; Speaking dan lainnya cukup penasaran. */pawReact(domain==='listening'?'listening-start':'question-shown');enhanceUI()}catch(error){const root=$('speakingListeningRoot');if(root)root.innerHTML=`<div class="card"><b>${FiezelI18n.t('skills.gagal-muat')}</b><p class="muted">${esc(error?.message||error)}</p></div>`;/* [ADAPTASI] OA-7 §4: error_system hanya untuk kegagalan sistem, bukan jawaban salah. */uiSfx('error_system')}}// m025-115 - Writing: satu-satunya dari empat skill inti tes yang belum punya mesin sama
 // sekali. Yang dibangun di sini sengaja yang paling kecil tapi utuh: satu topik sesuai
 // level, satu kotak tulis, satu masukan yang bisa dipakai. Bukan editor esai.
 //
@@ -9690,7 +9807,7 @@ function startReadingExam(id){
   if(set.level!==getActiveLevel())return showToast(FiezelI18n.t('reading.set-disusun-untuk-level',{level:set.level}));
   const qs=(set.questions||[]).map((q,i)=>makeExamReadingQuestion(set,q,i)).filter(q=>validateQuestion(q).ok);
   if(!qs.length)return showToast(FiezelI18n.t('reading.item-for-set-pending-lengkap'));
-  quizLoop({type:'reading',count:qs.length,pool:qs,factory:x=>x,context:set,preserveOrder:true});
+  quizLoop({type:'reading',count:qs.length,pool:qs,factory:x=>x,context:set,preserveOrder:true,examKind:'reading_exam'});
 }
 function readingSession(r){const qs=(r.qs||[]).map((q,i)=>makeReadingQuestion(r,q,i));quizLoop({type:'reading',count:Math.min(8,qs.length),pool:qs,factory:x=>x,context:r,preserveOrder:true})}
 /* m025-246: naskah layar penempatan mengikuti JUMLAH SOAL yang benar-benar akan
@@ -10046,6 +10163,11 @@ function quizLoop(cfg){
     netral ("Tersimpan"), dan seluruh pembahasan per-soal pindah ke layar hasil. Sesi BELAJAR
     tidak tersentuh: semua jalur umpan balik lama tetap berjalan bila MEASURE false. */
  const MEASURE=!!cfg.placement||['level-exam','grammar-skip','placement'].includes(String(cfg.type||''));
+ /* m025-273: SEMUA sesi ukur — tes penempatan, ujian Skip Level, gerbang lewati materi — plus
+    set berformat ujian yang membawa examKind sendiri (Reading), menyalakan kunci ujian. Dulu
+    hanya runner tugas Kelas yang melakukannya, jadi keluar layar di sini tidak tercatat sama
+    sekali dan pembimbing tetap bisa ditanya di tengah ujian. */
+ try{const lk=String(cfg.examKind||'')||(String(cfg.type||'')==='placement'||cfg.placement?'placement':(['level-exam','grammar-skip'].includes(String(cfg.type||''))?'level_exam':''));if(lk)examLockBegin(lk,{});}catch(_){}
  let questions=cfg.pool.map(item=>cfg.factory?cfg.factory(item):item).filter(q=>cfg.placement||!q?.level||q.level===(cfg.levelScope||getActiveLevel()));
  const unique=[],seen=new Set();
  /* Fase 3 (C5 butir 2): soal cloze memang tanpa opsi (murid mengetik), jadi validator

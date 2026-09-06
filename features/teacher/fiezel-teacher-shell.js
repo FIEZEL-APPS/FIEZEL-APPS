@@ -180,7 +180,7 @@
            yang mayoritas pada jeda 3 detik - cukup menyegarkan chipnya. */
         var berubah = total.ingested || total.graded || total.events.length;
         if (!quiet) render(); else if (berubah) syncRender(); else paintSyncChip();
-        if (total.events.length) { var top = total.events.filter(function (e) { return e.kind === 'focus_exit'; })[0] || total.events.filter(function (e) { return e.kind === 'assignment_done'; })[0] || total.events[0]; toast(T.inboxText(top) + (total.events.length > 1 ? ' · +' + (total.events.length - 1) + ' kabar lain' : '')); }
+        if (total.events.length) { var top = total.events.filter(function (e) { return e.kind === 'focus_exit'; })[0] || total.events.filter(function (e) { return e.kind === 'join_request'; })[0] || total.events.filter(function (e) { return e.kind === 'assignment_done'; })[0] || total.events[0]; toast(T.inboxText(top) + (total.events.length > 1 ? ' · +' + (total.events.length - 1) + ' kabar lain' : '')); }
         else if (total.ingested) toast(total.ingested + ' laporan murid masuk' + (total.graded ? ' · ' + total.graded + ' tugas dinilai otomatis' : '') + '.');
         else if (!quiet) toast(total.failed ? 'Sinkron gagal untuk ' + total.failed + ' kelas.' : 'Tersinkron — belum ada laporan baru.');
       })
@@ -335,7 +335,7 @@
     var T = S(), list = (st.inbox || []).slice(0, 30);
     return '<div class="tg-inbox-scrim" data-tg="close"></div><section class="tg-inbox" role="dialog" aria-label="Notifikasi" data-testid="tg-inbox"><div class="tg-inbox-head"><h3>' + t('umum.notifikasi', 'Notifikasi') + '</h3>' + (list.length ? '<button type="button" class="tg-link" data-tg="inbox-clear">Bersihkan</button>' : '') + '</div>' +
       (list.length ? '<ul class="tg-inbox-list">' + list.map(function (e) {
-        var ic = e.kind === 'assignment_done' ? 'clipboard-check' : e.kind === 'student_joined' ? 'user-plus' : e.kind === 'focus_exit' ? 'eye-off' : 'inbox';
+        var ic = e.kind === 'assignment_done' ? 'clipboard-check' : e.kind === 'student_joined' || e.kind === 'join_request' ? 'user-plus' : e.kind === 'focus_exit' ? 'eye-off' : 'inbox';
         var warn = e.kind === 'focus_exit' ? ' is-warn' : '';
         return '<li><button type="button" class="tg-inbox-item' + warn + (e.read ? '' : ' is-unread') + '" data-tg="inbox-open" data-id="' + esc(e.id) + '" data-testid="tg-inbox-' + esc(e.id) + '">' + icon(ic) + '<div><b>' + esc(T.inboxText(e)) + '</b><small>' + esc(T.fmtDate(e.at)) + ' · ' + esc(new Date(e.at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })) + '</small></div></button></li>';
       }).join('') + '</ul>' : '<p class="tg-empty">' + t('guru.belum-ada-kabar', 'Belum ada kabar. Saat murid selesai mengerjakan tugas yang kamu kirim, hasilnya muncul di sini otomatis.') + '</p>') + '</section>';
@@ -574,7 +574,8 @@
       case 'inbox-clear': st.inbox = []; ui.inbox = false; break;
       case 'inbox-open': {
         var ev = (st.inbox || []).filter(function (x) { return x.id === id; })[0]; ui.inbox = false;
-        if (ev) { ev.read = true; if (ev.clsId && st.classes.some(function (k) { return k.id === ev.clsId; })) st.activeClassId = ev.clsId; if (ev.kind === 'assignment_done' && ev.aid) { st.view = 'assignments'; ui.modal = { kind: 'assign-detail', id: ev.aid }; ui.drawer = null; } else if (ev.sid) { st.view = 'classes'; ui.drawer = ev.sid; ui.modal = null; } }
+        if (ev) { ev.read = true; if (ev.clsId && st.classes.some(function (k) { return k.id === ev.clsId; })) st.activeClassId = ev.clsId; if (ev.kind === 'join_request') { st.view = 'hub'; ui.modal = null; ui.drawer = null; }
+        else if (ev.kind === 'assignment_done' && ev.aid) { st.view = 'assignments'; ui.modal = { kind: 'assign-detail', id: ev.aid }; ui.drawer = null; } else if (ev.sid) { st.view = 'classes'; ui.drawer = ev.sid; ui.modal = null; } }
         break;
       }
       case 'send-assign': {

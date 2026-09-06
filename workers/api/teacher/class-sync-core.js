@@ -9,6 +9,11 @@
  */
 
 export const CLASS_CODE_RE = /^FZ-[A-HJ-NP-Z2-9]{6}$/;
+/* Enum ini KEMBARAN dari KINDS di features/ui/fiezel-exam-lock.js. Sengaja disalin, bukan
+   diimpor: worker dan klien tidak berbagi modul, dan satu-satunya hal yang boleh melintas di
+   antara keduanya adalah data. Menambah jenis ujian berarti menyunting kedua daftar — dan
+   gerbangnya menuntut keduanya identik. */
+export const EXAM_KINDS = Object.freeze(['assignment', 'reading_exam', 'listening_exam', 'speaking_exam', 'writing_exam', 'placement', 'level_exam']);
 export const LIMITS = Object.freeze({
   NAME_MAX: 24, TITLE_MAX: 60, SKILLS_MAX: 12, SKILL_KEY_MAX: 32, COUNT_MAX: 5000,
   ASSIGN_MAX: 8, ASSIGN_ID_MAX: 40, WRONG_MAX: 40, REPORTS_PAGE: 200,
@@ -60,6 +65,27 @@ export function normalizeReport(body, nowMs) {
   const at = Number(body.at);
   const reportedAt = Number.isFinite(at) && Math.abs(at - nowMs) < 3 * 86400000 ? Math.round(at) : nowMs;
   const lessons = intIn(body.lessons, LIMITS.COUNT_MAX) || 0;
+  /* j = ketukan "aku baru memasukkan kode kelasmu". Dikirim SEKALI saat murid menekan
+     Gabung, sebelum ia mengerjakan apa pun. Tanpa ini guru tidak punya cara tahu muridnya
+     sudah masuk sampai murid itu menyelesaikan tugas pertamanya — dan murid yang salah
+     ketik kode diam-diam mengira dirinya sudah tergabung. Satu bilangan, nilai tunggal 1:
+     tidak ada ruang untuk menyelundupkan apa pun di sini. */
+  if (body.j !== undefined && body.j !== 1 && body.j !== true) return { ok: false, reason: 'bad_join_flag' };
+  const join = body.j === 1 || body.j === true ? 1 : undefined;
+  /* fx = catatan keluar layar untuk ujian yang BUKAN tugas guru (penempatan, Skip Level, set
+     berformat ujian). Ia tidak punya id tugas untuk ditempeli, jadi ia membawa JENIS ujiannya —
+     dan jenis itu enum tertutup, bukan teks: laporan kelas dilarang membawa kalimat, dan ini
+     satu-satunya bagian ujian non-tugas yang sampai ke guru. */
+  let examFocus;
+  if (body.fx !== undefined) {
+    const fx = body.fx;
+    if (!fx || typeof fx !== 'object' || Array.isArray(fx)) return { ok: false, reason: 'bad_exam_focus' };
+    if (!EXAM_KINDS.includes(fx.k)) return { ok: false, reason: 'bad_exam_kind' };
+    const n = intIn(fx.n, LIMITS.FOCUS_N_MAX), sec = intIn(fx.s, LIMITS.FOCUS_SEC_MAX);
+    const x = fx.x === undefined ? 0 : intIn(fx.x, LIMITS.FOCUS_SEC_MAX);
+    if (n == null || sec == null || x == null || x > sec) return { ok: false, reason: 'bad_exam_focus' };
+    examFocus = { k: fx.k, n, s: sec, x };
+  }
   const goal = typeof body.goal === 'string' && /^[a-z_]{1,24}$/.test(body.goal) ? body.goal : undefined;
   let assign;
   if (body.assign !== undefined) {
@@ -96,7 +122,7 @@ export function normalizeReport(body, nowMs) {
       assign.push(entry);
     }
   }
-  return { ok: true, code, name, key: learnerKey(name), report: { v: 1, name, at: reportedAt, goal, skills, lessons, cls: code, assign } };
+  return { ok: true, code, name, key: learnerKey(name), report: { v: 1, name, at: reportedAt, goal, skills, lessons, cls: code, assign, j: join, fx: examFocus } };
 }
 
 export const ASSIGN_LIMITS = Object.freeze({
