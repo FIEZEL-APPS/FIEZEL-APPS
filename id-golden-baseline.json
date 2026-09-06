@@ -1,6 +1,6 @@
 {
   "schema": "id-golden-baseline/1",
-  "generatedAt": "2026-09-05T23:14:52.129Z",
+  "generatedAt": "2026-09-06T01:04:29.850Z",
   "root": "/home/user/FIEZEL-APPS",
   "files": {
     "grammar-explanations-id.json": "90912890391b2e491f31a6558aec5b7cecccbf56bc7c341fb1106291b5c721b6",
@@ -11,15 +11,15 @@
     "misconception-taxonomy-v1.json": "bc5ca4c85418e6877dfe6fc1167bdfc53bd5f39f97f0076221ede9ec2e1b4ddf",
     "manifest.json": "3ff4250b536549a8638323db6cee13a7fc61a36d3f39ff6945009b44c25b9532",
     "404.html": "d6f620cd736b4f2b8f82bffa5b3c6440b82e0e00d0b179c5d95bceff3a5227aa",
-    "features/quota/quota-copy.js": "7d269eb75346639d50541bd95f8b865efae52be067e11fe2bbcce24d3607cfe2",
+    "features/quota/quota-copy.js": "f4f9c6c5bb79f0cffccdc67077938c706951e23b54bbe83e1af2511c69d1e855",
     "features/speaking-listening/gems-core.js": "5e30ae80b4234083f3b7a3bbb3b2e78f072835f124d298f21727a4e8e43890d6",
     "features/prasasti/fiezel-prasasti-core.js": "81b9b9fdcd5dec2f6f21582837709a9c4a7fa1624d8c1a9110a0abc2ca993ad7",
     "workers/api/tts/tts-key.js": "eaf1960ce71feebbc8aa6ea3d5c7784b3afe2a9ee9b94a79f45c5eb392230771",
     "features/audio-assets/fiezel-audio-key.js": "11624e303917fe0df881ac3f410911587766fd6f4d2491ca6687ec42de8d457d"
   },
   "literals": {
-    "count": 2842,
-    "sha256": "542aa9040e452a76a8041192aa967def9fb48cba1899b89f6e0f7d081888b920",
+    "count": 2843,
+    "sha256": "3d3f024d540319358735775e3d2f696c68c628c116587350e47184378232b284",
     "list": [
       "\n      SETELAH beat concern ≤1000ms selesai (13 §2.2), bukan menimpanya. Tanpa bunyi:\n      SFX hint sudah dipensiunkan (20 §4); cooldown 8 detiknya dijaga komponen. */\n   setTimeout(()=>{try{pawReact(",
       "\n      case 'silent':                        // L5: kalau mulut sempat mulai (taksiran L3 kandas), tutup SEKARANG\n        degradedLatch = false;\n        closeTurn(false);\n        break;\n      case 'interrupt':                     // stop(): snap tutup\n        degradedLatch = false;\n        closeTurn(true);\n        break;\n      default:\n        break;                              // fase asing dari versi fasad lebih baru: diabaikan tanpa suara\n    }\n  }\n\n  try { doc.addEventListener('fiezel-speech', onSpeech); } catch (_) {}\n\n  /* Suara terdegradasi (audibility-fix): mulut mati SEKETIKA dan tidak boleh\n     hidup lagi untuk sisa giliran — apa pun yang masih dikirim lapisan bawah. */\n  try {\n    root.addEventListener('fiezel-neural-voice-degraded', function () {\n      if (turn) closeTurn(true);\n      degradedLatch = true;                 // dilepas oleh end/silent/interrupt fasad berikutnya\n    });\n  } catch (_) {}\n\n  /* Permukaan kecil untuk Diagnostics/tes — bukan API pemanggil biasa:\n     satu-satunya pintu bicara tetap FiezelVoiceSay.say(). */\n  root.FiezelSpeechBridge = Object.freeze({\n    SCHEMA: SCHEMA,\n    speaking: function () { return !!turn; },\n    degraded: function () { return !!degradedLatch; },\n    motionAllowed: motionAllowed\n  });\n})(typeof self !== 'undefined' ? self : (typeof window !== 'undefined' ? window : this));\n",
@@ -45,7 +45,7 @@
       " Coba lagi dengan pola: {pola}.",
       " DIHAPUS.\n    //\n    // Ia menawarkan paket yang sudah tidak ada sejak m025-95, dan yang lebih buruk: sejak\n    // m025-100 prepareLearningBundle() hanya mengembalikan status tanpa menyiapkan apa pun.\n    // Jadi menekannya menampilkan ",
       " Gem Terjemahan buat kamu — simpan atau langsung pakai, bebas.",
-      " Jatah berikutnya mulai jam ",
+      " Jatah berikutnya mulai jam {jam} WIB.",
       " Kamu sedang offline: tampilan baru akan lengkap setelah tersambung internet.",
       " Kuis kosakata {level}</button>",
       " Oke, aku buka sekarang.",
@@ -1508,6 +1508,7 @@
       "Kalimat yang diucapkan di audio persis: “",
       "Kalimat yang rapi bikin orang fokus ke isi omongan lu, bukan ke cara lu ngomongnya.",
       "Kalimatnya kepanjangan untuk sekali dibunyikan, jadi belum ada suaranya. Teksnya tetap bisa kamu baca \\u2014 potong jadi dua bagian lalu coba lagi.",
+      "Kalimatnya kepanjangan untuk sekali dibunyikan, jadi belum ada suaranya. Teksnya tetap bisa kamu baca — potong jadi dua bagian lalu coba lagi.",
       "Kamar kecil yang ia sewa di kota",
       "Kami coba sambungkan lagi otomatis sebentar lagi, jadi kamu nggak perlu menekan apa pun.",
       "Kamu FIEZEL, pembimbing belajar Bahasa Inggris untuk satu murid SMA Indonesia bernama ${learnerName()}.\nGaya: santai, gaul, akrab seperti kakak yang nemenin belajar. Boleh emoji seperlunya.\nATURAN KETAT: jawab maksimal 60 kata, maksimal 3 kalimat, tanpa daftar bernomor, tanpa judul. Ini percakapan, bukan laporan.\nKalau relevan, akhiri dengan satu ajakan kecil yang bisa dikerjakan sekarang.\nKonteks murid: ${LEARNER_STAGE.gradeLabel} semester ${LEARNER_STAGE.semester}, level ${c.level||'A1'}, runtun ${c.streak||0} hari, ${c.dueReviews||0} materi menunggu review, sedang membuka halaman \"${c.view||'home'}\", fokus minggu ini ${c.focusLabel||'belum ditentukan'}.\nPertanyaan murid: \"${String(question||'').slice(0,600)}\"",

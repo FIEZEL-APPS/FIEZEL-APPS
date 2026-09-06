@@ -18,6 +18,11 @@
  * dan dijelaskan; naik satu = merah.
  *
  * KENAPA ANGGARAN, BUKAN NOL:
+ *   - features/quota/quota-copy.js: sejak m025-269 naskahnya SUDAH punya jalur th penuh —
+ *     build() membaca copy-map `quota.copy.<kunci>.<bidang>` lebih dulu, dan tabel beku di
+ *     dalam berkas ini tinggal menjadi KANON id + cadangan fail-soft saat copy-map belum
+ *     termuat. Anggarannya karena itu TETAP 5: yang dihitung pemindai adalah kalimat
+ *     cadangan itu, dan menghapusnya berarti menghapus jaring pengamannya.
  *   - features/quota/quota-copy.js dan features/prasasti/fiezel-prasasti-core.js adalah
  *     berkas KANON yang sha-nya dikunci id-golden-snapshot dan punya protokol th sendiri
  *     (copy-th-quota.js + CANON_TH_RULES yang menunggu penutur asli). Menyentuhnya lewat
@@ -54,7 +59,7 @@ const ALLOWLIST = Object.freeze({
   'features/neural-voice/fiezel-diag-panel.js': 6,              // zona audio: AI-17 F02 melarang FiezelI18n di sini
   'features/neural-voice/fiezel-neural-voice-audibility-fix.js': 2, // idem — lihat catatan ZONA AUDIO di bawah
   'features/prasasti/fiezel-prasasti-core.js': 3,               // berkas kanon, sha dikunci
-  'features/quota/quota-copy.js': 5,                            // berkas kanon, sha dikunci + CANON_TH_RULES
+  'features/quota/quota-copy.js': 5,                            // KANON id + cadangan; naskah th-nya sudah lewat copy-map (m025-269)
   'features/speaking-listening/listening-scenarios-a1.js': 11,  // konten belajar, jalur th lewat sidecar
   'features/speaking-listening/listening-scenarios-a2.js': 12   // idem
 });
