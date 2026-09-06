@@ -970,6 +970,14 @@ jobs:
         # Gerbang ini menahan graf Inggris pada patokan yang ditulis tangan, dan membuktikan
         # penyuntikan graf lain benar-benar berganti serta benar-benar bisa dipulihkan.
         run: node tests/family-graph-injection-test.js
+      - name: 'Bank soal Jepang: skema penuh, pengecoh bernama, concept sah di mesin nyata'
+        # Bank Jepang lahir dari nol. Cacatnya bukan yang membuat aplikasi error, melainkan
+        # yang membuat aplikasi MENGAJAR DENGAN KELIRU sambil tetap menyala: marker yang
+        # membuat conceptOf() mengembalikan null (pembatas kebaruan konsep mati diam-diam),
+        # pengecoh tanpa miskonsepsi bernama (bukti Braincore jadi angka tanpa makna), dan
+        # pengecoh yang sebenarnya benar (murid dihukum untuk jawaban benar). Gerbang ini
+        # memanggil conceptOf() yang SEBENARNYA, bukan menirunya.
+        run: node tests/japanese-content-test.js
       - name: 'Sumbu bahasa target: kunci murid Inggris identik byte per byte'
         # Menambah bahasa kedua punya satu cara gampang dan satu cara benar. Yang gampang:
         # beri SEMUA kunci awalan bahasa, termasuk kunci Inggris. Sekali dikirim, setiap murid
