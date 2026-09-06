@@ -82,3 +82,13 @@
    memakai bank dan markup yang sama, jadi ukurannya pun harus terbaca sama oleh murid. */
 .ch-picture{display:grid;place-items:center;width:150px;height:150px;margin:6px auto 14px;border-radius:16px;background:var(--yellow-soft,#FDF3D3);color:var(--ink,#3A2E22)}
 .ch-picture svg{width:96px;height:96px}
+
+/* Pendeteksi keluar layar (mode ujian). Nada warnanya sengaja NETRAL saat bersih dan
+   hanya menghangat saat ada kepergian: pita ini menemani murid selama ujian, dan pita
+   merah yang menyala sepanjang sesi mengajari rasa takut, bukan kejujuran. */
+.ch-proctor{display:flex;align-items:center;gap:8px;margin:8px 0 0;padding:9px 12px;border-radius:12px;background:var(--ch-soft);color:var(--ch-muted);font-size:.82rem;font-weight:600;line-height:1.4}
+.ch-proctor i,.ch-proctor svg{width:15px;height:15px;flex:none}
+.ch-proctor.is-warn{background:var(--ch-bad-soft);color:var(--ch-bad)}
+.ch-focus{display:inline-flex;align-items:center;gap:5px;font-size:.72rem;font-weight:700;padding:3px 9px;border-radius:999px;background:var(--ch-info-soft);color:var(--ch-info)}
+.ch-focus i,.ch-focus svg{width:13px;height:13px}
+.ch-focus.is-berat{background:var(--ch-bad-soft);color:var(--ch-bad)}
