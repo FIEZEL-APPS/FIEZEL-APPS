@@ -256,3 +256,42 @@ Jepang di `n5-a1-family-graph.json` bisa dipakai apa adanya.
 
 Sisa rencana §6 belum dikerjakan: sumbu bahasa target, gerbang konten Jepang, konten A1, dan
 sidecar Thai.
+
+**Langkah 2 dari rencana §6 — SELESAI SEBAGIAN (modul + gerbang; belum ada pemanggil).**
+`features/brain/fiezel-target-language.js` memutuskan bagaimana kunci penyimpanan sebuah
+bahasa dibentuk. Aturannya satu, dan ia yang menentukan segalanya: **bahasa bawaan (Inggris)
+tidak punya awalan sama sekali** — kunci Inggris sesudah modul ini lahir identik byte per byte
+dengan kunci Inggris sebelumnya. Bahasa lain yang menumpang awalan (`fiezel-olm-v1@ja`),
+bukan sebaliknya.
+
+Alasannya bukan kerapian. Kalau semua kunci diberi awalan "supaya seragam", setiap murid
+Inggris yang sudah ada membuka aplikasi dan menemukan dirinya kembali ke nol: progresnya
+tidak terhapus, ia hanya tidak lagi dicari di tempat ia disimpan — tanpa error, tanpa gejala,
+baru ketahuan dari keluhan murid.
+
+Gerbangnya `tests/target-language-axis-test.js`, dibuktikan merah lebih dulu. Ia membaca
+daftar kunci **langsung dari sumber** (`app.js`, `fiezel-learner-flow.js`,
+`fiezel-core-brain.js`), bukan mengetiknya ulang, supaya ia ikut tumbuh saat kunci baru lahir
+dan tidak bisa basi diam-diam. Yang dibuktikan: setiap kunci nyata tidak bergeser untuk
+Inggris; masukan tak dikenal/kosong/salah bentuk jatuh ke Inggris, bukan melahirkan ruang
+kunci asing; kunci bahasa kedua tidak pernah bertabrakan dengan kunci Inggris; dan kunci
+berbahasa bisa dibaca balik menjadi kunci dasar + bahasanya.
+
+Di manifest brain modul ini ditandai **`authorityKey: 'off'`, dan itu jujur**: belum ada satu
+pun pemanggil di `app.js`. Menandainya `'active'` berarti berbohong tentang mesin yang sedang
+berjalan.
+
+**Yang BELUM ada, dan perlu dikatakan terang-terangan:** murid belum bisa memilih bahasa apa
+pun di layar. Tidak ada pemilih bahasa target, tidak ada panel kursus di dashboard, dan nol
+konten Jepang yang dimuat aplikasi. Yang ada di aplikasi hari ini hanyalah `learnerLocale` —
+bahasa ANTARMUKA (Indonesia/Thai), bukan bahasa yang dipelajari. Panel pemilih sengaja
+ditunda sampai progres terpisah benar-benar bekerja: menaruh tombol "pilih kursus" lebih dulu
+berarti murid bisa memilih Jepang dan menimpa progres Inggrisnya.
+
+**Nol byte tambahan bagi murid Inggris — dan itu diperiksa, bukan dijanjikan.**
+`fiezel-target-language.js` SENGAJA belum didaftarkan di `index.html` maupun di ASSETS
+`sw.js`. Selama belum ada pemanggilnya, memuatnya di shell berarti mengirim kode mati ke
+setiap murid Inggris dan memaksa mereka mengunduh ulang shell tanpa mendapat apa pun.
+Modul ini diuji lewat Node dari gerbangnya sendiri, dan baru akan masuk shell bersama
+pemanggil pertamanya. Yang naik ke m025-280 adalah `fiezel-brain-manifest.js` (memang
+dikirim, karena daftar modulnya bertambah).
