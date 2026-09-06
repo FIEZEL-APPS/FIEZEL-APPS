@@ -207,7 +207,8 @@
    * di bawahnya, jadi murid tanpa Google (atau tanpa akses ke Google) selalu
    * punya jalan masuk.
    */
-  async function renderButton(host, onResult) {
+  async function renderButton(host, onResult, opts) {
+    var o = opts || {};
     if (!host) return { ok: false, error: 'no_host' };
     var id = clientId();
     if (!id) return { ok: false, error: 'not_configured' };
@@ -235,15 +236,23 @@
         itp_support: true,
         ux_mode: 'popup'
       });
-      root.google.accounts.id.renderButton(host, {
+      var cfg = {
         type: 'standard',
         theme: 'outline',
         size: 'large',
         text: 'signin_with',
         shape: 'pill',
-        logo_alignment: 'left',
-        locale: locale() === 'th' ? 'th' : 'id'
-      });
+        logo_alignment: 'left'
+      };
+      /* `locale:'auto'` = JANGAN kirim locale sama sekali, biarkan Google memakai
+         bahasa peramban. Itu satu-satunya jawaban yang benar untuk layar pemilih
+         bahasa: di sana murid BELUM memilih, dan memaksa 'id' di situ berarti
+         murid Thai membaca tombol Indonesia pada layar yang justru sedang
+         menanyakan bahasanya. */
+      if (o.locale !== 'auto') cfg.locale = (o.locale === 'th' || o.locale === 'id') ? o.locale
+        : (locale() === 'th' ? 'th' : 'id');
+      if (o.width) cfg.width = o.width;
+      root.google.accounts.id.renderButton(host, cfg);
     } catch (_) {
       return { ok: false, error: 'script', message: t('google.gagal-muat', 'Tombol Google belum bisa dimuat. Masuk dengan akun FIEZEL di bawah, ya.') };
     }
