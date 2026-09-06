@@ -28,7 +28,7 @@
 <meta name="twitter:description" content="เรียน grammar คำศัพท์ reading speaking และ listening ในแอปเดียว ฟรี และติดตั้งลงหน้าจอหลักได้">
 <meta name="twitter:image" content="https://fiezel.my.id/assets/shots/home-desktop.png">
 <link rel="stylesheet" href="../tokens.css?v=20260903-hula02">
-<link rel="stylesheet" href="../style.css?v=20260906-fzflow01">
+<link rel="stylesheet" href="../style.css?v=20260906-fzflow02">
 <link rel="stylesheet" href="../assets/mascot/fiezel-motion.css?v=20260903-hula02">
 <!-- Font (W3-WEB): halaman th memakai stack font SISTEM Thai — brand font Plus Jakarta Sans tak punya glyph Thai,
      dan keputusan Noto Sans Thai Looped self-host di brief berlaku untuk APP; marketing tak wajib brand font (dicatat di laporan). -->
@@ -181,6 +181,8 @@
         </div>
 
         <!-- Maskot PAW: Hawaiian Hula Dance (3s Dynamic Auto-Cycle) -->
+        <!-- FZFLOW rig lompat PAW: pembungkus X > Y > squash. SVG PAW di dalamnya utuh (gerbang palet). -->
+        <div class="fzflow-paw-rig"><div class="fzflow-paw-x"><div class="fzflow-paw-y"><div class="fzflow-paw-squash">
         <svg class="hero-paw hula-paw hula-playing routine-1" viewBox="0 0 320 310" role="img" aria-label="PAW — มาสคอต FIEZEL เต้นระบำฮาวายฮูลา">
           <defs>
             <clipPath id="hula-eyeL-hero-th"><circle cx="126" cy="98" r="16"/></clipPath>
@@ -420,6 +422,53 @@
             </g>
           </g>
         </svg>
+        <!-- FZFLOW kostum PAW (aset terpisah; SVG PAW di atas TIDAK disentuh — gerbang palet).
+             Menumpang di atas PAW dengan keyframes hula yang sama supaya ikut goyang.
+             Isi: topi toga + kacamata bulat (meniru MIRA) + dasi kupu, mata bintang / "^^",
+             mulut "waa", dan POOF saat kostum muncul/lepas. Warna: token + palet G1 PAW. -->
+        <svg class="fzflow-paw-costume" viewBox="0 0 320 310" aria-hidden="true">
+          <g class="fzflow-pc-all">
+            <g class="fzflow-pc-torso">
+              <g class="fzflow-pc-costume fzflow-pc-tie-wrap">
+                <path class="fzflow-pc-tie" d="M160 197 L136 185 Q132 197 136 209 Z"/>
+                <path class="fzflow-pc-tie" d="M160 197 L184 185 Q188 197 184 209 Z"/>
+                <circle class="fzflow-pc-knot" cx="160" cy="197" r="5.5"/>
+              </g>
+            </g>
+            <g class="fzflow-pc-head">
+              <g class="fzflow-pc-costume">
+                <ellipse class="fzflow-pc-band" cx="160" cy="36" rx="42" ry="15"/>
+                <polygon class="fzflow-pc-board" points="160,-4 238,24 160,52 82,24"/>
+                <path class="fzflow-pc-tassel" d="M236 25 Q248 40 242 62"/>
+                <circle class="fzflow-pc-tassel-end" cx="242" cy="66" r="5.5"/>
+                <circle class="fzflow-pc-lens" cx="126" cy="98" r="21"/>
+                <circle class="fzflow-pc-lens" cx="194" cy="98" r="21"/>
+                <circle class="fzflow-pc-frame" cx="126" cy="98" r="21"/>
+                <circle class="fzflow-pc-frame" cx="194" cy="98" r="21"/>
+                <path class="fzflow-pc-frame" d="M147 96 Q160 88 173 96 M105 96 L92 89 M215 96 L228 89"/>
+              </g>
+              <g class="fzflow-pc-star">
+                <circle class="fzflow-pc-white" cx="126" cy="98" r="16"/>
+                <circle class="fzflow-pc-white" cx="194" cy="98" r="16"/>
+                <path class="fzflow-pc-pupil" d="M126.0 87.0L128.7 94.3L136.5 94.6L130.4 99.4L132.5 106.9L126.0 102.6L119.5 106.9L121.6 99.4L115.5 94.6L123.3 94.3Z"/>
+                <path class="fzflow-pc-pupil" d="M194.0 87.0L196.7 94.3L204.5 94.6L198.4 99.4L200.5 106.9L194.0 102.6L187.5 106.9L189.6 99.4L183.5 94.6L191.3 94.3Z"/>
+              </g>
+              <g class="fzflow-pc-joy">
+                <circle class="fzflow-pc-fur" cx="126" cy="98" r="18"/>
+                <circle class="fzflow-pc-fur" cx="194" cy="98" r="18"/>
+                <path class="fzflow-pc-arc" d="M112 103 Q126 86 140 103"/>
+                <path class="fzflow-pc-arc" d="M180 103 Q194 86 208 103"/>
+              </g>
+              <g class="fzflow-pc-mouth">
+                <ellipse class="fzflow-pc-patch" cx="160" cy="150" rx="20" ry="13"/>
+                <path class="fzflow-pc-open" d="M144 144 C146 163 174 163 176 144 Z"/>
+                <ellipse class="fzflow-pc-tongue" cx="160" cy="157" rx="8" ry="3.5"/>
+              </g>
+              <g class="fzflow-pc-poof"><circle cx="222.0" cy="80.0" r="4.5"/><circle cx="203.8" cy="113.9" r="6"/><circle cx="160.0" cy="128.0" r="4.5"/><circle cx="116.2" cy="113.9" r="6"/><circle cx="98.0" cy="80.0" r="4.5"/><circle cx="116.2" cy="46.1" r="6"/><circle cx="160.0" cy="32.0" r="4.5"/><circle cx="203.8" cy="46.1" r="6"/></g>
+            </g>
+          </g>
+        </svg>
+        </div></div></div></div>
 
         <ul class="cefr-cycle" aria-hidden="true">
           <li>A1</li><li>A2</li><li>B1</li><li>B2</li><li>C1</li><li>C2</li>
@@ -433,7 +482,7 @@
           
           <!-- MIRA มาสคอตครู — เท้าคางอยู่หลังแล็ปท็อป -->
           <div class="mira-teacher-wrapper">
-            <svg class="mira-svg" viewBox="0 0 220 180" role="img" aria-label="MIRA — มาสคอตครูของ FIEZEL เอามือเท้าคางอยู่หลังแล็ปท็อป">
+            <svg class="mira-svg" viewBox="0 0 220 260" role="img" aria-label="MIRA — มาสคอตครูของ FIEZEL เอามือเท้าคางอยู่หลังแล็ปท็อป">
               <defs>
                 <linearGradient id="miraCardigan-hero" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stop-color="#3AA385"/>
@@ -452,6 +501,14 @@
               </defs>
 
               <!-- Mascot Lower Body (Cardigan & Shoulders) — Berada di balik layar laptop -->
+              <!-- FZFLOW: kaki + rok MIRA — tersembunyi di balik lid saat di rumah, tampak saat turun ke panggung -->
+              <g class="fzflow-mira-legs">
+                <rect x="88" y="222" width="16" height="26" rx="8" fill="url(#miraSkin-hero)"/>
+                <rect x="116" y="222" width="16" height="26" rx="8" fill="url(#miraSkin-hero)"/>
+                <ellipse class="fzflow-mira-shoe" cx="96" cy="249" rx="12" ry="6"/>
+                <ellipse class="fzflow-mira-shoe" cx="124" cy="249" rx="12" ry="6"/>
+                <path class="fzflow-mira-skirt" d="M56 176 L164 176 L176 228 Q110 240 44 228 Z"/>
+              </g>
               <g class="mira-shoulders">
                 <path d="M40 180 C40 140 70 128 110 128 C150 128 180 140 180 180 Z" fill="url(#miraCardigan-hero)"/>
                 <path d="M110 134 L92 180" stroke="#166052" stroke-width="3" stroke-linecap="round"/>
@@ -459,6 +516,17 @@
                 <polygon points="100,134 120,134 110,154" fill="#FDFBF7"/>
               </g>
 
+              <!-- FZFLOW: lengan MIRA — muncul saat turun (tangan-di-dagu disembunyikan), kanan melambai / ta-da -->
+              <g class="fzflow-mira-arms">
+                <g class="fzflow-mira-arm-l">
+                  <path d="M58 150 Q44 172 50 192" stroke="url(#miraCardigan-hero)" stroke-width="15" stroke-linecap="round" fill="none"/>
+                  <circle cx="50" cy="196" r="8" fill="url(#miraSkin-hero)"/>
+                </g>
+                <g class="fzflow-mira-arm-r">
+                  <path d="M162 150 Q178 172 172 192" stroke="url(#miraCardigan-hero)" stroke-width="15" stroke-linecap="round" fill="none"/>
+                  <circle cx="172" cy="196" r="8" fill="url(#miraSkin-hero)"/>
+                </g>
+              </g>
               <!-- Animated Head & Hands Assembly -->
               <g class="mira-anim-head">
                 <!-- Hair Back -->
@@ -586,6 +654,12 @@
         </div></div>
         <span class="fzflow-badge">1</span>
         <span class="fzflow-progress"><span class="fzflow-track"><span class="fzflow-bar"></span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+        <!-- hati/bintang di titik temu MIRA×PAW (netral bahasa) -->
+        <span class="fzflow-heart" style="--hx:-44px;--hy:-64px"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-4.6-9.3-9A5.2 5.2 0 0 1 12 6.3 5.2 5.2 0 0 1 21.3 12C19 16.4 12 21 12 21Z"/></svg></span>
+        <span class="fzflow-heart fzflow-star" style="--hx:6px;--hy:-96px"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z"/></svg></span>
+        <span class="fzflow-heart" style="--hx:52px;--hy:-58px"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-4.6-9.3-9A5.2 5.2 0 0 1 12 6.3 5.2 5.2 0 0 1 21.3 12C19 16.4 12 21 12 21Z"/></svg></span>
+        <span class="fzflow-heart fzflow-star" style="--hx:-12px;--hy:-30px"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z"/></svg></span>
+        <span class="fzflow-heart" style="--hx:30px;--hy:-118px"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-4.6-9.3-9A5.2 5.2 0 0 1 12 6.3 5.2 5.2 0 0 1 21.3 12C19 16.4 12 21 12 21Z"/></svg></span>
         <span class="fzflow-notif"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>1<i></i></span>
       </div>
 
