@@ -21,6 +21,7 @@ sini yang menjadi urutan resmi.
 | `0006_social.sql` | `fiezel-core` (binding `CORE_DB`) | `social_profile`, `social_handle`, `social_invite`, `social_friend`, `social_counter`, `rank_week`, `social_cohort`, `milestone_feed`, `cheer_feed`, `rank_jti` |
 | `0011_auth_roles.sql` | `fiezel-core` (binding `CORE_DB`) | `auth_account`, `auth_login_handle`, `auth_credential`, `teacher_invite`, `teacher_profile`, `friend_request`, `notification`, `push_subscription` |
 | `0012_teacher_content.sql` | `fiezel-core` (binding `CORE_DB`) | `tc_node`, `tc_question`, `tc_assignment`, `tc_assignment_target`, `tc_lesson_evidence`, `tc_class`, `tc_class_report` |
+| `0013_oauth_email.sql` | `fiezel-core` (binding `CORE_DB`) | `auth_oauth_identity`, `auth_email` |
 
 Tabel di atas adalah **satu-satunya** daftar berkas→database yang ditulis manusia.
 `tools/d1-schema-check.mjs` dan `tests/d1-schema-contract-test.js` **menurunkan** peta itu
@@ -97,6 +98,8 @@ wrangler d1 execute fiezel-core --remote --file=migrations/0010_learner_name.sql
 wrangler d1 execute fiezel-core --remote --file=migrations/0011_auth_roles.sql
 # --- fiezel-core: hierarki konten guru + bank soal + penugasan (SLOT 10) ---
 wrangler d1 execute fiezel-core --remote --file=migrations/0012_teacher_content.sql
+# --- fiezel-core: identitas Google + email (keputusan OWNER 6 Sep 2026) ---
+wrangler d1 execute fiezel-core --remote --file=migrations/0013_oauth_email.sql
 ```
 
 `0009_learner_evidence.sql` masuk `fiezel-core` dan **bukan** `fiezel-evidence`,
