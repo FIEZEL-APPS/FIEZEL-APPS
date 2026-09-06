@@ -108,6 +108,7 @@
    */
   var MODULES = [
     { file: 'fiezel-affect.js', global: 'FiezelAffect', schema: 'fiezel-affect-v1', authorityKey: 'affectTargetSuccess' },
+    { file: 'fiezel-arena-bot.js', global: 'FiezelArenaBot', schema: 'fiezel-arena-bot-v1', authorityKey: 'arenaBot' },
     { file: 'fiezel-attempt-record.js', global: 'FiezelAttemptRecord', schema: 'fiezel-attempt-record-v1', authorityKey: 'attemptRecord' },
     { file: 'fiezel-brain-config.js', global: 'FiezelBrainConfig', schema: 'fiezel-brain-config-v1', authorityKey: 'brainConfig' },
     { file: 'fiezel-brain-manifest.js', global: 'FiezelBrainManifest', schema: SCHEMA, authorityKey: 'manifest' },
@@ -149,6 +150,14 @@
    */
   var AUTHORITY_MAP = {
     memory: 'active',
+    // PAW ARENA (m025-276): bot lawan untuk tiga permainan arena. Ia MURNI (schema null,
+    // seed→langkah deterministik) DAN sudah dimuat index.html + di-precache sw.js supaya siap
+    // dipakai view arena. Tetapi HARI INI belum ada satu pun pemanggil di jalur app.js —
+    // penyambungan view arena (VALID_VIEWS + render + kartu Home/Profil) sengaja menyusul di
+    // perubahan tersendiri yang bisa ditinjau (lihat PAW-ARENA-HANDOFF). Persis pola
+    // questionAllocation/nof1: 'off' jujur (belum berjalan), BUKAN 'active' tanpa pemanggil —
+    // 'active' tanpa pemanggil adalah kebohongan yang manifest ini ada untuk menutup.
+    arenaBot: 'off',
     tutorSelection: 'active',
     misconceptionPrior: 'active',
     itemDifficultyPrior: 'active',

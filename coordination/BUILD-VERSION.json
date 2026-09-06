@@ -1,7 +1,7 @@
 {
-  "version": "m025-275",
-  "claimedBy": "branch claude/th-quota-notice-dlz1d4",
-  "claimedAt": "2026-09-06T11:29:04.919Z",
-  "reason": "Naskah notice kuota dan suara masuk copy-map",
+  "version": "m025-277",
+  "claimedBy": "branch main",
+  "claimedAt": "2026-09-06T12:16:21.949Z",
+  "reason": "PAW ARENA: view arena, tiga permainan, bot Braincore, kartu aturan per-sesi",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

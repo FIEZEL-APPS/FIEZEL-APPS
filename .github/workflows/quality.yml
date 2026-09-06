@@ -354,6 +354,12 @@ jobs:
           node tests/lucide-icon-coverage-test.js
           node tests/settings-cache-test.js
           node tests/gems-test.js
+          # m025-276: PAW ARENA — kartu aturan WAJIB muncul SETIAP kali masuk sesi (bukan
+          # sekali seumur hidup). Gerbang ini dibuktikan bisa MERAH: ia menjalankan penilai
+          # yang sama atas dua stub rusak (once-per-lifetime; petunjuk-menghanguskan-giliran)
+          # dan menuntut keduanya merah, plus meng-assert modul arena tidak bersandar pada
+          # modul tur sekali-seumur-hidup (fiezel-tour). Bug persis yang diminta owner cegah.
+          node tests/paw-arena-rules-card-test.js
           node tests/back-nav-test.js
           node grammar-quality-audit.js
           node content-integrity-audit.js

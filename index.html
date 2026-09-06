@@ -513,6 +513,9 @@ html.fz-booting body{overflow:hidden}
        menuntut copy-th-google.js — dan layar masuk adalah layar PERTAMA yang ditemui
        murid Thai, tempat paling mahal untuk salah bahasa. -->
   <script defer src="./features/i18n/copy-id-google.js"></script>
+  <!-- m025-276: naskah PAW ARENA (dwibahasa). Nama merek "PAW ARENA" tidak diterjemahkan;
+       kalimat sekelilingnya dua bahasa. Domain sendiri → th-coverage menuntut copy-th-pawarena.js. -->
+  <script defer src="./features/i18n/copy-id-pawarena.js"></script>
   <!-- W4-MERGE: aset th TIDAK dimuat statis (copy-th-*, naskah-th-brain, dua dataset th) —
        semuanya disuntik/difetch DINAMIS oleh pemuat kecil di bawah HANYA saat locale th
        (AI-13 F02/F05: murid Indonesia nol byte th). Pemuat wajib SETELAH fiezel-i18n.js
@@ -568,6 +571,9 @@ html.fz-booting body{overflow:hidden}
   <script defer src="./features/brain/fiezel-mastery-bkt.js"></script>
   <script defer src="./features/brain/fiezel-olm.js"></script>
   <script defer src="./features/brain/fiezel-affect.js"></script>
+  <!-- m025-276: bot lawan PAW ARENA. Modul brain MURNI (seed→langkah deterministik),
+       authority 'active' di manifest → wajib dimuat halaman + di-precache sw.js. -->
+  <script defer src="./features/brain/fiezel-arena-bot.js"></script>
   <script defer src="./features/brain/fiezel-confusion-matrix.js"></script>
   <script defer src="./features/brain/fiezel-step-tutor.js"></script>
   <script defer src="./features/brain/fiezel-production-grader.js"></script>
@@ -730,6 +736,8 @@ html.fz-booting body{overflow:hidden}
   <script defer src="./features/learner-flow/fiezel-review-bank.js"></script>
   <script defer src="./features/learner-flow/fiezel-progress-backup.js"></script>
   <script defer src="./features/learner-flow/fiezel-duel.js"></script>
+  <!-- m025-276: orkestrator PAW ARENA (view sendiri; kartu aturan per-sesi; ?duel= lama tetap hidup). -->
+  <script defer src="./features/learner-flow/fiezel-paw-arena.js"></script>
   <script defer src="./features/learner-flow/fiezel-learner-flow.js"></script>
   <script defer src="./features/tutor-action-center/fiezel-tutor-action-center.js"></script>
   <!-- Ruang Guru (cangkang guru terpisah). Wajib SEBELUM app.js: tutorCenterView() memasangnya,

@@ -50,6 +50,7 @@
     './features/i18n/copy-th-proctor.js',
     './features/i18n/copy-th-classjoin.js',
     './features/i18n/copy-th-google.js',
+    './features/i18n/copy-th-pawarena.js',
     './features/i18n/naskah-th-brain.js'
   ];
   var GRAMMAR_TH = './grammar-explanations-th.json';
