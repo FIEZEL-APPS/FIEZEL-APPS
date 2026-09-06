@@ -1,9 +1,39 @@
-# m025-266 — Bottom nav: satu definisi, kapsul aktif, dua ikon baru
+# m025-270 — Chrome: bottom nav + topbar satu definisi, kapsul aktif, dua ikon baru
 
-**Status:** selesai di branch `redesign/chrome-bottomnav`, gerbang lokal hijau (daftar penuh
-`quality.yml`, termasuk `ui-render-audit` di Chromium 320/390/768/1280).
-**Otoritas:** OWNER (fitrajft-ux). PR 1 dari tiga PR redesign chrome (nav → topbar → Home);
-tiap PR berdiri sendiri dan bisa dibatalkan sendiri.
+**Status:** selesai, 252/252 gerbang `quality.yml` hijau di build `m025-270` (termasuk
+`ui-render-audit` di Chromium 320/390/768/1280).
+**Otoritas:** OWNER (fitrajft-ux).
+
+**KOREKSI CAKUPAN (m025-270).** Judul dan status dokumen ini semula menyebut `m025-266`,
+branch `redesign/chrome-bottomnav`, dan "PR 1 dari tiga (nav → topbar → Home)". Dua-duanya
+tidak lagi benar dan sudah diperbaiki di tempat:
+
+1. **Nomor build.** `m025-266` sudah dipakai sapuan kebocoran naskah Thai yang mendarat
+   lebih dulu. Cabang ini naik ke `m025-270` lewat `tools/bump-build.mjs`.
+2. **Cakupan.** PR ini TIDAK hanya menyentuh nav: ia juga merancang ulang topbar menjadi
+   pil lengket sekeluarga dengan tab bar (lihat blok `.topbar` di `style.css`, dan blok
+   `body.fz-lux .topbar`/`.icon-button` yang dicabut dari `fiezel-lux.css`). Membaca
+   dokumen ini sebagai "topbar belum tersentuh" akan menyesatkan penerusnya — dan sempat
+   menyesatkan agen yang melanjutkannya: percobaan mengembalikan blok lux itu justru
+   melahirkan definisi topbar kedua yang bertabrakan, persis penyakit yang PR ini
+   sembuhkan. Percobaan itu sudah di-revert.
+
+**Regresi yang ditemukan dan ditutup sebelum merge.** `ui-render-audit` merah: judul
+halaman Vocab jatuh ke kontras 1,02:1 pada beberapa fase langit, di tema terang dan gelap.
+Sebabnya diukur, bukan ditebak — gerbang itu menyampel WARNA TERBANYAK di dalam kotak
+judul, dan bayangan pil topbar (`0 14px 34px -14px`, jarak 18 px) jatuh tepat di kotak itu
+lalu memecah krem di sana menjadi beberapa bin. Tidak ada bin krem yang menang, jadi yang
+menang adalah goresan huruf: tinta dibanding tinta.
+
+| warna dominan di kotak judul "Kosakata" (390 px, layar Vocab) | |
+| --- | --- |
+| `origin/main` | (252, 236, 204) krem |
+| cabang ini sebelum patch | (36, 28, 20) tinta |
+| sesudah patch | (252, 244, 212) krem |
+
+Bayangan menjadi `0 10px 22px -18px rgba(36,26,17,.20)`: pil topbar tetap terangkat, tapi
+ekornya tidak lagi mencapai baris judul. **Aturan berikutnya untuk siapa pun yang menyentuh
+chrome: bayangan pil lengket tidak boleh mencapai baris judul halaman di bawahnya.**
 
 ---
 
