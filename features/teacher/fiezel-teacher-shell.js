@@ -314,7 +314,7 @@
     var teacherVerified = isTeacherRole();
     var exitLabel = teacherVerified ? 'Keluar akun guru' : 'Ke mode murid';
     var exitAction = teacherVerified ? 'logout' : 'exit';
-    return '<aside class="tg-side"><div class="tg-brand"><span class="tg-brand-mark">K</span><div class="kelasku-brand"><span class="kelasku-main">KelasKu</span> <span class="kelasku-tag">untuk Guru</span></div></div>' +
+    return '<aside class="tg-side"><div class="tg-brand"><span class="tg-brand-mark">K</span><div class="kelasku-brand"><span class="kelasku-main">KelasKu</span> <span class="kelasku-tag">' + esc(t('guru.merek-tag', 'untuk Guru')) + '</span></div></div>' +
       '<button type="button" class="tg-teacher" data-tg="view" data-view="settings" data-testid="tg-profile">' + icon('user-round') + '<div><b>' + esc(st.teacher.name || accountHandle() || 'Guru FIEZEL') + '</b><small>' + esc(st.teacher.school || 'Atur profil →') + '</small></div></button>' +
       (st.classes.length ? '<label class="tg-class-switch">' + t('guru.kelas-aktif', 'Kelas aktif') + '<select data-tg-select="class" data-testid="tg-class-select">' + st.classes.map(function (k) { return '<option value="' + k.id + '"' + (c && k.id === c.id ? ' selected' : '') + '>' + esc(k.name) + '</option>'; }).join('') + '</select></label>' : '') +
       '<nav class="tg-nav">' + NAV.map(function (n) { return '<button type="button" class="tg-nav-item' + (st.view === n[0] ? ' is-active' : '') + '" data-tg="view" data-view="' + n[0] + '" data-testid="tg-nav-' + n[0] + '">' + icon(n[2]) + '<span>' + n[1] + '</span></button>'; }).join('') + '</nav>' +
@@ -323,7 +323,7 @@
   }
   function topbar(c) {
     var d = new Date();
-    return '<header class="tg-top"><div><p class="tg-kicker">' + esc(d.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' })) + '</p><h1>' + esc(st.classes.length ? (TITLE[st.view] || 'KelasKu untuk Guru') : 'KelasKu untuk Guru') + '</h1></div>' +
+    return '<header class="tg-top"><div><p class="tg-kicker">' + esc(d.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' })) + '</p><h1>' + esc(st.classes.length ? (TITLE[st.view] || t('guru.merek-penuh', 'KelasKu untuk Guru')) : t('guru.merek-penuh', 'KelasKu untuk Guru')) + '</h1></div>' +
       '<div class="tg-top-actions">' + (c ? syncChip(c) + '<button type="button" class="tg-chip tg-code" data-tg="copy" data-text="' + esc(c.code) + '" title="Salin kode kelas" data-testid="tg-class-code">' + icon('hash') + '<span>' + esc(c.code) + '</span></button>' : '') + bell() + (c ? '<button type="button" class="tg-btn is-ghost" data-tg="modal" data-kind="board" data-testid="tg-open-board">' + icon('presentation') + '<span>Mode papan</span></button><button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="assign" data-testid="tg-quick-assign">' + icon('plus') + '<span>' + t('guru.tugas-baru', 'Tugas baru') + '</span></button>' : '') + '</div></header>' + inboxPanel();
   }
   function bell() {
