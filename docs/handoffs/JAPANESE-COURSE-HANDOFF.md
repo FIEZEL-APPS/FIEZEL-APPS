@@ -295,4 +295,3 @@ setiap murid Inggris dan memaksa mereka mengunduh ulang shell tanpa mendapat apa
 Modul ini diuji lewat Node dari gerbangnya sendiri, dan baru akan masuk shell bersama
 pemanggil pertamanya. Yang naik ke m025-280 adalah `fiezel-brain-manifest.js` (memang
 dikirim, karena daftar modulnya bertambah).
-
