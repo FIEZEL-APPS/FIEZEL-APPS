@@ -78,3 +78,8 @@ CREATE TABLE IF NOT EXISTS auth_email (
   source TEXT NOT NULL,
   updated_at INTEGER NOT NULL
 ) WITHOUT ROWID;
+
+-- DIPAKAI: penautan Google memeriksa apakah akun ini SUDAH menaut satu akun Google; PRIMARY KEY tabel berawalan `provider`, jadi ia tidak melayani arah ini.
+-- workers/api/route-auth-google.js (routeAuthGoogle, kasus B)
+-- 'SELECT provider_sub FROM auth_oauth_identity WHERE sub = ?1 AND provider = ?2'
+CREATE UNIQUE INDEX IF NOT EXISTS ux_auth_oauth_sub_provider ON auth_oauth_identity (sub, provider);

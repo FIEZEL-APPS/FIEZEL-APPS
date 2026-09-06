@@ -67,6 +67,12 @@ const INDEX_PROOF = {
     from: 'workers/api/route-teacher.js (importContext)',
     query: 'SELECT id, lesson_id, type, stem FROM tc_question WHERE teacher_sub = ?1'
   },
+  ux_auth_oauth_sub_provider: {
+    why: 'penautan Google memeriksa apakah akun ini SUDAH menaut satu akun Google; '
+      + 'PRIMARY KEY tabel berawalan `provider`, jadi ia tidak melayani arah ini',
+    from: 'workers/api/route-auth-google.js (routeAuthGoogle, kasus B)',
+    query: 'SELECT provider_sub FROM auth_oauth_identity WHERE sub = ?1 AND provider = ?2'
+  },
   ix_tc_assignment_owner: {
     why: 'laporan kelas menelusuri penugasan milik guru pemanggil',
     from: 'workers/api/route-teacher.js (routeTeacherProgress)',

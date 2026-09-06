@@ -260,7 +260,15 @@ export const OAUTH_DDL = Object.freeze([
     ' verified INTEGER NOT NULL DEFAULT 0,' +
     ' source TEXT NOT NULL,' +
     ' updated_at INTEGER NOT NULL' +
-    ' ) WITHOUT ROWID'
+    ' ) WITHOUT ROWID',
+  /* Satu akun FIEZEL = paling banyak satu akun Google. PRIMARY KEY tabel ini
+     berawalan `provider`, jadi ia menjawab "akun Google ini milik siapa" tetapi
+     TIDAK menjawab "akun ini sudah menaut Google atau belum" — pertanyaan yang
+     ditanyakan rute penautan setiap kali. UNIQUE, bukan sekadar indeks:
+     penegakannya harus ada di basis data, bukan hanya di pemeriksaan handler
+     yang bisa dilewati dua permintaan serentak. */
+  'CREATE UNIQUE INDEX IF NOT EXISTS ux_auth_oauth_sub_provider' +
+    ' ON auth_oauth_identity (sub, provider)'
 ]);
 
 /** Seluruh DDL paket ini, urut terapan. */
