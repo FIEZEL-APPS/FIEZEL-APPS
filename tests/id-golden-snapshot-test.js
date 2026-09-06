@@ -116,10 +116,23 @@ function extractStrings(src) {
 const STRONG = /\b(nggak|kamu|aku|belajar|latihan|jawaban|pelajaran|kosakata|soal|murid|jatah|runtun|permata|tandai|ketuk|ulangi|lanjut|berikutnya|sebelumnya|pengaturan|pencapaian|harian|dengarkan|ucapkan|terjemahan|bahasa)\b/i;
 const COMMON = /\b(yang|dengan|untuk|sudah|belum|bisa|akan|lagi|coba|benar|salah|hari|ini|itu|dan|atau|dari|kalau|masih|sedang|semua|target|kembali|mulai|pilih|selesai|baru|saat|per|ke|di)\b/gi;
 
+/* m025-277: NAMA PLACEHOLDER BUKAN NASKAH. Kunci berparameter memakai nama placeholder
+   berbahasa Indonesia ({soal}, {jumlah}, {hari}) dan nama itu WAJIB identik di setiap
+   locale - itu kontrak copy-map. Akibatnya kalimat THAI seperti '{soal} ข้อ · ราว {menit}
+   นาที' ikut terbaca sebagai "Indonesia" hanya karena kata 'soal' di dalam kurung kurawal,
+   lalu mendarat di himpunan emas Indonesia. Sekali satu kalimat th masuk ke sana, setiap
+   penerjemah berikutnya harus meregenerasi baseline untuk naskah yang bukan bahasa
+   Indonesia - pagarnya jadi berisik dan lama-lama diabaikan.
+
+   Karena itu token {...} dibuang SEBELUM klasifikasi. Kalimat Indonesia yang sesungguhnya
+   tidak terpengaruh: yang menjadikannya Indonesia adalah kata-kata di LUAR kurung
+   ('{soal} soal · sekitar {menit} menit' tetap punya 'soal' dan 'sekitar'). Diverifikasi:
+   himpunan literal sebelum dan sesudah perubahan ini identik pada seluruh pohon. */
 function isIndonesian(s) {
   if (s.length < 4) return false;
-  if (STRONG.test(s)) return true;
-  const m = s.match(COMMON);
+  const t = s.replace(/\{[a-zA-Z0-9_]+\}/g, ' ');
+  if (STRONG.test(t)) return true;
+  const m = t.match(COMMON);
   return !!m && new Set(m.map(x => x.toLowerCase())).size >= 2;
 }
 
