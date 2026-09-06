@@ -1,0 +1,1143 @@
+{
+ "schema": "fiezel-japanese-bank-v1",
+ "target": "ja",
+ "cefr": "A1",
+ "jlpt": "N5",
+ "family": "existence_location",
+ "catatan": "Bank soal A1/N5 keluarga existence_location. Dijaga tests/japanese-content-test.js.",
+ "provenans": {
+  "sumberSilabus": "Minna no Nihongo dan Irodori dipakai SEBAGAI SILABUS SAJA: poin tata bahasa apa, urutannya bagaimana, di tingkat berapa. NOL kalimat, dialog, teks, atau daftar kosakata yang direproduksi atau diturunkan — setiap stem, pilihan, pengecoh, dan penjelasan ditulis baru.",
+  "akibatLisensi": "Karena tidak ada teks Irodori yang dipakai, FIEZEL TIDAK terikat kewajiban gratis-selamanya dari lisensinya.",
+  "statusNaskah": "Kalimat Jepang dan penjelasan Inggris/Indonesia berstatus DRAFT AI dan wajib direview penutur asli sebelum dipakai menilai murid."
+ },
+ "jumlah": 18,
+ "templates": [
+  {
+   "id": "JP-EX-101",
+   "family": "existence_location",
+   "skill": "existence_location",
+   "subskill": "arimasu_for_inanimate_things",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "arimasu-inanimate-book-on-desk",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Choose ARIMASU for a thing that has no life of its own",
+   "pedagogicalObjectiveId": "Pilih あります untuk benda yang tidak bernyawa",
+   "misconceptionTargeted": "Learner picks the verb by the sentence pattern instead of by whether the subject is alive",
+   "misconceptionTargetedId": "Murid memilih kata kerja dari pola kalimat, bukan dari hidup atau tidaknya subjek",
+   "reasoningOperation": "check if the subject can move by itself -> a book cannot -> ARIMASU",
+   "reasoningOperationId": "periksa apakah subjeknya bisa bergerak sendiri -> buku tidak bisa -> あります",
+   "stem": "つくえの うえに 本が ___。",
+   "stemKana": "つくえの うえに ほんが ___。",
+   "furigana": [
+    [
+     "本",
+     "ほん"
+    ]
+   ],
+   "options": [
+    "あります",
+    "います",
+    "いります",
+    "なります"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "います",
+     "misconception": "living-thing verb used for an object",
+     "misconceptionId": "kata kerja makhluk hidup dipakai untuk benda",
+     "whyFails": "IMASU is reserved for things that can move on their own. A book stays where it is put.",
+     "whyFailsId": "います khusus untuk yang bisa bergerak sendiri. Buku diam di tempat ia diletakkan."
+    },
+    {
+     "option": "いります",
+     "misconception": "'to need' mistaken for 'to exist' because both start with I",
+     "misconceptionId": "'membutuhkan' tertukar dengan 'ada' karena sama-sama diawali い",
+     "whyFails": "IRIMASU means to need something. The sentence states where the book is, not that someone wants it.",
+     "whyFailsId": "いります berarti membutuhkan. Kalimat ini menyatakan letak buku, bukan bahwa ada yang memerlukannya."
+    },
+    {
+     "option": "なります",
+     "misconception": "'to become' used for a static situation",
+     "misconceptionId": "'menjadi' dipakai untuk keadaan yang diam",
+     "whyFails": "NARIMASU describes a change into something else. Nothing is changing here.",
+     "whyFailsId": "なります menggambarkan perubahan menjadi sesuatu yang lain. Di sini tidak ada yang berubah."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "A book is inanimate, so its existence is expressed with ARIMASU.",
+    "whyCorrectId": "Buku adalah benda mati, jadi keberadaannya dinyatakan dengan あります.",
+    "rule": "ARIMASU = existence of things without life; IMASU = existence of people and animals.",
+    "ruleId": "あります = keberadaan benda tak bernyawa; います = keberadaan orang dan hewan.",
+    "whyOthersFail": "IMASU treats the book as alive; IRIMASU talks about needing; NARIMASU talks about becoming.",
+    "whyOthersFailId": "います memperlakukan buku seolah hidup; いります berbicara soal butuh; なります soal menjadi.",
+    "howToAvoid": "Ask one question first: can this subject walk away on its own? If not, use ARIMASU.",
+    "howToAvoidId": "Tanyakan satu hal dulu: bisakah subjek ini pergi sendiri? Kalau tidak, pakai あります.",
+    "memoryCue": "No legs, no will: ARIMASU.",
+    "memoryCueId": "Tak berkaki, tak berkehendak: あります."
+   }
+  },
+  {
+   "id": "JP-EX-102",
+   "family": "existence_location",
+   "skill": "existence_location",
+   "subskill": "imasu_for_pets_and_animals",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "imasu-pet-cat-under-chair",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Choose IMASU for an animal, including a pet kept at home",
+   "pedagogicalObjectiveId": "Pilih います untuk hewan, termasuk hewan peliharaan di rumah",
+   "misconceptionTargeted": "Learner treats a pet as a possession, and possessions feel like objects",
+   "misconceptionTargetedId": "Murid menganggap hewan peliharaan sebagai barang milik, dan barang terasa seperti benda mati",
+   "reasoningOperation": "a pet is an animal -> animals move on their own -> IMASU",
+   "reasoningOperationId": "peliharaan adalah hewan -> hewan bergerak sendiri -> います",
+   "stem": "いすの したに ねこが ___。",
+   "stemKana": "いすの したに ねこが ___。",
+   "furigana": [],
+   "options": [
+    "います",
+    "あります",
+    "おきます",
+    "つきます"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "あります",
+     "misconception": "a pet counted as belongings rather than as a living creature",
+     "misconceptionId": "peliharaan dihitung sebagai barang milik, bukan makhluk hidup",
+     "whyFails": "Owning an animal does not make it an object. The cat can walk off by itself, so it takes IMASU.",
+     "whyFailsId": "Memiliki hewan tidak menjadikannya benda. Kucing bisa pergi sendiri, jadi memakai います."
+    },
+    {
+     "option": "おきます",
+     "misconception": "'to put' used where the sentence only reports a location",
+     "misconceptionId": "'meletakkan' dipakai padahal kalimat hanya melaporkan letak",
+     "whyFails": "OKIMASU means someone placed something there. Nobody placed the cat; it simply is there.",
+     "whyFailsId": "おきます berarti ada yang meletakkan sesuatu. Tidak ada yang meletakkan kucing itu; ia memang di situ."
+    },
+    {
+     "option": "つきます",
+     "misconception": "'to arrive' confused with 'to be present'",
+     "misconceptionId": "'tiba' dikira 'berada'",
+     "whyFails": "TSUKIMASU is about arriving at a place at a moment. This sentence describes a state, not an arrival.",
+     "whyFailsId": "つきます soal tiba di suatu tempat pada suatu saat. Kalimat ini melukiskan keadaan, bukan kedatangan."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "A cat is a living animal, so its existence uses IMASU even though it is a pet.",
+    "whyCorrectId": "Kucing adalah hewan hidup, jadi keberadaannya memakai います meski ia peliharaan.",
+    "rule": "Animals and people = IMASU, no matter who owns them.",
+    "ruleId": "Hewan dan orang = います, tidak peduli siapa pemiliknya.",
+    "whyOthersFail": "ARIMASU would file the cat with the furniture; OKIMASU adds a placer; TSUKIMASU adds an arrival.",
+    "whyOthersFailId": "あります menggolongkan kucing bersama perabot; おきます menambah pelaku peletak; つきます menambah kedatangan.",
+    "howToAvoid": "Decide by life, not by ownership: a pet is still an animal.",
+    "howToAvoidId": "Putuskan berdasarkan nyawa, bukan kepemilikan: peliharaan tetap hewan.",
+    "memoryCue": "It can run away, so it IMASU.",
+    "memoryCueId": "Ia bisa lari, jadi います."
+   }
+  },
+  {
+   "id": "JP-EX-103",
+   "family": "existence_location",
+   "skill": "existence_location",
+   "subskill": "arimasu_for_plants",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "arimasu-plant-tree-in-garden",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Choose ARIMASU for a plant, which is alive but cannot move itself",
+   "pedagogicalObjectiveId": "Pilih あります untuk tumbuhan, yang hidup tetapi tak bisa berpindah sendiri",
+   "misconceptionTargeted": "Learner reasons that a tree is alive and therefore must take IMASU",
+   "misconceptionTargetedId": "Murid berpikir pohon itu hidup sehingga harus memakai います",
+   "reasoningOperation": "a tree is rooted -> it cannot move by its own will -> ARIMASU",
+   "reasoningOperationId": "pohon berakar -> tak bisa berpindah atas kehendaknya -> あります",
+   "stem": "にわに 大きい きが ___。",
+   "stemKana": "にわに おおきい きが ___。",
+   "furigana": [
+    [
+     "大",
+     "おお"
+    ]
+   ],
+   "options": [
+    "あります",
+    "います",
+    "いきます",
+    "みえます"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "います",
+     "misconception": "biological life mistaken for the test Japanese actually uses",
+     "misconceptionId": "hidup secara biologis dikira sama dengan ukuran yang dipakai bahasa Jepang",
+     "whyFails": "Japanese does not ask whether the subject is biologically alive but whether it moves on its own. A tree stays rooted, so ARIMASU.",
+     "whyFailsId": "Bahasa Jepang tidak menanyakan apakah subjeknya hidup secara biologis, melainkan apakah ia bergerak sendiri. Pohon tetap berakar, jadi あります."
+    },
+    {
+     "option": "いきます",
+     "misconception": "'to go' used to express being somewhere",
+     "misconceptionId": "'pergi' dipakai untuk menyatakan berada di suatu tempat",
+     "whyFails": "IKIMASU is movement toward a place. The tree is not travelling to the garden.",
+     "whyFailsId": "いきます adalah perpindahan menuju suatu tempat. Pohon itu tidak sedang menuju taman."
+    },
+    {
+     "option": "みえます",
+     "misconception": "'to be visible' substituted for 'to exist'",
+     "misconceptionId": "'terlihat' dipakai menggantikan 'ada'",
+     "whyFails": "MIEMASU says the tree can be seen from here, which is about the viewer, not about the tree being in the garden.",
+     "whyFailsId": "みえます menyatakan pohon itu tampak dari sini, yakni soal pengamatnya, bukan soal pohon berada di taman."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "A tree cannot relocate itself, so Japanese counts it with the ARIMASU group.",
+    "whyCorrectId": "Pohon tidak bisa memindahkan dirinya, jadi bahasa Jepang menggolongkannya ke kelompok あります.",
+    "rule": "The split is self-movement, not biology: plants take ARIMASU.",
+    "ruleId": "Pembagiannya adalah kemampuan bergerak sendiri, bukan biologi: tumbuhan memakai あります.",
+    "whyOthersFail": "IMASU applies the wrong test; IKIMASU adds motion; MIEMASU reports visibility instead of location.",
+    "whyOthersFailId": "います memakai ukuran yang keliru; いきます menambahkan gerak; みえます melaporkan keterlihatan, bukan letak.",
+    "howToAvoid": "Before choosing IMASU, check that the subject could leave the room by itself.",
+    "howToAvoidId": "Sebelum memilih います, pastikan subjeknya bisa keluar ruangan dengan sendirinya.",
+    "memoryCue": "Roots down, ARIMASU.",
+    "memoryCueId": "Berakar, berarti あります."
+   }
+  },
+  {
+   "id": "JP-EX-104",
+   "family": "existence_location",
+   "skill": "existence_location",
+   "subskill": "arimasu_for_vehicles",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "arimasu-vehicle-car-in-front",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Choose ARIMASU for a vehicle, which moves only when a person drives it",
+   "pedagogicalObjectiveId": "Pilih あります untuk kendaraan, yang bergerak hanya jika dikemudikan orang",
+   "misconceptionTargeted": "Learner sees that a car moves and concludes it belongs with living things",
+   "misconceptionTargetedId": "Murid melihat mobil bergerak lalu menyimpulkan ia sekelompok dengan makhluk hidup",
+   "reasoningOperation": "a car moves only with a driver -> no will of its own -> ARIMASU",
+   "reasoningOperationId": "mobil bergerak hanya jika ada pengemudi -> tak punya kehendak sendiri -> あります",
+   "stem": "いえの まえに くるまが ___。",
+   "stemKana": "いえの まえに くるまが ___。",
+   "furigana": [],
+   "options": [
+    "あります",
+    "います",
+    "はしります",
+    "うごきます"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "います",
+     "misconception": "motion mistaken for will, so a machine is grouped with animals",
+     "misconceptionId": "gerak dikira kehendak, sehingga mesin disamakan dengan hewan",
+     "whyFails": "A parked car moves only because a driver moves it. Without its own will it stays in the ARIMASU group.",
+     "whyFailsId": "Mobil yang parkir bergerak hanya karena digerakkan pengemudi. Tanpa kehendak sendiri ia tetap di kelompok あります."
+    },
+    {
+     "option": "はしります",
+     "misconception": "'to run' used to state that something is parked",
+     "misconceptionId": "'berlari/melaju' dipakai untuk menyatakan sesuatu terparkir",
+     "whyFails": "HASHIRIMASU says the car is driving along. The sentence says it is standing in front of the house.",
+     "whyFailsId": "はしります berarti mobil sedang melaju. Kalimat ini menyatakan mobil berdiri di depan rumah."
+    },
+    {
+     "option": "うごきます",
+     "misconception": "'to move' substituted for 'to exist'",
+     "misconceptionId": "'bergerak' dipakai menggantikan 'ada'",
+     "whyFails": "UGOKIMASU reports movement, but the point here is simply where the car is.",
+     "whyFailsId": "うごきます melaporkan gerakan, padahal yang dibicarakan hanyalah letak mobil."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "A car has no will of its own, so its existence is stated with ARIMASU.",
+    "whyCorrectId": "Mobil tidak punya kehendak sendiri, jadi keberadaannya dinyatakan dengan あります.",
+    "rule": "Machines and vehicles take ARIMASU even though they can be driven around.",
+    "ruleId": "Mesin dan kendaraan memakai あります meskipun bisa dikemudikan ke mana-mana.",
+    "whyOthersFail": "IMASU mistakes engine motion for life; HASHIRIMASU and UGOKIMASU report motion instead of location.",
+    "whyOthersFailId": "います mengira gerak mesin sebagai kehidupan; はしります dan うごきます melaporkan gerak, bukan letak.",
+    "howToAvoid": "Ask who decides the movement. If the answer is a person, use ARIMASU.",
+    "howToAvoidId": "Tanyakan siapa yang memutuskan gerakannya. Kalau jawabannya manusia, pakai あります.",
+    "memoryCue": "No driver, no motion: ARIMASU.",
+    "memoryCueId": "Tanpa sopir tak bergerak: あります."
+   }
+  },
+  {
+   "id": "JP-EX-105",
+   "family": "existence_location",
+   "skill": "existence_location",
+   "subskill": "ni_marks_place_of_existence",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "ni-marks-place-of-existence-cat",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Use NI to mark the place where someone or something exists",
+   "pedagogicalObjectiveId": "Pakai に untuk menandai tempat seseorang atau sesuatu berada",
+   "misconceptionTargeted": "Learner uses DE for every place word because DE was learned first as 'at'",
+   "misconceptionTargetedId": "Murid memakai で untuk semua kata tempat karena で lebih dulu dikenal sebagai 'di'",
+   "reasoningOperation": "the verb is IMASU (existence) -> the place takes NI",
+   "reasoningOperationId": "kata kerjanya います (keberadaan) -> tempatnya memakai に",
+   "stem": "へや___ ねこが います。",
+   "stemKana": "へや___ ねこが います。",
+   "furigana": [],
+   "options": [
+    "に",
+    "で",
+    "を",
+    "へ"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "で",
+     "misconception": "action particle used with an existence verb",
+     "misconceptionId": "partikel perbuatan dipakai dengan kata kerja keberadaan",
+     "whyFails": "DE marks where an action is carried out. IMASU is not an action; it only states presence, so the place takes NI.",
+     "whyFailsId": "で menandai tempat suatu perbuatan dilakukan. います bukan perbuatan; ia hanya menyatakan keberadaan, jadi tempatnya memakai に."
+    },
+    {
+     "option": "を",
+     "misconception": "object marker attached to a place",
+     "misconceptionId": "penanda objek ditempel ke kata tempat",
+     "whyFails": "O marks what receives an action. The room is not being acted upon by the cat.",
+     "whyFailsId": "を menandai yang dikenai perbuatan. Kamar itu tidak sedang dikenai perbuatan oleh kucing."
+    },
+    {
+     "option": "へ",
+     "misconception": "direction particle used for a static location",
+     "misconceptionId": "partikel arah dipakai untuk letak yang diam",
+     "whyFails": "E points toward a destination of movement. Nothing is travelling in this sentence.",
+     "whyFailsId": "へ menunjuk arah tujuan perpindahan. Tidak ada yang berpindah dalam kalimat ini."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "NI marks the place where the cat exists, which is what IMASU expresses.",
+    "whyCorrectId": "に menandai tempat kucing itu berada, dan itulah yang dinyatakan います.",
+    "rule": "With ARIMASU and IMASU, the place is always marked with NI.",
+    "ruleId": "Dengan あります dan います, tempatnya selalu ditandai に.",
+    "whyOthersFail": "DE belongs to action verbs; O marks an object; E marks a destination.",
+    "whyOthersFailId": "で milik kata kerja perbuatan; を menandai objek; へ menandai tujuan.",
+    "howToAvoid": "Look at the verb first. If it is ARIMASU or IMASU, write NI without hesitating.",
+    "howToAvoidId": "Lihat kata kerjanya dulu. Kalau あります atau います, tulis に tanpa ragu.",
+    "memoryCue": "Exist here = NI here.",
+    "memoryCueId": "Ada di sini = に di sini."
+   }
+  },
+  {
+   "id": "JP-EX-106",
+   "family": "existence_location",
+   "skill": "existence_location",
+   "subskill": "de_marks_place_of_action",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "de-marks-place-of-action-study",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Use DE, not NI, when the place is where an action is performed",
+   "pedagogicalObjectiveId": "Pakai で, bukan に, saat tempatnya adalah lokasi berlangsungnya suatu perbuatan",
+   "misconceptionTargeted": "Learner overgeneralises NI from existence sentences to every place word",
+   "misconceptionTargetedId": "Murid menggeneralisasi に dari kalimat keberadaan ke semua kata tempat",
+   "reasoningOperation": "the verb is an action (to study) -> the place takes DE",
+   "reasoningOperationId": "kata kerjanya perbuatan (belajar) -> tempatnya memakai で",
+   "stem": "としょかん___ にほんごを べんきょうします。",
+   "stemKana": "としょかん___ にほんごを べんきょうします。",
+   "furigana": [],
+   "options": [
+    "で",
+    "に",
+    "が",
+    "は"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "に",
+     "misconception": "existence particle carried over to an action verb",
+     "misconceptionId": "partikel keberadaan dibawa ke kata kerja perbuatan",
+     "whyFails": "NI marks where something simply is. Studying is something you do, so the library takes DE.",
+     "whyFailsId": "に menandai tempat sesuatu sekadar berada. Belajar adalah perbuatan, jadi perpustakaan memakai で."
+    },
+    {
+     "option": "が",
+     "misconception": "subject marker attached to the place of an action",
+     "misconceptionId": "penanda subjek ditempel ke tempat berlangsungnya perbuatan",
+     "whyFails": "GA would make the library the doer, but a building cannot study Japanese.",
+     "whyFailsId": "が akan menjadikan perpustakaan pelakunya, padahal gedung tidak bisa belajar bahasa Jepang."
+    },
+    {
+     "option": "は",
+     "misconception": "topic marker used where a place particle is needed",
+     "misconceptionId": "penanda topik dipakai padahal yang dibutuhkan partikel tempat",
+     "whyFails": "WA raises the library as the topic and drops the information that the studying happens inside it.",
+     "whyFailsId": "は mengangkat perpustakaan sebagai topik dan menghilangkan keterangan bahwa belajarnya terjadi di dalamnya."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "Studying is an action, and the place where an action happens is marked with DE.",
+    "whyCorrectId": "Belajar adalah perbuatan, dan tempat berlangsungnya perbuatan ditandai dengan で.",
+    "rule": "NI = where something exists. DE = where something is done.",
+    "ruleId": "に = tempat sesuatu berada. で = tempat sesuatu dilakukan.",
+    "whyOthersFail": "NI treats the sentence as an existence sentence; GA makes the building the doer; WA hides the location role.",
+    "whyOthersFailId": "に memperlakukan kalimat ini sebagai kalimat keberadaan; が menjadikan gedung pelakunya; は menyembunyikan peran tempat.",
+    "howToAvoid": "Test the verb: can you do it? Then the place is DE.",
+    "howToAvoidId": "Uji kata kerjanya: bisakah dilakukan? Kalau ya, tempatnya memakai で.",
+    "memoryCue": "Doing happens at DE.",
+    "memoryCueId": "Yang dikerjakan terjadi di で."
+   }
+  },
+  {
+   "id": "JP-EX-107",
+   "family": "existence_location",
+   "skill": "existence_location",
+   "subskill": "ni_versus_de_with_arimasu",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "ni-not-de-with-arimasu-bag",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Keep NI with ARIMASU even when the place feels like a busy everyday scene",
+   "pedagogicalObjectiveId": "Tetap pakai に dengan あります meski tempatnya terasa seperti lokasi kegiatan sehari-hari",
+   "misconceptionTargeted": "Learner chooses the particle from the noun's atmosphere instead of from the verb",
+   "misconceptionTargetedId": "Murid memilih partikel dari suasana kata bendanya, bukan dari kata kerjanya",
+   "reasoningOperation": "the verb is ARIMASU -> ignore the scene -> the place takes NI",
+   "reasoningOperationId": "kata kerjanya あります -> abaikan suasananya -> tempatnya memakai に",
+   "stem": "きょうしつ___ 大きい とけいが あります。",
+   "stemKana": "きょうしつ___ おおきい とけいが あります。",
+   "furigana": [
+    [
+     "大",
+     "おお"
+    ]
+   ],
+   "options": [
+    "に",
+    "で",
+    "へ",
+    "と"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "で",
+     "misconception": "classroom read as a place of activity, so the action particle is chosen",
+     "misconceptionId": "kelas dibaca sebagai tempat kegiatan, sehingga partikel perbuatan yang dipilih",
+     "whyFails": "A classroom is full of activity, but this sentence performs no action. ARIMASU only reports that the clock is there, so NI is required.",
+     "whyFailsId": "Kelas memang penuh kegiatan, tetapi kalimat ini tidak melakukan perbuatan apa pun. あります hanya melaporkan bahwa jamnya ada di situ, jadi に yang dibutuhkan."
+    },
+    {
+     "option": "へ",
+     "misconception": "movement particle used in a sentence with no movement",
+     "misconceptionId": "partikel perpindahan dipakai di kalimat tanpa perpindahan",
+     "whyFails": "E marks where someone heads. The clock is hanging still.",
+     "whyFailsId": "へ menandai arah tujuan seseorang. Jam itu tergantung diam."
+    },
+    {
+     "option": "と",
+     "misconception": "'with' used to mark a location",
+     "misconceptionId": "'bersama' dipakai untuk menandai tempat",
+     "whyFails": "TO joins companions or items. It cannot mark the place where something exists.",
+     "whyFailsId": "と menggabungkan teman atau benda. Ia tidak bisa menandai tempat keberadaan sesuatu."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "The verb is ARIMASU, so the classroom is the place of existence and takes NI.",
+    "whyCorrectId": "Kata kerjanya あります, jadi kelas adalah tempat keberadaan dan memakai に.",
+    "rule": "The particle follows the verb, never the mood of the place noun.",
+    "ruleId": "Partikel mengikuti kata kerjanya, bukan kesan dari kata benda tempatnya.",
+    "whyOthersFail": "DE would demand an action verb; E would demand movement; TO would make the classroom a companion.",
+    "whyOthersFailId": "で menuntut kata kerja perbuatan; へ menuntut perpindahan; と menjadikan kelas sebagai pendamping.",
+    "howToAvoid": "Read to the end of the sentence before picking the particle.",
+    "howToAvoidId": "Baca sampai akhir kalimat sebelum memilih partikel.",
+    "memoryCue": "ARIMASU pulls NI, always.",
+    "memoryCueId": "あります selalu menarik に."
+   }
+  },
+  {
+   "id": "JP-EX-108",
+   "family": "existence_location",
+   "skill": "existence_location",
+   "subskill": "position_noun_ue",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "position-noun-ue-on-top-of-desk",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Use UE to say that something rests on the upper surface of another thing",
+   "pedagogicalObjectiveId": "Pakai うえ untuk mengatakan sesuatu berada di permukaan atas benda lain",
+   "misconceptionTargeted": "Learner confuses UE with NAKA because both are translated loosely as 'in the desk area'",
+   "misconceptionTargetedId": "Murid mencampur うえ dengan なか karena keduanya diterjemahkan longgar sebagai 'di meja'",
+   "reasoningOperation": "the pen rests on the visible surface -> UE",
+   "reasoningOperationId": "pulpennya ada di permukaan yang terlihat -> うえ",
+   "stem": "ペンは つくえの ___に あります。",
+   "stemKana": "ペンは つくえの ___に あります。",
+   "furigana": [],
+   "options": [
+    "うえ",
+    "なか",
+    "した",
+    "うしろ"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "なか",
+     "misconception": "surface confused with interior space",
+     "misconceptionId": "permukaan tertukar dengan ruang di dalam",
+     "whyFails": "NAKA means inside an enclosed space, such as a drawer. A pen lying visibly on top is not enclosed.",
+     "whyFailsId": "なか berarti di dalam ruang tertutup, misalnya laci. Pulpen yang tergeletak terlihat di atas tidak berada di dalam apa pun."
+    },
+    {
+     "option": "した",
+     "misconception": "the opposite vertical direction chosen",
+     "misconceptionId": "arah vertikal yang berlawanan yang dipilih",
+     "whyFails": "SHITA places the pen underneath the desk, on the floor side, which is the reverse of resting on it.",
+     "whyFailsId": "した menempatkan pulpen di bawah meja, di sisi lantai, kebalikan dari tergeletak di atasnya."
+    },
+    {
+     "option": "うしろ",
+     "misconception": "a front-back word used for an up-down relation",
+     "misconceptionId": "kata depan-belakang dipakai untuk hubungan atas-bawah",
+     "whyFails": "USHIRO describes what is behind something, an idea that needs a front. It says nothing about the top surface.",
+     "whyFailsId": "うしろ menggambarkan apa yang di belakang sesuatu, gagasan yang menuntut adanya sisi depan. Ia tidak berbicara tentang permukaan atas."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "The pen lies on the top surface of the desk, which UE names.",
+    "whyCorrectId": "Pulpen itu tergeletak di permukaan atas meja, dan itulah yang disebut うえ.",
+    "rule": "Position nouns follow the pattern NOUN + NO + POSITION + NI.",
+    "ruleId": "Kata posisi mengikuti pola KATA BENDA + の + POSISI + に.",
+    "whyOthersFail": "NAKA encloses it, SHITA flips it downward, USHIRO switches to front-and-back.",
+    "whyOthersFailId": "なか mengurungnya, した membaliknya ke bawah, うしろ berpindah ke depan-belakang.",
+    "howToAvoid": "Picture the object and ask which side of the desk you would touch to reach it.",
+    "howToAvoidId": "Bayangkan bendanya dan tanyakan sisi meja mana yang kau sentuh untuk meraihnya.",
+    "memoryCue": "Touchable from above: UE.",
+    "memoryCueId": "Terjangkau dari atas: うえ."
+   }
+  },
+  {
+   "id": "JP-EX-109",
+   "family": "existence_location",
+   "skill": "existence_location",
+   "subskill": "position_noun_shita",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "position-noun-shita-under-bed",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Use SHITA for the space directly below another object",
+   "pedagogicalObjectiveId": "Pakai した untuk ruang tepat di bawah benda lain",
+   "misconceptionTargeted": "Learner reaches for NAKA whenever an object is hidden from sight",
+   "misconceptionTargetedId": "Murid langsung memilih なか setiap kali benda tersembunyi dari pandangan",
+   "reasoningOperation": "the ball is below the bed, not enclosed by it -> SHITA",
+   "reasoningOperationId": "bolanya di bawah ranjang, bukan terkurung di dalamnya -> した",
+   "stem": "ボールは ベッドの ___に あります。",
+   "stemKana": "ボールは ベッドの ___に あります。",
+   "furigana": [],
+   "options": [
+    "した",
+    "なか",
+    "うえ",
+    "となり"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "なか",
+     "misconception": "hidden from view mistaken for enclosed inside",
+     "misconceptionId": "tersembunyi dari pandangan dikira terkurung di dalam",
+     "whyFails": "NAKA needs walls around the object. A bed has a gap underneath, not an interior that holds a ball.",
+     "whyFailsId": "なか menuntut ada dinding yang mengelilingi bendanya. Ranjang punya celah di bawahnya, bukan ruang dalam yang menampung bola."
+    },
+    {
+     "option": "うえ",
+     "misconception": "the opposite vertical direction chosen",
+     "misconceptionId": "arah vertikal yang berlawanan yang dipilih",
+     "whyFails": "UE would put the ball on the mattress where anyone could see it.",
+     "whyFailsId": "うえ akan menaruh bola di atas kasur di mana siapa pun bisa melihatnya."
+    },
+    {
+     "option": "となり",
+     "misconception": "a side-by-side word used for a vertical relation",
+     "misconceptionId": "kata sebelah-menyebelah dipakai untuk hubungan atas-bawah",
+     "whyFails": "TONARI means beside, on the same level. It cannot express being underneath.",
+     "whyFailsId": "となり berarti di samping, pada tinggi yang sama. Ia tidak bisa menyatakan berada di bawah."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "The ball sits in the space under the bed, and SHITA names exactly that space.",
+    "whyCorrectId": "Bola itu berada di ruang bawah ranjang, dan した persis menyebut ruang itu.",
+    "rule": "SHITA = directly below; NAKA = inside something with walls.",
+    "ruleId": "した = tepat di bawah; なか = di dalam sesuatu yang berdinding.",
+    "whyOthersFail": "NAKA claims an enclosure, UE flips it upward, TONARI moves it sideways.",
+    "whyOthersFailId": "なか mengklaim ada ruang tertutup, うえ membaliknya ke atas, となり menggesernya ke samping.",
+    "howToAvoid": "Ask whether the object is surrounded or merely covered. Covered means SHITA.",
+    "howToAvoidId": "Tanyakan apakah bendanya dikelilingi atau sekadar tertutupi. Tertutupi berarti した.",
+    "memoryCue": "Below, not within: SHITA.",
+    "memoryCueId": "Di bawah, bukan di dalam: した."
+   }
+  },
+  {
+   "id": "JP-EX-110",
+   "family": "existence_location",
+   "skill": "existence_location",
+   "subskill": "position_noun_naka",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "position-noun-naka-inside-box",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Use NAKA for the inside of a container",
+   "pedagogicalObjectiveId": "Pakai なか untuk bagian dalam sebuah wadah",
+   "misconceptionTargeted": "Learner picks UE because the object was placed into the box from above",
+   "misconceptionTargetedId": "Murid memilih うえ karena bendanya dimasukkan ke kotak dari atas",
+   "reasoningOperation": "the box closes around the sweets -> NAKA",
+   "reasoningOperationId": "kotaknya mengurung permennya -> なか",
+   "stem": "はこの ___に おかしが あります。",
+   "stemKana": "はこの ___に おかしが あります。",
+   "furigana": [],
+   "options": [
+    "なか",
+    "うえ",
+    "まえ",
+    "した"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "うえ",
+     "misconception": "the direction of putting mistaken for the resulting position",
+     "misconceptionId": "arah memasukkan tertukar dengan posisi akhirnya",
+     "whyFails": "You lower the sweets from above, but they end up surrounded by the box, so the position is NAKA.",
+     "whyFailsId": "Permennya diturunkan dari atas, tetapi akhirnya dikelilingi kotak, jadi posisinya なか."
+    },
+    {
+     "option": "まえ",
+     "misconception": "a front-back word used for an inside relation",
+     "misconceptionId": "kata depan-belakang dipakai untuk hubungan bagian dalam",
+     "whyFails": "MAE places the sweets outside the box, in front of it, where anyone could take them.",
+     "whyFailsId": "まえ menempatkan permennya di luar kotak, di depannya, tempat siapa pun bisa mengambilnya."
+    },
+    {
+     "option": "した",
+     "misconception": "underneath chosen instead of inside",
+     "misconceptionId": "bawah dipilih alih-alih dalam",
+     "whyFails": "SHITA would mean the sweets are on the floor beneath the box, not held by it.",
+     "whyFailsId": "した berarti permennya ada di lantai di bawah kotak, bukan tertampung olehnya."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "The box surrounds the sweets on every side, which is what NAKA describes.",
+    "whyCorrectId": "Kotak itu mengelilingi permennya dari segala sisi, dan itulah yang digambarkan なか.",
+    "rule": "NAKA is chosen by the final position, not by the direction of the movement.",
+    "ruleId": "なか dipilih berdasarkan posisi akhirnya, bukan arah gerakannya.",
+    "whyOthersFail": "UE follows the hand instead of the result; MAE and SHITA move the sweets outside the box.",
+    "whyOthersFailId": "うえ mengikuti gerak tangan alih-alih hasilnya; まえ dan した memindahkan permennya ke luar kotak.",
+    "howToAvoid": "Ask where the object ends up, not how it got there.",
+    "howToAvoidId": "Tanyakan di mana bendanya berakhir, bukan bagaimana ia sampai ke situ.",
+    "memoryCue": "Walls all around: NAKA.",
+    "memoryCueId": "Dikelilingi dinding: なか."
+   }
+  },
+  {
+   "id": "JP-EX-111",
+   "family": "existence_location",
+   "skill": "existence_location",
+   "subskill": "position_noun_mae",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "position-noun-mae-in-front-of-station",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Use MAE for the area in front of a building",
+   "pedagogicalObjectiveId": "Pakai まえ untuk area di depan sebuah bangunan",
+   "misconceptionTargeted": "Learner picks NAKA because a bus stop feels like part of the station complex",
+   "misconceptionTargetedId": "Murid memilih なか karena halte terasa bagian dari kompleks stasiun",
+   "reasoningOperation": "the bus stop is outside, on the entrance side -> MAE",
+   "reasoningOperationId": "haltenya di luar, di sisi pintu masuk -> まえ",
+   "stem": "えきの ___に バスていが あります。",
+   "stemKana": "えきの ___に バスていが あります。",
+   "furigana": [],
+   "options": [
+    "まえ",
+    "なか",
+    "うえ",
+    "した"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "なか",
+     "misconception": "belonging to a place mistaken for being inside its building",
+     "misconceptionId": "termasuk satu kawasan dikira berada di dalam gedungnya",
+     "whyFails": "NAKA puts the bus stop inside the station hall. A bus stop stands out on the street by the entrance.",
+     "whyFailsId": "なか menaruh haltenya di dalam ruang stasiun. Halte berdiri di jalan dekat pintu masuk."
+    },
+    {
+     "option": "うえ",
+     "misconception": "an up-down word used for a front-back relation",
+     "misconceptionId": "kata atas-bawah dipakai untuk hubungan depan-belakang",
+     "whyFails": "UE would balance the bus stop on the station roof.",
+     "whyFailsId": "うえ akan menaruh halte itu di atas atap stasiun."
+    },
+    {
+     "option": "した",
+     "misconception": "underneath chosen for something standing at ground level",
+     "misconceptionId": "bawah dipilih untuk sesuatu yang berdiri di permukaan tanah",
+     "whyFails": "SHITA suggests the bus stop is beneath the station structure, which is not what the sentence means.",
+     "whyFailsId": "した mengesankan halte berada di bawah bangunan stasiun, padahal bukan itu maksud kalimatnya."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "The bus stop stands on the entrance side of the station, and MAE names that side.",
+    "whyCorrectId": "Halte itu berdiri di sisi pintu masuk stasiun, dan まえ menyebut sisi itu.",
+    "rule": "MAE = the front side, the side you face when you approach.",
+    "ruleId": "まえ = sisi depan, sisi yang kau hadapi saat mendekat.",
+    "whyOthersFail": "NAKA moves it indoors; UE lifts it onto the roof; SHITA buries it below.",
+    "whyOthersFailId": "なか memindahkannya ke dalam; うえ mengangkatnya ke atap; した menaruhnya di bawah.",
+    "howToAvoid": "Ask where you would be standing to see the entrance in front of you.",
+    "howToAvoidId": "Tanyakan di mana kau berdiri agar pintu masuk berada di depanmu.",
+    "memoryCue": "Facing the door: MAE.",
+    "memoryCueId": "Menghadap pintu: まえ."
+   }
+  },
+  {
+   "id": "JP-EX-112",
+   "family": "existence_location",
+   "skill": "existence_location",
+   "subskill": "position_noun_ushiro",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "position-noun-ushiro-behind-house",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Use USHIRO for the area behind a building",
+   "pedagogicalObjectiveId": "Pakai うしろ untuk area di belakang sebuah bangunan",
+   "misconceptionTargeted": "Learner picks MAE because the front is the only side that has been named in class",
+   "misconceptionTargetedId": "Murid memilih まえ karena hanya sisi depan yang pernah dikenalkan di kelas",
+   "reasoningOperation": "the garden lies on the side away from the entrance -> USHIRO",
+   "reasoningOperationId": "kebunnya di sisi yang membelakangi pintu masuk -> うしろ",
+   "stem": "いえの ___に ちいさい にわが あります。",
+   "stemKana": "いえの ___に ちいさい にわが あります。",
+   "furigana": [],
+   "options": [
+    "うしろ",
+    "まえ",
+    "なか",
+    "となり"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "まえ",
+     "misconception": "the opposite side of the front-back pair chosen",
+     "misconceptionId": "sisi yang berlawanan dari pasangan depan-belakang yang dipilih",
+     "whyFails": "MAE is the entrance side. The sentence describes the garden on the far side of the house.",
+     "whyFailsId": "まえ adalah sisi pintu masuk. Kalimat ini menggambarkan kebun di sisi seberang rumah."
+    },
+    {
+     "option": "なか",
+     "misconception": "outdoor space treated as an interior room",
+     "misconceptionId": "ruang terbuka diperlakukan sebagai ruangan dalam",
+     "whyFails": "NAKA would place the garden inside the house, among the rooms.",
+     "whyFailsId": "なか akan menempatkan kebun itu di dalam rumah, di antara ruangan-ruangan."
+    },
+    {
+     "option": "となり",
+     "misconception": "a neighbouring-property word used for a part of the same house",
+     "misconceptionId": "kata 'sebelah' dipakai untuk bagian dari rumah yang sama",
+     "whyFails": "TONARI means the next one along, a separate neighbour, not the back of this same house.",
+     "whyFailsId": "となり berarti yang di sebelah, tetangga terpisah, bukan bagian belakang rumah yang sama."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "The garden is on the side of the house opposite the entrance, which USHIRO names.",
+    "whyCorrectId": "Kebun itu berada di sisi rumah yang berseberangan dengan pintu masuk, dan うしろ menyebut sisi itu.",
+    "rule": "MAE and USHIRO are a pair: front and back of the same object.",
+    "ruleId": "まえ dan うしろ adalah sepasang: depan dan belakang benda yang sama.",
+    "whyOthersFail": "MAE reverses the side; NAKA moves the garden indoors; TONARI makes it a separate property.",
+    "whyOthersFailId": "まえ membalik sisinya; なか memindahkan kebun ke dalam rumah; となり menjadikannya properti terpisah.",
+    "howToAvoid": "Fix the front of the object first; the back is whatever it turns away from you.",
+    "howToAvoidId": "Tetapkan dulu bagian depan bendanya; belakangnya adalah sisi yang membelakangimu.",
+    "memoryCue": "Behind the door side: USHIRO.",
+    "memoryCueId": "Di balik sisi pintu: うしろ."
+   }
+  },
+  {
+   "id": "JP-EX-113",
+   "family": "existence_location",
+   "skill": "existence_location",
+   "subskill": "position_noun_tonari",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "position-noun-tonari-next-to-bank",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Use TONARI for the building immediately beside another of the same kind",
+   "pedagogicalObjectiveId": "Pakai となり untuk bangunan yang persis bersebelahan dengan bangunan sejenis",
+   "misconceptionTargeted": "Learner uses NAKA or MAE because any nearby place feels close enough",
+   "misconceptionTargetedId": "Murid memakai なか atau まえ karena semua tempat yang dekat terasa cukup dekat",
+   "reasoningOperation": "two buildings stand side by side on the same street -> TONARI",
+   "reasoningOperationId": "dua bangunan berdiri bersebelahan di jalan yang sama -> となり",
+   "stem": "ぎんこうの ___に ゆうびんきょくが あります。",
+   "stemKana": "ぎんこうの ___に ゆうびんきょくが あります。",
+   "furigana": [],
+   "options": [
+    "となり",
+    "なか",
+    "うえ",
+    "した"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "なか",
+     "misconception": "two separate buildings collapsed into one interior",
+     "misconceptionId": "dua bangunan terpisah disatukan menjadi satu ruang dalam",
+     "whyFails": "NAKA would put the post office inside the bank building, as if it were a counter there.",
+     "whyFailsId": "なか akan menempatkan kantor pos di dalam gedung bank, seolah ia hanya loket di sana."
+    },
+    {
+     "option": "うえ",
+     "misconception": "a vertical word used for two buildings on the same ground",
+     "misconceptionId": "kata vertikal dipakai untuk dua bangunan di tanah yang sama",
+     "whyFails": "UE stacks the post office on the bank's roof.",
+     "whyFailsId": "うえ menumpuk kantor pos di atap bank."
+    },
+    {
+     "option": "した",
+     "misconception": "below chosen for a building standing on the street",
+     "misconceptionId": "bawah dipilih untuk bangunan yang berdiri di tepi jalan",
+     "whyFails": "SHITA places the post office underneath the bank, in a basement position.",
+     "whyFailsId": "した menempatkan kantor pos di bawah bank, seperti di lantai basemen."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "The post office stands directly beside the bank, and TONARI names that neighbouring position.",
+    "whyCorrectId": "Kantor pos berdiri persis di samping bank, dan となり menyebut posisi bersebelahan itu.",
+    "rule": "TONARI is used for two things of the same kind standing next to each other.",
+    "ruleId": "となり dipakai untuk dua hal sejenis yang berdiri berdampingan.",
+    "whyOthersFail": "NAKA merges the two buildings; UE and SHITA stack them vertically.",
+    "whyOthersFailId": "なか meleburkan kedua bangunan; うえ dan した menumpuknya secara vertikal.",
+    "howToAvoid": "Check that the two things are the same kind and on the same level.",
+    "howToAvoidId": "Pastikan kedua hal itu sejenis dan berada pada tingkat yang sama.",
+    "memoryCue": "Shoulder to shoulder: TONARI.",
+    "memoryCueId": "Bahu-membahu: となり."
+   }
+  },
+  {
+   "id": "JP-EX-114",
+   "family": "existence_location",
+   "skill": "existence_location",
+   "subskill": "no_links_noun_and_position_word",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "no-links-noun-to-position-word",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Insert NO between the reference noun and the position word",
+   "pedagogicalObjectiveId": "Sisipkan の di antara kata benda acuan dan kata posisi",
+   "misconceptionTargeted": "Learner omits NO or replaces it with NI, treating the position word as a standalone place",
+   "misconceptionTargetedId": "Murid menghilangkan の atau menggantinya dengan に, menganggap kata posisi berdiri sendiri",
+   "reasoningOperation": "UE needs a reference point -> link it to the noun with NO",
+   "reasoningOperationId": "うえ butuh titik acuan -> hubungkan ke kata bendanya dengan の",
+   "stem": "ねこは テレビ___ うえに います。",
+   "stemKana": "ねこは テレビ___ うえに います。",
+   "furigana": [],
+   "options": [
+    "の",
+    "に",
+    "で",
+    "を"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "に",
+     "misconception": "the location particle repeated where the linking particle belongs",
+     "misconceptionId": "partikel tempat diulang di posisi yang seharusnya partikel penghubung",
+     "whyFails": "NI already appears after UE to mark the place. Between the noun and the position word, the link is possessive NO.",
+     "whyFailsId": "に sudah muncul setelah うえ untuk menandai tempatnya. Di antara kata benda dan kata posisi, penghubungnya adalah の."
+    },
+    {
+     "option": "で",
+     "misconception": "action particle inserted inside a noun phrase",
+     "misconceptionId": "partikel perbuatan disisipkan ke dalam frasa kata benda",
+     "whyFails": "DE marks where an action happens and cannot join two nouns into one phrase.",
+     "whyFailsId": "で menandai tempat perbuatan dan tidak bisa menyatukan dua kata benda menjadi satu frasa."
+    },
+    {
+     "option": "を",
+     "misconception": "object marker used to connect two nouns",
+     "misconceptionId": "penanda objek dipakai menghubungkan dua kata benda",
+     "whyFails": "O marks what receives an action. The television is not being acted on here.",
+     "whyFailsId": "を menandai yang dikenai perbuatan. Televisinya tidak sedang dikenai apa pun di sini."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "UE is itself a noun meaning 'the top', so it attaches to TEREBI with NO, giving 'the top of the television'.",
+    "whyCorrectId": "うえ sendiri adalah kata benda yang berarti 'bagian atas', jadi ia menempel ke テレビ dengan の, menghasilkan 'bagian atas televisi'.",
+    "rule": "Pattern: NOUN + NO + POSITION WORD + NI + ARIMASU/IMASU.",
+    "ruleId": "Pola: KATA BENDA + の + KATA POSISI + に + あります/います.",
+    "whyOthersFail": "NI duplicates a particle that already follows UE; DE and O belong to verbs, not to noun phrases.",
+    "whyOthersFailId": "に menggandakan partikel yang sudah mengikuti うえ; で dan を milik kata kerja, bukan frasa kata benda.",
+    "howToAvoid": "Read the position word as a noun and the missing particle becomes obvious.",
+    "howToAvoidId": "Bacalah kata posisi sebagai kata benda, maka partikel yang hilang jadi jelas.",
+    "memoryCue": "Two nouns holding hands: NO.",
+    "memoryCueId": "Dua kata benda bergandengan: の."
+   }
+  },
+  {
+   "id": "JP-EX-115",
+   "family": "existence_location",
+   "skill": "existence_location",
+   "subskill": "ga_with_question_word_in_existence",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "ga-with-question-word-in-existence",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Use GA for the unknown thing asked about with NANI in an existence question",
+   "pedagogicalObjectiveId": "Pakai が untuk hal tak diketahui yang ditanyakan dengan なに dalam kalimat keberadaan",
+   "misconceptionTargeted": "Learner marks the question word with WA because WA feels like the standard subject particle",
+   "misconceptionTargetedId": "Murid menandai kata tanya dengan は karena は terasa seperti penanda subjek baku",
+   "reasoningOperation": "NANI is unknown information -> unknown information takes GA",
+   "reasoningOperationId": "なに adalah informasi yang belum diketahui -> informasi baru memakai が",
+   "stem": "かばんの なかに なに___ ありますか。",
+   "stemKana": "かばんの なかに なに___ ありますか。",
+   "furigana": [],
+   "options": [
+    "が",
+    "は",
+    "を",
+    "も"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "は",
+     "misconception": "topic marker attached to a question word",
+     "misconceptionId": "penanda topik ditempel ke kata tanya",
+     "whyFails": "WA presents something as already shared, but a question word is by definition the part nobody has yet named.",
+     "whyFailsId": "は menyajikan sesuatu sebagai hal yang sudah sama-sama diketahui, padahal kata tanya justru bagian yang belum disebut siapa pun."
+    },
+    {
+     "option": "を",
+     "misconception": "object marker used with an existence verb",
+     "misconceptionId": "penanda objek dipakai dengan kata kerja keberadaan",
+     "whyFails": "ARIMASU takes no object. Nothing is being done to the contents of the bag.",
+     "whyFailsId": "あります tidak berobjek. Tidak ada yang sedang dilakukan terhadap isi tas itu."
+    },
+    {
+     "option": "も",
+     "misconception": "'also' used in a first question",
+     "misconceptionId": "'juga' dipakai di pertanyaan pertama",
+     "whyFails": "MO needs something mentioned before it. This is the opening question of the exchange.",
+     "whyFailsId": "も menuntut ada yang sudah disebut sebelumnya. Ini pertanyaan pembuka percakapan."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "NANI asks for information the speaker does not have, and such information is marked with GA.",
+    "whyCorrectId": "なに menanyakan informasi yang belum dimiliki penanya, dan informasi semacam itu ditandai が.",
+    "rule": "Question words in existence sentences always take GA, never WA.",
+    "ruleId": "Kata tanya dalam kalimat keberadaan selalu memakai が, tidak pernah は.",
+    "whyOthersFail": "WA claims the item is already known; O supplies an object ARIMASU cannot take; MO invents an earlier mention.",
+    "whyOthersFailId": "は mengklaim bendanya sudah diketahui; を memberi objek yang tak bisa diterima あります; も mengarang sebutan sebelumnya.",
+    "howToAvoid": "Whenever you see NANI, DARE or DOKO as the gap, reach for GA.",
+    "howToAvoidId": "Setiap kali なに, だれ atau どこ yang jadi rumpangnya, ambil が.",
+    "memoryCue": "Unknown answers wear GA.",
+    "memoryCueId": "Jawaban yang belum diketahui memakai が."
+   }
+  },
+  {
+   "id": "JP-EX-116",
+   "family": "existence_location",
+   "skill": "existence_location",
+   "subskill": "wa_marks_known_topic_in_existence",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "wa-topic-first-existence-teacher",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Use WA when the person is already known and only the location is new",
+   "pedagogicalObjectiveId": "Pakai は saat orangnya sudah diketahui dan hanya letaknya yang baru",
+   "misconceptionTargeted": "Learner uses GA for every subject of IMASU, even one just mentioned by the other speaker",
+   "misconceptionTargetedId": "Murid memakai が untuk semua subjek います, bahkan yang baru saja disebut lawan bicara",
+   "reasoningOperation": "the teacher was named in the question -> she is the known topic -> WA",
+   "reasoningOperationId": "gurunya sudah disebut di pertanyaan -> ia topik yang diketahui -> は",
+   "stem": "「やまだ先生は どこに いますか。」「やまだ先生___ きょうしつに います。」",
+   "stemKana": "「やまだせんせいは どこに いますか。」「やまだせんせい___ きょうしつに います。」",
+   "furigana": [
+    [
+     "先生",
+     "せんせい"
+    ]
+   ],
+   "options": [
+    "は",
+    "が",
+    "を",
+    "へ"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "が",
+     "misconception": "new-information marker used for a person already named",
+     "misconceptionId": "penanda informasi baru dipakai untuk orang yang sudah disebut",
+     "whyFails": "GA presents the noun as news. The other speaker has just said the teacher's name, so she is known; the new part is the classroom.",
+     "whyFailsId": "が menyajikan kata bendanya sebagai kabar baru. Lawan bicara baru saja menyebut nama gurunya, jadi ia sudah diketahui; yang baru justru kelasnya."
+    },
+    {
+     "option": "を",
+     "misconception": "object marker attached to a person who exists somewhere",
+     "misconceptionId": "penanda objek ditempel ke orang yang berada di suatu tempat",
+     "whyFails": "IMASU has no object. The teacher is not receiving any action.",
+     "whyFailsId": "います tidak berobjek. Gurunya tidak sedang dikenai perbuatan apa pun."
+    },
+    {
+     "option": "へ",
+     "misconception": "direction particle used for a person who is standing still",
+     "misconceptionId": "partikel arah dipakai untuk orang yang sedang diam",
+     "whyFails": "E marks a destination of movement, but the answer says where she already is.",
+     "whyFailsId": "へ menandai tujuan perpindahan, padahal jawaban ini menyatakan di mana ia sudah berada."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "The teacher is the shared topic carried over from the question, so she takes WA and the new information is the place.",
+    "whyCorrectId": "Gurunya adalah topik bersama yang dibawa dari pertanyaan, jadi ia memakai は dan informasi barunya adalah tempatnya.",
+    "rule": "Known noun + WA; the new information sits elsewhere in the sentence.",
+    "ruleId": "Kata benda yang sudah diketahui + は; informasi barunya ada di bagian lain kalimat.",
+    "whyOthersFail": "GA would re-announce a known person; O gives IMASU an impossible object; E adds movement.",
+    "whyOthersFailId": "が akan mengumumkan ulang orang yang sudah dikenal; を memberi います objek yang mustahil; へ menambahkan perpindahan.",
+    "howToAvoid": "Ask which part of the answer the listener did not already have. That part is not the WA.",
+    "howToAvoidId": "Tanyakan bagian mana dari jawaban yang belum dimiliki lawan bicara. Bagian itu bukan yang memakai は.",
+    "memoryCue": "Old news takes WA.",
+    "memoryCueId": "Kabar lama memakai は."
+   }
+  },
+  {
+   "id": "JP-EX-117",
+   "family": "existence_location",
+   "skill": "existence_location",
+   "subskill": "imasu_for_people",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "imasu-people-students-in-classroom",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Choose IMASU for people existing in a place",
+   "pedagogicalObjectiveId": "Pilih います untuk orang yang berada di suatu tempat",
+   "misconceptionTargeted": "Learner uses ARIMASU for a group because a crowd is thought of as one mass",
+   "misconceptionTargetedId": "Murid memakai あります untuk kelompok karena kerumunan dianggap satu kesatuan benda",
+   "reasoningOperation": "students are people -> people move on their own -> IMASU",
+   "reasoningOperationId": "murid adalah orang -> orang bergerak sendiri -> います",
+   "stem": "きょうしつに 学生が 五人 ___。",
+   "stemKana": "きょうしつに がくせいが ごにん ___。",
+   "furigana": [
+    [
+     "学生",
+     "がくせい"
+    ],
+    [
+     "五人",
+     "ごにん"
+    ]
+   ],
+   "options": [
+    "います",
+    "あります",
+    "します",
+    "もちます"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "あります",
+     "misconception": "a counted group treated as a quantity of objects",
+     "misconceptionId": "kelompok yang dihitung diperlakukan sebagai sejumlah benda",
+     "whyFails": "Counting people does not turn them into things. Each student can walk out, so the verb stays IMASU.",
+     "whyFailsId": "Menghitung orang tidak mengubah mereka jadi benda. Setiap murid bisa berjalan keluar, jadi kata kerjanya tetap います."
+    },
+    {
+     "option": "します",
+     "misconception": "'to do' used where an existence verb is needed",
+     "misconceptionId": "'melakukan' dipakai padahal yang dibutuhkan kata kerja keberadaan",
+     "whyFails": "SHIMASU needs something to be done. The sentence only reports who is present.",
+     "whyFailsId": "します menuntut ada yang dikerjakan. Kalimat ini hanya melaporkan siapa yang hadir."
+    },
+    {
+     "option": "もちます",
+     "misconception": "'to hold' confused with 'to be there'",
+     "misconceptionId": "'memegang' dikira 'berada'",
+     "whyFails": "MOCHIMASU is about carrying something in the hand, not about being in a room.",
+     "whyFailsId": "もちます soal membawa sesuatu di tangan, bukan soal berada di suatu ruangan."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "Students are people, so their presence in the classroom is expressed with IMASU.",
+    "whyCorrectId": "Murid adalah orang, jadi keberadaan mereka di kelas dinyatakan dengan います.",
+    "rule": "People and animals take IMASU regardless of how many of them there are.",
+    "ruleId": "Orang dan hewan memakai います berapa pun jumlahnya.",
+    "whyOthersFail": "ARIMASU turns the class into objects; SHIMASU and MOCHIMASU are action verbs, not existence verbs.",
+    "whyOthersFailId": "あります mengubah kelasnya jadi benda; します dan もちます kata kerja perbuatan, bukan keberadaan.",
+    "howToAvoid": "Let the subject decide the verb, not the counter that follows it.",
+    "howToAvoidId": "Biarkan subjeknya yang menentukan kata kerjanya, bukan kata bantu bilangan di belakangnya.",
+    "memoryCue": "People stay people: IMASU.",
+    "memoryCueId": "Orang tetap orang: います."
+   }
+  },
+  {
+   "id": "JP-EX-118",
+   "family": "existence_location",
+   "skill": "existence_location",
+   "subskill": "imasu_for_animals_in_a_container",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "imasu-fish-inside-tank",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Keep IMASU for an animal even when it is enclosed inside a container",
+   "pedagogicalObjectiveId": "Tetap pakai います untuk hewan meski ia berada di dalam wadah",
+   "misconceptionTargeted": "Learner switches to ARIMASU because the container is an object and seems to set the pattern",
+   "misconceptionTargetedId": "Murid beralih ke あります karena wadahnya benda dan seolah menentukan polanya",
+   "reasoningOperation": "the subject is the fish, not the tank -> fish are animals -> IMASU",
+   "reasoningOperationId": "subjeknya ikan, bukan akuariumnya -> ikan adalah hewan -> います",
+   "stem": "すいそうの なかに さかなが ___。",
+   "stemKana": "すいそうの なかに さかなが ___。",
+   "furigana": [],
+   "options": [
+    "います",
+    "あります",
+    "おきます",
+    "いれます"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "あります",
+     "misconception": "the container's inanimacy transferred to its living contents",
+     "misconceptionId": "sifat tak bernyawa wadahnya dipindahkan ke isinya yang hidup",
+     "whyFails": "The verb agrees with the subject, and the subject is the fish. Fish swim by themselves, so IMASU is required.",
+     "whyFailsId": "Kata kerjanya menyesuaikan subjek, dan subjeknya adalah ikan. Ikan berenang sendiri, jadi います yang dibutuhkan."
+    },
+    {
+     "option": "おきます",
+     "misconception": "'to put' used where the sentence reports a state",
+     "misconceptionId": "'meletakkan' dipakai padahal kalimat melaporkan keadaan",
+     "whyFails": "OKIMASU introduces a person who placed something. This sentence just says the fish are there.",
+     "whyFailsId": "おきます memunculkan orang yang meletakkan sesuatu. Kalimat ini hanya menyatakan ikannya ada di situ."
+    },
+    {
+     "option": "いれます",
+     "misconception": "'to put in' substituted for 'to be inside'",
+     "misconceptionId": "'memasukkan' dipakai menggantikan 'berada di dalam'",
+     "whyFails": "IREMASU describes the act of putting the fish in, which happened before; the sentence describes the situation now.",
+     "whyFailsId": "いれます menggambarkan perbuatan memasukkan ikannya, yang terjadi sebelumnya; kalimat ini menggambarkan keadaan sekarang."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "The fish are the subject and they are animals, so their existence uses IMASU no matter what holds them.",
+    "whyCorrectId": "Ikan adalah subjeknya dan mereka hewan, jadi keberadaannya memakai います apa pun yang menampungnya.",
+    "rule": "Match the verb to the subject, never to the surrounding container.",
+    "ruleId": "Cocokkan kata kerjanya dengan subjeknya, bukan dengan wadah di sekelilingnya.",
+    "whyOthersFail": "ARIMASU copies the tank's nature; OKIMASU and IREMASU turn a state into somebody's action.",
+    "whyOthersFailId": "あります menyalin sifat akuariumnya; おきます dan いれます mengubah keadaan menjadi perbuatan seseorang.",
+    "howToAvoid": "Underline the word before GA; that word decides the verb.",
+    "howToAvoidId": "Garis bawahi kata sebelum が; kata itulah yang menentukan kata kerjanya.",
+    "memoryCue": "The swimmer decides: IMASU.",
+    "memoryCueId": "Yang berenang yang menentukan: います."
+   }
+  }
+ ]
+}

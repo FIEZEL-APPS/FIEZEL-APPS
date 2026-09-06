@@ -1,0 +1,1236 @@
+{
+ "schema": "fiezel-japanese-bank-v1",
+ "target": "ja",
+ "cefr": "A1",
+ "jlpt": "N5",
+ "family": "te_form",
+ "catatan": "Bank soal A1/N5 keluarga te_form. Dijaga tests/japanese-content-test.js.",
+ "provenans": {
+  "sumberSilabus": "Minna no Nihongo dan Irodori dipakai SEBAGAI SILABUS SAJA: poin tata bahasa apa, urutannya bagaimana, di tingkat berapa. NOL kalimat, dialog, teks, atau daftar kosakata yang direproduksi atau diturunkan — setiap stem, pilihan, pengecoh, dan penjelasan ditulis baru.",
+  "akibatLisensi": "Karena tidak ada teks Irodori yang dipakai, FIEZEL TIDAK terikat kewajiban gratis-selamanya dari lisensinya.",
+  "statusNaskah": "Kalimat Jepang dan penjelasan Inggris/Indonesia berstatus DRAFT AI dan wajib direview penutur asli sebelum dipakai menilai murid."
+ },
+ "jumlah": 20,
+ "templates": [
+  {
+   "subskill": "godan_u_tsu_ru_to_tte",
+   "marker": "godan-u-ending-becomes-tte",
+   "pedagogicalObjective": "Build the TE-form of a godan verb ending in U by replacing U with TTE",
+   "pedagogicalObjectiveId": "Membentuk bentuk て dari verba godan berakhiran う dengan mengganti う menjadi って",
+   "misconceptionTargeted": "Learner sorts U-verbs into the wrong sound group and picks NDE or ITE",
+   "misconceptionTargetedId": "Murid memasukkan verba berakhiran う ke kelompok bunyi yang salah lalu memilih んで atau いて",
+   "reasoningOperation": "read final syllable of dictionary form -> match it to its TE sound group -> attach the ending",
+   "reasoningOperationId": "baca suku kata terakhir bentuk kamus -> cocokkan ke kelompok bunyi て -> pasang akhirannya",
+   "stem": "まいあさ コーヒーを ___、かいしゃへ いきます。（かう）",
+   "stemKana": "まいあさ コーヒーを ___、かいしゃへ いきます。（かう）",
+   "furigana": [],
+   "options": [
+    "かって",
+    "かんで",
+    "かいて",
+    "かして"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "かんで",
+     "misconception": "applies the MU/BU/NU rule NDE to a verb whose final syllable is U",
+     "misconceptionId": "menerapkan aturan んで milik む/ぶ/ぬ pada verba yang berakhiran う",
+     "whyFails": "NDE belongs to verbs ending in MU, BU or NU. KAU ends in U, so its group ending is TTE.",
+     "whyFailsId": "んで milik verba berakhiran む, ぶ, atau ぬ. かう berakhiran う, jadi akhirannya って."
+    },
+    {
+     "option": "かいて",
+     "misconception": "applies the KU rule ITE to a verb that does not end in KU",
+     "misconceptionId": "menerapkan aturan いて milik く pada verba yang tidak berakhiran く",
+     "whyFails": "ITE is produced only by KU verbs such as KAKU. KAU has no K sound to soften.",
+     "whyFailsId": "いて hanya dihasilkan verba berakhiran く seperti かく. かう tidak punya bunyi k untuk diluluhkan."
+    },
+    {
+     "option": "かして",
+     "misconception": "applies the SU rule SHITE to a verb that does not end in SU",
+     "misconceptionId": "menerapkan aturan して milik す pada verba yang tidak berakhiran す",
+     "whyFails": "SHITE comes from SU verbs like HANASU. KAU ends in U and takes the small-TSU ending.",
+     "whyFailsId": "して berasal dari verba berakhiran す seperti はなす. かう berakhiran う dan memakai akhiran っ."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "KAU ends in U, and U, TSU and RU verbs all take the small TSU: KATTE.",
+    "whyCorrectId": "かう berakhiran う, dan verba う, つ, る sama-sama memakai っ kecil: かって.",
+    "rule": "Godan verbs ending in U, TSU or RU form TE as -TTE.",
+    "ruleId": "Verba godan berakhiran う, つ, atau る membentuk て menjadi -って.",
+    "whyOthersFail": "NDE is the MU/BU/NU ending, ITE the KU ending, SHITE the SU ending; none of those sounds appear here.",
+    "whyOthersFailId": "んで akhiran む/ぶ/ぬ, いて akhiran く, して akhiran す; tidak satu pun bunyi itu ada di sini.",
+    "howToAvoid": "Cover everything but the last syllable, name that syllable, then recall its group.",
+    "howToAvoidId": "Tutup semuanya kecuali suku kata terakhir, sebut suku kata itu, lalu ingat kelompoknya.",
+    "memoryCue": "U, TSU, RU knock together into a small TSU.",
+    "memoryCueId": "う, つ, る saling beradu menjadi っ kecil."
+   },
+   "id": "JP-TF-101",
+   "family": "te_form",
+   "skill": "te_form",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "questionType": "multiple_choice"
+  },
+  {
+   "subskill": "godan_tsu_to_tte",
+   "marker": "godan-tsu-ending-becomes-tte",
+   "pedagogicalObjective": "Build the TE-form of a godan verb ending in TSU",
+   "pedagogicalObjectiveId": "Membentuk bentuk て dari verba godan berakhiran つ",
+   "misconceptionTargeted": "Learner keeps the TSU syllable whole instead of shrinking it to a small TSU",
+   "misconceptionTargetedId": "Murid mempertahankan suku kata つ utuh alih-alih mengecilkannya menjadi っ",
+   "reasoningOperation": "identify TSU ending -> replace it with small TSU + TE",
+   "reasoningOperationId": "kenali akhiran つ -> ganti dengan っ + て",
+   "stem": "えきの まえで ちょっと ___ ください。（まつ）",
+   "stemKana": "えきの まえで ちょっと ___ ください。（まつ）",
+   "furigana": [],
+   "options": [
+    "まって",
+    "まちて",
+    "まつて",
+    "まんで"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "まちて",
+     "misconception": "glues TE onto the MASU-stem instead of applying the sound change",
+     "misconceptionId": "menempelkan て pada bentuk ます alih-alih menerapkan perubahan bunyi",
+     "whyFails": "MACHI is the MASU-stem. Godan verbs change sound before TE; they do not simply add TE to the stem.",
+     "whyFailsId": "まち adalah pangkal ます. Verba godan mengalami perubahan bunyi sebelum て, bukan sekadar menambah て."
+    },
+    {
+     "option": "まつて",
+     "misconception": "leaves the dictionary form untouched and appends TE",
+     "misconceptionId": "membiarkan bentuk kamus utuh lalu menambahkan て",
+     "whyFails": "The final TSU must shrink to a small TSU. MATSUTE keeps the full syllable, which never happens in TE-form.",
+     "whyFailsId": "つ terakhir harus mengecil menjadi っ. まつて mempertahankan suku kata penuh, dan itu tidak pernah terjadi di bentuk て."
+    },
+    {
+     "option": "まんで",
+     "misconception": "applies the MU/BU/NU rule NDE to a TSU verb",
+     "misconceptionId": "menerapkan aturan んで milik む/ぶ/ぬ pada verba つ",
+     "whyFails": "NDE belongs to MU, BU and NU verbs. TSU verbs join the small-TSU group.",
+     "whyFailsId": "んで milik verba む, ぶ, ぬ. Verba つ masuk kelompok っ."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "MATSU ends in TSU, so the TSU becomes a small TSU and TE follows: MATTE.",
+    "whyCorrectId": "まつ berakhiran つ, jadi つ berubah menjadi っ lalu diikuti て: まって.",
+    "rule": "TSU verbs, like U and RU verbs, form TE as -TTE.",
+    "ruleId": "Verba つ, sama seperti verba う dan る, membentuk て menjadi -って.",
+    "whyOthersFail": "MACHITE uses the MASU-stem, MATSUTE skips the sound change, MANDE uses another group’s ending.",
+    "whyOthersFailId": "まちて memakai pangkal ます, まつて melewatkan perubahan bunyi, まんで memakai akhiran kelompok lain.",
+    "howToAvoid": "If you can still hear the full TSU, you have not finished the change.",
+    "howToAvoidId": "Kalau つ penuh masih terdengar, perubahannya belum selesai.",
+    "memoryCue": "Big TSU shrinks to small TSU.",
+    "memoryCueId": "つ besar menyusut jadi っ kecil."
+   },
+   "id": "JP-TF-102",
+   "family": "te_form",
+   "skill": "te_form",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "questionType": "multiple_choice"
+  },
+  {
+   "subskill": "godan_ru_to_tte",
+   "marker": "godan-ru-not-ichidan-ru",
+   "pedagogicalObjective": "Treat a godan verb ending in RU as a TTE verb, not as an ichidan verb",
+   "pedagogicalObjectiveId": "Memperlakukan verba godan berakhiran る sebagai verba って, bukan sebagai verba ichidan",
+   "misconceptionTargeted": "Learner assumes every RU-final verb is ichidan and simply drops RU",
+   "misconceptionTargetedId": "Murid menganggap semua verba berakhiran る itu ichidan lalu tinggal membuang る",
+   "reasoningOperation": "check the vowel before RU -> A/U/O means godan -> apply the TTE rule",
+   "reasoningOperationId": "periksa vokal sebelum る -> a/u/o berarti godan -> terapkan aturan って",
+   "stem": "しゃしんを ___、ともだちに おくりました。（とる）",
+   "stemKana": "しゃしんを ___、ともだちに おくりました。（とる）",
+   "furigana": [],
+   "options": [
+    "とって",
+    "とて",
+    "とんで",
+    "といて"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "とて",
+     "misconception": "applies the ichidan rule (drop RU, add TE) to a godan RU verb",
+     "misconceptionId": "menerapkan aturan ichidan (buang る, tambah て) pada verba godan berakhiran る",
+     "whyFails": "Only ichidan verbs drop RU cleanly. TORU has O before RU, marking it godan, so it needs the small TSU.",
+     "whyFailsId": "Hanya verba ichidan yang membuang る begitu saja. とる punya vokal o sebelum る, tanda godan, jadi butuh っ."
+    },
+    {
+     "option": "とんで",
+     "misconception": "applies the MU/BU/NU rule NDE to a RU verb",
+     "misconceptionId": "menerapkan aturan んで milik む/ぶ/ぬ pada verba る",
+     "whyFails": "NDE is reserved for MU, BU and NU endings; TONDE is the TE-form of TOBU, a different verb.",
+     "whyFailsId": "んで hanya untuk akhiran む, ぶ, ぬ; とんで adalah bentuk て dari とぶ, verba yang berbeda."
+    },
+    {
+     "option": "といて",
+     "misconception": "applies the KU rule ITE to a RU verb",
+     "misconceptionId": "menerapkan aturan いて milik く pada verba る",
+     "whyFails": "ITE comes from KU verbs. TORU has no KU, so ITE cannot be produced.",
+     "whyFailsId": "いて berasal dari verba く. とる tidak punya く, jadi いて mustahil muncul."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "TORU is a godan verb, so its RU becomes a small TSU: TOTTE.",
+    "whyCorrectId": "とる verba godan, jadi る-nya menjadi っ: とって.",
+    "rule": "Godan RU verbs pattern with U and TSU verbs: -TTE. Ichidan verbs instead drop RU and add TE.",
+    "ruleId": "Verba godan る seirama dengan verba う dan つ: -って. Verba ichidan justru membuang る lalu menambah て.",
+    "whyOthersFail": "TOTE follows the ichidan rule, TONDE and TOITE borrow endings from the MU and KU groups.",
+    "whyOthersFailId": "とて mengikuti aturan ichidan, とんで dan といて meminjam akhiran kelompok む dan く.",
+    "howToAvoid": "Look at the vowel before RU: I or E suggests ichidan, A, U or O means godan.",
+    "howToAvoidId": "Lihat vokal sebelum る: i atau e mengarah ke ichidan, a, u, atau o berarti godan.",
+    "memoryCue": "O before RU: godan, so TTE.",
+    "memoryCueId": "Vokal o sebelum る: godan, jadi って."
+   },
+   "id": "JP-TF-103",
+   "family": "te_form",
+   "skill": "te_form",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "questionType": "multiple_choice"
+  },
+  {
+   "subskill": "godan_mu_to_nde",
+   "marker": "godan-mu-ending-becomes-nde",
+   "pedagogicalObjective": "Build the TE-form of a godan verb ending in MU",
+   "pedagogicalObjectiveId": "Membentuk bentuk て dari verba godan berakhiran む",
+   "misconceptionTargeted": "Learner uses the voiceless TE after a nasal ending instead of the voiced DE",
+   "misconceptionTargetedId": "Murid memakai て tak bersuara setelah akhiran nasal, bukan で bersuara",
+   "reasoningOperation": "identify MU ending -> select the nasal group -> attach NDE",
+   "reasoningOperationId": "kenali akhiran む -> pilih kelompok nasal -> pasang んで",
+   "stem": "よる ミルクを ___、ねます。（のむ）",
+   "stemKana": "よる ミルクを ___、ねます。（のむ）",
+   "furigana": [],
+   "options": [
+    "のんで",
+    "のんて",
+    "のって",
+    "のみて"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "のんて",
+     "misconception": "keeps TE unvoiced after the nasal N",
+     "misconceptionId": "mempertahankan て tak bersuara setelah nasal ん",
+     "whyFails": "After the nasal N the ending is always voiced: NDE, never NTE.",
+     "whyFailsId": "Setelah nasal ん akhirannya selalu bersuara: んで, tidak pernah んて."
+    },
+    {
+     "option": "のって",
+     "misconception": "applies the U/TSU/RU rule TTE to a MU verb",
+     "misconceptionId": "menerapkan aturan って milik う/つ/る pada verba む",
+     "whyFails": "TTE belongs to U, TSU and RU verbs; NOTTE is the TE-form of NORU, a different verb.",
+     "whyFailsId": "って milik verba う, つ, る; のって adalah bentuk て dari のる, verba yang berbeda."
+    },
+    {
+     "option": "のみて",
+     "misconception": "adds TE to the MASU-stem without the sound change",
+     "misconceptionId": "menambahkan て pada pangkal ます tanpa perubahan bunyi",
+     "whyFails": "NOMI is the MASU-stem. Godan verbs must undergo the sound change before TE.",
+     "whyFailsId": "のみ adalah pangkal ます. Verba godan harus mengalami perubahan bunyi sebelum て."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "NOMU ends in MU, one of the three nasal endings, so it becomes NONDE.",
+    "whyCorrectId": "のむ berakhiran む, salah satu dari tiga akhiran nasal, jadi menjadi のんで.",
+    "rule": "Godan verbs ending in MU, BU or NU form TE as -NDE.",
+    "ruleId": "Verba godan berakhiran む, ぶ, atau ぬ membentuk て menjadi -んで.",
+    "whyOthersFail": "NONTE forgets the voicing, NOTTE uses the small-TSU group, NOMITE skips the change entirely.",
+    "whyOthersFailId": "のんて lupa menyuarakan, のって memakai kelompok っ, のみて sama sekali melewatkan perubahan.",
+    "howToAvoid": "When you hear N before the ending, voice it to DE.",
+    "howToAvoidId": "Kalau ada ん sebelum akhiran, suarakan menjadi で.",
+    "memoryCue": "Nasal N drags TE down into DE.",
+    "memoryCueId": "Nasal ん menyeret て menjadi で."
+   },
+   "id": "JP-TF-104",
+   "family": "te_form",
+   "skill": "te_form",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "questionType": "multiple_choice"
+  },
+  {
+   "subskill": "godan_bu_to_nde",
+   "marker": "godan-bu-ending-becomes-nde",
+   "pedagogicalObjective": "Build the TE-form of a godan verb ending in BU",
+   "pedagogicalObjectiveId": "Membentuk bentuk て dari verba godan berakhiran ぶ",
+   "misconceptionTargeted": "Learner keeps BU outside the nasal group because it has no N sound in the dictionary form",
+   "misconceptionTargetedId": "Murid mengeluarkan ぶ dari kelompok nasal karena bentuk kamusnya tidak berbunyi n",
+   "reasoningOperation": "identify BU ending -> recall that BU joins MU and NU -> attach NDE",
+   "reasoningOperationId": "kenali akhiran ぶ -> ingat ぶ bergabung dengan む dan ぬ -> pasang んで",
+   "stem": "こうえんで こどもたちが ___ います。（あそぶ）",
+   "stemKana": "こうえんで こどもたちが ___ います。（あそぶ）",
+   "furigana": [],
+   "options": [
+    "あそんで",
+    "あそって",
+    "あそびて",
+    "あそいで"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "あそって",
+     "misconception": "applies the U/TSU/RU rule TTE to a BU verb",
+     "misconceptionId": "menerapkan aturan って milik う/つ/る pada verba ぶ",
+     "whyFails": "TTE is the small-TSU group. BU belongs with MU and NU and takes the nasal NDE.",
+     "whyFailsId": "って kelompok っ. ぶ bergabung dengan む dan ぬ serta memakai nasal んで."
+    },
+    {
+     "option": "あそびて",
+     "misconception": "adds TE to the MASU-stem ASOBI",
+     "misconceptionId": "menambahkan て pada pangkal ます あそび",
+     "whyFails": "ASOBI is the MASU-stem; the TE-form needs the nasal change, not a bare TE.",
+     "whyFailsId": "あそび adalah pangkal ます; bentuk て butuh perubahan nasal, bukan sekadar て."
+    },
+    {
+     "option": "あそいで",
+     "misconception": "applies the GU rule IDE to a BU verb",
+     "misconceptionId": "menerapkan aturan いで milik ぐ pada verba ぶ",
+     "whyFails": "IDE is produced only by GU verbs such as OYOGU. ASOBU has no GU.",
+     "whyFailsId": "いで hanya dihasilkan verba ぐ seperti およぐ. あそぶ tidak punya ぐ."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "ASOBU ends in BU, a nasal-group ending, so its TE-form is ASONDE.",
+    "whyCorrectId": "あそぶ berakhiran ぶ, akhiran kelompok nasal, jadi bentuk て-nya あそんで.",
+    "rule": "MU, BU and NU all become -NDE.",
+    "ruleId": "む, ぶ, dan ぬ semuanya menjadi -んで.",
+    "whyOthersFail": "ASOTTE uses the small-TSU group, ASOBITE skips the change, ASOIDE borrows the GU ending.",
+    "whyOthersFailId": "あそって memakai kelompok っ, あそびて melewatkan perubahan, あそいで meminjam akhiran ぐ.",
+    "howToAvoid": "Memorise the trio MU-BU-NU as one block so BU never drifts away.",
+    "howToAvoidId": "Hafalkan trio む-ぶ-ぬ sebagai satu blok agar ぶ tidak lepas.",
+    "memoryCue": "MU, BU, NU: three friends, one NDE.",
+    "memoryCueId": "む, ぶ, ぬ: tiga sahabat, satu んで."
+   },
+   "id": "JP-TF-105",
+   "family": "te_form",
+   "skill": "te_form",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "questionType": "multiple_choice"
+  },
+  {
+   "subskill": "godan_nu_to_nde",
+   "marker": "godan-nu-ending-becomes-nde",
+   "pedagogicalObjective": "Build the TE-form of the godan verb ending in NU",
+   "pedagogicalObjectiveId": "Membentuk bentuk て dari verba godan berakhiran ぬ",
+   "misconceptionTargeted": "Learner treats the rare NU ending as an unknown and guesses a different group",
+   "misconceptionTargetedId": "Murid menganggap akhiran ぬ yang langka sebagai hal asing lalu menebak kelompok lain",
+   "reasoningOperation": "identify NU ending -> place it in the nasal trio -> attach NDE",
+   "reasoningOperationId": "kenali akhiran ぬ -> masukkan ke trio nasal -> pasang んで",
+   "stem": "にわの はなが ___ しまいました。（しぬ）",
+   "stemKana": "にわの はなが ___ しまいました。（しぬ）",
+   "furigana": [],
+   "options": [
+    "しんで",
+    "しって",
+    "しにて",
+    "しいて"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "しって",
+     "misconception": "applies the U/TSU/RU rule TTE to the NU verb",
+     "misconceptionId": "menerapkan aturan って milik う/つ/る pada verba ぬ",
+     "whyFails": "TTE is the small-TSU group; SHITTE is the TE-form of SHIRU, a different verb.",
+     "whyFailsId": "って kelompok っ; しって adalah bentuk て dari しる, verba yang berbeda."
+    },
+    {
+     "option": "しにて",
+     "misconception": "adds TE to the MASU-stem SHINI",
+     "misconceptionId": "menambahkan て pada pangkal ます しに",
+     "whyFails": "SHINI is the MASU-stem. The nasal change must happen before TE.",
+     "whyFailsId": "しに adalah pangkal ます. Perubahan nasal harus terjadi sebelum て."
+    },
+    {
+     "option": "しいて",
+     "misconception": "applies the KU rule ITE to the NU verb",
+     "misconceptionId": "menerapkan aturan いて milik く pada verba ぬ",
+     "whyFails": "ITE comes from KU verbs only; SHINU has no K sound.",
+     "whyFailsId": "いて hanya dari verba く; しぬ tidak punya bunyi k."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "SHINU ends in NU, so it joins MU and BU and becomes SHINDE.",
+    "whyCorrectId": "しぬ berakhiran ぬ, jadi bergabung dengan む dan ぶ menjadi しんで.",
+    "rule": "MU, BU and NU verbs all form TE as -NDE.",
+    "ruleId": "Verba む, ぶ, dan ぬ semuanya membentuk て menjadi -んで.",
+    "whyOthersFail": "SHITTE belongs to another verb, SHINITE skips the change, SHIITE borrows the KU ending.",
+    "whyOthersFailId": "しって milik verba lain, しにて melewatkan perubahan, しいて meminjam akhiran く.",
+    "howToAvoid": "NU is rare, so file it beside MU and BU the first time you meet it.",
+    "howToAvoidId": "ぬ langka, jadi simpan berdampingan dengan む dan ぶ sejak pertama bertemu.",
+    "memoryCue": "NU is the quiet third member of the NDE trio.",
+    "memoryCueId": "ぬ anggota ketiga yang pendiam di trio んで."
+   },
+   "id": "JP-TF-106",
+   "family": "te_form",
+   "skill": "te_form",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "questionType": "multiple_choice"
+  },
+  {
+   "subskill": "godan_ku_to_ite",
+   "marker": "godan-ku-ending-becomes-ite",
+   "pedagogicalObjective": "Build the TE-form of a godan verb ending in KU",
+   "pedagogicalObjectiveId": "Membentuk bentuk て dari verba godan berakhiran く",
+   "misconceptionTargeted": "Learner voices the KU ending to IDE, which belongs to GU",
+   "misconceptionTargetedId": "Murid menyuarakan akhiran く menjadi いで, padahal itu milik ぐ",
+   "reasoningOperation": "identify KU ending -> choose the unvoiced I-ending -> attach ITE",
+   "reasoningOperationId": "kenali akhiran く -> pilih akhiran i tak bersuara -> pasang いて",
+   "stem": "ノートに なまえを ___ ください。（かく）",
+   "stemKana": "ノートに なまえを ___ ください。（かく）",
+   "furigana": [],
+   "options": [
+    "かいて",
+    "かいで",
+    "かって",
+    "かきて"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "かいで",
+     "misconception": "voices the ending as if the verb ended in GU",
+     "misconceptionId": "menyuarakan akhiran seolah verbanya berakhiran ぐ",
+     "whyFails": "IDE belongs to GU verbs. KAKU is unvoiced, so the ending stays ITE.",
+     "whyFailsId": "いで milik verba ぐ. かく tak bersuara, jadi akhirannya tetap いて."
+    },
+    {
+     "option": "かって",
+     "misconception": "applies the U/TSU/RU rule TTE to a KU verb",
+     "misconceptionId": "menerapkan aturan って milik う/つ/る pada verba く",
+     "whyFails": "TTE is the small-TSU group; KATTE is the TE-form of KAU, a different verb.",
+     "whyFailsId": "って kelompok っ; かって adalah bentuk て dari かう, verba yang berbeda."
+    },
+    {
+     "option": "かきて",
+     "misconception": "adds TE to the MASU-stem KAKI",
+     "misconceptionId": "menambahkan て pada pangkal ます かき",
+     "whyFails": "KAKI is the MASU-stem; the K must soften to I before TE.",
+     "whyFailsId": "かき adalah pangkal ます; k harus meluluh menjadi い sebelum て."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "KAKU ends in KU, so the KU softens to I and the unvoiced TE follows: KAITE.",
+    "whyCorrectId": "かく berakhiran く, jadi く meluluh menjadi い lalu diikuti て tak bersuara: かいて.",
+    "rule": "KU becomes -ITE; only GU becomes -IDE.",
+    "ruleId": "く menjadi -いて; hanya ぐ yang menjadi -いで.",
+    "whyOthersFail": "KAIDE voices an unvoiced verb, KATTE and KAKITE come from other patterns.",
+    "whyOthersFailId": "かいで menyuarakan verba tak bersuara, かって dan かきて berasal dari pola lain.",
+    "howToAvoid": "Ask whether the dictionary form has a voiced dot; no dot means no dot in the TE-form.",
+    "howToAvoidId": "Tanyakan apakah bentuk kamusnya bertanda dakuten; tanpa titik berarti tanpa titik di bentuk て.",
+    "memoryCue": "No dot in KU, no dot in ITE.",
+    "memoryCueId": "Tanpa titik di く, tanpa titik di いて."
+   },
+   "id": "JP-TF-107",
+   "family": "te_form",
+   "skill": "te_form",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "questionType": "multiple_choice"
+  },
+  {
+   "subskill": "godan_gu_to_ide",
+   "marker": "godan-gu-ending-becomes-ide",
+   "pedagogicalObjective": "Build the TE-form of a godan verb ending in GU",
+   "pedagogicalObjectiveId": "Membentuk bentuk て dari verba godan berakhiran ぐ",
+   "misconceptionTargeted": "Learner loses the voicing of GU and produces the KU ending ITE",
+   "misconceptionTargetedId": "Murid kehilangan suara ぐ lalu menghasilkan akhiran いて milik く",
+   "reasoningOperation": "identify GU ending -> carry the voicing over -> attach IDE",
+   "reasoningOperationId": "kenali akhiran ぐ -> bawa suaranya -> pasang いで",
+   "stem": "なつ うみで ___、たのしかったです。（およぐ）",
+   "stemKana": "なつ うみで ___、たのしかったです。（およぐ）",
+   "furigana": [],
+   "options": [
+    "およいで",
+    "およいて",
+    "およって",
+    "およぎて"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "およいて",
+     "misconception": "applies the KU rule ITE to a GU verb, dropping the voicing",
+     "misconceptionId": "menerapkan aturan いて milik く pada verba ぐ dan membuang suaranya",
+     "whyFails": "GU is voiced, so its ending keeps the voicing: IDE, not ITE.",
+     "whyFailsId": "ぐ bersuara, jadi akhirannya tetap bersuara: いで, bukan いて."
+    },
+    {
+     "option": "およって",
+     "misconception": "applies the U/TSU/RU rule TTE to a GU verb",
+     "misconceptionId": "menerapkan aturan って milik う/つ/る pada verba ぐ",
+     "whyFails": "TTE belongs to U, TSU and RU verbs. OYOGU ends in GU and softens to I.",
+     "whyFailsId": "って milik verba う, つ, る. およぐ berakhiran ぐ dan meluluh menjadi い."
+    },
+    {
+     "option": "およぎて",
+     "misconception": "adds TE to the MASU-stem OYOGI",
+     "misconceptionId": "menambahkan て pada pangkal ます およぎ",
+     "whyFails": "OYOGI is the MASU-stem; the G must soften to I and the ending must be DE.",
+     "whyFailsId": "およぎ adalah pangkal ます; g harus meluluh menjadi い dan akhirannya で."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "OYOGU ends in GU, so the GU softens to I and the voiced DE follows: OYOIDE.",
+    "whyCorrectId": "およぐ berakhiran ぐ, jadi ぐ meluluh menjadi い lalu diikuti で bersuara: およいで.",
+    "rule": "GU becomes -IDE, keeping the voicing that KU lacks.",
+    "ruleId": "ぐ menjadi -いで, mempertahankan suara yang tidak dimiliki く.",
+    "whyOthersFail": "OYOITE loses the voicing, OYOTTE uses the small-TSU group, OYOGITE skips the change.",
+    "whyOthersFailId": "およいて kehilangan suara, およって memakai kelompok っ, およぎて melewatkan perubahan.",
+    "howToAvoid": "The dakuten on GU survives the change and lands on DE.",
+    "howToAvoidId": "Dakuten pada ぐ selamat melewati perubahan dan mendarat di で.",
+    "memoryCue": "The two dots move from GU to DE.",
+    "memoryCueId": "Dua titik pindah dari ぐ ke で."
+   },
+   "id": "JP-TF-108",
+   "family": "te_form",
+   "skill": "te_form",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "questionType": "multiple_choice"
+  },
+  {
+   "subskill": "godan_su_to_shite",
+   "marker": "godan-su-ending-becomes-shite",
+   "pedagogicalObjective": "Build the TE-form of a godan verb ending in SU",
+   "pedagogicalObjectiveId": "Membentuk bentuk て dari verba godan berakhiran す",
+   "misconceptionTargeted": "Learner expects a sound change and forgets that SU verbs simply use the MASU-stem plus TE",
+   "misconceptionTargetedId": "Murid mengira ada perubahan bunyi dan lupa verba す cukup memakai pangkal ます ditambah て",
+   "reasoningOperation": "identify SU ending -> take the SHI stem -> attach TE",
+   "reasoningOperationId": "kenali akhiran す -> ambil pangkal し -> pasang て",
+   "stem": "せんせいと にほんごで ___、れんしゅうします。（はなす）",
+   "stemKana": "せんせいと にほんごで ___、れんしゅうします。（はなす）",
+   "furigana": [],
+   "options": [
+    "はなして",
+    "はなって",
+    "はないて",
+    "はなんで"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "はなって",
+     "misconception": "applies the U/TSU/RU rule TTE to an SU verb",
+     "misconceptionId": "menerapkan aturan って milik う/つ/る pada verba す",
+     "whyFails": "TTE belongs to U, TSU and RU endings. SU verbs keep the SHI syllable.",
+     "whyFailsId": "って milik akhiran う, つ, る. Verba す mempertahankan suku kata し."
+    },
+    {
+     "option": "はないて",
+     "misconception": "applies the KU rule ITE to an SU verb",
+     "misconceptionId": "menerapkan aturan いて milik く pada verba す",
+     "whyFails": "ITE comes from KU verbs only; HANASU has no K.",
+     "whyFailsId": "いて hanya dari verba く; はなす tidak punya k."
+    },
+    {
+     "option": "はなんで",
+     "misconception": "applies the MU/BU/NU rule NDE to an SU verb",
+     "misconceptionId": "menerapkan aturan んで milik む/ぶ/ぬ pada verba す",
+     "whyFails": "NDE is the nasal group ending; SU is not nasal.",
+     "whyFailsId": "んで akhiran kelompok nasal; す bukan nasal."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "SU verbs change SU to SHI and add TE: HANASHITE.",
+    "whyCorrectId": "Verba す mengubah す menjadi し lalu menambah て: はなして.",
+    "rule": "Godan verbs ending in SU form TE as -SHITE.",
+    "ruleId": "Verba godan berakhiran す membentuk て menjadi -して.",
+    "whyOthersFail": "HANATTE, HANAITE and HANANDE each borrow another group’s ending.",
+    "whyOthersFailId": "はなって, はないて, dan はなんで masing-masing meminjam akhiran kelompok lain.",
+    "howToAvoid": "For SU verbs, say the MASU-form first: HANASHIMASU gives you HANASHI.",
+    "howToAvoidId": "Untuk verba す, ucapkan bentuk ます dulu: はなします memberi はなし.",
+    "memoryCue": "SU verbs are the polite ones: MASU-stem plus TE.",
+    "memoryCueId": "Verba す paling penurut: pangkal ます ditambah て."
+   },
+   "id": "JP-TF-109",
+   "family": "te_form",
+   "skill": "te_form",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "questionType": "multiple_choice"
+  },
+  {
+   "subskill": "irregular_iku_to_itte",
+   "marker": "iku-irregular-not-iite",
+   "pedagogicalObjective": "Recall that IKU is the one KU verb that takes TTE instead of ITE",
+   "pedagogicalObjectiveId": "Mengingat いく satu-satunya verba く yang memakai って, bukan いて",
+   "misconceptionTargeted": "Learner applies the regular KU rule to IKU and produces the non-existent IITE",
+   "misconceptionTargetedId": "Murid menerapkan aturan く biasa pada いく dan menghasilkan いいて yang tidak ada",
+   "reasoningOperation": "recognise IKU as a listed exception -> override the KU rule -> use ITTE",
+   "reasoningOperationId": "kenali いく sebagai pengecualian -> batalkan aturan く -> pakai いって",
+   "stem": "あした びょういんへ ___、くすりを もらいます。（いく）",
+   "stemKana": "あした びょういんへ ___、くすりを もらいます。（いく）",
+   "furigana": [],
+   "options": [
+    "いって",
+    "いいて",
+    "いきて",
+    "いいで"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "いいて",
+     "misconception": "applies the regular KU rule ITE to IKU, which is the one irregular exception",
+     "misconceptionId": "menerapkan aturan いて milik く pada いく, padahal itu satu-satunya pengecualian",
+     "whyFails": "The KU rule would give IITE, but IKU is memorised as an exception: it takes the small TSU.",
+     "whyFailsId": "Aturan く akan menghasilkan いいて, tetapi いく dihafal sebagai pengecualian: memakai っ."
+    },
+    {
+     "option": "いきて",
+     "misconception": "adds TE to the MASU-stem IKI",
+     "misconceptionId": "menambahkan て pada pangkal ます いき",
+     "whyFails": "IKI is the MASU-stem; the exception form is ITTE, not a bare stem plus TE.",
+     "whyFailsId": "いき adalah pangkal ます; bentuk pengecualiannya いって, bukan pangkal ditambah て."
+    },
+    {
+     "option": "いいで",
+     "misconception": "applies the GU rule IDE to a KU verb",
+     "misconceptionId": "menerapkan aturan いで milik ぐ pada verba く",
+     "whyFails": "IDE belongs to GU verbs, and IKU is neither a GU verb nor a regular KU verb here.",
+     "whyFailsId": "いで milik verba ぐ, sedangkan いく bukan verba ぐ maupun verba く yang beraturan."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "IKU is the single irregular KU verb: its TE-form is ITTE, with a small TSU.",
+    "whyCorrectId": "いく satu-satunya verba く yang tidak beraturan: bentuk て-nya いって, dengan っ.",
+    "rule": "All KU verbs give -ITE except IKU, which gives ITTE.",
+    "ruleId": "Semua verba く memberi -いて kecuali いく, yang memberi いって.",
+    "whyOthersFail": "IITE is the regular rule misapplied, IKITE is a bare stem, IIDE borrows the GU ending.",
+    "whyOthersFailId": "いいて aturan beraturan yang salah tempat, いきて pangkal telanjang, いいで meminjam akhiran ぐ.",
+    "howToAvoid": "Learn IKU together with SURU and KURU as the three forms you memorise rather than derive.",
+    "howToAvoidId": "Hafalkan いく bersama する dan くる sebagai tiga bentuk yang dihafal, bukan diturunkan.",
+    "memoryCue": "Going always stops short: ITTE, never IITE.",
+    "memoryCueId": "Pergi selalu tersendat: いって, tidak pernah いいて."
+   },
+   "id": "JP-TF-110",
+   "family": "te_form",
+   "skill": "te_form",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "questionType": "multiple_choice"
+  },
+  {
+   "subskill": "irregular_suru_to_shite",
+   "marker": "suru-irregular-te-form",
+   "pedagogicalObjective": "Recall the TE-form of the irregular verb SURU",
+   "pedagogicalObjectiveId": "Mengingat bentuk て verba tak beraturan する",
+   "misconceptionTargeted": "Learner treats SURU as a RU verb and applies a regular rule",
+   "misconceptionTargetedId": "Murid menganggap する verba る lalu menerapkan aturan beraturan",
+   "reasoningOperation": "recognise SURU as irregular -> retrieve the memorised form SHITE",
+   "reasoningOperationId": "kenali する tak beraturan -> ambil bentuk hafalan して",
+   "stem": "まいばん にほんごの しゅくだいを ___、ねます。（する）",
+   "stemKana": "まいばん にほんごの しゅくだいを ___、ねます。（する）",
+   "furigana": [],
+   "options": [
+    "して",
+    "すって",
+    "すて",
+    "すりて"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "すって",
+     "misconception": "applies the godan RU rule TTE to SURU",
+     "misconceptionId": "menerapkan aturan って milik る godan pada する",
+     "whyFails": "SUTTE is the TE-form of SUU. SURU is irregular and must be memorised as SHITE.",
+     "whyFailsId": "すって adalah bentuk て dari すう. する tak beraturan dan harus dihafal sebagai して."
+    },
+    {
+     "option": "すて",
+     "misconception": "applies the ichidan rule (drop RU, add TE) to SURU",
+     "misconceptionId": "menerapkan aturan ichidan (buang る, tambah て) pada する",
+     "whyFails": "SURU is not ichidan; dropping RU does not produce its TE-form.",
+     "whyFailsId": "する bukan ichidan; membuang る tidak menghasilkan bentuk て-nya."
+    },
+    {
+     "option": "すりて",
+     "misconception": "adds TE to a stem invented from the dictionary form",
+     "misconceptionId": "menambahkan て pada pangkal karangan dari bentuk kamus",
+     "whyFails": "SURU has no SURI stem; its TE-form is the memorised SHITE.",
+     "whyFailsId": "する tidak punya pangkal すり; bentuk て-nya adalah して hafalan."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "SURU is irregular and its TE-form is simply SHITE.",
+    "whyCorrectId": "する tak beraturan dan bentuk て-nya cukup して.",
+    "rule": "The three irregulars are SURU to SHITE, KURU to KITE and IKU to ITTE.",
+    "ruleId": "Tiga verba tak beraturan: する jadi して, くる jadi きて, いく jadi いって.",
+    "whyOthersFail": "SUTTE, SUTE and SURITE all come from applying regular rules to an irregular verb.",
+    "whyOthersFailId": "すって, すて, dan すりて sama-sama lahir dari aturan beraturan yang dipakai pada verba tak beraturan.",
+    "howToAvoid": "Do not derive irregular verbs; recall them.",
+    "howToAvoidId": "Jangan menurunkan verba tak beraturan; ingat saja.",
+    "memoryCue": "SURU turns into SHITE, no rule needed.",
+    "memoryCueId": "する berubah jadi して, tanpa aturan."
+   },
+   "id": "JP-TF-111",
+   "family": "te_form",
+   "skill": "te_form",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "questionType": "multiple_choice"
+  },
+  {
+   "subskill": "irregular_kuru_to_kite",
+   "marker": "kuru-irregular-te-form",
+   "pedagogicalObjective": "Recall the TE-form of the irregular verb KURU",
+   "pedagogicalObjectiveId": "Mengingat bentuk て verba tak beraturan くる",
+   "misconceptionTargeted": "Learner keeps the KU vowel and applies a godan rule to KURU",
+   "misconceptionTargetedId": "Murid mempertahankan vokal く lalu menerapkan aturan godan pada くる",
+   "reasoningOperation": "recognise KURU as irregular -> retrieve the memorised form KITE",
+   "reasoningOperationId": "kenali くる tak beraturan -> ambil bentuk hafalan きて",
+   "stem": "ともだちが うちへ ___、いっしょに ごはんを たべました。（くる）",
+   "stemKana": "ともだちが うちへ ___、いっしょに ごはんを たべました。（くる）",
+   "furigana": [],
+   "options": [
+    "きて",
+    "くて",
+    "くって",
+    "くいて"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "くて",
+     "misconception": "applies the ichidan rule (drop RU, add TE) to KURU",
+     "misconceptionId": "menerapkan aturan ichidan (buang る, tambah て) pada くる",
+     "whyFails": "KURU is not ichidan; its vowel also changes from U to I, giving KITE.",
+     "whyFailsId": "くる bukan ichidan; vokalnya pun berubah dari u ke i, menghasilkan きて."
+    },
+    {
+     "option": "くって",
+     "misconception": "applies the godan RU rule TTE to KURU",
+     "misconceptionId": "menerapkan aturan って milik る godan pada くる",
+     "whyFails": "TTE would be right for a godan RU verb, but KURU is irregular and becomes KITE.",
+     "whyFailsId": "って cocok untuk verba godan る, tetapi くる tak beraturan dan menjadi きて."
+    },
+    {
+     "option": "くいて",
+     "misconception": "applies the KU rule ITE by hearing KU inside KURU",
+     "misconceptionId": "menerapkan aturan いて milik く karena mendengar ku di dalam くる",
+     "whyFails": "The KU here is not a verb ending; the ending is RU, and the verb is irregular.",
+     "whyFailsId": "く di sini bukan akhiran verba; akhirannya る, dan verbanya tak beraturan."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "KURU is irregular: the vowel shifts to I and TE is added, giving KITE.",
+    "whyCorrectId": "くる tak beraturan: vokalnya bergeser ke i lalu ditambah て, menjadi きて.",
+    "rule": "KURU to KITE is memorised, exactly like SURU to SHITE.",
+    "ruleId": "くる jadi きて dihafal, persis seperti する jadi して.",
+    "whyOthersFail": "KUTE, KUTTE and KUITE all preserve the U vowel that KURU actually loses.",
+    "whyOthersFailId": "くて, くって, dan くいて sama-sama mempertahankan vokal u yang justru hilang pada くる.",
+    "howToAvoid": "Check the vowel first: irregular KURU changes it, regular verbs do not.",
+    "howToAvoidId": "Periksa vokalnya dulu: くる yang tak beraturan mengubahnya, verba beraturan tidak.",
+    "memoryCue": "Coming changes its vowel: KU becomes KI.",
+    "memoryCueId": "Datang mengubah vokalnya: く jadi き."
+   },
+   "id": "JP-TF-112",
+   "family": "te_form",
+   "skill": "te_form",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "questionType": "multiple_choice"
+  },
+  {
+   "subskill": "ichidan_drop_ru_add_te",
+   "marker": "ichidan-eru-drop-ru-add-te",
+   "pedagogicalObjective": "Build the TE-form of an ichidan verb by dropping RU and adding TE",
+   "pedagogicalObjectiveId": "Membentuk bentuk て verba ichidan dengan membuang る lalu menambah て",
+   "misconceptionTargeted": "Learner over-generalises the godan RU rule and inserts a small TSU",
+   "misconceptionTargetedId": "Murid menggeneralisasi aturan る godan lalu menyisipkan っ",
+   "reasoningOperation": "check the vowel before RU -> E means ichidan -> drop RU and add TE",
+   "reasoningOperationId": "periksa vokal sebelum る -> e berarti ichidan -> buang る lalu tambah て",
+   "stem": "ひるごはんを ___、さんぽしました。（たべる）",
+   "stemKana": "ひるごはんを ___、さんぽしました。（たべる）",
+   "furigana": [],
+   "options": [
+    "たべて",
+    "たべって",
+    "たべんで",
+    "たべりて"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "たべって",
+     "misconception": "applies the godan RU rule TTE to an ichidan verb",
+     "misconceptionId": "menerapkan aturan って milik る godan pada verba ichidan",
+     "whyFails": "TABERU has E before RU, so it is ichidan and never takes a small TSU.",
+     "whyFailsId": "たべる punya vokal e sebelum る, jadi ichidan dan tidak pernah memakai っ."
+    },
+    {
+     "option": "たべんで",
+     "misconception": "applies the MU/BU/NU rule NDE to an ichidan verb",
+     "misconceptionId": "menerapkan aturan んで milik む/ぶ/ぬ pada verba ichidan",
+     "whyFails": "NDE requires a nasal ending. TABERU ends in RU and is ichidan.",
+     "whyFailsId": "んで menuntut akhiran nasal. たべる berakhiran る dan ichidan."
+    },
+    {
+     "option": "たべりて",
+     "misconception": "invents a godan-style stem TABERI",
+     "misconceptionId": "mengarang pangkal bergaya godan たべり",
+     "whyFails": "Ichidan verbs have no RI stem; the MASU-stem is TABE, so TE attaches directly.",
+     "whyFailsId": "Verba ichidan tidak punya pangkal り; pangkal ます-nya たべ, jadi て langsung menempel."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "TABERU is ichidan, so RU simply drops and TE is added: TABETE.",
+    "whyCorrectId": "たべる verba ichidan, jadi る tinggal dibuang lalu ditambah て: たべて.",
+    "rule": "Ichidan verbs form TE by dropping RU and adding TE, with no sound change.",
+    "ruleId": "Verba ichidan membentuk て dengan membuang る lalu menambah て, tanpa perubahan bunyi.",
+    "whyOthersFail": "TABETTE, TABENDE and TABERITE all apply godan machinery to a verb that needs none.",
+    "whyOthersFailId": "たべって, たべんで, dan たべりて sama-sama memakai mesin godan pada verba yang tidak membutuhkannya.",
+    "howToAvoid": "Say the MASU-form: TABEMASU shows the stem TABE, and TE goes straight on.",
+    "howToAvoidId": "Ucapkan bentuk ます: たべます menunjukkan pangkal たべ, dan て langsung menempel.",
+    "memoryCue": "Ichidan is the lazy group: RU off, TE on.",
+    "memoryCueId": "Ichidan kelompok paling santai: る lepas, て pasang."
+   },
+   "id": "JP-TF-113",
+   "family": "te_form",
+   "skill": "te_form",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "questionType": "multiple_choice"
+  },
+  {
+   "subskill": "ichidan_iru_verb_te",
+   "marker": "ichidan-iru-drop-ru-add-te",
+   "pedagogicalObjective": "Build the TE-form of a short ichidan verb ending in IRU",
+   "pedagogicalObjectiveId": "Membentuk bentuk て verba ichidan pendek berakhiran いる",
+   "misconceptionTargeted": "Learner mistakes a short IRU verb for a godan verb because of its length",
+   "misconceptionTargetedId": "Murid mengira verba いる pendek itu godan hanya karena pendek",
+   "reasoningOperation": "check the vowel before RU -> I means ichidan -> drop RU and add TE",
+   "reasoningOperationId": "periksa vokal sebelum る -> i berarti ichidan -> buang る lalu tambah て",
+   "stem": "まいばん ニュースを ___、ねます。（みる）",
+   "stemKana": "まいばん ニュースを ___、ねます。（みる）",
+   "furigana": [],
+   "options": [
+    "みて",
+    "みって",
+    "みんで",
+    "みりて"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "みって",
+     "misconception": "applies the godan RU rule TTE to an ichidan verb",
+     "misconceptionId": "menerapkan aturan って milik る godan pada verba ichidan",
+     "whyFails": "MIRU has I before RU and is ichidan, so no small TSU appears.",
+     "whyFailsId": "みる punya vokal i sebelum る dan ichidan, jadi tidak ada っ."
+    },
+    {
+     "option": "みんで",
+     "misconception": "applies the MU/BU/NU rule NDE to an ichidan verb",
+     "misconceptionId": "menerapkan aturan んで milik む/ぶ/ぬ pada verba ichidan",
+     "whyFails": "NDE needs a nasal ending; MIRU has none.",
+     "whyFailsId": "んで butuh akhiran nasal; みる tidak punya."
+    },
+    {
+     "option": "みりて",
+     "misconception": "invents a godan-style stem MIRI",
+     "misconceptionId": "mengarang pangkal bergaya godan みり",
+     "whyFails": "MIMASU shows the stem is MI, so TE attaches to MI directly.",
+     "whyFailsId": "みます menunjukkan pangkalnya み, jadi て langsung menempel pada み."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "MIRU is ichidan, so its TE-form is MITE.",
+    "whyCorrectId": "みる verba ichidan, jadi bentuk て-nya みて.",
+    "rule": "Ichidan verbs drop RU and add TE, however short the verb is.",
+    "ruleId": "Verba ichidan membuang る lalu menambah て, sependek apa pun verbanya.",
+    "whyOthersFail": "MITTE, MINDE and MIRITE all treat a two-syllable ichidan verb as godan.",
+    "whyOthersFailId": "みって, みんで, dan みりて sama-sama memperlakukan verba ichidan dua suku kata sebagai godan.",
+    "howToAvoid": "Length says nothing about the group; the vowel before RU does.",
+    "howToAvoidId": "Panjang verba tidak menentukan kelompok; vokal sebelum る yang menentukan.",
+    "memoryCue": "MIMASU, so MITE.",
+    "memoryCueId": "みます, jadi みて."
+   },
+   "id": "JP-TF-114",
+   "family": "te_form",
+   "skill": "te_form",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "questionType": "multiple_choice"
+  },
+  {
+   "subskill": "te_kudasai_request_form",
+   "marker": "kudasai-requires-te-form",
+   "pedagogicalObjective": "Attach KUDASAI to the TE-form, not to the dictionary or MASU form",
+   "pedagogicalObjectiveId": "Menempelkan ください pada bentuk て, bukan pada bentuk kamus atau ます",
+   "misconceptionTargeted": "Learner attaches KUDASAI to whichever verb form comes to mind first",
+   "misconceptionTargetedId": "Murid menempelkan ください pada bentuk verba mana pun yang lebih dulu terlintas",
+   "reasoningOperation": "recognise a request -> select the TE-form as the required base -> add KUDASAI",
+   "reasoningOperationId": "kenali kalimat permintaan -> pilih bentuk て sebagai dasarnya -> tambahkan ください",
+   "stem": "すみません、ここで ちょっと ___。（まつ・おねがい）",
+   "stemKana": "すみません、ここで ちょっと ___。（まつ・おねがい）",
+   "furigana": [],
+   "options": [
+    "まってください",
+    "まちますください",
+    "まつください",
+    "またないでください"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "まちますください",
+     "misconception": "attaches KUDASAI to the polite MASU form",
+     "misconceptionId": "menempelkan ください pada bentuk sopan ます",
+     "whyFails": "KUDASAI already carries the politeness; two polite endings cannot stack.",
+     "whyFailsId": "ください sendiri sudah membawa kesopanan; dua akhiran sopan tidak bisa ditumpuk."
+    },
+    {
+     "option": "まつください",
+     "misconception": "attaches KUDASAI to the dictionary form",
+     "misconceptionId": "menempelkan ください pada bentuk kamus",
+     "whyFails": "KUDASAI needs a TE-form base. The dictionary form cannot connect to it.",
+     "whyFailsId": "ください butuh dasar bentuk て. Bentuk kamus tidak bisa tersambung."
+    },
+    {
+     "option": "またないでください",
+     "misconception": "uses the negative request pattern when a positive request is meant",
+     "misconceptionId": "memakai pola permintaan negatif padahal yang dimaksud permintaan positif",
+     "whyFails": "NAIDE KUDASAI asks someone NOT to do something. Here the speaker is asking them to wait.",
+     "whyFailsId": "ないでください meminta agar sesuatu TIDAK dilakukan. Di sini penutur justru meminta orang menunggu."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "A polite request is TE-form plus KUDASAI, so MATSU becomes MATTE KUDASAI.",
+    "whyCorrectId": "Permintaan sopan adalah bentuk て ditambah ください, jadi まつ menjadi まってください.",
+    "rule": "V-TE + KUDASAI = please do V.",
+    "ruleId": "V-て + ください = tolong lakukan V.",
+    "whyOthersFail": "MACHIMASU KUDASAI stacks two polite endings, MATSU KUDASAI uses the dictionary form, MATANAIDE KUDASAI reverses the meaning.",
+    "whyOthersFailId": "まちますください menumpuk dua akhiran sopan, まつください memakai bentuk kamus, またないでください membalik maknanya.",
+    "howToAvoid": "Build the TE-form first, then bolt KUDASAI on; never attach it to MASU or the dictionary form.",
+    "howToAvoidId": "Bentuk dulu て-nya, baru pasang ください; jangan pernah menempelkannya pada ます atau bentuk kamus.",
+    "memoryCue": "KUDASAI only shakes hands with TE.",
+    "memoryCueId": "ください hanya mau bersalaman dengan て."
+   },
+   "id": "JP-TF-115",
+   "family": "te_form",
+   "skill": "te_form",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "questionType": "multiple_choice"
+  },
+  {
+   "subskill": "te_kudasai_negative_contrast",
+   "marker": "kudasai-positive-vs-naide-request",
+   "pedagogicalObjective": "Choose the positive TE-KUDASAI request when the speaker wants the action done",
+   "pedagogicalObjectiveId": "Memilih permintaan positif て-ください saat penutur ingin perbuatan itu dilakukan",
+   "misconceptionTargeted": "Learner confuses the request pattern with the prohibition pattern",
+   "misconceptionTargetedId": "Murid mengacaukan pola permintaan dengan pola larangan",
+   "reasoningOperation": "read the situational cue -> decide do or do not -> select the matching request pattern",
+   "reasoningOperationId": "baca petunjuk situasi -> tentukan lakukan atau jangan -> pilih pola permintaan yang cocok",
+   "stem": "さむいですね。まどを ___。（しめる・おねがい）",
+   "stemKana": "さむいですね。まどを ___。（しめる・おねがい）",
+   "furigana": [],
+   "options": [
+    "しめてください",
+    "しめないでください",
+    "しめるください",
+    "しめましてください"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "しめないでください",
+     "misconception": "uses the prohibition pattern NAIDE KUDASAI where a positive request is meant",
+     "misconceptionId": "memakai pola larangan ないでください padahal yang dimaksud permintaan positif",
+     "whyFails": "It is cold, so the speaker wants the window closed, not left open.",
+     "whyFailsId": "Udara dingin, jadi penutur ingin jendela ditutup, bukan dibiarkan terbuka."
+    },
+    {
+     "option": "しめるください",
+     "misconception": "attaches KUDASAI to the dictionary form",
+     "misconceptionId": "menempelkan ください pada bentuk kamus",
+     "whyFails": "KUDASAI only follows a TE-form; the dictionary form cannot precede it.",
+     "whyFailsId": "ください hanya mengikuti bentuk て; bentuk kamus tidak bisa mendahuluinya."
+    },
+    {
+     "option": "しめましてください",
+     "misconception": "uses the polite MASHITE form before KUDASAI",
+     "misconceptionId": "memakai bentuk sopan まして sebelum ください",
+     "whyFails": "MASHITE is a polite connector, not the TE-form; requests need the plain TE-form.",
+     "whyFailsId": "まして penyambung sopan, bukan bentuk て; permintaan butuh bentuk て biasa."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "The speaker wants the window shut, so the positive request SHIMETE KUDASAI is used.",
+    "whyCorrectId": "Penutur ingin jendela ditutup, jadi dipakai permintaan positif しめてください.",
+    "rule": "V-TE + KUDASAI asks for the action; V-NAIDE + KUDASAI asks against it.",
+    "ruleId": "V-て + ください meminta perbuatan; V-ないで + ください melarangnya.",
+    "whyOthersFail": "SHIMENAIDE KUDASAI reverses the meaning; the other two attach KUDASAI to forms it cannot follow.",
+    "whyOthersFailId": "しめないでください membalik makna; dua sisanya menempelkan ください pada bentuk yang tidak bisa diikutinya.",
+    "howToAvoid": "Read the situation clause before choosing: it tells you whether the action is wanted.",
+    "howToAvoidId": "Baca klausa situasinya sebelum memilih: di situ terlihat apakah perbuatan itu diinginkan.",
+    "memoryCue": "Cold room, closed window: TE plus KUDASAI.",
+    "memoryCueId": "Ruangan dingin, jendela ditutup: て tambah ください."
+   },
+   "id": "JP-TF-116",
+   "family": "te_form",
+   "skill": "te_form",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "questionType": "multiple_choice"
+  },
+  {
+   "subskill": "te_kudasai_with_ichidan_verb",
+   "marker": "kudasai-request-with-ichidan-base",
+   "pedagogicalObjective": "Form a request from an ichidan verb using TE plus KUDASAI",
+   "pedagogicalObjectiveId": "Membentuk permintaan dari verba ichidan memakai て ditambah ください",
+   "misconceptionTargeted": "Learner uses a non-TE base such as the MASU-stem before KUDASAI",
+   "misconceptionTargetedId": "Murid memakai dasar selain て, misalnya pangkal ます, sebelum ください",
+   "reasoningOperation": "select the TE-form of the ichidan verb -> attach KUDASAI unchanged",
+   "reasoningOperationId": "pilih bentuk て verba ichidan -> pasang ください tanpa perubahan",
+   "stem": "このかんじを もういちど ___。（おしえる・おねがい）",
+   "stemKana": "このかんじを もういちど ___。（おしえる・おねがい）",
+   "furigana": [],
+   "options": [
+    "おしえてください",
+    "おしえください",
+    "おしえるください",
+    "おしえますください"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "おしえください",
+     "misconception": "drops TE and leaves the bare MASU-stem before KUDASAI",
+     "misconceptionId": "membuang て dan menyisakan pangkal ます telanjang sebelum ください",
+     "whyFails": "A beginner request needs the TE-form; the stem alone belongs to a different, more formal pattern.",
+     "whyFailsId": "Permintaan tingkat pemula butuh bentuk て; pangkal saja milik pola lain yang lebih formal."
+    },
+    {
+     "option": "おしえるください",
+     "misconception": "attaches KUDASAI to the dictionary form",
+     "misconceptionId": "menempelkan ください pada bentuk kamus",
+     "whyFails": "KUDASAI cannot follow a dictionary form.",
+     "whyFailsId": "ください tidak bisa mengikuti bentuk kamus."
+    },
+    {
+     "option": "おしえますください",
+     "misconception": "stacks the polite MASU form before KUDASAI",
+     "misconceptionId": "menumpuk bentuk sopan ます sebelum ください",
+     "whyFails": "MASU and KUDASAI are both polite endings and cannot appear together.",
+     "whyFailsId": "ます dan ください sama-sama akhiran sopan dan tidak bisa muncul bersama."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "OSHIERU is ichidan, so its TE-form OSHIETE takes KUDASAI directly.",
+    "whyCorrectId": "おしえる verba ichidan, jadi bentuk て-nya おしえて langsung memakai ください.",
+    "rule": "Every request, whatever the verb group, is built on the TE-form.",
+    "ruleId": "Setiap permintaan, apa pun kelompok verbanya, dibangun di atas bentuk て.",
+    "whyOthersFail": "The three wrong options put a stem, a dictionary form and a MASU form where only TE belongs.",
+    "whyOthersFailId": "Tiga pilihan salah menaruh pangkal, bentuk kamus, dan bentuk ます di tempat yang hanya milik て.",
+    "howToAvoid": "Build the TE-form first and only then think about KUDASAI.",
+    "howToAvoidId": "Bentuk dulu て-nya, baru pikirkan ください.",
+    "memoryCue": "No TE, no KUDASAI.",
+    "memoryCueId": "Tanpa て, tanpa ください."
+   },
+   "id": "JP-TF-117",
+   "family": "te_form",
+   "skill": "te_form",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "questionType": "multiple_choice"
+  },
+  {
+   "subskill": "te_imasu_action_in_progress",
+   "marker": "te-imasu-action-happening-now",
+   "pedagogicalObjective": "Use TE-IMASU for an action happening at this moment",
+   "pedagogicalObjectiveId": "Memakai て-います untuk perbuatan yang sedang berlangsung saat ini",
+   "misconceptionTargeted": "Learner uses the plain MASU form for an action in progress because it also refers to the present",
+   "misconceptionTargetedId": "Murid memakai bentuk ます biasa untuk perbuatan yang sedang berlangsung karena sama-sama waktu kini",
+   "reasoningOperation": "spot the time cue IMA -> require the progressive -> build TE plus IMASU",
+   "reasoningOperationId": "temukan penanda waktu いま -> tuntut bentuk berlangsung -> bentuk て ditambah います",
+   "stem": "いま ははは だいどころで ごはんを ___。（つくる）",
+   "stemKana": "いま ははは だいどころで ごはんを ___。（つくる）",
+   "furigana": [],
+   "options": [
+    "つくっています",
+    "つくります",
+    "つくりました",
+    "つくってあります"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "つくります",
+     "misconception": "uses the plain MASU form for an action in progress",
+     "misconceptionId": "memakai bentuk ます biasa untuk perbuatan yang sedang berlangsung",
+     "whyFails": "MASU states a habit or a future plan, not something unfolding right now.",
+     "whyFailsId": "ます menyatakan kebiasaan atau rencana, bukan hal yang sedang berlangsung sekarang."
+    },
+    {
+     "option": "つくりました",
+     "misconception": "uses the past form despite the present-time cue IMA",
+     "misconceptionId": "memakai bentuk lampau padahal ada penanda waktu いま",
+     "whyFails": "IMA fixes the action in the present, so a past ending contradicts it.",
+     "whyFailsId": "いま menempatkan perbuatan di masa kini, jadi akhiran lampau bertentangan dengannya."
+    },
+    {
+     "option": "つくってあります",
+     "misconception": "uses the resultant-state pattern TE ARIMASU instead of the progressive",
+     "misconceptionId": "memakai pola keadaan hasil てあります alih-alih bentuk berlangsung",
+     "whyFails": "TE ARIMASU describes a finished preparation left in place, not the mother cooking at this moment.",
+     "whyFailsId": "てあります menggambarkan persiapan yang sudah selesai dan dibiarkan, bukan ibu yang sedang memasak saat ini."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "IMA marks the present moment, so the progressive TE-IMASU is required: TSUKUTTE IMASU.",
+    "whyCorrectId": "いま menandai saat ini, jadi bentuk berlangsung て-います yang dibutuhkan: つくっています.",
+    "rule": "V-TE + IMASU describes an action in progress.",
+    "ruleId": "V-て + います menggambarkan perbuatan yang sedang berlangsung.",
+    "whyOthersFail": "TSUKURIMASU is habitual or future, TSUKURIMASHITA is past, TSUKUTTE ARIMASU is a resultant state.",
+    "whyOthersFailId": "つくります kebiasaan atau rencana, つくりました lampau, つくってあります keadaan hasil.",
+    "howToAvoid": "Look for time words like IMA; they force the progressive.",
+    "howToAvoidId": "Cari kata waktu seperti いま; kata itu memaksa bentuk berlangsung.",
+    "memoryCue": "IMA in the sentence, TE IMASU on the verb.",
+    "memoryCueId": "Ada いま di kalimat, ada ています di verbanya."
+   },
+   "id": "JP-TF-118",
+   "family": "te_form",
+   "skill": "te_form",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "questionType": "multiple_choice"
+  },
+  {
+   "subskill": "te_imasu_ongoing_event",
+   "marker": "te-imasu-ongoing-weather-event",
+   "pedagogicalObjective": "Use TE-IMASU for an event that is going on as the speaker speaks",
+   "pedagogicalObjectiveId": "Memakai て-います untuk peristiwa yang berlangsung saat penutur berbicara",
+   "misconceptionTargeted": "Learner reports an ongoing event with a plain present or past form",
+   "misconceptionTargetedId": "Murid melaporkan peristiwa yang sedang berlangsung dengan bentuk kini biasa atau lampau",
+   "reasoningOperation": "notice that the event is unfinished -> choose the progressive -> attach IMASU to the TE-form",
+   "reasoningOperationId": "sadari peristiwanya belum selesai -> pilih bentuk berlangsung -> pasang います pada bentuk て",
+   "stem": "まどを みて ください。あめが ___。（ふる）",
+   "stemKana": "まどを みて ください。あめが ___。（ふる）",
+   "furigana": [],
+   "options": [
+    "ふっています",
+    "ふります",
+    "ふっていました",
+    "ふりています"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "ふります",
+     "misconception": "uses the plain MASU form for an event in progress",
+     "misconceptionId": "memakai bentuk ます biasa untuk peristiwa yang sedang berlangsung",
+     "whyFails": "FURIMASU predicts or generalises; the speaker is describing rain falling at this moment.",
+     "whyFailsId": "ふります meramalkan atau menggeneralisasi; penutur sedang menggambarkan hujan yang turun saat ini."
+    },
+    {
+     "option": "ふっていました",
+     "misconception": "puts the progressive in the past",
+     "misconceptionId": "menaruh bentuk berlangsung di masa lampau",
+     "whyFails": "The listener is being told to look now, so the rain is present, not remembered.",
+     "whyFailsId": "Lawan bicara disuruh melihat sekarang, jadi hujannya kini, bukan kenangan."
+    },
+    {
+     "option": "ふりています",
+     "misconception": "attaches IMASU to the MASU-stem instead of the TE-form",
+     "misconceptionId": "memasang います pada pangkal ます, bukan pada bentuk て",
+     "whyFails": "The progressive is built on the TE-form; FURU is godan and becomes FUTTE.",
+     "whyFailsId": "Bentuk berlangsung dibangun di atas bentuk て; ふる verba godan dan menjadi ふって."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "The rain is falling as the speaker speaks, so FUTTE IMASU is used.",
+    "whyCorrectId": "Hujan turun saat penutur berbicara, jadi dipakai ふっています.",
+    "rule": "V-TE + IMASU presents an event as still unfolding at the reference time.",
+    "ruleId": "V-て + います menyajikan peristiwa sebagai masih berlangsung pada waktu acuan.",
+    "whyOthersFail": "FURIMASU is a general or future statement, FUTTE IMASHITA shifts to the past, FURITE IMASU uses the wrong base.",
+    "whyOthersFailId": "ふります pernyataan umum atau nanti, ふっていました bergeser ke lampau, ふりています memakai dasar yang salah.",
+    "howToAvoid": "Fix the time first, then choose between IMASU and IMASHITA.",
+    "howToAvoidId": "Tentukan dulu waktunya, baru pilih antara います dan いました.",
+    "memoryCue": "Still happening, still IMASU.",
+    "memoryCueId": "Masih berlangsung, masih います."
+   },
+   "id": "JP-TF-119",
+   "family": "te_form",
+   "skill": "te_form",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "questionType": "multiple_choice"
+  },
+  {
+   "subskill": "te_imasu_answer_to_nani_o",
+   "marker": "te-imasu-answer-what-are-you-doing",
+   "pedagogicalObjective": "Answer a NANI O SHITE IMASU KA question with a matching TE-IMASU form",
+   "pedagogicalObjectiveId": "Menjawab pertanyaan なにを していますか dengan bentuk て-います yang sepadan",
+   "misconceptionTargeted": "Learner answers a progressive question with a non-progressive form",
+   "misconceptionTargetedId": "Murid menjawab pertanyaan bentuk berlangsung dengan bentuk yang bukan berlangsung",
+   "reasoningOperation": "match the answer form to the form used in the question -> keep the progressive",
+   "reasoningOperationId": "samakan bentuk jawaban dengan bentuk pada pertanyaan -> pertahankan bentuk berlangsung",
+   "stem": "「いま なにを して いますか。」「にほんごを ___。」（べんきょうする）",
+   "stemKana": "「いま なにを して いますか。」「にほんごを ___。」（べんきょうする）",
+   "furigana": [],
+   "options": [
+    "べんきょうしています",
+    "べんきょうします",
+    "べんきょうしました",
+    "べんきょうしてください"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "べんきょうします",
+     "misconception": "answers a progressive question with the plain MASU form",
+     "misconceptionId": "menjawab pertanyaan bentuk berlangsung dengan bentuk ます biasa",
+     "whyFails": "The question asks what is happening now, so the answer must stay progressive.",
+     "whyFailsId": "Pertanyaannya menanyakan apa yang sedang terjadi, jadi jawabannya harus tetap berlangsung."
+    },
+    {
+     "option": "べんきょうしました",
+     "misconception": "answers with the past form",
+     "misconceptionId": "menjawab dengan bentuk lampau",
+     "whyFails": "IMA in the question places the action in the present; a past answer does not match it.",
+     "whyFailsId": "いま pada pertanyaan menempatkan perbuatan di masa kini; jawaban lampau tidak cocok."
+    },
+    {
+     "option": "べんきょうしてください",
+     "misconception": "answers a question with a request",
+     "misconceptionId": "menjawab pertanyaan dengan permintaan",
+     "whyFails": "TE KUDASAI asks someone to do something; it cannot report what the speaker is doing.",
+     "whyFailsId": "てください meminta orang melakukan sesuatu; tidak bisa melaporkan apa yang sedang dilakukan penutur."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "The question uses SHITE IMASU, so the answer keeps the same progressive shape: BENKYOU SHITE IMASU.",
+    "whyCorrectId": "Pertanyaannya memakai しています, jadi jawabannya mempertahankan bentuk berlangsung yang sama: べんきょうしています.",
+    "rule": "Answers mirror the tense and aspect of the question.",
+    "ruleId": "Jawaban mengikuti kala dan aspek pertanyaannya.",
+    "whyOthersFail": "BENKYOU SHIMASU is habitual, BENKYOU SHIMASHITA is past, BENKYOU SHITE KUDASAI is a request.",
+    "whyOthersFailId": "べんきょうします kebiasaan, べんきょうしました lampau, べんきょうしてください permintaan.",
+    "howToAvoid": "Reread the question ending before answering and copy its shape.",
+    "howToAvoidId": "Baca ulang akhiran pertanyaannya sebelum menjawab, lalu tiru bentuknya.",
+    "memoryCue": "IMASU asked, IMASU answered.",
+    "memoryCueId": "います ditanya, います dijawab."
+   },
+   "id": "JP-TF-120",
+   "family": "te_form",
+   "skill": "te_form",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "questionType": "multiple_choice"
+  }
+ ]
+}
