@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-06T16:39:33.333Z",
+  "updated": "2026-09-06T16:50:18.880Z",
   "active": [
     {
       "sesi": "ses_0034e69d3ffes3kjiFLNDzYXUZ",
@@ -111,11 +111,10 @@
       "peran": "claude-code / graf keluarga brain",
       "paths": [
         "features/brain/fiezel-core-brain.js",
-        "tests/family-graph-injection-test.js",
-        "docs/handoffs/JAPANESE-COURSE-HANDOFF.md"
+        "tests/family-graph-injection-test.js"
       ],
       "mulai": "2026-09-06T16:39:33Z",
-      "catatan": "Langkah 1 kursus Jepang: setFamilyGraph/resetFamilyGraph/familyGraph. Graf Inggris tetap bawaan, dijaga patokan tulis-tangan di gerbang."
+      "catatan": "Langkah 1 kursus Jepang: setFamilyGraph/resetFamilyGraph/familyGraph. Graf Inggris tetap bawaan, dijaga patokan tulis-tangan di gerbang. Handoff JAPANESE-COURSE sudah diklaim entri sesi-claude-cq1nea di atas."
     }
   ],
   "finished": [
