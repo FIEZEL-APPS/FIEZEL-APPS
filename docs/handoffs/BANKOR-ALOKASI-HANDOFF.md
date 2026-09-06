@@ -81,10 +81,8 @@ baru. Karena itu tiap tahap pelonggaran dilaporkan di hasil: `relaxed`, `repeate
 
 ## Langkah berikutnya — urut dari yang paling menentukan
 
-1. **Sambungkan ke latihan mandiri murid.** `fiezel-learner-flow.js:116` masih memakai
-   `avoid: seenFor(skill)`. Ganti dengan alokator, dan catat hasil per butir ke ingatan di
-   `answerLesson()` — hari ini hanya `markSeen` (tanpa hasil) yang dicatat. Ini langkah
-   yang paling murah dan paling cepat terasa, karena tidak menyentuh guru sama sekali.
+1. ~~**Sambungkan ke latihan mandiri murid.**~~ **SELESAI di m025-277.** Lihat bagian
+   "Penyambungan latihan mandiri" di bawah.
 2. **Tugas guru mode adaptif.** `fiezel-teacher-store.js:buildAssignment` hari ini
    mengunci `itemIds` di perangkat GURU. Untuk personalisasi, tugas harus membawa RESEP
    (skill + jumlah + batasan) alih-alih daftar tetap, lalu `fiezel-class-hub.js:startRunner`
@@ -104,3 +102,49 @@ baru. Karena itu tiap tahap pelonggaran dilaporkan di hasil: `relaxed`, `repeate
   menjaga ini.
 - Jangan naikkan otoritas kedua modul di `fiezel-brain-manifest.js` sebelum pemanggilnya
   benar-benar ada. `tests/brain-page-wiring-test.js` W8 memerahkan drift arah balik.
+
+## Penyambungan latihan mandiri (m025-277)
+
+Dua modul dinaikkan dari `off` ke `active` di `fiezel-brain-manifest.js`
+(`questionMemory`, `questionAllocation`) dalam SATU commit bersama pemuatannya di
+`index.html` dan precache `sw.js` — otoritas yang naik tanpa pemuatannya adalah peta
+yang bohong, dan `tests/brain-page-wiring-test.js` W1/W2 memerahkannya.
+
+Yang berubah di `features/learner-flow/fiezel-learner-flow.js`, semuanya kecil:
+
+- `allocateIds(st, block)` — kolam `bank().itemsFor(skill)` + ingatan murid diserahkan ke
+  `FiezelQuestionAllocator.allocate()`. Kalau modulnya belum termuat atau kolamnya kosong,
+  `pickFresh` lama tetap jadi jalan mundur; latihan tidak boleh mati hanya karena satu
+  script gagal dimuat.
+- `rememberAttempt(st, item, correct)` di `answerLesson()` — hasil per BUTIR dicatat.
+  Sebelum ini yang tersimpan hanya agregat per skill, jadi ingatan soal kosong selamanya.
+- `learnerSeed(st)` — seed dari `storedSocialHandle()` (identitas murid), bukan jam.
+  Dua murid dengan riwayat sama mendapat urutan berbeda, dan set yang sama bisa dibangun
+  ulang persis untuk diperiksa. Murid tanpa handle mendapat id acak sekali, lalu tetap.
+- `memoryOf(st)` memeriksa bentuk lewat `M.SCHEMA`, **bukan** `isMemory()` — fungsi itu
+  tidak diekspor modulnya, dan versi pertama sambungan ini memakainya, sehingga ingatan
+  murid diam-diam dikosongkan setiap kali dibaca. Gerbang P3 yang menemukannya.
+
+Keputusan yang sengaja TIDAK diambil:
+
+- `markSeen`/`seenFor` tetap hidup — `diagnosticSet` masih memakainya. Membuangnya adalah
+  perubahan tersendiri.
+- `st.seen` **tidak** dimigrasikan jadi ingatan soal. "Pernah tampil" bukan "pernah dijawab
+  benar"; memindahkannya menanam bukti palsu ke seluruh riwayat murid lama. Ada gerbang
+  yang menjaganya.
+- Tidak ada tutup 600 kedua di learner-flow; `prune()` milik modul ingatan sudah menanganinya.
+- Sisi guru nol perubahan (`git diff --stat` tidak menyentuh `features/teacher/` maupun
+  `features/class-hub/`). Tugas guru tetap membawa `itemIds` tetap — itu langkah 2, belum ini.
+
+`tests/bankor-latihan-test.js` menjalankan alur latihan yang SEBENARNYA lewat DOM palsu
+(mount → tujuan → diagnostic → rencana → lesson) dan menguji lima perilaku P1–P5 plus dua
+batas. Setiap perilaku dibuktikan merah dulu dengan mutasi: alokator dilepas, pencatatan
+jawaban dibuang, seed dilepas dari identitas murid, alokator ikut campur set manual guru,
+dan ingatan dikosongkan tiap dibaca.
+
+`tests/brain-manifest-test.js` ikut disunting, dan itu bukan pelonggaran: assert-nya utuh,
+yang dilebarkan adalah PERMUKAAN yang dibaca — dari `app.js` saja menjadi `app.js` +
+seluruh modul fitur (kecuali `features/brain/` sendiri). Penyambungan BANKOR hidup di
+`features/learner-flow/`, dan gerbang yang hanya melihat `app.js` akan menuduh modul yang
+jelas-jelas dipakai sebagai "active tetapi nol pemanggil". Dua mutasi membuktikan bentuk
+barunya masih menggigit di kedua arah.

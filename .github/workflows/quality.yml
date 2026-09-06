@@ -214,6 +214,7 @@ jobs:
           node tests/brain-config-test.js
           node tests/brain-manifest-test.js
           node tests/question-allocator-test.js
+          node tests/bankor-latihan-test.js
           node tests/fiezel-stat-gate-test.js
           node tests/learning-lane-test.js
           node tests/braincore-evidence-test.js
