@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-06T18:09:26.241Z",
+  "updated": "2026-09-06T18:38:39.616Z",
   "active": [
     {
       "sesi": "ses_0034e69d3ffes3kjiFLNDzYXUZ",
@@ -97,14 +97,14 @@
       "catatan": "Menyentuh juga app.js (kunci ujian di quizLoop/Skills Lab/Writing + gerbang pintu AI + pendeteksi ujian non-tugas), features/class-hub/fiezel-class-hub.js, features/learner-flow/fiezel-learner-flow.js, features/teacher/fiezel-teacher-store.js, workers/api/teacher/class-sync-core.js (fx), copy-*-proctor.js, index.html, sw.js, quality.yml. Build m025-273 lewat tools/bump-build.mjs."
     },
     {
-      "sesi": "claude-code-sumbu-bahasa",
-      "peran": "claude-code / sumbu bahasa target",
+      "sesi": "claude-code-gerbang-konten-ja",
+      "peran": "claude-code / gerbang konten Jepang",
       "paths": [
-        "features/brain/fiezel-target-language.js",
-        "tests/target-language-axis-test.js"
+        "tests/japanese-content-test.js",
+        "docs/japanese/n5-a1-sample-templates.json"
       ],
-      "mulai": "2026-09-06T18:09:26Z",
-      "catatan": "Langkah 2 kursus Jepang: kunci penyimpanan per bahasa. Kunci Inggris identik byte per byte; modul off di manifest karena belum ada pemanggil."
+      "mulai": "2026-09-06T18:38:39Z",
+      "catatan": "Langkah 3: gerbang skema+pengecoh+concept. Nol byte produksi (gerbang dan dokumen saja)."
     }
   ],
   "finished": [
@@ -346,6 +346,18 @@
       "catatan": "Normalisasi dua berkas kosakata milik owner jadi satu bank JSON per tingkat JLPT. Nol byte produksi.",
       "selesai": "2026-09-06T18:09:26Z",
       "hasil": "Mendarat lewat PR #374."
+    },
+    {
+      "sesi": "claude-code-sumbu-bahasa",
+      "peran": "claude-code / sumbu bahasa target",
+      "paths": [
+        "features/brain/fiezel-target-language.js",
+        "tests/target-language-axis-test.js"
+      ],
+      "mulai": "2026-09-06T18:09:26Z",
+      "catatan": "Langkah 2 kursus Jepang: kunci penyimpanan per bahasa. Kunci Inggris identik byte per byte; modul off di manifest karena belum ada pemanggil.",
+      "selesai": "2026-09-06T18:38:39Z",
+      "hasil": "Mendarat lewat PR #379 (m025-281)."
     }
   ],
   "protocol": "coordination-claims-v1",
