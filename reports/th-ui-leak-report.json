@@ -1,13 +1,13 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-09-06T01:19:27.858Z",
+  "generatedAt": "2026-09-06T01:31:07.062Z",
   "files": {
     "app.js": {
       "leaks": 1,
       "budget": 1,
       "sample": [
         {
-          "line": 8612,
+          "line": 8670,
           "text": "Nama kriteria: n/4 - satu kalimat alasan yang menunjuk bukti di tulisannya"
         }
       ]
@@ -45,7 +45,7 @@
       "budget": 1,
       "sample": [
         {
-          "line": 103,
+          "line": 226,
           "text": "Tugas disimpan sebagai"
         }
       ]
@@ -216,8 +216,8 @@
     }
   },
   "copyKeys": {
-    "id": 2206,
-    "th": 2208,
+    "id": 2229,
+    "th": 2231,
     "idTanpaTh": 0
   },
   "pass": true

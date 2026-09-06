@@ -12,6 +12,10 @@ export const CLASS_CODE_RE = /^FZ-[A-HJ-NP-Z2-9]{6}$/;
 export const LIMITS = Object.freeze({
   NAME_MAX: 24, TITLE_MAX: 60, SKILLS_MAX: 12, SKILL_KEY_MAX: 32, COUNT_MAX: 5000,
   ASSIGN_MAX: 8, ASSIGN_ID_MAX: 40, WRONG_MAX: 40, REPORTS_PAGE: 200,
+  // Pendeteksi keluar layar (assign.f): batas atas yang sengaja longgar untuk sesi
+  // terpanjang yang masuk akal, tetapi tetap TERTUTUP — angka mustahil dari jam
+  // perangkat yang meloncat ditolak di gerbang, bukan dipajang di layar guru.
+  FOCUS_N_MAX: 500, FOCUS_SEC_MAX: 6 * 3600,
   LEARNER_MIN_INTERVAL_MS: 15000, TEACHER_MIN_INTERVAL_MS: 3000
 });
 
@@ -68,6 +72,17 @@ export function normalizeReport(body, nowMs) {
       const entry = { id, at: Number(a.at) || reportedAt, c: c == null ? undefined : c, t: t == null ? undefined : t };
       // s = sedang mengerjakan (dibuka, belum selesai); w = soal yang salah {i:itemId, o:pilihan}.
       if (a.s) entry.s = 1;
+      // f = pendeteksi keluar layar saat ujian: n kali keluar, s detik total di luar,
+      // x detik kepergian terlama. TIGA BILANGAN saja — tanpa nama aplikasi, tanpa jam
+      // presisi, tanpa teks bebas; guru perlu tahu celahnya terbuka, bukan isi ponsel murid.
+      if (a.f !== undefined) {
+        if (!a.f || typeof a.f !== 'object' || Array.isArray(a.f)) return { ok: false, reason: 'bad_assign_focus' };
+        const fn = intIn(a.f.n, LIMITS.FOCUS_N_MAX);
+        const fs = intIn(a.f.s, LIMITS.FOCUS_SEC_MAX);
+        const fx = a.f.x === undefined ? 0 : intIn(a.f.x, LIMITS.FOCUS_SEC_MAX);
+        if (fn == null || fs == null || fx == null || fx > fs) return { ok: false, reason: 'bad_assign_focus' };
+        entry.f = { n: fn, s: fs, x: fx };
+      }
       if (a.w !== undefined) {
         if (!Array.isArray(a.w) || a.w.length > LIMITS.WRONG_MAX) return { ok: false, reason: 'bad_assign_wrong' };
         entry.w = [];

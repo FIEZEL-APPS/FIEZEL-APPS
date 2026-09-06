@@ -506,7 +506,8 @@ html.fz-booting body{overflow:hidden}
   <script defer src="./features/i18n/copy-id-redesign.js"></script>
   <script defer src="./features/i18n/copy-id-grammar-labels.js"></script>
   <script defer src="./features/i18n/copy-id-student.js"></script>
-  <!-- m025-269: naskah "masuk dengan Google". Domain sendiri, bukan tumpangan: gerbang
+  <script defer src="./features/i18n/copy-id-proctor.js"></script>
+  <!-- m025-270: naskah "masuk dengan Google". Domain sendiri, bukan tumpangan: gerbang
        cakupan Thai menemukan domain dari isi features/i18n/, jadi berkas ini otomatis
        menuntut copy-th-google.js — dan layar masuk adalah layar PERTAMA yang ditemui
        murid Thai, tempat paling mahal untuk salah bahasa. -->
@@ -733,6 +734,8 @@ html.fz-booting body{overflow:hidden}
   <script defer src="./features/teacher/fiezel-teacher-icons.js"></script>
   <script defer src="./features/teacher/fiezel-teacher-store.js"></script>
   <!-- Class hub: Kelas = pusat Guru ↔ Murid ↔ Braincore (dipakai tab Kelas murid & view Kelas Ruang Guru). Harus sebelum teacher-shell. -->
+  <!-- Pendeteksi keluar layar saat ujian: inti murni, dipakai class-hub. Harus sebelum class-hub. -->
+  <script defer src="./features/class-hub/fiezel-focus-guard.js"></script>
   <script defer src="./features/class-hub/fiezel-braincore-review.js"></script>
   <script defer src="./features/class-hub/fiezel-class-hub.js"></script>
   <script defer src="./features/teacher/fiezel-teacher-shell.js"></script>
