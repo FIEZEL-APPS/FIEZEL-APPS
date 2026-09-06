@@ -165,6 +165,26 @@
       return { name: firstName(p.name), lastActiveAt: Number(p.at) || Date.now(), targetDone: (p.lessons || 0) >= 3, results: results, goal: p.goal || null, cls: normalizeClassCode(p.cls) || null, assignments: Array.isArray(p.assign) ? p.assign : (p.assign ? [{ id: p.assign }] : []) };
     } catch (_) { return null; }
   }
+  /* ---- pendeteksi keluar layar (assign.f dari murid) ------------------------------------
+   * Bentuk yang datang dari murid sudah dibatasi gerbang server (class-sync-core.js), tetapi
+   * kelas juga bisa terisi dari KODE hasil yang ditempel guru — jalur itu tidak lewat server,
+   * jadi angkanya dinormalkan lagi di sini. */
+  function normalizeFocus(f) {
+    var n = Math.max(0, Math.round(Number(f && f.n) || 0)), sec = Math.max(0, Math.round(Number(f && f.s) || 0));
+    return { n: n, s: sec, x: Math.max(0, Math.min(sec, Math.round(Number(f && f.x) || 0))), at: Date.now() };
+  }
+  /** Laporan murid dikirim ulang berkali-kali; guru hanya perlu dibangunkan saat angkanya NAIK. */
+  function focusGrew(prev, next) {
+    var pn = Number(prev && prev.n) || 0, ps = Number(prev && prev.s) || 0;
+    return (Number(next && next.n) || 0) > pn || (Number(next && next.s) || 0) > ps;
+  }
+  function focusOf(a, s) { return (a && a.focus && s && a.focus[s.id]) || null; }
+  /** Kalimat pendek untuk chip di layar guru. Menyebut fakta, tidak menuduh. */
+  function focusLabel(f) {
+    if (!f || !f.n) return 'Tidak keluar layar';
+    return 'Keluar layar ' + f.n + '× · ' + (f.s >= 60 ? Math.round(f.s / 60) + ' mnt' : f.s + ' dtk');
+  }
+  function focusLevel(f) { return !f || !f.n ? 'bersih' : (f.n >= 3 || f.s >= 30 ? 'berat' : 'ringan'); }
   /** Masukkan hasil murid ke kelas: perbarui murid yang ada (nama depan sama) atau tambah baru. Skill digabung per-skill. */
   function ingest(c, parsed) {
     var s = c.students.filter(function (x) { return x.name.toLowerCase() === parsed.name.toLowerCase(); })[0], isNew = false;
@@ -173,15 +193,16 @@
     s.results = s.results.filter(function (r) { return !incoming[r.skill]; }).concat(parsed.results);
     s.lastActiveAt = parsed.lastActiveAt; s.targetDone = parsed.targetDone || s.targetDone; s.goal = parsed.goal || s.goal;
     s.attendance[today(parsed.lastActiveAt)] = s.attendance[today(parsed.lastActiveAt)] || 'H';
-    var graded = [], explicit = parsed.assignments || [];
+    var graded = [], focusEvents = [], explicit = parsed.assignments || [];
     (c.assignments || []).forEach(function (a) {
       var hit = explicit.filter(function (x) { return x.id === a.id; })[0];
+      if (hit && hit.f) { a.focus = a.focus || {}; if (focusGrew(a.focus[s.id], hit.f)) { a.focus[s.id] = normalizeFocus(hit.f); focusEvents.push({ kind: 'focus_exit', student: s.name, sid: s.id, title: a.title, aid: a.id, f: a.focus[s.id], mode: a.mode || 'latihan' }); } }
       if (hit && hit.s && !(hit.t > 0) && !(a.done && a.done[s.id])) { a.progress = a.progress || {}; a.progress[s.id] = Number(hit.at) || parsed.lastActiveAt; return; }
       if (a.done && a.done[s.id]) return;
       var implicit = !explicit.length && targeted(a, s) && parsed.lastActiveAt >= a.createdAt && a.skills.some(function (k) { return incoming[k]; });
       if (hit || implicit) { a.done = a.done || {}; a.done[s.id] = { at: Number(hit && hit.at) || parsed.lastActiveAt, acc: hit && hit.t ? hit.c / hit.t : skillAcc(s, a.skills[0]), c: hit ? hit.c : undefined, t: hit ? hit.t : undefined, w: hit && Array.isArray(hit.w) ? hit.w : undefined }; if (a.progress) delete a.progress[s.id]; graded.push(a); }
     });
-    return { student: s, graded: graded, isNew: isNew };
+    return { student: s, graded: graded, isNew: isNew, focusEvents: focusEvents };
   }
   /** Bentuk payload tugas yang dikirim ke server = isi kode tugas (tanpa base64). */
   function assignmentPayload(c, a) { var p = { v: 1, t: 'assign', id: a.id, title: a.title, skills: a.skills, itemIds: a.itemIds, minutes: a.minutes, from: c.name, cls: c.code, deadline: a.deadline || null, mode: a.mode || 'latihan', timer: a.timer || 0, shuffle: !!a.shuffle }; if (a.teacher) p.teacher = String(a.teacher).slice(0, 60); if (Array.isArray(a.items) && a.items.length) p.items = a.items.map(function (q) { var o = { id: q.id, prompt: q.prompt, options: q.options, answer: q.answer, skill: q.skill }; if (q.context) o.context = q.context; if (q.why && Object.keys(q.why).length) o.why = q.why; return o; }); return p; }
@@ -307,6 +328,7 @@
     if (e.kind === 'assignment_done') return e.student + ' selesai mengerjakan “' + e.title + '”' + (e.acc != null ? ' · ' + pct(e.acc) : '');
     if (e.kind === 'student_joined') return e.student + ' bergabung ke kelas ' + (e.cls || '');
     if (e.kind === 'report_in') return 'Laporan latihan baru dari ' + e.student;
+    if (e.kind === 'focus_exit') return e.student + ' keluar dari layar ' + (e.mode === 'ujian' ? 'ujian' : 'tugas') + ' “' + e.title + '” — ' + focusLabel(e.f).toLowerCase();
     return e.text || '';
   }
   /** syncAvailable() -> 'ok' | 'offline' | 'no_account' | 'not_teacher' | 'disabled' */
@@ -340,6 +362,9 @@
       (d.reports || []).forEach(function (rep) {
         var p = parseLearnerPayload(rep.report); if (!p) return;
         var res = ingest(c, p); ingested++; graded += res.graded.length; names.push(res.student.name);
+        // Kabar keluar-layar didahulukan: ia satu-satunya kabar yang masih bisa ditindaklanjuti
+        // guru SAAT ujian berlangsung; sisanya (selesai, bergabung) bisa dibaca kapan saja.
+        (res.focusEvents || []).forEach(function (e) { events.push(Object.assign({ clsId: c.id }, e)); });
         if (res.isNew) events.push({ kind: 'student_joined', student: res.student.name, sid: res.student.id, cls: c.name, clsId: c.id });
         res.graded.forEach(function (a) { var dn = a.done && a.done[res.student.id]; events.push({ kind: 'assignment_done', student: res.student.name, sid: res.student.id, title: a.title, aid: a.id, acc: dn ? dn.acc : null, clsId: c.id }); });
         if (!res.isNew && !res.graded.length) events.push({ kind: 'report_in', student: res.student.name, sid: res.student.id, clsId: c.id });
@@ -374,6 +399,7 @@
   return { KEY: KEY, ASSIGN_KEY: ASSIGN_KEY, SKILL_LABEL: SKILL_LABEL, SKILL_ORDER: SKILL_ORDER, ATT: ATT, DAY: DAY,
     load: load, save: save, defaults: defaults, uid: uid, today: today, firstName: firstName, newClass: newClass, newStudent: newStudent, normalizeClass: normalizeClass, seedDemo: seedDemo, makeClassCode: makeClassCode, normalizeClassCode: normalizeClassCode,
     skillAcc: skillAcc, overallAcc: overallAcc, daysSince: daysSince, risk: risk, classStats: classStats, classSkillMap: classSkillMap, heatmap: heatmap, studyGroups: studyGroups, misconceptions: misconceptions, needsGreeting: needsGreeting, agenda: agenda, pendingAssignments: pendingAssignments, targeted: targeted, recentAttendance: recentAttendance, attendanceRate: attendanceRate, weakestSkill: weakestSkill,
+    normalizeFocus: normalizeFocus, focusGrew: focusGrew, focusOf: focusOf, focusLabel: focusLabel, focusLevel: focusLevel,
     parseLearnerCode: parseLearnerCode, parseLearnerPayload: parseLearnerPayload, ingest: ingest, assignmentCode: assignmentCode, assignmentPayload: assignmentPayload, parseAssignmentCode: parseAssignmentCode, acceptAssignmentCode: acceptAssignmentCode, acceptAssignmentPayload: acceptAssignmentPayload, buildAssignment: buildAssignment,
     SYNC_PATHS: SYNC_PATHS, syncAvailable: syncAvailable, claimClass: claimClass, pullReports: pullReports, syncClass: syncClass, reportToClass: reportToClass, syncLabel: syncLabel, sendAssignment: sendAssignment, sentTo: sentTo,
     notify: notify, inboxUnread: inboxUnread, inboxMarkAllRead: inboxMarkAllRead, inboxText: inboxText,

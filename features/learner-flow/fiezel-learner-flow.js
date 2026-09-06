@@ -221,6 +221,23 @@
    * Rencana hari ini — satu jalur bukti, bukan dua. res = { id, title, skill, mode, minutes,
    * results:[{itemId, skill, correct, chosen}] }. Bukti per-soal yang salah ikut ke guru (assign.w).
    */
+  /**
+   * Sisi Kelas (class-hub): pendeteksi keluar layar melaporkan bahwa murid meninggalkan
+   * layar ujian. Dipanggil SETIAP episode ditutup (dan saat episode dibuka) supaya guru
+   * melihatnya saat ujian masih berjalan, bukan setelah selesai. `focus` = { n, s, x }
+   * dari FiezelFocusGuard.payload: tiga bilangan, tanpa teks bebas.
+   */
+  function recordAssignmentFocus(id, focus) {
+    if (!id || !focus) return false;
+    var s = ensureState();
+    var list = (s.doneAssign || []).slice();
+    var cur = list.filter(function (x) { return x.id === id; })[0];
+    var f = { n: Math.max(0, Math.round(Number(focus.n) || 0)), s: Math.max(0, Math.round(Number(focus.s) || 0)), x: Math.max(0, Math.round(Number(focus.x) || 0)) };
+    if (cur) cur.f = f;
+    else list.push({ id: id, at: Date.now(), s: 1, f: f });
+    s.doneAssign = list.slice(-8);
+    save(s); pushToClass(); return true;
+  }
   function recordAssignmentResult(res) {
     if (!res || !res.id || !Array.isArray(res.results)) return null; var s = ensureState(), B = bank();
     var correct = res.results.filter(function (r) { return r.correct; }).length;
@@ -228,6 +245,12 @@
     var meta = B && B.SKILLS[res.skill]; s.lessons.push({ at: Date.now(), skill: res.skill, area: meta ? meta.area : (res.skill || 'grammar'), kind: res.mode === 'ujian' ? 'Ujian dari guru' : t('flow.tugas-guru', 'Tugas dari guru'), title: res.title, correct: correct, total: res.results.length, minutes: res.minutes || 0 });
     var wrong = res.results.filter(function (r) { return !r.correct; }).slice(0, 40).map(function (r) { return { i: String(r.itemId).slice(0, 40), o: Number(r.chosen) >= 0 ? Number(r.chosen) : 0 }; });
     var entry = { id: res.id, at: Date.now(), c: correct, t: res.results.length }; if (wrong.length) entry.w = wrong;
+    // Catatan keluar layar milik sesi ini ikut ke hasil akhir; tanpa penggabungan ini,
+    // entri hasil MENIMPA entri "sedang mengerjakan" dan bukti pengawasan hilang persis
+    // pada saat guru paling membutuhkannya (saat menilai).
+    var prevFocus = (s.doneAssign || []).filter(function (x) { return x.id === res.id; })[0];
+    if (res.focus && Number(res.focus.n) > 0) entry.f = { n: Math.round(Number(res.focus.n) || 0), s: Math.round(Number(res.focus.s) || 0), x: Math.round(Number(res.focus.x) || 0) };
+    else if (prevFocus && prevFocus.f) entry.f = prevFocus.f;
     s.doneAssign = (s.doneAssign || []).filter(function (x) { return x.id !== res.id; }).concat([entry]).slice(-8);
     if (s.plan && s.plan.done.indexOf('assign-' + res.id) === -1) s.plan.done.push('assign-' + res.id);
     try { localStorage.setItem(ASSIGN_KEY, JSON.stringify(loadAssignments().filter(function (a) { return a.id !== res.id; }))); } catch (_) {}
@@ -559,5 +582,5 @@
     });
   }
 
-  return { KEY: KEY, ASSIGN_KEY: ASSIGN_KEY, GOALS: GOALS, mount: mount, render: render, load: load, buildPlan: buildPlan, skillSummary: skillSummary, weeklySummary: weeklySummary, tutorCode: tutorCode, rankedSkills: rankedSkills, statusOf: statusOf, openAssignment: openAssignment, markAssignmentStarted: markAssignmentStarted, recordAssignmentResult: recordAssignmentResult, pushToClass: function () { ensureState(); return pushToClass(); }, _state: function () { return st; } };
+  return { KEY: KEY, ASSIGN_KEY: ASSIGN_KEY, GOALS: GOALS, mount: mount, render: render, load: load, buildPlan: buildPlan, skillSummary: skillSummary, weeklySummary: weeklySummary, tutorCode: tutorCode, rankedSkills: rankedSkills, statusOf: statusOf, openAssignment: openAssignment, markAssignmentStarted: markAssignmentStarted, recordAssignmentFocus: recordAssignmentFocus, recordAssignmentResult: recordAssignmentResult, pushToClass: function () { ensureState(); return pushToClass(); }, _state: function () { return st; } };
 });
