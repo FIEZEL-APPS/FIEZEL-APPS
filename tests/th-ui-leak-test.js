@@ -66,6 +66,22 @@ const ALLOWLIST = Object.freeze({
   'features/neural-voice/fiezel-neural-voice-audibility-fix.js': 2, // idem — lihat catatan ZONA AUDIO di bawah
   'features/prasasti/fiezel-prasasti-core.js': 3,               // berkas kanon, sha dikunci
   'features/quota/quota-copy.js': 5,                            // KANON id + cadangan; naskah th-nya sudah lewat copy-map (m025-269)
+  /* KONTEN KURIKULUM NASIONAL INDONESIA, bukan naskah antarmuka. Empat literalnya adalah
+     nama Fase resmi Kurikulum Merdeka dan dua saran pedagogis di dalam paket materinya.
+     Menerjemahkannya ke Thai bukan sia-sia melainkan menyesatkan: guru Thai tidak mengajar
+     di bawah Kurikulum Merdeka.
+
+     Entri ini ada karena alternatifnya sudah dicoba dan salah. m025-283 sempat "menghijaukan"
+     berkas ini dengan MENGGANTI KATANYA sampai heuristik pemindai tidak lagi mengenalinya —
+     'Kelas 10' jadi 'Tingkat 10', 'Selesai' jadi 'Resolusi', 'Buat' jadi 'Gambar'. Isinya
+     tetap seratus persen Indonesia; yang berubah hanya kemampuan gerbang melihatnya. Lebih
+     buruk lagi, 'Fase E (SMA / SMK Kelas 10)' adalah istilah REGULASI: menulisnya 'Tingkat 10'
+     membuat naskahnya salah menurut Kemendikbud demi lolos sebuah tes. Kata-katanya
+     dikembalikan di m025-284 dan utangnya dinyatakan di sini, terbuka.
+
+     Kalau FIEZEL kelak membawa kurikulum negara lain, jalannya paket kurikulum per-negara —
+     bukan menerjemahkan paket Indonesia, dan bukan pula menyamarkan katanya. */
+  'features/teacher/fiezel-teacher-curriculum.js': 4,
   'features/speaking-listening/listening-scenarios-a1.js': 11,  // konten belajar, jalur th lewat sidecar
   'features/speaking-listening/listening-scenarios-a2.js': 12   // idem
 });
@@ -123,7 +139,7 @@ function leaksIn(file) {
   return hits;
 }
 
-const files = ['app.js', ...walk(path.join(__fzRoot, 'features')).map((p) => path.relative(__fzRoot, p))];
+const files = ['app.js', ...walk(path.join(__fzRoot, 'features')).map((p) => path.relative(__fzRoot, p).replace(/\\/g, '/'))];
 let failed = false;
 const report = { schema: 'fiezel-th-ui-leak-v1', generatedAt: new Date().toISOString(), files: {} };
 

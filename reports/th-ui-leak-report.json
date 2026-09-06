@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-09-06T20:59:30.895Z",
+  "generatedAt": "2026-09-06T22:57:37.463Z",
   "files": {
     "app.js": {
       "leaks": 1,
@@ -224,7 +224,7 @@
     },
     "features/teacher/fiezel-teacher-curriculum.js": {
       "leaks": 4,
-      "budget": 0,
+      "budget": 4,
       "sample": [
         {
           "line": 25,
@@ -243,34 +243,12 @@
           "text": "Buat bagan alur 3 langkah di papan: Disruption → Displacement of water → Giant waves."
         }
       ]
-    },
-    "features/teacher/fiezel-teacher-shell.js": {
-      "leaks": 4,
-      "budget": 0,
-      "sample": [
-        {
-          "line": 584,
-          "text": "Pilih Bab / Genre Materi Kurikulum Merdeka"
-        },
-        {
-          "line": 595,
-          "text": "🎤 Apersepsi 5 Menit (Hook Kelas):"
-        },
-        {
-          "line": 611,
-          "text": "Judul Tugas / Bab"
-        },
-        {
-          "line": 616,
-          "text": "Terbitkan Tugas Kurikulum"
-        }
-      ]
     }
   },
   "copyKeys": {
-    "id": 2400,
-    "th": 2402,
+    "id": 2405,
+    "th": 2407,
     "idTanpaTh": 0
   },
-  "pass": false
+  "pass": true
 }

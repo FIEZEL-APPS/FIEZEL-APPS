@@ -581,7 +581,7 @@
           return '<button type="button" class="tg-chip' + (curPhase === p.id ? ' is-active' : '') + '" data-tg="assign-phase" data-phase="' + p.id + '"><b>' + esc(p.name) + '</b><small>' + esc(p.cefr) + '</small></button>';
         }).join('') + '</div>';
 
-        var unitSelect = '<label class="tg-label">Pilih Bab / Genre Materi Kurikulum Merdeka<select name="unit_id" data-tg-select="unit" class="tg-select-unit">' + units.map(function (u) {
+        var unitSelect = '<label class="tg-label">' + t('guru.pilih-bab-kurikulum', 'Pilih Bab / Genre Materi Kurikulum Merdeka') + '<select name="unit_id" data-tg-select="unit" class="tg-select-unit">' + units.map(function (u) {
           return '<option value="' + u.id + '"' + (curUnit && curUnit.id === u.id ? ' selected' : '') + '>Kelas ' + u.grade + ' (Sem ' + u.semester + ') · ' + esc(u.genre) + ' — ' + esc(u.title) + '</option>';
         }).join('') + '</select></label>';
 
@@ -592,7 +592,7 @@
             '<div class="tg-brief-head"><span class="tg-badge">💡 Teaching Brief</span><h4>' + esc(curUnit.title) + '</h4><span class="tg-cefr-pill">' + esc(curUnit.targetCefr) + '</span></div>' +
             '<p class="tg-brief-summary">' + esc(tb.summary) + '</p>' +
             '<div class="tg-brief-grid">' +
-              '<div class="tg-brief-col"><b>🎤 Apersepsi 5 Menit (Hook Kelas):</b><p>' + esc(tb.hook5Minutes) + '</p></div>' +
+              '<div class="tg-brief-col"><b>' + t('guru.apersepsi-5-menit', '🎤 Apersepsi 5 Menit (Hook Kelas):') + '</b><p>' + esc(tb.hook5Minutes) + '</p></div>' +
               '<div class="tg-brief-col"><b>📋 Rumus Papan Tulis:</b><code>' + esc(tb.boardFormula) + '</code></div>' +
             '</div>' +
             (tb.commonMisconceptions && tb.commonMisconceptions.length ? '<div class="tg-brief-miscons"><b>⚠️ Top Miskonsepsi Siswa:</b><ul>' + tb.commonMisconceptions.map(function (mc) { return '<li><b>' + esc(mc.trap) + ':</b> ' + esc(mc.pattern) + ' ➔ <em>' + esc(mc.fix) + '</em></li>'; }).join('') + '</ul></div>' : '') +
@@ -608,12 +608,12 @@
       }
 
       body = '<form data-tg-form="assign" class="tg-form">' + tabHeader + tabContent +
-        '<label class="tg-label">Judul Tugas / Bab<input name="title" maxlength="80" value="' + esc(curUnit && tab === 'curriculum' ? curUnit.title : '') + '" placeholder="' + (curUnit && tab === 'curriculum' ? esc(curUnit.title) : 'Kosongkan untuk judul otomatis') + '" data-testid="tg-assign-title"></label>' +
+        '<label class="tg-label">' + t('guru.judul-tugas-bab', 'Judul Tugas / Bab') + '<input name="title" maxlength="80" value="' + esc(curUnit && tab === 'curriculum' ? curUnit.title : '') + '" placeholder="' + (curUnit && tab === 'curriculum' ? esc(curUnit.title) : esc(t('guru.judul-otomatis', 'Kosongkan untuk judul otomatis'))) + '" data-testid="tg-assign-title"></label>' +
         '<div class="tg-form-row"><label class="tg-label">Jumlah soal<select name="count">' + [2, 3, 5, 8, 10].map(function (n) { return '<option' + (n === (curUnit ? Math.min(curUnit.items.length, 5) : 5) ? ' selected' : '') + '>' + n + '</option>'; }).join('') + '</select></label><label class="tg-label">Tenggat<input type="date" name="deadline" value="' + T.today(Date.now() + 2 * T.DAY) + '" data-testid="tg-assign-deadline"></label></div>' +
         '<label class="tg-label">Mode</label><div class="tg-mode"><label class="tg-mode-opt"><input type="radio" name="mode" value="latihan" checked><div><b>Latihan</b><small>Feedback langsung tiap soal, boleh diulang</small></div></label><label class="tg-mode-opt"><input type="radio" name="mode" value="ujian" data-testid="tg-assign-mode-exam"><div><b>Ujian mini</b><small>Urutan diacak per murid + timer — anti saling contek</small></div></label></div>' +
         '<label class="tg-label">Untuk siapa</label><div class="tg-chips tg-chips-select tg-chips-scroll"><label class="tg-chip is-check"><input type="radio" name="scope" value="all"' + (tgt.length ? '' : ' checked') + '><span>Seluruh kelas</span></label>' + c.students.map(function (s) { return '<label class="tg-chip is-check"><input type="checkbox" name="targets" value="' + s.id + '"' + (tgt.indexOf(s.id) !== -1 ? ' checked' : '') + '><span>' + esc(s.name) + '</span></label>'; }).join('') + '</div>' +
         (tab === 'curriculum'
-          ? '<div class="tg-actions"><button type="submit" class="tg-btn is-primary" data-testid="tg-assign-submit">' + icon('sparkles') + ' Terbitkan Tugas Kurikulum</button></div></form>'
+          ? '<div class="tg-actions"><button type="submit" class="tg-btn is-primary" data-testid="tg-assign-submit">' + icon('sparkles') + ' ' + t('guru.terbitkan-tugas-kurikulum', 'Terbitkan Tugas Kurikulum') + '</button></div></form>'
           : '<div class="tg-actions"><button type="submit" class="tg-btn is-primary" data-testid="tg-assign-submit">' + icon('sparkles') + ' Susun dari bank soal</button></div></form>');
     } else if (m.kind === 'share-assign' || m.kind === 'assign-detail') {
       var a = (c.assignments || []).filter(function (x) { return x.id === m.id; })[0]; if (!a) return '';

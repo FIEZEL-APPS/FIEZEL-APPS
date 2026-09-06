@@ -1,7 +1,7 @@
 {
-  "version": "m025-284",
+  "version": "m025-285",
   "claimedBy": "branch claude/demo-guru-langsung-dlz1d4",
-  "claimedAt": "2026-09-06T21:10:00.000Z",
-  "reason": "m025-284: demo guru dari landing page langsung membuka papan KelasKu",
+  "claimedAt": "2026-09-06T22:40:00.000Z",
+  "reason": "m025-285: demo guru dari landing page langsung membuka papan KelasKu",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

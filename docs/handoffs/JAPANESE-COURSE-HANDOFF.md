@@ -295,3 +295,46 @@ setiap murid Inggris dan memaksa mereka mengunduh ulang shell tanpa mendapat apa
 Modul ini diuji lewat Node dari gerbangnya sendiri, dan baru akan masuk shell bersama
 pemanggil pertamanya. Yang naik ke m025-280 adalah `fiezel-brain-manifest.js` (memang
 dikirim, karena daftar modulnya bertambah).
+
+## 9. Langkah 3 — gerbang konten Jepang (SELESAI)
+
+`tests/japanese-content-test.js`, dibuktikan merah lebih dulu (3 assert merah), lalu 12/12
+hijau. Ia menemukan bank Jepang dari isi direktori (`docs/japanese/`, `content/ja/`), jadi
+bank yang lahir nanti ikut terperiksa tanpa daftar yang perlu disunting.
+
+### Temuan: cacat KEDUA di `conceptOf()`, berbeda dari yang dicatat §3.3
+
+§3.3 mencatat marker non-ASCII membuat `conceptOf()` mengembalikan `null`. Saat gerbang ini
+memanggil fungsi yang sebenarnya — bukan menirunya — muncul cacat kedua yang tidak tercatat:
+
+`conceptOf(item)` membaca **`item.skill`**, bukan `item.family`. Kesepuluh contoh di
+`n5-a1-sample-templates.json` hanya punya `family` dan `subskill`, jadi setiap butir Jepang
+menghasilkan `x|<marker>` — awalan cadangan.
+
+Terukur:
+
+| butir | concept |
+|---|---|
+| contoh apa adanya (tanpa `skill`) | `x\|wa-vs-ga-answer-to-question-word` |
+| sesudah `skill` ditambahkan | `particles\|wa-vs-ga-answer-to-question-word` |
+| contoh Inggris pembanding | `past_tense\|yesterday` |
+
+Ini lebih licin daripada cacat pertama: `x|marker` **bukan null**, jadi pembatas kebaruan
+konsep tampak bekerja. Yang hilang adalah pemisahan antar-keluarga — dua keluarga yang
+kebetulan memakai marker sama terbaca sebagai satu konsep. Kesepuluh contoh sudah diperbaiki
+(`skill` = `family`), dan gerbang menolak butir mana pun yang jatuh ke awalan cadangan.
+
+**Pelajarannya, dan sengaja ditulis:** temuan §3.3 lahir dari MEMBACA kode; temuan ini lahir
+dari MEMANGGIL kode. Yang kedua menemukan apa yang yang pertama lewatkan.
+
+### Yang dijaga gerbang, dan semuanya dibuktikan lewat mutasi
+
+Sebelas mutasi dijalankan, sebelas tertangkap: marker non-ASCII, butir kehilangan `skill`,
+pengecoh sama dengan kunci, pengecoh tanpa miskonsepsi bernama, penjelasan kehilangan
+kembaran Indonesia, stem tanpa rumpang, family asing dari graf, `correctIndex` di luar
+jangkauan, pilihan kembar, tingkat JLPT tidak sah, id kembar.
+
+Sisa rencana §6: konten A1 (200-300 template) dan sidecar Thai. Panel pemilih bahasa di
+dashboard belum ada dan sengaja ditunda sampai progres terpisah benar-benar bekerja —
+memasang tombolnya lebih dulu berarti murid bisa memilih Jepang dan menimpa progres
+Inggrisnya.
