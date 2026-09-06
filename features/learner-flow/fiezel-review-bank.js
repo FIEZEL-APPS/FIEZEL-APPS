@@ -10,6 +10,11 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
 
+  /* m025-265 · sapuan kebocoran Thai: naskah di berkas ini dulu literal Indonesia,
+     jadi murid yang memilih th tetap membacanya dalam bahasa Indonesia. t() fail-soft:
+     kalau copy-map belum termuat, fallback id-lah yang tampil. */
+  function t(k, fb) { try { var I = (typeof self !== 'undefined' ? self : this).FiezelI18n; return I && I.t ? I.t(k) : fb; } catch (_) { return fb; } }
+
   var AREAS = { grammar: 'Grammar', vocabulary: 'Vocabulary', reading: 'Reading', listening: 'Listening', speaking: 'Speaking' };
 
   var SKILLS = {
@@ -345,7 +350,7 @@
     }
     return {
       correct: false,
-      text: 'Belum tepat. Kamu memilih “' + picked + '”. ' + (reason ? reason + ' ' : '') + body + ' Coba lagi dengan pola: ' + SKILLS[item.skill].pattern + '.'
+      text: t('review.belum-tepat-pilih', 'Belum tepat. Kamu memilih “{pilihan}”. ').replace('{pilihan}', picked) + (reason ? reason + ' ' : '') + body + t('review.coba-pola', ' Coba lagi dengan pola: {pola}.').replace('{pola}', SKILLS[item.skill].pattern)
     };
   }
 
@@ -394,7 +399,33 @@
     return map[skill] || '';
   }
 
+  /*
+   * Markup gambar soal — SATU sumber untuk semua yang menampilkan soal dari bank ini.
+   *
+   * Soal `contextKind: 'picture'` menaruh pertanyaannya SEPENUHNYA pada gambar ("Kata
+   * Inggris apa yang cocok untuk gambar ini?"). Tanpa gambarnya, soal itu bukan sekadar
+   * kurang cantik — ia MUSTAHIL dijawab, dan murid hanya bisa menebak.
+   *
+   * Bank ini punya tiga penampil: latihan mandiri (fiezel-learner-flow.js), duel
+   * (fiezel-duel.js), dan runner kelas (features/class-hub/). Selama markupnya disalin ke
+   * masing-masing, penampil KEEMPAT akan lahir tanpa gambar juga — persis yang terjadi pada
+   * runner kelas, yang mencetak item.context tetapi tidak pernah menyebut item.picture sama
+   * sekali, sehingga setiap soal gambar dalam tugas guru sampai ke murid sebagai pertanyaan
+   * tanpa gambar. Siapa pun yang menampilkan soal bank ini memanggil fungsi ini, bukan
+   * menyalin tag <svg>-nya.
+   */
+  function pictureHtml(item, cls) {
+    if (!item || item.contextKind !== 'picture' || !item.picture) return '';
+    var alt = String(item.pictureAlt == null ? '' : item.pictureAlt)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    return '<div class="' + (cls || 'lf-picture') + '" role="img" aria-label="Gambar: ' + alt +
+      '" data-testid="bank-picture"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+      'stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      item.picture + '</svg></div>';
+  }
+
   return {
+    pictureHtml: pictureHtml,
     AREAS: AREAS, SKILLS: SKILLS, SKILL_ORDER: SKILL_ORDER, ITEMS: ITEMS,
     itemsFor: itemsFor, byId: byId, pick: pick, pickFresh: pickFresh, variant: variant, generated: generated, picItem: picItem, PIC: PIC,
     diagnosticSet: diagnosticSet, explain: explain, buildSession: buildSession, afterSessionNote: afterSessionNote
