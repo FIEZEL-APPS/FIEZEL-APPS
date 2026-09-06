@@ -168,6 +168,34 @@
 
   var FALLBACK_KEY = 'service.unknown';
 
+  /* m025-269 · JALUR THAI. Tabel COPY di atas tetap KANON id dan tetap menjadi cadangan,
+     tapi ia bukan lagi satu-satunya sumber: naskah yang benar-benar tampil diambil dari
+     copy-map (`quota.copy.<kunci>.<bidang>`) lewat FiezelI18n. Sebelum ini murid yang
+     memilih th membaca ke-15 keadaan notice ini dalam bahasa Indonesia, karena build()
+     membaca objek beku ini langsung.
+
+     Fail-soft dan sengaja: copy-th dimuat DINAMIS (fiezel-th-loader), jadi sebelum ia tiba
+     — dan di lingkungan tanpa FiezelI18n sama sekali, seperti harness gerbang — yang
+     dikembalikan adalah kalimat id dari tabel. Yang dilarang di sini adalah kebisuan dan
+     kunci mentah, bukan kalimat Indonesia yang muncul sesaat. */
+  function naskah(key, field, fallback) {
+    try {
+      var I = (typeof self !== 'undefined' ? self : this).FiezelI18n;
+      if (!I || typeof I.t !== 'function') return fallback;
+      var out = I.t('quota.copy.' + key + '.' + field);
+      return typeof out === 'string' && out && out.indexOf('quota.copy.') !== 0 ? out : fallback;
+    } catch (_) { return fallback; }
+  }
+  /** Naskah lepas (penenang + frasa waktu kembali): kunci `quota.copy.<nama>`, tanpa keadaan. */
+  function frasa(name, fallback) {
+    try {
+      var I = (typeof self !== 'undefined' ? self : this).FiezelI18n;
+      if (!I || typeof I.t !== 'function') return fallback;
+      var out = I.t('quota.copy.' + name);
+      return typeof out === 'string' && out && out.indexOf('quota.copy.') !== 0 ? out : fallback;
+    } catch (_) { return fallback; }
+  }
+
   /* ============================================ 2 · KEJUJURAN KEADAAN ================== */
 
   /**
@@ -291,25 +319,29 @@
     var key = resolveKey(f);
     var e = COPY[key];
     var spoken = f.spoken === true;
-    var body = spoken ? e.spoken : e.silent;
+    var body = spoken ? naskah(key, 'spoken', e.spoken) : naskah(key, 'silent', e.silent);
     var reset = jakartaResetLabel(f.resetAt);
     if (!spoken && reset && key.indexOf('quota.') === 0 && key !== 'quota.unavailable') {
       // Kalau naskahnya sudah menyebut waktu kembalinya secara kasar ("sesudah tengah
       // malam"), jam pastinya MENGGANTI frasa itu, bukan menempel sesudahnya. Menempel
       // menghasilkan dua kalimat waktu berturut-turut, dan murid membaca yang kedua sebagai
       // aturan lain.
-      body = /sesudah tengah malam/.test(body)
-        ? body.replace('sesudah tengah malam', 'jam ' + reset + ' WIB')
-        : body + ' Jatah berikutnya mulai jam ' + reset + ' WIB.';
+      /* m025-269: penanda waktu ikut locale. Naskah th memakai penanda th ('หลังเที่ยงคืน'),
+         jadi mencari frasa Indonesia di dalamnya akan selalu meleset dan menempelkan kalimat
+         waktu kedua — persis cacat yang komentar di atas ada untuk mencegahnya. */
+      var penanda = frasa('reset-marker', 'sesudah tengah malam');
+      var sisip = frasa('reset-inline', 'jam {jam} WIB').replace('{jam}', reset);
+      var ekor = frasa('reset-tail', ' Jatah berikutnya mulai jam {jam} WIB.').replace('{jam}', reset);
+      body = body.indexOf(penanda) >= 0 ? body.replace(penanda, sisip) : body + ekor;
     }
     var a11y = announcement(key, { listeningActive: f.listeningActive === true });
     return Object.freeze({
       schema: SCHEMA,
       key: key,
       requestedCopyKey: String(f.copyKey || ''),
-      title: e.title,
+      title: naskah(key, 'title', e.title),
       body: body,
-      reassurance: REASSURANCE,
+      reassurance: frasa('reassurance', REASSURANCE),
       spoken: spoken,
       urgency: e.urgency,
       surface: e.surface,
