@@ -60,6 +60,13 @@ export function normalizeReport(body, nowMs) {
   const at = Number(body.at);
   const reportedAt = Number.isFinite(at) && Math.abs(at - nowMs) < 3 * 86400000 ? Math.round(at) : nowMs;
   const lessons = intIn(body.lessons, LIMITS.COUNT_MAX) || 0;
+  /* j = ketukan "aku baru memasukkan kode kelasmu". Dikirim SEKALI saat murid menekan
+     Gabung, sebelum ia mengerjakan apa pun. Tanpa ini guru tidak punya cara tahu muridnya
+     sudah masuk sampai murid itu menyelesaikan tugas pertamanya — dan murid yang salah
+     ketik kode diam-diam mengira dirinya sudah tergabung. Satu bilangan, nilai tunggal 1:
+     tidak ada ruang untuk menyelundupkan apa pun di sini. */
+  if (body.j !== undefined && body.j !== 1 && body.j !== true) return { ok: false, reason: 'bad_join_flag' };
+  const join = body.j === 1 || body.j === true ? 1 : undefined;
   const goal = typeof body.goal === 'string' && /^[a-z_]{1,24}$/.test(body.goal) ? body.goal : undefined;
   let assign;
   if (body.assign !== undefined) {
@@ -96,7 +103,7 @@ export function normalizeReport(body, nowMs) {
       assign.push(entry);
     }
   }
-  return { ok: true, code, name, key: learnerKey(name), report: { v: 1, name, at: reportedAt, goal, skills, lessons, cls: code, assign } };
+  return { ok: true, code, name, key: learnerKey(name), report: { v: 1, name, at: reportedAt, goal, skills, lessons, cls: code, assign, j: join } };
 }
 
 export const ASSIGN_LIMITS = Object.freeze({

@@ -53,7 +53,7 @@ const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
 // dilayani dan kedua berkas baru tidak pernah sampai ke pengguna lama - aplikasi mereka
 // akan menjalankan app.js baru tanpa berkas benderanya, dan seluruh bendera jatuh ke
 // salinan bawaan di app.js. Naik SEKALI untuk seluruh gelombang.
-const SW_REV='m025-271-proctor-realtime-20260906';
+const SW_REV='m025-272-class-join-request-20260906';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 // m025-61: health check menanyakan revisi shell langsung ke worker yang sedang aktif.
 // Menebaknya dari nama cache tidak cukup: cache lama bisa tertinggal, sedangkan jawaban ini
@@ -108,7 +108,7 @@ const ASSETS=['./','./index.html','./style.css','./features/mascot/fiezel-motion
   // (copy-th-*, grammar-explanations-th, font Thai) SENGAJA tidak di sini - lihat
   // LOCALE_TH_CACHE di bawah. (Catatan alat yang sama dengan blok lain: jangan menaruh
   // titik koma di dalam komentar array ini - pwa-cache-test memotong daftar di situ.)
-  './features/i18n/fiezel-i18n.js','./features/i18n/copy-id-core.js','./features/i18n/copy-id-app-a.js','./features/i18n/copy-id-app-b.js','./features/i18n/copy-id-app-c.js','./features/i18n/copy-id-app-d.js','./features/i18n/copy-id-feat-a.js','./features/i18n/copy-id-feat-b.js','./features/i18n/copy-id-gems.js','./features/i18n/copy-id-quota.js','./features/i18n/copy-id-settings-locale.js','./features/i18n/copy-id-redesign.js','./features/i18n/copy-id-student.js','./features/i18n/copy-id-proctor.js','./features/i18n/copy-id-google.js',
+  './features/i18n/fiezel-i18n.js','./features/i18n/copy-id-core.js','./features/i18n/copy-id-app-a.js','./features/i18n/copy-id-app-b.js','./features/i18n/copy-id-app-c.js','./features/i18n/copy-id-app-d.js','./features/i18n/copy-id-feat-a.js','./features/i18n/copy-id-feat-b.js','./features/i18n/copy-id-gems.js','./features/i18n/copy-id-quota.js','./features/i18n/copy-id-settings-locale.js','./features/i18n/copy-id-redesign.js','./features/i18n/copy-id-student.js','./features/i18n/copy-id-proctor.js','./features/i18n/copy-id-classjoin.js','./features/i18n/copy-id-google.js',
   // W4-QA (handoff W4-MERGE butir 3): loader th dimuat SEMUA locale dari index.html (guard
   // locale ada DI DALAM berkasnya, ia baru bertindak saat getLocale()==='th') — jadi ia
   // bagian shell dan wajib precache, BUKAN anggota isLocaleThAsset. Tanpa entri ini murid
