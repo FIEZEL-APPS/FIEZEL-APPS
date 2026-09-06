@@ -1,0 +1,34 @@
+{
+  "schema": "fiezel-japanese-family-graph-proposal-v0",
+  "status": "USULAN — menunggu persetujuan owner. Belum disuntikkan ke mesin mana pun.",
+  "target": "ja",
+  "catatan": "Bentuknya sengaja sama dengan PREREQUISITES di features/brain/fiezel-core-brain.js: peta keluarga -> daftar keluarga prasyarat. Tingkat kedalaman DI DALAM keluarga tetap ditangani urutan CEFR, persis seperti di kursus Inggris.",
+  "families": {
+    "particles": [],
+    "demonstratives": [],
+    "noun_modification": ["particles"],
+    "adjectives": ["particles"],
+    "existence_location": ["particles"],
+    "verb_groups": ["particles"],
+    "polite_forms": ["verb_groups"],
+    "negation_past": ["polite_forms", "adjectives"],
+    "question_words": ["particles", "demonstratives"],
+    "counters": ["existence_location"],
+    "time_expressions": ["particles"],
+    "te_form": ["verb_groups", "polite_forms"],
+    "plain_forms": ["polite_forms", "te_form"],
+    "transitivity_pairs": ["te_form", "particles"],
+    "keigo": ["plain_forms", "polite_forms"]
+  },
+  "cakupanTingkat": {
+    "A1_N5": ["particles", "demonstratives", "noun_modification", "adjectives", "existence_location", "verb_groups", "polite_forms", "negation_past", "question_words", "counters", "time_expressions", "te_form"],
+    "A2_N4_dan_seterusnya": ["plain_forms", "transitivity_pairs", "keigo"]
+  },
+  "alasanUrutan": {
+    "particles_lebih_dulu": "Tanpa は/が/を/に/で, tidak ada satu pun kalimat Jepang yang bisa disusun benar. Ia akar yang sama seperti tense_aspect di kursus Inggris.",
+    "verb_groups_sebelum_polite_forms": "ます/ません dibentuk dari akar yang berbeda per golongan (godan/ichidan/tak beraturan). Murid yang belum bisa menggolongkan kata kerja hanya menghafal bentuk satu per satu.",
+    "polite_forms_sebelum_te_form": "Bentuk て di N5 diajarkan setelah murid punya ragam sopan yang stabil, dan aturan てnya sendiri dipilih berdasarkan golongan — jadi ia menuntut verb_groups DAN polite_forms.",
+    "counters_setelah_existence_location": "Kata bantu bilangan muncul pertama kali di kalimat keberadaan (…が さんにん います), jadi prasyaratnya kalimat itu, bukan sekadar kata benda.",
+    "keigo_paling_akhir": "Keigo menuntut murid sudah bisa berpindah sadar antara ragam biasa dan sopan; menaruhnya lebih awal membuat murid menghafal tanpa pernah bisa memilih."
+  }
+}

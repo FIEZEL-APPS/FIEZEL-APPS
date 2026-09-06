@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-06T11:20:00+07:00",
+  "updated": "2026-09-06T13:30:00+07:00",
   "active": [
     {
       "sesi": "ses_0034e69d3ffes3kjiFLNDzYXUZ",
@@ -95,6 +95,16 @@
       ],
       "mulai": "2026-09-06T11:20:00+07:00",
       "catatan": "Menyentuh juga app.js (kunci ujian di quizLoop/Skills Lab/Writing + gerbang pintu AI + pendeteksi ujian non-tugas), features/class-hub/fiezel-class-hub.js, features/learner-flow/fiezel-learner-flow.js, features/teacher/fiezel-teacher-store.js, workers/api/teacher/class-sync-core.js (fx), copy-*-proctor.js, index.html, sw.js, quality.yml. Build m025-273 lewat tools/bump-build.mjs."
+    },
+    {
+      "sesi": "sesi-claude-cq1nea/JAPANESE-COURSE",
+      "peran": "kursus bahasa Jepang: usulan tingkat pertama (A1/N5) — silabus, contoh soal, graf keluarga",
+      "paths": [
+        "docs/japanese/",
+        "docs/handoffs/JAPANESE-COURSE-HANDOFF.md"
+      ],
+      "mulai": "2026-09-06T13:30:00+07:00",
+      "catatan": "Tahap usulan: NOL byte produksi berubah, build tidak dinaikkan. Wilayah yang akan diklaim SESUDAH usulan disetujui: features/brain/fiezel-core-brain.js (PREREQUISITES bisa disuntik), berkas konten Jepang, dan gerbangnya. Temuan yang perlu diketahui sesi lain: conceptOf() di features/brain/fiezel-question-memory.js membuang karakter non-ASCII, jadi marker berkana menghasilkan concept null dan pembatas kebaruan konsep mati diam."
     }
   ],
   "finished": [
