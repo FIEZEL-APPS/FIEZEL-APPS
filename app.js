@@ -8168,7 +8168,7 @@ function bindFiezelAccountControls(){
 function openTeacherRoomModal(){
   const acc=self.FiezelAccount?.getAccount?.();
   openModal(`<div class="modal-mark">KELASKU UNTUK GURU</div>
-    <h2><span class="kelasku-brand"><span class="kelasku-main" style="font-size:1.4rem">KelasKu</span> <span class="kelasku-tag" style="font-size:0.6rem">${FiezelI18n.t('guru.merek-tag')}</span></span></h2>
+    <h2><span class="kelasku-brand"><span class="kelasku-main" style="font-size:1.4rem">KelasKu</span> <span class="kelasku-tag" style="font-size:0.6rem">${t('guru.merek-tag')}</span></span></h2>
     <p>${FiezelI18n.t('guru.ruang-sapaan',{handle:esc(acc?.handle||'Guru')})}</p>
     <div class="card" style="margin:12px 0;text-align:left">
       <h3 style="margin-bottom:8px"><i data-lucide="check-circle" style="color:#15803d"></i> Hak Akses Pengajar Terbuka:</h3>
@@ -11383,7 +11383,7 @@ function learnerFlowHomeMarkup(){
   const isGuru=isVerifiedTeacher();
   const inviteCard=invite?`<button class="launch-card duel-invite-card" onclick="go('learn')" data-testid="home-duel-invite"><span class="launch-icon"><i class="fz-i" data-fz-icon="speaking" aria-hidden="true"></i></span><span><small>${esc(FiezelI18n.t('student.duel-invite-sub',{from:invite.from||FiezelI18n.t('student.duel-invite-anon'),score:Number(invite.score)||0}))}</small><b>${FiezelI18n.t('student.duel-invite-title')}</b></span><i data-lucide="arrow-up-right"></i></button>`:'';
   const learnCard=`<button class="launch-card learn-launch" onclick="go('learn')" data-testid="home-learn-flow"><span class="launch-icon"><i class="fz-i" data-fz-icon="grammar" aria-hidden="true"></i></span><span><small>${esc(sub)}</small><b>${FiezelI18n.t('student.flow-title')}</b></span><i data-lucide="arrow-up-right"></i></button>`;
-  const tutorCard=`<button class="launch-card tutor-launch" onclick="go('tutor')" data-testid="home-tutor-center"><span class="launch-icon"><i class="fz-i" data-fz-icon="map" aria-hidden="true"></i></span><span><small>${esc(FiezelI18n.t('student.tutor-sub'))}</small><b class="kelasku-brand"><span class="kelasku-main">KelasKu</span> <span class="kelasku-tag">${FiezelI18n.t('guru.merek-tag')}</span></b></span><i data-lucide="arrow-up-right"></i></button>`;
+  const tutorCard=`<button class="launch-card tutor-launch" onclick="go('tutor')" data-testid="home-tutor-center"><span class="launch-icon"><i class="fz-i" data-fz-icon="map" aria-hidden="true"></i></span><span><small>${esc(FiezelI18n.t('student.tutor-sub'))}</small><b class="kelasku-brand"><span class="kelasku-main">KelasKu</span> <span class="kelasku-tag">${esc(FiezelI18n.t('guru.merek-tag'))}</span></b></span><i data-lucide="arrow-up-right"></i></button>`;
   /* m025-277: pintu Home ke PAW ARENA (ruang permainan). Naskah pakai domain pawarena
      (dwibahasa). Untuk murid, bukan guru. */
   const arenaCard=`<button class="launch-card arena-launch" onclick="go('arena')" data-testid="home-paw-arena"><span class="launch-icon"><i class="fz-i" data-fz-icon="speaking" aria-hidden="true"></i></span><span><small>${esc(FiezelI18n.t('pawarena.subtitle'))}</small><b>${FiezelI18n.t('pawarena.title')}</b></span><i data-lucide="arrow-up-right"></i></button>`;

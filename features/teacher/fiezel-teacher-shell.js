@@ -561,13 +561,60 @@
       body = '<form data-tg-form="import-code" class="tg-form"><p class="tg-muted">' + t('guru.murid-menyalin', 'Murid menyalin') + ' <b>Kode hasil untuk tutor</b> dari Today Plan-nya (Peta → ringkasan). Kode hanya berisi nama depan + akurasi per skill. Tugas yang cocok otomatis dinilai selesai.</p><textarea name="code" rows="4" required placeholder="Tempel kode di sini…" data-autofocus data-testid="tg-import-code"></textarea>' + (m.error ? '<p class="tg-error">' + esc(m.error) + '</p>' : '') + '<div class="tg-actions"><button type="submit" class="tg-btn is-primary" data-testid="tg-import-submit">Masukkan ke ' + esc(c.name) + '</button></div></form>';
     } else if (m.kind === 'assign') {
       title = t('guru.buat-tugas-ujian', 'Buat tugas / ujian'); wide = true;
+      var C = root.FiezelCurriculum;
+      var tab = ui.assignTab || 'curriculum';
+      var curPhase = ui.curriculumPhase || (c && c.level === 'A1' ? 'fase_d' : c && (c.level === 'B1' || c.level === 'B2') ? 'fase_f' : 'fase_d');
+      var phases = C ? C.getPhases() : [];
+      var units = C ? C.getUnits({ phaseId: curPhase }) : [];
+      var selUnitId = ui.curriculumUnitId || (units[0] ? units[0].id : null);
+      var curUnit = C && selUnitId ? C.getUnit(selUnitId) : (units[0] || null);
       var skills = T.SKILL_ORDER.filter(function (k) { return k !== 'speaking'; }), pre = m.skill || 'past_tense', tgt = m.target ? [m.target] : [];
-      body = '<form data-tg-form="assign" class="tg-form"><label class="tg-label">Judul<input name="title" maxlength="80" placeholder="Kosongkan untuk judul otomatis" data-autofocus data-testid="tg-assign-title"></label>' +
-        '<label class="tg-label">Skill (pilih 1–3)</label><div class="tg-chips tg-chips-select">' + skills.map(function (k) { return '<label class="tg-chip is-check"><input type="checkbox" name="skills" value="' + k + '"' + (k === pre ? ' checked' : '') + ' data-testid="tg-assign-skill-' + k + '"><span>' + esc(T.SKILL_LABEL[k]) + '</span></label>'; }).join('') + '</div>' +
-        '<div class="tg-form-row"><label class="tg-label">Jumlah soal<select name="count">' + [5, 8, 10, 12, 15].map(function (n) { return '<option' + (n === 10 ? ' selected' : '') + '>' + n + '</option>'; }).join('') + '</select></label><label class="tg-label">Tenggat<input type="date" name="deadline" value="' + T.today(Date.now() + 2 * T.DAY) + '" data-testid="tg-assign-deadline"></label></div>' +
+
+      var tabHeader = '<div class="tg-assign-tabs">' +
+        '<button type="button" class="tg-tab-btn' + (tab === 'curriculum' ? ' is-active' : '') + '" data-tg="assign-tab" data-tab="curriculum">' + icon('notebook-pen') + ' 📘 Kurikulum Sekolah (SMP & SMA)</button>' +
+        '<button type="button" class="tg-tab-btn' + (tab === 'skills' ? ' is-active' : '') + '" data-tg="assign-tab" data-tab="skills">' + icon('sparkles') + ' ⚡ Bank Skill Kilat (A2)</button>' +
+        '</div>';
+
+      var tabContent = '';
+      if (tab === 'curriculum' && C) {
+        var phasePills = '<div class="tg-phase-pills">' + phases.map(function (p) {
+          return '<button type="button" class="tg-chip' + (curPhase === p.id ? ' is-active' : '') + '" data-tg="assign-phase" data-phase="' + p.id + '"><b>' + esc(p.name) + '</b><small>' + esc(p.cefr) + '</small></button>';
+        }).join('') + '</div>';
+
+        var unitSelect = '<label class="tg-label">Pilih Bab / Genre Materi Kurikulum Merdeka<select name="unit_id" data-tg-select="unit" class="tg-select-unit">' + units.map(function (u) {
+          return '<option value="' + u.id + '"' + (curUnit && curUnit.id === u.id ? ' selected' : '') + '>Kelas ' + u.grade + ' (Sem ' + u.semester + ') · ' + esc(u.genre) + ' — ' + esc(u.title) + '</option>';
+        }).join('') + '</select></label>';
+
+        var briefCard = '';
+        if (curUnit && curUnit.teachingBrief) {
+          var tb = curUnit.teachingBrief;
+          briefCard = '<div class="tg-brief-card">' +
+            '<div class="tg-brief-head"><span class="tg-badge">💡 Teaching Brief</span><h4>' + esc(curUnit.title) + '</h4><span class="tg-cefr-pill">' + esc(curUnit.targetCefr) + '</span></div>' +
+            '<p class="tg-brief-summary">' + esc(tb.summary) + '</p>' +
+            '<div class="tg-brief-grid">' +
+              '<div class="tg-brief-col"><b>🎤 Apersepsi 5 Menit (Hook Kelas):</b><p>' + esc(tb.hook5Minutes) + '</p></div>' +
+              '<div class="tg-brief-col"><b>📋 Rumus Papan Tulis:</b><code>' + esc(tb.boardFormula) + '</code></div>' +
+            '</div>' +
+            (tb.commonMisconceptions && tb.commonMisconceptions.length ? '<div class="tg-brief-miscons"><b>⚠️ Top Miskonsepsi Siswa:</b><ul>' + tb.commonMisconceptions.map(function (mc) { return '<li><b>' + esc(mc.trap) + ':</b> ' + esc(mc.pattern) + ' ➔ <em>' + esc(mc.fix) + '</em></li>'; }).join('') + '</ul></div>' : '') +
+            (tb.keyVocabulary && tb.keyVocabulary.length ? '<div class="tg-brief-vocab"><b>📖 Kosakata Kunci:</b><div class="tg-vocab-chips">' + tb.keyVocabulary.map(function (v) { return '<span class="tg-vocab-chip">' + esc(v.word) + ' <em>(' + esc(v.meaning) + ')</em></span>'; }).join('') + '</div></div>' : '') +
+            '</div>';
+        }
+
+        tabContent = '<input type="hidden" name="assign_source" value="curriculum">' +
+          phasePills + unitSelect + briefCard;
+      } else {
+        tabContent = '<input type="hidden" name="assign_source" value="bank">' +
+          '<label class="tg-label">Skill (pilih 1–3)</label><div class="tg-chips tg-chips-select">' + skills.map(function (k) { return '<label class="tg-chip is-check"><input type="checkbox" name="skills" value="' + k + '"' + (k === pre ? ' checked' : '') + ' data-testid="tg-assign-skill-' + k + '"><span>' + esc(T.SKILL_LABEL[k]) + '</span></label>'; }).join('') + '</div>';
+      }
+
+      body = '<form data-tg-form="assign" class="tg-form">' + tabHeader + tabContent +
+        '<label class="tg-label">Judul Tugas / Bab<input name="title" maxlength="80" value="' + esc(curUnit && tab === 'curriculum' ? curUnit.title : '') + '" placeholder="' + (curUnit && tab === 'curriculum' ? esc(curUnit.title) : 'Kosongkan untuk judul otomatis') + '" data-testid="tg-assign-title"></label>' +
+        '<div class="tg-form-row"><label class="tg-label">Jumlah soal<select name="count">' + [2, 3, 5, 8, 10].map(function (n) { return '<option' + (n === (curUnit ? Math.min(curUnit.items.length, 5) : 5) ? ' selected' : '') + '>' + n + '</option>'; }).join('') + '</select></label><label class="tg-label">Tenggat<input type="date" name="deadline" value="' + T.today(Date.now() + 2 * T.DAY) + '" data-testid="tg-assign-deadline"></label></div>' +
         '<label class="tg-label">Mode</label><div class="tg-mode"><label class="tg-mode-opt"><input type="radio" name="mode" value="latihan" checked><div><b>Latihan</b><small>Feedback langsung tiap soal, boleh diulang</small></div></label><label class="tg-mode-opt"><input type="radio" name="mode" value="ujian" data-testid="tg-assign-mode-exam"><div><b>Ujian mini</b><small>Urutan diacak per murid + timer — anti saling contek</small></div></label></div>' +
         '<label class="tg-label">Untuk siapa</label><div class="tg-chips tg-chips-select tg-chips-scroll"><label class="tg-chip is-check"><input type="radio" name="scope" value="all"' + (tgt.length ? '' : ' checked') + '><span>Seluruh kelas</span></label>' + c.students.map(function (s) { return '<label class="tg-chip is-check"><input type="checkbox" name="targets" value="' + s.id + '"' + (tgt.indexOf(s.id) !== -1 ? ' checked' : '') + '><span>' + esc(s.name) + '</span></label>'; }).join('') + '</div>' +
-        '<div class="tg-actions"><button type="submit" class="tg-btn is-primary" data-testid="tg-assign-submit">' + icon('sparkles') + ' Susun dari bank soal</button></div></form>';
+        (tab === 'curriculum'
+          ? '<div class="tg-actions"><button type="submit" class="tg-btn is-primary" data-testid="tg-assign-submit">' + icon('sparkles') + ' Terbitkan Tugas Kurikulum</button></div></form>'
+          : '<div class="tg-actions"><button type="submit" class="tg-btn is-primary" data-testid="tg-assign-submit">' + icon('sparkles') + ' Susun dari bank soal</button></div></form>');
     } else if (m.kind === 'share-assign' || m.kind === 'assign-detail') {
       var a = (c.assignments || []).filter(function (x) { return x.id === m.id; })[0]; if (!a) return '';
       var tg = c.students.filter(function (s) { return T.targeted(a, s); }), notDone = tg.filter(function (s) { return !(a.done && a.done[s.id]); }), code = T.assignmentCode(c, a);
@@ -683,6 +730,9 @@
       case 'copy-groups': { var g = T.studyGroups(c, ui.insightSkill); copy('Kelompok belajar ' + T.SKILL_LABEL[ui.insightSkill] + ' — ' + c.name + '\n' + g.map(function (x) { return 'Kelompok ' + x.no + ' (mentor: ' + x.mentor.s.name + '): ' + x.members.map(function (m) { return m.s.name; }).join(', '); }).join('\n'), t('guru.kelompok-tersalin', 'Daftar kelompok tersalin.')); saveMinutes(15); persist(); return; }
       case 'copy-all-parents': copy(c.students.map(function (s) { return '=== ' + s.name + ' ===\n' + T.parentReport(c, s, st.teacher); }).join('\n\n'), c.students.length + ' laporan tersalin.'); saveMinutes(c.students.length * 6); persist(); return;
       case 'print-weekly': { var w = window.open('', '_blank'); if (w) { w.document.write('<pre style="font:15px/1.5 Georgia,serif;white-space:pre-wrap;max-width:720px;margin:40px auto">' + esc(T.weeklyClassReport(c, st.teacher)) + '</pre>'); w.document.close(); w.print(); } saveMinutes(20); persist(); return; }
+      case 'assign-tab': { ui.assignTab = btn.getAttribute('data-tab'); persist(); render(); return; }
+      case 'assign-phase': { ui.curriculumPhase = btn.getAttribute('data-phase'); ui.curriculumUnitId = null; persist(); render(); return; }
+      case 'assign-unit': { ui.curriculumUnitId = btn.getAttribute('data-unit'); persist(); render(); return; }
       default: return;
     }
     persist(); render();
@@ -695,7 +745,41 @@
     else if (kind === 'edit-class' && c) { c.name = String(fd.get('name')).slice(0, 60); c.level = fd.get('level'); c.subject = fd.get('subject'); if (c.sync) c.sync.claimed = false; ui.modal = null; }
     else if (kind === 'add-students' && c) { var names = T.parseNames(fd.get('names')), added = 0; names.forEach(function (n) { var fn = T.firstName(n); if (!c.students.some(function (s) { return s.name.toLowerCase() === fn.toLowerCase(); })) { c.students.push(T.newStudent(fn)); added++; } }); ui.modal = null; st.view = 'classes'; saveMinutes(added * 0.5); toast(added + ' siswa ditambahkan.'); }
     else if (kind === 'import-code' && c) { var p = T.parseLearnerCode(fd.get('code')); if (!p) { ui.modal = { kind: 'import-code', error: 'Kode tidak dikenali. Pastikan menyalin utuh "Kode hasil untuk tutor" dari murid.' }; render(); return; } var res = T.ingest(c, p); ui.modal = null; ui.drawer = res.student.id; saveMinutes(4 + res.graded.length * 5); toast('Hasil ' + res.student.name + ' masuk' + (res.graded.length ? ' · ' + res.graded.length + ' tugas dinilai otomatis' : '') + '.'); }
-    else if (kind === 'assign' && c) { var skills = fd.getAll('skills').slice(0, 3), targets = fd.getAll('targets'); if (!skills.length) { toast(t('guru.pilih-satu-skill', 'Pilih minimal satu skill.')); return; } var a = T.buildAssignment({ title: fd.get('title'), skills: skills, count: fd.get('count'), deadline: fd.get('deadline'), mode: fd.get('mode'), targets: targets, avoid: c.sentItemIds }); c.assignments.push(a); c.sentItemIds = (c.sentItemIds || []).concat(a.itemIds).slice(-120); st.view = 'assignments'; ui.modal = { kind: 'share-assign', id: a.id }; ui.drawer = null; saveMinutes(25); toast(t('guru.tugas-tersusun', 'Tugas tersusun:') + ' ' + a.itemIds.length + ' soal dari bank FIEZEL.'); }
+    else if (kind === 'assign' && c) {
+      var srcType = fd.get('assign_source') || 'curriculum';
+      var unitId = fd.get('unit_id');
+      var C = root.FiezelCurriculum;
+      var unit = (C && unitId) ? C.getUnit(unitId) : null;
+      var skills = fd.getAll('skills').slice(0, 3), targets = fd.getAll('targets'), customItems = [];
+      if (srcType === 'curriculum' && unit) {
+        var count = Number(fd.get('count')) || 5;
+        customItems = C.pickItems(unitId, count, { avoid: c.sentItemIds || [] });
+        skills = [unit.genre];
+      }
+      if (!skills.length && !customItems.length) { toast(t('guru.pilih-satu-skill', 'Pilih minimal satu skill atau bab kurikulum.')); return; }
+      var a = T.buildAssignment({
+        title: fd.get('title') || (unit ? unit.title : ''),
+        skills: skills,
+        items: customItems,
+        count: fd.get('count'),
+        deadline: fd.get('deadline'),
+        mode: fd.get('mode'),
+        targets: targets,
+        avoid: c.sentItemIds,
+        source: unit ? { unitId: unit.id, genre: unit.genre, grade: unit.grade, phaseId: unit.phaseId } : null
+      });
+      c.assignments.push(a);
+      c.sentItemIds = (c.sentItemIds || []).concat(a.itemIds).slice(-120);
+      st.view = 'assignments';
+      ui.modal = { kind: 'share-assign', id: a.id };
+      ui.drawer = null;
+      saveMinutes(25);
+      if (unit) {
+        toast(t('guru.tugas-tersusun', 'Tugas tersusun:') + ' ' + a.itemIds.length + ' soal kurikulum (' + unit.genre + ').');
+      } else {
+        toast(t('guru.tugas-tersusun', 'Tugas tersusun:') + ' ' + a.itemIds.length + ' soal dari bank FIEZEL.');
+      }
+    }
     else if (kind === 'announce' && c) { var text = String(fd.get('text')).trim(); c.announcements.push({ id: T.uid('an'), at: Date.now(), text: text }); form.reset(); ui.modal = null; saveMinutes(2); if (viaWa) window.open(T.waLink('', '📣 ' + c.name + '\n' + text), '_blank'); else copy(text, 'Pengumuman disimpan & tersalin.'); }
     else if (kind === 'journal' && c) { c.journal.push({ id: T.uid('jr'), at: Date.now(), text: String(fd.get('text')).trim(), tags: fd.getAll('tags') }); form.reset(); toast('Refleksi tersimpan.'); }
     else if (kind === 'teacher') { st.teacher = { name: String(fd.get('name')).trim().slice(0, 40), school: String(fd.get('school')).trim().slice(0, 60) }; toast('Profil tersimpan.'); }
@@ -706,6 +790,7 @@
   function onChange(e) {
     var sel = e.target;
     if (sel.getAttribute('data-tg-select') === 'class') { st.activeClassId = sel.value; ui.drawer = null; persist(); render(); }
+    if (sel.getAttribute('data-tg-select') === 'unit') { ui.curriculumUnitId = sel.value; persist(); render(); }
     if (sel.getAttribute('data-tg-input') === 'att-date') { ui.attDate = sel.value; render(); }
     if (sel.getAttribute('data-tg-file') === 'import-json') { var f = sel.files && sel.files[0]; if (!f) return; f.text().then(function (txt) { try { var raw = JSON.parse(txt); if (raw.schema !== S().KEY) throw 0; st = Object.assign(S().defaults(), raw); st.classes = st.classes.map(S().normalizeClass); persist(); toast('Cadangan dipulihkan.'); render(); } catch (_) { toast('Berkas cadangan tidak valid.'); } }); }
   }
