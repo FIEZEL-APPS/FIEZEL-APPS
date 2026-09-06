@@ -1,8 +1,7 @@
 {
-  "version": "m025-279",
-  "version": "m025-280",
-  "claimedBy": "branch feature/paw-arena-m025-277",
-  "claimedAt": "2026-09-06T17:45:00.000Z",
-  "reason": "m025-280: PAW ARENA — view arena, tiga permainan, bot Braincore, kartu aturan per-sesi",
+  "version": "m025-281",
+  "claimedBy": "branch claude/japanese-target-lang",
+  "claimedAt": "2026-09-06T18:10:50.767Z",
+  "reason": "Sumbu bahasa target: kunci penyimpanan per bahasa (langkah 2 kursus Jepang)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
