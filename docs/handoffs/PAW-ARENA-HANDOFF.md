@@ -66,3 +66,24 @@ dijalankan di CI; `cf-live-selftest` merah-diketahui bukan milik perubahan ini.
   di luar konten sosial ber-flag sehingga tetap tampil offline).
 - **Main berdua lewat kode** untuk Sinyal & Taruhan (async, nol server).
 - **Papan artefak**: koleksi cerita Story Chain tersimpan tampil di lobby, bisa dibuka penuh.
+
+## m025-279 · penggabungan ke main dan koreksi otoritas bot
+
+Cabang ini dibuka saat `main` masih di m025-277. Ketika digabung, `main` sudah bergerak dua
+rilis (copy-th-redesign m025-277, BANKOR latihan m025-278), jadi build PAW ARENA naik ke
+**m025-279** dan `SW_REV` menjadi `m025-279-paw-arena-20260906`. Konflik yang muncul hanya di
+berkas penanda (BUILD-VERSION, core-config, sw.js, diag-panel), daftar aset locale th, plus
+dua berkas yang memang diregenerate (baseline emas, laporan kebocoran th).
+
+**`arenaBot` dinaikkan `off` → `active`, dan itu koreksi, bukan penambahan fitur.** Komentar
+di manifest berbunyi "belum ada satu pun pemanggil" — benar saat commit pertama cabang ini,
+dan berhenti benar pada commit yang menyambungkan view arena:
+`features/learner-flow/fiezel-paw-arena.js` memanggil bot delapan kali (jawaban, kalimat
+lanjutan, kartu petunjuk, tebakan, taruhan). `tests/brain-manifest-test.js` yang menemukannya
+— bentuk barunya (sejak m025-278) menurunkan peta otoritas dari app.js **plus seluruh modul
+fitur**, dan versi lama yang hanya membaca app.js akan membiarkan kebohongan ini lewat, karena
+penyambungan arena hidup di `features/learner-flow/`.
+
+Baseline emas Indonesia diregenerate di penggabungan ini. Selisihnya diperiksa lebih dulu:
+36 potongan baru (naskah dan komentar arena) dan satu potongan "hilang" yang sebenarnya baris
+yang sama dengan `+arenaCard` ditambahkan — kartu Home arena. Nol kalimat murid hilang.

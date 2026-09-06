@@ -150,14 +150,16 @@
    */
   var AUTHORITY_MAP = {
     memory: 'active',
-    // PAW ARENA (m025-276): bot lawan untuk tiga permainan arena. Ia MURNI (schema null,
-    // seed→langkah deterministik) DAN sudah dimuat index.html + di-precache sw.js supaya siap
-    // dipakai view arena. Tetapi HARI INI belum ada satu pun pemanggil di jalur app.js —
-    // penyambungan view arena (VALID_VIEWS + render + kartu Home/Profil) sengaja menyusul di
-    // perubahan tersendiri yang bisa ditinjau (lihat PAW-ARENA-HANDOFF). Persis pola
-    // questionAllocation/nof1: 'off' jujur (belum berjalan), BUKAN 'active' tanpa pemanggil —
-    // 'active' tanpa pemanggil adalah kebohongan yang manifest ini ada untuk menutup.
-    arenaBot: 'off',
+    // PAW ARENA (m025-279): bot lawan untuk tiga permainan arena. MURNI — seed→langkah
+    // deterministik, tanpa DOM/jam/acak — dimuat index.html dan di-precache sw.js.
+    //
+    // Nilainya 'off' sampai penyambungannya belum ada, dan komentar di sini pernah berbunyi
+    // begitu. Klaim itu berhenti benar pada commit yang menyambungkan view arena:
+    // features/learner-flow/fiezel-paw-arena.js memanggilnya delapan kali untuk memilih
+    // jawaban, kalimat lanjutan, kartu petunjuk, tebakan, dan taruhan bot. Bot yang benar-
+    // benar memutuskan langkah lawan murid adalah 'active'; membiarkannya 'off' membuat peta
+    // ini berbohong ke arah yang paling berbahaya — mengaku tidak berjalan padahal berjalan.
+    arenaBot: 'active',
     tutorSelection: 'active',
     misconceptionPrior: 'active',
     itemDifficultyPrior: 'active',
@@ -206,8 +208,12 @@
     // tersendiri yang bisa ditinjau. Selama itu jujurnya 'off' — bukan 'shadow',
     // karena 'shadow' berarti ia berjalan dan hasilnya dibuang, sedangkan ini
     // belum berjalan sama sekali.
-    questionMemory: 'off',
-    questionAllocation: 'off',
+    /* m025-278: langkah 1 handoff BANKOR selesai — latihan mandiri murid memakai kedua
+       modul ini. fiezel-learner-flow.js memilih butir lewat allocate() dan mencatat hasil
+       per BUTIR lewat recordAttempt(); ingatannya hidup di st.qmem. Sisi guru belum,
+       dan itu sengaja: langkah 2-4 handoff masih terbuka. */
+    questionMemory: 'active',
+    questionAllocation: 'active',
     nof1: 'off',
     // Langkah 4: rantai hash perubahan parameter. Prasyarat penyetelan-diri, belum ada
     // pemanggil di app.js karena belum ada parameter yang boleh bergerak sendiri: 'off'.

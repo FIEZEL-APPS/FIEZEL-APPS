@@ -121,7 +121,11 @@ const DOMAINS = [...new Set(fs.readdirSync(path.join(ROOT, 'features', 'i18n'))
  * Setiap nama di sini WAJIB punya alasan dan tanggal, dan hilang begitu terjemahannya ada.
  */
 const UTANG_TANPA_TH = new Map([
-  ['redesign', { sejak: '2026-09-05', kunci: 76, catatan: 'm025-246 gelombang penyederhanaan pengalaman; terjemahan th menunggu peninjauan penutur Thai' }]
+  /* m025-277: entri 'redesign' DILUNASI dan karena itu dihapus dari sini, bukan dibiarkan
+     berdiri sebagai izin yang menganga. copy-th-redesign.js kini ada (76 kunci, terdaftar
+     di fiezel-th-loader.js + locale-assets-th.json). Daftar ini sekarang KOSONG — dan itu
+     keadaan yang seharusnya: setiap nama baru di sini berarti memilih mengirim layar
+     berbahasa campur ke murid Thai. */
 ]);
 
 /*
