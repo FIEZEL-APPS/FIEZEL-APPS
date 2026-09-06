@@ -81,7 +81,7 @@ baru. Karena itu tiap tahap pelonggaran dilaporkan di hasil: `relaxed`, `repeate
 
 ## Langkah berikutnya — urut dari yang paling menentukan
 
-1. ~~**Sambungkan ke latihan mandiri murid.**~~ **SELESAI di m025-278.** Lihat bagian
+1. ~~**Sambungkan ke latihan mandiri murid.**~~ **SELESAI di m025-277.** Lihat bagian
    "Penyambungan latihan mandiri" di bawah.
 2. **Tugas guru mode adaptif.** `fiezel-teacher-store.js:buildAssignment` hari ini
    mengunci `itemIds` di perangkat GURU. Untuk personalisasi, tugas harus membawa RESEP
@@ -103,7 +103,7 @@ baru. Karena itu tiap tahap pelonggaran dilaporkan di hasil: `relaxed`, `repeate
 - Jangan naikkan otoritas kedua modul di `fiezel-brain-manifest.js` sebelum pemanggilnya
   benar-benar ada. `tests/brain-page-wiring-test.js` W8 memerahkan drift arah balik.
 
-## Penyambungan latihan mandiri (m025-278)
+## Penyambungan latihan mandiri (m025-277)
 
 Dua modul dinaikkan dari `off` ke `active` di `fiezel-brain-manifest.js`
 (`questionMemory`, `questionAllocation`) dalam SATU commit bersama pemuatannya di
