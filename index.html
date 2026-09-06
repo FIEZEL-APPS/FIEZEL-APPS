@@ -507,6 +507,7 @@ html.fz-booting body{overflow:hidden}
   <script defer src="./features/i18n/copy-id-grammar-labels.js"></script>
   <script defer src="./features/i18n/copy-id-student.js"></script>
   <script defer src="./features/i18n/copy-id-proctor.js"></script>
+  <script defer src="./features/i18n/copy-id-classjoin.js"></script>
   <!-- m025-270: naskah "masuk dengan Google". Domain sendiri, bukan tumpangan: gerbang
        cakupan Thai menemukan domain dari isi features/i18n/, jadi berkas ini otomatis
        menuntut copy-th-google.js — dan layar masuk adalah layar PERTAMA yang ditemui
@@ -736,6 +737,8 @@ html.fz-booting body{overflow:hidden}
   <script defer src="./features/teacher/fiezel-teacher-icons.js"></script>
   <script defer src="./features/teacher/fiezel-teacher-store.js"></script>
   <!-- Class hub: Kelas = pusat Guru ↔ Murid ↔ Braincore (dipakai tab Kelas murid & view Kelas Ruang Guru). Harus sebelum teacher-shell. -->
+  <!-- Kunci ujian: satu penanda "sedang ujian" untuk pendeteksi DAN pintu AI. Harus sebelum app.js. -->
+  <script defer src="./features/ui/fiezel-exam-lock.js"></script>
   <!-- Pendeteksi keluar layar saat ujian: inti murni, dipakai class-hub. Harus sebelum class-hub. -->
   <script defer src="./features/class-hub/fiezel-focus-guard.js"></script>
   <script defer src="./features/class-hub/fiezel-braincore-review.js"></script>
