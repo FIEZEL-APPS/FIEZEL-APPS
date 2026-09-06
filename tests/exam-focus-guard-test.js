@@ -196,6 +196,32 @@ test('class-sync-core: f = tiga bilangan diterima; bentuk lain ditolak', async (
   assert.ok(asing.ok && asing.report.assign[0].f.catatan === undefined, 'tanpa teks bebas: field asing tidak tersimpan');
 });
 
+/* ------------------------------------------- 3b · kiriman yang ditolak server --- */
+
+test('learner-flow: laporan yang ditolak server DIULANG, tidak hilang diam-diam', async () => {
+  const LF = globalThis.FiezelLearnerFlow, TS = globalThis.FiezelTeacherStore;
+  assert.ok(LF && TS, 'modul sudah dimuat oleh gerbang DOM-stub di atas');
+  const asli = TS.reportToClass;
+  let kiriman = 0;
+  try {
+    // Urutan yang menghasilkan keluhan nyata: murid membuka ujian (laporan #1), lalu keluar
+    // layar beberapa detik kemudian — laporan #2 jatuh di bawah lantai 15 detik server (429).
+    TS.reportToClass = function () { kiriman++; return Promise.resolve({ ok: false, status: 429, error: 'rate_limited' }); };
+    LF.recordAssignmentFocus('ujian-1', { n: 1, s: 20, x: 20 });
+    await new Promise((r) => setTimeout(r, 0));
+    assert.strictEqual(kiriman, 1, 'percobaan pertama terkirim');
+    const tunggu = LF._retryState();
+    assert.ok(tunggu.pending, 'penolakan server menjadwalkan percobaan ulang');
+    assert.ok(tunggu.delay >= 16000, 'jedanya di atas lantai server, bukan langsung menghujani: ' + tunggu.delay);
+
+    TS.reportToClass = function () { kiriman++; return Promise.resolve({ ok: true }); };
+    LF.pushToClass();
+    await new Promise((r) => setTimeout(r, 0));
+    assert.strictEqual(kiriman, 2);
+    assert.ok(!LF._retryState().pending, 'kiriman yang berhasil menghentikan pengulangan');
+  } finally { TS.reportToClass = asli; }
+});
+
 /* ----------------------------------------------------------------- 4 · sisi guru --- */
 
 test('teacher store: f tersimpan per murid dan kabar hanya lahir saat angkanya naik', () => {
@@ -218,7 +244,15 @@ test('teacher store: f tersimpan per murid dan kabar hanya lahir saat angkanya n
   assert.strictEqual(TS.focusLevel(c.assignments[0].focus[r1.student.id]), 'berat');
   assert.ok(/2×/.test(TS.focusLabel(c.assignments[0].focus[r1.student.id])));
   assert.strictEqual(TS.focusLabel({ n: 0, s: 0, x: 0 }), 'Tidak keluar layar');
-  assert.ok(/keluar dari layar ujian/.test(TS.inboxText(Object.assign({ at: Date.now() }, r3.focusEvents[0]))), 'kabar terbaca guru');
+  const kabar = TS.inboxText(Object.assign({ at: Date.now() }, r3.focusEvents[0]));
+  assert.ok(/^⚠/.test(kabar), 'kabar dibaca sebagai PERINGATAN, bukan catatan administratif: ' + kabar);
+  assert.ok(/Ani/.test(kabar) && /Ujian mini/.test(kabar) && /2×/.test(kabar), 'menyebut siapa, sedang apa, seberapa sering: ' + kabar);
+  assert.ok(!/curang|menyontek/i.test(kabar), 'menyebut fakta, tidak memvonis');
+
+  // Kabar generik tidak boleh lahir bersama peringatan untuk murid yang sama — dulu ia yang
+  // terbaca duluan di kotak masuk, dan peringatannya tertutup.
+  const src = read('features/teacher/fiezel-teacher-store.js');
+  assert.ok(/!\(res\.focusEvents \|\| \[\]\)\.length\) events\.push\(\{ kind: 'report_in'/.test(src), 'report_in ditahan saat ada focus_exit');
 });
 
 test('sisi guru: chip keluar-layar muncul di daftar status murid, cangkang mendahulukan kabarnya', () => {
@@ -233,6 +267,88 @@ test('sisi guru: chip keluar-layar muncul di daftar status murid, cangkang menda
   assert.ok(/'focus_exit' \? 'eye-off'/.test(shell), 'ikon kabar di kotak masuk guru');
 });
 
+test('realtime: detak murid tidak boleh jauh lebih lambat daripada detak guru', () => {
+  const app = read('app.js'), inbox = read('features/notify/fiezel-inbox.js'), shell = read('features/teacher/fiezel-teacher-shell.js');
+  const murid = Number((app.match(/const NOTIF_POLL_MS=(\d+)/) || [])[1]);
+  const remKlien = Number((inbox.match(/var MIN_GAP_MS = (\d+)/) || [])[1]);
+  const guru = Number((shell.match(/var SYNC_EVERY_MS = (\d+)/) || [])[1]);
+  assert.ok(murid && remKlien && guru, 'ketiga detak terbaca');
+  /* Keluhan yang menutup angka lama: papan guru hidup sendiri tiap 10 detik sementara layar
+     murid menunggu satu menit penuh, jadi murid harus menutup-buka aplikasi. Batas 1,5×
+     membuat jarak itu tidak bisa melebar lagi tanpa seseorang menyadarinya. */
+  assert.ok(murid <= guru * 1.5, 'detak murid (' + murid + ') tidak boleh jauh di atas detak guru (' + guru + ')');
+  assert.ok(remKlien <= murid, 'rem klien (' + remKlien + ') tidak boleh membuang tanya yang sudah dijadwalkan (' + murid + ')');
+  assert.ok(murid >= 5000 && remKlien >= 5000, 'tetap di atas lantai server 5 detik');
+});
+
+test('papan guru: detak otomatis TIDAK boleh mati saat akun guru belum siap', () => {
+  // Modul cangkang guru dimuat di atas root yang sudah dipalsukan gerbang DOM-stub.
+  // Perencana detaknya dimuat lebih dulu, urutan yang sama dengan index.html.
+  require('../features/notify/fiezel-sync-plan.js');
+  require('../features/teacher/fiezel-teacher-shell.js');
+  const Shell = globalThis.FiezelTeacherShell;
+  assert.ok(Shell && Shell._autoSyncPlan, 'cangkang guru memuat rencana detaknya');
+  const plan = Shell._autoSyncPlan, T = Shell._syncTicks();
+  const dasar = { mounted: true, hidden: false, syncing: false, avail: 'ok', failStreak: 0, tickIndex: 0, now: 1000, syncingSince: 0 };
+  const dg = (o) => plan(Object.assign({}, dasar, o));
+
+  assert.strictEqual(dg({}), 'sync');
+  /* INI kerusakannya: FiezelAccount memulihkan sesi secara asinkron, jadi saat Ruang Guru
+     dipasang, perannya sering belum terbaca. Dulu itu membuat startAutoSync pulang SEBELUM
+     timer dipasang — papan guru mati untuk sisa sesi dan hanya hidup kalau tombol Sinkron
+     ditekan tangan. 'wait' berarti: jangan sentuh jaringan, tapi detaknya tetap berdenyut. */
+  assert.strictEqual(dg({ avail: 'no_account' }), 'wait');
+  assert.strictEqual(dg({ avail: 'not_teacher' }), 'wait');
+  assert.strictEqual(dg({ avail: 'offline' }), 'wait');
+  assert.strictEqual(dg({ hidden: true }), 'skip', 'layar tak dipandang tidak perlu jaringan');
+  assert.strictEqual(dg({ mounted: false }), 'idle');
+  assert.strictEqual(dg({ syncing: true, now: 5000, syncingSince: 4000 }), 'skip', 'ronde yang masih wajar dibiarkan selesai');
+  /* Permintaan yang menggantung dulu mengunci ui.syncing selamanya, dan detaknya berhenti
+     dengan cara yang sama diamnya. */
+  assert.strictEqual(dg({ syncing: true, now: 100000, syncingSince: 1000 }), 'reset');
+  // Rem menanjak sesudah gagal beruntun tetap ada, tapi ia melewati ronde — bukan mematikannya.
+  assert.strictEqual(dg({ failStreak: 3, tickIndex: 1 }), 'skip');
+  assert.strictEqual(dg({ failStreak: 3, tickIndex: 4 }), 'sync');
+  assert.ok(T.every > 3000 && T.every <= 10000, 'detak guru di atas lantai server 3 detik: ' + T.every);
+
+  // Satu aturan untuk dua papan: cangkang guru TIDAK boleh punya pengertian sendiri.
+  const P = globalThis.FiezelSyncPlan;
+  assert.ok(P && P.plan, 'perencana bersama termuat');
+  ['ok', 'no_account', 'offline'].forEach(function (avail) {
+    assert.strictEqual(dg({ avail: avail }), P.plan(Object.assign({}, dasar, { ready: avail === 'ok' })),
+      'cangkang guru meneruskan keputusannya ke perencana bersama (' + avail + ')');
+  });
+
+  const src = read('features/teacher/fiezel-teacher-shell.js');
+  assert.ok(!/function startAutoSync\(\) \{[\s\S]{0,200}?syncAvailable\(\) !== 'ok'\) return;/.test(src),
+    'startAutoSync tidak boleh pulang sebelum timernya terpasang');
+  assert.ok(/syncTimer = setInterval/.test(src) && /chipTimer = setInterval/.test(src), 'kedua detak terpasang');
+  assert.ok(/\.catch\(function \(\) \{ ui\.syncing = false;/.test(src), 'galat tidak boleh meninggalkan kunci ui.syncing');
+});
+
+test('papan murid: detak yang SAMA dengan guru, tanpa tombol sinkron', () => {
+  const app = read('app.js'), hub = read('features/class-hub/fiezel-class-hub.js');
+  const P = require('../features/notify/fiezel-sync-plan.js');
+
+  // Satu aturan, dua papan: keduanya menanyakan keputusannya ke modul yang sama.
+  assert.ok(/FiezelSyncPlan/.test(app), 'detak murid memakai perencana bersama');
+  assert.ok(/function notifSyncPlan\(\)/.test(app) && /notifSyncRound\(\)/.test(app), 'ronde murid punya penjaga sendiri');
+  assert.ok(/plan==='reset'/.test(app), 'ronde murid yang menggantung bisa dilepas');
+  /* Penjaga ada DI DALAM detak, bukan sebelum timernya lahir — kerusakan sisi guru persis
+     lahir dari urutan yang terbalik. */
+  const arm = app.slice(app.indexOf('function startNotifPolling'), app.indexOf('function startNotifPolling') + 900);
+  assert.ok(/notifPollTimer=setInterval/.test(arm), 'timer murid selalu terpasang');
+  assert.ok(!/if\(!notifReady\(\)\)return/.test(arm), 'tidak ada penjaga yang memulangkan pemasang timer');
+
+  // Tombol sinkron murid HILANG: menyegarkan papan adalah tugas sistem, bukan pekerjaan murid.
+  assert.ok(!/data-ch="resend"/.test(hub), 'tombol "Kirim ulang laporan" tidak lagi dirender');
+  assert.ok(/case 'resend'/.test(hub), 'pintunya tetap hidup untuk jalur pemulihan');
+
+  // Cabang "belum ada kode kelas" tidak boleh mematikan detak — ia hanya menahan jaringan.
+  assert.strictEqual(P.plan({ mounted: true, ready: false, now: 1 }), 'wait');
+  assert.strictEqual(P.plan({ mounted: true, ready: true, now: 1 }), 'sync');
+});
+
 /* --------------------------------------------------------- 5 · pemasangan & i18n --- */
 
 test('pemasangan: modul terdaftar di index.html + sw.js, dan teks murid lahir dua bahasa', () => {
@@ -241,6 +357,8 @@ test('pemasangan: modul terdaftar di index.html + sw.js, dan teks murid lahir du
   assert.ok(sw.includes('./features/class-hub/fiezel-focus-guard.js'), 'ikut precache: ujian sering dikerjakan tanpa jaringan');
   assert.ok(html.includes('copy-id-proctor.js') && sw.includes('./features/i18n/copy-id-proctor.js'));
   assert.ok(read('features/i18n/fiezel-th-loader.js').includes('copy-th-proctor.js'), 'pasangan th ikut dimuat saat locale th');
+  assert.ok(html.indexOf('fiezel-sync-plan.js') > -1 && html.indexOf('fiezel-sync-plan.js') < html.indexOf('./app.js'), 'perencana detak dimuat sebelum app.js');
+  assert.ok(sw.includes('./features/notify/fiezel-sync-plan.js'), 'perencana detak ikut precache');
   const idKeys = (read('features/i18n/copy-id-proctor.js').match(/'proctor\.[a-z-]+'/g) || []).sort();
   const thKeys = (read('features/i18n/copy-th-proctor.js').match(/'proctor\.[a-z-]+'/g) || []).sort();
   assert.ok(idKeys.length >= 3);
