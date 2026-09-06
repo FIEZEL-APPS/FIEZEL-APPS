@@ -108,6 +108,7 @@
    */
   var MODULES = [
     { file: 'fiezel-affect.js', global: 'FiezelAffect', schema: 'fiezel-affect-v1', authorityKey: 'affectTargetSuccess' },
+    { file: 'fiezel-arena-bot.js', global: 'FiezelArenaBot', schema: 'fiezel-arena-bot-v1', authorityKey: 'arenaBot' },
     { file: 'fiezel-attempt-record.js', global: 'FiezelAttemptRecord', schema: 'fiezel-attempt-record-v1', authorityKey: 'attemptRecord' },
     { file: 'fiezel-brain-config.js', global: 'FiezelBrainConfig', schema: 'fiezel-brain-config-v1', authorityKey: 'brainConfig' },
     { file: 'fiezel-brain-manifest.js', global: 'FiezelBrainManifest', schema: SCHEMA, authorityKey: 'manifest' },
@@ -156,6 +157,16 @@
     // menandainya 'active' berarti berbohong tentang mesin yang sedang berjalan.
     targetLanguage: 'off',
     memory: 'active',
+    // PAW ARENA (m025-279): bot lawan untuk tiga permainan arena. MURNI — seed→langkah
+    // deterministik, tanpa DOM/jam/acak — dimuat index.html dan di-precache sw.js.
+    //
+    // Nilainya 'off' sampai penyambungannya belum ada, dan komentar di sini pernah berbunyi
+    // begitu. Klaim itu berhenti benar pada commit yang menyambungkan view arena:
+    // features/learner-flow/fiezel-paw-arena.js memanggilnya delapan kali untuk memilih
+    // jawaban, kalimat lanjutan, kartu petunjuk, tebakan, dan taruhan bot. Bot yang benar-
+    // benar memutuskan langkah lawan murid adalah 'active'; membiarkannya 'off' membuat peta
+    // ini berbohong ke arah yang paling berbahaya — mengaku tidak berjalan padahal berjalan.
+    arenaBot: 'active',
     tutorSelection: 'active',
     misconceptionPrior: 'active',
     itemDifficultyPrior: 'active',
