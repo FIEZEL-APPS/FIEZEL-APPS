@@ -4807,6 +4807,14 @@ html[data-fz-input="touch"] :focus{outline-color:transparent!important}
    termasuk saat diklik - jadi cincinnya tetap muncul persis seperti sebelumnya, dan yang
    hilang hanya pengecualian diam-diam terhadap kebijakan itu. */
 .auth-field-label input:focus-visible{outline:2px solid var(--sun-deep);background:var(--panel)}
+.auth-google{display:flex;flex-direction:column;align-items:center;gap:8px;margin:12px 0 4px}
+/* Tombol resmi Google digambar skrip Google ke dalam kotak ini; tinggi minimum
+   ada supaya isi modal tidak melompat saat tombolnya akhirnya tiba. */
+.auth-google-btn{min-height:44px;display:flex;justify-content:center;align-items:center}
+.auth-google-status{margin:0;font-size:.85rem;color:var(--muted);text-align:center;line-height:1.45}
+.auth-google-note{margin:0;font-size:.78rem;color:var(--muted);text-align:center;line-height:1.45;max-width:34ch}
+.auth-google-sep{display:flex;align-items:center;gap:10px;width:100%;margin-top:4px;color:var(--muted);font-size:.8rem}
+.auth-google-sep::before,.auth-google-sep::after{content:'';flex:1;height:1px;background:var(--line,rgba(0,0,0,.12))}
 .auth-error-box{padding:10px 12px;background:var(--accent-soft);border:1px solid var(--accent);border-radius:var(--radius-sm);color:var(--accent-strong);font-size:.85rem;line-height:1.4;text-align:left}
 .badge-success{background:#dcfce7;color:#166534;padding:2px 8px;border-radius:var(--radius-pill);font-size:.8rem}
 .badge-neutral{background:var(--panel-soft);color:var(--muted);padding:2px 8px;border-radius:var(--radius-pill);font-size:.8rem}
