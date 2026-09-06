@@ -102,7 +102,11 @@ test('kunci dilepas di setiap akhir sesi, bukan hanya saat selesai bersih', () =
   const app = read('app.js'), hub = read('features/class-hub/fiezel-class-hub.js');
   assert.ok(/function abandonActiveSession[\s\S]{0,400}?examLockEnd/.test(app), 'sesi yang ditinggalkan melepas kunci');
   assert.ok(/function completeActiveSession[\s\S]{0,200}?examLockEnd/.test(app), 'sesi yang selesai melepas kunci');
-  assert.ok(/onSessionEnd:\(\)=>\{try\{examLockEnd\('listening_exam'\);examLockEnd\('speaking_exam'\)/.test(app), 'sesi Skills Lab');
+  /* Bentuk pembuka onSessionEnd dikunci dua gerbang lain (quota-notice-a11y, puter-popup-once):
+     pemberitahuan Puter harus tetap yang pertama di sana. Kunci ujian karena itu dilepas
+     SESUDAHNYA — dan yang dijaga di sini adalah keberadaannya, bukan urutannya. */
+  assert.ok(/onSessionEnd:\(\)=>\{try\{maybePresentPuterCreditNotice\(\)/.test(app), 'pemberitahuan Puter tetap membuka callback');
+  assert.ok(/onSessionEnd:[\s\S]{0,400}?examLockEnd\('listening_exam'\);examLockEnd\('speaking_exam'\)/.test(app), 'sesi Skills Lab melepas kunci');
   assert.ok(/function syncExamLockForView/.test(app), 'permukaan berbasis layar dilepas saat murid pergi');
   assert.ok(/FiezelExamLock\.end\('assignment'\)/.test(hub), 'runner tugas Kelas');
 });
