@@ -197,8 +197,12 @@
     // tersendiri yang bisa ditinjau. Selama itu jujurnya 'off' — bukan 'shadow',
     // karena 'shadow' berarti ia berjalan dan hasilnya dibuang, sedangkan ini
     // belum berjalan sama sekali.
-    questionMemory: 'off',
-    questionAllocation: 'off',
+    /* m025-278: langkah 1 handoff BANKOR selesai — latihan mandiri murid memakai kedua
+       modul ini. fiezel-learner-flow.js memilih butir lewat allocate() dan mencatat hasil
+       per BUTIR lewat recordAttempt(); ingatannya hidup di st.qmem. Sisi guru belum,
+       dan itu sengaja: langkah 2-4 handoff masih terbuka. */
+    questionMemory: 'active',
+    questionAllocation: 'active',
     nof1: 'off',
     // Langkah 4: rantai hash perubahan parameter. Prasyarat penyetelan-diri, belum ada
     // pemanggil di app.js karena belum ada parameter yang boleh bergerak sendiri: 'off'.

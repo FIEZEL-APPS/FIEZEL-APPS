@@ -61,6 +61,78 @@
     s.total += 1; if (correct) s.correct += 1; s.lastAt = Date.now();
     st.skills[skill] = s;
   }
+  /* ══ BANKOR — ingatan soal per BUTIR + alokator (m025-278, langkah 1 handoff) ══════
+     Sebelum ini pemilihan soal hanya tahu satu hal: "pernah tampil" (st.seen). Butir yang
+     SELALU SALAH dan butir yang SUDAH DIKUASAI terlihat sama persis olehnya, dan keduanya
+     sama-sama dibuang — jadi yang paling perlu diulang justru yang paling cepat hilang.
+
+     Dua modul murni mengambil alih keputusan itu. Keduanya TIDAK menyentuh jam dan tidak
+     menyimpan apa pun sendiri: waktu dan seed masuk sebagai argumen dari sini, dan ingatan
+     yang mereka kembalikan disimpan di st.qmem (localStorage yang sudah ada), sejajar
+     dengan st.seen. Batas 600 butir sudah ditangani prune() di dalam modulnya — tidak ada
+     pembatas kedua di sini.
+
+     FAIL-SOFT DAN SENGAJA: kalau modulnya belum termuat (build lama, skrip gagal), jalur
+     pickFresh yang lama tetap dipakai. Yang dilarang adalah sesi yang gagal terbentuk,
+     bukan sesi yang dipilih dengan cara lama. */
+  function QM() { try { return root.FiezelQuestionMemory || null; } catch (_) { return null; } }
+  function QA() { try { return root.FiezelQuestionAllocator || null; } catch (_) { return null; } }
+
+  /* Seed = IDENTITAS MURID, bukan jam. Itu yang membuat dua murid dengan riwayat sama
+     tetap mendapat urutan berbeda, dan membuat satu sesi bisa diputar ulang saat ada
+     laporan bug — jam tidak pernah bisa diputar ulang. Handle online dipakai kalau ada
+     (satu identitas untuk satu murid lintas perangkat); kalau belum, penanda acak sekali
+     per perangkat disimpan di state. */
+  function learnerSeed(st) {
+    try { var h = root.storedSocialHandle && root.storedSocialHandle(); if (h) return String(h); } catch (_) {}
+    if (!st.seedId) st.seedId = 'lf-' + Math.random().toString(36).slice(2, 10);
+    return st.seedId;
+  }
+
+  function memoryOf(st) {
+    var M = QM();
+    if (!M) return null;
+    /* Bentuknya diperiksa lewat SCHEMA modulnya sendiri, bukan lewat isMemory() —
+       fungsi itu tidak diekspor, dan menebaknya ada membuat ingatan murid diam-diam
+       dikosongkan setiap kali dibaca. */
+    return st.qmem && st.qmem.schema === M.SCHEMA && st.qmem.items ? st.qmem : M.emptyMemory();
+  }
+
+  /* Butir untuk satu blok rencana. Alokator kalau ada, pickFresh kalau tidak. */
+  function allocateIds(st, block) {
+    var B = bank(), A = QA();
+    if (A && typeof A.allocate === 'function') {
+      var pool = B.itemsFor(block.skill);
+      if (pool && pool.length) {
+        var plan = A.allocate({
+          pool: pool,
+          memory: memoryOf(st),
+          count: block.count,
+          nowMs: Date.now(),
+          seed: learnerSeed(st)
+        });
+        var picked = (plan && plan.items || []).map(function (it) { return it.id; });
+        if (picked.length) return picked;
+      }
+    }
+    return B.pickFresh(block.skill, block.count, { avoid: seenFor(block.skill), seed: (Date.now() % 9000) + 3 })
+      .map(function (it) { return it.id; });
+  }
+
+  /* Satu percobaan, satu butir. record() di atas hanya menyimpan agregat per SKILL —
+     karena itulah ingatan soalnya kosong selamanya sebelum ini. */
+  function rememberAttempt(st, item, correct) {
+    var M = QM();
+    if (!M || !item || !item.id) return;
+    st.qmem = M.recordAttempt(memoryOf(st), {
+      item: item.id,
+      skill: item.skill || null,
+      concept: item.concept || null,
+      ok: !!correct,
+      at: Date.now()
+    });
+  }
+
   function accuracy(s) { return s && s.total ? s.correct / s.total : null; }
   function statusOf(s) {
     var a = accuracy(s);
@@ -113,7 +185,9 @@
     var B = bank();
     // Tugas guru dikerjakan DI DALAM Kelas (class-hub): satu tempat, mendukung soal kustom guru + bukti per-soal.
     if (block.id.indexOf('assign-') === 0 && root.FiezelClassHub && typeof root.go === 'function') { root.FiezelClassHub.openAssignment(block.id.slice(7)); root.go('classroom'); return; }
-    var ids = block.itemIds || B.pickFresh(block.skill, block.count, { avoid: seenFor(block.skill), seed: (Date.now() % 9000) + 3 }).map(function (it) { return it.id; });
+    var ids = block.itemIds || allocateIds(st, block);
+    /* markSeen TETAP dipanggil: st.seen masih dipakai diagnosticSet di bawah. Membuangnya
+       adalah perubahan tersendiri, bukan bagian penyambungan ini. */
     ids.forEach(function (id) { markSeen(block.skill, id); });
     st.activeLesson = { blockId: block.id, skill: block.skill, title: block.title, kind: block.kind, minutes: block.minutes, itemIds: ids, index: 0, attempt: 0, results: [], feedback: null, revealed: false, startedAt: Date.now() };
     st.step = 'lesson';
@@ -127,6 +201,7 @@
       var firstTry = fb.correct && L.attempt === 1;
       L.results.push({ itemId: item.id, skill: item.skill, correct: firstTry, attempts: L.attempt });
       record(st, item.skill, firstTry);
+      rememberAttempt(st, item, firstTry);
       L.revealed = true;
     }
     L.feedback = fb;
