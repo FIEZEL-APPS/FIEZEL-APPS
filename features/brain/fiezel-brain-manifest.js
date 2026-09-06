@@ -127,6 +127,8 @@
     { file: 'fiezel-nof1.js', global: 'FiezelNof1', schema: 'fiezel-nof1-v1', authorityKey: 'nof1' },
     { file: 'fiezel-olm.js', global: 'FiezelOLM', schema: 'fiezel-olm-v1', authorityKey: 'olmInsight' },
     { file: 'fiezel-production-grader.js', global: 'FiezelProductionGrader', schema: 'fiezel-production-grader-v1', authorityKey: 'productionGrader' },
+    { file: 'fiezel-question-memory.js', global: 'FiezelQuestionMemory', schema: 'fiezel-question-memory-v1', authorityKey: 'questionMemory' },
+    { file: 'fiezel-question-allocator.js', global: 'FiezelQuestionAllocator', schema: 'fiezel-question-allocator-v1', authorityKey: 'questionAllocation' },
     { file: 'fiezel-retention-probe.js', global: 'FiezelPostTest', schema: 'fiezel-post-test-v1', authorityKey: 'retentionProbe' },
     { file: 'fiezel-speaking-adaptive.js', global: 'FiezelSpeakingAdaptive', schema: 'fiezel-speaking-adaptive-v1', authorityKey: 'speakingPolicy' },
     { file: 'fiezel-self-tune.js', global: 'FiezelSelfTune', schema: 'fiezel-self-tune-v1', authorityKey: 'selfTune' },
@@ -189,6 +191,14 @@
     policyVerdict: 'active',
     // Langkah 3 roadmap otonomi: pembagi lengan eksperimen N-of-1. Modul murni yang belum
     // punya pemanggil di app.js — eksperimen pertama belum dibuka. Jujurnya 'off'.
+    // Bankor sebagai mesin alokasi (m025-271). Keduanya MURNI dan dimuat halaman,
+    // tetapi hari ini belum ada satu pun pemanggil di jalur murid: modulnya lahir
+    // lebih dulu beserta gerbangnya, penyambungannya menyusul di perubahan
+    // tersendiri yang bisa ditinjau. Selama itu jujurnya 'off' — bukan 'shadow',
+    // karena 'shadow' berarti ia berjalan dan hasilnya dibuang, sedangkan ini
+    // belum berjalan sama sekali.
+    questionMemory: 'off',
+    questionAllocation: 'off',
     nof1: 'off',
     // Langkah 4: rantai hash perubahan parameter. Prasyarat penyetelan-diri, belum ada
     // pemanggil di app.js karena belum ada parameter yang boleh bergerak sendiri: 'off'.

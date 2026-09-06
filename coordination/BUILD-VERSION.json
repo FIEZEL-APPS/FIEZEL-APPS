@@ -1,7 +1,7 @@
 {
-  "version": "m025-272",
+  "version": "m025-273",
   "claimedBy": "branch claude/task-home-exit-detector-cq1nea",
-  "claimedAt": "2026-09-06T03:42:54.001Z",
+  "claimedAt": "2026-09-06T04:05:55.722Z",
   "reason": "gabung kelas + kunci ujian: satu rilis untuk kedua perbaikan",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
