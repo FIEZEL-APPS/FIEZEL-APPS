@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-09-06T01:49:42.818Z",
+  "generatedAt": "2026-09-06T03:03:15.933Z",
   "files": {
     "app.js": {
       "leaks": 1,
@@ -109,12 +109,20 @@
       ]
     },
     "features/onboarding/fiezel-onboarding.js": {
-      "leaks": 1,
-      "budget": 1,
+      "leaks": 3,
+      "budget": 3,
       "sample": [
         {
           "line": 627,
           "text": "Pilih bahasa untuk melanjutkan"
+        },
+        {
+          "line": 667,
+          "text": "Sudah punya akun? Masuk dulu supaya kelas dan tugas gurumu ikut."
+        },
+        {
+          "line": 1424,
+          "text": "Belum berhasil masuk. Pilih bahasa dulu — masuk bisa nanti dari Pengaturan. ·"
         }
       ]
     },
