@@ -1,7 +1,7 @@
 {
-  "version": "m025-270",
-  "claimedBy": "branch feat/google-auth-schema",
-  "claimedAt": "2026-09-06T02:10:00.000Z",
-  "reason": "Masuk dengan Google: tombol resmi di layar akun, naskah id+th, dan rute penukar ID token menjadi sesi FIEZEL",
+  "version": "m025-271",
+  "claimedBy": "branch feat/google-onboarding-awal",
+  "claimedAt": "2026-09-06T03:00:30.512Z",
+  "reason": "Tombol Masuk dengan Google naik ke layar paling awal, sebelum pemilih bahasa",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
