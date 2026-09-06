@@ -1,5 +1,5 @@
 /**
- * FIEZEL Ruang Guru — cangkang UI khusus guru (terpisah total dari cangkang murid).
+ * FIEZEL KelasKu untuk Guru — cangkang UI khusus guru (terpisah total dari cangkang murid).
  * Dipasang oleh app.js lewat tutorCenterView() untuk akun guru terverifikasi.
  * Semua data via FiezelTeacherStore (lokal di perangkat guru).
  */
@@ -314,7 +314,7 @@
     var teacherVerified = isTeacherRole();
     var exitLabel = teacherVerified ? 'Keluar akun guru' : 'Ke mode murid';
     var exitAction = teacherVerified ? 'logout' : 'exit';
-    return '<aside class="tg-side"><div class="tg-brand"><span class="tg-brand-mark">F</span><div><b>FIEZEL</b><small>' + t('guru.ruang-judul', 'Ruang Guru') + '</small></div></div>' +
+    return '<aside class="tg-side"><div class="tg-brand"><span class="tg-brand-mark">K</span><div class="kelasku-brand"><span class="kelasku-main">KelasKu</span> <span class="kelasku-tag">untuk Guru</span></div></div>' +
       '<button type="button" class="tg-teacher" data-tg="view" data-view="settings" data-testid="tg-profile">' + icon('user-round') + '<div><b>' + esc(st.teacher.name || accountHandle() || 'Guru FIEZEL') + '</b><small>' + esc(st.teacher.school || 'Atur profil →') + '</small></div></button>' +
       (st.classes.length ? '<label class="tg-class-switch">' + t('guru.kelas-aktif', 'Kelas aktif') + '<select data-tg-select="class" data-testid="tg-class-select">' + st.classes.map(function (k) { return '<option value="' + k.id + '"' + (c && k.id === c.id ? ' selected' : '') + '>' + esc(k.name) + '</option>'; }).join('') + '</select></label>' : '') +
       '<nav class="tg-nav">' + NAV.map(function (n) { return '<button type="button" class="tg-nav-item' + (st.view === n[0] ? ' is-active' : '') + '" data-tg="view" data-view="' + n[0] + '" data-testid="tg-nav-' + n[0] + '">' + icon(n[2]) + '<span>' + n[1] + '</span></button>'; }).join('') + '</nav>' +
@@ -323,7 +323,7 @@
   }
   function topbar(c) {
     var d = new Date();
-    return '<header class="tg-top"><div><p class="tg-kicker">' + esc(d.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' })) + '</p><h1>' + esc(st.classes.length ? (TITLE[st.view] || 'Ruang Guru') : 'Ruang Guru') + '</h1></div>' +
+    return '<header class="tg-top"><div><p class="tg-kicker">' + esc(d.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' })) + '</p><h1>' + esc(st.classes.length ? (TITLE[st.view] || 'KelasKu untuk Guru') : 'KelasKu untuk Guru') + '</h1></div>' +
       '<div class="tg-top-actions">' + (c ? syncChip(c) + '<button type="button" class="tg-chip tg-code" data-tg="copy" data-text="' + esc(c.code) + '" title="Salin kode kelas" data-testid="tg-class-code">' + icon('hash') + '<span>' + esc(c.code) + '</span></button>' : '') + bell() + (c ? '<button type="button" class="tg-btn is-ghost" data-tg="modal" data-kind="board" data-testid="tg-open-board">' + icon('presentation') + '<span>Mode papan</span></button><button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="assign" data-testid="tg-quick-assign">' + icon('plus') + '<span>' + t('guru.tugas-baru', 'Tugas baru') + '</span></button>' : '') + '</div></header>' + inboxPanel();
   }
   function bell() {
@@ -344,7 +344,7 @@
 
   function welcome() {
     return '<section class="tg-welcome" data-testid="tg-welcome"><p class="tg-kicker">Selamat datang</p><h2>' + t('guru.ruang-kerja-desc', 'Ruang kerja yang membaca kelasmu, lalu memberi tahu') + ' <em>siapa yang perlu disapa hari ini</em>.</h2>' +
-      '<p class="tg-lead">FIEZEL Ruang Guru mengubah data latihan murid menjadi tindakan: deteksi dini siswa tertinggal, kartu sapa personal 1 ketuk, laporan orang tua otomatis, kelompok belajar yang dipasangkan sendiri, dan tugas yang menilai dirinya sendiri.</p>' +
+      '<p class="tg-lead">FIEZEL KelasKu untuk Guru mengubah data latihan murid menjadi tindakan: deteksi dini siswa tertinggal, kartu sapa personal 1 ketuk, laporan orang tua otomatis, kelompok belajar yang dipasangkan sendiri, dan tugas yang menilai dirinya sendiri.</p>' +
       '<div class="tg-welcome-actions"><button type="button" class="tg-btn is-primary is-lg" data-tg="modal" data-kind="new-class" data-testid="tg-welcome-new-class">' + icon('plus') + ' ' + t('guru.buat-kelas-pertama', 'Buat kelas pertama') + '</button><button type="button" class="tg-btn is-ghost is-lg" data-tg="seed-demo" data-testid="tg-welcome-demo">' + icon('sparkles') + ' Coba dengan kelas contoh (18 siswa)</button></div>' +
       '<ul class="tg-welcome-list"><li>' + icon('shield-check') + ' Data tetap di perangkatmu — tanpa jawaban mentah murid.</li><li>' + icon('timer') + ' Rata-rata guru menghemat 40+ menit/minggu untuk laporan & pesan.</li><li>' + icon('wifi-off') + ' Bekerja offline, cocok untuk sekolah dengan sinyal terbatas.</li></ul></section>';
   }
@@ -446,7 +446,7 @@
   function settings() {
     return accountCard() +
       '<section class="tg-card tg-narrow" data-testid="tg-settings"><p class="tg-kicker">Profil guru</p><h3>' + t('guru.nama-sekolah-ttd', 'Nama & sekolah dipakai di tanda tangan laporan') + '</h3><form data-tg-form="teacher" class="tg-form"><label class="tg-label">' + t('guru.nama-panggilan', 'Nama panggilan') + '<input name="name" value="' + esc(st.teacher.name) + '" placeholder="Bu Rina / Pak Dimas" maxlength="40" data-testid="tg-teacher-name"></label><label class="tg-label">Sekolah / lembaga<input name="school" value="' + esc(st.teacher.school) + '" placeholder="SMA Negeri 3 Bandung" maxlength="60" data-testid="tg-teacher-school"></label><div class="tg-actions"><button type="submit" class="tg-btn is-primary is-small" data-testid="tg-teacher-save">' + t('umum.simpan', 'Simpan') + '</button></div></form>' +
-      '<hr class="tg-hr"><p class="tg-kicker">Data</p><p class="tg-muted">' + t('guru.data-lokal-warn', 'Semua data Ruang Guru tersimpan di perangkat ini. Ekspor cadangan sebelum ganti perangkat.') + '</p><div class="tg-actions"><button type="button" class="tg-btn is-ghost is-small" data-tg="export-json">' + icon('download') + ' Ekspor cadangan</button><label class="tg-btn is-ghost is-small">' + icon('upload') + ' Pulihkan cadangan<input type="file" accept="application/json" hidden data-tg-file="import-json"></label><button type="button" class="tg-btn is-danger is-small" data-tg="reset-all" data-testid="tg-reset">' + icon('trash-2') + ' ' + t('guru.hapus-semua-data', 'Hapus semua data guru') + '</button></div></section>';
+      '<hr class="tg-hr"><p class="tg-kicker">Data</p><p class="tg-muted">' + t('guru.data-lokal-warn', 'Semua data KelasKu untuk Guru tersimpan di perangkat ini. Ekspor cadangan sebelum ganti perangkat.') + '</p><div class="tg-actions"><button type="button" class="tg-btn is-ghost is-small" data-tg="export-json">' + icon('download') + ' Ekspor cadangan</button><label class="tg-btn is-ghost is-small">' + icon('upload') + ' Pulihkan cadangan<input type="file" accept="application/json" hidden data-tg-file="import-json"></label><button type="button" class="tg-btn is-danger is-small" data-tg="reset-all" data-testid="tg-reset">' + icon('trash-2') + ' ' + t('guru.hapus-semua-data', 'Hapus semua data guru') + '</button></div></section>';
   }
   var views = { hub: function () { return '<div id="tgClassHub" class="tg-hub-host"></div>'; }, briefing: briefing, classes: classes, assignments: assignments, insights: insights, comms: comms, journal: journal, settings: settings };
 
@@ -608,8 +608,8 @@
       case 'att': { var s3 = student(id), date = ui.attDate || T.today(); if (s3) { var v = btn.getAttribute('data-v'); s3.attendance[date] = s3.attendance[date] === v ? undefined : v; if (!s3.attendance[date]) delete s3.attendance[date]; if (v === 'H' && (!s3.lastActiveAt || T.today(s3.lastActiveAt) < date)) { /* kehadiran ≠ belajar mandiri; jangan ubah lastActiveAt */ } } saveMinutes(0.2); break; }
       case 'att-all': { var dt = ui.attDate || T.today(); c.students.forEach(function (s) { s.attendance[dt] = 'H'; }); saveMinutes(3); toast('Semua ditandai hadir. Ubah yang tidak hadir saja.'); break; }
       case 'export-csv': download(c.name.replace(/\W+/g, '-') + '-siswa.csv', T.csvStudents(c), 'text/csv'); saveMinutes(10); toast('CSV diunduh.'); break;
-      case 'export-json': download('fiezel-ruang-guru-cadangan.json', JSON.stringify(st), 'application/json'); return;
-      case 'reset-all': if (!confirm(t('guru.konfirm-hapus-semua', 'Hapus SEMUA data Ruang Guru di perangkat ini?'))) return; st = T.defaults(); break;
+      case 'export-json': download('fiezel-kelasku-guru-cadangan.json', JSON.stringify(st), 'application/json'); return;
+      case 'reset-all': if (!confirm(t('guru.konfirm-hapus-semua', 'Hapus SEMUA data KelasKu untuk Guru di perangkat ini?'))) return; st = T.defaults(); break;
       case 'copy-groups': { var g = T.studyGroups(c, ui.insightSkill); copy('Kelompok belajar ' + T.SKILL_LABEL[ui.insightSkill] + ' — ' + c.name + '\n' + g.map(function (x) { return 'Kelompok ' + x.no + ' (mentor: ' + x.mentor.s.name + '): ' + x.members.map(function (m) { return m.s.name; }).join(', '); }).join('\n'), t('guru.kelompok-tersalin', 'Daftar kelompok tersalin.')); saveMinutes(15); persist(); return; }
       case 'copy-all-parents': copy(c.students.map(function (s) { return '=== ' + s.name + ' ===\n' + T.parentReport(c, s, st.teacher); }).join('\n\n'), c.students.length + ' laporan tersalin.'); saveMinutes(c.students.length * 6); persist(); return;
       case 'print-weekly': { var w = window.open('', '_blank'); if (w) { w.document.write('<pre style="font:15px/1.5 Georgia,serif;white-space:pre-wrap;max-width:720px;margin:40px auto">' + esc(T.weeklyClassReport(c, st.teacher)) + '</pre>'); w.document.close(); w.print(); } saveMinutes(20); persist(); return; }

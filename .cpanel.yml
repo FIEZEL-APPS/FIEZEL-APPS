@@ -16,6 +16,7 @@
 # di bawah nama revisi baru. Satu entri gagal = SELURUH precache gagal.
 deployment:
   tasks:
+    - export SITEPATH="$HOME/public_html"
     - export DEPLOYPATH="$HOME/public_html/app"
     - /bin/mkdir -p "$DEPLOYPATH"
 
@@ -29,4 +30,7 @@ deployment:
     # FIEZEL_DEPLOY_STEP_SW_LAST — gelombang KEDUA: service worker, sesudah asetnya lengkap.
     - /usr/bin/rsync -a ./sw.js "$DEPLOYPATH/sw.js"
 
-    - /bin/echo "FIEZEL diterbitkan ke $DEPLOYPATH (aset lebih dulu, sw.js terakhir)."
+    # Penerbitan landing page root website ke ~/public_html/
+    - /usr/bin/rsync -a website/ "$SITEPATH/"
+
+    - /bin/echo "FIEZEL diterbitkan ke $DEPLOYPATH dan $SITEPATH (aset lebih dulu, sw.js terakhir)."
