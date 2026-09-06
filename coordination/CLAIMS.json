@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-06T17:30:59.941Z",
+  "updated": "2026-09-06T17:31:19.536Z",
   "active": [
     {
       "sesi": "ses_0034e69d3ffes3kjiFLNDzYXUZ",
@@ -95,26 +95,6 @@
       ],
       "mulai": "2026-09-06T11:20:00+07:00",
       "catatan": "Menyentuh juga app.js (kunci ujian di quizLoop/Skills Lab/Writing + gerbang pintu AI + pendeteksi ujian non-tugas), features/class-hub/fiezel-class-hub.js, features/learner-flow/fiezel-learner-flow.js, features/teacher/fiezel-teacher-store.js, workers/api/teacher/class-sync-core.js (fx), copy-*-proctor.js, index.html, sw.js, quality.yml. Build m025-273 lewat tools/bump-build.mjs."
-    },
-    {
-      "sesi": "sesi-claude-cq1nea/JAPANESE-COURSE",
-      "peran": "kursus bahasa Jepang: usulan tingkat pertama (A1/N5) — silabus, contoh soal, graf keluarga",
-      "paths": [
-        "docs/japanese/",
-        "docs/handoffs/JAPANESE-COURSE-HANDOFF.md"
-      ],
-      "mulai": "2026-09-06T13:30:00+07:00",
-      "catatan": "Tahap usulan: NOL byte produksi berubah, build tidak dinaikkan. Wilayah yang akan diklaim SESUDAH usulan disetujui: features/brain/fiezel-core-brain.js (PREREQUISITES bisa disuntik), berkas konten Jepang, dan gerbangnya. Temuan yang perlu diketahui sesi lain: conceptOf() di features/brain/fiezel-question-memory.js membuang karakter non-ASCII, jadi marker berkana menghasilkan concept null dan pembatas kebaruan konsep mati diam."
-    },
-    {
-      "sesi": "claude-code-graf-keluarga",
-      "peran": "claude-code / graf keluarga brain",
-      "paths": [
-        "features/brain/fiezel-core-brain.js",
-        "tests/family-graph-injection-test.js"
-      ],
-      "mulai": "2026-09-06T16:39:33Z",
-      "catatan": "Langkah 1 kursus Jepang: setFamilyGraph/resetFamilyGraph/familyGraph. Graf Inggris tetap bawaan, dijaga patokan tulis-tangan di gerbang. Handoff JAPANESE-COURSE sudah diklaim entri sesi-claude-cq1nea di atas."
     },
     {
       "sesi": "claude-code-kosakata-jepang",
@@ -330,6 +310,30 @@
       "mulai": "2026-08-28T16:55:00+07:00",
       "catatan": "Overhaul penuh UI/UX+maskot+lesson-mode selesai: 20 agen desain/impl/QA + 50 verifikator read-only (V01-V50, semua verdict masuk; 10 cacat genuine diperbaiki+diverifikasi ulang). Gate suite 166 hijau (7 FAIL identik pra-eksisting di main), release-audit.py PASS penuh. Siap PR; klaim dilepas setelah merge. | SELESAI: PR #251 merged 2026-08-29 (CI penuh hijau).",
       "selesai": "2026-08-29T08:00:00+07:00"
+    },
+    {
+      "sesi": "sesi-claude-cq1nea/JAPANESE-COURSE",
+      "peran": "kursus bahasa Jepang: usulan tingkat pertama (A1/N5) — silabus, contoh soal, graf keluarga",
+      "paths": [
+        "docs/japanese/",
+        "docs/handoffs/JAPANESE-COURSE-HANDOFF.md"
+      ],
+      "mulai": "2026-09-06T13:30:00+07:00",
+      "catatan": "Tahap usulan: NOL byte produksi berubah, build tidak dinaikkan. Wilayah yang akan diklaim SESUDAH usulan disetujui: features/brain/fiezel-core-brain.js (PREREQUISITES bisa disuntik), berkas konten Jepang, dan gerbangnya. Temuan yang perlu diketahui sesi lain: conceptOf() di features/brain/fiezel-question-memory.js membuang karakter non-ASCII, jadi marker berkana menghasilkan concept null dan pembatas kebaruan konsep mati diam.",
+      "selesai": "2026-09-06T17:31:19Z",
+      "hasil": "Mendarat lewat PR #373 (m025-279)."
+    },
+    {
+      "sesi": "claude-code-graf-keluarga",
+      "peran": "claude-code / graf keluarga brain",
+      "paths": [
+        "features/brain/fiezel-core-brain.js",
+        "tests/family-graph-injection-test.js"
+      ],
+      "mulai": "2026-09-06T16:39:33Z",
+      "catatan": "Langkah 1 kursus Jepang: setFamilyGraph/resetFamilyGraph/familyGraph. Graf Inggris tetap bawaan, dijaga patokan tulis-tangan di gerbang. Handoff JAPANESE-COURSE sudah diklaim entri sesi-claude-cq1nea di atas.",
+      "selesai": "2026-09-06T17:31:19Z",
+      "hasil": "Mendarat lewat PR #373 (m025-279)."
     }
   ],
   "protocol": "coordination-claims-v1",
