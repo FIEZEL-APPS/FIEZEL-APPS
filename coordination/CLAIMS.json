@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-06T16:50:18.880Z",
+  "updated": "2026-09-06T17:36:14.403Z",
   "active": [
     {
       "sesi": "ses_0034e69d3ffes3kjiFLNDzYXUZ",
@@ -115,6 +115,16 @@
       ],
       "mulai": "2026-09-06T16:39:33Z",
       "catatan": "Langkah 1 kursus Jepang: setFamilyGraph/resetFamilyGraph/familyGraph. Graf Inggris tetap bawaan, dijaga patokan tulis-tangan di gerbang. Handoff JAPANESE-COURSE sudah diklaim entri sesi-claude-cq1nea di atas."
+    },
+    {
+      "sesi": "claude-code-sumbu-bahasa",
+      "peran": "claude-code / sumbu bahasa target",
+      "paths": [
+        "features/brain/fiezel-target-language.js",
+        "tests/target-language-axis-test.js"
+      ],
+      "mulai": "2026-09-06T17:36:14Z",
+      "catatan": "Langkah 2 kursus Jepang: kunci penyimpanan per bahasa. Kunci Inggris identik byte per byte; modul ditandai off di manifest karena belum ada pemanggil."
     }
   ],
   "finished": [

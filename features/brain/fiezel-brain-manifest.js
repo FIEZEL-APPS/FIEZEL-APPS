@@ -135,6 +135,7 @@
     { file: 'fiezel-srl-coach.js', global: 'FiezelSrlCoach', schema: 'fiezel-srl-coach-v1', authorityKey: 'srlCoach' },
     { file: 'fiezel-stat-gate.js', global: 'FiezelStatGate', schema: null, authorityKey: 'statGate' },
     { file: 'fiezel-step-tutor.js', global: 'FiezelStepTutor', schema: null, authorityKey: 'stepTutor' },
+    { file: 'fiezel-target-language.js', global: 'FiezelTargetLanguage', schema: 'fiezel-target-language-v1', authorityKey: 'targetLanguage' },
     { file: 'fiezel-tutor-brain.js', global: 'FiezelTutorBrain', schema: 'fiezel-tutor-brain-v3', authorityKey: 'tutorSelection' }
   ];
 
@@ -148,6 +149,12 @@
    * Bukti tiap klasifikasi ada di komentar kepala berkas (hasil inspeksi app.js).
    */
   var AUTHORITY_MAP = {
+    // targetLanguage: 'off' dan itu JUJUR, bukan sementara-yang-terlupakan. Modul sumbu
+    // bahasa sudah ada dan sudah dijaga gerbang, tetapi BELUM ADA satu pun pemanggil di
+    // app.js: tidak ada layar yang memilih bahasa target, dan tidak ada kunci yang dilewatkan
+    // melaluinya. Selama itu benar, ia tidak mempengaruhi apa pun yang dilihat murid, dan
+    // menandainya 'active' berarti berbohong tentang mesin yang sedang berjalan.
+    targetLanguage: 'off',
     memory: 'active',
     tutorSelection: 'active',
     misconceptionPrior: 'active',
