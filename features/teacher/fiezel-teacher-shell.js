@@ -73,18 +73,60 @@
 
   // ---- sinkron server ---------------------------------------------------------------------
   function pageHidden() { try { return root.document && root.document.visibilityState === 'hidden'; } catch (_) { return false; } }
+  /*
+   * KENAPA KEPUTUSAN TIAP DETAK DIPISAH JADI FUNGSI MURNI
+   * -----------------------------------------------------
+   * Versi sebelumnya menaruh keputusan itu di dalam startAutoSync, dan satu barisnya —
+   * `if (S().syncAvailable() !== 'ok') return;` SEBELUM timer dipasang — mematikan seluruh
+   * detak untuk sisa sesi. Itu bukan kasus langka: FiezelAccount memulihkan sesinya secara
+   * asinkron, jadi pada saat Ruang Guru dipasang, peran akun sering BELUM terbaca. Guru lalu
+   * melihat papan yang hanya bergerak kalau tombol Sinkron ditekan tangan — persis laporan
+   * dari kelas — dan tidak ada apa pun yang menghidupkannya kembali setelah akunnya siap.
+   *
+   * Sekarang detaknya SELALU dipasang, dan tiap detak menanyakan rencananya ke fungsi di
+   * bawah. Fungsi ini murni (tanpa DOM, tanpa jaringan, tanpa jam internal) supaya setiap
+   * cabangnya bisa diuji di Node — termasuk cabang "akun belum siap", yang dulu tidak punya
+   * gerbang sama sekali dan karena itu bisa rusak tanpa satu pun tes memerah.
+   *
+   * 'sync'  jalankan ronde jaringan sekarang.
+   * 'wait'  akun/koneksi belum siap: JANGAN menyentuh jaringan, tapi detaknya tetap hidup —
+   *         begitu akun guru mendarat, ronde berikutnya langsung jalan tanpa campur tangan.
+   * 'skip'  ronde ini dilewati (layar tak dipandang, ronde sebelumnya masih jalan, atau
+   *         rem menanjak sesudah gagal beruntun).
+   * 'reset' ronde sebelumnya menggantung melewati batas wajar: lepaskan kuncinya lalu ulangi.
+   *         Tanpa cabang ini, satu permintaan yang tidak pernah selesai mengunci ui.syncing
+   *         selamanya dan mematikan detak dengan cara yang sama diamnya seperti bug di atas.
+   * 'idle'  cangkang tidak terpasang.
+   */
+  /* Aturannya sendiri hidup di features/notify/fiezel-sync-plan.js — modul murni yang dipakai
+     BERSAMA dengan detak murid, supaya dua papan tidak bisa lagi punya dua pengertian berbeda
+     tentang kapan boleh menyentuh jaringan. Salinan di bawah hanya jaring pengaman kalau
+     berkasnya belum termuat (urutan skrip berubah, cache separuh): lebih baik detak yang
+     sedikit lebih sederhana daripada papan guru yang mati lagi. */
+  var syncingSince = 0;
+  function autoSyncPlan(o) {
+    var P = root.FiezelSyncPlan;
+    var arg = { mounted: o.mounted, syncing: o.syncing, syncingSince: o.syncingSince, hidden: o.hidden, ready: o.avail === 'ok', failStreak: o.failStreak, tickIndex: o.tickIndex, now: o.now };
+    if (P && typeof P.plan === 'function') return P.plan(arg);
+    if (!arg.mounted) return 'idle';
+    if (arg.syncing) return (Number(arg.now) - Number(arg.syncingSince || 0)) > 45000 ? 'reset' : 'skip';
+    if (arg.hidden) return 'skip';
+    if (!arg.ready) return 'wait';
+    return 'sync';
+  }
   function startAutoSync() {
     stopAutoSync();
-    if (S().syncAvailable() !== 'ok') return;
     syncFailStreak = 0;
-    syncAll(true);
+    if (S().syncAvailable() === 'ok') syncAll(true);
     syncTimer = setInterval(function () {
-      if (!el || ui.syncing) return;
-      if (pageHidden()) return;                      // tab tak dilihat: tidak ada yang perlu disegarkan
-      /* Jeda menanjak sesudah gagal beruntun: 1 ronde dilewati per kegagalan, sampai 10.
-         Server yang sakit tidak dihujani sampai ia pulih. */
-      if (syncFailStreak > 0 && (Date.now() / SYNC_EVERY_MS | 0) % (Math.min(syncFailStreak, 10) + 1) !== 0) return;
-      syncAll(true);
+      var plan = autoSyncPlan({
+        mounted: !!el, hidden: pageHidden(), syncing: ui.syncing, avail: S().syncAvailable(),
+        failStreak: syncFailStreak, tickIndex: (Date.now() / SYNC_EVERY_MS | 0),
+        now: Date.now(), syncingSince: syncingSince
+      });
+      if (plan === 'reset') { ui.syncing = false; syncingSince = 0; }
+      if (plan === 'sync' || plan === 'reset') syncAll(true);
+      else if (plan === 'wait') paintSyncChip();     // guru tetap melihat status akunnya, tanpa jaringan
     }, SYNC_EVERY_MS);
     /* Detak chip: murni lokal, tanpa jaringan. Ia juga yang menyusulkan render yang tertunda
        karena guru sedang mengetik - begitu kolomnya dilepas, cat ulangnya menyusul sendiri. */
@@ -124,12 +166,12 @@
       return Promise.resolve();
     }
     if (ui.syncing || !st.classes.length) return Promise.resolve();
-    ui.syncing = true;
+    ui.syncing = true; syncingSince = Date.now();
     if (quiet) paintSyncChip(); else render();   // sinkron manual = ketukan guru, jangan ditunda
     var total = { ingested: 0, graded: 0, names: [], failed: 0, events: [] };
     return st.classes.reduce(function (p, c) { return p.then(function () { return T.syncClass(c).then(function (r) { if (r.ok) { total.ingested += r.ingested; total.graded += r.graded; total.names = total.names.concat(r.names || []); total.events = total.events.concat(r.events || []); } else total.failed++; }); }); }, Promise.resolve())
       .then(function () {
-        ui.syncing = false; st.lastSyncAt = Date.now();
+        ui.syncing = false; syncingSince = 0; st.lastSyncAt = Date.now();
         syncFailStreak = total.failed ? syncFailStreak + 1 : 0;
         if (total.ingested) saveMinutes(total.ingested * 4 + total.graded * 5);
         total.events.forEach(function (e) { T.notify(st, e); });
@@ -138,10 +180,16 @@
            yang mayoritas pada jeda 3 detik - cukup menyegarkan chipnya. */
         var berubah = total.ingested || total.graded || total.events.length;
         if (!quiet) render(); else if (berubah) syncRender(); else paintSyncChip();
-        if (total.events.length) { var top = total.events.filter(function (e) { return e.kind === 'assignment_done'; })[0] || total.events[0]; toast(T.inboxText(top) + (total.events.length > 1 ? ' · +' + (total.events.length - 1) + ' kabar lain' : '')); }
+        if (total.events.length) { var top = total.events.filter(function (e) { return e.kind === 'focus_exit'; })[0] || total.events.filter(function (e) { return e.kind === 'join_request'; })[0] || total.events.filter(function (e) { return e.kind === 'assignment_done'; })[0] || total.events[0]; toast(T.inboxText(top) + (total.events.length > 1 ? ' · +' + (total.events.length - 1) + ' kabar lain' : '')); }
         else if (total.ingested) toast(total.ingested + ' laporan murid masuk' + (total.graded ? ' · ' + total.graded + ' tugas dinilai otomatis' : '') + '.');
         else if (!quiet) toast(total.failed ? 'Sinkron gagal untuk ' + total.failed + ' kelas.' : 'Tersinkron — belum ada laporan baru.');
-      });
+      })
+      /* Satu galat yang lolos dari rantai di atas (cat ulang, penyimpanan penuh, kabar yang
+         bentuknya asing) dulu meninggalkan ui.syncing = true, dan sejak itu SETIAP detak
+         berikutnya melihat "ronde sebelumnya masih jalan" lalu pulang. Papan guru berhenti
+         hidup tanpa satu pun pesan. Kuncinya dilepas di sini, bukan diandaikan tidak pernah
+         tersangkut. */
+      .catch(function () { ui.syncing = false; syncingSince = 0; try { paintSyncChip(); } catch (_) {} });
   }
   /*
    * Apakah guru sedang MEMEGANG cangkang ini?
@@ -287,8 +335,9 @@
     var T = S(), list = (st.inbox || []).slice(0, 30);
     return '<div class="tg-inbox-scrim" data-tg="close"></div><section class="tg-inbox" role="dialog" aria-label="Notifikasi" data-testid="tg-inbox"><div class="tg-inbox-head"><h3>' + t('umum.notifikasi', 'Notifikasi') + '</h3>' + (list.length ? '<button type="button" class="tg-link" data-tg="inbox-clear">Bersihkan</button>' : '') + '</div>' +
       (list.length ? '<ul class="tg-inbox-list">' + list.map(function (e) {
-        var ic = e.kind === 'assignment_done' ? 'clipboard-check' : e.kind === 'student_joined' ? 'user-plus' : 'inbox';
-        return '<li><button type="button" class="tg-inbox-item' + (e.read ? '' : ' is-unread') + '" data-tg="inbox-open" data-id="' + esc(e.id) + '" data-testid="tg-inbox-' + esc(e.id) + '">' + icon(ic) + '<div><b>' + esc(T.inboxText(e)) + '</b><small>' + esc(T.fmtDate(e.at)) + ' · ' + esc(new Date(e.at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })) + '</small></div></button></li>';
+        var ic = e.kind === 'assignment_done' ? 'clipboard-check' : e.kind === 'student_joined' || e.kind === 'join_request' ? 'user-plus' : e.kind === 'focus_exit' ? 'eye-off' : 'inbox';
+        var warn = e.kind === 'focus_exit' ? ' is-warn' : '';
+        return '<li><button type="button" class="tg-inbox-item' + warn + (e.read ? '' : ' is-unread') + '" data-tg="inbox-open" data-id="' + esc(e.id) + '" data-testid="tg-inbox-' + esc(e.id) + '">' + icon(ic) + '<div><b>' + esc(T.inboxText(e)) + '</b><small>' + esc(T.fmtDate(e.at)) + ' · ' + esc(new Date(e.at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })) + '</small></div></button></li>';
       }).join('') + '</ul>' : '<p class="tg-empty">' + t('guru.belum-ada-kabar', 'Belum ada kabar. Saat murid selesai mengerjakan tugas yang kamu kirim, hasilnya muncul di sini otomatis.') + '</p>') + '</section>';
   }
   function mobileNav() { return '<nav class="tg-mnav">' + NAV.map(function (n) { return '<button type="button" class="' + (st.view === n[0] ? 'is-active' : '') + '" data-tg="view" data-view="' + n[0] + '">' + icon(n[2]) + '<span>' + n[1].split(' ')[0] + '</span></button>'; }).join('') + '</nav>'; }
@@ -402,6 +451,17 @@
   var views = { hub: function () { return '<div id="tgClassHub" class="tg-hub-host"></div>'; }, briefing: briefing, classes: classes, assignments: assignments, insights: insights, comms: comms, journal: journal, settings: settings };
 
   // ---- DRAWER siswa -------------------------------------------------------------------------------
+  /* Pendeteksi keluar layar: yang ditampilkan di sini adalah UJIAN yang benar-benar punya
+     catatan. Murid tanpa catatan tidak memunculkan bagian apa pun — laci ini dibuka guru
+     untuk menolong satu murid, dan menambahkan baris "0 kali keluar layar" pada setiap laci
+     akan mengubah alat bantu menjadi rapor kecurigaan. */
+  function focusPanel(c, s) {
+    var T = S(), rows = (c.assignments || []).map(function (a) { var f = T.focusOf ? T.focusOf(a, s) : null; return f && f.n ? { a: a, f: f } : null; }).filter(Boolean);
+    if (!rows.length) return '';
+    return '<h4>Keluar layar saat mengerjakan</h4><ul class="tg-mini-list" data-testid="tg-focus-list">' + rows.map(function (r) {
+      return '<li><span class="tg-focus is-' + T.focusLevel(r.f) + '">' + icon('eye-off') + ' ' + esc(T.focusLabel(r.f)) + '</span> ' + esc(r.a.title) + '</li>';
+    }).join('') + '</ul><p class="tg-muted tg-small">Terdeteksi berpindah dari layar FIEZEL saat sesi berjalan. Tanyakan dulu ke muridnya — bisa saja ia dipanggil atau sinyalnya putus.</p>';
+  }
   function drawer(c) {
     if (!ui.drawer || !c) return '';
     var T = S(), s = student(ui.drawer); if (!s) return '';
@@ -412,6 +472,7 @@
       '<div class="tg-action-box"><p class="tg-kicker">Tindakan yang disarankan</p><p>' + esc(r.action) + '</p><div class="tg-actions"><button type="button" class="tg-btn is-primary is-small" data-tg="modal" data-kind="greet" data-id="' + s.id + '">' + icon('message-circle-heart') + ' Kartu sapa</button><button type="button" class="tg-btn is-ghost is-small" data-tg="modal" data-kind="parent" data-id="' + s.id + '">' + icon('file-text') + ' Laporan ortu</button><button type="button" class="tg-btn is-ghost is-small" data-tg="modal" data-kind="assign" data-target="' + s.id + '"' + (r.weak ? ' data-skill="' + r.weak.skill + '"' : '') + '>' + icon('plus') + ' ' + t('guru.tugas-khusus', 'Tugas khusus') + '</button></div></div>' +
       '<h4>Skill</h4><div class="tg-skill-rows">' + T.SKILL_ORDER.map(function (k) { var v = T.skillAcc(s, k); return '<div class="tg-skill-row"><span>' + esc(T.SKILL_LABEL[k]) + '</span>' + bar(v, v != null && v < 0.5 ? 'is-warn' : '') + '<b>' + pct(v) + '</b></div>'; }).join('') + '</div>' +
       '<h4>Kehadiran 7 hari</h4><div class="tg-att-strip">' + att.map(function (a) { return '<span class="is-' + (a.v || 'none') + '" title="' + a.date + '">' + (a.v || '·') + '</span>'; }).join('') + '</div>' +
+      focusPanel(c, s) +
       '<h4>' + t('umum.tugas', 'Tugas') + '</h4>' + (pend.length ? '<ul class="tg-mini-list">' + pend.map(function (p) { return '<li>' + esc(p.a.title) + (p.late ? ' <strong class="tg-late">lewat</strong>' : '') + ' <button type="button" class="tg-link" data-tg="mark-done" data-id="' + p.a.id + '" data-sid="' + s.id + '">tandai selesai</button></li>'; }).join('') + '</ul>' : '<p class="tg-muted">Semua tugas selesai.</p>') +
       '<h4>Kontak orang tua</h4><form data-tg-form="phone" data-id="' + s.id + '" class="tg-inline"><input name="phone" inputmode="tel" value="' + esc(s.parentPhone) + '" placeholder="08xx / 62xx" data-testid="tg-phone-input"><button type="submit" class="tg-btn is-small is-ghost" data-testid="tg-phone-save">' + t('umum.simpan', 'Simpan') + '</button></form>' +
       '<h4>Catatan guru</h4><form data-tg-form="note" data-id="' + s.id + '" class="tg-inline"><input name="text" required placeholder="Catatan singkat…" data-testid="tg-note-input"><button type="submit" class="tg-btn is-small is-ghost" data-testid="tg-note-save">' + t('umum.tambah', 'Tambah') + '</button></form>' +
@@ -513,7 +574,8 @@
       case 'inbox-clear': st.inbox = []; ui.inbox = false; break;
       case 'inbox-open': {
         var ev = (st.inbox || []).filter(function (x) { return x.id === id; })[0]; ui.inbox = false;
-        if (ev) { ev.read = true; if (ev.clsId && st.classes.some(function (k) { return k.id === ev.clsId; })) st.activeClassId = ev.clsId; if (ev.kind === 'assignment_done' && ev.aid) { st.view = 'assignments'; ui.modal = { kind: 'assign-detail', id: ev.aid }; ui.drawer = null; } else if (ev.sid) { st.view = 'classes'; ui.drawer = ev.sid; ui.modal = null; } }
+        if (ev) { ev.read = true; if (ev.clsId && st.classes.some(function (k) { return k.id === ev.clsId; })) st.activeClassId = ev.clsId; if (ev.kind === 'join_request') { st.view = 'hub'; ui.modal = null; ui.drawer = null; }
+        else if (ev.kind === 'assignment_done' && ev.aid) { st.view = 'assignments'; ui.modal = { kind: 'assign-detail', id: ev.aid }; ui.drawer = null; } else if (ev.sid) { st.view = 'classes'; ui.drawer = ev.sid; ui.modal = null; } }
         break;
       }
       case 'send-assign': {
@@ -584,5 +646,5 @@
   }
   function download(name, text, type) { try { var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type: type || 'text/plain' })); a.download = name; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 800); } catch (_) { copy(text, 'Unduhan tidak didukung — isi tersalin.'); } }
 
-  root.FiezelTeacherShell = { mount: mount, unmount: unmount, render: render, previewAllowed: previewAllowed, _state: function () { return st; } };
+  root.FiezelTeacherShell = { mount: mount, unmount: unmount, render: render, previewAllowed: previewAllowed, _state: function () { return st; }, _autoSyncPlan: autoSyncPlan, _syncTicks: function () { return { every: SYNC_EVERY_MS, chip: CHIP_TICK_MS, stuck: (root.FiezelSyncPlan && root.FiezelSyncPlan.STUCK_MS) || 45000 }; }, _armed: function () { return !!syncTimer && !!chipTimer; } };
 })(typeof window !== 'undefined' ? window : null);

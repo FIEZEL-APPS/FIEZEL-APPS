@@ -55,7 +55,13 @@ const ALLOWLIST = Object.freeze({
   'features/brain/fiezel-tutor-brain.js': 3,                    // idem
   'features/class-hub/fiezel-class-hub.js': 1,                  // fallback t() dengan kutip ganda di dalamnya
   'features/neural-voice/fiezel-cf-voice-notice.js': 3,         // cermin naskah kanon quota
-  'features/onboarding/fiezel-onboarding.js': 1,                // pemilih bahasa memang dwibahasa
+  /* Naik 1 -> 3 (m025-271). Blok "sudah punya akun?" ikut berdiri di pemilih bahasa,
+     dan alasannya sama persis dengan literal yang sudah ada di sana: pada cat PERTAMA
+     belum ada locale pilihan dan copy Thai memang belum diunduh, jadi naskah layar ini
+     ditulis dwibahasa secara harfiah — bukan lewat copy-map. Menaikkan anggaran di sini
+     BUKAN pelonggaran diam-diam: setiap kalimat yang dihitung punya padanan Thai di
+     baris yang sama, dan itulah yang membuatnya sah. */
+  'features/onboarding/fiezel-onboarding.js': 3,                // pemilih bahasa + blok masuk, keduanya dwibahasa harfiah
   'features/neural-voice/fiezel-diag-panel.js': 6,              // zona audio: AI-17 F02 melarang FiezelI18n di sini
   'features/neural-voice/fiezel-neural-voice-audibility-fix.js': 2, // idem — lihat catatan ZONA AUDIO di bawah
   'features/prasasti/fiezel-prasasti-core.js': 3,               // berkas kanon, sha dikunci
