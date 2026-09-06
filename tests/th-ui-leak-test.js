@@ -123,7 +123,7 @@ function leaksIn(file) {
   return hits;
 }
 
-const files = ['app.js', ...walk(path.join(__fzRoot, 'features')).map((p) => path.relative(__fzRoot, p))];
+const files = ['app.js', ...walk(path.join(__fzRoot, 'features')).map((p) => path.relative(__fzRoot, p).replace(/\\/g, '/'))];
 let failed = false;
 const report = { schema: 'fiezel-th-ui-leak-v1', generatedAt: new Date().toISOString(), files: {} };
 
