@@ -17,7 +17,7 @@
 -- HARGA YANG DIBAYAR, disebut supaya jujur: D1 tidak bisa menegakkan "induk
 -- sebuah lesson wajib bertipe topic" lewat FK. Penegakannya ada di
 -- `checkParent()` (workers/api/teacher/content-core.js) dan gerbang
--- `teacher-content-test.js` mengujinya langsung. Aturan yang ditegakkan kode
+-- `tests/teacher-content-test.js` mengujinya langsung. Aturan yang ditegakkan kode
 -- WAJIB punya gerbang; itu syarat memilih desain ini.
 --
 -- TANPA FK CASCADE lintas paket (pola yang sama dengan 0006_social.sql) supaya
