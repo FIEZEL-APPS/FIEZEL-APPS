@@ -54,24 +54,6 @@ body.fz-lux .app{max-width:720px;padding:14px 18px calc(124px + env(safe-area-in
 /* ---------- topbar ---------- */
 /* m025-267: pita topbar, ukuran brand, dan chip ikon yang dulu di sini DIPINDAH ke
    style.css "Top bar" - satu definisi. Blur-nya juga melanggar keputusan baterai m025-81. */
-/* m025-270: blok topbar + tombol ikon DIKEMBALIKAN. Sapuan bottom nav m025-266 ikut
-   menghapusnya, padahal handoff-nya sendiri menyatakan topbar adalah PR BERIKUTNYA
-   (nav -> topbar -> Home). Akibatnya topbar kehilangan latarnya sementara aturan
-   turunannya (.ask-button di bawah) tetap hidup, dan ui-render-audit merah: judul
-   halaman Vocab jatuh ke kontras 1,02:1 karena langit menembus header. */
-body.fz-lux .topbar{
-  position:sticky;top:0;z-index:30;margin:0 -18px 14px;padding:10px 18px;
-  background:rgba(255,249,238,.78);backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3);
-  border-bottom:1px solid var(--lux-line-soft);
-}
-body.fz-lux .brand-button{padding:4px 0}
-body.fz-lux .brand{width:96px}
-body.fz-lux .topbar-actions{gap:8px}
-body.fz-lux .icon-button{
-  width:42px;height:42px;border-radius:999px;background:var(--lux-paper);
-  border:1px solid var(--lux-line);color:var(--lux-ink);box-shadow:var(--lux-shadow-sm);
-}
-body.fz-lux .icon-button:hover{transform:translateY(-1px);box-shadow:var(--lux-shadow-md);border-color:var(--lux-ink)}
 body.fz-lux .ask-button{width:auto;height:42px;flex-direction:row;padding:0 14px 0 12px;gap:8px}
 body.fz-lux .ask-button .fiezel-ask-mark{height:16px;width:auto}
 body.fz-lux .ask-button .ask-label{font-size:.8rem;font-weight:700;letter-spacing:.01em;text-transform:none}
