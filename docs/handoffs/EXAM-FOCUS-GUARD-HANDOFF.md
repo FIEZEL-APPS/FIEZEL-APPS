@@ -102,6 +102,36 @@ Pendeteksinya bekerja, tetapi tiga hal di jalur ke guru tidak:
    saat aplikasi tidak terlihat. `tests/exam-focus-guard-test.js` MERAH kalau detak murid
    melebihi 1,5× detak guru.
 
+## Perbaikan m025-273 — ujian BUKAN hanya tugas Kelas
+
+Laporan owner dari kelas, dua kalimat, satu akar: *"detector hanya berfungsi di ujian mini"*
+dan *"pembimbing kamu berada dalam semua sesi ujian, hasilnya sama aja, murid bisa menanyakan
+kepada AI"*. Sampai m025-272 tidak ada satu pun tempat di aplikasi ini yang tahu jawaban atas
+**"apakah murid sedang ujian sekarang?"** — pendeteksi menanyakannya ke runner tugas Kelas
+(jadi buta terhadap ujian lain), dan pintu AI tidak menanyakannya ke siapa pun (jadi selalu
+terbuka).
+
+`features/ui/fiezel-exam-lock.js` menjadi jawaban tunggal itu. Ia tidak memantau dan tidak
+melarang apa pun; ia hanya menjawab. Dua perilaku, satu kebenaran.
+
+**Permukaan ujian yang menyalakan kunci** (gerbang `tests/exam-lock-test.js` menuntut kelimanya):
+tugas guru mode `ujian`; tes penempatan; ujian Skip Level dan gerbang lewati materi; set
+berformat ujian Reading; set berformat ujian Skills Lab (listening + speaking, lewat pembungkus
+`controller.open` — addonnya tidak disentuh); Writing berformat ujian.
+
+**Pintu AI yang menanyakannya**: navigasi ke layar Tanya FIEZEL (`go('ask'|'search')`),
+gelembung pembimbing PAW saat **bertanya**, dan gelembung saat **membuka layar Tanya**. Menutup
+salah satu saja tidak menutup apa pun — gelembungnya sendiri sudah bisa menjawab tanpa pernah
+membuka layar.
+
+**Catatan ujian non-tugas** tidak punya tugas untuk ditempeli, jadi ia berjalan sebagai `fx`:
+jenis ujian (enum tertutup, kembar di klien dan server) plus tiga bilangan yang sama dengan
+`assign.f`. Guru membaca "…mengerjakan ujian 'tes penempatan' — 2× · 1 mnt".
+
+**Kunci disimpan, bukan sekadar variabel**: memuat ulang halaman adalah pelarian termurah dari
+penjagaan yang hidup di memori. Konsekuensinya dijinakkan dengan kedaluwarsa 4 jam — sesi yang
+mati di tengah ujian tidak boleh mengunci pembimbing selamanya.
+
 ## Batas yang diketahui, dan kenapa dibiarkan
 
 - **Murid yang keluar dan tidak pernah kembali.** Episode yang masih berjalan dikirim
@@ -112,6 +142,10 @@ Pendeteksinya bekerja, tetapi tiga hal di jalur ke guru tidak:
   jarak antar kiriman di klien (`REPORT_GAP_MS` di class-hub) dan pengulangan kiriman yang
   tetap ditolak (`pushToClass` di learner-flow). Yang tertinggal adalah keterlambatan belasan
   detik, bukan peristiwa.
+- **Ujian yang ditinggalkan lewat navigasi biasa tetap terkunci.** Murid yang membuka tugas
+  ujian lalu pindah layar masih di dalam ujian — pembimbing tetap tertutup sampai ia menutup
+  sesinya atau kuncinya kedaluwarsa. Itu disengaja: melepasnya berarti pindah layar menjadi
+  jalan pintas ke AI.
 - **Pendeteksi ini bukan bukti kecurangan.** Ia melaporkan bahwa layar ditinggalkan.
   Keputusannya tetap milik guru, dan laci murid menyebutkan itu dengan kalimat penuh.
 

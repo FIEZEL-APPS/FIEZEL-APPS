@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-06T10:05:00+07:00",
+  "updated": "2026-09-06T11:20:00+07:00",
   "active": [
     {
       "sesi": "ses_0034e69d3ffes3kjiFLNDzYXUZ",
@@ -85,6 +85,16 @@
       ],
       "mulai": "2026-09-06T10:05:00+07:00",
       "catatan": "Menyentuh juga di luar path yang diklaim: features/class-hub/fiezel-class-hub.js, features/teacher/fiezel-teacher-store.js + fiezel-teacher-shell.js, features/learner-flow/fiezel-learner-flow.js, workers/api/teacher/class-sync-core.js (penanda j), index.html + sw.js + fiezel-th-loader.js (pendaftaran berkas), .github/workflows/quality.yml (gerbang baru). Build m025-272 lewat tools/bump-build.mjs."
+    },
+    {
+      "sesi": "sesi-claude-cq1nea/EXAM-LOCK",
+      "peran": "kunci ujian: semua permukaan ujian dipantau, pintu AI tertutup di dalamnya",
+      "paths": [
+        "features/ui/fiezel-exam-lock.js",
+        "tests/exam-lock-test.js"
+      ],
+      "mulai": "2026-09-06T11:20:00+07:00",
+      "catatan": "Menyentuh juga app.js (kunci ujian di quizLoop/Skills Lab/Writing + gerbang pintu AI + pendeteksi ujian non-tugas), features/class-hub/fiezel-class-hub.js, features/learner-flow/fiezel-learner-flow.js, features/teacher/fiezel-teacher-store.js, workers/api/teacher/class-sync-core.js (fx), copy-*-proctor.js, index.html, sw.js, quality.yml. Build m025-273 lewat tools/bump-build.mjs."
     }
   ],
   "finished": [

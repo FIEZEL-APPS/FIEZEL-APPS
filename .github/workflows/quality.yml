@@ -230,6 +230,7 @@ jobs:
           node tests/class-hub-test.js
           node tests/exam-focus-guard-test.js
           node tests/class-join-test.js
+          node tests/exam-lock-test.js
           node tests/social-notify-test.js
           node tests/braincore-learner-identity-test.js
           node tests/learning-metrics-test.js

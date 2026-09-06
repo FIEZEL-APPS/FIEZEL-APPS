@@ -243,6 +243,11 @@
        pertama. Murid yang menekan Gabung saat sinyalnya putus tetap sampai ke guru begitu
        jaringannya kembali — kalau tidak, ketukan itu hilang dan guru tidak pernah tahu. */
     if (st.pendingJoin) payload.j = 1;
+    /* Catatan ujian non-tugas ikut selama ia masih hari ini: guru butuh melihatnya saat
+       ujiannya masih hangat, dan laporan yang mengulang catatan pekan lalu hanya kebisingan. */
+    if (st.examFocus && Date.now() - Number(st.examFocus.at || 0) < 86400000) {
+      payload.fx = { k: st.examFocus.k, n: st.examFocus.n, s: st.examFocus.s, x: st.examFocus.x };
+    }
     try { return btoa(unescape(encodeURIComponent(JSON.stringify(payload)))); } catch (_) { return ''; }
   }
   function ensureState() { if (!st) st = load(); return st; }
@@ -251,6 +256,19 @@
    * ketukan bergabung dan mengirimnya sekarang juga. Penandanya bertahan sampai satu kiriman
    * BERHASIL, jadi ia tahan terhadap offline dan terhadap pembatas laju server.
    */
+  /**
+   * Sisi ujian NON-TUGAS (penempatan, Skip Level, set berformat ujian): catatan keluar layar
+   * tidak punya tugas untuk ditempeli, jadi ia menempel pada laporan itu sendiri sebagai
+   * `fx` — jenis ujian (enum) plus tiga bilangan yang sama dengan assign.f.
+   */
+  function recordExamFocus(kind, focus) {
+    if (!kind || !focus) return false;
+    var s = ensureState();
+    var n = Math.max(0, Math.round(Number(focus.n) || 0));
+    if (!n) return false;
+    s.examFocus = { k: String(kind).slice(0, 24), n: n, s: Math.max(0, Math.round(Number(focus.s) || 0)), x: Math.max(0, Math.round(Number(focus.x) || 0)), at: Date.now() };
+    save(s); pushToClass(); return true;
+  }
   function announceJoin() {
     var s = ensureState();
     s.pendingJoin = 1; save(s);
@@ -628,5 +646,5 @@
     });
   }
 
-  return { KEY: KEY, ASSIGN_KEY: ASSIGN_KEY, GOALS: GOALS, mount: mount, render: render, load: load, buildPlan: buildPlan, skillSummary: skillSummary, weeklySummary: weeklySummary, tutorCode: tutorCode, rankedSkills: rankedSkills, statusOf: statusOf, openAssignment: openAssignment, announceJoin: announceJoin, markAssignmentStarted: markAssignmentStarted, recordAssignmentFocus: recordAssignmentFocus, recordAssignmentResult: recordAssignmentResult, pushToClass: function () { ensureState(); return pushToClass(); }, _retryState: function () { return { pending: !!retryTimer, delay: retryDelay }; }, _state: function () { return st; } };
+  return { KEY: KEY, ASSIGN_KEY: ASSIGN_KEY, GOALS: GOALS, mount: mount, render: render, load: load, buildPlan: buildPlan, skillSummary: skillSummary, weeklySummary: weeklySummary, tutorCode: tutorCode, rankedSkills: rankedSkills, statusOf: statusOf, openAssignment: openAssignment, announceJoin: announceJoin, recordExamFocus: recordExamFocus, markAssignmentStarted: markAssignmentStarted, recordAssignmentFocus: recordAssignmentFocus, recordAssignmentResult: recordAssignmentResult, pushToClass: function () { ensureState(); return pushToClass(); }, _retryState: function () { return { pending: !!retryTimer, delay: retryDelay }; }, _state: function () { return st; } };
 });

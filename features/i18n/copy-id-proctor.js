@@ -23,6 +23,11 @@
     'proctor.kembali-toast': 'Kamu keluar dari layar ujian {n}× ({detik} detik terakhir). Catatannya sudah sampai ke gurumu.',
     'proctor.guru-chip': 'Keluar layar {n}×',
     'proctor.guru-bersih': 'Tidak keluar layar',
-    'proctor.guru-ringkas': '{jumlah} murid terdeteksi keluar layar'
+    'proctor.guru-ringkas': '{jumlah} murid terdeteksi keluar layar',
+    /* m025-273 — kunci ujian berlaku di SELURUH permukaan ujian, bukan hanya tugas Kelas. */
+    'ujian.mode-aktif': 'Mode ujian: pembimbing FIEZEL nonaktif, dan kalau kamu keluar dari layar ini gurumu menerima catatannya.',
+    'ujian.ai-terkunci': 'Pembimbing FIEZEL nonaktif selama sesi ujian. Kerjakan dengan kemampuanmu sendiri — ia kembali begitu ujian selesai.',
+    'ujian.ai-terkunci-singkat': 'Nonaktif selama ujian.',
+    'ujian.keluar-tercatat': 'Kamu keluar dari layar ujian {n}× ({detik} detik terakhir). Catatannya sudah sampai ke gurumu.'
   });
 })();
