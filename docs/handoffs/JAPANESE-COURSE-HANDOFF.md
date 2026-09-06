@@ -191,13 +191,68 @@ pilihan, dan masih bisa ditinjau manusia satu per satu.
 
 ---
 
-## 7. Pertanyaan yang menunggu jawaban owner
+## 7. Keputusan atas enam pertanyaan — DIPUTUSKAN
 
-1. Mutu sepuluh contoh — layak dijadikan patokan untuk 200-an berikutnya?
-2. Graf keluarga (§2, `n5-a1-family-graph.json`) — urutannya sesuai dengan cara owner mengajar?
-3. Sakelar furigana: ada di Pengaturan, atau mengikuti tingkat saja?
-4. A1 tanpa listening dan tanpa produksi bebas — diterima?
-5. Sumbu bahasa target: satu murid boleh belajar keduanya sekaligus (progres terpisah), atau
-   memilih satu dan bisa berganti?
-6. Namespace berkas: `*-ja.json` di akar (mengikuti pola berkas Inggris) atau folder sendiri
-   `content/ja/`? Yang kedua lebih rapi, yang pertama lebih mirip yang sudah ada.
+Owner menyerahkan keenam keputusan ini kepada agen (2026-09-06, "INI AKU SERAHKAN SEMUANYA
+KEPADAMU"). Jadi keenamnya diputuskan di sini, lengkap dengan alasan dan dengan biaya kalau
+suatu saat dibalik. Semuanya masih bisa dibalik owner kapan pun — yang mahal untuk dibalik
+ditandai secara khusus.
+
+**1. Sepuluh contoh soal layak jadi patokan — DITERIMA, dengan dua pengetatan.**
+Skemanya sudah penuh dan tiap pengecoh punya miskonsepsi bernama, yang memang bagian
+tersulitnya. Dua hal diketatkan sebelum 200-an berikutnya ditulis: (a) satu butir boleh
+menguji tepat satu titik tata bahasa — beberapa contoh menumpang dua sekaligus, dan itu
+membuat jawaban salah tidak bisa dibaca sebagai diagnosis; (b) pengecoh harus salah karena
+SATU sebab yang bisa dinamai, bukan karena "kedengaran aneh".
+
+**2. Graf keluarga A1 — DIPAKAI APA ADANYA, dan ini yang paling mudah dibalik.**
+Urutannya mengikuti konvensi pengajaran yang lazim (partikel → nomina → adjektiva → kata
+kerja → bentuk-te). Ini satu-satunya dari enam yang benar-benar bergantung pada cara owner
+mengajar, dan aku tidak bisa mengetahuinya. Aku pilih konvensi karena itu tebakan paling
+aman, bukan karena aku tahu itu benar. Menggantinya nanti cuma menyunting satu berkas JSON
+selama kontennya belum ditulis — jadi kalau urutannya tidak cocok, **katakan sebelum 200-an
+butir lahir**, bukan sesudah.
+
+**3. Furigana — mengikuti tingkat, DITAMBAH satu sakelar "furigana selalu" di Pengaturan.**
+Mengikuti tingkat saja gagal untuk kasus nyata di FIEZEL: murid Thai membaca aksara Jepang
+tanpa bekal kanji dari bahasa ibunya, dan murid yang lambat di satu keluarga tetap dipaksa
+kehilangan furigana karena tingkatnya sudah naik. Sakelarnya murah — satu preferensi, nol
+dampak ke mesin — dan menahan murid yang seharusnya bisa lanjut adalah biaya yang jauh
+lebih mahal daripada satu baris di Pengaturan.
+
+**4. A1 tanpa listening dan tanpa produksi bebas — DITERIMA.**
+Aset audio Jepang belum ada, dan penilai produksi bebas butuh normalisasi kana↔kanji yang
+belum ada modulnya. Keduanya ditunda dengan jujur, bukan diklaim bekerja. Konsekuensinya
+dikatakan di depan: A1 Jepang **lebih sempit** daripada A1 Inggris, dan itu harus terlihat di
+layar murid, bukan disembunyikan.
+
+**5. Sumbu bahasa target — DUA BAHASA SEKALIGUS, progres terpisah.**
+FIEZEL sudah dipakai murid yang sedang belajar Inggris. Memaksa memilih berarti murid yang
+mencoba Jepang menaruh progres Inggrisnya dalam bahaya, dan itu kerugian yang tidak perlu.
+Progres, bukti Braincore, dan penjadwal memori dipisah per bahasa; satu bahasa aktif pada
+satu waktu di layar, tapi tidak ada yang terhapus saat berganti. **Ini yang paling mahal
+untuk dibalik** — begitu ada murid yang punya dua progres, menyatukannya kembali berarti
+membuang salah satunya.
+
+**6. Namespace berkas — `content/ja/`, bukan `*-ja.json` di akar.**
+Akar repo sudah padat, dan A1 saja akan melahirkan belasan berkas bank. Pola berkas Inggris
+di akar adalah warisan, bukan rancangan; menirunya berarti menyalin sesak yang sudah ada.
+Berkas Inggris **tidak** dipindahkan — memindahkannya menyentuh `sw.js` dan setiap pemuat,
+dengan nol manfaat bagi murid.
+
+## 8. Yang sudah dikerjakan sesudah keputusan ini
+
+**Langkah 1 dari rencana §6 — SELESAI.** Graf keluarga di `fiezel-core-brain.js` kini bisa
+disuntikkan (`setFamilyGraph` / `resetFamilyGraph` / `familyGraph`), mengikuti pola
+`setCurriculumGraph(rows)` yang sudah ada untuk graf lesson. `PREREQUISITES` tetap graf
+Inggris dan tetap menjadi bawaan.
+
+Gerbangnya `tests/family-graph-injection-test.js`, **dibuktikan merah lebih dulu** (7 assert
+merah sebelum mesin disentuh, 9/9 hijau sesudah). Ia menahan graf Inggris pada patokan yang
+**ditulis tangan di dalam gerbang** — bukan dibaca dari modul yang sedang diuji, sebab
+patokan yang menyalin dirinya sendiri akan setuju dengan dirinya sendiri selamanya. Ia juga
+membuktikan graf yang disuntikkan tidak bisa dimutasi dari luar setelah disuntikkan, dan graf
+Jepang di `n5-a1-family-graph.json` bisa dipakai apa adanya.
+
+Sisa rencana §6 belum dikerjakan: sumbu bahasa target, gerbang konten Jepang, konten A1, dan
+sidecar Thai.
