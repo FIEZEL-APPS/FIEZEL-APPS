@@ -28,7 +28,7 @@
 <meta name="twitter:description" content="เรียน grammar คำศัพท์ reading speaking และ listening ในแอปเดียว ฟรี และติดตั้งลงหน้าจอหลักได้">
 <meta name="twitter:image" content="https://fiezel.my.id/assets/shots/home-desktop.png">
 <link rel="stylesheet" href="../tokens.css?v=20260903-hula02">
-<link rel="stylesheet" href="../style.css?v=20260903-hula02">
+<link rel="stylesheet" href="../style.css?v=20260906-fzflow01">
 <link rel="stylesheet" href="../assets/mascot/fiezel-motion.css?v=20260903-hula02">
 <!-- Font (W3-WEB): halaman th memakai stack font SISTEM Thai — brand font Plus Jakarta Sans tak punya glyph Thai,
      dan keputusan Noto Sans Thai Looped self-host di brief berlaku untuk APP; marketing tak wajib brand font (dicatat di laporan). -->
@@ -55,6 +55,7 @@
       <svg class="brand-word" viewBox="0 0 968 260" role="img" aria-label="Wordmark FIEZEL"><g fill="currentColor"><rect x="30" y="30" width="42" height="200" rx="21"/><rect x="30" y="30" width="144" height="42" rx="21"/><rect x="30" y="109" width="116" height="42" rx="21"/><rect x="268" y="30" width="42" height="200" rx="21"/><rect x="268" y="30" width="144" height="42" rx="21"/><rect x="268" y="109" width="100" height="42" rx="21"/><rect x="268" y="188" width="130" height="42" rx="21"/><rect x="446" y="30" width="150" height="42" rx="21"/><rect x="446" y="188" width="150" height="42" rx="21"/><rect x="575" y="30" width="191.38" height="42" rx="21" transform="rotate(124.354 575 51)"/><rect x="630" y="30" width="42" height="200" rx="21"/><rect x="630" y="30" width="144" height="42" rx="21"/><rect x="630" y="109" width="100" height="42" rx="21"/><rect x="630" y="188" width="130" height="42" rx="21"/><rect x="808" y="30" width="42" height="200" rx="21"/><rect x="808" y="188" width="130" height="42" rx="21"/><rect x="192" y="30" width="42" height="200" rx="21"/></g></svg>
     </a>
     <nav class="topnav" aria-label="เมนูหลัก">
+      <a href="../app/?teacher=preview"><span class="kelasku-brand"><span class="kelasku-main" style="color:#1F7A63">KelasKu</span> <span class="kelasku-tag" style="color:var(--maroon-mid)">สำหรับครู</span></span></a>
       <a href="install/">วิธีติดตั้ง</a>
       <a class="lang-switch" href="../" hreflang="id" lang="id" aria-label="Ganti ke Bahasa Indonesia" onclick="try{localStorage.setItem('fiezel-site-locale','id')}catch(e){}">Indonesia</a>
       <a class="btn btn-sm btn-primary" href="../app/">เริ่มเรียน</a>
@@ -81,12 +82,70 @@
       <p class="mast-sub seq seq-2">Not just learning with you. Learning about you.</p>
       <div class="cta-row cta-center mast-cta seq seq-3">
         <a class="btn btn-primary" href="../app/">เริ่มเรียน</a>
+        <a class="btn btn-teacher-hero" href="../app/?teacher=preview">เปิด <span class="kelasku-brand"><span class="kelasku-main">KelasKu</span> <span class="kelasku-tag">สำหรับครู</span></span> →</a>
         <a class="btn btn-ghost" href="install/">วิธีติดตั้ง</a>
       </div>
     </div>
 
-    <div class="wrap">
-      <div class="showcase seq seq-4">
+    <!-- เวทีคู่: ฝั่งนักเรียน (ซ้าย) + ฝั่งครู (ขวา) — โครงเดียวกับ website/index.html -->
+    <div class="hero-dual-stage">
+      <!-- FZFLOW Lapisan B: atmosfer scientific/AI — background, opasitas rendah, lambat.
+           Label data sengaja angka/simbol saja supaya netral bahasa (id & th sama).
+           Aksara 学/語 hanya dekorasi aspiratif, bukan klaim fitur. Rincian: style.css §FZFLOW -->
+      <div class="fzflow-atmos" aria-hidden="true">
+        <span class="fzflow-grid"></span>
+        <span class="fzflow-aura fzflow-aura-s"></span>
+        <span class="fzflow-aura fzflow-aura-t"></span>
+        <svg class="fzflow-net" viewBox="0 0 1000 500" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <line x1="500" y1="250" x2="430" y2="170"/>
+          <line x1="500" y1="250" x2="570" y2="150"/>
+          <line x1="500" y1="250" x2="400" y2="300"/>
+          <line x1="500" y1="250" x2="590" y2="330"/>
+          <line x1="500" y1="250" x2="500" y2="90"/>
+          <line x1="500" y1="250" x2="470" y2="410"/>
+          <line x1="500" y1="250" x2="650" y2="240"/>
+          <line x1="500" y1="250" x2="350" y2="230"/>
+          <line x1="430" y1="170" x2="570" y2="150"/>
+          <line x1="400" y1="300" x2="470" y2="410"/>
+          <line x1="590" y1="330" x2="650" y2="240"/>
+          <line x1="350" y1="230" x2="430" y2="170"/>
+          <line x1="760" y1="120" x2="650" y2="240" class="fzflow-lite"/>
+          <line x1="240" y1="400" x2="400" y2="300" class="fzflow-lite"/>
+          <line x1="820" y1="380" x2="590" y2="330" class="fzflow-lite"/>
+          <line x1="180" y1="90" x2="350" y2="230" class="fzflow-lite"/>
+          <line x1="700" y1="450" x2="590" y2="330" class="fzflow-lite"/>
+          <circle cx="500" cy="250" r="4.5" class="fzflow-node-core"/>
+          <circle cx="430" cy="170" r="3"/>
+          <circle cx="570" cy="150" r="3"/>
+          <circle cx="400" cy="300" r="3"/>
+          <circle cx="590" cy="330" r="3"/>
+          <circle cx="500" cy="90" r="3"/>
+          <circle cx="470" cy="410" r="3"/>
+          <circle cx="650" cy="240" r="3"/>
+          <circle cx="350" cy="230" r="3"/>
+          <circle cx="760" cy="120" r="3" class="fzflow-lite"/>
+          <circle cx="240" cy="400" r="3" class="fzflow-lite"/>
+          <circle cx="820" cy="380" r="3" class="fzflow-lite"/>
+          <circle cx="180" cy="90" r="3" class="fzflow-lite"/>
+          <circle cx="700" cy="450" r="3" class="fzflow-lite"/>
+        </svg>
+        <span class="fzflow-label fzflow-l1" style="--i:0"><b>B1</b> · 87%</span>
+        <span class="fzflow-label fzflow-l2" style="--i:1"><b>A2 → B1</b></span>
+        <span class="fzflow-label fzflow-l3" style="--i:2">98.2%</span>
+        <span class="fzflow-label fzflow-l4" style="--i:3"><b>×1.4</b></span>
+        <span class="fzflow-label fzflow-l5" style="--i:4">Δ +12</span>
+        <span class="fzflow-label fzflow-l6" style="--i:5">CEFR <b>B2</b></span>
+        <span class="fzflow-glyph fzflow-g1" style="--i:0" lang="ja">あ</span>
+        <span class="fzflow-glyph fzflow-g2" style="--i:1" lang="ja">学</span>
+        <span class="fzflow-glyph fzflow-g3" style="--i:2" lang="en">A</span>
+        <span class="fzflow-glyph fzflow-g4" style="--i:3" lang="ja">カ</span>
+        <span class="fzflow-glyph fzflow-g5" style="--i:4" lang="ja">語</span>
+        <span class="fzflow-glyph fzflow-g6" style="--i:5" lang="en">B</span>
+        <span class="fzflow-scan"></span>
+      </div>
+      <!-- ฝั่งนักเรียน -->
+      <div class="stage-student">
+        <div class="showcase seq seq-4">
         <div class="showcase-fx" aria-hidden="true">
           <svg class="fx-lines" viewBox="0 0 640 640" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
             <circle class="fx-ring fx-ring-1" cx="320" cy="320" r="252"/>
@@ -366,7 +425,172 @@
           <li>A1</li><li>A2</li><li>B1</li><li>B2</li><li>C1</li><li>C2</li>
         </ul>
       </div>
+      </div>
+
+      <!-- ฝั่งครู (MacBook Pro + ภาพจริงของ KelasKu + MIRA อยู่หลังจอ) — padanan Thai dari website/index.html -->
+      <div class="stage-teacher">
+        <div class="mac-container">
+          
+          <!-- MIRA มาสคอตครู — เท้าคางอยู่หลังแล็ปท็อป -->
+          <div class="mira-teacher-wrapper">
+            <svg class="mira-svg" viewBox="0 0 220 180" role="img" aria-label="MIRA — มาสคอตครูของ FIEZEL เอามือเท้าคางอยู่หลังแล็ปท็อป">
+              <defs>
+                <linearGradient id="miraCardigan-hero" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#3AA385"/>
+                  <stop offset="100%" stop-color="#1F7A63"/>
+                </linearGradient>
+                <linearGradient id="miraHair-hero" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#6E4436"/>
+                  <stop offset="100%" stop-color="#4B281E"/>
+                </linearGradient>
+                <linearGradient id="miraSkin-hero" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#FFF8EE"/>
+                  <stop offset="100%" stop-color="#FDEFD8"/>
+                </linearGradient>
+                <clipPath id="miraEyeClipL-hero"><ellipse cx="88" cy="80" rx="13" ry="14"/></clipPath>
+                <clipPath id="miraEyeClipR-hero"><ellipse cx="132" cy="80" rx="13" ry="14"/></clipPath>
+              </defs>
+
+              <!-- Mascot Lower Body (Cardigan & Shoulders) — Berada di balik layar laptop -->
+              <g class="mira-shoulders">
+                <path d="M40 180 C40 140 70 128 110 128 C150 128 180 140 180 180 Z" fill="url(#miraCardigan-hero)"/>
+                <path d="M110 134 L92 180" stroke="#166052" stroke-width="3" stroke-linecap="round"/>
+                <path d="M110 134 L128 180" stroke="#166052" stroke-width="3" stroke-linecap="round"/>
+                <polygon points="100,134 120,134 110,154" fill="#FDFBF7"/>
+              </g>
+
+              <!-- Animated Head & Hands Assembly -->
+              <g class="mira-anim-head">
+                <!-- Hair Back -->
+                <ellipse cx="110" cy="74" rx="58" ry="52" fill="url(#miraHair-hero)"/>
+                <path d="M54 78 Q50 110 68 135 Q80 144 86 130 Q72 105 72 78 Z" fill="url(#miraHair-hero)"/>
+                <path d="M166 78 Q170 110 152 135 Q140 144 134 130 Q148 105 148 78 Z" fill="url(#miraHair-hero)"/>
+
+                <!-- Head Base -->
+                <path d="M68 76 C68 44 86 36 110 36 C134 36 152 44 152 76 C152 104 136 122 110 122 C84 122 68 104 68 76 Z" fill="url(#miraSkin-hero)"/>
+
+                <!-- Hair Front & Bangs -->
+                <path d="M64 64 C76 40 102 38 114 48 C126 38 148 40 156 64 C160 52 152 32 110 32 C68 32 60 52 64 64 Z" fill="url(#miraHair-hero)"/>
+                <path d="M68 64 Q88 78 110 60 Q132 78 152 64 Q140 46 110 46 Q80 46 68 64 Z" fill="url(#miraHair-hero)"/>
+
+                <!-- Hair Bun / Scrunchie -->
+                <ellipse cx="110" cy="24" rx="22" ry="16" fill="url(#miraHair-hero)"/>
+                <ellipse cx="110" cy="26" rx="14" ry="7" fill="#1F7A63"/>
+
+                <!-- Glasses Frame -->
+                <g class="mira-glasses">
+                  <rect x="73" y="66" width="30" height="26" rx="9" fill="none" stroke="#634832" stroke-width="2.5"/>
+                  <rect x="117" y="66" width="30" height="26" rx="9" fill="none" stroke="#634832" stroke-width="2.5"/>
+                  <path d="M103 76 Q110 74 117 76" fill="none" stroke="#634832" stroke-width="2.5" stroke-linecap="round"/>
+                </g>
+
+                <!-- Animated Eyes with Natural Eyelid Blinking -->
+                <g class="mira-eyes">
+                  <g class="mira-eyelid">
+                    <ellipse cx="88" cy="79" rx="11" ry="12" fill="#FFFFFF"/>
+                    <circle cx="89" cy="79" r="7" fill="#3D2314"/>
+                    <circle cx="91" cy="76" r="2.8" fill="#FFFFFF"/>
+                    <circle cx="86" cy="82" r="1.3" fill="#FFFFFF" opacity="0.8"/>
+                  </g>
+                  <g class="mira-eyelid">
+                    <ellipse cx="132" cy="79" rx="11" ry="12" fill="#FFFFFF"/>
+                    <circle cx="133" cy="79" r="7" fill="#3D2314"/>
+                    <circle cx="135" cy="76" r="2.8" fill="#FFFFFF"/>
+                    <circle cx="130" cy="82" r="1.3" fill="#FFFFFF" opacity="0.8"/>
+                  </g>
+                </g>
+
+                <!-- Blush & Smile -->
+                <ellipse class="fzflow-mira-blush" cx="76" cy="94" rx="8" ry="4.5" fill="#F43F5E" opacity="0.32"/>
+                <ellipse class="fzflow-mira-blush" cx="144" cy="94" rx="8" ry="4.5" fill="#F43F5E" opacity="0.32"/>
+                <path class="fzflow-mira-mouth" d="M103 100 Q110 107 117 100" fill="none" stroke="#884232" stroke-width="2.5" stroke-linecap="round"/>
+
+                <!-- Two Hands Supporting Chin (Posed right on top of laptop bezel) -->
+                <g class="mira-hands-chin">
+                  <!-- Left Hand -->
+                  <path d="M84 126 C80 120 86 112 94 114 C98 115 102 119 104 124 C100 128 88 130 84 126 Z" fill="url(#miraSkin-hero)"/>
+                  <circle cx="91" cy="116" r="4.2" fill="#FDEFD8"/>
+                  <circle cx="96" cy="118" r="4.2" fill="#FDEFD8"/>
+                  <circle cx="101" cy="121" r="3.8" fill="#FDEFD8"/>
+                  
+                  <!-- Right Hand — rig fzflow: terangkat saat "kirim", melambai saat "senang" -->
+                  <g class="fzflow-mira-hand-r">
+                    <path d="M136 126 C140 120 134 112 126 114 C122 115 118 119 116 124 C120 128 132 130 136 126 Z" fill="url(#miraSkin-hero)"/>
+                    <circle cx="129" cy="116" r="4.2" fill="#FDEFD8"/>
+                    <circle cx="124" cy="118" r="4.2" fill="#FDEFD8"/>
+                    <circle cx="119" cy="121" r="3.8" fill="#FDEFD8"/>
+                  </g>
+                </g>
+
+                <!-- FZFLOW rig ekspresi MIRA (warna via token di style.css): kilau mata saat hasil
+                     masuk + balon paper-plane saat mengirim. Tidak menyentuh bentuk asli MIRA. -->
+                <g class="fzflow-mira-sparkle">
+                  <path d="M64 56Q64 62 70 62Q64 62 64 68Q64 62 58 62Q64 62 64 56Z"/>
+                  <path d="M160 52Q160 58 166 58Q160 58 160 64Q160 58 154 58Q160 58 160 52Z"/>
+                  <path d="M70 104Q70 108 74 108Q70 108 70 112Q70 108 66 108Q70 108 70 104Z"/>
+                </g>
+                <g class="fzflow-mira-bubble">
+                  <circle cx="176" cy="62" r="13"/>
+                  <path d="M167.5 63.5L184.5 56.5L178.5 69.5L175.2 64.2Z"/>
+                </g>
+              </g>
+            </svg>
+          </div>
+
+          <!-- MacBook Pro Display Lid -->
+          <div class="mac-lid">
+            <div class="mac-notch">
+              <span class="mac-camera"></span>
+              <span class="mac-led"></span>
+            </div>
+            <div class="mac-screen">
+              <img src="../assets/shots/teacher-desktop.png" alt="หน้าจอจริงของแดชบอร์ด KelasKu สำหรับครู" width="1440" height="900" loading="eager">
+            </div>
+          </div>
+
+          <!-- MacBook Pro Aluminium Unibody Base -->
+          <div class="mac-base">
+            <div class="mac-hinge"></div>
+            <div class="mac-scoop"></div>
+          </div>
+        </div>
+
+        <div class="teacher-hero-meta">
+          <span class="teacher-hero-badge">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/></svg>
+            <span class="kelasku-brand"><span class="kelasku-main">KelasKu</span> <span class="kelasku-tag">สำหรับครู</span></span> — สรุปงาน &amp; วิเคราะห์ห้องเรียน
+          </span>
+          <a class="btn-teacher-hero" href="../app/?teacher=preview">
+            เปิดเดโมสำหรับครู →
+          </a>
+        </div>
+      </div>
+
+
+      <!-- FZFLOW Lapisan A: alur tugas guru -> HP murid -> hasil -> notifikasi guru (foreground, 7 s loop).
+           Teks di dalamnya hanya angka/simbol ("B1", "87%", "1") — netral bahasa. Rincian: style.css §FZFLOW -->
+      <div class="fzflow" aria-hidden="true">
+        <svg class="fzflow-link fzflow-link-h" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          <path class="fzflow-link-out" d="M72.4 49 Q47 -33.5 22.4 50"/>
+          <path class="fzflow-link-back" d="M22.4 50 Q47 126.5 72.4 49"/>
+        </svg>
+        <svg class="fzflow-link fzflow-link-v" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          <path class="fzflow-link-out" d="M50 74 Q118 49 50 24"/>
+          <path class="fzflow-link-back" d="M50 24 Q-18 49 50 74"/>
+        </svg>
+        <div class="fzflow-packet fzflow-task"><div class="fzflow-py">
+          <div class="fzflow-card fzflow-card-task"><span class="fzflow-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V6a2 2 0 0 1 2-2h9l5 5v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"/><path d="M14 4v5h5"/><path d="M8 13h7M8 16.5h4"/></svg><b>B1</b></span><i></i><i></i></div>
+        </div></div>
+        <div class="fzflow-packet fzflow-result"><div class="fzflow-py">
+          <div class="fzflow-card fzflow-card-result"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>87%</div>
+        </div></div>
+        <span class="fzflow-badge">1</span>
+        <span class="fzflow-progress"><span class="fzflow-track"><span class="fzflow-bar"></span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+        <span class="fzflow-notif"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>1<i></i></span>
+      </div>
+
     </div>
+
   </section>
 
   <!-- ============ RINGKASAN (teks panjang: turun setelah panggung visual) ============ -->

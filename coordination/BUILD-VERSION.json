@@ -1,7 +1,7 @@
 {
-  "version": "m025-281",
-  "claimedBy": "branch claude/japanese-target-lang",
-  "claimedAt": "2026-09-06T18:10:50.767Z",
-  "reason": "Sumbu bahasa target: kunci penyimpanan per bahasa (langkah 2 kursus Jepang)",
+  "version": "m025-282",
+  "claimedBy": "branch feat/hero-fzflow-teacher-student",
+  "claimedAt": "2026-09-06T19:35:01.544Z",
+  "reason": "hero: animasi alur guru-murid fzflow + atmosfer AI + panggung guru di halaman Thai",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
