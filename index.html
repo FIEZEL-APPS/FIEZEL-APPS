@@ -627,6 +627,8 @@ html.fz-booting body{overflow:hidden}
   <script defer src="./features/social/fiezel-invite-link.js"></script>
   <script defer src="./features/social/fiezel-social-notify.js"></script>
   <!-- KOTAK MASUK MURID: tugas dari guru (polling /api/learner/class-assignments) + lonceng topbar. -->
+  <!-- Perencana detak bersama (papan guru + papan murid). Harus sebelum app.js dan teacher-shell. -->
+  <script defer src="./features/notify/fiezel-sync-plan.js"></script>
   <script defer src="./features/notify/fiezel-inbox.js"></script>
   <!-- LAPIS AKUN (masuk / daftar / aktivasi guru). Inti murni tanpa DOM, seperti
        gems-core: seluruh UI-nya hidup di app.js. Dimuat SEBELUM app.js karena alur

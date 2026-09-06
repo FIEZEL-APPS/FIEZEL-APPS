@@ -87,7 +87,15 @@ Pendeteksinya bekerja, tetapi tiga hal di jalur ke guru tidak:
    tetap hidup), `skip`, `reset` (ronde yang menggantung >45 detik melepas kuncinya), `idle`.
    Rantai `syncAll` juga mendapat `.catch` supaya satu galat cat-ulang tidak meninggalkan
    `ui.syncing = true` — kunci itu mematikan detak dengan cara yang sama diamnya.
-4. **Layar murid tertinggal jauh di belakang papan guru.** Guru menyegarkan diri tiap 10 detik
+4. **Papan murid tidak punya sistem yang sama, dan punya tombol yang tidak seharusnya ada.**
+   Detak murid kini memakai perencana yang SAMA dengan papan guru
+   (`features/notify/fiezel-sync-plan.js`, modul murni lima cabang), termasuk cabang `wait`
+   (belum ada kode kelas / offline: jaringan tidak disentuh, detak tetap berdenyut) dan
+   `reset` (ronde yang menggantung dilepas). Tombol "Kirim ulang laporan" di tab Kelas Saya
+   **dihapus dari layar**: menyegarkan papan adalah tugas sistem, bukan pekerjaan rumah
+   murid — laporan yang gagal sudah dikirim ulang sendiri (backoff 16 detik → 2 menit).
+   Pintunya (`case 'resend'`) dibiarkan hidup untuk jalur pemulihan, tanpa tombol.
+5. **Layar murid tertinggal jauh di belakang papan guru.** Guru menyegarkan diri tiap 10 detik
    (`SYNC_EVERY_MS`), murid tiap 60 detik — jadi murid harus menutup-buka aplikasi agar tugas
    baru muncul. Detak murid turun ke 15 detik (`NOTIF_POLL_MS`) dengan rem klien 10 detik
    (`fiezel-inbox.js`), keduanya masih di atas lantai server 5 detik, dan timernya tetap diam
