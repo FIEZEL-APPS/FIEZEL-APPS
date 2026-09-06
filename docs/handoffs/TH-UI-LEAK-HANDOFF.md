@@ -110,3 +110,32 @@ juga menuntut setiap kunci id punya padanan th.
    Yang MASIH terbuka di wilayah ini hanyalah naskah notice kuota/suara di butir 1.
 5. Naskah Thai di commit ini adalah terjemahan yang ditulis mesin dan **wajib
    direview penutur asli** sebelum dianggap final, sama dengan aturan copy-th lain.
+
+## m025-277 · utang `redesign` lunas
+
+`copy-id-redesign.js` memegang 76 kunci layar utama — nav bawah, ringkasan hari ini,
+baris progres — dan kembaran Thai-nya tidak pernah ada, jadi utangnya duduk di
+`UTANG_TANPA_TH` pada `tests/th-coverage-test.js`. Murid Thai membaca layar campur:
+kerangka Thai, isi Indonesia.
+
+Status: **SELESAI**. `features/i18n/copy-th-redesign.js` ditulis (76 kunci, nama kunci
+dan `{placeholder}` sama persis), didaftarkan di `fiezel-th-loader.js` dan
+`locale-assets-th.json` (`contentRev` 4 → 5), dan entri `redesign` DIHAPUS dari
+`UTANG_TANPA_TH` — registri utang tidak boleh menyimpan izin yang sudah tidak dipakai.
+
+Label nav diukur, bukan dikira-kira: pada 360px dengan locale benar-benar dipindah
+(`lang=th-TH`), yang terlebar `ห้องเรียน` 47px, semuanya masuk tombol 63px satu baris
+tanpa terpotong. Pembanding terburuk sisi Indonesia adalah "Progres" pada 46px.
+
+`tests/id-golden-snapshot-test.js` ikut disunting — heuristik `isIndonesian()` sekarang
+membuang nama placeholder (`{soal}`, `{menit}`, `{skill}`) sebelum menilai, karena nama
+placeholder bukan naskah. Tanpa itu gerbang menandai kalimat Thai sebagai kalimat
+Indonesia baru. Baseline TIDAK diregenerate.
+
+Naskahnya berkepala `⚠ DRAFT AI` dan **wajib direview penutur asli**, sama seperti
+seluruh copy-th lain di berkas ini. Wewenang tetap pada OWNER.
+
+### Yang masih terbuka sesudah ini
+
+Tidak berubah dari daftar di atas: label zona audio (8 kalimat), lencana prasasti (3),
+dan skenario listening (23).
