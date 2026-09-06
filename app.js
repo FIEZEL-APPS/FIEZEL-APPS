@@ -13120,10 +13120,50 @@ async function inboxPoll(force){
   return r;
 }
 let notifPollTimer=null;
-const NOTIF_POLL_MS=60000;
+/* Detak murid memakai perencana yang SAMA dengan papan guru (features/notify/fiezel-sync-plan.js).
+   Sebelum ini keduanya punya aturan sendiri, dan sisi guru sudah membuktikan mahalnya: satu
+   penjaga yang ditaruh sebelum timer dipasang mematikan seluruh detak untuk sisa sesi tanpa
+   satu pun pesan. Di sini penjaga itu hidup DI DALAM detak, bukan sebelum ia lahir. */
+let notifSyncing=false,notifSyncingSince=0,notifFailStreak=0;
+function notifReady(){
+  try{if(navigator&&navigator.onLine===false)return false}catch(_){}
+  try{return !!JSON.parse(localStorage.getItem('fiezel-onboarding-v1')||'{}').classCode}catch(_){return false}
+}
+function notifSyncPlan(){
+  const o={mounted:!!document.body,syncing:notifSyncing,syncingSince:notifSyncingSince,hidden:(()=>{try{return document.visibilityState!=='visible'}catch(_){return false}})(),ready:notifReady(),failStreak:notifFailStreak,tickIndex:(Date.now()/NOTIF_POLL_MS|0),now:Date.now()};
+  const P=self.FiezelSyncPlan;
+  if(P&&typeof P.plan==='function')return P.plan(o);
+  return !o.mounted?'idle':o.syncing?'skip':o.hidden?'skip':o.ready?'sync':'wait';
+}
+/* Satu ronde murid: tanya kabar guru, lalu susulkan laporan yang belum sampai. Keduanya diam —
+   murid tidak punya tombol Sinkron dan memang tidak boleh punya: menyegarkan papan sendiri
+   adalah tugas sistem, bukan pekerjaan rumah murid. */
+async function notifSyncRound(){
+  notifSyncing=true;notifSyncingSince=Date.now();
+  try{
+    const r=await inboxPoll(false);
+    notifFailStreak=r===null?notifFailStreak:0;
+  }catch(_){notifFailStreak++}
+  finally{notifSyncing=false;notifSyncingSince=0}
+}
+/* 15 detik, turun dari 60. Sisi guru menyegarkan dirinya tiap 10 detik (SYNC_EVERY_MS di
+   fiezel-teacher-shell.js), jadi pada angka lama papan guru hidup sementara layar murid
+   tertinggal satu menit penuh: tugas yang baru dikirim guru baru muncul setelah murid
+   menutup-buka aplikasi, dan itu terbaca sebagai "aplikasinya lambat", bukan sebagai jeda
+   polling. Lantai server untuk tanya ini 5 detik (ASSIGN_LIMITS.LEARNER_POLL_MIN_INTERVAL_MS),
+   jadi 15 detik masih tiga kali lipat di atasnya - dan timer ini SUDAH diam total saat
+   aplikasi tidak terlihat, sehingga biayanya hanya jatuh pada murid yang benar-benar sedang
+   memandang layarnya. */
+const NOTIF_POLL_MS=15000;
 function startNotifPolling(){
   if(notifPollTimer)return false;
-  notifPollTimer=setInterval(()=>{try{if(document.visibilityState!=='visible')return}catch(_){}inboxPoll(false);socialNotifyPoll(false)},NOTIF_POLL_MS);
+  notifPollTimer=setInterval(()=>{
+    const plan=notifSyncPlan();
+    if(plan==='reset'){notifSyncing=false;notifSyncingSince=0}
+    if(plan==='sync'||plan==='reset'){notifSyncRound();socialNotifyPoll(false)}
+    /* 'wait' (belum ada kode kelas / offline) dan 'skip' TIDAK mematikan timer: begitu murid
+       memasukkan kode kelas atau jaringannya kembali, ronde berikutnya jalan sendiri. */
+  },NOTIF_POLL_MS);
   notifPollTimer?.unref?.();
   /* Timer di atas SENGAJA diam saat aplikasi tidak terlihat - menanyai server untuk layar
      yang tidak dipandang hanya membakar baterai. Tapi tanpa baris di bawah ini, murid yang
