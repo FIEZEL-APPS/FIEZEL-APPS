@@ -53,7 +53,7 @@ const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
 // dilayani dan kedua berkas baru tidak pernah sampai ke pengguna lama - aplikasi mereka
 // akan menjalankan app.js baru tanpa berkas benderanya, dan seluruh bendera jatuh ke
 // salinan bawaan di app.js. Naik SEKALI untuk seluruh gelombang.
-const SW_REV='m025-276-chrome-nav-20260906';
+const SW_REV='m025-278-chrome-nav-20260906';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 // m025-61: health check menanyakan revisi shell langsung ke worker yang sedang aktif.
 // Menebaknya dari nama cache tidak cukup: cache lama bisa tertinggal, sedangkan jawaban ini
@@ -118,7 +118,7 @@ const ASSETS=['./','./index.html','./style.css','./features/mascot/fiezel-motion
   // queue, transport). Aturan sama dengan modul brain lain - masuk precache HANYA setelah
   // berkasnya ada di repo, karena cache.addAll gagal total bila satu saja 404, dan
   // kesembilan berkas ini sudah ada. (Ingat: tanpa titik-koma di komentar blok ASSETS.)
-  './features/brain/fiezel-stat-gate.js','./features/brain/fiezel-brain-manifest.js','./features/brain/fiezel-brain-config.js','./features/brain/fiezel-learning-metrics.js','./features/brain/fiezel-metrics-digest.js','./features/brain/fiezel-retention-probe.js','./features/brain/fiezel-attempt-record.js','./features/brain/fiezel-policy-verdict.js',
+  './features/brain/fiezel-stat-gate.js','./features/brain/fiezel-brain-manifest.js','./features/brain/fiezel-brain-config.js','./features/brain/fiezel-learning-metrics.js','./features/brain/fiezel-metrics-digest.js','./features/brain/fiezel-retention-probe.js','./features/brain/fiezel-attempt-record.js','./features/brain/fiezel-policy-verdict.js','./features/brain/fiezel-question-memory.js','./features/brain/fiezel-question-allocator.js',
   './features/telemetry/fiezel-telemetry-config.js','./features/telemetry/fiezel-learning-events.js','./features/telemetry/fiezel-learning-queue.js','./features/telemetry/fiezel-learning-transport.js','./features/telemetry/fiezel-braincore-evidence.js',
   './features/neural-voice/fiezel-cf-tts-transport.js','./features/neural-voice/fiezel-cf-voice-notice.js','./features/quota/quota-copy.js',
   // FASE 11: jembatan bicara→maskot ikut precache - ia anggota grup malas 'voice',
