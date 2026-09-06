@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-06T18:09:26.241Z",
+  "updated": "2026-09-06T18:44:26.116Z",
   "active": [
     {
       "sesi": "ses_0034e69d3ffes3kjiFLNDzYXUZ",
@@ -105,6 +105,16 @@
       ],
       "mulai": "2026-09-06T18:09:26Z",
       "catatan": "Langkah 2 kursus Jepang: kunci penyimpanan per bahasa. Kunci Inggris identik byte per byte; modul off di manifest karena belum ada pemanggil."
+    },
+    {
+      "sesi": "claude-code-fix-th-branding",
+      "peran": "claude-code / tutup kebocoran th rebranding",
+      "paths": [
+        "features/i18n/copy-id-feat-d.js",
+        "features/i18n/copy-th-feat-d.js"
+      ],
+      "mulai": "2026-09-06T18:44:26Z",
+      "catatan": "Menyentuh juga app.js dan features/teacher/fiezel-teacher-shell.js (dua baris merek), id-golden-baseline."
     }
   ],
   "finished": [
