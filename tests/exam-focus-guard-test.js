@@ -281,6 +281,41 @@ test('realtime: detak murid tidak boleh jauh lebih lambat daripada detak guru', 
   assert.ok(murid >= 5000 && remKlien >= 5000, 'tetap di atas lantai server 5 detik');
 });
 
+test('papan guru: detak otomatis TIDAK boleh mati saat akun guru belum siap', () => {
+  // Modul cangkang guru dimuat di atas root yang sudah dipalsukan gerbang DOM-stub.
+  require('../features/teacher/fiezel-teacher-shell.js');
+  const Shell = globalThis.FiezelTeacherShell;
+  assert.ok(Shell && Shell._autoSyncPlan, 'cangkang guru memuat rencana detaknya');
+  const plan = Shell._autoSyncPlan, T = Shell._syncTicks();
+  const dasar = { mounted: true, hidden: false, syncing: false, avail: 'ok', failStreak: 0, tickIndex: 0, now: 1000, syncingSince: 0 };
+  const dg = (o) => plan(Object.assign({}, dasar, o));
+
+  assert.strictEqual(dg({}), 'sync');
+  /* INI kerusakannya: FiezelAccount memulihkan sesi secara asinkron, jadi saat Ruang Guru
+     dipasang, perannya sering belum terbaca. Dulu itu membuat startAutoSync pulang SEBELUM
+     timer dipasang — papan guru mati untuk sisa sesi dan hanya hidup kalau tombol Sinkron
+     ditekan tangan. 'wait' berarti: jangan sentuh jaringan, tapi detaknya tetap berdenyut. */
+  assert.strictEqual(dg({ avail: 'no_account' }), 'wait');
+  assert.strictEqual(dg({ avail: 'not_teacher' }), 'wait');
+  assert.strictEqual(dg({ avail: 'offline' }), 'wait');
+  assert.strictEqual(dg({ hidden: true }), 'skip', 'layar tak dipandang tidak perlu jaringan');
+  assert.strictEqual(dg({ mounted: false }), 'idle');
+  assert.strictEqual(dg({ syncing: true, now: 5000, syncingSince: 4000 }), 'skip', 'ronde yang masih wajar dibiarkan selesai');
+  /* Permintaan yang menggantung dulu mengunci ui.syncing selamanya, dan detaknya berhenti
+     dengan cara yang sama diamnya. */
+  assert.strictEqual(dg({ syncing: true, now: 100000, syncingSince: 1000 }), 'reset');
+  // Rem menanjak sesudah gagal beruntun tetap ada, tapi ia melewati ronde — bukan mematikannya.
+  assert.strictEqual(dg({ failStreak: 3, tickIndex: 1 }), 'skip');
+  assert.strictEqual(dg({ failStreak: 3, tickIndex: 4 }), 'sync');
+  assert.ok(T.every > 3000 && T.every <= 10000, 'detak guru di atas lantai server 3 detik: ' + T.every);
+
+  const src = read('features/teacher/fiezel-teacher-shell.js');
+  assert.ok(!/function startAutoSync\(\) \{[\s\S]{0,200}?syncAvailable\(\) !== 'ok'\) return;/.test(src),
+    'startAutoSync tidak boleh pulang sebelum timernya terpasang');
+  assert.ok(/syncTimer = setInterval/.test(src) && /chipTimer = setInterval/.test(src), 'kedua detak terpasang');
+  assert.ok(/\.catch\(function \(\) \{ ui\.syncing = false;/.test(src), 'galat tidak boleh meninggalkan kunci ui.syncing');
+});
+
 /* --------------------------------------------------------- 5 · pemasangan & i18n --- */
 
 test('pemasangan: modul terdaftar di index.html + sw.js, dan teks murid lahir dua bahasa', () => {

@@ -77,7 +77,17 @@ Pendeteksinya bekerja, tetapi tiga hal di jalur ke guru tidak:
    menilai." Barisnya juga dicat beda di kotak masuk (`.tg-inbox-item.is-warn`).
    Kalimatnya tetap menyebut FAKTA; kata "curang" sengaja tidak dipakai di mana pun, dan
    gerbang menolaknya.
-3. **Layar murid tertinggal jauh di belakang papan guru.** Guru menyegarkan diri tiap 10 detik
+3. **Detak otomatis papan guru mati sejak awal sesi.** `startAutoSync()` pulang lebih dulu
+   (`if (S().syncAvailable() !== 'ok') return;`) **sebelum** timernya dipasang. `FiezelAccount`
+   memulihkan sesi secara asinkron, jadi saat Ruang Guru dipasang peran akun sering belum
+   terbaca — dan sesudah itu tidak ada apa pun yang menghidupkan detaknya kembali. Guru
+   melihat papan yang hanya bergerak kalau tombol Sinkron ditekan tangan. Sekarang detaknya
+   SELALU dipasang dan tiap denyut menanyakan rencananya ke `autoSyncPlan()` — fungsi murni,
+   lima cabang, semuanya bergerbang: `sync`, `wait` (akun belum siap: tanpa jaringan, detak
+   tetap hidup), `skip`, `reset` (ronde yang menggantung >45 detik melepas kuncinya), `idle`.
+   Rantai `syncAll` juga mendapat `.catch` supaya satu galat cat-ulang tidak meninggalkan
+   `ui.syncing = true` — kunci itu mematikan detak dengan cara yang sama diamnya.
+4. **Layar murid tertinggal jauh di belakang papan guru.** Guru menyegarkan diri tiap 10 detik
    (`SYNC_EVERY_MS`), murid tiap 60 detik — jadi murid harus menutup-buka aplikasi agar tugas
    baru muncul. Detak murid turun ke 15 detik (`NOTIF_POLL_MS`) dengan rem klien 10 detik
    (`fiezel-inbox.js`), keduanya masih di atas lantai server 5 detik, dan timernya tetap diam

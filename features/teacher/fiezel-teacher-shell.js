@@ -73,18 +73,57 @@
 
   // ---- sinkron server ---------------------------------------------------------------------
   function pageHidden() { try { return root.document && root.document.visibilityState === 'hidden'; } catch (_) { return false; } }
+  /*
+   * KENAPA KEPUTUSAN TIAP DETAK DIPISAH JADI FUNGSI MURNI
+   * -----------------------------------------------------
+   * Versi sebelumnya menaruh keputusan itu di dalam startAutoSync, dan satu barisnya —
+   * `if (S().syncAvailable() !== 'ok') return;` SEBELUM timer dipasang — mematikan seluruh
+   * detak untuk sisa sesi. Itu bukan kasus langka: FiezelAccount memulihkan sesinya secara
+   * asinkron, jadi pada saat Ruang Guru dipasang, peran akun sering BELUM terbaca. Guru lalu
+   * melihat papan yang hanya bergerak kalau tombol Sinkron ditekan tangan — persis laporan
+   * dari kelas — dan tidak ada apa pun yang menghidupkannya kembali setelah akunnya siap.
+   *
+   * Sekarang detaknya SELALU dipasang, dan tiap detak menanyakan rencananya ke fungsi di
+   * bawah. Fungsi ini murni (tanpa DOM, tanpa jaringan, tanpa jam internal) supaya setiap
+   * cabangnya bisa diuji di Node — termasuk cabang "akun belum siap", yang dulu tidak punya
+   * gerbang sama sekali dan karena itu bisa rusak tanpa satu pun tes memerah.
+   *
+   * 'sync'  jalankan ronde jaringan sekarang.
+   * 'wait'  akun/koneksi belum siap: JANGAN menyentuh jaringan, tapi detaknya tetap hidup —
+   *         begitu akun guru mendarat, ronde berikutnya langsung jalan tanpa campur tangan.
+   * 'skip'  ronde ini dilewati (layar tak dipandang, ronde sebelumnya masih jalan, atau
+   *         rem menanjak sesudah gagal beruntun).
+   * 'reset' ronde sebelumnya menggantung melewati batas wajar: lepaskan kuncinya lalu ulangi.
+   *         Tanpa cabang ini, satu permintaan yang tidak pernah selesai mengunci ui.syncing
+   *         selamanya dan mematikan detak dengan cara yang sama diamnya seperti bug di atas.
+   * 'idle'  cangkang tidak terpasang.
+   */
+  var SYNC_STUCK_MS = 45000, SYNC_BACKOFF_MAX = 10;
+  var syncingSince = 0;
+  function autoSyncPlan(o) {
+    if (!o || !o.mounted) return 'idle';
+    if (o.syncing) return (Number(o.now) - Number(o.syncingSince || 0)) > SYNC_STUCK_MS ? 'reset' : 'skip';
+    if (o.hidden) return 'skip';                     // tab tak dilihat: tidak ada yang perlu disegarkan
+    if (o.avail !== 'ok') return 'wait';
+    /* Jeda menanjak sesudah gagal beruntun: 1 ronde dilewati per kegagalan, sampai 10.
+       Server yang sakit tidak dihujani sampai ia pulih. */
+    var streak = Math.max(0, Number(o.failStreak) || 0);
+    if (streak > 0 && Number(o.tickIndex) % (Math.min(streak, SYNC_BACKOFF_MAX) + 1) !== 0) return 'skip';
+    return 'sync';
+  }
   function startAutoSync() {
     stopAutoSync();
-    if (S().syncAvailable() !== 'ok') return;
     syncFailStreak = 0;
-    syncAll(true);
+    if (S().syncAvailable() === 'ok') syncAll(true);
     syncTimer = setInterval(function () {
-      if (!el || ui.syncing) return;
-      if (pageHidden()) return;                      // tab tak dilihat: tidak ada yang perlu disegarkan
-      /* Jeda menanjak sesudah gagal beruntun: 1 ronde dilewati per kegagalan, sampai 10.
-         Server yang sakit tidak dihujani sampai ia pulih. */
-      if (syncFailStreak > 0 && (Date.now() / SYNC_EVERY_MS | 0) % (Math.min(syncFailStreak, 10) + 1) !== 0) return;
-      syncAll(true);
+      var plan = autoSyncPlan({
+        mounted: !!el, hidden: pageHidden(), syncing: ui.syncing, avail: S().syncAvailable(),
+        failStreak: syncFailStreak, tickIndex: (Date.now() / SYNC_EVERY_MS | 0),
+        now: Date.now(), syncingSince: syncingSince
+      });
+      if (plan === 'reset') { ui.syncing = false; syncingSince = 0; }
+      if (plan === 'sync' || plan === 'reset') syncAll(true);
+      else if (plan === 'wait') paintSyncChip();     // guru tetap melihat status akunnya, tanpa jaringan
     }, SYNC_EVERY_MS);
     /* Detak chip: murni lokal, tanpa jaringan. Ia juga yang menyusulkan render yang tertunda
        karena guru sedang mengetik - begitu kolomnya dilepas, cat ulangnya menyusul sendiri. */
@@ -124,12 +163,12 @@
       return Promise.resolve();
     }
     if (ui.syncing || !st.classes.length) return Promise.resolve();
-    ui.syncing = true;
+    ui.syncing = true; syncingSince = Date.now();
     if (quiet) paintSyncChip(); else render();   // sinkron manual = ketukan guru, jangan ditunda
     var total = { ingested: 0, graded: 0, names: [], failed: 0, events: [] };
     return st.classes.reduce(function (p, c) { return p.then(function () { return T.syncClass(c).then(function (r) { if (r.ok) { total.ingested += r.ingested; total.graded += r.graded; total.names = total.names.concat(r.names || []); total.events = total.events.concat(r.events || []); } else total.failed++; }); }); }, Promise.resolve())
       .then(function () {
-        ui.syncing = false; st.lastSyncAt = Date.now();
+        ui.syncing = false; syncingSince = 0; st.lastSyncAt = Date.now();
         syncFailStreak = total.failed ? syncFailStreak + 1 : 0;
         if (total.ingested) saveMinutes(total.ingested * 4 + total.graded * 5);
         total.events.forEach(function (e) { T.notify(st, e); });
@@ -141,7 +180,13 @@
         if (total.events.length) { var top = total.events.filter(function (e) { return e.kind === 'focus_exit'; })[0] || total.events.filter(function (e) { return e.kind === 'assignment_done'; })[0] || total.events[0]; toast(T.inboxText(top) + (total.events.length > 1 ? ' · +' + (total.events.length - 1) + ' kabar lain' : '')); }
         else if (total.ingested) toast(total.ingested + ' laporan murid masuk' + (total.graded ? ' · ' + total.graded + ' tugas dinilai otomatis' : '') + '.');
         else if (!quiet) toast(total.failed ? 'Sinkron gagal untuk ' + total.failed + ' kelas.' : 'Tersinkron — belum ada laporan baru.');
-      });
+      })
+      /* Satu galat yang lolos dari rantai di atas (cat ulang, penyimpanan penuh, kabar yang
+         bentuknya asing) dulu meninggalkan ui.syncing = true, dan sejak itu SETIAP detak
+         berikutnya melihat "ronde sebelumnya masih jalan" lalu pulang. Papan guru berhenti
+         hidup tanpa satu pun pesan. Kuncinya dilepas di sini, bukan diandaikan tidak pernah
+         tersangkut. */
+      .catch(function () { ui.syncing = false; syncingSince = 0; try { paintSyncChip(); } catch (_) {} });
   }
   /*
    * Apakah guru sedang MEMEGANG cangkang ini?
@@ -597,5 +642,5 @@
   }
   function download(name, text, type) { try { var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type: type || 'text/plain' })); a.download = name; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 800); } catch (_) { copy(text, 'Unduhan tidak didukung — isi tersalin.'); } }
 
-  root.FiezelTeacherShell = { mount: mount, unmount: unmount, render: render, previewAllowed: previewAllowed, _state: function () { return st; } };
+  root.FiezelTeacherShell = { mount: mount, unmount: unmount, render: render, previewAllowed: previewAllowed, _state: function () { return st; }, _autoSyncPlan: autoSyncPlan, _syncTicks: function () { return { every: SYNC_EVERY_MS, chip: CHIP_TICK_MS, stuck: SYNC_STUCK_MS }; }, _armed: function () { return !!syncTimer && !!chipTimer; } };
 })(typeof window !== 'undefined' ? window : null);
