@@ -1,7 +1,7 @@
 {
-  "version": "m025-285",
+  "version": "m025-286",
   "claimedBy": "branch claude/japanese-wire-ui",
-  "claimedAt": "2026-09-06T22:55:36.371Z",
-  "reason": "Kursus Jepang sampai ke layar: pemilih bahasa + bank ja dimuat",
+  "claimedAt": "2026-09-06T23:40:41.906Z",
+  "reason": "m025-286: kursus Jepang sampai ke layar murid — pemilih bahasa + bank ja",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

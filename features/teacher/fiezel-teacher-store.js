@@ -31,8 +31,29 @@
 
   // ---- persist -------------------------------------------------------------------------
   function defaults() { return { schema: KEY, teacher: { name: '', school: '' }, classes: [], activeClassId: null, view: 'briefing', savedMinutes: 0, inbox: [], createdAt: Date.now() }; }
-  function load() { try { var raw = JSON.parse(localStorage.getItem(KEY)); if (raw && raw.schema === KEY) { var st = Object.assign(defaults(), raw); st.inbox = Array.isArray(st.inbox) ? st.inbox : []; return st; } } catch (_) {} return defaults(); }
-  function save(st) { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (_) {} return st; }
+  /*
+   * MODE PRATINJAU — PENYIMPANAN TERPISAH, BUKAN BENDERA DI ATAS PENYIMPANAN YANG SAMA.
+   *
+   * Demo guru di landing page membawa pengunjung ke papan yang terisi. Kalau demo itu
+   * menulis ke localStorage yang sama dengan guru sungguhan, satu kunjungan iseng dari
+   * perangkat seorang guru akan menyuntikkan "Kelas 10A" berisi 18 murid karangan ke
+   * data kelasnya yang asli — dan tidak ada yang memberitahunya.
+   *
+   * Jadi pratinjau memakai sessionStorage dengan kunci sendiri: data guru asli di
+   * localStorage tidak pernah dibaca maupun ditulis selama mode ini hidup, dan seluruh
+   * isinya lenyap begitu tab ditutup. Konsekuensi yang disengaja: apa pun yang dicoba
+   * pengunjung di demo memang tidak disimpan — itulah arti demo.
+   */
+  var previewMode = false;
+  var PREVIEW_KEY = KEY + '-preview';
+  function setPreview(on) { previewMode = !!on; return previewMode; }
+  function isPreview() { return previewMode; }
+  function bin() {
+    try { if (previewMode && root.sessionStorage) return { s: root.sessionStorage, k: PREVIEW_KEY }; } catch (_) {}
+    return { s: localStorage, k: KEY };
+  }
+  function load() { var b = bin(); try { var raw = JSON.parse(b.s.getItem(b.k)); if (raw && raw.schema === KEY) { var st = Object.assign(defaults(), raw); st.inbox = Array.isArray(st.inbox) ? st.inbox : []; return st; } } catch (_) {} return defaults(); }
+  function save(st) { var b = bin(); try { b.s.setItem(b.k, JSON.stringify(st)); } catch (_) {} return st; }
   function normalizeStudent(s) {
     s.results = Array.isArray(s.results) ? s.results : [];
     s.notes = Array.isArray(s.notes) ? s.notes : [];
@@ -472,7 +493,7 @@
   }
 
   return { KEY: KEY, ASSIGN_KEY: ASSIGN_KEY, SKILL_LABEL: SKILL_LABEL, SKILL_ORDER: SKILL_ORDER, ATT: ATT, DAY: DAY,
-    load: load, save: save, defaults: defaults, uid: uid, today: today, firstName: firstName, newClass: newClass, newStudent: newStudent, normalizeClass: normalizeClass, seedDemo: seedDemo, makeClassCode: makeClassCode, normalizeClassCode: normalizeClassCode,
+    load: load, save: save, defaults: defaults, setPreview: setPreview, isPreview: isPreview, uid: uid, today: today, firstName: firstName, newClass: newClass, newStudent: newStudent, normalizeClass: normalizeClass, seedDemo: seedDemo, makeClassCode: makeClassCode, normalizeClassCode: normalizeClassCode,
     skillAcc: skillAcc, overallAcc: overallAcc, daysSince: daysSince, risk: risk, classStats: classStats, classSkillMap: classSkillMap, heatmap: heatmap, studyGroups: studyGroups, misconceptions: misconceptions, needsGreeting: needsGreeting, agenda: agenda, pendingAssignments: pendingAssignments, targeted: targeted, recentAttendance: recentAttendance, attendanceRate: attendanceRate, weakestSkill: weakestSkill,
     durasi: durasi, examLabel: examLabel, acceptJoin: acceptJoin, rejectJoin: rejectJoin, pendingJoins: pendingJoins, normalizeFocus: normalizeFocus, focusGrew: focusGrew, focusOf: focusOf, focusLabel: focusLabel, focusLevel: focusLevel,
     parseLearnerCode: parseLearnerCode, parseLearnerPayload: parseLearnerPayload, ingest: ingest, assignmentCode: assignmentCode, assignmentPayload: assignmentPayload, parseAssignmentCode: parseAssignmentCode, acceptAssignmentCode: acceptAssignmentCode, acceptAssignmentPayload: acceptAssignmentPayload, buildAssignment: buildAssignment,
