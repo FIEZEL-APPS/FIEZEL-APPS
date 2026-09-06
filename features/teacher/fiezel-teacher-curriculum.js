@@ -22,14 +22,14 @@
     },
     {
       id: 'fase_e',
-      name: 'Fase E (SMA / SMK Tingkat 10)',
+      name: 'Fase E (SMA / SMK Kelas 10)',
       grades: [10],
       cefr: 'B1 (Independent User)',
       desc: 'Transisi kemahiran mandiri: teks deskriptif wisata bersejarah, narasi legenda nusantara, biografi tokoh, report sains, dan eksposisi analitis isu remaja.'
     },
     {
       id: 'fase_f',
-      name: 'Fase F (SMA / SMK Tingkat 11 & 12)',
+      name: 'Fase F (SMA / SMK Kelas 11 & 12)',
       grades: [11, 12],
       cefr: 'B1+ – B2 (Vantage)',
       desc: 'Kemahiran analitis lanjut: eksposisi akademis, eksplanasi fenomena, wacana dialektika (diskusi dua arah), news item, surat lamaran kerja & CV, serta kesiapan UTBK SNBT.'
@@ -283,7 +283,7 @@
           }
         ],
         differentiation: {
-          struggling: 'Gunakan bagan alur cerita (Story Mountain) 3 kotak: Awal, Masalah, Resolusi.',
+          struggling: 'Gunakan bagan alur cerita (Story Mountain) 3 kotak: Awal, Masalah, Selesai.',
           advanced: 'Minta siswa menulis ulang akhir cerita fabel dengan akhir alternatif (alternate resolution).'
         },
         keyVocabulary: [
@@ -481,7 +481,7 @@
       languageFeatures: ['Passive Voice intensif', 'Cause-and-Effect Connectors (Due to, As a result, Leads to)', 'Action Verbs in scientific process', 'Simple Present Tense'],
       teachingBrief: {
         summary: 'Explanation text menguji pemahaman proses ilmiah. Siswa SMA kelas 11 dilatih membaca wacana kausal berbasis sains dan menggunakan passive voice tingkat lanjut.',
-        hook5Minutes: 'Tanyakan: "Why does an earthquake beneath the seabed cause a tsunami?" Gambar bagan alur 3 langkah di papan: Disruption → Displacement of water → Giant waves.',
+        hook5Minutes: 'Tanyakan: "Why does an earthquake beneath the seabed cause a tsunami?" Buat bagan alur 3 langkah di papan: Disruption → Displacement of water → Giant waves.',
         boardFormula: 'General Statement → Process 1 (Due to...) → Process 2 (Is triggered by...) → Final Stage (Results in...)',
         commonMisconceptions: [
           {
