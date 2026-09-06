@@ -214,6 +214,7 @@ jobs:
           node tests/brain-config-test.js
           node tests/brain-manifest-test.js
           node tests/question-allocator-test.js
+          node tests/bankor-latihan-test.js
           node tests/fiezel-stat-gate-test.js
           node tests/learning-lane-test.js
           node tests/braincore-evidence-test.js
@@ -955,6 +956,14 @@ jobs:
         # sebagai pelanggaran; gerbang yang merah karena alasan salah akan dimatikan orang.
         # Berdiri di step sendiri agar kegagalannya punya lampu merah sendiri.
         run: node tests/braincore-purity-test.js
+      - name: 'Graf keluarga bisa diganti bahasa tanpa menggeser prasyarat Inggris'
+        # PREREQUISITES adalah jawaban mesin atas "sebelum ini, apa yang harus sudah bisa?",
+        # dan isinya keluarga INGGRIS. Kursus bahasa lain butuh graf yang lain sama sekali.
+        # Menempelkan keluarga asing ke peta yang sama tidak melempar error - ia hanya
+        # membuat rootCause() menunjuk akar yang keliru bagi murid yang sudah ada, pelan-pelan.
+        # Gerbang ini menahan graf Inggris pada patokan yang ditulis tangan, dan membuktikan
+        # penyuntikan graf lain benar-benar berganti serta benar-benar bisa dipulihkan.
+        run: node tests/family-graph-injection-test.js
       - name: 'Wave E4: post-test tertunda / probe retensi (fiezel-post-test)'
         # Modul murni baru features/brain/fiezel-retention-probe.js: penjadwal probe retensi
         # deterministik (offset 3/7/21 hari, jitter seeded per lessonId+userSeed) +
