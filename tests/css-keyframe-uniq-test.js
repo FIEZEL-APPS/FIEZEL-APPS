@@ -51,14 +51,61 @@ function linkedCss(htmlPath) {
 /** Buang komentar dulu: tombstone audit 12-003 MENYEBUT `@keyframes pageIn` dalam prosa. */
 function stripComments(css) { return css.replace(/\/\*[\s\S]*?\*\//g, ' '); }
 
-function keyframesIn(file) {
+/**
+ * CSS yang dikirim LANGSUNG di dalam halaman lewat <style>. Halaman landing website/
+ * memakai bentuk ini (satu blok, nol permintaan tambahan) alih-alih menautkan berkas.
+ * Tanpa dibaca di sini, @keyframes-nya tidak pernah terlihat gerbang — jadi menambahkannya
+ * MEMPERLUAS jangkauan, bukan melonggarkan syarat.
+ */
+function inlineCss(htmlPath) {
+  const html = fs.readFileSync(htmlPath, 'utf8');
   const out = [];
-  stripComments(fs.readFileSync(file, 'utf8')).split('\n').forEach((line, i) => {
-    for (const m of line.matchAll(/@(?:-webkit-)?keyframes\s+("[^"]+"|'[^']+'|[A-Za-z_][\w-]*)/g)) {
-      out.push({ name: m[1].replace(/^["']|["']$/g, ''), at: path.relative(__fzRoot, file) + ':' + (i + 1) });
-    }
-  });
+  for (const m of html.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/gi)) {
+    const isi = m[1];
+    if (isi && isi.trim()) out.push({ css: isi, at: path.relative(__fzRoot, htmlPath) + ' <style>' });
+  }
   return out;
+}
+
+/**
+ * Isi sebuah @keyframes, dinormalkan. Dipakai untuk membedakan dua hal yang sangat berbeda:
+ *
+ *   - kembar BERBEDA  -> bahaya. Definisi belakangan menang dan yang lebih dulu lenyap
+ *                        diam-diam. Ini bentuk persis bug m025-263.
+ *   - kembar IDENTIK  -> sah. Halaman menyalin sebagian CSS kritisnya ke dalam <style>
+ *                        supaya splash beranimasi sebelum style.css tiba. Menghukumnya
+ *                        berarti gerbang merah karena alasan salah — dan gerbang yang merah
+ *                        karena alasan salah akan dilonggarkan orang sampai tidak berarti.
+ */
+function bodyAt(css, start) {
+  const buka = css.indexOf('{', start);
+  if (buka < 0) return '';
+  let d = 0;
+  for (let i = buka; i < css.length; i++) {
+    if (css[i] === '{') d++;
+    else if (css[i] === '}') { d--; if (!d) return css.slice(buka, i + 1).replace(/\s+/g, ''); }
+  }
+  return '';
+}
+
+function keyframesInText(css, label) {
+  const bersih = stripComments(css);
+  const out = [];
+  const re = /@(?:-webkit-)?keyframes\s+("[^"]+"|'[^']+'|[A-Za-z_][\w-]*)/g;
+  let m;
+  while ((m = re.exec(bersih)) !== null) {
+    const baris = bersih.slice(0, m.index).split('\n').length;
+    out.push({
+      name: m[1].replace(/^["']|["']$/g, ''),
+      at: label + ':' + baris,
+      body: bodyAt(bersih, m.index + m[0].length)
+    });
+  }
+  return out;
+}
+
+function keyframesIn(file) {
+  return keyframesInText(fs.readFileSync(file, 'utf8'), path.relative(__fzRoot, file));
 }
 
 /* Setiap halaman yang benar-benar dikirim ke pengguna. */
@@ -71,19 +118,36 @@ const seen = new Map(); // dipakai pagar khusus di bawah: nama -> lokasi di inde
 for (const page of PAGES) {
   const rel = path.relative(__fzRoot, page);
   const sheets = linkedCss(page);
-  assert(sheets.length > 0, rel + ' menautkan CSS yang bisa dibaca (' + sheets.length + ' berkas)');
+  const inline = inlineCss(page);
+  // Syaratnya BUKAN "harus menautkan berkas" melainkan "CSS halaman ini harus bisa dibaca".
+  // Halaman yang mengirim CSS-nya inline tetap wajib terperiksa; halaman tanpa CSS sama
+  // sekali yang tidak boleh lolos, sebab itu berarti gerbang ini tidak memeriksa apa pun.
+  assert(sheets.length + inline.length > 0,
+    rel + ' punya CSS yang bisa dibaca (' + sheets.length + ' berkas tertaut, ' + inline.length + ' blok inline)');
   const here = new Map();
   for (const sheet of sheets) {
     for (const k of keyframesIn(sheet)) {
       if (!here.has(k.name)) here.set(k.name, []);
-      here.get(k.name).push(k.at);
+      here.get(k.name).push(k);
+    }
+  }
+  for (const blok of inline) {
+    for (const k of keyframesInText(blok.css, blok.at)) {
+      if (!here.has(k.name)) here.set(k.name, []);
+      here.get(k.name).push(k);
     }
   }
   totalNames += here.size;
-  if (rel === 'index.html') for (const [n, w] of here) seen.set(n, w);
-  const clashes = [...here.entries()].filter(([, where]) => where.length > 1);
-  for (const [name, where] of clashes) {
-    assert(false, rel + ': nama @keyframes KEMBAR "' + name + '" di ' + where.join(' dan ') +
+  // Pagar khusus di bawah menghitung DEFINISI YANG BERBEDA, bukan salinan identik: satu nama
+  // yang disalin apa adanya ke CSS kritis inline tetap satu perilaku.
+  if (rel === 'index.html') {
+    for (const [n, w] of here) seen.set(n, [...new Set(w.map((k) => k.body))]);
+  }
+  const clashes = [...here.entries()]
+    .filter(([, ks]) => new Set(ks.map((k) => k.body)).size > 1);
+  for (const [name, ks] of clashes) {
+    assert(false, rel + ': nama @keyframes KEMBAR dengan ISI BERBEDA "' + name + '" di ' +
+      ks.map((k) => k.at).join(' dan ') +
       ' — definisi belakangan menang dan yang lebih dulu lenyap diam-diam; beri nama berbeda');
   }
   assert(clashes.length === 0, rel + ': tidak ada nama @keyframes kembar di antara CSS yang dimuatnya');
