@@ -67,11 +67,11 @@ dijalankan di CI; `cf-live-selftest` merah-diketahui bukan milik perubahan ini.
 - **Main berdua lewat kode** untuk Sinyal & Taruhan (async, nol server).
 - **Papan artefak**: koleksi cerita Story Chain tersimpan tampil di lobby, bisa dibuka penuh.
 
-## m025-279 · penggabungan ke main dan koreksi otoritas bot
+## m025-280 · penggabungan ke main dan koreksi otoritas bot
 
 Cabang ini dibuka saat `main` masih di m025-277. Ketika digabung, `main` sudah bergerak dua
 rilis (copy-th-redesign m025-277, BANKOR latihan m025-278), jadi build PAW ARENA naik ke
-**m025-279** dan `SW_REV` menjadi `m025-279-paw-arena-20260906`. Konflik yang muncul hanya di
+**m025-280** dan `SW_REV` menjadi `m025-280-paw-arena-20260906`. Konflik yang muncul hanya di
 berkas penanda (BUILD-VERSION, core-config, sw.js, diag-panel), daftar aset locale th, plus
 dua berkas yang memang diregenerate (baseline emas, laporan kebocoran th).
 
