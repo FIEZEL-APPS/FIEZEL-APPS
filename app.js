@@ -5694,7 +5694,7 @@ function openApp(){
   // sebelum rilis ini). Dibersihkan sekali di sini supaya .app/.bottomnav tidak tetap
   // tersembunyi oleh aturan CSS yang sekarang tidak pernah dipasang lagi.
   document.body?.classList?.remove?.('notification-locked');notifyAppUpdateIfNew();render();
-  // Deteksi token undangan guru di URL (?token=...): langsung aktivasi & buka Ruang Guru
+  // Deteksi token undangan guru di URL (?token=...): langsung aktivasi & buka KelasKu untuk Guru
   try{checkUrlTeacherToken()}catch(_){}
   // Tautan undangan Duel Belajar (?duel=KODE): langsung buka alur belajar tab Duel.
   try{if(new URL(location.href).searchParams.get('duel')&&state.view!=='learn')go('learn')}catch{}
@@ -8167,8 +8167,8 @@ function bindFiezelAccountControls(){
 
 function openTeacherRoomModal(){
   const acc=self.FiezelAccount?.getAccount?.();
-  openModal(`<div class="modal-mark">RUANG GURU FIEZEL</div>
-    <h2>${FiezelI18n.t('guru.ruang-judul')}</h2>
+  openModal(`<div class="modal-mark">KELASKU UNTUK GURU</div>
+    <h2><span class="kelasku-brand"><span class="kelasku-main" style="font-size:1.4rem">KelasKu</span> <span class="kelasku-tag" style="font-size:0.6rem">untuk Guru</span></span></h2>
     <p>${FiezelI18n.t('guru.ruang-sapaan',{handle:esc(acc?.handle||'Guru')})}</p>
     <div class="card" style="margin:12px 0;text-align:left">
       <h3 style="margin-bottom:8px"><i data-lucide="check-circle" style="color:#15803d"></i> Hak Akses Pengajar Terbuka:</h3>
@@ -8265,7 +8265,7 @@ function openFiezelAuthModal(initialTab){
         <p class="muted" style="font-size:0.85rem;margin-top:-2px">${FiezelI18n.t('guru.nama-otomatis')}</p>
         <div id="authModalError" class="auth-error-box" style="display:none"></div>
         <button type="button" id="btnAuthAction" class="primary" style="margin-top:6px">
-          <i data-lucide="award"></i> Aktifkan & Buka Ruang Guru
+          <i data-lucide="award"></i> Aktifkan & Buka KelasKu untuk Guru
         </button>
       </div>`;
     }
@@ -11348,7 +11348,7 @@ function tutorCenterView(){
         <div class="modal-mark">AKSES TERBATAS</div>
         <h2 style="margin:8px 0 12px 0">${FiezelI18n.t('guru.gate-judul')}</h2>
         <p class="muted" style="margin-bottom:20px;line-height:1.5;font-size:0.95rem">
-          Ruang Guru dan Tutor Action Center hanya dapat diakses oleh akun guru yang telah terverifikasi dengan kode undangan resmi dari Owner FIEZEL.
+          KelasKu untuk Guru dan Tutor Action Center hanya dapat diakses oleh akun guru yang telah terverifikasi dengan kode undangan resmi dari Owner FIEZEL.
         </p>
         <button type="button" class="primary" id="btnGateAktivasiGuru" style="width:100%;margin-bottom:8px">
           <i data-lucide="key"></i> Aktivasi Akun Guru dengan Kode
@@ -11363,7 +11363,7 @@ function tutorCenterView(){
     enhanceUI();
     return;
   }
-  // Ruang Guru: cangkang terpisah (features/teacher). Tutor Action Center lama tetap jadi cadangan bila modul gagal dimuat.
+  // KelasKu untuk Guru: cangkang terpisah (features/teacher). Tutor Action Center lama tetap jadi cadangan bila modul gagal dimuat.
   const shell=self.FiezelTeacherShell;
   if(shell&&self.FiezelTeacherStore){
     setApp('<div id="fzTeacherShell" class="teacher-shell-root"></div>');
@@ -11383,7 +11383,7 @@ function learnerFlowHomeMarkup(){
   const isGuru=isVerifiedTeacher();
   const inviteCard=invite?`<button class="launch-card duel-invite-card" onclick="go('learn')" data-testid="home-duel-invite"><span class="launch-icon"><i class="fz-i" data-fz-icon="speaking" aria-hidden="true"></i></span><span><small>${esc(FiezelI18n.t('student.duel-invite-sub',{from:invite.from||FiezelI18n.t('student.duel-invite-anon'),score:Number(invite.score)||0}))}</small><b>${FiezelI18n.t('student.duel-invite-title')}</b></span><i data-lucide="arrow-up-right"></i></button>`:'';
   const learnCard=`<button class="launch-card learn-launch" onclick="go('learn')" data-testid="home-learn-flow"><span class="launch-icon"><i class="fz-i" data-fz-icon="grammar" aria-hidden="true"></i></span><span><small>${esc(sub)}</small><b>${FiezelI18n.t('student.flow-title')}</b></span><i data-lucide="arrow-up-right"></i></button>`;
-  const tutorCard=`<button class="launch-card tutor-launch" onclick="go('tutor')" data-testid="home-tutor-center"><span class="launch-icon"><i class="fz-i" data-fz-icon="map" aria-hidden="true"></i></span><span><small>${esc(FiezelI18n.t('student.tutor-sub'))}</small><b>${FiezelI18n.t('student.tutor-title')}</b></span><i data-lucide="arrow-up-right"></i></button>`;
+  const tutorCard=`<button class="launch-card tutor-launch" onclick="go('tutor')" data-testid="home-tutor-center"><span class="launch-icon"><i class="fz-i" data-fz-icon="map" aria-hidden="true"></i></span><span><small>${esc(FiezelI18n.t('student.tutor-sub'))}</small><b class="kelasku-brand"><span class="kelasku-main">KelasKu</span> <span class="kelasku-tag">untuk Guru</span></b></span><i data-lucide="arrow-up-right"></i></button>`;
   /* m025-277: pintu Home ke PAW ARENA (ruang permainan). Naskah pakai domain pawarena
      (dwibahasa). Untuk murid, bukan guru. */
   const arenaCard=`<button class="launch-card arena-launch" onclick="go('arena')" data-testid="home-paw-arena"><span class="launch-icon"><i class="fz-i" data-fz-icon="speaking" aria-hidden="true"></i></span><span><small>${esc(FiezelI18n.t('pawarena.subtitle'))}</small><b>${FiezelI18n.t('pawarena.title')}</b></span><i data-lucide="arrow-up-right"></i></button>`;

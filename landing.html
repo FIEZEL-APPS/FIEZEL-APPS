@@ -17,24 +17,6 @@
   <meta property="og:description" content="Platform belajar bahasa cerdas untuk murid &amp; guru. Bahasa Inggris &amp; Jepang, adaptif, dengan AI tutor.">
   <meta property="og:image" content="assets/shots/teacher-desktop.png">
 
-  
-  <link rel="icon" href="assets/brand/fiezel-icon.svg" type="image/svg+xml">
-  <link rel="icon" href="assets/brand/fiezel-icon-192.png" type="image/png">
-  <link rel="apple-touch-icon" href="assets/brand/fiezel-icon-192.png">
-  <link rel="alternate" hreflang="id" href="https://fiezel.my.id/">
-  <link rel="alternate" hreflang="th" href="https://fiezel.my.id/th/">
-  <link rel="alternate" hreflang="x-default" href="https://fiezel.my.id/">
-  <meta property="og:type" content="website">
-  <meta property="og:locale" content="id_ID">
-  <meta property="og:site_name" content="FIEZEL">
-  <meta property="og:title" content="FIEZEL — Platform Belajar Bahasa Cerdas untuk Murid & Guru">
-  <meta property="og:description" content="Platform belajar adaptif untuk murid (Bahasa Inggris & Jepang) dan KelasKu untuk Guru (manajemen kelas & analitik cerdas). Gratis.">
-  <meta property="og:image" content="https://fiezel.my.id/assets/shots/landing-hero-review.png">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="FIEZEL — Platform Belajar Bahasa Cerdas untuk Murid & Guru">
-  <meta name="twitter:description" content="Platform belajar adaptif untuk murid (Bahasa Inggris & Jepang) dan KelasKu untuk Guru (manajemen kelas & analitik cerdas). Gratis.">
-  <meta name="twitter:image" content="https://fiezel.my.id/assets/shots/landing-hero-review.png">
-
   <!-- Preload fonts & assets -->
   <link rel="preload" href="assets/fonts/PlusJakartaSans-700.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/PlusJakartaSans-400.woff2" as="font" type="font/woff2" crossorigin>
@@ -108,31 +90,6 @@
       overflow-x: hidden;
     }
     ::selection { background: var(--sun); color: var(--text); }
-
-    
-    /* Credit strip */
-    .credit-strip {
-      background: var(--cream-warm);
-      color: var(--maroon);
-      border-bottom: 1px solid var(--gold-line-soft);
-      padding: 4px 16px;
-      margin: -12px -28px 10px -28px;
-    }
-    .credit-in {
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      min-height: 26px; font-size: 0.72rem; letter-spacing: .12em; text-transform: uppercase;
-      flex-wrap: nowrap; white-space: nowrap;
-    }
-    .credit-ig {
-      display: inline-flex; align-items: center; gap: 6px; padding: 2px 8px; border-radius: var(--radius-pill);
-      color: var(--maroon); text-decoration: none; font-weight: 700; transition: transform .18s ease;
-    }
-    .credit-ig:hover { transform: scale(1.05); }
-    .credit-ig svg { width: 14px; height: 14px; flex-shrink: 0; }
-    .credit-ig strong { color: var(--maroon-deep); }
-    @media (max-width: 720px) {
-      .credit-strip { margin: -12px -16px 8px -16px; }
-    }
 
     /* =====================================================================
        TOPBAR NAVIGATION
@@ -680,23 +637,6 @@
       }
     }
   </style>
-
-  <!-- GEO locale detector -->
-  <script>(function(){try{
-    var KEY='fiezel-site-locale',saved=null;
-    try{saved=localStorage.getItem(KEY)}catch(_){}
-    if(saved==='id')return;
-    if(saved==='th'){location.replace('th/');return;}
-    if(typeof fetch!=='function')return;
-    var ctrl=('AbortController' in window)?new AbortController():null;
-    var timer=setTimeout(function(){try{ctrl&&ctrl.abort()}catch(_){}}, 2000);
-    fetch('https://ipwho.is/?fields=success,country_code', ctrl?{signal:ctrl.signal}:{})
-      .then(function(r){return (r&&r.ok)?r.json():null})
-      .then(function(d){clearTimeout(timer);
-        if(d&&d.success!==false&&d.country_code==='TH'){try{localStorage.setItem(KEY,'th')}catch(_){}location.replace('th/');}
-      })
-      .catch(function(){try{clearTimeout(timer)}catch(_){}});
-  }catch(_){}})();</script>
 </head>
 <body>
 
@@ -704,17 +644,8 @@
        TOPBAR
        =================================================================== -->
   <header class="topbar">
-    <div class="credit-strip">
-      <div class="wrap credit-in">
-        <span>Create by</span>
-        <a class="credit-ig" href="https://instagram.com/fitrarustqi" target="_blank" rel="noopener" aria-label="Instagram @fitrarustqi">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.2" fill="currentColor" stroke="none"/></svg>
-          <strong>@fitrarustqi</strong>
-        </a>
-      </div>
-    </div>
     <div class="topbar-in">
-      <a class="brand" href="./" aria-label="FIEZEL">
+      <a class="brand" href="./index.html" aria-label="FIEZEL">
         <!-- Official maroon paw logo -->
         <svg class="brand-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
           <g fill="currentColor">
@@ -733,14 +664,13 @@
       </a>
 
       <nav class="topnav">
-        <a class="nav-link" href="app/#home" data-i18n="nav.students">Untuk Murid</a>
-        <a class="nav-link is-teacher" href="app/?teacher=preview" data-i18n="nav.teachers"><span class="kelasku-brand"><span class="kelasku-main" style="color:var(--tg-sage)">KelasKu</span> <span class="kelasku-tag" style="color:var(--muted)">untuk Guru</span></span></a>
-        <a class="nav-link" href="install/">Cara Install</a>
+        <a class="nav-link" href="./index.html#home" data-i18n="nav.students">Untuk Murid</a>
+        <a class="nav-link is-teacher" href="./index.html?teacher=preview" data-i18n="nav.teachers"><span class="kelasku-brand"><span class="kelasku-main" style="color:var(--tg-sage)">KelasKu</span> <span class="kelasku-tag" style="color:var(--muted)">untuk Guru</span></span></a>
         <div class="lang-switcher" role="group" aria-label="Bahasa">
           <button type="button" class="lang-btn active" data-lang="id" onclick="setLang('id')">ID</button>
           <button type="button" class="lang-btn" data-lang="th" onclick="setLang('th')">TH</button>
         </div>
-        <a class="btn btn-primary" href="app/" data-i18n="nav.start">Mulai Belajar</a>
+        <a class="btn btn-primary" href="./index.html" data-i18n="nav.start">Mulai Belajar</a>
       </nav>
     </div>
   </header>
@@ -761,8 +691,8 @@
         FIEZEL menyesuaikan diri dengan polamu. Bahasa Inggris &amp; Jepang adaptif untuk murid, serta KelasKu untuk Guru terpadu untuk pendidik.
       </p>
       <div class="hero-cta-row">
-        <a class="btn btn-primary" href="app/" data-i18n="hero.cta-student">Mulai Belajar Gratis</a>
-        <a class="btn btn-teacher" href="app/?teacher=preview" data-i18n="hero.cta-teacher">Buka <span class="kelasku-brand"><span class="kelasku-main">KelasKu</span> <span class="kelasku-tag">untuk Guru</span></span> →</a>
+        <a class="btn btn-primary" href="./index.html" data-i18n="hero.cta-student">Mulai Belajar Gratis</a>
+        <a class="btn btn-teacher" href="./index.html?teacher=preview" data-i18n="hero.cta-teacher">Buka <span class="kelasku-brand"><span class="kelasku-main">KelasKu</span> <span class="kelasku-tag">untuk Guru</span></span> →</a>
       </div>
       <div class="hero-badges">
         <span class="lang-badge"><span>🇬🇧</span> <b>English</b> <small>(A1–C1 Adaptif)</small></span>
@@ -1007,14 +937,14 @@
     <p class="sec-kicker" data-i18n="lang.kicker">Dua Bahasa. Satu Platform Cerdas.</p>
     <h2 class="sec-title" data-i18n="lang.title">Bahasa Inggris &amp; Jepang dalam Satu Ekosistem</h2>
     <div class="lang-cards">
-      <a class="lang-card" href="app/">
+      <a class="lang-card" href="./index.html">
         <span class="lang-flag">🇬🇧</span>
         <div>
           <b data-i18n="lang.en-title">Bahasa Inggris</b>
           <small data-i18n="lang.en-desc">A1–C1 · 180 Pelajaran · Grammar &amp; Vocab Adaptif</small>
         </div>
       </a>
-      <a class="lang-card" href="app/">
+      <a class="lang-card" href="./index.html">
         <span class="lang-flag">🇯🇵</span>
         <div>
           <b data-i18n="lang.jp-title">Bahasa Jepang</b>
@@ -1136,7 +1066,7 @@
           </div>
 
           <div style="margin-top:10px">
-            <a class="btn btn-teacher" href="app/?teacher=preview" data-i18n="teach.cta">Buka Demo <span class="kelasku-brand"><span class="kelasku-main">KelasKu</span> <span class="kelasku-tag">untuk Guru</span></span> →</a>
+            <a class="btn btn-teacher" href="./index.html?teacher=preview" data-i18n="teach.cta">Buka Demo <span class="kelasku-brand"><span class="kelasku-main">KelasKu</span> <span class="kelasku-tag">untuk Guru</span></span> →</a>
           </div>
         </div>
       </div>
@@ -1179,8 +1109,8 @@
       <h2 class="sec-title" data-i18n="final.title">Siap untuk Pengalaman Belajar yang Berbeda?</h2>
       <p class="sec-lead" data-i18n="final.lead">Gratis untuk murid, praktis dan menyeluruh untuk pendidik. Bahasa Inggris dan Jepang dalam genggamanmu.</p>
       <div class="hero-cta-row">
-        <a class="btn btn-primary" href="app/" data-i18n="final.cta-student">Mulai Belajar Sekarang</a>
-        <a class="btn btn-teacher" href="app/?teacher=preview" data-i18n="final.cta-teacher">Buka <span class="kelasku-brand"><span class="kelasku-main">KelasKu</span> <span class="kelasku-tag">untuk Guru</span></span></a>
+        <a class="btn btn-primary" href="./index.html" data-i18n="final.cta-student">Mulai Belajar Sekarang</a>
+        <a class="btn btn-teacher" href="./index.html?teacher=preview" data-i18n="final.cta-teacher">Buka <span class="kelasku-brand"><span class="kelasku-main">KelasKu</span> <span class="kelasku-tag">untuk Guru</span></span></a>
       </div>
     </div>
   </section>
@@ -1192,11 +1122,9 @@
     <div class="footer-in">
       <div class="footer-brand">FIE<span>ZEL</span> · Learning That Learns You.</div>
       <div class="footer-links">
-        <a class="footer-link" href="app/" data-i18n="footer.app">Buka Aplikasi Murid</a>
-        <a class="footer-link" href="app/?teacher=preview" data-i18n="footer.teacher">KelasKu untuk Guru</a>
-        <a class="footer-link" href="install/" data-i18n="footer.install">Panduan Pasang</a>
-        <a class="footer-link" href="privacy/">Privasi</a>
-        <a class="footer-link" href="terms/">Syarat</a>
+        <a class="footer-link" href="./index.html" data-i18n="footer.app">Buka Aplikasi Murid</a>
+        <a class="footer-link" href="./index.html?teacher=preview" data-i18n="footer.teacher">KelasKu untuk Guru</a>
+        <a class="footer-link" href="./index.html#home" data-i18n="footer.install">Panduan Pasang</a>
       </div>
       <div class="footer-copy">© 2026 FIEZEL. Semua hak cipta dilindungi.</div>
     </div>

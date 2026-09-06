@@ -266,8 +266,8 @@
     'student.duel-invite-title': 'Terima Duel Belajar',
     'student.duel-invite-sub': '{from} menantangmu · {score} poin',
     'student.duel-invite-anon': 'Teman',
-    'student.tutor-heading': 'Ruang guru',
-    'student.tutor-title': 'Ruang Guru',
+    'student.tutor-heading': 'KelasKu untuk Guru',
+    'student.tutor-title': 'KelasKu untuk Guru',
     'student.tutor-sub': 'Peranmu: Guru · briefing, deteksi dini, tugas, laporan ortu',
     // ── Online & Teman (FIEZEL 2.0) ──
     'social2.panel-title': 'Online & Teman',

@@ -1,4 +1,4 @@
-/* FIEZEL Ruang Guru — tema terpisah dari cangkang murid (cream/pastel/maskot).
+/* FIEZEL KelasKu untuk Guru — tema terpisah dari cangkang murid (cream/pastel/maskot).
    Guru: ruang kerja tenang. Tinta hijau-gelap, kertas hangat, aksen sage & amber. Tipografi
    Fraunces (judul) + IBM Plex Sans (teks) + IBM Plex Mono (kode). */
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap');
@@ -29,6 +29,13 @@ body.fz-teacher-mode #app{font-family:var(--tg-body)}
 .tg-brand{display:flex;align-items:center;gap:12px}
 .tg-brand-mark{width:40px;height:40px;border-radius:12px;background:linear-gradient(145deg,#2C9C80,#166052);display:grid;place-items:center;font-family:var(--tg-display);font-weight:700;font-size:1.3rem;color:#fff}
 .tg-brand b{display:block;font-family:var(--tg-display);font-size:1.15rem;letter-spacing:.02em}.tg-brand small{color:var(--tg-mist);font-size:.75rem;text-transform:uppercase;letter-spacing:.14em}
+
+/* Reusable Wordmark: KelasKu untuk Guru */
+.kelasku-brand{display:inline-flex;align-items:baseline;gap:8px;white-space:nowrap;line-height:1}
+.kelasku-main{font-family:var(--tg-display,'Plus Jakarta Sans',sans-serif);font-weight:700;font-size:1.18rem;color:#0F224A;letter-spacing:-0.02em}
+.kelasku-tag{font-family:var(--tg-body,'Plus Jakarta Sans',sans-serif);font-size:0.52rem;font-weight:500;color:#5B6B82;letter-spacing:0.02em;text-transform:none}
+.tg-side .kelasku-brand .kelasku-main{color:#FFFFFF}
+.tg-side .kelasku-brand .kelasku-tag{color:#9DB0CC}
 .tg-teacher{display:flex;align-items:center;gap:10px;background:var(--tg-ink-2);border:1px solid var(--tg-ink-3);border-radius:var(--tg-r);padding:10px 12px;color:inherit;text-align:left;cursor:pointer;transition:background-color .2s,transform .2s;font:inherit}
 .tg-teacher:hover{background:var(--tg-ink-3);transform:translateY(-1px)}
 .tg-teacher svg{width:20px;height:20px;color:var(--tg-mist);flex:none}.tg-teacher b{display:block;font-size:.92rem}.tg-teacher small{color:var(--tg-mist);font-size:.75rem}
@@ -252,7 +259,7 @@ body.reduce-motion .tg-rise,body.reduce-motion .tg-drawer,body.reduce-motion .tg
   .tg-row{flex-wrap:wrap}.tg-row-actions{flex-direction:row;width:100%;justify-content:flex-start;padding-left:48px}
 }
 
-/* Penawar dekorasi `html.fiezel-ui-v6 body button:not(...)` (style.css:2464, dipasang tutor-v3 saat idle) yang menimpa tombol Ruang Guru. Specificity disamakan lalu dinaikkan lewat body.fz-teacher-mode .tg. */
+/* Penawar dekorasi `html.fiezel-ui-v6 body button:not(...)` (style.css:2464, dipasang tutor-v3 saat idle) yang menimpa tombol KelasKu untuk Guru. Specificity disamakan lalu dinaikkan lewat body.fz-teacher-mode .tg. */
 html.fiezel-ui-v6 body.fz-teacher-mode .tg button:not(.primary):not(.nav):not(.icon-button):not(.text-button):not(.coach-link):not(.fz-coach-bubble):not(.launch-card):not(.skill-card):not(.option):not(.skill-help-dot):not(.olm-dispute){border:0;border-radius:12px;box-shadow:none;transition:background-color .18s,color .18s,transform .18s,border-color .18s,box-shadow .18s}
 html.fiezel-ui-v6 body.fz-teacher-mode .tg button:not(.primary):not(.nav):not(.icon-button):not(.text-button):not(.coach-link):not(.fz-coach-bubble):not(.launch-card):not(.skill-card):not(.option):not(.skill-help-dot):not(.olm-dispute):active{transform:none;box-shadow:none}
 html.fiezel-ui-v6 body.fz-teacher-mode .tg button:not(.primary):not(.nav):not(.icon-button):not(.text-button):not(.coach-link):not(.fz-coach-bubble):not(.launch-card):not(.skill-card):not(.option):not(.skill-help-dot):not(.olm-dispute):hover{box-shadow:none}
