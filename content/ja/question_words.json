@@ -1,0 +1,1236 @@
+{
+ "schema": "fiezel-japanese-bank-v1",
+ "target": "ja",
+ "cefr": "A1",
+ "jlpt": "N5",
+ "family": "question_words",
+ "catatan": "Bank soal A1/N5 keluarga question_words. Dijaga tests/japanese-content-test.js.",
+ "provenans": {
+  "sumberSilabus": "Minna no Nihongo dan Irodori dipakai SEBAGAI SILABUS SAJA: poin tata bahasa apa, urutannya bagaimana, di tingkat berapa. NOL kalimat, dialog, teks, atau daftar kosakata yang direproduksi atau diturunkan — setiap stem, pilihan, pengecoh, dan penjelasan ditulis baru.",
+  "akibatLisensi": "Karena tidak ada teks Irodori yang dipakai, FIEZEL TIDAK terikat kewajiban gratis-selamanya dari lisensinya.",
+  "statusNaskah": "Kalimat Jepang dan penjelasan Inggris/Indonesia berstatus DRAFT AI dan wajib direview penutur asli sebelum dipakai menilai murid."
+ },
+ "jumlah": 20,
+ "templates": [
+  {
+   "id": "JP-QW-101",
+   "family": "question_words",
+   "skill": "question_words",
+   "subskill": "nan_before_desu",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "nan-reading-before-desu",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Read the what-word as NAN when DESU follows it",
+   "pedagogicalObjectiveId": "Membaca kata tanya 'apa' sebagai なん ketika diikuti です",
+   "misconceptionTargeted": "Learner assumes the what-word is always read NANI and never switches to NAN",
+   "misconceptionTargetedId": "Murid mengira kata tanya 'apa' selalu dibaca なに dan tidak pernah berubah jadi なん",
+   "reasoningOperation": "look at the sound right after the gap -> DESU triggers the NAN reading",
+   "reasoningOperationId": "lihat bunyi tepat setelah rumpang -> です memicu bacaan なん",
+   "stem": "「その あかい ものは___ですか。」「りんごです。」",
+   "stemKana": "「その あかい ものは___ですか。」「りんごです。」",
+   "furigana": [],
+   "options": [
+    "なん",
+    "なに",
+    "だれ",
+    "どこ"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "なに",
+     "misconception": "NANI reading kept in front of DESU",
+     "misconceptionId": "bacaan なに dipertahankan di depan です",
+     "whyFails": "Directly before DESU the word fuses to NAN. NANI DESU KA is not said.",
+     "whyFailsId": "Tepat sebelum です kata itu melebur jadi なん. なにですか tidak dipakai."
+    },
+    {
+     "option": "だれ",
+     "misconception": "person-word used for a thing",
+     "misconceptionId": "kata tanya orang dipakai untuk benda",
+     "whyFails": "DARE asks for a person, but the reply names a fruit, not somebody.",
+     "whyFailsId": "だれ menanyakan orang, padahal jawabannya menyebut buah, bukan orang."
+    },
+    {
+     "option": "どこ",
+     "misconception": "place-word used for identity",
+     "misconceptionId": "kata tanya tempat dipakai untuk identitas",
+     "whyFails": "DOKO asks where something is; the reply gives what the object is.",
+     "whyFailsId": "どこ menanyakan letak; jawabannya justru menyebut benda apa itu."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "The reply identifies the object, so the gap is the what-word, and before DESU it is read NAN.",
+    "whyCorrectId": "Jawabannya menyebut bendanya, jadi rumpangnya kata tanya 'apa', dan sebelum です dibaca なん.",
+    "rule": "The what-word is NAN before DESU, DE and NO, and before counters; NANI elsewhere.",
+    "ruleId": "Kata tanya 'apa' dibaca なん sebelum です, で, の, dan sebelum kata bantu bilangan; selain itu なに.",
+    "whyOthersFail": "NANI has the wrong reading here; DARE asks for a person; DOKO asks for a place.",
+    "whyOthersFailId": "なに salah bacaan di sini; だれ menanyakan orang; どこ menanyakan tempat.",
+    "howToAvoid": "Before choosing, say the sentence out loud: if DESU comes next, the mouth wants NAN.",
+    "howToAvoidId": "Sebelum memilih, ucapkan kalimatnya: kalau setelahnya です, mulut menuntut なん.",
+    "memoryCue": "DESU pulls the I off NANI.",
+    "memoryCueId": "です mencabut 'i' dari なに."
+   }
+  },
+  {
+   "id": "JP-QW-102",
+   "family": "question_words",
+   "skill": "question_words",
+   "subskill": "nan_plus_people_counter",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "nannin-counter-for-people",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Ask how many people with NAN plus the people counter",
+   "pedagogicalObjectiveId": "Menanyakan jumlah orang dengan なん ditambah kata bantu bilangan orang",
+   "misconceptionTargeted": "Learner keeps the NANI reading in front of a counter, or picks a counter that does not fit people",
+   "misconceptionTargetedId": "Murid mempertahankan bacaan なに di depan kata bantu bilangan, atau memilih kata bantu yang tidak untuk orang",
+   "reasoningOperation": "read the reply as a number of people -> pick NAN plus the counter for people",
+   "reasoningOperationId": "baca jawabannya sebagai jumlah orang -> pilih なん plus kata bantu bilangan orang",
+   "stem": "「きょうしつに がくせいが___いますか。」「ごにん います。」",
+   "stemKana": "「きょうしつに がくせいが___いますか。」「ごにん います。」",
+   "furigana": [],
+   "options": [
+    "なんにん",
+    "なににん",
+    "なんこ",
+    "だれ"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "なににん",
+     "misconception": "NANI reading kept in front of a counter",
+     "misconceptionId": "bacaan なに dipertahankan di depan kata bantu bilangan",
+     "whyFails": "A counter attaches to NAN, never to NANI.",
+     "whyFailsId": "Kata bantu bilangan menempel pada なん, tidak pernah pada なに."
+    },
+    {
+     "option": "なんこ",
+     "misconception": "object counter applied to people",
+     "misconceptionId": "kata bantu bilangan benda dipakai untuk orang",
+     "whyFails": "KO counts small objects. The reply counts students with NIN, the people counter.",
+     "whyFailsId": "こ menghitung benda kecil. Jawabannya menghitung murid dengan にん, kata bantu untuk orang."
+    },
+    {
+     "option": "だれ",
+     "misconception": "identity asked where a quantity is asked",
+     "misconceptionId": "identitas ditanyakan padahal yang diminta jumlah",
+     "whyFails": "DARE asks which person; the reply gives a number, not a name.",
+     "whyFailsId": "だれ menanyakan orang yang mana; jawabannya berupa angka, bukan nama."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "GONIN is a headcount, so the question must ask how many people: NAN plus NIN.",
+    "whyCorrectId": "ごにん adalah jumlah orang, jadi pertanyaannya harus 'berapa orang': なん plus にん.",
+    "rule": "To ask a quantity, put NAN in front of the counter that matches the thing being counted.",
+    "ruleId": "Untuk menanyakan jumlah, letakkan なん di depan kata bantu bilangan yang cocok dengan benda yang dihitung.",
+    "whyOthersFail": "NANI cannot carry a counter; KO is for objects; DARE asks who, not how many.",
+    "whyOthersFailId": "なに tidak bisa membawa kata bantu bilangan; こ untuk benda; だれ menanyakan siapa, bukan berapa.",
+    "howToAvoid": "Find the counter inside the answer and reuse it after NAN.",
+    "howToAvoidId": "Temukan kata bantu bilangan di dalam jawaban, lalu pakai ulang setelah なん.",
+    "memoryCue": "Counter in the answer, same counter after NAN.",
+    "memoryCueId": "Kata bantu di jawaban, kata bantu yang sama setelah なん."
+   }
+  },
+  {
+   "id": "JP-QW-103",
+   "family": "question_words",
+   "skill": "question_words",
+   "subskill": "nan_de_means_of_transport",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "nande-asking-by-what-means",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Ask by what means with NAN plus DE",
+   "pedagogicalObjectiveId": "Menanyakan 'dengan apa' memakai なん plus で",
+   "misconceptionTargeted": "Learner writes NANI before DE, or asks for a place when the answer is a vehicle",
+   "misconceptionTargetedId": "Murid menulis なに sebelum で, atau menanyakan tempat padahal jawabannya kendaraan",
+   "reasoningOperation": "reply names a vehicle -> the gap asks by what means -> NAN before DE",
+   "reasoningOperationId": "jawaban menyebut kendaraan -> rumpangnya menanyakan sarana -> なん sebelum で",
+   "stem": "「___ えきまで いきますか。」「じてんしゃで いきます。」",
+   "stemKana": "「___ えきまで いきますか。」「じてんしゃで いきます。」",
+   "furigana": [],
+   "options": [
+    "なんで",
+    "なにで",
+    "どこで",
+    "だれで"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "なにで",
+     "misconception": "NANI reading kept in front of DE",
+     "misconceptionId": "bacaan なに dipertahankan di depan で",
+     "whyFails": "DE is one of the sounds that pull the word to NAN.",
+     "whyFailsId": "で termasuk bunyi yang menarik kata itu menjadi なん."
+    },
+    {
+     "option": "どこで",
+     "misconception": "place asked where means is asked",
+     "misconceptionId": "tempat ditanyakan padahal yang diminta sarana",
+     "whyFails": "DOKO DE asks at what location the action happens; the reply names a bicycle, not a location.",
+     "whyFailsId": "どこで menanyakan di lokasi mana perbuatannya terjadi; jawabannya menyebut sepeda, bukan lokasi."
+    },
+    {
+     "option": "だれで",
+     "misconception": "person-word forced into the means slot",
+     "misconceptionId": "kata tanya orang dipaksa masuk ke slot sarana",
+     "whyFails": "A person is not a means of transport; going with someone is TO, not DE.",
+     "whyFailsId": "Orang bukan sarana transportasi; pergi bersama seseorang memakai と, bukan で."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "JITENSHA DE answers a means question, and in front of DE the what-word is read NAN.",
+    "whyCorrectId": "じてんしゃで menjawab pertanyaan sarana, dan di depan で kata tanya 'apa' dibaca なん.",
+    "rule": "NAN DE asks by what means; the same DE appears in the answer.",
+    "ruleId": "なんで menanyakan 'dengan apa'; で yang sama muncul di jawabannya.",
+    "whyOthersFail": "NANI DE has the wrong reading; DOKO DE asks a location; DARE DE is not a possible pairing.",
+    "whyOthersFailId": "なにで salah bacaan; どこで menanyakan lokasi; だれで bukan pasangan yang mungkin.",
+    "howToAvoid": "Check which particle the answer carries: if the answer ends in DE with a vehicle, ask NAN DE.",
+    "howToAvoidId": "Periksa partikel di jawaban: kalau jawabannya berakhir で dengan kendaraan, tanyakan なんで.",
+    "memoryCue": "DE after the gap, NAN before it.",
+    "memoryCueId": "で sesudah rumpang, なん sebelumnya."
+   }
+  },
+  {
+   "id": "JP-QW-104",
+   "family": "question_words",
+   "skill": "question_words",
+   "subskill": "nani_before_object_particle",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "nani-before-o-particle",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Keep the NANI reading in front of the object particle O",
+   "pedagogicalObjectiveId": "Mempertahankan bacaan なに di depan partikel objek を",
+   "misconceptionTargeted": "Learner overgeneralises the NAN reading to every position after meeting NAN DESU",
+   "misconceptionTargetedId": "Murid menggeneralisasi bacaan なん ke semua posisi setelah mengenal なんです",
+   "reasoningOperation": "check the particle after the gap -> O does not trigger NAN -> keep NANI",
+   "reasoningOperationId": "periksa partikel setelah rumpang -> を tidak memicu なん -> tetap なに",
+   "stem": "「ひるごはんに___を たべましたか。」「サンドイッチを たべました。」",
+   "stemKana": "「ひるごはんに___を たべましたか。」「サンドイッチを たべました。」",
+   "furigana": [],
+   "options": [
+    "なに",
+    "なん",
+    "どれ",
+    "どこ"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "なん",
+     "misconception": "NAN reading spread to a position that does not take it",
+     "misconceptionId": "bacaan なん diperluas ke posisi yang tidak menerimanya",
+     "whyFails": "NAN appears only before DESU, DE, NO and counters. Before O the reading stays NANI.",
+     "whyFailsId": "なん hanya muncul sebelum です, で, の, dan kata bantu bilangan. Sebelum を bacaannya tetap なに."
+    },
+    {
+     "option": "どれ",
+     "misconception": "which-of-these used with no set of items shown",
+     "misconceptionId": "'yang mana' dipakai padahal tidak ada pilihan yang ditunjukkan",
+     "whyFails": "DORE picks from things already in view; here nothing has been laid out to choose from.",
+     "whyFailsId": "どれ memilih dari benda yang sudah terlihat; di sini tidak ada pilihan yang dipaparkan."
+    },
+    {
+     "option": "どこ",
+     "misconception": "place asked where an eaten item is asked",
+     "misconceptionId": "tempat ditanyakan padahal yang diminta benda yang dimakan",
+     "whyFails": "DOKO asks where; the reply names the food, and O marks a thing, not a place.",
+     "whyFailsId": "どこ menanyakan di mana; jawabannya menyebut makanan, dan を menandai benda, bukan tempat."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "The reply gives the thing eaten, so the gap is the what-word before O, which keeps the NANI reading.",
+    "whyCorrectId": "Jawabannya menyebut yang dimakan, jadi rumpangnya kata tanya 'apa' sebelum を, yang tetap dibaca なに.",
+    "rule": "NANI is the default reading; NAN is the exception before DESU, DE, NO and counters.",
+    "ruleId": "なに adalah bacaan dasar; なん adalah pengecualian sebelum です, で, の, dan kata bantu bilangan.",
+    "whyOthersFail": "NAN is the wrong reading before O; DORE needs visible choices; DOKO asks a place.",
+    "whyOthersFailId": "なん salah bacaan sebelum を; どれ butuh pilihan yang terlihat; どこ menanyakan tempat.",
+    "howToAvoid": "Memorise the short NAN list. If the next sound is not on it, say NANI.",
+    "howToAvoidId": "Hafalkan daftar pendek pemicu なん. Kalau bunyi berikutnya tidak ada di daftar, ucapkan なに.",
+    "memoryCue": "Short list for NAN, everything else NANI.",
+    "memoryCueId": "Daftar pendek untuk なん, sisanya なに."
+   }
+  },
+  {
+   "id": "JP-QW-105",
+   "family": "question_words",
+   "skill": "question_words",
+   "subskill": "nan_no_asking_what_kind",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "nanno-what-kind-of-noun",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Ask what kind of thing with NAN plus NO in front of a noun",
+   "pedagogicalObjectiveId": "Menanyakan 'jenis apa' dengan なん plus の di depan kata benda",
+   "misconceptionTargeted": "Learner confuses the topic question NAN NO with the owner question DARE NO or the origin question DOKO NO",
+   "misconceptionTargetedId": "Murid mencampur pertanyaan isi なんの dengan pertanyaan pemilik だれの atau pertanyaan asal どこの",
+   "reasoningOperation": "the reply names the subject matter of the magazine -> ask NAN NO",
+   "reasoningOperationId": "jawaban menyebut isi majalahnya -> tanyakan なんの",
+   "stem": "「これは___ ざっしですか。」「りょうりの ざっしです。」",
+   "stemKana": "「これは___ ざっしですか。」「りょうりの ざっしです。」",
+   "furigana": [],
+   "options": [
+    "なんの",
+    "なにの",
+    "どこの",
+    "だれの"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "なにの",
+     "misconception": "NANI reading kept in front of NO",
+     "misconceptionId": "bacaan なに dipertahankan di depan の",
+     "whyFails": "NO is one of the three sounds after which the word is read NAN.",
+     "whyFailsId": "の adalah salah satu dari tiga bunyi yang membuat kata itu dibaca なん."
+    },
+    {
+     "option": "どこの",
+     "misconception": "origin asked where subject matter is asked",
+     "misconceptionId": "asal ditanyakan padahal yang diminta isi",
+     "whyFails": "DOKO NO asks which place it comes from; the reply names cooking, a topic, not a country or shop.",
+     "whyFailsId": "どこの menanyakan berasal dari mana; jawabannya menyebut masakan, sebuah topik, bukan negara atau toko."
+    },
+    {
+     "option": "だれの",
+     "misconception": "owner asked where subject matter is asked",
+     "misconceptionId": "pemilik ditanyakan padahal yang diminta isi",
+     "whyFails": "DARE NO asks whose it is; the reply gives no owner at all.",
+     "whyFailsId": "だれの menanyakan milik siapa; jawabannya sama sekali tidak menyebut pemilik."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "RYOURI NO ZASSHI states what the magazine is about, which is what NAN NO asks.",
+    "whyCorrectId": "りょうりのざっし menyatakan majalah itu tentang apa, dan itulah yang ditanyakan なんの.",
+    "rule": "NAN NO plus noun asks what kind of that noun it is.",
+    "ruleId": "なんの plus kata benda menanyakan kata benda itu jenis apa.",
+    "whyOthersFail": "NANI NO is the wrong reading; DOKO NO asks origin; DARE NO asks ownership.",
+    "whyOthersFailId": "なにの salah bacaan; どこの menanyakan asal; だれの menanyakan kepemilikan.",
+    "howToAvoid": "Look at what sits before NO in the answer: a topic wants NAN NO, a person wants DARE NO, a place wants DOKO NO.",
+    "howToAvoidId": "Lihat apa yang ada sebelum の di jawaban: topik menuntut なんの, orang menuntut だれの, tempat menuntut どこの.",
+    "memoryCue": "Whatever sits before NO in the answer decides the question word.",
+    "memoryCueId": "Apa pun yang ada sebelum の di jawaban menentukan kata tanyanya."
+   }
+  },
+  {
+   "id": "JP-QW-106",
+   "family": "question_words",
+   "skill": "question_words",
+   "subskill": "dare_ga_as_subject",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "dare-ga-never-dare-wa",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Attach GA, never WA, to a question word that is the subject",
+   "pedagogicalObjectiveId": "Menempelkan が, bukan は, pada kata tanya yang berperan sebagai subjek",
+   "misconceptionTargeted": "Learner treats WA as the all-purpose subject marker and writes DARE WA",
+   "misconceptionTargetedId": "Murid menganggap は penanda subjek serba guna lalu menulis だれは",
+   "reasoningOperation": "the gap is the subject and it is a question word -> only GA is possible",
+   "reasoningOperationId": "rumpangnya subjek dan berupa kata tanya -> hanya が yang mungkin",
+   "stem": "「___ まどを あけましたか。」「やまださんが あけました。」",
+   "stemKana": "「___ まどを あけましたか。」「やまださんが あけました。」",
+   "furigana": [],
+   "options": [
+    "だれが",
+    "だれは",
+    "だれを",
+    "だれの"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "だれは",
+     "misconception": "topic marker attached to a question word",
+     "misconceptionId": "penanda topik ditempelkan pada kata tanya",
+     "whyFails": "WA presents known information, but a question word is by definition unknown, so DARE WA is impossible.",
+     "whyFailsId": "は menyajikan informasi yang sudah diketahui, padahal kata tanya justru belum diketahui, jadi だれは mustahil."
+    },
+    {
+     "option": "だれを",
+     "misconception": "object marker attached to the doer",
+     "misconceptionId": "penanda objek ditempelkan pada pelaku",
+     "whyFails": "The window is already the object with O. The gap is the person doing the opening.",
+     "whyFailsId": "Jendelanya sudah menjadi objek dengan を. Rumpangnya adalah orang yang membuka."
+    },
+    {
+     "option": "だれの",
+     "misconception": "possessive used with no following noun",
+     "misconceptionId": "bentuk milik dipakai tanpa kata benda sesudahnya",
+     "whyFails": "DARE NO must be followed by a noun it modifies; here a verb follows.",
+     "whyFailsId": "だれの harus diikuti kata benda yang diterangkannya; di sini yang menyusul adalah kata kerja."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "The answer YAMADA-SAN GA copies the particle the question needs: a question-word subject takes GA.",
+    "whyCorrectId": "Jawaban やまださんが menyalin partikel yang dituntut pertanyaannya: subjek berupa kata tanya memakai が.",
+    "rule": "Question words as subjects always take GA, and the answer echoes that GA.",
+    "ruleId": "Kata tanya sebagai subjek selalu memakai が, dan jawabannya menggemakan が itu.",
+    "whyOthersFail": "WA clashes with unknown information; O marks the window, not the doer; NO needs a noun after it.",
+    "whyOthersFailId": "は bertabrakan dengan informasi yang belum diketahui; を menandai jendelanya, bukan pelakunya; の butuh kata benda sesudahnya.",
+    "howToAvoid": "If you can replace the gap with a name plus GA, the question word also takes GA.",
+    "howToAvoidId": "Kalau rumpangnya bisa diganti nama plus が, kata tanyanya juga memakai が.",
+    "memoryCue": "Question words never wear WA.",
+    "memoryCueId": "Kata tanya tidak pernah memakai は."
+   }
+  },
+  {
+   "id": "JP-QW-107",
+   "family": "question_words",
+   "skill": "question_words",
+   "subskill": "donata_polite_who",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "donata-polite-asking-who",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Use DONATA to ask who a person is in a polite register",
+   "pedagogicalObjectiveId": "Memakai どなた untuk menanyakan seseorang dalam ragam sopan",
+   "misconceptionTargeted": "Learner reaches for a thing-word or place-word when the reply names a person's position",
+   "misconceptionTargetedId": "Murid meraih kata tanya benda atau tempat padahal jawabannya menyebut jabatan seseorang",
+   "reasoningOperation": "reply names a human role -> the gap asks who -> polite context selects DONATA",
+   "reasoningOperationId": "jawaban menyebut peran manusia -> rumpangnya menanyakan siapa -> konteks sopan memilih どなた",
+   "stem": "「しつれいですが、そちらの かたは___ですか。」「わたしの ぶちょうです。」",
+   "stemKana": "「しつれいですが、そちらの かたは___ですか。」「わたしの ぶちょうです。」",
+   "furigana": [],
+   "options": [
+    "どなた",
+    "どこ",
+    "なん",
+    "いつ"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "どこ",
+     "misconception": "place asked about a human being",
+     "misconceptionId": "tempat ditanyakan tentang seorang manusia",
+     "whyFails": "DOKO asks for a location; the reply gives a person's role, not a location.",
+     "whyFailsId": "どこ menanyakan lokasi; jawabannya menyebut peran seseorang, bukan lokasi."
+    },
+    {
+     "option": "なん",
+     "misconception": "thing-word applied to a person",
+     "misconceptionId": "kata tanya benda dipakai untuk orang",
+     "whyFails": "Asking NAN about KATA treats a human as an object; Japanese uses DARE or DONATA for people.",
+     "whyFailsId": "Menanyakan なん tentang かた memperlakukan manusia sebagai benda; bahasa Jepang memakai だれ atau どなた untuk orang."
+    },
+    {
+     "option": "いつ",
+     "misconception": "time asked where identity is asked",
+     "misconceptionId": "waktu ditanyakan padahal yang diminta identitas",
+     "whyFails": "ITSU asks when; the reply contains no time expression at all.",
+     "whyFailsId": "いつ menanyakan kapan; jawabannya sama sekali tidak memuat keterangan waktu."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "BUCHOU names a person, so the question asks who; with SHITSUREI DESU GA and KATA the polite DONATA fits.",
+    "whyCorrectId": "ぶちょう menyebut seseorang, jadi pertanyaannya 'siapa'; dengan しつれいですが dan かた, bentuk sopan どなた yang cocok.",
+    "rule": "DONATA is the polite counterpart of DARE and is used with respectful words like KATA.",
+    "ruleId": "どなた adalah padanan sopan dari だれ dan dipakai bersama kata hormat seperti かた.",
+    "whyOthersFail": "DOKO asks a place, NAN treats the person as a thing, ITSU asks a time.",
+    "whyOthersFailId": "どこ menanyakan tempat, なん memperlakukan orang sebagai benda, いつ menanyakan waktu.",
+    "howToAvoid": "Notice the politeness signals in the sentence; if they are there, upgrade DARE to DONATA.",
+    "howToAvoidId": "Perhatikan tanda-tanda kesopanan dalam kalimat; kalau ada, naikkan だれ menjadi どなた.",
+    "memoryCue": "Polite person, polite question word.",
+    "memoryCueId": "Orang yang dihormati, kata tanya yang sopan."
+   }
+  },
+  {
+   "id": "JP-QW-108",
+   "family": "question_words",
+   "skill": "question_words",
+   "subskill": "dare_no_asking_owner",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "dareno-asking-the-owner",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Ask whose something is with DARE plus NO before the noun",
+   "pedagogicalObjectiveId": "Menanyakan milik siapa dengan だれ plus の di depan kata bendanya",
+   "misconceptionTargeted": "Learner marks the question word with GA instead of building a noun modifier with NO",
+   "misconceptionTargetedId": "Murid menandai kata tanya dengan が, bukan membentuk penerang kata benda dengan の",
+   "reasoningOperation": "reply gives a person plus NO plus the same noun -> mirror it as DARE NO",
+   "reasoningOperationId": "jawaban memberi orang plus の plus kata benda yang sama -> cerminkan sebagai だれの",
+   "stem": "「これは___ かさですか。」「せんぱいの かさです。」",
+   "stemKana": "「これは___ かさですか。」「せんぱいの かさです。」",
+   "furigana": [],
+   "options": [
+    "だれの",
+    "だれが",
+    "どこの",
+    "なんの"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "だれが",
+     "misconception": "subject marker used where a noun modifier is needed",
+     "misconceptionId": "penanda subjek dipakai di tempat yang menuntut penerang kata benda",
+     "whyFails": "GA marks a subject of a verb, but here the gap sits directly in front of the noun KASA and must modify it.",
+     "whyFailsId": "が menandai subjek kata kerja, padahal rumpang ini persis di depan kata benda かさ dan harus menerangkannya."
+    },
+    {
+     "option": "どこの",
+     "misconception": "origin asked where ownership is asked",
+     "misconceptionId": "asal ditanyakan padahal yang diminta kepemilikan",
+     "whyFails": "DOKO NO asks which country or shop it is from; the reply names a person who owns it.",
+     "whyFailsId": "どこの menanyakan dari negara atau toko mana; jawabannya menyebut orang yang memilikinya."
+    },
+    {
+     "option": "なんの",
+     "misconception": "kind asked where ownership is asked",
+     "misconceptionId": "jenis ditanyakan padahal yang diminta kepemilikan",
+     "whyFails": "NAN NO asks what kind of umbrella; the reply says nothing about kind, only about who owns it.",
+     "whyFailsId": "なんの menanyakan payung jenis apa; jawabannya tidak menyebut jenis, hanya pemiliknya."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "SENPAI NO KASA gives an owner plus NO, so the question is DARE NO plus the same noun.",
+    "whyCorrectId": "せんぱいのかさ memberi pemilik plus の, jadi pertanyaannya だれの plus kata benda yang sama.",
+    "rule": "A question word directly before a noun links to it with NO.",
+    "ruleId": "Kata tanya yang langsung mendahului kata benda dihubungkan dengan の.",
+    "whyOthersFail": "GA cannot modify a following noun; DOKO NO asks origin; NAN NO asks kind.",
+    "whyOthersFailId": "が tidak bisa menerangkan kata benda sesudahnya; どこの menanyakan asal; なんの menanyakan jenis.",
+    "howToAvoid": "Copy the shape of the answer: person plus NO plus noun becomes DARE plus NO plus noun.",
+    "howToAvoidId": "Tiru bentuk jawabannya: orang plus の plus kata benda menjadi だれ plus の plus kata benda.",
+    "memoryCue": "Owner questions carry NO.",
+    "memoryCueId": "Pertanyaan pemilik membawa の."
+   }
+  },
+  {
+   "id": "JP-QW-109",
+   "family": "question_words",
+   "skill": "question_words",
+   "subskill": "doko_asking_location_of_action",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "doko-location-of-the-action",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Ask where an action happened with DOKO plus DE",
+   "pedagogicalObjectiveId": "Menanyakan di mana suatu perbuatan terjadi dengan どこ plus で",
+   "misconceptionTargeted": "Learner picks a time or person word although the reply names a building",
+   "misconceptionTargetedId": "Murid memilih kata tanya waktu atau orang padahal jawabannya menyebut bangunan",
+   "reasoningOperation": "reply names a venue marked with DE -> the gap asks where",
+   "reasoningOperationId": "jawaban menyebut tempat bertanda で -> rumpangnya menanyakan di mana",
+   "stem": "「きのう___で えいがを みましたか。」「えきの ちかくの えいがかんで みました。」",
+   "stemKana": "「きのう___で えいがを みましたか。」「えきの ちかくの えいがかんで みました。」",
+   "furigana": [],
+   "options": [
+    "どこ",
+    "いつ",
+    "だれ",
+    "なに"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "いつ",
+     "misconception": "time asked although the time is already stated",
+     "misconceptionId": "waktu ditanyakan padahal waktunya sudah disebut",
+     "whyFails": "KINOU already fixes the time, and ITSU never takes DE.",
+     "whyFailsId": "きのう sudah menetapkan waktunya, dan いつ tidak pernah memakai で."
+    },
+    {
+     "option": "だれ",
+     "misconception": "person asked where a venue is asked",
+     "misconceptionId": "orang ditanyakan padahal yang diminta tempat",
+     "whyFails": "The reply names a cinema, not a companion or a doer.",
+     "whyFailsId": "Jawabannya menyebut bioskop, bukan teman atau pelaku."
+    },
+    {
+     "option": "なに",
+     "misconception": "thing asked although the thing watched is already stated",
+     "misconceptionId": "benda ditanyakan padahal yang ditonton sudah disebut",
+     "whyFails": "EIGA O is already in the sentence, so the unknown part is the venue, not the thing watched.",
+     "whyFailsId": "えいがを sudah ada dalam kalimat, jadi bagian yang belum diketahui adalah tempatnya, bukan tontonannya."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "The reply ends in EIGAKAN DE, a place plus DE, so the question asks DOKO DE.",
+    "whyCorrectId": "Jawabannya berakhir えいがかんで, tempat plus で, jadi pertanyaannya どこで.",
+    "rule": "DOKO plus DE asks where an action takes place.",
+    "ruleId": "どこ plus で menanyakan di mana perbuatan berlangsung.",
+    "whyOthersFail": "ITSU cannot take DE and the time is given; DARE asks a person; NANI asks a thing already named.",
+    "whyOthersFailId": "いつ tidak bisa memakai で dan waktunya sudah ada; だれ menanyakan orang; なに menanyakan benda yang sudah disebut.",
+    "howToAvoid": "Cross out every piece of information the sentence already gives; the gap asks for what is left.",
+    "howToAvoidId": "Coret setiap keterangan yang sudah ada dalam kalimat; rumpangnya menanyakan sisanya.",
+    "memoryCue": "Place plus DE in the answer, DOKO plus DE in the question.",
+    "memoryCueId": "Tempat plus で di jawaban, どこ plus で di pertanyaan."
+   }
+  },
+  {
+   "id": "JP-QW-110",
+   "family": "question_words",
+   "skill": "question_words",
+   "subskill": "doko_no_asking_origin",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "dokono-country-of-origin",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Ask where a product is from with DOKO plus NO before the noun",
+   "pedagogicalObjectiveId": "Menanyakan asal suatu barang dengan どこ plus の di depan kata bendanya",
+   "misconceptionTargeted": "Learner marks the place word with GA instead of linking it to the noun with NO",
+   "misconceptionTargetedId": "Murid menandai kata tempat dengan が, bukan menghubungkannya ke kata benda dengan の",
+   "reasoningOperation": "reply gives a country plus NO plus the noun -> mirror it as DOKO NO",
+   "reasoningOperationId": "jawaban memberi negara plus の plus kata benda -> cerminkan sebagai どこの",
+   "stem": "「その くるまは___ くるまですか。」「ドイツの くるまです。」",
+   "stemKana": "「その くるまは___ くるまですか。」「ドイツの くるまです。」",
+   "furigana": [],
+   "options": [
+    "どこの",
+    "どこが",
+    "だれの",
+    "なんの"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "どこが",
+     "misconception": "subject marker used where a noun modifier is needed",
+     "misconceptionId": "penanda subjek dipakai di tempat yang menuntut penerang kata benda",
+     "whyFails": "The gap stands in front of KURUMA and must modify it, and only NO can do that.",
+     "whyFailsId": "Rumpangnya berdiri di depan くるま dan harus menerangkannya, dan hanya の yang bisa."
+    },
+    {
+     "option": "だれの",
+     "misconception": "owner asked where origin is asked",
+     "misconceptionId": "pemilik ditanyakan padahal yang diminta asal",
+     "whyFails": "The reply names a country, and a country cannot be the owner of the car.",
+     "whyFailsId": "Jawabannya menyebut negara, dan negara tidak mungkin jadi pemilik mobil itu."
+    },
+    {
+     "option": "なんの",
+     "misconception": "kind asked where origin is asked",
+     "misconceptionId": "jenis ditanyakan padahal yang diminta asal",
+     "whyFails": "NAN NO asks what the car is for or about; DOITSU answers where it was made.",
+     "whyFailsId": "なんの menanyakan mobil itu untuk apa; ドイツ menjawab dibuat di mana."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "DOITSU NO KURUMA states the country of origin, which is exactly what DOKO NO asks for.",
+    "whyCorrectId": "ドイツのくるま menyatakan negara asal, dan itulah yang ditanyakan どこの.",
+    "rule": "DOKO NO plus noun asks which country, company or shop the thing comes from.",
+    "ruleId": "どこの plus kata benda menanyakan barang itu berasal dari negara, perusahaan, atau toko mana.",
+    "whyOthersFail": "GA cannot modify the noun; DARE NO asks an owner; NAN NO asks a kind.",
+    "whyOthersFailId": "が tidak bisa menerangkan kata benda; だれの menanyakan pemilik; なんの menanyakan jenis.",
+    "howToAvoid": "Ask what sort of word sits before NO in the answer: a country means DOKO NO.",
+    "howToAvoidId": "Lihat jenis kata sebelum の di jawaban: negara berarti どこの.",
+    "memoryCue": "Made where? DOKO NO.",
+    "memoryCueId": "Buatan mana? どこの."
+   }
+  },
+  {
+   "id": "JP-QW-201",
+   "family": "question_words",
+   "skill": "question_words",
+   "subskill": "itsu_asking_time_of_past_event",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "itsu-asking-when-event-happened",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Pick ITSU when the reply supplies a point in time rather than a place, a person or a means",
+   "pedagogicalObjectiveId": "Pilih いつ ketika jawabannya berupa titik waktu, bukan tempat, orang, atau alat",
+   "misconceptionTargeted": "Learner chooses a question word by feel instead of matching it to the category of the answer given",
+   "misconceptionTargetedId": "Murid memilih kata tanya berdasarkan perasaan, bukan mencocokkannya dengan jenis jawaban yang diberikan",
+   "reasoningOperation": "read the reply -> classify it as a time expression -> select the time question word",
+   "reasoningOperationId": "baca jawabannya -> golongkan sebagai keterangan waktu -> pilih kata tanya waktu",
+   "stem": "「___ にほんへ きましたか。」「きょねんの しちがつに きました。」",
+   "stemKana": "「___ にほんへ きましたか。」「きょねんの しちがつに きました。」",
+   "furigana": [],
+   "options": [
+    "いつ",
+    "どこ",
+    "だれと",
+    "なんで"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "どこ",
+     "misconception": "asks doko when the answer given is a time, not a place",
+     "misconceptionId": "memakai どこ padahal jawabannya waktu, bukan tempat",
+     "whyFails": "DOKO demands a location, but the reply is 'last July', which names no place at all.",
+     "whyFailsId": "どこ menuntut nama tempat, sedangkan jawabannya 'Juli tahun lalu', yang sama sekali tidak menyebut tempat."
+    },
+    {
+     "option": "だれと",
+     "misconception": "asks for a companion when no person appears in the answer",
+     "misconceptionId": "menanyakan teman padahal tidak ada orang dalam jawabannya",
+     "whyFails": "DARE TO asks who came along; the reply names a month, so the answer would not fit the question.",
+     "whyFailsId": "だれと menanyakan siapa yang ikut; jawabannya menyebut bulan, jadi tidak nyambung dengan pertanyaannya."
+    },
+    {
+     "option": "なんで",
+     "misconception": "asks by what means when the answer states a date",
+     "misconceptionId": "menanyakan alat padahal jawabannya tanggal",
+     "whyFails": "NAN DE asks about transport or method; 'last July' is not a way of travelling.",
+     "whyFailsId": "なんで menanyakan kendaraan atau cara; 'Juli tahun lalu' bukan cara bepergian."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "The reply gives a month and a year, so the missing question word must be the one that asks for a point in time: ITSU.",
+    "whyCorrectId": "Jawabannya menyebut bulan dan tahun, jadi kata tanya yang hilang pasti yang menanyakan titik waktu: いつ.",
+    "rule": "Let the answer decide the question word: a time answer requires ITSU.",
+    "ruleId": "Biarkan jawaban yang menentukan kata tanya: jawaban berupa waktu menuntut いつ.",
+    "whyOthersFail": "DOKO wants a place, DARE TO wants a person, NAN DE wants a means; none of those is what the speaker replied.",
+    "whyOthersFailId": "どこ meminta tempat, だれと meminta orang, なんで meminta alat; tidak satu pun sesuai jawaban penutur.",
+    "howToAvoid": "Cover the question and read only the answer first, then ask which question word that answer could reply to.",
+    "howToAvoidId": "Tutup pertanyaannya, baca dulu jawabannya saja, lalu tanyakan kata tanya mana yang bisa dijawab begitu.",
+    "memoryCue": "Month or year in the answer, ITSU in the gap.",
+    "memoryCueId": "Ada bulan atau tahun di jawaban, isi rumpangnya いつ."
+   }
+  },
+  {
+   "id": "JP-QW-202",
+   "family": "question_words",
+   "skill": "question_words",
+   "subskill": "itsu_kara_asking_starting_point",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "itsu-kara-asking-start-point",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Attach KARA to ITSU when the answer marks the beginning of a period rather than a single moment",
+   "pedagogicalObjectiveId": "Tambahkan から pada いつ ketika jawabannya menandai awal suatu periode, bukan satu saat tunggal",
+   "misconceptionTargeted": "Learner uses bare ITSU even when the reply carries KARA or MADE and so asks the wrong half of the period",
+   "misconceptionTargetedId": "Murid memakai いつ polos padahal jawabannya memakai から atau まで, sehingga menanyakan sisi periode yang keliru",
+   "reasoningOperation": "spot KARA in the reply -> mirror the same particle onto the question word",
+   "reasoningOperationId": "temukan から di jawaban -> cerminkan partikel yang sama pada kata tanyanya",
+   "stem": "「なつやすみは___ですか。」「らいしゅうの きんようびから です。」",
+   "stemKana": "「なつやすみは___ですか。」「らいしゅうの きんようびから です。」",
+   "furigana": [],
+   "options": [
+    "いつから",
+    "いつまで",
+    "どこから",
+    "いくら"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "いつまで",
+     "misconception": "asks for the end point when the answer marks the start",
+     "misconceptionId": "menanyakan batas akhir padahal jawabannya menandai awal",
+     "whyFails": "ITSU MADE asks until when, but the reply ends in KARA, which announces where the holiday begins.",
+     "whyFailsId": "いつまで menanyakan sampai kapan, sedangkan jawabannya berakhir dengan から yang mengumumkan kapan liburnya mulai."
+    },
+    {
+     "option": "どこから",
+     "misconception": "asks for a starting place when the answer gives a starting day",
+     "misconceptionId": "menanyakan tempat asal padahal jawabannya hari mulai",
+     "whyFails": "DOKO KARA asks from what place; 'from next Friday' is a day, not a location.",
+     "whyFailsId": "どこから menanyakan dari tempat mana; 'mulai Jumat depan' adalah hari, bukan tempat."
+    },
+    {
+     "option": "いくら",
+     "misconception": "asks a price about something that has no cost",
+     "misconceptionId": "menanyakan harga untuk sesuatu yang tidak punya harga",
+     "whyFails": "IKURA asks how much money; a school holiday is not being bought and the reply names no amount.",
+     "whyFailsId": "いくら menanyakan jumlah uang; libur sekolah tidak dibeli dan jawabannya tidak menyebut nominal."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "The reply is 'from next Friday', so the question must ask from when: ITSU plus KARA.",
+    "whyCorrectId": "Jawabannya 'mulai Jumat depan', jadi pertanyaannya harus menanyakan mulai kapan: いつ ditambah から.",
+    "rule": "Question words keep the same particle the answer uses: KARA answer, KARA question.",
+    "ruleId": "Kata tanya memakai partikel yang sama dengan jawabannya: jawaban ber-から, pertanyaan ber-から.",
+    "whyOthersFail": "ITSU MADE asks the opposite edge, DOKO KARA swaps time for place, IKURA swaps time for money.",
+    "whyOthersFailId": "いつまで menanyakan ujung yang berlawanan, どこから menukar waktu dengan tempat, いくら menukar waktu dengan uang.",
+    "howToAvoid": "Underline the last word of the reply; if it is KARA, the question word must carry KARA too.",
+    "howToAvoidId": "Garis bawahi kata terakhir jawabannya; kalau から, kata tanyanya juga harus memakai から.",
+    "memoryCue": "KARA answers, KARA asks.",
+    "memoryCueId": "Jawaban から, tanyanya juga から."
+   }
+  },
+  {
+   "id": "JP-QW-203",
+   "family": "question_words",
+   "skill": "question_words",
+   "subskill": "ikura_asking_price",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "ikura-asking-the-price",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Use IKURA when the reply states an amount of money",
+   "pedagogicalObjectiveId": "Gunakan いくら ketika jawabannya menyebut sejumlah uang",
+   "misconceptionTargeted": "Learner reaches for NAN or a counter question word when the missing information is a price",
+   "misconceptionTargetedId": "Murid memakai なん atau kata tanya berpenggolong padahal yang ditanyakan adalah harga",
+   "reasoningOperation": "recognise the yen amount in the reply -> choose the money question word",
+   "reasoningOperationId": "kenali nominal yen di jawaban -> pilih kata tanya untuk uang",
+   "stem": "「この しろい ぼうしは___ですか。」「にせんえんです。」",
+   "stemKana": "「この しろい ぼうしは___ですか。」「にせんえんです。」",
+   "furigana": [],
+   "options": [
+    "いくら",
+    "いくつ",
+    "なんじ",
+    "どこ"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "いくつ",
+     "misconception": "asks how many items when the answer is a price",
+     "misconceptionId": "menanyakan jumlah barang padahal jawabannya harga",
+     "whyFails": "IKUTSU counts objects; the reply says 2000 yen, which is money, not a number of hats.",
+     "whyFailsId": "いくつ menghitung benda; jawabannya 2000 yen, yaitu uang, bukan banyaknya topi."
+    },
+    {
+     "option": "なんじ",
+     "misconception": "asks a clock time about an object",
+     "misconceptionId": "menanyakan jam untuk sebuah benda",
+     "whyFails": "NANJI asks what time it is; a hat has no hour, and the reply names no clock time.",
+     "whyFailsId": "なんじ menanyakan pukul berapa; topi tidak punya jam, dan jawabannya tidak menyebut waktu."
+    },
+    {
+     "option": "どこ",
+     "misconception": "asks a place when the answer is an amount",
+     "misconceptionId": "menanyakan tempat padahal jawabannya nominal",
+     "whyFails": "DOKO would be answered with a shop or a country, but the reply is a sum of money.",
+     "whyFailsId": "どこ akan dijawab dengan toko atau negara, sedangkan jawabannya berupa jumlah uang."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "The reply '2000 yen' is a price, and the only question word that asks for a price is IKURA.",
+    "whyCorrectId": "Jawaban '2000 yen' adalah harga, dan satu-satunya kata tanya yang menanyakan harga adalah いくら.",
+    "rule": "Money in the answer means IKURA in the question.",
+    "ruleId": "Ada uang di jawaban berarti いくら di pertanyaan.",
+    "whyOthersFail": "IKUTSU counts things, NANJI asks the hour, DOKO asks a place; none of them is answered by yen.",
+    "whyOthersFailId": "いくつ menghitung benda, なんじ menanyakan jam, どこ menanyakan tempat; tak satu pun dijawab dengan yen.",
+    "howToAvoid": "Look for the word EN in the reply; if it is there, the gap is IKURA.",
+    "howToAvoidId": "Cari kata えん di jawaban; kalau ada, rumpangnya いくら.",
+    "memoryCue": "EN in the answer, IKURA in the question.",
+    "memoryCueId": "Ada えん di jawaban, いくら di pertanyaan."
+   }
+  },
+  {
+   "id": "JP-QW-204",
+   "family": "question_words",
+   "skill": "question_words",
+   "subskill": "ikutsu_counting_things_not_price",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "ikutsu-not-ikura-for-counting",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Separate IKUTSU, which counts objects, from IKURA, which asks a price",
+   "pedagogicalObjectiveId": "Bedakan いくつ yang menghitung benda dari いくら yang menanyakan harga",
+   "misconceptionTargeted": "Learner treats IKURA as a general how-much word and uses it for quantities of objects",
+   "misconceptionTargetedId": "Murid menganggap いくら kata umum untuk 'berapa' lalu memakainya untuk jumlah benda",
+   "reasoningOperation": "see the native counting form in the reply -> choose the object-counting question word",
+   "reasoningOperationId": "lihat bentuk hitungan asli Jepang di jawaban -> pilih kata tanya penghitung benda",
+   "stem": "「みせで みかんを___ かいましたか。」「みっつ かいました。」",
+   "stemKana": "「みせで みかんを___ かいましたか。」「みっつ かいました。」",
+   "furigana": [],
+   "options": [
+    "いくつ",
+    "いくら",
+    "どこ",
+    "いつ"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "いくら",
+     "misconception": "price word used for a number of objects",
+     "misconceptionId": "kata harga dipakai untuk jumlah benda",
+     "whyFails": "IKURA is answered with money, but the reply is MITTSU, the native count for three items.",
+     "whyFailsId": "いくら dijawab dengan uang, sedangkan jawabannya みっつ, hitungan asli untuk tiga buah."
+    },
+    {
+     "option": "どこ",
+     "misconception": "asks a place although the shop is already named in the sentence",
+     "misconceptionId": "menanyakan tempat padahal tokonya sudah disebut di kalimat",
+     "whyFails": "The place is already given as MISE DE, and the reply supplies a quantity instead.",
+     "whyFailsId": "Tempatnya sudah disebut みせで, dan jawabannya justru memberi jumlah."
+    },
+    {
+     "option": "いつ",
+     "misconception": "asks a time when the answer is a quantity",
+     "misconceptionId": "menanyakan waktu padahal jawabannya jumlah",
+     "whyFails": "ITSU needs a day or hour in reply; MITTSU tells us how many, not when.",
+     "whyFailsId": "いつ butuh jawaban hari atau jam; みっつ memberi tahu berapa banyak, bukan kapan."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "MITTSU is the native counting form for three objects, so the question asked how many: IKUTSU.",
+    "whyCorrectId": "みっつ adalah bentuk hitungan asli untuk tiga benda, jadi pertanyaannya menanyakan berapa buah: いくつ.",
+    "rule": "IKUTSU counts things; IKURA counts money. They are not interchangeable.",
+    "ruleId": "いくつ menghitung benda; いくら menghitung uang. Keduanya tidak bisa saling menggantikan.",
+    "whyOthersFail": "IKURA expects yen, DOKO expects a place already stated, ITSU expects a time nobody gave.",
+    "whyOthersFailId": "いくら menuntut yen, どこ menuntut tempat yang sudah disebut, いつ menuntut waktu yang tidak diberikan.",
+    "howToAvoid": "If the answer ends in TSU (hitotsu, futatsu, mittsu), the question is IKUTSU.",
+    "howToAvoidId": "Kalau jawabannya berakhiran つ (ひとつ, ふたつ, みっつ), pertanyaannya いくつ.",
+    "memoryCue": "TSU counts, EN costs.",
+    "memoryCueId": "つ untuk jumlah, えん untuk harga."
+   }
+  },
+  {
+   "id": "JP-QW-205",
+   "family": "question_words",
+   "skill": "question_words",
+   "subskill": "dou_asking_impression_or_quality",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "dou-asking-impression-quality",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Use DOU when the reply describes what something is like rather than naming what it is",
+   "pedagogicalObjectiveId": "Gunakan どう ketika jawabannya menggambarkan bagaimana sesuatu, bukan menyebut apa benda itu",
+   "misconceptionTargeted": "Learner asks NAN DESU KA when hunting for a quality, so the reply becomes an identity instead of a description",
+   "misconceptionTargetedId": "Murid bertanya なんですか saat mencari sifat, sehingga jawabannya jadi identitas, bukan gambaran",
+   "reasoningOperation": "notice the reply is an adjective -> choose the question word that requests a description",
+   "reasoningOperationId": "sadari jawabannya kata sifat -> pilih kata tanya yang meminta gambaran",
+   "stem": "「にほんの なつは___ですか。」「とても あつくて、あめが おおいです。」",
+   "stemKana": "「にほんの なつは___ですか。」「とても あつくて、あめが おおいです。」",
+   "furigana": [],
+   "options": [
+    "どう",
+    "なん",
+    "どこ",
+    "いくら"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "なん",
+     "misconception": "asks for an identity when the answer describes a quality",
+     "misconceptionId": "menanyakan identitas padahal jawabannya menggambarkan sifat",
+     "whyFails": "NAN DESU KA is answered with a noun that names the thing; the reply here is adjectives about the weather.",
+     "whyFailsId": "なんですか dijawab dengan kata benda yang menyebut namanya; jawaban di sini kata sifat tentang cuaca."
+    },
+    {
+     "option": "どこ",
+     "misconception": "asks a place when summer is already the topic",
+     "misconceptionId": "menanyakan tempat padahal musim panas sudah jadi topiknya",
+     "whyFails": "DOKO DESU KA asks where something is; a season has no location and the reply gives none.",
+     "whyFailsId": "どこですか menanyakan letak sesuatu; musim tidak punya letak dan jawabannya pun tidak menyebutnya."
+    },
+    {
+     "option": "いくら",
+     "misconception": "asks a price about a season",
+     "misconceptionId": "menanyakan harga untuk sebuah musim",
+     "whyFails": "IKURA needs a sum of money in reply, but the answer talks about heat and rain.",
+     "whyFailsId": "いくら butuh jawaban berupa uang, sedangkan jawabannya bicara soal panas dan hujan."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "The reply is a string of adjectives, which is exactly what DOU DESU KA asks for: what is it like?",
+    "whyCorrectId": "Jawabannya rangkaian kata sifat, dan itulah yang diminta どうですか: bagaimana rasanya?",
+    "rule": "DOU asks for a description; NAN asks for a name.",
+    "ruleId": "どう meminta gambaran; なん meminta nama.",
+    "whyOthersFail": "NAN would be answered with a noun, DOKO with a place, IKURA with money; the reply is none of these.",
+    "whyOthersFailId": "なん dijawab kata benda, どこ dengan tempat, いくら dengan uang; jawabannya bukan salah satu pun.",
+    "howToAvoid": "If the reply is adjectives, the gap is DOU, not NAN.",
+    "howToAvoidId": "Kalau jawabannya kata sifat, rumpangnya どう, bukan なん.",
+    "memoryCue": "Adjective back, DOU asked.",
+    "memoryCueId": "Balasannya kata sifat, tanyanya どう."
+   }
+  },
+  {
+   "id": "JP-QW-206",
+   "family": "question_words",
+   "skill": "question_words",
+   "subskill": "douyatte_asking_method_of_doing",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "douyatte-asking-how-to-do",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Use DOU YATTE when the reply explains the steps of doing something",
+   "pedagogicalObjectiveId": "Gunakan どうやって ketika jawabannya menjelaskan langkah melakukan sesuatu",
+   "misconceptionTargeted": "Learner confuses DOU YATTE (procedure) with DOU (impression) and with NAN DE (instrument)",
+   "misconceptionTargetedId": "Murid mencampur どうやって (cara/langkah) dengan どう (kesan) dan なんで (alat)",
+   "reasoningOperation": "read the step-by-step reply -> choose the question word that asks for a procedure",
+   "reasoningOperationId": "baca jawaban yang berupa langkah -> pilih kata tanya yang meminta prosedur",
+   "stem": "「___ この きかいを つかいますか。」「はじめに あかい ボタンを おして、そのあと ドアを しめます。」",
+   "stemKana": "「___ この きかいを つかいますか。」「はじめに あかい ボタンを おして、そのあと ドアを しめます。」",
+   "furigana": [],
+   "options": [
+    "どうやって",
+    "どう",
+    "なんで",
+    "どこで"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "どう",
+     "misconception": "asks for an impression when the answer lists actions",
+     "misconceptionId": "menanyakan kesan padahal jawabannya urutan tindakan",
+     "whyFails": "Plain DOU before a verb asks how something feels or seems, so it would be answered 'it is easy', not with two steps.",
+     "whyFailsId": "どう polos sebelum kata kerja menanyakan kesan, jadi jawabannya 'mudah', bukan dua langkah."
+    },
+    {
+     "option": "なんで",
+     "misconception": "asks with what tool when the answer describes an order of actions",
+     "misconceptionId": "menanyakan dengan alat apa padahal jawabannya urutan tindakan",
+     "whyFails": "NAN DE expects one instrument such as a key or a card; the reply gives a sequence of movements instead.",
+     "whyFailsId": "なんで menuntut satu alat seperti kunci atau kartu; jawabannya justru rangkaian gerakan."
+    },
+    {
+     "option": "どこで",
+     "misconception": "asks where the action happens although the reply never names a place",
+     "misconceptionId": "menanyakan di mana perbuatannya padahal jawabannya tidak menyebut tempat",
+     "whyFails": "DOKO DE is answered with a room or a shop; buttons and doors are steps, not a location.",
+     "whyFailsId": "どこで dijawab dengan ruangan atau toko; tombol dan pintu adalah langkah, bukan tempat."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "The reply is a procedure with HAJIME NI and SONO ATO, so the question asked in what way it is done: DOU YATTE.",
+    "whyCorrectId": "Jawabannya prosedur dengan はじめに dan そのあと, jadi pertanyaannya menanyakan bagaimana caranya: どうやって.",
+    "rule": "DOU YATTE asks for a method; DOU asks for an impression; NAN DE asks for a tool.",
+    "ruleId": "どうやって menanyakan cara; どう menanyakan kesan; なんで menanyakan alat.",
+    "whyOthersFail": "DOU wants an adjective, NAN DE wants one instrument, DOKO DE wants a place; the reply gives steps.",
+    "whyOthersFailId": "どう meminta kata sifat, なんで meminta satu alat, どこで meminta tempat; jawabannya berupa langkah.",
+    "howToAvoid": "If the answer can be numbered 1, 2, 3, the question is DOU YATTE.",
+    "howToAvoidId": "Kalau jawabannya bisa dinomori 1, 2, 3, pertanyaannya どうやって.",
+    "memoryCue": "Steps in the answer, DOU YATTE in the gap.",
+    "memoryCueId": "Jawabannya langkah-langkah, rumpangnya どうやって."
+   }
+  },
+  {
+   "id": "JP-QW-207",
+   "family": "question_words",
+   "skill": "question_words",
+   "subskill": "dore_standing_alone_for_choice",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "dore-alone-choosing-among-three",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Use DORE when the choice word stands alone with no noun after it",
+   "pedagogicalObjectiveId": "Gunakan どれ ketika kata pilihan berdiri sendiri tanpa kata benda di belakangnya",
+   "misconceptionTargeted": "Learner puts DONO where no noun follows, treating DONO and DORE as free variants",
+   "misconceptionTargetedId": "Murid memakai どの padahal tidak ada kata benda sesudahnya, menganggap どの dan どれ bebas ditukar",
+   "reasoningOperation": "check what follows the gap -> DESU KA with no noun -> use the standalone form",
+   "reasoningOperationId": "periksa apa yang mengikuti rumpang -> ですか tanpa kata benda -> pakai bentuk berdiri sendiri",
+   "stem": "「たなかさんの かさは___ですか。」「その あおいのです。」",
+   "stemKana": "「たなかさんの かさは___ですか。」「その あおいのです。」",
+   "furigana": [],
+   "options": [
+    "どれ",
+    "どの",
+    "どこ",
+    "だれ"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "どの",
+     "misconception": "noun-modifying choice word used with no noun after it",
+     "misconceptionId": "kata pilihan penerang benda dipakai tanpa kata benda sesudahnya",
+     "whyFails": "DONO must be glued to a noun, as in DONO KASA; standing before DESU KA it has nothing to modify.",
+     "whyFailsId": "どの harus menempel pada kata benda, misalnya どのかさ; berdiri sebelum ですか, tidak ada yang diterangkannya."
+    },
+    {
+     "option": "どこ",
+     "misconception": "asks the location of the umbrella instead of which one it is",
+     "misconceptionId": "menanyakan letak payungnya, bukan yang mana",
+     "whyFails": "DOKO would be answered 'in the classroom'; the reply picks one item out of several, so it is a choice, not a place.",
+     "whyFailsId": "どこ akan dijawab 'di kelas'; jawabannya memilih satu benda dari beberapa, jadi ini pilihan, bukan tempat."
+    },
+    {
+     "option": "だれ",
+     "misconception": "asks for a person when the owner is already named",
+     "misconceptionId": "menanyakan orang padahal pemiliknya sudah disebut",
+     "whyFails": "Tanaka is already given as the owner, and the reply points at a blue one, not at a person.",
+     "whyFailsId": "Tanaka sudah disebut sebagai pemiliknya, dan jawabannya menunjuk yang biru, bukan seseorang."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "The reply picks one umbrella out of several without repeating the noun, and the gap is followed directly by DESU KA, so the standalone DORE is required.",
+    "whyCorrectId": "Jawabannya memilih satu payung dari beberapa tanpa mengulang kata bendanya, dan rumpangnya langsung diikuti ですか, jadi harus どれ yang berdiri sendiri.",
+    "rule": "DORE stands alone; DONO always needs a noun behind it.",
+    "ruleId": "どれ berdiri sendiri; どの selalu butuh kata benda di belakangnya.",
+    "whyOthersFail": "DONO is left without a noun, DOKO turns the question into a place question, DARE asks about an owner already known.",
+    "whyOthersFailId": "どの kehilangan kata bendanya, どこ mengubahnya jadi pertanyaan tempat, だれ menanyakan pemilik yang sudah diketahui.",
+    "howToAvoid": "Look at the word right after the gap; if it is DESU, only DORE fits.",
+    "howToAvoidId": "Lihat kata tepat setelah rumpang; kalau です, hanya どれ yang cocok.",
+    "memoryCue": "No noun behind it, DORE.",
+    "memoryCueId": "Tidak ada kata benda di belakangnya, どれ."
+   }
+  },
+  {
+   "id": "JP-QW-208",
+   "family": "question_words",
+   "skill": "question_words",
+   "subskill": "dono_before_a_noun",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "dono-attached-to-following-noun",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Use DONO when a noun follows the choice word directly",
+   "pedagogicalObjectiveId": "Gunakan どの ketika ada kata benda langsung mengikuti kata pilihannya",
+   "misconceptionTargeted": "Learner places DORE in front of a noun, producing a choice word that cannot modify anything",
+   "misconceptionTargetedId": "Murid menaruh どれ di depan kata benda, menghasilkan kata pilihan yang tidak bisa menerangkan apa pun",
+   "reasoningOperation": "see the noun after the gap -> select the modifying form of the choice word",
+   "reasoningOperationId": "lihat kata benda setelah rumpang -> pilih bentuk penerang dari kata pilihannya",
+   "stem": "「___ ひとが やまださんですか。」「あの めがねの ひとです。」",
+   "stemKana": "「___ ひとが やまださんですか。」「あの めがねの ひとです。」",
+   "furigana": [],
+   "options": [
+    "どの",
+    "どれ",
+    "だれの",
+    "どこの"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "どれ",
+     "misconception": "standalone choice word wrongly placed in front of a noun",
+     "misconceptionId": "kata pilihan berdiri sendiri salah ditaruh di depan kata benda",
+     "whyFails": "DORE already means 'which one' by itself, so it cannot be stuck onto HITO the way DONO can.",
+     "whyFailsId": "どれ sendiri sudah berarti 'yang mana', jadi tidak bisa ditempelkan ke ひと seperti どの."
+    },
+    {
+     "option": "だれの",
+     "misconception": "asks whose person, turning a selection into ownership",
+     "misconceptionId": "menanyakan 'orang milik siapa', mengubah pemilihan jadi kepemilikan",
+     "whyFails": "DARE NO HITO would ask whose person that is; the reply describes which person by their glasses, not an owner.",
+     "whyFailsId": "だれのひと menanyakan orang milik siapa; jawabannya menunjuk orang mana lewat kacamatanya, bukan pemiliknya."
+    },
+    {
+     "option": "どこの",
+     "misconception": "asks the person's place of origin instead of identifying them in the group",
+     "misconceptionId": "menanyakan asal orangnya, bukan menunjuk siapa dalam kelompok",
+     "whyFails": "DOKO NO HITO asks which country or company someone is from; the reply picks a person out of a crowd.",
+     "whyFailsId": "どこのひと menanyakan orang dari negara atau perusahaan mana; jawabannya memilih satu orang dari kerumunan."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "HITO follows the gap directly and the reply singles out one person from a group, so the modifying choice word DONO is needed.",
+    "whyCorrectId": "ひと langsung mengikuti rumpang dan jawabannya menunjuk satu orang dari kelompok, jadi dibutuhkan kata pilihan penerang どの.",
+    "rule": "DONO + noun; DORE alone. The word after the gap decides.",
+    "ruleId": "どの + kata benda; どれ sendirian. Kata sesudah rumpang yang menentukan.",
+    "whyOthersFail": "DORE cannot modify a noun, DARE NO asks about ownership, DOKO NO asks about origin.",
+    "whyOthersFailId": "どれ tidak bisa menerangkan kata benda, だれの menanyakan kepemilikan, どこの menanyakan asal.",
+    "howToAvoid": "If a noun sits right after the blank, write DONO.",
+    "howToAvoidId": "Kalau ada kata benda tepat setelah rumpang, tulis どの.",
+    "memoryCue": "DONO leans on a noun; DORE stands up alone.",
+    "memoryCueId": "どの bersandar pada kata benda; どれ berdiri sendiri."
+   }
+  },
+  {
+   "id": "JP-QW-209",
+   "family": "question_words",
+   "skill": "question_words",
+   "subskill": "sentence_final_ka_makes_a_question",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "sentence-final-ka-yes-no-question",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Close a yes-no question with KA rather than a confirmation or emphasis particle",
+   "pedagogicalObjectiveId": "Tutup pertanyaan ya-tidak dengan か, bukan dengan partikel penegas atau pencari persetujuan",
+   "misconceptionTargeted": "Learner ends a question with NE or YO, which asks for agreement or adds emphasis instead of asking anything",
+   "misconceptionTargetedId": "Murid mengakhiri pertanyaan dengan ね atau よ, yang meminta persetujuan atau menegaskan, bukan bertanya",
+   "reasoningOperation": "see the HAI/IIE reply -> the sentence must be a genuine question -> close it with KA",
+   "reasoningOperationId": "lihat jawaban はい/いいえ -> kalimatnya pasti pertanyaan sungguhan -> tutup dengan か",
+   "stem": "「あした としょかんへ いきます___。」「いいえ、いきません。」",
+   "stemKana": "「あした としょかんへ いきます___。」「いいえ、いきません。」",
+   "furigana": [],
+   "options": [
+    "か",
+    "ね",
+    "よ",
+    "から"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "ね",
+     "misconception": "confirmation particle used where real information is being requested",
+     "misconceptionId": "partikel persetujuan dipakai padahal informasinya benar-benar ditanyakan",
+     "whyFails": "NE seeks agreement about something the speaker already believes, so an IIE reply contradicts the sentence rather than answering it.",
+     "whyFailsId": "ね mencari persetujuan atas hal yang sudah diyakini penutur, sehingga jawaban いいえ membantahnya, bukan menjawabnya."
+    },
+    {
+     "option": "よ",
+     "misconception": "emphasis particle turning a question into an assertion",
+     "misconceptionId": "partikel penegas mengubah pertanyaan menjadi pernyataan",
+     "whyFails": "YO tells the listener something new; it makes the line a statement, and a statement cannot be answered with IIE.",
+     "whyFailsId": "よ memberi tahu lawan bicara sesuatu yang baru; kalimatnya jadi pernyataan, dan pernyataan tidak dijawab dengan いいえ."
+    },
+    {
+     "option": "から",
+     "misconception": "reason particle attached where no reason is being given",
+     "misconceptionId": "partikel alasan ditempel padahal tidak ada alasan yang disampaikan",
+     "whyFails": "KARA means 'because' and leaves the sentence hanging; nothing here explains a cause.",
+     "whyFailsId": "から berarti 'karena' dan membuat kalimatnya menggantung; tidak ada sebab yang dijelaskan di sini."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "The reply is IIE, IKIMASEN, a yes-no answer, which is only possible if the sentence was closed with the question particle KA.",
+    "whyCorrectId": "Jawabannya いいえ、いきません, yaitu jawaban ya-tidak, yang hanya mungkin kalau kalimatnya ditutup dengan partikel tanya か.",
+    "rule": "Adding KA at the end turns any polite sentence into a question; the word order does not change.",
+    "ruleId": "Menambahkan か di akhir mengubah kalimat sopan mana pun menjadi pertanyaan; urutan katanya tidak berubah.",
+    "whyOthersFail": "NE asks for agreement, YO asserts, KARA gives a reason; none of them can be answered with HAI or IIE.",
+    "whyOthersFailId": "ね meminta persetujuan, よ menegaskan, から memberi alasan; tak satu pun bisa dijawab はい atau いいえ.",
+    "howToAvoid": "If the reply begins with HAI or IIE, the sentence before it must end in KA.",
+    "howToAvoidId": "Kalau jawabannya diawali はい atau いいえ, kalimat sebelumnya harus berakhir dengan か.",
+    "memoryCue": "IIE came back, so KA went out.",
+    "memoryCueId": "いいえ yang kembali, berarti か yang dikirim."
+   }
+  },
+  {
+   "id": "JP-QW-210",
+   "family": "question_words",
+   "skill": "question_words",
+   "subskill": "ka_linking_two_alternatives",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "ka-linking-two-choices-or",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Use KA between two nouns to offer alternatives, distinct from TO which joins them together",
+   "pedagogicalObjectiveId": "Gunakan か di antara dua kata benda untuk menawarkan pilihan, berbeda dari と yang menggabungkan keduanya",
+   "misconceptionTargeted": "Learner uses TO or YA to mean 'or', so the sentence asks about both items instead of asking the listener to pick one",
+   "misconceptionTargetedId": "Murid memakai と atau や untuk arti 'atau', sehingga kalimatnya menanyakan keduanya, bukan meminta lawan bicara memilih satu",
+   "reasoningOperation": "notice the reply names only one of the two nouns -> the linker must offer a choice",
+   "reasoningOperationId": "sadari jawabannya hanya menyebut salah satu dari dua kata benda -> penghubungnya harus menawarkan pilihan",
+   "stem": "「コーヒー___ こうちゃを のみますか。」「コーヒーを おねがいします。」",
+   "stemKana": "「コーヒー___ こうちゃを のみますか。」「コーヒーを おねがいします。」",
+   "furigana": [],
+   "options": [
+    "か",
+    "と",
+    "や",
+    "も"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "と",
+     "misconception": "and-linker used where only one item may be chosen",
+     "misconceptionId": "penghubung 'dan' dipakai padahal hanya satu yang boleh dipilih",
+     "whyFails": "TO joins both drinks into one order, so the natural reply would take both; here the guest picks only coffee.",
+     "whyFailsId": "と menggabungkan kedua minuman jadi satu pesanan, jadi jawaban wajarnya mengambil keduanya; di sini tamunya hanya memilih kopi."
+    },
+    {
+     "option": "や",
+     "misconception": "partial-list linker used in a two-way choice",
+     "misconceptionId": "penghubung daftar sebagian dipakai dalam pilihan dua arah",
+     "whyFails": "YA lists examples among more items and still means 'and', so it does not ask the listener to choose one.",
+     "whyFailsId": "や mendaftar contoh dari benda yang lebih banyak dan tetap berarti 'dan', jadi tidak meminta lawan bicara memilih satu."
+    },
+    {
+     "option": "も",
+     "misconception": "also-marker used as a connector between alternatives",
+     "misconceptionId": "penanda 'juga' dipakai sebagai penghubung antarpilihan",
+     "whyFails": "MO adds coffee to something already mentioned; it cannot present two options side by side.",
+     "whyFailsId": "も menambahkan kopi ke sesuatu yang sudah disebut; ia tidak bisa menyajikan dua pilihan berdampingan."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "The guest answers with one drink only, so the question must have offered a choice between two, and that linker is KA.",
+    "whyCorrectId": "Tamunya menjawab dengan satu minuman saja, jadi pertanyaannya pasti menawarkan pilihan antara dua, dan penghubungnya adalah か.",
+    "rule": "Noun KA noun = 'A or B'; noun TO noun = 'A and B'.",
+    "ruleId": "Kata benda か kata benda = 'A atau B'; kata benda と kata benda = 'A dan B'.",
+    "whyOthersFail": "TO and YA both mean 'and', and MO means 'also'; none of them lets the listener pick just one.",
+    "whyOthersFailId": "と dan や sama-sama berarti 'dan', dan も berarti 'juga'; tidak ada yang membiarkan lawan bicara memilih satu saja.",
+    "howToAvoid": "Count the items in the reply: one item means the question used KA.",
+    "howToAvoidId": "Hitung benda dalam jawabannya: satu benda berarti pertanyaannya memakai か.",
+    "memoryCue": "One thing chosen, KA in the middle.",
+    "memoryCueId": "Satu yang dipilih, か di tengahnya."
+   }
+  }
+ ]
+}
