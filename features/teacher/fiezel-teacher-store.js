@@ -179,10 +179,11 @@
     return (Number(next && next.n) || 0) > pn || (Number(next && next.s) || 0) > ps;
   }
   function focusOf(a, s) { return (a && a.focus && s && a.focus[s.id]) || null; }
+  function durasi(sec) { var n = Math.max(0, Math.round(Number(sec) || 0)); return n >= 60 ? Math.round(n / 60) + ' mnt' : n + ' dtk'; }
   /** Kalimat pendek untuk chip di layar guru. Menyebut fakta, tidak menuduh. */
   function focusLabel(f) {
     if (!f || !f.n) return 'Tidak keluar layar';
-    return 'Keluar layar ' + f.n + '× · ' + (f.s >= 60 ? Math.round(f.s / 60) + ' mnt' : f.s + ' dtk');
+    return 'Keluar layar ' + f.n + '× · ' + durasi(f.s);
   }
   function focusLevel(f) { return !f || !f.n ? 'bersih' : (f.n >= 3 || f.s >= 30 ? 'berat' : 'ringan'); }
   /** Masukkan hasil murid ke kelas: perbarui murid yang ada (nama depan sama) atau tambah baru. Skill digabung per-skill. */
@@ -328,7 +329,18 @@
     if (e.kind === 'assignment_done') return e.student + ' selesai mengerjakan “' + e.title + '”' + (e.acc != null ? ' · ' + pct(e.acc) : '');
     if (e.kind === 'student_joined') return e.student + ' bergabung ke kelas ' + (e.cls || '');
     if (e.kind === 'report_in') return 'Laporan latihan baru dari ' + e.student;
-    if (e.kind === 'focus_exit') return e.student + ' keluar dari layar ' + (e.mode === 'ujian' ? 'ujian' : 'tugas') + ' “' + e.title + '” — ' + focusLabel(e.f).toLowerCase();
+    /* Kalimat ini adalah SATU-SATUNYA hal yang guru baca saat kabar itu lewat, jadi ia harus
+       menyebut siapa, sedang apa, dan seberapa berat — tanpa memvonis. "Laporan latihan baru"
+       yang generik pernah menutupi peringatan ini di kotak masuk; itulah kenapa ia diawali
+       penanda dan diakhiri angka. */
+    if (e.kind === 'focus_exit') {
+      // Kotak masuk guru bertahan 30 hari dan dibaca ulang tiap render; satu entri lama tanpa
+      // `f` tidak boleh mematikan seluruh panel, jadi bentuknya dijamin di sini, bukan diandaikan.
+      var f = e.f || { n: 0, s: 0 }, berat = focusLevel(f) === 'berat';
+      return (berat ? '⚠ Perlu ditengok: ' : '⚠ ') + e.student + ' keluar dari layar saat mengerjakan ' +
+        (e.mode === 'ujian' ? 'ujian' : 'tugas') + ' “' + e.title + '” — ' + (Number(f.n) || 0) + '× · ' + durasi(f.s) +
+        (berat ? '. Tanyakan ke muridnya sebelum menilai.' : '');
+    }
     return e.text || '';
   }
   /** syncAvailable() -> 'ok' | 'offline' | 'no_account' | 'not_teacher' | 'disabled' */
@@ -367,7 +379,11 @@
         (res.focusEvents || []).forEach(function (e) { events.push(Object.assign({ clsId: c.id }, e)); });
         if (res.isNew) events.push({ kind: 'student_joined', student: res.student.name, sid: res.student.id, cls: c.name, clsId: c.id });
         res.graded.forEach(function (a) { var dn = a.done && a.done[res.student.id]; events.push({ kind: 'assignment_done', student: res.student.name, sid: res.student.id, title: a.title, aid: a.id, acc: dn ? dn.acc : null, clsId: c.id }); });
-        if (!res.isNew && !res.graded.length) events.push({ kind: 'report_in', student: res.student.name, sid: res.student.id, clsId: c.id });
+        /* Kabar generik "laporan masuk" hanya berguna saat TIDAK ada yang lebih spesifik.
+           Sebelum syarat focusEvents di bawah, satu ronde sinkron bisa melahirkan peringatan
+           keluar-layar DAN kabar generik untuk murid yang sama, lalu yang generik itu yang
+           terbaca duluan di kotak masuk. */
+        if (!res.isNew && !res.graded.length && !(res.focusEvents || []).length) events.push({ kind: 'report_in', student: res.student.name, sid: res.student.id, clsId: c.id });
       });
       c.sync = Object.assign(c.sync || {}, { claimed: true, cursor: Number(d.cursor) || since, lastPullAt: Date.now(), error: '' });
       return { ok: true, ingested: ingested, graded: graded, names: names, events: events, more: !!d.more };
@@ -399,7 +415,7 @@
   return { KEY: KEY, ASSIGN_KEY: ASSIGN_KEY, SKILL_LABEL: SKILL_LABEL, SKILL_ORDER: SKILL_ORDER, ATT: ATT, DAY: DAY,
     load: load, save: save, defaults: defaults, uid: uid, today: today, firstName: firstName, newClass: newClass, newStudent: newStudent, normalizeClass: normalizeClass, seedDemo: seedDemo, makeClassCode: makeClassCode, normalizeClassCode: normalizeClassCode,
     skillAcc: skillAcc, overallAcc: overallAcc, daysSince: daysSince, risk: risk, classStats: classStats, classSkillMap: classSkillMap, heatmap: heatmap, studyGroups: studyGroups, misconceptions: misconceptions, needsGreeting: needsGreeting, agenda: agenda, pendingAssignments: pendingAssignments, targeted: targeted, recentAttendance: recentAttendance, attendanceRate: attendanceRate, weakestSkill: weakestSkill,
-    normalizeFocus: normalizeFocus, focusGrew: focusGrew, focusOf: focusOf, focusLabel: focusLabel, focusLevel: focusLevel,
+    durasi: durasi, normalizeFocus: normalizeFocus, focusGrew: focusGrew, focusOf: focusOf, focusLabel: focusLabel, focusLevel: focusLevel,
     parseLearnerCode: parseLearnerCode, parseLearnerPayload: parseLearnerPayload, ingest: ingest, assignmentCode: assignmentCode, assignmentPayload: assignmentPayload, parseAssignmentCode: parseAssignmentCode, acceptAssignmentCode: acceptAssignmentCode, acceptAssignmentPayload: acceptAssignmentPayload, buildAssignment: buildAssignment,
     SYNC_PATHS: SYNC_PATHS, syncAvailable: syncAvailable, claimClass: claimClass, pullReports: pullReports, syncClass: syncClass, reportToClass: reportToClass, syncLabel: syncLabel, sendAssignment: sendAssignment, sentTo: sentTo,
     notify: notify, inboxUnread: inboxUnread, inboxMarkAllRead: inboxMarkAllRead, inboxText: inboxText,

@@ -18,7 +18,11 @@
   var MAX = 60;
   var RETENTION_MS = 30 * 86400000;
   var PATH = '/api/learner/class-assignments';
-  var MIN_GAP_MS = 20000;
+  /* Rem klien: jarak minimal antar tanya ke server. 10 detik, turun dari 20 — rem lama lebih
+     lambat daripada detak pemanggilnya sendiri (app.js kini menanya tiap 15 detik), jadi ia
+     akan membuang satu dari setiap dua tanya dan mengembalikan jeda menuju setengah menit.
+     Lantai sesungguhnya tetap milik server (5 detik). */
+  var MIN_GAP_MS = 10000;
   var lastPollAt = 0, busy = false;
 
   function storage() { try { return root.localStorage || null; } catch (_) { return null; } }

@@ -59,15 +59,59 @@ hanya hasil akhir — celah itu tidak meninggalkan jejak apa pun.
    berulang; membangunkan guru setiap kali laporan yang sama mendarat akan mengubur
    kabar yang benar-benar baru.
 
+## Perbaikan m025-270 (temuan pemakaian pertama di kelas)
+
+Pendeteksinya bekerja, tetapi tiga hal di jalur ke guru tidak:
+
+1. **Kiriman yang ditolak server hilang diam-diam.** Lantai server satu laporan per 15 detik
+   per murid (`LIMITS.LEARNER_MIN_INTERVAL_MS`) menolak laporan kedua dengan 429, dan klien
+   membuangnya. Urutan paling wajar — murid membuka ujian (laporan #1), keluar layar beberapa
+   detik kemudian (laporan #2, ditolak) — membuat guru hanya menerima kabar generik "laporan
+   masuk", persis gejala yang dilaporkan. `pushToClass()` kini mengulang kiriman yang gagal
+   (16 detik, berlipat sampai 2 menit, berhenti saat berhasil). Aman karena laporan kelas
+   adalah upsert, bukan selisih.
+2. **Kabar generik menenggelamkan peringatan.** Satu ronde sinkron bisa melahirkan
+   `focus_exit` DAN `report_in` untuk murid yang sama. `report_in` sekarang ditahan bila ronde
+   itu membawa peringatan, dan kalimat peringatannya diawali penanda: "⚠ Perlu ditengok: Ani
+   keluar dari layar saat mengerjakan ujian "…" — 2× · 75 dtk. Tanyakan ke muridnya sebelum
+   menilai." Barisnya juga dicat beda di kotak masuk (`.tg-inbox-item.is-warn`).
+   Kalimatnya tetap menyebut FAKTA; kata "curang" sengaja tidak dipakai di mana pun, dan
+   gerbang menolaknya.
+3. **Detak otomatis papan guru mati sejak awal sesi.** `startAutoSync()` pulang lebih dulu
+   (`if (S().syncAvailable() !== 'ok') return;`) **sebelum** timernya dipasang. `FiezelAccount`
+   memulihkan sesi secara asinkron, jadi saat Ruang Guru dipasang peran akun sering belum
+   terbaca — dan sesudah itu tidak ada apa pun yang menghidupkan detaknya kembali. Guru
+   melihat papan yang hanya bergerak kalau tombol Sinkron ditekan tangan. Sekarang detaknya
+   SELALU dipasang dan tiap denyut menanyakan rencananya ke `autoSyncPlan()` — fungsi murni,
+   lima cabang, semuanya bergerbang: `sync`, `wait` (akun belum siap: tanpa jaringan, detak
+   tetap hidup), `skip`, `reset` (ronde yang menggantung >45 detik melepas kuncinya), `idle`.
+   Rantai `syncAll` juga mendapat `.catch` supaya satu galat cat-ulang tidak meninggalkan
+   `ui.syncing = true` — kunci itu mematikan detak dengan cara yang sama diamnya.
+4. **Papan murid tidak punya sistem yang sama, dan punya tombol yang tidak seharusnya ada.**
+   Detak murid kini memakai perencana yang SAMA dengan papan guru
+   (`features/notify/fiezel-sync-plan.js`, modul murni lima cabang), termasuk cabang `wait`
+   (belum ada kode kelas / offline: jaringan tidak disentuh, detak tetap berdenyut) dan
+   `reset` (ronde yang menggantung dilepas). Tombol "Kirim ulang laporan" di tab Kelas Saya
+   **dihapus dari layar**: menyegarkan papan adalah tugas sistem, bukan pekerjaan rumah
+   murid — laporan yang gagal sudah dikirim ulang sendiri (backoff 16 detik → 2 menit).
+   Pintunya (`case 'resend'`) dibiarkan hidup untuk jalur pemulihan, tanpa tombol.
+5. **Layar murid tertinggal jauh di belakang papan guru.** Guru menyegarkan diri tiap 10 detik
+   (`SYNC_EVERY_MS`), murid tiap 60 detik — jadi murid harus menutup-buka aplikasi agar tugas
+   baru muncul. Detak murid turun ke 15 detik (`NOTIF_POLL_MS`) dengan rem klien 10 detik
+   (`fiezel-inbox.js`), keduanya masih di atas lantai server 5 detik, dan timernya tetap diam
+   saat aplikasi tidak terlihat. `tests/exam-focus-guard-test.js` MERAH kalau detak murid
+   melebihi 1,5× detak guru.
+
 ## Batas yang diketahui, dan kenapa dibiarkan
 
 - **Murid yang keluar dan tidak pernah kembali.** Episode yang masih berjalan dikirim
   begitu masa tenggang lewat, jadi guru tetap melihatnya — tetapi kalau aplikasi
   langsung dimatikan sebelum pengiriman itu, angka terakhir yang guru punya adalah
   angka sebelum kepergian. Sisanya menyusul saat murid membuka lagi (`resumeFocus`).
-- **Pembatas laju server 15 detik** (`LIMITS.LEARNER_MIN_INTERVAL_MS`). Kiriman yang
-  kena batas disusulkan di ujung jendela (`REPORT_GAP_MS` di class-hub), jadi yang
-  tertinggal adalah keterlambatan, bukan peristiwa.
+- **Pembatas laju server 15 detik** (`LIMITS.LEARNER_MIN_INTERVAL_MS`). Dua lapis menahannya:
+  jarak antar kiriman di klien (`REPORT_GAP_MS` di class-hub) dan pengulangan kiriman yang
+  tetap ditolak (`pushToClass` di learner-flow). Yang tertinggal adalah keterlambatan belasan
+  detik, bukan peristiwa.
 - **Pendeteksi ini bukan bukti kecurangan.** Ia melaporkan bahwa layar ditinggalkan.
   Keputusannya tetap milik guru, dan laci murid menyebutkan itu dengan kalimat penuh.
 
