@@ -1,7 +1,7 @@
 {
-  "version": "m025-274",
-  "claimedBy": "branch claude/task-home-exit-detector-cq1nea",
-  "claimedAt": "2026-09-06T04:36:10.705Z",
-  "reason": "gabung kelas + kunci ujian: satu rilis untuk kedua perbaikan",
+  "version": "m025-275",
+  "claimedBy": "branch claude/th-quota-notice-dlz1d4",
+  "claimedAt": "2026-09-06T11:29:04.919Z",
+  "reason": "Naskah notice kuota dan suara masuk copy-map",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
