@@ -121,14 +121,45 @@
    * @param {string} copyKey kunci naskah dari server
    * @param {object} [options] `{spoken, layer, resetAt, retryAfter}`
    */
+  /* m025-269 · JALUR THAI. Tabel COPY di berkas ini tetap kanon id dan tetap menjadi
+     cadangan; naskah yang tampil diambil dari copy-map `voice.notice.<kunci>.<bidang>`.
+     Berkas ini SUDAH terdaftar sebagai pengecualian di tests/audio-locale-guard-test.js
+     (EXEMPT) justru untuk urusan naskah seperti ini — locale TIDAK boleh masuk ke kunci
+     cache audio, dan tak satu pun baris di bawah menyentuhnya. */
+  function naskah(key, field, fallback) {
+    try {
+      var I = (typeof self !== 'undefined' ? self : this).FiezelI18n;
+      if (!I || typeof I.t !== 'function') return fallback;
+      var out = I.t('voice.notice.' + key + '.' + field);
+      return typeof out === 'string' && out && out.indexOf('voice.notice.') !== 0 ? out : fallback;
+    } catch (_) { return fallback; }
+  }
+  function frasaVoice(name, fallback) {
+    try {
+      var I = (typeof self !== 'undefined' ? self : this).FiezelI18n;
+      if (!I || typeof I.t !== 'function') return fallback;
+      var out = I.t('voice.notice.' + name);
+      return typeof out === 'string' && out && out.indexOf('voice.notice.') !== 0 ? out : fallback;
+    } catch (_) { return fallback; }
+  }
+
   function build(copyKey, options) {
     var opts = options || {};
     var e = entry(copyKey);
     var spoken = opts.spoken === true;
     var reset = jakartaResetLabel(opts.resetAt);
-    var body = spoken ? e.spoken : e.silent;
+    var kunci = COPY[String(copyKey || '').trim()] ? String(copyKey).trim() : 'service.unknown';
+    var body = spoken ? naskah(kunci, 'spoken', e.spoken) : naskah(kunci, 'silent', e.silent);
     if (!spoken && reset && e.tone === 'quota') {
-      body = body + ' Jatah berikutnya mulai jam ' + reset + ' WIB.';
+      /* m025-269: dulu jam pastinya SELALU ditempel, padahal naskahnya sendiri sudah
+         menyebut waktu kembalinya secara kasar ("setelah tengah malam") — murid membaca dua
+         kalimat waktu berturut-turut dan menganggap yang kedua aturan lain. Sekarang jam
+         pastinya MENGGANTI frasa kasar itu kalau ada, persis seperti quota-copy.js, dan
+         penandanya ikut locale supaya naskah th tidak dicari dengan frasa Indonesia. */
+      var penanda = frasaVoice('reset-marker', 'setelah tengah malam');
+      var sisip = frasaVoice('reset-inline', 'jam {jam} WIB').replace('{jam}', reset);
+      var ekor = frasaVoice('reset-tail', ' Jatah berikutnya mulai jam {jam} WIB.').replace('{jam}', reset);
+      body = body.indexOf(penanda) >= 0 ? body.replace(penanda, sisip) : body + ekor;
     }
     return Object.freeze({
       schema: SCHEMA,
@@ -143,9 +174,9 @@
       // membiarkannya berdiri di daftar membuat pembaca diagnostik berikutnya percaya
       // masih ada cadangan peramban di bawah L3 — padahal di bawah L3 tinggal teks senyap.
       layer: String(opts.layer || ''),
-      title: e.title,
+      title: naskah(kunci, 'title', e.title),
       body: body,
-      reassurance: REASSURANCE,
+      reassurance: frasaVoice('reassurance', REASSURANCE),
       // Selalu ada, dan selalu 'advisory'. Ia menandai bahwa pemberitahuan ini TIDAK BOLEH
       // mengubah state pelajaran: tidak mengunci item, tidak menghitung replay.
       severity: 'advisory',
