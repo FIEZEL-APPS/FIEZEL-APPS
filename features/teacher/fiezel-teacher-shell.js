@@ -138,7 +138,7 @@
            yang mayoritas pada jeda 3 detik - cukup menyegarkan chipnya. */
         var berubah = total.ingested || total.graded || total.events.length;
         if (!quiet) render(); else if (berubah) syncRender(); else paintSyncChip();
-        if (total.events.length) { var top = total.events.filter(function (e) { return e.kind === 'assignment_done'; })[0] || total.events[0]; toast(T.inboxText(top) + (total.events.length > 1 ? ' · +' + (total.events.length - 1) + ' kabar lain' : '')); }
+        if (total.events.length) { var top = total.events.filter(function (e) { return e.kind === 'focus_exit'; })[0] || total.events.filter(function (e) { return e.kind === 'assignment_done'; })[0] || total.events[0]; toast(T.inboxText(top) + (total.events.length > 1 ? ' · +' + (total.events.length - 1) + ' kabar lain' : '')); }
         else if (total.ingested) toast(total.ingested + ' laporan murid masuk' + (total.graded ? ' · ' + total.graded + ' tugas dinilai otomatis' : '') + '.');
         else if (!quiet) toast(total.failed ? 'Sinkron gagal untuk ' + total.failed + ' kelas.' : 'Tersinkron — belum ada laporan baru.');
       });
@@ -287,7 +287,7 @@
     var T = S(), list = (st.inbox || []).slice(0, 30);
     return '<div class="tg-inbox-scrim" data-tg="close"></div><section class="tg-inbox" role="dialog" aria-label="Notifikasi" data-testid="tg-inbox"><div class="tg-inbox-head"><h3>' + t('umum.notifikasi', 'Notifikasi') + '</h3>' + (list.length ? '<button type="button" class="tg-link" data-tg="inbox-clear">Bersihkan</button>' : '') + '</div>' +
       (list.length ? '<ul class="tg-inbox-list">' + list.map(function (e) {
-        var ic = e.kind === 'assignment_done' ? 'clipboard-check' : e.kind === 'student_joined' ? 'user-plus' : 'inbox';
+        var ic = e.kind === 'assignment_done' ? 'clipboard-check' : e.kind === 'student_joined' ? 'user-plus' : e.kind === 'focus_exit' ? 'eye-off' : 'inbox';
         return '<li><button type="button" class="tg-inbox-item' + (e.read ? '' : ' is-unread') + '" data-tg="inbox-open" data-id="' + esc(e.id) + '" data-testid="tg-inbox-' + esc(e.id) + '">' + icon(ic) + '<div><b>' + esc(T.inboxText(e)) + '</b><small>' + esc(T.fmtDate(e.at)) + ' · ' + esc(new Date(e.at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })) + '</small></div></button></li>';
       }).join('') + '</ul>' : '<p class="tg-empty">' + t('guru.belum-ada-kabar', 'Belum ada kabar. Saat murid selesai mengerjakan tugas yang kamu kirim, hasilnya muncul di sini otomatis.') + '</p>') + '</section>';
   }
@@ -402,6 +402,17 @@
   var views = { hub: function () { return '<div id="tgClassHub" class="tg-hub-host"></div>'; }, briefing: briefing, classes: classes, assignments: assignments, insights: insights, comms: comms, journal: journal, settings: settings };
 
   // ---- DRAWER siswa -------------------------------------------------------------------------------
+  /* Pendeteksi keluar layar: yang ditampilkan di sini adalah UJIAN yang benar-benar punya
+     catatan. Murid tanpa catatan tidak memunculkan bagian apa pun — laci ini dibuka guru
+     untuk menolong satu murid, dan menambahkan baris "0 kali keluar layar" pada setiap laci
+     akan mengubah alat bantu menjadi rapor kecurigaan. */
+  function focusPanel(c, s) {
+    var T = S(), rows = (c.assignments || []).map(function (a) { var f = T.focusOf ? T.focusOf(a, s) : null; return f && f.n ? { a: a, f: f } : null; }).filter(Boolean);
+    if (!rows.length) return '';
+    return '<h4>Keluar layar saat mengerjakan</h4><ul class="tg-mini-list" data-testid="tg-focus-list">' + rows.map(function (r) {
+      return '<li><span class="tg-focus is-' + T.focusLevel(r.f) + '">' + icon('eye-off') + ' ' + esc(T.focusLabel(r.f)) + '</span> ' + esc(r.a.title) + '</li>';
+    }).join('') + '</ul><p class="tg-muted tg-small">Terdeteksi berpindah dari layar FIEZEL saat sesi berjalan. Tanyakan dulu ke muridnya — bisa saja ia dipanggil atau sinyalnya putus.</p>';
+  }
   function drawer(c) {
     if (!ui.drawer || !c) return '';
     var T = S(), s = student(ui.drawer); if (!s) return '';
@@ -412,6 +423,7 @@
       '<div class="tg-action-box"><p class="tg-kicker">Tindakan yang disarankan</p><p>' + esc(r.action) + '</p><div class="tg-actions"><button type="button" class="tg-btn is-primary is-small" data-tg="modal" data-kind="greet" data-id="' + s.id + '">' + icon('message-circle-heart') + ' Kartu sapa</button><button type="button" class="tg-btn is-ghost is-small" data-tg="modal" data-kind="parent" data-id="' + s.id + '">' + icon('file-text') + ' Laporan ortu</button><button type="button" class="tg-btn is-ghost is-small" data-tg="modal" data-kind="assign" data-target="' + s.id + '"' + (r.weak ? ' data-skill="' + r.weak.skill + '"' : '') + '>' + icon('plus') + ' ' + t('guru.tugas-khusus', 'Tugas khusus') + '</button></div></div>' +
       '<h4>Skill</h4><div class="tg-skill-rows">' + T.SKILL_ORDER.map(function (k) { var v = T.skillAcc(s, k); return '<div class="tg-skill-row"><span>' + esc(T.SKILL_LABEL[k]) + '</span>' + bar(v, v != null && v < 0.5 ? 'is-warn' : '') + '<b>' + pct(v) + '</b></div>'; }).join('') + '</div>' +
       '<h4>Kehadiran 7 hari</h4><div class="tg-att-strip">' + att.map(function (a) { return '<span class="is-' + (a.v || 'none') + '" title="' + a.date + '">' + (a.v || '·') + '</span>'; }).join('') + '</div>' +
+      focusPanel(c, s) +
       '<h4>' + t('umum.tugas', 'Tugas') + '</h4>' + (pend.length ? '<ul class="tg-mini-list">' + pend.map(function (p) { return '<li>' + esc(p.a.title) + (p.late ? ' <strong class="tg-late">lewat</strong>' : '') + ' <button type="button" class="tg-link" data-tg="mark-done" data-id="' + p.a.id + '" data-sid="' + s.id + '">tandai selesai</button></li>'; }).join('') + '</ul>' : '<p class="tg-muted">Semua tugas selesai.</p>') +
       '<h4>Kontak orang tua</h4><form data-tg-form="phone" data-id="' + s.id + '" class="tg-inline"><input name="phone" inputmode="tel" value="' + esc(s.parentPhone) + '" placeholder="08xx / 62xx" data-testid="tg-phone-input"><button type="submit" class="tg-btn is-small is-ghost" data-testid="tg-phone-save">' + t('umum.simpan', 'Simpan') + '</button></form>' +
       '<h4>Catatan guru</h4><form data-tg-form="note" data-id="' + s.id + '" class="tg-inline"><input name="text" required placeholder="Catatan singkat…" data-testid="tg-note-input"><button type="submit" class="tg-btn is-small is-ghost" data-testid="tg-note-save">' + t('umum.tambah', 'Tambah') + '</button></form>' +

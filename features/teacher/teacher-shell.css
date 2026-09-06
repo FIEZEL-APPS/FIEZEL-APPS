@@ -323,3 +323,9 @@ html.fiezel-ui-v6 body.fz-teacher-mode .tg button.tg-seg-btn:not(.primary):not(.
 .tg-send-list .tg-grow{flex:1}
 .tg-sent-note{display:flex;align-items:center;gap:6px;margin:8px 0 0;font-size:.8rem}
 @media (max-width:760px){.tg-inbox{top:auto;bottom:76px;right:12px;left:12px;width:auto;max-height:60vh}}
+
+/* Pendeteksi keluar layar di laci murid: satu chip per ujian yang punya catatan. */
+.tg-focus{display:inline-flex;align-items:center;gap:5px;font-size:.72rem;font-weight:700;padding:3px 9px;border-radius:999px;background:var(--tg-info-soft);color:var(--tg-info)}
+.tg-focus i,.tg-focus svg{width:13px;height:13px}
+.tg-focus.is-berat{background:var(--tg-bad-soft);color:var(--tg-bad)}
+.tg-muted.tg-small{font-size:.78rem;line-height:1.45}
