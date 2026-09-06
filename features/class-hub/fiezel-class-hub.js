@@ -199,6 +199,9 @@
     u.runner = { aid: a.id, idx: 0, order: order, answers: [], chosen: null, revealed: false, startedAt: Date.now(), timerEnd: a.mode === 'ujian' && a.timer ? Date.now() + a.timer * 60000 : 0, finished: false, result: null };
     u.tab = 'tugas'; u.review = null;
     u.focus = a.mode === 'ujian' && FG() ? FG().start(a.id, Date.now()) : null;
+    /* Kunci ujian global: ia yang membuat pembimbing PAW dan layar Tanya FIEZEL menutup
+       diri, dan ia sama untuk SEMUA permukaan ujian — bukan hanya runner ini. */
+    try { if (a.mode === 'ujian' && root.FiezelExamLock) root.FiezelExamLock.begin('assignment', { id: a.id }); } catch (_) {}
     saveUi();
     try { LF() && LF().markAssignmentStarted(a.id); } catch (_) {}
     if (a.mode === 'ujian') { bindFocus(); } else { unbindFocus(); }
@@ -223,6 +226,7 @@
     if (!a) { ui().runner = null; saveUi(); renderStudent(); return; }
     var focus = null;
     focusSentAt = 0;
+    try { if (root.FiezelExamLock) root.FiezelExamLock.end('assignment'); } catch (_) {}
     if (ui().focus && FG()) { var fst = ui().focus; if (fst.awaySince) FG().back(fst, Date.now()); focus = FG().payload(fst, Date.now()); }
     unbindFocus();
     var res = null; try { res = LF() ? LF().recordAssignmentResult({ id: a.id, title: a.title, skill: a.skills[0], mode: a.mode, minutes: Math.round((Date.now() - r.startedAt) / 60000), results: r.answers, focus: focus }) : null; } catch (_) {}
@@ -234,7 +238,7 @@
     try { root.refreshNotifBadge && root.refreshNotifBadge(); } catch (_) {}
     renderStudent();
   }
-  function closeRunner() { var u = ui(); if (u.focus && FG()) { if (u.focus.awaySince) FG().back(u.focus, Date.now()); reportFocus(u.focus); } unbindFocus(); if (u.runner && u.runner.finished) u.focus = null; if (u.runner && !u.runner.finished && sEnv.toast) sEnv.toast(t('kelas.toast-disimpan-sedang', 'Tugas disimpan sebagai "sedang mengerjakan". Lanjutkan kapan saja.')); if (u.runner && u.runner.finished) u.runner = null; u.paused = !!u.runner; saveUi(); renderStudent(); }
+  function closeRunner() { var u = ui(); if (u.focus && FG()) { if (u.focus.awaySince) FG().back(u.focus, Date.now()); reportFocus(u.focus); } unbindFocus(); try { if (root.FiezelExamLock) root.FiezelExamLock.end('assignment'); } catch (_) {} if (u.runner && u.runner.finished) u.focus = null; if (u.runner && !u.runner.finished && sEnv.toast) sEnv.toast(t('kelas.toast-disimpan-sedang', 'Tugas disimpan sebagai "sedang mengerjakan". Lanjutkan kapan saja.')); if (u.runner && u.runner.finished) u.runner = null; u.paused = !!u.runner; saveUi(); renderStudent(); }
 
   function renderStudent() {
     if (!sEl) return; var u = ui(), pend = assignments(), done = subs();

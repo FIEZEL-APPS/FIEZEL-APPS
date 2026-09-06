@@ -737,6 +737,8 @@ html.fz-booting body{overflow:hidden}
   <script defer src="./features/teacher/fiezel-teacher-icons.js"></script>
   <script defer src="./features/teacher/fiezel-teacher-store.js"></script>
   <!-- Class hub: Kelas = pusat Guru ↔ Murid ↔ Braincore (dipakai tab Kelas murid & view Kelas Ruang Guru). Harus sebelum teacher-shell. -->
+  <!-- Kunci ujian: satu penanda "sedang ujian" untuk pendeteksi DAN pintu AI. Harus sebelum app.js. -->
+  <script defer src="./features/ui/fiezel-exam-lock.js"></script>
   <!-- Pendeteksi keluar layar saat ujian: inti murni, dipakai class-hub. Harus sebelum class-hub. -->
   <script defer src="./features/class-hub/fiezel-focus-guard.js"></script>
   <script defer src="./features/class-hub/fiezel-braincore-review.js"></script>
