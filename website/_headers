@@ -16,6 +16,14 @@
   Cache-Control: public, max-age=0, must-revalidate
 /promo/
   Cache-Control: public, max-age=0, must-revalidate
+/privacy/
+  Cache-Control: public, max-age=0, must-revalidate
+/terms/
+  Cache-Control: public, max-age=0, must-revalidate
+/th/privacy/
+  Cache-Control: public, max-age=0, must-revalidate
+/th/terms/
+  Cache-Control: public, max-age=0, must-revalidate
 
 # Static assets dengan cache-busting version query string
 /*.css
