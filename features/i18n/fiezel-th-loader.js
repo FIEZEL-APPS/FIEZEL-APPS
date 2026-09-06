@@ -49,6 +49,7 @@
     './features/i18n/copy-th-student.js',
     './features/i18n/copy-th-redesign.js',
     './features/i18n/copy-th-proctor.js',
+    './features/i18n/copy-th-bahasa.js',
     './features/i18n/copy-th-classjoin.js',
     './features/i18n/copy-th-google.js',
     './features/i18n/copy-th-pawarena.js',

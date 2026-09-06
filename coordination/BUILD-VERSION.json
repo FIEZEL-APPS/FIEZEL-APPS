@@ -1,7 +1,7 @@
 {
-  "version": "m025-284",
-  "claimedBy": "branch claude/th-kebocoran-kurikulum-dlz1d4",
-  "claimedAt": "2026-09-06T21:47:27.059Z",
-  "reason": "m025-285: kunci i18n hantu di kurikulum diperbaiki + gerbang barunya",
+  "version": "m025-285",
+  "claimedBy": "branch claude/japanese-wire-ui",
+  "claimedAt": "2026-09-06T22:55:36.371Z",
+  "reason": "Kursus Jepang sampai ke layar: pemilih bahasa + bank ja dimuat",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
