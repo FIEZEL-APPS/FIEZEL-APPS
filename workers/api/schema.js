@@ -55,6 +55,9 @@ export const BYTE_LIMITS = Object.freeze({
   '/api/usage/pepper': 512,     // GET, tanpa body
   // --- SLOT 10: akun/peran/konten guru. Cap kecil di mana-mana KECUALI dua jalur
   //     CSV: payload kecil = CPU kecil, dan CPU adalah anggaran paling langka.
+  // --- SLOT 12: login Google. ID token Google ~1-2 KB; cap 8 KB memberi ruang
+  //     token panjang tanpa membuka pintu bagi badan besar yang tidak dipakai.
+  '/api/auth/google': 8192,
   '/api/account/register': 1024,
   '/api/account/login': 1024,
   '/api/account/logout': 512,
