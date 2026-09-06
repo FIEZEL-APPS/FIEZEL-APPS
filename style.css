@@ -1954,6 +1954,21 @@ body.voice-bundle-locked .bottomnav,body.voice-bundle-locked .app-header{pointer
 .fiezel-language-copy{display:flex;flex-direction:column;gap:3px;text-align:left}
 .fiezel-language-copy small{font-size:12px;color:var(--fz-ink-muted)}
 @media (max-width:340px){.fiezel-language-grid{grid-template-columns:1fr}}
+/* "Sudah punya akun?" di layar pemilih bahasa. SENGAJA sekunder: pemisah tipis,
+   naskah kecil, tanpa warna aksi — mayoritas yang membuka layar ini murid baru yang
+   memang harus memilih bahasa, dan tombol masuk yang menonjol akan membuat mereka
+   ragu pada langkah pertama. */
+.fiezel-language-signin{margin-top:18px;display:flex;flex-direction:column;
+  align-items:center;gap:8px}
+.fiezel-language-sep{display:flex;align-items:center;gap:10px;width:100%;
+  font-size:var(--fs-caption);color:var(--fz-ink-muted)}
+.fiezel-language-sep::before,.fiezel-language-sep::after{content:'';flex:1;height:1px;
+  background:var(--fz-line)}
+.fiezel-language-signin-note{margin:0;text-align:center;font-size:12px;line-height:1.5;
+  color:var(--fz-ink-muted);max-width:38ch}
+/* Tinggi minimum supaya isi layar tidak melompat saat tombol Google akhirnya tiba. */
+.fiezel-language-google{min-height:44px;display:flex;justify-content:center;
+  align-items:center}
 .fiezel-level-row{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-start;width:100%}
 .fiezel-level-chip{min-height:44px;padding:0 16px;border-radius:var(--radius-pill);border:1.5px solid var(--fz-line);
   background:var(--fz-paper);color:var(--fz-ink);font-family:var(--fz-body);font-weight:700;font-size:13px}
