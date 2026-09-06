@@ -1,0 +1,1236 @@
+{
+ "schema": "fiezel-japanese-bank-v1",
+ "target": "ja",
+ "cefr": "A1",
+ "jlpt": "N5",
+ "family": "polite_forms",
+ "catatan": "Bank soal A1/N5 keluarga polite_forms. Dijaga tests/japanese-content-test.js.",
+ "provenans": {
+  "sumberSilabus": "Minna no Nihongo dan Irodori dipakai SEBAGAI SILABUS SAJA: poin tata bahasa apa, urutannya bagaimana, di tingkat berapa. NOL kalimat, dialog, teks, atau daftar kosakata yang direproduksi atau diturunkan — setiap stem, pilihan, pengecoh, dan penjelasan ditulis baru.",
+  "akibatLisensi": "Karena tidak ada teks Irodori yang dipakai, FIEZEL TIDAK terikat kewajiban gratis-selamanya dari lisensinya.",
+  "statusNaskah": "Kalimat Jepang dan penjelasan Inggris/Indonesia berstatus DRAFT AI dan wajib direview penutur asli sebelum dipakai menilai murid."
+ },
+ "jumlah": 20,
+ "templates": [
+  {
+   "id": "JP-PF-201",
+   "family": "polite_forms",
+   "skill": "polite_forms",
+   "subskill": "masu_nonpast_affirmative_habit",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "masu-answers-nonpast-habit-question",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Answer a MASU-KA question about a daily habit with the plain polite non-past MASU",
+   "pedagogicalObjectiveId": "Menjawab pertanyaan berakhiran ますか tentang kebiasaan harian dengan bentuk sopan non-lampau ます",
+   "misconceptionTargeted": "Learner switches to a past ending even though the question asks about a repeated present habit",
+   "misconceptionTargetedId": "Murid berpindah ke akhiran lampau padahal pertanyaannya tentang kebiasaan yang berulang saat ini",
+   "reasoningOperation": "read the ending of the question -> keep the same tense and polarity in the answer",
+   "reasoningOperationId": "baca akhiran pertanyaannya -> pertahankan kala dan polaritas yang sama di jawaban",
+   "stem": "「まいあさ なんじに おきますか。」「ろくじに ___。」",
+   "stemKana": "「まいあさ なんじに おきますか。」「ろくじに ___。」",
+   "furigana": [],
+   "options": [
+    "おきます",
+    "おきました",
+    "おきません",
+    "おきませんでした"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "おきました",
+     "misconception": "answers a habit question with the past tense",
+     "misconceptionId": "menjawab pertanyaan kebiasaan dengan kala lampau",
+     "whyFails": "MAIASA means every morning, a habit that is still true. MASHITA would report one finished morning only.",
+     "whyFailsId": "まいあさ berarti setiap pagi, kebiasaan yang masih berlaku. ました hanya melaporkan satu pagi yang sudah lewat."
+    },
+    {
+     "option": "おきません",
+     "misconception": "flips polarity although the answer states the time of getting up",
+     "misconceptionId": "membalik polaritas padahal jawabannya menyebutkan jam bangun",
+     "whyFails": "The answer names a time, ROKUJI, so the person does get up. A negative would contradict the time given.",
+     "whyFailsId": "Jawabannya menyebut jam, ろくじ, jadi orangnya memang bangun. Bentuk negatif akan bertentangan dengan jam itu."
+    },
+    {
+     "option": "おきませんでした",
+     "misconception": "changes both tense and polarity at once",
+     "misconceptionId": "mengubah kala sekaligus polaritas sekaligus",
+     "whyFails": "MASEN DESHITA is past and negative. The question is non-past and the answer is affirmative, so both parts are wrong.",
+     "whyFailsId": "ませんでした itu lampau dan negatif. Pertanyaannya non-lampau dan jawabannya afirmatif, jadi kedua bagiannya salah."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "MAIASA marks a repeated present habit, so the polite non-past MASU is the matching ending.",
+    "whyCorrectId": "まいあさ menandai kebiasaan yang berulang sekarang, jadi bentuk sopan non-lampau ます adalah akhiran yang cocok.",
+    "rule": "A MASU-KA question about a habit is answered with MASU; the answer keeps the tense and polarity of the question.",
+    "ruleId": "Pertanyaan ますか tentang kebiasaan dijawab dengan ます; jawaban mempertahankan kala dan polaritas pertanyaannya.",
+    "whyOthersFail": "MASHITA moves the habit into the past, MASEN denies it, MASEN DESHITA does both.",
+    "whyOthersFailId": "ました memindahkan kebiasaan ke masa lampau, ません menyangkalnya, ませんでした melakukan keduanya.",
+    "howToAvoid": "Find the time word first. MAIASA, MAINICHI and MAIBAN all point to MASU.",
+    "howToAvoidId": "Cari kata waktunya lebih dulu. まいあさ, まいにち, dan まいばん semuanya mengarah ke ます.",
+    "memoryCue": "Every morning is still happening, so the ending stays MASU.",
+    "memoryCueId": "Setiap pagi masih berlangsung, jadi akhirannya tetap ます."
+   }
+  },
+  {
+   "id": "JP-PF-202",
+   "family": "polite_forms",
+   "skill": "polite_forms",
+   "subskill": "masu_nonpast_affirmative_future_plan",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "masu-covers-future-plan-with-raishuu",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Use MASU for a future plan, since Japanese has no separate future ending",
+   "pedagogicalObjectiveId": "Memakai ます untuk rencana di masa depan, karena bahasa Jepang tidak punya akhiran khusus masa depan",
+   "misconceptionTargeted": "Learner looks for a special future form and picks the past ending because MASU feels present-only",
+   "misconceptionTargetedId": "Murid mencari bentuk khusus masa depan lalu memilih akhiran lampau karena ます terasa hanya untuk sekarang",
+   "reasoningOperation": "classify the time word as future -> choose the non-past ending MASU",
+   "reasoningOperationId": "golongkan kata waktunya sebagai masa depan -> pilih akhiran non-lampau ます",
+   "stem": "「らいしゅう きょうとへ いきますか。」「はい、かぞくと ___。」",
+   "stemKana": "「らいしゅう きょうとへ いきますか。」「はい、かぞくと ___。」",
+   "furigana": [],
+   "options": [
+    "いきます",
+    "いきました",
+    "いきません",
+    "いきませんでした"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "いきました",
+     "misconception": "uses the past ending for an event that has not happened yet",
+     "misconceptionId": "memakai akhiran lampau untuk peristiwa yang belum terjadi",
+     "whyFails": "RAISHUU is next week. MASHITA can only report something already finished.",
+     "whyFailsId": "らいしゅう artinya minggu depan. ました hanya bisa melaporkan hal yang sudah selesai."
+    },
+    {
+     "option": "いきません",
+     "misconception": "gives a negative verb after the affirmative answer word HAI",
+     "misconceptionId": "memberi verba negatif setelah kata jawaban afirmatif はい",
+     "whyFails": "HAI has already agreed with the question, so the verb must stay affirmative.",
+     "whyFailsId": "はい sudah menyetujui pertanyaannya, jadi verbanya harus tetap afirmatif."
+    },
+    {
+     "option": "いきませんでした",
+     "misconception": "attaches a past negative to a future plan",
+     "misconceptionId": "menempelkan negatif lampau pada rencana masa depan",
+     "whyFails": "MASEN DESHITA reports a past non-event; it cannot describe a trip planned for next week.",
+     "whyFailsId": "ませんでした melaporkan sesuatu yang tidak terjadi di masa lampau; itu tidak bisa menggambarkan perjalanan minggu depan."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "Japanese uses one non-past ending for both present habits and future plans, so RAISHUU takes MASU.",
+    "whyCorrectId": "Bahasa Jepang memakai satu akhiran non-lampau untuk kebiasaan sekarang dan rencana nanti, jadi らいしゅう memakai ます.",
+    "rule": "MASU = non-past: now, habits, and anything still to come. Only finished events take MASHITA.",
+    "ruleId": "ます = non-lampau: sekarang, kebiasaan, dan segala yang belum terjadi. Hanya peristiwa selesai yang memakai ました.",
+    "whyOthersFail": "MASHITA and MASEN DESHITA place the trip in the past; MASEN contradicts HAI.",
+    "whyOthersFailId": "ました dan ませんでした menempatkan perjalanan itu di masa lampau; ません bertentangan dengan はい.",
+    "howToAvoid": "Sort the time word into past or not-past. RAISHUU, ASHITA and RAINEN are all not-past.",
+    "howToAvoidId": "Golongkan kata waktunya: lampau atau bukan. らいしゅう, あした, dan らいねん semuanya bukan lampau.",
+    "memoryCue": "There is no future ending; MASU already covers tomorrow.",
+    "memoryCueId": "Tidak ada akhiran masa depan; ます sudah mencakup besok."
+   }
+  },
+  {
+   "id": "JP-PF-203",
+   "family": "polite_forms",
+   "skill": "polite_forms",
+   "subskill": "masen_nonpast_negative_after_iie",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "masen-answers-iie-in-nonpast",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Form the polite non-past negative MASEN when IIE denies a non-past question",
+   "pedagogicalObjectiveId": "Membentuk negatif sopan non-lampau ません ketika いいえ menyangkal pertanyaan non-lampau",
+   "misconceptionTargeted": "Learner hears IIE and reaches for the past negative MASEN DESHITA regardless of the question tense",
+   "misconceptionTargetedId": "Murid mendengar いいえ lalu langsung meraih negatif lampau ませんでした tanpa melihat kala pertanyaannya",
+   "reasoningOperation": "check the tense of the question -> negate without changing that tense",
+   "reasoningOperationId": "periksa kala pertanyaannya -> negasikan tanpa mengubah kala itu",
+   "stem": "「まいばん コーヒーを のみますか。」「いいえ、___。」",
+   "stemKana": "「まいばん コーヒーを のみますか。」「いいえ、___。」",
+   "furigana": [],
+   "options": [
+    "のみません",
+    "のみませんでした",
+    "のみます",
+    "のみました"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "のみませんでした",
+     "misconception": "adds past tense to the negation although the question is non-past",
+     "misconceptionId": "menambahkan kala lampau pada negasi padahal pertanyaannya non-lampau",
+     "whyFails": "The question ends in MASU KA, not MASHITA KA, so the denial must stay non-past.",
+     "whyFailsId": "Pertanyaannya berakhir ますか, bukan ましたか, jadi penyangkalannya harus tetap non-lampau."
+    },
+    {
+     "option": "のみます",
+     "misconception": "keeps the affirmative verb after the denial word IIE",
+     "misconceptionId": "mempertahankan verba afirmatif setelah kata penyangkal いいえ",
+     "whyFails": "IIE announces a denial, so an affirmative verb immediately contradicts it.",
+     "whyFailsId": "いいえ mengumumkan penyangkalan, jadi verba afirmatif langsung bertentangan dengannya."
+    },
+    {
+     "option": "のみました",
+     "misconception": "changes tense instead of polarity",
+     "misconceptionId": "mengubah kala, bukan polaritas",
+     "whyFails": "MASHITA is affirmative and past; the answer needs negative and non-past.",
+     "whyFailsId": "ました itu afirmatif dan lampau; jawabannya butuh negatif dan non-lampau."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "MAIBAN and the MASU KA ending set the tense as non-past; IIE only flips the polarity, giving MASEN.",
+    "whyCorrectId": "まいばん dan akhiran ますか menetapkan kalanya non-lampau; いいえ hanya membalik polaritas, sehingga menjadi ません.",
+    "rule": "IIE changes affirmative to negative but never changes the tense of the question.",
+    "ruleId": "いいえ mengubah afirmatif menjadi negatif, tetapi tidak pernah mengubah kala pertanyaan.",
+    "whyOthersFail": "MASEN DESHITA adds an unwanted past, while MASU and MASHITA stay affirmative.",
+    "whyOthersFailId": "ませんでした menambah kala lampau yang tidak diminta, sedangkan ます dan ました tetap afirmatif.",
+    "howToAvoid": "Copy the tense from the question, then flip only the polarity.",
+    "howToAvoidId": "Salin kala dari pertanyaannya, lalu balik polaritasnya saja.",
+    "memoryCue": "IIE flips one switch, not two.",
+    "memoryCueId": "いいえ membalik satu sakelar, bukan dua."
+   }
+  },
+  {
+   "id": "JP-PF-204",
+   "family": "polite_forms",
+   "skill": "polite_forms",
+   "subskill": "masen_with_zenzen_habitual",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "zenzen-forces-negative-mainichi-keeps-nonpast",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Match ZENZEN, which demands a negative, with MAINICHI, which demands non-past",
+   "pedagogicalObjectiveId": "Memadukan ぜんぜん yang menuntut bentuk negatif dengan まいにち yang menuntut non-lampau",
+   "misconceptionTargeted": "Learner notices only one of the two cues and gets either the polarity or the tense wrong",
+   "misconceptionTargetedId": "Murid hanya memperhatikan satu dari dua petunjuk sehingga salah polaritas atau salah kala",
+   "reasoningOperation": "collect both cues -> ZENZEN sets negative, MAINICHI sets non-past -> combine into MASEN",
+   "reasoningOperationId": "kumpulkan kedua petunjuk -> ぜんぜん menetapkan negatif, まいにち menetapkan non-lampau -> gabungkan menjadi ません",
+   "stem": "わたしは まいにち にくを ぜんぜん ___。やさいだけ たべます。",
+   "stemKana": "わたしは まいにち にくを ぜんぜん ___。やさいだけ たべます。",
+   "furigana": [],
+   "options": [
+    "たべません",
+    "たべます",
+    "たべませんでした",
+    "たべました"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "たべます",
+     "misconception": "ignores that ZENZEN can only be completed by a negative verb",
+     "misconceptionId": "mengabaikan bahwa ぜんぜん hanya bisa dilengkapi verba negatif",
+     "whyFails": "ZENZEN means not at all and needs a negative ending; with MASU the sentence has no negation to attach to.",
+     "whyFailsId": "ぜんぜん berarti sama sekali tidak dan butuh akhiran negatif; dengan ます kalimatnya tidak punya negasi untuk disandarkan."
+    },
+    {
+     "option": "たべませんでした",
+     "misconception": "reads the negative cue but adds a past that MAINICHI rules out",
+     "misconceptionId": "membaca petunjuk negatif tetapi menambah kala lampau yang ditolak まいにち",
+     "whyFails": "MAINICHI describes a habit that is still true, and the next sentence ends in MASU, so the past does not fit.",
+     "whyFailsId": "まいにち menggambarkan kebiasaan yang masih berlaku, dan kalimat berikutnya berakhir ます, jadi kala lampau tidak cocok."
+    },
+    {
+     "option": "たべました",
+     "misconception": "misses both cues at once",
+     "misconceptionId": "melewatkan kedua petunjuk sekaligus",
+     "whyFails": "MASHITA is affirmative and past, so it clashes with ZENZEN and with MAINICHI together.",
+     "whyFailsId": "ました itu afirmatif dan lampau, jadi bertabrakan dengan ぜんぜん dan まいにち sekaligus."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "ZENZEN requires a negative verb and MAINICHI requires the non-past, and only MASEN satisfies both.",
+    "whyCorrectId": "ぜんぜん menuntut verba negatif dan まいにち menuntut non-lampau, dan hanya ません yang memenuhi keduanya.",
+    "rule": "Adverbs like ZENZEN and AMARI pair only with negative endings; the time word decides which negative.",
+    "ruleId": "Kata keterangan seperti ぜんぜん dan あまり hanya berpasangan dengan akhiran negatif; kata waktu menentukan negatif yang mana.",
+    "whyOthersFail": "MASU and MASHITA are affirmative, and MASEN DESHITA puts a current habit in the past.",
+    "whyOthersFailId": "ます dan ました itu afirmatif, dan ませんでした menempatkan kebiasaan sekarang di masa lampau.",
+    "howToAvoid": "Answer two questions in order: negative or not, then past or not.",
+    "howToAvoidId": "Jawab dua pertanyaan berurutan: negatif atau tidak, lalu lampau atau tidak.",
+    "memoryCue": "ZENZEN always ends in a NO; MAINICHI keeps that NO in the present.",
+    "memoryCueId": "ぜんぜん selalu berujung 'tidak'; まいにち menjaga 'tidak' itu tetap di masa kini."
+   }
+  },
+  {
+   "id": "JP-PF-205",
+   "family": "polite_forms",
+   "skill": "polite_forms",
+   "subskill": "mashita_past_affirmative_kinou",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "kinou-selects-mashita-affirmative",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Choose MASHITA when KINOU marks a finished affirmative event",
+   "pedagogicalObjectiveId": "Memilih ました ketika きのう menandai peristiwa afirmatif yang sudah selesai",
+   "misconceptionTargeted": "Learner reads KINOU but still answers with the non-past MASU",
+   "misconceptionTargetedId": "Murid membaca きのう tetapi tetap menjawab dengan ます non-lampau",
+   "reasoningOperation": "identify the time word as past -> attach the past affirmative ending",
+   "reasoningOperationId": "kenali kata waktunya sebagai lampau -> pasang akhiran afirmatif lampau",
+   "stem": "きのう えきで ふるい ともだちに ___。とても うれしかったです。",
+   "stemKana": "きのう えきで ふるい ともだちに ___。とても うれしかったです。",
+   "furigana": [],
+   "options": [
+    "あいました",
+    "あいます",
+    "あいませんでした",
+    "あいません"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "あいます",
+     "misconception": "reads KINOU but still answers in the non-past",
+     "misconceptionId": "membaca きのう tetapi tetap menjawab dalam bentuk non-lampau",
+     "whyFails": "KINOU is yesterday, a closed day, so the non-past MASU cannot describe it.",
+     "whyFailsId": "きのう adalah kemarin, hari yang sudah tertutup, jadi ます non-lampau tidak bisa menggambarkannya."
+    },
+    {
+     "option": "あいませんでした",
+     "misconception": "gets the past right but negates an event the next sentence confirms",
+     "misconceptionId": "kalanya benar tetapi menegasikan peristiwa yang justru dibenarkan kalimat berikutnya",
+     "whyFails": "The speaker says they were very happy, which only makes sense if the meeting did happen.",
+     "whyFailsId": "Penuturnya berkata sangat senang, dan itu hanya masuk akal kalau pertemuannya memang terjadi."
+    },
+    {
+     "option": "あいません",
+     "misconception": "misses the tense and the polarity together",
+     "misconceptionId": "salah kala dan polaritas sekaligus",
+     "whyFails": "MASEN is non-past and negative, while the sentence needs past and affirmative.",
+     "whyFailsId": "ません itu non-lampau dan negatif, sedangkan kalimatnya butuh lampau dan afirmatif."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "KINOU places the meeting in a finished day and the follow-up sentence confirms it happened, so MASHITA is right.",
+    "whyCorrectId": "きのう menempatkan pertemuan itu di hari yang sudah selesai dan kalimat lanjutannya menegaskan itu terjadi, jadi ました yang tepat.",
+    "rule": "MASU becomes MASHITA for events that are already over.",
+    "ruleId": "ます berubah menjadi ました untuk peristiwa yang sudah berlalu.",
+    "whyOthersFail": "MASU and MASEN are non-past; MASEN DESHITA denies a meeting the speaker enjoyed.",
+    "whyOthersFailId": "ます dan ません itu non-lampau; ませんでした menyangkal pertemuan yang justru disenangi penuturnya.",
+    "howToAvoid": "Underline the time word before you touch the verb ending.",
+    "howToAvoidId": "Garis bawahi kata waktunya sebelum menyentuh akhiran verbanya.",
+    "memoryCue": "KINOU closes the door; MASHITA locks it.",
+    "memoryCueId": "きのう menutup pintunya; ました menguncinya."
+   }
+  },
+  {
+   "id": "JP-PF-206",
+   "family": "polite_forms",
+   "skill": "polite_forms",
+   "subskill": "mashita_answers_mou_question",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "mou-question-answered-with-mashita",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Answer a MOU question with MASHITA to confirm a completed action",
+   "pedagogicalObjectiveId": "Menjawab pertanyaan もう dengan ました untuk memastikan perbuatan yang sudah selesai",
+   "misconceptionTargeted": "Learner treats MOU as a present-time word and answers with MASU",
+   "misconceptionTargetedId": "Murid menganggap もう sebagai kata waktu masa kini lalu menjawab dengan ます",
+   "reasoningOperation": "read MOU as already -> completion -> answer with the past affirmative",
+   "reasoningOperationId": "baca もう sebagai 'sudah' -> keselesaian -> jawab dengan afirmatif lampau",
+   "stem": "「もう ひるごはんを たべましたか。」「はい、じゅうにじに ___。」",
+   "stemKana": "「もう ひるごはんを たべましたか。」「はい、じゅうにじに ___。」",
+   "furigana": [],
+   "options": [
+    "たべました",
+    "たべます",
+    "たべませんでした",
+    "たべません"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "たべます",
+     "misconception": "answers a completion question with the non-past",
+     "misconceptionId": "menjawab pertanyaan keselesaian dengan bentuk non-lampau",
+     "whyFails": "The question ends in MASHITA KA and MOU means already, so the answer cannot stay non-past.",
+     "whyFailsId": "Pertanyaannya berakhir ましたか dan もう berarti sudah, jadi jawabannya tidak bisa tetap non-lampau."
+    },
+    {
+     "option": "たべませんでした",
+     "misconception": "negates the verb after the confirming word HAI",
+     "misconceptionId": "menegasikan verba setelah kata penegas はい",
+     "whyFails": "HAI confirms the action was completed, and a stated time of twelve o'clock supports it.",
+     "whyFailsId": "はい menegaskan perbuatannya selesai, dan penyebutan pukul dua belas mendukungnya."
+    },
+    {
+     "option": "たべません",
+     "misconception": "answers with a non-past refusal instead of a past report",
+     "misconceptionId": "menjawab dengan penolakan non-lampau, bukan laporan lampau",
+     "whyFails": "MASEN would say the speaker does not eat lunch at all, which does not answer whether lunch is finished.",
+     "whyFailsId": "ません akan berarti penuturnya memang tidak makan siang, dan itu tidak menjawab apakah makan siangnya sudah selesai."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "MOU asks whether the action is finished, and HAI plus a clock time confirms it, so MASHITA is required.",
+    "whyCorrectId": "もう menanyakan apakah perbuatannya sudah selesai, dan はい ditambah penyebutan jam menegaskannya, jadi ました yang diperlukan.",
+    "rule": "MOU + MASHITA KA is answered with HAI + MASHITA; the denial would be MADA + TE IMASEN.",
+    "ruleId": "もう + ましたか dijawab dengan はい + ました; penyangkalannya adalah まだ + ていません.",
+    "whyOthersFail": "MASU and MASEN stay non-past; MASEN DESHITA contradicts HAI.",
+    "whyOthersFailId": "ます dan ません tetap non-lampau; ませんでした bertentangan dengan はい.",
+    "howToAvoid": "Let the question ending choose your answer ending.",
+    "howToAvoidId": "Biarkan akhiran pertanyaannya yang memilih akhiran jawabanmu.",
+    "memoryCue": "MOU means done, and done means MASHITA.",
+    "memoryCueId": "もう berarti selesai, dan selesai berarti ました."
+   }
+  },
+  {
+   "id": "JP-PF-207",
+   "family": "polite_forms",
+   "skill": "polite_forms",
+   "subskill": "mashita_past_affirmative_senshuu",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "senshuu-report-takes-mashita",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Report a finished past action with MASHITA when the time word is SENSHUU",
+   "pedagogicalObjectiveId": "Melaporkan perbuatan lampau yang selesai dengan ました ketika kata waktunya せんしゅう",
+   "misconceptionTargeted": "Learner confuses SENSHUU with RAISHUU and picks a non-past ending",
+   "misconceptionTargetedId": "Murid mengacaukan せんしゅう dengan らいしゅう lalu memilih akhiran non-lampau",
+   "reasoningOperation": "translate the time word exactly -> last week is past -> use MASHITA",
+   "reasoningOperationId": "terjemahkan kata waktunya dengan tepat -> minggu lalu itu lampau -> pakai ました",
+   "stem": "せんしゅうの にちようび、わたしは あたらしい かばんを ___。",
+   "stemKana": "せんしゅうの にちようび、わたしは あたらしい かばんを ___。",
+   "furigana": [],
+   "options": [
+    "かいました",
+    "かいます",
+    "かいません",
+    "かいませんでした"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "かいます",
+     "misconception": "confuses SENSHUU with RAISHUU and answers in the non-past",
+     "misconceptionId": "mengacaukan せんしゅう dengan らいしゅう lalu menjawab non-lampau",
+     "whyFails": "SEN means before and SHUU means week, so the day is already gone and MASU cannot reach it.",
+     "whyFailsId": "せん berarti sebelum dan しゅう berarti minggu, jadi harinya sudah lewat dan ます tidak bisa menjangkaunya."
+    },
+    {
+     "option": "かいません",
+     "misconception": "negates in the non-past when the sentence reports a past purchase",
+     "misconceptionId": "menegasikan dalam non-lampau padahal kalimatnya melaporkan pembelian lampau",
+     "whyFails": "The sentence names the new bag as bought, so a non-past denial does not fit the statement.",
+     "whyFailsId": "Kalimatnya menyebut tas baru itu dibeli, jadi penyangkalan non-lampau tidak cocok dengan pernyataannya."
+    },
+    {
+     "option": "かいませんでした",
+     "misconception": "adds a negation the sentence never signals",
+     "misconceptionId": "menambahkan negasi yang sama sekali tidak diisyaratkan kalimatnya",
+     "whyFails": "There is no negative cue here, only a past time word, so only the tense should change.",
+     "whyFailsId": "Tidak ada petunjuk negatif di sini, hanya kata waktu lampau, jadi yang berubah hanya kalanya."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "SENSHUU NO NICHIYOUBI is a finished day, and the sentence is affirmative, so MASHITA is the only fit.",
+    "whyCorrectId": "せんしゅうの にちようび adalah hari yang sudah selesai, dan kalimatnya afirmatif, jadi ました satu-satunya yang cocok.",
+    "rule": "Past time word plus no negative cue equals MASHITA.",
+    "ruleId": "Kata waktu lampau tanpa petunjuk negatif sama dengan ました.",
+    "whyOthersFail": "MASU is non-past, MASEN is non-past and negative, MASEN DESHITA adds a negation with no cue.",
+    "whyOthersFailId": "ます non-lampau, ません non-lampau dan negatif, ませんでした menambah negasi tanpa petunjuk.",
+    "howToAvoid": "Learn SEN as before and RAI as coming; they sit on opposite sides of today.",
+    "howToAvoidId": "Hafalkan せん sebagai 'sebelum' dan らい sebagai 'akan datang'; keduanya di sisi berlawanan dari hari ini.",
+    "memoryCue": "SEN points backward, so the verb points backward too.",
+    "memoryCueId": "せん menunjuk ke belakang, jadi verbanya ikut menunjuk ke belakang."
+   }
+  },
+  {
+   "id": "JP-PF-208",
+   "family": "polite_forms",
+   "skill": "polite_forms",
+   "subskill": "mashita_answers_past_question_word",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "past-question-word-answer-keeps-mashita",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Keep MASHITA when answering a question that already used MASHITA KA with a question word",
+   "pedagogicalObjectiveId": "Mempertahankan ました saat menjawab pertanyaan yang sudah memakai ましたか dengan kata tanya",
+   "misconceptionTargeted": "Learner resets the tense to non-past because the answer supplies new information",
+   "misconceptionTargetedId": "Murid mengembalikan kala ke non-lampau karena jawabannya memberi informasi baru",
+   "reasoningOperation": "copy the tense and polarity of the question -> insert the answering noun",
+   "reasoningOperationId": "salin kala dan polaritas pertanyaannya -> masukkan kata benda penjawabnya",
+   "stem": "「きのう だれに あいましたか。」「やまださんに ___。」",
+   "stemKana": "「きのう だれに あいましたか。」「やまださんに ___。」",
+   "furigana": [],
+   "options": [
+    "あいました",
+    "あいます",
+    "あいませんでした",
+    "あいません"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "あいます",
+     "misconception": "resets the tense to non-past when supplying new information",
+     "misconceptionId": "mengembalikan kala ke non-lampau saat memberikan informasi baru",
+     "whyFails": "New information does not change the tense; the question was about yesterday, so the answer stays past.",
+     "whyFailsId": "Informasi baru tidak mengubah kala; pertanyaannya tentang kemarin, jadi jawabannya tetap lampau."
+    },
+    {
+     "option": "あいませんでした",
+     "misconception": "negates although the answer names the person who was met",
+     "misconceptionId": "menegasikan padahal jawabannya menyebutkan orang yang ditemui",
+     "whyFails": "Naming Yamada as the person met already asserts the meeting happened.",
+     "whyFailsId": "Menyebut Yamada sebagai orang yang ditemui sudah menyatakan pertemuan itu terjadi."
+    },
+    {
+     "option": "あいません",
+     "misconception": "drops both the past and the affirmative",
+     "misconceptionId": "menghilangkan kala lampau dan afirmatifnya sekaligus",
+     "whyFails": "MASEN is non-past and negative, so it matches neither KINOU nor the named person.",
+     "whyFailsId": "ません itu non-lampau dan negatif, jadi tidak cocok dengan きのう maupun dengan nama yang disebut."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "An answer to a DARE question keeps the tense of the question, and that question ended in MASHITA KA.",
+    "whyCorrectId": "Jawaban atas pertanyaan だれ mempertahankan kala pertanyaannya, dan pertanyaan itu berakhir ましたか.",
+    "rule": "Question words change what is asked, not when it happened.",
+    "ruleId": "Kata tanya mengubah apa yang ditanyakan, bukan kapan hal itu terjadi.",
+    "whyOthersFail": "MASU shifts the tense, and both negatives deny a meeting the answer describes.",
+    "whyOthersFailId": "ます menggeser kalanya, dan kedua bentuk negatif menyangkal pertemuan yang justru dijelaskan jawabannya.",
+    "howToAvoid": "Read the last four kana of the question and repeat that ending in the answer.",
+    "howToAvoidId": "Baca empat kana terakhir pertanyaannya dan ulangi akhiran itu di jawabannya.",
+    "memoryCue": "Same tense in, same tense out.",
+    "memoryCueId": "Kala yang masuk sama dengan kala yang keluar."
+   }
+  },
+  {
+   "id": "JP-PF-209",
+   "family": "polite_forms",
+   "skill": "polite_forms",
+   "subskill": "masen_deshita_assembly_from_masen",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "masen-deshita-built-on-masen-not-nakatta",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Build the polite past negative by adding DESHITA to MASEN, not to the plain negative",
+   "pedagogicalObjectiveId": "Membentuk negatif lampau sopan dengan menambahkan でした pada ません, bukan pada bentuk negatif biasa",
+   "misconceptionTargeted": "Learner attaches DESHITA to the plain negative NAKATTA and produces NAKATTA DESHITA",
+   "misconceptionTargetedId": "Murid menempelkan でした pada bentuk biasa なかった sehingga menghasilkan なかったでした",
+   "reasoningOperation": "start from the MASU stem -> make MASEN -> add DESHITA",
+   "reasoningOperationId": "mulai dari akar ます -> jadikan ません -> tambahkan でした",
+   "stem": "「きのう べんきょうしましたか。」「いいえ、ぜんぜん ___。」",
+   "stemKana": "「きのう べんきょうしましたか。」「いいえ、ぜんぜん ___。」",
+   "furigana": [],
+   "options": [
+    "しませんでした",
+    "しなかったでした",
+    "しませんかった",
+    "しました"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "しなかったでした",
+     "misconception": "builds the past negative by adding DESHITA to the plain negative instead of to MASEN",
+     "misconceptionId": "membentuk negatif lampau dengan menambahkan でした pada bentuk biasa, bukan pada ません",
+     "whyFails": "SHINAKATTA is already past, so DESHITA marks the past a second time and the polite form is never built this way.",
+     "whyFailsId": "しなかった sudah lampau, jadi でした menandai kala lampau untuk kedua kalinya, dan bentuk sopan tidak pernah dibangun begitu."
+    },
+    {
+     "option": "しませんかった",
+     "misconception": "attaches the plain past ending KATTA directly to MASEN",
+     "misconceptionId": "menempelkan akhiran lampau biasa かった langsung pada ません",
+     "whyFails": "KATTA belongs to plain forms and I-adjectives; MASEN takes the separate word DESHITA.",
+     "whyFailsId": "かった milik bentuk biasa dan kata sifat i; ません memakai kata terpisah でした."
+    },
+    {
+     "option": "しました",
+     "misconception": "gives an affirmative past after IIE and ZENZEN",
+     "misconceptionId": "memberi bentuk lampau afirmatif setelah いいえ dan ぜんぜん",
+     "whyFails": "Both IIE and ZENZEN demand a negative, so an affirmative verb cannot close the sentence.",
+     "whyFailsId": "Baik いいえ maupun ぜんぜん menuntut bentuk negatif, jadi verba afirmatif tidak bisa menutup kalimatnya."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "The polite past negative is MASEN plus the separate word DESHITA, so SHIMASEN becomes SHIMASEN DESHITA.",
+    "whyCorrectId": "Negatif lampau sopan adalah ません ditambah kata terpisah でした, jadi しません menjadi しませんでした.",
+    "rule": "MASEN + DESHITA. Never NAKATTA + DESHITA, never MASEN + KATTA.",
+    "ruleId": "ません + でした. Bukan なかった + でした, bukan pula ません + かった.",
+    "whyOthersFail": "Two options use wrong assembly routes, and SHIMASHITA is affirmative.",
+    "whyOthersFailId": "Dua pilihan memakai jalur perakitan yang salah, dan しました itu afirmatif.",
+    "howToAvoid": "Say MASEN out loud first; only then add DESHITA as a whole word.",
+    "howToAvoidId": "Ucapkan ません lebih dulu; baru setelah itu tambahkan でした sebagai satu kata utuh.",
+    "memoryCue": "DESHITA is a passenger that rides only on MASEN.",
+    "memoryCueId": "でした adalah penumpang yang hanya menumpang pada ません."
+   }
+  },
+  {
+   "id": "JP-PF-210",
+   "family": "polite_forms",
+   "skill": "polite_forms",
+   "subskill": "masen_deshita_with_dokohemo",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "dokohemo-plus-past-cue-needs-masen-deshita",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Combine the negative-only phrase DOKO E MO with a past time word to reach MASEN DESHITA",
+   "pedagogicalObjectiveId": "Menggabungkan frasa khusus negatif どこへも dengan kata waktu lampau sehingga menghasilkan ませんでした",
+   "misconceptionTargeted": "Learner uses the non-past negative MASEN even though the time word is in the past",
+   "misconceptionTargetedId": "Murid memakai negatif non-lampau ません padahal kata waktunya lampau",
+   "reasoningOperation": "DOKO E MO sets negative -> SENSHUU sets past -> assemble MASEN DESHITA",
+   "reasoningOperationId": "どこへも menetapkan negatif -> せんしゅう menetapkan lampau -> rakit menjadi ませんでした",
+   "stem": "せんしゅうの どようび、あめでしたから どこへも ___。",
+   "stemKana": "せんしゅうの どようび、あめでしたから どこへも ___。",
+   "furigana": [],
+   "options": [
+    "いきませんでした",
+    "いきません",
+    "いきました",
+    "いかなかったでした"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "いきません",
+     "misconception": "keeps the negative but leaves it in the non-past despite the past time word",
+     "misconceptionId": "mempertahankan negatif tetapi membiarkannya non-lampau meski kata waktunya lampau",
+     "whyFails": "SENSHUU NO DOYOUBI is a finished Saturday, and AME DESHITA is already past, so MASEN is too early in time.",
+     "whyFailsId": "せんしゅうの どようび adalah Sabtu yang sudah lewat, dan あめでした sudah lampau, jadi ません terlalu awal dalam waktu."
+    },
+    {
+     "option": "いきました",
+     "misconception": "ignores that DOKO E MO can only end in a negative",
+     "misconceptionId": "mengabaikan bahwa どこへも hanya bisa berakhir dengan bentuk negatif",
+     "whyFails": "DOKO E MO means nowhere at all and requires a negative verb; with IKIMASHITA the phrase has no meaning.",
+     "whyFailsId": "どこへも berarti tidak ke mana pun dan menuntut verba negatif; dengan いきました frasa itu kehilangan makna."
+    },
+    {
+     "option": "いかなかったでした",
+     "misconception": "makes the polite past negative from the plain negative plus DESHITA",
+     "misconceptionId": "membuat negatif lampau sopan dari bentuk biasa negatif ditambah でした",
+     "whyFails": "IKANAKATTA is the plain past negative; politeness is added by using IKIMASEN DESHITA instead, not by gluing DESHITA on.",
+     "whyFailsId": "いかなかった adalah negatif lampau bentuk biasa; kesopanan ditambahkan lewat いきませんでした, bukan dengan menempelkan でした."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "DOKO E MO forces a negative and the past context forces the past, so the answer is the polite past negative.",
+    "whyCorrectId": "どこへも memaksa bentuk negatif dan konteks lampau memaksa kala lampau, jadi jawabannya negatif lampau sopan.",
+    "rule": "Question word + MO must be completed by a negative verb; the time word then decides MASEN or MASEN DESHITA.",
+    "ruleId": "Kata tanya + も harus dilengkapi verba negatif; kata waktu lalu menentukan ません atau ませんでした.",
+    "whyOthersFail": "One is too early in time, one is affirmative, one uses the wrong assembly route.",
+    "whyOthersFailId": "Satu terlalu awal dalam waktu, satu afirmatif, satu memakai jalur perakitan yang salah.",
+    "howToAvoid": "Fix the polarity from the MO phrase, then fix the tense from the calendar word.",
+    "howToAvoidId": "Tetapkan polaritas dari frasa も, lalu tetapkan kala dari kata kalendernya.",
+    "memoryCue": "Nowhere plus last Saturday equals MASEN DESHITA.",
+    "memoryCueId": "'Tidak ke mana pun' ditambah 'Sabtu lalu' sama dengan ませんでした."
+   }
+  },
+  {
+   "id": "JP-PF-211",
+   "family": "polite_forms",
+   "skill": "polite_forms",
+   "subskill": "masen_deshita_not_masen_katta",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "masen-deshita-rejects-i-adjective-katta",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Reject the I-adjective past ending KATTA when making a verb polite past negative",
+   "pedagogicalObjectiveId": "Menolak akhiran lampau kata sifat i かった saat membuat negatif lampau sopan pada verba",
+   "misconceptionTargeted": "Learner transfers the adjective pattern TAKANAKATTA to verbs and writes MASEN KATTA",
+   "misconceptionTargetedId": "Murid memindahkan pola kata sifat たかくなかった ke verba lalu menulis ませんかった",
+   "reasoningOperation": "identify the word class as verb -> apply the verb past-negative route MASEN DESHITA",
+   "reasoningOperationId": "kenali kelas katanya sebagai verba -> terapkan jalur negatif lampau verba ませんでした",
+   "stem": "きのうの よる うるさかったですから、ぜんぜん ___。",
+   "stemKana": "きのうの よる うるさかったですから、ぜんぜん ___。",
+   "furigana": [],
+   "options": [
+    "ねませんでした",
+    "ねませんかった",
+    "ねなかったでした",
+    "ねません"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "ねませんかった",
+     "misconception": "attaches the I-adjective past ending KATTA to a verb's MASEN",
+     "misconceptionId": "menempelkan akhiran lampau kata sifat i かった pada ません milik verba",
+     "whyFails": "KATTA is how I-adjectives such as URUSAI form the past; verbs use the separate word DESHITA after MASEN.",
+     "whyFailsId": "かった adalah cara kata sifat i seperti うるさい membentuk kala lampau; verba memakai kata terpisah でした setelah ません."
+    },
+    {
+     "option": "ねなかったでした",
+     "misconception": "stacks DESHITA onto an already past plain negative",
+     "misconceptionId": "menumpuk でした pada bentuk biasa negatif yang sudah lampau",
+     "whyFails": "NENAKATTA already carries the past, so adding DESHITA marks the past twice.",
+     "whyFailsId": "ねなかった sudah membawa kala lampau, jadi menambahkan でした menandai lampau dua kali."
+    },
+    {
+     "option": "ねません",
+     "misconception": "leaves the negative in the non-past although last night is over",
+     "misconceptionId": "membiarkan negatif dalam non-lampau padahal tadi malam sudah lewat",
+     "whyFails": "KINOU NO YORU is a finished night, so the sleeping that did not happen belongs to the past.",
+     "whyFailsId": "きのうの よる adalah malam yang sudah lewat, jadi tidurnya yang tidak terjadi termasuk masa lampau."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "NEMASU is a verb, so its polite past negative is NEMASEN plus DESHITA, matching the past night and ZENZEN.",
+    "whyCorrectId": "ねます adalah verba, jadi negatif lampau sopannya ねません ditambah でした, sesuai dengan malam yang lampau dan ぜんぜん.",
+    "rule": "Verbs take MASEN DESHITA; I-adjectives take KUNAKATTA DESU. The two routes never mix.",
+    "ruleId": "Verba memakai ませんでした; kata sifat i memakai くなかったです. Kedua jalur itu tidak pernah bercampur.",
+    "whyOthersFail": "One borrows the adjective ending, one doubles the past, one is not past at all.",
+    "whyOthersFailId": "Satu meminjam akhiran kata sifat, satu menggandakan kala lampau, satu sama sekali bukan lampau.",
+    "howToAvoid": "Ask whether the word before the gap describes or acts. Actions never take KATTA on MASEN.",
+    "howToAvoidId": "Tanyakan apakah kata sebelum rumpangnya menyifati atau berbuat. Perbuatan tidak pernah memakai かった pada ません.",
+    "memoryCue": "KATTA is for adjectives; DESHITA is for MASEN.",
+    "memoryCueId": "かった untuk kata sifat; でした untuk ません."
+   }
+  },
+  {
+   "id": "JP-PF-212",
+   "family": "polite_forms",
+   "skill": "polite_forms",
+   "subskill": "masen_deshita_ototoi_absence",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "ototoi-absence-requires-masen-deshita",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Report something that did not happen on a past day with MASEN DESHITA",
+   "pedagogicalObjectiveId": "Melaporkan sesuatu yang tidak terjadi pada hari lampau dengan ませんでした",
+   "misconceptionTargeted": "Learner produces the past affirmative because the surrounding sentence is affirmative",
+   "misconceptionTargetedId": "Murid menghasilkan lampau afirmatif karena kalimat di sekitarnya afirmatif",
+   "reasoningOperation": "read the reason clause -> being sick blocks the action -> negate in the past",
+   "reasoningOperationId": "baca klausa alasannya -> sakit menghalangi perbuatan itu -> negasikan dalam kala lampau",
+   "stem": "おととい ねつが ありましたから、がっこうへ ___。",
+   "stemKana": "おととい ねつが ありましたから、がっこうへ ___。",
+   "furigana": [],
+   "options": [
+    "いきませんでした",
+    "いきました",
+    "いきません",
+    "いかないでした"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "いきました",
+     "misconception": "misses that the reason clause blocks the action",
+     "misconceptionId": "melewatkan bahwa klausa alasannya justru menghalangi perbuatan itu",
+     "whyFails": "Having a fever is given as the reason with KARA, and a reason introduced this way explains why school was missed.",
+     "whyFailsId": "Demam disebut sebagai alasan lewat から, dan alasan seperti itu menjelaskan mengapa sekolahnya dilewatkan."
+    },
+    {
+     "option": "いきません",
+     "misconception": "negates in the non-past although OTOTOI is two days ago",
+     "misconceptionId": "menegasikan dalam non-lampau padahal おととい adalah dua hari lalu",
+     "whyFails": "The reason clause already ends in ARIMASHITA, so the result clause must be past too.",
+     "whyFailsId": "Klausa alasannya sudah berakhir ありました, jadi klausa akibatnya juga harus lampau."
+    },
+    {
+     "option": "いかないでした",
+     "misconception": "adds DESHITA to the plain non-past negative",
+     "misconceptionId": "menambahkan でした pada bentuk biasa negatif non-lampau",
+     "whyFails": "IKANAI is plain and non-past; politeness and past come together only in IKIMASEN DESHITA.",
+     "whyFailsId": "いかない itu bentuk biasa dan non-lampau; kesopanan dan kala lampau menyatu hanya pada いきませんでした."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "OTOTOI and ARIMASHITA fix the past, and the fever explains an absence, so the verb is past negative.",
+    "whyCorrectId": "おととい dan ありました menetapkan kala lampau, dan demamnya menjelaskan ketidakhadiran, jadi verbanya negatif lampau.",
+    "rule": "KARA links a past reason to a past result; a blocking reason makes that result negative.",
+    "ruleId": "から menghubungkan alasan lampau dengan akibat lampau; alasan yang menghalangi membuat akibatnya negatif.",
+    "whyOthersFail": "One is affirmative, one is non-past, one uses the plain form with DESHITA.",
+    "whyOthersFailId": "Satu afirmatif, satu non-lampau, satu memakai bentuk biasa dengan でした.",
+    "howToAvoid": "Read the clause before KARA and ask whether it helps or blocks the action.",
+    "howToAvoidId": "Baca klausa sebelum から dan tanyakan apakah itu mendukung atau menghalangi perbuatannya.",
+    "memoryCue": "Fever yesterday, empty desk: MASEN DESHITA.",
+    "memoryCueId": "Demam kemarin lusa, bangku kosong: ませんでした."
+   }
+  },
+  {
+   "id": "JP-PF-213",
+   "family": "polite_forms",
+   "skill": "polite_forms",
+   "subskill": "masen_deshita_with_ichidomo",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "ichidomo-kyonen-pairs-with-masen-deshita",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Complete ICHIDO MO with the polite past negative when the period is KYONEN",
+   "pedagogicalObjectiveId": "Melengkapi いちども dengan negatif lampau sopan ketika periodenya きょねん",
+   "misconceptionTargeted": "Learner keeps the polite negative in the non-past for a closed year",
+   "misconceptionTargetedId": "Murid mempertahankan negatif sopan dalam non-lampau untuk tahun yang sudah berakhir",
+   "reasoningOperation": "ICHIDO MO demands a negative -> KYONEN is a closed period -> MASEN DESHITA",
+   "reasoningOperationId": "いちども menuntut bentuk negatif -> きょねん periode yang sudah berakhir -> ませんでした",
+   "stem": "きょねん わたしは おさけを いちども ___。",
+   "stemKana": "きょねん わたしは おさけを いちども ___。",
+   "furigana": [],
+   "options": [
+    "のみませんでした",
+    "のみません",
+    "のみましたでした",
+    "のみました"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "のみません",
+     "misconception": "leaves a closed year in the non-past",
+     "misconceptionId": "membiarkan tahun yang sudah berakhir dalam bentuk non-lampau",
+     "whyFails": "KYONEN is last year and is completely finished, so the record of not drinking belongs to the past.",
+     "whyFailsId": "きょねん adalah tahun lalu yang sudah sepenuhnya berakhir, jadi catatan tidak minum itu milik masa lampau."
+    },
+    {
+     "option": "のみましたでした",
+     "misconception": "stacks DESHITA onto the past affirmative MASHITA",
+     "misconceptionId": "menumpuk でした pada bentuk lampau afirmatif ました",
+     "whyFails": "DESHITA attaches only to MASEN. MASHITA is already the finished past and is affirmative besides.",
+     "whyFailsId": "でした hanya menempel pada ません. ました sudah merupakan lampau selesai dan lagi pula afirmatif."
+    },
+    {
+     "option": "のみました",
+     "misconception": "ignores that ICHIDO MO can only end in a negative",
+     "misconceptionId": "mengabaikan bahwa いちども hanya bisa berakhir dengan bentuk negatif",
+     "whyFails": "ICHIDO MO means not even once and needs a negative verb to complete it.",
+     "whyFailsId": "いちども berarti tidak sekali pun dan butuh verba negatif untuk melengkapinya."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "ICHIDO MO forces the negative and KYONEN forces the past, giving the polite past negative NOMIMASEN DESHITA.",
+    "whyCorrectId": "いちども memaksa bentuk negatif dan きょねん memaksa kala lampau, sehingga menjadi negatif lampau sopan のみませんでした.",
+    "rule": "Counter + MO always ends in a negative; a finished year makes that negative past.",
+    "ruleId": "Kata bilangan + も selalu berakhir negatif; tahun yang sudah berakhir membuat negatif itu lampau.",
+    "whyOthersFail": "One is non-past, one stacks DESHITA on MASHITA, one is affirmative.",
+    "whyOthersFailId": "Satu non-lampau, satu menumpuk でした pada ました, satu afirmatif.",
+    "howToAvoid": "Whenever you see MO after a counter, write the negative first and only then set the tense.",
+    "howToAvoidId": "Setiap melihat も setelah kata bilangan, tulis bentuk negatifnya dulu, baru tetapkan kalanya.",
+    "memoryCue": "Not even once, and the year is over: MASEN DESHITA.",
+    "memoryCueId": "Tidak sekali pun, dan tahunnya sudah lewat: ませんでした."
+   }
+  },
+  {
+   "id": "JP-PF-214",
+   "family": "polite_forms",
+   "skill": "polite_forms",
+   "subskill": "masen_deshita_answers_past_question",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "iie-to-mashita-ka-gives-masen-deshita",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Turn a MASHITA KA question into its denial MASEN DESHITA after IIE",
+   "pedagogicalObjectiveId": "Mengubah pertanyaan ましたか menjadi penyangkalannya ませんでした setelah いいえ",
+   "misconceptionTargeted": "Learner denies with the non-past MASEN and loses the past of the question",
+   "misconceptionTargetedId": "Murid menyangkal dengan ません non-lampau sehingga kehilangan kala lampau pertanyaannya",
+   "reasoningOperation": "read the question ending MASHITA KA -> keep past -> flip polarity only",
+   "reasoningOperationId": "baca akhiran pertanyaan ましたか -> pertahankan lampau -> balik polaritasnya saja",
+   "stem": "「けさ しんぶんを よみましたか。」「いいえ、じかんが ありませんでしたから ___。」",
+   "stemKana": "「けさ しんぶんを よみましたか。」「いいえ、じかんが ありませんでしたから ___。」",
+   "furigana": [],
+   "options": [
+    "よみませんでした",
+    "よみません",
+    "よまなかったでした",
+    "よみました"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "よみません",
+     "misconception": "denies in the non-past a question that was asked in the past",
+     "misconceptionId": "menyangkal dalam non-lampau pertanyaan yang diajukan dalam kala lampau",
+     "whyFails": "KESA and the question ending MASHITA KA both point to this finished morning, so MASEN is the wrong tense.",
+     "whyFailsId": "けさ dan akhiran pertanyaan ましたか sama-sama menunjuk pagi yang sudah lewat, jadi ません salah kala."
+    },
+    {
+     "option": "よまなかったでした",
+     "misconception": "builds the polite past negative from the plain negative plus DESHITA",
+     "misconceptionId": "membangun negatif lampau sopan dari bentuk biasa negatif ditambah でした",
+     "whyFails": "The rest of the reply is polite; the polite route is YOMIMASEN DESHITA, and YOMANAKATTA never takes DESHITA.",
+     "whyFailsId": "Sisa jawabannya sopan; jalur sopannya adalah よみませんでした, dan よまなかった tidak pernah memakai でした."
+    },
+    {
+     "option": "よみました",
+     "misconception": "gives an affirmative after IIE and a blocking reason",
+     "misconceptionId": "memberi bentuk afirmatif setelah いいえ dan alasan yang menghalangi",
+     "whyFails": "IIE and having no time both say the newspaper was not read.",
+     "whyFailsId": "いいえ dan tidak adanya waktu sama-sama menyatakan korannya tidak dibaca."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "The question is past affirmative, so its denial is the same tense with the polarity flipped: MASEN DESHITA.",
+    "whyCorrectId": "Pertanyaannya lampau afirmatif, jadi penyangkalannya berkala sama dengan polaritas dibalik: ませんでした.",
+    "rule": "MASHITA KA is denied by MASEN DESHITA, exactly as MASU KA is denied by MASEN.",
+    "ruleId": "ましたか disangkal dengan ませんでした, persis seperti ますか disangkal dengan ません.",
+    "whyOthersFail": "One loses the past, one uses the plain form with DESHITA, one stays affirmative.",
+    "whyOthersFailId": "Satu kehilangan kala lampau, satu memakai bentuk biasa dengan でした, satu tetap afirmatif.",
+    "howToAvoid": "Mirror the question ending, then swap only affirmative for negative.",
+    "howToAvoidId": "Cerminkan akhiran pertanyaannya, lalu tukar afirmatif menjadi negatif saja.",
+    "memoryCue": "MASHITA KA in, MASEN DESHITA out.",
+    "memoryCueId": "Masuk ましたか, keluar ませんでした."
+   }
+  },
+  {
+   "id": "JP-PF-215",
+   "family": "polite_forms",
+   "skill": "polite_forms",
+   "subskill": "masen_deshita_with_daremo",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "daremo-sengetsu-needs-past-negative",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Complete DARE MO with the polite past negative when the period is SENGETSU",
+   "pedagogicalObjectiveId": "Melengkapi だれも dengan negatif lampau sopan ketika periodenya せんげつ",
+   "misconceptionTargeted": "Learner treats DARE MO as everyone and answers affirmatively",
+   "misconceptionTargetedId": "Murid menganggap だれも berarti 'semua orang' lalu menjawab afirmatif",
+   "reasoningOperation": "DARE MO means nobody with a negative -> SENGETSU is past -> MASEN DESHITA",
+   "reasoningOperationId": "だれも berarti 'tidak seorang pun' bersama bentuk negatif -> せんげつ itu lampau -> ませんでした",
+   "stem": "せんげつ わたしの うちへ だれも ___。さびしかったです。",
+   "stemKana": "せんげつ わたしの うちへ だれも ___。さびしかったです。",
+   "furigana": [],
+   "options": [
+    "きませんでした",
+    "きました",
+    "きません",
+    "こなかったでした"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "きました",
+     "misconception": "reads DARE MO as everyone instead of nobody",
+     "misconceptionId": "membaca だれも sebagai 'semua orang', bukan 'tidak seorang pun'",
+     "whyFails": "DARE MO means nobody only when the verb is negative, and the speaker says they felt lonely.",
+     "whyFailsId": "だれも berarti 'tidak seorang pun' hanya bila verbanya negatif, dan penuturnya mengaku merasa kesepian."
+    },
+    {
+     "option": "きません",
+     "misconception": "keeps the negative in the non-past for a finished month",
+     "misconceptionId": "mempertahankan negatif dalam non-lampau untuk bulan yang sudah berakhir",
+     "whyFails": "SENGETSU is last month and SABISHIKATTA is past, so the visit that never happened is past as well.",
+     "whyFailsId": "せんげつ adalah bulan lalu dan さびしかった itu lampau, jadi kunjungan yang tak pernah terjadi juga lampau."
+    },
+    {
+     "option": "こなかったでした",
+     "misconception": "glues DESHITA onto the plain past negative of KURU",
+     "misconceptionId": "menempelkan でした pada bentuk biasa negatif lampau dari くる",
+     "whyFails": "KONAKATTA already means did not come; the polite version replaces it entirely with KIMASEN DESHITA.",
+     "whyFailsId": "こなかった sudah berarti tidak datang; versi sopannya menggantinya seluruhnya dengan きませんでした."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "DARE MO needs a negative verb to mean nobody, and SENGETSU plus SABISHIKATTA place it in the past.",
+    "whyCorrectId": "だれも butuh verba negatif agar berarti 'tidak seorang pun', dan せんげつ serta さびしかった menempatkannya di masa lampau.",
+    "rule": "DARE MO, NANI MO and DOKO E MO are only complete with a negative ending.",
+    "ruleId": "だれも, なにも, dan どこへも hanya lengkap dengan akhiran negatif.",
+    "whyOthersFail": "One is affirmative, one is non-past, one uses the plain form with DESHITA.",
+    "whyOthersFailId": "Satu afirmatif, satu non-lampau, satu memakai bentuk biasa dengan でした.",
+    "howToAvoid": "Translate DARE MO as nobody, then let the surrounding tense finish the verb.",
+    "howToAvoidId": "Terjemahkan だれも sebagai 'tidak seorang pun', lalu biarkan kala di sekitarnya menyelesaikan verbanya.",
+    "memoryCue": "Nobody came, and last month is gone: MASEN DESHITA.",
+    "memoryCueId": "Tidak seorang pun datang, dan bulan lalu sudah lewat: ませんでした."
+   }
+  },
+  {
+   "id": "JP-PF-216",
+   "family": "polite_forms",
+   "skill": "polite_forms",
+   "subskill": "masen_deshita_versus_masen_with_kyonen_contrast",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "past-negative-contrasted-with-present-habit",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Pick MASEN DESHITA for the past half of a sentence that contrasts past with present",
+   "pedagogicalObjectiveId": "Memilih ませんでした untuk bagian lampau dalam kalimat yang mempertentangkan masa lalu dan masa kini",
+   "misconceptionTargeted": "Learner copies the tense of the second clause into the first",
+   "misconceptionTargetedId": "Murid menyalin kala klausa kedua ke klausa pertama",
+   "reasoningOperation": "split the sentence at GA -> each half keeps its own time word -> fill the past half",
+   "reasoningOperationId": "pisahkan kalimat di が -> tiap bagian mempertahankan kata waktunya sendiri -> isi bagian lampaunya",
+   "stem": "きょねんまで にほんごを ぜんぜん ___が、いま まいにち べんきょうして います。",
+   "stemKana": "きょねんまで にほんごを ぜんぜん ___が、いま まいにち べんきょうして います。",
+   "furigana": [],
+   "options": [
+    "はなしませんでした",
+    "はなしません",
+    "はなしました",
+    "はなしませんかった"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "はなしません",
+     "misconception": "copies the present tense of the second clause into the past clause",
+     "misconceptionId": "menyalin kala masa kini klausa kedua ke klausa lampau",
+     "whyFails": "The first clause is bounded by KYONEN MADE, so it is finished, even though the second clause is about now.",
+     "whyFailsId": "Klausa pertama dibatasi きょねんまで, jadi sudah selesai, meski klausa keduanya tentang sekarang."
+    },
+    {
+     "option": "はなしました",
+     "misconception": "loses the negative demanded by ZENZEN",
+     "misconceptionId": "kehilangan bentuk negatif yang dituntut ぜんぜん",
+     "whyFails": "ZENZEN needs a negative, and GA marks a contrast with the studying that started later.",
+     "whyFailsId": "ぜんぜん butuh bentuk negatif, dan が menandai pertentangan dengan belajar yang baru dimulai kemudian."
+    },
+    {
+     "option": "はなしませんかった",
+     "misconception": "forms the past by adding KATTA to MASEN",
+     "misconceptionId": "membentuk kala lampau dengan menambahkan かった pada ません",
+     "whyFails": "MASEN never takes KATTA; the polite past negative always ends in the separate word DESHITA.",
+     "whyFailsId": "ません tidak pernah memakai かった; negatif lampau sopan selalu berakhir dengan kata terpisah でした."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "KYONEN MADE closes the first clause in the past and ZENZEN makes it negative, so MASEN DESHITA fills the gap.",
+    "whyCorrectId": "きょねんまで menutup klausa pertama di masa lampau dan ぜんぜん membuatnya negatif, jadi ませんでした mengisi rumpangnya.",
+    "rule": "In a GA contrast each clause carries its own tense; do not let one half infect the other.",
+    "ruleId": "Dalam pertentangan が tiap klausa membawa kalanya sendiri; jangan biarkan satu bagian menular ke bagian lain.",
+    "whyOthersFail": "One borrows the present tense, one drops the negative, one uses the adjective past ending.",
+    "whyOthersFailId": "Satu meminjam kala masa kini, satu menghilangkan negatif, satu memakai akhiran lampau kata sifat.",
+    "howToAvoid": "Cover the clause after GA and read the first half alone before choosing.",
+    "howToAvoidId": "Tutup klausa setelah が dan baca bagian pertamanya sendirian sebelum memilih.",
+    "memoryCue": "MADE draws a line; everything before it is MASEN DESHITA.",
+    "memoryCueId": "まで menarik garis; segala yang sebelumnya memakai ませんでした."
+   }
+  },
+  {
+   "id": "JP-PF-217",
+   "family": "polite_forms",
+   "skill": "polite_forms",
+   "subskill": "masen_nonpast_negative_refusal_ashita",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "ashita-declined-invitation-uses-masen",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Decline a future invitation with the non-past negative MASEN",
+   "pedagogicalObjectiveId": "Menolak ajakan untuk masa depan dengan negatif non-lampau ません",
+   "misconceptionTargeted": "Learner uses the past negative because the refusal feels like a settled decision",
+   "misconceptionTargetedId": "Murid memakai negatif lampau karena penolakannya terasa seperti keputusan yang sudah bulat",
+   "reasoningOperation": "locate ASHITA as future -> the denial must stay non-past",
+   "reasoningOperationId": "temukan あした sebagai masa depan -> penyangkalannya harus tetap non-lampau",
+   "stem": "「あした パーティーへ いきますか。」「すみません、しごとが ありますから ___。」",
+   "stemKana": "「あした パーティーへ いきますか。」「すみません、しごとが ありますから ___。」",
+   "furigana": [],
+   "options": [
+    "いきません",
+    "いきませんでした",
+    "いきます",
+    "いきました"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "いきませんでした",
+     "misconception": "puts a refusal about tomorrow into the past",
+     "misconceptionId": "menempatkan penolakan tentang besok ke dalam kala lampau",
+     "whyFails": "ASHITA has not arrived, so nothing about it can be reported as already not done.",
+     "whyFailsId": "あした belum tiba, jadi tidak ada yang bisa dilaporkan sebagai sudah tidak dilakukan."
+    },
+    {
+     "option": "いきます",
+     "misconception": "keeps the affirmative after an apology and a blocking reason",
+     "misconceptionId": "mempertahankan afirmatif setelah permintaan maaf dan alasan yang menghalangi",
+     "whyFails": "SUMIMASEN plus having work signals a refusal, so an affirmative verb contradicts the apology.",
+     "whyFailsId": "すみません ditambah adanya pekerjaan menandakan penolakan, jadi verba afirmatif bertentangan dengan permintaan maafnya."
+    },
+    {
+     "option": "いきました",
+     "misconception": "reports a past trip in answer to a question about tomorrow",
+     "misconceptionId": "melaporkan perjalanan lampau untuk menjawab pertanyaan tentang besok",
+     "whyFails": "The question asks about a future party, so a finished trip answers a different question.",
+     "whyFailsId": "Pertanyaannya tentang pesta di masa depan, jadi perjalanan yang sudah selesai menjawab pertanyaan lain."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "ASHITA is future and the apology signals a refusal, so the polite non-past negative MASEN is used.",
+    "whyCorrectId": "あした itu masa depan dan permintaan maafnya menandakan penolakan, jadi dipakai negatif sopan non-lampau ません.",
+    "rule": "Refusals about the future use MASEN; MASEN DESHITA only reports what already did not happen.",
+    "ruleId": "Penolakan tentang masa depan memakai ません; ませんでした hanya melaporkan yang memang sudah tidak terjadi.",
+    "whyOthersFail": "One is past negative, one is affirmative, one reports a past trip.",
+    "whyOthersFailId": "Satu negatif lampau, satu afirmatif, satu melaporkan perjalanan lampau.",
+    "howToAvoid": "Ask whether the day in question has already passed. If not, DESHITA cannot appear.",
+    "howToAvoidId": "Tanyakan apakah harinya sudah lewat. Kalau belum, でした tidak boleh muncul.",
+    "memoryCue": "You cannot report the past of a day that has not come.",
+    "memoryCueId": "Kamu tidak bisa melaporkan masa lampau dari hari yang belum datang."
+   }
+  },
+  {
+   "id": "JP-PF-218",
+   "family": "polite_forms",
+   "skill": "polite_forms",
+   "subskill": "masu_nonpast_affirmative_answer_to_nani",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "nani-o-shimasu-ka-answered-with-masu",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Answer NANI O SHIMASU KA about tomorrow with a MASU verb",
+   "pedagogicalObjectiveId": "Menjawab なにを しますか tentang besok dengan verba berakhiran ます",
+   "misconceptionTargeted": "Learner switches tense when replacing the question word with a real activity",
+   "misconceptionTargetedId": "Murid mengganti kala saat menukar kata tanya dengan kegiatan yang sesungguhnya",
+   "reasoningOperation": "replace the question word with the activity -> keep the question ending MASU",
+   "reasoningOperationId": "ganti kata tanya dengan kegiatannya -> pertahankan akhiran ます dari pertanyaannya",
+   "stem": "「あしたの ごご なにを しますか。」「ともだちと えいがを ___。」",
+   "stemKana": "「あしたの ごご なにを しますか。」「ともだちと えいがを ___。」",
+   "furigana": [],
+   "options": [
+    "みます",
+    "みました",
+    "みません",
+    "みませんでした"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "みました",
+     "misconception": "answers a question about tomorrow with a finished action",
+     "misconceptionId": "menjawab pertanyaan tentang besok dengan perbuatan yang sudah selesai",
+     "whyFails": "ASHITA NO GOGO is tomorrow afternoon, which cannot contain an action that is already over.",
+     "whyFailsId": "あしたの ごご adalah besok sore, yang tidak mungkin memuat perbuatan yang sudah selesai."
+    },
+    {
+     "option": "みません",
+     "misconception": "negates a plan the speaker is volunteering",
+     "misconceptionId": "menegasikan rencana yang justru sedang disampaikan penuturnya",
+     "whyFails": "The reply names a companion and a film, which describes something the speaker will do, not avoid.",
+     "whyFailsId": "Jawabannya menyebut teman dan film, yang menggambarkan hal yang akan dilakukan penuturnya, bukan dihindari."
+    },
+    {
+     "option": "みませんでした",
+     "misconception": "changes tense and polarity at once in a plan statement",
+     "misconceptionId": "mengubah kala dan polaritas sekaligus dalam pernyataan rencana",
+     "whyFails": "MASEN DESHITA reports a past non-event and cannot describe tomorrow's plan.",
+     "whyFailsId": "ませんでした melaporkan sesuatu yang tidak terjadi di masa lampau dan tidak bisa menggambarkan rencana besok."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "The question uses SHIMASU KA about tomorrow, so the answer supplies the activity and keeps MASU.",
+    "whyCorrectId": "Pertanyaannya memakai しますか tentang besok, jadi jawabannya memberi kegiatannya dan mempertahankan ます.",
+    "rule": "Replacing NANI with a real object changes the content, never the ending.",
+    "ruleId": "Mengganti なに dengan objek yang sesungguhnya mengubah isinya, bukan akhirannya.",
+    "whyOthersFail": "MASHITA and MASEN DESHITA are past; MASEN denies the plan being offered.",
+    "whyOthersFailId": "ました dan ませんでした itu lampau; ません menyangkal rencana yang justru sedang ditawarkan.",
+    "howToAvoid": "Write the answer as the question with the question word swapped out, then check the ending matches.",
+    "howToAvoidId": "Tulis jawabannya seperti pertanyaannya dengan kata tanya ditukar, lalu pastikan akhirannya sama.",
+    "memoryCue": "Swap the word, keep the ending.",
+    "memoryCueId": "Tukar katanya, pertahankan akhirannya."
+   }
+  },
+  {
+   "id": "JP-PF-219",
+   "family": "polite_forms",
+   "skill": "polite_forms",
+   "subskill": "masen_deshita_with_nanimo",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "nanimo-kinou-no-ban-past-negative",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Use MASEN DESHITA after NANI MO when the evening referred to is over",
+   "pedagogicalObjectiveId": "Memakai ませんでした setelah なにも ketika malam yang dimaksud sudah lewat",
+   "misconceptionTargeted": "Learner drops MASEN and writes DESHITA straight onto the MASU stem",
+   "misconceptionTargetedId": "Murid menghilangkan ません lalu menulis でした langsung pada akar ます",
+   "reasoningOperation": "NANI MO sets negative -> the evening is over -> assemble MASEN then DESHITA",
+   "reasoningOperationId": "なにも menetapkan negatif -> malamnya sudah lewat -> rakit ません lalu でした",
+   "stem": "きのうの ばん つかれて いましたから、なにも ___。すぐ ねました。",
+   "stemKana": "きのうの ばん つかれて いましたから、なにも ___。すぐ ねました。",
+   "furigana": [],
+   "options": [
+    "たべませんでした",
+    "たべでした",
+    "たべません",
+    "たべました"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "たべでした",
+     "misconception": "attaches DESHITA directly to the verb stem with no MASEN",
+     "misconceptionId": "menempelkan でした langsung pada akar verba tanpa ません",
+     "whyFails": "DESHITA is not a verb ending on its own; a verb needs MASEN in front of it to become past negative.",
+     "whyFailsId": "でした bukan akhiran verba yang berdiri sendiri; verba butuh ません di depannya agar menjadi negatif lampau."
+    },
+    {
+     "option": "たべません",
+     "misconception": "leaves a finished evening in the non-past",
+     "misconceptionId": "membiarkan malam yang sudah lewat dalam bentuk non-lampau",
+     "whyFails": "TSUKARETE IMASHITA and NEMASHITA are both past, so the eating that did not happen is past too.",
+     "whyFailsId": "つかれて いました dan ねました sama-sama lampau, jadi makan yang tidak terjadi itu juga lampau."
+    },
+    {
+     "option": "たべました",
+     "misconception": "ignores that NANI MO requires a negative verb",
+     "misconceptionId": "mengabaikan bahwa なにも menuntut verba negatif",
+     "whyFails": "NANI MO means nothing at all and only makes sense with a negative ending.",
+     "whyFailsId": "なにも berarti tidak apa pun dan hanya bermakna bersama akhiran negatif."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "NANI MO forces a negative and the surrounding past verbs force the past, so it is MASEN plus DESHITA.",
+    "whyCorrectId": "なにも memaksa bentuk negatif dan verba-verba lampau di sekitarnya memaksa kala lampau, jadi ません ditambah でした.",
+    "rule": "The polite past negative is always two pieces: MASEN, then DESHITA.",
+    "ruleId": "Negatif lampau sopan selalu terdiri dari dua bagian: ません, lalu でした.",
+    "whyOthersFail": "One skips MASEN entirely, one is non-past, one is affirmative.",
+    "whyOthersFailId": "Satu melewatkan ません sama sekali, satu non-lampau, satu afirmatif.",
+    "howToAvoid": "Check that MASEN is present before you write DESHITA.",
+    "howToAvoidId": "Pastikan ません sudah ada sebelum kamu menulis でした.",
+    "memoryCue": "No MASEN, no DESHITA.",
+    "memoryCueId": "Tidak ada ません, tidak boleh ada でした."
+   }
+  },
+  {
+   "id": "JP-PF-220",
+   "family": "polite_forms",
+   "skill": "polite_forms",
+   "subskill": "masen_nonpast_negative_present_state",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "ima-plus-nanimo-keeps-masen-nonpast",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Keep the negative non-past when the reason clause is about the present moment",
+   "pedagogicalObjectiveId": "Mempertahankan negatif non-lampau ketika klausa alasannya tentang saat ini",
+   "misconceptionTargeted": "Learner adds DESHITA out of habit whenever the sentence sounds like a decision",
+   "misconceptionTargetedId": "Murid menambahkan でした karena kebiasaan setiap kali kalimatnya terdengar seperti keputusan",
+   "reasoningOperation": "read the reason clause tense -> ARIMASEN is non-past -> keep the result non-past",
+   "reasoningOperationId": "baca kala klausa alasannya -> ありません itu non-lampau -> pertahankan akibatnya non-lampau",
+   "stem": "いま おかねが ありませんから、きょうは なにも ___。",
+   "stemKana": "いま おかねが ありませんから、きょうは なにも ___。",
+   "furigana": [],
+   "options": [
+    "かいません",
+    "かいませんでした",
+    "かいます",
+    "かわないでした"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "かいませんでした",
+     "misconception": "adds DESHITA although the reason clause is in the non-past",
+     "misconceptionId": "menambahkan でした padahal klausa alasannya non-lampau",
+     "whyFails": "IMA and ARIMASEN are both non-past and KYOU is still running, so nothing places this in the past.",
+     "whyFailsId": "いま dan ありません sama-sama non-lampau dan きょう masih berjalan, jadi tidak ada yang menempatkannya di masa lampau."
+    },
+    {
+     "option": "かいます",
+     "misconception": "ignores that NANI MO must be completed by a negative",
+     "misconceptionId": "mengabaikan bahwa なにも harus dilengkapi bentuk negatif",
+     "whyFails": "NANI MO means nothing, and having no money is a reason not to buy.",
+     "whyFailsId": "なにも berarti tidak apa pun, dan tidak punya uang adalah alasan untuk tidak membeli."
+    },
+    {
+     "option": "かわないでした",
+     "misconception": "adds DESHITA to the plain non-past negative KAWANAI",
+     "misconceptionId": "menambahkan でした pada bentuk biasa negatif non-lampau かわない",
+     "whyFails": "KAWANAI is the plain form; its polite twin is KAIMASEN, and DESHITA would also add a past that is not wanted.",
+     "whyFailsId": "かわない adalah bentuk biasa; kembaran sopannya かいません, dan でした juga menambah kala lampau yang tidak diinginkan."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "The reason clause ends in ARIMASEN, a non-past negative, and KYOU is not finished, so the result is MASEN.",
+    "whyCorrectId": "Klausa alasannya berakhir ありません, negatif non-lampau, dan きょう belum berakhir, jadi akibatnya memakai ません.",
+    "rule": "Match the tense of the result clause to the tense of the reason clause before KARA.",
+    "ruleId": "Samakan kala klausa akibat dengan kala klausa alasan sebelum から.",
+    "whyOthersFail": "One adds an unmotivated past, one is affirmative, one uses the plain form with DESHITA.",
+    "whyOthersFailId": "Satu menambah kala lampau tanpa alasan, satu afirmatif, satu memakai bentuk biasa dengan でした.",
+    "howToAvoid": "Look at the verb just before KARA and copy its tense.",
+    "howToAvoidId": "Lihat verba tepat sebelum から dan salin kalanya.",
+    "memoryCue": "IMA on the left, MASEN on the right.",
+    "memoryCueId": "いま di kiri, ません di kanan."
+   }
+  }
+ ]
+}

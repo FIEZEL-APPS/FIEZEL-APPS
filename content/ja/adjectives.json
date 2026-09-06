@@ -1,0 +1,1358 @@
+{
+ "schema": "fiezel-japanese-bank-v1",
+ "target": "ja",
+ "cefr": "A1",
+ "jlpt": "N5",
+ "family": "adjectives",
+ "catatan": "Bank soal A1/N5 keluarga adjectives. Dijaga tests/japanese-content-test.js.",
+ "provenans": {
+  "sumberSilabus": "Minna no Nihongo dan Irodori dipakai SEBAGAI SILABUS SAJA: poin tata bahasa apa, urutannya bagaimana, di tingkat berapa. NOL kalimat, dialog, teks, atau daftar kosakata yang direproduksi atau diturunkan — setiap stem, pilihan, pengecoh, dan penjelasan ditulis baru.",
+  "akibatLisensi": "Karena tidak ada teks Irodori yang dipakai, FIEZEL TIDAK terikat kewajiban gratis-selamanya dari lisensinya.",
+  "statusNaskah": "Kalimat Jepang dan penjelasan Inggris/Indonesia berstatus DRAFT AI dan wajib direview penutur asli sebelum dipakai menilai murid."
+ },
+ "jumlah": 22,
+ "templates": [
+  {
+   "id": "JP-AD-101",
+   "family": "adjectives",
+   "skill": "adjectives",
+   "subskill": "i_adjective_before_noun_no_na",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "i-adjective-attributive-plain",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Attach an i-adjective straight to the noun it describes, with nothing added",
+   "pedagogicalObjectiveId": "Menempelkan kata sifat -i langsung ke kata bendanya, tanpa tambahan apa pun",
+   "misconceptionTargeted": "Learner inserts NA after an i-adjective, treating every adjective as a na-adjective",
+   "misconceptionTargetedId": "Murid menyisipkan な sesudah kata sifat -i, seolah semua kata sifat itu jenis -na",
+   "reasoningOperation": "check the adjective ending -> i-ending means no connector before the noun",
+   "reasoningOperationId": "periksa akhiran kata sifatnya -> berakhiran -i berarti tanpa penyambung sebelum kata benda",
+   "stem": "この みせの パン___ おいしいです。",
+   "stemKana": "この みせの パン___ おいしいです。",
+   "furigana": [],
+   "options": [
+    "やすい",
+    "やすいな",
+    "やすくの",
+    "やすいの"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "やすいな",
+     "misconception": "na inserted after an i-adjective",
+     "misconceptionId": "な disisipkan sesudah kata sifat -i",
+     "whyFails": "NA belongs only to na-adjectives. YASUI already ends in I, so it links to the noun by itself.",
+     "whyFailsId": "な hanya milik kata sifat -na. やすい sudah berakhiran い, jadi ia menempel sendiri ke kata benda."
+    },
+    {
+     "option": "やすくの",
+     "misconception": "the -ku stem used as a modifier of a noun",
+     "misconceptionId": "bentuk -ku dipakai untuk menerangkan kata benda",
+     "whyFails": "The KU form leads into negatives and joins, never straight into a noun.",
+     "whyFailsId": "Bentuk く menuju bentuk ingkar atau penyambung, tidak pernah langsung ke kata benda."
+    },
+    {
+     "option": "やすいの",
+     "misconception": "possessive NO added where no possession exists",
+     "misconceptionId": "の kepemilikan ditambahkan padahal tidak ada kepemilikan",
+     "whyFails": "NO links two nouns. YASUI is an adjective, so it needs no bridge to PAN.",
+     "whyFailsId": "の menyambung dua kata benda. やすい itu kata sifat, jadi tidak perlu jembatan ke パン."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "An i-adjective sits directly in front of the noun in its dictionary shape: YASUI PAN.",
+    "whyCorrectId": "Kata sifat -i berdiri langsung di depan kata benda dalam bentuk kamusnya: やすい パン.",
+    "rule": "i-adjective + noun = no connector at all.",
+    "ruleId": "kata sifat -i + kata benda = tanpa penyambung sama sekali.",
+    "whyOthersFail": "YASUINA borrows na-adjective grammar; YASUKUNO and YASUINO add endings that have no job here.",
+    "whyOthersFailId": "やすいな meminjam tata bahasa kata sifat -na; やすくの dan やすいの menambah akhiran yang tak berfungsi di sini.",
+    "howToAvoid": "Look at the last letter. If it is I, put nothing between the adjective and the noun.",
+    "howToAvoidId": "Lihat huruf terakhirnya. Kalau い, jangan sisipkan apa pun antara kata sifat dan kata benda.",
+    "memoryCue": "I ends it, nothing follows.",
+    "memoryCueId": "Berakhir い, tidak ada lanjutannya."
+   }
+  },
+  {
+   "id": "JP-AD-102",
+   "family": "adjectives",
+   "skill": "adjectives",
+   "subskill": "na_adjective_before_noun_needs_na",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "na-adjective-attributive-needs-na",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Add NA when a na-adjective stands in front of the noun it describes",
+   "pedagogicalObjectiveId": "Menambahkan な saat kata sifat -na berdiri di depan kata benda yang diterangkannya",
+   "misconceptionTargeted": "Learner drops NA, or bends the na-adjective into i-adjective shapes",
+   "misconceptionTargetedId": "Murid membuang な, atau memaksa kata sifat -na masuk ke bentuk kata sifat -i",
+   "reasoningOperation": "recognise the word as a na-adjective -> supply NA before the noun",
+   "reasoningOperationId": "kenali kata itu sebagai kata sifat -na -> sediakan な sebelum kata benda",
+   "stem": "ここは ___ こうえんです。",
+   "stemKana": "ここは ___ こうえんです。",
+   "furigana": [],
+   "options": [
+    "しずかな",
+    "しずか",
+    "しずかい",
+    "しずかの"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "しずか",
+     "misconception": "NA omitted before the noun",
+     "misconceptionId": "な dihilangkan sebelum kata benda",
+     "whyFails": "Bare SHIZUKA can end a sentence, but in front of a noun it needs NA to attach.",
+     "whyFailsId": "しずか telanjang bisa mengakhiri kalimat, tetapi di depan kata benda ia butuh な untuk menempel."
+    },
+    {
+     "option": "しずかい",
+     "misconception": "na-adjective given an i-adjective ending",
+     "misconceptionId": "kata sifat -na diberi akhiran kata sifat -i",
+     "whyFails": "SHIZUKA is not an i-adjective; gluing I onto it invents a word that does not exist.",
+     "whyFailsId": "しずか bukan kata sifat -i; menempelkan い di situ menciptakan kata yang tidak ada."
+    },
+    {
+     "option": "しずかの",
+     "misconception": "NO used where NA is required",
+     "misconceptionId": "の dipakai padahal yang dibutuhkan な",
+     "whyFails": "NO joins noun to noun. SHIZUKA here describes a quality, so the connector is NA.",
+     "whyFailsId": "の menyambung kata benda ke kata benda. しずか di sini menyatakan sifat, jadi penyambungnya な."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "A na-adjective modifying a noun carries NA: SHIZUKA NA KOUEN.",
+    "whyCorrectId": "Kata sifat -na yang menerangkan kata benda membawa な: しずかな こうえん.",
+    "rule": "na-adjective + NA + noun.",
+    "ruleId": "kata sifat -na + な + kata benda.",
+    "whyOthersFail": "Bare SHIZUKA leaves the two words unlinked; SHIZUKAI and SHIZUKANO use endings from other patterns.",
+    "whyOthersFailId": "しずka tanpa apa pun membiarkan dua kata itu tak tersambung; しずかい dan しずかの memakai akhiran dari pola lain.",
+    "howToAvoid": "If the adjective can appear bare before DESU and does not end in I, expect NA before a noun.",
+    "howToAvoidId": "Kalau kata sifatnya bisa berdiri telanjang sebelum です dan tidak berakhiran い, harapkan な sebelum kata benda.",
+    "memoryCue": "The na-adjective carries its NA like a suitcase to the noun.",
+    "memoryCueId": "Kata sifat -na membawa な-nya seperti koper menuju kata benda."
+   }
+  },
+  {
+   "id": "JP-AD-103",
+   "family": "adjectives",
+   "skill": "adjectives",
+   "subskill": "i_adjective_negative_kunai",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "i-adjective-negative-kunai",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Form the plain negative of an i-adjective by replacing I with KUNAI",
+   "pedagogicalObjectiveId": "Membentuk ingkar biasa kata sifat -i dengan mengganti い menjadi くない",
+   "misconceptionTargeted": "Learner keeps the I and simply appends NAI, or uses the na-adjective negative",
+   "misconceptionTargetedId": "Murid mempertahankan い lalu sekadar menambah ない, atau memakai ingkar kata sifat -na",
+   "reasoningOperation": "drop the final I -> attach KUNAI",
+   "reasoningOperationId": "buang い terakhir -> tempelkan くない",
+   "stem": "きょうは ___。あついです。",
+   "stemKana": "きょうは ___。あついです。",
+   "furigana": [],
+   "options": [
+    "さむくない",
+    "さむいない",
+    "さむじゃない",
+    "さむいくない"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "さむいない",
+     "misconception": "NAI appended without dropping the I",
+     "misconceptionId": "ない ditambahkan tanpa membuang い",
+     "whyFails": "The final I must leave before NAI arrives; SAMUI plus NAI stacks two endings.",
+     "whyFailsId": "い terakhir harus pergi sebelum ない datang; さむい ditambah ない menumpuk dua akhiran."
+    },
+    {
+     "option": "さむじゃない",
+     "misconception": "na-adjective negative applied to an i-adjective",
+     "misconceptionId": "ingkar kata sifat -na dipakai pada kata sifat -i",
+     "whyFails": "JA NAI belongs to na-adjectives and nouns. SAMUI ends in I, so it uses KUNAI.",
+     "whyFailsId": "じゃない milik kata sifat -na dan kata benda. さむい berakhiran い, jadi memakai くない."
+    },
+    {
+     "option": "さむいくない",
+     "misconception": "KU inserted while the I is still there",
+     "misconceptionId": "く disisipkan padahal い masih ada",
+     "whyFails": "KU replaces the I; it cannot sit after it.",
+     "whyFailsId": "く menggantikan い; ia tidak bisa berdiri sesudahnya."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "SAMUI loses its I and takes KUNAI, giving SAMUKUNAI.",
+    "whyCorrectId": "さむい melepas い-nya dan mengambil くない, menjadi さむくない.",
+    "rule": "i-adjective negative: cut I, add KUNAI.",
+    "ruleId": "ingkar kata sifat -i: potong い, tambahkan くない.",
+    "whyOthersFail": "Two options keep the I that must go; one borrows the na-adjective negative.",
+    "whyOthersFailId": "Dua pilihan mempertahankan い yang seharusnya hilang; satu meminjam ingkar kata sifat -na.",
+    "howToAvoid": "Say the stem without the final I first, then add KUNAI to it.",
+    "howToAvoidId": "Ucapkan dulu akar katanya tanpa い terakhir, baru tambahkan くない.",
+    "memoryCue": "The I steps aside so KU can stand.",
+    "memoryCueId": "い menyingkir agar く bisa berdiri."
+   }
+  },
+  {
+   "id": "JP-AD-104",
+   "family": "adjectives",
+   "skill": "adjectives",
+   "subskill": "i_adjective_negative_polite_kuarimasen",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "i-adjective-negative-polite-ku-arimasen",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Build the polite negative of an i-adjective as KU ARIMASEN",
+   "pedagogicalObjectiveId": "Membangun ingkar sopan kata sifat -i sebagai くありません",
+   "misconceptionTargeted": "Learner negates the copula DESU instead of the adjective itself",
+   "misconceptionTargetedId": "Murid mengingkarkan kopula です, bukan kata sifatnya sendiri",
+   "reasoningOperation": "cut the final I -> attach KU -> add ARIMASEN",
+   "reasoningOperationId": "potong い terakhir -> tempelkan く -> tambahkan ありません",
+   "stem": "この かばんは ___。",
+   "stemKana": "この かばんは ___。",
+   "furigana": [],
+   "options": [
+    "たかくありません",
+    "たかいでは ありません",
+    "たかいじゃ ありません",
+    "たかいくありません"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "たかいでは ありません",
+     "misconception": "noun-style DE WA ARIMASEN used on an i-adjective",
+     "misconceptionId": "pola kata benda ではありません dipakai pada kata sifat -i",
+     "whyFails": "DE WA ARIMASEN negates nouns and na-adjectives. An i-adjective changes its own ending instead.",
+     "whyFailsId": "ではありません mengingkarkan kata benda dan kata sifat -na. Kata sifat -i justru mengubah akhirannya sendiri."
+    },
+    {
+     "option": "たかいじゃ ありません",
+     "misconception": "the casual na-adjective negative attached to an i-adjective",
+     "misconceptionId": "ingkar santai kata sifat -na ditempelkan ke kata sifat -i",
+     "whyFails": "JA ARIMASEN also belongs to the noun pattern, and the I has not been removed.",
+     "whyFailsId": "じゃありません juga milik pola kata benda, dan い-nya pun belum dibuang."
+    },
+    {
+     "option": "たかいくありません",
+     "misconception": "KU added on top of the surviving I",
+     "misconceptionId": "く ditambahkan di atas い yang masih bertahan",
+     "whyFails": "KU is the replacement for I, so both cannot appear together.",
+     "whyFailsId": "く adalah pengganti い, jadi keduanya tidak bisa muncul bersamaan."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "TAKAI becomes TAKAKU, and ARIMASEN supplies the polite negation: TAKAKU ARIMASEN.",
+    "whyCorrectId": "たかい menjadi たかく, lalu ありません memberi ingkar sopannya: たかくありません.",
+    "rule": "i-adjective polite negative: I to KU, then ARIMASEN.",
+    "ruleId": "ingkar sopan kata sifat -i: い jadi く, lalu ありません.",
+    "whyOthersFail": "Two options use the noun/na-adjective negative; the third stacks KU after an I that should be gone.",
+    "whyOthersFailId": "Dua pilihan memakai ingkar kata benda/kata sifat -na; yang ketiga menumpuk く sesudah い yang seharusnya hilang.",
+    "howToAvoid": "In an i-adjective sentence the negation lives in the adjective, never in DESU.",
+    "howToAvoidId": "Dalam kalimat kata sifat -i, ingkarnya tinggal di kata sifat, bukan di です.",
+    "memoryCue": "The adjective does its own denying.",
+    "memoryCueId": "Kata sifatnya mengingkari dirinya sendiri."
+   }
+  },
+  {
+   "id": "JP-AD-105",
+   "family": "adjectives",
+   "skill": "adjectives",
+   "subskill": "na_adjective_negative_janai",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "na-adjective-negative-janai",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Negate a na-adjective in plain speech with JA NAI on the bare stem",
+   "pedagogicalObjectiveId": "Mengingkarkan kata sifat -na secara santai dengan じゃない pada akar telanjangnya",
+   "misconceptionTargeted": "Learner applies the i-adjective KUNAI pattern to a na-adjective",
+   "misconceptionTargetedId": "Murid menerapkan pola くない milik kata sifat -i pada kata sifat -na",
+   "reasoningOperation": "identify the na-adjective -> leave the stem untouched -> add JA NAI",
+   "reasoningOperationId": "kenali kata sifat -na -> biarkan akarnya utuh -> tambahkan じゃない",
+   "stem": "この アプリは ___。つかいにくいです。",
+   "stemKana": "この アプリは ___。つかいにくいです。",
+   "furigana": [],
+   "options": [
+    "べんりじゃない",
+    "べんりくない",
+    "べんりないです",
+    "べんりなじゃない"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "べんりくない",
+     "misconception": "i-adjective KUNAI attached to a na-adjective",
+     "misconceptionId": "くない milik kata sifat -i ditempelkan ke kata sifat -na",
+     "whyFails": "KUNAI comes from replacing a final I. BENRI has no final I to replace.",
+     "whyFailsId": "くない lahir dari penggantian い terakhir. べんり tidak punya い untuk diganti."
+    },
+    {
+     "option": "べんりないです",
+     "misconception": "NAI attached directly with no JA",
+     "misconceptionId": "ない ditempel langsung tanpa じゃ",
+     "whyFails": "A na-adjective needs JA (or DE WA) before NAI; NAI cannot glue on by itself.",
+     "whyFailsId": "Kata sifat -na perlu じゃ (atau では) sebelum ない; ない tidak bisa menempel sendiri."
+    },
+    {
+     "option": "べんりなじゃない",
+     "misconception": "attributive NA kept in a predicate position",
+     "misconceptionId": "な bentuk penerang dipertahankan di posisi predikat",
+     "whyFails": "NA appears only before a noun. Ending the sentence, the stem stands bare.",
+     "whyFailsId": "な hanya muncul sebelum kata benda. Saat mengakhiri kalimat, akarnya berdiri telanjang."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "BENRI is a na-adjective, so its plain negative is the bare stem plus JA NAI.",
+    "whyCorrectId": "べんり adalah kata sifat -na, jadi ingkar biasanya adalah akar telanjang ditambah じゃない.",
+    "rule": "na-adjective negative: stem + JA NAI.",
+    "ruleId": "ingkar kata sifat -na: akar + じゃない.",
+    "whyOthersFail": "One imports i-adjective morphology, one drops JA, one keeps the NA that only modifiers use.",
+    "whyOthersFailId": "Satu mengimpor morfologi kata sifat -i, satu membuang じゃ, satu mempertahankan な yang hanya dipakai penerang.",
+    "howToAvoid": "Ask whether the word ends in I. BENRI does not, so KUNAI is off the table.",
+    "howToAvoidId": "Tanyakan apakah katanya berakhiran い. べんり tidak, jadi くない tidak berlaku.",
+    "memoryCue": "No I to cut, so JA NAI does the work.",
+    "memoryCueId": "Tidak ada い untuk dipotong, jadi じゃない yang bekerja."
+   }
+  },
+  {
+   "id": "JP-AD-106",
+   "family": "adjectives",
+   "skill": "adjectives",
+   "subskill": "na_adjective_negative_polite_dewaarimasen",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "na-adjective-negative-polite-dewa-arimasen",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Use DE WA ARIMASEN for the polite negative of a na-adjective",
+   "pedagogicalObjectiveId": "Memakai ではありません untuk ingkar sopan kata sifat -na",
+   "misconceptionTargeted": "Learner reaches for KU ARIMASEN, the i-adjective polite negative",
+   "misconceptionTargetedId": "Murid meraih くありません, yaitu ingkar sopan kata sifat -i",
+   "reasoningOperation": "classify the adjective as na-type -> choose the noun-style polite negative",
+   "reasoningOperationId": "golongkan kata sifatnya sebagai jenis -na -> pilih ingkar sopan bergaya kata benda",
+   "stem": "この うたは まだ ___。",
+   "stemKana": "この うたは まだ ___。",
+   "furigana": [],
+   "options": [
+    "ゆうめいでは ありません",
+    "ゆうめくありません",
+    "ゆうめいくありません",
+    "ゆうめいないです"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "ゆうめくありません",
+     "misconception": "the final I of the stem treated as an adjective ending and swapped for KU",
+     "misconceptionId": "い di akhir akar dianggap akhiran kata sifat lalu ditukar menjadi く",
+     "whyFails": "YUUMEI is a na-adjective whose stem happens to end in the sound I; that I is part of the word, not a changeable ending.",
+     "whyFailsId": "ゆうめい adalah kata sifat -na yang akarnya kebetulan berbunyi い; い itu bagian kata, bukan akhiran yang bisa diubah."
+    },
+    {
+     "option": "ゆうめいくありません",
+     "misconception": "i-adjective KU pattern bolted onto a na-adjective",
+     "misconceptionId": "pola く kata sifat -i dipasang paksa pada kata sifat -na",
+     "whyFails": "KU only exists for adjectives that truly end in the I ending, which YUUMEI does not.",
+     "whyFailsId": "く hanya ada untuk kata sifat yang benar-benar berakhiran い sebagai akhiran, dan ゆうめい bukan begitu."
+    },
+    {
+     "option": "ゆうめいないです",
+     "misconception": "NAI joined with no DE WA or JA",
+     "misconceptionId": "ない disambung tanpa では atau じゃ",
+     "whyFails": "The negation of a na-adjective must pass through DE WA or JA before NAI.",
+     "whyFailsId": "Ingkar kata sifat -na harus lewat では atau じゃ sebelum ない."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "YUUMEI is a na-adjective, so it negates like a noun: YUUMEI DE WA ARIMASEN.",
+    "whyCorrectId": "ゆうめい adalah kata sifat -na, jadi ingkarnya seperti kata benda: ゆうめいではありません.",
+    "rule": "na-adjective polite negative: stem + DE WA ARIMASEN.",
+    "ruleId": "ingkar sopan kata sifat -na: akar + ではありません.",
+    "whyOthersFail": "All three treat the I sound inside YUUMEI as a grammatical ending, or skip the required DE WA.",
+    "whyOthersFailId": "Ketiganya menganggap bunyi い di dalam ゆうめい sebagai akhiran tata bahasa, atau melompati では yang wajib.",
+    "howToAvoid": "Test the word before a noun: YUUMEI NA HITO takes NA, so it is a na-adjective.",
+    "howToAvoidId": "Uji katanya di depan kata benda: ゆうめいな ひと memakai な, jadi ia kata sifat -na.",
+    "memoryCue": "An I you can hear is not always an I you can cut.",
+    "memoryCueId": "い yang terdengar belum tentu い yang bisa dipotong."
+   }
+  },
+  {
+   "id": "JP-AD-107",
+   "family": "adjectives",
+   "skill": "adjectives",
+   "subskill": "i_adjective_past_katta",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "i-adjective-past-katta",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Form the past of an i-adjective by replacing I with KATTA",
+   "pedagogicalObjectiveId": "Membentuk lampau kata sifat -i dengan mengganti い menjadi かった",
+   "misconceptionTargeted": "Learner marks the past on DESHITA and leaves the adjective in the present",
+   "misconceptionTargetedId": "Murid menandai lampau pada でした dan membiarkan kata sifatnya tetap bentuk sekarang",
+   "reasoningOperation": "cut the final I -> attach KATTA",
+   "reasoningOperationId": "potong い terakhir -> tempelkan かった",
+   "stem": "きのうの パーティーは ___です。",
+   "stemKana": "きのうの パーティーは ___です。",
+   "furigana": [],
+   "options": [
+    "たのしかった",
+    "たのしいでした",
+    "たのしでした",
+    "たのしいかった"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "たのしいでした",
+     "misconception": "past marked on the copula instead of the i-adjective",
+     "misconceptionId": "lampau ditandai pada kopula, bukan pada kata sifat -i",
+     "whyFails": "An i-adjective carries its own tense; DESHITA after TANOSHII doubles the job and is not used.",
+     "whyFailsId": "Kata sifat -i membawa kalanya sendiri; でした sesudah たのしい menggandakan tugas dan tidak dipakai."
+    },
+    {
+     "option": "たのしでした",
+     "misconception": "i-adjective stripped to a stem and treated as a na-adjective",
+     "misconceptionId": "kata sifat -i dikupas jadi akar lalu diperlakukan seperti kata sifat -na",
+     "whyFails": "Only na-adjectives take DESHITA on a bare stem. TANOSHII is an i-adjective.",
+     "whyFailsId": "Hanya kata sifat -na yang memakai でした pada akar telanjang. たのしい itu kata sifat -i."
+    },
+    {
+     "option": "たのしいかった",
+     "misconception": "KATTA added without removing the I",
+     "misconceptionId": "かった ditambahkan tanpa membuang い",
+     "whyFails": "KATTA replaces the final I; keeping both leaves the ending doubled.",
+     "whyFailsId": "かった menggantikan い terakhir; mempertahankan keduanya membuat akhirannya ganda."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "TANOSHII drops I and takes KATTA: TANOSHIKATTA (DESU stays only for politeness).",
+    "whyCorrectId": "たのしい melepas い dan mengambil かった: たのしかった (です hanya untuk kesopanan).",
+    "rule": "i-adjective past: cut I, add KATTA.",
+    "ruleId": "lampau kata sifat -i: potong い, tambahkan かった.",
+    "whyOthersFail": "Two options move the tense onto DESU/DESHITA; one keeps the I that KATTA replaces.",
+    "whyOthersFailId": "Dua pilihan memindahkan kala ke です/でした; satu mempertahankan い yang mestinya diganti かった.",
+    "howToAvoid": "With an i-adjective, change the adjective and leave DESU alone.",
+    "howToAvoidId": "Pada kata sifat -i, ubah kata sifatnya dan biarkan です apa adanya.",
+    "memoryCue": "The adjective remembers the past by itself.",
+    "memoryCueId": "Kata sifatnya mengingat masa lalu sendiri."
+   }
+  },
+  {
+   "id": "JP-AD-108",
+   "family": "adjectives",
+   "skill": "adjectives",
+   "subskill": "na_adjective_past_deshita",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "na-adjective-past-deshita",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Put a na-adjective into the past with DESHITA on the bare stem",
+   "pedagogicalObjectiveId": "Menjadikan kata sifat -na bentuk lampau dengan でした pada akar telanjang",
+   "misconceptionTargeted": "Learner conjugates the na-adjective with KATTA as if it ended in I",
+   "misconceptionTargetedId": "Murid mengonjugasikan kata sifat -na dengan かった seolah berakhiran い",
+   "reasoningOperation": "classify as na-adjective -> keep the stem -> add DESHITA",
+   "reasoningOperationId": "golongkan sebagai kata sifat -na -> pertahankan akarnya -> tambahkan でした",
+   "stem": "せんしゅうの にちようびは ___。",
+   "stemKana": "せんしゅうの にちようびは ___。",
+   "furigana": [],
+   "options": [
+    "ひまでした",
+    "ひまかった",
+    "ひまくかった",
+    "ひまいでした"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "ひまかった",
+     "misconception": "i-adjective past KATTA applied to a na-adjective",
+     "misconceptionId": "lampau かった milik kata sifat -i dipakai pada kata sifat -na",
+     "whyFails": "KATTA is what replaces a final I. HIMA has none, so its past comes from DESHITA.",
+     "whyFailsId": "かった adalah pengganti い terakhir. ひま tidak punya い, jadi lampaunya datang dari でした."
+    },
+    {
+     "option": "ひまくかった",
+     "misconception": "KU stem invented for a na-adjective",
+     "misconceptionId": "akar く direka-reka untuk kata sifat -na",
+     "whyFails": "Only i-adjectives have a KU stem; HIMAKU is not a form of this word.",
+     "whyFailsId": "Hanya kata sifat -i yang punya akar く; ひまく bukan bentuk dari kata ini."
+    },
+    {
+     "option": "ひまいでした",
+     "misconception": "an I added to make the word look like an i-adjective",
+     "misconceptionId": "い ditambahkan agar katanya tampak seperti kata sifat -i",
+     "whyFails": "HIMAI is not a word; the stem must stay HIMA.",
+     "whyFailsId": "ひまい bukan kata; akarnya harus tetap ひま."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "HIMA is a na-adjective, so the past is carried by DESHITA: HIMA DESHITA.",
+    "whyCorrectId": "ひま adalah kata sifat -na, jadi lampaunya dibawa でした: ひまでした.",
+    "rule": "na-adjective past: stem + DESHITA.",
+    "ruleId": "lampau kata sifat -na: akar + でした.",
+    "whyOthersFail": "Each wrong option borrows i-adjective machinery (KATTA, KU, or an added I) that HIMA does not have.",
+    "whyOthersFailId": "Tiap pilihan salah meminjam perkakas kata sifat -i (かった, く, atau い tambahan) yang tidak dimiliki ひま.",
+    "howToAvoid": "With na-adjectives the tense sits in DESU/DESHITA, not in the adjective.",
+    "howToAvoidId": "Pada kata sifat -na, kalanya ada di です/でした, bukan di kata sifatnya.",
+    "memoryCue": "na-adjective stands still; DESHITA moves the time.",
+    "memoryCueId": "Kata sifat -na diam; でした yang menggerakkan waktunya."
+   }
+  },
+  {
+   "id": "JP-AD-109",
+   "family": "adjectives",
+   "skill": "adjectives",
+   "subskill": "i_adjective_past_negative_kunakatta",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "i-adjective-past-negative-kunakatta",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Build the past negative of an i-adjective as KUNAKATTA",
+   "pedagogicalObjectiveId": "Membangun ingkar lampau kata sifat -i sebagai くなかった",
+   "misconceptionTargeted": "Learner leaves the negative in the present and marks the past on DESU",
+   "misconceptionTargetedId": "Murid membiarkan ingkarnya tetap bentuk sekarang lalu menandai lampau pada です",
+   "reasoningOperation": "form KUNAI -> treat NAI as an i-adjective -> change NAI to NAKATTA",
+   "reasoningOperationId": "bentuk くない -> perlakukan ない sebagai kata sifat -i -> ubah ない jadi なかった",
+   "stem": "テストは ___です。かんたんでした。",
+   "stemKana": "テストは ___です。かんたんでした。",
+   "furigana": [],
+   "options": [
+    "むずかしくなかった",
+    "むずかしくないでした",
+    "むずかしじゃなかった",
+    "むずかしいくなかった"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "むずかしくないでした",
+     "misconception": "past pushed onto DESU while NAI stays present",
+     "misconceptionId": "lampau didorong ke です sementara ない tetap bentuk sekarang",
+     "whyFails": "NAI is itself an i-adjective, so it must become NAKATTA rather than lean on DESHITA.",
+     "whyFailsId": "ない sendiri kata sifat -i, jadi ia harus menjadi なかった, bukan bersandar pada でした."
+    },
+    {
+     "option": "むずかしじゃなかった",
+     "misconception": "na-adjective negative used on an i-adjective",
+     "misconceptionId": "ingkar kata sifat -na dipakai pada kata sifat -i",
+     "whyFails": "MUZUKASHII ends in the I ending, so its negative runs through KU, not JA.",
+     "whyFailsId": "むずかしい berakhiran い, jadi ingkarnya lewat く, bukan じゃ."
+    },
+    {
+     "option": "むずかしいくなかった",
+     "misconception": "KU added while the I is still in place",
+     "misconceptionId": "く ditambahkan padahal い masih ada",
+     "whyFails": "KU takes the place of the final I; the two cannot both appear.",
+     "whyFailsId": "く mengambil tempat い terakhir; keduanya tidak bisa muncul bersama."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "MUZUKASHII becomes MUZUKASHIKU + NAI, and NAI itself goes past as NAKATTA.",
+    "whyCorrectId": "むずかしい menjadi むずかしく + ない, lalu ない sendiri berubah lampau menjadi なかった.",
+    "rule": "i-adjective past negative: KU + NAKATTA.",
+    "ruleId": "ingkar lampau kata sifat -i: く + なかった.",
+    "whyOthersFail": "One freezes NAI in the present, one uses the na-adjective route, one keeps the I before KU.",
+    "whyOthersFailId": "Satu membekukan ない di bentuk sekarang, satu memakai jalur kata sifat -na, satu mempertahankan い sebelum く.",
+    "howToAvoid": "Remember NAI behaves like any i-adjective: NAI to NAKATTA.",
+    "howToAvoidId": "Ingat ない berperilaku seperti kata sifat -i mana pun: ない jadi なかった.",
+    "memoryCue": "NAI has a past of its own.",
+    "memoryCueId": "ない punya masa lalunya sendiri."
+   }
+  },
+  {
+   "id": "JP-AD-110",
+   "family": "adjectives",
+   "skill": "adjectives",
+   "subskill": "na_adjective_past_negative_janakatta",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "na-adjective-past-negative-janakatta",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Build the past negative of a na-adjective as JA NAKATTA",
+   "pedagogicalObjectiveId": "Membangun ingkar lampau kata sifat -na sebagai じゃなかった",
+   "misconceptionTargeted": "Learner conjugates the na-adjective stem itself instead of the NAI that follows it",
+   "misconceptionTargetedId": "Murid mengonjugasikan akar kata sifat -na, bukan ない yang mengikutinya",
+   "reasoningOperation": "keep the stem -> add JA -> put NAI into the past as NAKATTA",
+   "reasoningOperationId": "pertahankan akarnya -> tambahkan じゃ -> ubah ない ke lampau menjadi なかった",
+   "stem": "こどもの とき、この まちは ___。",
+   "stemKana": "こどもの とき、この まちは ___。",
+   "furigana": [],
+   "options": [
+    "にぎやかじゃなかった",
+    "にぎやかくなかった",
+    "にぎやかじゃないでした",
+    "にぎやかかったない"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "にぎやかくなかった",
+     "misconception": "i-adjective KU stem forced onto a na-adjective",
+     "misconceptionId": "akar く kata sifat -i dipaksakan pada kata sifat -na",
+     "whyFails": "NIGIYAKA has no I ending to turn into KU, so this form does not exist.",
+     "whyFailsId": "にぎやか tidak punya akhiran い untuk diubah jadi く, jadi bentuk ini tidak ada."
+    },
+    {
+     "option": "にぎやかじゃないでした",
+     "misconception": "past put on DESU while NAI stays present",
+     "misconceptionId": "lampau ditaruh di です sementara ない tetap bentuk sekarang",
+     "whyFails": "NAI must itself become NAKATTA; DESHITA cannot rescue a present NAI.",
+     "whyFailsId": "ない sendiri harus menjadi なかった; でした tidak bisa menyelamatkan ない bentuk sekarang."
+    },
+    {
+     "option": "にぎやかかったない",
+     "misconception": "past and negative applied in the wrong order with i-adjective endings",
+     "misconceptionId": "lampau dan ingkar dipasang dengan urutan salah memakai akhiran kata sifat -i",
+     "whyFails": "Negation comes first and then goes past; KATTA also belongs to i-adjectives.",
+     "whyFailsId": "Ingkar datang lebih dulu lalu dilampaukan; かった pun milik kata sifat -i."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "NIGIYAKA is a na-adjective: stem + JA, then NAI turns into NAKATTA.",
+    "whyCorrectId": "にぎやか adalah kata sifat -na: akar + じゃ, lalu ない berubah menjadi なかった.",
+    "rule": "na-adjective past negative: stem + JA NAKATTA.",
+    "ruleId": "ingkar lampau kata sifat -na: akar + じゃなかった.",
+    "whyOthersFail": "Two options import i-adjective endings; one leaves NAI in the present.",
+    "whyOthersFailId": "Dua pilihan mengimpor akhiran kata sifat -i; satu meninggalkan ない di bentuk sekarang.",
+    "howToAvoid": "The stem never changes; only the NAI at the end moves in time.",
+    "howToAvoidId": "Akarnya tak pernah berubah; hanya ない di ujung yang bergerak dalam waktu.",
+    "memoryCue": "Stem still, NAI travels.",
+    "memoryCueId": "Akar diam, ない yang berjalan."
+   }
+  },
+  {
+   "id": "JP-AD-111",
+   "family": "adjectives",
+   "skill": "adjectives",
+   "subskill": "joining_two_i_adjectives_kute",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "join-two-i-adjectives-kute",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Join a first i-adjective to a second adjective using the KUTE form",
+   "pedagogicalObjectiveId": "Menyambung kata sifat -i pertama ke kata sifat berikutnya dengan bentuk くて",
+   "misconceptionTargeted": "Learner links adjectives with the na-adjective connector DE",
+   "misconceptionTargetedId": "Murid menyambung kata sifat dengan penyambung で milik kata sifat -na",
+   "reasoningOperation": "cut the final I of the first adjective -> attach KUTE -> continue",
+   "reasoningOperationId": "potong い kata sifat pertama -> tempelkan くて -> lanjutkan",
+   "stem": "この へやは ___ あかるいです。",
+   "stemKana": "この へやは ___ あかるいです。",
+   "furigana": [],
+   "options": [
+    "ひろくて",
+    "ひろいで",
+    "ひろいくて",
+    "ひろで"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "ひろいで",
+     "misconception": "na-adjective connector DE used after an i-adjective",
+     "misconceptionId": "penyambung で milik kata sifat -na dipakai sesudah kata sifat -i",
+     "whyFails": "DE joins na-adjectives and nouns. HIROI ends in I, so it joins with KUTE.",
+     "whyFailsId": "で menyambung kata sifat -na dan kata benda. ひろい berakhiran い, jadi ia menyambung dengan くて."
+    },
+    {
+     "option": "ひろいくて",
+     "misconception": "KUTE added without dropping the I",
+     "misconceptionId": "くて ditambahkan tanpa membuang い",
+     "whyFails": "KUTE replaces the final I; keeping it doubles the ending.",
+     "whyFailsId": "くて menggantikan い terakhir; mempertahankannya membuat akhiran ganda."
+    },
+    {
+     "option": "ひろで",
+     "misconception": "i-adjective stripped to a stem and joined like a na-adjective",
+     "misconceptionId": "kata sifat -i dikupas jadi akar lalu disambung seperti kata sifat -na",
+     "whyFails": "HIRO alone is not a usable form of this adjective in a sentence.",
+     "whyFailsId": "ひろ sendirian bukan bentuk yang bisa dipakai dari kata sifat ini dalam kalimat."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "HIROI becomes HIROKUTE, which carries the sentence on to the next adjective.",
+    "whyCorrectId": "ひろい menjadi ひろくて, yang membawa kalimat ke kata sifat berikutnya.",
+    "rule": "i-adjective joining form: cut I, add KUTE.",
+    "ruleId": "bentuk penyambung kata sifat -i: potong い, tambahkan くて.",
+    "whyOthersFail": "One uses the na-adjective connector, one keeps the I, one invents a bare stem.",
+    "whyOthersFailId": "Satu memakai penyambung kata sifat -na, satu mempertahankan い, satu mereka-reka akar telanjang.",
+    "howToAvoid": "The joining form is just the KU stem plus TE.",
+    "howToAvoidId": "Bentuk penyambungnya hanyalah akar く ditambah て.",
+    "memoryCue": "KU plus TE builds the bridge.",
+    "memoryCueId": "く ditambah て membangun jembatannya."
+   }
+  },
+  {
+   "id": "JP-AD-112",
+   "family": "adjectives",
+   "skill": "adjectives",
+   "subskill": "joining_na_adjective_with_de",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "join-na-adjective-with-de",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Join a na-adjective to the next adjective with the connector DE",
+   "pedagogicalObjectiveId": "Menyambung kata sifat -na ke kata sifat berikutnya dengan penyambung で",
+   "misconceptionTargeted": "Learner uses the i-adjective KUTE bridge after a na-adjective",
+   "misconceptionTargetedId": "Murid memakai jembatan くて milik kata sifat -i sesudah kata sifat -na",
+   "reasoningOperation": "classify as na-adjective -> keep the stem -> add DE",
+   "reasoningOperationId": "golongkan sebagai kata sifat -na -> pertahankan akarnya -> tambahkan で",
+   "stem": "この カフェは ___ しずかです。",
+   "stemKana": "この カフェは ___ しずかです。",
+   "furigana": [],
+   "options": [
+    "きれいで",
+    "きれくて",
+    "きれいくて",
+    "きれいなで"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "きれくて",
+     "misconception": "the I sound of the stem cut as if it were an adjective ending",
+     "misconceptionId": "bunyi い pada akar dipotong seolah itu akhiran kata sifat",
+     "whyFails": "KIREI is a na-adjective; the I is part of the stem and cannot be traded for KU.",
+     "whyFailsId": "きれい adalah kata sifat -na; い itu bagian akar dan tidak bisa ditukar dengan く."
+    },
+    {
+     "option": "きれいくて",
+     "misconception": "i-adjective KUTE bridge attached to a na-adjective",
+     "misconceptionId": "jembatan くて kata sifat -i ditempelkan ke kata sifat -na",
+     "whyFails": "KUTE only exists for true i-adjectives, and KIREI is not one despite its sound.",
+     "whyFailsId": "くて hanya ada untuk kata sifat -i sejati, dan きれい bukan itu meski bunyinya mirip."
+    },
+    {
+     "option": "きれいなで",
+     "misconception": "attributive NA kept before the connector",
+     "misconceptionId": "な bentuk penerang dipertahankan sebelum penyambung",
+     "whyFails": "NA appears only in front of a noun; the connecting form is the stem plus DE.",
+     "whyFailsId": "な hanya muncul di depan kata benda; bentuk penyambungnya adalah akar ditambah で."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "KIREI is a na-adjective, so it links onward as KIREI DE.",
+    "whyCorrectId": "きれい adalah kata sifat -na, jadi ia menyambung sebagai きれいで.",
+    "rule": "na-adjective joining form: stem + DE.",
+    "ruleId": "bentuk penyambung kata sifat -na: akar + で.",
+    "whyOthersFail": "Two options treat the I of KIREI as a changeable ending; one keeps NA outside its only position.",
+    "whyOthersFailId": "Dua pilihan menganggap い pada きれい sebagai akhiran yang bisa diubah; satu mempertahankan な di luar satu-satunya posisinya.",
+    "howToAvoid": "Memorise KIREI, YUUMEI and KIRAI as na-adjectives that merely sound like i-adjectives.",
+    "howToAvoidId": "Hafalkan きれい, ゆうめい dan きらい sebagai kata sifat -na yang hanya kedengaran seperti kata sifat -i.",
+    "memoryCue": "KIREI wears NA, not I.",
+    "memoryCueId": "きれい memakai な, bukan い."
+   }
+  },
+  {
+   "id": "JP-AD-113",
+   "family": "adjectives",
+   "skill": "adjectives",
+   "subskill": "ii_irregular_negative_yokunai",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "ii-irregular-negative-yokunai",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Use the YO- stem of II when forming its negative",
+   "pedagogicalObjectiveId": "Memakai akar よ- dari いい saat membentuk ingkarnya",
+   "misconceptionTargeted": "Learner conjugates II regularly as IIKUNAI instead of switching to YOKU",
+   "misconceptionTargetedId": "Murid mengonjugasikan いい secara beraturan jadi いくない, bukan berpindah ke よく",
+   "reasoningOperation": "recognise II as irregular -> switch the stem to YO- -> apply KUNAI",
+   "reasoningOperationId": "kenali いい sebagai tak beraturan -> ganti akarnya jadi よ- -> terapkan くない",
+   "stem": "この みずは ___。のまないで ください。",
+   "stemKana": "この みずは ___。のまないで ください。",
+   "furigana": [],
+   "options": [
+    "よくない",
+    "いくない",
+    "いいくない",
+    "いいじゃない"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "いくない",
+     "misconception": "regular KU rule applied to the irregular II",
+     "misconceptionId": "aturan く beraturan diterapkan pada いい yang tak beraturan",
+     "whyFails": "II is the one adjective that changes its stem to YO- before any ending.",
+     "whyFailsId": "いい adalah satu-satunya kata sifat yang mengganti akarnya jadi よ- sebelum akhiran apa pun."
+    },
+    {
+     "option": "いいくない",
+     "misconception": "KUNAI added without touching the stem at all",
+     "misconceptionId": "くない ditambahkan tanpa menyentuh akarnya sama sekali",
+     "whyFails": "Neither the I is dropped nor the stem changed, so the form is doubly wrong.",
+     "whyFailsId": "い-nya tidak dibuang dan akarnya tidak diganti, jadi bentuk ini salah ganda."
+    },
+    {
+     "option": "いいじゃない",
+     "misconception": "na-adjective negative used on an i-adjective",
+     "misconceptionId": "ingkar kata sifat -na dipakai pada kata sifat -i",
+     "whyFails": "II is an i-adjective; JA NAI belongs to na-adjectives and nouns.",
+     "whyFailsId": "いい adalah kata sifat -i; じゃない milik kata sifat -na dan kata benda."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "II keeps its meaning but borrows the older stem YO-, giving YOKUNAI.",
+    "whyCorrectId": "いい mempertahankan artinya tetapi meminjam akar lama よ-, sehingga menjadi よくない.",
+    "rule": "II conjugates from YO-: YOKUNAI, YOKATTA, YOKUTE.",
+    "ruleId": "いい dikonjugasikan dari よ-: よくない, よかった, よくて.",
+    "whyOthersFail": "Two options apply the regular rule that II refuses; one uses na-adjective negation.",
+    "whyOthersFailId": "Dua pilihan menerapkan aturan beraturan yang ditolak いい; satu memakai ingkar kata sifat -na.",
+    "howToAvoid": "The moment II needs any ending, rewrite it as YOI first.",
+    "howToAvoidId": "Begitu いい butuh akhiran apa pun, tulis ulang dulu sebagai よい.",
+    "memoryCue": "II stays II only when nothing follows.",
+    "memoryCueId": "いい tetap いい hanya kalau tidak ada lanjutannya."
+   }
+  },
+  {
+   "id": "JP-AD-114",
+   "family": "adjectives",
+   "skill": "adjectives",
+   "subskill": "ii_irregular_past_yokatta",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "ii-irregular-past-yokatta",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Form the past of II as YOKATTA, not by the regular pattern",
+   "pedagogicalObjectiveId": "Membentuk lampau いい sebagai よかった, bukan lewat pola beraturan",
+   "misconceptionTargeted": "Learner over-generalises the KATTA rule and produces IIKATTA",
+   "misconceptionTargetedId": "Murid menggeneralisasi aturan かった dan menghasilkan いかった",
+   "reasoningOperation": "switch II to the YO- stem -> apply the regular past KATTA",
+   "reasoningOperationId": "ganti いい ke akar よ- -> terapkan lampau beraturan かった",
+   "stem": "きのうの えいがは ほんとうに ___です。",
+   "stemKana": "きのうの えいがは ほんとうに ___です。",
+   "furigana": [],
+   "options": [
+    "よかった",
+    "いかった",
+    "いいかった",
+    "いいでした"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "いかった",
+     "misconception": "regular I-to-KATTA rule applied to the irregular II",
+     "misconceptionId": "aturan beraturan い-ke-かった diterapkan pada いい yang tak beraturan",
+     "whyFails": "The rule is right but the stem is wrong: II must become YO- before KATTA.",
+     "whyFailsId": "Aturannya benar tetapi akarnya salah: いい harus menjadi よ- sebelum かった."
+    },
+    {
+     "option": "いいかった",
+     "misconception": "KATTA added with the whole word left untouched",
+     "misconceptionId": "かった ditambahkan dengan kata utuh tak diubah sama sekali",
+     "whyFails": "The final I is not dropped and the stem is not switched, so nothing about the form is right.",
+     "whyFailsId": "い terakhir tidak dibuang dan akarnya tidak diganti, jadi tidak ada yang benar dari bentuk ini."
+    },
+    {
+     "option": "いいでした",
+     "misconception": "past marked on the copula as if II were a na-adjective",
+     "misconceptionId": "lampau ditandai pada kopula seolah いい kata sifat -na",
+     "whyFails": "II is an i-adjective and carries its own past; DESHITA cannot do it for it.",
+     "whyFailsId": "いい adalah kata sifat -i dan membawa lampaunya sendiri; でした tidak bisa menggantikannya."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "II shifts to YO- and then follows the normal rule: YOKATTA.",
+    "whyCorrectId": "いい bergeser ke よ- lalu mengikuti aturan biasa: よかった.",
+    "rule": "II past: YO + KATTA.",
+    "ruleId": "lampau いい: よ + かった.",
+    "whyOthersFail": "Two options apply the regular rule to the wrong stem; one moves tense onto DESU.",
+    "whyOthersFailId": "Dua pilihan menerapkan aturan beraturan pada akar yang salah; satu memindahkan kala ke です.",
+    "howToAvoid": "Whenever you would write IIKATTA or IIKUNAI, stop and put YO- in place of II.",
+    "howToAvoidId": "Setiap kali kamu hendak menulis いいかった atau いいくない, berhenti dan ganti いい dengan よ-.",
+    "memoryCue": "Good news in the past is always YOKATTA.",
+    "memoryCueId": "Kabar baik di masa lalu selalu よかった."
+   }
+  },
+  {
+   "id": "JP-AD-115",
+   "family": "adjectives",
+   "skill": "adjectives",
+   "subskill": "kirei_na_adjective_before_noun",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "kirei-attributive-na-not-i",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Treat KIREI as a na-adjective when it stands before a noun",
+   "pedagogicalObjectiveId": "Memperlakukan きれい sebagai kata sifat -na saat berdiri di depan kata benda",
+   "misconceptionTargeted": "Learner assumes any word ending in the I sound is an i-adjective",
+   "misconceptionTargetedId": "Murid mengira setiap kata berbunyi akhir い adalah kata sifat -i",
+   "reasoningOperation": "recall the word class from memory, not from the ending sound -> supply NA",
+   "reasoningOperationId": "ingat golongan katanya dari hafalan, bukan dari bunyi akhirnya -> sediakan な",
+   "stem": "まどから ___ うみが みえます。",
+   "stemKana": "まどから ___ うみが みえます。",
+   "furigana": [],
+   "options": [
+    "きれいな",
+    "きれい",
+    "きれいい",
+    "きれいの"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "きれい",
+     "misconception": "NA dropped before the noun",
+     "misconceptionId": "な dihilangkan sebelum kata benda",
+     "whyFails": "Because it sounds like an i-adjective, learners let it stand bare; a na-adjective still needs NA here.",
+     "whyFailsId": "Karena bunyinya seperti kata sifat -i, murid membiarkannya telanjang; kata sifat -na tetap butuh な di sini."
+    },
+    {
+     "option": "きれいい",
+     "misconception": "an extra I added to make it look like an i-adjective",
+     "misconceptionId": "い tambahan dipasang agar tampak seperti kata sifat -i",
+     "whyFails": "KIREII is not a word; the stem is KIREI and nothing is added to it.",
+     "whyFailsId": "きれいい bukan kata; akarnya きれい dan tidak ada tambahan apa pun."
+    },
+    {
+     "option": "きれいの",
+     "misconception": "NO used as the modifier link",
+     "misconceptionId": "の dipakai sebagai penyambung penerang",
+     "whyFails": "NO joins nouns; for a na-adjective describing a noun the link is NA.",
+     "whyFailsId": "の menyambung kata benda; untuk kata sifat -na yang menerangkan kata benda, penyambungnya な."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "KIREI is a na-adjective, so describing a noun it becomes KIREI NA UMI.",
+    "whyCorrectId": "きれい adalah kata sifat -na, jadi saat menerangkan kata benda ia menjadi きれいな うみ.",
+    "rule": "KIREI, YUUMEI, KIRAI, YUKKURI-sounding words: check the class, not the sound.",
+    "ruleId": "きれい, ゆうめい, きらい: periksa golongan katanya, bukan bunyinya.",
+    "whyOthersFail": "Each option either drops NA, adds a fake I, or uses the noun-linking NO.",
+    "whyOthersFailId": "Tiap pilihan entah membuang な, menambah い palsu, atau memakai の penyambung kata benda.",
+    "howToAvoid": "Learn KIREI together with NA the first time you meet it.",
+    "howToAvoidId": "Pelajari きれい bersama な sejak pertama kali kamu menemuinya.",
+    "memoryCue": "Sounds like I, behaves like NA.",
+    "memoryCueId": "Terdengar seperti い, berperilaku seperti な."
+   }
+  },
+  {
+   "id": "JP-AD-116",
+   "family": "adjectives",
+   "skill": "adjectives",
+   "subskill": "i_adjective_negative_polite_atarashii",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "i-adjective-negative-polite-atarashii",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Negate a longer i-adjective politely without disturbing its stem",
+   "pedagogicalObjectiveId": "Mengingkarkan kata sifat -i yang lebih panjang secara sopan tanpa mengganggu akarnya",
+   "misconceptionTargeted": "Learner cuts more than the final I, or negates DESU instead",
+   "misconceptionTargetedId": "Murid memotong lebih dari い terakhir, atau justru mengingkarkan です",
+   "reasoningOperation": "remove exactly one final I -> add KU ARIMASEN",
+   "reasoningOperationId": "buang tepat satu い terakhir -> tambahkan くありません",
+   "stem": "わたしの じてんしゃは ___。",
+   "stemKana": "わたしの じてんしゃは ___。",
+   "furigana": [],
+   "options": [
+    "あたらしくありません",
+    "あたらしいありません",
+    "あたらくありません",
+    "あたらしいでは ありません"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "あたらしいありません",
+     "misconception": "ARIMASEN attached with no KU form at all",
+     "misconceptionId": "ありません ditempel tanpa bentuk く sama sekali",
+     "whyFails": "ARIMASEN can only follow the KU form of an i-adjective.",
+     "whyFailsId": "ありません hanya bisa mengikuti bentuk く dari kata sifat -i."
+    },
+    {
+     "option": "あたらくありません",
+     "misconception": "too much of the stem removed along with the ending",
+     "misconceptionId": "terlalu banyak bagian akar ikut terbuang bersama akhirannya",
+     "whyFails": "Only the last I goes; ATARASHI- must stay intact before KU.",
+     "whyFailsId": "Hanya い terakhir yang hilang; あたらし- harus utuh sebelum く."
+    },
+    {
+     "option": "あたらしいでは ありません",
+     "misconception": "noun-style negation used on an i-adjective",
+     "misconceptionId": "ingkar bergaya kata benda dipakai pada kata sifat -i",
+     "whyFails": "DE WA ARIMASEN belongs to nouns and na-adjectives, not to ATARASHII.",
+     "whyFailsId": "ではありません milik kata benda dan kata sifat -na, bukan milik あたらしい."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "ATARASHII drops its final I to give ATARASHIKU, then ARIMASEN negates it politely.",
+    "whyCorrectId": "あたらしい melepas い terakhirnya menjadi あたらしく, lalu ありません mengingkarkannya dengan sopan.",
+    "rule": "Cut exactly one I, keep the rest of the word, then KU ARIMASEN.",
+    "ruleId": "Potong tepat satu い, pertahankan sisa katanya, lalu くありません.",
+    "whyOthersFail": "One skips KU, one over-trims the stem, one borrows the noun negative.",
+    "whyOthersFailId": "Satu melewati く, satu memotong akarnya berlebihan, satu meminjam ingkar kata benda.",
+    "howToAvoid": "Write the word, erase the last character only, then add KU ARIMASEN.",
+    "howToAvoidId": "Tulis katanya, hapus satu huruf terakhir saja, lalu tambahkan くありません.",
+    "memoryCue": "One I out, KU in.",
+    "memoryCueId": "Satu い keluar, く masuk."
+   }
+  },
+  {
+   "id": "JP-AD-117",
+   "family": "adjectives",
+   "skill": "adjectives",
+   "subskill": "na_adjective_before_noun_yuumei",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "yuumei-attributive-na",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Insert NA before the noun for a na-adjective whose stem ends in an I sound",
+   "pedagogicalObjectiveId": "Menyisipkan な sebelum kata benda untuk kata sifat -na yang akarnya berbunyi い",
+   "misconceptionTargeted": "Learner links YUUMEI to the noun with nothing, as if it were an i-adjective",
+   "misconceptionTargetedId": "Murid menyambungkan ゆうめい ke kata benda tanpa apa pun, seolah kata sifat -i",
+   "reasoningOperation": "recall YUUMEI as na-type -> place NA between adjective and noun",
+   "reasoningOperationId": "ingat ゆうめい sebagai jenis -na -> letakkan な di antara kata sifat dan kata benda",
+   "stem": "あそこは ___ おてらです。",
+   "stemKana": "あそこは ___ おてらです。",
+   "furigana": [],
+   "options": [
+    "ゆうめいな",
+    "ゆうめい",
+    "ゆうめいの",
+    "ゆうめく"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "ゆうめい",
+     "misconception": "NA omitted because the word sounds like an i-adjective",
+     "misconceptionId": "な dihilangkan karena katanya terdengar seperti kata sifat -i",
+     "whyFails": "Only true i-adjectives attach bare to a noun; YUUMEI needs NA.",
+     "whyFailsId": "Hanya kata sifat -i sejati yang menempel telanjang ke kata benda; ゆうめい butuh な."
+    },
+    {
+     "option": "ゆうめいの",
+     "misconception": "noun-linking NO used for an adjective",
+     "misconceptionId": "の penyambung kata benda dipakai untuk kata sifat",
+     "whyFails": "NO would treat YUUMEI as a noun; as a quality word it takes NA.",
+     "whyFailsId": "の akan memperlakukan ゆうめい sebagai kata benda; sebagai kata sifat ia memakai な."
+    },
+    {
+     "option": "ゆうめく",
+     "misconception": "the stem-final I traded for KU",
+     "misconceptionId": "い di akhir akar ditukar menjadi く",
+     "whyFails": "That I is part of the stem, and KU never appears before a noun anyway.",
+     "whyFailsId": "い itu bagian akar, dan lagipula く tidak pernah muncul sebelum kata benda."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "YUUMEI is a na-adjective, so before a noun it becomes YUUMEI NA OTERA.",
+    "whyCorrectId": "ゆうめい adalah kata sifat -na, jadi sebelum kata benda ia menjadi ゆうめいな おてら.",
+    "rule": "na-adjective + NA + noun, whatever the stem sounds like.",
+    "ruleId": "kata sifat -na + な + kata benda, apa pun bunyi akarnya.",
+    "whyOthersFail": "One leaves the words unlinked, one links them as nouns, one invents a KU stem.",
+    "whyOthersFailId": "Satu membiarkan kedua kata tak tersambung, satu menyambungnya seperti kata benda, satu mereka-reka akar く.",
+    "howToAvoid": "Store the NA in memory as part of the word: YUUMEI NA.",
+    "howToAvoidId": "Simpan な dalam ingatan sebagai bagian katanya: ゆうめいな.",
+    "memoryCue": "Famous words still need their NA.",
+    "memoryCueId": "Kata yang terkenal pun tetap butuh な-nya."
+   }
+  },
+  {
+   "id": "JP-AD-118",
+   "family": "adjectives",
+   "skill": "adjectives",
+   "subskill": "na_adjective_negative_janai_kirai",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "kirai-negative-janai",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Negate KIRAI with JA NAI even though its stem ends in an I sound",
+   "pedagogicalObjectiveId": "Mengingkarkan きらい dengan じゃない meski akarnya berbunyi い",
+   "misconceptionTargeted": "Learner produces KIRAKUNAI by cutting an I that is part of the stem",
+   "misconceptionTargetedId": "Murid menghasilkan きらくない dengan memotong い yang justru bagian akar",
+   "reasoningOperation": "test the word before a noun -> NA appears -> use JA NAI",
+   "reasoningOperationId": "uji katanya di depan kata benda -> muncul な -> pakai じゃない",
+   "stem": "やさいは ___。まいにち たべます。",
+   "stemKana": "やさいは ___。まいにち たべます。",
+   "furigana": [],
+   "options": [
+    "きらいじゃない",
+    "きらくない",
+    "きらいくない",
+    "きらいない"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "きらくない",
+     "misconception": "stem-internal I cut as if it were an adjective ending",
+     "misconceptionId": "い di dalam akar dipotong seolah itu akhiran kata sifat",
+     "whyFails": "KIRAI is a na-adjective; removing its I destroys the stem instead of conjugating it.",
+     "whyFailsId": "きらい adalah kata sifat -na; membuang い-nya merusak akar, bukan mengonjugasikannya."
+    },
+    {
+     "option": "きらいくない",
+     "misconception": "i-adjective KUNAI added to an intact na-adjective",
+     "misconceptionId": "くない milik kata sifat -i ditambahkan pada kata sifat -na yang utuh",
+     "whyFails": "KUNAI has no place after a na-adjective, whatever its final sound.",
+     "whyFailsId": "くない tidak punya tempat sesudah kata sifat -na, apa pun bunyi akhirnya."
+    },
+    {
+     "option": "きらいない",
+     "misconception": "NAI attached with the JA left out",
+     "misconceptionId": "ない ditempel dengan じゃ yang tertinggal",
+     "whyFails": "A na-adjective must pass through JA or DE WA before NAI.",
+     "whyFailsId": "Kata sifat -na harus lewat じゃ atau では sebelum ない."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "KIRAI behaves like a na-adjective, so its plain negative is KIRAI JA NAI.",
+    "whyCorrectId": "きらい berperilaku seperti kata sifat -na, jadi ingkar biasanya adalah きらいじゃない.",
+    "rule": "na-adjective negative: stem + JA NAI, no matter how the stem sounds.",
+    "ruleId": "ingkar kata sifat -na: akar + じゃない, apa pun bunyi akarnya.",
+    "whyOthersFail": "Two options cut or ignore the stem-final I wrongly; one omits JA.",
+    "whyOthersFailId": "Dua pilihan salah memotong atau mengabaikan い di akhir akar; satu menghilangkan じゃ.",
+    "howToAvoid": "If you can say the word plus NA before a noun, negate it with JA NAI.",
+    "howToAvoidId": "Kalau kata itu bisa diucapkan bersama な sebelum kata benda, ingkarkan dengan じゃない.",
+    "memoryCue": "KIRAI NA, so KIRAI JA NAI.",
+    "memoryCueId": "きらいな, jadi きらいじゃない."
+   }
+  },
+  {
+   "id": "JP-AD-119",
+   "family": "adjectives",
+   "skill": "adjectives",
+   "subskill": "na_adjective_past_deshita_shinsetsu",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "shinsetsu-past-deshita",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Choose DESHITA to place a na-adjective description in the past",
+   "pedagogicalObjectiveId": "Memilih でした untuk menempatkan sifat -na di masa lampau",
+   "misconceptionTargeted": "Learner uses KATTA, the i-adjective past, on a na-adjective stem",
+   "misconceptionTargetedId": "Murid memakai かった, lampau kata sifat -i, pada akar kata sifat -na",
+   "reasoningOperation": "confirm the adjective is na-type -> put the tense on the copula",
+   "reasoningOperationId": "pastikan kata sifatnya jenis -na -> taruh kalanya pada kopula",
+   "stem": "みちを おしえて くれた ひとは とても ___。",
+   "stemKana": "みちを おしえて くれた ひとは とても ___。",
+   "furigana": [],
+   "options": [
+    "しんせつでした",
+    "しんせつかった",
+    "しんせつくかった",
+    "しんせついでした"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "しんせつかった",
+     "misconception": "i-adjective past ending on a na-adjective stem",
+     "misconceptionId": "akhiran lampau kata sifat -i pada akar kata sifat -na",
+     "whyFails": "KATTA replaces a final I that SHINSETSU does not have.",
+     "whyFailsId": "かった menggantikan い terakhir yang tidak dimiliki しんせつ."
+    },
+    {
+     "option": "しんせつくかった",
+     "misconception": "a KU stem invented before the past ending",
+     "misconceptionId": "akar く direka-reka sebelum akhiran lampau",
+     "whyFails": "Only i-adjectives have a KU stem, and even they use KU only for negatives and joins.",
+     "whyFailsId": "Hanya kata sifat -i yang punya akar く, dan itu pun hanya untuk ingkar dan penyambung."
+    },
+    {
+     "option": "しんせついでした",
+     "misconception": "an I attached to force the word into the i-adjective class",
+     "misconceptionId": "い ditempelkan untuk memaksa kata itu masuk golongan -i",
+     "whyFails": "SHINSETSUI does not exist; the stem stays SHINSETSU.",
+     "whyFailsId": "しんせつい tidak ada; akarnya tetap しんせつ."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "SHINSETSU is a na-adjective, so its past is simply SHINSETSU DESHITA.",
+    "whyCorrectId": "しんせつ adalah kata sifat -na, jadi lampaunya cukup しんせつでした.",
+    "rule": "na-adjective past: stem + DESHITA.",
+    "ruleId": "lampau kata sifat -na: akar + でした.",
+    "whyOthersFail": "All three fabricate i-adjective forms for a word that has none.",
+    "whyOthersFailId": "Ketiganya mengarang bentuk kata sifat -i untuk kata yang tidak memilikinya.",
+    "howToAvoid": "Ask whether you would say SHINSETSU NA HITO. If yes, use DESHITA for the past.",
+    "howToAvoidId": "Tanyakan apakah kamu akan bilang しんせつな ひと. Kalau ya, pakai でした untuk lampaunya.",
+    "memoryCue": "NA words borrow their past from DESU.",
+    "memoryCueId": "Kata ber-な meminjam lampaunya dari です."
+   }
+  },
+  {
+   "id": "JP-AD-120",
+   "family": "adjectives",
+   "skill": "adjectives",
+   "subskill": "i_adjective_past_negative_polite_context",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "i-adjective-past-negative-oishikunakatta",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Move an already-negative i-adjective into the past by conjugating NAI",
+   "pedagogicalObjectiveId": "Memindahkan kata sifat -i yang sudah ingkar ke lampau dengan mengonjugasikan ない",
+   "misconceptionTargeted": "Learner adds DESHITA after KUNAI instead of changing NAI to NAKATTA",
+   "misconceptionTargetedId": "Murid menambah でした sesudah くない alih-alih mengubah ない jadi なかった",
+   "reasoningOperation": "build the KU NAI form -> conjugate the final NAI to NAKATTA",
+   "reasoningOperationId": "bangun bentuk くない -> konjugasikan ない di ujung menjadi なかった",
+   "stem": "その りょうりは ___です。しおを いれすぎました。",
+   "stemKana": "その りょうりは ___です。しおを いれすぎました。",
+   "furigana": [],
+   "options": [
+    "おいしくなかった",
+    "おいしくないでした",
+    "おいしくありませんでした です",
+    "おいしいなかった"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "おいしくないでした",
+     "misconception": "DESHITA stacked on a present NAI",
+     "misconceptionId": "でした ditumpuk pada ない bentuk sekarang",
+     "whyFails": "NAI is an i-adjective and must go past itself, becoming NAKATTA.",
+     "whyFailsId": "ない adalah kata sifat -i dan harus melampaukan dirinya sendiri menjadi なかった."
+    },
+    {
+     "option": "おいしくありませんでした です",
+     "misconception": "polite and plain endings doubled in one predicate",
+     "misconceptionId": "akhiran sopan dan biasa digandakan dalam satu predikat",
+     "whyFails": "The sentence already ends with DESU; a second polite ending cannot be inserted before it.",
+     "whyFailsId": "Kalimatnya sudah berakhir です; akhiran sopan kedua tidak bisa disisipkan sebelumnya."
+    },
+    {
+     "option": "おいしいなかった",
+     "misconception": "NAKATTA attached without forming the KU stem",
+     "misconceptionId": "なかった ditempelkan tanpa membentuk akar く",
+     "whyFails": "The path to NAKATTA runs through OISHIKU; the I cannot survive.",
+     "whyFailsId": "Jalan menuju なかった melewati おいしく; い tidak bisa bertahan."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "OISHII gives OISHIKU NAI, and NAI conjugates to NAKATTA: OISHIKUNAKATTA.",
+    "whyCorrectId": "おいしい menjadi おいしくない, lalu ない berkonjugasi jadi なかった: おいしくなかった.",
+    "rule": "Negative first, then past, both inside the adjective.",
+    "ruleId": "Ingkar dulu, lalu lampau, keduanya di dalam kata sifatnya.",
+    "whyOthersFail": "One leans on DESHITA, one doubles the politeness, one skips the KU stem.",
+    "whyOthersFailId": "Satu bersandar pada でした, satu menggandakan kesopanan, satu melompati akar く.",
+    "howToAvoid": "Once you see NAI, treat it exactly like any other i-adjective.",
+    "howToAvoidId": "Begitu kamu melihat ない, perlakukan persis seperti kata sifat -i lainnya.",
+    "memoryCue": "KU, NA, KATTA - in that order.",
+    "memoryCueId": "く, な, かった - dengan urutan itu."
+   }
+  },
+  {
+   "id": "JP-AD-121",
+   "family": "adjectives",
+   "skill": "adjectives",
+   "subskill": "joining_na_then_i_adjective",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "join-na-adjective-de-then-i",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Pick the right bridge when a na-adjective is followed by an i-adjective",
+   "pedagogicalObjectiveId": "Memilih jembatan yang tepat saat kata sifat -na diikuti kata sifat -i",
+   "misconceptionTargeted": "Learner chooses the connector by looking at the second adjective instead of the first",
+   "misconceptionTargetedId": "Murid memilih penyambung dengan melihat kata sifat kedua, bukan yang pertama",
+   "reasoningOperation": "look at the FIRST adjective -> na-type takes DE",
+   "reasoningOperationId": "lihat kata sifat PERTAMA -> jenis -na memakai で",
+   "stem": "あの えきは ___ ひろいです。",
+   "stemKana": "あの えきは ___ ひろいです。",
+   "furigana": [],
+   "options": [
+    "べんりで",
+    "べんりくて",
+    "べんりなで",
+    "べんりくで"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "べんりくて",
+     "misconception": "connector chosen from the following i-adjective",
+     "misconceptionId": "penyambung dipilih berdasarkan kata sifat -i yang menyusul",
+     "whyFails": "The bridge is built by the first adjective, and BENRI is na-type.",
+     "whyFailsId": "Jembatan dibangun oleh kata sifat pertama, dan べんり berjenis -na."
+    },
+    {
+     "option": "べんりなで",
+     "misconception": "attributive NA kept in front of the connector",
+     "misconceptionId": "な bentuk penerang dipertahankan di depan penyambung",
+     "whyFails": "NA is only used directly before a noun, never before DE.",
+     "whyFailsId": "な hanya dipakai tepat sebelum kata benda, tidak pernah sebelum で."
+    },
+    {
+     "option": "べんりくで",
+     "misconception": "i-adjective KU stem mixed with the na-adjective DE",
+     "misconceptionId": "akar く kata sifat -i dicampur dengan で kata sifat -na",
+     "whyFails": "This blends two systems; BENRI has no KU form to begin with.",
+     "whyFailsId": "Ini mencampur dua sistem; べんり memang tidak punya bentuk く."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "BENRI is a na-adjective, so it joins with DE regardless of what follows.",
+    "whyCorrectId": "べんり adalah kata sifat -na, jadi ia menyambung dengan で terlepas dari apa yang menyusul.",
+    "rule": "The joining form belongs to the adjective that comes first.",
+    "ruleId": "Bentuk penyambung ditentukan oleh kata sifat yang datang lebih dulu.",
+    "whyOthersFail": "One copies the second adjective's type, one keeps NA, one mixes both systems.",
+    "whyOthersFailId": "Satu meniru jenis kata sifat kedua, satu mempertahankan な, satu mencampur kedua sistem.",
+    "howToAvoid": "Decide DE or KUTE before you even read the rest of the sentence.",
+    "howToAvoidId": "Tentukan で atau くて bahkan sebelum kamu membaca sisa kalimatnya.",
+    "memoryCue": "The first word builds the bridge.",
+    "memoryCueId": "Kata pertama yang membangun jembatannya."
+   }
+  },
+  {
+   "id": "JP-AD-122",
+   "family": "adjectives",
+   "skill": "adjectives",
+   "subskill": "ii_irregular_joining_yokute",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "ii-irregular-joining-yokute",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Use YOKUTE as the joining form of II",
+   "pedagogicalObjectiveId": "Memakai よくて sebagai bentuk penyambung いい",
+   "misconceptionTargeted": "Learner builds the joining form regularly from II instead of the YO- stem",
+   "misconceptionTargetedId": "Murid membangun bentuk penyambung secara beraturan dari いい, bukan dari akar よ-",
+   "reasoningOperation": "swap II for the YO- stem -> apply the regular KUTE join",
+   "reasoningOperationId": "tukar いい dengan akar よ- -> terapkan penyambung beraturan くて",
+   "stem": "この へやは ひあたりが ___ あたたかいです。",
+   "stemKana": "この へやは ひあたりが ___ あたたかいです。",
+   "furigana": [],
+   "options": [
+    "よくて",
+    "いくて",
+    "いいくて",
+    "いいで"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "いくて",
+     "misconception": "regular KUTE rule applied to the wrong stem",
+     "misconceptionId": "aturan くて beraturan diterapkan pada akar yang salah",
+     "whyFails": "The rule is right but II must first become YO-.",
+     "whyFailsId": "Aturannya benar tetapi いい harus lebih dulu menjadi よ-."
+    },
+    {
+     "option": "いいくて",
+     "misconception": "KUTE added with the word left completely unchanged",
+     "misconceptionId": "くて ditambahkan dengan kata sama sekali tidak diubah",
+     "whyFails": "Neither the ending nor the stem was adjusted, so nothing is right about the form.",
+     "whyFailsId": "Baik akhiran maupun akarnya tidak disesuaikan, jadi tidak ada yang benar dari bentuk ini."
+    },
+    {
+     "option": "いいで",
+     "misconception": "na-adjective connector used after an i-adjective",
+     "misconceptionId": "penyambung kata sifat -na dipakai sesudah kata sifat -i",
+     "whyFails": "DE joins na-adjectives and nouns; II is an i-adjective and joins with KUTE.",
+     "whyFailsId": "で menyambung kata sifat -na dan kata benda; いい kata sifat -i dan menyambung dengan くて."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "II shifts to YO- and takes the ordinary joining ending: YOKUTE.",
+    "whyCorrectId": "いい bergeser ke よ- dan mengambil akhiran penyambung biasa: よくて.",
+    "rule": "II joining form: YO + KUTE.",
+    "ruleId": "bentuk penyambung いい: よ + くて.",
+    "whyOthersFail": "Two options keep II where YO- is required; one uses the na-adjective connector.",
+    "whyOthersFailId": "Dua pilihan mempertahankan いい padahal dibutuhkan よ-; satu memakai penyambung kata sifat -na.",
+    "howToAvoid": "Every ending on II starts from YO-, without exception.",
+    "howToAvoidId": "Setiap akhiran pada いい berangkat dari よ-, tanpa kecuali.",
+    "memoryCue": "YOKUNAI, YOKATTA, YOKUTE - one stem, three forms.",
+    "memoryCueId": "よくない, よかった, よくて - satu akar, tiga bentuk."
+   }
+  }
+ ]
+}

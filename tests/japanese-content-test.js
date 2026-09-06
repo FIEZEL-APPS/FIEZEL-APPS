@@ -167,6 +167,30 @@ test('NOL pengecoh sama dengan kunci, dan nol pilihan kembar', () => {
   assert.deepStrictEqual(salah.slice(0, 10), [], salah.length + ' masalah pilihan: ' + salah.slice(0, 10).join(' | '));
 });
 
+test('SETIAP pilihan salah punya pengecoh yang terpasang, dan sebaliknya', () => {
+  // Ditemukan saat bank A1 pertama dinilai: satu pengecoh menulis optionnya dengan spasi
+  // nyasar ("なにに ん"), sehingga ia tidak cocok dengan pilihan mana pun. Akibatnya bukan
+  // error — pilihan yang BENAR-BENAR tampil di layar berjalan tanpa miskonsepsi terpasang,
+  // jadi murid yang memilihnya tidak memberi tahu apa pun. Diagnosisnya hilang diam-diam,
+  // persis kelas kegagalan yang gerbang ini ada untuk mencegah.
+  const salah = [];
+  bank.forEach((b) => b.butir.forEach((t) => {
+    const opts = (Array.isArray(t.options) ? t.options : []).map((o) => String(o).trim());
+    const kunci = opts[t.correctIndex];
+    const pengecoh = (t.distractors || []).map((d) => String(d && d.option).trim());
+    pengecoh.forEach((o) => {
+      if (opts.indexOf(o) < 0) salah.push(b.berkas + '#' + t.id + ': pengecoh "' + o + '" tidak ada di options');
+    });
+    opts.forEach((o) => {
+      if (o !== kunci && pengecoh.indexOf(o) < 0) {
+        salah.push(b.berkas + '#' + t.id + ': pilihan salah "' + o + '" tidak punya miskonsepsi');
+      }
+    });
+  }));
+  assert.deepStrictEqual(salah.slice(0, 10), [],
+    salah.length + ' pilihan tanpa diagnosis: ' + salah.slice(0, 10).join(' | '));
+});
+
 test('setiap stem punya rumpang yang harus diisi', () => {
   const tanpa = [];
   bank.forEach((b) => b.butir.forEach((t) => {
