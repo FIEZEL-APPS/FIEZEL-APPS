@@ -233,6 +233,8 @@
     'guru.tab-kelas-siswa': 'Kelas & Siswa',
     'guru.tab-tugas-ujian': 'Tugas & Ujian',
     'guru.tab-jurnal': 'Jurnal Guru',
+    'guru.merek-tag': 'untuk Guru',
+    'guru.merek-penuh': 'KelasKu untuk Guru',
     'guru.judul-kelas': 'Kelas — Guru · Murid · Braincore',
     'guru.tab-profil': 'Profil Guru',
     'guru.kelas-aktif': 'Kelas aktif',

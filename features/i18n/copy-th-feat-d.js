@@ -228,6 +228,8 @@
     'guru.tab-kelas-siswa': 'ชั้นเรียนและนักเรียน',
     'guru.tab-tugas-ujian': 'งานและแบบทดสอบ',
     'guru.tab-jurnal': 'บันทึกของครู',
+    'guru.merek-tag': 'สำหรับครู',
+    'guru.merek-penuh': 'KelasKu สำหรับครู',
     'guru.judul-kelas': 'ชั้นเรียน — ครู · นักเรียน · Braincore',
     'guru.tab-profil': 'โปรไฟล์ครู',
     'guru.kelas-aktif': 'ชั้นเรียนที่ใช้งาน',
