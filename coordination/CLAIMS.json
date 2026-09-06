@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-06T13:30:00+07:00",
+  "updated": "2026-09-06T16:39:33.333Z",
   "active": [
     {
       "sesi": "ses_0034e69d3ffes3kjiFLNDzYXUZ",
@@ -105,6 +105,17 @@
       ],
       "mulai": "2026-09-06T13:30:00+07:00",
       "catatan": "Tahap usulan: NOL byte produksi berubah, build tidak dinaikkan. Wilayah yang akan diklaim SESUDAH usulan disetujui: features/brain/fiezel-core-brain.js (PREREQUISITES bisa disuntik), berkas konten Jepang, dan gerbangnya. Temuan yang perlu diketahui sesi lain: conceptOf() di features/brain/fiezel-question-memory.js membuang karakter non-ASCII, jadi marker berkana menghasilkan concept null dan pembatas kebaruan konsep mati diam."
+    },
+    {
+      "sesi": "claude-code-graf-keluarga",
+      "peran": "claude-code / graf keluarga brain",
+      "paths": [
+        "features/brain/fiezel-core-brain.js",
+        "tests/family-graph-injection-test.js",
+        "docs/handoffs/JAPANESE-COURSE-HANDOFF.md"
+      ],
+      "mulai": "2026-09-06T16:39:33Z",
+      "catatan": "Langkah 1 kursus Jepang: setFamilyGraph/resetFamilyGraph/familyGraph. Graf Inggris tetap bawaan, dijaga patokan tulis-tangan di gerbang."
     }
   ],
   "finished": [

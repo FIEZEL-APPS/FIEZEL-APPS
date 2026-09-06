@@ -687,6 +687,60 @@
     question_formation: Object.freeze(['tense_aspect'])
   });
 
+  // -------------------------------------------------------------------------------------
+  // Graf keluarga yang SEDANG BERLAKU, dan kenapa ia bisa diganti.
+  //
+  // Daftar di atas adalah keluarga tata bahasa INGGRIS. Kursus bahasa lain punya keluarga
+  // yang sama sekali berbeda - partikel, bentuk-te, penggolong - dan tidak satu pun di
+  // antaranya masuk akal sebagai prasyarat bagi murid Inggris.
+  //
+  // Cara termurah menambahkannya adalah menempelkan keluarga baru ke dalam peta di atas.
+  // Itu justru kelas kegagalan yang paling mahal: peta itu dibaca murid Inggris HARI INI,
+  // dan pencemarannya tidak melempar error - ia hanya membuat rootCause() mulai menunjuk
+  // akar yang keliru, tanpa satu pun gerbang lain yang merah.
+  //
+  // Jadi graf keluarga DISUNTIKKAN, persis seperti graf lesson di bawah: satu bahasa, satu
+  // graf, diganti utuh. PREREQUISITES tetap graf Inggris dan tetap menjadi bawaan; ia tidak
+  // pernah ikut berubah saat graf lain aktif. Dijaga tests/family-graph-injection-test.js.
+  // -------------------------------------------------------------------------------------
+  var activeFamilyGraph = PREREQUISITES;
+
+  /**
+   * Ganti graf keluarga yang berlaku. Peta disalin dan dibekukan, sehingga penyunting objek
+   * asal setelah pemanggilan tidak bisa lagi menggeser jawaban brain diam-diam.
+   * Mengembalikan jumlah keluarga yang diterima.
+   */
+  function setFamilyGraph(map) {
+    var next = Object.create(null);
+    var count = 0;
+    if (map && typeof map === 'object') {
+      var keys = Object.keys(map);
+      for (var i = 0; i < keys.length; i++) {
+        var family = str(keys[i]);
+        if (!family) continue;
+        var declared = Array.isArray(map[keys[i]]) ? map[keys[i]] : [];
+        var parents = [];
+        for (var p = 0; p < declared.length; p++) {
+          var parent = str(declared[p]);
+          if (parent && parent !== family) parents.push(parent);
+        }
+        next[family] = Object.freeze(parents);
+        count++;
+      }
+    }
+    activeFamilyGraph = Object.freeze(next);
+    return count;
+  }
+
+  /** Kembali ke graf keluarga Inggris bawaan. */
+  function resetFamilyGraph() {
+    activeFamilyGraph = PREREQUISITES;
+    return activeFamilyGraph;
+  }
+
+  /** Graf keluarga yang sedang berlaku (beku). */
+  function familyGraph() { return activeFamilyGraph; }
+
   // =====================================================================================
   // Graph kurikulum tingkat LESSON.
   //
@@ -744,7 +798,7 @@
     var guard = 0;
     while (queue.length && guard++ < 32) {
       var current = queue.shift();
-      var parents = PREREQUISITES[current] || [];
+      var parents = activeFamilyGraph[current] || [];
       for (var i = 0; i < parents.length; i++) {
         if (seen[parents[i]]) continue;
         seen[parents[i]] = true;
@@ -1228,6 +1282,9 @@
     GUESS_FLOOR: GUESS_FLOOR,
     TARGET_SUCCESS: TARGET_SUCCESS,
     PREREQUISITES: PREREQUISITES,
+    setFamilyGraph: setFamilyGraph,
+    resetFamilyGraph: resetFamilyGraph,
+    familyGraph: familyGraph,
     MOMENTUM_BLOCK: MOMENTUM_BLOCK,
     levelIndex: levelIndex,
     successProbability: successProbability,
