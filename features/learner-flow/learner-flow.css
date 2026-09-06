@@ -200,3 +200,47 @@
 .lf-assign-code{margin:12px 0 4px;padding:10px 12px;border:1px dashed var(--line,#F0E4CF);border-radius:12px}
 .lf-assign-code .lf-actions{margin-top:6px;align-items:stretch}
 .lf-code-input{flex:1;min-width:0;padding:8px 10px;border:1px solid var(--line,#F0E4CF);border-radius:10px;background:var(--panel,#fff)}
+
+/* ============================================================================
+   PAW ARENA (m025-277) — tata letak ruang permainan. Memakai token warna yang
+   sudah ada; nol @keyframes baru (css-keyframe-uniq). Animasi tunduk pada
+   prefers-reduced-motion di bawah. */
+.paw-arena{display:flex;flex-direction:column;gap:14px}
+.paw-arena-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.paw-arena-brand{font-weight:800;letter-spacing:.14em;text-transform:uppercase;font-size:.82rem;color:var(--ink,#2b2b2b)}
+.paw-arena-top .lf-mini{min-width:34px;height:34px;border-radius:50%;font-weight:800}
+.paw-lobby-grid{display:grid;grid-template-columns:1fr;gap:12px}
+@media(min-width:520px){.paw-lobby-grid{grid-template-columns:repeat(3,1fr)}}
+.paw-lobby-card{display:flex;flex-direction:column;align-items:flex-start;gap:6px;text-align:left;cursor:pointer;transition:transform .18s ease,box-shadow .18s ease}
+.paw-lobby-card:hover{transform:translateY(-3px)}
+.paw-lobby-card b{font-size:1.05rem}
+.paw-lobby-cta{margin-top:6px;align-self:flex-start;background:var(--brand,#0f8f6f);color:#fff;border-radius:999px;padding:4px 10px}
+.paw-rules-card{border:2px solid var(--brand,#0f8f6f)}
+.paw-rules-goal{font-size:1.02rem;font-weight:600;margin:6px 0 10px}
+.paw-rules-steps{list-style:none;padding:0;margin:0 0 12px;display:flex;flex-direction:column;gap:8px}
+.paw-rules-steps li{display:flex;gap:10px;align-items:flex-start}
+.paw-rules-steps li span{flex:none;width:22px;height:22px;border-radius:50%;background:var(--brand,#0f8f6f);color:#fff;font-weight:700;font-size:.78rem;display:grid;place-items:center;margin-top:1px}
+.paw-scores{display:flex;gap:10px;margin-bottom:4px}
+.paw-story-scroll{max-height:230px;overflow:auto}
+.paw-story-text{line-height:1.7}
+.paw-sent{padding:1px 2px;border-radius:4px}
+.paw-sent-opponent{background:rgba(15,143,111,.10)}
+.paw-sentence-choices,.paw-clue-set,.paw-wager-row{display:flex;flex-direction:column;gap:8px}
+.paw-wager-row{flex-direction:row;flex-wrap:wrap}
+.paw-wager{flex:1;min-width:96px;text-align:center}
+.paw-wager.is-picked,.paw-clue.is-picked{border-color:var(--brand,#0f8f6f);box-shadow:0 0 0 2px var(--brand,#0f8f6f) inset}
+.paw-secret-word{font-size:1.5rem;font-weight:800;letter-spacing:.02em;color:var(--brand,#0f8f6f)}
+.paw-clue-list{margin:6px 0 12px;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+.paw-stakes-tally{margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--panel-2,#faf5ea);font-size:.92rem;line-height:1.6}
+.paw-help-overlay{position:fixed;inset:0;z-index:60;background:rgba(20,20,20,.5);display:grid;place-items:center;padding:20px}
+.paw-help-inner{max-width:420px;width:100%}
+.paw-artifact .paw-story-text{font-style:italic;line-height:1.75}
+@media(prefers-reduced-motion:reduce){.paw-lobby-card,.paw-lobby-card:hover{transition:none;transform:none}}
+/* PAW ARENA (m025-277 · main berdua + artefak) */
+.paw-lobby-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;align-items:center}
+.paw-lobby-friend{cursor:pointer;border:1px solid var(--line,#F0E4CF);border-radius:999px;padding:4px 10px;color:var(--brand,#0f8f6f)}
+.paw-code-share .lf-code,.paw-stories .paw-story-list{margin-top:8px}
+.paw-story-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
+.paw-story-item{display:flex;gap:10px;align-items:center;justify-content:space-between}
+.paw-story-snip{flex:1;min-width:0;font-style:italic;color:var(--ink,#2b2b2b);overflow:hidden;text-overflow:ellipsis}
+.paw-story-full{max-height:70vh;overflow:auto}
