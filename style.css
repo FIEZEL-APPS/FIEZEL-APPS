@@ -1954,6 +1954,21 @@ body.voice-bundle-locked .bottomnav,body.voice-bundle-locked .app-header{pointer
 .fiezel-language-copy{display:flex;flex-direction:column;gap:3px;text-align:left}
 .fiezel-language-copy small{font-size:12px;color:var(--fz-ink-muted)}
 @media (max-width:340px){.fiezel-language-grid{grid-template-columns:1fr}}
+/* "Sudah punya akun?" di layar pemilih bahasa. SENGAJA sekunder: pemisah tipis,
+   naskah kecil, tanpa warna aksi — mayoritas yang membuka layar ini murid baru yang
+   memang harus memilih bahasa, dan tombol masuk yang menonjol akan membuat mereka
+   ragu pada langkah pertama. */
+.fiezel-language-signin{margin-top:18px;display:flex;flex-direction:column;
+  align-items:center;gap:8px}
+.fiezel-language-sep{display:flex;align-items:center;gap:10px;width:100%;
+  font-size:var(--fs-caption);color:var(--fz-ink-muted)}
+.fiezel-language-sep::before,.fiezel-language-sep::after{content:'';flex:1;height:1px;
+  background:var(--fz-line)}
+.fiezel-language-signin-note{margin:0;text-align:center;font-size:12px;line-height:1.5;
+  color:var(--fz-ink-muted);max-width:38ch}
+/* Tinggi minimum supaya isi layar tidak melompat saat tombol Google akhirnya tiba. */
+.fiezel-language-google{min-height:44px;display:flex;justify-content:center;
+  align-items:center}
 .fiezel-level-row{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-start;width:100%}
 .fiezel-level-chip{min-height:44px;padding:0 16px;border-radius:var(--radius-pill);border:1.5px solid var(--fz-line);
   background:var(--fz-paper);color:var(--fz-ink);font-family:var(--fz-body);font-weight:700;font-size:13px}
@@ -4807,6 +4822,14 @@ html[data-fz-input="touch"] :focus{outline-color:transparent!important}
    termasuk saat diklik - jadi cincinnya tetap muncul persis seperti sebelumnya, dan yang
    hilang hanya pengecualian diam-diam terhadap kebijakan itu. */
 .auth-field-label input:focus-visible{outline:2px solid var(--sun-deep);background:var(--panel)}
+.auth-google{display:flex;flex-direction:column;align-items:center;gap:8px;margin:12px 0 4px}
+/* Tombol resmi Google digambar skrip Google ke dalam kotak ini; tinggi minimum
+   ada supaya isi modal tidak melompat saat tombolnya akhirnya tiba. */
+.auth-google-btn{min-height:44px;display:flex;justify-content:center;align-items:center}
+.auth-google-status{margin:0;font-size:.85rem;color:var(--muted);text-align:center;line-height:1.45}
+.auth-google-note{margin:0;font-size:.78rem;color:var(--muted);text-align:center;line-height:1.45;max-width:34ch}
+.auth-google-sep{display:flex;align-items:center;gap:10px;width:100%;margin-top:4px;color:var(--muted);font-size:.8rem}
+.auth-google-sep::before,.auth-google-sep::after{content:'';flex:1;height:1px;background:var(--line,rgba(0,0,0,.12))}
 .auth-error-box{padding:10px 12px;background:var(--accent-soft);border:1px solid var(--accent);border-radius:var(--radius-sm);color:var(--accent-strong);font-size:.85rem;line-height:1.4;text-align:left}
 .badge-success{background:#dcfce7;color:#166534;padding:2px 8px;border-radius:var(--radius-pill);font-size:.8rem}
 .badge-neutral{background:var(--panel-soft);color:var(--muted);padding:2px 8px;border-radius:var(--radius-pill);font-size:.8rem}

@@ -44,6 +44,11 @@ AI_GATEWAY_MODE   = "core-only"    # cermin core-config.js aiGateway
 # bisa belajar penuh (semua pelajaran lokal), tanpa AI/TTS. Keputusan owner.
 ALLOWED_ORIGINS   = "https://fiezel.my.id,https://www.fiezel.my.id,https://fiezel-apps.github.io"
 COOKIE_DOMAIN     = "fiezel.my.id" # cookie ikut terkirim ke api.fiezel.my.id
+# Client ID OAuth Google. BUKAN rahasia: ia ikut terkirim ke setiap browser yang
+# membuka tombol "Masuk dengan Google". Yang rahasia adalah client SECRET — dan
+# alur ini (ID token, bukan authorization code) tidak memakainya sama sekali,
+# jadi tidak ada secret yang perlu disimpan di mana pun.
+GOOGLE_CLIENT_ID  = "1084250087-hvfdttommi8gnkguc5rlqidpkiptopf0.apps.googleusercontent.com"
 # Entitlement fase ini: AI HIDUP, TTS dan COACH masih mati. Aturannya tetap: fitur baru
 # wajib di belakang flag OFF sampai jalurnya terbukti hidup ujung-ke-ujung.
 #

@@ -1,13 +1,13 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-09-06T01:06:22.695Z",
+  "generatedAt": "2026-09-06T11:29:16.010Z",
   "files": {
     "app.js": {
       "leaks": 1,
       "budget": 1,
       "sample": [
         {
-          "line": 8612,
+          "line": 8787,
           "text": "Nama kriteria: n/4 - satu kalimat alasan yang menunjuk bukti di tulisannya"
         }
       ]
@@ -45,7 +45,7 @@
       "budget": 1,
       "sample": [
         {
-          "line": 103,
+          "line": 241,
           "text": "Tugas disimpan sebagai"
         }
       ]
@@ -109,12 +109,20 @@
       ]
     },
     "features/onboarding/fiezel-onboarding.js": {
-      "leaks": 1,
-      "budget": 1,
+      "leaks": 3,
+      "budget": 3,
       "sample": [
         {
           "line": 627,
           "text": "Pilih bahasa untuk melanjutkan"
+        },
+        {
+          "line": 667,
+          "text": "Sudah punya akun? Masuk dulu supaya kelas dan tugas gurumu ikut."
+        },
+        {
+          "line": 1424,
+          "text": "Belum berhasil masuk. Pilih bahasa dulu — masuk bisa nanti dari Pengaturan. ·"
         }
       ]
     },
@@ -216,8 +224,8 @@
     }
   },
   "copyKeys": {
-    "id": 2280,
-    "th": 2282,
+    "id": 2314,
+    "th": 2316,
     "idTanpaTh": 0
   },
   "pass": true

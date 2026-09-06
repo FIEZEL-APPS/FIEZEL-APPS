@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-29T10:00:00+07:00",
+  "updated": "2026-09-06T11:20:00+07:00",
   "active": [
     {
       "sesi": "ses_0034e69d3ffes3kjiFLNDzYXUZ",
@@ -60,9 +60,59 @@
       ],
       "mulai": "2026-08-29T10:00:00+07:00",
       "catatan": "TIDAK menyentuh features/neural-voice/ (diag panel, diklaim opencode), sw.js atau core-config.js (diklaim A6). Kontrol <16px di diag panel dilaporkan ke pemiliknya, tidak diperbaiki dari sini. index.html TIDAK disentuh: viewport zoom 5x dipertahankan demi WCAG 1.4.4/1.4.10."
+    },
+    {
+      "sesi": "sesi-claude-cq1nea/EXAM-FOCUS-GUARD-2",
+      "peran": "tindak lanjut pendeteksi keluar layar: peringatan ke guru + detak realtime murid",
+      "paths": [
+        "features/teacher/fiezel-teacher-store.js",
+        "features/teacher/fiezel-teacher-shell.js",
+        "features/teacher/teacher-shell.css",
+        "features/notify/fiezel-inbox.js",
+        "tests/exam-focus-guard-test.js",
+        "docs/handoffs/EXAM-FOCUS-GUARD-HANDOFF.md"
+      ],
+      "mulai": "2026-09-06T09:10:00+07:00",
+      "catatan": "Temuan pemakaian pertama di kelas: kiriman yang ditolak 429 hilang diam-diam, kabar generik menenggelamkan peringatan, dan detak murid 60 detik jauh di belakang detak guru 10 detik. Menyentuh juga app.js (satu tetapan NOTIF_POLL_MS) dan features/learner-flow/fiezel-learner-flow.js (pengulangan kiriman gagal) — keduanya perubahan kecil di luar path yang diklaim, tidak bertabrakan dengan klaim aktif mana pun. Build dinaikkan lewat tools/bump-build.mjs (m025-270)."
+    },
+    {
+      "sesi": "sesi-claude-cq1nea/CLASS-JOIN",
+      "peran": "permintaan gabung kelas: ketukan murid sampai ke guru, guru menambahkan",
+      "paths": [
+        "features/i18n/copy-id-classjoin.js",
+        "features/i18n/copy-th-classjoin.js",
+        "tests/class-join-test.js"
+      ],
+      "mulai": "2026-09-06T10:05:00+07:00",
+      "catatan": "Menyentuh juga di luar path yang diklaim: features/class-hub/fiezel-class-hub.js, features/teacher/fiezel-teacher-store.js + fiezel-teacher-shell.js, features/learner-flow/fiezel-learner-flow.js, workers/api/teacher/class-sync-core.js (penanda j), index.html + sw.js + fiezel-th-loader.js (pendaftaran berkas), .github/workflows/quality.yml (gerbang baru). Build m025-272 lewat tools/bump-build.mjs."
+    },
+    {
+      "sesi": "sesi-claude-cq1nea/EXAM-LOCK",
+      "peran": "kunci ujian: semua permukaan ujian dipantau, pintu AI tertutup di dalamnya",
+      "paths": [
+        "features/ui/fiezel-exam-lock.js",
+        "tests/exam-lock-test.js"
+      ],
+      "mulai": "2026-09-06T11:20:00+07:00",
+      "catatan": "Menyentuh juga app.js (kunci ujian di quizLoop/Skills Lab/Writing + gerbang pintu AI + pendeteksi ujian non-tugas), features/class-hub/fiezel-class-hub.js, features/learner-flow/fiezel-learner-flow.js, features/teacher/fiezel-teacher-store.js, workers/api/teacher/class-sync-core.js (fx), copy-*-proctor.js, index.html, sw.js, quality.yml. Build m025-273 lewat tools/bump-build.mjs."
     }
   ],
   "finished": [
+    {
+      "sesi": "sesi-claude-cq1nea/EXAM-FOCUS-GUARD",
+      "peran": "pendeteksi keluar layar saat ujian + laporan realtime ke guru",
+      "paths": [
+        "features/class-hub/fiezel-focus-guard.js",
+        "features/class-hub/fiezel-class-hub.js",
+        "features/class-hub/class-hub.css",
+        "features/i18n/copy-id-proctor.js",
+        "features/i18n/copy-th-proctor.js",
+        "tests/exam-focus-guard-test.js"
+      ],
+      "mulai": "2026-09-05T23:40:00+07:00",
+      "catatan": "Menyentuh juga, di luar path yang diklaim, sebagai perubahan kecil yang tidak bertabrakan dengan klaim aktif mana pun: features/learner-flow/fiezel-learner-flow.js (satu fungsi baru recordAssignmentFocus), features/teacher/fiezel-teacher-store.js + fiezel-teacher-shell.js + teacher-shell.css (menampilkan catatan keluar layar), workers/api/teacher/class-sync-core.js (assign.f = tiga bilangan), features/i18n/fiezel-th-loader.js + index.html + sw.js (pendaftaran berkas baru), tests/class-hub-test.js (assert ekspor dilonggarkan), .github/workflows/quality.yml (gerbang baru didaftarkan). Nomor build dinaikkan lewat tools/bump-build.mjs (m025-267), bukan dengan tangan. sw.js/core-config.js diklaim A6 (sesi-computer-086e9698/A6) — yang disentuh di sana HANYA daftar precache + penanda build lewat arbiter, bukan sakelar Cloudflare. | SELESAI: seluruh pekerjaan mendarat lewat PR #363 (build m025-269). Gerbang quality 252/252 hijau di CI, guardian A6/A7/A9/A10/A11/A13/A14 hijau. Klaim dilepas bersama commit terakhir PR itu supaya wilayahnya bebas begitu ia merge.",
+      "selesai": "2026-09-06T08:05:00+07:00"
+    },
     {
       "sesi": "sesi-computer-ed18fcf2",
       "peran": "UIUX-AUDIT-REPAIR (perplexity computer)",

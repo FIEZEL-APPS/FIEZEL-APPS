@@ -115,7 +115,7 @@ test('learner-flow: markAssignmentStarted + recordAssignmentResult (satu mesin l
   const src = read('features/learner-flow/fiezel-learner-flow.js');
   assert.ok(/function markAssignmentStarted/.test(src) && /s: 1/.test(src));
   assert.ok(/function recordAssignmentResult/.test(src) && /entry\.w = wrong/.test(src) && /pushToClass\(\)/.test(src));
-  assert.ok(/markAssignmentStarted: markAssignmentStarted, recordAssignmentResult: recordAssignmentResult/.test(src), 'diekspor');
+  assert.ok(/markAssignmentStarted: markAssignmentStarted/.test(src) && /recordAssignmentResult: recordAssignmentResult/.test(src), 'diekspor');
 });
 
 test('wiring: tab Kelas → classHubView; notifikasi tugas membuka Kelas; tutor tetap hidup; shell guru punya view hub', () => {

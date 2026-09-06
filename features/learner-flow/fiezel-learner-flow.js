@@ -189,6 +189,28 @@
 
   /** Kode hasil untuk tutor: hanya nama depan + akurasi per skill, tanpa jawaban mentah. */
   function classCode() { try { var r = JSON.parse(localStorage.getItem('fiezel-onboarding-v1') || '{}'); return String(r.classCode || ''); } catch (_) { return ''; } }
+  /* KENAPA KIRIMAN YANG GAGAL DIULANG, DAN KENAPA INI BUKAN KEMEWAHAN
+   * ----------------------------------------------------------------
+   * Server memasang lantai satu laporan per 15 detik per murid (LIMITS.LEARNER_MIN_INTERVAL_MS
+   * di workers/api/teacher/class-sync-core.js) dan menjawab 429 di bawah itu. Sebelum ada
+   * pengulangan di sini, jawaban 429 itu DIBUANG diam-diam — dan justru pada urutan yang
+   * paling penting: murid membuka ujian (laporan #1), lalu keluar layar beberapa detik
+   * kemudian (laporan #2, ditolak). Yang sampai ke guru hanya "laporan masuk" yang biasa,
+   * dan peringatan keluar-layarnya hilang tanpa jejak sampai laporan berikutnya kebetulan
+   * terkirim. Laporan kelas adalah UPSERT — ia selalu membawa keadaan terbaru, bukan selisih —
+   * jadi mengirim ulang isi yang sama beberapa detik kemudian aman dan cukup.
+   * Jeda 16 detik: satu detik di atas lantai server, supaya percobaan kedua tidak jatuh
+   * di detik yang sama persis. Naik dua kali lipat sampai 2 menit supaya server yang benar-benar
+   * sakit tidak dihujani, dan berhenti sama sekali saat berhasil. */
+  var RETRY_BASE_MS = 16000, RETRY_MAX_MS = 120000;
+  var retryTimer = null, retryDelay = 0;
+  function clearRetry() { if (retryTimer) { try { clearTimeout(retryTimer); } catch (_) {} retryTimer = null; } retryDelay = 0; }
+  function scheduleRetry() {
+    if (retryTimer || typeof setTimeout !== 'function') return;
+    retryDelay = retryDelay ? Math.min(retryDelay * 2, RETRY_MAX_MS) : RETRY_BASE_MS;
+    retryTimer = setTimeout(function () { retryTimer = null; pushToClass(); }, retryDelay);
+    if (retryTimer && retryTimer.unref) retryTimer.unref();
+  }
   // Di perangkat yang sama (kelas demo/uji), hasil diagnostic langsung masuk ke kelas berkode.
   function pushToClass() {
     if (!classCode()) return false;
@@ -196,7 +218,16 @@
     try { payload = JSON.parse(decodeURIComponent(escape(atob(tutorCode(st, env.learnerName ? env.learnerName() : ''))))); } catch (_) { return false; }
     // Sinkron server: laporan agregat ke kelas yang kodenya diklaim guru (tanpa tempel kode). Gagal diam-diam bila offline.
     var TS = root.FiezelTeacherStore;
-    if (TS && TS.reportToClass) { try { TS.reportToClass(payload).then(function (r) { st.classReport = { at: Date.now(), ok: !!r.ok, error: r.error || '' }; save(st); }); } catch (_) {} }
+    if (TS && TS.reportToClass) {
+      try {
+        TS.reportToClass(payload).then(function (r) {
+          st.classReport = { at: Date.now(), ok: !!r.ok, error: r.error || '' };
+          if (r && r.ok && st.pendingJoin) st.pendingJoin = 0;
+          save(st);
+          if (r && r.ok) clearRetry(); else scheduleRetry();
+        }, function () { scheduleRetry(); });
+      } catch (_) { scheduleRetry(); }
+    }
     var T = root.FiezelTutorActionCenter; if (!T) return true;
     try { return T.ingestLearnerResult(payload) || true; } catch (_) { return true; }
   }
@@ -207,9 +238,42 @@
     var nm = String(name || '').trim();
     if (!nm || /^(sobat|murid|teman)$/i.test(nm)) { try { nm = String(JSON.parse(localStorage.getItem('fiezel-onboarding-v1') || '{}').name || nm || t('umum.murid', 'Murid')); } catch (_) { nm = nm || t('umum.murid', 'Murid'); } }
     var payload = { v: 1, name: nm.split(' ')[0], at: Date.now(), goal: st.goal, skills: skills, lessons: st.lessons.length, cls: classCode() || undefined, assign: (st.doneAssign || []).length ? st.doneAssign.slice(-8) : undefined };
+    /* Penanda "aku baru memasukkan kode kelasmu" ikut sampai ia benar-benar mendarat: ia
+       dilepas HANYA oleh kiriman yang berhasil (lihat pushToClass), bukan oleh percobaan
+       pertama. Murid yang menekan Gabung saat sinyalnya putus tetap sampai ke guru begitu
+       jaringannya kembali — kalau tidak, ketukan itu hilang dan guru tidak pernah tahu. */
+    if (st.pendingJoin) payload.j = 1;
+    /* Catatan ujian non-tugas ikut selama ia masih hari ini: guru butuh melihatnya saat
+       ujiannya masih hangat, dan laporan yang mengulang catatan pekan lalu hanya kebisingan. */
+    if (st.examFocus && Date.now() - Number(st.examFocus.at || 0) < 86400000) {
+      payload.fx = { k: st.examFocus.k, n: st.examFocus.n, s: st.examFocus.s, x: st.examFocus.x };
+    }
     try { return btoa(unescape(encodeURIComponent(JSON.stringify(payload)))); } catch (_) { return ''; }
   }
   function ensureState() { if (!st) st = load(); return st; }
+  /**
+   * Sisi Kelas: murid baru saja mengirim kode kelas. Menandai laporan berikutnya sebagai
+   * ketukan bergabung dan mengirimnya sekarang juga. Penandanya bertahan sampai satu kiriman
+   * BERHASIL, jadi ia tahan terhadap offline dan terhadap pembatas laju server.
+   */
+  /**
+   * Sisi ujian NON-TUGAS (penempatan, Skip Level, set berformat ujian): catatan keluar layar
+   * tidak punya tugas untuk ditempeli, jadi ia menempel pada laporan itu sendiri sebagai
+   * `fx` — jenis ujian (enum) plus tiga bilangan yang sama dengan assign.f.
+   */
+  function recordExamFocus(kind, focus) {
+    if (!kind || !focus) return false;
+    var s = ensureState();
+    var n = Math.max(0, Math.round(Number(focus.n) || 0));
+    if (!n) return false;
+    s.examFocus = { k: String(kind).slice(0, 24), n: n, s: Math.max(0, Math.round(Number(focus.s) || 0)), x: Math.max(0, Math.round(Number(focus.x) || 0)), at: Date.now() };
+    save(s); pushToClass(); return true;
+  }
+  function announceJoin() {
+    var s = ensureState();
+    s.pendingJoin = 1; save(s);
+    return pushToClass();
+  }
   /** Sisi Kelas (class-hub): murid membuka tugas — dilaporkan sebagai "sedang mengerjakan" (assign.s). */
   function markAssignmentStarted(id) {
     if (!id) return false; var s = ensureState();
@@ -221,6 +285,23 @@
    * Rencana hari ini — satu jalur bukti, bukan dua. res = { id, title, skill, mode, minutes,
    * results:[{itemId, skill, correct, chosen}] }. Bukti per-soal yang salah ikut ke guru (assign.w).
    */
+  /**
+   * Sisi Kelas (class-hub): pendeteksi keluar layar melaporkan bahwa murid meninggalkan
+   * layar ujian. Dipanggil SETIAP episode ditutup (dan saat episode dibuka) supaya guru
+   * melihatnya saat ujian masih berjalan, bukan setelah selesai. `focus` = { n, s, x }
+   * dari FiezelFocusGuard.payload: tiga bilangan, tanpa teks bebas.
+   */
+  function recordAssignmentFocus(id, focus) {
+    if (!id || !focus) return false;
+    var s = ensureState();
+    var list = (s.doneAssign || []).slice();
+    var cur = list.filter(function (x) { return x.id === id; })[0];
+    var f = { n: Math.max(0, Math.round(Number(focus.n) || 0)), s: Math.max(0, Math.round(Number(focus.s) || 0)), x: Math.max(0, Math.round(Number(focus.x) || 0)) };
+    if (cur) cur.f = f;
+    else list.push({ id: id, at: Date.now(), s: 1, f: f });
+    s.doneAssign = list.slice(-8);
+    save(s); pushToClass(); return true;
+  }
   function recordAssignmentResult(res) {
     if (!res || !res.id || !Array.isArray(res.results)) return null; var s = ensureState(), B = bank();
     var correct = res.results.filter(function (r) { return r.correct; }).length;
@@ -228,6 +309,12 @@
     var meta = B && B.SKILLS[res.skill]; s.lessons.push({ at: Date.now(), skill: res.skill, area: meta ? meta.area : (res.skill || 'grammar'), kind: res.mode === 'ujian' ? 'Ujian dari guru' : t('flow.tugas-guru', 'Tugas dari guru'), title: res.title, correct: correct, total: res.results.length, minutes: res.minutes || 0 });
     var wrong = res.results.filter(function (r) { return !r.correct; }).slice(0, 40).map(function (r) { return { i: String(r.itemId).slice(0, 40), o: Number(r.chosen) >= 0 ? Number(r.chosen) : 0 }; });
     var entry = { id: res.id, at: Date.now(), c: correct, t: res.results.length }; if (wrong.length) entry.w = wrong;
+    // Catatan keluar layar milik sesi ini ikut ke hasil akhir; tanpa penggabungan ini,
+    // entri hasil MENIMPA entri "sedang mengerjakan" dan bukti pengawasan hilang persis
+    // pada saat guru paling membutuhkannya (saat menilai).
+    var prevFocus = (s.doneAssign || []).filter(function (x) { return x.id === res.id; })[0];
+    if (res.focus && Number(res.focus.n) > 0) entry.f = { n: Math.round(Number(res.focus.n) || 0), s: Math.round(Number(res.focus.s) || 0), x: Math.round(Number(res.focus.x) || 0) };
+    else if (prevFocus && prevFocus.f) entry.f = prevFocus.f;
     s.doneAssign = (s.doneAssign || []).filter(function (x) { return x.id !== res.id; }).concat([entry]).slice(-8);
     if (s.plan && s.plan.done.indexOf('assign-' + res.id) === -1) s.plan.done.push('assign-' + res.id);
     try { localStorage.setItem(ASSIGN_KEY, JSON.stringify(loadAssignments().filter(function (a) { return a.id !== res.id; }))); } catch (_) {}
@@ -559,5 +646,5 @@
     });
   }
 
-  return { KEY: KEY, ASSIGN_KEY: ASSIGN_KEY, GOALS: GOALS, mount: mount, render: render, load: load, buildPlan: buildPlan, skillSummary: skillSummary, weeklySummary: weeklySummary, tutorCode: tutorCode, rankedSkills: rankedSkills, statusOf: statusOf, openAssignment: openAssignment, markAssignmentStarted: markAssignmentStarted, recordAssignmentResult: recordAssignmentResult, pushToClass: function () { ensureState(); return pushToClass(); }, _state: function () { return st; } };
+  return { KEY: KEY, ASSIGN_KEY: ASSIGN_KEY, GOALS: GOALS, mount: mount, render: render, load: load, buildPlan: buildPlan, skillSummary: skillSummary, weeklySummary: weeklySummary, tutorCode: tutorCode, rankedSkills: rankedSkills, statusOf: statusOf, openAssignment: openAssignment, announceJoin: announceJoin, recordExamFocus: recordExamFocus, markAssignmentStarted: markAssignmentStarted, recordAssignmentFocus: recordAssignmentFocus, recordAssignmentResult: recordAssignmentResult, pushToClass: function () { ensureState(); return pushToClass(); }, _retryState: function () { return { pending: !!retryTimer, delay: retryDelay }; }, _state: function () { return st; } };
 });
