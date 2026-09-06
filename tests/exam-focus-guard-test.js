@@ -283,6 +283,8 @@ test('realtime: detak murid tidak boleh jauh lebih lambat daripada detak guru', 
 
 test('papan guru: detak otomatis TIDAK boleh mati saat akun guru belum siap', () => {
   // Modul cangkang guru dimuat di atas root yang sudah dipalsukan gerbang DOM-stub.
+  // Perencana detaknya dimuat lebih dulu, urutan yang sama dengan index.html.
+  require('../features/notify/fiezel-sync-plan.js');
   require('../features/teacher/fiezel-teacher-shell.js');
   const Shell = globalThis.FiezelTeacherShell;
   assert.ok(Shell && Shell._autoSyncPlan, 'cangkang guru memuat rencana detaknya');
@@ -309,11 +311,42 @@ test('papan guru: detak otomatis TIDAK boleh mati saat akun guru belum siap', ()
   assert.strictEqual(dg({ failStreak: 3, tickIndex: 4 }), 'sync');
   assert.ok(T.every > 3000 && T.every <= 10000, 'detak guru di atas lantai server 3 detik: ' + T.every);
 
+  // Satu aturan untuk dua papan: cangkang guru TIDAK boleh punya pengertian sendiri.
+  const P = globalThis.FiezelSyncPlan;
+  assert.ok(P && P.plan, 'perencana bersama termuat');
+  ['ok', 'no_account', 'offline'].forEach(function (avail) {
+    assert.strictEqual(dg({ avail: avail }), P.plan(Object.assign({}, dasar, { ready: avail === 'ok' })),
+      'cangkang guru meneruskan keputusannya ke perencana bersama (' + avail + ')');
+  });
+
   const src = read('features/teacher/fiezel-teacher-shell.js');
   assert.ok(!/function startAutoSync\(\) \{[\s\S]{0,200}?syncAvailable\(\) !== 'ok'\) return;/.test(src),
     'startAutoSync tidak boleh pulang sebelum timernya terpasang');
   assert.ok(/syncTimer = setInterval/.test(src) && /chipTimer = setInterval/.test(src), 'kedua detak terpasang');
   assert.ok(/\.catch\(function \(\) \{ ui\.syncing = false;/.test(src), 'galat tidak boleh meninggalkan kunci ui.syncing');
+});
+
+test('papan murid: detak yang SAMA dengan guru, tanpa tombol sinkron', () => {
+  const app = read('app.js'), hub = read('features/class-hub/fiezel-class-hub.js');
+  const P = require('../features/notify/fiezel-sync-plan.js');
+
+  // Satu aturan, dua papan: keduanya menanyakan keputusannya ke modul yang sama.
+  assert.ok(/FiezelSyncPlan/.test(app), 'detak murid memakai perencana bersama');
+  assert.ok(/function notifSyncPlan\(\)/.test(app) && /notifSyncRound\(\)/.test(app), 'ronde murid punya penjaga sendiri');
+  assert.ok(/plan==='reset'/.test(app), 'ronde murid yang menggantung bisa dilepas');
+  /* Penjaga ada DI DALAM detak, bukan sebelum timernya lahir — kerusakan sisi guru persis
+     lahir dari urutan yang terbalik. */
+  const arm = app.slice(app.indexOf('function startNotifPolling'), app.indexOf('function startNotifPolling') + 900);
+  assert.ok(/notifPollTimer=setInterval/.test(arm), 'timer murid selalu terpasang');
+  assert.ok(!/if\(!notifReady\(\)\)return/.test(arm), 'tidak ada penjaga yang memulangkan pemasang timer');
+
+  // Tombol sinkron murid HILANG: menyegarkan papan adalah tugas sistem, bukan pekerjaan murid.
+  assert.ok(!/data-ch="resend"/.test(hub), 'tombol "Kirim ulang laporan" tidak lagi dirender');
+  assert.ok(/case 'resend'/.test(hub), 'pintunya tetap hidup untuk jalur pemulihan');
+
+  // Cabang "belum ada kode kelas" tidak boleh mematikan detak — ia hanya menahan jaringan.
+  assert.strictEqual(P.plan({ mounted: true, ready: false, now: 1 }), 'wait');
+  assert.strictEqual(P.plan({ mounted: true, ready: true, now: 1 }), 'sync');
 });
 
 /* --------------------------------------------------------- 5 · pemasangan & i18n --- */
@@ -324,6 +357,8 @@ test('pemasangan: modul terdaftar di index.html + sw.js, dan teks murid lahir du
   assert.ok(sw.includes('./features/class-hub/fiezel-focus-guard.js'), 'ikut precache: ujian sering dikerjakan tanpa jaringan');
   assert.ok(html.includes('copy-id-proctor.js') && sw.includes('./features/i18n/copy-id-proctor.js'));
   assert.ok(read('features/i18n/fiezel-th-loader.js').includes('copy-th-proctor.js'), 'pasangan th ikut dimuat saat locale th');
+  assert.ok(html.indexOf('fiezel-sync-plan.js') > -1 && html.indexOf('fiezel-sync-plan.js') < html.indexOf('./app.js'), 'perencana detak dimuat sebelum app.js');
+  assert.ok(sw.includes('./features/notify/fiezel-sync-plan.js'), 'perencana detak ikut precache');
   const idKeys = (read('features/i18n/copy-id-proctor.js').match(/'proctor\.[a-z-]+'/g) || []).sort();
   const thKeys = (read('features/i18n/copy-th-proctor.js').match(/'proctor\.[a-z-]+'/g) || []).sort();
   assert.ok(idKeys.length >= 3);

@@ -98,17 +98,20 @@
    *         selamanya dan mematikan detak dengan cara yang sama diamnya seperti bug di atas.
    * 'idle'  cangkang tidak terpasang.
    */
-  var SYNC_STUCK_MS = 45000, SYNC_BACKOFF_MAX = 10;
+  /* Aturannya sendiri hidup di features/notify/fiezel-sync-plan.js — modul murni yang dipakai
+     BERSAMA dengan detak murid, supaya dua papan tidak bisa lagi punya dua pengertian berbeda
+     tentang kapan boleh menyentuh jaringan. Salinan di bawah hanya jaring pengaman kalau
+     berkasnya belum termuat (urutan skrip berubah, cache separuh): lebih baik detak yang
+     sedikit lebih sederhana daripada papan guru yang mati lagi. */
   var syncingSince = 0;
   function autoSyncPlan(o) {
-    if (!o || !o.mounted) return 'idle';
-    if (o.syncing) return (Number(o.now) - Number(o.syncingSince || 0)) > SYNC_STUCK_MS ? 'reset' : 'skip';
-    if (o.hidden) return 'skip';                     // tab tak dilihat: tidak ada yang perlu disegarkan
-    if (o.avail !== 'ok') return 'wait';
-    /* Jeda menanjak sesudah gagal beruntun: 1 ronde dilewati per kegagalan, sampai 10.
-       Server yang sakit tidak dihujani sampai ia pulih. */
-    var streak = Math.max(0, Number(o.failStreak) || 0);
-    if (streak > 0 && Number(o.tickIndex) % (Math.min(streak, SYNC_BACKOFF_MAX) + 1) !== 0) return 'skip';
+    var P = root.FiezelSyncPlan;
+    var arg = { mounted: o.mounted, syncing: o.syncing, syncingSince: o.syncingSince, hidden: o.hidden, ready: o.avail === 'ok', failStreak: o.failStreak, tickIndex: o.tickIndex, now: o.now };
+    if (P && typeof P.plan === 'function') return P.plan(arg);
+    if (!arg.mounted) return 'idle';
+    if (arg.syncing) return (Number(arg.now) - Number(arg.syncingSince || 0)) > 45000 ? 'reset' : 'skip';
+    if (arg.hidden) return 'skip';
+    if (!arg.ready) return 'wait';
     return 'sync';
   }
   function startAutoSync() {
@@ -642,5 +645,5 @@
   }
   function download(name, text, type) { try { var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type: type || 'text/plain' })); a.download = name; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 800); } catch (_) { copy(text, 'Unduhan tidak didukung — isi tersalin.'); } }
 
-  root.FiezelTeacherShell = { mount: mount, unmount: unmount, render: render, previewAllowed: previewAllowed, _state: function () { return st; }, _autoSyncPlan: autoSyncPlan, _syncTicks: function () { return { every: SYNC_EVERY_MS, chip: CHIP_TICK_MS, stuck: SYNC_STUCK_MS }; }, _armed: function () { return !!syncTimer && !!chipTimer; } };
+  root.FiezelTeacherShell = { mount: mount, unmount: unmount, render: render, previewAllowed: previewAllowed, _state: function () { return st; }, _autoSyncPlan: autoSyncPlan, _syncTicks: function () { return { every: SYNC_EVERY_MS, chip: CHIP_TICK_MS, stuck: (root.FiezelSyncPlan && root.FiezelSyncPlan.STUCK_MS) || 45000 }; }, _armed: function () { return !!syncTimer && !!chipTimer; } };
 })(typeof window !== 'undefined' ? window : null);
