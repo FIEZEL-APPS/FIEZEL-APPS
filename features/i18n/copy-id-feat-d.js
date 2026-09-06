@@ -306,6 +306,11 @@
     'diag.ringkasan-belum-siap': 'Ringkasan belum siap. Tutup lalu buka lagi Diagnostics.',
     'guru.pendamping-teman': 'dengan pendamping teman (lihat Kelompok Belajar).',
     'guru.tugas-belum-selesai': '• Tugas belum selesai:',
+    'guru.merek-tag': 'untuk Guru',
+    'guru.merek-penuh': 'KelasKu untuk Guru',
+    'guru.demo-pita': 'Kamu sedang melihat DEMO — kelas, murid, dan angkanya contoh.',
+    'guru.demo-keluar': 'Keluar dari demo',
+    'guru.demo-cta': 'Punya kode undangan? Aktifkan akun guru',
     'guru.tanda-tangan': 'Guru Bahasa Inggris'
   });
 }());

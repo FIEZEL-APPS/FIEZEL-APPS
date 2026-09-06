@@ -62,13 +62,40 @@
   function bar(v, cls) { return '<span class="tg-bar' + (cls ? ' ' + cls : '') + '"><i style="width:' + (v == null ? 0 : Math.round(v * 100)) + '%"></i></span>'; }
   function cell(v) { var t = v == null ? 'none' : v >= 0.75 ? 'hi' : v >= 0.5 ? 'mid' : 'lo'; return '<td class="tg-heat is-' + t + '">' + pct(v) + '</td>'; }
 
-  /** Pratinjau lokal (bukan produksi): hanya di host pengembangan, dinyalakan ?teacher=preview. */
+  /*
+   * DEMO GURU — DINYALAKAN ?teacher=preview, DI HOST MANA PUN TERMASUK PRODUKSI.
+   *
+   * Sebelumnya baris pertama fungsi ini menolak `fiezel.my.id` mentah-mentah, karena
+   * pratinjau lahir sebagai alat pengembangan. Lalu landing page memasang tombol
+   * "Buka Demo Guru" yang menunjuk ke sini — dan tombol itu tidak melakukan apa-apa:
+   * pengunjung yang ingin melihat papan guru justru mendarat di perkenalan murid.
+   * Calon pengguna yang datang untuk melihat produknya malah disuruh mendaftar dulu.
+   *
+   * Yang dibuka demo ini HANYA cangkang antarmuka. Tiga batas menjaganya, dan
+   * ketiganya ditegakkan di tempat lain, bukan oleh sopan santun:
+   *   1. `fiezel-teacher-store.js` mengalihkan seluruh baca/tulis ke sessionStorage
+   *      berkunci sendiri — data guru sungguhan tidak tersentuh, dan demo lenyap
+   *      saat tab ditutup;
+   *   2. `syncAvailable()` di store itu menuntut peran akun 'teacher' yang sah, jadi
+   *      demo tidak pernah menyentuh satu pun rute server;
+   *   3. penanda `fz_teacher_mode` di localStorage TIDAK pernah ditulis, jadi mode ini
+   *      tidak bertahan melewati sesi dan tidak menaikkan peran siapa pun.
+   *
+   * Guru yang benar-benar sudah masuk tidak boleh terseret ke sini: kalau akunnya
+   * berperan guru, demo dimatikan supaya papan aslinya yang tampil.
+   */
   function previewAllowed() {
     try {
-      var h = location.hostname; if (/fiezel\.my\.id$|github\.io$/.test(h)) return false;
+      if (isTeacherRole()) return false;
       if (new URL(location.href).searchParams.get('teacher') === 'preview') sessionStorage.setItem('fz-teacher-preview', '1');
       return sessionStorage.getItem('fz-teacher-preview') === '1';
     } catch (_) { return false; }
+  }
+  /** Keluar dari demo: penandanya dibuang, lalu halaman kembali ke sisi murid. */
+  function exitPreview() {
+    try { sessionStorage.removeItem('fz-teacher-preview'); } catch (_) {}
+    try { sessionStorage.removeItem('fiezel-teacher-v1-preview'); } catch (_) {}
+    try { S().setPreview(false); } catch (_) {}
   }
 
   // ---- sinkron server ---------------------------------------------------------------------
@@ -103,6 +130,7 @@
      tentang kapan boleh menyentuh jaringan. Salinan di bawah hanya jaring pengaman kalau
      berkasnya belum termuat (urutan skrip berubah, cache separuh): lebih baik detak yang
      sedikit lebih sederhana daripada papan guru yang mati lagi. */
+  var previewOn = false;
   var syncingSince = 0;
   function autoSyncPlan(o) {
     var P = root.FiezelSyncPlan;
@@ -249,7 +277,25 @@
 
   // ---- mount ------------------------------------------------------------------------------
   function mount(target, options) {
-    el = target; env = options || {}; st = S().load();
+    el = target; env = options || {};
+    /* Urutannya penting: penyimpanan dialihkan SEBELUM load(), kalau tidak papan demo
+       terisi dari data guru asli dan tulisan pertamanya mendarat di sana juga. */
+    previewOn = previewAllowed();
+    try { S().setPreview(previewOn); } catch (_) {}
+    st = S().load();
+    /* Demo yang kosong bukan demo. Pengunjung yang menekan "Buka Demo Guru" datang untuk
+       melihat papan yang HIDUP — 18 murid, dua tugas, kehadiran, jurnal — bukan layar
+       "buat kelas pertamamu" yang justru menyembunyikan seluruh produknya. Disemai hanya
+       sekali per sesi, dan hanya ke penyimpanan pratinjau. */
+    if (previewOn && !st.classes.length) {
+      try {
+        var demo = S().seedDemo();
+        st.classes.push(demo); st.activeClassId = demo.id; st.onboarded = true;
+        st.teacher = { name: 'Bu Sari', school: 'SMP Nusantara 1' };
+        st.view = 'briefing';
+        S().save(st);
+      } catch (_) { /* bank soal belum termuat: papan tetap terbuka, sekadar kosong */ }
+    }
     st.classes = st.classes.map(S().normalizeClass);
     if (!cls() && st.classes.length) st.activeClassId = st.classes[0].id;
     if (!st.classes.length && !st.onboarded) { st.view = 'briefing'; }
@@ -300,7 +346,7 @@
     var key = (st.view || 'briefing') + '|' + (st.activeClassId || '') + '|' + (ui.modal ? ui.modal.kind : '') + '|' + (ui.drawer || '');
     var repaint = key === lastPaintKey;
     lastPaintKey = key;
-    el.innerHTML = '<div class="tg' + (repaint ? ' is-repaint' : '') + (ui.modal && ui.modal.kind === 'board' ? ' tg-board-open' : '') + '" data-testid="teacher-shell">' + sidebar(c) + '<div class="tg-main">' + topbar(c) + '<div class="tg-content">' + (st.classes.length ? views[st.view || 'briefing'](c) : welcome()) + '</div></div>' + mobileNav() + drawer(c) + modal(c) + '</div>';
+    el.innerHTML = '<div class="tg' + (repaint ? ' is-repaint' : '') + (previewOn ? ' is-demo' : '') + (ui.modal && ui.modal.kind === 'board' ? ' tg-board-open' : '') + '" data-testid="teacher-shell">' + demoBanner() + sidebar(c) + '<div class="tg-main">' + topbar(c) + '<div class="tg-content">' + (st.classes.length ? views[st.view || 'briefing'](c) : welcome()) + '</div></div>' + mobileNav() + drawer(c) + modal(c) + '</div>';
     var hubEl = el.querySelector('#tgClassHub');
     if (hubEl && root.FiezelClassHub) root.FiezelClassHub.mountTeacher(hubEl, { st: function () { return st; }, cls: cls, persist: persist, toast: toast, rerender: render });
     if (env.afterRender) try { env.afterRender(); } catch (_) {}
@@ -309,12 +355,32 @@
     if (!repaint) { var f = el.querySelector('[data-autofocus]'); if (f) try { f.focus(); } catch (_) {} }
   }
 
+  /*
+   * PITA DEMO — KEJUJURAN YANG TERLIHAT, BUKAN CATATAN KECIL DI KAKI HALAMAN.
+   *
+   * Papan ini terisi 18 murid dengan nama, nilai, dan catatan wali kelas. Tanpa pita ini
+   * seorang guru bisa memakainya setengah jam sebelum sadar tidak satu pun angkanya nyata —
+   * dan yang lebih buruk, mengira kelasnya sudah terdaftar. Jadi statusnya dinyatakan di
+   * baris paling atas, bukan disembunyikan, lengkap dengan dua jalan keluar: kembali ke
+   * sisi murid, atau naik ke akun guru sungguhan.
+   */
+  function demoBanner() {
+    if (!previewOn) return '';
+    return '<div class="tg-demo-bar" role="status" data-testid="tg-demo-bar">' +
+      '<span class="tg-demo-tag">DEMO</span>' +
+      '<span class="tg-demo-text">' + esc(t('guru.demo-pita', 'Kamu sedang melihat DEMO — kelas, murid, dan angkanya contoh.')) + '</span>' +
+      '<span class="tg-demo-acts">' +
+        '<button type="button" class="tg-demo-btn is-primary" data-tg="demo-activate" data-testid="tg-demo-activate">' + esc(t('guru.demo-cta', 'Punya kode undangan? Aktifkan akun guru')) + '</button>' +
+        '<button type="button" class="tg-demo-btn" data-tg="demo-exit" data-testid="tg-demo-exit">' + esc(t('guru.demo-keluar', 'Keluar dari demo')) + '</button>' +
+      '</span></div>';
+  }
+
   // ---- kerangka ---------------------------------------------------------------------------
   function sidebar(c) {
     var teacherVerified = isTeacherRole();
     var exitLabel = teacherVerified ? 'Keluar akun guru' : 'Ke mode murid';
     var exitAction = teacherVerified ? 'logout' : 'exit';
-    return '<aside class="tg-side"><div class="tg-brand"><span class="tg-brand-mark">K</span><div class="kelasku-brand"><span class="kelasku-main">KelasKu</span> <span class="kelasku-tag">untuk Guru</span></div></div>' +
+    return '<aside class="tg-side"><div class="tg-brand"><span class="tg-brand-mark">K</span><div class="kelasku-brand"><span class="kelasku-main">KelasKu</span> <span class="kelasku-tag">' + esc(t('guru.merek-tag', 'untuk Guru')) + '</span></div></div>' +
       '<button type="button" class="tg-teacher" data-tg="view" data-view="settings" data-testid="tg-profile">' + icon('user-round') + '<div><b>' + esc(st.teacher.name || accountHandle() || 'Guru FIEZEL') + '</b><small>' + esc(st.teacher.school || 'Atur profil →') + '</small></div></button>' +
       (st.classes.length ? '<label class="tg-class-switch">' + t('guru.kelas-aktif', 'Kelas aktif') + '<select data-tg-select="class" data-testid="tg-class-select">' + st.classes.map(function (k) { return '<option value="' + k.id + '"' + (c && k.id === c.id ? ' selected' : '') + '>' + esc(k.name) + '</option>'; }).join('') + '</select></label>' : '') +
       '<nav class="tg-nav">' + NAV.map(function (n) { return '<button type="button" class="tg-nav-item' + (st.view === n[0] ? ' is-active' : '') + '" data-tg="view" data-view="' + n[0] + '" data-testid="tg-nav-' + n[0] + '">' + icon(n[2]) + '<span>' + n[1] + '</span></button>'; }).join('') + '</nav>' +
@@ -323,7 +389,7 @@
   }
   function topbar(c) {
     var d = new Date();
-    return '<header class="tg-top"><div><p class="tg-kicker">' + esc(d.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' })) + '</p><h1>' + esc(st.classes.length ? (TITLE[st.view] || 'KelasKu untuk Guru') : 'KelasKu untuk Guru') + '</h1></div>' +
+    return '<header class="tg-top"><div><p class="tg-kicker">' + esc(d.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' })) + '</p><h1>' + esc(st.classes.length ? (TITLE[st.view] || t('guru.merek-penuh', 'KelasKu untuk Guru')) : t('guru.merek-penuh', 'KelasKu untuk Guru')) + '</h1></div>' +
       '<div class="tg-top-actions">' + (c ? syncChip(c) + '<button type="button" class="tg-chip tg-code" data-tg="copy" data-text="' + esc(c.code) + '" title="Salin kode kelas" data-testid="tg-class-code">' + icon('hash') + '<span>' + esc(c.code) + '</span></button>' : '') + bell() + (c ? '<button type="button" class="tg-btn is-ghost" data-tg="modal" data-kind="board" data-testid="tg-open-board">' + icon('presentation') + '<span>Mode papan</span></button><button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="assign" data-testid="tg-quick-assign">' + icon('plus') + '<span>' + t('guru.tugas-baru', 'Tugas baru') + '</span></button>' : '') + '</div></header>' + inboxPanel();
   }
   function bell() {
@@ -551,6 +617,10 @@
       case 'view': st.view = btn.getAttribute('data-view'); if (btn.getAttribute('data-skill')) ui.insightSkill = btn.getAttribute('data-skill'); ui.modal = null; ui.drawer = null; ui.filter = ''; break;
       case 'account': openAccount(btn.getAttribute('data-mode') || 'login'); return;
       case 'exit': persist(); exit(); return;
+      /* Keluar demo TIDAK memanggil persist(): yang tersimpan hanya penyimpanan pratinjau,
+         dan yang diinginkan justru membuangnya. */
+      case 'demo-exit': exitPreview(); previewOn = false; exit(); return;
+      case 'demo-activate': openAccount('teacher'); return;
       case 'logout':
         persist();
         if (confirm('Keluar dari akun guru?')) {
@@ -646,5 +716,5 @@
   }
   function download(name, text, type) { try { var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type: type || 'text/plain' })); a.download = name; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 800); } catch (_) { copy(text, 'Unduhan tidak didukung — isi tersalin.'); } }
 
-  root.FiezelTeacherShell = { mount: mount, unmount: unmount, render: render, previewAllowed: previewAllowed, _state: function () { return st; }, _autoSyncPlan: autoSyncPlan, _syncTicks: function () { return { every: SYNC_EVERY_MS, chip: CHIP_TICK_MS, stuck: (root.FiezelSyncPlan && root.FiezelSyncPlan.STUCK_MS) || 45000 }; }, _armed: function () { return !!syncTimer && !!chipTimer; } };
+  root.FiezelTeacherShell = { mount: mount, unmount: unmount, render: render, previewAllowed: previewAllowed, exitPreview: exitPreview, _state: function () { return st; }, _autoSyncPlan: autoSyncPlan, _syncTicks: function () { return { every: SYNC_EVERY_MS, chip: CHIP_TICK_MS, stuck: (root.FiezelSyncPlan && root.FiezelSyncPlan.STUCK_MS) || 45000 }; }, _armed: function () { return !!syncTimer && !!chipTimer; } };
 })(typeof window !== 'undefined' ? window : null);

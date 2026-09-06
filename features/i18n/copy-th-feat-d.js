@@ -301,6 +301,11 @@
     'diag.ringkasan-belum-siap': 'สรุปยังไม่พร้อม ปิดแล้วเปิด Diagnostics อีกครั้ง',
     'guru.pendamping-teman': 'โดยมีเพื่อนช่วย (ดูกลุ่มการเรียน)',
     'guru.tugas-belum-selesai': '• งานที่ยังไม่เสร็จ:',
+    'guru.merek-tag': 'สำหรับครู',
+    'guru.merek-penuh': 'KelasKu สำหรับครู',
+    'guru.demo-pita': 'คุณกำลังดู "ตัวอย่าง" — ชั้นเรียน นักเรียน และตัวเลขทั้งหมดเป็นข้อมูลสมมติ',
+    'guru.demo-keluar': 'ออกจากตัวอย่าง',
+    'guru.demo-cta': 'มีรหัสเชิญไหม เปิดใช้งานบัญชีครู',
     'guru.tanda-tangan': 'ครูภาษาอังกฤษ'
   });
 }());

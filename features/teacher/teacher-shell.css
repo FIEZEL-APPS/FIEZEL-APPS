@@ -342,3 +342,26 @@ html.fiezel-ui-v6 body.fz-teacher-mode .tg button.tg-seg-btn:not(.primary):not(.
 .tg-focus i,.tg-focus svg{width:13px;height:13px}
 .tg-focus.is-berat{background:var(--tg-bad-soft);color:var(--tg-bad)}
 .tg-muted.tg-small{font-size:.78rem;line-height:1.45}
+
+/* ---------- pita DEMO ----------------------------------------------------------------
+   Papan demo terisi 18 murid dengan nama dan nilai. Tanpa pernyataan yang tidak bisa
+   dilewatkan mata, pengunjung bisa mengira kelasnya sudah terdaftar. Pita ini duduk di
+   baris paling atas grid (menyeberangi sidebar dan konten), memakai amber — bukan merah:
+   ini bukan galat, ini keterangan. */
+.tg.is-demo{grid-template-rows:auto 1fr}
+.tg-demo-bar{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;
+  padding:10px clamp(14px,3vw,26px);background:var(--tg-amber-soft);border-bottom:1px solid var(--tg-line);
+  color:var(--tg-ink-2);font-size:.9rem}
+.tg-demo-tag{flex:none;font-family:var(--tg-mono);font-size:.68rem;letter-spacing:.14em;font-weight:500;
+  background:var(--tg-amber);color:#fff;border-radius:999px;padding:3px 10px}
+.tg-demo-text{flex:1 1 240px;min-width:0}
+.tg-demo-acts{display:flex;flex-wrap:wrap;gap:8px}
+.tg-demo-btn{font:inherit;font-size:.85rem;font-weight:500;cursor:pointer;border-radius:999px;
+  padding:7px 15px;border:1px solid var(--tg-line);background:var(--tg-paper-2);color:var(--tg-ink-2)}
+.tg-demo-btn.is-primary{background:var(--tg-sage);border-color:var(--tg-sage);color:#fff}
+.tg-demo-btn:hover{filter:brightness(.97)}
+@media (max-width:720px){
+  .tg-demo-bar{font-size:.84rem;padding:9px 14px}
+  .tg-demo-acts{width:100%}
+  .tg-demo-btn{flex:1 1 auto;text-align:center}
+}
