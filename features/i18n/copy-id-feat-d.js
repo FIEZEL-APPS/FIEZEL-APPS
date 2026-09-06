@@ -233,6 +233,13 @@
     'guru.tab-kelas-siswa': 'Kelas & Siswa',
     'guru.tab-tugas-ujian': 'Tugas & Ujian',
     'guru.tab-jurnal': 'Jurnal Guru',
+    'guru.pilih-bab-kurikulum': 'Pilih Bab / Genre Materi Kurikulum Merdeka',
+    'guru.apersepsi-5-menit': '🎤 Apersepsi 5 Menit (Hook Kelas):',
+    'guru.judul-tugas-bab': 'Judul Tugas / Bab',
+    'guru.terbitkan-tugas-kurikulum': 'Terbitkan Tugas Kurikulum',
+    'guru.judul-otomatis': 'Kosongkan untuk judul otomatis',
+    'guru.merek-tag': 'untuk Guru',
+    'guru.merek-penuh': 'KelasKu untuk Guru',
     'guru.judul-kelas': 'Kelas — Guru · Murid · Braincore',
     'guru.tab-profil': 'Profil Guru',
     'guru.kelas-aktif': 'Kelas aktif',
@@ -306,6 +313,9 @@
     'diag.ringkasan-belum-siap': 'Ringkasan belum siap. Tutup lalu buka lagi Diagnostics.',
     'guru.pendamping-teman': 'dengan pendamping teman (lihat Kelompok Belajar).',
     'guru.tugas-belum-selesai': '• Tugas belum selesai:',
+    'guru.demo-pita': 'Kamu sedang melihat DEMO — kelas, murid, dan angkanya contoh.',
+    'guru.demo-keluar': 'Keluar dari demo',
+    'guru.demo-cta': 'Punya kode undangan? Aktifkan akun guru',
     'guru.tanda-tangan': 'Guru Bahasa Inggris'
   });
 }());

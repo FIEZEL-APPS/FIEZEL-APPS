@@ -1,0 +1,1375 @@
+{
+ "schema": "fiezel-japanese-bank-v1",
+ "target": "ja",
+ "cefr": "A1",
+ "jlpt": "N5",
+ "family": "verb_groups",
+ "catatan": "Bank soal A1/N5 keluarga verb_groups. Dijaga tests/japanese-content-test.js.",
+ "provenans": {
+  "sumberSilabus": "Minna no Nihongo dan Irodori dipakai SEBAGAI SILABUS SAJA: poin tata bahasa apa, urutannya bagaimana, di tingkat berapa. NOL kalimat, dialog, teks, atau daftar kosakata yang direproduksi atau diturunkan — setiap stem, pilihan, pengecoh, dan penjelasan ditulis baru.",
+  "akibatLisensi": "Karena tidak ada teks Irodori yang dipakai, FIEZEL TIDAK terikat kewajiban gratis-selamanya dari lisensinya.",
+  "statusNaskah": "Kalimat Jepang dan penjelasan Inggris/Indonesia berstatus DRAFT AI dan wajib direview penutur asli sebelum dipakai menilai murid."
+ },
+ "jumlah": 20,
+ "templates": [
+  {
+   "id": "JP-VG-101",
+   "family": "verb_groups",
+   "skill": "verb_groups",
+   "subskill": "identify_group_of_trap_verb_kaeru",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "group-id-kaeru-godan-trap",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Classify 帰る as a godan verb even though its ending looks ichidan",
+   "pedagogicalObjectiveId": "Menggolongkan 帰る sebagai kata kerja godan meski akhirannya terlihat seperti ichidan",
+   "misconceptionTargeted": "Learner applies the shape rule 'ends in -eru therefore ichidan' to a verb that is a listed godan exception",
+   "misconceptionTargetedId": "Murid memakai aturan bentuk 'berakhir -eru berarti ichidan' pada kata kerja yang justru pengecualian godan",
+   "reasoningOperation": "read the -eru ending -> check the exception list -> assign godan",
+   "reasoningOperationId": "baca akhiran -eru -> periksa daftar pengecualian -> tetapkan godan",
+   "stem": "「わたしは 六時に 家へ 帰る」の「帰る」は ___ です。",
+   "stemKana": "「わたしは ろくじに いえへ かえる」の「かえる」は ___ です。",
+   "furigana": [
+    [
+     "六",
+     "ろく"
+    ],
+    [
+     "家",
+     "いえ"
+    ],
+    [
+     "帰",
+     "かえ"
+    ]
+   ],
+   "options": [
+    "五段動詞（グループ1）",
+    "一段動詞（グループ2）",
+    "する動詞（グループ3）",
+    "くる動詞（グループ3）"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "一段動詞（グループ2）",
+     "misconception": "ichidan rule applied to an -eru verb that is a godan exception",
+     "misconceptionId": "aturan ichidan diterapkan pada kata kerja -eru yang sebenarnya pengecualian godan",
+     "whyFails": "The -eru shape does suggest ichidan, but 帰る is one of the fixed exceptions: its polite form is 帰ります, not 帰ます.",
+     "whyFailsId": "Bentuk -eru memang mengesankan ichidan, tetapi 帰る salah satu pengecualian tetap: bentuk sopannya 帰ります, bukan 帰ます."
+    },
+    {
+     "option": "する動詞（グループ3）",
+     "misconception": "irregular label attached to a plain compound-free verb",
+     "misconceptionId": "label tak beraturan ditempelkan pada kata kerja biasa yang bukan gabungan する",
+     "whyFails": "Group 3 する covers する itself and noun+する compounds. 帰る contains no する.",
+     "whyFailsId": "Grup 3 する mencakup する sendiri dan gabungan kata benda+する. 帰る tidak mengandung する."
+    },
+    {
+     "option": "くる動詞（グループ3）",
+     "misconception": "irregular label given because the meaning involves going home",
+     "misconceptionId": "label tak beraturan diberikan karena maknanya soal pulang",
+     "whyFails": "Group 3 くる is only the verb 来る. Meaning about coming or going home does not change the group.",
+     "whyFailsId": "Grup 3 くる hanya kata kerja 来る. Makna tentang datang atau pulang tidak mengubah golongan."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "帰る ends in -eru but belongs to the small closed list of godan exceptions, so it conjugates with an -i- stem: 帰ります.",
+    "whyCorrectId": "帰る berakhir -eru tetapi masuk daftar kecil pengecualian godan, jadi berkonjugasi dengan batang -i-: 帰ります.",
+    "rule": "Shape is only a first guess. 帰る・入る・走る・切る・知る end in -eru/-iru yet are godan.",
+    "ruleId": "Bentuk hanya tebakan awal. 帰る・入る・走る・切る・知る berakhir -eru/-iru namun godan.",
+    "whyOthersFail": "Group 2 misreads the ending; both Group 3 answers apply an irregular label to an ordinary verb.",
+    "whyOthersFailId": "Grup 2 salah membaca akhiran; kedua jawaban Grup 3 menempelkan label tak beraturan pada kata kerja biasa.",
+    "howToAvoid": "Memorise the exception list first, then apply the -eru/-iru shape rule to everything else.",
+    "howToAvoidId": "Hafalkan dulu daftar pengecualiannya, baru terapkan aturan bentuk -eru/-iru pada sisanya.",
+    "memoryCue": "Going home is a godan trip: 帰ります.",
+    "memoryCueId": "Pulang itu perjalanan godan: 帰ります."
+   }
+  },
+  {
+   "id": "JP-VG-102",
+   "family": "verb_groups",
+   "skill": "verb_groups",
+   "subskill": "masu_stem_of_godan_exception_kaeru",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "masu-stem-kaeru-godan-exception",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Build the polite form of 帰る with the godan -i- stem",
+   "pedagogicalObjectiveId": "Membentuk bentuk sopan 帰る dengan batang -i- godan",
+   "misconceptionTargeted": "Learner drops -ru like an ichidan verb and produces 帰ます",
+   "misconceptionTargetedId": "Murid membuang -ru seperti kata kerja ichidan lalu menghasilkan 帰ます",
+   "reasoningOperation": "classify 帰る as godan -> change -ru to -ri -> add ます",
+   "reasoningOperationId": "golongkan 帰る sebagai godan -> ubah -ru menjadi -ri -> tambahkan ます",
+   "stem": "しごとが おわったら、すぐ 家へ ___。",
+   "stemKana": "しごとが おわったら、すぐ いえへ ___。",
+   "furigana": [
+    [
+     "家",
+     "いえ"
+    ],
+    [
+     "帰",
+     "かえ"
+    ]
+   ],
+   "options": [
+    "帰ります",
+    "帰ます",
+    "帰るます",
+    "帰って"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "帰ます",
+     "misconception": "ichidan -ru deletion applied to a godan exception verb",
+     "misconceptionId": "penghapusan -ru cara ichidan diterapkan pada kata kerja pengecualian godan",
+     "whyFails": "Dropping -ru is the ichidan recipe. 帰る is godan, so the stem ends in -ri: 帰ります.",
+     "whyFailsId": "Membuang -ru adalah resep ichidan. 帰る itu godan, jadi batangnya berakhir -ri: 帰ります."
+    },
+    {
+     "option": "帰るます",
+     "misconception": "ます glued to the dictionary form without making a stem",
+     "misconceptionId": "ます ditempel ke bentuk kamus tanpa membuat batang",
+     "whyFails": "ます never attaches to a full dictionary form; the verb must first become a stem.",
+     "whyFailsId": "ます tidak pernah menempel pada bentuk kamus utuh; kata kerjanya harus jadi batang dulu."
+    },
+    {
+     "option": "帰って",
+     "misconception": "te-form chosen where a polite sentence-final form is needed",
+     "misconceptionId": "bentuk te dipilih padahal yang dibutuhkan bentuk sopan penutup kalimat",
+     "whyFails": "帰って connects clauses or makes requests; it cannot close this sentence politely.",
+     "whyFailsId": "帰って menyambung klausa atau membuat permintaan; ia tidak bisa menutup kalimat ini secara sopan."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "帰る is a godan exception, so -ru becomes -ri before ます: 帰ります.",
+    "whyCorrectId": "帰る adalah pengecualian godan, jadi -ru berubah jadi -ri sebelum ます: 帰ります.",
+    "rule": "Godan verbs shift the final -u sound to the -i row, then take ます.",
+    "ruleId": "Kata kerja godan menggeser bunyi -u terakhir ke baris -i, lalu memakai ます.",
+    "whyOthersFail": "帰ます uses the ichidan recipe, 帰るます skips the stem, 帰って is the te-form.",
+    "whyOthersFailId": "帰ます memakai resep ichidan, 帰るます melewati batang, 帰って adalah bentuk te.",
+    "howToAvoid": "Whenever a verb looks ichidan, check the exception list before deleting -ru.",
+    "howToAvoidId": "Setiap kali kata kerja terlihat ichidan, periksa daftar pengecualian sebelum membuang -ru.",
+    "memoryCue": "帰る hides an -ri inside: 帰ります.",
+    "memoryCueId": "帰る menyembunyikan -ri di dalamnya: 帰ります."
+   }
+  },
+  {
+   "id": "JP-VG-103",
+   "family": "verb_groups",
+   "skill": "verb_groups",
+   "subskill": "masu_stem_of_godan_exception_hairu",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "masu-stem-hairu-godan-exception",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Build the polite form of 入る with the godan -i- stem",
+   "pedagogicalObjectiveId": "Membentuk bentuk sopan 入る dengan batang -i- godan",
+   "misconceptionTargeted": "Learner reads the -iru ending as ichidan and produces 入ます",
+   "misconceptionTargetedId": "Murid membaca akhiran -iru sebagai ichidan lalu menghasilkan 入ます",
+   "reasoningOperation": "spot the -iru ending -> recall 入る is a godan exception -> use 入り + ます",
+   "reasoningOperationId": "kenali akhiran -iru -> ingat 入る adalah pengecualian godan -> pakai 入り + ます",
+   "stem": "くつを ぬいでから、へやに ___。",
+   "stemKana": "くつを ぬいでから、へやに ___。",
+   "furigana": [
+    [
+     "入",
+     "はい"
+    ]
+   ],
+   "options": [
+    "入ります",
+    "入ます",
+    "入いります",
+    "入ろます"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "入ます",
+     "misconception": "ichidan -ru deletion applied to the godan exception 入る",
+     "misconceptionId": "penghapusan -ru cara ichidan diterapkan pada pengecualian godan 入る",
+     "whyFails": "入る only looks like 見る or 起きる. It is godan, so the polite stem is 入り-.",
+     "whyFailsId": "入る hanya mirip 見る atau 起きる. Ia godan, jadi batang sopannya 入り-."
+    },
+    {
+     "option": "入いります",
+     "misconception": "extra kana inserted because the reading of the kanji is written twice",
+     "misconceptionId": "kana berlebih disisipkan karena bacaan kanji ditulis dua kali",
+     "whyFails": "The reading はい is already inside 入; writing い again spells はいいります.",
+     "whyFailsId": "Bacaan はい sudah ada di dalam 入; menulis い lagi menghasilkan はいいります."
+    },
+    {
+     "option": "入ろます",
+     "misconception": "volitional-looking -o- stem used in place of the -i- stem",
+     "misconceptionId": "batang -o- yang menyerupai bentuk kehendak dipakai menggantikan batang -i-",
+     "whyFails": "The -o- row builds 入ろう, not the polite form. ます always follows the -i- stem.",
+     "whyFailsId": "Baris -o- membentuk 入ろう, bukan bentuk sopan. ます selalu mengikuti batang -i-."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "入る is a godan verb despite its -iru ending, so the polite form is 入ります.",
+    "whyCorrectId": "入る adalah kata kerja godan meski berakhiran -iru, jadi bentuk sopannya 入ります.",
+    "rule": "Godan polite form = final -u sound moved to the -i row + ます.",
+    "ruleId": "Bentuk sopan godan = bunyi -u terakhir dipindah ke baris -i + ます.",
+    "whyOthersFail": "入ます follows the ichidan rule, 入いります doubles the reading, 入ろます picks the wrong row.",
+    "whyOthersFailId": "入ます mengikuti aturan ichidan, 入いります menggandakan bacaan, 入ろます memilih baris yang salah.",
+    "howToAvoid": "Learn 帰る・入る・走る・切る・知る as one block of godan look-alikes.",
+    "howToAvoidId": "Hafalkan 帰る・入る・走る・切る・知る sebagai satu blok godan yang menyamar.",
+    "memoryCue": "Enter the room the godan way: 入ります.",
+    "memoryCueId": "Masuk ke ruangan dengan cara godan: 入ります."
+   }
+  },
+  {
+   "id": "JP-VG-104",
+   "family": "verb_groups",
+   "skill": "verb_groups",
+   "subskill": "identify_group_of_trap_verb_hashiru",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "group-id-hashiru-godan-trap",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Classify 走る as godan even though it ends in -iru",
+   "pedagogicalObjectiveId": "Menggolongkan 走る sebagai godan meski berakhiran -iru",
+   "misconceptionTargeted": "Learner sorts every -iru verb into the ichidan group",
+   "misconceptionTargetedId": "Murid memasukkan setiap kata kerja -iru ke golongan ichidan",
+   "reasoningOperation": "read the -iru ending -> test with the polite form -> 走ります proves godan",
+   "reasoningOperationId": "baca akhiran -iru -> uji dengan bentuk sopan -> 走ります membuktikan godan",
+   "stem": "「まいあさ こうえんを 走る」の「走る」は ___ です。",
+   "stemKana": "「まいあさ こうえんを はしる」の「はしる」は ___ です。",
+   "furigana": [
+    [
+     "走",
+     "はし"
+    ]
+   ],
+   "options": [
+    "一段動詞（グループ2）",
+    "五段動詞（グループ1）",
+    "する動詞（グループ3）",
+    "くる動詞（グループ3）"
+   ],
+   "correctIndex": 1,
+   "distractors": [
+    {
+     "option": "一段動詞（グループ2）",
+     "misconception": "ichidan rule applied to an -iru verb that is a godan exception",
+     "misconceptionId": "aturan ichidan diterapkan pada kata kerja -iru yang sebenarnya pengecualian godan",
+     "whyFails": "If 走る were ichidan its polite form would be 走ます, which no speaker uses; it is 走ります.",
+     "whyFailsId": "Kalau 走る ichidan, bentuk sopannya 走ます, dan itu tidak dipakai siapa pun; yang benar 走ります."
+    },
+    {
+     "option": "する動詞（グループ3）",
+     "misconception": "irregular する label given to a verb that contains no する",
+     "misconceptionId": "label tak beraturan する diberikan pada kata kerja yang tidak mengandung する",
+     "whyFails": "Group 3 する needs する itself or a noun before it, such as 運動する.",
+     "whyFailsId": "Grup 3 する butuh する sendiri atau kata benda di depannya, seperti 運動する."
+    },
+    {
+     "option": "くる動詞（グループ3）",
+     "misconception": "irregular くる label given because the action involves movement",
+     "misconceptionId": "label tak beraturan くる diberikan karena perbuatannya melibatkan gerak",
+     "whyFails": "Only 来る is in that group. Verbs of motion are not automatically irregular.",
+     "whyFailsId": "Hanya 来る yang ada di golongan itu. Kata kerja gerak tidak otomatis tak beraturan."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "走る is one of the fixed godan exceptions, so it is Group 1 and becomes 走ります.",
+    "whyCorrectId": "走る salah satu pengecualian godan tetap, jadi ia Grup 1 dan menjadi 走ります.",
+    "rule": "Testing the polite form is the fastest way to reveal a verb's group.",
+    "ruleId": "Menguji bentuk sopan adalah cara tercepat menyingkap golongan kata kerja.",
+    "whyOthersFail": "Group 2 trusts the ending alone; the Group 3 options invent irregularity.",
+    "whyOthersFailId": "Grup 2 hanya percaya akhiran; pilihan Grup 3 mengada-adakan ketakberaturan.",
+    "howToAvoid": "When an -iru verb appears, say its ます form out loud before deciding.",
+    "howToAvoidId": "Saat bertemu kata kerja -iru, ucapkan bentuk ます-nya dulu sebelum memutuskan.",
+    "memoryCue": "Running takes an extra -ri: 走ります.",
+    "memoryCueId": "Berlari memerlukan -ri tambahan: 走ります."
+   }
+  },
+  {
+   "id": "JP-VG-105",
+   "family": "verb_groups",
+   "skill": "verb_groups",
+   "subskill": "masu_stem_kiru_cut_vs_wear",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "masu-stem-kiru-cut-godan",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Distinguish godan 切る from ichidan 着る when building the polite form",
+   "pedagogicalObjectiveId": "Membedakan 切る (godan) dari 着る (ichidan) saat membentuk bentuk sopan",
+   "misconceptionTargeted": "Learner treats the two verbs read きる as one word and gives them the same conjugation",
+   "misconceptionTargetedId": "Murid menganggap dua kata kerja berbunyi きる sebagai satu kata dan menyamakan konjugasinya",
+   "reasoningOperation": "identify the meaning cut -> choose 切る -> apply the godan -i- stem",
+   "reasoningOperationId": "kenali makna memotong -> pilih 切る -> terapkan batang -i- godan",
+   "stem": "母は まいばん やさいを ___。",
+   "stemKana": "ははは まいばん やさいを ___。",
+   "furigana": [
+    [
+     "母",
+     "はは"
+    ],
+    [
+     "切",
+     "き"
+    ]
+   ],
+   "options": [
+    "切ります",
+    "切ます",
+    "着ます",
+    "切るます"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "切ます",
+     "misconception": "ichidan -ru deletion applied to the godan verb 切る",
+     "misconceptionId": "penghapusan -ru cara ichidan diterapkan pada kata kerja godan 切る",
+     "whyFails": "切る is godan, so the stem is 切り-. 切ます exists in no register.",
+     "whyFailsId": "切る itu godan, jadi batangnya 切り-. 切ます tidak ada dalam ragam mana pun."
+    },
+    {
+     "option": "着ます",
+     "misconception": "homophone confusion: the ichidan verb 'wear' substituted for 'cut'",
+     "misconceptionId": "kekeliruan homofon: kata kerja ichidan 'memakai' menggantikan 'memotong'",
+     "whyFails": "着ます is the polite form of 着る, to wear. Vegetables are cut, not worn.",
+     "whyFailsId": "着ます adalah bentuk sopan 着る, memakai pakaian. Sayuran dipotong, bukan dipakai."
+    },
+    {
+     "option": "切るます",
+     "misconception": "ます attached directly to the dictionary form",
+     "misconceptionId": "ます ditempel langsung pada bentuk kamus",
+     "whyFails": "A stem must be formed first; the dictionary -る cannot stay in front of ます.",
+     "whyFailsId": "Batang harus dibentuk dulu; -る bentuk kamus tidak boleh bertahan di depan ます."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "切る means to cut and is a godan exception, so its polite form is 切ります.",
+    "whyCorrectId": "切る berarti memotong dan merupakan pengecualian godan, jadi bentuk sopannya 切ります.",
+    "rule": "Same sound, different group: 切る is godan (切ります), 着る is ichidan (着ます).",
+    "ruleId": "Bunyi sama, golongan beda: 切る godan (切ります), 着る ichidan (着ます).",
+    "whyOthersFail": "切ます uses the ichidan rule, 着ます swaps in the wrong verb, 切るます skips the stem.",
+    "whyOthersFailId": "切ます memakai aturan ichidan, 着ます menukar kata kerjanya, 切るます melewati batang.",
+    "howToAvoid": "Check the kanji and the meaning before conjugating a verb read きる.",
+    "howToAvoidId": "Periksa kanji dan maknanya sebelum mengonjugasikan kata kerja berbunyi きる.",
+    "memoryCue": "Cutting needs a knife and an -ri: 切ります.",
+    "memoryCueId": "Memotong butuh pisau dan -ri: 切ります."
+   }
+  },
+  {
+   "id": "JP-VG-106",
+   "family": "verb_groups",
+   "skill": "verb_groups",
+   "subskill": "masu_stem_of_godan_exception_shiru",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "masu-stem-shiru-godan-exception",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Build the polite negative of 知る with the godan -i- stem",
+   "pedagogicalObjectiveId": "Membentuk bentuk sopan negatif 知る dengan batang -i- godan",
+   "misconceptionTargeted": "Learner deletes -ru from 知る because it ends in -iru",
+   "misconceptionTargetedId": "Murid membuang -ru dari 知る karena berakhiran -iru",
+   "reasoningOperation": "recall 知る as a godan exception -> build 知り- -> attach ません",
+   "reasoningOperationId": "ingat 知る sebagai pengecualian godan -> bentuk 知り- -> tambahkan ません",
+   "stem": "すみません、その ひとの なまえは ___。",
+   "stemKana": "すみません、その ひとの なまえは ___。",
+   "furigana": [
+    [
+     "知",
+     "し"
+    ]
+   ],
+   "options": [
+    "知りません",
+    "知ません",
+    "知るません",
+    "知ないです"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "知ません",
+     "misconception": "ichidan -ru deletion applied to the godan exception 知る",
+     "misconceptionId": "penghapusan -ru cara ichidan diterapkan pada pengecualian godan 知る",
+     "whyFails": "知る conjugates like 帰る and 入る, so the stem keeps -り: 知りません.",
+     "whyFailsId": "知る berkonjugasi seperti 帰る dan 入る, jadi batangnya mempertahankan -り: 知りません."
+    },
+    {
+     "option": "知るません",
+     "misconception": "polite negative ending glued to the dictionary form",
+     "misconceptionId": "akhiran sopan negatif ditempel pada bentuk kamus",
+     "whyFails": "ません follows a stem, never a dictionary form ending in -る.",
+     "whyFailsId": "ません mengikuti batang, tidak pernah bentuk kamus yang berakhir -る."
+    },
+    {
+     "option": "知ないです",
+     "misconception": "plain negative built with an ichidan stem, then made polite with です",
+     "misconceptionId": "bentuk negatif biasa dibuat dengan batang ichidan, lalu disopankan dengan です",
+     "whyFails": "The plain negative of this godan verb is 知らない; 知ない comes from the ichidan rule.",
+     "whyFailsId": "Bentuk negatif biasa kata kerja godan ini adalah 知らない; 知ない lahir dari aturan ichidan."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "知る is godan, so the polite stem is 知り- and the negative is 知りません.",
+    "whyCorrectId": "知る itu godan, jadi batang sopannya 知り- dan negatifnya 知りません.",
+    "rule": "Polite negative of a godan verb = -i- stem + ません.",
+    "ruleId": "Negatif sopan kata kerja godan = batang -i- + ません.",
+    "whyOthersFail": "知ません and 知ないです both come from the ichidan rule; 知るません skips the stem entirely.",
+    "whyOthersFailId": "知ません dan 知ないです sama-sama lahir dari aturan ichidan; 知るません melewatkan batang sama sekali.",
+    "howToAvoid": "Group the five look-alike godan verbs and drill them together.",
+    "howToAvoidId": "Kelompokkan lima kata kerja godan penyamar itu dan latih bersamaan.",
+    "memoryCue": "Not knowing still needs its -ri: 知りません.",
+    "memoryCueId": "Tidak tahu pun tetap butuh -ri: 知りません."
+   }
+  },
+  {
+   "id": "JP-VG-107",
+   "family": "verb_groups",
+   "skill": "verb_groups",
+   "subskill": "masu_stem_of_regular_ichidan_taberu",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "masu-stem-taberu-ichidan",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Build the polite form of the genuine ichidan verb 食べる",
+   "pedagogicalObjectiveId": "Membentuk bentuk sopan kata kerja ichidan sejati 食べる",
+   "misconceptionTargeted": "Learner over-corrects after meeting the godan exceptions and inserts -ri everywhere",
+   "misconceptionTargetedId": "Murid terlalu mengoreksi setelah bertemu pengecualian godan lalu menyisipkan -ri di mana-mana",
+   "reasoningOperation": "confirm 食べる is a true ichidan verb -> drop -る -> add ます",
+   "reasoningOperationId": "pastikan 食べる kata kerja ichidan sejati -> buang -る -> tambahkan ます",
+   "stem": "わたしは あさ パンを ___。",
+   "stemKana": "わたしは あさ パンを ___。",
+   "furigana": [
+    [
+     "食",
+     "た"
+    ]
+   ],
+   "options": [
+    "食べます",
+    "食べります",
+    "食べるます",
+    "食びます"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "食べります",
+     "misconception": "godan -ri- stem forced onto a true ichidan verb",
+     "misconceptionId": "batang -ri- godan dipaksakan pada kata kerja ichidan sejati",
+     "whyFails": "Only godan verbs take -ri. 食べる is ichidan, so -る simply disappears.",
+     "whyFailsId": "Hanya kata kerja godan yang memakai -ri. 食べる ichidan, jadi -る tinggal dihapus."
+    },
+    {
+     "option": "食べるます",
+     "misconception": "ます attached to the dictionary form without removing -る",
+     "misconceptionId": "ます ditempel pada bentuk kamus tanpa membuang -る",
+     "whyFails": "The ichidan recipe requires -る to go before ます arrives.",
+     "whyFailsId": "Resep ichidan menuntut -る hilang sebelum ます datang."
+    },
+    {
+     "option": "食びます",
+     "misconception": "vowel of the stem changed as if the verb belonged to the -iru pattern",
+     "misconceptionId": "vokal batang diubah seolah kata kerjanya mengikuti pola -iru",
+     "whyFails": "The stem is 食べ, not 食び; ichidan verbs never change their stem vowel.",
+     "whyFailsId": "Batangnya 食べ, bukan 食び; kata kerja ichidan tidak pernah mengubah vokal batangnya."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "食べる is a true ichidan verb: remove -る and add ます to get 食べます.",
+    "whyCorrectId": "食べる kata kerja ichidan sejati: buang -る lalu tambahkan ます sehingga jadi 食べます.",
+    "rule": "Ichidan polite form = dictionary form minus -る, plus ます.",
+    "ruleId": "Bentuk sopan ichidan = bentuk kamus dikurangi -る, ditambah ます.",
+    "whyOthersFail": "食べります borrows the godan stem, 食べるます keeps -る, 食びます alters the stem vowel.",
+    "whyOthersFailId": "食べります meminjam batang godan, 食べるます mempertahankan -る, 食びます mengubah vokal batang.",
+    "howToAvoid": "Do not let the exception list make you suspicious of every -eru verb.",
+    "howToAvoidId": "Jangan biarkan daftar pengecualian membuatmu curiga pada setiap kata kerja -eru.",
+    "memoryCue": "食べる loses its tail cleanly: 食べます.",
+    "memoryCueId": "食べる kehilangan ekornya dengan rapi: 食べます."
+   }
+  },
+  {
+   "id": "JP-VG-108",
+   "family": "verb_groups",
+   "skill": "verb_groups",
+   "subskill": "masu_stem_of_regular_ichidan_miru",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "masu-stem-miru-ichidan",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Build the polite form of the short ichidan verb 見る",
+   "pedagogicalObjectiveId": "Membentuk bentuk sopan kata kerja ichidan pendek 見る",
+   "misconceptionTargeted": "Learner assumes every -iru verb is a godan exception after studying the trap list",
+   "misconceptionTargetedId": "Murid mengira setiap kata kerja -iru adalah pengecualian godan setelah menghafal daftar jebakan",
+   "reasoningOperation": "check 見る against the exception list -> not there -> apply the ichidan rule",
+   "reasoningOperationId": "cocokkan 見る dengan daftar pengecualian -> tidak ada -> terapkan aturan ichidan",
+   "stem": "まいばん テレビで ニュースを ___。",
+   "stemKana": "まいばん テレビで ニュースを ___。",
+   "furigana": [
+    [
+     "見",
+     "み"
+    ]
+   ],
+   "options": [
+    "見ます",
+    "見ります",
+    "見るます",
+    "見えます"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "見ります",
+     "misconception": "godan -ri- stem applied to an -iru verb that is not on the exception list",
+     "misconceptionId": "batang -ri- godan diterapkan pada kata kerja -iru yang tidak ada di daftar pengecualian",
+     "whyFails": "The exception list is closed: 帰る・入る・走る・切る・知る. 見る is not on it.",
+     "whyFailsId": "Daftar pengecualian itu tertutup: 帰る・入る・走る・切る・知る. 見る tidak termasuk."
+    },
+    {
+     "option": "見るます",
+     "misconception": "ます attached to the dictionary form without removing -る",
+     "misconceptionId": "ます ditempel pada bentuk kamus tanpa membuang -る",
+     "whyFails": "見る must lose -る before ます can attach.",
+     "whyFailsId": "見る harus kehilangan -る dulu sebelum ます bisa menempel."
+    },
+    {
+     "option": "見えます",
+     "misconception": "different verb chosen: the intransitive 'be visible' instead of 'watch'",
+     "misconceptionId": "kata kerja lain dipilih: 'terlihat' yang taktransitif menggantikan 'menonton'",
+     "whyFails": "見えます means something is visible by itself; here the person deliberately watches.",
+     "whyFailsId": "見えます berarti sesuatu terlihat dengan sendirinya; di sini orangnya sengaja menonton."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "見る is a plain ichidan verb, so its polite form is 見ます.",
+    "whyCorrectId": "見る kata kerja ichidan biasa, jadi bentuk sopannya 見ます.",
+    "rule": "Only five common -eru/-iru verbs are godan exceptions; everything else follows the shape rule.",
+    "ruleId": "Hanya lima kata kerja -eru/-iru umum yang jadi pengecualian godan; sisanya mengikuti aturan bentuk.",
+    "whyOthersFail": "見ります over-applies the exception, 見るます keeps -る, 見えます changes the verb's meaning.",
+    "whyOthersFailId": "見ります berlebihan menerapkan pengecualian, 見るます mempertahankan -る, 見えます mengubah makna.",
+    "howToAvoid": "Keep the exception list short and closed so it cannot spread.",
+    "howToAvoidId": "Jaga daftar pengecualian tetap pendek dan tertutup agar tidak menyebar.",
+    "memoryCue": "Five exceptions only; 見る is not one of them.",
+    "memoryCueId": "Pengecualiannya hanya lima; 見る bukan salah satunya."
+   }
+  },
+  {
+   "id": "JP-VG-109",
+   "family": "verb_groups",
+   "skill": "verb_groups",
+   "subskill": "masu_stem_of_plain_godan_nomu",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "masu-stem-nomu-godan-mu-ending",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Build the polite form of a godan verb ending in -mu",
+   "pedagogicalObjectiveId": "Membentuk bentuk sopan kata kerja godan berakhiran -mu",
+   "misconceptionTargeted": "Learner does not move the final -u sound to the -i row before adding ます",
+   "misconceptionTargetedId": "Murid tidak memindahkan bunyi -u terakhir ke baris -i sebelum menambahkan ます",
+   "reasoningOperation": "identify the final syllable む -> shift to み -> add ます",
+   "reasoningOperationId": "kenali suku kata akhir む -> geser ke み -> tambahkan ます",
+   "stem": "まいあさ ミルクを ___。",
+   "stemKana": "まいあさ ミルクを ___。",
+   "furigana": [
+    [
+     "飲",
+     "の"
+    ]
+   ],
+   "options": [
+    "飲みます",
+    "飲むます",
+    "飲ます",
+    "飲めます"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "飲むます",
+     "misconception": "ます glued to the dictionary form with no vowel shift",
+     "misconceptionId": "ます ditempel pada bentuk kamus tanpa pergeseran vokal",
+     "whyFails": "The final む must become み first; ます never follows a dictionary form.",
+     "whyFailsId": "む di akhir harus berubah jadi み dulu; ます tidak pernah mengikuti bentuk kamus."
+    },
+    {
+     "option": "飲ます",
+     "misconception": "final syllable deleted as if the verb were ichidan",
+     "misconceptionId": "suku kata terakhir dihapus seolah kata kerjanya ichidan",
+     "whyFails": "Deleting the ending is the ichidan recipe, and it is only for verbs ending in -る.",
+     "whyFailsId": "Menghapus akhiran adalah resep ichidan, dan itu hanya untuk kata kerja berakhiran -る."
+    },
+    {
+     "option": "飲めます",
+     "misconception": "potential form used where a plain polite statement is needed",
+     "misconceptionId": "bentuk potensial dipakai padahal yang dibutuhkan pernyataan sopan biasa",
+     "whyFails": "飲めます means 'can drink'; the sentence reports a daily habit, not an ability.",
+     "whyFailsId": "飲めます berarti 'bisa minum'; kalimat ini melaporkan kebiasaan harian, bukan kemampuan."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "飲む is godan, so む shifts to み and ます follows: 飲みます.",
+    "whyCorrectId": "飲む itu godan, jadi む bergeser ke み lalu ます mengikuti: 飲みます.",
+    "rule": "Godan verbs move their last syllable one row up, from the -u row to the -i row.",
+    "ruleId": "Kata kerja godan memindahkan suku kata terakhirnya satu baris, dari baris -u ke baris -i.",
+    "whyOthersFail": "飲むます skips the shift, 飲ます uses the ichidan rule, 飲めます adds an ability meaning.",
+    "whyOthersFailId": "飲むます melewati pergeseran, 飲ます memakai aturan ichidan, 飲めます menambah makna kemampuan.",
+    "howToAvoid": "Say the kana chart row aloud: む・み — the polite stem is the -i one.",
+    "howToAvoidId": "Ucapkan baris tabel kana: む・み — batang sopannya yang -i.",
+    "memoryCue": "む climbs to み before ます.",
+    "memoryCueId": "む naik ke み sebelum ます."
+   }
+  },
+  {
+   "id": "JP-VG-110",
+   "family": "verb_groups",
+   "skill": "verb_groups",
+   "subskill": "polite_form_of_irregular_suru",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "polite-form-suru-irregular",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Produce the polite form of the irregular verb する",
+   "pedagogicalObjectiveId": "Menghasilkan bentuk sopan kata kerja tak beraturan する",
+   "misconceptionTargeted": "Learner applies a regular stem rule to a verb whose stem changes vowel unpredictably",
+   "misconceptionTargetedId": "Murid menerapkan aturan batang beraturan pada kata kerja yang batangnya berubah vokal tanpa pola",
+   "reasoningOperation": "recognise する as Group 3 -> recall the memorised stem し -> add ます",
+   "reasoningOperationId": "kenali する sebagai Grup 3 -> ingat batang hafalan し -> tambahkan ます",
+   "stem": "にちようびに いつも せんたくを ___。",
+   "stemKana": "にちようびに いつも せんたくを ___。",
+   "furigana": [],
+   "options": [
+    "します",
+    "すります",
+    "するます",
+    "せます"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "すります",
+     "misconception": "godan -ri- stem applied to an irregular verb",
+     "misconceptionId": "batang -ri- godan diterapkan pada kata kerja tak beraturan",
+     "whyFails": "する is not godan; its stem is the memorised し, not すり.",
+     "whyFailsId": "する bukan godan; batangnya adalah し yang dihafal, bukan すり."
+    },
+    {
+     "option": "するます",
+     "misconception": "ます attached to the dictionary form of an irregular verb",
+     "misconceptionId": "ます ditempel pada bentuk kamus kata kerja tak beraturan",
+     "whyFails": "No verb keeps its full dictionary form in front of ます.",
+     "whyFailsId": "Tidak ada kata kerja yang mempertahankan bentuk kamus utuh di depan ます."
+    },
+    {
+     "option": "せます",
+     "misconception": "the -e- stem of する used instead of the ます-stem",
+     "misconceptionId": "batang -e- dari する dipakai menggantikan batang ます",
+     "whyFails": "せ appears in other constructions such as させる, but the polite stem is し.",
+     "whyFailsId": "せ muncul di bentuk lain seperti させる, tetapi batang sopannya adalah し."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "する is irregular and its ます-stem is simply し, giving します.",
+    "whyCorrectId": "する tak beraturan dan batang ます-nya cukup し, sehingga menjadi します.",
+    "rule": "Group 3 verbs are memorised, not derived: する becomes します.",
+    "ruleId": "Kata kerja Grup 3 dihafal, bukan diturunkan: する menjadi します.",
+    "whyOthersFail": "すります borrows a godan stem, するます keeps the dictionary form, せます picks the wrong stem vowel.",
+    "whyOthersFailId": "すります meminjam batang godan, するます mempertahankan bentuk kamus, せます memilih vokal batang yang salah.",
+    "howToAvoid": "Memorise the two Group 3 verbs on day one so they never need analysis.",
+    "howToAvoidId": "Hafalkan dua kata kerja Grup 3 sejak hari pertama agar tak perlu dianalisis.",
+    "memoryCue": "する has only one polite face: します.",
+    "memoryCueId": "する hanya punya satu wajah sopan: します."
+   }
+  },
+  {
+   "id": "JP-VG-111",
+   "family": "verb_groups",
+   "skill": "verb_groups",
+   "subskill": "polite_form_of_irregular_kuru",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "polite-form-kuru-irregular",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Produce the polite form of the irregular verb 来る, including its reading change",
+   "pedagogicalObjectiveId": "Menghasilkan bentuk sopan kata kerja tak beraturan 来る, termasuk perubahan bacaannya",
+   "misconceptionTargeted": "Learner keeps the reading く and treats 来る as a normal -uru verb",
+   "misconceptionTargetedId": "Murid mempertahankan bacaan く dan menganggap 来る kata kerja -uru biasa",
+   "reasoningOperation": "recognise 来る as Group 3 -> change the reading to き -> add ます",
+   "reasoningOperationId": "kenali 来る sebagai Grup 3 -> ubah bacaannya jadi き -> tambahkan ます",
+   "stem": "友だちが あした うちへ ___。",
+   "stemKana": "ともだちが あした うちへ ___。",
+   "furigana": [
+    [
+     "友",
+     "とも"
+    ],
+    [
+     "来",
+     "き"
+    ]
+   ],
+   "options": [
+    "来ます（きます）",
+    "来ます（くます）",
+    "来ります（きります）",
+    "来るます（くるます）"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "来ます（くます）",
+     "misconception": "stem vowel left unchanged in an irregular verb",
+     "misconceptionId": "vokal batang dibiarkan tetap pada kata kerja tak beraturan",
+     "whyFails": "来る changes its reading in the polite form: く becomes き, so it is きます.",
+     "whyFailsId": "来る mengubah bacaannya dalam bentuk sopan: く menjadi き, jadi bacaannya きます."
+    },
+    {
+     "option": "来ります（きります）",
+     "misconception": "godan -ri- stem added on top of the correct reading change",
+     "misconceptionId": "batang -ri- godan ditambahkan di atas perubahan bacaan yang sudah benar",
+     "whyFails": "The reading change is right but 来る is not godan, so no -ри-like -り appears.",
+     "whyFailsId": "Perubahan bacaannya benar tetapi 来る bukan godan, jadi tidak ada -り."
+    },
+    {
+     "option": "来るます（くるます）",
+     "misconception": "ます attached to the dictionary form of an irregular verb",
+     "misconceptionId": "ます ditempel pada bentuk kamus kata kerja tak beraturan",
+     "whyFails": "The dictionary form くる cannot stand in front of ます.",
+     "whyFailsId": "Bentuk kamus くる tidak bisa berdiri di depan ます."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "来る is irregular: the polite form is 来ます, read きます.",
+    "whyCorrectId": "来る tak beraturan: bentuk sopannya 来ます, dibaca きます.",
+    "rule": "Group 3 くる changes its vowel across forms: こない・きます・くる.",
+    "ruleId": "Grup 3 くる mengubah vokalnya di tiap bentuk: こない・きます・くる.",
+    "whyOthersFail": "くます keeps the wrong vowel, きります adds a godan stem, くるます keeps the dictionary form.",
+    "whyOthersFailId": "くます mempertahankan vokal yang salah, きります menambah batang godan, くるます mempertahankan bentuk kamus.",
+    "howToAvoid": "Learn 来る as a set of three sounds rather than as a rule.",
+    "howToAvoidId": "Pelajari 来る sebagai satu set tiga bunyi, bukan sebagai aturan.",
+    "memoryCue": "こ・き・く: the polite one is き.",
+    "memoryCueId": "こ・き・く: yang sopan adalah き."
+   }
+  },
+  {
+   "id": "JP-VG-112",
+   "family": "verb_groups",
+   "skill": "verb_groups",
+   "subskill": "masu_stem_of_plain_godan_kaku",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "masu-stem-kaku-godan-ku-ending",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Build the polite form of a godan verb ending in -ku",
+   "pedagogicalObjectiveId": "Membentuk bentuk sopan kata kerja godan berakhiran -ku",
+   "misconceptionTargeted": "Learner deletes the final syllable instead of shifting it to the -i row",
+   "misconceptionTargetedId": "Murid menghapus suku kata terakhir alih-alih menggesernya ke baris -i",
+   "reasoningOperation": "identify the final syllable く -> shift to き -> add ます",
+   "reasoningOperationId": "kenali suku kata akhir く -> geser ke き -> tambahkan ます",
+   "stem": "まいにち にっきを ___。",
+   "stemKana": "まいにち にっきを ___。",
+   "furigana": [
+    [
+     "書",
+     "か"
+    ]
+   ],
+   "options": [
+    "書きます",
+    "書ます",
+    "書くます",
+    "書けます"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "書ます",
+     "misconception": "final syllable deleted as if the verb ended in -る",
+     "misconceptionId": "suku kata terakhir dihapus seolah kata kerjanya berakhiran -る",
+     "whyFails": "Deletion only applies to ichidan verbs, and only to a final -る.",
+     "whyFailsId": "Penghapusan hanya berlaku untuk kata kerja ichidan, dan hanya pada -る di akhir."
+    },
+    {
+     "option": "書くます",
+     "misconception": "ます glued to the dictionary form with no vowel shift",
+     "misconceptionId": "ます ditempel pada bentuk kamus tanpa pergeseran vokal",
+     "whyFails": "く must first move to き; a dictionary form cannot carry ます.",
+     "whyFailsId": "く harus pindah ke き dulu; bentuk kamus tidak bisa membawa ます."
+    },
+    {
+     "option": "書けます",
+     "misconception": "potential form used where a simple habitual statement is needed",
+     "misconceptionId": "bentuk potensial dipakai padahal yang dibutuhkan pernyataan kebiasaan sederhana",
+     "whyFails": "書けます says 'can write'; the sentence describes what the person does every day.",
+     "whyFailsId": "書けます berarti 'bisa menulis'; kalimat ini menggambarkan yang dilakukan setiap hari."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "書く is godan, so く shifts to き before ます: 書きます.",
+    "whyCorrectId": "書く itu godan, jadi く bergeser ke き sebelum ます: 書きます.",
+    "rule": "Every godan verb ending in -ku takes a -ki- stem.",
+    "ruleId": "Setiap kata kerja godan berakhiran -ku memakai batang -ki-.",
+    "whyOthersFail": "書ます deletes wrongly, 書くます shifts nothing, 書けます adds ability.",
+    "whyOthersFailId": "書ます salah menghapus, 書くます tidak menggeser apa pun, 書けます menambah kemampuan.",
+    "howToAvoid": "Only verbs ending in -る can ever be ichidan; 書く never qualifies.",
+    "howToAvoidId": "Hanya kata kerja berakhiran -る yang bisa ichidan; 書く tidak pernah memenuhi syarat.",
+    "memoryCue": "く steps up to き for ます.",
+    "memoryCueId": "く naik ke き untuk ます."
+   }
+  },
+  {
+   "id": "JP-VG-113",
+   "family": "verb_groups",
+   "skill": "verb_groups",
+   "subskill": "masu_stem_of_regular_ichidan_okiru",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "masu-stem-okiru-ichidan",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Build the polite form of the ichidan verb 起きる",
+   "pedagogicalObjectiveId": "Membentuk bentuk sopan kata kerja ichidan 起きる",
+   "misconceptionTargeted": "Learner over-generalises the godan exception list to every -iru verb",
+   "misconceptionTargetedId": "Murid menggeneralisasi daftar pengecualian godan ke semua kata kerja -iru",
+   "reasoningOperation": "check 起きる against the exception list -> absent -> drop -る and add ます",
+   "reasoningOperationId": "cocokkan 起きる dengan daftar pengecualian -> tidak ada -> buang -る lalu tambahkan ます",
+   "stem": "わたしは まいあさ 六時に ___。",
+   "stemKana": "わたしは まいあさ ろくじに ___。",
+   "furigana": [
+    [
+     "六",
+     "ろく"
+    ],
+    [
+     "起",
+     "お"
+    ]
+   ],
+   "options": [
+    "起きます",
+    "起きります",
+    "起きるます",
+    "起こします"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "起きります",
+     "misconception": "godan -ri- stem applied to an -iru verb that is not an exception",
+     "misconceptionId": "batang -ri- godan diterapkan pada kata kerja -iru yang bukan pengecualian",
+     "whyFails": "起きる is a plain ichidan verb; only 走る and 知る among -iru verbs are godan here.",
+     "whyFailsId": "起きる kata kerja ichidan biasa; di antara kata kerja -iru hanya 走る dan 知る yang godan di sini."
+    },
+    {
+     "option": "起きるます",
+     "misconception": "ます attached without removing -る",
+     "misconceptionId": "ます ditempel tanpa membuang -る",
+     "whyFails": "The ichidan recipe removes -る before ます attaches.",
+     "whyFailsId": "Resep ichidan membuang -る sebelum ます menempel."
+    },
+    {
+     "option": "起こします",
+     "misconception": "transitive partner verb used instead of the intransitive one",
+     "misconceptionId": "kata kerja pasangan transitif dipakai menggantikan yang taktransitif",
+     "whyFails": "起こします means waking someone else up; here the speaker gets up alone.",
+     "whyFailsId": "起こします berarti membangunkan orang lain; di sini pembicara bangun sendiri."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "起きる is a genuine ichidan verb, so removing -る gives 起きます.",
+    "whyCorrectId": "起きる kata kerja ichidan sejati, jadi membuang -る menghasilkan 起きます.",
+    "rule": "The godan exception list has exactly five common members; check membership, do not guess.",
+    "ruleId": "Daftar pengecualian godan punya tepat lima anggota umum; periksa keanggotaannya, jangan menebak.",
+    "whyOthersFail": "起きります over-applies the exception, 起きるます keeps -る, 起こします changes the verb.",
+    "whyOthersFailId": "起きります berlebihan menerapkan pengecualian, 起きるます mempertahankan -る, 起こします mengganti kata kerjanya.",
+    "howToAvoid": "Recite the five exceptions; if the verb is not among them, trust the shape rule.",
+    "howToAvoidId": "Lafalkan lima pengecualian itu; kalau kata kerjanya tidak ada, percayai aturan bentuk.",
+    "memoryCue": "起きる wakes up without -ri: 起きます.",
+    "memoryCueId": "起きる bangun tanpa -ri: 起きます."
+   }
+  },
+  {
+   "id": "JP-VG-114",
+   "family": "verb_groups",
+   "skill": "verb_groups",
+   "subskill": "identify_group_of_trap_verb_hairu",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "group-id-hairu-godan-trap",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Classify 入る as godan on the evidence of its polite form",
+   "pedagogicalObjectiveId": "Menggolongkan 入る sebagai godan berdasarkan bukti bentuk sopannya",
+   "misconceptionTargeted": "Learner classifies by ending shape alone and calls 入る ichidan",
+   "misconceptionTargetedId": "Murid menggolongkan hanya dari bentuk akhiran lalu menyebut 入る ichidan",
+   "reasoningOperation": "read the given polite form 入ります -> an -ri- stem means godan",
+   "reasoningOperationId": "baca bentuk sopan yang diberikan 入ります -> batang -ri- berarti godan",
+   "stem": "「まいあさ 八時に 会社に 入ります」から わかるとおり、「入る」は ___ です。",
+   "stemKana": "「まいあさ はちじに かいしゃに はいります」から わかるとおり、「はいる」は ___ です。",
+   "furigana": [
+    [
+     "八",
+     "はち"
+    ],
+    [
+     "会社",
+     "かいしゃ"
+    ],
+    [
+     "入",
+     "はい"
+    ]
+   ],
+   "options": [
+    "一段動詞（グループ2）",
+    "くる動詞（グループ3）",
+    "五段動詞（グループ1）",
+    "する動詞（グループ3）"
+   ],
+   "correctIndex": 2,
+   "distractors": [
+    {
+     "option": "一段動詞（グループ2）",
+     "misconception": "ending shape trusted over the evidence of the polite form",
+     "misconceptionId": "bentuk akhiran lebih dipercaya daripada bukti bentuk sopan",
+     "whyFails": "An ichidan verb would give 入ます. The sentence shows 入ります, which only godan verbs produce.",
+     "whyFailsId": "Kata kerja ichidan akan menghasilkan 入ます. Kalimatnya menunjukkan 入ります, yang hanya dihasilkan godan."
+    },
+    {
+     "option": "くる動詞（グループ3）",
+     "misconception": "irregular くる label given because the meaning is about entering",
+     "misconceptionId": "label tak beraturan くる diberikan karena maknanya soal masuk",
+     "whyFails": "Group 3 くる contains only 来る; 入る is a separate, regular godan verb.",
+     "whyFailsId": "Grup 3 くる hanya berisi 来る; 入る kata kerja godan tersendiri yang beraturan."
+    },
+    {
+     "option": "する動詞（グループ3）",
+     "misconception": "irregular する label applied to a verb used with a workplace noun",
+     "misconceptionId": "label tak beraturan する diterapkan pada kata kerja yang dipakai dengan kata benda tempat kerja",
+     "whyFails": "会社 is just the destination here; there is no noun+する compound in the sentence.",
+     "whyFailsId": "会社 di sini sekadar tujuan; tidak ada gabungan kata benda+する dalam kalimat itu."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "The form 入ります carries an -ri- stem, and only godan verbs build stems that way.",
+    "whyCorrectId": "Bentuk 入ります memuat batang -ri-, dan hanya kata kerja godan yang membentuk batang seperti itu.",
+    "rule": "The polite form is proof of group: -ri- stem = godan, bare stem + ます = ichidan.",
+    "ruleId": "Bentuk sopan adalah bukti golongan: batang -ri- = godan, batang telanjang + ます = ichidan.",
+    "whyOthersFail": "Group 2 ignores the given evidence; both Group 3 answers invent irregularity from meaning.",
+    "whyOthersFailId": "Grup 2 mengabaikan bukti yang diberikan; kedua jawaban Grup 3 mengarang ketakberaturan dari makna.",
+    "howToAvoid": "When a polite form is visible, classify from it instead of from the ending.",
+    "howToAvoidId": "Kalau bentuk sopannya terlihat, golongkan dari situ, bukan dari akhirannya.",
+    "memoryCue": "-ります in sight means Group 1.",
+    "memoryCueId": "Terlihat -ります berarti Grup 1."
+   }
+  },
+  {
+   "id": "JP-VG-115",
+   "family": "verb_groups",
+   "skill": "verb_groups",
+   "subskill": "polite_form_of_noun_plus_suru_compound",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "polite-form-noun-plus-suru-compound",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Recognise a noun+する compound as Group 3 and make it polite",
+   "pedagogicalObjectiveId": "Mengenali gabungan kata benda+する sebagai Grup 3 dan menyopankannya",
+   "misconceptionTargeted": "Learner conjugates the noun part or treats the compound as a regular verb",
+   "misconceptionTargetedId": "Murid mengonjugasikan bagian kata bendanya atau menganggap gabungannya kata kerja beraturan",
+   "reasoningOperation": "split the compound into noun + する -> conjugate only する -> します",
+   "reasoningOperationId": "pisahkan gabungan jadi kata benda + する -> konjugasikan hanya する -> します",
+   "stem": "まいばん としょかんで 日本語を ___。",
+   "stemKana": "まいばん としょかんで にほんごを ___。",
+   "furigana": [
+    [
+     "日本語",
+     "にほんご"
+    ],
+    [
+     "勉強",
+     "べんきょう"
+    ]
+   ],
+   "options": [
+    "勉強します",
+    "勉強すります",
+    "勉強するます",
+    "勉強きます"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "勉強すります",
+     "misconception": "godan -ri- stem applied to the irregular する",
+     "misconceptionId": "batang -ri- godan diterapkan pada する yang tak beraturan",
+     "whyFails": "する is Group 3, so it becomes し, never すり, whatever noun precedes it.",
+     "whyFailsId": "する itu Grup 3, jadi berubah menjadi し, tidak pernah すり, apa pun kata benda di depannya."
+    },
+    {
+     "option": "勉強するます",
+     "misconception": "ます attached to the compound's dictionary form",
+     "misconceptionId": "ます ditempel pada bentuk kamus gabungan itu",
+     "whyFails": "The する part must become し before ます can follow.",
+     "whyFailsId": "Bagian する harus menjadi し sebelum ます bisa mengikuti."
+    },
+    {
+     "option": "勉強きます",
+     "misconception": "the stem of 来る used instead of the stem of する",
+     "misconceptionId": "batang 来る dipakai menggantikan batang する",
+     "whyFails": "き is the polite stem of 来る. The compound here is built on する, so the stem is し.",
+     "whyFailsId": "き adalah batang sopan 来る. Gabungan ini dibangun di atas する, jadi batangnya し."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "勉強する is a noun+する compound, so only する changes: 勉強します.",
+    "whyCorrectId": "勉強する adalah gabungan kata benda+する, jadi hanya する yang berubah: 勉強します.",
+    "rule": "In a noun+する compound the noun never conjugates; the irregular する carries all the change.",
+    "ruleId": "Dalam gabungan kata benda+する, kata bendanya tak pernah berkonjugasi; する yang tak beraturan menanggung semua perubahan.",
+    "whyOthersFail": "勉強すります invents a godan stem, 勉強するます keeps the dictionary form, 勉強きます borrows 来る's stem.",
+    "whyOthersFailId": "勉強すります mengarang batang godan, 勉強するます mempertahankan bentuk kamus, 勉強きます meminjam batang 来る.",
+    "howToAvoid": "Cover the noun with your finger and conjugate only what is left.",
+    "howToAvoidId": "Tutup kata bendanya dengan jari lalu konjugasikan yang tersisa saja.",
+    "memoryCue": "Noun + します, always.",
+    "memoryCueId": "Kata benda + します, selalu."
+   }
+  },
+  {
+   "id": "JP-VG-116",
+   "family": "verb_groups",
+   "skill": "verb_groups",
+   "subskill": "masu_stem_of_regular_ichidan_miseru",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "masu-stem-miseru-ichidan",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Build the polite form of the ichidan verb 見せる",
+   "pedagogicalObjectiveId": "Membentuk bentuk sopan kata kerja ichidan 見せる",
+   "misconceptionTargeted": "Learner treats an -eru verb as a godan exception by analogy with 帰る",
+   "misconceptionTargetedId": "Murid memperlakukan kata kerja -eru sebagai pengecualian godan dengan menganalogikan 帰る",
+   "reasoningOperation": "compare 見せる with the closed exception list -> absent -> drop -る and add ます",
+   "reasoningOperationId": "bandingkan 見せる dengan daftar pengecualian tertutup -> tidak ada -> buang -る lalu tambahkan ます",
+   "stem": "くうこうで パスポートを ___。",
+   "stemKana": "くうこうで パスポートを ___。",
+   "furigana": [
+    [
+     "見",
+     "み"
+    ]
+   ],
+   "options": [
+    "見せます",
+    "見せります",
+    "見せるます",
+    "見ます"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "見せります",
+     "misconception": "godan -ri- stem applied by analogy with the exception 帰る",
+     "misconceptionId": "batang -ri- godan diterapkan dengan menganalogikan pengecualian 帰る",
+     "whyFails": "帰る is on the exception list; 見せる is not, so it follows the ordinary ichidan rule.",
+     "whyFailsId": "帰る ada di daftar pengecualian; 見せる tidak, jadi ia mengikuti aturan ichidan biasa."
+    },
+    {
+     "option": "見せるます",
+     "misconception": "ます attached without removing -る",
+     "misconceptionId": "ます ditempel tanpa membuang -る",
+     "whyFails": "The dictionary -る has to go before ます can attach.",
+     "whyFailsId": "-る bentuk kamus harus hilang dulu sebelum ます bisa menempel."
+    },
+    {
+     "option": "見ます",
+     "misconception": "related shorter verb substituted for the one the sentence needs",
+     "misconceptionId": "kata kerja pendek yang serumpun menggantikan yang dibutuhkan kalimat",
+     "whyFails": "見ます means the speaker looks at the passport; the sentence is about showing it to someone.",
+     "whyFailsId": "見ます berarti pembicara melihat paspornya; kalimat ini tentang menunjukkannya kepada orang lain."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "見せる is an ordinary ichidan verb, so -る drops and ます attaches: 見せます.",
+    "whyCorrectId": "見せる kata kerja ichidan biasa, jadi -る lepas dan ます menempel: 見せます.",
+    "rule": "The exception list does not grow by analogy; membership is fixed.",
+    "ruleId": "Daftar pengecualian tidak bertambah lewat analogi; keanggotaannya tetap.",
+    "whyOthersFail": "見せります copies 帰る wrongly, 見せるます keeps -る, 見ます swaps in a different verb.",
+    "whyOthersFailId": "見せります meniru 帰る secara keliru, 見せるます mempertahankan -る, 見ます menukar kata kerjanya.",
+    "howToAvoid": "Ask 'is this verb on the list?' before treating it as an exception.",
+    "howToAvoidId": "Tanyakan 'apakah kata kerja ini ada di daftar?' sebelum memperlakukannya sebagai pengecualian.",
+    "memoryCue": "Not on the list, so no -ri: 見せます.",
+    "memoryCueId": "Tidak ada di daftar, jadi tanpa -ri: 見せます."
+   }
+  },
+  {
+   "id": "JP-VG-117",
+   "family": "verb_groups",
+   "skill": "verb_groups",
+   "subskill": "masu_stem_of_plain_godan_matsu",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "masu-stem-matsu-godan-tsu-ending",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Build the polite form of a godan verb ending in -tsu",
+   "pedagogicalObjectiveId": "Membentuk bentuk sopan kata kerja godan berakhiran -tsu",
+   "misconceptionTargeted": "Learner does not know that つ shifts to ち, and keeps or deletes the syllable instead",
+   "misconceptionTargetedId": "Murid tidak tahu bahwa つ bergeser ke ち, lalu mempertahankan atau menghapusnya",
+   "reasoningOperation": "identify the final syllable つ -> shift to ち in the same column -> add ます",
+   "reasoningOperationId": "kenali suku kata akhir つ -> geser ke ち di kolom yang sama -> tambahkan ます",
+   "stem": "えきの まえで 友だちを ___。",
+   "stemKana": "えきの まえで ともだちを ___。",
+   "furigana": [
+    [
+     "友",
+     "とも"
+    ],
+    [
+     "待",
+     "ま"
+    ]
+   ],
+   "options": [
+    "待ちます",
+    "待つます",
+    "待ます",
+    "待ります"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "待つます",
+     "misconception": "ます glued to the dictionary form with no vowel shift",
+     "misconceptionId": "ます ditempel pada bentuk kamus tanpa pergeseran vokal",
+     "whyFails": "つ has to become ち first; ます cannot follow a dictionary form.",
+     "whyFailsId": "つ harus menjadi ち dulu; ます tidak bisa mengikuti bentuk kamus."
+    },
+    {
+     "option": "待ます",
+     "misconception": "final syllable deleted as if the verb were ichidan",
+     "misconceptionId": "suku kata terakhir dihapus seolah kata kerjanya ichidan",
+     "whyFails": "Deletion belongs to ichidan verbs, which all end in -る. 待つ does not.",
+     "whyFailsId": "Penghapusan milik kata kerja ichidan, yang semuanya berakhiran -る. 待つ tidak."
+    },
+    {
+     "option": "待ります",
+     "misconception": "the -ri- stem of -ru godan verbs applied to a -tsu verb",
+     "misconceptionId": "batang -ri- milik kata kerja godan -ru diterapkan pada kata kerja -tsu",
+     "whyFails": "-ri- belongs to godan verbs ending in -る, such as 帰る. 待つ ends in つ, so the stem is ち.",
+     "whyFailsId": "-ri- milik kata kerja godan berakhiran -る, seperti 帰る. 待つ berakhiran つ, jadi batangnya ち."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "待つ is godan and つ sits in the T column, so the -i- form is ち: 待ちます.",
+    "whyCorrectId": "待つ itu godan dan つ ada di kolom T, jadi bentuk -i-nya adalah ち: 待ちます.",
+    "rule": "Each godan verb shifts within its own consonant column: つ→ち, む→み, く→き, る→り.",
+    "ruleId": "Tiap kata kerja godan bergeser dalam kolom konsonannya sendiri: つ→ち, む→み, く→き, る→り.",
+    "whyOthersFail": "待つます shifts nothing, 待ます deletes, 待ります borrows the column of -る verbs.",
+    "whyOthersFailId": "待つます tidak menggeser apa pun, 待ます menghapus, 待ります meminjam kolom kata kerja -る.",
+    "howToAvoid": "Find the verb's column on the kana chart, then step to the -i row.",
+    "howToAvoidId": "Temukan kolom kata kerjanya di tabel kana, lalu melangkah ke baris -i.",
+    "memoryCue": "つ and ち share a column: 待ちます.",
+    "memoryCueId": "つ dan ち sekolom: 待ちます."
+   }
+  },
+  {
+   "id": "JP-VG-118",
+   "family": "verb_groups",
+   "skill": "verb_groups",
+   "subskill": "sort_look_alike_verbs_by_group",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "odd-one-out-godan-among-eru-verbs",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Pick the godan exception out of a set of look-alike -eru/-iru verbs",
+   "pedagogicalObjectiveId": "Memilih pengecualian godan dari sekumpulan kata kerja -eru/-iru yang mirip",
+   "misconceptionTargeted": "Learner cannot separate list membership from surface shape when several verbs look identical",
+   "misconceptionTargetedId": "Murid tak bisa memisahkan keanggotaan daftar dari bentuk permukaan saat beberapa kata kerja tampak serupa",
+   "reasoningOperation": "scan four -eru/-iru verbs -> match each against the exception list -> name the one that is godan",
+   "reasoningOperationId": "pindai empat kata kerja -eru/-iru -> cocokkan dengan daftar pengecualian -> sebut yang godan",
+   "stem": "つぎの 中で 五段動詞は ___ です。",
+   "stemKana": "つぎの なかで ごだんどうしは ___ です。",
+   "furigana": [
+    [
+     "中",
+     "なか"
+    ],
+    [
+     "五段動詞",
+     "ごだんどうし"
+    ]
+   ],
+   "options": [
+    "食べる",
+    "教える",
+    "切る",
+    "開ける"
+   ],
+   "correctIndex": 2,
+   "distractors": [
+    {
+     "option": "食べる",
+     "misconception": "an ordinary ichidan verb mistaken for an exception",
+     "misconceptionId": "kata kerja ichidan biasa dikira pengecualian",
+     "whyFails": "食べる is ichidan: its polite form is 食べます, with no -ri-.",
+     "whyFailsId": "食べる itu ichidan: bentuk sopannya 食べます, tanpa -ri-."
+    },
+    {
+     "option": "教える",
+     "misconception": "an ordinary -eru ichidan verb mistaken for an exception",
+     "misconceptionId": "kata kerja ichidan -eru biasa dikira pengecualian",
+     "whyFails": "教える gives 教えます, so it deletes -る like every regular ichidan verb.",
+     "whyFailsId": "教える menjadi 教えます, jadi ia membuang -る seperti kata kerja ichidan beraturan lain."
+    },
+    {
+     "option": "開ける",
+     "misconception": "an ordinary -eru ichidan verb mistaken for an exception",
+     "misconceptionId": "kata kerja ichidan -eru biasa dikira pengecualian",
+     "whyFails": "開ける gives 開けます; it is not on the closed list of godan exceptions.",
+     "whyFailsId": "開ける menjadi 開けます; ia tidak ada di daftar tertutup pengecualian godan."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "切る is one of the five godan exceptions, so it alone gives an -ri- stem: 切ります.",
+    "whyCorrectId": "切る salah satu dari lima pengecualian godan, jadi hanya ia yang memberi batang -ri-: 切ります.",
+    "rule": "Shape cannot separate these verbs; only the memorised exception list can.",
+    "ruleId": "Bentuk tidak bisa memisahkan kata kerja ini; hanya daftar pengecualian hafalan yang bisa.",
+    "whyOthersFail": "食べる, 教える and 開ける are all regular ichidan verbs that simply drop -る.",
+    "whyOthersFailId": "食べる, 教える dan 開ける semuanya kata kerja ichidan beraturan yang tinggal membuang -る.",
+    "howToAvoid": "Keep the five exceptions on a card and test any -eru/-iru verb against it.",
+    "howToAvoidId": "Simpan lima pengecualian itu di kartu dan uji setiap kata kerja -eru/-iru terhadapnya.",
+    "memoryCue": "帰・入・走・切・知 — five traps, no more.",
+    "memoryCueId": "帰・入・走・切・知 — lima jebakan, tak lebih."
+   }
+  },
+  {
+   "id": "JP-VG-119",
+   "family": "verb_groups",
+   "skill": "verb_groups",
+   "subskill": "identify_group_of_trap_verb_shiru",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "group-id-shiru-godan-trap",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Classify 知る as godan despite its -iru ending",
+   "pedagogicalObjectiveId": "Menggolongkan 知る sebagai godan meski berakhiran -iru",
+   "misconceptionTargeted": "Learner assigns 知る to the ichidan group on the strength of its ending",
+   "misconceptionTargetedId": "Murid memasukkan 知る ke golongan ichidan hanya berdasarkan akhirannya",
+   "reasoningOperation": "read the -iru ending -> recall the exception list -> assign godan",
+   "reasoningOperationId": "baca akhiran -iru -> ingat daftar pengecualian -> tetapkan godan",
+   "stem": "「わたしは その みせを 知る」の「知る」は ___ です。",
+   "stemKana": "「わたしは その みせを しる」の「しる」は ___ です。",
+   "furigana": [
+    [
+     "知",
+     "し"
+    ]
+   ],
+   "options": [
+    "する動詞（グループ3）",
+    "一段動詞（グループ2）",
+    "五段動詞（グループ1）",
+    "くる動詞（グループ3）"
+   ],
+   "correctIndex": 2,
+   "distractors": [
+    {
+     "option": "する動詞（グループ3）",
+     "misconception": "irregular する label applied to a two-syllable verb",
+     "misconceptionId": "label tak beraturan する diterapkan pada kata kerja dua suku kata",
+     "whyFails": "Group 3 する needs the syllable する in the verb; 知る has none.",
+     "whyFailsId": "Grup 3 する butuh suku kata する dalam kata kerjanya; 知る tidak punya."
+    },
+    {
+     "option": "一段動詞（グループ2）",
+     "misconception": "ichidan rule applied to an -iru verb on the exception list",
+     "misconceptionId": "aturan ichidan diterapkan pada kata kerja -iru yang ada di daftar pengecualian",
+     "whyFails": "知る behaves like 走る and 切る: the polite form is 知ります, so it is godan.",
+     "whyFailsId": "知る berperilaku seperti 走る dan 切る: bentuk sopannya 知ります, jadi ia godan."
+    },
+    {
+     "option": "くる動詞（グループ3）",
+     "misconception": "irregular くる label given to an unrelated short verb",
+     "misconceptionId": "label tak beraturan くる diberikan pada kata kerja pendek yang tak berkaitan",
+     "whyFails": "Only 来る belongs there; being short does not make a verb irregular.",
+     "whyFailsId": "Hanya 来る yang termasuk di sana; pendek tidak membuat kata kerja jadi tak beraturan."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "知る is a godan exception, so it is Group 1 and its polite form is 知ります.",
+    "whyCorrectId": "知る pengecualian godan, jadi ia Grup 1 dan bentuk sopannya 知りません/知ります.",
+    "rule": "Five -eru/-iru verbs are godan; 知る is one of them.",
+    "ruleId": "Lima kata kerja -eru/-iru bersifat godan; 知る salah satunya.",
+    "whyOthersFail": "Group 2 trusts the ending; the Group 3 answers apply irregular labels with no basis.",
+    "whyOthersFailId": "Grup 2 percaya akhiran; jawaban Grup 3 menempelkan label tak beraturan tanpa dasar.",
+    "howToAvoid": "Say 知ります once; the -ri- announces Group 1.",
+    "howToAvoidId": "Ucapkan 知ります sekali; -ri- itu mengumumkan Grup 1.",
+    "memoryCue": "知る knows it is godan.",
+    "memoryCueId": "知る tahu dirinya godan."
+   }
+  },
+  {
+   "id": "JP-VG-120",
+   "family": "verb_groups",
+   "skill": "verb_groups",
+   "subskill": "masu_stem_of_plain_godan_kau",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "masu-stem-kau-godan-u-ending",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Build the polite form of a godan verb ending in a bare -u",
+   "pedagogicalObjectiveId": "Membentuk bentuk sopan kata kerja godan berakhiran -u telanjang",
+   "misconceptionTargeted": "Learner writes an う-row stem instead of shifting to い",
+   "misconceptionTargetedId": "Murid menulis batang baris う alih-alih bergeser ke い",
+   "reasoningOperation": "identify the final syllable う -> shift to い -> add ます",
+   "reasoningOperationId": "kenali suku kata akhir う -> geser ke い -> tambahkan ます",
+   "stem": "スーパーで たまごを ___。",
+   "stemKana": "スーパーで たまごを ___。",
+   "furigana": [
+    [
+     "買",
+     "か"
+    ]
+   ],
+   "options": [
+    "買います",
+    "買うます",
+    "買ります",
+    "買ます"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "買うます",
+     "misconception": "ます glued to the dictionary form with no vowel shift",
+     "misconceptionId": "ます ditempel pada bentuk kamus tanpa pergeseran vokal",
+     "whyFails": "う must become い before ます; a dictionary form cannot host ます.",
+     "whyFailsId": "う harus menjadi い sebelum ます; bentuk kamus tidak bisa menampung ます."
+    },
+    {
+     "option": "買ります",
+     "misconception": "the -ri- stem of -ru godan verbs applied to a -u verb",
+     "misconceptionId": "batang -ri- kata kerja godan -ru diterapkan pada kata kerja -u",
+     "whyFails": "-ri- belongs to verbs ending in -る. 買う ends in う, so the stem is 買い.",
+     "whyFailsId": "-ri- milik kata kerja berakhiran -る. 買う berakhiran う, jadi batangnya 買い."
+    },
+    {
+     "option": "買ます",
+     "misconception": "final syllable deleted as if the verb were ichidan",
+     "misconceptionId": "suku kata terakhir dihapus seolah kata kerjanya ichidan",
+     "whyFails": "Only ichidan verbs delete their ending, and only when that ending is -る.",
+     "whyFailsId": "Hanya kata kerja ichidan yang menghapus akhirannya, dan hanya bila akhirannya -る."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "買う is godan, and a final う shifts to い before ます: 買います.",
+    "whyCorrectId": "買う itu godan, dan う di akhir bergeser ke い sebelum ます: 買います.",
+    "rule": "Verbs ending in a bare -u take an -i- stem, never a -ri- stem.",
+    "ruleId": "Kata kerja berakhiran -u telanjang memakai batang -i-, bukan batang -ri-.",
+    "whyOthersFail": "買うます shifts nothing, 買ります borrows the -る column, 買ます deletes like an ichidan verb.",
+    "whyOthersFailId": "買うます tidak menggeser apa pun, 買ります meminjam kolom -る, 買ます menghapus seperti kata kerja ichidan.",
+    "howToAvoid": "Look at the last kana, not at the last consonant you imagine.",
+    "howToAvoidId": "Lihat kana terakhirnya, bukan konsonan yang kamu bayangkan.",
+    "memoryCue": "う slides to い: 買います.",
+    "memoryCueId": "う meluncur ke い: 買います."
+   }
+  }
+ ]
+}

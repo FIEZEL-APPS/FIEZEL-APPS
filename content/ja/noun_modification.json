@@ -1,0 +1,1014 @@
+{
+ "schema": "fiezel-japanese-bank-v1",
+ "target": "ja",
+ "cefr": "A1",
+ "jlpt": "N5",
+ "family": "noun_modification",
+ "catatan": "Bank soal A1/N5 keluarga noun_modification. Dijaga tests/japanese-content-test.js.",
+ "provenans": {
+  "sumberSilabus": "Minna no Nihongo dan Irodori dipakai SEBAGAI SILABUS SAJA: poin tata bahasa apa, urutannya bagaimana, di tingkat berapa. NOL kalimat, dialog, teks, atau daftar kosakata yang direproduksi atau diturunkan — setiap stem, pilihan, pengecoh, dan penjelasan ditulis baru.",
+  "akibatLisensi": "Karena tidak ada teks Irodori yang dipakai, FIEZEL TIDAK terikat kewajiban gratis-selamanya dari lisensinya.",
+  "statusNaskah": "Kalimat Jepang dan penjelasan Inggris/Indonesia berstatus DRAFT AI dan wajib direview penutur asli sebelum dipakai menilai murid."
+ },
+ "jumlah": 16,
+ "templates": [
+  {
+   "id": "JP-NM-101",
+   "family": "noun_modification",
+   "skill": "noun_modification",
+   "subskill": "no_marks_possession",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "no-possession-basic",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Use NO to link an owner noun to the thing owned",
+   "pedagogicalObjectiveId": "Gunakan の untuk menghubungkan kata benda pemilik dengan benda yang dimiliki",
+   "misconceptionTargeted": "Learner reaches for a case particle such as WA or GA where a noun-to-noun link is needed",
+   "misconceptionTargetedId": "Murid memakai partikel kasus seperti は atau が padahal yang dibutuhkan adalah penghubung antar kata benda",
+   "reasoningOperation": "see two nouns in one phrase -> ask whose -> insert NO between them",
+   "reasoningOperationId": "lihat dua kata benda dalam satu frasa -> tanya milik siapa -> sisipkan の di antaranya",
+   "stem": "これは わたし___ かさです。",
+   "stemKana": "これは わたし___ かさです。",
+   "furigana": [],
+   "options": [
+    "の",
+    "は",
+    "が",
+    "を"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "は",
+     "misconception": "topic marker used inside a single noun phrase",
+     "misconceptionId": "penanda topik dipakai di dalam satu frasa benda",
+     "whyFails": "WA would start a new topic, so the sentence would read 'as for me, it is an umbrella', not 'my umbrella'.",
+     "whyFailsId": "は akan memulai topik baru, sehingga kalimatnya berarti 'kalau saya, itu payung', bukan 'payung saya'."
+    },
+    {
+     "option": "が",
+     "misconception": "subject marker used to join two nouns",
+     "misconceptionId": "penanda subjek dipakai untuk menyambung dua kata benda",
+     "whyFails": "GA marks a subject of a verb or adjective. Here there is no verb for 'I' to be the subject of.",
+     "whyFailsId": "が menandai subjek dari kata kerja atau kata sifat. Di sini tidak ada kata kerja yang subjeknya 'saya'."
+    },
+    {
+     "option": "を",
+     "misconception": "object marker used for ownership",
+     "misconceptionId": "penanda objek dipakai untuk kepemilikan",
+     "whyFails": "O marks the thing an action is done to; nothing is being done to the umbrella here.",
+     "whyFailsId": "を menandai benda yang dikenai tindakan; di sini tidak ada tindakan atas payung itu."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "NO glues an owner to the thing owned: watashi + NO + kasa = my umbrella.",
+    "whyCorrectId": "の merekatkan pemilik dengan benda miliknya: わたし + の + かさ = payung saya.",
+    "rule": "Noun A NO Noun B = B belonging to A.",
+    "ruleId": "Kata benda A の kata benda B = B milik A.",
+    "whyOthersFail": "WA, GA and O all attach nouns to a predicate, not to another noun.",
+    "whyOthersFailId": "は, が, dan を semuanya menghubungkan kata benda ke predikat, bukan ke kata benda lain.",
+    "howToAvoid": "If both sides of the gap are nouns and the meaning is 'whose', the answer is NO.",
+    "howToAvoidId": "Kalau kedua sisi rumpang berupa kata benda dan maknanya 'milik siapa', jawabannya の.",
+    "memoryCue": "Noun touching noun, NO in between.",
+    "memoryCueId": "Benda ketemu benda, の di tengahnya."
+   }
+  },
+  {
+   "id": "JP-NM-102",
+   "family": "noun_modification",
+   "skill": "noun_modification",
+   "subskill": "no_phrase_word_order_owner_first",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "order-owner-before-thing",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Order a NO phrase as owner first, possession second, opposite to English 'B of A'",
+   "pedagogicalObjectiveId": "Susun frasa の dengan pemilik di depan dan benda di belakang, kebalikan dari 'B of A' dalam bahasa Inggris",
+   "misconceptionTargeted": "Learner maps NO onto English 'of' and writes the two nouns in English order",
+   "misconceptionTargetedId": "Murid menyamakan の dengan 'of' Inggris lalu menulis kedua kata benda dalam urutan Inggris",
+   "reasoningOperation": "identify owner and thing -> place owner before NO, thing after",
+   "reasoningOperationId": "tentukan pemilik dan bendanya -> taruh pemilik sebelum の, bendanya sesudah",
+   "stem": "「だれの くるまですか。」「あれは ___ です。」（田中さんの車）",
+   "stemKana": "「だれの くるまですか。」「あれは ___ です。」（たなかさんの くるま）",
+   "furigana": [
+    [
+     "田中",
+     "たなか"
+    ],
+    [
+     "車",
+     "くるま"
+    ]
+   ],
+   "options": [
+    "たなかさんの くるま",
+    "くるまの たなかさん",
+    "たなかさん くるま",
+    "くるま たなかさんの"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "くるまの たなかさん",
+     "misconception": "treats NO like English 'of' and reverses the order",
+     "misconceptionId": "menganggap の sama dengan 'of' Inggris lalu membalik urutannya",
+     "whyFails": "This says 'Tanaka of the car', making Tanaka belong to the car instead of the other way round.",
+     "whyFailsId": "Ini berarti 'Tanaka milik mobil', jadi Tanaka yang menjadi milik mobil, bukan sebaliknya."
+    },
+    {
+     "option": "たなかさん くるま",
+     "misconception": "two nouns stacked with the linking NO left out",
+     "misconceptionId": "dua kata benda ditumpuk tanpa penghubung の",
+     "whyFails": "Japanese does not allow two plain nouns side by side here; the link NO is missing.",
+     "whyFailsId": "Bahasa Jepang tidak membiarkan dua kata benda berdampingan begitu saja; penghubung の hilang."
+    },
+    {
+     "option": "くるま たなかさんの",
+     "misconception": "NO placed after the final noun as an English possessive apostrophe-s",
+     "misconceptionId": "の diletakkan setelah kata benda terakhir seolah 's dalam bahasa Inggris",
+     "whyFails": "NO must sit between the two nouns, not trail at the end of the phrase.",
+     "whyFailsId": "の harus berada di antara dua kata benda, bukan menggantung di akhir frasa."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "The owner Tanaka comes first, NO follows, then the possessed noun kuruma.",
+    "whyCorrectId": "Pemilik, たなかさん, di depan, lalu の, baru benda miliknya, くるま.",
+    "rule": "A NO B is read right to left in English: 'B of A'.",
+    "ruleId": "A の B dibaca dari belakang dalam bahasa Inggris: 'B of A'.",
+    "whyOthersFail": "One reverses owner and thing, one drops NO, one puts NO at the end.",
+    "whyOthersFailId": "Satu membalik pemilik dan benda, satu menghilangkan の, satu menaruh の di akhir.",
+    "howToAvoid": "Say the English out loud, then flip it before writing Japanese.",
+    "howToAvoidId": "Ucapkan versi Inggrisnya, lalu balik urutannya sebelum menulis bahasa Jepang.",
+    "memoryCue": "Owner first, always.",
+    "memoryCueId": "Pemilik selalu duluan."
+   }
+  },
+  {
+   "id": "JP-NM-103",
+   "family": "noun_modification",
+   "skill": "noun_modification",
+   "subskill": "no_marks_country_of_origin",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "no-country-origin-product",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Use NO to say which country a thing comes from",
+   "pedagogicalObjectiveId": "Gunakan の untuk menyatakan negara asal sebuah benda",
+   "misconceptionTargeted": "Learner uses the place particle DE or KARA to modify a noun",
+   "misconceptionTargetedId": "Murid memakai partikel tempat で atau から untuk menerangkan kata benda",
+   "reasoningOperation": "country modifies a thing, not a verb -> choose the noun-linking particle",
+   "reasoningOperationId": "negara menerangkan benda, bukan kata kerja -> pilih partikel penghubung kata benda",
+   "stem": "これは にほん___ カメラです。",
+   "stemKana": "これは にほん___ カメラです。",
+   "furigana": [],
+   "options": [
+    "の",
+    "で",
+    "から",
+    "に"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "で",
+     "misconception": "location-of-action particle used to modify a noun",
+     "misconceptionId": "partikel tempat berlangsungnya tindakan dipakai untuk menerangkan kata benda",
+     "whyFails": "DE marks where an action happens and needs a verb; there is no verb here, only two nouns.",
+     "whyFailsId": "で menandai tempat berlangsungnya tindakan dan butuh kata kerja; di sini tidak ada kata kerja, hanya dua kata benda."
+    },
+    {
+     "option": "から",
+     "misconception": "English 'from' translated literally into a noun phrase",
+     "misconceptionId": "kata 'dari' diterjemahkan mentah ke dalam frasa benda",
+     "whyFails": "KARA marks a starting point of movement or time, not the origin label built into a noun phrase.",
+     "whyFailsId": "から menandai titik awal gerak atau waktu, bukan label asal yang menempel pada frasa benda."
+    },
+    {
+     "option": "に",
+     "misconception": "destination particle used between two nouns",
+     "misconceptionId": "partikel tujuan dipakai di antara dua kata benda",
+     "whyFails": "NI points to a destination or location of existence; it cannot join two nouns into one phrase.",
+     "whyFailsId": "に menunjuk tujuan atau tempat keberadaan; ia tidak bisa menyatukan dua kata benda menjadi satu frasa."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "Nihon NO kamera treats the country as a label describing which camera it is.",
+    "whyCorrectId": "にほんのカメラ menjadikan nama negara sebagai keterangan kamera yang mana.",
+    "rule": "Country NO thing = a thing of/from that country.",
+    "ruleId": "Negara の benda = benda dari negara itu.",
+    "whyOthersFail": "DE, KARA and NI all need a predicate; none of them can build a noun phrase.",
+    "whyOthersFailId": "で, から, dan に semuanya butuh predikat; tidak satu pun bisa membentuk frasa benda.",
+    "howToAvoid": "If the phrase still ends in a noun, only NO can hold it together.",
+    "howToAvoidId": "Kalau frasanya masih berakhir dengan kata benda, hanya の yang bisa menyatukannya.",
+    "memoryCue": "Made-in label = NO.",
+    "memoryCueId": "Label buatan mana = の."
+   }
+  },
+  {
+   "id": "JP-NM-104",
+   "family": "noun_modification",
+   "skill": "noun_modification",
+   "subskill": "no_marks_company_affiliation",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "no-company-affiliation",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Use NO to say which organisation a person belongs to",
+   "pedagogicalObjectiveId": "Gunakan の untuk menyatakan organisasi tempat seseorang bernaung",
+   "misconceptionTargeted": "Learner marks affiliation with the existence particle NI as in 'works at'",
+   "misconceptionTargetedId": "Murid menandai afiliasi dengan partikel keberadaan に seperti 'bekerja di'",
+   "reasoningOperation": "company describes which employee -> noun modifies noun -> NO",
+   "reasoningOperationId": "nama perusahaan menerangkan karyawan yang mana -> benda menerangkan benda -> の",
+   "stem": "かのじょは さくらしょうじ___ しゃいんです。",
+   "stemKana": "かのじょは さくらしょうじ___ しゃいんです。",
+   "furigana": [],
+   "options": [
+    "の",
+    "に",
+    "で",
+    "と"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "に",
+     "misconception": "existence particle borrowed for 'works at'",
+     "misconceptionId": "partikel keberadaan dipinjam untuk makna 'bekerja di'",
+     "whyFails": "NI would need a verb like imasu or tsutomete imasu; the sentence ends in a noun plus desu.",
+     "whyFailsId": "に butuh kata kerja seperti います atau つとめています; kalimat ini berakhir dengan kata benda plus です."
+    },
+    {
+     "option": "で",
+     "misconception": "workplace-of-action particle inserted before a noun",
+     "misconceptionId": "partikel tempat bekerja disisipkan sebelum kata benda",
+     "whyFails": "DE describes where something is done, but shain here is a description of the person, not an action.",
+     "whyFailsId": "で menerangkan tempat sesuatu dilakukan, sedangkan しゃいん di sini adalah keterangan tentang orangnya, bukan tindakan."
+    },
+    {
+     "option": "と",
+     "misconception": "and-particle used to link a company and a job title",
+     "misconceptionId": "partikel 'dan' dipakai menyambung perusahaan dengan jabatan",
+     "whyFails": "TO would list the company and the employee as two separate things, not one as a description of the other.",
+     "whyFailsId": "と akan mendaftar perusahaan dan karyawan sebagai dua hal terpisah, bukan yang satu menerangkan yang lain."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "The company name narrows down which shain she is, so it modifies the noun with NO.",
+    "whyCorrectId": "Nama perusahaan mempersempit しゃいん yang mana, jadi ia menerangkan kata benda dengan の.",
+    "rule": "Organisation NO role = a person's affiliation.",
+    "ruleId": "Organisasi の peran = afiliasi seseorang.",
+    "whyOthersFail": "NI and DE need verbs; TO would make two separate items out of one description.",
+    "whyOthersFailId": "に dan で butuh kata kerja; と akan memecah satu keterangan menjadi dua hal terpisah.",
+    "howToAvoid": "Check the sentence ending: noun + desu means the gap is a noun link, so NO.",
+    "howToAvoidId": "Periksa akhiran kalimat: kata benda + です berarti rumpangnya penghubung benda, jadi の.",
+    "memoryCue": "Badge on the chest = company NO role.",
+    "memoryCueId": "Tanda pengenal di dada = perusahaan の jabatan."
+   }
+  },
+  {
+   "id": "JP-NM-105",
+   "family": "noun_modification",
+   "skill": "noun_modification",
+   "subskill": "no_marks_content_or_topic_of_thing",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "no-content-of-book",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Use NO to say what a thing is about or what kind it is",
+   "pedagogicalObjectiveId": "Gunakan の untuk menyatakan isi atau jenis sebuah benda",
+   "misconceptionTargeted": "Learner marks the content noun as an object with O",
+   "misconceptionTargetedId": "Murid menandai kata benda isi sebagai objek dengan を",
+   "reasoningOperation": "content noun describes which book -> noun modifies noun -> NO",
+   "reasoningOperationId": "kata benda isi menerangkan buku yang mana -> benda menerangkan benda -> の",
+   "stem": "きのう にほんご___ ほんを かいました。",
+   "stemKana": "きのう にほんご___ ほんを かいました。",
+   "furigana": [],
+   "options": [
+    "の",
+    "を",
+    "が",
+    "も"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "を",
+     "misconception": "second object marker added inside one object phrase",
+     "misconceptionId": "penanda objek kedua ditambahkan di dalam satu frasa objek",
+     "whyFails": "The sentence already has O after hon; one verb cannot take two O-marked objects.",
+     "whyFailsId": "Kalimat ini sudah punya を setelah ほん; satu kata kerja tidak bisa punya dua objek berpenanda を."
+    },
+    {
+     "option": "が",
+     "misconception": "subject marker placed inside the object phrase",
+     "misconceptionId": "penanda subjek ditaruh di dalam frasa objek",
+     "whyFails": "GA would make Japanese the subject of kaimashita, so the language would be doing the buying.",
+     "whyFailsId": "が akan menjadikan にほんご subjek かいました, seolah bahasanya yang membeli."
+    },
+    {
+     "option": "も",
+     "misconception": "also-marker used where a descriptive link is needed",
+     "misconceptionId": "penanda 'juga' dipakai padahal yang dibutuhkan penghubung keterangan",
+     "whyFails": "MO would mean 'Japanese too', adding a second bought item rather than describing the book.",
+     "whyFailsId": "も akan berarti 'bahasa Jepang juga', menambah barang belian kedua, bukan menerangkan bukunya."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "Nihongo NO hon names the kind of book, and the whole phrase is then marked as one object by O.",
+    "whyCorrectId": "にほんごのほん menyebut jenis bukunya, lalu seluruh frasa itu ditandai sebagai satu objek oleh を.",
+    "rule": "Content NO thing = a thing about that content.",
+    "ruleId": "Isi の benda = benda tentang isi itu.",
+    "whyOthersFail": "O, GA and MO all attach to the verb, breaking the single noun phrase into pieces.",
+    "whyOthersFailId": "を, が, dan も semuanya menempel ke kata kerja, sehingga satu frasa benda terpecah.",
+    "howToAvoid": "Find the verb's particle first; anything inside the phrase before it is joined with NO.",
+    "howToAvoidId": "Cari dulu partikel milik kata kerja; apa pun di dalam frasa sebelum itu disambung dengan の.",
+    "memoryCue": "About-what = NO.",
+    "memoryCueId": "Tentang apa = の."
+   }
+  },
+  {
+   "id": "JP-NM-106",
+   "family": "noun_modification",
+   "skill": "noun_modification",
+   "subskill": "no_apposition_title_and_name",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "no-apposition-title-name",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Use NO to join a job title to the person's name in apposition",
+   "pedagogicalObjectiveId": "Gunakan の untuk menyatukan jabatan dengan nama orangnya dalam aposisi",
+   "misconceptionTargeted": "Learner puts the name before the title, copying English 'Mori, the manager'",
+   "misconceptionTargetedId": "Murid menaruh nama sebelum jabatan, meniru pola Inggris 'Mori, the manager'",
+   "reasoningOperation": "title narrows which person -> title first, NO, then name",
+   "reasoningOperationId": "jabatan mempersempit orang yang mana -> jabatan dulu, の, lalu nama",
+   "stem": "はじめまして。あちらが ___ です。",
+   "stemKana": "はじめまして。あちらが ___ です。",
+   "furigana": [],
+   "options": [
+    "ぶちょうの もりさん",
+    "もりさんの ぶちょう",
+    "ぶちょう もりさん",
+    "もりさんは ぶちょう"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "もりさんの ぶちょう",
+     "misconception": "apposition reversed so the title becomes the possessed noun",
+     "misconceptionId": "aposisi dibalik sehingga jabatan menjadi benda yang dimiliki",
+     "whyFails": "This means 'Mori's manager', pointing at a different person entirely.",
+     "whyFailsId": "Ini berarti 'atasan Pak Mori', yang menunjuk orang yang sama sekali lain."
+    },
+    {
+     "option": "ぶちょう もりさん",
+     "misconception": "title stacked on the name with no linking NO",
+     "misconceptionId": "jabatan ditumpuk pada nama tanpa penghubung の",
+     "whyFails": "Without NO the two nouns are not joined; Japanese needs the link to show apposition.",
+     "whyFailsId": "Tanpa の kedua kata benda tidak tersambung; bahasa Jepang butuh penghubung itu untuk menandai aposisi."
+    },
+    {
+     "option": "もりさんは ぶちょう",
+     "misconception": "a full topic-comment sentence dropped into a noun slot",
+     "misconceptionId": "kalimat topik-komentar utuh dijejalkan ke slot kata benda",
+     "whyFails": "The slot before desu needs one noun phrase, not a sentence with its own topic marker.",
+     "whyFailsId": "Slot sebelum です butuh satu frasa benda, bukan kalimat yang punya penanda topik sendiri."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "Buchou NO Mori-san presents the title as a description of which Mori-san, the normal Japanese order.",
+    "whyCorrectId": "ぶちょうのもりさん menyajikan jabatan sebagai keterangan もりさん yang mana, urutan lazim bahasa Jepang.",
+    "rule": "Title NO name, in that order, for apposition.",
+    "ruleId": "Jabatan の nama, dalam urutan itu, untuk aposisi.",
+    "whyOthersFail": "One reverses the pair, one drops NO, one smuggles in a whole sentence.",
+    "whyOthersFailId": "Satu membalik pasangannya, satu menghilangkan の, satu menyelipkan kalimat utuh.",
+    "howToAvoid": "The describing noun always stands to the left of NO.",
+    "howToAvoidId": "Kata benda yang menerangkan selalu berdiri di kiri の.",
+    "memoryCue": "Title left, person right.",
+    "memoryCueId": "Jabatan di kiri, orang di kanan."
+   }
+  },
+  {
+   "id": "JP-NM-107",
+   "family": "noun_modification",
+   "skill": "noun_modification",
+   "subskill": "no_chained_three_nouns",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "chained-no-three-nouns",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Chain NO twice so each noun narrows the one to its right",
+   "pedagogicalObjectiveId": "Rangkai の dua kali sehingga tiap kata benda mempersempit kata benda di kanannya",
+   "misconceptionTargeted": "Learner drops the second NO or reorders the chain from the English end",
+   "misconceptionTargetedId": "Murid menghilangkan の kedua atau menyusun rantainya dari ujung versi Inggris",
+   "reasoningOperation": "widest owner first -> narrower -> final thing, NO after each modifier",
+   "reasoningOperationId": "pemilik terluas dulu -> yang lebih sempit -> benda akhirnya, の setelah tiap penerang",
+   "stem": "これは ___ です。（姉の学校の制服）",
+   "stemKana": "これは ___ です。（あねの がっこうの せいふく）",
+   "furigana": [
+    [
+     "姉",
+     "あね"
+    ],
+    [
+     "学校",
+     "がっこう"
+    ],
+    [
+     "制服",
+     "せいふく"
+    ]
+   ],
+   "options": [
+    "あねの がっこうの せいふく",
+    "せいふくの がっこうの あね",
+    "あねの がっこう せいふく",
+    "がっこうの あねの せいふく"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "せいふくの がっこうの あね",
+     "misconception": "whole chain reversed into English 'of' order",
+     "misconceptionId": "seluruh rantai dibalik mengikuti urutan 'of' Inggris",
+     "whyFails": "Read literally this is 'the older sister of the school of the uniform', which owns nothing correctly.",
+     "whyFailsId": "Secara harfiah ini 'kakak dari sekolah dari seragam', yang kepemilikannya sama sekali salah."
+    },
+    {
+     "option": "あねの がっこう せいふく",
+     "misconception": "second NO omitted, leaving two nouns unlinked",
+     "misconceptionId": "の kedua dihilangkan sehingga dua kata benda tak tersambung",
+     "whyFails": "Every step of the chain needs its own NO; gakkou and seifuku are left stuck together.",
+     "whyFailsId": "Tiap mata rantai butuh の sendiri; がっこう dan せいふく tertinggal menempel tanpa penghubung."
+    },
+    {
+     "option": "がっこうの あねの せいふく",
+     "misconception": "middle and first nouns swapped inside the chain",
+     "misconceptionId": "kata benda pertama dan tengah tertukar di dalam rantai",
+     "whyFails": "This says 'the uniform of my sister who belongs to the school', changing what the school modifies.",
+     "whyFailsId": "Ini berarti 'seragam kakak milik sekolah', mengubah apa yang diterangkan oleh sekolah."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "Ane narrows gakkou, and ane-no-gakkou narrows seifuku, so NO appears after each modifier.",
+    "whyCorrectId": "あね mempersempit がっこう, lalu あねのがっこう mempersempit せいふく, jadi の muncul setelah tiap penerang.",
+    "rule": "A NO B NO C = C of B of A; the last noun is the real head.",
+    "ruleId": "A の B の C = C dari B dari A; kata benda terakhir adalah intinya.",
+    "whyOthersFail": "One reverses the chain, one drops a NO, one swaps two links.",
+    "whyOthersFailId": "Satu membalik rantainya, satu menghilangkan の, satu menukar dua mata rantai.",
+    "howToAvoid": "Decide the head noun last, then build leftwards from widest owner.",
+    "howToAvoidId": "Tentukan kata benda inti paling akhir, lalu bangun ke kiri mulai dari pemilik terluas.",
+    "memoryCue": "The thing you mean is at the far right.",
+    "memoryCueId": "Benda yang kamu maksud ada di ujung kanan."
+   }
+  },
+  {
+   "id": "JP-NM-108",
+   "family": "noun_modification",
+   "skill": "noun_modification",
+   "subskill": "na_adjective_takes_na_not_no",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "no-wrongly-inserted-after-na-adjective",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Attach a NA-adjective to a noun with NA, never with NO",
+   "pedagogicalObjectiveId": "Sambungkan kata sifat な ke kata benda dengan な, bukan dengan の",
+   "misconceptionTargeted": "Learner treats every modifier before a noun as needing NO",
+   "misconceptionTargetedId": "Murid mengira setiap penerang sebelum kata benda harus memakai の",
+   "reasoningOperation": "classify modifier as NA-adjective -> use NA before the noun",
+   "reasoningOperationId": "kenali penerangnya sebagai kata sifat な -> pakai な sebelum kata benda",
+   "stem": "きょうとには ゆうめい___ おてらが たくさん あります。",
+   "stemKana": "きょうとには ゆうめい___ おてらが たくさん あります。",
+   "furigana": [],
+   "options": [
+    "な",
+    "の",
+    "だ",
+    "に"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "の",
+     "misconception": "noun-linking NO inserted between a NA-adjective and its noun",
+     "misconceptionId": "の penghubung benda disisipkan antara kata sifat な dan kata bendanya",
+     "whyFails": "NO joins two nouns, but yuumei here is an adjective describing the temples, so it needs NA.",
+     "whyFailsId": "の menyambung dua kata benda, sedangkan ゆうめい di sini kata sifat yang menerangkan kuil, jadi butuh な."
+    },
+    {
+     "option": "だ",
+     "misconception": "plain copula left in front of the noun it should follow",
+     "misconceptionId": "kopula bentuk biasa dibiarkan di depan kata benda yang seharusnya diikutinya",
+     "whyFails": "DA ends a sentence; it cannot stand in the middle of a noun phrase.",
+     "whyFailsId": "だ mengakhiri kalimat; ia tidak bisa berdiri di tengah frasa benda."
+    },
+    {
+     "option": "に",
+     "misconception": "adverbial NI form used where a noun is being modified",
+     "misconceptionId": "bentuk keterangan に dipakai padahal yang diterangkan kata benda",
+     "whyFails": "NA-adjective + NI modifies a verb, not a following noun.",
+     "whyFailsId": "Kata sifat な + に menerangkan kata kerja, bukan kata benda sesudahnya."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "Yuumei is a NA-adjective, so before a noun it appears as yuumei NA otera.",
+    "whyCorrectId": "ゆうめい adalah kata sifat な, jadi sebelum kata benda ia menjadi ゆうめいな おてら.",
+    "rule": "NA-adjective + NA + noun; NO is only for noun + noun.",
+    "ruleId": "Kata sifat な + な + kata benda; の hanya untuk benda + benda.",
+    "whyOthersFail": "NO treats an adjective as a noun, DA cannot sit mid-phrase, NI targets verbs.",
+    "whyOthersFailId": "の memperlakukan kata sifat sebagai kata benda, だ tak bisa di tengah frasa, に mengarah ke kata kerja.",
+    "howToAvoid": "Ask whether the word can stand alone as a thing. If not, it is an adjective and takes NA.",
+    "howToAvoidId": "Tanya apakah kata itu bisa berdiri sendiri sebagai benda. Kalau tidak, ia kata sifat dan memakai な.",
+    "memoryCue": "NA-adjective keeps its NA.",
+    "memoryCueId": "Kata sifat な tetap membawa な-nya."
+   }
+  },
+  {
+   "id": "JP-NM-109",
+   "family": "noun_modification",
+   "skill": "noun_modification",
+   "subskill": "i_adjective_takes_no_particle",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "no-wrongly-inserted-after-i-adjective",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Attach an I-adjective straight to its noun with no particle at all",
+   "pedagogicalObjectiveId": "Sambungkan kata sifat い langsung ke kata bendanya tanpa partikel apa pun",
+   "misconceptionTargeted": "Learner inserts NO between an I-adjective and the noun it describes",
+   "misconceptionTargetedId": "Murid menyisipkan の antara kata sifat い dan kata benda yang diterangkannya",
+   "reasoningOperation": "recognise I-adjective -> place it directly before the noun",
+   "reasoningOperationId": "kenali kata sifat い -> tempatkan langsung sebelum kata benda",
+   "stem": "にわに ___ が さいて います。",
+   "stemKana": "にわに ___ が さいて います。",
+   "furigana": [],
+   "options": [
+    "あかい はな",
+    "あかいの はな",
+    "はなの あかい",
+    "あかいな はな"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "あかいの はな",
+     "misconception": "NO inserted between an I-adjective and its noun",
+     "misconceptionId": "の disisipkan antara kata sifat い dan kata bendanya",
+     "whyFails": "An I-adjective already ends in a form that can attach to a noun; adding NO makes it a stand-alone 'the red one'.",
+     "whyFailsId": "Kata sifat い sudah berbentuk siap menempel ke kata benda; menambah の menjadikannya 'yang merah' yang berdiri sendiri."
+    },
+    {
+     "option": "はなの あかい",
+     "misconception": "modifier and noun reversed as in English 'red of flower'",
+     "misconceptionId": "penerang dan kata benda dibalik seperti 'red of flower' dalam Inggris",
+     "whyFails": "The noun must come last in Japanese modification; here the adjective is stranded at the end.",
+     "whyFailsId": "Dalam penerangan bahasa Jepang kata benda harus di akhir; di sini kata sifatnya justru terdampar di belakang."
+    },
+    {
+     "option": "あかいな はな",
+     "misconception": "NA-adjective pattern applied to an I-adjective",
+     "misconceptionId": "pola kata sifat な diterapkan pada kata sifat い",
+     "whyFails": "NA belongs to NA-adjectives only; akai already carries its own connecting form.",
+     "whyFailsId": "な hanya milik kata sifat な; あかい sudah punya bentuk penyambung sendiri."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "Akai attaches straight to hana with nothing in between.",
+    "whyCorrectId": "あかい menempel langsung ke はな tanpa apa pun di antaranya.",
+    "rule": "I-adjective + noun, no particle.",
+    "ruleId": "Kata sifat い + kata benda, tanpa partikel.",
+    "whyOthersFail": "One adds NO, one reverses the order, one borrows NA from the other adjective class.",
+    "whyOthersFailId": "Satu menambah の, satu membalik urutan, satu meminjam な dari kelas kata sifat lain.",
+    "howToAvoid": "If the word ends in -i and means a quality, put it next to the noun and stop.",
+    "howToAvoidId": "Kalau katanya berakhiran -i dan menyatakan sifat, taruh di sebelah kata benda dan berhenti di situ.",
+    "memoryCue": "Akai hana, nothing between.",
+    "memoryCueId": "あかいはな, tak ada apa-apa di tengah."
+   }
+  },
+  {
+   "id": "JP-NM-110",
+   "family": "noun_modification",
+   "skill": "noun_modification",
+   "subskill": "no_omission_between_two_nouns",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "no-wrongly-omitted-subject-teacher",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Keep NO when a noun names the subject a teacher teaches",
+   "pedagogicalObjectiveId": "Pertahankan の saat sebuah kata benda menyebut mata pelajaran yang diajar seorang guru",
+   "misconceptionTargeted": "Learner drops NO because English lets 'English teacher' stand as two bare nouns",
+   "misconceptionTargetedId": "Murid menghilangkan の karena dalam Inggris 'English teacher' boleh berupa dua kata benda telanjang",
+   "reasoningOperation": "notice two nouns forming one phrase -> restore the required NO",
+   "reasoningOperationId": "sadari dua kata benda membentuk satu frasa -> kembalikan の yang wajib",
+   "stem": "やまださんは ___ です。",
+   "stemKana": "やまださんは ___ です。",
+   "furigana": [],
+   "options": [
+    "えいごの せんせい",
+    "えいご せんせい",
+    "せんせいの えいご",
+    "えいごは せんせい"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "えいご せんせい",
+     "misconception": "NO omitted on the model of English noun-plus-noun compounds",
+     "misconceptionId": "の dihilangkan meniru gabungan benda-benda dalam bahasa Inggris",
+     "whyFails": "English can stack 'English teacher', but Japanese needs NO to show the first noun describes the second.",
+     "whyFailsId": "Bahasa Inggris boleh menumpuk 'English teacher', tetapi bahasa Jepang butuh の untuk menunjukkan kata pertama menerangkan kata kedua."
+    },
+    {
+     "option": "せんせいの えいご",
+     "misconception": "order reversed so the phrase means the teacher's English",
+     "misconceptionId": "urutan dibalik sehingga frasanya berarti bahasa Inggris milik guru itu",
+     "whyFails": "This describes a language, not a person, so it cannot say what Yamada-san is.",
+     "whyFailsId": "Ini menerangkan sebuah bahasa, bukan orang, jadi tidak bisa menyatakan Yamada itu siapa."
+    },
+    {
+     "option": "えいごは せんせい",
+     "misconception": "topic marker used inside a noun phrase",
+     "misconceptionId": "penanda topik dipakai di dalam frasa benda",
+     "whyFails": "The sentence already has a topic, and WA cannot join two nouns into one phrase.",
+     "whyFailsId": "Kalimat ini sudah punya topik, dan は tidak bisa menyatukan dua kata benda menjadi satu frasa."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "Eigo NO sensei names which kind of teacher Yamada-san is.",
+    "whyCorrectId": "えいごのせんせい menyebut guru jenis apa Yamada itu.",
+    "rule": "Two nouns in one phrase always need NO between them.",
+    "ruleId": "Dua kata benda dalam satu frasa selalu butuh の di antaranya.",
+    "whyOthersFail": "One omits NO, one reverses the pair, one uses a topic marker where a link is needed.",
+    "whyOthersFailId": "Satu menghilangkan の, satu membalik pasangannya, satu memakai penanda topik padahal butuh penghubung.",
+    "howToAvoid": "Whenever English compounds two nouns, check that your Japanese still has its NO.",
+    "howToAvoidId": "Setiap kali bahasa Inggris menggabung dua kata benda, pastikan versi Jepangmu masih punya の.",
+    "memoryCue": "English glues, Japanese ties with NO.",
+    "memoryCueId": "Inggris merekat, Jepang mengikat dengan の."
+   }
+  },
+  {
+   "id": "JP-NM-111",
+   "family": "noun_modification",
+   "skill": "noun_modification",
+   "subskill": "no_place_modifier_word_order",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "order-place-modifier-map",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Put the place name before NO when saying a map of that place",
+   "pedagogicalObjectiveId": "Taruh nama tempat sebelum の saat menyebut peta tempat itu",
+   "misconceptionTargeted": "Learner follows English 'map of Tokyo' and puts the map first",
+   "misconceptionTargetedId": "Murid mengikuti 'map of Tokyo' dan menaruh petanya di depan",
+   "reasoningOperation": "identify the head noun (map) -> put it last, place name before NO",
+   "reasoningOperationId": "tentukan kata benda inti (peta) -> taruh di akhir, nama tempat sebelum の",
+   "stem": "すみません、___ を ください。",
+   "stemKana": "すみません、___ を ください。",
+   "furigana": [],
+   "options": [
+    "とうきょうの ちず",
+    "ちずの とうきょう",
+    "とうきょうちずの",
+    "とうきょうは ちず"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "ちずの とうきょう",
+     "misconception": "English 'of' order kept, so head and modifier swap",
+     "misconceptionId": "urutan 'of' Inggris dipertahankan sehingga inti dan penerang tertukar",
+     "whyFails": "This means 'the Tokyo of the map', asking for a city rather than a map.",
+     "whyFailsId": "Ini berarti 'Tokyo milik peta', yang diminta jadi kotanya, bukan petanya."
+    },
+    {
+     "option": "とうきょうちずの",
+     "misconception": "NO left dangling at the end with no following noun",
+     "misconceptionId": "の tertinggal menggantung di akhir tanpa kata benda sesudahnya",
+     "whyFails": "NO must be followed by the noun it modifies; here O comes straight after it.",
+     "whyFailsId": "の harus diikuti kata benda yang diterangkannya; di sini justru を yang langsung menyusul."
+    },
+    {
+     "option": "とうきょうは ちず",
+     "misconception": "topic marker substituted for the noun link",
+     "misconceptionId": "penanda topik dipakai menggantikan penghubung benda",
+     "whyFails": "WA would make a sentence 'as for Tokyo, it is a map' instead of one requestable noun phrase.",
+     "whyFailsId": "は membentuk kalimat 'kalau Tokyo, itu peta', bukan satu frasa benda yang bisa diminta."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "Toukyou NO chizu keeps the head noun chizu at the end, where O can attach to it.",
+    "whyCorrectId": "とうきょうのちず menjaga kata benda inti ちず di akhir, tempat を bisa menempel.",
+    "rule": "The head noun of a NO phrase is always the last one.",
+    "ruleId": "Kata benda inti dalam frasa の selalu yang paling akhir.",
+    "whyOthersFail": "One reverses the order, one leaves NO with nothing to modify, one uses WA.",
+    "whyOthersFailId": "Satu membalik urutan, satu meninggalkan の tanpa yang diterangkan, satu memakai は.",
+    "howToAvoid": "Ask what you are actually buying, and put that word last.",
+    "howToAvoidId": "Tanya benda apa yang sebenarnya kamu beli, lalu taruh kata itu paling belakang.",
+    "memoryCue": "What you want sits closest to the verb.",
+    "memoryCueId": "Yang kamu inginkan duduk paling dekat kata kerja."
+   }
+  },
+  {
+   "id": "JP-NM-112",
+   "family": "noun_modification",
+   "skill": "noun_modification",
+   "subskill": "kono_versus_kore_no",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "kono-not-kore-no",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Use KONO before a noun instead of KORE plus NO",
+   "pedagogicalObjectiveId": "Gunakan この sebelum kata benda, bukan これ ditambah の",
+   "misconceptionTargeted": "Learner builds a demonstrative modifier by adding NO to the pronoun KORE",
+   "misconceptionTargetedId": "Murid membentuk penunjuk dengan menambahkan の pada kata ganti これ",
+   "reasoningOperation": "a noun follows -> choose the pre-noun form KONO, not the pronoun",
+   "reasoningOperationId": "ada kata benda sesudahnya -> pilih bentuk pranomina この, bukan kata gantinya",
+   "stem": "___ かばんは わたしのです。",
+   "stemKana": "___ かばんは わたしのです。",
+   "furigana": [],
+   "options": [
+    "この",
+    "これの",
+    "これは",
+    "これが"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "これの",
+     "misconception": "NO added to a pronoun that already has a pre-noun form",
+     "misconceptionId": "の ditambahkan ke kata ganti yang sudah punya bentuk pranomina",
+     "whyFails": "KORE stands alone as 'this thing'; when a noun follows, Japanese switches to KONO instead of adding NO.",
+     "whyFailsId": "これ berdiri sendiri sebagai 'benda ini'; kalau ada kata benda sesudahnya, bahasa Jepang beralih ke この, bukan menambah の."
+    },
+    {
+     "option": "これは",
+     "misconception": "pronoun plus topic marker placed before another noun",
+     "misconceptionId": "kata ganti plus penanda topik ditaruh sebelum kata benda lain",
+     "whyFails": "That would give the sentence two topics, and kaban would be left without a modifier.",
+     "whyFailsId": "Itu memberi kalimat dua topik, dan かばん tertinggal tanpa penerang."
+    },
+    {
+     "option": "これが",
+     "misconception": "pronoun plus subject marker used as a modifier",
+     "misconceptionId": "kata ganti plus penanda subjek dipakai sebagai penerang",
+     "whyFails": "GA marks a subject for a predicate; it cannot attach KORE to the noun that follows.",
+     "whyFailsId": "が menandai subjek bagi predikat; ia tidak bisa menempelkan これ ke kata benda sesudahnya."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "Before a noun the demonstrative takes its pre-noun shape KONO.",
+    "whyCorrectId": "Sebelum kata benda, kata penunjuk memakai bentuk pranominanya, この.",
+    "rule": "KORE alone, KONO plus noun; never KORE NO plus noun.",
+    "ruleId": "これ berdiri sendiri, この plus kata benda; jangan pernah これの plus kata benda.",
+    "whyOthersFail": "All three keep the pronoun form where the pre-noun form is required.",
+    "whyOthersFailId": "Ketiganya mempertahankan bentuk kata ganti padahal yang dibutuhkan bentuk pranomina.",
+    "howToAvoid": "Look right: if a noun follows, use KONO, SONO, ANO.",
+    "howToAvoidId": "Lihat ke kanan: kalau ada kata benda, pakai この, その, あの.",
+    "memoryCue": "Noun after? KONO.",
+    "memoryCueId": "Ada kata benda sesudahnya? この."
+   }
+  },
+  {
+   "id": "JP-NM-113",
+   "family": "noun_modification",
+   "skill": "noun_modification",
+   "subskill": "no_stands_for_omitted_noun",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "no-standing-for-omitted-noun",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Use NO alone to stand for a noun already known from context",
+   "pedagogicalObjectiveId": "Gunakan の sendiri untuk menggantikan kata benda yang sudah jelas dari konteks",
+   "misconceptionTargeted": "Learner thinks NO must always be followed by a noun and reaches for the copula instead",
+   "misconceptionTargetedId": "Murid mengira の harus selalu diikuti kata benda lalu memilih kopula",
+   "reasoningOperation": "the owned noun is already known -> drop it and keep NO",
+   "reasoningOperationId": "kata benda miliknya sudah diketahui -> hilangkan dan sisakan の",
+   "stem": "「その じしょは だれのですか。」「それは いもうと___ です。」",
+   "stemKana": "「その じしょは だれのですか。」「それは いもうと___ です。」",
+   "furigana": [],
+   "options": [
+    "の",
+    "が",
+    "は",
+    "のの"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "が",
+     "misconception": "subject marker used where a possessive pronoun is needed",
+     "misconceptionId": "penanda subjek dipakai padahal yang dibutuhkan kata ganti milik",
+     "whyFails": "GA plus desu cannot express ownership; the answer must say the dictionary belongs to the sister.",
+     "whyFailsId": "が plus です tidak bisa menyatakan kepemilikan; jawabannya harus menyebut kamus itu milik adik."
+    },
+    {
+     "option": "は",
+     "misconception": "second topic marker added inside the answer",
+     "misconceptionId": "penanda topik kedua ditambahkan di dalam jawaban",
+     "whyFails": "Sore is already the topic; a second WA leaves the sentence with no possessive at all.",
+     "whyFailsId": "それ sudah menjadi topik; は kedua membuat kalimat sama sekali tanpa penanda kepemilikan."
+    },
+    {
+     "option": "のの",
+     "misconception": "NO doubled to compensate for the missing noun",
+     "misconceptionId": "の digandakan untuk menutupi kata benda yang hilang",
+     "whyFails": "One NO already both links and replaces the omitted noun; repeating it is not a Japanese form.",
+     "whyFailsId": "Satu の sudah sekaligus menghubungkan dan menggantikan kata benda yang dihilangkan; mengulangnya bukan bentuk bahasa Jepang."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "Since jisho is already known, imouto NO on its own means 'my younger sister's one'.",
+    "whyCorrectId": "Karena じしょ sudah diketahui, いもうとの sendiri sudah berarti 'punya adik perempuan saya'.",
+    "rule": "NO can end the phrase when the noun it modifies is obvious.",
+    "ruleId": "の boleh mengakhiri frasa bila kata benda yang diterangkannya sudah jelas.",
+    "whyOthersFail": "GA and WA are predicate particles; NONO is not a form at all.",
+    "whyOthersFailId": "が dan は adalah partikel predikat; のの sama sekali bukan bentuk yang ada.",
+    "howToAvoid": "If the question already named the object, answer with owner plus NO and stop.",
+    "howToAvoidId": "Kalau pertanyaannya sudah menyebut bendanya, jawab dengan pemilik plus の lalu berhenti.",
+    "memoryCue": "NO can be 'the one'.",
+    "memoryCueId": "の bisa berarti 'punya'."
+   }
+  },
+  {
+   "id": "JP-NM-114",
+   "family": "noun_modification",
+   "skill": "noun_modification",
+   "subskill": "no_marks_person_nationality",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "no-nationality-of-person",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Use NO to state which country a person is from",
+   "pedagogicalObjectiveId": "Gunakan の untuk menyatakan asal negara seseorang",
+   "misconceptionTargeted": "Learner reverses country and person, following English 'a person of China'",
+   "misconceptionTargetedId": "Murid membalik negara dan orang, mengikuti 'a person of China' dalam Inggris",
+   "reasoningOperation": "country describes the person -> country before NO, hito after",
+   "reasoningOperationId": "negara menerangkan orangnya -> negara sebelum の, ひと sesudahnya",
+   "stem": "リーさんは ___ です。",
+   "stemKana": "リーさんは ___ です。",
+   "furigana": [],
+   "options": [
+    "ちゅうごくの ひと",
+    "ひとの ちゅうごく",
+    "ちゅうごく ひと",
+    "ちゅうごくで ひと"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "ひとの ちゅうごく",
+     "misconception": "English 'of' order reproduced, reversing modifier and head",
+     "misconceptionId": "urutan 'of' Inggris ditiru sehingga penerang dan inti terbalik",
+     "whyFails": "This means 'the China of a person', which describes a country, not Lee-san.",
+     "whyFailsId": "Ini berarti 'Tiongkok milik seseorang', yang menerangkan negara, bukan Pak Lee."
+    },
+    {
+     "option": "ちゅうごく ひと",
+     "misconception": "linking NO omitted between country and person",
+     "misconceptionId": "penghubung の dihilangkan antara negara dan orang",
+     "whyFails": "Two bare nouns cannot form a phrase here; the modifying link is missing.",
+     "whyFailsId": "Dua kata benda telanjang tidak bisa membentuk frasa di sini; penghubung penerangnya hilang."
+    },
+    {
+     "option": "ちゅうごくで ひと",
+     "misconception": "place-of-action DE used to modify a noun",
+     "misconceptionId": "で penanda tempat tindakan dipakai untuk menerangkan kata benda",
+     "whyFails": "DE needs a verb; it cannot describe what kind of person Lee-san is.",
+     "whyFailsId": "で butuh kata kerja; ia tidak bisa menerangkan Pak Lee itu orang seperti apa."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "Chuugoku NO hito describes Lee-san as a person from China.",
+    "whyCorrectId": "ちゅうごくのひと menerangkan Pak Lee sebagai orang dari Tiongkok.",
+    "rule": "Country NO person, with the person last.",
+    "ruleId": "Negara の orang, dengan orangnya di belakang.",
+    "whyOthersFail": "One reverses the pair, one drops NO, one borrows a verb particle.",
+    "whyOthersFailId": "Satu membalik pasangannya, satu menghilangkan の, satu meminjam partikel kata kerja.",
+    "howToAvoid": "Whoever or whatever the sentence is really about goes to the right of NO.",
+    "howToAvoidId": "Siapa atau apa yang sebenarnya dibicarakan kalimat itu diletakkan di kanan の.",
+    "memoryCue": "Country label, then the person.",
+    "memoryCueId": "Label negara dulu, baru orangnya."
+   }
+  },
+  {
+   "id": "JP-NM-115",
+   "family": "noun_modification",
+   "skill": "noun_modification",
+   "subskill": "no_time_expression_wide_to_narrow",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "order-time-wide-before-narrow",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Order time expressions from the wider period to the narrower one across NO",
+   "pedagogicalObjectiveId": "Susun keterangan waktu dari periode yang lebih luas ke yang lebih sempit melalui の",
+   "misconceptionTargeted": "Learner puts the narrow time first, as English says 'Friday of next week'",
+   "misconceptionTargetedId": "Murid menaruh waktu sempit lebih dulu, seperti 'Friday of next week' dalam Inggris",
+   "reasoningOperation": "compare the two time spans -> wider one before NO",
+   "reasoningOperationId": "bandingkan dua rentang waktunya -> yang lebih luas sebelum の",
+   "stem": "かいぎは ___ です。",
+   "stemKana": "かいぎは ___ です。",
+   "furigana": [],
+   "options": [
+    "らいしゅうの きんようび",
+    "きんようびの らいしゅう",
+    "らいしゅう きんようび",
+    "きんようびに らいしゅう"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "きんようびの らいしゅう",
+     "misconception": "English 'Friday of next week' order copied straight over",
+     "misconceptionId": "urutan 'Friday of next week' disalin mentah-mentah",
+     "whyFails": "This makes 'the next week belonging to Friday', which names a week, not a day.",
+     "whyFailsId": "Ini menjadi 'minggu depan milik hari Jumat', yang menyebut minggu, bukan hari."
+    },
+    {
+     "option": "らいしゅう きんようび",
+     "misconception": "NO omitted between two time nouns",
+     "misconceptionId": "の dihilangkan antara dua kata benda waktu",
+     "whyFails": "Two time nouns still need NO to show that one narrows the other.",
+     "whyFailsId": "Dua kata benda waktu tetap butuh の untuk menunjukkan yang satu mempersempit yang lain."
+    },
+    {
+     "option": "きんようびに らいしゅう",
+     "misconception": "time particle NI used inside a noun phrase",
+     "misconceptionId": "partikel waktu に dipakai di dalam frasa benda",
+     "whyFails": "NI marks when an action happens and needs a verb; this sentence ends in desu.",
+     "whyFailsId": "に menandai kapan tindakan terjadi dan butuh kata kerja; kalimat ini berakhir dengan です."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "Raishuu narrows down which Friday, so the wider span comes first with NO after it.",
+    "whyCorrectId": "らいしゅう mempersempit hari Jumat yang mana, jadi rentang yang lebih luas datang dulu diikuti の.",
+    "rule": "Wide time NO narrow time, exactly the reverse of English.",
+    "ruleId": "Waktu luas の waktu sempit, persis kebalikan bahasa Inggris.",
+    "whyOthersFail": "One reverses the spans, one drops NO, one uses the verb-time particle NI.",
+    "whyOthersFailId": "Satu membalik rentangnya, satu menghilangkan の, satu memakai に partikel waktu untuk kata kerja.",
+    "howToAvoid": "Zoom out first, then in: year, month, week, day.",
+    "howToAvoidId": "Mulai dari yang luas lalu menyempit: tahun, bulan, minggu, hari.",
+    "memoryCue": "Big time first.",
+    "memoryCueId": "Waktu besar duluan."
+   }
+  },
+  {
+   "id": "JP-NM-116",
+   "family": "noun_modification",
+   "skill": "noun_modification",
+   "subskill": "no_before_position_noun",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "no-before-position-noun-ue",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Link a reference object to a position noun such as UE with NO",
+   "pedagogicalObjectiveId": "Hubungkan benda acuan dengan kata benda posisi seperti うえ memakai の",
+   "misconceptionTargeted": "Learner treats UE as a preposition and marks the reference object with NI",
+   "misconceptionTargetedId": "Murid menganggap うえ sebagai kata depan lalu menandai benda acuan dengan に",
+   "reasoningOperation": "UE is a noun -> the reference object modifies it -> NO before it, NI after the whole phrase",
+   "reasoningOperationId": "うえ adalah kata benda -> benda acuan menerangkannya -> の sebelum うえ, に setelah seluruh frasa",
+   "stem": "テーブル___ うえに ねこが います。",
+   "stemKana": "テーブル___ うえに ねこが います。",
+   "furigana": [],
+   "options": [
+    "の",
+    "に",
+    "で",
+    "は"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "に",
+     "misconception": "location particle placed before the position noun as if UE were a preposition",
+     "misconceptionId": "partikel tempat ditaruh sebelum kata benda posisi seolah うえ itu kata depan",
+     "whyFails": "NI already appears after ue; the phrase would then carry two location markers and the noun link would be missing.",
+     "whyFailsId": "に sudah muncul setelah うえ; frasanya jadi punya dua penanda tempat dan penghubung bendanya hilang."
+    },
+    {
+     "option": "で",
+     "misconception": "place-of-action particle used inside a location phrase",
+     "misconceptionId": "partikel tempat tindakan dipakai di dalam frasa keterangan tempat",
+     "whyFails": "DE marks where an action is performed; imasu states existence, and ue still needs its noun link.",
+     "whyFailsId": "で menandai tempat tindakan dilakukan; います menyatakan keberadaan, dan うえ tetap butuh penghubung bendanya."
+    },
+    {
+     "option": "は",
+     "misconception": "topic marker inserted between the object and its position noun",
+     "misconceptionId": "penanda topik disisipkan antara benda dan kata benda posisinya",
+     "whyFails": "WA would split the location phrase in two and make the table a separate topic.",
+     "whyFailsId": "は akan memecah frasa tempat itu menjadi dua dan menjadikan mejanya topik tersendiri."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "UE is a noun meaning 'the top', so teeburu modifies it with NO, and NI marks the whole location.",
+    "whyCorrectId": "うえ adalah kata benda yang berarti 'bagian atas', jadi テーブル menerangkannya dengan の, lalu に menandai seluruh keterangan tempat.",
+    "rule": "Object NO position-noun NI = at that position of the object.",
+    "ruleId": "Benda の kata benda posisi に = di posisi itu pada bendanya.",
+    "whyOthersFail": "NI, DE and WA all belong to the predicate level, not inside the position phrase.",
+    "whyOthersFailId": "に, で, dan は semuanya milik tataran predikat, bukan bagian dalam frasa posisi.",
+    "howToAvoid": "Remember that ue, shita, naka and mae are nouns, so they take NO in front.",
+    "howToAvoidId": "Ingat bahwa うえ, した, なか, dan まえ adalah kata benda, jadi memakai の di depannya.",
+    "memoryCue": "Position words are nouns, so NO first.",
+    "memoryCueId": "Kata posisi itu kata benda, jadi の dulu."
+   }
+  }
+ ]
+}

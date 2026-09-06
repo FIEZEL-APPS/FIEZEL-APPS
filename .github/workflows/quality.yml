@@ -244,6 +244,7 @@ jobs:
           node tests/social-invite-link-test.js
           node tests/student-single-registration-test.js
           node tests/th-ui-leak-test.js
+          node tests/i18n-kunci-hantu-test.js
           # Lapis AKUN sisi murid (masuk/daftar/aktivasi guru). Ditempatkan tepat sesudah
           # gerbang sosial karena keduanya memakai lane transport yang sama (panggilan
           # langsung ke Worker dengan cookie fz_id), dan cacat di lane itu akan memerahkan
@@ -280,6 +281,7 @@ jobs:
           node tests/boot-order-test.js
           node tests/splash-first-paint-test.js
           node tests/teacher-instant-boot-test.js
+          node tests/teacher-demo-preview-test.js
           # m025-199: m025-84 memindahkan markup splash ke frame pertama, tetapi peramban
           # tetap menahan cat sampai style.css (286 KB) berlaku - separuh cacat yang sama
           # bertahan sampai pemilik melaporkannya lagi. Gerbang ini menjaga separuh kedua,
@@ -970,6 +972,14 @@ jobs:
         # Gerbang ini menahan graf Inggris pada patokan yang ditulis tangan, dan membuktikan
         # penyuntikan graf lain benar-benar berganti serta benar-benar bisa dipulihkan.
         run: node tests/family-graph-injection-test.js
+      - name: 'Bank soal Jepang: skema penuh, pengecoh bernama, concept sah di mesin nyata'
+        # Bank Jepang lahir dari nol. Cacatnya bukan yang membuat aplikasi error, melainkan
+        # yang membuat aplikasi MENGAJAR DENGAN KELIRU sambil tetap menyala: marker yang
+        # membuat conceptOf() mengembalikan null (pembatas kebaruan konsep mati diam-diam),
+        # pengecoh tanpa miskonsepsi bernama (bukti Braincore jadi angka tanpa makna), dan
+        # pengecoh yang sebenarnya benar (murid dihukum untuk jawaban benar). Gerbang ini
+        # memanggil conceptOf() yang SEBENARNYA, bukan menirunya.
+        run: node tests/japanese-content-test.js
       - name: 'Sumbu bahasa target: kunci murid Inggris identik byte per byte'
         # Menambah bahasa kedua punya satu cara gampang dan satu cara benar. Yang gampang:
         # beri SEMUA kunci awalan bahasa, termasuk kunci Inggris. Sekali dikirim, setiap murid

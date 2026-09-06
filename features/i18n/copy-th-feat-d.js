@@ -228,6 +228,13 @@
     'guru.tab-kelas-siswa': 'ชั้นเรียนและนักเรียน',
     'guru.tab-tugas-ujian': 'งานและแบบทดสอบ',
     'guru.tab-jurnal': 'บันทึกของครู',
+    'guru.pilih-bab-kurikulum': 'เลือกบท / ประเภทเนื้อหาตามหลักสูตร Merdeka',
+    'guru.apersepsi-5-menit': '🎤 กิจกรรมนำเข้าสู่บทเรียน 5 นาที:',
+    'guru.judul-tugas-bab': 'ชื่องาน / บท',
+    'guru.terbitkan-tugas-kurikulum': 'เผยแพร่งานตามหลักสูตร',
+    'guru.judul-otomatis': 'เว้นว่างไว้เพื่อตั้งชื่ออัตโนมัติ',
+    'guru.merek-tag': 'สำหรับครู',
+    'guru.merek-penuh': 'KelasKu สำหรับครู',
     'guru.judul-kelas': 'ชั้นเรียน — ครู · นักเรียน · Braincore',
     'guru.tab-profil': 'โปรไฟล์ครู',
     'guru.kelas-aktif': 'ชั้นเรียนที่ใช้งาน',
@@ -301,6 +308,9 @@
     'diag.ringkasan-belum-siap': 'สรุปยังไม่พร้อม ปิดแล้วเปิด Diagnostics อีกครั้ง',
     'guru.pendamping-teman': 'โดยมีเพื่อนช่วย (ดูกลุ่มการเรียน)',
     'guru.tugas-belum-selesai': '• งานที่ยังไม่เสร็จ:',
+    'guru.demo-pita': 'คุณกำลังดู "ตัวอย่าง" — ชั้นเรียน นักเรียน และตัวเลขทั้งหมดเป็นข้อมูลสมมติ',
+    'guru.demo-keluar': 'ออกจากตัวอย่าง',
+    'guru.demo-cta': 'มีรหัสเชิญไหม เปิดใช้งานบัญชีครู',
     'guru.tanda-tangan': 'ครูภาษาอังกฤษ'
   });
 }());

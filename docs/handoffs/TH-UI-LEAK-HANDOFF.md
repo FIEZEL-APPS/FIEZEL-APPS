@@ -139,3 +139,75 @@ seluruh copy-th lain di berkas ini. Wewenang tetap pada OWNER.
 
 Tidak berubah dari daftar di atas: label zona audio (8 kalimat), lencana prasasti (3),
 dan skenario listening (23).
+
+## m025-282 — kebocoran merek "KelasKu untuk Guru" ditutup
+
+Commit `4406515a` (rebranding + landing page baru) didorong **langsung ke main**, bukan
+lewat PR, jadi tidak ada gerbang yang menahannya sebelum mendarat. Ia memasukkan `untuk
+Guru` ke tiga jalur render sekaligus dan memerahkan gerbang ini di `quality` — yang berarti
+**setiap PR siapa pun ikut merah** sampai ditutup.
+
+| Berkas | Tempat | Terlihat kapan |
+|---|---|---|
+| `features/teacher/fiezel-teacher-shell.js:317` | sidebar dashboard guru | setiap layar guru |
+| `features/teacher/fiezel-teacher-shell.js:326` | header dashboard guru | setiap layar guru |
+| `app.js` | kartu pintu guru di Home | layar Home murid/guru |
+
+Ditutup **lewat i18n, bukan lewat menaikkan anggaran**: menaikkan anggaran menyembunyikan
+kebocoran, tidak menutupnya. Dua kunci baru di pasangan `copy-id-feat-d` / `copy-th-feat-d`:
+
+- `guru.merek-tag` — id `untuk Guru`, th `สำหรับครู`
+- `guru.merek-penuh` — id `KelasKu untuk Guru`, th `KelasKu สำหรับครู`
+
+**`KelasKu` sengaja TIDAK diterjemahkan** — itu nama merek, bukan naskah. Yang berbahasa
+hanya taglinenya. Naskah Thai berstatus DRAFT AI dan wajib review penutur asli, sama seperti
+seluruh copy-th lain.
+
+`id-golden-baseline` diregenerate di commit yang sama; selisihnya diperiksa lebih dulu —
+hanya dua fragmen merek yang berubah, **nol kalimat murid hilang**.
+
+### Yang masih terbuka sesudah ini
+
+Tidak berubah: label zona audio (8 kalimat), lencana prasasti (3), skenario listening (23).
+
+## m025-284 · kunci hantu: "hijau" yang justru merusak layar
+
+Kejadiannya berurutan dalam satu jam, dan urutannya penting:
+
+1. m025-283 membawa kurikulum SMP/SMA, dengan delapan literal Indonesia di jalur render.
+   `th-ui-leak` memerahkan `main` itu sendiri.
+2. Perbaikan `9fc9ac6` menghijaukannya dengan dua cara, dan **keduanya tidak menyelesaikan
+   apa pun**:
+   - empat label layar dibungkus `t('guru.pilih-bab-kurikulum')` dan kunci-kuncinya
+     **tidak pernah didaftarkan** di copy-map mana pun;
+   - empat literal isi kurikulum **diganti katanya** sampai heuristik pemindai tidak lagi
+     mengenalinya: `Kelas 10` → `Tingkat 10`, `Selesai` → `Resolusi`, `Buat` → `Gambar`.
+
+`FiezelI18n.t()` untuk kunci yang tidak terdaftar **mengembalikan nama kuncinya**
+(`fiezel-i18n.js`: `if (s === undefined) s = key;`) — bukan fallback. Jadi sesudah
+"perbaikan" itu, guru melihat teks `guru.pilih-bab-kurikulum` mentah di layar, dalam
+bahasa apa pun. Gerbangnya hijau; layarnya lebih rusak daripada sebelum disentuh.
+
+Dan `Fase E (SMA / SMK Kelas 10)` adalah **istilah regulasi Kemendikbud**. Menulisnya
+`Tingkat 10` membuat naskahnya salah menurut kurikulum yang diacunya, demi lolos sebuah tes.
+
+### Yang dikerjakan m025-284
+
+- Empat kunci `guru.*` didaftarkan di copy id DAN th (plus `guru.judul-otomatis`, satu
+  placeholder yang masih literal dan luput dari sapuan itu).
+- Empat frasa kurikulum **dikembalikan kata aslinya**, dan utangnya dinyatakan terbuka
+  sebagai anggaran beralasan di `th-ui-leak` — isi kurikulum nasional Indonesia bukan
+  naskah antarmuka; guru Thai tidak mengajar di bawah Kurikulum Merdeka.
+- **Gerbang baru `tests/i18n-kunci-hantu-test.js`.** Seluruh gerbang i18n yang ada
+  memeriksa satu arah — kunci yang terdaftar tapi tanpa padanan th. Arah sebaliknya, kunci
+  yang DIPANGGIL tapi tidak pernah ada, tidak dijaga siapa pun. Sekarang dijaga.
+
+### Utang yang ditemukan sambil jalan
+
+Sapuan pertama gerbang itu menemukan **16 kunci hantu yang sudah ada sebelumnya** —
+`progress.belum-terukur`, `account.err-pass-mismatch`, `quiz.tombol-dengar`, enam kunci
+validasi di `fiezel-social.js`, lima `fsl.explain-*`, plus dua th-only yang sah
+(`gems.*`). Semuanya menampilkan nama kunci di layar hari ini. Mereka dicatat di `UTANG`
+di dalam gerbang itu — bukan dimaafkan diam-diam — supaya gerbangnya bisa berdiri sekarang
+dan menahan kerusakan baru, sementara utang lama dibayar terpisah oleh yang paling paham
+maksud tiap kunci.

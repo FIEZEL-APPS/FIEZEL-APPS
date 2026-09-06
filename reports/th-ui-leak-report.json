@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-09-06T18:11:07.147Z",
+  "generatedAt": "2026-09-06T23:29:43.636Z",
   "files": {
     "app.js": {
       "leaks": 1,
@@ -221,11 +221,33 @@
           "text": "Daftar sebenarnya tidak berguna"
         }
       ]
+    },
+    "features/teacher/fiezel-teacher-curriculum.js": {
+      "leaks": 4,
+      "budget": 4,
+      "sample": [
+        {
+          "line": 25,
+          "text": "Fase E (SMA / SMK Kelas 10)"
+        },
+        {
+          "line": 32,
+          "text": "Fase F (SMA / SMK Kelas 11 & 12)"
+        },
+        {
+          "line": 286,
+          "text": "Gunakan bagan alur cerita (Story Mountain) 3 kotak: Awal, Masalah, Selesai."
+        },
+        {
+          "line": 484,
+          "text": "Buat bagan alur 3 langkah di papan: Disruption → Displacement of water → Giant waves."
+        }
+      ]
     }
   },
   "copyKeys": {
-    "id": 2395,
-    "th": 2397,
+    "id": 2405,
+    "th": 2407,
     "idTanpaTh": 0
   },
   "pass": true
