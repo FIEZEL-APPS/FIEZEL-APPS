@@ -218,6 +218,7 @@ jobs:
           node tests/braincore-evidence-test.js
           # --- SLOT 10: akun, peran, konten guru, CSV, Braincore, sosial -------
           node tests/auth-schema-contract-test.js
+          node tests/google-auth-core-test.js
           node tests/auth-role-test.js
           node tests/role-security-test.js
           node tests/teacher-content-test.js
