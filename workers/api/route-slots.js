@@ -121,6 +121,13 @@ import { ROUTES as TEACHER_ROUTES } from './route-teacher.js';
 /* --- SLOT 11: SINKRON RUANG GURU (route-class-sync.js) — /api/learner/class-report,
    /api/teacher/class/claim|list|reports. Kode kelas diklaim guru, murid melapor agregat. [TERPASANG] */
 import { ROUTES as CLASS_SYNC_ROUTES } from './route-class-sync.js';
+/* --- SLOT 12: LOGIN GOOGLE (route-auth-google.js) — POST /api/auth/google [TERPASANG]
+ * Array `ROUTES` sungguhan, BUKAN lewat route-wiring.js, alasan yang sama dengan
+ * SLOT 10 dan 11: tidak memanggil provider berbayar (nol jembatan kuota) dan
+ * memakai CORE_DB. Gerbangnya: mw-guard (cap byte dari schema.js) -> mw-identity
+ * (kasus penautan butuh identitas yang sedang dipakai) -> verifikasi tanda tangan
+ * ID token terhadap JWKS Google di dalam modulnya. */
+import { ROUTES as GOOGLE_AUTH_ROUTES } from './route-auth-google.js';
 
 export const EXTRA_ROUTES = [
   ...buildExtraRoutes(),  /* SLOT 1-4 */
@@ -133,4 +140,5 @@ export const EXTRA_ROUTES = [
   ...OWNER_TEACHER_ROUTES,    /* SLOT 10 */
   ...TEACHER_ROUTES,          /* SLOT 10 */
   ...CLASS_SYNC_ROUTES,       /* SLOT 11 */
+  ...GOOGLE_AUTH_ROUTES,      /* SLOT 12 */
 ];

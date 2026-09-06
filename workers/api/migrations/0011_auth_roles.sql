@@ -10,7 +10,7 @@
 --
 -- PENERAPAN: token CI juga tidak bisa `wrangler d1 execute --remote`. Runtime
 -- punya `ensureAuthSchema()` yang menerapkan DDL YANG SAMA secara idempoten.
--- Berkas ini TETAP SUMBER RESMI; gerbang `auth-schema-contract-test.js`
+-- Berkas ini TETAP SUMBER RESMI; gerbang `tests/auth-schema-contract-test.js`
 -- menegakkan keduanya setara pernyataan-per-pernyataan (ternormalisasi).
 --
 -- ==========================================================================

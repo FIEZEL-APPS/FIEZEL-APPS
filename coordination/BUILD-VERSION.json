@@ -1,7 +1,7 @@
 {
-  "version": "m025-269",
-  "claimedBy": "branch claude/task-home-exit-detector-cq1nea",
-  "claimedAt": "2026-09-05T23:54:37.867Z",
-  "reason": "pendeteksi keluar layar saat ujian (laporan realtime ke guru)",
+  "version": "m025-270",
+  "claimedBy": "branch feat/google-auth-schema",
+  "claimedAt": "2026-09-06T02:10:00.000Z",
+  "reason": "Masuk dengan Google: tombol resmi di layar akun, naskah id+th, dan rute penukar ID token menjadi sesi FIEZEL",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
