@@ -8003,6 +8003,10 @@ function bindFiezelAccountControls(){
     }
     try{
       await self.FiezelAccount?.logout?.();
+      /* Status tampilan Google ikut dilupakan. Ia memang bukan gerbang apa pun,
+         tapi layar yang masih berbunyi "kamu masuk sebagai …" sesudah murid
+         menekan Keluar adalah layar yang berbohong. */
+      try{self.FiezelGoogle?.signOut?.()}catch(_){}
       showToast('Berhasil keluar dari akun.');
     }catch(_){
       showToast('Keluar dari sesi.');
@@ -8072,6 +8076,41 @@ function openTeacherRoomModal(){
 function openFiezelAuthModal(initialTab){
   let currentTab=initialTab||'login';
 
+  /**
+   * Gambar tombol Google resmi ke dalam modal yang SUDAH terbuka.
+   *
+   * Kenapa sesudah openModal dan bukan di dalam string HTML: tombolnya digambar
+   * oleh skrip Google ke dalam elemen yang harus sudah ada di dokumen. Dan kenapa
+   * kegagalan di sini TIDAK menutup apa pun — formulir akun FIEZEL sudah tergambar
+   * di bawahnya, jadi skrip Google yang tidak sampai (jaringan sekolah yang
+   * memblokirnya, misalnya) berarti satu jalan masuk hilang, bukan semuanya.
+   */
+  async function mountGoogleButton(){
+    const host=$('authGoogleBtn');
+    const status=$('authGoogleStatus');
+    if(!host||!self.FiezelGoogle?.renderButton)return;
+    const hasil=await self.FiezelGoogle.renderButton(host,(res)=>{
+      const errBox=$('authModalError');
+      if(res?.ok){
+        if(status)status.textContent=FiezelI18n.t('google.status-masuk',{email:res.email||''});
+        showToast(res.linked?FiezelI18n.t('google.toast-tertaut'):FiezelI18n.t('google.toast-berhasil'));
+        closeModal();
+        setTimeout(openSettings,100);
+        return;
+      }
+      if(errBox){
+        errBox.textContent=res?.message||FiezelI18n.t('google.gagal');
+        errBox.style.display='block';
+      }else if(status){
+        status.textContent=res?.message||FiezelI18n.t('google.gagal');
+      }
+    });
+    if(status){
+      if(hasil?.ok)status.textContent=FiezelI18n.t('google.pakai-akun-fiezel');
+      else status.textContent=hasil?.message||FiezelI18n.t('google.gagal-muat');
+    }
+  }
+
   function renderAuthModalContent(){
     let tabContent='';
     const acc=self.FiezelAccount?.getAccount?.();
@@ -8118,8 +8157,26 @@ function openFiezelAuthModal(initialTab){
       </div>`;
     }
 
+    /* Blok Google berdiri DI ATAS formulir, dan hanya di tab masuk/daftar — bukan di
+       tab guru, yang jalurnya token undangan. Ia tidak pernah menggantikan formulir
+       FIEZEL di bawahnya: murid tanpa akun Google (atau tanpa akses ke Google) harus
+       selalu melihat jalan masuk keduanya di layar yang sama. */
+    const googleAda=!!self.FiezelGoogle?.available?.();
+    const googleEmail=self.FiezelGoogle?.rememberedEmail?.()||'';
+    const googleBlock=(googleAda&&currentTab!=='teacher')?`<div class="auth-google">
+        <div id="authGoogleBtn" class="auth-google-btn"></div>
+        <p id="authGoogleStatus" class="auth-google-status" role="status">${
+          googleEmail
+            ? esc(FiezelI18n.t('google.status-masuk',{email:googleEmail}))
+            : esc(FiezelI18n.t('google.menyiapkan'))
+        }</p>
+        <p class="auth-google-note">${esc(FiezelI18n.t('google.email-untuk-sekolah'))}</p>
+        <div class="auth-google-sep"><span>${esc(FiezelI18n.t('google.atau'))}</span></div>
+      </div>`:'';
+
     const html=`<div class="modal-mark">FIEZEL AUTH</div>
       <h2>${FiezelI18n.t('account.card-title')}</h2>
+      ${googleBlock}
       <div class="auth-tabs">
         <button type="button" class="auth-tab ${currentTab==='login'?'active':''}" data-tab="login">${FiezelI18n.t('account.tab-masuk')}</button>
         <button type="button" class="auth-tab ${currentTab==='register'?'active':''}" data-tab="register">${FiezelI18n.t('account.tab-daftar')}</button>
@@ -8132,6 +8189,7 @@ function openFiezelAuthModal(initialTab){
 
     openModal(html);
     enhanceUI();
+    if(googleBlock)mountGoogleButton();
 
     $('btnAuthCancel').onclick=()=>{
       closeModal();

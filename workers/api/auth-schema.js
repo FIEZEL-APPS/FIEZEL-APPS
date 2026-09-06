@@ -42,6 +42,16 @@ export const AUTH_TABLES = Object.freeze([
   'friend_request', 'notification', 'push_subscription'
 ]);
 
+/**
+ * Tabel identitas pihak ketiga + email. Grup TERPISAH dari AUTH_TABLES dengan
+ * sengaja: keduanya lahir dari keputusan owner yang berbeda dan lebih baru
+ * (login Google + email untuk menghubungi orang tua/sekolah), dan pemisahan itu
+ * membuat migrasi 0013 bisa dibaca sebagai satu keputusan utuh.
+ */
+export const OAUTH_TABLES = Object.freeze([
+  'auth_oauth_identity', 'auth_email'
+]);
+
 /** Tabel konten guru. */
 export const TEACHER_TABLES = Object.freeze([
   'tc_node', 'tc_question', 'tc_assignment', 'tc_assignment_target', 'tc_lesson_evidence',
@@ -236,8 +246,33 @@ export const TEACHER_DDL = Object.freeze([
     ' ) WITHOUT ROWID',
 ]);
 
+export const OAUTH_DDL = Object.freeze([
+  'CREATE TABLE IF NOT EXISTS auth_oauth_identity (' +
+    ' provider TEXT NOT NULL,' +
+    ' provider_sub TEXT NOT NULL,' +
+    ' sub TEXT NOT NULL,' +
+    ' linked_at INTEGER NOT NULL' +
+    ', PRIMARY KEY (provider, provider_sub)' +
+    ' ) WITHOUT ROWID',
+  'CREATE TABLE IF NOT EXISTS auth_email (' +
+    ' sub TEXT PRIMARY KEY,' +
+    ' email TEXT NOT NULL,' +
+    ' verified INTEGER NOT NULL DEFAULT 0,' +
+    ' source TEXT NOT NULL,' +
+    ' updated_at INTEGER NOT NULL' +
+    ' ) WITHOUT ROWID',
+  /* Satu akun FIEZEL = paling banyak satu akun Google. PRIMARY KEY tabel ini
+     berawalan `provider`, jadi ia menjawab "akun Google ini milik siapa" tetapi
+     TIDAK menjawab "akun ini sudah menaut Google atau belum" — pertanyaan yang
+     ditanyakan rute penautan setiap kali. UNIQUE, bukan sekadar indeks:
+     penegakannya harus ada di basis data, bukan hanya di pemeriksaan handler
+     yang bisa dilewati dua permintaan serentak. */
+  'CREATE UNIQUE INDEX IF NOT EXISTS ux_auth_oauth_sub_provider' +
+    ' ON auth_oauth_identity (sub, provider)'
+]);
+
 /** Seluruh DDL paket ini, urut terapan. */
-export const ALL_DDL = Object.freeze([...AUTH_DDL, ...TEACHER_DDL]);
+export const ALL_DDL = Object.freeze([...AUTH_DDL, ...TEACHER_DDL, ...OAUTH_DDL]);
 
 /**
  * Cache per handle DB. WeakMap supaya isolate yang membuang binding-nya tidak
