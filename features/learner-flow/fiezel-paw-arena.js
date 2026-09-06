@@ -84,10 +84,11 @@
     var seed = (o.seed >>> 0) || 20260601;
     var Bot = root && root.FiezelArenaBot;
     var persona = Bot ? Bot.pickPersona(seed) : { id: 'bumi', name: 'Bumi', skill: 0.62 };
+    var isFriend = o.mode === 'friend';
     return {
       schema: 'fiezel-paw-arena-session-v1',
       game: g.id,
-      mode: o.mode === 'friend' ? 'friend' : 'solo',
+      mode: isFriend ? 'friend' : 'solo',
       seed: seed,
       phase: 'rules',        // SELALU 'rules' saat masuk (§3.3).
       rulesShown: false,
@@ -95,7 +96,8 @@
       round: 0,
       turn: 0,               // 0 = kamu, 1 = bot.
       scores: [0, 0],
-      opponent: { name: persona.name, persona: persona.id, isBot: o.mode !== 'friend' },
+      opponent: { name: isFriend ? (o.from || t('pawarena.friend', 'Teman')) : persona.name, persona: persona.id, isBot: !isFriend },
+      invite: o.invite || null,   // tantangan teman yang sedang dibalas (kode masuk).
       story: [],
       log: [],
       rt: null               // runtime ronde (disiapkan controller saat mulai main).
@@ -148,10 +150,43 @@
   }
   function readLegacyDuelCode(str) { try { var D = root && root.FiezelDuel; return D && D.decode ? D.decode(str) : null; } catch (_) { return null; } }
 
+  // ---- MAIN BERDUA lewat KODE/TAUTAN (nol server, §3.1.2) — untuk Sinyal & Taruhan --------
+  // Kedua pemain mengerjakan KONTEN IDENTIK karena seed sama (soal/kata deterministik dari
+  // seed). Pola async persis duel lama: A main → bagi kode (seed+skor) → B buka kode → main
+  // seed yang sama → banding skor → kirim kode balasan. Tak perlu WebSocket/polling.
+  var FRIEND_GAMES = { signal: 1, stakes: 1 };
+  function b64enc(s) { try { if (typeof btoa === 'function') return btoa(unescape(encodeURIComponent(s))).replace(/=+$/, ''); } catch (_) {} try { return Buffer.from(s, 'utf8').toString('base64').replace(/=+$/, ''); } catch (_) { return ''; } }
+  function b64dec(s) { try { if (typeof atob === 'function') return decodeURIComponent(escape(atob(s))); } catch (_) {} try { return Buffer.from(s, 'base64').toString('utf8'); } catch (_) { return ''; } }
+  function encodeChallenge(obj) {
+    var o = obj || {};
+    return b64enc(JSON.stringify({ v: 1, g: o.game, s: (o.seed >>> 0), f: String(o.from || '').slice(0, 20), sc: Math.max(0, Math.round(Number(o.score) || 0)), rp: o.reply ? 1 : 0 }));
+  }
+  function decodeChallenge(code) {
+    try {
+      var s = String(code || '').trim(); var q = s.indexOf('arena=');
+      if (q > -1) s = decodeURIComponent(s.slice(q + 6).split(/[&#\s]/)[0]);
+      var o = JSON.parse(b64dec(s));
+      if (!o || o.v !== 1 || !FRIEND_GAMES[o.g] || !(o.s >= 0)) return null;
+      return { game: o.g, seed: (o.s >>> 0), from: String(o.f || '').slice(0, 20), score: Math.max(0, Math.round(Number(o.sc) || 0)), reply: o.rp === 1 };
+    } catch (_) { return null; }
+  }
+  function shareLink(code) {
+    try { var u = new URL(root.location.href); u.search = ''; u.hash = ''; u.searchParams.set('arena', code); return u.toString(); }
+    catch (_) { return code; }
+  }
+  function myChallengeCode(session) {
+    return encodeChallenge({ game: session.game, seed: session.seed, from: challengerName(), score: session.scores[0], reply: !!session.invite });
+  }
+  function challengerName() { try { return env.learnerName ? String(env.learnerName() || '').split(' ')[0] || 'Teman' : 'Teman'; } catch (_) { return 'Teman'; } }
+
+  // ---- ARTEFAK: koleksi cerita Story Chain tersimpan -------------------------------------
+  var STORIES_KEY = 'fiezel-paw-arena-stories-v1';
+  function loadStories() { try { var a = JSON.parse(root.localStorage.getItem(STORIES_KEY) || '[]'); return Array.isArray(a) ? a : []; } catch (_) { return []; } }
+
   // ====================================================================================
   // CONTROLLER (DOM) — dijaga typeof document; gerbang Node berhenti sebelum sini.
   // ====================================================================================
-  var mountEl = null, env = {}, S = null, timer = null;
+  var mountEl = null, env = {}, S = null, timer = null, showJoin = false, joinErr = '', openStoryIdx = -1;
 
   function bank() { return root && root.FiezelReviewBank; }
   function rng(n) { var Bot = root && root.FiezelArenaBot; return Bot ? Bot.makeRng((S.seed >>> 0) + (n || 0)) : function () { return 0.5; }; }
@@ -187,7 +222,9 @@
       if (S.turn === 1) runBotStory();
     } else if (S.game === 'signal') {
       var entry = SIGNAL_BANK[(S.round + (S.seed % SIGNAL_BANK.length)) % SIGNAL_BANK.length];
-      var youGive = (S.round % 2) === 0; // ronde genap: kamu beri petunjuk; ganjil: bot beri petunjuk.
+      // Mode friend: kamu SELALU penebak atas jejak yang dibangun sistem (deterministik dari
+      // seed) — kedua pemain menghadapi kata+petunjuk identik, jadi skornya adil dibandingkan.
+      var youGive = S.mode === 'friend' ? false : ((S.round % 2) === 0);
       S.rt = { step: youGive ? 'give' : 'botgive', entry: entry, picked: [], youGive: youGive, feedback: null };
       if (!youGive) runBotGive();
     } else { // stakes
@@ -238,21 +275,52 @@
     mountEl.innerHTML = '<div class="paw-arena duel" data-testid="paw-arena">' +
       '<div class="paw-arena-top"><b class="paw-arena-brand">' + esc(t('pawarena.title', 'PAW ARENA')) + '</b>' +
       (S && !shouldShowRules(S) && S.phase !== 'done' ? '<button type="button" class="lf-mini" data-arena="help" data-testid="paw-arena-help" aria-label="' + esc(t('pawarena.help', 'Petunjuk')) + '">?</button>' : '') +
-      '</div>' + body + (S && S.helpOpen ? helpOverlayHtml() : '') + '</div>';
+      '</div>' + body + (S && S.helpOpen ? helpOverlayHtml() : '') + (openStoryIdx >= 0 ? storyOverlayHtml() : '') + '</div>';
     if (env.afterRender) try { env.afterRender(); } catch (_) {}
   }
 
   function lobbyHtml() {
+    if (showJoin) return joinHtml();
     var cards = GAMES.map(function (g) {
       var base = 'pawarena.game.' + g.key;
-      return '<button type="button" class="lf-card paw-lobby-card" data-arena="pick" data-game="' + g.id + '" data-testid="paw-pick-' + g.id + '">' +
+      var friend = FRIEND_GAMES[g.id] ? '<span class="lf-mini paw-lobby-friend" data-arena="pick-friend" data-game="' + g.id + '" role="button" tabindex="0" data-testid="paw-friend-' + g.id + '">' + esc(t('pawarena.challenge-friend', 'Tantang teman')) + '</span>' : '';
+      return '<div class="lf-card paw-lobby-card" data-testid="paw-lobby-' + g.id + '">' +
         '<b>' + esc(t(base + '.name', g.id)) + '</b><small class="lf-muted">' + esc(t(base + '.tag', '')) + '</small>' +
-        '<span class="lf-mini paw-lobby-cta">' + esc(t('pawarena.solo-vs-bot', 'Main sendiri lawan bot')) + '</span></button>';
+        '<div class="paw-lobby-actions"><button type="button" class="lf-mini paw-lobby-cta" data-arena="pick" data-game="' + g.id + '" data-testid="paw-pick-' + g.id + '">' + esc(t('pawarena.solo-vs-bot', 'Main sendiri lawan bot')) + '</button>' + friend + '</div></div>';
     }).join('');
     return '<div class="lf-card duel-hero"><p class="lf-kicker">' + esc(t('pawarena.title', 'PAW ARENA')) + '</p>' +
       '<h2>' + esc(t('pawarena.pick-game', 'Pilih permainan')) + '</h2>' +
-      '<p class="lf-muted">' + esc(t('pawarena.subtitle', '')) + '</p></div>' +
-      '<div class="paw-lobby-grid">' + cards + '</div>';
+      '<p class="lf-muted">' + esc(t('pawarena.subtitle', '')) + '</p>' +
+      '<div class="lf-actions"><button type="button" class="lf-ghost" data-arena="join-open" data-testid="paw-have-code">' + esc(t('pawarena.have-code', 'Punya kode teman?')) + '</button></div></div>' +
+      '<div class="paw-lobby-grid">' + cards + '</div>' + storiesHtml();
+  }
+
+  function joinHtml() {
+    return '<div class="lf-card" data-testid="paw-join"><p class="lf-kicker">' + esc(t('pawarena.with-friend', 'Main berdua lewat kode')) + '</p>' +
+      '<p class="lf-muted">' + esc(t('pawarena.friend-mode-note', 'Kalian mengerjakan soal yang sama; skor dibandingkan lewat kode.')) + '</p>' +
+      '<textarea class="lf-code" rows="3" placeholder="' + esc(t('pawarena.paste-code', 'Tempel kode / tautan ?arena=… di sini')) + '" data-testid="paw-join-code"></textarea>' +
+      (joinErr ? '<div class="lf-feedback is-wrong">' + esc(joinErr) + '</div>' : '') +
+      '<div class="lf-actions"><button type="button" class="lf-primary" data-arena="join-go" data-testid="paw-join-go">' + esc(t('pawarena.play-code', 'Main soal yang sama')) + '</button>' +
+      '<button type="button" class="lf-ghost" data-arena="join-close">' + esc(t('pawarena.back', 'Kembali')) + '</button></div></div>';
+  }
+
+  function storiesHtml() {
+    var list = loadStories();
+    if (!list.length) return '';
+    var items = list.slice(0, 8).map(function (s, i) {
+      var snip = String(s.text || '').slice(0, 90);
+      return '<li class="paw-story-item"><span class="paw-story-snip">“' + esc(snip) + (s.text && s.text.length > 90 ? '…' : '') + '”</span>' +
+        '<button type="button" class="lf-mini" data-arena="open-story" data-idx="' + i + '" data-testid="paw-open-story-' + i + '">' + esc(t('pawarena.open-story', 'Buka')) + '</button></li>';
+    }).join('');
+    return '<div class="lf-card paw-stories" data-testid="paw-stories"><h3>' + esc(t('pawarena.stories-title', 'Koleksi cerita')) + '</h3><ul class="paw-story-list">' + items + '</ul></div>';
+  }
+
+  function storyOverlayHtml() {
+    var list = loadStories(), s = list[openStoryIdx]; if (!s) return '';
+    return '<div class="paw-help-overlay" data-testid="paw-story-overlay" role="dialog" aria-label="' + esc(t('pawarena.stories-title', 'Koleksi cerita')) + '">' +
+      '<div class="lf-card paw-help-inner paw-story-full"><p class="lf-kicker">' + esc(t('pawarena.stories-title', 'Koleksi cerita')) + '</p>' +
+      '<p class="paw-story-text">' + esc(s.text || '') + '</p>' +
+      '<div class="lf-actions"><button type="button" class="lf-primary" data-arena="close-story" data-testid="paw-story-close">' + esc(t('pawarena.close', 'Tutup')) + '</button></div></div></div>';
   }
 
   function rulesCardHtml() {
@@ -359,8 +427,8 @@
     if (rt.feedback) {
       head += '<div class="lf-feedback ' + (rt.feedback.correct ? 'is-correct' : 'is-wrong') + '">' + esc(rt.feedback.text) + '</div>';
       head += '<div class="paw-stakes-tally" data-testid="paw-stakes-tally">' +
-        esc(t('pawarena.stakes.you-line', 'Kamu: taruhan {w} → {pts} poin').replace('{w}', t('pawarena.wager.' + rt.wager, rt.wager)).replace('{pts}', String(rt.feedback.correct ? WAGER_POINTS[rt.wager] : 0))) + '<br>' +
-        esc(t('pawarena.stakes.bot-line', '{name}: taruhan {w} → {pts} poin').replace('{name}', S.opponent.name).replace('{w}', t('pawarena.wager.' + rt.botWager, rt.botWager)).replace('{pts}', String(rt.botCorrect ? WAGER_POINTS[rt.botWager] : 0))) + '</div>';
+        esc(t('pawarena.stakes.you-line', 'Kamu: taruhan {w} → {pts} poin').replace('{w}', t('pawarena.wager.' + rt.wager, rt.wager)).replace('{pts}', String(rt.feedback.correct ? WAGER_POINTS[rt.wager] : 0))) +
+        (rt.botWager ? '<br>' + esc(t('pawarena.stakes.bot-line', '{name}: taruhan {w} → {pts} poin').replace('{name}', S.opponent.name).replace('{w}', t('pawarena.wager.' + rt.botWager, rt.botWager)).replace('{pts}', String(rt.botCorrect ? WAGER_POINTS[rt.botWager] : 0))) : '') + '</div>';
       head += '<div class="lf-actions"><button type="button" class="lf-primary" data-arena="next" data-testid="paw-next">' + esc(t('pawarena.next', 'Lanjut')) + '</button></div>';
     }
     return head + '</div>';
@@ -369,18 +437,41 @@
   // ---- result ----
   function resultHtml() {
     var r = result(S);
-    var head = r.outcome === 'win' ? t('pawarena.result.win', 'Kamu menang!') : (r.outcome === 'lose' ? t('pawarena.result.lose', '{name} menang!').replace('{name}', S.opponent.name) : t('pawarena.result.tie', 'Seri!'));
+    var head, friendBlock = '';
+    if (S.mode === 'friend') {
+      if (S.invite) {
+        // Kamu membalas tantangan: banding skormu vs skor teman dari kode.
+        var mine = S.scores[0], theirs = S.invite.score, nm = S.opponent.name;
+        head = mine > theirs ? t('pawarena.vs-friend-win', 'Kamu unggul atas {name}! ({mine} vs {theirs})') : (mine < theirs ? t('pawarena.vs-friend-lose', '{name} unggul ({theirs} vs {mine}) — tantang balik!') : t('pawarena.vs-friend-tie', 'Seri dengan {name} ({mine})'));
+        head = head.replace('{name}', nm).replace('{mine}', String(mine)).replace('{theirs}', String(theirs));
+        friendBlock = codeShareBlock(t('pawarena.reply-code', 'Kirim skor balik'));
+      } else {
+        head = t('pawarena.your-score', 'Skormu: {n} poin').replace('{n}', String(r.mine));
+        friendBlock = codeShareBlock(t('pawarena.share-code', 'Bagikan kode tantangan'));
+      }
+    } else {
+      head = r.outcome === 'win' ? t('pawarena.result.win', 'Kamu menang!') : (r.outcome === 'lose' ? t('pawarena.result.lose', '{name} menang!').replace('{name}', S.opponent.name) : t('pawarena.result.tie', 'Seri!'));
+    }
     var artifact = '';
     if (S.game === 'story') {
       artifact = '<div class="lf-card paw-artifact" data-testid="paw-artifact"><h3>' + esc(t('pawarena.story-done', 'Cerita kalian selesai — ini artefaknya.')) + '</h3>' +
         '<p class="paw-story-text">' + esc(r.story) + '</p>' +
         '<div class="lf-actions"><button type="button" class="lf-primary" data-arena="save-story" data-testid="paw-save-story">' + esc(t('pawarena.save-artifact', 'Simpan cerita')) + '</button></div></div>';
     }
-    return '<div class="lf-card duel-result" data-testid="paw-result"><p class="lf-kicker">' + esc(t('pawarena.title', 'PAW ARENA')) + '</p><h2>' + esc(head) + '</h2>' +
-      '<ul class="duel-versus"><li class="is-me"><b>' + esc(t('pawarena.you', 'Kamu')) + '</b><span>' + r.mine + ' ' + esc(t('pawarena.points', 'poin')) + '</span></li>' +
-      '<li><b>' + esc(S.opponent.name) + '</b><span>' + r.theirs + ' ' + esc(t('pawarena.points', 'poin')) + '</span></li></ul></div>' + artifact +
+    var versus = S.mode === 'friend'
+      ? '<ul class="duel-versus"><li class="is-me"><b>' + esc(t('pawarena.you', 'Kamu')) + '</b><span>' + r.mine + ' ' + esc(t('pawarena.points', 'poin')) + '</span></li>' + (S.invite ? '<li><b>' + esc(S.opponent.name) + '</b><span>' + S.invite.score + ' ' + esc(t('pawarena.points', 'poin')) + '</span></li>' : '') + '</ul>'
+      : '<ul class="duel-versus"><li class="is-me"><b>' + esc(t('pawarena.you', 'Kamu')) + '</b><span>' + r.mine + ' ' + esc(t('pawarena.points', 'poin')) + '</span></li>' +
+        '<li><b>' + esc(S.opponent.name) + '</b><span>' + r.theirs + ' ' + esc(t('pawarena.points', 'poin')) + '</span></li></ul>';
+    return '<div class="lf-card duel-result" data-testid="paw-result"><p class="lf-kicker">' + esc(t('pawarena.title', 'PAW ARENA')) + '</p><h2>' + esc(head) + '</h2>' + versus + '</div>' + artifact + friendBlock +
       '<div class="lf-actions"><button type="button" class="lf-primary" data-arena="replay" data-testid="paw-replay">' + esc(t('pawarena.play-again', 'Main lagi')) + '</button>' +
       '<button type="button" class="lf-ghost" data-arena="to-lobby" data-testid="paw-to-lobby">' + esc(t('pawarena.to-lobby', 'Ke daftar permainan')) + '</button></div>';
+  }
+
+  function codeShareBlock(label) {
+    var link = shareLink(myChallengeCode(S));
+    return '<div class="lf-card paw-code-share" data-testid="paw-code-share"><h3>' + esc(label) + '</h3>' +
+      '<textarea class="lf-code" readonly rows="2" data-testid="paw-my-code">' + esc(link) + '</textarea>' +
+      '<div class="lf-actions"><button type="button" class="lf-primary" data-arena="copy-code" data-testid="paw-copy-code">' + esc(t('pawarena.copy', 'Salin')) + '</button></div></div>';
   }
 
   function finishGame() {
@@ -402,11 +493,29 @@
     if (!btn || btn.disabled) return;
     var act = btn.getAttribute('data-arena');
     if (act === 'pick') { S = newSession(btn.getAttribute('data-game'), { seed: (Date.now() % 100000) + 7 }); sfx('nav'); render(); return; }
+    if (act === 'pick-friend') { S = newSession(btn.getAttribute('data-game'), { mode: 'friend', seed: (Date.now() % 100000) + 7 }); sfx('nav'); render(); return; }
+    if (act === 'join-open') { showJoin = true; joinErr = ''; sfx('nav'); render(); return; }
+    if (act === 'join-close') { showJoin = false; render(); return; }
+    if (act === 'join-go') {
+      var ta = mountEl.querySelector('[data-testid=paw-join-code]');
+      var inv = ta ? decodeChallenge(ta.value) : null;
+      if (!inv) { joinErr = t('pawarena.code-invalid', 'Kode belum dikenali — pastikan tersalin utuh.'); render(); return; }
+      showJoin = false; joinErr = '';
+      S = newSession(inv.game, { mode: 'friend', seed: inv.seed, from: inv.from, invite: inv });
+      sfx('start'); render(); return;
+    }
+    if (act === 'copy-code') {
+      var el = mountEl.querySelector('[data-testid=paw-my-code]');
+      if (el) { try { if (root.navigator && root.navigator.clipboard) root.navigator.clipboard.writeText(el.value); } catch (_) {} if (env.toast) try { env.toast(t('pawarena.copied', 'Tersalin.')); } catch (_) {} }
+      return;
+    }
+    if (act === 'open-story') { openStoryIdx = Number(btn.getAttribute('data-idx')); render(); return; }
+    if (act === 'close-story') { openStoryIdx = -1; render(); return; }
     if (act === 'start' || act === 'skip') { dismissRules(S, act); sfx('start'); paw('milestone'); setupTurn(); render(); return; }
     if (act === 'help') { openHelp(S); sfx('nav'); render(); return; }
     if (act === 'close-help') { closeHelp(S); render(); return; }
-    if (act === 'to-lobby') { S = null; unmount(); render(); return; }
-    if (act === 'replay') { S = newSession(S.game, { seed: (Date.now() % 100000) + 11 }); render(); return; }
+    if (act === 'to-lobby') { S = null; showJoin = false; openStoryIdx = -1; unmount(); render(); return; }
+    if (act === 'replay') { S = newSession(S.game, { mode: S.mode, seed: (Date.now() % 100000) + 11, from: S.invite ? S.invite.from : undefined, invite: S.invite || undefined }); render(); return; }
     if (act === 'save-story') { saveStory(); return; }
     if (act === 'answer') { onAnswer(Number(btn.getAttribute('data-choice'))); return; }
     if (act === 'pick-sentence') { onStoryPick(Number(btn.getAttribute('data-idx'))); return; }
@@ -427,12 +536,17 @@
       // jawaban benar yang menambah poin (harga tiket §3.1 Story Chain).
       S.rt.step = 'append';
     } else { // stakes: reveal, hitung bot, tambah skor
-      var Bot = root && root.FiezelArenaBot, r = rng(S.round * 3 + 2);
-      var bw = Bot.chooseWager({ persona: personaObj(), rng: r });
-      var ba = Bot.chooseAnswer({ correctIndex: item.answer, optionCount: item.options.length, difficulty: 3, persona: personaObj(), rng: r });
-      S.rt.botWager = bw; S.rt.botChoice = ba.choice; S.rt.botCorrect = ba.correct;
-      if (ex.correct) S.scores[0] += WAGER_POINTS[S.rt.wager];
-      if (ba.correct) S.scores[1] += WAGER_POINTS[bw];
+      if (S.mode === 'friend') {
+        // Tanpa lawan langsung: hanya skormu yang terhitung; bandingkan lewat kode di hasil.
+        if (ex.correct) S.scores[0] += WAGER_POINTS[S.rt.wager];
+      } else {
+        var Bot = root && root.FiezelArenaBot, r = rng(S.round * 3 + 2);
+        var bw = Bot.chooseWager({ persona: personaObj(), rng: r });
+        var ba = Bot.chooseAnswer({ correctIndex: item.answer, optionCount: item.options.length, difficulty: 3, persona: personaObj(), rng: r });
+        S.rt.botWager = bw; S.rt.botChoice = ba.choice; S.rt.botCorrect = ba.correct;
+        if (ex.correct) S.scores[0] += WAGER_POINTS[S.rt.wager];
+        if (ba.correct) S.scores[1] += WAGER_POINTS[bw];
+      }
     }
     render();
   }
@@ -479,6 +593,8 @@
     openHelp: openHelp, closeHelp: closeHelp, recordTurn: recordTurn,
     appendSentence: appendSentence, storyText: storyText, isOver: isOver,
     advance: advance, result: result, readLegacyDuelCode: readLegacyDuelCode,
+    encodeChallenge: encodeChallenge, decodeChallenge: decodeChallenge, shareLink: shareLink,
+    loadStories: loadStories,
     mount: mount, unmount: unmount, render: render
   };
 });

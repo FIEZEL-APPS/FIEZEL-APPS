@@ -236,3 +236,11 @@
 .paw-help-inner{max-width:420px;width:100%}
 .paw-artifact .paw-story-text{font-style:italic;line-height:1.75}
 @media(prefers-reduced-motion:reduce){.paw-lobby-card,.paw-lobby-card:hover{transition:none;transform:none}}
+/* PAW ARENA (m025-277 · main berdua + artefak) */
+.paw-lobby-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;align-items:center}
+.paw-lobby-friend{cursor:pointer;border:1px solid var(--line,#F0E4CF);border-radius:999px;padding:4px 10px;color:var(--brand,#0f8f6f)}
+.paw-code-share .lf-code,.paw-stories .paw-story-list{margin-top:8px}
+.paw-story-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
+.paw-story-item{display:flex;gap:10px;align-items:center;justify-content:space-between}
+.paw-story-snip{flex:1;min-width:0;font-style:italic;color:var(--ink,#2b2b2b);overflow:hidden;text-overflow:ellipsis}
+.paw-story-full{max-height:70vh;overflow:auto}

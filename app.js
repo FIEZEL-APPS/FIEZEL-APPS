@@ -12308,7 +12308,11 @@ window.switchOnlineTab=id=>{if(onlineTabs().some(([t])=>t===id))onlineTab=id;uiS
 window.switchOnlineBoard=id=>{onlineBoardTab=id==='liga'?'liga':'teman';uiSfx('toggle');render()};
 function onlineView(){
   const tabs=`<div class="progress-tabs" role="tablist">${onlineTabs().map(([id,label])=>`<button type="button" class="progress-tab${onlineTab===id?' active':''}" role="tab" aria-selected="${onlineTab===id}" onclick="switchOnlineTab('${id}')">${esc(label)}</button>`).join('')}</div>`;
-  shell(FiezelI18n.t('social.shell-title'),FiezelI18n.t('social.shell-desc'),`${tabs}<div id="onlineRoot">${card(`<p class="muted">${FiezelI18n.t('social.loading')}</p>`)}</div>`);
+  /* m025-277 (§4a): pintu KEDUA ke PAW ARENA (selain kartu Home). Ditaruh di cangkang
+     Profil, DI LUAR konten sosial yang bergantung flag/jaringan, supaya arena tetap bisa
+     dibuka murid meski offline (arena itu offline-first). Untuk murid, bukan guru. */
+  const arenaDoor=isVerifiedTeacher()?'':`<div class="learning-launcher"><button class="launch-card arena-launch" onclick="go('arena')" data-testid="profile-paw-arena"><span class="launch-icon"><i class="fz-i" data-fz-icon="speaking" aria-hidden="true"></i></span><span><small>${esc(FiezelI18n.t('pawarena.subtitle'))}</small><b>${FiezelI18n.t('pawarena.title')}</b></span><i data-lucide="arrow-up-right"></i></button></div>`;
+  shell(FiezelI18n.t('social.shell-title'),FiezelI18n.t('social.shell-desc'),`${arenaDoor}${tabs}<div id="onlineRoot">${card(`<p class="muted">${FiezelI18n.t('social.loading')}</p>`)}</div>`);
   renderOnlineTab();
 }
 // Kartu keadaan yang dijanjikan spec: dua kalimat jujur, nol nada gagal. Belajar tidak

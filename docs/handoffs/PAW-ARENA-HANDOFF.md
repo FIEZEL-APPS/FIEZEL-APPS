@@ -51,9 +51,18 @@ petunjuk mid-ronde tak ubah skor. Suite penuh 259 gerbang (Node 22/Python/Chromi
 dijalankan di CI; `cf-live-selftest` merah-diketahui bukan milik perubahan ini.
 
 ## Sengaja BELUM dikerjakan (langkah berikutnya)
-- **Entri Profil** (§4a "dari Profil"): tinggal satu tombol `go('arena')` di tab Profil —
-  ditunda agar tab sosial tak disentuh dulu. Pintu Home + view sudah jalan.
-- **Main berdua lewat kode untuk game arena baru**: `?duel=` lama tetap hidup; round-trip kode
-  untuk Story/Signal/Stakes menyusul (pola encode/decode duel bisa dipakai ulang).
+- **Story Chain berdua**: main-berdua lewat kode kini jalan untuk **Sinyal & Taruhan**
+  (`encodeChallenge`/`decodeChallenge`/`shareLink`, param `?arena=`, konten identik dari seed,
+  banding skor + kode balasan). Story bersifat kolaboratif (bukan head-to-head) → co-writing
+  async menyusul.
+- **Rute `?arena=` di boot app.js**: kode teman bisa ditempel di dalam arena (panel "Punya
+  kode?"); auto-buka dari URL `?arena=` saat boot (seperti `?duel=`) menyusul. `?duel=` lama
+  tetap hidup.
 - **Penghapusan `fiezel-duel.js`**: ditahan sampai transisi selesai.
 - **Coach-mark kali-pertama** (opsional, §3.3) sebagai TAMBAHAN kartu per-sesi.
+
+## Sudah lengkap sejak commit ini
+- **Dua pintu masuk** (§4a): kartu Home (`home-paw-arena`) + kartu Profil (`profile-paw-arena`,
+  di luar konten sosial ber-flag sehingga tetap tampil offline).
+- **Main berdua lewat kode** untuk Sinyal & Taruhan (async, nol server).
+- **Papan artefak**: koleksi cerita Story Chain tersimpan tampil di lobby, bisa dibuka penuh.
