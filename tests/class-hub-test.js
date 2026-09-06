@@ -125,7 +125,11 @@ test('wiring: tab Kelas → classHubView; notifikasi tugas membuka Kelas; tutor 
   assert.ok(app.includes("hub.mountStudent(host,{go,toast:showToast") && app.includes('openTutor:()=>tutorClassroomWrapper()'), 'tutor bersuara tetap dapat dibuka dari hub');
   assert.ok(app.includes("self.FiezelClassHub.openAssignment(e.aid)") && app.includes("go('classroom');return true"), 'notif tugas → Kelas');
   const shell = read('features/teacher/fiezel-teacher-shell.js');
-  assert.ok(/\['hub', 'Kelas', 'school'\]/.test(shell) && /FiezelClassHub\.mountTeacher\(hubEl/.test(shell), 'Ruang Guru memasang hub');
+  /* m025-265: label nav Ruang Guru kini lewat t('umum.kelas') supaya murid/guru th tidak
+     membaca 'Kelas'. Yang dijaga gerbang ini tetap sama persis — entri nav 'hub' dengan
+     ikon 'school' dan pemasangan mountTeacher — hanya bentuk labelnya yang tidak lagi
+     dibekukan sebagai literal Indonesia. */
+  assert.ok(/\['hub',[^\]]*'school'\]/.test(shell) && /FiezelClassHub\.mountTeacher\(hubEl/.test(shell), 'Ruang Guru memasang hub');
   assert.ok(/st\.view = 'hub'; st\.hubSeen = true/.test(shell), 'hub landing default sekali');
   const html = read('index.html');
   ['features/class-hub/fiezel-braincore-review.js', 'features/class-hub/fiezel-class-hub.js', 'features/class-hub/class-hub.css'].forEach((f) => assert.ok(html.includes(f), f + ' dimuat'));
@@ -235,6 +239,78 @@ test('smoke DOM-stub: alur murid (terima → kerjakan → hasil → laporan w/s)
   assert.ok(tEl.innerHTML.includes('Braincore menyarankan. Guru memutuskan. Murid belajar.') && /Bentuk dasar dipakai/.test(tEl.innerHTML));
   tEl.fire('click', btn({ 'data-ch': 'remedial', 'data-skill': 'past_tense', 'data-title': 'Remedial Past tense' }));
   assert.strictEqual(Hub._teacherUi().tab, 'buat'); assert.strictEqual(Hub._teacherUi().draft.title, 'Remedial Past tense');
+});
+
+/*
+ * SOAL BERGAMBAR HARUS MEMBAWA GAMBARNYA KE RUNNER KELAS.
+ *
+ * Owner melaporkan: "banyak soal di dalam kelas tentang kata Inggris apa yang cocok untuk
+ * gambar ini, tapi banyak sekali soal yang tidak ada gambarnya, jadi siswa tidak bisa
+ * menjawab." Datanya tidak pernah hilang — bank soal utuh, dan latihan mandiri menggambarnya
+ * dengan benar. Yang bolong adalah PENAMPILNYA: runner kelas mencetak item.context dan
+ * item.prompt tetapi tidak pernah menyebut item.picture sama sekali, sehingga setiap soal
+ * `contextKind:'picture'` sampai ke murid sebagai pertanyaan tanpa gambar — mustahil
+ * dijawab, hanya bisa ditebak.
+ *
+ * Penyebab strukturalnya: satu bank, TIGA penampil (latihan mandiri, duel, runner kelas),
+ * markup gambarnya disalin ke masing-masing. Penampil yang lupa menyalin tidak membuat
+ * apa pun merah. Karena itu markupnya sekarang satu sumber di bank (pictureHtml) dan
+ * gerbang di bawah menuntut SETIAP penampil memakainya.
+ */
+test('soal bergambar: bank menyediakan satu sumber markup', () => {
+  const Bank = require(path.join(ROOT, 'features', 'learner-flow', 'fiezel-review-bank.js'));
+  assert.strictEqual(typeof Bank.pictureHtml, 'function', 'bank mengekspor pictureHtml');
+  const item = Bank.byId('gpi:0:1:2:3');
+  assert.ok(item && item.contextKind === 'picture' && item.picture, 'bank bisa membangun soal gambar');
+  const html = Bank.pictureHtml(item, 'ch-picture');
+  assert.ok(/<svg/.test(html) && html.includes(item.picture), 'markup membawa SVG gambarnya');
+  assert.ok(/class="ch-picture"/.test(html), 'kelas CSS bisa ditentukan pemanggil');
+  assert.ok(/role="img"/.test(html) && /aria-label="Gambar: /.test(html), 'gambar punya nama aksesibel');
+  assert.strictEqual(Bank.pictureHtml({ contextKind: 'text', prompt: 'x' }), '', 'soal non-gambar tidak menghasilkan markup');
+  assert.strictEqual(Bank.pictureHtml(null), '', 'item kosong tidak melempar');
+});
+
+test('soal bergambar: runner kelas BENAR-BENAR mencetak gambarnya', () => {
+  /* Uji PERILAKU, bukan pencocokan teks sumber. Versi pertama gerbang ini hanya mencari
+     kata "pictureHtml" di berkasnya dan tetap hijau saat pemanggilannya dilumpuhkan —
+     hijau yang berarti "tidak diukur". Sekarang runnernya benar-benar dijalankan. */
+  const store = {};
+  globalThis.window = globalThis;
+  globalThis.localStorage = { getItem: (k) => (k in store ? store[k] : null), setItem: (k, v) => { store[k] = String(v); }, removeItem: (k) => { delete store[k]; } };
+  Object.defineProperty(globalThis, 'navigator', { value: { onLine: false }, configurable: true, writable: true });
+  globalThis.document = { body: { classList: { add() {}, remove() {} } }, getElementById: () => null };
+  globalThis.fetch = () => Promise.reject(new Error('offline'));
+  require('../features/learner-flow/fiezel-review-bank.js');
+  require('../features/brain/fiezel-item-prior.js');
+  require('../features/teacher/fiezel-teacher-store.js');
+  require('../features/learner-flow/fiezel-learner-flow.js');
+  require('../features/class-hub/fiezel-braincore-review.js');
+  require('../features/class-hub/fiezel-class-hub.js');
+  const Hub = globalThis.FiezelClassHub, TS = globalThis.FiezelTeacherStore, Bank = globalThis.FiezelReviewBank;
+  const pic = Bank.byId('gpi:0:1:2:3');
+  assert.ok(pic && pic.picture, 'bank menyediakan soal bergambar');
+
+  const mkEl = () => { const el = { innerHTML: '', _h: {}, addEventListener(t, fn) { (el._h[t] = el._h[t] || []).push(fn); }, querySelector: () => null, fire(t, target) { (el._h[t] || []).forEach((fn) => fn({ target, preventDefault() {} })); } }; return el; };
+  const btn = (attrs) => { const b = { _attrs: attrs, getAttribute: (k) => (k in attrs ? attrs[k] : null), value: attrs.value }; b.closest = (sel) => (sel === '[data-ch]' ? b : null); return b; };
+
+  store['fiezel-onboarding-v1'] = JSON.stringify({ name: 'Ani', classCode: 'FZ-AB2C3D' });
+  /* Tugas yang HANYA berisi satu soal bergambar, dikirim lewat itemIds seperti tugas
+     bank sungguhan: murid menyelesaikannya dari bank lokal. */
+  assert.ok(TS.acceptAssignmentPayload({
+    v: 1, t: 'assign', id: 'as-pic-1', title: 'Kosakata bergambar', skills: ['vocab_a2'],
+    itemIds: [pic.id], minutes: 5, from: 'Bu Rina', teacher: 'Bu Rina', cls: 'FZ-AB2C3D',
+    mode: 'latihan', timer: 0, shuffle: false
+  }), 'tugas bergambar diterima murid');
+
+  const sEl = mkEl();
+  Hub.mountStudent(sEl, { toast() {}, go() {}, openTutor() {}, afterRender() {} });
+  sEl.fire('click', btn({ 'data-ch': 'open', 'data-id': 'as-pic-1' }));
+
+  assert.ok(sEl.innerHTML.includes('class-runner'), 'runner kelas terbuka');
+  assert.ok(sEl.innerHTML.includes(pic.prompt), 'pertanyaannya tercetak');
+  assert.ok(/<svg/.test(sEl.innerHTML), 'GAMBARNYA ikut tercetak — tanpa ini soal mustahil dijawab');
+  assert.ok(sEl.innerHTML.includes(pic.picture), 'yang tercetak adalah gambar milik soal ini');
+  assert.ok(/aria-label="Gambar: /.test(sEl.innerHTML), 'gambar punya nama aksesibel');
 });
 
 test('sintaks: app.js & modul class-hub dapat di-parse', () => {
