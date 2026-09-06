@@ -1,0 +1,1114 @@
+{
+ "schema": "fiezel-japanese-bank-v1",
+ "target": "ja",
+ "cefr": "A1",
+ "jlpt": "N5",
+ "family": "time_expressions",
+ "catatan": "Bank soal A1/N5 keluarga time_expressions. Dijaga tests/japanese-content-test.js.",
+ "provenans": {
+  "sumberSilabus": "Minna no Nihongo dan Irodori dipakai SEBAGAI SILABUS SAJA: poin tata bahasa apa, urutannya bagaimana, di tingkat berapa. NOL kalimat, dialog, teks, atau daftar kosakata yang direproduksi atau diturunkan — setiap stem, pilihan, pengecoh, dan penjelasan ditulis baru.",
+  "akibatLisensi": "Karena tidak ada teks Irodori yang dipakai, FIEZEL TIDAK terikat kewajiban gratis-selamanya dari lisensinya.",
+  "statusNaskah": "Kalimat Jepang dan penjelasan Inggris/Indonesia berstatus DRAFT AI dan wajib direview penutur asli sebelum dipakai menilai murid."
+ },
+ "jumlah": 18,
+ "templates": [
+  {
+   "id": "JP-TM-101",
+   "family": "time_expressions",
+   "skill": "time_expressions",
+   "subskill": "ni_with_clock_time",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "ni-after-clock-hour",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Attach NI to a clock time to say at what hour an action happens",
+   "pedagogicalObjectiveId": "Menempelkan に pada jam untuk menyatakan pukul berapa suatu perbuatan terjadi",
+   "misconceptionTargeted": "Learner picks a place or object particle for a point in time",
+   "misconceptionTargetedId": "Murid memilih partikel tempat atau objek untuk menyatakan titik waktu",
+   "reasoningOperation": "check whether the time word names a point on the clock -> if yes, mark it with NI",
+   "reasoningOperationId": "periksa apakah kata waktunya menyebut titik pada jam -> kalau ya, tandai dengan に",
+   "stem": "6じ___ おきます。",
+   "stemKana": "ろくじ___ おきます。",
+   "furigana": [],
+   "options": [
+    "に",
+    "で",
+    "を",
+    "へ"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "で",
+     "misconception": "place particle used for a point in time",
+     "misconceptionId": "partikel tempat dipakai untuk titik waktu",
+     "whyFails": "DE marks where an action happens, not when. Six o'clock is a moment, not a location.",
+     "whyFailsId": "で menandai di mana perbuatan terjadi, bukan kapan. Pukul enam itu saat, bukan tempat."
+    },
+    {
+     "option": "を",
+     "misconception": "object particle attached to a time word",
+     "misconceptionId": "partikel objek ditempel ke kata waktu",
+     "whyFails": "O marks what receives the action. Nobody wakes up a six o'clock.",
+     "whyFailsId": "を menandai yang dikenai perbuatan. Tidak ada yang 'membangunkan pukul enam'."
+    },
+    {
+     "option": "へ",
+     "misconception": "direction particle used for time",
+     "misconceptionId": "partikel arah dipakai untuk waktu",
+     "whyFails": "E points toward a destination in space. A clock hour is not somewhere you move to.",
+     "whyFailsId": "へ menunjuk tujuan dalam ruang. Jam bukan tempat yang dituju."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "A clock time is a fixed point on the calendar-and-clock scale, and Japanese marks such points with NI.",
+    "whyCorrectId": "Jam adalah titik tetap pada skala waktu, dan bahasa Jepang menandai titik seperti itu dengan に.",
+    "rule": "Numbered time (hour, date, month, year) takes NI.",
+    "ruleId": "Waktu bernomor (jam, tanggal, bulan, tahun) memakai に.",
+    "whyOthersFail": "DE marks place, O marks the object, E marks direction; none of them locates an action in time.",
+    "whyOthersFailId": "で menandai tempat, を menandai objek, へ menandai arah; tidak satu pun menempatkan perbuatan dalam waktu.",
+    "howToAvoid": "Ask whether the word could be answered by 'nanji?'. If yes, put NI after it.",
+    "howToAvoidId": "Tanyakan apakah kata itu bisa dijawab dengan なんじ. Kalau ya, beri に sesudahnya.",
+    "memoryCue": "A number on the clock, a NI behind it.",
+    "memoryCueId": "Ada angka jam, di belakangnya ada に."
+   }
+  },
+  {
+   "id": "JP-TM-102",
+   "family": "time_expressions",
+   "skill": "time_expressions",
+   "subskill": "no_ni_with_relative_time",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "ashita-takes-no-ni",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Leave a relative time word such as ASHITA bare, with no NI",
+   "pedagogicalObjectiveId": "Membiarkan kata waktu relatif seperti あした tanpa partikel, tanpa に",
+   "misconceptionTargeted": "Learner generalises the time-NI rule to relative time words and says ASHITA NI",
+   "misconceptionTargetedId": "Murid menyamaratakan aturan に waktu ke kata waktu relatif lalu mengucapkan あしたに",
+   "reasoningOperation": "test whether the time word carries a number -> if it does not, drop NI",
+   "reasoningOperationId": "uji apakah kata waktunya mengandung angka -> kalau tidak, hilangkan に",
+   "stem": "___ ともだちに あいます。",
+   "stemKana": "___ ともだちに あいます。",
+   "furigana": [],
+   "options": [
+    "あした",
+    "あしたに",
+    "あしたで",
+    "あしたへ"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "あしたに",
+     "misconception": "NI added to a relative time word",
+     "misconceptionId": "に ditambahkan pada kata waktu relatif",
+     "whyFails": "ASHITA has no number in it; it is defined only against today, so Japanese leaves it bare.",
+     "whyFailsId": "あした tidak memuat angka; maknanya hanya relatif terhadap hari ini, jadi dibiarkan tanpa partikel."
+    },
+    {
+     "option": "あしたで",
+     "misconception": "place particle used for a day",
+     "misconceptionId": "partikel tempat dipakai untuk hari",
+     "whyFails": "DE would say the meeting happens inside a place called tomorrow.",
+     "whyFailsId": "で seolah mengatakan pertemuannya terjadi di dalam tempat bernama 'besok'."
+    },
+    {
+     "option": "あしたへ",
+     "misconception": "direction particle used for a day",
+     "misconceptionId": "partikel arah dipakai untuk hari",
+     "whyFails": "E marks movement toward a place; you do not travel to tomorrow.",
+     "whyFailsId": "へ menandai gerak menuju tempat; kita tidak bepergian menuju 'besok'."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "Relative time words point at a day only by comparison with now, so they stand alone before the verb.",
+    "whyCorrectId": "Kata waktu relatif menunjuk hari hanya lewat perbandingan dengan sekarang, jadi berdiri sendiri sebelum verba.",
+    "rule": "KYOU, ASHITA, KINOU, MAINICHI, IMA, RAISHUU take no NI.",
+    "ruleId": "きょう, あした, きのう, まいにち, いま, らいしゅう tidak memakai に.",
+    "whyOthersFail": "ASHITA NI over-applies the number rule; DE and E treat a day as a place.",
+    "whyOthersFailId": "あしたに menerapkan aturan angka secara berlebihan; で dan へ memperlakukan hari sebagai tempat.",
+    "howToAvoid": "Look for a number. No number, no NI.",
+    "howToAvoidId": "Cari angkanya. Tidak ada angka, tidak ada に.",
+    "memoryCue": "No number, naked time word.",
+    "memoryCueId": "Tanpa angka, kata waktunya telanjang."
+   }
+  },
+  {
+   "id": "JP-TM-103",
+   "family": "time_expressions",
+   "skill": "time_expressions",
+   "subskill": "no_ni_with_relative_time",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "kinou-takes-no-ni",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Use KINOU without NI when saying what happened yesterday",
+   "pedagogicalObjectiveId": "Memakai きのう tanpa に saat menceritakan kejadian kemarin",
+   "misconceptionTargeted": "Learner attaches NI to KINOU by analogy with clock times",
+   "misconceptionTargetedId": "Murid menempelkan に pada きのう karena menyamakannya dengan jam",
+   "reasoningOperation": "identify KINOU as a now-relative day -> withhold NI",
+   "reasoningOperationId": "kenali きのう sebagai hari yang relatif terhadap sekarang -> jangan beri に",
+   "stem": "___ うちに いました。",
+   "stemKana": "___ うちに いました。",
+   "furigana": [],
+   "options": [
+    "きのう",
+    "きのうに",
+    "きのうで",
+    "きのうを"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "きのうに",
+     "misconception": "NI added to a relative time word",
+     "misconceptionId": "に ditambahkan pada kata waktu relatif",
+     "whyFails": "KINOU is counted from today, not from the calendar, so it never carries NI.",
+     "whyFailsId": "きのう dihitung dari hari ini, bukan dari kalender, jadi tidak pernah memakai に."
+    },
+    {
+     "option": "きのうで",
+     "misconception": "place particle used for a day",
+     "misconceptionId": "partikel tempat dipakai untuk hari",
+     "whyFails": "The sentence already has a place, UCHI. Yesterday is the time, not a second location.",
+     "whyFailsId": "Kalimatnya sudah punya tempat, yaitu うち. Kemarin adalah waktu, bukan tempat kedua."
+    },
+    {
+     "option": "きのうを",
+     "misconception": "object particle attached to a time word",
+     "misconceptionId": "partikel objek ditempel ke kata waktu",
+     "whyFails": "IMASU takes no object at all, so O has nothing to mark here.",
+     "whyFailsId": "います tidak memiliki objek, jadi を tidak punya apa pun untuk ditandai."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "KINOU belongs to the group of time words fixed by their distance from today, and that group stays bare.",
+    "whyCorrectId": "きのう termasuk kelompok kata waktu yang ditentukan jaraknya dari hari ini, dan kelompok itu tetap tanpa partikel.",
+    "rule": "Days named relative to now are used bare; only numbered dates take NI.",
+    "ruleId": "Hari yang dinamai relatif terhadap sekarang dipakai polos; hanya tanggal bernomor yang memakai に.",
+    "whyOthersFail": "KINOU NI over-applies the NI rule; DE and O give yesterday a role it cannot fill.",
+    "whyOthersFailId": "きのうに menerapkan aturan に berlebihan; で dan を memberi 'kemarin' peran yang tidak mungkin.",
+    "howToAvoid": "If you could replace the word with 'today', it takes no NI.",
+    "howToAvoidId": "Kalau kata itu bisa diganti 'hari ini', berarti tanpa に.",
+    "memoryCue": "Yesterday needs no ticket.",
+    "memoryCueId": "Kemarin tidak perlu karcis に."
+   }
+  },
+  {
+   "id": "JP-TM-104",
+   "family": "time_expressions",
+   "skill": "time_expressions",
+   "subskill": "no_ni_with_relative_time",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "mainichi-takes-no-ni",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Use MAINICHI bare as a frequency word before the verb",
+   "pedagogicalObjectiveId": "Memakai まいにち polos sebagai kata frekuensi sebelum verba",
+   "misconceptionTargeted": "Learner reads MAINICHI as a date and marks it with NI",
+   "misconceptionTargetedId": "Murid membaca まいにち sebagai tanggal lalu menandainya dengan に",
+   "reasoningOperation": "recognise MAINICHI as a repeating span, not a point -> use it bare",
+   "reasoningOperationId": "kenali まいにち sebagai rentang berulang, bukan titik -> pakai polos",
+   "stem": "___ にほんごを べんきょうします。",
+   "stemKana": "___ にほんごを べんきょうします。",
+   "furigana": [],
+   "options": [
+    "まいにち",
+    "まいにちに",
+    "まいにちで",
+    "まいにちは"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "まいにちに",
+     "misconception": "NI added to a relative time word",
+     "misconceptionId": "に ditambahkan pada kata waktu relatif",
+     "whyFails": "The NICHI inside MAINICHI is not a date number; MAINICHI names a habit, so no NI follows.",
+     "whyFailsId": "にち di dalam まいにち bukan nomor tanggal; まいにち menyebut kebiasaan, jadi tidak diikuti に."
+    },
+    {
+     "option": "まいにちで",
+     "misconception": "place particle used for a repeating time",
+     "misconceptionId": "partikel tempat dipakai untuk waktu berulang",
+     "whyFails": "DE marks where or by what means, and every day is neither.",
+     "whyFailsId": "で menandai tempat atau sarana, sedangkan 'setiap hari' bukan keduanya."
+    },
+    {
+     "option": "まいにちは",
+     "misconception": "topic marker forced onto a frequency adverb",
+     "misconceptionId": "penanda topik dipaksakan pada kata keterangan frekuensi",
+     "whyFails": "WA would make 'every day' the thing being talked about, but the sentence is about studying.",
+     "whyFailsId": "は akan menjadikan 'setiap hari' hal yang dibicarakan, padahal kalimatnya tentang belajar."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "MAINICHI works like an adverb of frequency and sits directly in front of the verb phrase without a particle.",
+    "whyCorrectId": "まいにち berfungsi seperti kata keterangan frekuensi dan berdiri langsung di depan frasa verba tanpa partikel.",
+    "rule": "MAI- words (mainichi, maiasa, maiban) take no particle.",
+    "ruleId": "Kata berawalan まい (まいにち, まいあさ, まいばん) tidak memakai partikel.",
+    "whyOthersFail": "NI treats a habit as a date, DE turns it into a place, WA turns it into the topic.",
+    "whyOthersFailId": "に menganggap kebiasaan sebagai tanggal, で menjadikannya tempat, は menjadikannya topik.",
+    "howToAvoid": "If the word answers 'how often?', leave it bare.",
+    "howToAvoidId": "Kalau kata itu menjawab 'seberapa sering?', biarkan polos.",
+    "memoryCue": "MAI- words go naked.",
+    "memoryCueId": "Kata まい dipakai telanjang."
+   }
+  },
+  {
+   "id": "JP-TM-105",
+   "family": "time_expressions",
+   "skill": "time_expressions",
+   "subskill": "month_counter_gatsu",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "gatsu-names-the-month",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Choose the counter GATSU to name a month of the year",
+   "pedagogicalObjectiveId": "Memilih penghitung がつ untuk menyebut nama bulan",
+   "misconceptionTargeted": "Learner confuses the month counter with the day counter NICHI",
+   "misconceptionTargetedId": "Murid mencampuradukkan penghitung bulan dengan penghitung hari にち",
+   "reasoningOperation": "decide which calendar unit the number counts -> attach the matching counter",
+   "reasoningOperationId": "tentukan satuan kalender yang dihitung angkanya -> pasang penghitung yang cocok",
+   "stem": "わたしは 9___ に にほんへ きました。",
+   "stemKana": "わたしは く___ に にほんへ きました。",
+   "furigana": [],
+   "options": [
+    "がつ",
+    "にち",
+    "じ",
+    "ようび"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "にち",
+     "misconception": "day counter used where a month is meant",
+     "misconceptionId": "penghitung hari dipakai padahal yang dimaksud bulan",
+     "whyFails": "NICHI counts days of the month, so 9-nichi would be the ninth day, not September.",
+     "whyFailsId": "にち menghitung tanggal, jadi 9にち berarti tanggal sembilan, bukan September."
+    },
+    {
+     "option": "じ",
+     "misconception": "hour counter used for a calendar unit",
+     "misconceptionId": "penghitung jam dipakai untuk satuan kalender",
+     "whyFails": "JI counts hours on the clock; arriving at nine o'clock says nothing about the month.",
+     "whyFailsId": "じ menghitung jam; datang pukul sembilan tidak menyatakan bulan apa pun."
+    },
+    {
+     "option": "ようび",
+     "misconception": "weekday suffix attached to a bare number",
+     "misconceptionId": "akhiran hari dalam minggu ditempel ke angka telanjang",
+     "whyFails": "YOUBI follows a weekday name such as GETSU or KIN, never a plain number.",
+     "whyFailsId": "ようび mengikuti nama hari seperti げつ atau きん, bukan angka biasa."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "Months of the year are formed as number plus GATSU, so 9 plus GATSU is September.",
+    "whyCorrectId": "Nama bulan dibentuk dari angka ditambah がつ, jadi 9 + がつ berarti September.",
+    "rule": "Number + GATSU = month; number + NICHI = day of the month.",
+    "ruleId": "Angka + がつ = bulan; angka + にち = tanggal.",
+    "whyOthersFail": "NICHI names a date, JI names an hour, YOUBI needs a weekday stem, not a number.",
+    "whyOthersFailId": "にち menyebut tanggal, じ menyebut jam, ようび butuh nama hari, bukan angka.",
+    "howToAvoid": "Ask what the number counts: months, dates, or hours. Match the counter to the answer.",
+    "howToAvoidId": "Tanyakan angka itu menghitung apa: bulan, tanggal, atau jam. Cocokkan penghitungnya.",
+    "memoryCue": "GATSU is the month gate.",
+    "memoryCueId": "がつ adalah gerbang bulan."
+   }
+  },
+  {
+   "id": "JP-TM-106",
+   "family": "time_expressions",
+   "skill": "time_expressions",
+   "subskill": "ni_with_month",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "ni-after-month-name",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Mark a named month with NI to say in which month something happens",
+   "pedagogicalObjectiveId": "Menandai nama bulan dengan に untuk menyatakan bulan terjadinya sesuatu",
+   "misconceptionTargeted": "Learner leaves a numbered month bare because relative time words are bare",
+   "misconceptionTargetedId": "Murid membiarkan bulan bernomor tanpa partikel karena kata waktu relatif memang polos",
+   "reasoningOperation": "see that the month carries a number -> supply NI",
+   "reasoningOperationId": "lihat bahwa bulannya bernomor -> berikan に",
+   "stem": "3がつ___ タイへ かえります。",
+   "stemKana": "さんがつ___ タイへ かえります。",
+   "furigana": [],
+   "options": [
+    "に",
+    "で",
+    "は",
+    "を"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "で",
+     "misconception": "place particle used for a calendar month",
+     "misconceptionId": "partikel tempat dipakai untuk bulan kalender",
+     "whyFails": "DE marks where the action happens; the destination is already marked by E.",
+     "whyFailsId": "で menandai tempat berlangsungnya perbuatan; tujuannya sudah ditandai oleh へ."
+    },
+    {
+     "option": "は",
+     "misconception": "topic marker replacing the time particle",
+     "misconceptionId": "penanda topik menggantikan partikel waktu",
+     "whyFails": "Bare WA here would set March up as the topic instead of locating the trip in time.",
+     "whyFailsId": "は di sini akan menjadikan Maret sebagai topik, bukan menempatkan perjalanan dalam waktu."
+    },
+    {
+     "option": "を",
+     "misconception": "object particle attached to a month",
+     "misconceptionId": "partikel objek ditempel ke bulan",
+     "whyFails": "KAERIMASU takes no direct object, so O cannot appear at all.",
+     "whyFailsId": "かえります tidak punya objek langsung, jadi を tidak bisa muncul."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "SANGATSU is a numbered calendar point, and numbered calendar points take NI.",
+    "whyCorrectId": "さんがつ adalah titik kalender bernomor, dan titik kalender bernomor memakai に.",
+    "rule": "Year, month, date and clock time all take NI.",
+    "ruleId": "Tahun, bulan, tanggal, dan jam semuanya memakai に.",
+    "whyOthersFail": "DE marks place, WA shifts the topic, O demands an object the verb does not have.",
+    "whyOthersFailId": "で menandai tempat, は menggeser topik, を menuntut objek yang tidak dimiliki verba.",
+    "howToAvoid": "Count the numbers: a number in the time word calls for NI.",
+    "howToAvoidId": "Perhatikan angkanya: ada angka pada kata waktu, berarti perlu に.",
+    "memoryCue": "Calendar number, NI after.",
+    "memoryCueId": "Angka kalender, sesudahnya に."
+   }
+  },
+  {
+   "id": "JP-TM-107",
+   "family": "time_expressions",
+   "skill": "time_expressions",
+   "subskill": "amari_requires_negative",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "amari-needs-negative-verb",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Finish a sentence containing AMARI with a negative verb form",
+   "pedagogicalObjectiveId": "Menutup kalimat ber-あまり dengan bentuk verba negatif",
+   "misconceptionTargeted": "Learner treats AMARI as a plain 'sometimes' adverb and keeps the verb affirmative",
+   "misconceptionTargetedId": "Murid menganggap あまり sekadar 'kadang' lalu membiarkan verbanya positif",
+   "reasoningOperation": "spot AMARI in the sentence -> require a negative predicate",
+   "reasoningOperationId": "temukan あまり dalam kalimat -> tuntut predikat negatif",
+   "stem": "わたしは あさごはんを あまり ___。",
+   "stemKana": "わたしは あさごはんを あまり ___。",
+   "furigana": [],
+   "options": [
+    "たべません",
+    "たべます",
+    "たべました",
+    "たべたいです"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "たべます",
+     "misconception": "affirmative predicate left after AMARI",
+     "misconceptionId": "predikat positif dibiarkan sesudah あまり",
+     "whyFails": "AMARI is a negative-polarity adverb; with an affirmative verb the sentence has no meaning to complete.",
+     "whyFailsId": "あまり adalah kata keterangan berpolaritas negatif; dengan verba positif kalimatnya tidak selesai maknanya."
+    },
+    {
+     "option": "たべました",
+     "misconception": "affirmative past used after AMARI",
+     "misconceptionId": "bentuk lampau positif dipakai sesudah あまり",
+     "whyFails": "Changing the tense does not fix the polarity; AMARI still needs a NAI ending.",
+     "whyFailsId": "Mengubah kala tidak memperbaiki polaritas; あまり tetap butuh akhiran negatif."
+    },
+    {
+     "option": "たべたいです",
+     "misconception": "desire form substituted for a negative",
+     "misconceptionId": "bentuk keinginan menggantikan bentuk negatif",
+     "whyFails": "TAI expresses wanting, which is still affirmative, so AMARI is left unsupported.",
+     "whyFailsId": "たい menyatakan keinginan, yang tetap positif, sehingga あまり tidak didukung."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "AMARI plus a negative verb means 'not much', and the pair must be completed to make sense.",
+    "whyCorrectId": "あまり dengan verba negatif berarti 'tidak begitu', dan pasangan itu harus lengkap agar bermakna.",
+    "rule": "AMARI always pairs with a negative predicate.",
+    "ruleId": "あまり selalu berpasangan dengan predikat negatif.",
+    "whyOthersFail": "All three keep the verb affirmative, leaving AMARI without the negative half it demands.",
+    "whyOthersFailId": "Ketiganya membiarkan verba positif, sehingga あまり kehilangan pasangan negatifnya.",
+    "howToAvoid": "When you write AMARI, immediately plan a MASEN or NAI ending.",
+    "howToAvoidId": "Begitu menulis あまり, langsung rencanakan akhiran ません atau ない.",
+    "memoryCue": "AMARI opens, MASEN closes.",
+    "memoryCueId": "あまり membuka, ません menutup."
+   }
+  },
+  {
+   "id": "JP-TM-108",
+   "family": "time_expressions",
+   "skill": "time_expressions",
+   "subskill": "zenzen_requires_negative",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "zenzen-needs-negative-verb",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Finish a sentence containing ZENZEN with a negative verb form",
+   "pedagogicalObjectiveId": "Menutup kalimat ber-ぜんぜん dengan bentuk verba negatif",
+   "misconceptionTargeted": "Learner uses ZENZEN as an intensifier like TOTEMO and keeps the verb affirmative",
+   "misconceptionTargetedId": "Murid memakai ぜんぜん sebagai penguat seperti とても lalu membiarkan verbanya positif",
+   "reasoningOperation": "spot ZENZEN -> require a negative predicate",
+   "reasoningOperationId": "temukan ぜんぜん -> tuntut predikat negatif",
+   "stem": "ちちは よる テレビを ぜんぜん ___。",
+   "stemKana": "ちちは よる テレビを ぜんぜん ___。",
+   "furigana": [],
+   "options": [
+    "みません",
+    "みます",
+    "みました",
+    "みています"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "みます",
+     "misconception": "affirmative predicate left after ZENZEN",
+     "misconceptionId": "predikat positif dibiarkan sesudah ぜんぜん",
+     "whyFails": "ZENZEN means 'not at all' and cannot combine with an affirmative verb at this level.",
+     "whyFailsId": "ぜんぜん berarti 'sama sekali tidak' dan tidak bisa digabung dengan verba positif pada tingkat ini."
+    },
+    {
+     "option": "みました",
+     "misconception": "affirmative past used after ZENZEN",
+     "misconceptionId": "bentuk lampau positif dipakai sesudah ぜんぜん",
+     "whyFails": "The past tense is still affirmative; ZENZEN would have to end in MASEN DESHITA instead.",
+     "whyFailsId": "Bentuk lampau tetap positif; ぜんぜん justru harus berakhir ませんでした."
+    },
+    {
+     "option": "みています",
+     "misconception": "progressive form used where a negative is required",
+     "misconceptionId": "bentuk sedang berlangsung dipakai padahal dibutuhkan negatif",
+     "whyFails": "TE IMASU describes an ongoing action, which contradicts 'not at all'.",
+     "whyFailsId": "ています menggambarkan perbuatan yang sedang berlangsung, bertentangan dengan 'sama sekali tidak'."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "ZENZEN sets up a complete denial and is only finished by a negative ending such as MASEN.",
+    "whyCorrectId": "ぜんぜん menyiapkan penyangkalan total dan hanya diselesaikan oleh akhiran negatif seperti ません.",
+    "rule": "ZENZEN always pairs with a negative predicate.",
+    "ruleId": "ぜんぜん selalu berpasangan dengan predikat negatif.",
+    "whyOthersFail": "Every other option is affirmative, so the denial started by ZENZEN never lands.",
+    "whyOthersFailId": "Pilihan lain semuanya positif, sehingga penyangkalan yang dimulai ぜんぜん tidak pernah mendarat.",
+    "howToAvoid": "Treat ZENZEN as half a sentence: the other half must end in MASEN.",
+    "howToAvoidId": "Anggap ぜんぜん sebagai separuh kalimat: separuh lainnya harus berakhir ません.",
+    "memoryCue": "ZENZEN demands a NO at the end.",
+    "memoryCueId": "ぜんぜん menuntut 'tidak' di ujung."
+   }
+  },
+  {
+   "id": "JP-TM-109",
+   "family": "time_expressions",
+   "skill": "time_expressions",
+   "subskill": "frequency_adverb_yoku",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "yoku-for-high-frequency",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Choose YOKU to describe an action done often with an affirmative verb",
+   "pedagogicalObjectiveId": "Memilih よく untuk menggambarkan perbuatan yang sering dilakukan dengan verba positif",
+   "misconceptionTargeted": "Learner picks a negative-polarity adverb in front of an affirmative verb",
+   "misconceptionTargetedId": "Murid memilih kata keterangan berpolaritas negatif di depan verba positif",
+   "reasoningOperation": "read the verb ending -> pick a frequency adverb whose polarity matches",
+   "reasoningOperationId": "baca akhiran verbanya -> pilih kata keterangan frekuensi yang polaritasnya cocok",
+   "stem": "アリさんは えいがが すきですから、___ えいがかんへ いきます。",
+   "stemKana": "アリさんは えいがが すきですから、___ えいがかんへ いきます。",
+   "furigana": [],
+   "options": [
+    "よく",
+    "ぜんぜん",
+    "あまり",
+    "すこし"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "ぜんぜん",
+     "misconception": "negative-polarity adverb placed before an affirmative verb",
+     "misconceptionId": "kata keterangan berpolaritas negatif ditaruh di depan verba positif",
+     "whyFails": "ZENZEN requires MASEN, and it would also contradict the stated liking for films.",
+     "whyFailsId": "ぜんぜん menuntut ません, dan juga bertentangan dengan pernyataan suka film."
+    },
+    {
+     "option": "あまり",
+     "misconception": "negative-polarity adverb placed before an affirmative verb",
+     "misconceptionId": "kata keterangan berpolaritas negatif ditaruh di depan verba positif",
+     "whyFails": "AMARI also needs a negative ending, but the verb here is IKIMASU.",
+     "whyFailsId": "あまり juga butuh akhiran negatif, padahal verbanya di sini いきます."
+    },
+    {
+     "option": "すこし",
+     "misconception": "quantity adverb used to express frequency",
+     "misconceptionId": "kata keterangan jumlah dipakai untuk menyatakan frekuensi",
+     "whyFails": "SUKOSHI measures amount, not how often something is repeated.",
+     "whyFailsId": "すこし mengukur jumlah, bukan seberapa sering sesuatu diulang."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "YOKU means 'often' and sits comfortably before an affirmative verb, matching the reason given in the first clause.",
+    "whyCorrectId": "よく berarti 'sering' dan cocok di depan verba positif, sejalan dengan alasan di klausa pertama.",
+    "rule": "YOKU and TOKIDOKI go with affirmative verbs; AMARI and ZENZEN go with negatives.",
+    "ruleId": "よく dan ときどき dipakai dengan verba positif; あまり dan ぜんぜん dengan negatif.",
+    "whyOthersFail": "ZENZEN and AMARI clash with the affirmative ending, and SUKOSHI is about amount.",
+    "whyOthersFailId": "ぜんぜん dan あまり bertabrakan dengan akhiran positif, dan すこし soal jumlah.",
+    "howToAvoid": "Check the verb ending first, then choose an adverb of the same polarity.",
+    "howToAvoidId": "Periksa akhiran verba dulu, baru pilih kata keterangan dengan polaritas sama.",
+    "memoryCue": "Positive verb, positive adverb.",
+    "memoryCueId": "Verba positif, kata keterangan positif."
+   }
+  },
+  {
+   "id": "JP-TM-110",
+   "family": "time_expressions",
+   "skill": "time_expressions",
+   "subskill": "frequency_adverb_tokidoki",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "tokidoki-for-occasional",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Choose TOKIDOKI for an occasional exception to a usual habit",
+   "pedagogicalObjectiveId": "Memilih ときどき untuk pengecualian sesekali dari kebiasaan biasa",
+   "misconceptionTargeted": "Learner ignores the contrast set up by the first clause when picking a frequency adverb",
+   "misconceptionTargetedId": "Murid mengabaikan pertentangan yang dibangun klausa pertama saat memilih kata frekuensi",
+   "reasoningOperation": "read the GA contrast -> choose the adverb that makes the second clause a rarer case",
+   "reasoningOperationId": "baca pertentangan が -> pilih kata keterangan yang menjadikan klausa kedua kasus yang lebih jarang",
+   "stem": "たいてい うちで べんきょうしますが、___ としょかんで べんきょうします。",
+   "stemKana": "たいてい うちで べんきょうしますが、___ としょかんで べんきょうします。",
+   "furigana": [],
+   "options": [
+    "ときどき",
+    "ぜんぜん",
+    "あまり",
+    "まいにち"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "ぜんぜん",
+     "misconception": "negative-polarity adverb placed before an affirmative verb",
+     "misconceptionId": "kata keterangan berpolaritas negatif ditaruh di depan verba positif",
+     "whyFails": "ZENZEN needs a negative ending, but the clause ends in BENKYOU SHIMASU.",
+     "whyFailsId": "ぜんぜん butuh akhiran negatif, padahal klausanya berakhir べんきょうします."
+    },
+    {
+     "option": "あまり",
+     "misconception": "negative-polarity adverb placed before an affirmative verb",
+     "misconceptionId": "kata keterangan berpolaritas negatif ditaruh di depan verba positif",
+     "whyFails": "AMARI cannot stand before an affirmative verb; it would need SHIMASEN.",
+     "whyFailsId": "あまり tidak bisa berdiri di depan verba positif; seharusnya しません."
+    },
+    {
+     "option": "まいにち",
+     "misconception": "everyday frequency used for the rarer half of a contrast",
+     "misconceptionId": "frekuensi 'setiap hari' dipakai untuk sisi yang justru lebih jarang",
+     "whyFails": "GA marks a contrast with the usual case, so the second clause must be less frequent, not daily.",
+     "whyFailsId": "が menandai pertentangan dengan kebiasaan, jadi klausa kedua harus lebih jarang, bukan setiap hari."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "TOKIDOKI means 'sometimes' and fits the less frequent side of the contrast introduced by GA.",
+    "whyCorrectId": "ときどき berarti 'kadang-kadang' dan cocok untuk sisi yang lebih jarang dalam pertentangan yang dibuka が.",
+    "rule": "Frequency adverbs must match both the polarity of the verb and the logic of the sentence.",
+    "ruleId": "Kata keterangan frekuensi harus cocok dengan polaritas verba sekaligus logika kalimat.",
+    "whyOthersFail": "ZENZEN and AMARI need negatives; MAINICHI destroys the contrast with TAITEI.",
+    "whyOthersFailId": "ぜんぜん dan あまり butuh negatif; まいにち merusak pertentangan dengan たいてい.",
+    "howToAvoid": "After GA, ask which side is rarer, then rank the adverbs by frequency.",
+    "howToAvoidId": "Sesudah が, tanyakan sisi mana yang lebih jarang, lalu urutkan kata keterangan menurut frekuensi.",
+    "memoryCue": "Usually here, sometimes there.",
+    "memoryCueId": "Biasanya di sini, kadang di sana."
+   }
+  },
+  {
+   "id": "JP-TM-111",
+   "family": "time_expressions",
+   "skill": "time_expressions",
+   "subskill": "no_ni_with_relative_time",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "ima-takes-no-ni",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Use IMA without NI when stating what is happening now",
+   "pedagogicalObjectiveId": "Memakai いま tanpa に saat menyatakan apa yang terjadi sekarang",
+   "misconceptionTargeted": "Learner adds NI to IMA as if it were a clock time",
+   "misconceptionTargetedId": "Murid menambahkan に pada いま seolah-olah itu jam",
+   "reasoningOperation": "note that IMA is anchored to the moment of speaking -> use it bare",
+   "reasoningOperationId": "catat bahwa いま berpatokan pada saat berbicara -> pakai polos",
+   "stem": "___ あねは だいがくで はたらいています。",
+   "stemKana": "___ あねは だいがくで はたらいています。",
+   "furigana": [],
+   "options": [
+    "いま",
+    "いまに",
+    "いまで",
+    "いまへ"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "いまに",
+     "misconception": "NI added to a relative time word",
+     "misconceptionId": "に ditambahkan pada kata waktu relatif",
+     "whyFails": "IMA is fixed only by the moment of speaking, so it belongs to the bare group.",
+     "whyFailsId": "いま hanya ditentukan oleh saat berbicara, jadi termasuk kelompok tanpa partikel."
+    },
+    {
+     "option": "いまで",
+     "misconception": "place particle used for a time word",
+     "misconceptionId": "partikel tempat dipakai untuk kata waktu",
+     "whyFails": "The place is already DAIGAKU DE; 'now' is not a second location.",
+     "whyFailsId": "Tempatnya sudah だいがくで; 'sekarang' bukan tempat kedua."
+    },
+    {
+     "option": "いまへ",
+     "misconception": "direction particle used for a time word",
+     "misconceptionId": "partikel arah dipakai untuk kata waktu",
+     "whyFails": "E marks a destination you move toward, and 'now' is not a destination.",
+     "whyFailsId": "へ menandai tujuan yang dituju, dan 'sekarang' bukan tujuan."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "IMA is a now-relative time word, and such words appear without a particle.",
+    "whyCorrectId": "いま adalah kata waktu relatif terhadap sekarang, dan kata seperti itu muncul tanpa partikel.",
+    "rule": "Relative time words are bare; numbered time points take NI.",
+    "ruleId": "Kata waktu relatif polos; titik waktu bernomor memakai に.",
+    "whyOthersFail": "NI over-applies the clock rule, DE and E treat a moment as a place.",
+    "whyOthersFailId": "に menerapkan aturan jam berlebihan, で dan へ memperlakukan saat sebagai tempat.",
+    "howToAvoid": "Ask if a clock or calendar number is hiding in the word. In IMA there is none.",
+    "howToAvoidId": "Tanyakan apakah ada angka jam atau kalender di dalam kata itu. Di いま tidak ada.",
+    "memoryCue": "Now needs nothing.",
+    "memoryCueId": "'Sekarang' tidak butuh apa-apa."
+   }
+  },
+  {
+   "id": "JP-TM-112",
+   "family": "time_expressions",
+   "skill": "time_expressions",
+   "subskill": "no_ni_with_relative_time",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "raishuu-takes-no-ni",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Use RAISHUU without NI when announcing a coming week's event",
+   "pedagogicalObjectiveId": "Memakai らいしゅう tanpa に saat mengumumkan acara minggu depan",
+   "misconceptionTargeted": "Learner attaches NI to RAISHUU by analogy with dated events",
+   "misconceptionTargetedId": "Murid menempelkan に pada らいしゅう karena menyamakannya dengan acara bertanggal",
+   "reasoningOperation": "classify RAISHUU as counted from this week -> withhold NI",
+   "reasoningOperationId": "golongkan らいしゅう sebagai hitungan dari minggu ini -> jangan beri に",
+   "stem": "___ にほんごの しけんが あります。",
+   "stemKana": "___ にほんごの しけんが あります。",
+   "furigana": [],
+   "options": [
+    "らいしゅう",
+    "らいしゅうに",
+    "らいしゅうで",
+    "らいしゅうを"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "らいしゅうに",
+     "misconception": "NI added to a relative time word",
+     "misconceptionId": "に ditambahkan pada kata waktu relatif",
+     "whyFails": "RAISHUU is measured from the present week rather than named on the calendar, so it stays bare.",
+     "whyFailsId": "らいしゅう dihitung dari minggu ini, bukan disebut di kalender, jadi tetap polos."
+    },
+    {
+     "option": "らいしゅうで",
+     "misconception": "place particle used for a week",
+     "misconceptionId": "partikel tempat dipakai untuk minggu",
+     "whyFails": "DE marks a location or means; next week is neither.",
+     "whyFailsId": "で menandai tempat atau sarana; minggu depan bukan keduanya."
+    },
+    {
+     "option": "らいしゅうを",
+     "misconception": "object particle attached to a time word",
+     "misconceptionId": "partikel objek ditempel ke kata waktu",
+     "whyFails": "ARIMASU takes GA for the thing that exists, never O.",
+     "whyFailsId": "あります memakai が untuk hal yang ada, bukan を."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "RAISHUU joins KYOU and ASHITA in the group of time words fixed only against the present, and that group takes no particle.",
+    "whyCorrectId": "らいしゅう sekelompok dengan きょう dan あした, kata waktu yang hanya ditentukan terhadap saat ini, dan kelompok itu tanpa partikel.",
+    "rule": "RAI- and SEN- time words (raishuu, senshuu, raigetsu) are used bare.",
+    "ruleId": "Kata waktu berawalan らい dan せん (らいしゅう, せんしゅう, らいげつ) dipakai polos.",
+    "whyOthersFail": "NI over-applies the calendar rule; DE and O give the week impossible roles.",
+    "whyOthersFailId": "に menerapkan aturan kalender berlebihan; で dan を memberi minggu peran yang mustahil.",
+    "howToAvoid": "If the word would change meaning next week, it takes no NI.",
+    "howToAvoidId": "Kalau makna kata itu berubah minggu depan, berarti tanpa に.",
+    "memoryCue": "Shifting words stay bare.",
+    "memoryCueId": "Kata yang bergeser tetap polos."
+   }
+  },
+  {
+   "id": "JP-TM-113",
+   "family": "time_expressions",
+   "skill": "time_expressions",
+   "subskill": "date_counter_nichi",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "nichi-names-the-date",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Choose the counter NICHI to name a day of the month",
+   "pedagogicalObjectiveId": "Memilih penghitung にち untuk menyebut tanggal dalam bulan",
+   "misconceptionTargeted": "Learner reuses GATSU for the date because the month was just mentioned",
+   "misconceptionTargetedId": "Murid memakai ulang がつ untuk tanggal karena bulannya baru saja disebut",
+   "reasoningOperation": "see that the month slot is already filled -> the second number must be a date",
+   "reasoningOperationId": "lihat bahwa slot bulan sudah terisi -> angka kedua pasti tanggal",
+   "stem": "6がつ25___に パーティーが あります。",
+   "stemKana": "ろくがつ にじゅうご___に パーティーが あります。",
+   "furigana": [],
+   "options": [
+    "にち",
+    "がつ",
+    "じ",
+    "ふん"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "がつ",
+     "misconception": "month counter reused for the date",
+     "misconceptionId": "penghitung bulan dipakai ulang untuk tanggal",
+     "whyFails": "The month is already given as 6-gatsu, and there is no 25th month.",
+     "whyFailsId": "Bulannya sudah disebut 6がつ, dan tidak ada bulan ke-25."
+    },
+    {
+     "option": "じ",
+     "misconception": "hour counter used inside a date",
+     "misconceptionId": "penghitung jam dipakai di dalam tanggal",
+     "whyFails": "JI counts hours, and the clock stops at 24, so it cannot follow a month.",
+     "whyFailsId": "じ menghitung jam, dan jam berhenti di 24, jadi tidak bisa mengikuti nama bulan."
+    },
+    {
+     "option": "ふん",
+     "misconception": "minute counter used inside a date",
+     "misconceptionId": "penghitung menit dipakai di dalam tanggal",
+     "whyFails": "FUN counts minutes and belongs after an hour, not after a month.",
+     "whyFailsId": "ふん menghitung menit dan letaknya sesudah jam, bukan sesudah bulan."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "Dates are built as month plus number plus NICHI, so the number after 6-gatsu is a day of the month.",
+    "whyCorrectId": "Tanggal dibentuk sebagai bulan + angka + にち, jadi angka sesudah 6がつ adalah tanggal.",
+    "rule": "GATSU for the month, NICHI for the day of the month, in that order.",
+    "ruleId": "がつ untuk bulan, にち untuk tanggal, dengan urutan itu.",
+    "whyOthersFail": "GATSU repeats a slot already filled; JI and FUN belong to the clock, not the calendar.",
+    "whyOthersFailId": "がつ mengulang slot yang sudah terisi; じ dan ふん milik jam, bukan kalender.",
+    "howToAvoid": "Read the sentence left to right: once GATSU appears, the next number is a date.",
+    "howToAvoidId": "Baca kalimat dari kiri: begitu がつ muncul, angka berikutnya adalah tanggal.",
+    "memoryCue": "Month first, day second.",
+    "memoryCueId": "Bulan dulu, tanggal kemudian."
+   }
+  },
+  {
+   "id": "JP-TM-114",
+   "family": "time_expressions",
+   "skill": "time_expressions",
+   "subskill": "weekday_suffix_youbi",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "youbi-completes-weekday-name",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Complete a weekday name with the suffix YOUBI",
+   "pedagogicalObjectiveId": "Melengkapi nama hari dengan akhiran ようび",
+   "misconceptionTargeted": "Learner attaches a calendar counter to a weekday stem instead of YOUBI",
+   "misconceptionTargetedId": "Murid menempelkan penghitung kalender pada nama hari, bukan ようび",
+   "reasoningOperation": "identify KIN as a weekday stem -> complete it with YOUBI",
+   "reasoningOperationId": "kenali きん sebagai akar nama hari -> lengkapi dengan ようび",
+   "stem": "つぎの テストは きん___です。",
+   "stemKana": "つぎの テストは きん___です。",
+   "furigana": [],
+   "options": [
+    "ようび",
+    "がつ",
+    "にち",
+    "しゅう"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "がつ",
+     "misconception": "month counter attached to a weekday stem",
+     "misconceptionId": "penghitung bulan ditempel ke akar nama hari",
+     "whyFails": "GATSU follows a number from 1 to 12, never a weekday stem like KIN.",
+     "whyFailsId": "がつ mengikuti angka 1 sampai 12, bukan akar nama hari seperti きん."
+    },
+    {
+     "option": "にち",
+     "misconception": "date counter attached to a weekday stem",
+     "misconceptionId": "penghitung tanggal ditempel ke akar nama hari",
+     "whyFails": "NICHI follows a date number; KIN is not a number.",
+     "whyFailsId": "にち mengikuti angka tanggal; きん bukan angka."
+    },
+    {
+     "option": "しゅう",
+     "misconception": "week noun used as a weekday suffix",
+     "misconceptionId": "kata 'minggu' dipakai sebagai akhiran nama hari",
+     "whyFails": "SHUU names a week as a unit and never completes a weekday name.",
+     "whyFailsId": "しゅう menyebut minggu sebagai satuan dan tidak pernah melengkapi nama hari."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "Weekday names are a fixed stem plus YOUBI, so KIN plus YOUBI is Friday.",
+    "whyCorrectId": "Nama hari terdiri dari akar tetap ditambah ようび, jadi きん + ようび berarti Jumat.",
+    "rule": "Weekday = stem (getsu, ka, sui, moku, kin, do, nichi) + YOUBI.",
+    "ruleId": "Nama hari = akar (げつ, か, すい, もく, きん, ど, にち) + ようび.",
+    "whyOthersFail": "GATSU and NICHI need numbers in front of them, and SHUU counts whole weeks.",
+    "whyOthersFailId": "がつ dan にち butuh angka di depannya, dan しゅう menghitung minggu utuh.",
+    "howToAvoid": "If what comes before is a syllable, not a number, the suffix is YOUBI.",
+    "howToAvoidId": "Kalau yang di depannya suku kata, bukan angka, akhirannya ようび.",
+    "memoryCue": "Letters take YOUBI, numbers take counters.",
+    "memoryCueId": "Suku kata pakai ようび, angka pakai penghitung."
+   }
+  },
+  {
+   "id": "JP-TM-115",
+   "family": "time_expressions",
+   "skill": "time_expressions",
+   "subskill": "minute_counter_fun",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "fun-names-the-minutes",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Choose the counter FUN for the minutes part of a clock time",
+   "pedagogicalObjectiveId": "Memilih penghitung ふん untuk bagian menit pada jam",
+   "misconceptionTargeted": "Learner uses a calendar counter for the second half of a clock time",
+   "misconceptionTargetedId": "Murid memakai penghitung kalender untuk bagian kedua sebuah jam",
+   "reasoningOperation": "see JI already used -> the following number must be minutes",
+   "reasoningOperationId": "lihat じ sudah dipakai -> angka berikutnya pasti menit",
+   "stem": "6じ15___に いえを でます。",
+   "stemKana": "ろくじ じゅうご___に いえを でます。",
+   "furigana": [],
+   "options": [
+    "ふん",
+    "にち",
+    "がつ",
+    "ようび"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "にち",
+     "misconception": "date counter used for minutes",
+     "misconceptionId": "penghitung tanggal dipakai untuk menit",
+     "whyFails": "NICHI counts days of the month and cannot follow an hour.",
+     "whyFailsId": "にち menghitung tanggal dan tidak bisa mengikuti jam."
+    },
+    {
+     "option": "がつ",
+     "misconception": "month counter used for minutes",
+     "misconceptionId": "penghitung bulan dipakai untuk menit",
+     "whyFails": "GATSU names one of the twelve months, not part of a clock time.",
+     "whyFailsId": "がつ menyebut salah satu dari dua belas bulan, bukan bagian dari jam."
+    },
+    {
+     "option": "ようび",
+     "misconception": "weekday suffix attached to a number",
+     "misconceptionId": "akhiran nama hari ditempel ke angka",
+     "whyFails": "YOUBI needs a weekday stem before it, not the number 15.",
+     "whyFailsId": "ようび butuh akar nama hari di depannya, bukan angka 15."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "A clock time is hour plus JI followed by minutes plus FUN, and the whole phrase then takes NI.",
+    "whyCorrectId": "Jam terdiri dari angka + じ lalu menit + ふん, dan seluruh frasa itu kemudian memakai に.",
+    "rule": "JI for hours, FUN or PUN for minutes.",
+    "ruleId": "じ untuk jam, ふん atau ぷん untuk menit.",
+    "whyOthersFail": "NICHI, GATSU and YOUBI all belong to the calendar, not the clock.",
+    "whyOthersFailId": "にち, がつ, dan ようび semuanya milik kalender, bukan jam.",
+    "howToAvoid": "Once you see JI, expect FUN next.",
+    "howToAvoidId": "Begitu melihat じ, harapkan ふん sesudahnya.",
+    "memoryCue": "JI then FUN, always in that order.",
+    "memoryCueId": "じ lalu ふん, selalu urutan itu."
+   }
+  },
+  {
+   "id": "JP-TM-116",
+   "family": "time_expressions",
+   "skill": "time_expressions",
+   "subskill": "ni_only_on_the_numbered_part",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "ni-on-clock-not-on-ashita",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Put NI on the clock time only, leaving the relative day bare, when both appear together",
+   "pedagogicalObjectiveId": "Menaruh に hanya pada jam, membiarkan hari relatif polos, saat keduanya muncul bersama",
+   "misconceptionTargeted": "Learner marks every time word in the sentence with NI",
+   "misconceptionTargetedId": "Murid menandai setiap kata waktu dalam kalimat dengan に",
+   "reasoningOperation": "split the time phrase into relative day and numbered hour -> mark only the numbered part",
+   "reasoningOperationId": "pisahkan frasa waktu menjadi hari relatif dan jam bernomor -> tandai hanya bagian bernomor",
+   "stem": "___ えきの まえで あいましょう。",
+   "stemKana": "___ えきの まえで あいましょう。",
+   "furigana": [],
+   "options": [
+    "あした 8じに",
+    "あしたに 8じ",
+    "あしたに 8じに",
+    "あした 8じ"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "あしたに 8じ",
+     "misconception": "NI moved onto the relative day and taken off the clock time",
+     "misconceptionId": "に dipindahkan ke hari relatif dan dilepas dari jam",
+     "whyFails": "This reverses the rule: the bare word gets NI and the numbered hour loses it.",
+     "whyFailsId": "Ini membalik aturannya: kata polos justru diberi に dan jam bernomor kehilangan に."
+    },
+    {
+     "option": "あしたに 8じに",
+     "misconception": "NI attached to every time word in the phrase",
+     "misconceptionId": "に ditempelkan pada setiap kata waktu dalam frasa",
+     "whyFails": "Only the numbered part may carry NI; ASHITA NI is ungrammatical however the rest is written.",
+     "whyFailsId": "Hanya bagian bernomor yang boleh memakai に; あしたに tetap salah bagaimanapun sisanya ditulis."
+    },
+    {
+     "option": "あした 8じ",
+     "misconception": "NI dropped from a numbered clock time",
+     "misconceptionId": "に dihilangkan dari jam bernomor",
+     "whyFails": "The hour needs NI to say the meeting happens at that point in time.",
+     "whyFailsId": "Jamnya butuh に untuk menyatakan pertemuan terjadi pada titik waktu itu."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "In a day-plus-hour phrase the relative day stays bare and only the numbered hour takes NI.",
+    "whyCorrectId": "Dalam frasa hari + jam, hari relatif tetap polos dan hanya jam bernomor yang memakai に.",
+    "rule": "One NI per time phrase, and it lands on the numbered element.",
+    "ruleId": "Satu に per frasa waktu, dan letaknya pada unsur bernomor.",
+    "whyOthersFail": "The others either move NI to the bare word, double it, or delete it entirely.",
+    "whyOthersFailId": "Pilihan lain memindahkan に ke kata polos, menggandakannya, atau menghapusnya sama sekali.",
+    "howToAvoid": "Underline the numbers in the time phrase; NI goes after the last one.",
+    "howToAvoidId": "Garis bawahi angka dalam frasa waktu; に diletakkan sesudah angka terakhir.",
+    "memoryCue": "One number, one NI.",
+    "memoryCueId": "Satu angka, satu に."
+   }
+  },
+  {
+   "id": "JP-TM-117",
+   "family": "time_expressions",
+   "skill": "time_expressions",
+   "subskill": "no_ni_with_relative_time",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "maiasa-takes-no-ni",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Use MAIASA bare when describing a daily morning routine",
+   "pedagogicalObjectiveId": "Memakai まいあさ polos saat menggambarkan rutinitas pagi harian",
+   "misconceptionTargeted": "Learner adds NI to MAIASA because mornings feel like a time slot",
+   "misconceptionTargetedId": "Murid menambahkan に pada まいあさ karena pagi terasa seperti slot waktu",
+   "reasoningOperation": "recognise MAI- as a habitual prefix -> keep the phrase bare",
+   "reasoningOperationId": "kenali awalan まい sebagai penanda kebiasaan -> biarkan frasanya polos",
+   "stem": "___ コーヒーを のみます。",
+   "stemKana": "___ コーヒーを のみます。",
+   "furigana": [],
+   "options": [
+    "まいあさ",
+    "まいあさに",
+    "まいあさで",
+    "まいあさへ"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "まいあさに",
+     "misconception": "NI added to a habitual time word",
+     "misconceptionId": "に ditambahkan pada kata waktu kebiasaan",
+     "whyFails": "MAIASA describes how often, not a point on the clock, so it takes no NI.",
+     "whyFailsId": "まいあさ menyatakan seberapa sering, bukan titik pada jam, jadi tanpa に."
+    },
+    {
+     "option": "まいあさで",
+     "misconception": "place particle used for a habitual time",
+     "misconceptionId": "partikel tempat dipakai untuk waktu kebiasaan",
+     "whyFails": "DE marks a place or a means, and every morning is a frequency.",
+     "whyFailsId": "で menandai tempat atau sarana, sedangkan 'setiap pagi' adalah frekuensi."
+    },
+    {
+     "option": "まいあさへ",
+     "misconception": "direction particle used for a time word",
+     "misconceptionId": "partikel arah dipakai untuk kata waktu",
+     "whyFails": "E marks a destination; mornings are not places you head toward.",
+     "whyFailsId": "へ menandai tujuan; pagi bukan tempat yang dituju."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "MAIASA behaves like MAINICHI: it states frequency and stands in front of the verb without a particle.",
+    "whyCorrectId": "まいあさ berperilaku seperti まいにち: menyatakan frekuensi dan berdiri di depan verba tanpa partikel.",
+    "rule": "MAI- words take no particle.",
+    "ruleId": "Kata berawalan まい tidak memakai partikel.",
+    "whyOthersFail": "NI treats a habit as a clock point; DE and E treat it as a place.",
+    "whyOthersFailId": "に menganggap kebiasaan sebagai titik jam; で dan へ menganggapnya tempat.",
+    "howToAvoid": "Compare with MAINICHI: if the pattern matches, drop the particle.",
+    "howToAvoidId": "Bandingkan dengan まいにち: kalau polanya sama, buang partikelnya.",
+    "memoryCue": "Every morning, empty particle.",
+    "memoryCueId": "Setiap pagi, partikelnya kosong."
+   }
+  },
+  {
+   "id": "JP-TM-118",
+   "family": "time_expressions",
+   "skill": "time_expressions",
+   "subskill": "no_ni_with_relative_time",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "kyou-takes-no-ni",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Use KYOU without NI when saying what is or is not on today",
+   "pedagogicalObjectiveId": "Memakai きょう tanpa に saat menyatakan ada atau tidaknya sesuatu hari ini",
+   "misconceptionTargeted": "Learner attaches NI to KYOU because it names a day",
+   "misconceptionTargetedId": "Murid menempelkan に pada きょう karena kata itu menyebut hari",
+   "reasoningOperation": "classify KYOU as a now-relative day -> withhold NI",
+   "reasoningOperationId": "golongkan きょう sebagai hari relatif terhadap sekarang -> jangan beri に",
+   "stem": "___ アルバイトが ありません。",
+   "stemKana": "___ アルバイトが ありません。",
+   "furigana": [],
+   "options": [
+    "きょう",
+    "きょうに",
+    "きょうで",
+    "きょうを"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "きょうに",
+     "misconception": "NI added to a relative time word",
+     "misconceptionId": "に ditambahkan pada kata waktu relatif",
+     "whyFails": "KYOU changes reference every day, which is exactly the group that refuses NI.",
+     "whyFailsId": "きょう berubah acuannya setiap hari, dan justru kelompok itulah yang menolak に."
+    },
+    {
+     "option": "きょうで",
+     "misconception": "place particle used for a day",
+     "misconceptionId": "partikel tempat dipakai untuk hari",
+     "whyFails": "DE marks where something happens, and today is a time, not a location.",
+     "whyFailsId": "で menandai tempat terjadinya sesuatu, sedangkan hari ini adalah waktu, bukan tempat."
+    },
+    {
+     "option": "きょうを",
+     "misconception": "object particle attached to a time word",
+     "misconceptionId": "partikel objek ditempel ke kata waktu",
+     "whyFails": "ARIMASEN uses GA for the thing that does not exist; there is no object slot.",
+     "whyFailsId": "ありません memakai が untuk hal yang tidak ada; tidak ada slot objek."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "KYOU is defined against the present day, so like ASHITA and KINOU it appears without a particle.",
+    "whyCorrectId": "きょう ditentukan relatif terhadap hari ini, jadi seperti あした dan きのう ia muncul tanpa partikel.",
+    "rule": "KYOU, ASHITA and KINOU never take NI.",
+    "ruleId": "きょう, あした, dan きのう tidak pernah memakai に.",
+    "whyOthersFail": "NI over-applies the calendar rule; DE makes today a place; O demands an object.",
+    "whyOthersFailId": "に menerapkan aturan kalender berlebihan; で menjadikan hari ini tempat; を menuntut objek.",
+    "howToAvoid": "Say the sentence tomorrow: if the word would mean a different day, it takes no NI.",
+    "howToAvoidId": "Ucapkan kalimatnya besok: kalau kata itu jadi berarti hari lain, berarti tanpa に.",
+    "memoryCue": "Today travels light.",
+    "memoryCueId": "Hari ini bepergian tanpa beban."
+   }
+  }
+ ]
+}
