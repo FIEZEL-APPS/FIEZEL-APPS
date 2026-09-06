@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-06T11:20:00+07:00",
+  "updated": "2026-09-06T13:09:47.211Z",
   "active": [
     {
       "sesi": "ses_0034e69d3ffes3kjiFLNDzYXUZ",
@@ -95,6 +95,16 @@
       ],
       "mulai": "2026-09-06T11:20:00+07:00",
       "catatan": "Menyentuh juga app.js (kunci ujian di quizLoop/Skills Lab/Writing + gerbang pintu AI + pendeteksi ujian non-tugas), features/class-hub/fiezel-class-hub.js, features/learner-flow/fiezel-learner-flow.js, features/teacher/fiezel-teacher-store.js, workers/api/teacher/class-sync-core.js (fx), copy-*-proctor.js, index.html, sw.js, quality.yml. Build m025-273 lewat tools/bump-build.mjs."
+    },
+    {
+      "sesi": "ses_01GmUXhkAchQKMb5G24xTerU-vocab",
+      "peran": "claude-code / kosakata jepang",
+      "paths": [
+        "docs/japanese/kosakata-jlpt.json",
+        "docs/handoffs/JAPANESE-VOCAB-HANDOFF.md"
+      ],
+      "mulai": "2026-09-06T13:09:47.210Z",
+      "catatan": "Normalisasi dua berkas kosakata milik owner jadi satu bank JSON per tingkat JLPT. Nol byte produksi."
     }
   ],
   "finished": [
