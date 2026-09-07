@@ -1,6 +1,6 @@
 {
   "schema": "id-golden-baseline/1",
-  "generatedAt": "2026-09-07T12:20:02.031Z",
+  "generatedAt": "2026-09-07T14:31:13.171Z",
   "root": "/home/user/FIEZEL-APPS",
   "files": {
     "grammar-explanations-id.json": "90912890391b2e491f31a6558aec5b7cecccbf56bc7c341fb1106291b5c721b6",
@@ -18,8 +18,8 @@
     "features/audio-assets/fiezel-audio-key.js": "11624e303917fe0df881ac3f410911587766fd6f4d2491ca6687ec42de8d457d"
   },
   "literals": {
-    "count": 3219,
-    "sha256": "13a40fc40cc70ed5426f3498a36e6fc42b2097a83030321485b33d5b2c35e71a",
+    "count": 3220,
+    "sha256": "055df46c19e68f63f2ed73c32b508dd2ad98a26997462977887c5154268f5fdc",
     "list": [
       "\n      SETELAH beat concern ≤1000ms selesai (13 §2.2), bukan menimpanya. Tanpa bunyi:\n      SFX hint sudah dipensiunkan (20 §4); cooldown 8 detiknya dijaga komponen. */\n   setTimeout(()=>{try{pawReact(",
       "\n      case 'silent':                        // L5: kalau mulut sempat mulai (taksiran L3 kandas), tutup SEKARANG\n        degradedLatch = false;\n        closeTurn(false);\n        break;\n      case 'interrupt':                     // stop(): snap tutup\n        degradedLatch = false;\n        closeTurn(true);\n        break;\n      default:\n        break;                              // fase asing dari versi fasad lebih baru: diabaikan tanpa suara\n    }\n  }\n\n  try { doc.addEventListener('fiezel-speech', onSpeech); } catch (_) {}\n\n  /* Suara terdegradasi (audibility-fix): mulut mati SEKETIKA dan tidak boleh\n     hidup lagi untuk sisa giliran — apa pun yang masih dikirim lapisan bawah. */\n  try {\n    root.addEventListener('fiezel-neural-voice-degraded', function () {\n      if (turn) closeTurn(true);\n      degradedLatch = true;                 // dilepas oleh end/silent/interrupt fasad berikutnya\n    });\n  } catch (_) {}\n\n  /* Permukaan kecil untuk Diagnostics/tes — bukan API pemanggil biasa:\n     satu-satunya pintu bicara tetap FiezelVoiceSay.say(). */\n  root.FiezelSpeechBridge = Object.freeze({\n    SCHEMA: SCHEMA,\n    speaking: function () { return !!turn; },\n    degraded: function () { return !!degradedLatch; },\n    motionAllowed: motionAllowed\n  });\n})(typeof self !== 'undefined' ? self : (typeof window !== 'undefined' ? window : this));\n",
@@ -669,6 +669,7 @@
       ">' + icon('user-minus') + ' ' + t('guru.hapus-dari-kelas', 'Hapus dari kelas') + '</button></div></div></aside>';\n  }\n\n  // ---- MODAL --------------------------------------------------------------------------------------\n  function modal(c) {\n    if (!ui.modal) return '';\n    var m = ui.modal, T = S(), body = '', title = '', wide = false;\n    if (m.kind === 'new-class' || m.kind === 'edit-class') {\n      var e = m.kind === 'edit-class' ? c : null; title = e ? t('guru.ubah-kelas', 'Ubah kelas') : t('guru.kelas-baru', 'Kelas baru');\n      body = '<form data-tg-form=",
       ">' + icon('user-plus') + ' ' + t('kelas.tambah-murid', 'Tambah murid') + '</button><button type=",
       ">' + icon('users') + ' ' + t('guru.pilih-murid-kode', 'Pilih murid / kode') + '</button><button type=",
+      ">' + icon(n[2]) + '<span>' + n[1] + '</span></button>'; }).join('') + '</nav>' +\n      /* Pintu konsol kurikulum HANYA dibuka kalau benderanya menyala. Backend yang\n         melayaninya (/api/...) belum berjalan di produksi — diperiksa owner 7 Sep 2026,\n         404. Nama bendera yang salah ketik jatuh ke false, jadi kegagalannya menyembunyikan\n         pintu, bukan membukanya. Lihat alasan lengkap di fiezel-ux-flags.js. */\n      (uxOn('curriculumConsole')\n        ? '<a class=",
       ">' + icon(open ? 'chevron-up' : 'list-checks') + (open ? ' ' + t('umum.tutup', 'Tutup') : ' ' + t('kelas.status-murid-soal', 'Status murid & soal')) + '</button><button type=",
       ">' + icon(t[2]) + '<span>' + t[1] + '</span></button>'; }).join('') + '</nav>' + body + '</div>';\n  }\n  /* Permintaan bergabung: murid sudah mengetik kode kelas ini, guru yang memutuskan ia masuk\n     atau tidak. Kartunya hanya muncul kalau memang ada yang menunggu — kelas yang tidak\n     kedatangan siapa pun tidak perlu melihat kotak kosong tiap hari. */\n  function pendingCard(c) {\n    var TS = T(), list = TS.pendingJoins ? TS.pendingJoins(c) : [];\n    if (!list.length) return '';\n    return '<section class=",
       ">' + icon(ui.syncing ? 'refresh-cw' : L.state === 'ok' ? 'cloud-check' : L.state === 'err' ? 'cloud-alert' : 'cloud') + '<span>' + esc(ui.syncing ? 'Menyinkron…' : L.text) + '</span></button>';\n  }\n\n  // ---- mount ------------------------------------------------------------------------------\n  function mount(target, options) {\n    el = target; env = options || {};\n    /* Urutannya penting: penyimpanan dialihkan SEBELUM load(), kalau tidak papan demo\n       terisi dari data guru asli dan tulisan pertamanya mendarat di sana juga. */\n    previewOn = previewAllowed();\n    try { S().setPreview(previewOn); } catch (_) {}\n    st = S().load();\n    /* Demo yang kosong bukan demo. Pengunjung yang menekan ",
