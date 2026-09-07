@@ -1010,6 +1010,15 @@ jobs:
         # Assert intinya karena itu bukan soal bentuk: evidence tiap soal WAJIB substring
         # persis dari teks bacaannya sendiri.
         run: node tests/japanese-reading-bank-test.js
+      - name: 'Konsol kurikulum: pintu ke ruangan kosong wajib tertutup'
+        # m025-294 memasang tautan Kurikulum di sidebar Ruang Guru. Isinya dilayani
+        # features/curriculum/fz-api.js yang memanggil '/api/...' relatif ke origin yang
+        # sama, jadi ia menuntut FastAPI berjalan di domain yang sama dengan PWA. Diperiksa
+        # owner di fiezel.my.id (7 Sep 2026): /api/health 404, /kurikulum.html 404. Repo
+        # juga tidak punya passenger_wsgi.py / Procfile / requirements.txt di akar. Gerbang
+        # menuntut benderanya MATI di kedua jalur dan tautannya dijaga bendera - sekaligus
+        # menuntut mesinnya TIDAK dihapus, supaya satu bendera cukup saat backend siap.
+        run: node tests/curriculum-console-gate-test.js
       - name: 'Sumbu bahasa target: kunci murid Inggris identik byte per byte'
         # Menambah bahasa kedua punya satu cara gampang dan satu cara benar. Yang gampang:
         # beri SEMUA kunci awalan bahasa, termasuk kunci Inggris. Sekali dikirim, setiap murid

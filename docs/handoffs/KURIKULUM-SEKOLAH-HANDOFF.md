@@ -155,3 +155,53 @@ owner. Kode produksinya bersih — `backend/auth.py` membaca `OWNER_MASTER_TOKEN
 berjalan memakai nilai yang tertulis di kedua berkas itu, mempublikasikannya di repo sama
 dengan membocorkannya. Menggantinya jadi placeholder adalah keputusan owner, bukan keputusan
 sesi ini.
+
+---
+
+## m025-296 — pintu konsol kurikulum ditutup sampai backend benar-benar berjalan
+
+m025-294 memasang tautan **"Kurikulum & Kompetensi"** di sidebar Ruang Guru. Tautan itu
+menuju `./kurikulum.html`, dan seluruh isi halaman itu dilayani
+`features/curriculum/fz-api.js` yang memanggil **`/api/...` relatif ke origin yang sama** —
+artinya halaman itu menuntut server FastAPI berjalan di domain yang sama dengan PWA-nya.
+
+**Diperiksa owner sendiri di fiezel.my.id, 7 September 2026:**
+
+| Alamat | Jawaban |
+|---|---|
+| `/api/health` | **404** |
+| `/kurikulum.html` | **404** |
+
+Repo juga tidak memuat satu pun berkas yang memberi tahu hosting cara menjalankan Python:
+tidak ada `passenger_wsgi.py`, tidak ada `Procfile`, `requirements.txt` hanya ada di dalam
+`backend/` dan bukan di akar, dan tidak ada dokumen pemasangan. Jadi bukan kebetulan
+backend-nya mati — memang belum pernah ada yang memasangnya.
+
+Akibatnya di produksi: guru menekan tautan di sidebar, `kurikulum.html` terbuka, dan setiap
+panggilan API gagal. Itu **lebih buruk daripada fitur yang belum ada** — fitur yang belum ada
+tidak menjanjikan apa-apa, sedangkan pintu yang terbuka ke ruangan kosong menghabiskan
+kepercayaan guru pada seluruh aplikasi.
+
+### Yang dilakukan, dan yang sengaja TIDAK dilakukan
+
+Bendera `curriculumConsole` ditambahkan ke `fiezel-ux-flags.js` dengan bawaan **mati**, plus
+kembarannya di peta cadangan `app.js` — dua jalur, keduanya mati, sesuai konvensi bendera yang
+sudah ada di repo. Tautan sidebar hanya dirender saat benderanya menyala.
+
+**Mesinnya tidak disentuh sama sekali.** `backend/`, `kurikulum.html`, `misi.html`, dan
+seluruh `features/curriculum/` tetap utuh dan tetap diuji. Ini menutup pintu, bukan membakar
+ruangannya: begitu backend benar-benar berjalan, **satu bendera membalikkannya** dan tidak ada
+kode yang perlu ditulis ulang. `tests/curriculum-console-gate-test.js` justru menuntut
+berkas-berkas itu TETAP ADA — supaya "perbaikan" berikutnya tidak menghapus mesinnya.
+
+Pembaca bendera di `fiezel-teacher-shell.js` mengikuti aturan yang sama dengan `uxOn()` di
+`app.js`: nama tak dikenal dan FiezelUX yang absen sama-sama menjawab **false**. Diukur dengan
+menjalankan fungsinya: bendera mati → `false`, bendera nyala → `true`, FiezelUX tidak ada →
+`false`. Kegagalannya menyembunyikan pintu, bukan membukanya.
+
+### Kalau kelak backend dipasang
+
+Yang dibutuhkan bukan mengunggah berkas: hosting yang bisa menjalankan Python, MongoDB, dan
+variabel rahasia (`OWNER_MASTER_TOKEN`, `JWT_SECRET`, `ADMIN_PASSWORD`, `MONGO_URL`). Hosting
+cPanel bersama umumnya tidak bisa. Itu keputusan biaya dan waktu milik owner — dan sampai
+keputusan itu diambil, benderanya tetap mati.
