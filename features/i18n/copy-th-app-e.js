@@ -41,6 +41,8 @@
     'quiz.next-btn': 'ถัดไป',
     'quiz.reading-eyebrow': 'บทอ่าน',
     'quiz.listen-btn': 'ฟัง',
+    'progress.belum-terukur': 'ยังไม่ได้วัด',
+    'quiz.tombol-dengar': 'ฟัง',
     'quiz.listen-note': 'ตัวเลือกจะเปิดหลังจากเสียงเล่นจบ',
     'quiz.feedback-saved-title': 'บันทึกแล้ว',
     'quiz.feedback-saved-body-test': 'คำตอบของคุณถูกบันทึก คำอธิบายจะแสดงในหน้าผลลัพธ์หลังทำข้อสอบเสร็จ',

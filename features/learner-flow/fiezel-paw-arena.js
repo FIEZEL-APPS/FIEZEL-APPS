@@ -73,8 +73,11 @@
   function gameById(id) { for (var i = 0; i < GAMES.length; i++) if (GAMES[i].id === id) return GAMES[i]; return null; }
 
   function t(k, fb) {
-    try { var I = root && root.FiezelI18n; return I && I.t ? I.t(k) : (fb == null ? k : fb); }
-    catch (_) { return fb == null ? k : fb; }
+    /* Kunci yang tidak terpecahkan kembali sebagai kuncinya sendiri; itu bukan kalimat.
+       Cadangan dipakai untuk keduanya: FiezelI18n absen, dan kunci tak terpecahkan. */
+    var s;
+    try { var I = root && root.FiezelI18n; s = I && I.t ? I.t(k) : undefined; } catch (_) {}
+    return (s === undefined || s === k) ? (fb == null ? k : fb) : s;
   }
 
   // ---- SESI (murni; dipakai gerbang) --------------------------------------------------
