@@ -49,7 +49,7 @@ penanda build dan berkas laporan.
 A9 sempat merah pada spasi di ujung dua baris `website/th/index.html`; dibersihkan, bukan
 dikecualikan.
 
-## Yang sengaja BELUM dikerjakan
+## Langkah berikutnya — yang sengaja BELUM dikerjakan
 
 - Animasi ini murni CSS/SVG di dalam halaman; tidak ada aset media baru dan tidak ada
   permintaan jaringan tambahan. Kalau kelak ingin lebih kaya, batas itu yang pertama akan
