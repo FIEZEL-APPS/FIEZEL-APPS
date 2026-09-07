@@ -507,6 +507,9 @@ html.fz-booting body{overflow:hidden}
   <script defer src="./features/i18n/copy-id-grammar-labels.js"></script>
   <script defer src="./features/i18n/copy-id-student.js"></script>
   <script defer src="./features/i18n/copy-id-proctor.js"></script>
+  <!-- Pemilih BAHASA YANG DIPELAJARI (bukan bahasa layar). Domain sendiri -> th-coverage
+       menuntut copy-th-bahasa.js sebagai kembarannya. -->
+  <script defer src="./features/i18n/copy-id-bahasa.js"></script>
   <script defer src="./features/i18n/copy-id-classjoin.js"></script>
   <!-- m025-270: naskah "masuk dengan Google". Domain sendiri, bukan tumpangan: gerbang
        cakupan Thai menemukan domain dari isi features/i18n/, jadi berkas ini otomatis
@@ -609,6 +612,9 @@ html.fz-booting body{overflow:hidden}
        stat-gate karena ia adapter di atasnya. -->
   <script defer src="./features/brain/fiezel-policy-verdict.js"></script>
   <script defer src="./features/brain/fiezel-question-memory.js"></script>
+  <!-- Sumbu bahasa target: kunci penyimpanan per bahasa. Bahasa bawaan (en) TIDAK punya
+       awalan, jadi kunci murid Inggris identik byte per byte dengan sebelum modul ini ada. -->
+  <script defer src="./features/brain/fiezel-target-language.js"></script>
   <script defer src="./features/brain/fiezel-question-allocator.js"></script>
   <!-- brain-learning-infra: lane telemetri belajar (config → events → queue → transport).
        Urutan penting: transport membaca queue, queue membaca events, semuanya membaca

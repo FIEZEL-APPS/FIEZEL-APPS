@@ -150,12 +150,13 @@
    * Bukti tiap klasifikasi ada di komentar kepala berkas (hasil inspeksi app.js).
    */
   var AUTHORITY_MAP = {
-    // targetLanguage: 'off' dan itu JUJUR, bukan sementara-yang-terlupakan. Modul sumbu
-    // bahasa sudah ada dan sudah dijaga gerbang, tetapi BELUM ADA satu pun pemanggil di
-    // app.js: tidak ada layar yang memilih bahasa target, dan tidak ada kunci yang dilewatkan
-    // melaluinya. Selama itu benar, ia tidak mempengaruhi apa pun yang dilihat murid, dan
-    // menandainya 'active' berarti berbohong tentang mesin yang sedang berjalan.
-    targetLanguage: 'off',
+    // targetLanguage: 'off' -> 'active' (m025-285). Sebelumnya 'off' dan itu jujur: modulnya
+    // ada tetapi nol pemanggil. Sekarang app.js benar-benar memakainya — pemilih bahasa di
+    // Pengaturan menulis preferences.targetLang, pemuat bank membaca bahasa itu untuk memilih
+    // bank Jepang, dan graf keluarga Jepang disuntikkan ke Core Brain lewat setFamilyGraph.
+    // Otoritas naik BERSAMA pemuatannya di index.html dan precache sw.js dalam satu commit;
+    // otoritas yang naik tanpa pemuatan adalah peta yang bohong ke arah sebaliknya.
+    targetLanguage: 'active',
     memory: 'active',
     // PAW ARENA (m025-279): bot lawan untuk tiga permainan arena. MURNI — seed→langkah
     // deterministik, tanpa DOM/jam/acak — dimuat index.html dan di-precache sw.js.

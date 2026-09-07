@@ -265,7 +265,7 @@ function validTimeZone(value){
 // sanitizeState (AI-11 F04 pola #3): blob lama tanpa field ini ter-merge mulus ke 'id',
 // tanpa kunci baru, tanpa bump schema. Nilainya enum tertutup FiezelI18n.SUPPORTED ('id'|'th');
 // JANGAN pernah meneruskannya ke opsi audio/voice (audio-locale-guard-test, AI-17 F02).
-const defaultPreferences={haptics:true,feedbackSounds:true,motion:true,neuralVoice:'auto',reminders:null,reportConsent:false,reportEndpoint:DEFAULT_REPORT_ENDPOINT,selfAssessedLevel:'',activeLevel:'',levelMode:'placement',goalProfile:'general',timeZone:detectedTimeZone(),learnerLocale:'id',/* m026 GEO-IP: penanda pilihan bahasa MANUAL murid. Sekali true (murid memilih di onboarding/Pengaturan), deteksi IP tidak pernah menimpanya lagi. localeAutoDetected: sudah pernah dicek lokasi sekali per perangkat supaya tidak fetch tiap buka. */learnerLocaleExplicit:false,localeAutoDetected:false,/* S5b: sinkron otak antar-perangkat. BAWAAN false dan sengaja begitu — bukti belajar tidak boleh mulai meninggalkan perangkat karena sebuah pembaruan mendarat, hanya karena murid memilihnya. */brainSync:false,};
+const defaultPreferences={haptics:true,feedbackSounds:true,motion:true,neuralVoice:'auto',reminders:null,reportConsent:false,reportEndpoint:DEFAULT_REPORT_ENDPOINT,selfAssessedLevel:'',activeLevel:'',levelMode:'placement',goalProfile:'general',timeZone:detectedTimeZone(),learnerLocale:'id',/* m025-285: BAHASA YANG DIPELAJARI, bukan bahasa layar. learnerLocale mengatur bahasa antarmuka; targetLang memilih kursus mana yang dibuka. BAWAAN 'en' dan wajib begitu — setiap murid yang sudah ada memakai kursus Inggris, dan sebuah pembaruan tidak boleh memindahkan mereka. Kunci penyimpanan bahasa bawaan TIDAK berawalan, jadi progres Inggris tetap dicari di tempat ia disimpan. */targetLang:'en',/* m026 GEO-IP: penanda pilihan bahasa MANUAL murid. Sekali true (murid memilih di onboarding/Pengaturan), deteksi IP tidak pernah menimpanya lagi. localeAutoDetected: sudah pernah dicek lokasi sekali per perangkat supaya tidak fetch tiap buka. */learnerLocaleExplicit:false,localeAutoDetected:false,/* S5b: sinkron otak antar-perangkat. BAWAAN false dan sengaja begitu — bukti belajar tidak boleh mulai meninggalkan perangkat karena sebuah pembaruan mendarat, hanya karena murid memilihnya. */brainSync:false,};
 const defaultReportMeta={lastSentAnswered:0,lastSentAt:0,lastStatus:'not_configured',lastReceipt:'',lastAccessReportDay:'',queue:[]};
 const LOGIN_MESSAGES=__fzI18nTable([],()=>([
   {headline:FiezelI18n.t('login.pesan-01-headline'),lead:FiezelI18n.t('login.pesan-01-lead')},
@@ -4175,6 +4175,37 @@ async function load(){const root=document.baseURI;/* W1 P0-1 (16-001): fetch ban
   // dipakai Grammar Hub. Sebelumnya Core Brain hanya punya graph keluarga - lima keluarga
   // bahkan hilang darinya - jadi diagnosis akar masalah tidak pernah bisa menunjuk lesson.
   try{self.FiezelCoreBrain?.setCurriculumGraph?.(GRAMMAR_CURRICULUM)}catch{}
+  // m025-285: SUMBU BAHASA TARGET. Bank Jepang memakai NAMA MEDAN yang sama persis dengan
+  // grammar-templates.json Inggris, jadi ia lewat jalur hidrasi YANG SAMA di bawah — satu
+  // mesin, dua bahasa. Membuat jalur kedua akan berarti murid Jepang kehilangan alokator,
+  // ingatan soal, dan tutor brain sekaligus: soalnya tetap keluar, tetapi berhenti
+  // menyesuaikan diri dengan murid.
+  //
+  // Jalur Inggris TIDAK tersentuh. Cabang ini hanya berjalan saat targetLang === 'ja';
+  // untuk 'en' (bawaan) satu-satunya yang terjadi adalah resetFamilyGraph, yang memulihkan
+  // graf Inggris — tanpa itu, murid yang pernah mencoba Jepang lalu kembali akan mewarisi
+  // prasyarat Jepang di diagnosis akar masalahnya.
+  if(activeTargetLang()==='ja'){
+    const jaBank=await optional('content/ja/grammar-templates-ja.json',null);
+    const jaGraph=await optional('content/ja/family-graph-ja.json',null);
+    if(jaBank&&Array.isArray(jaBank.templates)&&jaBank.templates.length){
+      G=jaBank;
+      // Graf keluarga Jepang menggantikan graf Inggris SELAMA bahasa ini aktif. Graf lesson
+      // (setCurriculumGraph) sengaja dikosongkan: kurikulum tingkat-lesson Jepang belum ada,
+      // dan membiarkan kurikulum Inggris terpasang berarti prasyarat lesson Inggris dipakai
+      // untuk menilai butir Jepang.
+      try{self.FiezelCoreBrain?.setFamilyGraph?.(jaGraph?.families||{})}catch{}
+      try{self.FiezelCoreBrain?.setCurriculumGraph?.({schema:'fiezel-grammar-curriculum-v1',lessons:[]})}catch{}
+    }else{
+      // Bank Jepang gagal dimuat: JANGAN diam-diam menyajikan kursus Inggris dengan label
+      // Jepang. Kembalikan murid ke Inggris dan katakan, supaya kegagalannya terlihat.
+      try{self.FiezelCoreBrain?.resetFamilyGraph?.()}catch{}
+      state.preferences={...state.preferences,targetLang:'en'};
+      try{showToast(FiezelI18n.t('bahasa.berganti',{bahasa:FiezelI18n.t('bahasa.en')}))}catch(_){}
+    }
+  }else{
+    try{self.FiezelCoreBrain?.resetFamilyGraph?.()}catch{}
+  }
   if(CONTENT_CANARY){const canonical={version:APP_VERSION,vocabulary:V,reading:R,grammar:grammarMaster},now=Date.now();contentPromotionRuntime=CONTENT_PROMOTION?CONTENT_PROMOTION.evaluate(CONTENT_CANARY_CONFIG,state.contentCanaryMeta,now):contentPromotionRuntime;if(CONTENT_CANARY_CONFIG?.enabled&&CONTENT_CANARY_CONFIG?.canaryId)state.contentCanaryMeta=CONTENT_CANARY.recordPromotionDecision(state.contentCanaryMeta,CONTENT_CANARY_CONFIG.canaryId,contentPromotionRuntime,new Date(now).toISOString());contentCanaryRuntime=await CONTENT_CANARY.prepare(canonical,CONTENT_CANARY_CONFIG,learnerName(),state.contentCanaryMeta,now,contentPromotionRuntime);state.contentCanaryMeta=contentCanaryRuntime.evidence||state.contentCanaryMeta;V=contentCanaryRuntime.dataset.vocabulary;R=contentCanaryRuntime.dataset.reading;grammarMaster=contentCanaryRuntime.dataset.grammar;save()}G=grammarMaster;
   // Normalize the structured grammar master source into the runtime's canonical skill buckets.
   // The JSON master is authoritative; no legacy G[skill] file is used.
@@ -11545,6 +11576,40 @@ function setLearnerLocalePreference(next){
   return true;
 }
 window.setLearnerLocalePreference=setLearnerLocalePreference;
+/* m025-285: baris pemilih BAHASA YANG DIPELAJARI. Sengaja duduk tepat di bawah pemilih
+   bahasa tampilan karena keduanya paling mudah tertukar — dan sengaja memakai ikon berbeda
+   (graduation-cap vs languages) supaya perbedaannya terbaca sebelum labelnya dibaca.
+   Kalimatnya hidup di pasangan copy-id/copy-th-bahasa.js; tidak ada satu pun kalimat murid
+   yang ditulis langsung di sini. */
+function targetLangRowMarkup(){
+  const active=activeTargetLang();
+  const options=[['en',FiezelI18n.t('bahasa.en'),FiezelI18n.t('bahasa.en-catatan')],['ja',FiezelI18n.t('bahasa.ja'),FiezelI18n.t('bahasa.ja-catatan')]]
+    .map(([value,label,note])=>`<option value="${value}"${value===active?' selected':''}>${esc(label)} — ${esc(note)}</option>`).join('');
+  const warn=active==='ja'?`<p class="setting-note is-warn">${esc(FiezelI18n.t('bahasa.ja-peringatan'))}</p>`:'';
+  return `<label class="setting-row"><span class="setting-icon"><i data-lucide="graduation-cap"></i></span><span><b>${FiezelI18n.t('bahasa.judul')}</b><small>${FiezelI18n.t('bahasa.penjelasan')}</small></span><select id="settingTargetLang" aria-label="${FiezelI18n.t('bahasa.judul')}">${options}</select></label>${warn}`;
+}
+/* Bahasa target yang sedang berlaku, dinormalkan lewat modul sumbu bahasa supaya nilai
+   rusak/asing SELALU jatuh ke 'en'. Tanpa normalisasi, satu nilai aneh di localStorage
+   memindahkan murid ke kursus yang tidak ada dan layarnya kosong tanpa error. */
+function activeTargetLang(){
+  const raw=state.preferences?.targetLang;
+  try{return self.FiezelTargetLanguage?.normalize?.(raw)||'en'}catch(_){return raw==='ja'?'ja':'en'}
+}
+window.activeTargetLang=activeTargetLang;
+/* Berganti kursus MEMUAT ULANG bank soal, bukan sekadar mengganti label: bank Inggris dan
+   Jepang adalah dua berkas berbeda, dan mesin adaptif membaca yang sedang termuat. Progres
+   TIDAK disentuh — kunci tiap bahasa berdiri sendiri lewat FiezelTargetLanguage. */
+async function setTargetLangPreference(next){
+  const value=(next==='ja')?'ja':'en';
+  if(activeTargetLang()===value)return true;
+  state.preferences={...state.preferences,targetLang:value};save();
+  try{await load()}catch(_){}
+  try{leaveAllStages()}catch(_){}
+  closeModal();render();haptic('confirm');
+  showToast(FiezelI18n.t('bahasa.berganti',{bahasa:FiezelI18n.t('bahasa.'+value)}));
+  return true;
+}
+window.setTargetLangPreference=setTargetLangPreference;
 /* Mode gelap dihapus — baris pemilih tema tidak lagi ditampilkan. */
 function themeChoiceRowMarkup(){
   return '';
@@ -11557,7 +11622,7 @@ function openSettings(){const p=state.preferences||defaultPreferences,endpoint=p
   // Kartu Akun Puter dibungkus lipatan bersarang, BUKAN dipindah atau dihapus: elemennya
   // tetap di DOM (bindAccountSettingControls dan refreshPuterAccountCard tetap menemukannya),
   // tetapi 330 px penjelasan akun tidak lagi ikut terbuka saat panel baru dibuka.
-  const grupProfil=`<label class="endpoint-label">${FiezelI18n.t('onboarding.name-field-label')}<input id="settingLearnerName" type="text" value="${esc(state.userName||'')}" maxlength="24" placeholder="${FiezelI18n.t('settings.nama-you')}" autocomplete="given-name"></label>${learnerLocaleRowMarkup()}${studentRegistrationMarkup()}`+settingsFold(FiezelI18n.t('settings.akun-puter'),accountSettingsMarkup(),false,'settings-subfold');
+  const grupProfil=`<label class="endpoint-label">${FiezelI18n.t('onboarding.name-field-label')}<input id="settingLearnerName" type="text" value="${esc(state.userName||'')}" maxlength="24" placeholder="${FiezelI18n.t('settings.nama-you')}" autocomplete="given-name"></label>${learnerLocaleRowMarkup()}${targetLangRowMarkup()}${studentRegistrationMarkup()}`+settingsFold(FiezelI18n.t('settings.akun-puter'),accountSettingsMarkup(),false,'settings-subfold');
   const grupBelajar=`<div class="settings-list"><button type="button" class="setting-row setting-row-action" onclick="replayTour()"><span class="setting-icon"><i data-lucide="rotate-ccw"></i></span><span><b>${FiezelI18n.t('settings.redo-kenalan-cepat')}</b><small>${FiezelI18n.t('settings.menjalankan-ulang-tur-menu-awal')}</small></span><i data-lucide="chevron-right"></i></button><label class="setting-row"><span class="setting-icon"><i data-lucide="wand-sparkles"></i></span><span><b>${FiezelI18n.t('settings.animation-label')}</b><small>${FiezelI18n.t('settings.transisi-halaman-kartu-popup-feedback')}</small></span><input id="settingMotion" type="checkbox" ${p.motion?'checked':''}></label><label class="setting-row"><span class="setting-icon"><i data-lucide="vibrate"></i></span><span><b>${FiezelI18n.t('settings.vibration-label')}</b><small>${typeof navigator!=='undefined'&&typeof navigator.vibrate==='function'?FiezelI18n.t('settings.vibration-supported'):FiezelI18n.t('settings.vibration-fallback')}</small></span><input id="settingHaptics" type="checkbox" ${p.haptics?'checked':''}></label>${gemsSettingsRowMarkup()}</div>`;  const grupSuara=`<div class="settings-list"><label class="setting-row"><span class="setting-icon"><i data-lucide="bell-check"></i></span><span><b>${FiezelI18n.t('settings.pengingat-study')}</b><small>${esc(reminderSettingHint())}</small></span><input id="settingReminders" type="checkbox" ${remindersActive()?'checked':''} ${notificationPermission()==='denied'||notificationPermission()==='unsupported'?'disabled':''} aria-label="${FiezelI18n.t('settings.reminder-aria')}"></label><label class="setting-row"><span class="setting-icon"><i data-lucide="badge-check"></i></span><span><b>${FiezelI18n.t('settings.suara-answer')}</b><small>${FiezelI18n.t('settings.bunyi-naik-when-right-bunyi')}</small></span><input id="settingFeedbackSounds" type="checkbox" ${p.feedbackSounds!==false?'checked':''}></label><div class="setting-row" id="audioDiagRow"><span class="setting-icon"><i data-lucide="smartphone"></i></span><span><b>${FiezelI18n.t('settings.status-bunyi-perangkat')}</b><small id="audioDiagText">${FiezelI18n.t('settings.audio-checking')}</small></span></div></div><div id="voiceSettingsCard">${neuralVoiceStatusMarkup()}</div>`;
   // Tombol bersihkan-cache duduk di antara Backup dan Kesehatan Instalasi: kartu diagnosis
   // itulah yang melaporkan shell usang, jadi tombol perbaikannya berdampingan dengannya.
@@ -11579,7 +11644,7 @@ function openSettings(){const p=state.preferences||defaultPreferences,endpoint=p
     +settingsFold(FiezelI18n.t('settings.data-amp-penyimpanan'),grupData,false)
     +settingsFold(FiezelI18n.t('settings.lanjutan'),grupLanjutan,false)
     +`<div class="modal-actions settings-actions"><button id="settingsCancel">${FiezelI18n.t('settings.cancel-btn')}</button><button class="primary" id="settingsSave">${FiezelI18n.t('settings.simpan-prefs')}</button></div>`);
-  $('settingsCancel').onclick=closeModal;setTimeout(refreshInstallHealth,0);setTimeout(refreshAudioDiagnostics,0);$('backupExport')?.addEventListener('click',runBackupExport);$('backupPick')?.addEventListener('click',()=>$('backupFile')?.click());$('backupFile')?.addEventListener('change',event=>runBackupImport(event.currentTarget.files?.[0]));$('openFeedback')?.addEventListener('click',()=>{closeModal();openFeedback('')});$('reportPreview').onclick=openReportPreview;$('settingsSave').onclick=saveSettings;$('settingClearCache')?.addEventListener('click',()=>{confirmClearAppCache()});bindVoiceSettingControls();bindAccountSettingControls();bindFiezelAccountControls();$('settingReminders')?.addEventListener('change',event=>toggleStudyReminders(event.currentTarget));$('settingLearnerLocale')?.addEventListener('change',event=>setLearnerLocalePreference(event.currentTarget.value));$('settingBoardHidden')?.addEventListener('change',event=>socialToggleHidden(event.currentTarget));
+  $('settingsCancel').onclick=closeModal;setTimeout(refreshInstallHealth,0);setTimeout(refreshAudioDiagnostics,0);$('backupExport')?.addEventListener('click',runBackupExport);$('backupPick')?.addEventListener('click',()=>$('backupFile')?.click());$('backupFile')?.addEventListener('change',event=>runBackupImport(event.currentTarget.files?.[0]));$('openFeedback')?.addEventListener('click',()=>{closeModal();openFeedback('')});$('reportPreview').onclick=openReportPreview;$('settingsSave').onclick=saveSettings;$('settingClearCache')?.addEventListener('click',()=>{confirmClearAppCache()});bindVoiceSettingControls();bindAccountSettingControls();bindFiezelAccountControls();$('settingReminders')?.addEventListener('change',event=>toggleStudyReminders(event.currentTarget));$('settingLearnerLocale')?.addEventListener('change',event=>setLearnerLocalePreference(event.currentTarget.value));$('settingTargetLang')?.addEventListener('change',event=>setTargetLangPreference(event.currentTarget.value));$('settingBoardHidden')?.addEventListener('change',event=>socialToggleHidden(event.currentTarget));
 // Pengaturan sebelum gelombang idle selesai, kartunya akan berbunyi "tidak tersedia"
 // padahal berkasnya sedang dalam perjalanan - jadi kartunya digambar ulang begitu tiba.
 if(!self.FiezelVoiceRuntime)ensureVoiceRuntime().then(()=>{const holder=$('voiceSettingsCard');if(!holder)return;holder.innerHTML=neuralVoiceStatusMarkup();bindVoiceSettingControls();enhanceUI()});
