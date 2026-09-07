@@ -298,14 +298,35 @@
     } catch (_) {}
     return p;
   }
+  /*
+   * TUGAS KURIKULUM TIDAK BOLEH DITAMBAL DARI BANK UMUM.
+   *
+   * Sampai m025-290, jalur kurikulum jatuh ke sini dengan skills = ['Descriptive Text']
+   * (nama GENRE, bukan nama skill bank). Tiga baris berikutnya menghancurkannya secara
+   * berurutan: penyaring membuang genre itu karena tidak ada di B.SKILLS, baris default
+   * memaksa skills = ['past_tense'], lalu penambal menarik soal Past Tense dari bank umum.
+   *
+   * Hasilnya diukur, bukan dikira-kira: guru memilih bab "Descriptive Text — About Me"
+   * kelas 7 dan meminta 5 soal, yang terkirim ke murid adalah 3 soal kurikulum DITAMBAH
+   * lima soal Past Tense ("Yesterday I ___ to the market") — materi kelas 8 — dan tugasnya
+   * dilabeli skill past_tense. Karena satu unit hanya berisi 2-3 soal sementara pilihan
+   * jumlahnya 2/3/5/8/10, pencemaran itu terjadi pada HAMPIR SETIAP tugas kurikulum.
+   *
+   * `curriculumOnly` menutupnya di sumbernya: kalau pemanggil menyatakan set ini berasal
+   * dari materi ajar, bank umum tidak pernah disentuh dan jumlah soalnya apa adanya —
+   * lebih baik guru melihat "3 soal" yang jujur daripada delapan soal yang setengahnya
+   * mengajarkan bab yang salah.
+   */
   function buildAssignment(opts) {
     var B = bank(), custom = Array.isArray(opts.items) ? opts.items.filter(function (q) { return q && q.prompt && Array.isArray(q.options) && q.options.length >= 2; }).slice(0, 40) : [];
+    var kurikulum = !!opts.curriculumOnly && custom.length > 0;
     var skills = (opts.skills || []).filter(function (k) { return (B && B.SKILLS[k]) || custom.some(function (q) { return q.skill === k; }); });
     custom.forEach(function (q) { if (q.skill && skills.indexOf(q.skill) === -1 && skills.length < 3) skills.push(q.skill); });
+    if (!skills.length) skills = kurikulum ? (opts.skills || []).slice(0, 3) : ['past_tense'];
     if (!skills.length) skills = ['past_tense'];
     var ids = [], seed = Date.now() % 997;
     if (Array.isArray(opts.itemIds) && opts.itemIds.length) ids = opts.itemIds.slice(0, 40);
-    else if (!custom.length || opts.count) { var per = Math.max(1, Math.round((Number(opts.count) || 10) / skills.length)); skills.forEach(function (k, i) { if (B && B.SKILLS[k]) B.pickFresh(k, per, { avoid: opts.avoid || [], seed: seed + i }).forEach(function (it) { ids.push(it.id); }); }); }
+    else if (!kurikulum && (!custom.length || opts.count)) { var per = Math.max(1, Math.round((Number(opts.count) || 10) / skills.length)); skills.forEach(function (k, i) { if (B && B.SKILLS[k]) B.pickFresh(k, per, { avoid: opts.avoid || [], seed: seed + i }).forEach(function (it) { ids.push(it.id); }); }); }
     custom.forEach(function (q) { if (ids.indexOf(q.id) === -1) ids.push(q.id); });
     ids = ids.slice(0, 40);
     var minutes = Math.max(3, Math.round(ids.length * 0.9));
