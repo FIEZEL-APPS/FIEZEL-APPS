@@ -25,29 +25,21 @@ const path = require('path');
 const __fzRoot = path.join(__dirname, '..');
 
 /*
- * UTANG YANG SUDAH ADA SEBELUM GERBANG INI (sapuan 2026-09-06).
- * Lima belas kunci ini sudah dipanggil tanpa pernah didaftarkan, jauh sebelum berkas ini
- * ditulis. Mereka dicatat — bukan dimaafkan diam-diam — supaya gerbang ini bisa berdiri
- * hari ini dan menahan kerusakan BARU, sementara utang lama dibayar terpisah oleh yang
- * paling tahu maksud tiap kunci. Hapus barisnya begitu kuncinya didaftarkan; menambah
- * baris baru ke sini untuk membuat gerbang hijau adalah persis kesalahan yang berkas ini
- * ada untuk mencegah.
+ * UTANG YANG SUDAH ADA SEBELUM GERBANG INI (sapuan 2026-09-06) — SUDAH DIBAYAR (m025-295).
+ * Enam belas kunci pernah dipanggil tanpa pernah didaftarkan. Empat belas di antaranya kini
+ * terdaftar id + th; barisnya dihapus dari daftar di bawah, persis seperti yang diminta
+ * catatan aslinya. Dua sisanya tetap tercatat karena ia SAH menurut desain, bukan karena
+ * belum sempat dikerjakan.
+ *
+ * Menambah baris baru ke sini untuk membuat gerbang hijau adalah persis kesalahan yang
+ * berkas ini ada untuk mencegah.
  */
 const UTANG = new Set([
-  'progress.belum-terukur',            // app.js
-  'account.err-pass-mismatch',         // features/auth/fiezel-account.js
-  'quiz.tombol-dengar',                // features/library/fiezel-library-ui.js
-  'social.validate-too-short',         // features/social/fiezel-social.js — enam kunci validasi
-  'social.validate-too-long',
-  'social.validate-end-underscore',
-  'social.validate-impersonation',
-  'social.milestone-default',
-  'social.error-rate-limited-with-retry',
-  'fsl.explain-detail',                // features/speaking-listening/listening-generate.js
-  'fsl.explain-inference',
-  'fsl.explain-attitude',
-  'fsl.explain-paraphrase',
-  'fsl.explain-dictation',
+  /* m025-295: keempat belas utang lama DIBAYAR — semuanya kini terdaftar id + th, dengan
+     nilai id disalin verbatim dari kalimat cadangan yang sudah ada di pemanggilnya (jadi
+     himpunan literal baseline emas tidak berubah sama sekali). Yang tersisa di bawah
+     bukan utang: ia sah menurut desain. */
+
   /* th-only yang SAH menurut tests/th-coverage-test.js: padanan id-nya adalah fungsi
      perakit di gems-core.js, jadi mendaftarkannya di copy-id justru melanggar gerbang emas. */
   'gems.chip-aria',
