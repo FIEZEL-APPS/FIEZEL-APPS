@@ -246,6 +246,7 @@
     'guru.judul-ruang-kelas': 'ห้องเรียน — ครู นักเรียน และผลการเรียนในหน้าจอเดียว',
     'guru.tab-bank-cepat': 'แบบฝึกหัดเร็วตามทักษะ (A2)',
     'guru.waktu-hemat': 'เวลางานธุรการที่ประหยัดได้',
+    'guru.nav-kurikulum': 'หลักสูตรและสมรรถนะ',
     'guru.kpi-perlu-dibantu': 'ต้องการความช่วยเหลือ',
     'guru.panduan-mengajar': 'แนวทางการสอน',
     'guru.opsi-bab': 'ชั้น {kelas} (ภาค {sem}) · {genre} — {judul}',

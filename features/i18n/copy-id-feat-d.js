@@ -251,6 +251,7 @@
     'guru.judul-ruang-kelas': 'Ruang Kelas — guru, murid, dan hasil belajar dalam satu layar',
     'guru.tab-bank-cepat': 'Latihan cepat per skill (A2)',
     'guru.waktu-hemat': 'Waktu administrasi yang dihemat',
+    'guru.nav-kurikulum': 'Kurikulum & Kompetensi',
     'guru.kpi-perlu-dibantu': 'Perlu dibantu',
     'guru.panduan-mengajar': 'Panduan mengajar',
     'guru.opsi-bab': 'Kelas {kelas} (Sem {sem}) · {genre} — {judul}',

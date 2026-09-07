@@ -1,13 +1,13 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-09-07T04:42:57.330Z",
+  "generatedAt": "2026-09-07T12:19:32.102Z",
   "files": {
     "app.js": {
       "leaks": 1,
       "budget": 1,
       "sample": [
         {
-          "line": 8818,
+          "line": 8837,
           "text": "Nama kriteria: n/4 - satu kalimat alasan yang menunjuk bukti di tulisannya"
         }
       ]
@@ -47,6 +47,58 @@
         {
           "line": 241,
           "text": "Tugas disimpan sebagai"
+        }
+      ]
+    },
+    "features/curriculum/learning-mission.js": {
+      "leaks": 19,
+      "budget": 19,
+      "sample": [
+        {
+          "line": 36,
+          "text": "FIEZEL · Misi Belajar"
+        },
+        {
+          "line": 40,
+          "text": "Masuk"
+        },
+        {
+          "line": 41,
+          "text": "Daftar"
+        },
+        {
+          "line": 45,
+          "text": "Masuk dengan Google"
+        },
+        {
+          "line": 46,
+          "text": "Guru masuk di"
+        }
+      ]
+    },
+    "features/curriculum/teacher-console.js": {
+      "leaks": 56,
+      "budget": 56,
+      "sample": [
+        {
+          "line": 17,
+          "text": "Kopilot Guru"
+        },
+        {
+          "line": 18,
+          "text": "Bank Soal"
+        },
+        {
+          "line": 18,
+          "text": "Murid & Paspor"
+        },
+        {
+          "line": 29,
+          "text": "FIEZEL · Ruang Guru"
+        },
+        {
+          "line": 34,
+          "text": "Nama panggilan"
         }
       ]
     },
@@ -250,8 +302,8 @@
     }
   },
   "copyKeys": {
-    "id": 2429,
-    "th": 2431,
+    "id": 2430,
+    "th": 2432,
     "idTanpaTh": 0
   },
   "pass": true
