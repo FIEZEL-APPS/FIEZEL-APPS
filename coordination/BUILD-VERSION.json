@@ -1,7 +1,7 @@
 {
-  "version": "m025-296",
-  "claimedBy": "branch claude/sembunyikan-konsol-kurikulum",
-  "claimedAt": "2026-09-07T14:48:17.512Z",
-  "reason": "m025-296: konsol kurikulum disembunyikan sampai backend berjalan",
+  "version": "m025-297",
+  "claimedBy": "branch claude/ja-sembunyikan-tanpa-konten",
+  "claimedAt": "2026-09-07T14:52:03.421Z",
+  "reason": "m025-297: kursus Jepang berhenti menawarkan latihan berbahasa Inggris",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
