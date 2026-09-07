@@ -1,7 +1,7 @@
 {
-  "version": "m025-288",
-  "claimedBy": "branch main",
-  "claimedAt": "2026-09-07T00:28:33.148Z",
-  "reason": "fix(branding): warna kata Masukkan kode KelasKu selaras wordmark",
+  "version": "m025-289",
+  "claimedBy": "branch feat/hero-fzflow-teacher-student",
+  "claimedAt": "2026-09-07T00:45:00.000Z",
+  "reason": "m025-289: animasi alur guru-murid + atmosfer scientific di hero landing page",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
