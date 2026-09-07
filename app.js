@@ -4185,9 +4185,29 @@ async function load(){const root=document.baseURI;/* W1 P0-1 (16-001): fetch ban
   // untuk 'en' (bawaan) satu-satunya yang terjadi adalah resetFamilyGraph, yang memulihkan
   // graf Inggris — tanpa itu, murid yang pernah mencoba Jepang lalu kembali akan mewarisi
   // prasyarat Jepang di diagnosis akar masalahnya.
+  //
+  // LETAKNYA WAJIB DI SINI, SESUDAH `G=grammarMaster`. Di m025-290 blok ini duduk SEBELUM
+  // baris itu, jadi bank Jepang dipasang lalu ditimpa kembali ke bank Inggris delapan belas
+  // baris kemudian oleh jalur canary. Murid memilih Jepang, menyimpannya, melihat toast
+  // "Sekarang belajar Bahasa Jepang", lalu kembali ke menu dan melihat soal Inggris.
+  // `tests/japanese-bank-survives-load-test.js` menahan urutan ini: setiap penugasan G baru
+  // di bawah sini akan membuatnya merah.
+  if(CONTENT_CANARY){const canonical={version:APP_VERSION,vocabulary:V,reading:R,grammar:grammarMaster},now=Date.now();contentPromotionRuntime=CONTENT_PROMOTION?CONTENT_PROMOTION.evaluate(CONTENT_CANARY_CONFIG,state.contentCanaryMeta,now):contentPromotionRuntime;if(CONTENT_CANARY_CONFIG?.enabled&&CONTENT_CANARY_CONFIG?.canaryId)state.contentCanaryMeta=CONTENT_CANARY.recordPromotionDecision(state.contentCanaryMeta,CONTENT_CANARY_CONFIG.canaryId,contentPromotionRuntime,new Date(now).toISOString());contentCanaryRuntime=await CONTENT_CANARY.prepare(canonical,CONTENT_CANARY_CONFIG,learnerName(),state.contentCanaryMeta,now,contentPromotionRuntime);state.contentCanaryMeta=contentCanaryRuntime.evidence||state.contentCanaryMeta;V=contentCanaryRuntime.dataset.vocabulary;R=contentCanaryRuntime.dataset.reading;grammarMaster=contentCanaryRuntime.dataset.grammar;save()}G=grammarMaster;
   if(activeTargetLang()==='ja'){
     const jaBank=await optional('content/ja/grammar-templates-ja.json',null);
     const jaGraph=await optional('content/ja/family-graph-ja.json',null);
+    // Kosakata Jepang berdiri sendiri dari bank tata bahasa: kalau salah satu gagal dimuat,
+    // yang satu lagi tetap sampai ke murid. Bank kosakata memakai NAMA MEDAN yang sama
+    // dengan vocabulary-master.json, jadi ia lewat normalisasi V yang sama beberapa baris
+    // di bawah - kartu, ulangan, dan soal kosakata semuanya ikut tanpa jalur kedua.
+    const jaVocab=await optional('content/ja/vocabulary-master-ja.json',null);
+    if(jaVocab&&Array.isArray(jaVocab.words)&&jaVocab.words.length)V=jaVocab.words;
+    // Bank bacaan Jepang: bentuknya identik dengan reading-bank.json (id, level, title,
+    // text, topic, qs[[pertanyaan, opsi, kunci, meta]]), jadi ia dibaca jalur yang sama.
+    // Teksnya Jepang, pertanyaannya Indonesia - murid diuji membaca Jepang, bukan diuji
+    // dua bahasa sekaligus di tingkat yang belum sampai ke situ.
+    const jaRead=await optional('content/ja/reading-bank-ja.json',null);
+    if(Array.isArray(jaRead)&&jaRead.length)R=jaRead;
     if(jaBank&&Array.isArray(jaBank.templates)&&jaBank.templates.length){
       G=jaBank;
       // Graf keluarga Jepang menggantikan graf Inggris SELAMA bahasa ini aktif. Graf lesson
@@ -4206,7 +4226,6 @@ async function load(){const root=document.baseURI;/* W1 P0-1 (16-001): fetch ban
   }else{
     try{self.FiezelCoreBrain?.resetFamilyGraph?.()}catch{}
   }
-  if(CONTENT_CANARY){const canonical={version:APP_VERSION,vocabulary:V,reading:R,grammar:grammarMaster},now=Date.now();contentPromotionRuntime=CONTENT_PROMOTION?CONTENT_PROMOTION.evaluate(CONTENT_CANARY_CONFIG,state.contentCanaryMeta,now):contentPromotionRuntime;if(CONTENT_CANARY_CONFIG?.enabled&&CONTENT_CANARY_CONFIG?.canaryId)state.contentCanaryMeta=CONTENT_CANARY.recordPromotionDecision(state.contentCanaryMeta,CONTENT_CANARY_CONFIG.canaryId,contentPromotionRuntime,new Date(now).toISOString());contentCanaryRuntime=await CONTENT_CANARY.prepare(canonical,CONTENT_CANARY_CONFIG,learnerName(),state.contentCanaryMeta,now,contentPromotionRuntime);state.contentCanaryMeta=contentCanaryRuntime.evidence||state.contentCanaryMeta;V=contentCanaryRuntime.dataset.vocabulary;R=contentCanaryRuntime.dataset.reading;grammarMaster=contentCanaryRuntime.dataset.grammar;save()}G=grammarMaster;
   // Normalize the structured grammar master source into the runtime's canonical skill buckets.
   // The JSON master is authoritative; no legacy G[skill] file is used.
   if(Array.isArray(G?.templates)){

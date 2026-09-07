@@ -369,3 +369,154 @@ diagnostik sendiri tidak berubah perilakunya — hanya penanda buildnya naik ke 
 
 **Utang yang masih berdiri:** sidecar Thai untuk 2.574 kalimat penjelasan butir Jepang, dan
 tinjauan penutur asli atas 234 butir yang semuanya bertanda DRAFT AI.
+
+---
+
+## m025-291 — bank Jepang ternyata ditimpa satu baris sesudah dipasang
+
+Catatan m025-290 di atas benar tentang niatnya dan **salah tentang hasilnya**. Owner menguji
+langsung: memilih Jepang di Pengaturan, kembali ke menu, soalnya tetap Inggris.
+
+Sebabnya satu baris, dan sudah ada di repo jauh sebelum kursus Jepang:
+
+```js
+if(activeTargetLang()==='ja'){ ... G=jaBank ... }      // blok pemuat ja
+...                                                    // 18 baris
+...grammarMaster=contentCanaryRuntime.dataset.grammar;save()}G=grammarMaster;   // menimpa
+```
+
+`G` dipasang ke bank Jepang, lalu dikembalikan ke bank Inggris oleh jalur canary yang sudah
+lama ada. Semua yang tampak di permukaan tetap benar — preferensi tersimpan, toast muncul,
+graf keluarga Jepang benar-benar tersuntik — hanya banknya yang tidak pernah sampai.
+Perbaikannya: blok pemuat ja dipindah ke **sesudah** `G=grammarMaster`.
+
+### Kenapa sebelas gerbang hijau dan bugnya tetap lolos
+
+`japanese-course-wiring-test` bertanya **"apakah kodenya ADA"**: apakah `setFamilyGraph`
+dipanggil, apakah banknya diprecache, apakah modulnya dimuat, apakah otoritas manifestnya
+naik. Semua jawabannya ya — dan semuanya benar. Yang tidak pernah ditanyakan adalah **"apakah
+kodenya BERPENGARUH"**.
+
+Penugasan yang ditimpa adalah kode yang ada tanpa berpengaruh. Gerbang keberadaan secara
+struktural tidak bisa menangkapnya. `tests/japanese-bank-survives-load-test.js` memeriksa
+**urutan** penugasan `G` di dalam `load()`: bank Jepang harus jadi penugasan terakhir sebelum
+hidrasi membacanya. Dibuktikan menggigit — blok dikembalikan ke posisi lamanya, gerbang
+langsung merah dan menyebut `grammarMaster` sebagai penimpanya.
+
+### Yang MASIH berbahasa Inggris, dan ini bukan bug
+
+Hanya bank **tata bahasa** yang punya versi Jepang. `vocabulary-master.json` dan
+`reading-bank.json` tidak, jadi latihan kosakata, membaca, dan menyimak tetap Inggris
+meskipun murid memilih Jepang. Kosakata JLPT N5–N1 sudah ada sebagai data
+(`docs/japanese/kosakata-jlpt.json`, 1.371 entri) tetapi belum pernah dijadikan bank latihan
+berformat `vocabulary-master.json`. Itu pekerjaan berikutnya, bukan yang tersisa dari yang ini.
+
+---
+
+## m025-293 — bank kosakata Jepang: 1.370 entri, tiap kalimat ditulis baru
+
+Catatan m025-291 menyebut kosakata sebagai "pekerjaan berikutnya". Ini pekerjaan itu.
+
+**Isi.** `content/ja/vocabulary-master-ja.json`, 1.370 entri: A1/N5 486, A2/N4 327, B1/N3 278,
+B2/N2 202, C1/N1 77. Setiap entri membawa kanji, kana, romaji, kelas kata, arti Indonesia,
+satu kalimat contoh Jepang, dan terjemahannya.
+
+**Hak cipta — yang diambil dan yang tidak.** Daftar katanya berasal dari
+`docs/japanese/kosakata-jlpt.json`, yaitu daftar kata: fakta bahasa, bukan karya berhak
+cipta. **Seluruh 1.370 kalimat contoh dan terjemahannya ditulis baru untuk FIEZEL** — nol
+kalimat disalin dari Minna no Nihongo maupun Irodori. Keduanya tidak dipakai lebih dari
+sebagai rujukan silabus, jadi FIEZEL tidak terikat kewajiban wajib-gratis Irodori.
+
+**Satu mesin, dua bahasa.** Bank memakai nama medan yang sama dengan
+`vocabulary-master.json`, jadi ia lewat normalisasi `V` yang sama di `app.js`. Kartu hafalan,
+ulangan berjadwal, dan soal kosakata semuanya ikut tanpa jalur kedua. Diukur, bukan
+diasumsikan: 1.370 dari 1.370 lolos saringan hidrasi (`status complete` + tingkat CEFR + word
++ meaning), nol gugur.
+
+Satu catatan medan yang sengaja ditulis: `examples[0].en` berisi kalimat **Jepang**. Nama
+medannya warisan bank Inggris; memakainya adalah harga dari satu jalur hidrasi, dan harga itu
+lebih murah daripada dua jalur.
+
+### Gerbang, dan kenapa assert intinya cuma satu
+
+`tests/japanese-vocab-bank-test.js`. Assert yang benar-benar penting: **setiap kalimat contoh
+memuat kata targetnya**. Bank kosakata adalah tempat paling gampang berbohong tanpa terlihat
+— entri bisa punya kata, arti, tingkat, dan kalimat yang semuanya terisi, dan kalimatnya tidak
+memakai kata itu sama sekali. Di layar, murid melihat kartu yang tidak mengajar apa pun, dan
+tidak ada yang merah.
+
+Assert itu menuntut gerbangnya paham konjugasi: 言う muncul sebagai 言わなかった, 教えます
+sebagai 教えて, する sebagai します. Gerbang membangun batang godan/ichidan berikut perubahan
+bunyi て-form (く→い, つ/る/う→っ, ぬ/ぶ/む→ん). Versi pertama gerbang ini menandai 254 kalimat
+"meleset" — semuanya kalimat benar, matchernya yang naif. Menurunkan standar akan membuat
+gerbangnya tidak berguna; yang dinaikkan adalah kecerdasan matchernya.
+
+**Empat entri sumber dilengkapi kanjinya** (見つかる, 見つける, 詰まる, 揺れが収まる): sumber
+tidak membawanya padahal bentuk kanji itu yang lazim dan itulah yang dipakai di kalimat. Itu
+perbaikan data, bukan pintu belakang — kalimatnya tetap wajib memuat bentuk tersebut.
+
+**Satu entri dibuang, secara terbuka.** `tetto` ("kontan") tidak punya kana maupun kanji;
+sumbernya sendiri menandainya kemungkinan rusak OCR. Ia tercatat di blok `dikecualikan`
+beserta alasannya, dan gerbang menuntut setiap kata sumber yang tidak masuk bank punya alasan
+tertulis — hilang diam-diam dihitung merah. Karena itu 1.370, bukan 1.371.
+
+### Yang MASIH belum ada
+
+Bank **membaca** (`reading-bank.json`) belum punya versi Jepang, jadi latihan membaca dan
+menyimak tetap Inggris saat murid memilih Jepang. Seluruh 1.370 kalimat berstatus **DRAFT AI**
+dan wajib ditinjau penutur asli, sama seperti 234 butir tata bahasa. Sidecar Thai juga masih
+utang.
+
+### m025-293 (lanjutan) — bank bacaan: 150 bacaan, 750 soal, tiap jawaban berbukti
+
+Bagian terakhir yang membuat kursus Jepang setara: `content/ja/reading-bank-ja.json`.
+150 bacaan, **30 per tingkat A1–C1**, masing-masing 5 soal — **750 soal**. Teks bacaan
+berbahasa Jepang; pertanyaan dan pilihannya berbahasa Indonesia, karena murid FIEZEL orang
+Indonesia dan soal berbahasa Jepang tentang teks Jepang menguji dua hal sekaligus di tingkat
+yang belum sampai ke situ.
+
+Panjang teks naik menurut tingkat: A1 60–90 aksara dengan pola です/ます, sampai C1 250–320
+aksara bernada esai. Seluruh 150 teks dikarang untuk FIEZEL — nol kalimat disalin dari buku
+ajar, situs berita, maupun sumber lain.
+
+**Assert intinya cuma satu, dan sengaja bukan soal bentuk.** Soal bacaan adalah kebohongan
+paling sunyi di seluruh aplikasi: sebuah soal bisa punya pertanyaan wajar, empat pilihan
+wajar, dan kunci wajar — tanpa satu pun bisa dijawab dari teks yang ada di layar. Murid
+membaca, tidak menemukan jawabannya, lalu menebak; yang dilatih menebak, bukan membaca. Tidak
+ada gerbang bentuk yang bisa melihat itu.
+
+Karena itu `tests/japanese-reading-bank-test.js` menuntut **`evidence` setiap soal adalah
+substring persis dari `text` bacaannya sendiri**. Perakit menolak lebih dulu soal yang
+buktinya tidak ada di teks; dari 750 soal, **nol ditolak**. Tiga mutasi diuji — bukti dipalsukan,
+kunci diseragamkan ke satu posisi, satu soal dihapus — tiga-tiganya tertangkap.
+
+Satu assert lagi menjaga hal yang gampang terlewat: **kunci tidak boleh menumpuk di satu
+posisi**. Bank yang 60% jawabannya di opsi A bisa dijawab benar tanpa membaca sama sekali.
+
+**Dua kali gerbang ini salah, dan keduanya kuperbaiki di sisi gerbang:**
+1. Ia menolak 4 soal tipe `reference`/kosakata yang mengutip kata Jepang yang ditanyakan —
+   padahal justru itu bentuk soal yang paling melatih membaca. Sekarang yang dilarang hanya
+   soal yang **batang kalimatnya** berbahasa Jepang, bukan kutipannya.
+2. Ia menandai pilihan **"Mi"** (mi, makanan) sebagai "berbahasa Jepang" semata karena terlalu
+   pendek untuk lolos pemeriksaan kata Latin. Teks tanpa satu pun aksara Jepang sekarang tidak
+   bisa dituduh.
+
+**`author`, `setting`, `focus` sengaja tidak dibawa.** Bank Inggris punya ketiganya dan
+`app.js` tidak pernah membacanya. Mengarangnya untuk 150 bacaan hanya menambah kebisingan yang
+terdengar spesifik padahal ditebak. `topic` **dibawa**, karena ia benar-benar dipakai
+`buildAcademicReadingPath` — diturunkan mekanis dari kata kunci teksnya, dan kalau tidak ada
+yang cocok jatuh ke "kehidupan sehari-hari": kasar, tetapi jujur.
+
+### Keadaan kursus Jepang sesudah m025-293
+
+| Bagian | Inggris | Jepang |
+|---|---|---|
+| Tata bahasa | 139 template | **234 butir A1** |
+| Kosakata | 2.440 entri | **1.370 entri N5–N1** |
+| Bacaan | 312 bacaan | **150 bacaan A1–C1** |
+| Menyimak | ada | **belum ada** |
+| Berbicara | ada | **belum ada** |
+
+Utang yang masih berdiri, dan tidak boleh hilang dari catatan: seluruh naskah Jepang berstatus
+**DRAFT AI** dan wajib ditinjau penutur asli; sidecar Thai belum ada; menyimak dan berbicara
+belum punya bank Jepang sama sekali.
