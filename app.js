@@ -11784,6 +11784,7 @@ window.audioDiagnosticsText=audioDiagnosticsText;
 // benar sejak awal; kabelnya yang tidak pernah dipasang.
 let lastSfxAt = 0;
 function uiSfx(name){
+  if(name==='nav'||name==='page_transition') return false;
   try{
     const ok = self.FiezelUiSfx?.play?.(name,self)===true;
     lastSfxAt = Date.now();   // dicatat walau gagal: yang penting ketukan ini SUDAH diklaim
@@ -11802,7 +11803,7 @@ function bindUiSfxDelegation(){
     try{
       const el=event.target?.closest?.('button,[role="button"],a.setup-link,a.creator-link');
       if(!el||el.disabled) return;
-      if(el.closest?.('.bottomnav')) return;               // tab bawah sudah membunyikan nav
+      if(el.closest?.('.bottomnav, .tg-nav, .tg-mnav, .tg-tabs, .tg-tab, .tg-nav-item, .tg-teacher, .ch-tabs, .online-tabs, .progress-tabs, .progress-tab, [role="tablist"], [role="tab"], [data-tg="view"], [data-tg="pick-class"], [data-ch="tab"], [data-view]')) return;
       if(el.dataset?.sfx==='none') return;
       if(Date.now()-lastSfxAt < SFX_CLAIM_MS) return;      // sudah dibunyikan hal lain
       uiSfx('tap');
@@ -12369,8 +12370,8 @@ function socialCore(){try{return self.FiezelSocial||null}catch(_){return null}}
 function socialMicroMoment(kind){try{if(feedbackSoundsOn())uiSfx(kind==='cheer'?'xp_gain':'notif_achievement')}catch(_){}try{pawReact('reward',{kind:kind||'social'})}catch(_){}}
 function openOnlineView(){closeModal();go('online')}
 window.openOnlineView=openOnlineView;
-window.switchOnlineTab=id=>{if(onlineTabs().some(([t])=>t===id))onlineTab=id;uiSfx('toggle');render()};
-window.switchOnlineBoard=id=>{onlineBoardTab=id==='liga'?'liga':'teman';uiSfx('toggle');render()};
+window.switchOnlineTab=id=>{if(onlineTabs().some(([t])=>t===id))onlineTab=id;render()};
+window.switchOnlineBoard=id=>{onlineBoardTab=id==='liga'?'liga':'teman';render()};
 function onlineView(){
   const tabs=`<div class="progress-tabs" role="tablist">${onlineTabs().map(([id,label])=>`<button type="button" class="progress-tab${onlineTab===id?' active':''}" role="tab" aria-selected="${onlineTab===id}" onclick="switchOnlineTab('${id}')">${esc(label)}</button>`).join('')}</div>`;
   /* m025-277 (§4a): pintu KEDUA ke PAW ARENA (selain kartu Home). Ditaruh di cangkang
