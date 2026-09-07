@@ -245,7 +245,7 @@
     var body = u.runner && !u.paused ? runnerView() : u.review ? reviewView(u.review) : u.tab === 'kelas' ? kelasView() : u.tab === 'progres' ? progresView() : tugasView(pend, done);
     sEl.innerHTML = '<section class="ch ch-student" data-testid="class-hub-student">' +
       '<header class="ch-head"><div><h1 data-testid="class-hub-title">' + (className() ? esc(className()) : (classCode() ? WM + ' ' + esc(classCode()) : t('kelas.belum-terhubung', 'Belum terhubung ke ') + WM)) + '</h1><p class="ch-sub">' + (teacherName() ? 'Guru: <b>' + esc(teacherName()) + '</b>' + (classCode() ? ' · ' : '') : '') + (classCode() ? 'Kode ' + esc(classCode()) : '') + '</p></div></header>' +
-      (u.runner && !u.paused ? '' : '<nav class="ch-tabs" role="tablist">' + [['tugas', t('umum.tugas', 'Tugas'), pend.length], ['kelas', WM + ' Saya', 0], ['progres', 'Progres', 0]].map(function (t) { return '<button type="button" role="tab" class="ch-tab' + (u.tab === t[0] && !u.review ? ' is-active' : '') + '" data-ch="tab" data-tab="' + t[0] + '" data-testid="class-tab-' + t[0] + '">' + t[1] + (t[2] ? '<span class="ch-badge">' + t[2] + '</span>' : '') + '</button>'; }).join('') + '</nav>') +
+      (u.runner && !u.paused ? '' : '<nav class="ch-tabs" role="tablist">' + [['tugas', t('umum.tugas', 'Tugas'), pend.length], ['kelas', WM, 0], ['progres', 'Progres', 0]].map(function (t) { return '<button type="button" role="tab" class="ch-tab' + (u.tab === t[0] && !u.review ? ' is-active' : '') + '" data-ch="tab" data-tab="' + t[0] + '" data-testid="class-tab-' + t[0] + '">' + t[1] + (t[2] ? '<span class="ch-badge">' + t[2] + '</span>' : '') + '</button>'; }).join('') + '</nav>') +
       body + '</section>';
     if (sEnv.afterRender) try { sEnv.afterRender(); } catch (_) {}
   }
