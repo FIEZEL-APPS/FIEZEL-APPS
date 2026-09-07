@@ -81,7 +81,13 @@ const ALLOWLIST = Object.freeze({
 
      Kalau FIEZEL kelak membawa kurikulum negara lain, jalannya paket kurikulum per-negara —
      bukan menerjemahkan paket Indonesia, dan bukan pula menyamarkan katanya. */
-  'features/teacher/fiezel-teacher-curriculum.js': 4,
+  /* 4 -> 10 (m025-290). Isi kurikulumnya bertambah dari 9 unit / 19 soal menjadi 15 unit /
+     115 soal, dan pemindai menghitung penanda serta catatan pembahasan berbahasa Indonesia
+     di dalam butir-butir baru itu. Alasannya sama persis dengan alasan entri ini ada:
+     pembahasan soal Kurikulum Merdeka ditulis untuk guru Indonesia yang mengajar di bawah
+     kurikulum Indonesia. Angka ini akan naik lagi setiap kali banknya diperdalam — itu
+     bukan utang yang menumpuk, melainkan ukuran isi berkas konten nasional. */
+  'features/teacher/fiezel-teacher-curriculum.js': 10,
   'features/speaking-listening/listening-scenarios-a1.js': 11,  // konten belajar, jalur th lewat sidecar
   'features/speaking-listening/listening-scenarios-a2.js': 12   // idem
 });

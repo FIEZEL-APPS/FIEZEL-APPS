@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-09-07T00:43:16.338Z",
+  "generatedAt": "2026-09-07T03:17:18.857Z",
   "files": {
     "app.js": {
       "leaks": 1,
@@ -223,8 +223,8 @@
       ]
     },
     "features/teacher/fiezel-teacher-curriculum.js": {
-      "leaks": 4,
-      "budget": 4,
+      "leaks": 10,
+      "budget": 10,
       "sample": [
         {
           "line": 25,
@@ -235,19 +235,23 @@
           "text": "Fase F (SMA / SMK Kelas 11 & 12)"
         },
         {
-          "line": 286,
+          "line": 568,
           "text": "Gunakan bagan alur cerita (Story Mountain) 3 kotak: Awal, Masalah, Selesai."
         },
         {
-          "line": 484,
-          "text": "Buat bagan alur 3 langkah di papan: Disruption → Displacement of water → Giant waves."
+          "line": 791,
+          "text": "Nama spesies tunggal + pasif"
+        },
+        {
+          "line": 795,
+          "text": "Nama satu spesies diperlakukan tunggal, jadi \\"
         }
       ]
     }
   },
   "copyKeys": {
-    "id": 2407,
-    "th": 2409,
+    "id": 2421,
+    "th": 2423,
     "idTanpaTh": 0
   },
   "pass": true
