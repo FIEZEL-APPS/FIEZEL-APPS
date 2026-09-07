@@ -1,7 +1,7 @@
 {
-  "version": "m025-295",
-  "claimedBy": "branch main",
-  "claimedAt": "2026-09-07T13:35:00.717Z",
-  "reason": "m025-295: kunci i18n hantu di Ruang Guru — cadangan dipakai, 12 kunci didaftarkan",
+  "version": "m025-296",
+  "claimedBy": "branch claude/sembunyikan-konsol-kurikulum",
+  "claimedAt": "2026-09-07T14:48:17.512Z",
+  "reason": "m025-296: konsol kurikulum disembunyikan sampai backend berjalan",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
