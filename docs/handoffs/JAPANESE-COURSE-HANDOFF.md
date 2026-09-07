@@ -338,3 +338,34 @@ Sisa rencana §6: konten A1 (200-300 template) dan sidecar Thai. Panel pemilih b
 dashboard belum ada dan sengaja ditunda sampai progres terpisah benar-benar bekerja —
 memasang tombolnya lebih dulu berarti murid bisa memilih Jepang dan menimpa progres
 Inggrisnya.
+
+---
+
+## m025-286 — kursus Jepang akhirnya sampai ke layar murid
+
+Catatan penutup di atas ("panel pemilih bahasa belum ada dan sengaja ditunda") **sudah tidak
+berlaku**. Syarat yang menahannya sudah terpenuhi: sumbu bahasa target (m025-281) membuat
+progres tiap bahasa berdiri sendiri — kunci penyimpanan Inggris tetap tanpa awalan, Jepang
+memakai `<kunci>@ja` — jadi memilih Jepang tidak bisa lagi menimpa progres Inggris.
+
+**Yang berubah untuk murid.** Di Pengaturan → Profil, di bawah pemilih bahasa tampilan,
+muncul baris **Bahasa yang dipelajari**: Inggris (kursus lengkap) atau Jepang (A1/N5, draf).
+Peringatan jujur ikut tampil saat Jepang aktif — baru A1, belum ada menyimak, naskah belum
+ditinjau penutur asli.
+
+**Satu mesin, dua bahasa.** Bank `content/ja/grammar-templates-ja.json` memakai nama medan
+yang sama persis dengan bank Inggris, jadi ia lewat jalur hidrasi yang sama: alokator,
+ingatan soal, dan tutor brain ikut. Jalur kedua akan membuat soalnya tetap keluar tetapi
+kursusnya berhenti menyesuaikan diri.
+
+**Yang dijaga.** Bawaan tetap `en`; graf keluarga Jepang disuntik lewat `setFamilyGraph` dan
+**dipulihkan** lewat `resetFamilyGraph` saat kembali ke Inggris; kurikulum lesson dikosongkan
+saat ja karena kurikulum lesson Jepang belum ada. `tests/japanese-course-wiring-test.js`
+merah 7 assert lebih dulu, lalu 9/9 hijau, dan lima mutasi semuanya tertangkap.
+
+**Kenapa berkas ini ikut berubah di m025-286:** ritual bump menyentuh `DIAG_BUILD` di
+`features/neural-voice/fiezel-diag-panel.js`, dan A13 menuntut jejaknya tercatat. Panel
+diagnostik sendiri tidak berubah perilakunya — hanya penanda buildnya naik ke m025-286.
+
+**Utang yang masih berdiri:** sidecar Thai untuk 2.574 kalimat penjelasan butir Jepang, dan
+tinjauan penutur asli atas 234 butir yang semuanya bertanda DRAFT AI.
