@@ -1,6 +1,6 @@
 {
   "schema": "id-golden-baseline/1",
-  "generatedAt": "2026-09-07T14:31:13.171Z",
+  "generatedAt": "2026-09-07T14:52:03.976Z",
   "root": "/home/user/FIEZEL-APPS",
   "files": {
     "grammar-explanations-id.json": "90912890391b2e491f31a6558aec5b7cecccbf56bc7c341fb1106291b5c721b6",
@@ -19,7 +19,7 @@
   },
   "literals": {
     "count": 3220,
-    "sha256": "055df46c19e68f63f2ed73c32b508dd2ad98a26997462977887c5154268f5fdc",
+    "sha256": "fa709b3bb2c3255b6e9103cf9cb9d818cd851d3381410420bf2f56134f795a72",
     "list": [
       "\n      SETELAH beat concern ≤1000ms selesai (13 §2.2), bukan menimpanya. Tanpa bunyi:\n      SFX hint sudah dipensiunkan (20 §4); cooldown 8 detiknya dijaga komponen. */\n   setTimeout(()=>{try{pawReact(",
       "\n      case 'silent':                        // L5: kalau mulut sempat mulai (taksiran L3 kandas), tutup SEKARANG\n        degradedLatch = false;\n        closeTurn(false);\n        break;\n      case 'interrupt':                     // stop(): snap tutup\n        degradedLatch = false;\n        closeTurn(true);\n        break;\n      default:\n        break;                              // fase asing dari versi fasad lebih baru: diabaikan tanpa suara\n    }\n  }\n\n  try { doc.addEventListener('fiezel-speech', onSpeech); } catch (_) {}\n\n  /* Suara terdegradasi (audibility-fix): mulut mati SEKETIKA dan tidak boleh\n     hidup lagi untuk sisa giliran — apa pun yang masih dikirim lapisan bawah. */\n  try {\n    root.addEventListener('fiezel-neural-voice-degraded', function () {\n      if (turn) closeTurn(true);\n      degradedLatch = true;                 // dilepas oleh end/silent/interrupt fasad berikutnya\n    });\n  } catch (_) {}\n\n  /* Permukaan kecil untuk Diagnostics/tes — bukan API pemanggil biasa:\n     satu-satunya pintu bicara tetap FiezelVoiceSay.say(). */\n  root.FiezelSpeechBridge = Object.freeze({\n    SCHEMA: SCHEMA,\n    speaking: function () { return !!turn; },\n    degraded: function () { return !!degradedLatch; },\n    motionAllowed: motionAllowed\n  });\n})(typeof self !== 'undefined' ? self : (typeof window !== 'undefined' ? window : this));\n",
@@ -1878,7 +1878,7 @@
       "Kurikulum → Fase → Kelas → Mapel → Elemen → CP → TP → Indikator → Kompetensi → Topik → Materi → Soal",
       "Kursi yang ia beli untuk balai warga",
       "Kursi yang ia rusak di rumah tadi pagi",
-      "Kursus Jepang masih tahap awal: baru tingkat A1, belum ada latihan menyimak, dan naskahnya belum ditinjau penutur asli.",
+      "Kursus Jepang masih tahap awal: baru tingkat A1; latihan menyimak, berbicara, dan menulis belum ada sehingga kartunya disembunyikan; naskahnya belum ditinjau penutur asli.",
       "LATIHAN BERIKUTNYA",
       "LATIHAN SUARA",
       "LEVEL KAMU",
