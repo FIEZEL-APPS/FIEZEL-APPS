@@ -1,7 +1,7 @@
 {
   "version": "m025-291",
   "claimedBy": "branch claude/kurikulum-subbab-dlz1d4",
-  "claimedAt": "2026-09-07T02:35:18.908Z",
-  "reason": "m025-290: kurikulum sub-bab + soal murni dari materi ajar",
+  "claimedAt": "2026-09-07T03:24:42.398Z",
+  "reason": "m025-291: kurikulum sekolah - soal dari materi ajar, sub-bab & fitur bahasa bisa dipilih",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
