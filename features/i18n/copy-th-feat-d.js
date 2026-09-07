@@ -164,6 +164,8 @@
     'kelas.tugas-tidak-ditemukan': 'ไม่พบงานนี้ หรืองานนี้เสร็จแล้ว',
     'kelas.tugas-disimpan-sebagai': 'บันทึกงานเป็น',
     'kelas.kelas-saya': 'ชั้นเรียนของฉัน',
+    'kelas.belum-terhubung': 'ยังไม่ได้เชื่อมต่อกับ ',
+    'kelas.murid-belum-ada-tugas': 'ยังไม่มีงานใหม่จากครู งานที่ครูส่งจะแสดงที่นี่และในการแจ้งเตือน',
     'kelas.kelas-terhubung': 'เชื่อมต่อชั้นเรียนแล้ว',
     'kelas.kirim-ulang-laporan': 'ส่งรายงานอีกครั้ง',
     'kelas.belajar-mandiri': 'เรียนด้วยตัวเองวันนี้',
