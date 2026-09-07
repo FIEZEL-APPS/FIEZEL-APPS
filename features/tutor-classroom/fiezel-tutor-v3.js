@@ -17,7 +17,15 @@
   /* m025-265 · sapuan kebocoran Thai: naskah di berkas ini dulu literal Indonesia,
      jadi murid yang memilih th tetap membacanya dalam bahasa Indonesia. t() fail-soft:
      kalau copy-map belum termuat, fallback id-lah yang tampil. */
-  function t(k, fb) { try { var I = (typeof self !== 'undefined' ? self : this).FiezelI18n; return I && I.t ? I.t(k) : fb; } catch (_) { return fb; } }
+  function t(k, fb) {
+    /* FiezelI18n.t() mengembalikan KUNCINYA saat kalimatnya belum termuat. Mengembalikan
+       itu apa adanya berarti guru membaca 'guru.tab-jurnal' di layarnya, padahal kalimat
+       cadangannya sudah tertulis di pemanggil. Cadangan dipakai untuk DUA keadaan:
+       FiezelI18n tidak ada, dan kuncinya tidak terpecahkan. */
+    var s;
+    try { var I = (typeof self !== 'undefined' ? self : this).FiezelI18n; s = I && I.t ? I.t(k) : undefined; } catch (_) {}
+    return (s === undefined || s === k) ? (fb == null ? k : fb) : s;
+  }
 
   // AI-02 F01: naskah murid diambil dari lapisan i18n (copy-id-feat-b.js). Di browser
   // runtime-nya dimuat lebih dulu (index.html); di Node modul memuatnya sendiri supaya
