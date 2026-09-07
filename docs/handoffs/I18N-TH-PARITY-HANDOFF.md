@@ -93,3 +93,79 @@ memindahkan lubangnya ke tempat yang tidak bisa dilihat siapa pun.
 - Lapisan konten th non-copy (bank soal, naskah brain, kosakata) sudah punya gerbangnya
   sendiri di berkas yang sama. Pola "daftar yang diketik tangan" tidak dipakai di sana —
   ketiganya menghitung terhadap sumber kebenaran masing-masing. Biarkan begitu.
+
+---
+
+## m025-295 — kunci hantu di layar guru: cadangannya ADA, hanya tidak pernah dipakai
+
+Owner melaporkan dasbor guru penuh frasa seperti `guru.merek-tag`, `guru.nav-ringkasan`,
+`guru.tab-jurnal`, `guru.opsi-bab`. Dugaan pertama yang wajar — kuncinya belum didaftarkan —
+**salah**: kesebelas kunci yang disebutkan owner terdaftar lengkap di id DAN th, dan di Node
+semuanya terpecahkan dengan benar.
+
+Penyebab sebenarnya ada di pembungkus `t()` lokal yang dipakai sebelas modul fitur:
+
+```js
+function t(k, fb) { ... return I && I.t ? I.t(k) : fb; }
+```
+
+`FiezelI18n.t(kunci)` mengembalikan **kuncinya sendiri** saat kalimatnya tidak ditemukan — itu
+disengaja, supaya lubangnya terlihat dan bisa dihitung. Tetapi pembungkus di atas hanya
+memakai cadangan `fb` kalau FiezelI18n **tidak ada sama sekali**. Kalau modulnya ada tetapi
+kuncinya belum termuat — copy-map telat, satu berkas 404 di server, deploy tidak lengkap —
+`I.t(k)` mengembalikan `'guru.merek-tag'` dan pembungkus meneruskannya apa adanya ke layar.
+
+Yang paling menyakitkan: **104 dari 117 pemanggilan di Ruang Guru sudah menuliskan kalimat
+cadangannya**. Teksnya ada di kode, satu baris di sebelahnya, dan tidak pernah dipakai.
+
+**Acuan perbaikannya sudah ada di repo sendiri**: `features/class-hub/fiezel-class-hub.js`
+menulis `if (s === undefined || s === k) s = fb == null ? k : fb;`. Sebelas modul lain
+disamakan dengannya. Diukur: `t('guru.merek-tag', 'untuk Guru')` dengan FiezelI18n yang
+kuncinya kosong — sebelumnya `guru.merek-tag`, sesudahnya `untuk Guru`.
+
+### Gerbang: menjalankan, bukan membaca pola
+
+`tests/i18n-fallback-wrapper-test.js` MENGAMBIL sumber tiap pembungkus, menjalankannya dengan
+FiezelI18n palsu yang meniru keadaan kunci-tak-ditemukan, lalu menuntut hasilnya kalimat
+cadangan. Gerbang yang membaca pola teks bisa dilewati dengan menulis ulang polanya; yang
+menjalankan kodenya tidak.
+
+Ia juga menahan arah sebaliknya: dengan FiezelI18n yang kuncinya ADA, pembungkus wajib
+mengembalikan kalimat aslinya. Tanpa assert itu, "perbaikan" yang selalu mengembalikan
+cadangan akan mematikan seluruh terjemahan Thai diam-diam dan assert pertama tetap hijau.
+
+Dua penyempitan dilakukan setelah gerbang versi pertama menuduh kode yang sehat:
+- Pembungkus yang menutup variabel modul lain tidak bisa dijalankan berdiri sendiri, jadi
+  hanya yang memanggil `FiezelI18n` yang diuji.
+- `features/ui/fiezel-update-prompt.js` memakai `t(kunci, params)` — parameter keduanya bukan
+  cadangan, jadi mengembalikan kunci di sana memang benar. Gerbang kini menuntut nama
+  parameter kedua benar-benar cadangan (`fb`/`fallback`/`cadangan`).
+
+### 12 kunci hantu sejati, didaftarkan dua bahasa
+
+Pindaian menyeluruh (`t()` di seluruh app.js + features/**, dibandingkan dengan seluruh
+copy-id) menemukan 16 kunci yang dipanggil tetapi tak pernah terdaftar. Dua di antaranya
+tampil sebagai nama kunci karena memang tanpa cadangan: `progress.belum-terukur`,
+`quiz.tombol-dengar`. Dua belas lainnya punya cadangan Indonesia — artinya **murid Thai
+membaca kalimat Indonesia di sana**: `account.err-pass-mismatch`, lima `fsl.explain-*`, empat
+`social.validate-*`, `social.milestone-default`, `social.error-rate-limited-with-retry`.
+Semuanya kini terdaftar id + th.
+
+Nilai id disalin **verbatim** dari cadangan yang sudah ada di kode, mengikuti HUKUM BESI di
+`copy-id-gems.js`. Buktinya: baseline emas **hijau tanpa perlu diregenerate** — himpunan
+kalimat murid tidak berubah sama sekali.
+
+**Dua kunci sisanya sengaja dibiarkan**: `gems.chip-aria` dan `gems.streak-toast`. Keduanya
+th-murni menurut desain — padanan id-nya adalah FUNGSI di `gems-core.js` yang merakit
+kalimat, bukan literal. Mendaftarkannya justru akan melanggar gerbang emas. Alasannya sudah
+tertulis di kepala `copy-id-gems.js` sejak Wave 2; catatan ini hanya menegaskan bahwa ia
+diperiksa, bukan terlewat.
+
+### Yang belum terjawab, dan sengaja dikatakan
+
+Perbaikan ini membuat layar **anggun saat gagal** — guru membaca kalimat Indonesia, bukan
+nama kunci. Ia tidak menjawab *kenapa* kuncinya tidak terpecahkan di perangkat owner, karena
+di repo semuanya terpecahkan dengan benar. Tersangka terkuat: salinan yang ter-deploy tidak
+lengkap (ingat galat Git cPanel "0 - Unknown Error" yang belum tuntas) sehingga sebagian
+`features/i18n/copy-id-*.js` tidak ikut terkirim. Kalau frasa hantu masih muncul sesudah
+build ini terpasang, yang perlu diperiksa adalah daftar berkas di server, bukan kodenya.

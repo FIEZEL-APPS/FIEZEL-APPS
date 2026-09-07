@@ -41,6 +41,8 @@
     'quiz.next-btn': 'Lanjut',
     'quiz.reading-eyebrow': 'TEKS BACAAN',
     'quiz.listen-btn': 'Dengarkan',
+    'progress.belum-terukur': 'belum terukur',
+    'quiz.tombol-dengar': 'Dengarkan',
     'quiz.listen-note': 'Pilihan terbuka setelah rekaman diputar.',
     'quiz.feedback-saved-title': 'Tersimpan.',
     'quiz.feedback-saved-body-test': 'Jawabanmu kecatat. Pembahasan lengkap muncul di layar hasil setelah tes ini selesai.',
