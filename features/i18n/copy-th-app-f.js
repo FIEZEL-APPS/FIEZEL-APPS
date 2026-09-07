@@ -200,6 +200,7 @@
     'account.toast-dibuat': 'สร้างบัญชี @{handle} สำเร็จแล้ว',
     'guru.aktivasi-gagal': 'เปิดใช้งานไม่สำเร็จ',
     'account.err-umum': 'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง',
+    'account.err-pass-mismatch': 'ยืนยันรหัสผ่านไม่ตรงกัน ลองตรวจอีกครั้งนะ',
     'tulis.tugas-ujian-brief': 'งานนี้อยู่ในรูปแบบ {label} จำกัด {minWords} คำ เวลา {minutes} นาที {note}',
     'tulis.tugas-fondasi': 'งานนี้เป็นแบบฝึกพื้นฐาน ยังไม่ใช่ข้อสอบ',
     'progress.metrik-belajar': 'ตัววัดการเรียน',

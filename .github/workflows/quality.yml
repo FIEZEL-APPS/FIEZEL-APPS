@@ -1010,6 +1010,24 @@ jobs:
         # Assert intinya karena itu bukan soal bentuk: evidence tiap soal WAJIB substring
         # persis dari teks bacaannya sendiri.
         run: node tests/japanese-reading-bank-test.js
+      - name: 'Pembungkus i18n memakai kalimat cadangannya, bukan nama kuncinya'
+        # FiezelI18n.t() mengembalikan KUNCINYA saat kalimatnya belum termuat - itu
+        # disengaja supaya lubangnya terlihat. Tetapi pembungkus t(kunci, cadangan) di
+        # modul-modul fitur mengembalikan kunci itu apa adanya, jadi guru membaca
+        # 'guru.tab-jurnal' di layarnya padahal kalimat cadangannya sudah tertulis satu
+        # baris di sebelahnya. Gerbang MENJALANKAN tiap pembungkus dengan FiezelI18n palsu
+        # yang meniru kunci-tak-ditemukan, jadi ia tidak bisa dilewati dengan menulis ulang
+        # polanya. Assert arah sebaliknya menjaga terjemahan Thai tidak mati diam-diam.
+        run: node tests/i18n-fallback-wrapper-test.js
+      - name: 'Setiap berkas yang dimuat index.html benar-benar diprecache'
+        # Akar masalah frasa hantu di Ruang Guru: 'guru.merek-tag' hidup di
+        # copy-id-feat-d.js, dimuat index.html, dan TIDAK ADA di ASSETS sw.js. PWA yang
+        # terpasang dilayani dari cache shell; berkas yang tidak diprecache hanya sampai
+        # kalau jaringan sedang baik. Di jaringan buruk seluruh kunci di dalamnya tampil
+        # sebagai nama kunci. pwa-cache-test memeriksa DAFTAR TETAP dan karena itu buta
+        # terhadap berkas yang ditambahkan sesudah daftarnya ditulis; gerbang ini
+        # menurunkan tuntutannya dari index.html sendiri.
+        run: node tests/precache-covers-shell-test.js
       - name: 'Sumbu bahasa target: kunci murid Inggris identik byte per byte'
         # Menambah bahasa kedua punya satu cara gampang dan satu cara benar. Yang gampang:
         # beri SEMUA kunci awalan bahasa, termasuk kunci Inggris. Sekali dikirim, setiap murid
