@@ -7062,8 +7062,19 @@ function latihanCards(){
      dilihat murid. Porsi HARIANNYA sudah dilebur: todayPlanBlocks() menaruh blok
      dengar/bicara di dalam kartu Hari ini, jadi murid yang hanya mengikuti sesi
      harian tetap mendapatkannya tanpa pernah membuka kartu ini. */
-  cards.push({view:'skills',icon:'skills',label:FiezelI18n.t('latihan.bicara-dengar'),note:FiezelI18n.t('latihan.bicara-dengar-note')});
-  cards.push({view:'writing',icon:'writing',label:'Writing',note:FiezelI18n.t('latihan.writing-note')});
+  /* Menyimak, berbicara, dan menulis BELUM punya bank Jepang: listening-bank-v1.json dan
+     speaking-bank-v1.json berbahasa Inggris, dan writing-prompts-v1.json meminta murid
+     menulis kalimat Inggris dengan fokus tata bahasa Inggris ("Describe your day...",
+     focus 'present simple'). Menawarkannya kepada murid yang memilih Jepang berarti
+     aplikasi mengatakan satu hal dan melakukan hal lain - dan peringatan di pemilih
+     bahasa memang sudah berjanji latihan itu belum ada. Kartunya disembunyikan sampai
+     banknya benar-benar dibuat; tests/japanese-surface-honesty-test.js mengikat penjaga
+     ini ke ADA-TIDAKNYA berkas di content/ja/, jadi ia menuntut dicabut begitu isinya siap. */
+  const punyaKontenJa=activeTargetLang()!=='ja';
+  if(punyaKontenJa){
+    cards.push({view:'skills',icon:'skills',label:FiezelI18n.t('latihan.bicara-dengar'),note:FiezelI18n.t('latihan.bicara-dengar-note')});
+    cards.push({view:'writing',icon:'writing',label:'Writing',note:FiezelI18n.t('latihan.writing-note')});
+  }
   cards.push({view:'library',icon:'library',label:FiezelI18n.t('home.library-card'),note:FiezelI18n.t('latihan.library-note')});
   return cards.map(c=>`<button class="launch-card" onclick="go('${esc(c.view)}')" aria-label="${esc(c.label)}"><span class="launch-icon"><i class="fz-i" data-fz-icon="${esc(c.icon)}" aria-hidden="true"></i></span><span><small>${esc(c.note)}</small><b>${esc(c.label)}</b></span><i data-lucide="arrow-up-right"></i></button>`).join('');
 }
@@ -7187,7 +7198,9 @@ function todayPlanBlocks(now=Date.now()){
      mendaratkan murid di kartu "gagal dimuat" lebih buruk daripada tidak menjanjikan. */
   const punyaSuara=!!self.FiezelSLAddon||!!self.FIEZEL_SPEAKING_LISTENING_CONFIG;
   const sudahAda=out.some(x=>/dengar|bicara|simak/i.test(x.label+' '+x.why));
-  if(punyaSuara&&!sudahAda&&out.length)out.push({label:FiezelI18n.t('latihan.bicara-dengar'),why:FiezelI18n.t('latihan.bicara-dengar-note')});
+  /* Alasan sama dengan latihanCards(): bank dengar/bicara Jepang belum ada, jadi rencana
+     harian murid Jepang tidak boleh menyelipkan latihan berbahasa Inggris. */
+  if(punyaSuara&&!sudahAda&&out.length&&activeTargetLang()!=='ja')out.push({label:FiezelI18n.t('latihan.bicara-dengar'),why:FiezelI18n.t('latihan.bicara-dengar-note')});
   return out;
 }
 /* Ringkasan angka untuk baris "{soal} soal . sekitar {menit} menit". Diambil dari

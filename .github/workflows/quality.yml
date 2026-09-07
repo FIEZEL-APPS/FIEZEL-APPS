@@ -1019,6 +1019,14 @@ jobs:
         # menuntut benderanya MATI di kedua jalur dan tautannya dijaga bendera - sekaligus
         # menuntut mesinnya TIDAK dihapus, supaya satu bendera cukup saat backend siap.
         run: node tests/curriculum-console-gate-test.js
+      - name: 'Kursus Jepang tidak menawarkan latihan berbahasa Inggris'
+        # Murid memilih Jepang; bank tata bahasa, kosakata, dan bacaan berganti. Menyimak,
+        # berbicara, dan menulis TIDAK punya versi Jepang - listening/speaking-bank-v1.json
+        # berbahasa Inggris dan writing-prompts-v1.json meminta menulis kalimat Inggris
+        # dengan fokus tata bahasa Inggris. Menawarkannya berarti aplikasi mengatakan satu
+        # hal dan melakukan hal lain. Gerbang mengikat penjaganya ke ADA-TIDAKNYA berkas di
+        # content/ja/, jadi ia BERBALIK menuntut penjaga dicabut begitu banknya dibuat.
+        run: node tests/japanese-surface-honesty-test.js
       - name: 'Pembungkus i18n memakai kalimat cadangannya, bukan nama kuncinya'
         # FiezelI18n.t() mengembalikan KUNCINYA saat kalimatnya belum termuat - itu
         # disengaja supaya lubangnya terlihat. Tetapi pembungkus t(kunci, cadangan) di
