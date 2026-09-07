@@ -201,6 +201,7 @@
     'account.toast-dibuat': 'Akun @{handle} berhasil dibuat!',
     'guru.aktivasi-gagal': 'Aktivasi gagal.',
     'account.err-umum': 'Terjadi kesalahan. Silakan coba lagi.',
+    'account.err-pass-mismatch': 'Konfirmasi kata sandi tidak cocok. Cek lagi ya.',
     'tulis.tugas-ujian-brief': 'Tugas ini berbentuk {label}. Batas kata {minWords}, waktu {minutes} menit. {note}',
     'tulis.tugas-fondasi': 'Tugas ini latihan fondasi, belum berbentuk soal ujian.',
     'progress.metrik-belajar': 'Metrik Belajar',

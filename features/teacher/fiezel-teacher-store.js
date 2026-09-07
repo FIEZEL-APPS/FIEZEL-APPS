@@ -11,7 +11,15 @@
   'use strict';
 
   /* m025-265 · sapuan kebocoran Thai: naskah modul ini dulu literal Indonesia. */
-  function t(k, fb) { try { var I = (typeof self !== 'undefined' ? self : this).FiezelI18n; return I && I.t ? I.t(k) : fb; } catch (_) { return fb; } }
+  function t(k, fb) {
+    /* FiezelI18n.t() mengembalikan KUNCINYA saat kalimatnya belum termuat. Mengembalikan
+       itu apa adanya berarti guru membaca 'guru.tab-jurnal' di layarnya, padahal kalimat
+       cadangannya sudah tertulis di pemanggil. Cadangan dipakai untuk DUA keadaan:
+       FiezelI18n tidak ada, dan kuncinya tidak terpecahkan. */
+    var s;
+    try { var I = (typeof self !== 'undefined' ? self : this).FiezelI18n; s = I && I.t ? I.t(k) : undefined; } catch (_) {}
+    return (s === undefined || s === k) ? (fb == null ? k : fb) : s;
+  }
   var root = typeof globalThis !== 'undefined' ? globalThis : (typeof window !== 'undefined' ? window : {});
   var KEY = 'fiezel-teacher-v1';
   var ASSIGN_KEY = 'fiezel-learner-assignments-v1';
