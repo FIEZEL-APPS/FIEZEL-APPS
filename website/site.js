@@ -1,8 +1,6 @@
-/* FIEZEL website — motion + maskot + musik latar (m028-06).
+/* FIEZEL website — motion + maskot (m028-06).
    Aturan: gerak hanya transform/opacity, hormati prefers-reduced-motion.
-   Dipakai landing (/) dan /install/ supaya bahasa visualnya satu.
-   Musik HANYA hidup di halaman yang memasang <html data-music="..."> (landing);
-   /install/ dibiarkan tenang. Tidak ada satu pun elemen UI musik. */
+   Dipakai landing (/) dan /install/ supaya bahasa visualnya satu. */
 (function () {
   'use strict';
   var mq = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
@@ -106,49 +104,4 @@
     initHulaPaw();
   }
 
-  /* ---------- 4. musik latar: OTOMATIS, loop, volume .35, TANPA UI ----------
-     Jujur terhadap kebijakan browser: play() dicoba saat load (kadang diizinkan bila
-     engagement situs tinggi). Kalau ditolak, musik dimulai pada gestur PERTAMA apa pun
-     (pointerdown / keydown / touchstart / scroll) — tanpa tombol, tanpa banner. */
-  var msrc = document.documentElement.getAttribute('data-music');
-  if (msrc) {
-    var audio = new Audio(msrc);
-    audio.loop = true;
-    audio.volume = 0.35;
-    audio.preload = 'auto';
-    audio.setAttribute('aria-hidden', 'true');
-    window.__fzAudio = audio; /* pengait QA otomatis */
-
-    var EVT = ['pointerdown', 'keydown', 'touchstart', 'scroll'];
-    var armed = false;
-
-    function detach() {
-      if (!armed) return;
-      armed = false;
-      for (var e = 0; e < EVT.length; e++) document.removeEventListener(EVT[e], onGesture, true);
-    }
-    function attach() {
-      if (armed) return;
-      armed = true;
-      for (var e = 0; e < EVT.length; e++) {
-        document.addEventListener(EVT[e], onGesture, { capture: true, passive: true });
-      }
-    }
-    function tryPlay() {
-      if (!audio.paused) { detach(); return; }
-      var p = audio.play();
-      if (p && p.then) p.then(detach).catch(attach);
-      else detach();
-    }
-    function onGesture() { tryPlay(); }
-
-    tryPlay();          /* percobaan autoplay langsung */
-    attach();           /* jaring gestur pertama kalau ditolak */
-
-    /* tab kembali fokus: lanjutkan kalau memang sudah pernah jalan */
-    document.addEventListener('visibilitychange', function () {
-      if (document.hidden) return;
-      if (audio.paused && audio.currentTime > 0) audio.play().catch(function () {});
-    });
-  }
 })();
