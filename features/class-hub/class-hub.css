@@ -92,3 +92,71 @@
 .ch-focus{display:inline-flex;align-items:center;gap:5px;font-size:.72rem;font-weight:700;padding:3px 9px;border-radius:999px;background:var(--ch-info-soft);color:var(--ch-info)}
 .ch-focus i,.ch-focus svg{width:13px;height:13px}
 .ch-focus.is-berat{background:var(--ch-bad-soft);color:var(--ch-bad)}
+
+/* ==========================================================================
+   KelasKu Wordmark — Class Hub Context Integrations
+   ========================================================================== */
+
+.kelasku-wordmark {
+  font-family: var(--fz-heading, 'Plus Jakarta Sans', sans-serif) !important;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #1F7A63 !important;
+  display: inline-block;
+  line-height: inherit;
+  vertical-align: baseline;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.ch-head h1 .kelasku-wordmark,
+.ch-h2 .kelasku-wordmark,
+.ch-card h2 .kelasku-wordmark,
+.ch-card h3 .kelasku-wordmark {
+  font-family: var(--fz-heading, 'Plus Jakarta Sans', sans-serif) !important;
+  font-weight: 800;
+  font-size: inherit;
+  line-height: inherit;
+  letter-spacing: -0.02em;
+  color: #1F7A63 !important;
+  display: inline;
+  vertical-align: baseline;
+}
+
+.ch-kicker .kelasku-wordmark {
+  font-family: var(--fz-heading, 'Plus Jakarta Sans', sans-serif) !important;
+  font-weight: 800;
+  font-size: 1.06em;
+  letter-spacing: -0.02em !important;
+  text-transform: none !important;
+  color: #1F7A63 !important;
+  display: inline-block;
+  vertical-align: baseline;
+}
+
+.ch-sub .kelasku-wordmark,
+.ch-muted .kelasku-wordmark,
+.ch-from .kelasku-wordmark {
+  font-size: inherit;
+  line-height: inherit;
+  font-weight: 800;
+  color: #1F7A63 !important;
+  display: inline;
+  white-space: nowrap;
+}
+
+.ch-btn .kelasku-wordmark {
+  font-family: var(--fz-heading, 'Plus Jakarta Sans', sans-serif) !important;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #1F7A63 !important;
+}
+
+.ch-btn.is-primary .kelasku-wordmark,
+.ch-card-ink .kelasku-wordmark,
+.ch-card-ink h1 .kelasku-wordmark,
+.ch-card-ink h2 .kelasku-wordmark,
+.ch-card-ink h3 .kelasku-wordmark,
+.ch-card-ink p .kelasku-wordmark {
+  color: #FFFFFF !important;
+}

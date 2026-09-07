@@ -169,6 +169,8 @@
     'kelas.tugas-tidak-ditemukan': 'Tugas ini tidak ditemukan atau sudah selesai.',
     'kelas.tugas-disimpan-sebagai': 'Tugas disimpan sebagai',
     'kelas.kelas-saya': 'Kelas Saya',
+    'kelas.belum-terhubung': 'Belum terhubung ke ',
+    'kelas.murid-belum-ada-tugas': 'Belum ada tugas baru dari guru. Tugas yang dikirim guru muncul di sini dan di lonceng notifikasi.',
     'kelas.kelas-terhubung': 'Kelas terhubung',
     'kelas.kirim-ulang-laporan': 'Kirim ulang laporan',
     'kelas.belajar-mandiri': 'Belajar mandiri hari ini',
