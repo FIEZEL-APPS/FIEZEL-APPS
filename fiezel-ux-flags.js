@@ -35,6 +35,24 @@
        `phase-*` di #globalSky, dan palet langit yang bergerak sepanjang hari.
        Yang HIDUP: jam celestial itu sendiri (murid memakainya untuk tahu jam),
        hanya saja panggungnya satu, bukan empat. */
+    /* "KONSOL KURIKULUM — pintu yang menuju ruangan kosong." Diperiksa owner sendiri di
+       fiezel.my.id pada 7 September 2026: /api/health menjawab 404, /kurikulum.html juga.
+
+       Seluruh isi kurikulum.html dilayani features/curriculum/fz-api.js yang memanggil
+       '/api/...' relatif ke origin yang sama, jadi halaman itu menuntut server FastAPI
+       berjalan di domain yang sama dengan PWA-nya. Repo ini tidak memuat satu pun berkas
+       yang memberi tahu hosting cara menjalankannya: tidak ada passenger_wsgi.py, tidak
+       ada Procfile, requirements.txt hanya ada di dalam backend/ dan bukan di akar.
+
+       Yang MATI: tautan "Kurikulum & Kompetensi" di sidebar Ruang Guru — pintunya saja.
+       Yang HIDUP: seluruh backend/, kurikulum.html, misi.html, dan modul
+       features/curriculum/ tetap utuh dan tetap diuji. Begitu backend benar-benar
+       berjalan, satu bendera ini membalikkannya - tidak ada kode yang perlu ditulis ulang.
+
+       Pintu yang terbuka ke ruangan kosong lebih merugikan daripada fitur yang belum ada:
+       yang belum ada tidak menjanjikan apa-apa. */
+    curriculumConsole: false,
+
     scenePhases: false,
 
     /* "Ujian per skill — muncul setelah N sesi atau dari placement." Yang mati:
