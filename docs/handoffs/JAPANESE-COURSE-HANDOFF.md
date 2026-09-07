@@ -410,3 +410,59 @@ Hanya bank **tata bahasa** yang punya versi Jepang. `vocabulary-master.json` dan
 meskipun murid memilih Jepang. Kosakata JLPT N5–N1 sudah ada sebagai data
 (`docs/japanese/kosakata-jlpt.json`, 1.371 entri) tetapi belum pernah dijadikan bank latihan
 berformat `vocabulary-master.json`. Itu pekerjaan berikutnya, bukan yang tersisa dari yang ini.
+
+---
+
+## m025-292 — bank kosakata Jepang: 1.370 entri, tiap kalimat ditulis baru
+
+Catatan m025-291 menyebut kosakata sebagai "pekerjaan berikutnya". Ini pekerjaan itu.
+
+**Isi.** `content/ja/vocabulary-master-ja.json`, 1.370 entri: A1/N5 486, A2/N4 327, B1/N3 278,
+B2/N2 202, C1/N1 77. Setiap entri membawa kanji, kana, romaji, kelas kata, arti Indonesia,
+satu kalimat contoh Jepang, dan terjemahannya.
+
+**Hak cipta — yang diambil dan yang tidak.** Daftar katanya berasal dari
+`docs/japanese/kosakata-jlpt.json`, yaitu daftar kata: fakta bahasa, bukan karya berhak
+cipta. **Seluruh 1.370 kalimat contoh dan terjemahannya ditulis baru untuk FIEZEL** — nol
+kalimat disalin dari Minna no Nihongo maupun Irodori. Keduanya tidak dipakai lebih dari
+sebagai rujukan silabus, jadi FIEZEL tidak terikat kewajiban wajib-gratis Irodori.
+
+**Satu mesin, dua bahasa.** Bank memakai nama medan yang sama dengan
+`vocabulary-master.json`, jadi ia lewat normalisasi `V` yang sama di `app.js`. Kartu hafalan,
+ulangan berjadwal, dan soal kosakata semuanya ikut tanpa jalur kedua. Diukur, bukan
+diasumsikan: 1.370 dari 1.370 lolos saringan hidrasi (`status complete` + tingkat CEFR + word
++ meaning), nol gugur.
+
+Satu catatan medan yang sengaja ditulis: `examples[0].en` berisi kalimat **Jepang**. Nama
+medannya warisan bank Inggris; memakainya adalah harga dari satu jalur hidrasi, dan harga itu
+lebih murah daripada dua jalur.
+
+### Gerbang, dan kenapa assert intinya cuma satu
+
+`tests/japanese-vocab-bank-test.js`. Assert yang benar-benar penting: **setiap kalimat contoh
+memuat kata targetnya**. Bank kosakata adalah tempat paling gampang berbohong tanpa terlihat
+— entri bisa punya kata, arti, tingkat, dan kalimat yang semuanya terisi, dan kalimatnya tidak
+memakai kata itu sama sekali. Di layar, murid melihat kartu yang tidak mengajar apa pun, dan
+tidak ada yang merah.
+
+Assert itu menuntut gerbangnya paham konjugasi: 言う muncul sebagai 言わなかった, 教えます
+sebagai 教えて, する sebagai します. Gerbang membangun batang godan/ichidan berikut perubahan
+bunyi て-form (く→い, つ/る/う→っ, ぬ/ぶ/む→ん). Versi pertama gerbang ini menandai 254 kalimat
+"meleset" — semuanya kalimat benar, matchernya yang naif. Menurunkan standar akan membuat
+gerbangnya tidak berguna; yang dinaikkan adalah kecerdasan matchernya.
+
+**Empat entri sumber dilengkapi kanjinya** (見つかる, 見つける, 詰まる, 揺れが収まる): sumber
+tidak membawanya padahal bentuk kanji itu yang lazim dan itulah yang dipakai di kalimat. Itu
+perbaikan data, bukan pintu belakang — kalimatnya tetap wajib memuat bentuk tersebut.
+
+**Satu entri dibuang, secara terbuka.** `tetto` ("kontan") tidak punya kana maupun kanji;
+sumbernya sendiri menandainya kemungkinan rusak OCR. Ia tercatat di blok `dikecualikan`
+beserta alasannya, dan gerbang menuntut setiap kata sumber yang tidak masuk bank punya alasan
+tertulis — hilang diam-diam dihitung merah. Karena itu 1.370, bukan 1.371.
+
+### Yang MASIH belum ada
+
+Bank **membaca** (`reading-bank.json`) belum punya versi Jepang, jadi latihan membaca dan
+menyimak tetap Inggris saat murid memilih Jepang. Seluruh 1.370 kalimat berstatus **DRAFT AI**
+dan wajib ditinjau penutur asli, sama seperti 234 butir tata bahasa. Sidecar Thai juga masih
+utang.

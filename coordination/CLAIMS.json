@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-07T02:14:20.000Z",
+  "updated": "2026-09-07T02:48:40.000Z",
   "active": [
     {
       "sesi": "ses_0034e69d3ffes3kjiFLNDzYXUZ",
@@ -97,35 +97,15 @@
       "catatan": "Menyentuh juga app.js (kunci ujian di quizLoop/Skills Lab/Writing + gerbang pintu AI + pendeteksi ujian non-tugas), features/class-hub/fiezel-class-hub.js, features/learner-flow/fiezel-learner-flow.js, features/teacher/fiezel-teacher-store.js, workers/api/teacher/class-sync-core.js (fx), copy-*-proctor.js, index.html, sw.js, quality.yml. Build m025-273 lewat tools/bump-build.mjs."
     },
     {
-      "sesi": "claude-code-sumbu-bahasa",
-      "peran": "claude-code / sumbu bahasa target",
-      "paths": [
-        "features/brain/fiezel-target-language.js",
-        "tests/target-language-axis-test.js"
-      ],
-      "mulai": "2026-09-06T18:09:26Z",
-      "catatan": "Langkah 2 kursus Jepang: kunci penyimpanan per bahasa. Kunci Inggris identik byte per byte; modul off di manifest karena belum ada pemanggil."
-    },
-    {
-      "sesi": "claude-code-wire-ja",
-      "peran": "claude-code / kursus Jepang ke layar",
-      "paths": [
-        "content/ja/",
-        "features/i18n/copy-id-bahasa.js",
-        "features/i18n/copy-th-bahasa.js",
-        "tests/japanese-course-wiring-test.js"
-      ],
-      "mulai": "2026-09-06T22:55:36Z",
-      "catatan": "Menyentuh juga app.js, index.html, sw.js, brain-manifest, th-loader, locale-assets-th."
-    },
-    {
       "sesi": "claude-code-jepang-hidrasi",
       "peran": "claude-code / bank Jepang bertahan sampai hidrasi",
       "paths": [
-        "tests/japanese-bank-survives-load-test.js"
+        "tests/japanese-bank-survives-load-test.js",
+        "tests/japanese-vocab-bank-test.js",
+        "content/ja/vocabulary-master-ja.json"
       ],
       "mulai": "2026-09-07T02:14:39Z",
-      "catatan": "m025-291: blok pemuat ja dipindah ke sesudah G=grammarMaster di app.js, karena di m025-290 bank Jepang ditimpa kembali ke bank Inggris. Menyentuh juga app.js dan quality.yml."
+      "catatan": "m025-291 memperbaiki bank Jepang yang ditimpa di load(); m025-292 menambah bank kosakata Jepang 1.370 entri. Menyentuh juga app.js, sw.js, quality.yml."
     }
   ],
   "finished": [
@@ -403,6 +383,30 @@
       "catatan": "234 butir, 12 keluarga. Nol byte produksi: belum dimuat modul mana pun.",
       "selesai": "2026-09-06T22:55:36Z",
       "hasil": "Mendarat lewat PR #385."
+    },
+    {
+      "sesi": "claude-code-sumbu-bahasa",
+      "peran": "claude-code / sumbu bahasa target",
+      "paths": [
+        "features/brain/fiezel-target-language.js",
+        "tests/target-language-axis-test.js"
+      ],
+      "mulai": "2026-09-06T18:09:26Z",
+      "catatan": "Langkah 2 kursus Jepang: kunci penyimpanan per bahasa. Kunci Inggris identik byte per byte; modul off di manifest karena belum ada pemanggil. | Sudah mendarat di main (PR #386, m025-290).",
+      "selesai": "2026-09-07T02:48:40Z"
+    },
+    {
+      "sesi": "claude-code-wire-ja",
+      "peran": "claude-code / kursus Jepang ke layar",
+      "paths": [
+        "content/ja/",
+        "features/i18n/copy-id-bahasa.js",
+        "features/i18n/copy-th-bahasa.js",
+        "tests/japanese-course-wiring-test.js"
+      ],
+      "mulai": "2026-09-06T22:55:36Z",
+      "catatan": "Menyentuh juga app.js, index.html, sw.js, brain-manifest, th-loader, locale-assets-th. | Sudah mendarat di main (PR #386, m025-290).",
+      "selesai": "2026-09-07T02:48:40Z"
     }
   ],
   "protocol": "coordination-claims-v1",

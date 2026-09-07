@@ -995,6 +995,13 @@ jobs:
         # keberadaan tidak pernah bisa menangkap penimpaan; yang ini memeriksa URUTAN
         # penugasan G di dalam load(), jadi penimpaan baru mana pun langsung merah.
         run: node tests/japanese-bank-survives-load-test.js
+      - name: 'Bank kosakata Jepang: nol kata hilang, tiap kalimat memakai katanya'
+        # Bank kosakata adalah tempat paling gampang berbohong tanpa terlihat: entri bisa
+        # punya kata, arti, dan kalimat contoh yang semuanya terisi, dan kalimatnya tidak
+        # memakai kata itu sama sekali. Assert intinya justru yang itu - gerbang paham
+        # konjugasi godan/ichidan supaya tidak menolak kalimat yang paling wajar. Kata yang
+        # sengaja tidak dibawa WAJIB punya alasan tertulis; hilang diam-diam dihitung merah.
+        run: node tests/japanese-vocab-bank-test.js
       - name: 'Sumbu bahasa target: kunci murid Inggris identik byte per byte'
         # Menambah bahasa kedua punya satu cara gampang dan satu cara benar. Yang gampang:
         # beri SEMUA kunci awalan bahasa, termasuk kunci Inggris. Sekali dikirim, setiap murid
