@@ -1,0 +1,43 @@
+{
+  "summary": "FIEZEL master implementation reviewed end-to-end via public URL. Ran unit_test (36 asserts) + smoke_test (35 asserts) on localhost — both PASS. New pytest regression suite added (17 tests, 16 pass via public URL). Frontend: /kurikulum.html teacher dashboard renders KPI + Kopilot Guru recommendations after logging in with FZ-OWNER-2026-MASTER, and /misi.html student flow (register → today mission → question with why-this-question + confidence) works with NO technical terms (BKT/posterior/FSRS) leaking to the student UI. One real bug found: brute-force lockout does not trip via the public ingress because backend uses request.client.host (which changes per proxied connection), so 5+ wrong passwords never return 429 in production.",
+  "backend_issues": {
+    "critical": [
+      {"endpoint": "POST /api/auth/login", "issue": "Brute-force lockout never triggers when accessed through the public ingress. Backend keys lockout on request.client.host + email, but the ingress makes that value change per connection, so unlimited 401s are returned instead of 429 after 5 fails. Verified: 8 consecutive wrong-password attempts via REACT_APP_BACKEND_URL all returned 401; identical test on http://localhost:8001 returns 429 after 5. Fix: derive identifier from X-Forwarded-For / X-Real-IP (fallback to client.host).", "priority": "HIGH"}
+    ],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_fiezel_backend.py",
+    "/app/backend/unit_test.py",
+    "/app/backend/smoke_test.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "Auth: use trusted proxy header (X-Forwarded-For) as part of the brute-force identifier in /app/backend/auth.py so that MAX_FAILED=5 -> 429 lockout works via ingress. Consider also throttling per email alone (not per IP+email) to avoid IP-rotation bypass."
+  ],
+  "critical_code_review_comments": [
+    "auth.py login lockout uses request.client.host, which is a single k8s pod IP behind ingress -> effectively per-connection random for real users, so the lockout is silently bypassed in production. Use X-Forwarded-For first hop or throttle per-email.",
+    "Curriculum POST /api/curriculum/nodes returns HTTP 422 (FastAPI validation) when required field name is missing; review request states 'menolak id duplikat (400)' — actual duplicate id path does return 400 with clear message, ok. Consider documenting that field name is required (not label).",
+    "Very good separation: all Braincore/BKT/FSRS jargon stays server-side; student UI (learning-mission.js) uses natural-language reasons and phases (WARM-UP, EXAMPLE, PRACTICE, CHALLENGE, TRANSFER, CHECK).",
+    "Migration idempotency works correctly (2nd run reports 0 new students). Coverage matrix correctly distinguishes MISSING (TP-MAT-D-7-BIL-03, zero questions) vs GAP (TP-01/02, questions exist but mastery <60%).",
+    "assessment analytics returns items + confidence_signals as required."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_fiezel_backend.py (new)"
+  ],
+  "success_rate": {
+    "backend": "94% (16/17 new pytest + 35/35 smoke + 36/36 unit)",
+    "frontend": "100% of smoke-tested surfaces (teacher dashboard render, student register + mission with no technical-term leaks)"
+  },
+  "test_credentials": "Owner/teacher token FZ-OWNER-2026-MASTER; owner login owner@fiezel.my.id / FiezelOwner#2026; class code FZ-DEMO7A; student created dynamically each run (murid.qa+<hex>@example.com / murid123).",
+  "seed_data_creation": "POST /api/seed/bootstrap called at fixture setup; test also created a legacy migration class (FZ-QA<hex>) with 2 students, and one ad-hoc registered student per run (leaves entries in users collection).",
+  "retest_needed": true,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Backend pytest lives at /app/backend/tests/test_fiezel_backend.py — uses REACT_APP_BACKEND_URL (auto-loaded from /app/frontend/.env). smoke_test.py + unit_test.py still valid regression references. Known-fail test: TestAuth.test_login_bruteforce_lockout — will pass again once auth uses X-Forwarded-For. Full teacher UI walk (bank soal manual create/import paste/publish/variant, blueprint check, coverage drawer, murid roster + passport drawer) NOT executed via Playwright in this iteration; smoke_test.py already exercises those API paths, but a UI E2E pass is recommended after any teacher-console.js changes. Student flow beyond mission-start (submit answer + hint + summary) also only verified at API level.",
+  "rca of the issue": "Brute-force lockout bypass — RCA: /app/backend/auth.py:161 builds ident='{request.client.host}:{email}'. Behind Kubernetes ingress, request.client.host is the reverse-proxy pod's socket peer, which is not stable per real end-user (different connections use different sidecar sockets) and is identical for ALL real users. Result: counters never accumulate for a single victim, so line 163 (>= MAX_FAILED) is never true. Reproduction: `for i in {1..8}; do curl -s -o /dev/null -w '%{http_code}\\n' -X POST $REACT_APP_BACKEND_URL/api/auth/login -H 'Content-Type: application/json' -d '{\"email\":\"nope@x.io\",\"password\":\"wrong\"}'; done` -> all 401. Same on http://localhost:8001 -> 5x401 then 429. Mitigation: prefer request.headers.get('x-forwarded-for','').split(',')[0].strip() or throttle purely per-email (with a small IP salt) to defeat rotation."
+}

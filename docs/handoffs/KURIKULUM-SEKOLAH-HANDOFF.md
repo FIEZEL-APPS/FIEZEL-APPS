@@ -98,3 +98,60 @@ penambalan — lalu membuktikan tidak satu pun butir asing masuk.
 - **Sisi Thai.** Isi kurikulum ini nasional Indonesia dan sengaja tidak diterjemahkan
   (alasannya di `tests/th-ui-leak-test.js`). Kalau FIEZEL kelak masuk kurikulum negara lain,
   jalannya paket kurikulum per-negara — bukan menerjemahkan paket Indonesia.
+
+---
+
+## m025-294 — PR #389: mesin kurikulum server-side masuk (backend Python)
+
+PR #389 datang dari agen Emergent, bukan dari sesi ini. Isinya besar dan arsitektural:
+`backend/` FastAPI+MongoDB (curriculum engine, question engine dengan lifecycle
+DRAFT→PUBLISHED, assessment engine, learning loop, braincore BKT+FSRS-lite), ditambah dua
+halaman baru `kurikulum.html` (konsol guru) dan `misi.html` (misi murid).
+
+Catatan ini dibuat karena ritual bump menyentuh `DIAG_BUILD` di
+`features/neural-voice/fiezel-diag-panel.js` dan A13 menuntut jejaknya. Panel diagnostiknya
+sendiri tidak berubah perilaku — hanya penanda buildnya naik ke m025-294.
+
+### Yang diperbaiki sebelum PR ini layak digabung
+
+**1. Gerbang yang dirusak, dikembalikan.** Cabang itu mengubah dua assert di
+`tests/braincore-learner-identity-test.js`: `sub` tak dikenal diganti dari UUID menjadi
+`curriculum-engine-6`. Itu bertentangan dengan assert tetangganya di gerbang yang sama, yang
+menuntut `sub` non-UUID ditolak 400. Diukur, bukan diperdebatkan: dengan suntingan itu
+gerbangnya **176/178 merah di cabangnya sendiri**; dikembalikan ke versi main, **178/178
+hijau**. Kode produksi yang melayani rute itu nol tersentuh oleh PR ini — jadi tidak ada
+perilaku baru yang perlu diakomodasi, hanya gerbang yang dilonggarkan tanpa sebab.
+
+**2. `memory/PRD.md` — dua dokumen berbeda, satu nama.** main memuat PRD redesign UI/UX
+FIEZEL 2.0; PR memuat PRD mesin kurikulum. Keduanya sah. PRD main dipulihkan, PRD kurikulum
+dipindah ke `memory/PRD-CURRICULUM-ENGINE.md`. Nol dokumen dibuang.
+
+**3. Tautan sidebar Ruang Guru.** PR menambahkannya dengan teks Indonesia langsung. Tautannya
+dipertahankan, labelnya dipindah ke `t('guru.nav-kurikulum')` dengan kunci id + th — kerangka
+Ruang Guru dilihat guru Thai juga, dan biayanya hanya satu kunci.
+
+**4. `.emergent/*`** (job id lingkungan): sisi main dipertahankan supaya PR tidak menimpa
+pendaftaran job milik main.
+
+### Utang yang dinyatakan terbuka, bukan disembunyikan
+
+**75 literal Indonesia** di `features/curriculum/teacher-console.js` (56) dan
+`features/curriculum/learning-mission.js` (19) didaftarkan sebagai anggaran di
+`tests/th-ui-leak-test.js`, mengikuti keputusan owner 7 September 2026: **kurikulum Indonesia
+tidak perlu Thai**. Alasannya sama dengan entri Kurikulum Merdeka yang sudah ada di gerbang
+itu — guru Thai tidak mengajar di bawah Kurikulum Merdeka, jadi menerjemahkan "Tujuan
+Pembelajaran" dan nama Fase resmi ke Thai bukan sia-sia melainkan menyesatkan.
+
+Yang harus tetap terlihat: **19 dari 75 ada di layar MURID** (`misi.html`), bukan layar guru.
+Kalau kelak ada murid Thai yang dibukakan konsol ini, sembilan belas kalimat itu sampai
+kepadanya dalam bahasa Indonesia. Itu konsekuensi yang diterima sadar, bukan kebocoran yang
+terlewat. Angka anggarannya menyatakan utang: naik satu tetap merah.
+
+### Yang BELUM diputuskan owner, dan sengaja tidak kusentuh
+
+`memory/test_credentials.md` dan `auth_testing.md` memuat nilai token owner master dan sandi
+owner. Kode produksinya bersih — `backend/auth.py` membaca `OWNER_MASTER_TOKEN`, `JWT_SECRET`,
+`ADMIN_PASSWORD` dari environment tanpa nilai cadangan tertanam. Tetapi kalau server yang
+berjalan memakai nilai yang tertulis di kedua berkas itu, mempublikasikannya di repo sama
+dengan membocorkannya. Menggantinya jadi placeholder adalah keputusan owner, bukan keputusan
+sesi ini.

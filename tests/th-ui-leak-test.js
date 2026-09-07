@@ -66,6 +66,23 @@ const ALLOWLIST = Object.freeze({
   'features/neural-voice/fiezel-neural-voice-audibility-fix.js': 2, // idem — lihat catatan ZONA AUDIO di bawah
   'features/prasasti/fiezel-prasasti-core.js': 3,               // berkas kanon, sha dikunci
   'features/quota/quota-copy.js': 5,                            // KANON id + cadangan; naskah th-nya sudah lewat copy-map (m025-269)
+  /* KONSOL KURIKULUM MERDEKA (PR #389) — keputusan owner, 7 September 2026: kurikulum
+     Indonesia tidak perlu Thai. Alasannya sama dengan entri Kurikulum Merdeka di bawah:
+     guru Thai tidak mengajar di bawah Kurikulum Merdeka, jadi menerjemahkan 'Tujuan
+     Pembelajaran', 'Capaian Pembelajaran', dan nama Fase resmi ke Thai bukan sia-sia
+     melainkan menyesatkan.
+
+     YANG PERLU DIKETAHUI TERUS TERANG, dan sengaja ditulis di sini supaya tidak hilang:
+     learning-mission.js adalah LAYAR MURID (misi.html), bukan layar guru. Kalau kelak ada
+     murid Thai yang dibukakan konsol ini, 19 kalimat itu sampai kepadanya dalam bahasa
+     Indonesia. Selama kursusnya memang Kurikulum Merdeka, itu konsekuensi yang diterima
+     sadar - bukan kebocoran yang terlewat.
+
+     Angka ini menyatakan utang, bukan izin bertambah: naik satu = merah, sama seperti
+     berkas lain. Jalan keluarnya, kalau FIEZEL kelak membawa kurikulum negara lain, adalah
+     paket kurikulum per-negara - bukan menerjemahkan istilah regulasi Indonesia. */
+  'features/curriculum/learning-mission.js': 19,                // layar misi murid, konten Kurikulum Merdeka
+  'features/curriculum/teacher-console.js': 56,                 // konsol guru Kurikulum Merdeka
   /* KONTEN KURIKULUM NASIONAL INDONESIA, bukan naskah antarmuka. Empat literalnya adalah
      nama Fase resmi Kurikulum Merdeka dan dua saran pedagogis di dalam paket materinya.
      Menerjemahkannya ke Thai bukan sia-sia melainkan menyesatkan: guru Thai tidak mengajar
