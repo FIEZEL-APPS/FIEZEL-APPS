@@ -520,3 +520,56 @@ yang cocok jatuh ke "kehidupan sehari-hari": kasar, tetapi jujur.
 Utang yang masih berdiri, dan tidak boleh hilang dari catatan: seluruh naskah Jepang berstatus
 **DRAFT AI** dan wajib ditinjau penutur asli; sidecar Thai belum ada; menyimak dan berbicara
 belum punya bank Jepang sama sekali.
+
+---
+
+## m025-297 — kursus Jepang berhenti menawarkan latihan berbahasa Inggris
+
+Sesudah m025-293, murid yang memilih Bahasa Jepang mendapat bank tata bahasa, kosakata, dan
+bacaan berbahasa Jepang. Tiga permukaan lain **tidak punya versi Jepang sama sekali** dan
+tetap ditawarkan:
+
+| Permukaan | Bank yang dipakai | Isinya |
+|---|---|---|
+| Menyimak | `listening-bank-v1.json` | Inggris |
+| Berbicara | `speaking-bank-v1.json` | Inggris |
+| Menulis | `writing-prompts-v1.json` | *"Describe your day today…"*, fokus `present simple` |
+
+Jadi murid memilih Jepang, membuka "Latihan bicara & dengar", lalu **mendengar bahasa
+Inggris** — atau diminta menulis kalimat Inggris dengan fokus tata bahasa Inggris. Tidak ada
+satu kalimat pun yang memberitahunya.
+
+Itu bukan sekadar fitur yang belum lengkap. Peringatan di pemilih bahasa **sudah berjanji**
+sejak m025-290 bahwa latihan menyimak belum ada; layarnya yang tidak menepati janji itu.
+Aplikasi yang mengatakan satu hal dan melakukan hal lain lebih merusak kepercayaan daripada
+aplikasi yang mengaku belum punya.
+
+### Yang dilakukan
+
+Dua penjaga, keduanya di titik permukaannya ditawarkan: `latihanCards()` (kartu Latihan) dan
+`todayPlanBlocks()` (blok dengar/bicara di rencana harian). Diukur dengan menjalankan
+`latihanCards()` langsung:
+
+| Bahasa target | Kartu yang muncul |
+|---|---|
+| `en` | vocab, grammar, reading, **skills, writing**, library |
+| `ja` | vocab, grammar, reading, library |
+
+Peringatan pemilih bahasa diperbarui — dari "belum ada latihan menyimak" menjadi menyebut
+**ketiganya** beserta konsekuensinya ("kartunya disembunyikan"), id dan th.
+
+### Gerbang yang MENUNTUT DIRINYA DICABUT
+
+`tests/japanese-surface-honesty-test.js` tidak memakai daftar tertulis. Ia membaca
+**ADA-TIDAKNYA** `listening-bank-ja` / `speaking-bank-ja` / `writing-prompts-ja` di direktori
+`content/ja/`. Selama berkas itu belum ada, ia menuntut penjaganya ada. **Begitu berkasnya
+dibuat, gerbang ini berbalik dan menuntut penjaganya dicabut** — lengkap dengan pesan yang
+mengatakan persis itu.
+
+Alasannya: penjaga yang ditinggalkan setelah kontennya siap adalah fitur yang hilang
+diam-diam, dan itu sama buruknya dengan menawarkan yang kosong. Gerbang yang hanya menjaga
+satu arah akan membuat kesalahan kedua tak terlihat selamanya.
+
+Bahwa berkas ini ikut berubah di m025-297: ritual bump menyentuh `DIAG_BUILD` di
+`features/neural-voice/fiezel-diag-panel.js`; panel diagnostiknya sendiri tidak berubah
+perilaku.
