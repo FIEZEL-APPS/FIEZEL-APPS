@@ -144,6 +144,33 @@ async function json(res) { return { status: res.status, body: JSON.parse(await r
   for (const p of ['/api/teacher/class/claim', '/api/teacher/class/list', '/api/teacher/class/reports', '/api/teacher/class/assign']) assert(rc.ROUTE_CAPABILITY[p], 'rute ' + p + ' terdaftar di ROUTE_CAPABILITY');
   assert(!rc.ROUTE_CAPABILITY['/api/learner/class-report'] && !rc.ROUTE_CAPABILITY['/api/learner/class-assignments'], 'lane murid TIDAK lewat matriks peran (murid lokal-dulu tanpa akun)');
 
+  /* ---------- 4. jeda klien vs lantai server (regresi m025-261) -------------------- */
+  /*
+   * m025-261 memasang jeda polling guru pada 3000 ms - PERSIS sama dengan lantai
+   * makeRateLimiter di sisi server. Klien yang berdiri tepat di lantainya membuat sebagian
+   * rondenya ditolak 429 oleh jitter belaka: chip berkedip merah dan syncFailStreak menanjak
+   * tanpa ada yang benar-benar rusak. Jarak amannya harus DI ATAS lantai, dengan marjin.
+   */
+  const syncCore = await import('file://' + path.join(API, 'teacher', 'class-sync-core.js'));
+  const shellSrc = fs.readFileSync(path.join(__fzRoot, 'features', 'teacher', 'fiezel-teacher-shell.js'), 'utf8');
+  const every = Number((shellSrc.match(/var SYNC_EVERY_MS = (\d+)/) || [])[1]);
+  assert(every > syncCore.LIMITS.TEACHER_MIN_INTERVAL_MS,
+    'SYNC_EVERY_MS klien (' + every + ') di ATAS lantai server TEACHER_MIN_INTERVAL_MS (' + syncCore.LIMITS.TEACHER_MIN_INTERVAL_MS + ')');
+
+  /*
+   * Cat ulang penuh mengganti el.innerHTML, jadi ronde sinkron yang membawa data BARU akan
+   * membuang kolom yang sedang diketik guru - itulah kenapa tugas baru tidak pernah terkirim
+   * di m025-261. Ronde sinkron karena itu wajib lewat syncRender(), yang menunda selama busy().
+   */
+  assert(/function busy\(\)/.test(shellSrc) && /function syncRender\(\)/.test(shellSrc),
+    'cangkang guru punya busy() dan syncRender()');
+  assert(/if \(busy\(\)\) \{ pendingRender = true;/.test(shellSrc),
+    'syncRender() menunda cat ulang selama guru memegang layar');
+  assert(/else if \(berubah\) syncRender\(\)/.test(shellSrc),
+    'ronde sinkron yang membawa data lewat syncRender(), bukan render() langsung');
+  assert(/is-repaint/.test(shellSrc) && /is-repaint/.test(fs.readFileSync(path.join(__fzRoot, 'features', 'teacher', 'teacher-shell.css'), 'utf8')),
+    'cat ulang memakai .tg.is-repaint supaya animasi masuk tidak diputar ulang');
+
   for (const r2 of results) console.log((r2.ok ? 'ok   - ' : 'FAIL - ') + r2.message);
   console.log('\n' + (results.length - failures) + '/' + results.length + ' PASS · tests/class-sync-test.js');
   process.exit(failures ? 1 : 0);

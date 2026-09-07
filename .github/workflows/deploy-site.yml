@@ -165,6 +165,24 @@ jobs:
             ./sw.js "$USER@$HOST:$TARGET/sw.js"
           echo "Service worker diterbitkan TERAKHIR — generasi shell kini utuh."
 
+      - name: Unggah landing page website ke root domain public_html
+        if: steps.creds.outputs.ready == 'true'
+        shell: bash
+        env:
+          HOST: ${{ secrets.FIEZEL_DEPLOY_HOST }}
+          USER: ${{ secrets.FIEZEL_DEPLOY_USER }}
+          PORT: ${{ secrets.FIEZEL_DEPLOY_PORT }}
+          DEST: ${{ secrets.FIEZEL_DEPLOY_PATH }}
+        run: |
+          set -euo pipefail
+          ROOT_DEST="${DEST%/app}"
+          if [ -d "website" ]; then
+            rsync -az \
+              -e "ssh -i ~/.ssh/id_deploy -p ${PORT:-22} -o StrictHostKeyChecking=yes" \
+              website/ "$USER@$HOST:$ROOT_DEST/"
+            echo "Landing page website diterbitkan ke $ROOT_DEST."
+          fi
+
       - name: Buktikan situs hidup menyajikan penanda yang baru diterbitkan
         if: steps.creds.outputs.ready == 'true'
         shell: bash

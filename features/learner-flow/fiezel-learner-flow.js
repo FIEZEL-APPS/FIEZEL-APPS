@@ -11,13 +11,18 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
 
+  /* m025-265 · sapuan kebocoran Thai: naskah modul ini dulu literal Indonesia, jadi murid
+     yang memilih th tetap membacanya dalam bahasa Indonesia. t() fail-soft — kalau copy-map
+     belum termuat (murid th memuat copy-th secara dinamis), fallback id-lah yang tampil. */
+  function t(k, fb) { try { var I = (typeof self !== 'undefined' ? self : this).FiezelI18n; return I && I.t ? I.t(k) : fb; } catch (_) { return fb; } }
+
   var root = typeof globalThis !== 'undefined' ? globalThis : (typeof window !== 'undefined' ? window : {});
   var KEY = 'fiezel-learner-flow-v1';
   var ASSIGN_KEY = 'fiezel-learner-assignments-v1';
   var DAY = 86400000;
 
   var GOALS = [
-    { id: 'school', label: 'English for school', desc: 'Tugas, ulangan, dan teks pelajaran.' },
+    { id: 'school', label: 'English for school', desc: t('flow.tab-desc', 'Tugas, ulangan, dan teks pelajaran.') },
     { id: 'campus', label: 'English for campus', desc: 'Kuliah, jurnal, dan presentasi.' },
     { id: 'it', label: 'English for IT', desc: 'Dokumentasi teknis dan komunikasi tim.' },
     { id: 'scholarship', label: 'English for scholarship', desc: 'Esai motivasi, email resmi, wawancara.' },
@@ -56,6 +61,78 @@
     s.total += 1; if (correct) s.correct += 1; s.lastAt = Date.now();
     st.skills[skill] = s;
   }
+  /* ══ BANKOR — ingatan soal per BUTIR + alokator (m025-278, langkah 1 handoff) ══════
+     Sebelum ini pemilihan soal hanya tahu satu hal: "pernah tampil" (st.seen). Butir yang
+     SELALU SALAH dan butir yang SUDAH DIKUASAI terlihat sama persis olehnya, dan keduanya
+     sama-sama dibuang — jadi yang paling perlu diulang justru yang paling cepat hilang.
+
+     Dua modul murni mengambil alih keputusan itu. Keduanya TIDAK menyentuh jam dan tidak
+     menyimpan apa pun sendiri: waktu dan seed masuk sebagai argumen dari sini, dan ingatan
+     yang mereka kembalikan disimpan di st.qmem (localStorage yang sudah ada), sejajar
+     dengan st.seen. Batas 600 butir sudah ditangani prune() di dalam modulnya — tidak ada
+     pembatas kedua di sini.
+
+     FAIL-SOFT DAN SENGAJA: kalau modulnya belum termuat (build lama, skrip gagal), jalur
+     pickFresh yang lama tetap dipakai. Yang dilarang adalah sesi yang gagal terbentuk,
+     bukan sesi yang dipilih dengan cara lama. */
+  function QM() { try { return root.FiezelQuestionMemory || null; } catch (_) { return null; } }
+  function QA() { try { return root.FiezelQuestionAllocator || null; } catch (_) { return null; } }
+
+  /* Seed = IDENTITAS MURID, bukan jam. Itu yang membuat dua murid dengan riwayat sama
+     tetap mendapat urutan berbeda, dan membuat satu sesi bisa diputar ulang saat ada
+     laporan bug — jam tidak pernah bisa diputar ulang. Handle online dipakai kalau ada
+     (satu identitas untuk satu murid lintas perangkat); kalau belum, penanda acak sekali
+     per perangkat disimpan di state. */
+  function learnerSeed(st) {
+    try { var h = root.storedSocialHandle && root.storedSocialHandle(); if (h) return String(h); } catch (_) {}
+    if (!st.seedId) st.seedId = 'lf-' + Math.random().toString(36).slice(2, 10);
+    return st.seedId;
+  }
+
+  function memoryOf(st) {
+    var M = QM();
+    if (!M) return null;
+    /* Bentuknya diperiksa lewat SCHEMA modulnya sendiri, bukan lewat isMemory() —
+       fungsi itu tidak diekspor, dan menebaknya ada membuat ingatan murid diam-diam
+       dikosongkan setiap kali dibaca. */
+    return st.qmem && st.qmem.schema === M.SCHEMA && st.qmem.items ? st.qmem : M.emptyMemory();
+  }
+
+  /* Butir untuk satu blok rencana. Alokator kalau ada, pickFresh kalau tidak. */
+  function allocateIds(st, block) {
+    var B = bank(), A = QA();
+    if (A && typeof A.allocate === 'function') {
+      var pool = B.itemsFor(block.skill);
+      if (pool && pool.length) {
+        var plan = A.allocate({
+          pool: pool,
+          memory: memoryOf(st),
+          count: block.count,
+          nowMs: Date.now(),
+          seed: learnerSeed(st)
+        });
+        var picked = (plan && plan.items || []).map(function (it) { return it.id; });
+        if (picked.length) return picked;
+      }
+    }
+    return B.pickFresh(block.skill, block.count, { avoid: seenFor(block.skill), seed: (Date.now() % 9000) + 3 })
+      .map(function (it) { return it.id; });
+  }
+
+  /* Satu percobaan, satu butir. record() di atas hanya menyimpan agregat per SKILL —
+     karena itulah ingatan soalnya kosong selamanya sebelum ini. */
+  function rememberAttempt(st, item, correct) {
+    var M = QM();
+    if (!M || !item || !item.id) return;
+    st.qmem = M.recordAttempt(memoryOf(st), {
+      item: item.id,
+      skill: item.skill || null,
+      concept: item.concept || null,
+      ok: !!correct,
+      at: Date.now()
+    });
+  }
+
   function accuracy(s) { return s && s.total ? s.correct / s.total : null; }
   function statusOf(s) {
     var a = accuracy(s);
@@ -84,7 +161,7 @@
   function buildPlan(st, now) {
     var B = bank(), ranked = rankedSkills(st), blocks = [], used = {};
     loadAssignments().slice(-3).reverse().forEach(function (a) {
-      blocks.push({ id: 'assign-' + a.id, kind: a.mode === 'ujian' ? 'Ujian dari guru' : 'Tugas dari guru', skill: a.skills[0], title: a.title, minutes: a.minutes, itemIds: a.itemIds, from: a.from });
+      blocks.push({ id: 'assign-' + a.id, kind: a.mode === 'ujian' ? 'Ujian dari guru' : t('flow.tugas-guru', 'Tugas dari guru'), skill: a.skills[0], title: a.title, minutes: a.minutes, itemIds: a.itemIds, from: a.teacher ? a.teacher + ' · ' + a.from : a.from });
       a.skills.forEach(function (s) { used[s] = true; });
     });
     var first = ranked[0], second = ranked[1];
@@ -106,7 +183,11 @@
 
   function startLesson(st, block) {
     var B = bank();
-    var ids = block.itemIds || B.pickFresh(block.skill, block.count, { avoid: seenFor(block.skill), seed: (Date.now() % 9000) + 3 }).map(function (it) { return it.id; });
+    // Tugas guru dikerjakan DI DALAM Kelas (class-hub): satu tempat, mendukung soal kustom guru + bukti per-soal.
+    if (block.id.indexOf('assign-') === 0 && root.FiezelClassHub && typeof root.go === 'function') { root.FiezelClassHub.openAssignment(block.id.slice(7)); root.go('classroom'); return; }
+    var ids = block.itemIds || allocateIds(st, block);
+    /* markSeen TETAP dipanggil: st.seen masih dipakai diagnosticSet di bawah. Membuangnya
+       adalah perubahan tersendiri, bukan bagian penyambungan ini. */
     ids.forEach(function (id) { markSeen(block.skill, id); });
     st.activeLesson = { blockId: block.id, skill: block.skill, title: block.title, kind: block.kind, minutes: block.minutes, itemIds: ids, index: 0, attempt: 0, results: [], feedback: null, revealed: false, startedAt: Date.now() };
     st.step = 'lesson';
@@ -120,6 +201,7 @@
       var firstTry = fb.correct && L.attempt === 1;
       L.results.push({ itemId: item.id, skill: item.skill, correct: firstTry, attempts: L.attempt });
       record(st, item.skill, firstTry);
+      rememberAttempt(st, item, firstTry);
       L.revealed = true;
     }
     L.feedback = fb;
@@ -182,6 +264,28 @@
 
   /** Kode hasil untuk tutor: hanya nama depan + akurasi per skill, tanpa jawaban mentah. */
   function classCode() { try { var r = JSON.parse(localStorage.getItem('fiezel-onboarding-v1') || '{}'); return String(r.classCode || ''); } catch (_) { return ''; } }
+  /* KENAPA KIRIMAN YANG GAGAL DIULANG, DAN KENAPA INI BUKAN KEMEWAHAN
+   * ----------------------------------------------------------------
+   * Server memasang lantai satu laporan per 15 detik per murid (LIMITS.LEARNER_MIN_INTERVAL_MS
+   * di workers/api/teacher/class-sync-core.js) dan menjawab 429 di bawah itu. Sebelum ada
+   * pengulangan di sini, jawaban 429 itu DIBUANG diam-diam — dan justru pada urutan yang
+   * paling penting: murid membuka ujian (laporan #1), lalu keluar layar beberapa detik
+   * kemudian (laporan #2, ditolak). Yang sampai ke guru hanya "laporan masuk" yang biasa,
+   * dan peringatan keluar-layarnya hilang tanpa jejak sampai laporan berikutnya kebetulan
+   * terkirim. Laporan kelas adalah UPSERT — ia selalu membawa keadaan terbaru, bukan selisih —
+   * jadi mengirim ulang isi yang sama beberapa detik kemudian aman dan cukup.
+   * Jeda 16 detik: satu detik di atas lantai server, supaya percobaan kedua tidak jatuh
+   * di detik yang sama persis. Naik dua kali lipat sampai 2 menit supaya server yang benar-benar
+   * sakit tidak dihujani, dan berhenti sama sekali saat berhasil. */
+  var RETRY_BASE_MS = 16000, RETRY_MAX_MS = 120000;
+  var retryTimer = null, retryDelay = 0;
+  function clearRetry() { if (retryTimer) { try { clearTimeout(retryTimer); } catch (_) {} retryTimer = null; } retryDelay = 0; }
+  function scheduleRetry() {
+    if (retryTimer || typeof setTimeout !== 'function') return;
+    retryDelay = retryDelay ? Math.min(retryDelay * 2, RETRY_MAX_MS) : RETRY_BASE_MS;
+    retryTimer = setTimeout(function () { retryTimer = null; pushToClass(); }, retryDelay);
+    if (retryTimer && retryTimer.unref) retryTimer.unref();
+  }
   // Di perangkat yang sama (kelas demo/uji), hasil diagnostic langsung masuk ke kelas berkode.
   function pushToClass() {
     if (!classCode()) return false;
@@ -189,17 +293,108 @@
     try { payload = JSON.parse(decodeURIComponent(escape(atob(tutorCode(st, env.learnerName ? env.learnerName() : ''))))); } catch (_) { return false; }
     // Sinkron server: laporan agregat ke kelas yang kodenya diklaim guru (tanpa tempel kode). Gagal diam-diam bila offline.
     var TS = root.FiezelTeacherStore;
-    if (TS && TS.reportToClass) { try { TS.reportToClass(payload).then(function (r) { st.classReport = { at: Date.now(), ok: !!r.ok, error: r.error || '' }; save(st); }); } catch (_) {} }
+    if (TS && TS.reportToClass) {
+      try {
+        TS.reportToClass(payload).then(function (r) {
+          st.classReport = { at: Date.now(), ok: !!r.ok, error: r.error || '' };
+          if (r && r.ok && st.pendingJoin) st.pendingJoin = 0;
+          save(st);
+          if (r && r.ok) clearRetry(); else scheduleRetry();
+        }, function () { scheduleRetry(); });
+      } catch (_) { scheduleRetry(); }
+    }
     var T = root.FiezelTutorActionCenter; if (!T) return true;
     try { return T.ingestLearnerResult(payload) || true; } catch (_) { return true; }
   }
   function tutorCode(st, name) {
     var B = bank(), skills = {};
     B.SKILL_ORDER.forEach(function (id) { var s = st.skills[id]; if (s) skills[id] = { c: s.correct, t: s.total }; });
+    Object.keys(st.skills || {}).forEach(function (id) { var s = st.skills[id]; if (s && !skills[id] && /^[a-z0-9_]{1,32}$/.test(id) && Object.keys(skills).length < 12) skills[id] = { c: s.correct, t: s.total }; });
     var nm = String(name || '').trim();
-    if (!nm || /^(sobat|murid|teman)$/i.test(nm)) { try { nm = String(JSON.parse(localStorage.getItem('fiezel-onboarding-v1') || '{}').name || nm || 'Murid'); } catch (_) { nm = nm || 'Murid'; } }
-    var payload = { v: 1, name: nm.split(' ')[0], at: Date.now(), goal: st.goal, skills: skills, lessons: st.lessons.length, cls: classCode() || undefined, assign: (st.doneAssign || []).length ? st.doneAssign : undefined };
+    if (!nm || /^(sobat|murid|teman)$/i.test(nm)) { try { nm = String(JSON.parse(localStorage.getItem('fiezel-onboarding-v1') || '{}').name || nm || t('umum.murid', 'Murid')); } catch (_) { nm = nm || t('umum.murid', 'Murid'); } }
+    var payload = { v: 1, name: nm.split(' ')[0], at: Date.now(), goal: st.goal, skills: skills, lessons: st.lessons.length, cls: classCode() || undefined, assign: (st.doneAssign || []).length ? st.doneAssign.slice(-8) : undefined };
+    /* Penanda "aku baru memasukkan kode kelasmu" ikut sampai ia benar-benar mendarat: ia
+       dilepas HANYA oleh kiriman yang berhasil (lihat pushToClass), bukan oleh percobaan
+       pertama. Murid yang menekan Gabung saat sinyalnya putus tetap sampai ke guru begitu
+       jaringannya kembali — kalau tidak, ketukan itu hilang dan guru tidak pernah tahu. */
+    if (st.pendingJoin) payload.j = 1;
+    /* Catatan ujian non-tugas ikut selama ia masih hari ini: guru butuh melihatnya saat
+       ujiannya masih hangat, dan laporan yang mengulang catatan pekan lalu hanya kebisingan. */
+    if (st.examFocus && Date.now() - Number(st.examFocus.at || 0) < 86400000) {
+      payload.fx = { k: st.examFocus.k, n: st.examFocus.n, s: st.examFocus.s, x: st.examFocus.x };
+    }
     try { return btoa(unescape(encodeURIComponent(JSON.stringify(payload)))); } catch (_) { return ''; }
+  }
+  function ensureState() { if (!st) st = load(); return st; }
+  /**
+   * Sisi Kelas: murid baru saja mengirim kode kelas. Menandai laporan berikutnya sebagai
+   * ketukan bergabung dan mengirimnya sekarang juga. Penandanya bertahan sampai satu kiriman
+   * BERHASIL, jadi ia tahan terhadap offline dan terhadap pembatas laju server.
+   */
+  /**
+   * Sisi ujian NON-TUGAS (penempatan, Skip Level, set berformat ujian): catatan keluar layar
+   * tidak punya tugas untuk ditempeli, jadi ia menempel pada laporan itu sendiri sebagai
+   * `fx` — jenis ujian (enum) plus tiga bilangan yang sama dengan assign.f.
+   */
+  function recordExamFocus(kind, focus) {
+    if (!kind || !focus) return false;
+    var s = ensureState();
+    var n = Math.max(0, Math.round(Number(focus.n) || 0));
+    if (!n) return false;
+    s.examFocus = { k: String(kind).slice(0, 24), n: n, s: Math.max(0, Math.round(Number(focus.s) || 0)), x: Math.max(0, Math.round(Number(focus.x) || 0)), at: Date.now() };
+    save(s); pushToClass(); return true;
+  }
+  function announceJoin() {
+    var s = ensureState();
+    s.pendingJoin = 1; save(s);
+    return pushToClass();
+  }
+  /** Sisi Kelas (class-hub): murid membuka tugas — dilaporkan sebagai "sedang mengerjakan" (assign.s). */
+  function markAssignmentStarted(id) {
+    if (!id) return false; var s = ensureState();
+    s.doneAssign = (s.doneAssign || []).filter(function (x) { return x.id !== id; }).concat([{ id: id, at: Date.now(), s: 1 }]).slice(-8);
+    save(s); pushToClass(); return true;
+  }
+  /**
+   * Sisi Kelas (class-hub): hasil tugas guru masuk ke mesin skill & laporan yang SAMA dengan
+   * Rencana hari ini — satu jalur bukti, bukan dua. res = { id, title, skill, mode, minutes,
+   * results:[{itemId, skill, correct, chosen}] }. Bukti per-soal yang salah ikut ke guru (assign.w).
+   */
+  /**
+   * Sisi Kelas (class-hub): pendeteksi keluar layar melaporkan bahwa murid meninggalkan
+   * layar ujian. Dipanggil SETIAP episode ditutup (dan saat episode dibuka) supaya guru
+   * melihatnya saat ujian masih berjalan, bukan setelah selesai. `focus` = { n, s, x }
+   * dari FiezelFocusGuard.payload: tiga bilangan, tanpa teks bebas.
+   */
+  function recordAssignmentFocus(id, focus) {
+    if (!id || !focus) return false;
+    var s = ensureState();
+    var list = (s.doneAssign || []).slice();
+    var cur = list.filter(function (x) { return x.id === id; })[0];
+    var f = { n: Math.max(0, Math.round(Number(focus.n) || 0)), s: Math.max(0, Math.round(Number(focus.s) || 0)), x: Math.max(0, Math.round(Number(focus.x) || 0)) };
+    if (cur) cur.f = f;
+    else list.push({ id: id, at: Date.now(), s: 1, f: f });
+    s.doneAssign = list.slice(-8);
+    save(s); pushToClass(); return true;
+  }
+  function recordAssignmentResult(res) {
+    if (!res || !res.id || !Array.isArray(res.results)) return null; var s = ensureState(), B = bank();
+    var correct = res.results.filter(function (r) { return r.correct; }).length;
+    res.results.forEach(function (r) { record(s, r.skill || res.skill || 'grammar', !!r.correct); });
+    var meta = B && B.SKILLS[res.skill]; s.lessons.push({ at: Date.now(), skill: res.skill, area: meta ? meta.area : (res.skill || 'grammar'), kind: res.mode === 'ujian' ? 'Ujian dari guru' : t('flow.tugas-guru', 'Tugas dari guru'), title: res.title, correct: correct, total: res.results.length, minutes: res.minutes || 0 });
+    var wrong = res.results.filter(function (r) { return !r.correct; }).slice(0, 40).map(function (r) { return { i: String(r.itemId).slice(0, 40), o: Number(r.chosen) >= 0 ? Number(r.chosen) : 0 }; });
+    var entry = { id: res.id, at: Date.now(), c: correct, t: res.results.length }; if (wrong.length) entry.w = wrong;
+    // Catatan keluar layar milik sesi ini ikut ke hasil akhir; tanpa penggabungan ini,
+    // entri hasil MENIMPA entri "sedang mengerjakan" dan bukti pengawasan hilang persis
+    // pada saat guru paling membutuhkannya (saat menilai).
+    var prevFocus = (s.doneAssign || []).filter(function (x) { return x.id === res.id; })[0];
+    if (res.focus && Number(res.focus.n) > 0) entry.f = { n: Math.round(Number(res.focus.n) || 0), s: Math.round(Number(res.focus.s) || 0), x: Math.round(Number(res.focus.x) || 0) };
+    else if (prevFocus && prevFocus.f) entry.f = prevFocus.f;
+    s.doneAssign = (s.doneAssign || []).filter(function (x) { return x.id !== res.id; }).concat([entry]).slice(-8);
+    if (s.plan && s.plan.done.indexOf('assign-' + res.id) === -1) s.plan.done.push('assign-' + res.id);
+    try { localStorage.setItem(ASSIGN_KEY, JSON.stringify(loadAssignments().filter(function (a) { return a.id !== res.id; }))); } catch (_) {}
+    save(s); pushToClass();
+    return { correct: correct, total: res.results.length, entry: entry };
   }
 
   // ---- render ----------------------------------------------------------------------------
@@ -213,13 +408,13 @@
     if (!id) return false;
     if (!mountEl || !st) { pendingAssignment = id; return true; }
     var a = loadAssignments().filter(function (x) { return x.id === id; })[0];
-    if (!a) { if (env.toast) env.toast('Tugas ini sudah selesai atau tidak ditemukan.'); return false; }
+    if (!a) { if (env.toast) env.toast(t('flow.tugas-hilang', 'Tugas ini sudah selesai atau tidak ditemukan.')); return false; }
     if (!st.goal) st.goal = GOALS[0].id;
     if (!st.diagnostic) st.diagnostic = { at: Date.now(), answers: [], skipped: true };
     var plan = ensurePlan(st), bid = 'assign-' + a.id;
     var block = plan.blocks.filter(function (b) { return b.id === bid; })[0];
-    if (!block) { block = { id: bid, kind: a.mode === 'ujian' ? 'Ujian dari guru' : 'Tugas dari guru', skill: a.skills[0], title: a.title, minutes: a.minutes, itemIds: a.itemIds, from: a.from }; plan.blocks.unshift(block); plan.minutes += block.minutes; }
-    if (plan.done.indexOf(bid) !== -1) { if (env.toast) env.toast('Tugas ini sudah kamu selesaikan.'); st.tab = 'flow'; st.step = 'plan'; save(st); render(); return true; }
+    if (!block) { block = { id: bid, kind: a.mode === 'ujian' ? 'Ujian dari guru' : t('flow.tugas-guru', 'Tugas dari guru'), skill: a.skills[0], title: a.title, minutes: a.minutes, itemIds: a.itemIds, from: a.from }; plan.blocks.unshift(block); plan.minutes += block.minutes; }
+    if (plan.done.indexOf(bid) !== -1) { if (env.toast) env.toast(t('flow.tugas-selesai', 'Tugas ini sudah kamu selesaikan.')); st.tab = 'flow'; st.step = 'plan'; save(st); render(); return true; }
     st.tab = 'flow';
     startLesson(st, block);
     save(st); render();
@@ -240,7 +435,7 @@
     if (!mountEl) return;
     var tabs = [['flow', 'Alur belajar'], ['duel', 'Duel'], ['summary', 'Ringkasan'], ['backup', 'Progres & backup']];
     var html = '<section class="lf" data-testid="learner-flow">' +
-      '<header class="lf-head"><div><p class="lf-kicker">Practice pathway</p><h1>Belajar hari ini</h1></div>' +
+      '<header class="lf-head"><div><p class="lf-kicker">Practice pathway</p><h1>' + t('flow.belajar-hari-ini', 'Belajar hari ini') + '</h1></div>' +
       '<nav class="lf-tabs" role="tablist">' + tabs.map(function (t) { return '<button type="button" role="tab" class="lf-tab' + (st.tab === t[0] ? ' is-active' : '') + '" data-lf="tab" data-tab="' + t[0] + '" data-testid="lf-tab-' + t[0] + '">' + t[1] + '</button>'; }).join('') + '</nav></header>' +
       (st.tab === 'summary' ? summaryView() : st.tab === 'backup' ? backupView() : st.tab === 'duel' ? '<div id="lfDuelHost" data-testid="lf-duel-host"></div>' : flowView()) + '</section>';
     mountEl.innerHTML = html;
@@ -250,7 +445,7 @@
   }
 
   function stepper() {
-    var steps = [['goal', 'Tujuan'], ['diagnostic', 'Tes singkat'], ['skillmap', 'Peta kemampuan'], ['plan', 'Rencana hari ini'], ['lesson', 'Materi'], ['next', 'Berikutnya']];
+    var steps = [['goal', 'Tujuan'], ['diagnostic', 'Tes singkat'], ['skillmap', 'Peta kemampuan'], ['plan', 'Rencana hari ini'], ['lesson', t('umum.materi', 'Materi')], ['next', 'Berikutnya']];
     var idx = steps.findIndex(function (s) { return s[0] === st.step; });
     return '<ol class="lf-stepper">' + steps.map(function (s, i) { return '<li class="' + (i < idx ? 'is-done' : i === idx ? 'is-current' : '') + '"><span>' + (i + 1) + '</span>' + s[1] + '</li>'; }).join('') + '</ol>';
   }
@@ -317,9 +512,9 @@
   function diagnosticView() {
     var run = ensureDiagRun(), B = bank(), item = B.byId(run.itemIds[run.index]);
     var fb = run.feedback, last = run.answers[run.answers.length - 1];
-    var footer = fb ? '<div class="lf-actions"><button type="button" class="lf-primary" data-lf="diag-next" data-testid="lf-diag-next">' + (run.index + 1 >= run.itemIds.length ? 'Lihat peta kemampuan' : 'Soal berikutnya') + '</button></div>' : '';
+    var footer = fb ? '<div class="lf-actions"><button type="button" class="lf-primary" data-lf="diag-next" data-testid="lf-diag-next">' + (run.index + 1 >= run.itemIds.length ? 'Lihat peta kemampuan' : t('flow.soal-berikutnya', 'Soal berikutnya')) + '</button></div>' : '';
     return '<div class="lf-intro"><h2>Tes singkat</h2><p class="lf-muted">Lima soal, satu untuk tiap kemampuan. Ini bukan nilai — cuma peta awal untuk menyusun rencana hari ini.</p></div>' +
-      questionCard(item, { action: 'diag-answer', progress: 'Soal ' + (run.index + 1) + ' dari ' + run.itemIds.length, feedback: fb, revealed: !!fb, chosen: last && last.itemId === item.id ? last.chosen : null, locked: !!fb, showTranscript: !!fb || !!run.transcript, footer: footer });
+      questionCard(item, { action: 'diag-answer', progress: t('flow.soal-progress', 'Soal {n} dari {total}').replace('{n}', run.index + 1).replace('{total}', run.itemIds.length), feedback: fb, revealed: !!fb, chosen: last && last.itemId === item.id ? last.chosen : null, locked: !!fb, showTranscript: !!fb || !!run.transcript, footer: footer });
   }
 
   function skillMapView() {
@@ -345,7 +540,7 @@
       '<ol class="lf-plan-list">' + plan.blocks.map(function (b, i) {
         var done = plan.done.indexOf(b.id) !== -1;
         return '<li class="' + (done ? 'is-done' : '') + '" data-testid="lf-plan-block-' + b.id + '"><span class="lf-num">' + (i + 1) + '</span><div><b>' + esc(b.kind) + ': ' + esc(b.title) + '</b><small>' + b.minutes + ' menit · ' + (b.count || (b.itemIds || []).length) + ' soal' + (b.from ? ' · dari ' + esc(b.from) : '') + '</small></div>' +
-          (done ? '<span class="lf-done">Selesai</span>' : '<button type="button" class="lf-mini lf-start" data-lf="start-lesson" data-block="' + b.id + '" data-testid="lf-start-' + b.id + '">Mulai</button>') + '</li>';
+          (done ? '<span class="lf-done">' + t('umum.selesai', 'Selesai') + '</span>' : '<button type="button" class="lf-mini lf-start" data-lf="start-lesson" data-block="' + b.id + '" data-testid="lf-start-' + b.id + '">Mulai</button>') + '</li>';
       }).join('') + '</ol>' +
       '<p class="lf-reason" data-testid="lf-plan-reason"><b>Alasan sesi ini:</b> ' + esc(plan.reason) + '</p>' +
       '<div class="lf-assign-code" data-testid="lf-assign-code"><label class="lf-muted" for="lfAssignCode">Punya kode tugas dari guru?</label><div class="lf-actions"><input id="lfAssignCode" class="lf-code lf-code-input" placeholder="Tempel kode tugas di sini" autocomplete="off" data-testid="lf-assign-code-input"><button type="button" class="lf-mini" data-lf="accept-assign" data-testid="lf-accept-assign">Tambahkan ke rencana</button></div></div>' +
@@ -356,15 +551,15 @@
   function lessonView() {
     var L = st.activeLesson, B = bank(), item = B.byId(L.itemIds[L.index]), fb = L.feedback;
     var footer = '';
-    if (fb && !L.revealed) footer = '<div class="lf-actions"><button type="button" class="lf-primary" data-lf="retry" data-testid="lf-retry">Coba lagi</button></div>';
-    else if (fb && L.revealed) footer = '<div class="lf-actions"><button type="button" class="lf-primary" data-lf="lesson-next" data-testid="lf-lesson-next">' + (L.index + 1 >= L.itemIds.length ? 'Selesaikan lesson' : 'Soal berikutnya') + '</button></div>';
+    if (fb && !L.revealed) footer = '<div class="lf-actions"><button type="button" class="lf-primary" data-lf="retry" data-testid="lf-retry">' + t('umum.coba-lagi', 'Coba lagi') + '</button></div>';
+    else if (fb && L.revealed) footer = '<div class="lf-actions"><button type="button" class="lf-primary" data-lf="lesson-next" data-testid="lf-lesson-next">' + (L.index + 1 >= L.itemIds.length ? 'Selesaikan lesson' : t('flow.soal-berikutnya', 'Soal berikutnya')) + '</button></div>';
     return '<div class="lf-intro"><p class="lf-kicker">' + esc(L.kind) + '</p><h2>' + esc(L.title) + '</h2><p class="lf-muted">Tujuan: ' + esc(B.SKILLS[L.skill].objective) + '</p></div>' +
-      questionCard(item, { action: 'lesson-answer', progress: 'Soal ' + (L.index + 1) + ' dari ' + L.itemIds.length, feedback: fb, revealed: L.revealed, chosen: L.lastChoice, locked: !!fb && (L.revealed || !fb.correct) && !!fb, showTranscript: L.attempt > 0 || !!L.transcript, footer: footer }) +
-      '<div class="lf-actions lf-actions-end"><button type="button" class="lf-ghost" data-lf="abandon" data-testid="lf-abandon">Kembali ke rencana</button></div>';
+      questionCard(item, { action: 'lesson-answer', progress: t('flow.soal-progress', 'Soal {n} dari {total}').replace('{n}', L.index + 1).replace('{total}', L.itemIds.length), feedback: fb, revealed: L.revealed, chosen: L.lastChoice, locked: !!fb && (L.revealed || !fb.correct) && !!fb, showTranscript: L.attempt > 0 || !!L.transcript, footer: footer }) +
+      '<div class="lf-actions lf-actions-end"><button type="button" class="lf-ghost" data-lf="abandon" data-testid="lf-abandon">' + t('flow.kembali-rencana', 'Kembali ke rencana') + '</button></div>';
   }
 
   function nextView() {
-    var n = st.lastNext || { reason: 'Belum ada lesson yang selesai.', done: false }, last = st.lessons[st.lessons.length - 1];
+    var n = st.lastNext || { reason: t('flow.belum-ada-lesson', 'Belum ada lesson yang selesai.'), done: false }, last = st.lessons[st.lessons.length - 1];
     return '<div class="lf-card" data-testid="lf-next">' + (last ? '<p class="lf-kicker">Session completed</p><h2>' + esc(last.title) + ': ' + last.correct + ' dari ' + last.total + ' tepat di percobaan pertama</h2>' : '<h2>Rekomendasi berikutnya</h2>') +
       '<div class="lf-reason" data-testid="lf-next-reason"><b>Kenapa rekomendasi ini:</b> ' + esc(n.reason) + '</div>' +
       (n.block ? '<div class="lf-next-block"><small>Berikutnya</small><b>' + esc(n.block.kind) + ': ' + esc(n.block.title) + '</b><span>' + n.block.minutes + ' menit</span></div>' : '') +
@@ -379,7 +574,7 @@
       '<p class="lf-muted">Istilah yang dipakai: practice completed, target coverage, review needed, confidence belum cukup, session completed. Menyelesaikan soal bukan berarti "menguasai" skill.</p>' +
       '<div class="lf-actions"><button type="button" class="lf-primary" data-lf="copy-summary" data-testid="lf-copy-summary">Salin ringkasan</button>' +
       (typeof navigator !== 'undefined' && navigator.share ? '<button type="button" class="lf-ghost" data-lf="share-summary" data-testid="lf-share-summary">Bagikan</button>' : '') + '</div></div>' +
-      '<div class="lf-card"><h3>Kode hasil untuk tutor</h3>' + (classCode() ? '<p class="lf-chip" data-testid="lf-class-code">Kelas ' + esc(classCode()) + (st.classReport && st.classReport.ok ? ' · terkirim otomatis' : '') + '</p>' : '') + '<p class="lf-muted">Berisi nama depan dan akurasi per skill saja — tanpa jawaban mentah atau audio. ' + (classCode() ? (st.classReport && st.classReport.ok ? 'Hasilmu sudah dikirim ke guru lewat kode kelas; kode di bawah hanya cadangan.' : 'Saat online, hasil dikirim otomatis ke guru lewat kode kelas. Kode di bawah untuk cadangan bila offline.') : 'Tempel di Ruang Guru → Tempel kode hasil murid.') + '</p>' +
+      '<div class="lf-card"><h3>Kode hasil untuk tutor</h3>' + (classCode() ? '<p class="lf-chip" data-testid="lf-class-code">' + t('flow.kode-kelas-chip', 'Kelas {kode}').replace('{kode}', esc(classCode())) + (st.classReport && st.classReport.ok ? ' · terkirim otomatis' : '') + '</p>' : '') + '<p class="lf-muted">Berisi nama depan dan akurasi per skill saja — tanpa jawaban mentah atau audio. ' + (classCode() ? (st.classReport && st.classReport.ok ? 'Hasilmu sudah dikirim ke guru lewat kode kelas; kode di bawah hanya cadangan.' : 'Saat online, hasil dikirim otomatis ke guru lewat kode kelas. Kode di bawah untuk cadangan bila offline.') : t('flow.tempel-ruang-guru', 'Tempel di KelasKu untuk Guru → Tempel kode hasil murid.')) + '</p>' +
       '<textarea class="lf-code" readonly rows="3" data-testid="lf-tutor-code">' + esc(tutorCode(st, name)) + '</textarea>' +
       '<div class="lf-actions"><button type="button" class="lf-ghost" data-lf="copy-code" data-testid="lf-copy-code">Salin kode</button></div></div>';
   }
@@ -392,19 +587,19 @@
       '<h3>Data yang tersimpan (' + payload.keyCount + ' kunci)</h3><ul class="lf-data-list">' + groups.map(function (g) { return '<li><b>' + esc(g.label) + '</b><small>' + esc(g.desc) + '</small><em>' + g.keys + ' kunci · ' + P.fmtBytes(g.bytes) + '</em></li>'; }).join('') + '</ul>' +
       '<p class="lf-muted">Tidak ada raw audio, transcript mentah, atau jawaban speaking yang disimpan.</p>' +
       '<div class="lf-actions"><button type="button" class="lf-primary" data-lf="export" data-testid="lf-export">Export progres (.json)</button>' +
-      '<label class="lf-ghost lf-file"><input type="file" accept="application/json,.json" data-lf-file="import" data-testid="lf-import-file">Pilih berkas untuk import</label></div>' +
+      '<label class="lf-ghost lf-file"><input type="file" accept="application/json,.json" data-lf-file="import" data-testid="lf-import-file">' + t('flow.pilih-berkas', 'Pilih berkas untuk import') + '</label></div>' +
       '<div id="lfRestorePreview" data-testid="lf-restore-preview">' + (pendingRestore ? restorePreviewMarkup() : '') + '</div></div>' +
-      '<div class="lf-card lf-danger"><h3>Hapus semua data</h3><p class="lf-muted">Menghapus seluruh progres, rencana, kelas tutor, dan pengaturan FIEZEL di perangkat ini. Tidak bisa dibatalkan — export dulu bila ragu.</p>' +
-      '<div class="lf-actions"><input type="text" class="lf-input" id="lfWipeConfirm" placeholder="Ketik HAPUS untuk konfirmasi" data-testid="lf-wipe-confirm" autocomplete="off"><button type="button" class="lf-danger-btn" data-lf="wipe" data-testid="lf-wipe">Hapus semua data</button></div></div>';
+      '<div class="lf-card lf-danger"><h3>' + t('flow.hapus-semua', 'Hapus semua data') + '</h3><p class="lf-muted">Menghapus seluruh progres, rencana, kelas tutor, dan pengaturan FIEZEL di perangkat ini. Tidak bisa dibatalkan — export dulu bila ragu.</p>' +
+      '<div class="lf-actions"><input type="text" class="lf-input" id="lfWipeConfirm" placeholder="Ketik HAPUS untuk konfirmasi" data-testid="lf-wipe-confirm" autocomplete="off"><button type="button" class="lf-danger-btn" data-lf="wipe" data-testid="lf-wipe">' + t('flow.hapus-semua', 'Hapus semua data') + '</button></div></div>';
   }
 
   function restorePreviewMarkup() {
     var p = pendingRestore.preview;
     if (!p.ok) return '<div class="lf-feedback is-wrong">' + esc(p.reason) + '</div>';
-    return '<div class="lf-preview"><h3>Pratinjau restore</h3><p class="lf-muted">Belum ada yang berubah. Berkas dibuat ' + esc(String(p.createdAt).slice(0, 10)) + (p.appVersion ? ' (FIEZEL ' + esc(p.appVersion) + ')' : '') + '.</p>' +
+    return '<div class="lf-preview"><h3>Pratinjau restore</h3><p class="lf-muted">' + t('flow.restore-belum-berubah', 'Belum ada yang berubah. Berkas dibuat {tanggal}').replace('{tanggal}', esc(String(p.createdAt).slice(0, 10))) + (p.appVersion ? ' (FIEZEL ' + esc(p.appVersion) + ')' : '') + '.</p>' +
       '<ul class="lf-preview-list"><li><b>' + p.added.length + '</b> kunci baru ditambahkan</li><li><b>' + p.replaced.length + '</b> kunci akan ditimpa dengan isi berkas</li><li><b>' + p.same.length + '</b> kunci sudah identik</li><li><b>' + p.keptLocal.length + '</b> kunci lokal tidak tersentuh</li></ul>' +
       '<ul class="lf-data-list">' + p.groups.map(function (g) { return '<li><b>' + esc(g.label) + '</b><em>' + g.keys + ' kunci</em></li>'; }).join('') + '</ul>' +
-      '<div class="lf-actions"><button type="button" class="lf-primary" data-lf="restore" data-testid="lf-restore-confirm">Terapkan restore</button><button type="button" class="lf-ghost" data-lf="cancel-restore" data-testid="lf-restore-cancel">Batal</button></div></div>';
+      '<div class="lf-actions"><button type="button" class="lf-primary" data-lf="restore" data-testid="lf-restore-confirm">Terapkan restore</button><button type="button" class="lf-ghost" data-lf="cancel-restore" data-testid="lf-restore-cancel">' + t('umum.batal', 'Batal') + '</button></div></div>';
   }
 
   // ---- events ----------------------------------------------------------------------------
@@ -480,7 +675,7 @@
       case 'transcript': if (st.activeLesson) st.activeLesson.transcript = true; else if (st.diagRun) st.diagRun.transcript = true; break;
       case 'listen': {
         var cur = st.activeLesson ? B.byId(st.activeLesson.itemIds[st.activeLesson.index]) : st.diagRun ? B.byId(st.diagRun.itemIds[st.diagRun.index]) : null;
-        if (cur && !speak(cur.context)) { toast('Suara tidak tersedia di perangkat ini — buka transkrip.'); if (st.activeLesson) st.activeLesson.transcript = true; else if (st.diagRun) st.diagRun.transcript = true; }
+        if (cur && !speak(cur.context)) { toast(t('flow.suara-tidak-ada', 'Suara tidak tersedia di perangkat ini — buka transkrip.')); if (st.activeLesson) st.activeLesson.transcript = true; else if (st.diagRun) st.diagRun.transcript = true; }
         else return;
         break;
       }
@@ -490,7 +685,7 @@
       case 'accept-assign': {
         var inp = mountEl.querySelector('#lfAssignCode'), T2 = root.FiezelTeacherStore, acc = inp && T2 ? T2.acceptAssignmentCode(inp.value) : null;
         if (!acc) { toast('Kode tugas tidak dikenali. Minta guru menyalin ulang kodenya.'); return; }
-        st.plan = null; toast('Tugas “' + acc.title + '” dari ' + acc.from + ' masuk ke rencana hari ini.'); break;
+        st.plan = null; toast(t('flow.toast-tugas-masuk', 'Tugas “{judul}” dari {dari} masuk ke rencana hari ini.').replace('{judul}', acc.title).replace('{dari}', acc.from)); break;
       }
       case 'export': {
         var P = backup(), payload = P.collect(localStorage, { appVersion: env.appVersion });
@@ -500,7 +695,7 @@
         if (!pendingRestore) return;
         var res = backup().restore(pendingRestore.payload, localStorage);
         pendingRestore = null;
-        if (res.ok) { toast('Restore selesai (' + res.written + ' kunci). Memuat ulang…'); setTimeout(function () { location.reload(); }, 700); return; }
+        if (res.ok) { toast(t('flow.toast-restore-selesai', 'Restore selesai ({jumlah} kunci). Memuat ulang…').replace('{jumlah}', res.written)); setTimeout(function () { location.reload(); }, 700); return; }
         toast(res.reason || 'Restore gagal.'); break;
       }
       case 'cancel-restore': pendingRestore = null; break;
@@ -508,7 +703,7 @@
         var inp = mountEl.querySelector('#lfWipeConfirm');
         if (!inp || inp.value.trim().toUpperCase() !== 'HAPUS') { toast('Ketik HAPUS untuk mengonfirmasi.'); return; }
         var w = backup().wipeAll(localStorage);
-        toast('Semua data FIEZEL dihapus (' + w.removed + ' kunci). Memuat ulang…');
+        toast(t('flow.hapus-semua-selesai', 'Semua data FIEZEL dihapus ({jumlah} kunci). Memuat ulang…').replace('{jumlah}', w.removed));
         setTimeout(function () { location.reload(); }, 700); return;
       }
       default: return;
@@ -526,5 +721,5 @@
     });
   }
 
-  return { KEY: KEY, ASSIGN_KEY: ASSIGN_KEY, GOALS: GOALS, mount: mount, render: render, load: load, buildPlan: buildPlan, skillSummary: skillSummary, weeklySummary: weeklySummary, tutorCode: tutorCode, rankedSkills: rankedSkills, statusOf: statusOf, openAssignment: openAssignment, _state: function () { return st; } };
+  return { KEY: KEY, ASSIGN_KEY: ASSIGN_KEY, GOALS: GOALS, mount: mount, render: render, load: load, buildPlan: buildPlan, skillSummary: skillSummary, weeklySummary: weeklySummary, tutorCode: tutorCode, rankedSkills: rankedSkills, statusOf: statusOf, openAssignment: openAssignment, announceJoin: announceJoin, recordExamFocus: recordExamFocus, markAssignmentStarted: markAssignmentStarted, recordAssignmentFocus: recordAssignmentFocus, recordAssignmentResult: recordAssignmentResult, pushToClass: function () { ensureState(); return pushToClass(); }, _retryState: function () { return { pending: !!retryTimer, delay: retryDelay }; }, _state: function () { return st; } };
 });

@@ -1,0 +1,2928 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>FIEZEL — UI/UX Redesign Preview Studio</title>
+  <style>
+    @font-face {
+      font-family: 'FZ Instrument Serif';
+      src: url('./assets/fonts/InstrumentSerif-400.woff2') format('woff2');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'FZ Plus Jakarta Sans';
+      src: url('./assets/fonts/PlusJakartaSans-400.woff2') format('woff2');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'FZ Plus Jakarta Sans';
+      src: url('./assets/fonts/PlusJakartaSans-700.woff2') format('woff2');
+      font-weight: 700;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    :root {
+      /* FIEZEL Design System v6.0 Core Tokens */
+      --bg: #FFF9EE;
+      --panel: #FFFFFF;
+      --panel-soft: #FFF3DC;
+      --line: #F0E4CF;
+      --line-soft: #F7EFDF;
+      --text: #241A11;
+      --muted: #6E5E47;
+      --muted-soft: #7E6C4B;
+      --accent: #C2402C;
+      --accent-strong: #A33422;
+      --accent-soft: #FDE3DE;
+      --sun: #FFC700;
+      --sun-deep: #E6A800;
+      --sun-press: #CC9600;
+      --sun-soft: #FFF3C4;
+      --sun-grad: linear-gradient(180deg, #FFDE59, #FFA500);
+      --gold: #C9A24B;
+      --good: #1F6B4E;
+      --good-bright: #2E8B69;
+      --good-soft: #E9F7F0;
+      --bad: #AC3E2A;
+      --bad-soft: #FDE3DE;
+      --info: #7A5F1B;
+      --info-soft: #FFF3C4;
+      --core: #1B1418;
+      --core-soft: #2A2126;
+      --on-core: #FDFAF3;
+      --on-core-muted: rgba(253,250,243,.68);
+
+      /* Pastel Palette Tokens */
+      --pz-yellow: #FBF1C2;
+      --pz-yellow-line: #F1DF95;
+      --pz-yellow-ink: #8A6400;
+      --pz-pink: #FBE3E1;
+      --pz-pink-line: #F2C8C4;
+      --pz-pink-ink: #A6473A;
+      --pz-mint: #E0F2EB;
+      --pz-mint-line: #BFE2D3;
+      --pz-mint-ink: #1F6F57;
+      --pz-lilac: #ECE6F8;
+      --pz-lilac-line: #D6CBEE;
+      --pz-lilac-ink: #5B4694;
+      --pz-sky: #E2EFF9;
+      --pz-sky-line: #C3DAEE;
+      --pz-sky-ink: #2A5C86;
+      --pz-peach: #FDE8D3;
+      --pz-peach-line: #F4CFAA;
+      --pz-peach-ink: #8F4E14;
+
+      --radius-lg: 24px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+      --radius-xs: 8px;
+      --radius-pill: 999px;
+
+      --shadow-sm: 0 2px 10px rgba(36,26,17,.06);
+      --shadow-md: 0 10px 30px rgba(36,26,17,.09);
+      --shadow-lg: 0 24px 60px rgba(36,26,17,.15);
+      --lift-sun: 0 4px 0 var(--sun-deep);
+      --lift-sun-press: 0 1px 0 var(--sun-deep);
+      --lift-edge: 0 3px 0 #E2D3BC;
+
+      --fz-display: 'FZ Instrument Serif', Georgia, serif;
+      --fz-heading: 'FZ Plus Jakarta Sans', -apple-system, sans-serif;
+      --fz-body: 'FZ Plus Jakarta Sans', -apple-system, sans-serif;
+
+      --ease: cubic-bezier(.22,.8,.28,1);
+      --ease-spring: cubic-bezier(.34,1.4,.4,1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--fz-body);
+      background: #241A11;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* TOP STUDIO BAR */
+    .studio-bar {
+      background: #1B1418;
+      color: #FDFAF3;
+      border-bottom: 1px solid rgba(240,228,207,0.15);
+      padding: 12px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    .studio-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .studio-logo {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: var(--sun);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--fz-heading);
+      font-weight: 700;
+      color: var(--text);
+      font-size: 16px;
+    }
+    .studio-title {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+    .studio-title span {
+      color: var(--sun);
+      font-size: 12px;
+      margin-left: 6px;
+      padding: 2px 8px;
+      background: rgba(255,199,0,0.15);
+      border-radius: 999px;
+      border: 1px solid rgba(255,199,0,0.3);
+    }
+
+    .studio-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .pill-group {
+      display: flex;
+      background: #2A2126;
+      padding: 3px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,244,218,0.15);
+    }
+    .pill-btn {
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      color: rgba(253,250,243,0.7);
+      background: transparent;
+      border: 0;
+      cursor: pointer;
+      transition: all 0.2s var(--ease);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .pill-btn:hover {
+      color: #FDFAF3;
+    }
+    .pill-btn.active {
+      background: var(--sun);
+      color: var(--text);
+      box-shadow: 0 2px 8px rgba(255,199,0,0.25);
+    }
+
+    .state-toggle-btn {
+      background: rgba(253,250,243,0.08);
+      border: 1px solid rgba(253,250,243,0.18);
+      color: #FDFAF3;
+      padding: 6px 12px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .state-toggle-btn:hover {
+      background: rgba(253,250,243,0.14);
+    }
+    .state-toggle-btn.active {
+      background: rgba(46,139,105,0.25);
+      border-color: #2E8B69;
+      color: #72E2B8;
+    }
+
+    /* MAIN STAGE CANVAS */
+    .studio-canvas {
+      flex: 1;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 30px 16px 60px;
+      background: radial-gradient(circle at top center, #352822 0%, #1E1617 100%);
+    }
+
+    /* DEVICE WRAPPER */
+    .device-shell {
+      transition: all 0.3s var(--ease);
+      position: relative;
+    }
+    .device-shell.mode-mobile {
+      width: 402px;
+      min-height: 852px;
+      background: #171114;
+      border: 4px solid #3A3038;
+      border-radius: 54px;
+      padding: 10px;
+      box-shadow: 0 30px 90px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.08) inset;
+    }
+    .device-shell.mode-responsive {
+      width: min(100%, 780px);
+      min-height: 800px;
+      background: #171114;
+      border: 2px solid #3A3038;
+      border-radius: 28px;
+      padding: 8px;
+      box-shadow: 0 20px 70px rgba(0,0,0,0.5);
+    }
+
+    /* APP SCREEN CONTAINER */
+    .app-screen {
+      width: 100%;
+      min-height: 832px;
+      background: var(--bg);
+      border-radius: 44px;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    }
+    .device-shell.mode-responsive .app-screen {
+      border-radius: 20px;
+    }
+
+    /* STATUS BAR (Mobile simulated) */
+    .sim-statusbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 28px 4px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      z-index: 50;
+      position: relative;
+    }
+    .sim-notch {
+      width: 110px;
+      height: 22px;
+      background: #171114;
+      border-radius: 999px;
+      margin-top: -6px;
+    }
+
+    /* APP HEADER */
+    .app-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px 12px;
+      background: var(--bg);
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+    .topbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+    .topbar-wordmark {
+      height: 24px;
+      display: block;
+    }
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .streak-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-pill);
+      padding: 4px 10px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      box-shadow: var(--shadow-sm);
+    }
+    .streak-chip .flame-icon {
+      color: #E24F35;
+      font-size: 15px;
+    }
+    .top-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text);
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s;
+    }
+    .top-btn:active {
+      transform: scale(0.94);
+    }
+
+    /* SCROLLABLE VIEWPORT */
+    .app-scroll {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 8px 18px 110px;
+      scrollbar-width: none;
+    }
+    .app-scroll::-webkit-scrollbar { display: none; }
+
+    /* DIRECTION ANNOTATION HEADER */
+    .direction-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+      padding: 8px 14px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+    .ver-hybrid .direction-badge {
+      background: linear-gradient(90deg, #FFF6DA 0%, #FFFDF8 100%);
+      color: #7A5F1B;
+      border-left: 3.5px solid var(--sun-deep);
+      box-shadow: 0 2px 10px rgba(230,168,0,0.12);
+    }
+    .ver-a .direction-badge {
+      background: rgba(36,26,17,0.06);
+      color: var(--text);
+      border-left: 3px solid var(--text);
+    }
+    .ver-b .direction-badge {
+      background: var(--sun-soft);
+      color: var(--info);
+      border-left: 3px solid var(--sun-deep);
+    }
+    .ver-c .direction-badge {
+      background: #E8F5EE;
+      color: #1F6B4E;
+      border-left: 3px solid #2E8B69;
+    }
+
+    /* CARD STYLES */
+    .f-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+    }
+    .f-card-soft {
+      background: var(--panel-soft);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      margin-bottom: 14px;
+    }
+    .f-card-core {
+      background: var(--core);
+      color: var(--on-core);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      margin-bottom: 14px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+    }
+    .f-card-core .muted { color: var(--on-core-muted); }
+
+    /* TYPOGRAPHY IN APP */
+    .f-h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.01em;
+      line-height: 1.25;
+    }
+    .f-h2 {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .f-display {
+      font-family: var(--fz-display);
+      font-size: 28px;
+      font-weight: 400;
+      letter-spacing: -0.015em;
+      line-height: 1.15;
+    }
+    .f-body {
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+    .f-tag {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--info);
+      background: var(--sun-soft);
+      padding: 3px 8px;
+      border-radius: 999px;
+      display: inline-block;
+      margin-bottom: 6px;
+    }
+
+    /* BUTTONS */
+    .btn-primary {
+      width: 100%;
+      min-height: 52px;
+      border-radius: var(--radius-md);
+      background: var(--sun);
+      color: var(--text);
+      border: 0;
+      font-family: var(--fz-heading);
+      font-size: 15px;
+      font-weight: 700;
+      box-shadow: var(--lift-sun), var(--shadow-sm);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.15s var(--ease-spring), box-shadow 0.15s var(--ease);
+      text-decoration: none;
+    }
+    .btn-primary:active {
+      transform: translateY(3px);
+      box-shadow: var(--lift-sun-press);
+    }
+
+    .btn-secondary {
+      width: 100%;
+      min-height: 46px;
+      border-radius: var(--radius-md);
+      background: var(--panel);
+      color: var(--text);
+      border: 1.5px solid var(--line);
+      font-family: var(--fz-heading);
+      font-size: 14px;
+      font-weight: 700;
+      box-shadow: var(--lift-edge);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.15s;
+    }
+    .btn-secondary:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 #E2D3BC;
+    }
+
+    /* BOTTOM NAVIGATION */
+    .app-bottomnav-wrap {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 10px 16px max(14px, env(safe-area-inset-bottom, 14px));
+      background: linear-gradient(180deg, rgba(255,249,238,0) 0%, rgba(255,249,238,0.92) 25%, #FFF9EE 100%);
+      z-index: 50;
+      pointer-events: none;
+    }
+    .app-bottomnav {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.96);
+      backdrop-filter: blur(12px);
+      border-radius: 28px;
+      padding: 6px 8px;
+      box-shadow: var(--shadow-md);
+      pointer-events: auto;
+    }
+    .nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      padding: 6px 0;
+      border-radius: 18px;
+      background: transparent;
+      border: 0;
+      cursor: pointer;
+      color: var(--muted);
+      font-family: var(--fz-heading);
+      font-size: 11px;
+      font-weight: 600;
+      transition: all 0.2s var(--ease);
+      position: relative;
+    }
+    .nav-item .nav-icon {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s var(--ease-spring);
+    }
+    .nav-item:active .nav-icon {
+      transform: scale(0.9);
+    }
+    .nav-item.active {
+      color: var(--text);
+      font-weight: 700;
+    }
+    .nav-item.active .nav-icon {
+      transform: translateY(-1px);
+    }
+
+    /* =========================================================================
+       1. BOTTOM NAVIGATION BAR (VERSION B FLOATING DOCK + GOLD PILL BOUNCE)
+       ========================================================================= */
+    /* GOLD PILL ACTIVE BOUNCE ANIMATION */
+    @keyframes goldPillBounce {
+      0% { transform: scale(0.82); opacity: 0; }
+      55% { transform: scale(1.09); opacity: 1; }
+      80% { transform: scale(0.97); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    @keyframes tabIconBounce {
+      0% { transform: translateY(0) scale(0.9); }
+      50% { transform: translateY(-4px) scale(1.18); }
+      100% { transform: translateY(-1px) scale(1); }
+    }
+
+    .nav-pill-bg {
+      position: absolute;
+      inset: 3px;
+      border-radius: 16px;
+      z-index: -1;
+      opacity: 0;
+    }
+    .ver-hybrid .nav-item.active .nav-pill-bg,
+    .ver-b .nav-item.active .nav-pill-bg {
+      background: linear-gradient(135deg, #FFF3C4 0%, #FFE699 100%);
+      border: 1px solid rgba(230,168,0,0.4);
+      box-shadow: 0 2px 8px rgba(255,199,0,0.28);
+      opacity: 1;
+      animation: goldPillBounce 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+    .ver-hybrid .nav-item.active .nav-icon,
+    .ver-b .nav-item.active .nav-icon {
+      animation: tabIconBounce 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* CENTER HOME TAB SPECIAL STYLING (ELEVATED GOLD BUTTON) */
+    .ver-hybrid .nav-item[data-tab="home"] .nav-icon,
+    .ver-b .nav-item[data-tab="home"] .nav-icon,
+    .ver-c .nav-item[data-tab="home"] .nav-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #FFDE59 0%, #FFA500 100%);
+      color: #241A11;
+      box-shadow: 0 6px 16px rgba(230,168,0,0.45), 0 2px 0 #CC8800;
+      margin-top: -18px;
+      border: 3.5px solid #FFFFFF;
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .ver-hybrid .nav-item[data-tab="home"].active .nav-icon,
+    .ver-b .nav-item[data-tab="home"].active .nav-icon,
+    .ver-c .nav-item[data-tab="home"].active .nav-icon {
+      background: linear-gradient(180deg, #FFE169 0%, #FF9900 100%);
+      box-shadow: 0 8px 20px rgba(230,168,0,0.55), 0 3px 0 #B37700;
+      transform: translateY(-4px) scale(1.08);
+    }
+
+    .nav-item.active .nav-pill-bg {
+      opacity: 1;
+    }
+
+    /* SVG DUOTONE ICONS */
+    .fz-svg {
+      width: 24px;
+      height: 24px;
+      stroke-width: 1.7;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .fz-svg .f-fill { fill: var(--sun-soft); }
+    .fz-svg .f-stroke { stroke: var(--text); fill: none; }
+    .nav-item.active .fz-svg .f-fill { fill: var(--sun); }
+    .nav-item.active .fz-svg .f-stroke { stroke: var(--text); }
+
+    /* =========================================================================
+       2. PAW LIVING HERO MASCOT & INTERACTIVE SPEECH BUBBLE
+       ========================================================================= */
+    @keyframes pawBob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+    @keyframes pawWiggle {
+      0% { transform: rotate(0deg) scale(1); }
+      25% { transform: rotate(-6deg) scale(1.08); }
+      50% { transform: rotate(6deg) scale(1.08); }
+      75% { transform: rotate(-3deg) scale(1.03); }
+      100% { transform: rotate(0deg) scale(1); }
+    }
+    @keyframes bubblePop {
+      0% { transform: scale(0.92); opacity: 0.6; }
+      55% { transform: scale(1.03); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .living-paw-hero {
+      background: linear-gradient(180deg, #FFFFFF 0%, #FFFDF8 100%);
+      border: 1.5px solid var(--line);
+      border-top: 4px solid var(--sun);
+      border-radius: var(--radius-lg);
+      padding: 16px 18px 18px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+    }
+    .living-paw-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .living-paw-avatar {
+      width: 68px;
+      height: 68px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, #FFF9E6 0%, #FFE8A0 100%);
+      border: 2px solid var(--sun);
+      box-shadow: 0 4px 14px rgba(255,199,0,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      position: relative;
+      user-select: none;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      animation: pawBob 3.5s ease-in-out infinite;
+    }
+    .living-paw-avatar:active, .living-paw-avatar.wiggling {
+      animation: pawWiggle 0.45s ease-in-out;
+    }
+    .living-paw-avatar .tap-badge {
+      position: absolute;
+      bottom: -4px;
+      right: -4px;
+      background: var(--core);
+      color: var(--sun);
+      font-size: 10px;
+      font-weight: 800;
+      padding: 1px 6px;
+      border-radius: 999px;
+      border: 1.5px solid #FFFFFF;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    }
+
+    .living-paw-bubble {
+      flex: 1;
+      background: #FFFDF7;
+      border: 1.5px solid #F0E2C8;
+      border-radius: 16px;
+      padding: 10px 14px;
+      position: relative;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(36,26,17,0.04);
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+    .living-paw-bubble:hover {
+      border-color: var(--sun-deep);
+      background: #FFFFFF;
+    }
+    .living-paw-bubble.popping {
+      animation: bubblePop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .living-paw-bubble::before {
+      content: '';
+      position: absolute;
+      left: -8px;
+      top: 18px;
+      width: 0;
+      height: 0;
+      border-top: 6px solid transparent;
+      border-bottom: 6px solid transparent;
+      border-right: 8px solid #F0E2C8;
+    }
+    .living-paw-bubble::after {
+      content: '';
+      position: absolute;
+      left: -6px;
+      top: 18px;
+      width: 0;
+      height: 0;
+      border-top: 5px solid transparent;
+      border-bottom: 5px solid transparent;
+      border-right: 7px solid #FFFDF7;
+    }
+    .bubble-label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 3px;
+    }
+    .bubble-author {
+      font-size: 10.5px;
+      font-weight: 800;
+      color: var(--info);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .bubble-tap-hint {
+      font-size: 10px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .bubble-text {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.4;
+    }
+
+    /* =========================================================================
+       3. SMART DAILY FOCUS COCKPIT (HOME SCREEN)
+       ========================================================================= */
+    .home-hero-card {
+      background: var(--panel);
+      border: 1.5px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      overflow: hidden;
+    }
+    .companion-banner {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+    .paw-avatar-wrap {
+      width: 62px;
+      height: 62px;
+      border-radius: 20px;
+      background: var(--sun-soft);
+      border: 1.5px solid var(--sun-deep);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .paw-avatar-wrap img, .paw-avatar-wrap svg {
+      width: 48px;
+      height: 48px;
+    }
+    .companion-say {
+      flex: 1;
+    }
+    .companion-say .greet {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .companion-say .headline {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.3;
+    }
+
+    .today-rhythm-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .rhythm-box {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      padding: 12px 10px;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+    }
+    .rhythm-box .val {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+      display: block;
+      margin-bottom: 2px;
+    }
+    .rhythm-box .lbl {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .session-tags-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+    .session-tag-chip {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 8px;
+      background: var(--panel-soft);
+      color: var(--text);
+      border: 1px solid var(--line);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .daily-rhythm-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 14px 18px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow-sm);
+    }
+    .daily-rhythm-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .daily-rhythm-track {
+      height: 8px;
+      background: var(--line-soft);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .daily-rhythm-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.4s cubic-bezier(0.34, 1.4, 0.4, 1);
+    }
+
+    .checklist-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    .check-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--line-soft);
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .check-item:last-child { border-bottom: 0; }
+    .check-dot {
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .check-dot.done {
+      background: var(--good);
+      color: #FFFFFF;
+    }
+    .check-dot.pending {
+      border: 2px solid var(--line);
+      color: transparent;
+    }
+
+    .quick-practice-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .quick-chip {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s;
+    }
+    .quick-chip:hover {
+      border-color: var(--sun-deep);
+      transform: translateY(-2px);
+    }
+    .quick-chip .q-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--sun-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* =========================================================================
+       4. PRACTICE ARENA: CONTINUE LEARNING HERO & 2x2 SKILL MATRIX WITH RINGS
+       ========================================================================= */
+    .continue-learning-card {
+      background: linear-gradient(135deg, #FFF4DE 0%, #FFE9B5 100%);
+      border: 1.5px solid var(--sun-deep);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      margin-bottom: 16px;
+      position: relative;
+      box-shadow: 0 4px 14px rgba(230,168,0,0.12);
+    }
+
+    .skill-matrix-2x2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .skill-matrix-card {
+      background: var(--panel);
+      border: 1.5px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s var(--ease);
+      position: relative;
+    }
+    .skill-matrix-card:hover {
+      border-color: var(--sun-deep);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .skill-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .skill-icon-pill {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background: var(--sun-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    .skill-ring-wrap {
+      width: 44px;
+      height: 44px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .skill-ring-svg {
+      width: 44px;
+      height: 44px;
+      transform: rotate(-90deg);
+    }
+    .ring-bg {
+      fill: none;
+      stroke: var(--line-soft);
+      stroke-width: 3.8;
+    }
+    .ring-fill {
+      fill: none;
+      stroke-width: 3.8;
+      stroke-linecap: round;
+      transition: stroke-dasharray 0.6s ease;
+    }
+    .ring-text {
+      position: absolute;
+      font-size: 10.5px;
+      font-weight: 800;
+      color: var(--text);
+    }
+    .skill-title-block b {
+      font-size: 14px;
+      color: var(--text);
+      display: block;
+    }
+    .skill-title-block span {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.3;
+      display: block;
+      margin-top: 1px;
+    }
+    .skill-submetric {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text);
+      background: var(--panel-soft);
+      padding: 3px 8px;
+      border-radius: 6px;
+      display: inline-block;
+      align-self: flex-start;
+    }
+
+    .ai-booster-card {
+      background: #FFFDF5;
+      border: 1.5px solid var(--sun-deep);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .skill-matrix {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .skill-tile {
+      background: var(--panel);
+      border: 1.5px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s var(--ease);
+      text-align: left;
+    }
+    .skill-tile:hover {
+      border-color: var(--sun-deep);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .skill-tile-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .skill-icon-wrap {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: var(--sun-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .skill-badge {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      background: var(--line-soft);
+      padding: 3px 7px;
+      border-radius: 6px;
+    }
+    .skill-progress-bar {
+      height: 6px;
+      background: var(--line-soft);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+    .skill-progress-bar > i {
+      display: block;
+      height: 100%;
+      background: var(--sun-grad);
+      border-radius: 999px;
+    }
+
+    /* =========================================================================
+       5. SCHOOL SCREEN: ENROLLED COUNTDOWN & UNENROLLED 6-BOX CODE
+       ========================================================================= */
+    .school-card-active {
+      background: var(--panel);
+      border: 1.5px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow-sm);
+    }
+    .class-header-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--sun-soft);
+      color: var(--info);
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    @keyframes countdownPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.65; }
+    }
+    .countdown-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--bad-soft);
+      color: var(--bad);
+      border: 1px solid rgba(172, 62, 42, 0.25);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11.5px;
+      font-weight: 700;
+      animation: countdownPulse 2s ease-in-out infinite;
+    }
+
+    .assignment-box {
+      background: #FDF9F2;
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--accent);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      margin: 12px 0;
+    }
+    .teacher-note-box {
+      display: flex;
+      gap: 12px;
+      background: var(--panel-soft);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      margin-top: 14px;
+    }
+    .teacher-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--sun);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: var(--text);
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .school-empty-card {
+      background: var(--panel);
+      border: 2px dashed var(--line);
+      border-radius: var(--radius-lg);
+      padding: 32px 20px;
+      text-align: center;
+      margin-bottom: 14px;
+    }
+    .code-input-mock {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin: 20px 0;
+    }
+    .code-char {
+      width: 42px;
+      height: 52px;
+      border: 2px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    /* =========================================================================
+       6. PROGRESS SCREEN: CEFR ROADMAP (YOU ARE HERE) & STATIONS
+       ========================================================================= */
+    .cefr-track-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+    .cefr-stations {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      margin: 36px 8px 14px;
+    }
+    .cefr-track-line {
+      position: absolute;
+      left: 10px;
+      right: 10px;
+      height: 4px;
+      background: var(--line-soft);
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 1;
+    }
+    .cefr-track-fill {
+      width: 45%;
+      height: 100%;
+      background: var(--sun);
+      border-radius: 999px;
+    }
+    .cefr-station {
+      position: relative;
+      z-index: 2;
+      width: 36px;
+      height: 36px;
+      border-radius: 999px;
+      background: var(--panel);
+      border: 2px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+    .cefr-station.passed {
+      background: var(--good-soft);
+      border-color: var(--good);
+      color: var(--good);
+    }
+    .cefr-station.current {
+      background: var(--sun);
+      border-color: var(--sun-deep);
+      color: var(--text);
+      transform: scale(1.18);
+      box-shadow: 0 4px 10px rgba(255,199,0,0.4);
+    }
+    .cefr-station.current-hybrid {
+      background: var(--sun);
+      border-color: var(--sun-deep);
+      color: var(--text);
+      transform: scale(1.18);
+      box-shadow: 0 4px 14px rgba(255,199,0,0.45);
+      position: relative;
+    }
+    @keyframes pulseGlow {
+      0% { transform: translateX(-50%) scale(1); box-shadow: 0 0 0 0 rgba(255,199,0,0.6); }
+      70% { transform: translateX(-50%) scale(1.05); box-shadow: 0 0 0 8px rgba(255,199,0,0); }
+      100% { transform: translateX(-50%) scale(1); box-shadow: 0 0 0 0 rgba(255,199,0,0); }
+    }
+    .you-are-here-badge {
+      position: absolute;
+      bottom: 42px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1B1418;
+      color: #FFC700;
+      font-size: 9.5px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      padding: 3px 8px;
+      border-radius: 999px;
+      white-space: nowrap;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.28);
+      animation: pulseGlow 2s infinite;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .you-are-here-badge::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 5px solid #1B1418;
+    }
+
+    .weekly-bars {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      height: 100px;
+      padding-top: 14px;
+      margin: 14px 0 6px;
+    }
+    .w-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      flex: 1;
+    }
+    .w-bar {
+      width: 18px;
+      background: var(--sun-soft);
+      border-radius: 6px;
+      transition: height 0.3s;
+    }
+    .w-bar.active {
+      background: var(--sun);
+      border: 1px solid var(--sun-deep);
+    }
+    .w-lbl {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    /* 5. PROFILE SCREEN */
+    .profile-hero {
+      text-align: center;
+      padding: 10px 0 20px;
+    }
+    .profile-avatar-big {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: var(--sun-soft);
+      border: 3px solid var(--sun);
+      margin: 0 auto 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow: var(--shadow-md);
+    }
+    .profile-avatar-big img {
+      width: 58px;
+      height: 58px;
+    }
+    .badge-edit-avatar {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 26px;
+      height: 26px;
+      background: var(--text);
+      color: #FFFFFF;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      border: 2px solid #FFFFFF;
+    }
+
+    .friend-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--line-soft);
+    }
+    .friend-row:last-child { border-bottom: 0; }
+    .friend-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .friend-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--panel-soft);
+      border: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .btn-cheer {
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s;
+    }
+    .btn-cheer:active {
+      transform: scale(0.92);
+      background: var(--sun-soft);
+    }
+
+    .leaderboard-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      margin-bottom: 6px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+    }
+    .leaderboard-row.rank-1 {
+      background: #FFFDF4;
+      border-color: var(--sun);
+    }
+    .rank-num {
+      width: 24px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--muted);
+      text-align: center;
+    }
+    .rank-1 .rank-num { color: #E6A800; }
+
+    /* TOAST NOTIFICATION SIMULATOR */
+    .sim-toast {
+      position: absolute;
+      top: 54px;
+      left: 20px;
+      right: 20px;
+      background: var(--core);
+      color: var(--on-core);
+      padding: 12px 16px;
+      border-radius: 14px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: var(--shadow-lg);
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      opacity: 0;
+      transform: translateY(-10px);
+      transition: all 0.25s var(--ease);
+      pointer-events: none;
+    }
+    .sim-toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* SPEC MODAL OVERLAY */
+    .spec-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(36,26,17,0.7);
+      backdrop-filter: blur(4px);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .spec-modal.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .spec-modal-box {
+      background: var(--panel);
+      width: min(100%, 460px);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--line);
+    }
+
+    /* =========================================================================
+       PASTEL THEME ENHANCEMENTS (USER APPROVED HYBRID PALETTE)
+       ========================================================================= */
+    .ver-hybrid .app-screen {
+      background: #F9F3E6;
+    }
+    .ver-hybrid .streak-chip {
+      background: var(--pz-pink);
+      border-color: var(--pz-pink-line);
+      color: var(--pz-pink-ink);
+    }
+    .ver-hybrid .living-paw-avatar {
+      background: var(--pz-yellow);
+      border: 2px solid var(--pz-yellow-line);
+    }
+    .ver-hybrid .tap-badge {
+      background: var(--pz-mint);
+      color: var(--pz-mint-ink);
+      border: 1px solid var(--pz-mint-line);
+    }
+    .ver-hybrid .session-tag-chip:nth-child(1) {
+      background: var(--pz-yellow);
+      border-color: var(--pz-yellow-line);
+      color: var(--pz-yellow-ink);
+    }
+    .ver-hybrid .session-tag-chip:nth-child(2) {
+      background: var(--pz-mint);
+      border-color: var(--pz-mint-line);
+      color: var(--pz-mint-ink);
+    }
+    .ver-hybrid .session-tag-chip:nth-child(3) {
+      background: var(--pz-lilac);
+      border-color: var(--pz-lilac-line);
+      color: var(--pz-lilac-ink);
+    }
+    .ver-hybrid .daily-rhythm-track {
+      background: var(--pz-mint);
+    }
+    .ver-hybrid .quick-practice-grid .quick-chip:nth-child(1) {
+      background: var(--pz-yellow);
+      border-color: var(--pz-yellow-line);
+      box-shadow: 0 3px 0 var(--pz-yellow-line);
+    }
+    .ver-hybrid .quick-practice-grid .quick-chip:nth-child(1) .q-icon {
+      background: rgba(255,255,255,0.85);
+    }
+    .ver-hybrid .quick-practice-grid .quick-chip:nth-child(2) {
+      background: var(--pz-mint);
+      border-color: var(--pz-mint-line);
+      box-shadow: 0 3px 0 var(--pz-mint-line);
+    }
+    .ver-hybrid .quick-practice-grid .quick-chip:nth-child(2) .q-icon {
+      background: rgba(255,255,255,0.85);
+    }
+    .ver-hybrid .quick-practice-grid .quick-chip:nth-child(3) {
+      background: var(--pz-pink);
+      border-color: var(--pz-pink-line);
+      box-shadow: 0 3px 0 var(--pz-pink-line);
+    }
+    .ver-hybrid .quick-practice-grid .quick-chip:nth-child(3) .q-icon {
+      background: rgba(255,255,255,0.85);
+    }
+    .ver-hybrid .continue-learning-card {
+      background: linear-gradient(135deg, var(--pz-yellow) 0%, var(--pz-mint) 100%);
+      border-color: var(--pz-mint-line);
+      box-shadow: 0 4px 14px rgba(31, 111, 87, 0.12), 0 2px 0 var(--pz-mint-line);
+    }
+    .ver-hybrid .ai-booster-card {
+      background: var(--pz-pink);
+      border: 1.5px dashed var(--pz-pink-line);
+      box-shadow: 0 3px 0 var(--pz-pink-line);
+    }
+    .ver-hybrid .school-card-active {
+      background: var(--pz-sky);
+      border-color: var(--pz-sky-line);
+      box-shadow: 0 4px 0 var(--pz-sky-line);
+    }
+    .ver-hybrid .cefr-station.passed {
+      background: var(--pz-mint);
+      border-color: var(--pz-mint-line);
+      color: var(--pz-mint-ink);
+    }
+    .ver-hybrid .w-bar {
+      background: var(--pz-mint);
+    }
+    .ver-hybrid .w-bar.active {
+      background: var(--sun);
+      border-color: var(--sun-deep);
+    }
+
+    /* RESPONSIVE DESKTOP ADJUSTMENTS */
+    @media (min-width: 900px) {
+      .studio-bar { padding: 16px 32px; }
+      .studio-canvas { padding: 40px 24px 80px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- STUDIO CONTROLS TOPBAR -->
+  <header class="studio-bar">
+    <div class="studio-brand">
+      <div class="studio-logo">F</div>
+      <div class="studio-title">
+        FIEZEL Studio <span>Preview Gate</span>
+      </div>
+    </div>
+
+    <div class="studio-controls">
+      <!-- VERSION SELECTOR (APPROVED HYBRID ACTIVE BY DEFAULT) -->
+      <div class="pill-group" role="tablist" aria-label="Pilihan Desain">
+        <button type="button" class="pill-btn active" onclick="selectVersion('hybrid')" id="btnVerHybrid" title="Arah Desain Resmi Disetujui">
+          ⭐ APPROVED HYBRID (B+C)
+        </button>
+        <button type="button" class="pill-btn" onclick="selectVersion('a')" id="btnVerA">
+          Ver A · Safe
+        </button>
+        <button type="button" class="pill-btn" onclick="selectVersion('b')" id="btnVerB">
+          Ver B · Premium
+        </button>
+        <button type="button" class="pill-btn" onclick="selectVersion('c')" id="btnVerC">
+          Ver C · Architect
+        </button>
+      </div>
+
+      <!-- VIEWPORT TOGGLE -->
+      <div class="pill-group">
+        <button type="button" class="pill-btn active" onclick="toggleViewport('mobile')" id="btnVpMobile">
+          📱 Mobile 390
+        </button>
+        <button type="button" class="pill-btn" onclick="toggleViewport('responsive')" id="btnVpResp">
+          💻 Responsive
+        </button>
+      </div>
+
+      <!-- INTERACTIVE STATE SWITCHERS -->
+      <button type="button" class="state-toggle-btn active" id="btnToggleClassState" onclick="toggleClassState()">
+        🏫 Kelas: Terdaftar
+      </button>
+
+      <button type="button" class="state-toggle-btn" id="btnToggleGoal" onclick="toggleGoalDone()">
+        🎯 Goal: In-Progress
+      </button>
+    </div>
+  </header>
+
+  <!-- CANVAS WRAPPER -->
+  <main class="studio-canvas">
+    <div class="device-shell mode-mobile ver-hybrid" id="deviceShell">
+      <div class="app-screen">
+        
+        <!-- SIMULATED STATUS BAR -->
+        <div class="sim-statusbar">
+          <span>09:41</span>
+          <div class="sim-notch"></div>
+          <span>5G 100%</span>
+        </div>
+
+        <!-- APP TOPBAR -->
+        <header class="app-topbar">
+          <div class="topbar-brand" onclick="switchTab('home')">
+            <svg class="topbar-wordmark" viewBox="0 0 1000 260" role="img" aria-label="FIEZEL">
+              <g fill="#241A11">
+                <rect x="30" y="30" width="42" height="200" rx="21"/>
+                <rect x="30" y="30" width="144" height="42" rx="21"/>
+                <rect x="30" y="109" width="116" height="42" rx="21"/>
+                <rect x="300" y="30" width="42" height="200" rx="21"/>
+                <rect x="300" y="30" width="144" height="42" rx="21"/>
+                <rect x="300" y="109" width="100" height="42" rx="21"/>
+                <rect x="300" y="188" width="130" height="42" rx="21"/>
+                <rect x="478" y="30" width="150" height="42" rx="21"/>
+                <rect x="478" y="188" width="150" height="42" rx="21"/>
+                <rect x="607" y="30" width="191.38" height="42" rx="21" transform="rotate(124.354 607 51)"/>
+                <rect x="662" y="30" width="42" height="200" rx="21"/>
+                <rect x="662" y="30" width="144" height="42" rx="21"/>
+                <rect x="662" y="109" width="100" height="42" rx="21"/>
+                <rect x="662" y="188" width="130" height="42" rx="21"/>
+                <rect x="840" y="30" width="42" height="200" rx="21"/>
+                <rect x="840" y="188" width="130" height="42" rx="21"/>
+              </g>
+              <g fill="#FFC700">
+                <rect x="192" y="30" width="26" height="200" rx="13"/>
+                <rect x="240" y="106" width="26" height="124" rx="13"/>
+              </g>
+            </svg>
+          </div>
+
+          <div class="topbar-right">
+            <!-- CLICKABLE STREAK CHIP: RESPONDS AND INTERACTS WITH PAW -->
+            <div class="streak-chip" id="streakChip" onclick="incrementStreak()" title="Ketuk untuk menambah streak dan menyapa PAW!">
+              <span class="flame-icon">🔥</span>
+              <span id="streakCount">5</span>
+            </div>
+            <button type="button" class="top-btn" onclick="triggerToast('🔔 Belum ada notifikasi baru hari ini')" title="Notifikasi">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+            </button>
+            <button type="button" class="top-btn" onclick="openSpecModal()" title="Buka Detail Spesifikasi">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            </button>
+          </div>
+        </header>
+
+        <!-- DYNAMIC TOAST -->
+        <div class="sim-toast" id="simToast">
+          <span id="toastMsg">Pemberitahuan</span>
+          <span style="color:var(--sun);font-size:11px;font-weight:700;">OK</span>
+        </div>
+
+        <!-- VIEWPORT CONTENT BODY -->
+        <div class="app-scroll" id="screenContent">
+          <!-- Rendered dynamically by JavaScript based on activeTab & activeVersion -->
+        </div>
+
+        <!-- PRIMARY BOTTOM NAVIGATION (5 TABS) -->
+        <div class="app-bottomnav-wrap">
+          <nav class="app-bottomnav" aria-label="Navigasi Utama">
+            <!-- 1. PRACTICE -->
+            <button type="button" class="nav-item" data-tab="practice" onclick="switchTab('practice')">
+              <div class="nav-pill-bg"></div>
+              <div class="nav-icon">
+                <svg class="fz-svg" viewBox="0 0 24 24">
+                  <path class="f-fill" d="M6 10h2.2v4H6zM10.9 7.4h2.2v9.2h-2.2zM15.8 9h2.2v6h-2.2z"/>
+                  <path class="f-stroke" d="M6.9 9.4v5.2M12 6.6v10.8M17.1 8.4v7.2M3.6 11.2v1.6M20.4 11.2v1.6"/>
+                </svg>
+              </div>
+              <span>Practice</span>
+            </button>
+
+            <!-- 2. SCHOOL -->
+            <button type="button" class="nav-item" data-tab="school" onclick="switchTab('school')">
+              <div class="nav-pill-bg"></div>
+              <div class="nav-icon">
+                <svg class="fz-svg" viewBox="0 0 24 24">
+                  <rect class="f-fill" x="4.4" y="5" width="15.2" height="10" rx="2.4"/>
+                  <rect class="f-stroke" x="4.4" y="5" width="15.2" height="10" rx="2.4"/>
+                  <path class="f-stroke" d="M12 15v3.4M8.6 18.4h6.8M8 9.2h5.6M8 11.8h3.4"/>
+                </svg>
+              </div>
+              <span>School</span>
+            </button>
+
+            <!-- 3. HOME (CENTER) -->
+            <button type="button" class="nav-item active" data-tab="home" onclick="switchTab('home')">
+              <div class="nav-pill-bg"></div>
+              <div class="nav-icon">
+                <svg class="fz-svg" viewBox="0 0 24 24">
+                  <path class="f-fill" d="M12 3.6 21 11v7.6a2.4 2.4 0 0 1-2.4 2.4H5.4A2.4 2.4 0 0 1 3 18.6V11z"/>
+                  <path class="f-stroke" d="M12 3.6 21 11v7.6a2.4 2.4 0 0 1-2.4 2.4H5.4A2.4 2.4 0 0 1 3 18.6V11z"/>
+                  <path class="f-stroke" d="M9.5 21v-4.6a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1V21"/>
+                </svg>
+              </div>
+              <span>Home</span>
+            </button>
+
+            <!-- 4. PROGRESS -->
+            <button type="button" class="nav-item" data-tab="progress" onclick="switchTab('progress')">
+              <div class="nav-pill-bg"></div>
+              <div class="nav-icon">
+                <svg class="fz-svg" viewBox="0 0 24 24">
+                  <path class="f-fill" d="M8.9 3.9 15.1 6.4l5.3-2.2v12.6l-5.3 2.2-6.2-2.5-5.3 2.2V6.1z"/>
+                  <path class="f-stroke" d="M8.9 3.9 15.1 6.4l5.3-2.2v12.6l-5.3 2.2-6.2-2.5-5.3 2.2V6.1z"/>
+                  <path class="f-stroke" d="M8.9 3.9v14.6M15.1 6.4V21"/>
+                </svg>
+              </div>
+              <span>Progress</span>
+            </button>
+
+            <!-- 5. PROFILE -->
+            <button type="button" class="nav-item" data-tab="profile" onclick="switchTab('profile')">
+              <div class="nav-pill-bg"></div>
+              <div class="nav-icon">
+                <svg class="fz-svg" viewBox="0 0 24 24">
+                  <circle class="f-fill" cx="12" cy="8" r="4"/>
+                  <circle class="f-stroke" cx="12" cy="8" r="4"/>
+                  <path class="f-stroke" d="M5 20c0-3.3 3.1-6 7-6s7 2.7 7 6"/>
+                </svg>
+              </div>
+              <span>Profile</span>
+            </button>
+          </nav>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- SPEC MODAL -->
+  <div class="spec-modal" id="specModal" onclick="if(event.target===this)closeSpecModal()">
+    <div class="spec-modal-box">
+      <div class="f-tag">DESAIN ARSITEKTUR</div>
+      <h2 class="f-h2" id="specModalTitle">Spesifikasi Arah Redesain</h2>
+      <p class="f-body" id="specModalBody" style="margin: 10px 0 16px;">
+        Preview ini menyajikan 3 variasi eksplorasi UI/UX lengkap dengan 5 tab utama.
+      </p>
+      <button type="button" class="btn-primary" onclick="closeSpecModal()">Tutup Pratinjau</button>
+    </div>
+  </div>
+
+  <script>
+    // APP STATE (APPROVED HYBRID ACTIVE BY DEFAULT)
+    let currentVersion = 'hybrid'; // 'hybrid', 'a', 'b', 'c'
+    let currentTab = 'home'; // 'practice', 'school', 'home', 'progress', 'profile'
+    let isClassJoined = true;
+    let isGoalDone = false;
+    let streakCount = 5;
+    let pawSpeechIndex = 0;
+
+    // LIVING PAW SPEECH DIALOGUES
+    const pawSpeechLibrary = [
+      "Streak 5 hari aktif! Api belajarmu berkobar, Rara! 🔥",
+      "Hari ini fokus kita 10 menit: 8 kata baru & pola Past Tense siap dipelajari! 📖",
+      "Aku mendeteksi akurasimu di Irregular Verbs perlu dipoles. Tenang, kita selesaikan bareng! 💡",
+      "Belajar 10 menit tiap hari jauh lebih nempel di otak daripada 2 jam di akhir pekan! 🐾",
+      "Ada tugas dari Pak Budi batas besok jam 18:00. Mau kita cicil 5 soal sekarang? 🏫",
+      "Tinggal sedikit lagi menuju CEFR B1! Kuasai 85 kata baru lagi ya! ⭐"
+    ];
+
+    // MASCOT INTERACTION HANDLERS
+    function cyclePawSpeech() {
+      pawSpeechIndex = (pawSpeechIndex + 1) % pawSpeechLibrary.length;
+      updatePawBubble(pawSpeechLibrary[pawSpeechIndex]);
+      
+      const avatar = document.getElementById('pawLivingAvatar');
+      const bubble = document.getElementById('pawLivingBubble');
+      if (avatar) {
+        avatar.classList.add('wiggling');
+        setTimeout(() => avatar.classList.remove('wiggling'), 450);
+      }
+      if (bubble) {
+        bubble.classList.add('popping');
+        setTimeout(() => bubble.classList.remove('popping'), 350);
+      }
+    }
+
+    function updatePawBubble(text) {
+      const bubbleEl = document.getElementById('pawSpeechText');
+      if (bubbleEl) {
+        bubbleEl.textContent = text;
+      }
+    }
+
+    function incrementStreak() {
+      streakCount++;
+      const el = document.getElementById('streakCount');
+      if (el) el.textContent = streakCount;
+      triggerToast(`🔥 Streak naik ke ${streakCount} Hari! Luar biasa konsistensimu!`);
+      
+      // Update PAW speech bubble with celebratory message
+      const celebratoryMsg = `🔥 WOO-HOO! Streak ke-${streakCount} Hari! PAW bangga banget dengan konsistensimu, Rara!`;
+      updatePawBubble(celebratoryMsg);
+      
+      const avatar = document.getElementById('pawLivingAvatar');
+      const bubble = document.getElementById('pawLivingBubble');
+      if (avatar) {
+        avatar.classList.add('wiggling');
+        setTimeout(() => avatar.classList.remove('wiggling'), 450);
+      }
+      if (bubble) {
+        bubble.classList.add('popping');
+        setTimeout(() => bubble.classList.remove('popping'), 350);
+      }
+    }
+
+    function getPawSvgMarkup(size = 46) {
+      return `
+        <svg viewBox="0 0 512 512" style="width:${size}px;height:${size}px;" role="img" aria-label="PAW Mascot">
+          <ellipse cx="256" cy="280" rx="140" ry="120" fill="#241A11"/>
+          <!-- EARS -->
+          <circle cx="160" cy="190" r="46" fill="#241A11"/>
+          <circle cx="352" cy="190" r="46" fill="#241A11"/>
+          <circle cx="160" cy="190" r="28" fill="#FFC700"/>
+          <circle cx="352" cy="190" r="28" fill="#FFC700"/>
+          <!-- CHEEKS / BLUSH -->
+          <circle cx="175" cy="305" r="16" fill="#F0A0AC" opacity="0.8"/>
+          <circle cx="337" cy="305" r="16" fill="#F0A0AC" opacity="0.8"/>
+          <!-- EYES -->
+          <circle cx="210" cy="270" r="15" fill="#FFFFFF"/>
+          <circle cx="302" cy="270" r="15" fill="#FFFFFF"/>
+          <circle cx="212" cy="268" r="8" fill="#241A11"/>
+          <circle cx="300" cy="268" r="8" fill="#241A11"/>
+          <circle cx="215" cy="265" r="3" fill="#FFFFFF"/>
+          <circle cx="303" cy="265" r="3" fill="#FFFFFF"/>
+          <!-- SMILE & NOSE -->
+          <ellipse cx="256" cy="290" rx="10" ry="7" fill="#8C2233"/>
+          <path d="M238 308 Q256 324 274 308" stroke="#FFC700" stroke-width="7" fill="none" stroke-linecap="round"/>
+        </svg>
+      `;
+    }
+
+    // RENDER DISPATCHER
+    function render() {
+      const container = document.getElementById('screenContent');
+
+      // Update direction annotation banner
+      let bannerText = '';
+      if (currentVersion === 'hybrid') {
+        bannerText = '<b>⭐ APPROVED HYBRID (B+C Direction):</b> Menggabungkan kehangatan maskot PAW Living Hero & taktil 3D (Ver B) dengan Smart Daily Focus cockpit, CEFR Roadmap, & Matriks Keterampilan 2x2 (Ver C). Disetujui sebagai acuan implementasi utama!';
+      } else if (currentVersion === 'a') {
+        bannerText = '<b>Version A · Safe Evolution:</b> Memperbaiki layout FIEZEL saat ini, merapikan ritme kartu, mempertahankan tata letak familiar.';
+      } else if (currentVersion === 'b') {
+        bannerText = '<b>Version B · Premium FIEZEL:</b> Tampilan berkarakter kuat, Warm Paper + Solar Gold, lift 3D taktil, maskot ekspresif, floating dock.';
+      } else {
+        bannerText = '<b>Version C · Senior UX Architect Proposal:</b> Fokus harian intuitif, matriks skill mandiri, kelas digital ringan, CEFR roadmap, & hub murid.';
+      }
+
+      const badgeHtml = `<div class="direction-badge">${bannerText}</div>`;
+
+      let content = '';
+      switch (currentTab) {
+        case 'home':
+          content = renderHomeScreen();
+          break;
+        case 'practice':
+          content = renderPracticeScreen();
+          break;
+        case 'school':
+          content = renderSchoolScreen();
+          break;
+        case 'progress':
+          content = renderProgressScreen();
+          break;
+        case 'profile':
+          content = renderProfileScreen();
+          break;
+      }
+
+      container.innerHTML = badgeHtml + content;
+
+      // Update active tab buttons
+      document.querySelectorAll('.nav-item').forEach(el => {
+        el.classList.toggle('active', el.dataset.tab === currentTab);
+      });
+
+      // Update shell version class
+      const shell = document.getElementById('deviceShell');
+      shell.classList.remove('ver-hybrid', 'ver-a', 'ver-b', 'ver-c');
+      shell.classList.add('ver-' + currentVersion);
+    }
+
+    // --- 1. HOME SCREEN RENDERER ---
+    function renderHomeScreen() {
+      const goalCtaText = isGoalDone ? 'Ulas Materi Hari Ini' : 'Mulai Belajar Sekarang';
+      const goalHeadline = isGoalDone ? 'Hebat! Target Hari Ini Selesai 🎉' : 'Siap untuk 10 menit hari ini?';
+      const goalDesc = isGoalDone ? 'Kamu sudah menyelesaikan 12 kosakata dan 1 sesi listening.' : '10 menit · 12 kata & pola tata bahasa disiapkan PAW AI.';
+
+      // HYBRID (APPROVED B+C DIRECTION) HOME SCREEN
+      if (currentVersion === 'hybrid') {
+        return `
+          <!-- 2. VERSION B PAW LIVING HERO MASCOT WITH INTERACTIVE SPEECH BUBBLE -->
+          <div class="living-paw-hero">
+            <div class="living-paw-header">
+              <div class="living-paw-avatar" id="pawLivingAvatar" onclick="cyclePawSpeech()" title="Ketuk PAW untuk bicara!">
+                ${getPawSvgMarkup(50)}
+                <span class="tap-badge">TAP 🐾</span>
+              </div>
+              <div class="living-paw-bubble" id="pawLivingBubble" onclick="cyclePawSpeech()" title="Ketuk untuk ganti pesan!">
+                <div class="bubble-label-row">
+                  <span class="bubble-author">PAW AI TUTOR · TEMAN BELAJARMU</span>
+                  <span class="bubble-tap-hint">Ketuk 💬</span>
+                </div>
+                <div class="bubble-text" id="pawSpeechText">
+                  ${pawSpeechLibrary[pawSpeechIndex]}
+                </div>
+              </div>
+            </div>
+
+            <!-- 3. VERSION C SMART DAILY FOCUS COCKPIT -->
+            <div style="border-top: 1px solid var(--line-soft); padding-top: 14px; margin-top: 4px;">
+              <span class="f-tag" style="background:var(--sun-soft);color:var(--info);">SMART DAILY FOCUS · COCKPIT</span>
+              <h1 class="f-h1" style="font-size:20px;margin:2px 0 6px;">${goalHeadline}</h1>
+              <p class="f-body" style="margin-bottom:12px;">${goalDesc}</p>
+
+              <!-- TODAY'S SESSION PREVIEW TAGS -->
+              <div class="session-tags-row">
+                <span class="session-tag-chip">📖 8 Vocab Baru</span>
+                <span class="session-tag-chip">🧩 4 Latihan Grammar</span>
+                <span class="session-tag-chip">🎧 1 Dialog Listening</span>
+              </div>
+
+              <!-- 1 PRIMARY CTA -->
+              <button class="btn-primary" onclick="triggerToast('🎯 Meluncurkan sesi harian personal')" style="font-size:15px;">
+                <span>${goalCtaText}</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- DAILY RHYTHM PROGRESS BAR -->
+          <div class="daily-rhythm-card">
+            <div class="daily-rhythm-top">
+              <span style="font-size:13.5px;font-weight:700;color:var(--text);">Target Harianmu</span>
+              <span style="font-size:12px;font-weight:700;color:${isGoalDone ? 'var(--good)' : 'var(--muted)'};">
+                ${isGoalDone ? 'Tuntas 10/10 soal (100%)' : '4/10 soal selesai (40%)'}
+              </span>
+            </div>
+            <div class="daily-rhythm-track">
+              <div class="daily-rhythm-fill" style="width:${isGoalDone ? '100%' : '40%'};background:${isGoalDone ? 'var(--good)' : 'var(--sun-grad)'};"></div>
+            </div>
+          </div>
+
+          <!-- 3-MINUTE QUICK PRACTICE CHIPS -->
+          <div style="display:flex;justify-content:space-between;align-items:center;margin: 18px 4px 10px;">
+            <h2 class="f-h2" style="margin:0;">Latihan Mandiri Cepat</h2>
+            <button style="font-size:12px;font-weight:700;color:var(--accent);border:0;background:none;cursor:pointer;" onclick="switchTab('practice')">Buka Practice →</button>
+          </div>
+
+          <div class="quick-practice-grid">
+            <div class="quick-chip" onclick="switchTab('practice')">
+              <div class="q-icon">🗂️</div>
+              <div>
+                <b style="font-size:13px;display:block;">Flashcards</b>
+                <span style="font-size:11px;color:var(--muted);">15 kata A2 · 3 mnt</span>
+              </div>
+            </div>
+            <div class="quick-chip" onclick="switchTab('practice')">
+              <div class="q-icon">⚡</div>
+              <div>
+                <b style="font-size:13px;display:block;">Latih Rawan</b>
+                <span style="font-size:11px;color:var(--muted);">Past Tense · 3 mnt</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- CLASSROOM REMINDER IF ENROLLED -->
+          ${isClassJoined ? `
+          <div class="f-card" style="border-left:4px solid var(--accent);padding:14px 16px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div>
+                <span style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;">TUGAS KELAS 10A</span>
+                <p style="font-size:14px;font-weight:700;margin:2px 0;">Analytical Exposition Text</p>
+                <span class="f-body" style="font-size:12px;">Batas: Besok, 18:00 (SMAN 1)</span>
+              </div>
+              <button class="btn-secondary" style="width:auto;min-height:36px;padding:0 14px;font-size:12px;" onclick="switchTab('school')">Kerjakan</button>
+            </div>
+          </div>` : ''}
+        `;
+      }
+
+      if (currentVersion === 'a') {
+        // Safe Evolution: Clean Card Layout
+        return `
+          <div class="f-card">
+            <div class="f-tag">SESI HARIAN</div>
+            <h1 class="f-h1">${goalHeadline}</h1>
+            <p class="f-body" style="margin: 6px 0 16px;">${goalDesc}</p>
+            <button class="btn-primary" onclick="triggerToast('🚀 Memulai sesi belajar harian')">
+              <span>${goalCtaText}</span> →
+            </button>
+          </div>
+
+          <div class="f-card">
+            <h2 class="f-h2">Target Hari Ini</h2>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">
+              <span class="f-body">Waktu Belajar: <b>${isGoalDone ? '12/12' : '4/12'} menit</b></span>
+              <span class="f-body">Kosakata: <b>${isGoalDone ? '8/8' : '3/8'} kata</b></span>
+            </div>
+            <div style="height:8px;background:var(--line-soft);border-radius:999px;margin-top:10px;overflow:hidden;">
+              <div style="width:${isGoalDone ? '100%' : '35%'};height:100%;background:var(--sun);"></div>
+            </div>
+          </div>
+
+          <div class="f-card">
+            <h2 class="f-h2">Materi Hari Ini</h2>
+            <div class="checklist-card" style="padding:0;box-shadow:none;border:0;">
+              <div class="check-item">
+                <span>1. Vocabulary: Campus Life</span>
+                <span class="check-dot done">✓</span>
+              </div>
+              <div class="check-item">
+                <span>2. Grammar: Present Perfect</span>
+                <span class="check-dot ${isGoalDone ? 'done' : 'pending'}">${isGoalDone ? '✓' : ''}</span>
+              </div>
+              <div class="check-item">
+                <span>3. Reading: Eco-Friendly City</span>
+                <span class="check-dot ${isGoalDone ? 'done' : 'pending'}">${isGoalDone ? '✓' : ''}</span>
+              </div>
+            </div>
+          </div>
+
+          ${isClassJoined ? `
+          <div class="f-card-soft">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <b style="font-size:13px;color:var(--accent);">PENGINGAT KELAS</b>
+              <span style="font-size:11px;font-weight:700;color:var(--muted);">Besok 23:59</span>
+            </div>
+            <p style="font-size:14px;font-weight:700;margin:4px 0 2px;">Tugas 04: Narrative Writing</p>
+            <p class="f-body" style="font-size:12px;">Kelas 10A · Bahasa Inggris</p>
+          </div>` : ''}
+        `;
+      }
+
+      if (currentVersion === 'b') {
+        // Premium FIEZEL: Mascot-Integrated, Tactile
+        return `
+          <div class="home-hero-card">
+            <div class="companion-banner">
+              <div class="paw-avatar-wrap">
+                ${getPawSvgMarkup(46)}
+              </div>
+              <div class="companion-say">
+                <div class="greet">Halo Rara 👋</div>
+                <div class="headline">${goalHeadline}</div>
+              </div>
+            </div>
+            <p class="f-body" style="margin-bottom: 16px;">${goalDesc}</p>
+            <button class="btn-primary" onclick="triggerToast('⭐ Membuka sesi adaptif pilihan PAW')">
+              <span>${goalCtaText}</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </button>
+          </div>
+
+          <div class="today-rhythm-strip">
+            <div class="rhythm-box">
+              <span class="val" style="color:#C2402C;">🔥 ${streakCount} Hari</span>
+              <span class="lbl">Streak Aktif</span>
+            </div>
+            <div class="rhythm-box">
+              <span class="val" style="color:var(--text);">${isGoalDone ? '100%' : '35%'}</span>
+              <span class="lbl">Ritme Hari Ini</span>
+            </div>
+            <div class="rhythm-box">
+              <span class="val" style="color:#2E8B69;">A2</span>
+              <span class="lbl">Level Belajar</span>
+            </div>
+          </div>
+
+          <div class="f-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+              <h2 class="f-h2" style="margin:0;">Latihan Cepat 3 Menit</h2>
+              <span class="f-tag" style="margin:0;">BITE-SIZED</span>
+            </div>
+            <div class="quick-practice-grid">
+              <div class="quick-chip" onclick="switchTab('practice')">
+                <div class="q-icon">📖</div>
+                <div>
+                  <b style="font-size:13px;display:block;">Vocabulary</b>
+                  <span style="font-size:11px;color:var(--muted);">Review 8 kata</span>
+                </div>
+              </div>
+              <div class="quick-chip" onclick="switchTab('practice')">
+                <div class="q-icon">⚡</div>
+                <div>
+                  <b style="font-size:13px;display:block;">Grammar Drill</b>
+                  <span style="font-size:11px;color:var(--muted);">5 soal kilat</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          ${isClassJoined ? `
+          <div class="f-card-core">
+            <div class="f-tag" style="background:rgba(255,199,0,0.2);color:#FFC700;">KELAS DIGITAL</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div>
+                <b style="font-size:16px;">Tugas Bab 4: Passive Voice</b>
+                <p class="muted" style="font-size:12px;margin-top:2px;">English 10A · Batas besok siang</p>
+              </div>
+              <button style="padding:6px 14px;border-radius:12px;background:var(--sun);color:var(--text);font-weight:700;font-size:12px;border:0;cursor:pointer;" onclick="switchTab('school')">Buka</button>
+            </div>
+          </div>` : ''}
+        `;
+      }
+
+      // Version C: Senior UX Architect Proposal (The Optimal Cockpit)
+      return `
+        <!-- SMART DAILY COCKPIT -->
+        <div class="home-hero-card" style="border-top: 4px solid var(--sun);">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">
+            <div>
+              <span class="f-tag" style="background:#FAF3DD;color:#7A5F1B;">SMART DAILY FOCUS · PAW AI</span>
+              <h1 class="f-h1" style="font-size:20px;margin-top:4px;">${goalHeadline}</h1>
+            </div>
+            <div class="paw-avatar-wrap" style="width:52px;height:52px;border-radius:16px;">
+              ${getPawSvgMarkup(38)}
+            </div>
+          </div>
+
+          <p class="f-body" style="font-size:13px;line-height:1.5;margin-bottom:14px;">
+            ${goalDesc}
+          </p>
+
+          <!-- TODAY'S SESSIONS PREVIEW CHIPS -->
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;">
+            <span style="font-size:11px;font-weight:700;padding:4px 9px;border-radius:6px;background:var(--panel-soft);color:var(--text);border:1px solid var(--line);">📖 8 Vocab</span>
+            <span style="font-size:11px;font-weight:700;padding:4px 9px;border-radius:6px;background:var(--panel-soft);color:var(--text);border:1px solid var(--line);">🧩 4 Grammar</span>
+            <span style="font-size:11px;font-weight:700;padding:4px 9px;border-radius:6px;background:var(--panel-soft);color:var(--text);border:1px solid var(--line);">🎧 1 Listening</span>
+          </div>
+
+          <button class="btn-primary" onclick="triggerToast('🎯 Meluncurkan sesi harian')">
+            <span>${goalCtaText}</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </button>
+        </div>
+
+        <!-- PROGRESS & RHYTHM BAR -->
+        <div class="f-card" style="padding:14px 18px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <span style="font-size:13px;font-weight:700;color:var(--text);">Target Hari Ini</span>
+            <span style="font-size:12px;font-weight:700;color:${isGoalDone ? 'var(--good)' : 'var(--muted)'};">
+              ${isGoalDone ? 'Tuntas 10/10 soal (100%)' : '4/10 soal selesai'}
+            </span>
+          </div>
+          <div style="height:8px;background:var(--line-soft);border-radius:999px;overflow:hidden;">
+            <div style="width:${isGoalDone ? '100%' : '40%'};height:100%;background:${isGoalDone ? 'var(--good)' : 'var(--sun-grad)'};transition:width 0.4s;"></div>
+          </div>
+        </div>
+
+        <!-- QUICK PRACTICE SECTION -->
+        <div style="display:flex;justify-content:space-between;align-items:center;margin: 20px 4px 10px;">
+          <h2 class="f-h2" style="margin:0;">Latihan Mandiri Cepat</h2>
+          <button style="font-size:12px;font-weight:700;color:var(--accent);border:0;background:none;cursor:pointer;" onclick="switchTab('practice')">Lihat Semua →</button>
+        </div>
+
+        <div class="quick-practice-grid">
+          <div class="quick-chip" onclick="switchTab('practice')">
+            <div class="q-icon">🗂️</div>
+            <div>
+              <b style="font-size:13px;display:block;">Flashcards</b>
+              <span style="font-size:11px;color:var(--muted);">15 kata A2</span>
+            </div>
+          </div>
+          <div class="quick-chip" onclick="switchTab('practice')">
+            <div class="q-icon">🎯</div>
+            <div>
+              <b style="font-size:13px;display:block;">Latih Lemah</b>
+              <span style="font-size:11px;color:var(--muted);">Past Tense (3 rawan)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CLASSROOM REMINDER IF ENROLLED -->
+        ${isClassJoined ? `
+        <div class="f-card" style="border-left:4px solid var(--accent);padding:14px 16px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <span style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;">TUGAS KELAS 10A</span>
+              <p style="font-size:14px;font-weight:700;margin:2px 0;">Analytical Exposition Text</p>
+              <span class="f-body" style="font-size:12px;">Batas pengumpulan: Besok, 18:00</span>
+            </div>
+            <button class="btn-secondary" style="width:auto;min-height:36px;padding:0 14px;font-size:12px;" onclick="switchTab('school')">Kerjakan</button>
+          </div>
+        </div>` : ''}
+      `;
+    }
+
+    // --- 2. PRACTICE SCREEN RENDERER ---
+    function renderPracticeScreen() {
+      return `
+        <!-- 4. VERSION C PRACTICE ARENA: CONTINUE LEARNING HERO -->
+        <div class="continue-learning-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <span class="f-tag" style="background:#FFFFFF;color:var(--text);margin:0;">LANJUTKAN LATIHAN TERAKHIR</span>
+            <span style="font-size:12px;font-weight:700;color:#7A5F1B;">Soal 7 / 10</span>
+          </div>
+          <h2 class="f-h2" style="font-size:18px;margin:4px 0 2px;">Grammar: Passive Voice in Past Tense</h2>
+          <p class="f-body" style="font-size:13px;color:#57452E;margin-bottom:14px;">
+            Sesi terhenti di soal ke-7 dari 10. Progresmu tersimpan aman di cloud.
+          </p>
+          <div style="display:flex;gap:10px;">
+            <button class="btn-primary" style="flex:1;min-height:46px;font-size:14px;" onclick="triggerToast('▶️ Melanjutkan latihan Passive Voice...')">
+              Lanjutkan (7/10) →
+            </button>
+            <button class="btn-secondary" style="width:auto;min-height:46px;padding:0 14px;" onclick="triggerToast('🔄 Mengulang materi ini dari awal')">
+              Ulang
+            </button>
+          </div>
+        </div>
+
+        <!-- 2x2 SKILL MATRIX WITH CIRCULAR PROGRESS RINGS -->
+        <div style="display:flex;justify-content:space-between;align-items:center;margin:16px 4px 10px;">
+          <h2 class="f-h2" style="margin:0;">Matriks Keterampilan 2×2</h2>
+          <span class="f-body" style="font-size:12px;">Level Aktif: <b>A2</b></span>
+        </div>
+
+        <div class="skill-matrix-2x2">
+          <!-- 1. VOCABULARY RING -->
+          <div class="skill-matrix-card" onclick="triggerToast('Membuka modul Vocabulary A2')">
+            <div class="skill-card-top">
+              <div class="skill-icon-pill">📖</div>
+              <div class="skill-ring-wrap" title="Penguasaan: 78%">
+                <svg class="skill-ring-svg" viewBox="0 0 36 36">
+                  <path class="ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                  <path class="ring-fill" stroke="var(--sun)" stroke-dasharray="78, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                </svg>
+                <span class="ring-text">78%</span>
+              </div>
+            </div>
+            <div class="skill-title-block">
+              <b>Vocabulary</b>
+              <span>Spaced repetition flashcards</span>
+            </div>
+            <span class="skill-submetric">84 / 100 Kata A2</span>
+          </div>
+
+          <!-- 2. GRAMMAR RING -->
+          <div class="skill-matrix-card" onclick="triggerToast('Membuka modul Grammar A2')">
+            <div class="skill-card-top">
+              <div class="skill-icon-pill">🧩</div>
+              <div class="skill-ring-wrap" title="Penguasaan: 65%">
+                <svg class="skill-ring-svg" viewBox="0 0 36 36">
+                  <path class="ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                  <path class="ring-fill" stroke="#C2402C" stroke-dasharray="65, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                </svg>
+                <span class="ring-text">65%</span>
+              </div>
+            </div>
+            <div class="skill-title-block">
+              <b>Grammar</b>
+              <span>Pola kalimat & aturan</span>
+            </div>
+            <span class="skill-submetric">12 / 18 Topik</span>
+          </div>
+
+          <!-- 3. READING RING -->
+          <div class="skill-matrix-card" onclick="triggerToast('Membuka modul Reading A2')">
+            <div class="skill-card-top">
+              <div class="skill-icon-pill">📑</div>
+              <div class="skill-ring-wrap" title="Penguasaan: 82%">
+                <svg class="skill-ring-svg" viewBox="0 0 36 36">
+                  <path class="ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                  <path class="ring-fill" stroke="#2E8B69" stroke-dasharray="82, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                </svg>
+                <span class="ring-text">82%</span>
+              </div>
+            </div>
+            <div class="skill-title-block">
+              <b>Reading</b>
+              <span>Pemahaman bacaan teks</span>
+            </div>
+            <span class="skill-submetric">16 / 20 Teks</span>
+          </div>
+
+          <!-- 4. SPEAKING & LISTENING RING -->
+          <div class="skill-matrix-card" onclick="triggerToast('Membuka modul Speaking & Listening')">
+            <div class="skill-card-top">
+              <div class="skill-icon-pill">🎧</div>
+              <div class="skill-ring-wrap" title="Penguasaan: 70%">
+                <svg class="skill-ring-svg" viewBox="0 0 36 36">
+                  <path class="ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                  <path class="ring-fill" stroke="#D48220" stroke-dasharray="70, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                </svg>
+                <span class="ring-text">70%</span>
+              </div>
+            </div>
+            <div class="skill-title-block">
+              <b>Speaking & Lab</b>
+              <span>Audio dialog & pelafalan</span>
+            </div>
+            <span class="skill-submetric">28 Sesi Lab</span>
+          </div>
+        </div>
+
+        <!-- AI WEAK-SPOT BOOSTER -->
+        <div class="ai-booster-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="font-size:16px;">💡</span>
+              <b style="font-size:13.5px;color:var(--info);">Rekomendasi Penguatan PAW (AI Weak-Spot Booster)</b>
+            </div>
+            <span class="f-tag" style="background:#FFF3C4;color:#7A5F1B;margin:0;">ADAPTIVE</span>
+          </div>
+          <p class="f-body" style="font-size:13px;margin-bottom:12px;">
+            Akurasi kamu pada <b>Irregular Verbs</b> turun di bawah 60% dalam 3 hari terakhir (soal bentuk lampau V2/V3).
+          </p>
+          <button class="btn-secondary" onclick="triggerToast('🎯 Membuka 5 soal kilat Irregular Verbs')">
+            Latih 5 Soal Pemulihan Sekarang →
+          </button>
+        </div>
+
+        <!-- SECONDARY MODULES -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div class="f-card" style="padding:12px;margin:0;cursor:pointer;" onclick="triggerToast('Membuka Writing Studio')">
+            <b style="font-size:13px;display:block;">✍️ Writing Studio</b>
+            <span class="f-body" style="font-size:11px;">Rubrik CEFR · 55%</span>
+          </div>
+          <div class="f-card" style="padding:12px;margin:0;cursor:pointer;" onclick="triggerToast('Membuka Perpustakaan Cerita')">
+            <b style="font-size:13px;display:block;">📚 Library</b>
+            <span class="f-body" style="font-size:11px;">24 Cerita Bertingkat</span>
+          </div>
+        </div>
+      `;
+    }
+
+    // --- 3. SCHOOL SCREEN RENDERER ---
+    function renderSchoolScreen() {
+      if (!isClassJoined) {
+        // UNENROLLED STATE (6-BOX CODE ENTRY TOGGLE)
+        return `
+          <div class="school-empty-card">
+            <div style="width:68px;height:68px;border-radius:22px;background:var(--panel-soft);margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:34px;box-shadow:var(--shadow-sm);">
+              🏫
+            </div>
+            <h1 class="f-h1" style="font-size:21px;">Ruang Kelas Digital</h1>
+            <p class="f-body" style="margin:8px 0 20px;">
+              Gabung ke kelas sekolahmu untuk menerima tugas guru, latihan ulangan, dan belajar bersama teman sekelas.
+            </p>
+
+            <div style="background:var(--panel-soft);border:1.5px solid var(--line);border-radius:var(--radius-md);padding:18px;margin-bottom:16px;">
+              <span style="font-size:11.5px;font-weight:800;color:var(--muted);display:block;margin-bottom:10px;letter-spacing:0.04em;">
+                MASUKKAN KODE KELAS (6 KOTAK)
+              </span>
+              <!-- 6-BOX CODE ENTRY -->
+              <div class="code-input-mock">
+                <div class="code-char">E</div>
+                <div class="code-char">N</div>
+                <div class="code-char">G</div>
+                <div class="code-char">1</div>
+                <div class="code-char">0</div>
+                <div class="code-char">A</div>
+              </div>
+              <button class="btn-primary" onclick="toggleClassState();triggerToast('🎉 Berhasil bergabung ke Kelas 10A!')">
+                Gabung Kelas Sekarang →
+              </button>
+            </div>
+
+            <p class="f-body" style="font-size:12px;">
+              Belum punya kode? Minta kepada guru Bahasa Inggrismu di sekolah.
+            </p>
+          </div>
+        `;
+      }
+
+      // ENROLLED STATE (WITH ASSIGNMENT COUNTDOWN)
+      return `
+        <div class="school-card-active">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div class="class-header-pill">
+              <span>🏫 SMAN 1 Jakarta</span>
+              <span>·</span>
+              <b>English Class 10A</b>
+            </div>
+            <button style="font-size:12px;font-weight:700;color:var(--muted);border:0;background:none;cursor:pointer;" onclick="toggleClassState()">Ganti / Keluar</button>
+          </div>
+
+          <h1 class="f-h1" style="font-size:20px;margin:2px 0 4px;">Bahasa Inggris Kelas 10</h1>
+          <p class="f-body" style="font-size:13px;">Guru: <b>Budi Santoso, M.Pd.</b> · 34 Siswa Terdaftar</p>
+        </div>
+
+        <!-- UPCOMING ASSIGNMENT WITH LIVE COUNTDOWN BADGE -->
+        <div class="f-card" style="border-top:4px solid var(--accent);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <span class="f-tag" style="background:var(--accent-soft);color:var(--accent);margin:0;">TUGAS BERIKUTNYA</span>
+            <!-- COUNTDOWN BADGE -->
+            <span class="countdown-pill">
+              ⏳ Sisa 18 Jam 42 Menit
+            </span>
+          </div>
+          <h2 class="f-h2" style="font-size:17px;margin:4px 0 2px;">Tugas 04: Hortatory Exposition Text</h2>
+          <p class="f-body" style="font-size:13px;margin-bottom:14px;">15 soal pilihan ganda + analisis argumen teks bacaan kurikulum merdeka.</p>
+          <button class="btn-primary" onclick="triggerToast('Membuka lembar tugas...')">
+            Kerjakan Tugas Sekarang →
+          </button>
+        </div>
+
+        <!-- EXAM READINESS GAUGE -->
+        <div class="f-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <h2 class="f-h2" style="margin:0;">Kesiapan Ujian Semester (PAS)</h2>
+            <span style="font-size:16px;font-weight:800;color:#2E8B69;">84% Siap</span>
+          </div>
+          <div style="height:8px;background:var(--line-soft);border-radius:999px;overflow:hidden;margin-bottom:10px;">
+            <div style="width:84%;height:100%;background:var(--good);"></div>
+          </div>
+          <p class="f-body" style="font-size:12px;">
+            Kamu sudah menguasai 11 dari 13 indikator kompetensi semester ganjil.
+          </p>
+        </div>
+
+        <!-- TEACHER ANNOUNCEMENT -->
+        <div class="f-card">
+          <h2 class="f-h2" style="margin-bottom:10px;">Catatan Guru</h2>
+          <div class="teacher-note-box">
+            <div class="teacher-avatar">BS</div>
+            <div>
+              <b style="font-size:14px;color:var(--text);">Pak Budi Santoso</b>
+              <span class="f-body" style="font-size:11px;display:block;margin-bottom:4px;">Kemarin, 14:20</span>
+              <p class="f-body" style="font-size:13px;color:var(--text);">
+                "Anak-anak kelas 10A, harap selesaikan latihan Passive Voice di tab Practice sebelum mengerjakan Tugas 04 besok ya."
+              </p>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // --- 4. PROGRESS SCREEN RENDERER ---
+    function renderProgressScreen() {
+      return `
+        <!-- 6. VERSION C PROGRESS: CEFR ROADMAP (WITH "YOU ARE HERE" PIN) -->
+        <div class="cefr-track-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <span class="f-tag">STANDAR INTERNASIONAL CEFR</span>
+              <h1 class="f-h1" style="font-size:20px;margin-top:2px;">Jenjang Kemampuanmu</h1>
+            </div>
+            <div style="text-align:right;">
+              <span style="font-size:24px;font-weight:800;color:var(--text);">A2</span>
+              <span class="f-body" style="font-size:11px;display:block;">Waystage</span>
+            </div>
+          </div>
+
+          <!-- ROADMAP MILESTONES -->
+          <div class="cefr-stations">
+            <div class="cefr-track-line">
+              <div class="cefr-track-fill"></div>
+            </div>
+            <div class="cefr-station passed" title="Level A1 - Dasar Tuntas">✓ A1</div>
+            
+            <!-- CURRENT STATION WITH "YOU ARE HERE" PIN -->
+            <div class="cefr-station current-hybrid" title="Level A2 - Kamu Di Sini">
+              <div class="you-are-here-badge">📍 KAMU DI SINI</div>
+              A2
+            </div>
+
+            <div class="cefr-station" title="Level B1 - Menengah">B1</div>
+            <div class="cefr-station" title="Level B2 - Lanjutan">B2</div>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px;">
+            <span class="f-body" style="font-size:12px;">Menuju Level B1: <b>65% tuntas</b> (85 kata lagi)</span>
+            <button style="font-size:12px;font-weight:700;color:var(--accent);border:0;background:none;cursor:pointer;" onclick="triggerToast('Syarat B1: Kuasai 250 kata baru & skor ujian 80%')">Lihat Syarat →</button>
+          </div>
+        </div>
+
+        <!-- 7-DAY ACTIVITY BAR CHART -->
+        <div class="f-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <h2 class="f-h2" style="margin:0;">Aktivitas 7 Hari Terakhir</h2>
+            <span class="f-body" style="font-size:13px;">Total: <b>84 Menit</b></span>
+          </div>
+
+          <div class="weekly-bars">
+            <div class="w-col"><div class="w-bar" style="height:45px;"></div><span class="w-lbl">Sen</span></div>
+            <div class="w-col"><div class="w-bar active" style="height:70px;"></div><span class="w-lbl">Sel</span></div>
+            <div class="w-col"><div class="w-bar" style="height:35px;"></div><span class="w-lbl">Rab</span></div>
+            <div class="w-col"><div class="w-bar active" style="height:80px;"></div><span class="w-lbl">Kam</span></div>
+            <div class="w-col"><div class="w-bar active" style="height:92px;"></div><span class="w-lbl">Jum</span></div>
+            <div class="w-col"><div class="w-bar active" style="height:62px;"></div><span class="w-lbl">Sab</span></div>
+            <div class="w-col"><div class="w-bar" style="height:22px;"></div><span class="w-lbl">Min</span></div>
+          </div>
+          <p class="f-body" style="font-size:12px;text-align:center;margin-top:4px;">
+            5 dari 7 hari aktif belajar minggu ini. Konsistensi sangat baik! 🔥
+          </p>
+        </div>
+
+        <!-- 5-SKILL MASTERY BARS -->
+        <div class="f-card">
+          <h2 class="f-h2" style="margin-bottom:12px;">Penguasaan 5 Keterampilan</h2>
+
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:4px;">
+                <span>Vocabulary</span>
+                <b>78%</b>
+              </div>
+              <div style="height:6px;background:var(--line-soft);border-radius:999px;overflow:hidden;">
+                <div style="width:78%;height:100%;background:var(--sun);"></div>
+              </div>
+            </div>
+
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:4px;">
+                <span>Reading</span>
+                <b>82%</b>
+              </div>
+              <div style="height:6px;background:var(--line-soft);border-radius:999px;overflow:hidden;">
+                <div style="width:82%;height:100%;background:#2E8B69;"></div>
+              </div>
+            </div>
+
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:4px;">
+                <span>Speaking & Listening</span>
+                <b>70%</b>
+              </div>
+              <div style="height:6px;background:var(--line-soft);border-radius:999px;overflow:hidden;">
+                <div style="width:70%;height:100%;background:#D48220;"></div>
+              </div>
+            </div>
+
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:4px;">
+                <span>Grammar</span>
+                <b>65%</b>
+              </div>
+              <div style="height:6px;background:var(--line-soft);border-radius:999px;overflow:hidden;">
+                <div style="width:65%;height:100%;background:#C2402C;"></div>
+              </div>
+            </div>
+
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:4px;">
+                <span>Writing</span>
+                <b>55%</b>
+              </div>
+              <div style="height:6px;background:var(--line-soft);border-radius:999px;overflow:hidden;">
+                <div style="width:55%;height:100%;background:#8E5094;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ACHIEVEMENTS / PRASASTI -->
+        <div class="f-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <h2 class="f-h2" style="margin:0;">Prasasti & Lencana</h2>
+            <span class="f-body" style="font-size:12px;">3/12 Terbuka</span>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;text-align:center;">
+            <div style="background:var(--panel-soft);padding:12px 8px;border-radius:12px;border:1px solid var(--line);">
+              <span style="font-size:24px;">🔥</span>
+              <b style="font-size:11px;display:block;margin-top:4px;">5-Day Streak</b>
+            </div>
+            <div style="background:var(--panel-soft);padding:12px 8px;border-radius:12px;border:1px solid var(--line);">
+              <span style="font-size:24px;">🎯</span>
+              <b style="font-size:11px;display:block;margin-top:4px;">A1 Pioneer</b>
+            </div>
+            <div style="background:var(--panel-soft);padding:12px 8px;border-radius:12px;border:1px solid var(--line);">
+              <span style="font-size:24px;">📚</span>
+              <b style="font-size:11px;display:block;margin-top:4px;">Bookworm I</b>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // --- 5. PROFILE SCREEN RENDERER ---
+    function renderProfileScreen() {
+      return `
+        <!-- 7. VERSION C PROFILE: LEARNER AVATAR & INFO -->
+        <div class="profile-hero">
+          <div class="profile-avatar-big">
+            ${getPawSvgMarkup(54)}
+            <div class="badge-edit-avatar" onclick="triggerToast('✏️ Buka editor avatar & profil')">✏️</div>
+          </div>
+          <h1 class="f-h1" style="font-size:22px;">Rara Kirana</h1>
+          <p class="f-body" style="font-size:13px;margin:2px 0 8px;">@rara_belajar · Kelas 10 SMAN 1 Jakarta</p>
+          <span class="f-tag" style="font-size:11.5px;padding:4px 14px;">⭐ LEVEL A2 INTERMEDIATE</span>
+        </div>
+
+        <!-- LEARNER STATS STRIP -->
+        <div class="today-rhythm-strip">
+          <div class="rhythm-box">
+            <span class="val">420</span>
+            <span class="lbl">Poin Belajar</span>
+          </div>
+          <div class="rhythm-box">
+            <span class="val">14</span>
+            <span class="lbl">Teman</span>
+          </div>
+          <div class="rhythm-box">
+            <span class="val">#3</span>
+            <span class="lbl">Peringkat Kelas</span>
+          </div>
+        </div>
+
+        <!-- FRIENDS LIST WITH '👏 SORAK' CHEER BUTTONS -->
+        <div class="f-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <h2 class="f-h2" style="margin:0;">Teman Belajar</h2>
+            <button class="btn-secondary" style="width:auto;min-height:32px;padding:0 12px;font-size:11px;" onclick="triggerToast('🔗 Tautan undangan disalin ke clipboard!')">
+              + Ajak Teman
+            </button>
+          </div>
+
+          <!-- FRIEND 1 -->
+          <div class="friend-row">
+            <div class="friend-info">
+              <div class="friend-avatar">D</div>
+              <div>
+                <b style="font-size:13px;color:var(--text);display:block;">Dimas Arya</b>
+                <span class="f-body" style="font-size:11px;">Aktif 10m lalu · 🔥 7 hari</span>
+              </div>
+            </div>
+            <button class="btn-cheer" onclick="cheerFriend('Dimas')">
+              👏 Sorak
+            </button>
+          </div>
+
+          <!-- FRIEND 2 -->
+          <div class="friend-row">
+            <div class="friend-info">
+              <div class="friend-avatar" style="background:#FFE6DE;">S</div>
+              <div>
+                <b style="font-size:13px;color:var(--text);display:block;">Siti Aisyah</b>
+                <span class="f-body" style="font-size:11px;">Aktif kemarin · 🔥 12 hari</span>
+              </div>
+            </div>
+            <button class="btn-cheer" onclick="cheerFriend('Siti')">
+              👏 Sorak
+            </button>
+          </div>
+
+          <!-- FRIEND 3 -->
+          <div class="friend-row">
+            <div class="friend-info">
+              <div class="friend-avatar" style="background:#E2F3EA;">F</div>
+              <div>
+                <b style="font-size:13px;color:var(--text);display:block;">Farel Reza</b>
+                <span class="f-body" style="font-size:11px;">Aktif 2j lalu · 🔥 3 hari</span>
+              </div>
+            </div>
+            <button class="btn-cheer" onclick="cheerFriend('Farel')">
+              👏 Sorak
+            </button>
+          </div>
+        </div>
+
+        <!-- WEEKLY LEADERBOARD -->
+        <div class="f-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <h2 class="f-h2" style="margin:0;">Papan Peringkat Mingguan</h2>
+            <span class="f-body" style="font-size:11px;">Sisa 2 Hari</span>
+          </div>
+
+          <div class="leaderboard-row rank-1">
+            <span class="rank-num">🥇</span>
+            <div style="flex:1;">
+              <b style="font-size:13px;">Budi Pratama</b>
+              <span class="f-body" style="font-size:11px;display:block;">580 Poin</span>
+            </div>
+            <span style="font-size:12px;font-weight:700;color:#C9A24B;">Level A2</span>
+          </div>
+
+          <div class="leaderboard-row">
+            <span class="rank-num">🥈</span>
+            <div style="flex:1;">
+              <b style="font-size:13px;">Siti Aisyah</b>
+              <span class="f-body" style="font-size:11px;display:block;">490 Poin</span>
+            </div>
+            <span style="font-size:12px;font-weight:700;color:var(--muted);">Level B1</span>
+          </div>
+
+          <div class="leaderboard-row" style="background:#FFF8E8;border-color:var(--sun-deep);box-shadow:0 2px 8px rgba(255,199,0,0.15);">
+            <span class="rank-num" style="color:var(--text);">🥉</span>
+            <div style="flex:1;">
+              <b style="font-size:13px;color:#7A5F1B;">Rara Kirana (Kamu)</b>
+              <span class="f-body" style="font-size:11px;display:block;">420 Poin</span>
+            </div>
+            <span style="font-size:12px;font-weight:800;color:var(--info);">Level A2</span>
+          </div>
+
+          <div class="leaderboard-row">
+            <span class="rank-num">4</span>
+            <div style="flex:1;">
+              <b style="font-size:13px;">Dimas Arya</b>
+              <span class="f-body" style="font-size:11px;display:block;">395 Poin</span>
+            </div>
+            <span style="font-size:12px;font-weight:700;color:var(--muted);">Level A2</span>
+          </div>
+        </div>
+
+        <!-- SETTINGS SHORTCUT CARD -->
+        <div class="f-card-soft">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <b style="font-size:14px;color:var(--text);">⚙️ Pengaturan Akun & Pembelajaran</b>
+              <p class="f-body" style="font-size:12px;margin-top:2px;">Suara neural AI, pengingat harian, dan sinkronisasi Puter</p>
+            </div>
+            <button class="top-btn" onclick="triggerToast('⚙️ Membuka modal pengaturan akun & preferensi')" style="flex-shrink:0;">
+              ⚙️
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function cheerFriend(name) {
+      triggerToast(`👏 Sorakan terkirim ke ${name}! +5 XP Semangat!`);
+    }
+
+    // TAB SWITCHER
+    function switchTab(tab) {
+      currentTab = tab;
+      render();
+    }
+
+    // 8. VERSION SWITCHER (APPROVED HYBRID BY DEFAULT)
+    function selectVersion(v) {
+      currentVersion = v;
+      document.getElementById('btnVerHybrid').classList.toggle('active', v === 'hybrid');
+      document.getElementById('btnVerA').classList.toggle('active', v === 'a');
+      document.getElementById('btnVerB').classList.toggle('active', v === 'b');
+      document.getElementById('btnVerC').classList.toggle('active', v === 'c');
+      render();
+    }
+
+    // VIEWPORT SWITCHER
+    function toggleViewport(mode) {
+      const shell = document.getElementById('deviceShell');
+      shell.classList.remove('mode-mobile', 'mode-responsive');
+      shell.classList.add('mode-' + mode);
+      document.getElementById('btnVpMobile').classList.toggle('active', mode === 'mobile');
+      document.getElementById('btnVpResp').classList.toggle('active', mode === 'responsive');
+    }
+
+    // STATE TOGGLERS
+    function toggleClassState() {
+      isClassJoined = !isClassJoined;
+      const btn = document.getElementById('btnToggleClassState');
+      btn.classList.toggle('active', isClassJoined);
+      btn.textContent = isClassJoined ? '🏫 Kelas: Terdaftar' : '🏫 Kelas: Belum Masuk';
+      render();
+    }
+
+    function toggleGoalDone() {
+      isGoalDone = !isGoalDone;
+      const btn = document.getElementById('btnToggleGoal');
+      btn.classList.toggle('active', isGoalDone);
+      btn.textContent = isGoalDone ? '🎯 Goal: Selesai (100%)' : '🎯 Goal: In-Progress';
+      render();
+    }
+
+    // TOAST HELPER
+    let toastTimer = null;
+    function triggerToast(msg) {
+      const toast = document.getElementById('simToast');
+      document.getElementById('toastMsg').textContent = msg;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2600);
+    }
+
+    // SPEC MODAL HELPERS
+    function openSpecModal() {
+      const modal = document.getElementById('specModal');
+      const title = document.getElementById('specModalTitle');
+      const body = document.getElementById('specModalBody');
+
+      if (currentVersion === 'hybrid') {
+        title.textContent = '⭐ APPROVED HYBRID: B+C Direction';
+        body.innerHTML = `
+          <b>Harmoni Dua Arah Desain Terbaik:</b><br>
+          • <b>1. Bottom Navigation Bar (Ver B):</b> 5 tab (Practice, School, Home, Progress, Profile) dengan gold pill active bounce physics dan elevated round Home center button.<br>
+          • <b>2. PAW Living Hero (Ver B):</b> Maskot ekspresif interaktif di puncak Home yang merespons ketukan dengan dialog coach cerdas dan merayakan pertambahan streak.<br>
+          • <b>3. Smart Daily Focus Cockpit (Ver C):</b> 1 CTA utama tanpa ambiguitas, session preview chips (8 Vocab, 4 Grammar, 1 Listening), daily rhythm progress bar, dan 3-minute quick practice chips.<br>
+          • <b>4. Practice Arena (Ver C):</b> Hero card 'Lanjutkan Latihan', matriks 2x2 skill mandiri lengkap dengan circular progress rings (Vocab 78%, Grammar 65%, Reading 82%, Speaking 70%), dan AI weak-spot booster.<br>
+          • <b>5. School Screen (Ver C):</b> Ruang kelas digital ceria dengan countdown deadline tugas (Sisa 18 Jam) & toggle kode kelas 6 kotak jika belum terdaftar.<br>
+          • <b>6. Progress Screen (Ver C):</b> Roadmap jenjang CEFR A1→B2 dengan pin 'YOU ARE HERE' berdenyut pada level A2, grafik batang 7 hari (84 menit), dan radar 5 kompetensi.<br>
+          • <b>7. Profile Screen (Ver C):</b> Identitas murid, lencana level A2, daftar teman dengan tombol interaktif '👏 Sorak', leaderboard mingguan, dan shortcut pengaturan akun.<br>
+          • <b>8. Pilihan Desain:</b> [⭐ APPROVED HYBRID (B+C)] disetujui sebagai default resmi.
+        `;
+      } else if (currentVersion === 'a') {
+        title.textContent = 'Version A: Safe Evolution';
+        body.innerHTML = `
+          <b>Karakteristik:</b><br>
+          • Memperbaiki ritme kartu dan kontras warna FIEZEL yang ada.<br>
+          • Memindahkan 5 tab navigasi: Practice, School, Home, Progress, Profile.<br>
+          • Home menggunakan tata letak kartu stabil, Progress memadatkan statistik ke 3 metrik inti.<br>
+          • Paling minim perubahan struktural, risiko adaptasi murid rendah.
+        `;
+      } else if (currentVersion === 'b') {
+        title.textContent = 'Version B: Premium FIEZEL';
+        body.innerHTML = `
+          <b>Karakteristik:</b><br>
+          • Visual hangat dan ekspresif: Warm Paper (#FFF9EE) + Solar Gold (#FFC700).<br>
+          • Taktil 3D Lift pada tombol utama dan kartu interaktif.<br>
+          • Integrasi ekspresi maskot PAW di setiap layar sapaan.<br>
+          • Floating glass dock navigasi dengan tombol Home menonjol di tengah.<br>
+          • Memberikan identitas premium ala Duolingo namun dengan tone hangat khas FIEZEL.
+        `;
+      } else {
+        title.textContent = 'Version C: Senior UX Architect Proposal ⭐';
+        body.innerHTML = `
+          <b>Karakteristik Pilihan Senior Designer:</b><br>
+          • <b>Home (Smart Cockpit):</b> Menjawab langsung 3 pertanyaan murid: "Mau belajar apa sekarang?", "Bagaimana pencapaianku hari ini?", "Apa berikutnya?". Satu CTA utama tanpa kebingungan.<br>
+          • <b>Practice (Training Hub):</b> Anchor "Lanjutkan Latihan" prominent di paling atas, diikuti matriks 2x2 skill (Vocab, Grammar, Reading, Speaking/Listening) + booster materi rawan lupa.<br>
+          • <b>School (Ruang Kelas Ringan):</b> Bukan LMS kaku, melainkan ruang kelas digital ceria dengan sisa waktu tugas, kesiapan ujian semester, dan catatan audio guru.<br>
+          • <b>Progress (Roadmap CEFR):</b> Menghilangkan jargon developer (BKT/OLM). Menampilkan jalur A1→A2→B1 yang nyata, grafik 7 hari, dan radar 5 skill.<br>
+          • <b>Profile (Hub Murid & Sosial):</b> Identitas murid, lencana level, leaderboard kelas, sorakan teman, dan gear pengaturan di pojok kanan atas.
+        `;
+      }
+
+      modal.classList.add('open');
+    }
+
+    function closeSpecModal() {
+      document.getElementById('specModal').classList.remove('open');
+    }
+
+    // INITIAL MOUNT
+    render();
+  </script>
+</body>
+</html>

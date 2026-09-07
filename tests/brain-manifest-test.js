@@ -104,7 +104,7 @@ test('klaim otoritas kunci sesuai temuan council: memory aktif, bktUnlock bayang
   assert.strictEqual(manifest.authorityMap.bktUnlock, 'shadow');
 });
 
-test('otoritas off DITURUNKAN dari app.js, bukan dihafal sebagai literal', () => {
+test('otoritas off DITURUNKAN dari permukaan aplikasi, bukan dihafal sebagai literal', () => {
   // KENAPA GATE INI DITULIS ULANG. Versi lama memasak jawabannya ke dalam assert:
   // `stepTutor === 'off'` dan `productionGrader === 'off'`, dengan komentar "nol pemanggil
   // di app.js". Klaim itu berhenti benar ketika C5 menyambungkan keduanya (tuntunan langkah
@@ -115,21 +115,39 @@ test('otoritas off DITURUNKAN dari app.js, bukan dihafal sebagai literal', () =>
   // Bentuk sekarang membaca app.js dan menuntut kesepakatan dua arah: 'off' berarti benar-
   // benar nol pemanggil, dan nol pemanggil berarti bukan 'active'. (Pembacaan halaman/
   // precache-nya ada di tests/brain-page-wiring-test.js W8 — di sini yang diuji isi petanya.)
-  const appSource = fs.readFileSync(path.join(__fzRoot, 'app.js'), 'utf8');
-  const stripped = appSource
+  // KENAPA BUKAN app.js SAJA. Pembacaan lama menyamakan "permukaan aplikasi" dengan
+  // satu berkas app.js. Itu benar sampai penyambungan pindah ke modul fitur: BANKOR
+  // dipanggil dari features/learner-flow/, dan gate yang hanya melihat app.js akan
+  // menuduh modul yang jelas-jelas dipakai sebagai "active tetapi nol pemanggil".
+  // Melonggarkan assert-nya berarti gate berhenti mengukur; jadi yang dilebarkan
+  // adalah PERMUKAAN YANG DIBACA — app.js ditambah seluruh modul fitur yang ikut
+  // dikirim. features/brain/ sendiri dikecualikan: modul otak yang saling memanggil
+  // bukan bukti bahwa aplikasi memakainya, dan memasukkannya akan membuat sekumpulan
+  // modul 'off' tampak hidup hanya karena bertetangga.
+  const surface = ['app.js'];
+  (function walk(dir) {
+    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+      const rel = path.join(dir, e.name);
+      if (e.isDirectory()) { if (rel !== path.join('features', 'brain')) walk(rel); }
+      else if (e.name.endsWith('.js')) surface.push(rel);
+    }
+  })('features');
+  const stripped = surface
+    .map(f => fs.readFileSync(path.join(__fzRoot, f), 'utf8'))
+    .join('\n')
     .replace(/\/\*[\s\S]*?\*\//g, ' ')
     .replace(/(^|[^:])\/\/[^\n]*/g, '$1 ');
   const callSites = (name) => !name ? 0 : (stripped.match(
-    new RegExp('(?:self|window|globalThis)\\s*\\.\\s*' + name + '\\b|\\b' + name + '\\s*\\.\\s*[A-Za-z_$]', 'g')) || []).length;
+    new RegExp('(?:self|window|globalThis|root)\\s*\\.\\s*' + name + '\\b|\\b' + name + '\\s*\\.\\s*[A-Za-z_$]', 'g')) || []).length;
 
   const lying = [];
   for (const m of manifest.modules) {
     const authority = manifest.authorityMap[m.authorityKey];
     const hits = callSites(m.global);
     if (authority === 'off' && hits > 0) lying.push(m.file + ': off tetapi dipanggil ' + hits + '×');
-    if (authority === 'active' && hits === 0) lying.push(m.file + ': active tetapi nol pemanggil di app.js');
+    if (authority === 'active' && hits === 0) lying.push(m.file + ': active tetapi nol pemanggil di permukaan aplikasi');
   }
-  assert.deepStrictEqual(lying, [], 'peta otoritas tidak cocok dengan app.js — ' + lying.join('; '));
+  assert.deepStrictEqual(lying, [], 'peta otoritas tidak cocok dengan permukaan aplikasi — ' + lying.join('; '));
 });
 
 test('contentCompatibility cocok dengan deklarasi schemaVersion grammar-templates.json', () => {

@@ -55,6 +55,9 @@ export const BYTE_LIMITS = Object.freeze({
   '/api/usage/pepper': 512,     // GET, tanpa body
   // --- SLOT 10: akun/peran/konten guru. Cap kecil di mana-mana KECUALI dua jalur
   //     CSV: payload kecil = CPU kecil, dan CPU adalah anggaran paling langka.
+  // --- SLOT 12: login Google. ID token Google ~1-2 KB; cap 8 KB memberi ruang
+  //     token panjang tanpa membuka pintu bagi badan besar yang tidak dipakai.
+  '/api/auth/google': 8192,
   '/api/account/register': 1024,
   '/api/account/login': 1024,
   '/api/account/logout': 512,
@@ -81,12 +84,12 @@ export const BYTE_LIMITS = Object.freeze({
   '/api/teacher/assign': 32768,            // sampai 500 sub murid
   '/api/teacher/progress': 512,            // GET
   // --- SLOT 11: sinkron Ruang Guru lewat kode kelas + notifikasi tugas.
-  '/api/learner/class-report': 4096,
+  '/api/learner/class-report': 8192,       // + assign[].w (≤8 tugas × ≤40 soal salah)
   '/api/learner/class-assignments': 512,   // GET
   '/api/teacher/class/claim': 1024,
   '/api/teacher/class/list': 512,          // GET
   '/api/teacher/class/reports': 512,       // GET
-  '/api/teacher/class/assign': 16384,      // 40 itemIds + 80 nama target + amplop
+  '/api/teacher/class/assign': 32768,      // 40 itemIds + 80 nama target + ≤40 soal kustom (class-hub) + amplop
   // --- SLOT 7: lapisan sosial (route-social.js). Payload kecil = CPU kecil;
   // satu-satunya yang besar adalah evidence batch (maks 20 event, pola LIMITS
   // analytics 8KB — spec sosial §4.4.2).
@@ -95,6 +98,10 @@ export const BYTE_LIMITS = Object.freeze({
   '/api/social/profile/me': 512,        // GET, tanpa body
   '/api/social/friends/invite': 512,
   '/api/social/friends/redeem': 512,
+  '/api/social/friends/add': 512,
+  '/api/social/friends/requests': 512,  // GET, tanpa body
+  '/api/social/friends/accept': 512,
+  '/api/social/friends/reject': 512,
   '/api/social/friends': 512,           // GET, tanpa body
   '/api/social/cheer': 512,
   '/api/social/rank/evidence': 8192,

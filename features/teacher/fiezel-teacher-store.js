@@ -9,6 +9,9 @@
   if (root) root.FiezelTeacherStore = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
+
+  /* m025-265 · sapuan kebocoran Thai: naskah modul ini dulu literal Indonesia. */
+  function t(k, fb) { try { var I = (typeof self !== 'undefined' ? self : this).FiezelI18n; return I && I.t ? I.t(k) : fb; } catch (_) { return fb; } }
   var root = typeof globalThis !== 'undefined' ? globalThis : (typeof window !== 'undefined' ? window : {});
   var KEY = 'fiezel-teacher-v1';
   var ASSIGN_KEY = 'fiezel-learner-assignments-v1';
@@ -24,12 +27,33 @@
   function b64d(str) { return JSON.parse(decodeURIComponent(escape(atob(String(str || '').trim())))); }
   function makeClassCode() { var A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', out = ''; for (var i = 0; i < 6; i++) out += A[Math.floor(Math.random() * A.length)]; return 'FZ-' + out; }
   function normalizeClassCode(v) { v = String(v || '').toUpperCase().replace(/[^A-Z0-9]/g, ''); if (v.indexOf('FZ') === 0) v = v.slice(2); return v.length === 6 ? 'FZ-' + v : ''; }
-  function firstName(n) { return String(n || 'Murid').trim().split(/\s+/)[0].slice(0, 24); }
+  function firstName(n) { return String(n || t('umum.murid', 'Murid')).trim().split(/\s+/)[0].slice(0, 24); }
 
   // ---- persist -------------------------------------------------------------------------
   function defaults() { return { schema: KEY, teacher: { name: '', school: '' }, classes: [], activeClassId: null, view: 'briefing', savedMinutes: 0, inbox: [], createdAt: Date.now() }; }
-  function load() { try { var raw = JSON.parse(localStorage.getItem(KEY)); if (raw && raw.schema === KEY) { var st = Object.assign(defaults(), raw); st.inbox = Array.isArray(st.inbox) ? st.inbox : []; return st; } } catch (_) {} return defaults(); }
-  function save(st) { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (_) {} return st; }
+  /*
+   * MODE PRATINJAU — PENYIMPANAN TERPISAH, BUKAN BENDERA DI ATAS PENYIMPANAN YANG SAMA.
+   *
+   * Demo guru di landing page membawa pengunjung ke papan yang terisi. Kalau demo itu
+   * menulis ke localStorage yang sama dengan guru sungguhan, satu kunjungan iseng dari
+   * perangkat seorang guru akan menyuntikkan "Kelas 10A" berisi 18 murid karangan ke
+   * data kelasnya yang asli — dan tidak ada yang memberitahunya.
+   *
+   * Jadi pratinjau memakai sessionStorage dengan kunci sendiri: data guru asli di
+   * localStorage tidak pernah dibaca maupun ditulis selama mode ini hidup, dan seluruh
+   * isinya lenyap begitu tab ditutup. Konsekuensi yang disengaja: apa pun yang dicoba
+   * pengunjung di demo memang tidak disimpan — itulah arti demo.
+   */
+  var previewMode = false;
+  var PREVIEW_KEY = KEY + '-preview';
+  function setPreview(on) { previewMode = !!on; return previewMode; }
+  function isPreview() { return previewMode; }
+  function bin() {
+    try { if (previewMode && root.sessionStorage) return { s: root.sessionStorage, k: PREVIEW_KEY }; } catch (_) {}
+    return { s: localStorage, k: KEY };
+  }
+  function load() { var b = bin(); try { var raw = JSON.parse(b.s.getItem(b.k)); if (raw && raw.schema === KEY) { var st = Object.assign(defaults(), raw); st.inbox = Array.isArray(st.inbox) ? st.inbox : []; return st; } } catch (_) {} return defaults(); }
+  function save(st) { var b = bin(); try { b.s.setItem(b.k, JSON.stringify(st)); } catch (_) {} return st; }
   function normalizeStudent(s) {
     s.results = Array.isArray(s.results) ? s.results : [];
     s.notes = Array.isArray(s.notes) ? s.notes : [];
@@ -45,6 +69,7 @@
     c.announcements = c.announcements || [];
     c.journal = c.journal || [];
     c.sentItemIds = c.sentItemIds || [];
+    c.pending = Array.isArray(c.pending) ? c.pending : [];
     return c;
   }
 
@@ -106,7 +131,7 @@
     var weak = weakestSkill(s), action;
     if (d != null && d >= 7) action = 'Kirim Kartu Sapa hari ini — sapaan personal, bukan tagihan tugas.';
     else if (late.length) action = 'Ingatkan tugas “' + late[0].a.title + '” lewat pesan singkat + tawarkan waktu tambahan.';
-    else if (weak && weak.acc < 0.5) action = 'Beri 5 soal ' + SKILL_LABEL[weak.skill] + ' dengan pendamping teman (lihat Kelompok Belajar).';
+    else if (weak && weak.acc < 0.5) action = 'Beri 5 soal ' + SKILL_LABEL[weak.skill] + ' ' + t('guru.pendamping-teman', 'dengan pendamping teman (lihat Kelompok Belajar).');
     else if (level === 'pantau') action = 'Sapa 1 kalimat apresiasi supaya momentumnya tidak putus.';
     else action = 'Pertahankan — beri tantangan kecil satu level di atas.';
     return { score: score, level: level, reasons: reasons, action: action, weak: weak, pending: pend.length, late: late.length, inactiveDays: d };
@@ -159,28 +184,102 @@
     try {
       if (!p || p.v !== 1 || !p.skills) return null;
       var results = Object.keys(p.skills).map(function (k) { return { skill: k, correct: Number(p.skills[k].c) || 0, total: Number(p.skills[k].t) || 0 }; });
-      return { name: firstName(p.name), lastActiveAt: Number(p.at) || Date.now(), targetDone: (p.lessons || 0) >= 3, results: results, goal: p.goal || null, cls: normalizeClassCode(p.cls) || null, assignments: Array.isArray(p.assign) ? p.assign : (p.assign ? [{ id: p.assign }] : []) };
+      return { name: firstName(p.name), lastActiveAt: Number(p.at) || Date.now(), targetDone: (p.lessons || 0) >= 3, results: results, goal: p.goal || null, cls: normalizeClassCode(p.cls) || null, join: p.j === 1 || p.j === true, examFocus: (p.fx && typeof p.fx === 'object' && !Array.isArray(p.fx) && p.fx.k) ? { k: String(p.fx.k).slice(0, 24), n: Number(p.fx.n) || 0, s: Number(p.fx.s) || 0, x: Number(p.fx.x) || 0 } : null, assignments: Array.isArray(p.assign) ? p.assign : (p.assign ? [{ id: p.assign }] : []) };
     } catch (_) { return null; }
   }
+  /* ---- pendeteksi keluar layar (assign.f dari murid) ------------------------------------
+   * Bentuk yang datang dari murid sudah dibatasi gerbang server (class-sync-core.js), tetapi
+   * kelas juga bisa terisi dari KODE hasil yang ditempel guru — jalur itu tidak lewat server,
+   * jadi angkanya dinormalkan lagi di sini. */
+  function normalizeFocus(f) {
+    var n = Math.max(0, Math.round(Number(f && f.n) || 0)), sec = Math.max(0, Math.round(Number(f && f.s) || 0));
+    return { n: n, s: sec, x: Math.max(0, Math.min(sec, Math.round(Number(f && f.x) || 0))), at: Date.now() };
+  }
+  /** Laporan murid dikirim ulang berkali-kali; guru hanya perlu dibangunkan saat angkanya NAIK. */
+  function focusGrew(prev, next) {
+    var pn = Number(prev && prev.n) || 0, ps = Number(prev && prev.s) || 0;
+    return (Number(next && next.n) || 0) > pn || (Number(next && next.s) || 0) > ps;
+  }
+  function focusOf(a, s) { return (a && a.focus && s && a.focus[s.id]) || null; }
+  /* Kembaran EXAM_KINDS di klien dan server. Nilai yang tidak dikenal jatuh ke 'ujian' —
+     bukan ditolak: kabar dengan label generik masih berguna, kabar yang hilang tidak. */
+  var EXAM_LABEL = { assignment: 'ujian dari guru', reading_exam: 'ujian membaca', listening_exam: 'ujian menyimak', speaking_exam: 'ujian berbicara', writing_exam: 'ujian menulis', placement: 'tes penempatan', level_exam: 'ujian naik level' };
+  function examLabel(k) { return EXAM_LABEL[String(k || '')] || 'ujian'; }
+  function durasi(sec) { var n = Math.max(0, Math.round(Number(sec) || 0)); return n >= 60 ? Math.round(n / 60) + ' mnt' : n + ' dtk'; }
+  /** Kalimat pendek untuk chip di layar guru. Menyebut fakta, tidak menuduh. */
+  function focusLabel(f) {
+    if (!f || !f.n) return 'Tidak keluar layar';
+    return 'Keluar layar ' + f.n + '× · ' + durasi(f.s);
+  }
+  function focusLevel(f) { return !f || !f.n ? 'bersih' : (f.n >= 3 || f.s >= 30 ? 'berat' : 'ringan'); }
   /** Masukkan hasil murid ke kelas: perbarui murid yang ada (nama depan sama) atau tambah baru. Skill digabung per-skill. */
   function ingest(c, parsed) {
     var s = c.students.filter(function (x) { return x.name.toLowerCase() === parsed.name.toLowerCase(); })[0], isNew = false;
+    /* KETUKAN BERGABUNG (parsed.join) dari nama yang BELUM ada di kelas berhenti di sini
+       sebagai permintaan, bukan sebagai pendaftaran. Alasannya bukan kehati-hatian abstrak:
+       kode kelas enam huruf bisa salah ketik, dan murid kelas sebelah bisa memakainya. Guru
+       yang menambahkan sendiri tahu siapa yang ia terima. Laporan yang membawa HASIL tetap
+       mendaftar otomatis seperti sebelumnya — murid yang sudah mengerjakan tugas kelas ini
+       jelas bukan orang asing, dan menahannya berarti membuang buktinya. */
+    if (!s && parsed.join && !parsed.results.some(function (r) { return r.total > 0; })) {
+      c.pending = Array.isArray(c.pending) ? c.pending : [];
+      var key = String(parsed.name || '').toLowerCase();
+      var known = c.pending.filter(function (p) { return String(p.name || '').toLowerCase() === key; })[0];
+      if (known) { known.at = parsed.lastActiveAt; return { pending: true, name: parsed.name, isNewPending: false, graded: [], focusEvents: [] }; }
+      c.pending.push({ name: parsed.name, at: parsed.lastActiveAt });
+      c.pending = c.pending.slice(-40);
+      return { pending: true, name: parsed.name, isNewPending: true, graded: [], focusEvents: [] };
+    }
     if (!s) { s = newStudent(parsed.name); c.students.push(s); isNew = true; }
+    /* Murid yang tadinya menunggu lalu mengirim hasil sungguhan sudah terdaftar di baris atas;
+       entri tunggunya dibersihkan supaya tidak muncul dua kali di layar guru. */
+    if (Array.isArray(c.pending) && c.pending.length) c.pending = c.pending.filter(function (p) { return String(p.name || '').toLowerCase() !== String(parsed.name || '').toLowerCase(); });
     var incoming = {}; parsed.results.forEach(function (r) { incoming[r.skill] = r; });
     s.results = s.results.filter(function (r) { return !incoming[r.skill]; }).concat(parsed.results);
     s.lastActiveAt = parsed.lastActiveAt; s.targetDone = parsed.targetDone || s.targetDone; s.goal = parsed.goal || s.goal;
     s.attendance[today(parsed.lastActiveAt)] = s.attendance[today(parsed.lastActiveAt)] || 'H';
-    var graded = [], explicit = parsed.assignments || [];
+    var graded = [], focusEvents = [], explicit = parsed.assignments || [];
     (c.assignments || []).forEach(function (a) {
-      if (a.done && a.done[s.id]) return;
       var hit = explicit.filter(function (x) { return x.id === a.id; })[0];
+      if (hit && hit.f) { a.focus = a.focus || {}; if (focusGrew(a.focus[s.id], hit.f)) { a.focus[s.id] = normalizeFocus(hit.f); focusEvents.push({ kind: 'focus_exit', student: s.name, sid: s.id, title: a.title, aid: a.id, f: a.focus[s.id], mode: a.mode || 'latihan' }); } }
+      if (hit && hit.s && !(hit.t > 0) && !(a.done && a.done[s.id])) { a.progress = a.progress || {}; a.progress[s.id] = Number(hit.at) || parsed.lastActiveAt; return; }
+      if (a.done && a.done[s.id]) return;
       var implicit = !explicit.length && targeted(a, s) && parsed.lastActiveAt >= a.createdAt && a.skills.some(function (k) { return incoming[k]; });
-      if (hit || implicit) { a.done = a.done || {}; a.done[s.id] = { at: Number(hit && hit.at) || parsed.lastActiveAt, acc: hit && hit.t ? hit.c / hit.t : skillAcc(s, a.skills[0]) }; graded.push(a); }
+      if (hit || implicit) { a.done = a.done || {}; a.done[s.id] = { at: Number(hit && hit.at) || parsed.lastActiveAt, acc: hit && hit.t ? hit.c / hit.t : skillAcc(s, a.skills[0]), c: hit ? hit.c : undefined, t: hit ? hit.t : undefined, w: hit && Array.isArray(hit.w) ? hit.w : undefined }; if (a.progress) delete a.progress[s.id]; graded.push(a); }
     });
-    return { student: s, graded: graded, isNew: isNew };
+    /* Ujian NON-TUGAS: catatannya tidak menempel ke tugas mana pun, jadi ia disimpan pada
+       muridnya. Sama seperti assign.f, kabarnya hanya lahir saat angkanya NAIK — laporan kelas
+       adalah upsert yang dikirim berulang, dan tanpa syarat ini satu kepergian akan
+       membangunkan guru setiap 15 detik sampai laporannya berganti. */
+    if (parsed.examFocus && parsed.examFocus.n > 0) {
+      var prev = s.examFocus || null;
+      if (focusGrew(prev, parsed.examFocus) || !prev || prev.k !== parsed.examFocus.k) {
+        s.examFocus = Object.assign({ at: Date.now() }, parsed.examFocus);
+        focusEvents.push({ kind: 'focus_exit', student: s.name, sid: s.id, title: examLabel(parsed.examFocus.k), aid: '', f: { n: parsed.examFocus.n, s: parsed.examFocus.s, x: parsed.examFocus.x }, mode: 'ujian' });
+      }
+    }
+    return { student: s, graded: graded, isNew: isNew, focusEvents: focusEvents };
   }
+  /** Guru menerima permintaan bergabung: murid benar-benar masuk kelas sekarang. */
+  function acceptJoin(c, name) {
+    var key = String(name || '').toLowerCase();
+    c.pending = (c.pending || []).filter(function (p) { return String(p.name || '').toLowerCase() !== key; });
+    var ada = c.students.filter(function (x) { return x.name.toLowerCase() === key; })[0];
+    if (ada) return ada;
+    var s = newStudent(name); c.students.push(s); return s;
+  }
+  /** Guru menolak permintaan: entri tunggunya dibuang. Murid tidak diberi tahu — ia hanya
+      tidak pernah menerima tugas, sama seperti sebelum ia mengetik kode. Memberitahunya
+      berarti mengumumkan bahwa kode itu benar, dan itu justru membantu penebak. */
+  function rejectJoin(c, name) {
+    var key = String(name || '').toLowerCase();
+    var sebelum = (c.pending || []).length;
+    c.pending = (c.pending || []).filter(function (p) { return String(p.name || '').toLowerCase() !== key; });
+    return sebelum !== c.pending.length;
+  }
+  function pendingJoins(c) { return (c && Array.isArray(c.pending) ? c.pending : []).slice().sort(function (a, b) { return (b.at || 0) - (a.at || 0); }); }
   /** Bentuk payload tugas yang dikirim ke server = isi kode tugas (tanpa base64). */
-  function assignmentPayload(c, a) { return { v: 1, t: 'assign', id: a.id, title: a.title, skills: a.skills, itemIds: a.itemIds, minutes: a.minutes, from: c.name, cls: c.code, deadline: a.deadline || null, mode: a.mode || 'latihan', timer: a.timer || 0, shuffle: !!a.shuffle }; }
+  function assignmentPayload(c, a) { var p = { v: 1, t: 'assign', id: a.id, title: a.title, skills: a.skills, itemIds: a.itemIds, minutes: a.minutes, from: c.name, cls: c.code, deadline: a.deadline || null, mode: a.mode || 'latihan', timer: a.timer || 0, shuffle: !!a.shuffle }; if (a.teacher) p.teacher = String(a.teacher).slice(0, 60); if (Array.isArray(a.items) && a.items.length) p.items = a.items.map(function (q) { var o = { id: q.id, prompt: q.prompt, options: q.options, answer: q.answer, skill: q.skill }; if (q.context) o.context = q.context; if (q.why && Object.keys(q.why).length) o.why = q.why; return o; }); return p; }
   function assignmentCode(c, a) { return b64e(assignmentPayload(c, a)); }
   function parseAssignmentCode(code) { try { var p = b64d(code); if (!p || p.t !== 'assign' || !Array.isArray(p.itemIds)) return null; return p; } catch (_) { return null; } }
   /** Sisi murid: simpan tugas dari kode guru ke antrean Today Plan (dipakai learner-flow). */
@@ -193,19 +292,50 @@
     if (!p || p.t !== 'assign' || !Array.isArray(p.itemIds)) return null;
     try {
       var a = JSON.parse(localStorage.getItem(ASSIGN_KEY)) || [];
-      if (!a.some(function (x) { return x.id === p.id; })) a.push({ id: p.id, title: p.title, skills: p.skills, itemIds: p.itemIds, minutes: p.minutes, from: p.from, at: Date.now(), deadline: p.deadline, mode: p.mode });
-      localStorage.setItem(ASSIGN_KEY, JSON.stringify(a.slice(-5)));
+      if (!a.some(function (x) { return x.id === p.id; })) a.push({ id: p.id, title: p.title, skills: p.skills, itemIds: p.itemIds, minutes: p.minutes, from: p.from, teacher: p.teacher || '', cls: p.cls || '', items: Array.isArray(p.items) ? p.items : undefined, timer: p.timer || 0, shuffle: !!p.shuffle, at: Date.now(), deadline: p.deadline, mode: p.mode });
+      localStorage.setItem(ASSIGN_KEY, JSON.stringify(a.slice(-12)));
       if (p.cls) { var ob = JSON.parse(localStorage.getItem('fiezel-onboarding-v1') || '{}'); if (!ob.classCode) { ob.classCode = p.cls; localStorage.setItem('fiezel-onboarding-v1', JSON.stringify(ob)); } }
     } catch (_) {}
     return p;
   }
+  /*
+   * TUGAS KURIKULUM TIDAK BOLEH DITAMBAL DARI BANK UMUM.
+   *
+   * Sampai m025-290, jalur kurikulum jatuh ke sini dengan skills = ['Descriptive Text']
+   * (nama GENRE, bukan nama skill bank). Tiga baris berikutnya menghancurkannya secara
+   * berurutan: penyaring membuang genre itu karena tidak ada di B.SKILLS, baris default
+   * memaksa skills = ['past_tense'], lalu penambal menarik soal Past Tense dari bank umum.
+   *
+   * Hasilnya diukur, bukan dikira-kira: guru memilih bab "Descriptive Text — About Me"
+   * kelas 7 dan meminta 5 soal, yang terkirim ke murid adalah 3 soal kurikulum DITAMBAH
+   * lima soal Past Tense ("Yesterday I ___ to the market") — materi kelas 8 — dan tugasnya
+   * dilabeli skill past_tense. Karena satu unit hanya berisi 2-3 soal sementara pilihan
+   * jumlahnya 2/3/5/8/10, pencemaran itu terjadi pada HAMPIR SETIAP tugas kurikulum.
+   *
+   * `curriculumOnly` menutupnya di sumbernya: kalau pemanggil menyatakan set ini berasal
+   * dari materi ajar, bank umum tidak pernah disentuh dan jumlah soalnya apa adanya —
+   * lebih baik guru melihat "3 soal" yang jujur daripada delapan soal yang setengahnya
+   * mengajarkan bab yang salah.
+   */
   function buildAssignment(opts) {
-    var B = bank(), skills = (opts.skills || []).filter(function (k) { return B && B.SKILLS[k]; });
+    var B = bank(), custom = Array.isArray(opts.items) ? opts.items.filter(function (q) { return q && q.prompt && Array.isArray(q.options) && q.options.length >= 2; }).slice(0, 40) : [];
+    var kurikulum = !!opts.curriculumOnly && custom.length > 0;
+    var skills = (opts.skills || []).filter(function (k) { return (B && B.SKILLS[k]) || custom.some(function (q) { return q.skill === k; }); });
+    custom.forEach(function (q) { if (q.skill && skills.indexOf(q.skill) === -1 && skills.length < 3) skills.push(q.skill); });
+    if (!skills.length) skills = kurikulum ? (opts.skills || []).slice(0, 3) : ['past_tense'];
     if (!skills.length) skills = ['past_tense'];
-    var per = Math.max(1, Math.round((Number(opts.count) || 10) / skills.length)), ids = [], seed = Date.now() % 997;
-    skills.forEach(function (k, i) { B.pickFresh(k, per, { avoid: opts.avoid || [], seed: seed + i }).forEach(function (it) { ids.push(it.id); }); });
+    var ids = [], seed = Date.now() % 997;
+    if (Array.isArray(opts.itemIds) && opts.itemIds.length) ids = opts.itemIds.slice(0, 40);
+    else if (!kurikulum && (!custom.length || opts.count)) { var per = Math.max(1, Math.round((Number(opts.count) || 10) / skills.length)); skills.forEach(function (k, i) { if (B && B.SKILLS[k]) B.pickFresh(k, per, { avoid: opts.avoid || [], seed: seed + i }).forEach(function (it) { ids.push(it.id); }); }); }
+    custom.forEach(function (q) { if (ids.indexOf(q.id) === -1) ids.push(q.id); });
+    ids = ids.slice(0, 40);
     var minutes = Math.max(3, Math.round(ids.length * 0.9));
-    return { id: uid('as'), title: String(opts.title || ('Latihan ' + skills.map(function (k) { return SKILL_LABEL[k]; }).join(' + '))).slice(0, 80), skills: skills, itemIds: ids, minutes: minutes, mode: opts.mode || 'latihan', timer: opts.mode === 'ujian' ? (Number(opts.timer) || minutes) : 0, shuffle: opts.mode === 'ujian', deadline: opts.deadline || null, createdAt: Date.now(), targets: opts.targets && opts.targets.length ? opts.targets : null, done: {} };
+    var a = { id: uid('as'), title: String(opts.title || ('Latihan ' + skills.map(function (k) { return SKILL_LABEL[k] || k; }).join(' + '))).slice(0, 80), skills: skills, itemIds: ids, minutes: minutes, mode: opts.mode || 'latihan', timer: opts.mode === 'ujian' ? (Number(opts.timer) || minutes) : 0, shuffle: opts.mode === 'ujian', deadline: opts.deadline || null, createdAt: Date.now(), targets: opts.targets && opts.targets.length ? opts.targets : null, done: {}, progress: {} };
+    if (custom.length) a.items = custom;
+    if (opts.teacher) a.teacher = String(opts.teacher).slice(0, 60);
+    if (opts.source) a.source = opts.source;
+    if (opts.review) a.review = opts.review;
+    return a;
   }
 
   // ---- naskah komunikasi (tanpa AI, template berisi data) ----------------------------------
@@ -228,8 +358,8 @@
     if (w) lines.push('• Perlu latihan: ' + SKILL_LABEL[w.skill] + ' (' + pct(w.acc) + ')');
     if (att != null) lines.push('• Kehadiran 10 pertemuan terakhir: ' + Math.round(att * 100) + '%');
     lines.push('• Terakhir belajar mandiri: ' + (s.lastActiveAt ? fmtDate(s.lastActiveAt) : 'belum tercatat'));
-    if (pend.length) lines.push('• Tugas belum selesai: ' + pend.map(function (p) { return p.a.title; }).join(', '));
-    lines.push('', 'Yang bisa dibantu di rumah: tanyakan 1 kalimat Bahasa Inggris tentang kegiatan ' + s.name + ' kemarin (melatih ' + (w ? SKILL_LABEL[w.skill] : 'ingatan') + '). Cukup 5 menit.', '', 'Terima kasih atas kerja samanya 🙏', (teacher && teacher.name) || 'Guru Bahasa Inggris', (teacher && teacher.school) || '');
+    if (pend.length) lines.push(t('guru.tugas-belum-selesai', '• Tugas belum selesai:') + ' ' + pend.map(function (p) { return p.a.title; }).join(', '));
+    lines.push('', 'Yang bisa dibantu di rumah: tanyakan 1 kalimat Bahasa Inggris tentang kegiatan ' + s.name + ' kemarin (melatih ' + (w ? SKILL_LABEL[w.skill] : 'ingatan') + '). Cukup 5 menit.', '', 'Terima kasih atas kerja samanya 🙏', (teacher && teacher.name) || t('guru.tanda-tangan', 'Guru Bahasa Inggris'), (teacher && teacher.school) || '');
     return lines.join('\n').trim();
   }
   function weeklyClassReport(c, teacher) {
@@ -292,7 +422,20 @@
     if (!e) return '';
     if (e.kind === 'assignment_done') return e.student + ' selesai mengerjakan “' + e.title + '”' + (e.acc != null ? ' · ' + pct(e.acc) : '');
     if (e.kind === 'student_joined') return e.student + ' bergabung ke kelas ' + (e.cls || '');
+    if (e.kind === 'join_request') return e.student + ' memasukkan kode kelas ' + (e.cls || '') + ' — tambahkan ke kelas?';
     if (e.kind === 'report_in') return 'Laporan latihan baru dari ' + e.student;
+    /* Kalimat ini adalah SATU-SATUNYA hal yang guru baca saat kabar itu lewat, jadi ia harus
+       menyebut siapa, sedang apa, dan seberapa berat — tanpa memvonis. "Laporan latihan baru"
+       yang generik pernah menutupi peringatan ini di kotak masuk; itulah kenapa ia diawali
+       penanda dan diakhiri angka. */
+    if (e.kind === 'focus_exit') {
+      // Kotak masuk guru bertahan 30 hari dan dibaca ulang tiap render; satu entri lama tanpa
+      // `f` tidak boleh mematikan seluruh panel, jadi bentuknya dijamin di sini, bukan diandaikan.
+      var f = e.f || { n: 0, s: 0 }, berat = focusLevel(f) === 'berat';
+      return (berat ? '⚠ Perlu ditengok: ' : '⚠ ') + e.student + ' keluar dari layar saat mengerjakan ' +
+        (e.mode === 'ujian' ? 'ujian' : 'tugas') + ' “' + e.title + '” — ' + (Number(f.n) || 0) + '× · ' + durasi(f.s) +
+        (berat ? '. Tanyakan ke muridnya sebelum menilai.' : '');
+    }
     return e.text || '';
   }
   /** syncAvailable() -> 'ok' | 'offline' | 'no_account' | 'not_teacher' | 'disabled' */
@@ -325,10 +468,23 @@
       var d = r.data || {}, ingested = 0, graded = 0, names = [], events = [];
       (d.reports || []).forEach(function (rep) {
         var p = parseLearnerPayload(rep.report); if (!p) return;
-        var res = ingest(c, p); ingested++; graded += res.graded.length; names.push(res.student.name);
+        var res = ingest(c, p);
+        if (res.pending) {
+          // Permintaan bergabung tidak dihitung sebagai laporan masuk: belum ada apa pun yang dilaporkan.
+          if (res.isNewPending) events.push({ kind: 'join_request', student: res.name, cls: c.name, clsId: c.id });
+          return;
+        }
+        ingested++; graded += res.graded.length; names.push(res.student.name);
+        // Kabar keluar-layar didahulukan: ia satu-satunya kabar yang masih bisa ditindaklanjuti
+        // guru SAAT ujian berlangsung; sisanya (selesai, bergabung) bisa dibaca kapan saja.
+        (res.focusEvents || []).forEach(function (e) { events.push(Object.assign({ clsId: c.id }, e)); });
         if (res.isNew) events.push({ kind: 'student_joined', student: res.student.name, sid: res.student.id, cls: c.name, clsId: c.id });
         res.graded.forEach(function (a) { var dn = a.done && a.done[res.student.id]; events.push({ kind: 'assignment_done', student: res.student.name, sid: res.student.id, title: a.title, aid: a.id, acc: dn ? dn.acc : null, clsId: c.id }); });
-        if (!res.isNew && !res.graded.length) events.push({ kind: 'report_in', student: res.student.name, sid: res.student.id, clsId: c.id });
+        /* Kabar generik "laporan masuk" hanya berguna saat TIDAK ada yang lebih spesifik.
+           Sebelum syarat focusEvents di bawah, satu ronde sinkron bisa melahirkan peringatan
+           keluar-layar DAN kabar generik untuk murid yang sama, lalu yang generik itu yang
+           terbaca duluan di kotak masuk. */
+        if (!res.isNew && !res.graded.length && !(res.focusEvents || []).length) events.push({ kind: 'report_in', student: res.student.name, sid: res.student.id, clsId: c.id });
       });
       c.sync = Object.assign(c.sync || {}, { claimed: true, cursor: Number(d.cursor) || since, lastPullAt: Date.now(), error: '' });
       return { ok: true, ingested: ingested, graded: graded, names: names, events: events, more: !!d.more };
@@ -358,8 +514,9 @@
   }
 
   return { KEY: KEY, ASSIGN_KEY: ASSIGN_KEY, SKILL_LABEL: SKILL_LABEL, SKILL_ORDER: SKILL_ORDER, ATT: ATT, DAY: DAY,
-    load: load, save: save, defaults: defaults, uid: uid, today: today, firstName: firstName, newClass: newClass, newStudent: newStudent, normalizeClass: normalizeClass, seedDemo: seedDemo, makeClassCode: makeClassCode, normalizeClassCode: normalizeClassCode,
+    load: load, save: save, defaults: defaults, setPreview: setPreview, isPreview: isPreview, uid: uid, today: today, firstName: firstName, newClass: newClass, newStudent: newStudent, normalizeClass: normalizeClass, seedDemo: seedDemo, makeClassCode: makeClassCode, normalizeClassCode: normalizeClassCode,
     skillAcc: skillAcc, overallAcc: overallAcc, daysSince: daysSince, risk: risk, classStats: classStats, classSkillMap: classSkillMap, heatmap: heatmap, studyGroups: studyGroups, misconceptions: misconceptions, needsGreeting: needsGreeting, agenda: agenda, pendingAssignments: pendingAssignments, targeted: targeted, recentAttendance: recentAttendance, attendanceRate: attendanceRate, weakestSkill: weakestSkill,
+    durasi: durasi, examLabel: examLabel, acceptJoin: acceptJoin, rejectJoin: rejectJoin, pendingJoins: pendingJoins, normalizeFocus: normalizeFocus, focusGrew: focusGrew, focusOf: focusOf, focusLabel: focusLabel, focusLevel: focusLevel,
     parseLearnerCode: parseLearnerCode, parseLearnerPayload: parseLearnerPayload, ingest: ingest, assignmentCode: assignmentCode, assignmentPayload: assignmentPayload, parseAssignmentCode: parseAssignmentCode, acceptAssignmentCode: acceptAssignmentCode, acceptAssignmentPayload: acceptAssignmentPayload, buildAssignment: buildAssignment,
     SYNC_PATHS: SYNC_PATHS, syncAvailable: syncAvailable, claimClass: claimClass, pullReports: pullReports, syncClass: syncClass, reportToClass: reportToClass, syncLabel: syncLabel, sendAssignment: sendAssignment, sentTo: sentTo,
     notify: notify, inboxUnread: inboxUnread, inboxMarkAllRead: inboxMarkAllRead, inboxText: inboxText,
