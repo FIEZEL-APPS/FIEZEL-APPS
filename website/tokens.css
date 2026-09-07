@@ -160,8 +160,3 @@ body{margin:0;background:var(--bg);color:var(--body);font-family:var(--font);fon
 /* ---------- ornamen garis: hairline emas/maroon ---------- */
 .rule{height:1px;border:0;margin:0;background:linear-gradient(90deg,var(--maroon-line-strong),var(--gold-line) 42%,transparent)}
 .rule-center{background:linear-gradient(90deg,transparent,var(--gold-line) 30%,var(--maroon-line-strong) 50%,var(--gold-line) 70%,transparent)}
-
-/* ---------- musik latar: TANPA elemen UI sama sekali (arahan owner m028-06) ----------
-   Landing memutar assets/music/ambient.mp3 otomatis lewat site.js: percobaan play() saat
-   load, lalu fallback ke gestur pertama (pointerdown/keydown/touchstart/scroll). Tidak ada
-   tombol, banner, atau indikator apa pun — jadi tidak ada gaya yang perlu didefinisikan. */
