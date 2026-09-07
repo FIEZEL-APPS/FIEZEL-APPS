@@ -169,3 +169,38 @@ di repo semuanya terpecahkan dengan benar. Tersangka terkuat: salinan yang ter-d
 lengkap (ingat galat Git cPanel "0 - Unknown Error" yang belum tuntas) sehingga sebagian
 `features/i18n/copy-id-*.js` tidak ikut terkirim. Kalau frasa hantu masih muncul sesudah
 build ini terpasang, yang perlu diperiksa adalah daftar berkas di server, bukan kodenya.
+
+### AKAR MASALAHNYA KETEMU — lima copy-map tidak pernah diprecache
+
+Catatan di atas menutup dengan "tersangka terkuat: deploy tidak lengkap" dan menyarankan
+memeriksa daftar berkas di server. **Tidak perlu.** Penyebabnya ada di repo, dan bisa diukur:
+
+```
+'guru.merek-tag'  hidup di  features/i18n/copy-id-feat-d.js
+copy-id-feat-d.js dimuat    index.html
+copy-id-feat-d.js ADA di    ASSETS sw.js?   TIDAK
+```
+
+Lima copy-map dalam keadaan yang sama sekaligus — `copy-id-app-e`, `copy-id-app-f`,
+`copy-id-feat-c`, `copy-id-feat-d`, `copy-id-grammar-labels` — plus
+`features/mascot/fiezel-paw-outfit.js`.
+
+PWA yang sudah terpasang dilayani dari cache shell. Berkas yang tidak pernah diprecache tidak
+ada di cache; ia hanya sampai kalau jaringan sedang baik pada detik itu juga. Di jaringan
+buruk atau offline — keadaan paling sering di lapangan, dan justru keadaan yang PWA ada untuk
+melayaninya — berkasnya tidak pernah dieksekusi, seluruh kunci di dalamnya tidak terdaftar,
+dan guru membaca nama kuncinya. Dua dari lima berkas itu memuat naskah Ruang Guru.
+
+**Kenapa gerbang PWA yang sudah ada tidak menangkapnya.** `tests/pwa-cache-test.js` memeriksa
+DAFTAR TETAP yang ditulis tangan di dalam berkas gerbangnya. Daftar tetap hanya menjaga yang
+sempat diingat penulisnya; setiap berkas yang ditambahkan ke `index.html` sesudah daftar itu
+ditulis tidak pernah masuk, dan gerbangnya tetap hijau sambil melewatkan justru hal yang
+paling penting. `tests/precache-covers-shell-test.js` menurunkan tuntutannya dari
+`index.html` SENDIRI, jadi skrip baru mana pun langsung ikut terjaga tanpa ada daftar yang
+perlu disunting — dan satu assertnya menyebut kasus ini dengan nama: berkas TEMPAT kunci
+`guru.*` benar-benar tinggal wajib diprecache.
+
+**Hubungannya dengan perbaikan pembungkus di atas:** keduanya perlu, dan tidak saling
+menggantikan. Precache membuat kuncinya benar-benar sampai; pembungkus membuat layarnya
+anggun kalau suatu hari ada yang tidak sampai lagi. Yang pertama memperbaiki sebabnya, yang
+kedua memperbaiki akibatnya.
