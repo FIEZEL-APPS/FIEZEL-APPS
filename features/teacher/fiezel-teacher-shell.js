@@ -9,7 +9,15 @@
   /* m025-265 · sapuan kebocoran Thai: naskah modul ini dulu literal Indonesia, jadi murid
      yang memilih th tetap membacanya dalam bahasa Indonesia. t() fail-soft: kalau copy-map
      belum termuat, fallback id yang tampil — bukan kunci mentah. */
-  function t(k, fb) { try { var I = (typeof self !== 'undefined' ? self : this).FiezelI18n; return I && I.t ? I.t(k) : fb; } catch (_) { return fb; } }
+  function t(k, fb) {
+    /* FiezelI18n.t() mengembalikan KUNCINYA saat kalimatnya belum termuat. Mengembalikan
+       itu apa adanya berarti guru membaca 'guru.tab-jurnal' di layarnya, padahal kalimat
+       cadangannya sudah tertulis di pemanggil. Cadangan dipakai untuk DUA keadaan:
+       FiezelI18n tidak ada, dan kuncinya tidak terpecahkan. */
+    var s;
+    try { var I = (typeof self !== 'undefined' ? self : this).FiezelI18n; s = I && I.t ? I.t(k) : undefined; } catch (_) {}
+    return (s === undefined || s === k) ? (fb == null ? k : fb) : s;
+  }
   if (!root) return;
   var S = function () { return root.FiezelTeacherStore; };
   var el = null, env = {}, st = null, ui = { modal: null, drawer: null, filter: '', insightSkill: 'past_tense', attDate: null, pick: {}, syncing: false }, syncTimer = null, chipTimer = null, visListener = null;
