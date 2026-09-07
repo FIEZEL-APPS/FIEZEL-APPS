@@ -199,8 +199,8 @@ ul,ol{margin:0;padding:0;list-style:none}
 @keyframes pgFill{0%{stroke-dashoffset:327}42%,74%{stroke-dashoffset:78}100%{stroke-dashoffset:327}}
 
 /* maskot PAW resmi (custom element) — besar, dekat panggung */
-.showcase .hero-paw{position:absolute;z-index:3;left:-3%;bottom:0;
-  width:clamp(138px,37vw,236px);height:auto}
+/* posisi/lebar PAW kini dipegang pembungkus rig .fzflow-paw-rig (lihat §FZFLOW) supaya
+   SVG PAW bisa melompat ke titik temu tanpa disentuh isinya */
 
 /* chip level CEFR muncul bergantian */
 .cefr-cycle{position:absolute;z-index:3;right:0;top:50%;transform:translateY(-50%);display:grid;gap:7px;justify-items:end}
@@ -441,7 +441,6 @@ ul,ol{margin:0;padding:0;list-style:none}
 @media (max-width:359px){
   .hero .phone{max-width:52vw}
   .showcase{min-height:262px}
-  .showcase .hero-paw{width:112px}
   /* 320-359px: hentikan tagline memaksa satu baris — di lebar ini nowrap-lah yang
      membuat halaman meluber ke samping. */
   .mast-sub{white-space:normal}
@@ -759,4 +758,601 @@ ul,ol{margin:0;padding:0;list-style:none}
   50% { transform: rotate(10deg); }
 }
 
+
+
+/* ============ PANGGUNG GANDA HERO: MURID (HP) + GURU (MacBook + MIRA) ============
+   Blok ini dulu hidup sebagai <style> inline di website/index.html (commit d1b4e1e).
+   Dipindah ke sini apa adanya (nilai hex milik owner tidak diubah) karena halaman Thai
+   website/th/index.html memakai style.css yang SAMA dan kini juga merender panggung guru —
+   aturan dwibahasa menuntut satu sumber gaya, bukan salinan 280 baris di dua HTML.
+   Satu-satunya perubahan isi: animasi .mira-anim-head (miraHeadGlance) diganti oleh
+   timeline pose fzflow-mira-head di bagian FZFLOW di bawah, supaya kepala MIRA mengikuti
+   tahapan cerita (kirim -> menunggu -> senang), bukan glance lepas dari alur. */
+  /* Wordmark KelasKu untuk Guru — Satu baris horizontal ketat */
+  .kelasku-brand {
+    display: inline-flex !important;
+    align-items: baseline !important;
+    gap: 8px !important;
+    white-space: nowrap !important;
+    vertical-align: baseline !important;
+  }
+  .kelasku-main {
+    font-weight: 800 !important;
+    letter-spacing: -0.02em !important;
+    line-height: 1 !important;
+  }
+  .kelasku-tag {
+    font-weight: 600 !important;
+    font-size: 0.68em !important;
+    opacity: 0.88 !important;
+    letter-spacing: -0.01em !important;
+    line-height: 1 !important;
+  }
+
+  /* Dual Ecosystem Stage in Hero */
+  .hero-dual-stage {
+    display: grid;
+    grid-template-columns: minmax(320px, 1fr) minmax(340px, 1.25fr);
+    gap: 32px;
+    align-items: center;
+    max-width: 1240px;
+    margin: 24px auto 0;
+    padding: 0 16px;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Left Side: Student Showcase wrapper */
+  .stage-student {
+    position: relative;
+    width: 100%;
+    overflow: visible;
+  }
+  /* Preserve 100% of the original .showcase behavior */
+  .stage-student .showcase {
+    margin-top: 0;
+    min-height: clamp(340px, 48vh, 460px);
+  }
+
+  /* Right Side: Teacher MacBook Showcase wrapper */
+  .stage-teacher {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding-top: 50px; /* space for Mira behind screen */
+  }
+
+  /* Accurate Apple MacBook Pro Mockup */
+  .mac-container {
+    position: relative;
+    width: 100%;
+    max-width: 560px;
+    margin: 0 auto;
+    filter: drop-shadow(0 24px 48px rgba(36,26,17,0.18));
+  }
+
+  /* Teacher Mascot (MIRA) — Situated strictly BEHIND the laptop lid */
+  .mira-teacher-wrapper {
+    position: absolute;
+    top: -95px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 220px;
+    height: 202px; /* fzflow: viewBox 220x180 -> 220x260 (kaki ditambah); skala tetap 0.777 sehingga
+                      bagian atas MIRA tergambar persis seperti sebelumnya */
+    z-index: 1; /* Behind lid (z-index 2) */
+    pointer-events: none;
+  }
+  .mira-svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  /* Animations for MIRA */
+  /* .mira-teacher-wrapper: napas + perjalanan turun-ke-panggung kini di fzflow-mira-travel (§FZFLOW) */
+
+  /* .mira-anim-head: glance idle kini bagian dari timeline fzflow-mira-head (lihat FZFLOW) */
+
+  .anim .mira-eyelid {
+    animation: miraBlink 5.2s infinite;
+  }
+  @keyframes miraBlink {
+    0%, 46%, 50%, 96%, 100% { transform: scaleY(1); }
+    48%, 98% { transform: scaleY(0.08); }
+  }
+  .mira-eyelid {
+    transform-origin: center 80px;
+  }
+
+  /* MacBook Screen Lid */
+  .mac-lid {
+    position: relative;
+    z-index: 2; /* In front of Mira's body */
+    background: #0B0C0E;
+    border-radius: 16px 16px 0 0;
+    padding: 10px 10px 0 10px;
+    box-shadow:
+      inset 0 0 0 1.5px #A1A5A9,
+      inset 0 0 0 3px #1F2226,
+      0 -2px 8px rgba(0,0,0,0.15);
+  }
+  .mac-screen {
+    position: relative;
+    background: #0D1117;
+    border-radius: 9px 9px 0 0;
+    overflow: hidden;
+    aspect-ratio: 16 / 10;
+    border: 1px solid #1c2024;
+  }
+  .mac-screen img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    display: block;
+  }
+
+  /* FaceTime Notch */
+  .mac-notch {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 72px;
+    height: 14px;
+    background: #0B0C0E;
+    border-radius: 0 0 7px 7px;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  }
+  .mac-camera {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #111B27;
+    border: 0.8px solid #203045;
+    position: relative;
+  }
+  .mac-camera::after {
+    content: '';
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    border-radius: 50%;
+    background: #2563EB;
+    top: 1px; left: 1px;
+    opacity: 0.75;
+  }
+  .mac-led {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: #22C55E;
+    opacity: 0.85;
+    box-shadow: 0 0 4px #22C55E;
+  }
+
+  /* MacBook Keyboard Base */
+  .mac-base {
+    position: relative;
+    z-index: 3;
+    height: 14px;
+    background: linear-gradient(180deg, #D4D8DC 0%, #B8BCC0 35%, #9CA0A4 100%);
+    border-radius: 0 0 16px 16px;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.7),
+      0 4px 12px rgba(0,0,0,0.18);
+  }
+  .mac-hinge {
+    position: absolute;
+    top: 0; left: 12%; right: 12%;
+    height: 3px;
+    background: #2E3236;
+    border-radius: 0 0 2px 2px;
+  }
+  .mac-scoop {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 68px;
+    height: 5px;
+    background: #7B8085;
+    border-radius: 0 0 5px 5px;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.35);
+  }
+
+  /* Badge caption under laptop */
+  .teacher-hero-meta {
+    margin-top: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .teacher-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: var(--cream-warm);
+    border: 1px solid var(--gold-line);
+    border-radius: var(--radius-pill);
+    padding: 6px 14px;
+    font-size: var(--fs-micro);
+    font-weight: 700;
+    color: var(--maroon-deep);
+    box-shadow: var(--shadow-sm);
+  }
+  .btn-teacher-hero {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: #1F7A63;
+    color: #FFFFFF !important;
+    padding: 9px 18px;
+    border-radius: var(--radius-pill);
+    font-size: var(--fs-micro);
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 3px 0 #145545, var(--shadow-sm);
+    transition: transform .18s var(--fz-out);
+  }
+  .btn-teacher-hero:hover {
+    transform: translateY(-2px);
+    background: #279478;
+    color: #FFFFFF !important;
+  }
+  .btn-teacher-hero .kelasku-brand {
+    color: #FFFFFF !important;
+  }
+  .btn-teacher-hero .kelasku-main {
+    color: #FFFFFF !important;
+  }
+  .btn-teacher-hero .kelasku-tag {
+    color: rgba(255,255,255,0.85) !important;
+  }
+
+  @media (max-width: 980px) {
+    .hero-dual-stage {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+    .stage-teacher {
+      padding-top: 40px;
+    }
+    .mac-container {
+      max-width: 480px;
+    }
+  }
+
+/* ============ FZFLOW — ALUR GURU–MURID, PERTEMUAN MIRA×PAW, ATMOSFER SCIENTIFIC/AI ============
+   Bagian ini DIGENERATE dari /app/gen_fzflow.py (spesifikasi waktu dalam Python) — sunting
+   generatornya, bukan keyframes-nya langsung, kalau ingin mengubah koreografi.
+
+   KEPUTUSAN (a)/(b): saat brief dikerjakan, `main` (d1b4e1e) SUDAH punya ujung guru: mockup
+   MacBook (assets/shots/teacher-desktop.png) + maskot guru MIRA. Membuat mockup PC kedua atau
+   maskot guru kedua hanya akan bersaing dengan pekerjaan owner, jadi lapisan ini DIBANGUN DI
+   ATAS panggung ganda itu. MIRA diberi rig pose + kaki + lengan (elemen tambahan, bentuk asli
+   tidak diubah). PAW: SVG-nya TIDAK disentuh (gerbang palet) — ia dibungkus rig lompat
+   (.fzflow-paw-rig) dan diberi SVG kostum terpisah (.fzflow-paw-costume) yang menumpang di
+   atasnya dengan keyframes hula yang SAMA agar topi/kacamata/dasi ikut goyang kepala/pinggul.
+
+   MASTER TIMELINE 28 s (semua elemen 28 s supaya selalu sinkron; tanpa JS):
+     0–50%   dua siklus alur tugas (7 s masing-masing): kartu tugas Solar laptop -> HP,
+             lencana "1" + progres + centang di HP, kartu hasil Maroon HP -> laptop,
+             notifikasi lonceng; MIRA: condong-kirim, glance, senang (varian bounce / tilt).
+    50–58%   MIRA muncul dari balik lid laptop, melompat ke depan (z-index 1 -> 4, skala 1.25
+             = "lebih dekat") mendarat di titik temu; PAW melompat 3× dari sisi HP ke titik temu.
+    59–64%   sapaan: MIRA melambai, PAW mata-bintang + mulut "waa", hati/bintang naik.
+    64–67%   "ta-da": kedua lengan MIRA ke atas -> POOF di kepala PAW -> KOSTUM WISUDA
+             (topi toga + kacamata bulat seperti MIRA + dasi kupu) muncul di PAW.
+    67–84%   selebrasi: MIRA & PAW lompat kegirangan, PAW mata "^^", confetti hati/bintang.
+    84–87%   MIRA melambai pamit.  87–93%: MIRA melompat kembali ke balik lid (z kembali 1 di
+             puncak lompatan), PAW melompat pulang.  94%: POOF, kostum lepas.  96–100%: napas.
+
+   GEOMETRI relatif lewat custom property di .hero-dual-stage (persen panggung / px dari clamp).
+   Paket alur memakai trik pembungkus seukuran panggung (translate% = persen panggung, tanpa
+   layout per frame). Vektor lompat MIRA/PAW (--fz-mira-dx/dy, --fz-paw-dx/dy) dihitung dari
+   lebar panggung (--fz-stageW) dan tinggi showcase; breakpoint tumpuk (<=980px) menukar arah.
+
+   Lapisan B (.fzflow-atmos) memperluas semangat .showcase-fx ke seluruh panggung ganda:
+   dot-grid, aura Solar, node-network "Core Brain", label data (angka/simbol saja — netral
+   bahasa), aksara あ/カ/学/語/A/B (Mandarin dekorasi aspiratif), scan sweep. Semua pelan &
+   beropasitas rendah.
+
+   Tanpa .anim (prefers-reduced-motion): nilai dasar = pose diam yang terbaca sebagai diagram
+   (kartu tugas di puncak busur, kartu hasil di lembah, lencana/progres/notif tampil; MIRA di
+   balik laptop, PAW di rumahnya tanpa kostum). Hanya kedipan lambat MIRA yang dibiarkan hidup.
+   Warna hanya dari tokens.css + hex palet G1 milik PAW (#FFD94F/#FFF4DA/#33201F/#8C2233/#fff)
+   untuk patch ekspresi yang harus menyatu dengan bulu PAW. Tidak ada request jaringan baru. */
+.hero-dual-stage{
+  --fz-stageW:min(100vw,1240px);
+  --fz-tx:72.4%;--fz-ty:49%;      /* pusat layar laptop guru */
+  --fz-sx:22.4%;--fz-sy:50%;      /* pusat HP murid */
+  --fz-t-mid-x:47%;--fz-t-mid-y:8%;   /* puncak busur tugas (atas) */
+  --fz-r-mid-x:47%;--fz-r-mid-y:88%;  /* lembah busur hasil (bawah) */
+  --fz-ease-x:linear;--fz-ease-y:cubic-bezier(.42,0,.58,1);
+  --fz-phone-half:clamp(75px,20vw,96px);--fz-phone-halfh:clamp(162px,43vw,207px);
+  --fz-mac-half:280px;--fz-mac-halfh:calc(var(--fz-mac-half) * .625);
+  /* titik temu: MIRA turun ke kiri-bawah (ke arah HP), PAW melompat ke kanan */
+  --fz-meet-x:46%;--fz-meet-y:64%;
+  --fz-mira-scale:1.25;                      /* MIRA 'lebih dekat' saat di depan */
+  --fz-mira-dx:calc(var(--fz-stageW) * -.235);
+  --fz-mira-dy:calc(clamp(340px,48vh,460px) / 2 + 78px);
+  --fz-paw-dx:calc(var(--fz-stageW) * .25);--fz-paw-dy:0px;
+}
+.fzflow,.fzflow-atmos{position:absolute;inset:0;pointer-events:none;overflow:visible}
+.fzflow-atmos{z-index:0}
+.fzflow{z-index:5}
+
+/* ---- garis penghubung (hairline, dua busur membentuk lensa antar device) ---- */
+.fzflow-link{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.fzflow-link path{fill:none;stroke:var(--gold-line);stroke-width:1.2;vector-effect:non-scaling-stroke;
+  stroke-linecap:round;opacity:.55}
+.fzflow-link .fzflow-link-back{stroke:var(--maroon-line)}
+.fzflow-link-v{display:none}
+
+/* ---- paket: pembungkus seukuran panggung (X) > pembungkus (Y) > kartu di sudut (0,0) ---- */
+.fzflow-packet,.fzflow-py{position:absolute;inset:0;will-change:transform}
+.fzflow-task{transform:translateX(var(--fz-t-mid-x))}
+.fzflow-task .fzflow-py{transform:translateY(var(--fz-t-mid-y))}
+.fzflow-result{transform:translateX(var(--fz-r-mid-x))}
+.fzflow-result .fzflow-py{transform:translateY(var(--fz-r-mid-y))}
+.fzflow-card{position:absolute;left:0;top:0;transform:translate(-50%,-50%);
+  display:flex;align-items:center;gap:6px;padding:7px 10px;border-radius:var(--radius-sm);
+  font-size:var(--fs-micro);font-weight:800;letter-spacing:.06em;font-variant-numeric:tabular-nums;
+  white-space:nowrap;box-shadow:var(--shadow-md)}
+.fzflow-card svg{width:14px;height:14px;flex:none}
+.fzflow-card-task{background:var(--cream-warm);border:1px solid var(--gold-line);color:var(--maroon-deep);
+  border-left:3px solid var(--sun-deep);flex-direction:column;align-items:flex-start;gap:4px}
+.fzflow-card-task .fzflow-row{display:flex;align-items:center;gap:6px}
+.fzflow-card-task svg{color:var(--sun-deep)}
+.fzflow-card-task i{display:block;height:3px;border-radius:2px;background:var(--sun-soft);width:44px}
+.fzflow-card-task i+i{width:28px;background:var(--cream-deep)}
+.fzflow-card-result{background:var(--maroon);border:1px solid var(--maroon-deep);color:var(--cream-warm)}
+.fzflow-card-result svg{color:var(--sun-mid)}
+.anim .fzflow-task{animation:fzflow-task-x 28s linear infinite}
+.anim .fzflow-task .fzflow-py{animation:fzflow-task-y 28s linear infinite}
+.anim .fzflow-card-task{animation:fzflow-task-pop 28s var(--fz-out) infinite}
+.anim .fzflow-result{animation:fzflow-result-x 28s linear infinite}
+.anim .fzflow-result .fzflow-py{animation:fzflow-result-y 28s linear infinite}
+.anim .fzflow-card-result{animation:fzflow-result-pop 28s var(--fz-out) infinite}
+
+/* ---- sisi HP: lencana "1" + pil progres ---- */
+.fzflow-badge{position:absolute;left:calc(var(--fz-sx) + var(--fz-phone-half) - 12px);
+  top:calc(var(--fz-sy) - var(--fz-phone-halfh) + 22px);width:24px;height:24px;border-radius:50%;
+  display:grid;place-items:center;background:var(--sun);color:var(--maroon-deep);font-size:var(--fs-micro);
+  font-weight:800;border:2px solid var(--cream-warm);box-shadow:var(--shadow-sm);transform:translate(-50%,-50%)}
+.anim .fzflow-badge{animation:fzflow-badge 28s var(--fz-spring) infinite}
+.fzflow-progress{position:absolute;left:var(--fz-sx);top:calc(var(--fz-sy) + var(--fz-phone-halfh) - 42px);
+  transform:translate(-50%,-50%);display:flex;align-items:center;gap:7px;padding:6px 9px;
+  background:var(--cream-warm);border:1px solid var(--maroon-line);border-radius:var(--radius-pill);box-shadow:var(--shadow-sm)}
+.fzflow-progress .fzflow-track{width:clamp(48px,8vw,64px);height:5px;border-radius:3px;background:var(--sun-soft);overflow:hidden}
+.fzflow-progress .fzflow-bar{display:block;height:100%;width:100%;border-radius:3px;background:var(--sun-deep);
+  transform-origin:left center;transform:scaleX(.7)}
+.fzflow-progress svg{width:12px;height:12px;color:var(--maroon);opacity:0}
+.anim .fzflow-progress{animation:fzflow-progress 28s var(--fz-out) infinite}
+.anim .fzflow-bar{animation:fzflow-bar 28s var(--fz-out) infinite}
+.anim .fzflow-progress svg{animation:fzflow-check 28s var(--fz-spring) infinite}
+
+/* ---- sisi laptop: notifikasi lonceng ---- */
+.fzflow-notif{position:absolute;left:calc(var(--fz-tx) + var(--fz-mac-half) - 48px);
+  top:calc(var(--fz-ty) - var(--fz-mac-halfh) + 4px);transform:translate(-50%,-50%);
+  display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--cream-warm);
+  border:1px solid var(--maroon-line);border-radius:var(--radius-pill);box-shadow:var(--shadow-md);
+  color:var(--maroon-deep);font-size:var(--fs-micro);font-weight:800;font-variant-numeric:tabular-nums}
+.fzflow-notif svg{width:14px;height:14px;color:var(--maroon)}
+.fzflow-notif i{width:8px;height:8px;border-radius:50%;background:var(--sun);box-shadow:0 0 0 3px var(--sun-soft)}
+.anim .fzflow-notif{animation:fzflow-notif 28s var(--fz-spring) infinite}
+
+/* ---- hati/bintang di titik temu ---- */
+.fzflow-heart{position:absolute;left:calc(var(--fz-meet-x) + var(--hx,0px));top:calc(var(--fz-meet-y) + var(--hy,0px));
+  width:16px;height:16px;transform:translateY(8px) scale(.6);opacity:0}
+.fzflow-heart svg{width:100%;height:100%;display:block}
+.fzflow-heart svg path{fill:var(--maroon)}
+.fzflow-heart.fzflow-star svg path{fill:var(--sun-deep)}
+.anim .fzflow-heart{animation:fzflow-heart 28s ease-in-out infinite}
+
+/* ---- MIRA: rig pose + perjalanan ---- */
+.mira-teacher-wrapper{transform-origin:50% 100%}
+.mira-anim-head{transform-origin:110px 105px}
+.fzflow-mira-hand-r{transform-origin:136px 127px}
+.fzflow-mira-mouth{transform-origin:110px 100px}
+.fzflow-mira-bubble{transform-origin:176px 62px;opacity:0}
+.fzflow-mira-bubble circle{fill:var(--sun-soft);stroke:var(--gold-line);stroke-width:1.5}
+.fzflow-mira-bubble path{fill:var(--maroon)}
+.fzflow-mira-sparkle{opacity:0}
+.fzflow-mira-sparkle path{fill:var(--sun-mid);stroke:var(--sun-deep);stroke-width:.8;stroke-linejoin:round}
+.fzflow-mira-sparkle path:nth-child(1){transform-origin:64px 62px}
+.fzflow-mira-sparkle path:nth-child(2){transform-origin:160px 58px}
+.fzflow-mira-sparkle path:nth-child(3){transform-origin:70px 108px}
+/* kaki + lengan: tersembunyi di balik lid saat di rumah; tampak saat MIRA turun */
+.fzflow-mira-legs .fzflow-mira-skirt{fill:var(--maroon)}
+.fzflow-mira-legs .fzflow-mira-shoe{fill:var(--maroon-deep)}
+.fzflow-mira-arms{opacity:0}
+.fzflow-mira-arm-l{transform-origin:58px 150px}
+.fzflow-mira-arm-r{transform-origin:162px 150px}
+.anim .mira-teacher-wrapper{animation:fzflow-mira-travel 28s cubic-bezier(.4,0,.5,1) infinite}
+.anim .mira-anim-head{animation:fzflow-mira-head 28s ease-in-out infinite}
+.anim .mira-hands-chin{animation:fzflow-mira-chin 28s linear infinite}
+.anim .fzflow-mira-arms{animation:fzflow-mira-arms 28s linear infinite}
+.anim .fzflow-mira-arm-r{animation:fzflow-mira-arm-r 28s var(--fz-spring) infinite}
+.anim .fzflow-mira-arm-l{animation:fzflow-mira-arm-l 28s var(--fz-spring) infinite}
+.anim .fzflow-mira-hand-r{animation:fzflow-mira-hand 28s var(--fz-spring) infinite}
+.anim .fzflow-mira-bubble{animation:fzflow-mira-bubble 28s var(--fz-out) infinite}
+.anim .fzflow-mira-sparkle path{animation:fzflow-mira-sparkle 28s ease-in-out infinite}
+.anim .fzflow-mira-sparkle path:nth-child(2){animation-delay:-.25s}
+.anim .fzflow-mira-sparkle path:nth-child(3){animation-delay:-.5s}
+.anim .fzflow-mira-blush{animation:fzflow-mira-blush 28s ease-in-out infinite}
+.anim .fzflow-mira-mouth{animation:fzflow-mira-mouth 28s var(--fz-spring) infinite}
+
+/* ---- PAW: rig lompat (SVG PAW tidak disentuh) + kostum menumpang ---- */
+.showcase .fzflow-paw-rig{position:absolute;z-index:3;left:-3%;bottom:0;width:clamp(138px,37vw,236px)}
+.fzflow-paw-y{position:relative}
+.fzflow-paw-squash{transform-origin:50% 100%}
+.showcase .hero-paw{display:block;width:100%;height:auto}
+.fzflow-paw-costume{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.fzflow-paw-costume,.fzflow-paw-costume *{transform-box:view-box}
+/* sinkron dengan koreografi hula PAW: keyframes & origin SAMA, tidak bergantung .anim (hula pun tidak) */
+.hula-playing~.fzflow-paw-costume .fzflow-pc-all{animation:hula-all-sway 2.4s cubic-bezier(0.45,0.05,0.55,0.95) infinite;transform-origin:160px 280px}
+.hula-playing~.fzflow-paw-costume .fzflow-pc-torso{animation:hula-hip-roll 2.4s cubic-bezier(0.45,0.05,0.55,0.95) infinite;transform-origin:160px 240px}
+.hula-playing~.fzflow-paw-costume .fzflow-pc-head{animation:hula-head-tilt 2.4s cubic-bezier(0.45,0.05,0.55,0.95) infinite;transform-origin:160px 140px}
+.fzflow-pc-costume{opacity:0;transform:scale(.6);transform-origin:160px 70px}
+.fzflow-pc-costume .fzflow-pc-frame{fill:none;stroke:var(--maroon);stroke-width:3.5}
+.fzflow-pc-costume .fzflow-pc-lens{fill:var(--cream-warm);opacity:.28}
+.fzflow-pc-costume .fzflow-pc-board{fill:#33201F}
+.fzflow-pc-costume .fzflow-pc-band{fill:var(--maroon)}
+.fzflow-pc-costume .fzflow-pc-tassel{stroke:var(--sun-deep);stroke-width:3;fill:none;stroke-linecap:round}
+.fzflow-pc-costume .fzflow-pc-tassel-end{fill:var(--sun)}
+.fzflow-pc-costume .fzflow-pc-tie{fill:var(--maroon)}
+.fzflow-pc-costume .fzflow-pc-knot{fill:var(--sun)}
+.fzflow-pc-star,.fzflow-pc-joy,.fzflow-pc-mouth{opacity:0}
+.fzflow-pc-star .fzflow-pc-white{fill:#fff}
+.fzflow-pc-star .fzflow-pc-pupil{fill:var(--sun-deep);stroke:var(--maroon);stroke-width:1.6;stroke-linejoin:round}
+.fzflow-pc-joy .fzflow-pc-fur{fill:#FFD94F}
+.fzflow-pc-joy .fzflow-pc-arc{fill:none;stroke:#33201F;stroke-width:6;stroke-linecap:round}
+.fzflow-pc-mouth .fzflow-pc-patch{fill:#FFF4DA}
+.fzflow-pc-mouth .fzflow-pc-open{fill:#8C2233;stroke:#33201F;stroke-width:3}
+.fzflow-pc-mouth .fzflow-pc-tongue{fill:var(--maroon-soft)}
+.fzflow-pc-poof{opacity:0;transform:scale(.2);transform-origin:160px 80px}
+.fzflow-pc-poof circle{fill:var(--sun-mid);stroke:var(--sun-deep);stroke-width:1}
+.fzflow-pc-poof circle:nth-child(even){fill:var(--cream-warm);stroke:var(--maroon-line-strong)}
+.anim .fzflow-paw-x{animation:fzflow-paw-x 28s var(--fz-out) infinite}
+.anim .fzflow-paw-y{animation:fzflow-paw-y 28s cubic-bezier(.35,0,.65,1) infinite}
+.anim .fzflow-paw-squash{animation:fzflow-paw-squash 28s ease-out infinite}
+.anim .fzflow-pc-star{animation:fzflow-pc-star 28s linear infinite}
+.anim .fzflow-pc-joy{animation:fzflow-pc-joy 28s linear infinite}
+.anim .fzflow-pc-mouth{animation:fzflow-pc-mouth 28s linear infinite}
+.anim .fzflow-pc-costume{animation:fzflow-pc-costume 28s var(--fz-spring) infinite}
+.anim .fzflow-pc-poof{animation:fzflow-pc-poof 28s ease-out infinite}
+
+/* ---- Lapisan B ---- */
+.fzflow-grid{position:absolute;inset:0;opacity:.5;
+  background-image:radial-gradient(var(--maroon-line) 1px,transparent 1.2px);background-size:22px 22px;
+  -webkit-mask-image:radial-gradient(ellipse 70% 65% at 50% 50%,#000 30%,transparent 100%);
+  mask-image:radial-gradient(ellipse 70% 65% at 50% 50%,#000 30%,transparent 100%)}
+.fzflow-aura{position:absolute;width:clamp(240px,34vw,440px);aspect-ratio:1;border-radius:50%;
+  transform:translate(-50%,-50%);opacity:.7;
+  background:radial-gradient(circle,var(--sun-mid) 0%,var(--sun-soft) 38%,transparent 70%)}
+.fzflow-aura-s{left:var(--fz-sx);top:var(--fz-sy)}
+.fzflow-aura-t{left:var(--fz-tx);top:var(--fz-ty);width:clamp(280px,40vw,520px)}
+@keyframes fzflow-aura{0%,100%{opacity:.5;transform:translate(-50%,-50%) scale(1)}50%{opacity:.85;transform:translate(-50%,-50%) scale(1.1)}}
+.anim .fzflow-aura{animation:fzflow-aura 8s ease-in-out infinite}
+.anim .fzflow-aura-t{animation-delay:-3.5s}
+.fzflow-net{position:absolute;inset:0;width:100%;height:100%;opacity:.7}
+.fzflow-net line{stroke:var(--gold-line);stroke-width:1;stroke-dasharray:5 9}
+.fzflow-net circle{fill:var(--sun-mid);stroke:var(--maroon-line-strong);stroke-width:1;transform-box:fill-box;transform-origin:center}
+.fzflow-net .fzflow-node-core{fill:var(--maroon)}
+@keyframes fzflow-node{0%,100%{transform:scale(1);opacity:.55}50%{transform:scale(1.7);opacity:1}}
+@keyframes fzflow-edge{to{stroke-dashoffset:-140}}
+.anim .fzflow-net circle{animation:fzflow-node 5.6s ease-in-out infinite}
+.anim .fzflow-net circle:nth-of-type(2n){animation-delay:-1.4s}
+.anim .fzflow-net circle:nth-of-type(3n){animation-delay:-2.8s}
+.anim .fzflow-net circle:nth-of-type(5n){animation-delay:-4.2s}
+.anim .fzflow-net line{animation:fzflow-edge 12s linear infinite}
+.anim .fzflow-net line:nth-of-type(2n){animation-direction:reverse}
+.fzflow-label{position:absolute;transform:translate(-50%,-50%);padding:4px 9px;border-radius:var(--radius-pill);
+  background:var(--cream-warm);border:1px solid var(--gold-line);color:var(--maroon-soft);
+  font-size:var(--fs-micro);font-weight:700;letter-spacing:.08em;font-variant-numeric:tabular-nums;white-space:nowrap;opacity:.6}
+.fzflow-label b{color:var(--maroon-deep)}
+@keyframes fzflow-label{0%,100%{opacity:0;transform:translate(-50%,-50%) translateY(10px)}
+  14%,44%{opacity:.85;transform:translate(-50%,-50%) translateY(0)}58%{opacity:0;transform:translate(-50%,-50%) translateY(-12px)}}
+.anim .fzflow-label{animation:fzflow-label 14s ease-in-out infinite;animation-delay:calc(var(--i,0) * -2.3s)}
+.fzflow-l1{left:46%;top:24%}.fzflow-l2{left:48%;top:66%}.fzflow-l3{left:9%;top:10%}
+.fzflow-l4{left:93%;top:14%}.fzflow-l5{left:57%;top:36%}.fzflow-l6{left:40%;top:56%}
+.fzflow-glyph{position:absolute;transform:translate(-50%,-50%);color:var(--maroon);opacity:.08;
+  font-size:clamp(1.6rem,4.2vw,3.4rem);font-weight:600;line-height:1;font-family:'Noto Sans JP','Hiragino Sans','Yu Gothic','Noto Sans Thai',var(--font)}
+@keyframes fzflow-glyph{0%,100%{transform:translate(-50%,-50%) translateY(0) rotate(-3deg);opacity:.06}
+  50%{transform:translate(-50%,-50%) translateY(-18px) rotate(3deg);opacity:.13}}
+.anim .fzflow-glyph{animation:fzflow-glyph 24s ease-in-out infinite;animation-delay:calc(var(--i,0) * -4s)}
+.fzflow-g1{left:47%;top:44%}.fzflow-g2{left:5%;top:82%}.fzflow-g3{left:95%;top:80%}
+.fzflow-g4{left:36%;top:4%}.fzflow-g5{left:60%;top:92%}.fzflow-g6{left:88%;top:36%}
+.fzflow-scan{position:absolute;left:4%;right:4%;top:0;height:2px;opacity:0;--fz-scan-h:clamp(300px,46vh,470px);
+  background:linear-gradient(90deg,transparent,var(--gold-line) 30%,var(--sun-deep) 50%,var(--gold-line) 70%,transparent);
+  box-shadow:0 0 14px 2px var(--sun-soft)}
+@keyframes fzflow-scan{0%{transform:translateY(0);opacity:0}8%{opacity:.5}88%{opacity:.5}
+  100%{transform:translateY(var(--fz-scan-h));opacity:0}}
+.anim .fzflow-scan{animation:fzflow-scan 13s linear infinite}
+
+/* ---- breakpoint tumpuk (<=980px, seirama .hero-dual-stage): HP di atas, laptop di bawah ---- */
+@media (max-width:980px){
+  .hero-dual-stage{
+    --fz-tx:50%;--fz-ty:74%;--fz-sx:50%;--fz-sy:24%;
+    --fz-t-mid-x:84%;--fz-t-mid-y:50%;--fz-r-mid-x:16%;--fz-r-mid-y:50%;
+    --fz-ease-x:cubic-bezier(.42,0,.58,1);--fz-ease-y:linear;
+    --fz-mac-half:min(240px,50vw - 32px);
+    /* titik temu di celah antara showcase dan laptop: MIRA naik, PAW turun-kanan */
+    --fz-meet-x:50%;--fz-meet-y:50%;
+    --fz-mira-scale:1;
+    --fz-mira-dx:calc(var(--fz-stageW) * .22);--fz-mira-dy:-190px;
+    --fz-paw-dx:calc(var(--fz-stageW) * .1);--fz-paw-dy:64px;
+  }
+  .fzflow-link-h{display:none}.fzflow-link-v{display:block}
+  .fzflow-scan{--fz-scan-h:clamp(600px,100vh,900px)}
+  .fzflow-aura{width:clamp(220px,60vw,360px)}
+  .fzflow-aura-t{width:clamp(260px,70vw,420px)}
+  .fzflow-l1{left:74%;top:47%}.fzflow-l2{left:24%;top:52%}.fzflow-l3{left:10%;top:6%}
+  .fzflow-l4{left:90%;top:4%}.fzflow-l5{left:86%;top:62%}.fzflow-l6{left:14%;top:38%}
+  .fzflow-g1{left:80%;top:30%}.fzflow-g2{left:8%;top:64%}.fzflow-g3{left:92%;top:88%}
+  .fzflow-g4{left:30%;top:3%}.fzflow-g5{left:50%;top:50%}.fzflow-g6{left:88%;top:18%}
+}
+/* ---- layar sangat kecil: Lapisan B disederhanakan, Lapisan A + pertemuan tetap utuh ---- */
+@media (max-width:559px){
+  .fzflow-l4,.fzflow-l5,.fzflow-l6,.fzflow-g4,.fzflow-g5,.fzflow-g6,.fzflow-net .fzflow-lite{display:none}
+  .fzflow-card{padding:6px 8px}
+  .fzflow-card-task i{width:34px}.fzflow-card-task i+i{width:22px}
+  .fzflow-progress .fzflow-track{width:44px}
+  .fzflow-grid{background-size:18px 18px}
+  .fzflow-heart{width:12px;height:12px}
+}
+@media (max-width:359px){.showcase .fzflow-paw-rig{width:112px}}
+/* ---- reduced motion: site.js tidak memasang .anim, jadi nilai dasar di atas = pose diam.
+   Satu-satunya gerak yang dibiarkan: kedipan lambat MIRA (skala kelopak saja). ---- */
+@media (prefers-reduced-motion:reduce){
+  .mira-eyelid{animation:fzflow-mira-slowblink 8s ease-in-out infinite}
+  .fzflow-progress svg{opacity:1}
+}
+@keyframes fzflow-mira-slowblink{0%,47%,53%,100%{transform:scaleY(1)}50%{transform:scaleY(.12)}}
+
+/* ---- keyframes 28 s hasil generator ---- */
+@keyframes fzflow-task-x{0%,1%{transform:translateX(var(--fz-tx));animation-timing-function:var(--fz-ease-x)}3.25%{transform:translateX(var(--fz-t-mid-x));animation-timing-function:var(--fz-ease-x)}5.5%{transform:translateX(var(--fz-sx))}25%,26%{transform:translateX(var(--fz-tx));animation-timing-function:var(--fz-ease-x)}28.25%{transform:translateX(var(--fz-t-mid-x));animation-timing-function:var(--fz-ease-x)}30.5%,100%{transform:translateX(var(--fz-sx))}}
+@keyframes fzflow-task-y{0%,1%{transform:translateY(var(--fz-ty));animation-timing-function:var(--fz-ease-y)}3.25%{transform:translateY(var(--fz-t-mid-y));animation-timing-function:var(--fz-ease-y)}5.5%{transform:translateY(var(--fz-sy))}25%,26%{transform:translateY(var(--fz-ty));animation-timing-function:var(--fz-ease-y)}28.25%{transform:translateY(var(--fz-t-mid-y));animation-timing-function:var(--fz-ease-y)}30.5%,100%{transform:translateY(var(--fz-sy))}}
+@keyframes fzflow-task-pop{0%{opacity:0;transform:translate(-50%,-50%) scale(.4)}1%,5%{opacity:1;transform:translate(-50%,-50%) scale(1)}6%{opacity:0;transform:translate(-50%,-50%) scale(.45)}25%{opacity:0;transform:translate(-50%,-50%) scale(.4)}26%,30%{opacity:1;transform:translate(-50%,-50%) scale(1)}31%,100%{opacity:0;transform:translate(-50%,-50%) scale(.45)}}
+@keyframes fzflow-result-x{0%,15%{transform:translateX(var(--fz-sx));animation-timing-function:var(--fz-ease-x)}17.5%{transform:translateX(var(--fz-r-mid-x));animation-timing-function:var(--fz-ease-x)}20%{transform:translateX(var(--fz-tx))}25%,40%{transform:translateX(var(--fz-sx));animation-timing-function:var(--fz-ease-x)}42.5%{transform:translateX(var(--fz-r-mid-x));animation-timing-function:var(--fz-ease-x)}45%,100%{transform:translateX(var(--fz-tx))}}
+@keyframes fzflow-result-y{0%,15%{transform:translateY(var(--fz-sy));animation-timing-function:var(--fz-ease-y)}17.5%{transform:translateY(var(--fz-r-mid-y));animation-timing-function:var(--fz-ease-y)}20%{transform:translateY(var(--fz-ty))}25%,40%{transform:translateY(var(--fz-sy));animation-timing-function:var(--fz-ease-y)}42.5%{transform:translateY(var(--fz-r-mid-y));animation-timing-function:var(--fz-ease-y)}45%,100%{transform:translateY(var(--fz-ty))}}
+@keyframes fzflow-result-pop{0%,14.25%{opacity:0;transform:translate(-50%,-50%) scale(.4)}15%,19.5%{opacity:1;transform:translate(-50%,-50%) scale(1)}20.5%{opacity:0;transform:translate(-50%,-50%) scale(.45)}25%,39.25%{opacity:0;transform:translate(-50%,-50%) scale(.4)}40%,44.5%{opacity:1;transform:translate(-50%,-50%) scale(1)}45.5%,100%{opacity:0;transform:translate(-50%,-50%) scale(.45)}}
+@keyframes fzflow-badge{0%,5.25%{opacity:0;transform:translate(-50%,-50%) scale(.4)}6%{opacity:1;transform:translate(-50%,-50%) scale(1.18)}6.75%,14%{opacity:1;transform:translate(-50%,-50%) scale(1)}15%{opacity:0;transform:translate(-50%,-50%) scale(.6)}25%,30.25%{opacity:0;transform:translate(-50%,-50%) scale(.4)}31%{opacity:1;transform:translate(-50%,-50%) scale(1.18)}31.75%,39%{opacity:1;transform:translate(-50%,-50%) scale(1)}40%,100%{opacity:0;transform:translate(-50%,-50%) scale(.6)}}
+@keyframes fzflow-progress{0%,6.25%{opacity:0;transform:translate(-50%,-50%) translateY(6px)}7%,14.5%{opacity:1;transform:translate(-50%,-50%) translateY(0)}15.5%{opacity:0;transform:translate(-50%,-50%) translateY(-4px)}25%,31.25%{opacity:0;transform:translate(-50%,-50%) translateY(6px)}32%,39.5%{opacity:1;transform:translate(-50%,-50%) translateY(0)}40.5%,100%{opacity:0;transform:translate(-50%,-50%) translateY(-4px)}}
+@keyframes fzflow-bar{0%,7%{transform:scaleX(0)}13.5%{transform:scaleX(1)}25%,32%{transform:scaleX(0)}38.5%,100%{transform:scaleX(1)}}
+@keyframes fzflow-check{0%,13.5%{opacity:0;transform:scale(.4)}14.25%,15%{opacity:1;transform:scale(1)}15.75%{opacity:0;transform:scale(1)}25%,38.5%{opacity:0;transform:scale(.4)}39.25%,40%{opacity:1;transform:scale(1)}40.75%,100%{opacity:0;transform:scale(1)}}
+@keyframes fzflow-notif{0%,20%{opacity:0;transform:translate(-50%,-50%) scale(.6) translateY(6px)}20.75%{opacity:1;transform:translate(-50%,-50%) scale(1.08) translateY(0)}21.5%,24%{opacity:1;transform:translate(-50%,-50%) scale(1)}24.75%{opacity:0;transform:translate(-50%,-50%) scale(.8)}25%,45%{opacity:0;transform:translate(-50%,-50%) scale(.6) translateY(6px)}45.75%{opacity:1;transform:translate(-50%,-50%) scale(1.08) translateY(0)}46.5%,49%{opacity:1;transform:translate(-50%,-50%) scale(1)}49.75%,100%{opacity:0;transform:translate(-50%,-50%) scale(.8)}}
+@keyframes fzflow-mira-head{0%{transform:none}1.1%,2.6%{transform:rotate(-7deg) translate(-3px,-2px) scale(1.04)}4.1%{transform:none}9.75%{transform:rotate(2deg)}15%{transform:rotate(-1.5deg)}19.5%{transform:none}20.6%{transform:translateY(-5px) scale(1.03)}21.75%{transform:translateY(0)}22.9%{transform:translateY(-4px) scale(1.02)}24.4%,25%{transform:none}26.1%,27.6%{transform:rotate(-7deg) translate(-3px,-2px) scale(1.04)}29.1%{transform:none}34.75%{transform:rotate(2deg)}40%{transform:rotate(-1.5deg)}44.5%{transform:none}46.4%,48.6%{transform:rotate(8deg) translate(2px,-2px) scale(1.04)}49.75%,59%{transform:none}60.5%,63%{transform:rotate(-9deg)}64.5%{transform:none}65.5%{transform:rotate(4deg) translateY(-4px)}67%{transform:none}68%{transform:translateY(-5px) rotate(-3deg)}69%{transform:translateY(0)}70%{transform:translateY(-5px) rotate(3deg)}71%{transform:translateY(0)}72%{transform:translateY(-5px) rotate(-3deg)}73%{transform:translateY(0)}74%{transform:translateY(-5px) rotate(3deg)}75%{transform:translateY(0)}76%{transform:translateY(-5px) rotate(-3deg)}77%{transform:translateY(0)}78%{transform:translateY(-5px) rotate(3deg)}79%{transform:translateY(0)}80%{transform:translateY(-5px) rotate(-3deg)}81%{transform:translateY(0)}82%{transform:translateY(-5px) rotate(3deg)}83%{transform:translateY(0)}84%{transform:rotate(-6deg)}86%,100%{transform:none}}
+@keyframes fzflow-mira-hand{0%{transform:none}0.5%{transform:rotate(-58deg) translate(6px,-4px)}1.75%{transform:rotate(-52deg) translate(6px,-4px)}2.75%,20.5%{transform:none}21.25%{transform:rotate(-22deg)}22%{transform:rotate(-38deg)}22.75%{transform:rotate(-20deg)}23.75%,25%{transform:none}25.5%{transform:rotate(-58deg) translate(6px,-4px)}26.75%{transform:rotate(-52deg) translate(6px,-4px)}27.75%,45.5%{transform:none}46.25%{transform:rotate(-22deg)}47%{transform:rotate(-38deg)}47.75%{transform:rotate(-20deg)}48.75%,100%{transform:none}}
+@keyframes fzflow-mira-bubble{0%{opacity:0;transform:scale(.5)}0.62%,2%{opacity:1;transform:scale(1)}2.75%{opacity:0;transform:translate(-10px,-6px) scale(.7)}25%{opacity:0;transform:scale(.5)}25.62%,27%{opacity:1;transform:scale(1)}27.75%,100%{opacity:0;transform:translate(-10px,-6px) scale(.7)}}
+@keyframes fzflow-mira-sparkle{0%,20.25%{opacity:0;transform:scale(.3) rotate(0)}21%{opacity:1;transform:scale(1.1) rotate(20deg)}22%{opacity:.6;transform:scale(.85) rotate(40deg)}23%{opacity:1;transform:scale(1) rotate(60deg)}24.25%{opacity:0;transform:scale(.4) rotate(80deg)}25%,45.25%{opacity:0;transform:scale(.3) rotate(0)}46%{opacity:1;transform:scale(1.1) rotate(20deg)}47%{opacity:.6;transform:scale(.85) rotate(40deg)}48%{opacity:1;transform:scale(1) rotate(60deg)}49.25%{opacity:0;transform:scale(.4) rotate(80deg)}50%,66.5%{opacity:0;transform:scale(.3) rotate(0)}67.5%{opacity:1;transform:scale(1.1) rotate(20deg)}69.5%{opacity:.6;transform:scale(.85) rotate(40deg)}71.5%{opacity:1;transform:scale(1) rotate(60deg)}74%{opacity:0;transform:scale(.4) rotate(80deg)}100%{opacity:0;transform:scale(.3) rotate(0)}}
+@keyframes fzflow-mira-blush{0%,20%{opacity:.32}21.25%,23.75%{opacity:.62}24.75%,45%{opacity:.32}46.25%,48.75%{opacity:.62}49.75%,66%{opacity:.32}68%,84%{opacity:.62}86%,100%{opacity:.32}}
+@keyframes fzflow-mira-mouth{0%,20%{transform:scale(1)}21%,23.75%{transform:scale(1.3,1.7)}24.75%,45%{transform:scale(1)}46%,48.75%{transform:scale(1.3,1.7)}49.75%,59%{transform:scale(1)}60%,63%{transform:scale(1.2,1.5)}64%,67%{transform:scale(1)}68%,84%{transform:scale(1.3,1.7)}86%,100%{transform:scale(1)}}
+@keyframes fzflow-mira-travel{0%{transform:translateX(-50%) translateY(0) scale(1);z-index:1}6.25%{transform:translateX(-50%) translateY(-5px) scale(1);z-index:1}12.5%{transform:translateX(-50%) translateY(0) scale(1);z-index:1}18.75%{transform:translateX(-50%) translateY(-5px) scale(1);z-index:1}25%{transform:translateX(-50%) translateY(0) scale(1);z-index:1}31.25%{transform:translateX(-50%) translateY(-5px) scale(1);z-index:1}37.5%{transform:translateX(-50%) translateY(0) scale(1);z-index:1}43.75%{transform:translateX(-50%) translateY(-5px) scale(1);z-index:1}50%{transform:translateX(-50%) translateY(0) scale(1);z-index:1}52%{transform:translateX(-50%) translateY(-36px) scale(1.06);z-index:1}52.5%{transform:translateX(-50%) translateY(-36px) scale(1.06);z-index:4}55.5%{transform:translate(calc(-50% + var(--fz-mira-dx) * .5),calc(var(--fz-mira-dy) * .35 - 64px)) scale(calc(var(--fz-mira-scale) * .92 + .08));z-index:4}58%{transform:translate(calc(-50% + var(--fz-mira-dx)),var(--fz-mira-dy)) scale(var(--fz-mira-scale));z-index:4}58.7%{transform:translate(calc(-50% + var(--fz-mira-dx)),var(--fz-mira-dy)) scale(calc(var(--fz-mira-scale) * 1.07),calc(var(--fz-mira-scale) * .91));z-index:4}59.5%,67%{transform:translate(calc(-50% + var(--fz-mira-dx)),var(--fz-mira-dy)) scale(var(--fz-mira-scale));z-index:4}67.6%{transform:translate(calc(-50% + var(--fz-mira-dx)),calc(var(--fz-mira-dy) - 12px)) scale(var(--fz-mira-scale));z-index:4}68.4%{transform:translate(calc(-50% + var(--fz-mira-dx)),var(--fz-mira-dy)) scale(var(--fz-mira-scale));z-index:4}69.8%{transform:translate(calc(-50% + var(--fz-mira-dx)),calc(var(--fz-mira-dy) - 12px)) scale(var(--fz-mira-scale));z-index:4}70.6%,86.5%{transform:translate(calc(-50% + var(--fz-mira-dx)),var(--fz-mira-dy)) scale(var(--fz-mira-scale));z-index:4}87.3%{transform:translate(calc(-50% + var(--fz-mira-dx)),var(--fz-mira-dy)) scale(calc(var(--fz-mira-scale) * 1.06),calc(var(--fz-mira-scale) * .91));z-index:4}90%{transform:translate(calc(-50% + var(--fz-mira-dx) * .5),calc(var(--fz-mira-dy) * .35 - 64px)) scale(calc(var(--fz-mira-scale) * .92 + .08));z-index:4}90.6%{transform:translate(calc(-50% + var(--fz-mira-dx) * .3),calc(var(--fz-mira-dy) * .2 - 70px)) scale(1.08);z-index:1}92.5%{transform:translateX(-50%) translateY(-30px) scale(1);z-index:1}93.5%{transform:translateX(-50%) translateY(0) scale(1);z-index:1}96.75%{transform:translateX(-50%) translateY(-5px) scale(1);z-index:1}100%{transform:translateX(-50%) translateY(0) scale(1);z-index:1}}
+@keyframes fzflow-mira-chin{0%,52.5%{opacity:1}53.5%,91%{opacity:0}92%,100%{opacity:1}}
+@keyframes fzflow-mira-arms{0%,52.5%{opacity:0}53.5%,91%{opacity:1}92%,100%{opacity:0}}
+@keyframes fzflow-mira-arm-r{0%,58.5%{transform:rotate(0)}59.5%{transform:rotate(-125deg)}60.5%{transform:rotate(-100deg)}61.5%{transform:rotate(-135deg)}62.5%{transform:rotate(-100deg)}63.5%{transform:rotate(-125deg)}64.5%,66.6%{transform:rotate(-132deg)}68%,84%{transform:rotate(0)}84.6%{transform:rotate(-125deg)}85.4%{transform:rotate(-98deg)}86.2%{transform:rotate(-132deg)}87.2%,100%{transform:rotate(0)}}
+@keyframes fzflow-mira-arm-l{0%,63.5%{transform:rotate(0)}64.5%,66.6%{transform:rotate(128deg)}68%,100%{transform:rotate(0)}}
+@keyframes fzflow-paw-x{0%,53%{transform:translateX(0)}59%,87%{transform:translateX(var(--fz-paw-dx))}93%,100%{transform:translateX(0)}}
+@keyframes fzflow-paw-y{0%,53%{transform:translateY(0)}54%{transform:translateY(calc(var(--fz-paw-dy) * 0.17 - 36px))}55%{transform:translateY(calc(var(--fz-paw-dy) * 0.33 - 0px))}56%{transform:translateY(calc(var(--fz-paw-dy) * 0.5 - 36px))}57%{transform:translateY(calc(var(--fz-paw-dy) * 0.67 - 0px))}58%{transform:translateY(calc(var(--fz-paw-dy) * 0.83 - 30px))}59%,67%{transform:translateY(calc(var(--fz-paw-dy) * 1 - 0px))}67.6%{transform:translateY(calc(var(--fz-paw-dy) * 1 - 16px))}68.4%{transform:translateY(calc(var(--fz-paw-dy) * 1 - 0px))}69.8%{transform:translateY(calc(var(--fz-paw-dy) * 1 - 16px))}70.6%,87%{transform:translateY(calc(var(--fz-paw-dy) * 1 - 0px))}88%{transform:translateY(calc(var(--fz-paw-dy) * 0.83 - 36px))}89%{transform:translateY(calc(var(--fz-paw-dy) * 0.67 - 0px))}90%{transform:translateY(calc(var(--fz-paw-dy) * 0.5 - 36px))}91%{transform:translateY(calc(var(--fz-paw-dy) * 0.33 - 0px))}92%{transform:translateY(calc(var(--fz-paw-dy) * 0.17 - 30px))}93%,100%{transform:translateY(0)}}
+@keyframes fzflow-paw-squash{0%,53%{transform:scale(1)}53.6%{transform:scale(1.06,.94)}54%{transform:scale(.96,1.05)}55%{transform:scale(1.06,.94)}55.6%{transform:scale(1)}57%{transform:scale(1.06,.94)}57.6%{transform:scale(1)}59%{transform:scale(1.08,.92)}59.8%{transform:scale(1)}88%{transform:scale(1.06,.94)}88.6%{transform:scale(1)}91%{transform:scale(1.06,.94)}91.6%{transform:scale(1)}93%{transform:scale(1.08,.92)}93.8%,100%{transform:scale(1)}}
+@keyframes fzflow-pc-star{0%,58.8%{opacity:0}59.6%,66.4%{opacity:1}67%,100%{opacity:0}}
+@keyframes fzflow-pc-joy{0%,67%{opacity:0}67.6%,84.5%{opacity:1}85.2%,100%{opacity:0}}
+@keyframes fzflow-pc-mouth{0%,58.8%{opacity:0}59.6%,84.5%{opacity:1}85.2%,100%{opacity:0}}
+@keyframes fzflow-pc-costume{0%,66%{opacity:0;transform:scale(.6)}66.8%{opacity:1;transform:scale(1.12)}67.6%,93.6%{opacity:1;transform:scale(1)}94.6%,100%{opacity:0;transform:scale(.6)}}
+@keyframes fzflow-pc-poof{0%,65.6%{opacity:0;transform:scale(.2)}66.4%{opacity:1;transform:scale(1)}67.6%{opacity:0;transform:scale(1.7)}93.4%{opacity:0;transform:scale(.2)}94.2%{opacity:1;transform:scale(1)}95.4%{opacity:0;transform:scale(1.7)}100%{opacity:0;transform:scale(.2)}}
+@keyframes fzflow-heart{0%,60%{opacity:0;transform:translateY(8px) scale(.6)}62%{opacity:1;transform:translateY(0) scale(1)}66%{opacity:0;transform:translateY(-34px) scale(1.1)}67%{opacity:0;transform:translateY(8px) scale(.6)}69%{opacity:1;transform:translateY(0) scale(1)}74%{opacity:0;transform:translateY(-38px) scale(1.15)}75%{opacity:0;transform:translateY(8px) scale(.6)}77%{opacity:1;transform:translateY(0) scale(1)}82.5%{opacity:0;transform:translateY(-38px) scale(1.15)}83%,100%{opacity:0;transform:translateY(8px) scale(.6)}}
 
