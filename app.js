@@ -4196,6 +4196,12 @@ async function load(){const root=document.baseURI;/* W1 P0-1 (16-001): fetch ban
   if(activeTargetLang()==='ja'){
     const jaBank=await optional('content/ja/grammar-templates-ja.json',null);
     const jaGraph=await optional('content/ja/family-graph-ja.json',null);
+    // Kosakata Jepang berdiri sendiri dari bank tata bahasa: kalau salah satu gagal dimuat,
+    // yang satu lagi tetap sampai ke murid. Bank kosakata memakai NAMA MEDAN yang sama
+    // dengan vocabulary-master.json, jadi ia lewat normalisasi V yang sama beberapa baris
+    // di bawah - kartu, ulangan, dan soal kosakata semuanya ikut tanpa jalur kedua.
+    const jaVocab=await optional('content/ja/vocabulary-master-ja.json',null);
+    if(jaVocab&&Array.isArray(jaVocab.words)&&jaVocab.words.length)V=jaVocab.words;
     if(jaBank&&Array.isArray(jaBank.templates)&&jaBank.templates.length){
       G=jaBank;
       // Graf keluarga Jepang menggantikan graf Inggris SELAMA bahasa ini aktif. Graf lesson
