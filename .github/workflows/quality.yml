@@ -980,6 +980,14 @@ jobs:
         # pengecoh yang sebenarnya benar (murid dihukum untuk jawaban benar). Gerbang ini
         # memanggil conceptOf() yang SEBENARNYA, bukan menirunya.
         run: node tests/japanese-content-test.js
+      - name: 'Kursus Jepang sampai ke layar, dan jalur murid Inggris tidak tersentuh'
+        # Sampai m025-284 seluruh kursus Jepang ada di repo tapi NOL byte sampai ke murid.
+        # Gerbang ini menandai batas itu terlewati, dan menjaga syaratnya: bahasa bawaan tetap
+        # 'en' (update tidak memindahkan murid yang sudah ada), bank Jepang diprecache sw.js
+        # (kalau tidak, kursusnya mati saat offline — keadaan paling sering di lapangan),
+        # modul sumbu bahasa benar-benar dimuat, graf keluarga Jepang disuntik SAAT ja dan
+        # DIPULIHKAN saat kembali ke en, dan naskah pemilihnya punya kembaran Thai.
+        run: node tests/japanese-course-wiring-test.js
       - name: 'Sumbu bahasa target: kunci murid Inggris identik byte per byte'
         # Menambah bahasa kedua punya satu cara gampang dan satu cara benar. Yang gampang:
         # beri SEMUA kunci awalan bahasa, termasuk kunci Inggris. Sekali dikirim, setiap murid
