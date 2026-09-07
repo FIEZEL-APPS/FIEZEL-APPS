@@ -3218,6 +3218,60 @@ eteach) dan tawaran berhenti (reathe).
     58%{transform:scale(1.12) translateY(-1px)}
     100%{transform:scale(1) translateY(0)}
   }
+/* ==========================================================================
+   KelasKu Wordmark — Brand Typography & Contextual Styling
+   Signature Plus Jakarta Sans 800 with emerald/sage #1F7A63 identity.
+   ========================================================================== */
+
+.kelasku-wordmark {
+  font-family: var(--fz-heading, 'Plus Jakarta Sans', sans-serif) !important;
+  font-weight: 800;
+  font-style: normal;
+  letter-spacing: -0.02em;
+  color: #1F7A63 !important;
+  display: inline-block;
+  line-height: inherit;
+  vertical-align: baseline;
+  text-decoration: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* --- Bottom Navigation (.bottomnav .nav[data-view="classroom"]) --- */
+.bottomnav .nav[data-view="classroom"] .kelasku-wordmark,
+.bottomnav .nav .kelasku-wordmark {
+  font-size: var(--fs-caption, 0.75rem);
+  font-weight: 800;
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+  color: #1F7A63 !important;
+  white-space: nowrap;
+  display: block;
+  text-align: center;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+  transform: none;
+  transition: color 0.16s var(--ease, ease), transform 0.22s var(--ease-spring, ease);
+}
+
+.bottomnav .nav[data-view="classroom"].active .kelasku-wordmark {
+  color: #1F7A63 !important;
+  font-weight: 800;
+}
+
+.bottomnav .nav[data-view="classroom"].active .fz-i {
+  --fz-i-line: #1F7A63;
+}
+
+/* Inverted contrast when inside primary/dark buttons or dark containers */
+button.primary .kelasku-wordmark,
+.btn-primary .kelasku-wordmark,
+.btn-teacher .kelasku-wordmark,
+.btn-teacher-hero .kelasku-wordmark,
+.tg-side .kelasku-wordmark {
+  color: #FFFFFF !important;
 }
 
 /* ==========================================================================
