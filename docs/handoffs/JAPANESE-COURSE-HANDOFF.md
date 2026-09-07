@@ -369,3 +369,44 @@ diagnostik sendiri tidak berubah perilakunya — hanya penanda buildnya naik ke 
 
 **Utang yang masih berdiri:** sidecar Thai untuk 2.574 kalimat penjelasan butir Jepang, dan
 tinjauan penutur asli atas 234 butir yang semuanya bertanda DRAFT AI.
+
+---
+
+## m025-291 — bank Jepang ternyata ditimpa satu baris sesudah dipasang
+
+Catatan m025-290 di atas benar tentang niatnya dan **salah tentang hasilnya**. Owner menguji
+langsung: memilih Jepang di Pengaturan, kembali ke menu, soalnya tetap Inggris.
+
+Sebabnya satu baris, dan sudah ada di repo jauh sebelum kursus Jepang:
+
+```js
+if(activeTargetLang()==='ja'){ ... G=jaBank ... }      // blok pemuat ja
+...                                                    // 18 baris
+...grammarMaster=contentCanaryRuntime.dataset.grammar;save()}G=grammarMaster;   // menimpa
+```
+
+`G` dipasang ke bank Jepang, lalu dikembalikan ke bank Inggris oleh jalur canary yang sudah
+lama ada. Semua yang tampak di permukaan tetap benar — preferensi tersimpan, toast muncul,
+graf keluarga Jepang benar-benar tersuntik — hanya banknya yang tidak pernah sampai.
+Perbaikannya: blok pemuat ja dipindah ke **sesudah** `G=grammarMaster`.
+
+### Kenapa sebelas gerbang hijau dan bugnya tetap lolos
+
+`japanese-course-wiring-test` bertanya **"apakah kodenya ADA"**: apakah `setFamilyGraph`
+dipanggil, apakah banknya diprecache, apakah modulnya dimuat, apakah otoritas manifestnya
+naik. Semua jawabannya ya — dan semuanya benar. Yang tidak pernah ditanyakan adalah **"apakah
+kodenya BERPENGARUH"**.
+
+Penugasan yang ditimpa adalah kode yang ada tanpa berpengaruh. Gerbang keberadaan secara
+struktural tidak bisa menangkapnya. `tests/japanese-bank-survives-load-test.js` memeriksa
+**urutan** penugasan `G` di dalam `load()`: bank Jepang harus jadi penugasan terakhir sebelum
+hidrasi membacanya. Dibuktikan menggigit — blok dikembalikan ke posisi lamanya, gerbang
+langsung merah dan menyebut `grammarMaster` sebagai penimpanya.
+
+### Yang MASIH berbahasa Inggris, dan ini bukan bug
+
+Hanya bank **tata bahasa** yang punya versi Jepang. `vocabulary-master.json` dan
+`reading-bank.json` tidak, jadi latihan kosakata, membaca, dan menyimak tetap Inggris
+meskipun murid memilih Jepang. Kosakata JLPT N5–N1 sudah ada sebagai data
+(`docs/japanese/kosakata-jlpt.json`, 1.371 entri) tetapi belum pernah dijadikan bank latihan
+berformat `vocabulary-master.json`. Itu pekerjaan berikutnya, bukan yang tersisa dari yang ini.
