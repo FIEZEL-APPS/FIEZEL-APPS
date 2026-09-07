@@ -466,3 +466,57 @@ Bank **membaca** (`reading-bank.json`) belum punya versi Jepang, jadi latihan me
 menyimak tetap Inggris saat murid memilih Jepang. Seluruh 1.370 kalimat berstatus **DRAFT AI**
 dan wajib ditinjau penutur asli, sama seperti 234 butir tata bahasa. Sidecar Thai juga masih
 utang.
+
+### m025-292 (lanjutan) — bank bacaan: 150 bacaan, 750 soal, tiap jawaban berbukti
+
+Bagian terakhir yang membuat kursus Jepang setara: `content/ja/reading-bank-ja.json`.
+150 bacaan, **30 per tingkat A1–C1**, masing-masing 5 soal — **750 soal**. Teks bacaan
+berbahasa Jepang; pertanyaan dan pilihannya berbahasa Indonesia, karena murid FIEZEL orang
+Indonesia dan soal berbahasa Jepang tentang teks Jepang menguji dua hal sekaligus di tingkat
+yang belum sampai ke situ.
+
+Panjang teks naik menurut tingkat: A1 60–90 aksara dengan pola です/ます, sampai C1 250–320
+aksara bernada esai. Seluruh 150 teks dikarang untuk FIEZEL — nol kalimat disalin dari buku
+ajar, situs berita, maupun sumber lain.
+
+**Assert intinya cuma satu, dan sengaja bukan soal bentuk.** Soal bacaan adalah kebohongan
+paling sunyi di seluruh aplikasi: sebuah soal bisa punya pertanyaan wajar, empat pilihan
+wajar, dan kunci wajar — tanpa satu pun bisa dijawab dari teks yang ada di layar. Murid
+membaca, tidak menemukan jawabannya, lalu menebak; yang dilatih menebak, bukan membaca. Tidak
+ada gerbang bentuk yang bisa melihat itu.
+
+Karena itu `tests/japanese-reading-bank-test.js` menuntut **`evidence` setiap soal adalah
+substring persis dari `text` bacaannya sendiri**. Perakit menolak lebih dulu soal yang
+buktinya tidak ada di teks; dari 750 soal, **nol ditolak**. Tiga mutasi diuji — bukti dipalsukan,
+kunci diseragamkan ke satu posisi, satu soal dihapus — tiga-tiganya tertangkap.
+
+Satu assert lagi menjaga hal yang gampang terlewat: **kunci tidak boleh menumpuk di satu
+posisi**. Bank yang 60% jawabannya di opsi A bisa dijawab benar tanpa membaca sama sekali.
+
+**Dua kali gerbang ini salah, dan keduanya kuperbaiki di sisi gerbang:**
+1. Ia menolak 4 soal tipe `reference`/kosakata yang mengutip kata Jepang yang ditanyakan —
+   padahal justru itu bentuk soal yang paling melatih membaca. Sekarang yang dilarang hanya
+   soal yang **batang kalimatnya** berbahasa Jepang, bukan kutipannya.
+2. Ia menandai pilihan **"Mi"** (mi, makanan) sebagai "berbahasa Jepang" semata karena terlalu
+   pendek untuk lolos pemeriksaan kata Latin. Teks tanpa satu pun aksara Jepang sekarang tidak
+   bisa dituduh.
+
+**`author`, `setting`, `focus` sengaja tidak dibawa.** Bank Inggris punya ketiganya dan
+`app.js` tidak pernah membacanya. Mengarangnya untuk 150 bacaan hanya menambah kebisingan yang
+terdengar spesifik padahal ditebak. `topic` **dibawa**, karena ia benar-benar dipakai
+`buildAcademicReadingPath` — diturunkan mekanis dari kata kunci teksnya, dan kalau tidak ada
+yang cocok jatuh ke "kehidupan sehari-hari": kasar, tetapi jujur.
+
+### Keadaan kursus Jepang sesudah m025-292
+
+| Bagian | Inggris | Jepang |
+|---|---|---|
+| Tata bahasa | 139 template | **234 butir A1** |
+| Kosakata | 2.440 entri | **1.370 entri N5–N1** |
+| Bacaan | 312 bacaan | **150 bacaan A1–C1** |
+| Menyimak | ada | **belum ada** |
+| Berbicara | ada | **belum ada** |
+
+Utang yang masih berdiri, dan tidak boleh hilang dari catatan: seluruh naskah Jepang berstatus
+**DRAFT AI** dan wajib ditinjau penutur asli; sidecar Thai belum ada; menyimak dan berbicara
+belum punya bank Jepang sama sekali.
