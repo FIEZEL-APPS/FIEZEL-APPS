@@ -413,7 +413,7 @@ berformat `vocabulary-master.json`. Itu pekerjaan berikutnya, bukan yang tersisa
 
 ---
 
-## m025-292 — bank kosakata Jepang: 1.370 entri, tiap kalimat ditulis baru
+## m025-293 — bank kosakata Jepang: 1.370 entri, tiap kalimat ditulis baru
 
 Catatan m025-291 menyebut kosakata sebagai "pekerjaan berikutnya". Ini pekerjaan itu.
 
@@ -467,7 +467,7 @@ menyimak tetap Inggris saat murid memilih Jepang. Seluruh 1.370 kalimat berstatu
 dan wajib ditinjau penutur asli, sama seperti 234 butir tata bahasa. Sidecar Thai juga masih
 utang.
 
-### m025-292 (lanjutan) — bank bacaan: 150 bacaan, 750 soal, tiap jawaban berbukti
+### m025-293 (lanjutan) — bank bacaan: 150 bacaan, 750 soal, tiap jawaban berbukti
 
 Bagian terakhir yang membuat kursus Jepang setara: `content/ja/reading-bank-ja.json`.
 150 bacaan, **30 per tingkat A1–C1**, masing-masing 5 soal — **750 soal**. Teks bacaan
@@ -507,7 +507,7 @@ terdengar spesifik padahal ditebak. `topic` **dibawa**, karena ia benar-benar di
 `buildAcademicReadingPath` — diturunkan mekanis dari kata kunci teksnya, dan kalau tidak ada
 yang cocok jatuh ke "kehidupan sehari-hari": kasar, tetapi jujur.
 
-### Keadaan kursus Jepang sesudah m025-292
+### Keadaan kursus Jepang sesudah m025-293
 
 | Bagian | Inggris | Jepang |
 |---|---|---|

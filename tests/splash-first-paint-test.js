@@ -457,13 +457,27 @@ test('audio yang sudah terbuka membunyikan sapaan SEKARANG, di layar splashnya s
   });
 });
 
-test('audio yang sudah terbuka membunyikan SFX transisi seketika', () => {
+/* SFX pindah layar SENGAJA DIBISUKAN di m025-291 ("hapus musik latar landing page
+   dan sfx pindah tab murid & guru"): fiezel-ui-sfx.js kini menolak page_transition —
+   dan `nav` adalah aliasnya — sebelum menyentuh konteks audio. Gerbang ini masih
+   menuntut bunyinya keluar, jadi ia merah di main sejak commit itu; yang tertinggal
+   adalah memperbarui gerbangnya, bukan mengembalikan bunyinya.
+
+   Assert-nya DIBALIK, bukan dihapus: yang dijaga sekarang adalah bahwa pembisuan itu
+   terjadi TANPA menitipkan bunyi ke sentuhan berikutnya — persis pola bug yang
+   melahirkan berkas tes ini. Jalur SFX lain (`click`) tetap dibuktikan hidup, supaya
+   pembisuan satu kunci tidak diam-diam mematikan seluruh mekanismenya. */
+test('SFX pindah layar dibisukan di sumbernya, dan tidak diantre ke gestur berikutnya', () => {
   sfx.__reset();
   const env = audioEnv('running');
-  assert.strictEqual(sfx.play('nav', env), true);
-  // Pemutaran pertama menunggu unduhan+dekode sampelnya (asinkron, dalam tenggat).
+  assert.strictEqual(sfx.play('nav', env), false, 'page_transition sudah dibisukan sejak m025-291');
   return new Promise(r => setTimeout(r, 25)).then(() => {
-    assert.ok(env._ctx._scheduled.length > 0);
+    /* Konteks audionya bahkan tidak lahir - penolakan terjadi sebelum itu. */
+    assert.strictEqual(env._ctx ? env._ctx._scheduled.length : 0, 0,
+      'dibisukan berarti tidak berbunyi sama sekali - bukan ditunda ke layar berikutnya');
+    sfx.__reset();
+    const env2 = audioEnv('running');
+    assert.strictEqual(sfx.play('tap', env2), true, 'kunci SFX lain tetap hidup');
   });
 });
 
