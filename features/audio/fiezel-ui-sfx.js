@@ -612,6 +612,7 @@
       }
       return false;
     }
+    if (key === 'page_transition') return false;
     if (!ready(target, false)) return false;
     if (running()) {
       preloadHot(target);

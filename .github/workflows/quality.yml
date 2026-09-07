@@ -1002,6 +1002,13 @@ jobs:
         # konjugasi godan/ichidan supaya tidak menolak kalimat yang paling wajar. Kata yang
         # sengaja tidak dibawa WAJIB punya alasan tertulis; hilang diam-diam dihitung merah.
         run: node tests/japanese-vocab-bank-test.js
+      - name: 'Bacaan Jepang: tiap jawaban benar punya bukti yang ADA di teksnya'
+        # Soal bacaan adalah kebohongan paling sunyi di aplikasi: pertanyaan wajar, empat
+        # pilihan wajar, kunci wajar - dan tidak satu pun bisa dijawab dari teks di layar.
+        # Murid membaca, tidak menemukan jawabannya, lalu menebak; yang dilatih menebak.
+        # Assert intinya karena itu bukan soal bentuk: evidence tiap soal WAJIB substring
+        # persis dari teks bacaannya sendiri.
+        run: node tests/japanese-reading-bank-test.js
       - name: 'Sumbu bahasa target: kunci murid Inggris identik byte per byte'
         # Menambah bahasa kedua punya satu cara gampang dan satu cara benar. Yang gampang:
         # beri SEMUA kunci awalan bahasa, termasuk kunci Inggris. Sekali dikirim, setiap murid
