@@ -213,17 +213,26 @@ jobs:
           node tests/app-telemetry-wiring-test.js
           node tests/brain-config-test.js
           node tests/brain-manifest-test.js
+          node tests/question-allocator-test.js
+          node tests/bankor-latihan-test.js
           node tests/fiezel-stat-gate-test.js
           node tests/learning-lane-test.js
           node tests/braincore-evidence-test.js
           # --- SLOT 10: akun, peran, konten guru, CSV, Braincore, sosial -------
           node tests/auth-schema-contract-test.js
+          node tests/google-auth-core-test.js
+          node tests/google-auth-route-test.js
+          node tests/google-auth-ui-test.js
           node tests/auth-role-test.js
           node tests/role-security-test.js
           node tests/teacher-content-test.js
           node tests/teacher-csv-test.js
           node tests/teacher-braincore-test.js
           node tests/class-sync-test.js
+          node tests/class-hub-test.js
+          node tests/exam-focus-guard-test.js
+          node tests/class-join-test.js
+          node tests/exam-lock-test.js
           node tests/social-notify-test.js
           node tests/braincore-learner-identity-test.js
           node tests/learning-metrics-test.js
@@ -233,6 +242,9 @@ jobs:
           node tests/social-frontend-test.js
           node tests/social-schema-contract-test.js
           node tests/social-invite-link-test.js
+          node tests/student-single-registration-test.js
+          node tests/th-ui-leak-test.js
+          node tests/i18n-kunci-hantu-test.js
           # Lapis AKUN sisi murid (masuk/daftar/aktivasi guru). Ditempatkan tepat sesudah
           # gerbang sosial karena keduanya memakai lane transport yang sama (panggilan
           # langsung ke Worker dengan cookie fz_id), dan cacat di lane itu akan memerahkan
@@ -269,6 +281,8 @@ jobs:
           node tests/boot-order-test.js
           node tests/splash-first-paint-test.js
           node tests/teacher-instant-boot-test.js
+          node tests/kurikulum-integritas-test.js
+          node tests/teacher-demo-preview-test.js
           # m025-199: m025-84 memindahkan markup splash ke frame pertama, tetapi peramban
           # tetap menahan cat sampai style.css (286 KB) berlaku - separuh cacat yang sama
           # bertahan sampai pemilik melaporkannya lagi. Gerbang ini menjaga separuh kedua,
@@ -310,6 +324,7 @@ jobs:
           # Ia SKIP (keluar 0) kalau Playwright/Chromium tidak ada, jadi CI publik tidak berubah;
           # ia merah hanya kalau browsernya ada DAN invariannya benar-benar patah.
           node tests/ui-render-audit-test.js
+          node tests/css-keyframe-uniq-test.js
           node tests/pastel-field-contrast-test.js
           node tests/topbar-logo-contrast-test.js
           node tests/paw-mascot-test.js
@@ -343,6 +358,12 @@ jobs:
           node tests/lucide-icon-coverage-test.js
           node tests/settings-cache-test.js
           node tests/gems-test.js
+          # m025-276: PAW ARENA — kartu aturan WAJIB muncul SETIAP kali masuk sesi (bukan
+          # sekali seumur hidup). Gerbang ini dibuktikan bisa MERAH: ia menjalankan penilai
+          # yang sama atas dua stub rusak (once-per-lifetime; petunjuk-menghanguskan-giliran)
+          # dan menuntut keduanya merah, plus meng-assert modul arena tidak bersandar pada
+          # modul tur sekali-seumur-hidup (fiezel-tour). Bug persis yang diminta owner cegah.
+          node tests/paw-arena-rules-card-test.js
           node tests/back-nav-test.js
           node grammar-quality-audit.js
           node content-integrity-audit.js
@@ -471,6 +492,7 @@ jobs:
           node tests/speaking-listening-test.js
           node tools/dev/check-listening-similarity.js
           node tests/search-feedback-test.js
+          node tests/view-reachability-test.js
           node tests/diag-panel-test.js
           node tests/diag-search-test.js
           node tests/sw-corp-test.js
@@ -943,6 +965,60 @@ jobs:
         # sebagai pelanggaran; gerbang yang merah karena alasan salah akan dimatikan orang.
         # Berdiri di step sendiri agar kegagalannya punya lampu merah sendiri.
         run: node tests/braincore-purity-test.js
+      - name: 'Graf keluarga bisa diganti bahasa tanpa menggeser prasyarat Inggris'
+        # PREREQUISITES adalah jawaban mesin atas "sebelum ini, apa yang harus sudah bisa?",
+        # dan isinya keluarga INGGRIS. Kursus bahasa lain butuh graf yang lain sama sekali.
+        # Menempelkan keluarga asing ke peta yang sama tidak melempar error - ia hanya
+        # membuat rootCause() menunjuk akar yang keliru bagi murid yang sudah ada, pelan-pelan.
+        # Gerbang ini menahan graf Inggris pada patokan yang ditulis tangan, dan membuktikan
+        # penyuntikan graf lain benar-benar berganti serta benar-benar bisa dipulihkan.
+        run: node tests/family-graph-injection-test.js
+      - name: 'Bank soal Jepang: skema penuh, pengecoh bernama, concept sah di mesin nyata'
+        # Bank Jepang lahir dari nol. Cacatnya bukan yang membuat aplikasi error, melainkan
+        # yang membuat aplikasi MENGAJAR DENGAN KELIRU sambil tetap menyala: marker yang
+        # membuat conceptOf() mengembalikan null (pembatas kebaruan konsep mati diam-diam),
+        # pengecoh tanpa miskonsepsi bernama (bukti Braincore jadi angka tanpa makna), dan
+        # pengecoh yang sebenarnya benar (murid dihukum untuk jawaban benar). Gerbang ini
+        # memanggil conceptOf() yang SEBENARNYA, bukan menirunya.
+        run: node tests/japanese-content-test.js
+      - name: 'Kursus Jepang sampai ke layar, dan jalur murid Inggris tidak tersentuh'
+        # Sampai m025-284 seluruh kursus Jepang ada di repo tapi NOL byte sampai ke murid.
+        # Gerbang ini menandai batas itu terlewati, dan menjaga syaratnya: bahasa bawaan tetap
+        # 'en' (update tidak memindahkan murid yang sudah ada), bank Jepang diprecache sw.js
+        # (kalau tidak, kursusnya mati saat offline — keadaan paling sering di lapangan),
+        # modul sumbu bahasa benar-benar dimuat, graf keluarga Jepang disuntik SAAT ja dan
+        # DIPULIHKAN saat kembali ke en, dan naskah pemilihnya punya kembaran Thai.
+        run: node tests/japanese-course-wiring-test.js
+      - name: 'Bank Jepang bertahan sampai hidrasi, bukan dipasang lalu ditimpa'
+        # Gerbang di atas bertanya "apakah kodenya ADA". Semua jawabannya ya di m025-290, dan
+        # kursusnya tetap Inggris di layar murid: G dipasang ke bank Jepang lalu ditimpa
+        # kembali ke bank Inggris delapan belas baris kemudian. Gerbang yang memeriksa
+        # keberadaan tidak pernah bisa menangkap penimpaan; yang ini memeriksa URUTAN
+        # penugasan G di dalam load(), jadi penimpaan baru mana pun langsung merah.
+        run: node tests/japanese-bank-survives-load-test.js
+      - name: 'Bank kosakata Jepang: nol kata hilang, tiap kalimat memakai katanya'
+        # Bank kosakata adalah tempat paling gampang berbohong tanpa terlihat: entri bisa
+        # punya kata, arti, dan kalimat contoh yang semuanya terisi, dan kalimatnya tidak
+        # memakai kata itu sama sekali. Assert intinya justru yang itu - gerbang paham
+        # konjugasi godan/ichidan supaya tidak menolak kalimat yang paling wajar. Kata yang
+        # sengaja tidak dibawa WAJIB punya alasan tertulis; hilang diam-diam dihitung merah.
+        run: node tests/japanese-vocab-bank-test.js
+      - name: 'Bacaan Jepang: tiap jawaban benar punya bukti yang ADA di teksnya'
+        # Soal bacaan adalah kebohongan paling sunyi di aplikasi: pertanyaan wajar, empat
+        # pilihan wajar, kunci wajar - dan tidak satu pun bisa dijawab dari teks di layar.
+        # Murid membaca, tidak menemukan jawabannya, lalu menebak; yang dilatih menebak.
+        # Assert intinya karena itu bukan soal bentuk: evidence tiap soal WAJIB substring
+        # persis dari teks bacaannya sendiri.
+        run: node tests/japanese-reading-bank-test.js
+      - name: 'Sumbu bahasa target: kunci murid Inggris identik byte per byte'
+        # Menambah bahasa kedua punya satu cara gampang dan satu cara benar. Yang gampang:
+        # beri SEMUA kunci awalan bahasa, termasuk kunci Inggris. Sekali dikirim, setiap murid
+        # Inggris yang sudah ada membuka aplikasi dan menemukan dirinya kembali ke nol —
+        # progresnya tidak terhapus, ia hanya tidak lagi dicari di tempat ia disimpan. Tanpa
+        # error, tanpa gejala, baru ketahuan dari keluhan murid.
+        # Gerbang ini membaca daftar kunci LANGSUNG DARI SUMBER, jadi ia ikut tumbuh saat kunci
+        # baru lahir dan tidak bisa basi diam-diam.
+        run: node tests/target-language-axis-test.js
       - name: 'Wave E4: post-test tertunda / probe retensi (fiezel-post-test)'
         # Modul murni baru features/brain/fiezel-retention-probe.js: penjadwal probe retensi
         # deterministik (offset 3/7/21 hari, jitter seeded per lessonId+userSeed) +

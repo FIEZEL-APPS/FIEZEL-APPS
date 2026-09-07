@@ -1,98 +1,42 @@
-# FIEZEL — PRD / Status Implementasi
+# FIEZEL 2.0 — Full UI/UX Redesign
 
-**Terakhir diperbarui:** 7 Juni 2026
+## Problem statement (asli)
+Redesign UI/UX FIEZEL menyeluruh: cheerful + premium + modern, palet pastel dipertahankan (light yellow, pastel pink, cream, mint, lilac, maroon), mobile-first PWA, navigasi sederhana, CTA jelas, feedback benar/salah natural. Revisi user: mock diterima; SEMUA maskot PAW tetap seperti sebelumnya; tambah panel Online & Teman yang mudah dilihat; fitur tambah teman lewat ID; tombol gabung kelas dengan kode guru.
 
-## 1. Problem statement asli (ringkas, verbatim intent)
-FIEZEL tidak boleh lagi hanya "aplikasi tempat guru memberikan soal kepada murid". FIEZEL harus menjadi
-**sistem yang memastikan setiap kompetensi Kurikulum Merdeka benar-benar dipelajari, dipahami, dikuasai, diingat,
-dan dapat diterapkan oleh setiap murid**, dengan rantai:
-KURIKULUM → FASE → MAPEL → ELEMEN → CP → TP → INDIKATOR/KOMPETENSI → MATERI → SOAL → ASESMEN → HASIL MURID →
-BRAINCORE → DIAGNOSIS → INTERVENSI → REMEDIAL/PRACTICE/ENRICHMENT → MASTERY → RETENTION → TRANSFER → BUKTI PERKEMBANGAN.
+## Arsitektur
+- Static PWA di root repo (index.html, app.js, style.css, features/*), preview `tools/preview-server.mjs` :3000.
+- Backend: Cloudflare Worker `workers/api` (D1). Sosial: `route-social.js`.
 
-Prinsip inti: **TEACHER OWNS THE GOAL · BRAINCORE OPTIMIZES THE PATH · STUDENT OWNS THE LEARNING ACTION**;
-SCORE ≠ LEARNING; QUESTION ≠ COMPETENCY; ASSIGNMENT ≠ LEARNING.
+## Yang sudah diimplementasikan (Juni 2026, build m025-258)
+- `fiezel-2.css` (lapisan redesign, dimuat terakhir + masuk cache SW): token radius/shadow, tipografi Jakarta (serif dihapus dari display), tombol pill tactile (sun 3D edge, CTA utama ink), bottom nav pill dengan tab aktif kuning, kartu Hari Ini gradasi kuning + eyebrow maroon, skill hub pastel per skill (pink/mint/lilac/peach/kuning/sky), tabs segmented, opsi kuis berhuruf A–D dengan state benar/salah 3D, feedback tinted, form input membulat.
+- Panel **Online & Teman** di Home (`socialHomeBody`, data-testid `home-online-panel`): avatar teman + status online, tombol **Tambah teman** (`openAddFriendModal`) dan **Gabung kelas** (`openJoinClassModal`), tautan Lihat semua. Selalu tampil (juga saat offline/flag off).
+- Tab Teman: kartu "Tambah teman lewat ID" (input @handle → `POST /api/social/friends/add`), kartu "Gabung kelas dengan kode guru", daftar teman, kode undangan lama dipindah ke `<details>` "Cara lain".
+- Worker: route baru `POST /api/social/friends/add` {handle} (dua arah, idempoten, anti-oracle), schema.js size, client `api.friendAdd`.
+- Gabung kelas: kode disimpan ke `fiezel-onboarding-v1.classCode` (jalur yang sama dengan onboarding), memicu `FiezelLearnerFlow.pushToClass`, bisa diganti/keluar.
+- i18n: kunci `social2.*` id + th.
+- Mock design HTML statis di `/app/mockups/` (referensi arah desain).
+- Gate lokal hijau: pwa-release-coherence, install-health, boot-order, lucide-icon-coverage, th-coverage, social-frontend, social-api-contract.
 
-## 2. Pilihan user
-1. Parsing dokumen & pembuatan kandidat soal: **deterministik, tanpa LLM**.
-2. Auth: **guru masuk dengan token khusus dari owner**; **murid bisa Google login atau login FIEZEL (email+sandi)**.
+- Jalur Grammar bernode (`grammar()`): ringkasan ring X/N di atas, node dot + kartu lesson, node aktif berbingkai kuning dengan progress bar + CTA `grammar-path-continue`, lesson selesai bertanda ✓, terkunci redup.
+- Progres: `cefrRoadmapMarkup` → kartu level gelap (`progress-level-card`, % menuju level berikut dari lesson grammar yang tembus ambang, track A1–C2, streak); `weeklyActivityChartMarkup` → "Minggu ini" (`progress-week-card`) dari data nyata `skillTimeline()` (kotak per hari, hari ini putus-putus). Kunci i18n `progress2.*` id+th.
 
-## 3. Arsitektur
-* **Existing (tetap)**: PWA vanilla-JS (`index.html`, `app.js`), Ruang Guru local-first (`features/teacher/*`),
-  Braincore klien (`features/brain/*`), Worker API Cloudflare + D1, seluruh tes node di `tests/`.
-* **Baru (server source of truth)**: FastAPI + MongoDB di `/app/backend` — `curriculum.py`, `questions.py`,
-  `assessment.py`, `learning.py`, `braincore.py`, `auth.py`, `seed.py`. Semua route `/api`.
-* **Baru (UI)**: `/kurikulum.html` (konsol guru) + `/misi.html` (misi murid), aset `features/curriculum/*`.
-  Tautan masuk ditambahkan di sidebar Ruang Guru existing (satu baris, non-destruktif).
-* Dokumentasi arsitektur lengkap: `docs/CURRICULUM-ENGINE.md`. Playbook auth: `auth_testing.md`.
+## Backlog
+- P1: layar hasil sesi ala mock (skor besar, mastery naik, langkah berikutnya).
+- P1: desktop layout sidebar (mock d1–d3) untuk ≥1024px.
+- P2: deploy worker (`wrangler deploy`) supaya endpoint friends/add aktif di produksi.
 
-## 4. Persona
-* **Guru baru** — butuh kurikulum sudah terisi (seed Kurikulum Merdeka) dan bahasa non-teknis.
-* **Guru sibuk / punya Excel / punya PDF** — bulk import CSV/XLSX/PDF/paste, semua berhenti di antrean tinjau.
-* **Guru 30 murid** — coverage matrix, detail TP, kelompok dinamis, rekomendasi 1-klik.
-* **Murid cepat** — transfer & pengayaan otomatis. **Murid kesulitan** — tangga kesulitan turun + prasyarat.
-* **Murid menebak / hafal pola** — confidence + diagnosis + soal transfer.
-* **Owner** — mencetak token akses guru.
+## Class Hub — Kelas = Guru ↔ Murid ↔ Braincore (Sep 2026, build m025-259)
+Problem statement: rebuild "Class" di bottom nav sebagai learning hub guru–murid (audit dulu; jangan buang fondasi; Braincore di tengah loop, tanpa Puter/API key/cloud AI). Audit + flow + gap + arsitektur + 3 konsep UI: `docs/class-hub-audit.md`.
+- `features/class-hub/fiezel-braincore-review.js`: review lokal soal guru (parser impor, CEFR estimasi, skill, kesulitan via FiezelItemPrior, 9 cek kualitas, distraktor → kode taksonomi miskonsepsi, saran perbaikan, status tugas 4 warna).
+- `features/class-hub/fiezel-class-hub.js` + `class-hub.css`: wajah murid (Tugas / Kelas Saya / Progres + runner tugas di dalam Kelas) dan wajah guru (Kelas Saya / Tugas / Buat Tugas 3 langkah / Hasil / Braincore) yang dipasang di Ruang Guru sebagai view `hub` (landing default).
+- Kontrak data diperluas aditif: payload tugas `teacher`, `items[]` (soal kustom); laporan murid `assign[].s` (sedang) dan `assign[].w` (soal salah); byte limit assign 32 KB / class-report 8 KB.
+- app.js: view `classroom` → `classHubView()`; tutor bersuara tetap hidup lewat kartu "Tutor FIEZEL"; notifikasi tugas → Kelas; learner-flow merutekan blok tugas guru ke hub.
+- Gate baru `tests/class-hub-test.js` (unit + smoke DOM-stub loop penuh) masuk quality.yml.
+Backlog: satukan `route-teacher.js` (pohon konten server) sebagai sumber impor; kalibrasi review dengan bukti; ledger miskonsepsi murid dari `w[]`; i18n TH hub.
 
-## 5. Kebutuhan inti (statis)
-1. Kurikulum sebagai learning graph dengan ID stabil & metadata terlacak.
-2. Question DNA + ingestion multi-jalur + validasi + versioning + varian + lifecycle approval.
-3. Assessment blueprint + 8 jenis asesmen + coverage + analitik butir.
-4. Student learning loop: mission → adaptif → diagnosis → penjelasan → hint → retry → remediasi → transfer.
-5. Braincore sebagai decision engine (mastery, retensi, transfer, miskonsepsi, prasyarat) dengan human policy gate.
-6. Insight guru yang actionable + rencana mengajar berbasis evidence + learning passport.
-7. Telemetry idempoten, privasi minimal, backward compatibility & migrasi non-destruktif.
-
-## 6. Sudah diimplementasikan (7 Juni 2026)
-* **P0 Curriculum Foundation** — 11 tipe node, path denormalisasi, prasyarat, arsip non-destruktif, trace metadata,
-  health-check struktur, seed Kurikulum Merdeka Fase D Kelas 7 (Matematika Bilangan + Bahasa Inggris) lengkap
-  dengan indikator/kompetensi/topik/materi.
-* **P0 Question Engine** — Question DNA penuh, lifecycle DRAFT→REVIEW→APPROVED→PUBLISHED→ARCHIVED, 5 jalur ingestion
-  (manual, CSV/XLSX, paste, PDF/TXT, kandidat deterministik), 13 aturan validasi termasuk duplikat & saturasi
-  kompetensi, versioning + riwayat, varian & varian transfer.
-* **P0 Assessment Engine** — 8 jenis asesmen berperilaku beda, blueprint + peringatan keseimbangan (C3+, C1, transfer,
-  stok soal), perakitan sesuai kuota, coverage matrix MISSING/NOT_TAUGHT/GAP/DEVELOPING/GOOD, analitik butir + sinyal
-  confidence.
-* **P0 Student Learning Loop** — learning mission (goal, why, fase), item adaptif + alasan manusiawi, confidence,
-  diagnosis 7 label, penjelasan, hint bertingkat, targeted retry, micro-remediation prasyarat, cek transfer,
-  ringkasan sesi.
-* **P1 Braincore Integration** — BKT + koreksi hint/confidence, state NOT_EXPOSED..TRANSFERRED, FSRS-lite
-  (stability ×1.9/×0.5, due_at, retrievability), misconception ledger dengan auto-resolve, evidence graph,
-  learning passport.
-* **P1 Teacher Copilot** — 3 rekomendasi harian yang langsung dieksekusi menjadi asesmen nyata, kelompok dinamis,
-  rencana mengajar per menit berbasis snapshot kelas, detail TP.
-* **Auth** — token guru dari owner (+ mint token), murid email+sandi (bcrypt, lockout per-email & per-IP di belakang
-  ingress), Google Emergent-managed, JWT access+refresh cookie httpOnly, RBAC.
-* **Telemetry & privasi** — 15 tipe event stabil, `event_id`/`idempotency_key` unik, payload diminimalkan.
-* **Backward compatibility** — `legacy_skill` map + `POST /api/migration/legacy-teacher-store` (idempoten) + tombol
-  impor di konsol; data localStorage lama tidak dihapus.
-
-## 7. Hasil tes
-| Suite | Hasil |
-| --- | --- |
-| `backend/unit_test.py` | 36/36 PASS |
-| `backend/smoke_test.py` (integrasi e2e) | 35/35 PASS |
-| `backend/tests/test_fiezel_backend.py` (pytest, via URL publik) | 17/17 PASS |
-| Playwright e2e guru (bank soal, import, publish, varian, blueprint, coverage drawer, remedial, paspor) | PASS |
-| Playwright e2e murid (register → misi → hint → diagnosis → transfer → ringkasan → paspor, tanpa jargon) | PASS |
-| Regresi node existing (`teacher-content`, `teacher-braincore`, `teacher-csv`, `teacher-instant-boot`, `ui-structure`, `regression`, `tutor-classroom-regression`, `global-name-collision`) | PASS |
-
-Bug yang ditemukan & diperbaiki dalam iterasi ini: brute-force lockout tidak aktif di belakang ingress
-(`request.client.host`) → sekarang throttle per-email + `X-Forwarded-For`.
-
-## 8. Backlog terprioritas
-**P1**
-1. Sync dua arah local-first ↔ server (saat ini migrasi satu arah + server sebagai source of truth).
-2. Penilaian esai berbantuan rubrik untuk `question_type=essay` (kini ditandai menunggu penilaian guru).
-3. Ingestion gambar/foto soal (OCR) — kini hanya PDF/TXT/CSV/XLSX yang deterministik.
-4. Penjadwal review otomatis yang mengirim asesmen `review` tanpa aksi guru (kini muncul sebagai daftar due).
-
-**P2**
-5. Confusion matrix & affect existing klien disalurkan ke evidence server.
-6. Laporan orang tua / ekspor PDF paspor belajar.
-7. Editor kurikulum massal (impor CP/TP dari dokumen resmi per mapel).
-8. Analitik longitudinal antar-semester + prediksi risiko.
-
-## 9. Definition of done yang sudah terpenuhi
-Teacher → Curriculum → Competency → Question → Assessment → Student → Learning Session → Evidence → Braincore →
-Diagnosis → Adaptation → Mastery/Retention/Transfer → Teacher Insight → Next Action: **seluruh rantai memiliki data
-flow nyata yang diverifikasi lewat tes API dan UI**.
+## m025-266 — Pintu Tanya FIEZEL + gerbang layar yatim (Sep 2026, branch fix/pintu-tanya-fiezel)
+- Akar masalah: m025-254 mengganti tombol topbar "Tanya FIEZEL" dengan lonceng; `askView()` (view `ask`/`search`) yatim 11 build tanpa satu pun `go('ask')`.
+- Perbaikan: chip "Cari materi" di kepala panel pembimbing PAW (`features/ui/fiezel-coach-bubble.js`, opsi `openAsk` dari `syncCoachBubble()` app.js), i18n `coach.cari-materi` id+th.
+- Gerbang baru `tests/view-reachability-test.js` (VALID_VIEWS + alias renderInner + pintu, semua ditemukan dari kode); terdaftar di quality.yml. Merah pada app.js main, hijau sesudah.
+- Handoff: `docs/handoffs/FIEZEL-M025266-PINTU-TANYA-FIEZEL-HANDOFF.md`.
+- Backlog terdekat (PR terpisah): tiga chip + aria-label gelembung di coach-bubble masih teks Indonesia langsung (murid Thai melihat chip Indonesia).

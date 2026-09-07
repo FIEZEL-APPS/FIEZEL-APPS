@@ -38,7 +38,7 @@
   --orbit-y:10%;
   --ambient-text:#241A11;
   --ambient-muted:#6E5E47;
-  --chrome-bg:rgba(255,249,238,.82);
+  --chrome-bg:rgba(255,249,238,.94);
   --launcher-start:#FFF3C4;
   --launcher-end:#FFC700;
   --bg:#FFF9EE;
@@ -61,6 +61,10 @@
   --green-soft:#E9F7F0;
   --red:#B8432D;
   --red-soft:#FDE3DE;
+  /* --radius-xl dipakai 13 kali oleh kartu besar redesign (kokpit Home, hero PAW, kartu
+     fz2) tetapi tidak pernah didefinisikan - tiap call site hidup dari nilai cadangannya
+     sendiri, dan gerbang token search-feedback menandainya. Didefinisikan sekali di sini. */
+  --radius-xl:28px;
   --radius-lg:24px;
   --radius-md:16px;
   --radius-sm:12px;
@@ -805,6 +809,10 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
   --green-soft:#E9F7F0;
   --red:#B8432D;
   --red-soft:#FDE3DE;
+  /* --radius-xl dipakai 13 kali oleh kartu besar redesign (kokpit Home, hero PAW, kartu
+     fz2) tetapi tidak pernah didefinisikan - tiap call site hidup dari nilai cadangannya
+     sendiri, dan gerbang token search-feedback menandainya. Didefinisikan sekali di sini. */
+  --radius-xl:28px;
   --radius-lg:24px;
   --radius-md:16px;
   --radius-sm:12px;
@@ -978,7 +986,7 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 .primary:hover{background:var(--sun-deep);border-color:var(--sun-deep)}
 
 /* Premium Home Launcher */
-.home-page{display:grid;gap:var(--sp-6)}
+.home-page{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--sp-6)}/* kolom minmax(0,1fr): tanpa itu kolom implisit dilebarkan oleh min-content anak terlebar, dan di 320px Home menggeser horizontal (gerbang T6). */
 .launcher-shell{
   position:relative;overflow:hidden;display:grid;grid-template-columns:minmax(0,1.42fr) minmax(300px,.72fr);gap:36px;
   grid-template-rows:1fr;
@@ -1946,6 +1954,21 @@ body.voice-bundle-locked .bottomnav,body.voice-bundle-locked .app-header{pointer
 .fiezel-language-copy{display:flex;flex-direction:column;gap:3px;text-align:left}
 .fiezel-language-copy small{font-size:12px;color:var(--fz-ink-muted)}
 @media (max-width:340px){.fiezel-language-grid{grid-template-columns:1fr}}
+/* "Sudah punya akun?" di layar pemilih bahasa. SENGAJA sekunder: pemisah tipis,
+   naskah kecil, tanpa warna aksi — mayoritas yang membuka layar ini murid baru yang
+   memang harus memilih bahasa, dan tombol masuk yang menonjol akan membuat mereka
+   ragu pada langkah pertama. */
+.fiezel-language-signin{margin-top:18px;display:flex;flex-direction:column;
+  align-items:center;gap:8px}
+.fiezel-language-sep{display:flex;align-items:center;gap:10px;width:100%;
+  font-size:var(--fs-caption);color:var(--fz-ink-muted)}
+.fiezel-language-sep::before,.fiezel-language-sep::after{content:'';flex:1;height:1px;
+  background:var(--fz-line)}
+.fiezel-language-signin-note{margin:0;text-align:center;font-size:12px;line-height:1.5;
+  color:var(--fz-ink-muted);max-width:38ch}
+/* Tinggi minimum supaya isi layar tidak melompat saat tombol Google akhirnya tiba. */
+.fiezel-language-google{min-height:44px;display:flex;justify-content:center;
+  align-items:center}
 .fiezel-level-row{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-start;width:100%}
 .fiezel-level-chip{min-height:44px;padding:0 16px;border-radius:var(--radius-pill);border:1.5px solid var(--fz-line);
   background:var(--fz-paper);color:var(--fz-ink);font-family:var(--fz-body);font-weight:700;font-size:13px}
@@ -2548,12 +2571,12 @@ button.primary:active,.primary.luxe:active,html.fiezel-ui-v6 body .primary:activ
 /* i10 2026-08-28 (O5 §2): + :not(.option) — empat tombol jawaban berbayang tebal membuat
    layar soal terasa seperti empat kartu bersaing dengan soalnya; pilihan kembali ke resep
    dasar .option yang tenang (garis --line, tanpa bayangan lantai). */
-html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.text-button):not(.coach-link):not(.fz-coach-bubble):not(.launch-card):not(.skill-card):not(.option):not(.skill-help-dot):not(.olm-dispute){
+html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.brand-button):not(.text-button):not(.coach-link):not(.fz-coach-bubble):not(.launch-card):not(.skill-card):not(.option):not(.skill-help-dot):not(.olm-dispute){
   border:1.5px solid var(--surface-edge);border-radius:var(--radius-md);
   box-shadow:var(--lift-edge);
   transition:transform var(--dur-xs) var(--ease),box-shadow var(--dur-xs) var(--ease);
 }
-html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.text-button):not(.coach-link):not(.fz-coach-bubble):not(.launch-card):not(.skill-card):not(.option):not(.skill-help-dot):not(.olm-dispute):active{
+html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.brand-button):not(.text-button):not(.coach-link):not(.fz-coach-bubble):not(.launch-card):not(.skill-card):not(.option):not(.skill-help-dot):not(.olm-dispute):active{
   transform:translateY(2px);box-shadow:var(--lift-edge-press)}
 
 /* --------------------------------------------------------------------------
@@ -2730,6 +2753,12 @@ html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.tex
 .fz-coach-avatar{width:38px;height:38px;border-radius:50%;background:var(--yellow);border:2px solid var(--ink);display:grid;place-items:center}
 .fz-coach-avatar .fz-coach-face{width:22px;height:22px}
 .fz-coach-close{margin-left:auto;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;border:1.5px solid var(--surface-edge);background:transparent;color:var(--text);cursor:pointer}
+/* m025-266: pintu "Cari materi" di kepala panel pembimbing -> layar Tanya FIEZEL (askView).
+   Bentuk chip yang sama dengan .fz-coach-chip supaya terbaca sebagai pilihan, bukan tombol
+   tutup kedua; margin-left:auto memindahkan tombol tutup ke ujung kanan seperti sebelumnya. */
+.fz-coach-ask-page{margin-left:auto;display:inline-flex;align-items:center;min-height:32px;padding:5px 11px;border-radius:var(--radius-pill);font-size:.72rem;font-weight:600;cursor:pointer;border:1.5px solid var(--surface-edge);background:var(--panel-soft);color:var(--text);white-space:nowrap}
+.fz-coach-ask-page:active{transform:translateY(1px)}
+.fz-coach-ask-page+.fz-coach-close{margin-left:0}
 .fz-coach-log{flex:1;overflow-y:auto;display:grid;gap:10px;padding:14px 2px;align-content:start}
 .fz-coach-msg{max-width:88%;padding:10px 13px;font-size:.84rem;line-height:1.55;border-radius:var(--radius-md)}
 .fz-coach-msg.is-coach{justify-self:start;border-radius:var(--radius-md) var(--radius-md) var(--radius-md) var(--sp-1);background:var(--yellow-soft);border:1px solid var(--surface-edge)}
@@ -3126,48 +3155,172 @@ eteach) dan tawaran berhenti (reathe).
 }
 
 /* ==========================================================================
-   Tab bar — berat, bukan garis tipis (m025-129)
+   Tab bar — satu definisi, bukan enam (m025-129 -> m025-266)
    ==========================================================================
-   OWNER: "icon taskbarnya terlalu jadul kurang modern dan eye catching."
+   OWNER (m025-129): "icon taskbarnya terlalu jadul kurang modern dan eye catching."
+   OWNER (m025-266): tampilannya masih "kurang".
 
-   Ikonnya sendiri sudah digambar ulang di fiezel-icons.js - bidang jadi bentuk utamanya,
-   garis tinggal menegaskan tepi. Yang tersisa di sini adalah wadahnya, dan wadahnya punya
-   masalah yang sama: tab aktif hanya berubah warna latar. Perubahan warna adalah sinyal
-   TERLEMAH yang dimiliki antarmuka - ia tidak punya berat, tidak punya gerak, dan pada
-   layar terang nyaris tidak terbaca sama sekali.
+   Diagnosis m025-266, bukan selera: sebelum blok ini, tab bar didefinisikan oleh ENAM
+   blok .bottomnav/.nav yang saling menimpa dari enam redesign berbeda - lebar pil
+   560/620/580, ikon 18/24/26/22 px, dan EMPAT definisi keadaan aktif yang menumpuk:
+   kapsul kuning + naik 2 px + bayangan 2 px + titik coklat + tebal 700. Hasilnya bukan
+   yang dirancang siapa pun, melainkan penulis-terakhir yang menang. Titik coklat di
+   bawah label terbaca sebagai noda, dan ikon tidak-aktif berbidang --surface-mute
+   (nyaris putih di atas putih) sehingga lima ikon tampil sebagai empat garis + satu
+   bidang - bukan satu keluarga.
 
-   Tab aktif kini mendapat tiga hal sekaligus: ia NAIK, ia punya bayangan padat 2 px
-   seperti tombol chunky di seluruh aplikasi, dan ikonnya MEMANTUL sekali saat dipilih.
-   Ketiganya bahasa yang sudah dipakai FIEZEL - tidak ada kosakata visual baru yang
-   diperkenalkan hanya untuk tab bar.
+   Kontrak baru, satu sinyal bentuk + satu sinyal warna:
+     - Tab aktif = KAPSUL KUNING (--sun) di belakang ikon, ikon berbidang putih dengan
+       garis tinta, label tinta 700. Kapsulnya digambar ::after (penanda bentuk yang
+       bekerja tanpa warna - kontrak paw-mascot-test tetap dipegang), dan tab NAIK 3 px.
+     - Tab tidak aktif = ikon berbidang --sun-soft (pastel yang TERLIHAT), garis --muted,
+       label --muted 600. Kelima ikon kini punya bidang sebanding.
+     - Label 12 px: lantai tipografi F2-15, bukan 11 px seperti blok yang dihapus.
+   Blok .bottomnav/.nav yang lebih awal di berkas ini SENGAJA tidak dihapus: gerbang
+   ui-structure/ux-redesign/a11y membaca literal di sana (glass-solid, z-index:40,
+   width:calc(100% - 16px), min-height:44px). Blok ini penulis terakhir untuk semua
+   properti yang menentukan rupa.
    -------------------------------------------------------------------------- */
 
-.nav .fz-i{width:26px;height:26px}
+.bottomnav{
+  width:min(560px,calc(100% - 24px));padding:6px;gap:2px;
+  border:1px solid var(--line);border-radius:var(--radius-xl);
+  box-shadow:0 14px 34px -14px rgba(36,26,17,.28),0 1px 2px rgba(36,26,17,.06);
+}
+.nav,.bottomnav .nav{
+  position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:4px;
+  min-height:56px;padding:5px 2px 6px;border:0;border-radius:var(--radius-md);
+  font-size:var(--fs-caption);font-weight:600;letter-spacing:.01em;line-height:1.35;color:var(--muted);
+  background:transparent;box-shadow:none;
+  transition:transform .22s var(--ease-spring),color .16s var(--ease);
+}
+.nav .fz-i{width:24px;height:24px;position:relative;z-index:1;margin-top:3px;--fz-i-fill:var(--sun-soft);--fz-i-line:var(--muted)}
 .nav .fz-i .fz-line{stroke-width:2}
-
-html.fiezel-ui-v6 .nav{
-  gap:5px;border-radius:var(--radius-md);
-  transition:transform .18s var(--ease-spring),background .16s var(--ease),color .16s var(--ease),box-shadow .16s var(--ease);
+.nav span{position:relative;z-index:1;white-space:nowrap}
+.nav:hover{background:transparent}
+.nav:active{transform:scale(.95)}
+/* Kapsul kuning di belakang ikon. Ukurannya 46x30 - lebih lebar dari ikon 24 px supaya
+   terbaca sebagai wadah, bukan sebagai garis tepi ikon. */
+.nav.active::after{
+  content:"";position:absolute;top:0;left:50%;width:46px;height:30px;margin-left:-23px;
+  border-radius:var(--radius-pill);background:var(--sun);z-index:0;
 }
-html.fiezel-ui-v6 .nav.active{
+.nav.active,.bottomnav .nav.active{
+  color:var(--ink);font-weight:700;background:transparent;box-shadow:none;
   transform:translateY(-3px);
-  box-shadow:0 2px 0 var(--sun-deep);
 }
-/* Titik di bawah label. Penanda kedua yang tidak bergantung pada warna sama sekali -
-   satu-satunya bagian dari state aktif yang tetap terbaca oleh mata yang sulit
-   membedakan kuning pastel dari cream. */
-html.fiezel-ui-v6 .nav.active::after{
-  content:"";width:5px;height:5px;border-radius:50%;background:var(--ink);
-  margin-top:-1px;
-}
+.nav.active .fz-i,.bottomnav .nav.active .fz-i{--fz-i-fill:var(--panel);--fz-i-line:var(--ink)}
 
 @media (prefers-reduced-motion:no-preference){
-  html.fiezel-ui-v6 .nav.active .fz-i{animation:fzNavPop .42s cubic-bezier(.3,1.32,.5,1) 1}
+  .nav.active .fz-i{animation:fzNavPop .42s cubic-bezier(.3,1.32,.5,1) 1}
   @keyframes fzNavPop{
     0%{transform:scale(.84) translateY(2px)}
     58%{transform:scale(1.12) translateY(-1px)}
     100%{transform:scale(1) translateY(0)}
   }
+/* ==========================================================================
+   KelasKu Wordmark — Brand Typography & Contextual Styling
+   Signature Plus Jakarta Sans 800 with emerald/sage #1F7A63 identity.
+   ========================================================================== */
+
+.kelasku-wordmark {
+  font-family: var(--fz-heading, 'Plus Jakarta Sans', sans-serif) !important;
+  font-weight: 800;
+  font-style: normal;
+  letter-spacing: -0.02em;
+  color: #1F7A63 !important;
+  display: inline-block;
+  line-height: inherit;
+  vertical-align: baseline;
+  text-decoration: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* --- Bottom Navigation (.bottomnav .nav[data-view="classroom"]) --- */
+.bottomnav .nav[data-view="classroom"] .kelasku-wordmark,
+.bottomnav .nav .kelasku-wordmark {
+  font-size: var(--fs-caption, 0.75rem);
+  font-weight: 800;
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+  color: #1F7A63 !important;
+  white-space: nowrap;
+  display: block;
+  text-align: center;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+  transform: none;
+  transition: color 0.16s var(--ease, ease), transform 0.22s var(--ease-spring, ease);
+}
+
+.bottomnav .nav[data-view="classroom"].active .kelasku-wordmark {
+  color: #1F7A63 !important;
+  font-weight: 800;
+}
+
+.bottomnav .nav[data-view="classroom"].active .fz-i {
+  --fz-i-line: #1F7A63;
+}
+
+/* Inverted contrast when inside primary/dark buttons or dark containers */
+button.primary .kelasku-wordmark,
+.btn-primary .kelasku-wordmark,
+.btn-teacher .kelasku-wordmark,
+.btn-teacher-hero .kelasku-wordmark,
+.tg-side .kelasku-wordmark {
+  color: #FFFFFF !important;
+}
+
+/* ==========================================================================
+   Top bar — wordmark telanjang, dua ikon sunyi (m025-267)
+   ==========================================================================
+   Diagnosis, bukan selera. Sebelum blok ini topbar dirakit tiga berkas: tutor-v3.css
+   memberinya radius 18 + border + bayangan + blur (kartu melayang), fiezel-lux.css
+   memberinya margin -18px + border-bottom + blur (pita penuh), fiezel-2.css memangkas
+   tingginya. Hasilnya pita penuh-lebar dengan sudut membulat dan bayangan - dua ide
+   sekaligus, tidak satu pun utuh. Yang lebih fatal: .brand-button tidak dikecualikan
+   dari resep "tombol chunky" v6, jadi WORDMARK DUDUK DI DALAM KOTAK PUTIH bergaris,
+   sama beratnya dengan chip lonceng dan chip gigi di seberangnya. Tiga benda, tiga
+   kotak, satu suara - tidak ada hierarki.
+
+   Kontrak baru:
+     - Topbar = PIL LENGKET dengan material yang SAMA dengan tab bar (--glass-solid,
+       border --line, --radius-xl, bayangan yang sama): dua pil, atas dan bawah, satu
+       keluarga. Tanpa blur (keputusan baterai m025-81 kini berlaku juga di sini);
+       --chrome-bg dipekatkan ke .94 untuk pemakai lain yang masih membacanya.
+     - Wordmark TELANJANG di atas pil: tidak ada kotak, tidak ada border. Ia satu-
+       satunya benda bertinta penuh di baris ini, jadi ia yang menang.
+     - Lonceng dan gigi = cakram --panel-soft 44 px tanpa border dan tanpa bayangan:
+       hadir, tetapi bicara pelan. Lencana merah di lonceng tetap aksen kuat satu-satunya.
+     - Gigi Pengaturan TIDAK boleh disembunyikan: satu-satunya pintu Pengaturan dalam
+       mode pelajaran; tiga langkah tur menunjuknya.
+   -------------------------------------------------------------------------- */
+.topbar{
+  position:sticky;top:8px;z-index:35;margin:0 0 18px;padding:6px 8px 6px 16px;min-height:60px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  background:var(--glass-solid);border:1px solid var(--line);border-radius:var(--radius-xl);
+  box-shadow:0 10px 22px -18px rgba(36,26,17,.20),0 1px 2px rgba(36,26,17,.06);
+}
+.topbar .brand-button{padding:6px 0;margin:0;border:0;border-radius:0;background:transparent;box-shadow:none;min-height:44px}
+.topbar .brand-button:hover,.topbar .brand-button:active{transform:none;background:transparent;box-shadow:none}
+.topbar .brand{width:100px}
+.topbar-actions{gap:4px}
+.topbar .icon-button{
+  width:44px;height:44px;min-height:44px;padding:0;border-radius:50%;
+  background:var(--panel-soft);border:0;box-shadow:none;color:var(--ink);
+  transition:background-color var(--dur-s) var(--ease),transform var(--dur-s) var(--ease-spring);
+}
+.topbar .icon-button svg{width:20px;height:20px}
+.topbar .icon-button:hover{background:var(--sun-soft);transform:none;box-shadow:none}
+.topbar .icon-button:active{transform:scale(.94)}
+.topbar .notif-button.has-new{background:var(--sun-soft)}
+.topbar .notif-badge{top:2px;right:2px;box-shadow:0 0 0 2px var(--glass-solid)}
+@media(max-width:640px){
+  .topbar{top:6px;margin:0 0 16px;padding:5px 6px 5px 14px;min-height:56px}
+  .topbar .brand{width:92px}
 }
 
 /* ==========================================================================
@@ -4793,6 +4946,14 @@ html[data-fz-input="touch"] :focus{outline-color:transparent!important}
    termasuk saat diklik - jadi cincinnya tetap muncul persis seperti sebelumnya, dan yang
    hilang hanya pengecualian diam-diam terhadap kebijakan itu. */
 .auth-field-label input:focus-visible{outline:2px solid var(--sun-deep);background:var(--panel)}
+.auth-google{display:flex;flex-direction:column;align-items:center;gap:8px;margin:12px 0 4px}
+/* Tombol resmi Google digambar skrip Google ke dalam kotak ini; tinggi minimum
+   ada supaya isi modal tidak melompat saat tombolnya akhirnya tiba. */
+.auth-google-btn{min-height:44px;display:flex;justify-content:center;align-items:center}
+.auth-google-status{margin:0;font-size:.85rem;color:var(--muted);text-align:center;line-height:1.45}
+.auth-google-note{margin:0;font-size:.78rem;color:var(--muted);text-align:center;line-height:1.45;max-width:34ch}
+.auth-google-sep{display:flex;align-items:center;gap:10px;width:100%;margin-top:4px;color:var(--muted);font-size:.8rem}
+.auth-google-sep::before,.auth-google-sep::after{content:'';flex:1;height:1px;background:var(--line,rgba(0,0,0,.12))}
 .auth-error-box{padding:10px 12px;background:var(--accent-soft);border:1px solid var(--accent);border-radius:var(--radius-sm);color:var(--accent-strong);font-size:.85rem;line-height:1.4;text-align:left}
 .badge-success{background:#dcfce7;color:#166534;padding:2px 8px;border-radius:var(--radius-pill);font-size:.8rem}
 .badge-neutral{background:var(--panel-soft);color:var(--muted);padding:2px 8px;border-radius:var(--radius-pill);font-size:.8rem}
@@ -4882,11 +5043,430 @@ html body #app .social-home-launcher .launch-card{background:var(--pz-sky);borde
 .notif-item.is-social{background:var(--pz-mint);border-color:var(--pz-mint-line)}
 .notif-item.is-invite{background:var(--pz-pink);border-color:var(--pz-pink-line)}
 /* Nav bawah: pil putih, tab aktif tinta gelap dengan ikon emas */
-.bottomnav{background:rgba(255,255,255,.92);border-color:#E6DCC8;box-shadow:0 14px 40px -18px rgba(36,26,17,.35)}
-.bottomnav .nav.active .fz-i{color:var(--yellow)}
+.bottomnav{background:var(--glass-solid)}
 /* Topbar: lonceng & pengaturan sebagai chip pastel */
 .topbar .icon-button{background:#fff;border:1px solid var(--line)}
 .notif-button.has-new{background:var(--pz-yellow)}
 /* Tombol utama tetap kuning ceria */
 .primary{background:var(--yellow);color:var(--ink)}
 
+/* ==========================================================================
+   FIEZEL REDESIGN: Version B PAW Mascot Hero & Contextual Speech Bubble
+   ========================================================================== */
+.paw-hero-cockpit {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  background: var(--panel);
+  border: 1.5px solid var(--surface-edge);
+  border-radius: var(--radius-xl, 22px);
+  box-shadow: 0 4px 16px rgba(36, 26, 17, 0.05);
+}
+.paw-hero-avatar {
+  flex: 0 0 60px;
+  width: 60px;
+  height: 60px;
+  border-radius: var(--radius-lg, 18px);
+  background: var(--sun-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 0 rgba(230, 168, 0, 0.4);
+  position: relative;
+  cursor: pointer;
+  transition: transform var(--dur-s) var(--ease-spring);
+}
+.paw-hero-avatar:hover, .paw-hero-avatar:active {
+  transform: scale(1.06) rotate(-2deg);
+}
+.paw-hero-avatar .fz-i {
+  width: 40px;
+  height: 40px;
+}
+.paw-speech-bubble {
+  /* min-width:0 wajib: tanpa itu balon adalah flex-item yang menolak menyusut di bawah
+     lebar min-content-nya, dan di 320px seluruh kokpit Home ikut melebar sampai halaman
+     menggeser horizontal (gerbang T6 ui-render-audit). */
+  flex: 1 1 0;
+  min-width: 0;
+  position: relative;
+  background: var(--panel-soft, #FFFDF8);
+  border: 1.5px solid var(--line);
+  border-radius: 16px;
+  padding: 10px 14px;
+  text-align: left;
+  cursor: pointer;
+  transition: transform var(--dur-s) var(--ease), box-shadow var(--dur-s) var(--ease);
+}
+.paw-speech-bubble:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(36, 26, 17, 0.06);
+}
+.paw-speech-bubble::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 50%;
+  transform: translateY(-50%) rotate(45deg);
+  width: 12px;
+  height: 12px;
+  background: var(--panel-soft, #FFFDF8);
+  border-left: 1.5px solid var(--line);
+  border-bottom: 1.5px solid var(--line);
+}
+.paw-speech-bubble .paw-bubble-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 3px;
+}
+.paw-speech-bubble .paw-bubble-text {
+  overflow-wrap: anywhere;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--muted);
+  margin: 0;
+}
+
+/* ==========================================================================
+   FIEZEL REDESIGN: Version C Components (Rings, Cockpit, Matrix, Classroom, Progress)
+   ========================================================================== */
+/* Daily Rhythm Progress Bar */
+.today-rhythm-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 10px 0 14px;
+  padding: 8px 12px;
+  background: var(--panel-soft);
+  border: 1px solid var(--surface-edge);
+  border-radius: var(--radius-md);
+  font-size: 12px;
+}
+.today-rhythm-bar .rhythm-track {
+  flex: 1;
+  height: 8px;
+  background: var(--line);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.today-rhythm-bar .rhythm-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--sun), var(--gold));
+  border-radius: 99px;
+  transition: width 0.4s var(--ease);
+}
+
+/* Quick Practice Chips */
+.quick-practice-section {
+  margin-top: 18px;
+}
+.quick-chips-grid {
+  display: grid;
+  /* minmax(0,...): chip berisi label nowrap, jadi kolom 1fr biasa menolak menyusut di 320px. */
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+.quick-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 12px 10px;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: transform var(--dur-s) var(--ease), box-shadow var(--dur-s) var(--ease);
+  text-align: left;
+}
+.quick-chip:nth-child(1) {
+  background: var(--pz-yellow);
+  border: 1.5px solid var(--pz-yellow-line);
+  box-shadow: 0 3px 0 var(--pz-yellow-line);
+}
+.quick-chip:nth-child(1) .chip-label {
+  color: var(--pz-yellow-ink);
+}
+.quick-chip:nth-child(2) {
+  background: var(--pz-mint);
+  border: 1.5px solid var(--pz-mint-line);
+  box-shadow: 0 3px 0 var(--pz-mint-line);
+}
+.quick-chip:nth-child(2) .chip-label {
+  color: var(--pz-mint-ink);
+}
+.quick-chip:nth-child(3) {
+  background: var(--pz-pink);
+  border: 1.5px solid var(--pz-pink-line);
+  box-shadow: 0 3px 0 var(--pz-pink-line);
+}
+.quick-chip:nth-child(3) .chip-label {
+  color: var(--pz-pink-ink);
+}
+.quick-chip:active {
+  transform: translateY(2px);
+  box-shadow: 0 0 0 transparent;
+}
+.quick-chip .chip-label {
+  font-size: 12px;
+  font-weight: 700;
+}
+.quick-chip .chip-sub {
+  font-size: 10px;
+  color: var(--muted);
+}
+
+/* Practice: Continue Learning Banner */
+.continue-learning-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 16px;
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, var(--pz-yellow) 0%, var(--pz-mint) 100%);
+  border: 1.5px solid var(--pz-mint-line);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 4px 14px rgba(31, 111, 87, 0.12), 0 2px 0 var(--pz-mint-line);
+  cursor: pointer;
+  text-align: left;
+}
+.continue-learning-card:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 var(--pz-mint-line);
+}
+.continue-card-body b {
+  display: block;
+  font-size: 14px;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.continue-card-body small {
+  font-size: 11px;
+  color: var(--muted);
+}
+.continue-card-btn {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 99px;
+  background: var(--sun);
+  color: var(--text);
+  font-weight: 700;
+  font-size: 12px;
+  box-shadow: 0 2px 0 var(--gold);
+}
+
+/* AI Weak-Spot Booster Card */
+.ai-booster-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  margin-top: 18px;
+  background: var(--pz-pink);
+  border: 1.5px dashed var(--pz-pink-line);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  text-align: left;
+}
+.ai-booster-card:active {
+  transform: translateY(1px);
+}
+.ai-booster-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 99px;
+  /* Latar dipaku putih di bawah teks bertema = 1,08:1 saat Tema Malam (gerbang kontras
+     m025-85). Token panel mengikuti tema, jadi lencana tetap terbaca di kedua tema. */
+  background: var(--panel);
+  color: var(--pz-pink-ink);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+/* School Tab */
+.school-active-card {
+  padding: 18px;
+  background: var(--pz-sky);
+  border: 1.5px solid var(--pz-sky-line);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 4px 0 var(--pz-sky-line), var(--shadow-sm);
+  margin-bottom: 16px;
+  text-align: left;
+}
+.school-badge-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.school-code-input-card {
+  padding: 24px 18px;
+  background: var(--panel);
+  border: 1.5px solid var(--surface-edge);
+  border-radius: var(--radius-xl);
+  text-align: center;
+}
+.school-code-digits {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 18px 0;
+}
+.school-code-digit {
+  width: 44px;
+  height: 52px;
+  border: 2px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  font-size: 22px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--text);
+}
+
+/* Progress: CEFR Roadmap */
+.cefr-roadmap-card {
+  padding: 18px;
+  background: var(--panel);
+  border: 1.5px solid var(--surface-edge);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 4px 0 var(--surface-edge);
+  margin-bottom: 18px;
+  text-align: left;
+}
+.cefr-track-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  margin: 24px 8px 12px;
+}
+.cefr-track-line::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 4px;
+  background: var(--line);
+  z-index: 1;
+}
+.cefr-step {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.cefr-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--panel);
+  border: 2px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+}
+.cefr-step.passed .cefr-dot {
+  background: var(--pz-mint);
+  border-color: var(--pz-mint-line);
+  color: var(--pz-mint-ink);
+}
+.cefr-step.active .cefr-dot {
+  background: var(--pz-yellow);
+  border-color: var(--pz-yellow-ink);
+  color: var(--pz-yellow-ink);
+  box-shadow: 0 0 0 4px var(--pz-yellow-line);
+  transform: scale(1.15);
+}
+.cefr-step-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--muted);
+}
+.cefr-step.active .cefr-step-label {
+  color: var(--text);
+  font-weight: 800;
+}
+
+/* 7-Day Activity Chart */
+.weekly-activity-card {
+  padding: 16px;
+  background: var(--panel);
+  border: 1.5px solid var(--surface-edge);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 4px 0 var(--surface-edge);
+  margin-bottom: 18px;
+  text-align: left;
+}
+.weekly-bars {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px;
+  height: 90px;
+  padding: 10px 0 0;
+  margin-top: 10px;
+}
+.weekly-bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  height: 100%;
+  justify-content: flex-end;
+}
+.weekly-bar-pillar {
+  width: 100%;
+  max-width: 28px;
+  background: var(--pz-mint);
+  border-radius: 6px 6px 0 0;
+  transition: height 0.4s var(--ease);
+}
+.weekly-bar-pillar.active {
+  background: var(--sun);
+  box-shadow: 0 2px 0 var(--pz-yellow-line);
+}
+.weekly-day-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.weekly-bar-col.today .weekly-day-label {
+  font-weight: 800;
+  color: var(--text);
+}
+
+
+
+/* Kartu permintaan teman (modal Terima/Tolak). Barisnya sengaja memakai token yang
+   sama dengan .social-me supaya modal ini tidak jadi pulau gaya sendiri. */
+.social-request-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.social-request-row:last-child{border-bottom:0}
+.social-request-who{flex:1 1 0;min-width:0;display:flex;flex-direction:column}
+.social-request-who b{font-size:.95rem;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.social-request-who small{color:var(--muted)}
+.social-request-acts{display:flex;align-items:center;gap:8px;flex:none}
+.social-request-acts .primary{padding:8px 14px;min-height:40px}

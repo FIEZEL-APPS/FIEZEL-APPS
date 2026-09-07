@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-29T10:00:00+07:00",
+  "updated": "2026-09-07T02:48:40.000Z",
   "active": [
     {
       "sesi": "ses_0034e69d3ffes3kjiFLNDzYXUZ",
@@ -60,9 +60,70 @@
       ],
       "mulai": "2026-08-29T10:00:00+07:00",
       "catatan": "TIDAK menyentuh features/neural-voice/ (diag panel, diklaim opencode), sw.js atau core-config.js (diklaim A6). Kontrol <16px di diag panel dilaporkan ke pemiliknya, tidak diperbaiki dari sini. index.html TIDAK disentuh: viewport zoom 5x dipertahankan demi WCAG 1.4.4/1.4.10."
+    },
+    {
+      "sesi": "sesi-claude-cq1nea/EXAM-FOCUS-GUARD-2",
+      "peran": "tindak lanjut pendeteksi keluar layar: peringatan ke guru + detak realtime murid",
+      "paths": [
+        "features/teacher/fiezel-teacher-store.js",
+        "features/teacher/fiezel-teacher-shell.js",
+        "features/teacher/teacher-shell.css",
+        "features/notify/fiezel-inbox.js",
+        "tests/exam-focus-guard-test.js",
+        "docs/handoffs/EXAM-FOCUS-GUARD-HANDOFF.md"
+      ],
+      "mulai": "2026-09-06T09:10:00+07:00",
+      "catatan": "Temuan pemakaian pertama di kelas: kiriman yang ditolak 429 hilang diam-diam, kabar generik menenggelamkan peringatan, dan detak murid 60 detik jauh di belakang detak guru 10 detik. Menyentuh juga app.js (satu tetapan NOTIF_POLL_MS) dan features/learner-flow/fiezel-learner-flow.js (pengulangan kiriman gagal) — keduanya perubahan kecil di luar path yang diklaim, tidak bertabrakan dengan klaim aktif mana pun. Build dinaikkan lewat tools/bump-build.mjs (m025-270)."
+    },
+    {
+      "sesi": "sesi-claude-cq1nea/CLASS-JOIN",
+      "peran": "permintaan gabung kelas: ketukan murid sampai ke guru, guru menambahkan",
+      "paths": [
+        "features/i18n/copy-id-classjoin.js",
+        "features/i18n/copy-th-classjoin.js",
+        "tests/class-join-test.js"
+      ],
+      "mulai": "2026-09-06T10:05:00+07:00",
+      "catatan": "Menyentuh juga di luar path yang diklaim: features/class-hub/fiezel-class-hub.js, features/teacher/fiezel-teacher-store.js + fiezel-teacher-shell.js, features/learner-flow/fiezel-learner-flow.js, workers/api/teacher/class-sync-core.js (penanda j), index.html + sw.js + fiezel-th-loader.js (pendaftaran berkas), .github/workflows/quality.yml (gerbang baru). Build m025-272 lewat tools/bump-build.mjs."
+    },
+    {
+      "sesi": "sesi-claude-cq1nea/EXAM-LOCK",
+      "peran": "kunci ujian: semua permukaan ujian dipantau, pintu AI tertutup di dalamnya",
+      "paths": [
+        "features/ui/fiezel-exam-lock.js",
+        "tests/exam-lock-test.js"
+      ],
+      "mulai": "2026-09-06T11:20:00+07:00",
+      "catatan": "Menyentuh juga app.js (kunci ujian di quizLoop/Skills Lab/Writing + gerbang pintu AI + pendeteksi ujian non-tugas), features/class-hub/fiezel-class-hub.js, features/learner-flow/fiezel-learner-flow.js, features/teacher/fiezel-teacher-store.js, workers/api/teacher/class-sync-core.js (fx), copy-*-proctor.js, index.html, sw.js, quality.yml. Build m025-273 lewat tools/bump-build.mjs."
+    },
+    {
+      "sesi": "claude-code-jepang-hidrasi",
+      "peran": "claude-code / bank Jepang bertahan sampai hidrasi",
+      "paths": [
+        "tests/japanese-bank-survives-load-test.js",
+        "tests/japanese-vocab-bank-test.js",
+        "content/ja/vocabulary-master-ja.json"
+      ],
+      "mulai": "2026-09-07T02:14:39Z",
+      "catatan": "m025-291 memperbaiki bank Jepang yang ditimpa di load(); m025-292 menambah bank kosakata Jepang 1.370 entri. Menyentuh juga app.js, sw.js, quality.yml."
     }
   ],
   "finished": [
+    {
+      "sesi": "sesi-claude-cq1nea/EXAM-FOCUS-GUARD",
+      "peran": "pendeteksi keluar layar saat ujian + laporan realtime ke guru",
+      "paths": [
+        "features/class-hub/fiezel-focus-guard.js",
+        "features/class-hub/fiezel-class-hub.js",
+        "features/class-hub/class-hub.css",
+        "features/i18n/copy-id-proctor.js",
+        "features/i18n/copy-th-proctor.js",
+        "tests/exam-focus-guard-test.js"
+      ],
+      "mulai": "2026-09-05T23:40:00+07:00",
+      "catatan": "Menyentuh juga, di luar path yang diklaim, sebagai perubahan kecil yang tidak bertabrakan dengan klaim aktif mana pun: features/learner-flow/fiezel-learner-flow.js (satu fungsi baru recordAssignmentFocus), features/teacher/fiezel-teacher-store.js + fiezel-teacher-shell.js + teacher-shell.css (menampilkan catatan keluar layar), workers/api/teacher/class-sync-core.js (assign.f = tiga bilangan), features/i18n/fiezel-th-loader.js + index.html + sw.js (pendaftaran berkas baru), tests/class-hub-test.js (assert ekspor dilonggarkan), .github/workflows/quality.yml (gerbang baru didaftarkan). Nomor build dinaikkan lewat tools/bump-build.mjs (m025-267), bukan dengan tangan. sw.js/core-config.js diklaim A6 (sesi-computer-086e9698/A6) — yang disentuh di sana HANYA daftar precache + penanda build lewat arbiter, bukan sakelar Cloudflare. | SELESAI: seluruh pekerjaan mendarat lewat PR #363 (build m025-269). Gerbang quality 252/252 hijau di CI, guardian A6/A7/A9/A10/A11/A13/A14 hijau. Klaim dilepas bersama commit terakhir PR itu supaya wilayahnya bebas begitu ia merge.",
+      "selesai": "2026-09-06T08:05:00+07:00"
+    },
     {
       "sesi": "sesi-computer-ed18fcf2",
       "peran": "UIUX-AUDIT-REPAIR (perplexity computer)",
@@ -250,6 +311,102 @@
       "mulai": "2026-08-28T16:55:00+07:00",
       "catatan": "Overhaul penuh UI/UX+maskot+lesson-mode selesai: 20 agen desain/impl/QA + 50 verifikator read-only (V01-V50, semua verdict masuk; 10 cacat genuine diperbaiki+diverifikasi ulang). Gate suite 166 hijau (7 FAIL identik pra-eksisting di main), release-audit.py PASS penuh. Siap PR; klaim dilepas setelah merge. | SELESAI: PR #251 merged 2026-08-29 (CI penuh hijau).",
       "selesai": "2026-08-29T08:00:00+07:00"
+    },
+    {
+      "sesi": "sesi-claude-cq1nea/JAPANESE-COURSE",
+      "peran": "kursus bahasa Jepang: usulan tingkat pertama (A1/N5) — silabus, contoh soal, graf keluarga",
+      "paths": [
+        "docs/japanese/",
+        "docs/handoffs/JAPANESE-COURSE-HANDOFF.md"
+      ],
+      "mulai": "2026-09-06T13:30:00+07:00",
+      "catatan": "Tahap usulan: NOL byte produksi berubah, build tidak dinaikkan. Wilayah yang akan diklaim SESUDAH usulan disetujui: features/brain/fiezel-core-brain.js (PREREQUISITES bisa disuntik), berkas konten Jepang, dan gerbangnya. Temuan yang perlu diketahui sesi lain: conceptOf() di features/brain/fiezel-question-memory.js membuang karakter non-ASCII, jadi marker berkana menghasilkan concept null dan pembatas kebaruan konsep mati diam.",
+      "selesai": "2026-09-06T17:31:19Z",
+      "hasil": "Mendarat lewat PR #373 (m025-279)."
+    },
+    {
+      "sesi": "claude-code-graf-keluarga",
+      "peran": "claude-code / graf keluarga brain",
+      "paths": [
+        "features/brain/fiezel-core-brain.js",
+        "tests/family-graph-injection-test.js"
+      ],
+      "mulai": "2026-09-06T16:39:33Z",
+      "catatan": "Langkah 1 kursus Jepang: setFamilyGraph/resetFamilyGraph/familyGraph. Graf Inggris tetap bawaan, dijaga patokan tulis-tangan di gerbang. Handoff JAPANESE-COURSE sudah diklaim entri sesi-claude-cq1nea di atas.",
+      "selesai": "2026-09-06T17:31:19Z",
+      "hasil": "Mendarat lewat PR #373 (m025-279)."
+    },
+    {
+      "sesi": "claude-code-kosakata-jepang",
+      "peran": "claude-code / kosakata jepang",
+      "paths": [
+        "docs/japanese/kosakata-jlpt.json",
+        "docs/handoffs/JAPANESE-VOCAB-HANDOFF.md"
+      ],
+      "mulai": "2026-09-06T17:30:59Z",
+      "catatan": "Normalisasi dua berkas kosakata milik owner jadi satu bank JSON per tingkat JLPT. Nol byte produksi.",
+      "selesai": "2026-09-06T18:09:26Z",
+      "hasil": "Mendarat lewat PR #374."
+    },
+    {
+      "sesi": "claude-code-fix-th-branding",
+      "peran": "claude-code / tutup kebocoran th rebranding",
+      "paths": [
+        "features/i18n/copy-id-feat-d.js",
+        "features/i18n/copy-th-feat-d.js"
+      ],
+      "mulai": "2026-09-06T18:44:26Z",
+      "catatan": "Menyentuh juga app.js dan features/teacher/fiezel-teacher-shell.js (dua baris merek), id-golden-baseline.",
+      "selesai": "2026-09-06T19:46:35Z",
+      "hasil": "Mendarat lewat PR #381 (m025-282)."
+    },
+    {
+      "sesi": "claude-code-gerbang-konten-ja",
+      "peran": "claude-code / gerbang konten Jepang",
+      "paths": [
+        "tests/japanese-content-test.js",
+        "docs/japanese/n5-a1-sample-templates.json"
+      ],
+      "mulai": "2026-09-06T19:46:35Z",
+      "catatan": "Langkah 3: gerbang skema+pengecoh+concept. Nol byte produksi.",
+      "selesai": "2026-09-06T22:10:19Z",
+      "hasil": "Mendarat lewat PR #380."
+    },
+    {
+      "sesi": "claude-code-konten-a1-ja",
+      "peran": "claude-code / konten A1 Jepang",
+      "paths": [
+        "content/ja/",
+        "tests/japanese-content-test.js"
+      ],
+      "mulai": "2026-09-06T22:10:19Z",
+      "catatan": "234 butir, 12 keluarga. Nol byte produksi: belum dimuat modul mana pun.",
+      "selesai": "2026-09-06T22:55:36Z",
+      "hasil": "Mendarat lewat PR #385."
+    },
+    {
+      "sesi": "claude-code-sumbu-bahasa",
+      "peran": "claude-code / sumbu bahasa target",
+      "paths": [
+        "features/brain/fiezel-target-language.js",
+        "tests/target-language-axis-test.js"
+      ],
+      "mulai": "2026-09-06T18:09:26Z",
+      "catatan": "Langkah 2 kursus Jepang: kunci penyimpanan per bahasa. Kunci Inggris identik byte per byte; modul off di manifest karena belum ada pemanggil. | Sudah mendarat di main (PR #386, m025-290).",
+      "selesai": "2026-09-07T02:48:40Z"
+    },
+    {
+      "sesi": "claude-code-wire-ja",
+      "peran": "claude-code / kursus Jepang ke layar",
+      "paths": [
+        "content/ja/",
+        "features/i18n/copy-id-bahasa.js",
+        "features/i18n/copy-th-bahasa.js",
+        "tests/japanese-course-wiring-test.js"
+      ],
+      "mulai": "2026-09-06T22:55:36Z",
+      "catatan": "Menyentuh juga app.js, index.html, sw.js, brain-manifest, th-loader, locale-assets-th. | Sudah mendarat di main (PR #386, m025-290).",
+      "selesai": "2026-09-07T02:48:40Z"
     }
   ],
   "protocol": "coordination-claims-v1",

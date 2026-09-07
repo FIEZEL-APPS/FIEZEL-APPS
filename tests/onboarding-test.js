@@ -93,7 +93,11 @@ function el(tag) {
       if (node._html === node.innerHTML && node._found) return node._found;
       node._html = node.innerHTML;
       node._found = [];
-      const re = /<(button|input)([^>]*?)\/?>/g;
+      // m025-271: `div` dan `p` ikut dipindai. Slot tombol Google di layar bahasa BUKAN
+      // <button> — tombolnya digambar skrip Google ke dalam sebuah <div>. Selama pemindai
+      // hanya melihat button/input, gerbang tidak bisa membuktikan slot itu ada sama
+      // sekali, dan "hijau" di sini akan berarti "tidak terukur".
+      const re = /<(button|input|div|p)([^>]*?)\/?>/g;
       let m;
       while ((m = re.exec(node.innerHTML))) {
         const found = el(m[1]);
@@ -185,6 +189,92 @@ test('enam langkah nyata (Step 1 nama + Step 2-6), carousel tetap dua slide', ()
   assert.strictEqual(onboarding.LANGUAGE_STEP, 0);
   assert.strictEqual(onboarding.LAST_STEP, 6);
   assert.strictEqual(onboarding.NAME_STEP, 1);
+});
+
+/* =====================================================================================
+ * "Sudah punya akun?" DI LAYAR PALING AWAL (m025-271)
+ *
+ * Kenapa gerbang ini ada: murid yang ganti HP menyelesaikan seluruh onboarding sebagai
+ * murid BARU, lalu baru menemukan tombol masuk tiga ketukan di dalam Pengaturan. Saat itu
+ * `sub` perangkat sudah bukan `sub` akunnya — kelas, tugas guru, dan temannya hilang dari
+ * pandangan gurunya. Tombol yang baru bisa ditemukan sesudah kerugian itu terjadi adalah
+ * tombol yang datang terlambat, dan hanya gerbang yang bisa menahannya tetap di depan.
+ * ===================================================================================== */
+
+/** Tiruan FiezelGoogle: mencatat ke mana tombol digambar dan opsi apa yang dipakai. */
+function fakeGoogle(over) {
+  const calls = [];
+  return Object.assign({
+    _calls: calls,
+    available: () => true,
+    rememberedEmail: () => '',
+    renderButton: (host, cb, opts) => {
+      calls.push({ host, cb, opts });
+      return Promise.resolve({ ok: true });
+    }
+  }, over || {});
+}
+
+test('KUNCI: tombol masuk Google tergambar di layar PERTAMA, sebelum pilih bahasa', () => {
+  const G = fakeGoogle();
+  const env = fakeEnv({ FiezelGoogle: G });
+  const run = onboarding.show(env, { now: NOW, force: true, onLocale: () => {} });
+  assert.strictEqual(run.stepIndex(), onboarding.LANGUAGE_STEP, 'masih di pra-langkah bahasa');
+  assert.ok(/data-ob-google/.test(run.element.innerHTML), 'slot tombol ada di markup');
+  assert.strictEqual(G._calls.length, 1, 'renderButton dipanggil tepat sekali');
+  assert.ok(G._calls[0].host, 'digambar ke elemen sungguhan, bukan null');
+});
+
+test('KUNCI: tombolnya memakai bahasa peramban — bukan dipaksa Indonesia', () => {
+  const G = fakeGoogle();
+  const env = fakeEnv({ FiezelGoogle: G });
+  onboarding.show(env, { now: NOW, force: true, onLocale: () => {} });
+  assert.strictEqual(G._calls[0].opts && G._calls[0].opts.locale, 'auto',
+    'memaksa locale di layar yang JUSTRU sedang menanyakan bahasa akan menyodorkan '
+    + 'tombol Indonesia kepada murid Thai');
+});
+
+test('KUNCI: pemilih bahasa tetap utuh dan tetap jadi aksi utama', () => {
+  const G = fakeGoogle();
+  const env = fakeEnv({ FiezelGoogle: G });
+  const run = onboarding.show(env, { now: NOW, force: true, onLocale: () => {} });
+  const html = run.element.innerHTML;
+  assert.ok(/Choose your language/.test(html), 'judul bahasa tetap ada');
+  const choices = run.element.querySelectorAll('[data-ob-locale]');
+  assert.deepStrictEqual(choices.map(b => b.getAttribute('data-ob-locale')), ['id', 'th'],
+    'kedua pilihan bahasa tetap ada dan bisa diklik');
+  assert.ok(html.indexOf('data-ob-locale') < html.indexOf('data-ob-google'),
+    'blok masuk berdiri DI BAWAH pemilih bahasa — sekunder, bukan aksi utama');
+});
+
+test('KUNCI: tanpa FiezelGoogle, layar bahasa tetap utuh (nol slot menganggur)', () => {
+  const run = onboarding.show(fakeEnv(), { now: NOW, force: true, onLocale: () => {} });
+  assert.ok(!/data-ob-google/.test(run.element.innerHTML),
+    'fitur mati = blok tidak digambar sama sekali, bukan kotak kosong tanpa tombol');
+  assert.strictEqual(run.element.querySelectorAll('[data-ob-locale]').length, 2,
+    'pemilih bahasa tidak terpengaruh');
+});
+
+test('KUNCI: naskah blok masuk lahir DUA BAHASA secara harfiah', () => {
+  const G = fakeGoogle();
+  const run = onboarding.show(fakeEnv({ FiezelGoogle: G }), { now: NOW, force: true, onLocale: () => {} });
+  const html = run.element.innerHTML;
+  assert.ok(/Sudah punya akun\?/.test(html), 'ada kalimat Indonesia');
+  assert.ok(/[\u0E00-\u0E7F]/.test(html.split('data-ob-google')[0].split('Sudah punya akun')[1] || ''),
+    'ada aksara Thai di blok yang sama — layar ini tidak boleh menunggu copy-map, '
+    + 'karena copy Thai memang belum diunduh saat cat pertama');
+});
+
+test('tombol Google digambar ULANG setiap layar bahasa dicat ulang', () => {
+  /* paint() menulis ulang innerHTML, jadi tombol yang digambar skrip Google ikut
+     terhapus. Kalau ia tidak digambar ulang, murid yang menunggu unduhan copy Thai
+     akan melihat kotak kosong di tempat tombol seharusnya berada. */
+  const G = fakeGoogle();
+  const env = fakeEnv({ FiezelGoogle: G });
+  const run = onboarding.show(env, { now: NOW, force: true, onLocale: () => {} });
+  const sebelum = G._calls.length;
+  run.element.querySelector('[data-ob-locale="th"]').listeners.click[0]();
+  assert.ok(G._calls.length >= sebelum, 'nol pemanggilan yang hilang saat cat ulang');
 });
 
 test('popup pertama onboarding memilih Bahasa Indonesia atau Thai sebelum Step 1', () => {

@@ -1,0 +1,64 @@
+<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=390">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<style>
+.hero .paw{position:absolute;right:-6px;bottom:-8px;width:118px}
+.hero h2{font-size:23px;max-width:230px;margin-top:6px}
+.hero .btn{margin-top:14px;width:210px;height:50px}
+.hero{padding:18px 20px}
+.stat{padding:10px 14px}
+.skills{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.sk{border-radius:18px;padding:10px 10px 10px;border:1px solid transparent}
+.sk .ic{width:30px;height:30px;border-radius:10px;background:rgba(255,255,255,.8);display:grid;place-items:center;margin-bottom:6px}
+.sk b{display:block;font-size:13px;color:var(--ink)}
+.sk .bar{margin-top:8px;background:rgba(255,255,255,.7)}
+.cont{display:flex;gap:10px;overflow:hidden}
+.cc{flex:none;width:200px;padding:14px;border-radius:18px;background:var(--paper);border:1px solid var(--line)}
+</style></head><body>
+<div class="screen">
+  <div class="top">
+    <div class="row">
+      <span class="avatar"><img src="/assets/brand/paw-mascot-head.svg" alt=""></span>
+      <div><div style="font-weight:700;font-size:16px;line-height:1.2">Halo, Rani</div><div class="tiny muted">Selasa, 25 Agustus</div></div>
+    </div>
+    <div class="row" style="gap:8px">
+      <span class="chip flame"><i data-lucide="flame" class="i sm"></i>7</span>
+      <span class="iconbtn"><i data-lucide="bell" class="i sm"></i></span>
+    </div>
+  </div>
+
+  <div class="hero mt-3">
+    <span class="blob" style="width:220px;height:220px;background:#FFDE59;opacity:.5;right:-60px;top:-90px"></span>
+    <div class="row" style="gap:8px"><span class="pill maroon">Fokus hari ini</span><span class="pill"><i data-lucide="clock-3" class="i sm"></i>10 mnt</span></div>
+    <h2>Present Simple untuk kebiasaan sehari-hari</h2>
+    <p class="small muted mt-1" style="max-width:220px">Grammar · A1 · 10 soal · lanjut dari yang kemarin</p>
+    <a class="btn ink">Mulai sesi <i data-lucide="arrow-right" class="i sm"></i></a>
+    <img class="paw" src="/assets/brand/paw-mascot-full.svg" alt="">
+  </div>
+
+  <div class="row mt-2" style="gap:10px">
+    <div class="stat row" style="gap:12px"><span class="ring" style="--p:66"><span>2/3</span></span><div><b style="font-size:16px">Sesi hari ini</b><span>1 lagi, streak aman</span></div></div>
+    <div class="stat"><b>A1 <span class="tiny" style="font-family:var(--body);color:var(--good)">▲ 68%</span></b><span>Menuju A2</span></div>
+  </div>
+
+  <div class="row between mt-2"><h3>Lanjutkan</h3><span class="small txt-maroon" style="font-weight:700">Semua</span></div>
+  <div class="cont mt-1">
+    <div class="cc"><div class="row between"><span class="pill" style="background:var(--pink);color:var(--pink-ink)"><i data-lucide="book-a" class="i sm"></i>Vocab</span><span class="tiny muted">12/20</span></div><b style="display:block;margin-top:10px">Makanan & minuman</b><div class="bar thin mt-1"><i style="width:60%"></i></div></div>
+    <div class="cc"><div class="row between"><span class="pill" style="background:var(--lilac);color:var(--lilac-ink)"><i data-lucide="book-open" class="i sm"></i>Reading</span><span class="tiny muted">2 mnt</span></div><b style="display:block;margin-top:10px">Kabar dari Bali</b><div class="bar thin mt-1"><i style="width:25%;background:var(--lilac-ink)"></i></div></div>
+  </div>
+
+  <div class="row between mt-2"><h3>Skill kamu</h3><span class="tiny muted">mastery</span></div>
+  <div class="skills mt-1">
+    <div class="sk tile pink"><span class="ic"><i data-lucide="headphones" class="i sm"></i></span><b>Listening</b><div class="bar thin"><i style="width:72%;background:var(--pink-ink)"></i></div></div>
+    <div class="sk tile mint"><span class="ic"><i data-lucide="mic" class="i sm"></i></span><b>Speaking</b><div class="bar thin"><i style="width:40%;background:var(--mint-ink)"></i></div></div>
+    <div class="sk tile lilac"><span class="ic"><i data-lucide="book-open" class="i sm"></i></span><b>Reading</b><div class="bar thin"><i style="width:55%;background:var(--lilac-ink)"></i></div></div>
+  </div>
+</div>
+<nav class="nav">
+  <a class="on"><i data-lucide="house" class="i"></i>Hari ini</a>
+  <a><i data-lucide="zap" class="i"></i>Latihan</a>
+  <a><i data-lucide="school" class="i"></i>Kelas</a>
+  <a><i data-lucide="route" class="i"></i>Progres</a>
+  <a><i data-lucide="user-round" class="i"></i>Profil</a>
+</nav>
+<script src="/lucide.min.js"></script><script>lucide.createIcons()</script></body></html>

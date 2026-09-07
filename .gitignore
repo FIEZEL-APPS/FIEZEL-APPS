@@ -2,6 +2,7 @@
 Thumbs.db
 *.log
 *.tmp
+.tmp-*
 *.bak
 # Artefak merge/patch. Bukan sekadar sampah: `*.orig`/`*.rej` adalah SALINAN UTUH
 # versi lain sebuah berkas, jadi berkas yang placeholder-nya sudah dibersihkan bisa

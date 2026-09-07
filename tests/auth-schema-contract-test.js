@@ -62,11 +62,13 @@ function statementsOf(sql) {
 
   const sqlAuth = mustRead(path.join(MIG_DIR, '0011_auth_roles.sql'));
   const sqlTeacher = mustRead(path.join(MIG_DIR, '0012_teacher_content.sql'));
+  const sqlOauth = mustRead(path.join(MIG_DIR, '0013_oauth_email.sql'));
 
   /* ---------- 1. Kesetaraan runtime <-> migrasi ------------------------------- */
   const pairs = [
     ['0011_auth_roles.sql', sqlAuth, schema.AUTH_DDL],
-    ['0012_teacher_content.sql', sqlTeacher, schema.TEACHER_DDL]
+    ['0012_teacher_content.sql', sqlTeacher, schema.TEACHER_DDL],
+    ['0013_oauth_email.sql', sqlOauth, schema.OAUTH_DDL]
   ];
   for (const [name, sql, ddl] of pairs) {
     const fromFile = statementsOf(sql);
@@ -80,7 +82,7 @@ function statementsOf(sql) {
   }
 
   /* ---------- 2. Hanya DDL aditif -------------------------------------------- */
-  for (const [name, sql] of [['0011', sqlAuth], ['0012', sqlTeacher]]) {
+  for (const [name, sql] of [['0011', sqlAuth], ['0012', sqlTeacher], ['0013', sqlOauth]]) {
     const body = normalizeSql(sql).toUpperCase();
     for (const forbidden of ['DROP ', 'DELETE ', 'UPDATE ', 'INSERT ', 'ALTER ', 'TRUNCATE ', 'ATTACH ', 'PRAGMA ']) {
       assert(!body.includes(forbidden),
@@ -93,12 +95,12 @@ function statementsOf(sql) {
   }
 
   /* ---------- 3. Kontrak privasi diwarisi ------------------------------------ */
-  const allDdl = normalizeSql(sqlAuth + '\n' + sqlTeacher).toLowerCase();
+  const allDdl = normalizeSql(sqlAuth + '\n' + sqlTeacher + '\n' + sqlOauth).toLowerCase();
   // Hanya BADAN pernyataan yang diperiksa: komentar kepala berkas MEMBAHAS
   // larangan ini secara eksplisit, dan mencocokkan komentar akan memerah palsu.
   const columnsOnly = schema.ALL_DDL.join(' ').toLowerCase();
   const bannedColumns = [
-    'email', 'phone', 'nomor_hp', 'birth', 'age', 'real_name', 'full_name',
+    'phone', 'nomor_hp', 'birth', 'age', 'real_name', 'full_name',
     'ip_addr', 'user_agent', 'timezone', 'latitude', 'longitude',
     'message', 'comment', 'note_text', 'chat', 'transcript', 'answer_text',
     'visitor_token', 'pepper', 'password'
@@ -107,6 +109,25 @@ function statementsOf(sql) {
     assert(!columnsOnly.includes(banned),
       'DDL TIDAK memuat kolom terlarang `' + banned + '` (daftar keras bab 29)');
   }
+
+  /*
+   * EMAIL: larangan DIPERSEMPIT, bukan dihapus (keputusan OWNER 6 Sep 2026 —
+   * menghubungi orang tua/sekolah; lihat kepala 0013_oauth_email.sql).
+   *
+   * Kepala 0011 menulis larangan email itu "mengikat" dan mencabutnya adalah
+   * keputusan owner tersendiri. Keputusan itu sudah diambil, jadi assert ini
+   * tidak dihapus melainkan dipersempit ke SATU tabel. Email di tabel lain mana
+   * pun tetap merah — dan itulah yang menjaga pencabutan ini tidak melebar
+   * diam-diam ke auth_account, identity, atau tabel guru.
+   */
+  for (const statement of schema.ALL_DDL) {
+    const lower = statement.toLowerCase();
+    if (!lower.includes('email')) continue;
+    assert(/create table if not exists auth_email /.test(lower),
+      'kolom `email` HANYA boleh di tabel auth_email, bukan di: ' + statement.slice(0, 70));
+  }
+  assert(schema.OAUTH_DDL.join(' ').toLowerCase().includes('email text not null'),
+    'auth_email benar-benar menyimpan alamatnya (bukan hash) — itu yang owner putuskan');
   assert(columnsOnly.includes('pass_hash'),
     'kredensial disimpan sebagai `pass_hash` (turunan PBKDF2), BUKAN kolom bernama password');
   assert(columnsOnly.includes('code_hash') && !columnsOnly.includes('invite_code '),
@@ -127,17 +148,17 @@ function statementsOf(sql) {
     'paket ini tidak mendefinisikan ulang tabel identity');
 
   /* ---------- 5. Tabrakan nama tabel ----------------------------------------- */
-  const ours = new Set([...schema.AUTH_TABLES, ...schema.TEACHER_TABLES]);
+  const ours = new Set([...schema.AUTH_TABLES, ...schema.TEACHER_TABLES, ...schema.OAUTH_TABLES]);
   const declared = schema.ALL_DDL
     .map((s) => (s.match(/CREATE TABLE IF NOT EXISTS (\w+)/) || [])[1])
     .filter(Boolean);
   assert(declared.length === ours.size,
-    'daftar AUTH_TABLES+TEACHER_TABLES cocok dengan tabel yang benar-benar dibuat');
+    'daftar AUTH_TABLES+TEACHER_TABLES+OAUTH_TABLES cocok dengan tabel yang benar-benar dibuat');
   for (const table of declared) {
     assert(ours.has(table), 'tabel ' + table + ' terdaftar di manifes tabel');
   }
   for (const file of fs.readdirSync(MIG_DIR)) {
-    if (!file.endsWith('.sql') || file.startsWith('0011') || file.startsWith('0012')) continue;
+    if (!file.endsWith('.sql') || file.startsWith('0011') || file.startsWith('0012') || file.startsWith('0013')) continue;
     const other = mustRead(path.join(MIG_DIR, file));
     for (const match of other.matchAll(/CREATE TABLE IF NOT EXISTS (\w+)/gi)) {
       assert(!ours.has(match[1]),

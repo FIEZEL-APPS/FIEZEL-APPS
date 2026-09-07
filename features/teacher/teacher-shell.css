@@ -1,4 +1,4 @@
-/* FIEZEL Ruang Guru — tema terpisah dari cangkang murid (cream/pastel/maskot).
+/* FIEZEL KelasKu untuk Guru — tema terpisah dari cangkang murid (cream/pastel/maskot).
    Guru: ruang kerja tenang. Tinta hijau-gelap, kertas hangat, aksen sage & amber. Tipografi
    Fraunces (judul) + IBM Plex Sans (teks) + IBM Plex Mono (kode). */
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap');
@@ -29,6 +29,13 @@ body.fz-teacher-mode #app{font-family:var(--tg-body)}
 .tg-brand{display:flex;align-items:center;gap:12px}
 .tg-brand-mark{width:40px;height:40px;border-radius:12px;background:linear-gradient(145deg,#2C9C80,#166052);display:grid;place-items:center;font-family:var(--tg-display);font-weight:700;font-size:1.3rem;color:#fff}
 .tg-brand b{display:block;font-family:var(--tg-display);font-size:1.15rem;letter-spacing:.02em}.tg-brand small{color:var(--tg-mist);font-size:.75rem;text-transform:uppercase;letter-spacing:.14em}
+
+/* Reusable Wordmark: KelasKu untuk Guru */
+.kelasku-brand{display:inline-flex;align-items:baseline;gap:8px;white-space:nowrap;line-height:1}
+.kelasku-main{font-family:var(--tg-display,'Plus Jakarta Sans',sans-serif);font-weight:700;font-size:1.18rem;color:#0F224A;letter-spacing:-0.02em}
+.kelasku-tag{font-family:var(--tg-body,'Plus Jakarta Sans',sans-serif);font-size:0.52rem;font-weight:500;color:#5B6B82;letter-spacing:0.02em;text-transform:none}
+.tg-side .kelasku-brand .kelasku-main{color:#FFFFFF}
+.tg-side .kelasku-brand .kelasku-tag{color:#9DB0CC}
 .tg-teacher{display:flex;align-items:center;gap:10px;background:var(--tg-ink-2);border:1px solid var(--tg-ink-3);border-radius:var(--tg-r);padding:10px 12px;color:inherit;text-align:left;cursor:pointer;transition:background-color .2s,transform .2s;font:inherit}
 .tg-teacher:hover{background:var(--tg-ink-3);transform:translateY(-1px)}
 .tg-teacher svg{width:20px;height:20px;color:var(--tg-mist);flex:none}.tg-teacher b{display:block;font-size:.92rem}.tg-teacher small{color:var(--tg-mist);font-size:.75rem}
@@ -235,6 +242,9 @@ body.fz-teacher-mode #app{font-family:var(--tg-body)}
 @keyframes tg-slide{from{transform:translateX(40px);opacity:0}to{transform:none;opacity:1}}
 @keyframes tg-pop{from{transform:translate(-50%,-48%) scale(.97);opacity:0}to{transform:translate(-50%,-50%) scale(1);opacity:1}}
 body.reduce-motion .tg-rise,body.reduce-motion .tg-drawer,body.reduce-motion .tg-modal,body.reduce-motion .tg-scrim{animation:none}
+/* Cat ulang karena data masuk BUKAN "masuk layar". Tanpa pagar ini setiap ronde sinkron
+   memutar ulang animasi masuk: kartu jatuh ke posisi awal lalu merangkak kembali, berulang. */
+.tg.is-repaint .tg-rise,.tg.is-repaint .tg-drawer,.tg.is-repaint .tg-modal,.tg.is-repaint .tg-scrim,.tg.is-repaint .tg-inbox,.tg.is-repaint .tg-board{animation:none}
 
 /* responsive */
 @media (max-width:1100px){.tg-grid-kpi{grid-template-columns:repeat(2,1fr)}.tg-grid-2{grid-template-columns:1fr}.tg-grid-skill{grid-template-columns:repeat(3,1fr)}.tg-quick-row{grid-template-columns:repeat(3,1fr)}}
@@ -242,14 +252,14 @@ body.reduce-motion .tg-rise,body.reduce-motion .tg-drawer,body.reduce-motion .tg
   .tg{grid-template-columns:1fr}.tg-side{display:none}
   .tg-top{padding:22px 18px 14px;flex-direction:column;align-items:flex-start}.tg-content{padding:16px 16px calc(96px + env(safe-area-inset-bottom))}
   .tg-btn span{display:none}.tg-btn.is-primary span,.tg-modal .tg-btn span,.tg-card .tg-btn span,.tg-welcome .tg-btn span{display:inline}
-  .tg-mnav{display:grid;grid-template-columns:repeat(6,1fr);position:fixed;left:0;right:0;bottom:0;background:var(--tg-ink);padding:8px 6px calc(8px + env(safe-area-inset-bottom));z-index:50}
+  .tg-mnav{display:grid;grid-template-columns:repeat(7,1fr);position:fixed;left:0;right:0;bottom:0;background:var(--tg-ink);padding:8px 6px calc(8px + env(safe-area-inset-bottom));z-index:50}
   .tg-mnav button{display:flex;flex-direction:column;align-items:center;gap:3px;background:transparent;border:0;color:#C8D6D1;font:inherit;font-size:.62rem;font-weight:600;padding:6px 2px;border-radius:10px}.tg-mnav button svg{width:18px;height:18px}.tg-mnav button.is-active{color:#fff;background:var(--tg-sage)}
   .tg-quick-row{grid-template-columns:repeat(2,1fr)}.tg-grid-skill{grid-template-columns:repeat(2,1fr)}.tg-welcome-list{grid-template-columns:1fr}.tg-form-row,.tg-mode{grid-template-columns:1fr}
   .tg-board-kpi{grid-template-columns:1fr}.tg-board-skills div{grid-template-columns:1fr 3fr 60px;gap:10px}.tg-board{padding:70px 20px 24px}
   .tg-row{flex-wrap:wrap}.tg-row-actions{flex-direction:row;width:100%;justify-content:flex-start;padding-left:48px}
 }
 
-/* Penawar dekorasi `html.fiezel-ui-v6 body button:not(...)` (style.css:2464, dipasang tutor-v3 saat idle) yang menimpa tombol Ruang Guru. Specificity disamakan lalu dinaikkan lewat body.fz-teacher-mode .tg. */
+/* Penawar dekorasi `html.fiezel-ui-v6 body button:not(...)` (style.css:2464, dipasang tutor-v3 saat idle) yang menimpa tombol KelasKu untuk Guru. Specificity disamakan lalu dinaikkan lewat body.fz-teacher-mode .tg. */
 html.fiezel-ui-v6 body.fz-teacher-mode .tg button:not(.primary):not(.nav):not(.icon-button):not(.text-button):not(.coach-link):not(.fz-coach-bubble):not(.launch-card):not(.skill-card):not(.option):not(.skill-help-dot):not(.olm-dispute){border:0;border-radius:12px;box-shadow:none;transition:background-color .18s,color .18s,transform .18s,border-color .18s,box-shadow .18s}
 html.fiezel-ui-v6 body.fz-teacher-mode .tg button:not(.primary):not(.nav):not(.icon-button):not(.text-button):not(.coach-link):not(.fz-coach-bubble):not(.launch-card):not(.skill-card):not(.option):not(.skill-help-dot):not(.olm-dispute):active{transform:none;box-shadow:none}
 html.fiezel-ui-v6 body.fz-teacher-mode .tg button:not(.primary):not(.nav):not(.icon-button):not(.text-button):not(.coach-link):not(.fz-coach-bubble):not(.launch-card):not(.skill-card):not(.option):not(.skill-help-dot):not(.olm-dispute):hover{box-shadow:none}
@@ -290,8 +300,15 @@ html.fiezel-ui-v6 body.fz-teacher-mode .tg button.tg-seg-btn:not(.primary):not(.
 @keyframes tg-ring{0%,100%{transform:rotate(0)}15%{transform:rotate(14deg)}30%{transform:rotate(-12deg)}45%{transform:rotate(8deg)}60%{transform:rotate(-4deg)}}
 .tg-bell-badge{position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;padding:0 5px;border-radius:99px;background:var(--tg-brick);color:#fff;font-size:.68rem;font-weight:700;display:grid;place-items:center;line-height:1;border:2px solid var(--tg-paper)}
 .tg-inbox-scrim{position:fixed;inset:0;z-index:58;background:transparent}
-.tg-inbox{position:fixed;top:74px;right:26px;width:min(400px,calc(100vw - 32px));max-height:min(70vh,560px);overflow:auto;background:var(--tg-paper-2);border:1px solid var(--tg-line);border-radius:var(--tg-r-lg);box-shadow:0 24px 50px -20px rgba(18,33,31,.45);z-index:59;animation:tg-pop .18s ease-out}
-@keyframes tg-pop{from{opacity:0;transform:translateY(-6px) scale(.98)}to{opacity:1;transform:none}}
+/* NAMA keyframe itu GLOBAL, dan definisi belakangan MENANG. Blok ini dulu bernama `tg-pop`
+   juga - nama yang sama dengan animasi modal 85 baris di atasnya - jadi ia diam-diam
+   membajak .tg-modal. Modal dipusatkan lewat transform:translate(-50%,-50%); keyframe
+   inbox ini berakhir di transform:none, yang MENGHAPUS pemusatan itu selama animasi
+   berjalan: modal muncul di bawah-kanan titik tengah lalu menjentik balik ke tengah saat
+   animasinya habis. Persis kembaran bug @keyframes pageIn di style.css (tombstone audit
+   12-003). Gerbang tests/css-keyframe-uniq-test.js sekarang menolak nama kembar. */
+.tg-inbox{position:fixed;top:74px;right:26px;width:min(400px,calc(100vw - 32px));max-height:min(70vh,560px);overflow:auto;background:var(--tg-paper-2);border:1px solid var(--tg-line);border-radius:var(--tg-r-lg);box-shadow:0 24px 50px -20px rgba(18,33,31,.45);z-index:59;animation:tg-pop-inbox .18s ease-out}
+@keyframes tg-pop-inbox{from{opacity:0;transform:translateY(-6px) scale(.98)}to{opacity:1;transform:none}}
 .tg-inbox-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px 8px}
 .tg-inbox-head h3{font-size:1.05rem}
 .tg-inbox-list{list-style:none;margin:0;padding:4px 8px 10px}
@@ -313,3 +330,70 @@ html.fiezel-ui-v6 body.fz-teacher-mode .tg button.tg-seg-btn:not(.primary):not(.
 .tg-send-list .tg-grow{flex:1}
 .tg-sent-note{display:flex;align-items:center;gap:6px;margin:8px 0 0;font-size:.8rem}
 @media (max-width:760px){.tg-inbox{top:auto;bottom:76px;right:12px;left:12px;width:auto;max-height:60vh}}
+
+/* Peringatan keluar-layar di kotak masuk: satu-satunya baris yang boleh menarik mata lebih
+   dulu daripada tetangganya, karena ia satu-satunya yang masih bisa ditindaklanjuti guru saat
+   ujian MASIH berjalan. Garis kiri, bukan latar penuh: menyala tanpa berteriak. */
+.tg-inbox-item.is-warn{border-left:3px solid var(--tg-bad);background:var(--tg-bad-soft)}
+.tg-inbox-item.is-warn i,.tg-inbox-item.is-warn .tg-i{color:var(--tg-bad)}
+
+/* Pendeteksi keluar layar di laci murid: satu chip per ujian yang punya catatan. */
+.tg-focus{display:inline-flex;align-items:center;gap:5px;font-size:.72rem;font-weight:700;padding:3px 9px;border-radius:999px;background:var(--tg-info-soft);color:var(--tg-info)}
+.tg-focus i,.tg-focus svg{width:13px;height:13px}
+.tg-focus.is-berat{background:var(--tg-bad-soft);color:var(--tg-bad)}
+.tg-muted.tg-small{font-size:.78rem;line-height:1.45}
+
+/* ---- Kurikulum Sekolah SMP & SMA di Modal Assign ---- */
+.tg-assign-tabs{display:flex;gap:8px;margin-bottom:14px;border-bottom:1px solid var(--tg-line);padding-bottom:10px}
+.tg-assign-tabs .tg-tab-btn{background:transparent;border:0;padding:8px 16px;border-radius:var(--tg-r);font:inherit;font-weight:600;font-size:.9rem;color:var(--tg-muted);cursor:pointer;transition:all .15s}
+.tg-assign-tabs .tg-tab-btn.is-active{background:var(--tg-sage);color:#fff}
+.tg-phase-pills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.tg-phase-pills .tg-chip{display:flex;flex-direction:column;align-items:flex-start;padding:8px 14px;border-radius:var(--tg-r);border:1px solid var(--tg-line);background:var(--tg-paper);cursor:pointer;text-align:left;font:inherit;transition:all .15s}
+.tg-phase-pills .tg-chip.is-active{border-color:var(--tg-sage);background:var(--tg-sage-soft);color:var(--tg-ink)}
+.tg-phase-pills .tg-chip b{font-size:.88rem;font-weight:700}
+.tg-phase-pills .tg-chip small{font-size:.72rem;color:var(--tg-muted)}
+.tg-select-unit{width:100%;padding:10px 12px;border:1px solid var(--tg-line);border-radius:var(--tg-r);background:#fff;font:inherit;font-size:.9rem;margin-top:4px}
+.tg-brief-card{background:linear-gradient(180deg, #FBF8EE 0%, #F5EEDB 100%);border:1px solid #E6D9BC;border-radius:var(--tg-r-lg);padding:16px 18px;margin:12px 0 16px;box-shadow:0 4px 12px rgba(44,34,22,.04)}
+.tg-brief-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.tg-brief-head h4{font-size:1.02rem;margin:0;color:#2C2216;flex:1}
+.tg-brief-head .tg-badge{background:#D97706;color:#fff;font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:99px}
+.tg-brief-head .tg-cefr-pill{background:#1F7A63;color:#fff;font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:99px}
+.tg-brief-summary{font-size:.85rem;color:#4A3D2E;line-height:1.45;margin-bottom:12px}
+.tg-brief-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+@media(max-width:640px){.tg-brief-grid{grid-template-columns:1fr}}
+.tg-brief-col{background:rgba(255,255,255,.65);border-radius:var(--tg-r);padding:10px 12px;border:1px solid rgba(230,217,188,.6)}
+.tg-brief-col b{display:block;font-size:.78rem;color:#7C2D12;margin-bottom:4px}
+.tg-brief-col p{font-size:.82rem;line-height:1.4;margin:0;color:#2C2216}
+.tg-brief-col code{display:block;font-size:.8rem;font-family:monospace;background:rgba(0,0,0,.04);padding:4px 6px;border-radius:4px;color:#1F7A63}
+.tg-brief-miscons{background:rgba(254,242,242,.7);border-radius:var(--tg-r);padding:10px 12px;border:1px solid #FECACA;margin-bottom:12px}
+.tg-brief-miscons b{display:block;font-size:.78rem;color:#991B1B;margin-bottom:4px}
+.tg-brief-miscons ul{list-style:none;padding:0;margin:0}
+.tg-brief-miscons li{font-size:.8rem;color:#450A0A;margin-bottom:4px;line-height:1.35}
+.tg-brief-vocab{background:rgba(255,255,255,.65);border-radius:var(--tg-r);padding:10px 12px;border:1px solid rgba(230,217,188,.6)}
+.tg-brief-vocab b{display:block;font-size:.78rem;color:#1F7A63;margin-bottom:6px}
+.tg-vocab-chips{display:flex;flex-wrap:wrap;gap:6px}
+.tg-vocab-chip{background:#fff;border:1px solid #D1D5DB;padding:3px 8px;border-radius:99px;font-size:.75rem;color:#1F2937}
+.tg-vocab-chip em{color:#6B7280;font-style:normal;font-size:.7rem}
+
+/* ---------- pita DEMO ----------------------------------------------------------------
+   Papan demo terisi 18 murid dengan nama dan nilai. Tanpa pernyataan yang tidak bisa
+   dilewatkan mata, pengunjung bisa mengira kelasnya sudah terdaftar. Pita ini duduk di
+   baris paling atas grid (menyeberangi sidebar dan konten), memakai amber — bukan merah:
+   ini bukan galat, ini keterangan. */
+.tg.is-demo{grid-template-rows:auto 1fr}
+.tg-demo-bar{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;
+  padding:10px clamp(14px,3vw,26px);background:var(--tg-amber-soft);border-bottom:1px solid var(--tg-line);
+  color:var(--tg-ink-2);font-size:.9rem}
+.tg-demo-tag{flex:none;font-family:var(--tg-mono);font-size:.68rem;letter-spacing:.14em;font-weight:500;
+  background:var(--tg-amber);color:#fff;border-radius:999px;padding:3px 10px}
+.tg-demo-text{flex:1 1 240px;min-width:0}
+.tg-demo-acts{display:flex;flex-wrap:wrap;gap:8px}
+.tg-demo-btn{font:inherit;font-size:.85rem;font-weight:500;cursor:pointer;border-radius:999px;
+  padding:7px 15px;border:1px solid var(--tg-line);background:var(--tg-paper-2);color:var(--tg-ink-2)}
+.tg-demo-btn.is-primary{background:var(--tg-sage);border-color:var(--tg-sage);color:#fff}
+.tg-demo-btn:hover{filter:brightness(.97)}
+@media (max-width:720px){
+  .tg-demo-bar{font-size:.84rem;padding:9px 14px}
+  .tg-demo-acts{width:100%}
+  .tg-demo-btn{flex:1 1 auto;text-align:center}
+}

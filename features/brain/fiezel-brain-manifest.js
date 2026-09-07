@@ -108,6 +108,7 @@
    */
   var MODULES = [
     { file: 'fiezel-affect.js', global: 'FiezelAffect', schema: 'fiezel-affect-v1', authorityKey: 'affectTargetSuccess' },
+    { file: 'fiezel-arena-bot.js', global: 'FiezelArenaBot', schema: 'fiezel-arena-bot-v1', authorityKey: 'arenaBot' },
     { file: 'fiezel-attempt-record.js', global: 'FiezelAttemptRecord', schema: 'fiezel-attempt-record-v1', authorityKey: 'attemptRecord' },
     { file: 'fiezel-brain-config.js', global: 'FiezelBrainConfig', schema: 'fiezel-brain-config-v1', authorityKey: 'brainConfig' },
     { file: 'fiezel-brain-manifest.js', global: 'FiezelBrainManifest', schema: SCHEMA, authorityKey: 'manifest' },
@@ -127,12 +128,15 @@
     { file: 'fiezel-nof1.js', global: 'FiezelNof1', schema: 'fiezel-nof1-v1', authorityKey: 'nof1' },
     { file: 'fiezel-olm.js', global: 'FiezelOLM', schema: 'fiezel-olm-v1', authorityKey: 'olmInsight' },
     { file: 'fiezel-production-grader.js', global: 'FiezelProductionGrader', schema: 'fiezel-production-grader-v1', authorityKey: 'productionGrader' },
+    { file: 'fiezel-question-memory.js', global: 'FiezelQuestionMemory', schema: 'fiezel-question-memory-v1', authorityKey: 'questionMemory' },
+    { file: 'fiezel-question-allocator.js', global: 'FiezelQuestionAllocator', schema: 'fiezel-question-allocator-v1', authorityKey: 'questionAllocation' },
     { file: 'fiezel-retention-probe.js', global: 'FiezelPostTest', schema: 'fiezel-post-test-v1', authorityKey: 'retentionProbe' },
     { file: 'fiezel-speaking-adaptive.js', global: 'FiezelSpeakingAdaptive', schema: 'fiezel-speaking-adaptive-v1', authorityKey: 'speakingPolicy' },
     { file: 'fiezel-self-tune.js', global: 'FiezelSelfTune', schema: 'fiezel-self-tune-v1', authorityKey: 'selfTune' },
     { file: 'fiezel-srl-coach.js', global: 'FiezelSrlCoach', schema: 'fiezel-srl-coach-v1', authorityKey: 'srlCoach' },
     { file: 'fiezel-stat-gate.js', global: 'FiezelStatGate', schema: null, authorityKey: 'statGate' },
     { file: 'fiezel-step-tutor.js', global: 'FiezelStepTutor', schema: null, authorityKey: 'stepTutor' },
+    { file: 'fiezel-target-language.js', global: 'FiezelTargetLanguage', schema: 'fiezel-target-language-v1', authorityKey: 'targetLanguage' },
     { file: 'fiezel-tutor-brain.js', global: 'FiezelTutorBrain', schema: 'fiezel-tutor-brain-v3', authorityKey: 'tutorSelection' }
   ];
 
@@ -146,7 +150,24 @@
    * Bukti tiap klasifikasi ada di komentar kepala berkas (hasil inspeksi app.js).
    */
   var AUTHORITY_MAP = {
+    // targetLanguage: 'off' -> 'active' (m025-285). Sebelumnya 'off' dan itu jujur: modulnya
+    // ada tetapi nol pemanggil. Sekarang app.js benar-benar memakainya — pemilih bahasa di
+    // Pengaturan menulis preferences.targetLang, pemuat bank membaca bahasa itu untuk memilih
+    // bank Jepang, dan graf keluarga Jepang disuntikkan ke Core Brain lewat setFamilyGraph.
+    // Otoritas naik BERSAMA pemuatannya di index.html dan precache sw.js dalam satu commit;
+    // otoritas yang naik tanpa pemuatan adalah peta yang bohong ke arah sebaliknya.
+    targetLanguage: 'active',
     memory: 'active',
+    // PAW ARENA (m025-279): bot lawan untuk tiga permainan arena. MURNI — seed→langkah
+    // deterministik, tanpa DOM/jam/acak — dimuat index.html dan di-precache sw.js.
+    //
+    // Nilainya 'off' sampai penyambungannya belum ada, dan komentar di sini pernah berbunyi
+    // begitu. Klaim itu berhenti benar pada commit yang menyambungkan view arena:
+    // features/learner-flow/fiezel-paw-arena.js memanggilnya delapan kali untuk memilih
+    // jawaban, kalimat lanjutan, kartu petunjuk, tebakan, dan taruhan bot. Bot yang benar-
+    // benar memutuskan langkah lawan murid adalah 'active'; membiarkannya 'off' membuat peta
+    // ini berbohong ke arah yang paling berbahaya — mengaku tidak berjalan padahal berjalan.
+    arenaBot: 'active',
     tutorSelection: 'active',
     misconceptionPrior: 'active',
     itemDifficultyPrior: 'active',
@@ -189,6 +210,18 @@
     policyVerdict: 'active',
     // Langkah 3 roadmap otonomi: pembagi lengan eksperimen N-of-1. Modul murni yang belum
     // punya pemanggil di app.js — eksperimen pertama belum dibuka. Jujurnya 'off'.
+    // Bankor sebagai mesin alokasi (m025-271). Keduanya MURNI dan dimuat halaman,
+    // tetapi hari ini belum ada satu pun pemanggil di jalur murid: modulnya lahir
+    // lebih dulu beserta gerbangnya, penyambungannya menyusul di perubahan
+    // tersendiri yang bisa ditinjau. Selama itu jujurnya 'off' — bukan 'shadow',
+    // karena 'shadow' berarti ia berjalan dan hasilnya dibuang, sedangkan ini
+    // belum berjalan sama sekali.
+    /* m025-278: langkah 1 handoff BANKOR selesai — latihan mandiri murid memakai kedua
+       modul ini. fiezel-learner-flow.js memilih butir lewat allocate() dan mencatat hasil
+       per BUTIR lewat recordAttempt(); ingatannya hidup di st.qmem. Sisi guru belum,
+       dan itu sengaja: langkah 2-4 handoff masih terbuka. */
+    questionMemory: 'active',
+    questionAllocation: 'active',
     nof1: 'off',
     // Langkah 4: rantai hash perubahan parameter. Prasyarat penyetelan-diri, belum ada
     // pemanggil di app.js karena belum ada parameter yang boleh bergerak sendiri: 'off'.

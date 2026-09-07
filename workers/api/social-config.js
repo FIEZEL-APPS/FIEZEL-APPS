@@ -82,6 +82,17 @@ export const INVITE_RULES = Object.freeze({
 export const FRIENDS_MAX = 50;
 
 /**
+ * Batas permintaan teman MASUK yang boleh menggantung untuk satu murid.
+ *
+ * Ada dua alasan, dan yang kedua yang penting: (1) murid tidak perlu memilah
+ * ratusan kartu "Terima/Tolak", dan (2) jumlah baris `social_friend` yang
+ * menunjuk ke satu murid jadi TERBATAS (FRIENDS_MAX + REQUESTS_MAX). Batas itu
+ * yang membuat route-social.js boleh membaca tepi masuk dengan satu LIMIT dan
+ * tetap yakin tidak ada pertemanan sah yang terpotong di luar jendela.
+ */
+export const REQUESTS_MAX = 50;
+
+/**
  * Sorakan: 6 stiker ENUM TERTUTUP, NOL teks bebas (spec §3.3). Nilai adalah
  * token mesin; label/emoji hidup di frontend. Sorakan TIDAK bernilai poin.
  */
@@ -154,6 +165,7 @@ export const SOCIAL_CONFIG = Object.freeze({
   PROFILE_FLAGS,
   INVITE_RULES,
   FRIENDS_MAX,
+  REQUESTS_MAX,
   CHEER_STICKERS,
   CHEER_PER_FRIEND_PER_DAY,
   LEVEL_BANDS,
