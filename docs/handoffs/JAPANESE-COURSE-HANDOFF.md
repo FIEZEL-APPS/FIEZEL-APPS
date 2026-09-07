@@ -341,7 +341,7 @@ Inggrisnya.
 
 ---
 
-## m025-286 — kursus Jepang akhirnya sampai ke layar murid
+## m025-287 — kursus Jepang akhirnya sampai ke layar murid
 
 Catatan penutup di atas ("panel pemilih bahasa belum ada dan sengaja ditunda") **sudah tidak
 berlaku**. Syarat yang menahannya sudah terpenuhi: sumbu bahasa target (m025-281) membuat
@@ -363,9 +363,9 @@ kursusnya berhenti menyesuaikan diri.
 saat ja karena kurikulum lesson Jepang belum ada. `tests/japanese-course-wiring-test.js`
 merah 7 assert lebih dulu, lalu 9/9 hijau, dan lima mutasi semuanya tertangkap.
 
-**Kenapa berkas ini ikut berubah di m025-286:** ritual bump menyentuh `DIAG_BUILD` di
+**Kenapa berkas ini ikut berubah di m025-287:** ritual bump menyentuh `DIAG_BUILD` di
 `features/neural-voice/fiezel-diag-panel.js`, dan A13 menuntut jejaknya tercatat. Panel
-diagnostik sendiri tidak berubah perilakunya — hanya penanda buildnya naik ke m025-286.
+diagnostik sendiri tidak berubah perilakunya — hanya penanda buildnya naik ke m025-287.
 
 **Utang yang masih berdiri:** sidecar Thai untuk 2.574 kalimat penjelasan butir Jepang, dan
 tinjauan penutur asli atas 234 butir yang semuanya bertanda DRAFT AI.
