@@ -164,9 +164,26 @@ test('utang palet tidak diam-diam naik ke produksi', () => {
      dikapalkan. Kalau alasan itu gugur, utangnya gugur bersamanya — jadi alasannya
      DIPERIKSA, bukan dipercaya. */
   const shell = read('index.html') + read('sw.js');
+  /* PENANDA YANG DICARI BERBEDA UNTUK DIREKTORI DAN BERKAS, dan bedanya disengaja
+     (temuan review m025-301). Versi pertama memakai basename untuk keduanya, sehingga
+     entri direktori 'assets/brand/mascot/collection/' menyusut jadi kata 'collection'
+     — kata biasa yang bisa lahir di shell sebagai kelas CSS, nama variabel, atau jalur
+     aset lain yang tidak ada hubungannya dengan seni maskot. Gerbangnya lalu merah
+     sambil menuduh pose maskot yang tidak pernah dikapalkan: merah palsu yang menyita
+     waktu review untuk menelusuri kegagalan yang tidak ada. Diukur 8 September 2026:
+     'collection' nol kali di index.html maupun sw.js, jadi ini utang laten, bukan
+     kerusakan aktif — diperbaiki sekarang justru selagi murah.
+
+       - DIREKTORI -> dicocokkan sebagai JALUR PENUH ('assets/brand/mascot/collection').
+         Rujukan sungguhan ke isinya selalu membawa jalur itu utuh, jadi ketajamannya
+         tidak berkurang sedikit pun, sementara tabrakan kata biasa hilang.
+       - BERKAS -> tetap dicocokkan sebagai BASENAME ('paw-mascot-hello.svg'). Nama
+         seperti itu sudah cukup khas untuk tidak bertabrakan, dan basename menangkap
+         rujukan yang jalurnya ditulis lain (mis. kembar website/ yang dipanggil dari
+         akar) — hal yang justru lolos kalau jalur penuh dipaksakan ke berkas. */
   const naik = UTANG_TANPA_PALET.filter((x) => {
-    const nama = x.replace(/\/$/, '').split('/').pop();
-    return shell.indexOf(nama) >= 0;
+    const jejak = x.endsWith('/') ? x.replace(/\/$/, '') : x.split('/').pop();
+    return shell.indexOf(jejak) >= 0;
   });
   if (naik.length) {
     throw new Error(naik.join(', ')
