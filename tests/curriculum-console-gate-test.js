@@ -48,13 +48,21 @@ const shell = baca('features/teacher/fiezel-teacher-shell.js');
    melainkan "pintu mustahil terbuka tanpa backend" — tuntutan yang lebih kuat, karena
    bendera bisa dinyalakan orang yang lupa memasang backend-nya, sedangkan alamat tidak
    bisa diisi tanpa benar-benar punya alamat. */
-test('alamat backend ADA di konfigurasi dan bawaannya KOSONG', () => {
+test('alamat backend ADA di konfigurasi, dan kalau terisi ia https tanpa ekor', () => {
+  /* KOREKSI ASSERT (m025-300), sepasang dengan koreksi di curriculum-api-base-test.
+     "Harus kosong" lebih ketat daripada praktik repo ini sendiri (workerUrl sudah berisi
+     alamat operator) dan mustahil dipenuhi begitu backend-nya benar-benar dipasang — repo
+     tanpa langkah build tidak punya tempat lain untuk menaruh alamat.
+
+     Yang menjaga bug pintu-ke-ruangan-kosong BUKAN assert ini, melainkan assert di bawah
+     yang MENJALANKAN penjaganya: alamat kosong -> pintu tertutup. Itu tetap utuh. */
   const cfg = baca('core-config.js');
   const m = cfg.match(/curriculumApiUrl\s*:\s*'([^']*)'/);
   assert.ok(m, 'curriculumApiUrl belum ada di core-config.js');
-  assert.strictEqual(m[1], '',
-    "bawaan curriculumApiUrl bukan kosong ('" + m[1] + "') — repo yang didistribusikan " +
-    'akan mengirim data murid ke server milik pemasang pertama');
+  const v = m[1];
+  if (v === '') return;
+  assert.ok(/^https:\/\/[^\s'"]+$/.test(v) && !/\/$/.test(v),
+    "curriculumApiUrl terisi tetapi tidak sah: '" + v + "' (wajib https, tanpa garis miring di ekor)");
 });
 
 test('dua jalur bendera sepakat (fiezel-ux-flags.js dan peta cadangan app.js)', () => {

@@ -16,7 +16,7 @@ self.FIEZEL_REQUIRE_NOTIFICATIONS=false;
 // m025-61: penanda build halaman, dipakai health check untuk membandingkan versi yang
 // benar-benar dimuat dengan shell yang dipegang service worker. Nilainya dijaga gate agar
 // selalu sama dengan DIAG_BUILD; kalau keduanya berbeda, install-health-test gagal.
-self.FIEZEL_PAGE_BUILD='m025-299';
+self.FIEZEL_PAGE_BUILD='m025-300';
 // m025-150 profil suara ElevenLabs untuk sisi klien.
 //
 // Isinya sengaja hanya penanda, BUKAN rahasia apa pun: kunci API ElevenLabs hidup di
@@ -49,7 +49,7 @@ self.FIEZEL_AUDIO_CONFIG=Object.freeze({
 // Repo yang didistribusikan WAJIB mengirimkannya kosong: salinan orang lain tidak boleh
 // mengirim data muridnya ke server milik pemasang pertama.
 self.FIEZEL_CURRICULUM_CONFIG=Object.freeze({
-  curriculumApiUrl:''
+  curriculumApiUrl:'https://fiezel-apps.onrender.com'
 });
 self.FIEZEL_CORE_CONFIG=Object.freeze({
   workerUrl:'https://fiezel-core.puter.work',

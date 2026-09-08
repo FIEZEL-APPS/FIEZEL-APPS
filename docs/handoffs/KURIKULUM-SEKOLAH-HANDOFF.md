@@ -273,3 +273,59 @@ komentar dulu.**
 Catatan jujur untuk owner: Render paket gratis tidur setelah 15 menit menganggur, jadi guru
 yang membuka konsol setelah jeda menunggu ~50 detik. Untuk dipakai guru sungguhan, paketnya
 berbayar.
+
+---
+
+## m025-300 — alamat backend disambungkan (MENUNGGU VERIFIKASI OWNER)
+
+Owner memasang backend di Render dan memberikan alamatnya:
+`https://fiezel-apps.onrender.com`. `curriculumApiUrl` diisi dengan alamat itu, sehingga
+penjaga pintu (m025-298) membuka tautan "Kurikulum & Kompetensi" di sidebar Ruang Guru.
+
+Dibuktikan dengan menjalankan penjaganya: alamat terisi → `true`, alamat kosong → `false`.
+
+### KENAPA PR INI DRAF DAN TIDAK BOLEH DIGABUNG BEGITU SAJA
+
+Mengisi alamat **membuka pintu**. Kalau backend-nya ternyata belum benar-benar melayani,
+menggabungkan ini mengembalikan persis bug yang ditutup m025-296: guru menekan tautan lalu
+menemukan halaman mati.
+
+Sesi ini **tidak bisa menguji alamat itu sendiri** — jaringan keluar lingkungan kerjanya
+diblokir ke semua host selain GitHub, jadi `curl` menjawab `000` untuk apa pun. `000` itu
+tembok proxy, BUKAN bukti servernya mati, dan tidak boleh dibaca sebagai bukti apa pun.
+
+Syarat gabung: owner membuka `https://fiezel-apps.onrender.com/api/health` di browser dan
+melihat balasan JSON. Sampai itu terjadi, PR ini menunggu.
+
+### Dua assert gerbang KUKOREKSI, dan ini perlu tercatat
+
+Gerbang m025-298 yang kutulis sendiri menuntut `curriculumApiUrl` **selalu kosong** di repo,
+dengan alasan "salinan repo tidak boleh mengirim data murid ke server orang lain". Tuntutan
+itu **lebih ketat daripada praktik repo ini sendiri** dan mustahil dipenuhi begitu backend-nya
+benar-benar dipasang:
+
+* `CORE_CONFIG.workerUrl` sudah lama berisi alamat operator (`https://fiezel-core.puter.work`)
+  — presedennya ada di berkas yang sama.
+* FIEZEL tidak punya langkah build, jadi tidak ada tempat lain untuk menaruh alamat selain
+  `core-config.js`.
+* Repo ini milik satu operator (CLAUDE.md).
+
+Assert-nya diganti dengan yang benar-benar menjaga kerusakan nyata: **kalau terisi, wajib
+`https` dan tanpa garis miring di ekor**. `http` mengirim token guru dan jawaban murid sebagai
+teks terbuka; garis miring di ekor menghasilkan `//api` dan mematikan setiap panggilan.
+
+Yang menjaga bug pintu-ke-ruangan-kosong bukan assert itu, melainkan assert yang
+**MENJALANKAN** penjaganya (alamat kosong → pintu tertutup). Itu tetap utuh dan tidak
+dilonggarkan.
+
+### Utang yang tercatat di sini supaya tidak hilang
+
+`pydantic` dan `pydantic_core` **dicabut** dari `backend/requirements.txt` oleh tiga commit
+langsung ke main (62380627, 7c3fa7f3, 81f98f5f) saat mengejar kegagalan deploy Render. FastAPI
+akan menariknya sendiri, jadi kemungkinan besar tetap jalan — tetapi versinya sekarang tidak
+ditentukan siapa pun, jadi deploy bulan depan bisa rusak tanpa ada yang mengubah apa pun.
+
+Akar kegagalan itu juga belum tersentuh: tidak ada berkas yang menentukan versi Python, jadi
+Render memakai versi terbarunya (3.14 menurut pesan commit) dan paket-paket lama tidak punya
+wheel untuknya. Menambal `requirements.txt` satu per satu memadamkan api satu per satu;
+`PYTHON_VERSION=3.11.9` di Render memadamkan sumbernya.

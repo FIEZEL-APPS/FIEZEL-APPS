@@ -58,12 +58,28 @@ test('alamat backend dibaca dari konfigurasi, seperti CORE_CONFIG.workerUrl', ()
     'core-config.js tidak menyediakan curriculumApiUrl');
 });
 
-test('bawaan alamatnya KOSONG — repo tidak boleh menunjuk server orang lain', () => {
+test('alamatnya kosong ATAU https — tidak pernah http, tidak pernah sampah', () => {
+  /* KOREKSI ASSERT (m025-300). Versi pertama gerbang ini menuntut alamatnya SELALU kosong
+     di repo, dengan alasan "salinan repo tidak boleh mengirim data murid ke server orang
+     lain". Tuntutan itu lebih ketat daripada praktik repo ini sendiri: CORE_CONFIG.workerUrl
+     SUDAH berisi alamat operator ('https://fiezel-core.puter.work') dan sudah lama begitu,
+     karena FIEZEL tidak punya langkah build — tidak ada tempat lain untuk menaruh alamat
+     selain berkas ini, dan repo ini milik satu operator (lihat CLAUDE.md).
+
+     Yang benar-benar perlu dijaga karena itu bukan "harus kosong", melainkan: kalau terisi,
+     ia WAJIB https. Alamat http mengirim token guru dan jawaban murid sebagai teks terbuka,
+     dan itu kerusakan yang nyata — bukan soal selera. Pintu tetap tertutup saat kosong;
+     assert itu ada di curriculum-console-gate-test dan dijalankan, bukan dibaca. */
   const m = cfg.match(/curriculumApiUrl\s*:\s*'([^']*)'/);
   assert.ok(m, 'curriculumApiUrl tidak ditemukan di core-config.js');
-  assert.strictEqual(m[1], '',
-    "bawaan curriculumApiUrl bukan kosong ('" + m[1] + "') — salinan repo ini akan " +
-    'mengirim data murid ke server yang bukan milik pemasangnya');
+  const v = m[1];
+  if (v === '') return;                       // kosong = backend belum dipasang, sah
+  assert.ok(/^https:\/\/[^\s'"]+$/.test(v),
+    "curriculumApiUrl terisi tetapi bukan https yang sah: '" + v + "' — token guru dan " +
+    'jawaban murid tidak boleh lewat jalur terbuka');
+  assert.ok(!/\/$/.test(v),
+    "curriculumApiUrl diakhiri garis miring ('" + v + "') — fz-api menambahkan '/api' " +
+    'sendiri, jadi ekor itu menghasilkan //api dan setiap panggilan gagal');
 });
 
 test('fz-api MENOLAK memanggil apa pun saat alamatnya kosong', () => {
