@@ -1027,6 +1027,14 @@ jobs:
         # PINTUNYA DITURUNKAN DARI ALAMAT ITU - alamat kosong = pintu tertutup, sehingga
         # tidak ada keadaan "menyala tanpa backend" yang bisa dibuat lewat bendera.
         run: node tests/curriculum-api-base-test.js
+      - name: 'Kursus Jepang bisa dicapai satu ketuk dari layar depan'
+        # Sejak m025-290 kursus Jepang bisa dipakai, tetapi satu-satunya jalan ke sana
+        # adalah Pengaturan -> Profil -> "Bahasa yang dipelajari". Murid yang tidak tahu
+        # menu itu ada tidak akan pernah menemukannya, dan fitur yang tidak ditemukan sama
+        # nilainya dengan fitur yang tidak ada. Gerbang menuntut pintasannya ADA, benar-benar
+        # DIPANGGIL dari layar depan, DUA ARAH (pintu masuk tanpa pintu keluar adalah
+        # perangkap), dan naskahnya lewat kunci i18n dengan kembaran Thai lengkap.
+        run: node tests/target-lang-shortcut-test.js
       - name: 'Kursus Jepang tidak menawarkan latihan berbahasa Inggris'
         # Murid memilih Jepang; bank tata bahasa, kosakata, dan bacaan berganti. Menyimak,
         # berbicara, dan menulis TIDAK punya versi Jepang - listening/speaking-bank-v1.json

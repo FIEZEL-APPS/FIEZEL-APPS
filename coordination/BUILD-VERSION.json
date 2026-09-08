@@ -1,7 +1,7 @@
 {
-  "version": "m025-298",
-  "claimedBy": "branch claude/kurikulum-hidupkan",
-  "claimedAt": "2026-09-08T18:27:07.210Z",
-  "reason": "m025-298: konsol kurikulum memanggil alamat terkonfigurasi; pintu terikat alamat",
+  "version": "m025-299",
+  "claimedBy": "branch claude/jepang-satu-ketuk",
+  "claimedAt": "2026-09-08T18:34:31.266Z",
+  "reason": "m025-299: kursus Jepang satu ketuk dari layar depan",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
