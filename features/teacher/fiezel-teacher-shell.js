@@ -19,6 +19,20 @@
     } catch (_) { return false; }
   }
 
+  /* Pintu konsol kurikulum diturunkan dari ALAMAT BACKENDNYA, bukan dari bendera yang
+     bisa disetel tangan. Alamat kosong = backend belum dipasang = pintu tertutup, apa pun
+     isi benderanya. Bendera tetap dihormati sebagai sakelar mati tambahan: keduanya harus
+     setuju untuk membuka. Kegagalan di mana pun di rantai ini menutup pintu. */
+  function konsolKurikulumSiap() {
+    try {
+      var root = (typeof self !== 'undefined' ? self : this);
+      var c = root.FIEZEL_CURRICULUM_CONFIG || {};
+      var alamat = String(c.curriculumApiUrl || '').trim();
+      if (!alamat) return false;
+      return uxOn('curriculumConsole');
+    } catch (_) { return false; }
+  }
+
   function t(k, fb) {
     /* FiezelI18n.t() mengembalikan KUNCINYA saat kalimatnya belum termuat. Mengembalikan
        itu apa adanya berarti guru membaca 'guru.tab-jurnal' di layarnya, padahal kalimat
@@ -406,7 +420,7 @@
          melayaninya (/api/...) belum berjalan di produksi — diperiksa owner 7 Sep 2026,
          404. Nama bendera yang salah ketik jatuh ke false, jadi kegagalannya menyembunyikan
          pintu, bukan membukanya. Lihat alasan lengkap di fiezel-ux-flags.js. */
-      (uxOn('curriculumConsole')
+      (konsolKurikulumSiap()
         ? '<a class="tg-nav-item" href="./kurikulum.html" data-testid="tg-nav-curriculum">' + icon('library') + '<span>' + esc(t('guru.nav-kurikulum', 'Kurikulum & Kompetensi')) + '</span></a>'
         : '') +
       '<div class="tg-side-foot"><div class="tg-saved" title="Perkiraan waktu administrasi yang FIEZEL kerjakan untukmu">' + icon('hourglass') + '<div><small>' + esc(t('guru.waktu-hemat', 'Waktu administrasi yang dihemat')) + '</small><b>' + Math.round(st.savedMinutes || 0) + ' menit</b></div></div>' +

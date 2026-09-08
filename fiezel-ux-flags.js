@@ -51,7 +51,22 @@
 
        Pintu yang terbuka ke ruangan kosong lebih merugikan daripada fitur yang belum ada:
        yang belum ada tidak menjanjikan apa-apa. */
-    curriculumConsole: false,
+    /* DITURUNKAN DARI ALAMAT, BUKAN DISETEL TANGAN (m025-298). Nilai di sini adalah
+       bawaan saat alamatnya kosong; pembacanya di fiezel-teacher-shell.js membuka pintu
+       hanya kalau FIEZEL_CURRICULUM_CONFIG.curriculumApiUrl benar-benar terisi.
+
+       Alasannya: bendera manual bisa dinyalakan orang yang lupa memasang backend-nya, dan
+       itu mengembalikan persis bug yang ditutup m025-296 - guru menekan tautan lalu
+       menemukan halaman mati. Mengikat pintu ke alamatnya membuat keadaan "menyala tanpa
+       backend" mustahil dibuat tanpa berbohong di core-config.js.
+
+       NILAI true DI SINI TIDAK MEMBUKA APA PUN dengan sendirinya: ia hanya berarti
+       "fitur ini diizinkan tampil". Yang benar-benar membuka adalah alamat backend, yang
+       bawaannya KOSONG. Menyetelnya false tetap berfungsi sebagai sakelar mati paksa,
+       mis. saat backend sedang bermasalah dan pintunya perlu ditutup tanpa menyunting
+       alamatnya. Satu hal yang perlu diisi owner, bukan dua - dan sakelar matinya tetap
+       ada saat dibutuhkan. */
+    curriculumConsole: true,
 
     scenePhases: false,
 
