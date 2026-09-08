@@ -7299,6 +7299,7 @@ function todayHomeMarkup(){
       <h4 style="margin:0;font-size:13px;font-weight:700;color:var(--text)">Latihan Singkat 3 Menit</h4>
       <small style="color:var(--muted)">${FiezelI18n.t('home.pilih-fokus-label')}</small>
     </div>
+    ${targetLangChipMarkup()}
     <div class="quick-chips-grid">
       <button type="button" class="quick-chip" onclick="go('vocab')">
         <span class="chip-label"><i class="fz-i" data-fz-icon="vocab" style="width:14px;height:14px;display:inline-flex"></i> Kosakata</span>
@@ -11613,6 +11614,27 @@ window.setLearnerLocalePreference=setLearnerLocalePreference;
    (graduation-cap vs languages) supaya perbedaannya terbaca sebelum labelnya dibaca.
    Kalimatnya hidup di pasangan copy-id/copy-th-bahasa.js; tidak ada satu pun kalimat murid
    yang ditulis langsung di sini. */
+/* PINTASAN BAHASA DI LAYAR DEPAN (m025-299).
+   Sejak m025-290 kursus Jepang benar-benar bisa dipakai, tetapi satu-satunya jalan ke sana
+   adalah Pengaturan -> Profil -> "Bahasa yang dipelajari". Murid yang tidak tahu menu itu
+   ada tidak akan pernah menemukannya, dan fitur yang tidak ditemukan sama nilainya dengan
+   fitur yang tidak ada.
+
+   DUA ARAH dengan sengaja: chip yang sama yang membawa murid ke Jepang juga membawanya
+   kembali. Pintu masuk tanpa pintu keluar di layar yang sama adalah perangkap - murid akan
+   mencarinya di Pengaturan, yaitu tempat yang justru ingin kita hindari.
+
+   Bahasa bawaan tidak tersentuh: chip ini MENAWARKAN, tidak pernah memindahkan sendiri. */
+function targetLangChipMarkup(){
+  const ja=activeTargetLang()==='ja';
+  const tujuan=ja?'en':'ja';
+  const judul=ja?FiezelI18n.t('bahasa.chip-aktif-ja'):FiezelI18n.t('bahasa.chip-coba-ja');
+  const sub=ja?FiezelI18n.t('bahasa.chip-kembali-en'):FiezelI18n.t('bahasa.chip-coba-ja-sub');
+  return `<button type="button" class="target-lang-chip${ja?' is-active':''}" onclick="setTargetLangPreference('${tujuan}')" aria-label="${esc(FiezelI18n.t('bahasa.chip-aria'))}">
+      <span class="chip-label"><i class="fz-i" data-fz-icon="graduation-cap" style="width:14px;height:14px;display:inline-flex"></i> ${esc(judul)}</span>
+      <span class="chip-sub">${esc(sub)}</span>
+    </button>`;
+}
 function targetLangRowMarkup(){
   const active=activeTargetLang();
   const options=[['en',FiezelI18n.t('bahasa.en'),FiezelI18n.t('bahasa.en-catatan')],['ja',FiezelI18n.t('bahasa.ja'),FiezelI18n.t('bahasa.ja-catatan')]]
