@@ -42,17 +42,26 @@ const flags = baca('fiezel-ux-flags.js');
 const app = baca('app.js');
 const shell = baca('features/teacher/fiezel-teacher-shell.js');
 
-test('bendera curriculumConsole ada dan bawaannya MATI di fiezel-ux-flags.js', () => {
-  const m = flags.match(/curriculumConsole\s*:\s*(true|false)/);
-  assert.ok(m, 'bendera curriculumConsole belum ada di fiezel-ux-flags.js');
-  assert.strictEqual(m[1], 'false',
-    'bawaannya menyala — guru akan menemukan halaman yang backend-nya tidak ada');
+/* m025-298: penjaganya BERPINDAH, dan menguat. Dulu pintu dijaga bendera manual; kini
+   dijaga ALAMAT BACKEND yang bawaannya kosong (core-config.js). Bendera tetap ada sebagai
+   sakelar mati paksa. Yang dituntut gerbang ini karena itu bukan lagi "bendera mati"
+   melainkan "pintu mustahil terbuka tanpa backend" — tuntutan yang lebih kuat, karena
+   bendera bisa dinyalakan orang yang lupa memasang backend-nya, sedangkan alamat tidak
+   bisa diisi tanpa benar-benar punya alamat. */
+test('alamat backend ADA di konfigurasi dan bawaannya KOSONG', () => {
+  const cfg = baca('core-config.js');
+  const m = cfg.match(/curriculumApiUrl\s*:\s*'([^']*)'/);
+  assert.ok(m, 'curriculumApiUrl belum ada di core-config.js');
+  assert.strictEqual(m[1], '',
+    "bawaan curriculumApiUrl bukan kosong ('" + m[1] + "') — repo yang didistribusikan " +
+    'akan mengirim data murid ke server milik pemasang pertama');
 });
 
-test('peta cadangan di app.js sepakat: MATI juga', () => {
-  const m = app.match(/curriculumConsole\s*:\s*(true|false)/);
-  assert.ok(m, 'curriculumConsole tidak ada di UX_FALLBACK_FLAGS app.js');
-  assert.strictEqual(m[1], 'false',
+test('dua jalur bendera sepakat (fiezel-ux-flags.js dan peta cadangan app.js)', () => {
+  const a = (flags.match(/curriculumConsole\s*:\s*(true|false)/) || [])[1];
+  const b = (app.match(/curriculumConsole\s*:\s*(true|false)/) || [])[1];
+  assert.ok(a && b, 'bendera curriculumConsole hilang dari salah satu jalur');
+  assert.strictEqual(a, b,
     'dua jalur bendera tidak sepakat — yang satu menyembunyikan, yang lain menampilkan');
 });
 
@@ -61,8 +70,22 @@ test('tautan sidebar DIJAGA benderanya, bukan dirender tanpa syarat', () => {
   assert.ok(i > 0, 'tautan kurikulum tidak ditemukan di teacher shell');
   // Penjagaannya harus berada di dekat tautannya, di potongan yang sama.
   const sekitar = shell.slice(Math.max(0, i - 700), i + 200);
-  assert.ok(/curriculumConsole/.test(sekitar),
-    'tautan kurikulum dirender tanpa memeriksa bendera curriculumConsole');
+  assert.ok(/konsolKurikulumSiap|curriculumConsole/.test(sekitar),
+    'tautan kurikulum dirender tanpa penjaga apa pun');
+  // Penjaganya WAJIB membaca alamat backend, bukan hanya bendera: bendera saja bisa
+  // dinyalakan tanpa backend dan mengembalikan bug pintu-ke-ruangan-kosong.
+  assert.ok(/curriculumApiUrl/.test(shell),
+    'penjaga pintu tidak pernah membaca curriculumApiUrl — bendera saja tidak cukup');
+});
+
+test('DIJALANKAN: pintu tertutup tanpa alamat, terbuka dengan alamat, dan sakelar mati tetap berfungsi', () => {
+  const m = shell.match(/function konsolKurikulumSiap\(\) \{[\s\S]*?\n  \}/);
+  assert.ok(m, 'fungsi penjaga konsolKurikulumSiap() tidak ditemukan');
+  const jalan = (alamat, bendera) => new Function('self', 'uxOn', 'return (' + m[0] + ')')(
+    { FIEZEL_CURRICULUM_CONFIG: { curriculumApiUrl: alamat } }, () => bendera)();
+  assert.strictEqual(jalan('', true), false, 'alamat kosong tetapi pintu terbuka');
+  assert.strictEqual(jalan('https://contoh.example', true), true, 'alamat terisi tetapi pintu tertutup');
+  assert.strictEqual(jalan('https://contoh.example', false), false, 'sakelar mati paksa tidak berfungsi');
 });
 
 test('mesinnya TIDAK dihapus — ini menutup pintu, bukan membakar ruangan', () => {

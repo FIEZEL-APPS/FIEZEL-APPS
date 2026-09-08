@@ -58,7 +58,7 @@ const REQUIRED = {
      Konsol kurikulum dilayani '/api/...' relatif origin, dan repo tidak punya
      passenger_wsgi.py / Procfile / requirements.txt di akar - backend-nya memang belum
      pernah dipasang. Pintunya ditutup sampai ia benar-benar berjalan; mesinnya utuh. */
-  curriculumConsole: [false, 'Backend konsol kurikulum belum berjalan di produksi (404)']
+  curriculumConsole: [true, 'Fitur diizinkan; yang menentukan pintu terbuka adalah curriculumApiUrl yang bawaannya kosong (m025-298)']
 };
 
 /* -- T1: setiap bendera punya nilai yang diminta owner -------------------------------- */

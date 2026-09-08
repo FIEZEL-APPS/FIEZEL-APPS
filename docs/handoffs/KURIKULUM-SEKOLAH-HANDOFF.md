@@ -205,3 +205,71 @@ Yang dibutuhkan bukan mengunggah berkas: hosting yang bisa menjalankan Python, M
 variabel rahasia (`OWNER_MASTER_TOKEN`, `JWT_SECRET`, `ADMIN_PASSWORD`, `MONGO_URL`). Hosting
 cPanel bersama umumnya tidak bisa. Itu keputusan biaya dan waktu milik owner — dan sampai
 keputusan itu diambil, benderanya tetap mati.
+
+---
+
+## m025-298 — konsol kurikulum disiapkan untuk BENAR-BENAR hidup
+
+m025-296 menutup pintunya. Owner memutuskan sebaliknya: **kerja agen itu harus hidup dan
+aktif**. Keberatan sudah disampaikan (FIEZEL sudah punya backend hidup di
+`fiezel-core.puter.work`; menambah FastAPI+MongoDB berarti tumpukan kedua, sistem login
+ketiga, dua tempat data murid) dan owner tetap memilih menghidupkannya. Catatan ini
+menyiapkan jalannya, bukan memperdebatkannya lagi.
+
+### Akar teknis kenapa ia mati, dan bukan cuma "belum di-deploy"
+
+`features/curriculum/fz-api.js` memanggil `fetch('/api' + path)` — **same-origin**. Itu benar
+di lingkungan tempat berkas itu lahir (ingress mengarahkan `/api` ke FastAPI port 8001) dan
+salah di produksi FIEZEL, karena `fiezel.my.id` hosting statis. Jadi memasang backend saja
+TIDAK akan menghidupkannya: panggilannya tetap menembak domain yang salah.
+
+Backend FIEZEL yang sudah hidup tidak pernah memakai asumsi itu — `fiezel-core-worker`
+dipanggil lewat `CORE_CONFIG.workerUrl`, alamat **absolut dari konfigurasi**. `fz-api.js`
+kini mengikuti pola yang sama, karena pola itu yang terbukti bekerja di produksi ini.
+
+### Pintu diturunkan dari alamat, bukan dari bendera
+
+Bendera manual bisa dinyalakan orang yang lupa memasang backend-nya — dan itu mengembalikan
+persis bug yang ditutup m025-296. Karena itu penjaga pintu kini membaca
+`FIEZEL_CURRICULUM_CONFIG.curriculumApiUrl`:
+
+| Alamat | Bendera | Pintu |
+|---|---|---|
+| kosong | nyala | **tertutup** |
+| terisi | nyala | terbuka |
+| terisi | mati | **tertutup** (sakelar mati paksa tetap ada) |
+
+Diukur dengan menjalankan fungsinya, bukan membaca kodenya. Bendera dinaikkan ke `true`
+("fitur diizinkan"); yang menentukan tetap alamatnya, yang bawaannya **kosong**. Satu hal
+yang perlu diisi owner, bukan dua.
+
+Bawaan kosong itu juga kontrak distribusi: salinan repo ini tidak boleh mengirim data murid
+ke server milik pemasang pertama.
+
+### Gagal cepat, dengan kalimat yang menyebut sebabnya
+
+Tanpa alamat, `fz-api` menolak SEBELUM menyentuh jaringan dan mengatakan alasannya. Versi
+lama menembak halaman statis lalu memunculkan galat penguraian JSON — pesan yang tidak
+memberi tahu siapa pun apa yang sebenarnya salah.
+
+### Gerbangku sendiri tertipu komentarku, lagi
+
+`curriculum-api-base-test` versi pertama menuduh `fz-api.js` masih memakai pola lama —
+padahal yang ia baca adalah **kutipan pola lama di komentar** yang menjelaskan apa yang
+pernah salah. Komentar kini dibuang sebelum diperiksa. Ini kesalahan yang sama persis dengan
+m025-285 (`targetLanguage: 'off'` terbaca dari prosa); dicatat di sini supaya polanya
+dikenali lebih cepat lain kali: **setiap gerbang yang mencari pola kode wajib membuang
+komentar dulu.**
+
+### Yang MASIH harus dikerjakan owner, dan tanpa itu pintunya tetap tertutup
+
+1. MongoDB Atlas M0 (gratis) → dapatkan `MONGO_URL`
+2. Render Web Service, root `backend/`, start `uvicorn server:app --host 0.0.0.0 --port $PORT`
+3. Delapan variabel lingkungan; `OWNER_MASTER_TOKEN` dan `ADMIN_PASSWORD` **wajib nilai baru**
+   — yang tertulis di `memory/test_credentials.md` sudah terpublikasi di repo
+4. `CORS_ORIGINS=https://fiezel.my.id`
+5. Alamat hasilnya ditempel ke `curriculumApiUrl` di `core-config.js`
+
+Catatan jujur untuk owner: Render paket gratis tidur setelah 15 menit menganggur, jadi guru
+yang membuka konsol setelah jeda menunggu ~50 detik. Untuk dipakai guru sungguhan, paketnya
+berbayar.

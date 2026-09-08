@@ -1019,6 +1019,14 @@ jobs:
         # menuntut benderanya MATI di kedua jalur dan tautannya dijaga bendera - sekaligus
         # menuntut mesinnya TIDAK dihapus, supaya satu bendera cukup saat backend siap.
         run: node tests/curriculum-console-gate-test.js
+      - name: 'Konsol kurikulum memanggil alamat yang dikonfigurasi, bukan same-origin'
+        # fz-api.js lahir dengan asumsi ingress mengarahkan /api ke FastAPI di domain yang
+        # sama. Di produksi FIEZEL itu salah - fiezel.my.id hosting statis, /api/health 404.
+        # Backend FIEZEL yang sudah hidup dipanggil lewat alamat absolut dari konfigurasi
+        # (CORE_CONFIG.workerUrl); konsol kurikulum kini mengikuti pola yang sama, dan
+        # PINTUNYA DITURUNKAN DARI ALAMAT ITU - alamat kosong = pintu tertutup, sehingga
+        # tidak ada keadaan "menyala tanpa backend" yang bisa dibuat lewat bendera.
+        run: node tests/curriculum-api-base-test.js
       - name: 'Kursus Jepang tidak menawarkan latihan berbahasa Inggris'
         # Murid memilih Jepang; bank tata bahasa, kosakata, dan bacaan berganti. Menyimak,
         # berbicara, dan menulis TIDAK punya versi Jepang - listening/speaking-bank-v1.json
