@@ -61,8 +61,15 @@ test('alamat backend ADA di konfigurasi, dan kalau terisi ia https tanpa ekor', 
   assert.ok(m, 'curriculumApiUrl belum ada di core-config.js');
   const v = m[1];
   if (v === '') return;
+  /* Dua tuntutan dengan berat yang berbeda, dan itu perlu dikatakan supaya tidak ada yang
+     mengira keduanya sama gentingnya (koreksi dari temuan gitar-bot di PR #395):
+       - https WAJIB: alamat http mengirim token guru dan jawaban murid sebagai teks terbuka.
+       - tanpa ekor garis miring: KANONIKALISASI saja. base() di fz-api.js sudah membuang
+         ekor itu (`.replace(/\/$/, '')`), jadi 'https://x/' tetap berfungsi; kita hanya
+         menolak dua ejaan untuk alamat yang sama. */
   assert.ok(/^https:\/\/[^\s'"]+$/.test(v) && !/\/$/.test(v),
-    "curriculumApiUrl terisi tetapi tidak sah: '" + v + "' (wajib https, tanpa garis miring di ekor)");
+    "curriculumApiUrl terisi tetapi tidak sah: '" + v + "' (wajib https; ekor garis miring " +
+    'ditolak demi satu bentuk kanonik — fz-api sendiri sudah membuangnya)');
 });
 
 test('dua jalur bendera sepakat (fiezel-ux-flags.js dan peta cadangan app.js)', () => {
