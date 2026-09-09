@@ -163,7 +163,20 @@ test('utang palet tidak diam-diam naik ke produksi', () => {
   /* Alasan SATU-SATUNYA kenapa 104 berkas itu boleh berutang adalah karena tidak
      dikapalkan. Kalau alasan itu gugur, utangnya gugur bersamanya — jadi alasannya
      DIPERIKSA, bukan dipercaya. */
-  const shell = read('index.html') + read('sw.js');
+  /* KOMENTAR DIBUANG DULU, dan ini pelajaran yang sudah tiga kali menggigitku di sesi
+     m025-301: gerbang yang memindai prosa bisa dibohongi — atau menuduh — oleh sebuah
+     kalimat. sw.js penuh penjelasan, dan menyebut jalur aset DI DALAM KOMENTAR bukan
+     mengapalkannya. Yang lebih buruk: komentar yang PALING MUNGKIN ditulis orang di sw.js
+     adalah "collection/ sengaja TIDAK diprecache" — persis kalimat yang mendokumentasikan
+     aturan gerbang ini, dan tanpa penyaring ini gerbangnya justru merah karena kalimat itu,
+     sambil menuduh seni yang tidak dikapalkan. Diukur: kalimat itu memerahkan versi
+     sebelumnya. Yang ditanya gerbang ini adalah "apakah murid mengunduhnya", dan hanya
+     kode yang bisa menjawab. Pola '//' menjaga '://' supaya URL tidak ikut terpotong. */
+  const bersih = (src) => src
+    .replace(/\/\*[\s\S]*?\*\//g, ' ')
+    .replace(/<!--[\s\S]*?-->/g, ' ')
+    .replace(/(^|[^:])\/\/[^\n]*/g, '$1 ');
+  const shell = bersih(read('index.html')) + bersih(read('sw.js'));
   /* PENANDA YANG DICARI BERBEDA UNTUK DIREKTORI DAN BERKAS, dan bedanya disengaja
      (temuan review m025-301). Versi pertama memakai basename untuk keduanya, sehingga
      entri direktori 'assets/brand/mascot/collection/' menyusut jadi kata 'collection'
