@@ -175,7 +175,18 @@ test('utang palet tidak diam-diam naik ke produksi', () => {
   const bersih = (src) => src
     .replace(/\/\*[\s\S]*?\*\//g, ' ')
     .replace(/<!--[\s\S]*?-->/g, ' ')
-    .replace(/(^|[^:])\/\/[^\n]*/g, '$1 ');
+    /* '//' hanya dianggap komentar kalau ia berdiri di awal baris atau sesudah spasi,
+       ';', '{', atau '}' — BUKAN sesudah "sembarang yang bukan titik dua" (temuan
+       gitar-bot, PR #396). Versi pertama memakai [^:] untuk melindungi '://', dan itu
+       melindunginya, tapi kutip pembuka juga cocok dengan [^:]: pada
+       src="//cdn.host/assets/brand/mascot/paw-mascot-hello.svg" tanda " itu dibaca
+       sebagai pendahulu komentar, seluruh sisa barisnya dibuang, dan jalur utangnya
+       LENYAP dari yang dipindai. Akibatnya kebalikan dari masalah sebelumnya dan lebih
+       buruk: seni berutang yang benar-benar dikapalkan lewat URL protokol-relatif akan
+       lolos HIJAU. Gerbang yang diam saat seharusnya berteriak lebih berbahaya daripada
+       gerbang yang berteriak salah — yang kedua menyita waktu, yang pertama menipu.
+       Diukur: baris img di atas benar-benar hilang di versi sebelumnya. */
+    .replace(/(^|[\s;{}])\/\/[^\n]*/g, '$1 ');
   const shell = bersih(read('index.html')) + bersih(read('sw.js'));
   /* PENANDA YANG DICARI BERBEDA UNTUK DIREKTORI DAN BERKAS, dan bedanya disengaja
      (temuan review m025-301). Versi pertama memakai basename untuk keduanya, sehingga
