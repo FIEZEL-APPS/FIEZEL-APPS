@@ -72,7 +72,150 @@ const SVGS = [
   'assets/marketing/mascot-poses/paw-mascot-full-celebrating.svg',
   'assets/marketing/mascot-poses/paw-mascot-head-listening.svg',
   'assets/marketing/mascot-poses/paw-mascot-head-proud.svg',
+  // m025-301: dua pose ini SUDAH sesuai G1 dan cuma belum pernah didaftarkan.
+  // Diukur, bukan diasumsikan — keduanya lolos tanpa satu pun warna di luar palet.
+  'assets/brand/mascot/paw-mascot-head.svg',
+  'assets/brand/mascot/paw-mascot-official.svg',
 ];
+
+/* SENI KARAKTER YANG SENGAJA TIDAK DIJAGA — daftar UTANG, bukan daftar lingkup (m025-301).
+   -------------------------------------------------------------------------------------
+   Daftar SVGS di atas ditulis tangan, dan itu berarti gerbang ini hanya sekuat ingatan
+   orang yang terakhir menyuntingnya. Sapuan 8 September 2026 mengukur seluruh repo dan
+   menemukan 104 berkas SVG karakter yang TIDAK pernah diperiksa siapa pun — bukan karena
+   ada yang memutuskan begitu, tetapi karena tidak ada yang tahu.
+
+   Yang diukur (bukan ditebak):
+     - assets/brand/mascot/collection/*.svg — 100 pose, 100 dari 100 di luar palet G1.
+       Warnanya palet bawaan Tailwind (#334155 #06b6d4 #8b5cf6 #fde047 dst), jadi jelas
+       lahir dari pipeline lain, bukan dari rig PAW.
+     - assets/brand/mascot/paw-mascot-hawaiian{,-sunglasses}.svg — palet Material.
+     - assets/brand/mascot/paw-mascot-hello.svg + kembar website/-nya — kuning tetangga
+       (#ffe066 #f5c442) yang mirip G1 tapi bukan G1.
+
+   KENAPA TIDAK LANGSUNG DIJAGA: tidak satu pun dari 104 berkas itu dikapalkan. Dicari di
+   seluruh repo, satu-satunya yang menyebutnya adalah mockups/*.html, dan itu pun menunjuk
+   versi .png-nya. Tidak ada di index.html, tidak ada di ASSETS sw.js, tidak pernah sampai
+   ke murid. Memasukkannya sekarang membuat CI merah selamanya atas seni yang tidak dilihat
+   siapa pun, dan mengecat ulang 100 pose adalah keputusan seni OWNER dengan referensi spec
+   — persis yang dilarang kepala berkas ini: "warna baru tidak pernah masuk lewat tes",
+   dan kebalikannya juga benar, tes tidak boleh memutuskan seni.
+
+   Jadi yang dijaga di bawah BUKAN warnanya, melainkan BATAS UTANG ini: berkas karakter
+   baru — atau berkas lama yang naik dari mockup ke produksi — tidak bisa lagi menyelinap
+   tanpa nama. Ia harus lulus palet, atau ditulis di sini sebagai keputusan bertanggal. */
+const UTANG_TANPA_PALET = [
+  'assets/brand/mascot/collection/',                       // 100 pose, palet Tailwind, hanya di mockups/
+  'assets/brand/mascot/paw-mascot-hawaiian.svg',            // palet Material, tidak dikapalkan
+  'assets/brand/mascot/paw-mascot-hawaiian-sunglasses.svg', // palet Material, tidak dikapalkan
+  'assets/brand/mascot/paw-mascot-hello.svg',               // kuning tetangga, hanya .png-nya di mockups/
+  'website/assets/brand/paw-mascot-hello.svg',              // kembar website dari yang di atas
+];
+/* design/ adalah prototipe yang tidak pernah dimuat produksi (sama seperti pengecualian
+   di css-keyframe-uniq-test), jadi ia di luar lingkup, bukan utang. */
+const BUKAN_PRODUKSI = ['design/', 'node_modules/', 'vendor/'];
+
+test('inventaris: tidak ada SVG karakter yang tak bernama — lulus palet, atau tercatat sebagai utang', () => {
+  const ditemukan = [];
+  (function sapu(dir) {
+    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+      if (e.name === '.git') continue;
+      const abs = path.join(dir, e.name);
+      const rel = path.relative(__fzRoot, abs).split(path.sep).join('/');
+      if (BUKAN_PRODUKSI.some((x) => rel.startsWith(x))) continue;
+      if (e.isDirectory()) { sapu(abs); continue; }
+      /* "SVG karakter" = seni yang menggambar TUBUH PAW. Penandanya adalah nama berkas,
+         karena itu sudah jadi konvensi repo ini sejak awal (paw-*.svg / *paw-mascot*.svg).
+         BATAS HEURISTIK INI PERLU DITULIS, bukan dibiarkan tersirat: logo dan wordmark
+         (fiezel-icon.svg, fiezel-ask.svg, fiezel-wordmark{,-mono}.svg) tidak tertangkap,
+         dan memang di luar lingkup — kepala berkas ini menaruh "chrome aplikasi" di luar
+         palet karakter.
+
+         Tapi satu fakta terukur perlu sampai ke owner, bukan hilang di sini: pengukuran
+         8 September 2026 menemukan fiezel-wordmark.svg membawa #ffc700 dan #e6a800 —
+         PERSIS dua warna yang kepala berkas ini sebut sebagai drift pose lama. Apakah
+         wordmark wajib ikut palet karakter G1 adalah keputusan MEREK milik owner, bukan
+         keputusan tes, jadi gerbang ini tidak memutuskannya sendiri. Kalau owner
+         memutuskan ikut, tambahkan berkasnya ke SVGS. */
+      if (/\.svg$/.test(e.name) && /paw/i.test(e.name)) ditemukan.push(rel);
+    }
+  })(__fzRoot);
+
+  const dijaga = new Set(SVGS);
+  const tercatat = (f) => UTANG_TANPA_PALET.some((x) => (x.endsWith('/') ? f.startsWith(x) : f === x));
+  const liar = ditemukan.filter((f) => !dijaga.has(f) && !tercatat(f));
+
+  if (liar.length) {
+    throw new Error('\n      ' + liar.join('\n      ')
+      + '\n      — SVG karakter yang tidak dijaga palet DAN tidak tercatat sebagai utang.'
+      + '\n      Dua jalan sah: (a) sudah sesuai G1 -> tambahkan ke SVGS, atau'
+      + '\n      (b) belum -> tulis di UTANG_TANPA_PALET dengan alasan dan tanggal, lalu'
+      + '\n      sebutkan di laporan ke owner. Yang tidak sah adalah diam.');
+  }
+  if (ditemukan.length < SVGS.length) {
+    throw new Error('penyapu inventaris hanya menemukan ' + ditemukan.length
+      + ' SVG karakter padahal ' + SVGS.length + ' sudah dijaga dengan tangan — '
+      + 'penyapunya patah, bukan reponya menyusut');
+  }
+});
+
+test('utang palet tidak diam-diam naik ke produksi', () => {
+  /* Alasan SATU-SATUNYA kenapa 104 berkas itu boleh berutang adalah karena tidak
+     dikapalkan. Kalau alasan itu gugur, utangnya gugur bersamanya — jadi alasannya
+     DIPERIKSA, bukan dipercaya. */
+  /* KOMENTAR DIBUANG DULU, dan ini pelajaran yang sudah tiga kali menggigitku di sesi
+     m025-301: gerbang yang memindai prosa bisa dibohongi — atau menuduh — oleh sebuah
+     kalimat. sw.js penuh penjelasan, dan menyebut jalur aset DI DALAM KOMENTAR bukan
+     mengapalkannya. Yang lebih buruk: komentar yang PALING MUNGKIN ditulis orang di sw.js
+     adalah "collection/ sengaja TIDAK diprecache" — persis kalimat yang mendokumentasikan
+     aturan gerbang ini, dan tanpa penyaring ini gerbangnya justru merah karena kalimat itu,
+     sambil menuduh seni yang tidak dikapalkan. Diukur: kalimat itu memerahkan versi
+     sebelumnya. Yang ditanya gerbang ini adalah "apakah murid mengunduhnya", dan hanya
+     kode yang bisa menjawab. Pola '//' menjaga '://' supaya URL tidak ikut terpotong. */
+  const bersih = (src) => src
+    .replace(/\/\*[\s\S]*?\*\//g, ' ')
+    .replace(/<!--[\s\S]*?-->/g, ' ')
+    /* '//' hanya dianggap komentar kalau ia berdiri di awal baris atau sesudah spasi,
+       ';', '{', atau '}' — BUKAN sesudah "sembarang yang bukan titik dua" (temuan
+       gitar-bot, PR #396). Versi pertama memakai [^:] untuk melindungi '://', dan itu
+       melindunginya, tapi kutip pembuka juga cocok dengan [^:]: pada
+       src="//cdn.host/assets/brand/mascot/paw-mascot-hello.svg" tanda " itu dibaca
+       sebagai pendahulu komentar, seluruh sisa barisnya dibuang, dan jalur utangnya
+       LENYAP dari yang dipindai. Akibatnya kebalikan dari masalah sebelumnya dan lebih
+       buruk: seni berutang yang benar-benar dikapalkan lewat URL protokol-relatif akan
+       lolos HIJAU. Gerbang yang diam saat seharusnya berteriak lebih berbahaya daripada
+       gerbang yang berteriak salah — yang kedua menyita waktu, yang pertama menipu.
+       Diukur: baris img di atas benar-benar hilang di versi sebelumnya. */
+    .replace(/(^|[\s;{}])\/\/[^\n]*/g, '$1 ');
+  const shell = bersih(read('index.html')) + bersih(read('sw.js'));
+  /* PENANDA YANG DICARI BERBEDA UNTUK DIREKTORI DAN BERKAS, dan bedanya disengaja
+     (temuan review m025-301). Versi pertama memakai basename untuk keduanya, sehingga
+     entri direktori 'assets/brand/mascot/collection/' menyusut jadi kata 'collection'
+     — kata biasa yang bisa lahir di shell sebagai kelas CSS, nama variabel, atau jalur
+     aset lain yang tidak ada hubungannya dengan seni maskot. Gerbangnya lalu merah
+     sambil menuduh pose maskot yang tidak pernah dikapalkan: merah palsu yang menyita
+     waktu review untuk menelusuri kegagalan yang tidak ada. Diukur 8 September 2026:
+     'collection' nol kali di index.html maupun sw.js, jadi ini utang laten, bukan
+     kerusakan aktif — diperbaiki sekarang justru selagi murah.
+
+       - DIREKTORI -> dicocokkan sebagai JALUR PENUH ('assets/brand/mascot/collection').
+         Rujukan sungguhan ke isinya selalu membawa jalur itu utuh, jadi ketajamannya
+         tidak berkurang sedikit pun, sementara tabrakan kata biasa hilang.
+       - BERKAS -> tetap dicocokkan sebagai BASENAME ('paw-mascot-hello.svg'). Nama
+         seperti itu sudah cukup khas untuk tidak bertabrakan, dan basename menangkap
+         rujukan yang jalurnya ditulis lain (mis. kembar website/ yang dipanggil dari
+         akar) — hal yang justru lolos kalau jalur penuh dipaksakan ke berkas. */
+  const naik = UTANG_TANPA_PALET.filter((x) => {
+    const jejak = x.endsWith('/') ? x.replace(/\/$/, '') : x.split('/').pop();
+    return shell.indexOf(jejak) >= 0;
+  });
+  if (naik.length) {
+    throw new Error(naik.join(', ')
+      + ' — seni ini dikapalkan (disebut index.html atau ASSETS sw.js) padahal tercatat '
+      + 'sebagai utang palet. Begitu murid melihatnya, ia wajib lulus G1: cat ulang, '
+      + 'atau tarik dari shell.');
+  }
+});
 
 test('SVG karakter: tidak ada hex di luar palet G1', () => {
   const drift = [];
