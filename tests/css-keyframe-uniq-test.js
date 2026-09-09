@@ -109,9 +109,58 @@ function keyframesIn(file) {
 }
 
 /* Setiap halaman yang benar-benar dikirim ke pengguna. */
-const PAGES = ['index.html', path.join('website', 'index.html'), path.join('website', 'install', 'index.html')]
-  .map((p2) => path.join(__fzRoot, p2)).filter((p2) => fs.existsSync(p2));
+/* DAFTAR HALAMAN DITEMUKAN, TIDAK DITULIS TANGAN (m025-301).
+   Versi sebelumnya menyebut tiga halaman dengan tangan: index.html, website/index.html,
+   website/install/index.html. Itu benar saat ditulis dan diam-diam berhenti benar: repo
+   sekarang punya kurikulum.html dan misi.html yang masing-masing menautkan CSS dengan
+   empat @keyframes, dan keduanya di luar pengawasan gerbang ini. Tabrakan nama di sana
+   akan lolos hijau — persis dua bug yang membuat gerbang ini ada.
+
+   Gerbang yang memeriksa daftar tulisan tangan hanya sekuat ingatan orang yang terakhir
+   menyuntingnya. Jadi halamannya kini DITEMUKAN dari isi direktori, dan yang ditulis
+   tangan bukan lagi "apa yang diperiksa" melainkan "apa yang SENGAJA tidak diperiksa" —
+   satu daftar pendek dengan alasan, yang salah kalau kosong dan kelihatan kalau tumbuh.
+
+   Yang dikecualikan hanya yang TIDAK BISA DINAVIGASI siapa pun — empat direktori,
+   masing-masing dengan alasannya di sebelah namanya di daftar di bawah: design/ dan
+   mockups/ (prototipe & gambar rancangan, sejalan dengan kepala berkas ini), tools/
+   (harness pengembang), reports/ (keluaran bukti audit). Tabrakan @keyframes di sana
+   nyata tetapi tak berakibat, dan membiarkannya bisa memerahkan CI atas berkas yang
+   tidak pernah dilihat murid. Sisanya — termasuk halaman baru yang belum ada saat
+   kalimat ini ditulis — otomatis masuk pengawasan. */
+const DILUAR_LINGKUP = [
+  'design/',            // prototipe redesign-v1, tidak pernah ditautkan produksi
+  'mockups/',           // gambar rancangan statis, bukan halaman yang dikirim
+  'tools/',             // harness pengembang (probe TTS, pratinjau sfx) — tidak dinavigasi siapa pun
+  'reports/',           // keluaran bukti audit, bukan halaman
+  'node_modules/',
+  'vendor/',
+];
+function temukanHalaman(dir, keluar) {
+  keluar = keluar || [];
+  for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+    if (e.name === '.git') continue;
+    const abs = path.join(dir, e.name);
+    const rel = path.relative(__fzRoot, abs).split(path.sep).join('/');
+    if (DILUAR_LINGKUP.some((x) => rel === x.replace(/\/$/, '') || rel.startsWith(x))) continue;
+    if (e.isDirectory()) temukanHalaman(abs, keluar);
+    else if (e.name.endsWith('.html')) keluar.push(abs);
+  }
+  return keluar;
+}
+/* Halaman yang tidak punya CSS sama sekali (404.html, halaman setup creator) tidak
+   menyimpan @keyframes, jadi tidak bisa bertabrakan. Ia disaring DI SINI, bukan lewat
+   daftar nama, supaya penyaringnya tetap benar kalau halaman itu suatu hari diberi CSS. */
+const SEMUA_HALAMAN = temukanHalaman(__fzRoot);
+const PAGES = SEMUA_HALAMAN.filter((p2) => linkedCss(p2).length + inlineCss(p2).length > 0);
 assert(PAGES.length > 0, 'ada halaman HTML yang diperiksa (' + PAGES.length + ')');
+/* Pagar atas pagar: kalau suatu hari penemuannya rusak (pola diubah, direktori pindah),
+   jumlahnya jatuh dan gerbang ini akan lolos karena tidak memeriksa apa-apa. Tiga halaman
+   adalah yang PASTI ada sejak versi tulisan tangan; kurang dari itu berarti penemunya
+   patah, bukan reponya menyusut. */
+assert(PAGES.length >= 3,
+  'penemu halaman hanya menemukan ' + PAGES.length + ' halaman ber-CSS — dulu tiga ' +
+  'halaman diperiksa dengan tangan, jadi angka di bawah itu berarti penemunya patah');
 
 let totalNames = 0;
 const seen = new Map(); // dipakai pagar khusus di bawah: nama -> lokasi di index.html
