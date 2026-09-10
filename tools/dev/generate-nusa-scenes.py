@@ -25,6 +25,26 @@ STYLE = ("Flat 2D vector storybook illustration, clean smooth shapes, soft cel s
          "No text, no letters, no watermark, no signature. Background must be a completely flat, uniform, "
          "pure bright green (#00FF00) with no gradient, no shadow, no floor, and nothing green in the character or props.")
 
+FLAT_STYLE = ("Corporate flat mascot illustration in the style of modern SaaS / productivity-app brand art: bold, uniform, "
+              "thick dark-brown outlines on every shape, completely flat fill colours, minimal cel shading (one flat shadow tone per colour), "
+              "a few small white glossy highlight shapes, simple geometric forms, no gradients, no texture, no 3D render look. "
+              "The character is Nusa exactly as in the reference images (golden-brown cartoon monkey, round head, cream muzzle and belly, "
+              "big amber eyes, maroon bandana with a cream paw-print, brown crossbody satchel, curly tail) but RE-DRAWN in this flat thick-outline style. "
+              "Anatomy correct: two eyes, one nose, five fingers on the visible hand. No text, letters, watermark or signature.")
+
+FLAT_SCENES = {
+    'login-flat': ("Composition copied from a SaaS login-page hero card: portrait 3:4, the whole image is one flat pastel pink background (#FFE1DC). "
+                   "Nusa is an EXTREME close-up, cropped by the frame: only the top of his head to his upper chest is visible in the lower-left two-thirds "
+                   "of the frame, head tilted slightly, huge cheerful open smile with tongue peeking out, eyes squinting happily; his big open palm waving "
+                   "hand is in the foreground on the lower-right, fingers spread, partially cropped by the bottom edge. Upper-right: a floating white flat "
+                   "paper document with three grey rounded bars (no letters), tilted 15 degrees, with a soft flat drop shadow. Middle-right: a flat "
+                   "checklist icon made of two dark-mauve circles with two rounded bars. Leave the top-left corner empty for a logo. Everything flat, thick outlines."),
+    'login-flat-b': ("Portrait 3:4 hero-card composition on one flat pastel pink background (#FFE1DC). Nusa in extreme close-up cropped by the frame, "
+                     "filling the left and bottom edges: head and shoulders large, waving with a big open palm toward the viewer on the right side, "
+                     "very happy squinting eyes and wide smile. Floating flat props: a white paper card with grey bars top-right, a small flat speech "
+                     "bubble near his head, two list-bullet lines bottom-right. Top-left corner empty. Thick uniform outlines, flat colours."),
+}
+
 SCENES = {
     'login-wave': ("Close-up of Nusa from the waist up, filling the frame, leaning slightly toward the viewer, "
                    "big happy open-mouth smile, right hand raised waving hello with an open palm, left hand "
@@ -68,18 +88,20 @@ def key_green(im):
     return out.crop(bbox) if bbox else out
 
 
-async def render(name, prompt, refs):
+async def render(name, prompt, refs, style=STYLE, keep_bg=False):
     chat = LlmChat(api_key=os.environ['EMERGENT_LLM_KEY'], session_id='nusa-' + name,
                    system_message='You are a senior character illustrator who keeps a mascot perfectly on-model.')
     chat.with_model('gemini', 'gemini-3.1-flash-image-preview').with_params(modalities=['image', 'text'])
-    msg = UserMessage(text=STYLE + ' ' + prompt, file_contents=[ImageContent(x) for x in refs])
+    msg = UserMessage(text=style + ' ' + prompt, file_contents=[ImageContent(x) for x in refs])
     for attempt in range(3):
         try:
             text, images = await chat.send_message_multimodal_response(msg)
             if images:
                 raw = Image.open(io.BytesIO(base64.b64decode(images[0]['data'])))
-                raw.convert('RGB').save(os.path.join(OUT, name + '.raw.jpg'), quality=90)
-                key_green(raw).save(os.path.join(OUT, name + '.png'), optimize=True)
+                if keep_bg:
+                    raw.convert('RGB').save(os.path.join(OUT, name + '.jpg'), quality=92)
+                else:
+                    key_green(raw).save(os.path.join(OUT, name + '.png'), optimize=True)
                 print('ok', name, raw.size); return
             print('no image', name, (text or '')[:80])
         except Exception as e:
@@ -92,7 +114,8 @@ async def main():
             b64(os.path.join(CH, 'nusa', 'png', 'full-wave.png')),
             b64(os.path.join(CH, 'nusa', 'png', 'head-happy.png'))]
     names = sys.argv[1:] or list(SCENES)
-    await asyncio.gather(*(render(n, SCENES[n], refs) for n in names))
+    jobs = [render(n, SCENES[n], refs) if n in SCENES else render(n, FLAT_SCENES[n], refs, FLAT_STYLE, True) for n in names]
+    await asyncio.gather(*jobs)
 
 
 if __name__ == '__main__':
