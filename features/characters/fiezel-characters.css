@@ -1,0 +1,81 @@
+/* FIEZEL Character Universe — kulit Nusa di atas <fiezel-mascot> + penempatan Mira/scene.
+   Dimuat SETELAH fiezel-motion.css supaya menang kaskade. Rig SVG lama disembunyikan,
+   bukan dihapus: gerbang bentuk/palet tetap membaca sumber yang sama. */
+
+/* ---------- kulit Nusa pada <fiezel-mascot> ---------- */
+.fz-mascot.fz-skinned { aspect-ratio: auto; }
+.fz-mascot.fz-skinned > .fz-svg,
+.fz-mascot.fz-skinned > svg:not(.fz-nusa-skin) { visibility: hidden; position: absolute; inset: 0; pointer-events: none; }
+.fz-mascot.fz-skinned .fz-confetti-layer { visibility: visible; }
+.fz-mascot.fz-skinned .fz-nusa-skin {
+  display: block; width: 100%; height: 100%; object-fit: contain; object-position: center bottom;
+  transform-origin: 50% 90%; will-change: transform;
+  animation-duration: 3.2s; animation-timing-function: ease-in-out; animation-iteration-count: infinite;
+}
+.fz-mascot.fz-skin-head { aspect-ratio: 1/1; }
+.fz-mascot.fz-skin-head .fz-nusa-skin { object-position: center center; transform-origin: 50% 70%; }
+.fz-mascot.fz-skin-full { aspect-ratio: 3/4; }
+
+/* wadah bundar lama (coach strip / ring-row / quiz-mascot): wajah mengisi lingkaran */
+.coach-strip-face.has-mascot { overflow: hidden; background: #FDF3D8; border-color: #8C2233; }
+.coach-strip-face.has-mascot .fz-mascot.fz-skinned { width: 100%; height: 100%; }
+.coach-strip-face.has-mascot .fz-nusa-skin { transform: scale(1.18) translateY(6%); }
+.fz-coach-bubble .fz-coach-mascot.fz-skinned .fz-nusa-skin { transform: scale(1.1) translateY(4%); }
+
+/* panggung penuh (lesson/writing/result/onboarding) */
+.lesson-stage-paw .fz-mascot.fz-skinned,
+.writing-stage .fz-mascot.fz-skinned,
+.result-stage .fz-mascot.fz-skinned,
+.path-mascot .fz-mascot.fz-skinned { width: clamp(96px, 26vw, 150px); }
+.fiezel-ob-mascot .fz-mascot.fz-skinned { width: 100%; height: 100%; aspect-ratio: auto; }
+
+/* ---------- micro-motion per state (halus, panjang; dimatikan di reduce-motion) ---------- */
+@keyframes fzc-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-3%); } }
+@keyframes fzc-wave { 0%,100% { transform: rotate(0); } 25% { transform: rotate(-3deg); } 75% { transform: rotate(3deg); } }
+@keyframes fzc-jump { 0%,100% { transform: translateY(0) scale(1); } 30% { transform: translateY(-9%) scale(1.03); } 55% { transform: translateY(0) scale(.98,1.02); } }
+@keyframes fzc-nod { 0%,100% { transform: rotate(0); } 40% { transform: rotate(4deg) translateY(1%); } }
+@keyframes fzc-shake { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-2%); } 60% { transform: translateX(2%); } }
+@keyframes fzc-tilt { 0%,100% { transform: rotate(0); } 50% { transform: rotate(-5deg); } }
+@keyframes fzc-breathe { 0%,100% { transform: scale(1); } 50% { transform: scale(1.02); } }
+.fz-mascot.fz-m-float .fz-nusa-skin { animation-name: fzc-float; animation-duration: 4.6s; }
+.fz-mascot.fz-m-wave .fz-nusa-skin { animation-name: fzc-wave; animation-duration: 1.4s; animation-iteration-count: 2; }
+.fz-mascot.fz-m-jump .fz-nusa-skin { animation-name: fzc-jump; animation-duration: .9s; animation-iteration-count: 2; }
+.fz-mascot.fz-m-nod .fz-nusa-skin { animation-name: fzc-nod; animation-duration: 1.2s; animation-iteration-count: 1; }
+.fz-mascot.fz-m-shake .fz-nusa-skin { animation-name: fzc-shake; animation-duration: .7s; animation-iteration-count: 1; }
+.fz-mascot.fz-m-tilt .fz-nusa-skin { animation-name: fzc-tilt; animation-duration: 2.4s; }
+.fz-mascot.fz-m-breathe .fz-nusa-skin { animation-name: fzc-breathe; animation-duration: 3.6s; }
+.coach-strip-face.has-mascot .fz-mascot[class*="fz-m-"] .fz-nusa-skin,
+.fz-coach-bubble .fz-coach-mascot[class*="fz-m-"] .fz-nusa-skin { animation-name: none; }
+body.reduce-motion .fz-mascot .fz-nusa-skin,
+.fz-mascot.fz-skinned.st-idle.fz-quiet .fz-nusa-skin { animation: none !important; }
+@media (prefers-reduced-motion: reduce) { .fz-mascot .fz-nusa-skin { animation: none !important; } }
+
+/* ---------- gambar karakter mandiri (Mira, Nusa, tim) ---------- */
+.fz-char { display: block; line-height: 0; }
+.fz-char img { display: block; width: 100%; height: auto; }
+.fz-scene { display: block; line-height: 0; border-radius: 22px; overflow: hidden; }
+.fz-scene img { display: block; width: 100%; height: auto; }
+
+/* Kartu Mira — pemandu kelas (sisi murid: Kelas; sisi guru: KelasKu) */
+.fz-mira-card {
+  display: grid; grid-template-columns: 96px 1fr; gap: 14px; align-items: end;
+  background: #EAF3E6; border: 2px solid #1F7A63; border-radius: 22px; padding: 14px 16px 0 12px;
+  overflow: hidden; margin: 0 0 14px;
+}
+.fz-mira-card .fz-char { align-self: end; }
+.fz-mira-card .fz-char img { max-height: 132px; width: auto; }
+.fz-mira-card .fz-mira-say { padding-bottom: 14px; min-width: 0; }
+.fz-mira-card .fz-mira-say small { display: block; font-size: .62rem; letter-spacing: .13em; text-transform: uppercase; font-weight: 700; color: #1F7A63; margin-bottom: 4px; }
+.fz-mira-card .fz-mira-say p { margin: 0; font-size: .92rem; line-height: 1.4; color: #1B1418; }
+@media (max-width: 380px) { .fz-mira-card { grid-template-columns: 76px 1fr; } .fz-mira-card .fz-char img { max-height: 108px; } }
+
+/* Empty / offline state — Nusa tidur + Mira membaca */
+.fz-empty-scene { margin: 6px auto 12px; max-width: 320px; }
+.fz-empty-scene .fz-scene { border-radius: 20px; box-shadow: 0 8px 24px rgba(27,20,24,.08); }
+
+/* Result / celebration — tim di atas kartu hasil */
+.result-stage .fz-team-cheer { width: min(240px, 60vw); margin: -6px auto 4px; }
+
+/* Progress — tim berjalan sebagai penanda level */
+.fz-progress-team { display: flex; justify-content: flex-end; margin: -6px 4px 6px; }
+.fz-progress-team .fz-char { width: clamp(120px, 34vw, 180px); }

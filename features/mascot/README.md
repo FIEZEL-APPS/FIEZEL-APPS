@@ -8,6 +8,14 @@
 | `fiezel-motion.css` | DIPAKAI. Token gerak + animasi 14 state + penempatan di aplikasi. Dimuat PALING AKHIR di antara stylesheet. Ikut di-precache. |
 | `micro-ui.css` | REFERENSI, BELUM DIPAKAI. Tidak dimuat `index.html`, tidak di-precache. Berisi toast, ring progres, checkmark, skeleton. Baca sebelum membuat komponen serupa dari nol. |
 
+## Kulit karakter (Juni 2026 — FIEZEL Character Universe)
+
+`features/characters/fiezel-characters.js` menambal `setState` pada `<fiezel-mascot>` dan
+menumpangkan gambar **Nusa** (monyet, `assets/characters/nusa/`) di atas rig SVG lama; rig-nya
+disembunyikan lewat CSS, bukan dihapus, sehingga semua gerbang bentuk/palet tetap membaca sumber
+yang sama. API `FiezelPaw.*` tidak berubah. Peta state → pose dan konteks penempatan ada di
+`docs/FIEZEL-CHARACTER-UNIVERSE.md` dan `docs/FIEZEL-CHARACTER-CONTEXT-MAP.md`.
+
 ## Cara memanggil
 
 Satu pintu, `self.FiezelPaw`:

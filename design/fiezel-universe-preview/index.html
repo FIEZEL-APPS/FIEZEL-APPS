@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FIEZEL Character Universe — Asset Library</title>
+<style>
+:root{--maroon:#8C2233;--gold:#D8B36B;--cream:#FDFAF3;--ink:#1B1418;--green:#1F7A63;--leaf:#2E7D4F;--muted:#5c5344}
+*{box-sizing:border-box}
+body{margin:0;background:var(--cream);color:var(--ink);font:15px/1.5 "Plus Jakarta Sans",ui-sans-serif,system-ui,sans-serif}
+.wrap{max-width:1100px;margin:0 auto;padding:40px 20px 80px}
+.badge{display:inline-block;background:var(--maroon);color:#fff;font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;padding:6px 12px;border-radius:999px}
+h1{font-size:clamp(30px,5vw,52px);line-height:1.05;margin:16px 0 8px;letter-spacing:-.02em}
+h1 .hl{color:var(--maroon)}
+.lead{max-width:640px;color:var(--muted);font-size:17px}
+section{margin-top:56px}
+.sec-head{display:flex;gap:16px;align-items:baseline;margin-bottom:16px}
+.num{font-size:12px;font-weight:800;color:var(--gold);letter-spacing:.2em}
+h2{font-size:22px;margin:0}
+.sec-head p{margin:4px 0 0;color:var(--muted);font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
+.grid.big{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+.tile{background:#fff;border:1px solid #eee3cf;border-radius:18px;padding:12px;display:flex;flex-direction:column;gap:8px;align-items:center}
+.tile .art{width:100%;aspect-ratio:1/1;display:grid;place-items:center;background:repeating-conic-gradient(#f3ede0 0 25%,#fff 0 50%) 0 0/20px 20px;border-radius:12px;overflow:hidden}
+.tile .art img{max-width:92%;max-height:92%;object-fit:contain}
+.tile b{font-size:12px;font-family:ui-monospace,monospace;color:var(--maroon)}
+.tile small{color:var(--muted);font-size:11px;text-align:center}
+.tile .fmt{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.tile .fmt a{font-size:10px;text-decoration:none;color:var(--ink);background:#f6efdf;border-radius:999px;padding:2px 8px;font-weight:700}
+.scene{border-radius:20px;overflow:hidden;background:#fff;border:1px solid #eee3cf}
+.scene img{display:block;width:100%;height:auto}
+.palette{display:flex;flex-wrap:wrap;gap:10px}
+.sw{width:112px;font-size:11px;color:var(--muted)}
+.sw i{display:block;height:44px;border-radius:12px;margin-bottom:4px;border:1px solid rgba(0,0,0,.06)}
+.rules{columns:2;column-gap:32px;font-size:14px;color:var(--muted)}
+.rules li{break-inside:avoid;margin-bottom:6px}
+.ref{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.ref img{width:100%;border-radius:16px;border:1px solid #eee3cf}
+.footer{margin-top:56px;padding-top:20px;border-top:1px dashed #d8ccb0;color:var(--muted);font-size:13px}
+@media (max-width:640px){.rules{columns:1}.ref{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="badge">FIEZEL · Character Universe v1.0 · Asset Library</span>
+  <h1>Nusa & Mira <span class="hl">— Semesta Karakter FIEZEL</span></h1>
+  <p class="lead">Character Bible → Master Character → Construction System → Pose/Expression Library → Asset Library. Dokumen lengkap (ID + TH): <code>docs/FIEZEL-CHARACTER-UNIVERSE.md</code> dan <code>docs/FIEZEL-CHARACTER-CONTEXT-MAP.md</code>.</p>
+
+  <section>
+    <div class="sec-head"><span class="num">01</span><div><h2>Character Bible — gambar acuan</h2><p>Sumber render ulang. Setiap aset baru wajib dirender dari acuan ini dengan instruksi "ubah hanya pose".</p></div></div>
+    <div class="ref">
+      <img src="../../assets/characters/_reference/nusa-sheet.jpg" alt="Nusa character sheet">
+      <img src="../../assets/characters/_reference/mira-sheet.jpg" alt="Mira character bible">
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="num">02</span><div><h2>Nusa — Pose &amp; Ekspresi</h2><p>Monyet ekor panjang · syal marun ber-emblem PAW · tas selempang. 6 pose badan + 4 bust.</p></div></div>
+    <div class="grid" data-lib="nusa"></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="num">03</span><div><h2>Mira — Pose &amp; Ekspresi</h2><p>Guru petualang · kacamata bulat · pin PAW emas · kompas. 5 pose badan + 4 bust (tanpa topi).</p></div></div>
+    <div class="grid" data-lib="mira"></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="num">04</span><div><h2>Tim — Guru &amp; Murid, satu bingkai</h2><p>Nusa di pundak, tos, belajar bersama, mengintip dari topi, berjalan beriringan.</p></div></div>
+    <div class="grid big" data-lib="team"></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="num">05</span><div><h2>Scene konteks</h2><p>Hero landing · Onboarding · Celebration · Empty / Offline.</p></div></div>
+    <div class="grid big" data-lib="scenes"></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="num">06</span><div><h2>Construction System</h2></div></div>
+    <ul class="rules">
+      <li>Identitas tetap: bentuk kepala, mata, warna tanda tangan, kostum, siluet — hanya pose/ekspresi yang berubah.</li>
+      <li>Anatomi bersih: dua tangan lima jari, dua kaki, satu ekor; tidak ada bagian ganda/hilang/menyatu/terpotong.</li>
+      <li>Aksesori tetap: Nusa = syal + tas; Mira = kacamata + pin PAW + kompas (+ topi pada pose badan &amp; tim).</li>
+      <li>Emblem PAW selalu 4 batang + 1 telapak (<code>assets/brand/fiezel-paw.svg</code>).</li>
+      <li>Tanpa outline, cel-shading dua nada, tanpa gradasi/glow/3D.</li>
+      <li>Netral budaya: tanpa bendera, teks, atau simbol negara.</li>
+    </ul>
+    <div class="palette" style="margin-top:18px">
+      <div class="sw"><i style="background:#8C2233"></i>Marun</div><div class="sw"><i style="background:#E0A33C"></i>Oker</div><div class="sw"><i style="background:#B97F2A"></i>Oker gelap</div><div class="sw"><i style="background:#FDFAF3"></i>Krem</div><div class="sw"><i style="background:#D8B36B"></i>Emas</div><div class="sw"><i style="background:#2E7D4F"></i>Hijau hutan</div><div class="sw"><i style="background:#1F7A63"></i>Scrunchie</div><div class="sw"><i style="background:#FDEFD8"></i>Kulit</div><div class="sw"><i style="background:#4B281E"></i>Rambut</div><div class="sw"><i style="background:#2A9D8F"></i>Teal</div><div class="sw"><i style="background:#1B1418"></i>Tinta</div>
+    </div>
+  </section>
+
+  <div class="footer">Format: PNG transparan (2x &amp; 1x) · WebP · SVG (vektorisasi) · JPG/WebP untuk scene. Manifest: <code>assets/characters/manifest.json</code>.</div>
+</div>
+<script>
+fetch('../../assets/characters/manifest.json').then(r=>r.json()).then(m=>{
+  const B='../../';
+  for(const ch of ['nusa','mira','team']){
+    const g=document.querySelector(`[data-lib="${ch}"]`);
+    g.innerHTML=Object.entries(m.characters[ch]).map(([k,v])=>`<div class="tile"><div class="art"><img src="${B}${v.webp}" alt="${ch} ${k}" loading="lazy"></div><b>${k}</b><small>${v.w}×${v.h}</small><div class="fmt"><a href="${B}${v.png}" download>PNG</a><a href="${B}${v.png1x}" download>PNG 1x</a><a href="${B}${v.webp}" download>WebP</a><a href="${B}${v.svg}" download>SVG</a></div></div>`).join('');
+  }
+  const s=document.querySelector('[data-lib="scenes"]');
+  s.innerHTML=Object.entries(m.scenes).map(([k,v])=>`<div class="tile"><div class="scene"><img src="${B}${v.webp}" alt="scene ${k}" loading="lazy"></div><b>${k}</b><small>${v.w}×${v.h}</small><div class="fmt"><a href="${B}${v.jpg}" download>JPG</a><a href="${B}${v.webp}" download>WebP</a></div></div>`).join('');
+});
+</script>
+</body>
+</html>
